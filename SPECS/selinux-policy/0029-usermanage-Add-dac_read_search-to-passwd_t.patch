@@ -1,0 +1,73 @@
+From 60ea2b22ee115147f6bbebc328152cb23fe6c9bd Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Thu, 9 Feb 2023 21:18:33 +0000
+Subject: [PATCH 29/35] usermanage: Add dac_read_search to passwd_t.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/admin/cloudinit.if  | 18 ++++++++++++++++++
+ policy/modules/admin/usermanage.te |  2 +-
+ policy/modules/system/systemd.te   |  4 ++++
+ 3 files changed, 23 insertions(+), 1 deletion(-)
+
+MSFT_TAG: pending
+
+diff --git a/policy/modules/admin/cloudinit.if b/policy/modules/admin/cloudinit.if
+index 604f56dc4..525fd7795 100644
+--- a/policy/modules/admin/cloudinit.if
++++ b/policy/modules/admin/cloudinit.if
+@@ -1,5 +1,23 @@
+ ## <summary>Init scripts for cloud VMs</summary>
+ 
++########################################
++## <summary>
++##	Read cloud-init process state.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`cloudinit_read_state',`
++	gen_require(`
++		type cloud_init_t;
++	')
++
++	ps_process_pattern($1, cloud_init_t)
++')
++
+ ########################################
+ ## <summary>
+ ##	Read and write inherited cloud-init pipes.
+diff --git a/policy/modules/admin/usermanage.te b/policy/modules/admin/usermanage.te
+index 4123605c9..b66c3ef95 100644
+--- a/policy/modules/admin/usermanage.te
++++ b/policy/modules/admin/usermanage.te
+@@ -294,7 +294,7 @@ optional_policy(`
+ # Passwd local policy
+ #
+ 
+-allow passwd_t self:capability { chown dac_override fsetid setgid setuid sys_nice sys_resource };
++allow passwd_t self:capability { chown dac_override dac_read_search fsetid setgid setuid sys_nice sys_resource };
+ dontaudit passwd_t self:capability sys_tty_config;
+ allow passwd_t self:process { transition signal_perms getsched setsched getsession getpgid setpgid getcap setcap share getattr setfscreate noatsecure siginh setrlimit rlimitinh dyntransition setkeycreate setsockcreate getrlimit };
+ allow passwd_t self:fd use;
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index a5ca5575b..84d14eb18 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -941,6 +941,10 @@ tunable_policy(`systemd_logind_get_bootloader',`
+ # This reads the first sectors of fixed disk devices.
+ storage_raw_read_fixed_disk_cond(systemd_logind_t, systemd_logind_get_bootloader)
+ 
++optional_policy(`
++	cloudinit_read_state(systemd_logind_t)
++')
++
+ optional_policy(`
+ 	dbus_connect_system_bus(systemd_logind_t)
+ 	dbus_system_bus_client(systemd_logind_t)
+-- 
+2.34.1
+

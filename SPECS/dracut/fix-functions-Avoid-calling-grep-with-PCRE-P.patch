@@ -1,0 +1,32 @@
+From 937121dc301aa7396630665852a295c51dbc938e Mon Sep 17 00:00:00 2001
+From: Daniel McIlvaney <damcilva@microsoft.com>
+Date: Fri, 28 Apr 2023 14:02:05 -0700
+Subject: [PATCH] fix(functions): Avoid calling grep with PCRE (-P)
+
+Invoking grep in Perl mode requires JIT'ing the Perl regex.
+This can run into issues with SELinix policy which will generally try to
+limit use of execmem in general purpose scripts. This occurs since the
+JIT'd code will live in executable  memory.
+
+The PCRE only '\K' command in the Perl REGEX can be replaced by a call
+to awk instead.
+---
+ dracut-functions.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dracut-functions.sh b/dracut-functions.sh
+index f55d5dd4..b48c4b18 100755
+--- a/dracut-functions.sh
++++ b/dracut-functions.sh
+@@ -244,7 +244,7 @@ get_maj_min() {
+     local _out
+ 
+     if [[ $get_maj_min_cache_file ]]; then
+-        _out="$(grep -m1 -oP "^$1 \K\S+$" "$get_maj_min_cache_file")"
++        _out="$(grep -m1 -oE "^$1 \S+$" "$get_maj_min_cache_file" | awk '{print $NF}')"
+     fi
+ 
+     if ! [[ "$_out" ]]; then
+-- 
+2.17.1
+

@@ -1,0 +1,68 @@
+From 5c142d954fb3139abe9506fa01eae244042d8093 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Thu, 9 Feb 2023 19:27:37 +0000
+Subject: [PATCH 27/35] cloud-init: Allow use of sudo in runcmd.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/admin/cloudinit.te | 14 ++++++++++++++
+ policy/modules/admin/sudo.if      | 19 +++++++++++++++++++
+ 2 files changed, 33 insertions(+)
+
+MSFT_TAG: pending
+
+diff --git a/policy/modules/admin/cloudinit.te b/policy/modules/admin/cloudinit.te
+index 377891941..ec0db3209 100644
+--- a/policy/modules/admin/cloudinit.te
++++ b/policy/modules/admin/cloudinit.te
+@@ -114,6 +114,20 @@ optional_policy(`
+ 	rpm_domtrans(cloud_init_t)
+ ')
+ 
++optional_policy(`
++	# If sudo is used in runcmd:
++	allow cloud_init_t self:capability sys_resource;
++	allow cloud_init_t self:process { setrlimit setsched };
++
++	sudo_exec(cloud_init_t)
++
++	userdom_search_user_runtime(cloud_init_t)
++
++	optional_policy(`
++		systemd_write_inherited_logind_sessions_pipes(cloud_init_t)
++	')
++')
++
+ optional_policy(`
+ 	systemd_dbus_chat_hostnamed(cloud_init_t)
+ ')
+diff --git a/policy/modules/admin/sudo.if b/policy/modules/admin/sudo.if
+index 4840c740c..06867833d 100644
+--- a/policy/modules/admin/sudo.if
++++ b/policy/modules/admin/sudo.if
+@@ -229,3 +229,22 @@ interface(`sudo_sigchld',`
+ 
+ 	allow $1 sudodomain:process sigchld;
+ ')
++
++########################################
++## <summary>
++##	Execute sudo in the caller domain.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`sudo_exec',`
++	gen_require(`
++		type sudo_exec_t;
++	')
++
++	can_exec($1, sudo_exec_t)
++	corecmd_search_bin($1)
++')
+-- 
+2.34.1
+

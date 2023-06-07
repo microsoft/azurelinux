@@ -1,0 +1,26 @@
+From 5c16e156d420258c327243172cccb8817a264688 Mon Sep 17 00:00:00 2001
+From: Muhammad Falak R Wani <falakreyaz@gmail.com>
+Date: Mon, 20 Mar 2023 10:47:21 +0530
+Subject: [PATCH] rust: lib: modify lint for `unused_must_use` to enable build
+
+Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
+---
+ rust/src/lib.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/rust/src/lib.rs b/rust/src/lib.rs
+index 25ac0881..735cdaa7 100644
+--- a/rust/src/lib.rs
++++ b/rust/src/lib.rs
+@@ -10,7 +10,7 @@
+ // See https://doc.rust-lang.org/rustc/lints/listing/allowed-by-default.html
+ #![deny(missing_debug_implementations)]
+ #![deny(unsafe_op_in_unsafe_fn)]
+-#![forbid(unused_must_use)]
++#![warn(unused_must_use)]
+ #![allow(clippy::ptr_arg)]
+ 
+ // pub(crate) utilities
+-- 
+2.40.0
+

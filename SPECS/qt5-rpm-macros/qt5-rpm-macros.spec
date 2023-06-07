@@ -1,7 +1,7 @@
 Summary:        RPM macros for building Qt5 and KDE Frameworks 5 packages
 Name:           qt5-rpm-macros
 Version:        5.12.5
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3
 URL:            https://getfedora.org/
 Source0:        macros.qt5
@@ -43,6 +43,9 @@ sed -i \
 
 
 %changelog
+* Fri May 26 2023 Thien Trung Vuong <tvuong@microsoft.com> - 5.12.5-3
+- Verified license.
+
 * Thu Apr 02 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.12.5-2
 - Initial CBL-Mariner import from Fedora 31 (license: MIT).
 - Removing qt5 meta package bits and leaving only the macros.

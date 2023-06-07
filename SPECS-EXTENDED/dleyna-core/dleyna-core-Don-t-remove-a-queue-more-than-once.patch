@@ -1,0 +1,162 @@
+From 99244a4a19ee208e757df90602723278007c1b58 Mon Sep 17 00:00:00 2001
+From: Debarshi Ray <debarshir@freedesktop.org>
+Date: Fri, 4 Dec 2020 02:17:48 +0100
+Subject: [PATCH] Don't remove a queue more than once
+
+Currently, the dleyna_task_processor_remove_queues_for_sink and
+dleyna_task_processor_remove_queues_for_source APIs can corrupt the
+memory of the hash table of queues in the processor.
+
+These APIs iterate through the queues in the hash table using
+g_hash_table_foreach_remove, and let the callbacks return TRUE when a
+queue is to be removed. Unfortunately, the callbacks use prv_cancel,
+which might have already removed the queue using g_hash_table_remove.
+It happens specifically for queues that have no current_task and have
+the DLEYNA_TASK_QUEUE_FLAG_AUTO_REMOVE flag set.
+
+dleyna-renderer-service has such a queue, whose task_delete_cb handler
+is set to dleyna_gasync_task_delete_cb. When dleyna-renderer-service
+loses it's last D-Bus client, it first invokes
+dleyna_task_processor_remove_queues_for_source, followed by
+dleyna_task_processor_set_quitting. The former corrupts the hash
+table. The latter invokes prv_cancel_all_queues, which again goes
+through the hash table and tries to remove them. This leads to crashes
+with backtraces containing dleyna_gasync_task_delete_cb, GPtrArray,
+prv_task_cancel_and_free_cb, or similar code paths originating from
+prv_cancel_only.
+
+Here's an example:
+
+%0  prv_task_cancel_and_free_cb (data=0x56246f2425f0,
+                                 user_data=<optimized out>)
+    at libdleyna/core/task-processor.c:180
+%1  g_ptr_array_foreach (array=0x56246f68b5a0,
+                         func=0x7f41d2335850 <prv_task_cancel_and_free_cb>,
+                         user_data=0x56246f4ea1a0)
+    at ../glib/garray.c:2091
+%2  prv_cancel_only (queue_id=<optimized out>,
+                     task_queue=0x56246f4ea1a0)
+    at libdleyna/core/task-processor.c:193
+%3  prv_cancel_cb (key=<optimized out>,
+                   value=0x56246f4ea1a0,
+                   user_data=<optimized out>)
+    at libdleyna/core/task-processor.c:229
+%4  g_hash_table_foreach_remove_or_steal (hash_table=0x56246f1e82a0,
+                                          func=func@entry=0x7f41d2335c10 <prv_cancel_cb>,
+                                          user_data=user_data@entry=0x0,
+                                          notify=notify@entry=1)
+    at ../glib/ghash.c:1947
+%5  g_hash_table_foreach_remove (hash_table=<optimized out>,
+                                 func=func@entry=0x7f41d2335c10 <prv_cancel_cb>,
+                                 user_data=user_data@entry=0x0)
+    at ../glib/ghash.c:1993
+%6  prv_cancel_all_queues (processor=0x56246f1f3510)
+    at libdleyna/core/task-processor.c:244
+%7  dleyna_task_processor_set_quitting (processor=0x56246f1f3510)
+    at libdleyna/core/task-processor.c:259
+%8  prv_lost_client (connection=<optimized out>,
+                     name=0x56246f24e5d0 ":1.47515",
+                     user_data=<optimized out>)
+    at src/connector-dbus.c:283
+%9  actually_do_call (call_type=CALL_TYPE_NAME_VANISHED,
+                      name_owner=<optimized out>,
+                      connection=<optimized out>,
+                      client=0x56246f24efb0)
+    at ../gio/gdbusnamewatching.c:171
+%10 actually_do_call (call_type=CALL_TYPE_NAME_VANISHED,
+                      name_owner=<optimized out>,
+                      connection=<optimized out>,
+                      client=0x56246f24efb0)
+    at ../gio/gdbusnamewatching.c:149
+%11 do_call (client=0x56246f24efb0, call_type=CALL_TYPE_NAME_VANISHED)
+    at ../gio/gdbusnamewatching.c:224
+%12 call_vanished_handler (client=0x56246f24efb0)
+    at ../gio/gdbusnamewatching.c:249
+%13 call_vanished_handler (client=0x56246f24efb0)
+    at ../gio/gdbusnamewatching.c:242
+%14 on_name_owner_changed (connection=<optimized out>,
+                           sender_name=0x56246f24a260 "org.freedesktop.DBus",
+                           object_path=0x56246f7ad950 "/org/freedesktop/DBus",
+                           interface_name=0x56246f27a2a0 "org.freedesktop.DBus",
+                           signal_name=<optimized out>,
+                           parameters=0x56246f21ee90, user_data=0x1)
+    at ../gio/gdbusnamewatching.c:352
+%15 emit_signal_instance_in_idle_cb (data=data@entry=0x56246f236950)
+    at ../gio/gdbusconnection.c:3777
+%16 g_idle_dispatch (source=source@entry=0x56246f7080a0,
+                     callback=0x7f41d1e1e640 <emit_signal_instance_in_idle_cb>,
+                     user_data=0x56246f236950)
+    at ../glib/gmain.c:5836
+%17 g_main_dispatch (context=0x56246f1f2920) at ../glib/gmain.c:3325
+%18 g_main_context_dispatch (context=0x56246f1f2920)
+    at ../glib/gmain.c:4043
+%19 g_main_context_iterate.constprop.0 (context=0x56246f1f2920,
+                                        block=block@entry=1,
+                                        dispatch=dispatch@entry=1,
+                                        self=<optimized out>)
+    at ../glib/gmain.c:4119
+%20 g_main_loop_run (loop=0x56246f2337a0) at ../glib/gmain.c:4317
+%21 dleyna_main_loop_start (server=<optimized out>,
+                            control_point=<optimized out>,
+                            user_data=<optimized out>)
+    at libdleyna/core/main-loop.c:154
+%22 __libc_start_main (main=0x56246d8b40d0 <main>,
+                       argc=1,
+                       argv=0x7ffd4b757768,
+                       init=<optimized out>,
+                       fini=<optimized out>,
+                       rtld_fini=<optimized out>,
+                       stack_end=0x7ffd4b757758)
+    at ../csu/libc-start.c:314
+%23 _start ()
+
+Looking at the innards of the task_queue, it's seen that all the
+function pointers have the same value, which doesn't match with the
+reality of the code and is indicative of a memory error:
+
+(gdb) print *task_queue
+$2 = {tasks = 0x56210d62385a,
+  task_process_cb = 0x9595959595959595,
+  task_cancel_cb = 0x9595959595959595,
+  task_delete_cb = 0x9595959595959595,
+  task_queue_finally_cb = 0x9595959595959595,
+  current_task = 0x9595959595959595,
+  idle_id = 2509608341,
+  defer_remove = -1785358955,
+  flags = 2509608341,
+  user_data = 0x9595959595959595,
+  cancelled = -1785358955}
+
+Based on initial work done by Robert Tiemann.
+
+https://bugzilla.redhat.com/show_bug.cgi?id=1903139
+https://github.com/phako/dleyna-core/pull/1
+---
+ libdleyna/core/task-processor.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libdleyna/core/task-processor.c b/libdleyna/core/task-processor.c
+index 39529a3dc967..f50dd569ed61 100644
+--- a/libdleyna/core/task-processor.c
++++ b/libdleyna/core/task-processor.c
+@@ -285,7 +285,7 @@ static gboolean prv_free_queue_for_source(gpointer key, gpointer value,
+ 
+ 	if (!strcmp(source, queue_key->source) && !queue->defer_remove) {
+ 		queue->defer_remove = (queue->current_task != NULL);
+-		prv_cancel(queue_key, queue);
++		prv_cancel_only(queue_key, queue);
+ 
+ 		if (!queue->defer_remove) {
+ 			DLEYNA_LOG_DEBUG("Removing queue <%s,%s>",
+@@ -320,7 +320,7 @@ static gboolean prv_free_queue_for_sink(gpointer key, gpointer value,
+ 
+ 	if (!strcmp(sink, queue_key->sink) && !queue->defer_remove) {
+ 		queue->defer_remove = (queue->current_task != NULL);
+-		prv_cancel(queue_key, queue);
++		prv_cancel_only(queue_key, queue);
+ 
+ 		if (!queue->defer_remove) {
+ 			DLEYNA_LOG_DEBUG("Removing queue <%s,%s>",
+-- 
+2.28.0
+

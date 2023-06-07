@@ -1,11 +1,11 @@
 # Retrieved from 'deps/npm/package.json' inside the sources tarball.
-%define npm_version 8.19.2
+%define npm_version 8.19.3
 
 Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
-Version:        16.18.1
+Version:        16.19.1
 Release:        2%{?dist}
 License:        BSD and MIT and Public Domain and NAIST-2003 and Artistic-2.0
 Group:          Applications/System
@@ -27,6 +27,7 @@ BuildRequires:  openssl-devel >= 1.1.1
 BuildRequires:  python3
 BuildRequires:  which
 BuildRequires:  zlib-devel
+BuildRequires:  c-ares-devel
 
 Requires:       brotli
 Requires:       coreutils >= 8.22
@@ -78,7 +79,8 @@ python3 configure.py \
   --with-intl=small-icu \
   --with-icu-source=deps/icu-small \
   --without-dtrace \
-  --openssl-use-def-ca-store
+  --openssl-use-def-ca-store \
+  --shared-cares
 
 JOBS=4 make %{?_smp_mflags} V=0
 
@@ -93,8 +95,6 @@ install -m 755 -d %{buildroot}%{_datadir}/%{name}
 for FILE in .gitmodules .gitignore .npmignore .travis.yml \*.py[co]; do
   find %{buildroot}%{_libdir}/node_modules/ -name "$FILE" -delete
 done
-
-install -m 644 -d %{buildroot}%{_datadir}/systemtap/tapset/node.stp
 
 %check
 make cctest
@@ -116,6 +116,13 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
+* Tue May 30 2023 Dallas Delaney <dadelan@microsoft.com> - 16.19.1-2
+- Fix CVE-2023-32067, CVE-2023-31130, CVE-2023-31147 by using system c-ares
+
+* Wed Mar 01 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 16.19.1-1
+- Auto-upgrade to 16.19.1 - to fix CVE-2023-23936
+- Update npm version to 8.19.3 to reflect the actual version of npm bundled with v16.19.1
+
 * Tue Dec 13 2022 Andrew Phelps <anphel@microsoft.com> - 16.18.1-2
 - Update license to reference Artistic 2.0
 

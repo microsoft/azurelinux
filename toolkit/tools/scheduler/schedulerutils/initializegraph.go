@@ -26,8 +26,7 @@ func InitializeGraph(inputFile string, packagesToBuild []*pkgjson.PackageVer, de
 	// Delta builds can use cached implicit nodes
 	canUseCachedImplicit := deltaBuild
 
-	pkgGraph = pkggraph.NewPkgGraph()
-	err = pkggraph.ReadDOTGraphFile(pkgGraph, inputFile)
+	pkgGraph, err = pkggraph.ReadDOTGraphFile(inputFile)
 	if err != nil {
 		return
 	}

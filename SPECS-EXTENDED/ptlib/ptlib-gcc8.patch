@@ -1,0 +1,12 @@
+--- ptlib-2.10.11/src/ptlib/unix/channel.cxx.orig	2018-07-23 18:25:26.300381968 +0100
++++ ptlib-2.10.11/src/ptlib/unix/channel.cxx	2018-07-23 18:26:07.244497346 +0100
+@@ -36,7 +36,8 @@
+ 
+ #include <ptlib.h>
+ #include <sys/ioctl.h>
+-
++#include <sys/uio.h>
++#include <unistd.h>
+ 
+ #include "../common/pchannel.cxx"
+ 

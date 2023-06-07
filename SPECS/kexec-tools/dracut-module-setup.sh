@@ -798,6 +798,7 @@ install() {
     inst "$moddir/monitor_dd_progress" "/kdumpscripts/monitor_dd_progress"
     chmod +x ${initdir}/kdumpscripts/monitor_dd_progress
     inst "/bin/dd" "/bin/dd"
+    inst "/bin/grep" "/bin/grep"
     inst "/bin/tail" "/bin/tail"
     inst "/bin/date" "/bin/date"
     inst "/bin/sync" "/bin/sync"

@@ -1,0 +1,28 @@
+There are two licenses, one for the C library software, and one for
+the GeoLite Country database.
+
+SOFTWARE LICENSE
+
+Copyright (C) 2015 MaxMind, Inc.
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+Lesser General Public License for more details.
+
+For a copy of the LGPL License, see the COPYING file.
+
+DATA LICENSE (GeoLite Country and City Databases)
+
+The GeoLite databases are distributed under the Creative Commons
+Attribution-ShareAlike 3.0 Unported License. The attribution
+requirement may be met by including the following in all advertising
+and documentation mentioning features of or use of this database:
+
+ This product includes GeoLite data created by MaxMind, available from
+  <a href="http://www.maxmind.com">http://www.maxmind.com</a>.

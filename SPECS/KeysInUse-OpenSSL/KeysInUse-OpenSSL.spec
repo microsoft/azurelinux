@@ -1,7 +1,7 @@
 Summary:        The KeysInUse Engine for OpenSSL allows the logging of private key usage through OpenSSL
 Name:           KeysInUse-OpenSSL
-Version:        0.3.1
-Release:        7%{?dist}
+Version:        0.3.3
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,17 +20,25 @@ Requires:       openssl >= 1.1.1
 %description
  The KeysInUse Engine for OpenSSL allows the logging of private key usage through OpenSSL
 
+%ifarch x86_64
+%define keysinuse_arch amd64
+%endif
+
+%ifarch aarch64
+%define keysinuse_arch aarch64
+%endif
+
 %prep
 %setup -q
 
 %build
 export GO111MODULE=off
 
-cmake -DCMAKE_TOOLCHAIN_FILE=./cmake-toolchains/linux-amd64-glibc.cmake -H./ -B./build
+cmake -DCMAKE_TOOLCHAIN_FILE=./cmake-toolchains/linux-%{keysinuse_arch}-glibc.cmake -H./ -B./build
 cmake --build ./build --target keysinuse
 
 cd ./packaging/util
-make $(realpath ../../bin/keysinuseutil)
+make CONFIG=%{keysinuse_arch} $(realpath ../../bin/keysinuseutil)
 
 %install
 mkdir -p %{buildroot}/%{_libdir}/engines-1.1/
@@ -67,6 +75,18 @@ if [ -x %{_bindir}/keysinuseutil ]; then
 fi
 
 %changelog
+* Mon May 15 2023 Maxwell Moyer-McKee <mamckee@microsoft.com> - 0.3.3-1
+- Prevent loading by applications statically linked to OpenSSL
+
+* Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.3.1-10
+- Bump release to rebuild with go 1.19.8
+
+* Tue Mar 28 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.3.1-9
+- Bump release to rebuild with go 1.19.7
+
+* Wed Mar 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.3.1-8
+- Bump release to rebuild with go 1.19.6
+
 * Fri Feb 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.3.1-7
 - Bump release to rebuild with go 1.19.5
 

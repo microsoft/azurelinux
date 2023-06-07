@@ -7,7 +7,7 @@
 Summary:        Perl extension interface for libcurl
 Name:           perl-WWW-Curl
 Version:        4.17
-Release:        12%{?dist}
+Release:        14%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,13 +17,20 @@ Source0:        https://search.cpan.org/CPAN/authors/id/S/SZ/SZBALINT/WWW-Curl-%
 
 Patch0:         0001-Curl-macros-fix.patch
 Patch1:         WWW-Curl-4.17-Adapt-to-changes-in-cURL-7.69.0.patch
+Patch2:         WWW-Curl-4.17-Adapt-to-curl-7.87.0.patch
+Patch3:         WWW-Curl-4.17-Work-around-a-macro-bug-in-curl-7.87.0.patch
 
 BuildRequires:  curl-devel
 BuildRequires:  perl >= 5.28.0
-BuildRequires:  perl-generators
+BuildRequires:  perl(FindBin)
+BuildRequires:  perl(Module::CoreList)
 BuildRequires:  perl-Module-Install
 BuildRequires:  perl-YAML-Tiny
-BuildRequires:  curl-devel
+BuildRequires:  perl-generators
+%if %{with_check}
+BuildRequires:  perl(Test::More)
+BuildRequires:  perl(File::Temp)
+%endif
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       curl
 
@@ -76,6 +83,13 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Thu Apr 27 2023 Olivia Crain <oliviacrain@microsoft.com> - 4.17-14
+- Fix package test by adding check-time requirement on perl(Test::More), perl(File::Temp)
+
+* Fri Mar 17 2023 Muhammad Falak <mwani@microsoft.com> - 4.17-13
+- Introduce patches to workaround macro bug which breaks build
+- Add BR on perl(FindBin) & perl(Module::CoreList)
+
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.17-12
 - Adding 'BuildRequires: perl-generators'.
 

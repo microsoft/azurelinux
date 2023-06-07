@@ -9,6 +9,7 @@
 $(call create_folder,$(RPMS_DIR)/$(build_arch))
 $(call create_folder,$(RPMS_DIR)/noarch)
 $(call create_folder,$(SRPMS_DIR))
+$(call create_folder,$(TOOLCHAIN_RPMS_DIR))
 
 toolchain_build_dir = $(BUILD_DIR)/toolchain
 toolchain_local_temp = $(toolchain_build_dir)/extract_dir
@@ -33,26 +34,33 @@ TOOLCHAIN_MANIFEST ?= $(TOOLCHAIN_MANIFESTS_DIR)/toolchain_$(build_arch).txt
 # Find the *.rpm corresponding to each of the entries in the manifest
 # regex operation: (.*\.([^\.]+)\.rpm) extracts *.(<arch>).rpm" to determine
 # the exact path of the required rpm
-# Outputs: $(toolchain_rpms_dir)/<arch>/<name>.<arch>.rpm
-sed_regex_full_path = 's`(.*\.([^\.]+)\.rpm)`$(toolchain_rpms_dir)/\2/\1`p'
+# Outputs: $(TOOLCHAIN_RPMS_DIR)/<arch>/<name>.<arch>.rpm
+sed_regex_full_path = 's`(.*\.([^\.]+)\.rpm)`$(TOOLCHAIN_RPMS_DIR)/\2/\1`p'
 sed_regex_full_path_rehydrated = 's`(.*\.([^\.]+)\.rpm)`$(toolchain_from_repos)/\1`p'
+sed_regex_full_path_out_rpms = 's`(.*\.([^\.]+)\.rpm)`$(RPMS_DIR)/\2/\1`p'
 toolchain_rpms := $(shell sed -nr $(sed_regex_full_path) < $(TOOLCHAIN_MANIFEST))
 toolchain_rpms_buildarch := $(shell grep $(build_arch) $(TOOLCHAIN_MANIFEST))
 toolchain_rpms_noarch := $(shell grep noarch $(TOOLCHAIN_MANIFEST))
 toolchain_rpms_rehydrated := $(shell sed -nr $(sed_regex_full_path_rehydrated) < $(TOOLCHAIN_MANIFEST))
+toolchain_out_rpms := $(shell sed -nr $(sed_regex_full_path_out_rpms) < $(TOOLCHAIN_MANIFEST))
 
 $(call create_folder,$(toolchain_build_dir))
 $(call create_folder,$(toolchain_downloads_logs_dir))
 $(call create_folder,$(toolchain_from_repos))
 $(call create_folder,$(populated_toolchain_chroot))
 
-.PHONY: raw-toolchain toolchain clean-toolchain check-manifests check-aarch64-manifests check-x86_64-manifests
+.PHONY: raw-toolchain toolchain clean-toolchain clean-toolchain-containers check-manifests check-aarch64-manifests check-x86_64-manifests
 raw-toolchain: $(raw_toolchain)
 toolchain: $(toolchain_rpms)
+ifeq ($(REBUILD_TOOLCHAIN),y)
+# If we are rebuilding the toolchain, we also expect the built RPMs to end up in out/RPMS
+toolchain: $(toolchain_out_rpms)
+endif
 
 clean: clean-toolchain
 
 clean-toolchain:
+	$(SCRIPTS_DIR)/safeunmount.sh "$(toolchain_build_dir)"
 	rm -rf $(toolchain_build_dir)
 	rm -rf $(toolchain_local_temp)
 	rm -rf $(toolchain_logs_dir)
@@ -65,14 +73,26 @@ clean-toolchain:
 	rm -f $(SCRIPTS_DIR)/toolchain/container/rpm-define-RPM-LD-FLAGS.patch
 	rm -f $(SCRIPTS_DIR)/toolchain/container/.bashrc
 
+# Clean the containers we use during toolchain build
+ifeq ($(CLEAN_TOOLCHAIN_CONTAINERS),y)
+clean:  clean-toolchain-containers
+endif
+
+# Optionally remove all toolchain docker containers
+clean-toolchain-containers:
+	$(SCRIPTS_DIR)/toolchain/toolchain_clean.sh $(BUILD_DIR)
+
 clean-toolchain-rpms:
 	for f in $(toolchain_rpms_buildarch); do rm -vf $(RPMS_DIR)/$(build_arch)/$$f; done
 	for f in $(toolchain_rpms_noarch); do rm -vf $(RPMS_DIR)/noarch/$$f; done
 
 copy-toolchain-rpms:
-	for f in $(toolchain_rpms_buildarch); do cp -vf $(toolchain_rpms_dir)/$(build_arch)/$$f $(RPMS_DIR)/$(build_arch); done
-	for f in $(toolchain_rpms_noarch); do cp -vf $(toolchain_rpms_dir)/noarch/$$f $(RPMS_DIR)/noarch; done
-
+	for f in $(toolchain_rpms_buildarch); do cp -vf $(TOOLCHAIN_RPMS_DIR)/$(build_arch)/$$f $(RPMS_DIR)/$(build_arch); done
+	for f in $(toolchain_rpms_noarch); do cp -vf $(TOOLCHAIN_RPMS_DIR)/noarch/$$f $(RPMS_DIR)/noarch; done
+	@#Print a red warning message so that it is more visible to the user
+	@echo "\e[31m"
+	@echo "WARNING: copy-toolchain-rpms should no longer be required for most use-cases. Please remove it from your build script unless you need to build older versions of the repo."
+	@echo "\e[0m"
 
 # check that the manifest files only contain RPMs that could have been generated from toolchain specs.
 check-manifests: check-x86_64-manifests check-aarch64-manifests
@@ -142,7 +162,9 @@ $(raw_toolchain): $(toolchain_files)
 		./create_toolchain_in_container.sh \
 			$(BUILD_DIR) \
 			$(SPECS_DIR) \
-			$(SOURCE_URL)
+			$(SOURCE_URL) \
+			$(INCREMENTAL_TOOLCHAIN) \
+			$(ARCHIVE_TOOL)
 
 # This target establishes a cache of toolchain RPMs for partially rehydrating the toolchain from package repos.
 # $(toolchain_from_repos) is a staging folder for these RPMs. We use the toolchain manifest to get a list of
@@ -181,7 +203,7 @@ $(toolchain_rpms_rehydrated): $(TOOLCHAIN_MANIFEST)
 		touch $@; \
 	}
 else
-$(toolchain_rpms_rehydrated): $(TOOLCHAIN_MANIFEST) 
+$(toolchain_rpms_rehydrated): $(TOOLCHAIN_MANIFEST)
 	@touch $@
 endif
 
@@ -191,6 +213,7 @@ endif
 $(final_toolchain): $(raw_toolchain) $(toolchain_rpms_rehydrated) $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag
 	@echo "Building base packages"
 	# Clean the existing chroot if not doing an incremental build
+	$(if $(filter y,$(INCREMENTAL_TOOLCHAIN)),,$(SCRIPTS_DIR)/safeunmount.sh "$(populated_toolchain_chroot)" || $(call print_error,failed to clean mounts for toolchain build))
 	$(if $(filter y,$(INCREMENTAL_TOOLCHAIN)),,rm -rf $(populated_toolchain_chroot))
 	cd $(SCRIPTS_DIR)/toolchain && \
 		./build_mariner_toolchain.sh \
@@ -205,7 +228,8 @@ $(final_toolchain): $(raw_toolchain) $(toolchain_rpms_rehydrated) $(STATUS_FLAGS
 			$(INCREMENTAL_TOOLCHAIN) \
 			$(BUILD_SRPMS_DIR) \
 			$(SRPMS_DIR) \
-			$(toolchain_from_repos) && \
+			$(toolchain_from_repos) \
+			$(TOOLCHAIN_MANIFEST) && \
 	$(if $(filter y,$(UPDATE_TOOLCHAIN_LIST)), ls -1 $(toolchain_build_dir)/built_rpms_all > $(MANIFESTS_DIR)/package/toolchain_$(build_arch).txt && ) \
 	touch $@
 
@@ -233,7 +257,7 @@ $(STATUS_FLAGS_DIR)/toolchain_verify.flag: $(TOOLCHAIN_MANIFEST) $(selected_tool
 	sort $(TOOLCHAIN_MANIFEST) > $(toolchain_expected_contents) && \
 	diff="$$( comm -3 $(toolchain_actual_contents) $(toolchain_expected_contents) --check-order )" && \
 	if [ -n "$${diff}" ]; then \
-		echo "ERROR: Mismatched packages between '$(TOOLCHAIN_MANIFEST)' and '$(selected_toolchain_archive)':" && \
+		printf "ERROR: Mismatched packages between:\n\n'%s'\n\t'%s'\n\n" '$(selected_toolchain_archive)' '$(TOOLCHAIN_MANIFEST)' && \
 		echo "$${diff}"; \
 		$(call print_error, $@ failed) ; \
 	fi && \
@@ -247,7 +271,7 @@ $(toolchain_local_temp)%: ;
 
 # If $(depend_TOOLCHAIN_ARCHIVE) and $(depend_REBUILD_TOOLCHAIN) argument trackers change it is important to check
 #	that all of the toolchain .rpms are correct. The different toolchain sources may have identical files but with
-#	different contents, so always redo the bulk rpm extraction. The $(toolchain_rpms): target will take 
+#	different contents, so always redo the bulk rpm extraction. The $(toolchain_rpms): target will take
 #	responsibility for updating the .rpms in the final destination if needed.
 $(STATUS_FLAGS_DIR)/toolchain_local_temp.flag: $(selected_toolchain_archive) $(toolchain_local_temp) $(call shell_real_build_only, find $(toolchain_local_temp)/* 2>/dev/null) $(STATUS_FLAGS_DIR)/toolchain_verify.flag  $(depend_TOOLCHAIN_ARCHIVE) $(depend_REBUILD_TOOLCHAIN)
 	mkdir -p $(toolchain_local_temp) && \
@@ -296,4 +320,24 @@ $(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(depend_REBUILD_TOOLCHAIN)
 		tail -n$(toolchain_log_tail_length) $$log_file | sed 's/^/\t/' && \
 		$(call print_error,\nToolchain download failed. See above errors for more details.) \
 	}
+endif
+
+# ./out/RPMS is reserved for RPMs generated by the tooling, all other RPMs are cached in the ./build folder. If REBUILD_TOOLCHAIN=y is set
+# the toolchain RPMs should also be placed into out/RPMs.
+# ./out/SRPMS are still handled by build_official_toolchain_rpms.sh as a side effect of building the toolchain tar.gz.
+ifeq ($(REBUILD_TOOLCHAIN),y)
+$(RPMS_DIR): $(toolchain_out_rpms)
+
+# For each toolchain RPM in ./out/RPMS, add a dependency on the counterparts in the normal toolchain directory:
+# Each path in $(toolchain_out_rpms) corresponds to a .rpm file we expect to have been built by the toolchain target and made available in ./out/RPMS.
+# Those RPMs however are placed by default in ./build/toolchain/* (listed in $(toolchain_rpms)). So if we want a copy placed in ./out/RPMS
+# we will need to copy it over. We can filter the list of toolchain rpms $(toolchain_rpms) to find the source that matches the target ($@),
+# then copy it over.
+$(toolchain_out_rpms): $(toolchain_rpms)
+	@src_rpm='$(filter %/$(notdir $@),$(toolchain_rpms))'  && \
+	if [ ! -f "$@" \
+			-o "$$src_rpm" -nt "$@" ] ; then \
+		echo "Placing built toolchain RPM $(notdir $@) into $(RPMS_DIR)" && \
+		cp $$src_rpm $@; \
+	fi || $(call print_error, Failed to duplicate '$$src_rpm' to '$@' )
 endif

@@ -13,9 +13,9 @@ import (
 
 // KernelCommandLine holds extra command line parameters which can be
 // added to the grub config file.
-// - ImaPolicy: A list of IMA policies which will be used together
-// - ExtraCommandLine: Arbitrary parameters which will be appended to the
-//   end of the kernel command line
+//   - ImaPolicy: A list of IMA policies which will be used together
+//   - ExtraCommandLine: Arbitrary parameters which will be appended to the
+//     end of the kernel command line
 type KernelCommandLine struct {
 	CGroup           CGroup      `json:"CGroup"`
 	ImaPolicy        []ImaPolicy `json:"ImaPolicy"`

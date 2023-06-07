@@ -1,0 +1,115 @@
+diff --git a/package/rpm/install.sh b/package/rpm/install.sh
+index 432090ba03..a74a5cbc27 100755
+--- a/package/rpm/install.sh
++++ b/package/rpm/install.sh
+@@ -43,12 +43,8 @@ set -e
+ #     Commit of k3s to download from temporary cloud storage.
+ #     * (for developer & QA use)
+ #
+-#   - INSTALL_K3S_BIN_DIR
+-#     Directory to install k3s binary, links, and uninstall script to, or use
+-#     /usr/local/bin as the default
+-#
+ #   - INSTALL_K3S_BIN_DIR_READ_ONLY
+-#     If set to true will not write files to INSTALL_K3S_BIN_DIR, forces
++#     If set to true will not write files to BIN_DIR, forces
+ #     setting INSTALL_K3S_SKIP_DOWNLOAD=true
+ #
+ #   - INSTALL_K3S_SYSTEMD_DIR
+@@ -114,15 +110,8 @@ fatal()
+ 
+ # --- fatal if no systemd or openrc ---
+ verify_system() {
+-    if [ -x /sbin/openrc-run ]; then
+-        HAS_OPENRC=true
+-        return
+-    fi
+-    if [ -d /run/systemd ]; then
+-        HAS_SYSTEMD=true
+-        return
+-    fi
+-    fatal 'Can not find systemd or openrc to use as a process supervisor for k3s'
++    HAS_SYSTEMD=true
++    return
+ }
+ 
+ # --- add quotes to command arguments ---
+@@ -219,7 +208,7 @@ setup_env() {
+     fi
+ 
+     # --- use binary install directory if defined or create default ---
+-    BIN_DIR=${INSTALL_K3S_BIN_DIR:-/usr/local/bin}
++    BIN_DIR=/usr/local/bin
+     DATA_DIR=/var/lib/rancher/k3s
+ 
+     # --- set related files from system name ---
+diff --git a/scripts/build b/scripts/build
+index fb538350d0..3712ef2abf 100755
+--- a/scripts/build
++++ b/scripts/build
+@@ -117,15 +117,17 @@ if [ ! -x ${INSTALLBIN}/cni ]; then
+     echo Building cni
+     TMPDIR=$(mktemp -d)
+     trap cleanup EXIT
+-    WORKDIR=$TMPDIR/src/github.com/containernetworking/plugins
+-    git clone -b $VERSION_CNIPLUGINS https://github.com/rancher/plugins.git $WORKDIR
+-    cd $WORKDIR
+-    GO111MODULE=off GOPATH=$TMPDIR CGO_ENABLED=0 "${GO}" build -tags "$TAGS" -gcflags="all=${GCFLAGS}" -ldflags "$VERSIONFLAGS $LDFLAGS $STATIC" -o $INSTALLBIN/cni
++    WORKDIR=$TMPDIR/src/github.com/containernetworking
++    mkdir -p $WORKDIR
++    ls
++    cp -r vendor/plugins $WORKDIR
++    cd $WORKDIR/plugins
++    GO111MODULE=off GOPATH=$TMPDIR CGO_ENABLED=0 "${GO}" build -tags "$TAGS" -ldflags "$VERSIONFLAGS $LDFLAGS $STATIC" -o $INSTALLBIN/cni
+ )
+ fi
+ 
+ echo Building k3s
+-CGO_ENABLED=1 "${GO}" build -tags "$TAGS" -gcflags="all=${GCFLAGS}" -ldflags "$VERSIONFLAGS $LDFLAGS $STATIC" -o bin/k3s ./cmd/server/main.go
++CGO_ENABLED=1 "${GO}" build -mod=vendor -tags "$TAGS" -ldflags "$VERSIONFLAGS $LDFLAGS $STATIC" -o bin/k3s ./cmd/server/main.go
+ ln -s k3s ./bin/k3s-agent
+ ln -s k3s ./bin/k3s-server
+ ln -s k3s ./bin/k3s-token
+@@ -140,16 +142,22 @@ ln -s k3s ./bin/ctr
+ export GOPATH=$(pwd)/build
+ 
+ echo Building containerd
+-pushd ./build/src/github.com/containerd/containerd
++CONTAINERD_DIR=build/src/github.com/containerd
++mkdir -p $CONTAINERD_DIR
++cp -r vendor/containerd $CONTAINERD_DIR
++pushd ./$CONTAINERD_DIR/containerd
+ TAGS="${TAGS/netcgo/netgo}"
+-CGO_ENABLED=1 "${GO}" build -tags "$TAGS" -gcflags="all=${GCFLAGS}" -ldflags "$VERSIONFLAGS $LDFLAGS $STATIC" -o bin/containerd              ./cmd/containerd
+-CGO_ENABLED=1 "${GO}" build -tags "$TAGS" -gcflags="all=${GCFLAGS}" -ldflags "$VERSIONFLAGS $LDFLAGS $STATIC" -o bin/containerd-shim-runc-v2 ./cmd/containerd-shim-runc-v2
++CGO_ENABLED=1 "${GO}" build -mod=vendor -tags "$TAGS" -ldflags "$VERSIONFLAGS $LDFLAGS $STATIC" -o bin/containerd              ./cmd/containerd
++CGO_ENABLED=1 "${GO}" build -mod=vendor -tags "$TAGS" -ldflags "$VERSIONFLAGS $LDFLAGS $STATIC" -o bin/containerd-shim-runc-v2 ./cmd/containerd-shim-runc-v2
+ popd
+-cp -vf ./build/src/github.com/containerd/containerd/bin/* ./bin/
++cp -vf ./$CONTAINERD_DIR/containerd/bin/* ./bin/
+ 
+ echo Building runc
+-pushd ./build/src/github.com/opencontainers/runc
++RUNC_DIR=build/src/github.com/opencontainers
++mkdir -p $RUNC_DIR
++cp -r vendor/runc $RUNC_DIR
++pushd ./$RUNC_DIR/runc
+ rm -f runc
+-make EXTRA_FLAGS="-gcflags=\"all=${GCFLAGS}\"" EXTRA_LDFLAGS="$LDFLAGS" BUILDTAGS="$RUNC_TAGS" $RUNC_STATIC
++make EXTRA_LDFLAGS="-w -s" BUILDTAGS="$RUNC_TAGS" $RUNC_STATIC GOMODVENDOR=1
+ popd
+-cp -vf ./build/src/github.com/opencontainers/runc/runc ./bin/
++cp -vf ./$RUNC_DIR/runc/runc ./bin/
+diff --git a/scripts/package-cli b/scripts/package-cli
+index 2c71e851d1..9cd914b8db 100755
+--- a/scripts/package-cli
++++ b/scripts/package-cli
+@@ -60,7 +60,7 @@ LDFLAGS="
+ "
+ TAGS="urfave_cli_no_docs"
+ STATIC="-extldflags '-static'"
+-CGO_ENABLED=0 "${GO}" build -tags "$TAGS" -ldflags "$LDFLAGS $STATIC" -o ${CMD_NAME} ./cmd/k3s/main.go
++CGO_ENABLED=0 "${GO}" build -mod=vendor -tags "$TAGS" -ldflags "$LDFLAGS $STATIC" -o ${CMD_NAME} ./cmd/k3s/main.go
+ 
+ stat ${CMD_NAME}
+ 

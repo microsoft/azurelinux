@@ -1,0 +1,118 @@
+From 0ebd695bbec28c5a539a7a362c8fcf89ea9c9947 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Thu, 9 Feb 2023 14:44:00 +0000
+Subject: [PATCH 25/35] unconfined: Add remaining watch_* permissions.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/kernel/devices.te    |  6 +++---
+ policy/modules/kernel/files.te      | 14 +++++++-------
+ policy/modules/kernel/filesystem.te | 14 +++++++-------
+ policy/modules/kernel/kernel.te     | 24 ++++++++++++------------
+ 4 files changed, 29 insertions(+), 29 deletions(-)
+
+MSFT_TAG: pending
+
+diff --git a/policy/modules/kernel/devices.te b/policy/modules/kernel/devices.te
+index 5e2c77cbb..966769c2d 100644
+--- a/policy/modules/kernel/devices.te
++++ b/policy/modules/kernel/devices.te
+@@ -434,6 +434,6 @@ files_associate_tmp(device_node)
+ #
+ 
+ allow devices_unconfined_type self:capability sys_rawio;
+-allow devices_unconfined_type device_node:blk_file { manage_blk_file_perms relabel_blk_file_perms map execute quotaon mounton execmod watch };
+-allow devices_unconfined_type device_node:chr_file { manage_chr_file_perms relabel_chr_file_perms map execute quotaon mounton execmod watch };
+-allow devices_unconfined_type mtrr_device_t:file { manage_file_perms relabel_file_perms exec_file_perms quotaon mounton entrypoint execmod watch };
++allow devices_unconfined_type device_node:blk_file { manage_blk_file_perms relabel_blk_file_perms map execute quotaon mounton execmod watch watch_mount watch_reads watch_sb watch_with_perm };
++allow devices_unconfined_type device_node:chr_file { manage_chr_file_perms relabel_chr_file_perms map execute quotaon mounton execmod watch watch_mount watch_reads watch_sb watch_with_perm };
++allow devices_unconfined_type mtrr_device_t:file { manage_file_perms relabel_file_perms exec_file_perms quotaon mounton entrypoint execmod watch watch_mount watch_reads watch_sb watch_with_perm };
+diff --git a/policy/modules/kernel/files.te b/policy/modules/kernel/files.te
+index e8fe42214..f8258f855 100644
+--- a/policy/modules/kernel/files.te
++++ b/policy/modules/kernel/files.te
+@@ -227,13 +227,13 @@ fs_associate_tmpfs(tmpfsfile)
+ #
+ 
+ # Create/access any file in a labeled filesystem;
+-allow files_unconfined_type file_type:file { manage_file_perms relabel_file_perms exec_file_perms quotaon mounton watch };
+-allow files_unconfined_type file_type:lnk_file  { manage_lnk_file_perms relabel_lnk_file_perms append map execute quotaon mounton open execmod watch };
+-allow files_unconfined_type file_type:sock_file { manage_sock_file_perms relabel_sock_file_perms map execute quotaon mounton execmod watch };
+-allow files_unconfined_type file_type:fifo_file { manage_fifo_file_perms relabel_fifo_file_perms map execute quotaon mounton execmod watch };
+-allow files_unconfined_type file_type:blk_file { manage_blk_file_perms relabel_blk_file_perms map execute quotaon mounton execmod watch };
+-allow files_unconfined_type file_type:chr_file { manage_chr_file_perms relabel_chr_file_perms map execute quotaon mounton watch };
+-allow files_unconfined_type file_type:dir { manage_dir_perms relabel_dir_perms append map execute quotaon mounton add_name remove_name reparent search rmdir execmod watch };
++allow files_unconfined_type file_type:file { manage_file_perms relabel_file_perms exec_file_perms quotaon mounton watch watch_mount watch_reads watch_sb watch_with_perm};
++allow files_unconfined_type file_type:lnk_file  { manage_lnk_file_perms relabel_lnk_file_perms append map execute quotaon mounton open execmod watch watch_mount watch_reads watch_sb watch_with_perm };
++allow files_unconfined_type file_type:sock_file { manage_sock_file_perms relabel_sock_file_perms map execute quotaon mounton execmod watch watch_mount watch_reads watch_sb watch_with_perm };
++allow files_unconfined_type file_type:fifo_file { manage_fifo_file_perms relabel_fifo_file_perms map execute quotaon mounton execmod watch watch_mount watch_reads watch_sb watch_with_perm };
++allow files_unconfined_type file_type:blk_file { manage_blk_file_perms relabel_blk_file_perms map execute quotaon mounton execmod watch watch_mount watch_reads watch_sb watch_with_perm };
++allow files_unconfined_type file_type:chr_file { manage_chr_file_perms relabel_chr_file_perms map execute quotaon mounton watch watch_mount watch_reads watch_sb watch_with_perm };
++allow files_unconfined_type file_type:dir { manage_dir_perms relabel_dir_perms append map execute quotaon mounton add_name remove_name reparent search rmdir execmod watch watch_mount watch_reads watch_sb watch_with_perm };
+ 
+ # Mount/unmount any filesystem with the context= option.
+ allow files_unconfined_type file_type:filesystem { mount remount unmount getattr relabelfrom relabelto associate quotamod quotaget watch };
+diff --git a/policy/modules/kernel/filesystem.te b/policy/modules/kernel/filesystem.te
+index 632905dda..d1bdf5bde 100644
+--- a/policy/modules/kernel/filesystem.te
++++ b/policy/modules/kernel/filesystem.te
+@@ -338,10 +338,10 @@ allow filesystem_unconfined_type filesystem_type:filesystem { mount remount unmo
+ # Create/access other files. fs_type is to pick up various
+ # pseudo filesystem types that are applied to both the filesystem
+ # and its files.
+-allow filesystem_unconfined_type filesystem_type:file { manage_file_perms relabel_file_perms exec_file_perms quotaon mounton entrypoint execmod watch };
+-allow filesystem_unconfined_type filesystem_type:lnk_file  { manage_lnk_file_perms relabel_lnk_file_perms append map execute quotaon mounton open execmod watch };
+-allow filesystem_unconfined_type filesystem_type:sock_file { manage_sock_file_perms relabel_sock_file_perms map execute quotaon mounton execmod watch };
+-allow filesystem_unconfined_type filesystem_type:fifo_file { manage_fifo_file_perms relabel_fifo_file_perms map execute quotaon mounton execmod watch };
+-allow filesystem_unconfined_type filesystem_type:blk_file { manage_blk_file_perms relabel_blk_file_perms map execute quotaon mounton execmod watch };
+-allow filesystem_unconfined_type filesystem_type:chr_file { manage_chr_file_perms relabel_chr_file_perms map execute quotaon mounton execmod watch };
+-allow filesystem_unconfined_type filesystem_type:dir { manage_dir_perms relabel_dir_perms append map execute quotaon mounton add_name remove_name reparent search rmdir execmod watch };
++allow filesystem_unconfined_type filesystem_type:file { manage_file_perms relabel_file_perms exec_file_perms quotaon mounton entrypoint execmod watch watch_mount watch_reads watch_sb watch_with_perm };
++allow filesystem_unconfined_type filesystem_type:lnk_file  { manage_lnk_file_perms relabel_lnk_file_perms append map execute quotaon mounton open execmod watch watch_mount watch_reads watch_sb watch_with_perm };
++allow filesystem_unconfined_type filesystem_type:sock_file { manage_sock_file_perms relabel_sock_file_perms map execute quotaon mounton execmod watch watch_mount watch_reads watch_sb watch_with_perm };
++allow filesystem_unconfined_type filesystem_type:fifo_file { manage_fifo_file_perms relabel_fifo_file_perms map execute quotaon mounton execmod watch watch_mount watch_reads watch_sb watch_with_perm };
++allow filesystem_unconfined_type filesystem_type:blk_file { manage_blk_file_perms relabel_blk_file_perms map execute quotaon mounton execmod watch watch_mount watch_reads watch_sb watch_with_perm };
++allow filesystem_unconfined_type filesystem_type:chr_file { manage_chr_file_perms relabel_chr_file_perms map execute quotaon mounton execmod watch watch_mount watch_reads watch_sb watch_with_perm };
++allow filesystem_unconfined_type filesystem_type:dir { manage_dir_perms relabel_dir_perms append map execute quotaon mounton add_name remove_name reparent search rmdir execmod watch watch_mount watch_reads watch_sb watch_with_perm };
+diff --git a/policy/modules/kernel/kernel.te b/policy/modules/kernel/kernel.te
+index d0fcfe7dc..e8c84a02d 100644
+--- a/policy/modules/kernel/kernel.te
++++ b/policy/modules/kernel/kernel.te
+@@ -557,22 +557,22 @@ if(secure_mode_insmod) {
+ # Rules for unconfined access to this module
+ #
+ 
+-allow kern_unconfined proc_type:dir { manage_dir_perms relabel_dir_perms append map execute quotaon mounton execmod watch };
+-allow kern_unconfined proc_type:lnk_file { manage_lnk_file_perms relabel_lnk_file_perms append map execute quotaon mounton open execmod watch };
+-allow kern_unconfined proc_type:file { manage_file_perms relabel_file_perms exec_file_perms quotaon mounton watch };
++allow kern_unconfined proc_type:dir { manage_dir_perms relabel_dir_perms append map execute quotaon mounton execmod watch watch_mount watch_reads watch_sb watch_with_perm };
++allow kern_unconfined proc_type:lnk_file { manage_lnk_file_perms relabel_lnk_file_perms append map execute quotaon mounton open execmod watch watch_mount watch_reads watch_sb watch_with_perm };
++allow kern_unconfined proc_type:file { manage_file_perms relabel_file_perms exec_file_perms quotaon mounton watch watch_mount watch_reads watch_sb watch_with_perm };
+ 
+-allow kern_unconfined sysctl_type:dir { manage_dir_perms relabel_dir_perms append map execute quotaon mounton execmod watch };
+-allow kern_unconfined sysctl_type:file { manage_file_perms relabel_file_perms exec_file_perms quotaon mounton watch };
++allow kern_unconfined sysctl_type:dir { manage_dir_perms relabel_dir_perms append map execute quotaon mounton execmod watch watch_mount watch_reads watch_sb watch_with_perm };
++allow kern_unconfined sysctl_type:file { manage_file_perms relabel_file_perms exec_file_perms quotaon mounton watch watch_mount watch_reads watch_sb watch_with_perm };
+ 
+ allow kern_unconfined kernel_t:system { ipc_info syslog_read syslog_mod syslog_console module_request module_load halt reboot status start stop enable disable reload };
+ 
+-allow kern_unconfined unlabeled_t:file { manage_file_perms relabel_file_perms exec_file_perms quotaon mounton watch };
+-allow kern_unconfined unlabeled_t:lnk_file  { manage_lnk_file_perms relabel_lnk_file_perms append map execute quotaon mounton open execmod watch };
+-allow kern_unconfined unlabeled_t:sock_file { manage_sock_file_perms relabel_sock_file_perms map execute quotaon mounton execmod watch };
+-allow kern_unconfined unlabeled_t:fifo_file { manage_fifo_file_perms relabel_fifo_file_perms map execute quotaon mounton execmod watch };
+-allow kern_unconfined unlabeled_t:blk_file { manage_blk_file_perms relabel_blk_file_perms map execute quotaon mounton execmod watch };
+-allow kern_unconfined unlabeled_t:chr_file { manage_chr_file_perms relabel_chr_file_perms map execute quotaon mounton watch };
+-allow kern_unconfined unlabeled_t:dir { manage_dir_perms relabelfrom relabelto append map execute quotaon mounton add_name remove_name reparent search rmdir execmod watch };
++allow kern_unconfined unlabeled_t:file { manage_file_perms relabel_file_perms exec_file_perms quotaon mounton watch watch_mount watch_reads watch_sb watch_with_perm };
++allow kern_unconfined unlabeled_t:lnk_file  { manage_lnk_file_perms relabel_lnk_file_perms append map execute quotaon mounton open execmod watch watch_mount watch_reads watch_sb watch_with_perm };
++allow kern_unconfined unlabeled_t:sock_file { manage_sock_file_perms relabel_sock_file_perms map execute quotaon mounton execmod watch watch_mount watch_reads watch_sb watch_with_perm };
++allow kern_unconfined unlabeled_t:fifo_file { manage_fifo_file_perms relabel_fifo_file_perms map execute quotaon mounton execmod watch watch_mount watch_reads watch_sb watch_with_perm };
++allow kern_unconfined unlabeled_t:blk_file { manage_blk_file_perms relabel_blk_file_perms map execute quotaon mounton execmod watch watch_mount watch_reads watch_sb watch_with_perm };
++allow kern_unconfined unlabeled_t:chr_file { manage_chr_file_perms relabel_chr_file_perms map execute quotaon mounton watch watch_mount watch_reads watch_sb watch_with_perm };
++allow kern_unconfined unlabeled_t:dir { manage_dir_perms relabelfrom relabelto append map execute quotaon mounton add_name remove_name reparent search rmdir execmod watch watch_mount watch_reads watch_sb watch_with_perm };
+ allow kern_unconfined unlabeled_t:filesystem { mount remount unmount getattr relabelfrom relabelto associate quotamod quotaget watch };
+ allow kern_unconfined unlabeled_t:association { sendto recvfrom setcontext polmatch };
+ allow kern_unconfined unlabeled_t:packet { send recv relabelto forward_in forward_out };
+-- 
+2.34.1
+

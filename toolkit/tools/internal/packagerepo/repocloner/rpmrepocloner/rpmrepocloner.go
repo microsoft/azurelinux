@@ -19,11 +19,13 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/tdnf"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 )
 
 const (
 	allRepoIDs             = "*"
 	builtRepoID            = "local-repo"
+	toolchainRepoId        = "toolchain-repo"
 	cacheRepoID            = "upstream-cache-repo"
 	squashChrootRunErrors  = false
 	chrootDownloadDir      = "/outputrpms"
@@ -78,24 +80,28 @@ func New() *RpmRepoCloner {
 }
 
 // Initialize initializes rpmrepocloner, enabling Clone() to be called.
-//  - destinationDir is the directory to save RPMs
-//  - tmpDir is the directory to create a chroot
-//  - workerTar is the path to the worker tar used to seed the chroot
-//  - existingRpmsDir is the directory with prebuilt RPMs
-//  - usePreviewRepo if set, the upstream preview repository will be used.
-//  - repoDefinitions is a list of repo files to use when cloning RPMs
-func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRpmsDir string, usePreviewRepo bool, repoDefinitions []string) (err error) {
+//   - destinationDir is the directory to save RPMs
+//   - tmpDir is the directory to create a chroot
+//   - workerTar is the path to the worker tar used to seed the chroot
+//   - existingRpmsDir is the directory with prebuilt RPMs
+//   - prebuiltRpmsDir is the directory with toolchain RPMs
+//   - usePreviewRepo if set, the upstream preview repository will be used.
+//   - repoDefinitions is a list of repo files to use when cloning RPMs
+func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRpmsDir, toolchainRpmsDir string, usePreviewRepo bool, repoDefinitions []string) (err error) {
 	const (
 		isExistingDir = false
 
 		bindFsType = ""
 		bindData   = ""
 
-		chrootLocalRpmsDir = "/localrpms"
+		chrootLocalRpmsDir      = "/localrpms"
+		chrootLocalToolchainDir = "/toolchainrpms"
 
-		overlayWorkDirectory  = "/overlaywork/workdir"
-		overlayUpperDirectory = "/overlaywork/upper"
-		overlaySource         = "overlay"
+		overlaySource                  = "overlay"
+		overlayUpperDirectoryRpms      = "/overlaywork/upper_rpms"
+		overlayWorkDirectoryRpms       = "/overlaywork/workdir_rpms"
+		overlayUpperDirectoryToolchain = "/overlaywork/upper_toolchain"
+		overlayWorkDirectoryToolchain  = "/overlaywork/workdir_toolchain"
 	)
 
 	r.usePreviewRepo = usePreviewRepo
@@ -137,11 +143,16 @@ func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRp
 	//
 	// 2) Mount the directory to download RPMs into as a bind, allowing the chroot to write
 	// files into it.
-	overlayMount, overlayExtraDirs := safechroot.NewOverlayMountPoint(r.chroot.RootDir(), overlaySource, chrootLocalRpmsDir, existingRpmsDir, overlayUpperDirectory, overlayWorkDirectory)
+	outRpmsOverlayMount, overlayExtraDirs := safechroot.NewOverlayMountPoint(r.chroot.RootDir(), overlaySource, chrootLocalRpmsDir, existingRpmsDir, overlayUpperDirectoryRpms, overlayWorkDirectoryRpms)
 	extraMountPoints := []*safechroot.MountPoint{
-		overlayMount,
+		outRpmsOverlayMount,
 		safechroot.NewMountPoint(destinationDir, chrootDownloadDir, bindFsType, safechroot.BindMountPointFlags, bindData),
 	}
+
+	// Include the special toolchain packages directory.
+	toolchainRpmsOverlayMount, toolchainRpmsOverlayExtraDirs := safechroot.NewOverlayMountPoint(r.chroot.RootDir(), overlaySource, chrootLocalToolchainDir, toolchainRpmsDir, overlayUpperDirectoryToolchain, overlayWorkDirectoryToolchain)
+	extraMountPoints = append(extraMountPoints, toolchainRpmsOverlayMount)
+	overlayExtraDirs = append(overlayExtraDirs, toolchainRpmsOverlayExtraDirs...)
 
 	// Also request that /overlaywork is created before any chroot mounts happen so the overlay can
 	// be created successfully
@@ -154,7 +165,7 @@ func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRp
 	// The 'cacheRepoDir' repo is only used during Docker based builds, which don't
 	// use overlay so cache repo must be explicitly initialized.
 	// We make sure it's present during all builds to avoid noisy TDNF error messages in the logs.
-	reposToInitialize := []string{chrootLocalRpmsDir, chrootDownloadDir, cacheRepoDir}
+	reposToInitialize := []string{chrootLocalRpmsDir, chrootDownloadDir, cacheRepoDir, chrootLocalToolchainDir}
 	for _, repoToInitialize := range reposToInitialize {
 		logger.Log.Debugf("Initializing the '%s' repository.", repoToInitialize)
 		err = r.initializeMountedChrootRepo(repoToInitialize)
@@ -203,14 +214,26 @@ func (r *RpmRepoCloner) initializeRepoDefinitions(repoDefinitions []string) (err
 	// In order to simulate repository priority, concatenate all requested repofiles into a single file.
 	// TDNF will read the file top-down. It will then parse the results into a linked list, meaning
 	// the first repo entry in the file is the first to be checked.
-	const chrootRepoFile = "/etc/yum.repos.d/allrepos.repo"
+	const (
+		chrootRepoDir  = "/etc/yum.repos.d/"
+		chrootRepoFile = "allrepos.repo"
+	)
 
-	fullRepoFilePath := filepath.Join(r.chroot.RootDir(), chrootRepoFile)
+	fullRepoDirPath := filepath.Join(r.chroot.RootDir(), chrootRepoDir)
+	fullRepoFilePath := filepath.Join(fullRepoDirPath, chrootRepoFile)
 
-	// Create the directory for the repo file
+	// Create the directory for the repo file in case there wasn't already one there
 	err = os.MkdirAll(filepath.Dir(fullRepoFilePath), os.ModePerm)
 	if err != nil {
 		logger.Log.Warnf("Could not create directory for chroot repo file (%s)", fullRepoFilePath)
+		return
+	}
+
+	// Get a list of the existing repofiles that are part of the chroot, if any
+	// We need to capture this list before we add 'allrepos.repo'.
+	existingRepoFiles, err := filepath.Glob(filepath.Join(fullRepoDirPath, "*"))
+	if err != nil {
+		logger.Log.Warnf("Could not list existing repo files (%s)", fullRepoDirPath)
 		return
 	}
 
@@ -224,6 +247,19 @@ func (r *RpmRepoCloner) initializeRepoDefinitions(repoDefinitions []string) (err
 	// Assume the order of repoDefinitions indicates their relative priority.
 	for _, repoFilePath := range repoDefinitions {
 		err = appendRepoFile(repoFilePath, dstFile)
+		if err != nil {
+			return
+		}
+	}
+
+	// Add each previously existing repofile to the end of the new file, then delete the original.
+	// We want to try our custom mounted repos before reaching out to the upstream servers.
+	for _, originalRepoFilePath := range existingRepoFiles {
+		err = appendRepoFile(originalRepoFilePath, dstFile)
+		if err != nil {
+			return
+		}
+		err = os.Remove(originalRepoFilePath)
 		if err != nil {
 			return
 		}
@@ -266,9 +302,14 @@ func (r *RpmRepoCloner) initializeMountedChrootRepo(repoDir string) (err error) 
 // It will automatically resolve packages that describe a provide or file from a package.
 // The cloner will mark any package that locally built by setting preBuilt = true
 func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.PackageVer) (preBuilt bool, err error) {
+	timestamp.StartEvent("cloning packages", nil)
+	defer timestamp.StopEvent(nil)
 	for _, pkg := range packagesToClone {
+		timestamp.StartEvent(pkg.Name, nil)
+
 		pkgName := convertPackageVersionToTdnfArg(pkg)
 
+		effectiveCacheRepo := selectCorrectCacheRepoID()
 		downloadDir := chrootDownloadDir
 		if !buildpipeline.IsRegularBuild() {
 			downloadDir = cacheRepoDir
@@ -289,8 +330,8 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 
 		err = r.chroot.Run(func() (err error) {
 			var chrootErr error
-			// Consider the built RPMs first, then the already cached (e.g. tooolchain), and finally all remote packages.
-			repoOrderList := []string{builtRepoID, cacheRepoID, allRepoIDs}
+			// Consider the toolchain RPMs first, then built RPMs, then the already cached, and finally all remote packages.
+			repoOrderList := []string{toolchainRepoId, builtRepoID, effectiveCacheRepo, allRepoIDs}
 			preBuilt, chrootErr = r.clonePackage(args, repoOrderList...)
 			return chrootErr
 		})
@@ -298,6 +339,8 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 		if err != nil {
 			return
 		}
+
+		timestamp.StopEvent(nil) // pkg.Name
 	}
 
 	return
@@ -323,8 +366,10 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 		releaseverCliArg,
 	}
 
-	// Consider the built (local) RPMs first, then the already cached (e.g. tooolchain), and finally all remote packages.
-	repoOrderList := []string{builtRepoID, cacheRepoID, allRepoIDs}
+	effectiveCacheRepo := selectCorrectCacheRepoID()
+
+	// Consider the built (tooolchain, local) RPMs first, then the already cached, and finally all remote packages.
+	repoOrderList := []string{toolchainRepoId, builtRepoID, effectiveCacheRepo, allRepoIDs}
 	for _, repoID := range repoOrderList {
 		logger.Log.Debugf("Enabling repo ID: %s", repoID)
 
@@ -374,9 +419,14 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 }
 
 // ConvertDownloadedPackagesIntoRepo initializes the downloaded RPMs into an RPM repository.
+// Packages will be placed in a flat directory.
 func (r *RpmRepoCloner) ConvertDownloadedPackagesIntoRepo() (err error) {
-	srcDir := filepath.Join(r.chroot.RootDir(), chrootDownloadDir)
-	repoDir := srcDir
+	err = r.initializeMountedChrootRepo(chrootDownloadDir)
+	if err != nil {
+		return
+	}
+
+	repoDir := filepath.Join(r.chroot.RootDir(), chrootDownloadDir)
 
 	if !buildpipeline.IsRegularBuild() {
 		// Docker based build doesn't use overlay so repo folder
@@ -384,14 +434,12 @@ func (r *RpmRepoCloner) ConvertDownloadedPackagesIntoRepo() (err error) {
 		repoDir = filepath.Join(r.chroot.RootDir(), cacheRepoDir)
 	}
 
-	err = rpmrepomanager.OrganizePackagesByArch(srcDir, repoDir)
+	// Print warnings for any invalid RPMs
+	err = rpmrepomanager.ValidateRpmPaths(repoDir)
 	if err != nil {
-		return
-	}
-
-	err = r.initializeMountedChrootRepo(chrootDownloadDir)
-	if err != nil {
-		return
+		logger.Log.Warnf("Failed to validate RPM paths: %s", err)
+		// We treat this as just a warning, not a real error.
+		err = nil
 	}
 
 	if !buildpipeline.IsRegularBuild() {
@@ -436,11 +484,7 @@ func (r *RpmRepoCloner) ClonedRepoContents() (repoContents *repocloner.RepoConte
 		repoContents.Repo = append(repoContents.Repo, pkg)
 	}
 
-	checkedRepoID := fetcherRepoID
-	// Docker based build doesn't use overlay so cache repo was explicitely initialized
-	if !buildpipeline.IsRegularBuild() {
-		checkedRepoID = cacheRepoID
-	}
+	checkedRepoID := selectCorrectCacheRepoID()
 
 	err = r.chroot.Run(func() (err error) {
 		// Disable all repositories except the fetcher repository (the repository with the cloned packages)
@@ -544,7 +588,7 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string, enabledRepoOrder ...stri
 		}
 
 		if err == nil {
-			preBuilt = (repoID == builtRepoID)
+			preBuilt = (repoID == toolchainRepoId || repoID == builtRepoID)
 			break
 		}
 	}
@@ -554,6 +598,7 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string, enabledRepoOrder ...stri
 
 func convertPackageVersionToTdnfArg(pkgVer *pkgjson.PackageVer) (tdnfArg string) {
 	tdnfArg = pkgVer.Name
+
 	// TDNF does not accept versioning information on implicit provides.
 	if pkgVer.IsImplicitPackage() {
 		if pkgVer.Condition != "" {
@@ -562,19 +607,28 @@ func convertPackageVersionToTdnfArg(pkgVer *pkgjson.PackageVer) (tdnfArg string)
 		return
 	}
 
-	// Treat <= as =
-	// Treat > and >= as "latest"
+	// To avoid significant overhead we only download the latest version of a package
+	// for ">" and ">=" constraints (ie remove constraints).
 	switch pkgVer.Condition {
-	case "<=":
-		logger.Log.Warnf("Treating '%s' version constraint as '=' for: %v", pkgVer.Condition, pkgVer)
-		fallthrough
-	case "=":
-		tdnfArg = fmt.Sprintf("%s-%s", tdnfArg, pkgVer.Version)
-	case "":
-		break
+	case "<=", "<", "=":
+		tdnfArg = fmt.Sprintf("%s %s %s", pkgVer.Name, pkgVer.Condition, pkgVer.Version)
+	case ">", ">=", "":
+		if pkgVer.Condition != "" {
+			logger.Log.Warnf("Discarding '%s' version constraint for: %v", pkgVer.Condition, pkgVer)
+		}
 	default:
-		logger.Log.Warnf("Discarding '%s' version constraint for: %v", pkgVer.Condition, pkgVer)
+		logger.Log.Errorf("Unsupported version constraint: %s", pkgVer.Condition)
 	}
 
 	return
+}
+
+// selectCorrectCacheRepoID determines which cache repo we are using, the normal one, or the pre-mounted one for use with
+// containers.
+func selectCorrectCacheRepoID() string {
+	if buildpipeline.IsRegularBuild() {
+		return fetcherRepoID
+	} else {
+		return cacheRepoID
+	}
 }

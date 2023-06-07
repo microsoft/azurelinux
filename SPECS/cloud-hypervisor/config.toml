@@ -17,6 +17,16 @@ git = "https://github.com/firecracker-microvm/micro-http"
 branch = "main"
 replace-with = "vendored-sources"
 
+[source."https://github.com/rust-vmm/acpi_tables"]
+git = "https://github.com/rust-vmm/acpi_tables"
+branch = "main"
+replace-with = "vendored-sources"
+
+[source."https://github.com/rust-vmm/kvm-ioctls"]
+git = "https://github.com/rust-vmm/kvm-ioctls"
+branch = "main"
+replace-with = "vendored-sources"
+
 [source."https://github.com/rust-vmm/mshv"]
 git = "https://github.com/rust-vmm/mshv"
 branch = "main"
@@ -24,6 +34,11 @@ replace-with = "vendored-sources"
 
 [source."https://github.com/rust-vmm/vfio"]
 git = "https://github.com/rust-vmm/vfio"
+branch = "main"
+replace-with = "vendored-sources"
+
+[source."https://github.com/rust-vmm/vfio-user"]
+git = "https://github.com/rust-vmm/vfio-user"
 branch = "main"
 replace-with = "vendored-sources"
 

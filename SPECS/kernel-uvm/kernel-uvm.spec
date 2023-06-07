@@ -10,14 +10,14 @@
 
 Summary:        Linux Kernel for Kata UVM
 Name:           kernel-uvm
-Version:        5.15.48.1
-Release:        8%{?dist}
+Version:        5.15.110.mshv2
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Kernel
-URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
-Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/%{version}.tar.gz#/kernel-%{version}.tar.gz
+# uses same source as kernel-mshv
+Source0:       %{_mariner_sources_url}/kernel-mshv-%{version}.tar.gz
 Source1:        config
 BuildRequires:  audit-devel
 BuildRequires:  bash
@@ -41,11 +41,17 @@ Requires:       kmod
 Requires(post): coreutils
 Requires(postun): coreutils
 ExclusiveArch:  x86_64
+
+# Config file is only an inmutable copy from default config in lsg dom0 sources (arch/x86/configs/mshv_default_config)
+# to make permanent changes to config, make a PR for mshv_default_config in https://microsoft.visualstudio.com/DefaultCollection/LSG/_git/linux-dom0
+
+# To make temporary changes:
 # When updating the config files it is important to sanitize them.
 # Steps for updating a config file:
 #  1. Extract the linux sources into a folder
 #  2. Add the current config file to the folder
 #  3. Run `make menuconfig` to edit the file (Manually editing is not recommended)
+#     * You might have to install the following dependencies: libncurses5-dev flex
 #  4. Save the config file
 #  5. Copy the config file back into the kernel spec folder
 #  6. Revert any undesired changes (GCC related changes, etc)
@@ -55,18 +61,36 @@ ExclusiveArch:  x86_64
 # If there are significant changes to the config file, disable the config check and build the
 # kernel rpm. The final config file is included in /boot in the rpm.
 
+%ifarch x86_64
+%define image_fname vmlinux.bin
+%define image arch/x86/boot/compressed/%{image_fname}
+%if 0%{?centos_version} && 0%{?centos_version} < 900
+%define kcflags %{nil}
+%else
+%define kcflags -Wa,-mx86-used-note=no
+%endif
+%define arch x86_64
+%endif
+
 %description
 The kernel package contains the Linux kernel.
 
+%package devel
+Summary:        Lightweight kernel Devel package
+Group:          System Environment/Kernel
+Requires:       %{name} = %{version}-%{release}
+
+%description devel
+This package contains the kernel UVM devel files
+
 %prep
-%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{version}
+tar xf %{SOURCE0} --strip-components=1
 
 make mrproper
 
 cp %{config_source} .config
 cp .config current_config
-sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' .config
-make LC_ALL=  ARCH=%{arch} oldconfig
+make LC_ALL= ARCH=%{arch} oldconfig
 
 # Verify the config files match
 cp .config new_config
@@ -84,24 +108,70 @@ if [ -s config_diff ]; then
 fi
 
 %build
-make KCFLAGS="-Wa,-mx86-used-note=no" bzImage VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags}
+%ifarch x86_64
+KCFLAGS="%{kcflags}" make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags}
+%endif
 
 %install
-install -vdm 700 %{buildroot}/boot
+install -vdm 755 %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}
+install -vdm 755 %{buildroot}/lib/modules/%{uname_r}
 
+D=%{buildroot}%{_datadir}/cloud-hypervisor
+install -D -m 644 %{image} $D/%{image_fname}
+install -D -m 644 arch/%{arch}/boot/bzImage $D/bzImage
 %ifarch x86_64
-install -vm 600 arch/x86/boot/compressed/vmlinux.bin %{buildroot}/boot/vmlinux.bin
 mkdir -p %{buildroot}/lib/modules/%{name}
-cp arch/x86/boot/compressed/vmlinux.bin %{buildroot}/lib/modules/%{name}/vmlinux
+ln -s %{_datadir}/cloud-hypervisor/vmlinux.bin %{buildroot}/lib/modules/%{name}/vmlinux
 %endif
+
+find . -name Makefile* -o -name Kconfig* -o -name *.pl | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
+find arch/%{archdir}/include include scripts -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
+find $(find arch/%{archdir} -name include -o -name scripts -type d) -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
+find arch/%{archdir}/include Module.symvers include scripts -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
+%ifarch x86_64
+# CONFIG_STACK_VALIDATION=y requires objtool to build external modules
+install -vsm 755 tools/objtool/objtool %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/tools/objtool/
+install -vsm 755 tools/objtool/fixdep %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/tools/objtool/
+%endif
+
+cp .config %{buildroot}%{_prefix}/src/linux-headers-%{uname_r} # copy .config manually to be where it's expected to be
+ln -sf "%{_prefix}/src/linux-headers-%{uname_r}" "%{buildroot}/lib/modules/%{uname_r}/build"
+find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 
 %files
 %defattr(-,root,root)
 %license COPYING
-/boot/vmlinux.bin
-/lib/modules/%{name}
+%{_datadir}/cloud-hypervisor/%{image_fname}
+%{_datadir}/cloud-hypervisor/bzImage
+%dir %{_datadir}/cloud-hypervisor
+%ifarch x86_64
+/lib/modules/%{name}/vmlinux
+%endif
+
+%files devel
+%defattr(-,root,root)
+/lib/modules/%{uname_r}/build
+%{_prefix}/src/linux-headers-%{uname_r}
 
 %changelog
+* Fri May 12 2023 Saul Paredes <saulparedes@microsoft.com> - 5.15.110.mshv2-1
+- Update to v5.15.110.mshv2
+
+* Mon May 1 2023 Dallas Delaney <dadelan@microsoft.com> - 5.15.98.mshv1-4
+- Install the bzImage
+
+* Thu Apr 6 2023 Chris Co <chrco@microsoft.com> - 5.15.98.mshv1-3
+- Generate devel subpackage and enable loadable kernel module support
+
+* Thu Apr 6 2023 Saul Paredes <saulparedes@microsoft.com> 5.15.98.mshv1-2
+- Remove aarch64 build instructions
+
+* Fri Mar 24 2023 Saul Paredes <saulparedes@microsoft.com> 5.15.98.mshv1-1
+- Consume source and config from dom0
+
+* Thu Feb 23 2023 Aurélien Bombo <abombo@microsoft.com> - 5.15.48.1-9
+- Enable Hyper-V enlightenments.
+
 * Mon Sep 12 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.48.1-8
 - Create modules folder and copy vmlinux
 

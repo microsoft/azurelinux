@@ -1,7 +1,7 @@
 %define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
-Version:        9.0.1247
+Version:        9.0.1562
 Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
@@ -111,6 +111,7 @@ fi
 %{_datarootdir}/vim/vim*/ftplugof.vim
 %{_datarootdir}/vim/vim*/gvimrc_example.vim
 %{_datarootdir}/vim/vim*/import/dist/vimhelp.vim
+%{_datarootdir}/vim/vim*/import/dist/vimhighlight.vim
 %{_datarootdir}/vim/vim*/indent.vim
 %{_datarootdir}/vim/vim*/indent/*
 %{_datarootdir}/vim/vim*/indoff.vim
@@ -196,6 +197,21 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Wed May 17 2023 Muhammad Falak <mwani@microsoft.com> - 9.0.1562-1
+- Bump version to address CVE-2023-2609 & CVE-2023-2610
+
+* Mon May 08 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.0.1527-1
+- Auto-upgrade to 9.0.1527 - Fix CVE-2023-2426
+
+* Thu Mar 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.0.1402-1
+- Auto-upgrade to 9.0.1402 - fix CVE-2023-1355, CVE-2023-1264
+
+* Fri Mar 10 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.0.1378-1
+- Auto-upgrade to 9.0.1378 - to fix CVE-2023-1175
+
+* Thu Mar 09 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.0.1367-1
+- Auto-upgrade to 9.0.1367 - to fix CVE-2023-1127
+
 * Wed Feb 08 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.0.1247-1
 - Auto-upgrade to 9.0.1247 - to fix CVE-2023-0512
 

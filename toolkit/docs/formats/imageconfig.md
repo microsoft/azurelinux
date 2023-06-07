@@ -45,7 +45,7 @@ partition on the disk.
 
 Note that Partitions do not have to be provided; the resulting image is going to be a rootfs.
 
-Supported partition FsTypes: fat32, fat16, vfat, ext2, ext3, ext4, linux-swap.
+Supported partition FsTypes: fat32, fat16, vfat, ext2, ext3, ext4, xfs, linux-swap.
 
 Sample partitions entry, specifying a boot partition and a root partition:
 
@@ -191,44 +191,54 @@ A sample PackageLists entry pointing to three files containing package lists:
     "packagelists/cloud-init-packages.json"
 ],
 ```
-### PreInstallScripts
 
-There are customer requests that would like to use a Kickstart file to install Mariner OS. Kickstart installation normally includes pre-install scripts that run before installation begins and are normally used to handle tasks like network configuration, determining partition schema etc. The `PreInstallScripts` field allows for running customs scripts for similar purposes. Sample Kickstart pre-install script [here](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/5/html/installation_guide/s1-kickstart2-preinstallconfig). You must set the `IsKickStartBoot` to true in order to make the installer execute the preinstall scripts.
+### Customization Scripts
+The tools offer the option of executing arbitrary shell scripts during various points of the image generation process. There are three points that scripts can be executed: `PreInstall`, `PostInstall`, and `ImageFinalize`.
 
-**NOTE**: currently, Mariner's pre-install scripts are mostly intended to provide support for partitioning schema configuration. For this purpose, make sure the script creates a proper configuration file (example [here](https://www.golinuxhub.com/2018/05/sample-kickstart-partition-example-raid/)) under `/tmp/part-include` in order for it to be consumed by Mariner's image building tools.
+>Installer starts -> `PreInstallScripts` -> Create Partitions -> Install Packages -> `PostInstallScripts` -> Configure Bootloader (if any) -> Calculate dm-verity hashes (if configured) -> `ImageFinalizeScripts`
 
-PreInstallScripts is an array of file paths and the corresponding input arguments. Mariner tooling currently has the capability to execute the preinstall script and parse the partitioning commands inside /tmp/part-include.
+Each of the `PreInstallScripts`, `PostInstallScripts`, and `FinalizeImageScripts` entires are an array of file paths and the corresponding input arguments. The scripts will be executed in sequential order and within the context of the final image. The file paths are relative to the image configuration file. Scripts may be passed without arguments if desired.
 
-A sample PreInstallScripts entry pointing to two install scripts where one has input arguments and the other doesn't:
+All scripts follow the same format in the image config .json file:
 ``` json
-"PreInstallScripts":[
+"PreInstallScripts | PostInstallScripts | FinalizeImageScripts":[
     {
-        "Path": "arglessPreScript.sh"
+        "Path": "arglessScript.sh"
     },
     {
-        "Path": "PreScriptWithArguments.sh",
+        "Path": "ScriptWithArguments.sh",
         "Args": "--input abc --output cba"
     }
 ],
 ```
 
-### FinalizeImageScripts
+#### PreInstallScripts
 
-FinalizeImageScripts provide the opportunity to run shell scripts to customize the image before it is finalized.
+There are customer requests that would like to use a Kickstart file to install Mariner OS. Kickstart installation normally includes pre-install scripts that run before installation begins and are normally used to handle tasks like network configuration, determining partition schema etc. The `PreInstallScripts` field allows for running customs scripts for similar purposes. Sample Kickstart pre-install script [here](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/5/html/installation_guide/s1-kickstart2-preinstallconfig). You must set the `IsKickStartBoot` to true in order to make the installer execute the preinstall scripts.
 
-FinalizeImageScripts is an array of file paths and the corresponding input arguments. The scripts will be executed in sequential order and within the context of the final image.
+The preinstall scripts are run from the context of the installer, NOT the installed system (since it doesn't exist yet).
 
-Below is a sample FinalizeImageScripts entry pointing to two install scripts, where the first script has no input arguments and the second one has arguments:
-``` json
-"FinalizeImageScripts":[
-    {
-        "Path": "arglessPreScript.sh"
-    },
-    {
-        "Path": "PreScriptWithArguments.sh",
-        "Args": "--input abc --output cba"
-    }
-],
+**NOTE**: currently, Mariner's pre-install scripts are mostly intended to provide support for partitioning schema configuration. For this purpose, make sure the script creates a proper configuration file (example [here](https://www.golinuxhub.com/2018/05/sample-kickstart-partition-example-raid/)) under `/tmp/part-include` in order for it to be consumed by Mariner's image building tools.
+
+#### PostInstallScripts
+
+PostInstallScripts run immediately after all packages have been installed, but before image finalization steps are taken (configure bootloader, record read-only disks, etc). The postinstall scripts are run from the context of the installed system.
+
+#### FinalizeImageScripts
+
+FinalizeImageScripts provide the opportunity to run shell scripts to customize the image before it is finalized (converted to .vhdx, etc.). The finalizeimage scripts are run from the context of the installed system.
+
+### AdditionalFiles
+
+The `AdditionalFiles` list provides a mechanism to add arbitrary files to the image. The elemments are are `"src": "dst"` pairs. `src` is relative to the image config `.json` file, while `dst` is an absolute path on the installed system.
+
+ISO installers will include the files on the installation media and will place them  into the final installed image.
+
+```json
+    "AdditionalFiles": [
+        "../../out/tools/imager": "/installer/imager",
+        "additionalconfigs": "/etc/my/config.conf"
+    ]
 ```
 
 ### Networks
@@ -252,11 +262,38 @@ A sample Networks entry pointing to one network configuration:
 ],
 ```
 
+### PackageRepos
+
+The `PackageRepos` list defines custom package repos to use with **ISO installers**. Each repo must set `Name` and `BaseUrl`. Each repo may also set `GPGCheck`/`RepoGPGCheck` (both default to `true`), `GPGKeys` (a string of the form `file:///path/to/key1 file:///path/to/key2 ...`. `GPGKeys` defaults to the Microsoft RPM signing keys if left unset), and `Install` which causes the repo file to be installed into the final image.
+
+If a custom repo entry is present, the default local file repo entires **will not be used during install**. If you want to also use them you will need to add an entry for [local.repo](toolkit/resources/manifests/image/local.repo) into the repo list. The default behavior is to pre-download the required packages into the ISO installer from repos defined in `REPO_LIST`.
+
+By default the repo will only be used during ISO install, it may also be made available to the installed image by setting `Install` to `true`.
+
+> **Currently ISO installers don't support custom keys. Only installed repos support them. The keys must be provisioned via [AdditionalFiles](#additionalfiles)**
+
+```json
+"PackageRepos": [
+    {
+        "Name":     "PackageMicrosoftComMirror",
+        "BaseUrl":  "https://contoso.com/pmc-mirror/$releasever/prod/base/$basearch",
+        "Install":  false,
+    },
+    {
+        "Name":     "MyCopyOfOfficialRepo",
+        "BaseUrl":  "https://contoso.com/cbl-mariner-custom-packages/$releasever/prod/base/$basearch",
+        "Install":  true,
+        "GPGCheck": true,
+        "RepoGPGCheck": false,
+        "GPGKeys": "file:///etc/pki/rpm-gpg/my-custom-key"
+    }
+]
+```
+
 ### RemoveRpmDb
 
 RemoveRpmDb triggers RPM database removal after the packages have been installed.
 Removing the RPM database may break any package managers inside the image.
-
 
 ### KernelOptions
 
@@ -329,14 +366,18 @@ A sample ReadOnlyVerityRoot specifying a basic read-only root using default erro
 
 KernelCommandLine is an optional key which allows additional parameters to be passed to the kernel when it is launched from Grub.
 
+#### ImaPolicy
 ImaPolicy is a list of Integrity Measurement Architecture (IMA) policies to enable, they may be any combination of `tcb`, `appraise_tcb`, `secure_boot`.
 
-ExtraCommandLine is a string which will be appended to the end of the kernel command line and may contain any additional parameters desired. The `` ` `` character is reserved and may not be used.
+#### ExtraCommandLine
+ExtraCommandLine is a string which will be appended to the end of the kernel command line and may contain any additional parameters desired. The `` ` `` character is reserved and may not be used. **Note: Some kernel command line parameters are already configured by default in [grub.cfg](../../resources/assets/grub2/grub.cfg). Many command line options may be overwritten by passing a new value. If a specific argument must be removed from the existing grub template a `FinalizeImageScript` is currently required.
 
+#### SELinux
 The Security Enhanced Linux (SELinux) feature is enabled by using the `SELinux` key, with value containing the mode to use on boot.  The `enforcing` and `permissive` values will set the mode in /etc/selinux/config.
 This will instruct init (systemd) to set the configured mode on boot.  The `force_enforcing` option will set enforcing in the config and also add `enforcing=1` in the kernel command line,
 which is a higher precedent than the config file. This ensures SELinux boots in enforcing even if the /etc/selinux/config was altered.
 
+#### CGroup
 The version for CGroup in Mariner images can be enabled by using the `CGroup` key with value containing which version to use on boot. The value that can be chosen is either `version_one` or `version_two`. 
 The `version_two` value will set the cgroupv2 to be used in Mariner by setting the config value `systemd.unified_cgroup_hierarchy=1` in the default kernel command line. The value `version_one` or no value set will keep cgroupv1 (current default) to be enabled on boot.
 For more information about cgroups with Kubernetes, see [About cgroupv2](https://kubernetes.io/docs/concepts/architecture/cgroups/).

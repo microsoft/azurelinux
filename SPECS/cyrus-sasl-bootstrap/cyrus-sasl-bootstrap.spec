@@ -5,7 +5,7 @@
 Summary:        Cyrus Simple Authentication Service Layer (SASL) library
 Name:           %{_base_name}-bootstrap
 Version:        2.1.28
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD with advertising
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -25,7 +25,6 @@ Requires:       openssl
 Requires:       pam
 Requires:       systemd
 Requires:       libdb
-AutoProv:       no
 
 %description
 The Cyrus SASL package contains a Simple Authentication and Security
@@ -42,7 +41,6 @@ Summary:        Files needed for developing applications with Cyrus SASL
 Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-lib = %{version}-%{release}
 Requires:       pkg-config
-AutoProv:       no
 
 %description devel
 The %{name}-devel package contains files needed for developing and
@@ -50,7 +48,6 @@ compiling applications which use the Cyrus SASL library.
 
 %package lib
 Summary:        Shared libraries needed by applications which use Cyrus SASL
-AutoProv:       no
 
 %description lib
 The %{name}-lib package contains shared libraries which are needed by
@@ -195,6 +192,9 @@ make %{?_smp_mflags} check
 %exclude %{_plugindir2}/libsql.so.%{_soversion}*
 
 %changelog
+* Mon Feb 27 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.1.28-4
+- Remove AutoProv no to address build issues in openldap
+
 * Thu Feb 23 2023 Saul Paredes <saulparedes@microsoft.com> - 2.1.28-3
 - Bump release to solve dependency issue
 

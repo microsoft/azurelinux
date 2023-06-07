@@ -18,7 +18,7 @@
 Summary:        CLI for managing resources in InfluxDB
 Name:           influx-cli
 Version:        2.6.1
-Release:        4%{?dist}
+Release:        8%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -46,17 +46,6 @@ BuildRequires:  systemd-rpm-macros
 %description
 CLI for managing resources in InfluxDB v2.
 
-%package bash-completion
-Summary:        Bash Completion for %{name}
-Group:          Productivity/Databases/Servers
-Requires:       bash-completion
-Supplements:    (%{name} and bash-completion)
-BuildArch:      noarch
-
-%description bash-completion
-The official bash completion script for influx. It includes support
-for every argument that can currently be passed to influx.
-
 %package zsh-completion
 Summary:        ZSH Completion for %{name}
 Group:          Productivity/Databases/Servers
@@ -80,9 +69,6 @@ go build -mod vendor -ldflags="-X main.version=%{version}" -o bin/influx ./cmd/i
 mkdir -p %{buildroot}%{_bindir}
 install -D -m 0755 bin/influx %{buildroot}%{_bindir}/
 
-mkdir -p %{buildroot}/%{_datadir}/bash-completion/completions
-bin/influx completion bash > %{buildroot}/%{_datadir}/bash-completion/completions/influx
-
 mkdir -p %{buildroot}/%{_datadir}/zsh/site-functions
 bin/influx completion zsh > %{buildroot}/%{_datadir}/zsh/site-functions/_influx
 
@@ -91,13 +77,22 @@ bin/influx completion zsh > %{buildroot}/%{_datadir}/zsh/site-functions/_influx
 %doc README.md CHANGELOG.md
 %{_bindir}/influx
 
-%files bash-completion
-%{_datadir}/bash-completion
-
 %files zsh-completion
 %{_datadir}/zsh
 
 %changelog
+* Thu May 25 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 2.6.1-8
+- Removed bash-completion subpackage since the script produced is included in original bash-completion.
+
+* Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.6.1-7
+- Bump release to rebuild with go 1.19.8
+
+* Tue Mar 28 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.6.1-6
+- Bump release to rebuild with go 1.19.7
+
+* Wed Mar 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.6.1-5
+- Bump release to rebuild with go 1.19.6
+
 * Fri Feb 10 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.6.1-4
 - Fixing spec supplement of bash-completion library to not conflict with existing bash-completion
 

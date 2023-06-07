@@ -20,7 +20,7 @@
 %define lname libgd3
 Name:           gd
 Version:        2.3.3
-Release:        2%{?dist}
+Release:        4%{?dist}
 Summary:        A Drawing Library for Programs That Use PNG and JPEG Output
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -157,6 +157,12 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/gdlib.pc
 
 %changelog
+* Wed May 17 2023 Olivia Crain <oliviacrain@microsoft.com> - 2.3.3-4
+- Bumping release to re-build with newer 'libtiff' libraries.
+
+* Fri Mar 31 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.3-3
+- Bumping release to re-build with newer 'libtiff' libraries.
+
 * Tue Jun 28 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 2.3.3-2
 - Added temporary directory variable to check section to fix failing tests
 - See https://github.com/libgd/libgd/issues/763 for details

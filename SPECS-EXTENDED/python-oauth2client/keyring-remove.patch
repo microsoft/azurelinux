@@ -1,0 +1,23 @@
+diff -up oauth2client-4.1.3/docs/requirements.txt.keyring oauth2client-4.1.3/docs/requirements.txt
+diff -up oauth2client-4.1.3/docs/source/oauth2client.contrib.rst.keyring oauth2client-4.1.3/docs/source/oauth2client.contrib.rst
+--- oauth2client-4.1.3/docs/source/oauth2client.contrib.rst.keyring	2019-01-21 10:46:01.673326890 +0100
++++ oauth2client-4.1.3/docs/source/oauth2client.contrib.rst	2019-01-21 10:47:11.808142431 +0100
+@@ -17,7 +17,6 @@ Submodules
+    oauth2client.contrib.dictionary_storage
+    oauth2client.contrib.flask_util
+    oauth2client.contrib.gce
+-   oauth2client.contrib.keyring_storage
+    oauth2client.contrib.multiprocess_file_storage
+    oauth2client.contrib.sqlalchemy
+    oauth2client.contrib.xsrfutil
+diff -up oauth2client-4.1.3/tox.ini.keyring oauth2client-4.1.3/tox.ini
+--- oauth2client-4.1.3/tox.ini.keyring	2019-01-21 10:46:22.888573585 +0100
++++ oauth2client-4.1.3/tox.ini	2019-01-21 10:47:05.105064487 +0100
+@@ -13,7 +13,6 @@ basedeps = mock>=1.3.0
+            fasteners
+ deps = {[testenv]basedeps}
+        django
+-       keyring
+        jsonpickle
+ setenv =
+     pypy: with_gmp=no

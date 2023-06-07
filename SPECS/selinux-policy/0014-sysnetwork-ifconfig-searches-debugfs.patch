@@ -1,0 +1,27 @@
+From 107949f1e2a7ff7df1c16f1d2de0e395adc3ddc8 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Mon, 29 Aug 2022 20:07:54 +0000
+Subject: [PATCH 14/35] sysnetwork: ifconfig searches debugfs.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/system/sysnetwork.te | 1 +
+ 1 file changed, 1 insertion(+)
+
+MSFT_TAG: pending
+
+diff --git a/policy/modules/system/sysnetwork.te b/policy/modules/system/sysnetwork.te
+index 47811a554..9ef1300ef 100644
+--- a/policy/modules/system/sysnetwork.te
++++ b/policy/modules/system/sysnetwork.te
+@@ -326,6 +326,7 @@ kernel_read_network_state(ifconfig_t)
+ kernel_request_load_module(ifconfig_t)
+ kernel_search_network_sysctl(ifconfig_t)
+ kernel_rw_net_sysctls(ifconfig_t)
++kernel_search_debugfs(ifconfig_t)
+ 
+ corenet_rw_tun_tap_dev(ifconfig_t)
+ 
+-- 
+2.34.1
+

@@ -1,0 +1,947 @@
+From 2ddad2bc51816f719a65176c4ebe0b04f56ef8d0 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Thu, 16 Feb 2023 15:25:40 +0000
+Subject: [PATCH 32/35] Port PKI module from Fedora policy.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/kernel/corenetwork.te.in |   6 +
+ policy/modules/services/apache.if       |  38 ++
+ policy/modules/services/pki.fc          |  36 ++
+ policy/modules/services/pki.if          | 520 ++++++++++++++++++++++++
+ policy/modules/services/pki.te          | 253 ++++++++++++
+ policy/modules/services/tomcat.te       |  13 +
+ 6 files changed, 866 insertions(+)
+ create mode 100644 policy/modules/services/pki.fc
+ create mode 100644 policy/modules/services/pki.if
+ create mode 100644 policy/modules/services/pki.te
+
+MSFT_TAG: pending
+
+diff --git a/policy/modules/kernel/corenetwork.te.in b/policy/modules/kernel/corenetwork.te.in
+index b465af7de..dcedc5653 100644
+--- a/policy/modules/kernel/corenetwork.te.in
++++ b/policy/modules/kernel/corenetwork.te.in
+@@ -227,6 +227,12 @@ network_port(pegasus_http, tcp,5988,s0)
+ network_port(pegasus_https, tcp,5989,s0)
+ network_port(pgpkeyserver, udp, 11371,s0, tcp,11371,s0)
+ network_port(pingd, tcp,9125,s0)
++network_port(pki_ca, tcp, 829, s0, tcp, 9180, s0, tcp, 9701, s0, tcp, 9443-9447, s0)
++network_port(pki_kra, tcp, 10180, s0, tcp, 10701, s0, tcp, 10443-10446, s0)
++network_port(pki_ocsp, tcp, 11180, s0, tcp, 11701, s0, tcp, 11443-11446, s0)
++network_port(pki_ra, tcp,12888-12889,s0)
++network_port(pki_tks, tcp, 13180, s0, tcp, 13701, s0, tcp, 13443-13446, s0)
++network_port(pki_tps, tcp,7888-7889,s0)
+ network_port(pktcable_cops, tcp,2126,s0, udp,2126,s0)
+ network_port(pop, tcp,106,s0, tcp,109,s0, tcp,110,s0, tcp,143,s0, tcp,220,s0, tcp,993,s0, tcp,995,s0, tcp,1109,s0)
+ network_port(portmap, udp,111,s0, tcp,111,s0)
+diff --git a/policy/modules/services/apache.if b/policy/modules/services/apache.if
+index 2b3a7f3c5..6600ffedb 100644
+--- a/policy/modules/services/apache.if
++++ b/policy/modules/services/apache.if
+@@ -254,6 +254,25 @@ interface(`apache_exec',`
+ 	can_exec($1, httpd_exec_t)
+ ')
+ 
++########################################
++## <summary>
++##	Allow any httpd_exec_t to be an entrypoint of this domain
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++## <rolecap/>
++#
++interface(`apache_entrypoint',`
++	gen_require(`
++		type httpd_exec_t;
++	')
++
++	allow $1 httpd_exec_t:file entrypoint;
++')
++
+ ########################################
+ ## <summary>
+ ##	Execute httpd server in the httpd domain.
+@@ -997,6 +1016,25 @@ interface(`apache_domtrans_rotatelogs',`
+ 	domtrans_pattern($1, httpd_rotatelogs_exec_t, httpd_rotatelogs_t)
+ ')
+ 
++######################################
++## <summary>
++##	Allow the specified domain to execute apache suexec
++##	in the caller domain.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`apache_exec_suexec',`
++	gen_require(`
++		type httpd_suexec_exec_t;
++	')
++
++	can_exec($1, httpd_suexec_exec_t)
++')
++
+ ########################################
+ ## <summary>
+ ##	List httpd system content directories.
+diff --git a/policy/modules/services/pki.fc b/policy/modules/services/pki.fc
+new file mode 100644
+index 000000000..ae31da988
+--- /dev/null
++++ b/policy/modules/services/pki.fc
+@@ -0,0 +1,36 @@
++# default labeling for nCipher
++/dev/nfast(/.*)?			gen_context(system_u:object_r:pki_common_dev_t, s0)
++
++/etc/pki/pki-tomcat(/.*)?		gen_context(system_u:object_r:pki_tomcat_etc_rw_t,s0)
++/etc/pki/pki-tomcat/alias(/.*)?		gen_context(system_u:object_r:pki_tomcat_cert_t,s0)
++/etc/pki/pki-tomcat/ca(/.*)?		gen_context(system_u:object_r:pki_tomcat_cert_t,s0)
++/etc/pki-ra(/.*)?			gen_context(system_u:object_r:pki_ra_etc_rw_t,s0)
++/etc/pki-tps(/.*)?			gen_context(system_u:object_r:pki_tps_etc_rw_t,s0)
++
++/etc/sysconfig/pki/ra(/.*)?		gen_context(system_u:object_r:pki_ra_etc_rw_t,s0)
++/etc/sysconfig/pki/tomcat(/.*)?		gen_context(system_u:object_r:pki_tomcat_etc_rw_t,s0)
++/etc/sysconfig/pki/tps(/.*)?		gen_context(system_u:object_r:pki_tps_etc_rw_t,s0)
++
++# default labeling for nCipher
++/opt/nfast(/.*)?			gen_context(system_u:object_r:pki_common_t, s0)
++
++/usr/bin/pkidaemon		--	gen_context(system_u:object_r:pki_tomcat_exec_t,s0)
++
++/var/lib/pki/pki-tomcat(/.*)?		gen_context(system_u:object_r:pki_tomcat_var_lib_t,s0)
++/var/lib/pki-ra(/.*)?			gen_context(system_u:object_r:pki_ra_var_lib_t,s0)
++/var/lib/pki-ra/pki-ra		--	gen_context(system_u:object_r:pki_ra_exec_t,s0)
++/var/lib/pki-tps(/.*)?			gen_context(system_u:object_r:pki_tps_var_lib_t,s0)
++/var/lib/pki-tps/pki-tps	--	gen_context(system_u:object_r:pki_tps_exec_t,s0)
++
++/usr/lib/systemd/system/pki-tomcat.* --	gen_context(system_u:object_r:pki_tomcat_unit_t,s0)
++
++/var/lock/subsys/pkidaemon	--	gen_context(system_u:object_r:pki_tomcat_lock_t,s0)
++
++/var/log/pki(/.*)?			gen_context(system_u:object_r:pki_log_t,s0)
++/var/log/pki/pki-tomcat(/.*)?		gen_context(system_u:object_r:pki_tomcat_log_t,s0)
++/var/log/pki-ra(/.*)?			gen_context(system_u:object_r:pki_ra_log_t,s0)
++/var/log/pki-tps(/.*)?			gen_context(system_u:object_r:pki_tps_log_t,s0)
++
++/var/run/pki/ra(/.*)?			gen_context(system_u:object_r:pki_ra_runtime_t,s0)
++/var/run/pki/tomcat(/.*)?		gen_context(system_u:object_r:pki_tomcat_runtime_t,s0)
++/var/run/pki/tps(/.*)?			gen_context(system_u:object_r:pki_tps_runtime_t,s0)
+diff --git a/policy/modules/services/pki.if b/policy/modules/services/pki.if
+new file mode 100644
+index 000000000..83cdfec18
+--- /dev/null
++++ b/policy/modules/services/pki.if
+@@ -0,0 +1,520 @@
++
++## <summary>policy for pki</summary>
++
++########################################
++## <summary>
++##      Allow read and write pki cert files.
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++#
++interface(`pki_rw_tomcat_cert',`
++        gen_require(`
++                type pki_tomcat_cert_t, pki_tomcat_etc_rw_t;
++        ')
++
++	allow $1 pki_tomcat_etc_rw_t:dir search_dir_perms;
++        rw_files_pattern($1, pki_tomcat_cert_t, pki_tomcat_cert_t)
++        create_lnk_files_pattern($1, pki_tomcat_cert_t, pki_tomcat_cert_t)
++')
++
++########################################
++## <summary>
++##      Allow read and write pki cert files.
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++#
++interface(`pki_manage_tomcat_cert',`
++        gen_require(`
++                type pki_tomcat_cert_t, pki_tomcat_etc_rw_t;
++        ')
++
++	allow $1 pki_tomcat_etc_rw_t:dir manage_dir_perms;
++        manage_files_pattern($1, pki_tomcat_cert_t, pki_tomcat_cert_t)
++        manage_lnk_files_pattern($1, pki_tomcat_cert_t, pki_tomcat_cert_t)
++')
++
++########################################
++## <summary>
++##      Allow read and write pki cert files.
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++#
++interface(`pki_manage_tomcat_etc_rw',`
++        gen_require(`
++		type pki_tomcat_etc_rw_t;
++        ')
++
++        manage_files_pattern($1, pki_tomcat_etc_rw_t, pki_tomcat_etc_rw_t)
++        manage_lnk_files_pattern($1, pki_tomcat_etc_rw_t, pki_tomcat_etc_rw_t)
++')
++
++########################################
++## <summary>
++##      Allow domain to read pki cert files.
++## </summary>
++## <param name="domain">
++##      <summary>
++##      Domain allowed access.
++##      </summary>
++## </param>
++#
++interface(`pki_read_tomcat_cert',`
++        gen_require(`
++                type pki_tomcat_cert_t;
++        ')
++
++        read_files_pattern($1, pki_tomcat_cert_t, pki_tomcat_cert_t)
++        read_lnk_files_pattern($1, pki_tomcat_cert_t, pki_tomcat_cert_t)
++')
++
++########################################
++## <summary>
++##	Create a set of derived types for apache
++##	web content.
++## </summary>
++## <param name="prefix">
++##	<summary>
++##	The prefix to be used for deriving type names.
++##	</summary>
++## </param>
++#
++template(`pki_apache_template',`
++	gen_require(`
++		attribute pki_apache_domain;
++		attribute pki_apache_config, pki_apache_var_lib, pki_apache_var_run;
++		attribute pki_apache_executable, pki_apache_script, pki_apache_var_log;
++	')
++
++	########################################
++	#
++	# Declarations
++	#
++
++	type $1_t, pki_apache_domain;
++	type $1_exec_t, pki_apache_executable;
++	domain_type($1_t)
++	init_daemon_domain($1_t, $1_exec_t)
++
++	type $1_script_exec_t, pki_apache_script;
++	init_script_file($1_script_exec_t)
++
++	type $1_etc_rw_t, pki_apache_config;
++	files_type($1_etc_rw_t)
++
++	type $1_lock_t;
++	files_lock_file($1_lock_t)
++
++	type $1_log_t, pki_apache_var_log;
++	logging_log_file($1_log_t)
++
++	type $1_runtime_t, pki_apache_var_run;
++	files_runtime_file($1_runtime_t)
++
++	type $1_tmp_t;
++	files_tmpfs_file($1_tmp_t)
++
++	type $1_var_lib_t, pki_apache_var_lib;
++	files_type($1_var_lib_t)
++
++	########################################
++	#
++	# $1 local policy
++	#
++
++	files_read_etc_files($1_t)
++	allow $1_t $1_etc_rw_t:lnk_file read;
++
++	manage_dirs_pattern($1_t, $1_etc_rw_t, $1_etc_rw_t)
++	manage_files_pattern($1_t, $1_etc_rw_t, $1_etc_rw_t)
++	files_etc_filetrans($1_t,$1_etc_rw_t, { file dir })
++
++	manage_dirs_pattern($1_t, $1_lock_t, $1_lock_t)
++	manage_files_pattern($1_t, $1_lock_t, $1_lock_t)
++	manage_lnk_files_pattern($1_t, $1_lock_t, $1_lock_t)
++	files_lock_filetrans($1_t, $1_lock_t, { dir file lnk_file })
++
++	manage_dirs_pattern($1_t, $1_log_t,  $1_log_t)
++	manage_files_pattern($1_t, $1_log_t,  $1_log_t)
++	logging_log_filetrans($1_t, $1_log_t, { file dir } )
++
++	manage_dirs_pattern($1_t, $1_runtime_t,  $1_runtime_t)
++	manage_files_pattern($1_t, $1_runtime_t,  $1_runtime_t)
++	files_runtime_filetrans($1_t,$1_runtime_t, { file dir })
++
++	manage_files_pattern($1_t, $1_tmp_t, $1_tmp_t)
++	manage_dirs_pattern($1_t, $1_tmp_t, $1_tmp_t)
++	files_tmp_filetrans($1_t, $1_tmp_t, { file dir })
++
++	manage_dirs_pattern($1_t, $1_var_lib_t,  $1_var_lib_t)
++	manage_files_pattern($1_t, $1_var_lib_t,  $1_var_lib_t)
++	read_lnk_files_pattern($1_t, $1_var_lib_t, $1_var_lib_t)
++	files_var_lib_filetrans($1_t, $1_var_lib_t, { file dir } )
++
++	# need to resolve addresses?
++	auth_use_nsswitch($1_t)
++
++	corenet_all_recvfrom_unlabeled($1_t)
++
++	kernel_read_kernel_sysctls($1_t)
++	kernel_read_system_state($1_t)
++
++	#talk to lunasa hsm
++	logging_send_syslog_msg($1_t)
++')
++
++#######################################
++## <summary>
++##  Send a null signal to pki apache domains.
++## </summary>
++## <param name="domain">
++##  <summary>
++##  Domain allowed access.
++##  </summary>
++## </param>
++#
++interface(`pki_apache_domain_signal',`
++	gen_require(`
++		attribute pki_apache_domain;
++	')
++
++	allow $1 pki_apache_domain:process signal;
++')
++
++#######################################
++## <summary>
++##  Send a null signal to pki apache domains.
++## </summary>
++## <param name="domain">
++##  <summary>
++##  Domain allowed access.
++##  </summary>
++## </param>
++#
++interface(`pki_apache_domain_signull',`
++	gen_require(`
++		attribute pki_apache_domain;
++	')
++
++	allow $1 pki_apache_domain:process signull;
++')
++
++###################################
++## <summary>
++##  Allow domain to read pki apache subsystem pid files
++## </summary>
++## <param name="domain">
++##  <summary>
++##  Domain allowed access.
++##  </summary>
++## </param>
++#
++interface(`pki_manage_apache_run',`
++	gen_require(`
++		attribute pki_apache_var_run;
++	')
++
++	files_search_var_lib($1)
++	read_files_pattern($1, pki_apache_var_run, pki_apache_var_run)
++')
++
++####################################
++## <summary>
++##  Allow domain to manage pki apache subsystem lib files
++## </summary>
++## <param name="domain">
++##  <summary>
++##  Domain allowed access.
++##  </summary>
++## </param>
++#
++interface(`pki_manage_apache_lib',`
++	gen_require(`
++		attribute pki_apache_var_lib;
++	')
++
++	files_search_var_lib($1)
++	manage_files_pattern($1, pki_apache_var_lib, pki_apache_var_lib)
++	manage_lnk_files_pattern($1, pki_apache_var_lib, pki_apache_var_lib)
++')
++
++##################################
++## <summary>
++##  Dontaudit domain to write pki log files
++## </summary>
++## <param name="domain">
++##  <summary>
++##  Domain allowed access.
++##  </summary>
++## </param>
++#
++interface(`pki_search_log_dirs',`
++	gen_require(`
++		type pki_log_t;
++	')
++
++	search_dirs_pattern($1, pki_log_t, pki_log_t)
++')
++
++##################################
++## <summary>
++##  Dontaudit domain to write pki log files
++## </summary>
++## <param name="domain">
++##  <summary>
++##  Domain allowed access.
++##  </summary>
++## </param>
++#
++interface(`pki_dontaudit_write_log',`
++	gen_require(`
++		type pki_log_t;
++	')
++
++	dontaudit $1 pki_log_t:file write;
++')
++
++###################################
++## <summary>
++##  Allow domain to manage pki apache subsystem log files
++## </summary>
++## <param name="domain">
++##  <summary>
++##  Domain allowed access.
++##  </summary>
++## </param>
++#
++interface(`pki_manage_apache_log_files',`
++	gen_require(`
++		attribute pki_apache_var_log;
++	')
++
++	files_search_var_lib($1)
++	manage_files_pattern($1, pki_apache_var_log, pki_apache_var_log)
++')
++
++##################################
++## <summary>
++##  Allow domain to manage pki apache subsystem config files
++## </summary>
++## <param name="domain">
++##  <summary>
++##  Domain allowed access.
++##  </summary>
++## </param>
++#
++interface(`pki_manage_apache_config_files',`
++	gen_require(`
++		attribute pki_apache_config;
++	')
++
++	files_search_var_lib($1)
++	manage_files_pattern($1, pki_apache_config, pki_apache_config)
++')
++
++#################################
++## <summary>
++##  Allow domain to read pki tomcat lib files.
++## </summary>
++## <param name="domain">
++##  <summary>
++##  Domain allowed access.
++##  </summary>
++## </param>
++#
++interface(`pki_read_tomcat_lib_files',`
++	gen_require(`
++		type pki_tomcat_var_lib_t;
++	')
++
++	read_files_pattern($1, pki_tomcat_var_lib_t, pki_tomcat_var_lib_t)
++	read_lnk_files_pattern($1, pki_tomcat_var_lib_t, pki_tomcat_var_lib_t)
++')
++
++
++#################################
++## <summary>
++##  Allow domain to manage pki tomcat lib files.
++## </summary>
++## <param name="domain">
++##  <summary>
++##  Domain allowed access.
++##  </summary>
++## </param>
++#
++interface(`pki_manage_tomcat_lib',`
++	gen_require(`
++		type pki_tomcat_var_lib_t;
++	')
++
++	manage_dirs_pattern($1, pki_tomcat_var_lib_t, pki_tomcat_var_lib_t)
++	manage_files_pattern($1, pki_tomcat_var_lib_t, pki_tomcat_var_lib_t)
++	manage_lnk_files_pattern($1, pki_tomcat_var_lib_t, pki_tomcat_var_lib_t)
++')
++
++#################################
++## <summary>
++##  Allow domain to manage pki tomcat lib files.
++## </summary>
++## <param name="domain">
++##  <summary>
++##  Domain allowed access.
++##  </summary>
++## </param>
++#
++interface(`pki_manage_tomcat_log',`
++	gen_require(`
++		type pki_tomcat_log_t;
++	')
++
++	manage_dirs_pattern($1, pki_tomcat_log_t, pki_tomcat_log_t)
++	manage_files_pattern($1, pki_tomcat_log_t, pki_tomcat_log_t)
++')
++
++#################################
++## <summary>
++##  Allow domain to read pki tomcat lib dirs
++## </summary>
++## <param name="domain">
++##  <summary>
++##  Domain allowed access.
++##  </summary>
++## </param>
++#
++interface(`pki_read_tomcat_lib_dirs',`
++	gen_require(`
++		type pki_tomcat_var_lib_t;
++	')
++
++	list_dirs_pattern($1, pki_tomcat_var_lib_t, pki_tomcat_var_lib_t)
++')
++
++########################################
++## <summary>
++##	Allow read pki_common_t files
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`pki_read_common_files',`
++	gen_require(`
++		type pki_common_t;
++	')
++
++	read_files_pattern($1, pki_common_t, pki_common_t)
++')
++
++########################################
++## <summary>
++##	Allow execute pki_common_t files
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`pki_exec_common_files',`
++	gen_require(`
++		type pki_common_t;
++	')
++
++	exec_files_pattern($1, pki_common_t, pki_common_t)
++')
++
++########################################
++## <summary>
++##	Allow read pki_common_t files
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`pki_manage_common_files',`
++	gen_require(`
++		type pki_common_t;
++	')
++
++	manage_files_pattern($1, pki_common_t, pki_common_t)
++	manage_dirs_pattern($1, pki_common_t, pki_common_t)
++')
++
++########################################
++## <summary>
++##	Connect to pki over an unix
++##	stream socket.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`pki_stream_connect',`
++	gen_require(`
++		type pki_tomcat_t, pki_common_t;
++	')
++
++	files_search_runtime($1)
++	stream_connect_pattern($1, pki_common_t, pki_common_t, pki_tomcat_t)
++')
++
++########################################
++## <summary>
++##	Execute pki in the pkit_tomcat_t domain.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed to transition.
++##	</summary>
++## </param>
++#
++interface(`pki_tomcat_systemctl',`
++	gen_require(`
++		type pki_tomcat_t;
++		type pki_tomcat_unit_t;
++	')
++
++	systemd_exec_systemctl($1)
++	systemd_read_fifo_file_passwd_run($1)
++	allow $1 pki_tomcat_unit_t:file read_file_perms;
++	allow $1 pki_tomcat_unit_t:service manage_service_perms;
++
++	ps_process_pattern($1, pki_tomcat_t)
++')
++
++########################################
++## <summary>
++##	Create, read, write, and delete
++##	pki tomcat pid files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`pki_manage_tomcat_pid',`
++	gen_require(`
++		type pki_tomcat_var_run_t;
++	')
++
++	files_search_runtime($1)
++	manage_files_pattern($1, pki_tomcat_var_run_t, pki_tomcat_var_run_t)
++')
+diff --git a/policy/modules/services/pki.te b/policy/modules/services/pki.te
+new file mode 100644
+index 000000000..d77d31d6c
+--- /dev/null
++++ b/policy/modules/services/pki.te
+@@ -0,0 +1,253 @@
++policy_module(pki)
++
++########################################
++#
++# Declarations
++#
++
++attribute pki_apache_domain;
++attribute pki_apache_config;
++attribute pki_apache_executable;
++attribute pki_apache_var_lib;
++attribute pki_apache_var_log;
++attribute pki_apache_var_run;
++attribute pki_apache_pidfiles;
++attribute pki_apache_script;
++
++type pki_log_t;
++logging_log_file(pki_log_t)
++
++type pki_common_t;
++files_type(pki_common_t)
++
++type pki_common_dev_t;
++files_type(pki_common_dev_t)
++
++type pki_tomcat_etc_rw_t;
++files_type(pki_tomcat_etc_rw_t)
++
++type pki_tomcat_cert_t;
++miscfiles_cert_type(pki_tomcat_cert_t)
++
++tomcat_domain_template(pki_tomcat)
++domain_obj_id_change_exemption(pki_tomcat_t)
++
++type pki_tomcat_unit_t;
++init_unit_file(pki_tomcat_unit_t)
++
++type pki_tomcat_lock_t;
++files_lock_file(pki_tomcat_lock_t)
++
++# pki policy types
++type pki_tps_tomcat_exec_t;
++files_type(pki_tps_tomcat_exec_t)
++
++pki_apache_template(pki_tps)
++
++# ra policy types
++type pki_ra_tomcat_exec_t;
++files_type(pki_ra_tomcat_exec_t)
++
++pki_apache_template(pki_ra)
++
++# needed for dogtag 9 style instances
++type pki_tomcat_script_t;
++domain_type(pki_tomcat_script_t)
++role system_r types pki_tomcat_script_t;
++
++########################################
++#
++# pki-tomcat local policy
++#
++
++allow pki_tomcat_t self:capability { setuid chown setgid fowner audit_write dac_read_search  sys_nice fsetid };
++dontaudit pki_tomcat_t self:capability net_admin;
++allow pki_tomcat_t self:process { signal setsched signull execmem setfscreate };
++allow pki_tomcat_t self:netlink_audit_socket { nlmsg_relay create };
++allow pki_tomcat_t self:tcp_socket { accept listen };
++
++# allow writing to the kernel keyring
++allow pki_tomcat_t self:key { write read };
++
++# allow java subsystems to talk to the ncipher hsm
++allow pki_tomcat_t pki_common_dev_t:sock_file write;
++allow pki_tomcat_t pki_common_dev_t:dir search;
++allow pki_tomcat_t pki_common_t:dir create_dir_perms;
++manage_files_pattern(pki_tomcat_t, pki_common_t, pki_common_t)
++can_exec(pki_tomcat_t, pki_common_t)
++init_stream_connect_script(pki_tomcat_t)
++
++manage_dirs_pattern(pki_tomcat_t, pki_tomcat_cert_t, pki_tomcat_cert_t)
++manage_files_pattern(pki_tomcat_t, pki_tomcat_cert_t, pki_tomcat_cert_t)
++manage_lnk_files_pattern(pki_tomcat_t, pki_tomcat_cert_t, pki_tomcat_cert_t)
++
++manage_dirs_pattern(pki_tomcat_t, pki_tomcat_etc_rw_t, pki_tomcat_etc_rw_t)
++manage_files_pattern(pki_tomcat_t, pki_tomcat_etc_rw_t, pki_tomcat_etc_rw_t)
++manage_lnk_files_pattern(pki_tomcat_t, pki_tomcat_etc_rw_t, pki_tomcat_etc_rw_t)
++allow pki_tomcat_t pki_tomcat_etc_rw_t:file relabel_file_perms;
++
++manage_dirs_pattern(pki_tomcat_t,  pki_tomcat_lock_t,  pki_tomcat_lock_t)
++manage_files_pattern(pki_tomcat_t,  pki_tomcat_lock_t,  pki_tomcat_lock_t)
++manage_lnk_files_pattern(pki_tomcat_t,  pki_tomcat_lock_t,  pki_tomcat_lock_t)
++files_lock_filetrans(pki_tomcat_t,  pki_tomcat_lock_t, { dir file lnk_file })
++
++search_dirs_pattern(pki_tomcat_t, pki_log_t, pki_log_t)
++
++read_files_pattern(pki_tomcat_t, pki_tomcat_unit_t,pki_tomcat_unit_t)
++read_lnk_files_pattern(pki_tomcat_t, pki_tomcat_unit_t, pki_tomcat_unit_t)
++allow pki_tomcat_t pki_tomcat_unit_t:file setattr;
++allow pki_tomcat_t pki_tomcat_unit_t:lnk_file setattr;
++init_search_units(pki_tomcat_t)
++
++# for crl publishing
++allow pki_tomcat_t pki_tomcat_var_lib_t:lnk_file { rename create unlink };
++
++auth_use_nsswitch(pki_tomcat_t)
++# for ECC
++auth_getattr_shadow(pki_tomcat_t)
++
++corenet_tcp_connect_http_cache_port(pki_tomcat_t)
++corenet_tcp_connect_ldap_port(pki_tomcat_t)
++corenet_tcp_connect_smtp_port(pki_tomcat_t)
++corenet_tcp_connect_pki_ca_port(pki_tomcat_t)
++
++kernel_read_kernel_sysctls(pki_tomcat_t)
++kernel_read_net_sysctls(pki_tomcat_t)
++
++libs_exec_ldconfig(pki_tomcat_t)
++
++logging_send_audit_msgs(pki_tomcat_t)
++
++miscfiles_read_hwdata(pki_tomcat_t)
++
++selinux_get_enforce_mode(pki_tomcat_t)
++
++optional_policy(`
++        consoletype_exec(pki_tomcat_t)
++')
++
++optional_policy(`
++        hostname_exec(pki_tomcat_t)
++')
++
++#######################################
++#
++# tps local policy
++#
++
++# used to serve cgi web pages under /var/lib/pki-tps, formatting, enrollment
++allow pki_tps_t pki_tps_var_lib_t:file exec_file_perms;
++
++corenet_tcp_bind_pki_tps_port(pki_tps_t)
++# customer may run an ldap server on 389
++corenet_tcp_connect_ldap_port(pki_tps_t)
++# connect to other subsystems
++corenet_tcp_connect_pki_ca_port(pki_tps_t)
++corenet_tcp_connect_pki_kra_port(pki_tps_t)
++corenet_tcp_connect_pki_tks_port(pki_tps_t)
++
++files_exec_usr_files(pki_tps_t)
++
++######################################
++#
++# ra local policy
++#
++
++#  RA specific? talking to mysql?
++allow pki_ra_t self:udp_socket create_socket_perms;
++allow pki_ra_t self:unix_dgram_socket create_socket_perms;
++
++corenet_tcp_bind_pki_ra_port(pki_ra_t)
++# talk to other subsystems
++corenet_tcp_connect_http_port(pki_ra_t)
++corenet_tcp_connect_pki_ca_port(pki_ra_t)
++corenet_tcp_connect_smtp_port(pki_ra_t)
++
++fs_getattr_xattr_fs(pki_ra_t)
++
++files_search_spool(pki_ra_t)
++files_exec_usr_files(pki_ra_t)
++
++optional_policy(`
++	mta_send_mail(pki_ra_t)
++	mta_manage_spool(pki_ra_t)
++	mta_manage_queue(pki_ra_t)
++	mta_read_config(pki_ra_t)
++')
++
++#####################################
++#
++# pki_apache_domain local policy
++#
++
++
++allow pki_apache_domain self:capability { setuid sys_nice setgid dac_read_search  fowner fsetid kill chown };
++allow pki_apache_domain self:process { setsched signal getsched signull execstack execmem sigkill };
++allow pki_apache_domain self:sem all_sem_perms;
++allow pki_apache_domain self:tcp_socket create_stream_socket_perms;
++allow pki_apache_domain self:netlink_route_socket { create_socket_perms nlmsg_read };
++# allow writing to the kernel keyring
++allow pki_apache_domain self:key { write read };
++## internal communication is often done using fifo and unix sockets.
++allow pki_apache_domain self:fifo_file rw_file_perms;
++allow pki_apache_domain self:unix_stream_socket create_stream_socket_perms;
++
++# shutdown script uses ps
++ps_process_pattern(pki_apache_domain, pki_apache_domain)
++
++# talk to the hsm
++allow pki_apache_domain pki_common_dev_t:sock_file write;
++allow pki_apache_domain pki_common_dev_t:dir search;
++allow pki_apache_domain pki_common_t:dir create_dir_perms;
++manage_files_pattern(pki_apache_domain, pki_common_t, pki_common_t)
++can_exec(pki_apache_domain, pki_common_t)
++init_stream_connect_script(pki_apache_domain)
++
++corenet_sendrecv_unlabeled_packets(pki_apache_domain)
++corenet_tcp_bind_all_nodes(pki_apache_domain)
++corenet_tcp_sendrecv_all_if(pki_apache_domain)
++corenet_tcp_sendrecv_all_nodes(pki_apache_domain)
++#corenet_all_recvfrom_unlabeled(pki_apache_domain)
++corenet_tcp_connect_generic_port(pki_apache_domain)
++
++# Init script handling
++domain_use_interactive_fds(pki_apache_domain)
++# shutdown script uses ps
++domain_dontaudit_read_all_domains_state(pki_apache_domain)
++
++init_dontaudit_write_utmp(pki_apache_domain)
++
++libs_use_ld_so(pki_apache_domain)
++libs_use_shared_libs(pki_apache_domain)
++libs_exec_ld_so(pki_apache_domain)
++libs_exec_lib_files(pki_apache_domain)
++
++fs_search_cgroup_dirs(pki_apache_domain)
++
++corecmd_exec_bin(pki_apache_domain)
++corecmd_exec_shell(pki_apache_domain)
++
++dev_read_urand(pki_apache_domain)
++dev_read_rand(pki_apache_domain)
++
++seutil_exec_setfiles(pki_apache_domain)
++
++sysnet_read_config(pki_apache_domain)
++
++term_dontaudit_use_unallocated_ttys(pki_apache_domain)
++term_dontaudit_use_generic_ptys(pki_apache_domain)
++
++optional_policy(`
++	# apache permissions
++	apache_exec_modules(pki_apache_domain)
++	apache_list_modules(pki_apache_domain)
++	apache_read_config(pki_apache_domain)
++	apache_exec(pki_apache_domain)
++	apache_exec_suexec(pki_apache_domain)
++	apache_entrypoint(pki_apache_domain)
++')
++
++# allow rpm -q in init scripts
++optional_policy(`
++	rpm_exec(pki_apache_domain)
++')
+diff --git a/policy/modules/services/tomcat.te b/policy/modules/services/tomcat.te
+index 59dd6e0d6..a772ac7b7 100644
+--- a/policy/modules/services/tomcat.te
++++ b/policy/modules/services/tomcat.te
+@@ -43,6 +43,19 @@ auth_use_nsswitch(tomcat_t)
+ # Temporary fix, while missing SELinux policies for HSM
+ init_stream_connect_script(tomcat_t)
+ 
++optional_policy(`
++    pki_manage_tomcat_cert(tomcat_t)
++    pki_manage_apache_log_files(tomcat_t)
++    pki_manage_tomcat_lib(tomcat_t)
++    pki_manage_tomcat_etc_rw(tomcat_t)
++    pki_search_log_dirs(tomcat_t)
++    pki_manage_tomcat_pid(tomcat_t)
++    pki_manage_tomcat_log(tomcat_t)
++    pki_manage_common_files(tomcat_t)
++    pki_exec_common_files(tomcat_t)
++    pki_stream_connect(tomcat_t)
++')
++
+ ########################################
+ #
+ # tomcat domain local policy
+-- 
+2.34.1
+

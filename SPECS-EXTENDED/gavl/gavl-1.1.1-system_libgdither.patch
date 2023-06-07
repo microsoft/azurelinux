@@ -1,0 +1,60 @@
+diff -up gavl-1.1.1/configure.ac.gdither gavl-1.1.1/configure.ac
+--- gavl-1.1.1/configure.ac.gdither	2009-07-13 22:42:38.000000000 +0200
++++ gavl-1.1.1/configure.ac	2009-10-28 00:02:31.461428785 +0100
+@@ -217,6 +217,27 @@ TOP_SRCDIR=`cd ${srcdir} && pwd` 
+ AC_SUBST(TOP_SRCDIR)
+ 
+ dnl
++dnl System libraries
++dnl
++
++AC_ARG_ENABLE(libgdither,
++  [  --enable-libgdither	System libgdither (experimental)])
++if test "${enable_libgdither}" = "yes"
++then
++  PKG_CHECK_MODULES(LIBGDITHER, libgdither,
++    [
++      AC_DEFINE(HAVE_LIBGDITHER, 1, [Define to 1 if you have the `libgdither' library (-lgdither).])
++      have_libgdither="true"
++    ],
++    [
++      have_libgdither="false"
++    ]
++  )
++fi
++AM_CONDITIONAL(HAVE_LIBGDITHER, [test x$have_libgdither = xtrue])
++
++
++dnl
+ dnl Output variables
+ dnl
+ 
+diff -up gavl-1.1.1/gavl/Makefile.am.gdither gavl-1.1.1/gavl/Makefile.am
+--- gavl-1.1.1/gavl/Makefile.am.gdither	2009-05-13 17:10:37.000000000 +0200
++++ gavl-1.1.1/gavl/Makefile.am	2009-10-28 00:04:37.837435280 +0100
+@@ -40,8 +40,15 @@ threednow_libs = 
+ threednow_subdirs =
+ endif
+ 
++if HAVE_LIBGDITHER
++  MAYBE_LIBGDITHER_LA = @LIBGDITHER_LIBS@
++else
++  MAYBE_LIBGDITHER = libgdither
++  MAYBE_LIBGDITHER_LA = libgdither/libgdither.la
++endif
++
+ 
+-SUBDIRS = hq c libgdither libsamplerate $(mmx_subdirs) \
++SUBDIRS = hq c $(MAYBE_LIBGDITHER) libsamplerate $(mmx_subdirs) \
+ $(sse_subdirs) \
+ $(sse2_subdirs) \
+ $(sse3_subdirs) \
+@@ -109,7 +116,7 @@ $(sse3_libs) \
+ $(threednow_libs) \
+ c/libgavl_c.la \
+ hq/libgavl_hq.la \
+-libgdither/libgdither.la \
++$(MAYBE_LIBGDITHER_LA) \
+ libsamplerate/libsamplerate.la \
+ @LIBGAVL_LIBS@ \
+ -lm

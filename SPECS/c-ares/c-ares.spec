@@ -1,7 +1,7 @@
 Summary:        A library that performs asynchronous DNS operations
 Name:           c-ares
-Version:        1.18.1
-Release:        4%{?dist}
+Version:        1.19.1
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -113,6 +113,12 @@ fi
 %{_mandir}/man3/ares_*
 
 %changelog
+* Tue May 30 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.19.1-1
+- Auto-upgrade to 1.19.1 - CVE-2023-32067
+
+* Tue Apr 04 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.19.0-1
+- Auto-upgrade to 1.19.0 - Address CVE-2022-4904
+
 * Mon Mar 21 2022 Muhammad Falak <mwani@microsoft.com> - 1.18.1-4
 - Drop all live DNS lookup from the check section to enable ptest in pipeline
 

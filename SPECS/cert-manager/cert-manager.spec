@@ -1,16 +1,15 @@
 Summary:        Automatically provision and manage TLS certificates in Kubernetes
 Name:           cert-manager
-Version:        1.7.3
-Release:        6%{?dist}
+Version:        1.11.2
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/jetstack/cert-manager
-#Source0:       https://github.com/jetstack/%{name}/archive/refs/tags/v%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/jetstack/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
 # We're using pre-populated GO dependencies from this tarball, since network is disabled during build time.
-#   1. wget https://github.com/jetstack/%{name}/archive/refs/tags/v%{version}.tar.gz -o %%{name}-%%{version}.tar.gz
+#   1. wget https://github.com/jetstack/%%{name}/archive/refs/tags/v%%{version}.tar.gz -o %%{name}-%%{version}.tar.gz
 #   2. tar -xf %%{name}-%%{version}.tar.gz
 #   3. cd %%{name}-%%{version}
 #   4. go mod vendor
@@ -21,7 +20,6 @@ Source0:        %{name}-%{version}.tar.gz
 #           -cf %%{name}-%%{version}-govendor.tar.gz vendor
 Source1:        %{name}-%{version}-govendor.tar.gz
 BuildRequires:  golang
-BuildRequires:  patch
 Requires:       %{name}-acmesolver
 Requires:       %{name}-cainjector
 Requires:       %{name}-cmctl
@@ -111,6 +109,23 @@ install -D -m0755 bin/webhook %{buildroot}%{_bindir}/
 %{_bindir}/webhook
 
 %changelog
+* Mon May 15 2023 Aditya Dubey <adityadubey@microsoft.com> - 1.11.0-1
+- Upgrade to v1.11.2
+- Removed patch for CVE-2023-25165
+- This version uses helm v3.11.1, which fixes CVE-2023-25165 and thus we do not need the patch file anymore
+
+* Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7.3-10
+- Bump release to rebuild with go 1.19.8
+
+* Wed Mar 29 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7.3-9
+- Add patch for CVE-2023-25165
+
+* Tue Mar 28 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7.3-8
+- Bump release to rebuild with go 1.19.7
+
+* Wed Mar 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7.3-7
+- Bump release to rebuild with go 1.19.6
+
 * Fri Feb 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7.3-6
 - Bump release to rebuild with go 1.19.5
 

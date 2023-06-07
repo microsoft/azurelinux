@@ -1,0 +1,31 @@
+From 8d5626f075f473f55c9703509f870558e4f6d24b Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Thu, 7 Jul 2022 13:43:07 +0000
+Subject: [PATCH 17/35] usermanage: Add sysctl access for groupadd to get
+ number of groups.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/admin/usermanage.te | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+MSFT_TAG: pending
+
+diff --git a/policy/modules/admin/usermanage.te b/policy/modules/admin/usermanage.te
+index 82fc1dc42..636d0afdf 100644
+--- a/policy/modules/admin/usermanage.te
++++ b/policy/modules/admin/usermanage.te
+@@ -202,6 +202,10 @@ allow groupadd_t self:unix_stream_socket create_stream_socket_perms;
+ allow groupadd_t self:unix_dgram_socket sendto;
+ allow groupadd_t self:unix_stream_socket connectto;
+ 
++# for getting the number of groups
++kernel_read_kernel_sysctls(groupadd_t)
++kernel_dontaudit_getattr_proc(groupadd_t)
++
+ fs_getattr_xattr_fs(groupadd_t)
+ fs_search_auto_mountpoints(groupadd_t)
+ 
+-- 
+2.34.1
+

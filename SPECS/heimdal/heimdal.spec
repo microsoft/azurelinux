@@ -12,7 +12,7 @@
 Summary:        A Kerberos 5 implementation without export restrictions
 Name:           heimdal
 Version:        7.7.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -40,6 +40,7 @@ Source31:       %{name}-ipropd-slave-wrapper
 # to know how to interpret the "heimdal-" prefixes.
 Patch1:         heimdal-1.6.0-c25f45a-rename-commands.patch
 Patch2:         heimdal-configure.patch
+Patch3:         CVE-2022-45142.patch
 BuildRequires:  bison
 #libcom_err-devel is in
 #BuildRequires:  libcom_err-devel
@@ -482,6 +483,9 @@ fi
 %{_sysconfdir}/profile.d/%{name}.csh
 
 %changelog
+* Tue Mar 14 2023 Thien Trung Vuong <tvuong@microsoft.com> - 7.7.1-2
+- Add patch for CVE-2022-45142
+
 * Tue Dec 06 2022 Henry Beberman <henry.beberman@microsoft.com> - 7.7.1-1
 - Upgrade to version 7.7.1
 - Remove patches that were backported from upstream

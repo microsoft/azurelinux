@@ -1,0 +1,97 @@
+From a7f8d385ac55fce62cc5a9a1608e4d085801e6f3 Mon Sep 17 00:00:00 2001
+From: Laszlo Ersek <lersek@redhat.com>
+Date: Wed, 27 Jan 2016 03:05:18 +0100
+Subject: [PATCH 08/14] ArmVirtPkg: silence DEBUG_VERBOSE (0x00400000) in
+ QemuRamfbDxe (RH only)
+
+Notes about the RHEL-8.3/20200603-ca407c7246bf [edk2-stable202005] ->
+RHEL-8.5/20210520-e1999b264f1f [edk2-stable202105] rebase:
+
+- no change
+
+Notes about the RHEL-8.2/20190904-37eef91017ad [edk2-stable201908] ->
+RHEL-8.3/20200603-ca407c7246bf [edk2-stable202005] rebase:
+
+- no change
+
+Notes about the RHEL-8.1/20190308-89910a39dcfd [edk2-stable201903] ->
+RHEL-8.2/20190904-37eef91017ad [edk2-stable201908] rebase:
+
+- The previous version of this patch (downstream commit 76b4ac28e975)
+  caused a regression (RHBZ#1714446), which was fixed up in downstream
+  commit 5a216abaa737 ("ArmVirtPkg: silence DEBUG_VERBOSE masking
+  ~0x00400000 in QemuRamfbDxe (RH only)", 2019-08-05).
+
+  Squash the fixup into the original patch. Fuse the commit messages.
+  (Acked-by tags are not preserved, lest we confuse ourselves while
+  reviewing this rebase.)
+
+Notes about the RHEL-8.0/20180508-ee3198e672e2 ->
+RHEL-8.1/20190308-89910a39dcfd rebase:
+
+- new patch, due to upstream commit c64688f36a8b ("ArmVirtPkg: add
+  QemuRamfbDxe", 2018-06-14)
+
+QemuRamfbDxe uses FrameBufferLib. The FrameBufferBltLib instance added in
+commit b1ca386074bd ("MdeModulePkg: Add FrameBufferBltLib library
+instance") logs many messages on the VERBOSE level; for example, a normal
+boot with ArmVirtQemu[Kernel] can produce 500+ "VideoFill" messages,
+dependent on the progress bar, when the VERBOSE bit is set in
+PcdDebugPrintErrorLevel.
+
+Clear the VERBOSE bit without touching other bits -- those other bits
+differ between the "silent" and "verbose" builds, so we can't set them as
+constants.
+
+QemuRamfbDxe itself doesn't log anything at the VERBOSE level, so we lose
+none of its messages, with the VERBOSE bit clear.
+
+Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+(cherry picked from commit 76b4ac28e975bd63c25db903a1d42c47b38cc756)
+Reported-by: Andrew Jones <drjones@redhat.com>
+Suggested-by: Laszlo Ersek <lersek@redhat.com>
+Signed-off-by: Philippe Mathieu-Daude <philmd@redhat.com>
+(cherry picked from commit 5a216abaa737195327235e37563b18a6bf2a74dc)
+Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+(cherry picked from commit e5b8152bced2364a1ded0926dbba4d65e23e3f84)
+(cherry picked from commit e7f57f154439c1c18ea5030b01f8d7bc492698b2)
+---
+ ArmVirtPkg/ArmVirtQemu.dsc       | 5 ++++-
+ ArmVirtPkg/ArmVirtQemuKernel.dsc | 5 ++++-
+ 2 files changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/ArmVirtPkg/ArmVirtQemu.dsc b/ArmVirtPkg/ArmVirtQemu.dsc
+index 7a3be7e8592c..865172c5d56b 100644
+--- a/ArmVirtPkg/ArmVirtQemu.dsc
++++ b/ArmVirtPkg/ArmVirtQemu.dsc
+@@ -546,7 +546,10 @@ [Components.common]
+   #
+   # Video support
+   #
+-  OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf
++  OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf {
++    <PcdsFixedAtBuild>
++      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|($(DEBUG_PRINT_ERROR_LEVEL)) & 0xFFBFFFFF
++  }
+   OvmfPkg/VirtioGpuDxe/VirtioGpu.inf
+   OvmfPkg/PlatformDxe/Platform.inf
+ 
+diff --git a/ArmVirtPkg/ArmVirtQemuKernel.dsc b/ArmVirtPkg/ArmVirtQemuKernel.dsc
+index 3cb9120e4e10..02877284bfa3 100644
+--- a/ArmVirtPkg/ArmVirtQemuKernel.dsc
++++ b/ArmVirtPkg/ArmVirtQemuKernel.dsc
+@@ -444,7 +444,10 @@ [Components.common]
+   #
+   # Video support
+   #
+-  OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf
++  OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf {
++    <PcdsFixedAtBuild>
++      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|($(DEBUG_PRINT_ERROR_LEVEL)) & 0xFFBFFFFF
++  }
+   OvmfPkg/VirtioGpuDxe/VirtioGpu.inf
+   OvmfPkg/PlatformDxe/Platform.inf
+ 
+-- 
+2.39.2
+

@@ -1,0 +1,23 @@
+diff -up Unicode-EastAsianWidth-12.0/MANIFEST.noinc Unicode-EastAsianWidth-12.0/MANIFEST
+--- Unicode-EastAsianWidth-12.0/MANIFEST.noinc	2019-09-03 09:19:07.830434540 -0400
++++ Unicode-EastAsianWidth-12.0/MANIFEST	2019-09-03 09:20:05.104274990 -0400
+@@ -1,19 +1,4 @@
+ Changes
+-inc/Module/Install.pm
+-inc/Module/Install/Base.pm
+-inc/Module/Install/Can.pm
+-inc/Module/Install/Fetch.pm
+-inc/Module/Install/GithubMeta.pm
+-inc/Module/Install/Makefile.pm
+-inc/Module/Install/ManifestSkip.pm
+-inc/Module/Install/Metadata.pm
+-inc/Module/Install/Package.pm
+-inc/Module/Install/ReadmeFromPod.pm
+-inc/Module/Install/ReadmeMarkdownFromPod.pm
+-inc/Module/Install/Win32.pm
+-inc/Module/Install/WriteAll.pm
+-inc/Module/Package.pm
+-inc/Pod/Markdown.pm
+ lib/Unicode/EastAsianWidth.pm
+ Makefile.PL
+ MANIFEST			This list of files

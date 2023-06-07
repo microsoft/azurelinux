@@ -4,8 +4,71 @@
 # Modification to this file require admin approval.
 /.github/CODEOWNERS @microsoft/cbl-mariner-admins
 
+# Modifications to the build pipelines require admin approval.
+/pipelines/* @microsoft/cbl-mariner-admins
+
+# Modifications to the CredScan exceptions require admin approval.
+/.config/CredScanSuppressions.json @microsoft/cbl-mariner-admins
+
 # Modification to what is considered "core packages" require admin approval.
 /SPECS/core-packages/* @microsoft/cbl-mariner-admins
+
+# Modification to specific packages go to specific teams
+/SPECS/installkernel/* @microsoft/cbl-mariner-kernel
+/SPECS/kernel/* @microsoft/cbl-mariner-kernel
+/SPECS/kernel-azure/* @microsoft/cbl-mariner-kernel
+/SPECS/kernel-hci/* @microsoft/cbl-mariner-kernel
+/SPECS/kernel-headers/* @microsoft/cbl-mariner-kernel
+/SPECS/kernel-mshv/* @microsoft/cbl-mariner-kernel
+/SPECS/kernel-uvm/* @microsoft/cbl-mariner-kernel
+/SPECS-SIGNED/kernel-signed/* @microsoft/cbl-mariner-kernel
+/SPECS-SIGNED/kernel-hci-signed/* @microsoft/cbl-mariner-kernel
+/SPECS-SIGNED/kernel-azure-signed/* @microsoft/cbl-mariner-kernel
+/SPECS-SIGNED/kernel-mstflint-signed/* @microsoft/cbl-mariner-kernel
+
+/SPECS/grub2/* @microsoft/cbl-mariner-bootloader
+/SPECS/grubby/* @microsoft/cbl-mariner-bootloader
+/SPECS/shim/* @microsoft/cbl-mariner-bootloader
+/SPECS/shim-unsigned/* @microsoft/cbl-mariner-bootloader
+/SPECS/shim-unsigned-x64/* @microsoft/cbl-mariner-bootloader
+/SPECS/shim-unsigned-aarch64/* @microsoft/cbl-mariner-bootloader
+/SPECS-SIGNED/grub2-efi-binary-signed/* @microsoft/cbl-mariner-bootloader
+
+/SPECS/dracut/* @microsoft/cbl-mariner-dracut
+/SPECS/initramfs/* @microsoft/cbl-mariner-dracut
+/SPECS/verity-read-only-root/* @microsoft/cbl-mariner-dracut
+
+/SPECS/systemd/* @microsoft/cbl-mariner-systemd
+
+/SPECS/bcc/* @microsoft/cbl-mariner-debug-tools
+/SPECS/bpftrace/* @microsoft/cbl-mariner-debug-tools
+/SPECS/crash/* @microsoft/cbl-mariner-debug-tools
+/SPECS/gdb/* @microsoft/cbl-mariner-debug-tools
+/SPECS/kexec-tools/* @microsoft/cbl-mariner-debug-tools
+
+/SPECS/openssl/* @microsoft/cbl-mariner-openssl
+/SPECS/SymCrypt-OpenSSL/* @microsoft/cbl-mariner-openssl
+/SPECS/SymCrypt/* @microsoft/cbl-mariner-openssl
+/SPECS/KeysInUse-OpenSSL/* @microsoft/cbl-mariner-openssl
+
+/SPECS/dnf/* @microsoft/cbl-mariner-package-managers
+/SPECS/dnf-plugins-core/* @microsoft/cbl-mariner-package-managers
+/SPECS/rpm/* @microsoft/cbl-mariner-package-managers
+/SPECS/tdnf/* @microsoft/cbl-mariner-package-managers
+
+/SPECS/moby-buildx/* @microsoft/cbl-mariner-container-runtime
+/SPECS/moby-cli/* @microsoft/cbl-mariner-container-runtime
+/SPECS/moby-containerd/* @microsoft/cbl-mariner-container-runtime
+/SPECS/moby-containerd-cc/* @microsoft/cbl-mariner-container-runtime
+/SPECS/moby-engine/* @microsoft/cbl-mariner-container-runtime
+/SPECS/moby-runc/* @microsoft/cbl-mariner-container-runtime
+/SPECS/kata-containers/* @microsoft/cbl-mariner-container-runtime
+/SPECS/kata-containers-cc/* @microsoft/cbl-mariner-container-runtime
+
+/SPECS/cloud-hypervisor/* @microsoft/cbl-mariner-virtualization
+
+/SPECS/cloud-init/* @microsoft/cbl-mariner-provisioning
+/SPECS/walinuxagent/* @microsoft/cbl-mariner-provisioning
 
 # Modifications to the raw toolchain require admin approval.
 /toolkit/scripts/toolchain/container/* @microsoft/cbl-mariner-admins

@@ -1,0 +1,55 @@
+diff --git a/Makefile.am b/Makefile.am
+index 5be3264..33abc1d 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -130,8 +130,6 @@ include ospf6d/subdir.am
+ include ospfclient/subdir.am
+ include isisd/subdir.am
+ include nhrpd/subdir.am
+-include ldpd/subdir.am
+-include babeld/subdir.am
+ include eigrpd/subdir.am
+ include sharpd/subdir.am
+ include pimd/subdir.am
+@@ -182,7 +180,6 @@ EXTRA_DIST += \
+ 	snapcraft/defaults \
+ 	snapcraft/helpers \
+ 	snapcraft/snap \
+-	babeld/Makefile \
+ 	bgpd/Makefile \
+ 	bgpd/rfp-example/librfp/Makefile \
+ 	bgpd/rfp-example/rfptest/Makefile \
+@@ -193,7 +190,6 @@ EXTRA_DIST += \
+ 	fpm/Makefile \
+ 	grpc/Makefile \
+ 	isisd/Makefile \
+-	ldpd/Makefile \
+ 	lib/Makefile \
+ 	nhrpd/Makefile \
+ 	ospf6d/Makefile \
+diff --git a/tools/etc/frr/daemons b/tools/etc/frr/daemons
+index 8aa0887..c92dcca 100644
+--- a/tools/etc/frr/daemons
++++ b/tools/etc/frr/daemons
+@@ -22,10 +22,8 @@ ripngd=no
+ isisd=no
+ pimd=no
+ pim6d=no
+-ldpd=no
+ nhrpd=no
+ eigrpd=no
+-babeld=no
+ sharpd=no
+ pbrd=no
+ bfdd=no
+@@ -48,10 +46,8 @@ ripngd_options=" -A ::1"
+ isisd_options="  -A 127.0.0.1"
+ pimd_options="   -A 127.0.0.1"
+ pim6d_options="  -A ::1"
+-ldpd_options="   -A 127.0.0.1"
+ nhrpd_options="  -A 127.0.0.1"
+ eigrpd_options=" -A 127.0.0.1"
+-babeld_options=" -A 127.0.0.1"
+ sharpd_options=" -A 127.0.0.1"
+ pbrd_options="   -A 127.0.0.1"
+ staticd_options="-A 127.0.0.1"

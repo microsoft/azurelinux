@@ -1,0 +1,62 @@
+Drop tests that fail with Net::DNS ≥ 0.68 due to that module's
+sanitization of domain names
+
+https://rt.cpan.org/Ticket/Display.html?id=78214
+
+--- t/rfc4408-tests.yml
++++ t/rfc4408-tests.yml
+@@ -20,16 +20,6 @@
+ ---
+ description: Initial processing
+ tests:
+-  toolonglabel:
+-    description: >-
+-      DNS labels limited to 63 chars.
+-    comment: >-
+-      For initial processing, a long label results in None, not TempError
+-    spec: 4.3/1
+-    helo: mail.example.net
+-    host: 1.2.3.5
+-    mailfrom: lyme.eater@A123456789012345678901234567890123456789012345678901234567890123.example.com
+-    result: none
+   longlabel:
+     description: >-
+       DNS labels limited to 63 chars.
+@@ -360,21 +350,6 @@ tests:
+     host: 1.2.3.4
+     mailfrom: foo@t9.example.com
+     result: permerror
+-  invalid-domain-empty-label:
+-    description: >-
+-      target-name that is a valid domain-spec per RFC 4408 but an invalid
+-      domain name per RFC 1035 (empty label) must be treated as non-existent.
+-    comment: >-
+-      An empty domain label, i.e. two successive dots, in a mechanism
+-      target-name is valid domain-spec syntax, even though a DNS query cannot
+-      be composed from it.  The spec being unclear about it, this could either
+-      be considered a syntax error, or, by analogy to 4.3/1 and 5/10/3, the
+-      mechanism chould be treated as a no-match.
+-    spec: [4.3/1, 5/10/3]
+-    helo: mail.example.com
+-    host: 1.2.3.4
+-    mailfrom: foo@t10.example.com
+-    result: [permerror, fail]
+   invalid-domain-long:
+     description: >-
+       target-name that is a valid domain-spec per RFC 4408 but an invalid
+@@ -1776,15 +1751,6 @@ tests:
+     host: 192.168.218.40
+     mailfrom: test@e1.example.com
+     result: permerror
+-  macro-mania-in-domain:
+-    description: >-
+-      macro-encoded percents (%%), spaces (%_), and URL-percent-encoded
+-      spaces (%-)
+-    spec: 8.1/3, 8.1/4
+-    helo: mail.example.com
+-    host: 1.2.3.4
+-    mailfrom: test@e1a.example.com
+-    result: pass
+   exp-txt-macro-char:
+     spec: 8.1/20
+     description: >-

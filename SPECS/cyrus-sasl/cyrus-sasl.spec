@@ -4,7 +4,7 @@
 Summary:        Cyrus Simple Authentication Service Layer (SASL) library
 Name:           cyrus-sasl
 Version:        2.1.28
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD with advertising
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -30,7 +30,7 @@ Requires:       pam
 Requires:       systemd
 Requires:       libdb
 
-Obsoletes:      %{name}-bootstrap
+Obsoletes:      %{name}-bootstrap <= %{version}-%{release}
 
 %description
 The Cyrus SASL package contains a Simple Authentication and Security
@@ -47,7 +47,7 @@ Summary:        Files needed for developing applications with Cyrus SASL
 Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-lib = %{version}-%{release}
 Requires:       pkg-config
-Obsoletes:      %{name}-bootstrap-devel
+Obsoletes:      %{name}-bootstrap-devel <= %{version}-%{release}
 
 %description devel
 The %{name}-devel package contains files needed for developing and
@@ -83,6 +83,7 @@ a directory server, accessed using LDAP, for storing shared secrets.
 
 %package lib
 Summary:        Shared libraries needed by applications which use Cyrus SASL
+Obsoletes:      %{name}-bootstrap-lib <= %{version}-%{release}
 
 %description lib
 The %{name}-lib package contains shared libraries which are needed by
@@ -92,7 +93,6 @@ applications which use the Cyrus SASL library.
 Summary:        CRAM-MD5 and DIGEST-MD5 authentication support for Cyrus SASL
 
 Requires:       %{name}-lib = %{version}-%{release}
-Obsoletes:      %{name}-bootstrap-lib
 
 %description md5
 The %{name}-md5 package contains the Cyrus SASL plugins which support
@@ -310,6 +310,10 @@ make %{?_smp_mflags} check
 %{_plugindir2}/libsql.so.%{_soversion}*
 
 %changelog
+* Mon Feb 27 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.1.28-4
+- Fix Obsoletes happening in md5 subpackage when it should be lib.
+- Gate cyrus-sasl obsoletes by pkg version/rel
+
 * Thu Feb 23 2023 Saul Paredes <saulparedes@microsoft.com> - 2.1.28-3
 - Bump release to solve dependency issue
 
