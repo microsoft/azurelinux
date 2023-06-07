@@ -10,7 +10,7 @@ steps:
   - script: |
       cat <<EOF
       This is a package build.
-      The host architecture is: $(hostArchitecture)
-      Running checks: $(isCheckBuild)
+      The host architecture is: ${{ parameters.hostArchitecture }}
+      Running checks: ${{ parameters.isCheckBuild }}
       EOF
     displayName: "Print parameters"

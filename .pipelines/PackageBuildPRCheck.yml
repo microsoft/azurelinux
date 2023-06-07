@@ -3,8 +3,6 @@ pr:
   - fasttrack/*
   - main
 
-pool: mariner-core-x64-1es-mariner2-gpt-test
-
 resources:
   repositories:
     # - repository: CBL-Mariner-Pipelines
@@ -31,7 +29,7 @@ extends:
   parameters:
     featureFlags:
       runOnHost: true
-      skipOfficialValidation : true
+      skipOfficialValidation: true
     globalSdl:
       credscan:
         suppressionsFile: .config/CredScanSuppressions.json

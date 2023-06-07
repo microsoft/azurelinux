@@ -25,5 +25,5 @@ steps:
     displayName: 'Use pipeline variable'
 
   - script: |
-      echo "The used architecture is: $(hostArchitecture)"
+      echo "The used architecture is: ${{ parameters.hostArchitecture }}"
     displayName: 'Use parameter'
