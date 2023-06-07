@@ -3,8 +3,8 @@ parameters:
     type: string
     default: "x64"
   - name: isCheckBuild
-    type: boolean
-    default: false
+    type: string
+    default: 'false'
 
 steps:
   - script: |

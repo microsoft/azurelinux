@@ -78,10 +78,10 @@ extends:
                   check: "false"
                 AMD64_WITH_CHECK:
                   arch: "amd64"
-                  check: true
+                  check: "true"
                 ARM64_WITH_CHECK:
                   arch: "arm64"
-                  check: true
+                  check: "true"
             variables:
               ob_outputDirectory: "$(Build.SourcesDirectory)/ToBePublished"
             steps:
