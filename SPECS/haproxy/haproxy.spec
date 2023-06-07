@@ -1,13 +1,14 @@
 Summary:        A fast, reliable HA, load balancing, and proxy solution.
 Name:           haproxy
 Version:        2.1.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL
 URL:            http://www.haproxy.org
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        http://www.haproxy.org/download/2.1/src/%{name}-%{version}.tar.gz
+Patch0:         CVE-2023-25725-http-properly-reject-empty-http-header-.patch
 BuildRequires:  openssl-devel
 BuildRequires:  pcre-devel
 BuildRequires:  lua-devel
@@ -28,7 +29,7 @@ It contains the documentation and manpages for haproxy package.
 Requires:       %{name} = %{version}-%{release}
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 make %{?_smp_mflags} TARGET="linux-glibc" USE_PCRE=1 USE_OPENSSL=1 \
@@ -58,6 +59,8 @@ install -vDm644 examples/transparent_proxy.cfg  %{buildroot}/%{_sysconfdir}/hapr
 %{_mandir}/*
 
 %changelog
+*   Wed Jun 07 2023 Dan Streetman <ddstreet@ieee.org> 2.1.5-2
+-   Patch haproxy for CVE-2023-25725
 *   Thu Jun 04 2020 Ruying Chen <v-ruyche@microsoft.com> 2.1.5-1
 -   Update to 2.1.5
 *   Tue May 19 2020 Nicolas Ontiveros <niontive@microsoft.com> 1.9.6-5
