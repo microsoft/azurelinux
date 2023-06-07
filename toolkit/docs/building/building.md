@@ -43,6 +43,10 @@ It is possible to invoke any stage at any time. The tooling will automatically i
 
 If you want a detailed breakdown of how the stages interact, see [How it works](../how_it_works/0_intro.md).
 
+### Architectures
+
+The mariner build system is designed to build native packages. To build `aarch64` packages an ARM64 machine is required.
+
 ## Building in Stages
 
 The following sections run through a build step-by-step, briefly explaining the purpose of each stage. `make` will generally automate this flow for any target; however, building in stages can be useful for debugging and understanding the build process.
@@ -128,7 +132,7 @@ For expediency, if `REBUILD_TOOLCHAIN=n` is set, the toolchain will be populated
 A set of bootstrapped toolchain packages (`gcc`, etc.) are used to build CBL-Mariner packages and images. Rather than build the toolchain, the prebuilt binaries can be downloaded to your local machine. This happens automatically when the `REBUILD_TOOLCHAIN=` parameter is set to `n`, which is the default value unless otherwise specified.
 
 ```bash
-# Populate Toolchain from pre-existing binaries
+# Populate Toolchain from pre-existing binaries (REBUILD_TOOLCHAIN=n is the default value)
 # This will only work for stable release tags (https://github.com/microsoft/CBL-Mariner/releases)
 sudo make toolchain REBUILD_TOOLS=y
 ```
@@ -148,10 +152,10 @@ There are several optimizations possible to speed up the building of the toolcha
 
 # QUICK_REBUILD_TOOLCHAIN=y is a fast way to set all relevant optimization flags.
 # It implies the following:
-#   REBUILD_TOOLCHAIN             = y
-#   INCREMENTAL_TOOLCHAIN         = y
-#   ALLOW_TOOLCHAIN_DOWNLOAD_FAIL = y
-#   REBUILD_TOOLS                 = y
+#   REBUILD_TOOLCHAIN             = y   -> Build toolchain from sources instead of downloading everything
+#   INCREMENTAL_TOOLCHAIN         = y   -> Try to use existing toolchain packages if they match the version listed in the manifests
+#   ALLOW_TOOLCHAIN_DOWNLOAD_FAIL = y   -> Attempt to download existing toolchain packages from packages.microsoft.com, but don't fail if they are missing
+#   REBUILD_TOOLS                 = y   -> Rebuild the go tools from source
 sudo make toolchain QUICK_REBUILD_TOOLCHAIN=y
 ```
 
@@ -183,9 +187,9 @@ There are several more package build options; for example, it's possible to buil
 
 #### Rebuild All Packages
 
-The following command rebuilds all CBL-Mariner packages:
-
 **A reminder that you can build packages outside the core repo (which is often much faster). Refer to the [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials) repository for examples.**
+
+The following command rebuilds all CBL-Mariner packages:
 
 ```bash
 # Build ALL packages on a *stable* branch (i.e. 1.0-stable, 2.0-stable, etc)
@@ -201,12 +205,12 @@ sudo make build-packages -j$(nproc) CONFIG_FILE="" REBUILD_TOOLS=y
 # QUICK_REBUILD=y sets both QUICK_REBUILD_PACKAGES=y and QUICK_REBUILD_TOOLCHAIN=y
 
 # QUICK_REBUILD_PACKAGES=y implies the following flags:
-#   DELTA_BUILD   = y
-#   USE_CCACHE   ?= y
-#   REBUILD_TOOLS = y
+#   DELTA_BUILD   = y   -> Try to use existing packages to resolve dependencies instead of rebuilding them
+#   USE_CCACHE   ?= y   -> Configure CCache to speed up gcc compiles
+#   REBUILD_TOOLS = y   -> Rebuild the go tools from source
 
-# QUICK_REBUILD_TOOLCHAIN=y builds the toolchain as quickly as possible by using publicly available packages from our public package repo.
-# See the toolchain section for more details.
+# QUICK_REBUILD_TOOLCHAIN=y builds the toolchain as quickly as possible by using publicly available
+# packages from our public package repo. See the toolchain section for more details.
 
 sudo make build-packages -j$(nproc) CONFIG_FILE="" QUICK_REBUILD=y
 #  ---or---
@@ -531,7 +535,7 @@ sudo make go-tools REBUILD_TOOLS=y
 
 # Bootstrap just the toolchain using publicly available sources via wget (or from SOURCE_URL if set),
 #  then rebuild the toolchain properly using the provided sources
-# NOTE: Source files must made available via one of:
+# NOTE: Source files must be made available via one of:
 # - `SOURCE_URL=<YOUR_SOURCE_SERVER>`
 # - DOWNLOAD_SRPMS=y (will download pre-packages sources from SRPM_URL_LIST=...)
 # - manually placing the correct sources in each /SPECS/* package folder
@@ -541,7 +545,7 @@ sudo make toolchain PACKAGE_URL_LIST="" REPO_LIST="" DISABLE_UPSTREAM_REPOS=y RE
 
 ```bash
 # Complete rebuild of all tool, package, and image files from source necessary to build the default image config.
-# NOTE: Source files must made available via one of:
+# NOTE: Source files must be made available via one of:
 # - `SOURCE_URL=<YOUR_SOURCE_SERVER>`
 # - DOWNLOAD_SRPMS=y (will download pre-packages sources from SRPM_URL_LIST=...)
 # - manually placing the correct sources in each /SPECS/* package folder
