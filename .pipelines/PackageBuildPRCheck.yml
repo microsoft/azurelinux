@@ -55,7 +55,7 @@ extends:
             variables:
               ob_outputDirectory: "$(Build.SourcesDirectory)/ToBePublished"
             steps:
-              - template: .pipelines/templates/ToolchainBuild.yml
+              - template: .pipelines/templates/ToolchainBuild.yml@self
                 parameters:
                   hostArchitecture: $(arch)
 
@@ -85,7 +85,7 @@ extends:
             variables:
               ob_outputDirectory: "$(Build.SourcesDirectory)/ToBePublished"
             steps:
-              - template: .pipelines/templates/PackageBuild.yml
+              - template: .pipelines/templates/PackageBuild.yml@self
                 parameters:
                   hostArchitecture: $(arch)
                   isCheckBuild: $(check)
