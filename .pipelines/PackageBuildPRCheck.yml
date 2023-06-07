@@ -59,7 +59,7 @@ extends:
                 parameters:
                   hostArchitecture: $(arch)
 
-      - stage: Toolchain
+      - stage: RPMs
         dependsOn: Toolchain
         jobs:
           - job: Build
