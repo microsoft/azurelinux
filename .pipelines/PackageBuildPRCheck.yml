@@ -75,5 +75,4 @@ extends:
             steps:
               - template: .pipelines/templates/PackageBuild.yml@self
                 parameters:
-                  hostArchitecture: $(arch)
                   isCheckBuild: $(check)
