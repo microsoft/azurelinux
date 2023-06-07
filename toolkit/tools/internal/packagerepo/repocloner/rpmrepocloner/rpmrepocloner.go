@@ -258,6 +258,7 @@ func (r *RpmRepoCloner) initializeRepoDefinitions(disableDefaultRepos bool, repo
 
 	// Add each previously existing repofile to the end of the new file, then delete the original.
 	// We want to try our custom mounted repos before reaching out to the upstream servers.
+	// By default, chroot ships with PMC repositories specified in mariner-repos rpm.
 	// If `disableDefaultRepos` flag is turned on, we only remove these existing files from the
 	// chroot repo directory. tdnf will not reach out to the default PMC repositories for lookups.
 	for _, originalRepoFilePath := range existingRepoFiles {
