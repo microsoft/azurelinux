@@ -1,0 +1,459 @@
+diff --git a/LICENSE-templates.txt b/LICENSE-templates.txt
+index b54e7ad..8106890 100644
+--- a/LICENSE-templates.txt
++++ b/LICENSE-templates.txt
+@@ -1,6 +1,6 @@
+ MIT License
+ 
+-Copyright © 2019 Nicolas Mailhot <nim@fedoraproject.org>
++Copyright © 2019 Nicolas Mailhot <nim@marinerproject.org>
+ 
+ Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ 
+diff --git a/README.md b/README.md
+index 5764ac9..4faddca 100644
+--- a/README.md
++++ b/README.md
+@@ -11,12 +11,12 @@ It contains:
+ 
+ ## History
+ 
+-The fonts-rpm-macros project was initiated by the [Fedora Fonts Special Interest Group](http://fonts.fedoraproject.org/), and is the reference for Fedora font packaging guidelines. It is therefore a bit rpm-oriented. However great care was extended to keep it distribution-neutral, and contributors from other distributions are welcome, even if they use different packaging systems, and want to add non-rpm templates.
++The fonts-rpm-macros project was initiated by the [Fedora Fonts Special Interest Group](http://fonts.marinerproject.org/), and is the reference for Fedora font packaging guidelines. It is therefore a bit rpm-oriented. However great care was extended to keep it distribution-neutral, and contributors from other distributions are welcome, even if they use different packaging systems, and want to add non-rpm templates.
+ 
+ ## Publication
+ 
+ - [technical files](https://pagure.io/fonts-rpm-macros)
+-- [Fedora packaging](https://src.fedoraproject.org/rpms/fonts-rpm-macros)
++- [Fedora packaging](https://src.marinerproject.org/rpms/fonts-rpm-macros)
+ 
+ ## Licensing
+ 
+diff --git a/changelog.txt b/changelog.txt
+index 615ab27..b43ccb7 100644
+--- a/changelog.txt
++++ b/changelog.txt
+@@ -37,7 +37,7 @@
+      - repo-font-audit: replace the two existing WWS tests with a more
+        comprehensive one, and externalize it
+      - repo-font-audit: add core fonts use test
+-     - repo-font-audit: add fedora packager name detection
++     - repo-font-audit: add mariner packager name detection
+      - repo-font-audit: add a processed total to reassure users when no problem
+        is identified
+      - repo-font-audit: rework messenging (again)
+@@ -106,7 +106,7 @@
+        help detect collisions
+ 1.20 - Change %define to %global in templates
+ 1.19 - Add partial templates for fonts subpackages of other packages, update
+-       for rpm 4.6 changes in fedora-devel
++       for rpm 4.6 changes in mariner-devel
+ 1.18 - Auto-own the fonts directory, multiple ownership is ok after all
+ 1.17 - Tweak spec templates documentation, add fontconfig documentation
+ 1.16 - Fix recently introduced typo in the simple spec template
+diff --git a/rpm/lua/rpm/fonts.lua b/rpm/lua/rpm/fonts.lua
+index bb7475b..74556ae 100644
+--- a/rpm/lua/rpm/fonts.lua
++++ b/rpm/lua/rpm/fonts.lua
+@@ -1,4 +1,4 @@
+--- Copyright © 2019 Nicolas Mailhot <nim@fedoraproject.org>
++-- Copyright © 2019 Nicolas Mailhot <nim@marinerproject.org>
+ --
+ -- This program is free software: you can redistribute it and/or modify
+ -- it under the terms of the GNU General Public License as published by
+@@ -51,8 +51,8 @@ end
+ -- Reformat some text into something that can be included in an AppStream
+ -- XML description
+ local function txt2xml(text)
+-  local      fedora = require "fedora.common"
+-  local        text = fedora.wordwrap(text)
++  local      mariner = require "mariner.common"
++  local        text = mariner.wordwrap(text)
+   local      output = ""
+   local     oldtag  = nil
+   local oldadvance  = nil
+diff --git a/rpm/lua/srpm/fonts.lua b/rpm/lua/srpm/fonts.lua
+index 95cc2bd..3836fde 100644
+--- a/rpm/lua/srpm/fonts.lua
++++ b/rpm/lua/srpm/fonts.lua
+@@ -1,4 +1,4 @@
+--- Copyright © 2018-2019 Nicolas Mailhot <nim@fedoraproject.org>
++-- Copyright © 2018-2019 Nicolas Mailhot <nim@marinerproject.org>
+ --
+ -- This program is free software: you can redistribute it and/or modify
+ -- it under the terms of the GNU General Public License as published by
+@@ -92,12 +92,12 @@ end
+ -- The fontenv macro main processing function
+ -- See the documentation in the macros.fonts file for argument description
+ local function env(suffix, verbose, globvalues)
+-  local fedora = require "fedora.common"
++  local mariner = require "mariner.common"
+   local ismain = (suffix == "") or (suffix == "0")
+-  fedora.zalias({"foundry", "fontlicense"}, verbose)
+-  fedora.safeset("fontlicense", "%{license}", verbose)
++  mariner.zalias({"foundry", "fontlicense"}, verbose)
++  mariner.safeset("fontlicense", "%{license}", verbose)
+   if ismain then
+-    fedora.zalias({"fontsummary", "fontdescription", "fontpkgname", "fonthumanname",
++    mariner.zalias({"fontsummary", "fontdescription", "fontpkgname", "fonthumanname",
+                    "fontpkgheader", "fonts", "fontsex", "fontconfs", "fontconfsex",
+                    "fontconfngs", "fontconfngsex",
+                    "fontappstreams", "fontappstreamsex",
+@@ -107,41 +107,41 @@ local function env(suffix, verbose, globvalues)
+   for _, v in ipairs({"foundry", "fontdocs", "fontdocsex",
+                       "fontlicense", "fontlicenses", "fontlicensesex"}) do
+     if (rpm.expand("%{" .. v .. "}") ~= "%{" .. v .. "}") then
+-      fedora.safeset(v .. suffix, "%{" .. v .. "}", verbose)
++      mariner.safeset(v .. suffix, "%{" .. v .. "}", verbose)
+     end
+   end
+   for g, _ in pairs(globargs) do
+     local v = rpm.expand("%{?" .. g .. suffix .. "} " .. (globvalues[g] or ""))
+     if (string.gsub(v, "[%s]+", "") ~= "") then
+-      fedora.explicitset(  "current" .. g, v, verbose)
++      mariner.explicitset(  "current" .. g, v, verbose)
+     else
+-      fedora.explicitunset("current" .. g,    verbose)
++      mariner.explicitunset("current" .. g,    verbose)
+     end
+   end
+   local foundry = rpm.expand("%{?foundry" .. suffix .. ":%{foundry" .. suffix .. "}}")
+   local family = string.gsub(rpm.expand("%{fontfamily" .. suffix .. "}"), "^" .. foundry, "")
+   local basename = foundry .. " " .. family
+-  fedora.safeset("fontpkgname"   .. suffix, rpmname(basename), verbose)
+-  fedora.safeset("fonthumanname" .. suffix, basename, verbose)
+-  fedora.safeset("fontdir"       .. suffix, "%{_fontbasedir}/%{fontpkgname"  .. suffix .. "}", verbose)
+-  fedora.safeset("fontfilelist"  .. suffix, "%{_builddir}/%{?buildsubdir}/%{fontpkgname" .. suffix .. "}.list", verbose)
++  mariner.safeset("fontpkgname"   .. suffix, rpmname(basename), verbose)
++  mariner.safeset("fonthumanname" .. suffix, basename, verbose)
++  mariner.safeset("fontdir"       .. suffix, "%{_fontbasedir}/%{fontpkgname"  .. suffix .. "}", verbose)
++  mariner.safeset("fontfilelist"  .. suffix, "%{_builddir}/%{?buildsubdir}/%{fontpkgname" .. suffix .. "}.list", verbose)
+   if ismain then
+-    fedora.zalias({"fontpkgname", "fontdir", "fontfilelist"})
++    mariner.zalias({"fontpkgname", "fontdir", "fontfilelist"})
+   end
+   for _, v in ipairs({"foundry", "fontpkgname", "fonthumanname", "fontpkgheader",
+                       "fontdir", "fontfilelist", "fontfamily", "fontlicense",
+                       "fontsummary", "fontdescription"}) do
+     if (rpm.expand("%{?" .. v .. suffix .. "}") ~= "") then
+-      fedora.explicitset(  "current" .. v, "%{" .. v .. suffix .. "}", verbose)
++      mariner.explicitset(  "current" .. v, "%{" .. v .. suffix .. "}", verbose)
+     else
+-      fedora.explicitunset("current" .. v,                             verbose)
++      mariner.explicitunset("current" .. v,                             verbose)
+     end
+   end
+ end
+ 
+ -- Create a single %package section for a fonts subpackage
+ local function singlepkg(forcemain, forcesub, suffix, verbose)
+-  local fedora = require "fedora.common"
++  local mariner = require "mariner.common"
+   local    sub = (not forcemain) and (forcesub or ((suffix ~= nil) and (suffix ~= "") and (suffix ~= "0")))
+   env(suffix, verbose, {})
+   name = sub and "%package     -n " or "Name:           "
+@@ -156,15 +156,15 @@ local function singlepkg(forcemain, forcesub, suffix, verbose)
+       "Requires:       fontpackages-filesystem\n" ..
+       "%{?currentfontpkgheader}\n" ..
+       "%description -n %{currentfontpkgname}\n") ..
+-    fedora.wordwrap("%{?currentfontdescription}") ..
++    mariner.wordwrap("%{?currentfontdescription}") ..
+     "\n")
+ end
+ 
+ -- Create one or all %package sections for fonts subpackages
+ local function pkg(forcemain, forcesub, suffix, processall, verbose)
+-  local fedora = require "fedora.common"
++  local mariner = require "mariner.common"
+   if processall then
+-    for _, suffix in pairs(fedora.getsuffixes("fontfamily")) do
++    for _, suffix in pairs(mariner.getsuffixes("fontfamily")) do
+        singlepkg(forcemain, forcesub, suffix, verbose)
+     end
+   else
+@@ -174,8 +174,8 @@ end
+ 
+ -- Create a font (sub)metapackage header
+ local function metapkg(name, summary, description, suffixes)
+-  local   fedora = require "fedora.common"
+-  local fontpkgs = fedora.getsuffixed("fontpkgname")
++  local   mariner = require "mariner.common"
++  local fontpkgs = mariner.getsuffixed("fontpkgname")
+   if (name == "") then
+     name, _ = string.gsub(rpm.expand("%{name}"), "-fonts$", "")
+     name    = name .. "-fonts-all"
+@@ -186,7 +186,7 @@ local function metapkg(name, summary, description, suffixes)
+   if (description == "") then
+     description = "This meta-package installs all the font packages, generated from the %{name} source package."
+   end
+-  description = fedora.wordwrap(description)
++  description = mariner.wordwrap(description)
+   print(rpm.expand(
+     "%package   -n " .. name    .. "\n" ..
+     "Summary:   "    .. summary .. "\n"))
+diff --git a/rpm/macros.d/macros.fonts-rpm b/rpm/macros.d/macros.fonts-rpm
+index 6d2fa82..5a05c18 100644
+--- a/rpm/macros.d/macros.fonts-rpm
++++ b/rpm/macros.d/macros.fonts-rpm
+@@ -1,4 +1,4 @@
+-# Copyright © 2008-2019 Nicolas Mailhot <nim@fedoraproject.org>
++# Copyright © 2008-2019 Nicolas Mailhot <nim@marinerproject.org>
+ #
+ # This program is free software: you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+@@ -23,7 +23,7 @@
+ # Putting multiple lines of UTF-8 text inside a variable is usually
+ # accomplished with a %%{expand: some_text}.
+ %fonttxt2xml(v:) %{lua:
+-local    fonts = require "fedora.rpm.fonts"
++local    fonts = require "mariner.rpm.fonts"
+ local variable = "%{" .. rpm.expand("%{-v*}%{!-v:_description}") .. "}"
+ print(fonts.txt2xml(variable))
+ }
+@@ -35,8 +35,8 @@ print(fonts.txt2xml(variable))
+ #                     -z calls
+ # -v                  be verbose
+ %fontbuild(z:av) %{lua:
+-local     fedora = require "fedora.common"
+-local      fonts = require "fedora.srpm.fonts"
++local     mariner = require "mariner.common"
++local      fonts = require "mariner.srpm.fonts"
+ local processall = (rpm.expand("%{-a}") ~= "") and (rpm.expand("%{-z}") == "")
+ local    verbose = (rpm.expand("%{-v}") ~= "")
+ local function process(suffix)
+@@ -46,7 +46,7 @@ local function process(suffix)
+   if not verbose then print('set -x\\n') end
+ end
+ if processall then
+-  for _,s in pairs(fedora.getsuffixes("fontfamily")) do
++  for _,s in pairs(mariner.getsuffixes("fontfamily")) do
+     process(s)
+   end
+ else
+@@ -71,8 +71,8 @@ end
+ # -l "<shell globs>"  licensing files to include. Alternatively, set %{fontlicenses<number>}
+ # -L "<shell globs>"  licensing files to exclude. Alternatively, set %{fontlicensesex<number>}
+ %fontinstall(z:avf:F:c:C:s:S:d:D:l:L:) %{lua:
+-local     fedora = require "fedora.common"
+-local      fonts = require "fedora.srpm.fonts"
++local     mariner = require "mariner.common"
++local      fonts = require "mariner.srpm.fonts"
+ local processall = (rpm.expand("%{-a}") ~= "") and (rpm.expand("%{-z}") == "")
+ local    verbose = (rpm.expand("%{-v}") ~= "")
+ local globvalues = {}
+@@ -86,7 +86,7 @@ local function process(suffix)
+   if not verbose then print('set -x\\n') end
+ end
+ if processall then
+-  for _,s in pairs(fedora.getsuffixes("fontfamily")) do
++  for _,s in pairs(mariner.getsuffixes("fontfamily")) do
+     process(s)
+   end
+ else
+@@ -101,8 +101,8 @@ end
+ #                     -z calls
+ # -v                  be verbose
+ %fontcheck(z:av) %{lua:
+-local     fedora = require "fedora.common"
+-local      fonts = require "fedora.srpm.fonts"
++local     mariner = require "mariner.common"
++local      fonts = require "mariner.srpm.fonts"
+ local processall = (rpm.expand("%{-a}") ~= "") and (rpm.expand("%{-z}") == "")
+ local    verbose = (rpm.expand("%{-v}") ~= "")
+ local function process(suffix)
+@@ -115,7 +115,7 @@ local function process(suffix)
+     ]]))
+ end
+ if processall then
+-  for _,s in pairs(fedora.getsuffixes("fontfamily")) do
++  for _,s in pairs(mariner.getsuffixes("fontfamily")) do
+     process(s)
+   end
+ else
+@@ -130,8 +130,8 @@ end
+ #                     -z calls
+ # -v                  be verbose
+ %fontfiles(z:av) %{lua:
+-local     fedora = require "fedora.common"
+-local      fonts = require "fedora.srpm.fonts"
++local     mariner = require "mariner.common"
++local      fonts = require "mariner.srpm.fonts"
+ local processall = (rpm.expand("%{-a}") ~= "") and (rpm.expand("%{-z}") == "")
+ local    verbose = (rpm.expand("%{-v}") ~= "")
+ local function process(suffix)
+@@ -139,7 +139,7 @@ local function process(suffix)
+   print(rpm.expand('%files -n %{currentfontpkgname} -f %{currentfontfilelist}\\n'))
+ end
+ if processall then
+-  for _,s in pairs(fedora.getsuffixes("fontfamily")) do
++  for _,s in pairs(mariner.getsuffixes("fontfamily")) do
+     process(s)
+   end
+ else
+diff --git a/rpm/macros.d/macros.fonts-rpm.deprecated b/rpm/macros.d/macros.fonts-rpm.deprecated
+index bbd75cc..d77531a 100644
+--- a/rpm/macros.d/macros.fonts-rpm.deprecated
++++ b/rpm/macros.d/macros.fonts-rpm.deprecated
+@@ -1,4 +1,4 @@
+-# Copyright © 2008-2019 Nicolas Mailhot <nim@fedoraproject.org>
++# Copyright © 2008-2019 Nicolas Mailhot <nim@marinerproject.org>
+ #
+ # This program is free software: you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+diff --git a/rpm/macros.d/macros.fonts-rpm.internal b/rpm/macros.d/macros.fonts-rpm.internal
+index 9d87789..1303db1 100644
+--- a/rpm/macros.d/macros.fonts-rpm.internal
++++ b/rpm/macros.d/macros.fonts-rpm.internal
+@@ -1,4 +1,4 @@
+-# Copyright © 2018-2019 Nicolas Mailhot <nim@fedoraproject.org>
++# Copyright © 2018-2019 Nicolas Mailhot <nim@marinerproject.org>
+ #
+ # This program is free software: you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+diff --git a/rpm/macros.d/macros.fonts-srpm b/rpm/macros.d/macros.fonts-srpm
+index 77365d6..8afbfe2 100644
+--- a/rpm/macros.d/macros.fonts-srpm
++++ b/rpm/macros.d/macros.fonts-srpm
+@@ -1,4 +1,4 @@
+-# Copyright © 2008-2019 Nicolas Mailhot <nim@fedoraproject.org>
++# Copyright © 2008-2019 Nicolas Mailhot <nim@marinerproject.org>
+ #
+ # This program is free software: you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+@@ -36,16 +36,16 @@
+ 
+ # Default contact in font appstream files
+ # Override in your spec file if it does not apply
+-%fontcontact             fonts@lists.fedoraproject.org
++%fontcontact             fonts@lists.marinerproject.org
+ 
+ # Default org in font appstream files
+ # Override in your spec file if it does not apply
+-%fontorg                 org.fedoraproject
++%fontorg                 org.marinerproject
+ 
+ # Sanitize a font family name that can then serve as rpm package name
+ # Mandatory parameter: a font family name
+ %fontrpmname() %{lua:
+-local fonts = require "fedora.srpm.fonts"
++local fonts = require "mariner.srpm.fonts"
+ print(fonts.rpmname(rpm.expand("%1")))
+ }
+ 
+@@ -67,7 +67,7 @@ print(fonts.rpmname(rpm.expand("%1")))
+ # -l "<shell globs>"  licensing files to include. Alternatively, set %{fontlicenses<number>}
+ # -L "<shell globs>"  licensing files to exclude. Alternatively, set %{fontlicensesex<number>}
+ %fontenv(z:vf:F:c:C:s:S:d:D:l:L:) %{lua:
+-local      fonts = require "fedora.srpm.fonts"
++local      fonts = require "mariner.srpm.fonts"
+ local     suffix =  rpm.expand("%{?-z*}")
+ local    verbose = (rpm.expand("%{-v}") ~= "")
+ local globvalues = {}
+@@ -88,7 +88,7 @@ fonts.env(suffix, verbose, globvalues)
+ #                     by itself the macro assumes the zero or nil suffix block
+ #                     corresponds to the main package header
+ %fontpkg(z:avms) %{lua:
+-local      fonts =  require "fedora.srpm.fonts"
++local      fonts =  require "mariner.srpm.fonts"
+ local     suffix =  rpm.expand("%{?-z*}")
+ local processall = (rpm.expand("%{-a}") ~= "") and (rpm.expand("%{-z}") == "")
+ local    verbose = (rpm.expand("%{-v}") ~= "")
+@@ -104,7 +104,7 @@ fonts.pkg(forcemain, forcesub, suffix, processall, verbose)
+ # -z "<numbers>"  restrict metapackaging to <numbers> comma-separated list of
+ #                 font package suffixes
+ %fontmetapkg(n:s:d:z:) %{lua:
+-local        fonts = require "fedora.srpm.fonts"
++local        fonts = require "mariner.srpm.fonts"
+ local         name = rpm.expand("%{?-n*}")
+ local      summary = rpm.expand("%{?-s*}")
+ if (summary ~= "") then
+diff --git a/templates/fontconfig/basic-font-template.txt b/templates/fontconfig/basic-font-template.txt
+index ec72f00..bff0c1a 100644
+--- a/templates/fontconfig/basic-font-template.txt
++++ b/templates/fontconfig/basic-font-template.txt
+@@ -33,4 +33,4 @@ The output file will be named:
+ where [XX] should be a two-digit number corresponding to the font priority in
+ fontconfig.
+ 
+-© 2008-2009 Nicolas Mailhot <nim at fedoraproject dot org>
++© 2008-2009 Nicolas Mailhot <nim at marinerproject dot org>
+diff --git a/templates/fontconfig/fontconfig-generics.txt b/templates/fontconfig/fontconfig-generics.txt
+index 5781b42..8725f23 100644
+--- a/templates/fontconfig/fontconfig-generics.txt
++++ b/templates/fontconfig/fontconfig-generics.txt
+@@ -22,4 +22,4 @@ metadata is missing or plain false, so do not rely on it 100%.
+ ¹ http://en.wikipedia.org/wiki/Serif
+ ² <CTRL> + <SHIFT> + <F> then check the OS/2 tab.
+ 
+-© 2009 Nicolas Mailhot <nim at fedoraproject dot org>
++© 2009 Nicolas Mailhot <nim at marinerproject dot org>
+diff --git a/templates/fontconfig/fontconfig-priorities.txt b/templates/fontconfig/fontconfig-priorities.txt
+index 06e1a2d..263b0b5 100644
+--- a/templates/fontconfig/fontconfig-priorities.txt
++++ b/templates/fontconfig/fontconfig-priorities.txt
+@@ -27,4 +27,4 @@ belongs to, if you do not want to perturb distribution defaults.
+ 
+ See also /etc/fonts/conf.d/README
+ 
+-© 2007-2009 Nicolas Mailhot <nim at fedoraproject dot org>
++© 2007-2009 Nicolas Mailhot <nim at marinerproject dot org>
+diff --git a/templates/fontconfig/index.txt b/templates/fontconfig/index.txt
+index a398759..1242b1b 100644
+--- a/templates/fontconfig/index.txt
++++ b/templates/fontconfig/index.txt
+@@ -33,4 +33,4 @@ text file:
+   When you need to make several font families appear as a single one,
+   simplifying font management for users.
+ 
+-© 2009 Nicolas Mailhot <nim at fedoraproject dot org>
++© 2009 Nicolas Mailhot <nim at marinerproject dot org>
+diff --git a/templates/fontconfig/l10n-font-template.txt b/templates/fontconfig/l10n-font-template.txt
+index e380e71..f9937c1 100644
+--- a/templates/fontconfig/l10n-font-template.txt
++++ b/templates/fontconfig/l10n-font-template.txt
+@@ -44,4 +44,4 @@ The output file will be named:
+ where [XX] should be a two-digit number corresponding to the font priority in
+ fontconfig.
+ 
+-© 2008-2009 Nicolas Mailhot <nim at fedoraproject dot org>
++© 2008-2009 Nicolas Mailhot <nim at marinerproject dot org>
+diff --git a/templates/fontconfig/merging-font-template.txt b/templates/fontconfig/merging-font-template.txt
+index c9b555a..902d281 100644
+--- a/templates/fontconfig/merging-font-template.txt
++++ b/templates/fontconfig/merging-font-template.txt
+@@ -62,4 +62,4 @@ The output file will be named:
+ where [XX] should be a two-digit number corresponding to the font priority in
+ fontconfig.
+ 
+-© 2009 Nicolas Mailhot <nim at fedoraproject dot org>
++© 2009 Nicolas Mailhot <nim at marinerproject dot org>
+diff --git a/templates/fontconfig/remapping-font-template.txt b/templates/fontconfig/remapping-font-template.txt
+index c2829b5..be8e4c6 100644
+--- a/templates/fontconfig/remapping-font-template.txt
++++ b/templates/fontconfig/remapping-font-template.txt
+@@ -74,4 +74,4 @@ The output file will be named:
+ where [XX] should be a two-digit number corresponding to the font priority in
+ fontconfig.
+ 
+-© 2009 Nicolas Mailhot <nim at fedoraproject dot org>
++© 2009 Nicolas Mailhot <nim at marinerproject dot org>
+diff --git a/templates/fontconfig/rescaling-font-template.txt b/templates/fontconfig/rescaling-font-template.txt
+index 200fbda..fa5b2e3 100644
+--- a/templates/fontconfig/rescaling-font-template.txt
++++ b/templates/fontconfig/rescaling-font-template.txt
+@@ -45,4 +45,4 @@ The output file will be named:
+ where [XX] should be a two-digit number corresponding to the font priority in
+ fontconfig.
+ 
+-© 2008-2009 Nicolas Mailhot <nim at fedoraproject dot org>
++© 2008-2009 Nicolas Mailhot <nim at marinerproject dot org>
+diff --git a/templates/fontconfig/substitution-font-template.txt b/templates/fontconfig/substitution-font-template.txt
+index 2ae6940..39509de 100644
+--- a/templates/fontconfig/substitution-font-template.txt
++++ b/templates/fontconfig/substitution-font-template.txt
+@@ -39,4 +39,4 @@ The output file will be named:
+ where [XX] should be a two-digit number corresponding to the font priority in
+ fontconfig.
+ 
+-© 2008-2009 Nicolas Mailhot <nim at fedoraproject dot org>
++© 2008-2009 Nicolas Mailhot <nim at marinerproject dot org>

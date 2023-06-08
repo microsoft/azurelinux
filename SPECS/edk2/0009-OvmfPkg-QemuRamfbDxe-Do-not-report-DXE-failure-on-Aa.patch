@@ -1,0 +1,96 @@
+From 08c466269cf4728e954d61c1801b0eb6ca4175ff Mon Sep 17 00:00:00 2001
+From: Philippe Mathieu-Daude <philmd@redhat.com>
+Date: Thu, 1 Aug 2019 20:43:48 +0200
+Subject: [PATCH 09/14] OvmfPkg: QemuRamfbDxe: Do not report DXE failure on
+ Aarch64 silent builds (RH only)
+
+Notes about the RHEL-8.3/20200603-ca407c7246bf [edk2-stable202005] ->
+RHEL-8.5/20210520-e1999b264f1f [edk2-stable202105] rebase:
+
+- no change
+
+Notes about the RHEL-8.2/20190904-37eef91017ad [edk2-stable201908] ->
+RHEL-8.3/20200603-ca407c7246bf [edk2-stable202005] rebase:
+
+- no change
+
+Notes about the RHEL-8.1/20190308-89910a39dcfd [edk2-stable201903] ->
+RHEL-8.2/20190904-37eef91017ad [edk2-stable201908] rebase:
+
+- We have to carry this downstream-only patch -- committed originally as
+  aaaedc1e2cfd -- indefinitely.
+
+- To avoid confusion, remove the tags from the commit message that had
+  been added by the downstream maintainer scripts, such as: Message-id,
+  Patchwork-id, O-Subject, Acked-by. These remain available on the
+  original downstream commit. The Bugzilla line is preserved, as it
+  doesn't relate to a specific posting, but to the problem.
+
+Bugzilla: 1714446
+
+To suppress an error message on the silent build when ramfb is
+not configured, change QemuRamfbDxe to return EFI_SUCCESS even
+when it fails.
+Some memory is wasted (driver stays resident without
+any good use), but it is mostly harmless, as the memory
+is released by the OS after ExitBootServices().
+
+Suggested-by: Laszlo Ersek <lersek@redhat.com>
+Signed-off-by: Philippe Mathieu-Daude <philmd@redhat.com>
+(cherry picked from commit aaaedc1e2cfd55ef003fb1b5a37c73a196b26dc7)
+Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+(cherry picked from commit aa2b66b18a62d652bdbefae7b5732297294306ca)
+(cherry picked from commit deb3451034326b75fd760aba47a5171493ff055e)
+---
+ OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf |  1 +
+ OvmfPkg/QemuRamfbDxe/QemuRamfb.c      | 15 +++++++++++++++
+ 2 files changed, 16 insertions(+)
+
+diff --git a/OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf b/OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf
+index e3890b8c202f..6ffee5acb24c 100644
+--- a/OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf
++++ b/OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf
+@@ -29,6 +29,7 @@ [LibraryClasses]
+   BaseLib
+   BaseMemoryLib
+   DebugLib
++  DebugPrintErrorLevelLib
+   DevicePathLib
+   FrameBufferBltLib
+   MemoryAllocationLib
+diff --git a/OvmfPkg/QemuRamfbDxe/QemuRamfb.c b/OvmfPkg/QemuRamfbDxe/QemuRamfb.c
+index f5113fbc78a6..0295986fe0f1 100644
+--- a/OvmfPkg/QemuRamfbDxe/QemuRamfb.c
++++ b/OvmfPkg/QemuRamfbDxe/QemuRamfb.c
+@@ -13,6 +13,7 @@
+ #include <Library/BaseLib.h>
+ #include <Library/BaseMemoryLib.h>
+ #include <Library/DebugLib.h>
++#include <Library/DebugPrintErrorLevelLib.h>
+ #include <Library/DevicePathLib.h>
+ #include <Library/FrameBufferBltLib.h>
+ #include <Library/MemoryAllocationLib.h>
+@@ -259,6 +260,20 @@ InitializeQemuRamfb (
+ 
+   Status = QemuFwCfgFindFile ("etc/ramfb", &mRamfbFwCfgItem, &FwCfgSize);
+   if (EFI_ERROR (Status)) {
++ #if defined (MDE_CPU_AARCH64)
++    //
++    // RHBZ#1714446
++    // If no ramfb device was configured, this platform DXE driver should
++    // returns EFI_NOT_FOUND, so the DXE Core can unload it. However, even
++    // using a silent build, an error message is issued to the guest console.
++    // Since this confuse users, return success and stay resident. The wasted
++    // guest RAM still gets freed later after ExitBootServices().
++    //
++    if (GetDebugPrintErrorLevel () == DEBUG_ERROR) {
++      return EFI_SUCCESS;
++    }
++
++ #endif
+     return EFI_NOT_FOUND;
+   }
+ 
+-- 
+2.39.2
+

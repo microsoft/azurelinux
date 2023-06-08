@@ -54,7 +54,7 @@ var (
 
 	imageTag = app.Flag("image-tag", "Tag (text) appended to the image name. Empty by default.").String()
 
-	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").Required().String()
+	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
 )
 
 func main() {
