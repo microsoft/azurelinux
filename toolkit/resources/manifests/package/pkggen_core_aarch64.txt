@@ -208,8 +208,8 @@ pcre-8.45-2.cm2.aarch64.rpm
 pcre-libs-8.45-2.cm2.aarch64.rpm
 lua-5.4.4-1.cm2.aarch64.rpm
 lua-libs-5.4.4-1.cm2.aarch64.rpm
-mariner-rpm-macros-2.0-21.cm2.noarch.rpm
-mariner-check-macros-2.0-21.cm2.noarch.rpm
+mariner-rpm-macros-2.0-22.cm2.noarch.rpm
+mariner-check-macros-2.0-22.cm2.noarch.rpm
 libassuan-2.5.5-2.cm2.aarch64.rpm
 libassuan-devel-2.5.5-2.cm2.aarch64.rpm
 libgpg-error-1.46-1.cm2.aarch64.rpm
