@@ -76,7 +76,7 @@ func fetchPackages() (err error) {
 
 	toolchainPackages, err := schedulerutils.ReadReservedFilesList(*toolchainManifest)
 	if err != nil {
-		err = fmt.Errorf("unable to read toolchain manifest file '%s': %w", *toolchainManifest, err)
+		err = fmt.Errorf("unable to read toolchain manifest file '%s':\n%w", *toolchainManifest, err)
 		return
 	}
 
