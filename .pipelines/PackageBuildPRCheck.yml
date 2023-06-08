@@ -50,18 +50,13 @@ extends:
                 isCustom: true
                 name: ${{ configuration.agentPool }}
                 vmImage: ${{ configuration.agentVMName }}
+              strategy:
+                matrix:
+                  regular:
+                    runCheck: 'false'
+                  ptest:
+                    runCheck: 'true'
               steps:
                 - template: .pipelines/templates/PackageBuild.yml@self
                   parameters:
-                    isCheckBuild: 'false'
-
-            - job: Ptests
-              pool:
-                type: linux
-                isCustom: true
-                name: ${{ configuration.agentPool }}
-                vmImage: ${{ configuration.agentVMName }}
-              steps:
-                - template: .pipelines/templates/PackageBuild.yml@self
-                  parameters:
-                    isCheckBuild: 'true'
+                    isCheckBuild: '$(runCheck)'
