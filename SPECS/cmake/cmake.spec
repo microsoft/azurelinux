@@ -2,7 +2,7 @@
 Summary:        Cmake
 Name:           cmake
 Version:        3.21.4
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        BSD AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,7 +15,7 @@ Patch0:         disableUnstableUT.patch
 Patch1:         CVE-2022-43551.patch
 Patch2:         CVE-2023-23914-0001-share-add-sharing-of-HSTS-cache-among-handles.patch
 Patch3:         CVE-2023-23914-0002-hsts-handle-adding-the-same-host-name-again.patch
-
+Patch4:         CVE-2023-28322-lib-unify-the-upload-method-handling.patch
 BuildRequires:  bzip2
 BuildRequires:  bzip2-devel
 BuildRequires:  curl
@@ -29,13 +29,11 @@ BuildRequires:  xz
 BuildRequires:  xz-devel
 BuildRequires:  zlib
 BuildRequires:  zlib-devel
-
 Requires:       bzip2
 Requires:       expat
 Requires:       libarchive
 Requires:       ncurses
 Requires:       zlib
-
 Provides:       %{name}%{major_version} = %{version}-%{release}
 Provides:       %{name}-filesystem = %{version}-%{release}
 Provides:       %{name}-filesystem%{?_isa} = %{version}-%{release}
@@ -83,10 +81,13 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %{_prefix}/doc/%{name}-*/*
 
 %changelog
-* Tue Jun 06 2023 Dan Streetman <ddstreet@ieee.org> - 3.21.4.5
+* Thu Jun 08 2023 Sumedh Sharma <sumsharma@microsoft.com> - 3.21.4-6
+- Patch vendored curl for CVE-2023-28322
+
+* Tue Jun 06 2023 Dan Streetman <ddstreet@ieee.org> - 3.21.4-5
 - Patch vendored curl for CVE-2023-23914
 
-* Mon Apr 03 2023 Bala <balakumaran.kannan@microsoft.com> - 3.21.4.4
+* Mon Apr 03 2023 Bala <balakumaran.kannan@microsoft.com> - 3.21.4-4
 - Add build directory to %cmake macro to align with %cmake_build
 
 * Mon Feb 06 2023 Daniel McIlvaney <damcilva@microsoft.com> - 3.21.4-3
