@@ -1,6 +1,7 @@
 package profile
 
 import (
+	"fmt"
 	"os"
 	"runtime"
 	"runtime/pprof"
@@ -23,35 +24,36 @@ func StartProfiling(cpuProfFile, memProfFile, traceFile string, enableCpuProf, e
 	if enableCpuProf {
 		cpf, err := os.Create(cpuProfFile)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("Unable to create cpu-pprof file: %s", err)
 		}
-		p.cpuProfFile = cpf
 		pprof.StartCPUProfile(cpf)
+		// Assign the file pointer after starting the profile operation
+		p.cpuProfFile = cpf
 	}
 
 	if enableMemProf {
 		mpf, err := os.Create(cpuProfFile)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("Unable to create mem-pprof file: %s", err)
 		}
-		p.memProfFile = mpf
-
 		runtime.GC() // get up-to-date statistics
 		if err := pprof.WriteHeapProfile(mpf); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("Unable to write mem-pprof file: %s", err)
 		}
+		// Assign the file pointer after starting the profile operation
+		p.memProfFile = mpf
 	}
 
 	if enableTrace {
 		tf, err := os.Create(traceFile)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("Unable to create trace file: %s", err)
 		}
-		p.traceFile = tf
-
 		if err := trace.Start(tf); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("Unable to write trace file: %s", err)
 		}
+		// Assign the file pointer after starting the trace
+		p.traceFile = tf
 	}
 
 	return p, nil
