@@ -1,7 +1,17 @@
 trigger: none
 pr:
   - fasttrack/*
-  - main
+
+parameters:
+  - name: buildConfiguration
+    type: object
+    default:
+    - AMD64:
+      - agentPool: "mariner-core-x64-1es-mariner2-gpt-test"
+        agentVMName: "Mariner-Build-Mariner2-1ES-Managed-Image2-GPT-Test"
+    - ARM64:
+      - agentPool: "mariner-core-arm64-1es-mariner2"
+        agentVMName: "Mariner-Build-Mariner2-1ES-ARM64-Managed-Image"
 
 resources:
   repositories:
@@ -15,64 +25,48 @@ extends:
   parameters:
     featureFlags:
       runOnHost: true
-      skipOfficialValidation: true
     globalSdl:
       credscan:
         suppressionsFile: .config/CredScanSuppressions.json
-      policheck:
-        break: true
     stages:
-      - stage: Toolchain
-        jobs:
-          - job: Build
-            strategy:
-              matrix:
-                AMD64:
-                  agentPool: "mariner-core-x64-1es-mariner2-gpt-test"
-                  agentVMName: "Mariner-Build-Mariner2-1ES-Managed-Image2-GPT-Test"
-                ARM64:
-                  agentPool: "mariner-core-arm64-1es-mariner2"
-                  agentVMName: "Mariner-Build-Mariner2-1ES-ARM64-Managed-Image"
-            pool:
-              type: linux
-              isCustom: true
-              name: "$(agentPool)"
-              vmImage: "$(agentVMName)"
-            variables:
-              ob_outputDirectory: "$(Build.SourcesDirectory)/ToBePublished"
-            steps:
-              - template: .pipelines/templates/ToolchainBuild.yml@self
+      - ${{ each configuration in parameters.buildConfiguration }}:
+        - stage: Toolchain_${{ configuration.Key }}
+          jobs:
+            - job: Build
+              pool:
+                type: linux
+                isCustom: true
+                name: ${{ configuration.agentPool }}}
+                vmImage: ${{ configuration.agentVMName }}
+              variables:
+                ob_outputDirectory: "$(Build.SourcesDirectory)/ToBePublished"
+              steps:
+                - template: .pipelines/templates/ToolchainBuild.yml@self
 
-      - stage: RPMs
-        dependsOn: Toolchain
-        jobs:
-          - job: Build
-            strategy:
-              matrix:
-                AMD64_NO_CHECK:
-                  agentPool: "mariner-core-x64-1es-mariner2-gpt-test"
-                  agentVMName: "Mariner-Build-Mariner2-1ES-Managed-Image2-GPT-Test"
-                  check: "false"
-                ARM64_NO_CHECK:
-                  agentPool: "mariner-core-arm64-1es-mariner2"
-                  agentVMName: "Mariner-Build-Mariner2-1ES-ARM64-Managed-Image"
-                  check: "false"
-                AMD64_WITH_CHECK:
-                  agentPool: "mariner-core-x64-1es-mariner2-gpt-test"
-                  agentVMName: "Mariner-Build-Mariner2-1ES-Managed-Image2-GPT-Test"
-                  check: "true"
-                ARM64_WITH_CHECK:
-                  agentPool: "mariner-core-arm64-1es-mariner2"
-                  agentVMName: "Mariner-Build-Mariner2-1ES-ARM64-Managed-Image"
-                  check: "true"
-            pool:
-              type: linux
-              isCustom: true
-              name: "$(agentPool)"
-              vmImage: "$(agentVMName)"
-            variables:
-              ob_outputDirectory: "$(Build.SourcesDirectory)/ToBePublished"
-            steps:
-              - template: .pipelines/templates/PackageBuild.yml@self
-                parameters:
-                  isCheckBuild: $(check)
+        - stage: RPMs
+          dependsOn: Toolchain_${{ configuration.Key }}
+          jobs:
+            - job: Build
+              pool:
+                type: linux
+                isCustom: true
+                name: ${{ configuration.agentPool }}}
+                vmImage: ${{ configuration.agentVMName }}
+              variables:
+                ob_outputDirectory: "$(Build.SourcesDirectory)/ToBePublished"
+              steps:
+                - template: .pipelines/templates/PackageBuild.yml@self
+                  parameters:
+                    isCheckBuild: 'false'
+            - job: Ptests
+              pool:
+                type: linux
+                isCustom: true
+                name: ${{ configuration.agentPool }}}
+                vmImage: ${{ configuration.agentVMName }}
+              variables:
+                ob_outputDirectory: "$(Build.SourcesDirectory)/ToBePublished"
+              steps:
+                - template: .pipelines/templates/PackageBuild.yml@self
+                  parameters:
+                    isCheckBuild: 'true'
