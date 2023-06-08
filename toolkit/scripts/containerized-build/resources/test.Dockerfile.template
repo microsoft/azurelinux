@@ -1,0 +1,16 @@
+FROM cblmariner.azurecr.io/base/core:<VER>
+
+COPY resources/_enable_repo.sh /enable_repo.sh
+COPY resources/_local_repo /etc/yum.repos.d/local_repo.not_a_repo
+COPY build_container/welcome.txt /mariner_docker_stuff/welcome.txt
+
+COPY resources/tester_splash.txt /mariner_docker_stuff/splash.txt
+
+RUN tdnf -y install createrepo_c openssh-server util-linux
+
+RUN echo "alias tdnf='tdnf --releasever=<VER>'"                 >> /root/.bashrc && \
+    echo "cat /mariner_docker_stuff/splash.txt"                 >> /root/.bashrc && \
+    cat /mariner_docker_stuff/welcome.txt                       >> /root/.bashrc && \
+    echo "if [[ ! -L /repo ]]; then ln -s /mnt/RPMS/ /repo ; fi" >> /root/.bashrc && \
+    echo "cd  /repo"                                            >> /root/.bashrc && \
+    echo "tdnf install -y dnf dnf-plugins-core"                 >> /root/.bashrc

@@ -1,0 +1,13 @@
+echo "*******************************************************************************************"
+echo "* RPMs from '<REPO_PATH>' will be available in /repo"
+echo "* Run /enable_repo.sh to make available to tdnf automatically"
+echo "* Individual packages may be installed directly via 'tdnf install /repo/x86_64/pkg.rpm'"
+echo "*"
+echo "* Some build tips:"
+echo "*     Install an SRPM:        'rpm -ihv /mnt/SRPMS/my-pkg.src.rpm'"
+echo "*     Build an SRPM:          'rpmbuild -ba /usr/src/mariner/SPECS/my-pkg.spec'"
+echo "*     Auto install deps:      'dnf builddep -y my-pkg.spec'"
+echo "*     Show pkg dependencies:  'dnf repoquery --deplist my-pkg'"
+echo "*"
+echo "*    Other mount points:"
+# Insert mounts dynamically here vvv

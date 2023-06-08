@@ -163,6 +163,10 @@ include $(SCRIPTS_DIR)/tools.mk
 #   input-srpms, clean-input-srpms
 include $(SCRIPTS_DIR)/srpm_pack.mk
 
+# Create local build env for building RPMs with:
+#   containerized-rpmbuild
+include $(SCRIPTS_DIR)/containerized-build.mk
+
 # Expand local SRPMS into sources and SPECS with:
 #   expand-specs clean-expand-specs
 include $(SCRIPTS_DIR)/srpm_expand.mk
