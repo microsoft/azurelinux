@@ -228,7 +228,7 @@ end
 %_vpath_builddir %_target_platform
 
 # Maximum number of CPU's to use when building, 0 for unlimited.
-%_smp_ncpus_max 0
+%_smp_ncpus_max 16
 
 %_smp_build_ncpus %([ -z "$RPM_BUILD_NCPUS" ] \\\
 	&& RPM_BUILD_NCPUS="`/usr/bin/getconf _NPROCESSORS_ONLN`"; \\\
