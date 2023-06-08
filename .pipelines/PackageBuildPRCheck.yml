@@ -30,7 +30,7 @@ extends:
         suppressionsFile: .config/CredScanSuppressions.json
     stages:
       - ${{ each configuration in parameters.buildConfiguration }}:
-        - stage: Toolchain_${{ configuration.Key }}
+        - stage: Toolchain_${{ configuration }}
           jobs:
             - job: Build
               pool:
@@ -44,7 +44,7 @@ extends:
                 - template: .pipelines/templates/ToolchainBuild.yml@self
 
         - stage: RPMs
-          dependsOn: Toolchain_${{ configuration.Key }}
+          dependsOn: Toolchain_${{ configuration }}
           jobs:
             - job: Build
               pool:
