@@ -10,14 +10,13 @@ import sys
 import re
 from kernel_sources_analysis import get_data_from_config, extract_kernel_dir_name, extract_config_arch
 
-# Find the lines in the diff that contain +/- CONFIG
-# Ignore the lines that contain @
-# Return the set of configs that follow +/-
+# Regex for finding config options
+# Matches words that start with +/-CONFIG_ or +/-# CONFIG_
+CONFIG_REGEX=r'(?:(?<=[-+])|(?<=[-+]# ))CONFIG_\w+'
+
 def extract_modified_configs(input_string):
-    pattern = r'(?!.*@)[+-]\s*.*CONFIG.*'
-    matching_lines = re.findall(pattern, input_string)
-    holder=[re.sub(r"\+|\-|=y|=m|\#|is not set", r"", s).strip() for s in matching_lines]
-    config_set = set(holder)
+    matching_lines = re.findall(CONFIG_REGEX, input_string)
+    config_set = set(matching_lines)
     return config_set
 
 # Parse diff for new kernel configs
