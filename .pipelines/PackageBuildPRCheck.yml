@@ -6,12 +6,12 @@ parameters:
   - name: buildConfiguration
     type: object
     default:
-    - AMD64:
-      - agentPool: "mariner-core-x64-1es-mariner2-gpt-test"
-        agentVMName: "Mariner-Build-Mariner2-1ES-Managed-Image2-GPT-Test"
-    - ARM64:
-      - agentPool: "mariner-core-arm64-1es-mariner2"
-        agentVMName: "Mariner-Build-Mariner2-1ES-ARM64-Managed-Image"
+    - name: "AMD64"
+      agentPool: "mariner-core-x64-1es-mariner2-gpt-test"
+      agentVMName: "Mariner-Build-Mariner2-1ES-Managed-Image2-GPT-Test"
+    - name: "ARM64"
+      agentPool: "mariner-core-arm64-1es-mariner2"
+      agentVMName: "Mariner-Build-Mariner2-1ES-ARM64-Managed-Image"
 
 resources:
   repositories:
@@ -30,7 +30,7 @@ extends:
         suppressionsFile: .config/CredScanSuppressions.json
     stages:
       - ${{ each configuration in parameters.buildConfiguration }}:
-        - stage: Toolchain_${{ configuration }}
+        - stage: Toolchain_${{ configuration.name }}
           jobs:
             - job: Build
               pool:
@@ -44,7 +44,7 @@ extends:
                 - template: .pipelines/templates/ToolchainBuild.yml@self
 
         - stage: RPMs
-          dependsOn: Toolchain_${{ configuration }}
+          dependsOn: Toolchain_${{ configuration.name }}
           jobs:
             - job: Build
               pool:
