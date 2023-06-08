@@ -31,13 +31,13 @@ extends:
     stages:
       - ${{ each configuration in parameters.buildConfiguration }}:
         - stage: Toolchain_${{ configuration.name }}
+          pool:
+            type: linux
+            isCustom: true
+            name: ${{ configuration.agentPool }}
+            vmImage: ${{ configuration.agentVMName }}
           jobs:
             - job: Build
-              pool:
-                type: linux
-                isCustom: true
-                name: ${{ configuration.agentPool }}
-                vmImage: ${{ configuration.agentVMName }}
               variables:
                 ob_outputDirectory: "$(Build.SourcesDirectory)/ToBePublished"
               steps:
@@ -45,25 +45,21 @@ extends:
 
         - stage: RPMs_${{ configuration.name }}
           dependsOn: Toolchain_${{ configuration.name }}
+          pool:
+            type: linux
+            isCustom: true
+            name: ${{ configuration.agentPool }}
+            vmImage: ${{ configuration.agentVMName }}
           jobs:
             - job: Build
-              pool:
-                type: linux
-                isCustom: true
-                name: ${{ configuration.agentPool }}
-                vmImage: ${{ configuration.agentVMName }}
               variables:
                 ob_outputDirectory: "$(Build.SourcesDirectory)/ToBePublished"
               steps:
                 - template: .pipelines/templates/PackageBuild.yml@self
                   parameters:
                     isCheckBuild: 'false'
+
             - job: Ptests
-              pool:
-                type: linux
-                isCustom: true
-                name: ${{ configuration.agentPool }}
-                vmImage: ${{ configuration.agentVMName }}
               variables:
                 ob_outputDirectory: "$(Build.SourcesDirectory)/ToBePublished"
               steps:
