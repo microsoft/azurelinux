@@ -38,8 +38,6 @@ extends:
                 isCustom: true
                 name: ${{ configuration.agentPool }}
                 vmImage: ${{ configuration.agentVMName }}
-              variables:
-                ob_outputDirectory: "$(Build.SourcesDirectory)/ToBePublished"
               steps:
                 - template: .pipelines/templates/ToolchainBuild.yml@self
 
@@ -52,8 +50,6 @@ extends:
                 isCustom: true
                 name: ${{ configuration.agentPool }}
                 vmImage: ${{ configuration.agentVMName }}
-              variables:
-                ob_outputDirectory: "$(Build.SourcesDirectory)/ToBePublished"
               steps:
                 - template: .pipelines/templates/PackageBuild.yml@self
                   parameters:
@@ -65,8 +61,6 @@ extends:
                 isCustom: true
                 name: ${{ configuration.agentPool }}
                 vmImage: ${{ configuration.agentVMName }}
-              variables:
-                ob_outputDirectory: "$(Build.SourcesDirectory)/ToBePublished"
               steps:
                 - template: .pipelines/templates/PackageBuild.yml@self
                   parameters:
