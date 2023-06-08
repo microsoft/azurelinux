@@ -14,8 +14,6 @@ import (
 	"path/filepath"
 	"reflect"
 	"runtime"
-	"runtime/pprof"
-	"runtime/trace"
 	"strings"
 	"sync"
 	"time"
@@ -31,6 +29,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/rpm"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/profile"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -138,45 +137,12 @@ func main() {
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
 
-	// CPU Profiling
-	if *enableCpuProf {
-		cpf, err := os.Create(*cpuProfFile)
-		if err != nil {
-			logger.Log.Fatalf("Unable to create cpu-pprof file: %s", err)
-		}
-		defer cpf.Close()
-
-		pprof.StartCPUProfile(cpf)
-		defer pprof.StopCPUProfile()
+	prof, err := profile.StartProfiling(*cpuProfFile, *memProfFile, *traceFile, *enableCpuProf, *enableMemProf, *enableTrace)
+	if err != nil {
+		logger.Log.Warnf("Could not start profiling: %s", err)
+		return
 	}
-
-	// Memory Profiling
-	if *enableMemProf {
-		mpf, err := os.Create(*memProfFile)
-		if err != nil {
-			logger.Log.Fatalf("Unable to create memory-pprof file: %s", err)
-		}
-		defer mpf.Close()
-
-		runtime.GC() // get up-to-date statistics
-		if err := pprof.WriteHeapProfile(mpf); err != nil {
-			logger.Log.Fatalf("Unable to write memory profile pprof file: %s", err)
-		}
-	}
-
-	// Tracing
-	if *enableTrace {
-		tf, err := os.Create(*traceFile)
-		if err != nil {
-			logger.Log.Fatalf("Unable to create trace file: %s", err)
-		}
-		defer tf.Close()
-
-		if err := trace.Start(tf); err != nil {
-			logger.Log.Fatalf("Unable to write trace file: %s", err)
-		}
-		defer trace.Stop()
-	}
+	defer prof.StopProfiler()
 
 	timestamp.BeginTiming("srpmpacker", *timestampFile)
 	defer timestamp.CompleteTiming()
@@ -204,7 +170,6 @@ func main() {
 	}
 
 	// Setup remote source configuration
-	var err error
 	templateSrcConfig.sourceURL = *sourceURL
 	templateSrcConfig.caCerts, err = x509.SystemCertPool()
 	logger.PanicOnError(err, "Received error calling x509.SystemCertPool(). Error: %v", err)

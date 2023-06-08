@@ -8,8 +8,6 @@ import (
 	"os"
 	"os/signal"
 	"runtime"
-	"runtime/pprof"
-	"runtime/trace"
 	"sync"
 	"time"
 
@@ -18,6 +16,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/profile"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/scheduler/buildagents"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/scheduler/schedulerutils"
 
@@ -103,49 +102,15 @@ var (
 
 func main() {
 	app.Version(exe.ToolkitVersion)
-
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
 
-	// CPU Profiling
-	if *enableCpuProf {
-		cpf, err := os.Create(*cpuProfFile)
-		if err != nil {
-			logger.Log.Fatalf("Unable to create cpu-pprof file: %s", err)
-		}
-		defer cpf.Close()
-
-		pprof.StartCPUProfile(cpf)
-		defer pprof.StopCPUProfile()
+	prof, err := profile.StartProfiling(*cpuProfFile, *memProfFile, *traceFile, *enableCpuProf, *enableMemProf, *enableTrace)
+	if err != nil {
+		logger.Log.Warnf("Could not start profiling: %s", err)
+		return
 	}
-
-	// Memory Profiling
-	if *enableMemProf {
-		mpf, err := os.Create(*memProfFile)
-		if err != nil {
-			logger.Log.Fatalf("Unable to create memory-pprof file: %s", err)
-		}
-		defer mpf.Close()
-
-		runtime.GC() // get up-to-date statistics
-		if err := pprof.WriteHeapProfile(mpf); err != nil {
-			logger.Log.Fatalf("Unable to write memory profile pprof file: %s", err)
-		}
-	}
-
-	// Tracing
-	if *enableTrace {
-		tf, err := os.Create(*traceFile)
-		if err != nil {
-			logger.Log.Fatalf("Unable to create trace file: %s", err)
-		}
-		defer tf.Close()
-
-		if err := trace.Start(tf); err != nil {
-			logger.Log.Fatalf("Unable to write trace file: %s", err)
-		}
-		defer trace.Stop()
-	}
+	defer prof.StopProfiler()
 
 	if *workers <= 0 {
 		*workers = runtime.NumCPU()

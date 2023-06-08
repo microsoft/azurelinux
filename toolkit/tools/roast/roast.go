@@ -10,15 +10,13 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"runtime"
-	"runtime/pprof"
-	"runtime/trace"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/profile"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/roast/formats"
 
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -71,45 +69,12 @@ func main() {
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
 
-	// CPU Profiling
-	if *enableCpuProf {
-		cpf, err := os.Create(*cpuProfFile)
-		if err != nil {
-			logger.Log.Fatalf("Unable to create cpu-pprof file: %s", err)
-		}
-		defer cpf.Close()
-
-		pprof.StartCPUProfile(cpf)
-		defer pprof.StopCPUProfile()
+	prof, err := profile.StartProfiling(*cpuProfFile, *memProfFile, *traceFile, *enableCpuProf, *enableMemProf, *enableTrace)
+	if err != nil {
+		logger.Log.Warnf("Could not start profiling: %s", err)
+		return
 	}
-
-	// Memory Profiling
-	if *enableMemProf {
-		mpf, err := os.Create(*memProfFile)
-		if err != nil {
-			logger.Log.Fatalf("Unable to create memory-pprof file: %s", err)
-		}
-		defer mpf.Close()
-
-		runtime.GC() // get up-to-date statistics
-		if err := pprof.WriteHeapProfile(mpf); err != nil {
-			logger.Log.Fatalf("Unable to write memory profile pprof file: %s", err)
-		}
-	}
-
-	// Tracing
-	if *enableTrace {
-		tf, err := os.Create(*traceFile)
-		if err != nil {
-			logger.Log.Fatalf("Unable to create trace file: %s", err)
-		}
-		defer tf.Close()
-
-		if err := trace.Start(tf); err != nil {
-			logger.Log.Fatalf("Unable to write trace file: %s", err)
-		}
-		defer trace.Stop()
-	}
+	defer prof.StopProfiler()
 
 	timestamp.BeginTiming("roast", *timestampFile)
 	defer timestamp.CompleteTiming()
