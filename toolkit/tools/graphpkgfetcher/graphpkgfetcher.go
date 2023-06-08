@@ -83,7 +83,7 @@ func fetchPackages() (err error) {
 	hasUnresolvedNodes := hasUnresolvedNodes(dependencyGraph)
 	if hasUnresolvedNodes {
 		// Create the worker environment
-		cloner, err = rpmrepocloner.ConstrcuctClonerWithNetwork(*outDir, *tmpDir, *workertar, *existingRpmDir, *existingToolchainRpmDir, *tlsClientCert, *tlsClientKey, *usePreviewRepo, *disableUpstreamRepos, *repoFiles)
+		cloner, err = rpmrepocloner.ConstructClonerWithNetwork(*outDir, *tmpDir, *workertar, *existingRpmDir, *existingToolchainRpmDir, *tlsClientCert, *tlsClientKey, *usePreviewRepo, *disableUpstreamRepos, *repoFiles)
 		if err != nil {
 			err = fmt.Errorf("failed to setup new cloner:\n%w", err)
 			return err

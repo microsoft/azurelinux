@@ -79,7 +79,7 @@ func New() *RpmRepoCloner {
 	return &RpmRepoCloner{}
 }
 
-// ConstrcuctClonerWithNetwork constructs a new RpmRepoCloner with optional network access.
+// ConstructClonerWithNetwork constructs a new RpmRepoCloner with optional network access.
 //   - destinationDir is the directory to save RPMs
 //   - tmpDir is the directory to create a chroot
 //   - workerTar is the path to the worker tar used to seed the chroot
@@ -90,9 +90,9 @@ func New() *RpmRepoCloner {
 //   - usePreviewRepo if set, the upstream preview repository will be used.
 //   - disableUpstreamRepos if set, the upstream repositories will not be used.
 //   - repoDefinitions is a list of repo files to use
-func ConstrcuctClonerWithNetwork(destinationDir, tmpDir, workerTar, existingRpmsDir, toolchainRpmsDir, tlsCert, tlsKey string, usePreviewRepo, disableUpstreamRepos bool, repoDefinitions []string) (r *RpmRepoCloner, err error) {
+func ConstructClonerWithNetwork(destinationDir, tmpDir, workerTar, existingRpmsDir, toolchainRpmsDir, tlsCert, tlsKey string, usePreviewRepo, disableUpstreamRepos bool, repoDefinitions []string) (r *RpmRepoCloner, err error) {
 	timestamp.StartEvent("initialize and configure cloner", nil)
-	timestamp.StopEvent(nil) // initialize and configure cloner
+	defer timestamp.StopEvent(nil) // initialize and configure cloner
 	r = New()
 	err = r.Initialize(destinationDir, tmpDir, workerTar, existingRpmsDir, toolchainRpmsDir, usePreviewRepo, repoDefinitions)
 	if err != nil {
