@@ -36,7 +36,7 @@ extends:
               pool:
                 type: linux
                 isCustom: true
-                name: ${{ configuration.agentPool }}}
+                name: ${{ configuration.agentPool }}
                 vmImage: ${{ configuration.agentVMName }}
               variables:
                 ob_outputDirectory: "$(Build.SourcesDirectory)/ToBePublished"
@@ -50,7 +50,7 @@ extends:
               pool:
                 type: linux
                 isCustom: true
-                name: ${{ configuration.agentPool }}}
+                name: ${{ configuration.agentPool }}
                 vmImage: ${{ configuration.agentVMName }}
               variables:
                 ob_outputDirectory: "$(Build.SourcesDirectory)/ToBePublished"
@@ -62,7 +62,7 @@ extends:
               pool:
                 type: linux
                 isCustom: true
-                name: ${{ configuration.agentPool }}}
+                name: ${{ configuration.agentPool }}
                 vmImage: ${{ configuration.agentVMName }}
               variables:
                 ob_outputDirectory: "$(Build.SourcesDirectory)/ToBePublished"
