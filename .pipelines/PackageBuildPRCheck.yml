@@ -43,7 +43,7 @@ extends:
               steps:
                 - template: .pipelines/templates/ToolchainBuild.yml@self
 
-        - stage: RPMs
+        - stage: RPMs_${{ configuration.name }}
           dependsOn: Toolchain_${{ configuration.name }}
           jobs:
             - job: Build
