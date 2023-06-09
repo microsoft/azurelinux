@@ -13,6 +13,8 @@ parameters:
       agentPool: "mariner-core-arm64-1es-mariner2"
       agentVMName: "Mariner-Build-Mariner2-1ES-ARM64-Managed-Image"
 
+
+
 resources:
   repositories:
     - repository: templates
