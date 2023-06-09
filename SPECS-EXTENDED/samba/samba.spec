@@ -84,8 +84,8 @@
 %global _systemd_extra "Environment=KRB5CCNAME=FILE:/run/samba/krb5cc_samba"
 
 Name:           samba
-Version:        4.12.5
-Release:        4%{?dist}
+Version:        4.12.15
+Release:        1%{?dist}
 
 
 %define samba_depver %{version}-%{release}
@@ -96,8 +96,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.samba.org
 
-# This is a xz recompressed file of https://ftp.samba.org/pub/samba/samba-%%{version}%%{pre_release}.tar.gz
-Source0:        https://ftp.samba.org/pub/samba/samba-%{version}%{pre_release}.tar.gz#/samba-%{version}%{pre_release}.tar.xz
+Source0:        https://ftp.samba.org/pub/samba/samba-%{version}%{pre_release}.tar.gz
 Source1:        https://ftp.samba.org/pub/samba/samba-%{version}%{pre_release}.tar.asc
 Source2:        gpgkey-52FBC0B86D954B0843324CDC6F33915B6568B7EA.gpg
 
@@ -109,6 +108,15 @@ Source13:       pam_winbind.conf
 Source14:       samba.pamd
 
 Source201:      README.downgrade
+
+#No-Patches
+Patch100:       CVE-2020-14318.nopatch
+Patch101:       CVE-2020-14323.nopatch
+Patch102:       CVE-2020-14383.nopatch
+Patch103:       CVE-2020-1472.nopatch
+Patch104:       CVE-2020-27840.nopatch
+Patch105:       CVE-2021-20254.nopatch
+Patch106:       CVE-2021-20277.nopatch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -3436,6 +3444,10 @@ fi
 %endif
 
 %changelog
+* Fri Jun 09 2023 Dan Streetman <ddstreet@ieee.org> - 4.12.15-1
+- Upgrade to 4.12.15 to fix CVEs
+- License verified
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 4.12.5-4
 - Remove epoch
 
