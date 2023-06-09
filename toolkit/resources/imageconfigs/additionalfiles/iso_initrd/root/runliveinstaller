@@ -8,6 +8,7 @@ export TERM=mariner-installer
 ISO_ROOT=/mnt/cdrom
 CONFIG_ROOT=$ISO_ROOT/config
 UNATTENDED_CONFIG_FILE=$CONFIG_ROOT/unattended_config.json
+UNATTENDED_LOCK_FILE=/var/lock/unattended.lock
 
 # PXE boot setup
 CMDLINE=/proc/cmdline
@@ -32,6 +33,39 @@ while getopts ":c:u:" OPTIONS; do
         ;;
   esac
 done
+
+# If we are running unattended, we need to make sure that we only run once.
+# We can use the unattended config file via flock to synchronize the unattended
+# install flows.
+if [[ ! -f "$UNATTENDED_CONFIG_FILE" ]]; then
+    echo "Synchronizing unattended install flows... current sessions are:"
+    who
+    thisTerminal=$(who -m | xargs | cut -d' ' -f2)
+    echo "This instance is on '$thisTerminal'"
+
+    # Generally we want to prioritize ttyS0 since that will be used for debugging. The output from the log file will
+    # contain the timestamp and color codes so it is still useful for debugging and showing liveness but it will look
+    # messy.
+    if [[ "$thisTerminal" != "ttyS0" ]]; then
+        echo "Pausing for 2 seconds to allow other session to take priority"
+        sleep 2
+    fi
+
+    # Create a lock file and open file descriptor 200 to it (200 is chosen arbitrarily)
+    # The exec will hold the file descriptor open for the duration of the script since the flock will only
+    # work on file descriptors that are open.
+    touch "$UNATTENDED_LOCK_FILE"
+    exec 200>> "$UNATTENDED_LOCK_FILE"
+
+    # If the file descriptor is already locked bail out immediately and just follow the other installer's log. The tail
+    # command will follow the log file and should never exit. We must ensure that this instance of the installer does
+    # not run any further so we always exit 0 just in case.
+    flock -x -n 200 || \
+        { echo "Unattended install already running, following other installer's log instead" ; \
+        sleep 5 ; \
+        tail -f -n 10000 /installer/log.txt ; \
+        exit 0 ; }
+fi
 
 # Mounting the ISO root for the installer.
 mkdir -p $ISO_ROOT
