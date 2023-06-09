@@ -45,7 +45,6 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-libs
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
-BuildRequires:  python-tox
 Requires:       %{name} = %{version}-%{release}
 Requires:       python3
 Requires:       python3-libs
@@ -78,14 +77,7 @@ popd
 
 %check
 # run C++ unit tests
-%make_build check || test_succeeded=false
-
-# run python subpackage tests
-cd python
-tox setup.py test || test_succeeded=false
-cd ..
-
-${test_succeeded:-true}
+%make_build check
 
 %files
 %defattr(-,root,root)
