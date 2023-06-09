@@ -30247,8 +30247,8 @@
         "type": "other",
         "other": {
           "name": "xterm",
-          "version": "372",
-          "downloadUrl": "http://ftp.invisible-island.net/archives/xterm/xterm-372.tgz"
+          "version": "375",
+          "downloadUrl": "http://invisible-island.net/archives/xterm/xterm-375.tgz"
         }
       }
     },

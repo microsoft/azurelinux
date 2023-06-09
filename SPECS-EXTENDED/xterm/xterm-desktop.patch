@@ -27,6 +27,7 @@ index 61dcd2c..401b03a 100644
 +Icon=xterm-color
  Categories=System;TerminalEmulator;
  Keywords=shell;prompt;command;commandline;cmd;
+ StartupWMClass=XTerm
 -- 
 2.37.1
 

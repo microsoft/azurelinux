@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Summary:        Terminal emulator for the X Window System
 Name:           xterm
-Version:        372
+Version:        375
 Release:        1%{?dist}
 URL:            https://invisible-island.net/xterm
 License:        MIT
@@ -12,8 +12,8 @@ BuildRequires:  libxkbfile-devel xorg-x11-apps
 Requires:       xterm-resize = %{version}-%{release}
 Recommends:     xorg-x11-fonts-misc
 
-Source0:        http://ftp.invisible-island.net/archives/xterm/%{name}-%{version}.tgz
-Source1:        http://ftp.invisible-island.net/archives/xterm/16colors.txt
+Source0:        http://invisible-island.net/archives/xterm/%{name}-%{version}.tgz
+Source1:        http://invisible-island.net/archives/xterm/16colors.txt
 
 Patch1:         xterm-defaults.patch
 Patch2:         xterm-desktop.patch
@@ -103,6 +103,9 @@ install -m644 -p xterm.appdata.xml $RPM_BUILD_ROOT%{_datadir}/appdata
 %{_mandir}/man1/resize.1*
 
 %changelog
+* Fri Jun 09 2023 Dan Streetman <ddstreet@ieee.org> - 375-1
+- Upgrade to version 375 for CVE-2022-45063
+
 * Fri Aug 12 2022 Muhammad Falak <mwani@microsoft.com> - 372-1
 - Bump version to address CVE-2021-27135
 - Refresh all patches to apply cleanly
