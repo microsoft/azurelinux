@@ -32,7 +32,6 @@ BuildRequires:  gcc
 BuildRequires:  glibc-devel
 #plugin repogpgcheck
 BuildRequires:  gpgme-devel
-BuildRequires:  libmetalink-devel
 BuildRequires:  libsolv-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  make
@@ -44,7 +43,6 @@ BuildRequires:  rpm-devel
 BuildRequires:  sqlite-devel
 BuildRequires:  zlib-devel
 Requires:       curl-libs
-Requires:       libmetalink
 Requires:       libsolv
 Requires:       openssl-libs
 Requires:       rpm-libs
