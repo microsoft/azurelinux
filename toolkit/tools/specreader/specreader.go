@@ -16,6 +16,7 @@ import (
 	"sync"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/buildpipeline"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/debugutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/directory"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
@@ -23,6 +24,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/rpm"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/profile"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/scheduler/schedulerutils"
@@ -32,7 +34,8 @@ import (
 )
 
 const (
-	defaultWorkerCount = "10"
+	defaultWorkerCount = "1"
+	specExtractDir     = "extracted_specs"
 )
 
 // parseResult holds the worker results from parsing a SPEC file.
@@ -82,13 +85,13 @@ func main() {
 	toolchainRPMs, err := schedulerutils.ReadReservedFilesList(*toolchainManifest)
 	logger.PanicOnError(err, "Unable to read toolchain manifest file '%s': %s", *toolchainManifest, err)
 
-	err = parseSPECsWrapper(*buildDir, *specsDir, *rpmsDir, *srpmsDir, *existingToolchainRpmDir, *distTag, *output, *workerTar, toolchainRPMs, *workers, *runCheck)
+	err = parseSRPMsWrapper(*buildDir, *srpmsDir, *rpmsDir, *srpmsDir, *existingToolchainRpmDir, *distTag, *output, *workerTar, toolchainRPMs, *workers, *runCheck)
 	logger.PanicOnError(err)
 }
 
-// parseSPECsWrapper wraps parseSPECs to conditionally run it inside a chroot.
+// parseSRPMsWrapper wraps parseSPECs to conditionally run it inside a chroot.
 // If workerTar is non-empty, parsing will occur inside a chroot, otherwise it will run on the host system.
-func parseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, outputFile, workerTar string, toolchainRPMs []string, workers int, runCheck bool) (err error) {
+func parseSRPMsWrapper(buildDir, inputSrpmsDir, rpmsDir, srpmsDir, toolchainDir, distTag, outputFile, workerTar string, toolchainRPMs []string, workers int, runCheck bool) (err error) {
 	var (
 		chroot      *safechroot.Chroot
 		packageRepo *pkgjson.PackageRepo
@@ -96,7 +99,7 @@ func parseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, toolchainDir, dist
 
 	if workerTar != "" {
 		const leaveFilesOnDisk = false
-		chroot, err = createChroot(workerTar, buildDir, specsDir, srpmsDir)
+		chroot, err = createChroot(workerTar, buildDir, inputSrpmsDir)
 		if err != nil {
 			return
 		}
@@ -111,14 +114,16 @@ func parseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, toolchainDir, dist
 	doParse := func() error {
 		var parseError error
 
+		logger.Log.Infof("Parsing specs in %s", inputSrpmsDir)
+
 		if *targetArch == "" {
-			packageRepo, parseError = parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, buildArch, toolchainRPMs, workers, runCheck)
+			packageRepo, parseError = parseSrpms(inputSrpmsDir, rpmsDir, srpmsDir, toolchainDir, distTag, buildArch, toolchainRPMs, workers, runCheck)
 			if parseError != nil {
 				err := fmt.Errorf("failed to parse native specs (%w)", parseError)
 				return err
 			}
 		} else {
-			packageRepo, parseError = parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, *targetArch, toolchainRPMs, workers, runCheck)
+			packageRepo, parseError = parseSrpms(inputSrpmsDir, rpmsDir, srpmsDir, toolchainDir, distTag, *targetArch, toolchainRPMs, workers, runCheck)
 			if parseError != nil {
 				err := fmt.Errorf("failed to parse cross specs (%w)", parseError)
 				return err
@@ -156,7 +161,7 @@ func parseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, toolchainDir, dist
 }
 
 // createChroot creates a chroot to parse SPECs inside of.
-func createChroot(workerTar, buildDir, specsDir, srpmsDir string) (chroot *safechroot.Chroot, err error) {
+func createChroot(workerTar, buildDir, srpmsDir string) (chroot *safechroot.Chroot, err error) {
 	const (
 		chrootName       = "specparser_chroot"
 		existingDir      = false
@@ -169,7 +174,6 @@ func createChroot(workerTar, buildDir, specsDir, srpmsDir string) (chroot *safec
 	var extraDirectories []string
 
 	extraMountPoints := []*safechroot.MountPoint{
-		safechroot.NewMountPoint(specsDir, specsDir, "", safechroot.BindMountPointFlags, ""),
 		safechroot.NewMountPoint(srpmsDir, srpmsDir, "", safechroot.BindMountPointFlags, ""),
 	}
 
@@ -183,7 +187,7 @@ func createChroot(workerTar, buildDir, specsDir, srpmsDir string) (chroot *safec
 
 	// If this is not a regular build then copy in all of the SPECs since there are no bind mounts.
 	if !buildpipeline.IsRegularBuild() {
-		dirsToCopy := []string{specsDir, srpmsDir}
+		dirsToCopy := []string{srpmsDir}
 		for _, dir := range dirsToCopy {
 			dirInChroot := filepath.Join(chroot.RootDir(), dir)
 			err = directory.CopyContents(dir, dirInChroot)
@@ -201,46 +205,50 @@ func createChroot(workerTar, buildDir, specsDir, srpmsDir string) (chroot *safec
 }
 
 // parseSPECs will parse all specs in specsDir and return a summary of the SPECs.
-func parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, arch string, toolchainRPMs []string, workers int, runCheck bool) (packageRepo *pkgjson.PackageRepo, err error) {
+func parseSrpms(inputSrpmsDir, rpmsDir, srpmsDir, toolchainDir, distTag, arch string, toolchainRPMs []string, workers int, runCheck bool) (packageRepo *pkgjson.PackageRepo, err error) {
 	var (
 		packageList []*pkgjson.Package
 		wg          sync.WaitGroup
-		specFiles   []string
+		srpmFiles   []string
 	)
 
 	packageRepo = &pkgjson.PackageRepo{}
 
-	// Find the filepath for each spec in the SPECS directory.
-	specSearch, err := filepath.Abs(filepath.Join(specsDir, "**/*.spec"))
+	// Find the filepath for each srpm in the input SRPMS directory.
+	specSearch, err := filepath.Abs(filepath.Join(inputSrpmsDir, "*.src.rpm"))
+
+	logger.Log.Infof("Searching for *.src.rpm files in %s", specSearch)
+
 	if err == nil {
-		specFiles, err = filepath.Glob(specSearch)
+		srpmFiles, err = filepath.Glob(specSearch)
 	}
 	if err != nil {
-		logger.Log.Errorf("Failed to find *.spec files. Check that %s is the correct directory. Error: %v", specsDir, err)
+		logger.Log.Errorf("Failed to find *.src.rpm files. Check that %s is the correct directory. Error: %v", *specsDir, err)
 		return
 	}
 
+	logger.Log.Infof("Found %d *.src.rpm files", len(srpmFiles))
 	tsRoot, _ := timestamp.StartEvent("parse specs", nil)
 	defer timestamp.StopEvent(nil)
 
-	results := make(chan *parseResult, len(specFiles))
-	requests := make(chan string, len(specFiles))
+	results := make(chan *parseResult, len(srpmFiles))
+	requests := make(chan string, len(srpmFiles))
 	cancel := make(chan struct{})
 
 	// Start the workers now so they begin working as soon as a new job is buffered.
 	for i := 0; i < workers; i++ {
 		wg.Add(1)
-		go readSpecWorker(requests, results, cancel, &wg, distTag, rpmsDir, srpmsDir, toolchainDir, toolchainRPMs, runCheck, arch, tsRoot)
+		go readSRPMWorker(requests, results, cancel, &wg, distTag, rpmsDir, srpmsDir, toolchainDir, toolchainRPMs, runCheck, arch, tsRoot)
 	}
 
-	for _, specFile := range specFiles {
-		requests <- specFile
+	for _, srpmFile := range srpmFiles {
+		requests <- srpmFile
 	}
 
 	close(requests)
 
 	// Receive the parsed spec structures from the workers and place them into a list.
-	for i := 0; i < len(specFiles); i++ {
+	for i := 0; i < len(srpmFiles); i++ {
 		parseResult := <-results
 		if parseResult.err != nil {
 			err = parseResult.err
@@ -287,10 +295,10 @@ func sortPackages(packageRepo *pkgjson.PackageRepo) {
 	}
 }
 
-// readspec is a goroutine that takes a full filepath to a spec file and scrapes it into the Specdef structure
+// readSRPMWorker is a goroutine that takes a full filepath to a spec file and scrapes it into the Specdef structure
 // Concurrency is limited by the size of the semaphore channel passed in. Too many goroutines at once can deplete
 // available filehandles.
-func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel <-chan struct{}, wg *sync.WaitGroup, distTag, rpmsDir, srpmsDir, toolchainDir string, toolchainRPMs []string, runCheck bool, arch string, tsRoot *timestamp.TimeStamp) {
+func readSRPMWorker(requests <-chan string, results chan<- *parseResult, cancel <-chan struct{}, wg *sync.WaitGroup, distTag, rpmsDir, srpmsDir, toolchainDir string, toolchainRPMs []string, runCheck bool, arch string, tsRoot *timestamp.TimeStamp) {
 	const (
 		emptyQueryFormat      = ``
 		querySrpm             = `%{NAME}-%{VERSION}-%{RELEASE}.src.rpm`
@@ -302,7 +310,7 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 	defines := rpm.DefaultDefinesWithDist(runCheck, distTag)
 
 	var ts *timestamp.TimeStamp = nil
-	for specfile := range requests {
+	for srpmfile := range requests {
 		select {
 		case <-cancel:
 			logger.Log.Debug("Cancellation signal received")
@@ -315,27 +323,41 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 			timestamp.StopEvent(ts)
 			ts = nil
 		}
-		ts, _ = timestamp.StartEvent(filepath.Base(specfile), tsRoot)
+		ts, _ = timestamp.StartEvent(filepath.Base(srpmfile), tsRoot)
 
 		result := &parseResult{}
 
 		providerList := []*pkgjson.Package{}
 		buildRequiresList := []*pkgjson.PackageVer{}
-		sourcedir := filepath.Dir(specfile)
+		sourcedir := filepath.Dir(srpmfile)
 
-		// Find the SRPM associated with the SPEC.
-		srpmResults, err := rpm.QuerySPEC(specfile, sourcedir, querySrpm, arch, defines, rpm.QueryHeaderArgument)
+		specfile, err := extractSpecIntoFolder(srpmfile, specExtractDir)
 		if err != nil {
-			result.err = err
+			result.err = fmt.Errorf("failed to extract specfile from %s: %w", srpmfile, err)
 			results <- result
 			continue
 		}
 
+		logger.Log.Warnf("Done extracting specfile %s, now parsing", specfile)
+
+		// Find the SRPM associated with the SPEC.
+		srpmResults, err := rpm.QuerySPEC(specfile, sourcedir, querySrpm, arch, defines)
+		if err != nil {
+			result.err = fmt.Errorf("failed to query %s: %w", specfile, err)
+			debugutils.WaitForUser("hello!")
+			results <- result
+			continue
+		}
+
+		logger.Log.Warnf("Found %d SRPMs for %s", len(srpmResults), specfile)
+
 		srpmPath := filepath.Join(srpmsDir, srpmResults[0])
+
+		logger.Log.Warnf("checking arch compatibility for %s", specfile)
 
 		isCompatible, err := rpm.SpecArchIsCompatible(specfile, sourcedir, arch, defines)
 		if err != nil {
-			result.err = err
+			result.err = fmt.Errorf("failed to check arch compatibility for %s: %w", specfile, err)
 			results <- result
 			continue
 		}
@@ -346,27 +368,33 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 			continue
 		}
 
+		logger.Log.Warnf("Q 1")
+
 		// Find every package that the spec provides
-		queryResults, err := rpm.QuerySPEC(specfile, sourcedir, queryProvidedPackages, arch, defines, rpm.QueryBuiltRPMHeadersArgument)
+		queryResults, err := rpm.QuerySPEC(specfile, sourcedir, queryProvidedPackages, arch, defines)
 		if err == nil && len(queryResults) != 0 {
 			providerList, err = parseProvides(rpmsDir, toolchainDir, toolchainRPMs, srpmPath, queryResults)
 			if err != nil {
-				result.err = err
+				result.err = fmt.Errorf("failed to parse provides for %s: %w", specfile, err)
 				results <- result
 				continue
 			}
 		}
+
+		logger.Log.Warnf("Q 2")
 
 		// Query the BuildRequires fields from this spec and turn them into an array of PackageVersions
 		queryResults, err = rpm.QuerySPEC(specfile, sourcedir, emptyQueryFormat, arch, defines, rpm.BuildRequiresArgument)
 		if err == nil && len(queryResults) != 0 {
 			buildRequiresList, err = parsePackageVersionList(queryResults)
 			if err != nil {
-				result.err = err
+				result.err = fmt.Errorf("failed to parse build requires for %s: %w", specfile, err)
 				results <- result
 				continue
 			}
 		}
+
+		logger.Log.Warnf("checking list")
 
 		// Every package provided by a spec will have the same BuildRequires and SrpmPath
 		for i := range providerList {
@@ -374,11 +402,13 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 			providerList[i].SourceDir = sourcedir
 			providerList[i].Requires, err = condensePackageVersionArray(providerList[i].Requires, specfile)
 			if err != nil {
+				err = fmt.Errorf("failed to condense Requires for %s: %w", specfile, err)
 				break
 			}
 
 			providerList[i].BuildRequires, err = condensePackageVersionArray(buildRequiresList, specfile)
 			if err != nil {
+				err = fmt.Errorf("failed to condense BuildRequires for %s: %w", specfile, err)
 				break
 			}
 		}
@@ -395,6 +425,49 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 	if ts != nil {
 		timestamp.StopEvent(ts)
 	}
+}
+
+// extractSpecIntoFolder extracts the spec file from the SRPM into a temporary folder. Returns an error if more than one
+// spec file is found in the SRPM, or the folder already exists.
+func extractSpecIntoFolder(srpmfile, specExtractDir string) (string, error) {
+	targetDir := filepath.Join(specExtractDir, filepath.Base(srpmfile))
+
+	// If the target directory already exists, its an error
+	if exists, err := file.DirExists(targetDir); exists || err != nil {
+		if err != nil {
+			return "", fmt.Errorf("error checking for target directory %s: %w", targetDir, err)
+		} else {
+			return "", fmt.Errorf("target directory %s already exists", targetDir)
+		}
+	}
+
+	// Create the target directory
+	if err := os.MkdirAll(targetDir, 0755); err != nil {
+		return "", fmt.Errorf("error creating target directory %s: %w", targetDir, err)
+	}
+
+	//Command
+	program := "bash"
+	args := []string{
+		"-c",
+		fmt.Sprintf("rpm2cpio %s | cpio -idvu *.spec *.macros", srpmfile),
+	}
+	_, stderr, err := shell.ExecuteInDirectory(targetDir, program, args...)
+	if err != nil {
+		return "", fmt.Errorf("error extracting spec file from SRPM (%s): %w", stderr, err)
+	}
+
+	// Find the spec file in the target directory and make sure we only  have one
+	specfiles, err := filepath.Glob(filepath.Join(targetDir, "*.spec"))
+	if err != nil {
+		return "", fmt.Errorf("error finding spec file in target directory %s: %w", targetDir, err)
+	}
+
+	if len(specfiles) != 1 {
+		return "", fmt.Errorf("expected one spec file in target directory %s, found %d", targetDir, len(specfiles))
+	}
+
+	return specfiles[0], nil
 }
 
 // parseProvides parses a newline separated list of Provides, Requires, and Arch from a single spec file.

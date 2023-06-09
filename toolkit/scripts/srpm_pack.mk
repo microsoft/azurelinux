@@ -104,6 +104,9 @@ $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(STATUS_FLAGS_DIR)/build_srpms.
 	@touch $@
 else
 
+# SRPM packing will run if any spec files are newer than the status flag or if the status flag does not exist. However, the tool is smart enough to only pack the spec files that have changed.
+# If no spec files have changed then the status flag will not be updated (determined by the summary file being empty).
+# The main SRPM packer recipe is also responsible for removing any SRPMs that are no longer needed (toolchain SRPM packer recipe does not do this).
 $(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(local_specs) $(local_spec_dirs) $(SPECS_DIR) $(go-srpmpacker) $(srpm_pack_list_file) $(srpm_keep_list_file) $(local_spec_sources) srpm_always_run_phony
 	[ -f $@ ] || touch $@
 	GODEBUG=netdns=go $(go-srpmpacker) \

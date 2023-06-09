@@ -428,7 +428,7 @@ func createChroot(workerTar, buildDir, outDir, specsDir string) (chroot *safechr
 	return
 }
 
-func deleteStaleSRPMs(srpmsToKeep map[string]bool, distTag, outDir string, workers int) (packagedSRPMs []string, err error) {
+func deleteStaleSRPMs(srpmsToKeep map[string]bool, distTag, outDir string, workers int) (tidiedSRPMs []string, err error) {
 	// Scan every file in outDir and delete any that are not in srpmsToKeep.
 	err = filepath.Walk(outDir, func(path string, info os.FileInfo, err error) error {
 		// Skip the root directory, and any file that isn't .src.rpm.
@@ -439,6 +439,7 @@ func deleteStaleSRPMs(srpmsToKeep map[string]bool, distTag, outDir string, worke
 			// Delete the file.
 			logger.Log.Infof("Deleting stale SRPM %s", path)
 			err := os.Remove(path)
+			tidiedSRPMs = append(tidiedSRPMs, filepath.Base(path))
 			if err != nil {
 				return fmt.Errorf("error deleting stale SRPM %s: %w", path, err)
 			}
@@ -490,8 +491,7 @@ func packSRPMs(specStates []*spectosrpm.SpecState, distTag, buildDir string, tem
 		if result.srpmFile == "" {
 			continue
 		}
-
-		packagedSRPMs = append(packagedSRPMs, result.srpmFile)
+		packagedSRPMs = append(packagedSRPMs, filepath.Base(result.srpmFile))
 		logger.Log.Infof("Packed (%s) -> (%s)", filepath.Base(result.specFile), filepath.Base(result.srpmFile))
 	}
 

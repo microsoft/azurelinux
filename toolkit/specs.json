@@ -1,0 +1,186 @@
+{
+    "Repo": [
+      {
+        "Provides": {
+          "Name": "nano(x86-64)",
+          "Version": "6.0-1.cm2",
+          "Condition": "=",
+          "SVersion": "",
+          "SCondition": ""
+        },
+        "SrpmPath": "/home/damcilva/repos/CBL-Mariner/build/INTERMEDIATE_SRPMS/nano-6.0-1.cm2.src.rpm",
+        "RpmPath": "/home/damcilva/repos/CBL-Mariner/out/RPMS/x86_64/nano-6.0-1.cm2.x86_64.rpm",
+        "SourceDir": "/home/damcilva/repos/CBL-Mariner/build/INTERMEDIATE_SPECS/nano-6.0-1.cm2",
+        "SpecPath": "/home/damcilva/repos/CBL-Mariner/build/INTERMEDIATE_SPECS/nano-6.0-1.cm2/nano.spec",
+        "Architecture": "x86_64",
+        "Requires": [
+          {
+            "Name": "ncurses",
+            "Version": "",
+            "Condition": "",
+            "SVersion": "",
+            "SCondition": ""
+          }
+        ],
+        "BuildRequires": [
+          {
+            "Name": "ncurses-devel",
+            "Version": "",
+            "Condition": "",
+            "SVersion": "",
+            "SCondition": ""
+          }
+        ],
+        "IsToolchain": false
+      },
+      {
+        "Provides": {
+          "Name": "nano-debuginfo(x86-64)",
+          "Version": "6.0-1.cm2",
+          "Condition": "=",
+          "SVersion": "",
+          "SCondition": ""
+        },
+        "SrpmPath": "/home/damcilva/repos/CBL-Mariner/build/INTERMEDIATE_SRPMS/nano-6.0-1.cm2.src.rpm",
+        "RpmPath": "/home/damcilva/repos/CBL-Mariner/out/RPMS/x86_64/nano-debuginfo-6.0-1.cm2.x86_64.rpm",
+        "SourceDir": "/home/damcilva/repos/CBL-Mariner/build/INTERMEDIATE_SPECS/nano-6.0-1.cm2",
+        "SpecPath": "/home/damcilva/repos/CBL-Mariner/build/INTERMEDIATE_SPECS/nano-6.0-1.cm2/nano.spec",
+        "Architecture": "x86_64",
+        "Requires": null,
+        "BuildRequires": [
+          {
+            "Name": "ncurses-devel",
+            "Version": "",
+            "Condition": "",
+            "SVersion": "",
+            "SCondition": ""
+          }
+        ],
+        "IsToolchain": false
+      },
+      {
+        "Provides": {
+          "Name": "nano-debuginfo",
+          "Version": "6.0-1.cm2",
+          "Condition": "=",
+          "SVersion": "",
+          "SCondition": ""
+        },
+        "SrpmPath": "/home/damcilva/repos/CBL-Mariner/build/INTERMEDIATE_SRPMS/nano-6.0-1.cm2.src.rpm",
+        "RpmPath": "/home/damcilva/repos/CBL-Mariner/out/RPMS/x86_64/nano-debuginfo-6.0-1.cm2.x86_64.rpm",
+        "SourceDir": "/home/damcilva/repos/CBL-Mariner/build/INTERMEDIATE_SPECS/nano-6.0-1.cm2",
+        "SpecPath": "/home/damcilva/repos/CBL-Mariner/build/INTERMEDIATE_SPECS/nano-6.0-1.cm2/nano.spec",
+        "Architecture": "x86_64",
+        "Requires": null,
+        "BuildRequires": [
+          {
+            "Name": "ncurses-devel",
+            "Version": "",
+            "Condition": "",
+            "SVersion": "",
+            "SCondition": ""
+          }
+        ],
+        "IsToolchain": false
+      },
+      {
+        "Provides": {
+          "Name": "nano-lang(x86-64)",
+          "Version": "6.0-1.cm2",
+          "Condition": "=",
+          "SVersion": "",
+          "SCondition": ""
+        },
+        "SrpmPath": "/home/damcilva/repos/CBL-Mariner/build/INTERMEDIATE_SRPMS/nano-6.0-1.cm2.src.rpm",
+        "RpmPath": "/home/damcilva/repos/CBL-Mariner/out/RPMS/x86_64/nano-lang-6.0-1.cm2.x86_64.rpm",
+        "SourceDir": "/home/damcilva/repos/CBL-Mariner/build/INTERMEDIATE_SPECS/nano-6.0-1.cm2",
+        "SpecPath": "/home/damcilva/repos/CBL-Mariner/build/INTERMEDIATE_SPECS/nano-6.0-1.cm2/nano.spec",
+        "Architecture": "x86_64",
+        "Requires": [
+          {
+            "Name": "nano",
+            "Version": "6.0-1.cm2",
+            "Condition": "=",
+            "SVersion": "",
+            "SCondition": ""
+          }
+        ],
+        "BuildRequires": [
+          {
+            "Name": "ncurses-devel",
+            "Version": "",
+            "Condition": "",
+            "SVersion": "",
+            "SCondition": ""
+          }
+        ],
+        "IsToolchain": false
+      },
+      {
+        "Provides": {
+          "Name": "nano-lang",
+          "Version": "6.0-1.cm2",
+          "Condition": "=",
+          "SVersion": "",
+          "SCondition": ""
+        },
+        "SrpmPath": "/home/damcilva/repos/CBL-Mariner/build/INTERMEDIATE_SRPMS/nano-6.0-1.cm2.src.rpm",
+        "RpmPath": "/home/damcilva/repos/CBL-Mariner/out/RPMS/x86_64/nano-lang-6.0-1.cm2.x86_64.rpm",
+        "SourceDir": "/home/damcilva/repos/CBL-Mariner/build/INTERMEDIATE_SPECS/nano-6.0-1.cm2",
+        "SpecPath": "/home/damcilva/repos/CBL-Mariner/build/INTERMEDIATE_SPECS/nano-6.0-1.cm2/nano.spec",
+        "Architecture": "x86_64",
+        "Requires": [
+          {
+            "Name": "nano",
+            "Version": "6.0-1.cm2",
+            "Condition": "=",
+            "SVersion": "",
+            "SCondition": ""
+          }
+        ],
+        "BuildRequires": [
+          {
+            "Name": "ncurses-devel",
+            "Version": "",
+            "Condition": "",
+            "SVersion": "",
+            "SCondition": ""
+          }
+        ],
+        "IsToolchain": false
+      },
+      {
+        "Provides": {
+          "Name": "nano",
+          "Version": "6.0-1.cm2",
+          "Condition": "=",
+          "SVersion": "",
+          "SCondition": ""
+        },
+        "SrpmPath": "/home/damcilva/repos/CBL-Mariner/build/INTERMEDIATE_SRPMS/nano-6.0-1.cm2.src.rpm",
+        "RpmPath": "/home/damcilva/repos/CBL-Mariner/out/RPMS/x86_64/nano-6.0-1.cm2.x86_64.rpm",
+        "SourceDir": "/home/damcilva/repos/CBL-Mariner/build/INTERMEDIATE_SPECS/nano-6.0-1.cm2",
+        "SpecPath": "/home/damcilva/repos/CBL-Mariner/build/INTERMEDIATE_SPECS/nano-6.0-1.cm2/nano.spec",
+        "Architecture": "x86_64",
+        "Requires": [
+          {
+            "Name": "ncurses",
+            "Version": "",
+            "Condition": "",
+            "SVersion": "",
+            "SCondition": ""
+          }
+        ],
+        "BuildRequires": [
+          {
+            "Name": "ncurses-devel",
+            "Version": "",
+            "Condition": "",
+            "SVersion": "",
+            "SCondition": ""
+          }
+        ],
+        "IsToolchain": false
+      }
+    ]
+  }

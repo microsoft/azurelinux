@@ -41,9 +41,31 @@ logging_command = --log-file=$(LOGS_DIR)/pkggen/workplan/$(notdir $@).log --log-
 $(call create_folder,$(LOGS_DIR)/pkggen/workplan)
 $(call create_folder,$(rpmbuilding_logs_dir))
 
+
+ENABLE_CPU_PROFILE=y
+ENABLE_MEM_PROFILE=y
+ENABLE_TRACE=y
+
+PROFILE_DIR    ?= $(BUILD_DIR)/profile
+traceing_file   = $(PROFILE_DIR)/$(notdir $@)
+tracing_command = --cpu-prof-file=$(traceing_file).cpu.pprof \
+                  --mem-prof-file=$(traceing_file).mem.pprof \
+                  --trace-file=$(traceing_file).trace \
+                  $(if $(filter y,$(ENABLE_CPU_PROFILE)),--enable-cpu-prof) \
+                  $(if $(filter y,$(ENABLE_MEM_PROFILE)),--enable-mem-prof) \
+                  $(if $(filter y,$(ENABLE_TRACE)),--enable-trace)
+
+
+bar: $(BUILD_DIR)/bar
+$(BUILD_DIR)/bar:
+	echo $(tracing_command)
+
 .PHONY: clean-workplan clean-cache clean-cache-worker clean-spec-parse clean-ccache graph-cache analyze-built-graph workplan
+parsed-specs: $(specs_file)
+graph: $(graph_file)
 graph-cache: $(cached_file)
 workplan: $(graph_file)
+
 clean: clean-workplan clean-cache clean-spec-parse
 clean-workplan: clean-cache clean-spec-parse
 	rm -rf $(PKGBUILD_DIR)
@@ -74,10 +96,12 @@ analyze-built-graph: $(go-graphanalytics)
 		exit 1; \
 	fi
 
+srpms = $(call shell_real_build_only, find $(BUILD_SRPMS_DIR)/ -type f -name '*.src.rpm')
+
 # Parse all specs in $(BUILD_SPECS_DIR) and generate a specs.json file encoding all dependency information
-$(specs_file): $(chroot_worker) $(BUILD_SPECS_DIR) $(build_specs) $(build_spec_dirs) $(go-specreader)
+$(specs_file): $(chroot_worker) $(go-specreader) $(srpms) $(BUILD_SRPMS_DIR)
 	$(go-specreader) \
-		--dir $(BUILD_SPECS_DIR) \
+		--dir $(BUILD_SRPMS_DIR) \
 		--build-dir $(parse_working_dir) \
 		--srpm-dir $(BUILD_SRPMS_DIR) \
 		--rpm-dir $(RPMS_DIR) \

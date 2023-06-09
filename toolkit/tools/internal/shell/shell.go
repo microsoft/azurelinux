@@ -70,8 +70,12 @@ func PermanentlyStopAllProcesses(signal unix.Signal) {
 	}
 }
 
-// Execute runs the provided command.
 func Execute(program string, args ...string) (stdout, stderr string, err error) {
+	return ExecuteInDirectory("", program, args...)
+}
+
+// Execute runs the provided command.
+func ExecuteInDirectory(workingDirectory, program string, args ...string) (stdout, stderr string, err error) {
 	var (
 		outBuf bytes.Buffer
 		errBuf bytes.Buffer
@@ -80,6 +84,10 @@ func Execute(program string, args ...string) (stdout, stderr string, err error) 
 	cmd := exec.Command(program, args...)
 	cmd.Stdout = &outBuf
 	cmd.Stderr = &errBuf
+
+	if workingDirectory != "" {
+		cmd.Dir = workingDirectory
+	}
 
 	err = trackAndStartProcess(cmd)
 	if err != nil {

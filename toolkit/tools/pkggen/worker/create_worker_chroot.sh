@@ -44,6 +44,37 @@ install_one_toolchain_rpm () {
     fi
 }
 
+install_multiple_toolchain_rpms () {
+    error_msg_tail="Inspect $chroot_log for more info. Did you hydrate the toolchain?"
+
+    # Create empty array
+    declare -a full_rpm_paths
+
+    for rpm in "$@"
+    do
+        echo "    Batching install of RPM to worker chroot: $rpm." | tee -a "$chroot_log"
+        full_rpm_path=$(find "$rpm_path" -name "$rpm" -type f 2>>"$chroot_log")
+        if [ ! $? -eq 0 ] || [ -z "$full_rpm_path" ]
+        then
+            echo "Failed to locate package $1 in ($rpm_path), aborting. $error_msg_tail" | tee -a "$chroot_log"
+            exit 1
+        fi
+        echo "Found full path for package $1 in $rpm_path: ($full_rpm_path)" >> "$chroot_log"
+
+        # add to array
+        full_rpm_paths+=("$full_rpm_path")
+    done
+
+    echo "Installing batched packages..."
+    rpm -i -v --nodeps --force --root "$chroot_builder_folder" --define '_dbpath /var/lib/rpm' "${full_rpm_paths[@]}" &>> "$chroot_log"
+
+    if [ ! $? -eq 0 ]
+    then
+        echo "Elevated install failed for package $1, aborting. $error_msg_tail" | tee -a "$chroot_log"
+        exit 1
+    fi
+}
+
 rm -rf "$chroot_builder_folder"
 rm -f "$chroot_archive"
 rm -f "$chroot_log"
@@ -60,9 +91,16 @@ mknod -m 600 $chroot_builder_folder/dev/console c 5 1
 mknod -m 666 $chroot_builder_folder/dev/null c 1 3
 mknod -m 444 $chroot_builder_folder/dev/urandom c 1 9
 
+# Start with filesystem
+install_one_toolchain_rpm "$(cat "$packages" | grep "^filesystem-.*rpm$")"
+
+# Convert the file $packages into an array
+packages_to_install=()
 while read -r package || [ -n "$package" ]; do
-    install_one_toolchain_rpm "$package"
+    packages_to_install+=("$package")
 done < "$packages"
+
+install_multiple_toolchain_rpms "${packages_to_install[@]}"
 
 # If the host machine rpm version is >= 4.16 (such as Mariner 2.0), it will create an "sqlite" rpm database backend incompatible with Mariner 1.0 (which uses "bdb")
 # To resolve this, enter the 1.0 chroot after the packages are installed, and use the older rpm tool in the chroot to re-create the database in "bdb" format.
