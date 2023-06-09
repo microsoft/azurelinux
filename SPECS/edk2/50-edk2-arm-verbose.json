@@ -1,0 +1,32 @@
+{
+    "description": "UEFI firmware for arm, verbose logs",
+    "interface-types": [
+        "uefi"
+    ],
+    "mapping": {
+        "device": "flash",
+        "mode" : "split",
+        "executable": {
+            "filename": "/usr/share/edk2/arm/QEMU_EFI-pflash.raw",
+            "format": "raw"
+        },
+        "nvram-template": {
+            "filename": "/usr/share/edk2/arm/vars-template-pflash.raw",
+            "format": "raw"
+        }
+    },
+    "targets": [
+        {
+            "architecture": "arm",
+            "machines": [
+                "virt-*"
+            ]
+        }
+    ],
+    "features": [
+        "verbose-static"
+    ],
+    "tags": [
+
+    ]
+}

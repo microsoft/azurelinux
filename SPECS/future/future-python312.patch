@@ -1,0 +1,70 @@
+From a6135542dffb6b1b8254d6daac779d119d4fc08c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Tom=C3=A1=C5=A1=20Hrn=C4=8Diar?= <thrnciar@redhat.com>
+Date: Wed, 17 May 2023 14:03:26 +0200
+Subject: [PATCH 1/2] Adjust tests to the repr changes in CPython
+
+---
+ tests/test_future/test_backports.py | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/tests/test_future/test_backports.py b/tests/test_future/test_backports.py
+index 63b1afea..5d46b115 100644
+--- a/tests/test_future/test_backports.py
++++ b/tests/test_future/test_backports.py
+@@ -599,8 +599,12 @@ def test_yaml_linkage(self):
+ 
+     def test_repr(self):
+         od = OrderedDict([('c', 1), ('b', 2), ('a', 3), ('d', 4), ('e', 5), ('f', 6)])
+-        self.assertEqual(repr(od),
+-            "OrderedDict([('c', 1), ('b', 2), ('a', 3), ('d', 4), ('e', 5), ('f', 6)])")
++        if sys.version_info[0] == 3 and sys.version_info[1] >= 12:
++            self.assertEqual(repr(od),
++                "OrderedDict({'c': 1, 'b': 2, 'a': 3, 'd': 4, 'e': 5, 'f': 6})")
++        else:
++            self.assertEqual(repr(od),
++                "OrderedDict([('c', 1), ('b', 2), ('a', 3), ('d', 4), ('e', 5), ('f', 6)])")
+         self.assertEqual(eval(repr(od)), od)
+         self.assertEqual(repr(OrderedDict()), "OrderedDict()")
+ 
+@@ -608,8 +612,12 @@ def test_repr_recursive(self):
+         # See issue #9826
+         od = OrderedDict.fromkeys('abc')
+         od['x'] = od
+-        self.assertEqual(repr(od),
+-            "OrderedDict([('a', None), ('b', None), ('c', None), ('x', ...)])")
++        if sys.version_info[0] == 3 and sys.version_info[1] >= 12:
++            self.assertEqual(repr(od),
++                "OrderedDict({'a': None, 'b': None, 'c': None, 'x': ...})")
++        else:
++            self.assertEqual(repr(od),
++                "OrderedDict([('a', None), ('b', None), ('c', None), ('x', ...)])")
+ 
+     def test_setdefault(self):
+         pairs = [('c', 1), ('b', 2), ('a', 3), ('d', 4), ('e', 5), ('f', 6)]
+
+From d7dc44e88b77fea57b9001421428cd7d95abb3bf Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Tom=C3=A1=C5=A1=20Hrn=C4=8Diar?= <thrnciar@redhat.com>
+Date: Wed, 17 May 2023 14:42:09 +0200
+Subject: [PATCH 2/2] Adjust test to the change in CPython, parser now raises
+ SyntaxError instead of ValueError when source code contains null bytes
+
+---
+ tests/test_future/test_builtins.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tests/test_future/test_builtins.py b/tests/test_future/test_builtins.py
+index 3921a608..d41d1254 100644
+--- a/tests/test_future/test_builtins.py
++++ b/tests/test_future/test_builtins.py
+@@ -523,8 +523,8 @@ def test_compile(self):
+         self.assertRaises(TypeError, compile)
+         self.assertRaises(ValueError, compile, 'print(42)\n', '<string>', 'badmode')
+         self.assertRaises(ValueError, compile, 'print(42)\n', '<string>', 'single', 0xff)
+-        # Raises TypeError in Python < v3.5, ValueError in v3.5:
+-        self.assertRaises((TypeError, ValueError), compile, chr(0), 'f', 'exec')
++        # Raises TypeError in Python < v3.5, ValueError in v3.5, SyntaxError in >= 3.12:
++        self.assertRaises((TypeError, ValueError, SyntaxError), compile, chr(0), 'f', 'exec')
+         self.assertRaises(TypeError, compile, 'pass', '?', 'exec',
+                           mode='eval', source='0', filename='tmp')
+         compile('print("\xe5")\n', '', 'exec')
+
