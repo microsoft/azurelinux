@@ -25,7 +25,7 @@ var (
 	logLevel         = exe.LogLevelFlag(app)
 	strictGoals      = app.Flag("strict-goals", "Don't allow missing goal packages").Bool()
 	strictUnresolved = app.Flag("strict-unresolved", "Don't allow missing unresolved packages").Bool()
-	timestampFile    = app.Flag("timestamp-file", "File that stores timestamps for this program.").Required().String()
+	timestampFile    = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
 
 	depGraph = pkggraph.NewPkgGraph()
 )

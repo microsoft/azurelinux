@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1k
-Release:        23%{?dist}
+Release:        24%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -56,6 +56,7 @@ Patch32:        CVE-2023-0215.patch
 Patch33:        CVE-2023-0464.patch
 Patch34:        CVE-2023-0465.patch
 Patch35:        CVE-2023-0466.patch
+Patch36:        CVE-2023-2650.patch
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
 BuildRequires:  perl(FindBin)
@@ -353,6 +354,9 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 %postun libs -p /sbin/ldconfig
 
 %changelog
+* Tue Jun 06 2023 Daniel McIlvaney <damcilva@microsoft.com> -  1.1.1k-24
+- Patch CVE-2023-2650
+
 * Wed Apr 12 2023 Rohit Rawat <rohitrawat@microsoft.com> - 1.1.1k-23
 - Patch CVE-2023-0465 and CVE-2023-0466
 

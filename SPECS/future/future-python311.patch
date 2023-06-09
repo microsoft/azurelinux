@@ -1,0 +1,31 @@
+--- a/tests/test_future/test_utils.orig.py	2019-10-31 01:56:12.000000000 +0100
++++ b/tests/test_future/test_utils.py	2021-12-04 11:26:23.050523816 +0100
+@@ -150,7 +150,7 @@
+         self.assertRaises(Timeout, raise_, Timeout())
+ 
+         if PY3:
+-            self.assertRaisesRegexp(
++            self.assertRaisesRegex(
+                 TypeError, "class must derive from BaseException",
+                 raise_, int)
+ 
+@@ -343,6 +343,8 @@
+   File "/opt/python-future/tests/test_future/test_utils.py", line 328, in test_single_exception_stacktrace
+     raise CustomException('ERROR')
+ '''
++        if sys.version_info >= (3, 11):
++            expected += '    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n'
+         if PY2:
+             expected += 'CustomException: ERROR\n'
+         else:
+--- a/tests/test_future/test_urllib_toplevel.orig.py	2021-12-04 12:16:44.475424000 +0100
++++ b/tests/test_future/test_urllib_toplevel.py	2021-12-04 12:37:15.282519570 +0100
+@@ -1198,7 +1198,7 @@
+ 
+ class Utility_Tests(unittest.TestCase):
+     """Testcase to test the various utility functions in the urllib."""
+-
++    @unittest.skipIf(sys.version_info >= (3, 11), "urllib.parse.splitpasswd() was removed from Python 3.11+")
+     def test_splitpasswd(self):
+         """Some of password examples are not sensible, but it is added to
+         confirming to RFC2617 and addressing issue4675.

@@ -56,7 +56,7 @@ var (
 	runCheck                = app.Flag("run-check", "Whether or not to run the spec file's check section during package build.").Bool()
 	logFile                 = exe.LogFileFlag(app)
 	logLevel                = exe.LogLevelFlag(app)
-	timestampFile           = app.Flag("timestamp-file", "File that stores timestamps for this program.").Required().String()
+	timestampFile           = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
 )
 
 func main() {

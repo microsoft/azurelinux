@@ -1,0 +1,22 @@
+{
+    "description": "OVMF for microvm",
+    "interface-types": [
+        "uefi"
+    ],
+    "mapping": {
+        "device": "memory",
+        "filename": "/usr/share/edk2/ovmf/MICROVM.fd"
+    },
+    "targets": [
+        {
+            "architecture": "x86_64",
+            "machines": [
+                "microvm"
+            ]
+        }
+    ],
+    "features": [
+    ],
+    "tags": [
+    ]
+}
