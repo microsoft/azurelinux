@@ -161,7 +161,7 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, out
 			// Failing to clone a dependency should not halt a build.
 			// The build should continue and attempt best effort to build as many packages as possible.
 			if resolveErr != nil {
-				logger.Log.Warnf("Failed to resolve graph node '%s':\n%w", n, resolveErr)
+				logger.Log.Warnf("Failed to resolve graph node '%s':\n%s", n, resolveErr)
 				cachingSucceeded = false
 				errorMessage := strings.Builder{}
 				errorMessage.WriteString(fmt.Sprintf("Failed to resolve all nodes in the graph while resolving '%s'\n", n))
