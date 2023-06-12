@@ -162,7 +162,7 @@ find %{buildroot} -name '*.pyc' -delete
 %post
 /sbin/ldconfig
 # Required step to ensure new history util from version 3.4.1 does not fail
-if [ -f %{_tdnf_history_db_dir}/history.db ]; then
+if [[ ! -f %{_tdnf_history_db_dir}/history.db ]]; then
     %{_libdir}/tdnf/tdnf-history-util init
 fi
 
