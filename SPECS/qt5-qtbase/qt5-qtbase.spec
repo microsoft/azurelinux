@@ -133,7 +133,7 @@ patch81: CVE-2023-24607.patch
 ## upstream patches
 
 # Fix CVE-2023-32762
-patch82: CVE-2023-32762.patch
+Patch82: CVE-2023-32762.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
