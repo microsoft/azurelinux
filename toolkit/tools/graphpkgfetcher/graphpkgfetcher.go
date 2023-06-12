@@ -93,7 +93,7 @@ func fetchPackages() (err error) {
 	hasUnresolvedNodes := hasUnresolvedNodes(dependencyGraph)
 	if *tryDownloadDeltaRPMs || hasUnresolvedNodes {
 		// Create the worker environment
-		cloner, err = rpmrepocloner.ConstructClonerWithNetwork(*outDir, *tmpDir, *workertar, *existingRpmDir, *existingToolchainRpmDir, *tlsClientCert, *tlsClientKey, *usePreviewRepo, *disableUpstreamRepos, *disableDefaultRepos, *repoFiles)
+		cloner, err = rpmrepocloner.ConstructCloner(*outDir, *tmpDir, *workertar, *existingRpmDir, *existingToolchainRpmDir, *tlsClientCert, *tlsClientKey, *usePreviewRepo, *disableUpstreamRepos, *disableDefaultRepos, *repoFiles)
 		if err != nil {
 			err = fmt.Errorf("failed to setup new cloner:\n%w", err)
 			return err
@@ -476,9 +476,8 @@ func downloadSingleDeltaRPM(realDependencyGraph *pkggraph.PkgGraph, realBuildNod
 	return true, err
 }
 
-// downloadSingleDeltaRPM attempts to download a single delta RPM for a build node. If the delta RPM is available
-// it will be downloaded and the build node will be updated to point to the new RPM. The associated run node will
-// also be updated to point to the new RPM since the scheduler uses the run node to find the RPM to install.
+// fixupDeltaImplicitNode will fix up the build and run nodes associated with an implicit delta RPM node. They need to
+// have their RPM paths updated to point to the delta RPMs we downloaded due to another node.
 //   - pkgGraph: The graph to update
 //   - implicitNode: The implicit build node to update, this node need not be in the actual graph and will be used as a reference
 //     to find the actual build node in the graph.
