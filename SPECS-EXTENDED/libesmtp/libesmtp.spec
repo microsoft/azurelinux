@@ -5,7 +5,7 @@ Distribution:   Mariner
 Summary:        SMTP client library
 Name:           libesmtp
 Version:        1.0.6
-Release:        20%{?dist}
+Release:        21%{?dist}
 License:        LGPLv2+
 #Source0:        https://github.com/libesmtp/libESMTP/archive/refs/tags/v1.0.6.tar.gz
 Source:         https://github.com/libesmtp/libESMTP/archive/refs/tags/%{name}-%{version}.tar.bz2
@@ -13,6 +13,7 @@ URL:            https://github.com/libesmtp
 BuildRequires:  gcc
 BuildRequires:  openssl-devel pkgconfig autoconf automake libtool
 Patch0: libesmtp-1.0.6-openssl-1.1.patch
+Patch1: CVE-2019-19977-avoid-stach-overrwrite-6.patch
 
 %description
 LibESMTP is a library to manage posting (or submission of) electronic
@@ -36,8 +37,7 @@ The libesmtp-devel package contains headers and development libraries
 necessary for building programs against libesmtp.
 
 %prep 
-%setup -q
-%patch0 -p1 -b .openssl-1.1
+%autosetup -p1
 
 autoreconf -fi
 
@@ -96,6 +96,11 @@ install -p -m644 -D libesmtp.pc $RPM_BUILD_ROOT%{_libdir}/pkgconfig/libesmtp.pc
 %{_libdir}/pkgconfig/libesmtp.pc
 
 %changelog
+* Tue Jun 6 2023 Dan Streetman <ddstreet@ieee.org> - 1.0.6-21
+- Fix buffer overflow for CVE-2019-19977
+- Change from %setup to %autosetup
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.6-20
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

@@ -1,0 +1,4 @@
+steps:
+  - script: |
+      echo "The used architecture is: $(uname -m)"
+    displayName: 'Use parameter'

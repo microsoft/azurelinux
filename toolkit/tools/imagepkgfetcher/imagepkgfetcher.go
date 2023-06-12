@@ -49,7 +49,7 @@ var (
 
 	logFile       = exe.LogFileFlag(app)
 	logLevel      = exe.LogLevelFlag(app)
-	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").Required().String()
+	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
 )
 
 func main() {
@@ -65,20 +65,11 @@ func main() {
 
 	timestamp.StartEvent("initialize and configure cloner", nil)
 
-	cloner := rpmrepocloner.New()
-	err := cloner.Initialize(*outDir, *tmpDir, *workertar, *existingRpmDir, *existingToolchainRpmDir, *usePreviewRepo, *disableDefaultRepos, *repoFiles)
+	cloner, err := rpmrepocloner.ConstructClonerWithNetwork(*outDir, *tmpDir, *workertar, *existingRpmDir, *existingToolchainRpmDir, *tlsClientCert, *tlsClientKey, *usePreviewRepo, *disableUpstreamRepos, *disableDefaultRepos, *repoFiles)
 	if err != nil {
 		logger.Log.Panicf("Failed to initialize RPM repo cloner. Error: %s", err)
 	}
 	defer cloner.Close()
-
-	if !*disableUpstreamRepos {
-		tlsKey, tlsCert := strings.TrimSpace(*tlsClientKey), strings.TrimSpace(*tlsClientCert)
-		err = cloner.AddNetworkFiles(tlsCert, tlsKey)
-		if err != nil {
-			logger.Log.Panicf("Failed to customize RPM repo cloner. Error: %s", err)
-		}
-	}
 
 	timestamp.StopEvent(nil) // initialize and configure cloner
 
@@ -99,7 +90,6 @@ func main() {
 
 	timestamp.StartEvent("finalize cloned packages", nil)
 
-	logger.Log.Info("Configuring downloaded RPMs as a local repository")
 	err = cloner.ConvertDownloadedPackagesIntoRepo()
 	if err != nil {
 		logger.Log.Panicf("Failed to convert downloaded RPMs into a repo. Error: %s", err)
