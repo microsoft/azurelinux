@@ -145,9 +145,9 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 		return
 	}
 
-    // Mariner images don't work appropriately when mariner-release is not installed.
-    // As a stopgap to this, mariner-release will now be added to all images regardless
-    // of presence in the CONFIG_FILE
+	// Mariner images don't work appropriately when mariner-release is not installed.
+	// As a stopgap to this, mariner-release will now be added to all images regardless
+	// of presence in the CONFIG_FILE
 	packagesToInstall = append([]string{marinerReleasePackage}, packagesToInstall...)
 
 	isRootFS = len(systemConfig.PartitionSettings) == 0
