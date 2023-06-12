@@ -20,8 +20,14 @@ Source4:        tdnfrepogpgcheck.conf
 Patch0:         tdnf-mandatory-space-list-output.patch
 Patch1:         tdnf-default-mariner-release.patch
 Patch2:         tdnf-enable-plugins-by-default.patch
+# Patch to be removed once we upgrade to a version of tdnf which contains the upstream fix
+# https://github.com/vmware/tdnf/commit/d62d7097c009ee867bee992840334dbc12f4f0f3
 Patch3:         tdnf-printf-fix.patch
+# Patch to be removed once we upgrade to a version of tdnf which contains the upstream fix
+# https://github.com/vmware/tdnf/commit/5311b5ed0867a40ceb71b89358d70290bc2d0c51
 Patch4:         tdnf-sqlite-library.patch
+# Patch to be removed once we upgrade to a version of tdnf which contains the upstream fix
+# https://github.com/vmware/tdnf/pull/432
 Patch5:         tdnf-GetRepoMD-fix.patch
 #Cmake requires binutils
 BuildRequires:  binutils
@@ -66,7 +72,7 @@ tdnf is a yum/dnf equivalent which uses libsolv and libcurl
 Summary:        A Library providing C API for tdnf
 Group:          Development/Libraries
 Requires:       libsolv-devel
-Requires:       tdnf = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 
 %description devel
 Development files for tdnf
@@ -81,7 +87,7 @@ Library providing cli libs for tdnf like clients.
 %package plugin-metalink
 Summary:        tdnf plugin providing metalink functionality for repo configurations
 Group:          Applications/RPM
-Requires:       tdnf = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 Requires:       libxml2
 
 %description plugin-metalink
@@ -90,7 +96,7 @@ tdnf plugin providing metalink functionality for repo configurations
 %package        plugin-repogpgcheck
 Summary:        tdnf plugin providing gpg verification for repository metadata
 Group:          Development/Libraries
-Requires:       tdnf = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 Requires:       gpgme
 
 %description plugin-repogpgcheck
@@ -156,8 +162,9 @@ find %{buildroot} -name '*.pyc' -delete
 %post
 /sbin/ldconfig
 # Required step to ensure new history util from version 3.4.1 does not fail
-[ -f %{_tdnf_history_db_dir}/history.db ] || %{_libdir}/tdnf/tdnf-history-util init
-
+if [ -f %{_tdnf_history_db_dir}/history.db ]; then
+    %{_libdir}/tdnf/tdnf-history-util init
+fi
 
 %postun
 /sbin/ldconfig
@@ -165,28 +172,28 @@ find %{buildroot} -name '*.pyc' -delete
 %files
 %license COPYING
 %defattr(-,root,root,0755)
+%config(noreplace) %{_sysconfdir}/tdnf/tdnf.conf
+%dir %{_tdnf_history_db_dir}
+%dir %{_var}/cache/tdnf
 %{_bindir}/tdnf
+%{_bindir}/tdnf-cache-updateinfo
+%{_bindir}/tdnf-config
+%{_bindir}/tdnfj
 %{_bindir}/tyum
 %{_bindir}/yum
-%{_bindir}/tdnfj
-%{_bindir}/tdnf-config
-%{_bindir}/tdnf-cache-updateinfo
+%{_datadir}/bash-completion/completions/tdnf
 %{_libdir}/libtdnf.so.3
 %{_libdir}/libtdnf.so.3.*
 %{_libdir}/tdnf/tdnf-history-util
-%config(noreplace) %{_sysconfdir}/tdnf/tdnf.conf
-%dir %{_var}/cache/tdnf
-%dir %{_tdnf_history_db_dir}
-%{_datadir}/bash-completion/completions/tdnf
 
 %files devel
 %defattr(-,root,root)
+%exclude %{_libdir}/debug
 %{_includedir}/tdnf/*.h
 %{_libdir}/libtdnf.so
 %{_libdir}/libtdnfcli.so
-%exclude %{_libdir}/debug
-%{_libdir}/pkgconfig/tdnf.pc
 %{_libdir}/pkgconfig/tdnf-cli-libs.pc
+%{_libdir}/pkgconfig/tdnf.pc
 
 %files cli-libs
 %defattr(-,root,root)
@@ -195,14 +202,14 @@ find %{buildroot} -name '*.pyc' -delete
 
 %files plugin-metalink
 %defattr(-,root,root)
-%dir %{_sysconfdir}/tdnf/pluginconf.d
 %config(noreplace) %{_sysconfdir}/tdnf/pluginconf.d/tdnfmetalink.conf
+%dir %{_sysconfdir}/tdnf/pluginconf.d
 %{_tdnfpluginsdir}/libtdnfmetalink.so
 
 %files plugin-repogpgcheck
 %defattr(-,root,root)
-%dir %{_sysconfdir}/tdnf/pluginconf.d
 %config(noreplace) %{_sysconfdir}/tdnf/pluginconf.d/tdnfrepogpgcheck.conf
+%dir %{_sysconfdir}/tdnf/pluginconf.d
 %{_tdnfpluginsdir}/libtdnfrepogpgcheck.so
 
 %files python
@@ -210,11 +217,11 @@ find %{buildroot} -name '*.pyc' -delete
 %{python3_sitelib}/*
 
 %files autoupdate
+%{_bindir}/tdnf-automatic
+%{_libdir}/systemd/system/tdnf-cache-updateinfo*
 %{_sysconfdir}/motdgen.d/02-tdnf-updateinfo.sh
 %{_sysconfdir}/tdnf/automatic.conf
 /%{_lib}/systemd/system/tdnf*
-%{_libdir}/systemd/system/tdnf-cache-updateinfo*
-%{_bindir}/tdnf-automatic
 
 %changelog
 * Wed Apr 12 2023 Sam Meluch <sammeluch@microsoft.com> - 3.5.2-1
