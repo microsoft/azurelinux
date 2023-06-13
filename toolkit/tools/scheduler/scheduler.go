@@ -396,8 +396,7 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesTo
 					err = setAssociatedDeltaPaths(res, res.BuiltFiles, pkgGraph, graphMutex)
 					if err != nil {
 						// Failures to manipulate the graph are fatal.
-						err = fmt.Errorf("error setting delta paths for ancillary nodes: %w", err)
-						logger.Log.Error(err)
+						err = fmt.Errorf("error setting delta paths for ancillary nodes:\n%w", err)
 						stopBuilding = true
 						stopBuild(channels, buildState)
 					}
