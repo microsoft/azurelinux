@@ -7,6 +7,8 @@ set -e
 
 script_dir=$( realpath "$(dirname "$0")" )
 script_name=$(basename "$0")
+specs_dir=/usr/src/mariner/SPECS
+sources_dir=/usr/src/mariner/SOURCES
 
 echo "***** script_name is ${script_name}"
 echo "***** script_dir is ${script_dir}"
@@ -30,9 +32,11 @@ print_error() {
 function help {
 echo "Usage: ${script_name} [REPO_PATH=/path/to/CBL-Mariner] [MODE=test|build] [VERSION=1.0|2.0] [MOUNTS= /src/path:/dst/path] [--help]
 
-Starts a docker container with the specified version of mariner and mounts the
-out/RPMS directory of the specified CBL-Mariner repo. The mounted repo can be enabled
-by running /enable_repo.sh in the container.
+Starts a docker container with the specified version of mariner. Mounts REPO_PATH/out/RPMS
+to /mnt/RPMS. The mounted repo can be enabled by running /enable_repo.sh in the container.
+
+In the 'build' mode, mounts REPO_PATH/build/INTERMEDIATE_SRPMS at /mnt/INTERMEDIATE_SRPMS
+and REPO_PATH/SPECS at ${specs_dir}
 
 Optional arguments:
     REPO_PATH:      path to the CBL-Mariner repo root directory. default: "current directory"
@@ -91,7 +95,7 @@ cat "${script_dir}/resources/welcome_1.txt.template" > "${build_dir}/welcome.txt
 mounts="${repo_path}/out/RPMS:/mnt/RPMS"
 if [[ "${mode}" == "build" ]]; then
     # Add extra build mounts
-    mounts="${mounts} ${repo_path}/build/INTERMEDIATE_SRPMS:/mnt/INTERMEDIATE_SRPMS ${repo_path}/SPECS:/usr/src/mariner/SPECS"
+    mounts="${mounts} ${repo_path}/build/INTERMEDIATE_SRPMS:/mnt/INTERMEDIATE_SRPMS ${repo_path}/SPECS:${specs_dir}"
 fi
 
 for mount in $mounts $extra_mounts; do
@@ -108,6 +112,8 @@ done
 
 cat "${script_dir}/resources/welcome_2.txt.template" >> "${build_dir}/welcome.txt"
 sed -i "s~<REPO_PATH>~${repo_path}~" "${build_dir}/welcome.txt"
+sed -i "s~<SPECS_DIR>~${specs_dir}~" "${script_dir}/resources/add_shell_functions.txt"
+sed -i "s~<SOURCES_DIR>~${sources_dir}~" "${script_dir}/resources/add_shell_functions.txt"
 
 # ============ Build the dockerfile ============
 echo "Updating dockerfile from template..."

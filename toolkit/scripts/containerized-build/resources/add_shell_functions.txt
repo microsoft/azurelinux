@@ -1,3 +1,6 @@
+SPECS_DIR=/usr/src/mariner/SPECS
+SOURCES_DIR=/usr/src/mariner/SOURCES
+
 # Create symlink from SPECS/ to SOURCES/ when rpm is called
 rpm() {
     local args=("$@")
@@ -6,25 +9,25 @@ rpm() {
         for ((i = 0; i < ${#args[@]}; ++i)); do
             if [[ ${args[$i]} = *".src.rpm"* ]]; then
                 local SPEC=${args[$i]}
-                SPEC=${SPEC##*/}
-                SPEC=${SPEC%-*}
-                SPEC=${SPEC%-*}
-                mkdir -p /usr/src/mariner/SOURCES/
-                ln -sf /usr/src/mariner/SPECS/${SPEC}/* /usr/src/mariner/SOURCES/
+                SPEC=$SPEC##*/
+                SPEC=$SPEC%-*
+                SPEC=$SPEC%-*
+                mkdir -p $SPECS_DIR
+                ln -sf $SPECS_DIR/$SPEC/* $SOURCES_DIR/
             fi
         done
     fi
-    rm -f /usr/src/mariner/SPECS/*.spec
-    rm -f /usr/src/mariner/SOURCES/*.spec
-    rm -f /usr/src/mariner/SOURCES/*.signatures.json
+    rm -f $SPECS_DIR/*.spec
+    rm -f $SOURCES_DIR/*.spec
+    rm -f $SOURCES_DIR/*.signatures.json
 }
 
 # Installs srpm, pkg dependencies and builds pkg
 build_pkg() {
     local PKG=("$@")
-    rpm -ihv /mnt/INTERMEDIATE_SRPMS/${PKG}*.src.rpm
-    dnf builddep -y /usr/src/mariner/SPECS/${PKG}/${PKG}.spec
-    rpmbuild -ba /usr/src/mariner/SPECS/${PKG}/${PKG}.spec
+    rpm -ihv /mnt/INTERMEDIATE_SRPMS/$PKG*.src.rpm
+    dnf builddep -y $SPECS_DIR/$PKG/$PKG.spec
+    rpmbuild -ba $SPECS_DIR/$PKG/$PKG.spec
 }
 
 # Show help on useful commands

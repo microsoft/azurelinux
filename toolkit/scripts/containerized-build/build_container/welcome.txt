@@ -1,5 +1,5 @@
 echo "*******************************************************************************************"
-echo "* RPMs from '<REPO_PATH>' will be available in /repo"
+echo "* RPMs from '/home/neha/repos/imaging/CBL-Mariner' will be available in /repo"
 echo "* Run /enable_repo.sh to make available to tdnf automatically"
 echo "* Individual packages may be installed directly via 'tdnf install /repo/x86_64/pkg.rpm'"
 echo "* To see this menu again, run show_help"
@@ -15,3 +15,8 @@ echo "*     Changes to /usr/src/mariner/SPECS will get reflected on host machine
 echo "*"
 echo "*    Mount points:"
 # Insert mounts dynamically here vvv
+echo "*        '/home/neha/repos/imaging/CBL-Mariner/out/RPMS' -> '/mnt/RPMS'"
+echo "*        '/home/neha/repos/imaging/CBL-Mariner/build/INTERMEDIATE_SRPMS' -> '/mnt/INTERMEDIATE_SRPMS'"
+echo "*        '/home/neha/repos/imaging/CBL-Mariner/SPECS' -> '/usr/src/mariner/SPECS'"
+# Mounts were inserted dynamically here ^^^
+echo "*******************************************************************************************"
