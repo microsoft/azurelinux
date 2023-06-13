@@ -3,21 +3,20 @@ Name:           sudo
 Version:        1.9.13p3
 Release:        3%{?dist}
 License:        ISC
-URL:            https://www.sudo.ws/
-Group:          System Environment/Security
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Group:          System Environment/Security
+URL:            https://www.sudo.ws/
 Source0:        https://www.sudo.ws/sudo/dist/%{name}-%{version}.tar.gz
 Source1:        sudo-ldap.conf
-
 BuildRequires:  audit-devel
 BuildRequires:  man-db
+BuildRequires:  openldap-devel
 BuildRequires:  openssl-devel
 BuildRequires:  openssl-libs
 BuildRequires:  pam-devel
 BuildRequires:  sed
 BuildRequires:  zlib-devel
-BuildRequires:  openldap-devel
 Requires:       audit-libs
 Requires:       openssl-libs
 Requires:       pam
@@ -43,7 +42,7 @@ the ability to run some (or all) commands as root or another user while logging 
     --with-ldap-conf-file="%{_sysconfdir}/sudo-ldap.conf" \
     --with-linux-audit \
     --enable-zlib=system \
-    --with-passprompt="[sudo] password for %p: "
+    --with-passprompt="[sudo] password for %{p}: "
 
 make %{?_smp_mflags}
 
@@ -51,20 +50,20 @@ make %{?_smp_mflags}
 [ %{buildroot} != "/"] && rm -rf %{buildroot}/*
 make install DESTDIR=%{buildroot}
 install -v -dm755 %{buildroot}/%{_docdir}/%{name}-%{version}
-find %{buildroot}/%{_libdir} -name '*.la' -delete
+find %{buildroot} -type f -name "*.la" -delete -print
 find %{buildroot}/%{_libdir} -name '*.so~' -delete
 # Add default user to sudoers group BEFORE the @includedir
-sed -i -E '/## Read drop-in files.+/i %wheel ALL=(ALL) ALL\n%sudo  ALL=(ALL) ALL' %{buildroot}/etc/sudoers
-install -vdm755 %{buildroot}/etc/pam.d
-install -p -c -m 0640 %{SOURCE1} $RPM_BUILD_ROOT/%{_sysconfdir}/sudo-ldap.conf
+sed -i -E '/## Read drop-in files.+/i %wheel ALL=(ALL) ALL\n%sudo  ALL=(ALL) ALL' %{buildroot}%{_sysconfdir}/sudoers
+install -vdm755 %{buildroot}%{_sysconfdir}/pam.d
+install -p -c -m 0640 %{SOURCE1} %{buildroot}/%{_sysconfdir}/sudo-ldap.conf
 
 # create sudo-ldap.conf man
 echo ".so man5/sudoers.ldap.5" > sudo-ldap.conf.5
 gzip sudo-ldap.conf.5
-install -p -c -m 0644 sudo-ldap.conf.5.gz $RPM_BUILD_ROOT/%{_mandir}/man5/sudo-ldap.conf.5.gz
+install -p -c -m 0644 sudo-ldap.conf.5.gz %{buildroot}/%{_mandir}/man5/sudo-ldap.conf.5.gz
 rm -f sudo-ldap.conf.5.gz
 
-cat > %{buildroot}/etc/pam.d/sudo << EOF
+cat > %{buildroot}%{_sysconfdir}/pam.d/sudo << EOF
 #%%PAM-1.0
 auth       include      system-auth
 account    include      system-account
@@ -108,7 +107,7 @@ fi
 %{_docdir}/%{name}-%{version}/*
 %attr(0644,root,root) %{_libdir}/tmpfiles.d/sudo.conf
 %attr(0640,root,root) %config(noreplace) %{_sysconfdir}/sudo-ldap.conf
-%exclude  /etc/sudoers.dist
+%exclude %{_sysconfdir}/sudoers.dist
 
 %changelog
 * Tue Jun 13 2023 Dmytro Chasovskykh <dchasovskykh@linkedin.com> - 1.9.13p3-3
