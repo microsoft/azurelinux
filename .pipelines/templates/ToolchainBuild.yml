@@ -1,4 +1,13 @@
 steps:
-  - script: |
-      echo "The used architecture is: $(uname -m)"
-    displayName: 'Use parameter'
+  - task: PipAuthenticate@1
+    displayName: Provision - Authenticate Pip
+    inputs:
+      artifactFeeds: "mariner/Mariner-Pypi-Feed"
+
+  - bash: |
+      .pipelines/templates/BuildToolchain.sh \
+        -b $(Build.ArtifactStagingDirectory)
+    env:
+      GITHUB_PAT: $(MARINER_BOT_PIPELINES_PAT_GITHUB)
+      ADO_PAT: $(MARINER_BOT_PIPELINES_PAT_ADO)
+    displayName: "Build toolchain"
