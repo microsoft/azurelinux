@@ -109,11 +109,12 @@ if [[ -f "$UNATTENDED_CONFIG_FILE" ]]; then
     # If the file descriptor is already locked bail out immediately and just follow the other installer's log. The tail
     # command will follow the log file and should never exit. We must ensure that this instance of the installer does
     # not run any further so we always exit 0 just in case.
-    flock -x -n 200 || \
-        { echo "Unattended install already running, following other installer's log instead" ; \
-        sleep 5 ; \
-        tail -f -n 10000 /installer/log.txt ; \
-        exit 0 ; }
+    if ! flock -x -n 200; then
+        echo "Unattended install already running, following other installer's log instead" 
+        sleep 5
+        tail -f -n 10000 /installer/log.txt 
+        exit 0
+    fi
 fi
 
 if [[ ! -f "$UNATTENDED_CONFIG_FILE" ]]; then
