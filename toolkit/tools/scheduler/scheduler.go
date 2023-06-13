@@ -379,7 +379,6 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesTo
 						// Failures to manipulate the graph are fatal.
 						// There is no guarantee the graph is still a directed acyclic graph and is solvable.
 						stopBuilding = true
-						stopBuild(channels, buildState)
 					} else if didOptimize {
 						isGraphOptimized = true
 						// Replace the graph and goal node pointers.
@@ -395,10 +394,10 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesTo
 					// We will need to update the graph with paths to any delta files that were actually rebuilt.
 					err = setAssociatedDeltaPaths(res, res.BuiltFiles, pkgGraph, graphMutex)
 					if err != nil {
-						// Failures to manipulate the graph are fatal.
+						// Failures to manipulate the graph are fatal. The ancillary delta nodes may be in an invalid state
+						// and we won't be able to track which RPMs were built or used delta files.
 						err = fmt.Errorf("error setting delta paths for ancillary nodes:\n%w", err)
 						stopBuilding = true
-						stopBuild(channels, buildState)
 					}
 				}
 
@@ -406,8 +405,15 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesTo
 			} else if stopOnFailure {
 				stopBuilding = true
 				err = res.Err
-				stopBuild(channels, buildState)
+
 			}
+		}
+
+		// stopBuilding will be set to true here only if the build has failed. We also set it to true if the goal node is available
+		// but only after this check is made. In that case we will call doneBuild() instead.
+		if stopBuilding {
+			// If the build has failed, stop all outstanding builds.
+			stopBuild(channels, buildState)
 		}
 
 		// If the goal node is available, mark the build as stopping.
