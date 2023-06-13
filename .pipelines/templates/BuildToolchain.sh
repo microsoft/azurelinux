@@ -57,7 +57,7 @@ if [[ "$CACHE_SHA256" != "$EXPECTED_RAW_TOOLCHAIN_HASH" ]]; then
     exit 1
 fi
 
-if sudo make -C "$TOOLKIT_DIR" toolchain QUICK_REBUILD=y
+if sudo make -C "$TOOLKIT_DIR" "-j$(nproc)" toolchain QUICK_REBUILD=y
 then
     BUILD_SUCCEEDED=true
     echo =========================
