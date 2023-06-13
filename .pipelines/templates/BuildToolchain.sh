@@ -8,7 +8,7 @@ set -e
 ROOT_FOLDER=$(git rev-parse --show-toplevel)
 ARCHITECTURE=$(uname -m)
 BUILD_LOG_DIR=$ROOT_FOLDER/build/logs/toolchain
-TOOLCHAIN_FROM_CONTAINER_TARBALL="$ROOT_FOLDER/build/toolchain/toolchain_from_container.tar.gz"
+RAW_TOOLCHAIN_CACHE_FILE="$ROOT_FOLDER/build/toolchain/toolchain_from_container.tar.gz"
 TOOLKIT_DIR="$ROOT_FOLDER/toolkit"
 
 echo "-- Toolchain build for the $ARCHITECTURE architecture."
@@ -37,21 +37,20 @@ if [[ $ARCHITECTURE == "x86_64" ]]; then
     EXPECTED_RAW_TOOLCHAIN_HASH="f56df34b90915c93f772d3961bf5e9eeb8c1233db43dd92070214e4ce6b72894"
 fi
 RAW_TOOLCHAIN_CACHE_URL="https://cblmarinerstorage.blob.core.windows.net/rawtoolchaincache/toolchain_from_container_2.0.20220709_$ARCHITECTURE.tar.gz"
-RAW_TOOLCHAIN_CACHE_LOCALFILE=$ROOT_FOLDER/build/toolchain/toolchain_from_container.tar.gz
 
 echo "-- Downloading cached raw toolchain from '$RAW_TOOLCHAIN_CACHE_URL'."
 
-sudo mkdir -pv "$ROOT_FOLDER/build/toolchain"
-sudo wget -nv --timeout=30 --continue "$RAW_TOOLCHAIN_CACHE_URL" -o "$RAW_TOOLCHAIN_CACHE_LOCALFILE"
-if [[ ! -f "$RAW_TOOLCHAIN_CACHE_LOCALFILE" ]]; then
+mkdir -pv "$ROOT_FOLDER/build/toolchain"
+wget -nv --timeout=30 --continue "$RAW_TOOLCHAIN_CACHE_URL" -O "$RAW_TOOLCHAIN_CACHE_FILE"
+if [[ ! -f "$RAW_TOOLCHAIN_CACHE_FILE" ]]; then
     echo "-- ERROR: failed to download raw toolchain cache." >&2
     exit 1
 fi
 
-touch "$RAW_TOOLCHAIN_CACHE_LOCALFILE"
+touch "$RAW_TOOLCHAIN_CACHE_FILE"
 
 # Verifying toolchains SHA-256 hash.
-CACHE_SHA256=$(sha256sum "$RAW_TOOLCHAIN_CACHE_LOCALFILE" | cut -d' ' -f1)
+CACHE_SHA256=$(sha256sum "$RAW_TOOLCHAIN_CACHE_FILE" | cut -d' ' -f1)
 echo "-- Raw toolchain hash: $CACHE_SHA256"
 if [[ "$CACHE_SHA256" != "$EXPECTED_RAW_TOOLCHAIN_HASH" ]]; then
     echo "-- ERROR: raw toolchain hash verification failed. Expected ($EXPECTED_RAW_TOOLCHAIN_HASH). Got ($CACHE_SHA256)." >&2
@@ -70,7 +69,7 @@ else
         echo =================================
         echo List of RPMs that failed to build
         echo =================================
-        sudo cat "$BUILD_LOG_DIR/failures.txt"
+        cat "$BUILD_LOG_DIR/failures.txt"
     else
         echo ==============================
         echo Build failed - no specific RPM
