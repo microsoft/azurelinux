@@ -60,7 +60,7 @@ $(call create_folder,$(imager_disk_output_dir))
 $(call create_folder,$(artifact_dir))
 $(call create_folder,$(meta_user_data_tmp_dir))
 
-.PHONY: fetch-image-packages fetch-external-image-packages make-raw-image image iso validate-image-config clean-imagegen
+.PHONY: fetch-image-packages fetch-external-image-packages make-raw-image image iso installer-initrd validate-image-config clean-imagegen
 
 clean: clean-imagegen
 clean-imagegen:
@@ -193,6 +193,7 @@ $(initrd_img): $(initrd_bundled_files) $(initrd_config_json) $(INITRD_CACHE_SUMM
 	# Recursive make call to build the initrd image $(artifact_dir)/iso-initrd.img
 	$(MAKE) image MAKEOVERRIDES= CONFIG_FILE=$(initrd_config_json) IMAGE_CACHE_SUMMARY=$(INITRD_CACHE_SUMMARY) IMAGE_TAG=
 
+installer-initrd: $(initrd_img)
 iso: $(initrd_img) $(iso_deps)
 	$(if $(CONFIG_FILE),,$(error Must set CONFIG_FILE=))
 	$(go-isomaker) \
