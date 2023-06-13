@@ -1,13 +1,66 @@
+parameters:
+  - name: coreRepoRoot
+    type: string
+    default: "$(Build.SourcesDirectory)"
+
+variables:
+  buildLogsDir: "${{ parameters.coreRepoRoot }}/build/logs/toolchain"
+
 steps:
-  - task: PipAuthenticate@1
-    displayName: Provision - Authenticate Pip
-    inputs:
-      artifactFeeds: "mariner/Mariner-Pypi-Feed"
+  - bash: |
+      architecture=$(uname -m)
+      raw_toolchain_cache_url="https://cblmarinerstorage.blob.core.windows.net/rawtoolchaincache/toolchain_from_container_2.0.20220709_$architecture.tar.gz"
+      raw_toolchain_file_path="${{ parameters.coreRepoRoot }}/build/toolchain/toolchain_from_container.tar.gz"
+
+      # ARM64 hash.
+      expected_raw_toolchain_hash="65de43b3bdcfdaac71df1f11fd1f830a8109b1eb9d7cb6cbc2e2d0e929d0ef76"
+      if [[ $architecture == "x86_64" ]]; then
+          expected_raw_toolchain_hash="f56df34b90915c93f772d3961bf5e9eeb8c1233db43dd92070214e4ce6b72894"
+      fi
+
+      echo "-- Downloading cached raw toolchain from '$raw_toolchain_cache_url'."
+
+      mkdir -p "$(dirname "$raw_toolchain_file_path")"
+      wget --quiet --timeout=30 --continue "$raw_toolchain_cache_url" -O "$raw_toolchain_file_path"
+      if [[ ! -f "$raw_toolchain_file_path" ]]; then
+          echo "-- ERROR: failed to download raw toolchain cache." >&2
+          return 1
+      fi
+
+      # Verifying toolchains SHA-256 hash.
+      cache_sha256=$(sha256sum "$raw_toolchain_file_path" | cut -d' ' -f1)
+      if [[ "$cache_sha256" != "$expected_raw_toolchain_hash" ]]; then
+          echo "-- ERROR: raw toolchain hash verification failed. Expected ($expected_raw_toolchain_hash). Got ($cache_sha256)." >&2
+          return 1
+      fi
+      echo "-- Raw toolchain hash OK."
+
+      touch "$raw_toolchain_file_path"
+    displayName: "Populate raw toolchain"
+
+  - bash: sudo make -C "${{ parameters.coreRepoRoot }}/toolkit" "-j$(nproc)" toolchain QUICK_REBUILD=y
+    displayName: "Build toolchain"
 
   - bash: |
-      .pipelines/templates/BuildToolchain.sh \
-        -b $(Build.ArtifactStagingDirectory)
-    env:
-      GITHUB_PAT: $(MARINER_BOT_PIPELINES_PAT_GITHUB)
-      ADO_PAT: $(MARINER_BOT_PIPELINES_PAT_ADO)
-    displayName: "Build toolchain"
+      cp "${{ parameters.coreRepoRoot }}"/build/toolchain/toolchain_built_{,s}rpms_all.tar.gz "$(Build.ArtifactStagingDirectory)"
+    displayName: "Copy built artifacts"
+    condition: succeeded()
+
+  - bash: |
+      if [[ -f "$(buildLogsDir)/failures.txt" ]]; then
+          echo =================================
+          echo List of RPMs that failed to build
+          echo =================================
+          cat "$(buildLogsDir)/failures.txt"
+      else
+          echo ==============================
+          echo Build failed - no specific RPM
+          echo ==============================
+      fi
+    displayName: "Print failure details"
+    condition: failed()
+
+  - bash: |
+      tar -C "$(buildLogsDir)" -czf "$(Build.ArtifactStagingDirectory)/toolchain.logs.tar.gz" .
+    displayName: "Publish logs"
+    condition: always()
