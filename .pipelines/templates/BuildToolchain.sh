@@ -5,13 +5,49 @@
 
 set -e
 
-ROOT_FOLDER=$(git rev-parse --show-toplevel)
-ARCHITECTURE=$(uname -m)
-BUILD_LOG_DIR=$ROOT_FOLDER/build/logs/toolchain
-RAW_TOOLCHAIN_CACHE_FILE="$ROOT_FOLDER/build/toolchain/toolchain_from_container.tar.gz"
-TOOLKIT_DIR="$ROOT_FOLDER/toolkit"
+function populate_raw_toolchain {
+    local architecture
+    local cache_sha256
+    local expected_raw_toolchain_hash
+    local raw_toolchain_cache_url
+    local raw_toolchain_file_path
+    local root_folder
 
-echo "-- Toolchain build for the $ARCHITECTURE architecture."
+    root_folder="$1"
+
+    architecture=$(uname -m)
+    raw_toolchain_cache_url="https://cblmarinerstorage.blob.core.windows.net/rawtoolchaincache/toolchain_from_container_2.0.20220709_$architecture.tar.gz"
+    raw_toolchain_file_path="$root_folder/build/toolchain/toolchain_from_container.tar.gz"
+
+    # ARM64 hash.
+    expected_raw_toolchain_hash="65de43b3bdcfdaac71df1f11fd1f830a8109b1eb9d7cb6cbc2e2d0e929d0ef76"
+    if [[ $architecture == "x86_64" ]]; then
+        expected_raw_toolchain_hash="f56df34b90915c93f772d3961bf5e9eeb8c1233db43dd92070214e4ce6b72894"
+    fi
+
+    echo "-- Downloading cached raw toolchain from '$raw_toolchain_cache_url'."
+
+    mkdir -p "$(dirname "$raw_toolchain_file_path")"
+    wget --quiet --timeout=30 --continue "$raw_toolchain_cache_url" -O "$raw_toolchain_file_path"
+    if [[ ! -f "$raw_toolchain_file_path" ]]; then
+        echo "-- ERROR: failed to download raw toolchain cache." >&2
+        return 1
+    fi
+
+    # Verifying toolchains SHA-256 hash.
+    cache_sha256=$(sha256sum "$raw_toolchain_file_path" | cut -d' ' -f1)
+    echo "-- Raw toolchain hash: $cache_sha256"
+    if [[ "$cache_sha256" != "$expected_raw_toolchain_hash" ]]; then
+        echo "-- ERROR: raw toolchain hash verification failed. Expected ($expected_raw_toolchain_hash). Got ($cache_sha256)." >&2
+        return 1
+    fi
+
+    touch "$raw_toolchain_file_path"
+}
+
+ROOT_FOLDER=$(git rev-parse --show-toplevel)
+BUILD_LOG_DIR=$ROOT_FOLDER/build/logs/toolchain
+TOOLKIT_DIR="$ROOT_FOLDER/toolkit"
 
 # Parameters:
 #
@@ -31,40 +67,22 @@ done
 echo "-- BUILD_ARTIFACT_FOLDER      -> $BUILD_ARTIFACT_FOLDER"
 echo
 
-# ARM64 hash.
-EXPECTED_RAW_TOOLCHAIN_HASH="65de43b3bdcfdaac71df1f11fd1f830a8109b1eb9d7cb6cbc2e2d0e929d0ef76"
-if [[ $ARCHITECTURE == "x86_64" ]]; then
-    EXPECTED_RAW_TOOLCHAIN_HASH="f56df34b90915c93f772d3961bf5e9eeb8c1233db43dd92070214e4ce6b72894"
-fi
-RAW_TOOLCHAIN_CACHE_URL="https://cblmarinerstorage.blob.core.windows.net/rawtoolchaincache/toolchain_from_container_2.0.20220709_$ARCHITECTURE.tar.gz"
-
-echo "-- Downloading cached raw toolchain from '$RAW_TOOLCHAIN_CACHE_URL'."
-
-mkdir -pv "$ROOT_FOLDER/build/toolchain"
-wget -nv --timeout=30 --continue "$RAW_TOOLCHAIN_CACHE_URL" -O "$RAW_TOOLCHAIN_CACHE_FILE"
-if [[ ! -f "$RAW_TOOLCHAIN_CACHE_FILE" ]]; then
-    echo "-- ERROR: failed to download raw toolchain cache." >&2
+if ! populate_raw_toolchain "$ROOT_FOLDER"; then
+    echo "-- ERROR: failed to populate the cached raw toolchain." >&2
     exit 1
 fi
 
-touch "$RAW_TOOLCHAIN_CACHE_FILE"
-
-# Verifying toolchains SHA-256 hash.
-CACHE_SHA256=$(sha256sum "$RAW_TOOLCHAIN_CACHE_FILE" | cut -d' ' -f1)
-echo "-- Raw toolchain hash: $CACHE_SHA256"
-if [[ "$CACHE_SHA256" != "$EXPECTED_RAW_TOOLCHAIN_HASH" ]]; then
-    echo "-- ERROR: raw toolchain hash verification failed. Expected ($EXPECTED_RAW_TOOLCHAIN_HASH). Got ($CACHE_SHA256)." >&2
-    exit 1
-fi
-
-if sudo make -C "$TOOLKIT_DIR" "-j$(nproc)" toolchain QUICK_REBUILD=y
-then
+if sudo make -C "$TOOLKIT_DIR" "-j$(nproc)" toolchain QUICK_REBUILD=y; then
     BUILD_SUCCEEDED=true
+
     echo =========================
     echo Toolchain built correctly
     echo =========================
+
+    cp "$ROOT_FOLDER"/build/toolchain/toolchain_built_{,s}rpms_all.tar.gz "$BUILD_ARTIFACT_FOLDER"
 else
     BUILD_SUCCEEDED=false
+
     if [[ -f "$BUILD_LOG_DIR/failures.txt" ]]; then
         echo =================================
         echo List of RPMs that failed to build
@@ -79,23 +97,5 @@ fi
 
 # Always publish logs
 tar -C "$BUILD_LOG_DIR" -czf "$BUILD_ARTIFACT_FOLDER/toolchain.logs.tar.gz" .
-
-# Always attempt to publish toolchain_from_container and manifests
-if [[ -f "$TOOLCHAIN_FROM_CONTAINER_TARBALL" ]]
-then
-    cp "$TOOLCHAIN_FROM_CONTAINER_TARBALL" "$BUILD_ARTIFACT_FOLDER"
-fi
-
-MANIFESTS_OUTPUT_DIR="$BUILD_ARTIFACT_FOLDER/manifests"
-mkdir -p "$MANIFESTS_OUTPUT_DIR"
-cp ./toolkit/resources/manifests/package/{pkggen_core,toolchain}_"$ARCHITECTURE".txt "$MANIFESTS_OUTPUT_DIR"
-if [[ -f ./build/logs/toolchain/downloads/download_manifest.txt ]]; then
-    cp ./build/logs/toolchain/downloads/download_manifest.txt "$MANIFESTS_OUTPUT_DIR"
-fi
-
-if $BUILD_SUCCEEDED
-then
-    cp "$ROOT_FOLDER/build/toolchain/toolchain_built_{,s}rpms_all.tar.gz" "$BUILD_ARTIFACT_FOLDER"
-fi
 
 $BUILD_SUCCEEDED
