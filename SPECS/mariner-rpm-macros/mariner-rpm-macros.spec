@@ -6,7 +6,7 @@
 Summary:        Mariner specific rpm macro files
 Name:           mariner-rpm-macros
 Version:        2.0
-Release:        22%{?dist}
+Release:        21%{?dist}
 License:        GPL+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -125,9 +125,6 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
-* Tue Jun 06 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 2.0-22
-- Add python test macro
-
 * Tue May 09 2023 Andy Zaugg <azaugg@linkedin.com> - 2.0-21
 - Set __python macro to python3 interpreter
 
