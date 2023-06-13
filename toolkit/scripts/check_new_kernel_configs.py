@@ -12,12 +12,14 @@ from kernel_sources_analysis import get_data_from_config, extract_kernel_dir_nam
 
 # Regex for finding config options
 # Matches words that start with +/-CONFIG_ or +/-# CONFIG_
-CONFIG_REGEX=r'(?:(?<=[-+])|(?<=[-+]# ))CONFIG_\w+'
+# Examples:
+# "+CONFIG_ABC=y" -> "CONFIG_ABC"
+# "-# CONFIG_XYZ is not set" -> "CONFIG_XYZ"
+CONFIG_REGEX=re.compile(r'(?:(?<=[-+])|(?<=[-+]# ))CONFIG_\w+')
 
 def extract_modified_configs(input_string):
-    matching_lines = re.findall(CONFIG_REGEX, input_string)
-    config_set = set(matching_lines)
-    return config_set
+    matching_configs = CONFIG_REGEX.findall(input_string)
+    return set(matching_configs)
 
 # Parse diff for new kernel configs
 # Check if they are in required configs
