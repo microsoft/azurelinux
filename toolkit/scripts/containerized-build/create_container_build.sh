@@ -28,16 +28,14 @@ print_error() {
 }
 
 function help {
-echo "Usage: ${script_name} REPO_PATH=/path/to/CBL-Mariner [MODE=test|build] [VERSION=1.0|2.0] [MOUNTS= /src/path:/dst/path] [--help]
+echo "Usage: ${script_name} [REPO_PATH=/path/to/CBL-Mariner] [MODE=test|build] [VERSION=1.0|2.0] [MOUNTS= /src/path:/dst/path] [--help]
 
 Starts a docker container with the specified version of mariner and mounts the
 out/RPMS directory of the specified CBL-Mariner repo. The mounted repo can be enabled
 by running /enable_repo.sh in the container.
 
-Required arguments:
-    REPO_PATH:      path to the CBL-Mariner repo root directory
-
 Optional arguments:
+    REPO_PATH:      path to the CBL-Mariner repo root directory. default: "current directory"
     MODE            build or test. In 'test' mode it will use a pre-built mariner chroot image. 
                                 In 'build' mode it will use the latest published container.default:"build"
     VERISION        1.0 or 2.0........................................................default: "2.0"
@@ -62,7 +60,7 @@ echo "***** repo_path is ${repo_path}"
 echo "***** extra_mounts is ${extra_mounts}"
 echo "***** version is ${version}"
 
-[[ -z "${repo_path}" ]] && { print_error " Repo Path not specified"; print_error "PLEASE PROVIDE /path/to/CBL-Mariner"; help; exit 1; }
+[[ -z "${repo_path}" ]] && repo_path="$(dirname $0)" && repo_path=${repo_path%'/toolkit'*}
 [[ ! -d "${repo_path}" ]] && { print_error " Directory ${repo_path} does not exist"; exit 1; }
 [[ -z "${mode}" ]] && mode="build"
 [[ -z  "${version}" ]] && version="2.0"
@@ -83,7 +81,7 @@ mkdir -p "${build_dir}"
 # Populate ${repo_path}/build/INTERMEDIATE_SRPMS with SRPMs, that can be used to build RPMs in the container
 cd "${repo_path}/toolkit"
 echo "Populating Intermediate SRPMs"
-#sudo make input-srpms
+sudo make input-srpms
 
 # ========= Setup mounts + Welcome file =========
 cd "${script_dir}"
@@ -93,7 +91,7 @@ cat "${script_dir}/resources/welcome_1.txt.template" > "${build_dir}/welcome.txt
 mounts="${repo_path}/out/RPMS:/mnt/RPMS"
 if [[ "${mode}" == "build" ]]; then
     # Add extra build mounts
-    mounts="${mounts} ${repo_path}/out/SRPMS:/mnt/SRPMS ${repo_path}/build/INTERMEDIATE_SRPMS:/mnt/INTERMEDIATE_SRPMS ${repo_path}/SPECS:/usr/src/mariner/SPECS"
+    mounts="${mounts} ${repo_path}/build/INTERMEDIATE_SRPMS:/mnt/INTERMEDIATE_SRPMS ${repo_path}/SPECS:/usr/src/mariner/SPECS"
 fi
 
 for mount in $mounts $extra_mounts; do

@@ -7,20 +7,27 @@
 ######## CONTAINER ENV ########
 
 # General targets
-.PHONY: containerized-rpmbuild blah neha
+.PHONY: containerized-rpmbuild
+containerized_build_args :=
+ifneq ($(MODE),)
+containerized_build_args += -m ${MODE}
+endif
 
-neha:
-	if [ ! -z $(MODE) ]; then \
-		echo not empty; \
-	fi;
-	@echo $(foo)
+ifneq ($(REPO_PATH),)
+containerized_build_args += -p ${REPO_PATH}
+endif
 
-blah:
-	$(if $(MODE),)
-	@echo i m here
-	$(endif)
-	@echo  run_container_args is ***** **** $(MYARGS)
-	$(SCRIPTS_DIR)/containerized-build/create_container_build.sh -p $(REPO_PATH) $(MYARGS)
+ifneq ($(VERSION),)
+containerized_build_args += -v ${VERSION}
+endif
+
+ifneq ($(MOUNTS),)
+containerized_build_args += -mo ${MOUNTS}
+endif
+
+ifneq ($(help),)
+containerized_build_args = -h
+endif
 
 containerized-rpmbuild:
-	$(SCRIPTS_DIR)/containerized-build/create_container_build.sh -p $(REPO_PATH) -m $(MODE) -v $(VERSION)
+	$(SCRIPTS_DIR)/containerized-build/create_container_build.sh $(containerized_build_args)
