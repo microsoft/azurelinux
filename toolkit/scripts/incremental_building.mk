@@ -71,6 +71,7 @@ REBUILD_TOOLS                   ?= n
 USE_CCACHE                      ?= n
 DELTA_BUILD                     ?= n
 CLEAN_TOOLCHAIN_CONTAINERS      ?= y
+MAX_CPU                         ?= 0
 
 ######## HANDLE INCREMENTAL_TOOLCHAIN DEPRECATION ########
 

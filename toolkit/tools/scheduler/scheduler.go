@@ -76,6 +76,7 @@ var (
 	deltaBuild             = app.Flag("delta-build", "Enable delta build using remote cached packages.").Bool()
 	useCcache              = app.Flag("use-ccache", "Automatically install and use ccache during package builds").Bool()
 	allowToolchainRebuilds = app.Flag("allow-toolchain-rebuilds", "Allow toolchain packages to rebuild without causing an error.").Bool()
+	maxCPU                 = app.Flag("max-cpu", "Max number of CPUs used for package building").String()
 
 	validBuildAgentFlags = []string{buildagents.TestAgentFlag, buildagents.ChrootAgentFlag}
 	buildAgent           = app.Flag("build-agent", "Type of build agent to build packages with.").PlaceHolder(exe.PlaceHolderize(validBuildAgentFlags)).Required().Enum(validBuildAgentFlags...)
@@ -173,6 +174,7 @@ func main() {
 		NoCleanup: *noCleanup,
 		RunCheck:  *runCheck,
 		UseCcache: *useCcache,
+		MaxCpu:    *maxCPU,
 
 		LogDir:   *buildLogsDir,
 		LogLevel: *logLevel,

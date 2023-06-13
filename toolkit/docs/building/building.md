@@ -801,6 +801,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | REBUILD_DEP_CHAINS            | y                                                                                                      | Rebuild packages if their dependencies need to be built, even though the package has already been built.
 | TARGET_ARCH                   |                                                                                                        | The architecture of the machine that will run the package binaries.
 | USE_CCACHE                    | n                                                                                                      | Use ccache automatically to speed up repeat package builds.
+| MAX_CPU                       | 0                                                                                                      | Max number of CPUs used for package building. 0 for unlimited. Overrides `%_smp_ncpus_max` macro
 
 ---
 
