@@ -76,7 +76,7 @@ func main() {
 	timestamp.BeginTiming("graphpkgfetcher", *timestampFile)
 	defer timestamp.CompleteTiming()
 
-	err := fetchPackages()
+	err = fetchPackages()
 	if err != nil {
 		logger.Log.Fatalf("Failed to fetch packages. Error: %s", err)
 	}
