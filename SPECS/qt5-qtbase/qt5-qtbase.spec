@@ -744,13 +744,13 @@ fi
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXdgDesktopPortalThemePlugin.cmake
 
 %changelog
-* Mon Jun 12 2023 Henry Li <lihl@microsoft.com> - 5.12.11-6
+* Mon Jun 12 2023 Henry Li <lihl@microsoft.com> - 5.12.11-7
 - Add patch to resolve CVE-2023-32762
 
-* Fri May 26 2023 Thien Trung Vuong <tvuong@microsoft.com> - 5.12.11-5
+* Fri May 26 2023 Thien Trung Vuong <tvuong@microsoft.com> - 5.12.11-6
 - Update ptch for CVE-2023-24607
 
-* Wed Apr 26 2023 Sean Dougherty <sdougherty@microsoft.com> - 5.12.11-4
+* Wed Apr 26 2023 Sean Dougherty <sdougherty@microsoft.com> - 5.12.11-5
 - Added patch to fix CVE-2023-24607
 
 * Mon Nov 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.12.11-4
