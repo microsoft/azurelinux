@@ -45,7 +45,7 @@
 Summary:        Graph Visualization Tools
 Name:           graphviz
 Version:        2.42.4
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        EPL-1.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -77,6 +77,7 @@ BuildRequires:  pango-devel
 BuildRequires:  perl
 # Temporary workaound for perl(Carp) not pulled
 BuildRequires:  perl-Carp
+BuildRequires:  perl-ExtUtils-Embed
 BuildRequires:  perl-devel
 BuildRequires:  pkg-config
 BuildRequires:  python3-devel
@@ -516,6 +517,9 @@ php --no-php-ini \
 %{_mandir}/man3/*.3tcl*
 
 %changelog
+* Tue Jun 13 2023 Osama Esmail <osamaesmail@microsoft.com> - 2.42.4-8
+- Adding `freefont` to 'gd'
+
 * Wed Mar 08 2023 Osama Esmail <osamaesmail@microsoft.com> - 2.42.4-7
 - Add `freefont` to BuildRequires to provide default font for graphviz
 
