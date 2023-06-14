@@ -147,6 +147,7 @@ Provides some additional PDF and HTML documentation for graphviz.
 %package gd
 Summary:        Graphviz plugin for renderers based on gd
 Requires:       %{name} = %{version}-%{release}
+Requires:       freefont
 Requires(post): %{_bindir}/dot
 Requires(post): /sbin/ldconfig
 Requires(postun): %{_bindir}/dot
