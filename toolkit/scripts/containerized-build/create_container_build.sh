@@ -9,19 +9,18 @@ script_dir=$( realpath "$(dirname "$0")" )
 script_name=$(basename "$0")
 specs_dir=/usr/src/mariner/SPECS
 sources_dir=/usr/src/mariner/SOURCES
+chroot_dir=/usr/src/mariner/BUILD
+chroot_dir2=/usr/src/mariner/BUILDROOT
 
-echo "***** script_name is ${script_name}"
-echo "***** script_dir is ${script_dir}"
-
-switch_to_red_text() {
+function switch_to_red_text() {
     printf "\e[31m"
 }
 
-switch_to_normal_text() {
+function switch_to_normal_text() {
     printf "\e[0m"
 }
 
-print_error() {
+function print_error() {
     echo ""
     switch_to_red_text
     echo ">>>> ERROR: $1"
@@ -35,8 +34,8 @@ echo "Usage: ${script_name} [REPO_PATH=/path/to/CBL-Mariner] [MODE=test|build] [
 Starts a docker container with the specified version of mariner. Mounts REPO_PATH/out/RPMS
 to /mnt/RPMS. The mounted repo can be enabled by running /enable_repo.sh in the container.
 
-In the 'build' mode, mounts REPO_PATH/build/INTERMEDIATE_SRPMS at /mnt/INTERMEDIATE_SRPMS
-and REPO_PATH/SPECS at ${specs_dir}
+In the 'build' mode, mounts REPO_PATH/build/INTERMEDIATE_SRPMS at /mnt/INTERMEDIATE_SRPMS;
+REPO_PATH/SPECS at ${specs_dir} and REPO_PATH/build/container-chroot at ${chroot_dir}
 
 Optional arguments:
     REPO_PATH:      path to the CBL-Mariner repo root directory. default: "current directory"
@@ -47,6 +46,12 @@ Optional arguments:
                                 Can be specified multiple times..........default: ""
     --help          print this help message
 "
+}
+
+function build_chroot() {
+    cd "${repo_path}/toolkit"
+    echo "Building worker chroot"
+    sudo make graph-cache REBUILD_TOOLS=y > /dev/null
 }
 
 while getopts "m:v:p:mo:h" OPTIONS; do
@@ -85,14 +90,24 @@ mkdir -p "${build_dir}"
 # Populate ${repo_path}/build/INTERMEDIATE_SRPMS with SRPMs, that can be used to build RPMs in the container
 cd "${repo_path}/toolkit"
 echo "Populating Intermediate SRPMs"
-sudo make input-srpms
+sudo make input-srpms > /dev/null
+
+# ============ Map chroot mount ============
+if [[ "${mode}" == "build" ]]; then
+    # Create a new directory and map it to chroot directory in container
+    if [ -d "${repo_path}/build/container-chroot" ]; then rm -Rf ${repo_path}/build/container-chroot; fi
+    if [ -d "${repo_path}/build/container-chroot2" ]; then rm -Rf ${repo_path}/build/container-chroot2; fi
+    mkdir ${repo_path}/build/container-chroot
+    mkdir ${repo_path}/build/container-chroot2
+    mounts="${mounts} ${repo_path}/build/container-chroot:${chroot_dir} ${repo_path}/build/container-chroot2:${chroot_dir2}"
+fi
 
 # ========= Setup mounts + Welcome file =========
 cd "${script_dir}"
 echo "Creating welcome message and checking mounts..."
 cat "${script_dir}/resources/welcome_1.txt.template" > "${build_dir}/welcome.txt"
 
-mounts="${repo_path}/out/RPMS:/mnt/RPMS"
+mounts="${mounts} ${repo_path}/out/RPMS:/mnt/RPMS"
 if [[ "${mode}" == "build" ]]; then
     # Add extra build mounts
     mounts="${mounts} ${repo_path}/build/INTERMEDIATE_SRPMS:/mnt/INTERMEDIATE_SRPMS ${repo_path}/SPECS:${specs_dir}"
@@ -137,7 +152,7 @@ sed -i "s/<VER>/${version}/" "${dockerfile}"
 if [[  "${mode}" == "build" ]]; then # Configure base image
     echo "Importing chroot into docker..."
     chroot_file="${repo_path}/build/worker/worker_chroot.tar.gz"
-    [[ ! -f "${chroot_file}" ]] && { print_error "No chroot file found at '${chroot_file}'"; exit 1 ; }
+    if [[ ! -f "${chroot_file}" ]]; then build_chroot; fi
     chroot_hash=$(sha256sum "${chroot_file}" | cut -d' ' -f1)
     # Check if the chroot file's hash has changed since the last build
     if [[ ! -f "${script_dir}/build_container/hash" ]] || [[ "$(cat "${script_dir}/build_container/hash")" != "${chroot_hash}" ]]; then

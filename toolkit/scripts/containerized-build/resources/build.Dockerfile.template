@@ -7,7 +7,7 @@ COPY resources/add_shell_functions.txt /mariner_docker_stuff/add_shell_functions
 COPY resources/builder_splash.txt /mariner_docker_stuff/splash.txt
 
 RUN echo "alias tdnf='tdnf --releasever=<VER>'"                 >> /root/.bashrc && \
-    echo "tdnf install -y dnf dnf-plugins-core"                 >> /root/.bashrc && \
+    echo "tdnf install -y dnf dnf-plugins-core > /dev/null"     >> /root/.bashrc && \
     cat /mariner_docker_stuff/add_shell_functions.txt           >> /root/.bashrc && \
     echo "cat /mariner_docker_stuff/splash.txt"                 >> /root/.bashrc && \
     cat /mariner_docker_stuff/welcome.txt                       >> /root/.bashrc && \

@@ -1,5 +1,5 @@
-SPECS_DIR=/usr/src/mariner/SPECS
-SOURCES_DIR=/usr/src/mariner/SOURCES
+SPECS_DIR=<SPECS_DIR>
+SOURCES_DIR=<SOURCES_DIR>
 
 # Create symlink from SPECS/ to SOURCES/ when rpm is called
 rpm() {
