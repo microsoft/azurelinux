@@ -8,11 +8,11 @@ name: Kernel Required Configs Check
 
 on:
   push:
-    branches: [main, dev, 1.0*, 2.0*]
+    branches: [main, 1.0*, 2.0*]
     paths:
       - 'SPECS/kernel*/config*'
   pull_request:
-    branches: [main, dev, 1.0*, 2.0*]
+    branches: [main, 1.0*, 2.0*]
     paths:
       - 'SPECS/kernel*/config*'
 
