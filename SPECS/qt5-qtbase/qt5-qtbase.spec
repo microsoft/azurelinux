@@ -266,6 +266,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %endif
 %patch81 -p1
 %patch82 -p1
+%patch83 -p1
 
 ## upstream patches
 
