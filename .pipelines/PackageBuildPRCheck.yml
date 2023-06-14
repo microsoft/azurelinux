@@ -45,7 +45,8 @@ extends:
                 - template: .pipelines/templates/ToolchainBuild.yml@self
                   parameters:
                     buildArtifactsFolder: $(ob_outputDirectory)
-
+                - drop_$(System.StageName)_$(Agent.JobName):
+                    artifact: drop_$(System.StageName)_$(Agent.JobName)
                 - task: PublishPipelineArtifact@1
                   displayName: 'Publish toolchain artifacts'
                   inputs:
