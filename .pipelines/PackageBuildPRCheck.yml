@@ -44,12 +44,13 @@ extends:
                 - template: .pipelines/templates/ToolchainBuild.yml@self
                   parameters:
                     buildArtifactsFolder: $(ob_outputDirectory)
+
                 # Automatic publishing seems to be broken in the OneBranch templates when the build runs directly on the agent host.
-                # Once that's fixed, we can remove this step and the 'ob_customArtifactName' variable.
+                # Once that's fixed, we should remove this step.
                 - task: PublishPipelineArtifact@1
                   displayName: 'Publish toolchain artifacts'
                   inputs:
-                    artifact: drop_$(System.StageName)_$(Agent.JobName)
+                    artifact: drop_Toolchain_${{ configuration.name }}_Build
                     targetPath: $(ob_outputDirectory)
 
         - stage: RPMs_${{ configuration.name }}
