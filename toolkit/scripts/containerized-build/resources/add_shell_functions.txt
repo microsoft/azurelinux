@@ -1,5 +1,6 @@
-SPECS_DIR=<SPECS_DIR>
-SOURCES_DIR=<SOURCES_DIR>
+SPECS_DIR=/usr/src/mariner/SPECS
+SOURCES_DIR=/usr/src/mariner/SOURCES
+RPMS_DIR=/usr/src/mariner/RPMS
 
 # Create symlink from SPECS/ to SOURCES/ when rpm is called
 rpm() {
@@ -25,6 +26,7 @@ rpm() {
 # Installs srpm, pkg dependencies and builds pkg
 build_pkg() {
     local PKG=("$@")
+    if [ -z "$PKG" ]; then echo "Please provide pkg name"; return; fi
     rpm -ihv /mnt/INTERMEDIATE_SRPMS/$PKG*.src.rpm
     dnf builddep -y $SPECS_DIR/$PKG/$PKG.spec
     rpmbuild -ba $SPECS_DIR/$PKG/$PKG.spec
@@ -33,4 +35,17 @@ build_pkg() {
 # Show help on useful commands
 show_help() {
     cat /mariner_docker_stuff/welcome.txt
+}
+
+# Satisfy dependencies from local RPMs
+enable_local_repo() {
+    mv /etc/yum.repos.d/local_repo.not_a_repo /etc/yum.repos.d/local_repo.repo
+    pushd /repo
+    createrepo .
+    mkdir -p $RPMS_DIR
+    pushd $RPMS_DIR
+    createrepo .
+    echo "The local repo is enabled"
+    #echo "You can install the following packages from it:"
+    #tdnf repoquery --repoid=local_build_repo 2>/dev/null
 }

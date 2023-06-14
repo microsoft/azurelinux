@@ -25,8 +25,12 @@ ifneq ($(MOUNTS),)
 containerized_build_args += -mo ${MOUNTS}
 endif
 
-ifneq ($(help),)
-containerized_build_args = -h
+ifeq ($(ENABLE_REPO),y)
+containerized_build_args += --enable-local-repo
+endif
+
+ifneq ($(usage),)
+containerized_build_args = --help
 endif
 
 containerized-rpmbuild:

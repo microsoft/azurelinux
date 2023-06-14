@@ -6,11 +6,11 @@
 set -e
 
 script_dir=$( realpath "$(dirname "$0")" )
-script_name=$(basename "$0")
 specs_dir=/usr/src/mariner/SPECS
 sources_dir=/usr/src/mariner/SOURCES
 chroot_dir=/usr/src/mariner/BUILD
 chroot_dir2=/usr/src/mariner/BUILDROOT
+enable_local_repo=false
 
 function switch_to_red_text() {
     printf "\e[31m"
@@ -29,10 +29,10 @@ function print_error() {
 }
 
 function help {
-echo "Usage: ${script_name} [REPO_PATH=/path/to/CBL-Mariner] [MODE=test|build] [VERSION=1.0|2.0] [MOUNTS= /src/path:/dst/path] [--help]
+echo "Usage: sudo make containerized-rpmbuild [REPO_PATH=/path/to/CBL-Mariner] [MODE=test|build] [VERSION=1.0|2.0] [MOUNTS= /src/path:/dst/path] [ENABLE_REPO=y] [--help]
 
 Starts a docker container with the specified version of mariner. Mounts REPO_PATH/out/RPMS
-to /mnt/RPMS. The mounted repo can be enabled by running /enable_repo.sh in the container.
+to /mnt/RPMS.
 
 In the 'build' mode, mounts REPO_PATH/build/INTERMEDIATE_SRPMS at /mnt/INTERMEDIATE_SRPMS;
 REPO_PATH/SPECS at ${specs_dir} and REPO_PATH/build/container-chroot at ${chroot_dir}
@@ -44,6 +44,7 @@ Optional arguments:
     VERISION        1.0 or 2.0........................................................default: "2.0"
     MOUNTS          mount a directory into the container. Should be of the form '/src/dir:/dest/dir'. 
                                 Can be specified multiple times..........default: ""
+    ENABLE_REPO:    Set to 'y' to use local RPMs to satisfy package dependencies. default: "n"
     --help          print this help message
 "
 }
@@ -54,29 +55,30 @@ function build_chroot() {
     sudo make graph-cache REBUILD_TOOLS=y > /dev/null
 }
 
-while getopts "m:v:p:mo:h" OPTIONS; do
-    case ${OPTIONS} in
-        m ) mode="$OPTARG" ;;
-        v ) version="$OPTARG" ;;
-        p ) repo_path="$OPTARG" ;;
-        h ) help; exit 0 ;;
-        ? ) echo -e "ERROR: INVALID OPTION.\n\n"; help; exit 1 ;;
-    esac
+while (( "$#")); do
+  case "$1" in
+    -m ) mode="$2"; shift 2 ;;
+    -v ) version="$2"; shift 2 ;;
+    -p ) repo_path="$2"; shift 2 ;;
+    --enable-local-repo ) enable_local_repo=true; shift ;;
+    --help ) help; exit 1 ;;
+    ? ) echo -e "ERROR: INVALID OPTION.\n\n"; help; exit 1 ;;
+  esac
 done
 
-echo "***** mode is ${mode}"
-echo "***** repo_path is ${repo_path}"
-echo "***** extra_mounts is ${extra_mounts}"
-echo "***** version is ${version}"
+#echo "***** mode is ${mode}"
+#echo "***** repo_path is ${repo_path}"
+#echo "***** extra_mounts is ${extra_mounts}"
+#echo "***** version is ${version}"
 
 [[ -z "${repo_path}" ]] && repo_path="$(dirname $0)" && repo_path=${repo_path%'/toolkit'*}
 [[ ! -d "${repo_path}" ]] && { print_error " Directory ${repo_path} does not exist"; exit 1; }
 [[ -z "${mode}" ]] && mode="build"
 [[ -z  "${version}" ]] && version="2.0"
-echo "***** mode is ${mode}"
-echo "***** repo_path is ${repo_path}"
-echo "***** extra_mounts is ${extra_mounts}"
-echo "***** version is ${version}"
+#echo "***** mode is ${mode}"
+#echo "***** repo_path is ${repo_path}"
+#echo "***** extra_mounts is ${extra_mounts}"
+#echo "***** version is ${version}"
 
 echo "Running in ${mode} mode, requires root..."
 sudo echo "Running as root!"
@@ -116,16 +118,15 @@ fi
 for mount in $mounts $extra_mounts; do
     if [[ -d "${mount%%:*}" ]]; then
         echo "Will mount '${mount%%:*}' to '${mount##*:}'"
-        echo "echo \"*        '${mount%%:*}' -> '${mount##*:}'\""  >> "${build_dir}/welcome.txt"
+        echo "${mount%%:*}' -> '${mount##*:}"  >> "${build_dir}/welcome.txt"
     else
         echo "WARNING: '${mount%%:*}' does not exist. Skipping mount."
-        echo "echo \"*        WARNING: '${mount%%:*}' does not exist. Skipping mount.\""  >> "${build_dir}/welcome.txt"
+        echo "WARNING: '${mount%%:*}' does not exist. Skipping mount."  >> "${build_dir}/welcome.txt"
         continue
     fi
     mount_arg=" $mount_arg -v '$mount' "
 done
 
-cat "${script_dir}/resources/welcome_2.txt.template" >> "${build_dir}/welcome.txt"
 sed -i "s~<REPO_PATH>~${repo_path}~" "${build_dir}/welcome.txt"
 sed -i "s~<SPECS_DIR>~${specs_dir}~" "${script_dir}/resources/add_shell_functions.txt"
 sed -i "s~<SOURCES_DIR>~${sources_dir}~" "${script_dir}/resources/add_shell_functions.txt"
@@ -133,14 +134,13 @@ sed -i "s~<SOURCES_DIR>~${sources_dir}~" "${script_dir}/resources/add_shell_func
 # ============ Build the dockerfile ============
 echo "Updating dockerfile from template..."
 dockerfile="${build_dir}/mariner.Dockerfile"
-echo "***** dockerfile is ${dockerfile}"
-echo "***** build_dir is ${build_dir}"
-echo "***** script_dir is ${script_dir}"
-echo "***** repo_path is ${repo_path}"
-echo "***** mounts is ${mounts}"
-echo "***** version is ${version}"
-echo "***** mount_arg is ${mount_arg}"
-echo "***** version is ${version}"
+#echo "***** dockerfile is ${dockerfile}"
+#echo "***** build_dir is ${build_dir}"
+#echo "***** script_dir is ${script_dir}"
+#echo "***** repo_path is ${repo_path}"
+#echo "***** mounts is ${mounts}"
+#echo "***** version is ${version}"
+#echo "***** mount_arg is ${mount_arg}"
 
 if [[  "${mode}" == "build" ]]; then # Select the correct dockerfile
     cp "${script_dir}/resources/build.Dockerfile.template" "${dockerfile}"
@@ -165,6 +165,10 @@ if [[  "${mode}" == "build" ]]; then # Configure base image
 else
     echo "Checking for latest ${version} mariner image..."
     sudo docker pull -q "mcr.microsoft.com/cbl-mariner/base/core:${version}"
+fi
+
+if [[ "${enable_local_repo}" == "true" ]]; then
+    echo "RUN echo "enable_local_repo" >> /root/.bashrc" >> "${dockerfile}"
 fi
 
 # ================== Launch Container ==================

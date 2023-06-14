@@ -1,17 +1,17 @@
-echo "*******************************************************************************************"
-echo "* RPMs from '<REPO_PATH>' will be available in /repo"
-echo "* Run /enable_repo.sh to make available to tdnf automatically"
-echo "* Individual packages may be installed directly via 'tdnf install /repo/x86_64/pkg.rpm'"
-echo "* To see this menu again, run show_help"
-echo "*"
-echo "* Some build tips:"
-echo "*     Build a package:        'build_pkg my-pkg' This will install my-pkg.src.rpm, install package dependencies and build it"
-echo "*     Install an SRPM:        'rpm -ihv /mnt/INTERMEDIATE_SRPMS/my-pkg.src.rpm' This will provide src tarball at /usr/src/mariner/SOURCES"
-echo "*     Build an SRPM:          'rpmbuild -ba /usr/src/mariner/SPECS/my-pkg.spec'"
-echo "*     For more build options, see https://linux.die.net/man/8/rpmbuild"
-echo "*     Auto install deps:      'dnf builddep -y my-pkg.spec'"
-echo "*     Show pkg dependencies:  'dnf repoquery --deplist my-pkg'"
-echo "*     Changes to /usr/src/mariner/SPECS will get reflected on host machine at /path/to/CBL-Mariner/SPECS"
-echo "*"
-echo "*    Mount points:"
-# Insert mounts dynamically here vvv
+******************************************************************************************
+* RPMs from '<REPO_PATH>' will be available in /repo
+* Run enable_local_repo to make available to tdnf automatically
+* Individual packages may be installed directly via 'tdnf install /repo/x86_64/pkg.rpm'
+* To see this menu again, run show_help
+*
+* Some tips:"
+*     Use local RPMs to satify dependencies:        'enable_local_repo'
+*     Build a package:                              'build_pkg my-pkg' This will install my-pkg.src.rpm, install package dependencies and build it
+*     Install an SRPM:                              'rpm -ihv /mnt/INTERMEDIATE_SRPMS/my-pkg.src.rpm' This will provide src tarball at /usr/src/mariner/SOURCES
+*     Build an SRPM:                                'rpmbuild -ba /usr/src/mariner/SPECS/my-pkg.spec'
+*     For more build options, see https://linux.die.net/man/8/rpmbuild
+*     Auto install deps:                            'dnf builddep -y my-pkg.spec'
+*     Show pkg dependencies:                        'dnf repoquery --deplist my-pkg'
+*     Changes to /usr/src/mariner/SPECS will get reflected on host machine at /path/to/CBL-Mariner/SPECS
+*
+*    Mount points:
