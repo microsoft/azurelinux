@@ -45,8 +45,10 @@ extends:
                   parameters:
                     buildArtifactsFolder: $(ob_outputDirectory)
 
-                # Automatic publishing seems to be broken in the OneBranch templates when the build runs directly on the agent host.
-                # Once that's fixed, we should remove this step.
+                # 1. Automatic publishing seems to be broken in the OneBranch templates when the build runs directly on the agent host.
+                #    Once that's fixed, we should remove this step.
+                # 2. The value for 'artifact' cannot be changed, as this is the only value OneBranch accepts.
+                #    We cannot also use pre-defined variables like "drop_$(System.StageName)_$(Agent.JobName)", to automatically track name changes.
                 - task: PublishPipelineArtifact@1
                   displayName: 'Publish toolchain artifacts'
                   inputs:
