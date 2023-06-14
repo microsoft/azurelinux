@@ -39,7 +39,6 @@ extends:
                 name: ${{ configuration.agentPool }}
                 vmImage: ${{ configuration.agentVMName }}
               variables:
-                ob_customArtifactName: $(System.StageName)_$(Agent.JobName)
                 ob_outputDirectory: $(Build.ArtifactStagingDirectory)
               steps:
                 - template: .pipelines/templates/ToolchainBuild.yml@self
@@ -50,7 +49,7 @@ extends:
                 - task: PublishPipelineArtifact@1
                   displayName: 'Publish toolchain artifacts'
                   inputs:
-                    artifact: $(ob_customArtifactName)
+                    artifact: drop_$(System.StageName)_$(Agent.JobName)
                     targetPath: $(ob_outputDirectory)
 
         - stage: RPMs_${{ configuration.name }}
