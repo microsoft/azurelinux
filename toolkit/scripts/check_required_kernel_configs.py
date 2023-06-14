@@ -7,66 +7,53 @@
 import json
 import argparse
 import sys
-from kernel_sources_analysis import get_data_from_config, extract_kernel_dir_name, extract_config_arch
+from kernel_sources_analysis import get_data_from_config, get_jsondata_from_jsonfile, extract_kernel_dir_name, extract_config_arch, create_map_of_config_values
 
-# Define a class
-    #incorrect configs is map: {config: (newValue, expectedValue, comment, PR)}
-class IncorrectConfig:
-    def __init__(self, name, newValue, expectedValue, comment, PR):
-        self.name = name
-        self.newValue = newValue
-        self.expectedValue = expectedValue
-        self.comment = comment
-        self.PR = PR
-
-def check_strings_in_file(json_file, kernel, arch, input_config_data):
-    with open(json_file, 'r') as req_config_json_file:
-        config_json_data = json.load(req_config_json_file)
-        if kernel not in config_json_data:
-            print(f"Kernel {kernel} not found in {json_file}")
-            print(f"Please provide required configs for {kernel} in {json_file}")
-            print(f"Exiting...")
-            return None
-        required_configs_data = config_json_data[kernel]['required-configs']
+def check_required_configs_in_configfile(req_config_json_file, kernel, arch, input_config_map):
+    config_json_data = get_jsondata_from_jsonfile(req_config_json_file)
+    if kernel not in config_json_data:
+        print(f"Kernel {kernel} not found in {req_config_json_file}")
+        print(f"Please provide required configs for {kernel} in {req_config_json_file}")
+        return None
+    required_configs_data = config_json_data[kernel]['required-configs']
 
     #incorrect configs is map: {config: (newValue, expectedValue, comment, PR)}
     incorrect_configs = {}
 
     # go through required configs
-    for config_option, value in required_configs_data.items():
+    for config_option, req_value in required_configs_data.items():
         # check for arch
-        if arch not in value['arch']:
+        if arch not in req_value['arch']:
             continue
-        # check if required config is present with correct value
-        found = False
-        # check for required config in each input config line (without extra _VALUE)
-        for line in input_config_data.split('\n'):
-            if f"{config_option}=" in line or f"{config_option} is not set" in line:
-                for val in value['value']:
-                    if val in line and val != "":
-                        found = True
-                        break
-                # config was found but value is not correct
-                # mark as found and add to incorrect_configs
-                if not found:
-                    incorrect_configs[config_option] = (IncorrectConfig(config_option, line.split(config_option)[1].replace('=',''), value['value'], value['comment'], value['PR']))
-                    found = True
-        if not found:
-            # check if config can be missing
-            if "" not in value['value']:
-                incorrect_configs[config_option] = (IncorrectConfig(config_option, line, value['value'], value['comment'], value['PR']))
-
+        # check required configs present in the kernel's config file
+        if config_option in input_config_map:
+            # check if value is correct
+            if input_config_map[config_option] not in req_value['value']:
+                incorrect_configs[config_option] = {
+                    "newValue": input_config_map[config_option],
+                    "expectedValue": req_value['value'],
+                    "comment": f"Unexpected value: {input_config_map[config_option]}",
+                    "PR": req_value['PR']
+                }
+        # check if required configs removed from the kernel's config file
+        # Note that some required configs are required to be missing
+        elif "" not in req_value['value']: 
+                incorrect_configs[config_option] = {
+                    "newValue": "MISSING",
+                    "expectedValue": req_value['value'],
+                    "comment": f"Config not found.",
+                    "PR": req_value['PR']
+                }
     return incorrect_configs
 
-def print_verbose(json_file, kernel, arch, results):
-    with open(json_file, 'r') as req_config_json_file:
-        data = json.load(req_config_json_file)
-        required_configs_data = data[kernel]['required-configs']
+def print_verbose(req_config_json_file, kernel, arch, results):
+    config_json_data = get_jsondata_from_jsonfile(req_config_json_file)
+    required_configs_data = config_json_data[kernel]['required-configs']
     print_data = [["Option", "Required Arch", "Expected Value", "Comment"]]
     for config_option, value in required_configs_data.items():
         if arch in value['arch']:
             if config_option in results:
-                print_data.append([config_option, value['arch'], value['value'], f"FAIL: Unexpected value: {results[config_option].newValue} See: {value['PR']}"])
+                print_data.append([config_option, value['arch'], value['value'], f'FAIL - Unexpected value: {results[config_option]["newValue"]} (See: {value["PR"]})'])
             else:
                 print_data.append([config_option, value['arch'], value['value'], "OK"])
     # Calculate maximum width for each column
@@ -106,13 +93,15 @@ if __name__ == '__main__':
         print("Architecture not found in config file")
         sys.exit(1)
 
+    config_map = create_map_of_config_values(input_config_data)
+
     print()
     print("===============================================================================")
     print(f"== Results for {config_file} ==")
     print("===============================================================================")
 
     # result is map: {config: (newValue, expectedValue, comment, PR)}
-    result = check_strings_in_file(required_configs, kernel, arch, input_config_data)
+    result = check_required_configs_in_configfile(required_configs, kernel, arch, config_map)
     # check if required configs are present
     # not an error is not all kernels are being checked
     if result == None:
@@ -128,7 +117,7 @@ if __name__ == '__main__':
             print()
             print ("----------------- Kernel config verification FAILED -----------------")
             for config_option, value in result.items():
-                print(f'{config_option} is "{value.newValue}", expected {value.expectedValue}.\nReason: {value.comment}')
-                print(f"PR: {value.PR}")
+                print(f'{config_option} is "{result[config_option]["newValue"]}", expected {result[config_option]["expectedValue"]}.\nReason: {result[config_option]["comment"]}')
+                print(f'PR: {result[config_option]["PR"]}')
                 print()
             sys.exit(1)
