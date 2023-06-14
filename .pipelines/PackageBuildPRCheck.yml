@@ -14,8 +14,7 @@ parameters:
       agentVMName: "Mariner-Build-Mariner2-1ES-ARM64-Managed-Image"
 
 variables:
-  buildArtifactsFolder: $(Build.ArtifactStagingDirectory)/build
-  logsFolder: $(Build.ArtifactStagingDirectory)/logs
+  buildArtifactsFolder: $(Build.ArtifactStagingDirectory)
 
 resources:
   repositories:
@@ -37,27 +36,17 @@ extends:
         - stage: Toolchain_${{ configuration.name }}
           jobs:
             - job: Build
-              templateContext:
-                outputs:
-                - output: pipelineArtifact
-                  displayName: 'Publish build artifacts'
-                  targetPath: $(buildArtifactsFolder)
-                  artifactName: BUILD_$(System.StageName)
-
-                - output: pipelineArtifact
-                  displayName: 'Publish logs'
-                  targetPath: $(logsFolder)
-                  artifactName: LOGS_$(System.StageName)
               pool:
                 type: linux
                 isCustom: true
                 name: ${{ configuration.agentPool }}
                 vmImage: ${{ configuration.agentVMName }}
+              variables:
+                ob_outputDirectory: $(buildArtifactsFolder)
               steps:
                 - template: .pipelines/templates/ToolchainBuild.yml@self
                   parameters:
-                    buildArtifactsFolder: $(buildArtifactsFolder)
-                    logsFolder: $(logsFolder)
+                    buildArtifactsFolder: $(ob_outputDirectory)
 
         - stage: RPMs_${{ configuration.name }}
           dependsOn: Toolchain_${{ configuration.name }}

@@ -1,13 +1,11 @@
 parameters:
   - name: buildArtifactsFolder
     type: string
-    default: "$(Build.ArtifactStagingDirectory)/build"
+    default: "$(Build.ArtifactStagingDirectory)"
+
   - name: coreRepoRoot
     type: string
     default: "$(Build.SourcesDirectory)"
-  - name: logsFolder
-    type: string
-    default: "$(Build.ArtifactStagingDirectory)/logs"
 
 steps:
   - bash: |
@@ -45,12 +43,6 @@ steps:
     displayName: "Build toolchain"
 
   - bash: |
-      mkdir -p "${{ parameters.buildArtifactsFolder }}"
-      cp "${{ parameters.coreRepoRoot }}"/build/toolchain/toolchain_built_{,s}rpms_all.tar.gz "${{ parameters.buildArtifactsFolder }}"
-    displayName: "Copy built artifacts"
-    condition: succeeded()
-
-  - bash: |
       failed_rpms_log="${{ parameters.coreRepoRoot }}/build/logs/toolchain/failures.txt"
 
       if [[ -f "$failed_rpms_log" ]]; then
@@ -63,7 +55,15 @@ steps:
     condition: failed()
 
   - bash: |
-      mkdir -p "${{ parameters.logsFolder }}"
-      tar -C "${{ parameters.coreRepoRoot }}/build/logs/toolchain" -czf "${{ parameters.logsFolder }}/toolchain.logs.tar.gz" .
-    displayName: "Publish logs"
+      published_artifacts_dir="${{ parameters.buildArtifactsFolder }}/ARTIFACTS"
+      mkdir -p "$published_artifacts_dir"
+      cp "${{ parameters.coreRepoRoot }}"/build/toolchain/toolchain_built_{,s}rpms_all.tar.gz "$published_artifacts_dir"
+    displayName: "Copy artifacts for publishing"
+    condition: succeeded()
+
+  - bash: |
+      published_logs_dir="${{ parameters.buildArtifactsFolder }}/LOGS"
+      mkdir -p "$published_logs_dir"
+      tar -C "${{ parameters.coreRepoRoot }}/build/logs/toolchain" -czf "$published_logs_dir/toolchain.logs.tar.gz" .
+    displayName: "Copy logs for publishing"
     condition: always()
