@@ -50,7 +50,7 @@ extends:
                   displayName: 'Publish toolchain artifacts'
                   inputs:
                     targetPath: $(ob_outputDirectory)
-                    artifactName: $(System.StageName)
+                    artifactName: drop_$(System.StageName)_$(Agent.JobName)
 
         - stage: RPMs_${{ configuration.name }}
           dependsOn: Toolchain_${{ configuration.name }}
