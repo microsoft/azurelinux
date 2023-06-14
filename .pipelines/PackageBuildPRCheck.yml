@@ -25,7 +25,6 @@ extends:
   parameters:
     featureFlags:
       runOnHost: true
-      skipPoliciesValidation: true
     globalSdl:
       credscan:
         suppressionsFile: .config/CredScanSuppressions.json
