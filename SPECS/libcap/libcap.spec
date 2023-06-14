@@ -1,6 +1,6 @@
 Summary:        Libcap
 Name:           libcap
-Version:        2.60
+Version:        2.69
 Release:        1%{?dist}
 License:        GPLv2+
 Group:          System Environment/Security
@@ -58,6 +58,9 @@ sed -i "s|pass_capsh --chroot=\$(/bin/pwd) ==||g" quicktest.sh
 %{_mandir}/man3/*
 
 %changelog
+* Wed Jun 14 2023 Henry Li <lihl@microsoft.com> - 2.69-1
+- Update version to 2.69 to resolve CVE-2023-2602
+
 * Sat Nov 20 2021 Chris Co <chrco@microsoft.com> - 2.60-1
 - Update version to 2.60
 
