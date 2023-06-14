@@ -1,7 +1,13 @@
 parameters:
+  - name: buildArtifactsFolder
+    type: string
+    default: "$(Build.ArtifactStagingDirectory)/build"
   - name: coreRepoRoot
     type: string
     default: "$(Build.SourcesDirectory)"
+  - name: logsFolder
+    type: string
+    default: "$(Build.ArtifactStagingDirectory)/logs"
 
 steps:
   - bash: |
@@ -39,29 +45,25 @@ steps:
     displayName: "Build toolchain"
 
   - bash: |
-      cp "${{ parameters.coreRepoRoot }}"/build/toolchain/toolchain_built_{,s}rpms_all.tar.gz "$(Build.ArtifactStagingDirectory)"
+      mkdir -p "${{ parameters.buildArtifactsFolder }}"
+      cp "${{ parameters.coreRepoRoot }}"/build/toolchain/toolchain_built_{,s}rpms_all.tar.gz "${{ parameters.buildArtifactsFolder }}"
     displayName: "Copy built artifacts"
     condition: succeeded()
 
   - bash: |
-      build_log_dir="${{ parameters.coreRepoRoot }}/build/logs/toolchain"
+      failed_rpms_log="${{ parameters.coreRepoRoot }}/build/logs/toolchain/failures.txt"
 
-      if [[ -f "$build_log_dir/failures.txt" ]]; then
-          echo =================================
-          echo List of RPMs that failed to build
-          echo =================================
-          cat "$build_log_dir/failures.txt"
+      if [[ -f "$failed_rpms_log" ]]; then
+          echo "List of RPMs that failed to build:" >&2
+          cat "$failed_rpms_log" >&2
       else
-          echo ==============================
-          echo Build failed - no specific RPM
-          echo ==============================
+          echo "Build failed - no specific RPM" >&2
       fi
-    displayName: "Print failure details"
+    displayName: "Print failed RPMs"
     condition: failed()
 
   - bash: |
-      build_log_dir="${{ parameters.coreRepoRoot }}/build/logs/toolchain"
-
-      tar -C "$build_log_dir" -czf "$(Build.ArtifactStagingDirectory)/toolchain.logs.tar.gz" .
+      mkdir -p "${{ parameters.logsFolder }}"
+      tar -C "${{ parameters.coreRepoRoot }}/build/logs/toolchain" -czf "${{ parameters.logsFolder }}/toolchain.logs.tar.gz" .
     displayName: "Publish logs"
     condition: always()
