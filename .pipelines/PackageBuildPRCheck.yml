@@ -25,7 +25,6 @@ extends:
   parameters:
     featureFlags:
       runOnHost: true
-      skipPoliciesValidation: true
     globalSdl:
       credscan:
         suppressionsFile: .config/CredScanSuppressions.json
@@ -40,18 +39,19 @@ extends:
                 name: ${{ configuration.agentPool }}
                 vmImage: ${{ configuration.agentVMName }}
               variables:
+                ob_customArtifactName: $(System.StageName)_$(Agent.JobName)
                 ob_outputDirectory: $(Build.ArtifactStagingDirectory)
               steps:
-                - bash: echo "drop_$(System.StageName)_$(Agent.JobName)"
-                  displayName: 'Debug print.'
                 - template: .pipelines/templates/ToolchainBuild.yml@self
                   parameters:
                     buildArtifactsFolder: $(ob_outputDirectory)
+                # Automatic publishing seems to be broken in the OneBranch templates when the build runs directly on the agent host.
+                # Once that's fixed, we can remove this step and the 'ob_customArtifactName' variable.
                 - task: PublishPipelineArtifact@1
                   displayName: 'Publish toolchain artifacts'
                   inputs:
+                    artifact: $(ob_customArtifactName)
                     targetPath: $(ob_outputDirectory)
-                    artifact: drop_Toolchain_${{ configuration.name }}_Build
 
         - stage: RPMs_${{ configuration.name }}
           dependsOn: Toolchain_${{ configuration.name }}
