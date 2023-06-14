@@ -13,7 +13,7 @@ URL:            http://python-requests.org
 Source0:        requests-%{version}.tar.gz
 Patch0:         test_requests_typeerror_testfix.patch
 Patch1:         test_requests_support_pytest_4.patch
-patch2:         CVE-2023-32681.patch
+Patch2:         CVE-2023-32681.patch
 
 BuildRequires:  python-setuptools
 BuildRequires:  python2
