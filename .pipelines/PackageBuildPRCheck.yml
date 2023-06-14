@@ -51,7 +51,7 @@ extends:
                   displayName: 'Publish toolchain artifacts'
                   inputs:
                     targetPath: $(ob_outputDirectory)
-                    artifactName: drop_Toolchain_AMD64_Build
+                    artifact: drop_Toolchain_AMD64_Build
 
         - stage: RPMs_${{ configuration.name }}
           dependsOn: Toolchain_${{ configuration.name }}
