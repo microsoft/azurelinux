@@ -13,9 +13,6 @@ parameters:
       agentPool: "mariner-core-arm64-1es-mariner2"
       agentVMName: "Mariner-Build-Mariner2-1ES-ARM64-Managed-Image"
 
-variables:
-  buildArtifactsFolder: $(Build.ArtifactStagingDirectory)
-
 resources:
   repositories:
     - repository: templates
@@ -28,6 +25,7 @@ extends:
   parameters:
     featureFlags:
       runOnHost: true
+      skipPoliciesValidation: true
     globalSdl:
       credscan:
         suppressionsFile: .config/CredScanSuppressions.json
@@ -42,7 +40,7 @@ extends:
                 name: ${{ configuration.agentPool }}
                 vmImage: ${{ configuration.agentVMName }}
               variables:
-                ob_outputDirectory: $(buildArtifactsFolder)
+                ob_outputDirectory: $(Build.ArtifactStagingDirectory)
               steps:
                 - template: .pipelines/templates/ToolchainBuild.yml@self
                   parameters:
