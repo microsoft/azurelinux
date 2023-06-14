@@ -51,19 +51,19 @@ steps:
       else
           echo "Build failed - no specific RPM" >&2
       fi
-    displayName: "Print failed RPMs"
     condition: failed()
+    displayName: "Print failed RPMs"
 
   - bash: |
       published_artifacts_dir="${{ parameters.buildArtifactsFolder }}/ARTIFACTS"
       mkdir -p "$published_artifacts_dir"
       cp "${{ parameters.coreRepoRoot }}"/build/toolchain/toolchain_built_{,s}rpms_all.tar.gz "$published_artifacts_dir"
-    displayName: "Copy artifacts for publishing"
     condition: succeeded()
+    displayName: "Copy artifacts for publishing"
 
   - bash: |
       published_logs_dir="${{ parameters.buildArtifactsFolder }}/LOGS"
       mkdir -p "$published_logs_dir"
       tar -C "${{ parameters.coreRepoRoot }}/build/logs/toolchain" -czf "$published_logs_dir/toolchain.logs.tar.gz" .
-    displayName: "Copy logs for publishing"
     condition: always()
+    displayName: "Copy logs for publishing"
