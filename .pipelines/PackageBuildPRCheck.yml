@@ -46,6 +46,12 @@ extends:
                   parameters:
                     buildArtifactsFolder: $(ob_outputDirectory)
 
+                - task: PublishPipelineArtifact@1
+                  displayName: 'Publish toolchain artifacts'
+                  inputs:
+                    targetPath: $(ob_outputDirectory)
+                    artifactName: $(System.StageName)
+
         - stage: RPMs_${{ configuration.name }}
           dependsOn: Toolchain_${{ configuration.name }}
           jobs:
