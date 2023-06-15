@@ -34,11 +34,11 @@ func main() {
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
 
-	snapshotGenerator, err := rpmssnapshot.New(*buildDirPath, *workerTar, *specsDirPath, *distTag)
+	snapshotGenerator, err := rpmssnapshot.New(*buildDirPath, *workerTar, *specsDirPath)
 	if err != nil {
 		logger.Log.Fatalf("Failed to initialize RPM snapshot generator. Error: %v", err)
 	}
-	defer snapshotGenerator.SimpleChrootTool.CleanUp()
+	defer snapshotGenerator.CleanUp()
 
 	logger.Log.Infof("Generating RPMs snapshot from specs inside (%s).", *specsDirPath)
 	logger.Log.Debugf("Distribution tag: %s.", *distTag)

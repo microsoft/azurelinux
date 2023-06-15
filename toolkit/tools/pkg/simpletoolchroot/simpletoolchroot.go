@@ -3,14 +3,13 @@
 
 // A common interface for creating a basic spec/rpm parsing environment inside a chroot.
 
-package simplechroottool
+package simpletoolchroot
 
 import (
 	"fmt"
 	"path/filepath"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/rpm"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 )
 
@@ -18,20 +17,18 @@ const (
 	chrootSpecDirPath = "/SPECS"
 )
 
-// SimpleChrootTool is a tool for creating an environment inside a chroot suitable for basic tasks like parsing RPMs.
+// SimpleToolChroot is a tool for creating an environment inside a chroot suitable for basic tasks like parsing RPMs.
 // The following fields will be set by InitializeChroot():
-//   - chroot: The chroot environment we are working in, call SimpleChrootTool.RunInChroot() to execute commands inside the chroot.
+//   - chroot: The chroot environment we are working in, call SimpleToolChroot.RunInChroot() to execute commands inside the chroot.
 //   - chrootSpecDir: The relative path to the SPECS directory inside the chroot: "/SPECS."
 //   - runChecks: Whether or not to parse with check sections enabled.
 //   - distTag: The distribution tag to use when parsing RPMs.
-type SimpleChrootTool struct {
-	chroot    *safechroot.Chroot
-	runChecks bool
-	distTag   string
+type SimpleToolChroot struct {
+	chroot *safechroot.Chroot
 }
 
 // ChrootRootDir returns the root directory where the chroot was created. Call InitializeChroot() before calling this function.
-func (s *SimpleChrootTool) ChrootRootDir() string {
+func (s *SimpleToolChroot) ChrootRootDir() string {
 	if s.chroot == nil {
 		return ""
 	}
@@ -39,7 +36,7 @@ func (s *SimpleChrootTool) ChrootRootDir() string {
 }
 
 // ChrootRelativeSpecDir returns the directory inside the chroot where the specs dir is mounted. Call InitializeChroot() before calling this function.
-func (s *SimpleChrootTool) ChrootRelativeSpecDir() string {
+func (s *SimpleToolChroot) ChrootRelativeSpecDir() string {
 	return chrootSpecDirPath
 }
 
@@ -51,15 +48,13 @@ func (s *SimpleChrootTool) ChrootRelativeSpecDir() string {
 //   - specsDirPath: The path to the directory containing the spec files
 //   - distTag: The distribution tag to use when parsing RPMs
 //   - runChecks: Whether or not to parse with check sections enabled
-func (s *SimpleChrootTool) InitializeChroot(buildDir, chrootName, workerTarPath, specsDirPath, distTag string, runChecks bool) (err error) {
+func (s *SimpleToolChroot) InitializeChroot(buildDir, chrootName, workerTarPath, specsDirPath string) (err error) {
 	const (
 		existingDir = false
 	)
 
 	chrootDirPath := filepath.Join(buildDir, chrootName)
 	s.chroot = safechroot.NewChroot(chrootDirPath, existingDir)
-	s.runChecks = runChecks
-	s.distTag = distTag
 
 	extraDirectories := []string{}
 	extraMountPoints := []*safechroot.MountPoint{
@@ -75,7 +70,7 @@ func (s *SimpleChrootTool) InitializeChroot(buildDir, chrootName, workerTarPath,
 
 // CleanUp cleans up the chroot environment. This function should be called after all other functions in this package have been
 // called (likely in a defer statement)
-func (s *SimpleChrootTool) CleanUp() {
+func (s *SimpleToolChroot) CleanUp() {
 	const leaveFilesOnDisk = false
 
 	if s.chroot != nil {
@@ -84,18 +79,9 @@ func (s *SimpleChrootTool) CleanUp() {
 }
 
 // Run executes a given function inside the tool's chroot environment.
-func (s *SimpleChrootTool) RunInChroot(toRun func() error) (err error) {
+func (s *SimpleToolChroot) RunInChroot(toRun func() error) (err error) {
 	if s.chroot == nil {
 		return fmt.Errorf("chroot has not been initialized")
 	}
 	return s.chroot.Run(toRun)
-}
-
-// DefaultDefines creates a map of RPM build defines for the chroot. This function should be called after InitializeChroot()
-// and from a context inside a call to the chroot's .Run() function.
-func (s *SimpleChrootTool) DefaultDefines() map[string]string {
-	defines := rpm.DefaultDefines(s.runChecks)
-	defines[rpm.DistTagDefine] = s.distTag
-
-	return defines
 }
