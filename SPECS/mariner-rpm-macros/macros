@@ -89,7 +89,6 @@
 %__os_install_post    \
     %{__os_install_post_leave_signatures} \
     %{?__brp_strip} \
-    %{?__brp_elfperms} \
     %{?mariner_ccache_enabled:CCACHE_DIR="/ccache-dir" ; export CCACHE_DIR ;} \
     %{?mariner_ccache_enabled:ccache --show-stats} \
     %{nil}
