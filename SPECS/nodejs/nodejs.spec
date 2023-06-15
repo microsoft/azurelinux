@@ -1,7 +1,7 @@
 Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs
 Version:        14.21.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD and MIT and Public Domain and naist-2003
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -18,6 +18,7 @@ BuildRequires:  coreutils >= 8.22
 BuildRequires:  openssl-devel >= 1.1.1
 BuildRequires:  python3
 BuildRequires:  which
+BuildRequires:  c-ares-devel
 Requires:       coreutils >= 8.22
 Requires:       openssl >= 1.1.1
 Requires:       python3
@@ -44,7 +45,8 @@ python3 configure.py \
   --prefix=%{_prefix} \
   --shared-openssl \
   --shared-zlib \
-  --openssl-use-def-ca-store
+  --openssl-use-def-ca-store \
+  --shared-cares
 %make_build
 
 %install
@@ -80,6 +82,9 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
+* Tue Jun 6 2023 Dallas Delaney <dadelan@microsoft.com> - 14.21.1-3
+- Fix CVE-2023-32067, CVE-2023-31130, CVE-2023-31147 by using system c-ares
+
 * Thu May 25 2023 Tobias Brick <tobiasb@microsoft.com> - 14.21.1-2
 - Add patch to fix CVE-2023-28155
 
