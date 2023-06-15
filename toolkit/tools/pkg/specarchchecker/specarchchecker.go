@@ -11,41 +11,37 @@ import (
 	"strings"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/rpm"
 	simplechroottool "github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/simplechroottool"
 )
 
 type ArchChecker struct {
-	*simplechroottool.SimpleChrootTool
+	simplechroottool.SimpleChrootTool
 }
 
-const chrootName = "specarchchecker_chroot"
+const (
+	chrootName = "specarchchecker_chroot"
+	runChecks  = false
+)
 
-// New creates an unitialized ArchChecker.
-func New(buildDirPath, workerTarPath string) *ArchChecker {
-	return &ArchChecker{
-		SimpleChrootTool: &simplechroottool.SimpleChrootTool{
-			BuildDirPath:  buildDirPath,
-			WorkerTarPath: workerTarPath,
-		},
-	}
+// New creates an ArchChecker.
+func New(buildDirPath, workerTarPath, specsDirPath, distTag string) (newArchChecker *ArchChecker, err error) {
+	newArchChecker = &ArchChecker{}
+	err = newArchChecker.InitializeChroot(buildDirPath, chrootName, workerTarPath, specsDirPath, distTag, runChecks)
+
+	return newArchChecker, err
 }
 
 // FilterSpecsByArch converts a list of spec names to those that are compatible with the current architecture. Will create
 // and destroy a chroot environment in the process.
 func (a *ArchChecker) FilterSpecsByArch(specsDirPath, distTag string, specFiles []string) (validSpecs []string, err error) {
-	err = a.InitializeChroot(chrootName, specsDirPath)
-	if err != nil {
-		return
-	}
-	defer a.CleanUp()
-
 	logger.Log.Infof("Filtering spec list in (%s).", specsDirPath)
 	logger.Log.Debugf("Distribution tag: %s.", distTag)
 	logger.Log.Debugf("Input list: %v.", specFiles)
 
-	err = a.Chroot().Run(func() error {
+	err = a.RunInChroot(func() error {
 		var runErr error
-		validSpecs, runErr = a.filterListInChroot(distTag, specFiles)
+		validSpecs, runErr = a.filterListInChroot(specFiles)
 		return runErr
 	})
 	if err != nil {
@@ -60,7 +56,7 @@ func (a *ArchChecker) FilterSpecsByArch(specsDirPath, distTag string, specFiles 
 func (a *ArchChecker) buildAllSpecsListFromNames(specNames []string) (specPaths []string, err error) {
 	for _, specName := range specNames {
 		var fullSpecPath []string
-		specFilesGlob := filepath.Join(a.ChrootSpecDir(), "**", fmt.Sprintf("%s.spec", specName))
+		specFilesGlob := filepath.Join(a.ChrootRelativeSpecDir(), "**", fmt.Sprintf("%s.spec", specName))
 
 		fullSpecPath, err = filepath.Glob(specFilesGlob)
 		if err != nil {
@@ -78,17 +74,17 @@ func (a *ArchChecker) buildAllSpecsListFromNames(specNames []string) (specPaths 
 	return
 }
 
-func (a *ArchChecker) filterListInChroot(distTag string, specFileNames []string) (filteredSpecNames []string, err error) {
-	defines := a.BuildDefines(distTag)
+func (a *ArchChecker) filterListInChroot(specFileNames []string) (filteredSpecNames []string, err error) {
+	defines := a.DefaultDefines()
 	specPaths, err := a.buildAllSpecsListFromNames(specFileNames)
 	if err != nil {
-		err = fmt.Errorf("failed to translate names to specs inside (%s). Error: %w", a.ChrootSpecDir(), err)
+		err = fmt.Errorf("failed to translate names to specs inside (%s). Error: %w", a.ChrootRelativeSpecDir(), err)
 		return
 	}
 	logger.Log.Debugf("Got specs: %v.", specPaths)
-	filteredSpecs, err := a.BuildCompatibleSpecsList(specPaths, defines)
+	filteredSpecs, err := rpm.BuildCompatibleSpecsList(a.ChrootRelativeSpecDir(), specPaths, defines)
 	if err != nil {
-		err = fmt.Errorf("failed to retrieve a list of compatible  specs inside (%s). Error: %w", a.ChrootSpecDir(), err)
+		err = fmt.Errorf("failed to retrieve a list of compatible  specs inside (%s). Error: %w", a.ChrootRelativeSpecDir(), err)
 		return
 	}
 	logger.Log.Debugf("Got filtered specs: %v.", filteredSpecs)

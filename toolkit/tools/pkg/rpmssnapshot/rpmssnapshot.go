@@ -54,42 +54,36 @@ const (
 	rpmSpecBuiltRPMRegexMatchesCount
 
 	chrootName = "rpmssnapshot_chroot"
+	runChecks  = false
 )
 
 type SnapshotGenerator struct {
-	*simplechroottool.SimpleChrootTool
+	simplechroottool.SimpleChrootTool
 }
 
-// New creates an unitialized RPMs snapshot generator.
-func New(buildDirPath, workerTarPath string) *SnapshotGenerator {
-	return &SnapshotGenerator{
-		SimpleChrootTool: &simplechroottool.SimpleChrootTool{
-			BuildDirPath:  buildDirPath,
-			WorkerTarPath: workerTarPath,
-		},
-	}
+// New creates a new snapshot generator.
+func New(buildDirPath, workerTarPath, specsDirPath, distTag string) (newSnapshotGenerator *SnapshotGenerator, err error) {
+	newSnapshotGenerator = &SnapshotGenerator{}
+	err = newSnapshotGenerator.InitializeChroot(buildDirPath, chrootName, workerTarPath, specsDirPath, distTag, runChecks)
+
+	return newSnapshotGenerator, err
 }
 
 // GenerateSnapshot generates a snapshot of all packages built from the specs inside the input directory.
 func (s *SnapshotGenerator) GenerateSnapshot(specsDirPath, outputFilePath, distTag string) (err error) {
-	err = s.InitializeChroot(chrootName, specsDirPath)
-	if err != nil {
-		return
-	}
-	defer s.CleanUp()
 
 	logger.Log.Infof("Generating RPMs snapshot from specs inside (%s).", specsDirPath)
 
 	logger.Log.Debugf("Distribution tag: %s.", distTag)
 
-	err = s.Chroot().Run(func() error {
-		return s.generateSnapshotInChroot(distTag)
+	err = s.RunInChroot(func() error {
+		return s.generateSnapshotInChroot()
 	})
 	if err != nil {
 		return
 	}
 
-	chrootOutputFileFullPath := filepath.Join(s.Chroot().RootDir(), chrootOutputFilePath)
+	chrootOutputFileFullPath := filepath.Join(s.ChrootRootDir(), chrootOutputFilePath)
 	err = file.Move(chrootOutputFileFullPath, outputFilePath)
 	if err != nil {
 		logger.Log.Errorf("Failed to retrieve the snapshot from the chroot. Error: %v.", err)
@@ -120,17 +114,17 @@ func (s *SnapshotGenerator) convertResultsToRepoContents(allBuiltRPMs []string) 
 	return
 }
 
-func (s *SnapshotGenerator) generateSnapshotInChroot(distTag string) (err error) {
+func (s *SnapshotGenerator) generateSnapshotInChroot() (err error) {
 	var (
 		allBuiltRPMs []string
 		repoContents repocloner.RepoContents
 		specPaths    []string
 	)
 
-	defines := s.BuildDefines(distTag)
-	specPaths, err = s.BuildCompatibleSpecsList([]string{}, defines)
+	defines := s.DefaultDefines()
+	specPaths, err = rpm.BuildCompatibleSpecsList(s.ChrootRelativeSpecDir(), []string{}, defines)
 	if err != nil {
-		logger.Log.Errorf("Failed to retrieve a list of specs inside (%s). Error: %v.", s.ChrootSpecDir(), err)
+		logger.Log.Errorf("Failed to retrieve a list of specs inside (%s). Error: %v.", s.ChrootRelativeSpecDir(), err)
 		return
 	}
 

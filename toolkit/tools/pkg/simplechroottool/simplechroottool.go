@@ -6,8 +6,8 @@
 package simplechroottool
 
 import (
+	"fmt"
 	"path/filepath"
-	"runtime"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/rpm"
@@ -18,52 +18,58 @@ const (
 	chrootSpecDirPath = "/SPECS"
 )
 
-// SimpleChrootTool is a tool for creating a basic spec/rpm parsing environment inside a chroot. When creating a new instance, the
-// following fields must be set:
-//   - BuildDirPath: The path to the directory where the chroot will be created and run from.
-//   - WorkerTarPath: The path to the tarball containing the chroot environment.
+// SimpleChrootTool is a tool for creating an environment inside a chroot suitable for basic tasks like parsing RPMs.
 // The following fields will be set by InitializeChroot():
-//   - chroot: The chroot environment we are working in, call Chroot.Run() to execute commands inside the chroot.
-//   - chrootSpecDir: The path to the SPECS directory inside the chroot "/SPECS."
-
+//   - chroot: The chroot environment we are working in, call SimpleChrootTool.RunInChroot() to execute commands inside the chroot.
+//   - chrootSpecDir: The relative path to the SPECS directory inside the chroot: "/SPECS."
+//   - runChecks: Whether or not to parse with check sections enabled.
+//   - distTag: The distribution tag to use when parsing RPMs.
 type SimpleChrootTool struct {
-	BuildDirPath  string
-	WorkerTarPath string
 	chroot        *safechroot.Chroot
 	chrootSpecDir string
+	runChecks     bool
+	distTag       string
 }
 
-// Chroot returns the chroot environment we are working in, call Chroot().Run() to execute commands inside the chroot. Call
-// InitializeChroot() before calling this function.
-func (s *SimpleChrootTool) Chroot() *safechroot.Chroot {
-	return s.chroot
+// ChrootRootDir returns the root directory where the chroot was created. Call InitializeChroot() before calling this function.
+func (s *SimpleChrootTool) ChrootRootDir() string {
+	if s.chroot == nil {
+		return ""
+	}
+	return s.chroot.RootDir()
 }
 
-// ChrootSpecDir returns the directory inside the choot where the specs dir is mounted. Call InitializeChroot() before calling this function.
-func (s *SimpleChrootTool) ChrootSpecDir() string {
+// ChrootSpecDir returns the directory inside the chroot where the specs dir is mounted. Call InitializeChroot() before calling this function.
+func (s *SimpleChrootTool) ChrootRelativeSpecDir() string {
 	return s.chrootSpecDir
 }
 
-// InitializeChroot initializes the chroot environment so .Run() can be used to execute commands inside the chroot. This function
-// should be called before any other functions in this package.
-//   - chrootName: The name of the chroot directory to use
+// InitializeChroot initializes the chroot environment so .RunInChroot() can be used to execute commands inside the chroot. This function
+// should be called before any other functions in this package. CleanUp() must be called (likely via defer) after InitializeChroot() is used.
+//   - buildDir: The path to the directory where the chroot will be created
+//   - chrootName: The name of the chroot to create
+//   - workerTarPath: The path to the tar file containing the worker files
 //   - specsDirPath: The path to the directory containing the spec files
-func (s *SimpleChrootTool) InitializeChroot(chrootName, specsDirPath string) (err error) {
+//   - distTag: The distribution tag to use when parsing RPMs
+//   - runChecks: Whether or not to parse with check sections enabled
+func (s *SimpleChrootTool) InitializeChroot(buildDir, chrootName, workerTarPath, specsDirPath, distTag string, runChecks bool) (err error) {
 	const (
 		existingDir = false
 	)
 
-	chrootDirPath := filepath.Join(s.BuildDirPath, chrootName)
+	chrootDirPath := filepath.Join(buildDir, chrootName)
 	s.chroot = safechroot.NewChroot(chrootDirPath, existingDir)
 	s.chrootSpecDir = chrootSpecDirPath
+	s.runChecks = runChecks
+	s.distTag = distTag
 
 	extraDirectories := []string{}
 	extraMountPoints := []*safechroot.MountPoint{
 		safechroot.NewMountPoint(specsDirPath, s.chrootSpecDir, "", safechroot.BindMountPointFlags, ""),
 	}
-	err = s.chroot.Initialize(s.WorkerTarPath, extraDirectories, extraMountPoints)
+	err = s.chroot.Initialize(workerTarPath, extraDirectories, extraMountPoints)
 	if err != nil {
-		logger.Log.Errorf("Failed to initialize chroot (%s) inside (%s). Error: %v.", s.WorkerTarPath, chrootDirPath, err)
+		logger.Log.Errorf("Failed to initialize chroot (%s) inside (%s). Error: %v.", workerTarPath, chrootDirPath, err)
 	}
 
 	return
@@ -79,68 +85,19 @@ func (s *SimpleChrootTool) CleanUp() {
 	}
 }
 
-// BuildDefines creates a map of RPM build defines for the crhoot. This function should be called after InitializeChroot()
-// and from a context inside a call to the chroot's .Run() function.
-func (s *SimpleChrootTool) BuildDefines(distTag string) map[string]string {
-	const runCheck = true
+// Run executes a given function inside the tool's chroot environment.
+func (s *SimpleChrootTool) RunInChroot(toRun func() error) (err error) {
+	if s.chroot == nil {
+		return fmt.Errorf("chroot has not been initialized")
+	}
+	return s.chroot.Run(toRun)
+}
 
-	defines := rpm.DefaultDefines(runCheck)
-	defines[rpm.DistTagDefine] = distTag
+// DefaultDefines creates a map of RPM build defines for the chroot. This function should be called after InitializeChroot()
+// and from a context inside a call to the chroot's .Run() function.
+func (s *SimpleChrootTool) DefaultDefines() map[string]string {
+	defines := rpm.DefaultDefines(s.runChecks)
+	defines[rpm.DistTagDefine] = s.distTag
 
 	return defines
-}
-
-// BuildCompatibleSpecsList builds a list of spec files in the chroot's SPECs directory that are compatible with the build arch. Paths
-// are relative to the chroot's base directory. This function should be called after InitializeChroot() and from a context inside a call
-// to the chroot's .Run() function.
-func (s *SimpleChrootTool) BuildCompatibleSpecsList(inputSpecPaths []string, defines map[string]string) (filteredSpecPaths []string, err error) {
-	var specPaths []string
-	if len(inputSpecPaths) > 0 {
-		specPaths = inputSpecPaths
-	} else {
-		specPaths, err = s.buildAllSpecsList()
-		if err != nil {
-			return
-		}
-	}
-
-	return s.filterCompatibleSpecs(specPaths, defines)
-}
-
-// buildAllSpecsList builds a list of all spec files in the chroot's SPECs directory. Paths are relative to the chroot's base directory.
-func (s *SimpleChrootTool) buildAllSpecsList() (specPaths []string, err error) {
-	specFilesGlob := filepath.Join(s.chrootSpecDir, "**", "*.spec")
-
-	specPaths, err = filepath.Glob(specFilesGlob)
-	if err != nil {
-		logger.Log.Errorf("Failed while trying to enumerate all spec files with (%s). Error: %v.", specFilesGlob, err)
-	}
-
-	return
-}
-
-// filterCompatibleSpecs filters a list of spec files in the chroot's SPECs directory that are compatible with the build arch. Paths
-func (s *SimpleChrootTool) filterCompatibleSpecs(inputSpecPaths []string, defines map[string]string) (filteredSpecPaths []string, err error) {
-	var specCompatible bool
-
-	buildArch, err := rpm.GetRpmArch(runtime.GOARCH)
-	if err != nil {
-		return
-	}
-
-	for _, specFilePath := range inputSpecPaths {
-		specDirPath := filepath.Dir(specFilePath)
-
-		specCompatible, err = rpm.SpecArchIsCompatible(specFilePath, specDirPath, buildArch, defines)
-		if err != nil {
-			logger.Log.Errorf("Failed while querrying spec (%s). Error: %v.", specFilePath, err)
-			return
-		}
-
-		if specCompatible {
-			filteredSpecPaths = append(filteredSpecPaths, specFilePath)
-		}
-	}
-
-	return
 }

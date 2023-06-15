@@ -47,7 +47,12 @@ func main() {
 		logger.Log.Fatalf("No specs were provided to filter.")
 	}
 
-	archChecker := specarchchecker.New(*buildDirPath, *workerTar)
+	archChecker, err := specarchchecker.New(*buildDirPath, *workerTar, *specsDirPath, *distTag)
+	if err != nil {
+		logger.Log.Fatalf("Failed to initialize spec arch checker. Error: %v", err)
+	}
+	defer archChecker.CleanUp()
+
 	filteredSpecNames, err := archChecker.FilterSpecsByArch(*specsDirPath, *distTag, specNames)
 	if err != nil {
 		logger.Log.Fatalf("Failed to filter specs folder (%s) Error: %v", *specsDirPath, err)
