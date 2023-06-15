@@ -25,10 +25,9 @@ const (
 //   - runChecks: Whether or not to parse with check sections enabled.
 //   - distTag: The distribution tag to use when parsing RPMs.
 type SimpleChrootTool struct {
-	chroot        *safechroot.Chroot
-	chrootSpecDir string
-	runChecks     bool
-	distTag       string
+	chroot    *safechroot.Chroot
+	runChecks bool
+	distTag   string
 }
 
 // ChrootRootDir returns the root directory where the chroot was created. Call InitializeChroot() before calling this function.
@@ -39,9 +38,9 @@ func (s *SimpleChrootTool) ChrootRootDir() string {
 	return s.chroot.RootDir()
 }
 
-// ChrootSpecDir returns the directory inside the chroot where the specs dir is mounted. Call InitializeChroot() before calling this function.
+// ChrootRelativeSpecDir returns the directory inside the chroot where the specs dir is mounted. Call InitializeChroot() before calling this function.
 func (s *SimpleChrootTool) ChrootRelativeSpecDir() string {
-	return s.chrootSpecDir
+	return chrootSpecDirPath
 }
 
 // InitializeChroot initializes the chroot environment so .RunInChroot() can be used to execute commands inside the chroot. This function
@@ -59,13 +58,12 @@ func (s *SimpleChrootTool) InitializeChroot(buildDir, chrootName, workerTarPath,
 
 	chrootDirPath := filepath.Join(buildDir, chrootName)
 	s.chroot = safechroot.NewChroot(chrootDirPath, existingDir)
-	s.chrootSpecDir = chrootSpecDirPath
 	s.runChecks = runChecks
 	s.distTag = distTag
 
 	extraDirectories := []string{}
 	extraMountPoints := []*safechroot.MountPoint{
-		safechroot.NewMountPoint(specsDirPath, s.chrootSpecDir, "", safechroot.BindMountPointFlags, ""),
+		safechroot.NewMountPoint(specsDirPath, chrootSpecDirPath, "", safechroot.BindMountPointFlags, ""),
 	}
 	err = s.chroot.Initialize(workerTarPath, extraDirectories, extraMountPoints)
 	if err != nil {
