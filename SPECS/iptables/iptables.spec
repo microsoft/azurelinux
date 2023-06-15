@@ -100,7 +100,6 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %changelog
 * Thu Jun 08 2023 Andy Zaugg <azaugg@linkedin.com> - 1.8.7-3
 - Removed icmpv6 redirect iptables rule and disabled redirect kernel option
-- Flush and reset raw table on iptables stop
 - Adding icmpv4 type 3, 11 for TTL decrementation and MTU negotiation
 
 * Wed May 31 2023 Rachel Menge <rachelmenge@microsoft.com> - 1.8.7-2
