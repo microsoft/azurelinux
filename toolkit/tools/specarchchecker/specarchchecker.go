@@ -56,7 +56,7 @@ func main() {
 	logger.Log.Infof("Filtering spec list in (%s).", *specsDirPath)
 	logger.Log.Debugf("Distribution tag: %s.", *distTag)
 	logger.Log.Debugf("Input list: %v.", specNames)
-	filteredSpecNames, err := archChecker.FilterSpecsByArch(specNames)
+	filteredSpecNames, err := archChecker.FilterSpecsByArch(specNames, *distTag)
 	if err != nil {
 		logger.Log.Fatalf("Failed to filter specs folder (%s) Error: %v", *specsDirPath, err)
 	}

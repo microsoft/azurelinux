@@ -291,8 +291,7 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 
 	defer wg.Done()
 
-	defines := rpm.DefaultDefines(runCheck)
-	defines[rpm.DistTagDefine] = distTag
+	defines := rpm.DefaultDefinesWithDist(runCheck, distTag)
 
 	var ts *timestamp.TimeStamp = nil
 	for specfile := range requests {

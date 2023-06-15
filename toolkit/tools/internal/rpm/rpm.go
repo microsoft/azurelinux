@@ -168,6 +168,14 @@ func executeRpmCommand(program string, args ...string) (results []string, err er
 	return
 }
 
+// DefaultDefinesWithDist returns a new map of default defines that can be used during RPM queries that also includes
+// the dist tag.
+func DefaultDefinesWithDist(runChecks bool, distTag string) map[string]string {
+	defines := DefaultDefines(runChecks)
+	defines[DistTagDefine] = distTag
+	return defines
+}
+
 // DefaultDefines returns a new map of default defines that can be used during RPM queries.
 func DefaultDefines(runCheck bool) map[string]string {
 	// "with_check" definition should align with the RUN_CHECK Make variable whenever possible

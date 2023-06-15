@@ -42,7 +42,7 @@ func main() {
 
 	logger.Log.Infof("Generating RPMs snapshot from specs inside (%s).", *specsDirPath)
 	logger.Log.Debugf("Distribution tag: %s.", *distTag)
-	err = snapshotGenerator.GenerateSnapshot(*outputSnapshotPath)
+	err = snapshotGenerator.GenerateSnapshot(*outputSnapshotPath, *distTag)
 	if err != nil {
 		logger.Log.Errorf("Failed to generate snapshot from specs folder (%s) into (%s). Error: %v", *specsDirPath, *outputSnapshotPath, err)
 	}

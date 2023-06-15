@@ -70,8 +70,8 @@ func (a *ArchChecker) buildAllSpecsListFromNames(specNames []string) (specPaths 
 	return
 }
 
-func (a *ArchChecker) filterListInChroot(specFileNames []string) (filteredSpecNames []string, err error) {
-	defines := a.SimpleChrootTool.DefaultDefines()
+func (a *ArchChecker) filterListInChroot(specFileNames []string, distTag string) (filteredSpecNames []string, err error) {
+	defines := rpm.DefaultDefinesWithDist(runChecks, distTag)
 	specPaths, err := a.buildAllSpecsListFromNames(specFileNames)
 	if err != nil {
 		err = fmt.Errorf("failed to translate names to specs inside (%s). Error: %w", a.SimpleChrootTool.ChrootRelativeSpecDir(), err)

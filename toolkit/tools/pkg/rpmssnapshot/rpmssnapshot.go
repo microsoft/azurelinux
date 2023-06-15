@@ -109,14 +109,14 @@ func (s *SnapshotGenerator) convertResultsToRepoContents(allBuiltRPMs []string) 
 	return
 }
 
-func (s *SnapshotGenerator) generateSnapshotInChroot() (err error) {
+func (s *SnapshotGenerator) generateSnapshotInChroot(distTag string) (err error) {
 	var (
 		allBuiltRPMs []string
 		repoContents repocloner.RepoContents
 		specPaths    []string
 	)
 
-	defines := s.SimpleChrootTool.DefaultDefines()
+	defines := rpm.DefaultDefinesWithDist(runChecks, distTag)
 	specPaths, err = rpm.BuildCompatibleSpecsList(s.SimpleChrootTool.ChrootRelativeSpecDir(), []string{}, defines)
 	if err != nil {
 		logger.Log.Errorf("Failed to retrieve a list of specs inside (%s). Error: %v.", s.SimpleChrootTool.ChrootRelativeSpecDir(), err)
