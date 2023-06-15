@@ -2737,6 +2737,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "dnf5",
+          "version": "5.0.14",
+          "downloadUrl": "https://github.com/rpm-software-management/dnf5/archive/refs/tags/5.0.14.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "dnsmasq",
           "version": "2.89",
           "downloadUrl": "https://www.thekelleys.org.uk/dnsmasq/dnsmasq-2.89.tar.xz"

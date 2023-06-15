@@ -1,7 +1,7 @@
 Summary:        Repodata downloading library
 Name:           librepo
-Version:        1.14.2
-Release:        2%{?dist}
+Version:        1.15.1
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner

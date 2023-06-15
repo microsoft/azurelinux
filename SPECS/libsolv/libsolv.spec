@@ -1,6 +1,6 @@
 Summary:        A free package dependency solver
 Name:           libsolv
-Version:        0.7.20
+Version:        0.7.24
 Release:        1%{?dist}
 License:        BSD
 URL:            https://github.com/openSUSE/libsolv
