@@ -1,5 +1,5 @@
 ******************************************************************************************
-* RPMs from '<REPO_PATH>' will be available in /repo
+* RPMs from host's '<REPO_PATH>' will be available in /repo
 * Run enable_local_repo to make available to tdnf automatically
 * Individual packages may be installed directly via 'tdnf install /repo/x86_64/pkg.rpm'
 * To see this menu again, run show_help
@@ -12,6 +12,10 @@
 *     For more build options, see https://linux.die.net/man/8/rpmbuild
 *     Auto install deps:                            'dnf builddep -y my-pkg.spec'
 *     Show pkg dependencies:                        'dnf repoquery --deplist my-pkg'
+*     Build a new package:                           Create spec folder under /usr/src/mariner/SPECS with spec, source tarball and any other files
+*                                                    Run 'build_pkg new-pkg' to build
 *     Changes to /usr/src/mariner/SPECS will get reflected on host machine at /path/to/CBL-Mariner/SPECS
+*     Changes to /usr/src/mariner/SOURCES will not get reflected on host machine
+*     RPMs built in the container will be available at /usr/src/mariner/RPMS, and will not get reflected on host machine
 *
 *    Mount points:
