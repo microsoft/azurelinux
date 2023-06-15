@@ -70,12 +70,7 @@ func New(buildDirPath, workerTarPath, specsDirPath, distTag string) (newSnapshot
 }
 
 // GenerateSnapshot generates a snapshot of all packages built from the specs inside the input directory.
-func (s *SnapshotGenerator) GenerateSnapshot(specsDirPath, outputFilePath, distTag string) (err error) {
-
-	logger.Log.Infof("Generating RPMs snapshot from specs inside (%s).", specsDirPath)
-
-	logger.Log.Debugf("Distribution tag: %s.", distTag)
-
+func (s *SnapshotGenerator) GenerateSnapshot(outputFilePath string) (err error) {
 	err = s.RunInChroot(func() error {
 		return s.generateSnapshotInChroot()
 	})

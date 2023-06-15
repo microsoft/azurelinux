@@ -34,11 +34,7 @@ func New(buildDirPath, workerTarPath, specsDirPath, distTag string) (newArchChec
 
 // FilterSpecsByArch converts a list of spec names to those that are compatible with the current architecture. Will create
 // and destroy a chroot environment in the process.
-func (a *ArchChecker) FilterSpecsByArch(specsDirPath, distTag string, specFiles []string) (validSpecs []string, err error) {
-	logger.Log.Infof("Filtering spec list in (%s).", specsDirPath)
-	logger.Log.Debugf("Distribution tag: %s.", distTag)
-	logger.Log.Debugf("Input list: %v.", specFiles)
-
+func (a *ArchChecker) FilterSpecsByArch(specFiles []string) (validSpecs []string, err error) {
 	err = a.RunInChroot(func() error {
 		var runErr error
 		validSpecs, runErr = a.filterListInChroot(specFiles)
