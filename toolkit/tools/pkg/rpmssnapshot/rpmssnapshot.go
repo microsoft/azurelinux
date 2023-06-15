@@ -58,27 +58,27 @@ const (
 )
 
 type SnapshotGenerator struct {
-	simplechroottool.SimpleChrootTool
+	SimpleChrootTool simplechroottool.SimpleChrootTool
 }
 
 // New creates a new snapshot generator.
 func New(buildDirPath, workerTarPath, specsDirPath, distTag string) (newSnapshotGenerator *SnapshotGenerator, err error) {
 	newSnapshotGenerator = &SnapshotGenerator{}
-	err = newSnapshotGenerator.InitializeChroot(buildDirPath, chrootName, workerTarPath, specsDirPath, distTag, runChecks)
+	err = newSnapshotGenerator.SimpleChrootTool.InitializeChroot(buildDirPath, chrootName, workerTarPath, specsDirPath, distTag, runChecks)
 
 	return newSnapshotGenerator, err
 }
 
 // GenerateSnapshot generates a snapshot of all packages built from the specs inside the input directory.
 func (s *SnapshotGenerator) GenerateSnapshot(outputFilePath string) (err error) {
-	err = s.RunInChroot(func() error {
+	err = s.SimpleChrootTool.RunInChroot(func() error {
 		return s.generateSnapshotInChroot()
 	})
 	if err != nil {
 		return
 	}
 
-	chrootOutputFileFullPath := filepath.Join(s.ChrootRootDir(), chrootOutputFilePath)
+	chrootOutputFileFullPath := filepath.Join(s.SimpleChrootTool.ChrootRootDir(), chrootOutputFilePath)
 	err = file.Move(chrootOutputFileFullPath, outputFilePath)
 	if err != nil {
 		logger.Log.Errorf("Failed to retrieve the snapshot from the chroot. Error: %v.", err)
@@ -116,10 +116,10 @@ func (s *SnapshotGenerator) generateSnapshotInChroot() (err error) {
 		specPaths    []string
 	)
 
-	defines := s.DefaultDefines()
-	specPaths, err = rpm.BuildCompatibleSpecsList(s.ChrootRelativeSpecDir(), []string{}, defines)
+	defines := s.SimpleChrootTool.DefaultDefines()
+	specPaths, err = rpm.BuildCompatibleSpecsList(s.SimpleChrootTool.ChrootRelativeSpecDir(), []string{}, defines)
 	if err != nil {
-		logger.Log.Errorf("Failed to retrieve a list of specs inside (%s). Error: %v.", s.ChrootRelativeSpecDir(), err)
+		logger.Log.Errorf("Failed to retrieve a list of specs inside (%s). Error: %v.", s.SimpleChrootTool.ChrootRelativeSpecDir(), err)
 		return
 	}
 

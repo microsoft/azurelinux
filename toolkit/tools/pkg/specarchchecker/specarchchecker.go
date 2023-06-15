@@ -16,7 +16,7 @@ import (
 )
 
 type ArchChecker struct {
-	simplechroottool.SimpleChrootTool
+	SimpleChrootTool simplechroottool.SimpleChrootTool
 }
 
 const (
@@ -27,7 +27,7 @@ const (
 // New creates an ArchChecker.
 func New(buildDirPath, workerTarPath, specsDirPath, distTag string) (newArchChecker *ArchChecker, err error) {
 	newArchChecker = &ArchChecker{}
-	err = newArchChecker.InitializeChroot(buildDirPath, chrootName, workerTarPath, specsDirPath, distTag, runChecks)
+	err = newArchChecker.SimpleChrootTool.InitializeChroot(buildDirPath, chrootName, workerTarPath, specsDirPath, distTag, runChecks)
 
 	return newArchChecker, err
 }
@@ -35,7 +35,7 @@ func New(buildDirPath, workerTarPath, specsDirPath, distTag string) (newArchChec
 // FilterSpecsByArch converts a list of spec names to those that are compatible with the current architecture. Will create
 // and destroy a chroot environment in the process.
 func (a *ArchChecker) FilterSpecsByArch(specFiles []string) (validSpecs []string, err error) {
-	err = a.RunInChroot(func() error {
+	err = a.SimpleChrootTool.RunInChroot(func() error {
 		var runErr error
 		validSpecs, runErr = a.filterListInChroot(specFiles)
 		return runErr
@@ -52,7 +52,7 @@ func (a *ArchChecker) FilterSpecsByArch(specFiles []string) (validSpecs []string
 func (a *ArchChecker) buildAllSpecsListFromNames(specNames []string) (specPaths []string, err error) {
 	for _, specName := range specNames {
 		var fullSpecPath []string
-		specFilesGlob := filepath.Join(a.ChrootRelativeSpecDir(), "**", fmt.Sprintf("%s.spec", specName))
+		specFilesGlob := filepath.Join(a.SimpleChrootTool.ChrootRelativeSpecDir(), "**", fmt.Sprintf("%s.spec", specName))
 
 		fullSpecPath, err = filepath.Glob(specFilesGlob)
 		if err != nil {
@@ -71,16 +71,16 @@ func (a *ArchChecker) buildAllSpecsListFromNames(specNames []string) (specPaths 
 }
 
 func (a *ArchChecker) filterListInChroot(specFileNames []string) (filteredSpecNames []string, err error) {
-	defines := a.DefaultDefines()
+	defines := a.SimpleChrootTool.DefaultDefines()
 	specPaths, err := a.buildAllSpecsListFromNames(specFileNames)
 	if err != nil {
-		err = fmt.Errorf("failed to translate names to specs inside (%s). Error: %w", a.ChrootRelativeSpecDir(), err)
+		err = fmt.Errorf("failed to translate names to specs inside (%s). Error: %w", a.SimpleChrootTool.ChrootRelativeSpecDir(), err)
 		return
 	}
 	logger.Log.Debugf("Got specs: %v.", specPaths)
-	filteredSpecs, err := rpm.BuildCompatibleSpecsList(a.ChrootRelativeSpecDir(), specPaths, defines)
+	filteredSpecs, err := rpm.BuildCompatibleSpecsList(a.SimpleChrootTool.ChrootRelativeSpecDir(), specPaths, defines)
 	if err != nil {
-		err = fmt.Errorf("failed to retrieve a list of compatible  specs inside (%s). Error: %w", a.ChrootRelativeSpecDir(), err)
+		err = fmt.Errorf("failed to retrieve a list of compatible  specs inside (%s). Error: %w", a.SimpleChrootTool.ChrootRelativeSpecDir(), err)
 		return
 	}
 	logger.Log.Debugf("Got filtered specs: %v.", filteredSpecs)

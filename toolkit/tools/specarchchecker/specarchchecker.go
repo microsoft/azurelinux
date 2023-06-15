@@ -51,7 +51,7 @@ func main() {
 	if err != nil {
 		logger.Log.Fatalf("Failed to initialize spec arch checker. Error: %v", err)
 	}
-	defer archChecker.CleanUp()
+	defer archChecker.SimpleChrootTool.CleanUp()
 
 	logger.Log.Infof("Filtering spec list in (%s).", *specsDirPath)
 	logger.Log.Debugf("Distribution tag: %s.", *distTag)

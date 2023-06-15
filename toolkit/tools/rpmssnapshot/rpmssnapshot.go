@@ -38,7 +38,7 @@ func main() {
 	if err != nil {
 		logger.Log.Fatalf("Failed to initialize RPM snapshot generator. Error: %v", err)
 	}
-	defer snapshotGenerator.CleanUp()
+	defer snapshotGenerator.SimpleChrootTool.CleanUp()
 
 	logger.Log.Infof("Generating RPMs snapshot from specs inside (%s).", *specsDirPath)
 	logger.Log.Debugf("Distribution tag: %s.", *distTag)
