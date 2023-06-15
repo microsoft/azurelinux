@@ -359,7 +359,7 @@ func tdnfInstall(packages []string) (err error) {
 // the build environment has libtool archive files present, gnu configure could
 // detect it and create more libtool archive files which can cause build failures.
 func removeLibArchivesFromSystem() (err error) {
-	dirsToExclude := []string{"/proc", "/dev", "/sys", "/run"}
+	dirsToExclude := []string{"/proc", "/dev", "/sys", "/run", "/ccache-dir"}
 
 	err = filepath.Walk("/", func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -368,6 +368,7 @@ func removeLibArchivesFromSystem() (err error) {
 
 		// Skip directories that are meant for device files and kernel virtual filesystems.
 		// These will not contain .la files and are mounted into the safechroot from the host.
+		// Also skip /ccache-dir, which is shared between chroots
 		if info.IsDir() && sliceutils.Contains(dirsToExclude, path, sliceutils.StringMatch) {
 			return filepath.SkipDir
 		}
