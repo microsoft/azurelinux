@@ -1,0 +1,34 @@
+parameters:
+  - name: coreRepoRoot
+    type: string
+    default: "$(Build.SourcesDirectory)"
+
+  - name: rawToolchainCacheURL
+    type: string
+
+  - name: rawToolchainExpectedHash
+    type: string
+
+steps:
+  - bash: |  
+      raw_toolchain_file_path="${{ parameters.coreRepoRoot }}/build/toolchain/toolchain_from_container.tar.gz"
+
+      echo "-- Downloading cached raw toolchain."
+  
+      mkdir -p "$(dirname "$raw_toolchain_file_path")"
+      wget --quiet --timeout=30 --continue "$(rawToolchainCacheURL)" -O "$raw_toolchain_file_path"
+      if [[ ! -f "$raw_toolchain_file_path" ]]; then
+          echo "-- ERROR: failed to download raw toolchain cache." >&2
+          return 1
+      fi
+
+      # Verifying toolchains SHA-256 hash.
+      cache_sha256=$(sha256sum "$raw_toolchain_file_path" | cut -d' ' -f1)
+      if [[ "$cache_sha256" != "$(rawToolchainExpectedHash)" ]]; then
+          echo "-- ERROR: raw toolchain hash verification failed. Expected ($(rawToolchainExpectedHash)). Got ($cache_sha256)." >&2
+          return 1
+      fi
+      echo "-- Raw toolchain hash OK."
+
+      touch "$raw_toolchain_file_path"
+    displayName: "Populate raw toolchain"

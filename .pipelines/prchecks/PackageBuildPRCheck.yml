@@ -1,3 +1,10 @@
+# Since we're boosting our builds by using a private, pre-compiled raw toolchain
+# the pipeline requires defining the following variables outside of the YAML:
+# - rawToolchainCacheURL_AMD64
+# - rawToolchainCacheURL_ARM64
+# - rawToolchainExpectedHash_AMD64
+# - rawToolchainExpectedHash_ARM64
+
 trigger: none
 pr:
   - fasttrack/*
@@ -41,6 +48,11 @@ extends:
               variables:
                 ob_outputDirectory: $(Build.ArtifactStagingDirectory)
               steps:
+                - template: .pipelines/templates/RawToolchainDownload.yml@self
+                  parameters:
+                    rawToolchainCacheURL: "$(rawToolchainCacheURL_${{ configuration.name }})"
+                    rawToolchainExpectedHash: "$(rawToolchainExpectedHash_${{ configuration.name }})"
+
                 - template: .pipelines/templates/ToolchainBuild.yml@self
                   parameters:
                     buildArtifactsFolder: $(ob_outputDirectory)
