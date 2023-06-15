@@ -92,7 +92,7 @@ mkdir -p "${build_dir}"
 # Populate ${repo_path}/build/INTERMEDIATE_SRPMS with SRPMs, that can be used to build RPMs in the container
 cd "${repo_path}/toolkit"
 echo "Populating Intermediate SRPMs"
-sudo make input-srpms > /dev/null
+sudo make input-srpms SRPM_FILE_SIGNATURE_HANDLING="update" > /dev/null
 
 # ============ Map chroot mount ============
 if [[ "${mode}" == "build" ]]; then
