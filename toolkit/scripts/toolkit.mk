@@ -27,7 +27,7 @@ rpms_snapshot_logs_path = $(LOGS_DIR)/$(rpms_snapshot_dir_name)/rpms_snapshot.lo
 rpms_snapshot_per_specs = $(rpms_snapshot_build_dir)/$(specs_dir_name)_$(rpms_snapshot_name)
 
 valid_arch_spec_names_build_dir = $(BUILD_DIR)/valid_arch_spec_names
-valid_arch_spec_names           =  $(valid_arch_spec_names_build_dir)/valid_arch_spec_names.txt
+valid_arch_spec_names           = $(valid_arch_spec_names_build_dir)/valid_arch_spec_names.txt
 valid_arch_spec_names_logs_path = $(LOGS_DIR)/valid_arch_spec_names/valid_arch_spec_names.log
 
 toolkit_build_dir   = $(BUILD_DIR)/toolkit_prep
@@ -107,7 +107,7 @@ print-build-summary:
 	sed -E -n 's:^.+level=info msg="Built \(([^\)]+)\) -> \[(.+)\].+$:\1\t\2:gp' $(LOGS_DIR)/pkggen/rpmbuilding/* | tee $(LOGS_DIR)/pkggen/build-summary.csv
 
 # This will run the spec arch checker and generate a list of valid spec names suitable for passing to PACKAGE_BUILD_LIST et. al.
-.PHONY: prepare-spec-arch-checker
+.PHONY: run-specarchchecker
 run-specarchchecker: $(valid_arch_spec_names)
 	@cat $(valid_arch_spec_names) && echo "" # File doesn't have a newline at the end, so add one via echo.
 	@echo "Valid arch spec names generated under '$(valid_arch_spec_names)'."
