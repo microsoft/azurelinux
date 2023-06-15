@@ -1,15 +1,13 @@
 Summary:        Package manager
 Name:           rpm
 Version:        4.18.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://rpm.org
 Source0:        http://ftp.rpm.org/releases/%{name}-%(echo %{version} | cut -d'.' -f1-2).x/%{name}-%{version}.tar.bz2
-Source1:        brp-strip-debug-symbols
-Source2:        brp-strip-unneeded
 # The license for the files below is the same as for RPM as they have originally came from rpm.
 # The git repo is hosted by centos. The version below is centos 8 stable.
 Source3:        https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/python.attr
@@ -175,8 +173,6 @@ find %{buildroot} -name 'perl*' -delete
 %find_lang %{name}
 # System macros and prefix
 install -dm 755 %{buildroot}%{_sysconfdir}/rpm
-install -vm755 %{SOURCE1} %{buildroot}%{_libdir}/rpm/
-install -vm755 %{SOURCE2} %{buildroot}%{_libdir}/rpm/
 install -vm644 %{SOURCE3} %{buildroot}%{_fileattrsdir}/
 install -vm755 %{SOURCE4} %{buildroot}%{_libdir}/rpm/
 install -vm755 %{SOURCE5} %{buildroot}%{_libdir}/rpm/
@@ -285,6 +281,9 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Thu Jun 15 2023 Andrew Phelps <anphel@microsoft.com> - 4.18.0-3
+- Remove brp-strip-debug-symbols and brp-strip-unneeded scripts
+
 * Fri Sep 30 2022 Andy Caldwell <andycaldwell@microsoft> - 4.18.0-2
 - Create versioned dependencies from `python3-rpm` -> `rpm-build-libs` -> `rpm-libs` to ensure ABI compatibility
 
