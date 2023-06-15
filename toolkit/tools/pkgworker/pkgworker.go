@@ -54,7 +54,7 @@ var (
 	packagesToInstall    = app.Flag("install-package", "Filepaths to RPM packages that should be installed before building.").Strings()
 	outArch              = app.Flag("out-arch", "Architecture of resulting package").String()
 	useCcache            = app.Flag("use-ccache", "Automatically install and use ccache during package builds").Bool()
-	maxCPU               = app.Flag("max-cpu", "Max number of CPUs used for package building").String()
+	maxCPU               = app.Flag("max-cpu", "Max number of CPUs used for package building").Default("").String()
 
 	logFile  = exe.LogFileFlag(app)
 	logLevel = exe.LogLevelFlag(app)
@@ -94,7 +94,9 @@ func main() {
 	if *useCcache {
 		defines[rpm.MarinerCCacheDefine] = "true"
 	}
-	defines[rpm.MaxCPUDefine] = *maxCPU
+	if *maxCPU != "" {
+		defines[rpm.MaxCPUDefine] = *maxCPU
+	}
 
 	builtRPMs, err := buildSRPMInChroot(chrootDir, rpmsDirAbsPath, toolchainDirAbsPath, *workerTar, *srpmFile, *repoFile, *rpmmacrosFile, *outArch, defines, *noCleanup, *runCheck, *packagesToInstall, *useCcache)
 	logger.PanicOnError(err, "Failed to build SRPM '%s'. For details see log file: %s .", *srpmFile, *logFile)
