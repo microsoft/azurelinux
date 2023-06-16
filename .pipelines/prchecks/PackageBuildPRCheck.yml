@@ -2,6 +2,10 @@
 # the pipeline requires defining the following variables outside of the YAML:
 # - rawToolchainCacheURL_AMD64
 # - rawToolchainCacheURL_ARM64
+# - agentPool_AMD64
+# - agentPool_ARM64
+# - agentVMName_AMD64
+# - agentVMName_ARM64
 
 trigger: none
 pr:
@@ -12,13 +16,13 @@ parameters:
     type: object
     default:
     - name: "AMD64"
-      agentPool: "mariner-core-x64-1es-mariner2-gpt-test"
-      agentVMName: "Mariner-Build-Mariner2-1ES-Managed-Image2-GPT-Test"
+      agentPool: "$(agentPool_AMD64)"
+      agentVMName: "$(agentVMName_AMD64)"
       rawToolchainCacheURL: "$(rawToolchainCacheURL_AMD64)"
       rawToolchainExpectedHash: "f56df34b90915c93f772d3961bf5e9eeb8c1233db43dd92070214e4ce6b72894"
     - name: "ARM64"
-      agentPool: "mariner-core-arm64-1es-mariner2"
-      agentVMName: "Mariner-Build-Mariner2-1ES-ARM64-Managed-Image"
+      agentPool: "$(agentPool_ARM64)"
+      agentVMName: "$(agentVMName_ARM64)"
       rawToolchainCacheURL: "$(rawToolchainCacheURL_ARM64)"
       rawToolchainExpectedHash: "65de43b3bdcfdaac71df1f11fd1f830a8109b1eb9d7cb6cbc2e2d0e929d0ef76"
 
