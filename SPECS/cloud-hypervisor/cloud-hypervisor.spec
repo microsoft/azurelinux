@@ -1,7 +1,7 @@
 Summary:        A Rust-VMM based cloud hypervisor from Intel
 Name:           cloud-hypervisor
 Version:        22.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0 or BSD
 URL:            https://github.com/cloud-hypervisor/cloud-hypervisor
 Group:          Development/Tools
@@ -11,8 +11,9 @@ Source0:       %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Note: the %%{name}-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
 # To update the cache run:
 #   [repo_root]/toolkit/scripts/build_cargo_cache.sh %%{name}-%%{version}.tar.gz
-Source1:        %{name}-%{version}-cargo.tar.gz
+Source1:        %{name}-%{version}-%{release}-cargo.tar.gz
 Patch0:         CVE-2023-28448.patch
+Patch1:         CVE-2023-2650.patch
 ExclusiveArch:  x86_64
 
 BuildRequires:  gcc
@@ -32,6 +33,7 @@ tar xf %{SOURCE1} --no-same-owner
 %patch0 -p1
 popd
 %setup -q
+%patch1 -p1
 
 %build
 cargo build --release
@@ -51,6 +53,9 @@ install -d %{buildroot}%{_libdir}/cloud-hypervisor
 %exclude %{_libdir}/debug
 
 %changelog
+* Thu Jun 15 2023 Suresh Thelkar <sthelkar@microsoft.com> - 22.0-3
+- Patch CVE-2023-2650.patch in vendored versionize crate
+
 * Wed Apr 05 2023 Henry Beberman <henry.beberman@microsoft.com> - 22.0-2
 - Patch CVE-2023-28448 in vendored versionize crate
 
