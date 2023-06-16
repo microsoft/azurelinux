@@ -8,8 +8,6 @@
 # - agentVMName_ARM64
 
 trigger: none
-pr:
-  - fasttrack/*
 
 parameters:
   - name: buildConfiguration
