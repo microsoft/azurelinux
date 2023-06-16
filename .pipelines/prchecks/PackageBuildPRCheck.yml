@@ -2,8 +2,6 @@
 # the pipeline requires defining the following variables outside of the YAML:
 # - rawToolchainCacheURL_AMD64
 # - rawToolchainCacheURL_ARM64
-# - rawToolchainExpectedHash_AMD64
-# - rawToolchainExpectedHash_ARM64
 
 trigger: none
 pr:
