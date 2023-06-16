@@ -54,14 +54,13 @@ const (
 	rpmSpecBuiltRPMRegexMatchesCount
 
 	chrootName = "rpmssnapshot_chroot"
-	runChecks  = false
 )
 
 type SnapshotGenerator struct {
 	simpleToolChroot simpletoolchroot.SimpleToolChroot
 }
 
-// New creates a new snapshot generator.
+// New creates a new snapshot generator. If the chroot is created successfully, the caller is responsible for calling CleanUp().
 func New(buildDirPath, workerTarPath, specsDirPath string) (newSnapshotGenerator *SnapshotGenerator, err error) {
 	newSnapshotGenerator = &SnapshotGenerator{}
 	err = newSnapshotGenerator.simpleToolChroot.InitializeChroot(buildDirPath, chrootName, workerTarPath, specsDirPath)
@@ -70,8 +69,8 @@ func New(buildDirPath, workerTarPath, specsDirPath string) (newSnapshotGenerator
 }
 
 // CleanUp tears down the chroot
-func (s *SnapshotGenerator) CleanUp() {
-	s.simpleToolChroot.CleanUp()
+func (s *SnapshotGenerator) CleanUp() error {
+	return s.simpleToolChroot.CleanUp()
 }
 
 // GenerateSnapshot generates a snapshot of all packages built from the specs inside the input directory.
@@ -115,6 +114,7 @@ func (s *SnapshotGenerator) convertResultsToRepoContents(allBuiltRPMs []string) 
 }
 
 func (s *SnapshotGenerator) generateSnapshotInChroot(distTag string) (err error) {
+	const runChecks = false
 	var (
 		allBuiltRPMs []string
 		repoContents repocloner.RepoContents

@@ -46,8 +46,6 @@ func (s *SimpleToolChroot) ChrootRelativeSpecDir() string {
 //   - chrootName: The name of the chroot to create
 //   - workerTarPath: The path to the tar file containing the worker files
 //   - specsDirPath: The path to the directory containing the spec files
-//   - distTag: The distribution tag to use when parsing RPMs
-//   - runChecks: Whether or not to parse with check sections enabled
 func (s *SimpleToolChroot) InitializeChroot(buildDir, chrootName, workerTarPath, specsDirPath string) (err error) {
 	const (
 		existingDir = false
@@ -70,15 +68,16 @@ func (s *SimpleToolChroot) InitializeChroot(buildDir, chrootName, workerTarPath,
 
 // CleanUp cleans up the chroot environment. This function should be called after all other functions in this package have been
 // called (likely in a defer statement)
-func (s *SimpleToolChroot) CleanUp() {
+func (s *SimpleToolChroot) CleanUp() (err error) {
 	const leaveFilesOnDisk = false
 
 	if s.chroot != nil {
-		s.chroot.Close(leaveFilesOnDisk)
+		err = s.chroot.Close(leaveFilesOnDisk)
 	}
+	return
 }
 
-// Run executes a given function inside the tool's chroot environment.
+// RunInChroot executes a given function inside the tool's chroot environment.
 func (s *SimpleToolChroot) RunInChroot(toRun func() error) (err error) {
 	if s.chroot == nil {
 		return fmt.Errorf("chroot has not been initialized")

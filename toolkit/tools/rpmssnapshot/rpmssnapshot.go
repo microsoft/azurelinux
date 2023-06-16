@@ -38,7 +38,12 @@ func main() {
 	if err != nil {
 		logger.Log.Fatalf("Failed to initialize RPM snapshot generator. Error: %v", err)
 	}
-	defer snapshotGenerator.CleanUp()
+	defer func() {
+		cleanupErr := snapshotGenerator.CleanUp()
+		if cleanupErr != nil {
+			logger.Log.Fatalf("Failed to cleanup snapshot generator. Error: %s", cleanupErr)
+		}
+	}()
 
 	logger.Log.Infof("Generating RPMs snapshot from specs inside (%s).", *specsDirPath)
 	logger.Log.Debugf("Distribution tag: %s.", *distTag)

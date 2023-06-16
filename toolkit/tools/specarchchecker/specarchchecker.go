@@ -49,22 +49,27 @@ func main() {
 
 	archChecker, err := specarchchecker.New(*buildDirPath, *workerTar, *specsDirPath)
 	if err != nil {
-		logger.Log.Fatalf("Failed to initialize spec arch checker. Error: %v", err)
+		logger.Log.Fatalf("Failed to initialize spec arch checker. Error:\n%s", err)
 	}
-	defer archChecker.CleanUp()
+	defer func() {
+		cleanupErr := archChecker.CleanUp()
+		if cleanupErr != nil {
+			logger.Log.Fatalf("Failed to cleanup spec arch checker. Error:\n%s", cleanupErr)
+		}
+	}()
 
 	logger.Log.Infof("Filtering spec list in (%s).", *specsDirPath)
 	logger.Log.Debugf("Distribution tag: %s.", *distTag)
 	logger.Log.Debugf("Input list: %v.", specNames)
 	filteredSpecNames, err := archChecker.FilterSpecsByArch(specNames, *distTag)
 	if err != nil {
-		logger.Log.Fatalf("Failed to filter specs folder (%s) Error: %v", *specsDirPath, err)
+		logger.Log.Fatalf("Failed to filter specs folder (%s) Error:\n%s", *specsDirPath, err)
 	}
 
 	// Print the list of specs that were filtered out space separated into the output file
 	outputString := strings.Join(filteredSpecNames, " ")
 	err = file.Write(outputString, *outputFilteredList)
 	if err != nil {
-		logger.Log.Fatalf("Failed to write output file (%s) Error: %v", *outputFilteredList, err)
+		logger.Log.Fatalf("Failed to write output file (%s) Error:\n%s", *outputFilteredList, err)
 	}
 }
