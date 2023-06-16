@@ -270,6 +270,7 @@ Patch1011:      CVE-2021-3929.patch
 # CVE-2021-4207 is fixed in 7.0.0 by https://gitlab.com/qemu-project/qemu/-/commit/9569f5cb
 Patch1012:      CVE-2021-4207.patch
 Patch1013:      CVE-2022-3165.patch
+Patch1014:      CVE-2021-3750.patch
 
 # alsa audio output
 BuildRequires:  alsa-lib-devel
