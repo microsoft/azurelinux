@@ -65,12 +65,12 @@ extends:
                 #    Once that's fixed, we should remove this step.
                 # 2. The value for 'artifact' cannot be changed, as this is the only value OneBranch accepts.
                 #    We cannot also use pre-defined variables like "drop_$(System.StageName)_$(Agent.JobName)", to automatically track name changes.
-                - task: PublishPipelineArtifact@1
-                  inputs:
-                    artifact: drop_Toolchain_${{ configuration.name }}_Build
-                    targetPath: $(ob_outputDirectory)
-                  condition: always()
-                  displayName: 'Publish toolchain artifacts'
+                # - task: PublishPipelineArtifact@1
+                #   inputs:
+                #     artifact: drop_Toolchain_${{ configuration.name }}_Build
+                #     targetPath: $(ob_outputDirectory)
+                #   condition: always()
+                #   displayName: 'Publish toolchain artifacts'
 
         - stage: RPMs_${{ configuration.name }}
           dependsOn: Toolchain_${{ configuration.name }}
