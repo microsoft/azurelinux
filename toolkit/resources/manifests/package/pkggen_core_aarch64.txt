@@ -111,7 +111,7 @@ openssl-libs-1.1.1k-16.cm1.aarch64.rpm
 openssl-perl-1.1.1k-16.cm1.aarch64.rpm
 openssl-static-1.1.1k-16.cm1.aarch64.rpm
 openssl-debuginfo-1.1.1k-16.cm1.aarch64.rpm
-libcap-2.26-2.cm1.aarch64.rpm
+libcap-2.26-3.cm1.aarch64.rpm
 libcap-devel-2.26-2.cm1.aarch64.rpm
 libcap-ng-0.7.9-3.cm1.aarch64.rpm
 libdb-5.3.28-6.cm1.aarch64.rpm
