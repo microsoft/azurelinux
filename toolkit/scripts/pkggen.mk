@@ -229,6 +229,7 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-
 		$(if $(filter y,$(DELTA_BUILD)),--delta-build) \
 		$(if $(filter y,$(USE_CCACHE)),--use-ccache) \
 		$(if $(filter y,$(ALLOW_TOOLCHAIN_REBUILDS)),--allow-toolchain-rebuilds) \
+		--max-cpu="$(MAX_CPU)" \
 		$(logging_command) && \
 	touch $@
 

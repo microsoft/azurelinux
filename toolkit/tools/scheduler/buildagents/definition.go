@@ -26,6 +26,7 @@ type BuildAgentConfig struct {
 	NoCleanup bool
 	RunCheck  bool
 	UseCcache bool
+	MaxCpu    string
 
 	LogDir   string
 	LogLevel string
