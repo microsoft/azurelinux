@@ -1,0 +1,22 @@
+From d62d7097c009ee867bee992840334dbc12f4f0f3 Mon Sep 17 00:00:00 2001
+From: Oliver Kurth <okurth@gmail.com>
+Date: Fri, 7 Apr 2023 11:53:56 -0700
+Subject: [PATCH] fix printf usage
+
+---
+ tools/config/main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/config/main.c b/tools/config/main.c
+index 2f07e460..e78e767d 100644
+--- a/tools/config/main.c
++++ b/tools/config/main.c
+@@ -462,7 +462,7 @@ int main(int argc, char *argv[])
+                     struct json_dump *jd = cnftree2json(cn_repo);
+                     unlink_node(cn_repo); /* do not dump siblings */
+                     if (jd) {
+-                        printf(jd->buf);
++                        printf("%s", jd->buf);
+                         jd_destroy(jd);
+                     } else
+                         fail(ERR_JSON, "failed to generate json\n");

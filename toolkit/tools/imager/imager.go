@@ -110,16 +110,17 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 	defer timestamp.StopEvent(nil)
 
 	const (
-		assetsMountPoint    = "/installer"
-		localRepoMountPoint = "/mnt/cdrom/RPMS"
-		repoFileMountPoint  = "/etc/yum.repos.d"
-		setupRoot           = "/setuproot"
-		installRoot         = "/installroot"
-		rootID              = "rootfs"
-		defaultDiskIndex    = 0
-		defaultTempDiskName = "disk.raw"
-		existingChrootDir   = false
-		leaveChrootOnDisk   = false
+		assetsMountPoint      = "/installer"
+		localRepoMountPoint   = "/mnt/cdrom/RPMS"
+		repoFileMountPoint    = "/etc/yum.repos.d"
+		setupRoot             = "/setuproot"
+		installRoot           = "/installroot"
+		rootID                = "rootfs"
+		defaultDiskIndex      = 0
+		defaultTempDiskName   = "disk.raw"
+		existingChrootDir     = false
+		leaveChrootOnDisk     = false
+		marinerReleasePackage = "mariner-release"
 	)
 
 	var (
@@ -143,6 +144,11 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 		logger.Log.Error("Failed to import packages from package lists in config file")
 		return
 	}
+
+	// Mariner images don't work appropriately when mariner-release is not installed.
+	// As a stopgap to this, mariner-release will now be added to all images regardless
+	// of presence in the CONFIG_FILE
+	packagesToInstall = append([]string{marinerReleasePackage}, packagesToInstall...)
 
 	isRootFS = len(systemConfig.PartitionSettings) == 0
 	if isRootFS {

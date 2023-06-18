@@ -1,26 +1,33 @@
-From: Pawel <pawelwi@microsoft.com>
-Date: Mon, 28 Dec 2020 14:18:43 -0800
+From: Sam Meluch <sammeluch@microsoft.com>
+Date: Mon, 10 Apr 2023 22:24:58 +0000
 Subject: [PATCH] Mandatory space in list output
 
+---
+ tools/cli/lib/api.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
 diff --git a/tools/cli/lib/api.c b/tools/cli/lib/api.c
-index f277b7c..7b7602c 100644
+index c58c890..f55974b 100644
 --- a/tools/cli/lib/api.c
 +++ b/tools/cli/lib/api.c
-@@ -172,7 +172,7 @@ TDNFCliListCommand(
-         if(snprintf(
-             szNameAndArch,
-             MAX_COL_LEN,
--            "%s.%s",
-+            "%s.%s ",
-             pPkg->pszName,
-             pPkg->pszArch) < 0)
-         {
-@@ -184,7 +184,7 @@ TDNFCliListCommand(
-         if(snprintf(
-             szVersionAndRelease,
-             MAX_COL_LEN,
--            "%s-%s",
-+            "%s-%s ",
-             pPkg->pszVersion,
-             pPkg->pszRelease) < 0)
-         {
+@@ -174,7 +174,7 @@ TDNFCliListPackagesPrint(
+             if(snprintf(
+                 szNameAndArch,
+                 MAX_COL_LEN,
+-                "%s.%s",
++                "%s.%s ",
+                 pPkg->pszName,
+                 pPkg->pszArch) < 0)
+             {
+@@ -186,7 +186,7 @@ TDNFCliListPackagesPrint(
+             if(snprintf(
+                 szVersionAndRelease,
+                 MAX_COL_LEN,
+-                "%s-%s",
++                "%s-%s ",
+                 pPkg->pszVersion,
+                 pPkg->pszRelease) < 0)
+             {
+-- 
+2.33.6
+
