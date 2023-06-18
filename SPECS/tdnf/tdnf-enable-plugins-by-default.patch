@@ -1,9 +1,20 @@
+From: Sam Meluch <sammeluch@microsoft.com>
+Date: Mon, 10 Apr 2023 23:07:00 +0000
+Subject: [PATCH] enable plugins by default
+
+---
+ etc/tdnf/tdnf.conf | 1 +
+ 1 file changed, 1 insertion(+)
+
 diff --git a/etc/tdnf/tdnf.conf b/etc/tdnf/tdnf.conf
-index f8cbc96..a7897ed 100644
+index a10bcbe..67c4d51 100644
 --- a/etc/tdnf/tdnf.conf
 +++ b/etc/tdnf/tdnf.conf
 @@ -4,3 +4,4 @@ installonly_limit=3
- clean_requirements_on_remove=true
+ clean_requirements_on_remove=0
  repodir=/etc/yum.repos.d
  cachedir=/var/cache/tdnf
 +plugins=1
+-- 
+2.33.6
+

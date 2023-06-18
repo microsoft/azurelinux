@@ -1,0 +1,42 @@
+From 17d73f1f7adb72b587b3710a7338996397abc63a Mon Sep 17 00:00:00 2001
+From: Oliver Kurth <okurth@gmail.com>
+Date: Fri, 9 Jun 2023 14:23:52 -0700
+Subject: [PATCH] Fix error when a repo was disabled because it's unavailable.
+ Fixes #431
+
+---
+ client/repo.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/client/repo.c b/client/repo.c
+index 2c9cb9ca..ee0224f8 100644
+--- a/client/repo.c
++++ b/client/repo.c
+@@ -57,6 +57,14 @@ TDNFInitRepo(
+                   NULL);
+     BAIL_ON_TDNF_ERROR(dwError);
+ 
++    if (pRepoData->nHasMetaData) {
++        dwError = TDNFGetRepoMD(pTdnf,
++                                pRepoData,
++                                pszRepoDataDir,
++                                &pRepoMD);
++        BAIL_ON_TDNF_ERROR(dwError);
++    }
++
+     dwError = TDNFAllocateMemory(
+                   1,
+                   sizeof(SOLV_REPO_INFO_INTERNAL),
+@@ -74,12 +82,6 @@ TDNFInitRepo(
+     pRepo->appdata = pSolvRepoInfo;
+ 
+     if (pRepoData->nHasMetaData) {
+-        dwError = TDNFGetRepoMD(pTdnf,
+-                                pRepoData,
+-                                pszRepoDataDir,
+-                                &pRepoMD);
+-        BAIL_ON_TDNF_ERROR(dwError);
+-
+         dwError = SolvCalculateCookieForFile(pRepoMD->pszRepoMD, pSolvRepoInfo->cookie);
+         BAIL_ON_TDNF_ERROR(dwError);
+         pSolvRepoInfo->nCookieSet = 1;

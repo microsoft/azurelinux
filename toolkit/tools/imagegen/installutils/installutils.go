@@ -543,7 +543,6 @@ func initializeRpmDatabase(installRoot string, diffDiskBuild bool) (err error) {
 			return err
 		}
 	}
-	err = initializeTdnfConfiguration(installRoot)
 	return
 }
 
@@ -605,63 +604,6 @@ func TdnfInstallWithProgress(packageName, installRoot string, currentPackagesIns
 		releaseverCliArg)
 	if err != nil {
 		logger.Log.Warnf("Failed to tdnf install: %v. Package name: %v", err, packageName)
-	}
-
-	return
-}
-
-// initializeTdnfConfiguration installs the 'mariner-release' package
-// into the clean RPM root. The package is used by tdnf to properly set
-// the default values for its variables and internal configuration.
-func initializeTdnfConfiguration(installRoot string) (err error) {
-	const (
-		squashErrors   = false
-		releasePackage = "mariner-release"
-	)
-
-	var (
-		releaseverCliArg string
-	)
-
-	logger.Log.Debugf("Downloading '%s' package to a clean RPM root under '%s'.", releasePackage, installRoot)
-
-	releaseverCliArg, err = tdnf.GetReleaseverCliArg()
-	if err != nil {
-		return
-	}
-
-	err = shell.ExecuteLive(squashErrors, "tdnf", "download", releaseverCliArg, "--alldeps", "--destdir", installRoot, releasePackage)
-	if err != nil {
-		logger.Log.Errorf("Failed to prepare the RPM database on downloading the 'mariner-release' package: %v", err)
-		return
-	}
-
-	rpmSearch := filepath.Join(installRoot, "*.rpm")
-	rpmFiles, err := filepath.Glob(rpmSearch)
-	if err != nil {
-		logger.Log.Errorf("Failed to prepare the RPM database while searching for RPM files: %v", err)
-		return
-	}
-
-	defer func() {
-		logger.Log.Tracef("Cleaning up leftover RPM files after installing 'mariner-release' package under '%s'.", installRoot)
-		for _, file := range rpmFiles {
-			err = os.Remove(file)
-			if err != nil {
-				logger.Log.Errorf("Failed to prepare the RPM database on removing leftover file (%s): %v", file, err)
-				return
-			}
-		}
-	}()
-
-	logger.Log.Debugf("Installing 'mariner-release' package to a clean RPM root under '%s'.", installRoot)
-
-	rpmArgs := []string{"-i", "--root", installRoot}
-	rpmArgs = append(rpmArgs, rpmFiles...)
-	err = shell.ExecuteLive(squashErrors, "rpm", rpmArgs...)
-	if err != nil {
-		logger.Log.Errorf("Failed to prepare the RPM database on installing the 'mariner-release' package: %v", err)
-		return
 	}
 
 	return
