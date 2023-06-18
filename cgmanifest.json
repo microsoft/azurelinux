@@ -3746,16 +3746,6 @@
     {
       "component": {
         "type": "other",
-        "other": {
-          "name": "fonts-rpm-macros",
-          "version": "2.0.5",
-          "downloadUrl": "https://pagure.io/fonts-rpm-macros/archive/2.0.5/fonts-rpm-macros-2.0.5.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
         "comment": "Imported as part of the 'xorg-x11-font-utils' package, version 7.5",
         "other": {
           "name": "font-util",
@@ -3791,6 +3781,16 @@
           "name": "fontpackages",
           "version": "1.44",
           "downloadUrl": "https://github.com/pnemade/fontpackages/archive/refs/tags/1.44.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "fonts-rpm-macros",
+          "version": "2.0.5",
+          "downloadUrl": "https://pagure.io/fonts-rpm-macros/archive/2.0.5/fonts-rpm-macros-2.0.5.tar.gz"
         }
       }
     },
@@ -12013,6 +12013,16 @@
           "name": "livepatch-5.15.112.1-2.cm2",
           "version": "1.0.0",
           "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.112.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "livepatch-5.15.116.1-1.cm2",
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.116.1.tar.gz"
         }
       }
     },
@@ -24593,9 +24603,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-virtualenv",
-          "version": "20.14.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/4a/c3/04f361a90ed4e6b3f3f696d61db5c786eaa741d2a6c125bc905b8a1c0200/virtualenv-20.14.0.tar.gz"
+          "name": "python-virt-firmware",
+          "version": "23.5",
+          "downloadUrl": "https://files.pythonhosted.org/packages/c2/f8/204dc513d2d3f0f3d3aead03600f7db1b763cf02998ad7b35e7ac5ef6849/virt-firmware-23.5.tar.gz"
         }
       }
     },
@@ -24603,9 +24613,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-virt-firmware",
-          "version": "23.5",
-          "downloadUrl": "https://files.pythonhosted.org/packages/c2/f8/204dc513d2d3f0f3d3aead03600f7db1b763cf02998ad7b35e7ac5ef6849/virt-firmware-23.5.tar.gz"
+          "name": "python-virtualenv",
+          "version": "20.14.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/4a/c3/04f361a90ed4e6b3f3f696d61db5c786eaa741d2a6c125bc905b8a1c0200/virtualenv-20.14.0.tar.gz"
         }
       }
     },
