@@ -24,19 +24,14 @@ import (
 var (
 	app = kingpin.New("imageconfigvalidator", "A tool for validating image configuration files")
 
-	logFile  = exe.LogFileFlag(app)
-	logLevel = exe.LogLevelFlag(app)
+	logFile   = exe.LogFileFlag(app)
+	logLevel  = exe.LogLevelFlag(app)
+	profFlags = exe.SetupProfileFlags(app)
 
 	input       = exe.InputStringFlag(app, "Path to the image config file.")
 	baseDirPath = exe.InputDirFlag(app, "Base directory for relative file paths from the config.")
 
 	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
-	enableCpuProf = app.Flag("enable-cpu-prof", "Enable CPU pprof data collection.").Bool()
-	enableMemProf = app.Flag("enable-mem-prof", "Enable Memory pprof data collection.").Bool()
-	enableTrace   = app.Flag("enable-trace", "Enable trace data collection.").Bool()
-	cpuProfFile   = app.Flag("cpu-prof-file", "File that stores CPU pprof data.").String()
-	memProfFile   = app.Flag("mem-prof-file", "File that stores Memory pprof data.").String()
-	traceFile     = app.Flag("trace-file", "File that stores trace data.").String()
 )
 
 func main() {
@@ -46,7 +41,7 @@ func main() {
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
 
-	prof, err := profile.StartProfiling(*cpuProfFile, *memProfFile, *traceFile, *enableCpuProf, *enableMemProf, *enableTrace)
+	prof, err := profile.StartProfiling(*profFlags.CpuProfFile, *profFlags.MemProfFile, *profFlags.TraceFile, *profFlags.EnableCpuProf, *profFlags.EnableMemProf, *profFlags.EnableTrace)
 	if err != nil {
 		logger.Log.Warnf("Could not start profiling: %s", err)
 		return

@@ -24,15 +24,10 @@ var (
 
 	logFile          = exe.LogFileFlag(app)
 	logLevel         = exe.LogLevelFlag(app)
+	profFlags        = exe.SetupProfileFlags(app)
 	strictGoals      = app.Flag("strict-goals", "Don't allow missing goal packages").Bool()
 	strictUnresolved = app.Flag("strict-unresolved", "Don't allow missing unresolved packages").Bool()
 	timestampFile    = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
-	enableCpuProf    = app.Flag("enable-cpu-prof", "Enable CPU pprof data collection.").Bool()
-	enableMemProf    = app.Flag("enable-mem-prof", "Enable Memory pprof data collection.").Bool()
-	enableTrace      = app.Flag("enable-trace", "Enable trace data collection.").Bool()
-	cpuProfFile      = app.Flag("cpu-prof-file", "File that stores CPU pprof data.").String()
-	memProfFile      = app.Flag("mem-prof-file", "File that stores Memory pprof data.").String()
-	traceFile        = app.Flag("trace-file", "File that stores trace data.").String()
 
 	depGraph = pkggraph.NewPkgGraph()
 )
@@ -44,7 +39,7 @@ func main() {
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
 
-	prof, err := profile.StartProfiling(*cpuProfFile, *memProfFile, *traceFile, *enableCpuProf, *enableMemProf, *enableTrace)
+	prof, err := profile.StartProfiling(*profFlags.CpuProfFile, *profFlags.MemProfFile, *profFlags.TraceFile, *profFlags.EnableCpuProf, *profFlags.EnableMemProf, *profFlags.EnableTrace)
 	if err != nil {
 		logger.Log.Warnf("Could not start profiling: %s", err)
 		return
