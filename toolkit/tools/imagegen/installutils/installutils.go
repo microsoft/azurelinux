@@ -923,22 +923,6 @@ func addEntryToCrypttab(installRoot string, devicePath string, encryptedRoot dis
 	return
 }
 
-// InstallGrubEnv installs an empty grubenv f
-func InstallGrubEnv(installRoot string) (err error) {
-	const (
-		assetGrubEnvFile = "/installer/grub2/grubenv"
-		grubEnvFile      = "boot/grub2/grubenv"
-	)
-	installGrubEnvFile := filepath.Join(installRoot, grubEnvFile)
-	err = file.CopyAndChangeMode(assetGrubEnvFile, installGrubEnvFile, bootDirectoryDirMode, bootDirectoryFileMode)
-	if err != nil {
-		logger.Log.Warnf("Failed to copy and change mode of grubenv: %v", err)
-		return
-	}
-
-	return
-}
-
 // InstallGrubCfg installs the main grub config to the boot partition
 // - installRoot is the base install directory
 // - rootDevice holds the root partition
@@ -949,8 +933,8 @@ func InstallGrubEnv(installRoot string) (err error) {
 // This boot partition specifically indicates where to find the kernel, config files, and initrd
 func InstallGrubCfg(installRoot, rootDevice, bootUUID, bootPrefix string, encryptedRoot diskutils.EncryptedRootDevice, kernelCommandLine configuration.KernelCommandLine, readOnlyRoot diskutils.VerityDevice) (err error) {
 	const (
-		assetGrubcfgFile = "/installer/grub2/grub.cfg"
-		grubCfgFile      = "boot/grub2/grub.cfg"
+		assetGrubcfgFile = "/installer/grub2/grub"
+		grubCfgFile      = "etc/default/grub"
 	)
 
 	// Copy the bootloader's grub.cfg and set the file permission
@@ -1025,6 +1009,24 @@ func InstallGrubCfg(installRoot, rootDevice, bootUUID, bootPrefix string, encryp
 	if err != nil {
 		logger.Log.Warnf("Failed to append extra command line parameterse in grub.cfg: %v", err)
 		return
+	}
+
+	os.Setenv("GRUB_DEVICE_UUID", bootUUID)
+	os.Setenv("GRUB_DISABLE_LINUX_UUID", "false")
+
+	grubConfFile := filepath.Join(installRoot, "boot", "grub2", "grub.cfg")
+
+	var (
+		stdout string
+		stderr string
+	)
+
+	stdout, stderr, err = shell.Execute("grub2-mkconfig", "-o", grubConfFile)
+	if err != nil {
+		logger.Log.Warnf("Failed to run grub2-mkconfig: %v", err)
+		logger.Log.Warn(stdout)
+		logger.Log.Warn(stderr)
+		return err
 	}
 
 	return
@@ -2027,6 +2029,20 @@ func setGrubCfgSELinux(grubPath string, kernelCommandline configuration.KernelCo
 	err = sed(selinuxPattern, selinux, kernelCommandline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set grub.cfg's SELinux setting: %v", err)
+	}
+
+	return
+}
+
+func setGrubUUID(grubPath string, kernelCommandline configuration.KernelCommandLine) (err error) {
+	const (
+		extraPattern = "{{.BootUUID}}"
+	)
+
+	logger.Log.Debugf("Updating BootUUID('%s') to '%s'", kernelCommandline.ExtraCommandLine, grubPath)
+	err = sed(extraPattern, kernelCommandline.ExtraCommandLine, kernelCommandline.GetSedDelimeter(), grubPath)
+	if err != nil {
+		logger.Log.Warnf("Failed to update Boot UUID in grub.cfg: %v", err)
 	}
 
 	return

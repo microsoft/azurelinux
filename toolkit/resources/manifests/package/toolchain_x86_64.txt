@@ -128,6 +128,7 @@ gpgme-devel-1.16.0-1.cm2.x86_64.rpm
 grep-3.7-2.cm2.x86_64.rpm
 grep-debuginfo-3.7-2.cm2.x86_64.rpm
 grep-lang-3.7-2.cm2.x86_64.rpm
+grub2-2.06-11.cm2.aarch64.rpm
 gtk-doc-1.33.2-1.cm2.noarch.rpm
 gzip-1.12-1.cm2.x86_64.rpm
 gzip-debuginfo-1.12-1.cm2.x86_64.rpm

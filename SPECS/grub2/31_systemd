@@ -1,0 +1,9 @@
+#!/bin/sh
+cat <<EOF
+
+if [ -f  $bootprefix/systemd.cfg ]; then
+        load_env -f $bootprefix/systemd.cfg
+else
+        set systemd_cmdline=net.ifnames=0
+fi
+EOF

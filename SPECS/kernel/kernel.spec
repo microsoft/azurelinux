@@ -28,7 +28,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.15.116.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -244,14 +244,6 @@ install -vm 744 vmlinux %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmli
 # `perf test vmlinux` needs it
 ln -s vmlinux-%{uname_r} %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux
 
-cat > %{buildroot}/boot/linux-%{uname_r}.cfg << "EOF"
-# GRUB Environment Block
-mariner_cmdline=init=/lib/systemd/systemd ro loglevel=3 no-vmw-sta crashkernel=256M
-mariner_linux=vmlinuz-%{uname_r}
-mariner_initrd=initrd.img-%{uname_r}
-EOF
-chmod 600 %{buildroot}/boot/linux-%{uname_r}.cfg
-
 # hmac sign the kernel for FIPS
 %{sha512hmac} %{buildroot}/boot/vmlinuz-%{uname_r} | sed -e "s,$RPM_BUILD_ROOT,," > %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac
 cp %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac %{buildroot}/lib/modules/%{uname_r}/.vmlinuz.hmac
@@ -317,19 +309,10 @@ rm -rf /boot/initrd.img-%{uname_r}
 echo "initrd of kernel %{uname_r} removed" >&2
 
 %postun
-if [ ! -e /boot/mariner.cfg ]
-then
-     ls /boot/linux-*.cfg 1> /dev/null 2>&1
-     if [ $? -eq 0 ]
-     then
-          list=`ls -tu /boot/linux-*.cfg | head -n1`
-          test -n "$list" && ln -sf "$list" /boot/mariner.cfg
-     fi
-fi
+grub2-mkconfig -o /boot/grub2/grub.cfg
 
 %post
 /sbin/depmod -a %{uname_r}
-ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 
 %post drivers-accessibility
 /sbin/depmod -a %{uname_r}
@@ -348,7 +331,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 /boot/config-%{uname_r}
 /boot/vmlinuz-%{uname_r}
 /boot/.vmlinuz-%{uname_r}.hmac
-%config(noreplace) /boot/linux-%{uname_r}.cfg
 %config %{_localstatedir}/lib/initramfs/kernel/%{uname_r}
 %defattr(0644,root,root)
 /lib/modules/%{uname_r}/*
@@ -422,6 +404,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Wed May 17 2023 Andy Zaugg <azaugg@linkedin.com> - 5.15.116.1-2
+- Removed Mariner cfg files from kernel and moving to grub2-mkconfig
+
 * Tue Jun 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.116.1-1
 - Auto-upgrade to 5.15.116.1
 

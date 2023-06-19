@@ -1,0 +1,11 @@
+GRUB_TIMEOUT=5
+GRUB_DISTRIBUTOR="$(sed 's, release .*$,,g' /etc/system-release)"
+GRUB_DISABLE_LINUX_UUID=false
+GRUB_DEVICE_UUID="{{.BootUUID}}"
+GRUB_DEFAULT=saved
+GRUB_DISABLE_SUBMENU=true
+GRUB_TERMINAL_OUTPUT="console"
+GRUB_CMDLINE_LINUX="{{.LuksUUID}} {{.LVM}} {{.IMAPolicy}} {{.ReadOnlyVerityRoot}} {{.SELinux}} rd.auto=1 root=$rootdevice $mariner_cmdline lockdown=integrity sysctl.kernel.unprivileged_bpf_disabled=1 $systemd_cmdline {{.CGroup}} {{.ExtraCommandLine}} $kernelopts"
+GRUB_DISABLE_RECOVERY="true"
+GRUB_ENABLE_BLSCFG=true
+

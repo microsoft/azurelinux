@@ -6,7 +6,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,6 +15,7 @@ URL:            https://www.gnu.org/software/grub
 Source0:        https://git.savannah.gnu.org/cgit/grub.git/snapshot/grub-%{version}.tar.gz
 Source1:        https://git.savannah.gnu.org/cgit/gnulib.git/snapshot/gnulib-%{gnulibversion}.tar.gz
 Source2:        sbat.csv.in
+Source3:        31_systemd
 # Incorporate relevant patches from Fedora 34
 # EFI Secure Boot / Handover Protocol patches
 Patch0001:      0001-Add-support-for-Linux-EFI-stub-loading.patch
@@ -284,6 +285,7 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %config() %{_sysconfdir}/grub.d/20_linux_xen
 %config() %{_sysconfdir}/grub.d/30_os-prober
 %config() %{_sysconfdir}/grub.d/30_uefi-firmware
+%config() %{_sysconfdir}/grub.d/31_systemd
 %config(noreplace) %{_sysconfdir}/grub.d/40_custom
 %config(noreplace) %{_sysconfdir}/grub.d/41_custom
 %{_sysconfdir}/grub.d/README
@@ -291,7 +293,7 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %{_bindir}/*
 %{_datarootdir}/grub/*
 %{_sysconfdir}/sysconfig/grub
-%{_sysconfdir}/default/grub
+%attr(0644,root,root) %ghost %config(noreplace) %{_sysconfdir}/default/grub
 %ghost %config(noreplace) /boot/%{name}/grub.cfg
 
 %ifarch x86_64
@@ -327,6 +329,10 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %endif
 
 %changelog
+* Wed May 17 2023 Andy Zaugg <azaugg@linkedin.com> - 2.06-11
+- Adding defaults to /etc/defaults/grub to support grub tools with Mariner
+- Added 31_systemd for mariner specific systemd configurations
+
 * Thu Jun 08 2023 Daniel McIlvaney <damcilva@microsoft.com> - 2.06-10
 - CVE-2022-3775
 
