@@ -125,6 +125,9 @@ CDI_GIT_TREE_STATE="clean" \
 	cmd/cdi-uploadproxy \
 	cmd/cdi-uploadserver \
 	cmd/cdi-operator \
+  tools/cdi-containerimage-server \
+  tools/cdi-image-size-detection \
+  tools/cdi-source-update-poller \
 	%{nil}
 
 ./hack/build/build-manifests.sh
@@ -135,6 +138,7 @@ mkdir -p %{buildroot}%{_bindir}
 install -p -m 0755 _out/cmd/cdi-apiserver/cdi-apiserver %{buildroot}%{_bindir}/virt-cdi-apiserver
 
 install -p -m 0755 cmd/cdi-cloner/cloner_startup.sh %{buildroot}%{_bindir}/
+
 install -p -m 0755 _out/cmd/cdi-cloner/cdi-cloner %{buildroot}%{_bindir}/
 
 install -p -m 0755 _out/cmd/cdi-controller/cdi-controller %{buildroot}%{_bindir}/virt-cdi-controller
@@ -146,6 +150,12 @@ install -p -m 0755 _out/cmd/cdi-operator/cdi-operator %{buildroot}%{_bindir}/vir
 install -p -m 0755 _out/cmd/cdi-uploadproxy/cdi-uploadproxy %{buildroot}%{_bindir}/virt-cdi-uploadproxy
 
 install -p -m 0755 _out/cmd/cdi-uploadserver/cdi-uploadserver %{buildroot}%{_bindir}/virt-cdi-uploadserver
+
+install -p -m 0755 _out/tools/cdi-containerimage-server/cdi-containerimage-server %{buildroot}%{_bindir}/cdi-containerimage-server
+
+install -p -m 0755 _out/tools/cdi-image-size-detection/cdi-image-size-detection %{buildroot}%{_bindir}/cdi-image-size-detection
+
+install -p -m 0755 _out/tools/cdi-source-update-poller/cdi-source-update-poller %{buildroot}%{_bindir}/cdi-source-update-poller
 
 # Install release manifests
 mkdir -p %{buildroot}%{_datadir}/cdi/manifests/release
@@ -197,6 +207,9 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %{_datadir}/cdi/manifests
 
 %changelog
+* Mon Jun 19 2023 Aditya Dubey <adityadubey@microsoft.com> - 1.55.0-1
+- Adding tools/ binaries to spec
+
 * Fri May 26 2023 Aditya Dubey <adityadubey@microsoft.com> - 1.55.0-0
 - Update to verion 1.55.0
 
