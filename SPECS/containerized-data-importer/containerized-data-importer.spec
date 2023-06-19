@@ -198,21 +198,6 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %doc README.md
 %{_bindir}/virt-cdi-uploadserver
 
-%files containerimage-server
-%license LICENSE
-%doc README.md
-%{_bindir}/cdi-containerimage-server
-
-%files image-size-detection
-%license LICENSE
-%doc README.md
-%{_bindir}/cdi-image-size-detection
-
-%files source-update-poller
-%license LICENSE
-%doc README.md
-%{_bindir}/cdi-source-update-poller
-
 %files manifests
 %license LICENSE
 %doc README.md
@@ -220,6 +205,9 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %dir %{_datadir}/cdi/manifests
 %dir %{_datadir}/cdi/manifests/release
 %{_datadir}/cdi/manifests
+%{_bindir}/cdi-containerimage-server
+%{_bindir}/cdi-image-size-detection
+%{_bindir}/cdi-source-update-poller
 
 %changelog
 * Mon Jun 19 2023 Aditya Dubey <adityadubey@microsoft.com> - 1.55.0-1
