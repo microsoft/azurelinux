@@ -54,6 +54,9 @@ const (
 
 	// MarinerCCacheDefine enables ccache in the Mariner build system
 	MarinerCCacheDefine = "mariner_ccache_enabled"
+
+	// MaxCPUDefine specifies the max number of CPUs to use for parallel build
+	MaxCPUDefine = "_smp_ncpus_max"
 )
 
 const (
