@@ -7,7 +7,7 @@
 ######## CONTAINER ENV ########
 
 # General targets
-.PHONY: containerized-rpmbuild
+.PHONY: containerized-rpmbuild containerized-rpmbuild-help
 containerized_build_args :=
 ifneq ($(MODE),)
 containerized_build_args += -m ${MODE}
@@ -29,9 +29,8 @@ ifeq ($(ENABLE_REPO),y)
 containerized_build_args += --enable-local-repo
 endif
 
-ifneq ($(usage),)
-containerized_build_args = --help
-endif
-
 containerized-rpmbuild:
 	$(SCRIPTS_DIR)/containerized-build/create_container_build.sh $(containerized_build_args)
+
+containerized-rpmbuild-help:
+	$(SCRIPTS_DIR)/containerized-build/create_container_build.sh --help

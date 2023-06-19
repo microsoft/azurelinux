@@ -1,5 +1,5 @@
 [host_build_repo]
-name=Mariner Local Build Repo
+name=Mariner Host Build Repo
 baseurl=file:///repo/
 gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY
 enabled=1

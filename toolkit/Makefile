@@ -164,7 +164,7 @@ include $(SCRIPTS_DIR)/tools.mk
 include $(SCRIPTS_DIR)/srpm_pack.mk
 
 # Create local build env for building RPMs with:
-#   containerized-rpmbuild
+#   containerized-rpmbuild containerized-rpmbuild-help
 include $(SCRIPTS_DIR)/containerized-build.mk
 
 # Expand local SRPMS into sources and SPECS with:

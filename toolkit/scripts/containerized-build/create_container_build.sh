@@ -6,10 +6,9 @@
 set -e
 
 script_dir=$( realpath "$(dirname "$0")" )
-specs_dir=/usr/src/mariner/SPECS
-sources_dir=/usr/src/mariner/SOURCES
-chroot_dir=/usr/src/mariner/BUILD
-chroot_dir2=/usr/src/mariner/BUILDROOT
+topdir=/usr/src/mariner
+container_build_dir=/usr/src/mariner/BUILD
+container_buildroot_dir=/usr/src/mariner/BUILDROOT
 enable_local_repo=false
 
 function switch_to_red_text() {
@@ -35,7 +34,8 @@ Starts a docker container with the specified version of mariner. Mounts REPO_PAT
 to /mnt/RPMS.
 
 In the 'build' mode, mounts REPO_PATH/build/INTERMEDIATE_SRPMS at /mnt/INTERMEDIATE_SRPMS;
-REPO_PATH/SPECS at ${specs_dir} and REPO_PATH/build/container-chroot at ${chroot_dir}
+REPO_PATH/SPECS at ${topdir}/SPECS; REPO_PATH/build/container-build at ${container_build_dir} and
+REPO_PATH/build/container-buildroot at ${container_buildroot_dir}
 
 Optional arguments:
     REPO_PATH:      path to the CBL-Mariner repo root directory. default: "current directory"
@@ -66,19 +66,10 @@ while (( "$#")); do
   esac
 done
 
-#echo "***** mode is ${mode}"
-#echo "***** repo_path is ${repo_path}"
-#echo "***** extra_mounts is ${extra_mounts}"
-#echo "***** version is ${version}"
-
 [[ -z "${repo_path}" ]] && repo_path="$(dirname $0)" && repo_path=${repo_path%'/toolkit'*}
 [[ ! -d "${repo_path}" ]] && { print_error " Directory ${repo_path} does not exist"; exit 1; }
 [[ -z "${mode}" ]] && mode="build"
 [[ -z  "${version}" ]] && version="2.0"
-#echo "***** mode is ${mode}"
-#echo "***** repo_path is ${repo_path}"
-#echo "***** extra_mounts is ${extra_mounts}"
-#echo "***** version is ${version}"
 
 echo "Running in ${mode} mode, requires root..."
 sudo echo "Running as root!"
@@ -97,11 +88,11 @@ sudo make input-srpms SRPM_FILE_SIGNATURE_HANDLING="update" > /dev/null
 # ============ Map chroot mount ============
 if [[ "${mode}" == "build" ]]; then
     # Create a new directory and map it to chroot directory in container
-    if [ -d "${repo_path}/build/container-chroot" ]; then rm -Rf ${repo_path}/build/container-chroot; fi
-    if [ -d "${repo_path}/build/container-chroot2" ]; then rm -Rf ${repo_path}/build/container-chroot2; fi
-    mkdir ${repo_path}/build/container-chroot
-    mkdir ${repo_path}/build/container-chroot2
-    mounts="${mounts} ${repo_path}/build/container-chroot:${chroot_dir} ${repo_path}/build/container-chroot2:${chroot_dir2}"
+    if [ -d "${repo_path}/build/container-build" ]; then rm -Rf ${repo_path}/build/container-build; fi
+    if [ -d "${repo_path}/build/container-buildroot" ]; then rm -Rf ${repo_path}/build/container-buildroot; fi
+    mkdir ${repo_path}/build/container-build
+    mkdir ${repo_path}/build/container-buildroot
+    mounts="${mounts} ${repo_path}/build/container-build:${container_build_dir} ${repo_path}/build/container-buildroot:${container_buildroot_dir}"
 fi
 
 # ========= Setup mounts + Welcome file =========
@@ -112,7 +103,7 @@ cat "${script_dir}/resources/welcome_1.txt.template" > "${build_dir}/welcome.txt
 mounts="${mounts} ${repo_path}/out/RPMS:/mnt/RPMS"
 if [[ "${mode}" == "build" ]]; then
     # Add extra build mounts
-    mounts="${mounts} ${repo_path}/build/INTERMEDIATE_SRPMS:/mnt/INTERMEDIATE_SRPMS ${repo_path}/SPECS:${specs_dir}"
+    mounts="${mounts} ${repo_path}/build/INTERMEDIATE_SRPMS:/mnt/INTERMEDIATE_SRPMS ${repo_path}/SPECS:${topdir}/SPECS"
 fi
 
 for mount in $mounts $extra_mounts; do
@@ -128,26 +119,9 @@ for mount in $mounts $extra_mounts; do
 done
 
 sed -i "s~<REPO_PATH>~${repo_path}~" "${build_dir}/welcome.txt"
-sed -i "s~<SPECS_DIR>~${specs_dir}~" "${script_dir}/resources/add_shell_functions.txt"
-sed -i "s~<SOURCES_DIR>~${sources_dir}~" "${script_dir}/resources/add_shell_functions.txt"
 
 # ============ Build the dockerfile ============
-echo "Updating dockerfile from template..."
-dockerfile="${build_dir}/mariner.Dockerfile"
-#echo "***** dockerfile is ${dockerfile}"
-#echo "***** build_dir is ${build_dir}"
-#echo "***** script_dir is ${script_dir}"
-#echo "***** repo_path is ${repo_path}"
-#echo "***** mounts is ${mounts}"
-#echo "***** version is ${version}"
-#echo "***** mount_arg is ${mount_arg}"
-
-if [[  "${mode}" == "build" ]]; then # Select the correct dockerfile
-    cp "${script_dir}/resources/build.Dockerfile.template" "${dockerfile}"
-else
-    cp "${script_dir}/resources/test.Dockerfile.template" "${dockerfile}"
-fi
-sed -i "s/<VER>/${version}/" "${dockerfile}"
+dockerfile="${script_dir}/resources/mariner.Dockerfile"
 
 if [[  "${mode}" == "build" ]]; then # Configure base image
     echo "Importing chroot into docker..."
@@ -167,17 +141,23 @@ else
     sudo docker pull -q "mcr.microsoft.com/cbl-mariner/base/core:${version}"
 fi
 
-if [[ "${enable_local_repo}" == "true" ]]; then
-    echo "RUN echo "enable_local_repo" >> /root/.bashrc" >> "${dockerfile}"
-fi
-
 # ================== Launch Container ==================
 echo "Checking if build env is up-to-date..."
-docker_image_name="mcr.microsoft.com/cbl-mariner/${USER}_tmp_pkgtest_${version}"
-sudo docker build -q -f "${dockerfile}" -t "${docker_image_name}" .
+docker_image_tag="mariner-containerizedbuild"
+tag=$(date +'%y%m%d.%H%M')
+sudo docker build -q \
+                -f "${dockerfile}" \
+                -t "${docker_image_tag}:${tag}" \
+                --build-arg version="$version" \
+                --build-arg mode="$mode" \
+                --build-arg enable_local_repo="$enable_local_repo" \
+                --build-arg topdir="$topdir" \
+                .
 
-echo "***** docker_image_name is ${docker_image_name}..."
+sudo docker tag ${docker_image_tag}:${tag} ${docker_image_tag}:latest
+
+echo "***** docker_image_tag is ${docker_image_tag}..."
 sudo bash -c "docker run --rm \
                     ${mount_arg} \
-                    -it ${docker_image_name} /bin/bash; \
+                    -it ${docker_image_tag}:latest /bin/bash; \
                     [[ -d ${repo_path}/out/RPMS/repodata ]] && { rm -r ${repo_path}/out/RPMS/repodata; echo 'Clearing repodata' ; }"

@@ -1,6 +1,7 @@
-SPECS_DIR=/usr/src/mariner/SPECS
-SOURCES_DIR=/usr/src/mariner/SOURCES
-RPMS_DIR=/usr/src/mariner/RPMS
+SPECS_DIR=<SPECS_DIR>
+SOURCES_DIR=<SOURCES_DIR>
+RPMS_DIR=<RPMS_DIR>
+IS_REPO_ENABLED=false
 
 # Create symlink from SPECS/ to SOURCES/ when rpm is called
 rpm() {
@@ -38,8 +39,34 @@ show_help() {
     cat /mariner_docker_stuff/welcome.txt
 }
 
+tdnf() {
+    if [[ ${IS_REPO_ENABLED} = true ]] ; then
+        refresh_local_repo
+        tdnf makecache
+    fi
+    local args=("$@")
+    command "$FUNCNAME" "${args[@]}"
+}
+
+dnf() {
+    if [[ ${IS_REPO_ENABLED} = true ]] ; then
+        refresh_local_repo
+        tdnf makecache
+    fi
+    local args=("$@")
+    command "$FUNCNAME" "${args[@]}"
+}
+
+# Refresh metadata for local RPMs' repo
+refresh_local_repo() {
+    echo "refreshing the local repo"
+    pushd $RPMS_DIR
+    createrepo .
+}
+
 # Satisfy dependencies from local RPMs
 enable_local_repo() {
+    IS_REPO_ENABLED=true
     mv /etc/yum.repos.d/local_repo.not_a_repo /etc/yum.repos.d/local_repo.repo
     pushd /repo
     createrepo .
