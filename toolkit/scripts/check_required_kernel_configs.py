@@ -72,25 +72,28 @@ def print_verbose(req_config_json_file, kernel, arch, results):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description="Tool for checking if known required kernel configs are present.")
-
-
     parser.add_argument('--required_configs', help='path to json of required configs', required=True)
     parser.add_argument('--config_file', help='path to config being checked', required=True)
     parser.add_argument('--verbose', action='store_true', help='get full report', required=False)
+    parser.add_argument('--kernel', help='kernel for the config being checked', required=False)
     args = parser.parse_args()
     required_configs = args.required_configs
     config_file = args.config_file
-
-    kernel = extract_kernel_dir_name(config_file)
+    if args.kernel:
+        kernel = args.kernel
+    else:
+        kernel = extract_kernel_dir_name(config_file)
     if kernel == None:
-        print("Kernel not found in config filepath")
+        print("ERROR: Kernel name not found. Please provide kernel name using --kernel flag or ensure config file path is correct")
         sys.exit(1)
+    else:
+        print(f"Analyzing for Kernel: {kernel}")
 
     input_config_data = get_data_from_config(config_file)
 
     arch = extract_config_arch(input_config_data)
     if arch == None:
-        print("Architecture not found in config file")
+        print("ERROR: Architecture not found in config file")
         sys.exit(1)
 
     config_map = create_map_of_config_values(input_config_data)

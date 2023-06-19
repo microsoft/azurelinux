@@ -30,7 +30,6 @@ def find_missing_configs(config_json_path, kernel, arch, config_diff):
         if kernel not in config_json_data:
             print(f"Kernel {kernel} not found in {config_json_path}")
             print(f"Please provide required configs for {kernel} in {config_json_path}")
-            print(f"Exiting...")
             return None
         required_configs_data = config_json_data[kernel]['required-configs']
 
@@ -44,39 +43,45 @@ def find_missing_configs(config_json_path, kernel, arch, config_diff):
             missing_configs.append(config_option)
     return missing_configs
 
+## Main
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+    description="Tool for checking new configs are present in required configs JSON.")
+    parser.add_argument('--required_configs', help='path to JSON of required configs', required=True)
+    parser.add_argument('--config_file', help='path to config', required=True)
+    parser.add_argument('--config_diff', help='diff showing changes for just the config_file', required=True)
+    parser.add_argument('--kernel', help='kernel for the config being checked', required=False)
+    args = parser.parse_args()
+    required_configs = args.required_configs
+    config_file = args.config_file
+    config_diff = args.config_diff
+    if args.kernel:
+        kernel = args.kernel
+    else:
+        kernel = extract_kernel_dir_name(config_file)
+    if kernel == None:
+        print("ERROR: Kernel name not found. Please provide kernel name using --kernel flag or ensure config file path is correct")
+        sys.exit(1)
+    else:
+        print(f"Analyzing for Kernel: {kernel}")
 
-parser = argparse.ArgumentParser(
-description="Tool for checking new configs are present in required configs JSON.")
-parser.add_argument('--required_configs', help='path to JSON of required configs', required=True)
-parser.add_argument('--config_file', help='path to config', required=True)
-parser.add_argument('--config_diff', help='diff showing changes for just the config_file', required=True)
-args = parser.parse_args()
-required_configs = args.required_configs
-config_file = args.config_file
-config_diff = args.config_diff
+    input_config_data = get_data_from_config(config_file)
 
-kernel = extract_kernel_dir_name(config_file)
-if kernel == None:
-    print("Kernel not found in config filepath")
-    sys.exit(1)
+    arch = extract_config_arch(input_config_data)
+    if arch == None:
+        print("ERROR: Architecture not found in config file")
+        sys.exit(1)
 
-input_config_data = get_data_from_config(config_file)
+    missing_configs = find_missing_configs(required_configs, kernel, arch, config_diff)
+    if missing_configs == None:
+        print(f"ERROR: Could not find required configs for {kernel}")
+        sys.exit(0)
 
-arch = extract_config_arch(input_config_data)
-if arch == None:
-    print("Architecture not found in config file")
-    sys.exit(1)
-
-missing_configs = find_missing_configs(required_configs, kernel, arch, config_diff)
-if missing_configs == None:
-    print(f"Could not find required configs for {kernel}")
-    sys.exit(0)
-
-if len(missing_configs) == 0:
-    print("All configs are present in required configs")
-else:
-    print (f"====================== Kernel new config verification FAILED for {arch} ======================")
-    print(f"New configs detected for {arch}. Please add the following to {required_configs}")
-    for word in missing_configs:
-        print(word)
-    sys.exit(1)
+    if len(missing_configs) == 0:
+        print("All configs are present in required configs")
+    else:
+        print (f"====================== Kernel new config verification FAILED for {arch} ======================")
+        print(f"New configs detected for {arch}. Please add the following to {required_configs}")
+        for word in missing_configs:
+            print(word)
+        sys.exit(1)
