@@ -11,6 +11,7 @@ Distribution:   Mariner
 Source0:        https://ftp.gnu.org/pub/gnu/%{name}/%{name}-ttf-%{version}.zip
 
 # BUG in Mariner RPMbuilder not providing zip
+BuildRequires: fontconfig
 BuildRequires: unzip
 
 %description
@@ -24,6 +25,7 @@ UCS (Universal Character Set).
 %install
 mkdir -p %{buildroot}%{_fontdir}
 mv *.ttf %{buildroot}%{_fontdir}/
+fc-cache
 
 %files
 %defattr(-,root,root)

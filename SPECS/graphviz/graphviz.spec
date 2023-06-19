@@ -267,7 +267,7 @@ sed -i 's|_MY_JAVA_INCLUDES_|-I%{java_home}/include/ -I%{java_home}/include/linu
 
 %configure --with-x --disable-static --disable-dependency-tracking \
 	--without-mylibgd --with-ipsepcola --with-pangocairo \
-	--without-gdk-pixbuf --with-visio --disable-silent-rules \
+	--without-gdk-pixbuf --with-visio --disable-silent-rules --with-freetypeincludedir="/usr/include/freetype2" --with-freetypelibdir="/usr/lib" \
   --without-ruby --without-python2 \
 %if ! %{LASI}
 	--without-lasi \
