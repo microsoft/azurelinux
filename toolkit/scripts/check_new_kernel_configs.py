@@ -76,7 +76,7 @@ if len(missing_configs) == 0:
     print("All configs are present in required configs")
 else:
     print (f"====================== Kernel new config verification FAILED for {arch} ======================")
-    print(f"New configs detected for {arch}. Please add the following to toolkit/scripts/mariner-required-configs.json")
+    print(f"New configs detected for {arch}. Please add the following to {required_configs}")
     for word in missing_configs:
         print(word)
     sys.exit(1)
