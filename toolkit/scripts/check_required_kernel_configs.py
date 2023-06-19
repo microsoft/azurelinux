@@ -37,7 +37,7 @@ def check_required_configs_in_configfile(req_config_json_file, kernel, arch, inp
                 }
         # check if required configs removed from the kernel's config file
         # Note that some required configs are required to be missing
-        elif "" not in req_value['value']: 
+        elif "<missing>" not in req_value['value']: 
                 incorrect_configs[config_option] = {
                     "newValue": "MISSING",
                     "expectedValue": req_value['value'],

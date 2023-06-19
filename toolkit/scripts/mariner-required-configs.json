@@ -478,7 +478,7 @@
             "CONFIG_INIT_ON_FREE_DEFAULT_ON": {
                 "value": [
                     "is not set",
-                    ""
+                    "<missing>"
                 ],
                 "arch": [
                     "AMD64",
@@ -542,7 +542,7 @@
             },
             "CONFIG_CC_CAN_LINK_STATIC": {
                 "value": [
-                    ""
+                    "<missing>"
                 ],
                 "arch": [
                     "AMD64",
@@ -697,7 +697,7 @@
             "CONFIG_SECURITY_SMACK": {
                 "value": [
                     "is not set",
-                    ""
+                    "<missing>"
                 ],
                 "arch": [
                     "AMD64",
