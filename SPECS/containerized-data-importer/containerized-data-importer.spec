@@ -128,6 +128,7 @@ CDI_GIT_TREE_STATE="clean" \
 	tools/cdi-containerimage-server \
 	tools/cdi-image-size-detection \
 	tools/cdi-source-update-poller \
+	tools/csv-generator \
 	%{nil}
 
 ./hack/build/build-manifests.sh
@@ -156,6 +157,8 @@ install -p -m 0755 _out/tools/cdi-containerimage-server/cdi-containerimage-serve
 install -p -m 0755 _out/tools/cdi-image-size-detection/cdi-image-size-detection %{buildroot}%{_bindir}/cdi-image-size-detection
 
 install -p -m 0755 _out/tools/cdi-source-update-poller/cdi-source-update-poller %{buildroot}%{_bindir}/cdi-source-update-poller
+
+install -p -m 0755 _out/tools/csv-generator/csv-generator %{buildroot}%{_bindir}/csv-generator
 
 # Install release manifests
 mkdir -p %{buildroot}%{_datadir}/cdi/manifests/release
@@ -208,6 +211,7 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %{_bindir}/cdi-containerimage-server
 %{_bindir}/cdi-image-size-detection
 %{_bindir}/cdi-source-update-poller
+%{_bindir}/csv-generator
 
 %changelog
 * Mon Jun 19 2023 Aditya Dubey <adityadubey@microsoft.com> - 1.55.0-1
