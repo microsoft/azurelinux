@@ -171,7 +171,7 @@ openssl-libs-1.1.1k-24.cm2.aarch64.rpm
 openssl-perl-1.1.1k-24.cm2.aarch64.rpm
 openssl-static-1.1.1k-24.cm2.aarch64.rpm
 libcap-2.60-2.cm2.aarch64.rpm
-libcap-devel-2.60-1.cm2.aarch64.rpm
+libcap-devel-2.60-2.cm2.aarch64.rpm
 debugedit-5.0-1.cm2.aarch64.rpm
 libarchive-3.6.1-2.cm2.aarch64.rpm
 libarchive-devel-3.6.1-2.cm2.aarch64.rpm
