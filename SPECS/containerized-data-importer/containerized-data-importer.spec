@@ -198,6 +198,21 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %doc README.md
 %{_bindir}/virt-cdi-uploadserver
 
+%files containerimage-server
+%license LICENSE
+%doc README.md
+%{_bindir}/cdi-containerimage-server
+
+%files image-size-detection
+%license LICENSE
+%doc README.md
+%{_bindir}/cdi-image-size-detection
+
+%files source-update-poller
+%license LICENSE
+%doc README.md
+%{_bindir}/cdi-source-update-poller
+
 %files manifests
 %license LICENSE
 %doc README.md
