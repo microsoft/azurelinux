@@ -62,8 +62,7 @@ if __name__ == '__main__':
     if kernel == None:
         print("ERROR: Kernel name not found. Please provide kernel name using --kernel flag or ensure config file path is correct")
         sys.exit(1)
-    else:
-        print(f"Analyzing for Kernel: {kernel}")
+    print(f"Analyzing for Kernel: {kernel}")
 
     input_config_data = get_data_from_config(config_file)
 

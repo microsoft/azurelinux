@@ -19,7 +19,7 @@ def get_jsondata_from_jsonfile(input_json_file):
     return config_json_data
 
 def extract_kernel_dir_name(input_file):
-    match =  os.path.basename(os.path.dirname(input_file))
+    match = os.path.basename(os.path.dirname(input_file))
     if match:
         return match
     else:
