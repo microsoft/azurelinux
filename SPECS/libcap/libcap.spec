@@ -1,13 +1,15 @@
 Summary:		Libcap
 Name:			libcap
 Version:		2.26
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:		GPLv2+
 URL:			https://www.gnu.org/software/hurd/community/gsoc/project_ideas/libcap.html
 Source0:		https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/%{name}-%{version}.tar.xz
 Group:			System Environment/Security
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+Patch0:         CVE-2023-2603.patch
+
 %description
 The libcap package implements the user-space interfaces to the POSIX 1003.1e capabilities available
 in Linux kernels. These capabilities are a partitioning of the all powerful root privilege
@@ -23,7 +25,7 @@ The libcap-devel package contains libraries, header files and documentation
 for developing applications that use libcap.
 
 %prep
-%setup -q
+%autosetup -p1
 %build
 sed -i 's:LIBDIR:PAM_&:g' pam_cap/Makefile
 make %{?_smp_mflags}
@@ -54,6 +56,9 @@ sed -i "s|pass_capsh --chroot=\$(/bin/pwd) ==||g" quicktest.sh
 %{_mandir}/man3/*
 
 %changelog
+* Thu Jun 15 2023 Henry Li <lihl@microsoft.com> - 2.26-3
+- Add patch to resolve CVE-2023-2603
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.26-2
 - Added %%license line automatically
 
