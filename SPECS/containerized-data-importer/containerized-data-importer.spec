@@ -18,7 +18,7 @@
 Summary:        Container native virtualization
 Name:           containerized-data-importer
 Version:        1.55.0
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -215,10 +215,10 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %{_datadir}/cdi/manifests
 
 %changelog
-* Mon Jun 19 2023 Aditya Dubey <adityadubey@microsoft.com> - 1.55.0-1
+* Mon Jun 19 2023 Aditya Dubey <adityadubey@microsoft.com> - 1.55.0-11
 - Adding tools/ binaries to spec
 
-* Fri May 26 2023 Aditya Dubey <adityadubey@microsoft.com> - 1.55.0-0
+* Fri May 26 2023 Aditya Dubey <adityadubey@microsoft.com> - 1.55.0-10
 - Update to verion 1.55.0
 
 * Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.51.0-10
