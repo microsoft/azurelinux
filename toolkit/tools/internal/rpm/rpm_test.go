@@ -106,7 +106,7 @@ func TestArchShouldFailForExcludedArchitectures(t *testing.T) {
 
 func TestShouldListOnlySubpackageWithArchitectureInRPMsList(t *testing.T) {
 	expectedRPMs := []string{
-		fmt.Sprintf("subpackage_name-1.0.0-1%s.%s", defines[definesDistKey], buildArch),
+		fmt.Sprintf("subpackage_name-0:1.0.0-1%s.%s", defines[definesDistKey], buildArch),
 	}
 	specFilePath := filepath.Join(specsDir, "no_default_package.spec")
 

@@ -177,8 +177,12 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, out
 		timestamp.StartEvent("restore packages", nil)
 
 		// If an input summary file was provided, simply restore the cache using the file.
+		cachingSucceeded = true
 		err = repoutils.RestoreClonedRepoContents(cloner, inputSummaryFile)
-		cachingSucceeded = err == nil
+		if err != nil {
+			logger.Log.Debugf("Failed to restore cloned repo contents: %s", err)
+			cachingSucceeded = false
+		}
 
 		timestamp.StopEvent(nil) // restore packages
 	}

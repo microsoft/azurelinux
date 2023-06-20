@@ -658,12 +658,13 @@ func convertPackageVersionToTdnfArg(pkgVer *pkgjson.PackageVer) (tdnfArg string)
 	// To avoid significant overhead we only download the latest version of a package
 	// for ">" and ">=" constraints (ie remove constraints).
 	switch pkgVer.Condition {
-	case "<=", "<", "=":
+	case "":
+	case "=":
+		tdnfArg = fmt.Sprintf("%s-%s", pkgVer.Name, pkgVer.Version)
+	case "<=", "<":
 		tdnfArg = fmt.Sprintf("%s %s %s", pkgVer.Name, pkgVer.Condition, pkgVer.Version)
-	case ">", ">=", "":
-		if pkgVer.Condition != "" {
-			logger.Log.Warnf("Discarding '%s' version constraint for: %v", pkgVer.Condition, pkgVer)
-		}
+	case ">", ">=":
+		logger.Log.Warnf("Discarding '%s' version constraint for: %v", pkgVer.Condition, pkgVer)
 	default:
 		logger.Log.Errorf("Unsupported version constraint: %s", pkgVer.Condition)
 	}
