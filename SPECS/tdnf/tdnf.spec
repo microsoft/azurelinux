@@ -5,7 +5,7 @@
 Summary:        dnf/yum equivalent using C libs
 Name:           tdnf
 Version:        3.5.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2.1 AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -29,6 +29,7 @@ Patch4:         tdnf-sqlite-library.patch
 # Patch to be removed once we upgrade to a version of tdnf which contains the upstream fix
 # https://github.com/vmware/tdnf/pull/432
 Patch5:         tdnf-GetRepoMD-fix.patch
+Patch6:		tdnf-dotarch.patch
 #Cmake requires binutils
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -224,6 +225,9 @@ fi
 /%{_lib}/systemd/system/tdnf*
 
 %changelog
+* Thu Jun 15 2023 Sam Meluch <sammeluch@microsoft.com> - 3.5.2-2
+- add patch for SELECTION_DOTARCH in solv/tdnfquery.c
+
 * Wed Apr 12 2023 Sam Meluch <sammeluch@microsoft.com> - 3.5.2-1
 - Update tdnf to version 3.5.2
 - Remove tdnf download patch in favor of upstream --downloadonly functionality
