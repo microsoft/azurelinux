@@ -52,8 +52,6 @@ const (
 	rpmSpecBuiltRPMRegexDistributionIndex
 	rpmSpecBuiltRPMRegexArchitectureIndex
 	rpmSpecBuiltRPMRegexMatchesCount
-
-	chrootName = "rpmssnapshot_chroot"
 )
 
 type SnapshotGenerator struct {
@@ -62,6 +60,7 @@ type SnapshotGenerator struct {
 
 // New creates a new snapshot generator. If the chroot is created successfully, the caller is responsible for calling CleanUp().
 func New(buildDirPath, workerTarPath, specsDirPath string) (newSnapshotGenerator *SnapshotGenerator, err error) {
+	const chrootName = "rpmssnapshot_chroot"
 	newSnapshotGenerator = &SnapshotGenerator{}
 	err = newSnapshotGenerator.simpleToolChroot.InitializeChroot(buildDirPath, chrootName, workerTarPath, specsDirPath)
 
