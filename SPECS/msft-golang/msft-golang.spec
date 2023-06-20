@@ -115,6 +115,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Tue Jun 06 2023 Bala <balakumaran.kannan@microsoft.com> - 1.19.10-1
+- Upgrade to 1.19.10 to fix CVE-2023-29404
+
 * Wed Apr 05 2023 Muhammad Falak <mwani@microsoft.com> - 1.19.8-1
 - Bump version to address CVE-2023-24534, CVE-2023-24536, CVE-2023-24537, CVE-2023-24538
 
