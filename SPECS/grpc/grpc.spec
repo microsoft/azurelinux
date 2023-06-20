@@ -1,7 +1,7 @@
 Summary:        Open source remote procedure call (RPC) framework
 Name:           grpc
 Version:        1.42.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -98,7 +98,6 @@ popd
 %install
 pushd cmake/build
 %cmake_install
-find %{buildroot} -name '*.cmake' -delete
 popd
 
 #python
@@ -135,6 +134,7 @@ export GRPC_PYTHON_BUILD_SYSTEM_ABSL=True
 %{_libdir}/libgrpcpp_channelz.so
 %{_libdir}/libupb.so
 %{_libdir}/pkgconfig/*.pc
+%{_libdir}/cmake/*
 
 %files plugins
 %license LICENSE
