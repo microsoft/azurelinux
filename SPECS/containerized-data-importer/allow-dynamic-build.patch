@@ -1,0 +1,20 @@
+diff --git a/hack/build/build-go.sh b/hack/build/build-go.sh
+index 9514723656..9ab28a434c 100755
+--- a/hack/build/build-go.sh
++++ b/hack/build/build-go.sh
+@@ -54,10 +54,14 @@ elif [ "${go_opt}" == "build" ]; then
+         outLink=${BIN_DIR}/${BIN_NAME}
+         rm -f ${outFile}
+         rm -f ${outLink}
++        static_flag=""
++        if [ "$tgt" == "tools/cdi-containerimage-server" ]; then
++          static_flag="static"
++        fi
+         (
+             cd $tgt
+             # Only build executables for linux
+-            GOOS=linux go build -o ${outFile} -ldflags '-extldflags "static"' -ldflags "$(cdi::version::ldflags)"
++            GOOS=linux go build -o ${outFile} -tags strictfipsruntime -ldflags '-extldflags $static_flag' -ldflags "$(cdi::version::ldflags)"
+ 
+             ln -sf ${outFile} ${outLink}
+         )

@@ -25,6 +25,7 @@ Distribution:   Mariner
 Group:          System/Packages
 URL:            https://github.com/kubevirt/containerized-data-importer
 Source0:        https://github.com/kubevirt/containerized-data-importer/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         allow-dynamic-build.patch
 BuildRequires:  golang
 BuildRequires:  golang-packaging
 BuildRequires:  libnbd-devel
