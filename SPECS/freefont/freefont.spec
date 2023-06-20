@@ -36,6 +36,7 @@ fc-cache
 * Tue Jun 20 2023 Osama Esmail <osamaesmail@microsoft.com> - 20120503-3
 - Added `BuildRequires: fontconfig`
 - Run `fc-cache` after install
+- License verified
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 20120503-2
 - Added %%license line automatically
