@@ -83,7 +83,8 @@ for component in etcd-dump-db etcd-dump-logs; do
     pushd tools/$component
     tar --no-same-owner -xf %{_builddir}/%{name}-%{version}/vendor-$component.tar.gz
     go build \
-        -o %{ETCD_TOOLS_OUT_DIR}
+        -o %{ETCD_TOOLS_OUT_DIR} \
+        -ldflags "-s -w"
     popd
 done
 

@@ -34,7 +34,7 @@ export CGO_ENABLED=0
 export GO111MODULE=on
 
 cd %{_topdir}/BUILD/%{name}-%{version}/go-md2man-2.0.0
-go build -mod vendor -o go-md2man
+go build -mod vendor -o go-md2man -ldflags "-s -w"
 
 %install
 mkdir -p "%{buildroot}%{_bindir}"

@@ -53,7 +53,7 @@ export GOGC=off
 
 cd %{OUR_GOPATH}/src/github.com/docker/buildx
 go build -mod=vendor \
-    -ldflags "-X github.com/docker/buildx/version.Version=%{version} -X github.com/docker/buildx/version.Revision=%{BUILDX_GITCOMMIT} -X github.com/docker/buildx/version.Package=github.com/docker/buildx" \
+    -ldflags "-X github.com/docker/buildx/version.Version=%{version} -X github.com/docker/buildx/version.Revision=%{BUILDX_GITCOMMIT} -X github.com/docker/buildx/version.Package=github.com/docker/buildx -s -w" \
     -o buildx \
     ./cmd/buildx
 
