@@ -107,6 +107,7 @@ kubernetes installation with kubectl apply.
 # like symlinks in go path are not resolved correctly. Hence the sources need
 # to be 'physically' placed into the proper location.
 %setup -q -n go/src/kubevirt.io/%{name} -c -T
+%patch0 -p1 
 tar --strip-components=1 -xf %{SOURCE0}
 
 %build
