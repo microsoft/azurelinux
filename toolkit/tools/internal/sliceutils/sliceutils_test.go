@@ -87,14 +87,14 @@ func TestStringShouldMatchForNilInBoth(t *testing.T) {
 }
 
 func TestStringsSetToSliceShouldCreateEmptySliceFromNil(t *testing.T) {
-	outputSlice := StringsSetToSlice(nil)
+	outputSlice := SetToSlice[string](nil)
 
 	assert.NotNil(t, outputSlice)
 	assert.Empty(t, outputSlice)
 }
 
 func TestStringsSetToSliceShouldCreateEmptySliceFromEmptySet(t *testing.T) {
-	outputSlice := StringsSetToSlice(map[string]bool{})
+	outputSlice := SetToSlice(map[string]bool{})
 
 	assert.NotNil(t, outputSlice)
 	assert.Empty(t, outputSlice)
@@ -107,7 +107,7 @@ func TestStringsSetToSliceShouldReturnValuesForAllTrueElementsInSet(t *testing.T
 		"X": false,
 		"Y": false,
 	}
-	outputSlice := StringsSetToSlice(inputSet)
+	outputSlice := SetToSlice(inputSet)
 
 	assert.NotNil(t, outputSlice)
 	assert.Len(t, outputSlice, 2)

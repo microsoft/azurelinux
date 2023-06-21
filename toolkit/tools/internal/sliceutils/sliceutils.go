@@ -74,19 +74,30 @@ func PackageVersSetToSlice(inputSet map[*pkgjson.PackageVer]bool) []*pkgjson.Pac
 	return outputSlice[:index]
 }
 
-// StringsSetToSlice converts a map[string]bool to a slice containing the map's keys.
-func StringsSetToSlice(inputSet map[string]bool) []string {
-	index := 0
-	outputSlice := make([]string, len(inputSet))
+func RemoveDuplicates[T comparable](inputSlice []T) []T {
+	return SetToSlice(SliceToSet(inputSlice))
+}
 
+// SetToSlice converts a map[T]bool to a slice containing the map's keys.
+func SetToSlice[T comparable](inputSet map[T]bool) []T {
+	index := 0
+	outputSlice := make([]T, len(inputSet))
 	for element, elementInSet := range inputSet {
 		if elementInSet {
 			outputSlice[index] = element
 			index++
 		}
 	}
-
 	return outputSlice[:index]
+}
+
+// SliceToSet converts a slice ot T to a map[T]bool.
+func SliceToSet[T comparable](inputSlice []T) map[T]bool {
+	outputSet := make(map[T]bool)
+	for _, element := range inputSlice {
+		outputSet[element] = true
+	}
+	return outputSet
 }
 
 func nilCheck(expected interface{}, given interface{}) (checkValid, checkResult bool) {
