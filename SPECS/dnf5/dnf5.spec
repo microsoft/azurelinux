@@ -20,12 +20,12 @@
 %bcond_without modulemd
 %bcond_without zchunk
 %bcond_with    html
-%bcond_without man
+%bcond_with    man
 # TODO Go bindings fail to build, disable for now
 %bcond_with    go
-%bcond_without perl5
+%bcond_with    perl5
 %bcond_without python3
-%bcond_without ruby
+%bcond_with    ruby
 %bcond_with    clang
 %bcond_with    sanitizers
 %bcond_without tests
@@ -49,7 +49,7 @@ BuildRequires:  cmake
 BuildRequires:  doxygen
 BuildRequires:  gettext
 BuildRequires:  pkg-config
-BuildRequires:  toml11-static
+BuildRequires:  toml11-devel
 BuildRequires:  pkgconfig(check)
 BuildRequires:  pkgconfig(fmt)
 BuildRequires:  pkgconfig(json-c)
@@ -159,6 +159,8 @@ It supports RPM packages, modulemd modules, and comps groups & environments.
 %verify(not md5 size mtime) %ghost %{_libdir}/sysimage/dnf/*
 %license COPYING.md
 %license gpl-2.0.txt
+
+%if %{with man}
 %{_mandir}/man8/dnf5.8.*
 %{_mandir}/man8/dnf5-advisory.8.*
 %{_mandir}/man8/dnf5-autoremove.8.*
@@ -190,6 +192,7 @@ It supports RPM packages, modulemd modules, and comps groups & environments.
 # TODO(jkolarik): modularity is not ready yet
 # %%{_mandir}/man7/dnf5-modularity.7.*
 %{_mandir}/man7/dnf5-specs.7.*
+%endif
 
 # ========== libdnf5 ==========
 %package -n libdnf5
@@ -450,7 +453,9 @@ Command-line interface for dnf5daemon-server.
 %{_bindir}/dnf5daemon-client
 %license COPYING.md
 %license gpl-2.0.txt
+%if %{with man}
 %{_mandir}/man8/dnf5daemon-client.8.*
+%endif
 %endif
 
 
@@ -486,8 +491,10 @@ Package management service with a DBus interface.
 %{_datadir}/polkit-1/actions/org.rpm.dnf.v0.policy
 %license COPYING.md
 %license gpl-2.0.txt
+%if %{with man}
 %{_mandir}/man8/dnf5daemon-server.8.*
 %{_mandir}/man8/dnf5daemon-dbus-api.8.*
+%endif
 %endif
 
 
@@ -504,9 +511,11 @@ Core DNF5 plugins that enhance dnf5 with builddep, changelog, copr, and repoclos
 
 %files -n dnf5-plugins
 %{_libdir}/dnf5/plugins/*.so
+%if %{with man}
 %{_mandir}/man8/dnf5-builddep.8.*
 %{_mandir}/man8/dnf5-copr.8.*
 %{_mandir}/man8/dnf5-repoclosure.8.*
+%endif
 %endif
 
 
