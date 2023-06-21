@@ -60,7 +60,7 @@ sed -i "s|pass_capsh --chroot=\$(/bin/pwd) ==||g" quicktest.sh
 %{_mandir}/man3/*
 
 %changelog
-* Thu JUn 15 2023 Henry Li <lihl@microsoft.com> - 2.60-2
+* Thu Jun 15 2023 Henry Li <lihl@microsoft.com> - 2.60-2
 - Add patch to resolve CVE-2023-2602 and CVE-2023-2603
 - Use autosetup
 
