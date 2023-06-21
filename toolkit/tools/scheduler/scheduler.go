@@ -100,7 +100,7 @@ func main() {
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
 
-	prof, err := profile.StartProfiling(*profFlags.CpuProfFile, *profFlags.MemProfFile, *profFlags.TraceFile, *profFlags.EnableCpuProf, *profFlags.EnableMemProf, *profFlags.EnableTrace)
+	prof, err := profile.StartProfiling(profFlags)
 	if err != nil {
 		logger.Log.Warnf("Could not start profiling: %s", err)
 		return

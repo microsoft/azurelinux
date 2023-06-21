@@ -6,6 +6,8 @@ import (
 	"runtime"
 	"runtime/pprof"
 	"runtime/trace"
+
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 )
 
 type Profiler struct {
@@ -14,15 +16,15 @@ type Profiler struct {
 	traceFile   *os.File
 }
 
-func StartProfiling(cpuProfFile, memProfFile, traceFile string, enableCpuProf, enableMemProf, enableTrace bool) (*Profiler, error) {
+func StartProfiling(pf *exe.ProfileFlags) (*Profiler, error) {
 	p := &Profiler{
 		cpuProfFile: nil,
 		memProfFile: nil,
 		traceFile:   nil,
 	}
 
-	if enableCpuProf {
-		cpf, err := os.Create(cpuProfFile)
+	if *pf.EnableCpuProf {
+		cpf, err := os.Create(*pf.CpuProfFile)
 		if err != nil {
 			return nil, fmt.Errorf("Unable to create cpu-pprof file: %s", err)
 		}
@@ -31,8 +33,8 @@ func StartProfiling(cpuProfFile, memProfFile, traceFile string, enableCpuProf, e
 		p.cpuProfFile = cpf
 	}
 
-	if enableMemProf {
-		mpf, err := os.Create(cpuProfFile)
+	if *pf.EnableMemProf {
+		mpf, err := os.Create(*pf.CpuProfFile)
 		if err != nil {
 			return nil, fmt.Errorf("Unable to create mem-pprof file: %s", err)
 		}
@@ -44,8 +46,8 @@ func StartProfiling(cpuProfFile, memProfFile, traceFile string, enableCpuProf, e
 		p.memProfFile = mpf
 	}
 
-	if enableTrace {
-		tf, err := os.Create(traceFile)
+	if *pf.EnableTrace {
+		tf, err := os.Create(*pf.TraceFile)
 		if err != nil {
 			return nil, fmt.Errorf("Unable to create trace file: %s", err)
 		}
