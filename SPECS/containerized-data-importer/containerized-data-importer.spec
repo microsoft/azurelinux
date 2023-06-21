@@ -25,7 +25,6 @@ Distribution:   Mariner
 Group:          System/Packages
 URL:            https://github.com/kubevirt/containerized-data-importer
 Source0:        https://github.com/kubevirt/containerized-data-importer/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:         allow-dynamic-build.patch
 BuildRequires:  golang
 BuildRequires:  golang-packaging
 BuildRequires:  libnbd-devel
@@ -107,7 +106,6 @@ kubernetes installation with kubectl apply.
 # like symlinks in go path are not resolved correctly. Hence the sources need
 # to be 'physically' placed into the proper location.
 %setup -q -n go/src/kubevirt.io/%{name} -c -T
-%patch0 -p1 
 tar --strip-components=1 -xf %{SOURCE0}
 
 %build
@@ -127,11 +125,12 @@ CDI_GIT_TREE_STATE="clean" \
 	cmd/cdi-uploadproxy \
 	cmd/cdi-uploadserver \
 	cmd/cdi-operator \
-	tools/cdi-containerimage-server \
 	tools/cdi-image-size-detection \
 	tools/cdi-source-update-poller \
 	tools/csv-generator \
 	%{nil}
+
+CGO_ENABLED=0 ./hack/build/build-go.sh build tools/cdi-containerimage-server
 
 ./hack/build/build-manifests.sh
 
