@@ -31,8 +31,8 @@ func Find(slice interface{}, searched interface{}, cond func(interface{}, interf
 }
 
 // FindMatches returns a new slice keeping only these elements from slice that matcher returned true for.
-func FindMatches(slice []string, isMatch func(string) bool) []string {
-	result := []string{}
+func FindMatches[T comparable](slice []T, isMatch func(T) bool) []T {
+	result := []T{}
 	for _, v := range slice {
 		if isMatch(v) {
 			result = append(result, v)
@@ -57,21 +57,6 @@ func PackageVerMatch(expected, given interface{}) bool {
 	}
 
 	return reflect.DeepEqual(expected.(*pkgjson.PackageVer), given.(*pkgjson.PackageVer))
-}
-
-// PackageVersSetToSlice converts a map[*pkgjson.PackageVer]bool to a slice containing the map's keys.
-func PackageVersSetToSlice(inputSet map[*pkgjson.PackageVer]bool) []*pkgjson.PackageVer {
-	index := 0
-	outputSlice := make([]*pkgjson.PackageVer, len(inputSet))
-
-	for element, elementInSet := range inputSet {
-		if elementInSet {
-			outputSlice[index] = element
-			index++
-		}
-	}
-
-	return outputSlice[:index]
 }
 
 func RemoveDuplicates[T comparable](inputSlice []T) []T {

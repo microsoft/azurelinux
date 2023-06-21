@@ -18,14 +18,14 @@ func TestMain(m *testing.M) {
 }
 
 func TestPackageVersSetToSliceShouldCreateEmptySliceFromNil(t *testing.T) {
-	outputSlice := PackageVersSetToSlice(nil)
+	outputSlice := SetToSlice[*pkgjson.PackageVer](nil)
 
 	assert.NotNil(t, outputSlice)
 	assert.Empty(t, outputSlice)
 }
 
 func TestPackageVersSetToSliceShouldCreateEmptySliceFromEmptySet(t *testing.T) {
-	outputSlice := PackageVersSetToSlice(map[*pkgjson.PackageVer]bool{})
+	outputSlice := SetToSlice(map[*pkgjson.PackageVer]bool{})
 
 	assert.NotNil(t, outputSlice)
 	assert.Empty(t, outputSlice)
@@ -38,7 +38,7 @@ func TestPackageVersSetToSliceShouldReturnValuesForAllTrueElementsInSet(t *testi
 		existingPackageVer: true,
 		missingPackageVer:  false,
 	}
-	outputSlice := PackageVersSetToSlice(inputSet)
+	outputSlice := SetToSlice(inputSet)
 
 	assert.NotNil(t, outputSlice)
 	assert.Len(t, outputSlice, 1)
