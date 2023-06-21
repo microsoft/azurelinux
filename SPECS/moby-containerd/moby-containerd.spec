@@ -4,7 +4,7 @@
 Summary:        Industry-standard container runtime
 Name:           moby-%{upstream_name}
 Version:        1.6.6+azure
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -107,6 +107,9 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 
 %changelog
+* Wed Jun 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.6.6+azure-10
+- Bump release to rebuild with go 1.19.10
+
 * Wed Mar 01 2023 Mitch Zhu <mitchzhu@microsoft.com> - 1.6.6+azure-9
 - Add patch to fix CVE-2023-25153
 

@@ -1,7 +1,7 @@
 Summary:        CLI tool for spawning and running containers per OCI spec.
 Name:           moby-runc
 Version:        1.1.5+azure
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -108,6 +108,9 @@ cp %{SOURCE7} %{buildroot}%{_docdir}/%{name}-%{version}/LICENSE
 %{_mandir}/*/*
 
 %changelog
+* Wed Jun 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.5+azure-2
+- Bump release to rebuild with go 1.19.10
+
 * Thu Apr 13 2023 Rohit Rawat <rohitrawat@microsoft.com> - 1.1.5+azure-1
 - Bump release to fix CVE-2023-28642, CVE-2023-27561, CVE-2023-25809
 
