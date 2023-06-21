@@ -61,7 +61,7 @@ BuildRequires:  bison
 BuildRequires:  expat-devel
 BuildRequires:  flex
 BuildRequires:  fontconfig-devel
-BuildRequires:  freefont
+# BuildRequires:  freefont
 BuildRequires:  freetype-devel >= 2
 BuildRequires:  gd-devel
 BuildRequires:  gmp-devel
@@ -86,6 +86,7 @@ BuildRequires:  swig >= 1.3.33
 BuildRequires:  tcl-devel >= 8.3
 BuildRequires:  zlib-devel
 BuildRequires:  pkgconfig(cairo) >= 1.1.10
+Requires(post): fontconfig
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 %if %{PHP}
@@ -148,7 +149,7 @@ Provides some additional PDF and HTML documentation for graphviz.
 %package gd
 Summary:        Graphviz plugin for renderers based on gd
 Requires:       %{name} = %{version}-%{release}
-Requires:       freefont
+# Requires:       freefont
 Requires(post): %{_bindir}/dot
 Requires(post): /sbin/ldconfig
 Requires(postun): %{_bindir}/dot
@@ -267,8 +268,9 @@ sed -i 's|_MY_JAVA_INCLUDES_|-I%{java_home}/include/ -I%{java_home}/include/linu
 
 %configure --with-x --disable-static --disable-dependency-tracking \
 	--without-mylibgd --with-ipsepcola --with-pangocairo \
-	--without-gdk-pixbuf --with-visio --disable-silent-rules --with-freetypeincludedir="%{_includedir}/freetype2" --with-freetypelibdir="%{_libdir}" \
-  --without-ruby --without-python2 \
+	--without-gdk-pixbuf --with-visio --disable-silent-rules \
+    --with-freetypeincludedir="%{_includedir}/freetype2" --with-freetypelibdir="%{_libdir}" \
+    --without-ruby --without-python2 \
 %if ! %{LASI}
 	--without-lasi \
 %endif
@@ -372,6 +374,7 @@ php --no-php-ini \
 # make rtest
 
 %post
+fc-cache
 %{?ldconfig}
 %{_bindir}/dot -c 2>/dev/null || :
 
