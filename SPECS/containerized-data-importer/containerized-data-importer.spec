@@ -110,7 +110,6 @@ tar --strip-components=1 -xf %{SOURCE0}
 
 %build
 
-export CGO_ENABLED=0
 export GOPATH=%{_builddir}/go
 export GOFLAGS+="-buildmode=pie -mod=vendor"
 env \
@@ -118,7 +117,7 @@ CDI_SOURCE_DATE_EPOCH="$(date -r LICENSE +%s)" \
 CDI_GIT_COMMIT='v%{version}' \
 CDI_GIT_VERSION='v%{version}' \
 CDI_GIT_TREE_STATE="clean" \
-./hack/build/build-go.sh build \
+CGO_ENABLED=0 ./hack/build/build-go.sh build \
 	cmd/cdi-apiserver \
 	cmd/cdi-cloner \
 	cmd/cdi-controller \
