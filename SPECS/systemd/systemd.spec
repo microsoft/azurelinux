@@ -48,7 +48,6 @@ BuildRequires:  tpm2-tss-devel
 BuildRequires:  util-linux-devel
 BuildRequires:  xz-devel
 Requires:       %{name}-rpm-macros = %{version}-%{release}
-Requires:       audit
 Requires:       glib
 Requires:       kmod
 Requires:       libcap
