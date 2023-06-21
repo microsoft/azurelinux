@@ -25,6 +25,7 @@ Distribution:   Mariner
 Group:          System/Packages
 URL:            https://github.com/kubevirt/containerized-data-importer
 Source0:        https://github.com/kubevirt/containerized-data-importer/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         allow-dynamic-build.patch
 BuildRequires:  golang
 BuildRequires:  golang-packaging
 BuildRequires:  libnbd-devel
@@ -117,7 +118,7 @@ CDI_SOURCE_DATE_EPOCH="$(date -r LICENSE +%s)" \
 CDI_GIT_COMMIT='v%{version}' \
 CDI_GIT_VERSION='v%{version}' \
 CDI_GIT_TREE_STATE="clean" \
-CGO_ENABLED=0 ./hack/build/build-go.sh build \
+./hack/build/build-go.sh build \
 	cmd/cdi-apiserver \
 	cmd/cdi-cloner \
 	cmd/cdi-controller \
