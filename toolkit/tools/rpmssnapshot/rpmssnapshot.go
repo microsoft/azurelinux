@@ -34,9 +34,20 @@ func main() {
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
 
-	snapshotGenerator := rpmssnapshot.New(*buildDirPath, *workerTar)
+	snapshotGenerator, err := rpmssnapshot.New(*buildDirPath, *workerTar, *specsDirPath)
+	if err != nil {
+		logger.Log.Fatalf("Failed to initialize RPM snapshot generator. Error: %v", err)
+	}
+	defer func() {
+		cleanupErr := snapshotGenerator.CleanUp()
+		if cleanupErr != nil {
+			logger.Log.Fatalf("Failed to cleanup snapshot generator. Error: %s", cleanupErr)
+		}
+	}()
 
-	err := snapshotGenerator.GenerateSnapshot(*specsDirPath, *outputSnapshotPath, *distTag)
+	logger.Log.Infof("Generating RPMs snapshot from specs inside (%s).", *specsDirPath)
+	logger.Log.Debugf("Distribution tag: %s.", *distTag)
+	err = snapshotGenerator.GenerateSnapshot(*outputSnapshotPath, *distTag)
 	if err != nil {
 		logger.Log.Errorf("Failed to generate snapshot from specs folder (%s) into (%s). Error: %v", *specsDirPath, *outputSnapshotPath, err)
 	}

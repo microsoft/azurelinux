@@ -485,8 +485,7 @@ func specsToPackWorker(requests <-chan string, results chan<- *specState, cancel
 		containingDir := filepath.Dir(specFile)
 
 		// Find the SRPM that this SPEC will produce.
-		defines := rpm.DefaultDefines(runCheck)
-		defines[rpm.DistTagDefine] = distTag
+		defines := rpm.DefaultDefinesWithDist(runCheck, distTag)
 
 		// Allow the user to configure if the SPEC sources are in a nested 'SOURCES' directory.
 		// Otherwise assume source files are next to the SPEC file.

@@ -19,6 +19,7 @@ echo 1 > /proc/sys/net/ipv4/tcp_syncookies
 
 # Disable ICMP Redirect Acceptance
 echo 0 > /proc/sys/net/ipv4/conf/default/accept_redirects
+echo 0 > /proc/sys/net/ipv6/conf/default/accept_redirects
 
 # Do not send Redirect Messages
 echo 0 > /proc/sys/net/ipv4/conf/all/send_redirects

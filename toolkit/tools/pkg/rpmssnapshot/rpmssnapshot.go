@@ -16,12 +16,11 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repocloner"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/rpm"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/simpletoolchroot"
 )
 
 const (
 	chrootOutputFilePath = "/snapshot.json"
-	chrootSpecDirPath    = "/SPECS"
 )
 
 // Regular expression to extract package name, version, distribution, and architecture from values returned by 'rpmspec --builtrpms'.
@@ -56,84 +55,39 @@ const (
 )
 
 type SnapshotGenerator struct {
-	chroot        *safechroot.Chroot
-	buildDirPath  string
-	workerTarPath string
+	simpleToolChroot simpletoolchroot.SimpleToolChroot
 }
 
-// New creates an unitialized RPMs snapshot generator.
-func New(buildDirPath, workerTarPath string) *SnapshotGenerator {
-	return &SnapshotGenerator{
-		buildDirPath:  buildDirPath,
-		workerTarPath: workerTarPath,
-	}
+// New creates a new snapshot generator. If the chroot is created successfully, the caller is responsible for calling CleanUp().
+func New(buildDirPath, workerTarPath, specsDirPath string) (newSnapshotGenerator *SnapshotGenerator, err error) {
+	const chrootName = "rpmssnapshot_chroot"
+	newSnapshotGenerator = &SnapshotGenerator{}
+	err = newSnapshotGenerator.simpleToolChroot.InitializeChroot(buildDirPath, chrootName, workerTarPath, specsDirPath)
+
+	return newSnapshotGenerator, err
+}
+
+// CleanUp tears down the chroot
+func (s *SnapshotGenerator) CleanUp() error {
+	return s.simpleToolChroot.CleanUp()
 }
 
 // GenerateSnapshot generates a snapshot of all packages built from the specs inside the input directory.
-func (s *SnapshotGenerator) GenerateSnapshot(specsDirPath, outputFilePath, distTag string) (err error) {
-	err = s.initializeChroot(specsDirPath)
-	if err != nil {
-		return
-	}
-	defer s.cleanUp()
-
-	logger.Log.Infof("Generating RPMs snapshot from specs inside (%s).", specsDirPath)
-
-	logger.Log.Debugf("Distribution tag: %s.", distTag)
-
-	err = s.chroot.Run(func() error {
+func (s *SnapshotGenerator) GenerateSnapshot(outputFilePath, distTag string) (err error) {
+	err = s.simpleToolChroot.RunInChroot(func() error {
 		return s.generateSnapshotInChroot(distTag)
 	})
 	if err != nil {
 		return
 	}
 
-	chrootOutputFileFullPath := filepath.Join(s.chroot.RootDir(), chrootOutputFilePath)
+	chrootOutputFileFullPath := filepath.Join(s.simpleToolChroot.ChrootRootDir(), chrootOutputFilePath)
 	err = file.Move(chrootOutputFileFullPath, outputFilePath)
 	if err != nil {
 		logger.Log.Errorf("Failed to retrieve the snapshot from the chroot. Error: %v.", err)
 	}
 
 	return
-}
-
-func (s *SnapshotGenerator) buildAllSpecsList() (specPaths []string, err error) {
-	specFilesGlob := filepath.Join(chrootSpecDirPath, "**", "*.spec")
-
-	specPaths, err = filepath.Glob(specFilesGlob)
-	if err != nil {
-		logger.Log.Errorf("Failed while trying to enumerate all spec files with (%s). Error: %v.", specFilesGlob, err)
-	}
-
-	return
-}
-
-func (s *SnapshotGenerator) buildCompatibleSpecsList(defines map[string]string) (specPaths []string, err error) {
-	var allSpecFilePaths []string
-
-	allSpecFilePaths, err = s.buildAllSpecsList()
-	if err != nil {
-		return
-	}
-
-	return s.filterCompatibleSpecs(allSpecFilePaths, defines)
-}
-
-func (s *SnapshotGenerator) buildDefines(distTag string) map[string]string {
-	const runCheck = true
-
-	defines := rpm.DefaultDefines(runCheck)
-	defines[rpm.DistTagDefine] = distTag
-
-	return defines
-}
-
-func (s *SnapshotGenerator) cleanUp() {
-	const leaveFilesOnDisk = false
-
-	if s.chroot != nil {
-		s.chroot.Close(leaveFilesOnDisk)
-	}
 }
 
 func (s *SnapshotGenerator) convertResultsToRepoContents(allBuiltRPMs []string) (repoContents repocloner.RepoContents, err error) {
@@ -158,42 +112,18 @@ func (s *SnapshotGenerator) convertResultsToRepoContents(allBuiltRPMs []string) 
 	return
 }
 
-func (s *SnapshotGenerator) filterCompatibleSpecs(allSpecFilePaths []string, defines map[string]string) (specPaths []string, err error) {
-	var specCompatible bool
-
-	buildArch, err := rpm.GetRpmArch(runtime.GOARCH)
-	if err != nil {
-		return
-	}
-
-	for _, specFilePath := range allSpecFilePaths {
-		specDirPath := filepath.Dir(specFilePath)
-
-		specCompatible, err = rpm.SpecArchIsCompatible(specFilePath, specDirPath, buildArch, defines)
-		if err != nil {
-			logger.Log.Errorf("Failed while querrying spec (%s). Error: %v.", specFilePath, err)
-			return
-		}
-
-		if specCompatible {
-			specPaths = append(specPaths, specFilePath)
-		}
-	}
-
-	return
-}
-
 func (s *SnapshotGenerator) generateSnapshotInChroot(distTag string) (err error) {
+	const runChecks = false
 	var (
 		allBuiltRPMs []string
 		repoContents repocloner.RepoContents
 		specPaths    []string
 	)
 
-	defines := s.buildDefines(distTag)
-	specPaths, err = s.buildCompatibleSpecsList(defines)
+	defines := rpm.DefaultDefinesWithDist(runChecks, distTag)
+	specPaths, err = rpm.BuildCompatibleSpecsList(s.simpleToolChroot.ChrootRelativeSpecDir(), []string{}, defines)
 	if err != nil {
-		logger.Log.Errorf("Failed to retrieve a list of specs inside (%s). Error: %v.", chrootSpecDirPath, err)
+		logger.Log.Errorf("Failed to retrieve a list of specs inside (%s). Error: %v.", s.simpleToolChroot.ChrootRelativeSpecDir(), err)
 		return
 	}
 
@@ -216,27 +146,6 @@ func (s *SnapshotGenerator) generateSnapshotInChroot(distTag string) (err error)
 	err = jsonutils.WriteJSONFile(chrootOutputFilePath, repoContents)
 	if err != nil {
 		logger.Log.Errorf("Failed to save results into (%s). Error: %v.", chrootOutputFilePath, err)
-	}
-
-	return
-}
-
-func (s *SnapshotGenerator) initializeChroot(specsDirPath string) (err error) {
-	const (
-		existingDir = false
-		chrootName  = "rpmssnapshot_chroot"
-	)
-
-	chrootDirPath := filepath.Join(s.buildDirPath, chrootName)
-	s.chroot = safechroot.NewChroot(chrootDirPath, existingDir)
-
-	extraDirectories := []string{}
-	extraMountPoints := []*safechroot.MountPoint{
-		safechroot.NewMountPoint(specsDirPath, chrootSpecDirPath, "", safechroot.BindMountPointFlags, ""),
-	}
-	err = s.chroot.Initialize(s.workerTarPath, extraDirectories, extraMountPoints)
-	if err != nil {
-		logger.Log.Errorf("Failed to initialize chroot (%s) inside (%s). Error: %v.", s.workerTarPath, chrootDirPath, err)
 	}
 
 	return

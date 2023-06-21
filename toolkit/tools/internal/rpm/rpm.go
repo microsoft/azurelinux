@@ -5,6 +5,7 @@ package rpm
 
 import (
 	"fmt"
+	"path/filepath"
 	"regexp"
 	"runtime"
 	"strings"
@@ -168,6 +169,14 @@ func executeRpmCommand(program string, args ...string) (results []string, err er
 
 	results = sanitizeOutput(stdout)
 	return
+}
+
+// DefaultDefinesWithDist returns a new map of default defines that can be used during RPM queries that also includes
+// the dist tag.
+func DefaultDefinesWithDist(runChecks bool, distTag string) map[string]string {
+	defines := DefaultDefines(runChecks)
+	defines[DistTagDefine] = distTag
+	return defines
 }
 
 // DefaultDefines returns a new map of default defines that can be used during RPM queries.
@@ -417,6 +426,61 @@ func SpecArchIsCompatible(specfile, sourcedir, arch string, defines map[string]s
 
 	if isCompatible {
 		return SpecExcludeArchIsCompatible(specfile, sourcedir, arch, defines)
+	}
+
+	return
+}
+
+// BuildCompatibleSpecsList builds a list of spec files in a directory that are compatible with the build arch. Paths
+// are relative to the 'baseDir' directory. This function should generally be used from inside a chroot to ensure the
+// correct defines are available.
+func BuildCompatibleSpecsList(baseDir string, inputSpecPaths []string, defines map[string]string) (filteredSpecPaths []string, err error) {
+	var specPaths []string
+	if len(inputSpecPaths) > 0 {
+		specPaths = inputSpecPaths
+	} else {
+		specPaths, err = buildAllSpecsList(baseDir)
+		if err != nil {
+			return
+		}
+	}
+
+	return filterCompatibleSpecs(specPaths, defines)
+}
+
+// buildAllSpecsList builds a list of all spec files in the directory. Paths are relative to the base directory.
+func buildAllSpecsList(baseDir string) (specPaths []string, err error) {
+	specFilesGlob := filepath.Join(baseDir, "**", "*.spec")
+
+	specPaths, err = filepath.Glob(specFilesGlob)
+	if err != nil {
+		logger.Log.Errorf("Failed while trying to enumerate all spec files with (%s). Error: %v.", specFilesGlob, err)
+	}
+
+	return
+}
+
+// filterCompatibleSpecs filters a list of spec files in the chroot's SPECs directory that are compatible with the build arch. Paths
+func filterCompatibleSpecs(inputSpecPaths []string, defines map[string]string) (filteredSpecPaths []string, err error) {
+	var specCompatible bool
+
+	buildArch, err := GetRpmArch(runtime.GOARCH)
+	if err != nil {
+		return
+	}
+
+	for _, specFilePath := range inputSpecPaths {
+		specDirPath := filepath.Dir(specFilePath)
+
+		specCompatible, err = SpecArchIsCompatible(specFilePath, specDirPath, buildArch, defines)
+		if err != nil {
+			logger.Log.Errorf("Failed while querrying spec (%s). Error: %v.", specFilePath, err)
+			return
+		}
+
+		if specCompatible {
+			filteredSpecPaths = append(filteredSpecPaths, specFilePath)
+		}
 	}
 
 	return
