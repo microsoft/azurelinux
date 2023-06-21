@@ -149,7 +149,7 @@ $(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_lo
 		--output-summary-file=$(PKGBUILD_DIR)/graph_external_deps.json \
 		--timestamp-file=$(TIMESTAMP_DIR)/graph_cache.jsonl \
 		--output=$(cached_file) && \
-	touch $@ || mv $@ $@.failed
+	touch $@
 
 $(preprocessed_file): $(cached_file) $(go-graphPreprocessor)
 	$(go-graphPreprocessor) \
