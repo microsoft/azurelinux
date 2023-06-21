@@ -45,7 +45,7 @@ ExclusiveArch: x86_64
 
 Name:       edk2
 Version:    %{GITDATE}git%{GITCOMMIT}
-Release:    33%{?dist}
+Release:    34%{?dist}
 Summary:    UEFI firmware for 64-bit virtual machines
 License:    BSD-2-Clause-Patent and OpenSSL and MIT
 URL:        http://www.tianocore.org
@@ -685,6 +685,9 @@ done
 
 
 %changelog
+* Wed Jun 21 2023 Vince Perri <viperri@microsoft.com> - 20230301gitf80f052277c8-34
+- Patch CVE-2023-0464 in bundled OpenSSL.
+
 * Tue Jun 6 2023 Daniel McIlvaney <damcilva@microsoft.com> - 20230301gitf80f052277c8-33
 - Patch CVE-2023-0464 in bundled OpenSSL.
 
