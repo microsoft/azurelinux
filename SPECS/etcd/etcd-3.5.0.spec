@@ -143,6 +143,7 @@ rm -rf %{buildroot}/*
 %changelog
 * Wed Jun 21 2023 Mitch Zhu <mitchzhu@microsoft.com> - 3.5.0-10
 - Bump release to rebuild with go 1.19.10
+  Disable DWARF compression in go 1.19.10
 
 * Tue Dec 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 3.5.0-9
 - Bump release to rebuild with go 1.18.8-2

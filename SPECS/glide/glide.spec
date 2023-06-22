@@ -24,17 +24,17 @@ Glide is a tool for managing the vendor directory within a Go package.
 
 %build
 export GO111MODULE=auto
-export GOFLAGS=-ldflags='-compressdwarf=false'
 export GOPATH=%{OUR_GOPATH}
 mkdir -p ${GOPATH}/src/github.com/Masterminds/glide
 cp -r * ${GOPATH}/src/github.com/Masterminds/glide/.
 pushd ${GOPATH}/src/github.com/Masterminds/glide
+# Disable DWARF compression
+sed -i 's/-ldflags "-X/-ldflags "-compressdwarf=false -X/g' Makefile
 make VERSION=%{version} build %{?_smp_mflags}
 popd
 
 %check
 export GO111MODULE=auto
-export GOFLAGS=-ldflags='-compressdwarf=false'
 export GOPATH=%{OUR_GOPATH}
 pushd ${GOPATH}/src/github.com/Masterminds/glide
 make test %{?_smp_mflags}
@@ -42,7 +42,6 @@ popd
 
 %install
 export GO111MODULE=auto
-export GOFLAGS=-ldflags='-compressdwarf=false'
 export GOPATH=%{OUR_GOPATH}
 pushd ${GOPATH}/src/github.com/Masterminds/glide
 make install %{?_smp_mflags}
@@ -58,6 +57,7 @@ popd
 %changelog
 * Wed Jun 21 2023 Mitch Zhu <mitchzhu@microsoft.com> - 0.13.3-16
 - Bump release to rebuild with go 1.19.10
+  Disable DWARF compression in go 1.19.10
 
 * Tue Dec 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.13.3-15
 - Bump release to rebuild with go 1.18.8-2

@@ -38,10 +38,11 @@ export GO111MODULE=off
 %define OUR_GOPATH %{_topdir}/.gopath
 mkdir -p "%{OUR_GOPATH}/vendor" "%{OUR_GOPATH}/etcd_src/src/go.etcd.io"
 export GOPATH=%{OUR_GOPATH}/vendor:%{OUR_GOPATH}/etcd_src
-export GOFLAGS=-ldflags='-compressdwarf=false'
 
 ln -s "%{_builddir}/%{name}-%{version}/vendor" "%{OUR_GOPATH}/vendor/src"
 ln -s "%{_builddir}/%{name}-%{version}" "%{OUR_GOPATH}/etcd_src/src/go.etcd.io/etcd"
+# Disable DWARF compression
+sed -i 's/GO_LDFLAGS -X/GO_LDFLAGS -compressdwarf=false -X/g' Makefile ./build
 ./build
 # Now build the etcd-dump* tools
 source ./build
@@ -96,6 +97,7 @@ rm -rf %{buildroot}/*
 %changelog
 * Wed Jun 21 2023 Mitch Zhu <mitchzhu@microsoft.com> - 3.4.23-2
 - Bump release to rebuild with go 1.19.10
+  Disable DWARF compression in go 1.19.10
 
 * Fri Jan 27 2023 Muhammad Falak <mwani@microsoft.com> - 3.4.23-1
 - Bump version to address CVE-2022-3064

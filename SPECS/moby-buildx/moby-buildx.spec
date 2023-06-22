@@ -81,6 +81,7 @@ cp %{SOURCE2} %{buildroot}/usr/share/doc/%{name}-%{version}/NOTICE
 %changelog
 * Wed Jun 21 2023 Mitch Zhu <mitchzhu@microsoft.com> - 0.4.1+azure-14
 - Bump release to rebuild with go 1.19.10
+  Disable DWARF compression in go 1.19.10
 
 * Tue Dec 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.4.1+azure-13
 - Bump release to rebuild with go 1.18.8-2

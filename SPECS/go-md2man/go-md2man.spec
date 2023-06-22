@@ -32,6 +32,7 @@ export GOPATH=%{OUR_GOPATH}
 export GOCACHE=%{OUR_GOPATH}/.cache
 export CGO_ENABLED=0
 export GO111MODULE=on
+# Disable DWARF compression
 export GOFLAGS=-ldflags='-compressdwarf=false'
 
 cd %{_topdir}/BUILD/%{name}-%{version}/go-md2man-2.0.0
@@ -52,6 +53,7 @@ cp go-md2man-2.0.0/LICENSE.md %{buildroot}/usr/share/doc/%{name}-%{version}/LICE
 %changelog
 * Wed Jun 21 2023 Mitch Zhu <mitchzhu@microsoft.com> - 2.0.0-17
 - Bump release to rebuild with go 1.19.10
+  Disable DWARF compression in go 1.19.10
 
 * Tue Dec 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.0.0-16
 - Bump release to rebuild with go 1.18.8-2
