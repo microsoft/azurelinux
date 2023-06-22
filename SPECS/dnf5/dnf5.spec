@@ -38,7 +38,7 @@ Summary:        Command-line package manager
 Name:           dnf5
 Version:        %{project_version_major}.%{project_version_minor}.%{project_version_patch}
 Release:        1%{?dist}
-License:        GPLv2+
+License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/rpm-software-management/dnf5
