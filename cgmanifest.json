@@ -2739,7 +2739,7 @@
         "other": {
           "name": "dnf5",
           "version": "5.0.14",
-          "downloadUrl": "https://github.com/rpm-software-management/dnf5/archive/refs/tags/5.0.14.tar.gz"
+          "downloadUrl": "https://github.com/rpm-software-management/dnf5/archive/5.0.14/5.0.14.tar.gz"
         }
       }
     },
@@ -10691,8 +10691,8 @@
         "type": "other",
         "other": {
           "name": "librepo",
-          "version": "1.14.2",
-          "downloadUrl": "https://github.com/rpm-software-management/librepo/archive/1.14.2.tar.gz"
+          "version": "1.15.1",
+          "downloadUrl": "https://github.com/rpm-software-management/librepo/archive/1.15.1.tar.gz"
         }
       }
     },
@@ -10941,8 +10941,8 @@
         "type": "other",
         "other": {
           "name": "libsolv",
-          "version": "0.7.20",
-          "downloadUrl": "https://github.com/openSUSE/libsolv/archive/0.7.20/libsolv-0.7.20.tar.gz"
+          "version": "0.7.24",
+          "downloadUrl": "https://github.com/openSUSE/libsolv/archive/0.7.24/libsolv-0.7.24.tar.gz"
         }
       }
     },

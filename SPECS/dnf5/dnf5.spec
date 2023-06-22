@@ -38,7 +38,7 @@ Summary:        Command-line package manager
 Name:           dnf5
 Version:        %{project_version_major}.%{project_version_minor}.%{project_version_patch}
 Release:        1%{?dist}
-License:        GPL-2.0-or-later
+License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/rpm-software-management/dnf5
@@ -595,6 +595,7 @@ done
 - turn off man, ruby, perl for mariner
 - update spec file for Mariner
 - License Verified
+- Initial CBL-Mariner import from rpm source repository
 
 * Wed Jun 14 2023 Packit Team <hello@packit.dev> - 5.0.14-1
 - New upstream release 5.0.14
