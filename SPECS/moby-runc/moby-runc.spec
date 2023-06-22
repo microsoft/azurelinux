@@ -108,7 +108,7 @@ cp %{SOURCE7} %{buildroot}%{_docdir}/%{name}-%{version}/LICENSE
 %{_mandir}/*/*
 
 %changelog
-* Wed Jun 21 2023 Mitch Zhu <mitchzhu@microsoft.com> - 1.1.5+azure-2
+* Thu Jun 22 2023 Mitch Zhu <mitchzhu@microsoft.com> - 1.1.5+azure-2
 - Bump release to rebuild with go 1.19.10
 
 * Thu Apr 13 2023 Rohit Rawat <rohitrawat@microsoft.com> - 1.1.5+azure-1

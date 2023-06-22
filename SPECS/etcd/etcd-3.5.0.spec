@@ -141,7 +141,7 @@ rm -rf %{buildroot}/*
 /%{_docdir}/%{name}-%{version}-tools/*
 
 %changelog
-* Wed Jun 21 2023 Mitch Zhu <mitchzhu@microsoft.com> - 3.5.0-10
+* Thu Jun 22 2023 Mitch Zhu <mitchzhu@microsoft.com> - 3.5.0-10
 - Bump release to rebuild with go 1.19.10
   Disable DWARF compression in go 1.19.10
 

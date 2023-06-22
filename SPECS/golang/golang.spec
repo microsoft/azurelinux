@@ -116,7 +116,7 @@ fi
 %{_bindir}/*
 
 %changelog
-* Wed Jun 21 2023 Mitch Zhu <mitchzhu@microsoft.com> - 1.19.10-1
+* Thu Jun 22 2023 Mitch Zhu <mitchzhu@microsoft.com> - 1.19.10-1
 - Upgrade to version 1.19.10 to fix CVE-2023-24540, CVE-2023-29402, 
   CVE-2023-29403, CVE-2023-29404, CVE-2023-29405
 

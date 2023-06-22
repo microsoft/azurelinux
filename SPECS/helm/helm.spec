@@ -58,7 +58,7 @@ install -m 755 ./helm %{buildroot}%{_bindir}
 go test -v ./cmd/helm
 
 %changelog
-* Wed Jun 21 2023 Mitch Zhu <mitchzhu@microsoft.com> - 3.4.1-17
+* Thu Jun 22 2023 Mitch Zhu <mitchzhu@microsoft.com> - 3.4.1-17
 - Bump release to rebuild with go 1.19.10
 
 * Wed Mar 01 2023 Mitch Zhu <mitchzhu@microsoft.com> - 3.4.1-16

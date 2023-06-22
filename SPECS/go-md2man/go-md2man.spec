@@ -51,7 +51,7 @@ cp go-md2man-2.0.0/LICENSE.md %{buildroot}/usr/share/doc/%{name}-%{version}/LICE
 %{_bindir}/go-md2man
 
 %changelog
-* Wed Jun 21 2023 Mitch Zhu <mitchzhu@microsoft.com> - 2.0.0-17
+* Thu Jun 22 2023 Mitch Zhu <mitchzhu@microsoft.com> - 2.0.0-17
 - Bump release to rebuild with go 1.19.10
   Disable DWARF compression in go 1.19.10
 

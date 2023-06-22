@@ -139,7 +139,7 @@ make  %{?_smp_mflags} check
 %doc %{_mandir}/man1/*.gz
 
 %changelog
-* Wed Jun 21 2023 Mitch Zhu <mitchzhu@microsoft.com> - 1.58.0-21
+* Thu Jun 22 2023 Mitch Zhu <mitchzhu@microsoft.com> - 1.58.0-21
 - Bump release to rebuild with go 1.19.10
 
 * Tue Dec 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.58.0-20

@@ -76,7 +76,7 @@ rm -f %{_bindir}/nvidia-container-runtime-hook
 %{_datadir}/containers/oci/hooks.d/oci-nvidia-hook.json
 
 %changelog
-* Wed Jun 21 2023 Mitch Zhu <mitchzhu@microsoft.com> - 1.9.0-7
+* Thu Jun 22 2023 Mitch Zhu <mitchzhu@microsoft.com> - 1.9.0-7
 - Bump release to rebuild with go 1.19.10
 
 * Tue Dec 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.9.0-6

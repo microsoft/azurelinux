@@ -107,7 +107,7 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 
 %changelog
-* Wed Jun 21 2023 Mitch Zhu <mitchzhu@microsoft.com> - 1.6.6+azure-10
+* Thu Jun 22 2023 Mitch Zhu <mitchzhu@microsoft.com> - 1.6.6+azure-10
 - Bump release to rebuild with go 1.19.10
 
 * Wed Mar 01 2023 Mitch Zhu <mitchzhu@microsoft.com> - 1.6.6+azure-9

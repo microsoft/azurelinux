@@ -50,7 +50,7 @@ rm -rf %{buildroot}/*
 %{_bindir}/flanneld
 
 %changelog
-* Wed Jun 21 2023 Mitch Zhu <mitchzhu@microsoft.com> - 0.14.0-11
+* Thu Jun 22 2023 Mitch Zhu <mitchzhu@microsoft.com> - 0.14.0-11
 - Bump release to rebuild with go 1.19.10
 
 * Tue Dec 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.14.0-10

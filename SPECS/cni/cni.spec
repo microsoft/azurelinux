@@ -42,7 +42,7 @@ install -vpm 0755 -t %{buildroot}%{_default_cni_plugins_dir} bin/*
 %{_default_cni_plugins_dir}/*
 
 %changelog
-* Wed Jun 21 2023 Mitch Zhu <mitchzhu@microsoft.com> - 0.9.1-11
+* Thu Jun 22 2023 Mitch Zhu <mitchzhu@microsoft.com> - 0.9.1-11
 - Bump release to rebuild with go 1.19.10
 
 * Tue Dec 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.9.1-10

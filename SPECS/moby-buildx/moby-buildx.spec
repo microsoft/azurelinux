@@ -79,7 +79,7 @@ cp %{SOURCE2} %{buildroot}/usr/share/doc/%{name}-%{version}/NOTICE
 %{_libexecdir}/docker/cli-plugins/docker-buildx
 
 %changelog
-* Wed Jun 21 2023 Mitch Zhu <mitchzhu@microsoft.com> - 0.4.1+azure-14
+* Thu Jun 22 2023 Mitch Zhu <mitchzhu@microsoft.com> - 0.4.1+azure-14
 - Bump release to rebuild with go 1.19.10
   Disable DWARF compression in go 1.19.10
 

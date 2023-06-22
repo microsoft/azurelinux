@@ -55,7 +55,7 @@ popd
 %{_bindir}/glide
 
 %changelog
-* Wed Jun 21 2023 Mitch Zhu <mitchzhu@microsoft.com> - 0.13.3-16
+* Thu Jun 22 2023 Mitch Zhu <mitchzhu@microsoft.com> - 0.13.3-16
 - Bump release to rebuild with go 1.19.10
   Disable DWARF compression in go 1.19.10
 
