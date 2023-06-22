@@ -78,6 +78,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %changelog
 * Tue Jun 20 2023 Sam Meluch <sammeluch@microsoft.com> - 0.7.24-1
+- add ENABLE_COMPS option to support dnf5
 - Upgrade to version 0.7.24
 
 * Fri Jan 14 2022 Henry Li <lihl@microsoft.com> - 0.7.20-1

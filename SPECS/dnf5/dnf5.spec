@@ -590,6 +590,12 @@ done
 
 
 %changelog
+* Wed Jun 21 2023 Sam Meluch <sammeluch@microsoft.com> - 5.0.14-1
+- Add "if with man" sections for files section
+- turn off man, ruby, perl for mariner
+- update spec file for Mariner
+- License Verified
+
 * Wed Jun 14 2023 Packit Team <hello@packit.dev> - 5.0.14-1
 - New upstream release 5.0.14
 
