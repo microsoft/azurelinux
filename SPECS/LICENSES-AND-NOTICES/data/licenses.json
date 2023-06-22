@@ -3057,6 +3057,12 @@
                 "k3s-1.25.8"
             ]
         },
+        "RPM software management source": {
+            "license": "[GPLv2+ License](https://github.com/akopytov/sysbench/blob/master/COPYING)",
+            "specs": [
+                "dnf5"
+            ]
+        },
         "Sysbench source": {
             "license": "[GPLv2+ License](https://github.com/akopytov/sysbench/blob/master/COPYING)",
             "specs": [

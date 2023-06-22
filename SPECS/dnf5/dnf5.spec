@@ -595,7 +595,7 @@ done
 - turn off man, ruby, perl for mariner
 - update spec file for Mariner
 - License Verified
-- Initial CBL-Mariner import from rpm source repository
+- Initial CBL-Mariner import from RPM software management source (license: GPLv2+)
 
 * Wed Jun 14 2023 Packit Team <hello@packit.dev> - 5.0.14-1
 - New upstream release 5.0.14
