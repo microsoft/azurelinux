@@ -47,14 +47,13 @@ export GOCACHE=%{OUR_GOPATH}/.cache
 export GOPROXY=direct
 export GO111MODULE=on
 export CGO_ENABLED=0
-export GOFLAGS=-ldflags='-compressdwarf=false'
 # GOFLAGS for go1.13 only
 #export GOFLAGS='-trimpath -gcflags=all="-trimpath=%{OUR_GOPATH}/src" -asmflags=all="-trimpath=%{OUR_GOPATH}/src"'
 export GOGC=off
 
 cd %{OUR_GOPATH}/src/github.com/docker/buildx
 go build -mod=vendor \
-    -ldflags "-X github.com/docker/buildx/version.Version=%{version} -X github.com/docker/buildx/version.Revision=%{BUILDX_GITCOMMIT} -X github.com/docker/buildx/version.Package=github.com/docker/buildx" \
+    -ldflags "-compressdwarf=false -X github.com/docker/buildx/version.Version=%{version} -X github.com/docker/buildx/version.Revision=%{BUILDX_GITCOMMIT} -X github.com/docker/buildx/version.Package=github.com/docker/buildx" \
     -o buildx \
     ./cmd/buildx
 

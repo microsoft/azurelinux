@@ -34,6 +34,7 @@ popd
 
 %check
 export GO111MODULE=auto
+export GOFLAGS=-ldflags='-compressdwarf=false'
 export GOPATH=%{OUR_GOPATH}
 pushd ${GOPATH}/src/github.com/Masterminds/glide
 make test %{?_smp_mflags}
@@ -41,6 +42,7 @@ popd
 
 %install
 export GO111MODULE=auto
+export GOFLAGS=-ldflags='-compressdwarf=false'
 export GOPATH=%{OUR_GOPATH}
 pushd ${GOPATH}/src/github.com/Masterminds/glide
 make install %{?_smp_mflags}

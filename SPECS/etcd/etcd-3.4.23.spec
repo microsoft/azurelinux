@@ -34,11 +34,11 @@ tools.
 # To successfully build, manually hydrate the go package cache (GOPATH) with the included vendor folder and
 # etcd's source code before invoking the build script.
 export GO111MODULE=off
-export GOFLAGS=-ldflags='-compressdwarf=false'
 
 %define OUR_GOPATH %{_topdir}/.gopath
 mkdir -p "%{OUR_GOPATH}/vendor" "%{OUR_GOPATH}/etcd_src/src/go.etcd.io"
 export GOPATH=%{OUR_GOPATH}/vendor:%{OUR_GOPATH}/etcd_src
+export GOFLAGS=-ldflags='-compressdwarf=false'
 
 ln -s "%{_builddir}/%{name}-%{version}/vendor" "%{OUR_GOPATH}/vendor/src"
 ln -s "%{_builddir}/%{name}-%{version}" "%{OUR_GOPATH}/etcd_src/src/go.etcd.io/etcd"
