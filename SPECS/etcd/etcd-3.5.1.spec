@@ -62,7 +62,7 @@ tools.
 tar --no-same-owner -xf %{SOURCE2}
 
 %build
-export GOFLAGS=-ldflags='-w -s'
+export GOFLAGS=-ldflags='-compressdwarf=false'
 %define ETCD_OUT_DIR %{_builddir}/%{name}-%{version}/bin
 mkdir -p %{ETCD_OUT_DIR}
 

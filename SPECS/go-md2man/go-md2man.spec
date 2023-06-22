@@ -32,7 +32,7 @@ export GOPATH=%{OUR_GOPATH}
 export GOCACHE=%{OUR_GOPATH}/.cache
 export CGO_ENABLED=0
 export GO111MODULE=on
-export GOFLAGS=-ldflags='-w -s'
+export GOFLAGS=-ldflags='-compressdwarf=false'
 
 cd %{_topdir}/BUILD/%{name}-%{version}/go-md2man-2.0.0
 go build -mod vendor -o go-md2man
