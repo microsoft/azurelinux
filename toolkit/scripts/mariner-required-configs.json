@@ -756,6 +756,19 @@
                 "PR": [
                     "https://github.com/microsoft/CBL-Mariner/pull/2352"
                 ]
+            },
+            "CONFIG_IP_VS_MH": {
+                "value": [
+                    "m",
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5657"
+                ]
             }
         }
     }
