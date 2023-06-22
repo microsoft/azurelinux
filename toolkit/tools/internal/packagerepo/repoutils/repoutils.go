@@ -53,7 +53,6 @@ func RestoreClonedRepoContents(cloner repocloner.RepoCloner, srcFile string) (er
 	}
 
 	// Verify the cloned contents are as expected.
-	logger.Log.Infof("Verifying cloned repo contents.")
 	clonedRepo, err := cloner.ClonedRepoContents(withSystemPackages)
 	if err != nil {
 		return
