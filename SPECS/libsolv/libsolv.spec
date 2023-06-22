@@ -47,7 +47,7 @@ Requires:       xz
     -DENABLE_RPMDB_BYRPMHEADER=ON       \
     -DENABLE_RPMDB_LIBRPM=ON            \
     -DENABLE_RPMMD=ON                   \
-	-DENABLE_COMPS=ON
+    -DENABLE_COMPS=ON
 %make_build
 
 %install
