@@ -84,7 +84,7 @@ Requires:       elfutils-libelf
 Requires:       file
 Requires:       gzip
 Requires:       lua
-Requires:       mariner-rpm-macros
+Requires:       mariner-rpm-macros >= 2.0-22
 Requires:       patch
 Requires:       sed
 Requires:       tar
