@@ -34,6 +34,7 @@ RUN tdnf install -y \
     perl \
     rpm \
     sudo \
+    tar \
     texinfo \
     unzip \
     vim \
