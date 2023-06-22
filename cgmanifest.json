@@ -3746,16 +3746,6 @@
     {
       "component": {
         "type": "other",
-        "other": {
-          "name": "fonts-rpm-macros",
-          "version": "2.0.5",
-		  "downloadUrl": "https://pagure.io/fonts-rpm-macros/archive/2.0.5/fonts-rpm-macros-2.0.5.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
         "comment": "Imported as part of the 'xorg-x11-font-utils' package, version 7.5",
         "other": {
           "name": "font-util",
@@ -3791,6 +3781,16 @@
           "name": "fontpackages",
           "version": "1.44",
           "downloadUrl": "https://github.com/pnemade/fontpackages/archive/refs/tags/1.44.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "fonts-rpm-macros",
+          "version": "2.0.5",
+          "downloadUrl": "https://pagure.io/fonts-rpm-macros/archive/2.0.5/fonts-rpm-macros-2.0.5.tar.gz"
         }
       }
     },
@@ -4610,8 +4610,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.19.8",
-          "downloadUrl": "https://golang.org/dl/go1.19.8.src.tar.gz"
+          "version": "1.19.10",
+          "downloadUrl": "https://golang.org/dl/go1.19.10.src.tar.gz"
         }
       }
     },
@@ -6500,8 +6500,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.112.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.112.1.tar.gz"
+          "version": "5.15.116.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.116.1.tar.gz"
         }
       }
     },
@@ -8111,8 +8111,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.112.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.112.1.tar.gz"
+          "version": "5.15.116.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.116.1.tar.gz"
         }
       }
     },
@@ -8121,8 +8121,8 @@
         "type": "other",
         "other": {
           "name": "kernel-azure",
-          "version": "5.15.112.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.112.1.tar.gz"
+          "version": "5.15.116.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.116.1.tar.gz"
         }
       }
     },
@@ -8131,8 +8131,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hci",
-          "version": "5.15.112.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.112.1.tar.gz"
+          "version": "5.15.116.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.116.1.tar.gz"
         }
       }
     },
@@ -8141,8 +8141,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.112.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.112.1.tar.gz"
+          "version": "5.15.116.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.116.1.tar.gz"
         }
       }
     },
@@ -12020,6 +12020,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "livepatch-5.15.116.1-1.cm2",
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.116.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "livepatch-5.15.94.1-1.cm2",
           "version": "1.0.0",
           "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.94.1.tar.gz"
@@ -13443,8 +13453,8 @@
         "type": "other",
         "other": {
           "name": "msft-golang",
-          "version": "1.19.8",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.19.8-1/go.20230404.2.src.tar.gz"
+          "version": "1.19.10",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.19.10-1/go.20230606.2.src.tar.gz"
         }
       }
     },
@@ -21174,8 +21184,8 @@
         "type": "other",
         "other": {
           "name": "postgresql",
-          "version": "14.5",
-          "downloadUrl": "https://ftp.postgresql.org/pub/source/v14.5/postgresql-14.5.tar.bz2"
+          "version": "14.8",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v14.8/postgresql-14.8.tar.bz2"
         }
       }
     },
@@ -24593,9 +24603,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-virtualenv",
-          "version": "20.14.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/4a/c3/04f361a90ed4e6b3f3f696d61db5c786eaa741d2a6c125bc905b8a1c0200/virtualenv-20.14.0.tar.gz"
+          "name": "python-virt-firmware",
+          "version": "23.5",
+          "downloadUrl": "https://files.pythonhosted.org/packages/c2/f8/204dc513d2d3f0f3d3aead03600f7db1b763cf02998ad7b35e7ac5ef6849/virt-firmware-23.5.tar.gz"
         }
       }
     },
@@ -24603,9 +24613,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-virt-firmware",
-          "version": "23.5",
-          "downloadUrl": "https://files.pythonhosted.org/packages/c2/f8/204dc513d2d3f0f3d3aead03600f7db1b763cf02998ad7b35e7ac5ef6849/virt-firmware-23.5.tar.gz"
+          "name": "python-virtualenv",
+          "version": "20.14.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/4a/c3/04f361a90ed4e6b3f3f696d61db5c786eaa741d2a6c125bc905b8a1c0200/virtualenv-20.14.0.tar.gz"
         }
       }
     },
@@ -28257,8 +28267,8 @@
         "type": "other",
         "other": {
           "name": "tdnf",
-          "version": "3.2.2",
-          "downloadUrl": "https://github.com/vmware/tdnf/archive/v3.2.2.tar.gz"
+          "version": "3.5.2",
+          "downloadUrl": "https://github.com/vmware/tdnf/archive/v3.5.2.tar.gz"
         }
       }
     },

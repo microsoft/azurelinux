@@ -1,0 +1,762 @@
+{
+    "kernel": {
+        "required-configs": {
+            "CONFIG_INTEL_IOMMU_SVM": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/84"
+                ]
+            },
+            "CONFIG_DRM_AMDGPU_SI": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5416"
+                ]
+            },
+            "CONFIG_TLS": {
+                "value": [
+                    "m",
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5406"
+                ]
+            },
+            "CONFIG_NVME_TARGET_TCP": {
+                "value": [
+                    "m",
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5406"
+                ]
+            },
+            "CONFIG_DELL_WMI_DESCRIPTOR": {
+                "value": [
+                    "m",
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5406"
+                ]
+            },
+            "CONFIG_X86_PLATFORM_DRIVERS_DELL": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/2671"
+                ]
+            },
+            "CONFIG_DRM_AMDGPU": {
+                "value": [
+                    "m",
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5416"
+                ]
+            },
+            "CONFIG_BINFMT_MISC": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/3300"
+                ]
+            },
+            "CONFIG_SCHEDSTATS": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "Initial CBL-Mariner PR"
+                ]
+            },
+            "CONFIG_BLK_DEV_IO_TRACE": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5417"
+                ]
+            },
+            "CONFIG_ISO9660_FS": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "Initial CBL-Mariner PR"
+                ]
+            },
+            "CONFIG_DELL_WMI_LED": {
+                "value": [
+                    "m",
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5406"
+                ]
+            },
+            "CONFIG_TASKSTATS": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "Initial CBL-Mariner PR"
+                ]
+            },
+            "CONFIG_TASK_IO_ACCOUNTING": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "Initial CBL-Mariner PR"
+                ]
+            },
+            "CONFIG_DELL_SMBIOS_SMM": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/2671"
+                ]
+            },
+            "CONFIG_IO_URING": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "Initial CBL-Mariner PR"
+                ]
+            },
+            "CONFIG_TASK_XACCT": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "Initial CBL-Mariner PR"
+                ]
+            },
+            "CONFIG_INFINIBAND_BNXT_RE": {
+                "value": [
+                    "m",
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5406"
+                ]
+            },
+            "CONFIG_DELL_WMI_PRIVACY": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5406"
+                ]
+            },
+            "CONFIG_DELL_SMO8800": {
+                "value": [
+                    "m",
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/2671"
+                ]
+            },
+            "CONFIG_SENSORS_DELL_SMM": {
+                "value": [
+                    "m",
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5406"
+                ]
+            },
+            "CONFIG_DELL_RBU": {
+                "value": [
+                    "m",
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/2671"
+                ]
+            },
+            "CONFIG_NVME_RDMA": {
+                "value": [
+                    "m",
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5283"
+                ]
+            },
+            "CONFIG_DELL_SMBIOS_WMI": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/2671"
+                ]
+            },
+            "CONFIG_RAS_CEC": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5417"
+                ]
+            },
+            "CONFIG_DRM_AMDGPU_CIK": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5416"
+                ]
+            },
+            "CONFIG_DELL_WMI": {
+                "value": [
+                    "m",
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5406"
+                ]
+            },
+            "CONFIG_NVME_TCP": {
+                "value": [
+                    "m",
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5283"
+                ]
+            },
+            "CONFIG_DELL_WMI_AIO": {
+                "value": [
+                    "m",
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/2671"
+                ]
+            },
+            "CONFIG_DELL_WMI_SYSMAN": {
+                "value": [
+                    "m",
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5406"
+                ]
+            },
+            "CONFIG_TASK_DELAY_ACCT": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "Initial CBL-Mariner PR"
+                ]
+            },
+            "CONFIG_DELL_SMBIOS": {
+                "value": [
+                    "m",
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/2671"
+                ]
+            },
+            "CONFIG_THERMAL_HWMON": {
+                "value": [
+                    "m",
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5417"
+                ]
+            },
+            "CONFIG_TCG_TPM": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/135"
+                ]
+            },
+            "CONFIG_HW_RANDOM_TPM": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "Initial CBL-Mariner PR"
+                ]
+            },
+            "CONFIG_EDAC_SKX": {
+                "value": [
+                    "m",
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5487"
+                ]
+            },
+            "CONFIG_NET_CLS_FLOWER": {
+                "value": [
+                    "m",
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5170"
+                ]
+            },
+            "CONFIG_HIST_TRIGGERS": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for auoms metrics",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5292"
+                ]
+            },
+            "CONFIG_INIT_ON_FREE_DEFAULT_ON": {
+                "value": [
+                    "is not set",
+                    "<missing>"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "Creates increased boot times and errors on large memory systems",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/4829"
+                ]
+            },
+            "CONFIG_WIREGUARD": {
+                "value": [
+                    "m",
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5135"
+                ]
+            },
+            "CONFIG_TARGET_CORE": {
+                "value": [
+                    "m",
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/4473"
+                ]
+            },
+            "CONFIG_HIBERNATION": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/4369"
+                ]
+            },
+            "CONFIG_TCP_CONG_BBR": {
+                "value": [
+                    "m",
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/4122"
+                ]
+            },
+            "CONFIG_CC_CAN_LINK_STATIC": {
+                "value": [
+                    "<missing>"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "Remove static linking support from the kernel",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/3748"
+                ]
+            },
+            "CONFIG_SCSI_LOGGING": {
+                "value": [
+                    "m",
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/3826"
+                ]
+            },
+            "CONFIG_NETFILTER_XT_TARGET_TRACE": {
+                "value": [
+                    "m",
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for the iptables TRACE target",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/3783"
+                ]
+            },
+            "CONFIG_VFAT_FS": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Make vfat always available",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/3733"
+                ]
+            },
+            "CONFIG_COMPAT_32BIT_TIME": {
+                "value": [
+                    "m",
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Avoid error that 2 bit get_time syscalls aren't available",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/3812"
+                ]
+            },
+            "CONFIG_SECURITY_LANDLOCK": {
+                "value": [
+                    "m",
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Security",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/3484"
+                ]
+            },
+            "CONFIG_BLK_DEV_ZONED": {
+                "value": [
+                    "m",
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Zoned block device support",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/3465"
+                ]
+            },
+            "CONFIG_FTRACE_SYSCALLS": {
+                "value": [
+                    "m",
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed to enable eBPF CO-RE syscalls tracers",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/3210"
+                ]
+            },
+            "CONFIG_VIRTIO_FS": {
+                "value": [
+                    "m",
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed to see logs in Azure serial console",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/3264"
+                ]
+            },
+            "CONFIG_DRM_VGEM": {
+                "value": [
+                    "m",
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed to enable media acceleration",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/3227"
+                ]
+            },
+            "CONFIG_PTP_1588_CLOCK_KVM": {
+                "value": [
+                    "m",
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Removes error boot message 'failed to initialize ptp kvm'",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/3122"
+                ]
+            },
+            "CONFIG_LIVEPATCH": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for livepatching",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/3107"
+                ]
+            },
+            "CONFIG_SECURITY_SMACK": {
+                "value": [
+                    "is not set",
+                    "<missing>"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "Removed in favor of SELinux",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/3080"
+                ]
+            },
+            "CONFIG_FW_LOADER_COMPRESS": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": " QLogic NIC firmware in linux-firmware is compressed",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/2201"
+                ]
+            },
+            "CONFIG_VFIO_NOIOMMU": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "VMs may not have access to iommu",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/2385"
+                ]
+            },
+            "CONFIG_IO_STRICT_DEVMEM": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for tboot",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/2357"
+                ]
+            },
+            "CONFIG_BPF_UNPRIV_DEFAULT_OFF": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "Needed for CVE-2021-20194",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/2352"
+                ]
+            }
+        }
+    }
+}

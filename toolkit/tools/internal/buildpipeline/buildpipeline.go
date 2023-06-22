@@ -188,6 +188,7 @@ func GetRpmsDir(chrootDir string, proposedDir string) string {
 func CleanupDockerChroot(chroot string) (err error) {
 	var folderToKeep = []string{
 		"dev",
+		"ccache-dir",
 		"proc",
 		"localrpms",
 		"toolchainrpms",

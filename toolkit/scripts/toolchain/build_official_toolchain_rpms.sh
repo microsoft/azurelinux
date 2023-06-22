@@ -314,7 +314,7 @@ build_rpm_in_chroot_no_install xz
 build_rpm_in_chroot_no_install zstd
 build_rpm_in_chroot_no_install lz4
 build_rpm_in_chroot_no_install m4
-build_rpm_in_chroot_no_install libcap
+build_rpm_in_chroot_no_install libcap libcap # Use full naming since we have a collision with libcap-ng
 build_rpm_in_chroot_no_install popt
 build_rpm_in_chroot_no_install tar
 build_rpm_in_chroot_no_install gawk
@@ -416,7 +416,7 @@ chroot_and_install_rpms lua lua
 build_rpm_in_chroot_no_install lua-rpm-macros
 chroot_and_install_rpms lua-rpm-macros
 
-# Build tdnf-3.2.2
+# Build tdnf-3.5.2
 build_rpm_in_chroot_no_install kmod
 build_rpm_in_chroot_no_install perl-XML-Parser
 build_rpm_in_chroot_no_install libssh2
@@ -586,7 +586,7 @@ copy_rpm_subpackage python3-jinja2
 
 # systemd-bootstrap requires libcap, xz, kbd, kmod, util-linux, meson, intltool, python3-jinja2
 # gperf is also needed, but is installed earlier
-chroot_and_install_rpms libcap
+chroot_and_install_rpms libcap libcap # Use full naming since we have a collision with libcap-ng
 chroot_and_install_rpms lz4
 chroot_and_install_rpms xz
 chroot_and_install_rpms kbd

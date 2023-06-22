@@ -1,5 +1,5 @@
-filesystem-1.1-13.cm2.x86_64.rpm
-kernel-headers-5.15.112.1-2.cm2.noarch.rpm
+filesystem-1.1-14.cm2.x86_64.rpm
+kernel-headers-5.15.116.1-1.cm2.noarch.rpm
 glibc-2.35-3.cm2.x86_64.rpm
 glibc-devel-2.35-3.cm2.x86_64.rpm
 glibc-i18n-2.35-3.cm2.x86_64.rpm
@@ -170,8 +170,8 @@ openssl-devel-1.1.1k-24.cm2.x86_64.rpm
 openssl-libs-1.1.1k-24.cm2.x86_64.rpm
 openssl-perl-1.1.1k-24.cm2.x86_64.rpm
 openssl-static-1.1.1k-24.cm2.x86_64.rpm
-libcap-2.60-1.cm2.x86_64.rpm
-libcap-devel-2.60-1.cm2.x86_64.rpm
+libcap-2.60-2.cm2.x86_64.rpm
+libcap-devel-2.60-2.cm2.x86_64.rpm
 debugedit-5.0-1.cm2.x86_64.rpm
 libarchive-3.6.1-2.cm2.x86_64.rpm
 libarchive-devel-3.6.1-2.cm2.x86_64.rpm
@@ -193,10 +193,6 @@ nghttp2-1.46.0-2.cm2.x86_64.rpm
 curl-8.0.1-2.cm2.x86_64.rpm
 curl-devel-8.0.1-2.cm2.x86_64.rpm
 curl-libs-8.0.1-2.cm2.x86_64.rpm
-tdnf-3.2.2-4.cm2.x86_64.rpm
-tdnf-cli-libs-3.2.2-4.cm2.x86_64.rpm
-tdnf-devel-3.2.2-4.cm2.x86_64.rpm
-tdnf-plugin-repogpgcheck-3.2.2-4.cm2.x86_64.rpm
 createrepo_c-0.17.5-1.cm2.x86_64.rpm
 libxml2-2.10.3-1.cm2.x86_64.rpm
 libxml2-devel-2.10.3-1.cm2.x86_64.rpm
@@ -210,6 +206,10 @@ lua-5.4.4-1.cm2.x86_64.rpm
 lua-libs-5.4.4-1.cm2.x86_64.rpm
 mariner-rpm-macros-2.0-21.cm2.noarch.rpm
 mariner-check-macros-2.0-21.cm2.noarch.rpm
+tdnf-3.5.2-2.cm2.x86_64.rpm
+tdnf-cli-libs-3.5.2-2.cm2.x86_64.rpm
+tdnf-devel-3.5.2-2.cm2.x86_64.rpm
+tdnf-plugin-repogpgcheck-3.5.2-2.cm2.x86_64.rpm
 libassuan-2.5.5-2.cm2.x86_64.rpm
 libassuan-devel-2.5.5-2.cm2.x86_64.rpm
 libgpg-error-1.46-1.cm2.x86_64.rpm
