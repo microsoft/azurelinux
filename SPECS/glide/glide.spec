@@ -24,6 +24,7 @@ Glide is a tool for managing the vendor directory within a Go package.
 
 %build
 export GO111MODULE=auto
+export GOFLAGS=-ldflags='-w -s'
 export GOPATH=%{OUR_GOPATH}
 mkdir -p ${GOPATH}/src/github.com/Masterminds/glide
 cp -r * ${GOPATH}/src/github.com/Masterminds/glide/.

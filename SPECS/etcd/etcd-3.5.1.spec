@@ -62,6 +62,7 @@ tools.
 tar --no-same-owner -xf %{SOURCE2}
 
 %build
+export GOFLAGS=-ldflags='-w -s'
 %define ETCD_OUT_DIR %{_builddir}/%{name}-%{version}/bin
 mkdir -p %{ETCD_OUT_DIR}
 
@@ -71,7 +72,7 @@ for component in server etcdctl etcdutl; do
     tar --no-same-owner -xf %{_builddir}/%{name}-%{version}/vendor-$component.tar.gz
     go build \
         -o %{ETCD_OUT_DIR} \
-        -ldflags '-w -s -X go.etcd.io/etcd/api/v3/version.GitSHA=v%{version} '
+        -ldflags=-X=go.etcd.io/etcd/api/v3/version.GitSHA=v%{version}
     popd
 done
 
@@ -83,8 +84,7 @@ for component in etcd-dump-db etcd-dump-logs; do
     pushd tools/$component
     tar --no-same-owner -xf %{_builddir}/%{name}-%{version}/vendor-$component.tar.gz
     go build \
-        -o %{ETCD_TOOLS_OUT_DIR} \
-        -ldflags '-w -s '
+        -o %{ETCD_TOOLS_OUT_DIR}
     popd
 done
 
