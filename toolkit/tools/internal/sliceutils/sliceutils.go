@@ -59,10 +59,6 @@ func PackageVerMatch(expected, given interface{}) bool {
 	return reflect.DeepEqual(expected.(*pkgjson.PackageVer), given.(*pkgjson.PackageVer))
 }
 
-func RemoveDuplicates[T comparable](inputSlice []T) []T {
-	return SetToSlice(SliceToSet(inputSlice))
-}
-
 // SetToSlice converts a map[T]bool to a slice containing the map's keys.
 func SetToSlice[T comparable](inputSet map[T]bool) []T {
 	index := 0

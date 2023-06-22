@@ -3,7 +3,11 @@
 
 package repocloner
 
-import "github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
+import (
+	"fmt"
+
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
+)
 
 // RepoContents contains an array of packages contained in a repo.
 type RepoContents struct {
@@ -27,7 +31,12 @@ type RepoCloner interface {
 	Clone(cloneDeps bool, packagesToClone ...*pkgjson.PackageVer) (prebuiltPackage bool, err error)
 	WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames []string, err error)
 	ConvertDownloadedPackagesIntoRepo() error
-	ClonedRepoContents() (repoContents *RepoContents, err error)
+	ClonedRepoContents(withSystemPackages bool) (repoContents *RepoContents, err error)
 	CloneDirectory() string
 	Close() error
+}
+
+// ID returns a unique identifier for a package.
+func (r *RepoPackage) ID() string {
+	return fmt.Sprintf("%s-%s.%s.%s", r.Name, r.Version, r.Distribution, r.Architecture)
 }

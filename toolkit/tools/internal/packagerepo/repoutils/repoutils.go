@@ -22,15 +22,15 @@ import (
 // cache (with exception of the toolchain packages) then this routine will return an error.
 // This is done to ensure the cache only contains the desired packages.
 func RestoreClonedRepoContents(cloner repocloner.RepoCloner, srcFile string) (err error) {
+	const (
+		cloneDeps          = false
+		withSystemPackages = false
+	)
+
 	timestamp.StartEvent("restoring cloned repo", nil)
 	defer timestamp.StopEvent(nil)
 
-	const (
-		cloneDeps        = false
-		packageCondition = "="
-	)
-
-	logger.Log.Infof("Restoring cloned repository contents from (%s)", srcFile)
+	logger.Log.Infof("Restoring cloned repository contents from (%s).", srcFile)
 
 	var repo *repocloner.RepoContents
 	err = jsonutils.ReadJSONFile(srcFile, &repo)
@@ -38,28 +38,12 @@ func RestoreClonedRepoContents(cloner repocloner.RepoCloner, srcFile string) (er
 		return
 	}
 
-	for _, pkg := range repo.Repo {
-		// Setup a PackageVer that points at the exact package to clone with the version and distribution tag included.
-		pkgVer := &pkgjson.PackageVer{
-			Name:      pkg.Name,
-			Version:   fmt.Sprintf("%s.%s", pkg.Version, pkg.Distribution),
-			Condition: packageCondition,
-		}
+	uniquePackages := removePackageDuplicates(repo.Repo)
+	packagesToDownload := removeDownloadedPackages(uniquePackages, cloner.CloneDirectory())
 
-		// Skip packages that are already present, this is expected for the toolchain
-		rpmName := fmt.Sprintf("%s-%s.%s.rpm", pkgVer.Name, pkgVer.Version, pkg.Architecture)
-		expectedFile := filepath.Join(cloner.CloneDirectory(), pkg.Architecture, rpmName)
-		logger.Log.Infof("Restoring (%s)", rpmName)
-
-		exists, _ := file.PathExists(expectedFile)
-		if exists {
-			logger.Log.Debugf("%s already exists, skipping clone", rpmName)
-			continue
-		}
-		_, err = cloner.Clone(cloneDeps, pkgVer)
-		if err != nil {
-			return err
-		}
+	_, err = cloner.Clone(cloneDeps, packagesToDownload...)
+	if err != nil {
+		return err
 	}
 
 	// Covert the packages into a repo so that they can be compared against the expected state.
@@ -69,41 +53,112 @@ func RestoreClonedRepoContents(cloner repocloner.RepoCloner, srcFile string) (er
 	}
 
 	// Verify the cloned contents are as expected.
-	logger.Log.Infof("Verify cloned repo contents")
-	clonedRepo, err := cloner.ClonedRepoContents()
+	logger.Log.Infof("Verifying cloned repo contents.")
+	clonedRepo, err := cloner.ClonedRepoContents(withSystemPackages)
 	if err != nil {
 		return
 	}
 
-	if len(repo.Repo) != len(clonedRepo.Repo) {
-		return fmt.Errorf("cloned repo (%s) has %d packages, expected %d", cloner.CloneDirectory(), len(repo.Repo), len(clonedRepo.Repo))
-	}
-
-	for i, expectedPkg := range repo.Repo {
-		clonedPkg := clonedRepo.Repo[i]
-
-		if expectedPkg.Name != clonedPkg.Name ||
-			expectedPkg.Version != clonedPkg.Version ||
-			expectedPkg.Architecture != clonedPkg.Architecture ||
-			expectedPkg.Distribution != clonedPkg.Distribution {
-
-			return fmt.Errorf("package mismatch, have (%v), expected (%v)", clonedPkg, expectedPkg)
-		}
-	}
-
-	return
+	return verifyClonedRepoContents(clonedRepo.Repo, uniquePackages)
 }
 
 // SaveClonedRepoContents saves a cloner's repo contents to a JSON file at `dstFile`.
-func SaveClonedRepoContents(cloner repocloner.RepoCloner, dstFile string) (err error) {
+func SaveClonedRepoContents(cloner repocloner.RepoCloner, dstFile string, withSystemPackages bool) (err error) {
 	timestamp.StartEvent("saving cloned repo contents", nil)
 	defer timestamp.StopEvent(nil)
 
-	repo, err := cloner.ClonedRepoContents()
+	repo, err := cloner.ClonedRepoContents(withSystemPackages)
 	if err != nil {
 		return
 	}
 
 	err = jsonutils.WriteJSONFile(dstFile, repo)
+	return
+}
+
+func removePackageDuplicates(packages []*repocloner.RepoPackage) []*repocloner.RepoPackage {
+	index := 0
+	seen := make(map[string]bool)
+	uniquePackages := make([]*repocloner.RepoPackage, len(packages))
+
+	for _, pkg := range packages {
+		packageID := pkg.ID()
+		if !seen[packageID] {
+			seen[packageID] = true
+			uniquePackages[index] = pkg
+			index++
+		}
+	}
+
+	return uniquePackages[:index]
+}
+
+func removeDownloadedPackages(packages []*repocloner.RepoPackage, cloneDirectory string) []*pkgjson.PackageVer {
+	const packageCondition = "="
+
+	packageVers := make([]*pkgjson.PackageVer, len(packages))
+	index := 0
+	for _, pkg := range packages {
+		pkgVersion := fmt.Sprintf("%s.%s", pkg.Version, pkg.Distribution)
+
+		// Skip packages that are already present, this is expected for the toolchain
+		rpmName := fmt.Sprintf("%s-%s.%s.rpm", pkg.Name, pkgVersion, pkg.Architecture)
+		expectedFile := filepath.Join(cloneDirectory, rpmName)
+
+		exists, _ := file.PathExists(expectedFile)
+		if exists {
+			logger.Log.Debugf("Package (%s) already cloned, skipping restoration.", rpmName)
+			continue
+		}
+
+		logger.Log.Infof("Found missing package to restore: %s.", rpmName)
+
+		// Setup a PackageVer that points at the exact package to clone with the pkgVersion and distribution tag included.
+		packageVers[index] = &pkgjson.PackageVer{
+			Name:      pkg.Name,
+			Version:   pkgVersion,
+			Condition: packageCondition,
+		}
+		index++
+	}
+
+	return packageVers[:index]
+}
+
+func verifyClonedRepoContents(clonedRepoContents, expectedPackages []*repocloner.RepoPackage) (err error) {
+	logger.Log.Infof("Verifying cloned repo contents.")
+
+	if len(expectedPackages) != len(clonedRepoContents) {
+		return fmt.Errorf("cloned repo has %d packages, expected %d", len(expectedPackages), len(clonedRepoContents))
+	}
+
+	expectedPackagesSet := map[string]bool{}
+	clonedPackagesSet := map[string]bool{}
+	for i := 0; i < len(expectedPackages); i++ {
+		expectedPackagesSet[expectedPackages[i].ID()] = true
+		clonedPackagesSet[clonedRepoContents[i].ID()] = true
+	}
+
+	extraPackages := []string{}
+	missingPackages := []string{}
+	for clonedPackage := range clonedPackagesSet {
+		if !expectedPackagesSet[clonedPackage] {
+			extraPackages = append(extraPackages, clonedPackage)
+		}
+	}
+
+	for expectedPackage := range expectedPackagesSet {
+		if !clonedPackagesSet[expectedPackage] {
+			missingPackages = append(missingPackages, expectedPackage)
+		}
+	}
+
+	if (len(extraPackages) > 0) || (len(missingPackages) > 0) {
+
+		return fmt.Errorf("package mismatch. Unexpected extra packages: %v.\n Expected missing packages: %v", extraPackages, missingPackages)
+	}
+
+	logger.Log.Infof("Cloned repo contents verified successfully.")
+
 	return
 }

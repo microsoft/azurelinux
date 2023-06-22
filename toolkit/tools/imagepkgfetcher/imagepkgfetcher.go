@@ -53,6 +53,8 @@ var (
 )
 
 func main() {
+	const withSystemPackages = true
+
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
@@ -96,7 +98,7 @@ func main() {
 	}
 
 	if strings.TrimSpace(*outputSummaryFile) != "" {
-		err = repoutils.SaveClonedRepoContents(cloner, *outputSummaryFile)
+		err = repoutils.SaveClonedRepoContents(cloner, *outputSummaryFile, withSystemPackages)
 		logger.PanicOnError(err, "Failed to save cloned repo contents")
 	}
 

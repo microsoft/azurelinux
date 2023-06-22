@@ -55,7 +55,7 @@ var (
 	//   - architecture:    aarch64
 	//   - version:         1.1b.8_X-22~rc1
 	//   - dist:            cm1
-	listedPackageRegex = regexp.MustCompile(`^\s*([[:alnum:]_+-]+)\.([[:alnum:]_+-]+)\s+([[:alnum:]._+~-]+)\.([[:alnum:]_+-]+)`)
+	listedPackageRegex = regexp.MustCompile(`^\s*([[:alnum:]_.+-]+)\.([[:alnum:]_+-]+)\s+([[:alnum:]._+~-]+)\.([[:alnum:]_+-]+)`)
 )
 
 const (
@@ -348,43 +348,59 @@ func (r *RpmRepoCloner) initializeMountedChrootRepo(repoDir string) (err error) 
 func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.PackageVer) (preBuilt bool, err error) {
 	timestamp.StartEvent("cloning packages", nil)
 	defer timestamp.StopEvent(nil)
+
+	if len(packagesToClone) == 0 {
+		logger.Log.Debug("No packages to clone.")
+		return
+	}
+
+	packageNames := make([]string, len(packagesToClone))
+	index := 0
 	for _, pkg := range packagesToClone {
-		timestamp.StartEvent(pkg.Name, nil)
+		packageNames[index] = convertPackageVersionToTdnfArg(pkg)
+		index++
+	}
 
-		pkgName := convertPackageVersionToTdnfArg(pkg)
+	effectiveCacheRepo := selectCorrectCacheRepoID()
 
-		effectiveCacheRepo := selectCorrectCacheRepoID()
-		downloadDir := chrootDownloadDir
-		if !buildpipeline.IsRegularBuild() {
-			downloadDir = cacheRepoDir
-		}
+	depsSwitch := "--nodeps"
+	if cloneDeps {
+		depsSwitch = "--alldeps"
+	}
 
-		logger.Log.Debugf("Cloning: %s", pkgName)
-		args := []string{
-			"--downloaddir",
-			downloadDir,
-			pkgName,
-		}
+	tempDirPath, err := os.MkdirTemp("", "")
+	if err != nil {
+		return false, fmt.Errorf("failed to create temp directory:\n%w", err)
+	}
+	defer os.RemoveAll(tempDirPath)
 
-		if cloneDeps {
-			args = append([]string{"install", "-y", "--downloadonly", "--alldeps"}, args...)
-		} else {
-			args = append([]string{"install", "-y", "--downloadonly", "--nodeps"}, args...)
-		}
+	// Setting install root to a temp directory to prevent TDNF
+	// from skipping over packages already installed in the chroot.
+	// The 'reinstall' command doesn't support the '--nodeps' flag.
+	constantArgs := []string{
+		"install",
+		"-y",
+		depsSwitch,
+		"--downloadonly",
+		"--downloaddir",
+		downloadDir(),
+		"--installroot",
+		tempDirPath,
+	}
+	finalArgs := make([]string, len(constantArgs)+len(packageNames))
+	finalArgs = append(constantArgs, packageNames...)
 
-		err = r.chroot.Run(func() (err error) {
-			var chrootErr error
-			// Consider the toolchain RPMs first, then built RPMs, then the already cached, and finally all remote packages.
-			repoOrderList := []string{toolchainRepoId, builtRepoID, effectiveCacheRepo, allRepoIDs}
-			preBuilt, chrootErr = r.clonePackage(args, repoOrderList...)
-			return chrootErr
-		})
+	logger.Log.Debugf("Cloning: %v", packageNames)
+	err = r.chroot.Run(func() (err error) {
+		var chrootErr error
+		// Consider the toolchain RPMs first, then built RPMs, then the already cached, and finally all remote packages.
+		repoOrderList := []string{toolchainRepoId, builtRepoID, effectiveCacheRepo, allRepoIDs}
+		preBuilt, chrootErr = r.clonePackage(finalArgs, repoOrderList...)
+		return chrootErr
+	})
 
-		if err != nil {
-			return
-		}
-
-		timestamp.StopEvent(nil) // pkg.Name
+	if err != nil {
+		return
 	}
 
 	return
@@ -474,13 +490,7 @@ func (r *RpmRepoCloner) ConvertDownloadedPackagesIntoRepo() (err error) {
 		return
 	}
 
-	repoDir := filepath.Join(r.chroot.RootDir(), chrootDownloadDir)
-
-	if !buildpipeline.IsRegularBuild() {
-		// Docker based build doesn't use overlay so repo folder
-		// must be explicitely set to the RPMs cache folder
-		repoDir = filepath.Join(r.chroot.RootDir(), cacheRepoDir)
-	}
+	repoDir := filepath.Join(r.chroot.RootDir(), downloadDir())
 
 	// Print warnings for any invalid RPMs
 	err = rpmrepomanager.ValidateRpmPaths(repoDir)
@@ -500,7 +510,7 @@ func (r *RpmRepoCloner) ConvertDownloadedPackagesIntoRepo() (err error) {
 }
 
 // ClonedRepoContents returns the packages contained in the cloned repository.
-func (r *RpmRepoCloner) ClonedRepoContents() (repoContents *repocloner.RepoContents, err error) {
+func (r *RpmRepoCloner) ClonedRepoContents(withSystemPackages bool) (repoContents *repocloner.RepoContents, err error) {
 	var (
 		releaseverCliArg string
 	)
@@ -522,6 +532,8 @@ func (r *RpmRepoCloner) ClonedRepoContents() (repoContents *repocloner.RepoConte
 			return
 		}
 
+		logger.Log.Debugf("Found package: %s", line)
+
 		pkg := &repocloner.RepoPackage{
 			Name:         matches[listPackageName],
 			Version:      matches[listPackageVersion],
@@ -535,7 +547,6 @@ func (r *RpmRepoCloner) ClonedRepoContents() (repoContents *repocloner.RepoConte
 	checkedRepoID := selectCorrectCacheRepoID()
 
 	err = r.chroot.Run(func() (err error) {
-		// Disable all repositories except the fetcher repository (the repository with the cloned packages)
 		tdnfArgs := []string{
 			"list",
 			"ALL",
@@ -543,6 +554,16 @@ func (r *RpmRepoCloner) ClonedRepoContents() (repoContents *repocloner.RepoConte
 			fmt.Sprintf("--enablerepo=%s", checkedRepoID),
 			releaseverCliArg,
 		}
+
+		if !withSystemPackages {
+			tempDirPath, err := os.MkdirTemp("", "")
+			if err != nil {
+				return err
+			}
+			defer os.RemoveAll(tempDirPath)
+			tdnfArgs = append(tdnfArgs, "--installroot", tempDirPath)
+		}
+
 		return shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, true, "tdnf", tdnfArgs...)
 	})
 
@@ -642,6 +663,16 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string, enabledRepoOrder ...stri
 	}
 
 	return
+}
+
+// Docker-based build doesn't use overlay so repo folder
+// must be explicitly be set to the RPMs cache folder.
+func downloadDir() string {
+	if buildpipeline.IsRegularBuild() {
+		return chrootDownloadDir
+	}
+
+	return cacheRepoDir
 }
 
 func convertPackageVersionToTdnfArg(pkgVer *pkgjson.PackageVer) (tdnfArg string) {
