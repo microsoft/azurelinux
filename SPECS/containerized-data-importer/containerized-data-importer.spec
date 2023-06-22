@@ -133,8 +133,7 @@ CDI_GIT_TREE_STATE="clean" \
 	%{nil}
 
 export GO_EXTLINK_ENABLED=0
-export CGO_ENABLED=0
-./hack/build/build-go.sh build tools/cdi-containerimage-server
+CGO_ENABLED=0 ./hack/build/build-go.sh build tools/cdi-containerimage-server
 
 ./hack/build/build-manifests.sh
 
