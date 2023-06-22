@@ -133,6 +133,10 @@ CDI_GIT_TREE_STATE="clean" \
 	tools/csv-generator \
 	%{nil}
 
+export GO_EXTLINK_ENABLED=0
+export CGO_ENABLED=0
+./hack/build/build-go.sh build tools/cdi-image-size-detection
+
 ./hack/build/build-manifests.sh
 
 %install
