@@ -686,7 +686,7 @@ done
 
 %changelog
 * Wed Jun 21 2023 Vince Perri <viperri@microsoft.com> - 20230301gitf80f052277c8-34
-- Patch CVE-2023-0464 in bundled OpenSSL.
+- Add nvram-template mapping to ovmf x64 config.
 
 * Tue Jun 6 2023 Daniel McIlvaney <damcilva@microsoft.com> - 20230301gitf80f052277c8-33
 - Patch CVE-2023-0464 in bundled OpenSSL.
