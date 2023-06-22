@@ -120,7 +120,6 @@ CDI_GIT_COMMIT='v%{version}' \
 CDI_GIT_VERSION='v%{version}' \
 CDI_GIT_TREE_STATE="clean" \
 ./hack/build/build-go.sh build \
-	tools/cdi-containerimage-server \
 	cmd/cdi-apiserver \
 	cmd/cdi-cloner \
 	cmd/cdi-controller \
@@ -135,7 +134,7 @@ CDI_GIT_TREE_STATE="clean" \
 
 export GO_EXTLINK_ENABLED=0
 export CGO_ENABLED=0
-./hack/build/build-go.sh build tools/cdi-image-size-detection
+./hack/build/build-go.sh build tools/cdi-containerimage-server
 
 ./hack/build/build-manifests.sh
 
