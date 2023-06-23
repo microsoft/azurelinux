@@ -1,6 +1,6 @@
 Summary:        PostgreSQL database engine
 Name:           postgresql
-Version:        12.12
+Version:        12.15
 Release:        1%{?dist}
 License:        PostgreSQL
 Vendor:         Microsoft Corporation
