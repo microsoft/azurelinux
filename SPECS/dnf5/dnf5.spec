@@ -9,8 +9,8 @@
 %global swig_version 4
 %global zchunk_version 0.9.11
 # ========== build options ==========
-%bcond_without dnf5daemon_client
-%bcond_without dnf5daemon_server
+%bcond_with dnf5daemon_client
+%bcond_with dnf5daemon_server
 %bcond_without libdnf_cli
 %bcond_without dnf5
 %bcond_without dnf5_plugins

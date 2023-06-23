@@ -3058,7 +3058,7 @@
             ]
         },
         "RPM software management source": {
-            "license": "[GPLv2+ License](https://github.com/akopytov/sysbench/blob/master/COPYING)",
+            "license": "[GPLv2+ License](https://github.com/rpm-software-management/dnf5/blob/main/COPYING.md)",
             "specs": [
                 "dnf5"
             ]

@@ -2739,7 +2739,7 @@
         "other": {
           "name": "dnf5",
           "version": "5.0.14",
-          "downloadUrl": "https://github.com/rpm-software-management/dnf5/archive/5.0.14/5.0.14.tar.gz"
+          "downloadUrl": "https://github.com/rpm-software-management/dnf5/archive/5.0.14/dnf5-5.0.14.tar.gz"
         }
       }
     },
