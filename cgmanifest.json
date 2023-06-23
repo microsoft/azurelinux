@@ -3950,8 +3950,8 @@
         "type": "other",
         "other": {
           "name": "fsverity-utils",
-          "version": "1.4",
-          "downloadUrl": "https://git.kernel.org/pub/scm/fs/fsverity/fsverity-utils.git/snapshot/fsverity-utils-1.4.tar.gz"
+          "version": "1.5",
+          "downloadUrl": "https://git.kernel.org/pub/scm/fs/fsverity/fsverity-utils.git/snapshot/fsverity-utils-1.5.tar.gz"
         }
       }
     },
