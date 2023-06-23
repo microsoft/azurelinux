@@ -1,13 +1,12 @@
 Summary:        fsverity utilities
 Name:           fsverity-utils
-Version:        1.4
-Release:        8%{?dist}
-License:        BSD
+Version:        1.5
+Release:        1%{?dist}
+License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://git.kernel.org/pub/scm/fs/fsverity/fsverity-utils.git/
 Source0:        https://git.kernel.org/pub/scm/fs/fsverity/fsverity-utils.git/snapshot/%{name}-%{version}.tar.gz
-Patch1:         %{name}-pkcs11-opaque-keys-support.patch
 BuildRequires:  gcc
 BuildRequires:  glibc-headers
 BuildRequires:  kernel-headers
@@ -25,7 +24,7 @@ rather than at the block device level. The fsverity utility allows you
 to set up fs-verity protected files.
 
 %package -n libfsverity
-Summary:        Development package for fsverity-utils
+Summary:        Library files for fsverity-utils
 
 %description -n libfsverity
 Library for fsverity-utils.
@@ -43,13 +42,14 @@ libfsverity header and library files.
 %autosetup -p1
 
 %build
-%{set_build_flags}
 %make_build CFLAGS="$CFLAGS -g" USE_SHARED_LIB=1
 
 %install
-%{set_build_flags}
 %make_install PREFIX=%{_prefix} LIBDIR=%{_libdir}  CFLAGS="$CFLAGS -g" USE_SHARED_LIB=1
 find %{buildroot} -type f -name "*.a" -delete
+
+%check
+make check
 
 %files
 %doc README.md
@@ -65,8 +65,10 @@ find %{buildroot} -type f -name "*.a" -delete
 %{_libdir}/pkgconfig/libfsverity.pc
 
 %changelog
-* Thu Apr 20 2023 Elaheh Dehghani <edehghani@microsoft.com> - 1.4-8
-- Initial overlake-packages import from Fedora 36 (license: MIT).
+* Thu Jun 22 2023 Zhichun Wan <zhichunwan@microsoft.com> - 1.5-1
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- Update to 1.5
+- License verified
 
 * Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.4-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
