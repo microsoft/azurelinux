@@ -759,13 +759,12 @@
             },
             "CONFIG_IP_VS_MH": {
                 "value": [
-                    "m",
-                    "y"
+                    "m"
                 ],
                 "arch": [
                     "AMD64"
                 ],
-                "comment": "Needed for customer",
+                "comment": "Add additional mh scheduler for ipvs per suggestion by customer",
                 "PR": [
                     "https://github.com/microsoft/CBL-Mariner/pull/5657"
                 ]
