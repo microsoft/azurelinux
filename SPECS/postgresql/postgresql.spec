@@ -169,6 +169,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/libpgtypes.a
 
 %changelog
+* Fri Jun 23 2023 Bala <balakumaran.kannan@microsoft.com> - 12.15-1
+- Upgrade to 12.15 to fix CVE-2023-2454
+
 * Thu Oct 06 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 12.12-1
 - Upgrade to 12.12 to fix CVE-2022-1552
 
