@@ -346,6 +346,8 @@ func (r *RpmRepoCloner) initializeMountedChrootRepo(repoDir string) (err error) 
 // It will automatically resolve packages that describe a provide or file from a package.
 // The cloner will mark any package that locally built by setting preBuilt = true
 func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.PackageVer) (preBuilt bool, err error) {
+	const maxBatchSize = 50
+
 	timestamp.StartEvent("cloning packages", nil)
 	defer timestamp.StopEvent(nil)
 
@@ -387,20 +389,31 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 		"--installroot",
 		tempDirPath,
 	}
-	finalArgs := make([]string, len(constantArgs)+len(packageNames))
-	finalArgs = append(constantArgs, packageNames...)
 
-	logger.Log.Debugf("Cloning: %v", packageNames)
-	err = r.chroot.Run(func() (err error) {
-		var chrootErr error
-		// Consider the toolchain RPMs first, then built RPMs, then the already cached, and finally all remote packages.
-		repoOrderList := []string{toolchainRepoId, builtRepoID, effectiveCacheRepo, allRepoIDs}
-		preBuilt, chrootErr = r.clonePackage(finalArgs, repoOrderList...)
-		return chrootErr
-	})
+	packagesCount := len(packageNames)
+	for i := 0; i < packagesCount; i += maxBatchSize {
+		batchEndIndex := i + maxBatchSize
+		if batchEndIndex > packagesCount {
+			batchEndIndex = packagesCount
+		}
 
-	if err != nil {
-		return
+		currentPackageNames := packageNames[i:batchEndIndex]
+
+		finalArgs := make([]string, len(constantArgs)+len(currentPackageNames))
+		finalArgs = append(constantArgs, currentPackageNames...)
+
+		logger.Log.Debugf("Cloning batch %d to %d: %v", i, batchEndIndex, currentPackageNames)
+		err = r.chroot.Run(func() (err error) {
+			var chrootErr error
+			// Consider the toolchain RPMs first, then built RPMs, then the already cached, and finally all remote packages.
+			repoOrderList := []string{toolchainRepoId, builtRepoID, effectiveCacheRepo, allRepoIDs}
+			preBuilt, chrootErr = r.clonePackage(finalArgs, repoOrderList...)
+			return chrootErr
+		})
+
+		if err != nil {
+			return
+		}
 	}
 
 	return

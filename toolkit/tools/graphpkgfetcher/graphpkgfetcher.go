@@ -276,7 +276,7 @@ func assignRPMPath(node *pkggraph.PkgNode, outDir string, resolvedPackages []str
 		rpmPaths = append(rpmPaths, rpmPackageToRPMPath(resolvedPackage, outDir))
 	}
 
-	node.RpmPath = rpmPaths[0]
+	chosenRPMPath := rpmPaths[0]
 	if len(rpmPaths) > 1 {
 		var resolvedRPMs []string
 		logger.Log.Debugf("Found %d candidates. Resolving.", len(rpmPaths))
@@ -297,8 +297,10 @@ func assignRPMPath(node *pkggraph.PkgNode, outDir string, resolvedPackages []str
 			logger.Log.Warnf("Found %d candidates to provide '%s'. Picking the first one.", resolvedRPMsCount, node.VersionedPkg.Name)
 		}
 
-		node.RpmPath = rpmPackageToRPMPath(resolvedRPMs[0], outDir)
+		chosenRPMPath = rpmPackageToRPMPath(resolvedRPMs[0], outDir)
 	}
+
+	node.RpmPath = chosenRPMPath
 
 	return
 }
