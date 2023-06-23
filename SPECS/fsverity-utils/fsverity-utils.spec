@@ -42,10 +42,10 @@ libfsverity header and library files.
 %autosetup -p1
 
 %build
-%make_build CFLAGS="$CFLAGS" USE_SHARED_LIB=1
+%make_build USE_SHARED_LIB=1
 
 %install
-%make_install PREFIX=%{_prefix} LIBDIR=%{_libdir}  CFLAGS="$CFLAGS" USE_SHARED_LIB=1
+%make_install PREFIX=%{_prefix} LIBDIR=%{_libdir} USE_SHARED_LIB=1
 find %{buildroot} -type f -name "*.a" -delete
 
 %check
