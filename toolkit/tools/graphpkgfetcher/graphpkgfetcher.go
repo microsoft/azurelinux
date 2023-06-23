@@ -398,8 +398,7 @@ func downloadAllAvailableDeltaRPMs(realDependencyGraph, dependencyGraphDeltaCopy
 //   - pathMap: A map of the original path to the delta path for each RPM that was downloaded. This is used to fix up
 //     the implicit nodes later.
 func downloadSingleDeltaRPM(realDependencyGraph *pkggraph.PkgGraph, realBuildNode *pkggraph.PkgNode, cloner *rpmrepocloner.RpmRepoCloner, deltaRpmDir string, pathMap *map[string]string) (foundMatch bool, err error) {
-	//TODO: downloadDependencies is broken right now, fix it
-	const downloadDependencies = true
+	const downloadDependencies = false
 	var lookup *pkggraph.LookupNode
 
 	// Find the real build node in the graph we want to keep (we will be discarding the graph the node was passed in from so we can't use it)
@@ -430,7 +429,7 @@ func downloadSingleDeltaRPM(realDependencyGraph *pkggraph.PkgGraph, realBuildNod
 	// We need to copy the node since the fetcher may on occasion choose a different package to provide something than
 	// we want. We only consider a delta node valid if the .rpm matches exactly. If we tryy and fail to download a delta
 	// the node would be left in a bad state.
-	nodeCopy := realBuildNode
+	nodeCopy := realBuildNode.Copy()
 
 	// Get the final output path for the build node if we don't convert it to a delta node
 	originalRpmPath := realBuildNode.RpmPath
