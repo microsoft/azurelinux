@@ -28,7 +28,10 @@ func StartProfiling(pf *exe.ProfileFlags) (*Profiler, error) {
 		if err != nil {
 			return nil, fmt.Errorf("Unable to create cpu-pprof file: %s", err)
 		}
-		pprof.StartCPUProfile(cpf)
+		err = pprof.StartCPUProfile(cpf)
+		if err != nil {
+			return nil, fmt.Errorf("Unable to start cpu-pprof: %s", err)
+		}
 		// Assign the file pointer after starting the profile operation
 		p.cpuProfFile = cpf
 	}
