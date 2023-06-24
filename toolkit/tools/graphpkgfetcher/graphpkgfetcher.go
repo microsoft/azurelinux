@@ -163,7 +163,7 @@ func fetchPackages() (err error) {
 //   - cloner: The cloner to use to download the RPMs
 func downloadDeltaNodes(dependencyGraph *pkggraph.PkgGraph, cloner *rpmrepocloner.RpmRepoCloner) (err error) {
 	const (
-		deltaBuildGraph = true
+		useImplicitForOptimization = true
 	)
 
 	timestamp.StartEvent("delta package download", nil)
@@ -181,7 +181,7 @@ func downloadDeltaNodes(dependencyGraph *pkggraph.PkgGraph, cloner *rpmrepoclone
 	// The scheduler utils expect to pick a graph up from a file, so we will write the graph we wrote it to a file and
 	// now we read it back in and optimize it. We will heavily modify this graph so it should not be used for anything
 	// else.
-	isGraphOptimized, deltaPkgGraphCopy, _, err := schedulerutils.InitializeGraph(*outputGraph, packageVersToBuild, deltaBuildGraph)
+	isGraphOptimized, deltaPkgGraphCopy, _, err := schedulerutils.InitializeGraph(*outputGraph, packageVersToBuild, useImplicitForOptimization)
 	if err != nil {
 		err = fmt.Errorf("failed to initialize graph for delta package downloading: %w", err)
 		return
@@ -350,6 +350,12 @@ func downloadAllAvailableDeltaRPMs(realDependencyGraph, dependencyGraphDeltaCopy
 		if n.Implicit {
 			logger.Log.Debugf("Skipping implicit delta build node %s", n)
 			skippedNodes = append(skippedNodes, n)
+			continue
+		}
+
+		// If this node isn't part of the optimized graph, skip it.
+		if _, ok := srpmPaths[n.SrpmPath]; !ok {
+			logger.Log.Debugf("Skipping non-optimized delta build node %s", n)
 			continue
 		}
 
