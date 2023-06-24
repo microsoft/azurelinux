@@ -202,7 +202,7 @@ $(RPMS_DIR):
 	@touch $@
 endif
 
-$(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-scheduler) $(go-pkgworker) $(depend_STOP_ON_PKG_FAIL) $(CONFIG_FILE) $(depend_CONFIG_FILE) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST)
+$(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-scheduler) $(go-pkgworker) $(depend_STOP_ON_PKG_FAIL) $(CONFIG_FILE) $(depend_CONFIG_FILE) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST) $(pkggen_rpms)
 	$(go-scheduler) \
 		--input="$(preprocessed_file)" \
 		--output="$(built_file)" \
@@ -236,7 +236,7 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-
 		$(if $(filter y,$(STOP_ON_PKG_FAIL)),--stop-on-failure) \
 		$(if $(filter-out y,$(USE_PACKAGE_BUILD_CACHE)),--no-cache) \
 		$(if $(filter-out y,$(CLEANUP_PACKAGE_BUILDS)),--no-cleanup) \
-		$(if $(filter y,$(DELTA_BUILD)),--delta-build) \
+		$(if $(filter y,$(DELTA_BUILD)),--optimize-with-cached-implicit) \
 		$(if $(filter y,$(USE_CCACHE)),--use-ccache) \
 		$(if $(filter y,$(ALLOW_TOOLCHAIN_REBUILDS)),--allow-toolchain-rebuilds) \
 		--max-cpu="$(MAX_CPU)" \

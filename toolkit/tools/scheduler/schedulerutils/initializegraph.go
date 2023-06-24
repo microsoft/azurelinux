@@ -17,14 +17,15 @@ const (
 )
 
 // InitializeGraph initializes and prepares a graph dot file for building.
-// - It will load and return the graph.
-// - It will subgraph the graph to only contain the desired packages if possible.
-func InitializeGraph(inputFile string, packagesToBuild []*pkgjson.PackageVer, deltaBuild bool) (isOptimized bool, pkgGraph *pkggraph.PkgGraph, goalNode *pkggraph.PkgNode, err error) {
+//   - It will load and return the graph.
+//   - It will subgraph the graph to only contain the desired packages if possible.
+//   - If canUseCachedImplicit is true, it will use cached nodes to resolve implicit dependencies instead of waiting for
+//     them to be built in the graph (This can allow the graph to be optimized immediately instead of waiting for the
+//     implicit nodes to be resolved by an unknown package later in the build).
+func InitializeGraph(inputFile string, packagesToBuild []*pkgjson.PackageVer, canUseCachedImplicit bool) (isOptimized bool, pkgGraph *pkggraph.PkgGraph, goalNode *pkggraph.PkgNode, err error) {
 	const (
 		strictGoalNode = true
 	)
-	// Delta builds can use cached implicit nodes
-	canUseCachedImplicit := deltaBuild
 
 	pkgGraph, err = pkggraph.ReadDOTGraphFile(inputFile)
 	if err != nil {
