@@ -26,8 +26,6 @@ type RepoPackage struct {
 // It is capable of generate a local repository consisting of a set of request packages
 // and their dependencies.
 type RepoCloner interface {
-	Initialize(destinationDir, tmpDir, workerTar, existingRpmsDir, toolchainRpmsDir string, usePreviewRepo, disableDefaultRepos bool, repoDefinitions []string) error
-	AddNetworkFiles(tlsClientCert, tlsClientKey string) error
 	Clone(cloneDeps bool, packagesToClone ...*pkgjson.PackageVer) (prebuiltPackage bool, err error)
 	WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames []string, err error)
 	ConvertDownloadedPackagesIntoRepo() error
