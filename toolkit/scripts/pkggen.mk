@@ -41,19 +41,20 @@ logging_command = --log-file=$(LOGS_DIR)/pkggen/workplan/$(notdir $@).log --log-
 $(call create_folder,$(LOGS_DIR)/pkggen/workplan)
 $(call create_folder,$(rpmbuilding_logs_dir))
 
-.PHONY: clean-workplan clean-cache clean-spec-parse clean-ccache graph-cache analyze-built-graph workplan
+.PHONY: clean-workplan clean-cache clean-cache-worker clean-spec-parse clean-ccache graph-cache analyze-built-graph workplan
 graph-cache: $(cached_file)
 workplan: $(graph_file)
 clean: clean-workplan clean-cache clean-spec-parse
 clean-workplan: clean-cache clean-spec-parse
 	rm -rf $(PKGBUILD_DIR)
 	rm -rf $(LOGS_DIR)/pkggen/workplan
-clean-cache:
+clean-cache-worker:
+	$(SCRIPTS_DIR)/safeunmount.sh "$(cache_working_dir)" && \
+	rm -rf $(cache_working_dir)
+clean-cache: clean-cache-worker
 	rm -rf $(CACHED_RPMS_DIR)
 	rm -f $(validate-pkggen-config)
 	@echo Verifying no mountpoints present in $(cache_working_dir)
-	$(SCRIPTS_DIR)/safeunmount.sh "$(cache_working_dir)" && \
-	rm -rf $(cache_working_dir)
 clean-spec-parse:
 	@echo Verifying no mountpoints present in $(parse_working_dir)
 	$(SCRIPTS_DIR)/safeunmount.sh "$(parse_working_dir)" && \
