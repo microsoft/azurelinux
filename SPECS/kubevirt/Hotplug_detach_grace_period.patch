@@ -1,21 +1,20 @@
 diff --git a/pkg/virt-launcher/virtwrap/manager.go b/pkg/virt-launcher/virtwrap/manager.go
-index 63d8d43d2..35cdc31d8 100644
+index 63d8d43d2..19719993a 100644
 --- a/pkg/virt-launcher/virtwrap/manager.go
 +++ b/pkg/virt-launcher/virtwrap/manager.go
-@@ -97,6 +97,12 @@ const (
+@@ -97,6 +97,11 @@ const (
  const maxConcurrentHotplugHostDevices = 1
  const maxConcurrentMemoryDumps = 1
  
 +// TODO: Make this configurable from the VMI object?
 +const hotplugDetachmentGracePeriod = 5 * time.Second
 +
-+// TODO: Either delete logging statements that use this or increase the value to 5
-+const hotplugDetachmentVerbosity = 1
++const hotplugDetachmentVerbosity = 4
 +
  type contextStore struct {
  	ctx    context.Context
  	cancel context.CancelFunc
-@@ -142,6 +148,7 @@ type LibvirtDomainManager struct {
+@@ -142,6 +147,7 @@ type LibvirtDomainManager struct {
  
  	hotplugHostDevicesInProgress chan struct{}
  	memoryDumpInProgress         chan struct{}
@@ -23,7 +22,7 @@ index 63d8d43d2..35cdc31d8 100644
  
  	virtShareDir             string
  	ephemeralDiskDir         string
-@@ -204,6 +211,7 @@ func newLibvirtDomainManager(connection cli.Connection, virtShareDir, ephemeralD
+@@ -204,6 +210,7 @@ func newLibvirtDomainManager(connection cli.Connection, virtShareDir, ephemeralD
  		cancelSafetyUnfreezeChan: make(chan struct{}),
  		migrateInfoStats:         &stats.DomainJobInfo{},
  		metadataCache:            metadataCache,
@@ -31,7 +30,7 @@ index 63d8d43d2..35cdc31d8 100644
  	}
  
  	manager.hotplugHostDevicesInProgress = make(chan struct{}, maxConcurrentHotplugHostDevices)
-@@ -922,19 +930,75 @@ func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, allowEmul
+@@ -922,19 +929,75 @@ func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, allowEmul
  		return nil, err
  	}
  
@@ -114,7 +113,7 @@ index 63d8d43d2..35cdc31d8 100644
  	}
  	// Look up all the disks to attach
  	for _, attachDisk := range getAttachedDisks(oldSpec.Devices.Disks, domain.Spec.Devices.Disks) {
-@@ -945,7 +1009,18 @@ func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, allowEmul
+@@ -945,7 +1008,18 @@ func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, allowEmul
  		if !allowAttach {
  			continue
  		}
@@ -134,7 +133,7 @@ index 63d8d43d2..35cdc31d8 100644
  		// set drivers cache mode
  		err = converter.SetDriverCacheMode(&attachDisk, l.directIOChecker)
  		if err != nil {
-@@ -1032,7 +1107,7 @@ func isHotplugDisk(disk api.Disk) bool {
+@@ -1032,7 +1106,7 @@ func isHotplugDisk(disk api.Disk) bool {
  	return strings.HasPrefix(getSourceFile(disk), v1.HotplugDiskDir)
  }
  
@@ -143,7 +142,7 @@ index 63d8d43d2..35cdc31d8 100644
  	newDiskMap := make(map[string]api.Disk)
  	for _, disk := range newDisks {
  		file := getSourceFile(disk)
-@@ -1040,14 +1115,15 @@ func getDetachedDisks(oldDisks, newDisks []api.Disk) []api.Disk {
+@@ -1040,14 +1114,15 @@ func getDetachedDisks(oldDisks, newDisks []api.Disk) []api.Disk {
  			newDiskMap[file] = disk
  		}
  	}
@@ -163,28 +162,27 @@ index 63d8d43d2..35cdc31d8 100644
  	return res
 diff --git a/prototype.patch b/prototype.patch
 new file mode 100644
-index 000000000..4925fa045
+index 000000000..a7d83eb93
 --- /dev/null
 +++ b/prototype.patch
-@@ -0,0 +1,86 @@
+@@ -0,0 +1,87 @@
 +diff --git a/pkg/virt-launcher/virtwrap/manager.go b/pkg/virt-launcher/virtwrap/manager.go
-+index 63d8d43d2..35cdc31d8 100644
++index 63d8d43d2..19719993a 100644
 +--- a/pkg/virt-launcher/virtwrap/manager.go
 ++++ b/pkg/virt-launcher/virtwrap/manager.go
-+@@ -97,6 +97,12 @@ const (
++@@ -97,6 +97,11 @@ const (
 + const maxConcurrentHotplugHostDevices = 1
 + const maxConcurrentMemoryDumps = 1
 + 
 ++// TODO: Make this configurable from the VMI object?
 ++const hotplugDetachmentGracePeriod = 5 * time.Second
 ++
-++// TODO: Either delete logging statements that use this or increase the value to 5
-++const hotplugDetachmentVerbosity = 1
+++const hotplugDetachmentVerbosity = 4
 ++
 + type contextStore struct {
 + 	ctx    context.Context
 + 	cancel context.CancelFunc
-+@@ -142,6 +148,7 @@ type LibvirtDomainManager struct {
++@@ -142,6 +147,7 @@ type LibvirtDomainManager struct {
 + 
 + 	hotplugHostDevicesInProgress chan struct{}
 + 	memoryDumpInProgress         chan struct{}
@@ -192,7 +190,7 @@ index 000000000..4925fa045
 + 
 + 	virtShareDir             string
 + 	ephemeralDiskDir         string
-+@@ -204,6 +211,7 @@ func newLibvirtDomainManager(connection cli.Connection, virtShareDir, ephemeralD
++@@ -204,6 +210,7 @@ func newLibvirtDomainManager(connection cli.Connection, virtShareDir, ephemeralD
 + 		cancelSafetyUnfreezeChan: make(chan struct{}),
 + 		migrateInfoStats:         &stats.DomainJobInfo{},
 + 		metadataCache:            metadataCache,
@@ -200,7 +198,7 @@ index 000000000..4925fa045
 + 	}
 + 
 + 	manager.hotplugHostDevicesInProgress = make(chan struct{}, maxConcurrentHotplugHostDevices)
-+@@ -922,19 +930,75 @@ func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, allowEmul
++@@ -922,19 +929,75 @@ func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, allowEmul
 + 		return nil, err
 + 	}
 + 
@@ -252,5 +250,7 @@ index 000000000..4925fa045
 ++			// so there aren't multiple goroutines waiting to detach the same disk.
 ++			if _, ok := l.cancelDiskDetachChannels[namespacedDiskName]; ok {
 ++				logger.V(hotplugDetachmentVerbosity).Infof("Potential hotplug disk detaching already handled: %s", namespacedDiskName)
-++	
+++				return
+++			}
+++			// There are no other goroutines waiting to detach this disk, cr
 \ No newline at end of file
