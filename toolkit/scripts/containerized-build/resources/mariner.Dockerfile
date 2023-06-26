@@ -5,7 +5,6 @@ ARG mode
 ARG enable_local_repo
 ARG topdir
 ARG mariner_repo
-ARG mariner_branch
 
 COPY resources/_local_repo /etc/yum.repos.d/local_repo.not_a_repo
 COPY build_container/depsearch /mariner_docker_stuff/
@@ -24,7 +23,7 @@ RUN echo "alias tdnf='tdnf --releasever=$version'"              >> /root/.bashrc
     echo "cat /mariner_docker_stuff/welcome.txt"                >> /root/.bashrc && \
     echo "if [[ ! -L /repo ]]; then ln -s /mnt/RPMS/ /repo; fi" >> /root/.bashrc && \
     echo "cd  /repo"                                            >> /root/.bashrc && \
-    echo "export 'PS1=$mariner_repo:$mariner_branch:\$(pwd)\$'" >> /root/.bashrc
+    echo "export 'PS1=\e[0m$mariner_repo:\e[34m\$(pwd)\\e[30m$'" >> /root/.bashrc
 
 #if enable_local_repo is set to true
 RUN if [[ "${enable_local_repo}" == "true" ]]; then echo "enable_local_repo" >> /root/.bashrc; fi

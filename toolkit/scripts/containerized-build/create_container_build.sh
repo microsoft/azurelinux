@@ -181,7 +181,6 @@ sudo docker build -q \
                 --build-arg enable_local_repo="$enable_local_repo" \
                 --build-arg topdir="$topdir" \
                 --build-arg mariner_repo="$repo_path" \
-                --build-arg mariner_branch="" \
                 .
 
 sudo docker tag ${docker_image_tag}:${tag} ${docker_image_tag}:latest
