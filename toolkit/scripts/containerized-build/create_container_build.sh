@@ -7,8 +7,6 @@ set -e
 
 script_dir=$( realpath "$(dirname "$0")" )
 topdir=/usr/src/mariner
-container_build_dir=/usr/src/mariner/BUILD
-container_buildroot_dir=/usr/src/mariner/BUILDROOT
 enable_local_repo=false
 
 function switch_to_red_text() {
@@ -28,14 +26,15 @@ function print_error() {
 }
 
 function help {
-echo "Usage: sudo make containerized-rpmbuild [REPO_PATH=/path/to/CBL-Mariner] [MODE=test|build] [VERSION=1.0|2.0] [MOUNTS= /src/path:/dst/path] [ENABLE_REPO=y] [--help]
+echo "
+Usage: sudo make containerized-rpmbuild [REPO_PATH=/path/to/CBL-Mariner] [MODE=test|build] [VERSION=1.0|2.0] [MOUNTS= /src/path:/dst/path] [ENABLE_REPO=y]
 
 Starts a docker container with the specified version of mariner. Mounts REPO_PATH/out/RPMS
 to /mnt/RPMS.
 
 In the 'build' mode, mounts REPO_PATH/build/INTERMEDIATE_SRPMS at /mnt/INTERMEDIATE_SRPMS;
-REPO_PATH/SPECS at ${topdir}/SPECS; REPO_PATH/build/container-build at ${container_build_dir} and
-REPO_PATH/build/container-buildroot at ${container_buildroot_dir}
+REPO_PATH/SPECS at ${topdir}/SPECS; REPO_PATH/build/container-build at ${topdir}/BUILD and
+REPO_PATH/build/container-buildroot at ${topdir}/BUILDROOT
 
 Optional arguments:
     REPO_PATH:      path to the CBL-Mariner repo root directory. default: "current directory"
@@ -45,7 +44,8 @@ Optional arguments:
     MOUNTS          mount a directory into the container. Should be of the form '/src/dir:/dest/dir'. 
                                 Can be specified multiple times..........default: ""
     ENABLE_REPO:    Set to 'y' to use local RPMs to satisfy package dependencies. default: "n"
-    --help          print this help message
+
+To see help, run 'sudo make containerized-rpmbuild-help'
 "
 }
 
@@ -53,6 +53,20 @@ function build_chroot() {
     cd "${repo_path}/toolkit"
     echo "Building worker chroot"
     sudo make graph-cache REBUILD_TOOLS=y > /dev/null
+}
+
+function build_tools() {
+    cd "${repo_path}/toolkit"
+    echo "Building tools"
+    sudo make go-depsearch REBUILD_TOOLS=y
+    sudo make go-grapher REBUILD_TOOLS=y
+    sudo make go-specreader REBUILD_TOOLS=y
+}
+
+function build_graph() {
+    cd "${repo_path}/toolkit"
+    echo "Building dependency graph"
+    sudo make workplan
 }
 
 while (( "$#")); do
@@ -66,6 +80,7 @@ while (( "$#")); do
   esac
 done
 
+# Assign default values
 [[ -z "${repo_path}" ]] && repo_path="$(dirname $0)" && repo_path=${repo_path%'/toolkit'*}
 [[ ! -d "${repo_path}" ]] && { print_error " Directory ${repo_path} does not exist"; exit 1; }
 [[ -z "${mode}" ]] && mode="build"
@@ -92,8 +107,23 @@ if [[ "${mode}" == "build" ]]; then
     if [ -d "${repo_path}/build/container-buildroot" ]; then rm -Rf ${repo_path}/build/container-buildroot; fi
     mkdir ${repo_path}/build/container-build
     mkdir ${repo_path}/build/container-buildroot
-    mounts="${mounts} ${repo_path}/build/container-build:${container_build_dir} ${repo_path}/build/container-buildroot:${container_buildroot_dir}"
+    mounts="${mounts} ${repo_path}/build/container-build:${topdir}/BUILD ${repo_path}/build/container-buildroot:${topdir}/BUILDROOT"
 fi
+
+# ============ Setup tools ============
+# Copy relavant build tool executables from ${repo_path}/tools/out
+echo "Setting up tools"
+cd "${repo_path}/toolkit"
+if [[ ( ! -f "out/tools/depsearch" ) || ( ! -f "out/tools/grapher" ) || ( ! -f "out/tools/specreader" ) ]]; then build_tools; fi
+
+#if [[ ! -f "out/tools/depsearch" ]]; then build_tools; fi
+cp ${repo_path}/toolkit/out/tools/depsearch ${build_dir}/depsearch
+#if [[ ! -f "out/tools/grapher" ]]; then build_tools; fi
+cp ${repo_path}/toolkit/out/tools/grapher ${build_dir}/grapher
+#if [[ ! -f "out/tools/specreader" ]]; then build_tools; fi
+cp ${repo_path}/toolkit/out/tools/specreader ${build_dir}/specreader
+if [[ ! -f "../build/pkg_artifacts/graph.dot" ]]; then build_graph; fi
+cp ${repo_path}/build/pkg_artifacts/graph.dot ${build_dir}/graph.dot
 
 # ========= Setup mounts + Welcome file =========
 cd "${script_dir}"
@@ -117,8 +147,6 @@ for mount in $mounts $extra_mounts; do
     fi
     mount_arg=" $mount_arg -v '$mount' "
 done
-
-sed -i "s~<REPO_PATH>~${repo_path}~" "${build_dir}/welcome.txt"
 
 # ============ Build the dockerfile ============
 dockerfile="${script_dir}/resources/mariner.Dockerfile"
@@ -152,11 +180,13 @@ sudo docker build -q \
                 --build-arg mode="$mode" \
                 --build-arg enable_local_repo="$enable_local_repo" \
                 --build-arg topdir="$topdir" \
+                --build-arg mariner_repo="$repo_path" \
+                --build-arg mariner_branch="" \
                 .
 
 sudo docker tag ${docker_image_tag}:${tag} ${docker_image_tag}:latest
 
-echo "***** docker_image_tag is ${docker_image_tag}..."
+echo "docker_image_tag is ${docker_image_tag}..."
 sudo bash -c "docker run --rm \
                     ${mount_arg} \
                     -it ${docker_image_tag}:latest /bin/bash; \

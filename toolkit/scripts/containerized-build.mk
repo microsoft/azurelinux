@@ -8,6 +8,7 @@
 
 # General targets
 .PHONY: containerized-rpmbuild containerized-rpmbuild-help
+
 containerized_build_args :=
 ifneq ($(MODE),)
 containerized_build_args += -m ${MODE}
