@@ -10,8 +10,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://ftp.gnu.org/pub/gnu/%{name}/%{name}-ttf-%{version}.zip
 
-# BUG in Mariner RPMbuilder not providing zip
-BuildRequires: fontconfig
 BuildRequires: unzip
 
 %description
@@ -25,7 +23,6 @@ UCS (Universal Character Set).
 %install
 mkdir -p %{buildroot}%{_fontdir}
 mv *.ttf %{buildroot}%{_fontdir}/
-fc-cache
 
 %files
 %defattr(-,root,root)
@@ -34,9 +31,8 @@ fc-cache
 
 %changelog
 * Tue Jun 20 2023 Osama Esmail <osamaesmail@microsoft.com> - 20120503-3
-- Added `BuildRequires: fontconfig`
-- Run `fc-cache` after install
 - License verified
+- Removed irrelevant comment
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 20120503-2
 - Added %%license line automatically
