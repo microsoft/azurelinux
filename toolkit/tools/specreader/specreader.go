@@ -69,7 +69,6 @@ func main() {
 	prof, err := profile.StartProfiling(profFlags)
 	if err != nil {
 		logger.Log.Warnf("Could not start profiling: %s", err)
-		return
 	}
 	defer prof.StopProfiler()
 
