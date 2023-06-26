@@ -9,13 +9,14 @@
 Summary:        Practical Extraction and Report Language
 Name:           perl
 Version:        5.30.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPL+ or Artistic
 URL:            https://www.perl.org/
 Group:          Development/Languages
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://www.cpan.org/src/5.0/%{name}-%{version}.tar.gz
+Patch0:    CVE-2023-31486.patch
 Provides:       perl >= 0:5.003000
 Provides:       perl(getopts.pl)
 Provides:       perl(s)
@@ -34,6 +35,7 @@ The Perl package contains the Practical Extraction and
 Report Language.
 %prep
 %setup -q
+%patch0 -p1
 sed -i 's/-fstack-protector/&-all/' Configure
 
 %build
@@ -74,6 +76,9 @@ make test TEST_SKIP_VERSION_CHECK=1
 %{_mandir}/*/*
 
 %changelog
+* Mon Jun 26 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.30.3-3
+- Add patch for CVE-2023-31486
+
 * Mon Apr 24 2023 Sam Meluch <sammeluch@microsoft.com> 5.30.3-2
 - Add -Dman3ext to Configure script in order to avoid manual page name conflicts on installs
 
