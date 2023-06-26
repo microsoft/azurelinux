@@ -14,7 +14,7 @@ index 9514723656..9ab28a434c 100755
              cd $tgt
              # Only build executables for linux
 -            GOOS=linux go build -o ${outFile} -ldflags '-extldflags "static"' -ldflags "$(cdi::version::ldflags)"
-+            GOOS=linux go build -a -o ${outFile} -tags netgo,strictfipsruntime -ldflags '-extldflags $static_flag' -ldflags "$(cdi::version::ldflags)"
++            GOOS=linux go build -o ${outFile} -tags netgo,strictfipsruntime -ldflags '-extldflags $static_flag' -ldflags "$(cdi::version::ldflags)"
  
              ln -sf ${outFile} ${outLink}
          )
