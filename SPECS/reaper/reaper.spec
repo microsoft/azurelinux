@@ -12,7 +12,7 @@
 
 Name:           reaper
 Version:        3.1.1
-Release:        2%{?dist}
+Release:        5%{?dist}
 Summary:        Reaper for cassandra is a tool for running Apache Cassandra repairs against single or multi-site clusters.
 License:        ASL 2.0
 Distribution:   Mariner
@@ -40,6 +40,8 @@ Source5:        %{npm_cache}
 Source6:        %{local_lib_node_modules}
 # v14.18.0 node binary under /usr/local
 Source7:        %{local_n}
+Patch0:         CVE-2022-37601.patch
+Patch1:         CVE-2023-28155.patch
 
 BuildRequires:  git
 BuildRequires:  javapackages-tools
@@ -57,7 +59,7 @@ Provides:       reaper = %{version}-%{release}
 Cassandra reaper is an open source tool that aims to schedule and orchestrate repairs of Apache Cassandra clusters.
 
 %prep
-%autosetup -n %{srcdir}
+%setup -n %{srcdir}
 
 %build
 export JAVA_HOME="%{_libdir}/jvm/msopenjdk-11"
@@ -107,6 +109,8 @@ tar xf %{SOURCE1}
 
 echo "Installing npm_modules"
 tar fx %{SOURCE2}
+patch -p1 --input %{PATCH0}
+patch -p1 --input %{PATCH1}
 popd
 
 # Building using maven in offline mode.
@@ -177,6 +181,15 @@ fi
 %{_unitdir}/cassandra-%{name}.service
 
 %changelog
+* Thu May 25 2023 Tobias Brick <tobiasb@microsoft.com> - 3.1.1-5
+- Patch CVE-2023-28155 for request npm module
+
+* Tue May 23 2023 Bala <balakumaran.kannan@microsoft.com> - 3.1.1-4
+- Update CVE-2022-37601.patch to patch two other occurances of the same CVE
+
+* Wed Apr 19 2023 Bala <balakumaran.kannan@microsoft.com> - 3.1.1-3
+- Patch CVE-2022-37601 for webpack/loader-utils npm module
+
 * Tue Sep 06 2022 Sumedh Sharma <sumsharma@microsoft.com> - 3.1.1-2
 - Adding Runtime requirement on msopenjdk.
 - Fix adding cassandra reaper custom user/group

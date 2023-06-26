@@ -101,7 +101,7 @@ done
 
 HOME=$ORIGINAL_HOME
 
-# In case of Docker based build do not add the below folders into chroot tarball 
+# In case of Docker based build do not add the below folders into chroot tarball
 # otherwise safechroot will fail to "untar" the tarball
 DOCKERCONTAINERONLY=/.dockerenv
 if [[ -f "$DOCKERCONTAINERONLY" ]]; then

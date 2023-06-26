@@ -9,19 +9,10 @@
 # use the non-underscored macros to refer to Python in spec, etc.
 %python3 %__python3
 
-# For backwards compatibility only
-# See the comments in https://src.fedoraproject.org/rpms/python-rpm-macros/pull-request/22
-%__python /usr/bin/python
+# Set default python macro to the version of python shipped with the OS
+%__python /usr/bin/python3
 
-# Users can use %%python only if they redefined %%__python (e.g. to %%__python3)
-%python() %{lua:\
-    __python = rpm.expand("%__python")\
-    if __python == "/usr/bin/python" then\
-        rpm.expand("%{error:Cannot use %%python if %%__python wasn't redefined to something other than /usr/bin/python.}")\
-    else\
-        print(__python)\
-    end\
-}
+%python %__python
 
 # python3_pkgversion specifies the version of Python 3 in the distro.  It can be
 # a specific version (e.g. 34 in Fedora EPEL7)

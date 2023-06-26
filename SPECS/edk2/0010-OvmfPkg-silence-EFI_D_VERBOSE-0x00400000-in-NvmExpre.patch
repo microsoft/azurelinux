@@ -1,0 +1,131 @@
+From ce8bf8cbb5ad81677c2b632b98f527a1d9fda3b1 Mon Sep 17 00:00:00 2001
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 21 Nov 2017 00:57:47 +0100
+Subject: [PATCH 10/14] OvmfPkg: silence EFI_D_VERBOSE (0x00400000) in
+ NvmExpressDxe (RH only)
+
+Notes about the RHEL-8.3/20200603-ca407c7246bf [edk2-stable202005] ->
+RHEL-8.5/20210520-e1999b264f1f [edk2-stable202105] rebase:
+
+- Extend the DSC change to the new OvmfPkg/AmdSev platform, which has been
+  introduced upstream in commit 30d277ed7a82 ("OvmfPkg/Amdsev: Base commit
+  to build encrypted boot specific OVMF", 2020-12-14), for TianoCore#3077.
+
+- Remove obsolete commit message tags related to downstream patch
+  management: Message-id, Patchwork-id, O-Subject, Acked-by, From
+  (RHBZ#1846481).
+
+Notes about the RHEL-8.2/20190904-37eef91017ad [edk2-stable201908] ->
+RHEL-8.3/20200603-ca407c7246bf [edk2-stable202005] rebase:
+
+- no change
+
+Notes about the RHEL-8.1/20190308-89910a39dcfd [edk2-stable201903] ->
+RHEL-8.2/20190904-37eef91017ad [edk2-stable201908] rebase:
+
+- no change
+
+Notes about the RHEL-8.0/20180508-ee3198e672e2 ->
+RHEL-8.1/20190308-89910a39dcfd rebase:
+
+- no change
+
+Notes about the RHEL-7.6/ovmf-20180508-2.gitee3198e672e2.el7 ->
+RHEL-8.0/20180508-ee3198e672e2 rebase:
+
+- reorder the rebase changelog in the commit message so that it reads like
+  a blog: place more recent entries near the top
+- no changes to the patch body
+
+Notes about the 20171011-92d07e48907f -> 20180508-ee3198e672e2 rebase:
+
+- no changes
+
+Bugzilla: 1488247
+
+NvmExpressDxe logs all BlockIo read & write calls on the EFI_D_VERBOSE
+level.
+
+Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+(this patch was previously applied as commit 5f432837b9c60c2929b13dda1a1b488d5c3a6d2f)
+(cherry picked from commit 33e00146eb878588ad1395d7b1ae38f401729da4)
+(cherry picked from commit bd10cabcfcb1bc9a32b05062f4ee3792e27bc2d8)
+(cherry picked from commit 5a27af700f49e00608f232f618dedd7bf5e9b3e6)
+(cherry picked from commit 58bba429b9ec7b78109940ef945d0dc93f3cd958)
+(cherry picked from commit b8d0ebded8c2cf5b266c807519e2d8ccfd66fee6)
+(cherry picked from commit ed89844b47f46cfe911f1bf2bda40e537a908502)
+---
+ OvmfPkg/AmdSev/AmdSevX64.dsc | 5 ++++-
+ OvmfPkg/OvmfPkgIa32.dsc      | 5 ++++-
+ OvmfPkg/OvmfPkgIa32X64.dsc   | 5 ++++-
+ OvmfPkg/OvmfPkgX64.dsc       | 5 ++++-
+ 4 files changed, 16 insertions(+), 4 deletions(-)
+
+diff --git a/OvmfPkg/AmdSev/AmdSevX64.dsc b/OvmfPkg/AmdSev/AmdSevX64.dsc
+index c7d7add60d44..2ea6fad2018a 100644
+--- a/OvmfPkg/AmdSev/AmdSevX64.dsc
++++ b/OvmfPkg/AmdSev/AmdSevX64.dsc
+@@ -676,7 +676,10 @@ [Components]
+   OvmfPkg/SataControllerDxe/SataControllerDxe.inf
+   MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf
+   MdeModulePkg/Bus/Ata/AtaBusDxe/AtaBusDxe.inf
+-  MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf
++  MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf {
++    <PcdsFixedAtBuild>
++      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000004F
++  }
+   MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
+   MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
+   MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
+diff --git a/OvmfPkg/OvmfPkgIa32.dsc b/OvmfPkg/OvmfPkgIa32.dsc
+index 30b843d2287a..db1cde0a3b03 100644
+--- a/OvmfPkg/OvmfPkgIa32.dsc
++++ b/OvmfPkg/OvmfPkgIa32.dsc
+@@ -844,7 +844,10 @@ [Components]
+   OvmfPkg/SataControllerDxe/SataControllerDxe.inf
+   MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf
+   MdeModulePkg/Bus/Ata/AtaBusDxe/AtaBusDxe.inf
+-  MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf
++  MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf {
++    <PcdsFixedAtBuild>
++      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000004F
++  }
+   MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
+   MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
+   MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
+diff --git a/OvmfPkg/OvmfPkgIa32X64.dsc b/OvmfPkg/OvmfPkgIa32X64.dsc
+index 2327c5c29611..938eaba74ad4 100644
+--- a/OvmfPkg/OvmfPkgIa32X64.dsc
++++ b/OvmfPkg/OvmfPkgIa32X64.dsc
+@@ -857,7 +857,10 @@ [Components.X64]
+   OvmfPkg/SataControllerDxe/SataControllerDxe.inf
+   MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf
+   MdeModulePkg/Bus/Ata/AtaBusDxe/AtaBusDxe.inf
+-  MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf
++  MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf {
++    <PcdsFixedAtBuild>
++      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000004F
++  }
+   MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
+   MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
+   MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
+diff --git a/OvmfPkg/OvmfPkgX64.dsc b/OvmfPkg/OvmfPkgX64.dsc
+index 49b914c29f35..91fbe83bfac1 100644
+--- a/OvmfPkg/OvmfPkgX64.dsc
++++ b/OvmfPkg/OvmfPkgX64.dsc
+@@ -930,7 +930,10 @@ [Components]
+   OvmfPkg/SataControllerDxe/SataControllerDxe.inf
+   MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf
+   MdeModulePkg/Bus/Ata/AtaBusDxe/AtaBusDxe.inf
+-  MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf
++  MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf {
++    <PcdsFixedAtBuild>
++      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000004F
++  }
+   MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
+   MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
+   MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
+-- 
+2.39.2
+

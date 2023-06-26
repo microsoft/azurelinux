@@ -3,7 +3,11 @@
 #
 # Dockerfile to Mariner toolchain from scratch
 #
-FROM mcr.microsoft.com/cbl-mariner/base/core:1.0.20220226
+FROM mcr.microsoft.com/cbl-mariner/base/core:2.0.20230609
+
+# Tag the layers so we can clean up all the containers associated with a build directory
+ARG MARINER_BUILD_DIR
+LABEL marinertoolchain=$MARINER_BUILD_DIR
 
 # Define LFS root directory and setup environment variables
 ENV LFS=/temptoolchain/lfs
@@ -30,6 +34,7 @@ RUN tdnf install -y \
     perl \
     rpm \
     sudo \
+    tar \
     texinfo \
     unzip \
     vim \

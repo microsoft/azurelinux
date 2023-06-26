@@ -5,6 +5,7 @@ package rpm
 
 import (
 	"fmt"
+	"path/filepath"
 	"regexp"
 	"runtime"
 	"strings"
@@ -54,10 +55,15 @@ const (
 
 	// MarinerCCacheDefine enables ccache in the Mariner build system
 	MarinerCCacheDefine = "mariner_ccache_enabled"
+
+	// MaxCPUDefine specifies the max number of CPUs to use for parallel build
+	MaxCPUDefine = "_smp_ncpus_max"
 )
 
 const (
-	installedRPMRegexRPMIndex = 1
+	installedRPMRegexRPMIndex        = 1
+	installedRPMRegexArchIndex       = 2
+	installedRPMRegexExpectedMatches = 3
 
 	rpmProgram      = "rpm"
 	rpmSpecProgram  = "rpmspec"
@@ -77,7 +83,7 @@ var (
 	// Example:
 	//
 	//	D: ========== +++ systemd-devel-239-42.cm2 x86_64-linux 0x0
-	installedRPMRegex = regexp.MustCompile(`^D: =+ \+{3} (\S+).*$`)
+	installedRPMRegex = regexp.MustCompile(`^D: =+ \+{3} (\S+) (\S+)-linux.*$`)
 )
 
 // GetRpmArch converts the GOARCH arch into an RPM arch
@@ -163,6 +169,14 @@ func executeRpmCommand(program string, args ...string) (results []string, err er
 
 	results = sanitizeOutput(stdout)
 	return
+}
+
+// DefaultDefinesWithDist returns a new map of default defines that can be used during RPM queries that also includes
+// the dist tag.
+func DefaultDefinesWithDist(runChecks bool, distTag string) map[string]string {
+	defines := DefaultDefines(runChecks)
+	defines[DistTagDefine] = distTag
+	return defines
 }
 
 // DefaultDefines returns a new map of default defines that can be used during RPM queries.
@@ -323,11 +337,6 @@ func QueryRPMProvides(rpmFile string) (provides []string, err error) {
 // ResolveCompetingPackages takes in a list of RPMs and returns only the ones, which would
 // end up being installed after resolving outdated, obsoleted, or conflicting packages.
 func ResolveCompetingPackages(rootDir string, rpmPaths ...string) (resolvedRPMs []string, err error) {
-	const (
-		queryFormat  = ""
-		squashErrors = true
-	)
-
 	args := []string{
 		"-Uvvh",
 		"--replacepkgs",
@@ -349,8 +358,9 @@ func ResolveCompetingPackages(rootDir string, rpmPaths ...string) (resolvedRPMs 
 	uniqueResolvedRPMs := map[string]bool{}
 	for _, line := range splitStdout {
 		matches := installedRPMRegex.FindStringSubmatch(line)
-		if len(matches) != 0 {
-			uniqueResolvedRPMs[matches[installedRPMRegexRPMIndex]] = true
+		if len(matches) == installedRPMRegexExpectedMatches {
+			rpmName := fmt.Sprintf("%s.%s", matches[installedRPMRegexRPMIndex], matches[installedRPMRegexArchIndex])
+			uniqueResolvedRPMs[rpmName] = true
 		}
 	}
 
@@ -360,58 +370,49 @@ func ResolveCompetingPackages(rootDir string, rpmPaths ...string) (resolvedRPMs 
 
 // SpecExclusiveArchIsCompatible verifies the "ExclusiveArch" tag is compatible with the current machine's architecture.
 func SpecExclusiveArchIsCompatible(specfile, sourcedir, arch string, defines map[string]string) (isCompatible bool, err error) {
-	const queryExclusiveArch = "%{ARCH}\n[%{EXCLUSIVEARCH} ]\n"
-
 	const (
-		machineArchField   = iota
-		exclusiveArchField = iota
-		minimumFieldsCount = iota
+		exclusiveArchIndex = 0
+		exclusiveArchQuery = "[%{EXCLUSIVEARCH} ]"
 	)
 
 	// Sanity check that this SPEC is meant to be built for the current machine architecture
-	exclusiveArchList, err := QuerySPEC(specfile, sourcedir, queryExclusiveArch, arch, defines, QueryHeaderArgument)
+	queryOutput, err := QuerySPEC(specfile, sourcedir, exclusiveArchQuery, arch, defines, QueryHeaderArgument)
 	if err != nil {
 		logger.Log.Warnf("Failed to query SPEC (%s), error: %s", specfile, err)
 		return
 	}
 
-	// If the list does not return enough lines then there is no exclusive arch set
-	if len(exclusiveArchList) < minimumFieldsCount {
+	// Empty result means the package is buildable for all architectures.
+	if len(queryOutput) == 0 {
 		isCompatible = true
 		return
 	}
 
-	if strings.Contains(exclusiveArchList[exclusiveArchField], exclusiveArchList[machineArchField]) {
-		isCompatible = true
-		return
-	}
+	isCompatible = strings.Contains(queryOutput[exclusiveArchIndex], arch)
 
 	return
 }
 
 // SpecExcludeArchIsCompatible verifies the "ExcludeArch" tag is compatible with the current machine's architecture.
 func SpecExcludeArchIsCompatible(specfile, sourcedir, arch string, defines map[string]string) (isCompatible bool, err error) {
-	const queryExclusiveArch = "%{ARCH}\n[%{EXCLUDEARCH} ]\n"
-
 	const (
-		machineArchField   = iota
-		excludeArchField   = iota
-		minimumFieldsCount = iota
+		excludeArchIndex = 0
+		excludeArchQuery = "[%{EXCLUDEARCH} ]"
 	)
 
-	excludedArchList, err := QuerySPEC(specfile, sourcedir, queryExclusiveArch, arch, defines, QueryHeaderArgument)
+	queryOutput, err := QuerySPEC(specfile, sourcedir, excludeArchQuery, arch, defines, QueryHeaderArgument)
 	if err != nil {
 		logger.Log.Warnf("Failed to query SPEC (%s), error: %s", specfile, err)
 		return
 	}
 
-	// If the list does not return enough lines then there is no excluded architectures set.
-	if len(excludedArchList) < minimumFieldsCount {
+	// Empty result means the package is buildable for all architectures.
+	if len(queryOutput) == 0 {
 		isCompatible = true
 		return
 	}
 
-	isCompatible = !strings.Contains(excludedArchList[excludeArchField], excludedArchList[machineArchField])
+	isCompatible = !strings.Contains(queryOutput[excludeArchIndex], arch)
 
 	return
 }
@@ -425,6 +426,61 @@ func SpecArchIsCompatible(specfile, sourcedir, arch string, defines map[string]s
 
 	if isCompatible {
 		return SpecExcludeArchIsCompatible(specfile, sourcedir, arch, defines)
+	}
+
+	return
+}
+
+// BuildCompatibleSpecsList builds a list of spec files in a directory that are compatible with the build arch. Paths
+// are relative to the 'baseDir' directory. This function should generally be used from inside a chroot to ensure the
+// correct defines are available.
+func BuildCompatibleSpecsList(baseDir string, inputSpecPaths []string, defines map[string]string) (filteredSpecPaths []string, err error) {
+	var specPaths []string
+	if len(inputSpecPaths) > 0 {
+		specPaths = inputSpecPaths
+	} else {
+		specPaths, err = buildAllSpecsList(baseDir)
+		if err != nil {
+			return
+		}
+	}
+
+	return filterCompatibleSpecs(specPaths, defines)
+}
+
+// buildAllSpecsList builds a list of all spec files in the directory. Paths are relative to the base directory.
+func buildAllSpecsList(baseDir string) (specPaths []string, err error) {
+	specFilesGlob := filepath.Join(baseDir, "**", "*.spec")
+
+	specPaths, err = filepath.Glob(specFilesGlob)
+	if err != nil {
+		logger.Log.Errorf("Failed while trying to enumerate all spec files with (%s). Error: %v.", specFilesGlob, err)
+	}
+
+	return
+}
+
+// filterCompatibleSpecs filters a list of spec files in the chroot's SPECs directory that are compatible with the build arch. Paths
+func filterCompatibleSpecs(inputSpecPaths []string, defines map[string]string) (filteredSpecPaths []string, err error) {
+	var specCompatible bool
+
+	buildArch, err := GetRpmArch(runtime.GOARCH)
+	if err != nil {
+		return
+	}
+
+	for _, specFilePath := range inputSpecPaths {
+		specDirPath := filepath.Dir(specFilePath)
+
+		specCompatible, err = SpecArchIsCompatible(specFilePath, specDirPath, buildArch, defines)
+		if err != nil {
+			logger.Log.Errorf("Failed while querrying spec (%s). Error: %v.", specFilePath, err)
+			return
+		}
+
+		if specCompatible {
+			filteredSpecPaths = append(filteredSpecPaths, specFilePath)
+		}
 	}
 
 	return

@@ -17,7 +17,7 @@ sudo tdnf -y install \
     glibc-devel \
     genisoimage \
     git \
-    "golang < 1.18" \
+    golang \
     kernel-headers \
     make \
     moby-cli \
@@ -29,7 +29,8 @@ sudo tdnf -y install \
     rpm-build \
     sudo \
     tar \
-    wget
+    wget \
+    xfsprogs
 
 # Enable Docker daemon at boot
 sudo systemctl enable --now docker.service

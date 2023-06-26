@@ -7,7 +7,7 @@
 Summary:        High Performance, Distributed Memory Object Cache
 Name:           memcached
 Version:        1.6.13
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,6 +15,7 @@ URL:            https://www.memcached.org/
 Source0:        https://www.memcached.org/files/%{name}-%{version}.tar.gz
 Source1:        memcached.sysconfig
 Patch0:         memcached-unit.patch
+Patch1:         CVE-2021-45985.patch
 BuildRequires:  gcc
 BuildRequires:  libevent-devel
 BuildRequires:  systemd-devel
@@ -119,6 +120,9 @@ exit 0
 %{_includedir}/memcached/*
 
 %changelog
+* Tue Apr 18 2023 Bala <balakumaran.kannan@microsoft.com> - 1.6.13-3
+- Patch CVE-2021-45985 on integrated lua source code
+
 * Thu Feb 03 2022 Muhammad Falak <mwani@microsfot.com> - 1.6.13-2
 - Add explict BR on perl-{FindBin,lib,fields} to fix ptest
 - Drop dependency on 'sudo' & 'shadow-utils'

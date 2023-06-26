@@ -26,7 +26,9 @@
 %if "%{?_lib}" == "lib64" \
 	%{?_cmake_lib_suffix64} \\\
 %endif \
-	-DBUILD_SHARED_LIBS:BOOL=ON
+	-DBUILD_SHARED_LIBS:BOOL=ON \\\
+    %{!?__cmake_in_source_build:-S "%{_vpath_srcdir}"} \\\
+    -B "%{__cmake_builddir}" 
 %cmake_build \
   %__cmake --build "%{__cmake_builddir}" %{?_smp_mflags} --verbose
 

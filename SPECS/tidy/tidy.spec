@@ -5,12 +5,13 @@
 Summary:        Utility to clean up and pretty print HTML/XHTML/XML
 Name:           tidy
 Version:        5.8.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        W3C
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.html-tidy.org/
 Source0:        https://github.com/htacg/%{upname}/archive/%{version}.tar.gz#/%{upname}-%{version}.tar.gz
+Patch0:         CVE-2021-33391.patch
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
@@ -92,6 +93,9 @@ rm -fv %{buildroot}%{_libdir}/libtidy.a
 %{_libdir}/pkgconfig/tidy.pc
 
 %changelog
+* Mon May 01 2023 Sean Dougherty <sdougherty@microsoft.com> - 5.8.0-6
+- Backported patch to fix CVE-2021-33391
+
 * Tue Oct 18 2022 Osama Esmail <osamaesmail@microsoft.com> - 5.8.0-5
 - Upgraded from 5.7.28 to 5.8.0
 - Changed libtidys.a to libtidy.a

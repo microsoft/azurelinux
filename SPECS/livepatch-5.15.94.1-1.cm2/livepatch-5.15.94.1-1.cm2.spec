@@ -64,7 +64,7 @@ fi
 Summary:        Set of livepatches for kernel %{kernel_version_release}
 Name:           livepatch-%{kernel_version_release}
 Version:        1.0.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -73,6 +73,7 @@ URL:            https://github.com/microsoft/CBL-Mariner
 Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/%{kernel_version}.tar.gz#/kernel-%{kernel_version}.tar.gz
 Source1:        config-%{kernel_version_release}
 Source2:        mariner-%{kernel_version_release}.pem
+Patch0:         CVE-2023-1281.patch
 
 ExclusiveArch:  x86_64
 
@@ -184,6 +185,9 @@ addressing CVEs present in Mariner's %{kernel_version_release} kernel.
 %endif
 
 %changelog
+* Mon Apr 10 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0-2
+- Patching CVE-2023-1281.
+
 * Wed Feb 22 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0.0-1
 - Original version for CBL-Mariner.
 - License verified.

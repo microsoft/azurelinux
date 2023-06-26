@@ -15,6 +15,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/roast/formats"
 
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -26,6 +27,7 @@ type convertRequest struct {
 	inputPath   string
 	isInputFile bool
 	artifact    configuration.Artifact
+	timestamp   *timestamp.TimeStamp
 }
 
 type convertResult struct {
@@ -51,12 +53,16 @@ var (
 	workers = app.Flag("workers", "Number of concurrent goroutines to convert with.").Default(defaultWorkerCount).Int()
 
 	imageTag = app.Flag("image-tag", "Tag (text) appended to the image name. Empty by default.").String()
+
+	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
 )
 
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
+	timestamp.BeginTiming("roast", *timestampFile)
+	defer timestamp.CompleteTiming()
 
 	if *workers <= 0 {
 		logger.Log.Panicf("Value in --workers must be greater than zero. Found %d", *workers)
@@ -95,6 +101,8 @@ func main() {
 
 func generateImageArtifacts(workers int, inDir, outDir, releaseVersion, imageTag, tmpDir string, config configuration.Config) (err error) {
 	const defaultSystemConfig = 0
+	timestamp.StartEvent("generate artifacts", nil)
+	defer timestamp.StopEvent(nil)
 
 	err = os.MkdirAll(tmpDir, os.ModePerm)
 	if err != nil {
@@ -119,6 +127,8 @@ func generateImageArtifacts(workers int, inDir, outDir, releaseVersion, imageTag
 	convertRequests := make(chan *convertRequest, numberOfArtifacts)
 	convertedResults := make(chan *convertResult, numberOfArtifacts)
 
+	artifactTimeStampRoot, _ := timestamp.StartEvent("convert artifacts", nil)
+
 	// Start the workers now so they begin working as soon as a new job is buffered.
 	for i := 0; i < workers; i++ {
 		go artifactConverterWorker(convertRequests, convertedResults, releaseVersion, tmpDir, imageTag, outDir)
@@ -127,10 +137,12 @@ func generateImageArtifacts(workers int, inDir, outDir, releaseVersion, imageTag
 	for i, disk := range config.Disks {
 		for _, artifact := range disk.Artifacts {
 			inputName, isFile := diskArtifactInput(i, disk)
+			ts, _ := timestamp.StartEvent("converting"+inputName, artifactTimeStampRoot)
 			convertRequests <- &convertRequest{
 				inputPath:   filepath.Join(inDir, inputName),
 				isInputFile: isFile,
 				artifact:    artifact,
+				timestamp:   ts,
 			}
 		}
 
@@ -138,16 +150,20 @@ func generateImageArtifacts(workers int, inDir, outDir, releaseVersion, imageTag
 			for _, artifact := range partition.Artifacts {
 				// Currently only process 1 system config
 				inputName, isFile := partitionArtifactInput(i, j, &artifact, retrievePartitionSettings(&config.SystemConfigs[defaultSystemConfig], partition.ID))
+				ts, _ := timestamp.StartEvent("converting"+inputName, artifactTimeStampRoot)
 				convertRequests <- &convertRequest{
 					inputPath:   filepath.Join(inDir, inputName),
 					isInputFile: isFile,
 					artifact:    artifact,
+					timestamp:   ts,
 				}
 			}
 		}
 	}
 
 	close(convertRequests)
+
+	timestamp.StopEvent(artifactTimeStampRoot) // convert artifacts
 
 	failedArtifacts := []string{}
 	for i := 0; i < numberOfArtifacts; i++ {
@@ -237,6 +253,7 @@ func artifactConverterWorker(convertRequests chan *convertRequest, convertedResu
 		}
 
 		convertedResults <- result
+		timestamp.StopEvent(req.timestamp)
 	}
 }
 

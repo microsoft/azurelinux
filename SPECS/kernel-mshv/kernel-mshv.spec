@@ -10,15 +10,16 @@
 
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
-Version:        5.15.98.mshv1
-Release:        2%{?dist}
+Version:        5.15.110.mshv2
+Release:        4%{?dist}
 License:        GPLv2
-URL:            https://microsoft.visualstudio.com/DefaultCollection/LSG/_git/linux-dom0
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
-Source1:        cbl-mariner-ca-20211013.pem
+Source1:        config
+Source2:        cbl-mariner-ca-20211013.pem
+Patch0:         0001-Implement-dom0-kernel-patch-for-loader-as-of-0524.patch
 ExclusiveArch:  x86_64
 BuildRequires:  audit-devel
 BuildRequires:  bash
@@ -76,10 +77,10 @@ This package contains the 'perf' performance analysis tools for MSHV kernel.
 %autosetup -p1
 
 make mrproper
-cp arch/x86/configs/mshv_defconfig .config
+cp %{SOURCE1} .config
 
 # Add CBL-Mariner cert into kernel's trusted keyring
-cp %{SOURCE1} certs/mariner.pem
+cp %{SOURCE2} certs/mariner.pem
 sed -i 's#CONFIG_SYSTEM_TRUSTED_KEYS=""#CONFIG_SYSTEM_TRUSTED_KEYS="certs/mariner.pem"#' .config
 
 sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' .config
@@ -129,9 +130,9 @@ ln -s vmlinux-%{uname_r} %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vml
 
 cat > %{buildroot}/boot/linux-%{uname_r}.cfg << "EOF"
 # GRUB Environment Block
-mariner_cmdline=init=/lib/systemd/systemd ro loglevel=3 no-vmw-sta crashkernel=128M
-mariner_linux=vmlinuz-%{uname_r}
-mariner_initrd=initrd.img-%{uname_r}
+mariner_cmdline_mshv=rd.auto=1 lockdown=integrity sysctl.kernel.unprivileged_bpf_disabled=1 init=/lib/systemd/systemd ro no-vmw-sta crashkernel=128M audit=0 console=ttyS0,115200n8 earlyprintk
+mariner_linux_mshv=vmlinuz-%{uname_r}
+mariner_initrd_mshv=initrd.img-%{uname_r}
 EOF
 chmod 600 %{buildroot}/boot/linux-%{uname_r}.cfg
 
@@ -182,19 +183,19 @@ rm -rf /boot/efi/initrd.img-%{uname_r}
 echo "initrd of kernel %{uname_r} removed" >&2
 
 %postun
-if [ ! -e /boot/mariner.cfg ]
+if [ ! -e /boot/mariner-mshv.cfg ]
 then
      ls /boot/linux-*.cfg 1> /dev/null 2>&1
      if [ $? -eq 0 ]
      then
           list=`ls -tu /boot/linux-*.cfg | head -n1`
-          test -n "$list" && ln -sf "$list" /boot/mariner.cfg
+          test -n "$list" && ln -sf "$list" /boot/mariner-mshv.cfg
      fi
 fi
 
 %post
 /sbin/depmod -a %{uname_r}
-ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
+ln -sf linux-%{uname_r}.cfg /boot/mariner-mshv.cfg
 
 %files
 %defattr(-,root,root)
@@ -235,6 +236,25 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Thu Jun 22 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.110.mshv2-4
+- Don't include duplicate systemd parameters in mariner-mshv.cfg; should be read from
+    systemd.cfg which is packaged in systemd
+
+* Tue May 30 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.110.mshv2-3
+- Align mariner_cmdline_mshv with the working configuration from 
+    old loader's linuxloader.conf
+
+* Wed May 24 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.110.mshv2-2
+- Add temporary 0001-Support-new-HV-loader... patch to support lxhvloader. 
+- Can be reverted once the kernel patch is upstreamed.
+- Introduce mariner-mshv.cfg symlink to improve grub menuentry
+
+* Fri May 12 2023 Saul Paredes <saulparedes@microsoft.com> - 5.15.110.mshv2-1
+- Update to v5.15.110.mshv2
+
+* Thu Mar 30 2023 Saul Paredes <saulparedes@microsoft.com> - 5.15.98.mshv1-3
+- Add back config
+
 * Fri Mar 24 2023 Saul Paredes <saulparedes@microsoft.com> - 5.15.98.mshv1-2
 - Consume config from LSG source
 

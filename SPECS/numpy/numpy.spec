@@ -1,4 +1,3 @@
-
 %global blaslib openblas
 %global blasvar p
 %define majmin %(echo %{version} | cut -d. -f1-2)
@@ -6,7 +5,7 @@
 Summary:        A fast multidimensional array facility for Python
 Name:           numpy
 Version:        1.23.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 # Everything is BSD except for class SafeEval in numpy/lib/utils.py which is Python
 License:        BSD AND Python AND ASL 2.0
 Vendor:         Microsoft Corporation
@@ -134,10 +133,13 @@ chrpath --delete %{buildroot}%{python3_sitearch}/%{name}/linalg/_umath_linalg.*.
 
 %check
 export PYTHONPATH=%{buildroot}%{python3_sitearch}
-pip install pytest==7.2 hypothesis typing-extensions
+
+# Hypothesis 6.72.0 introduced a deprecation error for "Healthcheck.all()" which fails the test run
+pip install 'pytest==7.2' 'hypothesis<6.72.0' typing-extensions
+
 # test_ppc64_ibm_double_double128 is unnecessary now that ppc64le has switched long doubles to IEEE format.
 # https://github.com/numpy/numpy/issues/21094
-python3 runtests.py --no-build -- -ra -k 'not test_ppc64_ibm_double_double128 %{?ix86_k}'
+python3 runtests.py --no-build -- -ra -k 'not test_ppc64_ibm_double_double128'
 
 
 %files -n python3-numpy
@@ -181,6 +183,9 @@ python3 runtests.py --no-build -- -ra -k 'not test_ppc64_ibm_double_double128 %{
 %doc docs/*
 
 %changelog
+* Mon May 22 2023 Olivia Crain <oliviacrain@microsoft.com> - 1.23.4-3
+- Pin version of hypothesis used to avoid deprecation errors
+
 * Tue Nov 15 2022 Osama Esmail <osamaesmail@microsoft.com> - 1.23.4-2
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
 - License verified.

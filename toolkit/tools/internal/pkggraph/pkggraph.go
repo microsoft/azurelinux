@@ -20,6 +20,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/versioncompare"
 
 	"gonum.org/v1/gonum/graph"
@@ -1079,8 +1080,9 @@ func (g *PkgGraph) AddGoalNode(goalName string, packages []*pkgjson.PackageVer, 
 		} else {
 			logger.Log.Warnf("Could not goal package %+v", pkg)
 			if strict {
-				logger.Log.Warnf("Missing %+v", pkg)
+				logger.Log.Errorf("Missing %+v", pkg)
 				err = fmt.Errorf("could not find all goal nodes with strict=true")
+				return
 			}
 		}
 	}
@@ -1145,16 +1147,17 @@ func WriteDOTGraphFile(g graph.Directed, filename string) (err error) {
 }
 
 // ReadDOTGraphFile reads the graph from a DOT graph format file
-func ReadDOTGraphFile(g graph.DirectedBuilder, filename string) (err error) {
+func ReadDOTGraphFile(filename string) (outputGraph *PkgGraph, err error) {
 	logger.Log.Infof("Reading DOT graph from %s", filename)
 
 	f, err := os.Open(filename)
 	if err != nil {
-		return err
+		return
 	}
 	defer f.Close()
 
-	err = ReadDOTGraph(g, f)
+	outputGraph = NewPkgGraph()
+	err = ReadDOTGraph(outputGraph, f)
 
 	return
 }
@@ -1195,6 +1198,9 @@ func (g *PkgGraph) DeepCopy() (deepCopy *PkgGraph, err error) {
 // MakeDAG ensures the graph is a directed acyclic graph (DAG).
 // If the graph is not a DAG, this routine will attempt to resolve any cycles to make the graph a DAG.
 func (g *PkgGraph) MakeDAG() (err error) {
+	timestamp.StartEvent("convert to DAG", nil)
+	defer timestamp.StopEvent(nil)
+
 	var cycle []*PkgNode
 
 	for {

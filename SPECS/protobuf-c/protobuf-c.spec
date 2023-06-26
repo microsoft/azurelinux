@@ -1,14 +1,13 @@
 Summary:        Google's data interchange format - C implementation
 Name:           protobuf-c
-Version:        1.4.0
-Release:        2%{?dist}
+Version:        1.4.1
+Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Libraries
 URL:            https://github.com/protobuf-c/protobuf-c
 Source0:        %{url}/releases/download/v%{version}/%{name}-%{version}.tar.gz
-Patch0:         CVE-2022-33070.patch
 BuildRequires:  curl
 BuildRequires:  libstdc++
 BuildRequires:  make
@@ -72,6 +71,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libprotobuf-c.a
 
 %changelog
+* Mon Apr 24 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.4.1-1
+- Auto-upgrade to 1.4.1 - to fix CVE-2022-48468
+- Remove CVE-2022-33070 patch as not required for 1.4.1
+
 * Thu Jul 21 2022 Henry Li <lihl@microsoft.com> - 1.4.0-2
 - Add patch to resolve CVE-2022-33070
 

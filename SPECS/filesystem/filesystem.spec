@@ -1,7 +1,7 @@
 Summary:      Default file system
 Name:         filesystem
 Version:      1.1
-Release:      12%{?dist}
+Release:      14%{?dist}
 License:      GPLv3
 Group:        System Environment/Base
 Vendor:       Microsoft Corporation
@@ -284,9 +284,20 @@ for script in /etc/profile.d/*.sh ; do
 done
 
 unset script RED GREEN NORMAL
-umask 027
 # End /etc/profile
 EOF
+
+#
+#   profile.d drop-in file that sets up a restrictive umask for all users.
+#   Note that this comes very late in lexigraphical order, so it will override
+#   other umask settings.
+#
+cat > %{buildroot}/etc/profile.d/99-umask.sh <<- "EOF"
+# Begin /etc/profile.d/99-umask.sh
+umask 027
+# End /etc/profile.d/99-umask.sh
+EOF
+
 #
 #   The Proxy Bash Shell Startup File
 #
@@ -597,6 +608,7 @@ return 0
 %config(noreplace) /etc/sysconfig/proxy
 %dir /etc/profile.d
 %config(noreplace) /etc/profile.d/proxy.sh
+%config(noreplace) /etc/profile.d/99-umask.sh
 #	media filesystem
 %dir /run/media/cdrom
 %dir /run/media/floppy
@@ -619,6 +631,7 @@ return 0
 %dir /usr/local/bin
 %dir /usr/local/include
 %dir /usr/local/lib
+%dir /usr/local/sbin
 %dir /usr/local/share
 %dir /usr/local/share/color
 %dir /usr/local/share/dict
@@ -708,6 +721,12 @@ return 0
 %config(noreplace) /etc/modprobe.d/tipc.conf
 
 %changelog
+* Tue Jun 13 2023 Andy Zaugg <azaugg@linkedin.com> - 1.1-14
+- Adding /usr/local/sbin as per FHS
+
+* Thu May 18 2023 Tobias Brick <tobiasb@microsoft.com> - 1.1-13
+- Remove setting umask from /etc/profile and add it to a separate file in /etc/profile.d
+
 * Thu Sep 14 2022 Thara Gopinath <tgopinath@microsoft.com> - 1.1-12
 - Add the 'systemd-coredump' and 'systemd-oom' user and group accounts.
 

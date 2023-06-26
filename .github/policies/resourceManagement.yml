@@ -1,0 +1,84 @@
+id:
+name: GitOps.PullRequestIssueManagement
+description: GitOps.PullRequestIssueManagement primitive
+owner:
+resource: repository
+disabled: false
+where:
+configuration:
+  resourceManagementConfiguration:
+    scheduledSearches: []
+    eventResponderTasks:
+      - if:
+          - payloadType: Pull_Request
+        then:
+          - if:
+              - includesModifiedFiles:
+                  files:
+                    - SPECS/
+                    - SPECS-EXTENDED/
+                    - SPECS-SIGNED/
+            then:
+              - addLabel:
+                  label: Packaging
+          - if:
+              - includesModifiedFiles:
+                  files:
+                    - toolkit/docs/
+            then:
+              - addLabel:
+                  label: documentation
+          - if:
+              - includesModifiedFiles:
+                  files:
+                    - toolkit/tools/
+                    - toolkit/scripts/
+            then:
+              - addLabel:
+                  label: Tools
+          - if:
+              - includesModifiedFiles:
+                  files:
+                    - toolkit/imageconfigs/
+                    - toolkit/tools/imagegen/configuration
+            then:
+              - addLabel:
+                  label: Schema
+        description:
+      - if:
+          - payloadType: Pull_Request
+          - filesMatchPattern:
+              pattern: (CVE|cve)-\d+-\d+\.(no)?patch
+        then:
+          - addLabel:
+              label: security
+        description:
+      - if:
+          - payloadType: Pull_Request
+          - isAction:
+              action: Opened
+          - isActivitySender:
+              user: CBL-Mariner-Bot
+              issueAuthor: False
+        then:
+          - addLabel:
+              label: Automatic PR
+        description:
+      - if:
+          - payloadType: Pull_Request
+        then:
+          - if:
+              - targetsBranch:
+                  branch: 1.0-dev
+            then:
+              - addLabel:
+                  label: 1.0-dev
+          - if:
+              - targetsBranch:
+                  branch: main
+            then:
+              - addLabel:
+                  label: main
+        description:
+onFailure:
+onSuccess:

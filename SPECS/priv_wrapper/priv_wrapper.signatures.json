@@ -1,0 +1,7 @@
+{
+ "Signatures": {
+  "priv_wrapper-1.0.1.tar.gz": "b10bff1672640e9e0dc92a821e8173bd0d727a148b5939f01e95abc89621e3c1",
+  "priv_wrapper-1.0.1.tar.gz.asc": "fabe9c53787bdb721f0f0626d4f21cc5754002c9d82d5561cb6c05faf5f964a7",
+  "priv_wrapper.keyring": "3861ac6763ff3edf0bbbb05fe890962a5dbcd99b2e00fae16687fd480c7fab0f"
+ }
+}

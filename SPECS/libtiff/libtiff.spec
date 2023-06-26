@@ -1,21 +1,22 @@
 Summary:        TIFF libraries and associated utilities.
 Name:           libtiff
 Version:        4.5.0
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        libtiff
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://gitlab.com/libtiff/libtiff
 Source0:        https://gitlab.com/libtiff/libtiff/-/archive/v%{version}/libtiff-v%{version}.tar.gz
-Patch7:         CVE-2022-48281.patch
+Patch0:         CVE-2022-48281.patch
+Patch1:         CVE-2023-0795.patch
+Patch2:         CVE-2023-0801.patch
+Patch3:         CVE-2023-2731.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libjpeg-turbo-devel
 BuildRequires:  libtool
-
 Requires:       libjpeg-turbo
-
 Provides:       %{name}-tools = %{version}-%{release}
 
 %description
@@ -23,7 +24,6 @@ The LibTIFF package contains the TIFF libraries and associated utilities. The li
 
 %package        devel
 Summary:        Header and development files
-
 Requires:       %{name} = %{version}-%{release}
 Requires:       libjpeg-turbo-devel
 
@@ -64,6 +64,13 @@ make %{?_smp_mflags} -k check
 %{_docdir}/*
 
 %changelog
+* Fri May 26 2023 Rachel Menge <rachelmenge@microsoft.com> - 4.5.0-3
+- Patch CVE-2023-2731
+
+* Mon May 15 2023 Andrew Phelps <anphel@microsoft.com> - 4.5.0-2
+- Patch CVE-2023-0795 CVE-2023-0796 CVE-2023-0797 CVE-2023-0798 CVE-2023-0799
+- Patch CVE-2023-0800 CVE-2023-0801 CVE-2023-0802 CVE-2023-0803 CVE-2023-0804
+
 * Mon Mar 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.5.0-1
 - Auto-upgrade to 4.5.0 - to fix CVE-2022-4645
 

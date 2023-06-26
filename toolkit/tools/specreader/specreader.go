@@ -23,6 +23,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/rpm"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/scheduler/schedulerutils"
 
 	"github.com/jinzhu/copier"
@@ -55,12 +56,16 @@ var (
 	runCheck                = app.Flag("run-check", "Whether or not to run the spec file's check section during package build.").Bool()
 	logFile                 = exe.LogFileFlag(app)
 	logLevel                = exe.LogLevelFlag(app)
+	timestampFile           = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
 )
 
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
+
+	timestamp.BeginTiming("specreader", *timestampFile)
+	defer timestamp.CompleteTiming()
 
 	if *workers <= 0 {
 		logger.Log.Panicf("Value in --workers must be greater than zero. Found %d", *workers)
@@ -207,6 +212,9 @@ func parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, arch string,
 		return
 	}
 
+	tsRoot, _ := timestamp.StartEvent("parse specs", nil)
+	defer timestamp.StopEvent(nil)
+
 	results := make(chan *parseResult, len(specFiles))
 	requests := make(chan string, len(specFiles))
 	cancel := make(chan struct{})
@@ -214,7 +222,7 @@ func parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, arch string,
 	// Start the workers now so they begin working as soon as a new job is buffered.
 	for i := 0; i < workers; i++ {
 		wg.Add(1)
-		go readSpecWorker(requests, results, cancel, &wg, distTag, rpmsDir, srpmsDir, toolchainDir, toolchainRPMs, runCheck, arch)
+		go readSpecWorker(requests, results, cancel, &wg, distTag, rpmsDir, srpmsDir, toolchainDir, toolchainRPMs, runCheck, arch, tsRoot)
 	}
 
 	for _, specFile := range specFiles {
@@ -274,7 +282,7 @@ func sortPackages(packageRepo *pkgjson.PackageRepo) {
 // readspec is a goroutine that takes a full filepath to a spec file and scrapes it into the Specdef structure
 // Concurrency is limited by the size of the semaphore channel passed in. Too many goroutines at once can deplete
 // available filehandles.
-func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel <-chan struct{}, wg *sync.WaitGroup, distTag, rpmsDir, srpmsDir, toolchainDir string, toolchainRPMs []string, runCheck bool, arch string) {
+func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel <-chan struct{}, wg *sync.WaitGroup, distTag, rpmsDir, srpmsDir, toolchainDir string, toolchainRPMs []string, runCheck bool, arch string, tsRoot *timestamp.TimeStamp) {
 	const (
 		emptyQueryFormat      = ``
 		querySrpm             = `%{NAME}-%{VERSION}-%{RELEASE}.src.rpm`
@@ -283,9 +291,9 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 
 	defer wg.Done()
 
-	defines := rpm.DefaultDefines(runCheck)
-	defines[rpm.DistTagDefine] = distTag
+	defines := rpm.DefaultDefinesWithDist(runCheck, distTag)
 
+	var ts *timestamp.TimeStamp = nil
 	for specfile := range requests {
 		select {
 		case <-cancel:
@@ -293,6 +301,13 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 			return
 		default:
 		}
+
+		// Many code paths hit 'continue', finish timing those here.
+		if ts != nil {
+			timestamp.StopEvent(ts)
+			ts = nil
+		}
+		ts, _ = timestamp.StartEvent(filepath.Base(specfile), tsRoot)
 
 		result := &parseResult{}
 
@@ -368,6 +383,9 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 
 		// Submit the result to the main thread, the deferred function will clear the semaphore.
 		results <- result
+	}
+	if ts != nil {
+		timestamp.StopEvent(ts)
 	}
 }
 

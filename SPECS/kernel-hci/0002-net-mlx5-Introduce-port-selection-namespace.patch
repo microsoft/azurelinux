@@ -221,8 +221,8 @@ index cd9d1c95129e..d20b5921d4a0 100644
  	MLX5_FDB_TO_VPORT_REG_C_0 = 0x01,
  	MLX5_FDB_TO_VPORT_REG_C_1 = 0x02,
 @@ -1514,7 +1526,8 @@ struct mlx5_ifc_cmd_hca_cap_bits {
- 	u8         uar_4k[0x1];
- 	u8         reserved_at_241[0x9];
+ 	u8         fl_rc_qp_when_roce_disabled[0x1];
+ 	u8         regexp_params[0x1];
  	u8         uar_sz[0x6];
 -	u8         reserved_at_248[0x2];
 +	u8         port_selection_cap[0x1];

@@ -1,0 +1,35 @@
+From 5311b5ed0867a40ceb71b89358d70290bc2d0c51 Mon Sep 17 00:00:00 2001
+From: Oliver Kurth <okurth@gmail.com>
+Date: Wed, 16 Nov 2022 11:01:28 -0800
+Subject: [PATCH] add sqlite libs to build with
+
+---
+ history/CMakeLists.txt   | 5 +++++
+ tools/cli/CMakeLists.txt | 1 +
+ 2 files changed, 6 insertions(+)
+
+diff --git a/history/CMakeLists.txt b/history/CMakeLists.txt
+index c7df53ae..d2dbc876 100644
+--- a/history/CMakeLists.txt
++++ b/history/CMakeLists.txt
+@@ -28,3 +28,8 @@ target_link_libraries(${TDNF_HISTORY_UTIL_BIN}
+     ${SQLITE3_LIBRARIES}
+     ${LIB_TDNF_HISTORY}
+ )
++
++target_link_libraries(${LIB_TDNF_HISTORY}
++    ${RPM_LIBRARIES}
++    ${SQLITE3_LIBRARIES}
++)
+diff --git a/tools/cli/CMakeLists.txt b/tools/cli/CMakeLists.txt
+index 9487db2b..0e2a2e30 100644
+--- a/tools/cli/CMakeLists.txt
++++ b/tools/cli/CMakeLists.txt
+@@ -13,6 +13,7 @@ add_executable(${TDNF_BIN}
+ )
+ 
+ target_link_libraries(${TDNF_BIN}
++    ${SQLITE3_LIBRARIES}
+     ${LIB_TDNF_CLI}
+     ${LIB_TDNF}
+ )
