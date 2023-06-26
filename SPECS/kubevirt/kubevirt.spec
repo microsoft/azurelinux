@@ -32,6 +32,7 @@ Source1:        disks-images-provider.yaml
 # correctly.
 Patch0:         Cleanup-housekeeping-cgroup-on-vm-del.patch
 Patch1:         Allocate-2-cpu-for-the-emulator-thread.patch
+Patch2:         Hotplug_detach_grace_period.patch
 BuildRequires:  glibc-devel
 BuildRequires:  glibc-static >= 2.35-3%{?dist}
 BuildRequires:  golang
