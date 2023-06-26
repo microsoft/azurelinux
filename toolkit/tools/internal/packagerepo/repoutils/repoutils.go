@@ -24,7 +24,7 @@ import (
 func RestoreClonedRepoContents(cloner repocloner.RepoCloner, srcFile string) (err error) {
 	const (
 		cloneDeps          = false
-		withSystemPackages = false
+		skipSystemPackages = false
 	)
 
 	timestamp.StartEvent("restoring cloned repo", nil)
@@ -41,7 +41,7 @@ func RestoreClonedRepoContents(cloner repocloner.RepoCloner, srcFile string) (er
 	uniquePackages := removePackageDuplicates(repo.Repo)
 	packagesToDownload := removeDownloadedPackages(uniquePackages, cloner.CloneDirectory())
 
-	_, err = cloner.Clone(cloneDeps, packagesToDownload...)
+	_, err = cloner.Clone(cloneDeps, skipSystemPackages, packagesToDownload...)
 	if err != nil {
 		return err
 	}
@@ -53,7 +53,7 @@ func RestoreClonedRepoContents(cloner repocloner.RepoCloner, srcFile string) (er
 	}
 
 	// Verify the cloned contents are as expected.
-	clonedRepo, err := cloner.ClonedRepoContents(withSystemPackages)
+	clonedRepo, err := cloner.ClonedRepoContents(skipSystemPackages)
 	if err != nil {
 		return
 	}
@@ -62,11 +62,11 @@ func RestoreClonedRepoContents(cloner repocloner.RepoCloner, srcFile string) (er
 }
 
 // SaveClonedRepoContents saves a cloner's repo contents to a JSON file at `dstFile`.
-func SaveClonedRepoContents(cloner repocloner.RepoCloner, dstFile string, withSystemPackages bool) (err error) {
+func SaveClonedRepoContents(cloner repocloner.RepoCloner, dstFile string, skipSystemPackages bool) (err error) {
 	timestamp.StartEvent("saving cloned repo contents", nil)
 	defer timestamp.StopEvent(nil)
 
-	repo, err := cloner.ClonedRepoContents(withSystemPackages)
+	repo, err := cloner.ClonedRepoContents(skipSystemPackages)
 	if err != nil {
 		return
 	}

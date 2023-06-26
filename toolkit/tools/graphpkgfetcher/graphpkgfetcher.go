@@ -155,7 +155,7 @@ func findUnresolvedNodes(runNodes []*pkggraph.PkgNode) (unreslovedNodes []*pkggr
 func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, outputSummaryFile string, toolchainPackages []string, cloner *rpmrepocloner.RpmRepoCloner, stopOnFailure bool) (err error) {
 	const (
 		downloadDependencies = true
-		withSystemPackages   = true
+		skipSystemPackages   = false
 	)
 
 	timestamp.StartEvent("Clone packages", nil)
@@ -168,9 +168,9 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, out
 			return fmt.Errorf("failed to restore external packages cache from '%s':\n%w", inputSummaryFile, err)
 		}
 
-		previousFlags := cloner.GetEnabledRepos()
-		cloner.SetEnabledRepos(rpmrepocloner.RepoFlagDownloadedCache | rpmrepocloner.RepoFlagLocalBuilds)
-		defer cloner.SetEnabledRepos(previousFlags)
+		previousEnabledRepos := cloner.GetEnabledRepos()
+		cloner.SetEnabledRepos(rpmrepocloner.RepoFlagToolchain | rpmrepocloner.RepoFlagDownloadedCache)
+		defer cloner.SetEnabledRepos(previousEnabledRepos)
 	}
 
 	// Cache an RPM for each unresolved node in the graph.
@@ -202,7 +202,7 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, out
 	}
 
 	if strings.TrimSpace(outputSummaryFile) != "" {
-		err = repoutils.SaveClonedRepoContents(cloner, outputSummaryFile, withSystemPackages)
+		err = repoutils.SaveClonedRepoContents(cloner, outputSummaryFile, skipSystemPackages)
 		if err != nil {
 			logger.Log.Errorf("Failed to save cloned repo contents.")
 			return
@@ -243,7 +243,7 @@ func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNo
 				Name: resolvedPackage,
 			}
 
-			preBuilt, err = cloner.Clone(cloneDeps, desiredPackage)
+			preBuilt, err = cloner.Clone(cloneDeps, false, desiredPackage)
 			if err != nil {
 				err = fmt.Errorf("failed to clone '%s' from RPM repo:\n%w", resolvedPackage, err)
 				return
