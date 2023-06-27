@@ -2,6 +2,9 @@
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
 %define uname_r %{version}-%{release}
 
+# Switch to multi-threaded xz rpm compression to handle large subpackages (debuginfo)
+%define _binary_payload w3T.xzdio
+
 # find_debuginfo.sh arguments are set by default in rpm's macros.
 # The default arguments regenerate the build-id for vmlinux in the 
 # debuginfo package causing a mismatch with the build-id for vmlinuz in
@@ -28,7 +31,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.15.116.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -422,6 +425,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Jun 27 2023 Andrew Phelps <anphel@microsoft.com> - 5.15.116.1-3
+- Use multithreaded xz compression
+
 * Tue Jun 20 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.116.1-2
 - Enable CONFIG_IP_VS_MH module
 
