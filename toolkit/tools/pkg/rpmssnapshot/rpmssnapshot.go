@@ -98,7 +98,7 @@ func (s *SnapshotGenerator) convertResultsToRepoContents(allBuiltRPMs []string) 
 	for _, builtRPM := range allBuiltRPMs {
 		matches := rpmSpecBuiltRPMRegex.FindStringSubmatch(builtRPM)
 		if len(matches) != rpmSpecBuiltRPMRegexMatchesCount {
-			return repoContents, fmt.Errorf("rPM package name (%s) doesn't match the regular expression (%s)", builtRPM, rpmSpecBuiltRPMRegex.String())
+			return repoContents, fmt.Errorf("RPM package name (%s) doesn't match the regular expression (%s)", builtRPM, rpmSpecBuiltRPMRegex.String())
 		}
 
 		repoContents.Repo = append(repoContents.Repo, &repocloner.RepoPackage{
