@@ -71,7 +71,7 @@ func checkMaxSizeCorrectness(disk *Disk) (err error) {
 		maxSizeString := strconv.FormatUint(maxSize, 10)
 		lastPartitionEndString := strconv.FormatUint(lastPartitionEnd, 10)
 		if maxSize < lastPartitionEnd {
-			return fmt.Errorf("the MaxSize of %s is not large enough to accomodate defined partitions ending at %s.", maxSizeString, lastPartitionEndString)
+			return fmt.Errorf("the MaxSize of %s is not large enough to accomodate defined partitions ending at %s", maxSizeString, lastPartitionEndString)
 		}
 	} else if disk.MaxSize != 0 {
 		logger.Log.Warnf("defining both a maxsize and target disk in the same config should be avoided as maxsize value will not be used")
