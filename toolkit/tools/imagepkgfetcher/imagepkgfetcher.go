@@ -88,6 +88,9 @@ func main() {
 	if *disableUpstreamRepos {
 		enabledRepos = enabledRepos & ^rpmrepocloner.RepoFlagUpstream
 	}
+	if *disableDefaultRepos {
+		enabledRepos = enabledRepos & ^rpmrepocloner.RepoFlagMarinerDefaults
+	}
 	cloner.SetEnabledRepos(enabledRepos)
 
 	timestamp.StopEvent(nil) // initialize and configure cloner

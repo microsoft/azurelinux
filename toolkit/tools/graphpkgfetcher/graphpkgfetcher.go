@@ -107,6 +107,9 @@ func fetchPackages() (err error) {
 		if *disableUpstreamRepos {
 			enabledRepos = enabledRepos & ^rpmrepocloner.RepoFlagUpstream
 		}
+		if *disableDefaultRepos {
+			enabledRepos = enabledRepos & ^rpmrepocloner.RepoFlagMarinerDefaults
+		}
 		cloner.SetEnabledRepos(enabledRepos)
 	}
 
