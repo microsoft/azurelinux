@@ -345,13 +345,13 @@ func (r *RpmRepoCloner) SetEnabledRepos(reposFlags uint64) {
 
 	if RepoFlagPreview&reposFlags == 0 {
 		previousReposList = append(previousReposList, fmt.Sprintf("--disablerepo=%s", repoIDPreview))
-		r.reposArgsList = append(r.reposArgsList, previousReposList)
 	}
 
 	if RepoFlagMarinerDefaults&reposFlags == 0 {
 		previousReposList = append(previousReposList, r.disabledDefaultMarinerReposArgs()...)
-		r.reposArgsList = append(r.reposArgsList, previousReposList)
 	}
+
+	r.reposArgsList = append(r.reposArgsList, previousReposList)
 }
 
 // WhatProvides attempts to find packages which provide the requested PackageVer.
