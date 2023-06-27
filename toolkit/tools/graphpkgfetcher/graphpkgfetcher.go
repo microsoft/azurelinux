@@ -153,10 +153,7 @@ func findUnresolvedNodes(runNodes []*pkggraph.PkgNode) (unreslovedNodes []*pkggr
 // resolveGraphNodes scans a graph and for each unresolved node in the graph clones the RPMs needed
 // to satisfy it.
 func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, outputSummaryFile string, toolchainPackages []string, cloner *rpmrepocloner.RpmRepoCloner, stopOnFailure bool) (err error) {
-	const (
-		downloadDependencies = true
-		skipSystemPackages   = false
-	)
+	const downloadDependencies = true
 
 	timestamp.StartEvent("Clone packages", nil)
 	defer timestamp.StopEvent(nil)
@@ -202,7 +199,7 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile, out
 	}
 
 	if strings.TrimSpace(outputSummaryFile) != "" {
-		err = repoutils.SaveClonedRepoContents(cloner, outputSummaryFile, skipSystemPackages)
+		err = repoutils.SaveClonedRepoContents(cloner, outputSummaryFile)
 		if err != nil {
 			logger.Log.Errorf("Failed to save cloned repo contents.")
 			return
@@ -243,7 +240,7 @@ func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNo
 				Name: resolvedPackage,
 			}
 
-			preBuilt, err = cloner.Clone(cloneDeps, false, desiredPackage)
+			preBuilt, err = cloner.Clone(cloneDeps, desiredPackage)
 			if err != nil {
 				err = fmt.Errorf("failed to clone '%s' from RPM repo:\n%w", resolvedPackage, err)
 				return

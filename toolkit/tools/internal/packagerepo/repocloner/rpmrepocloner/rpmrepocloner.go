@@ -134,7 +134,7 @@ func ConstructCloner(destinationDir, tmpDir, workerTar, existingRpmsDir, toolcha
 // If cloneDeps is set, package dependencies will also be cloned.
 // It will automatically resolve packages that describe a provide or file from a package.
 // The cloner will mark any package that locally built by setting preBuilt = true
-func (r *RpmRepoCloner) Clone(cloneDeps, skipSystemPackages bool, packagesToClone ...*pkgjson.PackageVer) (preBuilt bool, err error) {
+func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.PackageVer) (preBuilt bool, err error) {
 	const maxBatchSize = 50
 
 	timestamp.StartEvent("cloning packages", nil)
@@ -164,18 +164,6 @@ func (r *RpmRepoCloner) Clone(cloneDeps, skipSystemPackages bool, packagesToClon
 		"--downloadonly",
 		"--downloaddir",
 		r.chrootCloneDir,
-	}
-
-	if skipSystemPackages {
-		tempDirPath, err := os.MkdirTemp("", "")
-		if err != nil {
-			return false, fmt.Errorf("failed to create temp directory:\n%w", err)
-		}
-		defer os.RemoveAll(tempDirPath)
-
-		constantArgs = append(constantArgs,
-			"--installroot",
-			tempDirPath)
 	}
 
 	// Setting install root to a temp directory to prevent TDNF
@@ -219,7 +207,7 @@ func (r *RpmRepoCloner) CloneDirectory() string {
 
 // ClonedRepoContents returns the non-local, downloaded packages.
 // This includes the toolchain packages along with other packages downloaded from the upstream repositories.
-func (r *RpmRepoCloner) ClonedRepoContents(skipSystemPackages bool) (repoContents *repocloner.RepoContents, err error) {
+func (r *RpmRepoCloner) ClonedRepoContents() (repoContents *repocloner.RepoContents, err error) {
 	releaseverCliArg, err := tdnf.GetReleaseverCliArg()
 	if err != nil {
 		return
@@ -267,17 +255,6 @@ func (r *RpmRepoCloner) ClonedRepoContents(skipSystemPackages bool) (repoContent
 			fmt.Sprintf("--disablerepo=%s", repoIDAll),
 			fmt.Sprintf("--enablerepo=%s", r.repoIDCache),
 			releaseverCliArg,
-		}
-
-		if skipSystemPackages {
-			tempDirPath, err := os.MkdirTemp("", "")
-			if err != nil {
-				return err
-			}
-			defer os.RemoveAll(tempDirPath)
-			tdnfArgs = append(tdnfArgs,
-				"--installroot",
-				tempDirPath)
 		}
 
 		return shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, true, "tdnf", tdnfArgs...)

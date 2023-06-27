@@ -53,8 +53,6 @@ var (
 )
 
 func main() {
-	const skipSystemPackages = false
-
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
@@ -107,7 +105,7 @@ func main() {
 	}
 
 	if strings.TrimSpace(*outputSummaryFile) != "" {
-		err = repoutils.SaveClonedRepoContents(cloner, *outputSummaryFile, skipSystemPackages)
+		err = repoutils.SaveClonedRepoContents(cloner, *outputSummaryFile)
 		logger.PanicOnError(err, "Failed to save cloned repo contents")
 	}
 
@@ -146,7 +144,7 @@ func cloneSystemConfigs(cloner repocloner.RepoCloner, configFile, baseDirPath st
 
 	logger.Log.Infof("Cloning: %v", packageVersionsInConfig)
 	// The image tools don't care if a package was created locally or not, just that it exists. Disregard if it is prebuilt or not.
-	_, err = cloner.Clone(cloneDeps, false, packageVersionsInConfig...)
+	_, err = cloner.Clone(cloneDeps, packageVersionsInConfig...)
 	return
 }
 

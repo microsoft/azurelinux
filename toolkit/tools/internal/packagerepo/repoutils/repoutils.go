@@ -22,10 +22,7 @@ import (
 // cache (with exception of the toolchain packages) then this routine will return an error.
 // This is done to ensure the cache only contains the desired packages.
 func RestoreClonedRepoContents(cloner repocloner.RepoCloner, srcFile string) (err error) {
-	const (
-		cloneDeps          = false
-		skipSystemPackages = false
-	)
+	const cloneDeps = false
 
 	timestamp.StartEvent("restoring cloned repo", nil)
 	defer timestamp.StopEvent(nil)
@@ -41,7 +38,7 @@ func RestoreClonedRepoContents(cloner repocloner.RepoCloner, srcFile string) (er
 	uniquePackages := removePackageDuplicates(repo.Repo)
 	packagesToDownload := removeDownloadedPackages(uniquePackages, cloner.CloneDirectory())
 
-	_, err = cloner.Clone(cloneDeps, skipSystemPackages, packagesToDownload...)
+	_, err = cloner.Clone(cloneDeps, packagesToDownload...)
 	if err != nil {
 		return err
 	}
@@ -53,7 +50,7 @@ func RestoreClonedRepoContents(cloner repocloner.RepoCloner, srcFile string) (er
 	}
 
 	// Verify the cloned contents are as expected.
-	clonedRepo, err := cloner.ClonedRepoContents(skipSystemPackages)
+	clonedRepo, err := cloner.ClonedRepoContents()
 	if err != nil {
 		return
 	}
@@ -62,11 +59,11 @@ func RestoreClonedRepoContents(cloner repocloner.RepoCloner, srcFile string) (er
 }
 
 // SaveClonedRepoContents saves a cloner's repo contents to a JSON file at `dstFile`.
-func SaveClonedRepoContents(cloner repocloner.RepoCloner, dstFile string, skipSystemPackages bool) (err error) {
+func SaveClonedRepoContents(cloner repocloner.RepoCloner, dstFile string) (err error) {
 	timestamp.StartEvent("saving cloned repo contents", nil)
 	defer timestamp.StopEvent(nil)
 
-	repo, err := cloner.ClonedRepoContents(skipSystemPackages)
+	repo, err := cloner.ClonedRepoContents()
 	if err != nil {
 		return
 	}
