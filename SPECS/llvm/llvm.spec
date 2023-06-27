@@ -1,7 +1,7 @@
 Summary:        A collection of modular and reusable compiler and toolchain technologies.
 Name:           llvm
 Version:        12.0.1
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -44,7 +44,6 @@ cmake -G Ninja                              \
       -DLLVM_ENABLE_RTTI=ON                 \
       -DCMAKE_BUILD_TYPE=Release            \
       -DLLVM_PARALLEL_LINK_JOBS=1           \
-      -DLLVM_PARALLEL_COMPILE_JOBS=2        \
       -DLLVM_BUILD_LLVM_DYLIB=ON            \
       -DLLVM_LINK_LLVM_DYLIB=ON             \
       -DLLVM_INCLUDE_TESTS=ON               \
