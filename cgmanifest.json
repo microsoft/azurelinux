@@ -23903,6 +23903,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-resolvelib",
+          "version": "1.0.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/r/resolvelib/resolvelib-1.0.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-responses",
           "version": "0.20.0",
           "downloadUrl": "https://github.com/getsentry/responses/archive/refs/tags/0.20.0.tar.gz"
