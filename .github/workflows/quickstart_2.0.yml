@@ -12,7 +12,7 @@ on:
 
 jobs:
   get_input-srpms:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout
@@ -41,7 +41,7 @@ jobs:
         popd
 
   iso_quickstart:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout
@@ -69,7 +69,7 @@ jobs:
         popd
 
   vhdx_quickstart:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout
