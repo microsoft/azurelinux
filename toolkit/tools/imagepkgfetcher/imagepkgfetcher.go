@@ -123,7 +123,6 @@ func main() {
 	}
 
 	timestamp.StopEvent(nil) // finalize cloned packages
-
 }
 
 func cloneSystemConfigs(cloner repocloner.RepoCloner, configFile, baseDirPath string, externalOnly bool, inputGraph string) (err error) {
