@@ -488,29 +488,26 @@ func updateGraphWithImplicitProvides(res *schedulerutils.BuildResult, pkgGraph *
 	return
 }
 
-// setAssociatedDeltaPaths sets the DeltaPath for all of the request's ancillary nodes (both build and run) to the actual
+// setAssociatedDeltaPaths sets the RpmPath for all of the request's ancillary nodes (both build and run) to the actual
 // RPM paths. A delta node will normally point at the cached RPM path, but we want to point it at the actual RPM if we built it.
+// This function should only be called on delta build nodes.
 func setAssociatedDeltaPaths(res *schedulerutils.BuildResult, builtFiles []string, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex) (err error) {
 	graphMutex.Lock()
 	defer graphMutex.Unlock()
-
-	if !res.WasDelta {
-		err = fmt.Errorf("setAssociatedDeltaPaths called on non-delta node: %s", res.Node.FriendlyName())
-		return
-	}
 
 	// Build map of basename to full path for built files. This will allow us to find the actual RPM path we built for
 	// any given .rpm file built from our ancillary nodes.
 	builtFileMap := make(map[string]string)
 	for _, builtFile := range builtFiles {
 		// We should not expect to see multiple built files with the same basename
-		_, hasConflict := builtFileMap[filepath.Base(builtFile)]
+		baseName := filepath.Base(builtFile)
+		_, hasConflict := builtFileMap[baseName]
 		if hasConflict {
-			err = fmt.Errorf("multiple built files with same basename: %s", filepath.Base(builtFile))
+			err = fmt.Errorf("multiple built files with same basename: %s", baseName)
 			return
 		}
 		logger.Log.Tracef("Built delta file: %s", builtFile)
-		builtFileMap[filepath.Base(builtFile)] = builtFile
+		builtFileMap[baseName] = builtFile
 	}
 
 	// Now we can scan for all the run nodes that use the cached RPM path and update them to the actual RPM path.
@@ -521,9 +518,8 @@ func setAssociatedDeltaPaths(res *schedulerutils.BuildResult, builtFiles []strin
 		if ok {
 			// We only care about nodes that are deltas
 			if node.State == pkggraph.StateDelta {
-				logger.Log.Tracef("Found delta run node: %s", node)
 				// Update the node to point at the actual RPM path from our map of built files
-				logger.Log.Tracef("Updating delta run node from %s to %s", node.RpmPath, builtFile)
+				logger.Log.Tracef("Updating delta run node '%s' path from '%s' to '%s'", node, node.RpmPath, builtFile)
 				node.RpmPath = builtFile
 			} else {
 				err = fmt.Errorf("unexpected node type/state when scanning for delta run node '%s' when updating paths to '%s'", node, rpmBasePath)

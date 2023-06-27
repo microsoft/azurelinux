@@ -124,13 +124,13 @@ func fetchPackages() (err error) {
 		logger.Log.Info("Attempting to download delta RPMs for build nodes")
 		err = downloadDeltaNodes(dependencyGraph, cloner)
 		if err != nil {
-			err = fmt.Errorf("failed to download delta RPMs: %w", err)
+			err = fmt.Errorf("failed to download delta RPMs:\n%w", err)
 			return
 		}
 		// Update the package graph with the paths to the delta RPMs we downloaded
 		err = pkggraph.WriteDOTGraphFile(dependencyGraph, *outputGraph)
 		if err != nil {
-			err = fmt.Errorf("failed to write cache graph to file: %w", err)
+			err = fmt.Errorf("failed to write cache graph to file:\n%w", err)
 			return
 		}
 	}
@@ -147,8 +147,8 @@ func fetchPackages() (err error) {
 		if strings.TrimSpace(*outputSummaryFile) != "" {
 			err = repoutils.SaveClonedRepoContents(cloner, *outputSummaryFile)
 			if err != nil {
-				logger.Log.Errorf("Failed to save cloned repo contents.")
-				return
+				err = fmt.Errorf("failed to save cloned repo contents:\n%w", err)
+				return err
 			}
 		}
 	}
@@ -161,6 +161,13 @@ func fetchPackages() (err error) {
 //   - dependencyGraph: The graph to use to find the packages we need to build. Should have any caching operations already
 //     performed on it. Will be updated with the paths to the delta RPMs we download.
 //   - cloner: The cloner to use to download the RPMs
+//
+// We also access the package list related globals:
+//   - pkgsToBuild: The list of packages to build
+//   - pkgsToRebuild: The list of packages to rebuild
+//   - pkgsToIgnore: The list of packages to ignore
+//   - imageConfig: The image config to use to find the packages we need to build
+//   - baseDirPath: The base directory to use to find the packages we need to build
 func downloadDeltaNodes(dependencyGraph *pkggraph.PkgGraph, cloner *rpmrepocloner.RpmRepoCloner) (err error) {
 	const (
 		useImplicitForOptimization = true
@@ -177,7 +184,6 @@ func downloadDeltaNodes(dependencyGraph *pkggraph.PkgGraph, cloner *rpmrepoclone
 		return
 	}
 
-	timestamp.StartEvent("graph initialization", nil)
 	// The scheduler utils expect to pick a graph up from a file, so we will write the graph we wrote it to a file and
 	// now we read it back in and optimize it. We will heavily modify this graph so it should not be used for anything
 	// else.
@@ -186,10 +192,9 @@ func downloadDeltaNodes(dependencyGraph *pkggraph.PkgGraph, cloner *rpmrepoclone
 		err = fmt.Errorf("failed to initialize graph for delta package downloading: %w", err)
 		return
 	}
-	timestamp.StopEvent(nil) // graph initialization
 
 	if !isGraphOptimized {
-		logger.Log.Warnf("Graph is not optimized, delta package downloading will be very slow!")
+		logger.Log.Warnf("Delta fetcher was unable to prune the build graph. All possible build nodes will be included so delta package downloading will be very slow!")
 	}
 
 	if len(deltaPkgGraphCopy.AllBuildNodes()) > 0 {
@@ -381,13 +386,6 @@ func downloadAllAvailableDeltaRPMs(realDependencyGraph, dependencyGraphDeltaCopy
 		if err != nil {
 			return fmt.Errorf("failed to fixup skipped node %s: %w", n, err)
 		}
-	}
-
-	logger.Log.Info("Configuring additional delta RPMs as a local repository")
-	err = cloner.ConvertDownloadedPackagesIntoRepo()
-	if err != nil {
-		logger.Log.Errorf("Failed to convert downloaded RPMs into a repo. Error: %s", err)
-		return
 	}
 
 	return

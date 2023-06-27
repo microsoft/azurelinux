@@ -9,6 +9,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 )
 
 const (
@@ -26,6 +27,8 @@ func InitializeGraph(inputFile string, packagesToBuild []*pkgjson.PackageVer, ca
 	const (
 		strictGoalNode = true
 	)
+	timestamp.StartEvent("graph initialization", nil)
+	defer timestamp.StopEvent(nil)
 
 	pkgGraph, err = pkggraph.ReadDOTGraphFile(inputFile)
 	if err != nil {
