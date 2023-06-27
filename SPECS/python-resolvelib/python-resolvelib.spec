@@ -8,7 +8,7 @@ License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/sarugaku/resolvelib
-Source0:        %{pypi_source}#python-resolvelib-1.0.1.tar.gz
+Source0:        %{pypi_source}#/python-resolvelib-1.0.1.tar.gz
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildArch:      noarch
@@ -35,7 +35,7 @@ requirement format. class...
 
 
 %prep
-%autosetup -n %{name}-%{version}
+%autosetup -n resolvelib-%{version}
 # Remove bundled egg-info
 rm -rf %{pypi_name}.egg-info
 
