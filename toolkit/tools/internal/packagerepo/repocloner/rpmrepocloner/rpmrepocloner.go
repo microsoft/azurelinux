@@ -684,6 +684,7 @@ func (r *RpmRepoCloner) refreshPackagesCache() (err error) {
 	args := []string{
 		"makecache",
 		releaseverCliArg,
+		fmt.Sprintf("--enablerepo=%s", repoIDAll),
 	}
 
 	stdout, stderr, err := shell.Execute("tdnf", args...)
@@ -825,9 +826,11 @@ func (r *RpmRepoCloner) reposArgsUseOnlyLocalSources(reposArgs []string) bool {
 	const repoIDIndex = 1
 
 	for _, repoArg := range reposArgs {
-		repoID := strings.Split(repoArg, "=")[repoIDIndex]
-		if r.externalSourceRepoIDs[repoID] {
-			return false
+		if strings.Contains(repoArg, "--enablerepo=") {
+			repoID := strings.Split(repoArg, "=")[repoIDIndex]
+			if r.externalSourceRepoIDs[repoID] {
+				return false
+			}
 		}
 	}
 
