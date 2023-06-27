@@ -2,7 +2,7 @@
 Summary:        SpiderMonkey JavaScript library
 Name:           mozjs%{major}
 Version:        60.9.0
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        MPLv2.0 AND MPLv1.1 AND BSD AND GPLv2+ AND GPLv3+ AND LGPLv2+ AND AFL AND ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,6 +19,7 @@ Patch5:         icu_sources_data.py-Decouple-from-Mozilla-build-system.patch
 Patch6:         icu_sources_data-Write-command-output-to-our-stderr.patch
 Patch7:         CVE-2023-22895.patch
 Patch8:         CVE-2023-34411.patch
+Patch9:         CVE-2022-48285.patch
 BuildRequires:  autoconf213
 BuildRequires:  gcc
 BuildRequires:  libffi
@@ -57,6 +58,7 @@ pushd ../..
 %patch6 -p1
 %patch7 -p1
 %patch8 -p1
+%patch9 -p1
 # make sure we don't ever accidentally link against bundled security libs
 rm -rf ../../security/
 popd
@@ -126,6 +128,9 @@ python2 jit-test/jit_test.py -s -t 1800 --no-progress ../../js/src/js/src/shell/
 %{_includedir}/mozjs-%{major}/
 
 %changelog
+* Mon Jun 26 2023 Minghe Ren <mingheren@microsoft.com> - 60.9.0-13
+- Patch CVE-2022-48285
+
 * Wed Jun 14 2023 Henry Beberman <henry.beberman@microsoft.com> - 60.9.0-12
 - Patch CVE-2023-34411
 
