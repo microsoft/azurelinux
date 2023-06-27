@@ -88,7 +88,7 @@ func PackageNamesToBuiltPackages(packageOrSpecNames []string, dependencyGraph *p
 		}
 	}
 
-	packageVers = sliceutils.SetToSlice(packageVersMap)
+	packageVers = sliceutils.PackageVersSetToSlice(packageVersMap)
 
 	return
 }
@@ -225,5 +225,5 @@ func removePackageVersDuplicates(packageVers []*pkgjson.PackageVer) []*pkgjson.P
 		uniquePackageVersToBuild[packageVer] = true
 	}
 
-	return sliceutils.SetToSlice(uniquePackageVersToBuild)
+	return sliceutils.PackageVersSetToSlice(uniquePackageVersToBuild)
 }

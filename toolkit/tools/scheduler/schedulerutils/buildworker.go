@@ -186,7 +186,7 @@ func getBuildDependencies(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, g
 		return
 	})
 
-	dependencies = sliceutils.SetToSlice(dependencyLookup)
+	dependencies = sliceutils.StringsSetToSlice(dependencyLookup)
 
 	return
 }

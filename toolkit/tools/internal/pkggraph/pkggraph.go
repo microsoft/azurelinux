@@ -1419,7 +1419,7 @@ func rpmsProvidedBySRPM(srpmPath string, pkgGraph *PkgGraph, graphMutex *sync.RW
 		rpmsMap[node.RpmPath] = true
 	}
 
-	rpmFiles = sliceutils.SetToSlice(rpmsMap)
+	rpmFiles = sliceutils.StringsSetToSlice(rpmsMap)
 
 	return
 }

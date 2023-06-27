@@ -18,14 +18,14 @@ func TestMain(m *testing.M) {
 }
 
 func TestPackageVersSetToSliceShouldCreateEmptySliceFromNil(t *testing.T) {
-	outputSlice := SetToSlice[*pkgjson.PackageVer](nil)
+	outputSlice := PackageVersSetToSlice(nil)
 
 	assert.NotNil(t, outputSlice)
 	assert.Empty(t, outputSlice)
 }
 
 func TestPackageVersSetToSliceShouldCreateEmptySliceFromEmptySet(t *testing.T) {
-	outputSlice := SetToSlice(map[*pkgjson.PackageVer]bool{})
+	outputSlice := PackageVersSetToSlice(map[*pkgjson.PackageVer]bool{})
 
 	assert.NotNil(t, outputSlice)
 	assert.Empty(t, outputSlice)
@@ -38,7 +38,7 @@ func TestPackageVersSetToSliceShouldReturnValuesForAllTrueElementsInSet(t *testi
 		existingPackageVer: true,
 		missingPackageVer:  false,
 	}
-	outputSlice := SetToSlice(inputSet)
+	outputSlice := PackageVersSetToSlice(inputSet)
 
 	assert.NotNil(t, outputSlice)
 	assert.Len(t, outputSlice, 1)
@@ -87,14 +87,14 @@ func TestStringShouldMatchForNilInBoth(t *testing.T) {
 }
 
 func TestStringsSetToSliceShouldCreateEmptySliceFromNil(t *testing.T) {
-	outputSlice := SetToSlice[string](nil)
+	outputSlice := StringsSetToSlice(nil)
 
 	assert.NotNil(t, outputSlice)
 	assert.Empty(t, outputSlice)
 }
 
 func TestStringsSetToSliceShouldCreateEmptySliceFromEmptySet(t *testing.T) {
-	outputSlice := SetToSlice(map[string]bool{})
+	outputSlice := StringsSetToSlice(map[string]bool{})
 
 	assert.NotNil(t, outputSlice)
 	assert.Empty(t, outputSlice)
@@ -107,7 +107,7 @@ func TestStringsSetToSliceShouldReturnValuesForAllTrueElementsInSet(t *testing.T
 		"X": false,
 		"Y": false,
 	}
-	outputSlice := SetToSlice(inputSet)
+	outputSlice := StringsSetToSlice(inputSet)
 
 	assert.NotNil(t, outputSlice)
 	assert.Len(t, outputSlice, 2)

@@ -31,8 +31,8 @@ func Find(slice interface{}, searched interface{}, cond func(interface{}, interf
 }
 
 // FindMatches returns a new slice keeping only these elements from slice that matcher returned true for.
-func FindMatches[T comparable](slice []T, isMatch func(T) bool) []T {
-	result := []T{}
+func FindMatches(slice []string, isMatch func(string) bool) []string {
+	result := []string{}
 	for _, v := range slice {
 		if isMatch(v) {
 			result = append(result, v)
@@ -59,26 +59,34 @@ func PackageVerMatch(expected, given interface{}) bool {
 	return reflect.DeepEqual(expected.(*pkgjson.PackageVer), given.(*pkgjson.PackageVer))
 }
 
-// SetToSlice converts a map[T]bool to a slice containing the map's keys.
-func SetToSlice[T comparable](inputSet map[T]bool) []T {
+// PackageVersSetToSlice converts a map[*pkgjson.PackageVer]bool to a slice containing the map's keys.
+func PackageVersSetToSlice(inputSet map[*pkgjson.PackageVer]bool) []*pkgjson.PackageVer {
 	index := 0
-	outputSlice := make([]T, len(inputSet))
+	outputSlice := make([]*pkgjson.PackageVer, len(inputSet))
+
 	for element, elementInSet := range inputSet {
 		if elementInSet {
 			outputSlice[index] = element
 			index++
 		}
 	}
+
 	return outputSlice[:index]
 }
 
-// SliceToSet converts a slice ot T to a map[T]bool.
-func SliceToSet[T comparable](inputSlice []T) map[T]bool {
-	outputSet := make(map[T]bool)
-	for _, element := range inputSlice {
-		outputSet[element] = true
+// StringsSetToSlice converts a map[string]bool to a slice containing the map's keys.
+func StringsSetToSlice(inputSet map[string]bool) []string {
+	index := 0
+	outputSlice := make([]string, len(inputSet))
+
+	for element, elementInSet := range inputSet {
+		if elementInSet {
+			outputSlice[index] = element
+			index++
+		}
 	}
-	return outputSet
+
+	return outputSlice[:index]
 }
 
 func nilCheck(expected interface{}, given interface{}) (checkValid, checkResult bool) {
