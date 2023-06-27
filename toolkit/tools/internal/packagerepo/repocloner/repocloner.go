@@ -27,11 +27,11 @@ type RepoPackage struct {
 // and their dependencies.
 type RepoCloner interface {
 	Clone(cloneDeps, skipSystemPackages bool, packagesToClone ...*pkgjson.PackageVer) (prebuiltPackage bool, err error)
-	WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames []string, err error)
-	ConvertDownloadedPackagesIntoRepo() error
-	ClonedRepoContents(skipSystemPackages bool) (repoContents *RepoContents, err error)
 	CloneDirectory() string
+	ClonedRepoContents(skipSystemPackages bool) (repoContents *RepoContents, err error)
 	Close() error
+	ConvertDownloadedPackagesIntoRepo() error
+	WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames []string, err error)
 }
 
 // ID returns a unique identifier for a package.
