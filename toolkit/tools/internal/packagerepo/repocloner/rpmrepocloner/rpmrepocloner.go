@@ -581,6 +581,8 @@ func (r *RpmRepoCloner) initialize(destinationDir, tmpDir, workerTar, existingRp
 		overlayWorkDirectoryRpms       = "/overlaywork/workdir_rpms"
 		overlayUpperDirectoryToolchain = "/overlaywork/upper_toolchain"
 		overlayWorkDirectoryToolchain  = "/overlaywork/workdir_toolchain"
+
+		repoFlagClonerDefault = RepoFlagAll & ^RepoFlagPreview
 	)
 
 	// Ensure that if initialization fails, the chroot is closed
@@ -669,6 +671,8 @@ func (r *RpmRepoCloner) initialize(destinationDir, tmpDir, workerTar, existingRp
 		repoIDAll:     true,
 	}
 
+	r.SetEnabledRepos(repoFlagClonerDefault)
+
 	return
 }
 
@@ -685,8 +689,6 @@ func (r *RpmRepoCloner) initializeRepoDefinitions(repoDefinitions []string) (err
 	const (
 		chrootRepoDir  = "/etc/yum.repos.d/"
 		chrootRepoFile = "allrepos.repo"
-
-		repoFlagClonerDefault = RepoFlagAll & ^RepoFlagPreview
 	)
 
 	fullRepoDirPath := filepath.Join(r.chroot.RootDir(), chrootRepoDir)
@@ -741,8 +743,6 @@ func (r *RpmRepoCloner) initializeRepoDefinitions(repoDefinitions []string) (err
 			return err
 		}
 	}
-
-	r.SetEnabledRepos(repoFlagClonerDefault)
 
 	return
 }
