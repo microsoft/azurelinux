@@ -328,8 +328,7 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile stri
 //   - dependencyGraphDeltaCopy: A copy of the graph we will use to try to optimize the build nodes. This graph should be
 //     optimized to only contain the nodes we need to build.
 //   - cloner: The cloner to use to download the RPMs
-//   - stopOnFailure: If true, will stop the build if we fail to download any delta RPMs.
-func downloadAllAvailableDeltaRPMs(realDependencyGraph, dependencyGraphDeltaCopy *pkggraph.PkgGraph, cloner *rpmrepocloner.RpmRepoCloner, stopOnFailure bool) (err error) {
+func downloadAllAvailableDeltaRPMs(realDependencyGraph, dependencyGraphDeltaCopy *pkggraph.PkgGraph, cloner *rpmrepocloner.RpmRepoCloner) (err error) {
 	timestamp.StartEvent("downloading delta nodes", nil)
 	defer timestamp.StopEvent(nil)
 
