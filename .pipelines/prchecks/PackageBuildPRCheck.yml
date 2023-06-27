@@ -1,0 +1,93 @@
+# Since we're boosting our builds by using a private, pre-compiled raw toolchain
+# the pipeline requires defining the following variables outside of the YAML:
+# - rawToolchainCacheURL_AMD64
+# - rawToolchainCacheURL_ARM64
+# - agentPool_AMD64
+# - agentPool_ARM64
+# - agentVMName_AMD64
+# - agentVMName_ARM64
+
+trigger: none
+
+parameters:
+  - name: buildConfiguration
+    type: object
+    default:
+    - name: "AMD64"
+      agentPool: "$(agentPool_AMD64)"
+      agentVMName: "$(agentVMName_AMD64)"
+      rawToolchainCacheURL: "$(rawToolchainCacheURL_AMD64)"
+      rawToolchainExpectedHash: "f56df34b90915c93f772d3961bf5e9eeb8c1233db43dd92070214e4ce6b72894"
+    - name: "ARM64"
+      agentPool: "$(agentPool_ARM64)"
+      agentVMName: "$(agentVMName_ARM64)"
+      rawToolchainCacheURL: "$(rawToolchainCacheURL_ARM64)"
+      rawToolchainExpectedHash: "65de43b3bdcfdaac71df1f11fd1f830a8109b1eb9d7cb6cbc2e2d0e929d0ef76"
+
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      name: OneBranch.Pipelines/GovernedTemplates
+      ref: refs/heads/main
+
+extends:
+  template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates
+  parameters:
+    featureFlags:
+      runOnHost: true
+    globalSdl:
+      credscan:
+        suppressionsFile: .config/CredScanSuppressions.json
+    stages:
+      - ${{ each configuration in parameters.buildConfiguration }}:
+        - stage: Toolchain_${{ configuration.name }}
+          jobs:
+            - job: Build
+              pool:
+                type: linux
+                isCustom: true
+                name: ${{ configuration.agentPool }}
+                vmImage: ${{ configuration.agentVMName }}
+              variables:
+                ob_outputDirectory: $(Build.ArtifactStagingDirectory)
+              steps:
+                - template: .pipelines/templates/RawToolchainDownload.yml@self
+                  parameters:
+                    rawToolchainCacheURL: ${{ configuration.rawToolchainCacheURL }}
+                    rawToolchainExpectedHash: ${{ configuration.rawToolchainExpectedHash }}
+
+                - template: .pipelines/templates/ToolchainBuild.yml@self
+                  parameters:
+                    buildArtifactsFolder: $(ob_outputDirectory)
+
+                # 1. Automatic publishing seems to be broken in the OneBranch templates when the build runs directly on the agent host.
+                #    Once that's fixed, we should remove this step.
+                # 2. The value for 'artifact' cannot be changed, as this is the only value OneBranch accepts.
+                #    We cannot also use pre-defined variables like "drop_$(System.StageName)_$(Agent.JobName)", to automatically track name changes.
+                - task: PublishPipelineArtifact@1
+                  inputs:
+                    artifact: drop_Toolchain_${{ configuration.name }}_Build
+                    targetPath: $(ob_outputDirectory)
+                  condition: always()
+                  displayName: 'Publish toolchain artifacts'
+
+        - stage: RPMs_${{ configuration.name }}
+          dependsOn: Toolchain_${{ configuration.name }}
+          jobs:
+            - job: Build
+              pool:
+                type: linux
+                isCustom: true
+                name: ${{ configuration.agentPool }}
+                vmImage: ${{ configuration.agentVMName }}
+              strategy:
+                matrix:
+                  regular:
+                    runCheck: 'false'
+                  ptest:
+                    runCheck: 'true'
+              steps:
+                - template: .pipelines/templates/PackageBuild.yml@self
+                  parameters:
+                    isCheckBuild: '$(runCheck)'

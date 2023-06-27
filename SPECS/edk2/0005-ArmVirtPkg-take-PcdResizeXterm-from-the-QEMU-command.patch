@@ -1,0 +1,204 @@
+From 2d09cde35ac031aabf7a1dc09c8c8a5e65917ae8 Mon Sep 17 00:00:00 2001
+From: Laszlo Ersek <lersek@redhat.com>
+Date: Sun, 26 Jul 2015 08:02:50 +0000
+Subject: [PATCH 05/14] ArmVirtPkg: take PcdResizeXterm from the QEMU command
+ line (RH only)
+
+Notes about the RHEL-8.3/20200603-ca407c7246bf [edk2-stable202005] ->
+RHEL-8.5/20210520-e1999b264f1f [edk2-stable202105] rebase:
+
+- no change
+
+Notes about the RHEL-8.2/20190904-37eef91017ad [edk2-stable201908] ->
+RHEL-8.3/20200603-ca407c7246bf [edk2-stable202005] rebase:
+
+- Resolve leading context divergence in "ArmVirtPkg/ArmVirtQemu.dsc",
+  arising from upstream commits:
+
+  - 82662a3b5f56 ("ArmVirtPkg/PlatformPeiLib: discover the TPM base
+                  address from the DT", 2020-03-04)
+
+  - ddd34a818315 ("ArmVirtPkg/ArmVirtQemu: enable TPM2 support in the PEI
+                  phase", 2020-03-04)
+
+  - cdc3fa54184a ("ArmVirtPkg: control PXEv4 / PXEv6 boot support from the
+                  QEMU command line", 2020-04-28)
+
+- Rework the downstream patch quite a bit, paralleling the upstream work
+  done for <https://bugzilla.tianocore.org/show_bug.cgi?id=2681> in commit
+  range 64ab457d1f21..cdc3fa54184a:
+
+  - Refresh copyright year in TerminalPcdProducerLib.{inf,c}. Also replace
+    open-coded BSDL with "SPDX-License-Identifier: BSD-2-Clause-Patent".
+
+  - Simplify LIBRARY_CLASS: this lib instance is meant to be consumed only
+    via NULL class resolution (basically: as a plugin), so use NULL for
+    LIBRARY_CLASS, not "TerminalPcdProducerLib|DXE_DRIVER".
+
+  - Sort the [Packages] section alphabetically in the INF file.
+
+  - Replace the open-coded GetNamedFwCfgBoolean() function with a call to
+    QemuFwCfgParseBool(), from QemuFwCfgSimpleParserLib.
+
+  - Add the SOMETIMES_PRODUCES usage comment in the [Pcd] section of the
+    INF file.
+
+Notes about the RHEL-8.1/20190308-89910a39dcfd [edk2-stable201903] ->
+RHEL-8.2/20190904-37eef91017ad [edk2-stable201908] rebase:
+
+- no change
+
+Notes about the RHEL-8.0/20180508-ee3198e672e2 ->
+RHEL-8.1/20190308-89910a39dcfd rebase:
+
+- no change
+
+Notes about the RHEL-7.6/ovmf-20180508-2.gitee3198e672e2.el7 ->
+RHEL-8.0/20180508-ee3198e672e2 rebase:
+
+- reorder the rebase changelog in the commit message so that it reads like
+  a blog: place more recent entries near the top
+- no changes to the patch body
+
+Notes about the 20171011-92d07e48907f -> 20180508-ee3198e672e2 rebase:
+
+- no change
+
+Notes about the 20170228-c325e41585e3 -> 20171011-92d07e48907f rebase:
+
+- Refresh downstream-only commit d4564d39dfdb against context changes in
+  "ArmVirtPkg/ArmVirtQemu.dsc" from upstream commit 7e5f1b673870
+  ("ArmVirtPkg/PlatformHasAcpiDtDxe: allow guest level ACPI disable
+  override", 2017-03-29).
+
+Notes about the 20160608b-988715a -> 20170228-c325e41585e3 rebase:
+
+- Adapt commit 6b97969096a3 to the fact that upstream has deprecated such
+  setter functions for dynamic PCDs that don't return a status code (such
+  as PcdSetBool()). Employ PcdSetBoolS(), and assert that it succeeds --
+  there's really no circumstance in this case when it could fail.
+
+Contributed-under: TianoCore Contribution Agreement 1.0
+Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+(cherry picked from commit d4564d39dfdbf74e762af43314005a2c026cb262)
+(cherry picked from commit c9081ebe3bcd28e5cce4bf58bd8d4fca12f9af7c)
+(cherry picked from commit 8e92730c8e1cdb642b3b3e680e643ff774a90c65)
+(cherry picked from commit 9448b6b46267d8d807fac0c648e693171bb34806)
+(cherry picked from commit 232fcf06f6b3048b7c2ebd6931f23186b3852f04)
+(cherry picked from commit 8338545260fbb423f796d5196faaaf8ff6e1ed99)
+(cherry picked from commit a5f7a57bf390f1f340ff1d1f1884a73716817ef1)
+---
+ ArmVirtPkg/ArmVirtQemu.dsc                    |  7 +++-
+ .../TerminalPcdProducerLib.inf                | 33 ++++++++++++++++++
+ .../TerminalPcdProducerLib.c                  | 34 +++++++++++++++++++
+ 3 files changed, 73 insertions(+), 1 deletion(-)
+ create mode 100644 ArmVirtPkg/Library/TerminalPcdProducerLib/TerminalPcdProducerLib.inf
+ create mode 100644 ArmVirtPkg/Library/TerminalPcdProducerLib/TerminalPcdProducerLib.c
+
+diff --git a/ArmVirtPkg/ArmVirtQemu.dsc b/ArmVirtPkg/ArmVirtQemu.dsc
+index 72a0cacab4a8..7a3be7e8592c 100644
+--- a/ArmVirtPkg/ArmVirtQemu.dsc
++++ b/ArmVirtPkg/ArmVirtQemu.dsc
+@@ -304,6 +304,8 @@ [PcdsPatchableInModule]
+   gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0x0
+ !endif
+ 
++  gEfiMdeModulePkgTokenSpaceGuid.PcdResizeXterm|FALSE
++
+ [PcdsDynamicHii]
+   gUefiOvmfPkgTokenSpaceGuid.PcdForceNoAcpi|L"ForceNoAcpi"|gOvmfVariableGuid|0x0|FALSE|NV,BS
+ 
+@@ -418,7 +420,10 @@ [Components.common]
+   MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
+   MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
+   MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
+-  MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
++  MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf {
++    <LibraryClasses>
++      NULL|ArmVirtPkg/Library/TerminalPcdProducerLib/TerminalPcdProducerLib.inf
++  }
+   MdeModulePkg/Universal/SerialDxe/SerialDxe.inf
+ 
+   MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
+diff --git a/ArmVirtPkg/Library/TerminalPcdProducerLib/TerminalPcdProducerLib.inf b/ArmVirtPkg/Library/TerminalPcdProducerLib/TerminalPcdProducerLib.inf
+new file mode 100644
+index 000000000000..a51dbd1670a8
+--- /dev/null
++++ b/ArmVirtPkg/Library/TerminalPcdProducerLib/TerminalPcdProducerLib.inf
+@@ -0,0 +1,33 @@
++## @file
++#  Plugin library for setting up dynamic PCDs for TerminalDxe, from fw_cfg
++#
++#  Copyright (C) 2015-2020, Red Hat, Inc.
++#  Copyright (c) 2014, Linaro Ltd. All rights reserved.<BR>
++#
++#  SPDX-License-Identifier: BSD-2-Clause-Patent
++##
++
++[Defines]
++  INF_VERSION                    = 0x00010005
++  BASE_NAME                      = TerminalPcdProducerLib
++  FILE_GUID                      = 4a0c5ed7-8c42-4c01-8f4c-7bf258316a96
++  MODULE_TYPE                    = BASE
++  VERSION_STRING                 = 1.0
++  LIBRARY_CLASS                  = NULL
++  CONSTRUCTOR                    = TerminalPcdProducerLibConstructor
++
++[Sources]
++  TerminalPcdProducerLib.c
++
++[Packages]
++  MdeModulePkg/MdeModulePkg.dec
++  MdePkg/MdePkg.dec
++  OvmfPkg/OvmfPkg.dec
++
++[LibraryClasses]
++  DebugLib
++  PcdLib
++  QemuFwCfgSimpleParserLib
++
++[Pcd]
++  gEfiMdeModulePkgTokenSpaceGuid.PcdResizeXterm ## SOMETIMES_PRODUCES
+diff --git a/ArmVirtPkg/Library/TerminalPcdProducerLib/TerminalPcdProducerLib.c b/ArmVirtPkg/Library/TerminalPcdProducerLib/TerminalPcdProducerLib.c
+new file mode 100644
+index 000000000000..bfd3a6a535f9
+--- /dev/null
++++ b/ArmVirtPkg/Library/TerminalPcdProducerLib/TerminalPcdProducerLib.c
+@@ -0,0 +1,34 @@
++/** @file
++*  Plugin library for setting up dynamic PCDs for TerminalDxe, from fw_cfg
++*
++*  Copyright (C) 2015-2020, Red Hat, Inc.
++*  Copyright (c) 2014, Linaro Ltd. All rights reserved.<BR>
++*
++*  SPDX-License-Identifier: BSD-2-Clause-Patent
++**/
++
++#include <Library/DebugLib.h>
++#include <Library/PcdLib.h>
++#include <Library/QemuFwCfgSimpleParserLib.h>
++
++#define UPDATE_BOOLEAN_PCD_FROM_FW_CFG(TokenName)                             \
++          do {                                                                \
++            BOOLEAN       Setting;                                            \
++            RETURN_STATUS PcdStatus;                                          \
++                                                                              \
++            if (!RETURN_ERROR (QemuFwCfgParseBool (                           \
++                    "opt/org.tianocore.edk2.aavmf/" #TokenName, &Setting))) { \
++              PcdStatus = PcdSetBoolS (TokenName, Setting);                   \
++              ASSERT_RETURN_ERROR (PcdStatus);                                \
++            }                                                                 \
++          } while (0)
++
++RETURN_STATUS
++EFIAPI
++TerminalPcdProducerLibConstructor (
++  VOID
++  )
++{
++  UPDATE_BOOLEAN_PCD_FROM_FW_CFG (PcdResizeXterm);
++  return RETURN_SUCCESS;
++}
+-- 
+2.39.2
+

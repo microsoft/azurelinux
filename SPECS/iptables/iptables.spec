@@ -1,7 +1,7 @@
 Summary:        Linux kernel packet control tool
 Name:           iptables
 Version:        1.8.7
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -98,6 +98,13 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man3/*
 
 %changelog
+* Thu Jun 08 2023 Andy Zaugg <azaugg@linkedin.com> - 1.8.7-3
+- Removed icmpv6 redirect iptables rule and disabled redirect kernel option
+- Adding icmpv4 type 3, 11 for TTL decrementation and MTU negotiation
+
+* Wed May 31 2023 Rachel Menge <rachelmenge@microsoft.com> - 1.8.7-2
+- Modify defaults to account for DHCPv6
+
 * Wed Jan 05 2022 Rachel Menge <rachelmenge@microsoft.com> - 1.8.7-1
 - Update to version 1.8.7
 

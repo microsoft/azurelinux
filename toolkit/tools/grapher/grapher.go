@@ -12,6 +12,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/profile"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -23,9 +24,10 @@ var (
 
 	logFile          = exe.LogFileFlag(app)
 	logLevel         = exe.LogLevelFlag(app)
+	profFlags        = exe.SetupProfileFlags(app)
 	strictGoals      = app.Flag("strict-goals", "Don't allow missing goal packages").Bool()
 	strictUnresolved = app.Flag("strict-unresolved", "Don't allow missing unresolved packages").Bool()
-	timestampFile    = app.Flag("timestamp-file", "File that stores timestamps for this program.").Required().String()
+	timestampFile    = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
 
 	depGraph = pkggraph.NewPkgGraph()
 )
@@ -35,9 +37,13 @@ func main() {
 
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-
-	var err error
 	logger.InitBestEffort(*logFile, *logLevel)
+
+	prof, err := profile.StartProfiling(profFlags)
+	if err != nil {
+		logger.Log.Warnf("Could not start profiling: %s", err)
+	}
+	defer prof.StopProfiler()
 
 	timestamp.BeginTiming("grapher", *timestampFile)
 	defer timestamp.CompleteTiming()

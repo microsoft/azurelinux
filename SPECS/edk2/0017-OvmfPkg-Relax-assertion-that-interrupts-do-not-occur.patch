@@ -1,0 +1,75 @@
+From 7272c2fbe66941f0785be7ec437ed79ab9e35b80 Mon Sep 17 00:00:00 2001
+From: Michael Brown <mcb30@ipxe.org>
+Date: Tue, 9 May 2023 12:09:33 +0000
+Subject: [PATCH 17/18] OvmfPkg: Relax assertion that interrupts do not occur
+ at TPL_HIGH_LEVEL
+
+At TPL_HIGH_LEVEL, CPU interrupts are disabled (as per the UEFI
+specification) and so we should never encounter a situation in which
+an interrupt occurs at TPL_HIGH_LEVEL.  The specification also
+restricts usage of TPL_HIGH_LEVEL to the firmware itself.
+
+However, nothing actually prevents a UEFI application from calling
+gBS->RaiseTPL(TPL_HIGH_LEVEL) and then violating the invariant by
+enabling interrupts via the STI or equivalent instruction.  Some
+versions of the Microsoft Windows bootloader are known to do this.
+
+NestedInterruptTplLib maintains the invariant that interrupts are
+disabled at TPL_HIGH_LEVEL (even when performing the dark art of
+deliberately manipulating the stack so that IRET will return with
+interrupts still disabled), but does not itself rely on external code
+maintaining this invariant.
+
+Relax the assertion that the interrupted TPL is below TPL_HIGH_LEVEL
+to an error message, to allow UEFI applications such as these versions
+of the Microsoft Windows bootloader to continue to function.
+
+Debugged-by: Gerd Hoffmann <kraxel@redhat.com>
+Debugged-by: Laszlo Ersek <lersek@redhat.com>
+Ref: https://bugzilla.redhat.com/show_bug.cgi?id=2189136
+Signed-off-by: Michael Brown <mcb30@ipxe.org>
+Acked-by: Laszlo Ersek <lersek@redhat.com>
+Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
+(cherry picked from commit bee67e0c142af6599a85aa7640094816b8a24c4f)
+---
+ OvmfPkg/Library/NestedInterruptTplLib/Tpl.c | 21 ++++++++++++++++++---
+ 1 file changed, 18 insertions(+), 3 deletions(-)
+
+diff --git a/OvmfPkg/Library/NestedInterruptTplLib/Tpl.c b/OvmfPkg/Library/NestedInterruptTplLib/Tpl.c
+index e921a09c5599..d56c12a44529 100644
+--- a/OvmfPkg/Library/NestedInterruptTplLib/Tpl.c
++++ b/OvmfPkg/Library/NestedInterruptTplLib/Tpl.c
+@@ -34,12 +34,27 @@ NestedInterruptRaiseTPL (
+ 
+   //
+   // Raise TPL and assert that we were called from within an interrupt
+-  // handler (i.e. with TPL below TPL_HIGH_LEVEL but with interrupts
+-  // disabled).
++  // handler (i.e. with interrupts already disabled before raising the
++  // TPL).
+   //
+   ASSERT (GetInterruptState () == FALSE);
+   InterruptedTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
+-  ASSERT (InterruptedTPL < TPL_HIGH_LEVEL);
++
++  //
++  // At TPL_HIGH_LEVEL, CPU interrupts are disabled (as per the UEFI
++  // specification) and so we should never encounter a situation in
++  // which InterruptedTPL==TPL_HIGH_LEVEL.  The specification also
++  // restricts usage of TPL_HIGH_LEVEL to the firmware itself.
++  //
++  // However, nothing actually prevents a UEFI application from
++  // invalidly calling gBS->RaiseTPL(TPL_HIGH_LEVEL) and then
++  // violating the invariant by enabling interrupts via the STI or
++  // equivalent instruction.  Some versions of the Microsoft Windows
++  // bootloader are known to do this.
++  //
++  if (InterruptedTPL >= TPL_HIGH_LEVEL) {
++    DEBUG ((DEBUG_ERROR, "ERROR: Interrupts enabled at TPL_HIGH_LEVEL!\n"));
++  }
+ 
+   return InterruptedTPL;
+ }
+-- 
+2.40.1
+

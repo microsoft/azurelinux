@@ -9,5 +9,9 @@
 #keep commented till upgrade issues are sorted
 #-A INPUT -j LOG --log-prefix "FIREWALL:INPUT "
 -A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
+# Allow ICMP Time Exceeded - Used for TTL decrementing
+-A INPUT -p icmp --icmp-type 11 -j ACCEPT
+# Allot ICMP Destination Unreachable - Used for MTU negotiation
+-A INPUT -p icmp --icmp-type 3 -j ACCEPT
 -A OUTPUT -j ACCEPT
 COMMIT

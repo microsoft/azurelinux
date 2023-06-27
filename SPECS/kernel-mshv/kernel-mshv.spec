@@ -11,7 +11,7 @@
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
 Version:        5.15.110.mshv2
-Release:        2%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
@@ -130,7 +130,7 @@ ln -s vmlinux-%{uname_r} %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vml
 
 cat > %{buildroot}/boot/linux-%{uname_r}.cfg << "EOF"
 # GRUB Environment Block
-mariner_cmdline_mshv=init=/lib/systemd/systemd ro loglevel=3 no-vmw-sta crashkernel=128M
+mariner_cmdline_mshv=rd.auto=1 lockdown=integrity sysctl.kernel.unprivileged_bpf_disabled=1 init=/lib/systemd/systemd ro no-vmw-sta crashkernel=128M audit=0 console=ttyS0,115200n8 earlyprintk
 mariner_linux_mshv=vmlinuz-%{uname_r}
 mariner_initrd_mshv=initrd.img-%{uname_r}
 EOF
@@ -236,6 +236,14 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner-mshv.cfg
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Thu Jun 22 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.110.mshv2-4
+- Don't include duplicate systemd parameters in mariner-mshv.cfg; should be read from
+    systemd.cfg which is packaged in systemd
+
+* Tue May 30 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.110.mshv2-3
+- Align mariner_cmdline_mshv with the working configuration from 
+    old loader's linuxloader.conf
+
 * Wed May 24 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.110.mshv2-2
 - Add temporary 0001-Support-new-HV-loader... patch to support lxhvloader. 
 - Can be reverted once the kernel patch is upstreamed.

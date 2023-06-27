@@ -25,7 +25,7 @@ SRPM_PACK_LIST          ?=
 ######## SET INCREMENTAL BUILD FLAGS ########
 
 # Logic to auto configure build options for optimized builds
-# These will set the default values for: REBUILD_TOOLS, USE_CCACHE, REBUILD_TOOLCHAIN, DELTA_BUILD, INCREMENTAL_TOOLCHAIN, ALLOW_TOOLCHAIN_DOWNLOAD_FAIL, and CLEAN_TOOLCHAIN_CONTAINERS
+# These will set the default values for: REBUILD_TOOLS, USE_CCACHE, MAX_CPU, REBUILD_TOOLCHAIN, DELTA_BUILD, INCREMENTAL_TOOLCHAIN, ALLOW_TOOLCHAIN_DOWNLOAD_FAIL, and CLEAN_TOOLCHAIN_CONTAINERS
 include $(SCRIPTS_DIR)/incremental_building.mk
 
 ######## SET REMAINING FLAGS ########
@@ -37,6 +37,7 @@ ALLOW_SRPM_DOWNLOAD_FAIL        ?= n
 RUN_CHECK                       ?= n
 USE_PREVIEW_REPO                ?= n
 DISABLE_UPSTREAM_REPOS          ?= n
+DISABLE_DEFAULT_REPOS           ?= n
 TOOLCHAIN_CONTAINER_ARCHIVE     ?=
 TOOLCHAIN_ARCHIVE               ?=
 TOOLCHAIN_SOURCES_ARCHIVE       ?=
@@ -58,6 +59,11 @@ REBUILD_DEP_CHAINS              ?= y
 HYDRATED_BUILD                  ?= n
 TARGET_ARCH                     ?=
 ALLOW_TOOLCHAIN_REBUILDS        ?= n
+
+# Tracing & Profiling support: https://go.dev/doc/diagnostics
+ENABLE_CPU_PROFILE              ?= n
+ENABLE_MEM_PROFILE              ?= n
+ENABLE_TRACE                    ?= n
 
 # Folder defines
 TOOLS_DIR        ?= $(toolkit_root)/tools
@@ -83,6 +89,7 @@ CHROOT_DIR         ?= $(BUILD_DIR)/worker/chroot
 IMAGEGEN_DIR       ?= $(BUILD_DIR)/imagegen
 TOOLCHAIN_RPMS_DIR ?= $(BUILD_DIR)/toolchain_rpms
 TIMESTAMP_DIR      ?= $(BUILD_DIR)/timestamp
+PROFILE_DIR        ?= $(BUILD_DIR)/profile
 
 RPMRC_DIR        ?= $(MACRO_DIR)/usr/lib/rpm
 
@@ -147,6 +154,9 @@ include $(SCRIPTS_DIR)/utils.mk
 
 # Set up for the timestamp feature
 include $(SCRIPTS_DIR)/timestamp.mk
+
+# Profiling & Tracing feature
+include $(SCRIPTS_DIR)/profile.mk
 
 # Set the variables for build number, distro tag, etc
 include $(SCRIPTS_DIR)/build_tag.mk

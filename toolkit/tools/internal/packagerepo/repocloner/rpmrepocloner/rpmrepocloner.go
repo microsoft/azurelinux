@@ -79,6 +79,38 @@ func New() *RpmRepoCloner {
 	return &RpmRepoCloner{}
 }
 
+// ConstructClonerWithNetwork constructs a new RpmRepoCloner with optional network access.
+//   - destinationDir is the directory to save RPMs
+//   - tmpDir is the directory to create a chroot
+//   - workerTar is the path to the worker tar used to seed the chroot
+//   - existingRpmsDir is the directory with prebuilt RPMs
+//   - prebuiltRpmsDir is the directory with toolchain RPMs
+//   - tlsCert is the path to the TLS certificate, "" if not needed
+//   - tlsKey is the path to the TLS key, "" if not needed
+//   - usePreviewRepo if set, the upstream preview repository will be used.
+//   - disableUpstreamRepos if set, the upstream repositories will not be used.
+//   - disableDefaultRepos if set, the default repositories will not be used.
+//   - repoDefinitions is a list of repo files to use
+func ConstructClonerWithNetwork(destinationDir, tmpDir, workerTar, existingRpmsDir, toolchainRpmsDir, tlsCert, tlsKey string, usePreviewRepo, disableUpstreamRepos, disableDefaultRepos bool, repoDefinitions []string) (r *RpmRepoCloner, err error) {
+	timestamp.StartEvent("initialize and configure cloner", nil)
+	defer timestamp.StopEvent(nil) // initialize and configure cloner
+	r = New()
+	err = r.Initialize(destinationDir, tmpDir, workerTar, existingRpmsDir, toolchainRpmsDir, usePreviewRepo, disableDefaultRepos, repoDefinitions)
+	if err != nil {
+		err = fmt.Errorf("failed to prep new rpm cloner:\n%w", err)
+	}
+
+	if !disableUpstreamRepos {
+		tlsKey, tlsCert := strings.TrimSpace(tlsKey), strings.TrimSpace(tlsCert)
+		err = r.AddNetworkFiles(tlsCert, tlsKey)
+		if err != nil {
+			err = fmt.Errorf("failed to customize RPM repo cloner. Error:\n%w", err)
+			return
+		}
+	}
+	return
+}
+
 // Initialize initializes rpmrepocloner, enabling Clone() to be called.
 //   - destinationDir is the directory to save RPMs
 //   - tmpDir is the directory to create a chroot
@@ -86,8 +118,9 @@ func New() *RpmRepoCloner {
 //   - existingRpmsDir is the directory with prebuilt RPMs
 //   - prebuiltRpmsDir is the directory with toolchain RPMs
 //   - usePreviewRepo if set, the upstream preview repository will be used.
+//   - disableDefaultRepos if set, the default repositories will not be used.
 //   - repoDefinitions is a list of repo files to use when cloning RPMs
-func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRpmsDir, toolchainRpmsDir string, usePreviewRepo bool, repoDefinitions []string) (err error) {
+func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRpmsDir, toolchainRpmsDir string, usePreviewRepo, disableDefaultRepos bool, repoDefinitions []string) (err error) {
 	const (
 		isExistingDir = false
 
@@ -107,6 +140,10 @@ func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRp
 	r.usePreviewRepo = usePreviewRepo
 	if usePreviewRepo {
 		logger.Log.Info("Enabling preview repo")
+	}
+
+	if disableDefaultRepos {
+		logger.Log.Info("Disabling default upstream PMC repositories")
 	}
 
 	// Ensure that if initialization fails, the chroot is closed
@@ -176,7 +213,7 @@ func (r *RpmRepoCloner) Initialize(destinationDir, tmpDir, workerTar, existingRp
 	}
 
 	logger.Log.Info("Initializing repository configurations")
-	err = r.initializeRepoDefinitions(repoDefinitions)
+	err = r.initializeRepoDefinitions(disableDefaultRepos, repoDefinitions)
 	if err != nil {
 		return
 	}
@@ -206,7 +243,7 @@ func (r *RpmRepoCloner) AddNetworkFiles(tlsClientCert, tlsClientKey string) (err
 
 // initializeRepoDefinitions will configure the chroot's repo files to match those
 // provided by the caller.
-func (r *RpmRepoCloner) initializeRepoDefinitions(repoDefinitions []string) (err error) {
+func (r *RpmRepoCloner) initializeRepoDefinitions(disableDefaultRepos bool, repoDefinitions []string) (err error) {
 	// ============== TDNF SPECIFIC IMPLEMENTATION ==============
 	// Unlike some other package managers, TDNF has no notion of repository priority.
 	// It reads the repo files using `readdir`, which should be assumed to be random ordering.
@@ -254,10 +291,17 @@ func (r *RpmRepoCloner) initializeRepoDefinitions(repoDefinitions []string) (err
 
 	// Add each previously existing repofile to the end of the new file, then delete the original.
 	// We want to try our custom mounted repos before reaching out to the upstream servers.
+	// By default, chroot ships with PMC repositories specified in mariner-repos rpm.
+	// If `disableDefaultRepos` flag is turned on, we only remove these existing files from the
+	// chroot repo directory. tdnf will not reach out to the default PMC repositories for lookups.
 	for _, originalRepoFilePath := range existingRepoFiles {
-		err = appendRepoFile(originalRepoFilePath, dstFile)
-		if err != nil {
-			return
+		if !disableDefaultRepos {
+			err = appendRepoFile(originalRepoFilePath, dstFile)
+			if err != nil {
+				return
+			}
+		} else {
+			logger.Log.Debugf("Disabling repositories listed in %s", originalRepoFilePath)
 		}
 		err = os.Remove(originalRepoFilePath)
 		if err != nil {
@@ -317,15 +361,15 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 
 		logger.Log.Debugf("Cloning: %s", pkgName)
 		args := []string{
-			"--destdir",
+			"--downloaddir",
 			downloadDir,
 			pkgName,
 		}
 
 		if cloneDeps {
-			args = append([]string{"download", "--alldeps"}, args...)
+			args = append([]string{"install", "-y", "--downloadonly", "--alldeps"}, args...)
 		} else {
-			args = append([]string{"download-nodeps"}, args...)
+			args = append([]string{"install", "-y", "--downloadonly", "--nodeps"}, args...)
 		}
 
 		err = r.chroot.Run(func() (err error) {
@@ -421,6 +465,10 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 // ConvertDownloadedPackagesIntoRepo initializes the downloaded RPMs into an RPM repository.
 // Packages will be placed in a flat directory.
 func (r *RpmRepoCloner) ConvertDownloadedPackagesIntoRepo() (err error) {
+	logger.Log.Info("Configuring downloaded RPMs as a local repository")
+	timestamp.StartEvent("covert packages to repo", nil)
+	defer timestamp.StopEvent(nil)
+
 	err = r.initializeMountedChrootRepo(chrootDownloadDir)
 	if err != nil {
 		return

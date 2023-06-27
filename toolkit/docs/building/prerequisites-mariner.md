@@ -17,7 +17,7 @@ sudo tdnf -y install \
     glibc-devel \
     genisoimage \
     git \
-    "golang < 1.18" \
+    golang \
     kernel-headers \
     make \
     moby-cli \
