@@ -24,13 +24,14 @@ import (
 )
 
 const (
-	RepoFlagDefaults = uint64(1) << iota
+	RepoFlagMarinerDefaults = uint64(1) << iota
 	RepoFlagDownloadedCache
 	RepoFlagLocalBuilds
 	RepoFlagPreview
 	RepoFlagToolchain
 	RepoFlagUpstream
-	RepoFlagAll = RepoFlagToolchain | RepoFlagLocalBuilds | RepoFlagDownloadedCache | RepoFlagPreview | RepoFlagDefaults | RepoFlagUpstream
+
+	RepoFlagAll = RepoFlagToolchain | RepoFlagLocalBuilds | RepoFlagDownloadedCache | RepoFlagPreview | RepoFlagMarinerDefaults | RepoFlagUpstream
 )
 
 const (
@@ -91,14 +92,14 @@ const (
 
 // RpmRepoCloner represents an RPM repository cloner.
 type RpmRepoCloner struct {
-	chroot          *safechroot.Chroot
-	chrootCloneDir  string
-	defaultRepoIDs  []string
-	externalRepoIDs map[string]bool
-	mountedCloneDir string
-	repoIDCache     string
-	reposArgsList   [][]string
-	reposFlags      uint64
+	chroot                *safechroot.Chroot
+	chrootCloneDir        string
+	defaultMarinerRepoIDs []string
+	externalRepoIDs       map[string]bool
+	mountedCloneDir       string
+	repoIDCache           string
+	reposArgsList         [][]string
+	reposFlags            uint64
 }
 
 // ConstructCloner constructs a new RpmRepoCloner.
@@ -305,8 +306,8 @@ func (r *RpmRepoCloner) GetEnabledRepos() uint64 {
 }
 
 // SetEnabledRepos tells the cloner which repos it is allowed to use for its queries.
-func (r *RpmRepoCloner) SetEnabledRepos(repoFlags uint64) {
-	r.reposFlags = repoFlags
+func (r *RpmRepoCloner) SetEnabledRepos(reposFlags uint64) {
+	r.reposFlags = reposFlags
 	r.reposArgsList = [][]string{}
 	previousReposList := []string{fmt.Sprintf("--disablerepo=%s", repoIDAll)}
 
@@ -314,35 +315,41 @@ func (r *RpmRepoCloner) SetEnabledRepos(repoFlags uint64) {
 		logger.Log.Debugf("Enabled repos: %v.", r.reposArgsList)
 	}()
 
-	if RepoFlagToolchain&repoFlags != 0 {
+	// Do NOT change the order of the following 'if' statements!
+	// The order is critical as we want to gradually enable repositories in the following order:
+	// 1. Toolchain.
+	// 2. Locally-built packages.
+	// 3. Local cache of packages downloaded from external sources.
+	// 4. Upstream repositories requiring network access.
+	if RepoFlagToolchain&reposFlags != 0 {
 		previousReposList = append(previousReposList, fmt.Sprintf("--enablerepo=%s", repoIDToolchain))
 		r.reposArgsList = append(r.reposArgsList, previousReposList)
 	}
 
-	if RepoFlagLocalBuilds&repoFlags != 0 {
+	if RepoFlagLocalBuilds&reposFlags != 0 {
 		previousReposList = append(previousReposList, fmt.Sprintf("--enablerepo=%s", repoIDBuilt))
 		r.reposArgsList = append(r.reposArgsList, previousReposList)
 	}
 
-	if RepoFlagDownloadedCache&repoFlags != 0 {
+	if RepoFlagDownloadedCache&reposFlags != 0 {
 		previousReposList = append(previousReposList, fmt.Sprintf("--enablerepo=%s", r.repoIDCache))
 		r.reposArgsList = append(r.reposArgsList, previousReposList)
 	}
 
 	// Options past this point are only valid if upstream repos are enabled.
-	if RepoFlagUpstream&repoFlags == 0 {
+	if RepoFlagUpstream&reposFlags == 0 {
 		return
 	}
 
 	previousReposList = append(previousReposList, fmt.Sprintf("--enablerepo=%s", repoIDAll))
 
-	if RepoFlagPreview&repoFlags == 0 {
+	if RepoFlagPreview&reposFlags == 0 {
 		previousReposList = append(previousReposList, fmt.Sprintf("--disablerepo=%s", repoIDPreview))
 		r.reposArgsList = append(r.reposArgsList, previousReposList)
 	}
 
-	if RepoFlagDefaults&repoFlags == 0 {
-		previousReposList = append(previousReposList, r.buildDisabledDefaultReposArgs()...)
+	if RepoFlagMarinerDefaults&reposFlags == 0 {
+		previousReposList = append(previousReposList, r.disabledDefaultMarinerReposArgs()...)
 		r.reposArgsList = append(r.reposArgsList, previousReposList)
 	}
 }
@@ -431,9 +438,9 @@ func (r *RpmRepoCloner) addNetworkFiles(tlsClientCert, tlsClientKey string) (err
 	return
 }
 
-func (r *RpmRepoCloner) buildDisabledDefaultReposArgs() (args []string) {
-	args = make([]string, len(r.defaultRepoIDs))
-	for i, repoID := range r.defaultRepoIDs {
+func (r *RpmRepoCloner) disabledDefaultMarinerReposArgs() (args []string) {
+	args = make([]string, len(r.defaultMarinerRepoIDs))
+	for i, repoID := range r.defaultMarinerRepoIDs {
 		args[i] = fmt.Sprintf("--disablerepo=%s", repoID)
 	}
 
@@ -648,8 +655,6 @@ func (r *RpmRepoCloner) initialize(destinationDir, tmpDir, workerTar, existingRp
 		return
 	}
 
-	r.SetEnabledRepos(RepoFlagAll)
-
 	// Docker-based build doesn't use overlay so repo folder
 	// must be explicitly set to the RPMs cache folder.
 	r.chrootCloneDir = chrootCloneDirContainer
@@ -680,6 +685,8 @@ func (r *RpmRepoCloner) initializeRepoDefinitions(repoDefinitions []string) (err
 	const (
 		chrootRepoDir  = "/etc/yum.repos.d/"
 		chrootRepoFile = "allrepos.repo"
+
+		repoFlagClonerDefault = RepoFlagAll & ^RepoFlagPreview
 	)
 
 	fullRepoDirPath := filepath.Join(r.chroot.RootDir(), chrootRepoDir)
@@ -723,7 +730,7 @@ func (r *RpmRepoCloner) initializeRepoDefinitions(repoDefinitions []string) (err
 		if err != nil {
 			return err
 		}
-		r.defaultRepoIDs = append(r.defaultRepoIDs, repoIDs...)
+		r.defaultMarinerRepoIDs = append(r.defaultMarinerRepoIDs, repoIDs...)
 
 		err = appendRepoFile(originalRepoFilePath, dstFile)
 		if err != nil {
@@ -734,6 +741,8 @@ func (r *RpmRepoCloner) initializeRepoDefinitions(repoDefinitions []string) (err
 			return err
 		}
 	}
+
+	r.SetEnabledRepos(repoFlagClonerDefault)
 
 	return
 }

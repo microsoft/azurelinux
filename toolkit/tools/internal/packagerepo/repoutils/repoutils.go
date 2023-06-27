@@ -150,7 +150,6 @@ func verifyClonedRepoContents(clonedRepoContents, expectedPackages []*repocloner
 	}
 
 	if (len(extraPackages) > 0) || (len(missingPackages) > 0) {
-
 		return fmt.Errorf("packages mismatch. Unexpected extra packages: %v.\n Expected missing packages: %v", extraPackages, missingPackages)
 	}
 
