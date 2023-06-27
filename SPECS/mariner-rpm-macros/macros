@@ -52,6 +52,9 @@
 %{?mariner_ccache_enabled:CCACHE_DIR="/ccache-dir" ; export CCACHE_DIR ;}\
 %{nil}
 
+# use xz compression for binary package payloads
+%_binary_payload w3T.xzdio
+
 #
 ## Automatically compile python files
 %py_auto_byte_compile 1
