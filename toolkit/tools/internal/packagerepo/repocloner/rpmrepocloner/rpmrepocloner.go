@@ -91,14 +91,14 @@ const (
 
 // RpmRepoCloner represents an RPM repository cloner.
 type RpmRepoCloner struct {
-	chroot                *safechroot.Chroot
-	chrootCloneDir        string
-	defaultRepoIDs        []string
-	externalSourceRepoIDs map[string]bool
-	mountedCloneDir       string
-	repoIDCache           string
-	reposArgsList         [][]string
-	reposFlags            uint64
+	chroot          *safechroot.Chroot
+	chrootCloneDir  string
+	defaultRepoIDs  []string
+	externalRepoIDs map[string]bool
+	mountedCloneDir string
+	repoIDCache     string
+	reposArgsList   [][]string
+	reposFlags      uint64
 }
 
 // ConstructCloner constructs a new RpmRepoCloner.
@@ -659,7 +659,7 @@ func (r *RpmRepoCloner) initialize(destinationDir, tmpDir, workerTar, existingRp
 		r.repoIDCache = repoIDCacheRegular
 	}
 
-	r.externalSourceRepoIDs = map[string]bool{
+	r.externalRepoIDs = map[string]bool{
 		r.repoIDCache: true,
 		repoIDAll:     true,
 	}
@@ -806,7 +806,7 @@ func (r *RpmRepoCloner) reposArgsUseOnlyLocalSources(reposArgs []string) bool {
 	for _, repoArg := range reposArgs {
 		if strings.Contains(repoArg, "--enablerepo=") {
 			repoID := strings.Split(repoArg, "=")[repoIDIndex]
-			if r.externalSourceRepoIDs[repoID] {
+			if r.externalRepoIDs[repoID] {
 				return false
 			}
 		}
