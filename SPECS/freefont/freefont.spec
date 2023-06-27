@@ -2,7 +2,7 @@
 Summary:        GNU Free fonts
 Name:           freefont
 Version:        20120503
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3
 URL:            https://ftp.gnu.org/pub/gnu/freefont/
 Group:          System Environment/Base
@@ -10,7 +10,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://ftp.gnu.org/pub/gnu/%{name}/%{name}-ttf-%{version}.zip
 
-# BUG in Mariner RPMbuilder not providing zip
 BuildRequires: unzip
 
 %description
@@ -31,6 +30,10 @@ mv *.ttf %{buildroot}%{_fontdir}/
 %{_fontdir}/*.ttf
 
 %changelog
+* Tue Jun 20 2023 Osama Esmail <osamaesmail@microsoft.com> - 20120503-3
+- License verified
+- Removed irrelevant comment
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 20120503-2
 - Added %%license line automatically
 

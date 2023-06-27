@@ -17,6 +17,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/profile"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -49,6 +50,7 @@ var (
 
 	logFile       = exe.LogFileFlag(app)
 	logLevel      = exe.LogLevelFlag(app)
+	profFlags     = exe.SetupProfileFlags(app)
 	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
 )
 
@@ -56,6 +58,14 @@ func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
+
+	prof, profErr := profile.StartProfiling(profFlags)
+	if profErr != nil {
+		logger.Log.Warnf("Could not start profiling: %s", profErr)
+		return
+	}
+	defer prof.StopProfiler()
+
 	timestamp.BeginTiming("imagepkgfetcher", *timestampFile)
 	defer timestamp.CompleteTiming()
 

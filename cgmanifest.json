@@ -3949,6 +3949,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "fsverity-utils",
+          "version": "1.5",
+          "downloadUrl": "https://git.kernel.org/pub/scm/fs/fsverity/fsverity-utils.git/snapshot/fsverity-utils-1.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "fuse",
           "version": "2.9.7",
           "downloadUrl": "https://github.com/libfuse/libfuse/releases/download/fuse-2.9.7/fuse-2.9.7.tar.gz"
@@ -4610,8 +4620,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.19.8",
-          "downloadUrl": "https://golang.org/dl/go1.19.8.src.tar.gz"
+          "version": "1.19.10",
+          "downloadUrl": "https://golang.org/dl/go1.19.10.src.tar.gz"
         }
       }
     },
@@ -13453,8 +13463,8 @@
         "type": "other",
         "other": {
           "name": "msft-golang",
-          "version": "1.19.8",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.19.8-1/go.20230404.2.src.tar.gz"
+          "version": "1.19.10",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.19.10-1/go.20230606.2.src.tar.gz"
         }
       }
     },
@@ -21184,8 +21194,8 @@
         "type": "other",
         "other": {
           "name": "postgresql",
-          "version": "14.5",
-          "downloadUrl": "https://ftp.postgresql.org/pub/source/v14.5/postgresql-14.5.tar.bz2"
+          "version": "14.8",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v14.8/postgresql-14.8.tar.bz2"
         }
       }
     },
@@ -27467,8 +27477,8 @@
         "type": "other",
         "other": {
           "name": "skopeo",
-          "version": "1.11.0",
-          "downloadUrl": "https://github.com/containers/skopeo/archive/refs/tags/v1.11.0.tar.gz"
+          "version": "1.12.0",
+          "downloadUrl": "https://github.com/containers/skopeo/archive/refs/tags/v1.12.0.tar.gz"
         }
       }
     },

@@ -31,8 +31,6 @@
 -A INPUT -p icmpv6 --icmpv6-type 135 -j ACCEPT
 # Neighbour Advertisement
 -A INPUT -p icmpv6 --icmpv6-type 136 -j ACCEPT
-# Redirect
--A INPUT -p icmpv6 --icmpv6-type 137 -j ACCEPT
 # Inverse Neighbour Discovery Solicitation
 -A INPUT -p icmpv6 --icmpv6-type 141 -j ACCEPT
 # Inverse Neighbour Discovery Advertisement
