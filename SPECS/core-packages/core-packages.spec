@@ -24,7 +24,6 @@ Requires:       dbus
 Requires:       e2fsprogs
 Requires:       file
 Requires:       gdbm
-Requires:       grep
 Requires:       iana-etc
 Requires:       libtool
 Requires:       iproute
@@ -58,6 +57,7 @@ Requires:       elfutils-libelf
 Requires:       expat
 Requires:       filesystem
 Requires:       findutils
+Requires:       grep
 Requires:       gzip
 Requires:       mariner-release
 Requires:       mariner-repos
@@ -88,7 +88,7 @@ Requires:       zlib
 
 %changelog
 * Wed Jun 28 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-8
-- Moving 'curl' to the 'core-packages-container'.
+- Moving 'curl' and 'grep' to the 'core-packages-container' package.
 
 * Fri Jun 17 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.0-7
 - Remove nspr, nss-libs from base container image
