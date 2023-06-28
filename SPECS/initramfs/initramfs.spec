@@ -1,7 +1,7 @@
 Summary:        initramfs
 Name:           initramfs
 Version:        2.0
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        Apache License
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -83,7 +83,7 @@ echo "initramfs (re)generation" %* >&2
 # So in order to be compatible with kdump, we need to make sure to add the -k
 # option when invoking mkinitrd with an explicit <image> and <kernel version>
 #
-# Move initrd generated for kernel-mshv to /boot/efi, where linuxloader expects to find it
+# Copy initrd generated for kernel-mshv to /boot/efi, where linuxloader expects to find it
 %define file_trigger_action() \
 cat > /dev/null \
 if [ -f %{_localstatedir}/lib/rpm-state/initramfs/regenerate ]; then \
@@ -93,11 +93,10 @@ if [ -f %{_localstatedir}/lib/rpm-state/initramfs/regenerate ]; then \
 elif [ -d %{_localstatedir}/lib/rpm-state/initramfs/pending ]; then \
     for k in `ls %{_localstatedir}/lib/rpm-state/initramfs/pending/`; do \
         echo "(re)generate initramfs for $k," %* >&2 \
+        mkinitrd -q /boot/initrd.img-$k $k -k \
         if [[ $k == *mshv* ]]; then \
-            mkinitrd -q /boot/efi/initrd.img-$k $k -k \
-        else \
-            mkinitrd -q /boot/initrd.img-$k $k -k \
-        fi \
+            cp /boot/initrd.img-$k /boot/efi/initrd.img-$k \
+        fi \ 
     done; \
 fi \
 %removal_action
@@ -136,6 +135,10 @@ echo "initramfs" %{version}-%{release} "postun" >&2
 %dir %{_localstatedir}/lib/initramfs/kernel
 
 %changelog
+* Wed Jun 28 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.0.13
+- Copy the initrd image to /boot/efi to maintain backwards compatibility
+    with the old linuxloader. Let the initrd remain in /boot as well. 
+
 * Fri Apr 07 2023 Andy Zaugg <azaugg@linkedin.com> - 2.0.12
 - Added fsck.xfs into initrd
 
