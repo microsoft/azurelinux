@@ -241,6 +241,7 @@
                 "fribidi",
                 "fros",
                 "frr",
+                "fsverity-utils",
                 "fuse-overlayfs",
                 "fuse-sshfs",
                 "fuse-zip",

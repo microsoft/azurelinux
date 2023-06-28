@@ -66,3 +66,23 @@ func ParseListArgument(input string) (results []string) {
 	}
 	return
 }
+
+type ProfileFlags struct {
+	EnableCpuProf *bool
+	EnableMemProf *bool
+	EnableTrace   *bool
+	CpuProfFile   *string
+	MemProfFile   *string
+	TraceFile     *string
+}
+
+func SetupProfileFlags(k *kingpin.Application) *ProfileFlags {
+	p := &ProfileFlags{}
+	p.EnableCpuProf = k.Flag("enable-cpu-prof", "Enable CPU pprof data collection.").Bool()
+	p.EnableMemProf = k.Flag("enable-mem-prof", "Enable Memory pprof data collection.").Bool()
+	p.EnableTrace = k.Flag("enable-trace", "Enable trace data collection.").Bool()
+	p.CpuProfFile = k.Flag("cpu-prof-file", "File that stores CPU pprof data.").String()
+	p.MemProfFile = k.Flag("mem-prof-file", "File that stores Memory pprof data.").String()
+	p.TraceFile = k.Flag("trace-file", "File that stores trace data.").String()
+	return p
+}

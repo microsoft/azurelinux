@@ -3949,6 +3949,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "fsverity-utils",
+          "version": "1.5",
+          "downloadUrl": "https://git.kernel.org/pub/scm/fs/fsverity/fsverity-utils.git/snapshot/fsverity-utils-1.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "fuse",
           "version": "2.9.7",
           "downloadUrl": "https://github.com/libfuse/libfuse/releases/download/fuse-2.9.7/fuse-2.9.7.tar.gz"
@@ -27477,8 +27487,8 @@
         "type": "other",
         "other": {
           "name": "skopeo",
-          "version": "1.11.0",
-          "downloadUrl": "https://github.com/containers/skopeo/archive/refs/tags/v1.11.0.tar.gz"
+          "version": "1.12.0",
+          "downloadUrl": "https://github.com/containers/skopeo/archive/refs/tags/v1.12.0.tar.gz"
         }
       }
     },

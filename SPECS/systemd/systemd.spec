@@ -1,7 +1,7 @@
 Summary:        Systemd-250
 Name:           systemd
 Version:        250.3
-Release:        15%{?dist}
+Release:        16%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -25,6 +25,7 @@ Patch3:         CVE-2022-3821.patch
 Patch4:         CVE-2022-45873.patch
 Patch5:         backport-helper-util-macros.patch
 Patch6:         CVE-2022-4415.patch
+BuildRequires:  audit-devel
 BuildRequires:  cryptsetup-devel
 BuildRequires:  docbook-dtd-xml
 BuildRequires:  docbook-style-xsl
@@ -138,6 +139,7 @@ meson  --prefix %{_prefix}                                            \
        -Dsysvinit-path=%{_sysconfdir}/rc.d/init.d                     \
        -Drc-local=%{_sysconfdir}/rc.d/rc.local                        \
        -Dselinux=true                                                 \
+       -Daudit=true                                                   \
        $PWD build &&
        cd build &&
        %ninja_build
@@ -279,6 +281,9 @@ fi
 %files lang -f %{name}.lang
 
 %changelog
+* Tue Jun 20 2023 Chris Gunn <chrisgun@microsoft.com> - 250.3-16
+- Enable audit integration
+
 * Fri Mar 03 2023 Dan Streetman <ddstreet@microsoft.com> - 250.3-15
 - Build with libtss to enable tpm2 support
 
