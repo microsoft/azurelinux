@@ -80,17 +80,17 @@ URL:            https://www.mellanox.com/
 Source:         https://www.mellanox.com/downloads/ofed/%{name}-%{MLNX_OFED_VERSION}-%{MLNX_OFED_RELEASE}.tgz
 BuildRequires:  kernel-devel
 BuildRequires:  kmod
-Requires: coreutils
-Requires: grep
-Requires: kernel
-Requires: lsof
-Requires: mlnx-tools >= 5.2.0
-Requires: module-init-tools
-Requires: pciutils
-Requires: procps
+Requires:		coreutils
+Requires: 		grep
+Requires: 		kernel
+Requires: 		lsof
+Requires: 		mlnx-tools >= 5.2.0
+Requires: 		module-init-tools
+Requires: 		pciutils
+Requires: 		procps
 %description 
 InfiniBand "verbs", Access Layer  and ULPs.
-Utilities rpm with OFED release %MLNX_OFED_VERSION.
+Utilities rpm with OFED release %{MLNX_OFED_VERSION}.
 
 %global kernel_source() %{K_SRC}
 %global kernel_release() %{KVERSION}
@@ -135,10 +135,10 @@ mkdir obj
 cp source/COPYING .
 
 %build
-export EXTRA_CFLAGS='-DVERSION=\"%version\"'
+export EXTRA_CFLAGS='-DVERSION=\"%{version}\"'
 export INSTALL_MOD_DIR=%{install_mod_dir}
 export CONF_OPTIONS="%{configure_options}"
-for flavor in %flavors_to_build; do
+for flavor in %{flavors_to_build}; do
 	export KSRC=%{kernel_source $flavor}
 	export KVERSION=%{kernel_release $KSRC}
 	export LIB_MOD_DIR=/lib/modules/$KVERSION/$INSTALL_MOD_DIR
@@ -159,7 +159,7 @@ export INSTALL_MOD_DIR=%{install_mod_dir}
 export NAME=%{name}
 export VERSION=%{version}
 export PREFIX=%{_prefix}
-for flavor in %flavors_to_build; do 
+for flavor in %{flavors_to_build}; do 
 	export KSRC=%{kernel_source $flavor}
 	export KVERSION=%{kernel_release $KSRC}
 	cd $PWD/obj/$flavor
@@ -188,7 +188,7 @@ for flavor in %flavors_to_build; do
 done
 
 # Set the module(s) to be executable, so that they will be stripped when packaged.
-find %{buildroot} \( -type f -name '*.ko' -o -name '*ko.gz' \) -exec %{__chmod} u+x \{\} \;
+find %{buildroot} \( -type f -name '*.ko' -o -name '*ko.gz' \) -exec chmod u+x \{\} \;
 
 # copy sources
 mkdir -p %{buildroot}/%{_prefix}/src/ofa_kernel-%{version}
@@ -200,9 +200,9 @@ cp -a %{_builddir}/src/%{name}/* %{buildroot}/%{_prefix}/src/ofa_kernel/%{_arch}
 sed -i -e "s@=-I.*backport_includes@=-I/usr/src/ofa_kernel-$VERSION/backport_includes@" %{buildroot}/%{_prefix}/src/ofa_kernel/%{_arch}/%{KVERSION}/configure.mk.kernel || true
 rm -rf %{_builddir}/src
 
-INFO=%{buildroot}/etc/infiniband/info
+INFO=%{buildroot}%{_sysconfdir}/infiniband/info
 /bin/rm -f ${INFO}
-mkdir -p %{buildroot}/etc/infiniband
+mkdir -p %{buildroot}%{_sysconfdir}/infiniband
 touch ${INFO}
 
 cat >> ${INFO} << EOFINFO
@@ -219,9 +219,9 @@ chmod +x ${INFO} > /dev/null 2>&1
 
 %if "%{WITH_SYSTEMD}" == "1"
 install -d %{buildroot}%{_unitdir}
-install -d %{buildroot}/etc/systemd/system
+install -d %{buildroot}%{_sysconfdir}/systemd/system
 install -m 0644 %{_builddir}/$NAME-$VERSION/source/ofed_scripts/openibd.service %{buildroot}%{_unitdir}
-install -m 0644 %{_builddir}/$NAME-$VERSION/source/ofed_scripts/mlnx_interface_mgr\@.service %{buildroot}/etc/systemd/system
+install -m 0644 %{_builddir}/$NAME-$VERSION/source/ofed_scripts/mlnx_interface_mgr\@.service %{buildroot}%{_sysconfdir}/systemd/system
 %endif
 
 install -d %{buildroot}/bin
@@ -230,9 +230,9 @@ install -m 0755 %{_builddir}/$NAME-$VERSION/source/ofed_scripts/mlnx_conf_mgr.sh
 install -m 0755 %{_builddir}/$NAME-$VERSION/source/ofed_scripts/mlnx_interface_mgr.sh %{buildroot}/bin/
 %else
 # Wind River and Mellanox Bluenix are rpm based, however, interfaces management is done in Debian style
-install -d %{buildroot}/usr/sbin
+install -d %{buildroot}%{_sbindir}
 install -m 0755 %{_builddir}/$NAME-$VERSION/source/ofed_scripts/mlnx_interface_mgr_deb.sh %{buildroot}/bin/mlnx_interface_mgr.sh
-install -m 0755 %{_builddir}/$NAME-$VERSION/source/ofed_scripts/net-interfaces %{buildroot}/usr/sbin
+install -m 0755 %{_builddir}/$NAME-$VERSION/source/ofed_scripts/net-interfaces %{buildroot}%{_sbindir}
 %endif
 
 # Install ibroute utilities
@@ -252,7 +252,7 @@ esac
 /sbin/depmod %{KVERSION}
 # W/A for OEL6.7/7.x inbox modules get locked in memory
 # in dmesg we get: Module mlx4_core locked in memory until next boot
-if (grep -qiE "Oracle.*(6.([7-9]|10)| 7)" /etc/issue /etc/*release* 2>/dev/null); then
+if (grep -qiE "Oracle.*(6.([7-9]|10)| 7)" %{_sysconfdir}/issue %{_sysconfdir}/*release* 2>/dev/null); then
 	/sbin/dracut --force
 fi
 
@@ -261,7 +261,7 @@ if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
 	/sbin/depmod %{KVERSION}
 	# W/A for OEL6.7/7.x inbox modules get locked in memory
 	# in dmesg we get: Module mlx4_core locked in memory until next boot
-	if (grep -qiE "Oracle.*(6.([7-9]|10)| 7)" /etc/issue /etc/*release* 2>/dev/null); then
+	if (grep -qiE "Oracle.*(6.([7-9]|10)| 7)" %{_sysconfdir}/issue %{_sysconfdir}/*release* 2>/dev/null); then
 		/sbin/dracut --force
 	fi
 fi
@@ -271,52 +271,53 @@ if [ $1 -eq 1 ]; then # 1 : This package is being installed
 #############################################################################################################
 
 %if "%{WINDRIVER}" == "1" || "%{BLUENIX}" == "1"
-/usr/sbin/update-rc.d openibd defaults || true
+%{_sbindir}/update-rc.d openibd defaults || true
 %endif
 
 %if "%{POWERKVM}" == "1"
-/usr/bin/systemctl disable openibd >/dev/null  2>&1 || true
-/usr/bin/systemctl enable openibd >/dev/null  2>&1 || true
+%{_bindir}/systemctl disable openibd >/dev/null  2>&1 || true
+%{_bindir}/systemctl enable openibd >/dev/null  2>&1 || true
 %endif
 
 %if "%{WITH_SYSTEMD}" == "1"
-/usr/bin/systemctl daemon-reload >/dev/null 2>&1 || :
-cat /proc/sys/kernel/random/boot_id 2>/dev/null | sed -e 's/-//g' > /var/run/openibd.bootid || true
-test -s /var/run/openibd.bootid || echo manual > /var/run/openibd.bootid || true
+%{_bindir}/systemctl daemon-reload >/dev/null 2>&1 || :
+cat /proc/sys/kernel/random/boot_id 2>/dev/null | sed -e 's/-//g' > %{_var}/run/openibd.bootid || true
+test -s %{_var}/run/openibd.bootid || echo manual > %{_var}/run/openibd.bootid || true
 %endif
 
 # Comment core modules loading hack
-if [ -e /etc/modprobe.conf.dist ]; then
-	sed -i -r -e 's/^(\s*install ib_core.*)/#MLX# \1/' /etc/modprobe.conf.dist
-	sed -i -r -e 's/^(\s*alias ib.*)/#MLX# \1/' /etc/modprobe.conf.dist
+if [ -e %{_sysconfdir}/modprobe.conf.dist ]; then
+	sed -i -r -e 's/^(\s*install ib_core.*)/#MLX# \1/' %{_sysconfdir}/modprobe.conf.dist
+	sed -i -r -e 's/^(\s*alias ib.*)/#MLX# \1/' %{_sysconfdir}/modprobe.conf.dist
 fi
 
 %if %{build_ipoib}
-if [ -e /etc/modprobe.d/ipv6 ]; then
-	sed -i -r -e 's/^(\s*install ipv6.*)/#MLX# \1/' /etc/modprobe.d/ipv6
+if [ -e %{_sysconfdir}/modprobe.d/ipv6 ]; then
+	sed -i -r -e 's/^(\s*install ipv6.*)/#MLX# \1/' %{_sysconfdir}/modprobe.d/ipv6
 fi
 %endif
 
-# Update limits.conf (but not for Containers)
+ # Update limits.conf (but not for Containers)
 if [ ! -e "/.dockerenv" ] && ! (grep -q docker /proc/self/cgroup 2>/dev/null); then
-	if [ -e /etc/security/limits.conf ]; then
-		LIMITS_UPDATED=0
-		if ! (grep -qE "soft.*memlock" /etc/security/limits.conf 2>/dev/null); then
-			echo "* soft memlock unlimited" >> /etc/security/limits.conf
-			LIMITS_UPDATED=1
-		fi
-		if ! (grep -qE "hard.*memlock" /etc/security/limits.conf 2>/dev/null); then
-			echo "* hard memlock unlimited" >> /etc/security/limits.conf
-			LIMITS_UPDATED=1
-		fi
-		if [ $LIMITS_UPDATED -eq 1 ]; then
-			echo "Configured /etc/security/limits.conf"
+	if [ -e %{_sysconfdir}/security/limits.conf ]; then
+			LIMITS_UPDATED=0
+		if ! (grep -qE "soft.*memlock" %{_sysconfdir}/security/limits.conf 2>/dev/null); then
+			echo "* soft memlock unlimited" >> %{_sysconfdir}/security/limits.conf
+				LIMITS_UPDATED=1
+			fi
+		if ! (grep -qE "hard.*memlock" %{_sysconfdir}/security/limits.conf 2>/dev/null); then
+			echo "* hard memlock unlimited" >> %{_sysconfdir}/security/limits.conf
+				LIMITS_UPDATED=1
+			fi
+			if [ $LIMITS_UPDATED -eq 1 ]; then
+			echo "Configured %{_sysconfdir}/security/limits.conf"
+			fi
 		fi
 	fi
 fi
 
 # Make IPoIB interfaces be unmanaged on XenServer
-if (grep -qi xenserver /etc/issue /etc/*-release 2>/dev/null); then
+if (grep -qi xenserver %{_sysconfdir}/issue %{_sysconfdir}/*-release 2>/dev/null); then
 	IPOIB_PNUM=$(lspci -d 15b3: 2>/dev/null | wc -l 2>/dev/null)
 	IPOIB_PNUM=$(($IPOIB_PNUM * 2))
 	for i in $(seq 1 $IPOIB_PNUM)
@@ -334,26 +335,26 @@ fi # 1 : closed
 %preun -n %{utils_pname}
 if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
 %if "%{WINDRIVER}" == "1" || "%{BLUENIX}" == "1"
-/usr/sbin/update-rc.d -f openibd remove || true
+%{_sbindir}/update-rc.d -f openibd remove || true
 %endif
 
 %if "%{POWERKVM}" == "1"
-/usr/bin/systemctl disable openibd >/dev/null  2>&1 || true
+%{_bindir}/systemctl disable openibd >/dev/null  2>&1 || true
 %endif
 fi
 
 %postun -n %{utils_pname}
 %if "%{WITH_SYSTEMD}" == "1"
-/usr/bin/systemctl daemon-reload >/dev/null 2>&1 || :
+%{_bindir}/systemctl daemon-reload >/dev/null 2>&1 || :
 %endif
 
 # Uncomment core modules loading hack
-if [ -e /etc/modprobe.conf.dist ]; then
+if [ -e %{_sysconfdir}/modprobe.conf.dist ]; then
 	sed -i -r -e 's/^#MLX# (.*)/\1/' /etc/modprobe.conf.dist
 fi
 
 %if %{build_ipoib}
-if [ -e /etc/modprobe.d/ipv6 ]; then
+if [ -e %{_sysconfdir}/modprobe.d/ipv6 ]; then
 	sed -i -r -e 's/^#MLX# (.*)/\1/' /etc/modprobe.d/ipv6
 fi
 %endif
@@ -405,31 +406,31 @@ update-alternatives --remove \
 %defattr(-,root,root,-)
 %license COPYING
 %doc source/ofed_scripts/82-net-setup-link.rules source/ofed_scripts/vf-net-link-name.sh
-%dir /etc/infiniband
-%config(noreplace) /etc/infiniband/openib.conf
-%config(noreplace) /etc/infiniband/mlx5.conf
-/etc/infiniband/info
-/etc/init.d/openibd
+%dir %{_sysconfdir}/infiniband
+%config(noreplace) %{_sysconfdir}/infiniband/openib.conf
+%config(noreplace) %{_sysconfdir}/infiniband/mlx5.conf
+%{_sysconfdir}/infiniband/info
+%{_sysconfdir}/init.d/openibd
 %if "%{WITH_SYSTEMD}" == "1"
 %{_unitdir}/openibd.service
-/etc/systemd/system/mlnx_interface_mgr@.service
+%{_sysconfdir}/systemd/system/mlnx_interface_mgr@.service
 %endif
 /lib/udev/sf-rep-netdev-rename
 /lib/udev/auxdev-sf-netdev-rename
-/usr/sbin/setup_mr_cache.sh
-%_datadir/mlnx_ofed/mlnx_bf_assign_ct_cores.sh
-%config(noreplace) /etc/modprobe.d/mlnx.conf
-%config(noreplace) /etc/modprobe.d/mlnx-bf.conf
+%{_sbindir}/setup_mr_cache.sh
+%{_datadir}/mlnx_ofed/mlnx_bf_assign_ct_cores.sh
+%config(noreplace) %{_sysconfdir}/modprobe.d/mlnx.conf
+%config(noreplace) %{_sysconfdir}/modprobe.d/mlnx-bf.conf
 %{_sbindir}/*
 /lib/udev/rules.d/83-mlnx-sf-name.rules
 /lib/udev/rules.d/90-ib.rules
 /bin/mlnx_interface_mgr.sh
 /bin/mlnx_conf_mgr.sh
 %if "%{WINDRIVER}" == "1" || "%{BLUENIX}" == "1"
-/usr/sbin/net-interfaces
+%{_sbindir}/net-interfaces
 %endif
 %if %{build_ipoib}
-%config(noreplace) /etc/modprobe.d/ib_ipoib.conf
+%config(noreplace) %{_sysconfdir}/modprobe.d/ib_ipoib.conf
 %endif
 %if %{build_mlx5}
 %{_sbindir}/ibdev2netdev
@@ -444,8 +445,8 @@ update-alternatives --remove \
 
 %files source
 %defattr(-,root,root,-)
-%{_prefix}/src/ofa_kernel-%version/source
-%{_prefix}/src/mlnx-ofa_kernel-%version
+%{_prefix}/src/ofa_kernel-%{version}/source
+%{_prefix}/src/mlnx-ofa_kernel-%{version}
 
 %changelog
 * Thu Mar 23 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.6-2
