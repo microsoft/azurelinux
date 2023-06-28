@@ -1,7 +1,7 @@
 Summary:        Metapackage with core sets of packages
 Name:           core-packages
 Version:        2.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,7 +20,6 @@ Requires:       chrony
 Requires:       cpio
 Requires:       cracklib-dicts
 Requires:       cryptsetup
-Requires:       curl
 Requires:       dbus
 Requires:       e2fsprogs
 Requires:       file
@@ -54,6 +53,7 @@ Summary:        Metapackage to install the basic set of packages used all image 
 Requires:       bash
 Requires:       bzip2
 Requires:       ca-certificates-base
+Requires:       curl
 Requires:       elfutils-libelf
 Requires:       expat
 Requires:       filesystem
@@ -87,6 +87,9 @@ Requires:       zlib
 %files container
 
 %changelog
+* Wed Jun 28 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-8
+- Moving 'curl' to the 'core-packages-container'.
+
 * Fri Jun 17 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.0-7
 - Remove nspr, nss-libs from base container image
 
