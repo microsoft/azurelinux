@@ -1,18 +1,18 @@
 # Retrieved from 'deps/npm/package.json' inside the sources tarball.
-%define npm_version 8.19.3
+%define npm_version 8.19.4
 
 Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
-Version:        16.19.1
-Release:        2%{?dist}
+Version:        16.20.1
+Release:        1%{?dist}
 License:        BSD and MIT and Public Domain and NAIST-2003 and Artistic-2.0
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/nodejs/node
-# !!!! Nodejs code has a vendored version of OpenSSL code that must be removed from source tarball 
+# !!!! Nodejs code has a vendored version of OpenSSL code that must be removed from source tarball
 # !!!! because it contains patented algorithms.
 # !!!  => use clean-source-tarball.sh script to create a clean and reproducible source tarball.
 Source0:        https://nodejs.org/download/release/v%{version}/node-v%{version}.tar.xz
@@ -116,6 +116,9 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
+* Wed Jun 28 2023 David Steele <davidsteele@microsoft.com> - 16.20.1-1
+- Upgrade to nodejs to 16.20.1 and npm to 8.19.4
+
 * Tue May 30 2023 Dallas Delaney <dadelan@microsoft.com> - 16.19.1-2
 - Fix CVE-2023-32067, CVE-2023-31130, CVE-2023-31147 by using system c-ares
 
