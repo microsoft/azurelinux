@@ -23,7 +23,7 @@ jobs:
     - name: Set up Go 1.18
       uses: actions/setup-go@v2
       with:
-        go-version: 1.18
+        go-version: 1.19
       id: go
 
     - name: Install Remaining Prerequisites
@@ -52,7 +52,7 @@ jobs:
     - name: Set up Go 1.18
       uses: actions/setup-go@v2
       with:
-        go-version: 1.18
+        go-version: 1.19
       id: go
 
     - name: Install Remaining Prerequisites
@@ -80,7 +80,7 @@ jobs:
     - name: Set up Go 1.18
       uses: actions/setup-go@v2
       with:
-        go-version: 1.18
+        go-version: 1.19
       id: go
 
     - name: Install Remaining Prerequisites
