@@ -11,9 +11,9 @@ URL:            https://www.freedesktop.org/wiki/Software/dbus
 Source0:        https://%{name}.freedesktop.org/releases/%{name}/%{name}-%{version}.tar.xz
 BuildRequires:  audit-devel
 BuildRequires:  expat-devel
+BuildRequires:  libselinux-devel
 BuildRequires:  systemd-bootstrap-devel
 BuildRequires:  xz-devel
-BuildRequires:  libselinux-devel
 Requires:       expat
 Requires:       xz
 # Using the weak dependency 'Recommends' to break a circular dependency during
@@ -21,7 +21,6 @@ Requires:       xz
 # In real-life situations systemd will always be present and thus installed.
 Recommends:     systemd
 Provides:       dbus-libs = %{version}-%{release}
-
 # NOTE: We currently do not build with X11 support.
 # build with X11 support in the future.
 Provides:       %{name}-x11
