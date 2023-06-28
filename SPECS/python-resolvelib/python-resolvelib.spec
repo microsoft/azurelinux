@@ -53,7 +53,8 @@ rm -rf %{pypi_name}.egg-info
 
 %changelog
 * Fri Jun 23 2023 Sam Meluch <sammeluch@microsoft.com> - 1.0.1-1
-- Initial CBL-Mariner import from Fedora
+- Initial CBL-Mariner import from Fedora 38 (license: ISC).
+- License verified
 - upgrade spec to version 1.0.1
 
 * Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 0.5.5-8

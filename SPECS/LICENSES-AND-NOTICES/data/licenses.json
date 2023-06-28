@@ -1735,6 +1735,7 @@
                 "python-requests-oauthlib",
                 "python-requests-toolbelt",
                 "python-requests_ntlm",
+                "python-resolvelib",
                 "python-responses",
                 "python-retrying",
                 "python-rfc3986",
