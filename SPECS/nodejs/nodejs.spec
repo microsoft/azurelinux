@@ -6,7 +6,7 @@ Name:           nodejs
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
 Version:        16.20.1
 Release:        1%{?dist}
-License:        BSD and MIT and Public Domain and NAIST-2003 and Artistic-2.0
+License:        BSD AND MIT AND Public Domain AND NAIST-2003 AND Artistic-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
@@ -16,7 +16,6 @@ URL:            https://github.com/nodejs/node
 # !!!  => use clean-source-tarball.sh script to create a clean and reproducible source tarball.
 Source0:        https://nodejs.org/download/release/v%{version}/node-v%{version}.tar.xz
 Patch0:         disable-tlsv1-tlsv1-1.patch
-
 %define npm_version 8.19.4
 BuildRequires:  brotli-devel
 BuildRequires:  c-ares-devel
