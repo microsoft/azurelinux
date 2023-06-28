@@ -44,7 +44,7 @@ cmake -G Ninja                              \
       -DLLVM_ENABLE_RTTI=ON                 \
       -DCMAKE_BUILD_TYPE=Release            \
       -DLLVM_PARALLEL_LINK_JOBS=1           \
-      -DLLVM_PARALLEL_COMPILE_JOBS=2        \
+      -DLLVM_PARALLEL_COMPILE_JOBS=16       \
       -DLLVM_BUILD_LLVM_DYLIB=ON            \
       -DLLVM_LINK_LLVM_DYLIB=ON             \
       -DLLVM_INCLUDE_TESTS=ON               \
