@@ -60,13 +60,12 @@ Source:         https://www.mellanox.com/downloads/ofed/%{name}-%{MLNX_OFED_VERS
 %global build_mlx5 %(if ( echo %{configure_options} | grep "with-mlx5-mod" > /dev/null ); then echo -n '1'; else echo -n '0'; fi)
 %{!?LIB_MOD_DIR: %global LIB_MOD_DIR /lib/modules/%{KVERSION}/updates}
 %{!?IB_CONF_DIR: %global IB_CONF_DIR %{_sysconfdir}/infiniband}
-%{!?KERNEL_SOURCES: %global KERNEL_SOURCES %K_SRC}
+%{!?KERNEL_SOURCES: %global KERNEL_SOURCES %{K_SRC}}
 %global MLNX_OFED_VERSION 23.04
 %global MLNX_OFED_RELEASE 0.5.3
 %global utils_pname %{name}
 %global devel_pname %{name}-devel
 %global non_kmp_pname %{name}-modules
-
 BuildRequires:  kernel-devel
 BuildRequires:  kmod
 Requires:       coreutils
@@ -78,6 +77,7 @@ Requires:       module-init-tools
 Requires:       pciutils
 Requires:       procps
 %description 
+
 InfiniBand "verbs", Access Layer  and ULPs.
 Utilities rpm with OFED release %{MLNX_OFED_VERSION}.
 
@@ -86,8 +86,8 @@ Utilities rpm with OFED release %{MLNX_OFED_VERSION}.
 %global flavors_to_build default
 
 %package -n %{non_kmp_pname}
-Version:        %{MLNX_OFED_VERSION}
 Summary:        Infiniband Driver and ULPs kernel modules
+Version:        %{MLNX_OFED_VERSION}
 Group:          System Environment/Libraries
 
 %description -n %{non_kmp_pname}
