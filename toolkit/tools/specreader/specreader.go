@@ -114,13 +114,13 @@ func parseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, toolchainDir, dist
 		if *targetArch == "" {
 			packageRepo, parseError = parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, buildArch, toolchainRPMs, workers, runCheck)
 			if parseError != nil {
-				err := fmt.Errorf("Failed to parse native specs (%w)", parseError)
+				err := fmt.Errorf("failed to parse native specs (%w)", parseError)
 				return err
 			}
 		} else {
 			packageRepo, parseError = parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, *targetArch, toolchainRPMs, workers, runCheck)
 			if parseError != nil {
-				err := fmt.Errorf("Failed to parse cross specs (%w)", parseError)
+				err := fmt.Errorf("failed to parse cross specs (%w)", parseError)
 				return err
 			}
 		}

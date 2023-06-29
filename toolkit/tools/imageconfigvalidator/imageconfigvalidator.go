@@ -101,7 +101,7 @@ func validateKickStartInstall(config configuration.Config) (err error) {
 	for _, systemConfig := range config.SystemConfigs {
 		if systemConfig.IsKickStartBoot {
 			if len(config.Disks) > 0 || len(systemConfig.PartitionSettings) > 0 {
-				return fmt.Errorf("Partition should not be specified in image config file when performing kickstart installation")
+				return fmt.Errorf("partition should not be specified in image config file when performing kickstart installation")
 			}
 		}
 	}

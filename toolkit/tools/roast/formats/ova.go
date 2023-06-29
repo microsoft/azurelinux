@@ -37,13 +37,13 @@ type Ova struct {
 func filePathFromEnv(variable string) (path string, err error) {
 	path, varExist := unix.Getenv(variable)
 	if !varExist {
-		err = fmt.Errorf("Environment variable not found: %s", variable)
+		err = fmt.Errorf("environment variable not found: %s", variable)
 		return
 	}
 
 	fileExist, _ := file.PathExists(path)
 	if !fileExist {
-		err = fmt.Errorf("File from environment variable %s not found: %s", variable, path)
+		err = fmt.Errorf("file from environment variable %s not found: %s", variable, path)
 		return
 	}
 	return
