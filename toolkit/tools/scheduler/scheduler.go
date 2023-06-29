@@ -20,7 +20,6 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/scheduler/buildagents"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/scheduler/schedulerutils"
 
-	"github.com/juliangruber/go-intersect"
 	"golang.org/x/sys/unix"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -114,40 +113,9 @@ func main() {
 		logger.Log.Fatalf("Failed to read DOT graph with error:\n%s", err)
 	}
 
-	// Generate the list of packages that need to be built.
-	// If none are requested then all packages will be built.
-	packagesToBuild, err := schedulerutils.PackageNamesToBuiltPackages(exe.ParseListArgument(*pkgsToBuild), dependencyGraph)
+	finalPackagesToBuild, packagesToRebuild, packagesToIgnore, err := schedulerutils.ParseAndGeneratePackageList(dependencyGraph, *pkgsToBuild, *pkgsToRebuild, *pkgsToIgnore, *imageConfig, *baseDirPath)
 	if err != nil {
-		logger.Log.Fatalf("Unable to find build nodes for the packages to build, error:\n%s.", err)
-	}
-
-	packagesToRebuild, err := schedulerutils.PackageNamesToBuiltPackages(exe.ParseListArgument(*pkgsToRebuild), dependencyGraph)
-	if err != nil {
-		logger.Log.Fatalf("Unable to find build nodes for the packages to rebuild, error:\n%s.", err)
-	}
-
-	prunedIgnoredPackageNames, unknownNames, err := schedulerutils.PruneUnknownPackages(exe.ParseListArgument(*pkgsToIgnore), dependencyGraph)
-	if err != nil {
-		logger.Log.Fatalf("Failed to prune unknown package/spec names from the ignored list, error:\n%s.", err)
-	}
-
-	if len(unknownNames) != 0 {
-		logger.Log.Warnf("The following ignored items matched neither a spec nor a package name: %v.", unknownNames)
-	}
-
-	packagesToIgnore, err := schedulerutils.PackageNamesToBuiltPackages(prunedIgnoredPackageNames, dependencyGraph)
-	if err != nil {
-		logger.Log.Fatalf("Unable to find build nodes for the ignored packages, error:\n%s.", err)
-	}
-
-	ignoredAndRebuiltPackages := intersect.Hash(packagesToIgnore, packagesToRebuild)
-	if len(ignoredAndRebuiltPackages) != 0 {
-		logger.Log.Fatalf("Can't ignore and force a rebuild of a package at the same time. Abusing packages: %v.", ignoredAndRebuiltPackages)
-	}
-
-	finalPackagesToBuild, err := schedulerutils.CalculatePackagesToBuild(packagesToBuild, packagesToRebuild, *imageConfig, *baseDirPath, dependencyGraph)
-	if err != nil {
-		logger.Log.Fatalf("Unable to generate package build list, error:\n%s.", err)
+		logger.Log.Fatalf("Failed to generate package list with error:\n%s", err)
 	}
 
 	toolchainPackages, err := schedulerutils.ReadReservedFilesList(*toolchainManifest)
@@ -234,7 +202,7 @@ func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, work
 	// If optimizeWithCachedImplicit is true, we can use the cached implicit dependencies to aggressively prune the graph during the first pass. We will still
 	// try to avoid using the cached implicit dependencies until we have no other choice during the build, but since the graph is pruned, we will
 	// avoid building packages that are not needed.
-	_, pkgGraph, goalNode, err := schedulerutils.InitializeGraph(inputFile, packagesToBuild, (canUseCache && optimizeWithCachedImplicit))
+	_, pkgGraph, goalNode, err := schedulerutils.InitializeGraph(inputFile, nil, packagesToBuild, (canUseCache && optimizeWithCachedImplicit))
 	if err != nil {
 		return
 	}
@@ -522,7 +490,11 @@ func setAssociatedDeltaPaths(res *schedulerutils.BuildResult, builtFiles []strin
 				logger.Log.Tracef("Updating delta run node '%s' path from '%s' to '%s'", node, node.RpmPath, builtFile)
 				node.RpmPath = builtFile
 			} else {
-				err = fmt.Errorf("unexpected node type/state when scanning for delta run node '%s' when updating paths to '%s'", node, rpmBasePath)
+				// Sanity check that any non-delta node has an exact match to the real RPM path
+				logger.Log.Errorf("non-delta run node '%s' has path '%s' (expected '%s')", node, node.RpmPath, builtFile)
+				if node.RpmPath != builtFile {
+					err = fmt.Errorf("non-delta run node '%s' has unexpected path '%s' (expected non-delta path of '%s')", node, node.RpmPath, builtFile)
+				}
 				return
 			}
 		}

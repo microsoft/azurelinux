@@ -18,21 +18,30 @@ const (
 )
 
 // InitializeGraph initializes and prepares a graph dot file for building.
-//   - It will load and return the graph.
+//   - It will use an existing graph if provided (graph should not have been previously initialized, input file must be "")
+//   - It will load from disk if a path is provided (existing graph must be nil)
 //   - It will subgraph the graph to only contain the desired packages if possible.
 //   - If canUseCachedImplicit is true, it will use cached nodes to resolve implicit dependencies instead of waiting for
 //     them to be built in the graph (This can allow the graph to be optimized immediately instead of waiting for the
 //     implicit nodes to be resolved by an unknown package later in the build).
-func InitializeGraph(inputFile string, packagesToBuild []*pkgjson.PackageVer, canUseCachedImplicit bool) (isOptimized bool, pkgGraph *pkggraph.PkgGraph, goalNode *pkggraph.PkgNode, err error) {
+func InitializeGraph(inputFile string, existingGraph *pkggraph.PkgGraph, packagesToBuild []*pkgjson.PackageVer, canUseCachedImplicit bool) (isOptimized bool, pkgGraph *pkggraph.PkgGraph, goalNode *pkggraph.PkgNode, err error) {
 	const (
 		strictGoalNode = true
 	)
 	timestamp.StartEvent("graph initialization", nil)
 	defer timestamp.StopEvent(nil)
 
-	pkgGraph, err = pkggraph.ReadDOTGraphFile(inputFile)
-	if err != nil {
-		return
+	if existingGraph == nil {
+		pkgGraph, err = pkggraph.ReadDOTGraphFile(inputFile)
+		if err != nil {
+			return
+		}
+	} else {
+		if len(inputFile) != 0 {
+			err = fmt.Errorf("input file '%s' specified along with existing graph, use one or the other", inputFile)
+			return
+		}
+		pkgGraph = existingGraph
 	}
 
 	_, err = pkgGraph.AddGoalNode(buildGoalNodeName, packagesToBuild, strictGoalNode)
