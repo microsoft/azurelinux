@@ -1,7 +1,7 @@
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
 Version:        3.4.23
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -41,6 +41,8 @@ export GOPATH=%{OUR_GOPATH}/vendor:%{OUR_GOPATH}/etcd_src
 
 ln -s "%{_builddir}/%{name}-%{version}/vendor" "%{OUR_GOPATH}/vendor/src"
 ln -s "%{_builddir}/%{name}-%{version}" "%{OUR_GOPATH}/etcd_src/src/go.etcd.io/etcd"
+# Disable DWARF compression
+sed -i 's/GO_LDFLAGS -X/GO_LDFLAGS -compressdwarf=false -X/g' Makefile ./build
 ./build
 # Now build the etcd-dump* tools
 source ./build
@@ -93,6 +95,10 @@ rm -rf %{buildroot}/*
 %{_bindir}/etcd-dump-*
 
 %changelog
+* Thu Jun 22 2023 Mitch Zhu <mitchzhu@microsoft.com> - 3.4.23-2
+- Bump release to rebuild with go 1.19.10
+  Disable DWARF compression in go 1.19.10
+
 * Fri Jan 27 2023 Muhammad Falak <mwani@microsoft.com> - 3.4.23-1
 - Bump version to address CVE-2022-3064
 

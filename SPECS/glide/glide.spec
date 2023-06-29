@@ -1,7 +1,7 @@
 Summary:        Vendor Package Management for Golang
 Name:           glide
 Version:        0.13.3
-Release:        15%{?dist}
+Release:        16%{?dist}
 License:        MIT
 URL:            https://github.com/Masterminds/glide
 # Source0:      https://github.com/Masterminds/%{name}/archive/v%{version}.tar.gz
@@ -28,6 +28,8 @@ export GOPATH=%{OUR_GOPATH}
 mkdir -p ${GOPATH}/src/github.com/Masterminds/glide
 cp -r * ${GOPATH}/src/github.com/Masterminds/glide/.
 pushd ${GOPATH}/src/github.com/Masterminds/glide
+# Disable DWARF compression
+sed -i 's/-ldflags "-X/-ldflags "-compressdwarf=false -X/g' Makefile
 make VERSION=%{version} build %{?_smp_mflags}
 popd
 
@@ -53,6 +55,10 @@ popd
 %{_bindir}/glide
 
 %changelog
+* Thu Jun 22 2023 Mitch Zhu <mitchzhu@microsoft.com> - 0.13.3-16
+- Bump release to rebuild with go 1.19.10
+  Disable DWARF compression in go 1.19.10
+
 * Tue Dec 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.13.3-15
 - Bump release to rebuild with go 1.18.8-2
 
