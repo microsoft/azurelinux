@@ -437,11 +437,11 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 	}
 
 	// Consider the built (tooolchain, local) RPMs first, then the already cached, and finally all remote packages.
-	for _, reposList := range r.reposArgsList {
-		logger.Log.Debugf("Using repo args: %v", reposList)
+	for _, reposArgs := range r.reposArgsList {
+		logger.Log.Debugf("Using repos args: %v", reposArgs)
 
 		err = r.chroot.Run(func() (err error) {
-			completeArgs := append(baseArgs, reposList...)
+			completeArgs := append(baseArgs, reposArgs...)
 
 			stdout, stderr, err := shell.Execute("tdnf", completeArgs...)
 			logger.Log.Debugf("tdnf search for provide '%s':\n%s", pkgVer.Name, stdout)
@@ -674,6 +674,7 @@ func convertPackageVersionToTdnfArg(pkgVer *pkgjson.PackageVer) (tdnfArg string)
 	return
 }
 
+// GetEnabledRepos returns the repo flags that the cloner is allowed to use for its queries.
 func (r *RpmRepoCloner) GetEnabledRepos() uint64 {
 	return r.reposFlags
 }
