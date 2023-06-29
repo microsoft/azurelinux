@@ -1,5 +1,5 @@
 diff --git a/pkg/virt-launcher/virtwrap/manager.go b/pkg/virt-launcher/virtwrap/manager.go
-index 63d8d43d2..19719993a 100644
+index 63d8d43d2..2115b7950 100644
 --- a/pkg/virt-launcher/virtwrap/manager.go
 +++ b/pkg/virt-launcher/virtwrap/manager.go
 @@ -97,6 +97,11 @@ const (
@@ -30,7 +30,7 @@ index 63d8d43d2..19719993a 100644
  	}
  
  	manager.hotplugHostDevicesInProgress = make(chan struct{}, maxConcurrentHotplugHostDevices)
-@@ -922,19 +929,75 @@ func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, allowEmul
+@@ -922,19 +929,77 @@ func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, allowEmul
  		return nil, err
  	}
  
@@ -93,7 +93,7 @@ index 63d8d43d2..19719993a 100644
 +			case <-l.cancelDiskDetachChannels[namespacedDiskName]:
 +				// Disk attach has been requested within the grace period, cancel the detach
 +				logger.V(hotplugDetachmentVerbosity).Infof("Potential hotplug disk detaching was cancelled: %s", namespacedDiskName)
-+			case <-time.After(5 * time.Second):
++			case <-time.After(hotplugDetachmentGracePeriod):
 +				// Grace period has expired without an attache request, proceed to detach
 +				logger.V(1).Infof("Detaching disk %s, target %s", detachDiskName, detachDiskTargetDevice)
 +				dom, err := l.virConn.LookupDomainByName(domainName)
@@ -106,6 +106,8 @@ index 63d8d43d2..19719993a 100644
 +				if err != nil {
 +					logger.Reason(err).Error("detaching device")
 +				}
++
++				dom.Free()
 +			}
 +			// Detach request has been handled, remove channel from map
 +			delete(l.cancelDiskDetachChannels, namespacedDiskName)
@@ -113,7 +115,7 @@ index 63d8d43d2..19719993a 100644
  	}
  	// Look up all the disks to attach
  	for _, attachDisk := range getAttachedDisks(oldSpec.Devices.Disks, domain.Spec.Devices.Disks) {
-@@ -945,7 +1008,18 @@ func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, allowEmul
+@@ -945,7 +1010,18 @@ func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, allowEmul
  		if !allowAttach {
  			continue
  		}
@@ -133,7 +135,7 @@ index 63d8d43d2..19719993a 100644
  		// set drivers cache mode
  		err = converter.SetDriverCacheMode(&attachDisk, l.directIOChecker)
  		if err != nil {
-@@ -1032,7 +1106,7 @@ func isHotplugDisk(disk api.Disk) bool {
+@@ -1032,7 +1108,7 @@ func isHotplugDisk(disk api.Disk) bool {
  	return strings.HasPrefix(getSourceFile(disk), v1.HotplugDiskDir)
  }
  
@@ -142,7 +144,7 @@ index 63d8d43d2..19719993a 100644
  	newDiskMap := make(map[string]api.Disk)
  	for _, disk := range newDisks {
  		file := getSourceFile(disk)
-@@ -1040,14 +1114,15 @@ func getDetachedDisks(oldDisks, newDisks []api.Disk) []api.Disk {
+@@ -1040,14 +1116,15 @@ func getDetachedDisks(oldDisks, newDisks []api.Disk) []api.Disk {
  			newDiskMap[file] = disk
  		}
  	}
@@ -162,12 +164,12 @@ index 63d8d43d2..19719993a 100644
  	return res
 diff --git a/prototype.patch b/prototype.patch
 new file mode 100644
-index 000000000..a7d83eb93
+index 000000000..6d4f0f1e3
 --- /dev/null
 +++ b/prototype.patch
 @@ -0,0 +1,87 @@
 +diff --git a/pkg/virt-launcher/virtwrap/manager.go b/pkg/virt-launcher/virtwrap/manager.go
-+index 63d8d43d2..19719993a 100644
++index 63d8d43d2..2115b7950 100644
 +--- a/pkg/virt-launcher/virtwrap/manager.go
 ++++ b/pkg/virt-launcher/virtwrap/manager.go
 +@@ -97,6 +97,11 @@ const (
@@ -198,7 +200,7 @@ index 000000000..a7d83eb93
 + 	}
 + 
 + 	manager.hotplugHostDevicesInProgress = make(chan struct{}, maxConcurrentHotplugHostDevices)
-+@@ -922,19 +929,75 @@ func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, allowEmul
++@@ -922,19 +929,77 @@ func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, allowEmul
 + 		return nil, err
 + 	}
 + 
