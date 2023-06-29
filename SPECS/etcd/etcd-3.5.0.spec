@@ -1,7 +1,7 @@
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
 Version:        3.5.0
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -66,7 +66,7 @@ for component in server etcdctl etcdutl; do
     tar --no-same-owner -xf %{_builddir}/%{name}-%{version}/vendor-$component.tar.gz
     go build \
         -o %{ETCD_OUT_DIR} \
-        -ldflags=-X=go.etcd.io/etcd/api/v3/version.GitSHA=v%{version}
+        -ldflags='-compressdwarf=false -X=go.etcd.io/etcd/api/v3/version.GitSHA=v%{version}'
     popd
 done
 
@@ -141,6 +141,10 @@ rm -rf %{buildroot}/*
 /%{_docdir}/%{name}-%{version}-tools/*
 
 %changelog
+* Thu Jun 22 2023 Mitch Zhu <mitchzhu@microsoft.com> - 3.5.0-10
+- Bump release to rebuild with go 1.19.10
+  Disable DWARF compression in go 1.19.10
+
 * Tue Dec 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 3.5.0-9
 - Bump release to rebuild with go 1.18.8-2
 

@@ -1886,8 +1886,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.18.8",
-          "downloadUrl": "https://golang.org/dl/go1.18.8.src.tar.gz"
+          "version": "1.19.10",
+          "downloadUrl": "https://golang.org/dl/go1.19.10.src.tar.gz"
         }
       }
     },
@@ -2156,8 +2156,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.10.181.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.181.1.tar.gz"
+          "version": "5.10.183.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.183.1.tar.gz"
         }
       }
     },
@@ -2476,8 +2476,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.10.181.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.181.1.tar.gz"
+          "version": "5.10.183.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.183.1.tar.gz"
         }
       }
     },
@@ -2486,8 +2486,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.10.181.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.181.1.tar.gz"
+          "version": "5.10.183.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.183.1.tar.gz"
         }
       }
     },
@@ -2496,8 +2496,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hyperv",
-          "version": "5.10.181.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.181.1.tar.gz"
+          "version": "5.10.183.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner/5.10.183.1.tar.gz"
         }
       }
     },
@@ -5656,8 +5656,8 @@
         "type": "other",
         "other": {
           "name": "postgresql",
-          "version": "12.12",
-          "downloadUrl": "https://ftp.postgresql.org/pub/source/v12.12/postgresql-12.12.tar.bz2"
+          "version": "12.15",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v12.15/postgresql-12.15.tar.bz2"
         }
       }
     },
