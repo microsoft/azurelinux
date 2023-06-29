@@ -234,7 +234,7 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 
 
 %changelog
-*   Wed May 24 2023 Dallas Delaney <dadelan@microsoft.com> 0.4.2-1
+*   Thu Jun 29 2023 Dallas Delaney <dadelan@microsoft.com> 0.4.2-1
 -   Upgrade to version 0.4.2 for new snapshotter and policy features
 
 *   Thu Jun 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.4.1-3
