@@ -429,7 +429,7 @@ update-alternatives --remove \
 %endif
 
 %files -n %{non_kmp_pname}
-/lib/modules/%{KVERSION}/%{install_mod_dir}/
+/lib/modules/%{KVERSION}/%{install_mod_dir}
 
 %files -n %{devel_pname}
 %defattr(-,root,root,-)
