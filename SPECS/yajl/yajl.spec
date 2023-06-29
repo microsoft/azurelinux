@@ -1,7 +1,7 @@
 Summary:        Yet Another JSON Library (YAJL)
 Name:           yajl
 Version:        2.1.0
-Release:        17%{?dist}
+Release:        18%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,6 +20,7 @@ Patch1:         %{name}-%{version}-pkgconfig-location.patch
 Patch2:         %{name}-%{version}-pkgconfig-includedir.patch
 Patch3:         %{name}-%{version}-test-location.patch
 Patch4:         %{name}-%{version}-dynlink-binaries.patch
+Patch5:         CVE-2023-33460.patch
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  which
@@ -90,6 +91,9 @@ cd test
 %{_libdir}/pkgconfig/yajl.pc
 
 %changelog
+* Fri Jun 16 2023 Suresh Thelkar <sthelkar@microsoft.com> - 2.1.0-18
+- Patch CVE-2023-33460
+
 * Thu Jun 03 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.1.0-17
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - License verified
