@@ -76,6 +76,7 @@ Requires:       mlnx-tools >= 5.2.0
 Requires:       module-init-tools
 Requires:       pciutils
 Requires:       procps
+
 %description 
 
 InfiniBand "verbs", Access Layer  and ULPs.
