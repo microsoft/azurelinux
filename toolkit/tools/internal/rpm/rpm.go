@@ -90,7 +90,7 @@ var (
 func GetRpmArch(goArch string) (rpmArch string, err error) {
 	rpmArch, ok := goArchToRpmArch[goArch]
 	if !ok {
-		err = fmt.Errorf("Unknown GOARCH detected (%s)", goArch)
+		err = fmt.Errorf("unknown GOARCH detected (%s)", goArch)
 	}
 	return
 }
@@ -105,7 +105,7 @@ func SetMacroDir(newMacroDir string) (origenv []string, err error) {
 	}
 	exists, err := file.DirExists(newMacroDir)
 	if err != nil || exists == false {
-		err = fmt.Errorf("Directory %s does not exist", newMacroDir)
+		err = fmt.Errorf("directory %s does not exist", newMacroDir)
 		return
 	}
 

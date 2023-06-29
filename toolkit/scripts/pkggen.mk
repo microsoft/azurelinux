@@ -86,6 +86,12 @@ $(specs_file): $(chroot_worker) $(BUILD_SPECS_DIR) $(build_specs) $(build_spec_d
 		--worker-tar $(chroot_worker) \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		$(logging_command) \
+		--cpu-prof-file=$(PROFILE_DIR)/specreader.cpu.pprof \
+		--mem-prof-file=$(PROFILE_DIR)/specreader.mem.pprof \
+		--trace-file=$(PROFILE_DIR)/specreader.trace \
+		$(if $(filter y,$(ENABLE_CPU_PROFILE)),--enable-cpu-prof) \
+		$(if $(filter y,$(ENABLE_MEM_PROFILE)),--enable-mem-prof) \
+		$(if $(filter y,$(ENABLE_TRACE)),--enable-trace) \
 		--timestamp-file=$(TIMESTAMP_DIR)/specreader.jsonl \
 		$(if $(TARGET_ARCH),--target-arch="$(TARGET_ARCH)") \
 		--output $@
@@ -96,6 +102,12 @@ $(graph_file): $(specs_file) $(go-grapher) $(toolchain_rpms)
 	$(go-grapher) \
 		--input $(specs_file) \
 		$(logging_command) \
+		--cpu-prof-file=$(PROFILE_DIR)/grapher.cpu.pprof \
+		--mem-prof-file=$(PROFILE_DIR)/grapher.mem.pprof \
+		--trace-file=$(PROFILE_DIR)/grapher.trace \
+		$(if $(filter y,$(ENABLE_CPU_PROFILE)),--enable-cpu-prof) \
+		$(if $(filter y,$(ENABLE_MEM_PROFILE)),--enable-mem-prof) \
+		$(if $(filter y,$(ENABLE_TRACE)),--enable-trace) \
 		--timestamp-file=$(TIMESTAMP_DIR)/grapher.jsonl \
 		--output $@
 
@@ -147,6 +159,12 @@ $(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_lo
 		$(logging_command) \
 		--input-summary-file=$(PACKAGE_CACHE_SUMMARY) \
 		--output-summary-file=$(PKGBUILD_DIR)/graph_external_deps.json \
+		--cpu-prof-file=$(PROFILE_DIR)/graphpkgfetcher.cpu.pprof \
+		--mem-prof-file=$(PROFILE_DIR)/graphpkgfetcher.mem.pprof \
+		--trace-file=$(PROFILE_DIR)/graphpkgfetcher.trace \
+		$(if $(filter y,$(ENABLE_CPU_PROFILE)),--enable-cpu-prof) \
+		$(if $(filter y,$(ENABLE_MEM_PROFILE)),--enable-mem-prof) \
+		$(if $(filter y,$(ENABLE_TRACE)),--enable-trace) \
 		--timestamp-file=$(TIMESTAMP_DIR)/graph_cache.jsonl \
 		--output=$(cached_file) && \
 	touch $@
@@ -219,6 +237,12 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-
 		--packages="$(PACKAGE_BUILD_LIST)" \
 		--rebuild-packages="$(PACKAGE_REBUILD_LIST)" \
 		--image-config-file="$(CONFIG_FILE)" \
+		--cpu-prof-file=$(PROFILE_DIR)/scheduler.cpu.pprof \
+		--mem-prof-file=$(PROFILE_DIR)/scheduler.mem.pprof \
+		--trace-file=$(PROFILE_DIR)/scheduler.trace \
+		$(if $(filter y,$(ENABLE_CPU_PROFILE)),--enable-cpu-prof) \
+		$(if $(filter y,$(ENABLE_MEM_PROFILE)),--enable-mem-prof) \
+		$(if $(filter y,$(ENABLE_TRACE)),--enable-trace) \
 		--timestamp-file=$(TIMESTAMP_DIR)/scheduler.jsonl \
 		--toolchain-manifest="$(TOOLCHAIN_MANIFEST)" \
 		$(if $(CONFIG_FILE),--base-dir="$(CONFIG_BASE_DIR)") \

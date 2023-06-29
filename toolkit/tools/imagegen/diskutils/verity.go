@@ -147,7 +147,7 @@ func (v *VerityDevice) createVerityDisk(verityDirectory string) (err error) {
 	logger.Log.Info("Generating a dm-verity read-only partition")
 	verityOutput, stderr, err := shell.Execute("veritysetup", append(verityFecArgs, verityArgs...)...)
 	if err != nil {
-		err = fmt.Errorf("Unable to create verity disk '%s': %w", stderr, err)
+		err = fmt.Errorf("unable to create verity disk '%s': %w", stderr, err)
 		return
 	}
 
@@ -155,7 +155,7 @@ func (v *VerityDevice) createVerityDisk(verityDirectory string) (err error) {
 	matches := rootHashLineRegex.FindStringSubmatch(verityOutput)
 
 	if len(matches) != 2 {
-		err = fmt.Errorf("Unable to extract root hash from veritysetup output: '%s', matched: '%#v'", verityOutput, matches)
+		err = fmt.Errorf("unable to extract root hash from veritysetup output: '%s', matched: '%#v'", verityOutput, matches)
 		return
 	}
 	rootHash := matches[1]
@@ -180,7 +180,7 @@ func (v *VerityDevice) createVerityDisk(verityDirectory string) (err error) {
 	verityOutput, stderr, err = shell.Execute("veritysetup", verityVerifyArgs...)
 	if err != nil {
 		logger.Log.Errorf("Verity error: '%s'", verityOutput)
-		err = fmt.Errorf("Unable to validate new verity disk '%s': %w", stderr, err)
+		err = fmt.Errorf("unable to validate new verity disk '%s': %w", stderr, err)
 	}
 
 	return
@@ -198,7 +198,7 @@ func PrepReadOnlyDevice(partDevPath string, partition configuration.Partition, r
 	)
 
 	if !readOnlyConfig.Enable {
-		err = fmt.Errorf("Verity is not enabled, can't update partition '%s'", partition.ID)
+		err = fmt.Errorf("verity is not enabled, can't update partition '%s'", partition.ID)
 		return
 	}
 
@@ -231,7 +231,7 @@ func PrepReadOnlyDevice(partDevPath string, partition configuration.Partition, r
 	}
 	deviceSizeInt, err := strconv.ParseUint(strings.TrimSpace(deviceSizeStr), 10, 64)
 	if err != nil {
-		err = fmt.Errorf("Unable to convert disk size '%s' to integer: %w", deviceSizeStr, err)
+		err = fmt.Errorf("unable to convert disk size '%s' to integer: %w", deviceSizeStr, err)
 		return
 	}
 
@@ -244,7 +244,7 @@ func PrepReadOnlyDevice(partDevPath string, partition configuration.Partition, r
 	}
 	_, stderr, err = shell.Execute("dmsetup", dmsetupArgs...)
 	if err != nil {
-		err = fmt.Errorf("Unable to create a device mapper device '%s': %w", stderr, err)
+		err = fmt.Errorf("unable to create a device mapper device '%s': %w", stderr, err)
 		return
 	}
 
@@ -257,7 +257,7 @@ func PrepReadOnlyDevice(partDevPath string, partition configuration.Partition, r
 func (v *VerityDevice) CleanupVerityDevice() (err error) {
 	stdout, stderr, err := shell.Execute("dmsetup", "remove", v.MappedName)
 	if err != nil {
-		err = fmt.Errorf("Unable to clean up device mapper device '%s' '%s': %w", stdout, stderr, err)
+		err = fmt.Errorf("unable to clean up device mapper device '%s' '%s': %w", stdout, stderr, err)
 		logger.Log.Error(err.Error())
 		return
 	}

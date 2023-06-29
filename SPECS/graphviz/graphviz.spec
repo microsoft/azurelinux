@@ -45,7 +45,7 @@
 Summary:        Graph Visualization Tools
 Name:           graphviz
 Version:        2.42.4
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        EPL-1.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -77,6 +77,7 @@ BuildRequires:  pango-devel
 BuildRequires:  perl
 # Temporary workaound for perl(Carp) not pulled
 BuildRequires:  perl-Carp
+BuildRequires:  perl-ExtUtils-Embed
 BuildRequires:  perl-devel
 BuildRequires:  pkg-config
 BuildRequires:  python3-devel
@@ -147,6 +148,7 @@ Provides some additional PDF and HTML documentation for graphviz.
 %package gd
 Summary:        Graphviz plugin for renderers based on gd
 Requires:       %{name} = %{version}-%{release}
+Requires:       freefont
 Requires(post): %{_bindir}/dot
 Requires(post): /sbin/ldconfig
 Requires(postun): %{_bindir}/dot
@@ -266,7 +268,8 @@ sed -i 's|_MY_JAVA_INCLUDES_|-I%{java_home}/include/ -I%{java_home}/include/linu
 %configure --with-x --disable-static --disable-dependency-tracking \
 	--without-mylibgd --with-ipsepcola --with-pangocairo \
 	--without-gdk-pixbuf --with-visio --disable-silent-rules \
-  --without-ruby --without-python2 \
+    --without-ruby --without-python2 \
+    --with-freetypeincludedir=%{_includedir}/freetype2 --with-freetypelibdir=%{_libdir}/lib \
 %if ! %{LASI}
 	--without-lasi \
 %endif
@@ -515,6 +518,11 @@ php --no-php-ini \
 %{_mandir}/man3/*.3tcl*
 
 %changelog
+* Thu Jun 22 2023 Osama Esmail <osamaesmail@microsoft.com> - 2.42.4-8
+- Trying some more `freefont` fixes (added Requires to gd)
+- Added freetype option to build
+- `dot` complains about not having URW1 fonts, but works anyway
+
 * Wed Mar 08 2023 Osama Esmail <osamaesmail@microsoft.com> - 2.42.4-7
 - Add `freefont` to BuildRequires to provide default font for graphviz
 
