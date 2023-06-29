@@ -34,7 +34,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://www.mellanox.com/
-Source:         https://www.mellanox.com/downloads/ofed/"%{name}"-"%{version}"-0.5.3.tgz
+Source:         https://www.mellanox.com/downloads/ofed/%{name}-%{version}-0.5.3.tgz
 %global MLNX_OFED_VERSION 23.04
 %global MLNX_OFED_RELEASE 0.5.3
 %global WITH_SYSTEMD %(if ( test -d "%{_unitdir}" > /dev/null); then echo -n '1'; else echo -n '0'; fi)
