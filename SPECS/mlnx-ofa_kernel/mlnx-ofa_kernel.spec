@@ -25,48 +25,6 @@
 # and/or other materials provided with the distribution.
 #
 #
-
-%global WITH_SYSTEMD %(if ( test -d "%{_unitdir}" > /dev/null); then echo -n '1'; else echo -n '0'; fi)
-
-%{!?configure_options: %global configure_options --with-core-mod --with-user_mad-mod --with-user_access-mod --with-addr_trans-mod --with-mlx5-mod --with-mlxfw-mod --with-ipoib-mod}
-
-%global MEMTRACK %(if ( echo %{configure_options} | grep "with-memtrack" > /dev/null ); then echo -n '1'; else echo -n '0'; fi)
-%global MADEYE %(if ( echo %{configure_options} | grep "with-madeye-mod" > /dev/null ); then echo -n '1'; else echo -n '0'; fi)
-
-%global WINDRIVER %(if (grep -qiE "Wind River" %{_sysconfdir}/issue %{_sysconfdir}/*release* 2>/dev/null); then echo -n '1'; else echo -n '0'; fi)
-%global POWERKVM %(if (grep -qiE "powerkvm" %{_sysconfdir}/issue %{_sysconfdir}/*release* 2>/dev/null); then echo -n '1'; else echo -n '0'; fi)
-%global BLUENIX %(if (grep -qiE "Bluenix" %{_sysconfdir}/issue %{_sysconfdir}/*release* 2>/dev/null); then echo -n '1'; else echo -n '0'; fi)
-%global XENSERVER65 %(if (grep -qiE "XenServer.*6\.5" %{_sysconfdir}/issue %{_sysconfdir}/*release* 2>/dev/null); then echo -n '1'; else echo -n '0'; fi)
-
-# MarinerOS 1.0 sets -fPIE in the hardening cflags
-# (in the gcc specs file).
-# This seems to break only this package and not other kernel packages.
-%if "%{_vendor}" == "mariner"
-%global _hardened_cflags %{nil}
-%endif
-
-%global KVERSION %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-devel))
-%global K_SRC %{_libdir}/modules/%{KVERSION}/build
-%global moddestdir %{buildroot}%{_libdir}/modules/%{KVERSION}/kernel/
-
-# Select packages to build
-
-# Kernel module packages to be included into kernel-ib
-%global build_ipoib %(if ( echo %{configure_options} | grep "with-ipoib-mod" > /dev/null ); then echo -n '1'; else echo -n '0'; fi)
-%global build_oiscsi %(if ( echo %{configure_options} | grep "with-iscsi-mod" > /dev/null ); then echo -n '1'; else echo -n '0'; fi)
-%global build_mlx5 %(if ( echo %{configure_options} | grep "with-mlx5-mod" > /dev/null ); then echo -n '1'; else echo -n '0'; fi)
-
-%{!?LIB_MOD_DIR: %global LIB_MOD_DIR /lib/modules/%{KVERSION}/updates}
-%{!?IB_CONF_DIR: %global IB_CONF_DIR %{_sysconfdir}/infiniband}
-%{!?KERNEL_SOURCES: %global KERNEL_SOURCES %K_SRC}
-
-%global MLNX_OFED_VERSION 23.04
-%global MLNX_OFED_RELEASE 0.5.3
-
-%global utils_pname %{name}
-%global devel_pname %{name}-devel
-%global non_kmp_pname %{name}-modules
-
 Summary:        Infiniband HCA Driver
 Name:           mlnx-ofa_kernel
 # Update OFED version along with version updates
@@ -78,6 +36,37 @@ Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://www.mellanox.com/
 Source:         https://www.mellanox.com/downloads/ofed/%{name}-%{MLNX_OFED_VERSION}-%{MLNX_OFED_RELEASE}.tgz
+%global WITH_SYSTEMD %(if ( test -d "%{_unitdir}" > /dev/null); then echo -n '1'; else echo -n '0'; fi)
+%{!?configure_options: %global configure_options --with-core-mod --with-user_mad-mod --with-user_access-mod --with-addr_trans-mod --with-mlx5-mod --with-mlxfw-mod --with-ipoib-mod}
+%global MEMTRACK %(if ( echo %{configure_options} | grep "with-memtrack" > /dev/null ); then echo -n '1'; else echo -n '0'; fi)
+%global MADEYE %(if ( echo %{configure_options} | grep "with-madeye-mod" > /dev/null ); then echo -n '1'; else echo -n '0'; fi)
+%global WINDRIVER %(if (grep -qiE "Wind River" %{_sysconfdir}/issue %{_sysconfdir}/*release* 2>/dev/null); then echo -n '1'; else echo -n '0'; fi)
+%global POWERKVM %(if (grep -qiE "powerkvm" %{_sysconfdir}/issue %{_sysconfdir}/*release* 2>/dev/null); then echo -n '1'; else echo -n '0'; fi)
+%global BLUENIX %(if (grep -qiE "Bluenix" %{_sysconfdir}/issue %{_sysconfdir}/*release* 2>/dev/null); then echo -n '1'; else echo -n '0'; fi)
+%global XENSERVER65 %(if (grep -qiE "XenServer.*6\.5" %{_sysconfdir}/issue %{_sysconfdir}/*release* 2>/dev/null); then echo -n '1'; else echo -n '0'; fi)
+# MarinerOS 1.0 sets -fPIE in the hardening cflags
+# (in the gcc specs file).
+# This seems to break only this package and not other kernel packages.
+%if "%{_vendor}" == "mariner"
+%global _hardened_cflags %{nil}
+%endif
+%global KVERSION %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-devel))
+%global K_SRC %{_libdir}/modules/%{KVERSION}/build
+%global moddestdir %{buildroot}%{_libdir}/modules/%{KVERSION}/kernel/
+# Select packages to build
+# Kernel module packages to be included into kernel-ib
+%global build_ipoib %(if ( echo %{configure_options} | grep "with-ipoib-mod" > /dev/null ); then echo -n '1'; else echo -n '0'; fi)
+%global build_oiscsi %(if ( echo %{configure_options} | grep "with-iscsi-mod" > /dev/null ); then echo -n '1'; else echo -n '0'; fi)
+%global build_mlx5 %(if ( echo %{configure_options} | grep "with-mlx5-mod" > /dev/null ); then echo -n '1'; else echo -n '0'; fi)
+%{!?LIB_MOD_DIR: %global LIB_MOD_DIR /lib/modules/%{KVERSION}/updates}
+%{!?IB_CONF_DIR: %global IB_CONF_DIR %{_sysconfdir}/infiniband}
+%{!?KERNEL_SOURCES: %global KERNEL_SOURCES %K_SRC}
+%global MLNX_OFED_VERSION 23.04
+%global MLNX_OFED_RELEASE 0.5.3
+%global utils_pname %{name}
+%global devel_pname %{name}-devel
+%global non_kmp_pname %{name}-modules
+
 BuildRequires:  kernel-devel
 BuildRequires:  kmod
 Requires:       coreutils
@@ -95,28 +84,32 @@ Utilities rpm with OFED release %{MLNX_OFED_VERSION}.
 %global kernel_source() %{K_SRC}
 %global kernel_release() %{KVERSION}
 %global flavors_to_build default
+
 %package -n %{non_kmp_pname}
 Version:        %{MLNX_OFED_VERSION}
 Summary:        Infiniband Driver and ULPs kernel modules
 Group:          System Environment/Libraries
+
 %description -n %{non_kmp_pname}
 Core, HW and ULPs kernel modules
 Non-KMP format kernel modules rpm.
 
 %package -n %{devel_pname}
+Summary:        Infiniband Driver and ULPs kernel modules sources
 Version:        %{MLNX_OFED_VERSION}
+Group:          System Environment/Libraries
 Requires:       coreutils
 Requires:       pciutils
 Requires(post): %{_sbindir}/update-alternatives
 Requires(postun): %{_sbindir}/update-alternatives
-Summary:        Infiniband Driver and ULPs kernel modules sources
-Group:          System Environment/Libraries
+
 %description -n %{devel_pname}
 Core, HW and ULPs kernel modules sources
 
 %package source
 Summary:        Source of the MLNX_OFED main kernel driver
 Group:          System Environment/Libraries
+
 %description source
 Source of the mlnx-ofa_kernel modules.
 
