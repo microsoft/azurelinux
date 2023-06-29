@@ -25,6 +25,8 @@
 # and/or other materials provided with the distribution.
 #
 #
+%global MLNX_OFED_VERSION 23.04
+%global MLNX_OFED_RELEASE 0.5.3
 Summary:        Infiniband HCA Driver
 Name:           mlnx-ofa_kernel
 # Update OFED version along with version updates
@@ -61,8 +63,6 @@ Source:         https://www.mellanox.com/downloads/ofed/%{name}-%{MLNX_OFED_VERS
 %{!?LIB_MOD_DIR: %global LIB_MOD_DIR /lib/modules/%{KVERSION}/updates}
 %{!?IB_CONF_DIR: %global IB_CONF_DIR %{_sysconfdir}/infiniband}
 %{!?KERNEL_SOURCES: %global KERNEL_SOURCES %{K_SRC}}
-%global MLNX_OFED_VERSION 23.04
-%global MLNX_OFED_RELEASE 0.5.3
 %global utils_pname %{name}
 %global devel_pname %{name}-devel
 %global non_kmp_pname %{name}-modules
