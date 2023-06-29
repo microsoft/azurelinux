@@ -96,7 +96,7 @@ elif [ -d %{_localstatedir}/lib/rpm-state/initramfs/pending ]; then \
         mkinitrd -q /boot/initrd.img-$k $k -k \
         if [[ $k == *mshv* ]]; then \
             cp /boot/initrd.img-$k /boot/efi/initrd.img-$k \
-        fi \ 
+        fi \
     done; \
 fi \
 %removal_action
