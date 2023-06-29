@@ -20,7 +20,7 @@ jobs:
       with:
         ref: '1.0-stable'
 
-    - name: Set up Go 1.18
+    - name: Set up Go 1.19
       uses: actions/setup-go@v2
       with:
         go-version: 1.19
@@ -48,7 +48,7 @@ jobs:
       with:
         ref: '1.0-stable'
 
-    - name: Set up Go 1.18
+    - name: Set up Go 1.19
       uses: actions/setup-go@v2
       with:
         go-version: 1.19
@@ -75,7 +75,7 @@ jobs:
       with:
         ref: '1.0-stable'
 
-    - name: Set up Go 1.18
+    - name: Set up Go 1.19
       uses: actions/setup-go@v2
       with:
         go-version: 1.19
