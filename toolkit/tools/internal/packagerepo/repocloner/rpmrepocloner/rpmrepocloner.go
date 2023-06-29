@@ -136,8 +136,6 @@ func ConstructCloner(destinationDir, tmpDir, workerTar, existingRpmsDir, toolcha
 // It will automatically resolve packages that describe a provide or file from a package.
 // The cloner will mark any package that locally built by setting preBuilt = true
 func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.PackageVer) (preBuilt bool, err error) {
-	const maxBatchSize = 50
-
 	timestamp.StartEvent("cloning packages", nil)
 	defer timestamp.StopEvent(nil)
 
@@ -167,30 +165,15 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 		r.chrootCloneDir,
 	}
 
-	// Setting install root to a temp directory to prevent TDNF
-	// from skipping over packages already installed in the chroot.
-	// The 'reinstall' command doesn't support the '--nodeps' flag.
+	logger.Log.Debugf("Will clone in total %d items.", len(packageNames))
 
-	packagesCount := len(packageNames)
-	logger.Log.Debugf("Will clone in total %d packages.", packagesCount)
+	for _, packageName := range packageNames {
+		logger.Log.Debugf("Cloning (%s).", packageName)
 
-	for i := 0; i < packagesCount; i += maxBatchSize {
-		batchEndIndex := i + maxBatchSize
-		if batchEndIndex > packagesCount {
-			batchEndIndex = packagesCount
-		}
-
-		currentPackageNames := packageNames[i:batchEndIndex]
-
-		finalArgs := make([]string, len(constantArgs)+len(currentPackageNames))
-		finalArgs = append(constantArgs, currentPackageNames...)
-
-		logger.Log.Debugf("Cloning batch %d to %d: %v", i, batchEndIndex, currentPackageNames)
-		err = r.chroot.Run(func() (err error) {
-			var chrootErr error
-			// Consider the toolchain RPMs first, then built RPMs, then the already cached, and finally all remote packages.
+		finalArgs := append(constantArgs, packageName)
+		err = r.chroot.Run(func() (chrootErr error) {
 			preBuilt, chrootErr = r.clonePackage(finalArgs)
-			return chrootErr
+			return
 		})
 
 		if err != nil {
