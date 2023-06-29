@@ -9,7 +9,7 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -343,6 +343,10 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
+* Tue May 16 2023 Chris PeBenito <chpebeni@microsoft.com> - 2.20221101-3
+- Fix missing role associations in cloud-init patch.
+- Fix missing require in mkinitrd patch.
+
 * Tue Apr 11 2023 Chris PeBenito <chpebeni@microsoft.com> - 2.20221101-2
 - Handle non-standard location for iptables rules configuration.
 - Add further cloud-init permissions to handle a wider variety of use cases
