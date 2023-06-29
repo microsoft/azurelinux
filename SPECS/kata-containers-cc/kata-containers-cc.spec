@@ -17,6 +17,8 @@ Source1:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{n
 Source2:      %{name}-%{version}-cargo.tar.gz
 Source3:      mariner-coco-build-uvm.sh
 
+Patch0:       0001-Enable-using-an-igvm-file-with-cloud-hypervisor.patch
+
 ExclusiveArch: x86_64
 
 BuildRequires:  golang
