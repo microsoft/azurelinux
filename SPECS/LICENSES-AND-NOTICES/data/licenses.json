@@ -1736,7 +1736,6 @@
                 "python-requests-oauthlib",
                 "python-requests-toolbelt",
                 "python-requests_ntlm",
-                "python-resolvelib",
                 "python-responses",
                 "python-retrying",
                 "python-rfc3986",
@@ -2100,6 +2099,12 @@
             "specs": [
                 "libmemcached-awesome",
                 "librabbitmq"
+            ]
+        },
+        "Fedora (ISC)": {
+            "license": "[ISC License](https://github.com/sarugaku/resolvelib/blob/main/LICENSE)",
+            "specs": [
+                "python-resolvelib"
             ]
         },
         "Magnus Edenhill Open Source": {
