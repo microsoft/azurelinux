@@ -27,7 +27,7 @@
 #
 Summary:        Infiniband HCA Driver
 Name:           mlnx-ofa_kernel
-Version:        %{MLNX_OFED_VERSION}
+Version:        23.04
 Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
