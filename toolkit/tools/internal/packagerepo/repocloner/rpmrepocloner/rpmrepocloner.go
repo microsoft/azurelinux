@@ -378,8 +378,8 @@ func (r *RpmRepoCloner) initializeMountedChrootRepo(repoDir string) (err error) 
 // Clone clones the provided list of packages.
 // If cloneDeps is set, package dependencies will also be cloned.
 // It will automatically resolve packages that describe a provide or file from a package.
-// The cloner will mark any package that locally built by setting preBuilt = true
-func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.PackageVer) (preBuilt bool, err error) {
+// If all packages were pre-built, the cloner will set allPackagesPrebuilt = true.
+func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.PackageVer) (allPackagesPrebuilt bool, err error) {
 	timestamp.StartEvent("cloning packages", nil)
 	defer timestamp.StopEvent(nil)
 
@@ -399,13 +399,17 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 
 	logger.Log.Debugf("Will clone in total %d items.", len(packagesToClone))
 
+	allPackagesPrebuilt = true
 	for _, packageToClone := range packagesToClone {
 		logger.Log.Debugf("Cloning (%s).", packageToClone)
 
 		packageArg := convertPackageVersionToTdnfArg(packageToClone)
 		finalArgs := append(constantArgs, packageArg)
 		err = r.chroot.Run(func() (chrootErr error) {
-			preBuilt, chrootErr = r.clonePackage(finalArgs)
+			prebuilt, chrootErr := r.clonePackage(finalArgs)
+			if !prebuilt {
+				allPackagesPrebuilt = false
+			}
 			return
 		})
 

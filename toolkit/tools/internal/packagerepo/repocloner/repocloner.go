@@ -26,7 +26,7 @@ type RepoPackage struct {
 // It is capable of generate a local repository consisting of a set of request packages
 // and their dependencies.
 type RepoCloner interface {
-	Clone(cloneDeps bool, packagesToClone ...*pkgjson.PackageVer) (prebuiltPackage bool, err error)
+	Clone(cloneDeps bool, packagesToClone ...*pkgjson.PackageVer) (allPackagesPrebuilt bool, err error)
 	CloneDirectory() string
 	ClonedRepoContents() (repoContents *RepoContents, err error)
 	Close() error
