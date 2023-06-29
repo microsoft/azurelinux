@@ -77,7 +77,7 @@ Requires:       module-init-tools
 Requires:       pciutils
 Requires:       procps
 
-%description 
+%description
 
 InfiniBand "verbs", Access Layer  and ULPs.
 Utilities rpm with OFED release %{MLNX_OFED_VERSION}.
