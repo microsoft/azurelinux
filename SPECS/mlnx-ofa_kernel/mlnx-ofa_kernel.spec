@@ -27,16 +27,15 @@
 #
 Summary:        Infiniband HCA Driver
 Name:           mlnx-ofa_kernel
-Version:        23.04
+Version:        23.04-0.5.3
 Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://www.mellanox.com/
-Source:         https://www.mellanox.com/downloads/ofed/"%{name}"-"%{version}"-"%{MLNX_OFED_RELEASE}".tgz
-%global MLNX_OFED_VERSION 23.04
-%global MLNX_OFED_RELEASE 0.5.3
+Source:         https://www.mellanox.com/downloads/ofed/"%{name}"-"%{version}".tgz
+%global MLNX_OFED_VERSION 23.04-0.5.3
 %global WITH_SYSTEMD %(if ( test -d "%{_unitdir}" > /dev/null); then echo -n '1'; else echo -n '0'; fi)
 %{!?configure_options: %global configure_options --with-core-mod --with-user_mad-mod --with-user_access-mod --with-addr_trans-mod --with-mlx5-mod --with-mlxfw-mod --with-ipoib-mod}
 %global MEMTRACK %(if ( echo %{configure_options} | grep "with-memtrack" > /dev/null ); then echo -n '1'; else echo -n '0'; fi)
