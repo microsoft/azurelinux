@@ -139,18 +139,6 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 	timestamp.StartEvent("cloning packages", nil)
 	defer timestamp.StopEvent(nil)
 
-	if len(packagesToClone) == 0 {
-		logger.Log.Debug("No packages to clone.")
-		return
-	}
-
-	packageNames := make([]string, len(packagesToClone))
-	index := 0
-	for _, pkg := range packagesToClone {
-		packageNames[index] = convertPackageVersionToTdnfArg(pkg)
-		index++
-	}
-
 	depsSwitch := "--nodeps"
 	if cloneDeps {
 		depsSwitch = "--alldeps"
@@ -165,12 +153,13 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 		r.chrootCloneDir,
 	}
 
-	logger.Log.Debugf("Will clone in total %d items.", len(packageNames))
+	logger.Log.Debugf("Will clone in total %d items.", len(packagesToClone))
 
-	for _, packageName := range packageNames {
-		logger.Log.Debugf("Cloning (%s).", packageName)
+	for _, packageToClone := range packagesToClone {
+		logger.Log.Debugf("Cloning (%s).", packageToClone)
 
-		finalArgs := append(constantArgs, packageName)
+		packageArg := convertPackageVersionToTdnfArg(packageToClone)
+		finalArgs := append(constantArgs, packageArg)
 		err = r.chroot.Run(func() (chrootErr error) {
 			preBuilt, chrootErr = r.clonePackage(finalArgs)
 			return
