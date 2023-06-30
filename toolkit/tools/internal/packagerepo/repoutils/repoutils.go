@@ -36,7 +36,7 @@ func RestoreClonedRepoContents(cloner repocloner.RepoCloner, srcFile string) (er
 	}
 
 	uniquePackages := removePackageDuplicates(repo.Repo)
-	packagesToDownload := removeDownloadedPackages(uniquePackages, cloner.CloneDirectory())
+	packagesToDownload := filterOutDownloadedPackage(uniquePackages, cloner.CloneDirectory())
 
 	_, err = cloner.Clone(cloneDeps, packagesToDownload...)
 	if err != nil {
@@ -89,7 +89,7 @@ func removePackageDuplicates(packages []*repocloner.RepoPackage) []*repocloner.R
 	return uniquePackages[:index]
 }
 
-func removeDownloadedPackages(packages []*repocloner.RepoPackage, cloneDirectory string) []*pkgjson.PackageVer {
+func filterOutDownloadedPackage(packages []*repocloner.RepoPackage, cloneDirectory string) []*pkgjson.PackageVer {
 	const packageCondition = "="
 
 	packageVers := make([]*pkgjson.PackageVer, len(packages))
