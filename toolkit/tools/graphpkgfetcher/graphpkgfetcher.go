@@ -288,22 +288,9 @@ func downloadAllAvailableDeltaRPMs(realDependencyGraph, dependencyGraphDeltaCopy
 		srpmPaths[n.SrpmPath] = true
 	}
 
-	// Implicit nodes cause us troubles since we don't know exactly which RPMs they will be built from (so the cache
-	// fetcher will pull all of the possible matches). Since we are already matching against SRPMs, we can safely
-	// skip these nodes since they will be included in another node with the same SRPM and can be fixed up later.
-	skippedNodes := []*pkggraph.PkgNode{}
-	// We will need to keep track of the original path to delta path mapping so we can fix up the implicit nodes later.
-	originalPathToDeltaPathMap := make(map[string]string)
-
 	// For each build node, try to update it to a delta node with a downloaded RPM backing it.
 	logger.Log.Debugf("Resolving build nodes")
 	for _, n := range realDependencyGraph.AllBuildNodes() {
-		if n.Implicit {
-			logger.Log.Debugf("Skipping implicit delta build node %s", n)
-			skippedNodes = append(skippedNodes, n)
-			continue
-		}
-
 		// If this node isn't part of the optimized graph, skip it.
 		if _, ok := srpmPaths[n.SrpmPath]; !ok {
 			logger.Log.Debugf("Skipping non-optimized delta build node %s", n)
@@ -312,19 +299,10 @@ func downloadAllAvailableDeltaRPMs(realDependencyGraph, dependencyGraphDeltaCopy
 
 		logger.Log.Debugf("Resolving build node %s", n)
 		if n.State == pkggraph.StateBuild {
-			err := downloadSingleDeltaRPM(realDependencyGraph, n, cloner, *outDir, &originalPathToDeltaPathMap)
+			err := downloadSingleDeltaRPM(realDependencyGraph, n, cloner, *outDir)
 			if err != nil {
 				return fmt.Errorf("failed to download delta RPM for build node %s: %w", n, err)
 			}
-		}
-	}
-
-	// Fix up the implicit nodes to point to the correct delta RPMs that we parsed earlier.
-	for _, n := range skippedNodes {
-		logger.Log.Debugf("Fixing up skipped node %s", n)
-		err = fixupDeltaImplicitNode(realDependencyGraph, n, &originalPathToDeltaPathMap)
-		if err != nil {
-			return fmt.Errorf("failed to fixup skipped node %s: %w", n, err)
 		}
 	}
 
@@ -339,10 +317,8 @@ func downloadAllAvailableDeltaRPMs(realDependencyGraph, dependencyGraphDeltaCopy
 //   - realBuildNode: The build node to update. This node should be from the real graph as we will be updating it directly.
 //     to find the actual build node in the graph.
 //   - cloner: The cloner to use to download the RPMs
-//   - deltaRpmDir: The directory to download the RPMs into (likely the same as the normal RPM cache)
-//   - pathMap: A map of the original path to the delta path for each RPM that was downloaded. This is used to fix up
-//     the implicit nodes later.
-func downloadSingleDeltaRPM(realDependencyGraph *pkggraph.PkgGraph, realBuildNode *pkggraph.PkgNode, cloner *rpmrepocloner.RpmRepoCloner, deltaRpmDir string, pathMap *map[string]string) (err error) {
+//   - deltaRpmDir: The directory to download the RPMs into
+func downloadSingleDeltaRPM(realDependencyGraph *pkggraph.PkgGraph, realBuildNode *pkggraph.PkgNode, cloner *rpmrepocloner.RpmRepoCloner, deltaRpmDir string) (err error) {
 	const downloadDependencies = false
 	var lookup *pkggraph.LookupNode
 
@@ -351,7 +327,10 @@ func downloadSingleDeltaRPM(realDependencyGraph *pkggraph.PkgGraph, realBuildNod
 		return err
 	}
 
-	timestamp.StartEvent(fmt.Sprintf("downloading delta node %s", realBuildNode.VersionedPkg.Name), nil)
+	// Replace all '/' with '_' in the package name to get a valid timestamp name
+	// e.g. "bin/ls" -> "bin_ls"
+	tsName := strings.ReplaceAll(realBuildNode.VersionedPkg.Name, "/", "_")
+	timestamp.StartEvent(fmt.Sprintf("downloading delta node %s", tsName), nil)
 	defer timestamp.StopEvent(nil)
 
 	lookup, err = realDependencyGraph.FindExactPkgNodeFromPkg(realBuildNode.VersionedPkg)
@@ -361,11 +340,6 @@ func downloadSingleDeltaRPM(realDependencyGraph *pkggraph.PkgGraph, realBuildNod
 	}
 	if lookup == nil || lookup.RunNode == nil {
 		err = fmt.Errorf("can't find run lookup '%v' in graph", lookup)
-		return err
-	}
-
-	if lookup.BuildNode != realBuildNode {
-		err = fmt.Errorf("real build node '%v' does not match build node in the graph lookup '%v'", realBuildNode, lookup.BuildNode)
 		return err
 	}
 
@@ -404,14 +378,10 @@ func downloadSingleDeltaRPM(realDependencyGraph *pkggraph.PkgGraph, realBuildNod
 		realBuildNode.State = pkggraph.StateDelta
 		realRunNode.State = pkggraph.StateDelta
 
-		// Record the original path to delta path mapping so we can fix up the implicit nodes later.
-		(*pathMap)[originalRpmPath] = cachedRPMPath
 		// Update the build and run nodes to point to the new RPM in the cache
 		realRunNode.RpmPath = cachedRPMPath
 		realBuildNode.RpmPath = cachedRPMPath
 
-		logger.Log.Tracef("adding path map entry: %s -> %s", originalRpmPath, cachedRPMPath)
-		logger.Log.Tracef("PathMap updated: %v", *pathMap)
 		logger.Log.Debugf("Converted delta build node is now: '%s'", realBuildNode)
 		logger.Log.Debugf("Converted delta run node is now: '%s'", realRunNode)
 	} else {
@@ -419,48 +389,6 @@ func downloadSingleDeltaRPM(realDependencyGraph *pkggraph.PkgGraph, realBuildNod
 	}
 
 	return err
-}
-
-// fixupDeltaImplicitNode will fix up the build and run nodes associated with an implicit delta RPM node. They need to
-// have their RPM paths updated to point to the delta RPMs we downloaded due to another node.
-//   - pkgGraph: The graph to update
-//   - implicitNode: The implicit build node to update, this node need not be in the actual graph and will be used as a reference
-//     to find the actual build node in the graph.
-//   - pathMap: The map of original RPM paths to delta RPM paths that we have already downloaded.
-func fixupDeltaImplicitNode(realPkgGraph *pkggraph.PkgGraph, implicitNode *pkggraph.PkgNode, pathMap *map[string]string) (err error) {
-	var lookup *pkggraph.LookupNode
-
-	logger.Log.Debugf("Implicit node '%s' is a delta RPM, fixing up associated build and run nodes.", implicitNode)
-	lookup, err = realPkgGraph.FindExactPkgNodeFromPkg(implicitNode.VersionedPkg)
-	if err != nil {
-		err = fmt.Errorf("can't find implicit lookup node '%s' in graph: %w", implicitNode, err)
-		return
-	}
-	if lookup == nil || lookup.BuildNode == nil || lookup.RunNode == nil {
-		err = fmt.Errorf("can't find implicit build and run lookup '%v' in graph", lookup)
-		return
-	}
-
-	realBuildNode := lookup.BuildNode
-	realRunNode := lookup.RunNode
-
-	// Check if we have a path saved for this rpm
-	dstPath := realRunNode.RpmPath
-	logger.Log.Debugf("Found build node '%s' and run node '%s' for implicit node '%s'. Searching for an existing delta node with path '%s'", realBuildNode, realRunNode, implicitNode, dstPath)
-	if deltaPath, ok := (*pathMap)[dstPath]; ok {
-		logger.Log.Debugf("Found delta RPM for '%s' at '%s', updating build and run nodes.", implicitNode, dstPath)
-		realBuildNode.State = pkggraph.StateDelta
-		realRunNode.State = pkggraph.StateDelta
-
-		// Update the build and run nodes to point to the delta RPM
-		realBuildNode.RpmPath = deltaPath
-		realRunNode.RpmPath = deltaPath
-	} else {
-		logger.Log.Debugf("Can't find delta RPM for '%s' at '%s', skipping implicit delta update.", implicitNode, dstPath)
-		return
-	}
-
-	return
 }
 
 // resolveSingleNode caches the RPM for a single node.
