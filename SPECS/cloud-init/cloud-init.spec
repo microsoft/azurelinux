@@ -21,6 +21,7 @@ Patch4:         mariner-21.4.patch
 # backport patch https://github.com/canonical/cloud-init/commit/0988fb89be06aeb08083ce609f755509d08fa459.patch to 21.4
 Patch5:         azureds-set-ovf_is_accesible.patch
 Patch6:         CVE-2023-1786.patch
+Patch7:         CVE-2022-2084.patch
 
 BuildRequires:  automake
 BuildRequires:  dbus
@@ -163,8 +164,8 @@ rm -rf %{buildroot}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
-* Thu Jun 15 2023 Minghe Ren <mingheren@microsoft.com> - 21.4-3
-- Add patch for CVE-2023-1786
+* Tue Mar 22 2023 Minghe Ren <mingheren@microsoft.com> - 21.4-3
+- Add patch for CVE-2022-2084 and CVE-2023-1786
 
 * Tue Mar 22 2022 Anirudh Gopal <angop@microsoft.com> - 21.4-2
 - Backport cloud-init ovf_is_accessible DataSourceAzure.py fix to 21.4
