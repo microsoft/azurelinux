@@ -23,14 +23,16 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 )
 
+// RepoFlag* flags are used to denote which repos the cloner is allowed to use for its queries.
 const (
-	RepoFlagMarinerDefaults = uint64(1) << iota
-	RepoFlagDownloadedCache
-	RepoFlagLocalBuilds
-	RepoFlagPreview
-	RepoFlagToolchain
-	RepoFlagUpstream
+	RepoFlagMarinerDefaults = uint64(1) << iota // External default Mariner repos pre-installed in the chroot.
+	RepoFlagDownloadedCache                     // Local repo with the cached packages downloaded from upstream.
+	RepoFlagLocalBuilds                         // Local repo with the packages built from local spec files.
+	RepoFlagPreview                             // Separate flag to control the use of the Mariner preview packages repository.
+	RepoFlagToolchain                           // Local repo with the toolchain packages.
+	RepoFlagUpstream                            // Separate flag to control the use of all upstream packages repositories.
 
+	// A compound flag enabling all supported repositories.
 	RepoFlagAll = RepoFlagToolchain | RepoFlagLocalBuilds | RepoFlagDownloadedCache | RepoFlagPreview | RepoFlagMarinerDefaults | RepoFlagUpstream
 )
 
@@ -95,7 +97,6 @@ type RpmRepoCloner struct {
 	chroot                *safechroot.Chroot
 	chrootCloneDir        string
 	defaultMarinerRepoIDs []string
-	externalRepoIDs       map[string]bool
 	mountedCloneDir       string
 	repoIDCache           string
 	reposArgsList         [][]string
@@ -237,11 +238,6 @@ func (r *RpmRepoCloner) initialize(destinationDir, tmpDir, workerTar, existingRp
 	if buildpipeline.IsRegularBuild() {
 		r.chrootCloneDir = chrootCloneDirRegular
 		r.repoIDCache = repoIDCacheRegular
-	}
-
-	r.externalRepoIDs = map[string]bool{
-		r.repoIDCache: true,
-		repoIDAll:     true,
 	}
 
 	r.SetEnabledRepos(repoFlagClonerDefault)
@@ -792,7 +788,7 @@ func (r *RpmRepoCloner) reposArgsHaveOnlyLocalSources(reposArgs []string) bool {
 	for _, repoArg := range reposArgs {
 		if strings.Contains(repoArg, "--enablerepo=") {
 			repoID := strings.Split(repoArg, "=")[repoIDIndex]
-			if r.externalRepoIDs[repoID] {
+			if repoID != repoIDBuilt && repoID != repoIDToolchain {
 				return false
 			}
 		}
