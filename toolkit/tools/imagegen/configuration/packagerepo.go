@@ -102,7 +102,7 @@ func UpdatePackageRepo(installChroot *safechroot.Chroot, config SystemConfig) (e
 		err = ferr
 		return
 	} else if !exists {
-		err = fmt.Errorf("Could not find the repo file directory %s to update package repo", repoFileDir)
+		err = fmt.Errorf("could not find the repo file directory %s to update package repo", repoFileDir)
 		return
 	}
 
