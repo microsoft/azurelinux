@@ -2,17 +2,18 @@
 Summary:        DBus for systemd
 Name:           dbus
 Version:        1.15.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+ OR AFL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/File
 URL:            https://www.freedesktop.org/wiki/Software/dbus
 Source0:        https://%{name}.freedesktop.org/releases/%{name}/%{name}-%{version}.tar.xz
+BuildRequires:  audit-devel
 BuildRequires:  expat-devel
+BuildRequires:  libselinux-devel
 BuildRequires:  systemd-bootstrap-devel
 BuildRequires:  xz-devel
-BuildRequires:  libselinux-devel
 Requires:       expat
 Requires:       xz
 # Using the weak dependency 'Recommends' to break a circular dependency during
@@ -20,7 +21,6 @@ Requires:       xz
 # In real-life situations systemd will always be present and thus installed.
 Recommends:     systemd
 Provides:       dbus-libs = %{version}-%{release}
-
 # NOTE: We currently do not build with X11 support.
 # build with X11 support in the future.
 Provides:       %{name}-x11
@@ -42,7 +42,7 @@ It contains the libraries and header files to create applications
 %build
 %configure \
     --docdir=%{_versioneddocdir}  \
-    --enable-libaudit=no \
+    --enable-libaudit=yes \
     --enable-selinux=yes \
     --with-console-auth-dir=/run/console
 
@@ -86,6 +86,9 @@ make %{?_smp_mflags} check
 %{_libdir}/*.so
 
 %changelog
+* Tue Jun 27 2023 Chris Gunn <chrisgun@microsoft.com> - 1.15.2-3
+- Enable audit integration
+
 * Fri Oct 14 2022 Muhammad Falak <mwani@microsoft.com> - 1.15.2-2
 - Add an explicit provides `dbus-x11`
 

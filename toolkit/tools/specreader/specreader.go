@@ -24,6 +24,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/rpm"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/profile"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/scheduler/schedulerutils"
 
 	"github.com/jinzhu/copier"
@@ -56,6 +57,7 @@ var (
 	runCheck                = app.Flag("run-check", "Whether or not to run the spec file's check section during package build.").Bool()
 	logFile                 = exe.LogFileFlag(app)
 	logLevel                = exe.LogLevelFlag(app)
+	profFlags               = exe.SetupProfileFlags(app)
 	timestampFile           = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
 )
 
@@ -63,6 +65,12 @@ func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
+
+	prof, err := profile.StartProfiling(profFlags)
+	if err != nil {
+		logger.Log.Warnf("Could not start profiling: %s", err)
+	}
+	defer prof.StopProfiler()
 
 	timestamp.BeginTiming("specreader", *timestampFile)
 	defer timestamp.CompleteTiming()
@@ -106,13 +114,13 @@ func parseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, toolchainDir, dist
 		if *targetArch == "" {
 			packageRepo, parseError = parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, buildArch, toolchainRPMs, workers, runCheck)
 			if parseError != nil {
-				err := fmt.Errorf("Failed to parse native specs (%w)", parseError)
+				err := fmt.Errorf("failed to parse native specs (%w)", parseError)
 				return err
 			}
 		} else {
 			packageRepo, parseError = parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, *targetArch, toolchainRPMs, workers, runCheck)
 			if parseError != nil {
-				err := fmt.Errorf("Failed to parse cross specs (%w)", parseError)
+				err := fmt.Errorf("failed to parse cross specs (%w)", parseError)
 				return err
 			}
 		}

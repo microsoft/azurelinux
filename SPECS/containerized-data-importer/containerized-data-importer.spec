@@ -18,7 +18,7 @@
 Summary:        Container native virtualization
 Name:           containerized-data-importer
 Version:        1.55.0
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -62,6 +62,7 @@ Controller for the data fetching service for VM container images
 %package        importer
 Summary:        Data fetching service
 Group:          System/Packages
+Requires:       nbdkit
 
 %description    importer
 Data fetching service for VM container imagess
@@ -197,6 +198,9 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %{_datadir}/cdi/manifests
 
 %changelog
+* Tue Jun 27 2023 Vince Perri <viperri@microsoft.com> - 1.55.0-12
+- Add nbkdit as a dependency for the importer
+
 * Thu Jun 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.55.0-11
 - Bump release to rebuild with go 1.19.10
 
