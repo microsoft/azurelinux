@@ -28,7 +28,7 @@
 Summary:        Infiniband HCA Driver
 Name:           mlnx-ofa_kernel
 Version:        23.04
-Release:        3%{?dist}
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -441,6 +441,11 @@ update-alternatives --remove \
 %{_prefix}/src/mlnx-ofa_kernel-%{version}
 
 %changelog
+* Fri Jun 30 2023 Juan Camposeco <juanarturoc@microsoft.com> - 23.04-0
+- Update ofa_kernel to 23.04
+- Remove highest_supported_kernel and not applicable Obsoletes
+- Linting formatting
+
 * Thu Mar 23 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.6-2
 - Add highest_supported_kernel macro = 5.15.87.1
 - Add BuildRequires for kernel-devel <= highest_supported_kernel
