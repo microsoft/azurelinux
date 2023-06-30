@@ -3,7 +3,7 @@
 Summary:        Smart card library and applications
 Name:           opensc
 Version:        0.22.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,7 @@ URL:            https://github.com/OpenSC/OpenSC
 Source0:        https://github.com/OpenSC/OpenSC/releases/download/%{version}/%{name}-%{version}.tar.gz
 Source1:        opensc.module
 Patch1:         opensc-0.19.0-pinpad.patch
+Patch2:         CVE-2023-2977.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  bash-completion
@@ -140,6 +141,9 @@ rm %{buildroot}%{_mandir}/man1/opensc-notify.1*
 %{_mandir}/man5/*
 
 %changelog
+* Mon Jun 12 2023 Henry Beberman <henry.beberman@microsoft.com> - 0.22.0-3
+- Apply upstream patch for CVE-2023-2977
+
 * Tue Jul 12 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.22.0-2
 - test-pkcs11-tool-test-threads is marked as xfail upstream- remove Fedora-specific line un-xfailing the test
 - Remove obsoletes for packages Mariner has never shipped 

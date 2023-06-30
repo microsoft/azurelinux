@@ -1,13 +1,14 @@
 Summary:        Modular Assembler
 Name:           yasm
 Version:        1.3.0
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        BSD and (GPLv2+ or Artistic or LGPLv2+) and LGPLv2
 URL:            https://yasm.tortall.net/
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://www.tortall.net/projects/%{name}/releases/%{name}-%{version}.tar.gz
 Patch1:         0001-Update-elf-objfmt.c.patch
+Patch2:         CVE-2023-31975.patch
 
 BuildRequires:  gcc
 BuildRequires:  bison
@@ -43,9 +44,7 @@ Install this package if you need to rebuild applications that use yasm.
 
 
 %prep
-%setup -q
-%patch1 -p1
-
+%autosetup -p1
 
 %build
 %configure
@@ -74,6 +73,9 @@ make install DESTDIR=%{buildroot}
 
 
 %changelog
+* Tue Jun 13 2023 Henry Beberman <henry.beberman@microsoft.com> - 1.3.0-14
+- Apply upstream patch for CVE-2023-31975
+
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> 1.3.0-13
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 - License verified

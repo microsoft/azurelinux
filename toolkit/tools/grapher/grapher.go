@@ -11,6 +11,8 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/profile"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -22,8 +24,10 @@ var (
 
 	logFile          = exe.LogFileFlag(app)
 	logLevel         = exe.LogLevelFlag(app)
+	profFlags        = exe.SetupProfileFlags(app)
 	strictGoals      = app.Flag("strict-goals", "Don't allow missing goal packages").Bool()
 	strictUnresolved = app.Flag("strict-unresolved", "Don't allow missing unresolved packages").Bool()
+	timestampFile    = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
 
 	depGraph = pkggraph.NewPkgGraph()
 )
@@ -33,9 +37,16 @@ func main() {
 
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-
-	var err error
 	logger.InitBestEffort(*logFile, *logLevel)
+
+	prof, err := profile.StartProfiling(profFlags)
+	if err != nil {
+		logger.Log.Warnf("Could not start profiling: %s", err)
+	}
+	defer prof.StopProfiler()
+
+	timestamp.BeginTiming("grapher", *timestampFile)
+	defer timestamp.CompleteTiming()
 
 	localPackages := pkgjson.PackageRepo{}
 	err = localPackages.ParsePackageJSON(*input)
@@ -43,6 +54,7 @@ func main() {
 		logger.Log.Panic(err)
 	}
 
+	depGraph := pkggraph.NewPkgGraph()
 	err = populateGraph(depGraph, &localPackages)
 	if err != nil {
 		logger.Log.Panic(err)
@@ -246,7 +258,12 @@ func addPkgDependencies(g *pkggraph.PkgGraph, pkg *pkgjson.Package) (dependencie
 // populateGraph adds all the data contained in the PackageRepo structure into
 // the graph.
 func populateGraph(graph *pkggraph.PkgGraph, repo *pkgjson.PackageRepo) (err error) {
+	timestamp.StartEvent("populating graph", nil)
+	defer timestamp.StopEvent(nil)
+
 	packages := repo.Repo
+
+	timestamp.StartEvent("add package node", nil)
 
 	// Scan and add each package we know about
 	logger.Log.Infof("Adding all packages from %s", *input)
@@ -261,6 +278,9 @@ func populateGraph(graph *pkggraph.PkgGraph, repo *pkgjson.PackageRepo) (err err
 	}
 	logger.Log.Infof("\tAdded %d packages", len(packages))
 
+	timestamp.StopEvent(nil) // add package nodes
+	timestamp.StartEvent("add dependencies", nil)
+
 	// Rescan and add all the dependencies
 	logger.Log.Infof("Adding all dependencies from %s", *input)
 	dependenciesAdded := 0
@@ -274,6 +294,8 @@ func populateGraph(graph *pkggraph.PkgGraph, repo *pkgjson.PackageRepo) (err err
 		dependenciesAdded += num
 	}
 	logger.Log.Infof("\tAdded %d dependencies", dependenciesAdded)
+
+	timestamp.StopEvent(nil) // add dependencies
 
 	return err
 }

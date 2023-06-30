@@ -1,0 +1,34 @@
+From 54ae30cea7731b9949b7e503401f732f1e95e930 Mon Sep 17 00:00:00 2001
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Wed, 26 Apr 2023 14:38:34 +0200
+Subject: [PATCH 15/16] SecurityPkg: add TIS sanity check (tpm12)
+
+The code blindly assumes a TIS interface is present in case both CRB and
+FIFO checks fail.  Check the InterfaceType for TIS instead and only
+return PtpInterfaceTis in case it matches, PtpInterfaceMax otherwise.
+
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ SecurityPkg/Library/Tpm12DeviceLibDTpm/Tpm12Tis.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/SecurityPkg/Library/Tpm12DeviceLibDTpm/Tpm12Tis.c b/SecurityPkg/Library/Tpm12DeviceLibDTpm/Tpm12Tis.c
+index 51f43591287a..d2b79a274084 100644
+--- a/SecurityPkg/Library/Tpm12DeviceLibDTpm/Tpm12Tis.c
++++ b/SecurityPkg/Library/Tpm12DeviceLibDTpm/Tpm12Tis.c
+@@ -91,7 +91,11 @@ Tpm12GetPtpInterface (
+     return PtpInterfaceFifo;
+   }
+ 
+-  return PtpInterfaceTis;
++  if (InterfaceId.Bits.InterfaceType == PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_TIS) {
++    return PtpInterfaceTis;
++  }
++
++  return PtpInterfaceMax;
+ }
+ 
+ /**
+-- 
+2.40.0
+

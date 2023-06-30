@@ -1,0 +1,14 @@
+diff -pruN fonts-rpm-macros-2.0.5.orig/rpm/lua/srpm/fonts.lua fonts-rpm-macros-2.0.5/rpm/lua/srpm/fonts.lua
+--- fonts-rpm-macros-2.0.5.orig/rpm/lua/srpm/fonts.lua	2020-04-03 07:55:50.000000000 +0900
++++ fonts-rpm-macros-2.0.5/rpm/lua/srpm/fonts.lua	2022-07-29 18:57:38.183789875 +0900
+@@ -118,7 +118,9 @@ local function env(suffix, verbose, glob
+       fedora.explicitunset("current" .. g,    verbose)
+     end
+   end
+-  local basename = rpm.expand("%{?foundry" .. suffix .. ":%{foundry" .. suffix .. "} }%{fontfamily" .. suffix .. "}")
++  local foundry = rpm.expand("%{?foundry" .. suffix .. ":%{foundry" .. suffix .. "}}")
++  local family = string.gsub(rpm.expand("%{fontfamily" .. suffix .. "}"), "^" .. foundry, "")
++  local basename = foundry .. " " .. family
+   fedora.safeset("fontpkgname"   .. suffix, rpmname(basename), verbose)
+   fedora.safeset("fonthumanname" .. suffix, basename, verbose)
+   fedora.safeset("fontdir"       .. suffix, "%{_fontbasedir}/%{fontpkgname"  .. suffix .. "}", verbose)

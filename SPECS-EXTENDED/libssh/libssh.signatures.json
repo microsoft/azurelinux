@@ -1,9 +1,0 @@
-{
- "Signatures": {
-  "libssh-0.9.5.tar.xz": "acffef2da98e761fc1fd9c4fddde0f3af60ab44c4f5af05cd1b2d60a3fa08718",
-  "libssh-0.9.5.tar.xz.asc": "e8b6141b7370ea08f83b5d78233e4ab0789a7dab8a11561accf36fb18544fae7",
-  "libssh.keyring": "3861ac6763ff3edf0bbbb05fe890962a5dbcd99b2e00fae16687fd480c7fab0f",
-  "libssh_client.config": "332db0f675f29a2f1295486489cd5b2d0fb9ead138674e8c890b2e69daa50035",
-  "libssh_server.config": "b779ac90d463057293a5474b014f3fc6e4fc342f2a96b068eb2cc40d6112b9c7"
- }
-}

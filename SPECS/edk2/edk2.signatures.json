@@ -1,0 +1,32 @@
+{
+ "Signatures": {
+  "30-edk2-ovmf-4m-qcow2-x64-sb-enrolled.json": "827c542dee2906d261c92c19f390637c1e653165d6a920c45651edd68e7fffd0",
+  "30-edk2-ovmf-ia32-sb-enrolled.json": "8ce4600fd84968adca9d037df9531d34ce455ad566d4691d256d370acc86120d",
+  "31-edk2-ovmf-2m-raw-x64-sb-enrolled.json": "e0237cf4909d129324953bd854caf79136065402a30d363f13e594fd0e493bcf",
+  "40-edk2-ovmf-4m-qcow2-x64-sb.json": "52ad30099a600dc9d03d60557a94e8c5459cd72124445109287ebf6971b879a1",
+  "40-edk2-ovmf-ia32-sb.json": "de562405d0f9a9400eb58239e10753455216196dface2631858bcf1a3c886ac7",
+  "41-edk2-ovmf-2m-raw-x64-sb.json": "c9c505b6308af28f29c16b4108f7f295408f975a47c94fb7aef523cb2a999d8e",
+  "50-edk2-aarch64-qcow2.json": "a62d1c8b3801a33d670863fd4824252f65b93b64af8e5fd8908e6e09d8d5db99",
+  "50-edk2-arm-verbose.json": "8805fce3e313705b7b43be6f2601776871c35bac0914fa05c34d09c929044253",
+  "50-edk2-ovmf-4m-qcow2-x64-nosb.json": "a97c1339a837d106ccb25132a68cdeaf13f2b7cff3d4c7411ce4457e75b68278",
+  "50-edk2-ovmf-ia32-nosb.json": "b360162bd55df3b1cb4bfa8d0b7c2b46a7c7b492aabf6d0d57c3dbf3d8c7fd10",
+  "50-edk2-ovmf-x64-microvm.json": "5136200cd26eff9387259b1ca0f352b64298283f990277ac7a1b7a94d87baa27",
+  "51-edk2-aarch64-raw.json": "7523b4dc263748fc8bee26e763aa94463222a8d2e8b738fdbde0d2b263ad562d",
+  "51-edk2-ovmf-2m-raw-x64-nosb.json": "59aec29aa157bb0f7e5242ff0de9932367d5314d9ce8159b97360b6d44da58f2",
+  "52-edk2-aarch64-verbose-qcow2.json": "132627485055270421667399465b06e954f85b8e6f14b2efa1d31aac1b83a6cb",
+  "53-edk2-aarch64-verbose-raw.json": "a03962c06b66b33d55ee8d62273dabe625f1525fd1a7769af2dc07e7889b2163",
+  "60-edk2-ovmf-x64-amdsev.json": "be371d99a31c7ed0b4ecd0180daa63161983b7b25639bb176edb63c7a10f05c8",
+  "60-edk2-ovmf-x64-inteltdx.json": "1ee3857228c0b749f097ba0f2096430a98cc337b36ae5ebc0602ffb8b5420938",
+  "DBXUpdate-20230509.ia32.bin": "b073eb71894e933e22d935cf45bf8319543819998522785d967f51fd87c85f85",
+  "DBXUpdate-20230509.x64.bin": "3e56c3d9e5b12edbd9e4006413d87fba099de1eba33d2bea566e742166cb366a",
+  "edk2-build.fedora": "24510e0171266ba2ad0c05d0642713a06d2e1bf110cb621fa537badcce6a289e",
+  "edk2-build.fedora.platforms": "dd50f91d43adceedbab91358b67973983762f2410af33fedb3a03ccaf03197d8",
+  "edk2-build.py": "505f6bef60135c9d12a0f243bab08bff4e5d384d557e82ae30f476a31931d11c",
+  "edk2-f80f052277c8.tar.xz": "3a6c90d31390a847b27d1070c7420d7fbbdf8f8342305e51977790839c5dd663",
+  "edk2-platforms-54306d023e7d.tar.xz": "102ea5103c3522c5666209e4b933686678d4c4e3298f83e1b7dba418e69712e3",
+  "edk2-jansson-2.13.1.tar.bz2": "ee90a0f879d2b7b7159124ff22b937a2a9a8c36d3bb65d1da7dd3f04370a10bd",
+  "edk2-openssl-d00c3c5b8a9d6d3ea3dabfcafdf36afd61ba8bcc.tar.xz": "615de54b35787df151aea967a6fc3ff35e7b5aad2890b0df27ff60a8a582ac90",
+  "ovmf-whitepaper-c770f8c.txt": "842518adadaa837914dbb13a6628002fb7f7acca107c6d6f41815b399dc9f8b8",
+  "edk2-softfloat-20180726-gitb64af41.tar.xz": "c7f2172357ca3022621b9464fd92bf2b462256bda3e019bf9a669fa6b5aeea91"
+ }
+}

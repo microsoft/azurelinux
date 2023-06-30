@@ -18,6 +18,16 @@ MARINER_INPUT_SRPMS_DIR=$9
 MARINER_OUTPUT_SRPMS_DIR=${10}
 MARINER_REHYDRATED_RPMS_DIR=${11}
 MARINER_TOOLCHAIN_MANIFESTS_FILE=${12}
+#  Time stamp components
+# =====================================================
+BLDTRACKER=${13}
+TIMESTAMP_FILE_PATH=${14}
+source $(dirname  $0)/../timestamp.sh
+# =====================================================
+
+begin_timestamp
+start_record_timestamp "prep_files"
+
 
 MARINER_LOGS=$MARINER_BUILD_DIR/logs
 TOOLCHAIN_LOGS=$MARINER_LOGS/toolchain
@@ -73,6 +83,9 @@ sudo rm -f $TOOLCHAIN_FAILURES
 sudo rm -rf $CHROOT_BUILDROOT_DIR
 touch $TOOLCHAIN_FAILURES
 
+stop_record_timestamp "prep_files"
+start_record_timestamp "hydrate"
+
 # If we're incrementally building and there are RPMs available to rehydrate from the repo, copy to the proper chroot RPM folder.
 # Empty files are indicative of a failure to download or a disabling of repo rehydration, so filter out empty RPMs.
 if [ "$INCREMENTAL_TOOLCHAIN" = "y" ]; then
@@ -95,6 +108,8 @@ if [ "$INCREMENTAL_TOOLCHAIN" = "y" ]; then
         fi
     done
 fi
+
+stop_record_timestamp "hydrate"
 
 chroot_mount () {
     trap chroot_unmount EXIT
@@ -142,6 +157,7 @@ chroot_and_print_installed_rpms () {
 }
 
 chroot_and_install_rpms () {
+    start_record_timestamp "build packages/install/$1"
     # $1 = SRPM name
     # $2 = qualified package name
     # Clean and then copy the RPM into the chroot directory for installation below
@@ -160,7 +176,7 @@ chroot_and_install_rpms () {
     fi
 
     chroot_mount
-    
+
     echo "RPM files to be installed..."
     chroot "$LFS" ls -la $CHROOT_INSTALL_RPM_DIR_IN_CHROOT
     echo "Installing the rpms..."
@@ -172,6 +188,7 @@ chroot_and_install_rpms () {
         rpm -i -vh --force --nodeps $CHROOT_INSTALL_RPM_DIR_IN_CHROOT/*
 
     chroot_unmount
+    stop_record_timestamp "build packages/install/$1"
 }
 
 chroot_and_run_rpmbuild () {
@@ -202,6 +219,7 @@ chroot_and_run_rpmbuild () {
 }
 
 build_rpm_in_chroot_no_install () {
+    start_record_timestamp "build packages/build/$1"
     # $1 = SRPM name
     # $2 = qualified package name
     specPath=$(find $SPECROOT -name "$1.spec" -print -quit)
@@ -234,6 +252,7 @@ build_rpm_in_chroot_no_install () {
         echo NOT installing the package $srpmName
     fi
     echo "$1" >> $TOOLCHAIN_BUILD_LIST
+    stop_record_timestamp "build packages/build/$1"
 }
 
 # Copy RPM subpackages that have a different prefix
@@ -242,6 +261,8 @@ copy_rpm_subpackage () {
     cp $CHROOT_RPMS_DIR_ARCH/$1* $FINISHED_RPM_DIR
     cp $CHROOT_RPMS_DIR_NOARCH/$1* $FINISHED_RPM_DIR
 }
+
+start_record_timestamp "build prep"
 
 echo Setting up initial chroot to build pass1 toolchain RPMs from SPECs
 
@@ -259,6 +280,11 @@ chmod +x $LFS/usr/lib/rpm/brp*
 cp /etc/resolv.conf $LFS/etc/
 
 chroot_and_print_installed_rpms
+
+stop_record_timestamp "build prep"
+start_record_timestamp "build packages"
+start_record_timestamp "build packages/build"
+start_record_timestamp "build packages/install"
 
 echo Building final list of toolchain RPMs
 build_rpm_in_chroot_no_install mariner-rpm-macros
@@ -288,7 +314,7 @@ build_rpm_in_chroot_no_install xz
 build_rpm_in_chroot_no_install zstd
 build_rpm_in_chroot_no_install lz4
 build_rpm_in_chroot_no_install m4
-build_rpm_in_chroot_no_install libcap
+build_rpm_in_chroot_no_install libcap libcap # Use full naming since we have a collision with libcap-ng
 build_rpm_in_chroot_no_install popt
 build_rpm_in_chroot_no_install tar
 build_rpm_in_chroot_no_install gawk
@@ -390,7 +416,7 @@ chroot_and_install_rpms lua lua
 build_rpm_in_chroot_no_install lua-rpm-macros
 chroot_and_install_rpms lua-rpm-macros
 
-# Build tdnf-3.2.2
+# Build tdnf-3.5.2
 build_rpm_in_chroot_no_install kmod
 build_rpm_in_chroot_no_install perl-XML-Parser
 build_rpm_in_chroot_no_install libssh2
@@ -560,7 +586,7 @@ copy_rpm_subpackage python3-jinja2
 
 # systemd-bootstrap requires libcap, xz, kbd, kmod, util-linux, meson, intltool, python3-jinja2
 # gperf is also needed, but is installed earlier
-chroot_and_install_rpms libcap
+chroot_and_install_rpms libcap libcap # Use full naming since we have a collision with libcap-ng
 chroot_and_install_rpms lz4
 chroot_and_install_rpms xz
 chroot_and_install_rpms kbd
@@ -608,6 +634,9 @@ build_rpm_in_chroot_no_install pyproject-rpm-macros
 build_rpm_in_chroot_no_install audit
 copy_rpm_subpackage python3-audit
 
+stop_record_timestamp "build packages"
+start_record_timestamp "finalize"
+
 chroot_and_print_installed_rpms
 
 # Ensure all RPMS are copied out of the chroot
@@ -619,3 +648,6 @@ echo Finished building final list of toolchain RPMs
 chroot_unmount
 ls -la $FINISHED_RPM_DIR
 ls -la $FINISHED_RPM_DIR | wc
+
+stop_record_timestamp "finalize"
+finish_timestamp

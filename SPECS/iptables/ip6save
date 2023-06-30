@@ -9,5 +9,31 @@
 #keep commented till upgrade issues are sorted
 #-A INPUT -j LOG --log-prefix "FIREWALL:INPUT "
 -A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
+# Support SLAAC
+-A INPUT -p udp --dport 546 -d fe80::/64 -j ACCEPT
+# Destination Unreachable 
+-A INPUT -p icmpv6 --icmpv6-type 1 -j ACCEPT
+# Packet Too Big
+-A INPUT -p icmpv6 --icmpv6-type 2 -j ACCEPT
+# Time Exceeded
+-A INPUT -p icmpv6 --icmpv6-type 3 -j ACCEPT
+# Parameter Problem
+-A INPUT -p icmpv6 --icmpv6-type 4 -j ACCEPT
+# Echo Request
+-A INPUT -p icmpv6 --icmpv6-type 128 -j ACCEPT
+# Echo Reply
+-A INPUT -p icmpv6 --icmpv6-type 129 -j ACCEPT
+# Router Solicitation 
+-A INPUT -p icmpv6 --icmpv6-type 133 -j ACCEPT
+# Router Advertisement
+-A INPUT -p icmpv6 --icmpv6-type 134 -j ACCEPT
+# Neighbour Solicitation
+-A INPUT -p icmpv6 --icmpv6-type 135 -j ACCEPT
+# Neighbour Advertisement
+-A INPUT -p icmpv6 --icmpv6-type 136 -j ACCEPT
+# Inverse Neighbour Discovery Solicitation
+-A INPUT -p icmpv6 --icmpv6-type 141 -j ACCEPT
+# Inverse Neighbour Discovery Advertisement
+-A INPUT -p icmpv6 --icmpv6-type 142 -j ACCEPT
 -A OUTPUT -j ACCEPT
 COMMIT

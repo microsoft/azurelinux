@@ -15,6 +15,8 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/profile"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -22,11 +24,14 @@ import (
 var (
 	app = kingpin.New("imageconfigvalidator", "A tool for validating image configuration files")
 
-	logFile  = exe.LogFileFlag(app)
-	logLevel = exe.LogLevelFlag(app)
+	logFile   = exe.LogFileFlag(app)
+	logLevel  = exe.LogLevelFlag(app)
+	profFlags = exe.SetupProfileFlags(app)
 
 	input       = exe.InputStringFlag(app, "Path to the image config file.")
 	baseDirPath = exe.InputDirFlag(app, "Base directory for relative file paths from the config.")
+
+	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
 )
 
 func main() {
@@ -35,6 +40,15 @@ func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
+
+	prof, err := profile.StartProfiling(profFlags)
+	if err != nil {
+		logger.Log.Warnf("Could not start profiling: %s", err)
+	}
+	defer prof.StopProfiler()
+
+	timestamp.BeginTiming("config validator", *timestampFile)
+	defer timestamp.CompleteTiming()
 
 	inPath, err := filepath.Abs(*input)
 	logger.PanicOnError(err, "Error when calculating input path")
@@ -46,7 +60,6 @@ func main() {
 	if err != nil {
 		logger.Log.Fatalf("Failed while loading image configuration '%s': %s", inPath, err)
 	}
-
 	// Basic validation will occur during load, but we can add additional checking here.
 	err = ValidateConfiguration(config)
 	if err != nil {
@@ -60,6 +73,9 @@ func main() {
 
 // ValidateConfiguration will run sanity checks on a configuration structure
 func ValidateConfiguration(config configuration.Config) (err error) {
+	timestamp.StartEvent("validating config", nil)
+	defer timestamp.StopEvent(nil)
+
 	err = config.IsValid()
 	if err != nil {
 		return
@@ -75,13 +91,17 @@ func ValidateConfiguration(config configuration.Config) (err error) {
 }
 
 func validateKickStartInstall(config configuration.Config) (err error) {
+	timestamp.StartEvent("validate kickstart", nil)
+	defer timestamp.StopEvent(nil)
+
 	// If doing a kickstart-style installation, then the image config file
 	// must not have any partitioning info because that will be provided
 	// by the preinstall script
+
 	for _, systemConfig := range config.SystemConfigs {
 		if systemConfig.IsKickStartBoot {
 			if len(config.Disks) > 0 || len(systemConfig.PartitionSettings) > 0 {
-				return fmt.Errorf("Partition should not be specified in image config file when performing kickstart installation")
+				return fmt.Errorf("partition should not be specified in image config file when performing kickstart installation")
 			}
 		}
 	}
@@ -90,6 +110,9 @@ func validateKickStartInstall(config configuration.Config) (err error) {
 }
 
 func validatePackages(config configuration.Config) (err error) {
+	timestamp.StartEvent("validate packages", nil)
+	defer timestamp.StopEvent(nil)
+
 	const (
 		selinuxPkgName     = "selinux-policy"
 		validateError      = "failed to validate package lists in config"
@@ -98,6 +121,7 @@ func validatePackages(config configuration.Config) (err error) {
 		dracutFipsPkgName  = "dracut-fips"
 		fipsKernelCmdLine  = "fips=1"
 	)
+
 	for _, systemConfig := range config.SystemConfigs {
 		packageList, err := installutils.PackageNamesFromSingleSystemConfig(systemConfig)
 		if err != nil {
@@ -144,5 +168,6 @@ func validatePackages(config configuration.Config) (err error) {
 			}
 		}
 	}
+
 	return
 }

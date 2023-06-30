@@ -16,6 +16,8 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repoutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/profile"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -34,6 +36,7 @@ var (
 	workertar            = app.Flag("tdnf-worker", "Full path to worker_chroot.tar.gz").Required().ExistingFile()
 	repoFiles            = app.Flag("repo-file", "Full path to a repo file").Required().ExistingFiles()
 	usePreviewRepo       = app.Flag("use-preview-repo", "Pull packages from the upstream preview repo").Bool()
+	disableDefaultRepos  = app.Flag("disable-default-repos", "Disable pulling packages from PMC repos").Bool()
 	disableUpstreamRepos = app.Flag("disable-upstream-repos", "Disables pulling packages from upstream repos").Bool()
 
 	tlsClientCert = app.Flag("tls-cert", "TLS client certificate to use when downloading files.").String()
@@ -45,8 +48,10 @@ var (
 	inputSummaryFile  = app.Flag("input-summary-file", "Path to a file with the summary of packages cloned to be restored").String()
 	outputSummaryFile = app.Flag("output-summary-file", "Path to save the summary of packages cloned").String()
 
-	logFile  = exe.LogFileFlag(app)
-	logLevel = exe.LogLevelFlag(app)
+	logFile       = exe.LogFileFlag(app)
+	logLevel      = exe.LogLevelFlag(app)
+	profFlags     = exe.SetupProfileFlags(app)
+	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
 )
 
 func main() {
@@ -54,28 +59,37 @@ func main() {
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
 
+	prof, profErr := profile.StartProfiling(profFlags)
+	if profErr != nil {
+		logger.Log.Warnf("Could not start profiling: %s", profErr)
+		return
+	}
+	defer prof.StopProfiler()
+
+	timestamp.BeginTiming("imagepkgfetcher", *timestampFile)
+	defer timestamp.CompleteTiming()
+
 	if *externalOnly && strings.TrimSpace(*inputGraph) == "" {
 		logger.Log.Fatal("input-graph must be provided if external-only is set.")
 	}
 
-	cloner := rpmrepocloner.New()
-	err := cloner.Initialize(*outDir, *tmpDir, *workertar, *existingRpmDir, *existingToolchainRpmDir, *usePreviewRepo, *repoFiles)
+	timestamp.StartEvent("initialize and configure cloner", nil)
+
+	cloner, err := rpmrepocloner.ConstructClonerWithNetwork(*outDir, *tmpDir, *workertar, *existingRpmDir, *existingToolchainRpmDir, *tlsClientCert, *tlsClientKey, *usePreviewRepo, *disableUpstreamRepos, *disableDefaultRepos, *repoFiles)
 	if err != nil {
 		logger.Log.Panicf("Failed to initialize RPM repo cloner. Error: %s", err)
 	}
 	defer cloner.Close()
 
-	if !*disableUpstreamRepos {
-		tlsKey, tlsCert := strings.TrimSpace(*tlsClientKey), strings.TrimSpace(*tlsClientCert)
-		err = cloner.AddNetworkFiles(tlsCert, tlsKey)
-		if err != nil {
-			logger.Log.Panicf("Failed to customize RPM repo cloner. Error: %s", err)
-		}
-	}
+	timestamp.StopEvent(nil) // initialize and configure cloner
 
 	if strings.TrimSpace(*inputSummaryFile) != "" {
+		timestamp.StartEvent("restore packages", nil)
+
 		// If an input summary file was provided, simply restore the cache using the file.
 		err = repoutils.RestoreClonedRepoContents(cloner, *inputSummaryFile)
+
+		timestamp.StopEvent(nil) // restore packages
 	} else {
 		err = cloneSystemConfigs(cloner, *configFile, *baseDirPath, *externalOnly, *inputGraph)
 	}
@@ -84,7 +98,8 @@ func main() {
 		logger.Log.Panicf("Failed to clone RPM repo. Error: %s", err)
 	}
 
-	logger.Log.Info("Configuring downloaded RPMs as a local repository")
+	timestamp.StartEvent("finalize cloned packages", nil)
+
 	err = cloner.ConvertDownloadedPackagesIntoRepo()
 	if err != nil {
 		logger.Log.Panicf("Failed to convert downloaded RPMs into a repo. Error: %s", err)
@@ -94,9 +109,15 @@ func main() {
 		err = repoutils.SaveClonedRepoContents(cloner, *outputSummaryFile)
 		logger.PanicOnError(err, "Failed to save cloned repo contents")
 	}
+
+	timestamp.StopEvent(nil) // finalize cloned packages
+
 }
 
 func cloneSystemConfigs(cloner repocloner.RepoCloner, configFile, baseDirPath string, externalOnly bool, inputGraph string) (err error) {
+	timestamp.StartEvent("cloning system config", nil)
+	defer timestamp.StopEvent(nil)
+
 	const cloneDeps = true
 
 	cfg, err := configuration.LoadWithAbsolutePaths(configFile, baseDirPath)
@@ -130,8 +151,7 @@ func cloneSystemConfigs(cloner repocloner.RepoCloner, configFile, baseDirPath st
 
 // filterExternalPackagesOnly returns the subset of packageVersionsInConfig that only contains external packages.
 func filterExternalPackagesOnly(packageVersionsInConfig []*pkgjson.PackageVer, inputGraph string) (filteredPackages []*pkgjson.PackageVer, err error) {
-	dependencyGraph := pkggraph.NewPkgGraph()
-	err = pkggraph.ReadDOTGraphFile(dependencyGraph, inputGraph)
+	dependencyGraph, err := pkggraph.ReadDOTGraphFile(inputGraph)
 	if err != nil {
 		return
 	}

@@ -60,7 +60,7 @@ $(call create_folder,$(imager_disk_output_dir))
 $(call create_folder,$(artifact_dir))
 $(call create_folder,$(meta_user_data_tmp_dir))
 
-.PHONY: fetch-image-packages fetch-external-image-packages make-raw-image image iso validate-image-config clean-imagegen
+.PHONY: fetch-image-packages fetch-external-image-packages make-raw-image image iso installer-initrd validate-image-config clean-imagegen
 
 clean: clean-imagegen
 clean-imagegen:
@@ -83,13 +83,24 @@ $(STATUS_FLAGS_DIR)/validate-image-config%.flag: $(go-imageconfigvalidator) $(de
 	$(if $(CONFIG_FILE),,$(error Must set CONFIG_FILE=))
 	$(go-imageconfigvalidator) \
 		--input=$(CONFIG_FILE) \
-		--dir=$(CONFIG_BASE_DIR) && \
+		--dir=$(CONFIG_BASE_DIR) \
+		--cpu-prof-file=$(PROFILE_DIR)/imageconfigvalidator.cpu.pprof \
+		--mem-prof-file=$(PROFILE_DIR)/imageconfigvalidator.mem.pprof \
+		--trace-file=$(PROFILE_DIR)/imageconfigvalidator.trace \
+		$(if $(filter y,$(ENABLE_CPU_PROFILE)),--enable-cpu-prof) \
+		$(if $(filter y,$(ENABLE_MEM_PROFILE)),--enable-mem-prof) \
+		$(if $(filter y,$(ENABLE_TRACE)),--enable-trace) \
+		--timestamp-file=$(TIMESTAMP_DIR)/imageconfigvalidator.jsonl && \
 	touch $@
 
 
 imagepkgfetcher_extra_flags :=
 ifeq ($(DISABLE_UPSTREAM_REPOS),y)
 imagepkgfetcher_extra_flags += --disable-upstream-repos
+endif
+
+ifeq ($(DISABLE_DEFAULT_REPOS),y)
+imagepkgfetcher_extra_flags += --disable-default-repos
 endif
 
 ifeq ($(USE_PREVIEW_REPO),y)
@@ -113,7 +124,14 @@ $(image_package_cache_summary): $(go-imagepkgfetcher) $(chroot_worker) $(imggen_
 		$(imagepkgfetcher_extra_flags) \
 		--input-summary-file=$(IMAGE_CACHE_SUMMARY) \
 		--output-summary-file=$@ \
-		--output-dir=$(local_and_external_rpm_cache)
+		--output-dir=$(local_and_external_rpm_cache) \
+		--cpu-prof-file=$(PROFILE_DIR)/imagepkgfetcher.cpu.pprof \
+		--mem-prof-file=$(PROFILE_DIR)/imagepkgfetcher.mem.pprof \
+		--trace-file=$(PROFILE_DIR)/imagepkgfetcher.trace \
+		$(if $(filter y,$(ENABLE_CPU_PROFILE)),--enable-cpu-prof) \
+		$(if $(filter y,$(ENABLE_MEM_PROFILE)),--enable-mem-prof) \
+		$(if $(filter y,$(ENABLE_TRACE)),--enable-trace) \
+		--timestamp-file=$(TIMESTAMP_DIR)/imagepkgfetcher.jsonl
 
 make-raw-image: $(imager_disk_output_dir)
 $(imager_disk_output_dir): $(STATUS_FLAGS_DIR)/imager_disk_output.flag
@@ -134,7 +152,14 @@ $(STATUS_FLAGS_DIR)/imager_disk_output.flag: $(go-imager) $(image_package_cache_
 		--tdnf-worker $(chroot_worker) \
 		--repo-file=$(imggen_local_repo) \
 		--assets $(assets_dir) \
-		--output-dir $(imager_disk_output_dir) && \
+		--output-dir $(imager_disk_output_dir) \
+		--cpu-prof-file=$(PROFILE_DIR)/imager.cpu.pprof \
+		--mem-prof-file=$(PROFILE_DIR)/imager.mem.pprof \
+		--trace-file=$(PROFILE_DIR)/imager.trace \
+		$(if $(filter y,$(ENABLE_CPU_PROFILE)),--enable-cpu-prof) \
+		$(if $(filter y,$(ENABLE_MEM_PROFILE)),--enable-mem-prof) \
+		$(if $(filter y,$(ENABLE_TRACE)),--enable-trace) \
+		--timestamp-file=$(TIMESTAMP_DIR)/imager.jsonl && \
 	touch $@
 
 # Sometimes files will have been deleted, that is fine so long as we were able to detect the change
@@ -151,7 +176,14 @@ image: $(imager_disk_output_dir) $(imager_disk_output_files) $(go-roast) $(depen
 		--release-version $(RELEASE_VERSION) \
 		--log-level=$(LOG_LEVEL) \
 		--log-file=$(LOGS_DIR)/imggen/roast.log \
-		--image-tag=$(IMAGE_TAG)
+		--image-tag=$(IMAGE_TAG) \
+		--cpu-prof-file=$(PROFILE_DIR)/roast.cpu.pprof \
+		--mem-prof-file=$(PROFILE_DIR)/roast.mem.pprof \
+		--trace-file=$(PROFILE_DIR)/roast.trace \
+		$(if $(filter y,$(ENABLE_CPU_PROFILE)),--enable-cpu-prof) \
+		$(if $(filter y,$(ENABLE_MEM_PROFILE)),--enable-mem-prof) \
+		$(if $(filter y,$(ENABLE_TRACE)),--enable-trace) \
+		--timestamp-file=$(TIMESTAMP_DIR)/roast.jsonl
 
 $(image_external_package_cache_summary): $(cached_file) $(go-imagepkgfetcher) $(chroot_worker) $(graph_file) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config)
 	$(if $(CONFIG_FILE),,$(error Must set CONFIG_FILE=))
@@ -172,9 +204,16 @@ $(image_external_package_cache_summary): $(cached_file) $(go-imagepkgfetcher) $(
 		$(imagepkgfetcher_extra_flags) \
 		--input-summary-file=$(IMAGE_CACHE_SUMMARY) \
 		--output-summary-file=$@ \
-		--output-dir=$(external_rpm_cache)
+		--output-dir=$(external_rpm_cache) \
+		--cpu-prof-file=$(PROFILE_DIR)/imagepkgfetcher.cpu.pprof \
+		--mem-prof-file=$(PROFILE_DIR)/imagepkgfetcher.mem.pprof \
+		--trace-file=$(PROFILE_DIR)/imagepkgfetcher.trace \
+		$(if $(filter y,$(ENABLE_CPU_PROFILE)),--enable-cpu-prof) \
+		$(if $(filter y,$(ENABLE_MEM_PROFILE)),--enable-mem-prof) \
+		$(if $(filter y,$(ENABLE_TRACE)),--enable-trace) \
+		--timestamp-file=$(TIMESTAMP_DIR)/imagepkgfetcher.jsonl
 
-# We need to ensure that initrd_img recursive build will never run concurrently with another build component, so add all ISO prereqs as 
+# We need to ensure that initrd_img recursive build will never run concurrently with another build component, so add all ISO prereqs as
 # order-only-prerequisites to initrd_img
 iso_deps = $(go-isomaker) $(go-imager) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config) $(image_package_cache_summary)
 # The initrd bundles these files into the image, we should rebuild it if they change
@@ -184,6 +223,7 @@ $(initrd_img): $(initrd_bundled_files) $(initrd_config_json) $(INITRD_CACHE_SUMM
 	# Recursive make call to build the initrd image $(artifact_dir)/iso-initrd.img
 	$(MAKE) image MAKEOVERRIDES= CONFIG_FILE=$(initrd_config_json) IMAGE_CACHE_SUMMARY=$(INITRD_CACHE_SUMMARY) IMAGE_TAG=
 
+installer-initrd: $(initrd_img)
 iso: $(initrd_img) $(iso_deps)
 	$(if $(CONFIG_FILE),,$(error Must set CONFIG_FILE=))
 	$(go-isomaker) \

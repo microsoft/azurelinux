@@ -1,6 +1,6 @@
 Name:         kf5
 Version:      5.61.0
-Release:      4%{?dist}
+Release:      5%{?dist}
 Summary:      Filesystem and RPM macros for KDE Frameworks 5
 License:      BSD
 URL:          http://www.kde.org
@@ -74,6 +74,9 @@ sed -i \
 
 
 %changelog
+* Fri May 26 2023 Thien Trung Vuong <tvuong@microsoft.com> - 5.61.0-5
+- License verified.
+
 * Tue Mar 31 2020 Joe Schmitt <joschmit@microsoft.com> - 5.61.0-4
 - Generate kf5 package
 

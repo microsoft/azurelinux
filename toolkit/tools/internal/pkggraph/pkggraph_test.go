@@ -904,23 +904,20 @@ func TestReadWriteGraph(t *testing.T) {
 	err = WriteDOTGraphFile(gOut, "test_graph.dot")
 	assert.NoError(t, err)
 
-	gIn := NewPkgGraph()
-	err = ReadDOTGraphFile(gIn, "test_graph.dot")
+	gIn, err := ReadDOTGraphFile("test_graph.dot")
 	assert.NoError(t, err)
 	err = os.Remove("test_graph.dot")
 	assert.NoError(t, err)
 
 	checkTestGraph(t, gIn)
 
-	noGraph := NewPkgGraph()
-	err = ReadDOTGraphFile(noGraph, "no_such_file.dot")
+	_, err = ReadDOTGraphFile("no_such_file.dot")
 	assert.Error(t, err)
 }
 
 // Validate the reference graph is valid, and that it matches the output of the test graph.
 func TestReferenceDOTFile(t *testing.T) {
-	gIn := NewPkgGraph()
-	err := ReadDOTGraphFile(gIn, "test_graph_reference.dot")
+	gIn, err := ReadDOTGraphFile("test_graph_reference.dot")
 	assert.NoError(t, err)
 
 	checkTestGraph(t, gIn)

@@ -54,8 +54,7 @@ func main() {
 
 // analyzeGraph analyzes and prints various attributes of a graph file.
 func analyzeGraph(inputFile string, maxResults int) (err error) {
-	pkgGraph := pkggraph.NewPkgGraph()
-	err = pkggraph.ReadDOTGraphFile(pkgGraph, inputFile)
+	pkgGraph, err := pkggraph.ReadDOTGraphFile(inputFile)
 	if err != nil {
 		return
 	}

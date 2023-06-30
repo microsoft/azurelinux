@@ -8,6 +8,7 @@ export TERM=mariner-installer
 ISO_ROOT=/mnt/cdrom
 CONFIG_ROOT=$ISO_ROOT/config
 UNATTENDED_CONFIG_FILE=$CONFIG_ROOT/unattended_config.json
+UNATTENDED_LOCK_FILE=/var/lock/unattended.lock
 
 # PXE boot setup
 CMDLINE=/proc/cmdline
@@ -43,8 +44,8 @@ function retry {
     local sleep_seconds=15
     while [ $retry -lt $limit ]
     do
-        "$@" && break
-        echo "$@" failed. Retrying... 
+        eval "$@" && break
+        echo "$@" failed. Retrying...
         ((retry++))
         sleep $sleep_seconds
     done
@@ -75,8 +76,45 @@ elif grep -q "image-config" $CMDLINE; then
 else
     echo Attempt to mount the ISO root
     # It is possible that the partition isn't ready to be mounted when this script
-    # is first run. So use a retry loop.
-    retry mount -L $LABEL -o ro $ISO_ROOT
+    # is first run. So use a retry loop. There is a race condition here where the
+    # partition could be mounted between the first grep and the mount. If this happens
+    # the mount will fail and the retry loop would retry the mount repeatedly. This
+    # is handled by the 'or' in the retry loop which will grep for the mount point and
+    # break out of the loop if it is found.
+    retry "{ mount -L $LABEL -o ro $ISO_ROOT || grep -qs $ISO_ROOT /proc/mounts ; }"
+fi
+
+# If we are running unattended (i.e., have $UNATTENDED_CONFIG_FILE), we need to make sure that we only run once.
+# We can use flock to synchronize the unattended install flows.
+if [[ -f "$UNATTENDED_CONFIG_FILE" ]]; then
+    echo "Synchronizing unattended install flows... current sessions are:"
+    who
+    thisTerminal=$(who -m | xargs | cut -d' ' -f2)
+    echo "This instance is on '$thisTerminal'"
+
+    # Generally we want to prioritize ttyS0 since that will be used for debugging. The output from the log file will
+    # contain the timestamp and color codes so it is still useful for debugging and showing liveness but it will look
+    # messy.
+    if [[ "$thisTerminal" != "ttyS0" ]]; then
+        echo "Pausing for 2 seconds to allow other session to take priority"
+        sleep 2
+    fi
+
+    # Create a lock file and open file descriptor 200 to it (200 is chosen arbitrarily)
+    # The exec will hold the file descriptor open for the duration of the script since the flock will only
+    # work on file descriptors that are open.
+    touch "$UNATTENDED_LOCK_FILE"
+    exec 200>> "$UNATTENDED_LOCK_FILE"
+
+    # If the file descriptor is already locked bail out immediately and just follow the other installer's log. The tail
+    # command will follow the log file and should never exit. We must ensure that this instance of the installer does
+    # not run any further so we always exit 0 just in case.
+    if ! flock -x -n 200; then
+        echo "Unattended install already running, following other installer's log instead" 
+        sleep 5
+        tail -f -n 10000 /installer/log.txt 
+        exit 0
+    fi
 fi
 
 if [[ ! -f "$UNATTENDED_CONFIG_FILE" ]]; then

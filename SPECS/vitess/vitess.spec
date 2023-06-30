@@ -2,8 +2,8 @@
 %bcond_without check
 
 Name:           vitess
-Version:        8.0.0
-Release:        12%{?dist}
+Version:        16.0.2
+Release:        2%{?dist}
 Summary:        Database clustering system for horizontal scaling of MySQL
 # Upstream license specification: MIT and Apache-2.0
 License:        MIT and ASL 2.0
@@ -26,13 +26,6 @@ Source0:        %{name}-%{version}.tar.gz
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
 Source1:        %{name}-%{version}-vendor.tar.gz 
-# To use with newer k8s
-Patch0:         0001-Add-context-to-k8s-calls.patch
-# To use with newer azure-storage-blob
-Patch1:         0001-Fix-for-newer-azure-storage-blob.patch
-# Fix unit test error
-Patch2:         0001-Fix-unit-test-error.patch
-Patch3:         update-go-module-version.patch
 BuildRequires: golang
 
 %description
@@ -66,6 +59,10 @@ tar -xf %{SOURCE1} --no-same-owner
 export VERSION=%{version}
 
 for cmd in $(find go/cmd/* -maxdepth 0 -type d); do
+  # Skip internal directory
+  if [ "$cmd" == "go/cmd/internal" ]; then
+    continue
+  fi
   go build -buildmode pie -compiler gc '-tags=rpm_crashtraceback ' \
            -ldflags "-X vitess.io/vitess/version=$VERSION -extldflags -Wl,-z,relro" \
            -mod=vendor -v -a -x -o ./bin/$(basename $cmd) ./$cmd
@@ -107,6 +104,13 @@ go check -t go/cmd \
 %{_bindir}/*
 
 %changelog
+* Thu Jun 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 16.0.2-2
+- Bump release to rebuild with go 1.19.10
+
+* Fri May 12 2023 Bala <balakumaran.kannan@microsoft.com> - 16.0.2-1
+- Update to 16.0.2 to fix CVE-2023-29194
+- Remove all the patches are they are merged with latest version
+
 * Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.0.0-12
 - Bump release to rebuild with go 1.19.8
 
