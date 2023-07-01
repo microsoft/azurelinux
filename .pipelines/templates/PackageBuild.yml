@@ -5,6 +5,9 @@ parameters:
   - name: inputArtifactsFolder
     type: string
     default: "input"
+  - name: inputArtifactsName
+    type: string
+    default: "ARTIFACTS"
   - name: isExternalToolchain
     type: boolean
     default: false
@@ -14,8 +17,8 @@ steps:
     - task: DownloadPipelineArtifact@2
       displayName: "Download toolchain"
       inputs:
-        artifact: ARTIFACTS
-        patterns: '**/toolchain_built_rpms_all.tar.gz'
+        artifact: "${{ parameters.inputArtifactsName }}"
+        patterns: "**/toolchain_built_rpms_all.tar.gz"
         path: "$(Build.Repository.LocalPath)/${{ parameters.inputArtifactsFolder }}"
 
   - script: |

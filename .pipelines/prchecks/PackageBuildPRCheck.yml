@@ -91,3 +91,4 @@ extends:
                 - template: .pipelines/templates/PackageBuild.yml@self
                   parameters:
                     isCheckBuild: '$(runCheck)'
+                    inputArtifactsName: drop_Toolchain_${{ configuration.name }}_Build
