@@ -321,7 +321,7 @@ pcre-8.44-2.cm1.aarch64.rpm
 pcre-debuginfo-8.44-2.cm1.aarch64.rpm
 pcre-devel-8.44-2.cm1.aarch64.rpm
 pcre-libs-8.44-2.cm1.aarch64.rpm
-perl-5.30.3-2.cm1.aarch64.rpm
+perl-5.30.3-3.cm1.aarch64.rpm
 perl-DBD-SQLite-1.62-3.cm1.aarch64.rpm
 perl-DBD-SQLite-debuginfo-1.62-3.cm1.aarch64.rpm
 perl-DBI-1.641-3.cm1.aarch64.rpm
