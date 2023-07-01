@@ -1,13 +1,21 @@
 %global security_hardening nonow
 %define glibc_target_cpu %{_build}
 %define debug_package %{nil}
+# Modify __os_install_post so binaries are not stripped
+%define __os_install_post \
+    %{?__brp_compress} \
+    %{?__brp_strip_comment_note} \
+    %{?__brp_strip_static_archive} \
+    find %{buildroot} -name "*.pc" | xargs -I{} sed -i -e 's@-Wl,-dT,%{_topdir}/BUILD/module_info.ld@ @' {} \
+    %{nil}
+
 # Don't depend on bash by default
 %define __requires_exclude ^/(bin|usr/bin).*$
 
 Summary:        Main C library
 Name:           glibc
 Version:        2.35
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD AND GPLv2+ AND Inner-Net AND ISC AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -318,6 +326,9 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %defattr(-,root,root)
 
 %changelog
+* Fri Jun 30 2023 Andrew Phelps <anphel@microsoft.com> - 2.35-4
+- Modify __os_install_post so binaries are not stripped
+
 * Fri Sep 30 2022 Andy Caldwell <andycaldwell@microsoft> - 2.35-3
 - Split `glibc-static` into an actual package containing static libraries and runtime
 
