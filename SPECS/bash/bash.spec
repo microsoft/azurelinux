@@ -1,7 +1,7 @@
 Summary:        Bourne-Again SHell
 Name:           bash
 Version:        5.1.8
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,7 +16,6 @@ Requires(post): /bin/cp
 Requires(post): /bin/grep
 Requires(postun): /bin/grep
 Requires(postun): /bin/mv
-Requires:       filesystem
 Provides:       /bin/sh
 Provides:       /bin/bash
 Provides:       %{_bindir}/sh
@@ -97,6 +96,15 @@ if [ -z "$INPUTRC" -a ! -f "$HOME/.inputrc" ] ; then
         INPUTRC=%{_sysconfdir}/inputrc
 fi
 export INPUTRC
+EOF
+
+cat > %{buildroot}%{_sysconfdir}/profile.d/umask.sh << "EOF"
+# By default, the umask should be set.
+if [ "$(id -gn)" = "$(id -un)" -a $EUID -gt 99 ] ; then
+  umask 002
+else
+  umask 022
+fi
 EOF
 
 cat > %{buildroot}%{_sysconfdir}/profile.d/i18n.sh << "EOF"
@@ -320,6 +328,10 @@ fi
 %defattr(-,root,root)
 
 %changelog
+* Thu July 29 2023 Tobias Brick <tobiasb@microsoft.com> - 5.1.8-3
+- Revert: Add dependency on filesystem
+- Revert: Remove umask.sh, which will be provided by filesystem
+
 * Thu May 18 2023 Tobias Brick <tobiasb@microsoft.com> - 5.1.8-2
 - Add dependency on filesystem
 - Remove umask.sh, which will be provided by filesystem
