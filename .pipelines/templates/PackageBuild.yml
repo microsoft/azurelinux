@@ -13,7 +13,7 @@ parameters:
     default: false
 
 steps:
-  - ${{ if eq(parameters.isExternalToolchain, true) }}:
+  - ${{ if eq(parameters.isExternalToolchain, false) }}:
     - task: DownloadPipelineArtifact@2
       displayName: "Download toolchain"
       inputs:
