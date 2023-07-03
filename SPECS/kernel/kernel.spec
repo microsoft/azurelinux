@@ -91,7 +91,7 @@ Group:          System Environment/Kernel
 Requires:       %{name} = %{version}-%{release}
 Requires:       gawk
 Requires:       python3
-Obsoletes:      linux-dev < %{version}-%{release}
+Obsoletes:      linux-dev
 
 %description devel
 This package contains the Linux kernel dev files
