@@ -328,7 +328,7 @@ fi
 %defattr(-,root,root)
 
 %changelog
-* Thu July 29 2023 Tobias Brick <tobiasb@microsoft.com> - 5.1.8-3
+* Thu Jun 29 2023 Tobias Brick <tobiasb@microsoft.com> - 5.1.8-3
 - Revert: Add dependency on filesystem
 - Revert: Remove umask.sh, which will be provided by filesystem
 
