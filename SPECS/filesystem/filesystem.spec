@@ -709,7 +709,7 @@ return 0
 %config(noreplace) /etc/modprobe.d/tipc.conf
 
 %changelog
-* Thu July 29 2023 Tobias Brick <tobiasb@microsoft.com> - 1.1-15
+* Thu Jun 29 2023 Tobias Brick <tobiasb@microsoft.com> - 1.1-15
 - Revert: Remove setting umask from /etc/profile and add it to a separate file in /etc/profile.d
 
 * Tue Jun 13 2023 Andy Zaugg <azaugg@linkedin.com> - 1.1-14
