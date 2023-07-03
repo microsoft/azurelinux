@@ -80,7 +80,7 @@ func (s *SystemConfig) IsValid() (err error) {
 
 	// Validate BootType
 	if s.BootType != "efi" && s.BootType != "legacy" && s.BootType != "none" && s.BootType != "" {
-		return fmt.Errorf("invalid [BootType]: %s. Expecting values of either 'efi', 'legacy', 'none' or empty string.", s.BootType)
+		return fmt.Errorf("invalid [BootType]: %s. Expecting values of either 'efi', 'legacy', 'none' or empty string", s.BootType)
 	}
 
 	if len(s.PackageLists) == 0 && len(s.Packages) == 0 {

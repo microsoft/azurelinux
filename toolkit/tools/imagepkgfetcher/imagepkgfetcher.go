@@ -17,6 +17,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/profile"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -49,6 +50,7 @@ var (
 
 	logFile       = exe.LogFileFlag(app)
 	logLevel      = exe.LogLevelFlag(app)
+	profFlags     = exe.SetupProfileFlags(app)
 	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
 )
 
@@ -56,6 +58,14 @@ func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
+
+	prof, profErr := profile.StartProfiling(profFlags)
+	if profErr != nil {
+		logger.Log.Warnf("Could not start profiling: %s", profErr)
+		return
+	}
+	defer prof.StopProfiler()
+
 	timestamp.BeginTiming("imagepkgfetcher", *timestampFile)
 	defer timestamp.CompleteTiming()
 
@@ -65,11 +75,23 @@ func main() {
 
 	timestamp.StartEvent("initialize and configure cloner", nil)
 
-	cloner, err := rpmrepocloner.ConstructCloner(*outDir, *tmpDir, *workertar, *existingRpmDir, *existingToolchainRpmDir, *tlsClientCert, *tlsClientKey, *usePreviewRepo, *disableUpstreamRepos, *disableDefaultRepos, *repoFiles)
+	cloner, err := rpmrepocloner.ConstructCloner(*outDir, *tmpDir, *workertar, *existingRpmDir, *existingToolchainRpmDir, *tlsClientCert, *tlsClientKey, *repoFiles)
 	if err != nil {
 		logger.Log.Panicf("Failed to initialize RPM repo cloner. Error: %s", err)
 	}
 	defer cloner.Close()
+
+	enabledRepos := rpmrepocloner.RepoFlagAll
+	if !*usePreviewRepo {
+		enabledRepos = enabledRepos & ^rpmrepocloner.RepoFlagPreview
+	}
+	if *disableUpstreamRepos {
+		enabledRepos = enabledRepos & ^rpmrepocloner.RepoFlagUpstream
+	}
+	if *disableDefaultRepos {
+		enabledRepos = enabledRepos & ^rpmrepocloner.RepoFlagMarinerDefaults
+	}
+	cloner.SetEnabledRepos(enabledRepos)
 
 	timestamp.StopEvent(nil) // initialize and configure cloner
 
@@ -101,7 +123,6 @@ func main() {
 	}
 
 	timestamp.StopEvent(nil) // finalize cloned packages
-
 }
 
 func cloneSystemConfigs(cloner repocloner.RepoCloner, configFile, baseDirPath string, externalOnly bool, inputGraph string) (err error) {

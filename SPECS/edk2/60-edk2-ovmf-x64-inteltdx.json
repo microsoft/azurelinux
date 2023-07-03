@@ -9,6 +9,10 @@
         "executable": {
             "filename": "/usr/share/edk2/ovmf/OVMF.inteltdx.fd",
             "format": "raw"
+        },
+        "nvram-template": {
+            "filename": "/usr/share/edk2/ovmf/OVMF_VARS.fd",
+            "format": "raw"
         }
     },
     "targets": [
