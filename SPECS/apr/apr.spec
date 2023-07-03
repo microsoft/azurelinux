@@ -8,7 +8,6 @@ Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        http://archive.apache.org/dist/%{name}/%{name}-%{version}.tar.gz
-Patch0:         CVE-2022-28331.nopatch
 %define         aprver  1
 
 %if %{with_check}
