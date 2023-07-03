@@ -13143,8 +13143,8 @@
         "type": "other",
         "other": {
           "name": "mlnx-ofa_kernel",
-          "version": "5.6",
-          "downloadUrl": "https://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-5.6-1.0.3.tgz"
+          "version": "23.04",
+          "downloadUrl": "https://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-23.04-0.5.3.tgz"
         }
       }
     },
