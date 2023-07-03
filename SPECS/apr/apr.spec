@@ -9,7 +9,6 @@ Group:          System Environment/Libraries
 URL:            https://apr.apache.org/
 Source0:        http://archive.apache.org/dist/%{name}/%{name}-%{version}.tar.gz
 %define         aprver  1
-
 %if %{with_check}
 # test_serv_by_name test requires /etc/services file from iana-etc package
 BuildRequires:  iana-etc
@@ -29,7 +28,7 @@ It contains the libraries and header files to create applications
 %autosetup -p1
 
 %build
-./configure --prefix=/usr \
+./configure --prefix=%{_prefix} \
         --includedir=%{_includedir}/apr-%{aprver} \
         --with-installbuilddir=%{_libdir}/apr/build-%{aprver} \
         --with-devrandom=/dev/urandom \
