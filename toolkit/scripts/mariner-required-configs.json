@@ -793,7 +793,7 @@
                     "https://github.com/microsoft/CBL-Mariner/pull/5788"
                 ]
             },
-            "CONFIG_MLXREG_IO" {
+            "CONFIG_MLXREG_IO": {
                 "value": [
                     "m"
                 ],
