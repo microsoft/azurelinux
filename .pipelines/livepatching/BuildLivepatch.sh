@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 set -e
 
 ROOT_DIR="$(git rev-parse --show-toplevel)"

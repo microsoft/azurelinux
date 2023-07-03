@@ -2,7 +2,7 @@
 Summary:        Cmake
 Name:           cmake
 Version:        3.21.4
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        BSD AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -81,6 +81,9 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %{_prefix}/doc/%{name}-*/*
 
 %changelog
+* Thu Jun 08 2023 Sam Meluch <sammeluch@microsoft.com> - 3.21.4-7
+- Add source directory for when not building in source
+
 * Thu Jun 08 2023 Sumedh Sharma <sumsharma@microsoft.com> - 3.21.4-6
 - Patch vendored curl for CVE-2023-28322
 

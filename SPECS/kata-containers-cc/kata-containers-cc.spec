@@ -1,5 +1,4 @@
-%global runtime_make_vars       DEFSERVICEOFFLOAD=true \\\
-                                DEFSTATICRESOURCEMGMT=true \\\
+%global runtime_make_vars       DEFSTATICRESOURCEMGMT=true \\\
                                 SKIP_GO_VERSION_CHECK=1
 
 %global agent_make_vars         LIBC=gnu
@@ -7,8 +6,8 @@
 %global debug_package %{nil}
 
 Name:         kata-containers-cc
-Version:      0.4.1
-Release:      2%{?dist}
+Version:      0.4.2
+Release:      1%{?dist}
 Summary:      Kata Confidential Containers
 License:      ASL 2.0
 Vendor:       Microsoft Corporation
@@ -16,8 +15,9 @@ URL:          https://github.com/microsoft/kata-containers
 Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/cc-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{name}-%{version}.tar.gz
 Source2:      %{name}-%{version}-cargo.tar.gz
-Source3:      mariner-coco-build-uvm-image.sh
-Source4:      mariner-coco-build-uvm-rootfs.sh
+Source3:      mariner-coco-build-uvm.sh
+
+Patch0:       0001-Enable-using-an-igvm-file-with-cloud-hypervisor.patch
 
 ExclusiveArch: x86_64
 
@@ -34,6 +34,9 @@ BuildRequires:  perl-lib
 BuildRequires:  libseccomp-devel
 BuildRequires:  kernel-uvm-devel
 BuildRequires:  openssl-devel
+BuildRequires:  clang
+BuildRequires:  device-mapper-devel
+BuildRequires:  cmake
 
 Requires:  kernel-uvm
 Requires:  moby-containerd-cc
@@ -62,6 +65,7 @@ popd
 %build
 export PATH=$PATH:"$(pwd)/go/bin"
 export GOPATH="$(pwd)/go"
+export OPENSSL_NO_VENDOR=1
 
 # Runtime
 pushd %{_builddir}/%{name}-%{version}/src/runtime
@@ -89,7 +93,6 @@ popd
 
 # Agent
 pushd %{_builddir}/%{name}-%{version}/src/agent
-export OPENSSL_NO_VENDOR=1
 %make_build %{agent_make_vars}
 popd
 
@@ -114,11 +117,13 @@ pushd %{_builddir}/%{name}-%{version}
 rm tools/osbuilder/.gitignore
 rm tools/osbuilder/rootfs-builder/.gitignore
 
-install -D -m 0755 %{SOURCE3}           %{buildroot}%{osbuilder}/mariner-coco-build-uvm-image.sh
-install -D -m 0755 %{SOURCE4}           %{buildroot}%{osbuilder}/mariner-coco-build-uvm-rootfs.sh
+install -D -m 0755 %{SOURCE3}           %{buildroot}%{osbuilder}/mariner-coco-build-uvm.sh
 install -D -m 0644 VERSION              %{buildroot}%{osbuilder}/VERSION
 install -D -m 0644 ci/install_yq.sh     %{buildroot}%{osbuilder}/ci/install_yq.sh
 install -D -m 0644 versions.yaml        %{buildroot}%{osbuilder}/versions.yaml
+install -D -m 0644 tools/osbuilder/Makefile  %{buildroot}%{osbuilder}/tools/osbuilder/Makefile
+
+sed -i 's#distro_config_dir="${script_dir}/${distro}#distro_config_dir="${script_dir}/cbl-mariner#g' tools/osbuilder/rootfs-builder/rootfs.sh
 cp -aR tools/osbuilder/rootfs-builder   %{buildroot}%{osbuilder}/tools/osbuilder
 cp -aR tools/osbuilder/initrd-builder   %{buildroot}%{osbuilder}/tools/osbuilder
 cp -aR tools/osbuilder/scripts          %{buildroot}%{osbuilder}/tools/osbuilder
@@ -141,7 +146,6 @@ pushd %{_builddir}/%{name}-%{version}/src/agent
 
 mkdir -p %{buildroot}%{osbuilder}/src/agent/samples/policy
 cp -aR samples/policy/all-allowed         %{buildroot}%{osbuilder}/src/agent/samples/policy
-install -D -m 0755 mount_tar.sh           %{buildroot}%{osbuilder}/src/agent/mount_tar.sh
 install -D -m 0755 kata-containers.target %{buildroot}%{osbuilder}/kata-containers.target
 install -D -m 0755 kata-agent.service.in  %{buildroot}%{osbuilder}/kata-agent.service.in
 install -D -m 0755 coco-opa.service       %{buildroot}%{osbuilder}/coco-opa.service
@@ -204,10 +208,8 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %dir %{osbuilder}/src/agent/samples/policy/all-allowed
 %{osbuilder}/src/agent/samples/policy/all-allowed/all-allowed-data.json
 %{osbuilder}/src/agent/samples/policy/all-allowed/all-allowed.rego
-%{osbuilder}/src/agent/mount_tar.sh
 
-%{osbuilder}/mariner-coco-build-uvm-image.sh
-%{osbuilder}/mariner-coco-build-uvm-rootfs.sh
+%{osbuilder}/mariner-coco-build-uvm.sh
 %{osbuilder}/kata-containers.target
 %{osbuilder}/kata-agent.service.in
 %{osbuilder}/coco-opa.service
@@ -232,6 +234,12 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 
 
 %changelog
+*   Thu Jun 29 2023 Dallas Delaney <dadelan@microsoft.com> 0.4.2-1
+-   Upgrade to version 0.4.2 for new snapshotter and policy features
+
+*   Thu Jun 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.4.1-3
+-   Bump release to rebuild with go 1.19.10
+
 *   Wed May 24 2023 Dallas Delaney <dadelan@microsoft.com> 0.4.1-2
 -   Enable static resource management and build with host's openssl
 

@@ -1,7 +1,11 @@
+%undefine __cmake_in_source_build
+%define _tdnfpluginsdir %{_libdir}/tdnf-plugins
+%define _tdnf_history_db_dir %{_libdir}/sysimage/tdnf
+
 Summary:        dnf/yum equivalent using C libs
 Name:           tdnf
-Version:        3.2.2
-Release:        4%{?dist}
+Version:        3.5.2
+Release:        2%{?dist}
 License:        LGPLv2.1 AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,7 +20,16 @@ Source4:        tdnfrepogpgcheck.conf
 Patch0:         tdnf-mandatory-space-list-output.patch
 Patch1:         tdnf-default-mariner-release.patch
 Patch2:         tdnf-enable-plugins-by-default.patch
-Patch3:         tdnf-add-download-command.patch
+# Patch to be removed once we upgrade to a version of tdnf which contains the upstream fix
+# https://github.com/vmware/tdnf/commit/d62d7097c009ee867bee992840334dbc12f4f0f3
+Patch3:         tdnf-printf-fix.patch
+# Patch to be removed once we upgrade to a version of tdnf which contains the upstream fix
+# https://github.com/vmware/tdnf/commit/5311b5ed0867a40ceb71b89358d70290bc2d0c51
+Patch4:         tdnf-sqlite-library.patch
+# Patch to be removed once we upgrade to a version of tdnf which contains the upstream fix
+# https://github.com/vmware/tdnf/pull/432
+Patch5:         tdnf-GetRepoMD-fix.patch
+Patch6:		tdnf-dotarch.patch
 #Cmake requires binutils
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -26,19 +39,22 @@ BuildRequires:  gcc
 BuildRequires:  glibc-devel
 #plugin repogpgcheck
 BuildRequires:  gpgme-devel
-BuildRequires:  libmetalink-devel
 BuildRequires:  libsolv-devel
+BuildRequires:  libxml2-devel
 BuildRequires:  make
 BuildRequires:  openssl-devel
 BuildRequires:  popt-devel
 BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
 BuildRequires:  rpm-devel
-Requires:       curl
-Requires:       libmetalink
+BuildRequires:  sqlite-devel
+BuildRequires:  zlib-devel
+Requires:       curl-libs
 Requires:       libsolv
 Requires:       openssl-libs
 Requires:       rpm-libs
 Requires:       tdnf-cli-libs = %{version}-%{release}
+Requires:       zlib
 Obsoletes:      yum
 Provides:       yum
 %if %{with_check}
@@ -47,20 +63,17 @@ BuildRequires:  glib
 BuildRequires:  libxml2
 BuildRequires:  python3-pip
 BuildRequires:  python3-requests
-BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 %endif
 
 %description
 tdnf is a yum/dnf equivalent which uses libsolv and libcurl
 
-%define _tdnfpluginsdir %{_libdir}/tdnf-plugins
-
 %package    devel
 Summary:        A Library providing C API for tdnf
 Group:          Development/Libraries
 Requires:       libsolv-devel
-Requires:       tdnf = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 
 %description devel
 Development files for tdnf
@@ -72,9 +85,19 @@ Group:          Development/Libraries
 %description cli-libs
 Library providing cli libs for tdnf like clients.
 
+%package plugin-metalink
+Summary:        tdnf plugin providing metalink functionality for repo configurations
+Group:          Applications/RPM
+Requires:       %{name} = %{version}-%{release}
+Requires:       libxml2
+
+%description plugin-metalink
+tdnf plugin providing metalink functionality for repo configurations
+
 %package        plugin-repogpgcheck
 Summary:        tdnf plugin providing gpg verification for repository metadata
 Group:          Development/Libraries
+Requires:       %{name} = %{version}-%{release}
 Requires:       gpgme
 
 %description plugin-repogpgcheck
@@ -90,6 +113,7 @@ python bindings for tdnf
 
 %package        autoupdate
 Summary:        systemd services for periodic automatic update
+Group:          Applications/RPM
 Requires:       %{name} = %{version}-%{release}
 
 %description autoupdate
@@ -99,85 +123,115 @@ systemd services for periodic automatic update
 %autosetup -p1
 
 %build
-mkdir build && cd build
-cmake \
--DCMAKE_BUILD_TYPE=Debug \
--DCMAKE_INSTALL_PREFIX=%{_prefix} \
--DCMAKE_INSTALL_LIBDIR:PATH=lib \
-..
-make %{?_smp_mflags} && make python
+%cmake \
+    -DCMAKE_BUILD_TYPE=Debug \
+    -DBUILD_SHARED_LIBS=OFF \
+    -DCMAKE_INSTALL_LIBDIR:PATH=%{_libdir} \
+    -DHISTORY_DB_DIR=%{_tdnf_history_db_dir}
+
+%cmake_build
+
+cd %{__cmake_builddir}
+%make_build python
 
 %check
 pip3 install pytest requests pyOpenSSL
 cd build && make %{?_smp_mflags} check
 
 %install
-cd build && %make_install
+%cmake_install
 find %{buildroot} -name '*.a' -delete -print
 mkdir -p %{buildroot}%{_var}/cache/tdnf
+mkdir -p %{buildroot}%{_tdnf_history_db_dir}
 ln -sf %{_bindir}/tdnf %{buildroot}%{_bindir}/tyum
 ln -sf %{_bindir}/tdnf %{buildroot}%{_bindir}/yum
+ln -sf %{_bindir}/tdnf %{buildroot}%{_bindir}/tdnfj
 install -v -D -m 0755 %{SOURCE1} %{buildroot}%{_bindir}/tdnf-cache-updateinfo
 install -v -D -m 0644 %{SOURCE2} %{buildroot}%{_libdir}/systemd/system/tdnf-cache-updateinfo.service
 install -v -D -m 0644 %{SOURCE3} %{buildroot}%{_libdir}/systemd/system/tdnf-cache-updateinfo.timer
 install -v -D -m 0644 %{SOURCE4} %{buildroot}%{_sysconfdir}/tdnf/pluginconf.d/tdnfrepogpgcheck.conf
-mv %{buildroot}%{_libdir}/pkgconfig/tdnfcli.pc %{buildroot}%{_libdir}/pkgconfig/tdnf-cli-libs.pc
-mkdir -p %{buildroot}/%{_tdnfpluginsdir}/tdnfrepogpgcheck
-mv %{buildroot}/%{_tdnfpluginsdir}/libtdnfrepogpgcheck.so %{buildroot}/%{_tdnfpluginsdir}/tdnfrepogpgcheck/libtdnfrepogpgcheck.so
+rm -f %{buildroot}%{_bindir}/jsondumptest
+rm -rf %{buildroot}%{_datadir}/tdnf
 
-pushd python
-python3 setup.py install --skip-build --prefix=%{_prefix} --root=%{buildroot}
+mkdir -p %{buildroot}%{_sysconfdir}/%{name}/protected.d
+
+pushd %{__cmake_builddir}/python
+%py3_install
 popd
-
 find %{buildroot} -name '*.pyc' -delete
 
-%ldconfig_scriptlets
+%post
+/sbin/ldconfig
+# Required step to ensure new history util from version 3.4.1 does not fail
+if [[ ! -f %{_tdnf_history_db_dir}/history.db ]]; then
+    %{_libdir}/tdnf/tdnf-history-util init
+fi
+
+%postun
+/sbin/ldconfig
 
 %files
 %license COPYING
 %defattr(-,root,root,0755)
+%config(noreplace) %{_sysconfdir}/tdnf/tdnf.conf
+%dir %{_tdnf_history_db_dir}
+%dir %{_var}/cache/tdnf
 %{_bindir}/tdnf
+%{_bindir}/tdnf-cache-updateinfo
+%{_bindir}/tdnf-config
+%{_bindir}/tdnfj
 %{_bindir}/tyum
 %{_bindir}/yum
-%{_bindir}/tdnf-cache-updateinfo
+%{_datadir}/bash-completion/completions/tdnf
 %{_libdir}/libtdnf.so.3
 %{_libdir}/libtdnf.so.3.*
-%config(noreplace) %{_sysconfdir}/tdnf/tdnf.conf
-%dir %{_var}/cache/tdnf
-%{_datadir}/bash-completion/completions/tdnf
+%{_libdir}/tdnf/tdnf-history-util
 
 %files devel
 %defattr(-,root,root)
+%exclude %{_libdir}/debug
 %{_includedir}/tdnf/*.h
 %{_libdir}/libtdnf.so
 %{_libdir}/libtdnfcli.so
-%exclude %{_libdir}/debug
-%{_libdir}/pkgconfig/tdnf.pc
 %{_libdir}/pkgconfig/tdnf-cli-libs.pc
+%{_libdir}/pkgconfig/tdnf.pc
 
 %files cli-libs
 %defattr(-,root,root)
 %{_libdir}/libtdnfcli.so.3
 %{_libdir}/libtdnfcli.so.3.*
 
+%files plugin-metalink
+%defattr(-,root,root)
+%config(noreplace) %{_sysconfdir}/tdnf/pluginconf.d/tdnfmetalink.conf
+%dir %{_sysconfdir}/tdnf/pluginconf.d
+%{_tdnfpluginsdir}/libtdnfmetalink.so
+
 %files plugin-repogpgcheck
 %defattr(-,root,root)
-%dir %{_sysconfdir}/tdnf/pluginconf.d
 %config(noreplace) %{_sysconfdir}/tdnf/pluginconf.d/tdnfrepogpgcheck.conf
-%{_tdnfpluginsdir}/tdnfrepogpgcheck/libtdnfrepogpgcheck.so
+%dir %{_sysconfdir}/tdnf/pluginconf.d
+%{_tdnfpluginsdir}/libtdnfrepogpgcheck.so
 
 %files python
 %defattr(-,root,root)
 %{python3_sitelib}/*
 
 %files autoupdate
+%{_bindir}/tdnf-automatic
+%{_libdir}/systemd/system/tdnf-cache-updateinfo*
 %{_sysconfdir}/motdgen.d/02-tdnf-updateinfo.sh
 %{_sysconfdir}/tdnf/automatic.conf
 /%{_lib}/systemd/system/tdnf*
-%{_libdir}/systemd/system/tdnf-cache-updateinfo*
-%{_bindir}/tdnf-automatic
 
 %changelog
+* Thu Jun 15 2023 Sam Meluch <sammeluch@microsoft.com> - 3.5.2-2
+- add patch for SELECTION_DOTARCH in solv/tdnfquery.c
+
+* Wed Apr 12 2023 Sam Meluch <sammeluch@microsoft.com> - 3.5.2-1
+- Update tdnf to version 3.5.2
+- Remove tdnf download patch in favor of upstream --downloadonly functionality
+
 * Tue May 03 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.2.2-4
 - Reverting usage of "rpm" in RPM scripts since "/var/lib/rpm/.rpm.lock" is always taken.
 

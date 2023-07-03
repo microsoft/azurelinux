@@ -33,7 +33,7 @@
 Name:         qt5-qtbase
 Summary:      Qt5 - QtBase components
 Version:      5.12.11
-Release:      6%{?dist}
+Release:      8%{?dist}
 # See LICENSE.GPL3-EXCEPT.txt, for exception details
 License:      GFDL AND LGPLv3 AND GPLv2 AND GPLv3 with exceptions AND QT License Agreement 4.0
 Vendor:       Microsoft Corporation
@@ -130,6 +130,12 @@ Patch80: qtbase-use-wayland-on-gnome.patch
 
 # Fix CVE-2023-24607
 patch81: CVE-2023-24607.patch
+
+# Fix CVE-2023-32762
+Patch82: CVE-2023-32762.patch
+
+# Fix CVE-2023-32763
+Patch83: CVE-2023-32763.patch
 ## upstream patches
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
@@ -235,6 +241,8 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 
 %patch80 -p1 -b .use-wayland-on-gnome.patch
 %patch81 -p1
+%patch82 -p1
+%patch83 -p1
 
 ## upstream patches
 
@@ -740,10 +748,16 @@ fi
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXdgDesktopPortalThemePlugin.cmake
 
 %changelog
-* Fri May 26 2023 Thien Trung Vuong <tvuong@microsoft.com> - 5.12.11-5
+* Wed Jun 14 2023 Henry Li <lihl@microsoft.com> - 5.12.11-8
+- Add patch to resolve CVE-2023-32763
+
+* Mon Jun 12 2023 Henry Li <lihl@microsoft.com> - 5.12.11-7
+- Add patch to resolve CVE-2023-32762
+
+* Fri May 26 2023 Thien Trung Vuong <tvuong@microsoft.com> - 5.12.11-6
 - Update ptch for CVE-2023-24607
 
-* Wed Apr 26 2023 Sean Dougherty <sdougherty@microsoft.com> - 5.12.11-4
+* Wed Apr 26 2023 Sean Dougherty <sdougherty@microsoft.com> - 5.12.11-5
 - Added patch to fix CVE-2023-24607
 
 * Mon Nov 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.12.11-4
