@@ -768,7 +768,7 @@
                 "PR": [
                     "https://github.com/microsoft/CBL-Mariner/pull/5657"
                 ]
-            }
+            },
             "CONFIG_MELLANOX_PLATFORM": {
                 "value": [
                     "y"
