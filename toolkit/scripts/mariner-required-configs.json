@@ -769,6 +769,7 @@
                     "https://github.com/microsoft/CBL-Mariner/pull/5657"
                 ]
             },
+<<<<<<< HEAD
             "CONFIG_DECNET": {
                 "value": [
                     "is not set",
@@ -981,6 +982,8 @@
                     "https://github.com/microsoft/CBL-Mariner/pull/5788"
                 ]
             }
+=======
+>>>>>>> Fix typo
             "CONFIG_MELLANOX_PLATFORM": {
                 "value": [
                     "y"
