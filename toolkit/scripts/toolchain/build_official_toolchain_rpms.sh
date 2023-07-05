@@ -172,7 +172,7 @@ chroot_and_install_rpms () {
         specPath=$(find $SPECROOT -name "$1.spec" -print -quit)
         specDir=$(dirname $specPath)
         # This is a heuristic to find the associated RPMs. In theory we should instead use a more selective filtering like
-        # we use for build_rpm_in_chroot_no_install by querying for exact RPMs that match $2 fround in $1.spec however to
+        # we use for build_rpm_in_chroot_no_install by querying for exact RPMs that match $2 found in $1.spec however to
         # preserve the existing behavior we'll just copy all RPMs that match the name-version-release string.
         #     e.g. matching_rpms=$(rpmspec -q $specPath --srpm --define="with_check 1" --define="_sourcedir $specDir" --define="dist $PARAM_DIST_TAG" --builtrpms --queryformat '%{nvra}.rpm\n' | grep $2)
         verrel=$(rpmspec -q $specPath --srpm --define="with_check 1" --define="_sourcedir $specDir" --define="dist $PARAM_DIST_TAG" --queryformat %{VERSION}-%{RELEASE})
