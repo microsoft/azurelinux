@@ -83,7 +83,7 @@ rm -rf  %{buildroot}/include/
 
 %changelog
 * Wed Jul 05 2023 Muhammad Falak <mwani@microsoft.com> - 1.0.43-1
-- Updating to version 1.0.43 to fix CVE-2022-29503.
+- Bump version to 1.0.43 to fix CVE-2022-29503.
 
 * Fri Jun 24 2022 Henry Beberman <henry.beberman@microsoft.com> - 1.0.41-1
 - Updating to version 1.0.41 to fix CVE-2022-30295.
