@@ -368,10 +368,10 @@ func downloadSingleDeltaRPM(realDependencyGraph *pkggraph.PkgGraph, realBuildNod
 	}
 
 	realRunNode := lookup.RunNode
-	// We need to copy the node since the fetcher may on occasion choose a different package to provide something than
+	// We need to copy the build node since the fetcher may on occasion choose a different package to provide something than
 	// we want. We only consider a delta node valid if the .rpm matches exactly. If we tryy and fail to download a delta
 	// the node would be left in a bad state.
-	nodeCopy := realBuildNode.Copy()
+	buildNodeCopy := realBuildNode.Copy()
 
 	// Get the final output path for the build node if we don't convert it to a delta node
 	originalRpmPath := realBuildNode.RpmPath
@@ -380,18 +380,18 @@ func downloadSingleDeltaRPM(realDependencyGraph *pkggraph.PkgGraph, realBuildNod
 	// Only download dependencies for delta RPMs if we don't already have the RPM in the out/RPMS folder
 	if !foundFinalRPM {
 		// Flag the node as a delta node now so the resolver knows this isn't a critical issue if it fails to resolve
-		nodeCopy.State = pkggraph.StateDelta
-		resolveErr := resolveSingleNode(cloner, nodeCopy, downloadDependencies, nil, make(map[string]bool), make(map[string]bool), deltaRpmDir)
+		buildNodeCopy.State = pkggraph.StateDelta
+		resolveErr := resolveSingleNode(cloner, buildNodeCopy, downloadDependencies, nil, make(map[string]bool), make(map[string]bool), deltaRpmDir)
 		// Failing to clone a dependency should not halt a build.
 		// The build should continue and attempt best effort to build as many packages as possible.
 		if resolveErr != nil {
-			logger.Log.Warnf("Can't find delta RPM to download for %s-%s: %s", nodeCopy.VersionedPkg.Name, nodeCopy.VersionedPkg.Version, resolveErr)
+			logger.Log.Warnf("Can't find delta RPM to download for %s-%s: %s (local copy may be newer than published version)", buildNodeCopy.VersionedPkg.Name, buildNodeCopy.VersionedPkg.Version, resolveErr)
 			return nil
 		}
-		logger.Log.Tracef("Updating real node '%s' with info from newly cached delta node '%s'", realBuildNode, nodeCopy)
+		logger.Log.Tracef("Updating real node '%s' with info from newly cached delta node '%s'", realBuildNode, buildNodeCopy)
 
 		// Check that the RPM we are getting matches the expected out/RPM path using the base name of the file path
-		cachedRPMPath := nodeCopy.RpmPath
+		cachedRPMPath := buildNodeCopy.RpmPath
 		if filepath.Base(cachedRPMPath) != filepath.Base(originalRpmPath) {
 			logger.Log.Warnf("cached delta RPM '%s' does not match expected RPM '%s', skipping", filepath.Base(cachedRPMPath), filepath.Base(originalRpmPath))
 			return nil
