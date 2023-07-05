@@ -768,6 +768,62 @@
                 "PR": [
                     "https://github.com/microsoft/CBL-Mariner/pull/5657"
                 ]
+            },
+            "CONFIG_DECNET": {
+                "value": [
+                    "is not set",
+                    "<missing>"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "DECNET support removed in update to 5.15.118.1 for CBL-Mariner-Linux-Kernel",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/commit/2a974abc09761c05fef697fe229d1b85a7ce3918"
+                ]
+            },
+            "CONFIG_DECNET_ROUTER": {
+                "value": [
+                    "is not set",
+                    "<missing>"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "DECNET support removed in update to 5.15.118.1 for CBL-Mariner-Linux-Kernel",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/commit/2a974abc09761c05fef697fe229d1b85a7ce3918"
+                ]
+            },
+            "CONFIG_DECNET_NF_GRABULATOR": {
+                "value": [
+                    "is not set",
+                    "<missing>"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "DECNET support removed in update to 5.15.118.1 for CBL-Mariner-Linux-Kernel",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/commit/2a974abc09761c05fef697fe229d1b85a7ce3918"
+                ]
+            },
+            "CONFIG_BLK_DEV_SX8": {
+                "value": [
+                    "is not set",
+                    "<missing>"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "The sx8 block driver removed in update to 5.15.118.1 for CBL-Mariner-Linux-Kernel",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/commit/a9ad05e35412cfa69ff93603500e97b7f29a90ca"
+                ]
             }
         }
     }
