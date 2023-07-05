@@ -9,13 +9,14 @@
 Summary:        Practical Extraction and Report Language
 Name:           perl
 Version:        5.30.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPL+ or Artistic
 URL:            https://www.perl.org/
 Group:          Development/Languages
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://www.cpan.org/src/5.0/%{name}-%{version}.tar.gz
+Patch0:         CVE-2023-31486.patch
 Provides:       perl >= 0:5.003000
 Provides:       perl(getopts.pl)
 Provides:       perl(s)
@@ -34,6 +35,7 @@ The Perl package contains the Practical Extraction and
 Report Language.
 %prep
 %setup -q
+%patch0 -p1
 sed -i 's/-fstack-protector/&-all/' Configure
 
 %build
@@ -74,6 +76,10 @@ make test TEST_SKIP_VERSION_CHECK=1
 %{_mandir}/*/*
 
 %changelog
+* Fri Jun 30 2023 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 5.30.3-3
+- Add patch for CVE-2023-31486
+- Fix bogus date in changelog
+
 * Mon Apr 24 2023 Sam Meluch <sammeluch@microsoft.com> 5.30.3-2
 - Add -Dman3ext to Configure script in order to avoid manual page name conflicts on installs
 
@@ -83,7 +89,7 @@ make test TEST_SKIP_VERSION_CHECK=1
 -   Added %%license line automatically
 *   Fri May 8 2020 Nicolas Guibourge <nicolasg@microsoft.com> 5.28.1-3
 -   Undo caretx.c patch
-*   Thu Apr 29 2020 Nicolas Guibourge <nicolasg@microsoft.com> 5.28.1-2
+*   Thu Apr 30 2020 Nicolas Guibourge <nicolasg@microsoft.com> 5.28.1-2
 -   Patch caretx.c so perl works from chroot inside Doccker container
 *   Tue Apr 21 2020 Emre Girgin <mrgirgin@microsoft.com> 5.28.1-1
 -   Upgrade to 5.28.1.
