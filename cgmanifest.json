@@ -25370,6 +25370,16 @@
         }
       }
     },
+     {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rlwrap",
+          "version": "0.46.1",
+          "downloadUrl": "https://github.com/hanslub42/rlwrap/releases/download/0.46.1/rlwrap-0.46.1.tar.gz"
+        }
+      }
+    },
     {
       "component": {
         "type": "other",

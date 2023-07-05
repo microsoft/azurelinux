@@ -1840,6 +1840,7 @@
                 "resource-agents",
                 "rest",
                 "rhash",
+		"rlwrap",
                 "rp-pppoe",
                 "rpm-mpi-hooks",
                 "rpmdevtools",
