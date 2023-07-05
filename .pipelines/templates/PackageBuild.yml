@@ -2,18 +2,24 @@ parameters:
   - name: isCheckBuild
     type: string
     default: "false"
+  - name: isDeltaBuild
+    type: boolean
+    default: false
+  - name: repoRoot
+    type: string
+    default: "$(Build.SourcesDirectory)"
   - name: inputArtifactsFolder
     type: string
     default: "input"
   - name: inputArtifactsName
     type: string
     default: "ARTIFACTS"
-  - name: isExternalToolchain
+  - name: useCustomToolchain
     type: boolean
     default: false
 
 steps:
-  - ${{ if eq(parameters.isExternalToolchain, false) }}:
+  - ${{ if eq(parameters.useCustomToolchain, true) }}:
     - task: DownloadPipelineArtifact@2
       displayName: "Download toolchain"
       inputs:
@@ -21,10 +27,25 @@ steps:
         patterns: "**/toolchain_built_rpms_all.tar.gz"
         path: "$(Build.Repository.LocalPath)/${{ parameters.inputArtifactsFolder }}"
 
+    - script: |
+        toolchain_archive = "$(find "$(Build.Repository.LocalPath)/${{ parameters.inputArtifactsFolder }}" -name toolchain_built_rpms_all.tar.gz)"
+        sudo make -C "${{ parameters.coreRepoRoot }}/toolkit" toolchain TOOLCHAIN_ARCHIVE="$toolchain_archive"
+      displayName: "Populate toolchain"
+
   - script: |
       cat <<EOF
       This is a package build.
       The host architecture is: $(uname -m)
       Running checks: ${{ parameters.isCheckBuild }}
       EOF
-    displayName: "Print parameters"
+
+      run_check_arg="RUN_CHECK=n"
+      if [[ "${{ parameters.isCheckBuild }}" =~ [Tt]rue ]]; then
+        run_check_arg="RUN_CHECK=y"
+      fi
+
+      sudo make -C "${{ parameters.coreRepoRoot }}/toolkit" build-packages -j$(nproc) \
+        REBUILD_TOOLS=y \
+        $run_check_arg \
+        TOOLCHAIN_ARCHIVE="$toolchain_archive"
+    displayName: "Build packages"
