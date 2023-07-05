@@ -387,7 +387,7 @@ cp -pav test/system %{buildroot}/%{_datadir}/%{name}/test/
 
 # rhcontainerbot account currently managed by lsm5
 %changelog
-* Wed Jul 05 2023 Andrew Phelps - 4.1.1-12
+* Wed Jul 05 2023 Andrew Phelps <anphel@microsoft.com> - 4.1.1-12
 - Bump release to rebuild against glibc 2.35-4
 
 * Thu Jun 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.1.1-11

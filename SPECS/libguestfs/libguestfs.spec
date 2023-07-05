@@ -1234,7 +1234,7 @@ rm ocaml/html/.gitignore
 %endif
 
 %changelog
-* Wed Jul 05 2023 Andrew Phelps - 1.44.0-13
+* Wed Jul 05 2023 Andrew Phelps <anphel@microsoft.com> - 1.44.0-13
 - Bump release to rebuild against glibc 2.35-4
 
 * Wed Apr 12 2023 Sam Meluch <sammeluch@microsoft.com> - 1.44.0-12

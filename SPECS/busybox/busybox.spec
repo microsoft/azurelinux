@@ -94,7 +94,7 @@ install -m 644 docs/busybox.petitboot.1 %{buildroot}/%{_mandir}/man1/busybox.pet
 %{_mandir}/man1/busybox.petitboot.1.gz
 
 %changelog
-* Wed Jul 05 2023 Andrew Phelps - 1.35.0-5
+* Wed Jul 05 2023 Andrew Phelps <anphel@microsoft.com> - 1.35.0-5
 - Bump release to rebuild against glibc 2.35-4
 
 * Fri Oct 07 2022 Andy Caldwell <andycaldwell@microsoft.com> - 1.35.0-4

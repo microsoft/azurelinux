@@ -194,7 +194,7 @@ echo "%{_libdir}/dyninst" > %{buildroot}/etc/ld.so.conf.d/%{name}-%{_arch}.conf
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
-* Wed Jul 05 2023 Andrew Phelps - 10.1.0-9
+* Wed Jul 05 2023 Andrew Phelps <anphel@microsoft.com> - 10.1.0-9
 - Bump release to rebuild against glibc 2.35-4
 
 * Tue Sep 13 2022 Andy Caldwell <andycaldwell@microsoft.com> - 10.1.0-8

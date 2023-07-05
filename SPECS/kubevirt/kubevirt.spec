@@ -210,7 +210,7 @@ install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-v
 %{_bindir}/virt-tests
 
 %changelog
-* Wed Jul 05 2023 Andrew Phelps - 0.59.0-4
+* Wed Jul 05 2023 Andrew Phelps <anphel@microsoft.com> - 0.59.0-4
 - Bump release to rebuild against glibc 2.35-4
 
 * Thu Jun 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.59.0-3

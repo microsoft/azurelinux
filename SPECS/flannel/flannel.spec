@@ -48,7 +48,7 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./dist/flanneld
 %{_bindir}/flanneld
 
 %changelog
-* Wed Jul 05 2023 Andrew Phelps - 0.14.0-14
+* Wed Jul 05 2023 Andrew Phelps <anphel@microsoft.com> - 0.14.0-14
 - Bump release to rebuild against glibc 2.35-4
 
 * Thu Jun 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.14.0-13

@@ -122,7 +122,7 @@ cp imgtype %{buildroot}/%{_bindir}/%{name}-imgtype
 %{_datadir}/%{name}/test
 
 %changelog
-* Wed Jul 05 2023 Andrew Phelps - 1.18.0-14
+* Wed Jul 05 2023 Andrew Phelps <anphel@microsoft.com> - 1.18.0-14
 - Bump release to rebuild against glibc 2.35-4
 
 * Thu Jun 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.18.0-13

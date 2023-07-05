@@ -129,7 +129,7 @@ make check || {
 %{_rpmconfigdir}/supermin-find-requires
 
 %changelog
-* Wed Jul 05 2023 Andrew Phelps - 5.2.1-5
+* Wed Jul 05 2023 Andrew Phelps <anphel@microsoft.com> - 5.2.1-5
 - Bump release to rebuild against glibc 2.35-4
 
 * Tue Sep 13 2022 Andy Caldwell <andycaldwell@microsoft.com> - 5.2.1-4

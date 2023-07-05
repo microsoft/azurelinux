@@ -61,7 +61,7 @@ ln -s %{_libexecdir}/%{name}/%{name} %{buildroot}%{_libexecdir}/podman/%{name}
 %{_libexecdir}/podman/%{name}
 
 %changelog
-* Wed Jul 05 2023 Andrew Phelps - 0.1.7-7
+* Wed Jul 05 2023 Andrew Phelps <anphel@microsoft.com> - 0.1.7-7
 - Bump release to rebuild against glibc 2.35-4
 
 * Tue Sep 13 2022 Andy Caldwell <andycaldwell@microsoft.com> - 0.1.7-6

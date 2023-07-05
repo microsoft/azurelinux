@@ -66,7 +66,7 @@ ln -s %{_bindir}/tini-static %{buildroot}%{_bindir}/docker-init
 %{_bindir}/docker-init
 
 %changelog
-* Wed Jul 05 2023 Andrew Phelps - 0.19.0-9
+* Wed Jul 05 2023 Andrew Phelps <anphel@microsoft.com> - 0.19.0-9
 - Bump release to rebuild against glibc 2.35-4
 
 * Tue Sep 13 2022 Andy Caldwell <andycaldwell@microsoft.com> - 0.19.0-8
