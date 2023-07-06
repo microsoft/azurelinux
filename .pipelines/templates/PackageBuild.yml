@@ -25,7 +25,12 @@ steps:
         path: "$(Build.Repository.LocalPath)/input"
 
     - script: |
-        toolchain_archive = "$(find "$(Build.Repository.LocalPath)/input" -name toolchain_built_rpms_all.tar.gz)"
+        toolchain_archive="$(find "$(Build.Repository.LocalPath)/input" -name toolchain_built_rpms_all.tar.gz)"
+        if [[ ! -f "$toolchain_archive" ]]; then
+          echo "ERROR: toolchain archive not found!" >&2
+          exit 1
+        fi
+
         sudo make -C "${{ parameters.repoRoot }}/toolkit" toolchain TOOLCHAIN_ARCHIVE="$toolchain_archive"
       displayName: "Populate toolchain"
 
