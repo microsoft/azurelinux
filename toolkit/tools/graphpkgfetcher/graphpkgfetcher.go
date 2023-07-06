@@ -271,8 +271,9 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile stri
 	unresolvedNodes := findUnresolvedNodes(dependencyGraph.AllRunNodes())
 
 	timestamp.StartEvent("clone graph", nil)
-	for _, n := range unresolvedNodes {
-		resolveErr := resolveSingleNode(cloner, n, downloadDependencies, toolchainPackages, fetchedPackages, prebuiltPackages, *outDir)
+	for i, n := range unresolvedNodes {
+		progress := (i * 100) / len(unresolvedNodes)
+		resolveErr := resolveSingleNode(cloner, n, downloadDependencies, toolchainPackages, fetchedPackages, prebuiltPackages, *outDir, progress)
 		// Failing to clone a dependency should not halt a build.
 		// The build should continue and attempt best effort to build as many packages as possible.
 		if resolveErr != nil {
@@ -314,7 +315,9 @@ func downloadAllAvailableDeltaRPMs(realDependencyGraph, dependencyGraphDeltaCopy
 
 	// For each build node, try to update it to a delta node with a downloaded RPM backing it.
 	logger.Log.Debugf("Resolving build nodes")
-	for _, n := range realDependencyGraph.AllBuildNodes() {
+	buildNodes := realDependencyGraph.AllBuildNodes()
+	for i, n := range buildNodes {
+		progress := (i * 100) / len(buildNodes)
 		// If this node isn't part of the optimized graph, skip it.
 		if _, ok := srpmPaths[n.SrpmPath]; !ok {
 			logger.Log.Debugf("Skipping non-optimized delta build node %s", n)
@@ -323,7 +326,7 @@ func downloadAllAvailableDeltaRPMs(realDependencyGraph, dependencyGraphDeltaCopy
 
 		logger.Log.Debugf("Resolving build node %s", n)
 		if n.State == pkggraph.StateBuild {
-			err := downloadSingleDeltaRPM(realDependencyGraph, n, cloner, *outDir)
+			err := downloadSingleDeltaRPM(realDependencyGraph, n, cloner, *outDir, progress)
 			if err != nil {
 				return fmt.Errorf("failed to download delta RPM for build node %s: %w", n, err)
 			}
@@ -342,7 +345,7 @@ func downloadAllAvailableDeltaRPMs(realDependencyGraph, dependencyGraphDeltaCopy
 //     to find the actual build node in the graph.
 //   - cloner: The cloner to use to download the RPMs
 //   - deltaRpmDir: The directory to download the RPMs into
-func downloadSingleDeltaRPM(realDependencyGraph *pkggraph.PkgGraph, buildNode *pkggraph.PkgNode, cloner *rpmrepocloner.RpmRepoCloner, deltaRpmDir string) (err error) {
+func downloadSingleDeltaRPM(realDependencyGraph *pkggraph.PkgGraph, buildNode *pkggraph.PkgNode, cloner *rpmrepocloner.RpmRepoCloner, deltaRpmDir string, progress int) (err error) {
 	const downloadDependencies = false
 	var lookup *pkggraph.LookupNode
 
@@ -415,7 +418,7 @@ func downloadSingleDeltaRPM(realDependencyGraph *pkggraph.PkgGraph, buildNode *p
 			runNode.RpmPath = cachedRPMPath
 			buildNode.RpmPath = cachedRPMPath
 
-			logger.Log.Infof("Delta RPM found for '%s-%s'.", buildNode.VersionedPkg.Name, buildNode.VersionedPkg.Version)
+			logger.Log.Infof("Delta Progress %d%%: delta RPM found for '%s-%s'.", progress, buildNode.VersionedPkg.Name, buildNode.VersionedPkg.Version)
 			logger.Log.Debugf("Converted delta build node is now: '%s'", buildNode)
 			logger.Log.Debugf("Converted delta run node is now: '%s'", runNode)
 		} else {
@@ -423,7 +426,7 @@ func downloadSingleDeltaRPM(realDependencyGraph *pkggraph.PkgGraph, buildNode *p
 			return nil
 		}
 	} else {
-		logger.Log.Infof("Already have a RPM for '%s' at '%s'.", buildNode.VersionedPkg.Name, originalRpmPath)
+		logger.Log.Infof("Delta Progress %d%%: already have a RPM for '%s' at '%s'.", progress, buildNode.VersionedPkg.Name, originalRpmPath)
 	}
 
 	return err
@@ -431,7 +434,7 @@ func downloadSingleDeltaRPM(realDependencyGraph *pkggraph.PkgGraph, buildNode *p
 
 // resolveSingleNode caches the RPM for a single node.
 // It will modify fetchedPackages on a successful package clone.
-func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNode, cloneDeps bool, toolchainPackages []string, fetchedPackages, prebuiltPackages map[string]bool, outDir string) (err error) {
+func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNode, cloneDeps bool, toolchainPackages []string, fetchedPackages, prebuiltPackages map[string]bool, outDir string, progress int) (err error) {
 	logger.Log.Debugf("Adding node %s to the cache", node.FriendlyName())
 
 	logger.Log.Debugf("Searching for a package which supplies: %s", node.VersionedPkg.Name)
@@ -489,7 +492,7 @@ func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNo
 		node.State = pkggraph.StateCached
 	}
 
-	logger.Log.Infof("Choosing '%s' to provide '%s'.", filepath.Base(node.RpmPath), node.VersionedPkg.Name)
+	logger.Log.Infof("Cache progress %d%%: choosing '%s' to provide '%s'.", progress, filepath.Base(node.RpmPath), node.VersionedPkg.Name)
 
 	return
 }
