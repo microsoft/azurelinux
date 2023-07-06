@@ -146,6 +146,7 @@ make check %{?_smp_mflags}
 %changelog
 * Wed Jul 05 2023 Minghe Ren <mingheren@microsoft.com> - 23.2-1
 - Upgrade cloud-init to 23.2
+- Remove CVE-2023-1786.patch as it is no longer needed
 
 * Thu Jun 29 2023 Minghe Ren <mingheren@microsoft.com> - 22.4-3
 - Add patch for CVE-2023-1786
