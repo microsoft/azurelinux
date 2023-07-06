@@ -8,7 +8,9 @@ Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# Note: the %%{name}-%%{version}-cargo-%%{release}.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
 Source1:        %{name}-%{version}-cargo-%{release}.tar.gz
+# Note: the %%{name}-%%{version}-vendor-%%{release}.tar.gz file contains vendor sources by capturing the contents downloaded into "vendor" folder when "cargo vendor" is run.
 Source2:        %{name}-%{version}-vendor-%{release}.tar.gz
 Patch0:         CVE-2023-28448.patch
 Patch1:         CVE-2023-2650.patch
