@@ -384,6 +384,8 @@ func downloadSingleDeltaRPM(realDependencyGraph *pkggraph.PkgGraph, buildNode *p
 		fullyQualifiedRpmName := filepath.Base(originalRpmPath)
 		fullyQualifiedRpmName = strings.TrimSuffix(fullyQualifiedRpmName, ".rpm")
 
+		// Convert the name back into the expected path in the RPM cache. This is where the cloner is expected to put
+		// the RPM when it downloads it.
 		cachedRPMPath := rpmPackageToRPMPath(fullyQualifiedRpmName, deltaRpmDir)
 		foundCacheRPM, err := file.PathExists(cachedRPMPath)
 		if err != nil {
