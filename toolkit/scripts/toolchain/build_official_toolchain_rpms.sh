@@ -176,12 +176,10 @@ chroot_and_install_rpms () {
         # preserve the existing behavior we'll just copy all RPMs that match the name-version-release string.
         #     e.g. matching_rpms=$(rpmspec -q $specPath --srpm --define="with_check 1" --define="_sourcedir $specDir" --define="dist $PARAM_DIST_TAG" --builtrpms --queryformat '%{nvra}.rpm\n' | grep $2)
         verrel=$(rpmspec -q $specPath --srpm --define="with_check 1" --define="_sourcedir $specDir" --define="dist $PARAM_DIST_TAG" --queryformat %{VERSION}-%{RELEASE})
-        # Omit debuginfo RPMs since they're not needed for the build and are slow to install.
-        find $CHROOT_RPMS_DIR -name "$2*$verrel*" -not -path "*debuginfo*" -exec cp {} $CHROOT_INSTALL_RPM_DIR ';'
+        find $CHROOT_RPMS_DIR -name "$2*$verrel*" -exec cp {} $CHROOT_INSTALL_RPM_DIR ';'
     else
-        # Omit debuginfo RPMs since they're not needed for the build and are slow to install using an inverted glob pattern '!(*debuginfo*)'
-        cp -v $CHROOT_RPMS_DIR_ARCH/$1-!(*debuginfo*) $CHROOT_INSTALL_RPM_DIR
-        cp -v $CHROOT_RPMS_DIR_NOARCH/$1-!(*debuginfo*) $CHROOT_INSTALL_RPM_DIR
+        cp -v $CHROOT_RPMS_DIR_ARCH/$1-* $CHROOT_INSTALL_RPM_DIR
+        cp -v $CHROOT_RPMS_DIR_NOARCH/$1-* $CHROOT_INSTALL_RPM_DIR
     fi
 
     chroot_mount
