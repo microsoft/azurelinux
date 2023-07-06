@@ -5,9 +5,6 @@ parameters:
   - name: isDeltaBuild
     type: boolean
     default: false
-  - name: inputArtifactsFolder
-    type: string
-    default: "input"
   - name: inputArtifactsName
     type: string
     default: "ARTIFACTS"
@@ -25,10 +22,10 @@ steps:
       inputs:
         artifact: "${{ parameters.inputArtifactsName }}"
         patterns: "**/toolchain_built_rpms_all.tar.gz"
-        path: "$(Build.Repository.LocalPath)/${{ parameters.inputArtifactsFolder }}"
+        path: "$(Build.Repository.LocalPath)/input"
 
     - script: |
-        toolchain_archive = "$(find "$(Build.Repository.LocalPath)/${{ parameters.inputArtifactsFolder }}" -name toolchain_built_rpms_all.tar.gz)"
+        toolchain_archive = "$(find "$(Build.Repository.LocalPath)/input" -name toolchain_built_rpms_all.tar.gz)"
         sudo make -C "${{ parameters.repoRoot }}/toolkit" toolchain TOOLCHAIN_ARCHIVE="$toolchain_archive"
       displayName: "Populate toolchain"
 
