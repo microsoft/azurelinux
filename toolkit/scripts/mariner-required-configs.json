@@ -769,6 +769,7 @@
                     "https://github.com/microsoft/CBL-Mariner/pull/5657"
                 ]
             },
+<<<<<<< HEAD
             "CONFIG_DECNET": {
                 "value": [
                     "is not set",
@@ -825,6 +826,8 @@
                     "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/commit/a9ad05e35412cfa69ff93603500e97b7f29a90ca"
                 ]
             },
+=======
+>>>>>>> 34f8c4829fabed14d065c3eacf2a66555fd448c0
             "CONFIG_MELLANOX_PLATFORM": {
                 "value": [
                     "y"
