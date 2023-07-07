@@ -1,7 +1,8 @@
 %global security_hardening nofortify
 %define _use_internal_dependency_generator 0
+%define toolname gcc
 Summary:        Contains the GNU compiler collection
-Name:           gcc
+Name:           gcc12
 Version:        12.3.0
 Release:        1%{?dist}
 License:        GPLv2+
@@ -9,7 +10,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://gcc.gnu.org/
-Source0:        https://ftp.gnu.org/gnu/gcc/%{name}-%{version}/%{name}-%{version}.tar.xz
+Source0:        https://ftp.gnu.org/gnu/gcc/%{toolname}-%{version}/%{toolname}-%{version}.tar.xz
 Requires:       gcc-c++ = %{version}-%{release}
 Requires:       gmp
 Requires:       libgcc-atomic = %{version}-%{release}
@@ -127,7 +128,7 @@ An implementation of OpenMP for the C, C++, and Fortran 95 compilers in the GNU 
 This package contains development headers and static library for libgomp
 
 %prep
-%setup -q
+%setup -q -n %{toolname}-%{version}
 # disable no-pie for gcc binaries
 sed -i '/^NO_PIE_CFLAGS = /s/@NO_PIE_CFLAGS@//' gcc/Makefile.in
 
@@ -168,7 +169,7 @@ mv host-%{_host}/libbacktrace/.libs/libbacktrace.a %{buildroot}%{_lib64dir}
 mv libbacktrace/backtrace.h %{buildroot}%{_includedir}
 
 rm -rf %{buildroot}%{_infodir}
-%find_lang %{name} --all-name
+%find_lang %{toolname} --all-name
 
 %check
 ulimit -s 32768
@@ -185,7 +186,7 @@ make %{?_smp_mflags} check-gcc
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
-%files -f %{name}.lang
+%files -f %{toolname}.lang
 %defattr(-,root,root)
 %license COPYING
 %{_libdir}/cpp
