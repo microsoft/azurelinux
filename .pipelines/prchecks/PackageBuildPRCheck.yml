@@ -84,12 +84,20 @@ extends:
               strategy:
                 matrix:
                   regular:
-                    runCheck: 'false'
+                    runCheck: 'n'
                   ptest:
-                    runCheck: 'true'
+                    runCheck: 'y'
               steps:
                 - template: .pipelines/templates/PackageBuild.yml@self
                   parameters:
                     isCheckBuild: '$(runCheck)'
                     inputArtifactsName: drop_Toolchain_${{ configuration.name }}_Build
                     useCustomToolchain: true
+                    buildArtifactsFolder: $(ob_outputDirectory)
+
+                - task: PublishPipelineArtifact@1
+                  inputs:
+                    artifact: drop_RPMs_${{ configuration.name }}_Build
+                    targetPath: $(ob_outputDirectory)
+                  condition: always()
+                  displayName: 'Publish packages build artifacts'
