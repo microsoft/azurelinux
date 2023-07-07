@@ -376,19 +376,19 @@ func (r *RpmRepoCloner) initializeMountedChrootRepo(repoDir string) (err error) 
 // It will automatically resolve packages that describe a provide or file from a package.
 // If all packages were pre-built, the cloner will set allPackagesPrebuilt = true.
 func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.PackageVer) (allPackagesPrebuilt bool, err error) {
-	return r.cloneInternal(cloneDeps, packagesToClone, nil)
+	packageNames := []string{}
+	for _, packageToClone := range packagesToClone {
+		logger.Log.Debugf("Cloning (%s).", packageToClone)
+		packageNames = append(packageNames, convertPackageVersionToTdnfArg(packageToClone))
+	}
+	return r.CloneRawPackageNames(cloneDeps, packageNames...)
 }
 
 // CloneRawPackageNames clones the provided package name exactly as specified.
 // If cloneDeps is set, package dependencies will also be cloned.
 // This version of clone will not resolve provides or files from other packages beyond what tdnf is able to do itself.
 // If all packages were pre-built, the cloner will set allPackagesPrebuilt = true.
-func (r *RpmRepoCloner) CloneRawPackageNames(cloneDeps bool, packageNamesToClone ...string) (allPackagesPrebuilt bool, err error) {
-	return r.cloneInternal(cloneDeps, nil, packageNamesToClone)
-}
-
-// cloneInternal is the internal implementation of Clone and CloneRawPackageNames and can handle both cases.
-func (r *RpmRepoCloner) cloneInternal(cloneDeps bool, packagesToClone []*pkgjson.PackageVer, packageNamesToClone []string) (allPackagesPrebuilt bool, err error) {
+func (r *RpmRepoCloner) CloneRawPackageNames(cloneDeps bool, rawPackageNames ...string) (allPackagesPrebuilt bool, err error) {
 	timestamp.StartEvent("cloning packages", nil)
 	defer timestamp.StopEvent(nil)
 
@@ -406,28 +406,9 @@ func (r *RpmRepoCloner) cloneInternal(cloneDeps bool, packagesToClone []*pkgjson
 		r.chrootCloneDir,
 	}
 
-	logger.Log.Debugf("Will clone in total %d items.", len(packagesToClone)+len(packageNamesToClone))
+	logger.Log.Debugf("Will clone in total %d items.", len(rawPackageNames))
 
-	allPackagesPrebuilt = true
-	for _, packageToClone := range packagesToClone {
-		logger.Log.Debugf("Cloning (%s).", packageToClone)
-
-		packageArg := convertPackageVersionToTdnfArg(packageToClone)
-		finalArgs := append(constantArgs, packageArg)
-		err = r.chroot.Run(func() (chrootErr error) {
-			prebuilt, chrootErr := r.clonePackage(finalArgs)
-			if !prebuilt {
-				allPackagesPrebuilt = false
-			}
-			return
-		})
-
-		if err != nil {
-			return
-		}
-	}
-
-	for _, packageNameToClone := range packageNamesToClone {
+	for _, packageNameToClone := range rawPackageNames {
 		logger.Log.Debugf("Cloning raw name (%s).", packageNameToClone)
 
 		finalArgs := append(constantArgs, packageNameToClone)

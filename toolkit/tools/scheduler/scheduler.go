@@ -120,7 +120,7 @@ func main() {
 		logger.Log.Fatalf("Failed to read DOT graph with error:\n%s", err)
 	}
 
-	finalPackagesToBuild, packagesToRebuild, packagesToIgnore, err := schedulerutils.ParseAndGeneratePackageList(dependencyGraph, *pkgsToBuild, *pkgsToRebuild, *pkgsToIgnore, *imageConfig, *baseDirPath)
+	finalPackagesToBuild, packagesToRebuild, packagesToIgnore, err := schedulerutils.ParseAndGeneratePackageList(dependencyGraph, exe.ParseListArgument(*pkgsToBuild), exe.ParseListArgument(*pkgsToRebuild), exe.ParseListArgument(*pkgsToIgnore), *imageConfig, *baseDirPath)
 	if err != nil {
 		logger.Log.Fatalf("Failed to generate package list with error:\n%s", err)
 	}
@@ -208,8 +208,9 @@ func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, work
 
 	// If optimizeWithCachedImplicit is true, we can use the cached implicit dependencies to aggressively prune the graph during the first pass. We will still
 	// try to avoid using the cached implicit dependencies until we have no other choice during the build, but since the graph is pruned, we will
-	// avoid building packages that are not needed.
-	_, pkgGraph, goalNode, err := schedulerutils.InitializeGraph(inputFile, nil, packagesToBuild, (canUseCache && optimizeWithCachedImplicit))
+	// avoid building packages that are not needed. Obviously we can only do this if the cache is enabled.
+	allowEarlyImplicitOptimization := (canUseCache && optimizeWithCachedImplicit)
+	_, pkgGraph, goalNode, err := schedulerutils.InitializeGraphFromFile(inputFile, packagesToBuild, allowEarlyImplicitOptimization)
 	if err != nil {
 		return
 	}
@@ -376,7 +377,7 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild []*pkgjson
 				if res.Node.Type == pkggraph.TypeBuild && res.WasDelta {
 					logger.Log.Tracef("This is a delta result, update the graph with the new delta files for '%v'.", res.Node)
 					// We will need to update the graph with paths to any delta files that were actually rebuilt.
-					err = setAssociatedDeltaPaths(res, res.BuiltFiles, pkgGraph, graphMutex)
+					err = setAssociatedDeltaPaths(res, pkgGraph, graphMutex)
 					if err != nil {
 						// Failures to manipulate the graph are fatal. The ancillary delta nodes may be in an invalid state
 						// and we won't be able to track which RPMs were built or used delta files.
@@ -466,14 +467,14 @@ func updateGraphWithImplicitProvides(res *schedulerutils.BuildResult, pkgGraph *
 // setAssociatedDeltaPaths sets the RpmPath for all of the request's ancillary nodes (both build and run) to the actual
 // RPM paths. A delta node will normally point at the cached RPM path, but we want to point it at the actual RPM if we built it.
 // This function should only be called on delta build nodes.
-func setAssociatedDeltaPaths(res *schedulerutils.BuildResult, builtFiles []string, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex) (err error) {
+func setAssociatedDeltaPaths(res *schedulerutils.BuildResult, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex) (err error) {
 	graphMutex.Lock()
 	defer graphMutex.Unlock()
 
 	// Build map of basename to full path for built files. This will allow us to find the actual RPM path we built for
 	// any given .rpm file built from our ancillary nodes.
 	builtFileMap := make(map[string]string)
-	for _, builtFile := range builtFiles {
+	for _, builtFile := range res.BuiltFiles {
 		// We should not expect to see multiple built files with the same basename
 		baseName := filepath.Base(builtFile)
 		_, hasConflict := builtFileMap[baseName]
@@ -498,11 +499,10 @@ func setAssociatedDeltaPaths(res *schedulerutils.BuildResult, builtFiles []strin
 				node.RpmPath = builtFile
 			} else {
 				// Sanity check that any non-delta node has an exact match to the real RPM path
-				logger.Log.Errorf("non-delta run node '%s' has path '%s' (expected '%s')", node, node.RpmPath, builtFile)
 				if node.RpmPath != builtFile {
 					err = fmt.Errorf("non-delta run node '%s' has unexpected path '%s' (expected non-delta path of '%s')", node, node.RpmPath, builtFile)
+					return
 				}
-				return
 			}
 		}
 	}

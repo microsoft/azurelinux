@@ -56,8 +56,8 @@ func RecordBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, b
 	buildNodes := pkgGraph.AllBuildNodes()
 	for _, node := range buildNodes {
 
-		// Convert the below to a switch statement. A node can be a delta if it was build or cached. If it was cached
-		// we used the cached rpm. If it is not cached that means it was built and we discard the delta rpm.
+		//  node can be a delta if it was build or cached. If it was cached we used the cached rpm. If it is not cached
+		// that means it was built and we discard the delta rpm.
 		if buildState.IsNodeCached(node) {
 			if buildState.IsNodeDelta(node) {
 				prebuiltDeltaSRPMS[node.SrpmPath] = node

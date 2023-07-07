@@ -78,51 +78,46 @@ func main() {
 	timestamp.BeginTiming("graphpkgfetcher", *timestampFile)
 	defer timestamp.CompleteTiming()
 
-	err = fetchPackages()
-	if err != nil {
-		logger.Log.Fatalf("Failed to fetch packages. Error: %s", err)
-	}
-}
-
-func fetchPackages() (err error) {
-	var cloner *rpmrepocloner.RpmRepoCloner
 	dependencyGraph, err := pkggraph.ReadDOTGraphFile(*inputGraph)
 	if err != nil {
-		err = fmt.Errorf("failed to read graph to file:\n%w", err)
-		return
-	}
-
-	toolchainPackages, err := schedulerutils.ReadReservedFilesList(*toolchainManifest)
-	if err != nil {
-		err = fmt.Errorf("unable to read toolchain manifest file '%s':\n%w", *toolchainManifest, err)
+		logger.Log.Fatalf("Failed to read graph to file: %s", err)
 		return
 	}
 
 	hasUnresolvedNodes := hasUnresolvedNodes(dependencyGraph)
-	if *tryDownloadDeltaRPMs || hasUnresolvedNodes {
-		// Create the worker environment
-		cloner, err = rpmrepocloner.ConstructCloner(*outDir, *tmpDir, *workertar, *existingRpmDir, *existingToolchainRpmDir, *tlsClientCert, *tlsClientKey, *repoFiles)
+	if hasUnresolvedNodes || *tryDownloadDeltaRPMs {
+		err = fetchPackages(dependencyGraph, hasUnresolvedNodes, *tryDownloadDeltaRPMs)
 		if err != nil {
-			err = fmt.Errorf("failed to setup new cloner:\n%w", err)
-			return err
+			logger.Log.Fatalf("Failed to fetch packages. Error: %s", err)
 		}
-		defer cloner.Close()
-
-		enabledRepos := rpmrepocloner.RepoFlagAll
-		if !*usePreviewRepo {
-			enabledRepos = enabledRepos & ^rpmrepocloner.RepoFlagPreview
-		}
-		if *disableUpstreamRepos {
-			enabledRepos = enabledRepos & ^rpmrepocloner.RepoFlagUpstream
-		}
-		if *disableDefaultRepos {
-			enabledRepos = enabledRepos & ^rpmrepocloner.RepoFlagMarinerDefaults
-		}
-		cloner.SetEnabledRepos(enabledRepos)
 	}
 
+	// Write the final graph to file
+	err = pkggraph.WriteDOTGraphFile(dependencyGraph, *outputGraph)
+	if err != nil {
+		logger.Log.Fatalf("Failed to write cache graph to file: %s", err)
+		return
+	}
+}
+
+func fetchPackages(dependencyGraph *pkggraph.PkgGraph, hasUnresolvedNodes, tryDownloadDeltaRPMs bool) (err error) {
+	// Create the worker environment
+	cloner, err := setupCloner()
+	if err != nil {
+		err = fmt.Errorf("failed to setup cloner:\n%w", err)
+		return
+	}
+	defer cloner.Close()
+
 	if hasUnresolvedNodes {
+		var toolchainPackages []string
 		logger.Log.Info("Found unresolved packages to cache, downloading packages")
+		toolchainPackages, err = schedulerutils.ReadReservedFilesList(*toolchainManifest)
+		if err != nil {
+			err = fmt.Errorf("unable to read toolchain manifest file '%s':\n%w", *toolchainManifest, err)
+			return
+		}
+
 		err = resolveGraphNodes(dependencyGraph, *inputSummaryFile, toolchainPackages, cloner, *stopOnFailure)
 		if err != nil {
 			err = fmt.Errorf("failed to resolve graph:\n%w", err)
@@ -133,7 +128,7 @@ func fetchPackages() (err error) {
 	}
 
 	// Optional delta build cache hydration
-	if *tryDownloadDeltaRPMs {
+	if tryDownloadDeltaRPMs {
 		logger.Log.Info("Attempting to download delta RPMs for build nodes")
 		err = downloadDeltaNodes(dependencyGraph, cloner)
 		if err != nil {
@@ -142,29 +137,43 @@ func fetchPackages() (err error) {
 		}
 	}
 
-	// Write the final graph to file
-	err = pkggraph.WriteDOTGraphFile(dependencyGraph, *outputGraph)
+	// If we grabbed any RPMs, we need to convert them into a local repo
+	err = cloner.ConvertDownloadedPackagesIntoRepo()
 	if err != nil {
-		err = fmt.Errorf("failed to write cache graph to file:\n%w", err)
+		err = fmt.Errorf("failed to convert downloaded RPMs into a repo:\n%w", err)
+		return err
+	}
+
+	if strings.TrimSpace(*outputSummaryFile) != "" {
+		err = repoutils.SaveClonedRepoContents(cloner, *outputSummaryFile)
+		if err != nil {
+			err = fmt.Errorf("failed to save cloned repo contents:\n%w", err)
+			return err
+		}
+	}
+
+	return
+}
+
+func setupCloner() (cloner *rpmrepocloner.RpmRepoCloner, err error) {
+	// Create the worker environment
+	cloner, err = rpmrepocloner.ConstructCloner(*outDir, *tmpDir, *workertar, *existingRpmDir, *existingToolchainRpmDir, *tlsClientCert, *tlsClientKey, *repoFiles)
+	if err != nil {
+		err = fmt.Errorf("failed to setup new cloner:\n%w", err)
 		return
 	}
 
-	// If we grabbed any RPMs, we need to convert them into a local repo
-	if *tryDownloadDeltaRPMs || hasUnresolvedNodes {
-		err = cloner.ConvertDownloadedPackagesIntoRepo()
-		if err != nil {
-			err = fmt.Errorf("failed to convert downloaded RPMs into a repo:\n%w", err)
-			return err
-		}
-
-		if strings.TrimSpace(*outputSummaryFile) != "" {
-			err = repoutils.SaveClonedRepoContents(cloner, *outputSummaryFile)
-			if err != nil {
-				err = fmt.Errorf("failed to save cloned repo contents:\n%w", err)
-				return err
-			}
-		}
+	enabledRepos := rpmrepocloner.RepoFlagAll
+	if !*usePreviewRepo {
+		enabledRepos = enabledRepos & ^rpmrepocloner.RepoFlagPreview
 	}
+	if *disableUpstreamRepos {
+		enabledRepos = enabledRepos & ^rpmrepocloner.RepoFlagUpstream
+	}
+	if *disableDefaultRepos {
+		enabledRepos = enabledRepos & ^rpmrepocloner.RepoFlagMarinerDefaults
+	}
+	cloner.SetEnabledRepos(enabledRepos)
 	return
 }
 
@@ -191,22 +200,22 @@ func downloadDeltaNodes(dependencyGraph *pkggraph.PkgGraph, cloner *rpmrepoclone
 
 	// Generate the list of packages that need to be built. If none are requested then all packages will be built. We
 	// don't care about explicit rebuilds here since we are going to rebuild them anyway.
-	packageVersToBuild, _, _, err := schedulerutils.ParseAndGeneratePackageList(dependencyGraph, *pkgsToBuild, *pkgsToRebuild, *pkgsToIgnore, *imageConfig, *baseDirPath)
+	packageVersToBuild, _, _, err := schedulerutils.ParseAndGeneratePackageList(dependencyGraph, exe.ParseListArgument(*pkgsToBuild), exe.ParseListArgument(*pkgsToRebuild), exe.ParseListArgument(*pkgsToIgnore), *imageConfig, *baseDirPath)
 	if err != nil {
-		err = fmt.Errorf("unable to generate package build list to calculate delta downloads: %w", err)
+		err = fmt.Errorf("unable to generate package build list to calculate delta downloads:\n%w", err)
 		return
 	}
 
 	// We will heavily modify this graph so it should not be used for anything else, create a copy of it to work with.
 	deltaPkgGraphCopy, err := dependencyGraph.DeepCopy()
 	if err != nil {
-		err = fmt.Errorf("failed to copy graph for delta package downloading: %w", err)
+		err = fmt.Errorf("failed to copy graph for delta package downloading:\n%w", err)
 		return
 	}
 
-	isGraphOptimized, deltaPkgGraphCopy, _, err := schedulerutils.InitializeGraph("", deltaPkgGraphCopy, packageVersToBuild, useImplicitForOptimization)
+	isGraphOptimized, deltaPkgGraphCopy, _, err := schedulerutils.PrepareGraphForBuild(deltaPkgGraphCopy, packageVersToBuild, useImplicitForOptimization)
 	if err != nil {
-		err = fmt.Errorf("failed to initialize graph for delta package downloading: %w", err)
+		err = fmt.Errorf("failed to initialize graph for delta package downloading:\n%w", err)
 		return
 	}
 
@@ -214,12 +223,10 @@ func downloadDeltaNodes(dependencyGraph *pkggraph.PkgGraph, cloner *rpmrepoclone
 		logger.Log.Warnf("Delta fetcher was unable to prune the build graph. All possible build nodes will be included so delta package downloading will be very slow!")
 	}
 
-	if len(deltaPkgGraphCopy.AllBuildNodes()) > 0 {
-		err = downloadAllAvailableDeltaRPMs(dependencyGraph, deltaPkgGraphCopy, cloner)
-		if err != nil {
-			err = fmt.Errorf("failed to download delta RPMs: %w", err)
-			return
-		}
+	err = downloadAllAvailableDeltaRPMs(dependencyGraph, deltaPkgGraphCopy, cloner)
+	if err != nil {
+		err = fmt.Errorf("failed to download delta RPMs:\n%w", err)
+		return
 	}
 
 	return
@@ -272,8 +279,8 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile stri
 
 	timestamp.StartEvent("clone graph", nil)
 	for i, n := range unresolvedNodes {
-		progress := (i * 100) / len(unresolvedNodes)
-		resolveErr := resolveSingleNode(cloner, n, downloadDependencies, toolchainPackages, fetchedPackages, prebuiltPackages, *outDir, progress)
+		resolveErr := resolveSingleNode(cloner, n, downloadDependencies, toolchainPackages, fetchedPackages, prebuiltPackages, *outDir)
+		logger.Log.Infof("Cache progress %d%%: choosing '%s' to provide '%s'.", ((i * 100) / len(unresolvedNodes)), filepath.Base(n.RpmPath), n.VersionedPkg.Name)
 		// Failing to clone a dependency should not halt a build.
 		// The build should continue and attempt best effort to build as many packages as possible.
 		if resolveErr != nil {
@@ -296,7 +303,7 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile stri
 }
 
 // downloadAllAvailableDeltaRPMs scans a graph and for each build node in the graph and tries to replace it with a cached node instead.
-// to satisfy it.
+// to satisfy it. Delta nodes will be saved to the cache directory set for the cloner.
 //   - realDependencyGraph: The graph to use to find the packages we need to build. Should have any caching operations already
 //     performed on it. Will be updated with the paths to the delta RPMs we download.
 //   - dependencyGraphDeltaCopy: A copy of the graph we will use to try to optimize the build nodes. This graph should be
@@ -317,7 +324,6 @@ func downloadAllAvailableDeltaRPMs(realDependencyGraph, dependencyGraphDeltaCopy
 	logger.Log.Debugf("Resolving build nodes")
 	buildNodes := realDependencyGraph.AllBuildNodes()
 	for i, n := range buildNodes {
-		progress := (i * 100) / len(buildNodes)
 		// If this node isn't part of the optimized graph, skip it.
 		if _, ok := srpmPaths[n.SrpmPath]; !ok {
 			logger.Log.Debugf("Skipping non-optimized delta build node %s", n)
@@ -326,9 +332,14 @@ func downloadAllAvailableDeltaRPMs(realDependencyGraph, dependencyGraphDeltaCopy
 
 		logger.Log.Debugf("Resolving build node %s", n)
 		if n.State == pkggraph.StateBuild {
-			err := downloadSingleDeltaRPM(realDependencyGraph, n, cloner, *outDir, progress)
+			err := downloadSingleDeltaRPM(realDependencyGraph, n, cloner)
 			if err != nil {
-				return fmt.Errorf("failed to download delta RPM for build node %s: %w", n, err)
+				return fmt.Errorf("failed to download delta RPM for build node %s:\n%w", n, err)
+			}
+			if n.State == pkggraph.StateDelta {
+				logger.Log.Infof("Delta Progress %d%%: delta RPM found for '%s-%s'.", (i*100)/len(buildNodes), n.VersionedPkg.Name, n.VersionedPkg.Version)
+			} else {
+				logger.Log.Infof("Delta Progress %d%%: skipped getting delta RPM for '%s' at '%s'.", (i*100)/len(buildNodes), n.VersionedPkg.Name, n.RpmPath)
 			}
 		}
 	}
@@ -344,8 +355,7 @@ func downloadAllAvailableDeltaRPMs(realDependencyGraph, dependencyGraphDeltaCopy
 //   - buildNode: The build node to update. This node should be from the real graph as we will be updating it directly.
 //     to find the actual build node in the graph.
 //   - cloner: The cloner to use to download the RPMs
-//   - deltaRpmDir: The directory to download the RPMs into
-func downloadSingleDeltaRPM(realDependencyGraph *pkggraph.PkgGraph, buildNode *pkggraph.PkgNode, cloner *rpmrepocloner.RpmRepoCloner, deltaRpmDir string, progress int) (err error) {
+func downloadSingleDeltaRPM(realDependencyGraph *pkggraph.PkgGraph, buildNode *pkggraph.PkgNode, cloner *rpmrepocloner.RpmRepoCloner) (err error) {
 	const downloadDependencies = false
 	var lookup *pkggraph.LookupNode
 
@@ -362,7 +372,7 @@ func downloadSingleDeltaRPM(realDependencyGraph *pkggraph.PkgGraph, buildNode *p
 
 	lookup, err = realDependencyGraph.FindExactPkgNodeFromPkg(buildNode.VersionedPkg)
 	if err != nil {
-		err = fmt.Errorf("can't find build node '%s' in graph: %w", buildNode, err)
+		err = fmt.Errorf("can't find build node '%s' in graph:\n%w", buildNode, err)
 		return err
 	}
 	if lookup == nil || lookup.RunNode == nil {
@@ -376,7 +386,7 @@ func downloadSingleDeltaRPM(realDependencyGraph *pkggraph.PkgGraph, buildNode *p
 	originalRpmPath := buildNode.RpmPath
 	foundFinalRPM, err := file.PathExists(originalRpmPath)
 	if err != nil {
-		return fmt.Errorf("can't check if final RPM '%s' exists: %w", originalRpmPath, err)
+		return fmt.Errorf("can't check if final RPM '%s' exists:\n%w", originalRpmPath, err)
 	}
 
 	// Only download dependencies for delta RPMs if we don't already have the RPM in the out/RPMS folder
@@ -389,10 +399,10 @@ func downloadSingleDeltaRPM(realDependencyGraph *pkggraph.PkgGraph, buildNode *p
 
 		// Convert the name back into the expected path in the RPM cache. This is where the cloner is expected to put
 		// the RPM when it downloads it.
-		cachedRPMPath := rpmPackageToRPMPath(fullyQualifiedRpmName, deltaRpmDir)
+		cachedRPMPath := rpmPackageToRPMPath(fullyQualifiedRpmName, cloner.CloneDirectory())
 		foundCacheRPM, err := file.PathExists(cachedRPMPath)
 		if err != nil {
-			return fmt.Errorf("can't check if cached RPM '%s' exists: %w", cachedRPMPath, err)
+			return fmt.Errorf("can't check if cached RPM '%s' exists:\n%w", cachedRPMPath, err)
 		}
 
 		// We will likely try to download the delta RPM multiple times across different nodes, so only do it if we don't
@@ -408,7 +418,7 @@ func downloadSingleDeltaRPM(realDependencyGraph *pkggraph.PkgGraph, buildNode *p
 
 		foundCacheRPM, err = file.PathExists(cachedRPMPath)
 		if err != nil {
-			return fmt.Errorf("can't check if cached RPM '%s' exists: %w", cachedRPMPath, err)
+			return fmt.Errorf("can't check if cached RPM '%s' exists:\n%w", cachedRPMPath, err)
 		}
 		if foundCacheRPM {
 			buildNode.State = pkggraph.StateDelta
@@ -418,15 +428,12 @@ func downloadSingleDeltaRPM(realDependencyGraph *pkggraph.PkgGraph, buildNode *p
 			runNode.RpmPath = cachedRPMPath
 			buildNode.RpmPath = cachedRPMPath
 
-			logger.Log.Infof("Delta Progress %d%%: delta RPM found for '%s-%s'.", progress, buildNode.VersionedPkg.Name, buildNode.VersionedPkg.Version)
 			logger.Log.Debugf("Converted delta build node is now: '%s'", buildNode)
 			logger.Log.Debugf("Converted delta run node is now: '%s'", runNode)
 		} else {
 			logger.Log.Errorf("Delta download for '%s' did not generate the correct delta RPM: '%s'", buildNode, cachedRPMPath)
 			return nil
 		}
-	} else {
-		logger.Log.Infof("Delta Progress %d%%: already have a RPM for '%s' at '%s'.", progress, buildNode.VersionedPkg.Name, originalRpmPath)
 	}
 
 	return err
@@ -434,7 +441,7 @@ func downloadSingleDeltaRPM(realDependencyGraph *pkggraph.PkgGraph, buildNode *p
 
 // resolveSingleNode caches the RPM for a single node.
 // It will modify fetchedPackages on a successful package clone.
-func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNode, cloneDeps bool, toolchainPackages []string, fetchedPackages, prebuiltPackages map[string]bool, outDir string, progress int) (err error) {
+func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNode, cloneDeps bool, toolchainPackages []string, fetchedPackages, prebuiltPackages map[string]bool, outDir string) (err error) {
 	logger.Log.Debugf("Adding node %s to the cache", node.FriendlyName())
 
 	logger.Log.Debugf("Searching for a package which supplies: %s", node.VersionedPkg.Name)
@@ -491,8 +498,6 @@ func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNo
 	} else {
 		node.State = pkggraph.StateCached
 	}
-
-	logger.Log.Infof("Cache progress %d%%: choosing '%s' to provide '%s'.", progress, filepath.Base(node.RpmPath), node.VersionedPkg.Name)
 
 	return
 }
