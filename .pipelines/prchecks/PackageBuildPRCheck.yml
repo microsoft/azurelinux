@@ -87,6 +87,8 @@ extends:
                     runCheck: 'n'
                   ptest:
                     runCheck: 'y'
+              variables:
+                ob_outputDirectory: $(Build.ArtifactStagingDirectory)
               steps:
                 - template: .pipelines/templates/PackageBuild.yml@self
                   parameters:
