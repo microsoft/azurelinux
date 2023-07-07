@@ -11,7 +11,7 @@ Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://gcc.gnu.org/
 Source0:        https://ftp.gnu.org/gnu/gcc/%{toolname}-%{version}/%{toolname}-%{version}.tar.xz
-Requires:       gcc-c++ = %{version}-%{release}
+Requires:       %{name}-c++ = %{version}-%{release}
 Requires:       gmp
 Requires:       libgcc-atomic = %{version}-%{release}
 Requires:       libgcc-devel = %{version}-%{release}
@@ -19,7 +19,7 @@ Requires:       libgomp-devel = %{version}-%{release}
 Requires:       libmpc
 Requires:       libstdc++-devel = %{version}-%{release}
 Provides:       cpp = %{version}-%{release}
-Provides:       gcc-plugin-devel = %{version}-%{release}
+Provides:       %{name}-plugin-devel = %{version}-%{release}
 Provides:       libasan = %{version}-%{release}
 Provides:       libasan%{?_isa} = %{version}-%{release}
 Provides:       libasan-static = %{version}-%{release}
@@ -39,10 +39,6 @@ Provides:       libubsan-static%{?_isa} = %{version}-%{release}
 Provides:       libquadmath = %{version}-%{release}
 Provides:       libquadmath-devel = %{version}-%{release}
 Provides:       libquadmath-devel%{?_isa} = %{version}-%{release}
-#%if %{with_check}
-#BuildRequires:  autogen
-#BuildRequires:  dejagnu
-#%endif
 
 %description
 The GCC package contains the GNU compiler collection,
@@ -76,7 +72,7 @@ This package contains development headers and static library for libgcc.
 %package        c++
 Summary:        C++ support for GCC
 Group:          System Environment/Libraries
-Requires:       gcc = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 Requires:       libstdc++-devel = %{version}-%{release}
 Provides:       gcc-g++ = %{version}-%{release}
 Provides:       g++ = %{version}-%{release}
