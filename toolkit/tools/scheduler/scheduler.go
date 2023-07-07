@@ -477,11 +477,6 @@ func setAssociatedDeltaPaths(res *schedulerutils.BuildResult, pkgGraph *pkggraph
 	for _, builtFile := range res.BuiltFiles {
 		// We should not expect to see multiple built files with the same basename
 		baseName := filepath.Base(builtFile)
-		_, hasConflict := builtFileMap[baseName]
-		if hasConflict {
-			err = fmt.Errorf("multiple built files with same basename: %s", baseName)
-			return
-		}
 		logger.Log.Tracef("Built delta file: %s", builtFile)
 		builtFileMap[baseName] = builtFile
 	}
@@ -497,12 +492,11 @@ func setAssociatedDeltaPaths(res *schedulerutils.BuildResult, pkgGraph *pkggraph
 				// Update the node to point at the actual RPM path from our map of built files
 				logger.Log.Tracef("Updating delta run node '%s' path from '%s' to '%s'", node, node.RpmPath, builtFile)
 				node.RpmPath = builtFile
-			} else {
+			} else if node.RpmPath != builtFile {
 				// Sanity check that any non-delta node has an exact match to the real RPM path
-				if node.RpmPath != builtFile {
-					err = fmt.Errorf("non-delta run node '%s' has unexpected path '%s' (expected non-delta path of '%s')", node, node.RpmPath, builtFile)
-					return
-				}
+				err = fmt.Errorf("non-delta run node '%s' has unexpected path '%s' (expected non-delta path of '%s')", node, node.RpmPath, builtFile)
+				return
+
 			}
 		}
 	}

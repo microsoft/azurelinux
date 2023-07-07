@@ -119,7 +119,7 @@ func fetchPackages(dependencyGraph *pkggraph.PkgGraph, hasUnresolvedNodes, tryDo
 		err = resolveGraphNodes(dependencyGraph, *inputSummaryFile, toolchainPackages, cloner, *stopOnFailure)
 		if err != nil {
 			err = fmt.Errorf("failed to resolve graph:\n%w", err)
-			return err
+			return
 		}
 	} else {
 		logger.Log.Info("No unresolved packages to cache")
@@ -139,14 +139,14 @@ func fetchPackages(dependencyGraph *pkggraph.PkgGraph, hasUnresolvedNodes, tryDo
 	err = cloner.ConvertDownloadedPackagesIntoRepo()
 	if err != nil {
 		err = fmt.Errorf("failed to convert downloaded RPMs into a repo:\n%w", err)
-		return err
+		return
 	}
 
 	if strings.TrimSpace(*outputSummaryFile) != "" {
 		err = repoutils.SaveClonedRepoContents(cloner, *outputSummaryFile)
 		if err != nil {
 			err = fmt.Errorf("failed to save cloned repo contents:\n%w", err)
-			return err
+			return
 		}
 	}
 
@@ -329,16 +329,14 @@ func downloadAllAvailableDeltaRPMs(realDependencyGraph, dependencyGraphDeltaCopy
 		}
 
 		logger.Log.Debugf("Resolving build node %s", n)
-		if n.State == pkggraph.StateBuild {
-			err := downloadSingleDeltaRPM(realDependencyGraph, n, cloner)
-			if err != nil {
-				return fmt.Errorf("failed to download delta RPM for build node %s:\n%w", n, err)
-			}
-			if n.State == pkggraph.StateDelta {
-				logger.Log.Infof("Delta Progress %d%%: delta RPM found for '%s-%s'.", (i*100)/len(buildNodes), n.VersionedPkg.Name, n.VersionedPkg.Version)
-			} else {
-				logger.Log.Infof("Delta Progress %d%%: skipped getting delta RPM for '%s' at '%s'.", (i*100)/len(buildNodes), n.VersionedPkg.Name, n.RpmPath)
-			}
+		err = downloadSingleDeltaRPM(realDependencyGraph, n, cloner)
+		if err != nil {
+			return fmt.Errorf("failed to download delta RPM for build node %s:\n%w", n, err)
+		}
+		if n.State == pkggraph.StateDelta {
+			logger.Log.Infof("Delta Progress %d%%: delta RPM found for '%s-%s'.", (i*100)/len(buildNodes), n.VersionedPkg.Name, n.VersionedPkg.Version)
+		} else {
+			logger.Log.Infof("Delta Progress %d%%: skipped getting delta RPM for '%s' at '%s'.", (i*100)/len(buildNodes), n.VersionedPkg.Name, n.RpmPath)
 		}
 	}
 
@@ -356,11 +354,6 @@ func downloadAllAvailableDeltaRPMs(realDependencyGraph, dependencyGraphDeltaCopy
 func downloadSingleDeltaRPM(realDependencyGraph *pkggraph.PkgGraph, buildNode *pkggraph.PkgNode, cloner *rpmrepocloner.RpmRepoCloner) (err error) {
 	const downloadDependencies = false
 	var lookup *pkggraph.LookupNode
-
-	if buildNode.Type != pkggraph.TypeBuild {
-		err = fmt.Errorf("node '%s' is not a build node, can't download delta RPM", buildNode)
-		return err
-	}
 
 	// Replace all '/' with '_' in the package name to get a valid timestamp name
 	// e.g. "bin/ls" -> "bin_ls"
@@ -388,53 +381,54 @@ func downloadSingleDeltaRPM(realDependencyGraph *pkggraph.PkgGraph, buildNode *p
 	}
 
 	// Only download dependencies for delta RPMs if we don't already have the RPM in the out/RPMS folder
-	if !foundFinalRPM {
-		// We have the expected rpm path, take the base name and strip .rpm off to get a name we can pass to tdnf
-		// to download the delta RPM
-		// e.g. "/home/user/repo/out/RPMS/x86_64/pkg-1.0-1.cm2.x86_64.rpm" -> "pkg-1.0-1.cm2.x86_64"
-		fullyQualifiedRpmName := filepath.Base(originalRpmPath)
-		fullyQualifiedRpmName = strings.TrimSuffix(fullyQualifiedRpmName, ".rpm")
+	if foundFinalRPM {
+		return
+	}
+	// We have the expected rpm path, take the base name and strip .rpm off to get a name we can pass to tdnf
+	// to download the delta RPM
+	// e.g. "/home/user/repo/out/RPMS/x86_64/pkg-1.0-1.cm2.x86_64.rpm" -> "pkg-1.0-1.cm2.x86_64"
+	fullyQualifiedRpmName := filepath.Base(originalRpmPath)
+	fullyQualifiedRpmName = strings.TrimSuffix(fullyQualifiedRpmName, ".rpm")
 
-		// Convert the name back into the expected path in the RPM cache. This is where the cloner is expected to put
-		// the RPM when it downloads it.
-		cachedRPMPath := rpmPackageToRPMPath(fullyQualifiedRpmName, cloner.CloneDirectory())
-		foundCacheRPM, err := file.PathExists(cachedRPMPath)
+	// Convert the name back into the expected path in the RPM cache. This is where the cloner is expected to put
+	// the RPM when it downloads it.
+	cachedRPMPath := rpmPackageToRPMPath(fullyQualifiedRpmName, cloner.CloneDirectory())
+	foundCacheRPM, err := file.PathExists(cachedRPMPath)
+	if err != nil {
+		return fmt.Errorf("can't check if cached RPM '%s' exists:\n%w", cachedRPMPath, err)
+	}
+
+	// We will likely try to download the delta RPM multiple times across different nodes, so only do it if we don't
+	// already have it in the cache.
+	if !foundCacheRPM {
+		// Avoid any processing since we know the exact RPM we want to download
+		_, err = cloner.CloneRawPackageNames(downloadDependencies, fullyQualifiedRpmName)
 		if err != nil {
-			return fmt.Errorf("can't check if cached RPM '%s' exists:\n%w", cachedRPMPath, err)
-		}
-
-		// We will likely try to download the delta RPM multiple times across different nodes, so only do it if we don't
-		// already have it in the cache.
-		if !foundCacheRPM {
-			// Avoid any processing since we know the exact RPM we want to download
-			_, err = cloner.CloneRawPackageNames(downloadDependencies, fullyQualifiedRpmName)
-			if err != nil {
-				logger.Log.Warnf("Can't find delta RPM to download for %s: %s (local copy may be newer than published version)", fullyQualifiedRpmName, err)
-				return nil
-			}
-		}
-
-		foundCacheRPM, err = file.PathExists(cachedRPMPath)
-		if err != nil {
-			return fmt.Errorf("can't check if cached RPM '%s' exists:\n%w", cachedRPMPath, err)
-		}
-		if foundCacheRPM {
-			buildNode.State = pkggraph.StateDelta
-			runNode.State = pkggraph.StateDelta
-
-			// Update the build and run nodes to point to the new RPM in the cache
-			runNode.RpmPath = cachedRPMPath
-			buildNode.RpmPath = cachedRPMPath
-
-			logger.Log.Debugf("Converted delta build node is now: '%s'", buildNode)
-			logger.Log.Debugf("Converted delta run node is now: '%s'", runNode)
-		} else {
-			logger.Log.Errorf("Delta download for '%s' did not generate the correct delta RPM: '%s'", buildNode, cachedRPMPath)
+			logger.Log.Warnf("Can't find delta RPM to download for %s: %s (local copy may be newer than published version)", fullyQualifiedRpmName, err)
 			return nil
 		}
 	}
 
-	return err
+	foundCacheRPM, err = file.PathExists(cachedRPMPath)
+	if err != nil {
+		return fmt.Errorf("can't check if cached RPM '%s' exists:\n%w", cachedRPMPath, err)
+	}
+	if foundCacheRPM {
+		buildNode.State = pkggraph.StateDelta
+		runNode.State = pkggraph.StateDelta
+
+		// Update the build and run nodes to point to the new RPM in the cache
+		runNode.RpmPath = cachedRPMPath
+		buildNode.RpmPath = cachedRPMPath
+
+		logger.Log.Debugf("Converted delta build node is now: '%s'", buildNode)
+		logger.Log.Debugf("Converted delta run node is now: '%s'", runNode)
+	} else {
+		logger.Log.Warnf("Delta download for '%s' did not generate the correct delta RPM: '%s'", buildNode, cachedRPMPath)
+		return nil
+	}
+
+	return
 }
 
 // resolveSingleNode caches the RPM for a single node.
