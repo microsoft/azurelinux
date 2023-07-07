@@ -1106,62 +1106,67 @@ func (g *PkgGraph) AddGoalNode(goalName string, packages []*pkgjson.PackageVer, 
 	return
 }
 
-// addGoalNodeLayers will expand the goal nodes by one layer. For example, if the goaled node is "foo" and extraLevels
-// is 1, the goal node will now link to all nodes which depend on "foo" as well as "foo" itself. A node is considerd to
-// depend on "foo" if it is a run node that has edges connecting it to "foo" without any other run nodes in between.
+// addGoalNodeLayers will expand a goal node by one layer. For example, if the goaled node is "foo" (ie the goal node
+// points to "foo") and extraLevels is 1, the goal node will now link to all nodes which depend on "foo" as well as
+// "foo" itself. A node is considered to depend on "foo" if it is a run node that has edges connecting it to "foo"
+// without any other run nodes in between.
 //
 //	i.e., if "foo_run" -> "foo_build" -> "<Some Meta Node>" -> "bar_run" -> "bar_build", and we are expanding from "bar"
 //	with layers=1, only "foo_run" will be added to the goal nodes since "foo_build" and "<Some Meta Node>" are not run nodes.
 func (g *PkgGraph) addGoalNodeLayers(goalNode *PkgNode, layers int) {
+	logger.Log.Debugf("Expanding goal node %s by %d layers", goalNode.GoalName, layers)
+
 	var expandedGoalNodes []*PkgNode
-	// Use a set to keep track of the nodes we already added
+	// Use a set to keep track of the nodes we already added so we can avoid processing them again
 	expandedGoalNodesSet := make(map[*PkgNode]bool)
 
-	// Start with the already selected nodes.
-	initialGoalNodes := make([]*PkgNode, 0, len(graph.NodesOf(g.From(goalNode.ID()))))
+	// Start with the already selected nodes which make up the goal.
+	initialGoalNodes := []*PkgNode{}
 	for _, selectedNode := range graph.NodesOf(g.From(goalNode.ID())) {
 		initialGoalNodes = append(initialGoalNodes, selectedNode.(*PkgNode))
 	}
 
-	// Expand the goal nodes as many times as requested
+	// For each node in the current layer, add all of the nodes that depend on it, then repeat as many times as requested
 	expandedGoalNodes = initialGoalNodes
 	for i := 0; i < layers; i++ {
-		expandedGoalNodes = append(expandedGoalNodes, g.getNextGoalLayer(&expandedGoalNodesSet, expandedGoalNodes)...)
+		expandedGoalNodes = append(expandedGoalNodes, g.getNextGoalLayer(expandedGoalNodesSet, expandedGoalNodes)...)
 	}
 
 	// Add the new edges if they are missing
-	for _, expandedGoalNode := range expandedGoalNodes {
-		if expandedGoalNode == goalNode {
+	for _, n := range expandedGoalNodes {
+		if n == goalNode {
 			continue
 		}
-		if !g.HasEdgeFromTo(goalNode.ID(), expandedGoalNode.ID()) {
-			logger.Log.Debugf("Adding edge from %s to %s", goalNode.FriendlyName(), expandedGoalNode.FriendlyName())
-			g.SetEdge(g.NewEdge(goalNode, expandedGoalNode))
+		if !g.HasEdgeFromTo(goalNode.ID(), n.ID()) {
+			logger.Log.Debugf("Adding edge from %s to %s", goalNode.FriendlyName(), n.FriendlyName())
+			g.SetEdge(g.NewEdge(goalNode, n))
 		}
 	}
 }
 
 // getNextGoalLayer will return the next layer of goal nodes to expand. It will return a list of run nodes that depend on the current goal nodes.
-func (g *PkgGraph) getNextGoalLayer(expandedGoalNodesSet *map[*PkgNode]bool, currentGoalNodes []*PkgNode) (expandedGoalNodes []*PkgNode) {
-	for _, goalNode := range currentGoalNodes {
+// - expandedGoalNodesSet: A set of nodes that have already been expanded from. If a node is in this set we will skip it.
+// - currentGoalNodes: The current layer of goal nodes to expand from.
+//
+// Returns a list of additional nodes that connect to currentGoalNodes (but not any nodes that are already in currentGoalNodes)
+func (g *PkgGraph) getNextGoalLayer(expandedGoalNodesSet map[*PkgNode]bool, currentGoalNodes []*PkgNode) (expandedGoalNodes []*PkgNode) {
 
-		// If we already expanded from this node, skip it, otherwise mark it as already expanded.
-		if expandedGoalNodesSet != nil {
-			if (*expandedGoalNodesSet)[goalNode] {
-				logger.Log.Tracef("Already expanded from %s, skipping", goalNode.FriendlyName())
-				continue
-			} else {
-				logger.Log.Debugf("Expanding goal nodes from %s", goalNode.FriendlyName())
-				(*expandedGoalNodesSet)[goalNode] = true
-			}
+	// We will iterate over the current goal nodes and add all the nodes that depend on them to the expanded goal nodes.
+	// The expandedGoalNodesSet will ensure we don't add the same node twice.
+	for _, goalNode := range currentGoalNodes {
+		if expandedGoalNodesSet[goalNode] {
+			logger.Log.Tracef("Already expanded from %s, skipping", goalNode.FriendlyName())
+			continue
+		} else {
+			logger.Log.Debugf("Expanding goal nodes from %s", goalNode.FriendlyName())
+			expandedGoalNodesSet[goalNode] = true
 		}
 
 		// Add all the nodes that depend on this node to the expanded goal nodes list. If the dependant node is a run
-		// node we can stop expanding from it (A subsequent call to expandGoalNodesOnce() will expand from it if needed).
-		// If the dependant node is a build, meta, etc. node we need to keep expanding from it since we only care about
-		// adding goals to run nodes. We ignore goal nodes since they should have no dependants, and may potentially
-		// pull in unrelated parts of the graph.
-		expandedGoalNodes = []*PkgNode{}
+		// node we can stop expanding from it (A subsequent call to expandGoalNodesOnce() will expand from it further if
+		// needed). If the dependant node is a build, meta, etc. node we need to keep expanding from it since we only
+		// care about adding goals to run nodes. We ignore goal nodes since they should have no dependents, and may
+		// potentially pull in unrelated parts of the graph.
 		dependentNodes := graph.NodesOf(g.To(goalNode.ID()))
 		for _, dependentNeighbor := range dependentNodes {
 			neighborNode := dependentNeighbor.(*PkgNode)

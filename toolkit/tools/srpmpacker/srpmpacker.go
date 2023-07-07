@@ -67,7 +67,7 @@ const (
 
 const (
 	defaultBuildDir    = "./build/SRPMS"
-	defaultWorkerCount = "100"
+	defaultWorkerCount = "10"
 )
 
 // sourceRetrievalConfiguration holds information on where to hydrate files from.

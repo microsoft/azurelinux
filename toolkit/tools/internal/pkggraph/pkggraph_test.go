@@ -960,6 +960,43 @@ func TestGoalWithLevelOneAndMeta(t *testing.T) {
 	checkEqualComponents(t, expectedGoalPackages2meta, g.AllNodesFrom(goal))
 }
 
+func TestGoalWithMultipleGoals(t *testing.T) {
+	g, err := buildTestGraphHelper()
+	assert.NoError(t, err)
+	assert.NotNil(t, g)
+
+	goal, err := g.AddGoalNode("test_1multi", []*pkgjson.PackageVer{&pkgC, &pkgD4}, false, 1)
+	assert.NoError(t, err)
+	assert.NotNil(t, goal)
+	nodesInGoal := []*PkgNode{}
+	for _, n := range graph.NodesOf(g.From(goal.ID())) {
+		nodesInGoal = append(nodesInGoal, n.(*PkgNode))
+	}
+	expectedGoalNodes := []*PkgNode{
+		pkgCRun,
+		pkgC2Run,
+		pkgD4Unresolved,
+		pkgBRun,
+	}
+	checkEqualComponents(t, expectedGoalNodes, nodesInGoal)
+	// But we now pull in the entire graph when looking at the tree
+	expectedGoalPackages2meta := []*PkgNode{
+		pkgBRun,
+		pkgBBuild,
+		pkgCRun,
+		pkgCBuild,
+		pkgD2Unresolved,
+		pkgD3Unresolved,
+		pkgC2Run,
+		pkgC2Build,
+		pkgD4Unresolved,
+		pkgD5Unresolved,
+		pkgD6Unresolved,
+		goal,
+	}
+	checkEqualComponents(t, expectedGoalPackages2meta, g.AllNodesFrom(goal))
+}
+
 // Test encoding and decoding a DOT formatted graph
 func TestEncodeDecodeDOT(t *testing.T) {
 
