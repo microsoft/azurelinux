@@ -4069,6 +4069,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "gcc12",
+          "version": "12.3.0",
+          "downloadUrl": "https://ftp.gnu.org/gnu/gcc/gcc-12.3.0/gcc-12.3.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "gconf-editor",
           "version": "3.0.1",
           "downloadUrl": "http://download.gnome.org/sources/gconf-editor/3.0/gconf-editor-3.0.1.tar.xz"

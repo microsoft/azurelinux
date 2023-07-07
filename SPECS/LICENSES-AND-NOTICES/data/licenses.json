@@ -2654,6 +2654,7 @@
                 "gawk",
                 "gc",
                 "gcc",
+                "gcc12",
                 "gdb",
                 "gdbm",
                 "gettext",
