@@ -59,13 +59,13 @@ steps:
   - bash: |
       published_artifacts_dir="${{ parameters.buildArtifactsFolder }}/ARTIFACTS"
       mkdir -p "$published_artifacts_dir"
-      cp "${{ parameters.coreRepoRoot }}"/out/{,s}rpms.tar.gz "$published_artifacts_dir"
+      cp "${{ parameters.repoRoot }}"/out/{,s}rpms.tar.gz "$published_artifacts_dir"
     condition: succeeded()
     displayName: "Copy artifacts for publishing"
 
   - bash: |
       published_logs_dir="${{ parameters.buildArtifactsFolder }}/LOGS"
       mkdir -p "$published_logs_dir"
-      tar -C "${{ parameters.coreRepoRoot }}/build/logs/pkggen" -czf "$published_logs_dir/pkggen.logs.tar.gz" .
+      tar -C "${{ parameters.repoRoot }}/build/logs/pkggen" -czf "$published_logs_dir/pkggen.logs.tar.gz" .
     condition: always()
     displayName: "Copy logs for publishing"
