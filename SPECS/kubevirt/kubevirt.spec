@@ -16,7 +16,6 @@
 #
 
 
-%global debug_package %{nil}
 Summary:        Container native virtualization
 Name:           kubevirt
 Version:        0.59.0
@@ -33,6 +32,7 @@ Source1:        disks-images-provider.yaml
 Patch0:         Cleanup-housekeeping-cgroup-on-vm-del.patch
 Patch1:         Allocate-2-cpu-for-the-emulator-thread.patch
 Patch2:         Hotplug_detach_grace_period.patch
+%global debug_package %{nil}
 BuildRequires:  glibc-devel
 BuildRequires:  glibc-static >= 2.35-3%{?dist}
 BuildRequires:  golang
