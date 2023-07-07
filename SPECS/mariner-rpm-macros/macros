@@ -53,7 +53,7 @@
 %{nil}
 
 # use zstd compression for binary package payloads
-%_binary_payload w3T0.zstdio
+%_binary_payload w7T0.zstdio
 
 #
 ## Automatically compile python files
