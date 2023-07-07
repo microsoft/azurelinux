@@ -496,7 +496,6 @@ func setAssociatedDeltaPaths(res *schedulerutils.BuildResult, pkgGraph *pkggraph
 				// Sanity check that any non-delta node has an exact match to the real RPM path
 				err = fmt.Errorf("non-delta run node '%s' has unexpected path '%s' (expected non-delta path of '%s')", node, node.RpmPath, builtFile)
 				return
-
 			}
 		}
 	}
