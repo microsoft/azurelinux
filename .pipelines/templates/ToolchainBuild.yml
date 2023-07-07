@@ -33,6 +33,6 @@ steps:
   - bash: |
       published_logs_dir="${{ parameters.buildArtifactsFolder }}/LOGS"
       mkdir -p "$published_logs_dir"
-      tar -C "${{ parameters.coreRepoRoot }}/build/logs/toolchain" -czf "$published_logs_dir/toolchain.tar.gz" .
+      tar -C "${{ parameters.coreRepoRoot }}/build/logs/toolchain" -czf "$published_logs_dir/toolchain.logs.tar.gz" .
     condition: always()
     displayName: "Copy logs for publishing"
