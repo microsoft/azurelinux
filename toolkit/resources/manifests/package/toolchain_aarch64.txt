@@ -107,6 +107,7 @@ glib-devel-2.71.0-1.cm2.aarch64.rpm
 glib-doc-2.71.0-1.cm2.noarch.rpm
 glib-schemas-2.71.0-1.cm2.aarch64.rpm
 glibc-2.35-4.cm2.aarch64.rpm
+glibc-debuginfo-2.35-4.cm2.aarch64.rpm
 glibc-devel-2.35-4.cm2.aarch64.rpm
 glibc-i18n-2.35-4.cm2.aarch64.rpm
 glibc-iconv-2.35-4.cm2.aarch64.rpm

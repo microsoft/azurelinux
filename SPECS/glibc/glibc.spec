@@ -1,13 +1,5 @@
 %global security_hardening nonow
 %define glibc_target_cpu %{_build}
-%define debug_package %{nil}
-# Modify __os_install_post so binaries are not stripped
-%define __os_install_post \
-    %{?__brp_compress} \
-    %{?__brp_strip_comment_note} \
-    %{?__brp_strip_static_archive} \
-    find %{buildroot} -name "*.pc" | xargs -I{} sed -i -e 's@-Wl,-dT,%{_topdir}/BUILD/module_info.ld@ @' {} \
-    %{nil}
 
 # Don't depend on bash by default
 %define __requires_exclude ^/(bin|usr/bin).*$
@@ -36,6 +28,7 @@ Patch3:         CVE-2020-1751.nopatch
 Patch4:         CVE-2018-20796.nopatch
 Patch5:         glibc-2.34_pthread_cond_wait.patch
 BuildRequires:  bison
+BuildRequires:  gawk
 BuildRequires:  gettext
 BuildRequires:  kernel-headers
 BuildRequires:  texinfo
@@ -327,7 +320,7 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 
 %changelog
 * Fri Jun 30 2023 Andrew Phelps <anphel@microsoft.com> - 2.35-4
-- Modify __os_install_post so binaries are not stripped
+- Restore glibc-debuginfo package
 
 * Fri Sep 30 2022 Andy Caldwell <andycaldwell@microsoft> - 2.35-3
 - Split `glibc-static` into an actual package containing static libraries and runtime
