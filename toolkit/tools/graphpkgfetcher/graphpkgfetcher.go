@@ -81,7 +81,6 @@ func main() {
 	dependencyGraph, err := pkggraph.ReadDOTGraphFile(*inputGraph)
 	if err != nil {
 		logger.Log.Fatalf("Failed to read graph to file: %s", err)
-		return
 	}
 
 	hasUnresolvedNodes := hasUnresolvedNodes(dependencyGraph)
@@ -96,7 +95,6 @@ func main() {
 	err = pkggraph.WriteDOTGraphFile(dependencyGraph, *outputGraph)
 	if err != nil {
 		logger.Log.Fatalf("Failed to write cache graph to file: %s", err)
-		return
 	}
 }
 
