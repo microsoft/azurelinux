@@ -89,7 +89,7 @@ extends:
                 isCustom: true
                 name: ${{ configuration.agentPool }}
               variables:
-                ob_artifactBaseName: $(rpmsArtifactNameBase)_${{ configuration.name }}
+                ob_artifactBaseName: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}_${{ parameters.job.job }}
                 ob_outputDirectory: $(Build.ArtifactStagingDirectory)
               steps:
                 - template: .pipelines/templates/PackageBuild.yml@self
@@ -100,7 +100,7 @@ extends:
 
                 - task: PublishPipelineArtifact@1
                   inputs:
-                    artifact: $(rpmsArtifactNameBase)_${{ configuration.name }}
+                    artifact: ${{ variables.ob_artifactBaseName }}
                     targetPath: $(ob_outputDirectory)
                   condition: always()
                   displayName: 'Publish packages build artifacts'
@@ -111,7 +111,7 @@ extends:
                 isCustom: true
                 name: ${{ configuration.agentPool }}
               variables:
-                ob_artifactBaseName: $(rpmsArtifactNameBase)_${{ configuration.name }}
+                ob_artifactBaseName: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}_${{ parameters.job.job }}
                 ob_outputDirectory: $(Build.ArtifactStagingDirectory)
               steps:
                 - template: .pipelines/templates/PackageBuild.yml@self
@@ -123,7 +123,7 @@ extends:
 
                 - task: PublishPipelineArtifact@1
                   inputs:
-                    artifact: $(rpmsArtifactNameBase)_${{ configuration.name }}
+                    artifact: ${{ variables.ob_artifactBaseName }}
                     targetPath: $(ob_outputDirectory)
                   condition: always()
                   displayName: 'Publish packages build artifacts'
