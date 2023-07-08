@@ -100,7 +100,7 @@ extends:
 
                 - task: PublishPipelineArtifact@1
                   inputs:
-                    artifact: drop_RPMs_${{ configuration.name }}_Build
+                    artifact: drop_RPMs_${{ configuration.name }}_Build_packages
                     targetPath: $(ob_outputDirectory)
                   condition: always()
                   displayName: 'Publish packages build artifacts'
@@ -122,7 +122,7 @@ extends:
 
                 - task: PublishPipelineArtifact@1
                   inputs:
-                    artifact: drop_RPMs_${{ configuration.name }}_Build
+                    artifact: drop_RPMs_${{ configuration.name }}_Test_packages
                     targetPath: $(ob_outputDirectory)
                   condition: always()
                   displayName: 'Publish packages build artifacts'
