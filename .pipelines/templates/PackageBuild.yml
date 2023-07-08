@@ -6,6 +6,9 @@ parameters:
   - name: isCheckBuild
     type: string
     default: "n"
+    values:
+      - "n"
+      - "y"
 
   - name: isDeltaBuild
     type: boolean

@@ -46,9 +46,9 @@ extends:
             - job: Build
               pool:
                 type: linux
-                isCustom: true
+                # isCustom: true
                 name: ${{ configuration.agentPool }}
-                vmImage: ${{ configuration.agentVMName }}
+                # vmImage: ${{ configuration.agentVMName }}
               variables:
                 ob_outputDirectory: $(Build.ArtifactStagingDirectory)
               steps:
@@ -65,41 +65,56 @@ extends:
                 #    Once that's fixed, we should remove this step.
                 # 2. The value for 'artifact' cannot be changed, as this is the only value OneBranch accepts.
                 #    We cannot also use pre-defined variables like "drop_$(System.StageName)_$(Agent.JobName)", to automatically track name changes.
-                - task: PublishPipelineArtifact@1
-                  inputs:
-                    artifact: drop_Toolchain_${{ configuration.name }}_Build
-                    targetPath: $(ob_outputDirectory)
-                  condition: always()
-                  displayName: 'Publish toolchain artifacts'
+                # - task: PublishPipelineArtifact@1
+                #   inputs:
+                #     artifact: drop_Toolchain_${{ configuration.name }}_Build
+                #     targetPath: $(ob_outputDirectory)
+                #   condition: always()
+                #   displayName: 'Publish toolchain artifacts'
 
         - stage: RPMs_${{ configuration.name }}
           dependsOn: Toolchain_${{ configuration.name }}
           jobs:
-            - job: Build
+            - job: Build_packages
               pool:
                 type: linux
-                isCustom: true
+                # isCustom: true
                 name: ${{ configuration.agentPool }}
-                vmImage: ${{ configuration.agentVMName }}
-              strategy:
-                matrix:
-                  regular:
-                    runCheck: 'n'
-                  ptest:
-                    runCheck: 'y'
+                # vmImage: ${{ configuration.agentVMName }}
               variables:
                 ob_outputDirectory: $(Build.ArtifactStagingDirectory)
               steps:
                 - template: .pipelines/templates/PackageBuild.yml@self
                   parameters:
-                    isCheckBuild: '$(runCheck)'
                     inputArtifactsName: drop_Toolchain_${{ configuration.name }}_Build
                     useCustomToolchain: true
                     buildArtifactsFolder: $(ob_outputDirectory)
 
-                - task: PublishPipelineArtifact@1
-                  inputs:
-                    artifact: drop_RPMs_${{ configuration.name }}_Build
-                    targetPath: $(ob_outputDirectory)
-                  condition: always()
-                  displayName: 'Publish packages build artifacts'
+                # - task: PublishPipelineArtifact@1
+                #   inputs:
+                #     artifact: drop_RPMs_${{ configuration.name }}_Build
+                #     targetPath: $(ob_outputDirectory)
+                #   condition: always()
+                #   displayName: 'Publish packages build artifacts'
+            - job: Test_packages
+              pool:
+                type: linux
+                # isCustom: true
+                name: ${{ configuration.agentPool }}
+                # vmImage: ${{ configuration.agentVMName }}
+              variables:
+                ob_outputDirectory: $(Build.ArtifactStagingDirectory)
+              steps:
+                - template: .pipelines/templates/PackageBuild.yml@self
+                  parameters:
+                    isCheckBuild: 'y'
+                    inputArtifactsName: drop_Toolchain_${{ configuration.name }}_Build
+                    useCustomToolchain: true
+                    buildArtifactsFolder: $(ob_outputDirectory)
+
+                # - task: PublishPipelineArtifact@1
+                #   inputs:
+                #     artifact: drop_RPMs_${{ configuration.name }}_Build
+                #     targetPath: $(ob_outputDirectory)
+                #   condition: always()
+                #   displayName: 'Publish packages build artifacts'
