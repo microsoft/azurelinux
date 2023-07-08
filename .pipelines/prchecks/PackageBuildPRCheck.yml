@@ -67,8 +67,7 @@ extends:
                 # 1. Automatic publishing won't work if 'isCustom: true' is set on the pool. We cannot do 'isCustom: false' because
                 #    then OneBranch attempts to perform additional actions (adding build tags for instance), which require additional permissions
                 #    that the PR check pipeline does not have.
-                # 2. The value for 'artifact' cannot be changed, as this is the only value OneBranch accepts.
-                #    We cannot also use pre-defined variables like "drop_$(System.StageName)_$(Agent.JobName)", to automatically track name changes.
+                # 2. The value for 'artifact' must equal $(ob_artifactBaseName), as this is the only value OneBranch accepts.
                 - task: PublishPipelineArtifact@1
                   inputs:
                     artifact: $(toolchainArtifactNameBase)_${{ configuration.name }}
@@ -77,6 +76,7 @@ extends:
                   displayName: 'Publish toolchain artifacts'
 
         - stage: RPMs_${{ configuration.name }}
+          dependsOn: Toolchain_${{ configuration.name }}
           # The jobs are identical except for the value of 'isCheckBuild'.
           # We cannot use the matrix strategy - OneBranch automatically publishes the contents of $(ob_outputDirectory)
           # and uses the job's name in the artifact's name. Jobs created with the matrix strategy have
@@ -89,7 +89,7 @@ extends:
                 isCustom: true
                 name: ${{ configuration.agentPool }}
               variables:
-                ob_artifactBaseName: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}_$(System.JobName)
+                ob_artifactBaseName: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}_$(System.JobDisplayName)
                 ob_outputDirectory: $(Build.ArtifactStagingDirectory)
               steps:
                 - template: .pipelines/templates/PackageBuild.yml@self
@@ -100,7 +100,7 @@ extends:
 
                 - task: PublishPipelineArtifact@1
                   inputs:
-                    artifact: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}_$(System.JobName)
+                    artifact: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}_$(System.JobDisplayName)
                     targetPath: $(ob_outputDirectory)
                   condition: always()
                   displayName: 'Publish packages build artifacts'
@@ -111,7 +111,7 @@ extends:
                 isCustom: true
                 name: ${{ configuration.agentPool }}
               variables:
-                ob_artifactBaseName: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}_$(System.JobName)
+                ob_artifactBaseName: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}_$(System.JobDisplayName)
                 ob_outputDirectory: $(Build.ArtifactStagingDirectory)
               steps:
                 - template: .pipelines/templates/PackageBuild.yml@self
@@ -123,7 +123,7 @@ extends:
 
                 - task: PublishPipelineArtifact@1
                   inputs:
-                    artifact: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}_$(System.JobName)
+                    artifact: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}_$(System.JobDisplayName)
                     targetPath: $(ob_outputDirectory)
                   condition: always()
                   displayName: 'Publish packages build artifacts'
