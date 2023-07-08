@@ -35,11 +35,7 @@ extends:
   template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates
   parameters:
     featureFlags:
-      EnableCDPxPAT: false
       runOnHost: true
-    git:
-      # persistCredentials: true
-      lfs: false
     globalSdl:
       tsa:
         enabled: false # OneBranch publishes all SDL results to TSA. If TSA is disabled, all SDL tools will force a 'break' build mode.
@@ -52,7 +48,7 @@ extends:
             - job: Build
               pool:
                 type: linux
-                # isCustom: true
+                isCustom: true
                 name: ${{ configuration.agentPool }}
                 # vmImage: ${{ configuration.agentVMName }}
               variables:
@@ -67,16 +63,17 @@ extends:
                   parameters:
                     buildArtifactsFolder: $(ob_outputDirectory)
 
-                # 1. Automatic publishing seems to be broken in the OneBranch templates when the build runs directly on the agent host.
-                #    Once that's fixed, we should remove this step.
+                # 1. Automatic publishing won't work if 'isCustom: true' is set on the pool. We cannot do 'isCustom: false' because
+                #    then OneBranch attempts to perform additional actions (adding build tags for instance), which require additional permissions
+                #    that the PR check pipeline does not have.
                 # 2. The value for 'artifact' cannot be changed, as this is the only value OneBranch accepts.
                 #    We cannot also use pre-defined variables like "drop_$(System.StageName)_$(Agent.JobName)", to automatically track name changes.
-                # - task: PublishPipelineArtifact@1
-                #   inputs:
-                #     artifact: drop_Toolchain_${{ configuration.name }}_Build
-                #     targetPath: $(ob_outputDirectory)
-                #   condition: always()
-                #   displayName: 'Publish toolchain artifacts'
+                - task: PublishPipelineArtifact@1
+                  inputs:
+                    artifact: drop_Toolchain_${{ configuration.name }}_Build
+                    targetPath: $(ob_outputDirectory)
+                  condition: always()
+                  displayName: 'Publish toolchain artifacts'
 
         - stage: RPMs_${{ configuration.name }}
           dependsOn: Toolchain_${{ configuration.name }}
@@ -89,7 +86,7 @@ extends:
             - job: Build_packages
               pool:
                 type: linux
-                # isCustom: true
+                isCustom: true
                 name: ${{ configuration.agentPool }}
                 # vmImage: ${{ configuration.agentVMName }}
               variables:
@@ -101,16 +98,16 @@ extends:
                     useCustomToolchain: true
                     buildArtifactsFolder: $(ob_outputDirectory)
 
-                # - task: PublishPipelineArtifact@1
-                #   inputs:
-                #     artifact: drop_RPMs_${{ configuration.name }}_Build
-                #     targetPath: $(ob_outputDirectory)
-                #   condition: always()
-                #   displayName: 'Publish packages build artifacts'
+                - task: PublishPipelineArtifact@1
+                  inputs:
+                    artifact: drop_RPMs_${{ configuration.name }}_Build
+                    targetPath: $(ob_outputDirectory)
+                  condition: always()
+                  displayName: 'Publish packages build artifacts'
             - job: Test_packages
               pool:
                 type: linux
-                # isCustom: true
+                isCustom: true
                 name: ${{ configuration.agentPool }}
                 # vmImage: ${{ configuration.agentVMName }}
               variables:
@@ -123,9 +120,9 @@ extends:
                     useCustomToolchain: true
                     buildArtifactsFolder: $(ob_outputDirectory)
 
-                # - task: PublishPipelineArtifact@1
-                #   inputs:
-                #     artifact: drop_RPMs_${{ configuration.name }}_Build
-                #     targetPath: $(ob_outputDirectory)
-                #   condition: always()
-                #   displayName: 'Publish packages build artifacts'
+                - task: PublishPipelineArtifact@1
+                  inputs:
+                    artifact: drop_RPMs_${{ configuration.name }}_Build
+                    targetPath: $(ob_outputDirectory)
+                  condition: always()
+                  displayName: 'Publish packages build artifacts'
