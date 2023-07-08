@@ -71,7 +71,7 @@ extends:
                 #    We cannot also use pre-defined variables like "drop_$(System.StageName)_$(Agent.JobName)", to automatically track name changes.
                 - task: PublishPipelineArtifact@1
                   inputs:
-                    artifact: $(ob_artifactBaseName)
+                    artifact: $(toolchainArtifactNameBase)_${{ configuration.name }}
                     targetPath: $(ob_outputDirectory)
                   condition: always()
                   displayName: 'Publish toolchain artifacts'
@@ -101,7 +101,7 @@ extends:
 
                 - task: PublishPipelineArtifact@1
                   inputs:
-                    artifact: $(ob_artifactBaseName)
+                    artifact: $(rpmsArtifactNameBase)_${{ configuration.name }}
                     targetPath: $(ob_outputDirectory)
                   condition: always()
                   displayName: 'Publish packages build artifacts'
@@ -123,7 +123,7 @@ extends:
 
                 - task: PublishPipelineArtifact@1
                   inputs:
-                    artifact: $(ob_artifactBaseName)
+                    artifact: $(rpmsArtifactNameBase)_${{ configuration.name }}
                     targetPath: $(ob_outputDirectory)
                   condition: always()
                   displayName: 'Publish packages build artifacts'
