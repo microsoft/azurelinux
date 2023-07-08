@@ -28,7 +28,7 @@ resources:
       ref: refs/heads/main
 
 variables:
-  ob_outputDirectory: $(Build.ArtifactStagingDirectory)
+  # ob_outputDirectory: $(Build.ArtifactStagingDirectory)
   rpmsArtifactNameBase: RPMs
   toolchainArtifactNameBase: Toolchain
 
@@ -53,6 +53,7 @@ extends:
                 name: ${{ configuration.agentPool }}
               variables:
                 ob_artifactBaseName: $(toolchainArtifactNameBase)_${{ configuration.name }}
+                ob_outputDirectory: $(Build.ArtifactStagingDirectory)
               steps:
                 - template: .pipelines/templates/RawToolchainDownload.yml@self
                   parameters:
@@ -89,6 +90,7 @@ extends:
                 name: ${{ configuration.agentPool }}
               variables:
                 ob_artifactBaseName: $(rpmsArtifactNameBase)_${{ configuration.name }}
+                ob_outputDirectory: $(Build.ArtifactStagingDirectory)
               steps:
                 - template: .pipelines/templates/PackageBuild.yml@self
                   parameters:
@@ -110,6 +112,7 @@ extends:
                 name: ${{ configuration.agentPool }}
               variables:
                 ob_artifactBaseName: $(rpmsArtifactNameBase)_${{ configuration.name }}
+                ob_outputDirectory: $(Build.ArtifactStagingDirectory)
               steps:
                 - template: .pipelines/templates/PackageBuild.yml@self
                   parameters:
