@@ -37,6 +37,9 @@ extends:
     featureFlags:
       EnableCDPxPAT: false
       runOnHost: true
+    git:
+      # persistCredentials: true
+      lfs: false
     globalSdl:
       tsa:
         enabled: false # OneBranch publishes all SDL results to TSA. If TSA is disabled, all SDL tools will force a 'break' build mode.
