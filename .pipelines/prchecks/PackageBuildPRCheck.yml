@@ -4,8 +4,6 @@
 # - rawToolchainCacheURL_ARM64
 # - agentPool_AMD64
 # - agentPool_ARM64
-# - agentVMName_AMD64
-# - agentVMName_ARM64
 
 trigger: none
 
@@ -15,12 +13,10 @@ parameters:
     default:
     - name: "AMD64"
       agentPool: "$(agentPool_AMD64)"
-      agentVMName: "$(agentVMName_AMD64)"
       rawToolchainCacheURL: "$(rawToolchainCacheURL_AMD64)"
       rawToolchainExpectedHash: "f56df34b90915c93f772d3961bf5e9eeb8c1233db43dd92070214e4ce6b72894"
     - name: "ARM64"
       agentPool: "$(agentPool_ARM64)"
-      agentVMName: "$(agentVMName_ARM64)"
       rawToolchainCacheURL: "$(rawToolchainCacheURL_ARM64)"
       rawToolchainExpectedHash: "65de43b3bdcfdaac71df1f11fd1f830a8109b1eb9d7cb6cbc2e2d0e929d0ef76"
 
@@ -30,6 +26,11 @@ resources:
       type: git
       name: OneBranch.Pipelines/GovernedTemplates
       ref: refs/heads/main
+
+variables:
+  ob_outputDirectory: $(Build.ArtifactStagingDirectory)
+  rpmsArtifactNameBase: RPMs
+  toolchainArtifactNameBase: Toolchain
 
 extends:
   template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates
@@ -50,9 +51,9 @@ extends:
                 type: linux
                 isCustom: true
                 name: ${{ configuration.agentPool }}
-                # vmImage: ${{ configuration.agentVMName }}
               variables:
-                ob_outputDirectory: $(Build.ArtifactStagingDirectory)
+                ob_artifactBaseName: $(toolchainArtifactNameBase)_${{ configuration.name }}
+                # ob_outputDirectory: $(Build.ArtifactStagingDirectory)
               steps:
                 - template: .pipelines/templates/RawToolchainDownload.yml@self
                   parameters:
@@ -70,7 +71,7 @@ extends:
                 #    We cannot also use pre-defined variables like "drop_$(System.StageName)_$(Agent.JobName)", to automatically track name changes.
                 - task: PublishPipelineArtifact@1
                   inputs:
-                    artifact: drop_Toolchain_${{ configuration.name }}_Build
+                    artifact: $(ob_artifactBaseName)
                     targetPath: $(ob_outputDirectory)
                   condition: always()
                   displayName: 'Publish toolchain artifacts'
@@ -88,19 +89,19 @@ extends:
                 type: linux
                 isCustom: true
                 name: ${{ configuration.agentPool }}
-                # vmImage: ${{ configuration.agentVMName }}
               variables:
-                ob_outputDirectory: $(Build.ArtifactStagingDirectory)
+                ob_artifactBaseName: $(rpmsArtifactNameBase)_${{ configuration.name }}
+                # ob_outputDirectory: $(Build.ArtifactStagingDirectory)
               steps:
                 - template: .pipelines/templates/PackageBuild.yml@self
                   parameters:
-                    inputArtifactsName: drop_Toolchain_${{ configuration.name }}_Build
+                    inputArtifactsName: $(toolchainArtifactNameBase)_${{ configuration.name }}
                     useCustomToolchain: true
                     buildArtifactsFolder: $(ob_outputDirectory)
 
                 - task: PublishPipelineArtifact@1
                   inputs:
-                    artifact: drop_RPMs_${{ configuration.name }}_Build_packages
+                    artifact: $(ob_artifactBaseName)
                     targetPath: $(ob_outputDirectory)
                   condition: always()
                   displayName: 'Publish packages build artifacts'
@@ -109,20 +110,20 @@ extends:
                 type: linux
                 isCustom: true
                 name: ${{ configuration.agentPool }}
-                # vmImage: ${{ configuration.agentVMName }}
               variables:
-                ob_outputDirectory: $(Build.ArtifactStagingDirectory)
+                ob_artifactBaseName: $(rpmsArtifactNameBase)_${{ configuration.name }}
+                # ob_outputDirectory: $(Build.ArtifactStagingDirectory)
               steps:
                 - template: .pipelines/templates/PackageBuild.yml@self
                   parameters:
                     isCheckBuild: 'y'
-                    inputArtifactsName: drop_Toolchain_${{ configuration.name }}_Build
+                    inputArtifactsName: $(toolchainArtifactNameBase)_${{ configuration.name }}
                     useCustomToolchain: true
                     buildArtifactsFolder: $(ob_outputDirectory)
 
                 - task: PublishPipelineArtifact@1
                   inputs:
-                    artifact: drop_RPMs_${{ configuration.name }}_Test_packages
+                    artifact: $(ob_artifactBaseName)
                     targetPath: $(ob_outputDirectory)
                   condition: always()
                   displayName: 'Publish packages build artifacts'
