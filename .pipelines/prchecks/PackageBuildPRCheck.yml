@@ -35,8 +35,11 @@ extends:
   template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates
   parameters:
     featureFlags:
+      EnableCDPxPAT: false
       runOnHost: true
     globalSdl:
+      tsa:
+        enabled: false # OneBranch publishes all SDL results to TSA. If TSA is disabled, all SDL tools will force a 'break' build mode.
       credscan:
         suppressionsFile: .config/CredScanSuppressions.json
     stages:
@@ -74,6 +77,11 @@ extends:
 
         - stage: RPMs_${{ configuration.name }}
           dependsOn: Toolchain_${{ configuration.name }}
+          # The jobs are identical except for the value of 'isCheckBuild'.
+          # We cannot use the matrix strategy - OneBranch automatically publishes the contents of $(ob_outputDirectory)
+          # and uses the $(Agent.JobName) name in the artifact's name. Jobs created with the matrix strategy have
+          # the same value of $(Agent.JobName), so the artifact names are identical and the pipeline fails when
+          # the second job tries to publish its artifacts.
           jobs:
             - job: Build_packages
               pool:
