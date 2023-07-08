@@ -100,7 +100,7 @@ extends:
 
                 - task: PublishPipelineArtifact@1
                   inputs:
-                    artifact: ${{ variables.ob_artifactBaseName }}
+                    artifact: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}_$(System.JobName)
                     targetPath: $(ob_outputDirectory)
                   condition: always()
                   displayName: 'Publish packages build artifacts'
@@ -123,7 +123,7 @@ extends:
 
                 - task: PublishPipelineArtifact@1
                   inputs:
-                    artifact: ${{ variables.ob_artifactBaseName }}
+                    artifact: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}_$(System.JobName)
                     targetPath: $(ob_outputDirectory)
                   condition: always()
                   displayName: 'Publish packages build artifacts'
