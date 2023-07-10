@@ -37,6 +37,8 @@ extends:
   parameters:
     featureFlags:
       runOnHost: true
+    git:
+      lfs: false
     globalSdl:
       tsa:
         enabled: false # OneBranch publishes all SDL results to TSA. If TSA is disabled, all SDL tools will force a 'break' build mode.
@@ -49,7 +51,7 @@ extends:
             - job: Build
               pool:
                 type: linux
-                isCustom: true
+                # isCustom: true
                 name: ${{ configuration.agentPool }}
               variables:
                 ob_artifactBaseName: $(toolchainArtifactNameBase)_${{ configuration.name }}
@@ -68,12 +70,12 @@ extends:
                 #    then OneBranch attempts to perform additional actions (adding build tags for instance), which require additional permissions
                 #    that the PR check pipeline does not have.
                 # 2. The value for 'artifact' must equal $(ob_artifactBaseName), as this is the only value OneBranch accepts.
-                - task: PublishPipelineArtifact@1
-                  inputs:
-                    artifact: $(toolchainArtifactNameBase)_${{ configuration.name }}
-                    targetPath: $(ob_outputDirectory)
-                  condition: always()
-                  displayName: 'Publish toolchain artifacts'
+                # - task: PublishPipelineArtifact@1
+                #   inputs:
+                #     artifact: $(toolchainArtifactNameBase)_${{ configuration.name }}
+                #     targetPath: $(ob_outputDirectory)
+                #   condition: always()
+                #   displayName: 'Publish toolchain artifacts'
 
         - stage: RPMs_${{ configuration.name }}
           dependsOn: Toolchain_${{ configuration.name }}
