@@ -1,42 +1,47 @@
 parameters:
-  - name: buildArtifactsFolder
+  - name: customToolchainArtifactDir
     type: string
-    default: "$(Build.ArtifactStagingDirectory)"
+    default: "ARTIFACTS"
+
+  - name: customToolchainArtifactName
+    type: string
+    default: "toolchain_built_rpms_all.tar.gz"
+
+  - name: customToolchainEnabled
+    type: boolean
+    default: false
 
   - name: isCheckBuild
-    type: string
-    default: "n"
-    values:
-      - "n"
-      - "y"
+    type: boolean
+    default: false
 
   - name: isDeltaBuild
     type: boolean
     default: false
 
-  - name: inputArtifactsName
+  - name: outputArtifactsFolder
     type: string
-    default: "ARTIFACTS"
+    default: "$(Build.ArtifactStagingDirectory)"
 
   - name: repoRoot
     type: string
     default: "$(Build.SourcesDirectory)"
 
-  - name: useCustomToolchain
-    type: boolean
-    default: false
-
 steps:
-  - ${{ if eq(parameters.useCustomToolchain, true) }}:
+  - template: .pipelines/templates/ToolkitCheck.yml@self
+    parameters:
+      repoRoot: ${{ parameters.repoRoot }}
+
+  - ${{ if eq(parameters.customToolchainEnabled, true) }}:
     - task: DownloadPipelineArtifact@2
       displayName: "Download toolchain"
       inputs:
-        artifact: "${{ parameters.inputArtifactsName }}"
-        patterns: "**/toolchain_built_rpms_all.tar.gz"
+        artifact: "${{ parameters.customToolchainArtifactDir }}"
+        patterns: "**/${{ parameters.customToolchainArtifactName }}"
         path: "$(Build.Repository.LocalPath)/input"
 
     - script: |
-        toolchain_archive="$(find "$(Build.Repository.LocalPath)/input" -name toolchain_built_rpms_all.tar.gz)"
+        toolchain_archive="$(find "$(Build.Repository.LocalPath)/input" -name "${{ parameters.customToolchainArtifactName }}")"
         if [[ ! -f "$toolchain_archive" ]]; then
           echo "ERROR: toolchain archive not found!" >&2
           exit 1
@@ -46,9 +51,14 @@ steps:
       displayName: "Populate toolchain"
 
   - script: |
+      run_check_arg="RUN_CHECK=n"
+      if [[ ${{ parameters.isCheckBuild }} =~ [Tt]rue ]]; then
+        run_check_arg="RUN_CHECK=y"
+      fi
+
       sudo make -C "${{ parameters.repoRoot }}/toolkit" build-packages -j$(nproc) \
         REBUILD_TOOLS=y \
-        RUN_CHECK=${{ parameters.isCheckBuild }}
+        $run_check_arg
     displayName: "Build packages"
 
   - script: |
@@ -60,14 +70,14 @@ steps:
     displayName: "Compress SRPMs"
 
   - bash: |
-      published_artifacts_dir="${{ parameters.buildArtifactsFolder }}/ARTIFACTS"
+      published_artifacts_dir="${{ parameters.outputArtifactsFolder }}/ARTIFACTS"
       mkdir -p "$published_artifacts_dir"
       cp "${{ parameters.repoRoot }}"/out/{,s}rpms.tar.gz "$published_artifacts_dir"
     condition: succeeded()
     displayName: "Copy artifacts for publishing"
 
   - bash: |
-      published_logs_dir="${{ parameters.buildArtifactsFolder }}/LOGS"
+      published_logs_dir="${{ parameters.outputArtifactsFolder }}/LOGS"
       mkdir -p "$published_logs_dir"
       tar -C "${{ parameters.repoRoot }}/build/logs/pkggen" -czf "$published_logs_dir/pkggen.logs.tar.gz" .
     condition: always()
