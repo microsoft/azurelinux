@@ -1,5 +1,5 @@
 parameters:
-  - name: customToolchainArtifactDir
+  - name: customToolchainArtifactBuild
     type: string
     default: "ARTIFACTS"
 
@@ -36,7 +36,7 @@ steps:
     - task: DownloadPipelineArtifact@2
       displayName: "Download toolchain"
       inputs:
-        artifact: "${{ parameters.customToolchainArtifactDir }}"
+        artifact: "${{ parameters.customToolchainArtifactBuild }}"
         patterns: "**/${{ parameters.customToolchainArtifactName }}"
         path: "$(Build.Repository.LocalPath)/input"
 

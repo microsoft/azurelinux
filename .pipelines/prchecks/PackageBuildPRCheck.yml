@@ -94,8 +94,8 @@ extends:
               steps:
                 - template: .pipelines/templates/PackageBuild.yml@self
                   parameters:
+                    customToolchainArtifactBuild: $(toolchainArtifactNameBase)_${{ configuration.name }}
                     customToolchainEnabled: true
-                    inputArtifactsName: $(toolchainArtifactNameBase)_${{ configuration.name }}
                     outputArtifactsFolder: $(ob_outputDirectory)
 
                 - task: PublishPipelineArtifact@1
@@ -116,8 +116,8 @@ extends:
               steps:
                 - template: .pipelines/templates/PackageBuild.yml@self
                   parameters:
+                    customToolchainArtifactBuild: $(toolchainArtifactNameBase)_${{ configuration.name }}
                     customToolchainEnabled: true
-                    inputArtifactsName: $(toolchainArtifactNameBase)_${{ configuration.name }}
                     isCheckBuild: true
                     outputArtifactsFolder: $(ob_outputDirectory)
 
