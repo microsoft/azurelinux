@@ -122,7 +122,7 @@ make %{?_smp_mflags} check
 %{_mandir}/man5/*.5*
 
 %changelog
-* Sun Jul 09 2022 Muhammad Falak <mwani@microsoft.com> - 1.6.12-6
+* Sun Jul 09 2023 Muhammad Falak <mwani@microsoft.com> - 1.6.12-6
 - Address CVE-2023-3138
 
 * Fri Apr 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.6.12-5
