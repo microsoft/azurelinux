@@ -1,0 +1,20 @@
+parameters:
+  - name: repoRoot
+    type: string
+    default: "$(Build.SourcesDirectory)"
+
+steps:
+  - script: |
+      toolkit_dir="${{ parameters.repoRoot }}/toolkit"
+      if [[ ! -d "$toolkit_dir" ]]; then
+        echo "ERROR: toolkit not found! Expected under '$toolkit_dir'." >&2
+        exit 1
+      fi
+
+      echo "Using following version of Mariner:"
+      
+      if ! make -sC "$toolkit_dir" CONFIG_FILE="" get-release-major; then
+        echo "ERROR: version check failed!" >&2
+        exit 1
+      fi
+    displayName: "Toolkit check"
