@@ -28,7 +28,7 @@ parameters:
     default: "$(Build.SourcesDirectory)"
 
 steps:
-  - template: .pipelines/templates/ToolkitCheck.yml@self
+  - template: ToolkitCheck.yml@self
     parameters:
       repoRoot: ${{ parameters.repoRoot }}
 
