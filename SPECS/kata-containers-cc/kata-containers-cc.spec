@@ -1,12 +1,13 @@
 %global runtime_make_vars       DEFSTATICRESOURCEMGMT=true \\\
                                 SKIP_GO_VERSION_CHECK=1
 
-%global agent_make_vars         LIBC=gnu
+%global agent_make_vars         LIBC=gnu \\\
+                                SECURITY_POLICY=yes
 
 %global debug_package %{nil}
 
 Name:         kata-containers-cc
-Version:      0.4.2
+Version:      0.6.0
 Release:      1%{?dist}
 Summary:      Kata Confidential Containers
 License:      ASL 2.0
@@ -16,8 +17,6 @@ Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/cc-
 Source1:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{name}-%{version}.tar.gz
 Source2:      %{name}-%{version}-cargo.tar.gz
 Source3:      mariner-coco-build-uvm.sh
-
-Patch0:       0001-Enable-using-an-igvm-file-with-cloud-hypervisor.patch
 
 ExclusiveArch: x86_64
 
@@ -135,6 +134,7 @@ mkdir -p %{buildroot}%{share_kata}
 mkdir -p %{buildroot}%{coco_path}/libexec
 mkdir -p %{buildroot}/etc/systemd/system/containerd.service.d/
 ln -s /usr/bin/cloud-hypervisor               %{buildroot}%{coco_bin}/cloud-hypervisor
+ln -s /usr/bin/cloud-hypervisor               %{buildroot}%{coco_bin}/cloud-hypervisor-snp
 ln -s /usr/share/cloud-hypervisor/vmlinux.bin %{buildroot}%{share_kata}/vmlinux.container
 
 ln -sf /usr/libexec/virtiofsd %{buildroot}/%{coco_path}/libexec/virtiofsd
@@ -161,7 +161,9 @@ install -D -m 0755 kata-runtime %{buildroot}%{coco_bin}/kata-runtime
 install -D -m 0755 data/kata-collect-data.sh %{buildroot}%{coco_bin}/kata-collect-data.sh
 
 install -D -m 0644 config/configuration-clh.toml %{buildroot}/%{defaults_kata}/configuration-clh.toml
+install -D -m 0644 config/configuration-clh-snp.toml %{buildroot}/%{defaults_kata}/configuration-clh-snp.toml
 sed -i 's|/usr|/opt/confidential-containers|g' %{buildroot}/%{defaults_kata}/configuration-clh.toml
+sed -i 's|/usr|/opt/confidential-containers|g' %{buildroot}/%{defaults_kata}/configuration-clh-snp.toml
 popd
 
 # Tardev-snapshotter
@@ -188,6 +190,7 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %{share_kata}/vmlinux.container
 
 %{coco_bin}/cloud-hypervisor
+%{coco_bin}/cloud-hypervisor-snp
 %{coco_bin}/kata-collect-data.sh
 %{coco_bin}/kata-monitor
 %{coco_bin}/kata-runtime
@@ -234,6 +237,9 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 
 
 %changelog
+*   Tue Jul 11 2023 Dallas Delaney <dadelan@microsoft.com> 0.6.0-1
+-   Upgrade to version 0.6.0
+
 *   Thu Jun 29 2023 Dallas Delaney <dadelan@microsoft.com> 0.4.2-1
 -   Upgrade to version 0.4.2 for new snapshotter and policy features
 
