@@ -60,7 +60,8 @@ func replaceNodesWithProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph, pro
 	// Make this node the parent node for the new implicit provide node.
 	// - By making a run node the parent node, it will inherit the identical runtime dependencies of the already setup node.
 	for _, node := range pkgGraph.AllRunNodes() {
-		if rpmFileProviding == node.RpmPath {
+		// We need to filter out any non-run nodes since cached remote nodes are considered "Run" nodes for the graph.
+		if node.Type == pkggraph.TypeRun && rpmFileProviding == node.RpmPath {
 			logger.Log.Debugf("Linked implicit provide (%s) to run node (%s)", provides, node.FriendlyName())
 			parentNode = node
 			break
