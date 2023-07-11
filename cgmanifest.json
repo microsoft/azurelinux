@@ -10291,8 +10291,8 @@
         "type": "other",
         "other": {
           "name": "libnvidia-container",
-          "version": "1.11.0",
-          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.11.0.tar.gz"
+          "version": "1.13.3",
+          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.13.3.tar.gz"
         }
       }
     },
@@ -14393,8 +14393,8 @@
         "type": "other",
         "other": {
           "name": "nvidia-container-runtime",
-          "version": "3.11.0",
-          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-runtime/archive/v3.11.0.tar.gz"
+          "version": "3.13.0",
+          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-runtime/archive/v3.13.0.tar.gz"
         }
       }
     },
@@ -14403,8 +14403,8 @@
         "type": "other",
         "other": {
           "name": "nvidia-container-toolkit",
-          "version": "1.11.0",
-          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.11.0.tar.gz"
+          "version": "1.13.3",
+          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.13.3.tar.gz"
         }
       }
     },

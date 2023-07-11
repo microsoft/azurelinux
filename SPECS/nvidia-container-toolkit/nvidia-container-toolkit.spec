@@ -1,8 +1,8 @@
 %global debug_package %{nil}
 Summary:        NVIDIA container runtime hook
 Name:           nvidia-container-toolkit
-Version:        1.11.0
-Release:        9%{?dist}
+Version:        1.13.3
+Release:        1%{?dist}
 License:        ALS2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -94,6 +94,9 @@ rm -f %{_bindir}/nvidia-container-toolkit
 %{_bindir}/nvidia-ctk
 
 %changelog
+* Mon Jul 10 2023 Henry Li <lihl@microsoft.com> - 1.13.3-1
+- Upgrade to version 1.13.3
+
 * Thu Jun 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.11.0-9
 - Bump release to rebuild with go 1.19.10
 
