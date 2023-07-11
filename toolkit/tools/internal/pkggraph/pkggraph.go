@@ -58,6 +58,7 @@ const (
 	TypeRemoteRun  NodeType = iota         // A non-local node which may have a cache entry
 	TypePureMeta   NodeType = iota         // An arbitrary meta node with no other meaning
 	TypePreBuilt   NodeType = iota         // A node indicating a pre-built SRPM used in breaking cyclic build dependencies
+	TypePtest      NodeType = iota         // A node for running the '%check' section of the underlying package
 	TypeMAX        NodeType = TypePureMeta // Max allowable type
 )
 
@@ -83,6 +84,7 @@ type PkgNode struct {
 	SourceRepo   string              // The location this package was acquired from
 	GoalName     string              // Optional string for goal nodes
 	Implicit     bool                // If the package is an implicit provide
+	KeepChroot   bool                // If the chroot should be kept after building the package
 	This         *PkgNode            // Self reference since the graph library returns nodes by value, not reference
 }
 
