@@ -317,9 +317,9 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild []*pkgjson
 				fallthrough
 			case pkggraph.TypePureMeta:
 				fallthrough
-			case pkggraph.TypeRun:
+			case pkggraph.TypeLocalRun:
 				fallthrough
-			case pkggraph.TypeRemote:
+			case pkggraph.TypeRemoteRun:
 				fallthrough
 			case pkggraph.TypeBuild:
 				fallthrough

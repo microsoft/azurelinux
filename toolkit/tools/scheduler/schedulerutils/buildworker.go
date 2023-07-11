@@ -112,7 +112,7 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 			} else {
 				setAncillaryBuildNodesStatus(req, pkggraph.StateBuildError)
 			}
-		case pkggraph.TypeRun, pkggraph.TypeGoal, pkggraph.TypeRemote, pkggraph.TypePureMeta, pkggraph.TypePreBuilt:
+		case pkggraph.TypeLocalRun, pkggraph.TypeGoal, pkggraph.TypeRemoteRun, pkggraph.TypePureMeta, pkggraph.TypePreBuilt:
 			res.UsedCache = req.CanUseCache
 
 		case pkggraph.TypeUnknown:

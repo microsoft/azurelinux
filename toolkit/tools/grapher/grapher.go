@@ -100,7 +100,7 @@ func addUnresolvedPackage(g *pkggraph.PkgGraph, pkgVer *pkgjson.PackageVer) (new
 	}
 
 	// Create a new node
-	newRunNode, err = g.AddPkgNode(pkgVer, pkggraph.StateUnresolved, pkggraph.TypeRemote, "<NO_SRPM_PATH>", "<NO_RPM_PATH>", "<NO_SPEC_PATH>", "<NO_SOURCE_PATH>", "<NO_ARCHITECTURE>", "<NO_REPO>")
+	newRunNode, err = g.AddPkgNode(pkgVer, pkggraph.StateUnresolved, pkggraph.TypeRemoteRun, "<NO_SRPM_PATH>", "<NO_RPM_PATH>", "<NO_SPEC_PATH>", "<NO_SOURCE_PATH>", "<NO_ARCHITECTURE>", "<NO_REPO>")
 	if err != nil {
 		return
 	}
@@ -131,7 +131,7 @@ func addNodesForPackage(g *pkggraph.PkgGraph, pkgVer *pkgjson.PackageVer, pkg *p
 
 	if newRunNode == nil {
 		// Add "Run" node
-		newRunNode, err = g.AddPkgNode(pkgVer, pkggraph.StateMeta, pkggraph.TypeRun, pkg.SrpmPath, pkg.RpmPath, pkg.SpecPath, pkg.SourceDir, pkg.Architecture, "<LOCAL>")
+		newRunNode, err = g.AddPkgNode(pkgVer, pkggraph.StateMeta, pkggraph.TypeLocalRun, pkg.SrpmPath, pkg.RpmPath, pkg.SpecPath, pkg.SourceDir, pkg.Architecture, "<LOCAL>")
 		logger.Log.Debugf("Adding run node %s with id %d\n", newRunNode.FriendlyName(), newRunNode.ID())
 		if err != nil {
 			return
@@ -188,8 +188,8 @@ func addSingleDependency(g *pkggraph.PkgGraph, packageNode *pkggraph.PkgNode, de
 	// Creating these edges may cause non-problematic cycles that can significantly increase memory usage and runtime during cycle resolution.
 	// If there are enough of these cycles it can exhaust the system's memory when resolving them.
 	// - Only check run nodes. If a build node has a reflexive cycle then it cannot be built without a bootstrap version.
-	if packageNode.Type == pkggraph.TypeRun &&
-		dependentNode.Type == pkggraph.TypeRun &&
+	if packageNode.Type == pkggraph.TypeLocalRun &&
+		dependentNode.Type == pkggraph.TypeLocalRun &&
 		packageNode.RpmPath == dependentNode.RpmPath {
 
 		logger.Log.Debugf("%+v requires %+v which is provided by the same RPM.", packageNode, dependentNode)

@@ -103,7 +103,7 @@ func buildRunNodeHelper(pkg *pkgjson.PackageVer) (node *PkgNode) {
 	node = &PkgNode{
 		VersionedPkg: &pkgCopy,
 		State:        StateMeta,
-		Type:         TypeRun,
+		Type:         TypeLocalRun,
 		SrpmPath:     pkgCopy.Name + ".src.rpm",
 		RpmPath:      pkgCopy.Name + ".rpm",
 		SpecPath:     pkgCopy.Name + ".spec",
@@ -141,7 +141,7 @@ func buildUnresolvedNodeHelper(pkg *pkgjson.PackageVer) (node *PkgNode) {
 	node = &PkgNode{
 		VersionedPkg: &pkgCopy,
 		State:        StateUnresolved,
-		Type:         TypeRemote,
+		Type:         TypeRemoteRun,
 		SrpmPath:     "url://" + pkgCopy.Name + ".src.rpm",
 		RpmPath:      "url://" + pkgCopy.Name + ".rpm",
 		SpecPath:     "url://" + pkgCopy.Name + ".spec",
@@ -305,9 +305,9 @@ func TestNodeStateString(t *testing.T) {
 // TestNodeTypeString checks the NodeType -> string functionality
 func TestNodeTypeString(t *testing.T) {
 	assert.Equal(t, "Build", TypeBuild.String())
-	assert.Equal(t, "Run", TypeRun.String())
+	assert.Equal(t, "Run", TypeLocalRun.String())
 	assert.Equal(t, "Goal", TypeGoal.String())
-	assert.Equal(t, "Remote", TypeRemote.String())
+	assert.Equal(t, "Remote", TypeRemoteRun.String())
 	assert.Equal(t, "PureMeta", TypePureMeta.String())
 	assert.Equal(t, "PreBuilt", TypePreBuilt.String())
 	var tp NodeType
