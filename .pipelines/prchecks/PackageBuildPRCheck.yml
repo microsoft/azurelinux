@@ -88,12 +88,9 @@ extends:
 
           - stage: RPMs_${{ configuration.name }}
             dependsOn: Toolchain_${{ configuration.name }}
-            # The jobs are identical except for the value of 'isCheckBuild'.
-            # We cannot use the matrix strategy - OneBranch automatically publishes the contents of $(ob_outputDirectory)
-            # and uses the job's name in the artifact's name. Jobs created with the matrix strategy have
-            # the same name from the point of view of the pipeline, so the artifact names are identical and the pipeline fails when
-            # the second job tries to publish its artifacts.
             jobs:
+              # Using configuration object instead of the matrix strategy because the 'isCheckBuild' parameter must be set
+              # during YAML parsing and the matrix strategy arguments are available later during run-time.
               - ${{ each packageBuildJob in configuration.packageBuildJobs }}:
                   - job: ${{ packageBuildJob.name }}
                     pool:
