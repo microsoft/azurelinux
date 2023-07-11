@@ -3,10 +3,6 @@ parameters:
     type: string
     default: ""
 
-  - name: customToolchainArtifactName
-    type: string
-    default: "toolchain_built_rpms_all.tar.gz"
-
   - name: customToolchainEnabled
     type: boolean
     default: false
@@ -27,28 +23,35 @@ parameters:
     type: string
     default: "$(Build.SourcesDirectory)"
 
+  - name: rpmsTarballName
+    type: string
+    default: "rpms.tar.gz"
+
+  - name: srpmsTarballName
+    type: string
+    default: "srpms.tar.gz"
+
 steps:
   - template: ToolkitCheck.yml@self
     parameters:
       repoRoot: ${{ parameters.repoRoot }}
 
   - ${{ if eq(parameters.customToolchainEnabled, true) }}:
-    - task: DownloadPipelineArtifact@2
-      displayName: "Download toolchain"
-      inputs:
-        artifact: "${{ parameters.customToolchainArtifactBuild }}"
-        patterns: "**/${{ parameters.customToolchainArtifactName }}"
-        path: "$(Build.Repository.LocalPath)/input"
+      - task: DownloadPipelineArtifact@2
+        displayName: "Download toolchain"
+        inputs:
+          artifact: "${{ parameters.customToolchainArtifactBuild }}"
+          patterns: "**/toolchain_built_rpms_all.tar.gz"
 
-    - script: |
-        toolchain_archive="$(find "$(Build.Repository.LocalPath)/input" -name "${{ parameters.customToolchainArtifactName }}")"
-        if [[ ! -f "$toolchain_archive" ]]; then
-          echo "ERROR: toolchain archive not found!" >&2
-          exit 1
-        fi
+      - script: |
+          toolchain_archive="$(find "$(Pipeline.Workspace)" -name toolchain_built_rpms_all.tar.gz)"
+          if [[ ! -f "$toolchain_archive" ]]; then
+            echo "ERROR: toolchain archive not found!" >&2
+            exit 1
+          fi
 
-        sudo make -C "${{ parameters.repoRoot }}/toolkit" toolchain TOOLCHAIN_ARCHIVE="$toolchain_archive"
-      displayName: "Populate toolchain"
+          sudo make -C "${{ parameters.repoRoot }}/toolkit" toolchain TOOLCHAIN_ARCHIVE="$toolchain_archive"
+        displayName: "Populate toolchain"
 
   - script: |
       run_check_arg="RUN_CHECK=n"
@@ -72,7 +75,8 @@ steps:
   - bash: |
       published_artifacts_dir="${{ parameters.outputArtifactsFolder }}/ARTIFACTS"
       mkdir -p "$published_artifacts_dir"
-      cp "${{ parameters.repoRoot }}"/out/{,s}rpms.tar.gz "$published_artifacts_dir"
+      cp "${{ parameters.repoRoot }}"/out/rpms.tar.gz "$published_artifacts_dir/${{ parameters.rpmsTarballName }}"
+      cp "${{ parameters.repoRoot }}"/out/srpms.tar.gz "$published_artifacts_dir/${{ parameters.srpmsTarballName }}"
     condition: succeeded()
     displayName: "Copy artifacts for publishing"
 
