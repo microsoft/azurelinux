@@ -33,6 +33,7 @@ type Partition struct {
 	Name      string          `json:"Name"`
 	End       uint64          `json:"End"`
 	Start     uint64          `json:"Start"`
+	BlockSize uint64          `json:"BlockSize"`
 	Flags     []PartitionFlag `json:"Flags"`
 	Artifacts []Artifact      `json:"Artifacts"`
 }
@@ -68,6 +69,30 @@ func nameCheck(name string) (err error) {
 	return
 }
 
+// blockSizeCheck makes sure the BlockSize is a power of 2 and is at least 512 bytes, not larger than 65536. Only some
+// filesystems support BlockSize.
+func (p *Partition) blockSizeCheck() (err error) {
+	if p.BlockSize == 0 {
+		return
+	}
+
+	switch p.FsType {
+	case "ext2", "ext3", "ext4":
+		if p.BlockSize < 1024 || p.BlockSize > 4096 {
+			return fmt.Errorf("[BlockSize] must be 1024, 2048 or 4096 bytes for ext2, ext3 and ext4 filesystems")
+		}
+	case "xfs":
+		if p.BlockSize < 512 || p.BlockSize > 65536 {
+			return fmt.Errorf("[BlockSize] must be between 512 and 65536 bytes for xfs filesystems")
+		} else if p.BlockSize&(p.BlockSize-1) != 0 {
+			return fmt.Errorf("[BlockSize] must be a power of 2 for xfs filesystems")
+		}
+	default:
+		return fmt.Errorf("[BlockSize] is only supported for ext2, ext3, ext4 and xfs filesystems")
+	}
+	return
+}
+
 // IsValid returns an error if the Partition is not valid
 func (p *Partition) IsValid() (err error) {
 	for _, f := range p.Flags {
@@ -77,6 +102,11 @@ func (p *Partition) IsValid() (err error) {
 	}
 
 	err = nameCheck(p.Name)
+	if err != nil {
+		return err
+	}
+
+	err = p.blockSizeCheck()
 	if err != nil {
 		return err
 	}

@@ -24,7 +24,8 @@
                     "ID": "rootfs",
                     "Start": 9,
                     "End": 0,
-                    "FsType": "ext4"
+                    "FsType": "ext4",
+                    "BlockSize": 4096
                 }
             ]
         }

@@ -564,8 +564,9 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int, partitio
 // FormatSinglePartition formats the given partition to the type specified in the partition configuration
 func FormatSinglePartition(partDevPath string, partition configuration.Partition) (fsType string, err error) {
 	const (
-		totalAttempts = 5
-		retryDuration = time.Second
+		totalAttempts    = 5
+		retryDuration    = time.Second
+		defaultBlockSize = 4096
 	)
 
 	fsType = partition.FsType
@@ -578,8 +579,16 @@ func FormatSinglePartition(partDevPath string, partition configuration.Partition
 		if fsType == "fat32" || fsType == "fat16" {
 			fsType = "vfat"
 		}
+		// If block size is not specified, use default block sized picked by mkfs (it picks based on the size of the disk)
+		blockSizeArg := []string{}
+		if partition.BlockSize != 0 {
+			blockSizeArg = []string{"-b", strconv.Itoa(int(partition.BlockSize))}
+		}
+		args := []string{"-t", fsType}
+		args = append(args, blockSizeArg...)
+
 		err = retry.Run(func() error {
-			_, stderr, err := shell.Execute("mkfs", "-t", fsType, partDevPath)
+			_, stderr, err := shell.Execute("mkfs", append(args, partDevPath)...)
 			if err != nil {
 				logger.Log.Warnf("Failed to format partition using mkfs: %v", stderr)
 				return err
