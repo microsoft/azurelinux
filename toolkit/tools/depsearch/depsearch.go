@@ -338,7 +338,7 @@ func (t *treeSearch) printProgress() {
 func (t *treeSearch) treeNodeToString(n *pkggraph.PkgNode, depth, maxDepth int, filter bool, filterFile string, verbosity int, generateStrings, printDuplicates bool) (lines []string, hasNonToolchain bool) {
 	t.printProgress()
 	// We only care about run nodes for the purposes of detecting toolchain files
-	hasNonToolchain = n.Type == pkggraph.TypeBuild && !isFilteredFile(n.RpmPath, filterFile)
+	hasNonToolchain = n.Type == pkggraph.TypeLocalBuild && !isFilteredFile(n.RpmPath, filterFile)
 
 	if !printDuplicates && t.alreadyAdded[n] {
 		return []string{}, false

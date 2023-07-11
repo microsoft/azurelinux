@@ -73,7 +73,7 @@ func printIndirectlyMostUnresolved(pkgGraph *pkggraph.PkgGraph, maxResults int) 
 	unresolvedPackageDependents := make(map[string][]string)
 
 	for _, node := range pkgGraph.AllNodes() {
-		if node.Type != pkggraph.TypeLocalRun && node.Type != pkggraph.TypeBuild {
+		if node.Type != pkggraph.TypeLocalRun && node.Type != pkggraph.TypeLocalBuild {
 			continue
 		}
 
@@ -135,7 +135,7 @@ func printDirectlyClosestToBeingUnblocked(pkgGraph *pkggraph.PkgGraph, maxResult
 	srpmsBlockedBy := make(map[string][]string)
 
 	for _, node := range pkgGraph.AllNodes() {
-		if node.Type != pkggraph.TypeBuild {
+		if node.Type != pkggraph.TypeLocalBuild {
 			continue
 		}
 
@@ -176,7 +176,7 @@ func printIndirectlyClosestToBeingUnblocked(pkgGraph *pkggraph.PkgGraph, maxResu
 	srpmsBlockedByPaths := make(map[string][][]graph.Node)
 
 	for _, node := range pkgGraph.AllNodes() {
-		if node.Type != pkggraph.TypeBuild {
+		if node.Type != pkggraph.TypeLocalBuild {
 			continue
 		}
 

@@ -122,7 +122,7 @@ func buildBuildNodeHelper(pkg *pkgjson.PackageVer) (node *PkgNode) {
 	node = &PkgNode{
 		VersionedPkg: &pkgCopy,
 		State:        StateBuild,
-		Type:         TypeBuild,
+		Type:         TypeLocalBuild,
 		SrpmPath:     pkgCopy.Name + ".src.rpm",
 		RpmPath:      pkgCopy.Name + ".rpm",
 		SpecPath:     pkgCopy.Name + ".spec",
@@ -197,13 +197,13 @@ func addEdgeHelper(g *PkgGraph, pkg1 PkgNode, pkg2 PkgNode) (err error) {
 		return fmt.Errorf("couldn't find %s (%v)", pkg2.String(), lu2)
 	}
 
-	if pkg1.Type == TypeBuild {
+	if pkg1.Type == TypeLocalBuild {
 		n1 = lu1.BuildNode
 	} else {
 		n1 = lu1.RunNode
 	}
 
-	if pkg2.Type == TypeBuild {
+	if pkg2.Type == TypeLocalBuild {
 		n2 = lu2.BuildNode
 	} else {
 		n2 = lu2.RunNode
@@ -304,7 +304,7 @@ func TestNodeStateString(t *testing.T) {
 
 // TestNodeTypeString checks the NodeType -> string functionality
 func TestNodeTypeString(t *testing.T) {
-	assert.Equal(t, "Build", TypeBuild.String())
+	assert.Equal(t, "Build", TypeLocalBuild.String())
 	assert.Equal(t, "Run", TypeLocalRun.String())
 	assert.Equal(t, "Goal", TypeGoal.String())
 	assert.Equal(t, "Remote", TypeRemoteRun.String())
