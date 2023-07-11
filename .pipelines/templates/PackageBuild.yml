@@ -60,6 +60,7 @@ steps:
       fi
 
       sudo make -C "${{ parameters.repoRoot }}/toolkit" build-packages -j$(nproc) \
+        DELTA_FETCH=y \
         REBUILD_TOOLS=y \
         $run_check_arg
     displayName: "Build packages"
