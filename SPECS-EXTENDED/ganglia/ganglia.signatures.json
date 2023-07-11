@@ -1,0 +1,11 @@
+{
+ "Signatures": {
+  "ganglia-web-3.7.5.tar.gz": "067f791287a11210d274acf4c9c1b5e3df3482ab3f3a151071cf6c926460cfa9",
+  "ganglia-3.7.2.tar.gz": "042dbcaf580a661b55ae4d9f9b3566230b2232169a0898e91a797a4c61888409",
+  "gmetad.service": "aa3ecd801b4a0b9dd00ad77e51ada97ff2dc97aaaf8f7110095b8006e5f41352",
+  "gmond.service": "c80c3e65ebb4cee656e9f93f2c416143bb2e9b3509e9ef90cfdcda5d227c9db5",
+  "conf.php": "717c907523b70e5738ef92eba26db5abb28bb50dbfc1b107c0656394bb1d0094",
+  "ganglia-httpd.conf.d": "27517203c0bec8486f2807aec4abd9cdbee846268792e1fd712f9ee2cdb0af94",
+  "ganglia-httpd24.conf.d": "ba27cf98b7d18021269afa5adf2f22e24a860ee7e9ee62fff376fb019554f5a8"
+ }
+}

@@ -30584,6 +30584,26 @@
           "downloadUrl": "https://github.com/gdraheim/zziplib/archive/v0.13.72.tar.gz"
         }
       }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ganglia",
+          "version": "3.7.2",
+          "downloadUrl": "http://downloads.sourceforge.net/sourceforge/ganglia/ganglia-3.7.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ganglia-web",
+          "version": "3.7.5",
+          "downloadUrl": "https://github.com/ganglia/ganglia-web/archive/3.7.5/ganglia-web-3.7.5.tar.gz"
+        }
+      }
     }
   ],
   "Version": 1
