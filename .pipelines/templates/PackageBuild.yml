@@ -91,5 +91,7 @@ steps:
       published_logs_dir="${{ parameters.outputArtifactsFolder }}/LOGS"
       mkdir -p "$published_logs_dir"
       tar -C "${{ parameters.repoRoot }}/build/logs/pkggen" -czf "$published_logs_dir/pkggen.logs.tar.gz" .
+      tar -C "${{ parameters.repoRoot }}/build/pkg_artifacts" -czf "$published_logs_dir/pkg_artifacts.tar.gz" .
+      tar -C "${{ parameters.repoRoot }}/build/timestamp" -czf "$published_logs_dir/timestamp.tar.gz" .
     condition: always()
     displayName: "Copy logs for publishing"
