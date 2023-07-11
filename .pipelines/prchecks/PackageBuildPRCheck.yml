@@ -15,10 +15,22 @@ parameters:
       agentPool: "$(agentPool_AMD64)"
       rawToolchainCacheURL: "$(rawToolchainCacheURL_AMD64)"
       rawToolchainExpectedHash: "f56df34b90915c93f772d3961bf5e9eeb8c1233db43dd92070214e4ce6b72894"
+      packageBuildScenarios:
+        - scenario1:
+          name: Build_packages
+          runCheck: false
+        - scenario2:
+          name: Test_packages
+          runCheck: true
     - name: "ARM64"
       agentPool: "$(agentPool_ARM64)"
       rawToolchainCacheURL: "$(rawToolchainCacheURL_ARM64)"
       rawToolchainExpectedHash: "65de43b3bdcfdaac71df1f11fd1f830a8109b1eb9d7cb6cbc2e2d0e929d0ef76"
+      packageBuildScenarios:
+        - name: Build_packages
+          runCheck: false
+        - name: Test_packages
+          runCheck: true
 
 resources:
   repositories:
@@ -83,47 +95,26 @@ extends:
           # the same name from the point of view of the pipeline, so the artifact names are identical and the pipeline fails when
           # the second job tries to publish its artifacts.
           jobs:
-            - job: Build_packages
-              pool:
-                type: linux
-                isCustom: true
-                name: ${{ configuration.agentPool }}
-              variables:
-                ob_artifactBaseName: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}_$(System.JobDisplayName)
-                ob_outputDirectory: $(Build.ArtifactStagingDirectory)
-              steps:
-                - template: .pipelines/templates/PackageBuild.yml@self
-                  parameters:
-                    customToolchainArtifactBuild: $(toolchainArtifactNameBase)_${{ configuration.name }}
-                    customToolchainEnabled: true
-                    outputArtifactsFolder: $(ob_outputDirectory)
+            - ${{ each packageBuildScenario in configuration.packageBuildScenarios }}:
+              - job: ${{ packageBuildScenario.name }}
+                pool:
+                  type: linux
+                  isCustom: true
+                  name: ${{ configuration.agentPool }}
+                variables:
+                  ob_artifactBaseName: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}_$(System.JobDisplayName)
+                  ob_outputDirectory: $(Build.ArtifactStagingDirectory)
+                steps:
+                  - template: .pipelines/templates/PackageBuild.yml@self
+                    parameters:
+                      customToolchainArtifactBuild: $(toolchainArtifactNameBase)_${{ configuration.name }}
+                      customToolchainEnabled: true
+                      isCheckBuild: ${{ packageBuildScenario.runCheck }}
+                      outputArtifactsFolder: $(ob_outputDirectory)
 
-                - task: PublishPipelineArtifact@1
-                  inputs:
-                    artifact: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}_$(System.JobDisplayName)
-                    targetPath: $(ob_outputDirectory)
-                  condition: always()
-                  displayName: 'Publish packages build artifacts'
-
-            - job: Test_packages
-              pool:
-                type: linux
-                isCustom: true
-                name: ${{ configuration.agentPool }}
-              variables:
-                ob_artifactBaseName: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}_$(System.JobDisplayName)
-                ob_outputDirectory: $(Build.ArtifactStagingDirectory)
-              steps:
-                - template: .pipelines/templates/PackageBuild.yml@self
-                  parameters:
-                    customToolchainArtifactBuild: $(toolchainArtifactNameBase)_${{ configuration.name }}
-                    customToolchainEnabled: true
-                    isCheckBuild: true
-                    outputArtifactsFolder: $(ob_outputDirectory)
-
-                - task: PublishPipelineArtifact@1
-                  inputs:
-                    artifact: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}_$(System.JobDisplayName)
-                    targetPath: $(ob_outputDirectory)
-                  condition: always()
-                  displayName: 'Publish packages build artifacts'
+                  - task: PublishPipelineArtifact@1
+                    inputs:
+                      artifact: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}_$(System.JobDisplayName)
+                      targetPath: $(ob_outputDirectory)
+                    condition: always()
+                    displayName: 'Publish packages build artifacts'

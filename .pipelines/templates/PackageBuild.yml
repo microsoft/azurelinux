@@ -1,7 +1,7 @@
 parameters:
   - name: customToolchainArtifactBuild
     type: string
-    default: "ARTIFACTS"
+    default: ""
 
   - name: customToolchainArtifactName
     type: string
