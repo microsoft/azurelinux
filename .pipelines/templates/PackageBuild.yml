@@ -54,6 +54,11 @@ steps:
         displayName: "Populate toolchain"
 
   - script: |
+      delta_fetch_arg="DELTA_FETCH=n"
+      if [[ ${{ parameters.isDeltaBuild }} =~ [Tt]rue ]]; then
+        delta_fetch_arg="DELTA_FETCH=y"
+      fi
+
       run_check_arg="RUN_CHECK=n"
       if [[ ${{ parameters.isCheckBuild }} =~ [Tt]rue ]]; then
         run_check_arg="RUN_CHECK=y"
@@ -61,7 +66,7 @@ steps:
 
       sudo make -C "${{ parameters.repoRoot }}/toolkit" build-packages -j$(nproc) \
         CONFIG_FILE="" \
-        DELTA_FETCH=n \
+        $delta_fetch_arg \
         REBUILD_TOOLS=y \
         $run_check_arg
     displayName: "Build packages"

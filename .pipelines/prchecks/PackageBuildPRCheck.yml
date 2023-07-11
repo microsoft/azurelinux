@@ -106,6 +106,7 @@ extends:
                           customToolchainArtifactBuild: $(toolchainArtifactNameBase)_${{ configuration.name }}
                           customToolchainEnabled: true
                           isCheckBuild: ${{ packageBuildJob.runCheck }}
+                          isDeltaBuild: true
                           outputArtifactsFolder: $(ob_outputDirectory)
 
                       - task: PublishPipelineArtifact@1
