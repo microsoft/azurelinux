@@ -31,7 +31,6 @@ steps:
       published_artifacts_dir="${{ parameters.outputArtifactsFolder }}/ARTIFACTS"
       mkdir -p "$published_artifacts_dir"
       cp "${{ parameters.repoRoot }}"/build/toolchain/toolchain_built_{,s}rpms_all.tar.gz "$published_artifacts_dir"
-    condition: succeeded()
     displayName: "Copy artifacts for publishing"
 
   - bash: |

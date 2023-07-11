@@ -84,7 +84,6 @@ steps:
       mkdir -p "$published_artifacts_dir"
       cp "${{ parameters.repoRoot }}"/out/rpms.tar.gz "$published_artifacts_dir/${{ parameters.rpmsTarballName }}"
       cp "${{ parameters.repoRoot }}"/out/srpms.tar.gz "$published_artifacts_dir/${{ parameters.srpmsTarballName }}"
-    condition: succeeded()
     displayName: "Copy artifacts for publishing"
 
   - bash: |
