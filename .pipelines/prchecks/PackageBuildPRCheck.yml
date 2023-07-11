@@ -11,33 +11,33 @@ parameters:
   - name: buildConfiguration
     type: object
     default:
-    - name: "AMD64"
-      agentPool: "$(agentPool_AMD64)"
-      rawToolchainCacheURL: "$(rawToolchainCacheURL_AMD64)"
-      rawToolchainExpectedHash: "f56df34b90915c93f772d3961bf5e9eeb8c1233db43dd92070214e4ce6b72894"
-      packageBuildJobs:
-      - scenario1:
-        name: build
-        runCheck: false
-      - scenario2:
-        name: test
-        runCheck: true
-    - name: "ARM64"
-      agentPool: "$(agentPool_ARM64)"
-      rawToolchainCacheURL: "$(rawToolchainCacheURL_ARM64)"
-      rawToolchainExpectedHash: "65de43b3bdcfdaac71df1f11fd1f830a8109b1eb9d7cb6cbc2e2d0e929d0ef76"
-      packageBuildJobs:
-      - name: build
-        runCheck: false
-      - name: test
-        runCheck: true
+      - name: "AMD64"
+        agentPool: "$(agentPool_AMD64)"
+        rawToolchainCacheURL: "$(rawToolchainCacheURL_AMD64)"
+        rawToolchainExpectedHash: "f56df34b90915c93f772d3961bf5e9eeb8c1233db43dd92070214e4ce6b72894"
+        packageBuildJobs:
+          - scenario1:
+            name: Build
+            runCheck: false
+          - scenario2:
+            name: Test
+            runCheck: true
+      - name: "ARM64"
+        agentPool: "$(agentPool_ARM64)"
+        rawToolchainCacheURL: "$(rawToolchainCacheURL_ARM64)"
+        rawToolchainExpectedHash: "65de43b3bdcfdaac71df1f11fd1f830a8109b1eb9d7cb6cbc2e2d0e929d0ef76"
+        packageBuildJobs:
+          - name: Build
+            runCheck: false
+          - name: Test
+            runCheck: true
 
 resources:
   repositories:
-  - repository: templates
-    type: git
-    name: OneBranch.Pipelines/GovernedTemplates
-    ref: refs/heads/main
+    - repository: templates
+      type: git
+      name: OneBranch.Pipelines/GovernedTemplates
+      ref: refs/heads/main
 
 variables:
   rpmsArtifactNameBase: RPMs
@@ -54,61 +54,66 @@ extends:
       credscan:
         suppressionsFile: .config/CredScanSuppressions.json
     stages:
-    - stage: Check_packages
-      jobs:
       - ${{ each configuration in parameters.buildConfiguration }}:
-        - job: Toolchain_build_${{ configuration.name }}
-          pool:
-            type: linux
-            isCustom: true
-            name: ${{ configuration.agentPool }}
-          variables:
-            ob_artifactBaseName: $(toolchainArtifactNameBase)_${{ configuration.name }}
-            ob_outputDirectory: $(Build.ArtifactStagingDirectory)
-          steps:
-            - template: .pipelines/templates/RawToolchainDownload.yml@self
-              parameters:
-                rawToolchainCacheURL: ${{ configuration.rawToolchainCacheURL }}
-                rawToolchainExpectedHash: ${{ configuration.rawToolchainExpectedHash }}
+          - stage: Toolchain_${{ configuration.name }}
+            jobs:
+              - job: Build
+                pool:
+                  type: linux
+                  isCustom: true
+                  name: ${{ configuration.agentPool }}
+                variables:
+                  ob_artifactBaseName: $(toolchainArtifactNameBase)_${{ configuration.name }}
+                  ob_outputDirectory: $(Build.ArtifactStagingDirectory)
+                steps:
+                  - template: .pipelines/templates/RawToolchainDownload.yml@self
+                    parameters:
+                      rawToolchainCacheURL: ${{ configuration.rawToolchainCacheURL }}
+                      rawToolchainExpectedHash: ${{ configuration.rawToolchainExpectedHash }}
 
-            - template: .pipelines/templates/ToolchainBuild.yml@self
-              parameters:
-                outputArtifactsFolder: $(ob_outputDirectory)
+                  - template: .pipelines/templates/ToolchainBuild.yml@self
+                    parameters:
+                      outputArtifactsFolder: $(ob_outputDirectory)
 
-            # 1. Automatic publishing won't work if 'isCustom: true' is set on the pool. We cannot do 'isCustom: false' because
-            #    then OneBranch attempts to perform additional actions (adding build tags for instance), which require permissions
-            #    the PR check pipeline does not have.
-            # 2. The value for 'artifact' must equal $(ob_artifactBaseName), as this is the only value OneBranch accepts.
-            - task: PublishPipelineArtifact@1
-              inputs:
-                artifact: $(toolchainArtifactNameBase)_${{ configuration.name }}
-                targetPath: $(ob_outputDirectory)
-              condition: always()
-              displayName: 'Publish toolchain artifacts'
+                  # 1. Automatic publishing won't work if 'isCustom: true' is set on the pool. We cannot do 'isCustom: false' because
+                  #    then OneBranch attempts to perform additional actions (adding build tags for instance), which require additional permissions
+                  #    that the PR check pipeline does not have.
+                  # 2. The value for 'artifact' must equal $(ob_artifactBaseName), as this is the only value OneBranch accepts.
+                  - task: PublishPipelineArtifact@1
+                    inputs:
+                      artifact: $(toolchainArtifactNameBase)_${{ configuration.name }}
+                      targetPath: $(ob_outputDirectory)
+                    condition: always()
+                    displayName: "Publish toolchain artifacts"
 
-        # Using configuration object instead of the matrix strategy because the 'isCheckBuild' parameter must be set
-        # during YAML parsing while the matrix strategy arguments are available later during run-time.
-        - ${{ each packageBuildJob in configuration.packageBuildJobs }}:
-          - job: RPMs_${{ packageBuildJob.name }}_${{ configuration.name }}
-            dependsOn: Toolchain_build_${{ configuration.name }}
-            pool:
-              type: linux
-              isCustom: true
-              name: ${{ configuration.agentPool }}
-            variables:
-              ob_artifactBaseName: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}_$(System.JobDisplayName)
-              ob_outputDirectory: $(Build.ArtifactStagingDirectory)
-            steps:
-              - template: .pipelines/templates/PackageBuild.yml@self
-                parameters:
-                  customToolchainArtifactBuild: $(toolchainArtifactNameBase)_${{ configuration.name }}
-                  customToolchainEnabled: true
-                  isCheckBuild: ${{ packageBuildJob.runCheck }}
-                  outputArtifactsFolder: $(ob_outputDirectory)
+          - stage: RPMs_${{ configuration.name }}
+            dependsOn: Toolchain_${{ configuration.name }}
+            # The jobs are identical except for the value of 'isCheckBuild'.
+            # We cannot use the matrix strategy - OneBranch automatically publishes the contents of $(ob_outputDirectory)
+            # and uses the job's name in the artifact's name. Jobs created with the matrix strategy have
+            # the same name from the point of view of the pipeline, so the artifact names are identical and the pipeline fails when
+            # the second job tries to publish its artifacts.
+            jobs:
+              - ${{ each packageBuildJob in configuration.packageBuildJobs }}:
+                  - job: ${{ packageBuildJob.name }}
+                    pool:
+                      type: linux
+                      isCustom: true
+                      name: ${{ configuration.agentPool }}
+                    variables:
+                      ob_artifactBaseName: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}_$(System.JobDisplayName)
+                      ob_outputDirectory: $(Build.ArtifactStagingDirectory)
+                    steps:
+                      - template: .pipelines/templates/PackageBuild.yml@self
+                        parameters:
+                          customToolchainArtifactBuild: $(toolchainArtifactNameBase)_${{ configuration.name }}
+                          customToolchainEnabled: true
+                          isCheckBuild: ${{ packageBuildJob.runCheck }}
+                          outputArtifactsFolder: $(ob_outputDirectory)
 
-              - task: PublishPipelineArtifact@1
-                inputs:
-                  artifact: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}_$(System.JobDisplayName)
-                  targetPath: $(ob_outputDirectory)
-                condition: always()
-                displayName: 'Publish packages build artifacts'
+                      - task: PublishPipelineArtifact@1
+                        inputs:
+                          artifact: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}_$(System.JobDisplayName)
+                          targetPath: $(ob_outputDirectory)
+                        condition: always()
+                        displayName: "Publish packages build artifacts"
