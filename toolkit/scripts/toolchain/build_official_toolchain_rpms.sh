@@ -165,7 +165,7 @@ chroot_and_install_rpms () {
     # $2 = qualified package name
     # Clean and then copy the RPM into the chroot directory for installation below
     rm -v $CHROOT_INSTALL_RPM_DIR/*
-        if [[ -n $2 ]]; then
+    if [[ -n $2 ]]; then
         # If we're using the qualified package name, there's probably naming conflicts
         # that prevent us from simply globbing for RPMs with a prefix of the qualified name.
         # So, we add the version-release string to the pattern so we don't install unrelated packages
