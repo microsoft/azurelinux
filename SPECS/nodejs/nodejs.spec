@@ -1,5 +1,5 @@
 # Retrieved from 'deps/npm/package.json' inside the sources tarball.
-
+%define npm_version 8.19.4
 Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
@@ -16,7 +16,6 @@ URL:            https://github.com/nodejs/node
 # !!!  => use clean-source-tarball.sh script to create a clean and reproducible source tarball.
 Source0:        https://nodejs.org/download/release/v%{version}/node-v%{version}.tar.xz
 Patch0:         disable-tlsv1-tlsv1-1.patch
-%define npm_version 8.19.4
 BuildRequires:  brotli-devel
 BuildRequires:  c-ares-devel
 BuildRequires:  coreutils >= 8.22
@@ -101,11 +100,11 @@ make cctest
 %files
 %defattr(-,root,root)
 %license LICENSE
+%doc CHANGELOG.md README.md
 %{_bindir}/*
 %{_libdir}/node_modules/*
 %{_mandir}/man*/*
-%license LICENSE
-%doc CHANGELOG.md README.md
+
 
 %files devel
 %defattr(-,root,root)
