@@ -1,6 +1,6 @@
 Summary:        A free package dependency solver
 Name:           libsolv
-Version:        0.7.20
+Version:        0.7.24
 Release:        1%{?dist}
 License:        BSD
 URL:            https://github.com/openSUSE/libsolv
@@ -46,7 +46,8 @@ Requires:       xz
     -DENABLE_RPMDB=ON                   \
     -DENABLE_RPMDB_BYRPMHEADER=ON       \
     -DENABLE_RPMDB_LIBRPM=ON            \
-    -DENABLE_RPMMD=ON
+    -DENABLE_RPMMD=ON                   \
+    -DENABLE_COMPS=ON
 %make_build
 
 %install
@@ -76,6 +77,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man1/*
 
 %changelog
+* Tue Jun 20 2023 Sam Meluch <sammeluch@microsoft.com> - 0.7.24-1
+- add ENABLE_COMPS option to support dnf5
+- Upgrade to version 0.7.24
+
 * Fri Jan 14 2022 Henry Li <lihl@microsoft.com> - 0.7.20-1
 - Upgrade to version 0.7.20
 - License Verified
