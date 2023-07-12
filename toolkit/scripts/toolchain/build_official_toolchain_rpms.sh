@@ -32,7 +32,6 @@ start_record_timestamp "prep_files"
 MARINER_LOGS=$MARINER_BUILD_DIR/logs
 TOOLCHAIN_LOGS=$MARINER_LOGS/toolchain
 TOOLCHAIN_BUILD_LIST=$TOOLCHAIN_LOGS/build_list.txt
-TOOLCHAIN_BUILT_RPMS_LIST=$TOOLCHAIN_LOGS/build_rpms_list.txt
 TOOLCHAIN_FAILURES=$TOOLCHAIN_LOGS/failures.txt
 set -x
 
@@ -225,8 +224,7 @@ build_rpm_in_chroot_no_install () {
     # $2 = qualified package name
     specPath=$(find $SPECROOT -name "$1.spec" -print -quit)
     specDir=$(dirname $specPath)
-    defines=(-D "with_check 1" -D "_sourcedir $specDir" -D "dist $PARAM_DIST_TAG")
-    verrel=$(rpmspec -q $specPath --srpm "${defines[@]}" --queryformat %{VERSION}-%{RELEASE})
+    verrel=$(rpmspec -q $specPath --srpm --define="with_check 1" --define="_sourcedir $specDir" --define="dist $PARAM_DIST_TAG" --queryformat %{VERSION}-%{RELEASE})
     if [ -n "$2" ]; then
         rpmPath=$(find $CHROOT_RPMS_DIR -name "$2-$verrel*" -print -quit)
     else
@@ -244,12 +242,12 @@ build_rpm_in_chroot_no_install () {
         fi
     else
         echo only building RPM $1 within the chroot
-        builtRpms="$(rpmspec -q $specPath "${defines[@]}" --queryformat="%{nvra}.rpm\n")"
-        srpmName=$(rpmspec -q $specPath --srpm "${defines[@]}" --queryformat %{NAME}-%{VERSION}-%{RELEASE}.src.rpm)
+        srpmName=$(rpmspec -q $specPath --srpm --define="with_check 1" --define="_sourcedir $specDir" --define="dist $PARAM_DIST_TAG" --queryformat %{NAME}-%{VERSION}-%{RELEASE}.src.rpm)
         srpmPath=$MARINER_INPUT_SRPMS_DIR/$srpmName
         cp $srpmPath $CHROOT_SRPMS_DIR
         chroot_and_run_rpmbuild $srpmName 2>&1 | awk '{ print strftime("time=\"%Y-%m-%dT%T%Z\""), $0; fflush(); }' | tee $TOOLCHAIN_LOGS/$srpmName.log
-        copy_built_rpms $builtRpms
+        cp $CHROOT_RPMS_DIR_ARCH/$1* $FINISHED_RPM_DIR
+        cp $CHROOT_RPMS_DIR_NOARCH/$1* $FINISHED_RPM_DIR
         cp $srpmPath $MARINER_OUTPUT_SRPMS_DIR
         echo NOT installing the package $srpmName
     fi
@@ -257,12 +255,11 @@ build_rpm_in_chroot_no_install () {
     stop_record_timestamp "build packages/build/$1"
 }
 
-# Log the built RPMs and copy them to the finished RPMs directory.
-copy_built_rpms () {
-    for builtRpm in "$@"; do
-        find "$CHROOT_RPMS_DIR" -name "$builtRpm" -exec cp {} "$FINISHED_RPM_DIR" \;
-        echo "$builtRpm" >> "$TOOLCHAIN_BUILT_RPMS_LIST"
-    done
+# Copy RPM subpackages that have a different prefix
+copy_rpm_subpackage () {
+    echo cache $1 RPMS
+    cp $CHROOT_RPMS_DIR_ARCH/$1* $FINISHED_RPM_DIR
+    cp $CHROOT_RPMS_DIR_NOARCH/$1* $FINISHED_RPM_DIR
 }
 
 start_record_timestamp "build prep"
@@ -291,6 +288,7 @@ start_record_timestamp "build packages/install"
 
 echo Building final list of toolchain RPMs
 build_rpm_in_chroot_no_install mariner-rpm-macros
+copy_rpm_subpackage mariner-check-macros
 chroot_and_install_rpms mariner-rpm-macros
 chroot_and_install_rpms mariner-check-macros
 build_rpm_in_chroot_no_install filesystem
@@ -394,6 +392,7 @@ chroot_and_install_rpms python3 python3
 
 # libxml2 is required for at least: libxslt, createrepo_c
 build_rpm_in_chroot_no_install libxml2
+copy_rpm_subpackage python3-libxml2
 chroot_and_install_rpms libxml2
 
 # Download JDK rpms
@@ -566,6 +565,7 @@ build_rpm_in_chroot_no_install libselinux
 
 # libcap-ng needs: swig, python3
 build_rpm_in_chroot_no_install libcap-ng
+copy_rpm_subpackage python3-libcap-ng
 
 # util-linux and rpm require libselinux and libcap-ng
 chroot_and_install_rpms libselinux
@@ -579,8 +579,10 @@ build_rpm_in_chroot_no_install rpm
 # python-jinja2 needs python3-markupsafe
 # python3-setuptools, python3-libs are also needed but already installed
 build_rpm_in_chroot_no_install python-markupsafe python3-markupsafe
+copy_rpm_subpackage python3-markupsafe
 chroot_and_install_rpms python3-markupsafe
 build_rpm_in_chroot_no_install python-jinja2 python3-jinja2
+copy_rpm_subpackage python3-jinja2
 
 # systemd-bootstrap requires libcap, xz, kbd, kmod, util-linux, meson, intltool, python3-jinja2
 # gperf is also needed, but is installed earlier
@@ -630,6 +632,7 @@ build_rpm_in_chroot_no_install pyproject-rpm-macros
 # Without it, audit's systemd macros won't expand and install/uninstall
 # will fail.
 build_rpm_in_chroot_no_install audit
+copy_rpm_subpackage python3-audit
 
 stop_record_timestamp "build packages"
 start_record_timestamp "finalize"
