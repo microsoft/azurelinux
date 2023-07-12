@@ -6,7 +6,7 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.trustedfirmware.org/projects/mbed-tls
-Source:         https://github.com/Mbed-TLS/%{name}/archive/refs/tags/v%{version}.tar.gz#%{name}-%{version}.tar.gz
+Source:         https://github.com/Mbed-TLS/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  cmake
 BuildRequires:  doxygen
 BuildRequires:  gcc-c++
