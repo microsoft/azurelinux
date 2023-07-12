@@ -232,10 +232,6 @@ build_rpm_in_chroot_no_install () {
     start_record_timestamp "build packages/build/$1"
     # $1 = SRPM name
     # $2 is deprecated and should not be used
-    if [ -n "$2" ]; then
-        echo "ERROR: build_rpm_in_chroot_no_install \$2 is deprecated and should not be used"
-        exit 1
-    fi
 
     # Find all the associated RPMs for the SRPM and check if they are in the chroot RPM directory
     specPath=$(find $SPECROOT -name "$1.spec" -print -quit)
