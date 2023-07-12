@@ -305,6 +305,9 @@ func createAllSRPMsWrapper(specsDir, distTag, buildDir, outDir, workerTar string
 
 // createAllSRPMs will find all SPEC files in specsDir and pack SRPMs for them if needed.
 func createAllSRPMs(specsDir, distTag, buildDir, outDir string, workers int, nestedSourcesDir, repackAll, runCheck bool, packList, keepList map[string]bool, doTidy bool, templateSrcConfig sourceRetrievalConfiguration, packagedSRPMs, tidiedSRPMs *[]string) (err error) {
+	const (
+		doDryRun = true
+	)
 	logger.Log.Infof("Finding all SPEC files")
 	timestamp.StartEvent("packing SRPMS", nil)
 	defer timestamp.StopEvent(nil)
@@ -320,7 +323,8 @@ func createAllSRPMs(specsDir, distTag, buildDir, outDir string, workers int, nes
 			return
 		}
 
-		specStates, err = spectosrpm.CalculateSPECsToRepack(specFilesToKeep, distTag, outDir, false, false, true, runCheck, workers)
+		// Do a dry run to find which SRPMs we are going to process with but don't actually do any work.
+		specStates, err = spectosrpm.CalculateSPECsToRepack(specFilesToKeep, distTag, outDir, false, false, doDryRun, runCheck, workers)
 		if err != nil {
 			return fmt.Errorf("error calculating SRPM states: %w", err)
 		}
@@ -492,7 +496,7 @@ func packSRPMs(specStates []*spectosrpm.SpecState, distTag, buildDir string, tem
 			continue
 		}
 		packagedSRPMs = append(packagedSRPMs, filepath.Base(result.srpmFile))
-		logger.Log.Infof("Packed (%s) -> (%s)", filepath.Base(result.specFile), filepath.Base(result.srpmFile))
+		logger.Log.Infof("SRPM Progress %d%%: Packing (%s) -> (%s)", (i*100)/len(specStates), filepath.Base(result.specFile), filepath.Base(result.srpmFile))
 	}
 
 	logger.Log.Debug("Waiting for outstanding workers to finish")

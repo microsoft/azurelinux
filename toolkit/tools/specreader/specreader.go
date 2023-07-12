@@ -34,8 +34,11 @@ import (
 )
 
 const (
-	defaultWorkerCount = "1"
-	specExtractDir     = "extracted_specs"
+	defaultWorkerCount = "0"
+	// rpmbuild usually sits doing nothing most of the time, so we can run multiple instances of it in parallel.
+	defaultWorkerCountMultiplier = 8
+
+	specExtractDir = "extracted_specs"
 )
 
 // parseResult holds the worker results from parsing a SPEC file.
@@ -78,8 +81,10 @@ func main() {
 	timestamp.BeginTiming("specreader", *timestampFile)
 	defer timestamp.CompleteTiming()
 
+	// rpmspec is fairly light and single-threaded, so we can run multiple instances of it in parallel.
 	if *workers <= 0 {
-		logger.Log.Panicf("Value in --workers must be greater than zero. Found %d", *workers)
+		*workers = runtime.NumCPU() * defaultWorkerCountMultiplier
+		logger.Log.Debugf("No worker count supplied, running %d workers per logical CPUs (total= %d).", defaultWorkerCountMultiplier, *workers)
 	}
 
 	toolchainRPMs, err := schedulerutils.ReadReservedFilesList(*toolchainManifest)
@@ -329,9 +334,9 @@ func readSRPMWorker(requests <-chan string, results chan<- *parseResult, cancel 
 
 		providerList := []*pkgjson.Package{}
 		buildRequiresList := []*pkgjson.PackageVer{}
-		sourcedir := filepath.Dir(srpmfile)
 
 		specfile, err := extractSpecIntoFolder(srpmfile, specExtractDir)
+		sourcedir := filepath.Dir(specfile)
 		if err != nil {
 			result.err = fmt.Errorf("failed to extract specfile from %s: %w", srpmfile, err)
 			results <- result

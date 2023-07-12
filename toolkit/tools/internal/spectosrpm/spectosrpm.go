@@ -123,6 +123,11 @@ func CalculateSPECsToRepack(specFiles []string, distTag, outDir string, nestedSo
 	// resulting in `workers` being the upper capacity at any given time.
 	totalToRepack := 0
 	states = make([]*SpecState, len(specFiles))
+
+	// Dont spam the user with progress updates, just update every 20%. We can be a bit off here since this is VERY
+	// fast, and if we skip an update because the granularity is too coarse (ie not enough packages that we hit an
+	// exact 20%), it's not a big deal.
+	printedProgress := map[int]bool{0: false, 20: false, 40: false, 60: false, 80: false, 100: false}
 	for i := 0; i < len(specFiles); i++ {
 		result := <-results
 		states[i] = result
@@ -136,6 +141,12 @@ func CalculateSPECsToRepack(specFiles []string, distTag, outDir string, nestedSo
 
 		if result.ToPack {
 			totalToRepack++
+		}
+
+		progress := int((i + 1) * 100 / len(specFiles))
+		if progress%20 == 0 && !printedProgress[progress] {
+			printedProgress[progress] = true
+			logger.Log.Infof("Checking SPECs to repack: %d%%", progress)
 		}
 	}
 
