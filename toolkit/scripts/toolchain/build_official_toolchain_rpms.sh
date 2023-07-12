@@ -244,7 +244,7 @@ build_rpm_in_chroot_no_install () {
         fi
     else
         echo only building RPM $1 within the chroot
-        builtRpms="$(rpmspec -q $specPath "${defines[@]}" --queryformat="%{nvra}.rpm\n")"
+        builtRpms="$(rpmspec -q $specPath --builtrpms "${defines[@]}" --queryformat="%{nvra}.rpm\n")"
         srpmName=$(rpmspec -q $specPath --srpm "${defines[@]}" --queryformat %{NAME}-%{VERSION}-%{RELEASE}.src.rpm)
         srpmPath=$MARINER_INPUT_SRPMS_DIR/$srpmName
         cp $srpmPath $CHROOT_SRPMS_DIR
