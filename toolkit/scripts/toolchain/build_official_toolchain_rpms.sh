@@ -237,9 +237,6 @@ build_rpm_in_chroot_no_install () {
         exit 1
     fi
 
-    # Clean and then copy the RPM into the chroot directory for installation below
-    rm -v $CHROOT_INSTALL_RPM_DIR/*
-
     # Find all the associated RPMs for the SRPM and check if they are in the chroot RPM directory
     specPath=$(find $SPECROOT -name "$1.spec" -print -quit)
     specDir=$(dirname $specPath)
