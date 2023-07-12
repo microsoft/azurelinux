@@ -2,23 +2,21 @@ Summary:        Light-weight cryptographic and SSL/TLS library
 Name:           mbedtls
 Version:        2.28.3
 Release:        1%{?dist}
-Summary:        Light-weight cryptographic and SSL/TLS library
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.trustedfirmware.org/projects/mbed-tls
-Source:         https://github.com/Mbed-TLS/%{name}/archive/refs/tags/%{name}-%{version}.tar.gz
-BuildRequires: cmake
-BuildRequires: doxygen
-BuildRequires: gcc-c++
-BuildRequires: graphviz
-BuildRequires: make
-BuildRequires: perl-interpreter
-BuildRequires: python3
-Obsoletes: mbedtls-utils < 2.28.0-1
-Obsoletes: mbedtls-static < 2.28.0-1
+Source:         https://github.com/Mbed-TLS/%{name}/archive/refs/tags/v%{version}.tar.gz#%{name}-%{version}.tar.gz
+BuildRequires:  cmake
+BuildRequires:  doxygen
+BuildRequires:  gcc-c++
+BuildRequires:  graphviz
+BuildRequires:  make
+BuildRequires:  perl-interpreter
+BuildRequires:  python3
+Obsoletes:      mbedtls-utils < 2.28.0-1
+Obsoletes:      mbedtls-static < 2.28.0-1
  
-
 %description
 Mbed TLS is a light-weight open source cryptographic and SSL/TLS
 library written in C. Mbed TLS makes it easy for developers to include
@@ -29,18 +27,15 @@ applications with as little hassle as possible.
 %package        devel
 Summary:        Development files for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-
  
 %description    devel
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
  
-
 %package        doc
 Summary:        Documentation files for %{name}
 BuildArch:      noarch
  
-
 %description    doc
 The %{name}-doc package contains documentation.
 
@@ -51,6 +46,7 @@ sed -i 's|//\(#define MBEDTLS_HAVEGE_C\)|\1|' include/mbedtls/config.h
 sed -i 's|//\(#define MBEDTLS_THREADING_C\)|\1|' include/mbedtls/config.h
 sed -i 's|//\(#define MBEDTLS_THREADING_PTHREAD\)|\1|' include/mbedtls/config.h
  
+
 
 %build
 export CFLAGS="%{optflags} -Wno-stringop-overflow -Wno-maybe-uninitialized"
