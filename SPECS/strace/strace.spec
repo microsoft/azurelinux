@@ -2,7 +2,7 @@
 Summary:        Tracks system calls that are made by a running process
 Name:           strace
 Version:        5.16
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        GPL-2.0-or-later AND LGPL-2.1-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,8 @@ URL:            https://strace.io/
 Source0:        https://strace.io/files/%{version}/%{name}-%{version}.tar.xz
 # Released upstream in v5.18
 Patch0:         testfix-landlock-brackets.patch
+# Both patches released upstream in v6.4
+Patch1:         testfix-netlink-list-memberships.patch
 BuildRequires:  libacl-devel
 BuildRequires:  libaio-devel
 
@@ -41,11 +43,16 @@ all the arugments and return values from the system calls. This is useful in deb
 
 %files
 %defattr(-,root,root)
-%license COPYING
+%license COPYING LGPL-2.1-or-later bundled/linux/GPL-2.0
 %{_bindir}/*
 %{_mandir}/man1/*
 
 %changelog
+* Mon Jun 10 2023 Olivia Crain <oliviacrain@microsoft.com> - 5.16-3
+- Add upstream patch to fix sockopt-sol_netlink test with kernel >= 5.15.116.1
+- Modify landlock test patch to properly apply with `git am`
+- Package full license texts
+
 * Wed Jun 07 2023 Olivia Crain <oliviacrain@microsoft.com> - 5.16-2
 - Add upstream patch to fix landlock_create_ruleset-y test
 - Modernize calls to make by using macros

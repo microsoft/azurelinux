@@ -1777,8 +1777,8 @@
         "type": "other",
         "other": {
           "name": "cloud-init",
-          "version": "22.4",
-          "downloadUrl": "https://launchpad.net/cloud-init/trunk/22.4/+download/cloud-init-22.4.tar.gz"
+          "version": "23.2",
+          "downloadUrl": "https://launchpad.net/cloud-init/trunk/23.2/+download/cloud-init-23.2.tar.gz"
         }
       }
     },
@@ -11111,8 +11111,8 @@
         "type": "other",
         "other": {
           "name": "libtiff",
-          "version": "4.5.0",
-          "downloadUrl": "https://gitlab.com/libtiff/libtiff/-/archive/v4.5.0/libtiff-v4.5.0.tar.gz"
+          "version": "4.5.1",
+          "downloadUrl": "https://gitlab.com/libtiff/libtiff/-/archive/v4.5.1/libtiff-v4.5.1.tar.gz"
         }
       }
     },
@@ -25374,6 +25374,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rlwrap",
+          "version": "0.46.1",
+          "downloadUrl": "https://github.com/hanslub42/rlwrap/releases/download/0.46.1/rlwrap-0.46.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rng-tools",
           "version": "6.14",
           "downloadUrl": "https://github.com/nhorman/rng-tools/archive/v6.14/rng-tools-6.14.tar.gz"
@@ -28677,8 +28687,8 @@
         "type": "other",
         "other": {
           "name": "uclibc-ng",
-          "version": "1.0.41",
-          "downloadUrl": "https://downloads.uclibc-ng.org/releases/1.0.41/uClibc-ng-1.0.41.tar.xz"
+          "version": "1.0.43",
+          "downloadUrl": "https://downloads.uclibc-ng.org/releases/1.0.43/uClibc-ng-1.0.43.tar.xz"
         }
       }
     },
