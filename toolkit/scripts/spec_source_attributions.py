@@ -14,6 +14,7 @@ VALID_SOURCE_ATTRIBUTIONS = {
     "Netplan source":                 r'\n-\s+Initial CBL-Mariner import from Netplan source \(license: GPLv3\)(\.|\n|$)',
     "Fedora":                         r'\n-\s+Initial CBL-Mariner import from Fedora \d+ \(license: MIT\)(\.|\n|$)',
     "Fedora (Copyright Remi Collet)": r'\n-\s+Initial CBL-Mariner import from Fedora \d+ \(license: CC-BY-SA\)(\.|\n|$)',
+    "Fedora (ISC)":                   r'\n-\s+Initial CBL-Mariner import from Fedora \d+ \(license: ISC\)(\.|\n|$)',
     "Magnus Edenhill Open Source":    r'\n-\s+Initial CBL-Mariner import from Magnus Edenhill Open Source \(license: BSD\)(\.|\n|$)',
     "NVIDIA":                         r'\n-\s+Initial CBL-Mariner import from NVIDIA \(license: (ASL 2\.0|GPLv2)\)(\.|\n|$)',
     "OpenEuler":                      r'\n-\s+Initial CBL-Mariner import from OpenEuler \(license: BSD\)(\.|\n|$)',
