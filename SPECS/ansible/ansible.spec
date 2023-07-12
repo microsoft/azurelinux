@@ -50,7 +50,7 @@ python3 setup.py test
 * Mon Jun 26 2023 Sam Meluch <sammeluch@microsoft.com> - 2.12.1-3
 - add python-resolvelib dependency to fix ansible-galaxy
 
-* Mon Jan 31 2022 Thomas Crain <thcrain@microsoft.com> - 2.12.1-2
+* Mon Jan 31 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.12.1-2
 - Remove python-setuptools in favor of python3-setuptools
 
 * Tue Jan 04 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 2.12.1-1
