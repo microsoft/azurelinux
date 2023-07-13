@@ -5,7 +5,7 @@
 Summary:        dnf/yum equivalent using C libs
 Name:           tdnf
 Version:        3.5.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2.1 AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -170,6 +170,8 @@ fi
 %postun
 /sbin/ldconfig
 
+%ldconfig_scriptlets cli-libs
+
 %files
 %license COPYING
 %defattr(-,root,root,0755)
@@ -225,6 +227,9 @@ fi
 /%{_lib}/systemd/system/tdnf*
 
 %changelog
+* Wed Jul 12 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.5.2-3
+- Added the missing %%ldconfig_scriptlets macro for the 'tdnf-cli-libs' package.
+
 * Thu Jun 15 2023 Sam Meluch <sammeluch@microsoft.com> - 3.5.2-2
 - add patch for SELECTION_DOTARCH in solv/tdnfquery.c
 
