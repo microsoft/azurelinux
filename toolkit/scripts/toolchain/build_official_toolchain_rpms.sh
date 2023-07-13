@@ -141,11 +141,11 @@ blocking_unmount () {
         return
     fi
 
-    umount -l $1
+    umount -l $1 || true
     while mountpoint -q $1; do
         echo $1 is still busy...
         sleep 1
-        umount -l $1
+        umount -l $1 || true
     done
 }
 
