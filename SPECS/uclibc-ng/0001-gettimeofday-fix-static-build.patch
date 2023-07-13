@@ -1,0 +1,144 @@
+From b19f8f360970ffd0c1a6ac41e07c66dc39790b16 Mon Sep 17 00:00:00 2001
+From: Waldemar Brodkorb <wbx@openadk.org>
+Date: Wed, 10 May 2023 08:35:25 +0200
+Subject: [PATCH 1/3] gettimeofday: fix static build
+
+Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
+---
+ libc/sysdeps/linux/common/gettimeofday.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/libc/sysdeps/linux/common/gettimeofday.c b/libc/sysdeps/linux/common/gettimeofday.c
+index e5141088e..12473a8e6 100755
+--- a/libc/sysdeps/linux/common/gettimeofday.c
++++ b/libc/sysdeps/linux/common/gettimeofday.c
+@@ -9,8 +9,9 @@
+ #include <sys/syscall.h>
+ #include <sys/time.h>
+ 
++#ifdef SHARED
+ #include "ldso.h"
+-
++#endif
+ 
+ 
+ #ifdef __VDSO_SUPPORT__
+-- 
+2.41.0
+
+
+From a04b282ef264c58aadff623ff648a67aeeb9d876 Mon Sep 17 00:00:00 2001
+From: Yann Sionneau <yann@sionneau.net>
+Date: Mon, 12 Jun 2023 09:47:40 +0200
+Subject: [PATCH 2/3] Revert "librt: avoid compilation error"
+
+This reverts commit 08d46f1ce21e4ec51b2b1626beeaea6cbe7fdc6b.
+
+Signed-off-by: Yann Sionneau <yann@sionneau.net>
+Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
+---
+ librt/clock_nanosleep.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/librt/clock_nanosleep.c b/librt/clock_nanosleep.c
+index 1515cf5b0..4cf1e06b4 100644
+--- a/librt/clock_nanosleep.c
++++ b/librt/clock_nanosleep.c
+@@ -36,9 +36,9 @@ clock_nanosleep (clockid_t clock_id, int flags, const struct timespec *req,
+   if (clock_id == CLOCK_PROCESS_CPUTIME_ID)
+     clock_id = MAKE_PROCESS_CPUCLOCK (0, CPUCLOCK_SCHED);
+ 
+-#if defined(SINGLE_THREAD_P)
++  if (SINGLE_THREAD_P)
+     r = INTERNAL_SYSCALL (clock_nanosleep, err, 4, clock_id, flags, req, rem);
+-#else
++  else
+     {
+       int oldstate = LIBC_CANCEL_ASYNC ();
+ 
+@@ -47,7 +47,6 @@ clock_nanosleep (clockid_t clock_id, int flags, const struct timespec *req,
+ 
+       LIBC_CANCEL_RESET (oldstate);
+     }
+-#endif
+ 
+   return (INTERNAL_SYSCALL_ERROR_P (r, err)
+ 	  ? INTERNAL_SYSCALL_ERRNO (r, err) : 0);
+-- 
+2.41.0
+
+
+From 82fdc29f5fc430a725b922ac2086c02e918e269a Mon Sep 17 00:00:00 2001
+From: Yann Sionneau <yann@sionneau.net>
+Date: Mon, 12 Jun 2023 09:47:41 +0200
+Subject: [PATCH 3/3] Fix compilation error on noMMU/nothread systems with old
+ compilers
+
+For instance with buildroot config sipeed_maix_bit_defconfig the pre-processor generates
+
+  if (1)
+    r = ({ long _sys_result; { register long int _a7 __asm__ ("a7"); register long _a3 __asm__ ("a3"); long _a3tmp; register long _a2 __asm__ ("a2"); long _a2tmp; register long _a1 __asm__ ("a1"); long _a1tmp; long _a0tmp; register long _a0 __asm__ ("a0"); _a0tmp = (long) (clock_id); _a0 = _a0tmp; _a1tmp = (long) (flags); _a1 = _a1tmp; _a2tmp = (long) (req); _a2 = _a2tmp; _a3tmp = (long) (rem); _a3 = _a3tmp; _a7 = (115); __asm__ volatile ( "scall\n\t" : "=r" (_a0) : "r"(_a7) , "r" (_a0), "r" (_a1), "r" (_a2), "r" (_a3) : "memory"); _sys_result = _a0; } _sys_result; });
+  else
+    {
+      int oldstate = LIBC_CANCEL_ASYNC ();
+
+      r = ({ long _sys_result; { register long int _a7 __asm__ ("a7"); register long _a3 __asm__ ("a3"); long _a3tmp; register long _a2 __asm__ ("a2"); long _a2tmp; register long _a1 __asm__ ("a1"); long _a1tmp; long _a0tmp; register long _a0 __asm__ ("a0"); _a0tmp = (long) (clock_id); _a0 = _a0tmp; _a1tmp = (long) (flags); _a1 = _a1tmp; _a2tmp = (long) (req); _a2 = _a2tmp; _a3tmp = (long) (rem); _a3 = _a3tmp; _a7 = (115); __asm__ volatile ( "scall\n\t" : "=r" (_a0) : "r"(_a7) , "r" (_a0), "r" (_a1), "r" (_a2), "r" (_a3) : "memory"); _sys_result = _a0; } _sys_result; })
+           ;
+
+      LIBC_CANCEL_RESET (oldstate);
+    }
+
+And also the compiler issues these warnings:
+
+librt/clock_nanosleep.c: In function 'clock_nanosleep':
+librt/clock_nanosleep.c:43:22: warning: implicit declaration of function
+'LIBC_CANCEL_ASYNC'; did you mean 'LIBC_CANCEL_HANDLED'?
+[-Wimplicit-function-declaration]
+    43 |       int oldstate = LIBC_CANCEL_ASYNC ();
+       |                      ^~~~~~~~~~~~~~~~~
+       |                      LIBC_CANCEL_HANDLED
+librt/clock_nanosleep.c:48:7: warning: implicit declaration of function
+'LIBC_CANCEL_RESET'; did you mean 'LIBC_CANCEL_HANDLED'?
+[-Wimplicit-function-declaration]
+    48 |       LIBC_CANCEL_RESET (oldstate);
+       |       ^~~~~~~~~~~~~~~~~
+       |       LIBC_CANCEL_HANDLED
+
+So if the compiler is a bit picky and does not optimize the if (1) {} else {} it can fail to link with undefined symbols.
+This patch fixes this issue: no more warning.
+
+Btw, that's the solution that is already used in the following cancellation point files:
+* libc/sysdeps/linux/common/__syscall_fcntl.c
+* libc/sysdeps/linux/common/__syscall_fcntl64.c
+* libc/sysdeps/linux/common/ioctl.c
+* libc/sysdeps/linux/common/openat.c
+* libc/sysdeps/linux/common/open.c
+
+Signed-off-by: Yann Sionneau <yann@sionneau.net>
+Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
+---
+ librt/clock_nanosleep.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/librt/clock_nanosleep.c b/librt/clock_nanosleep.c
+index 4cf1e06b4..85db72fb3 100644
+--- a/librt/clock_nanosleep.c
++++ b/librt/clock_nanosleep.c
+@@ -40,12 +40,14 @@ clock_nanosleep (clockid_t clock_id, int flags, const struct timespec *req,
+     r = INTERNAL_SYSCALL (clock_nanosleep, err, 4, clock_id, flags, req, rem);
+   else
+     {
++#ifdef __NEW_THREADS
+       int oldstate = LIBC_CANCEL_ASYNC ();
+ 
+       r = INTERNAL_SYSCALL (clock_nanosleep, err, 4, clock_id, flags, req,
+ 			    rem);
+ 
+       LIBC_CANCEL_RESET (oldstate);
++#endif
+     }
+ 
+   return (INTERNAL_SYSCALL_ERROR_P (r, err)
+-- 
+2.41.0
+
