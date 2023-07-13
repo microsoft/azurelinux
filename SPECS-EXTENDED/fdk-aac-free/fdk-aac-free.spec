@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           fdk-aac-free
 Version:        2.0.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Third-Party Modified Version of the Fraunhofer FDK AAC Codec Library for Android
 
 License:        FDK-AAC
@@ -60,6 +60,9 @@ find %{buildroot} -name '*.la' -print -delete
 
 
 %changelog
+* Thu Jul 13 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.0-5
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.0-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
