@@ -292,12 +292,13 @@ build_rpm_in_chroot_no_install () {
 # Log the built RPMs and copy them to the finished RPMs directory.
 copy_built_rpms () {
     for builtRpm in "$@"; do
-        find "$CHROOT_RPMS_DIR" -name "$builtRpm" -exec cp {} "$FINISHED_RPM_DIR" \;
-        if [[ ! -f "$builtRpm" ]]; then
-            echo "ERROR: could not find expected built RPM '$builtRpm' in '$CHROOT_RPMS_DIR'." >&2
+        rpmPath="$(find "$CHROOT_RPMS_DIR" -name "$builtRpm" -print -quit)"
+        if [[ ! -f "$rpmPath" ]]; then
+            echo ERROR: could not find expected built RPM '$builtRpm' in '$CHROOT_RPMS_DIR'. >&2
             return 1
         fi
 
+        cp "$rpmPath" "$FINISHED_RPM_DIR"
         echo "$builtRpm" >> "$TEMP_BUILT_RPMS_LIST"
     done
 }
