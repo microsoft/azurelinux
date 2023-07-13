@@ -77,10 +77,10 @@ expat-2.5.0-1.cm2.aarch64.rpm
 expat-debuginfo-2.5.0-1.cm2.aarch64.rpm
 expat-devel-2.5.0-1.cm2.aarch64.rpm
 expat-libs-2.5.0-1.cm2.aarch64.rpm
-file-5.40-2.cm2.aarch64.rpm
-file-debuginfo-5.40-2.cm2.aarch64.rpm
-file-devel-5.40-2.cm2.aarch64.rpm
-file-libs-5.40-2.cm2.aarch64.rpm
+file-5.40-3.cm2.aarch64.rpm
+file-debuginfo-5.40-3.cm2.aarch64.rpm
+file-devel-5.40-3.cm2.aarch64.rpm
+file-libs-5.40-3.cm2.aarch64.rpm
 filesystem-1.1-15.cm2.aarch64.rpm
 filesystem-asc-1.1-15.cm2.aarch64.rpm
 findutils-4.8.0-4.cm2.aarch64.rpm
@@ -520,7 +520,7 @@ python3-libcap-ng-0.8.2-2.cm2.aarch64.rpm
 python3-libs-3.9.14-6.cm2.aarch64.rpm
 python3-libxml2-2.10.3-1.cm2.aarch64.rpm
 python3-lxml-4.9.1-1.cm2.aarch64.rpm
-python3-magic-5.40-2.cm2.noarch.rpm
+python3-magic-5.40-3.cm2.noarch.rpm
 python3-markupsafe-2.1.0-1.cm2.aarch64.rpm
 python3-newt-0.52.21-4.cm2.aarch64.rpm
 python3-pip-3.9.14-6.cm2.noarch.rpm
