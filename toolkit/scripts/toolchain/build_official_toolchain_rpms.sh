@@ -231,7 +231,6 @@ chroot_and_run_rpmbuild () {
 build_rpm_in_chroot_no_install () {
     start_record_timestamp "build packages/build/$1"
     # $1 = SRPM name
-    # $2 is deprecated and should not be used
 
     # Find all the associated RPMs for the SRPM and check if they are in the chroot RPM directory
     specPath=$(find $SPECROOT -name "$1.spec" -print -quit)
