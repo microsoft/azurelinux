@@ -235,8 +235,8 @@ build_rpm_in_chroot_no_install () {
 
     specPath=$(find $SPECROOT -name "$1.spec" -print -quit)
     specDir=$(dirname $specPath)
-    defines=(-D "with_check 1" -D "_sourcedir $specDir" -D "dist $PARAM_DIST_TAG")
-    builtRpms="$(rpmspec $specPath --builtrpms "${defines[@]}" --queryformat="%{nvra}.rpm\n")"
+    rpmMacros=(-D "with_check 1" -D "_sourcedir $specDir" -D "dist $PARAM_DIST_TAG")
+    builtRpms="$(rpmspec -q $specPath --builtrpms "${rpmMacros[@]}" --queryformat="%{nvra}.rpm\n")"
 
     # Find all the associated RPMs for the SRPM and check if they are in the chroot RPM directory
     foundAllRPMs="false"
@@ -256,7 +256,7 @@ build_rpm_in_chroot_no_install () {
 
     if [ "$foundAllRPMs" = "false" ]; then
         echo only building RPM $1 within the chroot
-        srpmName=$(rpmspec -q $specPath --srpm "${defines[@]}" --queryformat %{NAME}-%{VERSION}-%{RELEASE}.src.rpm)
+        srpmName=$(rpmspec -q $specPath --srpm "${rpmMacros[@]}" --queryformat %{NAME}-%{VERSION}-%{RELEASE}.src.rpm)
         srpmPath=$MARINER_INPUT_SRPMS_DIR/$srpmName
         cp $srpmPath $CHROOT_SRPMS_DIR
         chroot_and_run_rpmbuild $srpmName 2>&1 | awk '{ print strftime("time=\"%Y-%m-%dT%T%Z\""), $0; fflush(); }' | tee $TOOLCHAIN_LOGS/$srpmName.log
