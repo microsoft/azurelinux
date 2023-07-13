@@ -78,8 +78,6 @@ mkdir -pv $CHROOT_RPMS_DIR
 mkdir -pv $CHROOT_RPMS_DIR_ARCH
 mkdir -pv $CHROOT_RPMS_DIR_NOARCH
 
-CLEAN_CHROOT_ON_EXIT=false
-
 TEMP_DIR=$(mktemp -d -t)
 TEMP_BUILT_RPMS_LIST="$(mktemp --tmpdir="$TEMP_DIR")"
 TEMP_BUILT_SPECS_LIST="$(mktemp --tmpdir="$TEMP_DIR")"
@@ -90,9 +88,7 @@ function clean_up {
     sort "$TEMP_BUILT_SPECS_LIST" | uniq > "$TOOLCHAIN_BUILT_SPECS_LIST"
 
     echo "Cleaning up..."
-    if $CLEAN_CHROOT_ON_EXIT; then
-        chroot_unmount
-    fi
+    chroot_unmount
     rm -rf "$TEMP_DIR"
 }
 trap clean_up EXIT
@@ -132,7 +128,6 @@ fi
 stop_record_timestamp "hydrate"
 
 chroot_mount () {
-    CLEAN_CHROOT_ON_EXIT=true
     mount --bind /dev $LFS/dev
     mount -t devpts devpts $LFS/dev/pts -o gid=5,mode=620
     mount -t proc proc $LFS/proc
@@ -142,6 +137,10 @@ chroot_mount () {
 
 blocking_unmount () {
     # $1 mountpoint
+    if ! mountpoint -q "$1"; then
+        return
+    fi
+
     umount -l $1
     while mountpoint -q $1; do
         echo $1 is still busy...
@@ -157,7 +156,6 @@ chroot_unmount () {
     blocking_unmount $LFS/run
     blocking_unmount $LFS/proc
     blocking_unmount $LFS/sys
-    CLEAN_CHROOT_ON_EXIT=false
 }
 
 chroot_and_print_installed_rpms () {
@@ -678,7 +676,6 @@ cp -v $CHROOT_RPMS_DIR_ARCH/* $FINISHED_RPM_DIR
 cp -v $CHROOT_RPMS_DIR_NOARCH/* $FINISHED_RPM_DIR
 
 echo Finished building final list of toolchain RPMs
-chroot_unmount
 ls -la $FINISHED_RPM_DIR
 ls -la $FINISHED_RPM_DIR | wc
 
