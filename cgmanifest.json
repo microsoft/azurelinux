@@ -1777,8 +1777,8 @@
         "type": "other",
         "other": {
           "name": "cloud-init",
-          "version": "22.4",
-          "downloadUrl": "https://launchpad.net/cloud-init/trunk/22.4/+download/cloud-init-22.4.tar.gz"
+          "version": "23.2",
+          "downloadUrl": "https://launchpad.net/cloud-init/trunk/23.2/+download/cloud-init-23.2.tar.gz"
         }
       }
     },
@@ -2730,6 +2730,16 @@
           "name": "dnf-plugins-core",
           "version": "4.0.24",
           "downloadUrl": "https://github.com/rpm-software-management/dnf-plugins-core/archive/4.0.24/dnf-plugins-core-4.0.24.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "dnf5",
+          "version": "5.0.14",
+          "downloadUrl": "https://github.com/rpm-software-management/dnf5/archive/5.0.14/dnf5-5.0.14.tar.gz"
         }
       }
     },
@@ -10691,8 +10701,8 @@
         "type": "other",
         "other": {
           "name": "librepo",
-          "version": "1.14.2",
-          "downloadUrl": "https://github.com/rpm-software-management/librepo/archive/1.14.2.tar.gz"
+          "version": "1.15.1",
+          "downloadUrl": "https://github.com/rpm-software-management/librepo/archive/1.15.1.tar.gz"
         }
       }
     },
@@ -10941,8 +10951,8 @@
         "type": "other",
         "other": {
           "name": "libsolv",
-          "version": "0.7.20",
-          "downloadUrl": "https://github.com/openSUSE/libsolv/archive/0.7.20/libsolv-0.7.20.tar.gz"
+          "version": "0.7.24",
+          "downloadUrl": "https://github.com/openSUSE/libsolv/archive/0.7.24/libsolv-0.7.24.tar.gz"
         }
       }
     },
@@ -14203,8 +14213,8 @@
         "type": "other",
         "other": {
           "name": "nodejs",
-          "version": "16.19.1",
-          "downloadUrl": "https://nodejs.org/download/release/v16.19.1/node-v16.19.1.tar.xz"
+          "version": "16.20.1",
+          "downloadUrl": "https://nodejs.org/download/release/v16.20.1/node-v16.20.1.tar.xz"
         }
       }
     },
@@ -23916,6 +23926,16 @@
           "name": "python-requests_ntlm",
           "version": "1.1.0",
           "downloadUrl": "https://github.com/requests/requests-ntlm/archive/v1.1.0/requests_ntlm-1.1.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-resolvelib",
+          "version": "1.0.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/r/resolvelib/resolvelib-1.0.1.tar.gz"
         }
       }
     },
