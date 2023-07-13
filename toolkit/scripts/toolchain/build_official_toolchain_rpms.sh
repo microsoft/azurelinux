@@ -294,7 +294,7 @@ copy_built_rpms () {
     for builtRpm in "$@"; do
         rpmPath="$(find "$CHROOT_RPMS_DIR" -name "$builtRpm" -print -quit)"
         if [[ ! -f "$rpmPath" ]]; then
-            echo ERROR: could not find expected built RPM '$builtRpm' in '$CHROOT_RPMS_DIR'. >&2
+            echo ERROR: could not find expected built RPM "$builtRpm" in "$CHROOT_RPMS_DIR". >&2
             return 1
         fi
 
