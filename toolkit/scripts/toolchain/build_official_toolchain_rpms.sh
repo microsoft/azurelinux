@@ -28,11 +28,11 @@ source $(dirname  $0)/../timestamp.sh
 begin_timestamp
 start_record_timestamp "prep_files"
 
-
 MARINER_LOGS=$MARINER_BUILD_DIR/logs
 TOOLCHAIN_LOGS=$MARINER_LOGS/toolchain
 TOOLCHAIN_BUILD_LIST=$TOOLCHAIN_LOGS/build_list.txt
-TOOLCHAIN_BUILT_RPMS_LIST=$TOOLCHAIN_LOGS/build_rpms_list.txt
+TOOLCHAIN_BUILT_RPMS_LIST=$TOOLCHAIN_LOGS/built_rpms_list.txt
+TOOLCHAIN_BUILT_SPECS_LIST=$TOOLCHAIN_LOGS/built_specs_list.txt
 TOOLCHAIN_FAILURES=$TOOLCHAIN_LOGS/failures.txt
 set -ex
 
@@ -78,6 +78,25 @@ mkdir -pv $CHROOT_RPMS_DIR
 mkdir -pv $CHROOT_RPMS_DIR_ARCH
 mkdir -pv $CHROOT_RPMS_DIR_NOARCH
 
+CLEAN_CHROOT_ON_EXIT=false
+
+TEMP_DIR=$(mktemp -d -t)
+TEMP_BUILT_RPMS_LIST="$(mktemp --tmpdir="$TEMP_DIR")"
+TEMP_BUILT_SPECS_LIST="$(mktemp --tmpdir="$TEMP_DIR")"
+function clean_up {
+    # Removing duplicates during clean-up to simplify appends during run-time.
+    echo "Copying build lists to log output..."
+    sort "$TEMP_BUILT_RPMS_LIST" | uniq > "$TOOLCHAIN_BUILT_RPMS_LIST"
+    sort "$TEMP_BUILT_SPECS_LIST" | uniq > "$TOOLCHAIN_BUILT_SPECS_LIST"
+
+    echo "Cleaning up..."
+    if $CLEAN_CHROOT_ON_EXIT; then
+        chroot_unmount
+    fi
+    rm -rf "$TEMP_DIR"
+}
+trap clean_up EXIT
+
 # Remove artifacts from previous toolchain builds
 sudo rm -f $TOOLCHAIN_BUILD_LIST
 sudo rm -f $TOOLCHAIN_FAILURES
@@ -113,7 +132,7 @@ fi
 stop_record_timestamp "hydrate"
 
 chroot_mount () {
-    trap chroot_unmount EXIT
+    CLEAN_CHROOT_ON_EXIT=true
     mount --bind /dev $LFS/dev
     mount -t devpts devpts $LFS/dev/pts -o gid=5,mode=620
     mount -t proc proc $LFS/proc
@@ -138,7 +157,7 @@ chroot_unmount () {
     blocking_unmount $LFS/run
     blocking_unmount $LFS/proc
     blocking_unmount $LFS/sys
-    trap - EXIT
+    CLEAN_CHROOT_ON_EXIT=false
 }
 
 chroot_and_print_installed_rpms () {
@@ -231,7 +250,7 @@ chroot_and_run_rpmbuild () {
 # $INCREMENTAL_TOOLCHAIN is set to "y".
 build_rpm_in_chroot_no_install () {
     start_record_timestamp "build packages/build/$1"
-    # $1 = SRPM name
+    # $1 = spec name
 
     specPath=$(find $SPECROOT -name "$1.spec" -print -quit)
     specDir=$(dirname $specPath)
@@ -262,6 +281,7 @@ build_rpm_in_chroot_no_install () {
         chroot_and_run_rpmbuild $srpmName 2>&1 | awk '{ print strftime("time=\"%Y-%m-%dT%T%Z\""), $0; fflush(); }' | tee $TOOLCHAIN_LOGS/$srpmName.log
         copy_built_rpms $builtRpms
         cp $srpmPath $MARINER_OUTPUT_SRPMS_DIR
+        echo "$1" >> $TEMP_BUILT_SPECS_LIST
         echo NOT installing the package $srpmName
     fi
 
@@ -278,7 +298,7 @@ copy_built_rpms () {
             return 1
         fi
 
-        echo "$builtRpm" >> "$TOOLCHAIN_BUILT_RPMS_LIST"
+        echo "$builtRpm" >> "$TEMP_BUILT_RPMS_LIST"
     done
 }
 
