@@ -80,7 +80,7 @@ find %{buildroot} -name '*.la' -print -delete
 - Fix url
 
 * Tue Sep 25 2018 Wim Taymans <wtaymans@redhat.com> - 0.1.5-5
-- Use %ldconfig_scriptlets
+- Use %%ldconfig_scriptlets
 - Remove Group
 
 * Thu Nov 02 2017 Wim Taymans <wtaymans@redhat.com> - 0.1.5-4
@@ -110,4 +110,3 @@ find %{buildroot} -name '*.la' -print -delete
 
 * Thu Mar 28 2013 Nicolas Chauvet <kwizart@gmail.com> - 0.1.1-1
 - Initial spec
-

@@ -4,7 +4,7 @@ Distribution:   Mariner
 Summary:        Power Management Service
 Name:           upower
 Version:        0.99.11
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2+
 URL:            http://upower.freedesktop.org/
 Source0:        https://gitlab.freedesktop.org/upower/upower/uploads/%{commit}/%{name}-%{version}.tar.xz
@@ -62,15 +62,15 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 
 %find_lang upower
 
-%ldconfig_scriptlets
-
 %post
+%ldconfig
 %systemd_post upower.service
 
 %preun
 %systemd_preun upower.service
 
 %postun
+%ldconfig
 %systemd_postun_with_restart upower.service
 
 %files -f upower.lang
@@ -101,6 +101,9 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 %{_includedir}/libupower-glib/upower.h
 
 %changelog
+* Wed Jul 12 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.99.11-6
+- Fixing 'ldconfig' usage.
+
 * Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.99.11-5
 - Adding BR on '%%{_bindir}/xsltproc'.
 - Disabled gtk doc generation to remove network dependency during build-time.

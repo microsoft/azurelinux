@@ -1,7 +1,7 @@
 Summary:        Contains a utility for determining file types
 Name:           file
 Version:        5.40
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -64,7 +64,7 @@ python3 setup.py install -O1 --skip-build --root %{buildroot}
 %check
 %make_build check
 
-%ldconfig_scriptlets -n libs
+%ldconfig_scriptlets libs
 
 %files
 %defattr(-,root,root)
@@ -91,6 +91,9 @@ python3 setup.py install -O1 --skip-build --root %{buildroot}
 %{python3_sitelib}/__pycache__/*
 
 %changelog
+* Wed Jul 12 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.40-3
+- Fixing 'ldconfig' usage.
+
 * Tue Mar 15 2022 Bala <balakumaran.kannan@microsoft.com> - 5.40-2
 - Add patch to fix xz mime type reporting
 

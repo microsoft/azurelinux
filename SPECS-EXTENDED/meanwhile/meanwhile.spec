@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           meanwhile
 Version:        1.1.0
-Release:        30%{?dist}
+Release:        31%{?dist}
 Summary:        Lotus Sametime Community Client library
 License:        GPLv2+
 URL:            http://%{name}.sourceforge.net
@@ -76,8 +76,6 @@ mkdir docs
 mv %{buildroot}%{_datadir}/doc/%{name}-doc-%{version}/{html,samples} docs
 rm -rf %{buildroot}%{_datadir}/doc/%{name}-doc-%{version}/
 
-%ldconfig_scriptlets libs
-
 %files
 %license COPYING LICENSE
 %doc AUTHORS ChangeLog README TODO
@@ -92,6 +90,9 @@ rm -rf %{buildroot}%{_datadir}/doc/%{name}-doc-%{version}/
 %doc docs/*
 
 %changelog
+* Wed Jul 12 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.0-31
+- Fixing 'ldconfig' usage.
+
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.0-30
 - Updating source URLs.
 - License verified.

@@ -51,7 +51,7 @@ Distribution:   Mariner
 
 Name:           nbdkit
 Version:        1.35.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        NBD server
 
 License:        BSD
@@ -813,7 +813,7 @@ export LIBGUESTFS_TRACE=1
 
 
 %if 0%{?have_ocaml}
-%ldconfig_scriptlets plugin-ocaml
+%ldconfig_scriptlets ocaml-plugin
 %endif
 
 
@@ -1193,6 +1193,9 @@ export LIBGUESTFS_TRACE=1
 
 
 %changelog
+* Wed Jul 12 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.35.3-3
+- Fixing 'ldconfig' usage.
+
 * Tue May 23 2023 Vince Perri <viperri@microsoft.com> - 1.34.1-2
 - License verified.
 - Removing libxcrypt-compat requirement from vddk plugin.

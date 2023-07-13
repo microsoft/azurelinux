@@ -1,7 +1,7 @@
 Summary:        Netfilter Tables userspace utillites
 Name:           nftables
 Version:        1.0.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -97,14 +97,14 @@ sed -i -e 's/\(sofile=\)".*"/\1"'$sofile'"/' \
 
 %post
 %systemd_post nftables.service
-%ldconfig_post
+%ldconfig
 
 %preun
 %systemd_preun nftables.service
 
 %postun
 %systemd_postun_with_restart nftables.service
-%ldconfig_postun
+%ldconfig
 
 %files
 %license COPYING
@@ -128,6 +128,9 @@ sed -i -e 's/\(sofile=\)".*"/\1"'$sofile'"/' \
 %{python3_sitelib}/nftables/
 
 %changelog
+* Wed Jul 12 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.1-2
+- Fixing 'ldconfig' usage.
+
 * Tue Feb 08 2022 Rachel Menge <rachelmenge@microsoft.com> - 1.0.1-1
 - CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.

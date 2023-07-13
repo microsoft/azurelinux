@@ -3,7 +3,7 @@
 Summary:        Local network service discovery
 Name:           avahi
 Version:        0.8
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -303,8 +303,6 @@ exit 0
 
 %ldconfig_scriptlets libs
 
-%ldconfig_scriptlets ui
-
 %ldconfig_scriptlets gobject
 
 %files -f %{name}.lang
@@ -405,6 +403,9 @@ exit 0
 %endif
 
 %changelog
+* Wed Jul 12 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.8-2
+- Fixing 'ldconfig' usage.
+
 * Wed Apr 20 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.8-1
 - Upgrade to latest upstream version to fix CVE-2017-6519
 - Add upstream patch to fix CVE-2021-3502

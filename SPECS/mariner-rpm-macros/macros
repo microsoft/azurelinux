@@ -198,7 +198,7 @@ print(result)
 %__global_compiler_flags        -O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fexceptions -fstack-protector-strong -grecord-gcc-switches %{_hardened_cflags} %{_annotated_cflags} %{?_legacy_common_support: -fcommon}
 
 # https://src.fedoraproject.org/rpms/redhat-rpm-config/blob/master/f/macros.ldconfig
-#%ldconfig /sbin/ldconfig
+%ldconfig /sbin/ldconfig
 %ldconfig_post(n:) %{?ldconfig:%post -p %ldconfig %{?*} %{-n:-n %{-n*}}\
 %end}
 %ldconfig_postun(n:) %{?ldconfig:%postun -p %ldconfig %{?*} %{-n:-n %{-n*}}\
