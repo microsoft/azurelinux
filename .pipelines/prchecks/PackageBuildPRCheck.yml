@@ -68,7 +68,6 @@ extends:
                     parameters:
                       rawToolchainCacheURL: ${{ configuration.rawToolchainCacheURL }}
                       rawToolchainExpectedHash: ${{ configuration.rawToolchainExpectedHash }}
-                      selfRepoName: self
 
                   - template: .pipelines/templates/ToolchainBuild.yml@self
                     parameters:
