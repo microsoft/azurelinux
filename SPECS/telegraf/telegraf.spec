@@ -76,7 +76,7 @@ fi
 
 %changelog
 * Fri Jul 14 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.27.2-1
-- Auto-upgrade to 1.27.2 - to fix multip
+- Auto-upgrade to 1.27.2 to fix CVE-2023-34231, CVE-2023-25809, CVE-2023-28642
 
 * Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.26.0-4
 - Bump release to rebuild with go 1.19.11
