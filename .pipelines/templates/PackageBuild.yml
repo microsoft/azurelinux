@@ -29,7 +29,7 @@ parameters:
 
   - name: selfRepoName
     type: string
-    default: "self"
+    default: "CBL-Mariner"
 
   - name: srpmsTarballName
     type: string
