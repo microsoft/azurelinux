@@ -20,7 +20,6 @@ VALID_SOURCE_ATTRIBUTIONS = {
     "OpenMamba":                      r'\n-\s+Initial CBL-Mariner import from OpenMamba(\.|\n|$)',
     "OpenSUSE":                       r'\n-\s+Initial CBL-Mariner import from openSUSE \w+ \(license: same as "License" tag\)(\.|\n|$)',
     "Photon":                         r'\n-\s+Initial CBL-Mariner import from Photon \(license: Apache2\)(\.|\n|$)',
-    "Rancher":                        r'\n-\s+Initial CBL-Mariner import from Rancher \(license: ASL 2\.0\)(\.|\n|$)',
     "Sysbench source":                r'\n-\s+Initial CBL-Mariner import from Sysbench source \(license: GPLv2\+\)(\.|\n|$)'
 }
 
