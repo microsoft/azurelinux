@@ -1,7 +1,7 @@
 Summary:        An open source CoreSight(tm) Trace Decode library
 Name:           opencsd
 Version:        1.4.0
-Release:        0%{?dist}
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
