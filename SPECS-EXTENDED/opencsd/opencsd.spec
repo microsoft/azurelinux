@@ -56,7 +56,7 @@ PREFIX=%{buildroot}%{_prefix} LIB_PATH=%{_lib} make install DISABLE_STATIC=1 DEF
 %{_libdir}/*so
 
 %changelog
-* Wed Jul 12 2023 Saranya R <rsaranya@microsoft.com> - 2.28.3-1
+* Wed Jul 12 2023 Saranya R <rsaranya@microsoft.com> - 1.4.0-1
 - Initial CBL-Mariner import from Fedora 38 (license: MIT).
 - License verified
 
