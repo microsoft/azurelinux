@@ -1423,6 +1423,14 @@ func (g *PkgGraph) replaceCurrentNodeWithPrebuiltNode(currentNode, preBuiltNode,
 func (g *PkgGraph) fixPrebuiltSRPMsCycle(trimmedCycle []*PkgNode, resolveCyclesFromUpstream, ignoreVersionToResolveSelfDep bool, cloner *rpmrepocloner.RpmRepoCloner) (err error) {
 	logger.Log.Debug("Checking if cycle contains pre-built SRPMs.")
 
+	var cycleStringBuilder strings.Builder
+
+        fmt.Fprintf(&cycleStringBuilder, "{%s}", trimmedCycle[0].FriendlyName())
+        for _, node := range trimmedCycle[1:] {
+                fmt.Fprintf(&cycleStringBuilder, " --> {%s}", node.FriendlyName())
+        }
+        logger.Log.Infof("Trying to fix circular dependency found:\t%s", cycleStringBuilder.String())
+
 	currentNode := trimmedCycle[len(trimmedCycle)-1]
 	for _, previousNode := range trimmedCycle {
 		// Why we're targetting only "build node -> run node" edges:
@@ -1509,19 +1517,8 @@ func NodesProvidedBySRPM(srpmPath string, pkgGraph *PkgGraph, graphMutex *sync.R
 		defer graphMutex.RUnlock()
 	}
 
-	/*Get count of the number of rpms provided by the SRPM*/
-	count := 0
-	for _, node := range pkgGraph.AllRunNodes() {
-		if node.SrpmPath != srpmPath {
-			continue
-		}
-		if node.RpmPath == "" || node.RpmPath == "<NO_RPM_PATH>" {
-			continue
-		}
-		count++
-	}
-
-	rpmNodes = make([]*PkgNode, 0, count)
+	/*allocating 10 nodes initially. append will allocate more nodes if required*/
+	rpmNodes = make([]*PkgNode, 0, 10)
 	runNodes := pkgGraph.AllRunNodes()
 	for _, node := range runNodes {
 		if node.SrpmPath != srpmPath {
