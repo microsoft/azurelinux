@@ -28,7 +28,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.15.118.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -40,6 +40,7 @@ Source2:        config_aarch64
 Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20211013.pem
 Patch0:         nvme_multipath_default_false.patch
+Patch1:         CVE-2023-2007.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -161,6 +162,7 @@ manipulation of eBPF programs and maps.
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{version}
 %patch0 -p1
+%patch1 -p1
 
 make mrproper
 
@@ -422,6 +424,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Fri Jul 14 2023 Saul Paredes <saulparedes@microsoft.com> - 5.15.118.1-3
+- Patch CVE-2023-2007
+
 * Thu Jul 06 2023 Juan Camposeco <juanarturoc@microsoft.com> - 5.15.118.1-2
 - Enable Mellanox DPU drivers and configurations, ARM64 only
 
