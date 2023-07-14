@@ -3,12 +3,16 @@ parameters:
     type: string
     default: "$(Build.ArtifactStagingDirectory)"
 
+  - name: repoName
+    type: string
+    default: "self"
+
   - name: repoRoot
     type: string
     default: "$(Build.SourcesDirectory)"
 
 steps:
-  - template: ToolkitCheck.yml@self
+  - template: ToolkitCheck.yml@${{ parameters.repoName }}
     parameters:
       repoRoot: ${{ parameters.repoRoot }}
 
