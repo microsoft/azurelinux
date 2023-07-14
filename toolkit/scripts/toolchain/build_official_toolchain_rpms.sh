@@ -156,9 +156,12 @@ chroot_and_print_installed_rpms () {
     chroot_unmount
 }
 
+# $1 is the spec name (which often matches the package name). If there is a naming conflict, $2 is the qualified package name
+# (e.g. foo.spec might produce bar-foo-1.0-1.rpm, so $2 would be bar-foo-1.0-1 while $1 would be foo). Normally $2 is not needed
+# and we will grab all RPMs that match $1.rpm.
 chroot_and_install_rpms () {
     start_record_timestamp "build packages/install/$1"
-    # $1 = SRPM name
+    # $1 = spec name (or rpm name if $2 is omitted)
     # $2 = qualified package name
     # Clean and then copy the RPM into the chroot directory for installation below
     rm -v $CHROOT_INSTALL_RPM_DIR/*
@@ -168,11 +171,15 @@ chroot_and_install_rpms () {
         # So, we add the version-release string to the pattern so we don't install unrelated packages
         specPath=$(find $SPECROOT -name "$1.spec" -print -quit)
         specDir=$(dirname $specPath)
+        # This is a heuristic to find the associated RPMs. In theory we should instead use a more selective filtering like
+        # we use for build_rpm_in_chroot_no_install by querying for exact RPMs that match $2 found in $1.spec however to
+        # preserve the existing behavior we'll just copy all RPMs that match the name-version-release string.
+        #     e.g. matching_rpms=$(rpmspec -q $specPath --srpm --define="with_check 1" --define="_sourcedir $specDir" --define="dist $PARAM_DIST_TAG" --builtrpms --queryformat '%{nvra}.rpm\n' | grep $2)
         verrel=$(rpmspec -q $specPath --srpm --define="with_check 1" --define="_sourcedir $specDir" --define="dist $PARAM_DIST_TAG" --queryformat %{VERSION}-%{RELEASE})
-        find $CHROOT_RPMS_DIR -name "$2*$verrel*" -exec cp {} $CHROOT_INSTALL_RPM_DIR ';'
+        # Do not include any files with "debuginfo" in the name
+        find $CHROOT_RPMS_DIR -name "$2*$verrel*" ! -name "*debuginfo*" -exec cp {} $CHROOT_INSTALL_RPM_DIR ';'
     else
-        cp -v $CHROOT_RPMS_DIR_ARCH/$1-* $CHROOT_INSTALL_RPM_DIR
-        cp -v $CHROOT_RPMS_DIR_NOARCH/$1-* $CHROOT_INSTALL_RPM_DIR
+        find $CHROOT_RPMS_DIR -name "$1*" ! -name "*debuginfo*" -exec cp {} $CHROOT_INSTALL_RPM_DIR ';'
     fi
 
     chroot_mount
@@ -218,29 +225,33 @@ chroot_and_run_rpmbuild () {
     chroot_unmount
 }
 
+# This function is used to build a spec file and move its resulting RPMs to the build directory.
+# It will not build the RPMs in the chroot if they are already present in the environment and
+# $INCREMENTAL_TOOLCHAIN is set to "y".
 build_rpm_in_chroot_no_install () {
     start_record_timestamp "build packages/build/$1"
     # $1 = SRPM name
-    # $2 = qualified package name
+
+    # Find all the associated RPMs for the SRPM and check if they are in the chroot RPM directory
     specPath=$(find $SPECROOT -name "$1.spec" -print -quit)
     specDir=$(dirname $specPath)
-    verrel=$(rpmspec -q $specPath --srpm --define="with_check 1" --define="_sourcedir $specDir" --define="dist $PARAM_DIST_TAG" --queryformat %{VERSION}-%{RELEASE})
-    if [ -n "$2" ]; then
-        rpmPath=$(find $CHROOT_RPMS_DIR -name "$2-$verrel*" -print -quit)
-    else
-        rpmPath=$(find $CHROOT_RPMS_DIR -name "$1-*" -print -quit)
+
+    foundAllRPMs="false"
+    if [ "$INCREMENTAL_TOOLCHAIN" = "y" ]; then
+        foundAllRPMs="true"
+        all_rpms=$(rpmspec -q $specPath --srpm --define="with_check 1" --define="_sourcedir $specDir" --define="dist $PARAM_DIST_TAG" --builtrpms --queryformat '%{nvra}.rpm ' | xargs)
+        for rpm in ${all_rpms}; do
+            rpmPath=$(find $CHROOT_RPMS_DIR -name "$rpm" -print -quit)
+            if [ -z "$rpmPath" ]; then
+                echo "Did not find incremental toolchain rpm '$rpm' in '$CHROOT_RPMS_DIR', must rebuild."
+                foundAllRPMs="false"
+                break
+            else
+                cp $rpmPath $FINISHED_RPM_DIR
+            fi
+        done
     fi
-    if [ "$INCREMENTAL_TOOLCHAIN" = "y" ] && [ -n "$rpmPath" ]; then
-        echo found $rpmPath for $1
-        if [[ -n "$2" ]]; then
-            # If we're using the qualified package name, there's probably naming conflicts
-            # that prevent us from simply globbing for RPMs with a prefix of the qualified name.
-            # So, we add the version-release string to the pattern to not pull in unrelated packages
-            find $CHROOT_RPMS_DIR -name "$2*$verrel*" -exec cp {} $FINISHED_RPM_DIR ';'
-        else
-            find $CHROOT_RPMS_DIR -name "$1*" -exec cp {} $FINISHED_RPM_DIR ';'
-        fi
-    else
+    if [ "$foundAllRPMs" = "false" ]; then
         echo only building RPM $1 within the chroot
         srpmName=$(rpmspec -q $specPath --srpm --define="with_check 1" --define="_sourcedir $specDir" --define="dist $PARAM_DIST_TAG" --queryformat %{NAME}-%{VERSION}-%{RELEASE}.src.rpm)
         srpmPath=$MARINER_INPUT_SRPMS_DIR/$srpmName
@@ -314,7 +325,7 @@ build_rpm_in_chroot_no_install xz
 build_rpm_in_chroot_no_install zstd
 build_rpm_in_chroot_no_install lz4
 build_rpm_in_chroot_no_install m4
-build_rpm_in_chroot_no_install libcap libcap # Use full naming since we have a collision with libcap-ng
+build_rpm_in_chroot_no_install libcap
 build_rpm_in_chroot_no_install popt
 build_rpm_in_chroot_no_install tar
 build_rpm_in_chroot_no_install gawk
@@ -386,7 +397,7 @@ build_rpm_in_chroot_no_install gperf
 chroot_and_install_rpms gperf
 
 # Python3 needs to be installed for RPM to build
-build_rpm_in_chroot_no_install python3 python3
+build_rpm_in_chroot_no_install python3
 rm -vf $FINISHED_RPM_DIR/python3*debuginfo*.rpm
 chroot_and_install_rpms python3 python3
 
@@ -410,7 +421,7 @@ esac
 build_rpm_in_chroot_no_install grep
 
 # Lua needs to be installed for RPM to build
-build_rpm_in_chroot_no_install lua lua
+build_rpm_in_chroot_no_install lua
 chroot_and_install_rpms lua lua
 
 build_rpm_in_chroot_no_install lua-rpm-macros
@@ -484,7 +495,7 @@ build_rpm_in_chroot_no_install meson
 # gtk-doc needs itstool, meson, python3-pygments
 chroot_and_install_rpms itstool
 chroot_and_install_rpms meson
-build_rpm_in_chroot_no_install python-pygments python3-pygments
+build_rpm_in_chroot_no_install python-pygments
 chroot_and_install_rpms python3-pygments
 
 # gtk-doc and ca-certificates require libxslt
@@ -496,7 +507,7 @@ build_rpm_in_chroot_no_install gtk-doc
 # python3-lxml requires python3-Cython and libxslt
 build_rpm_in_chroot_no_install Cython
 chroot_and_install_rpms python3-Cython
-build_rpm_in_chroot_no_install python-lxml python3-lxml
+build_rpm_in_chroot_no_install python-lxml
 chroot_and_install_rpms python3-lxml
 
 # p11-kit, libtasn1 and glib need gtk-doc
@@ -578,10 +589,10 @@ build_rpm_in_chroot_no_install rpm
 
 # python-jinja2 needs python3-markupsafe
 # python3-setuptools, python3-libs are also needed but already installed
-build_rpm_in_chroot_no_install python-markupsafe python3-markupsafe
+build_rpm_in_chroot_no_install python-markupsafe
 copy_rpm_subpackage python3-markupsafe
 chroot_and_install_rpms python3-markupsafe
-build_rpm_in_chroot_no_install python-jinja2 python3-jinja2
+build_rpm_in_chroot_no_install python-jinja2
 copy_rpm_subpackage python3-jinja2
 
 # systemd-bootstrap requires libcap, xz, kbd, kmod, util-linux, meson, intltool, python3-jinja2
