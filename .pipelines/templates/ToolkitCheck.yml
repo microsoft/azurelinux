@@ -1,11 +1,11 @@
 parameters:
-  - name: repoRoot
+  - name: buildRepoRoot
     type: string
     default: "$(Build.SourcesDirectory)"
 
 steps:
   - script: |
-      toolkit_dir="${{ parameters.repoRoot }}/toolkit"
+      toolkit_dir="${{ parameters.buildRepoRoot }}/toolkit"
       if [[ ! -d "$toolkit_dir" ]]; then
         echo "ERROR: toolkit not found! Expected under '$toolkit_dir'." >&2
         exit 1

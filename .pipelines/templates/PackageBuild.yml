@@ -19,11 +19,7 @@ parameters:
     type: string
     default: "$(Build.ArtifactStagingDirectory)"
 
-  - name: repoName
-    type: string
-    default: "self"
-
-  - name: repoRoot
+  - name: buildRepoRoot
     type: string
     default: "$(Build.SourcesDirectory)"
 
@@ -31,14 +27,18 @@ parameters:
     type: string
     default: "rpms.tar.gz"
 
+  - name: selfRepoName
+    type: string
+    default: "self"
+
   - name: srpmsTarballName
     type: string
     default: "srpms.tar.gz"
 
 steps:
-  - template: ToolkitCheck.yml@${{ parameters.repoName }}
+  - template: ToolkitCheck.yml@${{ parameters.selfRepoName }}
     parameters:
-      repoRoot: ${{ parameters.repoRoot }}
+      buildRepoRoot: ${{ parameters.buildRepoRoot }}
 
   - ${{ if eq(parameters.customToolchainEnabled, true) }}:
       - task: DownloadPipelineArtifact@2
@@ -54,7 +54,7 @@ steps:
             exit 1
           fi
 
-          sudo make -C "${{ parameters.repoRoot }}/toolkit" toolchain TOOLCHAIN_ARCHIVE="$toolchain_archive"
+          sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" toolchain TOOLCHAIN_ARCHIVE="$toolchain_archive"
         displayName: "Populate toolchain"
 
   - script: |
@@ -68,7 +68,7 @@ steps:
         run_check_arg="RUN_CHECK=y"
       fi
 
-      sudo make -C "${{ parameters.repoRoot }}/toolkit" build-packages -j$(nproc) \
+      sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
         CONFIG_FILE="" \
         $delta_fetch_arg \
         REBUILD_TOOLS=y \
@@ -76,25 +76,25 @@ steps:
     displayName: "Build packages"
 
   - script: |
-      sudo make -C "${{ parameters.repoRoot }}/toolkit" compress-rpms
+      sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" compress-rpms
     displayName: "Compress RPMs"
 
   - script: |
-      sudo make -C "${{ parameters.repoRoot }}/toolkit" compress-srpms
+      sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" compress-srpms
     displayName: "Compress SRPMs"
 
   - bash: |
       published_artifacts_dir="${{ parameters.outputArtifactsFolder }}/ARTIFACTS"
       mkdir -p "$published_artifacts_dir"
-      cp "${{ parameters.repoRoot }}"/out/rpms.tar.gz "$published_artifacts_dir/${{ parameters.rpmsTarballName }}"
-      cp "${{ parameters.repoRoot }}"/out/srpms.tar.gz "$published_artifacts_dir/${{ parameters.srpmsTarballName }}"
+      cp "${{ parameters.buildRepoRoot }}"/out/rpms.tar.gz "$published_artifacts_dir/${{ parameters.rpmsTarballName }}"
+      cp "${{ parameters.buildRepoRoot }}"/out/srpms.tar.gz "$published_artifacts_dir/${{ parameters.srpmsTarballName }}"
     displayName: "Copy artifacts for publishing"
 
   - bash: |
       published_logs_dir="${{ parameters.outputArtifactsFolder }}/LOGS"
       mkdir -p "$published_logs_dir"
-      tar -C "${{ parameters.repoRoot }}/build/logs/pkggen" -czf "$published_logs_dir/pkggen.logs.tar.gz" .
-      tar -C "${{ parameters.repoRoot }}/build/pkg_artifacts" -czf "$published_logs_dir/pkg_artifacts.tar.gz" .
-      tar -C "${{ parameters.repoRoot }}/build/timestamp" -czf "$published_logs_dir/timestamp.tar.gz" .
+      tar -C "${{ parameters.buildRepoRoot }}/build/logs/pkggen" -czf "$published_logs_dir/pkggen.logs.tar.gz" .
+      tar -C "${{ parameters.buildRepoRoot }}/build/pkg_artifacts" -czf "$published_logs_dir/pkg_artifacts.tar.gz" .
+      tar -C "${{ parameters.buildRepoRoot }}/build/timestamp" -czf "$published_logs_dir/timestamp.tar.gz" .
     condition: always()
     displayName: "Copy logs for publishing"

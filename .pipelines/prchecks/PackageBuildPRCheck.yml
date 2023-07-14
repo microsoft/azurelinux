@@ -68,10 +68,12 @@ extends:
                     parameters:
                       rawToolchainCacheURL: ${{ configuration.rawToolchainCacheURL }}
                       rawToolchainExpectedHash: ${{ configuration.rawToolchainExpectedHash }}
+                      selfRepoName: self
 
                   - template: .pipelines/templates/ToolchainBuild.yml@self
                     parameters:
                       outputArtifactsFolder: $(ob_outputDirectory)
+                      selfRepoName: self
 
                   # 1. Automatic publishing won't work if 'isCustom: true' is set on the pool. We cannot do 'isCustom: false' because
                   #    then OneBranch attempts to perform additional actions (adding build tags for instance), which require additional permissions
@@ -106,6 +108,7 @@ extends:
                           isCheckBuild: ${{ packageBuildJob.runCheck }}
                           isDeltaBuild: true
                           outputArtifactsFolder: $(ob_outputDirectory)
+                          selfRepoName: self
 
                       - task: PublishPipelineArtifact@1
                         inputs:
