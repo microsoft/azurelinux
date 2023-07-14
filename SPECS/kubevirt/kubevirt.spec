@@ -19,7 +19,7 @@
 Summary:        Container native virtualization
 Name:           kubevirt
 Version:        0.59.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -211,8 +211,11 @@ install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-v
 %{_bindir}/virt-tests
 
 %changelog
-* Wed Jul 05 2023 Andrew Phelps <anphel@microsoft.com> - 0.59.0-5
+* Wed Jul 14 2023 Andrew Phelps <anphel@microsoft.com> - 0.59.0-6
 - Bump release to rebuild against glibc 2.35-4
+
+* Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.59.0-5
+- Bump release to rebuild with go 1.19.11
 
 * Fri Jun 30 2023 Brian Fjeldstad <bfjelds@microsoft.com> - 0.59.0-4
 - Patch 0.59.0 with Operator Nexus patch for hotplug volume detachment IO errors

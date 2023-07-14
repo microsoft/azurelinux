@@ -195,10 +195,10 @@ libselinux-utils-3.2-1.cm2.aarch64.rpm
 libsepol-3.2-2.cm2.aarch64.rpm
 libsepol-debuginfo-3.2-2.cm2.aarch64.rpm
 libsepol-devel-3.2-2.cm2.aarch64.rpm
-libsolv-0.7.20-1.cm2.aarch64.rpm
-libsolv-debuginfo-0.7.20-1.cm2.aarch64.rpm
-libsolv-devel-0.7.20-1.cm2.aarch64.rpm
-libsolv-tools-0.7.20-1.cm2.aarch64.rpm
+libsolv-0.7.24-1.cm2.aarch64.rpm
+libsolv-debuginfo-0.7.24-1.cm2.aarch64.rpm
+libsolv-devel-0.7.24-1.cm2.aarch64.rpm
+libsolv-tools-0.7.24-1.cm2.aarch64.rpm
 libssh2-1.9.0-2.cm2.aarch64.rpm
 libssh2-debuginfo-1.9.0-2.cm2.aarch64.rpm
 libssh2-devel-1.9.0-2.cm2.aarch64.rpm

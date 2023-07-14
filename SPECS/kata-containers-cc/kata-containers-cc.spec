@@ -7,7 +7,7 @@
 
 Name:         kata-containers-cc
 Version:      0.4.2
-Release:      1%{?dist}
+Release:      2%{?dist}
 Summary:      Kata Confidential Containers
 License:      ASL 2.0
 Vendor:       Microsoft Corporation
@@ -234,6 +234,9 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 
 
 %changelog
+* Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.4.2-2
+- Bump release to rebuild with go 1.19.11
+
 *   Thu Jun 29 2023 Dallas Delaney <dadelan@microsoft.com> 0.4.2-1
 -   Upgrade to version 0.4.2 for new snapshotter and policy features
 

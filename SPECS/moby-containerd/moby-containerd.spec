@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: moby-%{upstream_name}
 Version: 1.6.18
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -86,6 +86,9 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 
 %changelog
+* Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.6.18-6
+- Bump release to rebuild with go 1.19.11
+
 * Thu Jun 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.6.18-5
 - Bump release to rebuild with go 1.19.10
 
