@@ -12850,6 +12850,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "mbedtls",
+          "version": "2.28.3",
+          "downloadUrl": "https://github.com/Mbed-TLS/mbedtls/archive/refs/tags/v2.28.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "mc",
           "version": "4.8.27",
           "downloadUrl": "http://ftp.midnight-commander.org/mc-4.8.27.tar.xz"
