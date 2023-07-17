@@ -1015,6 +1015,7 @@
                 "opencl-filesystem",
                 "opencl-headers",
                 "opencryptoki",
+                "opencsd",
                 "opendnssec",
                 "OpenEXR",
                 "openjade",
