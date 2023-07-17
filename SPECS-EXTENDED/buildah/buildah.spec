@@ -19,9 +19,9 @@
 %define built_tag_strip %(b=%{built_tag}; echo ${b:1})
 %define download_url https://%{import_path}/archive/%{built_tag}.tar.gz
 Summary:        A command line tool used for creating OCI Images
-Name:           %{repo}
+Name:           buildah
 Version:        1.18.0
-Release:        13%{?dist}
+Release:        15%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -31,7 +31,7 @@ BuildRequires:  btrfs-progs-devel
 BuildRequires:  device-mapper-devel
 BuildRequires:  git
 BuildRequires:  glib2-devel
-BuildRequires:  glibc-static >= 2.35-3%{?dist}
+BuildRequires:  glibc-static >= 2.35-4%{?dist}
 BuildRequires:  go-md2man
 BuildRequires:  go-rpm-macros
 BuildRequires:  golang
@@ -122,6 +122,12 @@ cp imgtype %{buildroot}/%{_bindir}/%{name}-imgtype
 %{_datadir}/%{name}/test
 
 %changelog
+* Wed Jul 14 2023 Andrew Phelps <anphel@microsoft.com> - 1.18.0-15
+- Bump release to rebuild against glibc 2.35-4
+
+* Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.18.0-14
+- Bump release to rebuild with go 1.19.11
+
 * Thu Jun 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.18.0-13
 - Bump release to rebuild with go 1.19.10
 

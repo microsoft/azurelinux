@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "telegraf-1.26.0.tar.gz": "ee6933a16930dfd8b32832f0ed9e0393bb14cdb973abc1a773bfb58976470ea8",
-  "telegraf-1.26.0-vendor.tar.gz": "fc29d1b8b635b7cf71aba435b5d16041846bb4604d6e75f6f4b64b8868ffed18"
- }
+  "Signatures": {
+    "telegraf-1.27.2.tar.gz": "e3e1c42f334a3ada14c1f12538bd2f651ab2518e9eb0906f7edb51e49ac0f49c",
+    "telegraf-1.27.2-vendor.tar.gz": "4a7f83a49c5dc9ecdcb4476e5686342540c071fa22b7de9e28ea20c31526f404"
+  }
 }

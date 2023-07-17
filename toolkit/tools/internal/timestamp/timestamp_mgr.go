@@ -222,11 +222,11 @@ func StartEvent(name string, parentTS *TimeStamp) (ts *TimeStamp, err error) {
 	}
 
 	ts, err = newTimeStamp(name, parentTS)
-	ts.ID = timestampMgr.nextID()
 	if err != nil {
 		err = fmt.Errorf("failed to create a timestamp object %s: %v", name, err)
 		return &TimeStamp{}, err
 	}
+	ts.ID = timestampMgr.nextID()
 	timestampMgr.submitEvent(EventStart, ts)
 	return
 }
