@@ -30,8 +30,6 @@ to develop CoreSight(tm) trace decoders.
 
 %build
 cd decoder/build/linux
-export CFLAGS="%{optflags}"
-export CXXFLAGS="%{optflags}"
 LIB_PATH=%{_lib} make %{?_smp_mflags}
 
 
