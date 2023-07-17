@@ -1,7 +1,7 @@
 Summary:        Repodata downloading library
 Name:           librepo
-Version:        1.14.2
-Release:        2%{?dist}
+Version:        1.15.1
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -82,6 +82,9 @@ popd
 %{python3_sitearch}/%{name}/
 
 %changelog
+* Wed Jun 21 2023 Sam Meluch <sammeluch@microsoft.com> - 1.15.1-1
+- Upgrade to version 1.15.1 for dnf5
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.14.2-2
 - Remove unused python2 build requirements
 

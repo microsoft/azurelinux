@@ -26,7 +26,7 @@ var (
 func replaceRunNodesWithPrebuiltNodes(pkgGraph *pkggraph.PkgGraph) (err error) {
 	for _, node := range pkgGraph.AllNodes() {
 
-		if node.Type != pkggraph.TypeRun {
+		if node.Type != pkggraph.TypeLocalRun {
 			continue
 		}
 
