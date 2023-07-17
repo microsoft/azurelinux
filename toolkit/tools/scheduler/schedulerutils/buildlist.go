@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/juliangruber/go-intersect"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
@@ -16,6 +17,58 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
 )
+
+// ParseAndGeneratePackageList parses the common package request arguments and generates a list of packages to build based on the given dependency graph.
+// - dependencyGraph: the dependency graph of all packages. Used to convert package/spec names to PackageVers.
+// - pkgsToBuild: a list of package/spec names to build. If empty, all packages will be built.
+// - pkgsToRebuild: a list of package/spec names to always rebuild.
+// - pkgsToIgnore: a list of package/spec names to ignore.
+// - imageConfig: the path to the image config file. Used to extract additional packages to build.
+// - baseDirPath: the path to the base directory for the image. Used to resolve relative paths in the image config.
+func ParseAndGeneratePackageList(dependencyGraph *pkggraph.PkgGraph, pkgsToBuild, pkgsToRebuild, pkgsToIgnore []string, imageConfig, baseDirPath string) (finalPackagesToBuild, packagesToRebuild, packagesToIgnore []*pkgjson.PackageVer, err error) {
+	// Generate the list of packages that need to be built.
+	// If none are requested then all packages will be built.
+	packagesToBuild, err := PackageNamesToBuiltPackages(pkgsToBuild, dependencyGraph)
+	if err != nil {
+		err = fmt.Errorf("unable to find build nodes for the packages to build, error:\n%s", err)
+		return
+	}
+
+	packagesToRebuild, err = PackageNamesToBuiltPackages(pkgsToRebuild, dependencyGraph)
+	if err != nil {
+		err = fmt.Errorf("unable to find build nodes for the packages to rebuild, error:\n%s", err)
+		return
+	}
+
+	prunedIgnoredPackageNames, unknownNames, err := PruneUnknownPackages(pkgsToIgnore, dependencyGraph)
+	if err != nil {
+		err = fmt.Errorf("failed to prune unknown package/spec names from the ignored list, error:\n%s", err)
+		return
+	}
+
+	if len(unknownNames) != 0 {
+		logger.Log.Warnf("The following ignored items matched neither a spec nor a package name: %v.", unknownNames)
+	}
+
+	packagesToIgnore, err = PackageNamesToBuiltPackages(prunedIgnoredPackageNames, dependencyGraph)
+	if err != nil {
+		err = fmt.Errorf("unable to find build nodes for the ignored packages, error:\n%s", err)
+		return
+	}
+
+	ignoredAndRebuiltPackages := intersect.Hash(packagesToIgnore, packagesToRebuild)
+	if len(ignoredAndRebuiltPackages) != 0 {
+		err = fmt.Errorf("can't ignore and force a rebuild of a package at the same time. Abusing packages: %v", ignoredAndRebuiltPackages)
+		return
+	}
+
+	finalPackagesToBuild, err = CalculatePackagesToBuild(packagesToBuild, packagesToRebuild, imageConfig, baseDirPath, dependencyGraph)
+	if err != nil {
+		err = fmt.Errorf("unable to generate package build list, error:\n%s", err)
+		return
+	}
+	return
+}
 
 // CalculatePackagesToBuild generates a comprehensive list of all PackageVers that the scheduler should attempt to build.
 // The build list is a superset of:
