@@ -48,7 +48,7 @@ type BuildResult struct {
 	Err            error
 	LogFile        string
 	Node           *pkggraph.PkgNode
-	Skipped        bool
+	Ignored        bool
 	UsedCache      bool
 	WasDelta       bool
 }
@@ -106,12 +106,16 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 
 		switch req.Node.Type {
 		case pkggraph.TypeLocalBuild:
-			res.UsedCache, res.Skipped, res.BuiltFiles, res.LogFile, res.Err = buildBuildNode(req.Node, req.PkgGraph, graphMutex, agent, req.CanUseCache, buildAttempts, checkAttempts, ignoredPackages)
+			res.UsedCache, res.Ignored, res.BuiltFiles, res.LogFile, res.Err = buildBuildNode(req.Node, req.PkgGraph, graphMutex, agent, req.CanUseCache, buildAttempts, checkAttempts, ignoredPackages)
 			if res.Err == nil {
 				setAncillaryBuildNodesStatus(req, pkggraph.StateUpToDate)
 			} else {
 				setAncillaryBuildNodesStatus(req, pkggraph.StateBuildError)
 			}
+
+		case pkggraph.TypePtest:
+			res.Ignored, res.LogFile, res.Err = buildTestNode(req.Node, req.PkgGraph, graphMutex, agent, checkAttempts, ignoredPackages)
+
 		case pkggraph.TypeLocalRun, pkggraph.TypeGoal, pkggraph.TypeRemoteRun, pkggraph.TypePureMeta, pkggraph.TypePreBuilt:
 			res.UsedCache = req.CanUseCache
 
@@ -129,15 +133,15 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 }
 
 // buildBuildNode builds a TypeBuild node, either used a cached copy if possible or building the corresponding SRPM.
-func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, canUseCache bool, buildAttempts int, checkAttempts int, ignoredPackages []*pkgjson.PackageVer) (usedCache, skipped bool, builtFiles []string, logFile string, err error) {
+func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, canUseCache bool, buildAttempts int, ignoredPackages []*pkgjson.PackageVer) (usedCache, ignored bool, builtFiles []string, logFile string, err error) {
 	var missingFiles []string
 
 	baseSrpmName := node.SRPMFileName()
 	usedCache, builtFiles, missingFiles = pkggraph.IsSRPMPrebuilt(node.SrpmPath, pkgGraph, graphMutex)
-	skipped = sliceutils.Contains(ignoredPackages, node.VersionedPkg, sliceutils.PackageVerMatch)
+	ignored = sliceutils.Contains(ignoredPackages, node.VersionedPkg, sliceutils.PackageVerMatch)
 
-	if skipped {
-		logger.Log.Debugf("%s explicitly marked to be skipped.", baseSrpmName)
+	if ignored {
+		logger.Log.Debugf("%s explicitly marked to be ignored.", baseSrpmName)
 		return
 	}
 
@@ -155,8 +159,25 @@ func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMu
 
 	dependencies := getBuildDependencies(node, pkgGraph, graphMutex)
 
-	logger.Log.Infof("Building %s", baseSrpmName)
-	builtFiles, logFile, err = buildSRPMFile(agent, buildAttempts, checkAttempts, node.SrpmPath, node.Architecture, dependencies)
+	logger.Log.Infof("Building: %s", baseSrpmName)
+	builtFiles, logFile, err = buildSRPMFile(agent, buildAttempts, node.SrpmPath, node.Architecture, dependencies)
+	return
+}
+
+// buildTestNode tests a TypePtest node.
+func buildTestNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, checkAttempts int, ignoredPackages []*pkgjson.PackageVer) (ignored bool, logFile string, err error) {
+	baseSrpmName := node.SRPMFileName()
+	ignored = sliceutils.Contains(ignoredPackages, node.VersionedPkg, sliceutils.PackageVerMatch)
+
+	if ignored {
+		logger.Log.Debugf("%s (ptest) explicitly marked to be ignored.", baseSrpmName)
+		return
+	}
+
+	dependencies := getBuildDependencies(node, pkgGraph, graphMutex)
+
+	logger.Log.Infof("Testing: %s", baseSrpmName)
+	logFile, err = testSRPMFile(agent, checkAttempts, node.SrpmPath, dependencies)
 	return
 }
 
@@ -225,38 +246,45 @@ func parseCheckSection(logFile string) (err error) {
 }
 
 // buildSRPMFile sends an SRPM to a build agent to build.
-func buildSRPMFile(agent buildagents.BuildAgent, buildAttempts int, checkAttempts int, srpmFile, outArch string, dependencies []string) (builtFiles []string, logFile string, err error) {
+func buildSRPMFile(agent buildagents.BuildAgent, buildAttempts int, srpmFile, outArch string, dependencies []string) (builtFiles []string, logFile string, err error) {
+	const (
+		retryDuration = time.Second
+	)
+
+	logBaseName := filepath.Base(srpmFile) + ".log"
+
+	err = retry.Run(func() (buildErr error) {
+		builtFiles, logFile, buildErr = agent.BuildPackage(srpmFile, logBaseName, outArch, dependencies)
+		return
+	}, buildAttempts, retryDuration)
+
+	return
+}
+
+// testSRPMFile sends an SRPM to a build agent to test.
+func testSRPMFile(agent buildagents.BuildAgent, checkAttempts int, srpmFile string, dependencies []string) (logFile string, err error) {
 	const (
 		retryDuration = time.Second
 	)
 
 	// checkFailed is a flag to see if a non-null buildErr is from the %check section
 	checkFailed := false
-	logBaseName := filepath.Base(srpmFile) + ".log"
-	// temporary solution; potential fix: build normally for buildAttempts, then run rmpbuild -bi --short-circuit to just do the checks
-	// relevant bug https://microsoft.visualstudio.com/OS/_workitems/edit/43454529
-	maxAttempts := buildAttempts
-	if checkAttempts > maxAttempts {
-		maxAttempts = checkAttempts
-	}
+	logBaseName := filepath.Base(srpmFile) + ".test.log"
 
 	err = retry.Run(func() (buildErr error) {
-		builtFiles, logFile, buildErr = agent.BuildPackage(srpmFile, logBaseName, outArch, dependencies)
-		// If the package builds with no errors and RUN_CHECK=y, check logs to see if the %check section passed, and if not, return as the build error.
+		logFile, buildErr = agent.TestPackage(srpmFile, logBaseName, dependencies)
 		if buildErr != nil {
+			logger.Log.Warnf("Unexpected test build failure for '%s'. Error: %s", srpmFile, err)
 			return
 		}
 
-		if agent.Config().RunCheck {
-			buildErr = parseCheckSection(logFile)
-			checkFailed = (buildErr != nil)
-		}
+		buildErr = parseCheckSection(logFile)
+		checkFailed = (buildErr != nil)
 		return
-	}, maxAttempts, retryDuration)
+	}, checkAttempts, retryDuration)
 
-	// temporary solution; potential fix: once stable, fail builds if %check section fails?
 	if err != nil && checkFailed {
-		logger.Log.Warnf("Tests failed for '%s'. Ignoring since the package built correctly. Error: %v", srpmFile, err)
+		logger.Log.Warnf("Tests failed for '%s'. Error: %s", srpmFile, err)
 		err = nil
 	}
 	return

@@ -23,8 +23,8 @@ func PrintBuildResult(res *BuildResult) {
 	}
 
 	if res.Node.Type == pkggraph.TypeLocalBuild {
-		if res.Skipped {
-			logger.Log.Warnf("Skipped build for '%s' per user request. RPMs expected to be present: %v", baseSRPMName, res.BuiltFiles)
+		if res.Ignored {
+			logger.Log.Warnf("Ignored build for '%s' per user request. RPMs expected to be present: %v", baseSRPMName, res.BuiltFiles)
 		} else if res.UsedCache {
 			logger.Log.Infof("Prebuilt: %s -> %v", baseSRPMName, res.BuiltFiles)
 		} else {

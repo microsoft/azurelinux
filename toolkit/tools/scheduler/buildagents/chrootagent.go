@@ -53,7 +53,7 @@ func (c *ChrootAgent) BuildPackage(inputFile, logName, outArch string, dependenc
 		logger.Log.Trace(lastStdoutLine)
 	}
 
-	args := serializeChrootBuildAgentConfig(c.config, inputFile, logFile, outArch, dependencies)
+	args := serializeChrootBuildConfig(c.config, inputFile, logFile, outArch, dependencies)
 	err = shell.ExecuteLiveWithCallback(onStdout, logger.Log.Trace, true, c.config.Program, args...)
 
 	if err == nil && lastStdoutLine != "" {
@@ -73,8 +73,25 @@ func (c *ChrootAgent) Close() (err error) {
 	return
 }
 
-// serializeChrootBuildAgentConfig serializes a BuildAgentConfig into arguments usable by pkgworker.
-func serializeChrootBuildAgentConfig(config *BuildAgentConfig, inputFile, logFile, outArch string, dependencies []string) (serializedArgs []string) {
+// TestPackage runs the '%check' section for the given input and returns a path to the test log.
+// - inputFile is the SRPM to test.
+// - logName is the file name to save the package test log to.
+// - dependencies is a list of dependencies that need to be installed before testing.
+func (c *ChrootAgent) TestPackage(inputFile, logName string, dependencies []string) (logFile string, err error) {
+	logFile = filepath.Join(c.config.LogDir, logName)
+
+	args := serializeChrootTestConfig(c.config, inputFile, logFile, dependencies)
+
+	_, stderr, err := shell.Execute(c.config.Program, args...)
+	if err != nil {
+		err = fmt.Errorf("failed to run pkgworker.\nError:\n%w\nStderr:\n%s", err, stderr)
+	}
+
+	return
+}
+
+// serializeChrootBuildConfig serializes a BuildAgentConfig into arguments usable by pkgworker for the sake of building the package.
+func serializeChrootBuildConfig(config *BuildAgentConfig, inputFile, logFile, outArch string, dependencies []string) (serializedArgs []string) {
 	serializedArgs = []string{
 		fmt.Sprintf("--input=%s", inputFile),
 		fmt.Sprintf("--work-dir=%s", config.WorkDir),
@@ -104,6 +121,46 @@ func serializeChrootBuildAgentConfig(config *BuildAgentConfig, inputFile, logFil
 
 	if config.RunCheck {
 		serializedArgs = append(serializedArgs, "--run-check")
+	}
+
+	if config.UseCcache {
+		serializedArgs = append(serializedArgs, "--use-ccache")
+	}
+
+	for _, dependency := range dependencies {
+		serializedArgs = append(serializedArgs, fmt.Sprintf("--install-package=%s", dependency))
+	}
+
+	return
+}
+
+// serializeChrootTestConfig serializes a BuildAgentConfig into arguments usable by pkgworker for the sake of testing the package.
+func serializeChrootTestConfig(config *BuildAgentConfig, inputFile, logFile string, dependencies []string) (serializedArgs []string) {
+	serializedArgs = []string{
+		fmt.Sprintf("--input=%s", inputFile),
+		fmt.Sprintf("--work-dir=%s", config.WorkDir),
+		fmt.Sprintf("--worker-tar=%s", config.WorkerTar),
+		fmt.Sprintf("--repo-file=%s", config.RepoFile),
+		fmt.Sprintf("--rpm-dir=%s", config.RpmDir),
+		fmt.Sprintf("--toolchain-rpms-dir=%s", config.ToolchainDir),
+		fmt.Sprintf("--srpm-dir=%s", config.SrpmDir),
+		fmt.Sprintf("--cache-dir=%s", config.CacheDir),
+		fmt.Sprintf("--ccache-dir=%s", config.CCacheDir),
+		fmt.Sprintf("--dist-tag=%s", config.DistTag),
+		fmt.Sprintf("--distro-release-version=%s", config.DistroReleaseVersion),
+		fmt.Sprintf("--distro-build-number=%s", config.DistroBuildNumber),
+		fmt.Sprintf("--log-file=%s", logFile),
+		fmt.Sprintf("--log-level=%s", config.LogLevel),
+		fmt.Sprintf("--max-cpu=%s", config.MaxCpu),
+		fmt.Sprintf("--run-check"),
+	}
+
+	if config.RpmmacrosFile != "" {
+		serializedArgs = append(serializedArgs, fmt.Sprintf("--rpmmacros-file=%s", config.RpmmacrosFile))
+	}
+
+	if config.NoCleanup {
+		serializedArgs = append(serializedArgs, "--no-cleanup")
 	}
 
 	if config.UseCcache {

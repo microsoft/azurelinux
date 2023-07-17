@@ -61,12 +61,7 @@ var (
 )
 
 var (
-	brPackageNameRegex        = regexp.MustCompile(`^[^\s]+`)
-	equalToRegex              = regexp.MustCompile(` '?='? `)
-	greaterThanOrEqualRegex   = regexp.MustCompile(` '?>='? [^ ]*`)
-	installedPackageNameRegex = regexp.MustCompile(`^(.+)(-[^-]+-[^-]+)`)
-	lessThanOrEqualToRegex    = regexp.MustCompile(` '?<='? `)
-	packageUnavailableRegex   = regexp.MustCompile(`^No package \\x1b\[1m\\x1b\[30m(.+) \\x1b\[0mavailable`)
+	packageUnavailableRegex = regexp.MustCompile(`^No package \\x1b\[1m\\x1b\[30m(.+) \\x1b\[0mavailable`)
 )
 
 func main() {

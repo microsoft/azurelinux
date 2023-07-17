@@ -49,6 +49,12 @@ type BuildAgent interface {
 
 	// Close closes the build agent, releasing any resources.
 	Close() error
+
+	// TestPackage runs the '%check' section for the given input and returns a path to the test log.
+	// - inputFile is the SRPM to test.
+	// - logName is the file name to save the package test log to.
+	// - dependencies is a list of dependencies that need to be installed before testing.
+	TestPackage(inputFile, logName string, dependencies []string) (string, error)
 }
 
 // BuildAgentFactory returns an instance of the build agent that corresponds to the buildAgent string.

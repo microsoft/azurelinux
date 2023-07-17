@@ -153,7 +153,7 @@ func (g *GraphBuildState) RecordBuildResult(res *BuildResult, allowToolchainRebu
 		g.nodeToState[node] = state
 	}
 
-	if !allowToolchainRebuilds && !res.Skipped && !res.UsedCache {
+	if !allowToolchainRebuilds && !res.Ignored && !res.UsedCache {
 		for _, file := range res.BuiltFiles {
 			if g.isConflictWithToolchain(file) {
 				g.conflictingRPMs[filepath.Base(file)] = true
