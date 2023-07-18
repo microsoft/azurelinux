@@ -1,7 +1,7 @@
 Summary:        Braille translation and back-translation library
 Name:           liblouis
-Version:        3.24.0
-Release:        2%{?dist}
+Version:        3.26.0
+Release:        1%{?dist}
 License:        LGPL-3.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -151,6 +151,9 @@ done
 %endif
 
 %changelog
+* Tue Jul 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.26.0-1
+- Auto-upgrade to 3.26.0 - to fix CVE-2023-26767, CVE-2023-26768, CVE-2023-26769
+
 * Fri Jan 13 2023 Suresh Thelkar <sthelkar@microsoft.com> - 3.24.0-2
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
 - License verified
