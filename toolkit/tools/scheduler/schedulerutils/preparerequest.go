@@ -28,7 +28,7 @@ func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMute
 	buildNodes := make(map[string][]*pkggraph.PkgNode)
 
 	for _, node := range nodesToBuild {
-		if node.Type == pkggraph.TypeLocalBuild {
+		if node.Type == pkggraph.TypeBuild {
 			buildNodes[node.SrpmPath] = append(buildNodes[node.SrpmPath], node)
 			continue
 		}
