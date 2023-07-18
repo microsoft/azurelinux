@@ -4,17 +4,20 @@
 package schedulerutils
 
 import (
+	"path/filepath"
 	"sync"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
+	"github.com/sirupsen/logrus"
 	"gonum.org/v1/gonum/graph"
+	"gonum.org/v1/gonum/graph/path"
 	"gonum.org/v1/gonum/graph/traverse"
 )
 
 // CanSubGraph returns true if a node can be subgraphed without any unresolved dynamic dependencies.
 // Used to optimize graph solving.
-func CanSubGraph(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, useCachedImplicit bool) bool {
+func CanSubGraph(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, useCachedImplicit bool, toolchainPackageSet map[string]bool) bool {
 	search := traverse.BreadthFirst{}
 
 	foundUnsolvableNode := false
@@ -25,6 +28,11 @@ func CanSubGraph(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, useCachedI
 
 		// Non-implicit nodes are solvable
 		if !pkgNode.Implicit {
+			return
+		}
+
+		//Implicit nodes that are toolchain packages are solvable
+		if pkgNode.Implicit && isToolchainPackage(pkgNode, toolchainPackageSet) {
 			return
 		}
 
@@ -40,6 +48,22 @@ func CanSubGraph(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, useCachedI
 
 		// This node is not yet solvable
 		logger.Log.Warnf("Could not subgraph due to node: %v", pkgNode)
+
+		// If we are in trace mode, print the path from the root node to the unsolvable node
+		if logger.Log.IsLevelEnabled(logrus.TraceLevel) {
+			pt, ok := path.BellmanFordFrom(node, pkgGraph)
+			if !ok {
+				logger.Log.Warnf("Could not run BellmanFordFrom on %v", node)
+				return
+			} else {
+				path, _ := pt.To(pkgNode.ID())
+				logger.Log.Tracef("Path between %v and %v:", node, pkgNode)
+				for _, n := range path {
+					logger.Log.Warnf("  %v", n.(*pkggraph.PkgNode))
+				}
+			}
+		}
+
 		foundUnsolvableNode = true
 		return
 	})
@@ -48,7 +72,7 @@ func CanSubGraph(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, useCachedI
 }
 
 // LeafNodes returns a slice of all leaf nodes in the graph.
-func LeafNodes(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, goalNode *pkggraph.PkgNode, buildState *GraphBuildState, useCachedImplicit bool) (leafNodes []*pkggraph.PkgNode) {
+func LeafNodes(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, goalNode *pkggraph.PkgNode, buildState *GraphBuildState, useCachedImplicit bool, toolchainPackages map[string]bool) (leafNodes []*pkggraph.PkgNode) {
 	graphMutex.RLock()
 	defer graphMutex.RUnlock()
 
@@ -76,8 +100,12 @@ func LeafNodes(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, goalNode *
 		// Ideally we will wait for the actual provider of the implicit node to be built and convert the implicit node to
 		// a normal node via InjectMissingImplicitProvides().
 		if !useCachedImplicit && pkgNode.Implicit && pkgNode.State == pkggraph.StateCached {
-			logger.Log.Debugf("Skipping cached implicit provide leaf node: %v", pkgNode)
-			return
+			if isToolchainPackage(pkgNode, toolchainPackages) {
+				logger.Log.Debugf("Allowing cached implicit toolchain leaf node: %v", pkgNode)
+			} else {
+				logger.Log.Debugf("Skipping cached implicit provide leaf node: %v", pkgNode)
+				return
+			}
 		}
 
 		logger.Log.Debugf("Found leaf node: %v", pkgNode)
@@ -118,6 +146,12 @@ func FindUnblockedNodesFromResult(res *BuildResult, pkgGraph *pkggraph.PkgGraph,
 	}
 
 	return
+}
+
+func isToolchainPackage(pkgNode *pkggraph.PkgNode, toolchainPackages map[string]bool) bool {
+	base := filepath.Base(pkgNode.RpmPath)
+	_, found := toolchainPackages[base]
+	return found
 }
 
 // findUnblockedNodesFromNode takes a built node and returns a list of nodes that are now unblocked by it.

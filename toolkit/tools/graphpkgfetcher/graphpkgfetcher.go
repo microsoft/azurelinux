@@ -107,14 +107,18 @@ func fetchPackages(dependencyGraph *pkggraph.PkgGraph, hasUnresolvedNodes, tryDo
 	}
 	defer cloner.Close()
 
+	toolchainPackages, err := schedulerutils.ReadReservedFilesList(*toolchainManifest)
+	if err != nil {
+		err = fmt.Errorf("unable to read toolchain manifest file '%s':\n%w", *toolchainManifest, err)
+		return
+	}
+	toolchainPackageSet := make(map[string]bool)
+	for _, pkg := range toolchainPackages {
+		toolchainPackageSet[pkg] = true
+	}
+
 	if hasUnresolvedNodes {
-		var toolchainPackages []string
 		logger.Log.Info("Found unresolved packages to cache, downloading packages")
-		toolchainPackages, err = schedulerutils.ReadReservedFilesList(*toolchainManifest)
-		if err != nil {
-			err = fmt.Errorf("unable to read toolchain manifest file '%s':\n%w", *toolchainManifest, err)
-			return
-		}
 
 		err = resolveGraphNodes(dependencyGraph, *inputSummaryFile, toolchainPackages, cloner, *stopOnFailure)
 		if err != nil {
@@ -128,7 +132,7 @@ func fetchPackages(dependencyGraph *pkggraph.PkgGraph, hasUnresolvedNodes, tryDo
 	// Optional delta build cache hydration
 	if tryDownloadDeltaRPMs {
 		logger.Log.Info("Attempting to download delta RPMs for build nodes")
-		err = downloadDeltaNodes(dependencyGraph, cloner)
+		err = downloadDeltaNodes(dependencyGraph, cloner, toolchainPackageSet)
 		if err != nil {
 			err = fmt.Errorf("failed to download delta RPMs:\n%w", err)
 			return
@@ -188,7 +192,7 @@ func setupCloner() (cloner *rpmrepocloner.RpmRepoCloner, err error) {
 //   - pkgsToIgnore: The list of packages to ignore
 //   - imageConfig: The image config to use to find the packages we need to build
 //   - baseDirPath: The base directory to use to find the packages we need to build
-func downloadDeltaNodes(dependencyGraph *pkggraph.PkgGraph, cloner *rpmrepocloner.RpmRepoCloner) (err error) {
+func downloadDeltaNodes(dependencyGraph *pkggraph.PkgGraph, cloner *rpmrepocloner.RpmRepoCloner, toolchainPackageSet map[string]bool) (err error) {
 	const (
 		useImplicitForOptimization = true
 	)
@@ -211,7 +215,7 @@ func downloadDeltaNodes(dependencyGraph *pkggraph.PkgGraph, cloner *rpmrepoclone
 		return
 	}
 
-	isGraphOptimized, deltaPkgGraphCopy, _, err := schedulerutils.PrepareGraphForBuild(deltaPkgGraphCopy, packageVersToBuild, useImplicitForOptimization)
+	isGraphOptimized, deltaPkgGraphCopy, _, err := schedulerutils.PrepareGraphForBuild(deltaPkgGraphCopy, packageVersToBuild, useImplicitForOptimization, toolchainPackageSet)
 	if err != nil {
 		err = fmt.Errorf("failed to initialize graph for delta package downloading:\n%w", err)
 		return
