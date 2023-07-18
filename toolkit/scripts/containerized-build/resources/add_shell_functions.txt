@@ -33,7 +33,6 @@ build_pkg() {
     if [ -z "$PKG" ]; then echo "Please provide pkg name"; return; fi
     rpm -ihv /mnt/INTERMEDIATE_SRPMS/$PKG*.src.rpm
     $(install_dependencies $PKG)
-#    dnf builddep -y $SPECS_DIR/$PKG/$PKG.spec
     rpmbuild -ba $SPECS_DIR/$PKG/$PKG.spec
 }
 
@@ -57,23 +56,27 @@ refresh_local_repo() {
     echo "-------- refreshing the local repo ---------"
     pushd $RPMS_DIR
     createrepo .
+    popd
 }
 
 # Satisfy dependencies from local RPMs
 enable_local_repo() {
     IS_REPO_ENABLED=true
+    tdnf install -y createrepo
     mv /etc/yum.repos.d/local_repo.not_a_repo /etc/yum.repos.d/local_repo.repo
     pushd /repo
     createrepo .
+    popd
     mkdir -p $RPMS_DIR
     pushd $RPMS_DIR
     createrepo .
+    popd
     echo "-------- the local repo is enabled ---------"
     #echo "You can install the following packages from it:"
     #tdnf repoquery --repoid=local_build_repo 2>/dev/null
 }
 
-# Update dependency graph
+# Update dependency graph using build tools
 update_specs_metadata() {
     # update specs.json
     /mariner_docker_stuff/specreader --dir=$SPECS_DIR  --srpm-dir="/mnt/INTERMEDIATE_SRPMS/" --output=/mariner_docker_stuff/specs.json --dist-tag="containerized" --rpm-dir="/mnt/RPMS/"
@@ -81,30 +84,32 @@ update_specs_metadata() {
     /mariner_docker_stuff/grapher --input=/mariner_docker_stuff/specs.json --output=/mariner_docker_stuff/graph.dot
 }
 
+# Install package dependencies using depsearch tool
 install_dependencies_depsearch() {
     local PKG=("$@")
     if [ -z "$PKG" ]; then echo "Please provide pkg name"; return; fi
     echo "-------- installing dependencies ---------"
     dep_list=$(get_pkg_dependency $PKG)
-    echo "**** DEP list is $dep_list"
     for dependency in $dep_list
     do
         tdnf install -y $dependency 2>&1
     done
 }
 
-# Get dependencies of a package
+# Get dependencies of a package using depsearch tool
 get_pkg_dependency() {
     local PKG=("$@")
     if [ -z "$PKG" ]; then echo "Please provide pkg name"; return; fi
     /mariner_docker_stuff/depsearch --input=/mariner_docker_stuff/graph.dot  --packages=$PKG --reverse
 }
 
+# Install package dependencies listed as BuildRequires in spec
 install_dependencies() {
     local PKG=("$@")
     if [ -z "$PKG" ]; then echo "Please provide pkg name"; return; fi
+    echo "-------- installing build dependencies ---------"
     spec_file=$SPECS_DIR/$PKG/$PKG.spec
-    dep_list=$(grep "BuildRequires" $spec_file | cut -d ':' -f 2)
+    dep_list=$(grep "BuildRequires:" $spec_file | cut -d ':' -f 2)
     for dependency in $dep_list
     do
         tdnf install -y $dependency 2>&1

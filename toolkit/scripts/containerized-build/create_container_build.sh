@@ -27,22 +27,19 @@ function print_error() {
 
 function help {
 echo "
-Usage: sudo make containerized-rpmbuild [REPO_PATH=/path/to/CBL-Mariner] [MODE=test|build] [VERSION=1.0|2.0] [MOUNTS= /src/path:/dst/path] [ENABLE_REPO=y]
+Usage:
+sudo make containerized-rpmbuild [REPO_PATH=/path/to/CBL-Mariner] [MODE=test|build] [VERSION=1.0|2.0] [MOUNTS= /src/path:/dst/path] [ENABLE_REPO=y]
 
-Starts a docker container with the specified version of mariner. Mounts REPO_PATH/out/RPMS
-to /mnt/RPMS.
-
-In the 'build' mode, mounts REPO_PATH/build/INTERMEDIATE_SRPMS at /mnt/INTERMEDIATE_SRPMS;
-REPO_PATH/SPECS at ${topdir}/SPECS; REPO_PATH/build/container-build at ${topdir}/BUILD and
-REPO_PATH/build/container-buildroot at ${topdir}/BUILDROOT
+Starts a docker container with the specified version of mariner.
 
 Optional arguments:
     REPO_PATH:      path to the CBL-Mariner repo root directory. default: "current directory"
-    MODE            build or test. In 'test' mode it will use a pre-built mariner chroot image. 
-                                In 'build' mode it will use the latest published container.default:"build"
-    VERISION        1.0 or 2.0........................................................default: "2.0"
+    MODE            build or test. default:"build"
+                        In 'test' mode it will use a pre-built mariner chroot image.
+                        In 'build' mode it will use the latest published container.
+    VERISION        1.0 or 2.0. default: "2.0"
     MOUNTS          mount a directory into the container. Should be of the form '/src/dir:/dest/dir'. 
-                                Can be specified multiple times..........default: ""
+                    Can be specified multiple times.
     ENABLE_REPO:    Set to 'y' to use local RPMs to satisfy package dependencies. default: "n"
 
 To see help, run 'sudo make containerized-rpmbuild-help'
@@ -94,6 +91,12 @@ cd "${script_dir}"
 build_dir="${script_dir}/build_container"
 mkdir -p "${build_dir}"
 
+# get mariner GitHub branch for $repo_path
+pushd ${repo_path}
+repo_branch=$(git rev-parse --abbrev-ref HEAD)
+echo "Repo branch is $repo_branch"
+popd
+
 # ============ Populate SRPMS ============
 # Populate ${repo_path}/build/INTERMEDIATE_SRPMS with SRPMs, that can be used to build RPMs in the container
 cd "${repo_path}/toolkit"
@@ -116,11 +119,8 @@ echo "Setting up tools"
 cd "${repo_path}/toolkit"
 if [[ ( ! -f "out/tools/depsearch" ) || ( ! -f "out/tools/grapher" ) || ( ! -f "out/tools/specreader" ) ]]; then build_tools; fi
 
-#if [[ ! -f "out/tools/depsearch" ]]; then build_tools; fi
 cp ${repo_path}/toolkit/out/tools/depsearch ${build_dir}/depsearch
-#if [[ ! -f "out/tools/grapher" ]]; then build_tools; fi
 cp ${repo_path}/toolkit/out/tools/grapher ${build_dir}/grapher
-#if [[ ! -f "out/tools/specreader" ]]; then build_tools; fi
 cp ${repo_path}/toolkit/out/tools/specreader ${build_dir}/specreader
 if [[ ! -f "../build/pkg_artifacts/graph.dot" ]]; then build_graph; fi
 cp ${repo_path}/build/pkg_artifacts/graph.dot ${build_dir}/graph.dot
@@ -160,33 +160,33 @@ if [[  "${mode}" == "build" ]]; then # Configure base image
     if [[ ! -f "${script_dir}/build_container/hash" ]] || [[ "$(cat "${script_dir}/build_container/hash")" != "${chroot_hash}" ]]; then
         echo "Chroot file has changed, updating..."
         echo "${chroot_hash}" > "${script_dir}/build_container/hash"
-        sudo docker import "${chroot_file}" "mcr.microsoft.com/cbl-mariner/tmp_pkgbuild_${version}"
+        sudo docker import "${chroot_file}" "mcr.microsoft.com/cbl-mariner/containerized-rpmbuild:${version}"
     else
         echo "Chroot is up-to-date"
     fi
+    container_img="mcr.microsoft.com/cbl-mariner/containerized-rpmbuild:${version}"
 else
     echo "Checking for latest ${version} mariner image..."
-    sudo docker pull -q "mcr.microsoft.com/cbl-mariner/base/core:${version}"
+    container_img="mcr.microsoft.com/cbl-mariner/base/core:${version}"
 fi
 
 # ================== Launch Container ==================
 echo "Checking if build env is up-to-date..."
-docker_image_tag="mariner-containerizedbuild"
-tag=$(date +'%y%m%d.%H%M')
+docker_image_tag="mcr.microsoft.com/cbl-mariner/${USER}-containerized-rpmbuild:${version}"
 sudo docker build -q \
                 -f "${dockerfile}" \
-                -t "${docker_image_tag}:${tag}" \
+                -t "${docker_image_tag}" \
+                --build-arg container_img="$container_img" \
                 --build-arg version="$version" \
                 --build-arg mode="$mode" \
                 --build-arg enable_local_repo="$enable_local_repo" \
                 --build-arg topdir="$topdir" \
                 --build-arg mariner_repo="$repo_path" \
+                --build-arg mariner_branch="$repo_branch" \
                 .
-
-sudo docker tag ${docker_image_tag}:${tag} ${docker_image_tag}:latest
 
 echo "docker_image_tag is ${docker_image_tag}..."
 sudo bash -c "docker run --rm \
                     ${mount_arg} \
-                    -it ${docker_image_tag}:latest /bin/bash; \
+                    -it ${docker_image_tag} /bin/bash; \
                     [[ -d ${repo_path}/out/RPMS/repodata ]] && { rm -r ${repo_path}/out/RPMS/repodata; echo 'Clearing repodata' ; }"
