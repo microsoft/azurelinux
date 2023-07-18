@@ -9,14 +9,13 @@ Vendor:         Microsoft
 Distribution:   Mariner
 
 %description
-Test spec. Make sure the default package is not built and 'Epoch' is not set!
+Test spec. Make sure the default package is not built!
 
 %package -n subpackage_name
 Summary:        Actually built subpackage
 
 %description -n subpackage_name
 Test subpackage, which should be generate when this spec is built.
-The 'Epoch' tag must NOT be set!
 
 %prep
 
