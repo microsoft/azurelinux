@@ -24,6 +24,7 @@ pkggen_rpms     = $(call shell_real_build_only, find $(RPMS_DIR)/*  2>/dev/null 
 
 # Pkggen workspace
 cache_working_dir      = $(PKGBUILD_DIR)/tdnf_cache_worker
+grapher_working_dir    = $(PKGBUILD_DIR)/grapher_cache_worker
 parse_working_dir      = $(BUILD_DIR)/spec_parsing
 rpmbuilding_logs_dir   = $(LOGS_DIR)/pkggen/rpmbuilding
 rpm_cache_files        = $(call shell_real_build_only, find $(CACHED_RPMS_DIR)/)
@@ -41,13 +42,16 @@ logging_command = --log-file=$(LOGS_DIR)/pkggen/workplan/$(notdir $@).log --log-
 $(call create_folder,$(LOGS_DIR)/pkggen/workplan)
 $(call create_folder,$(rpmbuilding_logs_dir))
 
-.PHONY: clean-workplan clean-cache clean-cache-worker clean-spec-parse clean-ccache graph-cache analyze-built-graph workplan
+.PHONY: clean-workplan clean-cache clean-cache-worker clean-grapher-cache-worker clean-spec-parse clean-ccache graph-cache analyze-built-graph workplan
 graph-cache: $(cached_file)
 workplan: $(graph_file)
 clean: clean-workplan clean-cache clean-spec-parse
 clean-workplan: clean-cache clean-spec-parse
 	rm -rf $(PKGBUILD_DIR)
 	rm -rf $(LOGS_DIR)/pkggen/workplan
+clean-grapher-cache-worker:
+	$(SCRIPTS_DIR)/safeunmount.sh "$(grapher_working_dir)" && \
+	rm -rf $(grapher_working_dir)
 clean-cache-worker:
 	$(SCRIPTS_DIR)/safeunmount.sh "$(cache_working_dir)" && \
 	rm -rf $(cache_working_dir)
