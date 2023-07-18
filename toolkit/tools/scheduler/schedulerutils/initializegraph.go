@@ -9,7 +9,6 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 )
 
 const (
@@ -17,37 +16,20 @@ const (
 	buildGoalNodeName = "PackagesToBuild"
 )
 
-// InitializeGraphFromFile initializes and prepares a graph dot file for building.
-//   - It will use an existing graph if provided (graph should not have been previously initialized, input file must be "")
-//   - It will load from disk if a path is provided (existing graph must be nil)
-//   - It will subgraph the graph to only contain the desired packages if possible.
-//   - If canUseCachedImplicit is true, it will use cached nodes to resolve implicit dependencies instead of waiting for
-//     them to be built in the graph (This can allow the graph to be optimized immediately instead of waiting for the
-//     implicit nodes to be resolved by an unknown package later in the build).
-func InitializeGraphFromFile(inputFile string, packagesToBuild []*pkgjson.PackageVer, canUseCachedImplicit bool) (isOptimized bool, pkgGraph *pkggraph.PkgGraph, goalNode *pkggraph.PkgNode, err error) {
+// InitializeGraph initializes and prepares a graph dot file for building.
+// - It will load and return the graph.
+// - It will subgraph the graph to only contain the desired packages if possible.
+func InitializeGraph(inputFile string, packagesToBuild []*pkgjson.PackageVer, deltaBuild bool) (isOptimized bool, pkgGraph *pkggraph.PkgGraph, goalNode *pkggraph.PkgNode, err error) {
 	const (
 		strictGoalNode = true
 	)
-	timestamp.StartEvent("graph initialization", nil)
-	defer timestamp.StopEvent(nil)
+	// Delta builds can use cached implicit nodes
+	canUseCachedImplicit := deltaBuild
 
 	pkgGraph, err = pkggraph.ReadDOTGraphFile(inputFile)
 	if err != nil {
 		return
 	}
-
-	return PrepareGraphForBuild(pkgGraph, packagesToBuild, canUseCachedImplicit)
-}
-
-// PrepareGraphForBuild takes a graph and prepares it for package building.
-//   - It will subgraph the graph to only contain the desired packages if possible.
-//   - If canUseCachedImplicit is true, it will use cached nodes to resolve implicit dependencies instead of waiting for
-//     them to be built in the graph (This can allow the graph to be optimized immediately instead of waiting for the
-//     implicit nodes to be resolved by an unknown package later in the build).
-func PrepareGraphForBuild(pkgGraph *pkggraph.PkgGraph, packagesToBuild []*pkgjson.PackageVer, canUseCachedImplicit bool) (isOptimized bool, preparedGraph *pkggraph.PkgGraph, goalNode *pkggraph.PkgNode, err error) {
-	const (
-		strictGoalNode = true
-	)
 
 	_, err = pkgGraph.AddGoalNode(buildGoalNodeName, packagesToBuild, strictGoalNode)
 	if err != nil {
@@ -58,7 +40,7 @@ func PrepareGraphForBuild(pkgGraph *pkggraph.PkgGraph, packagesToBuild []*pkgjso
 	if optimizeErr == nil {
 		logger.Log.Infof("Successfully created solvable subgraph")
 		isOptimized = true
-		preparedGraph = optimizedGraph
+		pkgGraph = optimizedGraph
 	} else {
 		logger.Log.Warn("Could not create solvable subgraph, forcing full package build")
 		goalNode = pkgGraph.FindGoalNode(allGoalNodeName)
@@ -66,7 +48,6 @@ func PrepareGraphForBuild(pkgGraph *pkggraph.PkgGraph, packagesToBuild []*pkgjso
 			err = fmt.Errorf("could not find goal node %s", allGoalNodeName)
 			return
 		}
-		preparedGraph = pkgGraph
 	}
 
 	return

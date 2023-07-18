@@ -38,7 +38,6 @@ type BuildRequest struct {
 	PkgGraph       *pkggraph.PkgGraph
 	AncillaryNodes []*pkggraph.PkgNode
 	CanUseCache    bool
-	IsDelta        bool
 }
 
 // BuildResult represents the results of a build agent trying to build a given node.
@@ -50,7 +49,6 @@ type BuildResult struct {
 	Node           *pkggraph.PkgNode
 	Skipped        bool
 	UsedCache      bool
-	WasDelta       bool
 }
 
 // selectNextBuildRequest selects a job based on priority:
@@ -101,7 +99,6 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 		res := &BuildResult{
 			Node:           req.Node,
 			AncillaryNodes: req.AncillaryNodes,
-			WasDelta:       req.IsDelta,
 		}
 
 		switch req.Node.Type {
