@@ -1334,7 +1334,7 @@ func (g *PkgGraph) fixCycle(cycle []*PkgNode, resolveCyclesFromUpstream, ignoreV
 		return
 	}
 
-	return g.fixPrebuiltSRPMsCycle(trimmedCycle, resolveCyclesFromUpstream, ignoreVersionToResolveSelfDep, cloner)
+	return g.fixCyclesWithExistingRPMS(trimmedCycle, resolveCyclesFromUpstream, ignoreVersionToResolveSelfDep, cloner)
 }
 
 // fixIntraSpecCycle attempts to fix a cycle if none of the cycle nodes are build nodes.
@@ -1418,18 +1418,18 @@ func (g *PkgGraph) replaceCurrentNodeWithPrebuiltNode(currentNode, preBuiltNode,
 	}
 }
 
-// fixPrebuiltSRPMsCycle attempts to fix a cycle if at least one node is a pre-built SRPM.
-// If a cycle can be fixed, edges representing the build dependencies of the pre-built SRPM will be removed.
-func (g *PkgGraph) fixPrebuiltSRPMsCycle(trimmedCycle []*PkgNode, resolveCyclesFromUpstream, ignoreVersionToResolveSelfDep bool, cloner *rpmrepocloner.RpmRepoCloner) (err error) {
+// fixCyclesWithExistingRPMS attempts to fix a cycle if at least one node is a pre-built. It also searches upstream RPMS when the flag RESOLVE_CYCLES_FROM_UPSTREAM is enabled
+// If a cycle can be fixed, edges representing the build dependencies of the pre-built/available-upstream node will be removed.
+func (g *PkgGraph) fixCyclesWithExistingRPMS(trimmedCycle []*PkgNode, resolveCyclesFromUpstream, ignoreVersionToResolveSelfDep bool, cloner *rpmrepocloner.RpmRepoCloner) (err error) {
 	logger.Log.Debug("Checking if cycle contains pre-built SRPMs.")
 
 	var cycleStringBuilder strings.Builder
 
-        fmt.Fprintf(&cycleStringBuilder, "{%s}", trimmedCycle[0].FriendlyName())
-        for _, node := range trimmedCycle[1:] {
-                fmt.Fprintf(&cycleStringBuilder, " --> {%s}", node.FriendlyName())
-        }
-        logger.Log.Infof("Trying to fix circular dependency found:\t%s", cycleStringBuilder.String())
+	fmt.Fprintf(&cycleStringBuilder, "{%s}", trimmedCycle[0].FriendlyName())
+	for _, node := range trimmedCycle[1:] {
+		fmt.Fprintf(&cycleStringBuilder, " --> {%s}", node.FriendlyName())
+	}
+	logger.Log.Infof("Trying to fix circular dependency found:\t%s", cycleStringBuilder.String())
 
 	currentNode := trimmedCycle[len(trimmedCycle)-1]
 	for _, previousNode := range trimmedCycle {
