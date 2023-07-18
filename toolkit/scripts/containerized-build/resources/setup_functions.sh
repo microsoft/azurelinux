@@ -1,3 +1,5 @@
+#! /bin/bash
+
 TOPDIR=<TOPDIR>
 SPECS_DIR=$TOPDIR/SPECS
 SOURCES_DIR=$TOPDIR/SOURCES
@@ -38,7 +40,15 @@ build_pkg() {
 
 # Show help on useful commands
 show_help() {
-    cat /mariner_docker_stuff/welcome.txt
+    cat /mariner_setup_dir/welcome.txt
+    cat /mariner_setup_dir/mounts.txt
+    echo -e "* \n* Local repo information:"
+    if [[ "${IS_REPO_ENABLED}" == "true" ]]; then
+        echo -e "*\tLocal repo is enabled"
+    else
+        echo -e "*\tLocal repo is not enabled"
+    fi
+    echo "******************************************************************************************"
 }
 
 # Refresh repo cache with newly built RPM
@@ -61,6 +71,7 @@ refresh_local_repo() {
 
 # Satisfy dependencies from local RPMs
 enable_local_repo() {
+    echo "-------- enabling local repo ---------"
     IS_REPO_ENABLED=true
     tdnf install -y createrepo
     mv /etc/yum.repos.d/local_repo.not_a_repo /etc/yum.repos.d/local_repo.repo
@@ -79,9 +90,9 @@ enable_local_repo() {
 # Update dependency graph using build tools
 update_specs_metadata() {
     # update specs.json
-    /mariner_docker_stuff/specreader --dir=$SPECS_DIR  --srpm-dir="/mnt/INTERMEDIATE_SRPMS/" --output=/mariner_docker_stuff/specs.json --dist-tag="containerized" --rpm-dir="/mnt/RPMS/"
+    /mariner_setup_dir/specreader --dir=$SPECS_DIR  --srpm-dir="/mnt/INTERMEDIATE_SRPMS/" --output=/mariner_setup_dir/specs.json --dist-tag="containerized" --rpm-dir="/mnt/RPMS/"
     # update graph.dot
-    /mariner_docker_stuff/grapher --input=/mariner_docker_stuff/specs.json --output=/mariner_docker_stuff/graph.dot
+    /mariner_setup_dir/grapher --input=/mariner_setup_dir/specs.json --output=/mariner_setup_dir/graph.dot
 }
 
 # Install package dependencies using depsearch tool
@@ -100,7 +111,7 @@ install_dependencies_depsearch() {
 get_pkg_dependency() {
     local PKG=("$@")
     if [ -z "$PKG" ]; then echo "Please provide pkg name"; return; fi
-    /mariner_docker_stuff/depsearch --input=/mariner_docker_stuff/graph.dot  --packages=$PKG --reverse
+    /mariner_setup_dir/depsearch --input=/mariner_setup_dir/graph.dot  --packages=$PKG --reverse
 }
 
 # Install package dependencies listed as BuildRequires in spec

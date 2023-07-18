@@ -8,8 +8,10 @@
 *     Build an SRPM:                                run 'rpmbuild -ba /usr/src/mariner/SPECS/my-pkg.spec'
 *     For more build options, see https://linux.die.net/man/8/rpmbuild
 *     Auto install dependencies:                    there are 3 ways to auto install a package's build dependencies
-                                                        1) run 'install_dependencies pkg' which reads spec file and installs using tdnf
-                                                        2) run 'install_dependencies_depsearch pkg' which uses mariner tool depsearch
+                                                        1) run 'install_dependencies pkg' to install
+                                                            dependencies listed as 'BuildRequires' from spec
+                                                        2) run 'install_dependencies_depsearch pkg' to install
+                                                            dependencies using mariner depsearch tool
                                                         3) use dnf repoquery:
                                                             run 'tdnf install -y dnf dnf-plugins-core'
                                                             followed by 'dnf builddep -y my-pkg.spec'
@@ -21,7 +23,7 @@
 
 *     Changes to /usr/src/mariner/SPECS will be available on host machine at /path/to/CBL-Mariner/SPECS
 *     Changes to /usr/src/mariner/SOURCES will not be available on host machine
-*     RPMs built in the container will be outputted at /usr/src/mariner/RPMS, and will not be available on host machine
+*     RPMs built in the container are stored at /usr/src/mariner/RPMS, and will not be available on host machine
 *     RPMs from host's out/RPMs will be available in /repo
 *     Individual packages may be installed directly via 'tdnf install /repo/x86_64/pkg.rpm'
 *
