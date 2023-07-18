@@ -48,22 +48,14 @@ func RecordBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, b
 	}
 
 	prebuiltSRPMs := make(map[string]*pkggraph.PkgNode)
-	prebuiltDeltaSRPMS := make(map[string]*pkggraph.PkgNode)
 	builtSRPMs := make(map[string]*pkggraph.PkgNode)
 	unbuiltSRPMs := make(map[string]*pkggraph.PkgNode)
 	unresolvedDependencies := make(map[string]bool)
 
 	buildNodes := pkgGraph.AllBuildNodes()
 	for _, node := range buildNodes {
-
-		//  node can be a delta if it was build or cached. If it was cached we used the cached rpm. If it is not cached
-		// that means it was built and we discard the delta rpm.
 		if buildState.IsNodeCached(node) {
-			if buildState.IsNodeDelta(node) {
-				prebuiltDeltaSRPMS[node.SrpmPath] = node
-			} else {
-				prebuiltSRPMs[node.SrpmPath] = node
-			}
+			prebuiltSRPMs[node.SrpmPath] = node
 			continue
 		} else if buildState.IsNodeAvailable(node) {
 			builtSRPMs[node.SrpmPath] = node
@@ -90,10 +82,6 @@ func RecordBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, b
 
 	for srpm := range prebuiltSRPMs {
 		csvBlob = append(csvBlob, []string{filepath.Base(prebuiltSRPMs[srpm].SrpmPath), "PreBuilt"})
-	}
-
-	for srpm := range prebuiltDeltaSRPMS {
-		csvBlob = append(csvBlob, []string{filepath.Base(prebuiltDeltaSRPMS[srpm].SrpmPath), "PreBuiltDelta"})
 	}
 
 	for srpm := range failedSRPMs {
@@ -163,7 +151,6 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	}
 
 	prebuiltSRPMs := make(map[string]bool)
-	prebuiltDeltaSRPMS := make(map[string]bool)
 	builtSRPMs := make(map[string]bool)
 	unbuiltSRPMs := make(map[string]bool)
 	unresolvedDependencies := make(map[string]bool)
@@ -178,11 +165,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	buildNodes := pkgGraph.AllBuildNodes()
 	for _, node := range buildNodes {
 		if buildState.IsNodeCached(node) {
-			if buildState.IsNodeDelta(node) {
-				prebuiltDeltaSRPMS[node.SrpmPath] = true
-			} else {
-				prebuiltSRPMs[node.SrpmPath] = true
-			}
+			prebuiltSRPMs[node.SrpmPath] = true
 			continue
 		} else if buildState.IsNodeAvailable(node) {
 			builtSRPMs[node.SrpmPath] = true
@@ -207,7 +190,6 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 
 	logger.Log.Infof("Number of built SRPMs:             %d", len(builtSRPMs))
 	logger.Log.Infof("Number of prebuilt SRPMs:          %d", len(prebuiltSRPMs))
-	logger.Log.Infof("Number of prebuilt delta SRPMs:    %d", len(prebuiltDeltaSRPMS))
 	logger.Log.Infof("Number of failed SRPMs:            %d", len(failures))
 	logger.Log.Infof("Number of blocked SRPMs:           %d", len(unbuiltSRPMs))
 	logger.Log.Infof("Number of unresolved dependencies: %d", len(unresolvedDependencies))
@@ -231,13 +213,6 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	if len(prebuiltSRPMs) != 0 {
 		logger.Log.Info("Prebuilt SRPMs:")
 		for srpm := range prebuiltSRPMs {
-			logger.Log.Infof("--> %s", filepath.Base(srpm))
-		}
-	}
-
-	if len(prebuiltDeltaSRPMS) != 0 {
-		logger.Log.Info("Skipped SRPMs (i.e., delta mode is on, packages are already available in a repo):")
-		for srpm := range prebuiltDeltaSRPMS {
 			logger.Log.Infof("--> %s", filepath.Base(srpm))
 		}
 	}

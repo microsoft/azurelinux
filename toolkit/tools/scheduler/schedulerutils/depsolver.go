@@ -72,9 +72,6 @@ func LeafNodes(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, goalNode *
 			return
 		}
 
-		// Implicit nodes will only be considered valid leaf nodes as a last resort (aka when useCachedImplicit is set).
-		// Ideally we will wait for the actual provider of the implicit node to be built and convert the implicit node to
-		// a normal node via InjectMissingImplicitProvides().
 		if !useCachedImplicit && pkgNode.Implicit && pkgNode.State == pkggraph.StateCached {
 			logger.Log.Debugf("Skipping cached implicit provide leaf node: %v", pkgNode)
 			return

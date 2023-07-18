@@ -16,7 +16,7 @@ import (
 // ConvertNodesToRequests converts a slice of nodes into a slice of build requests.
 // - It will determine if the cache can be used for prebuilt nodes.
 // - It will group similar build nodes together into AncillaryNodes.
-func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, nodesToBuild []*pkggraph.PkgNode, packagesToRebuild []*pkgjson.PackageVer, buildState *GraphBuildState, isCacheAllowed bool) (requests []*BuildRequest) {
+func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, nodesToBuild []*pkggraph.PkgNode, packagesToRebuild []*pkgjson.PackageVer, buildState *GraphBuildState, isCacheAllowed bool, deltaBuild bool) (requests []*BuildRequest) {
 	timestamp.StartEvent("generate requests", nil)
 	defer timestamp.StopEvent(nil)
 
@@ -37,10 +37,9 @@ func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMute
 			Node:           node,
 			PkgGraph:       pkgGraph,
 			AncillaryNodes: []*pkggraph.PkgNode{node},
-			IsDelta:        node.State == pkggraph.StateDelta,
 		}
 
-		req.CanUseCache = isCacheAllowed && canUseCacheForNode(pkgGraph, req.Node, packagesToRebuild, buildState)
+		req.CanUseCache = isCacheAllowed && canUseCacheForNode(pkgGraph, req.Node, packagesToRebuild, buildState, deltaBuild)
 
 		requests = append(requests, req)
 	}
@@ -48,24 +47,13 @@ func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMute
 	for _, nodes := range buildNodes {
 		const defaultNode = 0
 
-		// Check if any of the nodes in buildNodes is a delta node and mark it. We will use this to determine if the
-		// build is a delta build that might have pre-built .rpm files available.
-		hasADeltaNode := false
-		for _, node := range nodes {
-			if node.State == pkggraph.StateDelta {
-				hasADeltaNode = true
-				break
-			}
-		}
-
 		req := &BuildRequest{
 			Node:           nodes[defaultNode],
 			PkgGraph:       pkgGraph,
 			AncillaryNodes: nodes,
-			IsDelta:        hasADeltaNode,
 		}
 
-		req.CanUseCache = isCacheAllowed && canUseCacheForNode(pkgGraph, req.Node, packagesToRebuild, buildState)
+		req.CanUseCache = isCacheAllowed && canUseCacheForNode(pkgGraph, req.Node, packagesToRebuild, buildState, deltaBuild)
 
 		requests = append(requests, req)
 	}
@@ -77,7 +65,7 @@ func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMute
 // - It will check if the node corresponds to an entry in packagesToRebuild.
 // - It will check if all dependencies of the node were also cached. Exceptions:
 //   - "TypePreBuilt" nodes must use the cache and have no dependencies to check.
-func canUseCacheForNode(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, packagesToRebuild []*pkgjson.PackageVer, buildState *GraphBuildState) (canUseCache bool) {
+func canUseCacheForNode(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, packagesToRebuild []*pkgjson.PackageVer, buildState *GraphBuildState, deltaBuild bool) (canUseCache bool) {
 	// The "TypePreBuilt" nodes always use the cache.
 	if node.Type == pkggraph.TypePreBuilt {
 		canUseCache = true
@@ -89,6 +77,13 @@ func canUseCacheForNode(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, pac
 	canUseCache = !sliceutils.Contains(packagesToRebuild, packageVer, sliceutils.PackageVerMatch)
 	if !canUseCache {
 		logger.Log.Debugf("Marking (%s) for rebuild per user request", packageVer)
+		return
+	}
+
+	// If delta build enabled, then we can use the cache, unless a dependency of this package is rebuilding
+	if deltaBuild {
+		logger.Log.Warnf("Delta build: Using cached version of %v regardles of rebuilding dependencies", node.FriendlyName())
+		canUseCache = true
 		return
 	}
 
