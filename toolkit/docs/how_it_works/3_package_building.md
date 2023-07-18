@@ -69,7 +69,7 @@ A critical component of package building is ensuring that the packages are built
 
 ### Types of Nodes
 The graph contains several types of nodes, with various states. As the graph is processed by each tool nodes are updated, pruned, or added as needed.
-#### TypeLocalBuild
+#### TypeBuild
 > This represents a local package which may be passed to the build worker to generate an RPM from.
 > It can be either:
 >
@@ -79,7 +79,7 @@ The graph contains several types of nodes, with various states. As the graph is 
 >
 > `StateUpToDate`: Package is already available locally
 
-#### TypeLocalRun
+#### TypeRun
 > This node represents a package which is may be installed or used as a dependency.
 > Run nodes are always:
 >
@@ -91,7 +91,7 @@ The graph contains several types of nodes, with various states. As the graph is 
 >
 > `StateMeta`: Organizational node used to impose ordering on other nodes
 
-#### TypeRemoteRun
+#### TypeRemote
 > This node represents a package which is unknown to the local build system, but has been requested as a dependency. It will need to be resolved from a remote source. `TypeRemote` nodes are considered equivalent to `TypeRun` nodes in most cases.
 > Remote nodes may be either:
 >

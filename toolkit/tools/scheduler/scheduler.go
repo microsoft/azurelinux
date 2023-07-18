@@ -317,11 +317,11 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild []*pkgjson
 				fallthrough
 			case pkggraph.TypePureMeta:
 				fallthrough
-			case pkggraph.TypeLocalRun:
+			case pkggraph.TypeRun:
 				fallthrough
-			case pkggraph.TypeRemoteRun:
+			case pkggraph.TypeRemote:
 				fallthrough
-			case pkggraph.TypeLocalBuild:
+			case pkggraph.TypeBuild:
 				fallthrough
 			default:
 				channels.Requests <- req
@@ -374,7 +374,7 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild []*pkgjson
 					}
 				}
 
-				if res.Node.Type == pkggraph.TypeLocalBuild && res.WasDelta {
+				if res.Node.Type == pkggraph.TypeBuild && res.WasDelta {
 					logger.Log.Tracef("This is a delta result, update the graph with the new delta files for '%v'.", res.Node)
 					// We will need to update the graph with paths to any delta files that were actually rebuilt.
 					err = setAssociatedDeltaPaths(res, pkgGraph, graphMutex)
@@ -419,7 +419,7 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild []*pkgjson
 			}
 		}
 
-		if res.Node.Type == pkggraph.TypeLocalBuild {
+		if res.Node.Type == pkggraph.TypeBuild {
 			logger.Log.Infof("%d currently active build(s): %v.", activeSRPMsCount, activeSRPMs)
 		}
 

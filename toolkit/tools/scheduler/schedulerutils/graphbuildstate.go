@@ -82,7 +82,7 @@ func (g *GraphBuildState) ActiveBuilds() map[int64]*BuildRequest {
 // ActiveSRPMs returns a list of all SRPMs, which are currently being built.
 func (g *GraphBuildState) ActiveSRPMs() (builtSRPMs []string) {
 	for _, buildRequest := range g.activeBuilds {
-		if buildRequest.Node.Type == pkggraph.TypeLocalBuild {
+		if buildRequest.Node.Type == pkggraph.TypeBuild {
 			builtSRPMs = append(builtSRPMs, buildRequest.Node.SRPMFileName())
 		}
 	}

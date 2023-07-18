@@ -56,12 +56,11 @@ func InjectMissingImplicitProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph
 func replaceNodesWithProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph, provides *pkgjson.PackageVer, nodes []*pkggraph.PkgNode, rpmFileProviding string) (err error) {
 	var parentNode *pkggraph.PkgNode
 
-	// Find a local run node that is backed by the same rpm as the one providing the implicit provide.
+	// Find a run node that is backed by the same rpm as the one providing the implicit provide.
 	// Make this node the parent node for the new implicit provide node.
 	// - By making a run node the parent node, it will inherit the identical runtime dependencies of the already setup node.
 	for _, node := range pkgGraph.AllRunNodes() {
-		// We need to filter out any non-local run nodes since cached remote nodes are not acceptable parent nodes for collapsed nodes.
-		if node.Type == pkggraph.TypeLocalRun && rpmFileProviding == node.RpmPath {
+		if rpmFileProviding == node.RpmPath {
 			logger.Log.Debugf("Linked implicit provide (%s) to run node (%s)", provides, node.FriendlyName())
 			parentNode = node
 			break
