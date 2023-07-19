@@ -980,6 +980,54 @@
                 "PR": [
                     "https://github.com/microsoft/CBL-Mariner/pull/5789"
                 ]
+            },
+            "CONFIG_SENSORS_MLXREG_FAN": {
+                "value": [
+                    "m"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for Mellanox DPUs",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                ]
+            },
+            "CONFIG_GPIO_MLXBF": {
+                "value": [
+                    "m"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for Mellanox DPUs",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                ]
+            },
+            "CONFIG_EDAC_BLUEFIELD": {
+                "value": [
+                    "m"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for Mellanox DPUs",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                ]
+            },
+            "CONFIG_MLX_WDT": {
+                "value": [
+                    "m"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for Mellanox DPUs",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                ]
             }
         }
     }
