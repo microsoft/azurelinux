@@ -1,5 +1,5 @@
 parameters:
-  - name: coreRepoRoot
+  - name: buildRepoRoot
     type: string
     default: "$(Build.SourcesDirectory)"
 
@@ -13,7 +13,7 @@ steps:
   - bash: |
       set -e
 
-      raw_toolchain_file_path="${{ parameters.coreRepoRoot }}/build/toolchain/toolchain_from_container.tar.gz"
+      raw_toolchain_file_path="${{ parameters.buildRepoRoot }}/build/toolchain/toolchain_from_container.tar.gz"
 
       echo "-- Downloading cached raw toolchain."
 
