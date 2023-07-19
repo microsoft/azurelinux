@@ -42,7 +42,6 @@ const (
 	StateUnresolved NodeState = iota            // A dependency is not available locally and must be acquired from a remote repo
 	StateCached     NodeState = iota            // A dependency was not available locally, but is now available in the chache
 	StateBuildError NodeState = iota            // A package from a local SRPM which failed to build
-	StateDelta      NodeState = iota            // Same as build state, but an attempt has been made to pre-download the .rpm to the cache
 	StateMAX        NodeState = StateBuildError // Max allowable state
 )
 
@@ -51,14 +50,14 @@ type NodeType int
 
 // Valid values for NodeType type
 const (
-	TypeUnknown    NodeType = iota         // Unknown type
-	TypeLocalBuild NodeType = iota         // Package can be build if all dependency edges are satisfied
-	TypeLocalRun   NodeType = iota         // Package can be run if all dependency edges are satisfied. Will be associated with a partner build node
-	TypeGoal       NodeType = iota         // Meta node which depends on a user selected subset of packages to be built.
-	TypeRemoteRun  NodeType = iota         // A non-local node which may have a cache entry
-	TypePureMeta   NodeType = iota         // An arbitrary meta node with no other meaning
-	TypePreBuilt   NodeType = iota         // A node indicating a pre-built SRPM used in breaking cyclic build dependencies
-	TypeMAX        NodeType = TypePureMeta // Max allowable type
+	TypeUnknown  NodeType = iota         // Unknown type
+	TypeBuild    NodeType = iota         // Package can be build if all dependency edges are satisfied
+	TypeRun      NodeType = iota         // Package can be run if all dependency edges are satisfied. Will be associated with a partner build node
+	TypeGoal     NodeType = iota         // Meta node which depends on a user selected subset of packages to be built.
+	TypeRemote   NodeType = iota         // A non-local node which may have a cache entry
+	TypePureMeta NodeType = iota         // An arbitrary meta node with no other meaning
+	TypePreBuilt NodeType = iota         // A node indicating a pre-built SRPM used in breaking cyclic build dependencies
+	TypeMAX      NodeType = TypePureMeta // Max allowable type
 )
 
 // Dot encoding/decoding keys
@@ -121,8 +120,6 @@ func (n NodeState) String() string {
 		return "Unresolved"
 	case StateCached:
 		return "Cached"
-	case StateDelta:
-		return "Delta"
 	default:
 		logger.Log.Panic("Invalid NodeState encountered when serializing to string!")
 		return "error"
@@ -131,13 +128,13 @@ func (n NodeState) String() string {
 
 func (n NodeType) String() string {
 	switch n {
-	case TypeLocalBuild:
+	case TypeBuild:
 		return "Build"
-	case TypeLocalRun:
+	case TypeRun:
 		return "Run"
 	case TypeGoal:
 		return "Goal"
-	case TypeRemoteRun:
+	case TypeRemote:
 		return "Remote"
 	case TypePureMeta:
 		return "PureMeta"
@@ -170,8 +167,6 @@ func (n *PkgNode) DOTColor() string {
 		return "crimson"
 	case StateCached:
 		return "darkorchid"
-	case StateDelta:
-		return "gold4"
 	default:
 		logger.Log.Panic("Invalid NodeState encountered when serializing to color!")
 		return "error"
@@ -195,7 +190,7 @@ func (g *PkgGraph) initLookup() {
 	// (they always expect a run node to be present)
 	for _, n := range graph.NodesOf(g.Nodes()) {
 		pkgNode := n.(*PkgNode)
-		if pkgNode.Type == TypeLocalRun || pkgNode.Type == TypeRemoteRun {
+		if pkgNode.Type == TypeRun || pkgNode.Type == TypeRemote {
 			g.addToLookup(pkgNode, true)
 		}
 	}
@@ -203,7 +198,7 @@ func (g *PkgGraph) initLookup() {
 	// Now run again for any build nodes, or other nodes we want to track
 	for _, n := range graph.NodesOf(g.Nodes()) {
 		pkgNode := n.(*PkgNode)
-		if pkgNode.Type != TypeLocalRun && pkgNode.Type != TypeRemoteRun {
+		if pkgNode.Type != TypeRun && pkgNode.Type != TypeRemote {
 			g.addToLookup(pkgNode, true)
 		}
 	}
@@ -250,7 +245,7 @@ func (g *PkgGraph) validateNodeForLookup(pkgNode *PkgNode) (valid bool, err erro
 	)
 
 	// Only add run, remote, or build nodes to lookup
-	if pkgNode.Type != TypeLocalBuild && pkgNode.Type != TypeLocalRun && pkgNode.Type != TypeRemoteRun {
+	if pkgNode.Type != TypeBuild && pkgNode.Type != TypeRun && pkgNode.Type != TypeRemote {
 		err = fmt.Errorf("%s has invalid type for lookup", pkgNode)
 		return
 	}
@@ -262,12 +257,12 @@ func (g *PkgGraph) validateNodeForLookup(pkgNode *PkgNode) (valid bool, err erro
 	}
 	if existingLookup != nil {
 		switch pkgNode.Type {
-		case TypeLocalBuild:
+		case TypeBuild:
 			haveDuplicateNode = existingLookup.BuildNode != nil
-		case TypeRemoteRun:
+		case TypeRemote:
 			// For the purposes of lookup, a "Remote" node provides the same utility as a "Run" node
 			fallthrough
-		case TypeLocalRun:
+		case TypeRun:
 			haveDuplicateNode = existingLookup.RunNode != nil
 		}
 		if haveDuplicateNode {
@@ -284,7 +279,7 @@ func (g *PkgGraph) validateNodeForLookup(pkgNode *PkgNode) (valid bool, err erro
 	}
 
 	// Basic run nodes can only provide basic conditional versions
-	if pkgNode.Type != TypeRemoteRun {
+	if pkgNode.Type != TypeRemote {
 		// We only support a single conditional (ie ver >= 1), or (ver = 1)
 		if versionInterval.UpperBound.Compare(versioncompare.NewMax()) != 0 && versionInterval.UpperBound.Compare(versionInterval.LowerBound) != 0 {
 			err = fmt.Errorf("%s is a run node and can't have double conditionals", pkgNode)
@@ -307,7 +302,7 @@ func (g *PkgGraph) addToLookup(pkgNode *PkgNode, deferSort bool) (err error) {
 	)
 
 	// We only care about run/build nodes or remote dependencies
-	if pkgNode.Type != TypeLocalBuild && pkgNode.Type != TypeLocalRun && pkgNode.Type != TypeRemoteRun {
+	if pkgNode.Type != TypeBuild && pkgNode.Type != TypeRun && pkgNode.Type != TypeRemote {
 		logger.Log.Tracef("Skipping %+v, not valid for lookup", pkgNode)
 		return
 	}
@@ -327,7 +322,7 @@ func (g *PkgGraph) addToLookup(pkgNode *PkgNode, deferSort bool) (err error) {
 		return err
 	}
 	if existingLookup == nil {
-		if (!deferSort) && pkgNode.Type == TypeLocalBuild {
+		if (!deferSort) && pkgNode.Type == TypeBuild {
 			err = fmt.Errorf("can't add %s, no corresponding run node found and not defering sort", pkgNode)
 			return
 		}
@@ -336,17 +331,17 @@ func (g *PkgGraph) addToLookup(pkgNode *PkgNode, deferSort bool) (err error) {
 	}
 
 	switch pkgNode.Type {
-	case TypeLocalBuild:
+	case TypeBuild:
 		if existingLookup.BuildNode == nil {
 			existingLookup.BuildNode = pkgNode.This
 		} else {
 			err = duplicateError
 			return
 		}
-	case TypeRemoteRun:
+	case TypeRemote:
 		// For the purposes of lookup, a "Remote" node provides the same utility as a "Run" node
 		fallthrough
-	case TypeLocalRun:
+	case TypeRun:
 		if existingLookup.RunNode == nil {
 			existingLookup.RunNode = pkgNode.This
 		} else {
@@ -395,7 +390,7 @@ func (g *PkgGraph) NewNode() graph.Node {
 // - The collapsed node will inherit all attributes of the parent node minus the versionedPkg.
 func (g *PkgGraph) CreateCollapsedNode(versionedPkg *pkgjson.PackageVer, parentNode *PkgNode, nodesToCollapse []*PkgNode) (newNode *PkgNode, err error) {
 	// enforce parent is run node
-	if parentNode.Type != TypeLocalRun {
+	if parentNode.Type != TypeRun {
 		err = fmt.Errorf("cannot collapse nodes to a non run node (%s)", parentNode.FriendlyName())
 		return
 	}
@@ -662,11 +657,11 @@ func (n PkgNode) SetDOTID(id string) {
 // FriendlyName formats a summary of a node into a string.
 func (n *PkgNode) FriendlyName() string {
 	switch n.Type {
-	case TypeLocalBuild:
+	case TypeBuild:
 		return fmt.Sprintf("%s-%s-BUILD<%s>", n.VersionedPkg.Name, n.VersionedPkg.Version, n.State.String())
-	case TypeLocalRun:
+	case TypeRun:
 		return fmt.Sprintf("%s-%s-RUN<%s>", n.VersionedPkg.Name, n.VersionedPkg.Version, n.State.String())
-	case TypeRemoteRun:
+	case TypeRemote:
 		ver1 := fmt.Sprintf("%s%s", n.VersionedPkg.Condition, n.VersionedPkg.Version)
 		ver2 := ""
 		if len(n.VersionedPkg.SCondition) > 0 || len(n.VersionedPkg.SVersion) > 0 {
@@ -1221,30 +1216,22 @@ func (g *PkgGraph) MakeDAG() (err error) {
 	}
 }
 
-// Copy returns a copy of a PkgNode. The ID of the copy is NOT unique.
-func (n *PkgNode) Copy() (copy *PkgNode) {
-	copy = &PkgNode{
-		nodeID:       n.nodeID,
-		VersionedPkg: n.VersionedPkg,
-		State:        n.State,
-		Type:         n.Type,
-		SrpmPath:     n.SrpmPath,
-		RpmPath:      n.RpmPath,
-		SpecPath:     n.SpecPath,
-		SourceDir:    n.SourceDir,
-		Architecture: n.Architecture,
-		SourceRepo:   n.SourceRepo,
-		Implicit:     n.Implicit,
-	}
-	copy.This = copy
-	return
-}
-
 // CloneNode creates a clone of the input node with a new, unique ID.
 // The clone doesn't have any edges attached to it.
 func (g *PkgGraph) CloneNode(pkgNode *PkgNode) (newNode *PkgNode) {
-	newNode = pkgNode.Copy()
-	newNode.nodeID = g.NewNode().ID()
+	newNode = &PkgNode{
+		nodeID:       g.NewNode().ID(),
+		VersionedPkg: pkgNode.VersionedPkg,
+		State:        pkgNode.State,
+		Type:         pkgNode.Type,
+		SrpmPath:     pkgNode.SrpmPath,
+		RpmPath:      pkgNode.RpmPath,
+		SpecPath:     pkgNode.SpecPath,
+		SourceDir:    pkgNode.SourceDir,
+		Architecture: pkgNode.Architecture,
+		SourceRepo:   pkgNode.SourceRepo,
+		Implicit:     pkgNode.Implicit,
+	}
 	newNode.This = newNode
 
 	return
@@ -1273,7 +1260,7 @@ func (g *PkgGraph) fixIntraSpecCycle(trimmedCycle []*PkgNode) (err error) {
 	logger.Log.Debug("Checking if cycle contains build nodes.")
 
 	for _, currentNode := range trimmedCycle {
-		if currentNode.Type == TypeLocalBuild {
+		if currentNode.Type == TypeBuild {
 			logger.Log.Debug("Cycle contains build dependencies, cannot be solved this way.")
 			return fmt.Errorf("cycle contains build dependencies, unresolvable")
 		}
@@ -1344,7 +1331,7 @@ func (g *PkgGraph) fixPrebuiltSRPMsCycle(trimmedCycle []*PkgNode) (err error) {
 		//    Considering that, we avoid accidentally skipping a rebuild by only removing edges between a build and a run node.
 		// 2. Every build cycle must contain at least one edge between a build node and a run node from different SRPMs.
 		//    These edges represent the 'BuildRequires' from the .spec file. If the cycle is breakable, the run node comes from a pre-built SRPM.
-		buildToRunEdge := previousNode.Type == TypeLocalBuild && currentNode.Type == TypeLocalRun
+		buildToRunEdge := previousNode.Type == TypeBuild && currentNode.Type == TypeRun
 		if isPrebuilt, _, _ := IsSRPMPrebuilt(currentNode.SrpmPath, g, nil); buildToRunEdge && isPrebuilt {
 			logger.Log.Debugf("Cycle contains pre-built SRPM '%s'. Replacing edges from build nodes associated with '%s' with an edge to a new 'PreBuilt' node.",
 				currentNode.SrpmPath, previousNode.SrpmPath)
@@ -1358,7 +1345,7 @@ func (g *PkgGraph) fixPrebuiltSRPMsCycle(trimmedCycle []*PkgNode) (err error) {
 			parentNodes := g.To(currentNode.ID())
 			for parentNodes.Next() {
 				parentNode := parentNodes.Node().(*PkgNode)
-				if parentNode.Type == TypeLocalBuild && parentNode.SrpmPath == previousNode.SrpmPath {
+				if parentNode.Type == TypeBuild && parentNode.SrpmPath == previousNode.SrpmPath {
 					g.RemoveEdge(parentNode.ID(), currentNode.ID())
 
 					err = g.AddEdge(parentNode, preBuiltNode)

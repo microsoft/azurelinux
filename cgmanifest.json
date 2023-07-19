@@ -1147,8 +1147,8 @@
         "type": "other",
         "other": {
           "name": "blobfuse2",
-          "version": "2.0.2",
-          "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse2-2.0.2.tar.gz"
+          "version": "2.0.4",
+          "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse2-2.0.4.tar.gz"
         }
       }
     },
@@ -9871,8 +9871,8 @@
         "type": "other",
         "other": {
           "name": "liblouis",
-          "version": "3.24.0",
-          "downloadUrl": "https://github.com/liblouis/liblouis/releases/download/v3.24.0/liblouis-3.24.0.tar.gz"
+          "version": "3.26.0",
+          "downloadUrl": "https://github.com/liblouis/liblouis/releases/download/v3.26.0/liblouis-3.26.0.tar.gz"
         }
       }
     },
@@ -11691,8 +11691,8 @@
         "type": "other",
         "other": {
           "name": "libxml2",
-          "version": "2.10.3",
-          "downloadUrl": "https://gitlab.gnome.org/GNOME/libxml2/-/archive/v2.10.3/libxml2-v2.10.3.tar.gz"
+          "version": "2.10.4",
+          "downloadUrl": "https://gitlab.gnome.org/GNOME/libxml2/-/archive/v2.10.4/libxml2-v2.10.4.tar.gz"
         }
       }
     },
@@ -15106,6 +15106,16 @@
           "name": "opencryptoki",
           "version": "3.13.0",
           "downloadUrl": "https://github.com/opencryptoki/opencryptoki/archive/v3.13.0/opencryptoki-3.13.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "opencsd",
+          "version": "1.4.0",
+          "downloadUrl": "https://github.com/Linaro/OpenCSD/archive/v1.4.0.tar.gz"
         }
       }
     },

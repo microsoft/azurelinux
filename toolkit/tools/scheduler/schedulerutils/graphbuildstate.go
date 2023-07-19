@@ -16,7 +16,6 @@ import (
 type nodeState struct {
 	available bool
 	cached    bool
-	usedDelta bool
 }
 
 // GraphBuildState represents the build state of a graph.
@@ -68,12 +67,6 @@ func (g *GraphBuildState) IsNodeCached(node *pkggraph.PkgNode) bool {
 	return state != nil && state.cached
 }
 
-// IsNodeDelta returns true if the requested node was pre-downloaded as a delta package.
-func (g *GraphBuildState) IsNodeDelta(node *pkggraph.PkgNode) bool {
-	state := g.nodeToState[node]
-	return state != nil && state.usedDelta
-}
-
 // ActiveBuilds returns a map of Node IDs to BuildRequests that represents all outstanding builds.
 func (g *GraphBuildState) ActiveBuilds() map[int64]*BuildRequest {
 	return g.activeBuilds
@@ -82,7 +75,7 @@ func (g *GraphBuildState) ActiveBuilds() map[int64]*BuildRequest {
 // ActiveSRPMs returns a list of all SRPMs, which are currently being built.
 func (g *GraphBuildState) ActiveSRPMs() (builtSRPMs []string) {
 	for _, buildRequest := range g.activeBuilds {
-		if buildRequest.Node.Type == pkggraph.TypeLocalBuild {
+		if buildRequest.Node.Type == pkggraph.TypeBuild {
 			builtSRPMs = append(builtSRPMs, buildRequest.Node.SRPMFileName())
 		}
 	}
@@ -146,7 +139,6 @@ func (g *GraphBuildState) RecordBuildResult(res *BuildResult, allowToolchainRebu
 	state := &nodeState{
 		available: res.Err == nil,
 		cached:    res.UsedCache,
-		usedDelta: res.WasDelta,
 	}
 
 	for _, node := range res.AncillaryNodes {
