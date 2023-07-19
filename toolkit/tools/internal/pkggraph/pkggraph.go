@@ -42,6 +42,7 @@ const (
 	StateUnresolved NodeState = iota            // A dependency is not available locally and must be acquired from a remote repo
 	StateCached     NodeState = iota            // A dependency was not available locally, but is now available in the chache
 	StateBuildError NodeState = iota            // A package from a local SRPM which failed to build
+	StateDelta      NodeState = iota            // Same as build state, but an attempt has been made to pre-download the .rpm to the cache
 	StateMAX        NodeState = StateBuildError // Max allowable state
 )
 
@@ -120,6 +121,8 @@ func (n NodeState) String() string {
 		return "Unresolved"
 	case StateCached:
 		return "Cached"
+	case StateDelta:
+		return "Delta"
 	default:
 		logger.Log.Panic("Invalid NodeState encountered when serializing to string!")
 		return "error"
@@ -167,6 +170,8 @@ func (n *PkgNode) DOTColor() string {
 		return "crimson"
 	case StateCached:
 		return "darkorchid"
+	case StateDelta:
+		return "gold4"
 	default:
 		logger.Log.Panic("Invalid NodeState encountered when serializing to color!")
 		return "error"
@@ -1216,22 +1221,30 @@ func (g *PkgGraph) MakeDAG() (err error) {
 	}
 }
 
+// Copy returns a copy of a PkgNode. The ID of the copy is NOT unique.
+func (n *PkgNode) Copy() (copy *PkgNode) {
+	copy = &PkgNode{
+		nodeID:       n.nodeID,
+		VersionedPkg: n.VersionedPkg,
+		State:        n.State,
+		Type:         n.Type,
+		SrpmPath:     n.SrpmPath,
+		RpmPath:      n.RpmPath,
+		SpecPath:     n.SpecPath,
+		SourceDir:    n.SourceDir,
+		Architecture: n.Architecture,
+		SourceRepo:   n.SourceRepo,
+		Implicit:     n.Implicit,
+	}
+	copy.This = copy
+	return
+}
+
 // CloneNode creates a clone of the input node with a new, unique ID.
 // The clone doesn't have any edges attached to it.
 func (g *PkgGraph) CloneNode(pkgNode *PkgNode) (newNode *PkgNode) {
-	newNode = &PkgNode{
-		nodeID:       g.NewNode().ID(),
-		VersionedPkg: pkgNode.VersionedPkg,
-		State:        pkgNode.State,
-		Type:         pkgNode.Type,
-		SrpmPath:     pkgNode.SrpmPath,
-		RpmPath:      pkgNode.RpmPath,
-		SpecPath:     pkgNode.SpecPath,
-		SourceDir:    pkgNode.SourceDir,
-		Architecture: pkgNode.Architecture,
-		SourceRepo:   pkgNode.SourceRepo,
-		Implicit:     pkgNode.Implicit,
-	}
+	newNode = pkgNode.Copy()
+	newNode.nodeID = g.NewNode().ID()
 	newNode.This = newNode
 
 	return
