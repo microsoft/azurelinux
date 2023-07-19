@@ -75,11 +75,23 @@ func main() {
 
 	timestamp.StartEvent("initialize and configure cloner", nil)
 
-	cloner, err := rpmrepocloner.ConstructClonerWithNetwork(*outDir, *tmpDir, *workertar, *existingRpmDir, *existingToolchainRpmDir, *tlsClientCert, *tlsClientKey, *usePreviewRepo, *disableUpstreamRepos, *disableDefaultRepos, *repoFiles)
+	cloner, err := rpmrepocloner.ConstructCloner(*outDir, *tmpDir, *workertar, *existingRpmDir, *existingToolchainRpmDir, *tlsClientCert, *tlsClientKey, *repoFiles)
 	if err != nil {
 		logger.Log.Panicf("Failed to initialize RPM repo cloner. Error: %s", err)
 	}
 	defer cloner.Close()
+
+	enabledRepos := rpmrepocloner.RepoFlagAll
+	if !*usePreviewRepo {
+		enabledRepos = enabledRepos & ^rpmrepocloner.RepoFlagPreview
+	}
+	if *disableUpstreamRepos {
+		enabledRepos = enabledRepos & ^rpmrepocloner.RepoFlagUpstream
+	}
+	if *disableDefaultRepos {
+		enabledRepos = enabledRepos & ^rpmrepocloner.RepoFlagMarinerDefaults
+	}
+	cloner.SetEnabledRepos(enabledRepos)
 
 	timestamp.StopEvent(nil) // initialize and configure cloner
 
@@ -111,7 +123,6 @@ func main() {
 	}
 
 	timestamp.StopEvent(nil) // finalize cloned packages
-
 }
 
 func cloneSystemConfigs(cloner repocloner.RepoCloner, configFile, baseDirPath string, externalOnly bool, inputGraph string) (err error) {
