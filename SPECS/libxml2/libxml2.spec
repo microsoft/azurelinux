@@ -1,6 +1,6 @@
 Summary:        Libxml2
 Name:           libxml2
-Version:        2.10.3
+Version:        2.10.4
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -78,6 +78,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/cmake/libxml2/libxml2-config.cmake
 
 %changelog
+* Tue May 23 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.10.4-1
+- Auto-upgrade to 2.10.4 - to fix CVE-2023-28484, CVE-2023-29469
+
 * Tue Nov 29 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.10.3-1
 - Auto-upgrade to 2.10.3 - CVE-2022-40303
 
