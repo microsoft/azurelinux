@@ -4,20 +4,17 @@
 package schedulerutils
 
 import (
-	"path/filepath"
 	"sync"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
-	"github.com/sirupsen/logrus"
 	"gonum.org/v1/gonum/graph"
-	"gonum.org/v1/gonum/graph/path"
 	"gonum.org/v1/gonum/graph/traverse"
 )
 
 // CanSubGraph returns true if a node can be subgraphed without any unresolved dynamic dependencies.
 // Used to optimize graph solving.
-func CanSubGraph(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, useCachedImplicit bool, toolchainPackageSet map[string]bool) bool {
+func CanSubGraph(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, useCachedImplicit bool) bool {
 	search := traverse.BreadthFirst{}
 
 	foundUnsolvableNode := false
@@ -28,11 +25,6 @@ func CanSubGraph(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, useCachedI
 
 		// Non-implicit nodes are solvable
 		if !pkgNode.Implicit {
-			return
-		}
-
-		//Implicit nodes that are toolchain packages are solvable
-		if pkgNode.Implicit && isToolchainPackage(pkgNode, toolchainPackageSet) {
 			return
 		}
 
@@ -72,7 +64,7 @@ func CanSubGraph(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, useCachedI
 }
 
 // LeafNodes returns a slice of all leaf nodes in the graph.
-func LeafNodes(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, goalNode *pkggraph.PkgNode, buildState *GraphBuildState, useCachedImplicit bool, toolchainPackages map[string]bool) (leafNodes []*pkggraph.PkgNode) {
+func LeafNodes(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, goalNode *pkggraph.PkgNode, buildState *GraphBuildState, useCachedImplicit bool) (leafNodes []*pkggraph.PkgNode) {
 	graphMutex.RLock()
 	defer graphMutex.RUnlock()
 
@@ -100,12 +92,8 @@ func LeafNodes(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, goalNode *
 		// Ideally we will wait for the actual provider of the implicit node to be built and convert the implicit node to
 		// a normal node via InjectMissingImplicitProvides().
 		if !useCachedImplicit && pkgNode.Implicit && pkgNode.State == pkggraph.StateCached {
-			if isToolchainPackage(pkgNode, toolchainPackages) {
-				logger.Log.Debugf("Allowing cached implicit toolchain leaf node: %v", pkgNode)
-			} else {
-				logger.Log.Debugf("Skipping cached implicit provide leaf node: %v", pkgNode)
-				return
-			}
+			logger.Log.Debugf("Skipping cached implicit provide leaf node: %v", pkgNode)
+			return
 		}
 
 		logger.Log.Debugf("Found leaf node: %v", pkgNode)
@@ -146,12 +134,6 @@ func FindUnblockedNodesFromResult(res *BuildResult, pkgGraph *pkggraph.PkgGraph,
 	}
 
 	return
-}
-
-func isToolchainPackage(pkgNode *pkggraph.PkgNode, toolchainPackages map[string]bool) bool {
-	base := filepath.Base(pkgNode.RpmPath)
-	_, found := toolchainPackages[base]
-	return found
 }
 
 // findUnblockedNodesFromNode takes a built node and returns a list of nodes that are now unblocked by it.

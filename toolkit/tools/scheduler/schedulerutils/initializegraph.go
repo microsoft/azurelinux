@@ -24,7 +24,7 @@ const (
 //   - If canUseCachedImplicit is true, it will use cached nodes to resolve implicit dependencies instead of waiting for
 //     them to be built in the graph (This can allow the graph to be optimized immediately instead of waiting for the
 //     implicit nodes to be resolved by an unknown package later in the build).
-func InitializeGraphFromFile(inputFile string, packagesToBuild []*pkgjson.PackageVer, canUseCachedImplicit bool, toolchainPackageSet map[string]bool) (isOptimized bool, pkgGraph *pkggraph.PkgGraph, goalNode *pkggraph.PkgNode, err error) {
+func InitializeGraphFromFile(inputFile string, packagesToBuild []*pkgjson.PackageVer, canUseCachedImplicit bool) (isOptimized bool, pkgGraph *pkggraph.PkgGraph, goalNode *pkggraph.PkgNode, err error) {
 	const (
 		strictGoalNode = true
 	)
@@ -36,7 +36,7 @@ func InitializeGraphFromFile(inputFile string, packagesToBuild []*pkgjson.Packag
 		return
 	}
 
-	return PrepareGraphForBuild(pkgGraph, packagesToBuild, canUseCachedImplicit, toolchainPackageSet)
+	return PrepareGraphForBuild(pkgGraph, packagesToBuild, canUseCachedImplicit)
 }
 
 // PrepareGraphForBuild takes a graph and prepares it for package building.
@@ -44,7 +44,7 @@ func InitializeGraphFromFile(inputFile string, packagesToBuild []*pkgjson.Packag
 //   - If canUseCachedImplicit is true, it will use cached nodes to resolve implicit dependencies instead of waiting for
 //     them to be built in the graph (This can allow the graph to be optimized immediately instead of waiting for the
 //     implicit nodes to be resolved by an unknown package later in the build).
-func PrepareGraphForBuild(pkgGraph *pkggraph.PkgGraph, packagesToBuild []*pkgjson.PackageVer, canUseCachedImplicit bool, toolchainPackageSet map[string]bool) (isOptimized bool, preparedGraph *pkggraph.PkgGraph, goalNode *pkggraph.PkgNode, err error) {
+func PrepareGraphForBuild(pkgGraph *pkggraph.PkgGraph, packagesToBuild []*pkgjson.PackageVer, canUseCachedImplicit bool) (isOptimized bool, preparedGraph *pkggraph.PkgGraph, goalNode *pkggraph.PkgNode, err error) {
 	const (
 		strictGoalNode = true
 	)
@@ -54,7 +54,7 @@ func PrepareGraphForBuild(pkgGraph *pkggraph.PkgGraph, packagesToBuild []*pkgjso
 		return
 	}
 
-	optimizedGraph, goalNode, optimizeErr := OptimizeGraph(pkgGraph, canUseCachedImplicit, toolchainPackageSet)
+	optimizedGraph, goalNode, optimizeErr := OptimizeGraph(pkgGraph, canUseCachedImplicit)
 	if optimizeErr == nil {
 		logger.Log.Infof("Successfully created solvable subgraph")
 		isOptimized = true
@@ -73,7 +73,7 @@ func PrepareGraphForBuild(pkgGraph *pkggraph.PkgGraph, packagesToBuild []*pkgjso
 }
 
 // OptimizeGraph will attempt to create a solvable subgraph that satisfies the build goal node.
-func OptimizeGraph(pkgGraph *pkggraph.PkgGraph, canUseCachedImplicit bool, toolchainPackageSet map[string]bool) (optimizedGraph *pkggraph.PkgGraph, goalNode *pkggraph.PkgNode, err error) {
+func OptimizeGraph(pkgGraph *pkggraph.PkgGraph, canUseCachedImplicit bool) (optimizedGraph *pkggraph.PkgGraph, goalNode *pkggraph.PkgNode, err error) {
 	buildGoalNode := pkgGraph.FindGoalNode(buildGoalNodeName)
 	if buildGoalNode == nil {
 		err = fmt.Errorf("could not find goal node %s", buildGoalNodeName)
@@ -81,7 +81,7 @@ func OptimizeGraph(pkgGraph *pkggraph.PkgGraph, canUseCachedImplicit bool, toolc
 		return
 	}
 
-	if CanSubGraph(pkgGraph, buildGoalNode, canUseCachedImplicit, toolchainPackageSet) {
+	if CanSubGraph(pkgGraph, buildGoalNode, canUseCachedImplicit) {
 		optimizedGraph, err = pkgGraph.CreateSubGraph(buildGoalNode)
 		if err != nil {
 			logger.Log.Warnf("Failed to create subgraph error: %s", err)
