@@ -8,7 +8,9 @@ import (
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
+	"github.com/sirupsen/logrus"
 	"gonum.org/v1/gonum/graph"
+	"gonum.org/v1/gonum/graph/path"
 	"gonum.org/v1/gonum/graph/traverse"
 )
 
@@ -46,12 +48,11 @@ func CanSubGraph(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, useCachedI
 			pt, ok := path.BellmanFordFrom(node, pkgGraph)
 			if !ok {
 				logger.Log.Warnf("Could not run BellmanFordFrom on %v", node)
-				return
 			} else {
 				path, _ := pt.To(pkgNode.ID())
 				logger.Log.Tracef("Path between %v and %v:", node, pkgNode)
 				for _, n := range path {
-					logger.Log.Warnf("  %v", n.(*pkggraph.PkgNode))
+					logger.Log.Tracef("  %v", n.(*pkggraph.PkgNode))
 				}
 			}
 		}
