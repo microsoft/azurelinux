@@ -47,7 +47,10 @@ extends:
   template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates
   parameters:
     featureFlags:
+      EnableCDPxPAT: false
       runOnHost: true
+    git:
+      lfs: false
     globalSdl:
       credscan:
         suppressionsFile: .config/CredScanSuppressions.json
@@ -58,7 +61,7 @@ extends:
               - job: Build
                 pool:
                   type: linux
-                  isCustom: true
+                  # isCustom: true
                   name: ${{ configuration.agentPool }}
                 variables:
                   ob_artifactBaseName: $(toolchainArtifactNameBase)_${{ configuration.name }}
@@ -78,12 +81,12 @@ extends:
                   #    then OneBranch attempts to perform additional actions (adding build tags for instance), which require additional permissions
                   #    that the PR check pipeline does not have.
                   # 2. The value for 'artifact' must equal $(ob_artifactBaseName), as this is the only value OneBranch accepts.
-                  - task: PublishPipelineArtifact@1
-                    inputs:
-                      artifact: $(toolchainArtifactNameBase)_${{ configuration.name }}
-                      targetPath: $(ob_outputDirectory)
-                    condition: always()
-                    displayName: "Publish toolchain artifacts"
+                  # - task: PublishPipelineArtifact@1
+                  #   inputs:
+                  #     artifact: $(toolchainArtifactNameBase)_${{ configuration.name }}
+                  #     targetPath: $(ob_outputDirectory)
+                  #   condition: always()
+                  #   displayName: "Publish toolchain artifacts"
 
           - stage: RPMs_${{ configuration.name }}
             dependsOn: Toolchain_${{ configuration.name }}
@@ -94,7 +97,7 @@ extends:
                   - job: ${{ packageBuildJob.name }}
                     pool:
                       type: linux
-                      isCustom: true
+                      # isCustom: true
                       name: ${{ configuration.agentPool }}
                     variables:
                       ob_artifactBaseName: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}_$(System.JobDisplayName)
@@ -109,9 +112,9 @@ extends:
                           outputArtifactsFolder: $(ob_outputDirectory)
                           selfRepoName: self
 
-                      - task: PublishPipelineArtifact@1
-                        inputs:
-                          artifact: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}_$(System.JobDisplayName)
-                          targetPath: $(ob_outputDirectory)
-                        condition: always()
-                        displayName: "Publish packages build artifacts"
+                      # - task: PublishPipelineArtifact@1
+                      #   inputs:
+                      #     artifact: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}_$(System.JobDisplayName)
+                      #     targetPath: $(ob_outputDirectory)
+                      #   condition: always()
+                      #   displayName: "Publish packages build artifacts"
