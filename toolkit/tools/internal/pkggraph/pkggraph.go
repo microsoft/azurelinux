@@ -58,7 +58,7 @@ const (
 	TypeRemoteRun  NodeType = iota         // A non-local node which may have a cache entry
 	TypePureMeta   NodeType = iota         // An arbitrary meta node with no other meaning
 	TypePreBuilt   NodeType = iota         // A node indicating a pre-built SRPM used in breaking cyclic build dependencies
-	TypePtest      NodeType = iota         // A node for running the '%check' section of the underlying package
+	TypeTest       NodeType = iota         // A node for running the '%check' section of the underlying package
 	TypeMAX        NodeType = TypePureMeta // Max allowable type
 )
 
@@ -103,6 +103,7 @@ type PkgGraph struct {
 type LookupNode struct {
 	RunNode   *PkgNode // The "meta" run node for a package. Tracks the run-time dependencies for the package. Remote packages will only have a RunNode.
 	BuildNode *PkgNode // The build node for a package. Tracks the build requirements for the package. May be nil for remote packages.
+	TestNode  *PkgNode // The test node for a package. Tracks the test requirements for the package. Nil for non-test builds and when its spec has no '%check' section.
 }
 
 var (
@@ -465,11 +466,11 @@ func (g *PkgGraph) CreateCollapsedNode(versionedPkg *pkgjson.PackageVer, parentN
 }
 
 // AddPkgNode adds a new node to the package graph. Run, Build, and Unresolved nodes are recorded in the lookup table.
-func (g *PkgGraph) AddPkgNode(versionedPkg *pkgjson.PackageVer, nodestate NodeState, nodeType NodeType, srpmPath, rpmPath, specPath, sourceDir, architecture, sourceRepo string) (newNode *PkgNode, err error) {
+func (g *PkgGraph) AddPkgNode(versionedPkg *pkgjson.PackageVer, nodeState NodeState, nodeType NodeType, srpmPath, rpmPath, specPath, sourceDir, architecture, sourceRepo string) (newNode *PkgNode, err error) {
 	newNode = &PkgNode{
 		nodeID:       g.NewNode().ID(),
 		VersionedPkg: versionedPkg,
-		State:        nodestate,
+		State:        nodeState,
 		Type:         nodeType,
 		SrpmPath:     srpmPath,
 		RpmPath:      rpmPath,
@@ -1081,8 +1082,15 @@ func (g *PkgGraph) AddGoalNode(goalName string, packages []*pkgjson.PackageVer, 
 
 		if existingNode != nil {
 			logger.Log.Tracef("Found %s to satisfy %s", existingNode.RunNode, pkg)
+
 			goalEdge := g.NewEdge(goalNode, existingNode.RunNode)
 			g.SetEdge(goalEdge)
+
+			if existingNode.TestNode != nil {
+				goalEdge = g.NewEdge(goalNode, existingNode.TestNode)
+				g.SetEdge(goalEdge)
+			}
+
 			goalSet[pkg] = false
 		} else {
 			logger.Log.Warnf("Could not goal package %+v", pkg)

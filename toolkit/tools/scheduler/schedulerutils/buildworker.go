@@ -113,7 +113,7 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 				setAncillaryBuildNodesStatus(req, pkggraph.StateBuildError)
 			}
 
-		case pkggraph.TypePtest:
+		case pkggraph.TypeTest:
 			res.Ignored, res.LogFile, res.Err = buildTestNode(req.Node, req.PkgGraph, graphMutex, agent, checkAttempts, ignoredPackages)
 
 		case pkggraph.TypeLocalRun, pkggraph.TypeGoal, pkggraph.TypeRemoteRun, pkggraph.TypePureMeta, pkggraph.TypePreBuilt:

@@ -299,10 +299,17 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 
 	defer wg.Done()
 
-	defines := rpm.DefaultDefinesWithDist(runCheck, distTag)
+	noCheckDefines := rpm.DefaultDefinesWithDist(false, distTag)
+	checkDefines := rpm.DefaultDefinesWithDist(true, distTag)
 
 	var ts *timestamp.TimeStamp = nil
 	for specfile := range requests {
+		var (
+			providerList      []*pkgjson.Package
+			buildRequiresList []*pkgjson.PackageVer
+			testRequiresList  []*pkgjson.PackageVer
+		)
+
 		select {
 		case <-cancel:
 			logger.Log.Debug("Cancellation signal received")
@@ -318,13 +325,10 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 		ts, _ = timestamp.StartEvent(filepath.Base(specfile), tsRoot)
 
 		result := &parseResult{}
-
-		providerList := []*pkgjson.Package{}
-		buildRequiresList := []*pkgjson.PackageVer{}
 		sourcedir := filepath.Dir(specfile)
 
 		// Find the SRPM associated with the SPEC.
-		srpmResults, err := rpm.QuerySPEC(specfile, sourcedir, querySrpm, arch, defines, rpm.QueryHeaderArgument)
+		srpmResults, err := rpm.QuerySPEC(specfile, sourcedir, querySrpm, arch, noCheckDefines, rpm.QueryHeaderArgument)
 		if err != nil {
 			result.err = err
 			results <- result
@@ -333,7 +337,7 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 
 		srpmPath := filepath.Join(srpmsDir, srpmResults[0])
 
-		isCompatible, err := rpm.SpecArchIsCompatible(specfile, sourcedir, arch, defines)
+		isCompatible, err := rpm.SpecArchIsCompatible(specfile, sourcedir, arch, noCheckDefines)
 		if err != nil {
 			result.err = err
 			results <- result
@@ -347,7 +351,7 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 		}
 
 		// Find every package that the spec provides
-		queryResults, err := rpm.QuerySPEC(specfile, sourcedir, queryProvidedPackages, arch, defines, rpm.QueryBuiltRPMHeadersArgument)
+		queryResults, err := rpm.QuerySPEC(specfile, sourcedir, queryProvidedPackages, arch, noCheckDefines, rpm.QueryBuiltRPMHeadersArgument)
 		if err == nil && len(queryResults) != 0 {
 			providerList, err = parseProvides(rpmsDir, toolchainDir, toolchainRPMs, srpmPath, queryResults)
 			if err != nil {
@@ -358,7 +362,7 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 		}
 
 		// Query the BuildRequires fields from this spec and turn them into an array of PackageVersions
-		queryResults, err = rpm.QuerySPEC(specfile, sourcedir, emptyQueryFormat, arch, defines, rpm.BuildRequiresArgument)
+		queryResults, err = rpm.QuerySPEC(specfile, sourcedir, emptyQueryFormat, arch, noCheckDefines, rpm.BuildRequiresArgument)
 		if err == nil && len(queryResults) != 0 {
 			buildRequiresList, err = parsePackageVersionList(queryResults)
 			if err != nil {
@@ -368,18 +372,38 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 			}
 		}
 
+		// Query the test BuildRequires fields from this spec and turn them into an array of PackageVersions
+		if runCheck {
+			queryResults, err = rpm.QuerySPEC(specfile, sourcedir, emptyQueryFormat, arch, checkDefines, rpm.BuildRequiresArgument)
+			if err == nil && len(queryResults) != 0 {
+				testRequiresList, err = parsePackageVersionList(queryResults)
+				if err != nil {
+					result.err = err
+					results <- result
+					continue
+				}
+			}
+		}
+
 		// Every package provided by a spec will have the same BuildRequires and SrpmPath
-		for i := range providerList {
-			providerList[i].SpecPath = specfile
-			providerList[i].SourceDir = sourcedir
-			providerList[i].Requires, err = condensePackageVersionArray(providerList[i].Requires, specfile)
+		for _, provider := range providerList {
+			provider.SpecPath = specfile
+			provider.SourceDir = sourcedir
+			provider.Requires, err = condensePackageVersionArray(provider.Requires, specfile)
 			if err != nil {
 				break
 			}
 
-			providerList[i].BuildRequires, err = condensePackageVersionArray(buildRequiresList, specfile)
+			provider.BuildRequires, err = condensePackageVersionArray(buildRequiresList, specfile)
 			if err != nil {
 				break
+			}
+
+			if testRequiresList != nil {
+				provider.TestRequires, err = condensePackageVersionArray(testRequiresList, specfile)
+				if err != nil {
+					break
+				}
 			}
 		}
 
