@@ -91,7 +91,7 @@ func (g *GraphBuildState) BuildFailures() []*BuildResult {
 // ConflictingRPMs will return a list of *.rpm files which should not have been rebuilt.
 // This list is based on the manifest of pre-built toolchain rpms.
 func (g *GraphBuildState) ConflictingRPMs() (rpms []string) {
-	rpms = sliceutils.StringsSetToSlice(g.conflictingRPMs)
+	rpms = sliceutils.SetToSlice(g.conflictingRPMs)
 	sort.Strings(rpms)
 
 	return rpms
@@ -100,7 +100,7 @@ func (g *GraphBuildState) ConflictingRPMs() (rpms []string) {
 // ConflictingSRPMs will return a list of *.src.rpm files which created rpms that should not have been rebuilt.
 // This list is based on the manifest of pre-built toolchain rpms.
 func (g *GraphBuildState) ConflictingSRPMs() (srpms []string) {
-	srpms = sliceutils.StringsSetToSlice(g.conflictingSRPMs)
+	srpms = sliceutils.SetToSlice(g.conflictingSRPMs)
 	sort.Strings(srpms)
 
 	return srpms
