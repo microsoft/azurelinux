@@ -1594,15 +1594,14 @@ func findAllRPMSUpstream(rpmsToFind []*PkgNode, ignoreVersionToResolveSelfDep bo
 	foundAllRpms = true
 	for _, node := range rpmsToFind {
 		logger.Log.Debugf("Searching for a package which supplies: %s", node.VersionedPkg.Name)
-		searchPkg := *node.VersionedPkg
 		// Resolve nodes to exact package names so they can be referenced in the graph.
 		if ignoreVersionToResolveSelfDep {
 			/*clear Version information so that any available version and release can be used*/
-			clearVersion(&searchPkg)
+			clearVersion(node.VersionedPkg)
 		}
 		//initialize an array of strings to hold the resolved packages
 		var resolvedPackages []string
-		resolvedPackages, err = cloner.WhatProvides(&searchPkg)
+		resolvedPackages, err = cloner.WhatProvides(node.VersionedPkg)
 		if err != nil {
 			foundAllRpms = false
 			msg := fmt.Sprintf("Failed to resolve (%s) to a package. Error: %s", node.VersionedPkg, err)
