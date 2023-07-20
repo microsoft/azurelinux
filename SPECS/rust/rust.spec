@@ -9,7 +9,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.68.2
-Release:        2%{?dist}
+Release:        4%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -55,7 +55,7 @@ BuildRequires:  ninja-build
 BuildRequires:  openssl-devel
 BuildRequires:  python3
 %if %{with_check}
-BuildRequires:  glibc-static >= 2.35-3%{?dist}
+BuildRequires:  glibc-static >= 2.35-4%{?dist}
 %endif
 # rustc uses a C compiler to invoke the linker, and links to glibc in most cases
 Requires:       binutils
@@ -112,7 +112,7 @@ export CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/ -g//'`"
 sh ./configure \
     --prefix=%{_prefix} \
     --enable-extended \
-    --tools="cargo,rustfmt" \
+    --tools="cargo,clippy,rustfmt" \
     --release-channel="stable" \
     --release-description="CBL-Mariner %{version}-%{release}"
 
@@ -148,7 +148,9 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %{_bindir}/rust-gdb
 %{_bindir}/rust-gdbgui
 %{_bindir}/cargo
+%{_bindir}/cargo-clippy
 %{_bindir}/cargo-fmt
+%{_bindir}/clippy-driver
 %{_bindir}/rustfmt
 %{_datadir}/zsh/*
 %{_sysconfdir}/bash_completion.d/cargo
@@ -163,6 +165,12 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %{_mandir}/man1/*
 
 %changelog
+* Wed Jul 05 2023 Andrew Phelps <anphel@microsoft.com> - 1.68.2-4
+- Bump release to rebuild against glibc 2.35-4
+
+* Wed Jun 21 2023 Jonathan Behrens <jbehrens@microsoft.com> - 1.68.2-3
+- Include "cargo-clippy" tool in the package.
+
 * Wed May 17 2023 Tobias Brick <tobiasb@microsoft.com> - 1.68.2-2
 - Fix CVE-2023-27477 by patching cranelift vulnerability that is exposed in rust
 

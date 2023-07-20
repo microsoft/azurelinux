@@ -247,7 +247,7 @@ func processMountPoint(inputMountPoint string, partitionNumber int) (err error) 
 	} else {
 		if !strings.HasPrefix(mountPoint, "/") {
 			// Other types of mount points are currently not supported
-			err = fmt.Errorf("Invalid mount point specified: (%s)", mountPoint)
+			err = fmt.Errorf("invalid mount point specified: (%s)", mountPoint)
 		}
 	}
 

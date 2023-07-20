@@ -16,6 +16,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/profile"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -23,8 +24,9 @@ import (
 var (
 	app = kingpin.New("imageconfigvalidator", "A tool for validating image configuration files")
 
-	logFile  = exe.LogFileFlag(app)
-	logLevel = exe.LogLevelFlag(app)
+	logFile   = exe.LogFileFlag(app)
+	logLevel  = exe.LogLevelFlag(app)
+	profFlags = exe.SetupProfileFlags(app)
 
 	input       = exe.InputStringFlag(app, "Path to the image config file.")
 	baseDirPath = exe.InputDirFlag(app, "Base directory for relative file paths from the config.")
@@ -38,6 +40,13 @@ func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
+
+	prof, err := profile.StartProfiling(profFlags)
+	if err != nil {
+		logger.Log.Warnf("Could not start profiling: %s", err)
+	}
+	defer prof.StopProfiler()
+
 	timestamp.BeginTiming("config validator", *timestampFile)
 	defer timestamp.CompleteTiming()
 
@@ -92,7 +101,7 @@ func validateKickStartInstall(config configuration.Config) (err error) {
 	for _, systemConfig := range config.SystemConfigs {
 		if systemConfig.IsKickStartBoot {
 			if len(config.Disks) > 0 || len(systemConfig.PartitionSettings) > 0 {
-				return fmt.Errorf("Partition should not be specified in image config file when performing kickstart installation")
+				return fmt.Errorf("partition should not be specified in image config file when performing kickstart installation")
 			}
 		}
 	}

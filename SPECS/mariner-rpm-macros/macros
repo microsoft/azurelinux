@@ -52,6 +52,9 @@
 %{?mariner_ccache_enabled:CCACHE_DIR="/ccache-dir" ; export CCACHE_DIR ;}\
 %{nil}
 
+# use zstd compression for binary package payloads
+%_binary_payload w7T0.zstdio
+
 #
 ## Automatically compile python files
 %py_auto_byte_compile 1
@@ -69,19 +72,26 @@
 %_use_internal_dependency_generator 1
 %_build_id_links alldebug
 
+# Standard brp-macro naming:
+# convert all '-' in basename to '_', add two leading underscores.
+%__brp_compress %{_rpmconfigdir}/brp-compress %{?_prefix}
+%__brp_strip %{_rpmconfigdir}/brp-strip %{__strip}
+%__brp_strip_comment_note %{_rpmconfigdir}/brp-strip-comment-note %{__strip} %{__objdump}
+%__brp_strip_static_archive %{_rpmconfigdir}/brp-strip-static-archive %{__strip}
+%__brp_elfperms %{_rpmconfigdir}/brp-elfperms
+%__brp_remove_la_files %{_rpmconfigdir}/brp-remove-la-files
+
 %__os_install_post_leave_signatures    \
-    %{_rpmconfigdir}/brp-compress \
-    %{_rpmconfigdir}/brp-strip-comment-note %{__strip} %{__objdump} \
-    %{_rpmconfigdir}/brp-strip-static-archive %{__strip} \
+    %{?__brp_compress} \
+    %{?__brp_strip_comment_note} \
+    %{?__brp_strip_static_archive} \
     %{?py_auto_byte_compile:%{?__brp_python_bytecompile}} \
     find %{buildroot} -name "*.pc" | xargs -I{} sed -i -e 's@-Wl,-dT,%{_topdir}/BUILD/module_info.ld@ @' {} \
     %{nil}
 
 %__os_install_post    \
     %{__os_install_post_leave_signatures} \
-    %{_rpmconfigdir}/brp-strip %{__strip} \
-    %{_rpmconfigdir}/brp-strip-debug-symbols %{__strip} \
-    %{_rpmconfigdir}/brp-strip-unneeded %{__strip} \
+    %{?__brp_strip} \
     %{?mariner_ccache_enabled:CCACHE_DIR="/ccache-dir" ; export CCACHE_DIR ;} \
     %{?mariner_ccache_enabled:ccache --show-stats} \
     %{nil}

@@ -1566,7 +1566,7 @@ func selinuxRelabelFiles(systemConfig configuration.SystemConfig, installChroot 
 		case "fat32", "fat16", "vfat":
 			logger.Log.Debugf("SELinux will not label mount at (%s) of type (%s), skipping", mount, fsType)
 		default:
-			err = fmt.Errorf("Unknown fsType (%s) for mount (%s), cannot configure SELinux", fsType, mount)
+			err = fmt.Errorf("unknown fsType (%s) for mount (%s), cannot configure SELinux", fsType, mount)
 			return
 		}
 	}

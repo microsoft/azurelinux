@@ -143,10 +143,10 @@ func TestShouldFailMaxSizeInsufficient(t *testing.T) {
 	invalidDisk.TargetDisk.Type = ""
 	err := invalidDisk.IsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "invalid [Disk]: the MaxSize of 512 is not large enough to accomodate defined partitions ending at 1024.", err.Error())
+	assert.Equal(t, "invalid [Disk]: the MaxSize of 512 is not large enough to accomodate defined partitions ending at 1024", err.Error())
 
 	// remarshal runs IsValid() on [SystemConfig] prior to running it on [Config], so we get a different error message here.
 	err = remarshalJSON(invalidDisk, &checkedDisk)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [Disk]: invalid [Disk]: the MaxSize of 512 is not large enough to accomodate defined partitions ending at 1024.", err.Error())
+	assert.Equal(t, "failed to parse [Disk]: invalid [Disk]: the MaxSize of 512 is not large enough to accomodate defined partitions ending at 1024", err.Error())
 }

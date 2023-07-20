@@ -3,7 +3,7 @@
 Summary:        Mozilla's JavaScript engine.
 Name:           mozjs
 Version:        78.10.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD AND MIT AND MPLv2.0 AND Unicode
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,6 +16,7 @@ Patch1:         emitter_test.patch
 Patch2:         init_patch.patch
 Patch3:         spidermonkey_checks_disable.patch
 Patch4:         fix-soname.patch
+Patch5:         CVE-2022-48285.patch
 
 BuildRequires:  autoconf213
 BuildRequires:  gcc
@@ -127,6 +128,9 @@ fi
 %{_libdir}/pkgconfig/mozjs-%{major}.pc
 
 %changelog
+* Tue Jun 27 2023 Minghe Ren <mingheren@microsoft.com> - 78.10.0-4
+- Add patch for CVE-2022-48285
+
 * Wed Aug 31 2022 Olivia Crain <oliviacrain@microsoft.com> - 78.10.0-3
 - Bump package to rebuild with stable Rust compiler
 

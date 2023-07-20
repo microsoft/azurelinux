@@ -29,6 +29,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/rpm"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/profile"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -102,6 +103,7 @@ var (
 	outDir        = exe.OutputDirFlag(app, "Directory to place the output SRPM.")
 	logFile       = exe.LogFileFlag(app)
 	logLevel      = exe.LogLevelFlag(app)
+	profFlags     = exe.SetupProfileFlags(app)
 	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
 
 	buildDir     = app.Flag("build-dir", "Directory to store temporary files while building.").Default(defaultBuildDir).String()
@@ -129,6 +131,13 @@ func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
+
+	prof, err := profile.StartProfiling(profFlags)
+	if err != nil {
+		logger.Log.Warnf("Could not start profiling: %s", err)
+	}
+	defer prof.StopProfiler()
+
 	timestamp.BeginTiming("srpmpacker", *timestampFile)
 	defer timestamp.CompleteTiming()
 
@@ -155,7 +164,6 @@ func main() {
 	}
 
 	// Setup remote source configuration
-	var err error
 	templateSrcConfig.sourceURL = *sourceURL
 	templateSrcConfig.caCerts, err = x509.SystemCertPool()
 	logger.PanicOnError(err, "Received error calling x509.SystemCertPool(). Error: %v", err)
@@ -485,8 +493,7 @@ func specsToPackWorker(requests <-chan string, results chan<- *specState, cancel
 		containingDir := filepath.Dir(specFile)
 
 		// Find the SRPM that this SPEC will produce.
-		defines := rpm.DefaultDefines(runCheck)
-		defines[rpm.DistTagDefine] = distTag
+		defines := rpm.DefaultDefinesWithDist(runCheck, distTag)
 
 		// Allow the user to configure if the SPEC sources are in a nested 'SOURCES' directory.
 		// Otherwise assume source files are next to the SPEC file.

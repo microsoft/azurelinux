@@ -28,12 +28,13 @@ source $(dirname  $0)/../timestamp.sh
 begin_timestamp
 start_record_timestamp "prep_files"
 
-
 MARINER_LOGS=$MARINER_BUILD_DIR/logs
 TOOLCHAIN_LOGS=$MARINER_LOGS/toolchain
 TOOLCHAIN_BUILD_LIST=$TOOLCHAIN_LOGS/build_list.txt
+TOOLCHAIN_BUILT_RPMS_LIST=$TOOLCHAIN_LOGS/built_rpms_list.txt
+TOOLCHAIN_BUILT_SPECS_LIST=$TOOLCHAIN_LOGS/built_specs_list.txt
 TOOLCHAIN_FAILURES=$TOOLCHAIN_LOGS/failures.txt
-set -x
+set -ex
 
 export LFS=$MARINER_BUILD_DIR/toolchain/populated_toolchain
 TOPDIR=/usr/src/mariner
@@ -77,6 +78,21 @@ mkdir -pv $CHROOT_RPMS_DIR
 mkdir -pv $CHROOT_RPMS_DIR_ARCH
 mkdir -pv $CHROOT_RPMS_DIR_NOARCH
 
+TEMP_DIR=$(mktemp -d -t)
+TEMP_BUILT_RPMS_LIST="$(mktemp --tmpdir="$TEMP_DIR")"
+TEMP_BUILT_SPECS_LIST="$(mktemp --tmpdir="$TEMP_DIR")"
+function clean_up {
+    # Removing duplicates during clean-up to simplify appends during run-time.
+    echo "Copying build lists to log output..."
+    sort "$TEMP_BUILT_RPMS_LIST" | uniq > "$TOOLCHAIN_BUILT_RPMS_LIST"
+    sort "$TEMP_BUILT_SPECS_LIST" | uniq > "$TOOLCHAIN_BUILT_SPECS_LIST"
+
+    echo "Cleaning up..."
+    chroot_unmount
+    rm -rf "$TEMP_DIR"
+}
+trap clean_up EXIT
+
 # Remove artifacts from previous toolchain builds
 sudo rm -f $TOOLCHAIN_BUILD_LIST
 sudo rm -f $TOOLCHAIN_FAILURES
@@ -112,7 +128,6 @@ fi
 stop_record_timestamp "hydrate"
 
 chroot_mount () {
-    trap chroot_unmount EXIT
     mount --bind /dev $LFS/dev
     mount -t devpts devpts $LFS/dev/pts -o gid=5,mode=620
     mount -t proc proc $LFS/proc
@@ -122,11 +137,15 @@ chroot_mount () {
 
 blocking_unmount () {
     # $1 mountpoint
-    umount -l $1
+    if ! mountpoint -q "$1"; then
+        return
+    fi
+
+    umount -l $1 || true
     while mountpoint -q $1; do
         echo $1 is still busy...
         sleep 1
-        umount -l $1
+        umount -l $1 || true
     done
 }
 
@@ -137,7 +156,6 @@ chroot_unmount () {
     blocking_unmount $LFS/run
     blocking_unmount $LFS/proc
     blocking_unmount $LFS/sys
-    trap - EXIT
 }
 
 chroot_and_print_installed_rpms () {
@@ -156,23 +174,30 @@ chroot_and_print_installed_rpms () {
     chroot_unmount
 }
 
+# $1 is the spec name (which often matches the package name). If there is a naming conflict, $2 is the qualified package name
+# (e.g. foo.spec might produce bar-foo-1.0-1.rpm, so $2 would be bar-foo-1.0-1 while $1 would be foo). Normally $2 is not needed
+# and we will grab all RPMs that match $1.rpm.
 chroot_and_install_rpms () {
     start_record_timestamp "build packages/install/$1"
-    # $1 = SRPM name
+    # $1 = spec name (or rpm name if $2 is omitted)
     # $2 = qualified package name
     # Clean and then copy the RPM into the chroot directory for installation below
-    rm -v $CHROOT_INSTALL_RPM_DIR/*
+    rm -fv $CHROOT_INSTALL_RPM_DIR/*
     if [[ -n $2 ]]; then
         # If we're using the qualified package name, there's probably naming conflicts
         # that prevent us from simply globbing for RPMs with a prefix of the qualified name.
         # So, we add the version-release string to the pattern so we don't install unrelated packages
         specPath=$(find $SPECROOT -name "$1.spec" -print -quit)
         specDir=$(dirname $specPath)
+        # This is a heuristic to find the associated RPMs. In theory we should instead use a more selective filtering like
+        # we use for build_rpm_in_chroot_no_install by querying for exact RPMs that match $2 found in $1.spec however to
+        # preserve the existing behavior we'll just copy all RPMs that match the name-version-release string.
+        #     e.g. matching_rpms=$(rpmspec -q $specPath --srpm --define="with_check 1" --define="_sourcedir $specDir" --define="dist $PARAM_DIST_TAG" --builtrpms --queryformat '%{nvra}.rpm\n' | grep $2)
         verrel=$(rpmspec -q $specPath --srpm --define="with_check 1" --define="_sourcedir $specDir" --define="dist $PARAM_DIST_TAG" --queryformat %{VERSION}-%{RELEASE})
-        find $CHROOT_RPMS_DIR -name "$2*$verrel*" -exec cp {} $CHROOT_INSTALL_RPM_DIR ';'
+        # Do not include any files with "debuginfo" in the name
+        find $CHROOT_RPMS_DIR -name "$2*$verrel*" ! -name "*debuginfo*" -exec cp {} $CHROOT_INSTALL_RPM_DIR ';'
     else
-        cp -v $CHROOT_RPMS_DIR_ARCH/$1-* $CHROOT_INSTALL_RPM_DIR
-        cp -v $CHROOT_RPMS_DIR_NOARCH/$1-* $CHROOT_INSTALL_RPM_DIR
+        find $CHROOT_RPMS_DIR -name "$1*" ! -name "*debuginfo*" -exec cp {} $CHROOT_INSTALL_RPM_DIR ';'
     fi
 
     chroot_mount
@@ -218,48 +243,62 @@ chroot_and_run_rpmbuild () {
     chroot_unmount
 }
 
+# This function is used to build a spec file and move its resulting RPMs to the build directory.
+# It will not build the RPMs in the chroot if they are already present in the environment and
+# $INCREMENTAL_TOOLCHAIN is set to "y".
 build_rpm_in_chroot_no_install () {
     start_record_timestamp "build packages/build/$1"
-    # $1 = SRPM name
-    # $2 = qualified package name
+    # $1 = spec name
+
     specPath=$(find $SPECROOT -name "$1.spec" -print -quit)
     specDir=$(dirname $specPath)
-    verrel=$(rpmspec -q $specPath --srpm --define="with_check 1" --define="_sourcedir $specDir" --define="dist $PARAM_DIST_TAG" --queryformat %{VERSION}-%{RELEASE})
-    if [ -n "$2" ]; then
-        rpmPath=$(find $CHROOT_RPMS_DIR -name "$2-$verrel*" -print -quit)
-    else
-        rpmPath=$(find $CHROOT_RPMS_DIR -name "$1-*" -print -quit)
+    rpmMacros=(-D "with_check 1" -D "_sourcedir $specDir" -D "dist $PARAM_DIST_TAG")
+    builtRpms="$(rpmspec -q $specPath --builtrpms "${rpmMacros[@]}" --queryformat="%{nvra}.rpm\n")"
+
+    # Find all the associated RPMs for the SRPM and check if they are in the chroot RPM directory
+    foundAllRPMs="false"
+    if [ "$INCREMENTAL_TOOLCHAIN" = "y" ]; then
+        foundAllRPMs="true"
+        for rpm in $builtRpms; do
+            rpmPath=$(find $CHROOT_RPMS_DIR -name "$rpm" -print -quit)
+            if [ -z "$rpmPath" ]; then
+                echo "Did not find incremental toolchain rpm '$rpm' in '$CHROOT_RPMS_DIR', must rebuild."
+                foundAllRPMs="false"
+                break
+            else
+                cp $rpmPath $FINISHED_RPM_DIR
+            fi
+        done
     fi
-    if [ "$INCREMENTAL_TOOLCHAIN" = "y" ] && [ -n "$rpmPath" ]; then
-        echo found $rpmPath for $1
-        if [[ -n "$2" ]]; then
-            # If we're using the qualified package name, there's probably naming conflicts
-            # that prevent us from simply globbing for RPMs with a prefix of the qualified name.
-            # So, we add the version-release string to the pattern to not pull in unrelated packages
-            find $CHROOT_RPMS_DIR -name "$2*$verrel*" -exec cp {} $FINISHED_RPM_DIR ';'
-        else
-            find $CHROOT_RPMS_DIR -name "$1*" -exec cp {} $FINISHED_RPM_DIR ';'
-        fi
-    else
+
+    if [ "$foundAllRPMs" = "false" ]; then
         echo only building RPM $1 within the chroot
-        srpmName=$(rpmspec -q $specPath --srpm --define="with_check 1" --define="_sourcedir $specDir" --define="dist $PARAM_DIST_TAG" --queryformat %{NAME}-%{VERSION}-%{RELEASE}.src.rpm)
+        srpmName=$(rpmspec -q $specPath --srpm "${rpmMacros[@]}" --queryformat %{NAME}-%{VERSION}-%{RELEASE}.src.rpm)
         srpmPath=$MARINER_INPUT_SRPMS_DIR/$srpmName
         cp $srpmPath $CHROOT_SRPMS_DIR
         chroot_and_run_rpmbuild $srpmName 2>&1 | awk '{ print strftime("time=\"%Y-%m-%dT%T%Z\""), $0; fflush(); }' | tee $TOOLCHAIN_LOGS/$srpmName.log
-        cp $CHROOT_RPMS_DIR_ARCH/$1* $FINISHED_RPM_DIR
-        cp $CHROOT_RPMS_DIR_NOARCH/$1* $FINISHED_RPM_DIR
+        copy_built_rpms $builtRpms
         cp $srpmPath $MARINER_OUTPUT_SRPMS_DIR
+        echo "$1" >> $TEMP_BUILT_SPECS_LIST
         echo NOT installing the package $srpmName
     fi
+
     echo "$1" >> $TOOLCHAIN_BUILD_LIST
     stop_record_timestamp "build packages/build/$1"
 }
 
-# Copy RPM subpackages that have a different prefix
-copy_rpm_subpackage () {
-    echo cache $1 RPMS
-    cp $CHROOT_RPMS_DIR_ARCH/$1* $FINISHED_RPM_DIR
-    cp $CHROOT_RPMS_DIR_NOARCH/$1* $FINISHED_RPM_DIR
+# Log the built RPMs and copy them to the finished RPMs directory.
+copy_built_rpms () {
+    for builtRpm in "$@"; do
+        rpmPath="$(find "$CHROOT_RPMS_DIR" -name "$builtRpm" -print -quit)"
+        if [[ ! -f "$rpmPath" ]]; then
+            echo ERROR: could not find expected built RPM "$builtRpm" in "$CHROOT_RPMS_DIR". >&2
+            return 1
+        fi
+
+        cp "$rpmPath" "$FINISHED_RPM_DIR"
+        echo "$builtRpm" >> "$TEMP_BUILT_RPMS_LIST"
+    done
 }
 
 start_record_timestamp "build prep"
@@ -273,10 +312,8 @@ mkdir -pv $LFS/usr/lib/rpm/mariner
 cp -v $SPECROOT/mariner-rpm-macros/gen-ld-script.sh $LFS/usr/lib/rpm/mariner/gen-ld-script.sh
 cp -v $SPECROOT/mariner-rpm-macros/generate-package-note.py $LFS/usr/lib/rpm/mariner/generate-package-note.py
 cp -v $SPECROOT/mariner-rpm-macros/verify-package-notes.sh $LFS/usr/lib/rpm/mariner/verify-package-notes.sh
-cp -v $SPECROOT/rpm/brp* $LFS/usr/lib/rpm
 mkdir -pv $LFS/usr/lib/rpm/macros.d
 cp -v $MARINER_TOOLCHAIN_MANIFESTS_DIR/macros.override $LFS/usr/lib/rpm/macros.d/macros.override
-chmod +x $LFS/usr/lib/rpm/brp*
 cp /etc/resolv.conf $LFS/etc/
 
 chroot_and_print_installed_rpms
@@ -288,7 +325,6 @@ start_record_timestamp "build packages/install"
 
 echo Building final list of toolchain RPMs
 build_rpm_in_chroot_no_install mariner-rpm-macros
-copy_rpm_subpackage mariner-check-macros
 chroot_and_install_rpms mariner-rpm-macros
 chroot_and_install_rpms mariner-check-macros
 build_rpm_in_chroot_no_install filesystem
@@ -386,13 +422,12 @@ build_rpm_in_chroot_no_install gperf
 chroot_and_install_rpms gperf
 
 # Python3 needs to be installed for RPM to build
-build_rpm_in_chroot_no_install python3 python3
+build_rpm_in_chroot_no_install python3
 rm -vf $FINISHED_RPM_DIR/python3*debuginfo*.rpm
 chroot_and_install_rpms python3 python3
 
 # libxml2 is required for at least: libxslt, createrepo_c
 build_rpm_in_chroot_no_install libxml2
-copy_rpm_subpackage python3-libxml2
 chroot_and_install_rpms libxml2
 
 # Download JDK rpms
@@ -410,7 +445,7 @@ esac
 build_rpm_in_chroot_no_install grep
 
 # Lua needs to be installed for RPM to build
-build_rpm_in_chroot_no_install lua lua
+build_rpm_in_chroot_no_install lua
 chroot_and_install_rpms lua lua
 
 build_rpm_in_chroot_no_install lua-rpm-macros
@@ -484,7 +519,7 @@ build_rpm_in_chroot_no_install meson
 # gtk-doc needs itstool, meson, python3-pygments
 chroot_and_install_rpms itstool
 chroot_and_install_rpms meson
-build_rpm_in_chroot_no_install python-pygments python3-pygments
+build_rpm_in_chroot_no_install python-pygments
 chroot_and_install_rpms python3-pygments
 
 # gtk-doc and ca-certificates require libxslt
@@ -496,7 +531,7 @@ build_rpm_in_chroot_no_install gtk-doc
 # python3-lxml requires python3-Cython and libxslt
 build_rpm_in_chroot_no_install Cython
 chroot_and_install_rpms python3-Cython
-build_rpm_in_chroot_no_install python-lxml python3-lxml
+build_rpm_in_chroot_no_install python-lxml
 chroot_and_install_rpms python3-lxml
 
 # p11-kit, libtasn1 and glib need gtk-doc
@@ -565,7 +600,6 @@ build_rpm_in_chroot_no_install libselinux
 
 # libcap-ng needs: swig, python3
 build_rpm_in_chroot_no_install libcap-ng
-copy_rpm_subpackage python3-libcap-ng
 
 # util-linux and rpm require libselinux and libcap-ng
 chroot_and_install_rpms libselinux
@@ -578,15 +612,13 @@ build_rpm_in_chroot_no_install rpm
 
 # python-jinja2 needs python3-markupsafe
 # python3-setuptools, python3-libs are also needed but already installed
-build_rpm_in_chroot_no_install python-markupsafe python3-markupsafe
-copy_rpm_subpackage python3-markupsafe
+build_rpm_in_chroot_no_install python-markupsafe
 chroot_and_install_rpms python3-markupsafe
-build_rpm_in_chroot_no_install python-jinja2 python3-jinja2
-copy_rpm_subpackage python3-jinja2
+build_rpm_in_chroot_no_install python-jinja2
 
 # systemd-bootstrap requires libcap, xz, kbd, kmod, util-linux, meson, intltool, python3-jinja2
 # gperf is also needed, but is installed earlier
-chroot_and_install_rpms libcap
+chroot_and_install_rpms libcap libcap # Use full naming since we have a collision with libcap-ng
 chroot_and_install_rpms lz4
 chroot_and_install_rpms xz
 chroot_and_install_rpms kbd
@@ -632,7 +664,6 @@ build_rpm_in_chroot_no_install pyproject-rpm-macros
 # Without it, audit's systemd macros won't expand and install/uninstall
 # will fail.
 build_rpm_in_chroot_no_install audit
-copy_rpm_subpackage python3-audit
 
 stop_record_timestamp "build packages"
 start_record_timestamp "finalize"
@@ -645,7 +676,6 @@ cp -v $CHROOT_RPMS_DIR_ARCH/* $FINISHED_RPM_DIR
 cp -v $CHROOT_RPMS_DIR_NOARCH/* $FINISHED_RPM_DIR
 
 echo Finished building final list of toolchain RPMs
-chroot_unmount
 ls -la $FINISHED_RPM_DIR
 ls -la $FINISHED_RPM_DIR | wc
 

@@ -3,7 +3,11 @@
 
 package repocloner
 
-import "github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
+import (
+	"fmt"
+
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
+)
 
 // RepoContents contains an array of packages contained in a repo.
 type RepoContents struct {
@@ -22,12 +26,15 @@ type RepoPackage struct {
 // It is capable of generate a local repository consisting of a set of request packages
 // and their dependencies.
 type RepoCloner interface {
-	Initialize(destinationDir, tmpDir, workerTar, existingRpmsDir, toolchainRpmsDir string, usePreviewRepo, disableDefaultRepos bool, repoDefinitions []string) error
-	AddNetworkFiles(tlsClientCert, tlsClientKey string) error
-	Clone(cloneDeps bool, packagesToClone ...*pkgjson.PackageVer) (prebuiltPackage bool, err error)
-	WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames []string, err error)
-	ConvertDownloadedPackagesIntoRepo() error
-	ClonedRepoContents() (repoContents *RepoContents, err error)
+	Clone(cloneDeps bool, packagesToClone ...*pkgjson.PackageVer) (allPackagesPrebuilt bool, err error)
 	CloneDirectory() string
+	ClonedRepoContents() (repoContents *RepoContents, err error)
 	Close() error
+	ConvertDownloadedPackagesIntoRepo() error
+	WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames []string, err error)
+}
+
+// ID returns a unique identifier for a package.
+func (r *RepoPackage) ID() string {
+	return fmt.Sprintf("%s-%s.%s.%s", r.Name, r.Version, r.Distribution, r.Architecture)
 }
