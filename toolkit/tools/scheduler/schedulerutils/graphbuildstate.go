@@ -16,6 +16,7 @@ import (
 type nodeState struct {
 	available bool
 	cached    bool
+	usedDelta bool
 }
 
 // GraphBuildState represents the build state of a graph.
@@ -65,6 +66,12 @@ func (g *GraphBuildState) IsNodeAvailable(node *pkggraph.PkgNode) bool {
 func (g *GraphBuildState) IsNodeCached(node *pkggraph.PkgNode) bool {
 	state := g.nodeToState[node]
 	return state != nil && state.cached
+}
+
+// IsNodeDelta returns true if the requested node was pre-downloaded as a delta package.
+func (g *GraphBuildState) IsNodeDelta(node *pkggraph.PkgNode) bool {
+	state := g.nodeToState[node]
+	return state != nil && state.usedDelta
 }
 
 // ActiveBuilds returns a map of Node IDs to BuildRequests that represents all outstanding builds.
@@ -139,6 +146,7 @@ func (g *GraphBuildState) RecordBuildResult(res *BuildResult, allowToolchainRebu
 	state := &nodeState{
 		available: res.Err == nil,
 		cached:    res.UsedCache,
+		usedDelta: res.WasDelta,
 	}
 
 	for _, node := range res.AncillaryNodes {
