@@ -45,13 +45,12 @@ func CanSubGraph(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, useCachedI
 
 		// If we are in trace mode, print the path from the root node to the unsolvable node
 		if logger.Log.IsLevelEnabled(logrus.TraceLevel) {
-			pt, ok := path.BellmanFordFrom(node, pkgGraph)
-			if !ok {
-				logger.Log.Warnf("Could not run BellmanFordFrom on %v", node)
+			paths := path.YenKShortestPaths(pkgGraph, 1, node, pkgNode)
+			if len(paths) == 0 {
+				logger.Log.Warnf("Could not find path between %v and %v with YenKShortestPaths()", node, pkgNode)
 			} else {
-				path, _ := pt.To(pkgNode.ID())
 				logger.Log.Tracef("Path between %v and %v:", node, pkgNode)
-				for _, n := range path {
+				for _, n := range paths[0] {
 					logger.Log.Tracef("  %v", n.(*pkggraph.PkgNode))
 				}
 			}
