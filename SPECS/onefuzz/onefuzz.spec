@@ -49,3 +49,6 @@ ONEFUZZ_SET_VERSION=%{version} RUSTFLAGS="-llzma" cargo test --release -- --skip
 %{_bindir}/*
 
 %changelog
+* Fri Jul 21 2023 Chris Swindle <chrisswindle@microsoft.com> - 8.5.0-1
+- Original version for CBL-Mariner
+- License verified
