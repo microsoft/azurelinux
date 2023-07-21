@@ -9,10 +9,11 @@ Group:          Development/Tools
 URL:            https://github.com/microsoft/OneFuzz
 Source0:        https://github.com/microsoft/onefuzz/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         git-version.patch
-%define debug_package %{nil}
+
 BuildRequires:  cargo >= 1.68
 BuildRequires:  git
 BuildRequires:  kernel-headers
+BuildRequires:  liblzma-devel
 BuildRequires:  libunwind-devel
 BuildRequires:  openssl-devel
 BuildRequires:  perl
