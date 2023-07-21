@@ -23,9 +23,10 @@ func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMute
 	graphMutex.RLock()
 	defer graphMutex.RUnlock()
 
-	// Group build nodes together as they will be unblocked all at once for any given SRPM,
+	// Group build and test nodes together as they will be unblocked all at once for any given SRPM,
 	// and building a single build node will result in all of them becoming available.
 	buildNodes := make(map[string][]*pkggraph.PkgNode)
+	testNodes := make(map[string][]*pkggraph.PkgNode)
 
 	for _, node := range nodesToBuild {
 		if node.Type == pkggraph.TypeLocalBuild {
@@ -33,22 +34,27 @@ func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMute
 			continue
 		}
 
-		req := &BuildRequest{
-			Node:           node,
-			PkgGraph:       pkgGraph,
-			AncillaryNodes: []*pkggraph.PkgNode{node},
-			IsDelta:        node.State == pkggraph.StateDelta,
+		if node.Type == pkggraph.TypeTest {
+			testNodes[node.SrpmPath] = append(testNodes[node.SrpmPath], node)
+			continue
 		}
 
-		req.CanUseCache = isCacheAllowed && canUseCacheForNode(pkgGraph, req.Node, packagesToRebuild, buildState)
+		ancillaryNodes := []*pkggraph.PkgNode{node}
+		isDelta := node.State == pkggraph.StateDelta
+		req := buildRequest(pkgGraph, buildState, packagesToRebuild, node, ancillaryNodes, isCacheAllowed, isDelta)
 
 		requests = append(requests, req)
 	}
 
-	for _, nodes := range buildNodes {
-		const defaultNode = 0
+	requests = append(requests, groupedNodesToRequests(pkgGraph, buildState, packagesToRebuild, buildNodes, isCacheAllowed)...)
+	requests = append(requests, groupedNodesToRequests(pkgGraph, buildState, packagesToRebuild, testNodes, isCacheAllowed)...)
 
-		// Check if any of the nodes in buildNodes is a delta node and mark it. We will use this to determine if the
+	return
+}
+
+func groupedNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, packagesToRebuild []*pkgjson.PackageVer, groupedNodes map[string][]*pkggraph.PkgNode, isCacheAllowed bool) (requests []*BuildRequest) {
+	for _, nodes := range groupedNodes {
+		// Check if any of the nodes in groupedNodes is a delta node and mark it. We will use this to determine if the
 		// build is a delta build that might have pre-built .rpm files available.
 		hasADeltaNode := false
 		for _, node := range nodes {
@@ -58,18 +64,24 @@ func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMute
 			}
 		}
 
-		req := &BuildRequest{
-			Node:           nodes[defaultNode],
-			PkgGraph:       pkgGraph,
-			AncillaryNodes: nodes,
-			IsDelta:        hasADeltaNode,
-		}
-
-		req.CanUseCache = isCacheAllowed && canUseCacheForNode(pkgGraph, req.Node, packagesToRebuild, buildState)
+		defaultNode := nodes[0]
+		req := buildRequest(pkgGraph, buildState, packagesToRebuild, defaultNode, nodes, isCacheAllowed, hasADeltaNode)
 
 		requests = append(requests, req)
 	}
 
+	return
+}
+
+func buildRequest(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, packagesToRebuild []*pkgjson.PackageVer, builtNode *pkggraph.PkgNode, ancillaryNodes []*pkggraph.PkgNode, isCacheAllowed, isDelta bool) (request *BuildRequest) {
+	request = &BuildRequest{
+		Node:           builtNode,
+		PkgGraph:       pkgGraph,
+		AncillaryNodes: ancillaryNodes,
+		IsDelta:        isDelta,
+	}
+
+	request.CanUseCache = isCacheAllowed && canUseCacheForNode(pkgGraph, request.Node, packagesToRebuild, buildState)
 	return
 }
 

@@ -132,7 +132,7 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 	logger.Log.Debug("Worker done")
 }
 
-// buildBuildNode builds a TypeBuild node, either used a cached copy if possible or building the corresponding SRPM.
+// buildBuildNode builds a TypeLocalBuild node, either used a cached copy if possible or building the corresponding SRPM.
 func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, canUseCache bool, buildAttempts int, ignoredPackages []*pkgjson.PackageVer) (usedCache, ignored bool, builtFiles []string, logFile string, err error) {
 	var missingFiles []string
 

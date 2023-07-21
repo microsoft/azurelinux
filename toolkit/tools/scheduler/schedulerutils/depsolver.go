@@ -8,6 +8,7 @@ import (
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
 	"gonum.org/v1/gonum/graph"
 	"gonum.org/v1/gonum/graph/traverse"
 )
@@ -103,19 +104,14 @@ func FindUnblockedNodesFromResult(res *BuildResult, pkgGraph *pkggraph.PkgGraph,
 	// Since all the ancillary nodes are marked as available already, there may be duplicate nodes returned by the below loop.
 	// e.g. If a meta node requires two build nodes for the same SPEC, then that meta node will be reported twice.
 	// Filter the nodes to ensure no duplicates.
-	var unfilteredUnblockedNodes []*pkggraph.PkgNode
-	unblockedNodesMap := make(map[*pkggraph.PkgNode]bool)
+	unblockedNodesSet := make(map[*pkggraph.PkgNode]bool)
 	for _, node := range res.AncillaryNodes {
-		unfilteredUnblockedNodes = append(unfilteredUnblockedNodes, findUnblockedNodesFromNode(pkgGraph, buildState, node)...)
-	}
-
-	for _, node := range unfilteredUnblockedNodes {
-		_, found := unblockedNodesMap[node]
-		if !found {
-			unblockedNodesMap[node] = true
-			unblockedNodes = append(unblockedNodes, node)
+		for _, unblockedNode := range findUnblockedNodesFromNode(pkgGraph, buildState, node) {
+			unblockedNodesSet[unblockedNode] = true
 		}
 	}
+
+	unblockedNodes = sliceutils.SetToSlice(unblockedNodesSet)
 
 	return
 }

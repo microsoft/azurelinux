@@ -73,7 +73,9 @@ func printIndirectlyMostUnresolved(pkgGraph *pkggraph.PkgGraph, maxResults int) 
 	unresolvedPackageDependents := make(map[string][]string)
 
 	for _, node := range pkgGraph.AllNodes() {
-		if node.Type != pkggraph.TypeLocalRun && node.Type != pkggraph.TypeLocalBuild {
+		if node.Type != pkggraph.TypeLocalRun &&
+			node.Type != pkggraph.TypeLocalBuild &&
+			node.Type != pkggraph.TypeTest {
 			continue
 		}
 
