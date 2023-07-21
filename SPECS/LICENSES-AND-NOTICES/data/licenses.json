@@ -2229,6 +2229,7 @@
                 "nmi",
                 "node-problem-detector",
                 "ntopng",
+                "onefuzz",
                 "packer",
                 "pcaudiolib",
                 "pcre2",
