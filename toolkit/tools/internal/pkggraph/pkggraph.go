@@ -370,7 +370,7 @@ func (g *PkgGraph) addToLookup(pkgNode *PkgNode, deferSort bool) (err error) {
 		existingLookup.TestNode = pkgNode.This
 	}
 
-	// Sort the updated list unless we are defering until all nodes are added
+	// Sort the updated list unless we are deferring until all nodes are added
 	if !deferSort {
 		sort.Slice(g.lookupTable()[pkgName], func(i, j int) bool {
 			intervalI, _ := g.lookupTable()[pkgName][i].RunNode.VersionedPkg.Interval()
