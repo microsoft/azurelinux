@@ -45,3 +45,12 @@ func (t *TestAgent) Config() (config BuildAgentConfig) {
 func (t *TestAgent) Close() (err error) {
 	return
 }
+
+// TestPackage simply sleeps and then returns success for TestAgent.
+func (t *TestAgent) TestPackage(inputFile, logName string, dependencies []string) (logFile string, err error) {
+	const sleepDuration = time.Second * 5
+	time.Sleep(sleepDuration)
+
+	logFile = filepath.Join(t.config.LogDir, logName)
+	return
+}

@@ -106,7 +106,7 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 
 		switch req.Node.Type {
 		case pkggraph.TypeLocalBuild:
-			res.UsedCache, res.Ignored, res.BuiltFiles, res.LogFile, res.Err = buildBuildNode(req.Node, req.PkgGraph, graphMutex, agent, req.CanUseCache, buildAttempts, checkAttempts, ignoredPackages)
+			res.UsedCache, res.Ignored, res.BuiltFiles, res.LogFile, res.Err = buildBuildNode(req.Node, req.PkgGraph, graphMutex, agent, req.CanUseCache, buildAttempts, ignoredPackages)
 			if res.Err == nil {
 				setAncillaryBuildNodesStatus(req, pkggraph.StateUpToDate)
 			} else {
@@ -201,7 +201,7 @@ func getBuildDependencies(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, g
 		dependencyNode := n.(*pkggraph.PkgNode)
 
 		rpmPath := dependencyNode.RpmPath
-		if rpmPath == "" || rpmPath == "<NO_RPM_PATH>" || rpmPath == node.RpmPath {
+		if rpmPath == "" || rpmPath == pkggraph.NoRPMPath || rpmPath == node.RpmPath {
 			return
 		}
 

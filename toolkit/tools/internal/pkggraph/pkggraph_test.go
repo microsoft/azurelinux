@@ -297,7 +297,7 @@ func TestNodeStateString(t *testing.T) {
 	var s NodeState
 	s = -1
 	assert.Panics(t, func() { _ = s.String() })
-	for s = StateUnknown + 1; s <= StateMAX; s++ {
+	for s = StateUnknown + 1; s < StateMAX; s++ {
 		assert.NotPanics(t, func() { _ = s.String() })
 	}
 }
@@ -310,10 +310,11 @@ func TestNodeTypeString(t *testing.T) {
 	assert.Equal(t, "Remote", TypeRemoteRun.String())
 	assert.Equal(t, "PureMeta", TypePureMeta.String())
 	assert.Equal(t, "PreBuilt", TypePreBuilt.String())
+	assert.Equal(t, "Test", TypeTest.String())
 	var tp NodeType
 	tp = -1
 	assert.Panics(t, func() { _ = tp.String() })
-	for tp = TypeUnknown + 1; tp <= TypeMAX; tp++ {
+	for tp = TypeUnknown + 1; tp < TypeMAX; tp++ {
 		assert.NotPanics(t, func() { _ = tp.String() })
 	}
 }
@@ -324,8 +325,8 @@ func TestDOTColor(t *testing.T) {
 		st NodeState
 		tp NodeType
 	)
-	for st = StateUnknown + 1; st <= StateMAX; st++ {
-		for tp = TypeUnknown + 1; tp <= TypeMAX; tp++ {
+	for st = StateUnknown + 1; st < StateMAX; st++ {
+		for tp = TypeUnknown + 1; tp < TypeMAX; tp++ {
 			n := PkgNode{State: st, Type: tp}
 			assert.NotPanics(t, func() { n.DOTColor() })
 			assert.True(t, len(n.DOTColor()) > 0)

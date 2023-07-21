@@ -100,7 +100,7 @@ func addUnresolvedPackage(g *pkggraph.PkgGraph, pkgVer *pkgjson.PackageVer) (new
 	}
 
 	// Create a new node
-	newRunNode, err = g.AddPkgNode(pkgVer, pkggraph.StateUnresolved, pkggraph.TypeRemoteRun, "<NO_SRPM_PATH>", "<NO_RPM_PATH>", "<NO_SPEC_PATH>", "<NO_SOURCE_PATH>", "<NO_ARCHITECTURE>", "<NO_REPO>")
+	newRunNode, err = g.AddPkgNode(pkgVer, pkggraph.StateUnresolved, pkggraph.TypeRemoteRun, pkggraph.NoSRPMPath, pkggraph.NoRPMPath, pkggraph.NoSpecPath, pkggraph.NoSourceDir, pkggraph.NoArchitecture, pkggraph.NoSourceRepo)
 	if err != nil {
 		return
 	}
@@ -171,17 +171,11 @@ func addNodesForPackage(g *pkggraph.PkgGraph, pkg *pkgjson.Package) (err error) 
 
 	if newTestNode == nil {
 		// Add "Test" node
-		newTestNode, err = g.AddPkgNode(pkg.Provides, pkggraph.StateBuild, pkggraph.TypeTest, pkg.SrpmPath, pkg.RpmPath, pkg.SpecPath, pkg.SourceDir, pkg.Architecture, "<LOCAL>")
+		newTestNode, err = g.AddPkgNode(pkg.Provides, pkggraph.StateBuild, pkggraph.TypeTest, pkg.SrpmPath, pkggraph.NoRPMPath, pkg.SpecPath, pkg.SourceDir, pkg.Architecture, "<LOCAL>")
 		if err != nil {
 			return
 		}
 		logger.Log.Debugf("Adding test node %s with id %d\n", newTestNode.FriendlyName(), newTestNode.ID())
-	}
-
-	// A "test" node has an implicit dependency on its corresponding "build" node, encode that here.
-	err = g.AddEdge(newTestNode, newBuildNode)
-	if err != nil {
-		logger.Log.Errorf("Adding test -> build edge failed for %+v", pkg.Provides)
 	}
 
 	return
@@ -271,7 +265,7 @@ func addPkgDependencies(g *pkggraph.PkgGraph, pkg *pkgjson.Package) (dependencie
 	}
 
 	if nodes.TestNode == nil {
-		logger.Log.Trace("No test node for package %+v, skipping test dependencies", pkg)
+		logger.Log.Tracef("No test node for package %+v, skipping test dependencies", pkg)
 		return
 	}
 

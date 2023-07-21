@@ -35,15 +35,15 @@ type NodeState int
 
 // Valid values for NodeState type
 const (
-	StateUnknown    NodeState = iota            // Unknown state
-	StateMeta       NodeState = iota            // Meta nodes do not represent actual build artifacts, but additional nodes used for managing dependencies
-	StateBuild      NodeState = iota            // A package from a local SRPM which should be built from source
-	StateUpToDate   NodeState = iota            // A local RPM is already built and is available
-	StateUnresolved NodeState = iota            // A dependency is not available locally and must be acquired from a remote repo
-	StateCached     NodeState = iota            // A dependency was not available locally, but is now available in the chache
-	StateBuildError NodeState = iota            // A package from a local SRPM which failed to build
-	StateDelta      NodeState = iota            // Same as build state, but an attempt has been made to pre-download the .rpm to the cache
-	StateMAX        NodeState = StateBuildError // Max allowable state
+	StateUnknown    NodeState = iota // Unknown state
+	StateMeta       NodeState = iota // Meta nodes do not represent actual build artifacts, but additional nodes used for managing dependencies
+	StateBuild      NodeState = iota // A package from a local SRPM which should be built from source
+	StateUpToDate   NodeState = iota // A local RPM is already built and is available
+	StateUnresolved NodeState = iota // A dependency is not available locally and must be acquired from a remote repo
+	StateCached     NodeState = iota // A dependency was not available locally, but is now available in the chache
+	StateBuildError NodeState = iota // A package from a local SRPM which failed to build
+	StateDelta      NodeState = iota // Same as build state, but an attempt has been made to pre-download the .rpm to the cache
+	StateMAX        NodeState = iota // Max allowable state
 )
 
 // NodeType indicates the general node type (build, run, goal, remote).
@@ -51,15 +51,26 @@ type NodeType int
 
 // Valid values for NodeType type
 const (
-	TypeUnknown    NodeType = iota         // Unknown type
-	TypeLocalBuild NodeType = iota         // Package can be build if all dependency edges are satisfied
-	TypeLocalRun   NodeType = iota         // Package can be run if all dependency edges are satisfied. Will be associated with a partner build node
-	TypeGoal       NodeType = iota         // Meta node which depends on a user selected subset of packages to be built.
-	TypeRemoteRun  NodeType = iota         // A non-local node which may have a cache entry
-	TypePureMeta   NodeType = iota         // An arbitrary meta node with no other meaning
-	TypePreBuilt   NodeType = iota         // A node indicating a pre-built SRPM used in breaking cyclic build dependencies
-	TypeTest       NodeType = iota         // A node for running the '%check' section of the underlying package
-	TypeMAX        NodeType = TypePureMeta // Max allowable type
+	TypeUnknown    NodeType = iota // Unknown type
+	TypeLocalBuild NodeType = iota // Package can be build if all dependency edges are satisfied
+	TypeLocalRun   NodeType = iota // Package can be run if all dependency edges are satisfied. Will be associated with a partner build node
+	TypeGoal       NodeType = iota // Meta node which depends on a user selected subset of packages to be built.
+	TypeRemoteRun  NodeType = iota // A non-local node which may have a cache entry
+	TypePureMeta   NodeType = iota // An arbitrary meta node with no other meaning
+	TypePreBuilt   NodeType = iota // A node indicating a pre-built SRPM used in breaking cyclic build dependencies
+	TypeTest       NodeType = iota // A node for running the '%check' section of the underlying package
+	TypeMAX        NodeType = iota // Max allowable type
+)
+
+// Constants representing empty member fields of the 'PkgNode' struct.
+const (
+	NoArchitecture = "<NO_ARCHITECTURE>"
+	NoName         = "<NO_NAME>"
+	NoRPMPath      = "<NO_RPM_PATH>"
+	NoSourceDir    = "<NO_SOURCE_DIR>"
+	NoSourceRepo   = "<NO_SOURCE_REPO>"
+	NoSpecPath     = "<NO_SPEC_PATH>"
+	NoSRPMPath     = "<NO_SRPM_PATH>"
 )
 
 // Dot encoding/decoding keys
@@ -146,6 +157,8 @@ func (n NodeType) String() string {
 		return "PureMeta"
 	case TypePreBuilt:
 		return "PreBuilt"
+	case TypeTest:
+		return "Test"
 	default:
 		logger.Log.Panic("Invalid NodeType encountered when serializing to string!")
 		return "error"
@@ -331,10 +344,10 @@ func (g *PkgGraph) addToLookup(pkgNode *PkgNode, deferSort bool) (err error) {
 	}
 	if existingLookup == nil {
 		if (!deferSort) && pkgNode.Type == TypeLocalBuild {
-			err = fmt.Errorf("can't add %s, no corresponding run node found and not defering sort", pkgNode)
+			err = fmt.Errorf("can't add %s, no corresponding run node found and not deferring sort", pkgNode)
 			return
 		}
-		existingLookup = &LookupNode{nil, nil}
+		existingLookup = &LookupNode{}
 		g.lookupTable()[pkgName] = append(g.lookupTable()[pkgName], existingLookup)
 	}
 
@@ -682,6 +695,8 @@ func (n *PkgNode) FriendlyName() string {
 		return fmt.Sprintf("Meta(%d)", n.ID())
 	case TypePreBuilt:
 		return fmt.Sprintf("%s-%s-PREBUILT<%s>", n.VersionedPkg.Name, n.VersionedPkg.Version, n.State.String())
+	case TypeTest:
+		return fmt.Sprintf("%s-%s-TEST<%s>", n.VersionedPkg.Name, n.VersionedPkg.Version, n.State.String())
 	default:
 		return "UNKNOWN NODE TYPE"
 	}
@@ -707,7 +722,7 @@ func (n *PkgNode) String() string {
 		name = n.VersionedPkg.Name
 		version = fmt.Sprintf("%s%s,%s%s", n.VersionedPkg.Condition, n.VersionedPkg.Version, n.VersionedPkg.SCondition, n.VersionedPkg.SVersion)
 	} else {
-		name = "<NO NAME>"
+		name = NoName
 	}
 
 	return fmt.Sprintf("%s(%s):<ID:%d Type:%s State:%s Rpm:%s> from '%s' in '%s'", name, version, n.nodeID, n.Type.String(), n.State.String(), n.RpmPath, n.SrpmPath, n.SourceRepo)
@@ -1056,9 +1071,9 @@ func (g *PkgGraph) AddGoalNode(goalName string, packages []*pkgjson.PackageVer, 
 	goalNode = &PkgNode{
 		State:      StateMeta,
 		Type:       TypeGoal,
-		SrpmPath:   "<NO_SRPM_PATH>",
-		RpmPath:    "<NO_RPM_PATH>",
-		SourceRepo: "<NO_REPO>",
+		SrpmPath:   NoSRPMPath,
+		RpmPath:    NoRPMPath,
+		SourceRepo: NoSourceRepo,
 		nodeID:     g.NewNode().ID(),
 		GoalName:   goalName,
 	}
@@ -1435,7 +1450,7 @@ func rpmsProvidedBySRPM(srpmPath string, pkgGraph *PkgGraph, graphMutex *sync.RW
 			continue
 		}
 
-		if node.RpmPath == "" || node.RpmPath == "<NO_RPM_PATH>" {
+		if node.RpmPath == "" || node.RpmPath == NoRPMPath {
 			continue
 		}
 
