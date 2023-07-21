@@ -1,0 +1,30 @@
+diff --git a/src/agent/onefuzz-agent/build.rs b/src/agent/onefuzz-agent/build.rs
+index d763c31c..34e74b1a 100644
+--- a/src/agent/onefuzz-agent/build.rs
++++ b/src/agent/onefuzz-agent/build.rs
+@@ -53,7 +53,9 @@ fn print_version(include_sha: bool, include_local: bool, sha: &str) -> Result<()
+ }
+ 
+ fn main() -> Result<(), Box<dyn Error>> {
+-    let sha = run_cmd(&["git", "rev-parse", "HEAD"])?;
++    // For mariner builds we don't record the sha from git, so
++    // just set it to N/A.
++    let sha = "N/A";
+ 
+     let hardcode_version = env::var("ONEFUZZ_SET_VERSION");
+     if let Ok(hardcode_version) = &hardcode_version {
+diff --git a/src/agent/onefuzz-task/build.rs b/src/agent/onefuzz-task/build.rs
+index 975c40d6..82d908aa 100644
+--- a/src/agent/onefuzz-task/build.rs
++++ b/src/agent/onefuzz-task/build.rs
+@@ -53,7 +53,9 @@ fn print_version(include_sha: bool, include_local: bool, sha: &str) -> Result<()
+ }
+ 
+ fn main() -> Result<(), Box<dyn Error>> {
+-    let sha = run_cmd(&["git", "rev-parse", "HEAD"])?;
++    // For mariner builds we don't record the sha from git, so
++    // just set it to N/A.
++    let sha = "N/A";
+ 
+     let hardcode_version = env::var("ONEFUZZ_SET_VERSION");
+     if let Ok(hardcode_version) = &hardcode_version {
