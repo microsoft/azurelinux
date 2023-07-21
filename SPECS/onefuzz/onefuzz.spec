@@ -1,4 +1,3 @@
-%define debug_package %{nil}
 Summary:        A self-hosted Fuzzing-As-A-Service platform
 Name:           onefuzz
 Version:        8.5.0
@@ -10,13 +9,14 @@ Group:          Development/Tools
 URL:            https://github.com/microsoft/OneFuzz
 Source0:        https://github.com/microsoft/onefuzz/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         git-version.patch
+%define debug_package %{nil}
 BuildRequires:  cargo >= 1.68
-BuildRequires:  rust >= 1.68
+BuildRequires:  git
 BuildRequires:  kernel-headers
+BuildRequires:  libunwind-devel
 BuildRequires:  openssl-devel
 BuildRequires:  perl
-BuildRequires:  libunwind-devel
-BuildRequires:  git
+BuildRequires:  rust >= 1.68
 BuildRequires:  util-linux
 
 %description
@@ -41,9 +41,8 @@ install target/release/onefuzz-task %{buildroot}%{_bindir}/
 
 %check
 cd src/agent
-# The tests expect a machine id file to be present and be a valid UUID, so creating one here
-uuidgen > /etc/machine-id
-ONEFUZZ_SET_VERSION=%{version} RUSTFLAGS="-llzma" cargo test --release
+# Run all tests except test_get_machine_id as that requires a specific file to exist
+ONEFUZZ_SET_VERSION=%{version} RUSTFLAGS="-llzma" cargo test --release -- --skip test_get_machine_id
 
 %files
 %license LICENSE
