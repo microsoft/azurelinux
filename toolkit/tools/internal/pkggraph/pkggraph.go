@@ -307,7 +307,7 @@ func (g *PkgGraph) AddRemoteToLookup(pkgNode *PkgNode, deferSort bool) (err erro
 		requestInterval, nodeInterval pkgjson.PackageVerInterval
 	)
 
-	if pkgNode.Type != TypeRemoteRun {
+	if pkgNode.Type != TypeRemote {
 		logger.Log.Tracef("Skipping %+v, not valid for replacing lookup", pkgNode)
 		return
 	}
@@ -327,7 +327,7 @@ func (g *PkgGraph) AddRemoteToLookup(pkgNode *PkgNode, deferSort bool) (err erro
 		}
 		logger.Log.Debugf("Found an existing lookup entry for %s of type %s", pkgNode.FriendlyName(), lookupNode.RunNode.State.String())
 
-		if lookupNode.RunNode.Type != TypeLocalRun {
+		if lookupNode.RunNode.Type != TypeRun {
 			continue
 		}
 
@@ -1406,7 +1406,7 @@ func (g *PkgGraph) replaceCurrentNodeWithPrebuiltNode(currentNode, preBuiltNode,
 	parentNodes := g.To(currentNode.ID())
 	for parentNodes.Next() {
 		parentNode := parentNodes.Node().(*PkgNode)
-		if parentNode.Type == TypeLocalBuild && parentNode.SrpmPath == previousNode.SrpmPath {
+		if parentNode.Type == TypeBuild && parentNode.SrpmPath == previousNode.SrpmPath {
 			g.RemoveEdge(parentNode.ID(), currentNode.ID())
 
 			err := g.AddEdge(parentNode, preBuiltNode)
@@ -1463,7 +1463,7 @@ func (g *PkgGraph) fixCyclesWithExistingRPMS(trimmedCycle []*PkgNode, resolveCyc
 					currentNode.SrpmPath, previousNode.SrpmPath)
 				upstreamAvailableNode := g.CloneNode(currentNode)
 				upstreamAvailableNode.State = StateUnresolved
-				upstreamAvailableNode.Type = TypeRemoteRun
+				upstreamAvailableNode.Type = TypeRemote
 
 				logger.Log.Debugf("Adding a remote unresolved node '%s' with id %d.", upstreamAvailableNode.FriendlyName(), upstreamAvailableNode.ID())
 				g.replaceCurrentNodeWithPrebuiltNode(currentNode, upstreamAvailableNode, previousNode)
