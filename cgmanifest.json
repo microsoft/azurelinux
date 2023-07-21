@@ -15033,6 +15033,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "onefuzz",
+          "version": "8.5.0",
+          "downloadUrl": "https://github.com/microsoft/onefuzz/archive/refs/tags/8.5.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "oniguruma",
           "version": "6.9.7.1",
           "downloadUrl": "https://github.com/kkos/oniguruma/releases/download/v6.9.7.1/onig-6.9.7.1.tar.gz"
