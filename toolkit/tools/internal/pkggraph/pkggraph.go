@@ -81,6 +81,13 @@ const (
 	dotKeyFill         = "style"
 )
 
+var lookupNodes = map[NodeType]bool{
+	TypeLocalBuild: true,
+	TypeLocalRun:   true,
+	TypeRemoteRun:  true,
+	TypeTest:       true,
+}
+
 // PkgNode represents a package.
 type PkgNode struct {
 	nodeID       int64               // Unique ID for the node
@@ -216,19 +223,19 @@ func (g *PkgGraph) initLookup() {
 
 	// Scan all nodes, start with only the run nodes to properly initialize the lookup structures
 	// (they always expect a run node to be present)
+	remainingLookupNodes := []*PkgNode{}
 	for _, n := range graph.NodesOf(g.Nodes()) {
 		pkgNode := n.(*PkgNode)
 		if pkgNode.Type == TypeLocalRun || pkgNode.Type == TypeRemoteRun {
 			g.addToLookup(pkgNode, true)
+		} else if lookupNodes[pkgNode.Type] {
+			remainingLookupNodes = append(remainingLookupNodes, pkgNode)
 		}
 	}
 
-	// Now run again for any build nodes, or other nodes we want to track
-	for _, n := range graph.NodesOf(g.Nodes()) {
-		pkgNode := n.(*PkgNode)
-		if pkgNode.Type != TypeLocalRun && pkgNode.Type != TypeRemoteRun {
-			g.addToLookup(pkgNode, true)
-		}
+	// Now run again for other nodes we want to track
+	for _, pkgNode := range remainingLookupNodes {
+		g.addToLookup(pkgNode, true)
 	}
 
 	// Sort each of the lookup lists from lowest version to highest version. The RunNode is always guaranteed to be
@@ -269,10 +276,7 @@ func (g *PkgGraph) lookupTable() map[string][]*LookupNode {
 // validateNodeForLookup checks if a node is valid for adding to the lookup table
 func (g *PkgGraph) validateNodeForLookup(pkgNode *PkgNode) (valid bool, err error) {
 	// Only add run, remote, or build nodes to lookup
-	if pkgNode.Type != TypeLocalBuild &&
-		pkgNode.Type != TypeLocalRun &&
-		pkgNode.Type != TypeRemoteRun &&
-		pkgNode.Type != TypeTest {
+	if !lookupNodes[pkgNode.Type] {
 		err = fmt.Errorf("%s has invalid type for lookup", pkgNode)
 		return
 	}
@@ -329,10 +333,7 @@ func (g *PkgGraph) validateNodeForLookup(pkgNode *PkgNode) (valid bool, err erro
 // addToLookup adds a node to the lookup table if it is the correct type (build/run)
 func (g *PkgGraph) addToLookup(pkgNode *PkgNode, deferSort bool) (err error) {
 	// We only care about run/build nodes or remote dependencies
-	if pkgNode.Type != TypeLocalBuild &&
-		pkgNode.Type != TypeLocalRun &&
-		pkgNode.Type != TypeRemoteRun &&
-		pkgNode.Type != TypeTest {
+	if !lookupNodes[pkgNode.Type] {
 		logger.Log.Tracef("Skipping %+v, not valid for lookup", pkgNode)
 		return
 	}
