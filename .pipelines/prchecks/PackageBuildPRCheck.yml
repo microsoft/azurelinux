@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 # Since we're boosting our builds by using a private, pre-compiled raw toolchain
 # the pipeline requires defining the following variables outside of the YAML:
 # - rawToolchainCacheURL_AMD64
