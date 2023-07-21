@@ -265,7 +265,7 @@ func addPkgDependencies(g *pkggraph.PkgGraph, pkg *pkgjson.Package) (dependencie
 	}
 
 	if nodes.TestNode == nil {
-		logger.Log.Tracef("No test node for package %+v, skipping test dependencies", pkg)
+		logger.Log.Debugf("No test node for package %+v, skipping test dependencies", pkg)
 		return
 	}
 

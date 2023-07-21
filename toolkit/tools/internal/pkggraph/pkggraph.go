@@ -174,14 +174,21 @@ func (n *PkgNode) DOTColor() string {
 		}
 		return "aquamarine"
 	case StateBuild:
+		if n.Type == TypeTest {
+			return "gold4"
+		}
 		return "gold"
 	case StateBuildError:
 		return "darkorange"
 	case StateUpToDate:
-		if n.Type == TypePreBuilt {
+		switch n.Type {
+		case TypePreBuilt:
 			return "greenyellow"
+		case TypeTest:
+			return "lime"
+		default:
+			return "forestgreen"
 		}
-		return "forestgreen"
 	case StateUnresolved:
 		return "crimson"
 	case StateCached:
@@ -261,12 +268,11 @@ func (g *PkgGraph) lookupTable() map[string][]*LookupNode {
 
 // validateNodeForLookup checks if a node is valid for adding to the lookup table
 func (g *PkgGraph) validateNodeForLookup(pkgNode *PkgNode) (valid bool, err error) {
-	var (
-		haveDuplicateNode bool = false
-	)
-
 	// Only add run, remote, or build nodes to lookup
-	if pkgNode.Type != TypeLocalBuild && pkgNode.Type != TypeLocalRun && pkgNode.Type != TypeRemoteRun {
+	if pkgNode.Type != TypeLocalBuild &&
+		pkgNode.Type != TypeLocalRun &&
+		pkgNode.Type != TypeRemoteRun &&
+		pkgNode.Type != TypeTest {
 		err = fmt.Errorf("%s has invalid type for lookup", pkgNode)
 		return
 	}
@@ -276,16 +282,20 @@ func (g *PkgGraph) validateNodeForLookup(pkgNode *PkgNode) (valid bool, err erro
 	if err != nil {
 		return
 	}
+
 	if existingLookup != nil {
+		haveDuplicateNode := false
+
 		switch pkgNode.Type {
 		case TypeLocalBuild:
 			haveDuplicateNode = existingLookup.BuildNode != nil
-		case TypeRemoteRun:
-			// For the purposes of lookup, a "Remote" node provides the same utility as a "Run" node
-			fallthrough
-		case TypeLocalRun:
+		// For the purposes of lookup, a "Remote" node provides the same utility as a "Run" node
+		case TypeLocalRun, TypeRemoteRun:
 			haveDuplicateNode = existingLookup.RunNode != nil
+		case TypeTest:
+			haveDuplicateNode = existingLookup.TestNode != nil
 		}
+
 		if haveDuplicateNode {
 			err = fmt.Errorf("already have a lookup for %s", pkgNode)
 			return
@@ -318,12 +328,11 @@ func (g *PkgGraph) validateNodeForLookup(pkgNode *PkgNode) (valid bool, err erro
 
 // addToLookup adds a node to the lookup table if it is the correct type (build/run)
 func (g *PkgGraph) addToLookup(pkgNode *PkgNode, deferSort bool) (err error) {
-	var (
-		duplicateError = fmt.Errorf("already have a lookup entry for %s", pkgNode)
-	)
-
 	// We only care about run/build nodes or remote dependencies
-	if pkgNode.Type != TypeLocalBuild && pkgNode.Type != TypeLocalRun && pkgNode.Type != TypeRemoteRun {
+	if pkgNode.Type != TypeLocalBuild &&
+		pkgNode.Type != TypeLocalRun &&
+		pkgNode.Type != TypeRemoteRun &&
+		pkgNode.Type != TypeTest {
 		logger.Log.Tracef("Skipping %+v, not valid for lookup", pkgNode)
 		return
 	}
@@ -333,15 +342,15 @@ func (g *PkgGraph) addToLookup(pkgNode *PkgNode, deferSort bool) (err error) {
 		return
 	}
 
-	var existingLookup *LookupNode
 	logger.Log.Tracef("Adding %+v to lookup", pkgNode)
 	// Get the existing package lookup, or create it
 	pkgName := pkgNode.VersionedPkg.Name
 
-	existingLookup, err = g.FindExactPkgNodeFromPkg(pkgNode.VersionedPkg)
+	existingLookup, err := g.FindExactPkgNodeFromPkg(pkgNode.VersionedPkg)
 	if err != nil {
-		return err
+		return
 	}
+
 	if existingLookup == nil {
 		if (!deferSort) && pkgNode.Type == TypeLocalBuild {
 			err = fmt.Errorf("can't add %s, no corresponding run node found and not deferring sort", pkgNode)
@@ -353,22 +362,12 @@ func (g *PkgGraph) addToLookup(pkgNode *PkgNode, deferSort bool) (err error) {
 
 	switch pkgNode.Type {
 	case TypeLocalBuild:
-		if existingLookup.BuildNode == nil {
-			existingLookup.BuildNode = pkgNode.This
-		} else {
-			err = duplicateError
-			return
-		}
-	case TypeRemoteRun:
+		existingLookup.BuildNode = pkgNode.This
 		// For the purposes of lookup, a "Remote" node provides the same utility as a "Run" node
-		fallthrough
-	case TypeLocalRun:
-		if existingLookup.RunNode == nil {
-			existingLookup.RunNode = pkgNode.This
-		} else {
-			err = duplicateError
-			return
-		}
+	case TypeLocalRun, TypeRemoteRun:
+		existingLookup.RunNode = pkgNode.This
+	case TypeTest:
+		existingLookup.TestNode = pkgNode.This
 	}
 
 	// Sort the updated list unless we are defering until all nodes are added
