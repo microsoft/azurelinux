@@ -133,7 +133,7 @@ func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMu
 	var missingFiles []string
 
 	baseSrpmName := node.SRPMFileName()
-	usedCache, builtFiles, missingFiles = pkggraph.IsSRPMPrebuilt(node.SrpmPath, pkgGraph, graphMutex)
+	usedCache, builtFiles, missingFiles, _, _ = pkggraph.IsSRPMPrebuilt(node.SrpmPath, pkgGraph, graphMutex, false, false, nil)
 	skipped = sliceutils.Contains(ignoredPackages, node.VersionedPkg, sliceutils.PackageVerMatch)
 
 	if skipped {

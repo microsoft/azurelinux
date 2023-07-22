@@ -429,6 +429,77 @@ func (r *RpmRepoCloner) CloneRawPackageNames(cloneDeps bool, rawPackageNames ...
 	return
 }
 
+func (r *RpmRepoCloner) WhatProvidesRpm(rpmName string) (packageNames []string, err error) {
+	var (
+		releaseverCliArg string
+	)
+
+	releaseverCliArg, err = tdnf.GetReleaseverCliArg()
+	if err != nil {
+		return
+	}
+
+	rpmName = filepath.Base(rpmName)
+	// if rpmName contains ".rpm" at the end, remove it
+	if strings.HasSuffix(rpmName, ".rpm") {
+		rpmName = rpmName[:len(rpmName)-4]
+	}
+	logger.Log.Debugf("rpmName after extracting : %s", rpmName)
+
+	provideQuery := rpmName //convertPackageVersionToTdnfArg(pkgVer)
+
+	baseArgs := []string{
+		"provides",
+		provideQuery,
+		releaseverCliArg,
+	}
+
+	// Consider the built (tooolchain, local) RPMs first, then the already cached, and finally all remote packages.
+	for _, reposArgs := range r.reposArgsList {
+		logger.Log.Debugf("Using repos args: %v", reposArgs)
+
+		err = r.chroot.Run(func() (err error) {
+			completeArgs := append(baseArgs, reposArgs...)
+
+			stdout, stderr, err := shell.Execute("tdnf", completeArgs...)
+			logger.Log.Debugf("tdnf search for provide '%s':\n%s", provideQuery, stdout)
+
+			if err != nil {
+				logger.Log.Debugf("Failed to lookup provide '%s', tdnf error: '%s'", provideQuery, stderr)
+				return
+			}
+
+			// MUST keep order of packages printed by TDNF.
+			// TDNF will print the packages starting from the highest version, which allows us to work around an RPM bug:
+			// https://github.com/rpm-software-management/rpm/issues/2359
+			for _, matches := range packageLookupNameMatchRegex.FindAllStringSubmatch(stdout, -1) {
+				packageName := matches[packageNameIndex]
+				packageNames = append(packageNames, packageName)
+				logger.Log.Debugf("'%s' is available from package '%s'", provideQuery, packageName)
+			}
+
+			return
+		})
+		if err != nil {
+			return
+		}
+
+		if len(packageNames) > 0 {
+			logger.Log.Debug("Found required package(s), skipping further search in other repos.")
+			break
+		}
+	}
+
+	if len(packageNames) == 0 {
+		err = fmt.Errorf("could not resolve %s", provideQuery)
+		return
+	}
+
+	logger.Log.Debugf("Translated '%s' to package(s): %s", provideQuery, strings.Join(packageNames, " "))
+	return
+}
+
+
 // WhatProvides attempts to find packages which provide the requested PackageVer.
 func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames []string, err error) {
 	var (
