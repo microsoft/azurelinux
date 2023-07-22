@@ -13,12 +13,12 @@ Patch0:         git-version.patch
 BuildRequires:  cargo >= 1.68
 BuildRequires:  git
 BuildRequires:  kernel-headers
-BuildRequires:  liblzma-devel
 BuildRequires:  libunwind-devel
 BuildRequires:  openssl-devel
 BuildRequires:  perl
 BuildRequires:  rust >= 1.68
 BuildRequires:  util-linux
+BuildRequires:  xz-devel
 
 %description
 Project OneFuzz enables continuous developer-driven fuzzing to proactively
@@ -27,8 +27,7 @@ into CICD, developers can launch fuzz jobs from a few virtual machines to
 thousands of cores.
 
 %prep
-%setup -q
-%patch0 -p1
+%autosetup -p1
 
 %build
 cd src/agent
