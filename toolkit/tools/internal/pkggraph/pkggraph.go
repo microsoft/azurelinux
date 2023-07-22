@@ -1450,6 +1450,7 @@ func (g *PkgGraph) fixCyclesWithExistingRPMS(trimmedCycle []*PkgNode, resolveCyc
 			logger.Log.Debugf("Adding a 'PreBuilt' node '%s' with id %d.", preBuiltNode.FriendlyName(), preBuiltNode.ID())
 
 			g.replaceCurrentNodeWithPrebuiltNode(currentNode, preBuiltNode, previousNode)
+			logger.Log.Infof("Cycle fixed using prebuilt node: %s with id %d", preBuiltNode.FriendlyName(), preBuiltNode.ID())
 
 			return
 		}
@@ -1467,7 +1468,7 @@ func (g *PkgGraph) fixCyclesWithExistingRPMS(trimmedCycle []*PkgNode, resolveCyc
 
 				logger.Log.Debugf("Adding a remote unresolved node '%s' with id %d.", upstreamAvailableNode.FriendlyName(), upstreamAvailableNode.ID())
 				g.replaceCurrentNodeWithPrebuiltNode(currentNode, upstreamAvailableNode, previousNode)
-				logger.Log.Info("Cycle resolved using upstream SRPMs.")
+				logger.Log.Infof("Cycle fixed using remote unresolved node: %s with id %d", upstreamAvailableNode.FriendlyName(), upstreamAvailableNode.ID())
 				return
 			}
 		}
