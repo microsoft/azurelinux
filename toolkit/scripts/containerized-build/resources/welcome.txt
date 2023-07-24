@@ -5,7 +5,7 @@
 *     Use local RPMs to satify dependencies:        run 'enable_local_repo'
 *     Install an SRPM:                              run 'rpm -ihv /mnt/INTERMEDIATE_SRPMS/my-pkg.src.rpm'
                                                         This will provide src tarball at /usr/src/mariner/SOURCES
-*     Build an SRPM:                                run 'rpmbuild -ba /usr/src/mariner/SPECS/my-pkg.spec'
+*     Build an SRPM:                                run 'rpmbuild -ba /usr/src/mariner/SPECS/my-pkg/my-pkg.spec'
 *     For more build options, see https://linux.die.net/man/8/rpmbuild
 *     Auto install dependencies:                    there are 3 ways to auto install a package's build dependencies
                                                         1) run 'install_dependencies pkg' to install

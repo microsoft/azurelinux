@@ -7,6 +7,14 @@ RPMS_DIR=$TOPDIR/RPMS
 SRPMS_DIR=$TOPDIR/SRPMS
 IS_REPO_ENABLED=false
 
+# Mariner macro files used during spec parsing (as defined in toolkit/scripts/rpmops.sh)
+DEFINES=(-D "with_check 1")
+MACROS=()
+for macro_file in "$SPECS_DIR"/mariner-rpm-macros/macros* "$SPECS_DIR"/pyproject-rpm-macros/macros.pyproject "$SPECS_DIR"/perl/macros.perl
+do
+  MACROS+=("--load=$macro_file")
+done
+
 # Create symlink from SPECS/ to SOURCES/ when rpm is called
 rpm() {
     local args=("$@")
@@ -44,17 +52,17 @@ show_help() {
     cat /mariner_setup_dir/mounts.txt
     echo -e "* \n* Local repo information:"
     if [[ "${IS_REPO_ENABLED}" == "true" ]]; then
-        echo -e "*\tLocal repo is enabled"
+        echo -e "*\tLocal repo is enabled. Package dependencies will be installed from $RPMS_DIR, /repo and upstream server"
     else
-        echo -e "*\tLocal repo is not enabled"
+        echo -e "*\tLocal repo is not enabled. Package dependencies will be installed from upstream server"
     fi
     echo "******************************************************************************************"
 }
 
-# Refresh repo cache with newly built RPM
+# Refresh repo cache with newly built RPM, use Mariner specific DEFINES
 rpmbuild() {
     local args=("$@")
-    command "$FUNCNAME" "${args[@]}"
+    command "$FUNCNAME" "${DEFINES[@]}" "${args[@]}"
     if [[ ${IS_REPO_ENABLED} = true ]] ; then
         refresh_local_repo
         tdnf makecache
@@ -83,6 +91,7 @@ enable_local_repo() {
     createrepo .
     popd
     echo "-------- the local repo is enabled ---------"
+    echo "--- Package dependencies will be installed from $RPMS_DIR, /repo and upstream server ---"
     #echo "You can install the following packages from it:"
     #tdnf repoquery --repoid=local_build_repo 2>/dev/null
 }
@@ -125,4 +134,10 @@ install_dependencies() {
     do
         tdnf install -y $dependency 2>&1
     done
+}
+
+# use Mariner specific DEFINES
+rpmspec() {
+    local args=("$@")
+    command "$FUNCNAME" "${DEFINES[@]}" "${args[@]}"
 }
