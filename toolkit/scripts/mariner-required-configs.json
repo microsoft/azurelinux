@@ -968,18 +968,6 @@
                 "PR": [
                     "https://github.com/microsoft/CBL-Mariner/pull/5789"
                 ]
-            },
-            "CONFIG_POWER_MLXBF": {
-                "value": [
-                    "m"
-                ],
-                "arch": [
-                    "ARM64"
-                ],
-                "comment": "Needed for Mellanox DPUs",
-                "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
-                ]
             }
         }
     }
