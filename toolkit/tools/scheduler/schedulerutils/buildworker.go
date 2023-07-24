@@ -189,7 +189,7 @@ func getBuildDependencies(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, g
 		return
 	})
 
-	dependencies = sliceutils.StringsSetToSlice(dependencyLookup)
+	dependencies = sliceutils.SetToSlice(dependencyLookup)
 
 	return
 }

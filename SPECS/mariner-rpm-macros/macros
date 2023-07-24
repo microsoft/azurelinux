@@ -52,6 +52,9 @@
 %{?mariner_ccache_enabled:CCACHE_DIR="/ccache-dir" ; export CCACHE_DIR ;}\
 %{nil}
 
+# use zstd compression for binary package payloads
+%_binary_payload w7T0.zstdio
+
 #
 ## Automatically compile python files
 %py_auto_byte_compile 1
