@@ -8,7 +8,7 @@ import (
 	"log"
 	"os"
 
-	imagecustomizer "github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizer/pkg"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerlib"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
@@ -27,9 +27,9 @@ var (
 )
 
 func main() {
-	logger.InitBestEffort(*logFile, *logLevel)
-
 	kingpin.MustParse(app.Parse(os.Args[1:]))
+
+	logger.InitBestEffort(*logFile, *logLevel)
 
 	err := customizeImage()
 	if err != nil {
@@ -45,7 +45,7 @@ func customizeImage() error {
 		return fmt.Errorf("copying base image file to output path failed: %w", err)
 	}
 
-	err = imagecustomizer.CustomizeImageWithConfigFile(*buildDir, *configFile, *outputImageFile)
+	err = imagecustomizerlib.CustomizeImageWithConfigFile(*buildDir, *configFile, *outputImageFile)
 	if err != nil {
 		return err
 	}

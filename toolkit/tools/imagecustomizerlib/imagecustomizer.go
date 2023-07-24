@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-package imagecustomizer
+package imagecustomizerlib
 
 import (
 	"fmt"
@@ -10,6 +10,7 @@ import (
 	"path"
 	"path/filepath"
 	"regexp"
+	"strconv"
 
 	icapi "github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizer/api"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
@@ -29,7 +30,9 @@ func CustomizeImageWithConfigFile(buildDir string, configFile string, imageFile 
 		return err
 	}
 
-	err = CustomizeImage(buildDir, &config, imageFile)
+	baseConfigPath, _ := filepath.Split(configFile)
+
+	err = CustomizeImage(buildDir, baseConfigPath, &config, imageFile)
 	if err != nil {
 		return err
 	}
@@ -37,7 +40,7 @@ func CustomizeImageWithConfigFile(buildDir string, configFile string, imageFile 
 	return nil
 }
 
-func CustomizeImage(buildDir string, config *icapi.SystemConfig, imageFile string) error {
+func CustomizeImage(buildDir string, baseConfigPath string, config *icapi.SystemConfig, imageFile string) error {
 	var err error
 
 	err = loadNbdKernelModule()
@@ -69,6 +72,50 @@ func CustomizeImage(buildDir string, config *icapi.SystemConfig, imageFile strin
 		return err
 	}
 	defer imageChroot.Close(false)
+
+	err = doCustomizations(baseConfigPath, config, imageChroot)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func doCustomizations(baseConfigPath string, config *icapi.SystemConfig, imageChroot *safechroot.Chroot) error {
+	var err error
+
+	err = handleAdditionalFiles(baseConfigPath, config, imageChroot)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func handleAdditionalFiles(baseConfigPath string, config *icapi.SystemConfig, imageChroot *safechroot.Chroot) error {
+	var err error
+
+	for destinationFile, additionalFile := range config.AdditionalFiles {
+		fileToCopy := safechroot.FileToCopy{
+			Src:  filepath.Join(baseConfigPath, additionalFile.SourceFile),
+			Dest: destinationFile,
+		}
+
+		if additionalFile.FilePermissions != "" {
+			fileModeUint, err := strconv.ParseUint(additionalFile.FilePermissions, 8, 32)
+			if err != nil {
+				return fmt.Errorf("can't parse FilePermissions value: %s: %w", additionalFile.FilePermissions, err)
+			}
+
+			fileMode := os.FileMode(fileModeUint)
+			fileToCopy.FileMode = &fileMode
+		}
+
+		err = imageChroot.AddFiles(fileToCopy)
+		if err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
