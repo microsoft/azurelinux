@@ -824,6 +824,162 @@
                 "PR": [
                     "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/commit/a9ad05e35412cfa69ff93603500e97b7f29a90ca"
                 ]
+            },
+            "CONFIG_MELLANOX_PLATFORM": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for Mellanox DPUs",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                ]
+            },
+            "CONFIG_MLXREG_HOTPLUG": {
+                "value": [
+                    "m"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for Mellanox DPUs",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                ]
+            },
+            "CONFIG_MLXREG_IO": {
+                "value": [
+                    "m"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for Mellanox DPUs",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                ]
+            },
+            "CONFIG_MLXBF_TMFIFO": {
+                "value": [
+                    "m"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for Mellanox DPUs",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                ]
+            },
+            "CONFIG_MLXBF_BOOTCTL": {
+                "value": [
+                    "m"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for Mellanox DPUs",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                ]
+            },
+            "CONFIG_MLXBF_PMC": {
+                "value": [
+                    "m"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for Mellanox DPUs",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                ]
+            },
+            "CONFIG_MLXBF_GIGE": {
+                "value": [
+                    "m"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for Mellanox DPUs",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                ]
+            },
+            "CONFIG_MMC_DW": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for Mellanox DPUs",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                ]
+            },
+            "CONFIG_MMC_DW_PLTFM": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for Mellanox DPUs",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                ]
+            },
+            "CONFIG_MMC_DW_BLUEFIELD": {
+                "value": [
+                    "m"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for Mellanox DPUs",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                ]
+            },
+            "CONFIG_I2C_MLXBF": {
+                "value": [
+                    "m"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for Mellanox DPUs",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                ]
+            },
+            "CONFIG_GPIO_MLXBF2": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for Mellanox DPUs",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                ]
+            },
+            "CONFIG_POWER_MLXBF": {
+                "value": [
+                    "m"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for Mellanox DPUs",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                ]
             }
         }
     }
