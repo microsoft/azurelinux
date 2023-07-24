@@ -95,25 +95,27 @@ func doCustomizations(baseConfigPath string, config *icapi.SystemConfig, imageCh
 func handleAdditionalFiles(baseConfigPath string, config *icapi.SystemConfig, imageChroot *safechroot.Chroot) error {
 	var err error
 
-	for destinationFile, additionalFile := range config.AdditionalFiles {
-		fileToCopy := safechroot.FileToCopy{
-			Src:  filepath.Join(baseConfigPath, additionalFile.SourceFile),
-			Dest: destinationFile,
-		}
-
-		if additionalFile.FilePermissions != "" {
-			fileModeUint, err := strconv.ParseUint(additionalFile.FilePermissions, 8, 32)
-			if err != nil {
-				return fmt.Errorf("can't parse FilePermissions value: %s: %w", additionalFile.FilePermissions, err)
+	for sourceFile, fileConfigs := range config.AdditionalFiles {
+		for _, fileConfig := range fileConfigs {
+			fileToCopy := safechroot.FileToCopy{
+				Src:  filepath.Join(baseConfigPath, sourceFile),
+				Dest: fileConfig.DestinationFile,
 			}
 
-			fileMode := os.FileMode(fileModeUint)
-			fileToCopy.FileMode = &fileMode
-		}
+			if fileConfig.FilePermissions != "" {
+				fileModeUint, err := strconv.ParseUint(fileConfig.FilePermissions, 8, 32)
+				if err != nil {
+					return fmt.Errorf("can't parse FilePermissions value: %s: %w", fileConfig.FilePermissions, err)
+				}
 
-		err = imageChroot.AddFiles(fileToCopy)
-		if err != nil {
-			return err
+				fileMode := os.FileMode(fileModeUint)
+				fileToCopy.FileMode = &fileMode
+			}
+
+			err = imageChroot.AddFiles(fileToCopy)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
