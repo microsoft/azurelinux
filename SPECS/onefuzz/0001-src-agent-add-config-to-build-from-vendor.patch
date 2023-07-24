@@ -1,0 +1,32 @@
+From 55c8201065b0ead50e995e17b1acf3c1676d549e Mon Sep 17 00:00:00 2001
+From: Muhammad Falak R Wani <falakreyaz@gmail.com>
+Date: Mon, 24 Jul 2023 18:45:22 +0530
+Subject: [PATCH] src: agent: add config to build from vendor
+
+Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
+---
+ src/agent/.cargo/config.toml | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/src/agent/.cargo/config.toml b/src/agent/.cargo/config.toml
+index 8f029ed..dbfbdf8 100644
+--- a/src/agent/.cargo/config.toml
++++ b/src/agent/.cargo/config.toml
+@@ -9,3 +9,14 @@ rustflags = [
+     "-C",
+     "link-arg=/CETCOMPAT",
+ ]
++
++[source.crates-io]
++replace-with = "vendored-sources"
++
++[source."git+https://github.com/servo/ipc-channel?rev=7f432aa"]
++git = "https://github.com/servo/ipc-channel"
++rev = "7f432aa"
++replace-with = "vendored-sources"
++
++[source.vendored-sources]
++directory = "vendor"
+-- 
+2.40.1
+

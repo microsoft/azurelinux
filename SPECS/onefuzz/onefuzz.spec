@@ -8,14 +8,17 @@ Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://github.com/microsoft/OneFuzz
 Source0:        https://github.com/microsoft/onefuzz/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source1:        %{name}-%{version}-vendor-v1.tar.gz
 Patch0:         git-version.patch
+Patch1:         0001-src-agent-add-config-to-build-from-vendor.patch
 
 BuildRequires:  cargo >= 1.68
 BuildRequires:  git
-BuildRequires:  kernel-headers
 BuildRequires:  libunwind-devel
 BuildRequires:  openssl-devel
 BuildRequires:  perl
+BuildRequires:  perl(FindBin)
+BuildRequires:  perl(lib)
 BuildRequires:  rust >= 1.68
 BuildRequires:  util-linux
 BuildRequires:  xz-devel
@@ -28,6 +31,9 @@ thousands of cores.
 
 %prep
 %autosetup -p1
+pushd src/agent
+tar xf %{SOURCE1}
+popd
 
 %build
 cd src/agent
