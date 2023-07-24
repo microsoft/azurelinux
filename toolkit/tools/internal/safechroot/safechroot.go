@@ -42,7 +42,8 @@ type MountPoint struct {
 	flags  uintptr
 	data   string
 
-	isMounted bool
+	isMounted           bool
+	mountBeforeDefaults bool
 }
 
 // Chroot represents a Chroot environment with automatic synchronization protections
@@ -94,6 +95,18 @@ func NewMountPoint(source, target, fstype string, flags uintptr, data string) (m
 		fstype: fstype,
 		flags:  flags,
 		data:   data,
+	}
+}
+
+// NewPreDefaultsMountPoint creates a new MountPoint struct to be created by a Chroot but before the default mount points.
+func NewPreDefaultsMountPoint(source, target, fstype string, flags uintptr, data string) (mountPoint *MountPoint) {
+	return &MountPoint{
+		source:              source,
+		target:              target,
+		fstype:              fstype,
+		flags:               flags,
+		data:                data,
+		mountBeforeDefaults: true,
 	}
 }
 
@@ -229,7 +242,21 @@ func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMoun
 	// mount is only supported in regular pipeline
 	if buildpipeline.IsRegularBuild() {
 		// Create kernel mountpoints
-		allMountPoints := append(defaultMountPoints(), extraMountPoints...)
+		allMountPoints := []*MountPoint{}
+
+		for _, mountPoint := range extraMountPoints {
+			if mountPoint.mountBeforeDefaults {
+				allMountPoints = append(allMountPoints, mountPoint)
+			}
+		}
+
+		allMountPoints = append(allMountPoints, defaultMountPoints()...)
+
+		for _, mountPoint := range extraMountPoints {
+			if !mountPoint.mountBeforeDefaults {
+				allMountPoints = append(allMountPoints, mountPoint)
+			}
+		}
 
 		// Mount with the original unsorted order. Assumes the order of mounts is important.
 		err = c.createMountPoints(allMountPoints)
@@ -533,7 +560,7 @@ func (c *Chroot) createMountPoints(allMountPoints []*MountPoint) (err error) {
 
 		err = unix.Mount(mountPoint.source, fullPath, mountPoint.fstype, mountPoint.flags, mountPoint.data)
 		if err != nil {
-			logger.Log.Errorf("Mount failed on (%s). Error: %s", fullPath, err)
+			logger.Log.Errorf("Mount of (%s) to (%s) failed. Error: %s", mountPoint.source, fullPath, err)
 			return
 		}
 
