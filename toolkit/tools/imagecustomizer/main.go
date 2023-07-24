@@ -10,8 +10,8 @@ import (
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerlib"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -40,9 +40,9 @@ func main() {
 func customizeImage() error {
 	var err error
 
-	err = file.Copy(*imageFile, *outputImageFile)
+	_, _, err = shell.Execute("qemu-img", "convert", "-O", "qcow2", *imageFile, *outputImageFile)
 	if err != nil {
-		return fmt.Errorf("copying base image file to output path failed: %w", err)
+		return fmt.Errorf("failed to load nbd kernel module: %w", err)
 	}
 
 	err = imagecustomizerlib.CustomizeImageWithConfigFile(*buildDir, *configFile, *outputImageFile)
