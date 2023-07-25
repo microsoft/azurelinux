@@ -368,7 +368,7 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 			continue
 		}
 
-		addTestNode := runCheck
+		readTestDependencies := runCheck
 		if runCheck {
 			specHasCheckSection, err := rpm.SpecHasCheckSection(specFile, sourceDir, arch, checkDefines)
 			if err != nil {
@@ -376,11 +376,11 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 				continue
 			}
 
-			addTestNode = specHasCheckSection
+			readTestDependencies = specHasCheckSection
 		}
 
 		// Query the test BuildRequires fields from this spec and turn them into an array of PackageVersions
-		if addTestNode {
+		if readTestDependencies {
 			testBuildRequiresList, err = readBuildRequires(specFile, sourceDir, arch, checkDefines)
 			if err != nil {
 				sendEmptyResult(results, err)
@@ -394,6 +394,7 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 			provider.SourceDir = sourceDir
 			provider.SpecPath = specFile
 			provider.TestRequires = testBuildRequiresList
+			provider.RunTests = readTestDependencies
 		}
 
 		// Submit the result to the main thread, the deferred function will clear the semaphore.
