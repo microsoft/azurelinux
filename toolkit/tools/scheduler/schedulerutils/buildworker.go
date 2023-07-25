@@ -114,7 +114,12 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 			}
 
 		case pkggraph.TypeTest:
-			res.Ignored, res.LogFile, res.Err = buildTestNode(req.Node, req.PkgGraph, graphMutex, agent, checkAttempts, ignoredPackages)
+			res.Ignored, res.LogFile, res.Err = buildTestNode(req.Node, req.PkgGraph, graphMutex, agent, req.CanUseCache, checkAttempts, ignoredPackages)
+			if res.Err == nil {
+				setAncillaryBuildNodesStatus(req, pkggraph.StateUpToDate)
+			} else {
+				setAncillaryBuildNodesStatus(req, pkggraph.StateBuildError)
+			}
 
 		case pkggraph.TypeLocalRun, pkggraph.TypeGoal, pkggraph.TypeRemoteRun, pkggraph.TypePureMeta, pkggraph.TypePreBuilt:
 			res.UsedCache = req.CanUseCache
@@ -151,7 +156,7 @@ func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMu
 	}
 
 	// Print a message if a package is partially built but needs to be regenerated because its missing something.
-	if len(missingFiles) > 0 && len(builtFiles) != len(missingFiles) {
+	if len(missingFiles) > 0 && len(builtFiles) > 0 {
 		logger.Log.Infof("SRPM '%s' is being rebuilt due to partially missing components: %v", node.SrpmPath, missingFiles)
 	}
 
@@ -164,13 +169,18 @@ func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMu
 	return
 }
 
-// buildTestNode tests a TypePtest node.
-func buildTestNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, checkAttempts int, ignoredPackages []*pkgjson.PackageVer) (ignored bool, logFile string, err error) {
+// buildTestNode tests a TypeTest node.
+func buildTestNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, canUseCache bool, checkAttempts int, ignoredPackages []*pkgjson.PackageVer) (ignored bool, logFile string, err error) {
 	baseSrpmName := node.SRPMFileName()
 	ignored = sliceutils.Contains(ignoredPackages, node.VersionedPkg, sliceutils.PackageVerMatch)
 
 	if ignored {
-		logger.Log.Debugf("%s (ptest) explicitly marked to be ignored.", baseSrpmName)
+		logger.Log.Debugf("%s (test) explicitly marked to be ignored.", baseSrpmName)
+		return
+	}
+
+	if canUseCache {
+		logger.Log.Debugf("All dependencies for '%s' were prebuilt, skipping its test.", baseSrpmName)
 		return
 	}
 

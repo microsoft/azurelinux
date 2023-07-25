@@ -134,7 +134,6 @@ func (g *GraphBuildState) isConflictWithToolchain(fileToCheck string) (hadConfli
 // - It will record the result as a failure if applicable.
 // - It will record all ancillary nodes of the result.
 func (g *GraphBuildState) RecordBuildResult(res *BuildResult, allowToolchainRebuilds bool) {
-
 	logger.Log.Debugf("Recording build result: %s", res.Node.FriendlyName())
 
 	delete(g.activeBuilds, res.Node.ID())
@@ -161,8 +160,6 @@ func (g *GraphBuildState) RecordBuildResult(res *BuildResult, allowToolchainRebu
 			}
 		}
 	} else {
-		logger.Log.Debugf("skipping checking conflicts since this is either not a built node (%v) or the ALLOW_TOOLCHAIN_REBUILDS flag was set to 'y'", res.Node)
+		logger.Log.Debugf("Skipping checking conflicts since this is either not a built node (%v) or the ALLOW_TOOLCHAIN_REBUILDS flag was set to 'y'.", res.Node)
 	}
-
-	return
 }
