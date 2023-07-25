@@ -69,7 +69,6 @@ var (
 	rpmmacrosFile              = app.Flag("rpmmacros-file", "Optional file path to an rpmmacros file for rpmbuild to use.").ExistingFile()
 	buildAttempts              = app.Flag("build-attempts", "Sets the number of times to try building a package.").Default(defaultBuildAttempts).Int()
 	checkAttempts              = app.Flag("check-attempts", "Sets the minimum number of times to test a package if the tests fail.").Default(defaultCheckAttempts).Int()
-	runCheck                   = app.Flag("run-check", "Run the check during package builds.").Bool()
 	noCleanup                  = app.Flag("no-cleanup", "Whether or not to delete the chroot folder after the build is done").Bool()
 	noCache                    = app.Flag("no-cache", "Disables using prebuilt cached packages.").Bool()
 	stopOnFailure              = app.Flag("stop-on-failure", "Stop on failed build").Bool()
@@ -148,7 +147,6 @@ func main() {
 		RpmmacrosFile:        *rpmmacrosFile,
 
 		NoCleanup: *noCleanup,
-		RunCheck:  *runCheck,
 		UseCcache: *useCcache,
 		MaxCpu:    *maxCPU,
 
@@ -351,21 +349,9 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild []*pkgjson
 
 		if !stopBuilding {
 			if res.Err == nil {
-				if res.Node.Type == pkggraph.TypeLocalBuild && res.WasDelta {
-					logger.Log.Tracef("This is a delta result, update the graph with the new delta files for '%v'.", res.Node)
-					// We will need to update the graph with paths to any delta files that were actually rebuilt.
-					err = setAssociatedDeltaPaths(res, pkgGraph, graphMutex)
-					if err != nil {
-						// Failures to manipulate the graph are fatal. The ancillary delta nodes may be in an invalid state
-						// and we won't be able to track which RPMs were built or used delta files.
-						err = fmt.Errorf("error setting delta paths for ancillary nodes:\n%w", err)
-						stopBuilding = true
-					}
-				}
-
 				// If the graph has already been optimized and is now solvable without any additional information
 				// then skip processing any new implicit provides.
-				if !stopBuilding && !isGraphOptimized {
+				if !isGraphOptimized {
 					var (
 						didOptimize bool
 						newGraph    *pkggraph.PkgGraph
@@ -386,6 +372,18 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild []*pkgjson
 					}
 				}
 
+				if res.Node.Type == pkggraph.TypeLocalBuild && res.WasDelta {
+					logger.Log.Tracef("This is a delta result, update the graph with the new delta files for '%v'.", res.Node)
+					// We will need to update the graph with paths to any delta files that were actually rebuilt.
+					err = setAssociatedDeltaPaths(res, pkgGraph, graphMutex)
+					if err != nil {
+						// Failures to manipulate the graph are fatal. The ancillary delta nodes may be in an invalid state
+						// and we won't be able to track which RPMs were built or used delta files.
+						err = fmt.Errorf("error setting delta paths for ancillary nodes:\n%w", err)
+						stopBuilding = true
+					}
+				}
+
 				nodesToBuild = schedulerutils.FindUnblockedNodesFromResult(res, pkgGraph, graphMutex, buildState)
 			} else if stopOnFailure {
 				stopBuilding = true
@@ -399,8 +397,6 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild []*pkgjson
 			// If the build has failed, stop all outstanding builds.
 			stopBuild(channels, buildState)
 			err = fmt.Errorf("fatal error building package graph:\n%w", err)
-			// Save out the current graph state for debugging
-			builtGraph = pkgGraph
 			return
 		}
 
@@ -492,11 +488,9 @@ func setAssociatedDeltaPaths(res *schedulerutils.BuildResult, pkgGraph *pkggraph
 			// We only care about nodes that are deltas
 			if node.State == pkggraph.StateDelta {
 				// Update the node to point at the actual RPM path from our map of built files
-				logger.Log.Debugf("Updating delta run node '%s' path from '%s' to '%s'", node, node.RpmPath, builtFile)
+				logger.Log.Tracef("Updating delta run node '%s' path from '%s' to '%s'", node, node.RpmPath, builtFile)
 				node.RpmPath = builtFile
-			} else if !node.Implicit && node.RpmPath != builtFile {
-				// Implicit nodes will point to the cached RPM path, but we don't care about them and will update their
-				// paths to the actual RPM path in a later step so ignore them here.
+			} else if node.RpmPath != builtFile {
 				// Sanity check that any non-delta node has an exact match to the real RPM path
 				err = fmt.Errorf("non-delta run node '%s' has unexpected path '%s' (expected non-delta path of '%s')", node, node.RpmPath, builtFile)
 				return
