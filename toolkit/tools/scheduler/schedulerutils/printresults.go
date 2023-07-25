@@ -51,16 +51,16 @@ func RecordBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, b
 
 	csvBlob := [][]string{{"Package", "State", "Blocker", "IsTest"}}
 
-	csvBlob = append(csvBlob, successfulPackagesCVSRows(builtRegularSRPMs, "Built", false)...)
-	csvBlob = append(csvBlob, successfulPackagesCVSRows(prebuiltSRPMs, "PreBuilt", false)...)
-	csvBlob = append(csvBlob, successfulPackagesCVSRows(prebuiltDeltaSRPMs, "PreBuiltDelta", false)...)
+	csvBlob = append(csvBlob, successfulPackagesCSVRows(builtRegularSRPMs, "Built", false)...)
+	csvBlob = append(csvBlob, successfulPackagesCSVRows(prebuiltSRPMs, "PreBuilt", false)...)
+	csvBlob = append(csvBlob, successfulPackagesCSVRows(prebuiltDeltaSRPMs, "PreBuiltDelta", false)...)
 	// Failed nodes shouldn't have any blockers
-	csvBlob = append(csvBlob, unbuiltPackagesCVSRows(pkgGraph, failedRegularNodes, failedRegularNodes, blockedRegularSRPMs, false)...)
-	csvBlob = append(csvBlob, unbuiltPackagesCVSRows(pkgGraph, blockedRegularSRPMs, failedRegularNodes, blockedRegularSRPMs, false)...)
+	csvBlob = append(csvBlob, unbuiltPackagesCSVRows(pkgGraph, failedRegularNodes, failedRegularNodes, blockedRegularSRPMs, false)...)
+	csvBlob = append(csvBlob, unbuiltPackagesCSVRows(pkgGraph, blockedRegularSRPMs, failedRegularNodes, blockedRegularSRPMs, false)...)
 
-	csvBlob = append(csvBlob, successfulPackagesCVSRows(builtTestSRPMs, "Built", true)...)
-	csvBlob = append(csvBlob, unbuiltPackagesCVSRows(pkgGraph, failedTestNodes, failedTestNodes, blockedTestSRPMs, true)...)
-	csvBlob = append(csvBlob, unbuiltPackagesCVSRows(pkgGraph, blockedTestSRPMs, failedTestNodes, blockedTestSRPMs, true)...)
+	csvBlob = append(csvBlob, successfulPackagesCSVRows(builtTestSRPMs, "Built", true)...)
+	csvBlob = append(csvBlob, unbuiltPackagesCSVRows(pkgGraph, failedTestNodes, failedTestNodes, blockedTestSRPMs, true)...)
+	csvBlob = append(csvBlob, unbuiltPackagesCSVRows(pkgGraph, blockedTestSRPMs, failedTestNodes, blockedTestSRPMs, true)...)
 
 	csvFile, err := os.Create(outputPath)
 	if err != nil {
@@ -273,7 +273,7 @@ func getTestSRPMsState(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState)
 	return
 }
 
-func successfulPackagesCVSRows(unblockedPackages map[string]bool, state string, isTest bool) (csvRows [][]string) {
+func successfulPackagesCSVRows(unblockedPackages map[string]bool, state string, isTest bool) (csvRows [][]string) {
 	const emptyBlockers = ""
 
 	isTestCell := testCellValue(isTest)
@@ -294,7 +294,7 @@ func testCellValue(isTest bool) string {
 	return "0"
 }
 
-func unbuiltPackagesCVSRows(pkgGraph *pkggraph.PkgGraph, unbuiltPackages, failedPackages, blockedPackages map[string]*pkggraph.PkgNode, isTest bool) (csvRows [][]string) {
+func unbuiltPackagesCSVRows(pkgGraph *pkggraph.PkgGraph, unbuiltPackages, failedPackages, blockedPackages map[string]*pkggraph.PkgNode, isTest bool) (csvRows [][]string) {
 	isTestCell := testCellValue(isTest)
 
 	csvRows = [][]string{}
