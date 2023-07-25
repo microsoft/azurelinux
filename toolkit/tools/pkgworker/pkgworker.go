@@ -78,8 +78,7 @@ func main() {
 	srpmsDirAbsPath, err := filepath.Abs(*srpmsDirPath)
 	logger.PanicOnError(err, "Unable to find absolute path for SRPMs directory '%s'", *srpmsDirPath)
 
-	srpmName := strings.TrimSuffix(filepath.Base(*srpmFile), ".src.rpm")
-	chrootDir := filepath.Join(*workDir, srpmName)
+	chrootDir := buildChrootDirPath(*workDir, *srpmFile, *runCheck)
 
 	defines := rpm.DefaultDefinesWithDist(*runCheck, *distTag)
 	defines[rpm.DistroReleaseVersionDefine] = *distroReleaseVersion
@@ -112,6 +111,15 @@ func copySRPMToOutput(srpmFilePath, srpmOutputDirPath string) (err error) {
 	err = file.Copy(srpmFilePath, srpmOutputFilePath)
 
 	return
+}
+
+func buildChrootDirPath(workDir, srpmFilePath string, runCheck bool) (chrootDirPath string) {
+	buildDirName := strings.TrimSuffix(filepath.Base(*srpmFile), ".src.rpm")
+	if runCheck {
+		buildDirName += "_TEST_BUILD"
+	}
+
+	return filepath.Join(workDir, buildDirName)
 }
 
 func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmFile, repoFile, rpmmacrosFile, outArch string, defines map[string]string, noCleanup, runCheck bool, packagesToInstall []string, useCcache bool) (builtRPMs []string, err error) {
