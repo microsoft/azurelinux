@@ -187,7 +187,7 @@ func buildTestNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMut
 	dependencies := getBuildDependencies(node, pkgGraph, graphMutex)
 
 	logger.Log.Infof("Testing: %s", baseSrpmName)
-	logFile, err = testSRPMFile(agent, checkAttempts, node.SrpmPath, dependencies)
+	logFile, err = testSRPMFile(agent, checkAttempts, node.SrpmPath, node.Architecture, dependencies)
 	return
 }
 
@@ -241,11 +241,11 @@ func parseCheckSection(logFile string) (err error) {
 			if strings.Contains(currLine, "EXIT STATUS 0") {
 				return
 			}
-			failedLogFile := strings.TrimSuffix(logFile, ".log")
+			failedLogFile := strings.TrimSuffix(logFile, ".test.log")
 			failedLogFile = fmt.Sprintf("%s-FAILED_TEST-%d.log", failedLogFile, time.Now().UnixMilli())
 			err = file.Copy(logFile, failedLogFile)
 			if err != nil {
-				logger.Log.Errorf("Log file rename failed. Error: %v", err)
+				logger.Log.Errorf("Log file copy failed. Error: %v", err)
 				return
 			}
 			err = fmt.Errorf("package test failed. Test status line: %s", currLine)

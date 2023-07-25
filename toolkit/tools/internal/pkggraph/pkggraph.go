@@ -627,22 +627,22 @@ func (g *PkgGraph) AllNodesFrom(rootNode *PkgNode) []*PkgNode {
 
 // AllRunNodes returns a list of all run nodes in the graph
 func (g *PkgGraph) AllRunNodes() []*PkgNode {
-	return g.allNodesWithFilter(func(n *LookupNode) bool {
-		return n.RunNode != nil
+	return g.allNodesOfType(func(n *LookupNode) *PkgNode {
+		return n.RunNode
 	})
 }
 
 // AllBuildNodes returns a list of all build nodes in the graph
 func (g *PkgGraph) AllBuildNodes() []*PkgNode {
-	return g.allNodesWithFilter(func(n *LookupNode) bool {
-		return n.BuildNode != nil
+	return g.allNodesOfType(func(n *LookupNode) *PkgNode {
+		return n.BuildNode
 	})
 }
 
 // AllTestNodes returns a list of all test nodes in the graph
 func (g *PkgGraph) AllTestNodes() []*PkgNode {
-	return g.allNodesWithFilter(func(n *LookupNode) bool {
-		return n.TestNode != nil
+	return g.allNodesOfType(func(n *LookupNode) *PkgNode {
+		return n.TestNode
 	})
 }
 
@@ -1258,8 +1258,8 @@ func (g *PkgGraph) CloneNode(pkgNode *PkgNode) (newNode *PkgNode) {
 	return
 }
 
-// allNodesWithFilter returns a list of all nodes satisfying the filter function.
-func (g *PkgGraph) allNodesWithFilter(filterFunction func(node *LookupNode) bool) []*PkgNode {
+// allNodesOfType returns a list of all nodes satisfying the filter function.
+func (g *PkgGraph) allNodesOfType(nodeGetter func(node *LookupNode) *PkgNode) []*PkgNode {
 	count := 0
 	for _, list := range g.lookupTable() {
 		count += len(list)
@@ -1268,8 +1268,8 @@ func (g *PkgGraph) allNodesWithFilter(filterFunction func(node *LookupNode) bool
 	nodes := make([]*PkgNode, 0, count)
 	for _, list := range g.lookupTable() {
 		for _, n := range list {
-			if filterFunction(n) {
-				nodes = append(nodes, n.TestNode)
+			if node := nodeGetter(n); node != nil {
+				nodes = append(nodes, node)
 			}
 		}
 	}
