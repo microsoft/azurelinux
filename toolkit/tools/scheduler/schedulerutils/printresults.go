@@ -43,24 +43,24 @@ func RecordBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, b
 	graphMutex.RLock()
 	defer graphMutex.RUnlock()
 
-	failedRegularSRPMs, prebuiltSRPMs, prebuiltDeltaSRPMs, builtRegularSRPMs, blockedRegularSRPMs := getRegularSRPMsState(pkgGraph, buildState)
-	failedRegularNodes := buildResultsSetToNodesSet(failedRegularSRPMs)
+	failedSRPMs, prebuiltSRPMs, prebuiltDeltaSRPMs, builtSRPMs, blockedSRPMs := getSRPMsState(pkgGraph, buildState)
+	failedBuildNodes := buildResultsSetToNodesSet(failedSRPMs)
 
-	failedTestSRPMs, builtTestSRPMs, blockedTestSRPMs := getTestSRPMsState(pkgGraph, buildState)
-	failedTestNodes := buildResultsSetToNodesSet(failedTestSRPMs)
+	failedSRPMsTests, testedSRPMs, blockedSRPMsTests := getSRPMsTestsState(pkgGraph, buildState)
+	failedTestNodes := buildResultsSetToNodesSet(failedSRPMsTests)
 
 	csvBlob := [][]string{{"Package", "State", "Blocker", "IsTest"}}
 
-	csvBlob = append(csvBlob, successfulPackagesCSVRows(builtRegularSRPMs, "Built", false)...)
+	csvBlob = append(csvBlob, successfulPackagesCSVRows(builtSRPMs, "Built", false)...)
 	csvBlob = append(csvBlob, successfulPackagesCSVRows(prebuiltSRPMs, "PreBuilt", false)...)
 	csvBlob = append(csvBlob, successfulPackagesCSVRows(prebuiltDeltaSRPMs, "PreBuiltDelta", false)...)
 	// Failed nodes shouldn't have any blockers
-	csvBlob = append(csvBlob, unbuiltPackagesCSVRows(pkgGraph, failedRegularNodes, failedRegularNodes, blockedRegularSRPMs, false)...)
-	csvBlob = append(csvBlob, unbuiltPackagesCSVRows(pkgGraph, blockedRegularSRPMs, failedRegularNodes, blockedRegularSRPMs, false)...)
+	csvBlob = append(csvBlob, unbuiltPackagesCSVRows(pkgGraph, failedBuildNodes, failedBuildNodes, blockedSRPMs, false)...)
+	csvBlob = append(csvBlob, unbuiltPackagesCSVRows(pkgGraph, blockedSRPMs, failedBuildNodes, blockedSRPMs, false)...)
 
-	csvBlob = append(csvBlob, successfulPackagesCSVRows(builtTestSRPMs, "Built", true)...)
-	csvBlob = append(csvBlob, unbuiltPackagesCSVRows(pkgGraph, failedTestNodes, failedTestNodes, blockedTestSRPMs, true)...)
-	csvBlob = append(csvBlob, unbuiltPackagesCSVRows(pkgGraph, blockedTestSRPMs, failedTestNodes, blockedTestSRPMs, true)...)
+	csvBlob = append(csvBlob, successfulPackagesCSVRows(testedSRPMs, "Built", true)...)
+	csvBlob = append(csvBlob, unbuiltPackagesCSVRows(pkgGraph, failedTestNodes, failedTestNodes, blockedSRPMsTests, true)...)
+	csvBlob = append(csvBlob, unbuiltPackagesCSVRows(pkgGraph, blockedSRPMsTests, failedTestNodes, blockedSRPMsTests, true)...)
 
 	csvFile, err := os.Create(outputPath)
 	if err != nil {
@@ -81,8 +81,8 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	graphMutex.RLock()
 	defer graphMutex.RUnlock()
 
-	failedRegularSRPMs, prebuiltSRPMs, prebuiltDeltaSRPMs, builtRegularSRPMs, blockedRegularSRPMs := getRegularSRPMsState(pkgGraph, buildState)
-	failedTestSRPMs, builtTestSRPMs, blockedTestSRPMs := getTestSRPMsState(pkgGraph, buildState)
+	failedSRPMs, prebuiltSRPMs, prebuiltDeltaSRPMs, builtSRPMs, blockedSRPMs := getSRPMsState(pkgGraph, buildState)
+	failedSRPMsTests, testedSRPMs, blockedSRPMsTests := getSRPMsTestsState(pkgGraph, buildState)
 
 	unresolvedDependencies := make(map[string]bool)
 	rpmConflicts := buildState.ConflictingRPMs()
@@ -103,14 +103,14 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	logger.Log.Info("--------- Summary ---------")
 	logger.Log.Info("---------------------------")
 
-	logger.Log.Infof("Number of built regular SRPMs:     %d", len(builtRegularSRPMs))
-	logger.Log.Infof("Number of built test SRPMs:        %d", len(builtTestSRPMs))
+	logger.Log.Infof("Number of built SRPMs:     %d", len(builtSRPMs))
+	logger.Log.Infof("Number of tested SRPMs:        %d", len(testedSRPMs))
 	logger.Log.Infof("Number of prebuilt SRPMs:          %d", len(prebuiltSRPMs))
 	logger.Log.Infof("Number of prebuilt delta SRPMs:    %d", len(prebuiltDeltaSRPMs))
-	logger.Log.Infof("Number of failed regular SRPMs:    %d", len(failedRegularSRPMs))
-	logger.Log.Infof("Number of failed test SRPMs:       %d", len(failedTestSRPMs))
-	logger.Log.Infof("Number of blocked regular SRPMs:   %d", len(blockedRegularSRPMs))
-	logger.Log.Infof("Number of blocked test SRPMs:      %d", len(blockedTestSRPMs))
+	logger.Log.Infof("Number of failed SRPMs:    %d", len(failedSRPMs))
+	logger.Log.Infof("Number of failed SRPMs tests:       %d", len(failedSRPMsTests))
+	logger.Log.Infof("Number of blocked SRPMs:   %d", len(blockedSRPMs))
+	logger.Log.Infof("Number of blocked SRPMs tests:      %d", len(blockedSRPMsTests))
 	logger.Log.Infof("Number of unresolved dependencies: %d", len(unresolvedDependencies))
 
 	if allowToolchainRebuilds && (len(rpmConflicts) > 0 || len(srpmConflicts) > 0) {
@@ -122,22 +122,22 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 		conflictsLogger("Number of toolchain SRPM conflicts: %d", len(srpmConflicts))
 	}
 
-	if len(builtRegularSRPMs) != 0 {
-		logger.Log.Info("Built regular SRPMs:")
-		for srpm := range builtRegularSRPMs {
+	if len(builtSRPMs) != 0 {
+		logger.Log.Info("Built SRPMs:")
+		for srpm := range builtSRPMs {
 			logger.Log.Infof("--> %s", filepath.Base(srpm))
 		}
 	}
 
-	if len(builtTestSRPMs) != 0 {
-		logger.Log.Info("Built test SRPMs:")
-		for srpm := range builtTestSRPMs {
+	if len(testedSRPMs) != 0 {
+		logger.Log.Info("Tested SRPMs:")
+		for srpm := range testedSRPMs {
 			logger.Log.Infof("--> %s", filepath.Base(srpm))
 		}
 	}
 
 	if len(prebuiltSRPMs) != 0 {
-		logger.Log.Info("Prebuilt regular SRPMs:")
+		logger.Log.Info("Prebuilt SRPMs:")
 		for srpm := range prebuiltSRPMs {
 			logger.Log.Infof("--> %s", filepath.Base(srpm))
 		}
@@ -150,30 +150,30 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 		}
 	}
 
-	if len(failedRegularSRPMs) != 0 {
-		logger.Log.Info("Failed regular SRPMs:")
-		for _, failure := range failedRegularSRPMs {
+	if len(failedSRPMs) != 0 {
+		logger.Log.Info("Failed SRPMs:")
+		for _, failure := range failedSRPMs {
 			logger.Log.Infof("--> %s , error: %s, for details see: %s", failure.Node.SRPMFileName(), failure.Err, failure.LogFile)
 		}
 	}
 
-	if len(failedTestSRPMs) != 0 {
-		logger.Log.Info("Failed test SRPMs:")
-		for _, failure := range failedTestSRPMs {
+	if len(failedSRPMsTests) != 0 {
+		logger.Log.Info("Failed SRPMs tests:")
+		for _, failure := range failedSRPMsTests {
 			logger.Log.Infof("--> %s , error: %s, for details see: %s", failure.Node.SRPMFileName(), failure.Err, failure.LogFile)
 		}
 	}
 
-	if len(blockedRegularSRPMs) != 0 {
-		logger.Log.Info("Blocked regular SRPMs:")
-		for srpm := range blockedRegularSRPMs {
+	if len(blockedSRPMs) != 0 {
+		logger.Log.Info("Blocked SRPMs:")
+		for srpm := range blockedSRPMs {
 			logger.Log.Infof("--> %s", filepath.Base(srpm))
 		}
 	}
 
-	if len(blockedTestSRPMs) != 0 {
-		logger.Log.Info("Blocked test SRPMs:")
-		for srpm := range blockedTestSRPMs {
+	if len(blockedSRPMsTests) != 0 {
+		logger.Log.Info("Blocked SRPMs tests:")
+		for srpm := range blockedSRPMsTests {
 			logger.Log.Infof("--> %s", filepath.Base(srpm))
 		}
 	}
@@ -209,17 +209,16 @@ func buildResultsSetToNodesSet(statesSet map[string]*BuildResult) (result map[st
 	return
 }
 
-func getRegularSRPMsState(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState) (failedRegularSRPMs map[string]*BuildResult, prebuiltSRPMs, prebuiltDeltaSRPMs, builtRegularSRPMs map[string]bool, blockedRegularSRPMs map[string]*pkggraph.PkgNode) {
-	failedRegularSRPMs = make(map[string]*BuildResult)
+func getSRPMsState(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState) (failedSRPMs map[string]*BuildResult, prebuiltSRPMs, prebuiltDeltaSRPMs, builtSRPMs map[string]bool, blockedSRPMs map[string]*pkggraph.PkgNode) {
+	failedSRPMs = make(map[string]*BuildResult)
 	prebuiltSRPMs = make(map[string]bool)
 	prebuiltDeltaSRPMs = make(map[string]bool)
-	builtRegularSRPMs = make(map[string]bool)
-	blockedRegularSRPMs = make(map[string]*pkggraph.PkgNode)
+	builtSRPMs = make(map[string]bool)
+	blockedSRPMs = make(map[string]*pkggraph.PkgNode)
 
-	// Check: do we only have build nodes (regular and test) in 'buildState'?
 	for _, failure := range buildState.BuildFailures() {
 		if failure.Node.Type == pkggraph.TypeLocalBuild {
-			failedRegularSRPMs[failure.Node.SrpmPath] = failure
+			failedSRPMs[failure.Node.SrpmPath] = failure
 		}
 	}
 
@@ -234,39 +233,39 @@ func getRegularSRPMsState(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildSta
 			}
 			continue
 		} else if buildState.IsNodeAvailable(node) {
-			builtRegularSRPMs[node.SrpmPath] = true
+			builtSRPMs[node.SrpmPath] = true
 			continue
 		}
 
-		_, found := failedRegularSRPMs[node.SrpmPath]
+		_, found := failedSRPMs[node.SrpmPath]
 		if !found {
-			blockedRegularSRPMs[node.SrpmPath] = node
+			blockedSRPMs[node.SrpmPath] = node
 		}
 	}
 
 	return
 }
 
-func getTestSRPMsState(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState) (failedTestSRPMs map[string]*BuildResult, builtTestSRPMs map[string]bool, blockedTestSRPMs map[string]*pkggraph.PkgNode) {
-	failedTestSRPMs = make(map[string]*BuildResult)
-	builtTestSRPMs = make(map[string]bool)
-	blockedTestSRPMs = make(map[string]*pkggraph.PkgNode)
+func getSRPMsTestsState(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState) (failedSRPMsTests map[string]*BuildResult, testedSRPMs map[string]bool, blockedSRPMsTests map[string]*pkggraph.PkgNode) {
+	failedSRPMsTests = make(map[string]*BuildResult)
+	testedSRPMs = make(map[string]bool)
+	blockedSRPMsTests = make(map[string]*pkggraph.PkgNode)
 
 	for _, failure := range buildState.BuildFailures() {
 		if failure.Node.Type == pkggraph.TypeTest {
-			failedTestSRPMs[failure.Node.SrpmPath] = failure
+			failedSRPMsTests[failure.Node.SrpmPath] = failure
 		}
 	}
 
 	for _, node := range pkgGraph.AllTestNodes() {
 		if buildState.IsNodeAvailable(node) {
-			builtTestSRPMs[node.SrpmPath] = true
+			testedSRPMs[node.SrpmPath] = true
 			continue
 		}
 
-		_, found := failedTestSRPMs[node.SrpmPath]
+		_, found := failedSRPMsTests[node.SrpmPath]
 		if !found {
-			blockedTestSRPMs[node.SrpmPath] = node
+			blockedSRPMsTests[node.SrpmPath] = node
 		}
 	}
 
