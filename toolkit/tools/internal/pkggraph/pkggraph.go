@@ -627,40 +627,23 @@ func (g *PkgGraph) AllNodesFrom(rootNode *PkgNode) []*PkgNode {
 
 // AllRunNodes returns a list of all run nodes in the graph
 func (g *PkgGraph) AllRunNodes() []*PkgNode {
-	count := 0
-	for _, list := range g.lookupTable() {
-		count += len(list)
-	}
-
-	nodes := make([]*PkgNode, 0, count)
-	for _, list := range g.lookupTable() {
-		for _, n := range list {
-			if n.RunNode != nil {
-				nodes = append(nodes, n.RunNode)
-			}
-		}
-	}
-
-	return nodes
+	return g.allNodesWithFilter(func(n *LookupNode) bool {
+		return n.RunNode != nil
+	})
 }
 
 // AllBuildNodes returns a list of all build nodes in the graph
 func (g *PkgGraph) AllBuildNodes() []*PkgNode {
-	count := 0
-	for _, list := range g.lookupTable() {
-		count += len(list)
-	}
+	return g.allNodesWithFilter(func(n *LookupNode) bool {
+		return n.BuildNode != nil
+	})
+}
 
-	nodes := make([]*PkgNode, 0, count)
-	for _, list := range g.lookupTable() {
-		for _, n := range list {
-			if n.BuildNode != nil {
-				nodes = append(nodes, n.BuildNode)
-			}
-		}
-	}
-
-	return nodes
+// AllTestNodes returns a list of all test nodes in the graph
+func (g *PkgGraph) AllTestNodes() []*PkgNode {
+	return g.allNodesWithFilter(func(n *LookupNode) bool {
+		return n.TestNode != nil
+	})
 }
 
 // DOTID generates an id for a DOT graph of the form
@@ -1273,6 +1256,25 @@ func (g *PkgGraph) CloneNode(pkgNode *PkgNode) (newNode *PkgNode) {
 	newNode.This = newNode
 
 	return
+}
+
+// allNodesWithFilter returns a list of all nodes satisfying the filter function.
+func (g *PkgGraph) allNodesWithFilter(filterFunction func(node *LookupNode) bool) []*PkgNode {
+	count := 0
+	for _, list := range g.lookupTable() {
+		count += len(list)
+	}
+
+	nodes := make([]*PkgNode, 0, count)
+	for _, list := range g.lookupTable() {
+		for _, n := range list {
+			if filterFunction(n) {
+				nodes = append(nodes, n.TestNode)
+			}
+		}
+	}
+
+	return nodes
 }
 
 // fixCycle attempts to fix a cycle. Cycles may be acceptable if:
