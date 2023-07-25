@@ -32,6 +32,9 @@ sudo tdnf -y install \
     wget \
     xfsprogs
 
+# Insert the kernel module for netfilter MASQUERADE target
+sudo modprobe nft_masq
+
 # Enable Docker daemon at boot
 sudo systemctl enable --now docker.service
 
