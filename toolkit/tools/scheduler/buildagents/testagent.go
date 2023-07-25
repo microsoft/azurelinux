@@ -28,7 +28,7 @@ func (t *TestAgent) Initialize(config *BuildAgentConfig) (err error) {
 }
 
 // BuildPackage simply sleeps and then returns success for TestAgent.
-func (t *TestAgent) BuildPackage(inputFile, logName, outArch string, dependencies []string) (builtFiles []string, logFile string, err error) {
+func (t *TestAgent) BuildPackage(inputFile, logName, outArch string, runCheck bool, dependencies []string) (builtFiles []string, logFile string, err error) {
 	const sleepDuration = time.Second * 5
 	time.Sleep(sleepDuration)
 
@@ -43,14 +43,5 @@ func (t *TestAgent) Config() (config BuildAgentConfig) {
 
 // Close closes the TestAgent, releasing any resources.
 func (t *TestAgent) Close() (err error) {
-	return
-}
-
-// TestPackage simply sleeps and then returns success for TestAgent.
-func (t *TestAgent) TestPackage(inputFile, logName string, dependencies []string) (logFile string, err error) {
-	const sleepDuration = time.Second * 5
-	time.Sleep(sleepDuration)
-
-	logFile = filepath.Join(t.config.LogDir, logName)
 	return
 }

@@ -259,12 +259,13 @@ func parseCheckSection(logFile string) (err error) {
 func buildSRPMFile(agent buildagents.BuildAgent, buildAttempts int, srpmFile, outArch string, dependencies []string) (builtFiles []string, logFile string, err error) {
 	const (
 		retryDuration = time.Second
+		runCheck      = false
 	)
 
 	logBaseName := filepath.Base(srpmFile) + ".log"
 
 	err = retry.Run(func() (buildErr error) {
-		builtFiles, logFile, buildErr = agent.BuildPackage(srpmFile, logBaseName, outArch, dependencies)
+		builtFiles, logFile, buildErr = agent.BuildPackage(srpmFile, logBaseName, outArch, runCheck, dependencies)
 		return
 	}, buildAttempts, retryDuration)
 
@@ -272,9 +273,10 @@ func buildSRPMFile(agent buildagents.BuildAgent, buildAttempts int, srpmFile, ou
 }
 
 // testSRPMFile sends an SRPM to a build agent to test.
-func testSRPMFile(agent buildagents.BuildAgent, checkAttempts int, srpmFile string, dependencies []string) (logFile string, err error) {
+func testSRPMFile(agent buildagents.BuildAgent, checkAttempts int, srpmFile string, outArch string, dependencies []string) (logFile string, err error) {
 	const (
 		retryDuration = time.Second
+		runCheck      = true
 	)
 
 	// checkFailed is a flag to see if a non-null buildErr is from the %check section
@@ -282,9 +284,9 @@ func testSRPMFile(agent buildagents.BuildAgent, checkAttempts int, srpmFile stri
 	logBaseName := filepath.Base(srpmFile) + ".test.log"
 
 	err = retry.Run(func() (buildErr error) {
-		logFile, buildErr = agent.TestPackage(srpmFile, logBaseName, dependencies)
+		_, logFile, buildErr = agent.BuildPackage(srpmFile, logBaseName, outArch, runCheck, dependencies)
 		if buildErr != nil {
-			logger.Log.Warnf("Unexpected test build failure for '%s'. Error: %s", srpmFile, err)
+			logger.Log.Warnf("Test build for '%s' failed on a non-test build issue. Error: %s", srpmFile, err)
 			return
 		}
 
