@@ -368,8 +368,19 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 			continue
 		}
 
-		// Query the test BuildRequires fields from this spec and turn them into an array of PackageVersions
+		addTestNode := runCheck
 		if runCheck {
+			specHasCheckSection, err := rpm.SpecHasCheckSection(specFile, sourceDir, arch, checkDefines)
+			if err != nil {
+				sendEmptyResult(results, err)
+				continue
+			}
+
+			addTestNode = specHasCheckSection
+		}
+
+		// Query the test BuildRequires fields from this spec and turn them into an array of PackageVersions
+		if addTestNode {
 			testBuildRequiresList, err = readBuildRequires(specFile, sourceDir, arch, checkDefines)
 			if err != nil {
 				sendEmptyResult(results, err)
