@@ -1,4 +1,3 @@
-%global __provides_exclude_from ^%{_libdir}/traceevent/plugins
 Summary:        Library to parse raw trace event formats
 # git tag
 #%%global commit 5dd505f3aba255c5fbc2a6dbed57fcba51b400f6
@@ -17,6 +16,7 @@ URL:            https://git.kernel.org/pub/scm/libs/libtrace/libtraceevent.git/
 # git archive --prefix=libtraceevent-%%{version}/ -o libtraceevent-%%{version}.tar.gz %%{git_commit}
 #Source: libtraceevent-%%{version}.tar.gz
 Source:         https://git.kernel.org/pub/scm/libs/libtrace/libtraceevent.git/snapshot/libtraceevent-%{version}.tar.gz
+%global __provides_exclude_from ^%{_libdir}/traceevent/plugins
 BuildRequires:  asciidoc
 BuildRequires:  gcc
 BuildRequires:  xmlto
