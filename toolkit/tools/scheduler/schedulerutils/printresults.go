@@ -103,14 +103,14 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	logger.Log.Info("--------- Summary ---------")
 	logger.Log.Info("---------------------------")
 
-	logger.Log.Infof("Number of built SRPMs:     %d", len(builtSRPMs))
-	logger.Log.Infof("Number of tested SRPMs:        %d", len(testedSRPMs))
+	logger.Log.Infof("Number of built SRPMs:             %d", len(builtSRPMs))
+	logger.Log.Infof("Number of tested SRPMs:            %d", len(testedSRPMs))
 	logger.Log.Infof("Number of prebuilt SRPMs:          %d", len(prebuiltSRPMs))
 	logger.Log.Infof("Number of prebuilt delta SRPMs:    %d", len(prebuiltDeltaSRPMs))
-	logger.Log.Infof("Number of failed SRPMs:    %d", len(failedSRPMs))
-	logger.Log.Infof("Number of failed SRPMs tests:       %d", len(failedSRPMsTests))
-	logger.Log.Infof("Number of blocked SRPMs:   %d", len(blockedSRPMs))
-	logger.Log.Infof("Number of blocked SRPMs tests:      %d", len(blockedSRPMsTests))
+	logger.Log.Infof("Number of failed SRPMs:            %d", len(failedSRPMs))
+	logger.Log.Infof("Number of failed SRPMs tests:      %d", len(failedSRPMsTests))
+	logger.Log.Infof("Number of blocked SRPMs:           %d", len(blockedSRPMs))
+	logger.Log.Infof("Number of blocked SRPMs tests:     %d", len(blockedSRPMsTests))
 	logger.Log.Infof("Number of unresolved dependencies: %d", len(unresolvedDependencies))
 
 	if allowToolchainRebuilds && (len(rpmConflicts) > 0 || len(srpmConflicts) > 0) {
