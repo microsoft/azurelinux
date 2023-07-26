@@ -27,7 +27,6 @@ import (
 )
 
 const (
-	chrootRpmBuildRoot      = "/usr/src/mariner"
 	chrootLocalRpmsDir      = "/localrpms"
 	chrootLocalToolchainDir = "/toolchainrpms"
 	chrootLocalRpmsCacheDir = "/upstream-cached-rpms"
@@ -99,12 +98,12 @@ func main() {
 
 	// On success write a comma-seperated list of RPMs built to stdout that can be parsed by the invoker.
 	// Any output from logger will be on stderr so stdout will only contain this output.
-	fmt.Printf(strings.Join(builtRPMs, ","))
+	if !*runCheck {
+		fmt.Print(strings.Join(builtRPMs, ","))
+	}
 }
 
 func copySRPMToOutput(srpmFilePath, srpmOutputDirPath string) (err error) {
-	const srpmsDirName = "SRPMS"
-
 	srpmFileName := filepath.Base(srpmFilePath)
 	srpmOutputFilePath := filepath.Join(srpmOutputDirPath, srpmFileName)
 
@@ -127,12 +126,10 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 		buildHeartbeatTimeout = 30 * time.Minute
 
 		existingChrootDir = false
-		squashErrors      = false
 
 		overlaySource           = ""
 		overlayWorkDirRpms      = "/overlaywork_rpms"
 		overlayWorkDirToolchain = "/overlaywork_toolchain"
-		rpmDirName              = "RPMS"
 	)
 
 	srpmBaseName := filepath.Base(srpmFile)
@@ -187,8 +184,9 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 		return
 	}
 
-	rpmBuildOutputDir := filepath.Join(chroot.RootDir(), chrootRpmBuildRoot, rpmDirName)
-	builtRPMs, err = moveBuiltRPMs(rpmBuildOutputDir, rpmDirPath)
+	if !runCheck {
+		builtRPMs, err = moveBuiltRPMs(chroot.RootDir(), rpmDirPath)
+	}
 
 	return
 }
@@ -240,8 +238,13 @@ func buildRPMFromSRPMInChroot(srpmFile, outArch string, runCheck bool, defines m
 	return
 }
 
-func moveBuiltRPMs(rpmOutDir, dstDir string) (builtRPMs []string, err error) {
-	const rpmExtension = ".rpm"
+func moveBuiltRPMs(chrootRootDir, dstDir string) (builtRPMs []string, err error) {
+	const (
+		chrootRpmBuildDir = "/usr/src/mariner/RPMS"
+		rpmExtension      = ".rpm"
+	)
+
+	rpmOutDir := filepath.Join(chrootRootDir, chrootRpmBuildDir)
 	err = filepath.Walk(rpmOutDir, func(path string, info os.FileInfo, fileErr error) (err error) {
 		if fileErr != nil {
 			return fileErr
