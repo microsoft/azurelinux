@@ -422,7 +422,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Thu Jul 26 2023 Juan Camposeco <juanarturoc@microsoft.com> - 5.15.118.1-2
+* Wed Jul 26 2023 Juan Camposeco <juanarturoc@microsoft.com> - 5.15.118.1-2
 - Enable Mellanox DPU drivers and configurations, ARM64 only
 
 * Wed Jun 28 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.118.1-1
