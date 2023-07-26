@@ -49,7 +49,7 @@ func PrepareGraphForBuild(pkgGraph *pkggraph.PkgGraph, packagesToBuild []*pkgjso
 		strictGoalNode = true
 	)
 
-	_, err = pkgGraph.AddGoalNode(buildGoalNodeName, packagesToBuild, strictGoalNode, extraLayers)
+	_, err = pkgGraph.AddGoalNodeWithExtraLayers(buildGoalNodeName, packagesToBuild, strictGoalNode, extraLayers)
 	if err != nil {
 		return
 	}
@@ -89,7 +89,7 @@ func OptimizeGraph(pkgGraph *pkggraph.PkgGraph, canUseCachedImplicit bool, extra
 		}
 
 		// Create a solvable ALL goal node
-		goalNode, err = optimizedGraph.AddGoalNode(allGoalNodeName, nil, true, extraLayers)
+		goalNode, err = optimizedGraph.AddGoalNodeWithExtraLayers(allGoalNodeName, nil, true, extraLayers)
 		if err != nil {
 			logger.Log.Warnf("Failed to add goal node (%s), error: %s", allGoalNodeName, err)
 			return

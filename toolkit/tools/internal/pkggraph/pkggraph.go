@@ -1019,14 +1019,22 @@ func (g *PkgGraph) AddMetaNode(from []*PkgNode, to []*PkgNode) (metaNode *PkgNod
 	return
 }
 
-// AddGoalNode adds a goal node to the graph which links to existing nodes. An empty package list will add an edge to all nodes
+// AddGoalNodeWithLayers adds a goal node to the graph which links to existing nodes. An empty package list will add an edge to all nodes
+//   - goalName: The name of the goal node to add
+//   - packages: A list of packages to add to link the goal node to. If empty, all nodes will be added to the goal node
+//   - strict: If true, the goal node will fail if any of the packages are not found
+func (g *PkgGraph) AddGoalNode(goalName string, packages []*pkgjson.PackageVer, strict bool) (goalNode *PkgNode, err error) {
+	return g.AddGoalNodeWithExtraLayers(goalName, packages, strict, 0)
+}
+
+// AddGoalNodeWithExtraLayers adds a goal node to the graph which links to existing nodes. An empty package list will add an edge to all nodes
 //   - goalName: The name of the goal node to add
 //   - packages: A list of packages to add to link the goal node to. If empty, all nodes will be added to the goal node
 //   - strict: If true, the goal node will fail if any of the packages are not found
 //   - extraLayers: The number of levels to expand the goal node. Each level will add one more layer of packages beyond
 //     the goal node. For example, if the goal node is "foo" and extraLevels is 1, the goal node will link to all nodes
 //     which depend on "foo" as well as "foo" itself (Specifically run nodes, all other nodes are stepped over)
-func (g *PkgGraph) AddGoalNode(goalName string, packages []*pkgjson.PackageVer, strict bool, extraLayers int) (goalNode *PkgNode, err error) {
+func (g *PkgGraph) AddGoalNodeWithExtraLayers(goalName string, packages []*pkgjson.PackageVer, strict bool, extraLayers int) (goalNode *PkgNode, err error) {
 	// Check if we already have a goal node with the requested name
 	if g.FindGoalNode(goalName) != nil {
 		err = fmt.Errorf("can't have two goal nodes named %s", goalName)
