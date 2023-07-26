@@ -303,12 +303,6 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 
 	var ts *timestamp.TimeStamp = nil
 	for specFile := range requests {
-		var (
-			providerList          []*pkgjson.Package
-			buildRequiresList     []*pkgjson.PackageVer
-			testBuildRequiresList []*pkgjson.PackageVer = nil
-		)
-
 		select {
 		case <-cancel:
 			logger.Log.Debug("Cancellation signal received")
@@ -323,7 +317,9 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 		}
 		ts, _ = timestamp.StartEvent(filepath.Base(specFile), tsRoot)
 
+		providerList := []*pkgjson.Package{}
 		sourceDir := filepath.Dir(specFile)
+		testBuildRequiresList := []*pkgjson.PackageVer{}
 
 		// Find the SRPM associated with the SPEC.
 		srpmResults, err := rpm.QuerySPEC(specFile, sourceDir, querySrpm, arch, noCheckDefines, rpm.QueryHeaderArgument)
@@ -362,7 +358,7 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 		}
 
 		// Query the BuildRequires fields from this spec and turn them into an array of PackageVersions
-		buildRequiresList, err = readBuildRequires(specFile, sourceDir, arch, noCheckDefines)
+		buildRequiresList, err := readBuildRequires(specFile, sourceDir, arch, noCheckDefines)
 		if err != nil {
 			sendEmptyResult(results, err)
 			continue
