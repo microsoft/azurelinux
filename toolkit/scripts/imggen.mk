@@ -221,7 +221,7 @@ initrd_bundled_files = $(go-liveinstaller) $(go-imager) $(assets_files) $(initrd
 
 $(initrd_img): $(initrd_bundled_files) $(initrd_config_json) $(INITRD_CACHE_SUMMARY) | $(iso_deps)
 	# Recursive make call to build the initrd image $(artifact_dir)/iso-initrd.img
-	$(MAKE) image MAKEOVERRIDES= CONFIG_FILE=$(initrd_config_json) IMAGE_CACHE_SUMMARY=$(INITRD_CACHE_SUMMARY) IMAGE_TAG=
+	$(MAKE) image MAKEOVERRIDES= CONFIG_FILE=$(initrd_config_json) IMAGE_CACHE_SUMMARY=$(INITRD_CACHE_SUMMARY) IMAGE_TAG= RELEASE_VERSION=$(RELEASE_VERSION) BUILD_NUMBER=$(BUILD_NUMBER)
 
 installer-initrd: $(initrd_img)
 iso: $(initrd_img) $(iso_deps)
