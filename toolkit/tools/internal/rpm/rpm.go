@@ -136,6 +136,32 @@ func sanitizeOutput(rawResults string) (sanitizedOutput []string) {
 	return
 }
 
+// formatBuildArgs will generate arguments to pass to 'rpmbuild'.
+func formatBuildArgs(outArch, srpmFile string, defines map[string]string) (commandArgs []string) {
+	const (
+		os          = "linux"
+		queryFormat = ""
+		vendor      = "mariner"
+	)
+
+	args := []string{"--rebuild", "--nodeps"}
+
+	// buildArch is the arch of the build machine
+	// outArch is the arch of the machine that will run the resulting binary
+	buildArch, err := GetRpmArch(runtime.GOARCH)
+	if err != nil {
+		return
+	}
+
+	if buildArch != outArch && outArch != "noarch" {
+		tuple := outArch + "-" + vendor + "-" + os
+		logger.Log.Debugf("Applying RPM target tuple (%s)", tuple)
+		args = append(args, TargetArgument, tuple)
+	}
+
+	return formatCommandArgs(args, srpmFile, queryFormat, defines)
+}
+
 // formatCommand will generate an RPM command to execute.
 func formatCommandArgs(extraArgs []string, file, queryFormat string, defines map[string]string) (commandArgs []string) {
 	commandArgs = append(commandArgs, extraArgs...)
@@ -241,31 +267,13 @@ func QueryPackage(packageFile, queryFormat string, defines map[string]string, ex
 	return executeRpmCommand(rpmProgram, args...)
 }
 
-// BuildRPMFromSRPM builds an RPM from the given SRPM file
-func BuildRPMFromSRPM(srpmFile, outArch string, defines map[string]string, extraArgs ...string) (err error) {
-	const (
-		queryFormat  = ""
-		squashErrors = true
-		vendor       = "mariner"
-		os           = "linux"
-	)
+// BuildRPMFromSRPM builds an RPM from the given SRPM file but does not run its '%check' section.
+func BuildRPMFromSRPM(srpmFile, outArch string, defines map[string]string) (err error) {
+	const squashErrors = true
 
-	extraArgs = append(extraArgs, "--rebuild", "--nodeps")
+	args := formatBuildArgs(outArch, srpmFile, defines)
+	args = append(args, "--nocheck")
 
-	// buildArch is the arch of the build machine
-	// outArch is the arch of the machine that will run the resulting binary
-	buildArch, err := GetRpmArch(runtime.GOARCH)
-	if err != nil {
-		return
-	}
-
-	if buildArch != outArch && "noarch" != outArch {
-		tuple := outArch + "-" + vendor + "-" + os
-		logger.Log.Debugf("Applying RPM target tuple (%s)", tuple)
-		extraArgs = append(extraArgs, TargetArgument, tuple)
-	}
-
-	args := formatCommandArgs(extraArgs, srpmFile, queryFormat, defines)
 	return shell.ExecuteLive(squashErrors, rpmBuildProgram, args...)
 }
 
@@ -461,6 +469,17 @@ func BuildCompatibleSpecsList(baseDir string, inputSpecPaths []string, defines m
 	}
 
 	return filterCompatibleSpecs(specPaths, defines)
+}
+
+// TestRPMFromSRPM builds an RPM from the given SRPM and runs its '%check' section SRPM file
+// but it does not generate any RPM packages.
+func TestRPMFromSRPM(srpmFile, outArch string, defines map[string]string) (err error) {
+	const squashErrors = true
+
+	args := formatBuildArgs(outArch, srpmFile, defines)
+	args = append(args, "-bi")
+
+	return shell.ExecuteLive(squashErrors, rpmBuildProgram, args...)
 }
 
 // buildAllSpecsList builds a list of all spec files in the directory. Paths are relative to the base directory.
