@@ -77,8 +77,8 @@ var (
 	}
 
 	// checkSectionRegex is used to determine if a SPEC file has a '%check' section.
-	// It works strings containing the full file contents, thus the need for the 'm' flag.
-	checkSectionRegex = regexp.MustCompile(`(?m)^\s*%check\s*$`)
+	// It works multi-line strings containing the whole file content, thus the need for the 'm' flag.
+	checkSectionRegex = regexp.MustCompile(`(?m)^\s*%check`)
 
 	// Output from 'rpm' prints installed RPMs in a line with the following format:
 	//
@@ -120,7 +120,7 @@ func SetMacroDir(newMacroDir string) (origenv []string, err error) {
 }
 
 // getCommonBuildArgs will generate arguments to pass to 'rpmbuild'.
-func getCommonBuildArgs(outArch, srpmFile string, defines map[string]string) (buildArgs []string) {
+func getCommonBuildArgs(outArch, srpmFile string, defines map[string]string) (buildArgs []string, err error) {
 	const (
 		os          = "linux"
 		queryFormat = ""
@@ -142,7 +142,7 @@ func getCommonBuildArgs(outArch, srpmFile string, defines map[string]string) (bu
 		buildArgs = append(buildArgs, TargetArgument, tuple)
 	}
 
-	return formatCommandArgs(buildArgs, srpmFile, queryFormat, defines)
+	return formatCommandArgs(buildArgs, srpmFile, queryFormat, defines), nil
 }
 
 // sanitizeOutput will take the raw output from an RPM command and split by new line,
@@ -272,8 +272,13 @@ func QueryPackage(packageFile, queryFormat string, defines map[string]string, ex
 func BuildRPMFromSRPM(srpmFile, outArch string, defines map[string]string) (err error) {
 	const squashErrors = true
 
+	commonBuildArgs, err := getCommonBuildArgs(outArch, srpmFile, defines)
+	if err != nil {
+		return
+	}
+
 	args := []string{"--nocheck", "--rebuild"}
-	args = append(args, getCommonBuildArgs(outArch, srpmFile, defines)...)
+	args = append(args, commonBuildArgs...)
 
 	return shell.ExecuteLive(squashErrors, rpmBuildProgram, args...)
 }
@@ -477,8 +482,13 @@ func BuildCompatibleSpecsList(baseDir string, inputSpecPaths []string, defines m
 func TestRPMFromSRPM(srpmFile, outArch string, defines map[string]string) (err error) {
 	const squashErrors = true
 
+	commonBuildArgs, err := getCommonBuildArgs(outArch, srpmFile, defines)
+	if err != nil {
+		return
+	}
+
 	args := []string{"-ri"}
-	args = append(args, getCommonBuildArgs(outArch, srpmFile, defines)...)
+	args = append(args, commonBuildArgs...)
 
 	return shell.ExecuteLive(squashErrors, rpmBuildProgram, args...)
 }
