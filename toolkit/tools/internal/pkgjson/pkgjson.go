@@ -60,17 +60,17 @@ type PackageVerInterval struct {
 
 // Package is a representation of a package with name and version information
 type Package struct {
-	Provides      *PackageVer   `json:"Provides"`          // Version information and name of package
-	SrpmPath      string        `json:"SrpmPath"`          // Reconstructed name of the SRPM the spec is from
-	RpmPath       string        `json:"RpmPath"`           // Reconstructed name of the RPM the package comes from
-	SourceDir     string        `json:"SourceDir"`         // The path to the directory of sources for this package
-	SpecPath      string        `json:"SpecPath"`          // The path to the spec file that builds this package
-	Architecture  string        `json:"Architecture"`      // The architecture of the package
-	Requires      []*PackageVer `json:"Requires"`          // List of targets this spec requires to install
-	BuildRequires []*PackageVer `json:"BuildRequires"`     // List of targets this spec requires to build
-	TestRequires  []*PackageVer `json:"TestBuildRequires"` // List of targets this spec requires to run tests.
-	IsToolchain   bool          `json:"IsToolchain"`       // Is this package part of the toolchain
-	RunTests      bool          `json:"RunTests"`          // Should we run tests for this package.
+	Provides      *PackageVer   `json:"Provides"`      // Version information and name of package
+	SrpmPath      string        `json:"SrpmPath"`      // Reconstructed name of the SRPM the spec is from
+	RpmPath       string        `json:"RpmPath"`       // Reconstructed name of the RPM the package comes from
+	SourceDir     string        `json:"SourceDir"`     // The path to the directory of sources for this package
+	SpecPath      string        `json:"SpecPath"`      // The path to the spec file that builds this package
+	Architecture  string        `json:"Architecture"`  // The architecture of the package
+	Requires      []*PackageVer `json:"Requires"`      // List of targets this spec requires to install
+	BuildRequires []*PackageVer `json:"BuildRequires"` // List of targets this spec requires to build
+	TestRequires  []*PackageVer `json:"TestRequires"`  // List of targets this spec requires to run tests.
+	IsToolchain   bool          `json:"IsToolchain"`   // Is this package part of the toolchain
+	RunTests      bool          `json:"RunTests"`      // Should we run tests for this package.
 }
 
 // ParsePackageJSON reads a package list json file
