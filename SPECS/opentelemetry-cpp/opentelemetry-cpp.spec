@@ -7,27 +7,50 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/open-telemetry/opentelemetry-cpp
 Source0:        https://github.com/open-telemetry/opentelemetry-cpp/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# Standard proto files source: https://github.com/open-telemetry/opentelemetry-proto
+Source1:        opentelemetry-proto-1.0.0.tar.gz
 
+BuildRequires:  c-ares-devel
 BuildRequires:  cmake
-BuildRequires:  gtest-devel
+BuildRequires:  curl-devel
 BuildRequires:  gmock-devel
+BuildRequires:  grpc-devel
+BuildRequires:  grpc-plugins
+BuildRequires:  gtest-devel
+BuildRequires:  nlohmann-json-devel
+BuildRequires:  protobuf-devel
+BuildRequires:  re2-devel
+
 
 %description
 The official OpenTelemetry CPP client
 
 %prep
 %autosetup -p1
+mkdir -p third_party/opentelemetry-proto
+tar xf %{SOURCE1} -C third_party/opentelemetry-proto --strip-components=1 
 
 %build
 mkdir build && cd build
-%cmake -DWITH_BENCHMARK=OFF ..
+%cmake \
+	-DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+	-DOPENTELEMETRY_INSTALL=ON \
+	-DWITH_BENCHMARK=OFF \
+	-DWITH_NO_DEPRECATED_CODE=ON \
+	-DWITH_OTLP_GRPC=ON \
+	-DWITH_OTLP_HTTP=ON \
+	-DWITH_STL=ON \
+	-DWITH_ZPAGES=ON \
+	-DOTELCPP_PROTO_PATH=../third_party/opentelemetry-proto \
+	..
+
 %make_build
 
 %install
 %make_install -C build
 
 %check
-%make_build -C build check
+%make_build -C build test
 
 %files
 %license LICENSE
@@ -37,10 +60,22 @@ mkdir build && cd build
 %{_libdir}/libopentelemetry_exporter_in_memory.so
 %{_libdir}/libopentelemetry_exporter_ostream_metrics.so
 %{_libdir}/libopentelemetry_exporter_ostream_span.so
+%{_libdir}/libopentelemetry_exporter_otlp_grpc_client.so
+%{_libdir}/libopentelemetry_exporter_otlp_grpc_log.so
+%{_libdir}/libopentelemetry_exporter_otlp_grpc_metrics.so
+%{_libdir}/libopentelemetry_exporter_otlp_grpc.so
+%{_libdir}/libopentelemetry_exporter_otlp_http_client.so
+%{_libdir}/libopentelemetry_exporter_otlp_http_metric.so
+%{_libdir}/libopentelemetry_exporter_otlp_http.so
+%{_libdir}/libopentelemetry_http_client_curl.so
 %{_libdir}/libopentelemetry_metrics.so
+%{_libdir}/libopentelemetry_otlp_recordable.so
+%{_libdir}/libopentelemetry_proto_grpc.so
+%{_libdir}/libopentelemetry_proto.so
 %{_libdir}/libopentelemetry_resources.so
 %{_libdir}/libopentelemetry_trace.so
 %{_libdir}/libopentelemetry_version.so
+%{_libdir}/libopentelemetry_zpages.so
 
 %changelog
 * Mon Jul 17 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 1.10.0-1
