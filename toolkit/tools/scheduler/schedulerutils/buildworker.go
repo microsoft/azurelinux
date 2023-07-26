@@ -155,8 +155,8 @@ func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMu
 		return
 	}
 
-	// Print a message if a package is partially built but needs to be regenerated because its missing something.
-	if len(missingFiles) > 0 && len(builtFiles) > 0 {
+	// Print a message if a package is partially built but needs to be regenerated because it's missing something.
+	if len(missingFiles) > 0 && len(builtFiles) != len(missingFiles) {
 		logger.Log.Infof("SRPM '%s' is being rebuilt due to partially missing components: %v", node.SrpmPath, missingFiles)
 	}
 
@@ -304,10 +304,10 @@ func testSRPMFile(agent buildagents.BuildAgent, checkAttempts int, srpmFile stri
 	return
 }
 
-// setAncillaryBuildNodesStatus sets the NodeState for all of the request's ancillary nodes.
+// setAncillaryBuildNodesStatus sets the NodeState for all of the request's ancillary build and test nodes.
 func setAncillaryBuildNodesStatus(req *BuildRequest, nodeState pkggraph.NodeState) {
 	for _, node := range req.AncillaryNodes {
-		if node.Type == pkggraph.TypeLocalBuild {
+		if node.Type == pkggraph.TypeLocalBuild || node.Type == pkggraph.TypeTest {
 			node.State = nodeState
 		}
 	}
