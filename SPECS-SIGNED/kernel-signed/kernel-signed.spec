@@ -153,7 +153,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %exclude /module_info.ld
 
 %changelog
-* Thu Jul 06 2023 Juan Camposeco <juanarturoc@microsoft.com> - 5.15.118.1-2
+* Wed Jul 26 2023 Juan Camposeco <juanarturoc@microsoft.com> - 5.15.118.1-2
 - Bump release to match kernel
 
 * Wed Jun 28 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.118.1-1
