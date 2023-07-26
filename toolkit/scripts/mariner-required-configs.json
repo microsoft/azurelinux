@@ -824,6 +824,51 @@
                 "PR": [
                     "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/commit/a9ad05e35412cfa69ff93603500e97b7f29a90ca"
                 ]
+            },
+            "CONFIG_ARM64_WORKAROUND_TSB_FLUSH_FAILURE": {
+                "value": [
+                    "is not set",
+                    "<missing>",
+                    "m",
+                    "y"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for updated 5.15.118.1",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5881"
+                ]
+            },
+            "CONFIG_ARM64_ERRATUM_2054223" : {
+                "value": [
+                    "is not set",
+                    "<missing>",
+                    "m",
+                    "y"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for updated 5.15.118.1",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5881"
+                ]
+            },
+            "CONFIG_ARM64_ERRATUM_2067961": {
+                "value": [
+                    "is not set",
+                    "<missing>",
+                    "m",
+                    "y"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for updated 5.15.118.1",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5881"
+                ]
             }
         }
     }
