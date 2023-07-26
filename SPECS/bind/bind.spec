@@ -1,7 +1,7 @@
 Summary:        Domain Name System software
 Name:           bind
 Version:        9.16.37
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,7 @@ URL:            https://www.isc.org/downloads/bind/
 Source0:        https://ftp.isc.org/isc/bind9/%{version}/%{name}-%{version}.tar.xz
 # CVE-2019-6470 is fixed by updating the dhcp package to 4.4.1 or greater
 Patch0:         CVE-2019-6470.nopatch
+Patch1:         CVE-2023-2828.patch
 BuildRequires:  libcap-devel
 BuildRequires:  libuv-devel
 BuildRequires:  openssl-devel
@@ -88,6 +89,9 @@ fi
 %{_libdir}/tmpfiles.d/named.conf
 
 %changelog
+* Wed Jul 26 2023 Suresh Thelkar <sthelkar@microsoft.com> - 9.16.37-2
+- Patch to fix CVE-2023-2828
+
 * Mon Feb 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.16.37-1
 - Auto-upgrade to 9.16.37 - to fix CVE-2022-3736, CVE-2022-3094, CVE-2022-3924
 
