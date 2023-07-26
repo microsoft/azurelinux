@@ -163,13 +163,7 @@ func addNodesForPackage(g *pkggraph.PkgGraph, pkg *pkgjson.Package) (err error) 
 		return
 	}
 
-	if !pkg.RunTests {
-		logger.Log.Debugf("Not running tests for %+v.\n", pkg)
-		newTestNode = nil
-		return
-	}
-
-	if newTestNode == nil {
+	if pkg.RunTests && (newTestNode == nil) {
 		// Add "Test" node
 		newTestNode, err = g.AddPkgNode(pkg.Provides, pkggraph.StateBuild, pkggraph.TypeTest, pkg.SrpmPath, pkggraph.NoRPMPath, pkg.SpecPath, pkg.SourceDir, pkg.Architecture, "<LOCAL>")
 		if err != nil {
