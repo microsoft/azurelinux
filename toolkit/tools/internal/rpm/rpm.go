@@ -119,32 +119,15 @@ func SetMacroDir(newMacroDir string) (origenv []string, err error) {
 	return
 }
 
-// sanitizeOutput will take the raw output from an RPM command and split by new line,
-// trimming whitespace and removing blank lines.
-func sanitizeOutput(rawResults string) (sanitizedOutput []string) {
-	rawSplitOutput := strings.Split(rawResults, "\n")
-
-	for _, line := range rawSplitOutput {
-		trimmedLine := strings.TrimSpace(line)
-		if trimmedLine == "" {
-			continue
-		}
-
-		sanitizedOutput = append(sanitizedOutput, trimmedLine)
-	}
-
-	return
-}
-
-// formatBuildArgs will generate arguments to pass to 'rpmbuild'.
-func formatBuildArgs(outArch, srpmFile string, defines map[string]string) (commandArgs []string) {
+// getCommonBuildArgs will generate arguments to pass to 'rpmbuild'.
+func getCommonBuildArgs(outArch, srpmFile string, defines map[string]string) (commandArgs []string) {
 	const (
 		os          = "linux"
 		queryFormat = ""
 		vendor      = "mariner"
 	)
 
-	args := []string{"--rebuild", "--nodeps"}
+	args := []string{"--nodeps"}
 
 	// buildArch is the arch of the build machine
 	// outArch is the arch of the machine that will run the resulting binary
@@ -160,6 +143,23 @@ func formatBuildArgs(outArch, srpmFile string, defines map[string]string) (comma
 	}
 
 	return formatCommandArgs(args, srpmFile, queryFormat, defines)
+}
+
+// sanitizeOutput will take the raw output from an RPM command and split by new line,
+// trimming whitespace and removing blank lines.
+func sanitizeOutput(rawResults string) (sanitizedOutput []string) {
+	rawSplitOutput := strings.Split(rawResults, "\n")
+
+	for _, line := range rawSplitOutput {
+		trimmedLine := strings.TrimSpace(line)
+		if trimmedLine == "" {
+			continue
+		}
+
+		sanitizedOutput = append(sanitizedOutput, trimmedLine)
+	}
+
+	return
 }
 
 // formatCommand will generate an RPM command to execute.
@@ -271,8 +271,8 @@ func QueryPackage(packageFile, queryFormat string, defines map[string]string, ex
 func BuildRPMFromSRPM(srpmFile, outArch string, defines map[string]string) (err error) {
 	const squashErrors = true
 
-	args := formatBuildArgs(outArch, srpmFile, defines)
-	args = append(args, "--nocheck")
+	args := getCommonBuildArgs(outArch, srpmFile, defines)
+	args = append(args, "--nocheck", "--rebuild")
 
 	return shell.ExecuteLive(squashErrors, rpmBuildProgram, args...)
 }
@@ -476,8 +476,8 @@ func BuildCompatibleSpecsList(baseDir string, inputSpecPaths []string, defines m
 func TestRPMFromSRPM(srpmFile, outArch string, defines map[string]string) (err error) {
 	const squashErrors = true
 
-	args := formatBuildArgs(outArch, srpmFile, defines)
-	args = append(args, "-bi")
+	args := getCommonBuildArgs(outArch, srpmFile, defines)
+	args = append(args, "--recompile")
 
 	return shell.ExecuteLive(squashErrors, rpmBuildProgram, args...)
 }
