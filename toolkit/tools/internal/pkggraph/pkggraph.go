@@ -1171,7 +1171,7 @@ func (g *PkgGraph) getNextGoalLayer(expandedGoalNodesSet map[*PkgNode]bool, curr
 		for _, dependentNeighbor := range dependentNodes {
 			neighborNode := dependentNeighbor.(*PkgNode)
 			switch neighborNode.Type {
-			case TypeRun:
+			case TypeLocalRun:
 				logger.Log.Debugf("Adding %s to expanded goal nodes", neighborNode.FriendlyName())
 				expandedGoalNodes = append(expandedGoalNodes, neighborNode)
 			case TypeGoal:

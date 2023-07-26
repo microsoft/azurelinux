@@ -25,6 +25,10 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
+const (
+	defaultExtraLayers = "0"
+)
+
 var (
 	app = kingpin.New("graphpkgfetcher", "A tool to download a unresolved packages in a graph into a given directory.")
 
@@ -54,6 +58,7 @@ var (
 	pkgsToIgnore         = app.Flag("ignored-packages", "Space separated list of specs ignoring rebuilds if their dependencies have been updated. Will still build if all of the spec's RPMs have not been built.").String()
 	pkgsToBuild          = app.Flag("packages", "Space separated list of top-level packages that should be built. Omit this argument to build all packages.").String()
 	pkgsToRebuild        = app.Flag("rebuild-packages", "Space separated list of base package names packages that should be rebuilt.").String()
+	extraLayers          = app.Flag("extra-layers", "Sets the number of additional layers in the graph beyond the goal packages to buid.").Default(defaultExtraLayers).Int()
 
 	inputSummaryFile  = app.Flag("input-summary-file", "Path to a file with the summary of packages cloned to be restored").String()
 	outputSummaryFile = app.Flag("output-summary-file", "Path to save the summary of packages cloned").String()
@@ -211,7 +216,7 @@ func downloadDeltaNodes(dependencyGraph *pkggraph.PkgGraph, cloner *rpmrepoclone
 		return
 	}
 
-	isGraphOptimized, deltaPkgGraphCopy, _, err := schedulerutils.PrepareGraphForBuild(deltaPkgGraphCopy, packageVersToBuild, useImplicitForOptimization)
+	isGraphOptimized, deltaPkgGraphCopy, _, err := schedulerutils.PrepareGraphForBuild(deltaPkgGraphCopy, packageVersToBuild, useImplicitForOptimization, *extraLayers)
 	if err != nil {
 		err = fmt.Errorf("failed to initialize graph for delta package downloading:\n%w", err)
 		return
