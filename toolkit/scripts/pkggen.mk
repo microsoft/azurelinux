@@ -75,7 +75,7 @@ analyze-built-graph: $(go-graphanalytics)
 	fi
 
 # Parse all specs in $(BUILD_SPECS_DIR) and generate a specs.json file encoding all dependency information
-$(specs_file): $(chroot_worker) $(BUILD_SPECS_DIR) $(build_specs) $(build_spec_dirs) $(go-specreader)
+$(specs_file): $(chroot_worker) $(BUILD_SPECS_DIR) $(build_specs) $(build_spec_dirs) $(go-specreader) $(depend_RUN_CHECK)
 	$(go-specreader) \
 		--dir $(BUILD_SPECS_DIR) \
 		--build-dir $(parse_working_dir) \

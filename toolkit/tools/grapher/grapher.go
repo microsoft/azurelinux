@@ -163,8 +163,8 @@ func addNodesForPackage(g *pkggraph.PkgGraph, pkg *pkgjson.Package) (err error) 
 		return
 	}
 
-	if pkg.TestRequires == nil {
-		logger.Log.Debugf("No test dependencies for package %+v, skipping test node\n", pkg)
+	if !pkg.RunTests {
+		logger.Log.Debugf("Not running tests for %+v.\n", pkg)
 		newTestNode = nil
 		return
 	}
