@@ -12,10 +12,9 @@ BUILD_NUMBER       ?= $(call shell_real_build_only, if [ -n "$$UID" ] && [ "$$UI
 # an empty BUILD_NUMBER breaks the build later on
 ifeq ($(BUILD_NUMBER),)
    BUILD_NUMBER = non-git
-else
-   # Staticly define BUILD_NUMBER so it is set only once
-   BUILD_NUMBER := $(BUILD_NUMBER)
 endif
+# Staticly define BUILD_NUMBER so it is set only once
+BUILD_NUMBER := $(BUILD_NUMBER)
 RELEASE_MAJOR_ID   ?= 2.0
 # use minor ID defined in file (if exist) otherwise define it
 # note this file must be single line
