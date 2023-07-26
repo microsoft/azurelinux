@@ -26,6 +26,11 @@ Requires(pre):  %{_bindir}/systemd-sysusers
 %description
 The Prometheus monitoring system and time series database
 
+%package docs
+Summary: prometheus docs
+%description docs
+Documentation for prometheus.
+
 %prep
 %autosetup -p1
 
@@ -108,8 +113,6 @@ fi
 
 %files
 %license LICENSE NOTICE
-%doc docs CHANGELOG.md MAINTAINERS.md CODE_OF_CONDUCT.md CONTRIBUTING.md
-%doc README.md RELEASE.md documentation
 %dir %{_sysconfdir}/prometheus/
 %dir %{_sysconfdir}/prometheus/consoles
 %dir %{_sysconfdir}/prometheus/console_libraries
@@ -121,9 +124,13 @@ fi
 %{_sysusersdir}/prometheus.conf
 %attr(0755,prometheus,prometheus) %{_sharedstatedir}/prometheus
 
+%files docs
+%doc docs CHANGELOG.md MAINTAINERS.md CODE_OF_CONDUCT.md CONTRIBUTING.md
+%doc README.md RELEASE.md documentation
+
 %changelog
-* Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.37.0-7
-- Bump release to rebuild with go 1.19.11
+* Wed Jul 26 2023 Osama Esmail <osamaesmail@microsoft.com> - 2.37.0.7
+- Making docs a separate package
 
 * Thu Jun 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.37.0-6
 - Bump release to rebuild with go 1.19.10
