@@ -102,7 +102,7 @@ pushd pam_ssh_agent_auth-%{pam_ssh_agent_ver}
 %patch306 -p2 -b .psaa-compat
 %patch305 -p2 -b .psaa-agent
 %patch307 -p2 -b .psaa-deref
-%patch308 -p1 -b .cve-2023-38408
+%patch308 -p2 -b .cve-2023-38408
 # Remove duplicate headers and library files
 rm -f $(cat %{SOURCE4})
 autoreconf
