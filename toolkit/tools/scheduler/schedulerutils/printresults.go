@@ -32,7 +32,13 @@ func PrintBuildResult(res *BuildResult) {
 			logger.Log.Infof("Built: %s -> %v", baseSRPMName, res.BuiltFiles)
 		}
 	case pkggraph.TypeTest:
-		logger.Log.Infof("Tested: %s", baseSRPMName)
+		if res.Ignored {
+			logger.Log.Warnf("Ignored test for '%s' per user request.", baseSRPMName)
+		} else if res.UsedCache {
+			logger.Log.Infof("Skipped test: %s", baseSRPMName)
+		} else {
+			logger.Log.Infof("Tested: %s", baseSRPMName)
+		}
 	default:
 		logger.Log.Debugf("Processed node %s", res.Node.FriendlyName())
 	}

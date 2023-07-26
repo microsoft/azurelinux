@@ -53,7 +53,7 @@ func (c *ChrootAgent) BuildPackage(inputFile, logName, outArch string, runCheck 
 		logger.Log.Trace(lastStdoutLine)
 	}
 
-	args := serializeChrootBuildConfig(c.config, inputFile, logFile, outArch, runCheck, dependencies)
+	args := serializeChrootBuildAgentConfig(c.config, inputFile, logFile, outArch, runCheck, dependencies)
 	err = shell.ExecuteLiveWithCallback(onStdout, logger.Log.Trace, true, c.config.Program, args...)
 
 	if err == nil && lastStdoutLine != "" {
@@ -73,8 +73,8 @@ func (c *ChrootAgent) Close() (err error) {
 	return
 }
 
-// serializeChrootBuildConfig serializes a BuildAgentConfig into arguments usable by pkgworker for the sake of building the package.
-func serializeChrootBuildConfig(config *BuildAgentConfig, inputFile, logFile, outArch string, runCheck bool, dependencies []string) (serializedArgs []string) {
+// serializeChrootBuildAgentConfig serializes a BuildAgentConfig into arguments usable by pkgworker for the sake of building the package.
+func serializeChrootBuildAgentConfig(config *BuildAgentConfig, inputFile, logFile, outArch string, runCheck bool, dependencies []string) (serializedArgs []string) {
 	serializedArgs = []string{
 		fmt.Sprintf("--input=%s", inputFile),
 		fmt.Sprintf("--work-dir=%s", config.WorkDir),
@@ -102,12 +102,12 @@ func serializeChrootBuildConfig(config *BuildAgentConfig, inputFile, logFile, ou
 		serializedArgs = append(serializedArgs, "--no-cleanup")
 	}
 
-	if config.UseCcache {
-		serializedArgs = append(serializedArgs, "--use-ccache")
-	}
-
 	if runCheck {
 		serializedArgs = append(serializedArgs, "--run-check")
+	}
+
+	if config.UseCcache {
+		serializedArgs = append(serializedArgs, "--use-ccache")
 	}
 
 	for _, dependency := range dependencies {

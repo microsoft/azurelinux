@@ -104,16 +104,14 @@ func FindUnblockedNodesFromResult(res *BuildResult, pkgGraph *pkggraph.PkgGraph,
 	// Since all the ancillary nodes are marked as available already, there may be duplicate nodes returned by the below loop.
 	// e.g. If a meta node requires two build nodes for the same SPEC, then that meta node will be reported twice.
 	// Filter the nodes to ensure no duplicates.
-	unblockedNodesSet := make(map[*pkggraph.PkgNode]bool)
+	unblockedNodesMap := make(map[*pkggraph.PkgNode]bool)
 	for _, node := range res.AncillaryNodes {
 		for _, unblockedNode := range findUnblockedNodesFromNode(pkgGraph, buildState, node) {
-			unblockedNodesSet[unblockedNode] = true
+			unblockedNodesMap[unblockedNode] = true
 		}
 	}
 
-	unblockedNodes = sliceutils.SetToSlice(unblockedNodesSet)
-
-	return
+	return sliceutils.SetToSlice(unblockedNodesMap)
 }
 
 // findUnblockedNodesFromNode takes a built node and returns a list of nodes that are now unblocked by it.
