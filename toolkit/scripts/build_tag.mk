@@ -25,7 +25,7 @@ else
 endif
 RELEASE_VERSION    ?= $(RELEASE_MAJOR_ID)$(RELEASE_MINOR_ID)
 
-# Reset RELEASE_VERSION so it is set statically only once
+# Re-assign RELEASE_VERSION so it is set statically only once
 # This is to prevent the version from changing as time passes during the build
 RELEASE_VERSION := $(RELEASE_VERSION)
 
