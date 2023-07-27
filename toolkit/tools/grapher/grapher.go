@@ -163,13 +163,27 @@ func addNodesForPackage(g *pkggraph.PkgGraph, pkg *pkgjson.Package) (err error) 
 		return
 	}
 
-	if pkg.RunTests && (newTestNode == nil) {
+	if !pkg.RunTests {
+		logger.Log.Debugf("Skipping adding a test node for package %+v", pkg)
+		return
+	}
+
+	if newTestNode == nil {
 		// Add "Test" node
 		newTestNode, err = g.AddPkgNode(pkg.Provides, pkggraph.StateBuild, pkggraph.TypeTest, pkg.SrpmPath, pkggraph.NoRPMPath, pkg.SpecPath, pkg.SourceDir, pkg.Architecture, "<LOCAL>")
 		if err != nil {
 			return
 		}
 		logger.Log.Debugf("Adding test node %s with id %d\n", newTestNode.FriendlyName(), newTestNode.ID())
+	}
+
+	// A "test" node has a dependency on its corresponding "build" node. This dependency is required
+	// to guarantee we will first check if the build node needs to be built or not before we make
+	// any decisions about running the tests.
+	err = g.AddEdge(newTestNode, newBuildNode)
+	if err != nil {
+		logger.Log.Errorf("Adding test -> build edge failed for %+v", pkg.Provides)
+		return
 	}
 
 	return

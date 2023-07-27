@@ -46,27 +46,102 @@ func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMute
 		requests = append(requests, req)
 	}
 
-	requests = append(requests, groupedNodesToRequests(pkgGraph, buildState, packagesToRebuild, buildNodes, isCacheAllowed)...)
-	requests = append(requests, groupedNodesToRequests(pkgGraph, buildState, packagesToRebuild, testNodes, isCacheAllowed)...)
+	requests = append(requests, buildNodesToRequests(pkgGraph, buildState, packagesToRebuild, buildNodes, isCacheAllowed)...)
+	requests = append(requests, testNodesToRequests(pkgGraph, buildState, packagesToRebuild, testNodes, isCacheAllowed)...)
 
 	return
 }
 
-func groupedNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, packagesToRebuild []*pkgjson.PackageVer, groupedNodes map[string][]*pkggraph.PkgNode, isCacheAllowed bool) (requests []*BuildRequest) {
-	for _, nodes := range groupedNodes {
-		// Check if any of the nodes in groupedNodes is a delta node and mark it. We will use this to determine if the
+func findBuildNodePartnerTestNode(pkgGraph *pkggraph.PkgGraph, buildNode *pkggraph.PkgNode) (testNode *pkggraph.PkgNode) {
+	dependents := pkgGraph.To(buildNode.ID())
+	for dependents.Next() {
+		dependent := dependents.Node().(*pkggraph.PkgNode)
+
+		if dependent.Type == pkggraph.TypeTest {
+			testNode = dependent
+			break
+		}
+	}
+
+	return
+}
+
+func partnerTestNodesToRequest(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, packagesToRebuild []*pkgjson.PackageVer, buildNodes []*pkggraph.PkgNode, buildUsesCache bool) (request *BuildRequest) {
+	const isDelta = false
+
+	defaultBuildNode := buildNodes[0]
+	testNode := findBuildNodePartnerTestNode(pkgGraph, defaultBuildNode)
+	if testNode == nil {
+		return
+	}
+
+	ancillaryTestNodes := []*pkggraph.PkgNode{}
+	for _, buildNode := range buildNodes {
+		testNode = findBuildNodePartnerTestNode(pkgGraph, buildNode)
+
+		// Removing edges even if tests are blocked by other dependencies,
+		// so that they can get unblocked once these other dependencies are available.
+		pkgGraph.RemoveEdge(testNode.ID(), buildNode.ID())
+
+		ancillaryTestNodes = append(ancillaryTestNodes, testNode)
+	}
+
+	if !isNodeUnblocked(pkgGraph, buildState, testNode) {
+		return
+	}
+
+	return &BuildRequest{
+		Node:           testNode,
+		PkgGraph:       pkgGraph,
+		AncillaryNodes: ancillaryTestNodes,
+		IsDelta:        isDelta,
+		UseCache:       buildUsesCache && canUseCacheForNode(pkgGraph, testNode, packagesToRebuild, buildState),
+	}
+}
+
+func buildNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, packagesToRebuild []*pkgjson.PackageVer, buildNodesLists map[string][]*pkggraph.PkgNode, isCacheAllowed bool) (requests []*BuildRequest) {
+	for _, buildNodes := range buildNodesLists {
+		// Check if any of the build nodes is a delta node and mark it. We will use this to determine if the
 		// build is a delta build that might have pre-built .rpm files available.
 		hasADeltaNode := false
-		for _, node := range nodes {
+		for _, node := range buildNodes {
 			if node.State == pkggraph.StateDelta {
 				hasADeltaNode = true
 				break
 			}
 		}
 
-		defaultNode := nodes[0]
-		req := buildRequest(pkgGraph, buildState, packagesToRebuild, defaultNode, nodes, isCacheAllowed, hasADeltaNode)
+		defaultNode := buildNodes[0]
+		req := buildRequest(pkgGraph, buildState, packagesToRebuild, defaultNode, buildNodes, isCacheAllowed, hasADeltaNode)
 
+		if req.UseCache {
+			expectedFiles, missingFiles := pkggraph.FindRPMFiles(defaultNode.SrpmPath, pkgGraph, nil)
+			req.UseCache = len(missingFiles) == 0
+
+			if len(missingFiles) > 0 && len(missingFiles) < len(expectedFiles) {
+				logger.Log.Infof("SRPM '%s' will be rebuilt due to partially missing components: %v", defaultNode.SrpmPath, missingFiles)
+			}
+		}
+
+		requests = append(requests, req)
+
+		partnerTestNodeRequest := partnerTestNodesToRequest(pkgGraph, buildState, packagesToRebuild, buildNodes, req.UseCache)
+		if partnerTestNodeRequest != nil {
+			requests = append(requests, partnerTestNodeRequest)
+		}
+	}
+
+	return
+}
+
+func testNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, packagesToRebuild []*pkgjson.PackageVer, testNodesLists map[string][]*pkggraph.PkgNode, isCacheAllowed bool) (requests []*BuildRequest) {
+	const isDelta = false
+
+	TODO: Find out what was the rebuild status of the corresponding build nodes.
+
+	for _, testNodes := range testNodesLists {
+		defaultNode := testNodes[0]
+		req := buildRequest(pkgGraph, buildState, packagesToRebuild, defaultNode, testNodes, isCacheAllowed, isDelta)
 		requests = append(requests, req)
 	}
 
@@ -81,7 +156,7 @@ func buildRequest(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, pack
 		IsDelta:        isDelta,
 	}
 
-	request.CanUseCache = isCacheAllowed && canUseCacheForNode(pkgGraph, request.Node, packagesToRebuild, buildState)
+	request.UseCache = isCacheAllowed && canUseCacheForNode(pkgGraph, request.Node, packagesToRebuild, buildState)
 	return
 }
 

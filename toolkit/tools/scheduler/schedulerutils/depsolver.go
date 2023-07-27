@@ -106,27 +106,23 @@ func FindUnblockedNodesFromResult(res *BuildResult, pkgGraph *pkggraph.PkgGraph,
 	// Filter the nodes to ensure no duplicates.
 	unblockedNodesMap := make(map[*pkggraph.PkgNode]bool)
 	for _, node := range res.AncillaryNodes {
-		for _, unblockedNode := range findUnblockedNodesFromNode(pkgGraph, buildState, node) {
-			unblockedNodesMap[unblockedNode] = true
-		}
+		findUnblockedNodesFromNode(pkgGraph, buildState, node, unblockedNodesMap)
 	}
 
 	return sliceutils.SetToSlice(unblockedNodesMap)
 }
 
 // findUnblockedNodesFromNode takes a built node and returns a list of nodes that are now unblocked by it.
-func findUnblockedNodesFromNode(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, builtNode *pkggraph.PkgNode) (unblockedNodes []*pkggraph.PkgNode) {
+func findUnblockedNodesFromNode(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, builtNode *pkggraph.PkgNode, unblockedNodes map[*pkggraph.PkgNode]bool) {
 	dependents := pkgGraph.To(builtNode.ID())
 
 	for dependents.Next() {
 		dependent := dependents.Node().(*pkggraph.PkgNode)
 
 		if isNodeUnblocked(pkgGraph, buildState, dependent) {
-			unblockedNodes = append(unblockedNodes, dependent)
+			unblockedNodes[dependent] = true
 		}
 	}
-
-	return
 }
 
 // isNodeUnblocked returns true if all nodes required to build `node` are UpToDate and do not need to be built.

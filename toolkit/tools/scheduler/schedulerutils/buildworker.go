@@ -37,7 +37,7 @@ type BuildRequest struct {
 	Node           *pkggraph.PkgNode
 	PkgGraph       *pkggraph.PkgGraph
 	AncillaryNodes []*pkggraph.PkgNode
-	CanUseCache    bool
+	UseCache       bool
 	IsDelta        bool
 }
 
@@ -101,12 +101,13 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 		res := &BuildResult{
 			Node:           req.Node,
 			AncillaryNodes: req.AncillaryNodes,
+			UsedCache:      req.UseCache,
 			WasDelta:       req.IsDelta,
 		}
 
 		switch req.Node.Type {
 		case pkggraph.TypeLocalBuild:
-			res.UsedCache, res.Ignored, res.BuiltFiles, res.LogFile, res.Err = buildBuildNode(req.Node, req.PkgGraph, graphMutex, agent, req.CanUseCache, buildAttempts, ignoredPackages)
+			res.Ignored, res.BuiltFiles, res.LogFile, res.Err = buildBuildNode(req.Node, req.PkgGraph, graphMutex, agent, req.UseCache, buildAttempts, ignoredPackages)
 			if res.Err == nil {
 				setAncillaryBuildNodesStatus(req, graphMutex, pkggraph.StateUpToDate)
 			} else {
@@ -114,7 +115,7 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 			}
 
 		case pkggraph.TypeTest:
-			res.Ignored, res.LogFile, res.Err = buildTestNode(req.Node, req.PkgGraph, graphMutex, agent, req.CanUseCache, checkAttempts, ignoredPackages)
+			res.Ignored, res.LogFile, res.Err = buildTestNode(req.Node, req.PkgGraph, graphMutex, agent, req.UseCache, checkAttempts, ignoredPackages)
 			if res.Err == nil {
 				setAncillaryBuildNodesStatus(req, graphMutex, pkggraph.StateUpToDate)
 			} else {
@@ -122,7 +123,7 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 			}
 
 		case pkggraph.TypeLocalRun, pkggraph.TypeGoal, pkggraph.TypeRemoteRun, pkggraph.TypePureMeta, pkggraph.TypePreBuilt:
-			res.UsedCache = req.CanUseCache
+			res.UsedCache = req.UseCache
 
 		case pkggraph.TypeUnknown:
 			fallthrough
@@ -138,11 +139,8 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 }
 
 // buildBuildNode builds a TypeLocalBuild node, either used a cached copy if possible or building the corresponding SRPM.
-func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, canUseCache bool, buildAttempts int, ignoredPackages []*pkgjson.PackageVer) (usedCache, ignored bool, builtFiles []string, logFile string, err error) {
-	var missingFiles []string
-
+func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, useCache bool, buildAttempts int, ignoredPackages []*pkgjson.PackageVer) (ignored bool, builtFiles []string, logFile string, err error) {
 	baseSrpmName := node.SRPMFileName()
-	usedCache, builtFiles, missingFiles = pkggraph.IsSRPMPrebuilt(node.SrpmPath, pkgGraph, graphMutex)
 	ignored = sliceutils.Contains(ignoredPackages, node.VersionedPkg, sliceutils.PackageVerMatch)
 
 	if ignored {
@@ -150,17 +148,10 @@ func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMu
 		return
 	}
 
-	if canUseCache && usedCache {
+	if useCache {
 		logger.Log.Debugf("%s is prebuilt, skipping", baseSrpmName)
 		return
 	}
-
-	// Print a message if a package is partially built but needs to be regenerated because it's missing something.
-	if len(missingFiles) > 0 && len(builtFiles) != len(missingFiles) {
-		logger.Log.Infof("SRPM '%s' is being rebuilt due to partially missing components: %v", node.SrpmPath, missingFiles)
-	}
-
-	usedCache = false
 
 	dependencies := getBuildDependencies(node, pkgGraph, graphMutex)
 
@@ -170,7 +161,7 @@ func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMu
 }
 
 // buildTestNode tests a TypeTest node.
-func buildTestNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, canUseCache bool, checkAttempts int, ignoredPackages []*pkgjson.PackageVer) (ignored bool, logFile string, err error) {
+func buildTestNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, useCache bool, checkAttempts int, ignoredPackages []*pkgjson.PackageVer) (ignored bool, logFile string, err error) {
 	baseSrpmName := node.SRPMFileName()
 	ignored = sliceutils.Contains(ignoredPackages, node.VersionedPkg, sliceutils.PackageVerMatch)
 
@@ -179,8 +170,8 @@ func buildTestNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMut
 		return
 	}
 
-	if canUseCache {
-		logger.Log.Debugf("All dependencies for '%s' were prebuilt, skipping its test.", baseSrpmName)
+	if useCache {
+		logger.Log.Debugf("Using cache for '%s', skipping its test run as well.", baseSrpmName)
 		return
 	}
 
