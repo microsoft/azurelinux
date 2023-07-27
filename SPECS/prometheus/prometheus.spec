@@ -4,7 +4,7 @@
 Summary:        Prometheus monitoring system and time series database
 Name:           prometheus
 Version:        2.37.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -129,8 +129,11 @@ fi
 %doc README.md RELEASE.md documentation
 
 %changelog
-* Wed Jul 26 2023 Osama Esmail <osamaesmail@microsoft.com> - 2.37.0.7
+* Wed Jul 26 2023 Osama Esmail <osamaesmail@microsoft.com> - 2.37.0.8
 - Making docs a separate package
+
+* Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.37.0-7
+- Bump release to rebuild with go 1.19.11
 
 * Thu Jun 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.37.0-6
 - Bump release to rebuild with go 1.19.10
