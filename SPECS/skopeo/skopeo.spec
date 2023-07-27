@@ -1,7 +1,7 @@
 Summary:        Inspect container images and repositories on registries
 Name:           skopeo
 Version:        1.12.0
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -46,9 +46,6 @@ make test-unit-local
 %{_mandir}/man1/%%{name}*
 
 %changelog
-* Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.12.0-2
-- Bump release to rebuild with go 1.19.11
-
 * Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.12.0-1
 - Bump skopeo version to 1.12.0 - upgrade to latest
 

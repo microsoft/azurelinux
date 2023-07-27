@@ -1,7 +1,7 @@
 Summary:      Default file system
 Name:         filesystem
 Version:      1.1
-Release:      15%{?dist}
+Release:      14%{?dist}
 License:      GPLv3
 Group:        System Environment/Base
 Vendor:       Microsoft Corporation
@@ -284,9 +284,20 @@ for script in /etc/profile.d/*.sh ; do
 done
 
 unset script RED GREEN NORMAL
-umask 027
 # End /etc/profile
 EOF
+
+#
+#   profile.d drop-in file that sets up a restrictive umask for all users.
+#   Note that this comes very late in lexigraphical order, so it will override
+#   other umask settings.
+#
+cat > %{buildroot}/etc/profile.d/99-umask.sh <<- "EOF"
+# Begin /etc/profile.d/99-umask.sh
+umask 027
+# End /etc/profile.d/99-umask.sh
+EOF
+
 #
 #   The Proxy Bash Shell Startup File
 #
@@ -597,6 +608,7 @@ return 0
 %config(noreplace) /etc/sysconfig/proxy
 %dir /etc/profile.d
 %config(noreplace) /etc/profile.d/proxy.sh
+%config(noreplace) /etc/profile.d/99-umask.sh
 #	media filesystem
 %dir /run/media/cdrom
 %dir /run/media/floppy
@@ -709,9 +721,6 @@ return 0
 %config(noreplace) /etc/modprobe.d/tipc.conf
 
 %changelog
-* Thu Jun 29 2023 Tobias Brick <tobiasb@microsoft.com> - 1.1-15
-- Revert: Remove setting umask from /etc/profile and add it to a separate file in /etc/profile.d
-
 * Tue Jun 13 2023 Andy Zaugg <azaugg@linkedin.com> - 1.1-14
 - Adding /usr/local/sbin as per FHS
 

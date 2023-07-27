@@ -1,7 +1,7 @@
 Summary:        A collection of modular and reusable compiler and toolchain technologies.
 Name:           llvm
 Version:        12.0.1
-Release:        7%{?dist}
+Release:        6%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -44,7 +44,7 @@ cmake -G Ninja                              \
       -DLLVM_ENABLE_RTTI=ON                 \
       -DCMAKE_BUILD_TYPE=Release            \
       -DLLVM_PARALLEL_LINK_JOBS=1           \
-      -DLLVM_PARALLEL_COMPILE_JOBS=%{?_smp_ncpus_max:%_smp_build_ncpus} \
+      -DLLVM_PARALLEL_COMPILE_JOBS=2        \
       -DLLVM_BUILD_LLVM_DYLIB=ON            \
       -DLLVM_LINK_LLVM_DYLIB=ON             \
       -DLLVM_INCLUDE_TESTS=ON               \
@@ -89,9 +89,6 @@ ninja check-all
 %{_includedir}/*
 
 %changelog
-* Thu Jun 29 2023 Andrew Phelps <anphel@microsoft.com> - 12.0.1-7
-- Modify parallel compile jobs limit to _smp_ncpus_max if set, or _smp_build_ncpus
-
 * Thu Jun 01 2023 Andrew Phelps <anphel@microsoft.com> - 12.0.1-6
 - Limit to 2 parallel compile jobs to avoid running out of memory in build
 
