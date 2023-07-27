@@ -1594,9 +1594,10 @@ func findAllRPMSUpstream(rpmsToFind []*PkgNode, ignoreVersionToResolveSelfDep bo
 	foundAllRpms = true
 	for _, node := range rpmsToFind {
 		logger.Log.Debugf("Searching for a package which supplies: %s", node.VersionedPkg.Name)
+		searchPkg := *node.VersionedPkg
 		//initialize an array of strings to hold the resolved packages
 		var resolvedPackages []string
-		resolvedPackages, err = cloner.WhatProvides(node.VersionedPkg)
+		resolvedPackages, err = cloner.WhatProvides(&searchPkg)
 		if err != nil {
 			foundAllRpms = false
 			msg := fmt.Sprintf("Failed to resolve (%s) to a package. Error: %s", node.VersionedPkg, err)
@@ -1611,11 +1612,11 @@ func findAllRPMSUpstream(rpmsToFind []*PkgNode, ignoreVersionToResolveSelfDep bo
 			if ignoreVersionToResolveSelfDep {
 				logger.Log.Debugf("Clearing version and retrying find %s package in repos", node.VersionedPkg.Name)
 				/*clear Version information so that any available version and release can be used*/
-				clearVersion(node.VersionedPkg)
-				resolvedPackages, err = cloner.WhatProvides(node.VersionedPkg)
+				clearVersion(&searchPkg)
+				resolvedPackages, err = cloner.WhatProvides(&searchPkg)
 				if err != nil {
 					foundAllRpms = false
-					msg := fmt.Sprintf("Failed to resolve (%s) to a package. Error: %s", node.VersionedPkg, err)
+					msg := fmt.Sprintf("Failed to resolve (%s) to a package. Error: %s", searchPkg, err)
 					logger.Log.Debug(msg)
 					if node.Implicit {
 						logger.Log.Debug("Implicit node, might be available later, but still treated as not found")
