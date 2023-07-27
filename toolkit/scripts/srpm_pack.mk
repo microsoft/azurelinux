@@ -32,6 +32,9 @@ ifneq ($(SRPM_PACK_LIST),) # Pack list has user entries in it, only build select
 local_specs = $(wildcard $(addprefix $(SPECS_DIR)/*/,$(addsuffix .spec,$(SRPM_PACK_LIST))))
 $(srpm_pack_list_file): $(depend_SRPM_PACK_LIST)
 	@echo $(SRPM_PACK_LIST) | tr " " "\n" > $(srpm_pack_list_file)
+
+# In this case we need the toolchain packages to be always included in the keep list in addition to the user specified
+# packages.
 $(srpm_keep_list_file): $(srpm_pack_list_file) $(toolchain_spec_list)
 	@cat $(srpm_pack_list_file) $(toolchain_spec_list) > $@
 
