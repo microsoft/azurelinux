@@ -16,11 +16,10 @@
 #
 
 
-%global debug_package %{nil}
 Summary:        Container native virtualization
 Name:           kubevirt
 Version:        0.59.0
-Release:        3%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -32,8 +31,10 @@ Source1:        disks-images-provider.yaml
 # correctly.
 Patch0:         Cleanup-housekeeping-cgroup-on-vm-del.patch
 Patch1:         Allocate-2-cpu-for-the-emulator-thread.patch
+Patch2:         Hotplug_detach_grace_period.patch
+%global debug_package %{nil}
 BuildRequires:  glibc-devel
-BuildRequires:  glibc-static >= 2.35-3%{?dist}
+BuildRequires:  glibc-static >= 2.35-4%{?dist}
 BuildRequires:  golang
 BuildRequires:  golang-packaging
 BuildRequires:  pkgconfig
@@ -210,6 +211,15 @@ install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-v
 %{_bindir}/virt-tests
 
 %changelog
+* Wed Jul 14 2023 Andrew Phelps <anphel@microsoft.com> - 0.59.0-6
+- Bump release to rebuild against glibc 2.35-4
+
+* Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.59.0-5
+- Bump release to rebuild with go 1.19.11
+
+* Fri Jun 30 2023 Brian Fjeldstad <bfjelds@microsoft.com> - 0.59.0-4
+- Patch 0.59.0 with Operator Nexus patch for hotplug volume detachment IO errors
+
 * Thu Jun 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.59.0-3
 - Bump release to rebuild with go 1.19.10
 

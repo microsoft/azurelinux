@@ -1,8 +1,8 @@
 Summary:        Braille translation and back-translation library
 Name:           liblouis
-Version:        3.24.0
-Release:        2%{?dist}
-License:        LGPL-3.0-or-later
+Version:        3.26.0
+Release:        1%{?dist}
+License:        LGPL-2.1-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/liblouis/liblouis
@@ -39,7 +39,7 @@ Linux. It has, however, gone far beyond these routines.
 
 %package        devel
 Summary:        Development files for %{name}
-License:        LGPL-3.0-or-later
+License:        LGPL-2.1-or-later
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       pkgconfig
 
@@ -59,7 +59,7 @@ them is suitable for braille transcription.
 
 %package -n python3-louis
 Summary:        Python 3 language bindings for %{name}
-License:        LGPL-3.0-or-later
+License:        LGPL-2.1-or-later
 %{?python_provide:%python_provide python3-louis}
 Requires:       %{name} = %{version}-%{release}
 Obsoletes:      %{name}-python3 < 2.6.2-3
@@ -72,7 +72,7 @@ This package provides Python 3 language bindings for %{name}.
 %if %{with docs}
 %package doc
 Summary:        Documentation for %{name}
-License:        LGPL-3.0-or-later
+License:        LGPL-2.1-or-later
 Requires:       %{name} = %{version}-%{release}
 BuildArch:      noarch
 
@@ -151,6 +151,10 @@ done
 %endif
 
 %changelog
+* Tue Jul 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.26.0-1
+- Auto-upgrade to 3.26.0 - to fix CVE-2023-26767, CVE-2023-26768, CVE-2023-26769
+- oliviacrain: Fix LGPL version in license tags 
+
 * Fri Jan 13 2023 Suresh Thelkar <sthelkar@microsoft.com> - 3.24.0-2
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
 - License verified
