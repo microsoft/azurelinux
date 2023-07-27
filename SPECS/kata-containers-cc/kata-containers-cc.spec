@@ -44,13 +44,13 @@ Requires:  moby-containerd-cc
 Kata Confidential Containers.
 
 %package tools
-Summary:        Kata CC Tools package
-Requires:       %{name} = %{version}-%{release}
+Summary:        Kata CC Tools package for building UVM components
 Requires:       cargo
 Requires:       qemu-img
 Requires:       parted
 Requires:       curl
 Requires:       opa >= 0.50.2
+Requires:       kernel-uvm
 
 %description tools
 This package contains the UVM osbuilder files
@@ -133,6 +133,8 @@ mkdir -p %{buildroot}%{coco_bin}
 mkdir -p %{buildroot}%{share_kata}
 mkdir -p %{buildroot}%{coco_path}/libexec
 mkdir -p %{buildroot}/etc/systemd/system/containerd.service.d/
+
+# cloud-hypervisor is not intended for prod scenarios
 ln -s /usr/bin/cloud-hypervisor               %{buildroot}%{coco_bin}/cloud-hypervisor
 ln -s /usr/bin/cloud-hypervisor               %{buildroot}%{coco_bin}/cloud-hypervisor-snp
 ln -s /usr/share/cloud-hypervisor/vmlinux.bin %{buildroot}%{share_kata}/vmlinux.container
@@ -160,6 +162,7 @@ install -D -m 0755 kata-monitor %{buildroot}%{coco_bin}/kata-monitor
 install -D -m 0755 kata-runtime %{buildroot}%{coco_bin}/kata-runtime
 install -D -m 0755 data/kata-collect-data.sh %{buildroot}%{coco_bin}/kata-collect-data.sh
 
+# configuration-clh.toml is not intended for prod scenarios
 install -D -m 0644 config/configuration-clh.toml %{buildroot}/%{defaults_kata}/configuration-clh.toml
 install -D -m 0644 config/configuration-clh-snp.toml %{buildroot}/%{defaults_kata}/configuration-clh-snp.toml
 sed -i 's|/usr|/opt/confidential-containers|g' %{buildroot}/%{defaults_kata}/configuration-clh.toml
