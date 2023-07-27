@@ -30,7 +30,7 @@ func replaceRunNodesWithPrebuiltNodes(pkgGraph *pkggraph.PkgGraph) (err error) {
 			continue
 		}
 
-		isPrebuilt, _, missing, _, _ := pkggraph.IsSRPMPrebuilt(node.SrpmPath, pkgGraph, nil, false, false, nil)
+		isPrebuilt, _, missing := pkggraph.IsSRPMPrebuilt(node.SrpmPath, pkgGraph, nil)
 
 		if isPrebuilt == false {
 			logger.Log.Tracef("Can't mark %s as prebuilt, missing: %v", node.SrpmPath, missing)
