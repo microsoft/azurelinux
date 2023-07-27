@@ -70,7 +70,7 @@ func buildNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildSta
 		if req.UseCache {
 			expectedFiles, missingFiles := pkggraph.FindRPMFiles(defaultNode.SrpmPath, pkgGraph, nil)
 			if len(missingFiles) > 0 && len(missingFiles) < len(expectedFiles) {
-				logger.Log.Infof("SRPM '%s' will be rebuilt due to partially missing components: %v", defaultNode.SrpmPath, missingFiles)
+				logger.Log.Infof("SRPM '%s' will be rebuilt due to partially missing components: %v", defaultNode.SRPMFileName(), missingFiles)
 			}
 
 			req.ExpectedFiles = expectedFiles
