@@ -5,7 +5,7 @@ Summary:        Prometheus monitoring system and time series database
 Name:           prometheus
 Version:        2.37.0
 Release:        8%{?dist}
-License:        ASL 2.0
+License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/prometheus/prometheus
@@ -27,7 +27,9 @@ Requires(pre):  %{_bindir}/systemd-sysusers
 The Prometheus monitoring system and time series database
 
 %package docs
-Summary: prometheus docs
+Summary:        prometheus docs
+Requires:       %{name}
+
 %description docs
 Documentation for prometheus.
 
@@ -129,7 +131,7 @@ fi
 %doc README.md RELEASE.md documentation
 
 %changelog
-* Wed Jul 26 2023 Osama Esmail <osamaesmail@microsoft.com> - 2.37.0.8
+* Wed Jul 26 2023 Osama Esmail <osamaesmail@microsoft.com> - 2.37.0-8
 - Making docs a separate package
 
 * Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.37.0-7

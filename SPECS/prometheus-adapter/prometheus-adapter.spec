@@ -13,7 +13,9 @@ BuildRequires:  golang
 Implementation of Prometheus via Kubernetes Custom, Resource, and External Metric API.
 
 %package docs
-Summary: prometheus-adapter docs
+Summary:        prometheus-adapter docs
+Requires:       %{name}
+
 %description docs
 Documentation for prometheus-adapter
 
