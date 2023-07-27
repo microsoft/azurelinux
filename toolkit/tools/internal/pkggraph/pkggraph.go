@@ -102,7 +102,6 @@ type PkgNode struct {
 	SourceRepo   string              // The location this package was acquired from
 	GoalName     string              // Optional string for goal nodes
 	Implicit     bool                // If the package is an implicit provide
-	KeepChroot   bool                // If the chroot should be kept after building the package
 	This         *PkgNode            // Self reference since the graph library returns nodes by value, not reference
 }
 
