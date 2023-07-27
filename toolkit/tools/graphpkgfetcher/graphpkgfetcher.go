@@ -462,42 +462,23 @@ func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNo
 		return fmt.Errorf("failed to find any packages providing '%v'", node.VersionedPkg)
 	}
 
-	/*if acceptFetchedPackages is true, graphpkgfetcher will not leave the node as unresolved even if some of the providing versions are not fetched*/
-	/* Otherwise error is thrown even in one of the providing packages fails to download. */
-	/* Not being able to download the resolved(providing) Packages happens mostly due to the following error*/
-	/* Nothing provides /usr/local/bin/zsh needed by zsh-5.9-1.cm2.x86_64\nFound 1 problem(s) while resolving\nError(1301) : Solv general runtime error\n"*/
-	acceptFetchedPackages := true
 	preBuilt := false
-	noPackageFetched := true //Assuming that no package has been fetched yet, will be set to false if atleast one of the resolved packages is fetched
 	for _, resolvedPackage := range resolvedPackages {
 		if !fetchedPackages[resolvedPackage] {
 			desiredPackage := &pkgjson.PackageVer{
 				Name: resolvedPackage,
 			}
 
-			//initialize cloneErr of type error to nil
-			var cloneErr error = nil
-			preBuilt, cloneErr = cloner.Clone(cloneDeps, desiredPackage)
-			if cloneErr != nil {
-				cloneErr = fmt.Errorf("failed to clone '%s' from RPM repo:\n%w", resolvedPackage, err)
-				if acceptFetchedPackages {
-					logger.Log.Warnf(cloneErr.Error())
-				} else {
-					err = cloneErr
-					return
-				}
+			preBuilt, err = cloner.Clone(cloneDeps, desiredPackage)
+			if err != nil {
+				err = fmt.Errorf("failed to clone '%s' from RPM repo:\n%w", resolvedPackage, err)
+				return
 			}
-			noPackageFetched = false
 			fetchedPackages[resolvedPackage] = true
 			prebuiltPackages[resolvedPackage] = preBuilt
 
 			logger.Log.Debugf("Fetched '%s' as potential candidate (is pre-built: %v).", resolvedPackage, prebuiltPackages[resolvedPackage])
 		}
-	}
-
-	if noPackageFetched {
-		err = fmt.Errorf("failed to find any packages providing '%v'", node.VersionedPkg)
-		return
 	}
 
 	err = assignRPMPath(node, outDir, resolvedPackages)
