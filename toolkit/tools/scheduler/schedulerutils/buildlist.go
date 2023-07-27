@@ -92,7 +92,7 @@ func CalculatePackagesToBuild(packagesNamesToBuild, packagesNamesToRebuild []*pk
 	}
 
 	packageVersToBuild = append(packageVersToBuild, packageVersFromConfig...)
-	packageVersToBuild = sliceutils.RemoveDuplicatesFromSlice[*pkgjson.PackageVer](packageVersToBuild)
+	packageVersToBuild = sliceutils.RemoveDuplicatesFromSlice(packageVersToBuild)
 
 	return
 }

@@ -90,7 +90,7 @@ func main() {
 	nodeListGoal := searchForGoal(graph, goalSearchList)
 
 	nodeLists := append(nodeListPkg, append(nodeListSpec, nodeListGoal...)...)
-	nodeSet := removeDuplicates(nodeLists)
+	nodeSet := sliceutils.RemoveDuplicatesFromSlice(nodeLists)
 
 	if len(nodeSet) == 0 {
 		logger.Log.Panicf("Could not find any nodes matching pkgs:[%s] or specs:[%s] or goals[%s]", *pkgsToSearch, *specsToSearch, *goalsToSearch)
@@ -169,15 +169,6 @@ func searchForSpec(graph *pkggraph.PkgGraph, specs []string) (list []*pkggraph.P
 				list = append(list, n)
 			}
 		}
-	}
-	return
-}
-
-func removeDuplicates(nodeList []*pkggraph.PkgNode) (uniqueNodeList []*pkggraph.PkgNode) {
-	nodeMap := sliceutils.SliceToSet[*pkggraph.PkgNode](nodeList)
-	uniqueNodeList = make([]*pkggraph.PkgNode, 0, len(nodeMap))
-	for key, _ := range nodeMap {
-		uniqueNodeList = append(uniqueNodeList, key)
 	}
 	return
 }
