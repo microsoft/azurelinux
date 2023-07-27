@@ -196,17 +196,16 @@ func main() {
 	packList, err := parsePackListFile(*packListFile)
 	logger.PanicOnError(err)
 
-	// A keep list may be provided. It will be combined with the pack list to decide
-	// which SRPMS to keep. If it is empty all packages will be kept (but only the
-	// most recent version of each).
+	// A keep list may be provided. Any SPECs in this list will be kept, even if they are not in the pack list.
+	// If a package is in both it will be treated only as a pack list entry.
 	keepList := map[string]bool{}
 	if *keepListFile != "" {
 		keepList, err = parsePackListFile(*keepListFile)
-		for spec := range packList {
-			keepList[spec] = true
-		}
 		logger.PanicOnError(err)
 	}
+
+	logger.Log.Debugf("Pack list: %v", packList)
+	logger.Log.Debugf("Keep list: %v", keepList)
 
 	packagedSRPMs, tidiedSRPMs, err := createAllSRPMsWrapper(*specsDir, *distTag, *buildDir, *outDir, *workerTar, *workers, *nestedSourcesDir, *repackAll, *runCheck, packList, keepList, *doTidy, templateSrcConfig)
 	logger.PanicOnError(err)
@@ -305,38 +304,25 @@ func createAllSRPMsWrapper(specsDir, distTag, buildDir, outDir, workerTar string
 
 // createAllSRPMs will find all SPEC files in specsDir and pack SRPMs for them if needed.
 func createAllSRPMs(specsDir, distTag, buildDir, outDir string, workers int, nestedSourcesDir, repackAll, runCheck bool, packList, keepList map[string]bool, doTidy bool, templateSrcConfig sourceRetrievalConfiguration, packagedSRPMs, tidiedSRPMs *[]string) (err error) {
-	const (
-		doDryRun = true
-	)
 	logger.Log.Infof("Finding all SPEC files")
 	timestamp.StartEvent("packing SRPMS", nil)
 	defer timestamp.StopEvent(nil)
 
 	timestamp.StartEvent("determining specs to pack", nil)
-	var specFilesToKeep []string
-	var specStates []*spectosrpm.SpecState
+	specFilesToPackage, specFilesToKeep, err := spectosrpm.FindSPECFiles(specsDir, packList, keepList)
+	if err != nil {
+		return
+	}
+
+	specStates, err := spectosrpm.CalculateSPECsToRepack(specFilesToPackage, specFilesToKeep, distTag, outDir, false, false, runCheck, workers)
+	if err != nil {
+		return fmt.Errorf("error calculating SRPM states: %w", err)
+	}
+	timestamp.StopEvent(nil) // determining specs to pack
+
 	if doTidy {
 		timestamp.StartEvent("calculating specs that need tidying", nil)
-		// First pass to remove any SPECs that should not be packed and are stale.
-		specFilesToKeep, err = spectosrpm.FindSPECFiles(specsDir, keepList)
-		if err != nil {
-			return
-		}
-
-		// Do a dry run to find which SRPMs we are going to process with but don't actually do any work.
-		specStates, err = spectosrpm.CalculateSPECsToRepack(specFilesToKeep, distTag, outDir, false, false, doDryRun, runCheck, workers)
-		if err != nil {
-			return fmt.Errorf("error calculating SRPM states: %w", err)
-		}
-
-		var srpmsToKeepMap map[string]bool
-		// Convert the results to a map of SRPMs to keep
-		srpmsToKeepMap, err = convertSpecStatesToMap(specStates)
-		if err != nil {
-			return fmt.Errorf("error calculating SRPM states: %w", err)
-		}
-
-		*tidiedSRPMs, err = deleteStaleSRPMs(srpmsToKeepMap, distTag, outDir, workers)
+		*tidiedSRPMs, err = deleteStaleSRPMs(specStates, distTag, outDir, workers)
 		if err != nil {
 			err = fmt.Errorf("error deleting stale SRPMs: %w", err)
 			return
@@ -345,18 +331,6 @@ func createAllSRPMs(specsDir, distTag, buildDir, outDir string, workers int, nes
 	} else {
 		*tidiedSRPMs = []string{}
 	}
-
-	// Second pass to actually check the any SPECs that need to be packed for stale sources.
-	specFilesToPackage, err := spectosrpm.FindSPECFiles(specsDir, packList)
-	if err != nil {
-		return
-	}
-
-	specStates, err = spectosrpm.CalculateSPECsToRepack(specFilesToPackage, distTag, outDir, false, false, false, runCheck, workers)
-	if err != nil {
-		return fmt.Errorf("error calculating SRPM states: %w", err)
-	}
-	timestamp.StopEvent(nil) // determining specs to pack
 
 	*packagedSRPMs, err = packSRPMs(specStates, distTag, buildDir, templateSrcConfig, workers)
 	return
@@ -432,7 +406,15 @@ func createChroot(workerTar, buildDir, outDir, specsDir string) (chroot *safechr
 	return
 }
 
-func deleteStaleSRPMs(srpmsToKeep map[string]bool, distTag, outDir string, workers int) (tidiedSRPMs []string, err error) {
+func deleteStaleSRPMs(specStates []*spectosrpm.SpecState, distTag, outDir string, workers int) (tidiedSRPMs []string, err error) {
+	// Build a map of all SRPMs that we would like to see present.
+	srpmsToKeep := make(map[string]bool)
+	for _, state := range specStates {
+		if state.CurrentState != spectosrpm.SRPMStateInvalid {
+			srpmsToKeep[state.SrpmFile] = true
+		}
+	}
+
 	// Scan every file in outDir and delete any that are not in srpmsToKeep.
 	err = filepath.Walk(outDir, func(path string, info os.FileInfo, err error) error {
 		// Skip the root directory, and any file that isn't .src.rpm.
@@ -517,14 +499,14 @@ func packSRPMWorker(allSpecStates <-chan *spectosrpm.SpecState, results chan<- *
 		default:
 		}
 
-		ts, _ := timestamp.StartEvent(filepath.Base(specState.specFile), tsRoot)
+		ts, _ := timestamp.StartEvent(filepath.Base(specState.SpecFile), tsRoot)
 
 		result := &packResult{
 			specFile: specState.SpecFile,
 		}
 
 		// Its a no-op if the SPEC does not need to be packed
-		if !specState.ToPack {
+		if !specState.CurrentState.ShouldRepack() {
 			results <- result
 			timestamp.StopEvent(ts)
 			continue
@@ -559,16 +541,6 @@ func packSRPMWorker(allSpecStates <-chan *spectosrpm.SpecState, results chan<- *
 		results <- result
 		timestamp.StopEvent(ts)
 	}
-}
-
-func convertSpecStatesToMap(specStates []*spectosrpm.SpecState) (srpmsToKeep map[string]bool, err error) {
-	srpmsToKeep = make(map[string]bool)
-	for _, state := range specStates {
-		if state.ToPack {
-			srpmsToKeep[state.SrpmFile] = true
-		}
-	}
-	return
 }
 
 func specPathToSignaturesPath(specFilePath string) string {
@@ -796,6 +768,11 @@ func hydrateFiles(fileTypeToHydrate fileType, specFile, workingDir string, srcCo
 // Will alter currentSignatures.
 func hydrateFromLocalSource(fileHydrationState map[string]bool, newSourceDir string, srcConfig sourceRetrievalConfiguration, skipSignatureHandling bool, currentSignatures map[string]string) (err error) {
 	err = filepath.Walk(srcConfig.localSourceDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			logger.Log.Warnf("Error walking local source directory (%s): %v, skipping", srcConfig.localSourceDir, err)
+			return nil
+		}
+
 		isFile, _ := file.IsFile(path)
 		if !isFile {
 			return nil

@@ -92,7 +92,7 @@ func CalculatePackagesToBuild(packagesNamesToBuild, packagesNamesToRebuild []*pk
 	}
 
 	packageVersToBuild = append(packageVersToBuild, packageVersFromConfig...)
-	packageVersToBuild = removePackageVersDuplicates(packageVersToBuild)
+	packageVersToBuild = sliceutils.RemoveDuplicatesFromSlice[*pkgjson.PackageVer](packageVersToBuild)
 
 	return
 }
@@ -269,14 +269,4 @@ func filterLocalPackagesOnly(packageVersionsInConfig []*pkgjson.PackageVer, depe
 	}
 
 	return
-}
-
-func removePackageVersDuplicates(packageVers []*pkgjson.PackageVer) []*pkgjson.PackageVer {
-	uniquePackageVersToBuild := make(map[*pkgjson.PackageVer]bool)
-
-	for _, packageVer := range packageVers {
-		uniquePackageVersToBuild[packageVer] = true
-	}
-
-	return sliceutils.PackageVersSetToSlice(uniquePackageVersToBuild)
 }

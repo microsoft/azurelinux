@@ -14,14 +14,29 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/directory"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/rpm"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
 )
+
+type srpmState int
+
+const (
+	SRPMStateMissing   srpmState = iota // SRPM does not exist
+	SRPMStateOutOfDate                  // SRPM exists but is older than a file used by the SPEC
+	SRPMStateUpToDate                   // SRPM exists and is up to date
+	SRPMStateInvalid                    // Unable to parse the SRPM, or not applicable to this arch
+	SRPMStateKeep                       // SRPM is not meant to be packed but should be retained
+)
+
+func (s srpmState) ShouldRepack() bool {
+	return s == SRPMStateMissing || s == SRPMStateOutOfDate
+}
 
 // specState holds the state of a SPEC file: if it should be packed and the resulting SRPM if it is.
 type SpecState struct {
-	SpecFile string
-	SrpmFile string
-	ToPack   bool
-	Err      error
+	SpecFile     string
+	SrpmFile     string
+	CurrentState srpmState
+	Err          error
 }
 
 func buildSearchMap(specsDir string) (specsMap map[string][]string, err error) {
@@ -47,17 +62,25 @@ func buildSearchMap(specsDir string) (specsMap map[string][]string, err error) {
 
 // findSPECFiles finds all SPEC files that should be considered for packing.
 // Takes into consideration a packList if provided.
-func FindSPECFiles(specsDir string, packList map[string]bool) (specFiles []string, err error) {
+// The output sets will be disjoint (i.e. a SPEC file will not be in both sets)
+func FindSPECFiles(specsDir string, packList, keepList map[string]bool) (specFilesToPackMap, specFilesToKeepMap map[string]bool, err error) {
 	logger.Log.Debugf("Searching for SPEC files in %s", specsDir)
+	specFilesToKeepMap = make(map[string]bool)
+	specFilesToPackMap = make(map[string]bool)
+	// If we are packing everything (aka no packList) then we don't care about the keepList, we are going to keep everything
+	// anyways.
 	if len(packList) == 0 {
+		var allSpecFiles []string
 		specSearch := filepath.Join(specsDir, "**/*.spec")
-		specFiles, err = filepath.Glob(specSearch)
+		allSpecFiles, err = filepath.Glob(specSearch)
+		// The sets are disjoint, so we don't need to check if we are keeping a SPEC file that we are also packing.
+		specFilesToPackMap = sliceutils.SliceToSet[string](allSpecFiles)
 	} else {
 		var specMap map[string][]string
 		specMap, err = buildSearchMap(specsDir)
 		if err != nil {
 			err = fmt.Errorf("error building SPEC search map: %w", err)
-			return nil, err
+			return nil, nil, err
 		}
 		for specName := range packList {
 			specFile := specMap[specName]
@@ -70,9 +93,30 @@ func FindSPECFiles(specsDir string, packList map[string]bool) (specFiles []strin
 					return
 				}
 			}
-			specFiles = append(specFiles, specFile[0])
+			specFilesToPackMap[specFile[0]] = true
+		}
+		// We many also want to keep some SPEC files that we are not packing
+		// (e.g. toolchain SPECs will be packed via another mechanism and must always be kept).
+		for specName := range keepList {
+			specFile := specMap[specName]
+			if len(specFile) != 1 {
+				if strings.HasPrefix(specName, "msopenjdk-11") {
+					logger.Log.Debugf("Ignoring missing match for '%s', which is externally-provided and thus doesn't have a local spec.", specName)
+					continue
+				} else {
+					err = fmt.Errorf("unexpected number of matches (%d) for spec file (%s)", len(specFile), specName)
+					return
+				}
+			}
+			if !specFilesToPackMap[specFile[0]] {
+				// Only add the SPEC file to the keep list if it is not already in the pack list.
+				specFilesToKeepMap[specFile[0]] = true
+			}
 		}
 	}
+
+	logger.Log.Debugf("Pack list: %v", sliceutils.SetToSlice(specFilesToPackMap))
+	logger.Log.Debugf("Keep list: %v", sliceutils.SetToSlice(specFilesToKeepMap))
 
 	return
 }
@@ -80,18 +124,17 @@ func FindSPECFiles(specsDir string, packList map[string]bool) (specFiles []strin
 // calculateSPECsToRepack will check which SPECs should be packed.
 // If the resulting SRPM does not exist, or is older than a modification to
 // one of the files used by the SPEC then it is repacked.
-func CalculateSPECsToRepack(specFiles []string, distTag, outDir string, nestedSourcesDir, repackAll, dryRun, runCheck bool, workers int) (states []*SpecState, err error) {
+func CalculateSPECsToRepack(specFilesToPackage, specFilesToKeep map[string]bool, distTag, outDir string, nestedSourcesDir, repackAll, runCheck bool, workers int) (states []*SpecState, err error) {
 	var wg sync.WaitGroup
+
+	specFiles := sliceutils.SetToSlice(specFilesToPackage)
+	specFiles = append(specFiles, sliceutils.SetToSlice(specFilesToKeep)...)
 
 	requests := make(chan string, len(specFiles))
 	results := make(chan *SpecState, len(specFiles))
 	cancel := make(chan struct{})
 
-	if !dryRun {
-		logger.Log.Infof("Calculating SPECs to repack")
-	} else {
-		logger.Log.Debugf("Calculating SPECs to repack (dryrun)")
-	}
+	logger.Log.Infof("Calculating SPECs to repack")
 
 	arch, err := rpm.GetRpmArch(runtime.GOARCH)
 	if err != nil {
@@ -101,7 +144,7 @@ func CalculateSPECsToRepack(specFiles []string, distTag, outDir string, nestedSo
 	// Start the workers now so they begin working as soon as a new job is buffered.
 	for i := 0; i < workers; i++ {
 		wg.Add(1)
-		go specsToPackWorker(requests, results, cancel, &wg, distTag, outDir, arch, nestedSourcesDir, repackAll, dryRun, runCheck)
+		go specsToPackWorker(requests, specFilesToKeep, results, cancel, &wg, distTag, outDir, arch, nestedSourcesDir, repackAll, runCheck)
 	}
 
 	for _, specFile := range specFiles {
@@ -139,7 +182,7 @@ func CalculateSPECsToRepack(specFiles []string, distTag, outDir string, nestedSo
 			break
 		}
 
-		if result.ToPack {
+		if result.CurrentState.ShouldRepack() {
 			totalToRepack++
 		}
 
@@ -157,16 +200,12 @@ func CalculateSPECsToRepack(specFiles []string, distTag, outDir string, nestedSo
 		return
 	}
 
-	if !dryRun {
-		logger.Log.Infof("Packing %d/%d SPECs", totalToRepack, len(specFiles))
-	} else {
-		logger.Log.Debugf("Would pack %d/%d SPECs (dryrun)", totalToRepack, len(specFiles))
-	}
+	logger.Log.Infof("Packing %d/%d SPECs", totalToRepack, len(specFilesToPackage))
 	return
 }
 
 // specsToPackWorker will process a channel of spec files that should be checked if packing is needed.
-func specsToPackWorker(requests <-chan string, results chan<- *SpecState, cancel <-chan struct{}, wg *sync.WaitGroup, distTag, outDir string, arch string, nestedSourcesDir, repackAll, dryRun, runCheck bool) {
+func specsToPackWorker(requests <-chan string, keepMap map[string]bool, results chan<- *SpecState, cancel <-chan struct{}, wg *sync.WaitGroup, distTag, outDir string, arch string, nestedSourcesDir, repackAll, runCheck bool) {
 	const (
 		queryFormat         = `%{NAME}-%{VERSION}-%{RELEASE}.src.rpm`
 		nestedSourceDirName = "SOURCES"
@@ -188,7 +227,8 @@ func specsToPackWorker(requests <-chan string, results chan<- *SpecState, cancel
 		}
 
 		result := &SpecState{
-			SpecFile: specFile,
+			SpecFile:     specFile,
+			CurrentState: SRPMStateInvalid,
 		}
 
 		containingDir := filepath.Dir(specFile)
@@ -226,8 +266,8 @@ func specsToPackWorker(requests <-chan string, results chan<- *SpecState, cancel
 		fullSRPMPath := filepath.Join(outDir, producedSRPM)
 		result.SrpmFile = fullSRPMPath
 
-		if repackAll {
-			result.ToPack = true
+		if repackAll && !keepMap[specFile] {
+			result.CurrentState = SRPMStateOutOfDate
 			results <- result
 			continue
 		}
@@ -242,13 +282,14 @@ func specsToPackWorker(requests <-chan string, results chan<- *SpecState, cancel
 
 		if !isCompatible {
 			logger.Log.Infof(`Skipping (%s) since it cannot be built on current architecture.`, specFile)
+			result.CurrentState = SRPMStateInvalid
 			results <- result
 			continue
 		}
 
-		// If we are forcing a full repack, or just doing a dry run (ie don't actually pack anything, just give us the files that might be packed)
-		if dryRun {
-			result.ToPack = true
+		// If we have just marked this SPEC as a keep, then we can skip the rest of the checks.
+		if keepMap[specFile] {
+			result.CurrentState = SRPMStateKeep
 			results <- result
 			continue
 		}
@@ -257,7 +298,7 @@ func specsToPackWorker(requests <-chan string, results chan<- *SpecState, cancel
 		srpmInfo, err := os.Stat(fullSRPMPath)
 		if err != nil {
 			logger.Log.Debugf("Updating (%s) since (%s) is not yet built", specFile, fullSRPMPath)
-			result.ToPack = true
+			result.CurrentState = SRPMStateMissing
 			results <- result
 			continue
 		}
@@ -272,9 +313,10 @@ func specsToPackWorker(requests <-chan string, results chan<- *SpecState, cancel
 
 		if specModTime.After(srpmInfo.ModTime()) {
 			logger.Log.Debugf("Updating (%s) since (%s) has changed", specFile, latestFile)
-			result.ToPack = true
+			result.CurrentState = SRPMStateOutOfDate
 		}
 
+		result.CurrentState = SRPMStateUpToDate
 		results <- result
 	}
 }
