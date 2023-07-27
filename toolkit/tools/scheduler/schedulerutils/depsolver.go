@@ -9,7 +9,9 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
+	"github.com/sirupsen/logrus"
 	"gonum.org/v1/gonum/graph"
+	"gonum.org/v1/gonum/graph/path"
 	"gonum.org/v1/gonum/graph/traverse"
 )
 
@@ -41,6 +43,20 @@ func CanSubGraph(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, useCachedI
 
 		// This node is not yet solvable
 		logger.Log.Warnf("Could not subgraph due to node: %v", pkgNode)
+
+		// If we are in trace mode, print the path from the root node to the unsolvable node
+		if logger.Log.IsLevelEnabled(logrus.TraceLevel) {
+			paths := path.YenKShortestPaths(pkgGraph, 1, node, pkgNode)
+			if len(paths) == 0 {
+				logger.Log.Warnf("Could not find path between %v and %v with YenKShortestPaths()", node, pkgNode)
+			} else {
+				logger.Log.Tracef("Path between %v and %v:", node, pkgNode)
+				for _, n := range paths[0] {
+					logger.Log.Tracef("  %v", n.(*pkggraph.PkgNode))
+				}
+			}
+		}
+
 		foundUnsolvableNode = true
 		return
 	})
