@@ -8,7 +8,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -107,10 +106,10 @@ type packResult struct {
 
 // specState holds the state of a SPEC file: if it should be packed and the resulting SRPM if it is.
 type specState struct {
-	SpecFile     string
-	SrpmFile     string
-	CurrentState srpmState
-	Err          error
+	specFile     string
+	srpmFile     string
+	currentState srpmState
+	err          error
 }
 
 var (
@@ -194,7 +193,7 @@ func main() {
 	templateSrcConfig.caCerts, err = x509.SystemCertPool()
 	logger.PanicOnError(err, "Received error calling x509.SystemCertPool(). Error: %v", err)
 	if *caCertFile != "" {
-		newCACert, err := ioutil.ReadFile(*caCertFile)
+		newCACert, err := os.ReadFile(*caCertFile)
 		if err != nil {
 			logger.Log.Panicf("Invalid CA certificate (%s), error: %s", *caCertFile, err)
 		}
@@ -564,14 +563,14 @@ func calculateSPECsToRepack(specFilesToPackage, specFilesToKeep map[string]bool,
 		result := <-results
 		states[i] = result
 
-		if result.Err != nil {
-			logger.Log.Errorf("Failed to check (%s). Error: %s", result.SpecFile, result.Err)
-			err = result.Err
+		if result.err != nil {
+			logger.Log.Errorf("Failed to check (%s). Error: %s", result.specFile, result.err)
+			err = result.err
 			close(cancel)
 			break
 		}
 
-		if result.CurrentState.shouldRepack() {
+		if result.currentState.shouldRepack() {
 			totalToRepack++
 		}
 
@@ -616,8 +615,8 @@ func specsToPackWorker(requests <-chan string, keepMap map[string]bool, results 
 		}
 
 		result := &specState{
-			SpecFile:     specFile,
-			CurrentState: srpmStateInvalid,
+			specFile:     specFile,
+			currentState: srpmStateInvalid,
 		}
 
 		containingDir := filepath.Dir(specFile)
@@ -637,7 +636,7 @@ func specsToPackWorker(requests <-chan string, keepMap map[string]bool, results 
 			if err.Error() == rpm.NoCompatibleArchError {
 				logger.Log.Infof("Skipping SPEC (%s) due to incompatible build architecture", specFile)
 			} else {
-				result.Err = err
+				result.err = err
 			}
 
 			results <- result
@@ -645,7 +644,7 @@ func specsToPackWorker(requests <-chan string, keepMap map[string]bool, results 
 		}
 
 		if len(specQueryResults) != expectedQueryResultsLen {
-			result.Err = fmt.Errorf("unexpected query results, wanted (%d) results but got (%d), results: %v", expectedQueryResultsLen, len(specQueryResults), specQueryResults)
+			result.err = fmt.Errorf("unexpected query results, wanted (%d) results but got (%d), results: %v", expectedQueryResultsLen, len(specQueryResults), specQueryResults)
 			results <- result
 			continue
 		}
@@ -653,10 +652,10 @@ func specsToPackWorker(requests <-chan string, keepMap map[string]bool, results 
 		// Resolve the full path of the SRPM that would be packed from this SPEC file.
 		producedSRPM := specQueryResults[srpmQueryResultsIndex]
 		fullSRPMPath := filepath.Join(outDir, producedSRPM)
-		result.SrpmFile = fullSRPMPath
+		result.srpmFile = fullSRPMPath
 
 		if repackAll && !keepMap[specFile] {
-			result.CurrentState = srpmStateOutOfDate
+			result.currentState = srpmStateOutOfDate
 			results <- result
 			continue
 		}
@@ -664,21 +663,21 @@ func specsToPackWorker(requests <-chan string, keepMap map[string]bool, results 
 		// Sanity check that SRPMS is meant to be built for the machine architecture
 		isCompatible, err := rpm.SpecArchIsCompatible(specFile, sourceDir, arch, defines)
 		if err != nil {
-			result.Err = err
+			result.err = err
 			results <- result
 			continue
 		}
 
 		if !isCompatible {
 			logger.Log.Infof(`Skipping (%s) since it cannot be built on current architecture.`, specFile)
-			result.CurrentState = srpmStateInvalid
+			result.currentState = srpmStateInvalid
 			results <- result
 			continue
 		}
 
 		// If we have just marked this SPEC as a keep, then we can skip the rest of the checks.
 		if keepMap[specFile] {
-			result.CurrentState = srpmStateKeep
+			result.currentState = srpmStateKeep
 			results <- result
 			continue
 		}
@@ -687,7 +686,7 @@ func specsToPackWorker(requests <-chan string, keepMap map[string]bool, results 
 		srpmInfo, err := os.Stat(fullSRPMPath)
 		if err != nil {
 			logger.Log.Debugf("Updating (%s) since (%s) is not yet built", specFile, fullSRPMPath)
-			result.CurrentState = srpmStateMissing
+			result.currentState = srpmStateMissing
 			results <- result
 			continue
 		}
@@ -695,17 +694,17 @@ func specsToPackWorker(requests <-chan string, keepMap map[string]bool, results 
 		// Check if a file used by the SPEC has been modified since the resulting SRPM was previously packed.
 		specModTime, latestFile, err := directory.LastModifiedFile(containingDir)
 		if err != nil {
-			result.Err = fmt.Errorf("failed to query modification time for SPEC (%s). Error: %s", specFile, err)
+			result.err = fmt.Errorf("failed to query modification time for SPEC (%s). Error: %s", specFile, err)
 			results <- result
 			continue
 		}
 
 		if specModTime.After(srpmInfo.ModTime()) {
 			logger.Log.Debugf("Updating (%s) since (%s) has changed", specFile, latestFile)
-			result.CurrentState = srpmStateOutOfDate
+			result.currentState = srpmStateOutOfDate
 		}
 
-		result.CurrentState = srpmStateUpToDate
+		result.currentState = srpmStateUpToDate
 		results <- result
 	}
 }
@@ -714,8 +713,8 @@ func deleteStaleSRPMs(specStates []*specState, distTag, outDir string, workers i
 	// Build a map of all SRPMs that we would like to see present.
 	srpmsToKeep := make(map[string]bool)
 	for _, state := range specStates {
-		if state.CurrentState != srpmStateInvalid {
-			srpmsToKeep[state.SrpmFile] = true
+		if state.currentState != srpmStateInvalid {
+			srpmsToKeep[state.srpmFile] = true
 		}
 	}
 
@@ -803,21 +802,21 @@ func packSRPMWorker(allSpecStates <-chan *specState, results chan<- *packResult,
 		default:
 		}
 
-		ts, _ := timestamp.StartEvent(filepath.Base(specState.SpecFile), tsRoot)
+		ts, _ := timestamp.StartEvent(filepath.Base(specState.specFile), tsRoot)
 
 		result := &packResult{
-			specFile: specState.SpecFile,
+			specFile: specState.specFile,
 		}
 
 		// Its a no-op if the SPEC does not need to be packed
-		if !specState.CurrentState.shouldRepack() {
+		if !specState.currentState.shouldRepack() {
 			results <- result
 			timestamp.StopEvent(ts)
 			continue
 		}
 
 		// Setup a source retrieval configuration based on the provided template
-		signaturesFilePath := specPathToSignaturesPath(specState.SpecFile)
+		signaturesFilePath := specPathToSignaturesPath(specState.specFile)
 		srcConfig, err := initializeSourceConfig(templateSrcConfig, signaturesFilePath)
 		if err != nil {
 			result.err = err
@@ -825,7 +824,7 @@ func packSRPMWorker(allSpecStates <-chan *specState, results chan<- *packResult,
 			continue
 		}
 
-		fullOutDirPath := filepath.Dir(specState.SrpmFile)
+		fullOutDirPath := filepath.Dir(specState.srpmFile)
 		err = os.MkdirAll(fullOutDirPath, os.ModePerm)
 		if err != nil {
 			result.err = err
@@ -833,7 +832,7 @@ func packSRPMWorker(allSpecStates <-chan *specState, results chan<- *packResult,
 			continue
 		}
 
-		outputPath, err := packSingleSPEC(specState.SpecFile, specState.SrpmFile, signaturesFilePath, buildDir, fullOutDirPath, distTag, srcConfig)
+		outputPath, err := packSingleSPEC(specState.specFile, specState.srpmFile, signaturesFilePath, buildDir, fullOutDirPath, distTag, srcConfig)
 		if err != nil {
 			result.err = err
 			results <- result

@@ -9,18 +9,18 @@
 
 function clean_dir {
     dir=${1}
-    for dir in $(find ${dir} -type d | sort) ; do
+    for dir in $(find "${dir}" -type d | sort) ; do
         if [[ -d $dir ]]; then
-            if  mountpoint -q ${dir} ; then
+            if  mountpoint -q "${dir}" ; then
                 echo "WARNING: Removing mountpoint at $dir"
-                umount -l ${dir}
+                umount -l "${dir}"
                 sleep 0.5
             fi
             retries=10
-            while mountpoint -q ${dir} ; do
+            while mountpoint -q "${dir}" ; do
                 echo "ERROR: Mountpoint still present at $dir, retrying unmount ${retries} times"
-                umount -l ${dir}
-                retries=$(( ${retries} - 1))
+                umount -l "${dir}"
+                retries=$(( "${retries}" - 1))
                 sleep 1
                 if [ ${retries} -eq 0 ] ; then return 1 ; fi
             done

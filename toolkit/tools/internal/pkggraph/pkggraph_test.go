@@ -6,7 +6,7 @@ package pkggraph
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"testing"
 
@@ -98,8 +98,7 @@ func TestMain(m *testing.M) {
 
 // buildRunNode creates a new 'Run' PkgNode based on a PackageVer struct
 func buildRunNodeHelper(pkg *pkgjson.PackageVer) (node *PkgNode) {
-	var pkgCopy pkgjson.PackageVer
-	pkgCopy = *pkg
+	pkgCopy := *pkg
 	node = &PkgNode{
 		VersionedPkg: &pkgCopy,
 		State:        StateMeta,
@@ -117,8 +116,7 @@ func buildRunNodeHelper(pkg *pkgjson.PackageVer) (node *PkgNode) {
 
 // buildBuildNode creates a new 'Build' PkgNode based on a PackageVer struct
 func buildBuildNodeHelper(pkg *pkgjson.PackageVer) (node *PkgNode) {
-	var pkgCopy pkgjson.PackageVer
-	pkgCopy = *pkg
+	pkgCopy := *pkg
 	node = &PkgNode{
 		VersionedPkg: &pkgCopy,
 		State:        StateBuild,
@@ -136,8 +134,7 @@ func buildBuildNodeHelper(pkg *pkgjson.PackageVer) (node *PkgNode) {
 
 // buildBuildNode creates a new 'Unresolved' PkgNode based on a PackageVer struct
 func buildUnresolvedNodeHelper(pkg *pkgjson.PackageVer) (node *PkgNode) {
-	var pkgCopy pkgjson.PackageVer
-	pkgCopy = *pkg
+	pkgCopy := *pkg
 	node = &PkgNode{
 		VersionedPkg: &pkgCopy,
 		State:        StateUnresolved,
@@ -722,8 +719,8 @@ func TestGoalWithPackages(t *testing.T) {
 	assert.Equal(t, len(runNodes)+len(unresolvedNodes), len(goalNodes))
 
 	goal, err = g.AddGoalNode("test2", []*pkgjson.PackageVer{
-		&pkgjson.PackageVer{Name: "A"},
-		&pkgjson.PackageVer{Name: "B"},
+		{Name: "A"},
+		{Name: "B"},
 	}, false)
 	assert.NoError(t, err)
 	assert.NotNil(t, goal)
@@ -739,7 +736,7 @@ func TestStrictGoalNodes(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, g)
 
-	_, err = g.AddGoalNode("test", []*pkgjson.PackageVer{&pkgjson.PackageVer{Name: "Not a package"}}, true)
+	_, err = g.AddGoalNode("test", []*pkgjson.PackageVer{{Name: "Not a package"}}, true)
 	assert.Error(t, err)
 }
 
@@ -890,6 +887,7 @@ func TestEncodeDecodeMultiDOT(t *testing.T) {
 
 	gFinal := NewPkgGraph()
 	err = ReadDOTGraph(gFinal, &buf2)
+	assert.NoError(t, err)
 
 	checkTestGraph(t, gFinal)
 }
@@ -931,13 +929,15 @@ func TestReferenceDOTFile(t *testing.T) {
 	assert.NoError(t, err)
 
 	f, err := os.Open("test_graph_reference.dot")
-	defer f.Close()
+	if err == nil {
+		defer f.Close()
+	}
 	assert.NoError(t, err)
 
 	// Compare the bytes from the reference file against a fresh encoding
-	bytesFromCode, err := ioutil.ReadAll(&buf)
+	bytesFromCode, err := io.ReadAll(&buf)
 	assert.NoError(t, err)
-	bytesFromFile, err := ioutil.ReadAll(f)
+	bytesFromFile, err := io.ReadAll(f)
 	assert.NoError(t, err)
 	assert.True(t, len(bytesFromCode) > 0)
 	assert.True(t, len(bytesFromFile) > 0)
@@ -989,6 +989,7 @@ func TestEncodingSubGraph(t *testing.T) {
 
 	// Copy uses the encode/decode flow
 	gCopy, err := subGraph.DeepCopy()
+	assert.NoError(t, err)
 
 	component := []*PkgNode{
 		pkgCRun,

@@ -9,7 +9,6 @@ import (
 	"encoding/gob"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sort"
@@ -1169,7 +1168,7 @@ func ReadDOTGraphFile(filename string) (outputGraph *PkgGraph, err error) {
 
 // ReadDOTGraph de-serializes a graph from a DOT formatted object
 func ReadDOTGraph(g graph.DirectedBuilder, input io.Reader) (err error) {
-	bytes, err := ioutil.ReadAll(input)
+	bytes, err := io.ReadAll(input)
 	if err != nil {
 		return
 	}
