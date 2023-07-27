@@ -94,7 +94,6 @@ The module is most useful for su and sudo service stacks.
 %prep
 %setup -q -a 3
 
-%patch308 -p2 -b .cve-2023-38408
 pushd pam_ssh_agent_auth-%{pam_ssh_agent_ver}
 %patch300 -p2 -b .psaa-build
 %patch301 -p2 -b .psaa-seteuid
@@ -106,6 +105,7 @@ pushd pam_ssh_agent_auth-%{pam_ssh_agent_ver}
 rm -f $(cat %{SOURCE4})
 autoreconf
 popd
+%patch308 -p2 -b .cve-2023-38408
 
 %build
 # The -fvisibility=hidden is needed for clean build of the pam_ssh_agent_auth.
