@@ -1,9 +1,9 @@
-%global openssh_ver 8.8p1
+%global openssh_ver 8.9p1
 %global pam_ssh_agent_ver 0.10.3
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        %{openssh_ver}
-Release:        7%{?dist}
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
