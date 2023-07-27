@@ -52,53 +52,6 @@ func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMute
 	return
 }
 
-func buildNodeToTestNode(pkgGraph *pkggraph.PkgGraph, buildNode *pkggraph.PkgNode) (testNode *pkggraph.PkgNode) {
-	dependents := pkgGraph.To(buildNode.ID())
-	for dependents.Next() {
-		dependent := dependents.Node().(*pkggraph.PkgNode)
-
-		if dependent.Type == pkggraph.TypeTest {
-			testNode = dependent
-			break
-		}
-	}
-
-	return
-}
-
-func partnerTestNodesToRequest(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, packagesToRebuild []*pkgjson.PackageVer, buildNodes []*pkggraph.PkgNode, buildUsesCache bool) (request *BuildRequest) {
-	const isDelta = false
-
-	defaultBuildNode := buildNodes[0]
-	testNode := buildNodeToTestNode(pkgGraph, defaultBuildNode)
-	if testNode == nil {
-		return
-	}
-
-	ancillaryTestNodes := []*pkggraph.PkgNode{}
-	for _, buildNode := range buildNodes {
-		testNode = buildNodeToTestNode(pkgGraph, buildNode)
-
-		// Removing edges even if tests are blocked by other dependencies,
-		// so that they can get unblocked once these other dependencies are available.
-		pkgGraph.RemoveEdge(testNode.ID(), buildNode.ID())
-
-		ancillaryTestNodes = append(ancillaryTestNodes, testNode)
-	}
-
-	if !isNodeUnblocked(pkgGraph, buildState, testNode) {
-		return
-	}
-
-	return &BuildRequest{
-		Node:           testNode,
-		PkgGraph:       pkgGraph,
-		AncillaryNodes: ancillaryTestNodes,
-		IsDelta:        isDelta,
-		UseCache:       buildUsesCache && canUseCacheForNode(pkgGraph, testNode, packagesToRebuild, buildState),
-	}
-}
-
 func buildNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, packagesToRebuild []*pkgjson.PackageVer, buildNodesLists map[string][]*pkggraph.PkgNode, isCacheAllowed bool) (requests []*BuildRequest) {
 	for _, buildNodes := range buildNodesLists {
 		// Check if any of the build nodes is a delta node and mark it. We will use this to determine if the
@@ -135,6 +88,65 @@ func buildNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildSta
 	return
 }
 
+func buildNodeToTestNode(pkgGraph *pkggraph.PkgGraph, buildNode *pkggraph.PkgNode) (testNode *pkggraph.PkgNode) {
+	dependents := pkgGraph.To(buildNode.ID())
+	for dependents.Next() {
+		dependent := dependents.Node().(*pkggraph.PkgNode)
+
+		if dependent.Type == pkggraph.TypeTest {
+			testNode = dependent
+			break
+		}
+	}
+
+	return
+}
+
+func buildRequest(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, packagesToRebuild []*pkgjson.PackageVer, builtNode *pkggraph.PkgNode, ancillaryNodes []*pkggraph.PkgNode, isCacheAllowed, isDelta bool) (request *BuildRequest) {
+	request = &BuildRequest{
+		Node:           builtNode,
+		PkgGraph:       pkgGraph,
+		AncillaryNodes: ancillaryNodes,
+		IsDelta:        isDelta,
+	}
+
+	request.UseCache = isCacheAllowed && canUseCacheForNode(pkgGraph, request.Node, packagesToRebuild, buildState)
+	return
+}
+
+func partnerTestNodesToRequest(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, packagesToRebuild []*pkgjson.PackageVer, buildNodes []*pkggraph.PkgNode, buildUsesCache bool) (request *BuildRequest) {
+	const isDelta = false
+
+	defaultBuildNode := buildNodes[0]
+	testNode := buildNodeToTestNode(pkgGraph, defaultBuildNode)
+	if testNode == nil {
+		return
+	}
+
+	ancillaryTestNodes := []*pkggraph.PkgNode{}
+	for _, buildNode := range buildNodes {
+		testNode = buildNodeToTestNode(pkgGraph, buildNode)
+
+		// Removing edges even if tests are blocked by other dependencies,
+		// so that they can get unblocked once these other dependencies are available.
+		pkgGraph.RemoveEdge(testNode.ID(), buildNode.ID())
+
+		ancillaryTestNodes = append(ancillaryTestNodes, testNode)
+	}
+
+	if !isNodeUnblocked(pkgGraph, buildState, testNode) {
+		return
+	}
+
+	return &BuildRequest{
+		Node:           testNode,
+		PkgGraph:       pkgGraph,
+		AncillaryNodes: ancillaryTestNodes,
+		IsDelta:        isDelta,
+		UseCache:       buildUsesCache && canUseCacheForNode(pkgGraph, testNode, packagesToRebuild, buildState),
+	}
+}
+
 // testNodesToRequests converts lists of test nodes into test build requests.
 // The function is expected to be only called for test nodes corresponding to build nodes,
 // which have already been queued to build or finished building.
@@ -156,18 +168,6 @@ func testNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildStat
 		requests = append(requests, testRequest)
 	}
 
-	return
-}
-
-func buildRequest(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, packagesToRebuild []*pkgjson.PackageVer, builtNode *pkggraph.PkgNode, ancillaryNodes []*pkggraph.PkgNode, isCacheAllowed, isDelta bool) (request *BuildRequest) {
-	request = &BuildRequest{
-		Node:           builtNode,
-		PkgGraph:       pkgGraph,
-		AncillaryNodes: ancillaryNodes,
-		IsDelta:        isDelta,
-	}
-
-	request.UseCache = isCacheAllowed && canUseCacheForNode(pkgGraph, request.Node, packagesToRebuild, buildState)
 	return
 }
 

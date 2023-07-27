@@ -258,7 +258,6 @@ func buildSRPMFile(agent buildagents.BuildAgent, buildAttempts int, srpmFile, ou
 	)
 
 	logBaseName := filepath.Base(srpmFile) + ".log"
-
 	err = retry.Run(func() (buildErr error) {
 		builtFiles, logFile, buildErr = agent.BuildPackage(srpmFile, logBaseName, outArch, runCheck, dependencies)
 		return
@@ -277,7 +276,6 @@ func testSRPMFile(agent buildagents.BuildAgent, checkAttempts int, srpmFile stri
 	// checkFailed is a flag to see if a non-null buildErr is from the %check section
 	checkFailed := false
 	logBaseName := filepath.Base(srpmFile) + ".test.log"
-
 	err = retry.Run(func() (buildErr error) {
 		checkFailed = false
 
