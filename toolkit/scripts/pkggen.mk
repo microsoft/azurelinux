@@ -153,7 +153,7 @@ graphpkgfetcher_extra_flags += $(if $(CONFIG_FILE),--base-dir="$(CONFIG_BASE_DIR
 $(cached_file): $(depend_CONFIG_FILE) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST)
 endif
 
-$(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(rpm_cache_files) $(TOOLCHAIN_MANIFEST) $(toolchain_rpms)
+$(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(rpm_cache_files) $(TOOLCHAIN_MANIFEST) $(toolchain_rpms) $(depend_EXTRA_BUILD_LAYERS)
 	mkdir -p $(CACHED_RPMS_DIR)/cache && \
 	$(go-graphpkgfetcher) \
 		--input=$(graph_file) \
@@ -163,6 +163,7 @@ $(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_lo
 		--tmp-dir=$(cache_working_dir) \
 		--tdnf-worker=$(chroot_worker) \
 		--toolchain-manifest=$(TOOLCHAIN_MANIFEST) \
+		--extra-layers="$(EXTRA_BUILD_LAYERS)" \
 		--tls-cert=$(TLS_CERT) \
 		--tls-key=$(TLS_KEY) \
 		$(foreach repo, $(pkggen_local_repo) $(graphpkgfetcher_cloned_repo) $(REPO_LIST),--repo-file=$(repo) ) \
