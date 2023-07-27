@@ -108,17 +108,17 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 		case pkggraph.TypeLocalBuild:
 			res.UsedCache, res.Ignored, res.BuiltFiles, res.LogFile, res.Err = buildBuildNode(req.Node, req.PkgGraph, graphMutex, agent, req.CanUseCache, buildAttempts, ignoredPackages)
 			if res.Err == nil {
-				setAncillaryBuildNodesStatus(req, pkggraph.StateUpToDate)
+				setAncillaryBuildNodesStatus(req, graphMutex, pkggraph.StateUpToDate)
 			} else {
-				setAncillaryBuildNodesStatus(req, pkggraph.StateBuildError)
+				setAncillaryBuildNodesStatus(req, graphMutex, pkggraph.StateBuildError)
 			}
 
 		case pkggraph.TypeTest:
 			res.Ignored, res.LogFile, res.Err = buildTestNode(req.Node, req.PkgGraph, graphMutex, agent, req.CanUseCache, checkAttempts, ignoredPackages)
 			if res.Err == nil {
-				setAncillaryBuildNodesStatus(req, pkggraph.StateUpToDate)
+				setAncillaryBuildNodesStatus(req, graphMutex, pkggraph.StateUpToDate)
 			} else {
-				setAncillaryBuildNodesStatus(req, pkggraph.StateBuildError)
+				setAncillaryBuildNodesStatus(req, graphMutex, pkggraph.StateBuildError)
 			}
 
 		case pkggraph.TypeLocalRun, pkggraph.TypeGoal, pkggraph.TypeRemoteRun, pkggraph.TypePureMeta, pkggraph.TypePreBuilt:
@@ -305,7 +305,10 @@ func testSRPMFile(agent buildagents.BuildAgent, checkAttempts int, srpmFile stri
 }
 
 // setAncillaryBuildNodesStatus sets the NodeState for all of the request's ancillary build and test nodes.
-func setAncillaryBuildNodesStatus(req *BuildRequest, nodeState pkggraph.NodeState) {
+func setAncillaryBuildNodesStatus(req *BuildRequest, graphMutex *sync.RWMutex, nodeState pkggraph.NodeState) {
+	graphMutex.Lock()
+	defer graphMutex.Unlock()
+
 	for _, node := range req.AncillaryNodes {
 		if node.Type == pkggraph.TypeLocalBuild || node.Type == pkggraph.TypeTest {
 			node.State = nodeState
