@@ -94,7 +94,7 @@ The module is most useful for su and sudo service stacks.
 %prep
 %setup -q -a 3
 
-%patch308 -p1 -b .cve-2023-38408
+%patch308 -p2 -b .cve-2023-38408
 pushd pam_ssh_agent_auth-%{pam_ssh_agent_ver}
 %patch300 -p2 -b .psaa-build
 %patch301 -p2 -b .psaa-seteuid
