@@ -28,7 +28,7 @@ The Prometheus monitoring system and time series database
 
 %package docs
 Summary:        prometheus docs
-Requires:       %{name}
+Requires:       %{name} = %{version}-%{release}
 
 %description docs
 Documentation for prometheus.

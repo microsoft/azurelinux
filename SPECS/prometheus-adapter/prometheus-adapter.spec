@@ -14,7 +14,7 @@ Implementation of Prometheus via Kubernetes Custom, Resource, and External Metri
 
 %package docs
 Summary:        prometheus-adapter docs
-Requires:       %{name}
+Requires:       %{name} = %{version}-%{release}
 
 %description docs
 Documentation for prometheus-adapter
