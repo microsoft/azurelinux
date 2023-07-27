@@ -74,9 +74,32 @@ func (g *GraphBuildState) IsNodeDelta(node *pkggraph.PkgNode) bool {
 	return state != nil && state.usedDelta
 }
 
+// IsSRPMCached returns true if the requested SRPM build used a cache.
+func (g *GraphBuildState) IsSRPMCached(srpmFileName string) bool {
+	for node, state := range g.nodeToState {
+		if node.Type == pkggraph.TypeLocalBuild && node.SRPMFileName() == srpmFileName {
+			return state.cached
+		}
+	}
+
+	return false
+}
+
 // ActiveBuilds returns a map of Node IDs to BuildRequests that represents all outstanding builds.
 func (g *GraphBuildState) ActiveBuilds() map[int64]*BuildRequest {
 	return g.activeBuilds
+}
+
+// ActiveBuildFromSRPM returns a build request for the queried SRPM file
+// or nil if the SRPM is not among the active builds.
+func (g *GraphBuildState) ActiveBuildFromSRPM(srpmFileName string) *BuildRequest {
+	for _, buildRequest := range g.activeBuilds {
+		if buildRequest.Node.Type == pkggraph.TypeLocalBuild && buildRequest.Node.SrpmPath == srpmFileName {
+			return buildRequest
+		}
+	}
+
+	return nil
 }
 
 // ActiveSRPMs returns a list of all SRPMs, which are currently being built.

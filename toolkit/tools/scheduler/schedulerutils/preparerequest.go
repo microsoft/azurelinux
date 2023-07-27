@@ -116,11 +116,12 @@ func buildNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildSta
 
 		if req.UseCache {
 			expectedFiles, missingFiles := pkggraph.FindRPMFiles(defaultNode.SrpmPath, pkgGraph, nil)
-			req.UseCache = len(missingFiles) == 0
-
 			if len(missingFiles) > 0 && len(missingFiles) < len(expectedFiles) {
 				logger.Log.Infof("SRPM '%s' will be rebuilt due to partially missing components: %v", defaultNode.SrpmPath, missingFiles)
 			}
+
+			req.ExpectedFiles = expectedFiles
+			req.UseCache = len(missingFiles) == 0
 		}
 
 		requests = append(requests, req)
@@ -128,20 +129,6 @@ func buildNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildSta
 		partnerTestNodeRequest := partnerTestNodesToRequest(pkgGraph, buildState, packagesToRebuild, buildNodes, req.UseCache)
 		if partnerTestNodeRequest != nil {
 			requests = append(requests, partnerTestNodeRequest)
-		}
-	}
-
-	return
-}
-
-func testNodeToBuildNode(pkgGraph *pkggraph.PkgGraph, testNode *pkggraph.PkgNode) (buildNode *pkggraph.PkgNode) {
-	dependencies := pkgGraph.From(testNode.ID())
-	for dependencies.Next() {
-		dependency := dependencies.Node().(*pkggraph.PkgNode)
-
-		if dependency.Type == pkggraph.TypeLocalBuild {
-			buildNode = dependency
-			break
 		}
 	}
 
@@ -158,11 +145,11 @@ func testNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildStat
 
 	for _, testNodes := range testNodesLists {
 		defaultTestNode := testNodes[0]
-		defaultBuildNode := testNodeToBuildNode(pkgGraph, defaultTestNode)
+		srpmFileName := defaultTestNode.SRPMFileName()
 
-		buildUsedCache := buildState.IsNodeCached(defaultBuildNode)
-		if activeBuildRequest := buildState.ActiveBuilds()[defaultBuildNode.ID()]; activeBuildRequest != nil {
-			buildUsedCache = activeBuildRequest.UseCache
+		buildUsedCache := buildState.IsSRPMCached(srpmFileName)
+		if buildRequest := buildState.ActiveBuildFromSRPM(srpmFileName); buildRequest != nil {
+			buildUsedCache = buildRequest.UseCache
 		}
 
 		testRequest := buildRequest(pkgGraph, buildState, packagesToRebuild, defaultTestNode, testNodes, buildUsedCache, isDelta)

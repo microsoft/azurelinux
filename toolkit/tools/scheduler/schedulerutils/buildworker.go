@@ -37,6 +37,7 @@ type BuildRequest struct {
 	Node           *pkggraph.PkgNode
 	PkgGraph       *pkggraph.PkgGraph
 	AncillaryNodes []*pkggraph.PkgNode
+	ExpectedFiles  []string
 	UseCache       bool
 	IsDelta        bool
 }
@@ -107,7 +108,7 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 
 		switch req.Node.Type {
 		case pkggraph.TypeLocalBuild:
-			res.Ignored, res.BuiltFiles, res.LogFile, res.Err = buildBuildNode(req.Node, req.PkgGraph, graphMutex, agent, req.UseCache, buildAttempts, ignoredPackages)
+			res.Ignored, res.BuiltFiles, res.LogFile, res.Err = buildNode(req, graphMutex, agent, buildAttempts, ignoredPackages)
 			if res.Err == nil {
 				setAncillaryBuildNodesStatus(req, graphMutex, pkggraph.StateUpToDate)
 			} else {
@@ -115,7 +116,7 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 			}
 
 		case pkggraph.TypeTest:
-			res.Ignored, res.LogFile, res.Err = buildTestNode(req.Node, req.PkgGraph, graphMutex, agent, req.UseCache, checkAttempts, ignoredPackages)
+			res.Ignored, res.LogFile, res.Err = testNode(req, graphMutex, agent, checkAttempts, ignoredPackages)
 			if res.Err == nil {
 				setAncillaryBuildNodesStatus(req, graphMutex, pkggraph.StateUpToDate)
 			} else {
@@ -138,8 +139,9 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 	logger.Log.Debug("Worker done")
 }
 
-// buildBuildNode builds a TypeLocalBuild node, either used a cached copy if possible or building the corresponding SRPM.
-func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, useCache bool, buildAttempts int, ignoredPackages []*pkgjson.PackageVer) (ignored bool, builtFiles []string, logFile string, err error) {
+// buildNode builds a TypeLocalBuild node, either used a cached copy if possible or building the corresponding SRPM.
+func buildNode(request *BuildRequest, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, buildAttempts int, ignoredPackages []*pkgjson.PackageVer) (ignored bool, builtFiles []string, logFile string, err error) {
+	node := request.Node
 	baseSrpmName := node.SRPMFileName()
 	ignored = sliceutils.Contains(ignoredPackages, node.VersionedPkg, sliceutils.PackageVerMatch)
 
@@ -148,20 +150,22 @@ func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMu
 		return
 	}
 
-	if useCache {
+	if request.UseCache {
 		logger.Log.Debugf("%s is prebuilt, skipping", baseSrpmName)
+		builtFiles = request.ExpectedFiles
 		return
 	}
 
-	dependencies := getBuildDependencies(node, pkgGraph, graphMutex)
+	dependencies := getBuildDependencies(node, request.PkgGraph, graphMutex)
 
 	logger.Log.Infof("Building: %s", baseSrpmName)
 	builtFiles, logFile, err = buildSRPMFile(agent, buildAttempts, node.SrpmPath, node.Architecture, dependencies)
 	return
 }
 
-// buildTestNode tests a TypeTest node.
-func buildTestNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, useCache bool, checkAttempts int, ignoredPackages []*pkgjson.PackageVer) (ignored bool, logFile string, err error) {
+// testNode tests a TypeTest node.
+func testNode(request *BuildRequest, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, checkAttempts int, ignoredPackages []*pkgjson.PackageVer) (ignored bool, logFile string, err error) {
+	node := request.Node
 	baseSrpmName := node.SRPMFileName()
 	ignored = sliceutils.Contains(ignoredPackages, node.VersionedPkg, sliceutils.PackageVerMatch)
 
@@ -170,12 +174,12 @@ func buildTestNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMut
 		return
 	}
 
-	if useCache {
+	if request.UseCache {
 		logger.Log.Debugf("Using cache for '%s', skipping its test run as well.", baseSrpmName)
 		return
 	}
 
-	dependencies := getBuildDependencies(node, pkgGraph, graphMutex)
+	dependencies := getBuildDependencies(node, request.PkgGraph, graphMutex)
 
 	logger.Log.Infof("Testing: %s", baseSrpmName)
 	logFile, err = testSRPMFile(agent, checkAttempts, node.SrpmPath, node.Architecture, dependencies)

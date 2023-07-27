@@ -52,7 +52,7 @@ func RecordBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, b
 	failedSRPMs, prebuiltSRPMs, prebuiltDeltaSRPMs, builtSRPMs, blockedSRPMs := getSRPMsState(pkgGraph, buildState)
 	failedBuildNodes := buildResultsSetToNodesSet(failedSRPMs)
 
-	failedSRPMsTests, testedSRPMs, blockedSRPMsTests := getSRPMsTestsState(pkgGraph, buildState)
+	failedSRPMsTests, _, testedSRPMs, blockedSRPMsTests := getSRPMsTestsState(pkgGraph, buildState)
 	failedTestNodes := buildResultsSetToNodesSet(failedSRPMsTests)
 
 	csvBlob := [][]string{{"Package", "State", "Blocker", "IsTest"}}
@@ -88,7 +88,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	defer graphMutex.RUnlock()
 
 	failedSRPMs, prebuiltSRPMs, prebuiltDeltaSRPMs, builtSRPMs, blockedSRPMs := getSRPMsState(pkgGraph, buildState)
-	failedSRPMsTests, testedSRPMs, blockedSRPMsTests := getSRPMsTestsState(pkgGraph, buildState)
+	failedSRPMsTests, skippedSRPMsTests, testedSRPMs, blockedSRPMsTests := getSRPMsTestsState(pkgGraph, buildState)
 
 	unresolvedDependencies := make(map[string]bool)
 	rpmConflicts := buildState.ConflictingRPMs()
@@ -113,6 +113,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	logger.Log.Infof("Number of tested SRPMs:            %d", len(testedSRPMs))
 	logger.Log.Infof("Number of prebuilt SRPMs:          %d", len(prebuiltSRPMs))
 	logger.Log.Infof("Number of prebuilt delta SRPMs:    %d", len(prebuiltDeltaSRPMs))
+	logger.Log.Infof("Number of skipped SRPMs tests:     %d", len(skippedSRPMsTests))
 	logger.Log.Infof("Number of failed SRPMs:            %d", len(failedSRPMs))
 	logger.Log.Infof("Number of failed SRPMs tests:      %d", len(failedSRPMsTests))
 	logger.Log.Infof("Number of blocked SRPMs:           %d", len(blockedSRPMs))
@@ -152,6 +153,13 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	if len(prebuiltDeltaSRPMs) != 0 {
 		logger.Log.Info("Skipped SRPMs (i.e., delta mode is on, packages are already available in a repo):")
 		for srpm := range prebuiltDeltaSRPMs {
+			logger.Log.Infof("--> %s", filepath.Base(srpm))
+		}
+	}
+
+	if len(skippedSRPMsTests) != 0 {
+		logger.Log.Info("Skipped SRPMs tests:")
+		for srpm := range skippedSRPMsTests {
 			logger.Log.Infof("--> %s", filepath.Base(srpm))
 		}
 	}
@@ -252,8 +260,9 @@ func getSRPMsState(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState) (fa
 	return
 }
 
-func getSRPMsTestsState(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState) (failedSRPMsTests map[string]*BuildResult, testedSRPMs map[string]bool, blockedSRPMsTests map[string]*pkggraph.PkgNode) {
+func getSRPMsTestsState(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState) (failedSRPMsTests map[string]*BuildResult, skippedSRPMsTests, testedSRPMs map[string]bool, blockedSRPMsTests map[string]*pkggraph.PkgNode) {
 	failedSRPMsTests = make(map[string]*BuildResult)
+	skippedSRPMsTests = make(map[string]bool)
 	testedSRPMs = make(map[string]bool)
 	blockedSRPMsTests = make(map[string]*pkggraph.PkgNode)
 
@@ -264,7 +273,10 @@ func getSRPMsTestsState(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState
 	}
 
 	for _, node := range pkgGraph.AllTestNodes() {
-		if buildState.IsNodeAvailable(node) {
+		if buildState.IsNodeCached(node) {
+			skippedSRPMsTests[node.SrpmPath] = true
+			continue
+		} else if buildState.IsNodeAvailable(node) {
 			testedSRPMs[node.SrpmPath] = true
 			continue
 		}
