@@ -1456,7 +1456,12 @@ func (g *PkgGraph) fixCyclesWithExistingRPMS(trimmedCycle []*PkgNode, resolveCyc
 		}
 		if resolveCyclesFromUpstream {
 			isAvailableUpstream := false
-			isAvailableUpstream, err = isSRPMAvailableUpstream(g, nil, currentNode.SrpmPath, ignoreVersionToResolveSelfDep, cloner)
+			var clonerErr error
+			isAvailableUpstream, clonerErr = isSRPMAvailableUpstream(g, nil, currentNode.SrpmPath, ignoreVersionToResolveSelfDep, cloner)
+			/*clonerErr is not fatal. gives error if rpm is not found*/
+			if clonerErr != nil {
+				logger.Log.Debugf("Error while checking if SRPM is available upstream: %v", clonerErr)
+			}
 			if buildToRunEdge && isAvailableUpstream {
 				//Mark node as unresolved remote to be fetched by pkgfetcher
 				logger.Log.Debugf("Cycle contains SRPM %s whose rpms are all available in PMC. MARK this node as remote unresolved", currentNode.SrpmPath)
