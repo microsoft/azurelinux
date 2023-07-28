@@ -432,7 +432,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 
 %changelog
 * Fri Jul 28 2023 Vince Perri <viperri@microsoft.com> - 5.15.122.1-2
-- Add net/mlx5 patches (patch 28) switching warn message to debug
+- Add net/mlx5 patch (27) switching warn message to debug
 
 * Wed Jul 26 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.122.1-1
 - Auto-upgrade to 5.15.122.1
