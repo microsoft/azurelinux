@@ -93,6 +93,7 @@ steps:
       cp "${{ parameters.buildRepoRoot }}"/out/rpms.tar.gz "$published_artifacts_dir/${{ parameters.rpmsTarballName }}"
       cp "${{ parameters.buildRepoRoot }}"/out/srpms.tar.gz "$published_artifacts_dir/${{ parameters.srpmsTarballName }}"
     displayName: "Copy artifacts for publishing"
+    condition: always()
 
   - bash: |
       published_logs_dir="${{ parameters.outputArtifactsFolder }}/LOGS"
