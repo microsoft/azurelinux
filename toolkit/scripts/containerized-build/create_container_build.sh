@@ -5,7 +5,7 @@
 
 set -e
 
-script_dir=$( realpath "$(dirname "$0")" )
+script_dir=$(realpath "$(dirname "$0")")
 topdir=/usr/src/mariner
 enable_local_repo=false
 
@@ -73,7 +73,7 @@ while (( "$#")); do
   case "$1" in
     -m ) mode="$2"; shift 2 ;;
     -v ) version="$2"; shift 2 ;;
-    -p ) repo_path="$2"; shift 2 ;;
+    -p ) repo_path="$(realpath $2)"; shift 2 ;;
     --enable-local-repo ) enable_local_repo=true; shift ;;
     --help ) help; exit 1 ;;
     ? ) echo -e "ERROR: INVALID OPTION.\n\n"; help; exit 1 ;;
@@ -81,16 +81,16 @@ while (( "$#")); do
 done
 
 # Assign default values
-[[ -z "${repo_path}" ]] && repo_path="$(dirname $0)" && repo_path=${repo_path%'/toolkit'*}
+[[ -z "${repo_path}" ]] && repo_path=$(realpath "$(dirname "$0")") && repo_path=${repo_path%'/toolkit'*}
 [[ ! -d "${repo_path}" ]] && { print_error " Directory ${repo_path} does not exist"; exit 1; }
 [[ -z "${mode}" ]] && mode="build"
 [[ -z  "${version}" ]] && version="2.0"
 
 echo "Running in ${mode} mode, requires root..."
 echo "Running as root!"
+cd "${script_dir}"  || { echo "ERROR: Could not change directory to ${script_dir}"; exit 1; }
 
 # ==================== Setup ====================
-cd "${script_dir}"
 build_dir="${script_dir}/build_container"
 mkdir -p "${build_dir}"
 
@@ -134,7 +134,6 @@ cp ${repo_path}/toolkit/out/tools/specreader ${build_dir}/
 cp ${repo_path}/build/pkg_artifacts/graph.dot ${build_dir}/
 
 # ========= Setup mounts =========
-cd "${script_dir}"
 echo "Setting up mounts..."
 
 mounts="${mounts} ${repo_path}/out/RPMS:/mnt/RPMS"

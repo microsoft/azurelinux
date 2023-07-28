@@ -1,5 +1,8 @@
 #! /bin/bash
 
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 TOPDIR=<TOPDIR>
 SPECS_DIR=$TOPDIR/SPECS
 SOURCES_DIR=$TOPDIR/SOURCES
