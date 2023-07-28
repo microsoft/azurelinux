@@ -7230,6 +7230,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "inih",
+          "version": "47",
+          "downloadUrl": "https://github.com/benhoyt/inih/archive/refs/tags/inih-r57.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "iniparser",
           "version": "4.1",
           "downloadUrl": "https://github.com/ndevilla/iniparser/archive/v4.1.tar.gz"
