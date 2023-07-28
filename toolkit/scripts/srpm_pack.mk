@@ -39,6 +39,10 @@ $(call create_folder,$(BUILD_DIR))
 $(call create_folder,$(BUILD_SRPMS_DIR))
 $(call create_folder,$(SRPM_BUILD_CHROOT_DIR))
 
+# Host's extended ACLs influence the default permissions of the
+# files inside the built RPMs. Disabling them for the build directory.
+$(call shell_real_build_only, setfacl -bn $(BUILD_DIR))
+
 # General targets
 .PHONY: toolchain-input-srpms input-srpms clean-input-srpms
 input-srpms: $(BUILD_SRPMS_DIR)
