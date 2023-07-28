@@ -155,7 +155,7 @@ sudo make toolchain REBUILD_TOOLS=y REBUILD_TOOLCHAIN=y
 
 After the toolchain is built or populated, package building is possible.  The CBL-Mariner ecosystem provides a significant number of packages, but most of those packages are not used in an image.  When rebuilding packages, you can choose to build everything, or you can choose to build just what you need for a specific image.  This can save significant time because only the subset of the CBL-Mariner packages needed for an image are built.
 
-The CONFIG_FILE argument provides a quick way to declare what to build. To manually build **all** packages you can clear the configuration with `CONFIG_FILE=` and invoke the package build target.  To build packages needed for a specific image, you must set the CONFIG_FILE= parameter to an image configuration file of your choice.  The standard image configuration files are in the toolkit/imageconfigs folder.
+The CONFIG_FILE argument provides a quick way to declare what to build. To manually build **all** packages you can use the default configuration (`CONFIG_FILE=""`) and invoke the package build target.  To build packages needed for a specific image, you must set the CONFIG_FILE= parameter to an image configuration file of your choice.  The standard image configuration files are in the toolkit/imageconfigs folder.
 
 Large parts of the package build stage are parallelized. Enable this by setting the `-j` flag for `make` to the number of parallel jobs to allow. (Recommend setting this value to the number of logical cores available on your system, or less)
 
@@ -255,10 +255,10 @@ Build all local packages needed for the default `core-efi.json`:
 sudo make build-packages -j$(nproc)
 ```
 
-Build only two packages along with their prerequisites (note `CONFIG_FILE` is explicitly cleared, not specifying it will use the default `core-efi.json` config):
+Build only two packages along with their prerequisites:
 
 ```bash
-sudo make build-packages PACKAGE_BUILD_LIST="vim nano" CONFIG_FILE= -j$(nproc)
+sudo make build-packages PACKAGE_BUILD_LIST="vim nano" -j$(nproc)
 ```
 
 Build packages from a custom SPECS dir:
@@ -281,11 +281,11 @@ Adding `PACKAGE_REBUILD_LIST="nano"` will tell the build system to always rebuil
 
 #### Ignoring Packages
 
-In the event the ncurses package is currently having issues, `PACKAGE_IGNORE_LIST="ncurses"` will tell the build system to pretend the `ncurses.spec` file was already successfully built regardless of the actual local state. As before, explicitly clear the `CONFIG_FILE` variable to skip adding `core-efi.json`'s packages.
+In the event the ncurses package is currently having issues, `PACKAGE_IGNORE_LIST="ncurses"` will tell the build system to pretend the `ncurses.spec` file was already successfully built regardless of the actual local state.
 
 ```bash
 # Work on the nano package while ignoring the state of the ncurses package
-sudo make build-packages PACKAGE_BUILD_LIST="nano" PACKAGE_REBUILD_LIST="nano" PACKAGE_IGNORE_LIST="ncurses" CONFIG_FILE=
+sudo make build-packages PACKAGE_BUILD_LIST="nano" PACKAGE_REBUILD_LIST="nano" PACKAGE_IGNORE_LIST="ncurses"
 ```
 
 Any build which requires the ignored packages will still attempt to use them during a build, so ensure they are available in the `../out/RPMS` folder.
@@ -748,7 +748,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 
 | Variable                      | Default                                                                                                | Description
 |:------------------------------|:-------------------------------------------------------------------------------------------------------|:---
-| CONFIG_FILE                   | `$(RESOURCES_DIR)`/imageconfigs/core-efi/core-efi.json                                                 | [Image config file](https://github.com/microsoft/CBL-MarinerTutorials#image-config-file) to build.
+| CONFIG_FILE                   | `""`                                                                                                   | [Image config file](https://github.com/microsoft/CBL-MarinerTutorials#image-config-file) to build.
 | CONFIG_BASE_DIR               | `$(dir $(CONFIG_FILE))`                                                                                | Base directory on the **build machine** to search for any **relative** file paths mentioned inside the [image config file](https://github.com/microsoft/CBL-MarinerTutorials#image-config-file). This has no effect on **absolute** file paths or file paths on the **built image**.
 | UNATTENDED_INSTALLER          |                                                                                                        | Create unattended ISO installer if set. Overrides all other installer options.
 | PACKAGE_BUILD_LIST            |                                                                                                        | Explicit list of packages to build. The package will be skipped if the build system thinks it is already up-to-date. The argument accepts both spec and package names. Example: for `python-werkzeug.spec`, which builds the `python3-werkzeug` package both `python-werkzeug` and `python3-werkzeug` are correct.
