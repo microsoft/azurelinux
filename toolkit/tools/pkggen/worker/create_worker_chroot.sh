@@ -22,10 +22,25 @@ chroot_builder_folder=$chroot_base/$chroot_name
 chroot_archive=$chroot_base/$chroot_name.tar.gz
 chroot_log="$log_path"/$chroot_name.log
 
+# We have two major steps per entry in the packages file: install the RPM, then add to database
+total_steps=$(wc -l < "$packages")
+total_steps=$((total_steps * 2))
+current_step=0
+# Print "<progress>%" and increment current_step
+function increment_progress() {
+    # Increment global counter current_step
+    current_step=$((current_step + 1))
+}
+function format_progress() {
+    progress=$((current_step * 100 / total_steps))
+    printf "%s%%" "$progress"
+}
+
 install_one_toolchain_rpm () {
     error_msg_tail="Inspect $chroot_log for more info. Did you hydrate the toolchain?"
 
-    echo "Adding RPM to worker chroot: $1." | tee -a "$chroot_log"
+    echo "Adding RPM to worker chroot $(format_progress): $1." | tee -a "$chroot_log"
+    increment_progress
 
     full_rpm_path=$(find "$rpm_path" -name "$1" -type f 2>>"$chroot_log")
     if [ ! $? -eq 0 ] || [ -z "$full_rpm_path" ]
@@ -60,6 +75,10 @@ mknod -m 600 $chroot_builder_folder/dev/console c 5 1
 mknod -m 666 $chroot_builder_folder/dev/null c 1 3
 mknod -m 444 $chroot_builder_folder/dev/urandom c 1 9
 
+# Start with filesystem, then macros, then everything else
+install_one_toolchain_rpm "$(cat "$packages" | grep "^filesystem-.*rpm$")"
+install_one_toolchain_rpm "$(cat "$packages" | grep "^mariner-rpm-macros-.*rpm$")"
+
 while read -r package || [ -n "$package" ]; do
     install_one_toolchain_rpm "$package"
 done < "$packages"
@@ -83,7 +102,8 @@ else
     while read -r package || [ -n "$package" ]; do
         full_rpm_path=$(find "$rpm_path" -name "$package" -type f 2>>"$chroot_log")
         cp $full_rpm_path $chroot_builder_folder/$package
-        echo "Adding RPM DB entry to worker chroot: $package." | tee -a "$chroot_log"
+        echo "Adding RPM DB entry to worker chroot $(format_progress): $package." | tee -a "$chroot_log"
+        increment_progress
         chroot "$chroot_builder_folder" rpm -i -v --nodeps --noorder --force --dbpath="$TEMP_DB_PATH" --justdb "$package" &>> "$chroot_log"
         chroot "$chroot_builder_folder" rm $package
     done < "$packages"
