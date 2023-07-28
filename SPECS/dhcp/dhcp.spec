@@ -1,6 +1,6 @@
-Summary:	    Dynamic host configuration protocol
-Name:		    dhcp
-Version:	    4.4.2
+Summary:        Dynamic host configuration protocol
+Name:           dhcp
+Version:        4.4.2
 Release:        5%{?dist}
 License:        MPLv2.0
 Url:            https://www.isc.org/dhcp/
