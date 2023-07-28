@@ -1,0 +1,30 @@
+diff --git a/internal/runtime/logger.go b/internal/runtime/logger.go
+index b3122ac..75a4be5 100644
+--- a/internal/runtime/logger.go
++++ b/internal/runtime/logger.go
+@@ -17,7 +17,6 @@
+ package runtime
+ 
+ import (
+-	"errors"
+ 	"fmt"
+ 	"io"
+ 	"os"
+@@ -62,7 +61,7 @@ func (l *Logger) Update(filename string, logLevel string, argv []string) {
+ 	if !configFromArgs.version {
+ 		configLogFile, err := createLogFile(filename)
+ 		if err != nil {
+-			argLogFileError = errors.Join(argLogFileError, err)
++			argLogFileError = err
+ 		}
+ 		if configLogFile != nil {
+ 			logFiles = append(logFiles, configLogFile)
+@@ -72,7 +71,7 @@ func (l *Logger) Update(filename string, logLevel string, argv []string) {
+ 		if argLogFile != nil {
+ 			logFiles = append(logFiles, argLogFile)
+ 		}
+-		argLogFileError = errors.Join(argLogFileError, err)
++		argLogFileError = err
+ 	}
+ 	defer func() {
+ 		if argLogFileError != nil {
