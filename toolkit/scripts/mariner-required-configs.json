@@ -834,7 +834,7 @@
                 ],
                 "comment": "Needed for Mellanox DPUs",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
                 ]
             },
             "CONFIG_MLXREG_HOTPLUG": {
@@ -846,7 +846,7 @@
                 ],
                 "comment": "Needed for Mellanox DPUs",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
                 ]
             },
             "CONFIG_MLXREG_IO": {
@@ -858,7 +858,7 @@
                 ],
                 "comment": "Needed for Mellanox DPUs",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
                 ]
             },
             "CONFIG_MLXBF_TMFIFO": {
@@ -870,7 +870,7 @@
                 ],
                 "comment": "Needed for Mellanox DPUs",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
                 ]
             },
             "CONFIG_MLXBF_BOOTCTL": {
@@ -882,7 +882,7 @@
                 ],
                 "comment": "Needed for Mellanox DPUs",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
                 ]
             },
             "CONFIG_MLXBF_PMC": {
@@ -894,7 +894,7 @@
                 ],
                 "comment": "Needed for Mellanox DPUs",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
                 ]
             },
             "CONFIG_MLXBF_GIGE": {
@@ -906,7 +906,7 @@
                 ],
                 "comment": "Needed for Mellanox DPUs",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
                 ]
             },
             "CONFIG_MMC_DW": {
@@ -918,7 +918,7 @@
                 ],
                 "comment": "Needed for Mellanox DPUs",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
                 ]
             },
             "CONFIG_MMC_DW_PLTFM": {
@@ -930,7 +930,7 @@
                 ],
                 "comment": "Needed for Mellanox DPUs",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
                 ]
             },
             "CONFIG_MMC_DW_BLUEFIELD": {
@@ -942,7 +942,7 @@
                 ],
                 "comment": "Needed for Mellanox DPUs",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
                 ]
             },
             "CONFIG_I2C_MLXBF": {
@@ -954,7 +954,7 @@
                 ],
                 "comment": "Needed for Mellanox DPUs",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
                 ]
             },
             "CONFIG_GPIO_MLXBF2": {
@@ -966,7 +966,7 @@
                 ],
                 "comment": "Needed for Mellanox DPUs",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
                 ]
             },
 	    "CONFIG_EDAC_BLUEFIELD": {
@@ -978,7 +978,7 @@
                 ],
                 "comment": "Needed for Mellanox DPUs",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
                 ]
             },
             "CONFIG_GPIO_MLXBF": {
@@ -990,7 +990,7 @@
                 ],
                 "comment": "Needed for Mellanox DPUs",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
                 ]
             },
             "CONFIG_MLX_WDT": {
@@ -1002,7 +1002,7 @@
                 ],
                 "comment": "Needed for Mellanox DPUs",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
                 ]
             },
             "CONFIG_SENSORS_MLXREG_FAN": {
@@ -1014,7 +1014,7 @@
                 ],
                 "comment": "Needed for Mellanox DPUs",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
                 ]
             }
 
