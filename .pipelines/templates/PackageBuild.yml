@@ -71,6 +71,8 @@ steps:
       sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
         CONFIG_FILE="" \
         $delta_fetch_arg \
+        PACKAGE_BUILD_LIST="systemd mdadm" \
+        SRPM_PACK_LIST="systemd mdadm" \
         REBUILD_TOOLS=y \
         $run_check_arg
     displayName: "Build packages"
@@ -78,10 +80,12 @@ steps:
   - script: |
       sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" compress-rpms
     displayName: "Compress RPMs"
+    condition: always()
 
   - script: |
       sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" compress-srpms
     displayName: "Compress SRPMs"
+    condition: always()
 
   - bash: |
       published_artifacts_dir="${{ parameters.outputArtifactsFolder }}/ARTIFACTS"
