@@ -1,7 +1,7 @@
 Summary:        Systemd-250
 Name:           systemd
 Version:        250.3
-Release:        17%{?dist}
+Release:        18%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -283,6 +283,9 @@ fi
 %files lang -f %{name}.lang
 
 %changelog
+* Fri Jul 28 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 250.3-18
+- Update to trigger build.
+
 * Fri Jul 07 2023 Dan Streetman <ddstreet@ieee.org> - 250.3-17
 - Add support to systemd-resolved to serve stale dns data
 
