@@ -2,7 +2,7 @@
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        8.9p1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,6 +17,7 @@ Patch0:         blfs_systemd_fixes.patch
 # Community agreed to not patch this
 Patch100:       CVE-2007-2768.nopatch
 Patch101:       CVE-2023-28531-upstream-include-destination-constraints-for-smartca.patch
+Patch102:       CVE-2023-38408
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  groff
 BuildRequires:  krb5-devel
@@ -62,6 +63,7 @@ This provides the ssh server daemons, utilities, configuration and service files
 tar xf %{SOURCE1} --no-same-owner
 %patch0
 %patch101 -p1
+%patch102 -p2 -b .cve-2023-38408
 
 %build
 %configure \
@@ -187,6 +189,9 @@ rm -rf %{buildroot}/*
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
+* Fri Jul 28 2023 Riken Maharjan <rmaharjan@microsoft.com> - 8.9p1-3
+- Fix CVE-2023-38408
+
 * Fri Jun 09 2023 Dan Streetman <ddstreet@ieee.org> - 8.9p1-2
 - Fix ssh-add/ssh-agent smartcard handling for CVE-2023-28531
 
