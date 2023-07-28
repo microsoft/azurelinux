@@ -64,11 +64,12 @@ Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
 Requires(postun): coreutils
+# Conflicts is not required for kernel-uvm or kernel-mshv
+# because they have specialized ".mshv" versions of the kernel
+# and do not produce generic subpackages python3-perf or bpftool
 Conflicts:      kernel
 Conflicts:      kernel-hci
 Conflicts:      kernel-rt
-Conflicts:      kernel-mshv
-Conflicts:      kernel-uvm
 # When updating the config files it is important to sanitize them.
 # Steps for updating a config file:
 #  1. Extract the linux sources into a folder
