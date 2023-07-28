@@ -17,7 +17,7 @@ Patch0:         blfs_systemd_fixes.patch
 # Community agreed to not patch this
 Patch100:       CVE-2007-2768.nopatch
 Patch101:       CVE-2023-28531-upstream-include-destination-constraints-for-smartca.patch
-Patch102:       CVE-2023-38408
+Patch102:       CVE-2023-38408.patch
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  groff
 BuildRequires:  krb5-devel
