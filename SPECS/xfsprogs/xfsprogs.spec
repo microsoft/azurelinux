@@ -1,7 +1,7 @@
 Summary:        Utilities for managing the XFS filesystem
 Name:           xfsprogs
-Version:        5.0.0
-Release:        3%{?dist}
+Version:        5.15.0
+Release:        1%{?dist}
 License:        GPL+ and LGPLv2+
 URL:            http://oss.sgi.com/projects/xfs/
 Group:          System Environment/Base
@@ -10,6 +10,8 @@ Distribution:   Mariner
 Source0:        https://kernel.org/pub/linux/utils/fs/xfs/xfsprogs/%{name}-%{version}.tar.xz
 BuildRequires:  gettext
 BuildRequires:  readline-devel
+BuildRequires:  inih-devel
+BuildRequires:  userspace-rcu-devel
 
 %description
 The xfsprogs package contains administration and debugging tools for the
@@ -70,7 +72,9 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_mandir}/man8/*
 %{_mandir}/man5/*
 %{_sbindir}/*
+%{_datadir}/%{name}/mkfs/lts_5.15.conf
 %exclude %{_docdir}/%{name}-%{version}/CHANGES.gz
+%exclude %{_datadir}/%{name}/mkfs/*.conf
 
 %files devel
 %defattr(-,root,root)
@@ -84,6 +88,9 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %defattr(-,root,root)
 
 %changelog
+* Fri Dec 28 2023 Andy Zaugg <azaugg@linkedin.com> - 5.15-1
+- Updated to version 5.15
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.0.0-3
 - Removing the explicit %%clean stage.
 
