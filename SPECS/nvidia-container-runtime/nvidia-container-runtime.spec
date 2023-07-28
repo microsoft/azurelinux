@@ -10,7 +10,7 @@ URL:            https://github.com/NVIDIA/nvidia-container-runtime
 #Source0:       https://github.com/NVIDIA/%%{name}/archive/v%%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 Obsoletes: nvidia-container-runtime < 2.0.0
-Requires: nvidia-container-toolkit >= 1.13.3, nvidia-container-toolkit < 2.0.0
+Requires: nvidia-container-toolkit >= 1.13.5, nvidia-container-toolkit < 2.0.0
 Requires:       libseccomp
 # NVIDIA now includes the runtime within the toolkit installs itself.
 # Previously there were independent installs of the runtime and the toolkit
@@ -34,7 +34,7 @@ containers.
 %changelog
 * Mon Jul 10 2023 Henry Li <lihl@microsoft.com> - 3.13.0-1
 - Upgrade to version 3.13.0
-- Add nvidia-container-toolkit minimum version 1.13.3 dependency
+- Add nvidia-container-toolkit minimum version 1.13.5 dependency
 
 * Wed Sep 21 2022 Henry Li <lihl@microsoft.com> - 3.11.0-1
 - Upgrade to version 3.11.0
