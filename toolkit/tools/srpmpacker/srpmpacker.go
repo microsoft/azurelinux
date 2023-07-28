@@ -773,6 +773,7 @@ func packSRPMs(specStates []*specState, distTag, buildDir string, templateSrcCon
 			logger.Log.Errorf("Failed to pack (%s). Error: %s", result.specFile, result.err)
 			err = result.err
 			close(cancel)
+			logger.Log.Warnf("Waiting for outstanding workers to finish...")
 			break
 		}
 
