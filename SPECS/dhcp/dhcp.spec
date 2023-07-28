@@ -1,11 +1,12 @@
 Summary:        Dynamic host configuration protocol
 Name:           dhcp
 Version:        4.4.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MPLv2.0
 Url:            https://www.isc.org/dhcp/
 Source0:        ftp://ftp.isc.org/isc/dhcp/%{version}/%{name}-%{version}.tar.gz
 Patch1:         CVE-2021-25217.patch
+Patch2:         CVE-2023-2828.patch
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -38,8 +39,14 @@ The ISC DHCP Client, dhclient, provides a means for configuring one or more netw
 
 
 %prep
-%autosetup -p1
-
+%setup -q
+%patch1 -p1
+tar xf bind/bind.tar.gz
+pushd bind-9.11.14
+%patch2 -p1
+popd
+tar zcf bind/bind.tar.gz bind-9.11.14
+rm -rf bind-9.11.14
 %setup -qn %{name}-%{version}
 
 %build
@@ -170,6 +177,8 @@ mkdir -p %{buildroot}%{_localstatedir}/lib/dhclient/
 %{_mandir}/man8/dhclient.8.gz
 
 %changelog
+*   Fri Jul 28 2023 Suresh Thelkar <sthelkar@microsoft.com> 4.4.2-3
+-   Patch to fix CVE-2023-2828.
 *   Wed May 26 2021 Jon Slobodzian <joslobo@microsoft.com> 4.4.2-2
 -   Patch to fix CVE-2021-25217.
 *   Thu May 28 2020 Nicolas Ontiveros <niontive@microsoft.com> 4.4.2-1
