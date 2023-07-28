@@ -1,18 +1,26 @@
 parameters:
-  - name: buildArtifactsFolder
-    type: string
-    default: "$(Build.ArtifactStagingDirectory)"
-
-  - name: coreRepoRoot
+  - name: buildRepoRoot
     type: string
     default: "$(Build.SourcesDirectory)"
 
+  - name: outputArtifactsFolder
+    type: string
+    default: "$(Build.ArtifactStagingDirectory)"
+
+  - name: selfRepoName
+    type: string
+    default: "CBL-Mariner"
+
 steps:
-  - bash: sudo make -C "${{ parameters.coreRepoRoot }}/toolkit" "-j$(nproc)" toolchain QUICK_REBUILD=y
+  - template: ToolkitCheck.yml@${{ parameters.selfRepoName }}
+    parameters:
+      buildRepoRoot: ${{ parameters.buildRepoRoot }}
+
+  - bash: sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" "-j$(nproc)" toolchain QUICK_REBUILD=y
     displayName: "Build toolchain"
 
   - bash: |
-      failed_rpms_log="${{ parameters.coreRepoRoot }}/build/logs/toolchain/failures.txt"
+      failed_rpms_log="${{ parameters.buildRepoRoot }}/build/logs/toolchain/failures.txt"
 
       if [[ -f "$failed_rpms_log" ]]; then
           echo "List of RPMs that failed to build:" >&2
@@ -24,15 +32,14 @@ steps:
     displayName: "Print failed RPMs"
 
   - bash: |
-      published_artifacts_dir="${{ parameters.buildArtifactsFolder }}/ARTIFACTS"
+      published_artifacts_dir="${{ parameters.outputArtifactsFolder }}/ARTIFACTS"
       mkdir -p "$published_artifacts_dir"
-      cp "${{ parameters.coreRepoRoot }}"/build/toolchain/toolchain_built_{,s}rpms_all.tar.gz "$published_artifacts_dir"
-    condition: succeeded()
+      cp "${{ parameters.buildRepoRoot }}"/build/toolchain/toolchain_built_{,s}rpms_all.tar.gz "$published_artifacts_dir"
     displayName: "Copy artifacts for publishing"
 
   - bash: |
-      published_logs_dir="${{ parameters.buildArtifactsFolder }}/LOGS"
+      published_logs_dir="${{ parameters.outputArtifactsFolder }}/LOGS"
       mkdir -p "$published_logs_dir"
-      tar -C "${{ parameters.coreRepoRoot }}/build/logs/toolchain" -czf "$published_logs_dir/toolchain.logs.tar.gz" .
+      tar -C "${{ parameters.buildRepoRoot }}/build/logs/toolchain" -czf "$published_logs_dir/toolchain.logs.tar.gz" .
     condition: always()
     displayName: "Copy logs for publishing"

@@ -105,14 +105,14 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 		}
 
 		switch req.Node.Type {
-		case pkggraph.TypeBuild:
+		case pkggraph.TypeLocalBuild:
 			res.UsedCache, res.Skipped, res.BuiltFiles, res.LogFile, res.Err = buildBuildNode(req.Node, req.PkgGraph, graphMutex, agent, req.CanUseCache, buildAttempts, checkAttempts, ignoredPackages)
 			if res.Err == nil {
 				setAncillaryBuildNodesStatus(req, pkggraph.StateUpToDate)
 			} else {
 				setAncillaryBuildNodesStatus(req, pkggraph.StateBuildError)
 			}
-		case pkggraph.TypeRun, pkggraph.TypeGoal, pkggraph.TypeRemote, pkggraph.TypePureMeta, pkggraph.TypePreBuilt:
+		case pkggraph.TypeLocalRun, pkggraph.TypeGoal, pkggraph.TypeRemoteRun, pkggraph.TypePureMeta, pkggraph.TypePreBuilt:
 			res.UsedCache = req.CanUseCache
 
 		case pkggraph.TypeUnknown:
@@ -173,7 +173,7 @@ func getBuildDependencies(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, g
 	// Skip traversing any build nodes to avoid other package's buildrequires.
 	search.Traverse = func(e graph.Edge) bool {
 		toNode := e.To().(*pkggraph.PkgNode)
-		return toNode.Type != pkggraph.TypeBuild
+		return toNode.Type != pkggraph.TypeLocalBuild
 	}
 
 	search.Walk(pkgGraph, node, func(n graph.Node, d int) (stopSearch bool) {
@@ -189,7 +189,7 @@ func getBuildDependencies(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, g
 		return
 	})
 
-	dependencies = sliceutils.StringsSetToSlice(dependencyLookup)
+	dependencies = sliceutils.SetToSlice(dependencyLookup)
 
 	return
 }
@@ -265,7 +265,7 @@ func buildSRPMFile(agent buildagents.BuildAgent, buildAttempts int, checkAttempt
 // setAncillaryBuildNodesStatus sets the NodeState for all of the request's ancillary nodes.
 func setAncillaryBuildNodesStatus(req *BuildRequest, nodeState pkggraph.NodeState) {
 	for _, node := range req.AncillaryNodes {
-		if node.Type == pkggraph.TypeBuild {
+		if node.Type == pkggraph.TypeLocalBuild {
 			node.State = nodeState
 		}
 	}

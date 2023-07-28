@@ -1,7 +1,7 @@
 Summary:        Configuration-management, application deployment, cloud provisioning system
 Name:           ansible
 Version:        2.12.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,6 +20,7 @@ Requires:       python3
 Requires:       python3-libs
 Requires:       python3-yamlloader
 Requires:       python3-jinja2
+Requires:       python3-resolvelib
 
 BuildArch:      noarch
 
@@ -46,7 +47,10 @@ python3 setup.py test
 %{python3_sitelib}/*
 
 %changelog
-* Mon Jan 31 2022 Thomas Crain <thcrain@microsoft.com> - 2.12.1-2
+* Mon Jun 26 2023 Sam Meluch <sammeluch@microsoft.com> - 2.12.1-3
+- add python-resolvelib dependency to fix ansible-galaxy
+
+* Mon Jan 31 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.12.1-2
 - Remove python-setuptools in favor of python3-setuptools
 
 * Tue Jan 04 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 2.12.1-1
