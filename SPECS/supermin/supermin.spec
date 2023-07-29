@@ -21,7 +21,7 @@
 Summary:        Tool for creating supermin appliances
 Name:           supermin
 Version:        5.2.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -54,7 +54,7 @@ BuildRequires:  systemd-udev
 %if %{with dietlibc}
 BuildRequires:  dietlibc-devel
 %else
-BuildRequires:  glibc-static >= 2.35-3%{?dist}
+BuildRequires:  glibc-static >= 2.35-4%{?dist}
 %endif
 
 %if %{with_check}
@@ -129,6 +129,9 @@ make check || {
 %{_rpmconfigdir}/supermin-find-requires
 
 %changelog
+* Wed Jul 05 2023 Andrew Phelps <anphel@microsoft.com> - 5.2.1-5
+- Bump release to rebuild against glibc 2.35-4
+
 * Tue Sep 13 2022 Andy Caldwell <andycaldwell@microsoft.com> - 5.2.1-4
 - Rebuilt for glibc-static 2.35-3
 

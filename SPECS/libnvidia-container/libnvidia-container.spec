@@ -135,6 +135,9 @@ This package contains command-line tools that facilitate using the library.
 * Wed Sep 21 2022 Henry Li <lihl@microsoft.com> - 1.13.5-1
 - Upgrade to version 1.13.5
 
+* Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.11.0-10
+- Bump release to rebuild with go 1.19.11
+
 * Thu Jun 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.11.0-9
 - Bump release to rebuild with go 1.19.10
 
