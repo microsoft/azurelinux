@@ -14,6 +14,8 @@ $(call create_folder,$(BUILD_DIR)/tools)
 # Host's extended ACLs influence the default permissions of the
 # files inside the built RPMs. Disabling them for the build directory.
 $(call shell_real_build_only, setfacl -bn $(BUILD_DIR))
+$(call shell_real_build_only, setfacl -bn $(OUT_DIR))
+$(call shell_real_build_only, setfacl -bn $(toolkit_root))
 
 ######## GO TOOLS ########
 
