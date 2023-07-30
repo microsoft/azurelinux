@@ -71,8 +71,8 @@ steps:
       sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
         CONFIG_FILE="" \
         $delta_fetch_arg \
-        PACKAGE_BUILD_LIST="apparmor" \
-        PACKAGE_REBUILD_LIST="apparmor" \
+        PACKAGE_BUILD_LIST="apparmor cri-o" \
+        PACKAGE_REBUILD_LIST="apparmor cri-o" \
         SRPM_PACK_LIST="apparmor cri-o" \
         REBUILD_TOOLS=y \
         $run_check_arg
