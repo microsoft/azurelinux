@@ -176,6 +176,9 @@ chmod 000 %{_sysconfdir}/shadow
 %{_libdir}/libsubid.so
 
 %changelog
+* Mon Jul 31 2023 Richard Whitehouse <richard.whitehouse@microsoft.com> - 4.9-13
+- Increase SHA-512 rounds to match OWASP guidance
+
 * Wed May 24 2023 Tobias Brick <tobiasb@microsoft.com> - 4.9-12
 - Add SETUID bit to passwd binary
 
