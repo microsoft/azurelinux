@@ -7,7 +7,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.35
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD AND GPLv2+ AND Inner-Net AND ISC AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -150,6 +150,7 @@ cd %{_builddir}/%{name}-build
         --enable-bind-now \
         --enable-static-pie \
         --disable-experimental-malloc \
+        --enable-extra-encodings \
 %ifarch x86_64
         --enable-cet \
 %endif
@@ -319,6 +320,9 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %defattr(-,root,root)
 
 %changelog
+* Mon Jul 31 2023 Archana Chouhdary <archana1@microsoft.com> - 2.35-5
+- Added '--enable-extra-encodings' flag to configure stage
+
 * Fri Jun 30 2023 Andrew Phelps <anphel@microsoft.com> - 2.35-4
 - Restore glibc-debuginfo package
 
