@@ -71,8 +71,9 @@ steps:
       sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
         CONFIG_FILE="" \
         $delta_fetch_arg \
-        PACKAGE_BUILD_LIST="systemd mdadm" \
-        SRPM_PACK_LIST="systemd mdadm" \
+        PACKAGE_BUILD_LIST="apparmor" \
+        PACKAGE_REBUILD_LIST="apparmor" \
+        SRPM_PACK_LIST="apparmor cri-o" \
         REBUILD_TOOLS=y \
         $run_check_arg
     displayName: "Build packages"
