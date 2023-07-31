@@ -230,16 +230,41 @@ FinalizeImageScripts provide the opportunity to run shell scripts to customize t
 
 ### AdditionalFiles
 
-The `AdditionalFiles` list provides a mechanism to add arbitrary files to the image. The elemments are are `"src": "dst"` pairs. `src` is relative to the image config `.json` file, while `dst` is an absolute path on the installed system.
+The `AdditionalFiles` list provides a mechanism to add arbitrary files to the image. The elements are are `"src": "dst"` pairs. `src` is relative to the image config `.json` file, while `dst` is an absolute path on the installed system.
 
-ISO installers will include the files on the installation media and will place them  into the final installed image.
+The `dst` can be one of:
+
+- A string representing the destination absolute path, OR
+- A object (`FileConfig`) containing the destination absolute path and other file options, OR
+- An array containing a mixture of strings and objects, which allows a single source file to be copied to multiple destination paths.
+
+ISO installers will include the files on the installation media and will place them into the final installed image.
 
 ```json
     "AdditionalFiles": [
         "../../out/tools/imager": "/installer/imager",
-        "additionalconfigs": "/etc/my/config.conf"
+        "additionalconfigs": [
+            "/etc/my/config.conf",
+            {
+                "Path": "/etc/yours/config.conf",
+                "Permissions": "664"
+            }
+        ]
     ]
 ```
+
+#### FileConfig
+
+`FileConfig` provides options to modify metadata of files copied using `AdditionalFiles`.
+
+Fields:
+
+- `Path`: The destination absolute path.
+- `Permissions`: The file permissions to apply to the file.
+
+  Supported value formats:
+
+  - Octal string: A JSON string containing an octal number. e.g. `"664"`
 
 ### Networks
 
