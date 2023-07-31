@@ -98,7 +98,9 @@ cmake -DCMAKE_BUILD_TYPE=Release                        \
       -DMYSQL_UNIX_ADDR="%{_sharedstatedir}/mysql/mysqld.sock" \
       -DWITH_EXTRA_CHARSETS=complex                     \
       -DWITH_EMBEDDED_SERVER=ON                         \
+      -DWITH_PCRE=system                                \
       -DWITH_SSL=system                                 \
+      -DWITH_ZLIB=system                                \
       -DSKIP_TESTS=ON                                   \
       -DTOKUDB_OK=0                                     \
       -DUPDATE_SUBMODULES=OFF                           \
@@ -461,7 +463,7 @@ fi
 
 %changelog
 * Mon Jul 31 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 10.6.9-4
-- Changing the SSL library to the system one instead of the bundled wolfSSL.
+- Explicitly using the system versions of PCRE2, openSSL, and zlib.
 
 * Thu Feb 09 2023 Rachel Menge <rachelmenge@microsoft.com> - 10.6.9-3
 - Add patch for CVE-2022-47015
