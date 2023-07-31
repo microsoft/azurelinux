@@ -72,7 +72,6 @@ func TestCopyAdditionalFiles(t *testing.T) {
 
 	defer chroot.Close(false)
 
-	orig_filemode := os.FileMode(0o644)
 	copy_2_filemode := os.FileMode(0o777)
 
 	err = copyAdditionalFilesHelper(chroot, map[string]configuration.FileConfigList{
@@ -87,19 +86,22 @@ func TestCopyAdditionalFiles(t *testing.T) {
 	copy_2_path := filepath.Join(dir, "a_copy_2.txt")
 
 	// Make sure the files exist.
-	orig_info, err := os.Stat("testdata/a.txt")
+	orig_stat, err := os.Stat("testdata/a.txt")
 	assert.NoError(t, err)
 
-	copy_1_info, err := os.Stat(copy_1_path)
+	copy_1_stat, err := os.Stat(copy_1_path)
 	assert.NoError(t, err)
 
-	copy_2_info, err := os.Stat(copy_2_path)
+	copy_2_stat, err := os.Stat(copy_2_path)
 	assert.NoError(t, err)
+
+	// Make sure the filemode of the original file is different from the target filemode,
+	// as otherwise it would defeat the purpose of the test.
+	assert.NotEqual(t, copy_2_filemode, orig_stat.Mode()&os.ModePerm)
 
 	// Make sure the file permissions are the expected values.
-	assert.Equal(t, orig_filemode, orig_info.Mode()&os.ModePerm)
-	assert.Equal(t, orig_filemode, copy_1_info.Mode()&os.ModePerm)
-	assert.Equal(t, copy_2_filemode, copy_2_info.Mode()&os.ModePerm)
+	assert.Equal(t, orig_stat.Mode()&os.ModePerm, copy_1_stat.Mode()&os.ModePerm)
+	assert.Equal(t, copy_2_filemode, copy_2_stat.Mode()&os.ModePerm)
 
 	// Make sure the files' contents are correct.
 	orig_contents, err := os.ReadFile("testdata/a.txt")
