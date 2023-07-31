@@ -23,7 +23,6 @@ BuildRequires:  libpcap-devel
 BuildRequires:  llvm-devel >= 12.0.1-1
 BuildRequires:  make
 BuildRequires:  systemtap-sdt-devel
-BuildRequires:  vim-extra
 BuildRequires:  zlib-devel
 Requires:       bcc
 Requires:       binutils

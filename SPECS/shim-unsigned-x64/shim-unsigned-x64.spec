@@ -17,7 +17,6 @@ Patch3:         mok-allocate-MOK-config-table-as-BootServicesData.patch
 Patch4:         shim-another-attempt-to-fix-load-options-handling.patch
 Patch5:         Relax-the-check-for-import_mok_state.patch
 BuildRequires:  dos2unix
-BuildRequires:  vim-extra
 ExclusiveArch:  x86_64
 
 %description

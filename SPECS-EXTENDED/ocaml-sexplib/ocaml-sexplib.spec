@@ -24,9 +24,6 @@ BuildRequires:  ocaml-findlib
 BuildRequires:  ocaml-num-devel
 BuildRequires:  ocaml-parsexp-devel
 BuildRequires:  ocaml-sexplib0-devel
-%if %{with vim}
-BuildRequires:  vim-filesystem
-%endif
 
 %description
 This package contains a library for serializing OCaml values to and from
@@ -46,7 +43,6 @@ developing applications that use %{name}.
 %package        vim
 Summary:        Support for sexplib syntax in vim
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       vim-filesystem
 
 %description    vim
 This package contains a vim syntax file for Sexplib.

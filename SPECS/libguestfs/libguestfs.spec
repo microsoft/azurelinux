@@ -172,7 +172,6 @@ BuildRequires:  udev
 BuildRequires:  unzip
 BuildRequires:  util-linux
 BuildRequires:  vala
-BuildRequires:  vim
 BuildRequires:  which
 BuildRequires:  xfsprogs
 BuildRequires:  xz
