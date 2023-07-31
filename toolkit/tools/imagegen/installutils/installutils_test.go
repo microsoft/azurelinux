@@ -72,7 +72,7 @@ func TestCopyAdditionalFiles(t *testing.T) {
 
 	defer chroot.Close(false)
 
-	orig_filemode := os.FileMode(0o664)
+	orig_filemode := os.FileMode(0o644)
 	copy_2_filemode := os.FileMode(0o777)
 
 	err = copyAdditionalFilesHelper(chroot, map[string]configuration.FileConfigList{
