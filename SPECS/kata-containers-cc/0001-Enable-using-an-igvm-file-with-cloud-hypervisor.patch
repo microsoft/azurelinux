@@ -1,0 +1,431 @@
+From 4f3d39c4a536e4ddfcecd79cd465e313b6c9ec79 Mon Sep 17 00:00:00 2001
+From: Dallas Delaney <dadelan@microsoft.com>
+Date: Thu, 29 Jun 2023 00:19:46 +0000
+Subject: [PATCH] Enable using an igvm file with cloud-hypervisor
+
+---
+ src/runtime/pkg/katautils/config.go           | 35 ++++++++++++++++--
+ src/runtime/virtcontainers/clh.go             | 37 +++++++++++++------
+ src/runtime/virtcontainers/hypervisor.go      | 13 +++++++
+ .../virtcontainers/hypervisor_config_linux.go |  8 ++--
+ .../pkg/annotations/annotations.go            |  5 +++
+ .../cloud-hypervisor/client/api/openapi.yaml  |  5 +++
+ .../client/model_payload_config.go            | 37 +++++++++++++++++++
+ .../cloud-hypervisor/cloud-hypervisor.yaml    |  2 +
+ src/runtime/virtcontainers/types/asset.go     |  6 +++
+ 9 files changed, 129 insertions(+), 19 deletions(-)
+
+diff --git a/src/runtime/pkg/katautils/config.go b/src/runtime/pkg/katautils/config.go
+index 51bf23a29..c70420419 100644
+--- a/src/runtime/pkg/katautils/config.go
++++ b/src/runtime/pkg/katautils/config.go
+@@ -78,6 +78,7 @@ type factory struct {
+ }
+ 
+ type hypervisor struct {
++	Igvm                           string   `toml:"igvm"`
+ 	Path                           string   `toml:"path"`
+ 	JailerPath                     string   `toml:"jailer_path"`
+ 	Kernel                         string   `toml:"kernel"`
+@@ -244,11 +245,25 @@ func (h hypervisor) jailerPath() (string, error) {
+ 	return ResolvePath(p)
+ }
+ 
++func (h hypervisor) igvm() (string, error) {
++	p := h.Igvm
++
++	if p == "" {
++		return "", nil
++	}
++
++	return ResolvePath(p)
++}
++
+ func (h hypervisor) kernel() (string, error) {
+ 	p := h.Kernel
+ 
+ 	if p == "" {
+-		p = defaultKernelPath
++		if h.Igvm == "" {
++			p = defaultKernelPath
++		} else {
++			return "", nil
++		}
+ 	}
+ 
+ 	return ResolvePath(p)
+@@ -987,9 +1002,9 @@ func newClhHypervisorConfig(h hypervisor) (vc.HypervisorConfig, error) {
+ 		return vc.HypervisorConfig{}, err
+ 	}
+ 
+-	if image == "" && initrd == "" {
+-		return vc.HypervisorConfig{},
+-			errors.New("image or initrd must be defined in the configuration file")
++	igvm, err := h.igvm()
++	if err != nil {
++		return vc.HypervisorConfig{}, err
+ 	}
+ 
+ 	rootfsType, err := h.rootfsType()
+@@ -997,6 +1012,11 @@ func newClhHypervisorConfig(h hypervisor) (vc.HypervisorConfig, error) {
+ 		return vc.HypervisorConfig{}, err
+ 	}
+ 
++	if image == "" && initrd == "" && igvm == "" {
++		return vc.HypervisorConfig{},
++			errors.New("image, initrd, or igvm must be defined in the configuration file")
++	}
++
+ 	firmware, err := h.firmware()
+ 	if err != nil {
+ 		return vc.HypervisorConfig{}, err
+@@ -1031,6 +1051,7 @@ func newClhHypervisorConfig(h hypervisor) (vc.HypervisorConfig, error) {
+ 		KernelPath:                     kernel,
+ 		InitrdPath:                     initrd,
+ 		ImagePath:                      image,
++		IgvmPath:                       igvm,
+ 		RootfsType:                     rootfsType,
+ 		FirmwarePath:                   firmware,
+ 		MachineAccelerators:            machineAccelerators,
+@@ -1163,6 +1184,8 @@ func updateRuntimeConfigHypervisor(configPath string, tomlConf tomlConfig, confi
+ 		case clhHypervisorTableType:
+ 			config.HypervisorType = vc.ClhHypervisor
+ 			hConfig, err = newClhHypervisorConfig(hypervisor)
++
++
+ 		case dragonballHypervisorTableType:
+ 			config.HypervisorType = vc.DragonballHypervisor
+ 			hConfig, err = newDragonballHypervisorConfig(hypervisor)
+@@ -1207,6 +1230,10 @@ func SetKernelParams(runtimeConfig *oci.RuntimeConfig) error {
+ 		kataUtilsLogger.WithField("default-kernel-parameters", formatted).Debug()
+ 	}
+ 
++	strParams := vc.SerializeParams(defaultKernelParams, "=")
++	formatted := strings.Join(strParams, " ")
++	kataUtilsLogger.WithField("default-kernel-parameters", formatted).Debug()
++
+ 	// retrieve the parameters specified in the config file
+ 	userKernelParams := runtimeConfig.HypervisorConfig.KernelParams
+ 
+diff --git a/src/runtime/virtcontainers/clh.go b/src/runtime/virtcontainers/clh.go
+index 95917f3a8..24cd1e967 100644
+--- a/src/runtime/virtcontainers/clh.go
++++ b/src/runtime/virtcontainers/clh.go
+@@ -476,12 +476,21 @@ func (clh *cloudHypervisor) CreateVM(ctx context.Context, id string, network Net
+ 	// Create the VM config via the constructor to ensure default values are properly assigned
+ 	clh.vmconfig = *chclient.NewVmConfig(*chclient.NewPayloadConfig())
+ 
+-	// Make sure the kernel path is valid
+-	kernelPath, err := clh.config.KernelAssetPath()
++	// Make sure the igvm path is valid
++	igvmPath, err := clh.config.IgvmAssetPath()
+ 	if err != nil {
+ 		return err
+ 	}
+-	clh.vmconfig.Payload.SetKernel(kernelPath)
++	clh.vmconfig.Payload.SetIgvm(igvmPath)
++
++	// Make sure the kernel path is valid if no igvm set
++	if igvmPath == "" {
++		kernelPath, err := clh.config.KernelAssetPath()
++		if err != nil {
++			return err
++		}
++		clh.vmconfig.Payload.SetKernel(kernelPath)
++	}
+ 
+ 	if clh.config.ConfidentialGuest {
+ 		if err := clh.enableProtection(); err != nil {
+@@ -495,7 +504,7 @@ func (clh *cloudHypervisor) CreateVM(ctx context.Context, id string, network Net
+ 	clh.vmconfig.Memory.Shared = func(b bool) *bool { return &b }(true)
+ 	// Enable hugepages if needed
+ 	clh.vmconfig.Memory.Hugepages = func(b bool) *bool { return &b }(clh.config.HugePages)
+-	if !clh.config.ConfidentialGuest {
++	if !clh.config.ConfidentialGuest && igvmPath == "" {
+ 		hotplugSize := clh.config.DefaultMaxMemorySize
+ 		// OpenAPI only supports int64 values
+ 		clh.vmconfig.Memory.HotplugSize = func(i int64) *int64 { return &i }(int64((utils.MemUnit(hotplugSize) * utils.MiB).ToBytes()))
+@@ -525,7 +534,10 @@ func (clh *cloudHypervisor) CreateVM(ctx context.Context, id string, network Net
+ 	// Followed by extra kernel parameters defined in the configuration file
+ 	params = append(params, clh.config.KernelParams...)
+ 
+-	clh.vmconfig.Payload.SetCmdline(kernelParamsToString(params))
++	// Set kernel cmdline if no IGVM file set
++	if igvmPath == "" {
++		clh.vmconfig.Payload.SetCmdline(kernelParamsToString(params))
++	}
+ 
+ 	// set random device generator to hypervisor
+ 	clh.vmconfig.Rng = chclient.NewRngConfig(clh.config.EntropySource)
+@@ -561,12 +573,14 @@ func (clh *cloudHypervisor) CreateVM(ctx context.Context, id string, network Net
+ 				clh.vmconfig.Pmem = &[]chclient.PmemConfig{*pmem}
+ 			}
+ 		}
+-	} else {
+-		initrdPath, err := clh.config.InitrdAssetPath()
+-		if err != nil {
+-			return err
+-		}
++	} 
++	
++	initrdPath, err := clh.config.InitrdAssetPath()
++	if err != nil {
++		return err
++	}
+ 
++	if initrdPath != "" {
+ 		clh.vmconfig.Payload.SetInitramfs(initrdPath)
+ 	}
+ 
+@@ -1317,6 +1331,7 @@ func (clh *cloudHypervisor) launchClh() (int, error) {
+ 	}
+ 
+ 	args := []string{cscAPIsocket, clh.state.apiSocket}
++
+ 	if clh.config.Debug {
+ 		// Cloud hypervisor log levels
+ 		// 'v' occurrences increase the level
+@@ -1348,9 +1363,9 @@ func (clh *cloudHypervisor) launchClh() (int, error) {
+ 	}
+ 
+ 	clh.Logger().WithField("path", clhPath).Info()
+-	clh.Logger().WithField("args", strings.Join(args, " ")).Info()
+ 
+ 	cmdHypervisor := exec.Command(clhPath, args...)
++
+ 	if clh.config.Debug {
+ 		cmdHypervisor.Env = os.Environ()
+ 		cmdHypervisor.Env = append(cmdHypervisor.Env, "RUST_BACKTRACE=full")
+diff --git a/src/runtime/virtcontainers/hypervisor.go b/src/runtime/virtcontainers/hypervisor.go
+index d0ecb1259..7c23db734 100644
+--- a/src/runtime/virtcontainers/hypervisor.go
++++ b/src/runtime/virtcontainers/hypervisor.go
+@@ -317,6 +317,7 @@ type HypervisorConfig struct {
+ 	KernelPath                     string
+ 	ImagePath                      string
+ 	InitrdPath                     string
++	IgvmPath                       string
+ 	FirmwarePath                   string
+ 	FirmwareVolumePath             string
+ 	MachineAccelerators            string
+@@ -493,6 +494,8 @@ func (conf *HypervisorConfig) assetPath(t types.AssetType) (string, error) {
+ 		return conf.KernelPath, nil
+ 	case types.ImageAsset:
+ 		return conf.ImagePath, nil
++	case types.IgvmAsset:
++		return conf.IgvmPath, nil
+ 	case types.InitrdAsset:
+ 		return conf.InitrdPath, nil
+ 	case types.HypervisorAsset:
+@@ -535,6 +538,16 @@ func (conf *HypervisorConfig) CustomImageAsset() bool {
+ 	return conf.isCustomAsset(types.ImageAsset)
+ }
+ 
++// IgvmAssetPath returns the guest image path
++func (conf *HypervisorConfig) IgvmAssetPath() (string, error) {
++	return conf.assetPath(types.IgvmAsset)
++}
++
++// CustomIgvmAsset returns true if the image asset is a custom one, false otherwise.
++func (conf *HypervisorConfig) CustomIgvmAsset() bool {
++	return conf.isCustomAsset(types.IgvmAsset)
++}
++
+ // InitrdAssetPath returns the guest initrd path
+ func (conf *HypervisorConfig) InitrdAssetPath() (string, error) {
+ 	return conf.assetPath(types.InitrdAsset)
+diff --git a/src/runtime/virtcontainers/hypervisor_config_linux.go b/src/runtime/virtcontainers/hypervisor_config_linux.go
+index 4a2d33e20..5aa57ae11 100644
+--- a/src/runtime/virtcontainers/hypervisor_config_linux.go
++++ b/src/runtime/virtcontainers/hypervisor_config_linux.go
+@@ -17,8 +17,8 @@ func validateHypervisorConfig(conf *HypervisorConfig) error {
+ 		return nil
+ 	}
+ 
+-	if conf.KernelPath == "" {
+-		return fmt.Errorf("Missing kernel path")
++	if conf.KernelPath == "" && conf.IgvmPath == "" {
++		return fmt.Errorf("Missing kernel and igvm path")
+ 	}
+ 
+ 	if conf.ConfidentialGuest && conf.HypervisorMachineType == QemuCCWVirtio {
+@@ -26,8 +26,8 @@ func validateHypervisorConfig(conf *HypervisorConfig) error {
+ 			fmt.Println("yes, failing")
+ 			return fmt.Errorf("Neither the image or initrd path may be set for Secure Execution")
+ 		}
+-	} else if conf.ImagePath == "" && conf.InitrdPath == "" {
+-		return fmt.Errorf("Missing image and initrd path")
++	} else if conf.ImagePath == "" && conf.InitrdPath == "" && conf.IgvmPath == "" {
++		return fmt.Errorf("Missing image, initrd, and igvm path")
+ 	} else if conf.ImagePath != "" && conf.InitrdPath != "" {
+ 		return fmt.Errorf("Image and initrd path cannot be both set")
+ 	}
+diff --git a/src/runtime/virtcontainers/pkg/annotations/annotations.go b/src/runtime/virtcontainers/pkg/annotations/annotations.go
+index e4c201a00..876f8b7a2 100644
+--- a/src/runtime/virtcontainers/pkg/annotations/annotations.go
++++ b/src/runtime/virtcontainers/pkg/annotations/annotations.go
+@@ -37,6 +37,9 @@ const (
+ 	// ImagePath is a sandbox annotation for passing a per container path pointing at the guest image that will run in the container VM.
+ 	ImagePath = kataAnnotHypervisorPrefix + "image"
+ 
++	// ImagePath is a sandbox annotation for passing a per container path pointing at the guest image that will run in the container VM.
++	IgvmPath = kataAnnotHypervisorPrefix + "igvm"
++	
+ 	// InitrdPath is a sandbox annotation for passing a per container path pointing at the guest initrd image that will run in the container VM.
+ 	InitrdPath = kataAnnotHypervisorPrefix + "initrd"
+ 
+@@ -65,6 +68,8 @@ const (
+ 	// ImageHash is an sandbox annotation for passing a container guest image SHA-512 hash value.
+ 	ImageHash = kataAnnotHypervisorPrefix + "image_hash"
+ 
++	IgvmHash = kataAnnotHypervisorPrefix + "igvm_hash"
++
+ 	// InitrdHash is an sandbox annotation for passing a container guest initrd SHA-512 hash value.
+ 	InitrdHash = kataAnnotHypervisorPrefix + "initrd_hash"
+ 
+diff --git a/src/runtime/virtcontainers/pkg/cloud-hypervisor/client/api/openapi.yaml b/src/runtime/virtcontainers/pkg/cloud-hypervisor/client/api/openapi.yaml
+index 750c1e725..28150f8ef 100644
+--- a/src/runtime/virtcontainers/pkg/cloud-hypervisor/client/api/openapi.yaml
++++ b/src/runtime/virtcontainers/pkg/cloud-hypervisor/client/api/openapi.yaml
+@@ -642,6 +642,7 @@ components:
+             cmdline: cmdline
+             kernel: kernel
+             initramfs: initramfs
++            igvm: igvm
+             firmware: firmware
+           serial:
+             mode: "false"
+@@ -776,6 +777,7 @@ components:
+         cmdline: cmdline
+         kernel: kernel
+         initramfs: initramfs
++        igvm: igvm
+         firmware: firmware
+       properties:
+         firmware:
+@@ -786,6 +788,8 @@ components:
+           type: string
+         initramfs:
+           type: string
++        igvm:
++          type: string
+       type: object
+     VmConfig:
+       description: Virtual machine configuration
+@@ -1004,6 +1008,7 @@ components:
+           cmdline: cmdline
+           kernel: kernel
+           initramfs: initramfs
++          igvm: igvm
+           firmware: firmware
+         serial:
+           mode: "false"
+diff --git a/src/runtime/virtcontainers/pkg/cloud-hypervisor/client/model_payload_config.go b/src/runtime/virtcontainers/pkg/cloud-hypervisor/client/model_payload_config.go
+index 5029c92d9..84b98d5ce 100644
+--- a/src/runtime/virtcontainers/pkg/cloud-hypervisor/client/model_payload_config.go
++++ b/src/runtime/virtcontainers/pkg/cloud-hypervisor/client/model_payload_config.go
+@@ -20,6 +20,7 @@ type PayloadConfig struct {
+ 	Kernel    *string `json:"kernel,omitempty"`
+ 	Cmdline   *string `json:"cmdline,omitempty"`
+ 	Initramfs *string `json:"initramfs,omitempty"`
++	Igvm      *string `json:"igvm,omitempty"`
+ }
+ 
+ // NewPayloadConfig instantiates a new PayloadConfig object
+@@ -39,6 +40,39 @@ func NewPayloadConfigWithDefaults() *PayloadConfig {
+ 	return &this
+ }
+ 
++// GetIgvm returns the Igvm field value if set, zero value otherwise.
++func (o *PayloadConfig) GetIgvm() string {
++	if o == nil || o.Igvm == nil {
++		var ret string
++		return ret
++	}
++	return *o.Igvm
++}
++
++// GetIgvmOk returns a tuple with the Igvm field value if set, nil otherwise
++// and a boolean to check if the value has been set.
++func (o *PayloadConfig) GetIgvmOk() (*string, bool) {
++	if o == nil || o.Igvm == nil {
++		return nil, false
++	}
++	return o.Igvm, true
++}
++
++// HasIgvm returns a boolean if a field has been set.
++func (o *PayloadConfig) HasIgvm() bool {
++	if o != nil && o.Igvm != nil {
++		return true
++	}
++
++	return false
++}
++
++// SetIgvm gets a reference to the given string and assigns it to the Igvm field.
++func (o *PayloadConfig) SetIgvm(v string) {
++	o.Igvm = &v
++}
++
++
+ // GetFirmware returns the Firmware field value if set, zero value otherwise.
+ func (o *PayloadConfig) GetFirmware() string {
+ 	if o == nil || o.Firmware == nil {
+@@ -169,6 +203,9 @@ func (o *PayloadConfig) SetInitramfs(v string) {
+ 
+ func (o PayloadConfig) MarshalJSON() ([]byte, error) {
+ 	toSerialize := map[string]interface{}{}
++	if o.Igvm != nil {
++		toSerialize["igvm"] = o.Igvm
++	}
+ 	if o.Firmware != nil {
+ 		toSerialize["firmware"] = o.Firmware
+ 	}
+diff --git a/src/runtime/virtcontainers/pkg/cloud-hypervisor/cloud-hypervisor.yaml b/src/runtime/virtcontainers/pkg/cloud-hypervisor/cloud-hypervisor.yaml
+index dee8bdbf0..61b455b25 100644
+--- a/src/runtime/virtcontainers/pkg/cloud-hypervisor/cloud-hypervisor.yaml
++++ b/src/runtime/virtcontainers/pkg/cloud-hypervisor/cloud-hypervisor.yaml
+@@ -510,6 +510,8 @@ components:
+           type: string
+         initramfs:
+           type: string
++        igvm:
++          type: string
+       description: Payloads to boot in guest
+ 
+     VmConfig:
+diff --git a/src/runtime/virtcontainers/types/asset.go b/src/runtime/virtcontainers/types/asset.go
+index 3b00b5a20..7e4b0105e 100644
+--- a/src/runtime/virtcontainers/types/asset.go
++++ b/src/runtime/virtcontainers/types/asset.go
+@@ -25,6 +25,9 @@ const (
+ 	// ImageAsset is an image asset.
+ 	ImageAsset AssetType = "image"
+ 
++	// IgvmAsset is an image asset.
++	IgvmAsset AssetType = "igvm"
++
+ 	// InitrdAsset is an initrd asset.
+ 	InitrdAsset AssetType = "initrd"
+ 
+@@ -53,6 +56,7 @@ func AssetTypes() []AssetType {
+ 		HypervisorAsset,
+ 		HypervisorCtlAsset,
+ 		ImageAsset,
++		IgvmAsset,
+ 		InitrdAsset,
+ 		JailerAsset,
+ 		KernelAsset,
+@@ -82,6 +86,8 @@ func (t AssetType) Annotations() (string, string, error) {
+ 		return annotations.KernelPath, annotations.KernelHash, nil
+ 	case ImageAsset:
+ 		return annotations.ImagePath, annotations.ImageHash, nil
++	case IgvmAsset:
++		return annotations.IgvmPath, annotations.IgvmHash, nil
+ 	case InitrdAsset:
+ 		return annotations.InitrdPath, annotations.InitrdHash, nil
+ 	case HypervisorAsset:
+-- 
+2.33.8
+

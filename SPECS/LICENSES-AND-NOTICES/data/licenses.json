@@ -1015,7 +1015,6 @@
                 "opencl-filesystem",
                 "opencl-headers",
                 "opencryptoki",
-                "opencsd",
                 "opendnssec",
                 "OpenEXR",
                 "openjade",
@@ -1841,7 +1840,6 @@
                 "resource-agents",
                 "rest",
                 "rhash",
-                "rlwrap",
                 "rp-pppoe",
                 "rpm-mpi-hooks",
                 "rpmdevtools",
@@ -2101,12 +2099,6 @@
             "specs": [
                 "libmemcached-awesome",
                 "librabbitmq"
-            ]
-        },
-        "Fedora (ISC)": {
-            "license": "[ISC License](https://github.com/sarugaku/resolvelib/blob/main/LICENSE)",
-            "specs": [
-                "python-resolvelib"
             ]
         },
         "Magnus Edenhill Open Source": {
@@ -3059,10 +3051,13 @@
                 "zsh"
             ]
         },
-        "RPM software management source": {
-            "license": "[GPLv2+ License](https://github.com/rpm-software-management/dnf5/blob/main/COPYING.md)",
+        "Rancher": {
+            "license": "[ASL 2.0 License](http://www.apache.org/licenses/LICENSE-2.0)",
             "specs": [
-                "dnf5"
+                "k3s",
+                "k3s-1.24.12",
+                "k3s-1.24.6",
+                "k3s-1.25.8"
             ]
         },
         "Sysbench source": {

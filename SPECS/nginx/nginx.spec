@@ -6,7 +6,7 @@ Name:           nginx
 # Currently on "stable" version of nginx from https://nginx.org/en/download.html.
 # Note: Stable versions are even (1.20), mainline versions are odd (1.21)
 Version:        1.22.1
-Release:        6%{?dist}
+Release:        5%{?dist}
 License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -59,7 +59,6 @@ sh configure \
     --sbin-path=%{_sbindir}/nginx                 \
     --user=%{nginx_user} \
     --with-http_auth_request_module \
-    --with-http_gunzip_module \
     --with-http_gzip_static_module \
     --with-http_realip_module \
     --with-http_ssl_module \
@@ -117,9 +116,6 @@ exit 0
 %dir %{_sysconfdir}/%{name}
 
 %changelog
-* Wed Jul 12 2023 Pete Birley <petebirley@microsoft.com> - 1.22.1-6
-- Enable building with http_gunzip_module
-
 * Mon Apr 17 2023 Olivia Crain <oliviacrain@microsoft.com> - 1.22.1-5
 - Upgrade bundled njs version to 0.7.12 to fix CVE-2020-19692, CVE-2020-19695
 - Use SPDX expression in license tag
