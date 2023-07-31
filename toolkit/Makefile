@@ -75,7 +75,6 @@ PROJECT_ROOT     ?= $(realpath $(toolkit_root)/..)
 BUILD_DIR        ?= $(PROJECT_ROOT)/build
 OUT_DIR          ?= $(PROJECT_ROOT)/out
 SPECS_DIR        ?= $(PROJECT_ROOT)/SPECS
-CCACHE_DIR       ?= $(PROJECT_ROOT)/ccache
 
 # Sub-folder defines
 LOGS_DIR           ?= $(BUILD_DIR)/logs
@@ -90,6 +89,7 @@ IMAGEGEN_DIR       ?= $(BUILD_DIR)/imagegen
 TOOLCHAIN_RPMS_DIR ?= $(BUILD_DIR)/toolchain_rpms
 TIMESTAMP_DIR      ?= $(BUILD_DIR)/timestamp
 PROFILE_DIR        ?= $(BUILD_DIR)/profile
+CCACHE_DIR         ?= $(BUILD_DIR)/ccache
 
 RPMRC_DIR        ?= $(MACRO_DIR)/usr/lib/rpm
 
