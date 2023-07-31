@@ -68,7 +68,9 @@ type Package struct {
 	Architecture  string        `json:"Architecture"`  // The architecture of the package
 	Requires      []*PackageVer `json:"Requires"`      // List of targets this spec requires to install
 	BuildRequires []*PackageVer `json:"BuildRequires"` // List of targets this spec requires to build
+	TestRequires  []*PackageVer `json:"TestRequires"`  // List of targets this spec requires to run tests.
 	IsToolchain   bool          `json:"IsToolchain"`   // Is this package part of the toolchain
+	RunTests      bool          `json:"RunTests"`      // Should we run tests for this package.
 }
 
 // ParsePackageJSON reads a package list json file
