@@ -123,6 +123,7 @@ $(graph_file): $(specs_file) $(go-grapher) $(toolchain_rpms) $(TOOLCHAIN_MANIFES
 		--output $@ \
 		$(if $(filter y,$(RESOLVE_CYCLES_FROM_UPSTREAM)), --resolve-cycles-from-upstream) \
 		$(if $(filter y,$(USE_PREVIEW_REPO)), --use-preview-repo) \
+		$(if $(filter y,$(DISABLE_DEFAULT_REPOS)), --disable-default-repos) \
 		$(if $(filter y,$(IGNORE_VERSION_TO_RESOLVE_SELFDEP)), --ignore-version-to-resolve-selfdep) \
 		--output-dir=$(CACHED_RPMS_DIR)/cache \
 		--rpm-dir=$(RPMS_DIR) \

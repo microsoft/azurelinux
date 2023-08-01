@@ -41,6 +41,7 @@ var (
 	workerTar                     = app.Flag("tdnf-worker", "Full path to worker_chroot.tar.gz").Required().ExistingFile()
 	repoFiles                     = app.Flag("repo-file", "Full path to a repo file").Required().ExistingFiles()
 	usePreviewRepo                = app.Flag("use-preview-repo", "Pull packages from the upstream preview repo").Bool()
+	disableDefaultRepos           = app.Flag("disable-default-repos", "Disable pulling packages from PMC repos").Bool()
 	toolchainManifest             = app.Flag("toolchain-manifest", "Path to a list of RPMs which are created by the toolchain. Will mark RPMs from this list as prebuilt.").ExistingFile()
 	ignoreVersionToResolveSelfDep = app.Flag("ignore-version-to-resolve-selfdep", "Ignore package version while downloading package from upstream when resolving cycle").Bool()
 
@@ -84,17 +85,19 @@ func main() {
 	var cloner *rpmrepocloner.RpmRepoCloner = nil
 	/*
 		disableUpstreamRepos is set to false because we want to download packages from upstream
-		disableDefaultRepos is also set to false. This can be enabled by sending a flag to grapher
 	*/
 	if *resolveCyclesFromUpstream {
 		cloner, err = rpmrepocloner.ConstructCloner(*outDir, *tmpDir, *workerTar, *existingRpmsDir, *existingToolchainRpmDir, *tlsClientCert, *tlsClientKey, *repoFiles)
 		if err != nil {
 			logger.Log.Panic(err)
 		}
-		/*setting repoFlags in cloner usePreviewRepo, disableUpstreamRepos=false, disableDefaultRepos=false*/
+		/*setting repoFlags in cloner usePreviewRepo, disableUpstreamRepos=false*/
 		enabledRepos := rpmrepocloner.RepoFlagAll
 		if !*usePreviewRepo {
 			enabledRepos = enabledRepos & ^rpmrepocloner.RepoFlagPreview
+		}
+		if *disableDefaultRepos {
+			enabledRepos = enabledRepos & ^rpmrepocloner.RepoFlagMarinerDefaults
 		}
 		cloner.SetEnabledRepos(enabledRepos)
 
