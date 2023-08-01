@@ -18,7 +18,7 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
 BuildRequires:  python3-six
-BuildRequires:  bazel = 5.3.0
+BuildRequires:  bazel
 BuildRequires:  python3-tf-nightly = 2.11.0
 BuildRequires:  gcc
 BuildRequires:  build-essential
@@ -67,7 +67,8 @@ pushd tensorboard/data/server/pip_package
 python3 setup.py -q bdist_wheel 
 popd
 mkdir -p pyproject-wheeldir/ && cp tensorboard/data/server/pip_package/dist/*.whl pyproject-wheeldir/
-
+#remove .bazelversion file so that latest bazel version available will be used to build tensorboard
+rm .bazelversion
 #tensorboard built using bazel
 bazel --batch build //tensorboard/pip_package:build_pip_package
 #cache 

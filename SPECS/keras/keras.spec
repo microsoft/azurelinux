@@ -11,7 +11,7 @@ Group:          Development/Languages/Python
 URL:            https://keras.io/
 Source0:        https://github.com/keras-team/keras/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-cache.tar.gz
-BuildRequires:  bazel = 5.3.0
+BuildRequires:  bazel
 BuildRequires:  build-essential
 BuildRequires:  git
 BuildRequires:  libstdc++-devel
@@ -45,6 +45,8 @@ Python 3 version.
 tar -xf %{SOURCE1} -C /root/
 
 ln -s %{_bindir}/python3 %{_bindir}/python
+#remove .bazelversion file so that the latest bazel version available will be used to build Keras
+rm .bazelversion
 
 bazel --batch build  --verbose_explanations //keras/tools/pip_package:build_pip_package
 # ---------
