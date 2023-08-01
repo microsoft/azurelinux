@@ -32,7 +32,6 @@ var (
 	usePMCtoResolveCycles = app.Flag("usePMCtoresolvecycles", "Cycles will be resolved by downloading rpm packages from PMC if locally unavailable").Bool()
 	tlsClientCert         = app.Flag("tls-cert", "TLS client certificate to use when downloading files.").String()
 	tlsClientKey          = app.Flag("tls-key", "TLS client key to use when downloading files.").String()
-	packageURLlist        = app.Flag("packageURLlist", "PACKAGE_URL_LIST").Strings()
 
 	resolveCyclesFromUpstream     = app.Flag("resolve-cycles-from-upstream", "Let grapher resolve cycles by marking rpms available in repo as remote").Bool()
 	outDir                        = exe.OutputDirFlag(app, "Directory to download packages into.")
