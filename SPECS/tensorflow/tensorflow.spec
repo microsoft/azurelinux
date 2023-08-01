@@ -9,7 +9,7 @@ Group:          Development/Languages/Python
 URL:            https://www.tensorflow.org/
 Source0:        https://github.com/tensorflow/tensorflow/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-cache.tar.gz
-BuildRequires:  bazel = 5.3.0
+BuildRequires:  bazel
 BuildRequires:  binutils
 BuildRequires:  build-essential
 BuildRequires:  git
@@ -110,7 +110,7 @@ Python 3 version.
 tar -xf %{SOURCE1} -C /root/
 
 ln -s %{_bindir}/python3 %{_bindir}/python
-
+echo 5.3.2 > .bazelversion
 bazel --batch build  --verbose_explanations //tensorflow/tools/pip_package:build_pip_package
 # ---------
 # steps to create the cache tar. network connection is required to create the cache.
