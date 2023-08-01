@@ -7231,8 +7231,8 @@
         "type": "other",
         "other": {
           "name": "inih",
-          "version": "47",
-          "downloadUrl": "https://github.com/benhoyt/inih/archive/refs/tags/inih-r57.tar.gz"
+          "version": "57",
+          "downloadUrl": "https://github.com/benhoyt/inih/archive/refs/tags/r57.tar.gz"
         }
       }
     },

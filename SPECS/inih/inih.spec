@@ -4,7 +4,8 @@ Version:  57
 Release:  1%{?dist}
 License:  BSD
 URL:      https://github.com/benhoyt/inih
-Source0:  https://github.com/benhoyt/inih/archive/refs/tags/inih-r57.tar.gz
+#Source0: https://github.com/benhoyt/inih/archive/refs/tags/r57.tar.gz
+Source0:  inih-r57.tar.gz
 Vendor:   Microsoft Corporation
 Distribution:   Mariner
 BuildRequires: gcc
