@@ -1,5 +1,6 @@
 %global nginx_user nginx
 %global njs_version 0.7.12
+%global opentelemetry_cpp_contrib_git_commit 37e4466d882cbddff6f607a20fe327060de76166
 
 Summary:        High-performance HTTP server and reverse proxy
 Name:           nginx
@@ -15,6 +16,7 @@ URL:            https://nginx.org/
 Source0:        https://nginx.org/download/%{name}-%{version}.tar.gz
 Source1:        nginx.service
 Source2:        https://github.com/nginx/njs/archive/refs/tags/%{njs_version}.tar.gz#/%{name}-njs-%{njs_version}.tar.gz
+Source3:        https://github.com/open-telemetry/opentelemetry-cpp-contrib/archive/%{opentelemetry_cpp_contrib_git_commit}.tar.gz#/opentelemetry-cpp-contrib-%{opentelemetry_cpp_contrib_git_commit}.tar.gz
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  openssl-devel
@@ -23,6 +25,9 @@ BuildRequires:  pcre2-devel
 BuildRequires:  readline-devel
 BuildRequires:  which
 BuildRequires:  zlib-devel
+BuildRequires:  opentelemetry-cpp
+BuildRequires:  protobuf-devel
+BuildRequires:  grpc-devel
 Requires:       %{name}-filesystem = %{version}-%{release}
 Requires:       %{name}-mimetypes
 
@@ -44,11 +49,18 @@ directories.
 pushd ../
 mkdir nginx-njs
 tar -C nginx-njs -xf %{SOURCE2}
+mkdir otel-cpp-contrib
+tar -C otel-cpp-contrib -xf %{SOURCE3}
+# The following change is a build break in upstream and a PR has been raised to fix it.
+sed -i \
+        '/\#include <opentelemetry\/sdk\/trace\/processor.h>$/a \#include <opentelemetry\/sdk\/trace\/batch_span_processor_options.h>' \
+        otel-cpp-contrib/opentelemetry-cpp-contrib-%{opentelemetry_cpp_contrib_git_commit}/instrumentation/nginx/src/otel_ngx_module.cpp
 popd
 
 %build
 sh configure \
     --add-module=../nginx-njs/njs-%{njs_version}/nginx   \
+    --add-module=../otel-cpp-contrib/opentelemetry-cpp-contrib-%{opentelemetry_cpp_contrib_git_commit}/instrumentation/nginx   \
     --conf-path=%{_sysconfdir}/nginx/nginx.conf    \
     --error-log-path=%{_var}/log/nginx/error.log   \
     --group=%{nginx_user} \
