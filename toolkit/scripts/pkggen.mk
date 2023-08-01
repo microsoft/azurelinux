@@ -18,7 +18,7 @@ pkggen_local_repo           = $(MANIFESTS_DIR)/package/local.repo
 graphpkgfetcher_cloned_repo = $(MANIFESTS_DIR)/package/fetcher.repo
 
 # SPECs and Built RPMs
-build_specs     = $(call shell_real_build_only, find $(BUILD_SPECS_DIR)/ -type f -name '*.spec')
+build_specs     = $(call shell_real_build_only, find $(SPECS_DIR)/ -type f -name '*.spec')
 build_spec_dirs = $(foreach spec,$(build_specs),$(dir $(spec)))
 pkggen_rpms     = $(call shell_real_build_only, find $(RPMS_DIR)/*  2>/dev/null )
 
@@ -59,6 +59,7 @@ clean-spec-parse:
 	@echo Verifying no mountpoints present in $(parse_working_dir)
 	$(SCRIPTS_DIR)/safeunmount.sh "$(parse_working_dir)" && \
 	rm -rf $(parse_working_dir)
+	rm -rf $(specs_file)*
 clean-ccache:
 	rm -rf $(CCACHE_DIR)
 
@@ -74,10 +75,10 @@ analyze-built-graph: $(go-graphanalytics)
 		exit 1; \
 	fi
 
-# Parse all specs in $(BUILD_SPECS_DIR) and generate a specs.json file encoding all dependency information
-$(specs_file): $(chroot_worker) $(BUILD_SPECS_DIR) $(build_specs) $(build_spec_dirs) $(go-specreader)
+# Parse all specs in $(SPECS_DIR) and generate a specs.json file encoding all dependency information
+$(specs_file): $(chroot_worker) $(SPECS_DIR) $(build_specs) $(build_spec_dirs) $(go-specreader) $(depend_SPECS_DIR)
 	$(go-specreader) \
-		--dir $(BUILD_SPECS_DIR) \
+		--dir $(SPECS_DIR) \
 		--build-dir $(parse_working_dir) \
 		--srpm-dir $(BUILD_SRPMS_DIR) \
 		--rpm-dir $(RPMS_DIR) \
@@ -221,7 +222,7 @@ $(RPMS_DIR):
 	@touch $@
 endif
 
-$(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-scheduler) $(go-pkgworker) $(depend_STOP_ON_PKG_FAIL) $(CONFIG_FILE) $(depend_CONFIG_FILE) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST) $(pkggen_rpms)
+$(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-scheduler) $(go-pkgworker) $(depend_STOP_ON_PKG_FAIL) $(CONFIG_FILE) $(depend_CONFIG_FILE) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST) $(pkggen_rpms) $(srpms) $(BUILD_SRPMS_DIR)
 	$(go-scheduler) \
 		--input="$(preprocessed_file)" \
 		--output="$(built_file)" \
