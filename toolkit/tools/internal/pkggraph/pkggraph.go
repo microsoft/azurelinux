@@ -64,6 +64,7 @@ const (
 
 // Constants representing empty member fields of the 'PkgNode' struct.
 const (
+	LocalRepo      = "<LOCAL_REPO>"
 	NoArchitecture = "<NO_ARCHITECTURE>"
 	NoName         = "<NO_NAME>"
 	NoRPMPath      = "<NO_RPM_PATH>"
