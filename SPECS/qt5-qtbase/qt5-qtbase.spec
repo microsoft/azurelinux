@@ -139,14 +139,14 @@ Patch82: CVE-2023-32762.patch
 Patch83: CVE-2023-32763.patch
 
 # Fix CVE-2023-33285
-Patch84: CVE-2023-33285
+Patch84: CVE-2023-33285.patch
 
 # Fix CVE-2023-34410
-Patch85: CVE-2023-34410
+Patch85: CVE-2023-34410.patch
 
 # Fix CVE-2023-37369, CVE-2023-38197
-Patch86: CVE-2023-37369
-Patch87: CVE-2023-38197
+Patch86: CVE-2023-37369.patch
+Patch87: CVE-2023-38197.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
