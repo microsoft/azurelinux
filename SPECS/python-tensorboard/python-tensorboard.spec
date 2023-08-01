@@ -67,8 +67,7 @@ pushd tensorboard/data/server/pip_package
 python3 setup.py -q bdist_wheel 
 popd
 mkdir -p pyproject-wheeldir/ && cp tensorboard/data/server/pip_package/dist/*.whl pyproject-wheeldir/
-#remove .bazelversion file so that latest bazel version available will be used to build tensorboard
-rm .bazelversion
+
 #tensorboard built using bazel
 bazel --batch build //tensorboard/pip_package:build_pip_package
 #cache 
@@ -104,7 +103,7 @@ mv %{pypi_name}-%{version}-*.whl pyproject-wheeldir/
 
 %changelog
 * Tue Aug 01 2023 Riken Maharjan <rmaharjan@microsoft.com> - 2.11.0-2
-- remove .bazelversion file.
+- remove bazel version.
 
 * Mon Dec 19 2022 Riken Maharjan <rmaharjan@microsoft.com> - 2.11.0-1
 - Original version for CBL-Mariner. License Verified.
