@@ -312,10 +312,6 @@ func (g *PkgGraph) AddRemoteToLookup(pkgNode *PkgNode, deferSort bool) (err erro
 		return
 	}
 
-	if deferSort {
-		logger.Log.Tracef("Deferring sort for %s", pkgNode.FriendlyName())
-	}
-
 	requestInterval, err = pkgNode.VersionedPkg.Interval()
 	if err != nil {
 		return
