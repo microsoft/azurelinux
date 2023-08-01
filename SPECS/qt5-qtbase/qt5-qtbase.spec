@@ -33,7 +33,7 @@
 Name:         qt5-qtbase
 Summary:      Qt5 - QtBase components
 Version:      5.12.11
-Release:      8%{?dist}
+Release:      9%{?dist}
 # See LICENSE.GPL3-EXCEPT.txt, for exception details
 License:      GFDL AND LGPLv3 AND GPLv2 AND GPLv3 with exceptions AND QT License Agreement 4.0
 Vendor:       Microsoft Corporation
@@ -128,6 +128,7 @@ Patch68: qtbase-everywhere-src-5.11.1-python3.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1732129
 Patch80: qtbase-use-wayland-on-gnome.patch
 
+## upstream patches
 # Fix CVE-2023-24607
 patch81: CVE-2023-24607.patch
 
@@ -136,7 +137,16 @@ Patch82: CVE-2023-32762.patch
 
 # Fix CVE-2023-32763
 Patch83: CVE-2023-32763.patch
-## upstream patches
+
+# Fix CVE-2023-33285
+Patch84: CVE-2023-33285
+
+# Fix CVE-2023-34410
+Patch85: CVE-2023-34410
+
+# Fix CVE-2023-37369, CVE-2023-38197
+Patch86: CVE-2023-37369
+Patch87: CVE-2023-38197
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -748,6 +758,9 @@ fi
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXdgDesktopPortalThemePlugin.cmake
 
 %changelog
+* Tue Aug 01 2023 Thien Trung Vuong <tvuong@microsoft.com> - 5.12.11-9
+- Add patch to resolve CVE-2023-33285, CVE-2023-34410, CVE-2023-37369, CVE-2023-38197
+
 * Wed Jun 14 2023 Henry Li <lihl@microsoft.com> - 5.12.11-8
 - Add patch to resolve CVE-2023-32763
 
