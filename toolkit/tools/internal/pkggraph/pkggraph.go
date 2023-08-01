@@ -302,7 +302,7 @@ func (g *PkgGraph) validateNodeForLookup(pkgNode *PkgNode) (valid bool, err erro
 }
 
 /*check if a runNode already exists for the same version of the remoteNode, if exists, replace runNode in the lookup with remoteNode*/
-func (g *PkgGraph) AddRemoteToLookup(pkgNode *PkgNode, deferSort bool) (err error) {
+func (g *PkgGraph) AddRemoteToLookup(pkgNode *PkgNode) (err error) {
 	var (
 		requestInterval, nodeInterval pkgjson.PackageVerInterval
 	)

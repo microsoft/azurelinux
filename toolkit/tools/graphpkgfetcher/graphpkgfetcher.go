@@ -86,7 +86,7 @@ func main() {
 	/*If there is an existing runNode and then there is one more remote node, donot throw dup error, instead replace the run node with remote node*/
 	for _, pkgNode := range dependencyGraph.AllNodes() {
 		if pkgNode.Type == pkggraph.TypeRemoteRun {
-			dependencyGraph.AddRemoteToLookup(pkgNode, true)
+			dependencyGraph.AddRemoteToLookup(pkgNode)
 		}
 	}
 
