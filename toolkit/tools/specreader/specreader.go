@@ -32,7 +32,7 @@ import (
 )
 
 const (
-	defaultWorkerCount = "10"
+	defaultWorkerCount = "100"
 )
 
 // parseResult holds the worker results from parsing a SPEC file.
@@ -82,7 +82,11 @@ func main() {
 	toolchainRPMs, err := schedulerutils.ReadReservedFilesList(*toolchainManifest)
 	logger.PanicOnError(err, "Unable to read toolchain manifest file '%s': %s", *toolchainManifest, err)
 
-	err = parseSPECsWrapper(*buildDir, *specsDir, *rpmsDir, *srpmsDir, *existingToolchainRpmDir, *distTag, *output, *workerTar, toolchainRPMs, *workers, *runCheck)
+	// Convert specsDir to an absolute path
+	specsAbsDir, err := filepath.Abs(*specsDir)
+	logger.PanicOnError(err, "Unable to get absolute path for specs directory '%s': %s", *specsDir, err)
+
+	err = parseSPECsWrapper(*buildDir, specsAbsDir, *rpmsDir, *srpmsDir, *existingToolchainRpmDir, *distTag, *output, *workerTar, toolchainRPMs, *workers, *runCheck)
 	logger.PanicOnError(err)
 }
 
