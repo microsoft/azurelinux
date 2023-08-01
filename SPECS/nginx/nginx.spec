@@ -60,7 +60,7 @@ popd
 %build
 sh configure \
     --add-module=../nginx-njs/njs-%{njs_version}/nginx   \
-    --add-module=../otel-cpp-contrib/opentelemetry-cpp-contrib-%{opentelemetry_cpp_contrib_git_commit}/instrumentation/nginx   \
+    --add-dynamic-module=../otel-cpp-contrib/opentelemetry-cpp-contrib-%{opentelemetry_cpp_contrib_git_commit}/instrumentation/nginx   \
     --conf-path=%{_sysconfdir}/nginx/nginx.conf    \
     --error-log-path=%{_var}/log/nginx/error.log   \
     --group=%{nginx_user} \
@@ -120,8 +120,9 @@ exit 0
 %config(noreplace) %{_sysconfdir}/%{name}/scgi_params.default
 %config(noreplace) %{_sysconfdir}/%{name}/uwsgi_params
 %config(noreplace) %{_sysconfdir}/%{name}/uwsgi_params.default
-%{_sysconfdir}/%{name}/win-utf
 %{_sysconfdir}/%{name}/html/*
+%{_sysconfdir}/%{name}/modules/otel_ngx_module.so
+%{_sysconfdir}/%{name}/win-utf
 %{_sbindir}/*
 %{_libdir}/systemd/system/nginx.service
 %dir %{_var}/opt/nginx/log
