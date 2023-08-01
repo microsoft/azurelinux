@@ -29755,8 +29755,8 @@
         "type": "other",
         "other": {
           "name": "xfsprogs",
-          "version": "5.0.0",
-          "downloadUrl": "https://kernel.org/pub/linux/utils/fs/xfs/xfsprogs/xfsprogs-5.0.0.tar.xz"
+          "version": "5.15.0",
+          "downloadUrl": "https://kernel.org/pub/linux/utils/fs/xfs/xfsprogs/xfsprogs-5.15.0.tar.xz"
         }
       }
     },
