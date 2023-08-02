@@ -42,6 +42,7 @@ for the Nginx server including the correct permissions for the
 directories.
 
 %package otel_ngx_module
+License:        Apache-2.0
 Summary:        OpenTelemetry Nginx Module
 BuildRequires:  grpc-devel
 BuildRequires:  opentelemetry-cpp-devel
@@ -138,6 +139,7 @@ exit 0
 %dir %{_sysconfdir}/%{name}
 
 %files otel_ngx_module
+%license ../otel-cpp-contrib/opentelemetry-cpp-contrib-%{opentelemetry_cpp_contrib_git_commit}/LICENSE
 %{_sysconfdir}/%{name}/modules/otel_ngx_module.so
 
 %changelog
