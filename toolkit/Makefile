@@ -181,6 +181,14 @@ include $(SCRIPTS_DIR)/srpm_pack.mk
 #   expand-specs clean-expand-specs
 include $(SCRIPTS_DIR)/srpm_expand.mk
 
+# Create self contained toolkit archive contianing all the required tools with:
+#   package-toolkit, clean-package-toolkit
+include $(SCRIPTS_DIR)/toolkit.mk
+
+# Fill the cache with rpms from the package server without using package manager or chroot with:
+#   pre-cache
+include $(SCRIPTS_DIR)/precache.mk
+
 # Create a package build workplan with:
 #   workplan, clean-workplan clean-cache
 # Build a package with:
@@ -192,10 +200,6 @@ include $(SCRIPTS_DIR)/pkggen.mk
 # Create images with:
 #   image, iso, clean-imggen
 include $(SCRIPTS_DIR)/imggen.mk
-
-# Create self contained toolkit archive contianing all the required tools with:
-#   package-toolkit, clean-package-toolkit
-include $(SCRIPTS_DIR)/toolkit.mk
 
 # Each component provides specific clean implementations which clean depends on.
 # They are guaranteed to run first and will verify there are no existing mount points

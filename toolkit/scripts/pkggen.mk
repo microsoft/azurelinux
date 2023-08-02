@@ -153,6 +153,11 @@ graphpkgfetcher_extra_flags += $(if $(CONFIG_FILE),--base-dir="$(CONFIG_BASE_DIR
 $(cached_file): $(depend_CONFIG_FILE) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST)
 endif
 
+ifeq ($(PRECACHE),y)
+# Use highly parallel downlader to fully hydrate the cache before trying to use the package manager to download packages
+$(cached_file): $(STATUS_FLAGS_DIR)/precache.flag
+endif
+
 $(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(rpm_cache_files) $(TOOLCHAIN_MANIFEST) $(toolchain_rpms)
 	mkdir -p $(CACHED_RPMS_DIR)/cache && \
 	$(go-graphpkgfetcher) \
