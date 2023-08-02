@@ -104,7 +104,7 @@ func main() {
 		defer cloner.Close()
 	}
 	logger.Log.Info("Running cycle resolution to fix any cycles in the dependency graph")
-	err = depGraph.MakeDAG(*resolveCyclesFromUpstream, *ignoreVersionToResolveSelfDep, cloner)
+	err = depGraph.MakeDAGusingUpstreamRepos(*resolveCyclesFromUpstream, *ignoreVersionToResolveSelfDep, cloner)
 	if err != nil {
 		logger.Log.Panic(err)
 	}

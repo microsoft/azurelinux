@@ -1015,7 +1015,7 @@ func TestShouldSucceedMakeDAGWithGoalNode(t *testing.T) {
 	assert.NotNil(t, goalNode)
 	assert.NoError(t, err)
 
-	assert.NoError(t, gOut.MakeDAG(false, false, nil))
+	assert.NoError(t, gOut.MakeDAG())
 }
 
 func TestShouldSucceedMakeDAGWithoutGoalNode(t *testing.T) {
@@ -1023,7 +1023,7 @@ func TestShouldSucceedMakeDAGWithoutGoalNode(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, gOut)
 
-	assert.NoError(t, gOut.MakeDAG(false, false, nil))
+	assert.NoError(t, gOut.MakeDAG())
 }
 
 func TestShouldGetSpecNameFromFilePath(t *testing.T) {

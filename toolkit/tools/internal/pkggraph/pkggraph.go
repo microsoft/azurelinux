@@ -1267,9 +1267,13 @@ func (g *PkgGraph) DeepCopy() (deepCopy *PkgGraph, err error) {
 	return
 }
 
+func (g *PkgGraph) MakeDAG() (err error) {
+	return g.MakeDAGusingUpstreamRepos(false, false, nil)
+}
+
 // MakeDAG ensures the graph is a directed acyclic graph (DAG).
 // If the graph is not a DAG, this routine will attempt to resolve any cycles to make the graph a DAG.
-func (g *PkgGraph) MakeDAG(resolveCyclesFromUpstream, ignoreVersionToResolveSelfDep bool, cloner *rpmrepocloner.RpmRepoCloner) (err error) {
+func (g *PkgGraph) MakeDAGusingUpstreamRepos(resolveCyclesFromUpstream, ignoreVersionToResolveSelfDep bool, cloner *rpmrepocloner.RpmRepoCloner) (err error) {
 	timestamp.StartEvent("convert to DAG", nil)
 	defer timestamp.StopEvent(nil)
 	var cycle []*PkgNode
