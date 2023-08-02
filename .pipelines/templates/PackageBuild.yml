@@ -72,7 +72,8 @@ steps:
         CONFIG_FILE="" \
         $delta_fetch_arg \
         REBUILD_TOOLS=y \
-        $run_check_arg
+        $run_check_arg \
+        PRECACHE=y
     displayName: "Build packages"
 
   - script: |
