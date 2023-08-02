@@ -309,6 +309,7 @@ func (g *PkgGraph) AddRemoteToLookup(pkgNode *PkgNode) (err error) {
 
 	if pkgNode.Type != TypeRemoteRun {
 		logger.Log.Tracef("Skipping %+v, not valid for replacing lookup", pkgNode)
+		err = fmt.Errorf("not a remote run node")
 		return
 	}
 
