@@ -1439,7 +1439,10 @@ func (g *PkgGraph) fixCyclesWithExistingRPMS(trimmedCycle []*PkgNode, resolveCyc
 		// 2. Every build cycle must contain at least one edge between a build node and a run node from different SRPMs.
 		//    These edges represent the 'BuildRequires' from the .spec file. If the cycle is breakable, the run node comes from a pre-built SRPM.
 		buildToRunEdge := previousNode.Type == TypeLocalBuild && currentNode.Type == TypeLocalRun
-		if isPrebuilt, _, _ := IsSRPMPrebuilt(currentNode.SrpmPath, g, nil); buildToRunEdge && isPrebuilt {
+		if !buildToRunEdge {
+			continue
+		}
+		if isPrebuilt, _, _ := IsSRPMPrebuilt(currentNode.SrpmPath, g, nil); isPrebuilt {
 			logger.Log.Debugf("Cycle contains pre-built SRPM '%s'. Replacing edges from build nodes associated with '%s' with an edge to a new 'PreBuilt' node.",
 				currentNode.SrpmPath, previousNode.SrpmPath)
 
@@ -1461,7 +1464,7 @@ func (g *PkgGraph) fixCyclesWithExistingRPMS(trimmedCycle []*PkgNode, resolveCyc
 				logger.Log.Debugf("Error while checking if SRPM is available upstream: %v", clonerErr)
 				continue
 			}
-			if buildToRunEdge && isAvailableUpstream {
+			if isAvailableUpstream {
 				//Mark node as unresolved remote to be fetched by pkgfetcher
 				logger.Log.Debugf("Cycle contains SRPM %s whose rpms are all available in PMC. MARK this node as remote unresolved", currentNode.SrpmPath)
 				logger.Log.Debugf("Cycle contains SRPM '%s' that is availabe in repo. Replacing edges from build nodes associated with '%s' with an edge to a new 'remote-unresolved' node.", currentNode.SrpmPath, previousNode.SrpmPath)
