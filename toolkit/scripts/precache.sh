@@ -28,17 +28,9 @@ rm -f "$downloaded_files"
 
 . /etc/os-release
 if [[ "$ID" == "mariner" ]]; then
-    if [[ 1 == $latest_packages_only ]]; then
-        REPOQUERY_OS_ARGS="-y -q --disablerepo=* --latest-limit 1"
-    else
-        REPOQUERY_OS_ARGS="-y -q --disablerepo=*"
-    fi
+    REPOQUERY_OS_ARGS="-y -q --disablerepo=*"
 else
-    if [[ 1 == $latest_packages_only ]]; then
-        REPOQUERY_OS_ARGS=""
-    else
-        REPOQUERY_OS_ARGS="--show-duplicates"
-    fi
+    REPOQUERY_OS_ARGS="--show-duplicates --tempcache"
 fi
 
 
@@ -52,8 +44,8 @@ echo "" > $cache_working_dir/repo.txt
 for base_url in "${base_urls[@]}"; do
     repo_unique="repo-$(echo $(((RANDOM%99999)+10000)))"
     repo_name="mariner-precache-$repo_unique"
-    echo "Querying repo $base_url via 'repoquery $REPOQUERY_OS_ARGS --repofrompath=$repo_name,$base_url --tempcache -a --qf="%{location}" >> $cache_working_dir/repo.txt'"
-    repoquery $REPOQUERY_OS_ARGS --repofrompath=$repo_name,$base_url --tempcache -a --qf="%{location}" >> $cache_working_dir/repo.txt || exit 1
+    echo "Querying repo $base_url via 'repoquery $REPOQUERY_OS_ARGS --repofrompath=$repo_name,$base_url -a --qf="%{location}" >> $cache_working_dir/repo.txt'"
+    repoquery $REPOQUERY_OS_ARGS --repofrompath=$repo_name,$base_url -a --qf="%{location}" >> $cache_working_dir/repo.txt || exit 1
 done
 
 touch "$downloaded_files"
