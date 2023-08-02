@@ -86,6 +86,7 @@ analyze-built-graph: $(go-graphanalytics)
 $(specs_file): $(chroot_worker) $(build_specs_base_dir) $(build_specs) $(build_spec_dirs) $(go-specreader) $(depend_SPECS_DIR) $(depend_SRPM_PACK_LIST) $(depend_RUN_CHECK)
 	$(go-specreader) \
 		--dir $(build_specs_base_dir) \
+		$(if $(SRPM_PACK_LIST),--parse-list=$(srpm_pack_list_file)) \
 		--build-dir $(parse_working_dir) \
 		--srpm-dir $(BUILD_SRPMS_DIR) \
 		--rpm-dir $(RPMS_DIR) \
