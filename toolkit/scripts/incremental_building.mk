@@ -62,6 +62,7 @@ DELTA_BUILD    = y
 USE_CCACHE    ?= y
 REBUILD_TOOLS ?= y
 DELTA_FETCH   ?= y
+PRECACHE	  ?= y
 endif
 
 ######## SET REMAINING FLAG DEFAULTS ########
@@ -74,6 +75,7 @@ DELTA_BUILD                     ?= n
 CLEAN_TOOLCHAIN_CONTAINERS      ?= y
 MAX_CPU                         ?=
 DELTA_FETCH                     ?= n
+PRECACHE                        ?= n
 
 ######## HANDLE INCREMENTAL_TOOLCHAIN DEPRECATION ########
 
