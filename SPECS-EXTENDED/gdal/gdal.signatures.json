@@ -1,0 +1,10 @@
+{
+ "Signatures": {
+  "PROVENANCE.TXT-fedora": "f2ae00db0605d41731fc06550cce3d814ac772760e236278e6751e7a6239a229",
+  "cpl-config.h": "a59d47f3092bf0026a982b90a18d9b99c4a089c7651544d398a403947d198b9c",
+  "gdal-3.5.2.tar.gz": "4803955ea5a2117bf6fe70dede65890423b06f6fbf7510de2af4a49c7a904fa7",
+  "gdal-cleaner.sh": "abffc6764969fddcd98cf560ade0a4b4bdb75af2ef3d060c86d64af2f7755a85",
+  "gdal-config": "696f44e42c98aa369c96418a9ebf497aa854ca9f6a45dfd55e4f231bae7b193f",
+  "gdalautotest-3.5.2.tar.gz": "002ccdfe44ce6686093e1a8690a2b93b764b392775e4a13a77d4da2ac37cd826"
+ }
+}

@@ -1,0 +1,38 @@
+gdal-1.9.1.tar.gz re-pack for Fedora
+
+All files with pending legal questions are stripped from the original tarball,
+to form this tarball. Legal information is mainly from PROVENANCE.TXT
+
+
+No files are manipulated. 
+
+Please see the cleaning script clean-gdal.sh!
+
+This leaves GDAL short of a few formats, coordinate systems and the PHP bindings.
+
+                           Volker Fröhlich <volker27@gmx.at>
+
+ * updated to 1.9.1 by Volker Fröhlich <volker27@gmx.at>
+ * updated to 1.9.0 by Volker Fröhlich <volker27@gmx.at>
+ * updated to 1.7.3 by Viji V Nair <viji@fedoraproject.org>
+ * updated to 1.7.2 by Sven Lankes <sven@lank.es>
+ * updated to 1.7.1 by Balint Crisitan <cristian.balint@gmail.com>
+ * updated to 1.6.1 by Dan Horak <dan@danny.cz>
+
+
+Removed files:
+========================================
+# due to uncertain license issues
+and derivative copy from ESRI (TM) and CubeWerx (TM):
+
+data/cubewerx_extra.wkt
+data/esri_extra.wkt
+data/ecw_cs.wkt
+
+Removed folders plus its contents:
+========================================
+# due to uncertain license issues these formats
+are removed and not suported in fedora pack:
+
+frmts/bsb <-- http://www.osgeo.org/pipermail/gdal-dev/2003-September/001097.html
+swig/php <-- PHP license, incompatible mixture
