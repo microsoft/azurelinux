@@ -18,14 +18,7 @@ pkggen_local_repo           = $(MANIFESTS_DIR)/package/local.repo
 graphpkgfetcher_cloned_repo = $(MANIFESTS_DIR)/package/fetcher.repo
 
 # SPECs and Built RPMs
-ifeq ($(SRPM_PACK_LIST),)
-# If we are not, just grab everything right away
-build_specs_base_dir = $(SPECS_DIR)
-else
-# If we are filtering SRPMS we should wait and use the final expanded set
-build_specs_base_dir =  $(BUILD_SPECS_DIR)
-endif
-build_specs     = $(call shell_real_build_only, find $(build_specs_base_dir)/ -type f -name '*.spec')
+build_specs     = $(call shell_real_build_only, find $(SPECS_DIR)/ -type f -name '*.spec')
 build_spec_dirs = $(foreach spec,$(build_specs),$(dir $(spec)))
 pkggen_rpms     = $(call shell_real_build_only, find $(RPMS_DIR)/*  2>/dev/null )
 
@@ -83,9 +76,9 @@ analyze-built-graph: $(go-graphanalytics)
 	fi
 
 # Parse all specs in $(SPECS_DIR) and generate a specs.json file encoding all dependency information
-$(specs_file): $(chroot_worker) $(build_specs_base_dir) $(build_specs) $(build_spec_dirs) $(go-specreader) $(depend_SPECS_DIR) $(depend_SRPM_PACK_LIST)
+$(specs_file): $(chroot_worker) $(SPECS_DIR) $(build_specs) $(build_spec_dirs) $(go-specreader) $(depend_SPECS_DIR) $(srpm_pack_list_file)
 	$(go-specreader) \
-		--dir $(build_specs_base_dir) \
+		--dir $(SPECS_DIR) \
 		$(if $(SRPM_PACK_LIST),--parse-list=$(srpm_pack_list_file)) \
 		--build-dir $(parse_working_dir) \
 		--srpm-dir $(BUILD_SRPMS_DIR) \
