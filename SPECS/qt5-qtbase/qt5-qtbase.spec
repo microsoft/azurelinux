@@ -130,7 +130,7 @@ Patch80: qtbase-use-wayland-on-gnome.patch
 
 ## upstream patches
 # Fix CVE-2023-24607
-patch81: CVE-2023-24607.patch
+Patch81: CVE-2023-24607.patch
 
 # Fix CVE-2023-32762
 Patch82: CVE-2023-32762.patch
@@ -253,6 +253,10 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch81 -p1
 %patch82 -p1
 %patch83 -p1
+%patch84 -p1
+%patch85 -p1
+%patch86 -p1
+%patch87 -p1
 
 ## upstream patches
 
