@@ -25,6 +25,14 @@ BuildRequires:  re2-devel
 %description
 The official OpenTelemetry CPP client
 
+%package devel
+Summary:        Development Libraries for OpenTelemetry CPP client
+Group:          Development/Libraries
+Requires:       opentelemetry-cpp = %{version}-%{release}
+
+%description devel
+Development Libraries for OpenTelemetry CPP client
+
 %prep
 %autosetup -p1
 mkdir -p third_party/opentelemetry-proto
@@ -54,8 +62,6 @@ mkdir build && cd build
 
 %files
 %license LICENSE
-%{_includedir}/opentelemetry/*
-%{_libdir}/cmake/opentelemetry-cpp/*
 %{_libdir}/libopentelemetry_common.so
 %{_libdir}/libopentelemetry_exporter_in_memory.so
 %{_libdir}/libopentelemetry_exporter_ostream_metrics.so
@@ -76,6 +82,10 @@ mkdir build && cd build
 %{_libdir}/libopentelemetry_trace.so
 %{_libdir}/libopentelemetry_version.so
 %{_libdir}/libopentelemetry_zpages.so
+
+%files devel
+%{_includedir}/opentelemetry/*
+%{_libdir}/cmake/opentelemetry-cpp/*
 
 %changelog
 * Mon Jul 17 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 1.10.0-1
