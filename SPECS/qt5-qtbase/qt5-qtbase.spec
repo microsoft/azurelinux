@@ -141,9 +141,6 @@ Patch83: CVE-2023-32763.patch
 # Fix CVE-2023-33285
 Patch84: CVE-2023-33285.patch
 
-# Fix CVE-2023-34410
-Patch85: CVE-2023-34410.patch
-
 # Fix CVE-2023-37369, CVE-2023-38197
 Patch86: CVE-2023-37369.patch
 Patch87: CVE-2023-38197.patch
@@ -254,7 +251,6 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch82 -p1
 %patch83 -p1
 %patch84 -p1
-%patch85 -p1
 %patch86 -p1
 %patch87 -p1
 
@@ -763,7 +759,7 @@ fi
 
 %changelog
 * Tue Aug 01 2023 Thien Trung Vuong <tvuong@microsoft.com> - 5.12.11-9
-- Add patch to resolve CVE-2023-33285, CVE-2023-34410, CVE-2023-37369, CVE-2023-38197
+- Add patch to resolve CVE-2023-33285, CVE-2023-37369, CVE-2023-38197
 
 * Wed Jun 14 2023 Henry Li <lihl@microsoft.com> - 5.12.11-8
 - Add patch to resolve CVE-2023-32763
