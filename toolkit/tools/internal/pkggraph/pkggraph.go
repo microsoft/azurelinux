@@ -1468,7 +1468,6 @@ func (g *PkgGraph) fixCyclesWithExistingRPMS(trimmedCycle []*PkgNode, resolveCyc
 			}
 			if isAvailableUpstream {
 				//Mark node as unresolved remote to be fetched by pkgfetcher
-				logger.Log.Debugf("Cycle contains SRPM %s whose rpms are all available in PMC. MARK this node as remote unresolved", currentNode.SrpmPath)
 				logger.Log.Debugf("Cycle contains SRPM '%s' that is availabe in repo. Replacing edges from build nodes associated with '%s' with an edge to a new 'remote-unresolved' node.", currentNode.SrpmPath, previousNode.SrpmPath)
 				upstreamAvailableNode := g.CloneNode(currentNode)
 				upstreamAvailableNode.State = StateUnresolved
