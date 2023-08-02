@@ -41,6 +41,23 @@ func (l *FileConfigList) IsValid() (err error) {
 func (l *FileConfigList) UnmarshalJSON(b []byte) error {
 	var err error
 
+	err = l.unmarshalJSONHelper(b)
+	if err != nil {
+		return err
+	}
+
+	// Validate the unmarshaled object.
+	err = l.IsValid()
+	if err != nil {
+		return fmt.Errorf("failed to parse [FileConfigList]: %w", err)
+	}
+
+	return nil
+}
+
+func (l *FileConfigList) unmarshalJSONHelper(b []byte) error {
+	var err error
+
 	// Try to parse as a single value.
 	var fileConfig FileConfig
 	err = json.Unmarshal(b, &fileConfig)
@@ -52,12 +69,6 @@ func (l *FileConfigList) UnmarshalJSON(b []byte) error {
 	// Try to parse as a list.
 	type IntermediateTypeFileConfigList FileConfigList
 	err = json.Unmarshal(b, (*IntermediateTypeFileConfigList)(l))
-	if err != nil {
-		return fmt.Errorf("failed to parse [FileConfigList]: %w", err)
-	}
-
-	// Validate the unmarshaled object.
-	err = l.IsValid()
 	if err != nil {
 		return fmt.Errorf("failed to parse [FileConfigList]: %w", err)
 	}
