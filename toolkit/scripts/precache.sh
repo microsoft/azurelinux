@@ -45,7 +45,13 @@ for base_url in "${base_urls[@]}"; do
     repo_unique="repo-$(echo $(((RANDOM%99999)+10000)))"
     repo_name="mariner-precache-$repo_unique"
     echo "Querying repo $base_url via 'repoquery $REPOQUERY_OS_ARGS --repofrompath=$repo_name,$base_url -a --qf="%{location}" >> $cache_working_dir/repo.txt'"
-    repoquery $REPOQUERY_OS_ARGS --repofrompath=$repo_name,$base_url -a --qf="%{location}" >> $cache_working_dir/repo.txt || exit 1
+    if [[ "$ID" == "mariner" ]]; then
+        # Mariner version doesn't prepend the full URL, so add manually via sed on every line
+        prefix="$base_url/"
+    else
+        prefix=""
+    fi
+    repoquery $REPOQUERY_OS_ARGS --repofrompath=$repo_name,$base_url -a --qf="%{location}" | sed "s|^|$prefix|" >> $cache_working_dir/repo.txt || exit 1
 done
 
 touch "$downloaded_files"
