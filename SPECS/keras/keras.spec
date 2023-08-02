@@ -45,8 +45,6 @@ Python 3 version.
 tar -xf %{SOURCE1} -C /root/
 
 ln -s %{_bindir}/python3 %{_bindir}/python
-#remove .bazelversion file so that the latest bazel version available will be used to build Keras
-rm .bazelversion
 
 bazel --batch build  --verbose_explanations //keras/tools/pip_package:build_pip_package
 # ---------
@@ -72,7 +70,7 @@ bazel --batch build  --verbose_explanations //keras/tools/pip_package:build_pip_
 
 %changelog
 * Tue Aug 01 2023 Riken Maharjan <rmaharjan@microsoft.com> - 2.11.0-2
-- remove .bazelversion file.
+- remove bazel version.
 
 * Mon Dec 12 2022 Riken Maharjan <rmaharjan@microsoft> - 2.11.0-1
 - License verified
