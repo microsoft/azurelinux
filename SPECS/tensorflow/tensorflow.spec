@@ -148,16 +148,16 @@ bazel --batch build  --verbose_explanations //tensorflow/tools/pip_package:build
 
 %changelog
 * Tue Aug 01 2023 Riken Maharjan <rmaharjan@microsoft.com> - 2.11.0-4
-- remove .bazelversion file.
+- Remove .bazelversion file.
 
 * Thu Jan 03 2022 Riken Maharjan <rmaharjan@microsoft> - 2.11.0-3
-- add tf-nightly subpackage. 
+- Add tf-nightly subpackage. 
 
 * Thu Dec 08 2022 Riken Maharjan <rmaharjan@microsoft> - 2.11.0-2
-- correct markupsafe package name. 
+- Correct markupsafe package name. 
 
 * Sun Dec 04 2022 Riken Maharjan <rmaharjan@microsoft> - 2.11.0-1
-- update to 2.11.0
+- Update to 2.11.0
 
 * Thu Sep 22 2022 Riken Maharjan <rmaharjan@microsoft> - 2.8.3-1
 - License verified

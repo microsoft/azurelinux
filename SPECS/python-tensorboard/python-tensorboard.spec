@@ -103,7 +103,7 @@ mv %{pypi_name}-%{version}-*.whl pyproject-wheeldir/
 
 %changelog
 * Tue Aug 01 2023 Riken Maharjan <rmaharjan@microsoft.com> - 2.11.0-2
-- remove bazel version.
+- Remove bazel version.
 
 * Mon Dec 19 2022 Riken Maharjan <rmaharjan@microsoft.com> - 2.11.0-1
 - Original version for CBL-Mariner. License Verified.
