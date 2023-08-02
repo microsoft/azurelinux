@@ -1,0 +1,142 @@
+From 8493fa7a1ea8b1396bf98a0378a3e1eee279643c Mon Sep 17 00:00:00 2001
+From: Dan Streetman <ddstreet@ieee.org>
+Date: Tue, 27 Jun 2023 15:04:59 -0400
+Subject: [PATCH 28/44] openssl: add openssl_cipher() function
+
+Add function to perform openssl cipher operations.
+---
+ src/shared/openssl-util.c | 96 +++++++++++++++++++++++++++++++++++++++
+ src/shared/openssl-util.h |  3 ++
+ 2 files changed, 99 insertions(+)
+
+diff --git a/src/shared/openssl-util.c b/src/shared/openssl-util.c
+index e99ac53c05..ab1b68ef8b 100644
+--- a/src/shared/openssl-util.c
++++ b/src/shared/openssl-util.c
+@@ -216,6 +216,102 @@ int openssl_hmac_many(
+         return 0;
+ }
+ 
++/* Symmetric Cipher encryption. */
++int openssl_cipher(
++                const char *alg,
++                size_t bits,
++                const char *mode,
++                const void *key,
++                size_t key_size,
++                const void *iv,
++                size_t iv_size,
++                const struct iovec data[],
++                size_t n_data,
++                void **ret,
++                size_t *ret_size) {
++
++        int r;
++
++        assert(alg);
++        assert(bits > 0);
++        assert(mode);
++        assert(key);
++        assert(iv || iv_size == 0);
++        assert(data || n_data == 0);
++        assert(ret);
++        assert(ret_size);
++
++        _cleanup_free_ char *cipher_alg = NULL;
++        r = asprintf(&cipher_alg, "%s-%zu-%s", alg, bits, mode);
++        if (r < 0)
++                return log_oom_debug();
++
++#if OPENSSL_VERSION_MAJOR >= 3
++        _cleanup_(EVP_CIPHER_freep) EVP_CIPHER *cipher = EVP_CIPHER_fetch(NULL, cipher_alg, NULL);
++#else
++        const EVP_CIPHER *cipher = EVP_get_cipherbyname(cipher_alg);
++#endif
++        if (!cipher)
++                return log_openssl_errors("Failed to get EVP_CIPHER for '%s'", cipher_alg);
++
++        _cleanup_(EVP_CIPHER_CTX_freep) EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
++        if (!ctx)
++                return log_openssl_errors("Failed to create new EVP_CIPHER_CTX");
++
++        /* Verify enough key data was provided. */
++        int cipher_key_length = EVP_CIPHER_key_length(cipher);
++        if ((size_t) cipher_key_length > key_size)
++                return log_debug_errno(SYNTHETIC_ERRNO(EINVAL),
++                                       "Not enough key bytes provided, require %d", cipher_key_length);
++
++        /* Verify enough IV data was provided or, if no IV was provided, use a zeroed buffer for IV data. */
++        int cipher_iv_length = EVP_CIPHER_iv_length(cipher);
++        _cleanup_free_ void *zero_iv = NULL;
++        if (!iv) {
++                zero_iv = malloc0(cipher_iv_length);
++                if (!zero_iv)
++                        return log_oom_debug();
++
++                iv = zero_iv;
++                iv_size = (size_t) cipher_iv_length;
++        }
++        if ((size_t) cipher_iv_length > iv_size)
++                return log_debug_errno(SYNTHETIC_ERRNO(EINVAL),
++                                       "Not enough IV bytes provided, require %d", cipher_iv_length);
++
++        if (!EVP_EncryptInit(ctx, cipher, key, iv))
++                return log_openssl_errors("Failed to initialize EVP_CIPHER_CTX.");
++
++        int cipher_block_size = EVP_CIPHER_CTX_block_size(ctx);
++
++        _cleanup_free_ uint8_t *buf = NULL;
++        size_t size = 0;
++
++        for (size_t i = 0; i < n_data; i++) {
++                /* Cipher may produce (up to) input length + cipher block size of output. */
++                if (!GREEDY_REALLOC(buf, size + data[i].iov_len + cipher_block_size))
++                        return log_oom_debug();
++
++                int update_size;
++                if (!EVP_EncryptUpdate(ctx, &buf[size], &update_size, data[i].iov_base, data[i].iov_len))
++                        return log_openssl_errors("Failed to update Cipher.");
++
++                size += update_size;
++        }
++
++        if (!GREEDY_REALLOC(buf, size + cipher_block_size))
++                return log_oom_debug();
++
++        int final_size;
++        if (!EVP_EncryptFinal_ex(ctx, &buf[size], &final_size))
++                return log_openssl_errors("Failed to finalize Cipher.");
++
++        *ret = TAKE_PTR(buf);
++        *ret_size = size + final_size;
++
++        return 0;
++}
++
+ /* Perform Key-Based HMAC KDF. The mode must be "COUNTER" or "FEEDBACK". The parameter naming is from the
+  * Openssl api, and maps to SP800-108 naming as "...key, salt, info, and seed correspond to KI, Label,
+  * Context, and IV (respectively)...". The n_derive parameter specifies how many bytes are derived.
+diff --git a/src/shared/openssl-util.h b/src/shared/openssl-util.h
+index ac3b41ae14..e3661f015a 100644
+--- a/src/shared/openssl-util.h
++++ b/src/shared/openssl-util.h
+@@ -41,6 +41,7 @@ DEFINE_TRIVIAL_CLEANUP_FUNC_FULL(SSL*, SSL_free, NULL);
+ DEFINE_TRIVIAL_CLEANUP_FUNC_FULL(BIO*, BIO_free, NULL);
+ DEFINE_TRIVIAL_CLEANUP_FUNC_FULL(EVP_MD_CTX*, EVP_MD_CTX_free, NULL);
+ #if OPENSSL_VERSION_MAJOR >= 3
++DEFINE_TRIVIAL_CLEANUP_FUNC_FULL(EVP_CIPHER*, EVP_CIPHER_free, NULL);
+ DEFINE_TRIVIAL_CLEANUP_FUNC_FULL(EVP_KDF*, EVP_KDF_free, NULL);
+ DEFINE_TRIVIAL_CLEANUP_FUNC_FULL(EVP_KDF_CTX*, EVP_KDF_CTX_free, NULL);
+ DEFINE_TRIVIAL_CLEANUP_FUNC_FULL(EVP_MAC*, EVP_MAC_free, NULL);
+@@ -77,6 +78,8 @@ static inline int openssl_hmac(const char *digest_alg, const void *key, size_t k
+         return openssl_hmac_many(digest_alg, key, key_size, &IOVEC_MAKE((void*) buf, len), 1, ret_digest, ret_digest_size);
+ }
+ 
++int openssl_cipher(const char *alg, size_t bits, const char *mode, const void *key, size_t key_size, const void *iv, size_t iv_size, const struct iovec data[], size_t n_data, void **ret, size_t *ret_size);
++
+ int kdf_kb_hmac_derive(const char *mode, const char *digest, const void *key, size_t n_key, const void *salt, size_t n_salt, const void *info, size_t n_info, const void *seed, size_t n_seed, size_t n_derive, void **ret);
+ 
+ int rsa_encrypt_bytes(EVP_PKEY *pkey, const void *decrypted_key, size_t decrypted_key_size, void **ret_encrypt_key, size_t *ret_encrypt_key_size);
+-- 
+2.34.1
+

@@ -1,0 +1,100 @@
+From 0c87b4cf2a6717be1899e8ce642c235040e2b923 Mon Sep 17 00:00:00 2001
+From: Dan Streetman <ddstreet@ieee.org>
+Date: Fri, 7 Jul 2023 10:13:27 -0400
+Subject: [PATCH 30/44] openssl: add kdf_ss_derive()
+
+Add function to perform KDF-SS ("concat" KDF).
+---
+ src/shared/openssl-util.c | 62 +++++++++++++++++++++++++++++++++++++++
+ src/shared/openssl-util.h |  2 ++
+ 2 files changed, 64 insertions(+)
+
+diff --git a/src/shared/openssl-util.c b/src/shared/openssl-util.c
+index a7971baad6..4532367c6f 100644
+--- a/src/shared/openssl-util.c
++++ b/src/shared/openssl-util.c
+@@ -312,6 +312,68 @@ int openssl_cipher(
+         return 0;
+ }
+ 
++int kdf_ss_derive(
++                const char *digest,
++                const void *key,
++                size_t key_size,
++                const void *salt,
++                size_t salt_size,
++                const void *info,
++                size_t info_size,
++                size_t derive_size,
++                void **ret) {
++
++#if OPENSSL_VERSION_MAJOR >= 3
++        assert(digest);
++        assert(key);
++        assert(derive_size > 0);
++        assert(ret);
++
++        _cleanup_(EVP_KDF_freep) EVP_KDF *kdf = EVP_KDF_fetch(NULL, "SSKDF", NULL);
++        if (!kdf)
++                return log_openssl_errors("Failed to create new EVP_KDF");
++
++        _cleanup_(EVP_KDF_CTX_freep) EVP_KDF_CTX *ctx = EVP_KDF_CTX_new(kdf);
++        if (!ctx)
++                return log_openssl_errors("Failed to create new EVP_KDF_CTX");
++
++        _cleanup_(OSSL_PARAM_BLD_freep) OSSL_PARAM_BLD *bld = OSSL_PARAM_BLD_new();
++        if (!bld)
++                return log_openssl_errors("Failed to create new OSSL_PARAM_BLD");
++
++        _cleanup_free_ void *buf = malloc(derive_size);
++        if (!buf)
++                return log_oom_debug();
++
++        if (!OSSL_PARAM_BLD_push_utf8_string(bld, OSSL_KDF_PARAM_DIGEST, (char*) digest, 0))
++                return log_openssl_errors("Failed to add KDF-SS OSSL_KDF_PARAM_DIGEST");
++
++        if (!OSSL_PARAM_BLD_push_octet_string(bld, OSSL_KDF_PARAM_KEY, (char*) key, key_size))
++                return log_openssl_errors("Failed to add KDF-SS OSSL_KDF_PARAM_KEY");
++
++        if (salt)
++                if (!OSSL_PARAM_BLD_push_octet_string(bld, OSSL_KDF_PARAM_SALT, (char*) salt, salt_size))
++                        return log_openssl_errors("Failed to add KDF-SS OSSL_KDF_PARAM_SALT");
++
++        if (info)
++                if (!OSSL_PARAM_BLD_push_octet_string(bld, OSSL_KDF_PARAM_INFO, (char*) info, info_size))
++                        return log_openssl_errors("Failed to add KDF-SS OSSL_KDF_PARAM_INFO");
++
++        _cleanup_(OSSL_PARAM_freep) OSSL_PARAM *params = OSSL_PARAM_BLD_to_param(bld);
++        if (!params)
++                return log_openssl_errors("Failed to build KDF-SS OSSL_PARAM");
++
++        if (EVP_KDF_derive(ctx, buf, derive_size, params) <= 0)
++                return log_openssl_errors("Openssl KDF-SS derive failed");
++
++        *ret = TAKE_PTR(buf);
++
++        return 0;
++#else
++        return log_debug_errno(SYNTHETIC_ERRNO(EOPNOTSUPP), "KDF-SS requires openssl >= 3.");
++#endif
++}
++
+ /* Perform Key-Based HMAC KDF. The mode must be "COUNTER" or "FEEDBACK". The parameter naming is from the
+  * Openssl api, and maps to SP800-108 naming as "...key, salt, info, and seed correspond to KI, Label,
+  * Context, and IV (respectively)...". The n_derive parameter specifies how many bytes are derived.
+diff --git a/src/shared/openssl-util.h b/src/shared/openssl-util.h
+index 8807e2dd4e..b6fe1841f9 100644
+--- a/src/shared/openssl-util.h
++++ b/src/shared/openssl-util.h
+@@ -80,6 +80,8 @@ static inline int openssl_hmac(const char *digest_alg, const void *key, size_t k
+ 
+ int openssl_cipher(const char *alg, size_t bits, const char *mode, const void *key, size_t key_size, const void *iv, size_t iv_size, const struct iovec data[], size_t n_data, void **ret, size_t *ret_size);
+ 
++int kdf_ss_derive(const char *digest, const void *key, size_t key_size, const void *salt, size_t salt_size, const void *info, size_t info_size, size_t derive_size, void **ret);
++
+ int kdf_kb_hmac_derive(const char *mode, const char *digest, const void *key, size_t n_key, const void *salt, size_t n_salt, const void *info, size_t n_info, const void *seed, size_t n_seed, size_t n_derive, void **ret);
+ 
+ int rsa_encrypt_bytes(EVP_PKEY *pkey, const void *decrypted_key, size_t decrypted_key_size, void **ret_encrypt_key, size_t *ret_encrypt_key_size);
+-- 
+2.34.1
+

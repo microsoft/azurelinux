@@ -1,0 +1,726 @@
+From 9e4379945b74ee7920fe375be0bcb04d8ef53873 Mon Sep 17 00:00:00 2001
+From: Dan Streetman <ddstreet@ieee.org>
+Date: Wed, 12 Jul 2023 17:35:54 -0400
+Subject: [PATCH 18/20] tpm2: move policy calculation out of tpm2_seal()
+
+Move the calculation of the sealed object policy hash out of the tpm2_seal()
+function. Instead, callers of tpm2_seal() can directly call
+tpm2_calculate_sealing_policy() and then provide the policy hash to
+tpm2_seal().
+---
+ src/cryptenroll/cryptenroll-tpm2.c |  86 ++++++++++++++++++------
+ src/cryptenroll/cryptenroll-tpm2.h |   5 +-
+ src/cryptenroll/cryptenroll.c      |  28 +++++---
+ src/partition/repart.c             |  89 +++++++++++++++++-------
+ src/shared/creds-util.c            |  51 ++++++++++++--
+ src/shared/tpm2-util.c             | 104 +++++++----------------------
+ src/shared/tpm2-util.h             |   6 +-
+ 7 files changed, 227 insertions(+), 142 deletions(-)
+
+diff --git a/src/cryptenroll/cryptenroll-tpm2.c b/src/cryptenroll/cryptenroll-tpm2.c
+index 4dc3c1794d..86aed31838 100644
+--- a/src/cryptenroll/cryptenroll-tpm2.c
++++ b/src/cryptenroll/cryptenroll-tpm2.c
+@@ -133,7 +133,8 @@ int enroll_tpm2(struct crypt_device *cd,
+                 const void *volume_key,
+                 size_t volume_key_size,
+                 const char *device,
+-                uint32_t hash_pcr_mask,
++                Tpm2PCRValue *hash_pcr_values,
++                size_t n_hash_pcr_values,
+                 const char *pubkey_path,
+                 uint32_t pubkey_pcr_mask,
+                 const char *signature_path,
+@@ -143,9 +144,8 @@ int enroll_tpm2(struct crypt_device *cd,
+         _cleanup_(json_variant_unrefp) JsonVariant *v = NULL, *signature_json = NULL;
+         _cleanup_(erase_and_freep) char *base64_encoded = NULL;
+         _cleanup_free_ void *srk_buf = NULL;
+-        size_t secret_size, blob_size, hash_size, pubkey_size = 0, srk_buf_size = 0;
+-        _cleanup_free_ void *blob = NULL, *hash = NULL, *pubkey = NULL;
+-        uint16_t pcr_bank, primary_alg;
++        size_t secret_size, blob_size, pubkey_size = 0, srk_buf_size = 0;
++        _cleanup_free_ void *blob = NULL, *pubkey = NULL;
+         const char *node;
+         _cleanup_(erase_and_freep) char *pin_str = NULL;
+         ssize_t base64_encoded_size;
+@@ -163,7 +163,7 @@ int enroll_tpm2(struct crypt_device *cd,
+         assert(cd);
+         assert(volume_key);
+         assert(volume_key_size > 0);
+-        assert(TPM2_PCR_MASK_VALID(hash_pcr_mask));
++        assert(TPM2_PCR_VALUES_VALID(hash_pcr_values, n_hash_pcr_values));
+         assert(TPM2_PCR_MASK_VALID(pubkey_pcr_mask));
+ 
+         assert_se(node = crypt_get_device_name(cd));
+@@ -206,23 +206,69 @@ int enroll_tpm2(struct crypt_device *cd,
+                         return log_debug_errno(r, "Failed to read TPM PCR signature: %m");
+         }
+ 
+-        r = tpm2_seal(device,
+-                      hash_pcr_mask,
+-                      pubkey, pubkey_size,
+-                      pubkey_pcr_mask,
++        _cleanup_(tpm2_context_unrefp) Tpm2Context *tpm2_context = NULL;
++        r = tpm2_context_new(device, &tpm2_context);
++        if (r < 0)
++                return r;
++
++        bool pcr_value_specified = false;
++        for (size_t i = 0; i < n_hash_pcr_values; i++)
++                if (hash_pcr_values[i].value.size > 0) {
++                        pcr_value_specified = true;
++                        break;
++                }
++
++        r = tpm2_pcr_read_missing_values(tpm2_context, hash_pcr_values, n_hash_pcr_values);
++        if (r < 0)
++                return r;
++
++        uint16_t hash_pcr_bank = 0;
++        uint32_t hash_pcr_mask = 0;
++        if (n_hash_pcr_values > 0) {
++                size_t hash_count;
++                r = tpm2_pcr_values_hash_count(hash_pcr_values, n_hash_pcr_values, &hash_count);
++                if (r < 0)
++                        return log_error_errno(r, "Could not get hash count: %m");
++
++                if (hash_count > 1)
++                        return log_error_errno(SYNTHETIC_ERRNO(EINVAL), "Multiple PCR banks selected.");
++
++                hash_pcr_bank = hash_pcr_values[0].hash;
++                r = tpm2_pcr_values_to_mask(hash_pcr_values, n_hash_pcr_values, hash_pcr_bank, &hash_pcr_mask);
++                if (r < 0)
++                        return log_error_errno(r, "Could not get hash mask: %m");
++        }
++
++        TPM2B_PUBLIC public;
++        if (pubkey) {
++                r = tpm2_tpm2b_public_from_pem(pubkey, pubkey_size, &public);
++                if (r < 0)
++                        return log_error_errno(r, "Could not convert public key to TPM2B_PUBLIC: %m");
++        }
++
++        TPM2B_DIGEST policy = TPM2B_DIGEST_MAKE(NULL, TPM2_SHA256_DIGEST_SIZE);
++        r = tpm2_calculate_sealing_policy(
++                        hash_pcr_values,
++                        n_hash_pcr_values,
++                        pubkey ? &public : NULL,
++                        use_pin,
++                        &policy);
++        if (r < 0)
++                return r;
++
++        r = tpm2_seal(tpm2_context,
++                      &policy,
+                       pin_str,
+                       &secret, &secret_size,
+                       &blob, &blob_size,
+-                      &hash, &hash_size,
+-                      &pcr_bank,
+-                      &primary_alg,
++                      /* ret_primary_alg= */ NULL,
+                       &srk_buf,
+                       &srk_buf_size);
+         if (r < 0)
+                 return r;
+ 
+         /* Let's see if we already have this specific PCR policy hash enrolled, if so, exit early. */
+-        r = search_policy_hash(cd, hash, hash_size);
++        r = search_policy_hash(cd, policy.buffer, policy.size);
+         if (r == -ENOENT)
+                 log_debug_errno(r, "PCR policy hash not yet enrolled, enrolling now.");
+         else if (r < 0)
+@@ -233,21 +279,21 @@ int enroll_tpm2(struct crypt_device *cd,
+         }
+ 
+         /* Quick verification that everything is in order, we are not in a hurry after all. */
+-        if (!pubkey || signature_json) {
++        if ((!pubkey || signature_json) && !pcr_value_specified) {
+                 _cleanup_(erase_and_freep) void *secret2 = NULL;
+                 size_t secret2_size;
+ 
+                 log_debug("Unsealing for verification...");
+                 r = tpm2_unseal(device,
+                                 hash_pcr_mask,
+-                                pcr_bank,
++                                hash_pcr_bank,
+                                 pubkey, pubkey_size,
+                                 pubkey_pcr_mask,
+                                 signature_json,
+                                 pin_str,
+-                                primary_alg,
++                                /* primary_alg= */ 0,
+                                 blob, blob_size,
+-                                hash, hash_size,
++                                policy.buffer, policy.size,
+                                 srk_buf, srk_buf_size,
+                                 &secret2, &secret2_size);
+                 if (r < 0)
+@@ -279,12 +325,12 @@ int enroll_tpm2(struct crypt_device *cd,
+         r = tpm2_make_luks2_json(
+                         keyslot,
+                         hash_pcr_mask,
+-                        pcr_bank,
++                        hash_pcr_bank,
+                         pubkey, pubkey_size,
+                         pubkey_pcr_mask,
+-                        primary_alg,
++                        /* primary_alg= */ 0,
+                         blob, blob_size,
+-                        hash, hash_size,
++                        policy.buffer, policy.size,
+                         use_pin ? binary_salt : NULL,
+                         use_pin ? sizeof(binary_salt) : 0,
+                         srk_buf, srk_buf_size,
+diff --git a/src/cryptenroll/cryptenroll-tpm2.h b/src/cryptenroll/cryptenroll-tpm2.h
+index b6e0c2808e..d43a9a8ffe 100644
+--- a/src/cryptenroll/cryptenroll-tpm2.h
++++ b/src/cryptenroll/cryptenroll-tpm2.h
+@@ -5,11 +5,12 @@
+ 
+ #include "cryptsetup-util.h"
+ #include "log.h"
++#include "tpm2-util.h"
+ 
+ #if HAVE_TPM2
+-int enroll_tpm2(struct crypt_device *cd, const void *volume_key, size_t volume_key_size, const char *device, uint32_t hash_pcr_mask, const char *pubkey_path, uint32_t pubkey_pcr_mask, const char *signature_path, bool use_pin);
++int enroll_tpm2(struct crypt_device *cd, const void *volume_key, size_t volume_key_size, const char *device, Tpm2PCRValue *hash_pcrs, size_t n_hash_pcrs, const char *pubkey_path, uint32_t pubkey_pcr_mask, const char *signature_path, bool use_pin);
+ #else
+-static inline int enroll_tpm2(struct crypt_device *cd, const void *volume_key, size_t volume_key_size, const char *device, uint32_t hash_pcr_mask, const char *pubkey_path, uint32_t pubkey_pcr_mask, const char *signature_path, bool use_pin) {
++static inline int enroll_tpm2(struct crypt_device *cd, const void *volume_key, size_t volume_key_size, const char *device, Tpm2PCRValue *hash_pcrs, size_t n_hash_pcrs, const char *pubkey_path, uint32_t pubkey_pcr_mask, const char *signature_path, bool use_pin) {
+         return log_debug_errno(SYNTHETIC_ERRNO(EOPNOTSUPP),
+                                "TPM2 key enrollment not supported.");
+ }
+diff --git a/src/cryptenroll/cryptenroll.c b/src/cryptenroll/cryptenroll.c
+index b2e4c0a5f5..1ac2c6951e 100644
+--- a/src/cryptenroll/cryptenroll.c
++++ b/src/cryptenroll/cryptenroll.c
+@@ -28,7 +28,6 @@
+ #include "strv.h"
+ #include "terminal-util.h"
+ #include "tpm-pcr.h"
+-#include "tpm2-util.h"
+ 
+ static EnrollType arg_enroll_type = _ENROLL_TYPE_INVALID;
+ static char *arg_unlock_keyfile = NULL;
+@@ -37,10 +36,13 @@ static char *arg_unlock_fido2_device = NULL;
+ static char *arg_pkcs11_token_uri = NULL;
+ static char *arg_fido2_device = NULL;
+ static char *arg_tpm2_device = NULL;
+-static uint32_t arg_tpm2_pcr_mask = UINT32_MAX;
++static Tpm2PCRValue *arg_tpm2_hash_pcr_values = NULL;
++static size_t arg_tpm2_n_hash_pcr_values = 0;
++static bool arg_tpm2_hash_pcr_values_use_default = true;
+ static bool arg_tpm2_pin = false;
+ static char *arg_tpm2_public_key = NULL;
+-static uint32_t arg_tpm2_public_key_pcr_mask = UINT32_MAX;
++static uint32_t arg_tpm2_public_key_pcr_mask = 0;
++static bool arg_tpm2_public_key_pcr_mask_use_default = true;
+ static char *arg_tpm2_signature = NULL;
+ static char *arg_node = NULL;
+ static int *arg_wipe_slots = NULL;
+@@ -61,6 +63,7 @@ STATIC_DESTRUCTOR_REGISTER(arg_unlock_fido2_device, freep);
+ STATIC_DESTRUCTOR_REGISTER(arg_pkcs11_token_uri, freep);
+ STATIC_DESTRUCTOR_REGISTER(arg_fido2_device, freep);
+ STATIC_DESTRUCTOR_REGISTER(arg_tpm2_device, freep);
++STATIC_DESTRUCTOR_REGISTER(arg_tpm2_hash_pcr_values, freep);
+ STATIC_DESTRUCTOR_REGISTER(arg_tpm2_public_key, freep);
+ STATIC_DESTRUCTOR_REGISTER(arg_tpm2_signature, freep);
+ STATIC_DESTRUCTOR_REGISTER(arg_node, freep);
+@@ -356,7 +359,8 @@ static int parse_argv(int argc, char *argv[]) {
+                 }
+ 
+                 case ARG_TPM2_PCRS:
+-                        r = tpm2_parse_pcr_argument_to_mask(optarg, &arg_tpm2_pcr_mask);
++                        arg_tpm2_hash_pcr_values_use_default = false;
++                        r = tpm2_parse_pcr_argument_append(optarg, &arg_tpm2_hash_pcr_values, &arg_tpm2_n_hash_pcr_values);
+                         if (r < 0)
+                                 return r;
+ 
+@@ -377,6 +381,7 @@ static int parse_argv(int argc, char *argv[]) {
+                         break;
+ 
+                 case ARG_TPM2_PUBLIC_KEY_PCRS:
++                        arg_tpm2_public_key_pcr_mask_use_default = false;
+                         r = tpm2_parse_pcr_argument_to_mask(optarg, &arg_tpm2_public_key_pcr_mask);
+                         if (r < 0)
+                                 return r;
+@@ -476,10 +481,15 @@ static int parse_argv(int argc, char *argv[]) {
+         if (r < 0)
+                 return r;
+ 
+-        if (arg_tpm2_pcr_mask == UINT32_MAX)
+-                arg_tpm2_pcr_mask = TPM2_PCR_MASK_DEFAULT;
+-        if (arg_tpm2_public_key_pcr_mask == UINT32_MAX)
+-                arg_tpm2_public_key_pcr_mask = UINT32_C(1) << TPM_PCR_INDEX_KERNEL_IMAGE;
++        if (arg_tpm2_public_key_pcr_mask_use_default && arg_tpm2_public_key)
++                arg_tpm2_public_key_pcr_mask = INDEX_TO_MASK(uint32_t, TPM_PCR_INDEX_KERNEL_IMAGE);
++
++        if (arg_tpm2_hash_pcr_values_use_default && !GREEDY_REALLOC_APPEND(
++                        arg_tpm2_hash_pcr_values,
++                        arg_tpm2_n_hash_pcr_values,
++                        &TPM2_PCR_VALUE_MAKE(TPM2_PCR_INDEX_DEFAULT, /* hash= */ 0, /* value= */ {}),
++                        1))
++                return log_oom();
+ 
+         return 1;
+ }
+@@ -655,7 +665,7 @@ static int run(int argc, char *argv[]) {
+                 break;
+ 
+         case ENROLL_TPM2:
+-                slot = enroll_tpm2(cd, vk, vks, arg_tpm2_device, arg_tpm2_pcr_mask, arg_tpm2_public_key, arg_tpm2_public_key_pcr_mask, arg_tpm2_signature, arg_tpm2_pin);
++                slot = enroll_tpm2(cd, vk, vks, arg_tpm2_device, arg_tpm2_hash_pcr_values, arg_tpm2_n_hash_pcr_values, arg_tpm2_public_key, arg_tpm2_public_key_pcr_mask, arg_tpm2_signature, arg_tpm2_pin);
+                 break;
+ 
+         case _ENROLL_TYPE_INVALID:
+diff --git a/src/partition/repart.c b/src/partition/repart.c
+index 9e30c6bbc3..1a316012e7 100644
+--- a/src/partition/repart.c
++++ b/src/partition/repart.c
+@@ -140,9 +140,12 @@ static size_t arg_key_size = 0;
+ static EVP_PKEY *arg_private_key = NULL;
+ static X509 *arg_certificate = NULL;
+ static char *arg_tpm2_device = NULL;
+-static uint32_t arg_tpm2_pcr_mask = UINT32_MAX;
++static Tpm2PCRValue *arg_tpm2_hash_pcr_values = NULL;
++static size_t arg_tpm2_n_hash_pcr_values = 0;
++static bool arg_tpm2_hash_pcr_values_use_default = true;
+ static char *arg_tpm2_public_key = NULL;
+-static uint32_t arg_tpm2_public_key_pcr_mask = UINT32_MAX;
++static uint32_t arg_tpm2_public_key_pcr_mask = 0;
++static bool arg_tpm2_public_key_pcr_mask_use_default = true;
+ static bool arg_split = false;
+ static GptPartitionType *arg_filter_partitions = NULL;
+ static size_t arg_n_filter_partitions = 0;
+@@ -162,6 +165,7 @@ STATIC_DESTRUCTOR_REGISTER(arg_key, erase_and_freep);
+ STATIC_DESTRUCTOR_REGISTER(arg_private_key, EVP_PKEY_freep);
+ STATIC_DESTRUCTOR_REGISTER(arg_certificate, X509_freep);
+ STATIC_DESTRUCTOR_REGISTER(arg_tpm2_device, freep);
++STATIC_DESTRUCTOR_REGISTER(arg_tpm2_hash_pcr_values, freep);
+ STATIC_DESTRUCTOR_REGISTER(arg_tpm2_public_key, freep);
+ STATIC_DESTRUCTOR_REGISTER(arg_filter_partitions, freep);
+ STATIC_DESTRUCTOR_REGISTER(arg_image_policy, image_policy_freep);
+@@ -3639,10 +3643,9 @@ static int partition_encrypt(Context *context, Partition *p, PartitionTarget *ta
+                 _cleanup_(json_variant_unrefp) JsonVariant *v = NULL;
+                 _cleanup_(erase_and_freep) void *secret = NULL;
+                 _cleanup_free_ void *pubkey = NULL;
+-                _cleanup_free_ void *blob = NULL, *hash = NULL, *srk_buf = NULL;
+-                size_t secret_size, blob_size, hash_size, pubkey_size = 0, srk_buf_size = 0;
++                _cleanup_free_ void *blob = NULL, *srk_buf = NULL;
++                size_t secret_size, blob_size, pubkey_size = 0, srk_buf_size = 0;
+                 ssize_t base64_encoded_size;
+-                uint16_t pcr_bank, primary_alg;
+                 int keyslot;
+ 
+                 if (arg_tpm2_public_key_pcr_mask != 0) {
+@@ -3656,18 +3659,51 @@ static int partition_encrypt(Context *context, Partition *p, PartitionTarget *ta
+                         }
+                 }
+ 
+-                r = tpm2_seal(arg_tpm2_device,
+-                              arg_tpm2_pcr_mask,
+-                              pubkey, pubkey_size,
+-                              arg_tpm2_public_key_pcr_mask,
++                _cleanup_(tpm2_context_unrefp) Tpm2Context *tpm2_context = NULL;
++                r = tpm2_context_new(arg_tpm2_device, &tpm2_context);
++                if (r < 0)
++                        return r;
++
++                TPM2B_PUBLIC public;
++                if (pubkey) {
++                        r = tpm2_tpm2b_public_from_pem(pubkey, pubkey_size, &public);
++                        if (r < 0)
++                                return log_error_errno(r, "Could not convert public key to TPM2B_PUBLIC: %m");
++                }
++
++                r = tpm2_pcr_read_missing_values(tpm2_context, arg_tpm2_hash_pcr_values, arg_tpm2_n_hash_pcr_values);
++                if (r < 0)
++                        return r;
++
++                uint16_t hash_pcr_bank = 0;
++                uint32_t hash_pcr_mask = 0;
++                if (arg_tpm2_n_hash_pcr_values > 0) {
++                        size_t hash_count;
++                        r = tpm2_pcr_values_hash_count(arg_tpm2_hash_pcr_values, arg_tpm2_n_hash_pcr_values, &hash_count);
++                        if (r < 0)
++                                return log_error_errno(r, "Could not get hash count: %m");
++
++                        if (hash_count > 1)
++                                return log_error_errno(SYNTHETIC_ERRNO(EINVAL), "Multiple PCR banks selected.");
++
++                        hash_pcr_bank = arg_tpm2_hash_pcr_values[0].hash;
++                        r = tpm2_pcr_values_to_mask(arg_tpm2_hash_pcr_values, arg_tpm2_n_hash_pcr_values, hash_pcr_bank, &hash_pcr_mask);
++                        if (r < 0)
++                                return log_error_errno(r, "Could not get hash mask: %m");
++                }
++
++                TPM2B_DIGEST policy = TPM2B_DIGEST_MAKE(NULL, TPM2_SHA256_DIGEST_SIZE);
++                r = tpm2_calculate_sealing_policy(arg_tpm2_hash_pcr_values, arg_tpm2_n_hash_pcr_values, &public, /* use_pin= */ false, &policy);
++                if (r < 0)
++                        return r;
++
++                r = tpm2_seal(tpm2_context,
++                              &policy,
+                               /* pin= */ NULL,
+                               &secret, &secret_size,
+                               &blob, &blob_size,
+-                              &hash, &hash_size,
+-                              &pcr_bank,
+-                              &primary_alg,
+-                              &srk_buf,
+-                              &srk_buf_size);
++                              /* ret_primary_alg= */ NULL,
++                              &srk_buf, &srk_buf_size);
+                 if (r < 0)
+                         return log_error_errno(r, "Failed to seal to TPM2: %m");
+ 
+@@ -3691,13 +3727,13 @@ static int partition_encrypt(Context *context, Partition *p, PartitionTarget *ta
+ 
+                 r = tpm2_make_luks2_json(
+                                 keyslot,
+-                                arg_tpm2_pcr_mask,
+-                                pcr_bank,
++                                hash_pcr_mask,
++                                hash_pcr_bank,
+                                 pubkey, pubkey_size,
+                                 arg_tpm2_public_key_pcr_mask,
+-                                primary_alg,
++                                /* primary_alg= */ 0,
+                                 blob, blob_size,
+-                                hash, hash_size,
++                                policy.buffer, policy.size,
+                                 NULL, 0, /* no salt because tpm2_seal has no pin */
+                                 srk_buf, srk_buf_size,
+                                 0,
+@@ -6447,7 +6483,8 @@ static int parse_argv(int argc, char *argv[]) {
+                 }
+ 
+                 case ARG_TPM2_PCRS:
+-                        r = tpm2_parse_pcr_argument_to_mask(optarg, &arg_tpm2_pcr_mask);
++                        arg_tpm2_hash_pcr_values_use_default = false;
++                        r = tpm2_parse_pcr_argument_append(optarg, &arg_tpm2_hash_pcr_values, &arg_tpm2_n_hash_pcr_values);
+                         if (r < 0)
+                                 return r;
+ 
+@@ -6461,6 +6498,7 @@ static int parse_argv(int argc, char *argv[]) {
+                         break;
+ 
+                 case ARG_TPM2_PUBLIC_KEY_PCRS:
++                        arg_tpm2_public_key_pcr_mask_use_default = false;
+                         r = tpm2_parse_pcr_argument_to_mask(optarg, &arg_tpm2_public_key_pcr_mask);
+                         if (r < 0)
+                                 return r;
+@@ -6597,10 +6635,15 @@ static int parse_argv(int argc, char *argv[]) {
+                 return log_error_errno(SYNTHETIC_ERRNO(EINVAL),
+                                        "A path to a loopback file must be specified when --split is used.");
+ 
+-        if (arg_tpm2_pcr_mask == UINT32_MAX)
+-                arg_tpm2_pcr_mask = TPM2_PCR_MASK_DEFAULT;
+-        if (arg_tpm2_public_key_pcr_mask == UINT32_MAX)
+-                arg_tpm2_public_key_pcr_mask = UINT32_C(1) << TPM_PCR_INDEX_KERNEL_IMAGE;
++        if (arg_tpm2_public_key_pcr_mask_use_default && arg_tpm2_public_key)
++                arg_tpm2_public_key_pcr_mask = INDEX_TO_MASK(uint32_t, TPM_PCR_INDEX_KERNEL_IMAGE);
++
++        if (arg_tpm2_hash_pcr_values_use_default && !GREEDY_REALLOC_APPEND(
++                        arg_tpm2_hash_pcr_values,
++                        arg_tpm2_n_hash_pcr_values,
++                        &TPM2_PCR_VALUE_MAKE(TPM2_PCR_INDEX_DEFAULT, /* hash= */ 0, /* value= */ {}),
++                        1))
++                return log_oom();
+ 
+         if (arg_pretty < 0 && isatty(STDOUT_FILENO))
+                 arg_pretty = true;
+diff --git a/src/shared/creds-util.c b/src/shared/creds-util.c
+index 16df01b9ca..8a5240e5f1 100644
+--- a/src/shared/creds-util.c
++++ b/src/shared/creds-util.c
+@@ -825,18 +825,49 @@ int encrypt_credential_and_warn(
+                 if (!pubkey)
+                         tpm2_pubkey_pcr_mask = 0;
+ 
+-                r = tpm2_seal(tpm2_device,
+-                              tpm2_hash_pcr_mask,
+-                              pubkey, pubkey_size,
+-                              tpm2_pubkey_pcr_mask,
++                _cleanup_(tpm2_context_unrefp) Tpm2Context *tpm2_context = NULL;
++                r = tpm2_context_new(tpm2_device, &tpm2_context);
++                if (r < 0)
++                        return r;
++
++                r = tpm2_get_best_pcr_bank(tpm2_context, tpm2_hash_pcr_mask | tpm2_pubkey_pcr_mask, &tpm2_pcr_bank);
++                if (r < 0)
++                        return r;
++
++                TPML_PCR_SELECTION tpm2_hash_pcr_selection;
++                tpm2_tpml_pcr_selection_from_mask(tpm2_hash_pcr_mask, tpm2_pcr_bank, &tpm2_hash_pcr_selection);
++
++                _cleanup_free_ Tpm2PCRValue *tpm2_hash_pcr_values = NULL;
++                size_t tpm2_n_hash_pcr_values;
++                r = tpm2_pcr_read(tpm2_context, &tpm2_hash_pcr_selection, &tpm2_hash_pcr_values, &tpm2_n_hash_pcr_values);
++                if (r < 0)
++                        return r;
++
++                TPM2B_PUBLIC public;
++                if (pubkey) {
++                        r = tpm2_tpm2b_public_from_pem(pubkey, pubkey_size, &public);
++                        if (r < 0)
++                                return log_error_errno(r, "Could not convert public key to TPM2B_PUBLIC: %m");
++                }
++
++                TPM2B_DIGEST tpm2_policy = TPM2B_DIGEST_MAKE(NULL, TPM2_SHA256_DIGEST_SIZE);
++                r = tpm2_calculate_sealing_policy(
++                                tpm2_hash_pcr_values,
++                                tpm2_n_hash_pcr_values,
++                                pubkey ? &public : NULL,
++                                /* use_pin= */ false,
++                                &tpm2_policy);
++                if (r < 0)
++                        return r;
++
++                r = tpm2_seal(tpm2_context,
++                              &tpm2_policy,
+                               /* pin= */ NULL,
+                               &tpm2_key, &tpm2_key_size,
+                               &tpm2_blob, &tpm2_blob_size,
+-                              &tpm2_policy_hash, &tpm2_policy_hash_size,
+-                              &tpm2_pcr_bank,
+                               &tpm2_primary_alg,
+                               /* ret_srk_buf= */ NULL,
+-                              /* ret_srk_buf_size= */ 0);
++                              /* ret_srk_buf_size= */ NULL);
+                 if (r < 0) {
+                         if (sd_id128_equal(with_key, _CRED_AUTO_INITRD))
+                                 log_warning("TPM2 present and used, but we didn't manage to talk to it. Credential will be refused if SecureBoot is enabled.");
+@@ -846,6 +877,12 @@ int encrypt_credential_and_warn(
+                         log_notice_errno(r, "TPM2 sealing didn't work, continuing without TPM2: %m");
+                 }
+ 
++                tpm2_policy_hash_size = tpm2_policy.size;
++                tpm2_policy_hash = malloc(tpm2_policy_hash_size);
++                if (!tpm2_policy_hash)
++                        return log_oom();
++                memcpy(tpm2_policy_hash, tpm2_policy.buffer, tpm2_policy_hash_size);
++
+                 assert(tpm2_blob_size <= CREDENTIAL_FIELD_SIZE_MAX);
+                 assert(tpm2_policy_hash_size <= CREDENTIAL_FIELD_SIZE_MAX);
+         }
+diff --git a/src/shared/tpm2-util.c b/src/shared/tpm2-util.c
+index 6b995fd272..21ee4dc8e0 100644
+--- a/src/shared/tpm2-util.c
++++ b/src/shared/tpm2-util.c
+@@ -3425,7 +3425,7 @@ static int tpm2_policy_authorize(
+ }
+ 
+ /* Extend 'digest' with the calculated policy hash. */
+-static int tpm2_calculate_sealing_policy(
++int tpm2_calculate_sealing_policy(
+                 const Tpm2PCRValue *pcr_values,
+                 size_t n_pcr_values,
+                 const TPM2B_PUBLIC *public,
+@@ -3722,38 +3722,25 @@ int tpm2_tpm2b_public_from_pem(const void *pem, size_t pem_size, TPM2B_PUBLIC *r
+ #endif
+ }
+ 
+-int tpm2_seal(const char *device,
+-              uint32_t hash_pcr_mask,
+-              const void *pubkey,
+-              const size_t pubkey_size,
+-              uint32_t pubkey_pcr_mask,
++int tpm2_seal(Tpm2Context *c,
++              const TPM2B_DIGEST *policy,
+               const char *pin,
+               void **ret_secret,
+               size_t *ret_secret_size,
+               void **ret_blob,
+               size_t *ret_blob_size,
+-              void **ret_pcr_hash,
+-              size_t *ret_pcr_hash_size,
+-              uint16_t *ret_pcr_bank,
+               uint16_t *ret_primary_alg,
+               void **ret_srk_buf,
+               size_t *ret_srk_buf_size) {
+ 
++        uint16_t primary_alg = 0;
+         TSS2_RC rc;
+         int r;
+ 
+-        assert(pubkey || pubkey_size == 0);
+-
+         assert(ret_secret);
+         assert(ret_secret_size);
+         assert(ret_blob);
+         assert(ret_blob_size);
+-        assert(ret_pcr_hash);
+-        assert(ret_pcr_hash_size);
+-        assert(ret_pcr_bank);
+-
+-        assert(TPM2_PCR_MASK_VALID(hash_pcr_mask));
+-        assert(TPM2_PCR_MASK_VALID(pubkey_pcr_mask));
+ 
+         /* So here's what we do here: we connect to the TPM2 chip. It persistently contains a "seed" key that
+          * is randomized when the TPM2 is first initialized or reset and remains stable across boots. We
+@@ -3773,53 +3760,6 @@ int tpm2_seal(const char *device,
+ 
+         usec_t start = now(CLOCK_MONOTONIC);
+ 
+-        _cleanup_(tpm2_context_unrefp) Tpm2Context *c = NULL;
+-        r = tpm2_context_new(device, &c);
+-        if (r < 0)
+-                return r;
+-
+-        TPMI_ALG_HASH pcr_bank = 0;
+-        if (hash_pcr_mask | pubkey_pcr_mask) {
+-                /* Some TPM2 devices only can do SHA1. Prefer SHA256 but allow SHA1. */
+-                r = tpm2_get_best_pcr_bank(c, hash_pcr_mask|pubkey_pcr_mask, &pcr_bank);
+-                if (r < 0)
+-                        return r;
+-        }
+-
+-        _cleanup_free_ Tpm2PCRValue *hash_pcr_values = NULL;
+-        size_t n_hash_pcr_values;
+-        if (hash_pcr_mask) {
+-                /* For now, we just read the current values from the system; we need to be able to specify
+-                 * expected values, eventually. */
+-                TPML_PCR_SELECTION hash_pcr_selection;
+-                tpm2_tpml_pcr_selection_from_mask(hash_pcr_mask, pcr_bank, &hash_pcr_selection);
+-
+-                r = tpm2_pcr_read(c, &hash_pcr_selection, &hash_pcr_values, &n_hash_pcr_values);
+-                if (r < 0)
+-                        return r;
+-        }
+-
+-        TPM2B_PUBLIC pubkey_tpm2b;
+-        if (pubkey) {
+-                r = tpm2_tpm2b_public_from_pem(pubkey, pubkey_size, &pubkey_tpm2b);
+-                if (r < 0)
+-                        return log_error_errno(r, "Could not create TPMT_PUBLIC: %m");
+-        }
+-
+-        TPM2B_DIGEST policy_digest;
+-        r = tpm2_digest_init(TPM2_ALG_SHA256, &policy_digest);
+-        if (r < 0)
+-                return r;
+-
+-        r = tpm2_calculate_sealing_policy(
+-                        hash_pcr_values,
+-                        n_hash_pcr_values,
+-                        pubkey ? &pubkey_tpm2b : NULL,
+-                        !!pin,
+-                        &policy_digest);
+-        if (r < 0)
+-                return r;
+-
+         /* We use a keyed hash object (i.e. HMAC) to store the secret key we want to use for unlocking the
+          * LUKS2 volume with. We don't ever use for HMAC/keyed hash operations however, we just use it
+          * because it's a key type that is universally supported and suitable for symmetric binary blobs. */
+@@ -3829,7 +3769,7 @@ int tpm2_seal(const char *device,
+                 .objectAttributes = TPMA_OBJECT_FIXEDTPM | TPMA_OBJECT_FIXEDPARENT,
+                 .parameters.keyedHashDetail.scheme.scheme = TPM2_ALG_NULL,
+                 .unique.keyedHash.size = SHA256_DIGEST_SIZE,
+-                .authPolicy = policy_digest,
++                .authPolicy = policy ? *policy : TPM2B_DIGEST_MAKE(NULL, TPM2_SHA256_DIGEST_SIZE),
+         };
+ 
+         TPMS_SENSITIVE_CREATE hmac_sensitive = {
+@@ -3854,21 +3794,33 @@ int tpm2_seal(const char *device,
+         if (r < 0)
+                 return log_error_errno(r, "Failed to generate secret key: %m");
+ 
+-        _cleanup_(Esys_Freep) TPM2B_PUBLIC *primary_public = NULL;
+         _cleanup_(tpm2_handle_freep) Tpm2Handle *primary_handle = NULL;
+         if (ret_srk_buf) {
+-                r = tpm2_get_or_create_srk(c, NULL, &primary_public, NULL, NULL, &primary_handle);
++                _cleanup_(Esys_Freep) TPM2B_PUBLIC *primary_public = NULL;
++                r = tpm2_get_or_create_srk(
++                                c,
++                                /* session= */ NULL,
++                                &primary_public,
++                                /* ret_name= */ NULL,
++                                /* ret_qname= */ NULL,
++                                &primary_handle);
+                 if (r < 0)
+                         return r;
++
++                primary_alg = primary_public->publicArea.type;
+         } else {
+                 /* TODO: force all callers to provide ret_srk_buf, so we can stop sealing with the legacy templates. */
++                primary_alg = TPM2_ALG_ECC;
++
+                 TPM2B_PUBLIC template = { .size = sizeof(TPMT_PUBLIC), };
+-                r = tpm2_get_legacy_template(TPM2_ALG_ECC, &template.publicArea);
++                r = tpm2_get_legacy_template(primary_alg, &template.publicArea);
+                 if (r < 0)
+                         return log_error_errno(r, "Could not get legacy ECC template: %m");
+ 
+                 if (!tpm2_supports_tpmt_public(c, &template.publicArea)) {
+-                        r = tpm2_get_legacy_template(TPM2_ALG_RSA, &template.publicArea);
++                        primary_alg = TPM2_ALG_RSA;
++
++                        r = tpm2_get_legacy_template(primary_alg, &template.publicArea);
+                         if (r < 0)
+                                 return log_error_errno(r, "Could not get legacy RSA template: %m");
+ 
+@@ -3882,7 +3834,7 @@ int tpm2_seal(const char *device,
+                                 /* session= */ NULL,
+                                 &template,
+                                 /* sensitive= */ NULL,
+-                                &primary_public,
++                                /* ret_public= */ NULL,
+                                 &primary_handle);
+                 if (r < 0)
+                         return r;
+@@ -3923,11 +3875,6 @@ int tpm2_seal(const char *device,
+                 return log_error_errno(SYNTHETIC_ERRNO(ENOTRECOVERABLE),
+                                        "Failed to marshal public key: %s", sym_Tss2_RC_Decode(rc));
+ 
+-        _cleanup_free_ void *hash = NULL;
+-        hash = memdup(policy_digest.buffer, policy_digest.size);
+-        if (!hash)
+-                return log_oom();
+-
+         /* serialize the key for storage in the LUKS header. A deserialized ESYS_TR provides both
+          * the raw TPM handle as well as the object name. The object name is used to verify that
+          * the key we use later is the key we expect to establish the session with.
+@@ -3963,10 +3910,9 @@ int tpm2_seal(const char *device,
+         *ret_secret_size = hmac_sensitive.data.size;
+         *ret_blob = TAKE_PTR(blob);
+         *ret_blob_size = blob_size;
+-        *ret_pcr_hash = TAKE_PTR(hash);
+-        *ret_pcr_hash_size = policy_digest.size;
+-        *ret_pcr_bank = pcr_bank;
+-        *ret_primary_alg = primary_public->publicArea.type;
++
++        if (ret_primary_alg)
++                *ret_primary_alg = primary_alg;
+ 
+         return 0;
+ }
+diff --git a/src/shared/tpm2-util.h b/src/shared/tpm2-util.h
+index c3bc35172a..32da247c37 100644
+--- a/src/shared/tpm2-util.h
++++ b/src/shared/tpm2-util.h
+@@ -154,8 +154,9 @@ int tpm2_calculate_name(const TPMT_PUBLIC *public, TPM2B_NAME *ret_name);
+ int tpm2_calculate_policy_auth_value(TPM2B_DIGEST *digest);
+ int tpm2_calculate_policy_authorize(const TPM2B_PUBLIC *public, const TPM2B_DIGEST *policy_ref, TPM2B_DIGEST *digest);
+ int tpm2_calculate_policy_pcr(const Tpm2PCRValue *pcr_values, size_t n_pcr_values, TPM2B_DIGEST *digest);
++int tpm2_calculate_sealing_policy(const Tpm2PCRValue *pcr_values, size_t n_pcr_values, const TPM2B_PUBLIC *public, bool use_pin, TPM2B_DIGEST *digest);
+ 
+-int tpm2_seal(const char *device, uint32_t hash_pcr_mask, const void *pubkey, size_t pubkey_size, uint32_t pubkey_pcr_mask, const char *pin, void **ret_secret, size_t *ret_secret_size, void **ret_blob, size_t *ret_blob_size, void **ret_pcr_hash, size_t *ret_pcr_hash_size, uint16_t *ret_pcr_bank, uint16_t *ret_primary_alg, void **ret_srk_buf, size_t *ret_srk_buf_size);
++int tpm2_seal(Tpm2Context *c, const TPM2B_DIGEST *policy, const char *pin, void **ret_secret, size_t *ret_secret_size, void **ret_blob, size_t *ret_blob_size, uint16_t *ret_primary_alg, void **ret_srk_buf, size_t *ret_srk_buf_size);
+ int tpm2_unseal(const char *device, uint32_t hash_pcr_mask, uint16_t pcr_bank, const void *pubkey, size_t pubkey_size, uint32_t pubkey_pcr_mask, JsonVariant *signature, const char *pin, uint16_t primary_alg, const void *blob, size_t blob_size, const void *policy_hash, size_t policy_hash_size, const void *srk_buf, size_t srk_buf_size, void **ret_secret, size_t *ret_secret_size);
+ 
+ #if HAVE_OPENSSL
+@@ -240,7 +241,8 @@ int tpm2_make_luks2_json(int keyslot, uint32_t hash_pcr_mask, uint16_t pcr_bank,
+ int tpm2_parse_luks2_json(JsonVariant *v, int *ret_keyslot, uint32_t *ret_hash_pcr_mask, uint16_t *ret_pcr_bank, void **ret_pubkey, size_t *ret_pubkey_size, uint32_t *ret_pubkey_pcr_mask, uint16_t *ret_primary_alg, void **ret_blob, size_t *ret_blob_size, void **ret_policy_hash, size_t *ret_policy_hash_size, void **ret_salt, size_t *ret_salt_size, void **ret_srk_buf, size_t *ret_srk_buf_size, TPM2Flags *ret_flags);
+ 
+ /* Default to PCR 7 only */
+-#define TPM2_PCR_MASK_DEFAULT (UINT32_C(1) << 7)
++#define TPM2_PCR_INDEX_DEFAULT (7)
++#define TPM2_PCR_MASK_DEFAULT INDEX_TO_MASK(uint32_t, TPM2_PCR_INDEX_DEFAULT)
+ 
+ /* We want the helpers below to work also if TPM2 libs are not available, hence define these four defines if
+  * they are missing. */
+-- 
+2.34.1
+

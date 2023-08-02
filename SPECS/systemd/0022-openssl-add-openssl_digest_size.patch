@@ -1,0 +1,73 @@
+From 90b7e465c652508b4571a9dd6d55edbf84f684a6 Mon Sep 17 00:00:00 2001
+From: Dan Streetman <ddstreet@ieee.org>
+Date: Wed, 5 Jul 2023 12:59:47 -0400
+Subject: [PATCH 22/44] openssl: add openssl_digest_size()
+
+Add function to get digest hash size for provided digest name.
+---
+ src/shared/openssl-util.c | 27 +++++++++++++++++++++++++++
+ src/shared/openssl-util.h |  3 +++
+ 2 files changed, 30 insertions(+)
+
+diff --git a/src/shared/openssl-util.c b/src/shared/openssl-util.c
+index db45b23aaf..7b0b63139d 100644
+--- a/src/shared/openssl-util.c
++++ b/src/shared/openssl-util.c
+@@ -87,6 +87,33 @@ int openssl_hash(const EVP_MD *alg,
+         return 0;
+ }
+ 
++int openssl_digest_size(const char *digest_alg, size_t *ret_digest_size) {
++        size_t digest_size;
++
++        assert(digest_alg);
++        assert(ret_digest_size);
++
++#if OPENSSL_VERSION_MAJOR >= 3
++        _cleanup_(EVP_MD_freep) EVP_MD *md = EVP_MD_fetch(NULL, digest_alg, NULL);
++#else
++        const EVP_MD *md = EVP_get_digestbyname(digest_alg);
++#endif
++        if (!md)
++                return log_openssl_errors("Failed to get EVP_MD for '%s'", digest_alg);
++
++#if OPENSSL_VERSION_MAJOR >= 3
++        digest_size = EVP_MD_get_size(md);
++#else
++        digest_size = EVP_MD_size(md);
++#endif
++        if (digest_size == 0)
++                return log_openssl_errors("Failed to get Digest size");
++
++        *ret_digest_size = digest_size;
++
++        return 0;
++}
++
+ int rsa_encrypt_bytes(
+                 EVP_PKEY *pkey,
+                 const void *decrypted_key,
+diff --git a/src/shared/openssl-util.h b/src/shared/openssl-util.h
+index 90158f589b..309dc16805 100644
+--- a/src/shared/openssl-util.h
++++ b/src/shared/openssl-util.h
+@@ -39,6 +39,7 @@ DEFINE_TRIVIAL_CLEANUP_FUNC_FULL(SSL*, SSL_free, NULL);
+ DEFINE_TRIVIAL_CLEANUP_FUNC_FULL(BIO*, BIO_free, NULL);
+ DEFINE_TRIVIAL_CLEANUP_FUNC_FULL(EVP_MD_CTX*, EVP_MD_CTX_free, NULL);
+ #if OPENSSL_VERSION_MAJOR >= 3
++DEFINE_TRIVIAL_CLEANUP_FUNC_FULL(EVP_MD*, EVP_MD_free, NULL);
+ DEFINE_TRIVIAL_CLEANUP_FUNC_FULL(OSSL_PARAM*, OSSL_PARAM_free, NULL);
+ DEFINE_TRIVIAL_CLEANUP_FUNC_FULL(OSSL_PARAM_BLD*, OSSL_PARAM_BLD_free, NULL);
+ #else
+@@ -57,6 +58,8 @@ int openssl_pkey_from_pem(const void *pem, size_t pem_size, EVP_PKEY **ret);
+ 
+ int openssl_hash(const EVP_MD *alg, const void *msg, size_t msg_len, uint8_t *ret_hash, size_t *ret_hash_len);
+ 
++int openssl_digest_size(const char *digest_alg, size_t *ret_digest_size);
++
+ int rsa_encrypt_bytes(EVP_PKEY *pkey, const void *decrypted_key, size_t decrypted_key_size, void **ret_encrypt_key, size_t *ret_encrypt_key_size);
+ 
+ int rsa_pkey_to_suitable_key_size(EVP_PKEY *pkey, size_t *ret_suitable_key_size);
+-- 
+2.34.1
+

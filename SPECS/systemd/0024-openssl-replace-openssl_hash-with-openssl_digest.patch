@@ -1,0 +1,166 @@
+From 48d2025f30b80a74179c8968bd40fb32ccbdb982 Mon Sep 17 00:00:00 2001
+From: Dan Streetman <ddstreet@ieee.org>
+Date: Wed, 5 Jul 2023 16:53:01 -0400
+Subject: [PATCH 24/44] openssl: replace openssl_hash() with openssl_digest()
+
+The openssl_hash() function was used only by string_hashnum(); change it to use
+openssl_digest() instead.
+---
+ src/shared/openssl-util.c | 57 +++++++--------------------------------
+ src/shared/openssl-util.h |  8 +++---
+ src/test/test-cryptolib.c |  8 +++---
+ 3 files changed, 16 insertions(+), 57 deletions(-)
+
+diff --git a/src/shared/openssl-util.c b/src/shared/openssl-util.c
+index 13052838e3..6c44c21436 100644
+--- a/src/shared/openssl-util.c
++++ b/src/shared/openssl-util.c
+@@ -50,43 +50,6 @@ int openssl_pkey_from_pem(const void *pem, size_t pem_size, EVP_PKEY **ret) {
+         return 0;
+ }
+ 
+-int openssl_hash(const EVP_MD *alg,
+-                 const void *msg,
+-                 size_t msg_len,
+-                 uint8_t *ret_hash,
+-                 size_t *ret_hash_len) {
+-
+-        _cleanup_(EVP_MD_CTX_freep) EVP_MD_CTX *ctx = NULL;
+-        unsigned len;
+-        int r;
+-
+-        ctx = EVP_MD_CTX_new();
+-        if (!ctx)
+-                /* This function just calls OPENSSL_zalloc, so failure
+-                 * here is almost certainly a failed allocation. */
+-                return -ENOMEM;
+-
+-        /* The documentation claims EVP_DigestInit behaves just like
+-         * EVP_DigestInit_ex if passed NULL, except it also calls
+-         * EVP_MD_CTX_reset, which deinitializes the context. */
+-        r = EVP_DigestInit_ex(ctx, alg, NULL);
+-        if (r == 0)
+-                return -EIO;
+-
+-        r = EVP_DigestUpdate(ctx, msg, msg_len);
+-        if (r == 0)
+-                return -EIO;
+-
+-        r = EVP_DigestFinal_ex(ctx, ret_hash, &len);
+-        if (r == 0)
+-                return -EIO;
+-
+-        if (ret_hash_len)
+-                *ret_hash_len = len;
+-
+-        return 0;
+-}
+-
+ int openssl_digest_size(const char *digest_alg, size_t *ret_digest_size) {
+         size_t digest_size;
+ 
+@@ -633,28 +596,26 @@ int pubkey_fingerprint(EVP_PKEY *pk, const EVP_MD *md, void **ret, size_t *ret_s
+ int string_hashsum(
+                 const char *s,
+                 size_t len,
+-                const EVP_MD *md_algorithm,
++                const char *md_algorithm,
+                 char **ret) {
+ 
+-        uint8_t hash[EVP_MAX_MD_SIZE];
+-        size_t hash_size;
+-        char *enc;
+         int r;
+ 
+-        hash_size = EVP_MD_size(md_algorithm);
+-        assert(hash_size > 0);
++        assert(s);
++        assert(md_algorithm);
++        assert(ret);
+ 
+-        r = openssl_hash(md_algorithm, s, len, hash, NULL);
++        _cleanup_free_ void *digest = NULL;
++        size_t digest_size;
++        r = openssl_digest(md_algorithm, s, len, &digest, &digest_size);
+         if (r < 0)
+                 return r;
+ 
+-        enc = hexmem(hash, hash_size);
+-        if (!enc)
++        *ret = hexmem(digest, digest_size);
++        if (!*ret)
+                 return -ENOMEM;
+ 
+-        *ret = enc;
+         return 0;
+-
+ }
+ #  endif
+ #endif
+diff --git a/src/shared/openssl-util.h b/src/shared/openssl-util.h
+index f1c84c102e..a37c6e3a50 100644
+--- a/src/shared/openssl-util.h
++++ b/src/shared/openssl-util.h
+@@ -57,8 +57,6 @@ static inline void sk_X509_free_allp(STACK_OF(X509) **sk) {
+ 
+ int openssl_pkey_from_pem(const void *pem, size_t pem_size, EVP_PKEY **ret);
+ 
+-int openssl_hash(const EVP_MD *alg, const void *msg, size_t msg_len, uint8_t *ret_hash, size_t *ret_hash_len);
+-
+ int openssl_digest_size(const char *digest_alg, size_t *ret_digest_size);
+ 
+ int openssl_digest_many(const char *digest_alg, const struct iovec data[], size_t n_data, void **ret_digest, size_t *ret_digest_size);
+@@ -128,13 +126,13 @@ typedef gcry_md_hd_t hash_context_t;
+ #endif
+ 
+ #if PREFER_OPENSSL
+-int string_hashsum(const char *s, size_t len, hash_algorithm_t md_algorithm, char **ret);
++int string_hashsum(const char *s, size_t len, const char *md_algorithm, char **ret);
+ 
+ static inline int string_hashsum_sha224(const char *s, size_t len, char **ret) {
+-        return string_hashsum(s, len, EVP_sha224(), ret);
++        return string_hashsum(s, len, "SHA224", ret);
+ }
+ 
+ static inline int string_hashsum_sha256(const char *s, size_t len, char **ret) {
+-        return string_hashsum(s, len, EVP_sha256(), ret);
++        return string_hashsum(s, len, "SHA256", ret);
+ }
+ #endif
+diff --git a/src/test/test-cryptolib.c b/src/test/test-cryptolib.c
+index ef39bda653..6202a5d6d4 100644
+--- a/src/test/test-cryptolib.c
++++ b/src/test/test-cryptolib.c
+@@ -11,25 +11,25 @@ TEST(string_hashsum) {
+         _cleanup_free_ char *out1 = NULL, *out2 = NULL, *out3 = NULL, *out4 = NULL;
+ 
+         assert_se(string_hashsum("asdf", 4,
+-                                 OPENSSL_OR_GCRYPT(EVP_sha224(), GCRY_MD_SHA224),
++                                 OPENSSL_OR_GCRYPT("SHA224", GCRY_MD_SHA224),
+                                  &out1) == 0);
+         /* echo -n 'asdf' | sha224sum - */
+         assert_se(streq(out1, "7872a74bcbf298a1e77d507cd95d4f8d96131cbbd4cdfc571e776c8a"));
+ 
+         assert_se(string_hashsum("asdf", 4,
+-                                 OPENSSL_OR_GCRYPT(EVP_sha256(), GCRY_MD_SHA256),
++                                 OPENSSL_OR_GCRYPT("SHA256", GCRY_MD_SHA256),
+                                  &out2) == 0);
+         /* echo -n 'asdf' | sha256sum - */
+         assert_se(streq(out2, "f0e4c2f76c58916ec258f246851bea091d14d4247a2fc3e18694461b1816e13b"));
+ 
+         assert_se(string_hashsum("", 0,
+-                                 OPENSSL_OR_GCRYPT(EVP_sha224(), GCRY_MD_SHA224),
++                                 OPENSSL_OR_GCRYPT("SHA224", GCRY_MD_SHA224),
+                                  &out3) == 0);
+         /* echo -n '' | sha224sum - */
+         assert_se(streq(out3, "d14a028c2a3a2bc9476102bb288234c415a2b01f828ea62ac5b3e42f"));
+ 
+         assert_se(string_hashsum("", 0,
+-                                 OPENSSL_OR_GCRYPT(EVP_sha256(), GCRY_MD_SHA256),
++                                 OPENSSL_OR_GCRYPT("SHA256", GCRY_MD_SHA256),
+                                  &out4) == 0);
+         /* echo -n '' | sha256sum - */
+         assert_se(streq(out4, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"));
+-- 
+2.34.1
+

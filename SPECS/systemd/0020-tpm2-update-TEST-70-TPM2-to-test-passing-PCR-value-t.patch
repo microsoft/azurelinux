@@ -1,0 +1,63 @@
+From e85ddd96446abec938ef75d4e3c256b170920575 Mon Sep 17 00:00:00 2001
+From: Dan Streetman <ddstreet@ieee.org>
+Date: Thu, 13 Jul 2023 16:02:37 -0400
+Subject: [PATCH 20/20] tpm2: update TEST-70-TPM2 to test passing PCR value to
+ systemd-cryptenroll
+
+Add tests to use expected, not current, PCR values during sealing.
+---
+ test/units/testsuite-70.sh | 38 +++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 37 insertions(+), 1 deletion(-)
+
+diff --git a/test/units/testsuite-70.sh b/test/units/testsuite-70.sh
+index f01642f71a..dd8cdb7efa 100755
+--- a/test/units/testsuite-70.sh
++++ b/test/units/testsuite-70.sh
+@@ -93,7 +93,43 @@ PASSWORD=passphrase systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=0+7 "$img
+ 
+ # Check with wrong PCR 0
+ tpm2_pcrextend 0:sha256=0000000000000000000000000000000000000000000000000000000000000000
+-"$SD_CRYPTSETUP" attach test-volume "$img" - tpm2-device=auto,headless=1 && exit 1
++(! "$SD_CRYPTSETUP" attach test-volume "$img" - tpm2-device=auto,headless=1)
++
++if tpm_has_pcr sha256 12; then
++    # Enroll using an explict PCR value (that does match current PCR value)
++    systemd-cryptenroll --wipe-slot=tpm2 "$img"
++    EXPECTED_PCR_VALUE=$(cat /sys/class/tpm/tpm0/pcr-sha256/12)
++    PASSWORD=passphrase systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs="12:sha256=$EXPECTED_PCR_VALUE" "$img"
++    "$SD_CRYPTSETUP" attach test-volume "$img" - tpm2-device=auto,headless=1
++    "$SD_CRYPTSETUP" detach test-volume
++
++    # Same as above plus more PCRs without the value or alg specified
++    systemd-cryptenroll --wipe-slot=tpm2 "$img"
++    EXPECTED_PCR_VALUE=$(cat /sys/class/tpm/tpm0/pcr-sha256/12)
++    PASSWORD=passphrase systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs="1,12:sha256=$EXPECTED_PCR_VALUE,3" "$img"
++    "$SD_CRYPTSETUP" attach test-volume "$img" - tpm2-device=auto,headless=1
++    "$SD_CRYPTSETUP" detach test-volume
++
++    # Same as above plus more PCRs with hash alg specified but hash value not specified
++    systemd-cryptenroll --wipe-slot=tpm2 "$img"
++    EXPECTED_PCR_VALUE=$(cat /sys/class/tpm/tpm0/pcr-sha256/12)
++    PASSWORD=passphrase systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs="1:sha256,12:sha256=$EXPECTED_PCR_VALUE,3" "$img"
++    "$SD_CRYPTSETUP" attach test-volume "$img" - tpm2-device=auto,headless=1
++    "$SD_CRYPTSETUP" detach test-volume
++
++    # Now the interesting part, enrolling using a hash value that doesn't match the current PCR value
++    systemd-cryptenroll --wipe-slot=tpm2 "$img"
++    tpm2_pcrread -Q -o /tmp/pcr.dat sha256:12
++    CURRENT_PCR_VALUE=$(cat /sys/class/tpm/tpm0/pcr-sha256/12)
++    EXPECTED_PCR_VALUE=$(cat /tmp/pcr.dat /tmp/pcr.dat | openssl dgst -sha256 -r | cut -d ' ' -f 1)
++    PASSWORD=passphrase systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs="12:sha256=$EXPECTED_PCR_VALUE" "$img"
++    (! "$SD_CRYPTSETUP" attach test-volume "$img" - tpm2-device=auto,headless=1)
++    tpm2_pcrextend "12:sha256=$CURRENT_PCR_VALUE"
++    "$SD_CRYPTSETUP" attach test-volume "$img" - tpm2-device=auto,headless=1
++    "$SD_CRYPTSETUP" detach test-volume
++
++    rm -f /tmp/pcr.dat
++fi
+ 
+ rm -f "${img:?}"
+ 
+-- 
+2.34.1
+

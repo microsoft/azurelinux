@@ -1,0 +1,44 @@
+From 7d42af9824eac69843a3093e638d73a3434bd01f Mon Sep 17 00:00:00 2001
+From: Dan Streetman <ddstreet@ieee.org>
+Date: Fri, 30 Jun 2023 12:57:23 -0400
+Subject: [PATCH 33/44] tpm2: allow tpm2_make_encryption_session() without bind
+ key
+
+Allow providing no bind key, and use ESYS_TR_NONE instead.
+---
+ src/shared/tpm2-util.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/shared/tpm2-util.c b/src/shared/tpm2-util.c
+index 5c775aedd6..a614940ef6 100644
+--- a/src/shared/tpm2-util.c
++++ b/src/shared/tpm2-util.c
+@@ -2865,6 +2865,7 @@ static int tpm2_make_encryption_session(
+         int r;
+ 
+         assert(c);
++        assert(primary);
+         assert(ret_session);
+ 
+         log_debug("Starting HMAC encryption session.");
+@@ -2880,7 +2881,7 @@ static int tpm2_make_encryption_session(
+         rc = sym_Esys_StartAuthSession(
+                         c->esys_context,
+                         primary->esys_handle,
+-                        bind_key->esys_handle,
++                        bind_key ? bind_key->esys_handle : ESYS_TR_NONE,
+                         ESYS_TR_NONE,
+                         ESYS_TR_NONE,
+                         ESYS_TR_NONE,
+@@ -3978,7 +3979,7 @@ int tpm2_seal(Tpm2Context *c,
+         }
+ 
+         _cleanup_(tpm2_handle_freep) Tpm2Handle *encryption_session = NULL;
+-        r = tpm2_make_encryption_session(c, primary_handle, &TPM2_HANDLE_NONE, &encryption_session);
++        r = tpm2_make_encryption_session(c, primary_handle, /* bind_key= */ NULL, &encryption_session);
+         if (r < 0)
+                 return r;
+ 
+-- 
+2.34.1
+

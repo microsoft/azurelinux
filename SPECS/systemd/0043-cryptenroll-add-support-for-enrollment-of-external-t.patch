@@ -1,0 +1,258 @@
+From 3fa7269131d81e4e8b0a23fb66e43b4db467e01f Mon Sep 17 00:00:00 2001
+From: Dan Streetman <ddstreet@ieee.org>
+Date: Fri, 21 Jul 2023 15:49:16 -0400
+Subject: [PATCH 43/44] cryptenroll: add support for enrollment of external tpm
+ using its public SRK/key
+
+Instead of enrolling the local TPM to a luks volume, use the public key from an
+external TPM to enroll it into the luks volume. The sealed data in the luks
+keyslot will be unsealable by the external TPM.
+---
+ man/systemd-cryptenroll.xml        | 22 ++++++++++
+ src/cryptenroll/cryptenroll-tpm2.c | 69 ++++++++++++++++++++----------
+ src/cryptenroll/cryptenroll-tpm2.h |  4 +-
+ src/cryptenroll/cryptenroll.c      | 33 +++++++++++++-
+ 4 files changed, 103 insertions(+), 25 deletions(-)
+
+diff --git a/man/systemd-cryptenroll.xml b/man/systemd-cryptenroll.xml
+index cea2072c47..0f89c72988 100644
+--- a/man/systemd-cryptenroll.xml
++++ b/man/systemd-cryptenroll.xml
+@@ -387,6 +387,28 @@
+         enrollment to.</para></listitem>
+       </varlistentry>
+ 
++      <varlistentry>
++        <term><option>--tpm2-external-key=</option><replaceable>PATH</replaceable></term>
++
++        <listitem><para>Enroll an external TPM2 security chip. Expects a path referring to the TPM2 public
++        key in TPM2B_PUBLIC format. This cannot be used with <option>--tpm2-device</option>, and this does
++        not use any TPM for the enrollment. However, once successfully enrolled, the TPM that provided the
++        public key will be able to unlock the LUKS2 volume just as if it was directly enrolled.</para>
++
++        <para>In order to unlock a LUKS2 volume with an externally enrolled TPM2 security chip, use the same
++        configuration in <filename>/etc/crypttab</filename> as would be used for direct TPM
++        enrollment.</para>
++
++        <para>Also see <option>--tpm2-external-location</option>, which is the TPM handle location where the
++        public key must be located to perform the unlocking.</para></listitem>
++      </varlistentry>
++
++      <varlistentry>
++        <term><option>--tpm2-external-location=</option><replaceable>LOCATION</replaceable></term>
++
++        <listitem><para>When used with <option>--tpm2-external-key</option>, specifies the external TPM handle location of the public key. This default to the Storage Root Key (SRK) defined location <literal>0x81000001</literal>.</para></listitem>
++      </varlistentry>
++
+       <varlistentry>
+         <term><option>--tpm2-pcrs=</option><arg rep="repeat">PCR</arg></term>
+ 
+diff --git a/src/cryptenroll/cryptenroll-tpm2.c b/src/cryptenroll/cryptenroll-tpm2.c
+index 86aed31838..f22f23030b 100644
+--- a/src/cryptenroll/cryptenroll-tpm2.c
++++ b/src/cryptenroll/cryptenroll-tpm2.c
+@@ -133,6 +133,8 @@ int enroll_tpm2(struct crypt_device *cd,
+                 const void *volume_key,
+                 size_t volume_key_size,
+                 const char *device,
++                uint32_t external_location,
++                const char *external_key,
+                 Tpm2PCRValue *hash_pcr_values,
+                 size_t n_hash_pcr_values,
+                 const char *pubkey_path,
+@@ -206,21 +208,33 @@ int enroll_tpm2(struct crypt_device *cd,
+                         return log_debug_errno(r, "Failed to read TPM PCR signature: %m");
+         }
+ 
++        bool any_pcr_value_specified = false, all_pcr_value_specified = true;
++        for (size_t i = 0; i < n_hash_pcr_values; i++)
++                if (hash_pcr_values[i].value.size > 0)
++                        any_pcr_value_specified = true;
++                else
++                        all_pcr_value_specified = false;
++
+         _cleanup_(tpm2_context_unrefp) Tpm2Context *tpm2_context = NULL;
+-        r = tpm2_context_new(device, &tpm2_context);
+-        if (r < 0)
+-                return r;
++        TPM2B_PUBLIC external_public = {};
++        if (external_key) {
++                r = tpm2_unmarshal_from_file("External TPM public key", &external_public, external_key, /* ret_size= */ NULL);
++                if (r < 0)
++                        return r;
+ 
+-        bool pcr_value_specified = false;
+-        for (size_t i = 0; i < n_hash_pcr_values; i++)
+-                if (hash_pcr_values[i].value.size > 0) {
+-                        pcr_value_specified = true;
+-                        break;
+-                }
++                if (!all_pcr_value_specified)
++                        return log_error_errno(SYNTHETIC_ERRNO(EINVAL), "Must provide all PCR values when using external TPM.");
++        } else {
++                r = tpm2_context_new(device, &tpm2_context);
++                if (r < 0)
++                        return r;
+ 
+-        r = tpm2_pcr_read_missing_values(tpm2_context, hash_pcr_values, n_hash_pcr_values);
+-        if (r < 0)
+-                return r;
++                if (!all_pcr_value_specified) {
++                        r = tpm2_pcr_read_missing_values(tpm2_context, hash_pcr_values, n_hash_pcr_values);
++                        if (r < 0)
++                                return r;
++                }
++        }
+ 
+         uint16_t hash_pcr_bank = 0;
+         uint32_t hash_pcr_mask = 0;
+@@ -256,14 +270,25 @@ int enroll_tpm2(struct crypt_device *cd,
+         if (r < 0)
+                 return r;
+ 
+-        r = tpm2_seal(tpm2_context,
+-                      &policy,
+-                      pin_str,
+-                      &secret, &secret_size,
+-                      &blob, &blob_size,
+-                      /* ret_primary_alg= */ NULL,
+-                      &srk_buf,
+-                      &srk_buf_size);
++        if (external_key)
++                r = tpm2_calculate_seal(
++                                external_location,
++                                &external_public,
++                                /* attributes= */ NULL,
++                                /* secret= */ NULL, /* secret_size= */ 0,
++                                &policy,
++                                pin_str,
++                                &secret, &secret_size,
++                                &blob, &blob_size,
++                                &srk_buf, &srk_buf_size);
++        else
++                r = tpm2_seal(tpm2_context,
++                              &policy,
++                              pin_str,
++                              &secret, &secret_size,
++                              &blob, &blob_size,
++                              /* ret_primary_alg= */ NULL,
++                              &srk_buf, &srk_buf_size);
+         if (r < 0)
+                 return r;
+ 
+@@ -278,8 +303,8 @@ int enroll_tpm2(struct crypt_device *cd,
+                 return r; /* return existing keyslot, so that wiping won't kill it */
+         }
+ 
+-        /* Quick verification that everything is in order, we are not in a hurry after all. */
+-        if ((!pubkey || signature_json) && !pcr_value_specified) {
++        /* If possible, verify the sealed data object. */
++        if ((!pubkey || signature_json) && !any_pcr_value_specified && !external_key) {
+                 _cleanup_(erase_and_freep) void *secret2 = NULL;
+                 size_t secret2_size;
+ 
+diff --git a/src/cryptenroll/cryptenroll-tpm2.h b/src/cryptenroll/cryptenroll-tpm2.h
+index d43a9a8ffe..43eddc6e46 100644
+--- a/src/cryptenroll/cryptenroll-tpm2.h
++++ b/src/cryptenroll/cryptenroll-tpm2.h
+@@ -8,9 +8,9 @@
+ #include "tpm2-util.h"
+ 
+ #if HAVE_TPM2
+-int enroll_tpm2(struct crypt_device *cd, const void *volume_key, size_t volume_key_size, const char *device, Tpm2PCRValue *hash_pcrs, size_t n_hash_pcrs, const char *pubkey_path, uint32_t pubkey_pcr_mask, const char *signature_path, bool use_pin);
++int enroll_tpm2(struct crypt_device *cd, const void *volume_key, size_t volume_key_size, const char *device, uint32_t external_location, const char *external_key, Tpm2PCRValue *hash_pcrs, size_t n_hash_pcrs, const char *pubkey_path, uint32_t pubkey_pcr_mask, const char *signature_path, bool use_pin);
+ #else
+-static inline int enroll_tpm2(struct crypt_device *cd, const void *volume_key, size_t volume_key_size, const char *device, Tpm2PCRValue *hash_pcrs, size_t n_hash_pcrs, const char *pubkey_path, uint32_t pubkey_pcr_mask, const char *signature_path, bool use_pin) {
++static inline int enroll_tpm2(struct crypt_device *cd, const void *volume_key, size_t volume_key_size, const char *device, uint32_t external_location, const char *external_key, Tpm2PCRValue *hash_pcrs, size_t n_hash_pcrs, const char *pubkey_path, uint32_t pubkey_pcr_mask, const char *signature_path, bool use_pin) {
+         return log_debug_errno(SYNTHETIC_ERRNO(EOPNOTSUPP),
+                                "TPM2 key enrollment not supported.");
+ }
+diff --git a/src/cryptenroll/cryptenroll.c b/src/cryptenroll/cryptenroll.c
+index 1ac2c6951e..79493e675d 100644
+--- a/src/cryptenroll/cryptenroll.c
++++ b/src/cryptenroll/cryptenroll.c
+@@ -36,6 +36,8 @@ static char *arg_unlock_fido2_device = NULL;
+ static char *arg_pkcs11_token_uri = NULL;
+ static char *arg_fido2_device = NULL;
+ static char *arg_tpm2_device = NULL;
++static uint32_t arg_tpm2_external_location = TPM2_SRK_HANDLE;
++static char *arg_tpm2_external_key = NULL;
+ static Tpm2PCRValue *arg_tpm2_hash_pcr_values = NULL;
+ static size_t arg_tpm2_n_hash_pcr_values = 0;
+ static bool arg_tpm2_hash_pcr_values_use_default = true;
+@@ -63,6 +65,7 @@ STATIC_DESTRUCTOR_REGISTER(arg_unlock_fido2_device, freep);
+ STATIC_DESTRUCTOR_REGISTER(arg_pkcs11_token_uri, freep);
+ STATIC_DESTRUCTOR_REGISTER(arg_fido2_device, freep);
+ STATIC_DESTRUCTOR_REGISTER(arg_tpm2_device, freep);
++STATIC_DESTRUCTOR_REGISTER(arg_tpm2_external_key, freep);
+ STATIC_DESTRUCTOR_REGISTER(arg_tpm2_hash_pcr_values, freep);
+ STATIC_DESTRUCTOR_REGISTER(arg_tpm2_public_key, freep);
+ STATIC_DESTRUCTOR_REGISTER(arg_tpm2_signature, freep);
+@@ -127,6 +130,10 @@ static int help(void) {
+                "                       Whether to require user verification to unlock the volume\n"
+                "     --tpm2-device=PATH\n"
+                "                       Enroll a TPM2 device\n"
++               "     --tpm2-external-location=LOCATION\n"
++               "                       Specify location of key in external TPM2 device\n"
++               "     --tpm2-external-key=PATH\n"
++               "                       Enroll using a public key from an external TPM2 device\n"
+                "     --tpm2-pcrs=PCR1+PCR2+PCR3+…\n"
+                "                       Specify TPM2 PCRs to seal against\n"
+                "     --tpm2-public-key=PATH\n"
+@@ -160,6 +167,8 @@ static int parse_argv(int argc, char *argv[]) {
+                 ARG_PKCS11_TOKEN_URI,
+                 ARG_FIDO2_DEVICE,
+                 ARG_TPM2_DEVICE,
++                ARG_TPM2_EXTERNAL_LOCATION,
++                ARG_TPM2_EXTERNAL_KEY,
+                 ARG_TPM2_PCRS,
+                 ARG_TPM2_PUBLIC_KEY,
+                 ARG_TPM2_PUBLIC_KEY_PCRS,
+@@ -186,6 +195,8 @@ static int parse_argv(int argc, char *argv[]) {
+                 { "fido2-with-user-presence",     required_argument, NULL, ARG_FIDO2_WITH_UP         },
+                 { "fido2-with-user-verification", required_argument, NULL, ARG_FIDO2_WITH_UV         },
+                 { "tpm2-device",                  required_argument, NULL, ARG_TPM2_DEVICE           },
++                { "tpm2-external-location",       required_argument, NULL, ARG_TPM2_EXTERNAL_LOCATION},
++                { "tpm2-external-key",            required_argument, NULL, ARG_TPM2_EXTERNAL_KEY     },
+                 { "tpm2-pcrs",                    required_argument, NULL, ARG_TPM2_PCRS             },
+                 { "tpm2-public-key",              required_argument, NULL, ARG_TPM2_PUBLIC_KEY       },
+                 { "tpm2-public-key-pcrs",         required_argument, NULL, ARG_TPM2_PUBLIC_KEY_PCRS  },
+@@ -358,6 +369,26 @@ static int parse_argv(int argc, char *argv[]) {
+                         break;
+                 }
+ 
++                case ARG_TPM2_EXTERNAL_LOCATION:
++                        r = safe_atou32(optarg, &arg_tpm2_external_location);
++                        if (r < 0)
++                                return r;
++
++                        break;
++
++                case ARG_TPM2_EXTERNAL_KEY:
++                        if (arg_enroll_type >= 0 || arg_tpm2_external_key)
++                                return log_error_errno(SYNTHETIC_ERRNO(EINVAL),
++                                                       "Multiple operations specified at once, refusing.");
++
++
++                        r = parse_path_argument(optarg, /* suppress_root= */ false, &arg_tpm2_external_key);
++                        if (r < 0)
++                                return r;
++
++                        arg_enroll_type = ENROLL_TPM2;
++                        break;
++
+                 case ARG_TPM2_PCRS:
+                         arg_tpm2_hash_pcr_values_use_default = false;
+                         r = tpm2_parse_pcr_argument_append(optarg, &arg_tpm2_hash_pcr_values, &arg_tpm2_n_hash_pcr_values);
+@@ -665,7 +696,7 @@ static int run(int argc, char *argv[]) {
+                 break;
+ 
+         case ENROLL_TPM2:
+-                slot = enroll_tpm2(cd, vk, vks, arg_tpm2_device, arg_tpm2_hash_pcr_values, arg_tpm2_n_hash_pcr_values, arg_tpm2_public_key, arg_tpm2_public_key_pcr_mask, arg_tpm2_signature, arg_tpm2_pin);
++                slot = enroll_tpm2(cd, vk, vks, arg_tpm2_device, arg_tpm2_external_location, arg_tpm2_external_key, arg_tpm2_hash_pcr_values, arg_tpm2_n_hash_pcr_values, arg_tpm2_public_key, arg_tpm2_public_key_pcr_mask, arg_tpm2_signature, arg_tpm2_pin);
+                 break;
+ 
+         case _ENROLL_TYPE_INVALID:
+-- 
+2.34.1
+

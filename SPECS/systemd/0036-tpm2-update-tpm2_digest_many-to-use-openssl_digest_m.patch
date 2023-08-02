@@ -1,0 +1,230 @@
+From 5f12c9b6bf2a742b3500bcb80160cdb39151342e Mon Sep 17 00:00:00 2001
+From: Dan Streetman <ddstreet@ieee.org>
+Date: Wed, 5 Jul 2023 13:23:33 -0400
+Subject: [PATCH 36/44] tpm2: update tpm2_digest_many() to use
+ openssl_digest_many()
+
+Update the function to use openssl_digest_many() so more hash functions besides
+SHA256 can be used.
+
+If built without openssl, this falls back to the internal sha256 hashing.
+
+Also add GREEDY_REALLOC_PREPREND() helper function.
+---
+ src/basic/alloc-util.c     | 28 ++++++++++++++++++
+ src/basic/alloc-util.h     |  4 +++
+ src/shared/tpm2-util.c     | 60 ++++++++++++++++++++++++++++++++++++--
+ src/test/test-alloc-util.c | 41 ++++++++++++++++++++++++--
+ 4 files changed, 128 insertions(+), 5 deletions(-)
+
+diff --git a/src/basic/alloc-util.c b/src/basic/alloc-util.c
+index fc98610a0f..9c1f6fd7d2 100644
+--- a/src/basic/alloc-util.c
++++ b/src/basic/alloc-util.c
+@@ -103,6 +103,34 @@ void* greedy_realloc0(
+         return q;
+ }
+ 
++void* greedy_realloc_prepend(
++                void **p,
++                size_t *n_p,
++                const void *from,
++                size_t n_from,
++                size_t size) {
++
++        uint8_t *q;
++
++        assert(p);
++        assert(n_p);
++        assert(from || n_from == 0);
++
++        if (n_from > SIZE_MAX - *n_p)
++                return NULL;
++
++        q = greedy_realloc(p, *n_p + n_from, size);
++        if (!q)
++                return NULL;
++
++        memmove(q + n_from * size, q, *n_p * size);
++        memcpy_safe(q, from, n_from * size);
++
++        *n_p += n_from;
++
++        return q;
++}
++
+ void* greedy_realloc_append(
+                 void **p,
+                 size_t *n_p,
+diff --git a/src/basic/alloc-util.h b/src/basic/alloc-util.h
+index 9abe8620c8..07bb7c52e5 100644
+--- a/src/basic/alloc-util.h
++++ b/src/basic/alloc-util.h
+@@ -147,6 +147,7 @@ static inline void *memdup_suffix0_multiply(const void *p, size_t size, size_t n
+ 
+ void* greedy_realloc(void **p, size_t need, size_t size);
+ void* greedy_realloc0(void **p, size_t need, size_t size);
++void* greedy_realloc_prepend(void **p, size_t *n_p, const void *from, size_t n_from, size_t size);
+ void* greedy_realloc_append(void **p, size_t *n_p, const void *from, size_t n_from, size_t size);
+ 
+ #define GREEDY_REALLOC(array, need)                                     \
+@@ -155,6 +156,9 @@ void* greedy_realloc_append(void **p, size_t *n_p, const void *from, size_t n_fr
+ #define GREEDY_REALLOC0(array, need)                                    \
+         greedy_realloc0((void**) &(array), (need), sizeof((array)[0]))
+ 
++#define GREEDY_REALLOC_PREPEND(array, n_array, from, n_from)            \
++        greedy_realloc_prepend((void**) &(array), (size_t*) &(n_array), (from), (n_from), sizeof((array)[0]))
++
+ #define GREEDY_REALLOC_APPEND(array, n_array, from, n_from)             \
+         greedy_realloc_append((void**) &(array), (size_t*) &(n_array), (from), (n_from), sizeof((array)[0]))
+ 
+diff --git a/src/shared/tpm2-util.c b/src/shared/tpm2-util.c
+index a307820512..1bcee38cc6 100644
+--- a/src/shared/tpm2-util.c
++++ b/src/shared/tpm2-util.c
+@@ -2701,7 +2701,7 @@ int tpm2_get_good_pcr_banks_strv(
+  * On success, the digest hash will be updated with the hashing operation result and the digest size will be
+  * correct for 'alg'.
+  *
+- * This currently only provides SHA256, so 'alg' must be TPM2_ALG_SHA256. */
++ * If built without openssl, this only provides SHA256. */
+ int tpm2_digest_many(
+                 TPMI_ALG_HASH alg,
+                 TPM2B_DIGEST *digest,
+@@ -2709,11 +2709,64 @@ int tpm2_digest_many(
+                 size_t n_data,
+                 bool extend) {
+ 
+-        struct sha256_ctx ctx;
+-
+         assert(digest);
+         assert(data || n_data == 0);
+ 
++#if HAVE_OPENSSL
++        int r;
++
++        const char *digest_alg = tpm2_hash_alg_to_string(alg);
++        if (!digest_alg)
++                return log_error_errno(SYNTHETIC_ERRNO(EOPNOTSUPP),
++                                       "Hash algorithm not supported: 0x%04" PRIx16, alg);
++
++        size_t digest_size;
++        r = openssl_digest_size(digest_alg, &digest_size);
++        if (r < 0)
++                return log_error_errno(r, "Could not get digest size: %m");
++
++        if (sizeof(digest->buffer) < digest_size)
++                return log_error_errno(SYNTHETIC_ERRNO(ENOTRECOVERABLE),
++                                       "Digest hash size %zu too large for TPM2B_DIGEST buffer.",
++                                       digest_size);
++
++        _cleanup_free_ struct iovec *data_copy = NULL;
++        if (extend) {
++                if (digest->size != digest_size)
++                        return log_error_errno(SYNTHETIC_ERRNO(EOPNOTSUPP),
++                                               "Digest size 0x%04" PRIx16 ", require 0x%zu",
++                                               digest->size, digest_size);
++
++                data_copy = memdup(data, sizeof(data[0]) * n_data);
++
++                struct iovec digest_buf = IOVEC_MAKE(digest->buffer, digest->size);
++                size_t n_data_copy = n_data;
++                if (!GREEDY_REALLOC_PREPEND(data_copy, n_data_copy, &digest_buf, 1))
++                    return log_oom();
++
++                data = data_copy;
++                n_data = n_data_copy;
++        } else if (n_data == 0) {
++                /* If not extending and no data, return zero hash */
++                *digest = (TPM2B_DIGEST) {
++                        .size = digest_size,
++                };
++
++                return 0;
++        }
++
++        _cleanup_free_ void *buf = NULL;
++        r = openssl_digest_many(digest_alg, data, n_data, &buf, NULL);
++        if (r < 0)
++                return log_error_errno(r, "Failed to calculate digest hash: %m");
++
++        *digest = (TPM2B_DIGEST) {
++                .size = digest_size,
++        };
++        memcpy(digest->buffer, buf, digest_size);
++#else
++        struct sha256_ctx ctx;
++
+         if (alg != TPM2_ALG_SHA256)
+                 return log_error_errno(SYNTHETIC_ERRNO(EOPNOTSUPP),
+                                        "Hash algorithm not supported: 0x%x", alg);
+@@ -2742,6 +2795,7 @@ int tpm2_digest_many(
+                 sha256_process_bytes(data[i].iov_base, data[i].iov_len, &ctx);
+ 
+         sha256_finish_ctx(&ctx, digest->buffer);
++#endif
+ 
+         return 0;
+ }
+diff --git a/src/test/test-alloc-util.c b/src/test/test-alloc-util.c
+index 57cb886c41..adea09984c 100644
+--- a/src/test/test-alloc-util.c
++++ b/src/test/test-alloc-util.c
+@@ -23,8 +23,8 @@ TEST(alloca) {
+ }
+ 
+ TEST(GREEDY_REALLOC) {
+-        _cleanup_free_ int *a = NULL, *b = NULL, *c = NULL;
+-        size_t i, j, n_c = 0;
++        _cleanup_free_ int *a = NULL, *b = NULL, *c = NULL, *d = NULL;
++        size_t i, j, n_c = 0, n_d = 0;
+ 
+         /* Give valgrind a chance to verify our realloc() operations */
+ 
+@@ -92,6 +92,43 @@ TEST(GREEDY_REALLOC) {
+ 
+         for (j = 0; j < i * n_from; j++)
+                 assert_se(c[j] == (int) j);
++
++        for (i = 0; i < 2048; i++) {
++                for (j = 0; j < n_from; j++)
++                        from[j] = n_from * i + j;
++
++                _cleanup_free_ int *before = NULL;
++                size_t n_before = 0;
++                assert_se(GREEDY_REALLOC_PREPEND(before, n_before, d, n_d));
++                assert_se(before);
++                assert_se(n_before == n_d);
++                assert_se(memcmp_safe(d, before, n_d) == 0);
++
++                assert_se(GREEDY_REALLOC_PREPEND(d, n_d, from, n_from));
++                assert_se(n_d == n_before + n_from);
++                assert_se(MALLOC_ELEMENTSOF(d) >= n_d);
++                assert_se(MALLOC_SIZEOF_SAFE(d) >= n_d * sizeof(int));
++                assert_se(memcmp_safe(d, from, n_from) == 0);
++                assert_se(memcmp_safe(&d[n_from], before, n_before) == 0);
++
++                before = mfree(before);
++                assert_se(!before);
++                n_before = 0;
++                assert_se(GREEDY_REALLOC_PREPEND(before, n_before, d, n_d));
++                assert_se(before);
++                assert_se(n_before == n_d);
++                assert_se(memcmp_safe(d, before, n_d) == 0);
++
++                assert_se(GREEDY_REALLOC_APPEND(d, n_d, NULL, 0));
++                assert_se(d);
++                assert_se(n_d == n_before);
++                assert_se(MALLOC_ELEMENTSOF(d) >= n_d);
++                assert_se(MALLOC_SIZEOF_SAFE(d) >= n_d * sizeof(int));
++                assert_se(memcmp_safe(d, before, n_d) == 0);
++        }
++
++        for (j = 0; j < i * n_from; j++)
++                assert_se(d[j] == (int) ((i - (j + n_from) / n_from) * n_from + j % n_from));
+ }
+ 
+ TEST(memdup_multiply_and_greedy_realloc) {
+-- 
+2.34.1
+

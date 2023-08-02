@@ -1,0 +1,681 @@
+From 07c040611751facf075dab7a72ab4935142dda3c Mon Sep 17 00:00:00 2001
+From: Dan Streetman <ddstreet@ieee.org>
+Date: Wed, 12 Jul 2023 22:36:37 -0400
+Subject: [PATCH 09/20] tpm2: change tpm2_parse_pcr_argument() parameters to
+ parse to Tpm2PCRValue array
+
+In order to allow users to specify expected PCR values, change the
+tpm2_parse_pcr_argument() to parse the text argument into an array of
+Tpm2PCRValue objects, which provide not only the selected PCR indexes, but also
+(optionally) the hash algorithm and hash value for each PCR index.
+---
+ src/creds/creds.c             |   4 +-
+ src/cryptenroll/cryptenroll.c |   4 +-
+ src/cryptsetup/cryptsetup.c   |   2 +-
+ src/partition/repart.c        |   4 +-
+ src/shared/tpm2-util.c        | 179 ++++++++++++++++------
+ src/shared/tpm2-util.h        |   5 +-
+ src/test/test-tpm2.c          | 279 ++++++++++++++++++++++++++--------
+ 7 files changed, 355 insertions(+), 122 deletions(-)
+
+diff --git a/src/creds/creds.c b/src/creds/creds.c
+index 679b0750de..36531d7d18 100644
+--- a/src/creds/creds.c
++++ b/src/creds/creds.c
+@@ -860,7 +860,7 @@ static int parse_argv(int argc, char *argv[]) {
+                         break;
+ 
+                 case ARG_TPM2_PCRS: /* For fixed hash PCR policies only */
+-                        r = tpm2_parse_pcr_argument(optarg, &arg_tpm2_pcr_mask);
++                        r = tpm2_parse_pcr_argument_to_mask(optarg, &arg_tpm2_pcr_mask);
+                         if (r < 0)
+                                 return r;
+ 
+@@ -874,7 +874,7 @@ static int parse_argv(int argc, char *argv[]) {
+                         break;
+ 
+                 case ARG_TPM2_PUBLIC_KEY_PCRS: /* For public key PCR policies only */
+-                        r = tpm2_parse_pcr_argument(optarg, &arg_tpm2_public_key_pcr_mask);
++                        r = tpm2_parse_pcr_argument_to_mask(optarg, &arg_tpm2_public_key_pcr_mask);
+                         if (r < 0)
+                                 return r;
+ 
+diff --git a/src/cryptenroll/cryptenroll.c b/src/cryptenroll/cryptenroll.c
+index fe25619d85..b2e4c0a5f5 100644
+--- a/src/cryptenroll/cryptenroll.c
++++ b/src/cryptenroll/cryptenroll.c
+@@ -356,7 +356,7 @@ static int parse_argv(int argc, char *argv[]) {
+                 }
+ 
+                 case ARG_TPM2_PCRS:
+-                        r = tpm2_parse_pcr_argument(optarg, &arg_tpm2_pcr_mask);
++                        r = tpm2_parse_pcr_argument_to_mask(optarg, &arg_tpm2_pcr_mask);
+                         if (r < 0)
+                                 return r;
+ 
+@@ -377,7 +377,7 @@ static int parse_argv(int argc, char *argv[]) {
+                         break;
+ 
+                 case ARG_TPM2_PUBLIC_KEY_PCRS:
+-                        r = tpm2_parse_pcr_argument(optarg, &arg_tpm2_public_key_pcr_mask);
++                        r = tpm2_parse_pcr_argument_to_mask(optarg, &arg_tpm2_public_key_pcr_mask);
+                         if (r < 0)
+                                 return r;
+ 
+diff --git a/src/cryptsetup/cryptsetup.c b/src/cryptsetup/cryptsetup.c
+index 5dc3c7f123..b5aa396cde 100644
+--- a/src/cryptsetup/cryptsetup.c
++++ b/src/cryptsetup/cryptsetup.c
+@@ -399,7 +399,7 @@ static int parse_one_option(const char *option) {
+ 
+         } else if ((val = startswith(option, "tpm2-pcrs="))) {
+ 
+-                r = tpm2_parse_pcr_argument(val, &arg_tpm2_pcr_mask);
++                r = tpm2_parse_pcr_argument_to_mask(val, &arg_tpm2_pcr_mask);
+                 if (r < 0)
+                         return r;
+ 
+diff --git a/src/partition/repart.c b/src/partition/repart.c
+index 4fe2c63a46..9e30c6bbc3 100644
+--- a/src/partition/repart.c
++++ b/src/partition/repart.c
+@@ -6447,7 +6447,7 @@ static int parse_argv(int argc, char *argv[]) {
+                 }
+ 
+                 case ARG_TPM2_PCRS:
+-                        r = tpm2_parse_pcr_argument(optarg, &arg_tpm2_pcr_mask);
++                        r = tpm2_parse_pcr_argument_to_mask(optarg, &arg_tpm2_pcr_mask);
+                         if (r < 0)
+                                 return r;
+ 
+@@ -6461,7 +6461,7 @@ static int parse_argv(int argc, char *argv[]) {
+                         break;
+ 
+                 case ARG_TPM2_PUBLIC_KEY_PCRS:
+-                        r = tpm2_parse_pcr_argument(optarg, &arg_tpm2_public_key_pcr_mask);
++                        r = tpm2_parse_pcr_argument_to_mask(optarg, &arg_tpm2_public_key_pcr_mask);
+                         if (r < 0)
+                                 return r;
+ 
+diff --git a/src/shared/tpm2-util.c b/src/shared/tpm2-util.c
+index 0ef6d3400a..70c3f0a8e4 100644
+--- a/src/shared/tpm2-util.c
++++ b/src/shared/tpm2-util.c
+@@ -4259,45 +4259,6 @@ char *tpm2_pcr_mask_to_string(uint32_t mask) {
+         return TAKE_PTR(s);
+ }
+ 
+-int tpm2_pcr_mask_from_string(const char *arg, uint32_t *ret_mask) {
+-        uint32_t mask = 0;
+-        int r;
+-
+-        assert(arg);
+-        assert(ret_mask);
+-
+-        if (isempty(arg)) {
+-                *ret_mask = 0;
+-                return 0;
+-        }
+-
+-        /* Parses a "," or "+" separated list of PCR indexes. We support "," since this is a list after all,
+-         * and most other tools expect comma separated PCR specifications. We also support "+" since in
+-         * /etc/crypttab the "," is already used to separate options, hence a different separator is nice to
+-         * avoid escaping. */
+-
+-        const char *p = arg;
+-        for (;;) {
+-                _cleanup_free_ char *pcr = NULL;
+-                unsigned n;
+-
+-                r = extract_first_word(&p, &pcr, ",+", EXTRACT_DONT_COALESCE_SEPARATORS);
+-                if (r == 0)
+-                        break;
+-                if (r < 0)
+-                        return log_error_errno(r, "Failed to parse PCR list: %s", arg);
+-
+-                r = pcr_index_from_string(pcr);
+-                if (r < 0)
+-                        return log_error_errno(r, "Failed to parse specified PCR or specified PCR is out of range: %s", pcr);
+-                n = r;
+-                SET_BIT(mask, n);
+-        }
+-
+-        *ret_mask = mask;
+-        return 0;
+-}
+-
+ int tpm2_make_pcr_json_array(uint32_t pcr_mask, JsonVariant **ret) {
+         _cleanup_(json_variant_unrefp) JsonVariant *a = NULL;
+         int r;
+@@ -4678,29 +4639,147 @@ Tpm2Support tpm2_support(void) {
+         return support;
+ }
+ 
+-int tpm2_parse_pcr_argument(const char *arg, uint32_t *mask) {
+-        uint32_t m;
++#if HAVE_TPM2
++static void tpm2_pcr_values_apply_default_hash_alg(Tpm2PCRValue *pcr_values, size_t n_pcr_values) {
++        TPMI_ALG_HASH default_hash = 0;
++        for (size_t i = 0; i < n_pcr_values; i++)
++                if (pcr_values[i].hash != 0) {
++                        default_hash = pcr_values[i].hash;
++                        break;
++                }
++
++        if (default_hash != 0)
++                for (size_t i = 0; i < n_pcr_values; i++)
++                        if (pcr_values[i].hash == 0)
++                                pcr_values[i].hash = default_hash;
++}
++#endif
++
++/* Parse the PCR selection/value arg(s) and return a corresponding array of Tpm2PCRValue objects.
++ *
++ * The format is the same as tpm2_pcr_values_from_string(). The first provided entry with a hash algorithm
++ * set will be used as the 'default' hash algorithm. All entries with an unset hash algorithm will be updated
++ * with the 'default' hash algorithm. The resulting array will be sorted and checked for validity.
++ *
++ * This will replace *ret_pcr_values with the new array of pcr values; to append to an existing array, use
++ * tpm2_parse_pcr_argument_append(). */
++int tpm2_parse_pcr_argument(const char *arg, Tpm2PCRValue **ret_pcr_values, size_t *ret_n_pcr_values) {
++#if HAVE_TPM2
+         int r;
+ 
+-        assert(mask);
++        assert(arg);
++        assert(ret_pcr_values);
++        assert(ret_n_pcr_values);
+ 
+-        /* For use in getopt_long() command line parsers: merges masks specified on the command line */
++        _cleanup_free_ Tpm2PCRValue *pcr_values = NULL;
++        size_t n_pcr_values = 0;
++        r = tpm2_pcr_values_from_string(arg, &pcr_values, &n_pcr_values);
++        if (r < 0)
++                return r;
++
++        tpm2_pcr_values_apply_default_hash_alg(pcr_values, n_pcr_values);
++
++        tpm2_sort_pcr_values(pcr_values, n_pcr_values);
++
++        if (!TPM2_PCR_VALUES_VALID(pcr_values, n_pcr_values))
++                return log_error_errno(SYNTHETIC_ERRNO(EINVAL), "Parsed PCR values are not valid.");
++
++        *ret_pcr_values = TAKE_PTR(pcr_values);
++        *ret_n_pcr_values = n_pcr_values;
+ 
+-        if (isempty(arg)) {
+-                *mask = 0;
++        return 0;
++#else
++        return log_error_errno(SYNTHETIC_ERRNO(EOPNOTSUPP), "TPM2 support is disabled.");
++#endif
++}
++
++/* Same as tpm2_parse_pcr_argument(), but the pcr values array is appended to. If the provided pcr values
++ * array is not NULL, it must point to an allocated pcr values array and the provided number of pcr values
++ * must be correct.
++ *
++ * Note that 'arg' is parsed into a new array of pcr values independently of any previous pcr values,
++ * including application of the default hash algorithm. Then the two arrays are combined, the default hash
++ * algorithm check applied again (in case either the previous or current array had no default hash
++ * algorithm), and then the resulting array is sorted and rechecked for validity. */
++int tpm2_parse_pcr_argument_append(const char *arg, Tpm2PCRValue **ret_pcr_values, size_t *ret_n_pcr_values) {
++#if HAVE_TPM2
++        int r;
++
++        assert(arg);
++        assert(ret_pcr_values);
++        assert(ret_n_pcr_values);
++
++        _cleanup_free_ Tpm2PCRValue *pcr_values = NULL;
++        size_t n_pcr_values;
++        r = tpm2_parse_pcr_argument(arg, &pcr_values, &n_pcr_values);
++        if (r < 0)
++                return r;
++
++        /* If we got previous values, append them. */
++        if (*ret_pcr_values && !GREEDY_REALLOC_APPEND(pcr_values, n_pcr_values, *ret_pcr_values, *ret_n_pcr_values))
++                return log_oom();
++
++        tpm2_pcr_values_apply_default_hash_alg(pcr_values, n_pcr_values);
++
++        tpm2_sort_pcr_values(pcr_values, n_pcr_values);
++
++        if (!TPM2_PCR_VALUES_VALID(pcr_values, n_pcr_values))
++                return log_error_errno(SYNTHETIC_ERRNO(EINVAL), "Parsed PCR values are not valid.");
++
++        SWAP_TWO(*ret_pcr_values, pcr_values);
++        *ret_n_pcr_values = n_pcr_values;
++
++        return 0;
++#else
++        return log_error_errno(SYNTHETIC_ERRNO(EOPNOTSUPP), "TPM2 support is disabled.");
++#endif
++}
++
++/* Same as tpm2_parse_pcr_argument() but converts the pcr values to a pcr mask. If more than one hash
++ * algorithm is included in the pcr values array this results in error. This retains the previous behavior of
++ * tpm2_parse_pcr_argument() of clearing the mask if 'arg' is empty, replacing the mask if it is set to
++ * UINT32_MAX, and or-ing the mask otherwise. */
++int tpm2_parse_pcr_argument_to_mask(const char *arg, uint32_t *ret_mask) {
++#if HAVE_TPM2
++        _cleanup_free_ Tpm2PCRValue *pcr_values = NULL;
++        size_t n_pcr_values;
++        int r;
++
++        assert(arg);
++        assert(ret_mask);
++
++        r = tpm2_parse_pcr_argument(arg, &pcr_values, &n_pcr_values);
++        if (r < 0)
++                return r;
++
++        if (n_pcr_values == 0) {
++                /* This retains the previous behavior of clearing the mask if the arg is empty */
++                *ret_mask = 0;
+                 return 0;
+         }
+ 
+-        r = tpm2_pcr_mask_from_string(arg, &m);
++        size_t hash_count;
++        r = tpm2_pcr_values_hash_count(pcr_values, n_pcr_values, &hash_count);
+         if (r < 0)
+-                return r;
++                return log_error_errno(r, "Could not get hash count from pcr values: %m");
++
++        if (hash_count > 1)
++                return log_error_errno(SYNTHETIC_ERRNO(EINVAL), "Multiple PCR hash banks selected.");
++
++        uint32_t new_mask;
++        r = tpm2_pcr_values_to_mask(pcr_values, n_pcr_values, pcr_values[0].hash, &new_mask);
++        if (r < 0)
++                return log_error_errno(r, "Could not get pcr values mask: %m");
+ 
+-        if (*mask == UINT32_MAX)
+-                *mask = m;
++        if (*ret_mask == UINT32_MAX)
++                *ret_mask = new_mask;
+         else
+-                *mask |= m;
++                *ret_mask |= new_mask;
+ 
+         return 0;
++#else
++        return log_error_errno(SYNTHETIC_ERRNO(EOPNOTSUPP), "TPM2 support is disabled.");
++#endif
+ }
+ 
+ int tpm2_load_pcr_signature(const char *path, JsonVariant **ret) {
+diff --git a/src/shared/tpm2-util.h b/src/shared/tpm2-util.h
+index 68eec1cb58..e44aa14106 100644
+--- a/src/shared/tpm2-util.h
++++ b/src/shared/tpm2-util.h
+@@ -208,7 +208,6 @@ const char *tpm2_asym_alg_to_string(uint16_t alg);
+ int tpm2_asym_alg_from_string(const char *alg);
+ 
+ char *tpm2_pcr_mask_to_string(uint32_t mask);
+-int tpm2_pcr_mask_from_string(const char *arg, uint32_t *mask);
+ 
+ typedef struct {
+         uint32_t search_pcr_mask;
+@@ -257,7 +256,9 @@ enum {
+ 
+ Tpm2Support tpm2_support(void);
+ 
+-int tpm2_parse_pcr_argument(const char *arg, uint32_t *mask);
++int tpm2_parse_pcr_argument(const char *arg, Tpm2PCRValue **ret_pcr_values, size_t *ret_n_pcr_values);
++int tpm2_parse_pcr_argument_append(const char *arg, Tpm2PCRValue **ret_pcr_values, size_t *ret_n_pcr_values);
++int tpm2_parse_pcr_argument_to_mask(const char *arg, uint32_t *mask);
+ 
+ int tpm2_load_pcr_signature(const char *path, JsonVariant **ret);
+ int tpm2_load_pcr_public_key(const char *path, void **ret_pubkey, size_t *ret_pubkey_size);
+diff --git a/src/test/test-tpm2.c b/src/test/test-tpm2.c
+index 8513581526..2b285fab47 100644
+--- a/src/test/test-tpm2.c
++++ b/src/test/test-tpm2.c
+@@ -4,39 +4,6 @@
+ #include "tpm2-util.h"
+ #include "tests.h"
+ 
+-static void test_tpm2_pcr_mask_from_string_one(const char *s, uint32_t mask, int ret) {
+-        uint32_t m;
+-
+-        assert_se(tpm2_pcr_mask_from_string(s, &m) == ret);
+-
+-        if (ret >= 0)
+-                assert_se(m == mask);
+-}
+-
+-TEST(tpm2_mask_from_string) {
+-        test_tpm2_pcr_mask_from_string_one("", 0, 0);
+-        test_tpm2_pcr_mask_from_string_one("0", 1, 0);
+-        test_tpm2_pcr_mask_from_string_one("1", 2, 0);
+-        test_tpm2_pcr_mask_from_string_one("0,1", 3, 0);
+-        test_tpm2_pcr_mask_from_string_one("0+1", 3, 0);
+-        test_tpm2_pcr_mask_from_string_one("0-1", 0, -EINVAL);
+-        test_tpm2_pcr_mask_from_string_one("0,1,2", 7, 0);
+-        test_tpm2_pcr_mask_from_string_one("0+1+2", 7, 0);
+-        test_tpm2_pcr_mask_from_string_one("0+1,2", 7, 0);
+-        test_tpm2_pcr_mask_from_string_one("0,1+2", 7, 0);
+-        test_tpm2_pcr_mask_from_string_one("0,2", 5, 0);
+-        test_tpm2_pcr_mask_from_string_one("0+2", 5, 0);
+-        test_tpm2_pcr_mask_from_string_one("foo", 0, -EINVAL);
+-        test_tpm2_pcr_mask_from_string_one("7+application-support", 8388736, 0);
+-        test_tpm2_pcr_mask_from_string_one("8+boot-loader-code", 272, 0);
+-        test_tpm2_pcr_mask_from_string_one("6+boot-loader-code,44", 0, -EINVAL);
+-        test_tpm2_pcr_mask_from_string_one("7,shim-policy,4", 16528, 0);
+-        test_tpm2_pcr_mask_from_string_one("sysexts,shim-policy+kernel-boot", 26624, 0);
+-        test_tpm2_pcr_mask_from_string_one("sysexts,shim+kernel-boot", 0, -EINVAL);
+-        test_tpm2_pcr_mask_from_string_one("sysexts+17+23", 8527872, 0);
+-        test_tpm2_pcr_mask_from_string_one("debug+24", 0, -EINVAL);
+-}
+-
+ TEST(pcr_index_from_string) {
+         assert_se(pcr_index_from_string("platform-code") == 0);
+         assert_se(pcr_index_from_string("0") == 0);
+@@ -463,18 +430,19 @@ static bool digest_check(const TPM2B_DIGEST *digest, const char *expect) {
+         h = hexmem(digest->buffer, digest->size);
+         assert_se(h);
+ 
+-        return streq(expect, h);
++        return strcaseeq(expect, h);
+ }
+ 
+-static void digest_init_sha256(TPM2B_DIGEST *digest, const char *hash) {
++static void digest_init(TPM2B_DIGEST *digest, const char *hash) {
+         _cleanup_free_ void *h = NULL;
+         size_t s = 0;
+ 
+-        assert_se(strlen(hash) == SHA256_DIGEST_SIZE * 2);
+         assert_se(strlen(hash) <= sizeof(digest->buffer) * 2);
+ 
+         assert_se(unhexmem(hash, strlen(hash), &h, &s) == 0);
+-        assert_se(s == SHA256_DIGEST_SIZE);
++
++        /* Make sure the length matches a known hash algorithm */
++        assert_se(IN_SET(s, TPM2_SHA1_DIGEST_SIZE, TPM2_SHA256_DIGEST_SIZE, TPM2_SHA384_DIGEST_SIZE, TPM2_SHA512_DIGEST_SIZE));
+ 
+         memcpy_safe(digest->buffer, h, s);
+         digest->size = s;
+@@ -485,11 +453,11 @@ static void digest_init_sha256(TPM2B_DIGEST *digest, const char *hash) {
+ TEST(digest_many) {
+         TPM2B_DIGEST d, d0, d1, d2, d3, d4;
+ 
+-        digest_init_sha256(&d0, "0000000000000000000000000000000000000000000000000000000000000000");
+-        digest_init_sha256(&d1, "17b7703d9d00776310ba032e88c1a8c2a9c630ebdd799db622f6631530789175");
+-        digest_init_sha256(&d2, "12998c017066eb0d2a70b94e6ed3192985855ce390f321bbdb832022888bd251");
+-        digest_init_sha256(&d3, "c3a65887fedd3fb4f5d0047e906dff830bcbd1293160909eb4b05f485e7387ad");
+-        digest_init_sha256(&d4, "6491fb4bc08fc0b2ef47fc63db57e249917885e69d8c0d99667df83a59107a33");
++        digest_init(&d0, "0000000000000000000000000000000000000000000000000000000000000000");
++        digest_init(&d1, "17b7703d9d00776310ba032e88c1a8c2a9c630ebdd799db622f6631530789175");
++        digest_init(&d2, "12998c017066eb0d2a70b94e6ed3192985855ce390f321bbdb832022888bd251");
++        digest_init(&d3, "c3a65887fedd3fb4f5d0047e906dff830bcbd1293160909eb4b05f485e7387ad");
++        digest_init(&d4, "6491fb4bc08fc0b2ef47fc63db57e249917885e69d8c0d99667df83a59107a33");
+ 
+         /* tpm2_digest_init, tpm2_digest_rehash */
+         d = (TPM2B_DIGEST){ .size = 1, .buffer = { 2, }, };
+@@ -553,6 +521,191 @@ TEST(digest_many) {
+         assert_se(digest_check(&d, "02ecb0628264235111e0053e271092981c8b15d59cd46617836bee3149a4ecb0"));
+ }
+ 
++static void check_parse_pcr_argument(
++                const char *arg,
++                const Tpm2PCRValue *prev_values,
++                size_t n_prev_values,
++                const Tpm2PCRValue *expected_values,
++                size_t n_expected_values) {
++
++        _cleanup_free_ Tpm2PCRValue *values = NULL;
++        size_t n_values = 0;
++
++        if (n_prev_values > 0) {
++                assert_se(GREEDY_REALLOC_APPEND(values, n_values, prev_values, n_prev_values));
++                assert_se(tpm2_parse_pcr_argument_append(arg, &values, &n_values) == 0);
++        } else
++                assert_se(tpm2_parse_pcr_argument(arg, &values, &n_values) == 0);
++
++        assert_se(n_values == n_expected_values);
++        for (size_t i = 0; i < n_values; i++) {
++                const Tpm2PCRValue *v = &values[i], *e = &expected_values[i];
++                //tpm2_log_debug_pcr_value(e, "Expected value");
++                //tpm2_log_debug_pcr_value(v, "Actual value");
++
++                assert_se(v->index == e->index);
++                assert_se(v->hash == e->hash);
++                assert_se(v->value.size == e->value.size);
++                assert_se(memcmp(v->value.buffer, e->value.buffer, e->value.size) == 0);
++        }
++
++        size_t hash_count;
++        assert_se(tpm2_pcr_values_hash_count(expected_values, n_expected_values, &hash_count) == 0);
++        if (hash_count == 1) {
++                uint32_t mask = UINT32_MAX, expected_mask = 0;
++
++                if (n_prev_values > 0)
++                        assert_se(tpm2_pcr_values_to_mask(prev_values, n_prev_values, prev_values[0].hash, &mask) == 0);
++
++                assert_se(tpm2_pcr_values_to_mask(expected_values, n_expected_values, expected_values[0].hash, &expected_mask) == 0);
++
++                assert_se(tpm2_parse_pcr_argument_to_mask(arg, &mask) == 0);
++                assert_se(mask == expected_mask);
++        }
++
++        size_t old_n_values = n_values;
++        assert_se(tpm2_parse_pcr_argument_append("", &values, &n_values) == 0);
++        assert_se(values);
++        assert_se(n_values == old_n_values);
++}
++
++static void check_parse_pcr_argument_to_mask(const char *arg, int mask) {
++        uint32_t m = 0;
++        int r = tpm2_parse_pcr_argument_to_mask(arg, &m);
++
++        if (mask < 0)
++                assert_se(mask == r);
++        else
++                assert_se((uint32_t) mask == m);
++}
++
++TEST(parse_pcr_argument) {
++        _cleanup_free_ Tpm2PCRValue *t0p = NULL;
++        size_t n_t0p;
++        assert_se(tpm2_parse_pcr_argument("", &t0p, &n_t0p) == 0);
++        assert_se(n_t0p == 0);
++        assert_se(tpm2_parse_pcr_argument_append("", &t0p, &n_t0p) == 0);
++        assert_se(n_t0p == 0);
++        uint32_t m0 = 0xf;
++        assert_se(tpm2_parse_pcr_argument_to_mask("", &m0) == 0);
++        assert_se(m0 == 0);
++        assert_se(tpm2_parse_pcr_argument_to_mask("", &m0) == 0);
++        assert_se(m0 == 0);
++
++        Tpm2PCRValue t1[] = {
++                TPM2_PCR_VALUE_MAKE(0, 0, {}),
++                TPM2_PCR_VALUE_MAKE(4, 0, {}),
++                TPM2_PCR_VALUE_MAKE(7, 0, {}),
++                TPM2_PCR_VALUE_MAKE(11, 0, {}),
++        };
++        check_parse_pcr_argument("0,4,7,11", NULL, 0, t1, ELEMENTSOF(t1));
++        check_parse_pcr_argument("11,4,7,0", NULL, 0, t1, ELEMENTSOF(t1));
++        check_parse_pcr_argument("7,4,0,11", NULL, 0, t1, ELEMENTSOF(t1));
++        check_parse_pcr_argument("11,7,4,0", NULL, 0, t1, ELEMENTSOF(t1));
++        check_parse_pcr_argument("0+4+7+11", NULL, 0, t1, ELEMENTSOF(t1));
++        check_parse_pcr_argument("0,4+7,11", NULL, 0, t1, ELEMENTSOF(t1));
++
++        Tpm2PCRValue t2[] = {
++                TPM2_PCR_VALUE_MAKE(0, TPM2_ALG_SHA1, {}),
++                TPM2_PCR_VALUE_MAKE(4, TPM2_ALG_SHA1, {}),
++                TPM2_PCR_VALUE_MAKE(7, TPM2_ALG_SHA1, {}),
++                TPM2_PCR_VALUE_MAKE(11, TPM2_ALG_SHA1, {}),
++        };
++        check_parse_pcr_argument("0:sha1,4,7,11", NULL, 0, t2, ELEMENTSOF(t2));
++        check_parse_pcr_argument("11,4,7,0:sha1", NULL, 0, t2, ELEMENTSOF(t2));
++        check_parse_pcr_argument("7,4:sha1,0,11", NULL, 0, t2, ELEMENTSOF(t2));
++        check_parse_pcr_argument("0:sha1,4:sha1,7:sha1,11:sha1", NULL, 0, t2, ELEMENTSOF(t2));
++        check_parse_pcr_argument("0:sha1+4:sha1,11:sha1+7:sha1", NULL, 0, t2, ELEMENTSOF(t2));
++
++        Tpm2PCRValue t3[] = {
++                TPM2_PCR_VALUE_MAKE(0, TPM2_ALG_SHA1, {}),
++                TPM2_PCR_VALUE_MAKE(1, TPM2_ALG_SHA1, {}),
++                TPM2_PCR_VALUE_MAKE(2, TPM2_ALG_SHA1, {}),
++                TPM2_PCR_VALUE_MAKE(3, TPM2_ALG_SHA1, {}),
++                TPM2_PCR_VALUE_MAKE(4, TPM2_ALG_SHA1, {}),
++                TPM2_PCR_VALUE_MAKE(7, TPM2_ALG_SHA1, {}),
++                TPM2_PCR_VALUE_MAKE(11, TPM2_ALG_SHA1, {}),
++                TPM2_PCR_VALUE_MAKE(12, TPM2_ALG_SHA1, {}),
++        };
++        check_parse_pcr_argument("1,2,3,12", t2, ELEMENTSOF(t2), t3, ELEMENTSOF(t3));
++        check_parse_pcr_argument("12,2,3,1", t2, ELEMENTSOF(t2), t3, ELEMENTSOF(t3));
++        check_parse_pcr_argument("1,2,3,12:sha1", t1, ELEMENTSOF(t1), t3, ELEMENTSOF(t3));
++        check_parse_pcr_argument("1,2,3,12:sha1", t2, ELEMENTSOF(t2), t3, ELEMENTSOF(t3));
++        check_parse_pcr_argument("1:sha1,2,3,12", t1, ELEMENTSOF(t1), t3, ELEMENTSOF(t3));
++        check_parse_pcr_argument("1:sha1,2,3,12", t2, ELEMENTSOF(t2), t3, ELEMENTSOF(t3));
++        check_parse_pcr_argument("1:sha1,2:sha1,3:sha1,12:sha1", t1, ELEMENTSOF(t1), t3, ELEMENTSOF(t3));
++        check_parse_pcr_argument("1:sha1,2:sha1,3:sha1,12:sha1", t2, ELEMENTSOF(t2), t3, ELEMENTSOF(t3));
++
++        TPM2B_DIGEST d4;
++        digest_init(&d4, "FCE7F1083082B16CFE2B085DD7858BB11A37C09B78E36C79E5A2FD529353C4E2");
++        Tpm2PCRValue t4[] = {
++                TPM2_PCR_VALUE_MAKE(0, TPM2_ALG_SHA256, {}),
++                TPM2_PCR_VALUE_MAKE(1, TPM2_ALG_SHA256, d4),
++                TPM2_PCR_VALUE_MAKE(2, TPM2_ALG_SHA256, {}),
++                TPM2_PCR_VALUE_MAKE(3, TPM2_ALG_SHA256, {}),
++                TPM2_PCR_VALUE_MAKE(4, TPM2_ALG_SHA256, {}),
++                TPM2_PCR_VALUE_MAKE(7, TPM2_ALG_SHA256, {}),
++                TPM2_PCR_VALUE_MAKE(11, TPM2_ALG_SHA256, {}),
++                TPM2_PCR_VALUE_MAKE(12, TPM2_ALG_SHA256, {}),
++        };
++        check_parse_pcr_argument("1:sha256=0xFCE7F1083082B16CFE2B085DD7858BB11A37C09B78E36C79E5A2FD529353C4E2,2,3,12", t1, ELEMENTSOF(t1), t4, ELEMENTSOF(t4));
++        check_parse_pcr_argument("12,2,3,1:sha256=FCE7F1083082B16CFE2B085DD7858BB11A37C09B78E36C79E5A2FD529353C4E2", t1, ELEMENTSOF(t1), t4, ELEMENTSOF(t4));
++        check_parse_pcr_argument("12,2,3,1:sha256=0xFCE7F1083082B16CFE2B085DD7858BB11A37C09B78E36C79E5A2FD529353C4E2", t1, ELEMENTSOF(t1), t4, ELEMENTSOF(t4));
++        check_parse_pcr_argument("1:sha256=0xFCE7F1083082B16CFE2B085DD7858BB11A37C09B78E36C79E5A2FD529353C4E2,2,3,12:SHA256", t1, ELEMENTSOF(t1), t4, ELEMENTSOF(t4));
++        check_parse_pcr_argument("1:sha256=0xFCE7F1083082B16CFE2B085DD7858BB11A37C09B78E36C79E5A2FD529353C4E2,2,3,12", t1, ELEMENTSOF(t1), t4, ELEMENTSOF(t4));
++        check_parse_pcr_argument("1:sha256=FCE7F1083082B16CFE2B085DD7858BB11A37C09B78E36C79E5A2FD529353C4E2,2:sha256,3:sha256,12:sha256", t1, ELEMENTSOF(t1), t4, ELEMENTSOF(t4));
++        check_parse_pcr_argument("1:sha256=0xFCE7F1083082B16CFE2B085DD7858BB11A37C09B78E36C79E5A2FD529353C4E2,2:sha256,3:sha256,12:sha256", t1, ELEMENTSOF(t1), t4, ELEMENTSOF(t4));
++
++        TPM2B_DIGEST d5;
++        digest_init(&d5, "0F21EADB7F27377668E3C8069BE88D116491FBEE");
++        Tpm2PCRValue t5[] = {
++                TPM2_PCR_VALUE_MAKE(1, TPM2_ALG_SHA1, d5),
++                TPM2_PCR_VALUE_MAKE(0, TPM2_ALG_SHA256, {}),
++                TPM2_PCR_VALUE_MAKE(1, TPM2_ALG_SHA256, d4),
++                TPM2_PCR_VALUE_MAKE(2, TPM2_ALG_SHA256, {}),
++                TPM2_PCR_VALUE_MAKE(3, TPM2_ALG_SHA256, {}),
++                TPM2_PCR_VALUE_MAKE(4, TPM2_ALG_SHA256, {}),
++                TPM2_PCR_VALUE_MAKE(7, TPM2_ALG_SHA256, {}),
++                TPM2_PCR_VALUE_MAKE(11, TPM2_ALG_SHA256, {}),
++                TPM2_PCR_VALUE_MAKE(12, TPM2_ALG_SHA256, {}),
++                TPM2_PCR_VALUE_MAKE(5, TPM2_ALG_SHA384, {}),
++                TPM2_PCR_VALUE_MAKE(6, TPM2_ALG_SHA512, {}),
++        };
++        check_parse_pcr_argument("0,1:sha256=0xFCE7F1083082B16CFE2B085DD7858BB11A37C09B78E36C79E5A2FD529353C4E2,1:sha1=0F21EADB7F27377668E3C8069BE88D116491FBEE,2,3,4,7,11,12,5:sha384,6:sha512", NULL, 0, t5, ELEMENTSOF(t5));
++        check_parse_pcr_argument("1:sha1=0F21EADB7F27377668E3C8069BE88D116491FBEE,6:sha512,5:sha384", t4, ELEMENTSOF(t4), t5, ELEMENTSOF(t5));
++
++        Tpm2PCRValue *v = NULL;
++        size_t n_v = 0;
++        assert_se(tpm2_parse_pcr_argument("1,100", &v, &n_v) < 0);
++        assert_se(tpm2_parse_pcr_argument("1,2=123456abc", &v, &n_v) < 0);
++        assert_se(tpm2_parse_pcr_argument("1,2:invalid", &v, &n_v) < 0);
++        assert_se(tpm2_parse_pcr_argument("1:sha1=invalid", &v, &n_v) < 0);
++        assert_se(v == NULL);
++        assert_se(n_v == 0);
++
++        check_parse_pcr_argument_to_mask("", 0x0);
++        check_parse_pcr_argument_to_mask("0", 0x1);
++        check_parse_pcr_argument_to_mask("1", 0x2);
++        check_parse_pcr_argument_to_mask("0,1", 0x3);
++        check_parse_pcr_argument_to_mask("0+1", 0x3);
++        check_parse_pcr_argument_to_mask("0-1", -EINVAL);
++        check_parse_pcr_argument_to_mask("foo", -EINVAL);
++        check_parse_pcr_argument_to_mask("0,1,2", 0x7);
++        check_parse_pcr_argument_to_mask("0+1+2", 0x7);
++        check_parse_pcr_argument_to_mask("0+1,2", 0x7);
++        check_parse_pcr_argument_to_mask("0,1+2", 0x7);
++        check_parse_pcr_argument_to_mask("0,2", 0x5);
++        check_parse_pcr_argument_to_mask("0+2", 0x5);
++        check_parse_pcr_argument_to_mask("7+application-support", 0x800080);
++        check_parse_pcr_argument_to_mask("8+boot-loader-code", 0x110);
++        check_parse_pcr_argument_to_mask("7,shim-policy,4", 0x4090);
++        check_parse_pcr_argument_to_mask("sysexts,shim-policy+kernel-boot", 0x6800);
++        check_parse_pcr_argument_to_mask("sysexts,shim+kernel-boot", -EINVAL);
++        check_parse_pcr_argument_to_mask("sysexts+17+23", 0x822000);
++        check_parse_pcr_argument_to_mask("6+boot-loader-code,44", -EINVAL);
++        check_parse_pcr_argument_to_mask("debug+24", -EINVAL);
++}
++
+ static void tpm2b_public_init(TPM2B_PUBLIC *public) {
+         TPMT_PUBLIC tpmt = {
+                 .type = TPM2_ALG_RSA,
+@@ -599,7 +752,7 @@ TEST(calculate_name) {
+ TEST(calculate_policy_auth_value) {
+         TPM2B_DIGEST d;
+ 
+-        digest_init_sha256(&d, "0000000000000000000000000000000000000000000000000000000000000000");
++        digest_init(&d, "0000000000000000000000000000000000000000000000000000000000000000");
+         assert_se(tpm2_calculate_policy_auth_value(&d) == 0);
+         assert_se(digest_check(&d, "8fcd2169ab92694e0c633f1ab772842b8241bbc20288981fc7ac1eddc1fddb0e"));
+         assert_se(tpm2_calculate_policy_auth_value(&d) == 0);
+@@ -611,7 +764,7 @@ TEST(calculate_policy_authorize) {
+         TPM2B_DIGEST d;
+ 
+         tpm2b_public_init(&public);
+-        digest_init_sha256(&d, "0000000000000000000000000000000000000000000000000000000000000000");
++        digest_init(&d, "0000000000000000000000000000000000000000000000000000000000000000");
+         assert_se(tpm2_calculate_policy_authorize(&public, NULL, &d) == 0);
+         assert_se(digest_check(&d, "95213a3784eaab04f427bc7e8851c2f1df0903be8e42428ec25dcefd907baff1"));
+         assert_se(tpm2_calculate_policy_authorize(&public, NULL, &d) == 0);
+@@ -621,24 +774,24 @@ TEST(calculate_policy_authorize) {
+ TEST(calculate_policy_pcr) {
+         TPM2B_DIGEST d, dN[16];
+ 
+-        digest_init_sha256(&dN[ 0], "2124793cbbe60c3a8637d3b84a5d054e87c351e1469a285acc04755e8b204dec");
+-        digest_init_sha256(&dN[ 1], "bf7592f18adcfdc549fc0b94939f5069a24697f9cff4a0dca29014767b97559d");
+-        digest_init_sha256(&dN[ 2], "4b00cff9dee3a364979b2dc241b34568a8ad49fcf2713df259e47dff8875feed");
+-        digest_init_sha256(&dN[ 3], "3d458cfe55cc03ea1f443f1562beec8df51c75e14a9fcf9a7234a13f198e7969");
+-        digest_init_sha256(&dN[ 4], "368f85b3013041dfe203faaa364f00b07c5da7b1e5f1dbf2efb06fa6b9bd92de");
+-        digest_init_sha256(&dN[ 5], "c97c40369691c8e4aa78fb3a52655cd193b780a838b8e23f5f476576919db5e5");
+-        digest_init_sha256(&dN[ 6], "3d458cfe55cc03ea1f443f1562beec8df51c75e14a9fcf9a7234a13f198e7969");
+-        digest_init_sha256(&dN[ 7], "aa1154c9e0a774854ccbed4c8ce7e9b906b3d700a1a8db1772d0341a62dbe51b");
+-        digest_init_sha256(&dN[ 8], "cfde439a2c06af3479ca6bdc60429b90553d65300c5cfcc40004a08c6b5ad81a");
+-        digest_init_sha256(&dN[ 9], "9c2bac22ef5ec84fcdb71c3ebf776cba1247e5da980e5ee08e45666a2edf0b8b");
+-        digest_init_sha256(&dN[10], "9885873f4d7348199ad286f8f2476d4f866940950f6f9fb9f945ed352dbdcbd2");
+-        digest_init_sha256(&dN[11], "42400ab950d21aa79d12cc4fdef67d1087a39ad64900619831c0974dbae54e44");
+-        digest_init_sha256(&dN[12], "767d064382e56ca1ad3bdcc6bc596112e6c2008b593d3570d24c2bfa64c4628c");
+-        digest_init_sha256(&dN[13], "30c16133175959408c9745d8dafadef5daf4b39cb2be04df0d60089bd46d3cc4");
+-        digest_init_sha256(&dN[14], "e3991b7ddd47be7e92726a832d6874c5349b52b789fa0db8b558c69fea29574e");
+-        digest_init_sha256(&dN[15], "852dae3ecb992bdeb13d6002fefeeffdd90feca8b378d56681ef2c885d0e5137");
+-
+-        digest_init_sha256(&d, "0000000000000000000000000000000000000000000000000000000000000000");
++        digest_init(&dN[ 0], "2124793cbbe60c3a8637d3b84a5d054e87c351e1469a285acc04755e8b204dec");
++        digest_init(&dN[ 1], "bf7592f18adcfdc549fc0b94939f5069a24697f9cff4a0dca29014767b97559d");
++        digest_init(&dN[ 2], "4b00cff9dee3a364979b2dc241b34568a8ad49fcf2713df259e47dff8875feed");
++        digest_init(&dN[ 3], "3d458cfe55cc03ea1f443f1562beec8df51c75e14a9fcf9a7234a13f198e7969");
++        digest_init(&dN[ 4], "368f85b3013041dfe203faaa364f00b07c5da7b1e5f1dbf2efb06fa6b9bd92de");
++        digest_init(&dN[ 5], "c97c40369691c8e4aa78fb3a52655cd193b780a838b8e23f5f476576919db5e5");
++        digest_init(&dN[ 6], "3d458cfe55cc03ea1f443f1562beec8df51c75e14a9fcf9a7234a13f198e7969");
++        digest_init(&dN[ 7], "aa1154c9e0a774854ccbed4c8ce7e9b906b3d700a1a8db1772d0341a62dbe51b");
++        digest_init(&dN[ 8], "cfde439a2c06af3479ca6bdc60429b90553d65300c5cfcc40004a08c6b5ad81a");
++        digest_init(&dN[ 9], "9c2bac22ef5ec84fcdb71c3ebf776cba1247e5da980e5ee08e45666a2edf0b8b");
++        digest_init(&dN[10], "9885873f4d7348199ad286f8f2476d4f866940950f6f9fb9f945ed352dbdcbd2");
++        digest_init(&dN[11], "42400ab950d21aa79d12cc4fdef67d1087a39ad64900619831c0974dbae54e44");
++        digest_init(&dN[12], "767d064382e56ca1ad3bdcc6bc596112e6c2008b593d3570d24c2bfa64c4628c");
++        digest_init(&dN[13], "30c16133175959408c9745d8dafadef5daf4b39cb2be04df0d60089bd46d3cc4");
++        digest_init(&dN[14], "e3991b7ddd47be7e92726a832d6874c5349b52b789fa0db8b558c69fea29574e");
++        digest_init(&dN[15], "852dae3ecb992bdeb13d6002fefeeffdd90feca8b378d56681ef2c885d0e5137");
++
++        digest_init(&d, "0000000000000000000000000000000000000000000000000000000000000000");
+         Tpm2PCRValue v1[] = {
+                 TPM2_PCR_VALUE_MAKE(4, TPM2_ALG_SHA256, dN[4]),
+                 TPM2_PCR_VALUE_MAKE(7, TPM2_ALG_SHA256, dN[7]),
+@@ -649,7 +802,7 @@ TEST(calculate_policy_pcr) {
+         assert_se(tpm2_calculate_policy_pcr(v1, ELEMENTSOF(v1), &d) == 0);
+         assert_se(digest_check(&d, "97e64bcabb64c1fa4b726528644926c8029f5b4458b0575c98c04fe225629a0b"));
+ 
+-        digest_init_sha256(&d, "0000000000000000000000000000000000000000000000000000000000000000");
++        digest_init(&d, "0000000000000000000000000000000000000000000000000000000000000000");
+         Tpm2PCRValue v2[] = {
+                 TPM2_PCR_VALUE_MAKE( 0, TPM2_ALG_SHA256, dN[ 0]),
+                 TPM2_PCR_VALUE_MAKE( 1, TPM2_ALG_SHA256, dN[ 1]),
+-- 
+2.34.1
+

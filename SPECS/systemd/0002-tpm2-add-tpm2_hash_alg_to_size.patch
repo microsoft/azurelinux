@@ -1,0 +1,50 @@
+From c9df1fb119b3e57b0468457cc681920f453ff6e7 Mon Sep 17 00:00:00 2001
+From: Dan Streetman <ddstreet@ieee.org>
+Date: Tue, 11 Jul 2023 11:11:59 -0400
+Subject: [PATCH 02/20] tpm2: add tpm2_hash_alg_to_size()
+
+Add function to get the hash size for a hash algorithm
+---
+ src/shared/tpm2-util.c | 12 ++++++++++++
+ src/shared/tpm2-util.h |  2 ++
+ 2 files changed, 14 insertions(+)
+
+diff --git a/src/shared/tpm2-util.c b/src/shared/tpm2-util.c
+index a26bf35c70..88cd7144b9 100644
+--- a/src/shared/tpm2-util.c
++++ b/src/shared/tpm2-util.c
+@@ -4239,6 +4239,18 @@ int tpm2_parse_luks2_json(
+         return 0;
+ }
+ 
++int tpm2_hash_alg_to_size(uint16_t alg) {
++        if (alg == TPM2_ALG_SHA1)
++                return 20;
++        if (alg == TPM2_ALG_SHA256)
++                return 32;
++        if (alg == TPM2_ALG_SHA384)
++                return 48;
++        if (alg == TPM2_ALG_SHA512)
++                return 64;
++        return log_debug_errno(SYNTHETIC_ERRNO(EINVAL), "Unknown hash algorithm id 0x%" PRIx16, alg);
++}
++
+ const char *tpm2_hash_alg_to_string(uint16_t alg) {
+         if (alg == TPM2_ALG_SHA1)
+                 return "sha1";
+diff --git a/src/shared/tpm2-util.h b/src/shared/tpm2-util.h
+index 12f05b43f9..9ea8e5bda3 100644
+--- a/src/shared/tpm2-util.h
++++ b/src/shared/tpm2-util.h
+@@ -164,6 +164,8 @@ int tpm2_parse_luks2_json(JsonVariant *v, int *ret_keyslot, uint32_t *ret_hash_p
+ #define TPM2_ALG_RSA 0x1
+ #endif
+ 
++int tpm2_hash_alg_to_size(uint16_t alg);
++
+ const char *tpm2_hash_alg_to_string(uint16_t alg);
+ int tpm2_hash_alg_from_string(const char *alg);
+ 
+-- 
+2.34.1
+

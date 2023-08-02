@@ -1,0 +1,43 @@
+From 3f181ace57848fd876627a999e5e73eb02bd9065 Mon Sep 17 00:00:00 2001
+From: Dan Streetman <ddstreet@ieee.org>
+Date: Wed, 2 Aug 2023 13:35:46 -0400
+Subject: [PATCH 40/44] tpm2: update tpm2 test for supported commands
+
+The test expects TPM2_CC_FIRST - 1 and TPM2_CC_LAST + 1 to be unsupported, but
+those are not necessarily invalid commands. Instead test known-invalid
+commands. Also add some more valid commands.
+---
+ src/test/test-tpm2.c | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
+
+diff --git a/src/test/test-tpm2.c b/src/test/test-tpm2.c
+index 5bd0391779..cd887d2a19 100644
+--- a/src/test/test-tpm2.c
++++ b/src/test/test-tpm2.c
+@@ -988,11 +988,18 @@ static void check_supports_alg(Tpm2Context *c) {
+ static void check_supports_command(Tpm2Context *c) {
+         assert(c);
+ 
+-        /* Test invalid commands */
+-        assert_se(!tpm2_supports_command(c, TPM2_CC_FIRST - 1));
+-        assert_se(!tpm2_supports_command(c, TPM2_CC_LAST + 1));
+-
+-        /* Test valid commands */
++        /* Test invalid commands. TPM specification Part 2 ("Structures") section "TPM_CC (Command Codes)"
++         * states bits 31:30 and 28:16 are reserved and must be 0. */
++        assert_se(!tpm2_supports_command(c, UINT32_C(0x80000000)));
++        assert_se(!tpm2_supports_command(c, UINT32_C(0x40000000)));
++        assert_se(!tpm2_supports_command(c, UINT32_C(0x00100000)));
++        assert_se(!tpm2_supports_command(c, UINT32_C(0x80000144)));
++        assert_se(!tpm2_supports_command(c, UINT32_C(0x40000144)));
++        assert_se(!tpm2_supports_command(c, UINT32_C(0x00100144)));
++
++        /* Test valid commands. We should be able to expect all TPMs support these. */
++        assert_se(tpm2_supports_command(c, TPM2_CC_Startup));
++        assert_se(tpm2_supports_command(c, TPM2_CC_StartAuthSession));
+         assert_se(tpm2_supports_command(c, TPM2_CC_Create));
+         assert_se(tpm2_supports_command(c, TPM2_CC_CreatePrimary));
+         assert_se(tpm2_supports_command(c, TPM2_CC_Unseal));
+-- 
+2.34.1
+

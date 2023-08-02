@@ -1,0 +1,57 @@
+From 9740ee7dbdd763f3a4484af997a2546bb48b1755 Mon Sep 17 00:00:00 2001
+From: Dan Streetman <ddstreet@ieee.org>
+Date: Mon, 24 Jul 2023 20:04:28 -0400
+Subject: [PATCH 44/44] test: update TEST-70 with systemd-cryptenroll external
+ sealing
+
+Update test to check if systemd-cryptenroll external sealing works.
+---
+ test/TEST-70-TPM2/test.sh  |  3 ++-
+ test/units/testsuite-70.sh | 10 +++++++++-
+ 2 files changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/test/TEST-70-TPM2/test.sh b/test/TEST-70-TPM2/test.sh
+index 8d54c3c05c..6ba60d80a0 100755
+--- a/test/TEST-70-TPM2/test.sh
++++ b/test/TEST-70-TPM2/test.sh
+@@ -11,7 +11,7 @@ TEST_REQUIRE_INSTALL_TESTS=0
+ # shellcheck source=test/test-functions
+ . "${TEST_BASE_DIR:?}/test-functions"
+ 
+-test_require_bin swtpm tpm2_pcrextend tpm2_dictionarylockout
++test_require_bin swtpm tpm2_dictionarylockout tpm2_pcrextend tpm2_pcrread tpm2_readpublic
+ 
+ test_append_files() {
+     local workspace="${1:?}"
+@@ -22,6 +22,7 @@ test_append_files() {
+     inst_binary tpm2_dictionarylockout
+     inst_binary tpm2_pcrextend
+     inst_binary tpm2_pcrread
++    inst_binary tpm2_readpublic
+     inst_binary openssl
+ }
+ 
+diff --git a/test/units/testsuite-70.sh b/test/units/testsuite-70.sh
+index dd8cdb7efa..9031574ad6 100755
+--- a/test/units/testsuite-70.sh
++++ b/test/units/testsuite-70.sh
+@@ -128,7 +128,15 @@ if tpm_has_pcr sha256 12; then
+     "$SD_CRYPTSETUP" attach test-volume "$img" - tpm2-device=auto,headless=1
+     "$SD_CRYPTSETUP" detach test-volume
+ 
+-    rm -f /tmp/pcr.dat
++    # enroll "external" TPM (the TPM isn't "external" here but we don't use it during sealing)
++    tpm2_pcrread -Q -o /tmp/pcr.dat sha256:12
++    CURRENT_PCR_VALUE=$(cat /sys/class/tpm/tpm0/pcr-sha256/12)
++    tpm2_readpublic -c 0x81000001 -o /tmp/srk.pub
++    PASSWORD=passphrase systemd-cryptenroll --tpm2-external-key=/tmp/srk.pub --tpm2-pcrs="12:sha256=$CURRENT_PCR_VALUE" "$img"
++    "$SD_CRYPTSETUP" attach test-volume "$img" - tpm2-device=auto,headless=1
++    "$SD_CRYPTSETUP" detach test-volume
++
++    rm -f /tmp/pcr.dat /tmp/srk.pub
+ fi
+ 
+ rm -f "${img:?}"
+-- 
+2.34.1
+

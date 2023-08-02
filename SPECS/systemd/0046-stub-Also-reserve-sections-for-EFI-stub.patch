@@ -1,0 +1,35 @@
+From d0bbe3248551e6cb02ba62559e7ff87b0a27f789 Mon Sep 17 00:00:00 2001
+From: Jan Janssen <medhefgo@web.de>
+Date: Sun, 30 Jul 2023 21:05:24 +0200
+Subject: [PATCH] stub: Also reserve sections for EFI stub
+
+The stub image may not have enough sections to cause enough PE header
+space to be free for later expansion. Given that the stub is guaranteed
+to be expanded we should always reserve enough sections for it.
+
+This also bumps the reservation to 15. It doesn't add more space
+compared to current builds but it more closely reflects the amount of
+sections that a UKI could have in total if all optional sections are
+used.
+
+Fixes: #28593
+---
+ src/boot/efi/meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/boot/efi/meson.build b/src/boot/efi/meson.build
+index e99bdb8748..0d0b8265a8 100644
+--- a/src/boot/efi/meson.build
++++ b/src/boot/efi/meson.build
+@@ -351,7 +351,7 @@ foreach efi_elf_binary : efi_elf_binaries
+         name += name.startswith('systemd-boot') ? '.efi' : '.efi.stub'
+         # For the addon, given it's empty, we need to explicitly reserve space in the header to account for
+         # the sections that ukify will add.
+-        minimum_sections = name.startswith('addon') ? '7' : '0'
++        minimum_sections = name.endswith('.stub') ? '15' : '0'
+         exe = custom_target(
+                 name,
+                 output : name,
+-- 
+2.34.1
+

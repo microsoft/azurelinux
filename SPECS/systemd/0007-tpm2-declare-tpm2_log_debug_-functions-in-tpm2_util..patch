@@ -1,0 +1,79 @@
+From 75de375aafa78ccf2cd93a2c0a15d3bc4b0fe4b7 Mon Sep 17 00:00:00 2001
+From: Dan Streetman <ddstreet@ieee.org>
+Date: Fri, 14 Jul 2023 07:23:55 -0400
+Subject: [PATCH 07/20] tpm2: declare tpm2_log_debug_*() functions in
+ tpm2_util.h
+
+Allow other code to use the log debug functions; e.g. they are useful in test
+code.
+---
+ src/shared/tpm2-util.c | 10 +++++-----
+ src/shared/tpm2-util.h |  6 ++++++
+ 2 files changed, 11 insertions(+), 5 deletions(-)
+
+diff --git a/src/shared/tpm2-util.c b/src/shared/tpm2-util.c
+index 26a67accff..f717784a39 100644
+--- a/src/shared/tpm2-util.c
++++ b/src/shared/tpm2-util.c
+@@ -1833,7 +1833,7 @@ char *tpm2_pcr_values_to_string(const Tpm2PCRValue *pcr_values, size_t n_pcr_val
+         return s ? TAKE_PTR(s) : strdup("");
+ }
+ 
+-static void tpm2_log_debug_tpml_pcr_selection(const TPML_PCR_SELECTION *l, const char *msg) {
++void tpm2_log_debug_tpml_pcr_selection(const TPML_PCR_SELECTION *l, const char *msg) {
+         if (!DEBUG_LOGGING || !l)
+                 return;
+ 
+@@ -1841,7 +1841,7 @@ static void tpm2_log_debug_tpml_pcr_selection(const TPML_PCR_SELECTION *l, const
+         log_debug("%s: %s", msg ?: "PCR selection", strna(s));
+ }
+ 
+-static void tpm2_log_debug_pcr_value(const Tpm2PCRValue *pcr_value, const char *msg) {
++void tpm2_log_debug_pcr_value(const Tpm2PCRValue *pcr_value, const char *msg) {
+         if (!DEBUG_LOGGING || !pcr_value)
+                 return;
+ 
+@@ -1849,7 +1849,7 @@ static void tpm2_log_debug_pcr_value(const Tpm2PCRValue *pcr_value, const char *
+         log_debug("%s: %s", msg ?: "PCR value", strna(s));
+ }
+ 
+-static void tpm2_log_debug_buffer(const void *buffer, size_t size, const char *msg) {
++void tpm2_log_debug_buffer(const void *buffer, size_t size, const char *msg) {
+         if (!DEBUG_LOGGING || !buffer || size == 0)
+                 return;
+ 
+@@ -1857,12 +1857,12 @@ static void tpm2_log_debug_buffer(const void *buffer, size_t size, const char *m
+         log_debug("%s: %s", msg ?: "Buffer", strna(h));
+ }
+ 
+-static void tpm2_log_debug_digest(const TPM2B_DIGEST *digest, const char *msg) {
++void tpm2_log_debug_digest(const TPM2B_DIGEST *digest, const char *msg) {
+         if (digest)
+                 tpm2_log_debug_buffer(digest->buffer, digest->size, msg ?: "Digest");
+ }
+ 
+-static void tpm2_log_debug_name(const TPM2B_NAME *name, const char *msg) {
++void tpm2_log_debug_name(const TPM2B_NAME *name, const char *msg) {
+         if (name)
+                 tpm2_log_debug_buffer(name->name, name->size, msg ?: "Name");
+ }
+diff --git a/src/shared/tpm2-util.h b/src/shared/tpm2-util.h
+index bf8135d0af..4916620a25 100644
+--- a/src/shared/tpm2-util.h
++++ b/src/shared/tpm2-util.h
+@@ -139,6 +139,12 @@ static inline int tpm2_digest_init(TPMI_ALG_HASH alg, TPM2B_DIGEST *digest) {
+         return tpm2_digest_many(alg, digest, NULL, 0, false);
+ }
+ 
++void tpm2_log_debug_tpml_pcr_selection(const TPML_PCR_SELECTION *l, const char *msg);
++void tpm2_log_debug_pcr_value(const Tpm2PCRValue *pcr_value, const char *msg);
++void tpm2_log_debug_buffer(const void *buffer, size_t size, const char *msg);
++void tpm2_log_debug_digest(const TPM2B_DIGEST *digest, const char *msg);
++void tpm2_log_debug_name(const TPM2B_NAME *name, const char *msg);
++
+ int tpm2_calculate_name(const TPMT_PUBLIC *public, TPM2B_NAME *ret_name);
+ int tpm2_calculate_policy_auth_value(TPM2B_DIGEST *digest);
+ int tpm2_calculate_policy_authorize(const TPM2B_PUBLIC *public, const TPM2B_DIGEST *policy_ref, TPM2B_DIGEST *digest);
+-- 
+2.34.1
+

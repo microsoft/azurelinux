@@ -1,0 +1,177 @@
+From 53b91e1981993f49e079d977e2ac651eaac5cc5a Mon Sep 17 00:00:00 2001
+From: Dan Streetman <ddstreet@ieee.org>
+Date: Wed, 19 Jul 2023 07:49:07 -0400
+Subject: [PATCH 10/20] tpm2: add TPM2B_*_MAKE(), TPM2B_*_CHECK_SIZE() macros
+
+The tpm2-tss library has many structs with only an array and size; these macros
+make it easy to assign to these structs.
+---
+ src/boot/measure.c     | 15 +++--------
+ src/shared/tpm2-util.c | 17 +++++++------
+ src/shared/tpm2-util.h | 56 ++++++++++++++++++++++++++++++++++++++++++
+ src/test/test-tpm2.c   |  7 ++----
+ 4 files changed, 72 insertions(+), 23 deletions(-)
+
+diff --git a/src/boot/measure.c b/src/boot/measure.c
+index 4dd039877c..518c41f65c 100644
+--- a/src/boot/measure.c
++++ b/src/boot/measure.c
+@@ -831,18 +831,11 @@ static int verb_sign(int argc, char *argv[], void *userdata) {
+                         if (tpmalg < 0)
+                                 return log_error_errno(tpmalg, "Unsupported PCR bank");
+ 
+-                        TPM2B_DIGEST pcr_digest = {
+-                                .size = p->value_size,
+-                        };
+-                        assert(sizeof(pcr_digest.buffer) >= p->value_size);
+-                        memcpy_safe(pcr_digest.buffer, p->value, p->value_size);
++                        Tpm2PCRValue pcr_value = TPM2_PCR_VALUE_MAKE(TPM_PCR_INDEX_KERNEL_IMAGE,
++                                                                     tpmalg,
++                                                                     TPM2B_DIGEST_MAKE(p->value, p->value_size));
+ 
+-                        Tpm2PCRValue pcr_value = TPM2_PCR_VALUE_MAKE(TPM_PCR_INDEX_KERNEL_IMAGE, tpmalg, pcr_digest);
+-
+-                        TPM2B_DIGEST pcr_policy_digest;
+-                        r = tpm2_digest_init(TPM2_ALG_SHA256, &pcr_policy_digest);
+-                        if (r < 0)
+-                                return r;
++                        TPM2B_DIGEST pcr_policy_digest = TPM2B_DIGEST_MAKE(NULL, TPM2_SHA256_DIGEST_SIZE);
+ 
+                         r = tpm2_calculate_policy_pcr(&pcr_value, 1, &pcr_policy_digest);
+                         if (r < 0)
+diff --git a/src/shared/tpm2-util.c b/src/shared/tpm2-util.c
+index 70c3f0a8e4..ba4baa54f8 100644
+--- a/src/shared/tpm2-util.c
++++ b/src/shared/tpm2-util.c
+@@ -1749,9 +1749,11 @@ int tpm2_pcr_value_from_string(const char *arg, Tpm2PCRValue *ret_pcr_value) {
+                 if (r < 0)
+                         return log_error_errno(r, "Invalid pcr hash value '%s': %m", p);
+ 
+-                pcr_value.value.size = buf_size;
+-                assert(sizeof(pcr_value.value.buffer) >= pcr_value.value.size);
+-                memcpy(pcr_value.value.buffer, buf, pcr_value.value.size);
++                r = TPM2B_DIGEST_CHECK_SIZE(buf_size);
++                if (r < 0)
++                        return log_error_errno(r, "PCR hash value size %zu too large.", buf_size);
++
++                pcr_value.value = TPM2B_DIGEST_MAKE(buf, buf_size);
+         }
+ 
+         *ret_pcr_value = pcr_value;
+@@ -3424,16 +3426,17 @@ static int tpm2_policy_authorize(
+                 if (r < 0)
+                         return r;
+ 
++                r = TPM2B_PUBLIC_KEY_RSA_CHECK_SIZE(signature_size);
++                if (r < 0)
++                        return log_error_errno(SYNTHETIC_ERRNO(ENOTRECOVERABLE), "Signature larger than buffer.");
++
+                 TPMT_SIGNATURE policy_signature = {
+                         .sigAlg = TPM2_ALG_RSASSA,
+                         .signature.rsassa = {
+                                 .hash = TPM2_ALG_SHA256,
+-                                .sig.size = signature_size,
++                                .sig = TPM2B_PUBLIC_KEY_RSA_MAKE(signature_raw, signature_size),
+                         },
+                 };
+-                if (signature_size > sizeof(policy_signature.signature.rsassa.sig.buffer))
+-                        return log_error_errno(SYNTHETIC_ERRNO(ENOTRECOVERABLE), "Signature larger than buffer.");
+-                memcpy(policy_signature.signature.rsassa.sig.buffer, signature_raw, signature_size);
+ 
+                 rc = sym_Esys_VerifySignature(
+                                 c->esys_context,
+diff --git a/src/shared/tpm2-util.h b/src/shared/tpm2-util.h
+index e44aa14106..90b9282780 100644
+--- a/src/shared/tpm2-util.h
++++ b/src/shared/tpm2-util.h
+@@ -153,6 +153,62 @@ int tpm2_calculate_policy_pcr(const Tpm2PCRValue *pcr_values, size_t n_pcr_value
+ int tpm2_seal(const char *device, uint32_t hash_pcr_mask, const void *pubkey, size_t pubkey_size, uint32_t pubkey_pcr_mask, const char *pin, void **ret_secret, size_t *ret_secret_size, void **ret_blob, size_t *ret_blob_size, void **ret_pcr_hash, size_t *ret_pcr_hash_size, uint16_t *ret_pcr_bank, uint16_t *ret_primary_alg, void **ret_srk_buf, size_t *ret_srk_buf_size);
+ int tpm2_unseal(const char *device, uint32_t hash_pcr_mask, uint16_t pcr_bank, const void *pubkey, size_t pubkey_size, uint32_t pubkey_pcr_mask, JsonVariant *signature, const char *pin, uint16_t primary_alg, const void *blob, size_t blob_size, const void *policy_hash, size_t policy_hash_size, const void *srk_buf, size_t srk_buf_size, void **ret_secret, size_t *ret_secret_size);
+ 
++/* The tpm2-tss library has many structs that are simply a combination of an array (or object) and
++ * size. These macros allow easily initializing or assigning instances of such structs from an existing
++ * buffer/object and size, while also checking the size for safety with the struct buffer/object size. If the
++ * provided buffer/object is NULL, the resulting struct's buffer/object will be 0s. If the provided size is
++ * larger than the struct's buffer/object size, this results in assertion failure; to check the size, use one
++ * of the TPM2B_*_CHECK_SIZE() macros. */
++#define TPM2B_AUTH_MAKE(b, s) TPM2B_BUF_SIZE_STRUCT_MAKE(b, s, TPM2B_AUTH, buffer, size)
++#define TPM2B_DATA_MAKE(b, s) TPM2B_BUF_SIZE_STRUCT_MAKE(b, s, TPM2B_DATA, buffer, size)
++#define TPM2B_DIGEST_MAKE(b, s) TPM2B_BUF_SIZE_STRUCT_MAKE(b, s, TPM2B_DIGEST, buffer, size)
++#define TPM2B_ECC_PARAMETER_MAKE(b, s) TPM2B_BUF_SIZE_STRUCT_MAKE(b, s, TPM2B_ECC_PARAMETER, buffer, size)
++#define TPM2B_ENCRYPTED_SECRET_MAKE(b, s) TPM2B_BUF_SIZE_STRUCT_MAKE(b, s, TPM2B_ENCRYPTED_SECRET, secret, size)
++#define TPM2B_MAX_BUFFER_MAKE(b, s) TPM2B_BUF_SIZE_STRUCT_MAKE(b, s, TPM2B_MAX_BUFFER, buffer, size)
++#define TPM2B_NAME_MAKE(b, s) TPM2B_BUF_SIZE_STRUCT_MAKE(b, s, TPM2B_NAME, name, size)
++#define TPM2B_PRIVATE_MAKE(b, s) TPM2B_BUF_SIZE_STRUCT_MAKE(b, s, TPM2B_PRIVATE, buffer, size)
++#define TPM2B_PRIVATE_KEY_RSA_MAKE(b, s) TPM2B_BUF_SIZE_STRUCT_MAKE(b, s, TPM2B_PRIVATE_KEY_RSA, buffer, size)
++#define TPM2B_PUBLIC_KEY_RSA_MAKE(b, s) TPM2B_BUF_SIZE_STRUCT_MAKE(b, s, TPM2B_PUBLIC_KEY_RSA, buffer, size)
++#define TPM2B_SENSITIVE_DATA_MAKE(b, s) TPM2B_BUF_SIZE_STRUCT_MAKE(b, s, TPM2B_SENSITIVE_DATA, buffer, size)
++#define TPM2B_BUF_SIZE_STRUCT_MAKE(buf, size, struct_type, buffer_field, size_field) \
++        _TPM2B_BUF_SIZE_STRUCT_MAKE(buf, size, UNIQ, struct_type, buffer_field, size_field)
++#define _TPM2B_BUF_SIZE_STRUCT_MAKE(buf, size, uniq, struct_type, buffer_field, size_field) \
++        ({                                                              \
++                typeof(buf) UNIQ_T(BUF, uniq) = (buf);                  \
++                typeof(size) UNIQ_T(SIZE, uniq) = (size);               \
++                struct_type UNIQ_T(STRUCT, uniq) = { .size_field = UNIQ_T(SIZE, uniq), }; \
++                assert(sizeof(UNIQ_T(STRUCT, uniq).buffer_field) >= (size_t) UNIQ_T(SIZE, uniq)); \
++                if (UNIQ_T(BUF, uniq))                                  \
++                        memcpy(UNIQ_T(STRUCT, uniq).buffer_field, UNIQ_T(BUF, uniq), UNIQ_T(SIZE, uniq)); \
++                UNIQ_T(STRUCT, uniq);                                   \
++        })
++
++/* Check if the size will fit in the TPM2B struct buffer. Returns 0 if the size will fit, otherwise this logs
++ * a debug message and returns < 0. */
++#define TPM2B_AUTH_CHECK_SIZE(s) TPM2B_BUF_SIZE_STRUCT_CHECK_SIZE(s, TPM2B_AUTH, buffer)
++#define TPM2B_DATA_CHECK_SIZE(s) TPM2B_BUF_SIZE_STRUCT_CHECK_SIZE(s, TPM2B_DATA, buffer)
++#define TPM2B_DIGEST_CHECK_SIZE(s) TPM2B_BUF_SIZE_STRUCT_CHECK_SIZE(s, TPM2B_DIGEST, buffer)
++#define TPM2B_ECC_PARAMETER_CHECK_SIZE(s) TPM2B_BUF_SIZE_STRUCT_CHECK_SIZE(s, TPM2B_ECC_PARAMETER, buffer)
++#define TPM2B_ENCRYPTED_SECRET_CHECK_SIZE(s) TPM2B_BUF_SIZE_STRUCT_CHECK_SIZE(s, TPM2B_ENCRYPTED_SECRET, buffer)
++#define TPM2B_MAX_BUFFER_CHECK_SIZE(s) TPM2B_BUF_SIZE_STRUCT_CHECK_SIZE(s, TPM2B_MAX_BUFFER, buffer)
++#define TPM2B_NAME_CHECK_SIZE(s) TPM2B_BUF_SIZE_STRUCT_CHECK_SIZE(s, TPM2B_NAME, name)
++#define TPM2B_PRIVATE_CHECK_SIZE(s) TPM2B_BUF_SIZE_STRUCT_CHECK_SIZE(s, TPM2B_PRIVATE, buffer)
++#define TPM2B_PRIVATE_KEY_RSA_CHECK_SIZE(s) TPM2B_BUF_SIZE_STRUCT_CHECK_SIZE(s, TPM2B_PRIVATE_KEY_RSA, buffer)
++#define TPM2B_PUBLIC_KEY_RSA_CHECK_SIZE(s) TPM2B_BUF_SIZE_STRUCT_CHECK_SIZE(s, TPM2B_PUBLIC_KEY_RSA, buffer)
++#define TPM2B_SENSITIVE_DATA_CHECK_SIZE(s) TPM2B_BUF_SIZE_STRUCT_CHECK_SIZE(s, TPM2B_SENSITIVE_DATA, buffer)
++#define TPM2B_BUF_SIZE_STRUCT_CHECK_SIZE(size, struct_type, buffer_field) \
++        _TPM2B_BUF_SIZE_STRUCT_CHECK_SIZE(size, UNIQ, struct_type, buffer_field)
++#define _TPM2B_BUF_SIZE_STRUCT_CHECK_SIZE(size, uniq, struct_type, buffer_field) \
++        ({                                                              \
++                size_t UNIQ_T(SIZE, uniq) = (size_t) (size);            \
++                size_t UNIQ_T(BUFSIZE, uniq) = sizeof_field(struct_type, buffer_field); \
++                UNIQ_T(BUFSIZE, uniq) < UNIQ_T(SIZE, uniq) ?            \
++                        log_debug_errno(SYNTHETIC_ERRNO(EINVAL),        \
++                                        "Size %zu larger than " #struct_type " buffer size %zu.", \
++                                        UNIQ_T(SIZE, uniq), UNIQ_T(BUFSIZE, uniq)) : \
++                        0;                                              \
++        })
++
+ #else /* HAVE_TPM2 */
+ typedef struct {} Tpm2Context;
+ typedef struct {} Tpm2Handle;
+diff --git a/src/test/test-tpm2.c b/src/test/test-tpm2.c
+index 2b285fab47..331770b527 100644
+--- a/src/test/test-tpm2.c
++++ b/src/test/test-tpm2.c
+@@ -444,8 +444,7 @@ static void digest_init(TPM2B_DIGEST *digest, const char *hash) {
+         /* Make sure the length matches a known hash algorithm */
+         assert_se(IN_SET(s, TPM2_SHA1_DIGEST_SIZE, TPM2_SHA256_DIGEST_SIZE, TPM2_SHA384_DIGEST_SIZE, TPM2_SHA512_DIGEST_SIZE));
+ 
+-        memcpy_safe(digest->buffer, h, s);
+-        digest->size = s;
++        *digest = TPM2B_DIGEST_MAKE(h, s);
+ 
+         assert_se(digest_check(digest, hash));
+ }
+@@ -726,9 +725,7 @@ static void tpm2b_public_init(TPM2B_PUBLIC *public) {
+         _cleanup_free_ void *mem = NULL;
+         size_t len = 0;
+         assert_se(unhexmem(key, strlen(key), &mem, &len) == 0);
+-        assert_se(len <= sizeof(tpmt.unique.rsa.buffer));
+-        memcpy_safe(tpmt.unique.rsa.buffer, mem, len);
+-        tpmt.unique.rsa.size = len;
++        tpmt.unique.rsa = TPM2B_PUBLIC_KEY_RSA_MAKE(mem, len);
+ 
+         public->publicArea = tpmt;
+ }
+-- 
+2.34.1
+
