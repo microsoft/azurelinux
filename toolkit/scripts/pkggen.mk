@@ -131,7 +131,7 @@ $(graph_file): $(specs_file) $(go-grapher) $(toolchain_rpms) $(TOOLCHAIN_MANIFES
 		--toolchain-manifest=$(TOOLCHAIN_MANIFEST) \
 		--tls-cert=$(TLS_CERT) \
 		--tls-key=$(TLS_KEY) \
-		--tmp-dir=$(cache_working_dir) \
+		--tmp-dir=$(grapher_working_dir) \
 		--tdnf-worker=$(chroot_worker) \
 		$(foreach repo, $(pkggen_local_repo) $(graphpkgfetcher_cloned_repo) $(REPO_LIST), --repo-file=$(repo))
 
