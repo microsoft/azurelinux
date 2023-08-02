@@ -262,7 +262,7 @@ func findSpecFiles(specsDir string, parseList map[string]bool) (specFiles []stri
 			specSearch := filepath.Join(specsDir, fmt.Sprintf("**/%s.spec", specName))
 			specFile, err = filepath.Glob(specSearch)
 
-			// If a SPEC is in the pack list, it must be packed.
+			// If a SPEC is in the parse list, it should be parsed.
 			if err != nil {
 				return nil, err
 			}
