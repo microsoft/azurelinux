@@ -1,13 +1,8 @@
 #!/bin/bash
-
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
 set -e
-
-script_dir=$(realpath "$(dirname "$0")")
-topdir=/usr/src/mariner
-enable_local_repo=false
 
 switch_to_red_text() {
     printf "\e[31m"
@@ -49,33 +44,45 @@ To see help, run 'sudo make containerized-rpmbuild-help'
 build_chroot() {
     pushd "${repo_path}/toolkit"
     echo "Building worker chroot..."
-    sudo make graph-cache REBUILD_TOOLS=y > /dev/null
+    make graph-cache REBUILD_TOOLS=y > /dev/null
     popd
 }
 
 build_tools() {
     pushd "${repo_path}/toolkit"
     echo "Building tools..."
-    sudo make go-depsearch REBUILD_TOOLS=y > /dev/null
-    sudo make go-grapher REBUILD_TOOLS=y > /dev/null
-    sudo make go-specreader REBUILD_TOOLS=y > /dev/null
+    make go-depsearch REBUILD_TOOLS=y > /dev/null
+    make go-grapher REBUILD_TOOLS=y > /dev/null
+    make go-specreader REBUILD_TOOLS=y > /dev/null
     popd
 }
 
 build_graph() {
     pushd "${repo_path}/toolkit"
     echo "Building dependency graph..."
-    sudo make workplan > /dev/null
+    make workplan > /dev/null
     popd
 }
+
+# exit if not running as root
+if [ "$EUID" -ne 0 ]; then
+  echo -e "\033[31mThis requires running as root\033[0m "
+  exit
+fi
+
+script_dir=$(realpath "$(dirname "$0")")
+topdir=/usr/src/mariner
+enable_local_repo=false
+extra_mounts=""
 
 while (( "$#")); do
   case "$1" in
     -m ) mode="$2"; shift 2 ;;
     -v ) version="$2"; shift 2 ;;
     -p ) repo_path="$(realpath $2)"; shift 2 ;;
-    --enable-local-repo ) enable_local_repo=true; shift ;;
-    --help ) help; exit 1 ;;
+    -mo ) extra_mounts="${extra_mounts} $2"; shift 2 ;;
+    -r ) enable_local_repo=true; shift ;;
+    -h ) help; exit 1 ;;
     ? ) echo -e "ERROR: INVALID OPTION.\n\n"; help; exit 1 ;;
   esac
 done
@@ -84,10 +91,8 @@ done
 [[ -z "${repo_path}" ]] && repo_path=$(realpath "$(dirname "$0")") && repo_path=${repo_path%'/toolkit'*}
 [[ ! -d "${repo_path}" ]] && { print_error " Directory ${repo_path} does not exist"; exit 1; }
 [[ -z "${mode}" ]] && mode="build"
-[[ -z  "${version}" ]] && version="2.0"
+[[ -z "${version}" ]] && version="2.0"
 
-echo "Running in ${mode} mode, requires root..."
-echo "Running as root!"
 cd "${script_dir}"  || { echo "ERROR: Could not change directory to ${script_dir}"; exit 1; }
 
 # ==================== Setup ====================
@@ -95,9 +100,7 @@ build_dir="${script_dir}/build_container"
 mkdir -p "${build_dir}"
 
 # Get Mariner GitHub branch at $repo_path
-pushd ${repo_path}
-repo_branch=$(git rev-parse --abbrev-ref HEAD)
-popd
+repo_branch=$(git -C ${repo_path} rev-parse --abbrev-ref HEAD)
 
 #Set splash text based on mode
 if [[ "${mode}" == "build" ]]; then
@@ -110,17 +113,19 @@ fi
 # Populate ${repo_path}/build/INTERMEDIATE_SRPMS with SRPMs, that can be used to build RPMs in the container
 pushd "${repo_path}/toolkit"
 echo "Populating Intermediate SRPMs..."
-sudo make input-srpms SRPM_FILE_SIGNATURE_HANDLING="update" > /dev/null
+make input-srpms SRPM_FILE_SIGNATURE_HANDLING="update" > /dev/null
 popd
 
 # ============ Map chroot mount ============
 if [[ "${mode}" == "build" ]]; then
     # Create a new directory and map it to chroot directory in container
-    if [ -d "${repo_path}/build/container-build" ]; then rm -Rf ${repo_path}/build/container-build; fi
-    if [ -d "${repo_path}/build/container-buildroot" ]; then rm -Rf ${repo_path}/build/container-buildroot; fi
-    mkdir ${repo_path}/build/container-build
-    mkdir ${repo_path}/build/container-buildroot
-    mounts="${mounts} ${repo_path}/build/container-build:${topdir}/BUILD ${repo_path}/build/container-buildroot:${topdir}/BUILDROOT"
+    build_mount="${repo_path}/build/container-build"
+    buildroot_mount="${repo_path}/build/container-buildroot"
+    if [ -d "${build_mount}" ]; then rm -Rf ${build_mount}; fi
+    if [ -d "${buildroot_mount}" ]; then rm -Rf ${buildroot_mount}; fi
+    mkdir ${build_mount}
+    mkdir ${buildroot_mount}
+    mounts="${mounts} ${build_mount}:${topdir}/BUILD ${buildroot_mount}:${topdir}/BUILDROOT"
 fi
 
 # ============ Setup tools ============
@@ -165,7 +170,7 @@ if [[ "${mode}" == "build" ]]; then # Configure base image
     if [[ ! -f "${script_dir}/build_container/hash" ]] || [[ "$(cat "${script_dir}/build_container/hash")" != "${chroot_hash}" ]]; then
         echo "Chroot file has changed, updating..."
         echo "${chroot_hash}" > "${script_dir}/build_container/hash"
-        sudo docker import "${chroot_file}" "mcr.microsoft.com/cbl-mariner/containerized-rpmbuild:${version}"
+        docker import "${chroot_file}" "mcr.microsoft.com/cbl-mariner/containerized-rpmbuild:${version}"
     else
         echo "Chroot is up-to-date"
     fi
@@ -177,7 +182,7 @@ fi
 # ================== Launch Container ==================
 echo "Checking if build env is up-to-date..."
 docker_image_tag="mcr.microsoft.com/cbl-mariner/${USER}-containerized-rpmbuild:${version}"
-sudo docker build -q \
+docker build -q \
                 -f "${dockerfile}" \
                 -t "${docker_image_tag}" \
                 --build-arg container_img="$container_img" \
@@ -191,7 +196,7 @@ sudo docker build -q \
 
 echo "docker_image_tag is ${docker_image_tag}"
 
-sudo bash -c "docker run --rm \
+bash -c "docker run --rm \
                     ${mount_arg} \
                     -it ${docker_image_tag} /bin/bash; \
                     [[ -d ${repo_path}/out/RPMS/repodata ]] && { rm -r ${repo_path}/out/RPMS/repodata; echo 'Clearing repodata' ; }"

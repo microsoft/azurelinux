@@ -85,7 +85,7 @@ enable_local_repo() {
     echo "-------- enabling local repo ---------"
     IS_REPO_ENABLED=true
     tdnf install -y createrepo
-    mv /etc/yum.repos.d/local_repo.not_a_repo /etc/yum.repos.d/local_repo.repo
+    mv /etc/yum.repos.d/local_repo.disabled_repo /etc/yum.repos.d/local_repo.repo
     pushd /repo
     createrepo .
     popd

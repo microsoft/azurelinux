@@ -8,7 +8,7 @@ ARG mariner_branch
 ARG splash_txt
 LABEL containerized-rpmbuild=$mariner_repo/build
 
-COPY resources/_local_repo /etc/yum.repos.d/local_repo.not_a_repo
+COPY resources/local_repo /etc/yum.repos.d/local_repo.disabled_repo
 COPY resources/welcome.txt /mariner_setup_dir/
 RUN sed -i "s~<REPO_PATH>~${mariner_repo}~" /mariner_setup_dir/welcome.txt
 RUN sed -i "s~<REPO_BRANCH>~${mariner_branch}~" /mariner_setup_dir/welcome.txt

@@ -27,11 +27,11 @@ containerized_build_args += -mo ${MOUNTS}
 endif
 
 ifeq ($(ENABLE_REPO),y)
-containerized_build_args += --enable-local-repo
+containerized_build_args += -r
 endif
 
 containerized-rpmbuild:
 	$(SCRIPTS_DIR)/containerized-build/create_container_build.sh $(containerized_build_args)
 
 containerized-rpmbuild-help:
-	$(SCRIPTS_DIR)/containerized-build/create_container_build.sh --help
+	$(SCRIPTS_DIR)/containerized-build/create_container_build.sh -h
