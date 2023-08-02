@@ -110,7 +110,7 @@ Python 3 version.
 tar -xf %{SOURCE1} -C /root/
 
 ln -s %{_bindir}/python3 %{_bindir}/python
-#remove .bazelversion file so that latest bazel version available will be used to build TensorFlow
+# Remove the .bazelversion file so that latest bazel version available will be used to build TensorFlow.
 rm .bazelversion
 bazel --batch build  --verbose_explanations //tensorflow/tools/pip_package:build_pip_package
 # ---------
