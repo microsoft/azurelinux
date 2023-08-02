@@ -230,12 +230,14 @@ FinalizeImageScripts provide the opportunity to run shell scripts to customize t
 
 ### AdditionalFiles
 
-The `AdditionalFiles` list provides a mechanism to add arbitrary files to the image. The elements are are `"src": "dst"` pairs. `src` is relative to the image config `.json` file, while `dst` is an absolute path on the installed system.
+The `AdditionalFiles` list provides a mechanism to add arbitrary files to the image. The elements are are `"src": "dst"` pairs.
+
+`src` is relative to the image config `.json` file.
 
 The `dst` can be one of:
 
 - A string representing the destination absolute path, OR
-- A object (`FileConfig`) containing the destination absolute path and other file options, OR
+- An object (`FileConfig`) containing the destination absolute path and other file options, OR
 - An array containing a mixture of strings and objects, which allows a single source file to be copied to multiple destination paths.
 
 ISO installers will include the files on the installation media and will place them into the final installed image.
