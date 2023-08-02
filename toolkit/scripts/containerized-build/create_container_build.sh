@@ -33,8 +33,8 @@ Optional arguments:
                         In 'test' mode it will use a pre-built mariner chroot image.
                         In 'build' mode it will use the latest published container.
     VERISION        1.0 or 2.0. default: "2.0"
-    MOUNTS          mount a directory into the container. Should be of the form '/src/dir:/dest/dir'. 
-                    Can be specified multiple times.
+    MOUNTS          mount a directory into the container. Should be of the form '/src/dir:/dest/dir'. For multiple mounts, please use ',' as delimiter
+                        e.g. MOUNTS=/src/dir1:/dest/dir1,/src/dir2:/dest/dir2
     ENABLE_REPO:    Set to 'y' to use local RPMs to satisfy package dependencies. default: "n"
 
 To see help, run 'sudo make containerized-rpmbuild-help'
@@ -73,14 +73,13 @@ fi
 script_dir=$(realpath "$(dirname "$0")")
 topdir=/usr/src/mariner
 enable_local_repo=false
-extra_mounts=""
 
 while (( "$#")); do
   case "$1" in
     -m ) mode="$2"; shift 2 ;;
     -v ) version="$2"; shift 2 ;;
     -p ) repo_path="$(realpath $2)"; shift 2 ;;
-    -mo ) extra_mounts="${extra_mounts} $2"; shift 2 ;;
+    -mo ) extra_mounts="$2"; shift 2 ;;
     -r ) enable_local_repo=true; shift ;;
     -h ) help; exit 1 ;;
     ? ) echo -e "ERROR: INVALID OPTION.\n\n"; help; exit 1 ;;
@@ -142,10 +141,13 @@ cp ${repo_path}/build/pkg_artifacts/graph.dot ${build_dir}/
 echo "Setting up mounts..."
 
 mounts="${mounts} ${repo_path}/out/RPMS:/mnt/RPMS"
+# Add extra 'build' mounts
 if [[ "${mode}" == "build" ]]; then
-    # Add extra build mounts
     mounts="${mounts} ${repo_path}/build/INTERMEDIATE_SRPMS:/mnt/INTERMEDIATE_SRPMS ${repo_path}/SPECS:${topdir}/SPECS"
 fi
+
+# Replace comma with space as delimiter
+extra_mounts=${extra_mounts//,/ }
 
 rm -f ${build_dir}/mounts.txt
 for mount in $mounts $extra_mounts; do
