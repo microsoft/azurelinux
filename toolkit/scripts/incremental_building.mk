@@ -62,7 +62,7 @@ DELTA_BUILD    = y
 USE_CCACHE    ?= y
 REBUILD_TOOLS ?= y
 DELTA_FETCH   ?= y
-PRECACHE	  ?= y
+PRECACHE      ?= y
 endif
 
 ######## SET REMAINING FLAG DEFAULTS ########

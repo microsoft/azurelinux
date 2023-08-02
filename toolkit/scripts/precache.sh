@@ -75,7 +75,6 @@ function download_rpm() {
     else
         # Output will contain the url + path only if it is downloaded. If it is not downloaded, it will be an empty string. Write all files we
         # successfully downloaded to the downloaded_files file.
-        echo "$output" 
         if [[ -n "$output" ]]; then
             echo "Successfully pre-cached $rpm_url"
             echo "$output" >> "$downloaded_files"

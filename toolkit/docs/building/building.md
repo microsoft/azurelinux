@@ -528,7 +528,7 @@ If that is not desired all remote sources can be disabled by clearing the follow
 
 > Don't pre-load the cache from upstream sources
 
-##### `PRECACHE=n`
+##### `PRECACHE=y`
 
 > Load the cache with as many rpms from the usptream repos before starting to build.
 

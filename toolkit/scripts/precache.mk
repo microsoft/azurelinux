@@ -14,6 +14,10 @@ precached_state_dir = $(CACHED_RPMS_DIR)/precache
 .PHONY: precache_always_run_phony
 pre-cache: $(STATUS_FLAGS_DIR)/precache.flag
 $(STATUS_FLAGS_DIR)/precache.flag: $(SCRIPTS_DIR)/precache.sh $(rpms_snapshot) precache_always_run_phony 
+	@if [ "$(DISABLE_UPSTREAM_REPOS)" = "y" ]; then \
+		echo "ERROR: Upstream repos are disabled (DISABLE_UPSTREAM_REPOS=y), cannot precache rpms"; \
+		exit 1; \
+	fi
 	[ -f $@ ] || touch $@ # Create the flag file if it doesn't exist in case we don't download anything
 	$(SCRIPTS_DIR)/precache.sh "$(rpms_snapshot)" "$(precached_state_dir)" "$(CACHED_RPMS_DIR)/cache" "$(downloaded_files)" $(PACKAGE_URL_LIST) && \
 	if [ -s "$(downloaded_files)" ]; then \
