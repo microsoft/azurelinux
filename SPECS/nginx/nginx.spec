@@ -7,7 +7,7 @@ Name:           nginx
 # Currently on "stable" version of nginx from https://nginx.org/en/download.html.
 # Note: Stable versions are even (1.20), mainline versions are odd (1.21)
 Version:        1.22.1
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -25,9 +25,6 @@ BuildRequires:  pcre2-devel
 BuildRequires:  readline-devel
 BuildRequires:  which
 BuildRequires:  zlib-devel
-BuildRequires:  opentelemetry-cpp
-BuildRequires:  protobuf-devel
-BuildRequires:  grpc-devel
 Requires:       %{name}-filesystem = %{version}-%{release}
 Requires:       %{name}-mimetypes
 
@@ -43,6 +40,16 @@ Requires(pre):  shadow-utils
 The nginx-filesystem package contains the basic directory layout
 for the Nginx server including the correct permissions for the
 directories.
+
+%package otel_ngx_module
+Summary:        OpenTelemetry Nginx Module
+BuildRequires:  grpc-devel
+BuildRequires:  opentelemetry-cpp-devel
+BuildRequires:  protobuf-devel
+Requires:       opentelemetry-cpp
+
+%description otel_ngx_module
+The OpenTelemetry module for Nginx
 
 %prep
 %autosetup -p1
@@ -121,7 +128,6 @@ exit 0
 %config(noreplace) %{_sysconfdir}/%{name}/uwsgi_params
 %config(noreplace) %{_sysconfdir}/%{name}/uwsgi_params.default
 %{_sysconfdir}/%{name}/html/*
-%{_sysconfdir}/%{name}/modules/otel_ngx_module.so
 %{_sysconfdir}/%{name}/win-utf
 %{_sbindir}/*
 %{_libdir}/systemd/system/nginx.service
@@ -131,7 +137,13 @@ exit 0
 %files filesystem
 %dir %{_sysconfdir}/%{name}
 
+%files otel_ngx_module
+%{_sysconfdir}/%{name}/modules/otel_ngx_module.so
+
 %changelog
+* Thu Aug 17 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 1.22.1-9
+- Add otel_ngx_module subpackage
+
 * Thu Aug 10 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 1.22.1-8
 - Configure with `--with-stream_ssl_module` to enable support for stream proxy server with SSL/TLS
 
