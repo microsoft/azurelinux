@@ -1402,16 +1402,17 @@ func (g *PkgGraph) fixIntraSpecCycle(trimmedCycle []*PkgNode) (err error) {
 	return
 }
 
-func (g *PkgGraph) replaceCurrentNodeWithPrebuiltNode(currentNode, preBuiltNode, previousNode *PkgNode) {
-	parentNodes := g.To(currentNode.ID())
+/*runNode is the currentNode which is being replaced in the cycle, and buildNode is its previous Node in the cycle*/
+func (g *PkgGraph) replaceCurrentRunNodeWithNewNode(runNode, newNode, buildNode *PkgNode) {
+	parentNodes := g.To(runNode.ID())
 	for parentNodes.Next() {
 		parentNode := parentNodes.Node().(*PkgNode)
-		if parentNode.Type == TypeLocalBuild && parentNode.SrpmPath == previousNode.SrpmPath {
-			g.RemoveEdge(parentNode.ID(), currentNode.ID())
+		if parentNode.Type == TypeLocalBuild && parentNode.SrpmPath == buildNode.SrpmPath {
+			g.RemoveEdge(parentNode.ID(), runNode.ID())
 
-			err := g.AddEdge(parentNode, preBuiltNode)
+			err := g.AddEdge(parentNode, newNode)
 			if err != nil {
-				logger.Log.Errorf("Adding edge failed for %v -> %v", parentNode, preBuiltNode)
+				logger.Log.Errorf("Adding edge failed for %v -> %v", parentNode, newNode)
 				return
 			}
 		}
@@ -1452,7 +1453,7 @@ func (g *PkgGraph) fixCyclesWithExistingRPMS(trimmedCycle []*PkgNode, resolveCyc
 
 			logger.Log.Debugf("Adding a 'PreBuilt' node '%s' with id %d.", preBuiltNode.FriendlyName(), preBuiltNode.ID())
 
-			g.replaceCurrentNodeWithPrebuiltNode(currentNode, preBuiltNode, previousNode)
+			g.replaceCurrentRunNodeWithNewNode(currentNode, preBuiltNode, previousNode)
 			logger.Log.Infof("Cycle fixed using prebuilt node: %s with id %d", preBuiltNode.FriendlyName(), preBuiltNode.ID())
 
 			return
@@ -1473,7 +1474,7 @@ func (g *PkgGraph) fixCyclesWithExistingRPMS(trimmedCycle []*PkgNode, resolveCyc
 				upstreamAvailableNode.Type = TypeRemoteRun
 
 				logger.Log.Debugf("Adding a remote unresolved node '%s' with id %d.", upstreamAvailableNode.FriendlyName(), upstreamAvailableNode.ID())
-				g.replaceCurrentNodeWithPrebuiltNode(currentNode, upstreamAvailableNode, previousNode)
+				g.replaceCurrentRunNodeWithNewNode(currentNode, upstreamAvailableNode, previousNode)
 				logger.Log.Infof("Cycle fixed using remote unresolved node: %s with id %d", upstreamAvailableNode.FriendlyName(), upstreamAvailableNode.ID())
 				return
 			}
