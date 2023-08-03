@@ -1,0 +1,36 @@
+diff -rupN --no-dereference libspatialite-5.0.1/configure.ac libspatialite-5.0.1-new/configure.ac
+--- libspatialite-5.0.1/configure.ac	2021-02-07 16:53:46.000000000 +0100
++++ libspatialite-5.0.1-new/configure.ac	2021-03-08 08:57:18.484858236 +0100
+@@ -489,7 +489,7 @@ AM_CONDITIONAL(MODULE_ONLY, [test x"$ena
+ #-----------------------------------------------------------------------
+ 
+ # Checking for MinGW
+-AM_CONDITIONAL([MINGW], [test "$target_alias" = "mingw32"])
++AM_CONDITIONAL([MINGW], [[[[ "$target_alias" = *"mingw32" ]]]])
+ # Checking for Mac OsX
+ AM_CONDITIONAL([MACOSX], [test "$target_alias" = "macosx"])
+ # Checking for Android
+diff -rupN --no-dereference libspatialite-5.0.1/src/gaiageo/gg_shape.c libspatialite-5.0.1-new/src/gaiageo/gg_shape.c
+--- libspatialite-5.0.1/src/gaiageo/gg_shape.c	2021-02-07 16:53:46.000000000 +0100
++++ libspatialite-5.0.1-new/src/gaiageo/gg_shape.c	2021-03-08 08:57:18.485858236 +0100
+@@ -58,7 +58,7 @@ the terms of any one of the MPL, the GPL
+ #endif
+ 
+ #ifdef _WIN32
+-#include <Windows.h>
++#include <windows.h>
+ #endif
+ 
+ #if OMIT_ICONV == 0		/* if ICONV is disabled no SHP support is available */
+diff -rupN --no-dereference libspatialite-5.0.1/test/scandir4win.h libspatialite-5.0.1-new/test/scandir4win.h
+--- libspatialite-5.0.1/test/scandir4win.h	2021-02-07 16:53:47.000000000 +0100
++++ libspatialite-5.0.1-new/test/scandir4win.h	2021-03-08 08:57:18.485858236 +0100
+@@ -11,7 +11,7 @@ even implied
+ 
+ #ifdef _WIN32
+ 
+-#include <Windows.h>
++#include <windows.h>
+ #include <stdio.h>
+ #include <sys/types.h>
+ 
