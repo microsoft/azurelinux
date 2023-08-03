@@ -960,7 +960,7 @@ func TestGoalWithLevelOneAndMeta(t *testing.T) {
 	checkEqualComponents(t, expectedGoalPackages2meta, g.AllNodesFrom(goal))
 }
 
-func TestGoalWithMultipleGoals(t *testing.T) {
+func TestGoalWithMultipleGoalsAndOneExtraLayer(t *testing.T) {
 	g, err := buildTestGraphHelper()
 	assert.NoError(t, err)
 	assert.NotNil(t, g)

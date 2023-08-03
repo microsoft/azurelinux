@@ -1019,7 +1019,7 @@ func (g *PkgGraph) AddMetaNode(from []*PkgNode, to []*PkgNode) (metaNode *PkgNod
 	return
 }
 
-// AddGoalNodeWithLayers adds a goal node to the graph which links to existing nodes. An empty package list will add an edge to all nodes
+// AddGoalNode adds a goal node to the graph which links to existing nodes. An empty package list will add an edge to all nodes
 //   - goalName: The name of the goal node to add
 //   - packages: A list of packages to add to link the goal node to. If empty, all nodes will be added to the goal node
 //   - strict: If true, the goal node will fail if any of the packages are not found
