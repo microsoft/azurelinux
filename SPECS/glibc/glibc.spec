@@ -1,3 +1,17 @@
+##############################################################################
+# Utility functions for pre/post scripts.  Stick them at the beginning of
+# any lua %pre, %post, %postun, etc. sections to have them expand into
+# those scripts.  It only works in lua sections and not anywhere else.
+%global glibc_post_funcs %{expand:
+-- We use lua because there may be no shell that we can run during
+-- glibc upgrade.
+--
+function call_ldconfig ()
+  if not rpm.execute("%/sbin/ldconfig") then
+    io.stdout:write ("Error: call to %/sbin/ldconfig failed.\n")
+  end
+end}
+
 %global security_hardening nonow
 %define glibc_target_cpu %{_build}
 %define debug_package %{nil}
@@ -243,6 +257,19 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
+######################################################################
+# File triggers to do ldconfig calls automatically (see rhbz#1380878)
+######################################################################
+%transfiletriggerin -P 2000000 -p <lua> -- /lib /usr/lib /lib64 /usr/lib64
+%glibc_post_funcs
+call_ldconfig()
+%end
+
+%transfiletriggerpostun -P 2000000 -p <lua> -- /lib /usr/lib /lib64 /usr/lib64
+%glibc_post_funcs
+call_ldconfig()
+%end
+
 %files
 %defattr(-,root,root)
 %license COPYING COPYING.LIB LICENSES
@@ -261,7 +288,6 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %{_lib64dir}/*.so
 /sbin/ldconfig
 /sbin/locale-gen.sh
-#%%{_sbindir}/zdump
 %{_sbindir}/zic
 %{_sbindir}/iconvconfig
 %{_bindir}/*
