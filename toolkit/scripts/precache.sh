@@ -73,7 +73,10 @@ function download_rpm() {
     else
         # Output will contain the url + path only if it is downloaded. If it is not downloaded, it will be an empty string. Write all files we
         # successfully downloaded to the downloaded_files file.
-        echo "$output" 
+
+        #debug:
+        echo "$rpm_name output: '$output'" 
+
         if [[ -n "$output" ]]; then
             echo "Successfully pre-cached $rpm_url"
             echo "$output" >> "$downloaded_files"
@@ -83,7 +86,7 @@ function download_rpm() {
 
 # For each rpm in the snapshot .json file, download it to the cache directory. We format the output as "Name-Version.Distribution.Architecture"
 for full_name in $(jq -r '.Repo[] | "\(.Name)-\(.Version).\(.Distribution).\(.Architecture)"' "$snapshot_path" | sort -u); do
-    download_rpm "$full_name" &
+    download_rpm "$full_name"
 done
 
 wait

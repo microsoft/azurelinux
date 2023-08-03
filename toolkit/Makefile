@@ -107,7 +107,7 @@ SRPMS_DIR       ?= $(OUT_DIR)/SRPMS
 IMAGES_DIR      ?= $(OUT_DIR)/images
 
 # External source server
-SOURCE_URL         ?= https://cblmarinerstorage.blob.core.windows.net/sources/core
+SOURCE_URL         ?= https://cblmarinerstorage-fxdgg5a7eghsfchj.z01.azurefd.net/sources/core/
 
 PACKAGE_URL_LIST   ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)
 PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/debuginfo/$(build_arch)
