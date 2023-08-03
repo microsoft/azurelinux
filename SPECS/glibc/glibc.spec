@@ -261,12 +261,12 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 ######################################################################
 # File triggers to do ldconfig calls automatically (see rhbz#1380878)
 ######################################################################
-%transfiletriggerin -P 2000000 -p <lua> -- /lib /usr/lib /lib64 /usr/lib64
+%transfiletriggerin -P 2000000 -p <lua> -- /lib %{_libdir} /lib64 %{_lib64dir}
 %glibc_post_funcs
 call_ldconfig()
 %end
 
-%transfiletriggerpostun -P 2000000 -p <lua> -- /lib /usr/lib /lib64 /usr/lib64
+%transfiletriggerpostun -P 2000000 -p <lua> -- /lib %{_libdir} /lib64 %{_lib64dir}
 %glibc_post_funcs
 call_ldconfig()
 %end
