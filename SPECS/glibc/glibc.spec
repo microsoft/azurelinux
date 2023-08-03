@@ -7,8 +7,8 @@
 -- glibc upgrade.
 --
 function call_ldconfig ()
-  if not rpm.execute("%/sbin/ldconfig") then
-    io.stdout:write ("Error: call to %/sbin/ldconfig failed.\n")
+  if not rpm.execute("/sbin/ldconfig") then
+    io.stdout:write ("Error: call to /sbin/ldconfig failed.\n")
   end
 end}
 
