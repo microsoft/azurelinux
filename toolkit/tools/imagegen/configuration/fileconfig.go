@@ -35,6 +35,13 @@ func (l *FileConfigList) IsValid() (err error) {
 		return fmt.Errorf("list is empty")
 	}
 
+	for i, fileConfig := range *l {
+		err = fileConfig.IsValid()
+		if err != nil {
+			return fmt.Errorf("invalid [FileConfig] at index %d: %w", i, err)
+		}
+	}
+
 	return nil
 }
 
@@ -83,6 +90,12 @@ func (f *FileConfig) IsValid() (err error) {
 	}
 
 	// Permissions
+	if f.Permissions != nil {
+		err = f.Permissions.IsValid()
+		if err != nil {
+			return fmt.Errorf("invalid [Permissions] value: %w", err)
+		}
+	}
 
 	return nil
 }

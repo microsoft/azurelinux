@@ -149,6 +149,13 @@ func (s *SystemConfig) IsValid() (err error) {
 		return fmt.Errorf("invalid [KernelCommandLine]: %w", err)
 	}
 
+	for srcFile, fileConfigList := range s.AdditionalFiles {
+		err = fileConfigList.IsValid()
+		if err != nil {
+			return fmt.Errorf("invalid [AdditionalFiles]: (%s): %w", srcFile, err)
+		}
+	}
+
 	// Validate that PackageRepos do not contain duplicate package repo name
 	repoNames := make(map[string]bool)
 	for _, packageRepo := range s.PackageRepos {
