@@ -36,7 +36,7 @@
 
 Name:           podman
 Version:        4.1.1
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        ASL 2.0 and BSD and ISC and MIT and MPLv2.0
 Summary:        Manage Pods, Containers and Container Images
 Vendor:         Microsoft Corporation
@@ -51,7 +51,7 @@ BuildRequires:  go-md2man
 BuildRequires:  golang
 BuildRequires:  gcc
 BuildRequires:  glib2-devel
-BuildRequires:  glibc-static >= 2.35-4%{?dist}
+BuildRequires:  glibc-static >= 2.35-5%{?dist}
 BuildRequires:  git
 BuildRequires:  go-rpm-macros
 BuildRequires:  gpgme-devel
@@ -387,6 +387,9 @@ cp -pav test/system %{buildroot}/%{_datadir}/%{name}/test/
 
 # rhcontainerbot account currently managed by lsm5
 %changelog
+* Thu Aug 03 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.1.1-14
+- Matching 'glibc' version.
+
 * Wed Jul 14 2023 Andrew Phelps <anphel@microsoft.com> - 4.1.1-13
 - Bump release to rebuild against glibc 2.35-4
 
