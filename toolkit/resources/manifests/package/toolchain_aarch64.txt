@@ -358,7 +358,7 @@ perl-Fedora-VSP-0.001-19.cm2.noarch.rpm
 perl-fields-2.27-488.cm2.noarch.rpm
 perl-File-Basename-2.85-488.cm2.noarch.rpm
 perl-File-Compare-1.100.600-488.cm2.noarch.rpm
-perl-File-Copy-2.35-588.cm2.noarch.rpm
+perl-File-Copy-2.35-488.cm2.noarch.rpm
 perl-File-DosGlob-1.12-488.cm2.aarch64.rpm
 perl-File-Fetch-1.00-488.cm2.noarch.rpm
 perl-File-Find-1.39-488.cm2.noarch.rpm
