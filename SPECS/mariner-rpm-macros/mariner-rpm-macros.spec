@@ -125,8 +125,8 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
-* Wed Jul 12 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-23
-- Fixing 'ldconfig' usage.
+* Thu Jul 06 2023 Andrew Phelps <anphel@microsoft.com> - 2.0-23
+- Compress rpm binaries with zstd
 
 * Thu Jun 15 2023 Andrew Phelps <anphel@microsoft.com> - 2.0-22
 - Optimize __os_install_post

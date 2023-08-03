@@ -3,7 +3,7 @@
 Summary:        Mozilla's JavaScript engine.
 Name:           mozjs
 Version:        78.10.0
-Release:        5%{?dist}
+Release:        4%{?dist}
 License:        BSD AND MIT AND MPLv2.0 AND Unicode
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -108,6 +108,10 @@ then
 fi
 [[ $TEST_RESULT -eq 0 ]]
 
+%post
+%ldconfig_scriptlets
+
+%postun
 %ldconfig_scriptlets
 
 %files
@@ -124,9 +128,6 @@ fi
 %{_libdir}/pkgconfig/mozjs-%{major}.pc
 
 %changelog
-* Wed Jul 12 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 78.10.0-5
-- Fixing 'ldconfig' usage.
-
 * Tue Jun 27 2023 Minghe Ren <mingheren@microsoft.com> - 78.10.0-4
 - Add patch for CVE-2022-48285
 
