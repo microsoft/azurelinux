@@ -13,7 +13,7 @@ jobs:
 
   build:
     name: Check Package CGManifests
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
 
     - name: Check out code

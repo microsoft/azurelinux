@@ -1147,8 +1147,8 @@
         "type": "other",
         "other": {
           "name": "blobfuse2",
-          "version": "2.0.2",
-          "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse2-2.0.2.tar.gz"
+          "version": "2.0.5",
+          "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse2-2.0.5.tar.gz"
         }
       }
     },
@@ -4630,8 +4630,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.19.10",
-          "downloadUrl": "https://golang.org/dl/go1.19.10.src.tar.gz"
+          "version": "1.19.11",
+          "downloadUrl": "https://golang.org/dl/go1.19.11.src.tar.gz"
         }
       }
     },
@@ -6520,8 +6520,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.118.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.118.1.tar.gz"
+          "version": "5.15.122.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.122.1.tar.gz"
         }
       }
     },
@@ -7351,8 +7351,8 @@
         "type": "other",
         "other": {
           "name": "iperf3",
-          "version": "3.11",
-          "downloadUrl": "https://github.com/esnet/iperf/archive/3.11.tar.gz"
+          "version": "3.14",
+          "downloadUrl": "https://github.com/esnet/iperf/archive/3.14.tar.gz"
         }
       }
     },
@@ -8010,46 +8010,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "k3s",
-          "version": "1.24.6",
-          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.24.6+k3s1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "k3s",
-          "version": "1.24.12",
-          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.24.12+k3s1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "k3s",
-          "version": "1.25.8",
-          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.25.8+k3s1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "k3s",
-          "version": "1.26.3",
-          "downloadUrl": "https://github.com/k3s-io/k3s/archive/refs/tags/v1.26.3+k3s1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "kata-containers",
           "version": "3.1.0",
           "downloadUrl": "https://github.com/kata-containers/kata-containers/archive/refs/tags/3.1.0.tar.gz"
@@ -8061,8 +8021,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers-cc",
-          "version": "0.4.2",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/cc-0.4.2.tar.gz"
+          "version": "0.6.0",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/cc-0.6.0.tar.gz"
         }
       }
     },
@@ -8131,8 +8091,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.118.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.118.1.tar.gz"
+          "version": "5.15.122.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.122.1.tar.gz"
         }
       }
     },
@@ -8141,8 +8101,8 @@
         "type": "other",
         "other": {
           "name": "kernel-azure",
-          "version": "5.15.118.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.118.1.tar.gz"
+          "version": "5.15.122.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.122.1.tar.gz"
         }
       }
     },
@@ -8151,8 +8111,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hci",
-          "version": "5.15.118.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.118.1.tar.gz"
+          "version": "5.15.122.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.122.1.tar.gz"
         }
       }
     },
@@ -8161,8 +8121,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.118.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.118.1.tar.gz"
+          "version": "5.15.122.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.122.1.tar.gz"
         }
       }
     },
@@ -9911,8 +9871,8 @@
         "type": "other",
         "other": {
           "name": "liblouis",
-          "version": "3.24.0",
-          "downloadUrl": "https://github.com/liblouis/liblouis/releases/download/v3.24.0/liblouis-3.24.0.tar.gz"
+          "version": "3.26.0",
+          "downloadUrl": "https://github.com/liblouis/liblouis/releases/download/v3.26.0/liblouis-3.26.0.tar.gz"
         }
       }
     },
@@ -11180,6 +11140,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libtraceevent",
+          "version": "1.7.2",
+          "downloadUrl": "https://git.kernel.org/pub/scm/libs/libtrace/libtraceevent.git/snapshot/libtraceevent-1.7.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libtranslit",
           "version": "0.0.3",
           "downloadUrl": "http://du-a.org/files/libtranslit/libtranslit-0.0.3.tar.gz"
@@ -11731,8 +11701,8 @@
         "type": "other",
         "other": {
           "name": "libxml2",
-          "version": "2.10.3",
-          "downloadUrl": "https://gitlab.gnome.org/GNOME/libxml2/-/archive/v2.10.3/libxml2-v2.10.3.tar.gz"
+          "version": "2.10.4",
+          "downloadUrl": "https://gitlab.gnome.org/GNOME/libxml2/-/archive/v2.10.4/libxml2-v2.10.4.tar.gz"
         }
       }
     },
@@ -15153,6 +15123,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "opencsd",
+          "version": "1.4.0",
+          "downloadUrl": "https://github.com/Linaro/OpenCSD/archive/v1.4.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "opendnssec",
           "version": "2.1.7",
           "downloadUrl": "http://www.opendnssec.org/files/source/opendnssec-2.1.7.tar.gz"
@@ -15304,8 +15284,8 @@
         "type": "other",
         "other": {
           "name": "openssh",
-          "version": "8.8p1",
-          "downloadUrl": "https://ftp.usa.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-8.8p1.tar.gz"
+          "version": "8.9p1",
+          "downloadUrl": "https://ftp.usa.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-8.9p1.tar.gz"
         }
       }
     },
@@ -15764,8 +15744,8 @@
         "type": "other",
         "other": {
           "name": "pcre2",
-          "version": "10.40",
-          "downloadUrl": "https://github.com/PhilipHazel/pcre2/releases/download/pcre2-10.40/pcre2-10.40.tar.bz2"
+          "version": "10.42",
+          "downloadUrl": "https://github.com/PhilipHazel/pcre2/releases/download/pcre2-10.42/pcre2-10.42.tar.bz2"
         }
       }
     },
@@ -28337,8 +28317,8 @@
         "type": "other",
         "other": {
           "name": "telegraf",
-          "version": "1.26.0",
-          "downloadUrl": "https://github.com/influxdata/telegraf/archive/v1.26.0.tar.gz"
+          "version": "1.27.2",
+          "downloadUrl": "https://github.com/influxdata/telegraf/archive/v1.27.2.tar.gz"
         }
       }
     },

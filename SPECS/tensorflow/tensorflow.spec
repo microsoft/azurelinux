@@ -1,7 +1,7 @@
 Summary:        TensorFlow is an open source machine learning framework for everyone.
 Name:           tensorflow
 Version:        2.11.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,7 +9,7 @@ Group:          Development/Languages/Python
 URL:            https://www.tensorflow.org/
 Source0:        https://github.com/tensorflow/tensorflow/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-cache.tar.gz
-BuildRequires:  bazel = 5.3.0
+BuildRequires:  bazel
 BuildRequires:  binutils
 BuildRequires:  build-essential
 BuildRequires:  git
@@ -110,7 +110,8 @@ Python 3 version.
 tar -xf %{SOURCE1} -C /root/
 
 ln -s %{_bindir}/python3 %{_bindir}/python
-
+# Remove the .bazelversion file so that latest bazel version available will be used to build TensorFlow.
+rm .bazelversion
 bazel --batch build  --verbose_explanations //tensorflow/tools/pip_package:build_pip_package
 # ---------
 # steps to create the cache tar. network connection is required to create the cache.
@@ -146,14 +147,17 @@ bazel --batch build  --verbose_explanations //tensorflow/tools/pip_package:build
 
 
 %changelog
+* Tue Aug 01 2023 Riken Maharjan <rmaharjan@microsoft.com> - 2.11.0-4
+- Remove .bazelversion file.
+
 * Thu Jan 03 2022 Riken Maharjan <rmaharjan@microsoft> - 2.11.0-3
-- add tf-nightly subpackage. 
+- Add tf-nightly subpackage. 
 
 * Thu Dec 08 2022 Riken Maharjan <rmaharjan@microsoft> - 2.11.0-2
-- correct markupsafe package name. 
+- Correct markupsafe package name. 
 
 * Sun Dec 04 2022 Riken Maharjan <rmaharjan@microsoft> - 2.11.0-1
-- update to 2.11.0
+- Update to 2.11.0
 
 * Thu Sep 22 2022 Riken Maharjan <rmaharjan@microsoft> - 2.8.3-1
 - License verified

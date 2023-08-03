@@ -834,7 +834,7 @@
                 ],
                 "comment": "Needed for Mellanox DPUs",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
                 ]
             },
             "CONFIG_MLXREG_HOTPLUG": {
@@ -846,7 +846,7 @@
                 ],
                 "comment": "Needed for Mellanox DPUs",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
                 ]
             },
             "CONFIG_MLXREG_IO": {
@@ -858,7 +858,7 @@
                 ],
                 "comment": "Needed for Mellanox DPUs",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
                 ]
             },
             "CONFIG_MLXBF_TMFIFO": {
@@ -870,7 +870,7 @@
                 ],
                 "comment": "Needed for Mellanox DPUs",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
                 ]
             },
             "CONFIG_MLXBF_BOOTCTL": {
@@ -882,7 +882,7 @@
                 ],
                 "comment": "Needed for Mellanox DPUs",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
                 ]
             },
             "CONFIG_MLXBF_PMC": {
@@ -894,7 +894,7 @@
                 ],
                 "comment": "Needed for Mellanox DPUs",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
                 ]
             },
             "CONFIG_MLXBF_GIGE": {
@@ -906,31 +906,31 @@
                 ],
                 "comment": "Needed for Mellanox DPUs",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
                 ]
             },
             "CONFIG_MMC_DW": {
                 "value": [
-                    "m"
+                    "y"
                 ],
                 "arch": [
                     "ARM64"
                 ],
                 "comment": "Needed for Mellanox DPUs",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
                 ]
             },
             "CONFIG_MMC_DW_PLTFM": {
                 "value": [
-                    "m"
+                    "y"
                 ],
                 "arch": [
                     "ARM64"
                 ],
                 "comment": "Needed for Mellanox DPUs",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
                 ]
             },
             "CONFIG_MMC_DW_BLUEFIELD": {
@@ -942,7 +942,7 @@
                 ],
                 "comment": "Needed for Mellanox DPUs",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
                 ]
             },
             "CONFIG_I2C_MLXBF": {
@@ -954,33 +954,71 @@
                 ],
                 "comment": "Needed for Mellanox DPUs",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
                 ]
             },
             "CONFIG_GPIO_MLXBF2": {
                 "value": [
-                    "m"
+                    "y"
                 ],
                 "arch": [
                     "ARM64"
                 ],
                 "comment": "Needed for Mellanox DPUs",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
                 ]
             },
-            "CONFIG_POWER_MLXBF": {
+	    "CONFIG_EDAC_BLUEFIELD": {
                 "value": [
-                    "m"
+                    "is not set"
                 ],
                 "arch": [
                     "ARM64"
                 ],
                 "comment": "Needed for Mellanox DPUs",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5789"
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
+                ]
+            },
+            "CONFIG_GPIO_MLXBF": {
+                "value": [
+                    "is not set"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for Mellanox DPUs",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
+                ]
+            },
+            "CONFIG_MLX_WDT": {
+                "value": [
+                    "is not set"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for Mellanox DPUs",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
+                ]
+            },
+            "CONFIG_SENSORS_MLXREG_FAN": {
+                "value": [
+                    "is not set"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for Mellanox DPUs",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
                 ]
             }
+
+            
         }
     }
 }

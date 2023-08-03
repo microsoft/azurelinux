@@ -1,13 +1,100 @@
 parameters:
-  - name: isCheckBuild
+  - name: customToolchainArtifactBuild
     type: string
-    default: 'false'
+    default: ""
+
+  - name: customToolchainEnabled
+    type: boolean
+    default: false
+
+  - name: isCheckBuild
+    type: boolean
+    default: false
+
+  - name: isDeltaBuild
+    type: boolean
+    default: false
+
+  - name: outputArtifactsFolder
+    type: string
+    default: "$(Build.ArtifactStagingDirectory)"
+
+  - name: buildRepoRoot
+    type: string
+    default: "$(Build.SourcesDirectory)"
+
+  - name: rpmsTarballName
+    type: string
+    default: "rpms.tar.gz"
+
+  - name: selfRepoName
+    type: string
+    default: "CBL-Mariner"
+
+  - name: srpmsTarballName
+    type: string
+    default: "srpms.tar.gz"
 
 steps:
+  - template: ToolkitCheck.yml@${{ parameters.selfRepoName }}
+    parameters:
+      buildRepoRoot: ${{ parameters.buildRepoRoot }}
+
+  - ${{ if eq(parameters.customToolchainEnabled, true) }}:
+      - task: DownloadPipelineArtifact@2
+        displayName: "Download toolchain"
+        inputs:
+          artifact: "${{ parameters.customToolchainArtifactBuild }}"
+          patterns: "**/toolchain_built_rpms_all.tar.gz"
+
+      - script: |
+          toolchain_archive="$(find "$(Pipeline.Workspace)" -name toolchain_built_rpms_all.tar.gz)"
+          if [[ ! -f "$toolchain_archive" ]]; then
+            echo "ERROR: toolchain archive not found!" >&2
+            exit 1
+          fi
+
+          sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" toolchain TOOLCHAIN_ARCHIVE="$toolchain_archive"
+        displayName: "Populate toolchain"
+
   - script: |
-      cat <<EOF
-      This is a package build.
-      The host architecture is: $(uname -m)
-      Running checks: ${{ parameters.isCheckBuild }}
-      EOF
-    displayName: "Print parameters"
+      delta_fetch_arg="DELTA_FETCH=n"
+      if [[ ${{ parameters.isDeltaBuild }} =~ [Tt]rue ]]; then
+        delta_fetch_arg="DELTA_FETCH=y"
+      fi
+
+      run_check_arg="RUN_CHECK=n"
+      if [[ ${{ parameters.isCheckBuild }} =~ [Tt]rue ]]; then
+        run_check_arg="RUN_CHECK=y"
+      fi
+
+      sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
+        CONFIG_FILE="" \
+        $delta_fetch_arg \
+        REBUILD_TOOLS=y \
+        $run_check_arg
+    displayName: "Build packages"
+
+  - script: |
+      sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" compress-rpms
+    displayName: "Compress RPMs"
+
+  - script: |
+      sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" compress-srpms
+    displayName: "Compress SRPMs"
+
+  - bash: |
+      published_artifacts_dir="${{ parameters.outputArtifactsFolder }}/ARTIFACTS"
+      mkdir -p "$published_artifacts_dir"
+      cp "${{ parameters.buildRepoRoot }}"/out/rpms.tar.gz "$published_artifacts_dir/${{ parameters.rpmsTarballName }}"
+      cp "${{ parameters.buildRepoRoot }}"/out/srpms.tar.gz "$published_artifacts_dir/${{ parameters.srpmsTarballName }}"
+    displayName: "Copy artifacts for publishing"
+
+  - bash: |
+      published_logs_dir="${{ parameters.outputArtifactsFolder }}/LOGS"
+      mkdir -p "$published_logs_dir"
+      tar -C "${{ parameters.buildRepoRoot }}/build/logs/pkggen" -czf "$published_logs_dir/pkggen.logs.tar.gz" .
+      tar -C "${{ parameters.buildRepoRoot }}/build/pkg_artifacts" -czf "$published_logs_dir/pkg_artifacts.tar.gz" .
+      tar -C "${{ parameters.buildRepoRoot }}/build/timestamp" -czf "$published_logs_dir/timestamp.tar.gz" .
+    condition: always()
+    displayName: "Copy logs for publishing"

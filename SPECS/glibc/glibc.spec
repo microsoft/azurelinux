@@ -14,14 +14,14 @@ end}
 
 %global security_hardening nonow
 %define glibc_target_cpu %{_build}
-%define debug_package %{nil}
+
 # Don't depend on bash by default
 %define __requires_exclude ^/(bin|usr/bin).*$
 
 Summary:        Main C library
 Name:           glibc
 Version:        2.35
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD AND GPLv2+ AND Inner-Net AND ISC AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -42,6 +42,7 @@ Patch3:         CVE-2020-1751.nopatch
 Patch4:         CVE-2018-20796.nopatch
 Patch5:         glibc-2.34_pthread_cond_wait.patch
 BuildRequires:  bison
+BuildRequires:  gawk
 BuildRequires:  gettext
 BuildRequires:  kernel-headers
 BuildRequires:  texinfo
@@ -344,6 +345,9 @@ call_ldconfig()
 %defattr(-,root,root)
 
 %changelog
+* Fri Jun 30 2023 Andrew Phelps <anphel@microsoft.com> - 2.35-4
+- Restore glibc-debuginfo package
+
 * Fri Sep 30 2022 Andy Caldwell <andycaldwell@microsoft> - 2.35-3
 - Split `glibc-static` into an actual package containing static libraries and runtime
 

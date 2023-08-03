@@ -408,6 +408,7 @@ func (r *RpmRepoCloner) CloneRawPackageNames(cloneDeps bool, rawPackageNames ...
 
 	logger.Log.Debugf("Will clone in total %d items.", len(rawPackageNames))
 
+	allPackagesPrebuilt = true
 	for _, packageNameToClone := range rawPackageNames {
 		logger.Log.Debugf("Cloning raw name (%s).", packageNameToClone)
 

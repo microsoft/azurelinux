@@ -747,6 +747,7 @@
                 "libtnc",
                 "libtomcrypt",
                 "libtommath",
+                "libtraceevent",
                 "libtranslit",
                 "libucil",
                 "libunicap",
@@ -1015,6 +1016,7 @@
                 "opencl-filesystem",
                 "opencl-headers",
                 "opencryptoki",
+                "opencsd",
                 "opendnssec",
                 "OpenEXR",
                 "openjade",
@@ -3056,15 +3058,6 @@
                 "zip",
                 "zlib",
                 "zsh"
-            ]
-        },
-        "Rancher": {
-            "license": "[ASL 2.0 License](http://www.apache.org/licenses/LICENSE-2.0)",
-            "specs": [
-                "k3s",
-                "k3s-1.24.12",
-                "k3s-1.24.6",
-                "k3s-1.25.8"
             ]
         },
         "RPM software management source": {

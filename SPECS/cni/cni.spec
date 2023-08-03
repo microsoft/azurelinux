@@ -24,7 +24,7 @@
 Summary:        Container Network Interface - networking for Linux containers
 Name:           cni
 Version:        1.0.1
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -113,6 +113,9 @@ install -m 755 -d "%{buildroot}%{cni_doc_dir}"
 %{_sbindir}/cnitool
 
 %changelog
+* Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0.1-12
+- Bump release to rebuild with go 1.19.11
+
 * Thu Jun 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0.1-11
 - Bump release to rebuild with go 1.19.10
 
