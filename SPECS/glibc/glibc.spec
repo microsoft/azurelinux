@@ -21,7 +21,7 @@ end}
 Summary:        Main C library
 Name:           glibc
 Version:        2.35
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD AND GPLv2+ AND Inner-Net AND ISC AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -345,6 +345,9 @@ call_ldconfig()
 %defattr(-,root,root)
 
 %changelog
+* Thu Aug 03 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.35-5
+- Adding file triggers to do ldconfig calls automatically (see rhbz#1380878).
+
 * Fri Jun 30 2023 Andrew Phelps <anphel@microsoft.com> - 2.35-4
 - Restore glibc-debuginfo package
 
