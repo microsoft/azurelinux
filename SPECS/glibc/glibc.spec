@@ -346,7 +346,7 @@ call_ldconfig()
 
 %changelog
 * Thu Aug 03 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.35-5
-- Adding file triggers to do ldconfig calls automatically (see rhbz#1380878).
+- Adding file triggers to do ldconfig calls automatically using Fedora 38 (license: MIT) spec for guidance.
 
 * Fri Jun 30 2023 Andrew Phelps <anphel@microsoft.com> - 2.35-4
 - Restore glibc-debuginfo package
