@@ -71,6 +71,8 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 script_dir=$(realpath "$(dirname "$0")")
+tmp_dir=${script_dir%'/toolkit'*}/build/containerized-rpmbuild/tmp
+mkdir -p ${tmp_dir}
 topdir=/usr/src/mariner
 enable_local_repo=false
 
@@ -87,7 +89,7 @@ while (( "$#")); do
 done
 
 # Assign default values
-[[ -z "${repo_path}" ]] && repo_path=$(realpath "$(dirname "$0")") && repo_path=${repo_path%'/toolkit'*}
+[[ -z "${repo_path}" ]] && repo_path=${script_dir} && repo_path=${repo_path%'/toolkit'*}
 [[ ! -d "${repo_path}" ]] && { print_error " Directory ${repo_path} does not exist"; exit 1; }
 [[ -z "${mode}" ]] && mode="build"
 [[ -z "${version}" ]] && version="2.0"
@@ -95,17 +97,15 @@ done
 cd "${script_dir}"  || { echo "ERROR: Could not change directory to ${script_dir}"; exit 1; }
 
 # ==================== Setup ====================
-build_dir="${script_dir}/build_container"
-mkdir -p "${build_dir}"
 
 # Get Mariner GitHub branch at $repo_path
 repo_branch=$(git -C ${repo_path} rev-parse --abbrev-ref HEAD)
 
-#Set splash text based on mode
+#Generate splash text based on mode
 if [[ "${mode}" == "build" ]]; then
-    splash_txt="builder_splash.txt"
+    figlet "Mariner Builder!" > ${tmp_dir}/splash.txt
 else
-    splash_txt="tester_splash.txt"
+    figlet "Mariner Tester!" > ${tmp_dir}/splash.txt
 fi
 
 # ============ Populate SRPMS ============
@@ -132,15 +132,15 @@ fi
 echo "Setting up tools..."
 if [[ ( ! -f "${repo_path}/toolkit/out/tools/depsearch" ) || ( ! -f "${repo_path}/toolkit/out/tools/grapher" ) || ( ! -f "${repo_path}/toolkit/out/tools/specreader" ) ]]; then build_tools; fi
 if [[ ! -f "${repo_path}/build/pkg_artifacts/graph.dot" ]]; then build_graph; fi
-cp ${repo_path}/toolkit/out/tools/depsearch ${build_dir}/
-cp ${repo_path}/toolkit/out/tools/grapher ${build_dir}/
-cp ${repo_path}/toolkit/out/tools/specreader ${build_dir}/
-cp ${repo_path}/build/pkg_artifacts/graph.dot ${build_dir}/
+cp ${repo_path}/toolkit/out/tools/depsearch ${tmp_dir}/
+cp ${repo_path}/toolkit/out/tools/grapher ${tmp_dir}/
+cp ${repo_path}/toolkit/out/tools/specreader ${tmp_dir}/
+cp ${repo_path}/build/pkg_artifacts/graph.dot ${tmp_dir}/
 
 # ========= Setup mounts =========
 echo "Setting up mounts..."
 
-mounts="${mounts} ${repo_path}/out/RPMS:/mnt/RPMS"
+mounts="${mounts} ${repo_path}/out/RPMS:/mnt/RPMS ${tmp_dir}:/mariner_setup_dir"
 # Add extra 'build' mounts
 if [[ "${mode}" == "build" ]]; then
     mounts="${mounts} ${repo_path}/build/INTERMEDIATE_SRPMS:/mnt/INTERMEDIATE_SRPMS ${repo_path}/SPECS:${topdir}/SPECS"
@@ -149,16 +149,23 @@ fi
 # Replace comma with space as delimiter
 extra_mounts=${extra_mounts//,/ }
 
-rm -f ${build_dir}/mounts.txt
+rm -f ${tmp_dir}/mounts.txt
 for mount in $mounts $extra_mounts; do
     if [[ -d "${mount%%:*}" ]]; then
-        echo "${mount%%:*}' -> '${mount##*:}"  >> "${build_dir}/mounts.txt"
+        echo "${mount%%:*}' -> '${mount##*:}"  >> "${tmp_dir}/mounts.txt"
     else
-        echo "WARNING: '${mount%%:*}' does not exist. Skipping mount."  >> "${build_dir}/mounts.txt"
+        echo "WARNING: '${mount%%:*}' does not exist. Skipping mount."  >> "${tmp_dir}/mounts.txt"
         continue
     fi
     mount_arg=" $mount_arg -v '$mount' "
 done
+
+# Copy resources into container
+cp resources/welcome.txt $tmp_dir
+sed -i "s~<REPO_PATH>~${repo_path}~" $tmp_dir/welcome.txt
+sed -i "s~<REPO_BRANCH>~${repo_branch}~" $tmp_dir/welcome.txt
+cp resources/setup_functions.sh $tmp_dir/setup_functions.sh
+sed -i "s~<TOPDIR>~${topdir}~" $tmp_dir/setup_functions.sh
 
 # ============ Build the dockerfile ============
 dockerfile="${script_dir}/resources/mariner.Dockerfile"
@@ -169,9 +176,9 @@ if [[ "${mode}" == "build" ]]; then # Configure base image
     if [[ ! -f "${chroot_file}" ]]; then build_chroot; fi
     chroot_hash=$(sha256sum "${chroot_file}" | cut -d' ' -f1)
     # Check if the chroot file's hash has changed since the last build
-    if [[ ! -f "${script_dir}/build_container/hash" ]] || [[ "$(cat "${script_dir}/build_container/hash")" != "${chroot_hash}" ]]; then
+    if [[ ! -f "${tmp_dir}/hash" ]] || [[ "$(cat "${tmp_dir}/hash")" != "${chroot_hash}" ]]; then
         echo "Chroot file has changed, updating..."
-        echo "${chroot_hash}" > "${script_dir}/build_container/hash"
+        echo "${chroot_hash}" > "${tmp_dir}/hash"
         docker import "${chroot_file}" "mcr.microsoft.com/cbl-mariner/containerized-rpmbuild:${version}"
     else
         echo "Chroot is up-to-date"
@@ -190,10 +197,7 @@ docker build -q \
                 --build-arg container_img="$container_img" \
                 --build-arg version="$version" \
                 --build-arg enable_local_repo="$enable_local_repo" \
-                --build-arg topdir="$topdir" \
                 --build-arg mariner_repo="$repo_path" \
-                --build-arg mariner_branch="$repo_branch" \
-                --build-arg splash_txt="$splash_txt" \
                 .
 
 echo "docker_image_tag is ${docker_image_tag}"

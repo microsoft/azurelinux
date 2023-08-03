@@ -388,6 +388,3 @@ MigrationBackup/
 
 # Output from the "download_spec_sources.sh" script
 downloaded_sources/
-
-# build_container from the containerized-build tool
-/toolkit/scripts/containerized-build/build_container/

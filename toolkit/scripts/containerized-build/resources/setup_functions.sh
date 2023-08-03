@@ -26,9 +26,9 @@ rpm() {
         for ((i = 0; i < ${#args[@]}; ++i)); do
             if [[ ${args[$i]} = *".src.rpm"* ]]; then
                 local SPEC=${args[$i]}
-                SPEC=${SPEC##*/}
-                SPEC=${SPEC%-*}
-                SPEC=${SPEC%-*}
+                SPEC=${SPEC##*/} #remove prefix ending in "/"
+                SPEC=${SPEC%-*} #remove last suffix of type -*
+                SPEC=${SPEC%-*} #remove last suffix of type -*
                 SPEC=${SPEC%\**}
                 mkdir -p $SOURCES_DIR
                 ln -sf $SPECS_DIR/$SPEC/* $SOURCES_DIR/
