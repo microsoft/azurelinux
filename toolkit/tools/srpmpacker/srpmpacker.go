@@ -943,7 +943,7 @@ func hydrateFromLocalSource(fileHydrationState map[string]bool, newSourceDir str
 // Will alter `currentSignatures`.
 func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir string, srcConfig sourceRetrievalConfiguration, skipSignatureHandling bool, currentSignatures map[string]string) {
 	const (
-		downloadRetryAttempts = 3
+		downloadRetryAttempts = 10
 		downloadRetryDuration = time.Second
 	)
 
@@ -956,14 +956,14 @@ func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir st
 
 		url := network.JoinURL(srcConfig.sourceURL, fileName)
 
-		err := retry.Run(func() error {
+		err := retry.RunWithExpBackoff(func() error {
 			err := network.DownloadFile(url, destinationFile, srcConfig.caCerts, srcConfig.tlsCerts)
 			if err != nil {
 				logger.Log.Warnf("Failed to download (%s). Error: %s", url, err)
 			}
 
 			return err
-		}, downloadRetryAttempts, downloadRetryDuration)
+		}, downloadRetryAttempts, downloadRetryDuration, 5.0)
 
 		if err != nil {
 			continue
