@@ -67,7 +67,8 @@ const (
 
 const (
 	defaultBuildDir    = "./build/SRPMS"
-	defaultWorkerCount = "10"
+	defaultWorkerCount = "80"
+	defaultNetOpsCount = "4"
 )
 
 // sourceRetrievalConfiguration holds information on where to hydrate files from.
@@ -112,6 +113,7 @@ var (
 	runCheck     = app.Flag("run-check", "Whether or not to run the spec file's check section during package build.").Bool()
 
 	workers          = app.Flag("workers", "Number of concurrent goroutines to parse with.").Default(defaultWorkerCount).Int()
+	concurrentNetOps = app.Flag("concurrent-net-ops", "Number of concurrent network operations to perform.").Default(defaultWorkerCount).Int()
 	repackAll        = app.Flag("repack", "Rebuild all SRPMs, even if already built.").Bool()
 	nestedSourcesDir = app.Flag("nested-sources", "Set if for a given SPEC, its sources are contained in a SOURCES directory next to the SPEC file.").Bool()
 
@@ -145,6 +147,10 @@ func main() {
 
 	if *workers <= 0 {
 		logger.Log.Fatalf("Value in --workers must be greater than zero. Found %d", *workers)
+	}
+
+	if *concurrentNetOps <= 0 {
+		logger.Log.Fatalf("Value in --concurrent-net-ops must be greater than zero. Found %d", *concurrentNetOps)
 	}
 
 	// Create a template configuration that all packed SRPM will be based on.
@@ -192,7 +198,7 @@ func main() {
 	packList, err := parsePackListFile(*packListFile)
 	logger.PanicOnError(err)
 
-	err = createAllSRPMsWrapper(*specsDir, *distTag, *buildDir, *outDir, *workerTar, *workers, *nestedSourcesDir, *repackAll, *runCheck, packList, templateSrcConfig)
+	err = createAllSRPMsWrapper(*specsDir, *distTag, *buildDir, *outDir, *workerTar, *workers, *concurrentNetOps, *nestedSourcesDir, *repackAll, *runCheck, packList, templateSrcConfig)
 	logger.PanicOnError(err)
 }
 
@@ -231,7 +237,7 @@ func parsePackListFile(packListFile string) (packList map[string]bool, err error
 
 // createAllSRPMsWrapper wraps createAllSRPMs to conditionally run it inside a chroot.
 // If workerTar is non-empty, packing will occur inside a chroot, otherwise it will run on the host system.
-func createAllSRPMsWrapper(specsDir, distTag, buildDir, outDir, workerTar string, workers int, nestedSourcesDir, repackAll, runCheck bool, packList map[string]bool, templateSrcConfig sourceRetrievalConfiguration) (err error) {
+func createAllSRPMsWrapper(specsDir, distTag, buildDir, outDir, workerTar string, workers, concurrentNetOps int, nestedSourcesDir, repackAll, runCheck bool, packList map[string]bool, templateSrcConfig sourceRetrievalConfiguration) (err error) {
 	var chroot *safechroot.Chroot
 	originalOutDir := outDir
 	if workerTar != "" {
@@ -244,7 +250,7 @@ func createAllSRPMsWrapper(specsDir, distTag, buildDir, outDir, workerTar string
 	}
 
 	doCreateAll := func() error {
-		return createAllSRPMs(specsDir, distTag, buildDir, outDir, workers, nestedSourcesDir, repackAll, runCheck, packList, templateSrcConfig)
+		return createAllSRPMs(specsDir, distTag, buildDir, outDir, workers, concurrentNetOps, nestedSourcesDir, repackAll, runCheck, packList, templateSrcConfig)
 	}
 
 	if chroot != nil {
@@ -270,7 +276,7 @@ func createAllSRPMsWrapper(specsDir, distTag, buildDir, outDir, workerTar string
 }
 
 // createAllSRPMs will find all SPEC files in specsDir and pack SRPMs for them if needed.
-func createAllSRPMs(specsDir, distTag, buildDir, outDir string, workers int, nestedSourcesDir, repackAll, runCheck bool, packList map[string]bool, templateSrcConfig sourceRetrievalConfiguration) (err error) {
+func createAllSRPMs(specsDir, distTag, buildDir, outDir string, workers, concurrentNetOps int, nestedSourcesDir, repackAll, runCheck bool, packList map[string]bool, templateSrcConfig sourceRetrievalConfiguration) (err error) {
 	logger.Log.Infof("Finding all SPEC files")
 	timestamp.StartEvent("packing SRPMS", nil)
 	defer timestamp.StopEvent(nil)
@@ -287,7 +293,7 @@ func createAllSRPMs(specsDir, distTag, buildDir, outDir string, workers int, nes
 	}
 	timestamp.StopEvent(nil)
 
-	err = packSRPMs(specStates, distTag, buildDir, templateSrcConfig, workers)
+	err = packSRPMs(specStates, distTag, buildDir, templateSrcConfig, workers, concurrentNetOps)
 	return
 }
 
@@ -572,7 +578,7 @@ func specsToPackWorker(requests <-chan string, results chan<- *specState, cancel
 }
 
 // packSRPMs will pack any SPEC files that have been marked as `toPack`.
-func packSRPMs(specStates []*specState, distTag, buildDir string, templateSrcConfig sourceRetrievalConfiguration, workers int) (err error) {
+func packSRPMs(specStates []*specState, distTag, buildDir string, templateSrcConfig sourceRetrievalConfiguration, workers, concurrentNetOps int) (err error) {
 	tsRoot, _ := timestamp.StartEvent("packing SRPMs", nil)
 	defer timestamp.StopEvent(nil)
 	var wg sync.WaitGroup
@@ -580,11 +586,12 @@ func packSRPMs(specStates []*specState, distTag, buildDir string, templateSrcCon
 	allSpecStates := make(chan *specState, len(specStates))
 	results := make(chan *packResult, len(specStates))
 	cancel := make(chan struct{})
+	netOpsSemaphor := make(chan struct{}, concurrentNetOps)
 
 	// Start the workers now so they begin working as soon as a new job is buffered.
 	for i := 0; i < workers; i++ {
 		wg.Add(1)
-		go packSRPMWorker(allSpecStates, results, cancel, &wg, distTag, buildDir, templateSrcConfig, tsRoot)
+		go packSRPMWorker(allSpecStates, results, cancel, netOpsSemaphor, &wg, distTag, buildDir, templateSrcConfig, tsRoot)
 	}
 
 	for _, state := range specStates {
@@ -619,7 +626,7 @@ func packSRPMs(specStates []*specState, distTag, buildDir string, templateSrcCon
 }
 
 // packSRPMWorker will process a channel of SPECs and pack any that are marked as toPack.
-func packSRPMWorker(allSpecStates <-chan *specState, results chan<- *packResult, cancel <-chan struct{}, wg *sync.WaitGroup, distTag, buildDir string, templateSrcConfig sourceRetrievalConfiguration, tsRoot *timestamp.TimeStamp) {
+func packSRPMWorker(allSpecStates <-chan *specState, results chan<- *packResult, cancel <-chan struct{}, netOpsSemaphor chan struct{}, wg *sync.WaitGroup, distTag, buildDir string, templateSrcConfig sourceRetrievalConfiguration, tsRoot *timestamp.TimeStamp) {
 	defer wg.Done()
 
 	for specState := range allSpecStates {
@@ -660,7 +667,7 @@ func packSRPMWorker(allSpecStates <-chan *specState, results chan<- *packResult,
 			continue
 		}
 
-		outputPath, err := packSingleSPEC(specState.specFile, specState.srpmFile, signaturesFilePath, buildDir, fullOutDirPath, distTag, srcConfig)
+		outputPath, err := packSingleSPEC(specState.specFile, specState.srpmFile, signaturesFilePath, buildDir, fullOutDirPath, distTag, srcConfig, netOpsSemaphor)
 		if err != nil {
 			result.err = err
 			results <- result
@@ -718,7 +725,7 @@ func readSignatures(signaturesFilePath string) (readSignatures map[string]string
 }
 
 // packSingleSPEC will pack a given SPEC file into an SRPM.
-func packSingleSPEC(specFile, srpmFile, signaturesFile, buildDir, outDir, distTag string, srcConfig sourceRetrievalConfiguration) (outputPath string, err error) {
+func packSingleSPEC(specFile, srpmFile, signaturesFile, buildDir, outDir, distTag string, srcConfig sourceRetrievalConfiguration, netOpsSemaphor chan struct{}) (outputPath string, err error) {
 	srpmName := filepath.Base(srpmFile)
 	workingDir := filepath.Join(buildDir, srpmName)
 
@@ -758,10 +765,17 @@ func packSingleSPEC(specFile, srpmFile, signaturesFile, buildDir, outDir, distTa
 		return
 	}
 
-	// Hydrate all sources. Download any missing ones not in `sourceDir`
-	err = hydrateFiles(fileTypeSource, specFile, workingDir, srcConfig, currentSignatures, defines)
-	if err != nil {
-		return
+	{
+		// Limit the number of concurrent network operations by pushing a struct{} into the channel. This will block until
+		// another operation completes and removes the struct{} from the channel.
+		netOpsSemaphor <- struct{}{}
+		// Hydrate all sources. Download any missing ones not in `sourceDir`
+		err = hydrateFiles(fileTypeSource, specFile, workingDir, srcConfig, currentSignatures, defines)
+		if err != nil {
+			return
+		}
+		// Clear the channel to allow another operation to start
+		<-netOpsSemaphor
 	}
 
 	err = updateSignaturesIfApplicable(signaturesFile, srcConfig, currentSignatures)
@@ -943,7 +957,7 @@ func hydrateFromLocalSource(fileHydrationState map[string]bool, newSourceDir str
 // Will alter `currentSignatures`.
 func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir string, srcConfig sourceRetrievalConfiguration, skipSignatureHandling bool, currentSignatures map[string]string) {
 	const (
-		downloadRetryAttempts = 3
+		downloadRetryAttempts = 10
 		downloadRetryDuration = time.Second
 	)
 
@@ -956,14 +970,16 @@ func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir st
 
 		url := network.JoinURL(srcConfig.sourceURL, fileName)
 
-		err := retry.Run(func() error {
+		// With 10 attempts, initial delay of 1 second, and a backoff factor of 2.0, this will
+		// take at most ~5 minutes before giving up.
+		err := retry.RunWithExpBackoff(func() error {
 			err := network.DownloadFile(url, destinationFile, srcConfig.caCerts, srcConfig.tlsCerts)
 			if err != nil {
 				logger.Log.Warnf("Failed to download (%s). Error: %s", url, err)
 			}
 
 			return err
-		}, downloadRetryAttempts, downloadRetryDuration)
+		}, downloadRetryAttempts, downloadRetryDuration, 2.0)
 
 		if err != nil {
 			continue
