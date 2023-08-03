@@ -2,10 +2,6 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-# We use a background process to monitor the progress of the download. We need to
-# kill the background process when the script exits abnormally.
-trap "kill 0" INT TERM ERR
-
 # Usage: precache.sh </path/to/snapshot.json> <cache_working_dir> <cache_dir> <downloaded_files.txt> <repo_base_urls>...
 snapshot_path="$1"
 [[ -z "$snapshot_path" ]] && echo "snapshot_path is required" && exit 1
@@ -61,7 +57,6 @@ for base_url in "${base_urls[@]}"; do
     repoquery $REPOQUERY_OS_ARGS --repofrompath=$repo_name,$base_url -a --qf="%{location}" | sed "s|^|$prefix|" >> $repo_summary_file || exit 1
 done
 
-
 # For each package in the snapshot summary, find the latest version of package $1 in the repo summary file $2 and print the url
 function get_url() {
     local name="$1"
@@ -70,6 +65,7 @@ function get_url() {
     # '/' is important here, otherwise we might match a similarly named package. The '/' guarantees we match the start of the name.
     rpm_url=$(grep "/$rpm_name" "$repo_summary_file" | head -n 1)
     if [[ -z "$rpm_url" ]]; then
+        echo "PRE-CACHE: Repos do not contain $rpm_name, skipping" >&2
         return
     fi
     echo "$rpm_url"
@@ -100,40 +96,16 @@ function download_rpm() {
     fi
 }
 
-# Background process that watches $downloaded_files and compares against the number of packages in the snapshot
-function monitor_progress() {
-    local expected_count="$1"
-    # Every 5 seconds calculate the current progress and print it
-    while true; do
-        if [[ -f "$downloaded_files" ]]; then
-            current_count=$( wc -l < "$downloaded_files")
-        fi
-        if [[ -f "$skipped_file" ]]; then
-            skipped_count=$( wc -l < "$skipped_file")
-        fi
-
-        percent=$(( (current_count + skipped_count) * 100 / expected_count ))
-        echo "Pre-cache progress $percent%, $current_count new packages added"
-
-        sleep 5
-    done
-}
-# Start the background process
-expected_count=$(jq -r '.Repo[] | .Name' "$snapshot_path" | wc -l)
-echo "Pre-caching $expected_count packages"
-monitor_progress "$expected_count" &
-monitor_pid=$!
-
-
 # For each rpm in the snapshot .json file, download it to the cache directory. We format the output as "Name-Version.Distribution.Architecture"
 # Export the functions so we can use them in parallel via xargs. We can run the grep fully in parallel since it is just a string match, but we want to
 # limit the number of concurrent downloads to avoid overloading the network.
 export -f get_url
 export -f download_rpm
 max_concurrent_downloads=30
-jq -r '.Repo[] | "\(.Name)-\(.Version).\(.Distribution).\(.Architecture)"' "$snapshot_path" | sort -u | xargs -I {} bash -c "get_url '{}' '$repo_summary_file'" | xargs -P $max_concurrent_downloads -I {} bash -c "download_rpm '{}' '$cache_dir' '$downloaded_files' '$skipped_file'"
+jq -r '.Repo[] | "\(.Name)-\(.Version).\(.Distribution).\(.Architecture)"' "$snapshot_path" | sort -u | \
+    xargs -I {} bash -c "get_url '{}' '$repo_summary_file'" | \
+    xargs -P $max_concurrent_downloads -I {} bash -c "download_rpm '{}' '$cache_dir' '$downloaded_files' '$skipped_file'"
 
-# Kill the background process
-kill $(jobs -p)
-
-echo "Pre-cached $(wc -l < "$downloaded_files") packages"
+# Calculate the expected number of packages in the snapshot we were expecting to download
+expected_count=$(jq -r '.Repo[] | .Name' "$snapshot_path" | wc -l)
+echo "Pre-cached $(wc -l < "$downloaded_files") packages out of $expected_count total packages"
