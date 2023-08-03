@@ -206,7 +206,7 @@ clean-build-packages:
 	rm -rf $(rpmbuilding_logs_dir)
 	rm -rf $(STATUS_FLAGS_DIR)/build-rpms.flag
 	@echo Verifying no mountpoints present in $(CHROOT_DIR)
-	$(SCRIPTS_DIR)/safeunmount.sh "$(CHROOT_DIR)" && \
+	$(SCRIPTS_DIR)/safeunmount.sh "$(CHROOT_DIR)/"* && \
 	rm -rf $(CHROOT_DIR)
 clean-compress-rpms:
 	rm -rf $(pkggen_archive)

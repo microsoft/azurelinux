@@ -228,19 +228,19 @@ func buildTestGraphHelper() (g *PkgGraph, err error) {
 // Checks if two lists of nodes are equivalent (ignoring order and graph edges)
 func checkEqualComponents(t *testing.T, expected, actual []*PkgNode) {
 	t.Helper()
-	foundPackage := make(map[*PkgNode]bool)
 	for _, mustHave := range expected {
+		foundPackage := false
 		for _, n := range actual {
-			foundPackage[mustHave] = foundPackage[mustHave] || mustHave.Equal(n)
+			foundPackage = foundPackage || mustHave.Equal(n)
 		}
-		assert.True(t, foundPackage[mustHave], "expected to find %s in actual", mustHave.String())
+		assert.True(t, foundPackage, "expected to find %s in actual", mustHave.String())
 	}
-	foundPackage = make(map[*PkgNode]bool)
 	for _, doHave := range actual {
+		foundPackage := false
 		for _, n := range expected {
-			foundPackage[doHave] = foundPackage[doHave] || doHave.Equal(n)
+			foundPackage = foundPackage || doHave.Equal(n)
 		}
-		assert.True(t, foundPackage[doHave], "found %s in actual, but it was unexpected", doHave.String())
+		assert.True(t, foundPackage, "found %s in actual, but it was unexpected", doHave.String())
 	}
 }
 
@@ -924,8 +924,10 @@ func TestGoalWithLevelOneAndMeta(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, g)
 
-	c1, _ := g.FindBestPkgNode(&pkgC)
-	c2, _ := g.FindBestPkgNode(&pkgC2)
+	c1, err := g.FindBestPkgNode(&pkgC)
+	assert.NoError(t, err)
+	c2, err := g.FindBestPkgNode(&pkgC2)
+	assert.NoError(t, err)
 	meta := g.AddMetaNode([]*PkgNode{c2.RunNode}, []*PkgNode{c1.RunNode})
 
 	goal, err := g.AddGoalNodeWithExtraLayers("test_1meta", []*pkgjson.PackageVer{&pkgC}, false, 1)
@@ -942,7 +944,7 @@ func TestGoalWithLevelOneAndMeta(t *testing.T) {
 	}
 	checkEqualComponents(t, expectedGoalNodes, nodesInGoal)
 	// But we now pull in the entire graph when looking at the tree
-	expectedGoalPackages2meta := []*PkgNode{
+	expectedGoalPackagesMeta := []*PkgNode{
 		pkgBRun,
 		pkgBBuild,
 		pkgCRun,
@@ -957,7 +959,7 @@ func TestGoalWithLevelOneAndMeta(t *testing.T) {
 		meta,
 		goal,
 	}
-	checkEqualComponents(t, expectedGoalPackages2meta, g.AllNodesFrom(goal))
+	checkEqualComponents(t, expectedGoalPackagesMeta, g.AllNodesFrom(goal))
 }
 
 func TestGoalWithMultipleGoalsAndOneExtraLayer(t *testing.T) {
@@ -980,7 +982,7 @@ func TestGoalWithMultipleGoalsAndOneExtraLayer(t *testing.T) {
 	}
 	checkEqualComponents(t, expectedGoalNodes, nodesInGoal)
 	// But we now pull in the entire graph when looking at the tree
-	expectedGoalPackages2meta := []*PkgNode{
+	expectedGoalPackagesMeta := []*PkgNode{
 		pkgBRun,
 		pkgBBuild,
 		pkgCRun,
@@ -994,7 +996,7 @@ func TestGoalWithMultipleGoalsAndOneExtraLayer(t *testing.T) {
 		pkgD6Unresolved,
 		goal,
 	}
-	checkEqualComponents(t, expectedGoalPackages2meta, g.AllNodesFrom(goal))
+	checkEqualComponents(t, expectedGoalPackagesMeta, g.AllNodesFrom(goal))
 }
 
 // Test encoding and decoding a DOT formatted graph
@@ -1047,6 +1049,7 @@ func TestEncodeDecodeMultiDOT(t *testing.T) {
 
 	gFinal := NewPkgGraph()
 	err = ReadDOTGraph(gFinal, &buf2)
+	assert.NoError(t, err)
 
 	checkTestGraph(t, gFinal)
 }
