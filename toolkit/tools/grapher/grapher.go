@@ -127,15 +127,9 @@ func addNodesForPackage(g *pkggraph.PkgGraph, pkg *pkgjson.Package) (err error) 
 
 	if nodes != nil {
 		logger.Log.Warnf(`Duplicate package name for package %+v read from SRPM "%s" (Previous: %+v)`, pkg.Provides, pkg.SrpmPath, nodes.RunNode)
-		if nodes.RunNode != nil {
-			newRunNode = nodes.RunNode
-		}
-		if nodes.BuildNode != nil {
-			newBuildNode = nodes.BuildNode
-		}
-		if nodes.TestNode != nil {
-			newTestNode = nodes.TestNode
-		}
+		newRunNode = nodes.RunNode
+		newBuildNode = nodes.BuildNode
+		newTestNode = nodes.TestNode
 	}
 
 	if newRunNode == nil {
