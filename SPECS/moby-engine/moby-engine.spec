@@ -4,7 +4,7 @@
 Summary: The open-source application container engine
 Name:    %{upstream_name}-engine
 Version: 20.10.24
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: ASL 2.0
 Group:   Tools/Container
 URL: https://mobyproject.org
@@ -20,6 +20,7 @@ Source1: https://github.com/moby/libnetwork/archive/master.tar.gz/#/%{upstream_n
 Source3: docker.service
 Source4: docker.socket
 Patch0:  CVE-2023-25153.patch
+Patch1:  fix-invalid-host-header.patch
 
 %{?systemd_requires}
 
@@ -126,6 +127,9 @@ fi
 %{_unitdir}/*
 
 %changelog
+* Fri Aug 04 2023 Muhammad Falak <mwani@microsoft.com> - 20.10.24-4
+- Introduce patch to fix 'http: invalid Host header'
+
 * Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 20.10.24-3
 - Bump release to rebuild with go 1.19.11
 
