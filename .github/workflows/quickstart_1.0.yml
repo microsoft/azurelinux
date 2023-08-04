@@ -12,7 +12,7 @@ on:
 
 jobs:
   get_input-srpms:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout
@@ -20,10 +20,10 @@ jobs:
       with:
         ref: '1.0-stable'
 
-    - name: Set up Go 1.17
+    - name: Set up Go 1.19
       uses: actions/setup-go@v2
       with:
-        go-version: 1.17
+        go-version: 1.19
       id: go
 
     - name: Install Remaining Prerequisites
@@ -40,7 +40,7 @@ jobs:
         popd
 
   iso_quickstart:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout
@@ -48,10 +48,10 @@ jobs:
       with:
         ref: '1.0-stable'
 
-    - name: Set up Go 1.17
+    - name: Set up Go 1.19
       uses: actions/setup-go@v2
       with:
-        go-version: 1.17
+        go-version: 1.19
       id: go
 
     - name: Install Remaining Prerequisites
@@ -67,7 +67,7 @@ jobs:
         popd
 
   vhdx_quickstart:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout
@@ -75,10 +75,10 @@ jobs:
       with:
         ref: '1.0-stable'
 
-    - name: Set up Go 1.17
+    - name: Set up Go 1.19
       uses: actions/setup-go@v2
       with:
-        go-version: 1.17
+        go-version: 1.19
       id: go
 
     - name: Install Remaining Prerequisites

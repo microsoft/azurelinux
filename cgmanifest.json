@@ -1147,8 +1147,8 @@
         "type": "other",
         "other": {
           "name": "blobfuse2",
-          "version": "2.0.4",
-          "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse2-2.0.4.tar.gz"
+          "version": "2.0.5",
+          "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse2-2.0.5.tar.gz"
         }
       }
     },
@@ -6520,8 +6520,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.118.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.118.1.tar.gz"
+          "version": "5.15.122.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.122.1.tar.gz"
         }
       }
     },
@@ -7351,8 +7351,8 @@
         "type": "other",
         "other": {
           "name": "iperf3",
-          "version": "3.11",
-          "downloadUrl": "https://github.com/esnet/iperf/archive/3.11.tar.gz"
+          "version": "3.14",
+          "downloadUrl": "https://github.com/esnet/iperf/archive/3.14.tar.gz"
         }
       }
     },
@@ -8021,8 +8021,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers-cc",
-          "version": "0.4.2",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/cc-0.4.2.tar.gz"
+          "version": "0.6.0",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/cc-0.6.0.tar.gz"
         }
       }
     },
@@ -8091,8 +8091,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.118.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.118.1.tar.gz"
+          "version": "5.15.122.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.122.1.tar.gz"
         }
       }
     },
@@ -8101,8 +8101,8 @@
         "type": "other",
         "other": {
           "name": "kernel-azure",
-          "version": "5.15.118.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.118.1.tar.gz"
+          "version": "5.15.122.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.122.1.tar.gz"
         }
       }
     },
@@ -8111,8 +8111,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hci",
-          "version": "5.15.118.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.118.1.tar.gz"
+          "version": "5.15.122.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.122.1.tar.gz"
         }
       }
     },
@@ -8121,8 +8121,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.118.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.118.1.tar.gz"
+          "version": "5.15.122.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.122.1.tar.gz"
         }
       }
     },
@@ -11133,6 +11133,16 @@
           "name": "libtool",
           "version": "2.4.6",
           "downloadUrl": "http://ftp.gnu.org/gnu/libtool/libtool-2.4.6.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libtraceevent",
+          "version": "1.7.2",
+          "downloadUrl": "https://git.kernel.org/pub/scm/libs/libtrace/libtraceevent.git/snapshot/libtraceevent-1.7.2.tar.gz"
         }
       }
     },
@@ -15274,8 +15284,8 @@
         "type": "other",
         "other": {
           "name": "openssh",
-          "version": "8.8p1",
-          "downloadUrl": "https://ftp.usa.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-8.8p1.tar.gz"
+          "version": "8.9p1",
+          "downloadUrl": "https://ftp.usa.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-8.9p1.tar.gz"
         }
       }
     },
@@ -15734,8 +15744,8 @@
         "type": "other",
         "other": {
           "name": "pcre2",
-          "version": "10.40",
-          "downloadUrl": "https://github.com/PhilipHazel/pcre2/releases/download/pcre2-10.40/pcre2-10.40.tar.bz2"
+          "version": "10.42",
+          "downloadUrl": "https://github.com/PhilipHazel/pcre2/releases/download/pcre2-10.42/pcre2-10.42.tar.bz2"
         }
       }
     },
