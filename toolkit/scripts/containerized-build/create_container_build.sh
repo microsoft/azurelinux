@@ -70,7 +70,7 @@ if [ "$EUID" -ne 0 ]; then
   exit
 fi
 
-script_dir=$(realpath "$(dirname "$0")")
+script_dir=$(realpath $(dirname "${BASH_SOURCE[0]}"))
 tmp_dir=${script_dir%'/toolkit'*}/build/containerized-rpmbuild/tmp
 mkdir -p ${tmp_dir}
 topdir=/usr/src/mariner
