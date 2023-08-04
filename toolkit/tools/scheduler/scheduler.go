@@ -422,7 +422,7 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild []*pkgjson
 			activeTestsCount := len(activeTests)
 
 			logger.Log.Infof("%d currently active build(s): %v.", activeSRPMsCount, activeSRPMs)
-			logger.Log.Infof("%d currently active tests(s): %v.", activeTestsCount, activeTests)
+			logger.Log.Infof("%d currently active test(s): %v.", activeTestsCount, activeTests)
 		}
 
 	}
