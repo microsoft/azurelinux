@@ -15,11 +15,11 @@ var expectedValuesMillis1 = []int{0, 100, 200, 300, 400, 500}
 var expectedValuesMillis2 = []int{0, 100, 400, 900, 1600, 2500}
 
 func TestCalcDelay1(t *testing.T) {
-	mult := 1.0
+	backoffExponentBase := 1.0
 	sleep := time.Millisecond * 100
 	for i, expected := range expectedValuesMillis1 {
 		expected := time.Duration(expected) * time.Millisecond
-		actual := calcDelay(i, sleep, mult)
+		actual := calcDelay(i, sleep, backoffExponentBase)
 		assert.Equal(t, expected, actual)
 	}
 }

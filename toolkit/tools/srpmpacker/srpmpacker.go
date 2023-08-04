@@ -113,7 +113,7 @@ var (
 	runCheck     = app.Flag("run-check", "Whether or not to run the spec file's check section during package build.").Bool()
 
 	workers          = app.Flag("workers", "Number of concurrent goroutines to parse with.").Default(defaultWorkerCount).Int()
-	concurrentNetOps = app.Flag("concurrent-net-ops", "Number of concurrent network operations to perform.").Default(defaultNetOpsCount).Int()
+	concurrentNetOps = app.Flag("concurrent-net-ops", "Number of concurrent network operations to perform.").Default(defaultNetOpsCount).UInt()
 	repackAll        = app.Flag("repack", "Rebuild all SRPMs, even if already built.").Bool()
 	nestedSourcesDir = app.Flag("nested-sources", "Set if for a given SPEC, its sources are contained in a SOURCES directory next to the SPEC file.").Bool()
 
@@ -149,9 +149,6 @@ func main() {
 		logger.Log.Fatalf("Value in --workers must be greater than zero. Found %d", *workers)
 	}
 
-	if *concurrentNetOps <= 0 {
-		logger.Log.Fatalf("Value in --concurrent-net-ops must be greater than zero. Found %d", *concurrentNetOps)
-	}
 
 	// Create a template configuration that all packed SRPM will be based on.
 	var templateSrcConfig sourceRetrievalConfiguration
