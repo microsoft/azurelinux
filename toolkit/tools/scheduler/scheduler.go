@@ -413,14 +413,16 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild []*pkgjson
 
 		activeSRPMs := buildState.ActiveSRPMs()
 		activeSRPMsCount := len(activeSRPMs)
-		if stopBuilding {
-			if activeSRPMsCount == 0 {
-				break
-			}
+		if stopBuilding && activeSRPMsCount == 0 {
+			break
 		}
 
-		if res.Node.Type == pkggraph.TypeLocalBuild {
+		if res.Node.Type == pkggraph.TypeLocalBuild || res.Node.Type == pkggraph.TypeTest {
+			activeTests := buildState.ActiveTests()
+			activeTestsCount := len(activeTests)
+
 			logger.Log.Infof("%d currently active build(s): %v.", activeSRPMsCount, activeSRPMs)
+			logger.Log.Infof("%d currently active tests(s): %v.", activeTestsCount, activeTests)
 		}
 
 	}

@@ -113,6 +113,17 @@ func (g *GraphBuildState) ActiveSRPMs() (builtSRPMs []string) {
 	return
 }
 
+// ActiveTests returns a list of all tests, which are currently being run.
+func (g *GraphBuildState) ActiveTests() (testedSRPMs []string) {
+	for _, testRequest := range g.activeBuilds {
+		if testRequest.Node.Type == pkggraph.TypeTest {
+			testedSRPMs = append(testedSRPMs, testRequest.Node.SRPMFileName())
+		}
+	}
+
+	return
+}
+
 // BuildFailures returns a slice of all failed builds.
 func (g *GraphBuildState) BuildFailures() []*BuildResult {
 	return g.failures
