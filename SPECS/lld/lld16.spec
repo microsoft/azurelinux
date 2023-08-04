@@ -82,6 +82,7 @@ cd build
 %changelog
 * Wed Jul 12 2023 Sam Meluch <sammeluch@microsoft.com> 16.0.0-1
 - Add lld16 for llvm16/clang16
+- Update spec from lld12 for use with lld16
 
 * Thu Aug 12 2021 Andy Caldwell <andycaldwell@microsoft.com>  12.0.1-1
 - Original version for CBL-Mariner.
