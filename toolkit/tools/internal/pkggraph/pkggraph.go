@@ -82,6 +82,7 @@ const (
 	dotKeyFill         = "style"
 )
 
+// Determines if a type of node is valid for inclusion in the lookup tables.
 var lookupNodesTypes = map[NodeType]bool{
 	TypeLocalBuild: true,
 	TypeLocalRun:   true,
