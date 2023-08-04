@@ -1,0 +1,12 @@
+Index: openexr-3.1.5/src/bin/exrcheck/main.cpp
+===================================================================
+--- openexr-3.1.5.orig/src/bin/exrcheck/main.cpp
++++ openexr-3.1.5/src/bin/exrcheck/main.cpp
+@@ -13,6 +13,7 @@
+ # include <unistd.h>
+ #endif
+ #include <vector>
++#include <cstdint>
+ 
+ using namespace OPENEXR_IMF_NAMESPACE;
+ using std::cout;
