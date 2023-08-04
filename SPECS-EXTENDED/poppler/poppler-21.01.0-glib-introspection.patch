@@ -1,0 +1,11 @@
+--- poppler-21.01.0/glib/CMakeLists.txt
++++ poppler-21.01.0/glib/CMakeLists.txt
+@@ -121,7 +121,7 @@ if (HAVE_INTROSPECTION AND BUILD_SHARED_
+ 
+   # General gir: Reset object-list for introspection & load tool args
+   set(INTROSPECTION_GIRS)
+-  set(INTROSPECTION_SCANNER_ARGS "--add-include-path=${CMAKE_CURRENT_SOURCE_DIR}" "--warn-all")
++  set(INTROSPECTION_SCANNER_ARGS "--add-include-path=${CMAKE_CURRENT_SOURCE_DIR}" "--warn-all" "--sources-top-dirs=${CMAKE_SOURCE_DIR}" "--sources-top-dirs=${CMAKE_BINARY_DIR}")
+   set(INTROSPECTION_COMPILER_ARGS ${INTROSPECTION_COMPILER_ARGS} "--includedir=${CMAKE_CURRENT_SOURCE_DIR}")
+ 
+   # Poppler: Assign package to gir & export keys

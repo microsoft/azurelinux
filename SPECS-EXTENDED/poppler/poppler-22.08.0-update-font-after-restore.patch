@@ -1,0 +1,94 @@
+From 111f38a722eedddd94faa52dda8c5e0da561fb41 Mon Sep 17 00:00:00 2001
+From: Marek Kasik <mkasik@redhat.com>
+Date: Fri, 24 Jun 2022 22:00:09 +0200
+Subject: [PATCH 1/2] Cairo: Update font after restore
+
+Update font after restore (Q operator) if font has changed.
+This is important when entering text into forms if there
+are characters shown by default font after characters
+which needed new font.
+
+New method getRef() where added to CairoFont class to
+be able to easily compare fonts.
+---
+ poppler/CairoFontEngine.h | 3 +++
+ poppler/CairoOutputDev.cc | 7 ++++++-
+ poppler/CairoOutputDev.h  | 2 ++
+ 3 files changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/poppler/CairoFontEngine.h b/poppler/CairoFontEngine.h
+index 56cc8825..c97e0ea4 100644
+--- a/poppler/CairoFontEngine.h
++++ b/poppler/CairoFontEngine.h
+@@ -22,6 +22,7 @@
+ // Copyright (C) 2013 Thomas Freitag <Thomas.Freitag@alfa.de>
+ // Copyright (C) 2018 Adam Reichold <adam.reichold@t-online.de>
+ // Copyright (C) 2022 Oliver Sander <oliver.sander@tu-dresden.de>
++// Copyright (C) 2022 Marek Kasik <mkasik@redhat.com>
+ //
+ // To see a description of the changes please see the Changelog file that
+ // came with your tarball or type make ChangeLog if you are building from git
+@@ -59,6 +60,8 @@ public:
+ 
+     bool isSubstitute() { return substitute; }
+ 
++    Ref getRef() { return ref; }
++
+ protected:
+     Ref ref;
+     cairo_font_face_t *cairo_font_face;
+diff --git a/poppler/CairoOutputDev.cc b/poppler/CairoOutputDev.cc
+index b402cc8b..a72c218a 100644
+--- a/poppler/CairoOutputDev.cc
++++ b/poppler/CairoOutputDev.cc
+@@ -31,7 +31,7 @@
+ // Copyright (C) 2015 Suzuki Toshiya <mpsuzuki@hiroshima-u.ac.jp>
+ // Copyright (C) 2018 Klarälvdalens Datakonsult AB, a KDAB Group company, <info@kdab.com>. Work sponsored by the LiMux project of the city of Munich
+ // Copyright (C) 2018, 2020 Adam Reichold <adam.reichold@t-online.de>
+-// Copyright (C) 2019, 2020 Marek Kasik <mkasik@redhat.com>
++// Copyright (C) 2019, 2020, 2022 Marek Kasik <mkasik@redhat.com>
+ // Copyright (C) 2020 Michal <sudolskym@gmail.com>
+ // Copyright (C) 2020, 2022 Oliver Sander <oliver.sander@tu-dresden.de>
+ // Copyright (C) 2021 Uli Schlachter <psychon@znc.in>
+@@ -357,6 +357,7 @@ void CairoOutputDev::saveState(GfxState *state)
+     elem.stroke_opacity = stroke_opacity;
+     elem.mask = mask ? cairo_pattern_reference(mask) : nullptr;
+     elem.mask_matrix = mask_matrix;
++    elem.fontRef = currentFont ? currentFont->getRef() : Ref::INVALID();
+     saveStateStack.push_back(elem);
+ 
+     if (strokePathClip) {
+@@ -384,6 +385,10 @@ void CairoOutputDev::restoreState(GfxState *state)
+     stroke_color = {};
+     stroke_opacity = saveStateStack.back().stroke_opacity;
+ 
++    if (saveStateStack.back().fontRef != (currentFont ? currentFont->getRef() : Ref::INVALID())) {
++        needFontUpdate = true;
++    }
++
+     /* This isn't restored by cairo_restore() since we keep it in the
+      * output device. */
+     updateBlendMode(state);
+diff --git a/poppler/CairoOutputDev.h b/poppler/CairoOutputDev.h
+index c287bf5c..5ce877d2 100644
+--- a/poppler/CairoOutputDev.h
++++ b/poppler/CairoOutputDev.h
+@@ -27,6 +27,7 @@
+ // Copyright (C) 2018 Klarälvdalens Datakonsult AB, a KDAB Group company, <info@kdab.com>. Work sponsored by the LiMux project of the city of Munich
+ // Copyright (C) 2020 Michal <sudolskym@gmail.com>
+ // Copyright (C) 2021 Christian Persch <chpe@src.gnome.org>
++// Copyright (C) 2022 Marek Kasik <mkasik@redhat.com>
+ //
+ // To see a description of the changes please see the Changelog file that
+ // came with your tarball or type make ChangeLog if you are building from git
+@@ -381,6 +382,7 @@ protected:
+         double stroke_opacity;
+         cairo_pattern_t *mask; // can be null
+         cairo_matrix_t mask_matrix;
++        Ref fontRef;
+     };
+     std::vector<SaveStateElement> saveStateStack;
+ };
+-- 
+2.38.1
+
