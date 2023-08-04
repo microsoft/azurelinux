@@ -25,7 +25,7 @@ func Run(function func() error, attempts int, sleep time.Duration) (err error) {
 // RunWithExpBackoff runs function up to 'attempts' times, waiting 'backoffExp^i * sleep' duration before each i-th attempt.
 func RunWithExpBackoff(function func() error, attempts int, sleep time.Duration, backoffExp float64) (err error) {
 	for i := 0; i < attempts; i++ {
-		// Calculate an exponential backoff.
+		// Calculate an exponential backoff. For i=0 we will calculate 0 delay and immediately call the function.
 		time.Sleep(calcDelay(i, sleep, backoffExp))
 		if err = function(); err == nil {
 			break

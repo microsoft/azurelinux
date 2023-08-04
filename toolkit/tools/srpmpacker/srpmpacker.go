@@ -583,12 +583,12 @@ func packSRPMs(specStates []*specState, distTag, buildDir string, templateSrcCon
 	allSpecStates := make(chan *specState, len(specStates))
 	results := make(chan *packResult, len(specStates))
 	cancel := make(chan struct{})
-	netOpsSemaphor := make(chan struct{}, concurrentNetOps)
+	netOpsSemaphore := make(chan struct{}, concurrentNetOps)
 
 	// Start the workers now so they begin working as soon as a new job is buffered.
 	for i := 0; i < workers; i++ {
 		wg.Add(1)
-		go packSRPMWorker(allSpecStates, results, cancel, netOpsSemaphor, &wg, distTag, buildDir, templateSrcConfig, tsRoot)
+		go packSRPMWorker(allSpecStates, results, cancel, netOpsSemaphore, &wg, distTag, buildDir, templateSrcConfig, tsRoot)
 	}
 
 	for _, state := range specStates {
@@ -623,7 +623,7 @@ func packSRPMs(specStates []*specState, distTag, buildDir string, templateSrcCon
 }
 
 // packSRPMWorker will process a channel of SPECs and pack any that are marked as toPack.
-func packSRPMWorker(allSpecStates <-chan *specState, results chan<- *packResult, cancel <-chan struct{}, netOpsSemaphor chan struct{}, wg *sync.WaitGroup, distTag, buildDir string, templateSrcConfig sourceRetrievalConfiguration, tsRoot *timestamp.TimeStamp) {
+func packSRPMWorker(allSpecStates <-chan *specState, results chan<- *packResult, cancel <-chan struct{}, netOpsSemaphore chan struct{}, wg *sync.WaitGroup, distTag, buildDir string, templateSrcConfig sourceRetrievalConfiguration, tsRoot *timestamp.TimeStamp) {
 	defer wg.Done()
 
 	for specState := range allSpecStates {
@@ -664,7 +664,7 @@ func packSRPMWorker(allSpecStates <-chan *specState, results chan<- *packResult,
 			continue
 		}
 
-		outputPath, err := packSingleSPEC(specState.specFile, specState.srpmFile, signaturesFilePath, buildDir, fullOutDirPath, distTag, srcConfig, netOpsSemaphor)
+		outputPath, err := packSingleSPEC(specState.specFile, specState.srpmFile, signaturesFilePath, buildDir, fullOutDirPath, distTag, srcConfig, netOpsSemaphore)
 		if err != nil {
 			result.err = err
 			results <- result
@@ -722,7 +722,7 @@ func readSignatures(signaturesFilePath string) (readSignatures map[string]string
 }
 
 // packSingleSPEC will pack a given SPEC file into an SRPM.
-func packSingleSPEC(specFile, srpmFile, signaturesFile, buildDir, outDir, distTag string, srcConfig sourceRetrievalConfiguration, netOpsSemaphor chan struct{}) (outputPath string, err error) {
+func packSingleSPEC(specFile, srpmFile, signaturesFile, buildDir, outDir, distTag string, srcConfig sourceRetrievalConfiguration, netOpsSemaphore chan struct{}) (outputPath string, err error) {
 	srpmName := filepath.Base(srpmFile)
 	workingDir := filepath.Join(buildDir, srpmName)
 
@@ -765,15 +765,15 @@ func packSingleSPEC(specFile, srpmFile, signaturesFile, buildDir, outDir, distTa
 	{
 		// Limit the number of concurrent network operations by pushing a struct{} into the channel. This will block until
 		// another operation completes and removes the struct{} from the channel.
-		netOpsSemaphor <- struct{}{}
+		netOpsSemaphore <- struct{}{}
 		// Hydrate all sources. Download any missing ones not in `sourceDir`
 		err = hydrateFiles(fileTypeSource, specFile, workingDir, srcConfig, currentSignatures, defines)
 		if err != nil {
-			<-netOpsSemaphor
+			<-netOpsSemaphore
 			return
 		}
 		// Clear the channel to allow another operation to start
-		<-netOpsSemaphor
+		<-netOpsSemaphore
 	}
 
 	err = updateSignaturesIfApplicable(signaturesFile, srcConfig, currentSignatures)
@@ -955,9 +955,9 @@ func hydrateFromLocalSource(fileHydrationState map[string]bool, newSourceDir str
 // Will alter `currentSignatures`.
 func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir string, srcConfig sourceRetrievalConfiguration, skipSignatureHandling bool, currentSignatures map[string]string) {
 	const (
-		downloadRetryAttempts = 10
-		failureBackoffExp = 2.0
-		downloadRetryDuration = time.Second
+		downloadRetryAttempts  = 10
+		failureBackoffExponent = 2.0
+		downloadRetryDuration  = time.Second
 	)
 
 	for fileName, alreadyHydrated := range fileHydrationState {
@@ -978,7 +978,7 @@ func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir st
 			}
 
 			return err
-		}, downloadRetryAttempts, downloadRetryDuration, failureBackoffExp)
+		}, downloadRetryAttempts, downloadRetryDuration, failureBackoffExponent)
 
 		if err != nil {
 			continue
