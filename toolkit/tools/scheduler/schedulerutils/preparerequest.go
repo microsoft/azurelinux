@@ -16,6 +16,17 @@ import (
 // ConvertNodesToRequests converts a slice of nodes into a slice of build requests.
 // - It will determine if the cache can be used for prebuilt nodes.
 // - It will group similar build nodes together into AncillaryNodes.
+//
+// Explanation of handling of the test nodes:
+//  1. The virtual B -> T edge guarantees the build node are unblocked and analyzed first.
+//  2. Once the build node is unblocked, analyze its partner test node in partnerTestNodesToRequest().
+//     We remove the virtual edge and the test node either gets immediately queued or is blocked on some extra dependencies.
+//     Blocking is decided by canUseCacheForNode().
+//  3. If the test node ends up being blocked, it gets re-analyzed later once its dependencies are done.
+//     The test nodes unblocked this way end up inside the 'testNodes' list in ConvertNodesToRequests()
+//     and are queued for building in the testNodesToRequests() function.
+//     At this point the partner build nodes for these test nodes have either already finished building or are being built,
+//     thus the check for active and cached SRPMs inside testNodesToRequests().
 func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, nodesToBuild []*pkggraph.PkgNode, packagesToRebuild []*pkgjson.PackageVer, buildState *GraphBuildState, isCacheAllowed bool) (requests []*BuildRequest) {
 	timestamp.StartEvent("generate requests", nil)
 	defer timestamp.StopEvent(nil)
