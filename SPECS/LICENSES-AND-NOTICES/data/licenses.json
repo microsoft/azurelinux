@@ -747,6 +747,7 @@
                 "libtnc",
                 "libtomcrypt",
                 "libtommath",
+                "libtraceevent",
                 "libtranslit",
                 "libucil",
                 "libunicap",
