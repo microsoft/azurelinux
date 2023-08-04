@@ -1,8 +1,8 @@
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 %define version_main %(echo %{version} | cut -d. -f-2)
 %global so_version 200
-%global with_mpich 0
-%global with_openmpi 0
+%global with_mpich 1
+%global with_openmpi 1
 %if %{with_mpich}
 %global mpi_list mpich
 %endif
@@ -12,7 +12,7 @@
 Summary:        A general purpose library and file format for storing scientific data
 Name:           hdf5
 Version:        1.12.1
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -409,6 +409,9 @@ done
 
 
 %changelog
+* Fri Aug 04 2023 Archana Choudhary <archana1@microsoft.com> - 1.12.1-12
+- Enable openmpi and mpich support
+
 * Tue Nov 01 2022 Riken Maharjan <rmaharjan@microsoft.com> - 1.12.1-11
 - License verified
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
