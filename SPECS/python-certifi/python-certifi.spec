@@ -1,4 +1,5 @@
 %global certs_bundle_path %{_sysconfdir}/pki/tls/certs/ca-bundle.crt
+
 Summary:        Python package for providing Mozilla's CA Bundle
 Name:           python-certifi
 Version:        2023.05.07
@@ -9,8 +10,12 @@ Distribution:   Mariner
 URL:            https://certifi.io/
 Source:         https://github.com/certifi/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
 Patch0:         certifi-2022.12.07-use-system-cert.patch
-BuildRequires:  python3-devel
+
 BuildArch:      noarch
+
+BuildRequires:  python3-devel
+BuildRequires:  python3-wheel
+
 %if %{with_check}
 BuildRequires:  ca-certificates-base
 BuildRequires:  python3-pytest
@@ -23,7 +28,6 @@ instead. For more details on this system, see the 'ca-certificates' package.
 
 %package -n python3-certifi
 Summary:        %{summary}
-Requires:       ca-certificates
 
 %description -n python3-certifi
 This Azure Linux package does not include its own certificate
