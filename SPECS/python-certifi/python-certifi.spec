@@ -42,14 +42,14 @@ This package provides the Python 3 certifi library.
 # Remove bundled root certificates collection
 rm -rf certifi/*.pem
 
-%{generate_buildrequires}
-%{pyproject_buildrequires}
+%generate_buildrequires
+%pyproject_buildrequires
 
 %build
-%{pyproject_wheel}
+%pyproject_wheel
 
 %install
-%{pyproject_install}
+%pyproject_install
 %pyproject_save_files certifi
 
 %check
