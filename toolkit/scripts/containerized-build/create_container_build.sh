@@ -50,7 +50,8 @@ build_chroot() {
 
 build_tools() {
     pushd "${repo_path}/toolkit"
-    echo "Building tools..."
+    echo "Building required tools..."
+    make go-srpmpacker REBUILD_TOOLS=y > /dev/null
     make go-depsearch REBUILD_TOOLS=y > /dev/null
     make go-grapher REBUILD_TOOLS=y > /dev/null
     make go-specreader REBUILD_TOOLS=y > /dev/null
@@ -101,17 +102,22 @@ cd "${script_dir}"  || { echo "ERROR: Could not change directory to ${script_dir
 # Get Mariner GitHub branch at $repo_path
 repo_branch=$(git -C ${repo_path} rev-parse --abbrev-ref HEAD)
 
-#Generate splash text based on mode
+# Generate text based on mode (Use figlet to generate splash text once available on Mariner)
 if [[ "${mode}" == "build" ]]; then
-    figlet "Mariner Builder!" > ${tmp_dir}/splash.txt
+    echo -e "\033[31m -----------------------------------------------------------------------------------------\033[0m" > ${tmp_dir}/splash.txt
+    echo -e "\033[31m ----------------------------------- MARINER BUILDER ! ----------------------------------- \033[0m" >> ${tmp_dir}/splash.txt
+    echo -e "\033[31m -----------------------------------------------------------------------------------------\033[0m" >> ${tmp_dir}/splash.txt
 else
-    figlet "Mariner Tester!" > ${tmp_dir}/splash.txt
+    echo -e "\033[31m -----------------------------------------------------------------------------------------\033[0m" > ${tmp_dir}/splash.txt
+    echo -e "\033[31m ----------------------------------- MARINER TESTER ! ------------------------------------ \033[0m" >> ${tmp_dir}/splash.txt
+    echo -e "\033[31m -----------------------------------------------------------------------------------------\033[0m" >> ${tmp_dir}/splash.txt
 fi
 
 # ============ Populate SRPMS ============
 # Populate ${repo_path}/build/INTERMEDIATE_SRPMS with SRPMs, that can be used to build RPMs in the container
 pushd "${repo_path}/toolkit"
 echo "Populating Intermediate SRPMs..."
+if [[ ( ! -f "${repo_path}/toolkit/out/tools/srpmpacker" ) ]]; then build_tools; fi
 make input-srpms SRPM_FILE_SIGNATURE_HANDLING="update" > /dev/null
 popd
 
