@@ -1,51 +1,70 @@
+%global certs_bundle_path %{_sysconfdir}/pki/tls/certs/ca-bundle.crt
 Summary:        Python package for providing Mozilla's CA Bundle
 Name:           python-certifi
-Version:        2022.12.07
+Version:        2023.05.07
 Release:        1%{?dist}
 License:        MPL-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Group:          Development/Languages/Python
-URL:            https://github.com/certifi
-#Source0:       https://github.com/certifi/python-certifi/archive/refs/tags/%{version}.tar.gz
-Source0:        certifi-%{version}.tar.gz
-BuildArch:      noarch
-
-%description
-Python package for providing Mozilla's CA Bundle
-
-%package -n     python3-certifi
-Summary:        Python package for providing Mozilla's CA Bundle
+URL:            https://certifi.io/
+Source:         https://github.com/certifi/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
+Patch0:         certifi-2022.12.07-use-system-cert.patch
 BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
+BuildArch:      noarch
 %if %{with_check}
-BuildRequires:  python3-pip
+BuildRequires:  ca-certificates-base
+BuildRequires:  python3-pytest
 %endif
 
+%description
+This Azure Linux package does not include its own certificate
+collection. It reads the system shared certificate trust collection
+instead. For more details on this system, see the 'ca-certificates' package.
+
+%package -n python3-certifi
+Summary:        %{summary}
+Requires:       ca-certificates
+
 %description -n python3-certifi
-Certifi is a carefully curated collection of
-Root Certificates for validating the trustworthiness of
-SSL certificates while verifying the identity of TLS hosts
+This Azure Linux package does not include its own certificate
+collection. It reads the system shared certificate trust collection
+instead. For more details on this system, see the 'ca-certificates' package.
+
+This package provides the Python 3 certifi library.
 
 %prep
-%autosetup -n python-certifi-%{version}
+%autosetup -p1
+
+# Remove bundled root certificates collection
+rm -rf certifi/*.pem
+
+%{generate_buildrequires}
+%{pyproject_buildrequires}
 
 %build
-%py3_build
+%{pyproject_wheel}
 
 %install
-%py3_install
+%{pyproject_install}
+%pyproject_save_files certifi
 
 %check
-pip3 install pytest
-%pytest
+# sanity check
+export PYTHONPATH=%{buildroot}%{python3_sitelib}
+test $(python3 -m certifi) == %{certs_bundle_path}
+test $(python3 -c 'import certifi; print(certifi.where())') == %{certs_bundle_path}
+python3 -c 'import certifi; print(certifi.contents())' > contents
+diff --ignore-blank-lines %{certs_bundle_path} contents
+# upstream tests
+%pytest -v
 
-%files -n python3-certifi
-%defattr(-,root,root,-)
-%license LICENSE
-%{python3_sitelib}/*
+%files -n python3-certifi -f %{pyproject_files}
+%doc README.rst
 
 %changelog
+* Fri Aug 04 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2023.05.07-1
+- Switching to Fedora 39 implementation of the spec (license: MIT).
+
 * Tue Jan 24 2023 Muhammad Falak <mwani@microsoft.com> - 2022.12.07-1
 - Bump version to 2022.12.07 to address CVE-2022-23491
 
