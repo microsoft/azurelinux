@@ -1,5 +1,3 @@
-%global certs_bundle_path %{_sysconfdir}/pki/tls/certs/ca-bundle.crt
-
 Summary:        Python package for providing Mozilla's CA Bundle
 Name:           python-certifi
 Version:        2023.05.07
@@ -14,6 +12,7 @@ Patch0:         certifi-2022.12.07-use-system-cert.patch
 BuildArch:      noarch
 
 BuildRequires:  python3-devel
+BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
 
 %if %{with_check}
@@ -53,13 +52,6 @@ rm -rf certifi/*.pem
 %pyproject_save_files certifi
 
 %check
-# sanity check
-export PYTHONPATH=%{buildroot}%{python3_sitelib}
-test $(python3 -m certifi) == %{certs_bundle_path}
-test $(python3 -c 'import certifi; print(certifi.where())') == %{certs_bundle_path}
-python3 -c 'import certifi; print(certifi.contents())' > contents
-diff --ignore-blank-lines %{certs_bundle_path} contents
-# upstream tests
 %pytest -v
 
 %files -n python3-certifi -f %{pyproject_files}
@@ -67,6 +59,7 @@ diff --ignore-blank-lines %{certs_bundle_path} contents
 
 %changelog
 * Fri Aug 04 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2023.05.07-1
+- Removing bundled certificates.
 - Switching to Fedora 39 implementation of the spec (license: MIT).
 
 * Tue Jan 24 2023 Muhammad Falak <mwani@microsoft.com> - 2022.12.07-1
