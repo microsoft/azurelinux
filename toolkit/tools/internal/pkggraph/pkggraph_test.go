@@ -791,7 +791,7 @@ func TestGoalWithLevelOne(t *testing.T) {
 		pkgBRun,
 	}
 	checkEqualComponents(t, expectedGoalNodes, nodesInGoal)
-	expectedGoalPackages2 := []*PkgNode{
+	expectedGoalPackages := []*PkgNode{
 		pkgBRun,
 		pkgBBuild,
 		pkgCRun,
@@ -800,7 +800,7 @@ func TestGoalWithLevelOne(t *testing.T) {
 		pkgD3Unresolved,
 		goal,
 	}
-	checkEqualComponents(t, expectedGoalPackages2, g.AllNodesFrom(goal))
+	checkEqualComponents(t, expectedGoalPackages, g.AllNodesFrom(goal))
 }
 
 func TestGoalWithLevelTwo(t *testing.T) {
@@ -821,7 +821,7 @@ func TestGoalWithLevelTwo(t *testing.T) {
 		pkgBRun,
 	}
 	checkEqualComponents(t, expectedGoalNodes, nodesInGoal)
-	expectedGoalPackages2 := []*PkgNode{
+	expectedGoalPackages := []*PkgNode{
 		pkgARun,
 		pkgABuild,
 		pkgBRun,
@@ -833,7 +833,7 @@ func TestGoalWithLevelTwo(t *testing.T) {
 		pkgD3Unresolved,
 		goal,
 	}
-	checkEqualComponents(t, expectedGoalPackages2, g.AllNodesFrom(goal))
+	checkEqualComponents(t, expectedGoalPackages, g.AllNodesFrom(goal))
 }
 
 // Add a meta node which should link the two disconnected graph components in the test graph
