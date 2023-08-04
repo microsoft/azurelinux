@@ -1,17 +1,23 @@
 Summary:        Kubernetes Custom, Resource, and External Metric APIs implemented to work with Prometheus.
 Name:           prometheus-adapter
 Version:        0.10.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/kubernetes-sigs/prometheus-adapter
 Source0:        https://github.com/kubernetes-sigs/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  golang
-BuildRequires:  prometheus
 
 %description
 Implementation of Prometheus via Kubernetes Custom, Resource, and External Metric API.
+
+%package docs
+Summary:        prometheus-adapter docs
+Requires:       %{name} = %{version}-%{release}
+
+%description docs
+Documentation for prometheus-adapter
 
 %prep
 %autosetup -p1
@@ -28,11 +34,17 @@ make test
 
 %files
 %license LICENSE NOTICE
-%doc docs CONTRIBUTING.md OWNERS SECURITY.md SECURITY_CONTACTS VERSION code-of-conduct.md
-%doc README.md RELEASE.md
 %{_bindir}/*
 
+%files docs
+%doc docs CONTRIBUTING.md OWNERS SECURITY.md SECURITY_CONTACTS VERSION code-of-conduct.md
+%doc README.md RELEASE.md
+
 %changelog
+* Wed Jul 26 2023 Osama Esmail <osamaesmail@mirosoft.com> - 0.10.0-7
+- Removing `prometheus` from BuildRequires
+- Making `docs` a separate package
+
 * Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.10.0-6
 - Bump release to rebuild with go 1.19.11
 

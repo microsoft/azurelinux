@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"runtime"
 	"sync"
 	"time"
@@ -20,7 +21,6 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/scheduler/buildagents"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/scheduler/schedulerutils"
 
-	"github.com/juliangruber/go-intersect"
 	"golang.org/x/sys/unix"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -63,21 +63,21 @@ var (
 	imageConfig = app.Flag("image-config-file", "Optional image config file to extract a package list from.").String()
 	baseDirPath = app.Flag("base-dir", "Base directory for relative file paths from the config. Defaults to config's directory.").ExistingDir()
 
-	distTag                = app.Flag("dist-tag", "The distribution tag SRPMs will be built with.").Required().String()
-	distroReleaseVersion   = app.Flag("distro-release-version", "The distro release version that the SRPM will be built with.").Required().String()
-	distroBuildNumber      = app.Flag("distro-build-number", "The distro build number that the SRPM will be built with.").Required().String()
-	rpmmacrosFile          = app.Flag("rpmmacros-file", "Optional file path to an rpmmacros file for rpmbuild to use.").ExistingFile()
-	buildAttempts          = app.Flag("build-attempts", "Sets the number of times to try building a package.").Default(defaultBuildAttempts).Int()
-	checkAttempts          = app.Flag("check-attempts", "Sets the minimum number of times to test a package if the tests fail.").Default(defaultCheckAttempts).Int()
-	runCheck               = app.Flag("run-check", "Run the check during package builds.").Bool()
-	noCleanup              = app.Flag("no-cleanup", "Whether or not to delete the chroot folder after the build is done").Bool()
-	noCache                = app.Flag("no-cache", "Disables using prebuilt cached packages.").Bool()
-	stopOnFailure          = app.Flag("stop-on-failure", "Stop on failed build").Bool()
-	toolchainManifest      = app.Flag("toolchain-manifest", "Path to a list of RPMs which are created by the toolchain. RPMs from this list will are considered 'prebuilt' and will not be rebuilt").ExistingFile()
-	deltaBuild             = app.Flag("delta-build", "Enable delta build using remote cached packages.").Bool()
-	useCcache              = app.Flag("use-ccache", "Automatically install and use ccache during package builds").Bool()
-	allowToolchainRebuilds = app.Flag("allow-toolchain-rebuilds", "Allow toolchain packages to rebuild without causing an error.").Bool()
-	maxCPU                 = app.Flag("max-cpu", "Max number of CPUs used for package building").Default("").String()
+	distTag                    = app.Flag("dist-tag", "The distribution tag SRPMs will be built with.").Required().String()
+	distroReleaseVersion       = app.Flag("distro-release-version", "The distro release version that the SRPM will be built with.").Required().String()
+	distroBuildNumber          = app.Flag("distro-build-number", "The distro build number that the SRPM will be built with.").Required().String()
+	rpmmacrosFile              = app.Flag("rpmmacros-file", "Optional file path to an rpmmacros file for rpmbuild to use.").ExistingFile()
+	buildAttempts              = app.Flag("build-attempts", "Sets the number of times to try building a package.").Default(defaultBuildAttempts).Int()
+	checkAttempts              = app.Flag("check-attempts", "Sets the minimum number of times to test a package if the tests fail.").Default(defaultCheckAttempts).Int()
+	runCheck                   = app.Flag("run-check", "Run the check during package builds.").Bool()
+	noCleanup                  = app.Flag("no-cleanup", "Whether or not to delete the chroot folder after the build is done").Bool()
+	noCache                    = app.Flag("no-cache", "Disables using prebuilt cached packages.").Bool()
+	stopOnFailure              = app.Flag("stop-on-failure", "Stop on failed build").Bool()
+	toolchainManifest          = app.Flag("toolchain-manifest", "Path to a list of RPMs which are created by the toolchain. RPMs from this list will are considered 'prebuilt' and will not be rebuilt").ExistingFile()
+	optimizeWithCachedImplicit = app.Flag("optimize-with-cached-implicit", "Optimize the build process by allowing cached implicit packages to be used to optimize the initial build graph instead of waiting for a real package build to provide the nodes.").Bool()
+	useCcache                  = app.Flag("use-ccache", "Automatically install and use ccache during package builds").Bool()
+	allowToolchainRebuilds     = app.Flag("allow-toolchain-rebuilds", "Allow toolchain packages to rebuild without causing an error.").Bool()
+	maxCPU                     = app.Flag("max-cpu", "Max number of CPUs used for package building").Default("").String()
 
 	validBuildAgentFlags = []string{buildagents.TestAgentFlag, buildagents.ChrootAgentFlag}
 	buildAgent           = app.Flag("build-agent", "Type of build agent to build packages with.").PlaceHolder(exe.PlaceHolderize(validBuildAgentFlags)).Required().Enum(validBuildAgentFlags...)
@@ -120,40 +120,9 @@ func main() {
 		logger.Log.Fatalf("Failed to read DOT graph with error:\n%s", err)
 	}
 
-	// Generate the list of packages that need to be built.
-	// If none are requested then all packages will be built.
-	packagesToBuild, err := schedulerutils.PackageNamesToBuiltPackages(exe.ParseListArgument(*pkgsToBuild), dependencyGraph)
+	finalPackagesToBuild, packagesToRebuild, packagesToIgnore, err := schedulerutils.ParseAndGeneratePackageList(dependencyGraph, exe.ParseListArgument(*pkgsToBuild), exe.ParseListArgument(*pkgsToRebuild), exe.ParseListArgument(*pkgsToIgnore), *imageConfig, *baseDirPath)
 	if err != nil {
-		logger.Log.Fatalf("Unable to find build nodes for the packages to build, error:\n%s.", err)
-	}
-
-	packagesToRebuild, err := schedulerutils.PackageNamesToBuiltPackages(exe.ParseListArgument(*pkgsToRebuild), dependencyGraph)
-	if err != nil {
-		logger.Log.Fatalf("Unable to find build nodes for the packages to rebuild, error:\n%s.", err)
-	}
-
-	prunedIgnoredPackageNames, unknownNames, err := schedulerutils.PruneUnknownPackages(exe.ParseListArgument(*pkgsToIgnore), dependencyGraph)
-	if err != nil {
-		logger.Log.Fatalf("Failed to prune unknown package/spec names from the ignored list, error:\n%s.", err)
-	}
-
-	if len(unknownNames) != 0 {
-		logger.Log.Warnf("The following ignored items matched neither a spec nor a package name: %v.", unknownNames)
-	}
-
-	packagesToIgnore, err := schedulerutils.PackageNamesToBuiltPackages(prunedIgnoredPackageNames, dependencyGraph)
-	if err != nil {
-		logger.Log.Fatalf("Unable to find build nodes for the ignored packages, error:\n%s.", err)
-	}
-
-	ignoredAndRebuiltPackages := intersect.Hash(packagesToIgnore, packagesToRebuild)
-	if len(ignoredAndRebuiltPackages) != 0 {
-		logger.Log.Fatalf("Can't ignore and force a rebuild of a package at the same time. Abusing packages: %v.", ignoredAndRebuiltPackages)
-	}
-
-	finalPackagesToBuild, err := schedulerutils.CalculatePackagesToBuild(packagesToBuild, packagesToRebuild, *imageConfig, *baseDirPath, dependencyGraph)
-	if err != nil {
-		logger.Log.Fatalf("Unable to generate package build list, error:\n%s.", err)
+		logger.Log.Fatalf("Failed to generate package list with error:\n%s", err)
 	}
 
 	toolchainPackages, err := schedulerutils.ReadReservedFilesList(*toolchainManifest)
@@ -205,7 +174,7 @@ func main() {
 	signal.Notify(signals, unix.SIGINT, unix.SIGTERM)
 	go cancelBuildsOnSignal(signals, agent)
 
-	err = buildGraph(*inputGraphFile, *outputGraphFile, agent, *workers, *buildAttempts, *checkAttempts, *stopOnFailure, !*noCache, finalPackagesToBuild, packagesToRebuild, packagesToIgnore, toolchainPackages, *deltaBuild, *allowToolchainRebuilds)
+	err = buildGraph(*inputGraphFile, *outputGraphFile, agent, *workers, *buildAttempts, *checkAttempts, *stopOnFailure, !*noCache, finalPackagesToBuild, packagesToRebuild, packagesToIgnore, toolchainPackages, *optimizeWithCachedImplicit, *allowToolchainRebuilds)
 	if err != nil {
 		logger.Log.Fatalf("Unable to build package graph.\nFor details see the build summary section above.\nError: %s.", err)
 	}
@@ -233,11 +202,15 @@ func cancelBuildsOnSignal(signals chan os.Signal, agent buildagents.BuildAgent) 
 
 // buildGraph builds all packages in the dependency graph requested.
 // It will save the resulting graph to outputFile.
-func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, workers, buildAttempts int, checkAttempts int, stopOnFailure, canUseCache bool, packagesToBuild, packagesToRebuild, ignoredPackages []*pkgjson.PackageVer, toolchainPackages []string, deltaBuild bool, allowToolchainRebuilds bool) (err error) {
+func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, workers, buildAttempts int, checkAttempts int, stopOnFailure, canUseCache bool, packagesToBuild, packagesToRebuild, ignoredPackages []*pkgjson.PackageVer, toolchainPackages []string, optimizeWithCachedImplicit bool, allowToolchainRebuilds bool) (err error) {
 	// graphMutex guards pkgGraph from concurrent reads and writes during build.
 	var graphMutex sync.RWMutex
 
-	isGraphOptimized, pkgGraph, goalNode, err := schedulerutils.InitializeGraph(inputFile, packagesToBuild, deltaBuild)
+	// If optimizeWithCachedImplicit is true, we can use the cached implicit dependencies to aggressively prune the graph during the first pass. We will still
+	// try to avoid using the cached implicit dependencies until we have no other choice during the build, but since the graph is pruned, we will
+	// avoid building packages that are not needed. Obviously we can only do this if the cache is enabled.
+	allowEarlyImplicitOptimization := (canUseCache && optimizeWithCachedImplicit)
+	_, pkgGraph, goalNode, err := schedulerutils.InitializeGraphFromFile(inputFile, packagesToBuild, allowEarlyImplicitOptimization)
 	if err != nil {
 		return
 	}
@@ -249,7 +222,7 @@ func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, work
 	logger.Log.Infof("Building %d nodes with %d workers", numberOfNodes, workers)
 
 	// After this call pkgGraph will be given to multiple routines and accessing it requires acquiring the mutex.
-	builtGraph, err := buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache, packagesToRebuild, pkgGraph, &graphMutex, goalNode, channels, toolchainPackages, deltaBuild, allowToolchainRebuilds)
+	builtGraph, err := buildAllNodes(stopOnFailure, canUseCache, packagesToRebuild, pkgGraph, &graphMutex, goalNode, channels, toolchainPackages, allowToolchainRebuilds)
 
 	if builtGraph != nil {
 		graphMutex.RLock()
@@ -302,7 +275,7 @@ func startWorkerPool(agent buildagents.BuildAgent, workers, buildAttempts, check
 // - Attempts to satisfy any unresolved dynamic dependencies with new implicit provides from the build result.
 // - Attempts to subgraph the graph to only contain the requested packages if possible.
 // - Repeat.
-func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesToRebuild []*pkgjson.PackageVer, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, goalNode *pkggraph.PkgNode, channels *schedulerChannels, reservedFiles []string, deltaBuild bool, allowToolchainRebuilds bool) (builtGraph *pkggraph.PkgGraph, err error) {
+func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild []*pkgjson.PackageVer, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, goalNode *pkggraph.PkgNode, channels *schedulerChannels, reservedFiles []string, allowToolchainRebuilds bool) (builtGraph *pkggraph.PkgGraph, err error) {
 	var (
 		// stopBuilding tracks if the build has entered a failed state and this routine should stop as soon as possible.
 		stopBuilding bool
@@ -310,7 +283,13 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesTo
 		// Local packages are preferred over cached remotes ones to satisfy these unresolved dependencies, however
 		// the scheduler does not know what packages provide which implicit provides until the packages have been built.
 		// Therefore the scheduler will attempt to build all possible packages without consuming any cached dynamic dependencies first.
+
+		// Even when --optimize-with-cached-implicit is passed to the tool we will want to wait until all local packages have
+		// been built before using cached implicit provides. This is because the local packages may provide updated versions
+		// of the cached implicit provides. --optimize-with-cached-implicit is instead used to aggressively optimize the graph
+		// by using cached implicit provides to satisfy unresolved dynamic dependencies during the first pass of the optimizer.
 		useCachedImplicit bool
+		isGraphOptimized  bool
 	)
 
 	// Start the build at the leaf nodes.
@@ -322,7 +301,7 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesTo
 		logger.Log.Debugf("Found %d unblocked nodes", len(nodesToBuild))
 
 		// Each node that is ready to build must be converted into a build request and submitted to the worker pool.
-		newRequests := schedulerutils.ConvertNodesToRequests(pkgGraph, graphMutex, nodesToBuild, packagesToRebuild, buildState, canUseCache, deltaBuild)
+		newRequests := schedulerutils.ConvertNodesToRequests(pkgGraph, graphMutex, nodesToBuild, packagesToRebuild, buildState, canUseCache)
 		for _, req := range newRequests {
 			buildState.RecordBuildRequest(req)
 			// Decide which priority the build should be. Generally we want to get any remote or prebuilt nodes out of the
@@ -338,11 +317,11 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesTo
 				fallthrough
 			case pkggraph.TypePureMeta:
 				fallthrough
-			case pkggraph.TypeRun:
+			case pkggraph.TypeLocalRun:
 				fallthrough
-			case pkggraph.TypeRemote:
+			case pkggraph.TypeRemoteRun:
 				fallthrough
-			case pkggraph.TypeBuild:
+			case pkggraph.TypeLocalBuild:
 				fallthrough
 			default:
 				channels.Requests <- req
@@ -350,9 +329,9 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesTo
 		}
 		nodesToBuild = nil
 
-		// If there are no active builds running try enabling cached packages for unresolved dynamic dependencies to unblocked more nodes.
-		// Otherwise there is nothing left that can be built.
-		if len(buildState.ActiveBuilds()) == 0 {
+		// If there are no active builds running or results waiting to check try enabling cached packages for unresolved
+		// dynamic dependencies to unblock more nodes. Otherwise, there is nothing left that can be built.
+		if len(buildState.ActiveBuilds()) == 0 && len(channels.Results) == 0 {
 			if useCachedImplicit {
 				err = fmt.Errorf("could not build all packages")
 				break
@@ -372,9 +351,21 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesTo
 
 		if !stopBuilding {
 			if res.Err == nil {
+				if res.Node.Type == pkggraph.TypeLocalBuild && res.WasDelta {
+					logger.Log.Tracef("This is a delta result, update the graph with the new delta files for '%v'.", res.Node)
+					// We will need to update the graph with paths to any delta files that were actually rebuilt.
+					err = setAssociatedDeltaPaths(res, pkgGraph, graphMutex)
+					if err != nil {
+						// Failures to manipulate the graph are fatal. The ancillary delta nodes may be in an invalid state
+						// and we won't be able to track which RPMs were built or used delta files.
+						err = fmt.Errorf("error setting delta paths for ancillary nodes:\n%w", err)
+						stopBuilding = true
+					}
+				}
+
 				// If the graph has already been optimized and is now solvable without any additional information
 				// then skip processing any new implicit provides.
-				if !isGraphOptimized {
+				if !stopBuilding && !isGraphOptimized {
 					var (
 						didOptimize bool
 						newGraph    *pkggraph.PkgGraph
@@ -385,7 +376,6 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesTo
 						// Failures to manipulate the graph are fatal.
 						// There is no guarantee the graph is still a directed acyclic graph and is solvable.
 						stopBuilding = true
-						stopBuild(channels, buildState)
 					} else if didOptimize {
 						isGraphOptimized = true
 						// Replace the graph and goal node pointers.
@@ -400,8 +390,18 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesTo
 			} else if stopOnFailure {
 				stopBuilding = true
 				err = res.Err
-				stopBuild(channels, buildState)
 			}
+		}
+
+		// stopBuilding will be set to true here only if the build has failed. We also set it to true if the goal node is available
+		// but only after this check is made. In that case we will call doneBuild() instead.
+		if stopBuilding {
+			// If the build has failed, stop all outstanding builds.
+			stopBuild(channels, buildState)
+			err = fmt.Errorf("fatal error building package graph:\n%w", err)
+			// Save out the current graph state for debugging
+			builtGraph = pkgGraph
+			return
 		}
 
 		// If the goal node is available, mark the build as stopping.
@@ -421,7 +421,7 @@ func buildAllNodes(stopOnFailure, isGraphOptimized, canUseCache bool, packagesTo
 			}
 		}
 
-		if res.Node.Type == pkggraph.TypeBuild {
+		if res.Node.Type == pkggraph.TypeLocalBuild {
 			logger.Log.Infof("%d currently active build(s): %v.", activeSRPMsCount, activeSRPMs)
 		}
 
@@ -460,6 +460,47 @@ func updateGraphWithImplicitProvides(res *schedulerutils.BuildResult, pkgGraph *
 		if subgraphErr == nil {
 			logger.Log.Infof("Created solvable subgraph with new implicit provide information")
 			didOptimize = true
+		}
+	}
+
+	return
+}
+
+// setAssociatedDeltaPaths sets the RpmPath for all of the request's ancillary nodes (both build and run) to the actual
+// RPM paths. A delta node will normally point at the cached RPM path, but we want to point it at the actual RPM if we built it.
+// This function should only be called on delta build nodes.
+func setAssociatedDeltaPaths(res *schedulerutils.BuildResult, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex) (err error) {
+	graphMutex.Lock()
+	defer graphMutex.Unlock()
+
+	// Build map of basename to full path for built files. This will allow us to find the actual RPM path we built for
+	// any given .rpm file built from our ancillary nodes.
+	builtFileMap := make(map[string]string)
+	for _, builtFile := range res.BuiltFiles {
+		// We should not expect to see multiple built files with the same basename
+		baseName := filepath.Base(builtFile)
+		logger.Log.Tracef("Built delta file: %s", builtFile)
+		builtFileMap[baseName] = builtFile
+	}
+
+	// Now we can scan for all the run nodes that use the cached RPM path and update them to the actual RPM path.
+	for _, node := range pkgGraph.AllRunNodes() {
+		// Get base path of the .rpm for the node and find the built file in the map
+		rpmBasePath := filepath.Base(node.RpmPath)
+		builtFile, ok := builtFileMap[rpmBasePath]
+		if ok {
+			// We only care about nodes that are deltas
+			if node.State == pkggraph.StateDelta {
+				// Update the node to point at the actual RPM path from our map of built files
+				logger.Log.Debugf("Updating delta run node '%s' path from '%s' to '%s'", node, node.RpmPath, builtFile)
+				node.RpmPath = builtFile
+			} else if !node.Implicit && node.RpmPath != builtFile {
+				// Implicit nodes will point to the cached RPM path, but we don't care about them and will update their
+				// paths to the actual RPM path in a later step so ignore them here.
+				// Sanity check that any non-delta node has an exact match to the real RPM path
+				err = fmt.Errorf("non-delta run node '%s' has unexpected path '%s' (expected non-delta path of '%s')", node, node.RpmPath, builtFile)
+				return
+			}
 		}
 	}
 
