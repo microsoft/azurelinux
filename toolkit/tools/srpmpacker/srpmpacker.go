@@ -772,6 +772,7 @@ func packSingleSPEC(specFile, srpmFile, signaturesFile, buildDir, outDir, distTa
 		// Hydrate all sources. Download any missing ones not in `sourceDir`
 		err = hydrateFiles(fileTypeSource, specFile, workingDir, srcConfig, currentSignatures, defines)
 		if err != nil {
+			<-netOpsSemaphor
 			return
 		}
 		// Clear the channel to allow another operation to start
@@ -958,6 +959,7 @@ func hydrateFromLocalSource(fileHydrationState map[string]bool, newSourceDir str
 func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir string, srcConfig sourceRetrievalConfiguration, skipSignatureHandling bool, currentSignatures map[string]string) {
 	const (
 		downloadRetryAttempts = 10
+		failureBackoffExp = 2.0
 		downloadRetryDuration = time.Second
 	)
 
@@ -979,7 +981,7 @@ func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir st
 			}
 
 			return err
-		}, downloadRetryAttempts, downloadRetryDuration, 2.0)
+		}, downloadRetryAttempts, downloadRetryDuration, failureBackoffExp)
 
 		if err != nil {
 			continue

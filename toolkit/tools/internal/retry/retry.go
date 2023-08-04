@@ -14,7 +14,7 @@ func calcDelay(retryCount int, sleep time.Duration, backoffExp float64) time.Dur
 	// For example, if sleep = 1 second, backoffExp = 2.0, retryCount = 3
 	// then the delay will be 1 * (2 ^ 3) = 8 seconds.
 	expRetry := math.Pow(float64(retryCount), backoffExp)
-	return time.Duration((expRetry * float64(sleep)))
+	return time.Duration(expRetry * float64(sleep))
 }
 
 // Run runs function up to attempts times, waiting i * sleep duration before each i-th attempt.
