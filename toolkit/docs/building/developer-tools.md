@@ -10,5 +10,5 @@ cd CBL-Mariner/toolkit
 sudo make containerized-rpmbuild
 
 # To see optional arguments and usage
-sudo make containerized-rpmnbuild-help
+sudo make containerized-rpmbuild-help
 ```
