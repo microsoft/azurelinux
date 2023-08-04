@@ -366,7 +366,7 @@ cp -a %{SOURCE3} %{buildroot}%{_bindir}/%{name}-config
 %endif
 
 %changelog
-* Wed Aug 02 2023 Archana Choudhary <archana1@microsoft.com> - 3.5.2-2.cm2
+* Wed Aug 02 2023 Archana Choudhary <archana1@microsoft.com> - 3.5.2-2
 - Initial CBL-Mariner import from Fedora 35 (license: MIT).
 
 * Tue Sep 13 2022 Sandro Mani <manisandro@gmail.com> - 3.5.2-1
