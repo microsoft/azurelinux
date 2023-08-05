@@ -8,76 +8,128 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// Delay vs. retry count for mult = 1.0, delay = .1 seconds
-var expectedValuesMillis1 = []int{0, 100, 200, 300, 400, 500}
+var defaultTestTime = time.Millisecond * 100
 
-// Delay vs. retry count for exp = 2.0, delay = 0.1 seconds
-var expectedValuesMillis2 = []int{0, 100, 400, 900, 1600, 2500}
+// Tests won't run with perfect timing, so we need to allow for some fudge factor when we check maximum duration.
+var timingFudgeFactor = time.Millisecond * 100
 
-func TestCalcDelay1(t *testing.T) {
-	backoffExponentBase := 1.0
-	sleep := time.Millisecond * 100
-	for i, expected := range expectedValuesMillis1 {
+func TestZeroBase(t *testing.T) {
+	// Two failures, 0.0 multiplier, should be 0 second delay
+	base := 0.0
+	fails := 2
+	val := calculateDelay(fails, defaultTestTime, base)
+	assert.Equal(t, time.Duration(0), val)
+}
+
+func TestZeroI(t *testing.T) {
+	// Zero failures, 1.0 multiplier, should be 0 second delay
+	fails := 0
+	base := 1.0
+	val := calculateDelay(fails, defaultTestTime, base)
+	assert.Equal(t, time.Second*0, val)
+
+	// Three failures, 1.0 multiplier, should still be 0 second delay
+	fails = 3
+	base = 0.0
+	val = calculateDelay(fails, defaultTestTime, base)
+	assert.Equal(t, time.Second*0, val)
+}
+
+func TestCalcDelayBaseLinear(t *testing.T) {
+	// Delay vs. retry count for base = -1.0, delay = .1 seconds (ie legacy "linear" backoff)
+	var expectedValuesMillis1 = []int{0, 100, 200, 300, 400, 500}
+
+	// Negative base should be linear backoff
+	backoffExponentBase := -1.0
+	for failures, expected := range expectedValuesMillis1 {
 		expected := time.Duration(expected) * time.Millisecond
-		actual := calcDelay(i, sleep, backoffExponentBase)
+		actual := calculateDelay(failures, defaultTestTime, backoffExponentBase)
 		assert.Equal(t, expected, actual)
 	}
 }
 
-func TestCalcDelay2(t *testing.T) {
-	mult := 2.0
-	sleep := time.Millisecond * 100
-	for i, expected := range expectedValuesMillis2 {
+func TestCalcDelayBase2(t *testing.T) {
+	// Delay vs. retry count for base = 2.0, delay = 0.1 seconds
+	var expectedValuesMillis2 = []int{0, 100, 200, 400, 800, 1600}
+
+	base := 2.0
+	for failures, expected := range expectedValuesMillis2 {
 		expected := time.Duration(expected) * time.Millisecond
-		actual := calcDelay(i, sleep, mult)
+		actual := calculateDelay(failures, defaultTestTime, base)
 		assert.Equal(t, expected, actual)
 	}
 }
 
-func TestTotalRunTimeWithFailures1(t *testing.T) {
+func TestTotalRunTimeWithFailuresLinear(t *testing.T) {
+	base := -1.0
+	attempts := 3
 	startTime := time.Now()
 	err := RunWithExpBackoff(func() error {
 		return fmt.Errorf("test error")
-	}, 3, time.Millisecond*100, 1.0)
+	}, attempts, defaultTestTime, base)
 	endTime := time.Now()
 	assert.NotNil(t, err)
 	// Delays should be 0 seconds, <attempt>, .1 second, <attempt>, .2 seconds, <attempt>
 	// for a total of .3 seconds.
-	minDelay := time.Millisecond * 300
-	maxDelay := time.Millisecond * 500
+	idealTime := time.Millisecond * 300
+	minDelay := idealTime
+	maxDelay := idealTime + timingFudgeFactor
+	assert.GreaterOrEqual(t, endTime.Sub(startTime), minDelay)
+	assert.LessOrEqual(t, endTime.Sub(startTime), maxDelay)
+
+	// Ensure the default Run() method works the same way
+	startTime = time.Now()
+	err = Run(func() error {
+		return fmt.Errorf("test error")
+	}, attempts, defaultTestTime)
+	endTime = time.Now()
+	assert.NotNil(t, err)
 	assert.GreaterOrEqual(t, endTime.Sub(startTime), minDelay)
 	assert.LessOrEqual(t, endTime.Sub(startTime), maxDelay)
 }
 
-func TestTotalRunTimeWithFailures2(t *testing.T) {
+func TestTotalRunTimeWithFailuresBase2(t *testing.T) {
+	tries := 3
+	base := 2.0
 	startTime := time.Now()
 	err := RunWithExpBackoff(func() error {
 		return fmt.Errorf("test error")
-	}, 3, time.Millisecond*100, 2.0)
+	}, tries, defaultTestTime, base)
 	endTime := time.Now()
 	assert.NotNil(t, err)
-	// Delays should be 0 seconds, <attempt>, .1 second, <attempt>, .4 seconds, <attempt>
-	// for a total of .5 seconds.
-	minDelay := time.Millisecond * 500
-	maxDelay := time.Millisecond * 700
+	// Delays should be 0 seconds, <attempt>, .1 second, <attempt>, .2 seconds, <attempt>
+	// for a total of .3 seconds.
+	idealTime := time.Millisecond * 300
+	minDelay := idealTime
+	maxDelay := idealTime + timingFudgeFactor
 	assert.GreaterOrEqual(t, endTime.Sub(startTime), minDelay)
 	assert.LessOrEqual(t, endTime.Sub(startTime), maxDelay)
 }
 
 func TestTotalRunTimeWithSuccess(t *testing.T) {
+	tries := 3
+	base := 2.0
 	startTime := time.Now()
 	err := RunWithExpBackoff(func() error {
 		return nil
-	}, 3, time.Second, 1.0)
+	}, tries, time.Second, base)
 	endTime := time.Now()
 	assert.Nil(t, err)
 	// Delays should be 0 seconds, <attempt>
 	// for a total of 0 seconds.
-	maxDelay := time.Millisecond * 100
+	maxDelay := timingFudgeFactor
 	assert.LessOrEqual(t, endTime.Sub(startTime), maxDelay)
 }
 
-func TestZeroMult(t *testing.T) {
-	val := calcDelay(2, time.Second, 0.0)
-	assert.LessOrEqual(t, val, time.Second*2)
-}
+// func TestFoo(t *testing.T) {
+// 	const (
+// 		downloadRetryAttempts  = 5
+// 		failureBackoffExponent = 2.0
+// 		downloadRetryDuration  = time.Second
+// 	)
+// 	totalDuration := time.Duration(0)
+// 	for i := 1; i <= downloadRetryAttempts; i++ {
+// 		totalDuration += calculateDelay(i, downloadRetryDuration, failureBackoffExponent)
+// 	}
+// 	assert.Equal(t, time.Duration(1023)*time.Millisecond, totalDuration)
+// }
