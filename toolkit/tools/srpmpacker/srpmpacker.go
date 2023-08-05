@@ -68,7 +68,7 @@ const (
 const (
 	defaultBuildDir    = "./build/SRPMS"
 	defaultWorkerCount = "80"
-	defaultNetOpsCount = "4"
+	defaultNetOpsCount = "10"
 )
 
 // sourceRetrievalConfiguration holds information on where to hydrate files from.
@@ -113,7 +113,7 @@ var (
 	runCheck     = app.Flag("run-check", "Whether or not to run the spec file's check section during package build.").Bool()
 
 	workers          = app.Flag("workers", "Number of concurrent goroutines to parse with.").Default(defaultWorkerCount).Int()
-	concurrentNetOps = app.Flag("concurrent-net-ops", "Number of concurrent network operations to perform.").Default(defaultNetOpsCount).UInt()
+	concurrentNetOps = app.Flag("concurrent-net-ops", "Number of concurrent network operations to perform.").Default(defaultNetOpsCount).Uint()
 	repackAll        = app.Flag("repack", "Rebuild all SRPMs, even if already built.").Bool()
 	nestedSourcesDir = app.Flag("nested-sources", "Set if for a given SPEC, its sources are contained in a SOURCES directory next to the SPEC file.").Bool()
 
@@ -148,7 +148,6 @@ func main() {
 	if *workers <= 0 {
 		logger.Log.Fatalf("Value in --workers must be greater than zero. Found %d", *workers)
 	}
-
 
 	// Create a template configuration that all packed SRPM will be based on.
 	var templateSrcConfig sourceRetrievalConfiguration
@@ -195,7 +194,7 @@ func main() {
 	packList, err := parsePackListFile(*packListFile)
 	logger.PanicOnError(err)
 
-	err = createAllSRPMsWrapper(*specsDir, *distTag, *buildDir, *outDir, *workerTar, *workers, *concurrentNetOps, *nestedSourcesDir, *repackAll, *runCheck, packList, templateSrcConfig)
+	err = createAllSRPMsWrapper(*specsDir, *distTag, *buildDir, *outDir, *workerTar, *workers, int(*concurrentNetOps), *nestedSourcesDir, *repackAll, *runCheck, packList, templateSrcConfig)
 	logger.PanicOnError(err)
 }
 
@@ -574,6 +573,17 @@ func specsToPackWorker(requests <-chan string, results chan<- *specState, cancel
 	}
 }
 
+// drainChannel will drain a channel of any buffered values and discard them
+func drainChannel(ch <-chan struct{}) {
+	for {
+		select {
+		case <-ch:
+		default:
+			return
+		}
+	}
+}
+
 // packSRPMs will pack any SPEC files that have been marked as `toPack`.
 func packSRPMs(specStates []*specState, distTag, buildDir string, templateSrcConfig sourceRetrievalConfiguration, workers, concurrentNetOps int) (err error) {
 	tsRoot, _ := timestamp.StartEvent("packing SRPMs", nil)
@@ -605,6 +615,8 @@ func packSRPMs(specStates []*specState, distTag, buildDir string, templateSrcCon
 			logger.Log.Errorf("Failed to pack (%s). Error: %s", result.specFile, result.err)
 			err = result.err
 			close(cancel)
+			// Drain the semaphore to ensure all workers can exit quickly
+			drainChannel(netOpsSemaphore)
 			break
 		}
 
@@ -757,23 +769,15 @@ func packSingleSPEC(specFile, srpmFile, signaturesFile, buildDir, outDir, distTa
 	}
 
 	// Hydrate all patches. Exclusively using `sourceDir`
-	err = hydrateFiles(fileTypePatch, specFile, workingDir, srcConfig, currentSignatures, defines)
+	err = hydrateFiles(fileTypePatch, specFile, workingDir, srcConfig, currentSignatures, defines, nil)
 	if err != nil {
 		return
 	}
 
-	{
-		// Limit the number of concurrent network operations by pushing a struct{} into the channel. This will block until
-		// another operation completes and removes the struct{} from the channel.
-		netOpsSemaphore <- struct{}{}
-		// Hydrate all sources. Download any missing ones not in `sourceDir`
-		err = hydrateFiles(fileTypeSource, specFile, workingDir, srcConfig, currentSignatures, defines)
-		if err != nil {
-			<-netOpsSemaphore
-			return
-		}
-		// Clear the channel to allow another operation to start
-		<-netOpsSemaphore
+	// Hydrate all sources. Download any missing ones not in `sourceDir`
+	err = hydrateFiles(fileTypeSource, specFile, workingDir, srcConfig, currentSignatures, defines, netOpsSemaphore)
+	if err != nil {
+		return
 	}
 
 	err = updateSignaturesIfApplicable(signaturesFile, srcConfig, currentSignatures)
@@ -833,7 +837,7 @@ func readSPECTagArray(specFile, sourceDir, tag string, arch string, defines map[
 
 // hydrateFiles will attempt to retrieve all sources needed to build an SRPM from a SPEC.
 // Will alter `currentSignatures`,
-func hydrateFiles(fileTypeToHydrate fileType, specFile, workingDir string, srcConfig sourceRetrievalConfiguration, currentSignatures, defines map[string]string) (err error) {
+func hydrateFiles(fileTypeToHydrate fileType, specFile, workingDir string, srcConfig sourceRetrievalConfiguration, currentSignatures, defines map[string]string, netOpsSemaphore chan struct{}) (err error) {
 	const (
 		downloadMissingPatchFiles = false
 		skipPatchSignatures       = true
@@ -894,7 +898,7 @@ func hydrateFiles(fileTypeToHydrate fileType, specFile, workingDir string, srcCo
 	}
 
 	if hydrateRemotely && srcConfig.sourceURL != "" {
-		hydrateFromRemoteSource(fileHydrationState, newSourceDir, srcConfig, skipSignatureHandling, currentSignatures)
+		hydrateFromRemoteSource(fileHydrationState, newSourceDir, srcConfig, skipSignatureHandling, currentSignatures, netOpsSemaphore)
 	}
 
 	for fileNeeded, alreadyHydrated := range fileHydrationState {
@@ -953,11 +957,13 @@ func hydrateFromLocalSource(fileHydrationState map[string]bool, newSourceDir str
 
 // hydrateFromRemoteSource will update fileHydrationState.
 // Will alter `currentSignatures`.
-func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir string, srcConfig sourceRetrievalConfiguration, skipSignatureHandling bool, currentSignatures map[string]string) {
+func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir string, srcConfig sourceRetrievalConfiguration, skipSignatureHandling bool, currentSignatures map[string]string, netOpsSemaphore chan struct{}) {
 	const (
-		downloadRetryAttempts  = 10
-		failureBackoffExponent = 2.0
-		downloadRetryDuration  = time.Second
+		// With 5 attempts, initial delay of 1 second, and a backoff factor of 2.0 the total time spent retrying will be
+		// ~30 seconds.
+		downloadRetryAttempts = 5
+		failureBackoffBase    = 2.0
+		downloadRetryDuration = time.Second
 	)
 
 	for fileName, alreadyHydrated := range fileHydrationState {
@@ -969,8 +975,12 @@ func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir st
 
 		url := network.JoinURL(srcConfig.sourceURL, fileName)
 
-		// With 10 attempts, initial delay of 1 second, and a backoff factor of 2.0, this will
-		// take at most ~5 minutes before giving up.
+		// Limit the number of concurrent network operations by pushing a struct{} into the channel. This will block until
+		// another operation completes and removes the struct{} from the channel.
+		if netOpsSemaphore != nil {
+			netOpsSemaphore <- struct{}{}
+		}
+
 		err := retry.RunWithExpBackoff(func() error {
 			err := network.DownloadFile(url, destinationFile, srcConfig.caCerts, srcConfig.tlsCerts)
 			if err != nil {
@@ -978,7 +988,16 @@ func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir st
 			}
 
 			return err
-		}, downloadRetryAttempts, downloadRetryDuration, failureBackoffExponent)
+		}, downloadRetryAttempts, downloadRetryDuration, failureBackoffBase)
+
+		if netOpsSemaphore != nil {
+			// Clear the channel to allow another operation to start
+			// A cancellation signal may have already cleared the channel so we need to account for that.
+			select {
+			case <-netOpsSemaphore:
+			default:
+			}
+		}
 
 		if err != nil {
 			continue
