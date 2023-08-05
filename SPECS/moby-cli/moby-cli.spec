@@ -1,10 +1,10 @@
 %define upstream_name cli
-%define commit_hash e91ed5707e038b02af3b5120fa0835c5bedfd42e
+%define commit_hash b82b9f3a0e763304a250531cb9350aa6d93723c9
 
 Summary: The open-source application container engine client.
 Name: moby-%{upstream_name}
-Version: 20.10.24
-Release: 4%{?dist}
+Version: 20.10.25
+Release: 1%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://github.com/docker/cli
@@ -80,6 +80,9 @@ install -p -m 644 contrib/completion/fish/docker.fish %{buildroot}%{_datadir}/fi
 %{_datadir}/fish/vendor_completions.d/docker.fish
 
 %changelog
+* Sat Aug 08 2023 Muhammad Falak <mwani@microsoft.com> - 20.10.25-1
+- Bump version to 20.10.25
+
 * Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 20.10.24-4
 - Bump release to rebuild with go 1.19.12
 
