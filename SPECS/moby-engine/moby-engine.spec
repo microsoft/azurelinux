@@ -1,10 +1,10 @@
 %define upstream_name moby
-%define commit_hash 87a90dc786bda134c9eb02adbae2c6a7342fb7f6
+%define commit_hash 5df983c7dbe2f8914e6efd4dd6e0083a20c41ce1
 
 Summary: The open-source application container engine
 Name:    %{upstream_name}-engine
-Version: 20.10.24
-Release: 4%{?dist}
+Version: 20.10.25
+Release: 1%{?dist}
 License: ASL 2.0
 Group:   Tools/Container
 URL: https://mobyproject.org
@@ -126,6 +126,9 @@ fi
 %{_unitdir}/*
 
 %changelog
+* Sat Aug 08 2023 Muhammad Falak <mwani@microsoft.com> - 20.10.25-1
+- Bump version to 20.10.25
+
 * Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 20.10.24-4
 - Bump release to rebuild with go 1.19.12
 
