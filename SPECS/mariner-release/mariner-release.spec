@@ -1,7 +1,7 @@
 Summary:       CBL-Mariner release files
 Name:          mariner-release
 Version:       1.0
-Release:       65%{?dist}
+Release:       66%{?dist}
 License:       MIT
 Group:         System Environment/Base
 URL:           https://aka.ms/cbl-mariner
@@ -67,6 +67,9 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) /etc/issue.net
 
 %changelog
+* Fri Aug 04 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0-66
+- Bump release for August 2023 Update
+
 * Thu Jun 29 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0-65
 - Bump release for June 2023 Update 3
 
