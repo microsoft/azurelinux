@@ -28,6 +28,8 @@ instead. For more details on this system, see the 'ca-certificates' package.
 %package -n python3-certifi
 Summary:        %{summary}
 
+Requires:       ca-certificates-base
+
 %description -n python3-certifi
 This Azure Linux package does not include its own certificate
 collection. It reads the system shared certificate trust collection
