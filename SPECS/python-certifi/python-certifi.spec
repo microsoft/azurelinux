@@ -28,7 +28,7 @@ instead. For more details on this system, see the 'ca-certificates' package.
 %package -n python3-certifi
 Summary:        %{summary}
 
-Requires:       ca-certificates-base
+Requires:       %{_sysconfdir}/pki/tls/certs/ca-bundle.crt
 
 %description -n python3-certifi
 This Azure Linux package does not include its own certificate
