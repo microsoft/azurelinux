@@ -1016,6 +1016,42 @@
                 "PR": [
                     "https://github.com/microsoft/CBL-Mariner/pull/5896"
                 ]
+            },
+            "CONFIG_ARM64_WORKAROUND_TSB_FLUSH_FAILURE": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for kernel upgrade 5.15.123.1",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5916"
+                ]
+            },
+            "CONFIG_ARM64_ERRATUM_2054223": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for kernel upgrade 5.15.123.1",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5916"
+                ]
+            },
+            "CONFIG_ARM64_ERRATUM_2067961": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for kernel upgrade 5.15.123.1",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5916"
+                ]
             }
 
             
