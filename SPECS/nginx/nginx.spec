@@ -6,7 +6,7 @@ Name:           nginx
 # Currently on "stable" version of nginx from https://nginx.org/en/download.html.
 # Note: Stable versions are even (1.20), mainline versions are odd (1.21)
 Version:        1.22.1
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -68,7 +68,8 @@ sh configure \
     --with-http_v2_module \
     --with-ipv6 \
     --with-pcre \
-    --with-stream
+    --with-stream \
+    --with-compat
 
 %make_build
 
@@ -117,6 +118,9 @@ exit 0
 %dir %{_sysconfdir}/%{name}
 
 %changelog
+* Mon Jul 31 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 1.22.1-7
+- Configure with `--with-compat` to enable dynamic modules compatibility
+
 * Wed Jul 12 2023 Pete Birley <petebirley@microsoft.com> - 1.22.1-6
 - Enable building with http_gunzip_module
 

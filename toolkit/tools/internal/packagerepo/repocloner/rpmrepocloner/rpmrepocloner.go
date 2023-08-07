@@ -376,6 +376,19 @@ func (r *RpmRepoCloner) initializeMountedChrootRepo(repoDir string) (err error) 
 // It will automatically resolve packages that describe a provide or file from a package.
 // If all packages were pre-built, the cloner will set allPackagesPrebuilt = true.
 func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.PackageVer) (allPackagesPrebuilt bool, err error) {
+	packageNames := []string{}
+	for _, packageToClone := range packagesToClone {
+		logger.Log.Debugf("Cloning (%s).", packageToClone)
+		packageNames = append(packageNames, convertPackageVersionToTdnfArg(packageToClone))
+	}
+	return r.CloneRawPackageNames(cloneDeps, packageNames...)
+}
+
+// CloneRawPackageNames clones the provided package name exactly as specified.
+// If cloneDeps is set, package dependencies will also be cloned.
+// This version of clone will not resolve provides or files from other packages beyond what tdnf is able to do itself.
+// If all packages were pre-built, the cloner will set allPackagesPrebuilt = true.
+func (r *RpmRepoCloner) CloneRawPackageNames(cloneDeps bool, rawPackageNames ...string) (allPackagesPrebuilt bool, err error) {
 	timestamp.StartEvent("cloning packages", nil)
 	defer timestamp.StopEvent(nil)
 
@@ -393,14 +406,13 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 		r.chrootCloneDir,
 	}
 
-	logger.Log.Debugf("Will clone in total %d items.", len(packagesToClone))
+	logger.Log.Debugf("Will clone in total %d items.", len(rawPackageNames))
 
 	allPackagesPrebuilt = true
-	for _, packageToClone := range packagesToClone {
-		logger.Log.Debugf("Cloning (%s).", packageToClone)
+	for _, packageNameToClone := range rawPackageNames {
+		logger.Log.Debugf("Cloning raw name (%s).", packageNameToClone)
 
-		packageArg := convertPackageVersionToTdnfArg(packageToClone)
-		finalArgs := append(constantArgs, packageArg)
+		finalArgs := append(constantArgs, packageNameToClone)
 		err = r.chroot.Run(func() (chrootErr error) {
 			prebuilt, chrootErr := r.clonePackage(finalArgs)
 			if !prebuilt {
