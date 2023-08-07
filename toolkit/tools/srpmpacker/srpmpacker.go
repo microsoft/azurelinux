@@ -233,7 +233,7 @@ func parsePackListFile(packListFile string) (packList map[string]bool, err error
 
 // createAllSRPMsWrapper wraps createAllSRPMs to conditionally run it inside a chroot.
 // If workerTar is non-empty, packing will occur inside a chroot, otherwise it will run on the host system.
-func createAllSRPMsWrapper(specsDir, distTag, buildDir, outDir, workerTar string, workers, concurrentNetOps int, nestedSourcesDir, repackAll, runCheck bool, packList map[string]bool, templateSrcConfig sourceRetrievalConfiguration) (err error) {
+func createAllSRPMsWrapper(specsDir, distTag, buildDir, outDir, workerTar string, workers int, concurrentNetOps uint, nestedSourcesDir, repackAll, runCheck bool, packList map[string]bool, templateSrcConfig sourceRetrievalConfiguration) (err error) {
 	var chroot *safechroot.Chroot
 	originalOutDir := outDir
 	if workerTar != "" {
