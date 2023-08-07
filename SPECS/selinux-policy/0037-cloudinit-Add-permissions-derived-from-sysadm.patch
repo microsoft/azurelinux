@@ -1,7 +1,7 @@
-From 6f653f2552c6e569bff9e0f067dbbc350cbc9db4 Mon Sep 17 00:00:00 2001
+From 11e7c998547fa7bcf0dc961afac204640a9649e9 Mon Sep 17 00:00:00 2001
 From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
 Date: Thu, 30 Mar 2023 14:33:57 +0000
-Subject: [PATCH 37/37] cloudinit: Add permissions derived from sysadm.
+Subject: [PATCH 37/40] cloudinit: Add permissions derived from sysadm.
 
 Allow a similar amount of admin capability to cloud-init as sysadm.  Also add
 a tunable to allow non-security file management for fallback.
@@ -9,17 +9,19 @@ a tunable to allow non-security file management for fallback.
 Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
 ---
  policy/modules/admin/cloudinit.if    |   76 ++
- policy/modules/admin/cloudinit.te    | 1036 +++++++++++++++++++++++++-
+ policy/modules/admin/cloudinit.te    | 1055 +++++++++++++++++++++++++-
  policy/modules/admin/rpm.fc          |    2 +
  policy/modules/admin/rpm.te          |   20 +-
  policy/modules/admin/usermanage.te   |   14 +-
+ policy/modules/services/ssh.if       |   25 +
  policy/modules/system/fstools.te     |    5 +
  policy/modules/system/init.if        |   20 +
  policy/modules/system/selinuxutil.te |    5 +
  policy/modules/system/systemd.te     |    4 +-
+ policy/modules/system/udev.te        |    2 +
  policy/modules/system/unconfined.if  |   19 +
  policy/modules/system/userdomain.if  |   19 +
- 11 files changed, 1191 insertions(+), 29 deletions(-)
+ 13 files changed, 1228 insertions(+), 38 deletions(-)
 
 MSFT_TAG: pending
 
@@ -115,10 +117,18 @@ index 525fd7795..7496b800a 100644
 +	create_files_pattern($1, cloud_init_tmp_t, cloud_init_tmp_t)
 +')
 diff --git a/policy/modules/admin/cloudinit.te b/policy/modules/admin/cloudinit.te
-index 80c17374b..e44e75089 100644
+index 80c17374b..bbc92f30d 100644
 --- a/policy/modules/admin/cloudinit.te
 +++ b/policy/modules/admin/cloudinit.te
-@@ -9,6 +9,13 @@ gen_require(`
+@@ -2,6 +2,7 @@ policy_module(cloudinit)
+
+ gen_require(`
+ 	class passwd passwd;
++	role sysadm_r;
+ ')
+
+ ########################################
+@@ -9,6 +10,13 @@ gen_require(`
  # Declarations
  #
 
@@ -132,7 +142,7 @@ index 80c17374b..e44e75089 100644
  type cloud_init_t;
  type cloud_init_exec_t;
  init_system_domain(cloud_init_t, cloud_init_exec_t)
-@@ -23,18 +30,21 @@ files_mountpoint(cloud_init_runtime_t)
+@@ -23,18 +31,21 @@ files_mountpoint(cloud_init_runtime_t)
  type cloud_init_state_t;
  files_type(cloud_init_state_t)
 
@@ -156,22 +166,23 @@ index 80c17374b..e44e75089 100644
  logging_log_filetrans(cloud_init_t, cloud_init_log_t, file)
 
  manage_files_pattern(cloud_init_t, cloud_init_runtime_t, cloud_init_runtime_t)
-@@ -48,12 +58,23 @@ manage_lnk_files_pattern(cloud_init_t, cloud_init_state_t, cloud_init_state_t)
+@@ -48,12 +59,23 @@ manage_lnk_files_pattern(cloud_init_t, cloud_init_state_t, cloud_init_state_t)
  manage_dirs_pattern(cloud_init_t, cloud_init_state_t, cloud_init_state_t)
  files_var_lib_filetrans(cloud_init_t, cloud_init_state_t, { dir file lnk_file })
 
+-auth_domtrans_chk_passwd(cloud_init_t)
 +manage_files_pattern(cloud_init_t, cloud_init_tmp_t, cloud_init_tmp_t)
 +manage_lnk_files_pattern(cloud_init_t, cloud_init_tmp_t, cloud_init_tmp_t)
 +manage_dirs_pattern(cloud_init_t, cloud_init_tmp_t, cloud_init_tmp_t)
 +files_tmp_filetrans(cloud_init_t, cloud_init_tmp_t, { dir file lnk_file })
-+
- auth_domtrans_chk_passwd(cloud_init_t)
 
 -corecmd_exec_bin(cloud_init_t)
 -corecmd_exec_shell(cloud_init_t)
-+corecmd_exec_all_executables(cloud_init_t)
++auth_run_chk_passwd(cloud_init_t, system_r)
 
 -corenet_dontaudit_tcp_bind_generic_node(cloud_init_t)
++corecmd_exec_all_executables(cloud_init_t)
++
 +corenet_all_recvfrom_netlabel(cloud_init_t)
 +corenet_tcp_sendrecv_generic_if(cloud_init_t)
 +corenet_tcp_sendrecv_generic_node(cloud_init_t)
@@ -183,7 +194,7 @@ index 80c17374b..e44e75089 100644
 
  dbus_system_bus_client(cloud_init_t)
 
-@@ -61,10 +82,14 @@ dev_getattr_all_blk_files(cloud_init_t)
+@@ -61,19 +83,23 @@ dev_getattr_all_blk_files(cloud_init_t)
  # /sys/devices/pci0000:00/0000:00:03.0/net/eth0/address
  dev_read_sysfs(cloud_init_t)
 
@@ -198,32 +209,63 @@ index 80c17374b..e44e75089 100644
 
  fs_getattr_all_fs(cloud_init_t)
  fs_search_tmpfs(cloud_init_t)
-@@ -87,7 +112,14 @@ miscfiles_read_localization(cloud_init_t)
+ fs_search_cgroup_dirs(cloud_init_t)
+ fs_read_iso9660_files(cloud_init_t)
 
- mount_domtrans(cloud_init_t)
+-fstools_domtrans(cloud_init_t)
++fstools_run(cloud_init_t, system_r)
 
+-hostname_domtrans(cloud_init_t)
++hostname_run(cloud_init_t, system_r)
+
+ kernel_read_system_state(cloud_init_t)
+ kernel_read_kernel_sysctls(cloud_init_t)
+@@ -85,54 +111,1021 @@ logging_send_syslog_msg(cloud_init_t)
+
+ miscfiles_read_localization(cloud_init_t)
+
+-mount_domtrans(cloud_init_t)
++mount_run(cloud_init_t, system_r)
++
 +selinux_set_enforce_mode(cloud_init_t)
 +selinux_set_all_booleans(cloud_init_t)
 +selinux_set_parameters(cloud_init_t)
 +selinux_read_policy(cloud_init_t)
-+
+
  seutil_read_default_contexts(cloud_init_t)
-+seutil_domtrans_semanage(cloud_init_t)
-+seutil_domtrans_setfiles(cloud_init_t)
++seutil_run_semanage(cloud_init_t, system_r)
++seutil_run_setfiles(cloud_init_t, system_r)
 
- ssh_domtrans_keygen(cloud_init_t)
+-ssh_domtrans_keygen(cloud_init_t)
++ssh_run_keygen(cloud_init_t, system_r)
  ssh_manage_home_files(cloud_init_t)
-@@ -107,32 +139,992 @@ usermanage_domtrans_useradd(cloud_init_t)
- usermanage_domtrans_groupadd(cloud_init_t)
- usermanage_domtrans_passwd(cloud_init_t)
+ ssh_create_home_dirs(cloud_init_t)
+ ssh_setattr_home_dirs(cloud_init_t)
+ # Read public keys
+ ssh_read_server_keys(cloud_init_t)
 
+-sysnet_domtrans_ifconfig(cloud_init_t)
++sysnet_run_ifconfig(cloud_init_t, system_r)
+
+ term_write_console(cloud_init_t)
+
+ udev_manage_rules_files(cloud_init_t)
+ udev_read_runtime_files(cloud_init_t)
+
+-usermanage_domtrans_useradd(cloud_init_t)
+-usermanage_domtrans_groupadd(cloud_init_t)
+-usermanage_domtrans_passwd(cloud_init_t)
++usermanage_run_useradd(cloud_init_t, system_r)
++usermanage_run_groupadd(cloud_init_t, system_r)
++usermanage_run_passwd(cloud_init_t, system_r)
++
 +tunable_policy(`cloudinit_manage_non_security',`
 +	files_manage_non_security_dirs(cloud_init_t)
 +	files_manage_non_security_files(cloud_init_t)
 +	files_relabel_non_security_dirs(cloud_init_t)
 +	files_relabel_non_security_files(cloud_init_t)
 +')
-+
+
  optional_policy(`
 -	rpm_domtrans(cloud_init_t)
 +	abrt_admin(cloud_init_t, system_r)
@@ -266,7 +308,7 @@ index 80c17374b..e44e75089 100644
 -	systemd_dbus_chat_hostnamed(cloud_init_t)
 -	systemd_dbus_chat_logind(cloud_init_t)
 +optional_policy(`
-+	amanda_domtrans_recover(cloud_init_t)
++	amanda_run_recover(cloud_init_t, system_r)
 +')
 +
 +optional_policy(`
@@ -282,7 +324,7 @@ index 80c17374b..e44e75089 100644
 +')
 +
 +optional_policy(`
-+	aptcacher_domtrans_acngtool(cloud_init_t)
++	aptcacher_run_acngtool(cloud_init_t, system_r)
 +')
 +
 +optional_policy(`
@@ -302,13 +344,13 @@ index 80c17374b..e44e75089 100644
 +')
 +
 +optional_policy(`
-+	bacula_domtrans_admin(cloud_init_t)
++	bacula_run_admin(cloud_init_t, system_r)
 +	bacula_admin(cloud_init_t, system_r)
 +')
 +
 +optional_policy(`
 +	bind_admin(cloud_init_t, system_r)
-+	bind_domtrans_ndc(cloud_init_t)
++	bind_run_ndc(cloud_init_t, system_r)
 +')
 +
 +optional_policy(`
@@ -558,7 +600,7 @@ index 80c17374b..e44e75089 100644
 +
 +optional_policy(`
 +	hwloc_admin(cloud_init_t)
-+	hwloc_domtrans_dhwd(cloud_init_t)
++	hwloc_run_dhwd(cloud_init_t, system_r)
 +')
 +
 +optional_policy(`
@@ -628,7 +670,7 @@ index 80c17374b..e44e75089 100644
 +
 +optional_policy(`
 +	knot_admin(cloud_init_t, system_r)
-+	knot_domtrans_client(cloud_init_t)
++	knot_run_client(cloud_init_t, system_r)
 +')
 +
 +optional_policy(`
@@ -648,7 +690,7 @@ index 80c17374b..e44e75089 100644
 +')
 +
 +optional_policy(`
-+	libs_domtrans_ldconfig(cloud_init_t)
++	libs_run_ldconfig(cloud_init_t, system_r)
 +')
 +
 +optional_policy(`
@@ -746,9 +788,9 @@ index 80c17374b..e44e75089 100644
 +')
 +
 +optional_policy(`
-+	netutils_domtrans(cloud_init_t)
-+	netutils_domtrans_ping(cloud_init_t)
-+	netutils_domtrans_traceroute(cloud_init_t)
++	netutils_run(cloud_init_t, system_r)
++	netutils_run_ping(cloud_init_t, system_r)
++	netutils_run_traceroute(cloud_init_t, system_r)
 +')
 +
 +optional_policy(`
@@ -845,13 +887,13 @@ index 80c17374b..e44e75089 100644
 +')
 +
 +optional_policy(`
-+	portage_domtrans(cloud_init_t)
-+	portage_domtrans_fetch(cloud_init_t)
-+	portage_domtrans_gcc_config(cloud_init_t)
++	portage_run(cloud_init_t, system_r)
++	portage_run_fetch(cloud_init_t, system_r)
++	portage_run_gcc_config(cloud_init_t, system_r)
 +')
 +
 +optional_policy(`
-+	portmap_domtrans_helper(cloud_init_t)
++	portmap_run_helper(cloud_init_t, system_r)
 +	portmap_admin(cloud_init_t, system_r)
 +')
 +
@@ -925,7 +967,7 @@ index 80c17374b..e44e75089 100644
 +')
 +
 +optional_policy(`
-+	raid_domtrans_mdadm(cloud_init_t)
++	raid_run_mdadm(system_r, cloud_init_t)
 +	raid_admin_mdadm(cloud_init_t, system_r)
 +')
 +
@@ -959,7 +1001,7 @@ index 80c17374b..e44e75089 100644
 +')
 +
 +optional_policy(`
-+	rpm_domtrans(cloud_init_t)
++	rpm_run(cloud_init_t, system_r)
 +	rpm_admin(cloud_init_t, system_r)
 +')
 +
@@ -976,11 +1018,11 @@ index 80c17374b..e44e75089 100644
 +')
 +
 +optional_policy(`
-+	samba_admin(cloud_init_t, system_r)
-+	samba_domtrans_smbcontrol(cloud_init_t)
-+	samba_domtrans_smbmount(cloud_init_t)
-+	samba_domtrans_net(cloud_init_t)
-+	samba_domtrans_winbind_helper(cloud_init_t)
++	samba_admin(cloud_init_t, system_r, system_r)
++	samba_run_smbcontrol(cloud_init_t, system_r)
++	samba_run_smbmount(cloud_init_t, system_r)
++	samba_run_net(cloud_init_t, system_r)
++	samba_run_winbind_helper(cloud_init_t, system_r)
 +')
 +
 +optional_policy(`
@@ -1074,8 +1116,8 @@ index 80c17374b..e44e75089 100644
 +')
 +
 +optional_policy(`
-+	sysnet_domtrans_ifconfig(cloud_init_t)
-+	sysnet_domtrans_dhcpc(cloud_init_t)
++	sysnet_run_ifconfig(cloud_init_t, system_r)
++	sysnet_run_dhcpc(cloud_init_t, system_r)
 +')
 +
 +optional_policy(`
@@ -1100,7 +1142,7 @@ index 80c17374b..e44e75089 100644
 +')
 +
 +optional_policy(`
-+	tboot_domtrans_txtstat(cloud_init_t)
++	tboot_run_txtstat(cloud_init_t, system_r)
 +')
 +
 +optional_policy(`
@@ -1124,18 +1166,18 @@ index 80c17374b..e44e75089 100644
 +')
 +
 +optional_policy(`
-+	tripwire_domtrans_siggen(cloud_init_t)
-+	tripwire_domtrans_tripwire(cloud_init_t)
-+	tripwire_domtrans_twadmin(cloud_init_t)
-+	tripwire_domtrans_twprint(cloud_init_t)
++	tripwire_run_siggen(cloud_init_t, system_r)
++	tripwire_run_tripwire(cloud_init_t, system_r)
++	tripwire_run_twadmin(cloud_init_t, system_r)
++	tripwire_run_twprint(cloud_init_t, system_r)
 +')
 +
 +optional_policy(`
-+	tzdata_domtrans(cloud_init_t)
++	tzdata_run(cloud_init_t, sysadm_r)
 +')
 +
 +optional_policy(`
-+	udev_domtrans_udevadm(cloud_init_t)
++	udev_run_udevadm(cloud_init_t, system_r)
 +')
 +
 +optional_policy(`
@@ -1143,7 +1185,7 @@ index 80c17374b..e44e75089 100644
 +')
 +
 +optional_policy(`
-+	unconfined_domtrans(cloud_init_t)
++	unconfined_run(cloud_init_t, system_r)
 +')
 +
 +optional_policy(`
@@ -1371,6 +1413,42 @@ index b66c3ef95..a8254fea9 100644
 -	unconfined_use_fds(useradd_t)
 +	unconfined_write_inherited_pipes(useradd_t)
  ')
+diff --git a/policy/modules/services/ssh.if b/policy/modules/services/ssh.if
+index 44cf1b873..450f7c801 100644
+--- a/policy/modules/services/ssh.if
++++ b/policy/modules/services/ssh.if
+@@ -805,6 +805,31 @@ interface(`ssh_domtrans_keygen',`
+ 	domtrans_pattern($1, ssh_keygen_exec_t, ssh_keygen_t)
+ ')
+
++######################################
++## <summary>
++##	Execute the ssh key generator in the ssh keygen domain,
++##	and allow the specified	role the ssh keygen domain.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++## <param name="role">
++##	<summary>
++##	Role allowed access.
++##	</summary>
++## </param>
++#
++interface(`ssh_run_keygen',`
++	gen_require(`
++		type ssh_keygen_t;
++	')
++
++	ssh_domtrans_keygen($1)
++	role $2 types ssh_keygen_t;
++')
++
+ ########################################
+ ## <summary>
+ ##	Read ssh server keys
 diff --git a/policy/modules/system/fstools.te b/policy/modules/system/fstools.te
 index 75da8a0a0..7c2eabb41 100644
 --- a/policy/modules/system/fstools.te
@@ -1463,6 +1541,19 @@ index 4ae907781..3c10cf38d 100644
  	cloudinit_create_runtime_files(systemd_generator_t)
  	cloudinit_filetrans_runtime(systemd_generator_t, dir, "cloud-init")
 
+diff --git a/policy/modules/system/udev.te b/policy/modules/system/udev.te
+index 7d38af496..f6a87c767 100644
+--- a/policy/modules/system/udev.te
++++ b/policy/modules/system/udev.te
+@@ -413,6 +413,8 @@ kernel_dontaudit_getattr_proc(udevadm_t)
+ kernel_read_kernel_sysctls(udevadm_t)
+ kernel_read_system_state(udevadm_t)
+
++selinux_use_status_page(udevadm_t)
++
+ seutil_read_file_contexts(udevadm_t)
+
+ storage_getattr_fixed_disk_dev(udevadm_t)
 diff --git a/policy/modules/system/unconfined.if b/policy/modules/system/unconfined.if
 index c4818431c..c9a6b96fd 100644
 --- a/policy/modules/system/unconfined.if
@@ -1524,5 +1615,5 @@ index 9fcb3a09a..66eefa441 100644
  ## <summary>
  ##	Mount a filesystem on user runtime dir
 --
-2.34.1
+2.40.1
 

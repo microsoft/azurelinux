@@ -1,6 +1,3 @@
-Maintainer note: Kernel patch mentioned below was backported to 5.15, is present in kernel>=5.15.33.1
-https://github.com/microsoft/CBL-Mariner-Linux-Kernel/commit/3d4b396a616d0d67bf95d6823ad1197f6247292e
-
 From 22cf83f78c12fe8afdd0b2d8029a037b6084edf2 Mon Sep 17 00:00:00 2001
 From: Eugene Syromyatnikov <evgsyr@gmail.com>
 Date: Fri, 27 May 2022 16:17:21 +0200
@@ -20,7 +17,11 @@ in the test instead.
 by the landlock_create_ruleset call and set it to fd_str, which
 is then printed.
 
-Signed-off-by: Olivia Crain <olivia@olivia.dev>
+Maintainer note: Kernel commit mentioned above was backported to 5.15,
+is present in kernel>=5.15.33.1
+https://github.com/microsoft/CBL-Mariner-Linux-Kernel/commit/3d4b396a616d0d67bf95d6823ad1197f6247292e
+
+Signed-off-by: Olivia Crain <oliviacrain@microsoft.com>
 ---
  tests/landlock_create_ruleset-y.c |  2 +-
  tests/landlock_create_ruleset.c   | 33 ++++++++++++++++++++++++++++++-

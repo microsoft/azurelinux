@@ -536,7 +536,7 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int, partitio
 		case configuration.PartitionFlagDeviceMapperRoot:
 			//Ignore, only used for internal tooling
 		default:
-			return partDevPath, fmt.Errorf("Partition %v - Unknown partition flag: %v", partitionNumber, flag)
+			return partDevPath, fmt.Errorf("partition %v - Unknown partition flag: %v", partitionNumber, flag)
 		}
 		if flagToSet != "" {
 			args = append(args, flagToSet, "on")
@@ -611,7 +611,7 @@ func FormatSinglePartition(partDevPath string, partition configuration.Partition
 	case "":
 		logger.Log.Debugf("No filesystem type specified. Ignoring for partition: %v", partDevPath)
 	default:
-		return fsType, fmt.Errorf("Unrecognized filesystem format: %v", fsType)
+		return fsType, fmt.Errorf("unrecognized filesystem format: %v", fsType)
 	}
 
 	return

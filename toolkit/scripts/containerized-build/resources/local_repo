@@ -1,0 +1,17 @@
+[host_build_repo]
+name=Mariner Host Build Repo
+baseurl=file:///repo/
+gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY
+enabled=1
+gpgcheck=0
+skip_if_unavailable=False
+sslverify=0
+
+[local_build_repo]
+name=Mariner Local Build Repo
+baseurl=file:///usr/src/mariner/RPMS/
+gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY
+enabled=1
+gpgcheck=0
+skip_if_unavailable=False
+sslverify=0

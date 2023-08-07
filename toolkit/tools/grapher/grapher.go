@@ -12,6 +12,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/profile"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -23,6 +24,7 @@ var (
 
 	logFile          = exe.LogFileFlag(app)
 	logLevel         = exe.LogLevelFlag(app)
+	profFlags        = exe.SetupProfileFlags(app)
 	strictGoals      = app.Flag("strict-goals", "Don't allow missing goal packages").Bool()
 	strictUnresolved = app.Flag("strict-unresolved", "Don't allow missing unresolved packages").Bool()
 	timestampFile    = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
@@ -35,9 +37,13 @@ func main() {
 
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-
-	var err error
 	logger.InitBestEffort(*logFile, *logLevel)
+
+	prof, err := profile.StartProfiling(profFlags)
+	if err != nil {
+		logger.Log.Warnf("Could not start profiling: %s", err)
+	}
+	defer prof.StopProfiler()
 
 	timestamp.BeginTiming("grapher", *timestampFile)
 	defer timestamp.CompleteTiming()
@@ -94,7 +100,7 @@ func addUnresolvedPackage(g *pkggraph.PkgGraph, pkgVer *pkgjson.PackageVer) (new
 	}
 
 	// Create a new node
-	newRunNode, err = g.AddPkgNode(pkgVer, pkggraph.StateUnresolved, pkggraph.TypeRemote, "<NO_SRPM_PATH>", "<NO_RPM_PATH>", "<NO_SPEC_PATH>", "<NO_SOURCE_PATH>", "<NO_ARCHITECTURE>", "<NO_REPO>")
+	newRunNode, err = g.AddPkgNode(pkgVer, pkggraph.StateUnresolved, pkggraph.TypeRemoteRun, "<NO_SRPM_PATH>", "<NO_RPM_PATH>", "<NO_SPEC_PATH>", "<NO_SOURCE_PATH>", "<NO_ARCHITECTURE>", "<NO_REPO>")
 	if err != nil {
 		return
 	}
@@ -125,7 +131,7 @@ func addNodesForPackage(g *pkggraph.PkgGraph, pkgVer *pkgjson.PackageVer, pkg *p
 
 	if newRunNode == nil {
 		// Add "Run" node
-		newRunNode, err = g.AddPkgNode(pkgVer, pkggraph.StateMeta, pkggraph.TypeRun, pkg.SrpmPath, pkg.RpmPath, pkg.SpecPath, pkg.SourceDir, pkg.Architecture, "<LOCAL>")
+		newRunNode, err = g.AddPkgNode(pkgVer, pkggraph.StateMeta, pkggraph.TypeLocalRun, pkg.SrpmPath, pkg.RpmPath, pkg.SpecPath, pkg.SourceDir, pkg.Architecture, "<LOCAL>")
 		logger.Log.Debugf("Adding run node %s with id %d\n", newRunNode.FriendlyName(), newRunNode.ID())
 		if err != nil {
 			return
@@ -134,7 +140,7 @@ func addNodesForPackage(g *pkggraph.PkgGraph, pkgVer *pkgjson.PackageVer, pkg *p
 
 	if newBuildNode == nil {
 		// Add "Build" node
-		newBuildNode, err = g.AddPkgNode(pkgVer, pkggraph.StateBuild, pkggraph.TypeBuild, pkg.SrpmPath, pkg.RpmPath, pkg.SpecPath, pkg.SourceDir, pkg.Architecture, "<LOCAL>")
+		newBuildNode, err = g.AddPkgNode(pkgVer, pkggraph.StateBuild, pkggraph.TypeLocalBuild, pkg.SrpmPath, pkg.RpmPath, pkg.SpecPath, pkg.SourceDir, pkg.Architecture, "<LOCAL>")
 		logger.Log.Debugf("Adding build node %s with id %d\n", newBuildNode.FriendlyName(), newBuildNode.ID())
 		if err != nil {
 			return
@@ -182,8 +188,8 @@ func addSingleDependency(g *pkggraph.PkgGraph, packageNode *pkggraph.PkgNode, de
 	// Creating these edges may cause non-problematic cycles that can significantly increase memory usage and runtime during cycle resolution.
 	// If there are enough of these cycles it can exhaust the system's memory when resolving them.
 	// - Only check run nodes. If a build node has a reflexive cycle then it cannot be built without a bootstrap version.
-	if packageNode.Type == pkggraph.TypeRun &&
-		dependentNode.Type == pkggraph.TypeRun &&
+	if packageNode.Type == pkggraph.TypeLocalRun &&
+		dependentNode.Type == pkggraph.TypeLocalRun &&
 		packageNode.RpmPath == dependentNode.RpmPath {
 
 		logger.Log.Debugf("%+v requires %+v which is provided by the same RPM.", packageNode, dependentNode)

@@ -60,6 +60,11 @@ HYDRATED_BUILD                  ?= n
 TARGET_ARCH                     ?=
 ALLOW_TOOLCHAIN_REBUILDS        ?= n
 
+# Tracing & Profiling support: https://go.dev/doc/diagnostics
+ENABLE_CPU_PROFILE              ?= n
+ENABLE_MEM_PROFILE              ?= n
+ENABLE_TRACE                    ?= n
+
 # Folder defines
 TOOLS_DIR        ?= $(toolkit_root)/tools
 TOOL_BINS_DIR    ?= $(toolkit_root)/out/tools
@@ -84,6 +89,7 @@ CHROOT_DIR         ?= $(BUILD_DIR)/worker/chroot
 IMAGEGEN_DIR       ?= $(BUILD_DIR)/imagegen
 TOOLCHAIN_RPMS_DIR ?= $(BUILD_DIR)/toolchain_rpms
 TIMESTAMP_DIR      ?= $(BUILD_DIR)/timestamp
+PROFILE_DIR        ?= $(BUILD_DIR)/profile
 
 RPMRC_DIR        ?= $(MACRO_DIR)/usr/lib/rpm
 
@@ -149,6 +155,9 @@ include $(SCRIPTS_DIR)/utils.mk
 # Set up for the timestamp feature
 include $(SCRIPTS_DIR)/timestamp.mk
 
+# Profiling & Tracing feature
+include $(SCRIPTS_DIR)/profile.mk
+
 # Set the variables for build number, distro tag, etc
 include $(SCRIPTS_DIR)/build_tag.mk
 
@@ -167,6 +176,10 @@ include $(SCRIPTS_DIR)/tools.mk
 # Create SRPMS from local SPECS with:
 #   input-srpms, clean-input-srpms
 include $(SCRIPTS_DIR)/srpm_pack.mk
+
+# Create local build env for building RPMs with:
+#   containerized-rpmbuild containerized-rpmbuild-help
+include $(SCRIPTS_DIR)/containerized-build.mk
 
 # Expand local SRPMS into sources and SPECS with:
 #   expand-specs clean-expand-specs

@@ -1,6 +1,6 @@
 module github.com/microsoft/CBL-Mariner/toolkit/tools
 
-go 1.17
+go 1.19
 
 require (
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d
