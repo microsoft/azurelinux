@@ -55,7 +55,6 @@ Patch24:        0025-net-mlx5-Bridge-implement-infrastructure-for-VLAN-pr.patch
 Patch25:        0026-net-mlx5-Bridge-implement-QinQ-support.patch
 Patch26:        0027-mstflint-This-driver-enables-under-the-secure-boot.patch
 Patch27:        0028-net-mlx5-Bridge-use-debug-not-warn-if-entry-not-found.patch
-Patch28:        0029-enable-dm-multipath-kernel-configs.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -199,7 +198,6 @@ manipulation of eBPF programs and maps.
 %patch25 -p1
 %patch26 -p1
 %patch27 -p1
-%patch28 -p1
 
 make mrproper
 
