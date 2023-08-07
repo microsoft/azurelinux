@@ -1,11 +1,11 @@
 parameters:
-  - name: customToolchainArtifactBuild
-    type: string
-    default: ""
-
-  - name: customToolchainEnabled
+  - name: customToolchain
     type: boolean
     default: false
+
+  - name: customToolchainArtifactName
+    type: string
+    default: ""
 
   - name: isCheckBuild
     type: boolean
@@ -22,6 +22,14 @@ parameters:
   - name: buildRepoRoot
     type: string
     default: "$(Build.SourcesDirectory)"
+
+  - name: rpmsCache
+    type: boolean
+    default: false
+
+  - name: rpmsCacheArtifactName
+    type: string
+    default: ""
 
   - name: rpmsTarballName
     type: string
@@ -44,11 +52,11 @@ steps:
     parameters:
       buildRepoRoot: ${{ parameters.buildRepoRoot }}
 
-  - ${{ if eq(parameters.customToolchainEnabled, true) }}:
+  - ${{ if eq(parameters.customToolchain, true) }}:
       - task: DownloadPipelineArtifact@2
         displayName: "Download toolchain"
         inputs:
-          artifact: "${{ parameters.customToolchainArtifactBuild }}"
+          artifact: "${{ parameters.customToolchainArtifactName }}"
           patterns: "**/toolchain_built_rpms_all.tar.gz"
 
       - script: |
@@ -60,6 +68,23 @@ steps:
 
           sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" toolchain TOOLCHAIN_ARCHIVE="$toolchain_archive"
         displayName: "Populate toolchain"
+
+  - ${{ if eq(parameters.rpmsCache, true) }}:
+      - task: DownloadPipelineArtifact@2
+        displayName: "Download RPM cache"
+        inputs:
+          artifact: "${{ parameters.rpmsCacheArtifactName }}"
+          patterns: "**/rpms*.tar.gz"
+
+      - script: |
+          rpms_archive="$(find "$(Pipeline.Workspace)" -name rpms*.tar.gz)"
+          if [[ ! -f "$rpms_archive" ]]; then
+            echo "ERROR: RPMs cache archive not found!" >&2
+            exit 1
+          fi
+
+          sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" hydrate-cached-rpms CACHED_PACKAGES_ARCHIVE="$rpms_archive"
+        displayName: "Populate RPMs cache"
 
   - script: |
       delta_fetch_arg="DELTA_FETCH=n"
