@@ -54,8 +54,8 @@ var (
 
 	outDir            = exe.OutputDirFlag(app, "Directory to download packages into.")
 	snapshot          = app.Flag("snapshot", "Path to the rpm snapshot .json file.").ExistingFile()
-	outputSummaryFile = app.Flag("output-summary-file", "Path to save the summary of packages cloned").String()
-	repoUrls          = app.Flag("repo-url", "URLs of the repos to clone.").Strings()
+	outputSummaryFile = app.Flag("output-summary-file", "Path to save the summary of packages downloaded").String()
+	repoUrls          = app.Flag("repo-url", "URLs of the repos to download from.").Strings()
 
 	concurrentNetOps = app.Flag("concurrent-net-ops", "Number of concurrent network operations to perform.").Default(defaultNetOpsCount).Uint()
 )
@@ -106,18 +106,17 @@ func main() {
 
 func rpmSnapshotFromFile(snapshotFile string) (rpmSnapshot *repocloner.RepoContents, err error) {
 	err = jsonutils.ReadJSONFile(snapshotFile, &rpmSnapshot)
-
 	return
 }
 
 func getAllRepoData(repoUrls []string) (namesToUrls map[string]string, err error) {
+	timestamp.StartEvent("pull available package data from repos", nil)
+	defer timestamp.StopEvent(nil)
 	// repoquery behaves differently on Mariner and Ubuntu
 	isMariner := shell.IsMarinerOs()
 
 	namesToUrls = make(map[string]string)
-	// Get the list of packages from the repos
 	for _, repoUrl := range repoUrls {
-		// Get the list of packages from the repo
 		packages, err := getRepoPackages(repoUrl, isMariner)
 		if err != nil {
 			return nil, err
@@ -126,9 +125,7 @@ func getAllRepoData(repoUrls []string) (namesToUrls map[string]string, err error
 		// We will be searching by the name: "<name>-<version>.<distro>.<arch>", the results from the repoquery will be
 		// in the form of "(BASE_URL)/<name>-<version>.<distro>.<arch>.rpm"
 		for _, pkgUrl := range packages {
-			// Take end of the url as the name
 			name := path.Base(pkgUrl)
-			// Remove the trailing ".rpm"
 			name = strings.TrimSuffix(name, ".rpm")
 
 			// We need to prepend the repoUrl to the name to get the full url on Mariner
@@ -141,8 +138,8 @@ func getAllRepoData(repoUrls []string) (namesToUrls map[string]string, err error
 	return
 }
 
+// getRepoPackages returns a list of packages available in the given repoUrl by running repoquery
 func getRepoPackages(repoUrl string, isMariner bool) (packages []string, err error) {
-	//repoquery $REPOQUERY_OS_ARGS --repofrompath=$repo_name,$base_url -a --qf="%{location}" | sed "s|^|$prefix|" >> $repo_summary_file || exit 1
 	const (
 		reqoqueryTool    = "repoquery"
 		randomNameLength = 10
@@ -171,9 +168,7 @@ func getRepoPackages(repoUrl string, isMariner bool) (packages []string, err err
 	repoPathArg := fmt.Sprintf("--repofrompath=mariner-precache-%s,%s", randomName, repoUrl)
 	finalArgList = append(finalArgList, repoPathArg)
 
-	// Find the entry with Major#, Minor#, ..., IOs which matches our disk
 	onStdout := func(args ...interface{}) {
-
 		line := args[0].(string)
 		packages = append(packages, line)
 	}
@@ -189,20 +184,31 @@ func getRepoPackages(repoUrl string, isMariner bool) (packages []string, err err
 }
 
 func downloadMissingPackages(rpmSnapshot *repocloner.RepoContents, availablePackages map[string]string, outDir string, concurrentNetOps uint) (downloadedPackages []string, err error) {
+	timestamp.StartEvent("download missing packages", nil)
+	defer timestamp.StopEvent(nil)
+
+	// We will be downloading packages concurrently, so we need to keep track of when they are all done via a wait group. To
+	// simplify the code just use goroutines with a semaphore channel to limit the number of concurrent network operations. Each
+	// goroutine will handle a single package and will send the result of the download to a results channel. The main thread will
+	// monitor the results channel and update the progress counter accordingly.
 	wg := new(sync.WaitGroup)
 	netOpsSemaphore := make(chan struct{}, concurrentNetOps)
 	results := make(chan downloadResult)
 	doneChannel := make(chan struct{})
 
+	// Spawn a worker for each package, they will all do preliminary checks in parrallel before synchronizing on the semaphore.
+	// Each worker is responsible for adding and removing itself from the wait group.
 	for _, pkg := range rpmSnapshot.Repo {
 		go precachePackage(pkg, availablePackages, outDir, wg, results, netOpsSemaphore)
 	}
 
+	// Wait for all the workers to finish and signal the main thread when we are done
 	go func() {
 		wg.Wait()
 		close(doneChannel)
 	}()
 
+	// Monitor the results channel and update the progress counter accordingly. Return once the done channel is closed.
 	downloadedPackages = monitorProgress(len(rpmSnapshot.Repo), results, doneChannel)
 
 	return
@@ -215,7 +221,9 @@ func monitorProgress(total int, results chan downloadResult, doneChannel chan st
 	unavailable := 0
 	progressIncrement := 5.0
 	lastProgressUpdate := progressIncrement * -1
+
 	for done := false; !done; {
+		// Wait for a result from a worker, or the done channel to be closed (which means all workers are done)
 		select {
 		case result := <-results:
 			switch result.resultType {
@@ -230,6 +238,7 @@ func monitorProgress(total int, results chan downloadResult, doneChannel chan st
 				unavailable++
 			}
 		case <-doneChannel:
+			// All workers are done, finish this iteration of the loop and then return
 			done = true
 		}
 		completed := downloaded + skipped + failed + unavailable
@@ -251,14 +260,15 @@ func precachePackage(pkg *repocloner.RepoPackage, availablePackages map[string]s
 	wg.Add(1)
 	defer wg.Done()
 
-	//File names are of the form "<name>-<version>.<distro>.<arch>.rpm"
+	// File names are of the form "<name>-<version>.<distro>.<arch>.rpm"
 	pkgName := fmt.Sprintf("%s-%s.%s.%s", pkg.Name, pkg.Version, pkg.Distribution, pkg.Architecture)
 	fileName := fmt.Sprintf("%s.rpm", pkgName)
 	fullFilePath := path.Join(outDir, fileName)
-
 	result := downloadResult{
 		pkgName: fileName,
 	}
+
+	// Bail out early if the file already exists
 	if exists, _ := file.PathExists(fullFilePath); exists {
 		logger.Log.Debugf("Skipping pre-caching '%s'. File already exists", fileName)
 		result.resultType = downloadResultTypeSkipped
@@ -266,7 +276,7 @@ func precachePackage(pkg *repocloner.RepoPackage, availablePackages map[string]s
 		return
 	}
 
-	// Get the url for the package
+	// Get the url for the package, or bail out if it is not available
 	url, ok := availablePackages[pkgName]
 	if !ok {
 		logger.Log.Warnf("Pre-caching '%s' failed. Package not found in any repos", fileName)
