@@ -13,6 +13,7 @@ sudo tdnf -y install \
     cdrkit \
     curl \
     dosfstools \
+    dnf-utils \
     gawk \
     glibc-devel \
     genisoimage \

@@ -127,6 +127,25 @@ func Write(data string, dst string) (err error) {
 	return
 }
 
+// WriteLines writes each string to the same file, separated by sep (e.g. "\n").
+func WriteLines(data []string, dst string, sep string) (err error) {
+	logger.Log.Debugf("Writing to (%s)", dst)
+
+	dstFile, err := os.Create(dst)
+	if err != nil {
+		return
+	}
+	defer dstFile.Close()
+
+	for _, line := range data {
+		_, err = dstFile.WriteString(line + sep)
+		if err != nil {
+			return
+		}
+	}
+	return
+}
+
 // Append appends a string to the end of file dst.
 func Append(data string, dst string) (err error) {
 	logger.Log.Debugf("Appending to file (%s): (%s)", dst, data)

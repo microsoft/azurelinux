@@ -31,6 +31,7 @@ go_tool_list = \
 	isomaker \
 	liveinstaller \
 	pkgworker \
+	precacher \
 	roast \
 	rpmssnapshot \
 	scheduler \

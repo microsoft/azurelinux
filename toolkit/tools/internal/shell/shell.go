@@ -18,6 +18,7 @@ import (
 
 // ShellProgram is the default shell program used by the tooling.
 const ShellProgram = "/bin/bash"
+const marinerReleaseFile = "/etc/mariner-release"
 
 var (
 	activeCommands = make(map[*exec.Cmd]bool)
@@ -36,6 +37,15 @@ func SetEnvironment(env []string) {
 // CurrentEnvironment returns the current environment variables that are being used for all processes launched from this package.
 func CurrentEnvironment() []string {
 	return currentEnv
+}
+
+// IsMarinerOs will return true if the file /etc/mariner-release exists.
+func IsMarinerOs() bool {
+	// Check if the OS is Mariner
+	if _, err := os.Stat(marinerReleaseFile); err == nil {
+		return true
+	}
+	return false
 }
 
 // PermanentlyStopAllProcesses will send the provided signal to all processes spawned by this package,
