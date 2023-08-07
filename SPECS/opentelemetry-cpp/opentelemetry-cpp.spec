@@ -1,6 +1,6 @@
 Summary:        The OpenTelemetry C++ Client
 Name:           opentelemetry-cpp
-Version:	1.10.0
+Version:        1.10.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -9,7 +9,6 @@ URL:            https://github.com/open-telemetry/opentelemetry-cpp
 Source0:        https://github.com/open-telemetry/opentelemetry-cpp/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Standard proto files source: https://github.com/open-telemetry/opentelemetry-proto
 Source1:        opentelemetry-proto-1.0.0.tar.gz
-
 BuildRequires:  c-ares-devel
 BuildRequires:  cmake
 BuildRequires:  curl-devel
@@ -20,7 +19,6 @@ BuildRequires:  gtest-devel
 BuildRequires:  nlohmann-json-devel
 BuildRequires:  protobuf-devel
 BuildRequires:  re2-devel
-
 
 %description
 The official OpenTelemetry CPP client
@@ -36,7 +34,7 @@ Development Libraries for OpenTelemetry CPP client
 %prep
 %autosetup -p1
 mkdir -p third_party/opentelemetry-proto
-tar xf %{SOURCE1} -C third_party/opentelemetry-proto --strip-components=1 
+tar xf %{SOURCE1} -C third_party/opentelemetry-proto --strip-components=1
 
 %build
 mkdir build && cd build
