@@ -131,16 +131,3 @@ func TestTotalRunTimeWithSuccess(t *testing.T) {
 	maxDelay := timingFudgeFactor
 	assert.LessOrEqual(t, endTime.Sub(startTime), maxDelay)
 }
-
-// func TestFoo(t *testing.T) {
-// 	const (
-// 		downloadRetryAttempts  = 5
-// 		failureBackoffExponent = 2.0
-// 		downloadRetryDuration  = time.Second
-// 	)
-// 	totalDuration := time.Duration(0)
-// 	for i := 1; i <= downloadRetryAttempts; i++ {
-// 		totalDuration += calculateDelay(i, downloadRetryDuration, failureBackoffExponent)
-// 	}
-// 	assert.Equal(t, time.Duration(1023)*time.Millisecond, totalDuration)
-// }
