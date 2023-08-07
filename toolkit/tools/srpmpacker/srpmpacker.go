@@ -112,7 +112,7 @@ var (
 	packListFile = app.Flag("pack-list", "Path to a list of SPECs to pack. If empty will pack all SPECs.").ExistingFile()
 	runCheck     = app.Flag("run-check", "Whether or not to run the spec file's check section during package build.").Bool()
 
-	workers          = app.Flag("workers", "Number of concurrent goroutines to parse with.").Default(defaultWorkerCount).Int()
+	workers          = app.Flag("workers", "Number of concurrent goroutines to parse with.").Default(defaultWorkerCount).Uint()
 	concurrentNetOps = app.Flag("concurrent-net-ops", "Number of concurrent network operations to perform.").Default(defaultNetOpsCount).Uint()
 	repackAll        = app.Flag("repack", "Rebuild all SRPMs, even if already built.").Bool()
 	nestedSourcesDir = app.Flag("nested-sources", "Set if for a given SPEC, its sources are contained in a SOURCES directory next to the SPEC file.").Bool()
@@ -144,10 +144,6 @@ func main() {
 	defer timestamp.CompleteTiming()
 
 	timestamp.StartEvent("configuring packer", nil)
-
-	if *workers <= 0 {
-		logger.Log.Fatalf("Value in --workers must be greater than zero. Found %d", *workers)
-	}
 
 	// Create a template configuration that all packed SRPM will be based on.
 	var templateSrcConfig sourceRetrievalConfiguration
@@ -194,7 +190,7 @@ func main() {
 	packList, err := parsePackListFile(*packListFile)
 	logger.PanicOnError(err)
 
-	err = createAllSRPMsWrapper(*specsDir, *distTag, *buildDir, *outDir, *workerTar, *workers, int(*concurrentNetOps), *nestedSourcesDir, *repackAll, *runCheck, packList, templateSrcConfig)
+	err = createAllSRPMsWrapper(*specsDir, *distTag, *buildDir, *outDir, *workerTar, *workers, *concurrentNetOps, *nestedSourcesDir, *repackAll, *runCheck, packList, templateSrcConfig)
 	logger.PanicOnError(err)
 }
 
@@ -233,7 +229,7 @@ func parsePackListFile(packListFile string) (packList map[string]bool, err error
 
 // createAllSRPMsWrapper wraps createAllSRPMs to conditionally run it inside a chroot.
 // If workerTar is non-empty, packing will occur inside a chroot, otherwise it will run on the host system.
-func createAllSRPMsWrapper(specsDir, distTag, buildDir, outDir, workerTar string, workers int, concurrentNetOps uint, nestedSourcesDir, repackAll, runCheck bool, packList map[string]bool, templateSrcConfig sourceRetrievalConfiguration) (err error) {
+func createAllSRPMsWrapper(specsDir, distTag, buildDir, outDir, workerTar string, workers, concurrentNetOps uint, nestedSourcesDir, repackAll, runCheck bool, packList map[string]bool, templateSrcConfig sourceRetrievalConfiguration) (err error) {
 	var chroot *safechroot.Chroot
 	originalOutDir := outDir
 	if workerTar != "" {
@@ -272,7 +268,7 @@ func createAllSRPMsWrapper(specsDir, distTag, buildDir, outDir, workerTar string
 }
 
 // createAllSRPMs will find all SPEC files in specsDir and pack SRPMs for them if needed.
-func createAllSRPMs(specsDir, distTag, buildDir, outDir string, workers, concurrentNetOps int, nestedSourcesDir, repackAll, runCheck bool, packList map[string]bool, templateSrcConfig sourceRetrievalConfiguration) (err error) {
+func createAllSRPMs(specsDir, distTag, buildDir, outDir string, workers, concurrentNetOps uint, nestedSourcesDir, repackAll, runCheck bool, packList map[string]bool, templateSrcConfig sourceRetrievalConfiguration) (err error) {
 	logger.Log.Infof("Finding all SPEC files")
 	timestamp.StartEvent("packing SRPMS", nil)
 	defer timestamp.StopEvent(nil)
@@ -400,7 +396,7 @@ func createChroot(workerTar, buildDir, outDir, specsDir string) (chroot *safechr
 // calculateSPECsToRepack will check which SPECs should be packed.
 // If the resulting SRPM does not exist, or is older than a modification to
 // one of the files used by the SPEC then it is repacked.
-func calculateSPECsToRepack(specFiles []string, distTag, outDir string, nestedSourcesDir, repackAll, runCheck bool, workers int) (states []*specState, err error) {
+func calculateSPECsToRepack(specFiles []string, distTag, outDir string, nestedSourcesDir, repackAll, runCheck bool, workers uint) (states []*specState, err error) {
 	var wg sync.WaitGroup
 
 	requests := make(chan string, len(specFiles))
@@ -415,7 +411,7 @@ func calculateSPECsToRepack(specFiles []string, distTag, outDir string, nestedSo
 	}
 
 	// Start the workers now so they begin working as soon as a new job is buffered.
-	for i := 0; i < workers; i++ {
+	for i := uint(0); i < workers; i++ {
 		wg.Add(1)
 		go specsToPackWorker(requests, results, cancel, &wg, distTag, outDir, arch, nestedSourcesDir, repackAll, runCheck)
 	}
@@ -585,7 +581,7 @@ func drainChannel(ch <-chan struct{}) {
 }
 
 // packSRPMs will pack any SPEC files that have been marked as `toPack`.
-func packSRPMs(specStates []*specState, distTag, buildDir string, templateSrcConfig sourceRetrievalConfiguration, workers, concurrentNetOps int) (err error) {
+func packSRPMs(specStates []*specState, distTag, buildDir string, templateSrcConfig sourceRetrievalConfiguration, workers, concurrentNetOps uint) (err error) {
 	tsRoot, _ := timestamp.StartEvent("packing SRPMs", nil)
 	defer timestamp.StopEvent(nil)
 	var wg sync.WaitGroup
@@ -596,7 +592,7 @@ func packSRPMs(specStates []*specState, distTag, buildDir string, templateSrcCon
 	netOpsSemaphore := make(chan struct{}, concurrentNetOps)
 
 	// Start the workers now so they begin working as soon as a new job is buffered.
-	for i := 0; i < workers; i++ {
+	for i := 0; uint(i) < workers; i++ {
 		wg.Add(1)
 		go packSRPMWorker(allSpecStates, results, cancel, netOpsSemaphore, &wg, distTag, buildDir, templateSrcConfig, tsRoot)
 	}
