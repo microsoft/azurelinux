@@ -15343,6 +15343,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "opentelemetry-cpp",
+          "version": "1.10.0",
+          "downloadUrl": "https://github.com/open-telemetry/opentelemetry-cpp/archive/refs/tags/v1.10.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "openvswitch",
           "version": "2.17.5",
           "downloadUrl": "http://openvswitch.org/releases/openvswitch-2.17.5.tar.gz"
