@@ -76,7 +76,7 @@ steps:
         CONFIG_FILE="" \
         $delta_fetch_arg \
         REBUILD_TOOLS=y \
-        SPECS_DIR="${{ parameters.buildRepoRoot }}/${{ parameters.specFolderPath }}"" \
+        SPECS_DIR="${{ parameters.buildRepoRoot }}/${{ parameters.specFolderPath }}" \
         $run_check_arg
     displayName: "Build packages"
 
