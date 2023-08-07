@@ -32,7 +32,7 @@ MARINER_LOGS=$MARINER_BUILD_DIR/logs
 TOOLCHAIN_LOGS=$MARINER_LOGS/toolchain
 TOOLCHAIN_BUILD_LIST=$TOOLCHAIN_LOGS/build_list.txt
 TOOLCHAIN_BUILT_RPMS_LIST=$TOOLCHAIN_LOGS/built_rpms_list.txt
-TOOLCHAIN_BUILT_SPECS_LIST=$TOOLCHAIN_LOGS/built_specs_list.txt
+TOOLCHAIN_BUILT_SRPMS_LIST=$TOOLCHAIN_LOGS/built_srpms_list.txt
 TOOLCHAIN_FAILURES=$TOOLCHAIN_LOGS/failures.txt
 set -ex
 
@@ -80,12 +80,12 @@ mkdir -pv $CHROOT_RPMS_DIR_NOARCH
 
 TEMP_DIR=$(mktemp -d -t)
 TEMP_BUILT_RPMS_LIST="$(mktemp --tmpdir="$TEMP_DIR")"
-TEMP_BUILT_SPECS_LIST="$(mktemp --tmpdir="$TEMP_DIR")"
+TEMP_BUILT_SRPMS_LIST="$(mktemp --tmpdir="$TEMP_DIR")"
 function clean_up {
     # Removing duplicates during clean-up to simplify appends during run-time.
     echo "Copying build lists to log output..."
     sort "$TEMP_BUILT_RPMS_LIST" | uniq > "$TOOLCHAIN_BUILT_RPMS_LIST"
-    sort "$TEMP_BUILT_SPECS_LIST" | uniq > "$TOOLCHAIN_BUILT_SPECS_LIST"
+    sort "$TEMP_BUILT_SRPMS_LIST" | uniq > "$TOOLCHAIN_BUILT_SRPMS_LIST"
 
     echo "Cleaning up..."
     chroot_unmount
@@ -279,7 +279,7 @@ build_rpm_in_chroot_no_install () {
         chroot_and_run_rpmbuild $srpmName 2>&1 | awk '{ print strftime("time=\"%Y-%m-%dT%T%Z\""), $0; fflush(); }' | tee $TOOLCHAIN_LOGS/$srpmName.log
         copy_built_rpms $builtRpms
         cp $srpmPath $MARINER_OUTPUT_SRPMS_DIR
-        echo "$1" >> $TEMP_BUILT_SPECS_LIST
+        echo "$srpmName" >> $TEMP_BUILT_SRPMS_LIST
         echo NOT installing the package $srpmName
     fi
 
