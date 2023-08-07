@@ -99,6 +99,7 @@ steps:
 
       sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
         CONFIG_FILE="" \
+        CONCURRENT_PACKAGE_BUILDS = 12 \
         $delta_fetch_arg \
         REBUILD_TOOLS=y \
         SPECS_DIR="${{ parameters.buildRepoRoot }}/${{ parameters.specFolderPath }}" \
