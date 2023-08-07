@@ -17,21 +17,35 @@ func TestZeroBase(t *testing.T) {
 	// Two failures, 0.0 multiplier, should be 0 second delay
 	base := 0.0
 	fails := 2
-	val := calculateDelay(fails, defaultTestTime, base)
+	val := calculateExpDelay(fails, defaultTestTime, base)
 	assert.Equal(t, time.Duration(0), val)
 }
 
 func TestZeroI(t *testing.T) {
-	// Zero failures, 1.0 multiplier, should be 0 second delay
+	// Zero failures, 1.0 base, should be 0 second delay
 	fails := 0
 	base := 1.0
-	val := calculateDelay(fails, defaultTestTime, base)
+	val := calculateExpDelay(fails, defaultTestTime, base)
 	assert.Equal(t, time.Second*0, val)
 
-	// Three failures, 1.0 multiplier, should still be 0 second delay
+	// Three failures, 1.0 base, should still be 0 second delay
 	fails = 3
 	base = 0.0
-	val = calculateDelay(fails, defaultTestTime, base)
+	val = calculateExpDelay(fails, defaultTestTime, base)
+	assert.Equal(t, time.Second*0, val)
+}
+
+func TestNegativeI(t *testing.T) {
+	// Negative failures, 1.0 base, should be 0 second delay
+	fails := -1
+	base := 1.0
+	val := calculateExpDelay(fails, defaultTestTime, base)
+	assert.Equal(t, time.Second*0, val)
+
+	// Negative failures, should be 0 second delay
+	fails = -1
+	base = 1.0
+	val = calculateLinearDelay(fails, defaultTestTime)
 	assert.Equal(t, time.Second*0, val)
 }
 
@@ -39,11 +53,9 @@ func TestCalcDelayBaseLinear(t *testing.T) {
 	// Delay vs. retry count for base = -1.0, delay = .1 seconds (ie legacy "linear" backoff)
 	var expectedValuesMillis1 = []int{0, 100, 200, 300, 400, 500}
 
-	// Negative base should be linear backoff
-	backoffExponentBase := -1.0
 	for failures, expected := range expectedValuesMillis1 {
 		expected := time.Duration(expected) * time.Millisecond
-		actual := calculateDelay(failures, defaultTestTime, backoffExponentBase)
+		actual := calculateLinearDelay(failures, defaultTestTime)
 		assert.Equal(t, expected, actual)
 	}
 }
@@ -55,18 +67,17 @@ func TestCalcDelayBase2(t *testing.T) {
 	base := 2.0
 	for failures, expected := range expectedValuesMillis2 {
 		expected := time.Duration(expected) * time.Millisecond
-		actual := calculateDelay(failures, defaultTestTime, base)
+		actual := calculateExpDelay(failures, defaultTestTime, base)
 		assert.Equal(t, expected, actual)
 	}
 }
 
 func TestTotalRunTimeWithFailuresLinear(t *testing.T) {
-	base := -1.0
 	attempts := 3
 	startTime := time.Now()
-	err := RunWithExpBackoff(func() error {
+	err := Run(func() error {
 		return fmt.Errorf("test error")
-	}, attempts, defaultTestTime, base)
+	}, attempts, defaultTestTime)
 	endTime := time.Now()
 	assert.NotNil(t, err)
 	// Delays should be 0 seconds, <attempt>, .1 second, <attempt>, .2 seconds, <attempt>
