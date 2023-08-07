@@ -31,6 +31,10 @@ parameters:
     type: string
     default: "CBL-Mariner"
 
+  - name: specFolderPath
+    type: string
+    default: "SPECS"
+
   - name: srpmsTarballName
     type: string
     default: "srpms.tar.gz"
@@ -72,6 +76,7 @@ steps:
         CONFIG_FILE="" \
         $delta_fetch_arg \
         REBUILD_TOOLS=y \
+        SPECS_DIR="${{ parameters.buildRepoRoot }}/${{ parameters.specFolderPath }}"" \
         $run_check_arg
     displayName: "Build packages"
 
