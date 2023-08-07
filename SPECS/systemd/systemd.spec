@@ -1,7 +1,7 @@
 Summary:        Systemd-250
 Name:           systemd
 Version:        250.3
-Release:        17%{?dist}
+Release:        18%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -27,6 +27,7 @@ Patch5:         backport-helper-util-macros.patch
 Patch6:         CVE-2022-4415.patch
 Patch7:         serve-stale-0001-resolved-added-serve-stale-feature-implementation-of.patch
 Patch8:         serve-stale-0002-resolved-Initialize-until_valid-while-storing-negati.patch
+Patch9:         serve-stale-0003-resolved-added-show-server-state-verb-DumpStatistics.patch
 BuildRequires:  audit-devel
 BuildRequires:  cryptsetup-devel
 BuildRequires:  docbook-dtd-xml
@@ -283,6 +284,9 @@ fi
 %files lang -f %{name}.lang
 
 %changelog
+* Mon Aug 07 2023 Pradeep Mishra <prmis@microsoft.com> - 250.3-18
+- Add support DumpServerState with detailed server state Cache information 
+
 * Fri Jul 07 2023 Dan Streetman <ddstreet@ieee.org> - 250.3-17
 - Add support to systemd-resolved to serve stale dns data
 
