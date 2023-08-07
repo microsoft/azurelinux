@@ -104,7 +104,7 @@ steps:
       set -x
       sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
         CONFIG_FILE="" \
-        CONCURRENT_PACKAGE_BUILDS = 12 \
+        CONCURRENT_PACKAGE_BUILDS=12 \
         $delta_fetch_arg \
         PACKAGE_BUILD_LIST="${{ parameters.TEMP_PARAM_packagesToBuild }}" \
         REBUILD_TOOLS=y \
