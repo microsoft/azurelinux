@@ -87,7 +87,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %changelog
 * Tue Aug 08 2023 Muhammad Falak <mwani@microsoft.com> - 8.2.1-1
 - Bump curl to 8.2.1 to address CVE-2023-32001
-- Drop un-needed patches
+- Drop un-needed patch
 
 * Wed Jun 07 2023 Sumedh Sharma <sumsharma@microsoft.com> - 8.0.1-2
 - Add patch to address CVE-2023-28322
