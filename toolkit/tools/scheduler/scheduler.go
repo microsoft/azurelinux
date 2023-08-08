@@ -120,6 +120,19 @@ func main() {
 		logger.Log.Fatalf("Failed to read DOT graph with error:\n%s", err)
 	}
 
+	/* Give priority to LocalRun node in scheduler.
+	 * If there is an existing runNode and then there is one more run node,
+	 * donot throw dup error, instead replace the remote node with run node
+	 */
+	for _, pkgNode := range dependencyGraph.AllNodes() {
+		if pkgNode.Type == pkggraph.TypeLocalRun {
+			locErr := dependencyGraph.AddRunToLookup(pkgNode)
+			if locErr != nil {
+				logger.Log.Infof("Failed to add remote to lookup: %s", locErr)
+			}
+		}
+	}
+
 	finalPackagesToBuild, packagesToRebuild, packagesToIgnore, err := schedulerutils.ParseAndGeneratePackageList(dependencyGraph, exe.ParseListArgument(*pkgsToBuild), exe.ParseListArgument(*pkgsToRebuild), exe.ParseListArgument(*pkgsToIgnore), *imageConfig, *baseDirPath)
 	if err != nil {
 		logger.Log.Fatalf("Failed to generate package list with error:\n%s", err)
