@@ -13,7 +13,7 @@
 
 Name:           javapackages-bootstrap
 Version:        1.5.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        A means of bootstrapping Java Packages Tools
 # For detailed info see the file javapackages-bootstrap-PACKAGE-LICENSING
 License:        ASL 2.0 and ASL 1.1 and (ASL 2.0 or EPL-2.0) and (EPL-2.0 or GPLv2 with exceptions) and MIT and (BSD with advertising) and BSD-3-Clause and EPL-1.0 and EPL-2.0 and CDDL-1.0 and xpp and CC0 and Public Domain
@@ -107,7 +107,7 @@ Source1078:     osgi-annotation.tar.xz
 Source1079:     osgi-cmpn.tar.xz
 Source1080:     osgi-core.tar.xz
 Source1081:     oss-parent-pom.tar.xz
-Source1082:     plexus-archiver.tar.xz
+Source1082:     plexus-archiver-4.8.0.tar.xz
 Source1083:     plexus-cipher.tar.xz
 Source1084:     plexus-classworlds.tar.xz
 Source1085:     plexus-compiler.tar.xz
@@ -219,7 +219,7 @@ Provides:       bundled(osgi-annotation) = 8.0.0
 Provides:       bundled(osgi-compendium) = 7.0.0
 Provides:       bundled(osgi-core) = 8.0.0
 Provides:       bundled(sonatype-oss-parent) = 7
-Provides:       bundled(plexus-archiver) = 4.2.2
+Provides:       bundled(plexus-archiver) = 4.8.0
 Provides:       bundled(plexus-cipher) = 1.7
 Provides:       bundled(plexus-classworlds) = 2.6.0
 Provides:       bundled(plexus-compiler) = 2.8.8
@@ -359,6 +359,9 @@ sed -i 's|/usr/lib/jvm/java-11-openjdk|%{java_home}|' %{buildroot}%{launchersPat
 %doc AUTHORS
 
 %changelog
+* Tue Aug 08 2023 Saul Paredes <saulparedes@microsoft.com> - 1.5.0-4
+- Update plexus-archiever to 4.8.0
+
 * Wed Apr 05 2023 Riken Maharjan <rmaharjan@microsoft.com> - 1.5.0-3
 - Update commons-compress to 1.21 
 

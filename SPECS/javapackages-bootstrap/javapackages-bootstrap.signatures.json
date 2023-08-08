@@ -2,7 +2,7 @@
     "Signatures": {
         "javapackages-bootstrap-1.5.0.tar.xz": "37518e10d629f6d7115bd78bed85977c7294f871c2438a57f7857f2c0e065c7c",
         "javapackages-bootstrap-PACKAGE-LICENSING": "3f440662012f41be31be13fb764c1f6a21d51f2efdcabf85ed35e9eb8c3b5714",
-        "ignore.upstream.patch.txt": "441bb5697fc5fb4089b1d43479dd443a8ce4405bec4d6b92c4152d4320ad3a80",
+        "ignore.upstream.patch.txt": "44d2daaf7bc6906603521b4585b1a693a773ce0a4cae6afebb0904a21edc9e64",
         "apache-pom.tar.xz": "cedc788ca41b99d04a6b058b1689e6eda8f33b9afd642e526a0998d7741f7614",
         "ant.tar.xz": "230ad9d99c5adfffd14abc3e094e8b7331cef0c061282ce0f13245a02458b604",
         "apiguardian.tar.xz": "2637e3d7ba392f36d2bd6faa792385bc33ec195e18215b7efa7f4c580cd3ab8b",
@@ -84,7 +84,7 @@
         "osgi-cmpn.tar.xz": "78344be15a3ac9b94ac94768493d402ee18c4f595ebb8b2b6471be839e597f57",
         "osgi-core.tar.xz": "faa87a67045f6db6d2623d3772f7034b8dadb12e832c38e94f9aa51f32bc9ae7",
         "oss-parent-pom.tar.xz": "7a0b3ba7507e99224d96d0bbc5ddc56a58b59999318cd52507b3ce3e2d79b3b7",
-        "plexus-archiver.tar.xz": "c444101f1ac55dddf2a9798c10074d8a0615902a0b8fdd09fa76da526be9c386",
+        "plexus-archiver-4.8.0.tar.xz": "1a089b453aadf56c32fc590adc2b44103fdf56d7e0defc32ee399fa5bd95caf9",
         "plexus-cipher.tar.xz": "7da516bba3704ef175ce4a5e6fcab7f78e72ed8104601f59d319409ed95cd189",
         "plexus-classworlds.tar.xz": "f92ba7722caa11a67d8f3d4ed86219c3eb20bba7708cff06dfc0690c7e857138",
         "plexus-compiler.tar.xz": "fc03377057331a19c3814a97992b94eed97c94cb86e12d1e0234cfac0fa7c298",

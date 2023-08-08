@@ -1,1 +1,2 @@
 patches/commons-compress/0001-Remove-usage-of-ArchiveStreamFactory.patch
+patches/plexus-archiver/0001-Remove-support-for-snappy.patch
