@@ -2207,6 +2207,7 @@
                 "livepatch-5.15.98.1-1.cm2",
                 "livepatching",
                 "lld",
+                "lld16",
                 "local-path-provisioner",
                 "lsb-release",
                 "ltp",

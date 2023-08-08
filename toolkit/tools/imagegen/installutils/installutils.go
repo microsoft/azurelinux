@@ -1837,19 +1837,26 @@ func installEfiBootloader(encryptEnabled bool, installRoot, bootUUID, bootPrefix
 }
 
 func copyAdditionalFiles(installChroot *safechroot.Chroot, config configuration.SystemConfig) (err error) {
+	return copyAdditionalFilesHelper(installChroot, config.AdditionalFiles)
+}
+
+func copyAdditionalFilesHelper(installChroot *safechroot.Chroot, additionalFiles map[string]configuration.FileConfigList) (err error) {
 	ReportAction("Copying additional files")
 	timestamp.StartEvent("Copying additional files", nil)
 	defer timestamp.StopEvent(nil)
 
-	for srcFile, dstFile := range config.AdditionalFiles {
-		fileToCopy := safechroot.FileToCopy{
-			Src:  srcFile,
-			Dest: dstFile,
-		}
+	for srcFile, dstFileConfigs := range additionalFiles {
+		for _, dstFileConfig := range dstFileConfigs {
+			fileToCopy := safechroot.FileToCopy{
+				Src:         srcFile,
+				Dest:        dstFileConfig.Path,
+				Permissions: (*os.FileMode)(dstFileConfig.Permissions),
+			}
 
-		err = installChroot.AddFiles(fileToCopy)
-		if err != nil {
-			return
+			err = installChroot.AddFiles(fileToCopy)
+			if err != nil {
+				return
+			}
 		}
 	}
 

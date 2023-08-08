@@ -322,10 +322,10 @@ func (im *IsoMaker) copyAndRenameAdditionalFiles(configFilesAbsDirPath string) {
 	for i := range im.config.SystemConfigs {
 		systemConfig := &im.config.SystemConfigs[i]
 
-		absAdditionalFiles := make(map[string]string)
-		for localAbsFilePath, installedSystemAbsFilePath := range systemConfig.AdditionalFiles {
+		absAdditionalFiles := make(map[string]configuration.FileConfigList)
+		for localAbsFilePath, installedSystemFileConfigs := range systemConfig.AdditionalFiles {
 			isoRelativeFilePath := im.copyFileToConfigRoot(configFilesAbsDirPath, additionalFilesSubDirName, localAbsFilePath)
-			absAdditionalFiles[isoRelativeFilePath] = installedSystemAbsFilePath
+			absAdditionalFiles[isoRelativeFilePath] = installedSystemFileConfigs
 		}
 		systemConfig.AdditionalFiles = absAdditionalFiles
 	}

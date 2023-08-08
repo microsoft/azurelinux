@@ -355,10 +355,10 @@ func convertRawBinariesPath(baseDirPath string, diskConfig *Disk) {
 }
 
 func convertAdditionalFilesPath(baseDirPath string, systemConfig *SystemConfig) {
-	absAdditionalFiles := make(map[string]string)
-	for localFilePath, targetFilePath := range systemConfig.AdditionalFiles {
+	absAdditionalFiles := make(map[string]FileConfigList)
+	for localFilePath, targetFileConfigs := range systemConfig.AdditionalFiles {
 		localFilePath = file.GetAbsPathWithBase(baseDirPath, localFilePath)
-		absAdditionalFiles[localFilePath] = targetFilePath
+		absAdditionalFiles[localFilePath] = targetFileConfigs
 	}
 	systemConfig.AdditionalFiles = absAdditionalFiles
 }

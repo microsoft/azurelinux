@@ -1,11 +1,19 @@
 parameters:
-  - name: customToolchainArtifactBuild
+  - name: buildRepoRoot
+    type: string
+    default: "$(Build.SourcesDirectory)"
+
+  - name: concurrentPackageBuilds
+    type: number
+    default: 12
+
+  - name: customToolchainArtifactName
     type: string
     default: ""
 
-  - name: customToolchainEnabled
-    type: boolean
-    default: false
+  - name: extraPackageRepos
+    type: string
+    default: ""
 
   - name: isCheckBuild
     type: boolean
@@ -19,9 +27,9 @@ parameters:
     type: string
     default: "$(Build.ArtifactStagingDirectory)"
 
-  - name: buildRepoRoot
+  - name: rpmsCacheArtifactName
     type: string
-    default: "$(Build.SourcesDirectory)"
+    default: ""
 
   - name: rpmsTarballName
     type: string
@@ -30,6 +38,10 @@ parameters:
   - name: selfRepoName
     type: string
     default: "CBL-Mariner"
+
+  - name: specsFolderPath
+    type: string
+    default: "SPECS"
 
   - name: srpmsTarballName
     type: string
@@ -40,11 +52,11 @@ steps:
     parameters:
       buildRepoRoot: ${{ parameters.buildRepoRoot }}
 
-  - ${{ if eq(parameters.customToolchainEnabled, true) }}:
+  - ${{ if parameters.customToolchainArtifactName }}:
       - task: DownloadPipelineArtifact@2
         displayName: "Download toolchain"
         inputs:
-          artifact: "${{ parameters.customToolchainArtifactBuild }}"
+          artifact: "${{ parameters.customToolchainArtifactName }}"
           patterns: "**/toolchain_built_rpms_all.tar.gz"
 
       - script: |
@@ -56,6 +68,23 @@ steps:
 
           sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" toolchain TOOLCHAIN_ARCHIVE="$toolchain_archive"
         displayName: "Populate toolchain"
+
+  - ${{ if parameters.rpmsCacheArtifactName }}:
+      - task: DownloadPipelineArtifact@2
+        displayName: "Download RPM cache"
+        inputs:
+          artifact: "${{ parameters.rpmsCacheArtifactName }}"
+          patterns: "**/rpms*.tar.gz"
+
+      - script: |
+          rpms_archive="$(find "$(Pipeline.Workspace)" -name rpms*.tar.gz)"
+          if [[ ! -f "$rpms_archive" ]]; then
+            echo "ERROR: RPMs cache archive not found!" >&2
+            exit 1
+          fi
+
+          sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" hydrate-cached-rpms CACHED_PACKAGES_ARCHIVE="$rpms_archive"
+        displayName: "Populate RPMs cache"
 
   - script: |
       delta_fetch_arg="DELTA_FETCH=n"
@@ -69,9 +98,12 @@ steps:
       fi
 
       sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
+        CONCURRENT_PACKAGE_BUILDS=${{ parameters.concurrentPackageBuilds }} \
         CONFIG_FILE="" \
-        $delta_fetch_arg \
         REBUILD_TOOLS=y \
+        REPO_LIST="${{ parameters.extraPackageRepos }}" \
+        SPECS_DIR="${{ parameters.buildRepoRoot }}/${{ parameters.specsFolderPath }}" \
+        $delta_fetch_arg \
         $run_check_arg
     displayName: "Build packages"
 

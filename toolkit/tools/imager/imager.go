@@ -325,10 +325,10 @@ func setupDiskEncryption(systemConfig *configuration.SystemConfig, encryptedRoot
 
 		// Copy the default keyfile into the image
 		if len(systemConfig.AdditionalFiles) == 0 {
-			systemConfig.AdditionalFiles = make(map[string]string)
+			systemConfig.AdditionalFiles = make(map[string]configuration.FileConfigList)
 		}
 
-		systemConfig.AdditionalFiles[encryptedRoot.HostKeyFile] = diskutils.DefaultKeyFilePath
+		systemConfig.AdditionalFiles[encryptedRoot.HostKeyFile] = configuration.FileConfigList{{Path: diskutils.DefaultKeyFilePath}}
 		logger.Log.Infof("Adding default key file to systemConfig additional files")
 	}
 
@@ -455,8 +455,8 @@ func fixupExtraFilesIntoChroot(installChroot *safechroot.Chroot, config *configu
 		}
 	}
 
-	fixedUpAdditionalFiles := make(map[string]string)
-	for srcFile, dstFile := range config.AdditionalFiles {
+	fixedUpAdditionalFiles := make(map[string]configuration.FileConfigList)
+	for srcFile, dstFileConfigs := range config.AdditionalFiles {
 		newFilePath := filepath.Join(additionalFilesTempDirectory, srcFile)
 
 		fileToCopy := safechroot.FileToCopy{
@@ -464,7 +464,7 @@ func fixupExtraFilesIntoChroot(installChroot *safechroot.Chroot, config *configu
 			Dest: newFilePath,
 		}
 
-		fixedUpAdditionalFiles[newFilePath] = dstFile
+		fixedUpAdditionalFiles[newFilePath] = dstFileConfigs
 		filesToCopy = append(filesToCopy, fileToCopy)
 	}
 	config.AdditionalFiles = fixedUpAdditionalFiles
