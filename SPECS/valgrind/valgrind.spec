@@ -9,6 +9,7 @@ Distribution:   Mariner
 Group:          Development/Debuggers
 URL:            https://valgrind.org
 Source0:        https://sourceware.org/pub/%{name}/%{name}-%{version}.tar.bz2
+Requires:       glibc-debuginfo
 BuildRequires:  pkg-config
 %if %{with_check}
 BuildRequires:  docbook-dtd-xml
