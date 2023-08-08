@@ -58,7 +58,7 @@ cd build
        -DCMAKE_SKIP_RPATH:BOOL=on                                 \
        -DCMAKE_C_FLAGS=-I../../libunwind-%{version}.src/include   \
        -DCMAKE_CXX_FLAGS=-I../../libunwind-%{version}.src/include \
-	   -DLLVM_LINK_LLVM_DYLIB:BOOL=on                             \
+       -DLLVM_LINK_LLVM_DYLIB:BOOL=on                             \
        -DLLVM_DYLIB_COMPONENTS="all"                              \
        -Wno-dev
 %ninja_build
