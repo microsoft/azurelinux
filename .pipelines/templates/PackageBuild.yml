@@ -1,4 +1,8 @@
 parameters:
+  - name: buildRepoRoot
+    type: string
+    default: "$(Build.SourcesDirectory)"
+
   - name: customToolchain
     type: boolean
     default: false
@@ -18,10 +22,6 @@ parameters:
   - name: outputArtifactsFolder
     type: string
     default: "$(Build.ArtifactStagingDirectory)"
-
-  - name: buildRepoRoot
-    type: string
-    default: "$(Build.SourcesDirectory)"
 
   - name: rpmsCache
     type: boolean
@@ -103,15 +103,13 @@ steps:
 
       set -x
       sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
-        CONFIG_FILE="" \
         CONCURRENT_PACKAGE_BUILDS=12 \
-        $delta_fetch_arg \
+        CONFIG_FILE="" \
         PACKAGE_BUILD_LIST="${{ parameters.TEMP_PARAM_packagesToBuild }}" \
         REBUILD_TOOLS=y \
         SPECS_DIR="${{ parameters.buildRepoRoot }}/${{ parameters.specFolderPath }}" \
         SRPM_PACK_LIST="${{ parameters.TEMP_PARAM_packagesToBuild }}" \
-        PACKAGE_BUILD_LIST="${{ parameters.TEMP_PARAM_packagesToBuild }}" \
-        PACKAGE_REBUILD_LIST="${{ parameters.TEMP_PARAM_packagesToBuild }}" \
+        $delta_fetch_arg \
         $run_check_arg
     displayName: "Build packages"
 
