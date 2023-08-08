@@ -64,8 +64,8 @@ func TestShouldReturnCorrectRequiredPackagesForArch(t *testing.T) {
 }
 
 func TestCopyAdditionalFiles(t *testing.T) {
-	dir := filepath.Join(tmpDir, "TestCopyAdditionalFiles")
-	chroot := safechroot.NewChroot(dir, false)
+	proposedDir := filepath.Join(tmpDir, "TestCopyAdditionalFiles")
+	chroot := safechroot.NewChroot(proposedDir, false)
 
 	err := chroot.Initialize("", []string{}, []*safechroot.MountPoint{})
 	assert.NoError(t, err)
@@ -82,8 +82,8 @@ func TestCopyAdditionalFiles(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	copy_1_path := filepath.Join(dir, "a_copy_1.txt")
-	copy_2_path := filepath.Join(dir, "a_copy_2.txt")
+	copy_1_path := filepath.Join(chroot.RootDir(), "a_copy_1.txt")
+	copy_2_path := filepath.Join(chroot.RootDir(), "a_copy_2.txt")
 
 	// Make sure the files exist.
 	orig_stat, err := os.Stat("testdata/a.txt")
