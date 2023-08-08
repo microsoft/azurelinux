@@ -68,15 +68,11 @@ tar -C ./populated_toolchain/usr/src/mariner -cvf toolchain_built_srpms_all.tar.
 popd
 
 if [ "$INCREMENTAL_TOOLCHAIN" = "y" ]; then
-    echo "Creating delta toolchain (S)RPM tarballs."
+    echo "Creating delta toolchain RPMs tarball."
 
     tar -C "$MARINER_BUILD_DIR"/toolchain/built_rpms_all \
         -T "$MARINER_BUILD_DIR"/logs/toolchain/built_rpms_list.txt \
         -cvf "$MARINER_BUILD_DIR"/toolchain/toolchain_built_rpms_delta.tar.gz
-
-    tar -C "$MARINER_BUILD_DIR"/toolchain/populated_toolchain/usr/src/mariner/SRPMS \
-        -T "$MARINER_BUILD_DIR"/logs/toolchain/built_srpms_list.txt \
-        -cvf "$MARINER_BUILD_DIR"/toolchain/toolchain_built_srpms_delta.tar.gz
 fi
 
 echo Printing list of built toolchain RPMS:
