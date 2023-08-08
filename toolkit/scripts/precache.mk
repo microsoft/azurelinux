@@ -38,8 +38,3 @@ $(STATUS_FLAGS_DIR)/precache.flag: $(go-precacher) $(rpms_snapshot) precache_alw
 	if [ -s "$(precache_downloaded_files)" ]; then \
 		touch $@; \
 	fi
-
-foo: $(STATUS_FLAGS_DIR)/precache.flag
-	@echo "precache_downloaded_files: $(precache_downloaded_files)"
-	@echo "precache_state_dir: $(precache_state_dir)"
-	touch $@
