@@ -43,7 +43,7 @@ parameters:
     type: string
     default: "CBL-Mariner"
 
-  - name: specFolderPath
+  - name: specsFolderPath
     type: string
     default: "SPECS"
 
@@ -107,7 +107,7 @@ steps:
         CONFIG_FILE="" \
         REBUILD_TOOLS=y \
         REPO_LIST="${{ parameters.extraPackageRepos }}" \
-        SPECS_DIR="${{ parameters.buildRepoRoot }}/${{ parameters.specFolderPath }}" \
+        SPECS_DIR="${{ parameters.buildRepoRoot }}/${{ parameters.specsFolderPath }}" \
         $delta_fetch_arg \
         $run_check_arg
     displayName: "Build packages"

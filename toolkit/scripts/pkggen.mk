@@ -280,7 +280,7 @@ compress-srpms:
 	tar -cvp -f $(BUILD_DIR)/temp_srpms_tarball.tar.gz -C $(SRPMS_DIR)/.. $(notdir $(SRPMS_DIR))
 	mv $(BUILD_DIR)/temp_srpms_tarball.tar.gz $(srpms_archive)
 
-# Seed the cache RPMs folder files from the archive.
+# Seed the cached RPMs folder files from the archive.
 hydrate-cached-rpms:
 	$(if $(CACHED_PACKAGES_ARCHIVE),,$(error Must set CACHED_PACKAGES_ARCHIVE=))
 	@echo Unpacking cache RPMs from $(CACHED_PACKAGES_ARCHIVE) into $(CACHED_RPMS_DIR)
