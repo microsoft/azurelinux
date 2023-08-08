@@ -51,10 +51,6 @@ parameters:
     type: string
     default: "srpms.tar.gz"
 
-  - name: TEMP_PARAM_packagesToBuild
-    type: string
-    default: ""
-
 steps:
   - template: ToolkitCheck.yml@${{ parameters.selfRepoName }}
     parameters:
@@ -109,11 +105,9 @@ steps:
       sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
         CONCURRENT_PACKAGE_BUILDS=12 \
         CONFIG_FILE="" \
-        PACKAGE_BUILD_LIST="${{ parameters.TEMP_PARAM_packagesToBuild }}" \
         REBUILD_TOOLS=y \
         REPO_LIST="${{ parameters.extraPackageRepos }}" \
         SPECS_DIR="${{ parameters.buildRepoRoot }}/${{ parameters.specFolderPath }}" \
-        SRPM_PACK_LIST="${{ parameters.TEMP_PARAM_packagesToBuild }}" \
         $delta_fetch_arg \
         $run_check_arg
     displayName: "Build packages"

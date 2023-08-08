@@ -28,7 +28,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.15.122.1
-Release:        3%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -422,9 +422,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Tue Aug 08 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.122.1-3
-- REVERT ME, TEST CHANGE.
-
 * Fri Jul 28 2023 Juan Camposeco <juanarturoc@microsoft.com> - 5.15.122.1-2
 - Enable Mellanox DPU drivers and configurations, ARM64 only
 
