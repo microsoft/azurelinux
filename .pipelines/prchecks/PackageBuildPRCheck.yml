@@ -87,8 +87,7 @@ extends:
                 steps:
                   - template: .pipelines/templates/PackageBuild.yml@self
                     parameters:
-                      customToolchainArtifactBuild: $(toolchainArtifactNameBase)_${{ configuration.name }}
-                      customToolchainEnabled: true
+                      customToolchainArtifactName: $(toolchainArtifactNameBase)_${{ configuration.name }}
                       isCheckBuild: true
                       isDeltaBuild: true
                       outputArtifactsFolder: $(ob_outputDirectory)
