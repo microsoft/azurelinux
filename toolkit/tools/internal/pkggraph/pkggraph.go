@@ -648,26 +648,6 @@ func (g *PkgGraph) AllNodesFrom(rootNode *PkgNode) []*PkgNode {
 	return nodes
 }
 
-func (g *PkgGraph) printLookupTable() {
-	for pkgname, list := range g.lookupTable() {
-		logger.Log.Debugf("----------------------------------")
-		logger.Log.Debugf("Package name: %s", pkgname)
-		for _, node := range list {
-			//check if node.RunNode is nil
-			if node.RunNode == nil {
-				logger.Log.Debugf("RunNode: NIL")
-			} else {
-				logger.Log.Debugf("RunNode: %s state: %s", node.RunNode.FriendlyName(), node.RunNode.State.String())
-			}
-			if node.BuildNode == nil {
-				logger.Log.Debugf("BuildNode: NIL")
-			} else {
-				logger.Log.Debugf("BuildNode: %s state: %s", node.BuildNode.FriendlyName(), node.BuildNode.State.String())
-			}
-		}
-	}
-}
-
 // AllRunNodes returns a list of all run nodes in the graph
 func (g *PkgGraph) AllRunNodes() []*PkgNode {
 	count := 0
