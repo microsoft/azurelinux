@@ -772,7 +772,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | USE_PREVIEW_REPO              | n                                                                                                      | Pull missing packages from the upstream preview repository in addition to the base repository?
 | DISABLE_UPSTREAM_REPOS        | n                                                                                                      | Only pull missing packages from local repositories? This does not affect hydrating the toolchain from `$(PACKAGE_URL_LIST)`.
 | DISABLE_DEFAULT_REPOS         | n                                                                                                      | Disable pulling packages from PMC. Use this option with `REPO_LIST` if you want to use your own repository exclusively.
-| CACHED_PACKAGES_ARCHIVE       | n                                                                                                      | Use with `make hydrate-cached-rpms` to populate the external RPMs cache from an archive.
+| CACHED_PACKAGES_ARCHIVE       |                                                                                                        | Use with `make hydrate-cached-rpms` to populate the external RPMs cache from an archive.
 
 ---
 
