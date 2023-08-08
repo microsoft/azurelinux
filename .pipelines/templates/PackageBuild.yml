@@ -3,6 +3,10 @@ parameters:
     type: string
     default: "$(Build.SourcesDirectory)"
 
+  - name: concurrentPackageBuilds
+    type: number
+    default: 12
+
   - name: customToolchain
     type: boolean
     default: false
@@ -101,9 +105,8 @@ steps:
         run_check_arg="RUN_CHECK=y"
       fi
 
-      set -x
       sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
-        CONCURRENT_PACKAGE_BUILDS=12 \
+        CONCURRENT_PACKAGE_BUILDS=${{ parameters.concurrentPackageBuilds }} \
         CONFIG_FILE="" \
         REBUILD_TOOLS=y \
         REPO_LIST="${{ parameters.extraPackageRepos }}" \
