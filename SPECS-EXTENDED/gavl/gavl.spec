@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           gavl
 Version:        1.4.0
-Release:        21%{?dist}
+Release:        22%{?dist}
 Summary:        A library for handling uncompressed audio and video data
 
 License:        GPLv3+
@@ -87,6 +87,9 @@ touch -r include/gavl/gavl.h $RPM_BUILD_ROOT%{_includedir}/gavl/gavl_version.h
 
 
 %changelog
+* Tue Aug 08 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.0-22
+- Test change, revert me.
+
 * Thu Mar 09 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 1.4.0-21
 - Initial CBL-Mariner import from Fedora 36 (license: MIT)
 - License verified.
