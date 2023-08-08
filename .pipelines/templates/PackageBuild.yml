@@ -11,6 +11,10 @@ parameters:
     type: string
     default: ""
 
+  - name: extraPackageRepos
+    type: string
+    default: ""
+
   - name: isCheckBuild
     type: boolean
     default: false
@@ -107,6 +111,7 @@ steps:
         CONFIG_FILE="" \
         PACKAGE_BUILD_LIST="${{ parameters.TEMP_PARAM_packagesToBuild }}" \
         REBUILD_TOOLS=y \
+        REPO_LIST="${{ parameters.extraPackageRepos }}" \
         SPECS_DIR="${{ parameters.buildRepoRoot }}/${{ parameters.specFolderPath }}" \
         SRPM_PACK_LIST="${{ parameters.TEMP_PARAM_packagesToBuild }}" \
         $delta_fetch_arg \
