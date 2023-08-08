@@ -52,7 +52,7 @@ steps:
     parameters:
       buildRepoRoot: ${{ parameters.buildRepoRoot }}
 
-  - ${{ if ne(parameters.customToolchainArtifactName, "") }}:
+  - ${{ if parameters.customToolchainArtifactName }}:
       - task: DownloadPipelineArtifact@2
         displayName: "Download toolchain"
         inputs:
@@ -69,7 +69,7 @@ steps:
           sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" toolchain TOOLCHAIN_ARCHIVE="$toolchain_archive"
         displayName: "Populate toolchain"
 
-  - ${{ if ne(parameters.rpmsCacheArtifactName, "") }}:
+  - ${{ if parameters.rpmsCacheArtifactName }}:
       - task: DownloadPipelineArtifact@2
         displayName: "Download RPM cache"
         inputs:
