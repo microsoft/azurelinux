@@ -55,6 +55,7 @@ Patch24:        0025-net-mlx5-Bridge-implement-infrastructure-for-VLAN-pr.patch
 Patch25:        0026-net-mlx5-Bridge-implement-QinQ-support.patch
 Patch26:        0027-mstflint-This-driver-enables-under-the-secure-boot.patch
 Patch27:        0028-net-mlx5-Bridge-use-debug-not-warn-if-entry-not-found.patch
+Patch28:        0029-gen2-pmem.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
