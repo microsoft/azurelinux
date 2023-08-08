@@ -2,7 +2,7 @@
 Summary:        Memory Management Debugger.
 Name:           valgrind
 Version:        3.18.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -50,6 +50,9 @@ make %{?_smp_mflags} -k check
 %{_libexecdir}/valgrind/*
 
 %changelog
+* Mon Aug 08 2023 Sam Meluch <sammeluch@microsoft.com> - 3.18.1-3
+- Add glibc-debug info to Requires
+
 * Wed Apr 26 2023 Olivia Crain <oliviacrain@microsoft.com> - 3.18.1-2
 - Fix flaky doctests by installing XML DTD files package during check builds
 - Use SPDX license expression in license tag
