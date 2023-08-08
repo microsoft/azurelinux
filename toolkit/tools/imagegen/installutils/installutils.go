@@ -1150,7 +1150,6 @@ func createUserWithPassword(installChroot *safechroot.Chroot, user configuration
 		rootHomeDir       = "/root"
 		userHomeDirPrefix = "/home"
 		postfixLength     = 12
-		alphaNumeric      = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	)
 
 	var (
@@ -1165,7 +1164,7 @@ func createUserWithPassword(installChroot *safechroot.Chroot, user configuration
 	if user.PasswordHashed {
 		hashedPassword = user.Password
 	} else {
-		salt, err = randomization.RandomString(postfixLength, alphaNumeric)
+		salt, err = randomization.RandomString(postfixLength, randomization.LegalCharactersAlphaNum)
 		if err != nil {
 			return
 		}

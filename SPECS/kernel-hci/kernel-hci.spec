@@ -17,7 +17,7 @@
 %define config_source %{SOURCE1}
 Summary:        Linux Kernel for HCI
 Name:           kernel-hci
-Version:        5.15.122.1
+Version:        5.15.123.1
 Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -431,6 +431,17 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Mon Aug 07 2023 Lanze Liu <lanzeliu@microsoft.com> - 5.15.123.1-2
+- Add patch (0028) to enable DM multipath Kernel configurations
+-   Changed CONFIG options:
+-       Enabled DM multipath QLogic support (`CONFIG_DM_MULTIPATH_QL=m`)
+-       Enabled DM multipath SCSI device handler (`CONFIG_DM_MULTIPATH_ST=m`)
+-       Enabled DM multipath hardware-specific module (`CONFIG_DM_MULTIPATH_HST=m`)
+-       Enabled DM multipath I/O ASCII storage (`CONFIG_DM_MULTIPATH_IOA=m`)
+
+* Tue Aug 01 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.123.1-1
+- Auto-upgrade to 5.15.123.1
+
 * Fri Jul 28 2023 Vince Perri <viperri@microsoft.com> - 5.15.122.1-2
 - Add net/mlx5 patch (27) switching warn message to debug
 
