@@ -7,10 +7,6 @@ parameters:
     type: number
     default: 12
 
-  - name: customToolchain
-    type: boolean
-    default: false
-
   - name: customToolchainArtifactName
     type: string
     default: ""
@@ -30,10 +26,6 @@ parameters:
   - name: outputArtifactsFolder
     type: string
     default: "$(Build.ArtifactStagingDirectory)"
-
-  - name: rpmsCache
-    type: boolean
-    default: false
 
   - name: rpmsCacheArtifactName
     type: string
@@ -60,7 +52,7 @@ steps:
     parameters:
       buildRepoRoot: ${{ parameters.buildRepoRoot }}
 
-  - ${{ if eq(parameters.customToolchain, true) }}:
+  - ${{ if ne(parameters.customToolchainArtifactName, "") }}:
       - task: DownloadPipelineArtifact@2
         displayName: "Download toolchain"
         inputs:
@@ -77,7 +69,7 @@ steps:
           sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" toolchain TOOLCHAIN_ARCHIVE="$toolchain_archive"
         displayName: "Populate toolchain"
 
-  - ${{ if eq(parameters.rpmsCache, true) }}:
+  - ${{ if ne(parameters.rpmsCacheArtifactName, "") }}:
       - task: DownloadPipelineArtifact@2
         displayName: "Download RPM cache"
         inputs:
