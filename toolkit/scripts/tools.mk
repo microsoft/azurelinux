@@ -13,6 +13,20 @@ $(call create_folder,$(BUILD_DIR)/tools)
 
 ######## GO TOOLS ########
 
+# The version as reported by 'go version'
+go_min_version = go1.19.0
+
+# Check if the go version is high enough to build the tools. The 'sort' command is used to compare the versions
+# (with -V which sorts by version number). If the lowest version in the sort is the same as the minimum version, then the installed
+# version must be greater than or equal to the minimum version and we are fine.
+ifeq ($(REBUILD_TOOLS),y)
+go_current_version = $(shell go version | awk '{print $$3}')
+go_version_check = $(shell printf '%s\n' "$(go_min_version)" "$(go_current_version)" | sort -V -r | head -n1)
+ifeq ($(go_version_check),$(go_min_version))
+$(error Go version '$(go_current_version)' is less than minimum required version '$(go_min_version)')
+endif
+endif
+
 # List of go utilities in tools/ directory
 go_tool_list = \
 	boilerplate \
