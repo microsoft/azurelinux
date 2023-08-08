@@ -156,8 +156,3 @@ const (
 	FinishTitle   = "CBL-Mariner Installation Complete"
 	FinishTextFmt = "Total installation time: %v seconds. Press Enter to restart."
 )
-
-// Common for input validation.
-const (
-	AlphaNumeric = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-)
