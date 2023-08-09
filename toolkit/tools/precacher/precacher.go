@@ -314,7 +314,7 @@ func precachePackage(pkg *repocloner.RepoPackage, availablePackages map[string]s
 
 func writeSummaryFile(summaryFile string, downloadedPackages []string) (err error) {
 	logger.Log.Infof("Writing pre-caching summary file to '%s'", summaryFile)
-	err = file.WriteLines(downloadedPackages, summaryFile, "\n")
+	err = file.WriteLines(downloadedPackages, "\n", summaryFile)
 	if err != nil {
 		err = fmt.Errorf("failed to write pre-caching summary file: %w", err)
 		return
