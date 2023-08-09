@@ -82,7 +82,7 @@ Name:           ruby
 # TODO: When changing ruby version, these gemified stdlib
 # provides should be versioned according to the ruby version.
 # More info: https://stdgems.org/
-Version:        3.1.4
+Version:        3.2.2
 Release:        1%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
@@ -399,6 +399,9 @@ sudo -u test make test TESTS="-v"
 %{_rpmconfigdir}/rubygems.con
 
 %changelog
+* Wed Aug 09 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.2-1
+- Auto-upgrade to 3.2.2 - Update uri_version to v0.12.1 to resolve CVE-2023-36617
+
 * Wed May 03 2023 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 3.1.4-1
 - Upgrade ruby to 3.1.4
 - Update time_version to v0.2.2 to resolve CVE-2023-28756
