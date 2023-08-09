@@ -126,7 +126,7 @@ Source1097:     sisu-build-api.tar.xz
 Source1098:     sisu-inject.tar.xz
 Source1099:     sisu-mojos.tar.xz
 Source1100:     sisu-plexus.tar.xz
-Source1101:     slf4j.tar.xz
+Source1101:     slf4j-1.7.36-test.tar.xz
 Source1102:     testng.tar.xz
 Source1103:     univocity-parsers.tar.xz
 Source1104:     velocity-engine.tar.xz
@@ -238,7 +238,7 @@ Provides:       bundled(plexus-build-api) = 0.0.7
 Provides:       bundled(sisu) = 0.3.4
 Provides:       bundled(sisu-mojos) = 0.3.4
 Provides:       bundled(sisu-plexus) = 0.3.4
-Provides:       bundled(slf4j) = 1.7.30
+Provides:       bundled(slf4j) = 1.7.36
 Provides:       bundled(testng) = 7.3.0
 Provides:       bundled(univocity-parsers) = 2.9.1
 Provides:       bundled(velocity) = 1.7
