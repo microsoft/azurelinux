@@ -1088,6 +1088,19 @@
                 "PR": [
                     "https://github.com/microsoft/CBL-Mariner/pull/5964"
                 ]
+            },
+            "CONFIG_BLK_DEV_NBD": {
+                "value": [
+                    "m"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "Add nbd module for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5972"
+                ]
             }
         }
     }
