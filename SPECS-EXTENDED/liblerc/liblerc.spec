@@ -1,12 +1,10 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-
+Summary:        Library for Limited Error Raster Compression
 Name:           liblerc
 Version:        4.0.0
 Release:        3%{?dist}
-Summary:        Library for Limited Error Raster Compression
-
 License:        ASL 2.0
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/Esri/lerc
 Source0:        https://github.com/Esri/lerc/archive/v%{version}/lerc-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Add version suffix to mingw dll
