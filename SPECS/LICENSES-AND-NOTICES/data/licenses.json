@@ -1600,6 +1600,7 @@
                 "python-betamax",
                 "python-blinker",
                 "python-blivet",
+                "python-cstruct",
                 "python-cached_property",
                 "python-charset-normalizer",
                 "python-cheetah",
