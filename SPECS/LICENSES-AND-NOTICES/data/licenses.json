@@ -634,6 +634,7 @@
                 "libgovirt",
                 "libgphoto2",
                 "libgsf",
+                "libgta",
                 "libguestfs",
                 "libgusb",
                 "libgxim",
