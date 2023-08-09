@@ -628,6 +628,7 @@
                 "libgdither",
                 "libgee",
                 "libgee06",
+                "libgeotiff",
                 "libgexiv2",
                 "libgit2",
                 "libgit2-glib",
