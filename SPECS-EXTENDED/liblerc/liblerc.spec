@@ -63,8 +63,8 @@ sed -i 's/\r$//' NOTICE README.md doc/MORE.md
 
 %changelog
 * Wed Aug 09 2023 Archana Choudhary <archana1@microsoft.com> - 4.0.0-3
-- Initial CBL-Mariner import from Fedora 37 (MIT).
-- Remove mingw execution blocks.
+- Initial CBL-Mariner import from Fedora 37 (license: MIT)
+- Remove mingw execution blocks
 
 * Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 4.0.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
