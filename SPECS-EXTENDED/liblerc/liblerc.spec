@@ -9,18 +9,15 @@ URL:            https://github.com/Esri/lerc
 Source0:        https://github.com/Esri/lerc/archive/v%{version}/lerc-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Add version suffix to mingw dll
 Patch0:         liblerc-dllver.patch
-
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
 BuildRequires:  python3-devel
-
 
 %description
 LERC is an open-source image or raster format which supports rapid encoding and
 decoding for any pixel type (not just RGB or Byte). Users set the maximum
 compression error per pixel while encoding, so the precision of the original
 input image is preserved (within user defined error bounds).
-
 
 %package        devel
 Summary:        Development files for %{name}
@@ -29,7 +26,6 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 %description    devel
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
-
 
 %prep
 %autosetup -p1 -n lerc-%{version}
@@ -60,11 +56,11 @@ sed -i 's/\r$//' NOTICE README.md doc/MORE.md
 %{_libdir}/libLerc.so
 %{_libdir}/pkgconfig/Lerc.pc
 
-
 %changelog
 * Wed Aug 09 2023 Archana Choudhary <archana1@microsoft.com> - 4.0.0-3
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
 - Remove mingw execution blocks
+- License verified
 
 * Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 4.0.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
