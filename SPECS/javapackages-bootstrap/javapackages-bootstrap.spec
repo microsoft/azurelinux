@@ -309,11 +309,11 @@ do
 done
 
 # removing harmony files from the source as it causes build time error
-# sed  -i "/<excludeSourceMatching>/a\ \t<excludeSourceMatching>/org/apache/commons/compress/harmony/(pack200|unpack200)/.*</excludeSourceMatching>" project/commons-compress.xml
+sed  -i "/<excludeSourceMatching>/a\ \t<excludeSourceMatching>/org/apache/commons/compress/harmony/(pack200|unpack200)/.*</excludeSourceMatching>" project/commons-compress.xml
 
 
 %build
-export LC_ALL=en_US.UTF-8 
+# export LC_ALL=en_US.UTF-8 
 export JAVA_HOME=$(find /usr/lib/jvm -name "*openjdk*")
 ./mbi.sh build -parallel
 
