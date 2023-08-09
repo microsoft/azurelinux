@@ -71,7 +71,7 @@
 %global tmpdir_version          0.1.2
 %global tsort_version           0.1.0
 %global un_version              0.2.0
-%global uri_version             0.11.1
+%global uri_version             0.12.1
 %global weakref_version         0.1.1
 %global win32ole_version        1.8.8
 %global yaml_version            0.2.0
@@ -104,6 +104,7 @@ BuildRequires:  tzdata
 %if %{with_check}
 BuildRequires:  shadow-utils
 BuildRequires:  sudo
+BuildRequires:  libyaml-devel
 %endif
 
 Requires:       gmp
@@ -370,8 +371,8 @@ sudo -u test make test TESTS="-v"
 %{_bindir}/*
 %{_includedir}/*
 %{_libdir}/*.so
-%{_libdir}/*.so.3.1
-%{_libdir}/*.so.3.1.4
+%{_libdir}/*.so.3.2
+%{_libdir}/*.so.3.2.2
 %{_libdir}/pkgconfig/*.pc
 %{_libdir}/ruby/*
 %{_datadir}/ri/*
@@ -400,7 +401,7 @@ sudo -u test make test TESTS="-v"
 
 %changelog
 * Wed Aug 09 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.2-1
-- Auto-upgrade to 3.2.2 - Update uri_version to v0.12.1 to resolve CVE-2023-36617
+- Auto-upgrade to 3.2.2 - Update uri_version to v0.12.1
 
 * Wed May 03 2023 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 3.1.4-1
 - Upgrade ruby to 3.1.4
