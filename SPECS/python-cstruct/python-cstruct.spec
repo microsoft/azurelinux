@@ -41,7 +41,6 @@ Requires:       python3
 %{python3} setup.py test
 
 %files -n python3-%{srcname}
-%defattr(-, root, root)
 %license LICENSE
 %{python3_sitelib}/*
 
