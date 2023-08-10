@@ -36,8 +36,7 @@ developing applications that use %{name}.
 find %{buildroot} -name '*.a' -delete -print
 
 %check
-# TODO: Koji isolated environment may cause some tests fail to pass.
-make check || true
+make check
 
 %ldconfig_scriptlets
 
