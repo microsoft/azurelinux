@@ -2055,6 +2055,7 @@
                 "xdelta",
                 "xdg-dbus-proxy",
                 "xdg-utils",
+                "xerces-c",
                 "xfconf",
                 "xfsdump",
                 "xhtml1-dtds",
