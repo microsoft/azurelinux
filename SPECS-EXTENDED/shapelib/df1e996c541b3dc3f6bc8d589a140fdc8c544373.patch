@@ -1,0 +1,11 @@
+diff -rupN --no-dereference shapelib-1.5.0/contrib/shpsort.c shapelib-1.5.0-new/contrib/shpsort.c
+--- shapelib-1.5.0/contrib/shpsort.c	2004-07-06 23:23:17.000000000 +0200
++++ shapelib-1.5.0-new/contrib/shpsort.c	2022-03-02 13:35:48.322878882 +0100
+@@ -279,7 +279,6 @@ static char ** split(const char *arg, co
+ 	free(result[--i]);
+       }
+       free(result);
+-      free(copy);
+       return NULL;
+     }
+     result = tmp;
