@@ -153,26 +153,7 @@ rm -rf %{buildroot}%{_datadir}/doc/${name}
 %{_mandir}/man1/gie.1*%{?ext_man}
 %{_mandir}/man1/projinfo.1*%{?ext_man}
 %{_mandir}/man1/projsync.1*%{?ext_man}
-%dir %{_datadir}/%{name}/
-%{_datadir}/%{name}/proj.ini
-%{_datadir}/%{name}/copyright_and_licenses.csv
-%{_datadir}/%{name}/CH
-%{_datadir}/%{name}/GL27
-%{_datadir}/%{name}/ITRF2000
-%{_datadir}/%{name}/ITRF2008
-%{_datadir}/%{name}/ITRF2014
-%{_datadir}/%{name}/README.DATA
-%{_datadir}/%{name}/deformation_model.schema.json
-%{_datadir}/%{name}/nad.lst
-%{_datadir}/%{name}/nad27
-%{_datadir}/%{name}/nad83
-%{_datadir}/%{name}/other.extra
-%{_datadir}/%{name}/proj.db
-%{_datadir}/%{name}/projjson.schema.json
-%{_datadir}/%{name}/triangulation.schema.json
-%{_datadir}/%{name}/world
-%{_datadir}/%{name}/si_gurs_README.txt
-%{_datadir}/%{name}/si_gurs_SLO-VRP2016-Koper.tif
+%{_datadir}/%{name}/*
 
 %files -n %{libname}
 %{_libdir}/libproj.so.%{sover}*
