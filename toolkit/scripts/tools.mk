@@ -6,7 +6,7 @@
 #	- Chroot Utilities
 
 $(call create_folder,$(RPMS_DIR))
-$(call create_folder,$(CACHED_RPMS_DIR))
+$(call create_folder,$(CACHED_RPMS_DIR)/cache)
 $(call create_folder,$(CCACHE_DIR))
 $(call create_folder,$(TOOL_BINS_DIR))
 $(call create_folder,$(BUILD_DIR)/tools)
@@ -193,7 +193,7 @@ macro_manifest = $(TOOLCHAIN_MANIFESTS_DIR)/macro_packages.txt
 macro-tools: $(macro_rpmrc)
 
 $(macro_rpmrc): $(toolchain_rpms)
-	$(SCRIPTS_DIR)/preparemacros.sh $(MACRO_DIR) $(CACHED_RPMS_DIR) $(macro_manifest)
+	$(SCRIPTS_DIR)/preparemacros.sh $(MACRO_DIR) $(CACHED_RPMS_DIR)/cache $(macro_manifest)
 
 clean: clean-macro-tools
 clean-macro-tools:
