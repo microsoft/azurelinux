@@ -32,21 +32,26 @@ import (
 )
 
 const (
-	defaultWorkerCount = "10"
+	// Spaces added on purpose to simplify substring matching.
+	andCondition  = " and "
+	ifCondition   = " if "
+	orCondition   = " or "
+	withCondition = " with "
 )
 
 var (
 	supportedBooleanConditions = []string{
-		"and",
-		"if",
-		"or",
-		"with",
+		andCondition,
+		ifCondition,
+		orCondition,
+		withCondition,
 	}
 
+	// Spaces added on purpose to simplify substring matching.
 	unsupportedBooleanConditions = []string{
-		"else",
-		"unless",
-		"without",
+		" else ",
+		" unless ",
+		" without ",
 	}
 )
 
@@ -55,6 +60,10 @@ type parseResult struct {
 	packages []*pkgjson.Package
 	err      error
 }
+
+const (
+	defaultWorkerCount = "10"
+)
 
 var (
 	app                     = kingpin.New("specreader", "A tool to parse spec dependencies into JSON")
@@ -519,7 +528,7 @@ func parseProvides(rpmsDir, toolchainDir string, toolchainRPMs []string, srpmPat
 func parsePackageVersions(packageString string) (newPackages []*pkgjson.PackageVer, err error) {
 	// If the first character of the packageString is a "(" then it's an "or" condition.
 	if packageString[0] == '(' {
-		return parseBooleanCondition(packageString)
+		return parseRichDependency(packageString)
 	}
 
 	pkgVer, err := pkgjson.PackageStringToPackageVer(packageString)
@@ -583,38 +592,49 @@ func condensePackageVersionArray(packagelist []*pkgjson.PackageVer, specfile str
 	return
 }
 
-// parseBooleanCondition splits a package name like '(foo or bar)' and returns both foo and bar as separate requirements.
-func parseBooleanCondition(fullCondition string) (versions []*pkgjson.PackageVer, err error) {
+// parseRichDependency splits a package name like '(foo or bar)' and returns both foo and bar as separate requirements.
+func parseRichDependency(richDependency string) (versions []*pkgjson.PackageVer, err error) {
+	const documentationHint = "Please refer to 'docs/how_it_works/3_package_building.md#rich-dependencies' for explanation of limitations"
+
 	for _, singleCondition := range unsupportedBooleanConditions {
-		if strings.Contains(fullCondition, singleCondition) {
-			err = fmt.Errorf("found unsupported boolean condition '%s' inside '%s'. Please refer to 'docs/how_it_works/3_package_building.md#or-clauses' for explanation of limitations", singleCondition, fullCondition)
+		if strings.Contains(richDependency, singleCondition) {
+			err = fmt.Errorf("found unsupported boolean condition '%s' inside '%s'. %s", singleCondition, richDependency, documentationHint)
 			return
 		}
 	}
 
 	conditionsCount := 0
 	for _, singleCondition := range supportedBooleanConditions {
-		conditionsCount += strings.Count(fullCondition, singleCondition)
+		conditionsCount += strings.Count(richDependency, singleCondition)
 		if conditionsCount > 1 {
-			err = fmt.Errorf("found more than one boolean condition inside '%s'. Please refer to 'docs/how_it_works/3_package_building.md#or-clauses' for explanation of limitations", fullCondition)
+			err = fmt.Errorf("found more than one boolean condition inside '%s'. %s", richDependency, documentationHint)
 			return
 		}
 	}
 
-	logger.Log.Warnf("Found a boolean condition '%s', make sure both packages are available. Please refer to 'docs/how_it_works/3_package_building.md#or-clauses' for explanation of limitations.", fullCondition)
-
-	fullCondition = strings.ReplaceAll(fullCondition, "(", "")
-	fullCondition = strings.ReplaceAll(fullCondition, ")", "")
+	richDependency = strings.ReplaceAll(richDependency, "(", "")
+	richDependency = strings.ReplaceAll(richDependency, ")", "")
 
 	packageStrings := []string{}
 	for _, singleCondition := range supportedBooleanConditions {
-		if strings.Contains(fullCondition, singleCondition) {
-			packageStrings = strings.Split(fullCondition, singleCondition)
+		if strings.Contains(richDependency, singleCondition) {
+			packageStrings = strings.Split(richDependency, singleCondition)
 			break
 		}
 	}
-	err = minSliceLength(packageStrings, 1)
+	err = minSliceLength(packageStrings, 2)
 	if err != nil {
+		return
+	}
+
+	switch {
+	case strings.Contains(richDependency, andCondition) || strings.Contains(richDependency, orCondition) || strings.Contains(richDependency, withCondition):
+		logger.Log.Warnf("Found a boolean condition '%s', make sure both packages are available. %s.", richDependency, documentationHint)
+	case strings.Contains(richDependency, ifCondition):
+		logger.Log.Warnf("Found a boolean condition '%s', make sure the packages on the left is available. %s.", richDependency, documentationHint)
+		packageStrings = []string{packageStrings[0]}
+	default:
+		err = fmt.Errorf("found a unsupported boolean condition inside '%s'. %s", richDependency, documentationHint)
 		return
 	}
 
