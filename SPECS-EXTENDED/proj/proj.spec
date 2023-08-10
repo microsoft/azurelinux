@@ -192,6 +192,7 @@ rm -rf %{buildroot}%{_datadir}/doc/${name}
 %changelog
 * Fri Jul 21 2023 Suresh Thelkar <sthelkar@microsoft.com> - 9.2.1-1
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
+- License verified
 - Used the appropriate Build Requires for gtest
 - Added Build Requires for gmock-devel
 - Used wildcards in man pages in the files section
