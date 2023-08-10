@@ -606,10 +606,10 @@ func parseRichDependency(richDependency string) (versions []*pkgjson.PackageVer,
 	conditionsCount := 0
 	for _, singleCondition := range supportedBooleanConditions {
 		conditionsCount += strings.Count(richDependency, singleCondition)
-		if conditionsCount > 1 {
-			err = fmt.Errorf("found more than one boolean condition inside '%s'. %s", richDependency, documentationHint)
-			return
-		}
+	}
+	if conditionsCount > 1 {
+		err = fmt.Errorf("found more than one boolean condition inside '%s'. %s", richDependency, documentationHint)
+		return
 	}
 
 	richDependency = strings.ReplaceAll(richDependency, "(", "")
