@@ -27,7 +27,7 @@ steps:
   - task: Cache@2
     inputs:
       key: '"raw-toolchain" | "$(Agent.OSArchitecture)" | "$(latestStableCommit)"'
-      path: "${{ parameters.buildRepoRoot }}/build/toolchain/toolchain_from_container.tar.gz"
+      path: "${{ parameters.buildRepoRoot }}/build/toolchain/raw_toolchain"
     displayName: Cache the raw toolchain
 
   - bash: sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" "-j$(nproc)" toolchain QUICK_REBUILD=y

@@ -12,6 +12,7 @@ $(call create_folder,$(SRPMS_DIR))
 $(call create_folder,$(TOOLCHAIN_RPMS_DIR))
 
 toolchain_build_dir = $(BUILD_DIR)/toolchain
+raw_toolchain_dir = $(toolchain_build_dir)/raw_toolchain
 toolchain_local_temp = $(toolchain_build_dir)/extract_dir
 toolchain_from_repos = $(toolchain_build_dir)/repo_rpms
 toolchain_logs_dir = $(LOGS_DIR)/toolchain
@@ -24,7 +25,7 @@ populated_toolchain_rpms = $(populated_toolchain_chroot)/usr/src/mariner/RPMS
 toolchain_spec_list = $(toolchain_build_dir)/toolchain_specs.txt
 toolchain_actual_contents = $(toolchain_build_dir)/actual_archive_contents.txt
 toolchain_expected_contents = $(toolchain_build_dir)/expected_archive_contents.txt
-raw_toolchain = $(toolchain_build_dir)/toolchain_from_container.tar.gz
+raw_toolchain = $(raw_toolchain_dir)/toolchain_from_container.tar.gz
 final_toolchain = $(toolchain_build_dir)/toolchain_built_rpms_all.tar.gz
 toolchain_files = \
 	$(call shell_real_build_only, find $(SCRIPTS_DIR)/toolchain -name *.sh) \
@@ -130,12 +131,13 @@ compress-toolchain:
 	$(if $(CACHE_DIR), cp $(raw_toolchain) $(final_toolchain) $(CACHE_DIR))
 
 # After hydrating the toolchain run
-# "sudo touch build/toolchain/toolchain_from_container.tar.gz" (should really check for existence of files in toolchain_*.txt)
+# "sudo touch build/toolchain/raw_toolchain/toolchain_from_container.tar.gz" (should really check for existence of files in toolchain_*.txt)
 # "sudo make toolchain REBUILD_TOOLCHAIN=y INCREMENTAL_TOOLCHAIN=y"
 hydrate-toolchain:
 	$(if $(TOOLCHAIN_CONTAINER_ARCHIVE),,$(error Must set TOOLCHAIN_CONTAINER_ARCHIVE=))
 	$(if $(TOOLCHAIN_ARCHIVE),,$(error Must set TOOLCHAIN_ARCHIVE=))
 	sudo mkdir -vp $(toolchain_build_dir)
+	sudo mkdir -vp $(raw_toolchain_dir)
 	sudo cp $(TOOLCHAIN_CONTAINER_ARCHIVE) $(raw_toolchain)
 	tar -I $(ARCHIVE_TOOL) -xf $(TOOLCHAIN_CONTAINER_ARCHIVE) -C $(toolchain_build_dir) --skip-old-files --touch --checkpoint=100000 --checkpoint-action=echo="%T"
 	sudo cp $(TOOLCHAIN_ARCHIVE) $(final_toolchain)
@@ -155,7 +157,7 @@ hydrate-toolchain:
 	sudo touch $(raw_toolchain)
 
 # Output:
-# out/toolchain/toolchain_from_container.tar.gz
+# out/toolchain/raw_toolchain/toolchain_from_container.tar.gz
 $(raw_toolchain): $(toolchain_files)
 	@echo "Building raw toolchain"
 	cd $(SCRIPTS_DIR)/toolchain && \
@@ -164,7 +166,8 @@ $(raw_toolchain): $(toolchain_files)
 			$(SPECS_DIR) \
 			$(SOURCE_URL) \
 			$(INCREMENTAL_TOOLCHAIN) \
-			$(ARCHIVE_TOOL)
+			$(ARCHIVE_TOOL) \
+			$@
 
 # This target establishes a cache of toolchain RPMs for partially rehydrating the toolchain from package repos.
 # $(toolchain_from_repos) is a staging folder for these RPMs. We use the toolchain manifest to get a list of
@@ -229,7 +232,8 @@ $(final_toolchain): $(raw_toolchain) $(toolchain_rpms_rehydrated) $(STATUS_FLAGS
 			$(BUILD_SRPMS_DIR) \
 			$(SRPMS_DIR) \
 			$(toolchain_from_repos) \
-			$(TOOLCHAIN_MANIFEST) && \
+			$(TOOLCHAIN_MANIFEST) \
+			$(raw_toolchain) && \
 	$(if $(filter y,$(UPDATE_TOOLCHAIN_LIST)), ls -1 $(toolchain_build_dir)/built_rpms_all > $(MANIFESTS_DIR)/package/toolchain_$(build_arch).txt && ) \
 	touch $@
 
