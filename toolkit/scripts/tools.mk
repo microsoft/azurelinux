@@ -16,6 +16,7 @@ $(call create_folder,$(BUILD_DIR)/tools)
 # The version as held in the go.mod file (a line like 'go 1.19'). Add "go" to the front of the version number
 # so that it matches the output of 'go version' (e.g. 'go1.19').
 go_min_version = go$(shell grep -E '^go [0-9]+\.[0-9]+' $(TOOLS_DIR)/go.mod | awk '{print $$2}')
+
 # Check if the go version is high enough to build the tools. The 'sort' command is used to compare the versions
 # (with -V which sorts by version number). If the lowest version in the sort is the same as the minimum version, then
 # the installed version must be greater than or equal to the minimum version and we are fine.
