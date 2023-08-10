@@ -10,6 +10,7 @@ MARINER_SPECS_DIR=$2
 MARINER_SOURCE_URL=$3
 INCREMENTAL_TOOLCHAIN=$4
 ARCHIVE_TOOL=$5
+RAW_TOOLCHAIN_PATH=$6
 
 # Grab an identity for the raw toolchain components so we can avoid rebuilding it if it hasn't changed
 sha_component_tag=$(sha256sum ./container/toolchain-sha256sums ./container/toolchain_build_in_chroot.sh ./create_toolchain_in_container.sh | sha256sum | cut -d' ' -f1 )
@@ -84,8 +85,9 @@ rm -rvf ./populated_toolchain/.dockerenv
 rm -rvf ./populated_toolchain/sources
 rm -rvf ./populated_toolchain/tools/libexec/gcc
 
-echo "Compressing toolchain_from_container.tar.gz"
-tar -I "$ARCHIVE_TOOL" -cf toolchain_from_container.tar.gz populated_toolchain
+echo "Compressing $(basename "$RAW_TOOLCHAIN_PATH")"
+mkdir -p "$(dirname "$RAW_TOOLCHAIN_PATH")"
+tar -I "$ARCHIVE_TOOL" -cf "$RAW_TOOLCHAIN_PATH" populated_toolchain
 ls -la ./
 ls -la ./populated_toolchain
 popd
