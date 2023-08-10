@@ -275,6 +275,7 @@ func downloadMissingPackages(rpmSnapshot *repocloner.RepoContents, availablePack
 	// Spawn a worker for each package, they will all do preliminary checks in parrallel before synchronizing on the semaphore.
 	// Each worker is responsible for adding and removing itself from the wait group.
 	for _, pkg := range rpmSnapshot.Repo {
+		wg.Add(1)
 		go precachePackage(pkg, availablePackages, outDir, wg, results, netOpsSemaphore)
 	}
 
@@ -335,16 +336,15 @@ func monitorProgress(total int, results chan downloadResult, doneChannel chan st
 
 // precachePackage will attempt to download the specified package. It will return a downloadResult struct via the results.
 // This function runs with best effort, so it will return a result (of type downloadResultTypeFailure) if any error occurs
-// rather than returning an error. This function is responsible for adding and removing itself from the provided wait group.
-// As much processing as possible is done before acquiring the network operations semaphore to minimize the time spent
-// holding it.
+// rather than returning an error. The caller is expected to have added to the provided wait group, while this function is
+// responsible for removing itself from the wait group. As much processing as possible is done before acquiring the
+// network operations semaphore to minimize the time spent holding it.
 func precachePackage(pkg *repocloner.RepoPackage, availablePackages map[string]string, outDir string, wg *sync.WaitGroup, results chan<- downloadResult, netOpsSemaphore chan struct{}) {
 	const (
 		downloadRetryAttempts = 2
 		downloadRetryDuration = time.Second
 	)
 
-	wg.Add(1)
 	defer wg.Done()
 
 	// File names are of the form "<name>-<version>.<distro>.<arch>.rpm"
