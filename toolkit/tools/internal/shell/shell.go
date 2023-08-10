@@ -39,15 +39,6 @@ func CurrentEnvironment() []string {
 	return currentEnv
 }
 
-// IsMarinerOs will return true if the file /etc/mariner-release exists.
-func IsMarinerOs() bool {
-	// Check if the OS is Mariner
-	if _, err := os.Stat(marinerReleaseFile); err == nil {
-		return true
-	}
-	return false
-}
-
 // PermanentlyStopAllProcesses will send the provided signal to all processes spawned by this package,
 // and all of those process's children.
 // Invoking this will also block future process creation, causing the Execute methods to return an error.
