@@ -43,6 +43,7 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 
 
 %build
+rm -rf examples
 %{qmake_qt5} \
   %{?_qt5_examplesdir:CONFIG+=qt_example_installs}
 
@@ -86,9 +87,6 @@ popd
 %{_qt5_docdir}/qtserialport.qch
 %{_qt5_docdir}/qtserialport/
 %endif
-
-%files examples
-%{_qt5_examplesdir}/
 
 
 %changelog
