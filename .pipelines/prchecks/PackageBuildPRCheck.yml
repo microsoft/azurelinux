@@ -56,11 +56,6 @@ extends:
                   ob_artifactBaseName: $(toolchainArtifactNameBase)_${{ configuration.name }}
                   ob_outputDirectory: $(Build.ArtifactStagingDirectory)
                 steps:
-                  - template: .pipelines/templates/RawToolchainDownload.yml@self
-                    parameters:
-                      rawToolchainCacheURL: ${{ configuration.rawToolchainCacheURL }}
-                      rawToolchainExpectedHash: ${{ configuration.rawToolchainExpectedHash }}
-
                   - template: .pipelines/templates/ToolchainBuild.yml@self
                     parameters:
                       outputArtifactsFolder: $(ob_outputDirectory)

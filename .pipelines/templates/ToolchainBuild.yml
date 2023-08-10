@@ -19,6 +19,16 @@ steps:
     parameters:
       buildRepoRoot: ${{ parameters.buildRepoRoot }}
 
+  - bash: |
+      echo "##vso[task.setvariable variable=latestStableCommit]$(git -C "${{ parameters.buildRepoRoot }}" rev-list -n 1 2.0-stable)"
+    displayName: "Get the latest stable commit hash"
+
+  - task: Cache@2
+    inputs:
+      key: '"raw-toolchain" | "$(Agent.OSArchitecture)" | "$(latestStableCommit)"'
+      path: "${{ parameters.buildRepoRoot }}/build/toolchain/toolchain_from_container.tar.gz"
+    displayName: Cache the raw toolchain
+
   - bash: sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" "-j$(nproc)" toolchain QUICK_REBUILD=y
     displayName: "Build toolchain"
 
