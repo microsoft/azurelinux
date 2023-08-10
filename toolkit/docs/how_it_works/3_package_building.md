@@ -59,10 +59,10 @@ All package dependency information is written to `./../build/pkg_artifacts/specs
 Spec files can have `(a <condition> b)` style requirements. Depending on the condition the following will happen::
 - `and`, `or`, `with`: the build system will record both options into the graph so that all possible requirements will be made available to pick from during package install allowing for maximum flexibility. This means that the build system requires all optional RPMs to be available to build/download even if they will not be used for a specific configuration.
 - `if`: the build will record the requirement on the left side of the clause as a dependency. That means that the build system will require the package to be available to build/download even if it will not be used for a specific configuration.
-- `else`, `unless`, `without`, or multiple boolean clauses of any kind: unsupported, the build will fail with an error.
+- `else`, `unless`, `without`, or multiple clauses of any kind: unsupported, the build will fail with an error.
 
 #### Warning:
-The build system will print a warning when it encounters a boolean clause. If the build fails make sure all conditional packages are following the guidelines from the message or remove the unavailable conditional packages from the SPEC file.
+The build system will print a warning when it encounters a rich dependency. If the build fails, make sure all conditional packages are following the guidelines from the message or remove the unavailable conditional packages from the SPEC file.
 
 ## Dependency Graphing
 
