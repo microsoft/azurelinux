@@ -45,7 +45,6 @@ data with a wide range of selectable projection functions.
 
 %package -n %{libname}
 Summary:        Cartographic projection software
-License:        MIT
 
 %description -n %{libname}
 This package the library for performing respective
@@ -54,7 +53,6 @@ data with a wide range of selectable projection functions.
 
 %package devel
 Summary:        Development files for PROJ
-License:        MIT
 Requires:       %{libname} = %{version}
 Provides:       libproj-devel = %{version}
 Obsoletes:      libproj-devel < %{version}
@@ -81,7 +79,6 @@ Supplements:  proj\
 %files data-%{countrycode}\
 %{wildcard}\
 %{extrafile}
-License:        MIT
 %data_subpkg -c at -n Austria
 %data_subpkg -c au -n Australia
 %data_subpkg -c be -n Belgium
@@ -136,6 +133,7 @@ rm -rf %{buildroot}%{_datadir}/doc/${name}
 
 %files
 %doc NEWS AUTHORS README ChangeLog
+%license COPYING
 %defattr(0755,root,root)
 %{_bindir}/cs2cs
 %{_bindir}/cct
@@ -176,7 +174,6 @@ rm -rf %{buildroot}%{_datadir}/doc/${name}
 %{_datadir}/%{name}/si_gurs_SLO-VRP2016-Koper.tif
 
 %files -n %{libname}
-%license COPYING
 %{_libdir}/libproj.so.%{sover}*
 
 %files devel
