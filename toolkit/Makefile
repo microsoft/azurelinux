@@ -59,6 +59,7 @@ REBUILD_DEP_CHAINS              ?= y
 HYDRATED_BUILD                  ?= n
 TARGET_ARCH                     ?=
 ALLOW_TOOLCHAIN_REBUILDS        ?= n
+CACHED_PACKAGES_ARCHIVE         ?=
 
 # Tracing & Profiling support: https://go.dev/doc/diagnostics
 ENABLE_CPU_PROFILE              ?= n
