@@ -314,6 +314,7 @@
                 "hicolor-icon-theme",
                 "hiera",
                 "highlight",
+                "hiredis",
                 "hivex",
                 "hostname",
                 "hsakmt",
