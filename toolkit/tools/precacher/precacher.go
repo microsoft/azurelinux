@@ -11,6 +11,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
@@ -19,9 +20,11 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repocloner"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/randomization"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/profile"
+	"github.com/sirupsen/logrus"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -45,7 +48,7 @@ type downloadResult struct {
 }
 
 var (
-	app = kingpin.New("precacher", "Pre-hydrate RPM caches for a given set of repo URLs.")
+	app = kingpin.New("precacher", "Pre-hydrate RPM cache for a given set of repo URLs and a RPM snapshot file.")
 
 	logFile       = exe.LogFileFlag(app)
 	logLevel      = exe.LogLevelFlag(app)
@@ -56,6 +59,8 @@ var (
 	snapshot          = app.Flag("snapshot", "Path to the rpm snapshot .json file.").ExistingFile()
 	outputSummaryFile = app.Flag("output-summary-file", "Path to save the summary of packages downloaded").String()
 	repoUrls          = app.Flag("repo-url", "URLs of the repos to download from.").Strings()
+	workerTar         = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz").Required().ExistingFile()
+	buildDir          = app.Flag("worker-dir", "Directory to store chroot while running repo query.").String()
 
 	concurrentNetOps = app.Flag("concurrent-net-ops", "Number of concurrent network operations to perform.").Default(defaultNetOpsCount).Uint()
 )
@@ -81,14 +86,16 @@ func main() {
 	}
 
 	// See what is available online from the upstream repos
-	availablePackages, err := getAllRepoData(*repoUrls)
+	availablePackages, err := getAllRepoData(*repoUrls, *workerTar, *buildDir)
 	if err != nil {
 		logger.PanicOnError(err)
 	}
 
-	logger.Log.Infof("Found %d packages to use for pre-caching", len(availablePackages))
-	for _, pkg := range availablePackages {
-		logger.Log.Debugf("Found package: %s", pkg)
+	logger.Log.Infof("Pre-caching: Found %d available packages", len(availablePackages))
+	if logger.Log.IsLevelEnabled(logrus.DebugLevel) {
+		for _, pkg := range availablePackages {
+			logger.Log.Debugf("Found package: %s", pkg)
+		}
 	}
 
 	// For each package in the snapshot, check if it is available online and try to download it
@@ -97,7 +104,7 @@ func main() {
 		logger.PanicOnError(err)
 	}
 
-	logger.Log.Infof("Pre-caching complete: Downloaded %d packages into the cache", len(downloadedPackages))
+	logger.Log.Infof("Pre-caching: Downloaded %d packages into the cache", len(downloadedPackages))
 	err = writeSummaryFile(*outputSummaryFile, downloadedPackages)
 	if err != nil {
 		logger.PanicOnError(err)
@@ -109,55 +116,120 @@ func rpmSnapshotFromFile(snapshotFile string) (rpmSnapshot *repocloner.RepoConte
 	return
 }
 
-func getAllRepoData(repoUrls []string) (namesToUrls map[string]string, err error) {
+// getAllRepoData returns a map of package names to URLs for all packages available in the given repos. It uses
+// a chroot to run repoquery.
+func getAllRepoData(repoUrls []string, workerTar, buildDir string) (namesToUrls map[string]string, err error) {
+	const (
+		leaveChrootOnDisk = false
+	)
 	timestamp.StartEvent("pull available package data from repos", nil)
 	defer timestamp.StopEvent(nil)
-	// repoquery behaves differently on Mariner and Ubuntu
-	isMariner := shell.IsMarinerOs()
+
+	// Create a chroot to run repoquery in
+	// Create the directory 'buildDir' if it does not exist
+	exists, err := file.DirExists(buildDir)
+	if err != nil {
+		err = fmt.Errorf("failed to check if directory %s exists: %w", buildDir, err)
+		return nil, err
+	}
+	if !exists {
+		logger.Log.Infof("Pre-caching: Creating 1st time chroot directory %s", buildDir)
+		err = os.MkdirAll(buildDir, 0755)
+		if err != nil {
+			err = fmt.Errorf("failed to create directory %s: %w", buildDir, err)
+			return nil, err
+		}
+	}
+	queryChroot, err := createChroot(workerTar, buildDir, leaveChrootOnDisk)
+	if err != nil {
+		err = fmt.Errorf("failed to create chroot: %w", err)
+		return nil, err
+	}
+	defer queryChroot.Close(leaveChrootOnDisk)
 
 	namesToUrls = make(map[string]string)
 	for _, repoUrl := range repoUrls {
-		packages, err := getRepoPackages(repoUrl, isMariner)
+		// Use the chroot to query each repo for the packages it contains
+		var packages []string
+		err = queryChroot.Run(func() (chrootErr error) {
+			packages, chrootErr = getRepoPackages(repoUrl)
+			return chrootErr
+		})
 		if err != nil {
 			return nil, err
 		}
 
 		// We will be searching by the name: "<name>-<version>.<distro>.<arch>", the results from the repoquery will be
-		// in the form of "(BASE_URL)/<name>-<version>.<distro>.<arch>.rpm"
+		// in the form of "<PARTIAL_URL>/<name>-<version>.<distro>.<arch>.rpm"
 		for _, pkgUrl := range packages {
 			name := path.Base(pkgUrl)
 			name = strings.TrimSuffix(name, ".rpm")
 
-			// We need to prepend the repoUrl to the name to get the full url on Mariner
-			if isMariner {
-				pkgUrl = fmt.Sprintf("%s/%s", repoUrl, pkgUrl)
-			}
+			// We need to prepend the repoUrl to the partial URL to get the full URL
+			pkgUrl = fmt.Sprintf("%s/%s", repoUrl, pkgUrl)
 			namesToUrls[name] = pkgUrl
 		}
 	}
 	return
 }
 
+// createChroot creates a network-enabled chroot to run repoquery in. The caller is expected to call Close() on the
+// returned chroot unless an error is returned, in which case the chroot will be closed by this function.
+func createChroot(workerTar, chrootDir string, leaveChrootOnDisk bool) (queryChroot *safechroot.Chroot, err error) {
+	const (
+		dnfUtilsPackageName = "dnf-utils"
+		rootDir             = "/"
+	)
+	timestamp.StartEvent("creating repoquery chroot", nil)
+	defer timestamp.StopEvent(nil)
+	logger.Log.Info("Pre-cache: Creating chroot for repoquery")
+
+	queryChroot = safechroot.NewChroot(chrootDir, true)
+	err = queryChroot.Initialize(workerTar, nil, nil)
+	if err != nil {
+		err = fmt.Errorf("failed to initialize chroot: %w", err)
+		return
+	}
+
+	// We will need network to install the repoquery package
+	files := []safechroot.FileToCopy{
+		{Src: "/etc/resolv.conf", Dest: "/etc/resolv.conf"},
+	}
+	err = queryChroot.AddFiles(files...)
+	if err != nil {
+		err = fmt.Errorf("failed to add files to chroot: %w", err)
+		queryChroot.Close(false)
+		return
+	}
+
+	// Install the repoquery package from upstream
+	logger.Log.Infof("Pre-cache: Installing '%s' package to get 'repoquery' command", dnfUtilsPackageName)
+	queryChroot.Run(func() error {
+		_, err = installutils.TdnfInstall(dnfUtilsPackageName, rootDir)
+		if err != nil {
+			err = fmt.Errorf("failed to install '%s': %w", dnfUtilsPackageName, err)
+		}
+		return err
+	})
+	if err != nil {
+		err = fmt.Errorf("failed to install '%s' in chroot: %w", dnfUtilsPackageName, err)
+		queryChroot.Close(false)
+		return
+	}
+	return
+}
+
 // getRepoPackages returns a list of packages available in the given repoUrl by running repoquery
-func getRepoPackages(repoUrl string, isMariner bool) (packages []string, err error) {
+func getRepoPackages(repoUrl string) (packages []string, err error) {
 	const (
 		reqoqueryTool    = "repoquery"
 		randomNameLength = 10
 	)
 	var (
-		queryCommonArgList = []string{"-a", "--qf", "%{location}"}
-		marinerArgList     = []string{"-y", "-q", "--disablerepo=*"}
-		ubuntuArgList      = []string{"--show-duplicates", "--tempcache"}
-
-		finalArgList []string
+		queryCommonArgList = []string{"-y", "-q", "--disablerepo=*", "-a", "--qf", "%{location}"}
 	)
 
-	logger.Log.Infof("Getting pre-caching package data from %s", repoUrl)
-	if isMariner {
-		finalArgList = append(marinerArgList, queryCommonArgList...)
-	} else {
-		finalArgList = append(ubuntuArgList, queryCommonArgList...)
-	}
+	logger.Log.Infof("Pre-cache: Getting package data from %s", repoUrl)
 
 	// We want to avoid using the same repo name for each repoUrl, so we generate a random name
 	randomName, err := randomization.RandomString(randomNameLength, randomization.LegalCharactersAlphaNum)
@@ -166,7 +238,7 @@ func getRepoPackages(repoUrl string, isMariner bool) (packages []string, err err
 		return
 	}
 	repoPathArg := fmt.Sprintf("--repofrompath=mariner-precache-%s,%s", randomName, repoUrl)
-	finalArgList = append(finalArgList, repoPathArg)
+	finalArgList := append(queryCommonArgList, repoPathArg)
 
 	onStdout := func(args ...interface{}) {
 		line := args[0].(string)
@@ -183,6 +255,10 @@ func getRepoPackages(repoUrl string, isMariner bool) (packages []string, err err
 	return
 }
 
+// downloadMissingPackages will attemp to download each package listed in rpmSnapshot that is not already present in the
+// outDir. It will return a list of the packages that were downloaded. It will use concurrentNetOps to limit the number of
+// concurrent network operations used to download the missing packages. It will also monitor the results and print periodic
+// progress updates to the console.
 func downloadMissingPackages(rpmSnapshot *repocloner.RepoContents, availablePackages map[string]string, outDir string, concurrentNetOps uint) (downloadedPackages []string, err error) {
 	timestamp.StartEvent("download missing packages", nil)
 	defer timestamp.StopEvent(nil)
@@ -214,12 +290,14 @@ func downloadMissingPackages(rpmSnapshot *repocloner.RepoContents, availablePack
 	return
 }
 
+// monitorProgress will wait for results from the downloadResult channel and update the progress counter accordingly. If
+// no more results are available we expect the done channel to be closed, at which point we will return.
 func monitorProgress(total int, results chan downloadResult, doneChannel chan struct{}) (downloadedPackages []string) {
 	downloaded := 0
 	skipped := 0
 	failed := 0
 	unavailable := 0
-	progressIncrement := 5.0
+	progressIncrement := 10.0
 	lastProgressUpdate := progressIncrement * -1
 
 	for done := false; !done; {
@@ -228,6 +306,7 @@ func monitorProgress(total int, results chan downloadResult, doneChannel chan st
 		case result := <-results:
 			switch result.resultType {
 			case downloadResultTypeSkipped:
+				logger.Log.Debugf("Skipping pre-caching '%s'. File already exists", result.pkgName)
 				skipped++
 			case downloadResultTypeSuccess:
 				downloadedPackages = append(downloadedPackages, result.pkgName)
@@ -235,22 +314,30 @@ func monitorProgress(total int, results chan downloadResult, doneChannel chan st
 			case downloadResultTypeFailure:
 				failed++
 			case donwloadResultTypeUnavailable:
+				logger.Log.Warnf("Pre-caching: '%s' failed, not found in any repos", result.pkgName)
 				unavailable++
 			}
 		case <-doneChannel:
 			// All workers are done, finish this iteration of the loop and then return
 			done = true
 		}
+
+		// Calculate the progress percentage and update the progress counter if needed (update every 'progressIncrement' percent)
 		completed := downloaded + skipped + failed + unavailable
 		progressPercent := (float64(completed) / float64(total)) * 100
 		if progressPercent > lastProgressUpdate+progressIncrement || done {
-			logger.Log.Infof("Pre-caching packages: %3d%% (downloaded: %4d, skipped: %4d, unavailable: %4d, failed: %4d)", int(progressPercent), downloaded, skipped, unavailable, failed)
+			logger.Log.Infof("Pre-caching: %3d%% ( downloaded: %4d, skipped: %4d, unavailable: %4d, failed: %4d )", int(progressPercent), downloaded, skipped, unavailable, failed)
 			lastProgressUpdate = progressPercent
 		}
 	}
 	return
 }
 
+// precachePackage will attempt to download the specified package. It will return a downloadResult struct via the results.
+// This function runs with best effort, so it will return a result (of type downloadResultTypeFailure) if any error occurs
+// rather than returning an error. This function is responsible for adding and removing itself from the provided wait group.
+// As much processing as possible is done before acquiring the network operations semaphore to minimize the time spent
+// holding it.
 func precachePackage(pkg *repocloner.RepoPackage, availablePackages map[string]string, outDir string, wg *sync.WaitGroup, results chan<- downloadResult, netOpsSemaphore chan struct{}) {
 	const (
 		downloadRetryAttempts = 2
@@ -270,7 +357,6 @@ func precachePackage(pkg *repocloner.RepoPackage, availablePackages map[string]s
 
 	// Bail out early if the file already exists
 	if exists, _ := file.PathExists(fullFilePath); exists {
-		logger.Log.Debugf("Skipping pre-caching '%s'. File already exists", fileName)
 		result.resultType = downloadResultTypeSkipped
 		results <- result
 		return
@@ -279,13 +365,13 @@ func precachePackage(pkg *repocloner.RepoPackage, availablePackages map[string]s
 	// Get the url for the package, or bail out if it is not available
 	url, ok := availablePackages[pkgName]
 	if !ok {
-		logger.Log.Warnf("Pre-caching '%s' failed. Package not found in any repos", fileName)
 		result.resultType = donwloadResultTypeUnavailable
 		results <- result
 		return
 	}
 
-	// Limit the number of concurrent network operations to avoid overloading the network
+	// Limit the number of concurrent network operations to avoid overloading the network. All work past this point
+	// is either network related, or trivial, so we can safely hold the semaphore until we are done.
 	netOpsSemaphore <- struct{}{}
 	defer func() {
 		<-netOpsSemaphore
@@ -295,7 +381,7 @@ func precachePackage(pkg *repocloner.RepoPackage, availablePackages map[string]s
 	err := retry.Run(func() error {
 		err := network.DownloadFile(url, fullFilePath, nil, nil)
 		if err != nil {
-			logger.Log.Warnf("Failed to download (%s). Error: %s", url, err)
+			logger.Log.Warnf("Pre-caching: Attempt to download (%s) failed. Error: %s", url, err)
 		}
 		return err
 	}, downloadRetryAttempts, downloadRetryDuration)
@@ -313,7 +399,7 @@ func precachePackage(pkg *repocloner.RepoPackage, availablePackages map[string]s
 }
 
 func writeSummaryFile(summaryFile string, downloadedPackages []string) (err error) {
-	logger.Log.Infof("Writing pre-caching summary file to '%s'", summaryFile)
+	logger.Log.Infof("Pre-caching: Writing summary file to '%s'", summaryFile)
 	err = file.WriteLines(downloadedPackages, "\n", summaryFile)
 	if err != nil {
 		err = fmt.Errorf("failed to write pre-caching summary file: %w", err)
