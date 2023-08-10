@@ -38,7 +38,8 @@ Requires:       python3
 %py3_install
 
 %check
-%{python3} setup.py test
+pip3 install pytest
+%pytest
 
 %files -n python3-%{srcname}
 %license LICENSE
