@@ -12040,6 +12040,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "livepatch-5.15.125.1-1.cm2",
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.125.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "livepatch-5.15.94.1-1.cm2",
           "version": "1.0.0",
           "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.94.1.tar.gz"
@@ -21873,16 +21883,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-cstruct",
-          "version": "5.2",
-          "downloadUrl": "https://github.com/andreax79/python-cstruct/archive/refs/tags/v5.2.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "python-cached_property",
           "version": "1.5.2",
           "downloadUrl": "https://github.com/pydanny/cached-property/archive/1.5.2/cached-property-1.5.2.tar.gz"
@@ -22076,6 +22076,16 @@
           "name": "python-cryptography",
           "version": "3.3.2",
           "downloadUrl": "https://pypi.io/packages/source/c/cryptography/cryptography-3.3.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-cstruct",
+          "version": "5.2",
+          "downloadUrl": "https://github.com/andreax79/python-cstruct/archive/refs/tags/v5.2.tar.gz"
         }
       }
     },
