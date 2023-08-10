@@ -1,0 +1,317 @@
+diff -up hdf-4.2.15/hdf/src/hdfi.h.s390 hdf-4.2.15/hdf/src/hdfi.h
+--- hdf-4.2.15/hdf/src/hdfi.h.s390	2020-04-30 21:07:16.946922845 -0600
++++ hdf-4.2.15/hdf/src/hdfi.h	2020-04-30 21:07:16.950922901 -0600
+@@ -77,6 +77,7 @@
+ #define     DFMT_POWERPC64      0x1111
+ #define     DFMT_LINUXPPC       0x1111
+ #define     DFMT_LINUXSPARC     0x1111
++#define     DFMT_LINUX390       0x1111
+ 
+ /* I/O library constants */
+ #define UNIXUNBUFIO 1
+@@ -1130,6 +1131,66 @@ typedef int               hdf_pint_t;
+ 
+ #endif /* Linux Sparc32/64 */
+ 
++/* Linux s390/s390x */
++#if defined __s390__ || defined __s390x__
++
++#ifdef GOT_MACHINE
++If you get an error on this line more than one machine type has been defined.
++Please check your Makefile.
++#endif
++#define GOT_MACHINE
++
++#include <sys/file.h>               /* for unbuffered i/o stuff */
++#include <sys/stat.h>
++#define DF_MT             DFMT_LINUX390
++typedef void              VOID;
++typedef void              *VOIDP;
++typedef char              *_fcd;
++typedef char              char8;
++typedef unsigned char     uchar8;
++typedef char              int8;
++typedef unsigned char     uint8;
++typedef short int         int16;
++typedef unsigned short int uint16;
++#ifdef __s390x__ /* 64-bit environment */
++typedef int               int32;
++typedef unsigned int      uint32;
++#else /* 32-bit environment */
++typedef long int          int32;
++typedef unsigned long int uint32;
++#endif
++typedef int               intn;
++typedef unsigned int      uintn;
++typedef int               intf;     /* size of INTEGERs in Fortran compiler */
++typedef float             float32;
++typedef double            float64;
++#ifdef __s390x__ /* 64-bit environment */
++typedef long              hdf_pint_t;   /* an integer the same size as a pointer */
++#else /* 32-bit environment */
++typedef int               hdf_pint_t;   /* an integer the same size as a pointer */
++#endif
++#define FNAME_POST_UNDERSCORE
++#define _fcdtocp(desc) (desc)
++#ifdef  HAVE_FMPOOL
++#define FILELIB PAGEBUFIO  /* enable page buffering */
++#else
++#define FILELIB UNIXBUFIO
++#endif
++
++/* JPEG #define's - Look in the JPEG docs before changing - (Q) */
++
++/* Determine the memory manager we are going to use. Valid values are: */
++/*  MEM_DOS, MEM_ANSI, MEM_NAME, MEM_NOBS.  See the JPEG docs for details on */
++/*  what each does */
++#define JMEMSYS         MEM_ANSI
++
++#ifdef __GNUC__
++#define HAVE_STDC
++#define INCLUDES_ARE_ANSI
++#endif
++
++#endif /* Linux s390/s390x */
++
+ /*-----------------------------------------------------*/
+ /* 64-bit Free BSD */
+ 
+diff -up hdf-4.2.15/mfhdf/fortran/jackets.c.in.s390 hdf-4.2.15/mfhdf/fortran/jackets.c.in
+--- hdf-4.2.15/mfhdf/fortran/jackets.c.in.s390	2020-04-30 21:07:16.942922790 -0600
++++ hdf-4.2.15/mfhdf/fortran/jackets.c.in	2020-04-30 21:10:30.030640644 -0600
+@@ -34,7 +34,7 @@
+ 
+ struct ncfils {            /* This will be a common block from Fortran */
+     double dd;
+-#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__
++#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__ || defined __s390x__
+     int ll;
+ #else
+     long ll;
+@@ -65,7 +65,7 @@ struct ncfils {            /* This will
+ 
+ struct ncfils {            /* This will be a common block from Fortran */
+     double dd;
+-#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__
++#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__ || defined __s390x__
+     int ll;
+ #else
+     long ll;
+@@ -420,7 +420,7 @@ stoig(shorts, ints, dims, basis, ndims)
+ }
+ #endif /* FORTRAN_HAS_NO_SHORT */
+ 
+-#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__
++#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__ || defined __s390x__
+ /*
+  * Convert multi-dimensional array of NCLONGs stored in ints to packed
+  * array of longs, in malloc'ed space.  Returns pointer to longs or NULL
+@@ -908,7 +908,7 @@ nncvpt1(cdfid, varid, indices, value, rc
+     return;
+     }                /* else */
+ #endif                /* FORTRAN_HAS_NO_SHORT */
+-#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__
++#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__ || defined __s390x__
+ #ifdef HDF
+     if ((nc_type) datatype == NC_LONG && handle->file_type!=HDF_FILE) {
+     long          longs = *(int *)value;
+@@ -1022,7 +1022,7 @@ nncvpt(cdfid, varid, start, count, value
+     return;
+     }                /* else */
+ #endif                /* FORTRAN_HAS_NO_SHORT */
+-#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__
++#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__ || defined __s390x__
+ #ifdef HDF
+     if ((nc_type) datatype == NC_LONG && handle->file_type!=HDF_FILE) {
+     long *longs = itol (value, ncount, ndims);
+@@ -1133,7 +1133,7 @@ nncvptg(cdfid, varid, start, count, stri
+     tmpbasis    = nctypelen(NC_LONG);
+     else
+ #endif
+-#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__
++#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__ || defined __s390x__
+     if (datatype == NC_LONG)
+     tmpbasis    = sizeof(int);
+     else
+@@ -1190,7 +1190,7 @@ nncvptg(cdfid, varid, start, count, stri
+     return;
+     }                /* else */
+ #endif                /* FORTRAN_HAS_NO_SHORT */
+-#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__
++#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__ || defined __s390x__
+ #ifdef HDF
+     if ((nc_type) datatype == NC_LONG && handle->file_type!=HDF_FILE) {
+     long *longs = itolg (value, ncount, nbasis, ndims);
+@@ -1326,7 +1326,7 @@ nncvgt1(cdfid, varid, indices, value, rc
+     return;
+     }                /* else */
+ #endif                /* FORTRAN_HAS_NO_SHORT */
+-#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__
++#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__ || defined __s390x__
+ #ifdef HDF
+     if ((nc_type) datatype == NC_LONG && handle->file_type!=HDF_FILE) {
+     long          longs;
+@@ -1468,7 +1468,7 @@ nncvgt(cdfid, varid, start, count, value
+     return;
+     }                /* else */
+ #endif                /* FORTRAN_HAS_NO_SHORT */
+-#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__
++#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__ || defined __s390x__
+ #ifdef HDF
+     if ((nc_type) datatype == NC_LONG && handle->file_type!=HDF_FILE) {
+     long iocount = dimprod (ncount, ndims);    /* product of dimensions */
+@@ -1606,7 +1606,7 @@ nncvgtg(cdfid, varid, start, count, stri
+     tmpbasis    = nctypelen(NC_LONG);
+     else
+ #endif
+-#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__
++#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__ || defined __s390x__
+     if (datatype == NC_LONG)
+     tmpbasis    = sizeof(int);
+     else
+@@ -1677,7 +1677,7 @@ nncvgtg(cdfid, varid, start, count, stri
+     return;
+     }                /* else */
+ #endif                /* FORTRAN_HAS_NO_SHORT */
+-#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__
++#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__ || defined __s390x__
+ #ifdef HDF
+     if ((nc_type) datatype == NC_LONG && handle->file_type!=HDF_FILE) {
+     long iocount = dimprod (ncount, ndims);    /* product of dimensions */
+@@ -1843,7 +1843,7 @@ nncapt(cdfid, varid, attname, datatype,
+     return;
+     }                /* else */
+ #endif                /* FORTRAN_HAS_NO_SHORT */
+-#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__
++#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__ || defined __s390x__
+ #ifdef HDF
+     if ((nc_type) *datatype == NC_LONG && handle->file_type!=HDF_FILE) {
+     long *longs = itol (value, attlen, 1);
+@@ -2008,7 +2008,7 @@ nncagt(cdfid, varid, attname, value, rco
+     return;
+     }                /* else */
+ #endif                /* FORTRAN_HAS_NO_SHORT */
+-#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__
++#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__ || defined __s390x__
+ #ifdef HDF
+     if ((nc_type) datatype == NC_LONG && handle->file_type!=HDF_FILE) {
+ /* EIP  We need to use int buffer to read data in on the platforms where long is 8 bytes
+diff -up hdf-4.2.15/mfhdf/libsrc/array.c.s390 hdf-4.2.15/mfhdf/libsrc/array.c
+diff -up hdf-4.2.15/mfhdf/libsrc/cdf.c.s390 hdf-4.2.15/mfhdf/libsrc/cdf.c
+diff -up hdf-4.2.15/mfhdf/libsrc/netcdf.h.in.s390 hdf-4.2.15/mfhdf/libsrc/netcdf.h.in
+--- hdf-4.2.15/mfhdf/libsrc/netcdf.h.in.s390	2020-04-30 21:07:16.957922998 -0600
++++ hdf-4.2.15/mfhdf/libsrc/netcdf.h.in	2020-04-30 21:15:23.731467288 -0600
+@@ -293,7 +293,7 @@ typedef double        ncdouble;
+ /*
+  * Variables/attributes of type NC_LONG should use the C type 'nclong'
+  */
+-#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__
++#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__ || defined __s390x__
+ /*
+  * LP64 (also known as 4/8/8) denotes long and pointer as 64 bit types.
+  * http://www.unix.org/version2/whatsnew/lp64_wp.html
+diff -up hdf-4.2.15/mfhdf/libsrc/putget.c.s390 hdf-4.2.15/mfhdf/libsrc/putget.c
+--- hdf-4.2.15/mfhdf/libsrc/putget.c.s390	2020-04-30 21:07:16.959923025 -0600
++++ hdf-4.2.15/mfhdf/libsrc/putget.c	2020-04-30 21:12:13.612268179 -0600
+@@ -665,7 +665,7 @@ Void *values ;
+     case NC_SHORT :
+         return( xdr_NCvshort(xdrs, (unsigned)rem/2, (short *)values) ) ;
+     case NC_LONG :
+-#if (_MIPS_SZLONG == 64) || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__ 
++#if (_MIPS_SZLONG == 64) || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__ || defined __s390x__
+         return( xdr_int(xdrs, (nclong *)values) ) ;
+ #else
+         return( xdr_long(xdrs, (nclong *)values) ) ;
+diff -up hdf-4.2.15/mfhdf/libsrc/xdrposix.c.s390 hdf-4.2.15/mfhdf/libsrc/xdrposix.c
+--- hdf-4.2.15/mfhdf/libsrc/xdrposix.c.s390	2020-03-03 10:40:50.000000000 -0700
++++ hdf-4.2.15/mfhdf/libsrc/xdrposix.c	2020-04-30 21:14:47.574557550 -0600
+@@ -262,7 +262,7 @@ int nbytes;
+ 
+ static bool_t   xdrposix_getlong();
+ static bool_t   xdrposix_putlong();
+-#if (_MIPS_SZLONG == 64) || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__
++#if (_MIPS_SZLONG == 64) || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__ || defined __s390x__
+ static bool_t   xdrposix_getint();
+ static bool_t   xdrposix_putint();
+ #endif
+@@ -276,7 +276,7 @@ static long *    xdrposix_inline();
+ #if (defined __sun && defined _LP64)
+ static rpc_inline_t *    xdrposix_inline();
+ #else
+-#if ((defined __x86_64__ ) && !(defined __sun && defined _LP64)) || defined __powerpc64__
++#if ((defined __x86_64__ ) && !(defined __sun && defined _LP64)) || defined __powerpc64__ || defined __s390x__
+ static int32_t *    xdrposix_inline();
+ #else
+ static netlong *    xdrposix_inline();
+@@ -302,9 +302,9 @@ static struct xdr_ops   xdrposix_ops = {
+     xdrposix_getpos,    /* get offset in the stream */
+     xdrposix_setpos,    /* set offset in the stream */
+     xdrposix_inline,    /* prime stream for inline macros */
+-#if (defined __sun && defined _LP64) || defined __x86_64__ || defined __powerpc64__
++#if (defined __sun && defined _LP64) || defined __x86_64__ || defined __powerpc64__ || defined __s390x__
+     xdrposix_destroy,   /* destroy stream */
+-#if !(defined __x86_64__) && !(defined __powerpc64__) || (defined  __sun && defined _LP64) /* i.e. we are on SUN/Intel in 64-bit mode */
++#if !(defined __x86_64__) && !(defined __powerpc64__) && !(defined __s390x__) || (defined  __sun && defined _LP64) /* i.e. we are on SUN/Intel in 64-bit mode */
+     NULL,               /* no xdr_control function defined */
+ #endif
+     /* Solaris 64-bit (arch=v9 and arch=amd64) has 64 bits long and 32 bits int. */
+@@ -442,7 +442,7 @@ xdrposix_getlong(xdrs, lp)
+     long *lp;
+ {
+     unsigned char *up = (unsigned char *)lp ;
+-#if (defined AIX5L64 || defined __powerpc64__ || (defined __hpux && __LP64__))
++#if (defined AIX5L64 || defined __powerpc64__ || defined __s390x__ || (defined __hpux && __LP64__))
+     *lp = 0 ;
+     up += (sizeof(long) - 4) ;
+ #endif
+@@ -465,7 +465,7 @@ xdrposix_putlong(xdrs, lp)
+     netlong mycopy = htonl(*lp);
+     up = (unsigned char *)&mycopy;
+ #endif
+-#if (defined AIX5L64  || defined __powerpc64__ || (defined __hpux && __LP64__))
++#if (defined AIX5L64  || defined __powerpc64__ || defined __s390x__ || (defined __hpux && __LP64__))
+     up += (sizeof(long) - 4) ;
+ #endif
+ 
+@@ -560,7 +560,7 @@ static long *
+ #if (defined __sun && defined _LP64)
+ static rpc_inline_t *
+ #else
+-#if ((defined  __x86_64__) && !(defined __sun && defined _LP64)) || defined __powerpc64__
++#if ((defined  __x86_64__) && !(defined __sun && defined _LP64)) || defined __powerpc64__ || defined __s390x__
+ static int32_t *
+ #else
+ static netlong *
+@@ -581,7 +581,7 @@ xdrposix_inline(xdrs, len)
+     return (NULL);
+ }
+ 
+-#if (_MIPS_SZLONG == 64) || (defined __sun && defined _LP64) || defined AIX5L64  || defined __x86_64__ || defined __powerpc64__
++#if (_MIPS_SZLONG == 64) || (defined __sun && defined _LP64) || defined AIX5L64  || defined __x86_64__ || defined __powerpc64__ || defined __s390x__
+ 
+ static bool_t
+ xdrposix_getint(xdrs, lp)
+diff -up hdf-4.2.15/mfhdf/ncgen/ncgen.l.s390 hdf-4.2.15/mfhdf/ncgen/ncgen.l
+--- hdf-4.2.15/mfhdf/ncgen/ncgen.l.s390	2020-04-30 21:07:16.961923053 -0600
++++ hdf-4.2.15/mfhdf/ncgen/ncgen.l	2020-04-30 21:08:10.175628593 -0600
+@@ -113,7 +113,7 @@ FloatInf|Infinity|Inf    {    /* float m
+             yyerror(errstr);
+         }
+ 
+-#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || __powerpc64__
++#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || __powerpc64__ || defined __s390x__
+         if (dd < INT_MIN  ||  dd > INT_MAX)
+ #else
+         if (dd < LONG_MIN  ||  dd > LONG_MAX)
+diff -up hdf-4.2.15/mfhdf/ncgen/ncgenyy.c.s390 hdf-4.2.15/mfhdf/ncgen/ncgenyy.c
+--- hdf-4.2.15/mfhdf/ncgen/ncgenyy.c.s390	2020-04-30 21:07:16.963923081 -0600
++++ hdf-4.2.15/mfhdf/ncgen/ncgenyy.c	2020-04-30 21:08:53.818030313 -0600
+@@ -991,7 +991,7 @@ YY_RULE_SETUP
+             yyerror(errstr);
+         }
+ 
+-#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || __powerpc64__
++#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || __powerpc64__ || __s390x__
+         if (dd < INT_MIN  ||  dd > INT_MAX)
+ #else
+         if (dd < LONG_MIN  ||  dd > LONG_MAX)

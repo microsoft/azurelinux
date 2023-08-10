@@ -1,0 +1,11 @@
+--- hdf-4.2.5-pre1/mfhdf/libsrc/file.c.maxavailfiles	2010-02-06 10:40:42.000000000 -0700
++++ hdf-4.2.5-pre1/mfhdf/libsrc/file.c	2010-02-09 13:53:09.600285597 -0700
+@@ -51,7 +51,7 @@
+    be in hlimits.h file in the future. EIP 2010-02-01*/
+ 
+ #define H4_MAX_AVAIL_OPENFILES 20000
+-#define MAX_AVAIL_OPENFILES  (((MAX_SYS_OPENFILES - 3) > H4_MAX_AVAIL_OPENFILES) ? H4_MAX_AVAIL_OPENFILES : (MAX_SYS_OPENFILES - 3)) 
++#define MAX_AVAIL_OPENFILES  (((MAX_SYS_OPENFILES - 10) > H4_MAX_AVAIL_OPENFILES) ? H4_MAX_AVAIL_OPENFILES : (MAX_SYS_OPENFILES - 10)) 
+ 
+ static int _curr_opened = 0 ; /* the number of files currently opened */
+ /* NOTE: _ncdf might have been the number of files currently opened, yet it

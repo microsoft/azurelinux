@@ -312,6 +312,7 @@
                 "gupnp-dlna",
                 "gupnp-igd",
                 "hardening-check",
+                "hdf",
                 "hdf5",
                 "heimdal",
                 "help2man",
