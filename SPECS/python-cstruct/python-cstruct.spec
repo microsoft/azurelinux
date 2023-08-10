@@ -17,6 +17,7 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 %if %{with_check}
 BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
 %endif
 BuildArch:      noarch
 
@@ -38,7 +39,6 @@ Requires:       python3
 %py3_install
 
 %check
-pip3 install pytest
 %pytest
 
 %files -n python3-%{srcname}
