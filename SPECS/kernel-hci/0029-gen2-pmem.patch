@@ -1,4 +1,4 @@
-diff --git a/arch/x86/hyperv/hv_init.c b/arch/x86/hyperv/hv_init.c
+t a/arch/x86/hyperv/hv_init.c b/arch/x86/hyperv/hv_init.c
 index b004370d3b01c6..6b22d49aee7b2f 100644
 --- a/arch/x86/hyperv/hv_init.c
 +++ b/arch/x86/hyperv/hv_init.c
