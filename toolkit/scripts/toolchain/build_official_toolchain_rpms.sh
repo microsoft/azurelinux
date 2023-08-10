@@ -79,10 +79,33 @@ mkdir -pv $CHROOT_RPMS_DIR
 mkdir -pv $CHROOT_RPMS_DIR_ARCH
 mkdir -pv $CHROOT_RPMS_DIR_NOARCH
 
+blocking_unmount () {
+    # $1 mountpoint
+    if ! mountpoint -q "$1"; then
+        return
+    fi
+
+    umount -l $1 || true
+    while mountpoint -q $1; do
+        echo $1 is still busy...
+        sleep 1
+        umount -l $1 || true
+    done
+}
+
+chroot_unmount () {
+    echo "Unmounting chroot"
+    blocking_unmount $LFS/dev/pts
+    blocking_unmount $LFS/dev
+    blocking_unmount $LFS/run
+    blocking_unmount $LFS/proc
+    blocking_unmount $LFS/sys
+}
+
 TEMP_DIR=$(mktemp -d -t)
 TEMP_BUILT_RPMS_LIST="$(mktemp --tmpdir="$TEMP_DIR")"
 TEMP_BUILT_SPECS_LIST="$(mktemp --tmpdir="$TEMP_DIR")"
-function clean_up {
+clean_up () {
     # Removing duplicates during clean-up to simplify appends during run-time.
     echo "Copying build lists to log output..."
     sort "$TEMP_BUILT_RPMS_LIST" | uniq > "$TOOLCHAIN_BUILT_RPMS_LIST"
@@ -134,29 +157,6 @@ chroot_mount () {
     mount -t proc proc $LFS/proc
     mount -t sysfs sysfs $LFS/sys
     mount -t tmpfs tmpfs $LFS/run
-}
-
-blocking_unmount () {
-    # $1 mountpoint
-    if ! mountpoint -q "$1"; then
-        return
-    fi
-
-    umount -l $1 || true
-    while mountpoint -q $1; do
-        echo $1 is still busy...
-        sleep 1
-        umount -l $1 || true
-    done
-}
-
-chroot_unmount () {
-    echo "Unmounting chroot"
-    blocking_unmount $LFS/dev/pts
-    blocking_unmount $LFS/dev
-    blocking_unmount $LFS/run
-    blocking_unmount $LFS/proc
-    blocking_unmount $LFS/sys
 }
 
 chroot_and_print_installed_rpms () {
