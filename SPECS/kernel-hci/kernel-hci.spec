@@ -17,8 +17,8 @@
 %define config_source %{SOURCE1}
 Summary:        Linux Kernel for HCI
 Name:           kernel-hci
-Version:        5.15.123.1
-Release:        2%{?dist}
+Version:        5.15.125.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -431,6 +431,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Wed Aug 09 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.125.1-1
+- Auto-upgrade to 5.15.125.1
+
 * Mon Aug 07 2023 Lanze Liu <lanzeliu@microsoft.com> - 5.15.123.1-2
 - Add patch (0028) to enable DM multipath Kernel configurations
 -   Changed CONFIG options:
