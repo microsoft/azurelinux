@@ -1052,9 +1052,43 @@
                 "PR": [
                     "https://github.com/microsoft/CBL-Mariner/pull/5916"
                 ]
+            },
+            "CONFIG_CPU_SRSO": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for kernel upgrade 5.15.125.1. Enables the SRSO mitigation for speculative RAS overflow",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5964"
+                ]
+            },
+            "CONFIG_GDS_FORCE_MITIGATION": {
+                "value": [
+                    "is not set"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for kernel upgrade 5.15.125.1. Off to prevent AVX being disabled",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5964"
+                ]
+            },
+            "CONFIG_ARCH_HAS_CPU_FINALIZE_INIT": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for kernel upgrade 5.15.125.1",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5964"
+                ]
             }
-
-            
         }
     }
 }
