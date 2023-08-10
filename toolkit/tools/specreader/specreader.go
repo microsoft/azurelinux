@@ -502,7 +502,7 @@ func parseProvides(rpmsDir, toolchainDir string, toolchainRPMs []string, srpmPat
 // Normally a list of length 1 is returned, however parsePackageVersions is also responsible for
 // identifying if the package name is an "or" condition and returning all options.
 func parsePackageVersions(packageString string) (newPackages []*pkgjson.PackageVer, err error) {
-	// If first character of the packageString is a "(" then its an "or" condition
+	// If the first character of the packageString is a "(" then it's an "or" condition.
 	if packageString[0] == '(' {
 		return parseOrCondition(packageString)
 	}
