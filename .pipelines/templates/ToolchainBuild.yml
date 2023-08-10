@@ -20,6 +20,7 @@ steps:
       buildRepoRoot: ${{ parameters.buildRepoRoot }}
 
   - bash: |
+      git -C "${{ parameters.buildRepoRoot }}" fetch --tags
       echo "##vso[task.setvariable variable=latestStableCommit]$(git -C "${{ parameters.buildRepoRoot }}" rev-list -n 1 2.0-stable)"
     displayName: "Get the latest stable commit hash"
 
