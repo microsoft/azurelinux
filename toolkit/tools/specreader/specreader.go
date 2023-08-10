@@ -570,12 +570,12 @@ func condensePackageVersionArray(packagelist []*pkgjson.PackageVer, specfile str
 
 // parseOrCondition splits a package name like (foo or bar) and returns both foo and bar as separate requirements.
 func parseOrCondition(orCondition string) (versions []*pkgjson.PackageVer, err error) {
-	logger.Log.Warnf("'OR' clause found (%s), make sure both packages are available. Please refer to 'docs/how_it_works/3_package_building.md#or-clauses' for explanation of limitations.", orCondition)
+	logger.Log.Warnf("'OR' clause found '%s', make sure both packages are available. Please refer to 'docs/how_it_works/3_package_building.md#or-clauses' for explanation of limitations.", orCondition)
 	orCondition = strings.ReplaceAll(orCondition, "(", "")
 	orCondition = strings.ReplaceAll(orCondition, ")", "")
 
 	packageStrings := strings.Split(orCondition, " or ")
-	err = minSliceLength(packageStrings, 2)
+	err = minSliceLength(packageStrings, 1)
 	if err != nil {
 		return
 	}
