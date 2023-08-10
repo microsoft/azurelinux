@@ -2244,6 +2244,7 @@
                 "prometheus-adapter",
                 "python-cachetools",
                 "python-cherrypy",
+                "python-cstruct",
                 "python-execnet",
                 "python-google-pasta",
                 "python-libclang",
