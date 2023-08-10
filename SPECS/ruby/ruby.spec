@@ -326,10 +326,11 @@ autoconf
         --with-sitearchhdrdir=%{_prefix}/local/%{_lib}/ruby/site_ruby/$(uname -m) \
         --with-vendorarchhdrdir=%{_libdir}/ruby/vendor_ruby/$(uname -m) \
         --with-rubygemsdir=%{rubygems_dir} \
+        --with-libyamldir=%{_libdir} \
         --enable-shared \
         --with-compress-debug-sections=no \
-        --docdir=%{_docdir}/%{name}-%{version}
-%make_build COPY="cp -p"
+        --docdir=%{_docdir}/%{name}-%{version} || cat ext/psych/mkmf.log
+%make_build COPY="cp -p" || cat ext/psych/mkmf.log
 
 %install
 %make_install
