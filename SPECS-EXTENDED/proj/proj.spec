@@ -16,26 +16,6 @@
 %define data_version 1.14
 %define sover   25
 %define libname lib%{name}%{sover}
-%define data_subpkg(c:n:e:s:) \
-%define countrycode %{-c:%{-c*}}%{!-c:%{error:Country code not defined}} \
-%define countryname %{-n:%{-n*}}%{!-n:%{error:Country name not defined}} \
-%define extrafile %{-e:%{_datadir}/%{name}/%{-e*}} \
-%define wildcard %{!-s:%{_datadir}/%{name}/%{countrycode}_*} \
-\
-%package data-%{countrycode}\
-Summary:      %{countryname} datum grids for Proj\
-BuildArch:    noarch\
-# See README.DATA \
-License:      BSD-2-Clause AND CC0-1.0 AND CC-BY-4.0 AND CC-BY-SA-4.0 AND SUSE-Public-Domain \
-Supplements:  proj\
-\
-%description data-%{countrycode}\
-%{countryname} datum grids for Proj.\
-\
-%files data-%{countrycode}\
-%{wildcard}\
-%{extrafile}
-
 Summary:        Cartographic projection software
 Name:           proj
 Version:        9.2.1
@@ -79,6 +59,26 @@ Obsoletes:      libproj-devel < %{version}
 
 %description devel
 This package contains libproj and the appropriate header files and man pages.
+
+%define data_subpkg(c:n:e:s:) \
+  %define countrycode %{-c:%{-c*}}%{!-c:%{error:Country code not defined}} \
+  %define countryname %{-n:%{-n*}}%{!-n:%{error:Country name not defined}} \
+  %define extrafile %{-e:%{_datadir}/%{name}/%{-e*}} \
+  %define wildcard %{!-s:%{_datadir}/%{name}/%{countrycode}_*} \
+  \
+  %package data-%{countrycode}\
+  Summary:      %{countryname} datum grids for Proj\
+  BuildArch:    noarch\
+  # See README.DATA \
+  License:      BSD-2-Clause AND CC0-1.0 AND CC-BY-4.0 AND CC-BY-SA-4.0 AND SUSE-Public-Domain \
+  Supplements:  proj\
+  \
+  %description data-%{countrycode}\
+  %{countryname} datum grids for Proj.\
+  \
+  %files data-%{countrycode}\
+  %{wildcard}\
+  %{extrafile}
 
 %data_subpkg -c at -n Austria
 %data_subpkg -c au -n Australia
