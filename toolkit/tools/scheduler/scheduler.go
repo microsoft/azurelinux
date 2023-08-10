@@ -88,6 +88,8 @@ var (
 	pkgsToBuild   = app.Flag("packages", "Space separated list of top-level packages that should be built. Omit this argument to build all packages.").String()
 	pkgsToRebuild = app.Flag("rebuild-packages", "Space separated list of base package names packages that should be rebuilt.").String()
 
+	testsToRun = app.Flag("tests", "Space separated list of tests that should be ran. Omit this argument to run package tests.").String()
+
 	logFile       = exe.LogFileFlag(app)
 	logLevel      = exe.LogLevelFlag(app)
 	profFlags     = exe.SetupProfileFlags(app)
@@ -122,6 +124,11 @@ func main() {
 	finalPackagesToBuild, packagesToRebuild, packagesToIgnore, err := schedulerutils.ParseAndGeneratePackageList(dependencyGraph, exe.ParseListArgument(*pkgsToBuild), exe.ParseListArgument(*pkgsToRebuild), exe.ParseListArgument(*pkgsToIgnore), *imageConfig, *baseDirPath)
 	if err != nil {
 		logger.Log.Fatalf("Failed to generate package list with error:\n%s", err)
+	}
+
+	finalTestsToRun, testsToRebuild, testsToIgnore, err := schedulerutils.ParseAndGeneratePackageList(dependencyGraph, exe.ParseListArgument(*testsToRun), exe.ParseListArgument(*testsToRerun), exe.ParseListArgument(*testsToIgnore), *imageConfig, *baseDirPath)
+	if err != nil {
+		logger.Log.Fatalf("Failed to generate tests list with error:\n%s", err)
 	}
 
 	toolchainPackages, err := schedulerutils.ReadReservedFilesList(*toolchainManifest)
@@ -172,7 +179,7 @@ func main() {
 	signal.Notify(signals, unix.SIGINT, unix.SIGTERM)
 	go cancelBuildsOnSignal(signals, agent)
 
-	err = buildGraph(*inputGraphFile, *outputGraphFile, agent, *workers, *buildAttempts, *checkAttempts, *stopOnFailure, !*noCache, finalPackagesToBuild, packagesToRebuild, packagesToIgnore, toolchainPackages, *optimizeWithCachedImplicit, *allowToolchainRebuilds)
+	err = buildGraph(*inputGraphFile, *outputGraphFile, agent, *workers, *buildAttempts, *checkAttempts, *stopOnFailure, !*noCache, finalPackagesToBuild, packagesToRebuild, packagesToIgnore, finalTestsToRun, toolchainPackages, *optimizeWithCachedImplicit, *allowToolchainRebuilds)
 	if err != nil {
 		logger.Log.Fatalf("Unable to build package graph.\nFor details see the build summary section above.\nError: %s.", err)
 	}
@@ -200,7 +207,7 @@ func cancelBuildsOnSignal(signals chan os.Signal, agent buildagents.BuildAgent) 
 
 // buildGraph builds all packages in the dependency graph requested.
 // It will save the resulting graph to outputFile.
-func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, workers, buildAttempts int, checkAttempts int, stopOnFailure, canUseCache bool, packagesToBuild, packagesToRebuild, ignoredPackages []*pkgjson.PackageVer, toolchainPackages []string, optimizeWithCachedImplicit bool, allowToolchainRebuilds bool) (err error) {
+func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, workers, buildAttempts int, checkAttempts int, stopOnFailure, canUseCache bool, packagesToBuild, packagesToRebuild, ignoredPackages, testsToRun []*pkgjson.PackageVer, toolchainPackages []string, optimizeWithCachedImplicit bool, allowToolchainRebuilds bool) (err error) {
 	// graphMutex guards pkgGraph from concurrent reads and writes during build.
 	var graphMutex sync.RWMutex
 
@@ -208,7 +215,7 @@ func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, work
 	// try to avoid using the cached implicit dependencies until we have no other choice during the build, but since the graph is pruned, we will
 	// avoid building packages that are not needed. Obviously we can only do this if the cache is enabled.
 	allowEarlyImplicitOptimization := (canUseCache && optimizeWithCachedImplicit)
-	_, pkgGraph, goalNode, err := schedulerutils.InitializeGraphFromFile(inputFile, packagesToBuild, allowEarlyImplicitOptimization)
+	_, pkgGraph, goalNode, err := schedulerutils.InitializeGraphFromFile(inputFile, packagesToBuild, testsToRun, allowEarlyImplicitOptimization)
 	if err != nil {
 		return
 	}

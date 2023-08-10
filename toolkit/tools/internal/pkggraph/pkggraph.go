@@ -22,6 +22,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/versioncompare"
+	"github.com/sirupsen/logrus"
 
 	"gonum.org/v1/gonum/graph"
 	"gonum.org/v1/gonum/graph/encoding"
@@ -496,15 +497,12 @@ func (g *PkgGraph) AddPkgNode(versionedPkg *pkgjson.PackageVer, nodeState NodeSt
 	}
 	newNode.This = newNode
 
-	// g.AddNode will panic on error (such as duplicate node IDs)
-	defer func() {
-		if r := recover(); r != nil {
-			err = fmt.Errorf("adding node failed for %s", newNode.FriendlyName())
-		}
-	}()
 	// Make sure the lookup table is initialized before we start (otherwise it will try to 'fix' orphaned build nodes by removing them)
 	g.lookupTable()
-	g.AddNode(newNode)
+	err = g.safeAddNode(newNode)
+	if err != nil {
+		return
+	}
 
 	// Register the package with the lookup table if needed
 	err = g.addToLookup(newNode, false)
@@ -1022,34 +1020,17 @@ func (g *PkgGraph) AddMetaNode(from []*PkgNode, to []*PkgNode) (metaNode *PkgNod
 }
 
 // AddGoalNode adds a goal node to the graph which links to existing nodes. An empty package list will add an edge to all nodes
-func (g *PkgGraph) AddGoalNode(goalName string, packages []*pkgjson.PackageVer, strict bool) (goalNode *PkgNode, err error) {
+func (g *PkgGraph) AddGoalNode(goalName string, packages, tests []*pkgjson.PackageVer, strict bool) (goalNode *PkgNode, err error) {
 	// Check if we already have a goal node with the requested name
 	if g.FindGoalNode(goalName) != nil {
 		err = fmt.Errorf("can't have two goal nodes named %s", goalName)
 		return
 	}
 
-	goalSet := make(map[*pkgjson.PackageVer]bool)
-	if len(packages) > 0 {
-		logger.Log.Debugf("Adding \"%s\" goal", goalName)
-		for _, pkg := range packages {
-			logger.Log.Tracef("\t%s-%s", pkg.Name, pkg.Version)
-			goalSet[pkg] = true
-		}
-	} else {
-		logger.Log.Debugf("Adding \"%s\" goal for all nodes", goalName)
-		for _, node := range g.AllRunNodes() {
-			logger.Log.Tracef("\t%s-%s %d", node.VersionedPkg.Name, node.VersionedPkg.Version, node.ID())
-			goalSet[node.VersionedPkg] = true
-		}
-	}
+	logger.Log.Debugf("Adding a goal node '%s'.", goalName)
 
-	// Handle failures in SetEdge() and AddNode()
-	defer func() {
-		if r := recover(); r != nil {
-			logger.Log.Panicf("Adding edge failed for goal node.")
-		}
-	}()
+	packagesGoalSet := g.buildGoalSet(packages, TypeLocalRun)
+	testsGoalSet := g.buildGoalSet(tests, TypeTest)
 
 	// Create goal node and add an edge to all requested packages
 	goalNode = &PkgNode{
@@ -1062,43 +1043,20 @@ func (g *PkgGraph) AddGoalNode(goalName string, packages []*pkgjson.PackageVer, 
 		GoalName:   goalName,
 	}
 	goalNode.This = goalNode
-	g.AddNode(goalNode)
 
-	for pkg := range goalSet {
-		var existingNode *LookupNode
-		// Try to find an exact match first (to make sure we match revision number exactly, if available)
-		existingNode, err = g.FindExactPkgNodeFromPkg(pkg)
-		if err != nil {
-			return
-		}
-		if existingNode == nil {
-			// Try again with a more general search
-			existingNode, err = g.FindBestPkgNode(pkg)
-			if err != nil {
-				return
-			}
-		}
+	err = g.safeAddNode(goalNode)
+	if err != nil {
+		return
+	}
 
-		if existingNode != nil {
-			logger.Log.Tracef("Found %s to satisfy %s", existingNode.RunNode, pkg)
+	err = g.connectGoalEdges(goalNode, packagesGoalSet, strict, TypeLocalRun)
+	if err != nil {
+		return
+	}
 
-			goalEdge := g.NewEdge(goalNode, existingNode.RunNode)
-			g.SetEdge(goalEdge)
-
-			if existingNode.TestNode != nil {
-				goalEdge = g.NewEdge(goalNode, existingNode.TestNode)
-				g.SetEdge(goalEdge)
-			}
-
-			goalSet[pkg] = false
-		} else {
-			logger.Log.Warnf("Could not goal package %+v", pkg)
-			if strict {
-				logger.Log.Errorf("Missing %+v", pkg)
-				err = fmt.Errorf("could not find all goal nodes with strict=true")
-				return
-			}
-		}
+	err = g.connectGoalEdges(goalNode, testsGoalSet, strict, TypeTest)
+	if err != nil {
+		return
 	}
 
 	return
@@ -1278,6 +1236,83 @@ func (g *PkgGraph) allNodesOfType(nodeGetter func(node *LookupNode) *PkgNode) []
 	return nodes
 }
 
+// buildGoalSet returns a set of package versions that are the goal of the graph.
+func (g *PkgGraph) buildGoalSet(packageVers []*pkgjson.PackageVer, nodeType NodeType) (goalSet map[*pkgjson.PackageVer]bool) {
+
+	if len(packageVers) > 0 {
+		logger.Log.Debugf("Adding a goal for selected nodes of type '%s'", nodeType)
+
+		goalSet = make(map[*pkgjson.PackageVer]bool)
+		for _, pkg := range packageVers {
+			logger.Log.Tracef("\t%s-%s", pkg.Name, pkg.Version)
+			goalSet[pkg] = true
+		}
+	} else {
+		logger.Log.Debugf("Adding a goal for all nodes of type '%s'", nodeType)
+
+		if nodeType == TypeTest {
+			goalSet = pkgNodesListToPackageVerSet(g.AllTestNodes())
+		} else {
+			goalSet = pkgNodesListToPackageVerSet(g.AllRunNodes())
+		}
+	}
+
+	if logger.Log.IsLevelEnabled(logrus.TraceLevel) {
+		for node := range goalSet {
+			logger.Log.Tracef("\t%s-%s", node.Name, node.Version)
+		}
+	}
+
+	return
+}
+
+func (g *PkgGraph) connectGoalEdges(goalNode *PkgNode, goalSet map[*pkgjson.PackageVer]bool, strict bool, nodeType NodeType) (err error) {
+	for pkg := range goalSet {
+		var existingNode *PkgNode = nil
+		// Try to find an exact match first (to make sure we match revision number exactly, if available)
+		nodeLookup, err := g.FindExactPkgNodeFromPkg(pkg)
+		if err != nil {
+			return err
+		}
+		if nodeLookup == nil {
+			// Try again with a more general search
+			nodeLookup, err = g.FindBestPkgNode(pkg)
+			if err != nil {
+				return err
+			}
+		}
+
+		if nodeLookup != nil {
+			switch nodeType {
+			case TypeLocalRun:
+				existingNode = nodeLookup.RunNode
+			case TypeTest:
+				existingNode = nodeLookup.TestNode
+			default:
+				return fmt.Errorf("unexpected node type to connect with a goal node: %s", nodeType)
+			}
+		}
+
+		if existingNode == nil {
+			if strict {
+				return fmt.Errorf("could not find all goal nodes with strict=true (missing %+v)", pkg)
+			}
+
+			logger.Log.Warnf("Could not goal package %+v", pkg)
+			continue
+		}
+
+		logger.Log.Tracef("Found %s to satisfy %s", existingNode, pkg)
+
+		err = g.AddEdge(goalNode, existingNode)
+		if err != nil {
+			return err
+		}
+	}
+
+	return
+}
+
 // fixCycle attempts to fix a cycle. Cycles may be acceptable if:
 // - all nodes are from the same spec file or
 // - at least one of the nodes of the cycle represents a pre-built SRPM.
@@ -1419,6 +1454,19 @@ func (g *PkgGraph) removePkgNodeFromLookup(pkgNode *PkgNode) {
 	}
 }
 
+// safeAddNode catches panics from adding nodes to the graph and converts them to errors.
+func (g *PkgGraph) safeAddNode(pkgNode *PkgNode) (err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("adding the (%v) node failed:\n%s", pkgNode, r)
+		}
+	}()
+
+	g.AddNode(pkgNode)
+
+	return
+}
+
 func formatCycleErrorMessage(cycle []*PkgNode, err error) error {
 	var cycleStringBuilder strings.Builder
 
@@ -1437,6 +1485,16 @@ func formatCycleErrorMessage(cycle []*PkgNode, err error) error {
 	logger.Log.Warn("╚════════════════════════════════════════════════════════════════════════════════════════════════╝")
 
 	return fmt.Errorf("cycles detected in dependency graph")
+}
+
+// pkgNodesListToPackageVerSet converts a list of "*PkgNode" elements to a set of "*PackageVer" elements.
+func pkgNodesListToPackageVerSet(nodes []*PkgNode) (packageVerSet map[*pkgjson.PackageVer]bool) {
+	packageVerSet = make(map[*pkgjson.PackageVer]bool)
+	for _, node := range nodes {
+		packageVerSet[node.VersionedPkg] = true
+	}
+
+	return
 }
 
 // rpmsProvidedBySRPM returns all RPMs produced from a SRPM file.
