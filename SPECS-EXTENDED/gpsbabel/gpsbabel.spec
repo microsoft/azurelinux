@@ -55,15 +55,15 @@ Qt GUI interface for GPSBabel
   -DGPS_BABEL_WITH_SHAPE_LIB=pkgconfig \
   -DGPSBABEL_WITH_SHAPELIB=pkgconfig \
   %{?!build_gui:-DGPSBABEL_MAPPREVIEW=OFF} \
-  ..
+  .
 %cmake_build
 
 
 %install
 %cmake_install
 
-install -m 0755 -d %{buildroot}%{_bindir}/
-install -m 0755 -p %{_vpath_builddir}/gpsbabel %{buildroot}%{_bindir}/
+install -m 0755 -d %{buildroot}/%{_bindir}
+install -m 0755 -p gpsbabel %{buildroot}/%{_bindir}
 
 %if 0%{?build_gui}
 install -m 0755 -d %{buildroot}%{_bindir}/
