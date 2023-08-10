@@ -18,7 +18,6 @@ import (
 
 // ShellProgram is the default shell program used by the tooling.
 const ShellProgram = "/bin/bash"
-const marinerReleaseFile = "/etc/mariner-release"
 
 var (
 	activeCommands = make(map[*exec.Cmd]bool)
