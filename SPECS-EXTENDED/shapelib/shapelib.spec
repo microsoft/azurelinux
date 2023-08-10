@@ -13,7 +13,7 @@ Summary:       C library for handling ESRI Shapefiles
 # - contrib/dbfcat.c:  Public domain
 License:       (LGPLv2+ or MIT) and GPLv2+ and Public Domain
 URL:           http://shapelib.maptools.org/
-Source0:       http://download.osgeo.org/shapelib/%{name}-%{version}%{?pre:%pre}.tar.gz
+Source0:       http://download.osgeo.org/shapelib/%{name}-%{version}%{?pre:%pre}.tar.gz/#/%{name}-%{version}.tar.gz
 # Man pages from debian package
 # wget https://salsa.debian.org/debian-gis-team/shapelib/-/archive/master/shapelib-master.tar.gz
 # tar --strip-components=2 -xvf shapelib-master.tar.gz shapelib-master/debian/man
