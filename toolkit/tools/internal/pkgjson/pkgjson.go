@@ -249,12 +249,13 @@ func (pkgVer *PackageVer) String() string {
 	return fmt.Sprintf("%s:C:'%s'V:'%s',C2:'%s'V2:'%s'", pkgVer.Name, pkgVer.Condition, pkgVer.Version, pkgVer.SCondition, pkgVer.SVersion)
 }
 
-// PackagesListEntryToPackageVer converts an entry from the packages list JSON into an instance of PackageVer.
-// The entries may contain only the name of the package or also include a single package version constraint.
+// PackageStringToPackageVer converts a package string into an instance of PackageVer.
+// The string may contain only the name of the package or also include a single package version constraint.
 // Examples:
 //   - "gcc"
 //   - "gcc=9.1.0"
-func PackagesListEntryToPackageVer(packageString string) (pkgVer *PackageVer, err error) {
+//   - "gcc < 9.1.0"
+func PackageStringToPackageVer(packageString string) (pkgVer *PackageVer, err error) {
 	matches := packageWithVersionRegex.FindStringSubmatch(packageString)
 	if len(matches) != packageWithVersionExpectedMatches {
 		err = fmt.Errorf("packages list entry \"%s\" does not match the '[name][optional_condition][optional_version]' format", packageString)
