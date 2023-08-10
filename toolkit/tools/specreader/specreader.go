@@ -35,6 +35,21 @@ const (
 	defaultWorkerCount = "10"
 )
 
+var (
+	supportedBooleanConditions = []string{
+		"and",
+		"if",
+		"or",
+		"with",
+	}
+
+	unsupportedBooleanConditions = []string{
+		"else",
+		"unless",
+		"without",
+	}
+)
+
 // parseResult holds the worker results from parsing a SPEC file.
 type parseResult struct {
 	packages []*pkgjson.Package
@@ -504,7 +519,7 @@ func parseProvides(rpmsDir, toolchainDir string, toolchainRPMs []string, srpmPat
 func parsePackageVersions(packageString string) (newPackages []*pkgjson.PackageVer, err error) {
 	// If the first character of the packageString is a "(" then it's an "or" condition.
 	if packageString[0] == '(' {
-		return parseOrCondition(packageString)
+		return parseBooleanCondition(packageString)
 	}
 
 	pkgVer, err := pkgjson.PackageStringToPackageVer(packageString)
@@ -568,13 +583,36 @@ func condensePackageVersionArray(packagelist []*pkgjson.PackageVer, specfile str
 	return
 }
 
-// parseOrCondition splits a package name like (foo or bar) and returns both foo and bar as separate requirements.
-func parseOrCondition(orCondition string) (versions []*pkgjson.PackageVer, err error) {
-	logger.Log.Warnf("'OR' clause found '%s', make sure both packages are available. Please refer to 'docs/how_it_works/3_package_building.md#or-clauses' for explanation of limitations.", orCondition)
-	orCondition = strings.ReplaceAll(orCondition, "(", "")
-	orCondition = strings.ReplaceAll(orCondition, ")", "")
+// parseBooleanCondition splits a package name like '(foo or bar)' and returns both foo and bar as separate requirements.
+func parseBooleanCondition(fullCondition string) (versions []*pkgjson.PackageVer, err error) {
+	for _, singleCondition := range unsupportedBooleanConditions {
+		if strings.Contains(fullCondition, singleCondition) {
+			err = fmt.Errorf("found unsupported boolean condition '%s' inside '%s'. Please refer to 'docs/how_it_works/3_package_building.md#or-clauses' for explanation of limitations", singleCondition, fullCondition)
+			return
+		}
+	}
 
-	packageStrings := strings.Split(orCondition, " or ")
+	conditionsCount := 0
+	for _, singleCondition := range supportedBooleanConditions {
+		conditionsCount += strings.Count(fullCondition, singleCondition)
+		if conditionsCount > 1 {
+			err = fmt.Errorf("found more than one boolean condition inside '%s'. Please refer to 'docs/how_it_works/3_package_building.md#or-clauses' for explanation of limitations", fullCondition)
+			return
+		}
+	}
+
+	logger.Log.Warnf("Found a boolean condition '%s', make sure both packages are available. Please refer to 'docs/how_it_works/3_package_building.md#or-clauses' for explanation of limitations.", fullCondition)
+
+	fullCondition = strings.ReplaceAll(fullCondition, "(", "")
+	fullCondition = strings.ReplaceAll(fullCondition, ")", "")
+
+	packageStrings := []string{}
+	for _, singleCondition := range supportedBooleanConditions {
+		if strings.Contains(fullCondition, singleCondition) {
+			packageStrings = strings.Split(fullCondition, singleCondition)
+			break
+		}
+	}
 	err = minSliceLength(packageStrings, 1)
 	if err != nil {
 		return
