@@ -133,7 +133,11 @@
             },
             "AdditionalFiles": {
                 "local/path/file1": "/final/system/path",
-                "local/path/file2": "/final/system/path/renamedfile2"
+                "local/path/file2": "/final/system/path/renamedfile2",
+                "local/path/file3": ["/final/system/path/file3"],
+                "local/path/file4": { "Path": "/final/system/path/file4", "Permissions": "664" },
+                "local/path/file5": [ { "Path": "/final/system/path/file5" }],
+                "local/path/file6": [ { "Path": "/final/system/path/file6" }, "/final/system/path/file6_copy" ]
             },
             "Hostname": "Mariner-Test",
             "BootType": "efi",
