@@ -41,7 +41,7 @@ Source1012:     commons-beanutils.tar.xz
 Source1013:     commons-cli.tar.xz
 Source1014:     commons-codec.tar.xz
 Source1015:     commons-collections.tar.xz
-Source1016:     commons-compress-1.21.tar.xz
+Source1016:     commons-compress-1.23.0.tar.xz
 Source1017:     commons-io.tar.xz
 Source1018:     commons-jxpath.tar.xz
 Source1019:     commons-lang.tar.xz
@@ -153,7 +153,7 @@ Provides:       bundled(apache-commons-beanutils) = 1.9.4
 Provides:       bundled(apache-commons-cli) = 1.4
 Provides:       bundled(apache-commons-codec) = 1.15
 Provides:       bundled(apache-commons-collections) = 3.2.2
-Provides:       bundled(apache-commons-compress) = 1.21
+Provides:       bundled(apache-commons-compress) = 1.23.0
 Provides:       bundled(apache-commons-io) = 2.8.0
 Provides:       bundled(apache-commons-jxpath) = 1.3
 Provides:       bundled(apache-commons-lang3) = 3.11
@@ -311,7 +311,7 @@ done
 # removing harmony files from the source as it causes build time error
 sed  -i "/<excludeSourceMatching>/a\ \t<excludeSourceMatching>/org/apache/commons/compress/harmony/(pack200|unpack200)/.*</excludeSourceMatching>" project/commons-compress.xml
 sed -i '13i\<dependency>slf4j</dependency>' project/plexus-archiver.xml
-
+sed -i '13i\<dependency>slf4j</dependency>' project/plexus-archiver.xml
 
 %build
 export LC_ALL=en_US.UTF-8 
