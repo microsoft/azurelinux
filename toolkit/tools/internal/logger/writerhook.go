@@ -6,7 +6,6 @@ package logger
 import (
 	"fmt"
 	"io"
-	"path/filepath"
 	"runtime"
 	"sync"
 
@@ -26,10 +25,8 @@ func newWriterHook(writer io.Writer, level logrus.Level, useColors bool, toolNam
 	formatter := &logrus.TextFormatter{
 		ForceColors: useColors,
 		CallerPrettyfier: func(frame *runtime.Frame) (function string, file string) {
-			if level >= logrus.DebugLevel {
-				return frame.Function, fmt.Sprintf("%s:%d", filepath.Base(frame.File), frame.Line)
-			}
-			return "", toolName
+			const gray = 90
+			return "", fmt.Sprintf("[\x1b[%dm%s\x1b[0m]", gray, toolName)
 		},
 	}
 

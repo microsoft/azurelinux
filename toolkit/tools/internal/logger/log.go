@@ -12,6 +12,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"sync"
 
 	log "github.com/sirupsen/logrus"
@@ -46,6 +47,7 @@ const (
 
 	defaultLogFileLevel   = log.DebugLevel
 	defaultStderrLogLevel = log.InfoLevel
+	parentCallerLevel     = 1
 )
 
 // initLogFile initializes the common logger with a file
@@ -71,11 +73,12 @@ func initLogFile(filePath, toolName string) (err error) {
 
 // InitStderrLog initializes the logger to print to stderr
 func InitStderrLog() {
-	_, toolName, _, ok := runtime.Caller(1)
+	_, filePath, _, ok := runtime.Caller(parentCallerLevel)
 	if !ok {
 		log.Panic("Failed to get caller info.")
 	}
 
+	toolName := strings.TrimSuffix(filepath.Base(filePath), ".go")
 	initStderrLogInternal(toolName)
 }
 
@@ -95,15 +98,16 @@ func InitBestEffort(path string, level string) {
 		level = defaultStderrLogLevel.String()
 	}
 
-	_, toolName, _, ok := runtime.Caller(1)
+	_, filePath, _, ok := runtime.Caller(parentCallerLevel)
 	if !ok {
 		log.Panic("Failed to get caller info.")
 	}
 
+	toolName := strings.TrimSuffix(filepath.Base(filePath), ".go")
 	initStderrLogInternal(toolName)
 
 	if path != "" {
-		PanicOnError(initLogFile(path, toolName), "Failed while setting log file (%s).", path)
+		PanicOnError(initLogFile(path, filePath), "Failed while setting log file (%s).", path)
 	}
 
 	PanicOnError(SetStderrLogLevel(level), "Failed while setting log level.")
