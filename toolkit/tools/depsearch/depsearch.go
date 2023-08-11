@@ -55,7 +55,7 @@ func main() {
 
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel, toolName)
+	logger.InitBestEffort(*logFile, *logLevel)
 
 	// only understand verbosity from 1 - 4 (spec, rpm, details, full node)
 	if verbosity == nil || *verbosity > 4 || *verbosity < 1 {

@@ -20,10 +20,12 @@ const (
 	recordMode     = "record"
 	stopMode       = "stop"
 	finishMode     = "finish"
+
+	toolName = "bldtracker"
 )
 
 var (
-	app        = kingpin.New("bldtracker", "A tool that helps track build time of different steps in the makefile.")
+	app        = kingpin.New(toolName, "A tool that helps track build time of different steps in the makefile.")
 	scriptName = app.Flag("script-name", "The name of the current tool.").Required().String()
 	stepPath   = app.Flag("step-path", "A '/' separated path of steps").Default("").String()
 	outPath    = app.Flag("out-path", "The file that stores timestamp CSVs.").Required().String() // currently must be absolute

@@ -11,19 +11,18 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 	"sync"
 
 	log "github.com/sirupsen/logrus"
-
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger/hooks/writerhook"
 )
 
 var (
 	// Log contains the shared Logger
 	Log *log.Logger
 
-	stderrHook *writerhook.WriterHook
-	fileHook   *writerhook.WriterHook
+	stderrHook *writerHook
+	fileHook   *writerHook
 
 	// Valid log levels
 	levelsArray = []string{"panic", "fatal", "error", "warn", "info", "debug", "trace"}
@@ -49,8 +48,8 @@ const (
 	defaultStderrLogLevel = log.InfoLevel
 )
 
-// InitLogFile initializes the common logger with a file
-func InitLogFile(filePath string) (err error) {
+// initLogFile initializes the common logger with a file
+func initLogFile(filePath, toolName string) (err error) {
 	const useColors = false
 
 	err = os.MkdirAll(filepath.Dir(filePath), os.ModePerm)
@@ -63,7 +62,7 @@ func InitLogFile(filePath string) (err error) {
 		return
 	}
 
-	fileHook = writerhook.NewWriterHook(file, defaultLogFileLevel, useColors)
+	fileHook = newWriterHook(file, defaultLogFileLevel, useColors, toolName)
 	Log.Hooks.Add(fileHook)
 	Log.SetLevel(defaultLogFileLevel)
 
@@ -71,16 +70,13 @@ func InitLogFile(filePath string) (err error) {
 }
 
 // InitStderrLog initializes the logger to print to stderr
-func InitStderrLog(toolName string) {
-	const useColors = true
+func InitStderrLog() {
+	_, toolName, _, ok := runtime.Caller(1)
+	if !ok {
+		log.Panic("Failed to get caller info.")
+	}
 
-	Log = log.WithFields(log.Fields{"tool": toolName})
-
-	// By default send all log messages through stderrHook
-	stderrHook = writerhook.NewWriterHook(os.Stderr, defaultStderrLogLevel, useColors)
-	Log.AddHook(stderrHook)
-	Log.SetLevel(defaultStderrLogLevel)
-	Log.SetOutput(ioutil.Discard)
+	initStderrLogInternal(toolName)
 }
 
 // SetFileLogLevel sets the lowest log level for file output
@@ -94,15 +90,20 @@ func SetStderrLogLevel(level string) (err error) {
 }
 
 // InitBestEffort runs InitStderrLog always, and InitLogFile if path is not empty
-func InitBestEffort(path string, level string, toolName string) {
+func InitBestEffort(path string, level string) {
 	if level == "" {
 		level = defaultStderrLogLevel.String()
 	}
 
-	InitStderrLog(toolName)
+	_, toolName, _, ok := runtime.Caller(1)
+	if !ok {
+		log.Panic("Failed to get caller info.")
+	}
+
+	initStderrLogInternal(toolName)
 
 	if path != "" {
-		PanicOnError(InitLogFile(path), "Failed while setting log file (%s).", path)
+		PanicOnError(initLogFile(path, toolName), "Failed while setting log file (%s).", path)
 	}
 
 	PanicOnError(SetStderrLogLevel(level), "Failed while setting log level.")
@@ -173,7 +174,20 @@ func ReplaceStderrFormatter(newFormatter log.Formatter) (oldFormatter log.Format
 	return stderrHook.ReplaceFormatter(newFormatter)
 }
 
-func setHookLogLevel(hook *writerhook.WriterHook, level string) (err error) {
+func initStderrLogInternal(toolName string) {
+	const useColors = true
+
+	Log = log.New()
+	Log.ReportCaller = true
+
+	// By default send all log messages through stderrHook
+	stderrHook = newWriterHook(os.Stderr, defaultStderrLogLevel, useColors, toolName)
+	Log.AddHook(stderrHook)
+	Log.SetLevel(defaultStderrLogLevel)
+	Log.SetOutput(ioutil.Discard)
+}
+
+func setHookLogLevel(hook *writerHook, level string) (err error) {
 	logLevel, err := log.ParseLevel(level)
 	if err != nil {
 		return

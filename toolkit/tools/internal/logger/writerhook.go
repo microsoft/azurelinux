@@ -1,31 +1,39 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-package writerhook
+package logger
 
 import (
 	"fmt"
 	"io"
+	"path/filepath"
+	"runtime"
 	"sync"
 
 	"github.com/sirupsen/logrus"
 )
 
-// WriterHook is a hook to handle writing to a writer at a custom log level
-type WriterHook struct {
+// writerHook is a hook to handle writing to a writer at a custom log level
+type writerHook struct {
 	lock      sync.Mutex
 	level     logrus.Level
 	writer    io.Writer
 	formatter logrus.Formatter
 }
 
-// NewWriterHook returns new WriterHook
-func NewWriterHook(writer io.Writer, level logrus.Level, useColors bool) *WriterHook {
+// newWriterHook returns new writerHook
+func newWriterHook(writer io.Writer, level logrus.Level, useColors bool, toolName string) *writerHook {
 	formatter := &logrus.TextFormatter{
 		ForceColors: useColors,
+		CallerPrettyfier: func(frame *runtime.Frame) (function string, file string) {
+			if level >= logrus.DebugLevel {
+				return frame.Function, fmt.Sprintf("%s:%d", filepath.Base(frame.File), frame.Line)
+			}
+			return "", toolName
+		},
 	}
 
-	return &WriterHook{
+	return &writerHook{
 		level:     level,
 		writer:    writer,
 		formatter: formatter,
@@ -33,7 +41,7 @@ func NewWriterHook(writer io.Writer, level logrus.Level, useColors bool) *Writer
 }
 
 // Fire writes the log entry to the writer
-func (h *WriterHook) Fire(entry *logrus.Entry) (err error) {
+func (h *writerHook) Fire(entry *logrus.Entry) (err error) {
 	// Filter out entries that are at a higher level (more verbose) than the current filter
 	if entry.Level > h.level {
 		return
@@ -52,17 +60,17 @@ func (h *WriterHook) Fire(entry *logrus.Entry) (err error) {
 }
 
 // SetLevel sets the lowest log level
-func (h *WriterHook) SetLevel(level logrus.Level) {
+func (h *writerHook) SetLevel(level logrus.Level) {
 	h.level = level
 }
 
 // Levels returns configured log levels
-func (h *WriterHook) Levels() []logrus.Level {
+func (h *writerHook) Levels() []logrus.Level {
 	return logrus.AllLevels
 }
 
 // ReplaceWriter replaces the writer and returns the old one
-func (h *WriterHook) ReplaceWriter(newWriter io.Writer) (oldWriter io.Writer) {
+func (h *writerHook) ReplaceWriter(newWriter io.Writer) (oldWriter io.Writer) {
 	h.lock.Lock()
 	defer h.lock.Unlock()
 
@@ -73,7 +81,7 @@ func (h *WriterHook) ReplaceWriter(newWriter io.Writer) (oldWriter io.Writer) {
 }
 
 // ReplaceFormatter replaces the formatter used by the hook and returns the old formatter
-func (h *WriterHook) ReplaceFormatter(newFormatter logrus.Formatter) (oldFormatter logrus.Formatter) {
+func (h *writerHook) ReplaceFormatter(newFormatter logrus.Formatter) (oldFormatter logrus.Formatter) {
 	h.lock.Lock()
 	defer h.lock.Unlock()
 
@@ -84,6 +92,6 @@ func (h *WriterHook) ReplaceFormatter(newFormatter logrus.Formatter) (oldFormatt
 }
 
 // CurrentLevel returns the current log level for the hook
-func (h *WriterHook) CurrentLevel() logrus.Level {
+func (h *writerHook) CurrentLevel() logrus.Level {
 	return h.level
 }

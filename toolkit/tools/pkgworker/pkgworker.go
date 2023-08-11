@@ -74,7 +74,7 @@ var (
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel, toolName)
+	logger.InitBestEffort(*logFile, *logLevel)
 
 	rpmsDirAbsPath, err := filepath.Abs(*rpmsDirPath)
 	logger.PanicOnError(err, "Unable to find absolute path for RPMs directory '%s'", *rpmsDirPath)

@@ -71,7 +71,7 @@ func main() {
 
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel, toolName)
+	logger.InitBestEffort(*logFile, *logLevel)
 
 	// Prevent a SIGINT (Ctr-C) from stopping liveinstaller while an installation is in progress.
 	// It is the responsibility of the installer's user interface (terminal installer or Calamares) to handle quit requests from the user.
