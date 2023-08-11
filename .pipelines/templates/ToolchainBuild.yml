@@ -10,6 +10,10 @@ parameters:
     type: string
     default: "$(Build.ArtifactStagingDirectory)"
 
+  - name: rawToolchainSourceRef
+    type: string
+    default: "refs/tags/2.0-stable"
+
   - name: selfRepoName
     type: string
     default: "CBL-Mariner"
@@ -21,7 +25,8 @@ steps:
 
   - bash: |
       git -C "${{ parameters.buildRepoRoot }}" fetch --tags
-      echo "##vso[task.setvariable variable=latestStableCommit]$(git -C "${{ parameters.buildRepoRoot }}" rev-list -n 1 2.0-stable)"
+      latestStableCommit="$(git -C "${{ parameters.buildRepoRoot }}" rev-list -n 1 ${{ parameters.rawToolchainSourceRef }})"
+      echo "##vso[task.setvariable variable=latestStableCommit]$latestStableCommit"
     displayName: "Get the latest stable commit hash"
 
   - task: Cache@2
@@ -32,7 +37,7 @@ steps:
     displayName: Cache the raw toolchain
 
   - bash: |
-      touch "${{ parameters.buildRepoRoot }}/build/toolchain/raw_toolchain"
+      touch "${{ parameters.buildRepoRoot }}/build/toolchain/raw_toolchain/toolchain_from_container.tar.gz"
     condition: eq(variables.cacheRestored, 'true')
     displayName: "Enable the raw toolchain for re-use"
 
