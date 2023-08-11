@@ -26,7 +26,7 @@ steps:
 
   - task: Cache@2
     inputs:
-      key: '"raw-toolchain" | "$(Agent.OSArchitecture)" | "pawelwi/cache_raw_toolchain" | "testing"'
+      key: '"raw-toolchain" | "$(Agent.OSArchitecture)" | "$(latestStableCommit)" | "testing"'
       path: "${{ parameters.buildRepoRoot }}/build/toolchain/raw_toolchain"
     displayName: Cache the raw toolchain
 
