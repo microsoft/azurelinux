@@ -362,7 +362,9 @@ chroot_and_install_rpms python-setuptools
 build_rpm_in_chroot_no_install cracklib
 
 # pam needs cracklib
+# cmake needs curl
 chroot_and_install_rpms cracklib
+chroot_and_install_rpms curl
 
 build_rpm_in_chroot_no_install cmake
 build_rpm_in_chroot_no_install pam
@@ -412,7 +414,6 @@ build_rpm_in_chroot_no_install gpgme
 
 # tdnf needs python3, gpgme, curl and libsolv
 chroot_and_install_rpms libsolv
-chroot_and_install_rpms curl
 
 chroot_and_install_rpms gpgme
 build_rpm_in_chroot_no_install pinentry

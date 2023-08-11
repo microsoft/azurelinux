@@ -1,13 +1,15 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
-Version:        7.84.0
-Release:        1%{?dist}
+# Heads up: 7.87 breaks perl-WWW-Curl (see #4588).
+Version:        7.88.1
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/NetworkingLibraries
 URL:            https://curl.haxx.se
 Source0:        https://curl.haxx.se/download/%{name}-%{version}.tar.gz
+Patch0:         CVE-2023-28322.patch
 BuildRequires:  krb5-devel
 BuildRequires:  libssh2-devel
 BuildRequires:  openssl-devel
@@ -88,6 +90,22 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libcurl.so.4*
 
 %changelog
+* Wed Jun 07 2023 Sumedh Sharma <sumsharma@microsoft.com> - 7.88.1-2
+- Apply patch to fix CVE-2023-28322
+
+* Thu Mar 09 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 7.88.1-1
+- Upgrade to version 7.88.1 to fix CVE-2023-23914, CVE-2023-23915, CVE-2023-23916
+- Removing old patches that are fixed in version 7.87.0
+
+* Mon Feb 13 2023 Dallas Delaney <dadelan@microsoft.com> - 7.86.0-3
+- Apply patch to fix CVE-2022-43552
+
+* Thu Jan 12 2023 Aurélien Bombo <abombo@microsoft.com> - 7.86.0-2
+- Apply patch to fix CVE-2022-43551.
+
+* Tue Nov 08 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 7.86.0-1
+- Auto-upgrade to 7.86.0 - CVE-2022-42915
+
 * Tue Aug 09 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.84.0-1
 - Updating to version 7.84.0 to fix CVE-2022-32207.
 

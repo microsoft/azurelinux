@@ -1,23 +1,24 @@
 Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs
-Version:        14.20.0
+Version:        14.21.3
 Release:        1%{?dist}
 License:        BSD and MIT and Public Domain and naist-2003
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://github.com/nodejs/node
-# Source0 has a vendored OpenSSL source tree with patented algorithms.
-# Use Source1 to create a clean and reproducible source tarball.
-#Source0:       https://nodejs.org/download/release/v%{version}/node-v%{version}.tar.xz
-Source0:        node-v%{version}-clean.tar.xz
-Source1:        clean-source-tarball.sh
+# !!!! Nodejs code has a vendored version of OpenSSL code that must be removed from source tarball
+# !!!! because it contains patented algorithms.
+# !!!  => use clean-source-tarball.sh script to create a clean and reproducible source tarball.
+Source0:        https://nodejs.org/download/release/v%{version}/node-v%{version}.tar.xz
 Patch0:         patch_tls_nodejs14.patch
 Patch1:         remove_unsupported_tlsv13_ciphers.patch
+Patch2:         CVE-2023-28155.patch
 BuildRequires:  coreutils >= 8.22
 BuildRequires:  openssl-devel >= 1.1.1
 BuildRequires:  python3
 BuildRequires:  which
+BuildRequires:  c-ares-devel
 Requires:       coreutils >= 8.22
 Requires:       openssl >= 1.1.1
 Requires:       python3
@@ -44,7 +45,8 @@ python3 configure.py \
   --prefix=%{_prefix} \
   --shared-openssl \
   --shared-zlib \
-  --openssl-use-def-ca-store
+  --openssl-use-def-ca-store \
+  --shared-cares
 %make_build
 
 %install
@@ -80,6 +82,27 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
+* Tue Jul 11 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 14.21.3-1
+- Auto-upgrade to 14.21.3 - to fix CVE-2023-23918, CVE-2023-23919, CVE-2023-23920
+
+* Tue Jun 6 2023 Dallas Delaney <dadelan@microsoft.com> - 14.21.1-3
+- Fix CVE-2023-32067, CVE-2023-31130, CVE-2023-31147 by using system c-ares
+
+* Thu May 25 2023 Tobias Brick <tobiasb@microsoft.com> - 14.21.1-2
+- Add patch to fix CVE-2023-28155
+
+* Sun Dec 11 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 14.21.1-1
+- Auto-upgrade to 14.21.1 - CVE-2022-3602_CVE-2022-3786_CVE-2022-43548
+
+* Mon Oct 10 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 14.20.1-2
+- Change src tarball generation mechanism so it is usable by autoupgrade tools
+
+* Thu Oct 06 2022 Jon Slobodzian <joslobo@microsoft.com> - 14.20.1-1
+- Upgrade to 14.20.1 to fix CVE-2022-32213, CVE-2022-32214, and CVE-2022-35256
+- Note the previous version was believed to be fixed for 32213 and 32214 but the
+- v14.20.1 nodejs release notes suggest that those two were resolved in this update
+- (See https://nodejs.org/en/blog/release/v14.20.1/)
+
 * Wed Jul 27 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 14.20.0-1
 - Update to v14.20.0 to fix CVE-2022-32213, CVE-2022-32214, CVE-2022-32215.
 

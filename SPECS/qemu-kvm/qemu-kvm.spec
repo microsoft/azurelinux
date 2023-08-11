@@ -1,7 +1,7 @@
 Summary:        QEMU is a machine emulator and virtualizer
 Name:           qemu-kvm
 Version:        4.2.0
-Release:        43%{?dist}
+Release:        48%{?dist}
 License:        GPLv2 AND GPLv2+ AND CC-BY AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -62,6 +62,11 @@ Patch44:        CVE-2021-3748.patch
 Patch45:        CVE-2021-3638.patch
 Patch46:        CVE-2021-3750.patch
 Patch47:        CVE-2021-4206.patch
+Patch48:        0001-removed-tulip.c-from-build-process-due-to-CVE-2022-2962.patch
+# CVE-2022-3872 is fixed in 7.1.0 by https://lists.nongnu.org/archive/html/qemu-devel/2022-11/msg01068.html
+Patch49:        CVE-2022-3872.patch
+# CVE-2021-4207 is fixed in 7.0.0 by https://gitlab.com/qemu-project/qemu/-/commit/9569f5cb
+Patch50:        CVE-2021-4207.patch
 # Range 1001+ reserved for nopatch files
 Patch1001:      CVE-2020-7039.nopatch
 # CVE-2020-12829 affects the sm501 video driver, which is only used for powerpc and SuperH emulation
@@ -87,6 +92,9 @@ Patch1009:      CVE-2022-35414.patch
 # Version (v4.2.0) does not ship tools component code.
 # CVE and provided patch not applicable hence adding nopatch.
 Patch1010:      CVE-2022-0358.nopatch
+# CVE and provided patch not applicable to v4.2.0 hence adding nopatch.
+Patch1011:      CVE-2022-26354.nopatch
+Patch1012:      CVE-2020-35505.patch
 
 BuildRequires:  alsa-lib-devel
 BuildRequires:  glib-devel
@@ -213,6 +221,22 @@ fi
 %{_bindir}/qemu-nbd
 
 %changelog
+* Thu Dec 22 2022 Amrita Kohli <amritakohli@microsoft.com> - 4.2.0-48
+- Patch CVE-2021-4207
+
+* Wed Dec 21 2022 Amrita Kohli <amritakohli@microsoft.com> - 4.2.0-47
+- Patch CVE-2022-3872
+
+* Tue Nov 15 2022 George Mileka <gmileka@microsoft.com> - 4.2.0-46
+- Patch CVE-2020-35505.
+
+* Tue Oct 18 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 4.2.0-45
+- Nopatch CVE-2022-26354.
+
+* Thu Sep 29 2022 Aadhar Agarwal <aadagarwal@microsoft.com> - 4.2.0-44
+- Disable tulip device emulation from QEMU to address CVE-2022-2962
+- Nopatch CVE-2022-2962
+
 * Tue Sep 06 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 4.2.0-43
 - Nopatch CVE-2022-0358.
 

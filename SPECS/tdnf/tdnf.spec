@@ -5,8 +5,8 @@
 Summary:        dnf/yum equivalent using C libs
 Name:           tdnf
 Version:        2.1.0
-Release:        6%{?dist}
-License:        LGPLv2.1 AND GPLv2
+Release:        8%{?dist}
+License:        LGPL-2.1-only AND GPL-2.0-only
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/RPM
@@ -27,6 +27,7 @@ Patch5:         tdnf-support-multiple-gpgkeys.patch
 Patch6:         tdnf-add-download-no-deps-command.patch
 Patch7:         tdnf-use-custom-keyring-for-gpg-checks.patch
 Patch8:         tdnf-mandatory-space-list-output.patch
+Patch9:         tdnf-increase-timeout.patch
 
 BuildRequires:  cmake
 BuildRequires:  curl-devel
@@ -49,6 +50,7 @@ BuildRequires:  python3-xml
 
 Requires:       curl
 Requires:       libsolv
+Requires:       mariner-repos-shared
 Requires:       openssl-libs
 Requires:       rpm-libs
 Requires:       tdnf-cli-libs = %{version}-%{release}
@@ -201,6 +203,12 @@ find %{buildroot} -name '*.pyc' -delete
 %{python3_sitelib}/*
 
 %changelog
+* Tue May 05 2023 Sam Meluch <sammeluch@microsoft.com> - 2.1.0-8
+- Add patch for increased curl timeout and retry logic
+
+* Tue Dec 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.0-7
+- Adding a dependency on "mariner-repos-shared" to guarantee existence of the YUM repos directory.
+
 * Mon Dec 28 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.0-6
 - Patching TDNF to print at least one space between columns in 'tdnf list' output.
 - Fixing whitelist warnings in previous patches.

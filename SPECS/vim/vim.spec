@@ -1,7 +1,6 @@
-%define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
-Version:        9.0.0404
+Version:        9.0.1562
 Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
@@ -9,6 +8,7 @@ Distribution:   Mariner
 Group:          Applications/Editors
 URL:            https://www.vim.org
 Source0:        https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+%define debug_package %{nil}
 BuildRequires:  ncurses-devel
 
 %description
@@ -106,6 +106,7 @@ fi
 %{_datarootdir}/vim/vim*/ftplugof.vim
 %{_datarootdir}/vim/vim*/gvimrc_example.vim
 %{_datarootdir}/vim/vim*/import/dist/vimhelp.vim
+%{_datarootdir}/vim/vim*/import/dist/vimhighlight.vim
 %{_datarootdir}/vim/vim*/indent.vim
 %{_datarootdir}/vim/vim*/indent/*
 %{_datarootdir}/vim/vim*/indoff.vim
@@ -191,6 +192,45 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Wed May 17 2023 Muhammad Falak <mwani@microsoft.com> - 9.0.1562-1
+- Bump version to address CVE-2023-2609 & CVE-2023-2610
+
+* Mon May 08 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.0.1527-1
+- Auto-upgrade to 9.0.1527 - Fix CVE-2023-2426
+
+* Thu Mar 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.0.1402-1
+- Auto-upgrade to 9.0.1402 - Fix CVE-2023-1264
+
+* Fri Mar 10 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.0.1378-1
+- Auto-upgrade to 9.0.1378 - patch CVE-2023-1175
+
+* Thu Mar 09 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.0.1367-1
+- Auto-upgrade to 9.0.1367 - patch CVE-2023-1127
+
+* Wed Feb 08 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.0.1247-1
+- Auto-upgrade to 9.0.1247 - to fix CVE-2023-0512
+
+* Thu Feb 02 2023 Henry Li <lihl@microsoft.com> - 9.0.1189-2
+- Add patch to resolve CVE-2023-0433  
+
+* Fri Jan 20 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.0.1189-1
+- Auto-upgrade to 9.0.1189 - to fix CVE-2023-0288
+
+* Tue Jan 17 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.0.1145-1
+- Auto-upgrade to 9.0.1145 - to fix CVE-2023-0049, CVE-2023-0054, CVE-2023-0051
+
+* Thu Dec 01 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.0.0982-1
+- Auto-upgrade to 9.0.0982 - CVE-2022-4141
+
+* Sun Oct 30 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.0.0805-1
+- Upgrade to 9.0.0805
+
+* Tue Oct 04 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.0.0614-1
+- Upgrade to 9.0.0614
+
+* Mon Sep 26 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.0.0530-1
+- Upgrade to 9.0.0530
+
 * Mon Sep 19 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.0.0404-1
 - Upgrade to 9.0.0404
 

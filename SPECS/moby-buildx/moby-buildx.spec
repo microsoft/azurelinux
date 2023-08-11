@@ -1,7 +1,7 @@
 Summary: A Docker CLI plugin for extended build capabilities with BuildKit
 Name: moby-buildx
 Version: 0.4.1+azure
-Release: 11%{?dist}
+Release: 14%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 
@@ -53,7 +53,7 @@ export GOGC=off
 
 cd %{OUR_GOPATH}/src/github.com/docker/buildx
 go build -mod=vendor \
-    -ldflags "-X github.com/docker/buildx/version.Version=%{version} -X github.com/docker/buildx/version.Revision=%{BUILDX_GITCOMMIT} -X github.com/docker/buildx/version.Package=github.com/docker/buildx" \
+    -ldflags "-compressdwarf=false -X github.com/docker/buildx/version.Version=%{version} -X github.com/docker/buildx/version.Revision=%{BUILDX_GITCOMMIT} -X github.com/docker/buildx/version.Package=github.com/docker/buildx" \
     -o buildx \
     ./cmd/buildx
 
@@ -79,6 +79,16 @@ cp %{SOURCE2} %{buildroot}/usr/share/doc/%{name}-%{version}/NOTICE
 %{_libexecdir}/docker/cli-plugins/docker-buildx
 
 %changelog
+* Thu Jun 22 2023 Mitch Zhu <mitchzhu@microsoft.com> - 0.4.1+azure-14
+- Bump release to rebuild with go 1.19.10
+  Disable DWARF compression in go 1.19.10
+
+* Tue Dec 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.4.1+azure-13
+- Bump release to rebuild with go 1.18.8-2
+
+* Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.4.1+azure-12
+- Bump release to rebuild with go 1.18.8
+
 * Wed Aug 17 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.4.1+azure-11
 - Bump to rebuild with golang 1.18.5-1
 

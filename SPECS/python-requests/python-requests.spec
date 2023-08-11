@@ -3,7 +3,7 @@
 Summary:        Awesome Python HTTP Library That's Actually Usable
 Name:           python-requests
 Version:        2.22.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,6 +13,7 @@ URL:            http://python-requests.org
 Source0:        requests-%{version}.tar.gz
 Patch0:         test_requests_typeerror_testfix.patch
 Patch1:         test_requests_support_pytest_4.patch
+Patch2:         CVE-2023-32681.patch
 
 BuildRequires:  python-setuptools
 BuildRequires:  python2
@@ -93,6 +94,7 @@ Python 3 version.
 %setup -q -n requests-%{version}
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 rm -rf ../p3dir
 cp -a . ../p3dir
 
@@ -131,6 +133,9 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Tue Jun 13 2023 Suresh Thelkar <sthelkar@microsoft.com> - 2.22.0-3
+- Add patch for CVE-2023-32681
+
 * Mon Mar 01 2021 Andrew Phelps <anphel@microsoft.com> - 2.22.0-2
 - Add patches for test issues and run tests with tox
 

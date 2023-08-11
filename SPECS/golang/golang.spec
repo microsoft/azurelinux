@@ -12,7 +12,7 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.18.5
+Version:        1.19.10
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -116,6 +116,18 @@ fi
 %{_bindir}/*
 
 %changelog
+* Thu Jun 22 2023 Mitch Zhu <mitchzhu@microsoft.com> - 1.19.10-1
+- Upgrade to version 1.19.10 to fix CVE-2023-24540, CVE-2023-29402, 
+  CVE-2023-29403, CVE-2023-29404, CVE-2023-29405
+
+* Tue Dec 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.18.8-2
+- Fix for CVE-2022-41717.
+
+* Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.18.8-1
+- Upgrade to version 1.18.8 to fix CVE-2022-XXXX
+- Also fixes CVE-2022-2879, CVE-2022-2880, CVE-2022-41715 (fixed in 1.18.7)
+- Also fixes CVE-2022-27664, CVE-2022-32190 (fixed in 1.18.6)
+
 * Wed Aug 17 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.18.5-1
 - Upgrade to version to fix CVE-2022-1705, CVE-2022-1962, CVE-2022-28131,
   CVE-2022-30630, CVE-2022-30631, CVE-2022-30632, CVE-2022-30633, CVE-2022-30635,

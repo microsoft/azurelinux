@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1k
-Release:        12%{?dist}
+Release:        16%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -48,6 +48,14 @@ Patch25:        CVE-2022-0778.patch
 Patch26:        CVE-2022-1292.patch
 Patch27:        openssl-1.1.1-update-expired-cert.patch
 Patch28:        CVE-2022-2068.patch
+Patch29:        CVE-2023-0286.patch
+Patch30:        CVE-2022-4304.patch
+Patch31:        CVE-2022-4450.patch
+Patch32:        CVE-2023-0215.patch
+Patch33:        CVE-2023-0464.patch
+Patch34:        CVE-2023-0465.patch
+Patch35:        CVE-2023-0466.patch
+Patch36:        CVE-2023-2650.patch
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
 Requires:       %{name}-libs = %{version}-%{release}
@@ -141,6 +149,13 @@ cp %{SOURCE4} test/
 %patch26 -p1
 %patch27 -p1
 %patch28 -p1
+%patch29 -p1
+%patch30 -p1
+%patch31 -p1
+%patch32 -p1
+%patch33 -p1
+%patch34 -p1
+%patch35 -p1
 
 %build
 # Add -Wa,--noexecstack here so that libcrypto's assembler modules will be
@@ -320,6 +335,19 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 %postun libs -p /sbin/ldconfig
 
 %changelog
+* Tue Jun 06 2023 Daniel McIlvaney <damcilva@microsoft.com> -  1.1.1k-16
+- Patch CVE-2023-2650
+
+* Wed Apr 12 2023 Rohit Rawat <rohitrawat@microsoft.com> - 1.1.1k-15
+- Patch CVE-2023-0465 and CVE-2023-0466
+
+* Fri Mar 31 2023 Osama Esmail <osamaesmail@microsoft.com> - 1.1.1k-14
+- Adding patch for CVE-2023-0464
+- 2 of the 3 patches for the CVE were for later versions
+
+* Tue Feb 07 2023 Olivia Crain <oliviacrain@microsoft.com> - 1.1.1k-13
+- Add upstream patches for CVE-2022-4304, CVE-2022-4450, CVE-2023-0215, CVE-2024-0286
+
 * Wed Jun 22 2022 Jon Slobodzian <joslobo@microsoft.com> - 1.1.1k-12
 - Patch for CVE-2022-2068
 

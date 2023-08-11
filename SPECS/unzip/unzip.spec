@@ -1,7 +1,7 @@
 Summary:        Unzip-6.0
 Name:           unzip
 Version:        6.0
-Release:        18%{?dist}
+Release:        19%{?dist}
 License:        BSD
 URL:            http://infozip.sourceforge.net/UnZip.html
 Source0:        https://downloads.sourceforge.net/infozip/unzip60.tar.gz
@@ -27,6 +27,7 @@ Patch13:        CVE-2015-7697.patch
 Patch14:        CVE-2018-1000035.patch
 # Upstream has fixed CVE-2008-0888 in 6.0
 Patch15:        CVE-2008-0888.nopatch
+Patch16:        CVE-2021-4217.patch
 
 %description
 The UnZip package contains ZIP extraction utilities. These are useful
@@ -69,6 +70,9 @@ make %{?_smp_mflags}  check
 %{_bindir}/*
 
 %changelog
+* Fri Feb 10 2023 Dan Streetman <ddstreet@microsoft.com> 6.0-19
+- CVE-2021-4217
+
 *   Fri Oct 23 2020 Nick Samson <nisamson@microsoft.com> 6.0-18
 -   Renamed patch files for CVE-2019-13232 and CVE-2018-18384 to ensure detection by CVE tooling
 *   Thu Oct 22 2020 Nicolas Ontiveros <niontive@microsoft.com> 6.0-17

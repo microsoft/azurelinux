@@ -202,5 +202,5 @@ compress-srpms:
 # Seed the RPMs folder with the any missing files from the archive.
 hydrate-rpms:
 	$(if $(PACKAGE_ARCHIVE),,$(error Must set PACKAGE_ARCHIVE=))
-	@echo Updating missing RPMs from $(PACKAGE_ARCHIVE) into $(RPMS_DIR)
-	tar -I $(ARCHIVE_TOOL) -xf $(PACKAGE_ARCHIVE) -C $(RPMS_DIR) --strip-components 1 --skip-old-files --touch --checkpoint=100000 --checkpoint-action=echo="%T"
+	@echo Unpacking RPMs from $(PACKAGE_ARCHIVE) into $(RPMS_DIR)
+	tar -xf $(PACKAGE_ARCHIVE) -C $(RPMS_DIR) --strip-components 1 --skip-old-files --touch --checkpoint=100000 --checkpoint-action=echo="%T"

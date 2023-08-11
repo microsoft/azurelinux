@@ -2,7 +2,7 @@
 Summary:        Provide the stuff missing in List::Util
 Name:           perl-List-MoreUtils
 Version:        0.428
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0 AND (GPLv1 OR Artistic)
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/List-MoreUtils/
@@ -47,9 +47,12 @@ make test
 %{perl_vendorlib}/List/
 %{_mandir}/man3/List::MoreUtils.3*
 %{_mandir}/man3/List::MoreUtils::PP.3*
-%{_mandir}/man3/List::MoreUtils::Contributing.3.gz
+%{_mandir}/man3/List::MoreUtils::Contributing.3pm.gz
 
 %changelog
+* Wed Apr 26 2023 Sam Meluch <sammeluch@microsoft.com> - 0.428-6
+- update man3 file extension
+
 * Fri Nov 13 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.428-5
 - Adding 'local::lib' perl5 library to fix test dependencies.
 - Removed %%sha1 macro.

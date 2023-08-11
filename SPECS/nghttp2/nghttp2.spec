@@ -1,6 +1,6 @@
 Summary:        nghttp2 is an implementation of HTTP/2 and its header compression algorithm, HPACK.
 Name:           nghttp2
-Version:        1.41.0
+Version:        1.50.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -58,6 +58,9 @@ rm %{buildroot}/%{_libdir}/*.la
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Thu Oct 06 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.50.0-1
+- Upgrade to 1.50.0
+
 * Tue Nov 03 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.41.0-1
 - Upgrading to 1.41.0 to fix CVE-2020-11080.
 - License verified.

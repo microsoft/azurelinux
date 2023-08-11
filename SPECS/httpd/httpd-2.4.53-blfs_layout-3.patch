@@ -54,27 +54,23 @@ diff -Naur a/config.layout b/config.layout
 diff -Naur a/configure b/configure
 --- a/configure	2022-03-09 15:17:37.000000000 +0100
 +++ b/configure	2022-03-19 10:58:09.202098385 +0100
-@@ -41141,17 +41141,17 @@
+@@ -42078,13 +42078,13 @@
+ ap_prefix="${ap_cur}"
  
  
- cat >>confdefs.h <<_ACEOF
--#define HTTPD_ROOT "${ap_prefix}"
-+#define HTTPD_ROOT "/etc/httpd"
- _ACEOF
+-printf "%s\n" "#define HTTPD_ROOT \"${ap_prefix}\"" >>confdefs.h
++printf "%s\n" "#define HTTPD_ROOT \"/etc/httpd\"" >>confdefs.h
  
  
- cat >>confdefs.h <<_ACEOF
--#define SERVER_CONFIG_FILE "${rel_sysconfdir}/${progname}.conf"
-+#define SERVER_CONFIG_FILE "${progname}.conf"
- _ACEOF
+-printf "%s\n" "#define SERVER_CONFIG_FILE \"${rel_sysconfdir}/${progname}.conf\"" >>confdefs.h
++printf "%s\n" "#define SERVER_CONFIG_FILE \"${progname}.conf\"" >>confdefs.h
  
  
- cat >>confdefs.h <<_ACEOF
--#define AP_TYPES_CONFIG_FILE "${rel_sysconfdir}/mime.types"
-+#define AP_TYPES_CONFIG_FILE "mime.types"
- _ACEOF
+-printf "%s\n" "#define AP_TYPES_CONFIG_FILE \"${rel_sysconfdir}/mime.types\"" >>confdefs.h
++printf "%s\n" "#define AP_TYPES_CONFIG_FILE \"mime.types\"" >>confdefs.h
  
  
+ perlbin=`$ac_aux_dir/PrintPath perl`
 diff -Naur a/configure.in b/configure.in
 --- a/configure.in	2022-02-24 23:18:42.000000000 +0100
 +++ b/configure.in	2022-03-19 10:58:09.202098385 +0100
@@ -3862,7 +3858,7 @@ diff -Naur a/Makefile.in b/Makefile.in
  	   test "x$(cgidir)" != "x" && cd $(DESTDIR)$(cgidir) && find . -name ".svn" -type d -print | xargs rm -rf 2>/dev/null || true; \
  	fi
  
-@@ -280,12 +280,12 @@
+@@ -281,12 +281,12 @@
  	@test -d $(DESTDIR)$(mandir)/man1 || $(MKINSTALLDIRS) $(DESTDIR)$(mandir)/man1
  	@test -d $(DESTDIR)$(mandir)/man8 || $(MKINSTALLDIRS) $(DESTDIR)$(mandir)/man8
  	@test -d $(DESTDIR)$(manualdir)   || $(MKINSTALLDIRS) $(DESTDIR)$(manualdir)

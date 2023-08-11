@@ -15,5 +15,5 @@ The following instructions register the nvidia package store with the package ma
 cd /etc/yum.repos.d
 
 # Copy the configuration to your directory to register the NVIDIA RPM repository with your package manager
-sudo wget https://raw.githubusercontent.com/microsoft/CBL-Mariner/toolkit/docs/nvidia/mariner-nvidia.repo
+sudo wget https://raw.githubusercontent.com/microsoft/CBL-Mariner/1.0/toolkit/docs/nvidia/mariner-nvidia.repo
 ```

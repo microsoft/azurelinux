@@ -4,7 +4,7 @@
 Summary:        Industry-standard container runtime
 Name:           moby-%{upstream_name}
 Version:        1.6.6+azure
-Release:        3%{?dist}
+Release:        10%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -18,6 +18,10 @@ Source2:        containerd.toml
 Source3:        NOTICE
 Source4:        LICENSE
 Patch0:         Makefile.patch
+Patch1:         CVE-2022-23471.patch
+Patch2:         add_ptrace_readby_tracedby_to_apparmor.patch
+Patch3:         CVE-2023-25173.patch
+Patch4:         CVE-2023-25153.patch
 
 %{?systemd_requires}
 
@@ -103,6 +107,27 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 
 %changelog
+* Thu Jun 22 2023 Mitch Zhu <mitchzhu@microsoft.com> - 1.6.6+azure-10
+- Bump release to rebuild with go 1.19.10
+
+* Wed Mar 01 2023 Mitch Zhu <mitchzhu@microsoft.com> - 1.6.6+azure-9
+- Add patch to fix CVE-2023-25153
+
+* Tue Feb 28 2023 Mitch Zhu <mitchzhu@microsoft.com> - 1.6.6+azure-8
+- Add patch to fix CVE-2023-25173
+
+* Tue Dec 27 2022 Aadhar Agarwal <aadagarwal@microsoft.com> - 1.6.6+azure-7
+- Backport upstream fix in containerd to add ptrace readby and tracedby to default AppArmor profile (add_ptrace_readby_tracedby_to_apparmor.patch)
+
+* Tue Dec 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.6.6+azure-6
+- Bump release to rebuild with go 1.18.8-2
+
+* Tue Dec 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.6.6+azure-5
+- Add patch for CVE-2022-23471
+
+* Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.6.6+azure-4
+- Bump release to rebuild with go 1.18.8
+
 * Wed Aug 17 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.6.6+azure-3
 - Bump to rebuild with golang 1.18.5-1
 

@@ -1,12 +1,13 @@
 Summary:        Fast incremental file transfer.
 Name:           rsync
 Version:        3.1.3
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv3+
 URL:            https://rsync.samba.org/
 Source0:        https://download.samba.org/pub/rsync/src/%{name}-%{version}.tar.gz
 # This vulnerability is fixed in upstream source
 Patch0:         CVE-2017-16548.nopatch
+Patch1:         CVE-2022-29154.patch
 Group:          Appication/Internet
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -58,6 +59,9 @@ make %{?_smp_mflags} check
 %{_libdir}/systemd/system/rsyncd.service
 %{_sysconfdir}/rsyncd.conf
 %changelog
+* Thu Dec 08 2020 Minghe Ren <mingheren@microsoft.com> - 3.1.3-6
+- Added upstream patch for CVE-2022-29154
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 3.1.3-5
 - Added %%license line automatically
 

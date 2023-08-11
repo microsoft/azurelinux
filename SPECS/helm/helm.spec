@@ -1,15 +1,13 @@
 %global debug_package %{nil}
-Summary:        The Kubernetes Package Manager
 Name:           helm
 Version:        3.4.1
-Release:        11%{?dist}
+Release:        17%{?dist}
+Summary:        The Kubernetes Package Manager
 License:        Apache 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Group:          Applications/Networking
 URL:            https://github.com/helm/helm
-#Source0:      https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
 # How to re-build this file:
@@ -26,6 +24,10 @@ Source0:        %{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         CVE-2021-21303.patch
 Patch1:         CVE-2021-32690.patch
+Patch2:         CVE-2022-23525.patch
+Patch3:         CVE-2022-23526.patch
+Patch4:         CVE-2022-23524.patch
+Patch5:         CVE-2023-25165.patch
 BuildRequires:  golang >= 1.15.5
 
 %description
@@ -51,7 +53,30 @@ install -m 755 ./helm %{buildroot}%{_bindir}
 %doc ADOPTERS.md SECURITY.md code-of-conduct.md CONTRIBUTING.md README.md
 %{_bindir}/helm
 
+
+%check
+go test -v ./cmd/helm
+
 %changelog
+* Thu Jun 22 2023 Mitch Zhu <mitchzhu@microsoft.com> - 3.4.1-17
+- Bump release to rebuild with go 1.19.10
+
+* Wed Mar 01 2023 Mitch Zhu <mitchzhu@microsoft.com> - 3.4.1-16
+- Add patch to fix CVE-2023-25165
+
+* Fri Feb 10 2023 Dan Streetman <ddstreet@microsoft.com> - 3.4.1-15
+- CVE-2022-23524
+
+* Wed Dec 21 2022 Jon Slobodzian <joslobo@microsoft.com> - 3.4.1-14
+- Patch CVE-2022-23525, CVE-2022-23526
+- Added Check Section
+
+* Tue Dec 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 3.4.1-13
+- Bump release to rebuild with go 1.18.8-2
+
+* Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.4.1-12
+- Bump release to rebuild with go 1.18.8
+
 * Wed Aug 17 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.4.1-11
 - Bump to rebuild with golang 1.18.5-1
 

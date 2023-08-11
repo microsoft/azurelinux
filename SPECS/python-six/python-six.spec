@@ -3,7 +3,7 @@
 
 Name:           python-six
 Version:        1.11.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Python 2 and 3 compatibility utilities
 License:        MIT
 Group:          Development/Languages/Python
@@ -53,11 +53,8 @@ python2 setup.py install --prefix=%{_prefix} --root=%{buildroot}
 python3 setup.py install --prefix=%{_prefix} --root=%{buildroot}
 
 %check
-easy_install_2=$(ls /usr/bin |grep easy_install |grep 2)
-$easy_install_2 pytest
-python2 test_six.py
 easy_install_3=$(ls /usr/bin |grep easy_install |grep 3)
-$easy_install_3 pytest
+$easy_install_3 pytest==7.1.3
 python3 test_six.py
 
 
@@ -71,6 +68,8 @@ python3 test_six.py
 %{python3_sitelib}/*
 
 %changelog
+*   Wed Nov 09 2022 Jon Slobodzian <joslobo@microsoft.com> 1.11.0-5
+-   Fix python-six test to use explicit version of pytest. Latest version is incompatible
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.11.0-4
 -   Added %%license line automatically
 *   Tue Apr 07 2020 Paul Monson <paulmon@microsoft.com> 1.11.0-3

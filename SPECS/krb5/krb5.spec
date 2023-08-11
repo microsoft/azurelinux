@@ -3,7 +3,7 @@
 Summary:        The Kerberos newtork authentication system
 Name:           krb5
 Version:        1.18.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,7 @@ Group:          System Environment/Security
 URL:            https://web.mit.edu/kerberos/
 Source0:        https://web.mit.edu/kerberos/dist/%{name}/1.18/%{name}-%{version}.tar.gz
 Patch0:         CVE-2021-37750.patch
+Patch1:         CVE-2022-42898.patch
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  openssl-devel
 Requires:       e2fsprogs-libs
@@ -126,6 +127,9 @@ rm -rf %{buildroot}/*
 %{_datarootdir}/locale/*
 
 %changelog
+* Fri Jan 06 2023 Aadhar Agarwal <aadagarwal@microsoft.com> - 1.18.4-3
+- Add patch to fix CVE-2022-42898
+
 * Tue Oct 26 2021 Mateusz Malisz <mamalisz@microsoft.com> - 1.18.4-2
 - Remove dependency on sh/bash.
 

@@ -1,21 +1,19 @@
 Summary:        TIFF libraries and associated utilities.
 Name:           libtiff
-Version:        4.4.0
-Release:        2%{?dist}
+Version:        4.5.1
+Release:        1%{?dist}
 License:        libtiff
 URL:            https://gitlab.com/libtiff/libtiff
 Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://gitlab.com/libtiff/libtiff/-/archive/v%{version}/libtiff-v%{version}.tar.gz
-# CVE-2020-35522 also covers 35521.
-Patch0:         CVE-2020-35521.nopatch
-# Also fixes CVE-2022-2057 and CVE-2022-2058.
-Patch1:         CVE-2022-2056.patch
+
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libtool
 BuildRequires:  libjpeg-turbo-devel
+
 Requires:       libjpeg-turbo
 
 %description
@@ -23,8 +21,10 @@ The LibTIFF package contains the TIFF libraries and associated utilities. The li
 
 %package        devel
 Summary:        Header and development files
+
 Requires:       %{name} = %{version}-%{release}
 Requires:       libjpeg-turbo-devel
+
 %description    devel
 It contains the libraries and header files to create applications
 
@@ -53,10 +53,9 @@ make %{?_smp_mflags} -k check
 
 %files
 %defattr(-,root,root)
-%license COPYRIGHT
+%license LICENSE.md
 %{_bindir}/*
 %{_libdir}/*.so.*
-%{_datadir}/man/man1/*
 
 %files devel
 %defattr(-,root,root)
@@ -64,9 +63,44 @@ make %{?_smp_mflags} -k check
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
 %{_datadir}/doc/*
-%{_datadir}/man/man3/*
 
 %changelog
+* Mon Jul 10 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.5.1-1
+- Auto-upgrade to 4.5.1 - patch CVE-2023-26966
+
+* Fri May 26 2023 Rachel Menge <rachelmenge@microsoft.com> - 4.5.0-3
+- Patch CVE-2023-2731
+
+* Fri May 12 2023 Aadhar Agarwal <aadagarwal@microsoft.com> - 4.5.0-2
+- Patch CVE-2023-0795 CVE-2023-0796 CVE-2023-0797 CVE-2023-0798 CVE-2023-0799
+
+* Tue Feb 28 2023 Mitch Zhu <mitchzhu@microsoft.com> - 4.5.0-1
+- Upgrade version to 4.5.0 to fix CVE-2023-0796,  CVE-2023-0797, CVE-2023-0798,
+- CVE-2023-0799, CVE-2023-0801, CVE-2023-0802, CVE-2023-0803, CVE-2023-0804
+- Remove patches that no longer apply
+- Repatched CVE-2022-48281
+
+* Thu Feb 16 2023 Dallas Delaney <dadelan@microsoft.com> - 4.4.0-9
+- Patch CVE-2023-0795 CVE-2023-0796 CVE-2023-0797 CVE-2023-0798 CVE-2023-0799
+
+* Thu Feb 16 2023 Dallas Delaney <dadelan@microsoft.com> - 4.4.0-8
+- Patch CVE-2023-0800 CVE-2023-0801 CVE-2023-0802 CVE-2023-0803 CVE-2023-0804
+
+* Thu Feb 02 2023 Henry Li <lihl@microsoft.com> - 4.4.0-7
+- Patch CVE-2022-48281
+
+* Fri Nov 18 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 4.4.0-6
+- Patching CVE-2022-3970.
+
+* Mon Nov 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.4.0-5
+- Patching CVE-2022s: 3597, 3598, 3599, 3626, and 3627.
+
+* Mon Oct 24 2022 Sean Dougherty <sdougherty@microsoft.com> - 4.4.0-4
+- Patch CVE-2022-3570
+
+* Fri Oct 07 2022 Bala <balakumaran.kannan@microsoft.com> - 4.4.0-3
+- Patch CVE-2022-2953
+
 * Fri Jul 15 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 4.4.0-2
 - Patch CVE-2022-2056, CVE-2022-2057, and CVE-2022-2058
 

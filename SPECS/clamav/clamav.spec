@@ -2,8 +2,8 @@
 %{!?python3_sitelib: %global python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Summary:        Open source antivirus engine
 Name:           clamav
-Version:        0.103.6
-Release:        2%{?dist}
+Version:        0.103.8
+Release:        1%{?dist}
 License:        ASL 2.0 AND BSD AND bzip2-1.0.4 AND GPLv2 AND LGPLv2+ AND MIT AND Public Domain AND UnRar
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -99,6 +99,9 @@ rm -f %{_var}/log/freshclam.log
 %ghost %attr(-,clamav,clamav) %{_var}/log/freshclam.log
 
 %changelog
+* Fri Feb 17 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.103.8-1
+- Auto-upgrade to 0.103.8 - CVE-2023-20032
+
 *Fri Jul 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.103.6-2
 - Fix freshclam DB download (backport of Tom Fay's 2.0 changes)
 - Create/delete clamav user and group on preinstall/postuninstall

@@ -1,7 +1,7 @@
 Summary:        The Windows Azure Linux Agent
 Name:           WALinuxAgent
 Version:        2.2.54.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,6 +9,9 @@ Group:          System/Daemons
 URL:            https://github.com/Azure/WALinuxAgent
 #Source0:       https://github.com/Azure/WALinuxAgent/archive/refs/tags/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
+Source1:        ephemeral-disk-warning.service
+Source2:        ephemeral-disk-warning.conf
+Source3:        ephemeral-disk-warning
 BuildRequires:  python3
 BuildRequires:  python3-distro
 BuildRequires:  python3-libs
@@ -55,12 +58,16 @@ install -m 644 config/66-azure-storage.rules %{buildroot}/%{_sysconfdir}/udev/ru
 sed -i 's,#!/usr/bin/env python,#!/usr/bin/python3,' %{buildroot}%{_bindir}/waagent
 sed -i 's,#!/usr/bin/env python,#!/usr/bin/python3,' %{buildroot}%{_bindir}/waagent2.0
 sed -i 's,/usr/bin/python ,/usr/bin/python3 ,' %{buildroot}%{_lib}/systemd/system/waagent.service
+install -m 644 %{SOURCE1} %{buildroot}%{_libdir}/systemd/system/ephemeral-disk-warning.service
+install -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/ephemeral-disk-warning.conf
+install -m 644 %{SOURCE3} %{buildroot}%{_bindir}/ephemeral-disk-warning
 
 %check
 python3 setup.py check && python3 setup.py test
 
 %post
 %systemd_post waagent.service
+%systemd_post ephemeral-disk-warning.service
 
 %preun
 %systemd_preun waagent.service
@@ -75,12 +82,17 @@ python3 setup.py check && python3 setup.py test
 %license LICENSE.txt
 %attr(0755,root,root) %{_bindir}/waagent
 %attr(0755,root,root) %{_bindir}/waagent2.0
+%attr(0755,root,root) %{_bindir}/ephemeral-disk-warning
 %config %{_sysconfdir}/waagent.conf
+%config %{_sysconfdir}/ephemeral-disk-warning.conf
 %ghost %{_localstatedir}/log/waagent.log
 %dir %attr(0700, root, root) %{_sharedstatedir}/waagent
 %{_lib}/python3.7/site-packages/*
 
 %changelog
+* Tue Nov 29 2022 Nan Liu <liunan@microsoft.com> - 2.2.54.2-4
+- Add ephemeral-disk-warning.service
+
 * Tue Dec 14 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 2.2.54.2-3
 - Include the 66-azure-storage udev rule.
 

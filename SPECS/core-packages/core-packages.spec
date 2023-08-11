@@ -1,7 +1,7 @@
 Summary:        Metapackage with core sets of packages
 Name:           core-packages
 Version:        0.1
-Release:        26%{?dist}
+Release:        27%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -41,7 +41,7 @@ Requires:       which
 %{summary}
 
 %package        container
-Summary:        Metapackage to install the basic set of packages used all image types.
+Summary:        Metapackage to install the basic set of packages used by all image types.
 Requires:       bash
 Requires:       bzip2
 Requires:       ca-certificates-base
@@ -69,6 +69,7 @@ Requires:       nss-libs
 Requires:       openssl
 Requires:       pkg-config
 Requires:       readline
+Requires:       rpm
 Requires:       rpm-libs
 Requires:       sed
 Requires:       sqlite-libs
@@ -95,6 +96,9 @@ Requires:       zlib
 %files container
 
 %changelog
+* Tue Dec 20 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.1-27
+- Making sure 'rpm' is always part of the base image.
+
 * Wed Dec 15 2021 Chris Co <chrco@microsoft.com> - 0.1-26
 - Remove check-restart and dnf-automatic from core set of packages
 

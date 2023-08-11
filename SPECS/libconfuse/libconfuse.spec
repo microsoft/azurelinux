@@ -1,13 +1,14 @@
 Summary:        Configuration file parser library
 Name:           libconfuse
 Version:        3.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Libraries
 URL:            https://github.com/libconfuse/libconfuse
 Source0:        https://github.com/libconfuse/libconfuse/releases/download/v%{version}/confuse-%{version}.tar.gz
+Patch0:         CVE-2022-40320.patch
 BuildRequires:  gcc
 BuildRequires:  make
 
@@ -55,6 +56,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/libconfuse.pc
 
 %changelog
+* Fri Feb 10 2023 Dan Streetman <ddstreet@microsoft.com> 3.3-2
+- CVE-2022-40320
+
 * Mon Feb 08 2021 Henry Beberman <henry.beberman@microsoft.com> 3.3-1
 - Add libconfuse spec
 - License verified

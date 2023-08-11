@@ -81,7 +81,7 @@ else
 $(TOOL_BINS_DIR)/%: $(go_common_files)
 	cd $(TOOLS_DIR)/$* && \
 		go test -covermode=atomic -coverprofile=$(BUILD_DIR)/tools/$*.test_coverage ./... && \
-		go build -o $(TOOL_BINS_DIR)
+		CGO_ENABLED=0 go build -o $(TOOL_BINS_DIR)
 endif
 
 # Runs tests for common components

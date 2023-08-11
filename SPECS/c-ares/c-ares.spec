@@ -1,6 +1,6 @@
 Summary:        A library that performs asynchronous DNS operations
 Name:           c-ares
-Version:        1.18.1
+Version:        1.19.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -70,6 +70,12 @@ rm -rf %{buildroot}
 %{_mandir}/man3/ares_*
 
 %changelog
+* Tue Jun 6 2023 Dallas Delaney <dadelan@microsoft.com> - 1.19.1-1
+- Upgrade to 1.19.1 - CVE-2023-32067, CVE-2023-31130, and CVE-2023-31147
+
+* Tue Apr 04 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.19.0-1
+- Auto-upgrade to 1.19.0 - To Address CVE-2022-4904
+
 * Sun Nov 28 2021 Muhammad Falak <mwani@microsoft.com> - 1.18.1-1
 - Bump version to fix CVE-2021-3672
 

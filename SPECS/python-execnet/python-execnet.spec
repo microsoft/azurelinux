@@ -6,7 +6,7 @@
 Summary:        Python execution distributor
 Name:           python-%{pkgname}
 Version:        1.7.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 URL:            https://codespeak.net/execnet/
 Vendor:         Microsoft Corporation
@@ -56,6 +56,7 @@ python3 setup.py install --root=%{buildroot}
 %if %{with check}
 %check
 pip3 install tox
+sed -i "s/pytest$/pytest==7.1.3/" tox.ini
 LANG=en_US.UTF-8 tox -e py37
 %endif
 
@@ -65,6 +66,8 @@ LANG=en_US.UTF-8 tox -e py37
 %{python3_sitelib}/*
 
 %changelog
+* Mon Oct 31 2022 Jon Slobodzian <joslobo@microsoft.com> 1.7.1-3
+- Fix check tests to enforce the 7.1.3 version of pytest. 
 * Tue Jun 08 2021 Andrew Phelps <anphel@microsoft.com> 1.7.1-2
 - Fix check tests
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> 1.7.1-1

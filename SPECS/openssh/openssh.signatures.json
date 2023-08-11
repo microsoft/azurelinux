@@ -1,7 +1,7 @@
 {
  "Signatures": {
   "blfs-systemd-units-20191026.tar.xz": "10f20d2f8db4dc48b4f9257c47821df238808fca3566c65a8c7e2284172da789",
-  "openssh-8.8p1.tar.gz": "4590890ea9bb9ace4f71ae331785a3a5823232435161960ed5fc86588f331fe9",
+  "openssh-8.9p1.tar.gz": "fd497654b7ab1686dac672fb83dfb4ba4096e8b5ffcdaccd262380ae58bec5e7",
   "sshd-keygen.service": "331515a4fb37951122ac8447111b126368386a49ac429f500fe3819ba25a70be",
   "sshd.service": "9233e23c1cc89316630ce25e14403f8cdb8503cf4235cc1d864770b5b56e28d2"
  }

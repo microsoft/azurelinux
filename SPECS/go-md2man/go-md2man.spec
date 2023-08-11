@@ -1,7 +1,7 @@
 Summary:    Converts markdown into roff (man pages)
 Name:       go-md2man
 Version:    2.0.0
-Release:    14%{?dist}
+Release:    17%{?dist}
 License:    MIT
 Group:      Tools/Container
 
@@ -32,6 +32,8 @@ export GOPATH=%{OUR_GOPATH}
 export GOCACHE=%{OUR_GOPATH}/.cache
 export CGO_ENABLED=0
 export GO111MODULE=on
+# Disable DWARF compression
+export GOFLAGS=-ldflags='-compressdwarf=false'
 
 cd %{_topdir}/BUILD/%{name}-%{version}/go-md2man-2.0.0
 go build -mod vendor -o go-md2man
@@ -49,6 +51,16 @@ cp go-md2man-2.0.0/LICENSE.md %{buildroot}/usr/share/doc/%{name}-%{version}/LICE
 %{_bindir}/go-md2man
 
 %changelog
+* Thu Jun 22 2023 Mitch Zhu <mitchzhu@microsoft.com> - 2.0.0-17
+- Bump release to rebuild with go 1.19.10
+  Disable DWARF compression in go 1.19.10
+
+* Tue Dec 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.0.0-16
+- Bump release to rebuild with go 1.18.8-2
+
+* Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.0.0-15
+- Bump release to rebuild with go 1.18.8
+
 * Wed Aug 17 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.0.0-14
 - Bump to rebuild with golang 1.18.5-1
 

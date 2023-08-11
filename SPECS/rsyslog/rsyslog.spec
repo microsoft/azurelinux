@@ -1,7 +1,7 @@
 Summary:        Rocket-fast system for log processing
 Name:           rsyslog
 Version:        8.37.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv3+ AND LGPLv3 AND ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,7 @@ Source0:        https://www.rsyslog.com/files/download/rsyslog/%{name}-%{version
 Source1:        rsyslog.service
 Source2:        50-rsyslog-journald.conf
 Source3:        rsyslog.conf
+Source4:        rsyslog.logrotate
 Patch1:         CVE-2022-24903.patch
 BuildRequires:  autogen
 BuildRequires:  curl-devel
@@ -54,10 +55,12 @@ make DESTDIR=%{buildroot} install
 install -vd %{buildroot}%{_libdir}/systemd/system/
 install -vd %{buildroot}%{_sysconfdir}/systemd/journald.conf.d/
 install -vdm 755 %{buildroot}/%{_sysconfdir}/rsyslog.d
+install -d -m 755 %{buildroot}%{_sysconfdir}/logrotate.d
 rm -f %{buildroot}/lib/systemd/system/rsyslog.service
 install -p -m 644 %{SOURCE1} %{buildroot}%{_libdir}/systemd/system/
 install -p -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/systemd/journald.conf.d/
 install -p -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/rsyslog.conf
+install -p -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}/logrotate.d/rsyslog
 find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
@@ -85,8 +88,13 @@ make %{?_smp_mflags} check
 %{_sysconfdir}/systemd/journald.conf.d/*
 %{_sysconfdir}/rsyslog.conf
 %dir %attr(0755, root, root) %{_sysconfdir}/rsyslog.d
+%config(noreplace) %{_sysconfdir}/logrotate.d/rsyslog
 
 %changelog
+* Fri Oct 14 2022 Nan Liu <liunan@microsoft.com> - 8.37.0-8
+- Add rsyslog configuration file to /etc/logrotate.d
+- Fix a typo in rsyslog.conf
+
 * Mon May 23 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 8.37.0-7
 - Patching CVE-2022-24903
 

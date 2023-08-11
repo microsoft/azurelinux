@@ -1,11 +1,13 @@
 Summary:	Library for accessing X.509 and CMS data structure.
 Name:		libksba
 Version:	1.3.5
-Release:        3%{?dist}
+Release:        5%{?dist}
 License:	GPLv3+
 URL:		https://www.gnupg.org/(fr)/download/index.html#libksba
 Group:		Security/Libraries.
 Source0:        https://www.gnupg.org/ftp/gcrypt/%{name}/%{name}-%{version}.tar.bz2
+Patch0:         CVE-2022-47629.patch
+Patch1:         CVE-2022-3515.patch
 %define sha1 libksba=a98385734a0c3f5b713198e8d6e6e4aeb0b76fde
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,7 +19,7 @@ CMS data and related objects more easy. It provides a highlevel interface
 to the implemented protocols and presents the data in a consistent way.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 %configure --disable-static \
@@ -46,6 +48,11 @@ make %{?_smp_mflags} -k check
 %exclude %{_datadir}/info/dir
 
 %changelog
+* Mon Feb 06 2023 Dan Streetman <ddstreet@microsoft.com> - 1.3.5-5
+- Add patch to fix CVE-2022-3515
+* Wed Jan 04 2023 Aadhar Agarwal <aadagarwal@microsoft.com> - 1.3.5-4
+- Add patch for CVE-2022-47629
+
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.3.5-3
 - Added %%license line automatically
 

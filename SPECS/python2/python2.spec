@@ -3,7 +3,7 @@
 Summary:        A high-level scripting language
 Name:           python2
 Version:        2.7.18
-Release:        10%{?dist}
+Release:        14%{?dist}
 License:        PSF
 URL:            http://www.python.org/
 Group:          System Environment/Programming
@@ -19,7 +19,7 @@ Patch5:         CVE-2020-26116.patch
 Patch6:         CVE-2017-18207.patch
 # Ignore CVE-2015-5652 because it only applies to Windows
 Patch7:         CVE-2015-5652.nopatch
-# Ignore CVE-2017-17522 as Upstream, Red Hat, Debian, and Ubuntu all agree it is not exploitable        
+# Ignore CVE-2017-17522 as Upstream, Red Hat, Debian, and Ubuntu all agree it is not exploitable
 # and is not a security issue
 Patch8:         CVE-2017-17522.nopatch
 # Ignore CVE-2019-9674 since the community agreed it shouldn't be patched and upstream
@@ -35,11 +35,20 @@ Patch12:        CVE-2020-27619.patch
 # https://gitweb.gentoo.org/repo/gentoo.git/commit/?id=f2a53a94f3b6b6395ef4541051a02d80c61442d0
 Patch13:        CVE-2021-23336.patch
 # CVE-2022-0391 patch backported from 3.7 courtesy of openSUSE
-# https://build.opensuse.org/package/view_file/openSUSE:Factory/python/CVE-2022-0391-urllib_parse-newline-parsing.patch?expand=1 
+# https://build.opensuse.org/package/view_file/openSUSE:Factory/python/CVE-2022-0391-urllib_parse-newline-parsing.patch?expand=1
 Patch14:        CVE-2022-0391.patch
 # CVE-2021-3733 patch backported from 3.11 courtesy of openSUSE
 # https://build.opensuse.org/package/view_file/openSUSE:Factory/python/CVE-2021-3733-fix-ReDoS-in-request.patch?expand=1
 Patch15:        CVE-2021-3733.patch
+# CVE-2015-20107 patch backported from 3.10:
+# https://github.com/python/cpython/commit/96739bccf220689a54ef33341f431eda19c287fa#diff-fddb3f7b76dfc3150d9c270d0adf6464078858e34d33614feff7b3edfaac162d
+Patch16:        CVE-2015-20107.patch
+# CVE-2023-24329 patch backported from 3.11:
+# https://github.com/python/cpython/pull/99421
+Patch17:        CVE-2023-24329.patch
+# CVE-2022-45061 patch backported from 3.7:
+# https://github.com/python/cpython/pull/99232
+Patch18:        CVE-2022-45061.patch
 BuildRequires:  pkg-config >= 0.28
 BuildRequires:  bzip2-devel
 BuildRequires:  openssl-devel
@@ -48,6 +57,7 @@ BuildRequires:  libffi-devel >= 3.0.13
 BuildRequires:  sqlite-devel
 BuildRequires:  ncurses-devel
 BuildRequires:  readline-devel
+BuildRequires:  zlib
 Requires:       openssl
 Requires:       python2-libs = %{version}-%{release}
 Provides:       python-sqlite = %{version}-%{release}
@@ -135,6 +145,7 @@ The test package contains all regression tests for Python as well as the modules
 
 %prep
 %autosetup -p1 -n Python-%{version}
+rm -rf Modules/zlib
 
 %build
 export OPT="${CFLAGS} %{openssl_flags}"
@@ -143,6 +154,7 @@ export OPT="${CFLAGS} %{openssl_flags}"
     CXXFLAGS="%{optflags} %{openssl_flags}" \
     --enable-shared \
     --with-ssl \
+    --with-system-zlib \
     --with-system-expat \
     --with-system-ffi \
     --enable-unicode=ucs4 \
@@ -252,6 +264,18 @@ make test
 %{_libdir}/python2.7/test/*
 
 %changelog
+* Thu Jun 01 2023 Rohit Rawat <rohitrawat@microsoft.com> - 2.7.18-14
+- Patch CVE-2022-45061.patch
+
+* Thu Apr 20 2023 Saul Paredes <saulparedes@microsoft.com> - 2.7.18-13
+- Remove vendored zlib and use system one to address CVE-2018-25032
+
+* Mon Mar 06 2023 Mitch Zhu <mitchzhu@microsoft.com> - 2.7.18-12
+- Patch CVE-2023-24329.
+
+* Wed Oct 05 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7.18-11
+- Patch CVE-2015-20107.
+
 * Fri Jul 15 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 2.7.18-10
 - Patch CVE-2021-3733
 

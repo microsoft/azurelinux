@@ -7,7 +7,7 @@
 Summary:        Perl extension interface for libcurl
 Name:           perl-WWW-Curl
 Version:        4.17
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,6 +17,8 @@ Source0:        https://search.cpan.org/CPAN/authors/id/S/SZ/SZBALINT/WWW-Curl-%
 
 Patch0:         0001-Curl-macros-fix.patch
 Patch1:         WWW-Curl-4.17-Adapt-to-changes-in-cURL-7.69.0.patch
+Patch2:         WWW-Curl-4.17-Adapt-to-curl-7.87.0.patch
+Patch3:         WWW-Curl-4.17-Work-around-a-macro-bug-in-curl-7.87.0.patch
 
 BuildRequires:  curl-devel
 BuildRequires:  perl >= 5.28.0
@@ -70,6 +72,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Fri Mar 17 2023 Muhammad Falak <mwani@microsoft.com> - 4.17-11
+- Introduce patches to workaround macro bug which breaks build
+
 * Tue Dec 29 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.17-10
 - Adapting Fedora 32 patch (license: MIT) for "curl" versions >= 7.69.0.
 

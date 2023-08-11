@@ -1,0 +1,141 @@
+diff -ru heimdal-7.7.1/lib/hx509/quote.py heimdal-7.7.1-mod/lib/hx509/quote.py
+--- heimdal-7.7.1/lib/hx509/quote.py	2023-01-05 14:55:11.272438858 -0800
++++ heimdal-7.7.1-mod/lib/hx509/quote.py	2023-01-05 14:55:19.452513023 -0800
+@@ -1,4 +1,4 @@
+-#!/usr/bin/python
++#!/usr/bin/python2
+ # -*- coding: utf-8 -*-
+ #
+ # Copyright (c) 2010 Kungliga Tekniska Högskolan
+diff -ru heimdal-7.7.1/lib/wind/gen-bidi.py heimdal-7.7.1-mod/lib/wind/gen-bidi.py
+--- heimdal-7.7.1/lib/wind/gen-bidi.py	2022-09-15 15:59:25.000000000 -0700
++++ heimdal-7.7.1-mod/lib/wind/gen-bidi.py	2023-01-05 14:56:21.693073239 -0800
+@@ -1,4 +1,4 @@
+-#!/usr/local/bin/python
++#!/usr/bin/python2
+ # -*- coding: iso-8859-1 -*-
+ 
+ # $Id$
+diff -ru heimdal-7.7.1/lib/wind/gen-combining.py heimdal-7.7.1-mod/lib/wind/gen-combining.py
+--- heimdal-7.7.1/lib/wind/gen-combining.py	2022-09-15 15:59:25.000000000 -0700
++++ heimdal-7.7.1-mod/lib/wind/gen-combining.py	2023-01-05 14:56:39.661233702 -0800
+@@ -1,4 +1,4 @@
+-#!/usr/local/bin/python
++#!/usr/bin/python2
+ # -*- coding: iso-8859-1 -*-
+ 
+ # $Id$
+diff -ru heimdal-7.7.1/lib/wind/generate.py heimdal-7.7.1-mod/lib/wind/generate.py
+--- heimdal-7.7.1/lib/wind/generate.py	2022-09-15 15:59:25.000000000 -0700
++++ heimdal-7.7.1-mod/lib/wind/generate.py	2023-01-05 14:58:16.934093590 -0800
+@@ -1,4 +1,4 @@
+-#!/usr/local/bin/python
++#!/usr/bin/python2
+ # -*- coding: iso-8859-1 -*-
+ 
+ # $Id$
+diff -ru heimdal-7.7.1/lib/wind/gen-errorlist.py heimdal-7.7.1-mod/lib/wind/gen-errorlist.py
+--- heimdal-7.7.1/lib/wind/gen-errorlist.py	2022-09-15 15:59:25.000000000 -0700
++++ heimdal-7.7.1-mod/lib/wind/gen-errorlist.py	2023-01-05 14:56:54.637367029 -0800
+@@ -1,4 +1,4 @@
+-#!/usr/local/bin/python
++#!/usr/bin/python2
+ # -*- coding: iso-8859-1 -*-
+ 
+ # $Id$
+diff -ru heimdal-7.7.1/lib/wind/gen-map.py heimdal-7.7.1-mod/lib/wind/gen-map.py
+--- heimdal-7.7.1/lib/wind/gen-map.py	2022-09-15 15:59:25.000000000 -0700
++++ heimdal-7.7.1-mod/lib/wind/gen-map.py	2023-01-05 14:57:09.501499008 -0800
+@@ -1,4 +1,4 @@
+-#!/usr/local/bin/python
++#!/usr/bin/python2
+ # -*- coding: iso-8859-1 -*-
+ 
+ # $Id$
+diff -ru heimdal-7.7.1/lib/wind/gen-normalize.py heimdal-7.7.1-mod/lib/wind/gen-normalize.py
+--- heimdal-7.7.1/lib/wind/gen-normalize.py	2022-09-15 15:59:25.000000000 -0700
++++ heimdal-7.7.1-mod/lib/wind/gen-normalize.py	2023-01-05 14:57:22.093610540 -0800
+@@ -1,4 +1,4 @@
+-#!/usr/local/bin/python
++#!/usr/bin/python2
+ # -*- coding: iso-8859-1 -*-
+ 
+ # $Id$
+diff -ru heimdal-7.7.1/lib/wind/gen-punycode-examples.py heimdal-7.7.1-mod/lib/wind/gen-punycode-examples.py
+--- heimdal-7.7.1/lib/wind/gen-punycode-examples.py	2022-09-15 15:59:25.000000000 -0700
++++ heimdal-7.7.1-mod/lib/wind/gen-punycode-examples.py	2023-01-05 14:57:36.537738195 -0800
+@@ -1,4 +1,4 @@
+-#!/usr/local/bin/python
++#!/usr/bin/python2
+ # -*- coding: iso-8859-1 -*-
+ 
+ # $Id$
+diff -ru heimdal-7.7.1/lib/wind/Makefile.am heimdal-7.7.1-mod/lib/wind/Makefile.am
+--- heimdal-7.7.1/lib/wind/Makefile.am	2022-11-15 09:14:35.000000000 -0800
++++ heimdal-7.7.1-mod/lib/wind/Makefile.am	2023-01-05 14:55:35.148654968 -0800
+@@ -89,6 +89,8 @@
+ 
+ LDADD = libwind.la $(LIB_roken)
+ 
++PYTHON = python2
++
+ if !MAINTAINER_MODE
+ skip_python = test -f $@ ||
+ endif
+diff -ru heimdal-7.7.1/lib/wind/rfc3454.py heimdal-7.7.1-mod/lib/wind/rfc3454.py
+--- heimdal-7.7.1/lib/wind/rfc3454.py	2022-09-15 15:59:25.000000000 -0700
++++ heimdal-7.7.1-mod/lib/wind/rfc3454.py	2023-01-05 14:59:04.002504868 -0800
+@@ -1,4 +1,4 @@
+-#!/usr/local/bin/python
++#!/usr/bin/python2
+ # -*- coding: iso-8859-1 -*-
+ 
+ # $Id$
+diff -ru heimdal-7.7.1/lib/wind/rfc4518.py heimdal-7.7.1-mod/lib/wind/rfc4518.py
+--- heimdal-7.7.1/lib/wind/rfc4518.py	2022-09-15 15:59:25.000000000 -0700
++++ heimdal-7.7.1-mod/lib/wind/rfc4518.py	2023-01-05 14:59:26.510700555 -0800
+@@ -1,4 +1,4 @@
+-#!/usr/local/bin/python
++#!/usr/bin/python2
+ # -*- coding: iso-8859-1 -*-
+ 
+ # $Id$
+diff -ru heimdal-7.7.1/lib/wind/stringprep.py heimdal-7.7.1-mod/lib/wind/stringprep.py
+--- heimdal-7.7.1/lib/wind/stringprep.py	2022-09-15 15:59:25.000000000 -0700
++++ heimdal-7.7.1-mod/lib/wind/stringprep.py	2023-01-05 14:59:38.042800580 -0800
+@@ -1,4 +1,4 @@
+-#!/usr/local/bin/python
++#!/usr/bin/python2
+ # -*- coding: iso-8859-1 -*-
+ 
+ # $Id$
+diff -ru heimdal-7.7.1/lib/wind/UnicodeData.py heimdal-7.7.1-mod/lib/wind/UnicodeData.py
+--- heimdal-7.7.1/lib/wind/UnicodeData.py	2022-09-15 15:59:25.000000000 -0700
++++ heimdal-7.7.1-mod/lib/wind/UnicodeData.py	2023-01-05 14:56:03.524910431 -0800
+@@ -1,4 +1,4 @@
+-#!/usr/local/bin/python
++#!/usr/bin/python2
+ # -*- coding: iso-8859-1 -*-
+ 
+ # $Id$
+diff -ru heimdal-7.7.1/lib/wind/util.py heimdal-7.7.1-mod/lib/wind/util.py
+--- heimdal-7.7.1/lib/wind/util.py	2022-09-15 15:59:25.000000000 -0700
++++ heimdal-7.7.1-mod/lib/wind/util.py	2023-01-05 14:59:54.050939167 -0800
+@@ -1,4 +1,4 @@
+-#!/usr/local/bin/python
++#!/usr/bin/python2
+ # -*- coding: iso-8859-1 -*-
+ 
+ # $Id$
+diff -ru heimdal-7.7.1/windows/NTMakefile.w32 heimdal-7.7.1-mod/windows/NTMakefile.w32
+--- heimdal-7.7.1/windows/NTMakefile.w32	2022-11-15 09:24:40.000000000 -0800
++++ heimdal-7.7.1-mod/windows/NTMakefile.w32	2023-01-05 15:00:14.987119999 -0800
+@@ -120,7 +120,7 @@
+ AWK_CMD=gawk.exe
+ YACC_CMD=bison.exe
+ LEX_CMD=flex.exe
+-PYTHON=python.exe
++PYTHON=python2.exe
+ PERL=perl.exe
+ CMP=cmp.exe
+ MAKECAT=makecat.exe

@@ -3,12 +3,14 @@
 
 Name:           python-mako
 Version:        1.0.7
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Python templating language
 License:        MIT
 Group:          Development/Languages/Python
 Url:            https://www.makotemplates.org/
 Source0:        https://files.pythonhosted.org/packages/eb/f3/67579bb486517c0d49547f9697e36582cd19dafb5df9e687ed8e22de57fa/Mako-1.0.7.tar.gz
+# Back-ported from 1.2.2: https://github.com/sqlalchemy/mako/commit/925760291d6efec64fda6e9dd1fd9cfbd5be068c?diff=split
+Patch0:         CVE-2022-40023.patch
 
 BuildRequires:  python2
 BuildRequires:  python2-libs
@@ -37,8 +39,7 @@ Requires:       python3-libs
 %description -n python3-mako
 Python 3 version.
 %prep
-%setup -n Mako-%{version}
-rm -rf ../p3dir
+%autosetup -p1 -n Mako-%{version}
 cp -a . ../p3dir
 
 %build
@@ -72,6 +73,8 @@ popd
 %{_bindir}/mako-render3
 
 %changelog
+*   Thu Sep 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.7-5
+-   Adding a patch for CVE-2022-40023.
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 1.0.7-4
 -   Added %%license line automatically
 *   Thu Apr 30 2020 Emre Girgin <mrgirgin@microsoft.com> 1.0.7-3
