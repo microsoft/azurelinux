@@ -136,7 +136,7 @@ Source1107:     xmvn.tar.xz
 Source1108:     xz-java.tar.xz
 
 Patch0:         0001-Bind-to-OpenJDK-11-for-runtime.patch
-Patch1:         0001-Remove-usage-of-ArchiveStreamFactory.patch
+# Patch1:         0001-Remove-usage-of-ArchiveStreamFactory.patch
 
 Provides:       bundled(ant) = 1.10.9
 Provides:       bundled(apache-parent) = 23
@@ -289,7 +289,7 @@ done
 
 %patch0 -p1
 pushd "downstream/commons-compress"
-%patch1 -p1 
+# %patch1 -p1 
 popd
 
 for patch_path in patches/*/*
@@ -310,7 +310,6 @@ done
 
 # removing harmony files from the source as it causes build time error
 sed  -i "/<excludeSourceMatching>/a\ \t<excludeSourceMatching>/org/apache/commons/compress/harmony/(pack200|unpack200)/.*</excludeSourceMatching>" project/commons-compress.xml
-sed -i '13i\<dependency>slf4j</dependency>' project/plexus-archiver.xml
 sed -i '13i\<dependency>slf4j</dependency>' project/plexus-archiver.xml
 
 %build
