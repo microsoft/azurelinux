@@ -25,9 +25,21 @@ func newWriterHook(writer io.Writer, level logrus.Level, useColors bool, toolNam
 	formatter := &logrus.TextFormatter{
 		ForceColors: useColors,
 		CallerPrettyfier: func(frame *runtime.Frame) (function string, file string) {
-			const gray = 90
-			return "", fmt.Sprintf("[\x1b[%dm%s\x1b[0m]", gray, toolName)
+			return
 		},
+	}
+
+	if toolName != "" {
+		formatter.CallerPrettyfier = func(frame *runtime.Frame) (function string, file string) {
+			const gray = 90
+
+			toolNameField := fmt.Sprintf("[%s]", toolName)
+			if useColors {
+				toolNameField = fmt.Sprintf("[\x1b[%dm%s\x1b[0m]", gray, toolName)
+			}
+
+			return "", toolNameField
+		}
 	}
 
 	return &writerHook{

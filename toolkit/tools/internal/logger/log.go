@@ -51,8 +51,11 @@ const (
 )
 
 // initLogFile initializes the common logger with a file
-func initLogFile(filePath, toolName string) (err error) {
-	const useColors = false
+func initLogFile(filePath string) (err error) {
+	const (
+		noToolName = ""
+		useColors  = false
+	)
 
 	err = os.MkdirAll(filepath.Dir(filePath), os.ModePerm)
 	if err != nil {
@@ -64,7 +67,7 @@ func initLogFile(filePath, toolName string) (err error) {
 		return
 	}
 
-	fileHook = newWriterHook(file, defaultLogFileLevel, useColors, toolName)
+	fileHook = newWriterHook(file, defaultLogFileLevel, useColors, noToolName)
 	Log.Hooks.Add(fileHook)
 	Log.SetLevel(defaultLogFileLevel)
 
@@ -73,12 +76,12 @@ func initLogFile(filePath, toolName string) (err error) {
 
 // InitStderrLog initializes the logger to print to stderr
 func InitStderrLog() {
-	_, filePath, _, ok := runtime.Caller(parentCallerLevel)
+	_, callerFilePath, _, ok := runtime.Caller(parentCallerLevel)
 	if !ok {
 		log.Panic("Failed to get caller info.")
 	}
 
-	toolName := strings.TrimSuffix(filepath.Base(filePath), ".go")
+	toolName := strings.TrimSuffix(filepath.Base(callerFilePath), ".go")
 	initStderrLogInternal(toolName)
 }
 
@@ -98,16 +101,16 @@ func InitBestEffort(path string, level string) {
 		level = defaultStderrLogLevel.String()
 	}
 
-	_, filePath, _, ok := runtime.Caller(parentCallerLevel)
+	_, callerFilePath, _, ok := runtime.Caller(parentCallerLevel)
 	if !ok {
 		log.Panic("Failed to get caller info.")
 	}
 
-	toolName := strings.TrimSuffix(filepath.Base(filePath), ".go")
+	toolName := strings.TrimSuffix(filepath.Base(callerFilePath), ".go")
 	initStderrLogInternal(toolName)
 
 	if path != "" {
-		PanicOnError(initLogFile(path, filePath), "Failed while setting log file (%s).", path)
+		PanicOnError(initLogFile(path), "Failed while setting log file (%s).", path)
 	}
 
 	PanicOnError(SetStderrLogLevel(level), "Failed while setting log level.")
