@@ -32,12 +32,10 @@ const (
 	chrootLocalToolchainDir = "/toolchainrpms"
 	chrootLocalRpmsCacheDir = "/upstream-cached-rpms"
 	chrootCcacheDir         = "/ccache-dir"
-
-	toolName = "pkgworker"
 )
 
 var (
-	app                  = kingpin.New(toolName, "A worker for building packages locally")
+	app                  = kingpin.New("pkgworker", "A worker for building packages locally")
 	srpmFile             = exe.InputFlag(app, "Full path to the SRPM to build")
 	workDir              = app.Flag("work-dir", "The directory to create the build folder").Required().String()
 	workerTar            = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz").Required().ExistingFile()

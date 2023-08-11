@@ -21,7 +21,6 @@ import (
 
 const (
 	defaultFilterPath = "./resources/manifests/package/toolchain_x86_64.txt"
-	toolName          = "depsearch"
 )
 
 var (

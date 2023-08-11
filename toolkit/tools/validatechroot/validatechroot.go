@@ -19,10 +19,12 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
-const toolName = "validatechroot"
+const (
+	leaveChrootFilesOnDisk = false
+)
 
 var (
-	app = kingpin.New(toolName, "A tool to validate that the worker chroot is well configured and all dependencies are satisfied.")
+	app = kingpin.New("validatechroot", "A tool to validate that the worker chroot is well configured and all dependencies are satisfied.")
 
 	toolchainRpmsDir = app.Flag("rpm-dir", "Directory that contains already built toolchain RPMs. Should contain top level directories for architecture.").Required().ExistingDir()
 	tmpDir           = app.Flag("tmp-dir", "Temporary chroot directory.").String()
@@ -50,7 +52,6 @@ func validateWorker(rpmsDir, chrootDir, workerTarPath, manifestPath string) (err
 	const (
 		chrootToolchainRpmsDir = "/toolchainrpms"
 		isExistingDir          = false
-		leaveChrootFilesOnDisk = false
 	)
 
 	var (

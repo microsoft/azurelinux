@@ -17,10 +17,8 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
-const toolName = "grapher"
-
 var (
-	app    = kingpin.New(toolName, "Dependency graph generation tool")
+	app    = kingpin.New("grapher", "Dependency graph generation tool")
 	input  = exe.InputFlag(app, "Input json listing all local SRPMs")
 	output = exe.OutputFlag(app, "Output file to export the graph to")
 

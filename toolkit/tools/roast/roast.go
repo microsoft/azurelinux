@@ -22,10 +22,7 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
-const (
-	defaultWorkerCount = "10"
-	toolName           = "roast"
-)
+const defaultWorkerCount = "10"
 
 type convertRequest struct {
 	inputPath   string
@@ -41,7 +38,7 @@ type convertResult struct {
 }
 
 var (
-	app = kingpin.New(toolName, "A tool to convert raw disk file into another image type")
+	app = kingpin.New("roast", "A tool to convert raw disk file into another image type")
 
 	logFile   = exe.LogFileFlag(app)
 	logLevel  = exe.LogLevelFlag(app)

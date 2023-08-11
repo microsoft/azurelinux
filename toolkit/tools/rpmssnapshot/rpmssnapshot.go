@@ -15,10 +15,8 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
-const toolName = "rpmssnapshot"
-
 var (
-	app = kingpin.New(toolName, "A tool to generate a snapshot of all RPMs expected to be built from given specs folder.")
+	app = kingpin.New("rpmsspnapshot", "A tool to generate a snapshot of all RPMs expected to be built from given specs folder.")
 
 	specsDirPath       = exe.InputStringFlag(app, "Path to specs directory.")
 	outputSnapshotPath = exe.OutputFlag(app, "Path to the generated snapshot.")

@@ -24,7 +24,7 @@ import (
 )
 
 var (
-	app             = kingpin.New(toolName, "Tool to create and install images.")
+	app             = kingpin.New("imager", "Tool to create and install images.")
 	buildDir        = app.Flag("build-dir", "Directory to store temporary files while building.").ExistingDir()
 	configFile      = exe.InputFlag(app, "Path to the image config file.")
 	localRepo       = app.Flag("local-repo", "Path to local RPM repo").ExistingDir()
@@ -61,8 +61,6 @@ const (
 	// kickstartPartitionFile is the file that includes the partitioning schema used by
 	// kickstart installation
 	kickstartPartitionFile = "/tmp/part-include"
-
-	toolName = "imager"
 )
 
 func main() {

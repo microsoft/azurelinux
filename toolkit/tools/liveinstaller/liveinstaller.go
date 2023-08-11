@@ -25,10 +25,8 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
-const toolName = "liveinstaller"
-
 var (
-	app = kingpin.New(toolName, "A tool to download a provided list of packages into a given directory.")
+	app = kingpin.New("liveinstaller", "A tool to download a provided list of packages into a given directory.")
 
 	// Take in strings for the config and template config file, as they may not exist on disk
 	configFile         = exe.InputStringFlag(app, "Path to the image config file.")

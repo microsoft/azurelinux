@@ -25,10 +25,8 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
-const toolName = "graphpkgfetcher"
-
 var (
-	app = kingpin.New(toolName, "A tool to download a unresolved packages in a graph into a given directory.")
+	app = kingpin.New("graphpkgfetcher", "A tool to download a unresolved packages in a graph into a given directory.")
 
 	inputGraph  = exe.InputStringFlag(app, "Path to the graph file to read")
 	outputGraph = exe.OutputFlag(app, "Updated graph file with unresolved nodes marked as resolved")

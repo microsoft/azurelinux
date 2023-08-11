@@ -30,8 +30,6 @@ const (
 	defaultWorkerCount   = "0"
 	defaultBuildAttempts = "1"
 	defaultCheckAttempts = "1"
-
-	toolName = "scheduler"
 )
 
 // schedulerChannels represents the communication channels used by a build agent.
@@ -46,7 +44,7 @@ type schedulerChannels struct {
 }
 
 var (
-	app = kingpin.New(toolName, "A tool to schedule package builds from a dependency graph.")
+	app = kingpin.New("scheduler", "A tool to schedule package builds from a dependency graph.")
 
 	inputGraphFile  = exe.InputFlag(app, "Path to the DOT graph file to build.")
 	outputGraphFile = exe.OutputFlag(app, "Path to save the built DOT graph file.")

@@ -16,10 +16,8 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
-const toolName = "boilerplate"
-
 var (
-	app = kingpin.New(toolName, "A sample golang tool for Mariner.")
+	app = kingpin.New("boilerplate", "A sample golang tool for Mariner.")
 
 	logFile  = exe.LogFileFlag(app)
 	logLevel = exe.LogLevelFlag(app)

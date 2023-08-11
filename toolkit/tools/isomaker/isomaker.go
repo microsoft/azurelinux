@@ -12,10 +12,8 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
-const toolName = "isomaker"
-
 var (
-	app               = kingpin.New(toolName, "Tool to generate ISO images.")
+	app               = kingpin.New("isomaker", "Tool to generate ISO images.")
 	unattendedInstall = app.Flag("unattended-install", "Set this flag, if the ISO should install the default system configuration without user's interaction.").Bool()
 	baseDirPath       = app.Flag("base-dir", "Base directory for relative file paths from the config. Defaults to config's directory.").ExistingDir()
 	buildDirPath      = app.Flag("build-dir", "Directory to store temporary files while building.").Required().String()

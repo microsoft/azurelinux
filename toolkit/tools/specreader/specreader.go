@@ -33,7 +33,6 @@ import (
 
 const (
 	defaultWorkerCount = "10"
-	toolName           = "specreader"
 )
 
 // parseResult holds the worker results from parsing a SPEC file.
@@ -43,7 +42,7 @@ type parseResult struct {
 }
 
 var (
-	app                     = kingpin.New(toolName, "A tool to parse spec dependencies into JSON")
+	app                     = kingpin.New("specreader", "A tool to parse spec dependencies into JSON")
 	specsDir                = exe.InputDirFlag(app, "Directory to scan for SPECS")
 	output                  = exe.OutputFlag(app, "Output file to export the JSON")
 	workers                 = app.Flag("workers", "Number of concurrent goroutines to parse with").Default(defaultWorkerCount).Int()

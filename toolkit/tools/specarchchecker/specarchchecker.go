@@ -17,10 +17,8 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
-const toolName = "specarchchecker"
-
 var (
-	app = kingpin.New(toolName, "Checks if the architecture of a .spec file is valid.")
+	app = kingpin.New("specarchchecker", "Checks if the architecture of a .spec file is valid.")
 
 	specsDirPath       = exe.InputStringFlag(app, "Path to specs directory.")
 	outputFilteredList = exe.OutputFlag(app, "Path to the filtered list.")

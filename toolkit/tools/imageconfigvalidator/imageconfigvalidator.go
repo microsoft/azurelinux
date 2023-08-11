@@ -21,10 +21,8 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
-const toolName = "imageconfigvalidator"
-
 var (
-	app = kingpin.New(toolName, "A tool for validating image configuration files")
+	app = kingpin.New("imageconfigvalidator", "A tool for validating image configuration files")
 
 	logFile   = exe.LogFileFlag(app)
 	logLevel  = exe.LogLevelFlag(app)

@@ -13,10 +13,8 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
-const toolName = "graphPreprocessor"
-
 var (
-	app             = kingpin.New(toolName, "Update the graph for the build requested")
+	app             = kingpin.New("graphPreprocessor", "Update the graph for the build requested")
 	inputGraphFile  = exe.InputFlag(app, "Input graph file having full build graph")
 	outputGraphFile = exe.OutputFlag(app, "Output file to export the scrubbed graph to")
 	hydratedBuild   = app.Flag("hydrated-build", "Build individual packages with dependencies Hydrated").Bool()
