@@ -23,9 +23,15 @@ steps:
 
   - task: Cache@2
     inputs:
+      cacheHitVar: cacheRestored
       key: '"raw-toolchain" | "$(Agent.OSArchitecture)" | "$(latestStableCommit)" | "testing"'
       path: "${{ parameters.buildRepoRoot }}/build/toolchain/raw_toolchain"
     displayName: Cache the raw toolchain
+
+  - bash: |
+      touch "${{ parameters.buildRepoRoot }}/build/toolchain/raw_toolchain"
+    condition: eq(variables.cacheRestored, 'true')
+    displayName: "Enable the raw toolchain for re-use"
 
   - bash: sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" "-j$(nproc)" toolchain QUICK_REBUILD=y
     displayName: "Build toolchain"
