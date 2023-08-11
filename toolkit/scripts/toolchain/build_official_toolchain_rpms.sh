@@ -21,8 +21,8 @@ MARINER_TOOLCHAIN_MANIFESTS_FILE=${12}
 MARINER_RAW_TOOLCHAIN_FILE=${13}
 #  Time stamp components
 # =====================================================
-BLDTRACKER=${13}
-TIMESTAMP_FILE_PATH=${14}
+BLDTRACKER=${14}
+TIMESTAMP_FILE_PATH=${15}
 source $(dirname  $0)/../timestamp.sh
 # =====================================================
 
