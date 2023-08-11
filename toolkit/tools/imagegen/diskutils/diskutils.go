@@ -196,17 +196,18 @@ func CreateEmptyDisk(workDirPath, diskName string, disk configuration.Disk) (dis
 
 	// Assume that Disk.MaxSize is given
 	maxSize := disk.MaxSize
-	err = ZeroDisk(diskFilePath, defautBlockSize, maxSize)
+	err = sparseDisk(diskFilePath, defautBlockSize, maxSize)
 	return
 }
 
-// ZeroDisk applies zeroes to the disk specified by diskpath
-func ZeroDisk(diskPath string, blockSize, size uint64) (err error) {
+// sparseDisk creates an empty sparse disk file.
+func sparseDisk(diskPath string, blockSize, size uint64) (err error) {
 	ddArgs := []string{
 		"if=/dev/zero",                  // Input file.
 		fmt.Sprintf("of=%s", diskPath),  // Output file.
 		fmt.Sprintf("bs=%d", blockSize), // Size of one copied block.
-		fmt.Sprintf("count=%d", size),   // Number of blocks to copy to the output file.
+		fmt.Sprintf("seek=%d", size),    // Size of the image.
+		"count=0",                       // Number of blocks to copy to the output file.
 	}
 
 	_, stderr, err := shell.Execute("dd", ddArgs...)

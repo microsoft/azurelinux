@@ -26,7 +26,7 @@ pkggen_rpms     = $(call shell_real_build_only, find $(RPMS_DIR)/*  2>/dev/null 
 cache_working_dir      = $(PKGBUILD_DIR)/tdnf_cache_worker
 parse_working_dir      = $(BUILD_DIR)/spec_parsing
 rpmbuilding_logs_dir   = $(LOGS_DIR)/pkggen/rpmbuilding
-rpm_cache_files        = $(call shell_real_build_only, find $(CACHED_RPMS_DIR)/)
+rpm_cache_files        = $(call shell_real_build_only, find $(CACHED_RPMS_DIR))
 validate-pkggen-config = $(STATUS_FLAGS_DIR)/validate-image-config-pkggen.flag
 
 # Outputs
@@ -280,8 +280,17 @@ compress-srpms:
 	tar -cvp -f $(BUILD_DIR)/temp_srpms_tarball.tar.gz -C $(SRPMS_DIR)/.. $(notdir $(SRPMS_DIR))
 	mv $(BUILD_DIR)/temp_srpms_tarball.tar.gz $(srpms_archive)
 
+# Seed the cached RPMs folder files from the archive.
+hydrate-cached-rpms:
+	$(if $(CACHED_PACKAGES_ARCHIVE),,$(error Must set CACHED_PACKAGES_ARCHIVE=<path>))
+	@echo Unpacking cache RPMs from $(CACHED_PACKAGES_ARCHIVE) into $(CACHED_RPMS_DIR)
+	@tar -xf $(CACHED_PACKAGES_ARCHIVE) -C $(CACHED_RPMS_DIR) --strip-components 1 --skip-old-files --touch --checkpoint=100000 --checkpoint-action=echo="%T"
+# The cached RPMs directory has a flat structure, so we need to move the RPMs into the cache's root directory.
+	@find $(CACHED_RPMS_DIR) -mindepth 2 -name "*.rpm" -exec mv {} $(CACHED_RPMS_DIR) \;
+	@find $(CACHED_RPMS_DIR) -mindepth 1 -type d -and ! -name repodata -exec rm -fr {} +
+
 # Seed the RPMs folder with the any missing files from the archive.
 hydrate-rpms:
-	$(if $(PACKAGE_ARCHIVE),,$(error Must set PACKAGE_ARCHIVE=))
+	$(if $(PACKAGE_ARCHIVE),,$(error Must set PACKAGE_ARCHIVE=<path>))
 	@echo Unpacking RPMs from $(PACKAGE_ARCHIVE) into $(RPMS_DIR)
 	tar -xf $(PACKAGE_ARCHIVE) -C $(RPMS_DIR) --strip-components 1 --skip-old-files --touch --checkpoint=100000 --checkpoint-action=echo="%T"

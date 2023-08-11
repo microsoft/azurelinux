@@ -1,0 +1,6 @@
+{
+ "Signatures": {
+  "opentelemetry-cpp-1.10.0.tar.gz": "19e8ade04a674c8cf7f0dc6da1f7b0583a27d2cf4dbc03df87894a16a4547834",
+  "opentelemetry-proto-1.0.0.tar.gz": "a13a1a7b76a1f22a0ca2e6c293e176ffef031413ab8ba653a82a1dbc286a3a33"
+ }
+}

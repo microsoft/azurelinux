@@ -27,7 +27,7 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.15.122.1
+Version:        5.15.125.1
 Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -422,6 +422,15 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Thu Aug 10 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.125.1-2
+- Enable CONFIG_BLK_DEV_NBD module
+
+* Wed Aug 09 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.125.1-1
+- Auto-upgrade to 5.15.125.1
+
+* Tue Aug 01 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.123.1-1
+- Auto-upgrade to 5.15.123.1
+
 * Fri Jul 28 2023 Juan Camposeco <juanarturoc@microsoft.com> - 5.15.122.1-2
 - Enable Mellanox DPU drivers and configurations, ARM64 only
 
