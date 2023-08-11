@@ -746,7 +746,7 @@ func TestShouldFailIntervalCreationUnkownFirstCondition(t *testing.T) {
 }
 
 func TestShouldCorrectlyConvertPackageNameWithoutVersionConstraints(t *testing.T) {
-	packageVer, err := PackagesListEntryToPackageVer("gcc-devel")
+	packageVer, err := PackageStringToPackageVer("gcc-devel")
 
 	assert.NoError(t, err)
 	assert.Equal(t, "gcc-devel", packageVer.Name)
@@ -757,7 +757,7 @@ func TestShouldCorrectlyConvertPackageNameWithoutVersionConstraints(t *testing.T
 }
 
 func TestShouldCorrectlyConvertPackageNameWithEqualsVersionConstraint(t *testing.T) {
-	packageVer, err := PackagesListEntryToPackageVer("gcc-devel=9.1.0")
+	packageVer, err := PackageStringToPackageVer("gcc-devel=9.1.0")
 
 	assert.NoError(t, err)
 	assert.Equal(t, "gcc-devel", packageVer.Name)
@@ -768,7 +768,7 @@ func TestShouldCorrectlyConvertPackageNameWithEqualsVersionConstraint(t *testing
 }
 
 func TestShouldCorrectlyConvertPackageNameWithGreaterEqualsVersionConstraint(t *testing.T) {
-	packageVer, err := PackagesListEntryToPackageVer("gcc-devel>=9.1.0")
+	packageVer, err := PackageStringToPackageVer("gcc-devel>=9.1.0")
 
 	assert.NoError(t, err)
 	assert.Equal(t, "gcc-devel", packageVer.Name)
@@ -779,7 +779,7 @@ func TestShouldCorrectlyConvertPackageNameWithGreaterEqualsVersionConstraint(t *
 }
 
 func TestShouldCorrectlyConvertPackageNameWithGreaterVersionConstraint(t *testing.T) {
-	packageVer, err := PackagesListEntryToPackageVer("gcc-devel>9.1.0")
+	packageVer, err := PackageStringToPackageVer("gcc-devel>9.1.0")
 
 	assert.NoError(t, err)
 	assert.Equal(t, "gcc-devel", packageVer.Name)
@@ -790,7 +790,7 @@ func TestShouldCorrectlyConvertPackageNameWithGreaterVersionConstraint(t *testin
 }
 
 func TestShouldCorrectlyConvertPackageNameWithLesserEqualsVersionConstraint(t *testing.T) {
-	packageVer, err := PackagesListEntryToPackageVer("gcc-devel<=9.1.0")
+	packageVer, err := PackageStringToPackageVer("gcc-devel<=9.1.0")
 
 	assert.NoError(t, err)
 	assert.Equal(t, "gcc-devel", packageVer.Name)
@@ -801,7 +801,7 @@ func TestShouldCorrectlyConvertPackageNameWithLesserEqualsVersionConstraint(t *t
 }
 
 func TestShouldCorrectlyConvertPackageNameWithLesserVersionConstraint(t *testing.T) {
-	packageVer, err := PackagesListEntryToPackageVer("gcc-devel<9.1.0")
+	packageVer, err := PackageStringToPackageVer("gcc-devel<9.1.0")
 
 	assert.NoError(t, err)
 	assert.Equal(t, "gcc-devel", packageVer.Name)
@@ -812,7 +812,7 @@ func TestShouldCorrectlyConvertPackageNameWithLesserVersionConstraint(t *testing
 }
 
 func TestShouldCorrectlyConvertPackageNameWithAllowedWhitespaces(t *testing.T) {
-	packageVer, err := PackagesListEntryToPackageVer("  gcc-devel\t\t< 9.1.0    ")
+	packageVer, err := PackageStringToPackageVer("  gcc-devel\t\t< 9.1.0    ")
 
 	assert.NoError(t, err)
 	assert.Equal(t, "gcc-devel", packageVer.Name)
@@ -823,7 +823,7 @@ func TestShouldCorrectlyConvertPackageNameWithAllowedWhitespaces(t *testing.T) {
 }
 
 func TestShouldFailToConvertPackageListEntryStartingWithInvalidCharacter(t *testing.T) {
-	_, err := PackagesListEntryToPackageVer("=gcc-devel")
+	_, err := PackageStringToPackageVer("=gcc-devel")
 
 	assert.Error(t, err)
 }
@@ -835,7 +835,7 @@ func TestShouldFailIntervalCreationUnkownSecondCondition(t *testing.T) {
 	assert.Error(t, err)
 }
 func TestShouldFailToConvertPackageListEntryWithIncompleteComparison(t *testing.T) {
-	_, err := PackagesListEntryToPackageVer("gcc-devel=")
+	_, err := PackageStringToPackageVer("gcc-devel=")
 
 	assert.Error(t, err)
 }
@@ -847,7 +847,7 @@ func TestShouldFailIntervalCreationFirstConditionWithoutVersion(t *testing.T) {
 	assert.Error(t, err)
 }
 func TestShouldFailToConvertPackageListEntryWithInvalidComparison(t *testing.T) {
-	_, err := PackagesListEntryToPackageVer("gcc-devel=>9.1.0")
+	_, err := PackageStringToPackageVer("gcc-devel=>9.1.0")
 
 	assert.Error(t, err)
 }
@@ -859,7 +859,7 @@ func TestShouldFailIntervalCreationSecondConditionWithoutVersion(t *testing.T) {
 	assert.Error(t, err)
 }
 func TestShouldFailToConvertPackageListEntryWithWhitespacesInComparison(t *testing.T) {
-	_, err := PackagesListEntryToPackageVer("gcc-devel< =9.1.0")
+	_, err := PackageStringToPackageVer("gcc-devel< =9.1.0")
 
 	assert.Error(t, err)
 }
@@ -871,7 +871,7 @@ func TestShouldFailIntervalCreationFirstConditionEmptySecondConditionWithoutVers
 	assert.Error(t, err)
 }
 func TestShouldFailToConvertPackageListEntryWithWhitespacesInName(t *testing.T) {
-	_, err := PackagesListEntryToPackageVer("gcc devel")
+	_, err := PackageStringToPackageVer("gcc devel")
 
 	assert.Error(t, err)
 }
@@ -883,7 +883,7 @@ func TestShouldFailIntervalCreationFirstConditionWithoutVersionSecondConditionEm
 	assert.Error(t, err)
 }
 func TestShouldFailToConvertPackageListEntryWithWhitespacesInVersion(t *testing.T) {
-	_, err := PackagesListEntryToPackageVer("gcc-devel<9 1.0")
+	_, err := PackageStringToPackageVer("gcc-devel<9 1.0")
 
 	assert.Error(t, err)
 }

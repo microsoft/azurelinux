@@ -32,7 +32,27 @@ import (
 )
 
 const (
-	defaultWorkerCount = "10"
+	// Spaces added on purpose to simplify substring matching.
+	andCondition  = " and "
+	ifCondition   = " if "
+	orCondition   = " or "
+	withCondition = " with "
+)
+
+var (
+	supportedBooleanConditions = []string{
+		andCondition,
+		ifCondition,
+		orCondition,
+		withCondition,
+	}
+
+	// Spaces added on purpose to simplify substring matching.
+	unsupportedBooleanConditions = []string{
+		" else ",
+		" unless ",
+		" without ",
+	}
 )
 
 // parseResult holds the worker results from parsing a SPEC file.
@@ -40,6 +60,10 @@ type parseResult struct {
 	packages []*pkgjson.Package
 	err      error
 }
+
+const (
+	defaultWorkerCount = "10"
+)
 
 var (
 	app                     = kingpin.New("specreader", "A tool to parse spec dependencies into JSON")
@@ -498,40 +522,23 @@ func parseProvides(rpmsDir, toolchainDir string, toolchainRPMs []string, srpmPat
 	return
 }
 
-// parsePackageVersions takes a package name and splits it into a set of PackageVer structures.
+// parsePackageVersions takes a package string and splits it into a set of PackageVer structures.
 // Normally a list of length 1 is returned, however parsePackageVersions is also responsible for
 // identifying if the package name is an "or" condition and returning all options.
-func parsePackageVersions(packagename string) (newpkgs []*pkgjson.PackageVer, err error) {
-	const (
-		NameField      = iota
-		ConditionField = iota
-		VersionField   = iota
-	)
+func parsePackageVersions(packageString string) (newPackages []*pkgjson.PackageVer, err error) {
+	packageString = strings.TrimSpace(packageString)
 
-	packageSplit := strings.Split(packagename, " ")
-	err = minSliceLength(packageSplit, 1)
+	// If the first character of the packageString is a "(" then it's an "or" condition.
+	if packageString[0] == '(' {
+		return parseRichDependency(packageString)
+	}
+
+	pkgVer, err := pkgjson.PackageStringToPackageVer(packageString)
 	if err != nil {
 		return
 	}
 
-	// If first character of the packagename is a "(" then its an "or" condition
-	if packagename[0] == '(' {
-		return parseOrCondition(packagename)
-	}
-
-	newpkg := &pkgjson.PackageVer{Name: packageSplit[NameField]}
-	if len(packageSplit) == 1 {
-		// Nothing to do, no condition or version was found.
-	} else if packageSplit[ConditionField] != "or" {
-		newpkg.Condition = packageSplit[ConditionField]
-		newpkg.Version = packageSplit[VersionField]
-	} else {
-		// Replace the name with the first name that appears in (foo or bar)
-		substr := packageSplit[NameField][1:]
-		newpkg.Name = substr
-	}
-
-	newpkgs = append(newpkgs, newpkg)
+	newPackages = append(newPackages, pkgVer)
 	return
 }
 
@@ -587,26 +594,63 @@ func condensePackageVersionArray(packagelist []*pkgjson.PackageVer, specfile str
 	return
 }
 
-// parseOrCondition splits a package name like (foo or bar) and returns both foo and bar as separate requirements.
-func parseOrCondition(packagename string) (versions []*pkgjson.PackageVer, err error) {
-	logger.Log.Warnf("'OR' clause found (%s), make sure both packages are available. Please refer to 'docs/how_it_works/3_package_building.md#or-clauses' for explanation of limitations.", packagename)
-	packagename = strings.ReplaceAll(packagename, "(", "")
-	packagename = strings.ReplaceAll(packagename, ")", "")
+// parseRichDependency splits a package name like '(foo or bar)' and returns both foo and bar as separate requirements.
+func parseRichDependency(richDependency string) (versions []*pkgjson.PackageVer, err error) {
+	const documentationHint = "Please refer to 'docs/how_it_works/3_package_building.md#rich-dependencies' for explanation of limitations"
 
-	packageSplit := strings.Split(packagename, " or ")
-	err = minSliceLength(packageSplit, 1)
+	// All single condition strings are surrounded by spaces to match full words.
+	for _, singleCondition := range unsupportedBooleanConditions {
+		if strings.Contains(richDependency, singleCondition) {
+			err = fmt.Errorf("found unsupported boolean condition '%s' inside '%s'. %s", singleCondition, richDependency, documentationHint)
+			return
+		}
+	}
+
+	conditionsCount := 0
+	// All single condition strings are surrounded by spaces to match full words.
+	for _, singleCondition := range supportedBooleanConditions {
+		conditionsCount += strings.Count(richDependency, singleCondition)
+	}
+	if conditionsCount > 1 {
+		err = fmt.Errorf("found more than one boolean condition inside '%s'. %s", richDependency, documentationHint)
+		return
+	}
+
+	richDependency = strings.ReplaceAll(richDependency, "(", "")
+	richDependency = strings.ReplaceAll(richDependency, ")", "")
+
+	packageStrings := []string{}
+	// All single condition strings are surrounded by spaces to match full words.
+	for _, singleCondition := range supportedBooleanConditions {
+		if strings.Contains(richDependency, singleCondition) {
+			packageStrings = strings.Split(richDependency, singleCondition)
+			break
+		}
+	}
+	err = minSliceLength(packageStrings, 2)
 	if err != nil {
 		return
 	}
 
-	versions = make([]*pkgjson.PackageVer, 0, len(packageSplit))
-	for _, condition := range packageSplit {
-		var parsedPkgVers []*pkgjson.PackageVer
-		parsedPkgVers, err = parsePackageVersions(condition)
+	switch {
+	case strings.Contains(richDependency, andCondition) || strings.Contains(richDependency, orCondition) || strings.Contains(richDependency, withCondition):
+		logger.Log.Warnf("Found a boolean condition '%s', make sure both packages are available. %s.", richDependency, documentationHint)
+	case strings.Contains(richDependency, ifCondition):
+		logger.Log.Warnf("Found a boolean condition '%s', make sure the packages on the left is available. %s.", richDependency, documentationHint)
+		packageStrings = []string{packageStrings[0]}
+	default:
+		err = fmt.Errorf("found a unsupported boolean condition inside '%s'. %s", richDependency, documentationHint)
+		return
+	}
+
+	versions = make([]*pkgjson.PackageVer, 0, len(packageStrings))
+	for _, packageString := range packageStrings {
+		pkgVer, err := pkgjson.PackageStringToPackageVer(packageString)
 		if err != nil {
-			return
+			return nil, err
 		}
-		versions = append(versions, parsedPkgVers...)
+
+		versions = append(versions, pkgVer)
 	}
 
 	return
