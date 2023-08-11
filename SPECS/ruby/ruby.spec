@@ -105,10 +105,13 @@ BuildRequires:  tzdata
 BuildRequires:  shadow-utils
 BuildRequires:  sudo
 BuildRequires:  libyaml-devel
+BuildRequires:  libyaml
 %endif
 
 Requires:       gmp
 Requires:       openssl
+Requires:       libyaml-devel
+Requires:       libyaml
 Provides:       %{_prefix}/local/bin/ruby
 Provides:       %{name}-devel = %{version}-%{release}
 Provides:       %{name}(release) = %{version}-%{release}
@@ -313,6 +316,13 @@ export LDFLAGS="%{extension_ldflags}"
 
 autoconf
 
+echo %{_libdir}
+
+ls /usr/src/mariner/BUILDROOT/
+
+LD_LIBRARY_PATH=/usr/src/mariner/BUILDROOT/libyaml-0.2.5-3.cm2.x86_64/
+export LD_LIBRARY_PATH
+
 %configure \
         --with-rubylibprefix=%{_libdir}/ruby \
         --with-archlibdir=%{_libdir} \
@@ -326,7 +336,7 @@ autoconf
         --with-sitearchhdrdir=%{_prefix}/local/%{_lib}/ruby/site_ruby/$(uname -m) \
         --with-vendorarchhdrdir=%{_libdir}/ruby/vendor_ruby/$(uname -m) \
         --with-rubygemsdir=%{rubygems_dir} \
-        --with-libyamldir=%{_libdir} \
+        --with-libyamldir=%{_includedir} \
         --enable-shared \
         --with-compress-debug-sections=no \
         --docdir=%{_docdir}/%{name}-%{version} || cat ext/psych/mkmf.log

@@ -33,6 +33,12 @@ make %{?_smp_mflags} AM_CFLAGS=""
 %install
 make install DESTDIR=%{buildroot}
 find %{buildroot} -type f -name "*.la" -delete -print
+echo %{_includedir}
+ls %{_includedir}
+ls /usr/src/mariner/BUILDROOT/libyaml-0.2.5-3.cm2.x86_64
+
+echo %{_libdir}
+ls %{_libdir}
 
 %check
 make %{?_smp_mflags} check
