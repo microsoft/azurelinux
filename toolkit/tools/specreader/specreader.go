@@ -526,6 +526,8 @@ func parseProvides(rpmsDir, toolchainDir string, toolchainRPMs []string, srpmPat
 // Normally a list of length 1 is returned, however parsePackageVersions is also responsible for
 // identifying if the package name is an "or" condition and returning all options.
 func parsePackageVersions(packageString string) (newPackages []*pkgjson.PackageVer, err error) {
+	packageString = strings.TrimSpace(packageString)
+
 	// If the first character of the packageString is a "(" then it's an "or" condition.
 	if packageString[0] == '(' {
 		return parseRichDependency(packageString)
@@ -596,6 +598,7 @@ func condensePackageVersionArray(packagelist []*pkgjson.PackageVer, specfile str
 func parseRichDependency(richDependency string) (versions []*pkgjson.PackageVer, err error) {
 	const documentationHint = "Please refer to 'docs/how_it_works/3_package_building.md#rich-dependencies' for explanation of limitations"
 
+	// All single condition strings are surrounded by spaces to match full words.
 	for _, singleCondition := range unsupportedBooleanConditions {
 		if strings.Contains(richDependency, singleCondition) {
 			err = fmt.Errorf("found unsupported boolean condition '%s' inside '%s'. %s", singleCondition, richDependency, documentationHint)
@@ -604,6 +607,7 @@ func parseRichDependency(richDependency string) (versions []*pkgjson.PackageVer,
 	}
 
 	conditionsCount := 0
+	// All single condition strings are surrounded by spaces to match full words.
 	for _, singleCondition := range supportedBooleanConditions {
 		conditionsCount += strings.Count(richDependency, singleCondition)
 	}
@@ -616,6 +620,7 @@ func parseRichDependency(richDependency string) (versions []*pkgjson.PackageVer,
 	richDependency = strings.ReplaceAll(richDependency, ")", "")
 
 	packageStrings := []string{}
+	// All single condition strings are surrounded by spaces to match full words.
 	for _, singleCondition := range supportedBooleanConditions {
 		if strings.Contains(richDependency, singleCondition) {
 			packageStrings = strings.Split(richDependency, singleCondition)
