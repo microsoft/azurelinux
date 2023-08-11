@@ -32,10 +32,12 @@ const (
 	chrootLocalToolchainDir = "/toolchainrpms"
 	chrootLocalRpmsCacheDir = "/upstream-cached-rpms"
 	chrootCcacheDir         = "/ccache-dir"
+
+	toolName = "pkgworker"
 )
 
 var (
-	app                  = kingpin.New("pkgworker", "A worker for building packages locally")
+	app                  = kingpin.New(toolName, "A worker for building packages locally")
 	srpmFile             = exe.InputFlag(app, "Full path to the SRPM to build")
 	workDir              = app.Flag("work-dir", "The directory to create the build folder").Required().String()
 	workerTar            = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz").Required().ExistingFile()
@@ -72,7 +74,7 @@ var (
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel)
+	logger.InitBestEffort(*logFile, *logLevel, toolName)
 
 	rpmsDirAbsPath, err := filepath.Abs(*rpmsDirPath)
 	logger.PanicOnError(err, "Unable to find absolute path for RPMs directory '%s'", *rpmsDirPath)

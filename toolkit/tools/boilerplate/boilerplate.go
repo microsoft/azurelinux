@@ -16,8 +16,10 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
+const toolName = "boilerplate"
+
 var (
-	app = kingpin.New("boilerplate", "A sample golang tool for Mariner.")
+	app = kingpin.New(toolName, "A sample golang tool for Mariner.")
 
 	logFile  = exe.LogFileFlag(app)
 	logLevel = exe.LogLevelFlag(app)
@@ -29,7 +31,7 @@ func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 
-	logger.InitBestEffort(*logFile, *logLevel)
+	logger.InitBestEffort(*logFile, *logLevel, toolName)
 
 	timestamp.BeginTiming("boilerplate", *timestampFile)
 	defer timestamp.CompleteTiming()

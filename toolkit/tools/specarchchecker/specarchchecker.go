@@ -17,8 +17,10 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
+const toolName = "specarchchecker"
+
 var (
-	app = kingpin.New("specarchchecker", "Checks if the architecture of a .spec file is valid.")
+	app = kingpin.New(toolName, "Checks if the architecture of a .spec file is valid.")
 
 	specsDirPath       = exe.InputStringFlag(app, "Path to specs directory.")
 	outputFilteredList = exe.OutputFlag(app, "Path to the filtered list.")
@@ -37,7 +39,7 @@ var (
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel)
+	logger.InitBestEffort(*logFile, *logLevel, toolName)
 
 	packagesToBuild := exe.ParseListArgument(*pkgsToBuild)
 	packagesToRebuild := exe.ParseListArgument(*pkgsToRebuild)

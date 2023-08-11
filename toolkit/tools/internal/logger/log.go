@@ -71,10 +71,10 @@ func InitLogFile(filePath string) (err error) {
 }
 
 // InitStderrLog initializes the logger to print to stderr
-func InitStderrLog() {
+func InitStderrLog(toolName string) {
 	const useColors = true
 
-	Log = log.New()
+	Log = log.WithFields(log.Fields{"tool": toolName})
 
 	// By default send all log messages through stderrHook
 	stderrHook = writerhook.NewWriterHook(os.Stderr, defaultStderrLogLevel, useColors)
@@ -94,12 +94,12 @@ func SetStderrLogLevel(level string) (err error) {
 }
 
 // InitBestEffort runs InitStderrLog always, and InitLogFile if path is not empty
-func InitBestEffort(path string, level string) {
+func InitBestEffort(path string, level string, toolName string) {
 	if level == "" {
 		level = defaultStderrLogLevel.String()
 	}
 
-	InitStderrLog()
+	InitStderrLog(toolName)
 
 	if path != "" {
 		PanicOnError(InitLogFile(path), "Failed while setting log file (%s).", path)

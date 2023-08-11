@@ -25,8 +25,10 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
+const toolName = "liveinstaller"
+
 var (
-	app = kingpin.New("liveinstaller", "A tool to download a provided list of packages into a given directory.")
+	app = kingpin.New(toolName, "A tool to download a provided list of packages into a given directory.")
 
 	// Take in strings for the config and template config file, as they may not exist on disk
 	configFile         = exe.InputStringFlag(app, "Path to the image config file.")
@@ -69,7 +71,7 @@ func main() {
 
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel)
+	logger.InitBestEffort(*logFile, *logLevel, toolName)
 
 	// Prevent a SIGINT (Ctr-C) from stopping liveinstaller while an installation is in progress.
 	// It is the responsibility of the installer's user interface (terminal installer or Calamares) to handle quit requests from the user.

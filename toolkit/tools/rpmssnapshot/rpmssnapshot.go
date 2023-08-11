@@ -15,8 +15,10 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
+const toolName = "rpmssnapshot"
+
 var (
-	app = kingpin.New("rpmsspnapshot", "A tool to generate a snapshot of all RPMs expected to be built from given specs folder.")
+	app = kingpin.New(toolName, "A tool to generate a snapshot of all RPMs expected to be built from given specs folder.")
 
 	specsDirPath       = exe.InputStringFlag(app, "Path to specs directory.")
 	outputSnapshotPath = exe.OutputFlag(app, "Path to the generated snapshot.")
@@ -32,7 +34,7 @@ var (
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel)
+	logger.InitBestEffort(*logFile, *logLevel, toolName)
 
 	snapshotGenerator, err := rpmssnapshot.New(*buildDirPath, *workerTar, *specsDirPath)
 	if err != nil {

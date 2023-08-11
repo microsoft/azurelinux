@@ -21,6 +21,7 @@ import (
 
 const (
 	defaultFilterPath = "./resources/manifests/package/toolchain_x86_64.txt"
+	toolName          = "depsearch"
 )
 
 var (
@@ -54,7 +55,7 @@ func main() {
 
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel)
+	logger.InitBestEffort(*logFile, *logLevel, toolName)
 
 	// only understand verbosity from 1 - 4 (spec, rpm, details, full node)
 	if verbosity == nil || *verbosity > 4 || *verbosity < 1 {

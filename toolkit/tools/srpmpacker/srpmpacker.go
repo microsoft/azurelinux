@@ -68,6 +68,7 @@ const (
 const (
 	defaultBuildDir    = "./build/SRPMS"
 	defaultWorkerCount = "10"
+	toolName           = "srpmpacker"
 )
 
 // sourceRetrievalConfiguration holds information on where to hydrate files from.
@@ -97,7 +98,7 @@ type specState struct {
 }
 
 var (
-	app = kingpin.New("srpmpacker", "A tool to package a SRPM.")
+	app = kingpin.New(toolName, "A tool to package a SRPM.")
 
 	specsDir      = exe.InputDirFlag(app, "Path to the SPEC directory to create SRPMs from.")
 	outDir        = exe.OutputDirFlag(app, "Directory to place the output SRPM.")
@@ -130,7 +131,7 @@ var (
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel)
+	logger.InitBestEffort(*logFile, *logLevel, toolName)
 
 	prof, err := profile.StartProfiling(profFlags)
 	if err != nil {

@@ -21,8 +21,10 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
+const toolName = "imageconfigvalidator"
+
 var (
-	app = kingpin.New("imageconfigvalidator", "A tool for validating image configuration files")
+	app = kingpin.New(toolName, "A tool for validating image configuration files")
 
 	logFile   = exe.LogFileFlag(app)
 	logLevel  = exe.LogLevelFlag(app)
@@ -39,7 +41,7 @@ func main() {
 
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel)
+	logger.InitBestEffort(*logFile, *logLevel, toolName)
 
 	prof, err := profile.StartProfiling(profFlags)
 	if err != nil {

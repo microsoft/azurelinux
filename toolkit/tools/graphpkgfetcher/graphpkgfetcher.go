@@ -25,8 +25,10 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
+const toolName = "graphpkgfetcher"
+
 var (
-	app = kingpin.New("graphpkgfetcher", "A tool to download a unresolved packages in a graph into a given directory.")
+	app = kingpin.New(toolName, "A tool to download a unresolved packages in a graph into a given directory.")
 
 	inputGraph  = exe.InputStringFlag(app, "Path to the graph file to read")
 	outputGraph = exe.OutputFlag(app, "Updated graph file with unresolved nodes marked as resolved")
@@ -67,7 +69,7 @@ var (
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel)
+	logger.InitBestEffort(*logFile, *logLevel, toolName)
 
 	prof, err := profile.StartProfiling(profFlags)
 	if err != nil {

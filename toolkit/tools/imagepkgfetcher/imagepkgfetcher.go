@@ -22,8 +22,10 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
+const toolName = "imagepkgfetcher"
+
 var (
-	app = kingpin.New("imagepkgfetcher", "A tool to download a provided list of packages into a given directory.")
+	app = kingpin.New(toolName, "A tool to download a provided list of packages into a given directory.")
 
 	configFile = exe.InputFlag(app, "Path to the image config file.")
 	outDir     = exe.OutputDirFlag(app, "Directory to download packages into.")
@@ -57,7 +59,7 @@ var (
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel)
+	logger.InitBestEffort(*logFile, *logLevel, toolName)
 
 	prof, profErr := profile.StartProfiling(profFlags)
 	if profErr != nil {

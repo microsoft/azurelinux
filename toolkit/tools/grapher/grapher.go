@@ -17,8 +17,10 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
+const toolName = "grapher"
+
 var (
-	app    = kingpin.New("grapher", "Dependency graph generation tool")
+	app    = kingpin.New(toolName, "Dependency graph generation tool")
 	input  = exe.InputFlag(app, "Input json listing all local SRPMs")
 	output = exe.OutputFlag(app, "Output file to export the graph to")
 
@@ -37,7 +39,7 @@ func main() {
 
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel)
+	logger.InitBestEffort(*logFile, *logLevel, toolName)
 
 	prof, err := profile.StartProfiling(profFlags)
 	if err != nil {

@@ -22,7 +22,10 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
-const defaultWorkerCount = "10"
+const (
+	defaultWorkerCount = "10"
+	toolName           = "roast"
+)
 
 type convertRequest struct {
 	inputPath   string
@@ -38,7 +41,7 @@ type convertResult struct {
 }
 
 var (
-	app = kingpin.New("roast", "A tool to convert raw disk file into another image type")
+	app = kingpin.New(toolName, "A tool to convert raw disk file into another image type")
 
 	logFile   = exe.LogFileFlag(app)
 	logLevel  = exe.LogLevelFlag(app)
@@ -62,7 +65,7 @@ var (
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel)
+	logger.InitBestEffort(*logFile, *logLevel, toolName)
 
 	prof, err := profile.StartProfiling(profFlags)
 	if err != nil {
