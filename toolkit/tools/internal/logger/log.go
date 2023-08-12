@@ -8,18 +8,19 @@ package logger
 import (
 	"bufio"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"sync"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 )
 
 var (
 	// Log contains the shared Logger
-	Log *log.Logger
+	Log *logrus.Logger
 
 	stderrHook *writerHook
 	fileHook   *writerHook
@@ -44,8 +45,8 @@ const (
 	// FileFlagHelp is the suggested help message for the logfile flag
 	FileFlagHelp = "Path to the image's log file."
 
-	defaultLogFileLevel   = log.DebugLevel
-	defaultStderrLogLevel = log.InfoLevel
+	defaultLogFileLevel   = logrus.DebugLevel
+	defaultStderrLogLevel = logrus.InfoLevel
 	parentCallerLevel     = 1
 )
 
@@ -174,14 +175,14 @@ func ReplaceStderrWriter(newOut io.Writer) (oldOut io.Writer) {
 }
 
 // ReplaceStderrFormatter replaces the stderr formatter and returns the old formatter
-func ReplaceStderrFormatter(newFormatter log.Formatter) (oldFormatter log.Formatter) {
+func ReplaceStderrFormatter(newFormatter logrus.Formatter) (oldFormatter logrus.Formatter) {
 	return stderrHook.ReplaceFormatter(newFormatter)
 }
 
 func initStderrLogInternal(callerFilePath string) {
 	const useColors = true
 
-	Log = log.New()
+	Log = logrus.New()
 	Log.ReportCaller = true
 
 	toolName := strings.TrimSuffix(filepath.Base(callerFilePath), ".go")
@@ -194,7 +195,7 @@ func initStderrLogInternal(callerFilePath string) {
 }
 
 func setHookLogLevel(hook *writerHook, level string) (err error) {
-	logLevel, err := log.ParseLevel(level)
+	logLevel, err := logrus.ParseLevel(level)
 	if err != nil {
 		return
 	}
