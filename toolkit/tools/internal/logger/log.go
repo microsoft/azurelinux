@@ -8,7 +8,6 @@ package logger
 import (
 	"bufio"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -81,8 +80,7 @@ func InitStderrLog() {
 		log.Panic("Failed to get caller info.")
 	}
 
-	toolName := strings.TrimSuffix(filepath.Base(callerFilePath), ".go")
-	initStderrLogInternal(toolName)
+	initStderrLogInternal(callerFilePath)
 }
 
 // SetFileLogLevel sets the lowest log level for file output
@@ -106,8 +104,7 @@ func InitBestEffort(path string, level string) {
 		log.Panic("Failed to get caller info.")
 	}
 
-	toolName := strings.TrimSuffix(filepath.Base(callerFilePath), ".go")
-	initStderrLogInternal(toolName)
+	initStderrLogInternal(callerFilePath)
 
 	if path != "" {
 		PanicOnError(initLogFile(path), "Failed while setting log file (%s).", path)
@@ -181,17 +178,19 @@ func ReplaceStderrFormatter(newFormatter log.Formatter) (oldFormatter log.Format
 	return stderrHook.ReplaceFormatter(newFormatter)
 }
 
-func initStderrLogInternal(toolName string) {
+func initStderrLogInternal(callerFilePath string) {
 	const useColors = true
 
 	Log = log.New()
 	Log.ReportCaller = true
 
+	toolName := strings.TrimSuffix(filepath.Base(callerFilePath), ".go")
+
 	// By default send all log messages through stderrHook
 	stderrHook = newWriterHook(os.Stderr, defaultStderrLogLevel, useColors, toolName)
 	Log.AddHook(stderrHook)
 	Log.SetLevel(defaultStderrLogLevel)
-	Log.SetOutput(ioutil.Discard)
+	Log.SetOutput(io.Discard)
 }
 
 func setHookLogLevel(hook *writerHook, level string) (err error) {
