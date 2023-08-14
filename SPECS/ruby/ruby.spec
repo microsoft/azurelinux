@@ -306,7 +306,7 @@ find -not -name 'bundled_gems' -delete
 sed -i '2,$d' bundled_gems
 popd
 # Remove bigdecimal. Add them back when version provided by ruby >= current version
-rm -rf ext/bigdecimal
+# rm -rf ext/bigdecimal
 
 %build
 # Remove GCC specs and build environment linker scripts
