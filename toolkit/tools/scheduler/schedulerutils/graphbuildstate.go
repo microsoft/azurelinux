@@ -4,6 +4,7 @@
 package schedulerutils
 
 import (
+	"math"
 	"path/filepath"
 	"sort"
 
@@ -17,12 +18,21 @@ type nodeState struct {
 	available bool
 	cached    bool
 	usedDelta bool
+	freshness int
 }
+
+const (
+	// Negative values indicate that the node was rebuilt due to missing files and should gain the maximum configured freshness value.
+	NodeFreshnessRebuildRequired int = -1
+	// The highest possible freshness value, used to force unbounded cascading rebuilds.
+	NodeFreshnessAbsoluteMax int = math.MaxInt
+)
 
 // GraphBuildState represents the build state of a graph.
 type GraphBuildState struct {
 	activeBuilds     map[int64]*BuildRequest
 	nodeToState      map[*pkggraph.PkgNode]*nodeState
+	maxFreshness     int
 	failures         []*BuildResult
 	reservedFiles    map[string]bool
 	conflictingRPMs  map[string]bool
@@ -30,18 +40,30 @@ type GraphBuildState struct {
 }
 
 // NewGraphBuildState returns a new GraphBuildState.
-// - reservedFiles is a list of reserved files which should NOT be rebuilt. Any files that ARE rebuilt will be recorded.
-func NewGraphBuildState(reservedFiles []string) (g *GraphBuildState) {
+//   - reservedFiles is a list of reserved files which should NOT be rebuilt. Any files that ARE rebuilt will be recorded.
+//   - maxFreshness is how fresh a newly rebuilt node is. Each dependant node will have a freshness of 'n-1', etc. until
+//     '0' where the subsequent nodes will no longer be rebuilt. 'maxFreshness < 0' will cause unbounded cascading rebuilds,
+//     while 'maxFreshness = 0' will cause no cascading rebuilds.
+func NewGraphBuildState(reservedFiles []string, maxFreshness int) (g *GraphBuildState) {
 	filesMap := make(map[string]bool)
 	for _, file := range reservedFiles {
 		filesMap[file] = true
 	}
+
+	//Use max int to represent infinity. This will cause unbounded cascading rebuilds so long as we build less that 2^31
+	// or more likely 2^63 packages (i.e., ~2.3 billion packages)
+	if maxFreshness < 0 {
+		logger.Log.Debugf("maxFreshness was set to %d, unbounded cascading rebuilds (maxFreshness = %d)", maxFreshness, NodeFreshnessAbsoluteMax)
+		maxFreshness = NodeFreshnessAbsoluteMax
+	}
+
 	return &GraphBuildState{
 		activeBuilds:     make(map[int64]*BuildRequest),
 		nodeToState:      make(map[*pkggraph.PkgNode]*nodeState),
 		reservedFiles:    filesMap,
 		conflictingRPMs:  make(map[string]bool),
 		conflictingSRPMs: make(map[string]bool),
+		maxFreshness:     maxFreshness,
 	}
 }
 
@@ -66,6 +88,17 @@ func (g *GraphBuildState) IsNodeAvailable(node *pkggraph.PkgNode) bool {
 func (g *GraphBuildState) IsNodeCached(node *pkggraph.PkgNode) bool {
 	state := g.nodeToState[node]
 	return state != nil && state.cached
+}
+
+// GetMaxFreshness returns the maximum freshness a node can have. (ie if a package is directly rebuilt due to user
+// request, or missing files, it will have this freshness. Each dependant node will have a freshness of 'n-1', etc.
+func (g *GraphBuildState) GetMaxFreshness() int {
+	return g.maxFreshness
+}
+
+// GetFreshnessOfNode returns the freshness of a node.
+func (g *GraphBuildState) GetFreshnessOfNode(node *pkggraph.PkgNode) int {
+	return g.nodeToState[node].freshness
 }
 
 // IsNodeDelta returns true if the requested node was pre-downloaded as a delta package.
@@ -143,10 +176,22 @@ func (g *GraphBuildState) RecordBuildResult(res *BuildResult, allowToolchainRebu
 		g.failures = append(g.failures, res)
 	}
 
+	// 'NodeFreshnessRebuildRequired' is a special value that indicates that the node was rebuilt due to  missing files
+	// (user requested rebuilds are already at the max freshness). In this case, we want to reset the freshness to the
+	// max, so that subsequent dependant nodes will be rebuilt. Also ensure that the freshness is not greater than the max.
+	freshness := res.ActualFreshness
+	if freshness < 0 || freshness > g.GetMaxFreshness() {
+		if freshness != NodeFreshnessRebuildRequired {
+			logger.Log.Debugf("Unexpected freshness value of '%d' for node '%s'. Defaulting to max freshness '%d'", freshness, res.Node.FriendlyName(), g.GetMaxFreshness())
+		}
+		freshness = g.GetMaxFreshness()
+	}
+
 	state := &nodeState{
 		available: res.Err == nil,
 		cached:    res.UsedCache,
 		usedDelta: res.WasDelta,
+		freshness: freshness,
 	}
 
 	for _, node := range res.AncillaryNodes {

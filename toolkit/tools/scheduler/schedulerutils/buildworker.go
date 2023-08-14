@@ -33,24 +33,32 @@ type BuildChannels struct {
 }
 
 // BuildRequest represents the results of a build agent trying to build a given node.
+// - Node: The node to process
+// - PkgGraph: The graph of all packages
+// - AncillaryNodes: All additional build nodes that share a common SRPM (will be processed together)
+// - CanUseCache: If the scheduler is allowed to use a cached/already built copy of this package instead of building it
+// - IsDelta: Is this a pre-downloaded rpm (not traditional cache) that we may be able to skip rebuilding
+// - ExpectedFreshness: The expected freshness of the node (used to determine if we can skip building future nodes)
 type BuildRequest struct {
-	Node           *pkggraph.PkgNode
-	PkgGraph       *pkggraph.PkgGraph
-	AncillaryNodes []*pkggraph.PkgNode
-	CanUseCache    bool
-	IsDelta        bool
+	Node              *pkggraph.PkgNode
+	PkgGraph          *pkggraph.PkgGraph
+	AncillaryNodes    []*pkggraph.PkgNode
+	CanUseCache       bool
+	IsDelta           bool
+	ExpectedFreshness int
 }
 
 // BuildResult represents the results of a build agent trying to build a given node.
 type BuildResult struct {
-	AncillaryNodes []*pkggraph.PkgNode
-	BuiltFiles     []string
-	Err            error
-	LogFile        string
-	Node           *pkggraph.PkgNode
-	Skipped        bool
-	UsedCache      bool
-	WasDelta       bool
+	AncillaryNodes  []*pkggraph.PkgNode
+	BuiltFiles      []string
+	Err             error
+	LogFile         string
+	Node            *pkggraph.PkgNode
+	Skipped         bool
+	UsedCache       bool
+	WasDelta        bool
+	ActualFreshness int
 }
 
 // selectNextBuildRequest selects a job based on priority:
@@ -99,14 +107,22 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 	// it when we pick up the next request
 	for req, cancelled := selectNextBuildRequest(channels); !cancelled && req != nil; req, cancelled = selectNextBuildRequest(channels) {
 		res := &BuildResult{
-			Node:           req.Node,
-			AncillaryNodes: req.AncillaryNodes,
-			WasDelta:       req.IsDelta,
+			Node:            req.Node,
+			AncillaryNodes:  req.AncillaryNodes,
+			WasDelta:        req.IsDelta,
+			ActualFreshness: req.ExpectedFreshness,
 		}
 
 		switch req.Node.Type {
 		case pkggraph.TypeLocalBuild:
-			res.UsedCache, res.Skipped, res.BuiltFiles, res.LogFile, res.Err = buildBuildNode(req.Node, req.PkgGraph, graphMutex, agent, req.CanUseCache, buildAttempts, checkAttempts, ignoredPackages)
+			var hadMissingFiles bool
+			res.UsedCache, res.Skipped, hadMissingFiles, res.BuiltFiles, res.LogFile, res.Err = buildBuildNode(req.Node, req.PkgGraph, graphMutex, agent, req.CanUseCache, buildAttempts, checkAttempts, ignoredPackages)
+			if hadMissingFiles {
+				res.ActualFreshness = NodeFreshnessRebuildRequired
+				logger.Log.Debugf("Resetting freshness to %d for %s", res.ActualFreshness, res.Node.FriendlyName())
+			} else {
+				logger.Log.Debugf("Keeping freshness at %d for %s", res.ActualFreshness, res.Node.FriendlyName())
+			}
 			if res.Err == nil {
 				setAncillaryBuildNodesStatus(req, pkggraph.StateUpToDate)
 			} else {
@@ -129,7 +145,7 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 }
 
 // buildBuildNode builds a TypeBuild node, either used a cached copy if possible or building the corresponding SRPM.
-func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, canUseCache bool, buildAttempts int, checkAttempts int, ignoredPackages []*pkgjson.PackageVer) (usedCache, skipped bool, builtFiles []string, logFile string, err error) {
+func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, canUseCache bool, buildAttempts int, checkAttempts int, ignoredPackages []*pkgjson.PackageVer) (usedCache, skipped, hadMissingFiles bool, builtFiles []string, logFile string, err error) {
 	var missingFiles []string
 
 	baseSrpmName := node.SRPMFileName()
@@ -152,6 +168,7 @@ func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMu
 	}
 
 	usedCache = false
+	hadMissingFiles = len(missingFiles) > 0
 
 	dependencies := getBuildDependencies(node, pkgGraph, graphMutex)
 
