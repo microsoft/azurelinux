@@ -148,11 +148,12 @@ graphpkgfetcher_extra_flags += --ignored-packages="$(PACKAGE_IGNORE_LIST)"
 graphpkgfetcher_extra_flags += --packages="$(PACKAGE_BUILD_LIST)"
 graphpkgfetcher_extra_flags += --rebuild-packages="$(PACKAGE_REBUILD_LIST)"
 graphpkgfetcher_extra_flags += --image-config-file="$(CONFIG_FILE)"
+graphpkgfetcher_extra_flags += --ignored-tests="$(TEST_IGNORE_LIST)"
 graphpkgfetcher_extra_flags += --tests="$(TEST_RUN_LIST)"
 graphpkgfetcher_extra_flags += --rerun-tests="$(TEST_RERUN_LIST)"
 graphpkgfetcher_extra_flags += --try-download-delta-rpms
 graphpkgfetcher_extra_flags += $(if $(CONFIG_FILE),--base-dir="$(CONFIG_BASE_DIR)")
-$(cached_file): $(depend_CONFIG_FILE) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST) $(depend_TEST_RUN_LIST) $(depend_TEST_RERUN_LIST)
+$(cached_file): $(depend_CONFIG_FILE) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST) $(depend_TEST_RUN_LIST) $(depend_TEST_RERUN_LIST) $(depend_TEST_IGNORE_LIST)
 endif
 
 $(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(rpm_cache_files) $(TOOLCHAIN_MANIFEST) $(toolchain_rpms)
@@ -249,6 +250,7 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-
 		--ignored-packages="$(PACKAGE_IGNORE_LIST)" \
 		--packages="$(PACKAGE_BUILD_LIST)" \
 		--rebuild-packages="$(PACKAGE_REBUILD_LIST)" \
+		--ignored-tests="$(TEST_IGNORE_LIST)" \
 		--tests="$(TEST_RUN_LIST)" \
 		--rerun-tests="$(TEST_RERUN_LIST)" \
 		--image-config-file="$(CONFIG_FILE)" \
