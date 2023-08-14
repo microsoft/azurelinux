@@ -27,7 +27,7 @@ import (
 //     and are queued for building in the testNodesToRequests() function.
 //     At this point the partner build nodes for these test nodes have either already finished building or are being built,
 //     thus the check for active and cached SRPMs inside testNodesToRequests().
-func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, nodesToBuild []*pkggraph.PkgNode, packagesToRebuild []*pkgjson.PackageVer, buildState *GraphBuildState, isCacheAllowed bool) (requests []*BuildRequest) {
+func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, nodesToBuild []*pkggraph.PkgNode, packagesToRebuild, testsToRerun []*pkgjson.PackageVer, buildState *GraphBuildState, isCacheAllowed bool) (requests []*BuildRequest) {
 	timestamp.StartEvent("generate requests", nil)
 	defer timestamp.StopEvent(nil)
 
@@ -57,13 +57,13 @@ func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMute
 		requests = append(requests, req)
 	}
 
-	requests = append(requests, buildNodesToRequests(pkgGraph, buildState, packagesToRebuild, buildNodes, isCacheAllowed)...)
-	requests = append(requests, testNodesToRequests(pkgGraph, buildState, packagesToRebuild, testNodes)...)
+	requests = append(requests, buildNodesToRequests(pkgGraph, buildState, packagesToRebuild, testsToRerun, buildNodes, isCacheAllowed)...)
+	requests = append(requests, testNodesToRequests(pkgGraph, buildState, testsToRerun, testNodes)...)
 
 	return
 }
 
-func buildNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, packagesToRebuild []*pkgjson.PackageVer, buildNodesLists map[string][]*pkggraph.PkgNode, isCacheAllowed bool) (requests []*BuildRequest) {
+func buildNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, packagesToRebuild, testsToRerun []*pkgjson.PackageVer, buildNodesLists map[string][]*pkggraph.PkgNode, isCacheAllowed bool) (requests []*BuildRequest) {
 	for _, buildNodes := range buildNodesLists {
 		// Check if any of the build nodes is a delta node and mark it. We will use this to determine if the
 		// build is a delta build that might have pre-built .rpm files available.
@@ -90,7 +90,7 @@ func buildNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildSta
 
 		requests = append(requests, req)
 
-		partnerTestNodeRequest := partnerTestNodesToRequest(pkgGraph, buildState, packagesToRebuild, buildNodes, req.UseCache)
+		partnerTestNodeRequest := partnerTestNodesToRequest(pkgGraph, buildState, testsToRerun, buildNodes, req.UseCache)
 		if partnerTestNodeRequest != nil {
 			requests = append(requests, partnerTestNodeRequest)
 		}
@@ -125,7 +125,7 @@ func buildRequest(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, pack
 	return
 }
 
-func partnerTestNodesToRequest(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, packagesToRebuild []*pkgjson.PackageVer, buildNodes []*pkggraph.PkgNode, buildUsesCache bool) (request *BuildRequest) {
+func partnerTestNodesToRequest(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, testsToRerun []*pkgjson.PackageVer, buildNodes []*pkggraph.PkgNode, buildUsesCache bool) (request *BuildRequest) {
 	const isDelta = false
 
 	defaultBuildNode := buildNodes[0]
@@ -154,7 +154,7 @@ func partnerTestNodesToRequest(pkgGraph *pkggraph.PkgGraph, buildState *GraphBui
 		PkgGraph:       pkgGraph,
 		AncillaryNodes: ancillaryTestNodes,
 		IsDelta:        isDelta,
-		UseCache:       buildUsesCache && canUseCacheForNode(pkgGraph, testNode, packagesToRebuild, buildState),
+		UseCache:       buildUsesCache && canUseCacheForNode(pkgGraph, testNode, testsToRerun, buildState),
 	}
 }
 
@@ -163,7 +163,7 @@ func partnerTestNodesToRequest(pkgGraph *pkggraph.PkgGraph, buildState *GraphBui
 // which have already been queued to build or finished building.
 //
 // NOTE: the caller must guarantee the build state does not change while this function is running.
-func testNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, packagesToRebuild []*pkgjson.PackageVer, testNodesLists map[string][]*pkggraph.PkgNode) (requests []*BuildRequest) {
+func testNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, testsToRerun []*pkgjson.PackageVer, testNodesLists map[string][]*pkggraph.PkgNode) (requests []*BuildRequest) {
 	const isDelta = false
 
 	for _, testNodes := range testNodesLists {
@@ -175,7 +175,7 @@ func testNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildStat
 			buildUsedCache = buildRequest.UseCache
 		}
 
-		testRequest := buildRequest(pkgGraph, buildState, packagesToRebuild, defaultTestNode, testNodes, buildUsedCache, isDelta)
+		testRequest := buildRequest(pkgGraph, buildState, testsToRerun, defaultTestNode, testNodes, buildUsedCache, isDelta)
 		requests = append(requests, testRequest)
 	}
 
@@ -197,7 +197,7 @@ func canUseCacheForNode(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, pac
 	packageVer := node.VersionedPkg
 	canUseCache = !sliceutils.Contains(packagesToRebuild, packageVer, sliceutils.PackageVerMatch)
 	if !canUseCache {
-		logger.Log.Debugf("Marking (%s) for rebuild per user request", packageVer)
+		logger.Log.Debugf("Marking node (type: %s, version: %s) for rebuild per user request", node.Type, packageVer)
 		return
 	}
 

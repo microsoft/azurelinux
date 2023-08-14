@@ -55,6 +55,7 @@ var (
 	pkgsToBuild          = app.Flag("packages", "Space separated list of top-level packages that should be built. Omit this argument to build all packages.").String()
 	pkgsToRebuild        = app.Flag("rebuild-packages", "Space separated list of base package names packages that should be rebuilt.").String()
 	testsToRun           = app.Flag("tests", "Space separated list of package tests that should be ran. Omit this argument to run all package tests.").String()
+	testsToRerun         = app.Flag("rerun-tests", "Space separated list of package tests that should be re-ran.").String()
 
 	inputSummaryFile  = app.Flag("input-summary-file", "Path to a file with the summary of packages cloned to be restored").String()
 	outputSummaryFile = app.Flag("output-summary-file", "Path to save the summary of packages cloned").String()
@@ -207,7 +208,7 @@ func downloadDeltaNodes(dependencyGraph *pkggraph.PkgGraph, cloner *rpmrepoclone
 
 	// Generate the list of tests that need to be ran. If none are requested then all packages will be built. We
 	// don't care about explicit rebuilds here since we are going to rebuild them anyway.
-	testVersToRun, _, _, err := schedulerutils.ParseAndGeneratePackageList(dependencyGraph, exe.ParseListArgument(*testsToRun), exe.ParseListArgument(*testsToRebuild), exe.ParseListArgument(*testsToIgnore), *imageConfig, *baseDirPath)
+	testVersToRun, _, _, err := schedulerutils.ParseAndGeneratePackageList(dependencyGraph, exe.ParseListArgument(*testsToRun), exe.ParseListArgument(*testsToRerun), exe.ParseListArgument(*testsToIgnore), *imageConfig, *baseDirPath)
 	if err != nil {
 		err = fmt.Errorf("unable to generate package build list to calculate delta downloads:\n%w", err)
 		return
