@@ -104,14 +104,14 @@ BuildRequires:  tzdata
 %if %{with_check}
 BuildRequires:  shadow-utils
 BuildRequires:  sudo
-# BuildRequires:  libyaml-devel
-# BuildRequires:  libyaml
+BuildRequires:  libyaml-devel
+BuildRequires:  libyaml
 %endif
 
 Requires:       gmp
 Requires:       openssl
-# Requires:       libyaml-devel
-# Requires:       libyaml
+Requires:       libyaml-devel
+Requires:       libyaml
 Provides:       %{_prefix}/local/bin/ruby
 Provides:       %{name}-devel = %{version}-%{release}
 Provides:       %{name}(release) = %{version}-%{release}
