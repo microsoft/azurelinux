@@ -298,6 +298,20 @@ BuildArch:      noarch
 %description -n rubygems-devel
 Macros and development tools for packaging RubyGems.
 
+%package -n rubygem-psych
+Summary:        A libyaml wrapper for Ruby
+Version:        %{psych_version}
+License:        MIT
+Requires:       ruby(release)
+Requires:       ruby(rubygems) >= %{rubygems_version}
+Provides:       rubygem(psych) = %{version}-%{release}
+
+%description -n rubygem-psych
+Psych is a YAML parser and emitter. Psych leverages
+libyaml[http://pyyaml.org/wiki/LibYAML] for its YAML parsing and emitting
+capabilities. In addition to wrapping libyaml, Psych also knows how to
+serialize and de-serialize most Ruby objects to and from the YAML format.
+
 %prep
 %autosetup -p1
 # Remove all bundled gems
@@ -410,6 +424,11 @@ sudo -u test make test TESTS="-v"
 %{_rpmconfigdir}/rubygems.req
 %{_rpmconfigdir}/rubygems.prov
 %{_rpmconfigdir}/rubygems.con
+
+%files -n rubygem-psych
+%{_libdir}/gems/%{name}/psych-%{psych_version}
+%{gem_dir}/gems/psych-%{psych_version}
+%{gem_dir}/specifications/psych-%{psych_version}.gemspec
 
 %changelog
 * Wed Aug 09 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.2-1
