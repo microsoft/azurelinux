@@ -71,7 +71,7 @@
 %global tmpdir_version          0.1.2
 %global tsort_version           0.1.0
 %global un_version              0.2.0
-%global uri_version             0.11.1
+%global uri_version             0.12.2
 %global weakref_version         0.1.1
 %global win32ole_version        1.8.8
 %global yaml_version            0.2.0
@@ -83,7 +83,7 @@ Name:           ruby
 # provides should be versioned according to the ruby version.
 # More info: https://stdgems.org/
 Version:        3.1.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -97,6 +97,7 @@ Source4:        rubygems.con
 Source5:        rubygems.prov
 Source6:        rubygems.req
 Source7:        macros.rubygems
+Patch0:         CVE-2023-36617.patch
 BuildRequires:  openssl-devel
 BuildRequires:  readline
 BuildRequires:  readline-devel
@@ -399,6 +400,9 @@ sudo -u test make test TESTS="-v"
 %{_rpmconfigdir}/rubygems.con
 
 %changelog
+* Mon Aug 14 2023 Saul Paredes <saulparedes@microsoft.com> - 3.1.4-2
+- Patch CVE-2023-36617
+
 * Wed May 03 2023 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 3.1.4-1
 - Upgrade ruby to 3.1.4
 - Update time_version to v0.2.2 to resolve CVE-2023-28756
