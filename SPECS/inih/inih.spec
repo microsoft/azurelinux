@@ -67,7 +67,7 @@ embedded systems.
 %changelog
 * Fri Jul 28 2023 Andy Zaugg <azaugg@linkedin.com> - 57-1
 - Updated version to 57
-- Initial CBL-Mariner import from Fedora (license: BSD)
+- Initial CBL-Mariner import from Fedora 37 (license: MIT)
 - License verified
 
 * Wed Jul 13 2022 Robert Scheck <robert@fedoraproejct.org> - 56-1
