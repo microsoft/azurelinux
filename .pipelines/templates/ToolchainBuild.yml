@@ -21,6 +21,10 @@ steps:
       buildRepoRoot: ${{ parameters.buildRepoRoot }}
 
   - bash: |
+      tdnf repolist
+    displayName: "Print RPM repos"
+
+  - bash: |
       git -C "${{ parameters.buildRepoRoot }}" fetch --tags
       latestStableCommit="$(git -C "${{ parameters.buildRepoRoot }}" rev-list -n 1 ${{ parameters.rawToolchainSourceRef }})"
       echo "##vso[task.setvariable variable=latestStableCommit]$latestStableCommit"
