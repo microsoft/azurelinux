@@ -569,17 +569,6 @@ func specsToPackWorker(requests <-chan string, results chan<- *specState, cancel
 	}
 }
 
-// drainChannel will drain a channel of any buffered values and discard them
-func drainChannel(ch <-chan struct{}) {
-	for {
-		select {
-		case <-ch:
-		default:
-			return
-		}
-	}
-}
-
 // packSRPMs will pack any SPEC files that have been marked as `toPack`.
 func packSRPMs(specStates []*specState, distTag, buildDir string, templateSrcConfig sourceRetrievalConfiguration, workers, concurrentNetOps uint) (err error) {
 	tsRoot, _ := timestamp.StartEvent("packing SRPMs", nil)
@@ -611,8 +600,6 @@ func packSRPMs(specStates []*specState, distTag, buildDir string, templateSrcCon
 			logger.Log.Errorf("Failed to pack (%s). Error: %s", result.specFile, result.err)
 			err = result.err
 			close(cancel)
-			// Drain the semaphore to ensure all workers can exit quickly
-			drainChannel(netOpsSemaphore)
 			break
 		}
 
@@ -672,7 +659,7 @@ func packSRPMWorker(allSpecStates <-chan *specState, results chan<- *packResult,
 			continue
 		}
 
-		outputPath, err := packSingleSPEC(specState.specFile, specState.srpmFile, signaturesFilePath, buildDir, fullOutDirPath, distTag, srcConfig, netOpsSemaphore)
+		outputPath, err := packSingleSPEC(specState.specFile, specState.srpmFile, signaturesFilePath, buildDir, fullOutDirPath, distTag, srcConfig, cancel, netOpsSemaphore)
 		if err != nil {
 			result.err = err
 			results <- result
@@ -730,7 +717,7 @@ func readSignatures(signaturesFilePath string) (readSignatures map[string]string
 }
 
 // packSingleSPEC will pack a given SPEC file into an SRPM.
-func packSingleSPEC(specFile, srpmFile, signaturesFile, buildDir, outDir, distTag string, srcConfig sourceRetrievalConfiguration, netOpsSemaphore chan struct{}) (outputPath string, err error) {
+func packSingleSPEC(specFile, srpmFile, signaturesFile, buildDir, outDir, distTag string, srcConfig sourceRetrievalConfiguration, cancel <-chan struct{}, netOpsSemaphore chan struct{}) (outputPath string, err error) {
 	srpmName := filepath.Base(srpmFile)
 	workingDir := filepath.Join(buildDir, srpmName)
 
@@ -765,13 +752,13 @@ func packSingleSPEC(specFile, srpmFile, signaturesFile, buildDir, outDir, distTa
 	}
 
 	// Hydrate all patches. Exclusively using `sourceDir`
-	err = hydrateFiles(fileTypePatch, specFile, workingDir, srcConfig, currentSignatures, defines, nil)
+	err = hydrateFiles(fileTypePatch, specFile, workingDir, srcConfig, currentSignatures, defines, nil, nil)
 	if err != nil {
 		return
 	}
 
 	// Hydrate all sources. Download any missing ones not in `sourceDir`
-	err = hydrateFiles(fileTypeSource, specFile, workingDir, srcConfig, currentSignatures, defines, netOpsSemaphore)
+	err = hydrateFiles(fileTypeSource, specFile, workingDir, srcConfig, currentSignatures, defines, cancel, netOpsSemaphore)
 	if err != nil {
 		return
 	}
@@ -833,7 +820,7 @@ func readSPECTagArray(specFile, sourceDir, tag string, arch string, defines map[
 
 // hydrateFiles will attempt to retrieve all sources needed to build an SRPM from a SPEC.
 // Will alter `currentSignatures`,
-func hydrateFiles(fileTypeToHydrate fileType, specFile, workingDir string, srcConfig sourceRetrievalConfiguration, currentSignatures, defines map[string]string, netOpsSemaphore chan struct{}) (err error) {
+func hydrateFiles(fileTypeToHydrate fileType, specFile, workingDir string, srcConfig sourceRetrievalConfiguration, currentSignatures, defines map[string]string, cancel <-chan struct{}, netOpsSemaphore chan struct{}) (err error) {
 	const (
 		downloadMissingPatchFiles = false
 		skipPatchSignatures       = true
@@ -894,7 +881,7 @@ func hydrateFiles(fileTypeToHydrate fileType, specFile, workingDir string, srcCo
 	}
 
 	if hydrateRemotely && srcConfig.sourceURL != "" {
-		hydrateFromRemoteSource(fileHydrationState, newSourceDir, srcConfig, skipSignatureHandling, currentSignatures, netOpsSemaphore)
+		hydrateFromRemoteSource(fileHydrationState, newSourceDir, srcConfig, skipSignatureHandling, currentSignatures, cancel, netOpsSemaphore)
 	}
 
 	for fileNeeded, alreadyHydrated := range fileHydrationState {
@@ -953,7 +940,7 @@ func hydrateFromLocalSource(fileHydrationState map[string]bool, newSourceDir str
 
 // hydrateFromRemoteSource will update fileHydrationState.
 // Will alter `currentSignatures`.
-func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir string, srcConfig sourceRetrievalConfiguration, skipSignatureHandling bool, currentSignatures map[string]string, netOpsSemaphore chan struct{}) {
+func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir string, srcConfig sourceRetrievalConfiguration, skipSignatureHandling bool, currentSignatures map[string]string, cancel <-chan struct{}, netOpsSemaphore chan struct{}) {
 	const (
 		// With 5 attempts, initial delay of 1 second, and a backoff factor of 2.0 the total time spent retrying will be
 		// ~30 seconds.
@@ -974,7 +961,12 @@ func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir st
 		// Limit the number of concurrent network operations by pushing a struct{} into the channel. This will block until
 		// another operation completes and removes the struct{} from the channel.
 		if netOpsSemaphore != nil {
-			netOpsSemaphore <- struct{}{}
+			select {
+			case netOpsSemaphore <- struct{}{}:
+			case <-cancel:
+				logger.Log.Debug("Cancellation signal received at network operation semaphore")
+				return
+			}
 		}
 
 		err := retry.RunWithExpBackoff(func() error {
@@ -988,11 +980,7 @@ func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir st
 
 		if netOpsSemaphore != nil {
 			// Clear the channel to allow another operation to start
-			// A cancellation signal may have already cleared the channel so we need to account for that.
-			select {
-			case <-netOpsSemaphore:
-			default:
-			}
+			<-netOpsSemaphore
 		}
 
 		if err != nil {
