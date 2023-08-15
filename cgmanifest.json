@@ -24053,6 +24053,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-"rpm-spec,
+          "version": "0.14.1",
+          "downloadUrl": ""https://github.com/bkircher/python-rpm-spec/archive/refs/tags/v0.14.1.tar.gz
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-rsa",
           "version": "4.7.2",
           "downloadUrl": "https://pypi.python.org/packages/source/r/rsa/rsa-4.7.2.tar.gz"
