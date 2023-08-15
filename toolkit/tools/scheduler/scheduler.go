@@ -123,12 +123,12 @@ func main() {
 		logger.Log.Fatalf("Failed to read DOT graph with error:\n%s", err)
 	}
 
-	finalPackagesToBuild, packagesToRebuild, packagesToIgnore, err := schedulerutils.ParseAndGeneratePackageList(dependencyGraph, exe.ParseListArgument(*pkgsToBuild), exe.ParseListArgument(*pkgsToRebuild), exe.ParseListArgument(*pkgsToIgnore), *imageConfig, *baseDirPath)
+	finalPackagesToBuild, packagesToRebuild, packagesToIgnore, err := schedulerutils.ParseAndGeneratePackageBuildList(dependencyGraph, exe.ParseListArgument(*pkgsToBuild), exe.ParseListArgument(*pkgsToRebuild), exe.ParseListArgument(*pkgsToIgnore), *imageConfig, *baseDirPath)
 	if err != nil {
 		logger.Log.Fatalf("Failed to generate package list with error:\n%s", err)
 	}
 
-	finalTestsToRun, testsToRerun, ignoredTests, err := schedulerutils.ParseAndGeneratePackageList(dependencyGraph, exe.ParseListArgument(*testsToRun), exe.ParseListArgument(*testsToRerun), exe.ParseListArgument(*testsToIgnore), *imageConfig, *baseDirPath)
+	finalTestsToRun, testsToRerun, ignoredTests, err := schedulerutils.ParseAndGeneratePackageTestList(dependencyGraph, exe.ParseListArgument(*testsToRun), exe.ParseListArgument(*testsToRerun), exe.ParseListArgument(*testsToIgnore), *imageConfig, *baseDirPath)
 	if err != nil {
 		logger.Log.Fatalf("Failed to generate tests list with error:\n%s", err)
 	}

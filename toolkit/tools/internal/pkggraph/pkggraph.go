@@ -9,7 +9,6 @@ import (
 	"encoding/gob"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sort"
@@ -248,12 +247,12 @@ func (g *PkgGraph) initLookup() {
 		// one of the cycle members but will get all of their build nodes)
 		endOfValidData := 0
 		for _, n := range g.nodeLookup[idx] {
-			if n.RunNode != nil {
+			if n.RunNode == nil && n.TestNode == nil {
+				logger.Log.Debugf("Lookup for %s has neither a run node nor a test node. Lost in a cycle fix? Removing it", idx)
+				g.RemoveNode(n.BuildNode.ID())
+			} else {
 				g.nodeLookup[idx][endOfValidData] = n
 				endOfValidData++
-			} else {
-				logger.Log.Debugf("Lookup for %s has no run node, lost in a cycle fix? Removing it", idx)
-				g.RemoveNode(n.BuildNode.ID())
 			}
 		}
 		// Prune off the invalid entries at the end of the slice
@@ -530,7 +529,7 @@ func (g *PkgGraph) FindDoubleConditionalPkgNodeFromPkg(pkgVer *pkgjson.PackageVe
 	bestLocalNode = nil
 	packageNodes := g.lookupTable()[pkgVer.Name]
 	for _, node := range packageNodes {
-		if node.RunNode == nil {
+		if node.RunNode == nil && node.TestNode == nil {
 			err = fmt.Errorf("found orphaned build node '%s' for name '%s'", node.BuildNode, pkgVer.Name)
 			return
 		}
@@ -574,7 +573,7 @@ func (g *PkgGraph) FindExactPkgNodeFromPkg(pkgVer *pkgjson.PackageVer) (lookupEn
 	packageNodes := g.lookupTable()[pkgVer.Name]
 
 	for _, node := range packageNodes {
-		if node.RunNode == nil {
+		if node.RunNode == nil && node.TestNode == nil {
 			err = fmt.Errorf("found orphaned build node %s for name %s", node.BuildNode, pkgVer.Name)
 			return
 		}
@@ -1136,7 +1135,7 @@ func ReadDOTGraphFile(filename string) (outputGraph *PkgGraph, err error) {
 
 // ReadDOTGraph de-serializes a graph from a DOT formatted object
 func ReadDOTGraph(g graph.DirectedBuilder, input io.Reader) (err error) {
-	bytes, err := ioutil.ReadAll(input)
+	bytes, err := io.ReadAll(input)
 	if err != nil {
 		return
 	}
@@ -1238,9 +1237,8 @@ func (g *PkgGraph) allNodesOfType(nodeGetter func(node *LookupNode) *PkgNode) []
 
 // buildGoalSet returns a set of package versions that are the goal of the graph.
 func (g *PkgGraph) buildGoalSet(packageVers []*pkgjson.PackageVer, nodeType NodeType) (goalSet map[*pkgjson.PackageVer]bool) {
-
 	if len(packageVers) > 0 {
-		logger.Log.Debugf("Adding a goal for selected nodes of type '%s'", nodeType)
+		logger.Log.Debugf("Adding a goal for selected nodes of type '%s': %v", nodeType, packageVers)
 
 		goalSet = make(map[*pkgjson.PackageVer]bool)
 		for _, pkg := range packageVers {

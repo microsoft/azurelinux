@@ -202,7 +202,7 @@ func downloadDeltaNodes(dependencyGraph *pkggraph.PkgGraph, cloner *rpmrepoclone
 
 	// Generate the list of packages that need to be built. If none are requested then all packages will be built. We
 	// don't care about explicit rebuilds here since we are going to rebuild them anyway.
-	packageVersToBuild, _, _, err := schedulerutils.ParseAndGeneratePackageList(dependencyGraph, exe.ParseListArgument(*pkgsToBuild), exe.ParseListArgument(*pkgsToRebuild), exe.ParseListArgument(*pkgsToIgnore), *imageConfig, *baseDirPath)
+	packageVersToBuild, _, _, err := schedulerutils.ParseAndGeneratePackageBuildList(dependencyGraph, exe.ParseListArgument(*pkgsToBuild), exe.ParseListArgument(*pkgsToRebuild), exe.ParseListArgument(*pkgsToIgnore), *imageConfig, *baseDirPath)
 	if err != nil {
 		err = fmt.Errorf("unable to generate package build list to calculate delta downloads:\n%w", err)
 		return
@@ -210,7 +210,7 @@ func downloadDeltaNodes(dependencyGraph *pkggraph.PkgGraph, cloner *rpmrepoclone
 
 	// Generate the list of tests that need to be ran. If none are requested then all packages will be built. We
 	// don't care about explicit rebuilds here since we are going to rebuild them anyway.
-	testVersToRun, _, _, err := schedulerutils.ParseAndGeneratePackageList(dependencyGraph, exe.ParseListArgument(*testsToRun), exe.ParseListArgument(*testsToRerun), exe.ParseListArgument(*testsToIgnore), *imageConfig, *baseDirPath)
+	testVersToRun, _, _, err := schedulerutils.ParseAndGeneratePackageTestList(dependencyGraph, exe.ParseListArgument(*testsToRun), exe.ParseListArgument(*testsToRerun), exe.ParseListArgument(*testsToIgnore), *imageConfig, *baseDirPath)
 	if err != nil {
 		err = fmt.Errorf("unable to generate package build list to calculate delta downloads:\n%w", err)
 		return

@@ -18,168 +18,42 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
 )
 
-// ParseAndGeneratePackageList parses the common package request arguments and generates a list of packages to build based on the given dependency graph.
+// ParseAndGeneratePackageBuildList parses the common package request arguments and generates a list of packages to build based on the given dependency graph.
 // - dependencyGraph: the dependency graph of all packages. Used to convert package/spec names to PackageVers.
 // - pkgsToBuild: a list of package/spec names to build. If empty, all packages will be built.
 // - pkgsToRebuild: a list of package/spec names to always rebuild.
 // - pkgsToIgnore: a list of package/spec names to ignore.
 // - imageConfig: the path to the image config file. Used to extract additional packages to build.
 // - baseDirPath: the path to the base directory for the image. Used to resolve relative paths in the image config.
-func ParseAndGeneratePackageList(dependencyGraph *pkggraph.PkgGraph, pkgsToBuild, pkgsToRebuild, pkgsToIgnore []string, imageConfig, baseDirPath string) (finalPackagesToBuild, packagesToRebuild, packagesToIgnore []*pkgjson.PackageVer, err error) {
-	// Generate the list of packages that need to be built.
-	// If none are requested then all packages will be built.
-	packagesToBuild, err := PackageNamesToBuiltPackages(pkgsToBuild, dependencyGraph)
-	if err != nil {
-		err = fmt.Errorf("unable to find build nodes for the packages to build, error:\n%s", err)
-		return
-	}
+func ParseAndGeneratePackageBuildList(dependencyGraph *pkggraph.PkgGraph, pkgsToBuild, pkgsToRebuild, pkgsToIgnore []string, imageConfig, baseDirPath string) (finalPackagesToBuild, packagesToRebuild, packagesToIgnore []*pkgjson.PackageVer, err error) {
+	logger.Log.Debug("Generating a package list for build nodes.")
 
-	packagesToRebuild, err = PackageNamesToBuiltPackages(pkgsToRebuild, dependencyGraph)
-	if err != nil {
-		err = fmt.Errorf("unable to find build nodes for the packages to rebuild, error:\n%s", err)
-		return
-	}
-
-	prunedIgnoredPackageNames, unknownNames, err := PruneUnknownPackages(pkgsToIgnore, dependencyGraph)
-	if err != nil {
-		err = fmt.Errorf("failed to prune unknown package/spec names from the ignored list, error:\n%s", err)
-		return
-	}
-
-	if len(unknownNames) != 0 {
-		logger.Log.Warnf("The following ignored items matched neither a spec nor a package name: %v.", unknownNames)
-	}
-
-	packagesToIgnore, err = PackageNamesToBuiltPackages(prunedIgnoredPackageNames, dependencyGraph)
-	if err != nil {
-		err = fmt.Errorf("unable to find build nodes for the ignored packages, error:\n%s", err)
-		return
-	}
-
-	ignoredAndRebuiltPackages := intersect.Hash(packagesToIgnore, packagesToRebuild)
-	if len(ignoredAndRebuiltPackages) != 0 {
-		err = fmt.Errorf("can't ignore and force a rebuild of a package at the same time. Abusing packages: %v", ignoredAndRebuiltPackages)
-		return
-	}
-
-	finalPackagesToBuild, err = CalculatePackagesToBuild(packagesToBuild, packagesToRebuild, imageConfig, baseDirPath, dependencyGraph)
-	if err != nil {
-		err = fmt.Errorf("unable to generate package build list, error:\n%s", err)
-		return
-	}
-	return
-}
-
-// CalculatePackagesToBuild generates a comprehensive list of all PackageVers that the scheduler should attempt to build.
-// The build list is a superset of:
-//   - packagesNamesToBuild,
-//   - packagesNamesToRebuild,
-//   - local packages listed in the image config, and
-//   - kernels in the image config (if built locally).
-func CalculatePackagesToBuild(packagesNamesToBuild, packagesNamesToRebuild []*pkgjson.PackageVer, imageConfig, baseDirPath string, dependencyGraph *pkggraph.PkgGraph) (packageVersToBuild []*pkgjson.PackageVer, err error) {
-	packageVersToBuild = append(packagesNamesToBuild, packagesNamesToRebuild...)
-
-	packageVersFromConfig, err := extractPackagesFromConfig(imageConfig, baseDirPath)
-	if err != nil {
-		err = fmt.Errorf("failed to extract packages from the image config, error:\n%w", err)
-		return
-	}
-
-	packageVersFromConfig, err = filterLocalPackagesOnly(packageVersFromConfig, dependencyGraph)
-	if err != nil {
-		err = fmt.Errorf("failed to filter local packages from the image config, error:\n%w", err)
-		return
-	}
-
-	packageVersToBuild = append(packageVersToBuild, packageVersFromConfig...)
-	packageVersToBuild = removePackageVersDuplicates(packageVersToBuild)
-
-	return
-}
-
-// PackageNamesToBuiltPackages converts the input strings to PackageVer structures that are understood by the graph.
-// If a string is a spec name, it will convert it to all packages built from that spec.
-// If the string is NOT a spec name, it will check, if the string is a package present in the graph.
-// If the package is not present in the graph, it will return an error.
-// All packages without a build node are considered invalid.
-//
-// Note: since "SRPM_PACK_LIST" can work only with spec names, spec names take priority over package names
-// so that passing "X" to "SRPM_PACK_LIST", "PACKAGE_IGNORE_LIST", and "*_BUILD_LIST" arguments targets the same set of packages.
-func PackageNamesToBuiltPackages(packageOrSpecNames []string, dependencyGraph *pkggraph.PkgGraph) (packageVers []*pkgjson.PackageVer, err error) {
-	logger.Log.Debugf("Converting package/spec names to build nodes' PackageVers: %v", packageOrSpecNames)
-
-	specToPackageNodes := make(map[string][]*pkggraph.PkgNode)
-	for _, node := range dependencyGraph.AllBuildNodes() {
-		specToPackageNodes[node.SpecName()] = append(specToPackageNodes[node.SpecName()], node)
-	}
-
-	packageVersMap := make(map[*pkgjson.PackageVer]bool)
-	for _, packageOrSpecName := range packageOrSpecNames {
-		if nodes, ok := specToPackageNodes[packageOrSpecName]; ok {
-			logger.Log.Debugf("Name '%s' matched a spec name. Adding all packages built from this spec to the list.", packageOrSpecName)
-			for _, pkg := range nodes {
-				packageVersMap[pkg.VersionedPkg] = true
-			}
-		} else {
-			logger.Log.Debugf("Name '%s' not found among known spec names. Searching among known package names.", packageOrSpecName)
-			foundNode, err := dependencyGraph.FindBestPkgNode(&pkgjson.PackageVer{Name: packageOrSpecName})
-			if err != nil {
-				err = fmt.Errorf("failed while searching the dependency graph for package '%s', error:\n%w", packageOrSpecName, err)
-				return nil, err
-			}
-			if foundNode == nil {
-				err = fmt.Errorf("couldn't find package '%s' in the dependency graph", packageOrSpecName)
-				return nil, err
-			}
-			if foundNode.BuildNode == nil {
-				err = fmt.Errorf("found package '%s' but it is not a locally-built package", packageOrSpecName)
-				return nil, err
-			}
-
-			logger.Log.Debugf("Name '%s' matched a package name. Adding it to the list.", packageOrSpecName)
-			packageVersMap[foundNode.BuildNode.VersionedPkg] = true
+	buildNodeGetter := func(node *pkggraph.LookupNode) *pkggraph.PkgNode {
+		if node != nil {
+			return node.BuildNode
 		}
+		return nil
 	}
-
-	packageVers = sliceutils.SetToSlice(packageVersMap)
-
-	return
+	return parseAndGeneratePackageList(dependencyGraph, pkgsToBuild, pkgsToRebuild, pkgsToIgnore, imageConfig, baseDirPath, dependencyGraph.AllBuildNodes(), buildNodeGetter)
 }
 
-// PruneUnknownPackages removes all packages from the input list that do not have a build node in the graph.
-// The function also returns a slice with the unknown package names.
-func PruneUnknownPackages(packageOrSpecNames []string, dependencyGraph *pkggraph.PkgGraph) (prunedNames, unknownNames []string, err error) {
-	logger.Log.Debugf("Pruning unknown packages from the following list: %v", packageOrSpecNames)
+// ParseAndGeneratePackageTestList parses the common package request arguments and generates a list of packages to test based on the given dependency graph.
+// - dependencyGraph: the dependency graph of all packages. Used to convert package/spec names to PackageVers.
+// - testsToRun: a list of package/spec names to test. If empty, all packages will be tested.
+// - testsToRerun: a list of package/spec names to always test.
+// - testsToIgnore: a list of package/spec names to ignore.
+// - imageConfig: the path to the image config file. Used to extract additional packages to test.
+// - baseDirPath: the path to the base directory for the image. Used to resolve relative paths in the image config.
+func ParseAndGeneratePackageTestList(dependencyGraph *pkggraph.PkgGraph, testsToRun, testsToRerun, testsToIgnore []string, imageConfig, baseDirPath string) (finalPackagesToBuild, packagesToRebuild, packagesToIgnore []*pkgjson.PackageVer, err error) {
+	logger.Log.Debug("Generating a package list for test nodes.")
 
-	specNames := make(map[string]bool)
-	for _, node := range dependencyGraph.AllBuildNodes() {
-		specNames[node.SpecName()] = true
-	}
-
-	for _, packageOrSpecName := range packageOrSpecNames {
-		if specNames[packageOrSpecName] {
-			logger.Log.Tracef("Name '%s' matched a spec name, keeping it in the list.", packageOrSpecName)
-			prunedNames = append(prunedNames, packageOrSpecName)
-		} else {
-			logger.Log.Debugf("Name '%s' not found among known spec names. Searching among known package names.", packageOrSpecName)
-			foundNode, err := dependencyGraph.FindBestPkgNode(&pkgjson.PackageVer{Name: packageOrSpecName})
-			if err != nil {
-				err = fmt.Errorf("failed while searching the dependency graph for package '%s', error:\n%w", packageOrSpecName, err)
-				return nil, nil, err
-			}
-
-			if (foundNode == nil) || (foundNode.BuildNode == nil) {
-				logger.Log.Tracef("Couldn't find package '%s' in the dependency graph. Pruning from the list.", packageOrSpecName)
-				unknownNames = append(unknownNames, packageOrSpecName)
-				continue
-			}
-
-			logger.Log.Debugf("Name '%s' matched a package name, keeping it in the list.", packageOrSpecName)
-			prunedNames = append(prunedNames, packageOrSpecName)
+	testNodeGetter := func(node *pkggraph.LookupNode) *pkggraph.PkgNode {
+		if node != nil {
+			return node.TestNode
 		}
+		return nil
 	}
-
-	return
+	return parseAndGeneratePackageList(dependencyGraph, testsToRun, testsToRerun, testsToIgnore, imageConfig, baseDirPath, dependencyGraph.AllTestNodes(), testNodeGetter)
 }
 
 // ReadReservedFilesList reads the list of reserved files (such as toolchain RPMs) from the manifest file passed in.
@@ -225,6 +99,33 @@ func IsReservedFile(rpmPath string, reservedRPMs []string) bool {
 		}
 	}
 	return false
+}
+
+// calculatePackagesToBuild generates a comprehensive list of all PackageVers that the scheduler should attempt to build.
+// The build list is a superset of:
+//   - packagesNamesToBuild,
+//   - packagesNamesToRebuild,
+//   - local packages listed in the image config, and
+//   - kernels in the image config (if built locally).
+func calculatePackagesToBuild(packagesNamesToBuild, packagesNamesToRebuild []*pkgjson.PackageVer, imageConfig, baseDirPath string, dependencyGraph *pkggraph.PkgGraph) (packageVersToBuild []*pkgjson.PackageVer, err error) {
+	packageVersToBuild = append(packagesNamesToBuild, packagesNamesToRebuild...)
+
+	packageVersFromConfig, err := extractPackagesFromConfig(imageConfig, baseDirPath)
+	if err != nil {
+		err = fmt.Errorf("failed to extract packages from the image config, error:\n%w", err)
+		return
+	}
+
+	packageVersFromConfig, err = filterLocalPackagesOnly(packageVersFromConfig, dependencyGraph)
+	if err != nil {
+		err = fmt.Errorf("failed to filter local packages from the image config, error:\n%w", err)
+		return
+	}
+
+	packageVersToBuild = append(packageVersToBuild, packageVersFromConfig...)
+	packageVersToBuild = removePackageVersDuplicates(packageVersToBuild)
+
+	return
 }
 
 // extractPackagesFromConfig reads configuration file and returns a package list required for the said configuration
@@ -279,4 +180,141 @@ func removePackageVersDuplicates(packageVers []*pkgjson.PackageVer) []*pkgjson.P
 	}
 
 	return sliceutils.SetToSlice(uniquePackageVersToBuild)
+}
+
+// packageNamesToPackages converts the input strings to PackageVer structures that are understood by the graph.
+// If a string is a spec name, it will convert it to all packages built from that spec.
+// If the string is NOT a spec name, it will check, if the string is a package present in the graph.
+// If the package is not present in the graph, it will return an error.
+// All packages without a expected node are considered invalid.
+//
+// Note: since "SRPM_PACK_LIST" can work only with spec names, spec names take priority over package names
+// so that passing "X" to "SRPM_PACK_LIST" and "(PACKAGE|TEST)_*_LIST" arguments targets the same set of packages.
+func packageNamesToPackages(packageOrSpecNames []string, analyzedNodes []*pkggraph.PkgNode, nodeGetter func(*pkggraph.LookupNode) *pkggraph.PkgNode, dependencyGraph *pkggraph.PkgGraph) (packageVers []*pkgjson.PackageVer, err error) {
+	logger.Log.Debugf("Converting following package/spec names to PackageVers: %v", packageOrSpecNames)
+
+	specToPackageNodes := make(map[string][]*pkggraph.PkgNode)
+	for _, node := range analyzedNodes {
+		specToPackageNodes[node.SpecName()] = append(specToPackageNodes[node.SpecName()], node)
+	}
+
+	packageVersMap := make(map[*pkgjson.PackageVer]bool)
+	for _, packageOrSpecName := range packageOrSpecNames {
+		if nodes, ok := specToPackageNodes[packageOrSpecName]; ok {
+			logger.Log.Debugf("Name '%s' matched a spec name. Adding all packages PackageVers from this spec to the list.", packageOrSpecName)
+			for _, pkg := range nodes {
+				packageVersMap[pkg.VersionedPkg] = true
+			}
+		} else {
+			logger.Log.Debugf("Name '%s' not found among known spec names. Searching among known package names.", packageOrSpecName)
+			foundNode, err := dependencyGraph.FindBestPkgNode(&pkgjson.PackageVer{Name: packageOrSpecName})
+			if err != nil {
+				err = fmt.Errorf("failed while searching the dependency graph for package '%s', error:\n%w", packageOrSpecName, err)
+				return nil, err
+			}
+			if foundNode == nil {
+				err = fmt.Errorf("couldn't find package '%s' in the dependency graph", packageOrSpecName)
+				return nil, err
+			}
+
+			expectedNode := nodeGetter(foundNode)
+			if expectedNode == nil {
+				err = fmt.Errorf("found package '%s' but it doesn't have a package of the expected type", packageOrSpecName)
+				return nil, err
+			}
+
+			logger.Log.Debugf("Name '%s' matched a package name. Adding it to the list.", packageOrSpecName)
+			packageVersMap[expectedNode.VersionedPkg] = true
+		}
+	}
+
+	packageVers = sliceutils.SetToSlice(packageVersMap)
+
+	return
+}
+
+// parseAndGeneratePackageList parses the common package request arguments and generates a list of packages to build based on the given dependency graph.
+// - dependencyGraph: the dependency graph of all packages. Used to convert package/spec names to PackageVers.
+// - buildList: a list of package/spec names to build. If empty, all packages will be built.
+// - rebuildList: a list of package/spec names to always build.
+// - ignoreList: a list of package/spec names to ignore.
+// - imageConfig: the path to the image config file. Used to extract additional packages to build.
+// - baseDirPath: the path to the base directory for the image. Used to resolve relative paths in the image config.
+func parseAndGeneratePackageList(dependencyGraph *pkggraph.PkgGraph, buildList, rebuiltList, ignoreList []string, imageConfig, baseDirPath string, analyzedNodes []*pkggraph.PkgNode, nodeGetter func(*pkggraph.LookupNode) *pkggraph.PkgNode) (finalPackagesToBuild, packagesToRebuild, packagesToIgnore []*pkgjson.PackageVer, err error) {
+	packagesToBuild, err := packageNamesToPackages(buildList, analyzedNodes, nodeGetter, dependencyGraph)
+	if err != nil {
+		err = fmt.Errorf("unable to find nodes for the packages from the build list, error:\n%s", err)
+		return
+	}
+
+	packagesToRebuild, err = packageNamesToPackages(rebuiltList, analyzedNodes, nodeGetter, dependencyGraph)
+	if err != nil {
+		err = fmt.Errorf("unable to find nodes for the packages from the re-built list, error:\n%s", err)
+		return
+	}
+
+	prunedIgnoredPackageNames, unknownNames, err := pruneUnknownPackages(ignoreList, analyzedNodes, nodeGetter, dependencyGraph)
+	if err != nil {
+		err = fmt.Errorf("failed to prune unknown package/spec names from the ignored list, error:\n%s", err)
+		return
+	}
+
+	if len(unknownNames) != 0 {
+		logger.Log.Warnf("The following ignored items matched neither a spec nor a package name: %v.", unknownNames)
+	}
+
+	packagesToIgnore, err = packageNamesToPackages(prunedIgnoredPackageNames, analyzedNodes, nodeGetter, dependencyGraph)
+	if err != nil {
+		err = fmt.Errorf("unable to find nodes for the packages from the ignore list, error:\n%s", err)
+		return
+	}
+
+	ignoredAndRebuiltPackages := intersect.Hash(packagesToIgnore, packagesToRebuild)
+	if len(ignoredAndRebuiltPackages) != 0 {
+		err = fmt.Errorf("can't ignore and force a re-build of a package at the same time. Abusing packages: %v", ignoredAndRebuiltPackages)
+		return
+	}
+
+	finalPackagesToBuild, err = calculatePackagesToBuild(packagesToBuild, packagesToRebuild, imageConfig, baseDirPath, dependencyGraph)
+	if err != nil {
+		err = fmt.Errorf("unable to generate the final package build list, error:\n%s", err)
+		return
+	}
+	return
+}
+
+// pruneUnknownPackages removes all packages from the input list that do not have a valid node in the graph.
+// The function also returns a slice with the unknown package names.
+func pruneUnknownPackages(packageOrSpecNames []string, analyzedNodes []*pkggraph.PkgNode, nodeGetter func(*pkggraph.LookupNode) *pkggraph.PkgNode, dependencyGraph *pkggraph.PkgGraph) (prunedNames, unknownNames []string, err error) {
+	logger.Log.Debugf("Pruning unknown packages from the following list: %v", packageOrSpecNames)
+
+	specNames := make(map[string]bool)
+	for _, node := range analyzedNodes {
+		specNames[node.SpecName()] = true
+	}
+
+	for _, packageOrSpecName := range packageOrSpecNames {
+		if specNames[packageOrSpecName] {
+			logger.Log.Tracef("Name '%s' matched a spec name, keeping it in the list.", packageOrSpecName)
+			prunedNames = append(prunedNames, packageOrSpecName)
+		} else {
+			logger.Log.Debugf("Name '%s' not found among known spec names. Searching among known package names.", packageOrSpecName)
+			foundNode, err := dependencyGraph.FindBestPkgNode(&pkgjson.PackageVer{Name: packageOrSpecName})
+			if err != nil {
+				err = fmt.Errorf("failed while searching the dependency graph for package '%s', error:\n%w", packageOrSpecName, err)
+				return nil, nil, err
+			}
+
+			if nodeGetter(foundNode) == nil {
+				logger.Log.Tracef("Couldn't find package '%s' in the dependency graph. Pruning from the list.", packageOrSpecName)
+				unknownNames = append(unknownNames, packageOrSpecName)
+				continue
+			}
+
+			logger.Log.Debugf("Name '%s' matched a package name, keeping it in the list.", packageOrSpecName)
+			prunedNames = append(prunedNames, packageOrSpecName)
+		}
+	}
+
+	return
 }
