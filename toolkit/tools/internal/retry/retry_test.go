@@ -8,10 +8,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var defaultTestTime = time.Millisecond * 100
+const (
+	defaultTestTime = time.Millisecond * 100
 
 // Tests won't run with perfect timing, so we need to allow for some fudge factor when we check maximum duration.
-var timingFudgeFactor = time.Millisecond * 100
+	timingFudgeFactor = time.Millisecond * 100
+)
 
 func TestZeroBase(t *testing.T) {
 	// Two failures, 0.0 multiplier, should be 0 second delay
