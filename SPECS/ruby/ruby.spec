@@ -97,7 +97,7 @@ Source4:        rubygems.con
 Source5:        rubygems.prov
 Source6:        rubygems.req
 Source7:        macros.rubygems
-Patch0:         CVE-2023-36617.patch
+Patch0:         CVE-2023-36617.patch # Updates ruby-uri from 0.12.1 to 0.12.2. Remove once ruby gets updated to a version that comes with ruby-uri 0.12.2
 BuildRequires:  openssl-devel
 BuildRequires:  readline
 BuildRequires:  readline-devel
