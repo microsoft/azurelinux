@@ -1743,6 +1743,7 @@
                 "python-rfc3986",
                 "python-rpm-generators",
                 "python-rpmfluff",
+                "python-rpm-spec",
                 "python-rtslib",
                 "python-ruamel-yaml",
                 "python-ruamel-yaml-clib",
