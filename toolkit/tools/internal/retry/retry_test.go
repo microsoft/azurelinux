@@ -11,7 +11,7 @@ import (
 const (
 	defaultTestTime = time.Millisecond * 100
 
-// Tests won't run with perfect timing, so we need to allow for some fudge factor when we check maximum duration.
+	// Tests won't run with perfect timing, so we need to allow for some fudge factor when we check maximum duration.
 	timingFudgeFactor = time.Millisecond * 100
 )
 
@@ -23,31 +23,34 @@ func TestZeroBase(t *testing.T) {
 	assert.Equal(t, time.Duration(0), val)
 }
 
-func TestZeroI(t *testing.T) {
+func TestZeroFailuresTime(t *testing.T) {
 	// Zero failures, 1.0 base, should be 0 second delay
 	fails := 0
 	base := 1.0
 	val := calculateExpDelay(fails, defaultTestTime, base)
 	assert.Equal(t, time.Second*0, val)
+}
 
-	// Three failures, 1.0 base, should still be 0 second delay
-	fails = 3
-	base = 0.0
-	val = calculateExpDelay(fails, defaultTestTime, base)
+func TestZeroBaseTime(t *testing.T) {
+	// Three failures, 0.0 base, should be 0 second delay
+	fails := 3
+	base := 0.0
+	val := calculateExpDelay(fails, defaultTestTime, base)
 	assert.Equal(t, time.Second*0, val)
 }
 
-func TestNegativeI(t *testing.T) {
+func TestNegativeFailuresCountExp(t *testing.T) {
 	// Negative failures, 1.0 base, should be 0 second delay
 	fails := -1
 	base := 1.0
 	val := calculateExpDelay(fails, defaultTestTime, base)
 	assert.Equal(t, time.Second*0, val)
+}
 
+func TestNegativeFailuresCountLinear(t *testing.T) {
 	// Negative failures, should be 0 second delay
-	fails = -1
-	base = 1.0
-	val = calculateLinearDelay(fails, defaultTestTime)
+	fails := -1
+	val := calculateLinearDelay(fails, defaultTestTime)
 	assert.Equal(t, time.Second*0, val)
 }
 
@@ -62,7 +65,7 @@ func TestCalcDelayBaseLinear(t *testing.T) {
 	}
 }
 
-func TestCalcDelayBase2(t *testing.T) {
+func TestCalcDelayExpBase2(t *testing.T) {
 	// Delay vs. retry count for base = 2.0, delay = 0.1 seconds
 	var expectedValuesMillis2 = []int{0, 100, 200, 400, 800, 1600}
 
@@ -89,14 +92,22 @@ func TestTotalRunTimeWithFailuresLinear(t *testing.T) {
 	maxDelay := idealTime + timingFudgeFactor
 	assert.GreaterOrEqual(t, endTime.Sub(startTime), minDelay)
 	assert.LessOrEqual(t, endTime.Sub(startTime), maxDelay)
+}
 
+func TestTotalRunTimeWithFailuresDefaultRun(t *testing.T) {
+	attempts := 3
 	// Ensure the default Run() method works the same way
-	startTime = time.Now()
-	err = Run(func() error {
+	startTime := time.Now()
+	err := Run(func() error {
 		return fmt.Errorf("test error")
 	}, attempts, defaultTestTime)
-	endTime = time.Now()
+	endTime := time.Now()
 	assert.NotNil(t, err)
+	// Delays should be 0 seconds, <attempt>, .1 second, <attempt>, .2 seconds, <attempt>
+	// for a total of .3 seconds.
+	idealTime := time.Millisecond * 300
+	minDelay := idealTime
+	maxDelay := idealTime + timingFudgeFactor
 	assert.GreaterOrEqual(t, endTime.Sub(startTime), minDelay)
 	assert.LessOrEqual(t, endTime.Sub(startTime), maxDelay)
 }
