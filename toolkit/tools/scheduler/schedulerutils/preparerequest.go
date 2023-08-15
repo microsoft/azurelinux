@@ -139,7 +139,7 @@ func calculateExpectedFreshness(currentNode, dependencyNode *pkggraph.PkgNode, b
 	// The transition from (* -> run) nodes is sufficient to attenuate the freshness through the graph. For BuildRequires,
 	// each build node will always be accompanied by a run node (i.e., no other nodes depend directly on the build
 	// node, and we would like the associated run node to inherit it's build node's freshness). We also want to
-	// attenuate for runtime requires wich again will generally be a (run -> run) transition. Meta nodes may be interposed
+	// attenuate for runtime requires which again will generally be a (run -> run) transition. Meta nodes may be interposed
 	// between any nodes so we pass the freshness through unchanged everywhere else.
 	if dependencyNode.Type == pkggraph.TypeLocalRun && expectedFreshness != 0 {
 		expectedFreshness -= 1
