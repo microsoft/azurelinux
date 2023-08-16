@@ -27,7 +27,6 @@ RPMs are build from a package's sources along with a spec file. The spec file co
 %setup -q
 
 %install
-rm -rf %{buildroot}
 mkdir -p %{buildroot}/%{python3_sitelib}/
 cp -r pyrpm %{buildroot}/%{python3_sitelib}/
 
@@ -40,6 +39,5 @@ cp -r pyrpm %{buildroot}/%{python3_sitelib}/
 
 %changelog
 * Tue Aug 15 2023 Andy Zaugg <azaugg@linkedin.com> - 0.14.1-1
-- Initial creation of RPM
 - Original version for CBL-Mariner
 - License verified
