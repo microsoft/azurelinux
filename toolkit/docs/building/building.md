@@ -530,7 +530,7 @@ If that is not desired all remote sources can be disabled by clearing the follow
 
 ##### `PRECACHE=y`
 
-> Load the cache with as many rpms from the usptream repos before starting to build.
+> Load the cache with RPMs from the upstream repos before starting to build.
 
 #### `ALLOW_TOOLCHAIN_DOWNLOAD_FAIL=...`
 
