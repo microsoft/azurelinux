@@ -302,6 +302,7 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 	// Start the build at the leaf nodes.
 	// The build will bubble up through the graph as it processes nodes.
 	buildState := schedulerutils.NewGraphBuildState(reservedFiles)
+	buildRunsTests := len(pkgGraph.AllTestNodes()) > 0
 	nodesToBuild := schedulerutils.LeafNodes(pkgGraph, graphMutex, goalNode, buildState, useCachedImplicit)
 
 	for {
@@ -427,11 +428,13 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 		}
 
 		if res.Node.Type == pkggraph.TypeLocalBuild || res.Node.Type == pkggraph.TypeTest {
-			activeTests := buildState.ActiveTests()
-			activeTestsCount := len(activeTests)
-
 			logger.Log.Infof("%d currently active build(s): %v.", activeSRPMsCount, activeSRPMs)
-			logger.Log.Infof("%d currently active test(s): %v.", activeTestsCount, activeTests)
+
+			if buildRunsTests {
+				activeTests := buildState.ActiveTests()
+
+				logger.Log.Infof("%d currently active test(s): %v.", len(activeTests), activeTests)
+			}
 		}
 
 	}
