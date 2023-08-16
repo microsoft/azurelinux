@@ -5,6 +5,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
 	"path"
 	"strings"
@@ -110,6 +111,15 @@ func main() {
 
 func rpmSnapshotFromFile(snapshotFile string) (rpmSnapshot *repocloner.RepoContents, err error) {
 	err = jsonutils.ReadJSONFile(snapshotFile, &rpmSnapshot)
+
+	// Randomize the order of the packages to average out the package sizes to optimize the download speed. Lots of small
+	// packages will be slow to download because of the overhead of the network operations, so mix in some large packages
+	// to average out the download time. We have a better chance of maximizing the network bandwidth this way.
+	rand.Seed(time.Now().UnixNano())
+	rand.Shuffle(len(rpmSnapshot.Repo), func(i, j int) {
+		rpmSnapshot.Repo[i], rpmSnapshot.Repo[j] = rpmSnapshot.Repo[j], rpmSnapshot.Repo[i]
+	})
+
 	return
 }
 
@@ -122,21 +132,12 @@ func getAllRepoData(repoURLs []string, workerTar, buildDir string) (namesToURLs 
 	timestamp.StartEvent("pull available package data from repos", nil)
 	defer timestamp.StopEvent(nil)
 
-	// Create a chroot to run repoquery in
-	// Create the directory 'buildDir' if it does not exist
-	exists, err := file.DirExists(buildDir)
+	err = os.MkdirAll(buildDir, 0755)
 	if err != nil {
-		err = fmt.Errorf("failed to check if directory %s exists:\n%w", buildDir, err)
+		err = fmt.Errorf("failed to create directory %s:\n%w", buildDir, err)
 		return nil, err
 	}
-	if !exists {
-		logger.Log.Infof("Creating 1st time chroot directory %s", buildDir)
-		err = os.MkdirAll(buildDir, 0755)
-		if err != nil {
-			err = fmt.Errorf("failed to create directory %s:\n%w", buildDir, err)
-			return nil, err
-		}
-	}
+
 	queryChroot, err := createChroot(workerTar, buildDir, leaveChrootOnDisk)
 	if err != nil {
 		err = fmt.Errorf("failed to create chroot:\n%w", err)
@@ -265,6 +266,12 @@ func getPackageRepoPaths(repoUrl string) (packages []string, err error) {
 func downloadMissingPackages(rpmSnapshot *repocloner.RepoContents, packagesAvailableFromRepos map[string]string, outDir string, concurrentNetOps uint) (downloadedPackages []string, err error) {
 	timestamp.StartEvent("download missing packages", nil)
 	defer timestamp.StopEvent(nil)
+
+	err = os.MkdirAll(outDir, 0755)
+	if err != nil {
+		err = fmt.Errorf("failed to create directory %s:\n%w", outDir, err)
+		return nil, err
+	}
 
 	// We will be downloading packages concurrently, so we need to keep track of when they are all done via a wait group. To
 	// simplify the code just use goroutines with a semaphore channel to limit the number of concurrent network operations. Each
