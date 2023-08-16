@@ -228,6 +228,7 @@ func getRepoPackages(repoUrl string) (packages []string, err error) {
 	const (
 		reqoqueryTool    = "repoquery"
 		randomNameLength = 10
+		printErrorOutput = true
 	)
 	var queryCommonArgList = []string{"-y", "-q", "--disablerepo=*", "-a", "--qf", "%{location}"}
 
@@ -248,7 +249,7 @@ func getRepoPackages(repoUrl string) (packages []string, err error) {
 	}
 
 	// Run the repoquery command
-	err = shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, true, reqoqueryTool, finalArgList...)
+	err = shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, printErrorOutput, reqoqueryTool, finalArgList...)
 	if err != nil {
 		err = fmt.Errorf("failed to run repoquery command:\n%w", err)
 		return
@@ -275,7 +276,7 @@ func downloadMissingPackages(rpmSnapshot *repocloner.RepoContents, availablePack
 	doneChannel := make(chan struct{})
 
 	// Spawn a worker for each package, they will all do preliminary checks in parallel before synchronizing on the semaphore.
-	// Each worker is responsible for adding and removing itself from the wait group.
+	// Each worker is responsible for removing itself from the wait group once done.
 	for _, pkg := range rpmSnapshot.Repo {
 		wg.Add(1)
 		go precachePackage(pkg, availablePackages, outDir, wg, results, netOpsSemaphore)
@@ -313,6 +314,7 @@ func monitorProgress(total int, results chan downloadResult, doneChannel chan st
 				logger.Log.Debugf("Skipping pre-caching '%s'. File already exists", result.pkgName)
 				skipped++
 			case downloadResultTypeSuccess:
+				logger.Log.Debugf("Pre-caching '%s' succeeded", result.pkgName)
 				downloadedPackages = append(downloadedPackages, result.pkgName)
 				downloaded++
 			case downloadResultTypeFailure:
@@ -390,15 +392,13 @@ func precachePackage(pkg *repocloner.RepoPackage, availablePackages map[string]s
 	}, downloadRetryAttempts, downloadRetryDuration)
 
 	if err != nil {
-		logger.Log.Warnf("Pre-caching '%s' failed. Error: %s", fileName, err)
 		result.resultType = downloadResultTypeFailure
 		results <- result
 		return
-	} else {
-		logger.Log.Debugf("Pre-caching '%s' succeeded", fileName)
-		result.resultType = downloadResultTypeSuccess
-		results <- result
 	}
+
+	result.resultType = downloadResultTypeSuccess
+	results <- result
 }
 
 func writeSummaryFile(summaryFile string, downloadedPackages []string) (err error) {
