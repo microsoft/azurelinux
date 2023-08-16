@@ -1278,11 +1278,11 @@ func (g *PkgGraph) DeepCopy() (deepCopy *PkgGraph, err error) {
 }
 
 func (g *PkgGraph) MakeDAG() (err error) {
-	return g.MakeDAGusingUpstreamRepos(false, false, nil)
+	return g.MakeDAGUsingUpstreamRepos(false, false, nil)
 }
 
-// MakeDAG ensures the graph is a directed acyclic graph (DAG).
-// If the graph is not a DAG, this routine will attempt to resolve any cycles to make the graph a DAG.
+// MakeDAGUsingUpstreamRepos ensures the graph is a directed acyclic graph (DAG).
+// If the graph is not a DAG, this routine will attempt to resolve any cycles using RPMs in the PMC to make the graph a DAG.
 func (g *PkgGraph) MakeDAGUsingUpstreamRepos(resolveCyclesFromUpstream, ignoreVersionToResolveSelfDep bool, cloner *rpmrepocloner.RpmRepoCloner) (err error) {
 	timestamp.StartEvent("convert to DAG", nil)
 	defer timestamp.StopEvent(nil)
@@ -1412,13 +1412,12 @@ func (g *PkgGraph) fixIntraSpecCycle(trimmedCycle []*PkgNode) (err error) {
 	return
 }
 
-/*runNode is the currentNode which is being replaced in the cycle, and buildNode is its previous Node in the cycle*/
-func (g *PkgGraph) replaceCurrentRunNodeWithNewNode(runNode, newNode, buildNode *PkgNode) {
-	parentNodes := g.To(runNode.ID())
+func (g *PkgGraph) replaceSRPMBuildDependency(replacedNode, newNode *PkgNode, dependencySRPMPath string) {
+	parentNodes := g.To(replacedNode.ID())
 	for parentNodes.Next() {
 		parentNode := parentNodes.Node().(*PkgNode)
-		if parentNode.Type == TypeLocalBuild && parentNode.SrpmPath == buildNode.SrpmPath {
-			g.RemoveEdge(parentNode.ID(), runNode.ID())
+		if parentNode.Type == TypeLocalBuild && parentNode.SrpmPath == dependencySRPMPath {
+			g.RemoveEdge(parentNode.ID(), replacedNode.ID())
 
 			err := g.AddEdge(parentNode, newNode)
 			if err != nil {
@@ -1436,7 +1435,7 @@ func (g *PkgGraph) cloneAndReplaceRunToRemote(runNode *PkgNode, buildNodeToUpdat
 	upstreamAvailableNode.Type = TypeRemoteRun
 
 	logger.Log.Debugf("Adding a remote unresolved node '%s' with id %d.", upstreamAvailableNode.FriendlyName(), upstreamAvailableNode.ID())
-	g.replaceCurrentRunNodeWithNewNode(runNode, upstreamAvailableNode, buildNodeToUpdate)
+	g.replaceSRPMBuildDependency(runNode, upstreamAvailableNode, buildNodeToUpdate.SrpmPath)
 }
 
 // fixCyclesWithExistingRPMS attempts to fix a cycle if at least one node is a pre-built. It also searches upstream RPMS when the flag RESOLVE_CYCLES_FROM_UPSTREAM is enabled
@@ -1461,6 +1460,7 @@ func (g *PkgGraph) fixCyclesWithExistingRPMS(trimmedCycle []*PkgNode, resolveCyc
 		//    These edges represent the 'BuildRequires' from the .spec file. If the cycle is breakable, the run node comes from a pre-built SRPM.
 		buildToRunEdge := previousNode.Type == TypeLocalBuild && currentNode.Type == TypeLocalRun
 		if !buildToRunEdge {
+			currentNode = previousNode
 			continue
 		}
 		if isPrebuilt, _, _ := IsSRPMPrebuilt(currentNode.SrpmPath, g, nil); isPrebuilt {
@@ -1473,25 +1473,15 @@ func (g *PkgGraph) fixCyclesWithExistingRPMS(trimmedCycle []*PkgNode, resolveCyc
 
 			logger.Log.Debugf("Adding a 'PreBuilt' node '%s' with id %d.", preBuiltNode.FriendlyName(), preBuiltNode.ID())
 
-			g.replaceCurrentRunNodeWithNewNode(currentNode, preBuiltNode, previousNode)
+			g.replaceSRPMBuildDependency(currentNode, preBuiltNode, previousNode.SrpmPath)
 			logger.Log.Infof("Cycle fixed using prebuilt node: %s with id %d", preBuiltNode.FriendlyName(), preBuiltNode.ID())
 
 			return
 		}
 		if resolveCyclesFromUpstream {
-			var isAvailableUpstream bool
-			isAvailableUpstream, err = findAllRPMSUpstream([]*PkgNode{currentNode}, false, cloner)
-			// Cloner errors are not fatal - may return one when the RPM is not found.
-			if err != nil {
-				logger.Log.Debugf("Error while checking if SRPM is available upstream: %v", err)
-				continue
-			}
-			if isAvailableUpstream {
-				logger.Log.Debugf("Cycle contains SRPM '%s' that is availabe in repo. Replacing edges from build nodes associated with '%s' with an edge to a new 'remote-unresolved' node.", currentNode.SrpmPath, previousNode.SrpmPath)
-				g.cloneAndReplaceRunToRemote(currentNode, previousNode)
+			if g.breakCycleAtThisNodeUsingUpstream(previousNode, currentNode, false, cloner) {
 				return
 			}
-
 		}
 		currentNode = previousNode
 	}
@@ -1507,20 +1497,13 @@ func (g *PkgGraph) fixCyclesWithExistingRPMS(trimmedCycle []*PkgNode, resolveCyc
 	for _, previousNode := range trimmedCycle {
 		buildToRunEdge := previousNode.Type == TypeLocalBuild && currentNode.Type == TypeLocalRun
 		if !buildToRunEdge {
+			currentNode = previousNode
 			continue
 		}
-		var isAvailableUpstream bool
-		isAvailableUpstream, err = findAllRPMSUpstream([]*PkgNode{currentNode}, true, cloner)
-		// Cloner errors are not fatal - may return one when the RPM is not found.
-		if err != nil {
-			logger.Log.Debugf("Error while checking if SRPM is available upstream: %v", err)
-			continue
-		}
-		if isAvailableUpstream {
-			logger.Log.Debugf("Cycle contains SRPM '%s' that is availabe in repo. Replacing edges from build nodes associated with '%s' with an edge to a new 'remote-unresolved' node.", currentNode.SrpmPath, previousNode.SrpmPath)
-			g.cloneAndReplaceRunToRemote(currentNode, previousNode)
+		if g.breakCycleAtThisNodeUsingUpstream(previousNode, currentNode, true, cloner) {
 			return
 		}
+		currentNode = previousNode
 	}
 
 	return fmt.Errorf("Cycle can't be resolved with prebuilt/PMC RPMs. unresolvable")
@@ -1631,6 +1614,24 @@ func findAllRPMS(rpmsToFind []string) (foundAllRpms bool, missingRpms []string) 
 	}
 	foundAllRpms = len(missingRpms) == 0
 
+	return
+}
+
+func (g *PkgGraph) breakCycleAtThisNodeUsingUpstream(previousNode, currentNode *PkgNode, ignoreVersionToResolveSelfDep bool, cloner *rpmrepocloner.RpmRepoCloner) (isCycleBroken bool) {
+	isCycleBroken = false
+
+	isAvailableUpstream, err := findAllRPMSUpstream([]*PkgNode{currentNode}, false, cloner)
+	// Cloner errors are not fatal - may return one when the RPM is not found.
+	if err != nil {
+		logger.Log.Debugf("Error while checking if SRPM is available upstream: %v", err)
+		return
+	}
+	if isAvailableUpstream {
+		logger.Log.Debugf("Cycle contains SRPM '%s' that is availabe in repo. Replacing edges from build nodes associated with '%s' with an edge to a new 'remote-unresolved' node.", currentNode.SrpmPath, previousNode.SrpmPath)
+		g.cloneAndReplaceRunToRemote(currentNode, previousNode)
+		isCycleBroken = true
+		return
+	}
 	return
 }
 
