@@ -128,7 +128,7 @@ func Write(data string, dst string) (err error) {
 }
 
 // WriteLines writes each string to the same file, separated by lineSeparator (e.g. "\n").
-func WriteLines(dataLines []string, lineSeparator string, destinationPath string) (err error) {
+func WriteLines(dataLines []string, destinationPath string) (err error) {
 	logger.Log.Debugf("Writing to (%s)", destinationPath)
 
 	dstFile, err := os.Create(destinationPath)
@@ -138,11 +138,7 @@ func WriteLines(dataLines []string, lineSeparator string, destinationPath string
 	defer dstFile.Close()
 
 	for _, line := range dataLines {
-		_, err = dstFile.WriteString(line)
-		if err != nil {
-			return
-		}
-		_, err = dstFile.WriteString(lineSeparator)
+		_, err = fmt.Fprintln(dstFile, line)
 		if err != nil {
 			return
 		}
