@@ -126,20 +126,20 @@ func getAllRepoData(repoUrls []string, workerTar, buildDir string) (namesToUrls 
 	// Create the directory 'buildDir' if it does not exist
 	exists, err := file.DirExists(buildDir)
 	if err != nil {
-		err = fmt.Errorf("failed to check if directory %s exists: %w", buildDir, err)
+		err = fmt.Errorf("failed to check if directory %s exists:\n%w", buildDir, err)
 		return nil, err
 	}
 	if !exists {
 		logger.Log.Infof("Creating 1st time chroot directory %s", buildDir)
 		err = os.MkdirAll(buildDir, 0755)
 		if err != nil {
-			err = fmt.Errorf("failed to create directory %s: %w", buildDir, err)
+			err = fmt.Errorf("failed to create directory %s:\n%w", buildDir, err)
 			return nil, err
 		}
 	}
 	queryChroot, err := createChroot(workerTar, buildDir, leaveChrootOnDisk)
 	if err != nil {
-		err = fmt.Errorf("failed to create chroot: %w", err)
+		err = fmt.Errorf("failed to create chroot:\n%w", err)
 		return nil, err
 	}
 	defer queryChroot.Close(leaveChrootOnDisk)
@@ -194,7 +194,7 @@ func createChroot(workerTar, chrootDir string, leaveChrootOnDisk bool) (queryChr
 	}
 	err = queryChroot.AddFiles(files...)
 	if err != nil {
-		err = fmt.Errorf("failed to add files to chroot: %w", err)
+		err = fmt.Errorf("failed to add files to chroot:\n%w", err)
 		queryChroot.Close(false)
 		return
 	}
@@ -204,12 +204,12 @@ func createChroot(workerTar, chrootDir string, leaveChrootOnDisk bool) (queryChr
 	queryChroot.Run(func() error {
 		_, err = installutils.TdnfInstall(dnfUtilsPackageName, rootDir)
 		if err != nil {
-			err = fmt.Errorf("failed to install '%s': %w", dnfUtilsPackageName, err)
+			err = fmt.Errorf("failed to install '%s':\n%w", dnfUtilsPackageName, err)
 		}
 		return err
 	})
 	if err != nil {
-		err = fmt.Errorf("failed to install '%s' in chroot: %w", dnfUtilsPackageName, err)
+		err = fmt.Errorf("failed to install '%s' in chroot:\n%w", dnfUtilsPackageName, err)
 		queryChroot.Close(false)
 		return
 	}
@@ -231,7 +231,7 @@ func getRepoPackages(repoUrl string) (packages []string, err error) {
 	// We want to avoid using the same repo name for each repoUrl, so we generate a random name
 	randomName, err := randomization.RandomString(randomNameLength, randomization.LegalCharactersAlphaNum)
 	if err != nil {
-		err = fmt.Errorf("failed to generate random string: %w", err)
+		err = fmt.Errorf("failed to generate random string:\n%w", err)
 		return
 	}
 	repoPathArg := fmt.Sprintf("--repofrompath=mariner-precache-%s,%s", randomName, repoUrl)
@@ -245,7 +245,7 @@ func getRepoPackages(repoUrl string) (packages []string, err error) {
 	// Run the repoquery command
 	err = shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, true, reqoqueryTool, finalArgList...)
 	if err != nil {
-		err = fmt.Errorf("failed to run repoquery command: %w", err)
+		err = fmt.Errorf("failed to run repoquery command:\n%w", err)
 		return
 	}
 
@@ -399,7 +399,7 @@ func writeSummaryFile(summaryFile string, downloadedPackages []string) (err erro
 	logger.Log.Infof("Writing summary file to '%s'", summaryFile)
 	err = file.WriteLines(downloadedPackages, "\n", summaryFile)
 	if err != nil {
-		err = fmt.Errorf("failed to write pre-caching summary file: %w", err)
+		err = fmt.Errorf("failed to write pre-caching summary file:\n%w", err)
 		return
 	}
 	return
