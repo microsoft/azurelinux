@@ -321,7 +321,7 @@ func monitorProgress(total int, results chan downloadResult, doneChannel chan st
 				logger.Log.Warnf("Failed to download: %s", result.pkgName)
 				failed++
 			case donwloadResultTypeUnavailable:
-				logger.Log.Warnf("'%s' not found in any repos", result.pkgName)
+				logger.Log.Warnf("Could not find '%s' in any repos", result.pkgName)
 				unavailable++
 			}
 		case <-doneChannel:
