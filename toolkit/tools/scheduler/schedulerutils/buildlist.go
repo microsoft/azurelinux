@@ -161,8 +161,8 @@ func filterLocalPackagesOnly(packageVersionsInConfig []*pkgjson.PackageVer, depe
 
 		// A pkgNode for a local package has the following characteristics:
 		// 1) The pkgNode exists in the graph (is not nil).
-		// 2) The pkgNode doesn't have the 'StateUnresolved' or 'StateCached' state. These are reserved for external dependencies nodes.
-		if pkgNode != nil && pkgNode.RunNode.State != pkggraph.StateUnresolved && pkgNode.RunNode.State != pkggraph.StateCached {
+		// 2) The pkgNode has a build node. External packages will only have a run node.
+		if pkgNode != nil && pkgNode.BuildNode != nil {
 			filteredPackages = append(filteredPackages, pkgVer)
 		} else {
 			logger.Log.Debugf("Found external package to filter out: %v.", pkgVer)

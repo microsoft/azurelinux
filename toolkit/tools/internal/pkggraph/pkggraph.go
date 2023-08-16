@@ -173,6 +173,19 @@ func (n NodeType) String() string {
 	}
 }
 
+func (n *LookupNode) PackageVer() (packageVer *pkgjson.PackageVer) {
+	switch {
+	case n.RunNode != nil:
+		return n.RunNode.VersionedPkg
+	case n.TestNode != nil:
+		return n.TestNode.VersionedPkg
+	case n.BuildNode != nil:
+		return n.BuildNode.VersionedPkg
+	}
+
+	return nil
+}
+
 // DOTColor returns the graphviz color to set a node to
 func (n *PkgNode) DOTColor() string {
 	switch n.State {
@@ -222,29 +235,19 @@ func NewPkgGraph() *PkgGraph {
 func (g *PkgGraph) initLookup() {
 	g.nodeLookup = make(map[string][]*LookupNode)
 
-	// Scan all nodes, start with only the run and test nodes to properly initialize the lookup structures
-	// (they always expect a run or test node to be present)
-	remainingLookupNodes := []*PkgNode{}
 	for _, n := range graph.NodesOf(g.Nodes()) {
-		pkgNode := n.(*PkgNode)
-		if pkgNode.Type == TypeLocalRun || pkgNode.Type == TypeRemoteRun || pkgNode.Type == TypeTest {
-			g.addToLookup(pkgNode, true)
-		} else if lookupNodesTypes[pkgNode.Type] {
-			remainingLookupNodes = append(remainingLookupNodes, pkgNode)
-		}
+		g.addToLookup(n.(*PkgNode), true)
 	}
 
-	// Now run again for other nodes we want to track
-	for _, pkgNode := range remainingLookupNodes {
-		g.addToLookup(pkgNode, true)
-	}
-
-	// Sort each of the lookup lists from lowest version to highest version. The RunNode is always guaranteed to be
+	// Sort each of the lookup lists from lowest version to highest version. The RunNode or TestNode is always expected to be
 	// a valid reference while BuildNode may be nil.
 	for idx := range g.nodeLookup {
-		// Validate the lookup table is well formed. Pure meta nodes created by cycles may, in some cases, create
-		// build nodes which have no associated run node after passing into a subgraph. (The subgraph only requires
-		// one of the cycle members but will get all of their build nodes)
+		// Validate the lookup table is well formed. Cases to consider:
+		// 1. Pure meta nodes created by cycles may, in some cases, create build nodes,
+		//    which have no associated run node after passing into a subgraph.
+		//    The subgraph only requires one of the cycle members but will get all of their build nodes.
+		// 2. Subgraphs for builds, which only require test runs will contain test-build node pairs
+		//    while the run nodes are optional.
 		endOfValidData := 0
 		for _, n := range g.nodeLookup[idx] {
 			if n.RunNode == nil && n.TestNode == nil {
@@ -259,8 +262,8 @@ func (g *PkgGraph) initLookup() {
 		g.nodeLookup[idx] = g.nodeLookup[idx][:endOfValidData]
 
 		sort.Slice(g.nodeLookup[idx], func(i, j int) bool {
-			intervalI, _ := g.nodeLookup[idx][i].RunNode.VersionedPkg.Interval()
-			intervalJ, _ := g.nodeLookup[idx][j].RunNode.VersionedPkg.Interval()
+			intervalI, _ := g.nodeLookup[idx][i].PackageVer().Interval()
+			intervalJ, _ := g.nodeLookup[idx][j].PackageVer().Interval()
 			return intervalI.Compare(&intervalJ) < 0
 		})
 	}
@@ -375,8 +378,8 @@ func (g *PkgGraph) addToLookup(pkgNode *PkgNode, deferSort bool) (err error) {
 	// Sort the updated list unless we are deferring until all nodes are added
 	if !deferSort {
 		sort.Slice(g.lookupTable()[pkgName], func(i, j int) bool {
-			intervalI, _ := g.lookupTable()[pkgName][i].RunNode.VersionedPkg.Interval()
-			intervalJ, _ := g.lookupTable()[pkgName][j].RunNode.VersionedPkg.Interval()
+			intervalI, _ := g.lookupTable()[pkgName][i].PackageVer().Interval()
+			intervalJ, _ := g.lookupTable()[pkgName][j].PackageVer().Interval()
 			return intervalI.Compare(&intervalJ) < 0
 		})
 	}
@@ -529,7 +532,7 @@ func (g *PkgGraph) FindDoubleConditionalPkgNodeFromPkg(pkgVer *pkgjson.PackageVe
 	bestLocalNode = nil
 	packageNodes := g.lookupTable()[pkgVer.Name]
 	for _, node := range packageNodes {
-		nodeInterval, err = getLookupNodeInterval(node)
+		nodeInterval, err = node.PackageVer().Interval()
 		if err != nil {
 			return
 		}
@@ -568,7 +571,7 @@ func (g *PkgGraph) FindExactPkgNodeFromPkg(pkgVer *pkgjson.PackageVer) (lookupEn
 	packageNodes := g.lookupTable()[pkgVer.Name]
 
 	for _, node := range packageNodes {
-		nodeInterval, err = getLookupNodeInterval(node)
+		nodeInterval, err = node.PackageVer().Interval()
 		if err != nil {
 			return
 		}
@@ -1436,7 +1439,7 @@ func (g *PkgGraph) removePkgNodeFromLookup(pkgNode *PkgNode) {
 	lookupSlice := g.lookupTable()[pkgName]
 
 	for i, lookupNode := range lookupSlice {
-		if lookupNode.BuildNode == pkgNode || lookupNode.RunNode == pkgNode {
+		if lookupNode.BuildNode == pkgNode || lookupNode.RunNode == pkgNode || lookupNode.TestNode == pkgNode {
 			g.lookupTable()[pkgName] = append(lookupSlice[:i], lookupSlice[i+1:]...)
 			break
 		}
@@ -1526,17 +1529,4 @@ func findMissingFiles(filePaths []string) (missingFiles []string) {
 	}
 
 	return
-}
-
-func getLookupNodeInterval(node *LookupNode) (nodeInterval pkgjson.PackageVerInterval, err error) {
-	if node.RunNode == nil && node.TestNode == nil {
-		err = fmt.Errorf("found orphaned build node %s for name %s", node.BuildNode, node.BuildNode.VersionedPkg.Name)
-		return
-	}
-
-	if node.RunNode != nil {
-		return node.RunNode.VersionedPkg.Interval()
-	}
-
-	return node.TestNode.VersionedPkg.Interval()
 }
