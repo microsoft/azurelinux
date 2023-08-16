@@ -1014,6 +1014,13 @@ func InstallGrubCfg(installRoot, rootDevice, bootUUID, bootPrefix string, encryp
 		return
 	}
 
+	// Configure FIPS
+	err = setGrubCfgFIPS(bootUUID, installGrubCfgFile, kernelCommandLine)
+	if err != nil {
+		logger.Log.Warnf("Failed to set FIPS in grub.cfg: %v", err)
+		return
+	}
+
 	err = setGrubCfgCGroup(installGrubCfgFile, kernelCommandLine)
 	if err != nil {
 		logger.Log.Warnf("Failed to set CGroup configuration in grub.cfg: %v", err)
@@ -2035,6 +2042,27 @@ func setGrubCfgSELinux(grubPath string, kernelCommandline configuration.KernelCo
 		logger.Log.Warnf("Failed to set grub.cfg's SELinux setting: %v", err)
 	}
 
+	return
+}
+
+func setGrubCfgFIPS(bootUUID, grubPath string, kernelCommandline configuration.KernelCommandLine) (err error) {
+	const (
+		enableFIPSPattern = "{{.FIPS}}"
+		enableFIPS        = "fips=1"
+		bootPrefix        = "boot="
+	)
+
+	var fips string
+
+	// If EnableFIPS is set, add fips=1 and set bootuuid in final kernel cmdline
+	if kernelCommandline.EnableFIPS {
+		fips = fmt.Sprintf("%s %s%s", enableFIPS, bootPrefix, bootUUID)
+		logger.Log.Debugf("Adding EnableFIPS('%s') to '%s'", fips, grubPath)
+		err = sed(enableFIPSPattern, fips, kernelCommandline.GetSedDelimeter(), grubPath)
+		if err != nil {
+			logger.Log.Warnf("Failed to set grub.cfg's EnableFIPS setting: %v", err)
+		}
+	}
 	return
 }
 
