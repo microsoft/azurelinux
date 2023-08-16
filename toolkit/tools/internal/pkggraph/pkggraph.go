@@ -529,12 +529,7 @@ func (g *PkgGraph) FindDoubleConditionalPkgNodeFromPkg(pkgVer *pkgjson.PackageVe
 	bestLocalNode = nil
 	packageNodes := g.lookupTable()[pkgVer.Name]
 	for _, node := range packageNodes {
-		if node.RunNode == nil && node.TestNode == nil {
-			err = fmt.Errorf("found orphaned build node '%s' for name '%s'", node.BuildNode, pkgVer.Name)
-			return
-		}
-
-		nodeInterval, err = node.RunNode.VersionedPkg.Interval()
+		nodeInterval, err = getLookupNodeInterval(node)
 		if err != nil {
 			return
 		}
@@ -573,16 +568,7 @@ func (g *PkgGraph) FindExactPkgNodeFromPkg(pkgVer *pkgjson.PackageVer) (lookupEn
 	packageNodes := g.lookupTable()[pkgVer.Name]
 
 	for _, node := range packageNodes {
-		if node.RunNode == nil && node.TestNode == nil {
-			err = fmt.Errorf("found orphaned build node %s for name %s", node.BuildNode, pkgVer.Name)
-			return
-		}
-
-		if node.RunNode != nil {
-			nodeInterval, err = node.RunNode.VersionedPkg.Interval()
-		} else {
-			nodeInterval, err = node.TestNode.VersionedPkg.Interval()
-		}
+		nodeInterval, err = getLookupNodeInterval(node)
 		if err != nil {
 			return
 		}
@@ -1540,4 +1526,17 @@ func findMissingFiles(filePaths []string) (missingFiles []string) {
 	}
 
 	return
+}
+
+func getLookupNodeInterval(node *LookupNode) (nodeInterval pkgjson.PackageVerInterval, err error) {
+	if node.RunNode == nil && node.TestNode == nil {
+		err = fmt.Errorf("found orphaned build node %s for name %s", node.BuildNode, node.BuildNode.VersionedPkg.Name)
+		return
+	}
+
+	if node.RunNode != nil {
+		return node.RunNode.VersionedPkg.Interval()
+	}
+
+	return node.TestNode.VersionedPkg.Interval()
 }
