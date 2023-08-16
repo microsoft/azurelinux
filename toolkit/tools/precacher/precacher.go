@@ -79,32 +79,29 @@ func main() {
 	timestamp.BeginTiming("precacher", *timestampFile)
 	defer timestamp.CompleteTiming()
 
-	// Get the state of the current repo from a snapshot
 	rpmSnapshot, err := rpmSnapshotFromFile(*snapshot)
 	if err != nil {
 		logger.PanicOnError(err)
 	}
 
-	// See what is available online from the upstream repos
-	availablePackages, err := getAllRepoData(*repoUrls, *workerTar, *buildDir)
+	packagesAvailableFromRepos, err := getAllRepoData(*repoUrls, *workerTar, *buildDir)
 	if err != nil {
 		logger.PanicOnError(err)
 	}
 
-	logger.Log.Infof("Pre-caching: Found %d available packages", len(availablePackages))
+	logger.Log.Infof("Found %d available packages", len(packagesAvailableFromRepos))
 	if logger.Log.IsLevelEnabled(logrus.DebugLevel) {
-		for _, pkg := range availablePackages {
+		for _, pkg := range packagesAvailableFromRepos {
 			logger.Log.Debugf("Found package: %s", pkg)
 		}
 	}
 
-	// For each package in the snapshot, check if it is available online and try to download it
-	downloadedPackages, err := downloadMissingPackages(rpmSnapshot, availablePackages, *outDir, *concurrentNetOps)
+	downloadedPackages, err := downloadMissingPackages(rpmSnapshot, packagesAvailableFromRepos, *outDir, *concurrentNetOps)
 	if err != nil {
 		logger.PanicOnError(err)
 	}
 
-	logger.Log.Infof("Pre-caching: Downloaded %d packages into the cache", len(downloadedPackages))
+	logger.Log.Infof("Downloaded %d packages into the cache", len(downloadedPackages))
 	err = writeSummaryFile(*outputSummaryFile, downloadedPackages)
 	if err != nil {
 		logger.PanicOnError(err)
@@ -133,7 +130,7 @@ func getAllRepoData(repoUrls []string, workerTar, buildDir string) (namesToUrls 
 		return nil, err
 	}
 	if !exists {
-		logger.Log.Infof("Pre-caching: Creating 1st time chroot directory %s", buildDir)
+		logger.Log.Infof("Creating 1st time chroot directory %s", buildDir)
 		err = os.MkdirAll(buildDir, 0755)
 		if err != nil {
 			err = fmt.Errorf("failed to create directory %s: %w", buildDir, err)
@@ -182,7 +179,7 @@ func createChroot(workerTar, chrootDir string, leaveChrootOnDisk bool) (queryChr
 	)
 	timestamp.StartEvent("creating repoquery chroot", nil)
 	defer timestamp.StopEvent(nil)
-	logger.Log.Info("Pre-cache: Creating chroot for repoquery")
+	logger.Log.Info("Creating chroot for repoquery")
 
 	queryChroot = safechroot.NewChroot(chrootDir, true)
 	err = queryChroot.Initialize(workerTar, nil, nil)
@@ -203,7 +200,7 @@ func createChroot(workerTar, chrootDir string, leaveChrootOnDisk bool) (queryChr
 	}
 
 	// Install the repoquery package from upstream
-	logger.Log.Infof("Pre-cache: Installing '%s' package to get 'repoquery' command", dnfUtilsPackageName)
+	logger.Log.Infof("Installing '%s' package to get 'repoquery' command", dnfUtilsPackageName)
 	queryChroot.Run(func() error {
 		_, err = installutils.TdnfInstall(dnfUtilsPackageName, rootDir)
 		if err != nil {
@@ -229,7 +226,7 @@ func getRepoPackages(repoUrl string) (packages []string, err error) {
 		queryCommonArgList = []string{"-y", "-q", "--disablerepo=*", "-a", "--qf", "%{location}"}
 	)
 
-	logger.Log.Infof("Pre-cache: Getting package data from %s", repoUrl)
+	logger.Log.Infof("Getting package data from %s", repoUrl)
 
 	// We want to avoid using the same repo name for each repoUrl, so we generate a random name
 	randomName, err := randomization.RandomString(randomNameLength, randomization.LegalCharactersAlphaNum)
@@ -315,7 +312,7 @@ func monitorProgress(total int, results chan downloadResult, doneChannel chan st
 			case downloadResultTypeFailure:
 				failed++
 			case donwloadResultTypeUnavailable:
-				logger.Log.Warnf("Pre-caching: '%s' failed, not found in any repos", result.pkgName)
+				logger.Log.Warnf("'%s' failed, not found in any repos", result.pkgName)
 				unavailable++
 			}
 		case <-doneChannel:
@@ -381,7 +378,7 @@ func precachePackage(pkg *repocloner.RepoPackage, availablePackages map[string]s
 	err := retry.Run(func() error {
 		err := network.DownloadFile(url, fullFilePath, nil, nil)
 		if err != nil {
-			logger.Log.Warnf("Pre-caching: Attempt to download (%s) failed. Error: %s", url, err)
+			logger.Log.Warnf("Attempt to download (%s) failed. Error: %s", url, err)
 		}
 		return err
 	}, downloadRetryAttempts, downloadRetryDuration)
@@ -399,7 +396,7 @@ func precachePackage(pkg *repocloner.RepoPackage, availablePackages map[string]s
 }
 
 func writeSummaryFile(summaryFile string, downloadedPackages []string) (err error) {
-	logger.Log.Infof("Pre-caching: Writing summary file to '%s'", summaryFile)
+	logger.Log.Infof("Writing summary file to '%s'", summaryFile)
 	err = file.WriteLines(downloadedPackages, "\n", summaryFile)
 	if err != nil {
 		err = fmt.Errorf("failed to write pre-caching summary file: %w", err)
