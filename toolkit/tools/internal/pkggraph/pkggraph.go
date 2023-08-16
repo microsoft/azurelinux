@@ -1506,7 +1506,7 @@ func (g *PkgGraph) fixCyclesWithExistingRPMS(trimmedCycle []*PkgNode, resolveCyc
 		currentNode = previousNode
 	}
 
-	return fmt.Errorf("Cycle can't be resolved with prebuilt/PMC RPMs. unresolvable")
+	return fmt.Errorf("cycle can't be resolved with prebuilt/PMC RPMs. Unresolvable")
 }
 
 // removePkgNodeFromLookup removes a node from the lookup tables.
