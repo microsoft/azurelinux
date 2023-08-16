@@ -83,15 +83,11 @@ func main() {
 	}
 
 	var cloner *rpmrepocloner.RpmRepoCloner = nil
-	/*
-		disableUpstreamRepos is set to false because we want to download packages from upstream
-	*/
 	if *resolveCyclesFromUpstream {
 		cloner, err = rpmrepocloner.ConstructCloner(*outDir, *tmpDir, *workerTar, *existingRpmsDir, *existingToolchainRpmDir, *tlsClientCert, *tlsClientKey, *repoFiles)
 		if err != nil {
 			logger.Log.Panic(err)
 		}
-		/*setting repoFlags in cloner usePreviewRepo, disableUpstreamRepos=false*/
 		enabledRepos := rpmrepocloner.RepoFlagAll
 		if !*usePreviewRepo {
 			enabledRepos = enabledRepos & ^rpmrepocloner.RepoFlagPreview
