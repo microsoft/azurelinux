@@ -13233,8 +13233,8 @@
         "type": "other",
         "other": {
           "name": "moby-cli",
-          "version": "20.10.24",
-          "downloadUrl": "https://github.com/docker/cli/archive/v20.10.24.tar.gz"
+          "version": "20.10.25",
+          "downloadUrl": "https://github.com/docker/cli/archive/v20.10.25.tar.gz"
         }
       }
     },
