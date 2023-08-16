@@ -12,7 +12,7 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.19.12
+Version:        1.20.7
 Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
@@ -119,6 +119,10 @@ fi
 %{_bindir}/*
 
 %changelog
+* Tue Aug 15 2023 Muhammad Falak <mwani@microsoft.com> - 1.20.7-1
+- Bump version to 1.20.7
+- Introduce patch to permit requests with invalid host header
+
 * Tue Aug 15 2023 Muhammad Falak <mwani@microsoft.com> - 1.19.12-1
 - Auto-upgrade to 1.19.12 to address CVE-2023-29409
 - Introduce patch to permit requests with invalid header
