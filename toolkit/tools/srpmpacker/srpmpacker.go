@@ -976,7 +976,7 @@ func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir st
 			}
 
 			return err
-		}, downloadRetryAttempts, downloadRetryDuration, failureBackoffBase)
+		}, downloadRetryAttempts, downloadRetryDuration, failureBackoffBase, cancel)
 
 		if netOpsSemaphore != nil {
 			// Clear the channel to allow another operation to start

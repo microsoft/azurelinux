@@ -4,9 +4,12 @@
 package retry
 
 import (
+	"fmt"
 	"math"
 	"time"
 )
+
+var ErrRetryCancelled = fmt.Errorf("retry cancelled")
 
 // calculateDelay calculates the delay for the given failure count, sleep duration, and backoff exponent base.
 // If the base is positive, it will calculate an exponential backoff.
@@ -32,12 +35,27 @@ func calculateLinearDelay(failCount int, sleep time.Duration) time.Duration {
 	return sleep * time.Duration(failCount)
 }
 
+// backoffSleep sleeps for the given duration, unless the cancelSignal is triggered first. The cancelSignal may be nil
+// in which case the sleep will always complete.
+func backoffSleep(delay time.Duration, cancelSignal <-chan struct{}) (cancelled bool) {
+	select {
+	case <-time.After(delay):
+	case <-cancelSignal:
+		cancelled = true
+	}
+	return
+}
+
 // runWithBackoffInternal runs function up to 'attempts' times, waiting delayCalc(failCount) before each i-th attempt.
 // delayCalc(0) is expected to return 0.
-func runWithBackoffInternal(function func() error, delayCalc func(failCount int) time.Duration, attempts int) (err error) {
+func runWithBackoffInternal(function func() error, delayCalc func(failCount int) time.Duration, attempts int, cancelSignal <-chan struct{}) (err error) {
 	for failures := 0; failures < attempts; failures++ {
 		delayTime := delayCalc(failures)
-		time.Sleep(delayTime)
+		cancelled := backoffSleep(delayTime, cancelSignal)
+		if cancelled {
+			err = fmt.Errorf("%w after %d tries", ErrRetryCancelled, failures)
+			break
+		}
 		if err = function(); err == nil {
 			break
 		}
@@ -47,14 +65,21 @@ func runWithBackoffInternal(function func() error, delayCalc func(failCount int)
 
 // Run runs function up to 'attempts' times, waiting i * sleep duration before each i-th attempt.
 func Run(function func() error, attempts int, sleep time.Duration) (err error) {
-	return runWithBackoffInternal(function, func(failCount int) time.Duration {
-		return calculateLinearDelay(failCount, sleep)
-	}, attempts)
+	return RunWithLinearBackoff(function, attempts, sleep, nil)
 }
 
-// RunWithExpBackoff runs function up to 'attempts' times, waiting 'backoffExponentBase^(i-1) * sleep' duration before each i-th attempt.
-func RunWithExpBackoff(function func() error, attempts int, sleep time.Duration, backoffExponentBase float64) (err error) {
+// RunWithLinearBackoff runs function up to 'attempts' times, waiting i * sleep duration before each i-th attempt. An
+// optional cancelSignal can be provided to cancel the retry loop immediately.
+func RunWithLinearBackoff(function func() error, attempts int, sleep time.Duration, cancelSignal <-chan struct{}) (err error) {
+	return runWithBackoffInternal(function, func(failCount int) time.Duration {
+		return calculateLinearDelay(failCount, sleep)
+	}, attempts, cancelSignal)
+}
+
+// RunWithExpBackoff runs function up to 'attempts' times, waiting 'backoffExponentBase^(i-1) * sleep' duration before
+// each i-th attempt. An optional cancelSignal can be provided to cancel the retry loop immediately.
+func RunWithExpBackoff(function func() error, attempts int, sleep time.Duration, backoffExponentBase float64, cancelSignal <-chan struct{}) (err error) {
 	return runWithBackoffInternal(function, func(failCount int) time.Duration {
 		return calculateExpDelay(failCount, sleep, backoffExponentBase)
-	}, attempts)
+	}, attempts, cancelSignal)
 }
