@@ -21,6 +21,7 @@ Group:          System Environment/Security
 URL:            https://golang.org
 Source0:        https://golang.org/dl/go%{version}.src.tar.gz
 Source1:        https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
+Source2:        https://dl.google.com/go/go1.19.12.src.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
 Patch1:         permit-requests-with-invalid-header.patch
 Obsoletes:      %{name} < %{version}
@@ -47,6 +48,19 @@ CGO_ENABLED=0 ./make.bash
 popd
 mv -v %{_topdir}/BUILD/go-bootstrap %{_libdir}/golang
 export GOROOT=%{_libdir}/golang
+
+# Use go1.4 bootstrap to compile go1.19.12 (bootstrap)
+export GOROOT_BOOTSTRAP=%{_libdir}/golang
+mkdir -p %{_topdir}/BUILD/go1.19.12
+tar xf %{SOURCE2} -C %{_topdir}/BUILD/go1.19.12 --strip-components=1
+pushd %{_topdir}/BUILD/go1.19.12/src
+CGO_ENABLED=0 ./make.bash
+popd
+
+# Nuke the older go1.4 bootstrap
+rm -rf %{_libdir}/golang
+# Make go1.19.12 as the new bootstrapper
+mv -v %{_topdir}/BUILD/go1.19.12 %{_libdir}/golang
 
 # Build current go version
 export GOHOSTOS=linux
