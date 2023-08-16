@@ -18,8 +18,7 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/bkircher/python-rpm-spec
-#Source0:       https://github.com/bkircher/python-rpm-spec/archive/refs/tags/v0.14.1.tar.gz
-Source0:        python-rpm-spec-v0.14.1.tar.gz   
+Source0:       https://github.com/bkircher/python-rpm-spec/archive/refs/tags/v0.14.1.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildArch:      noarch
 %description
