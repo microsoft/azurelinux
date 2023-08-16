@@ -1488,7 +1488,7 @@ func (g *PkgGraph) fixCyclesWithExistingRPMS(trimmedCycle []*PkgNode, resolveCyc
 
 	if !ignoreVersionToResolveSelfDep || !resolveCyclesFromUpstream {
 		logger.Log.Debugf("Cycle can't be fixed using pre-built SRPMs.")
-		return
+		return fmt.Errorf("Cycle can't be fixed using pre-built SRPMs. unresolvable")
 	}
 
 	logger.Log.Debug("Trying to resolve cycle by searching packages in PMC after ignoring package version.")
