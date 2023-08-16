@@ -115,7 +115,7 @@ fi
 %{_bindir}/*
 
 %changelog
-* Tue Aug 16 2023 Brian Fjeldstad <bfjelds@microsoft.com> - 1.19.12-2
+* Wed Aug 16 2023 Brian Fjeldstad <bfjelds@microsoft.com> - 1.19.12-2
 - Upgrade to 1.19.12 to fix CVE-2023-39533
 
 * Tue Jun 06 2023 Bala <balakumaran.kannan@microsoft.com> - 1.19.10-1
