@@ -38,6 +38,7 @@ Provides:       libubsan-static%{?_isa} = %{version}-%{release}
 Provides:       libquadmath = %{version}-%{release}
 Provides:       libquadmath-devel = %{version}-%{release}
 Provides:       libquadmath-devel%{?_isa} = %{version}-%{release}
+# no change
 #%if %{with_check}
 #BuildRequires:  autogen
 #BuildRequires:  dejagnu
