@@ -19,6 +19,7 @@ var (
 		ExtraCommandLine: "param1=value param2=\"value2 value3\"",
 		SELinux:          "permissive",
 		CGroup:           "version_two",
+		EnableFIPS:       true,
 	}
 	invalidExtraCommandLine     = "invalid=`delim`"
 	validExtraComandLineJSON    = `{"ImaPolicy": ["tcb"], "ExtraCommandLine": "param1=value param2=\"value2 value3\"", "SELinux": "permissive", "CGroup": "version_two"}`
