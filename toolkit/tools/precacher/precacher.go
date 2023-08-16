@@ -262,7 +262,7 @@ func getRepoPackages(repoUrl string) (packages []string, err error) {
 // outDir. It will return a list of the packages that were downloaded. It will use concurrentNetOps to limit the number of
 // concurrent network operations used to download the missing packages. It will also monitor the results and print periodic
 // progress updates to the console.
-func downloadMissingPackages(rpmSnapshot *repocloner.RepoContents, availablePackages map[string]string, outDir string, concurrentNetOps uint) (downloadedPackages []string, err error) {
+func downloadMissingPackages(rpmSnapshot *repocloner.RepoContents, packagesAvailableFromRepos map[string]string, outDir string, concurrentNetOps uint) (downloadedPackages []string, err error) {
 	timestamp.StartEvent("download missing packages", nil)
 	defer timestamp.StopEvent(nil)
 
@@ -279,7 +279,7 @@ func downloadMissingPackages(rpmSnapshot *repocloner.RepoContents, availablePack
 	// Each worker is responsible for removing itself from the wait group once done.
 	for _, pkg := range rpmSnapshot.Repo {
 		wg.Add(1)
-		go precachePackage(pkg, availablePackages, outDir, wg, results, netOpsSemaphore)
+		go precachePackage(pkg, packagesAvailableFromRepos, outDir, wg, results, netOpsSemaphore)
 	}
 
 	// Wait for all the workers to finish and signal the main thread when we are done
@@ -318,9 +318,10 @@ func monitorProgress(total int, results chan downloadResult, doneChannel chan st
 				downloadedPackages = append(downloadedPackages, result.pkgName)
 				downloaded++
 			case downloadResultTypeFailure:
+				logger.Log.Warnf("'%s' failed to download: %s", result.pkgName)
 				failed++
 			case donwloadResultTypeUnavailable:
-				logger.Log.Warnf("'%s' failed, not found in any repos", result.pkgName)
+				logger.Log.Warnf("'%s' not found in any repos", result.pkgName)
 				unavailable++
 			}
 		case <-doneChannel:
@@ -340,11 +341,17 @@ func monitorProgress(total int, results chan downloadResult, doneChannel chan st
 }
 
 // precachePackage will attempt to download the specified package. It will return a downloadResult struct via the results.
-// This function runs with best effort, so it will return a result (of type downloadResultTypeFailure) if any error occurs
-// rather than returning an error. The caller is expected to have added to the provided wait group, while this function is
+// This function runs with best effort, so it will return all errors via the results channel. rather than returning an error.
+// The results may be one of:
+//   - downloadResultTypeSuccess: The package was downloaded successfully
+//   - downloadResultTypeFailure: The package failed to download (ie error occured)
+//   - downloadResultTypeSkipped: The package was not downloaded because it already exists
+//   - donwloadResultTypeUnavailable: The package was not downloaded because it was not found in any of the repos
+//
+// The caller is expected to have added to the provided wait group, while this function is
 // responsible for removing itself from the wait group. As much processing as possible is done before acquiring the
 // network operations semaphore to minimize the time spent holding it.
-func precachePackage(pkg *repocloner.RepoPackage, availablePackages map[string]string, outDir string, wg *sync.WaitGroup, results chan<- downloadResult, netOpsSemaphore chan struct{}) {
+func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map[string]string, outDir string, wg *sync.WaitGroup, results chan<- downloadResult, netOpsSemaphore chan struct{}) {
 	const (
 		downloadRetryAttempts = 2
 		downloadRetryDuration = time.Second
@@ -368,7 +375,7 @@ func precachePackage(pkg *repocloner.RepoPackage, availablePackages map[string]s
 	}
 
 	// Get the url for the package, or bail out if it is not available
-	url, ok := availablePackages[pkgName]
+	url, ok := packagesAvailableFromRepos[pkgName]
 	if !ok {
 		result.resultType = donwloadResultTypeUnavailable
 		results <- result
