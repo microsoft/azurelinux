@@ -94,7 +94,7 @@ func (g *GraphBuildState) ActiveBuilds() map[int64]*BuildRequest {
 // or nil if the SRPM is not among the active builds.
 func (g *GraphBuildState) ActiveBuildFromSRPM(srpmFileName string) *BuildRequest {
 	for _, buildRequest := range g.activeBuilds {
-		if buildRequest.Node.Type == pkggraph.TypeLocalBuild && buildRequest.Node.SrpmPath == srpmFileName {
+		if buildRequest.Node.Type == pkggraph.TypeLocalBuild && buildRequest.Node.SRPMFileName() == srpmFileName {
 			return buildRequest
 		}
 	}
