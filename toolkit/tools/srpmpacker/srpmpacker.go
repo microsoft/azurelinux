@@ -7,6 +7,7 @@ import (
 	"bufio"
 	"crypto/tls"
 	"crypto/x509"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -96,6 +97,8 @@ type specState struct {
 	toPack   bool
 	err      error
 }
+
+var errPackerCancelReceived = fmt.Errorf("packer cancel signal received")
 
 var (
 	app = kingpin.New("srpmpacker", "A tool to package a SRPM.")
@@ -599,6 +602,7 @@ func packSRPMs(specStates []*specState, distTag, buildDir string, templateSrcCon
 		if result.err != nil {
 			logger.Log.Errorf("Failed to pack (%s). Error: %s", result.specFile, result.err)
 			err = result.err
+			logger.Log.Warn("Cancelling outstanding workers")
 			close(cancel)
 			break
 		}
@@ -881,7 +885,12 @@ func hydrateFiles(fileTypeToHydrate fileType, specFile, workingDir string, srcCo
 	}
 
 	if hydrateRemotely && srcConfig.sourceURL != "" {
-		hydrateFromRemoteSource(fileHydrationState, newSourceDir, srcConfig, skipSignatureHandling, currentSignatures, cancel, netOpsSemaphore)
+		err = hydrateFromRemoteSource(fileHydrationState, newSourceDir, srcConfig, skipSignatureHandling, currentSignatures, cancel, netOpsSemaphore)
+		// Most errors are non-fatal and are handled inside the function (encoded inside fileHydrationState), cancellation
+		// however will return and error that should cause an early exit.
+		if err != nil {
+			return
+		}
 	}
 
 	for fileNeeded, alreadyHydrated := range fileHydrationState {
@@ -940,7 +949,7 @@ func hydrateFromLocalSource(fileHydrationState map[string]bool, newSourceDir str
 
 // hydrateFromRemoteSource will update fileHydrationState.
 // Will alter `currentSignatures`.
-func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir string, srcConfig sourceRetrievalConfiguration, skipSignatureHandling bool, currentSignatures map[string]string, cancel <-chan struct{}, netOpsSemaphore chan struct{}) {
+func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir string, srcConfig sourceRetrievalConfiguration, skipSignatureHandling bool, currentSignatures map[string]string, cancel <-chan struct{}, netOpsSemaphore chan struct{}) (err error) {
 	const (
 		// With 5 attempts, initial delay of 1 second, and a backoff factor of 2.0 the total time spent retrying will be
 		// ~30 seconds.
@@ -965,11 +974,12 @@ func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir st
 			case netOpsSemaphore <- struct{}{}:
 			case <-cancel:
 				logger.Log.Debug("Cancellation signal received at network operation semaphore")
+				err = errPackerCancelReceived
 				return
 			}
 		}
 
-		err := retry.RunWithExpBackoff(func() error {
+		err = retry.RunWithExpBackoff(func() error {
 			err := network.DownloadFile(url, destinationFile, srcConfig.caCerts, srcConfig.tlsCerts)
 			if err != nil {
 				logger.Log.Warnf("Failed to download (%s). Error: %s", url, err)
@@ -984,6 +994,11 @@ func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir st
 		}
 
 		if err != nil {
+			// We may intentionally fail early due to a cancellation signal, stop immediately if that is the case.
+			if errors.Is(err, retry.ErrRetryCancelled) {
+				err = errPackerCancelReceived
+				return
+			}
 			continue
 		}
 
@@ -1006,6 +1021,8 @@ func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir st
 		fileHydrationState[fileName] = true
 		logger.Log.Debugf("Hydrated (%s) from (%s)", fileName, url)
 	}
+
+	return nil
 }
 
 // validateSignature will compare the SHA256 of the file at path against the signature for it in srcConfig.signatureLookup
