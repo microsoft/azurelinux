@@ -82,7 +82,8 @@ sed -i 's/GENERATE_QHP\ =\ yes/GENERATE_QHP\ =\ no/g' doc/Doxyfile.in
 
 %changelog
 * Wed Aug 16 2023 Archana Choudhary <archana1@microsoft.com> - 0.9.7-2
-- Initial cbl mariner import
+- Initial CBL-Mariner import from Fedora 37 (license: MIT).
+- License verified.
 
 * Fri Oct 07 2022 Sandro Mani <manisandro@gmail.com> - 0.9.7-1
 - Update to 0.9.7
