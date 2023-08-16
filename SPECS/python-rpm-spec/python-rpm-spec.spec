@@ -26,6 +26,8 @@ RPMs are build from a package's sources along with a spec file. The spec file co
 %prep
 %setup -q
 
+%build
+
 %install
 mkdir -p %{buildroot}/%{python3_sitelib}/
 cp -r pyrpm %{buildroot}/%{python3_sitelib}/
