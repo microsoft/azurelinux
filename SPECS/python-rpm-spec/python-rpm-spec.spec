@@ -1,14 +1,3 @@
-# sitelib for noarch packages, sitearch for others (remove the unneeded one)
-%{!?__python2: %global __python2 %__python}
-%{!?python2_sitelib: %global python2_sitelib %(%{__python2} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
-%{!?python2_sitearch: %global python2_sitearch %(%{__python2} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(1))")}
-
-%if 0%{?fedora}
-%bcond_without python3
-%else
-%bcond_with python3
-%endif
-
 Name:           python-rpm-spec
 Version:        0.14.1
 Release:        1%{?dist}
@@ -18,14 +7,14 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/bkircher/python-rpm-spec
-Source0:       https://github.com/bkircher/python-rpm-spec/archive/refs/tags/v0.14.1.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/bkircher/python-rpm-spec/archive/refs/tags/v0.14.1.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildArch:      noarch
 %description
 A Python library for parsing RPM spec files.
 
 %package -n       python3-rpm-spec
-Summary:          python-rpm-spec
+Summary:          A Python library for parsing RPM spec files.
 
 %description -n python3-rpm-spec
 python-rpm-spec is a Python library for parsing RPM spec files.
@@ -38,9 +27,9 @@ RPMs are build from a package's sources along with a spec file. The spec file co
 %setup -q
 
 %install
-rm -rf $RPM_BUILD_ROOT
-mkdir -p $RPM_BUILD_ROOT/%{python3_sitelib}/
-cp -r pyrpm $RPM_BUILD_ROOT/%{python3_sitelib}/
+rm -rf %{buildroot}
+mkdir -p %{buildroot}/%{python3_sitelib}/
+cp -r pyrpm %{buildroot}/%{python3_sitelib}/
 
 
 %files -n python3-rpm-spec
@@ -52,3 +41,5 @@ cp -r pyrpm $RPM_BUILD_ROOT/%{python3_sitelib}/
 %changelog
 * Tue Aug 15 2023 Andy Zaugg <azaugg@linkedin.com> - 0.14.1
 - Initial creation of RPM
+- Original version for CBL-Mariner
+- License verified
