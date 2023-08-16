@@ -24055,7 +24055,7 @@
         "other": {
           "name": "python-"rpm-spec,
           "version": "0.14.1",
-          "downloadUrl": ""https://github.com/bkircher/python-rpm-spec/archive/refs/tags/v0.14.1.tar.gz
+          "downloadUrl": "https://github.com/bkircher/python-rpm-spec/archive/refs/tags/v0.14.1.tar.gz"
         }
       }
     },
