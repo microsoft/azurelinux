@@ -144,10 +144,10 @@ func getAllRepoData(repoURLs []string, workerTar, buildDir string) (namesToURLs 
 	}
 	defer queryChroot.Close(leaveChrootOnDisk)
 
-	namesToUrls = make(map[string]string)
+	namesToURLs = make(map[string]string)
 	for _, repoURL := range repoURLs {
 		// Use the chroot to query each repo for the packages it contains
-		var packages []string
+		var packageRepoPaths []string
 		err = queryChroot.Run(func() (chrootErr error) {
 			packageRepoPaths, chrootErr = getPackageRepoPaths(repoURL)
 			return chrootErr
@@ -163,8 +163,8 @@ func getAllRepoData(repoURLs []string, workerTar, buildDir string) (namesToURLs 
 			packageName = strings.TrimSuffix(packageName, ".rpm")
 
 			// We need to prepend the repoURL to the partial URL to get the full URL
-			pkgURL = fmt.Sprintf("%s/%s", repoURL, packageRepoPath)
-			namesToUrls[name] = pkgURL
+			packageRepoPath = fmt.Sprintf("%s/%s", repoURL, packageRepoPath)
+			namesToURLs[packageName] = packageRepoPath
 		}
 	}
 	return
@@ -223,8 +223,8 @@ func createChroot(workerTar, chrootDir string, leaveChrootOnDisk bool) (queryChr
 	return
 }
 
-// getRepoPackages returns a list of packages available in the given repoUrl by running repoquery
-func getRepoPackages(repoUrl string) (packages []string, err error) {
+// getPackageRepoPaths returns a list of packages available in the given repoUrl by running repoquery
+func getPackageRepoPaths(repoUrl string) (packages []string, err error) {
 	const (
 		reqoqueryTool    = "repoquery"
 		randomNameLength = 10
@@ -318,7 +318,7 @@ func monitorProgress(total int, results chan downloadResult, doneChannel chan st
 				downloadedPackages = append(downloadedPackages, result.pkgName)
 				downloaded++
 			case downloadResultTypeFailure:
-				logger.Log.Warnf("'%s' failed to download: %s", result.pkgName)
+				logger.Log.Warnf("Failed to download: %s", result.pkgName)
 				failed++
 			case donwloadResultTypeUnavailable:
 				logger.Log.Warnf("'%s' not found in any repos", result.pkgName)
@@ -410,7 +410,7 @@ func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map
 
 func writeSummaryFile(summaryFile string, downloadedPackages []string) (err error) {
 	logger.Log.Infof("Writing summary file to '%s'", summaryFile)
-	err = file.WriteLines(downloadedPackages, "\n", summaryFile)
+	err = file.WriteLines(downloadedPackages, summaryFile)
 	if err != nil {
 		err = fmt.Errorf("failed to write pre-caching summary file:\n%w", err)
 		return
