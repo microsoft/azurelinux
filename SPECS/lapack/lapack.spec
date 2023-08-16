@@ -31,7 +31,7 @@ provides a number of basic algorithms for numerical algebra.
 Summary:        Numerical linear algebra package libraries
 Name:           lapack
 Version:        3.10.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -58,6 +58,13 @@ Requires:       blas-devel%{?_isa} = %{version}-%{release}
 
 %description devel
 LAPACK development libraries (shared).
+
+%package static
+Summary: LAPACK static libraries
+Requires: lapack-devel%{?_isa} = %{version}-%{release}
+
+%description static
+LAPACK static libraries.
 
 %package -n blas
 Summary:        The Basic Linear Algebra Subprograms library
@@ -108,21 +115,36 @@ This build has 64bit INTEGER support and a symbol name suffix.
 %global optflags %{optflags} -frecursive --no-optimize-sibling-calls
 
 # shared normal
-%cmake -B%{_vpath_builddir} -DBUILD_DEPRECATED=ON -DBUILD_SHARED_LIBS=ON -DLAPACKE=ON -DLAPACKE_WITH_TMG=ON -DCBLAS=ON
+%cmake -DCMAKE_SKIP_RPATH:BOOL=ON -DBUILD_DEPRECATED=ON -DBUILD_SHARED_LIBS=ON -DLAPACKE=ON -DLAPACKE_WITH_TMG=ON -DCBLAS=ON
 %cmake_build
-mv %{_vpath_builddir} %{_vpath_builddir}-SHARED
+mv %_vpath_builddir %_vpath_builddir-SHARED
+
+# static normal
+%cmake -DBUILD_DEPRECATED=ON -DBUILD_SHARED_LIBS=OFF -DLAPACKE=ON -DLAPACKE_WITH_TMG=ON -DCBLAS=ON
+%cmake_build
+mv %_vpath_builddir %_vpath_builddir-STATIC
 
 %if 0%{?arch64}
 # shared 64
-%cmake -B%{_vpath_builddir} -DBUILD_DEPRECATED=ON -DBUILD_SHARED_LIBS=ON -DBUILD_INDEX64=ON -DLAPACKE=OFF -DCBLAS=ON
+%cmake -DCMAKE_SKIP_RPATH:BOOL=ON -DBUILD_DEPRECATED=ON -DBUILD_SHARED_LIBS=ON -DBUILD_INDEX64=ON -DLAPACKE=OFF -DCBLAS=ON
 %cmake_build
-mv %{_vpath_builddir} %{_vpath_builddir}-SHARED64
+mv %_vpath_builddir %_vpath_builddir-SHARED64
+
+# static 64
+%cmake -DBUILD_DEPRECATED=ON -DBUILD_SHARED_LIBS=OFF -DBUILD_INDEX64=ON -DLAPACKE=OFF -DCBLAS=ON
+%cmake_build
+mv %_vpath_builddir %_vpath_builddir-STATIC64
 
 # shared 64 SUFFIX
 sed -i 's|64"|64_"|g' CMakeLists.txt
-%cmake -B%{_vpath_builddir} -DBUILD_DEPRECATED=ON -DBUILD_SHARED_LIBS=ON -DBUILD_INDEX64=ON -DLAPACKE=OFF -DCBLAS=ON
+%cmake -DCMAKE_SKIP_RPATH:BOOL=ON -DBUILD_DEPRECATED=ON -DBUILD_SHARED_LIBS=ON -DBUILD_INDEX64=ON -DLAPACKE=OFF -DCBLAS=ON
 %cmake_build
-mv %{_vpath_builddir} %{_vpath_builddir}-SHARED64SUFFIX
+mv %_vpath_builddir %_vpath_builddir-SHARED64SUFFIX
+
+# static 64 SUFFIX
+%cmake -DBUILD_DEPRECATED=ON -DBUILD_SHARED_LIBS=OFF -DBUILD_INDEX64=ON -DLAPACKE=OFF -DCBLAS=ON
+%cmake_build
+mv %_vpath_builddir %_vpath_builddir-STATIC64SUFFIX
 
 # Undo the 64_ suffix
 sed -i 's|64_"|64"|g' CMakeLists.txt
@@ -133,26 +155,30 @@ cp -p %{SOURCE5} blasqr.ps
 
 %install
 %if 0%{?arch64}
-for t in SHARED SHARED64; do
+for t in SHARED STATIC SHARED64 STATIC64; do
 %else
-for t in SHARED; do
+for t in SHARED STATIC; do
 %endif
-	mv %{_vpath_builddir}-$t %{_vpath_builddir}
+	mv %_vpath_builddir-$t %_vpath_builddir
 	%cmake_install
-	mv %{_vpath_builddir} %{_vpath_builddir}-$t
+	mv %_vpath_builddir %_vpath_builddir-$t
 done
 
 %if 0%{?arch64}
 # Set the suffix
 sed -i 's|64"|64_"|g' CMakeLists.txt
-for t in SHARED64SUFFIX; do
-	mv %{_vpath_builddir}-$t %{_vpath_builddir}
+for t in SHARED64SUFFIX STATIC64SUFFIX; do
+	mv %_vpath_builddir-$t %_vpath_builddir
 	%cmake_install
-	mv %{_vpath_builddir} %{_vpath_builddir}-$t
+	mv %_vpath_builddir %_vpath_builddir-$t
 done
 %endif
 
+install -m0644 %_vpath_builddir-STATICFPIC/lib/liblapack_pic.a %{buildroot}%{_libdir}
 %if 0%{?arch64}
+install -m0644 %_vpath_builddir-STATIC64FPIC/lib/liblapack_pic64.a %{buildroot}%{_libdir}
+install -m0644 %_vpath_builddir-STATIC64SUFFIXFPIC/lib/liblapack_pic64_.a %{buildroot}%{_libdir}
+
 pushd %{buildroot}%{_libdir}
 for name in blas cblas lapack; do
 	for i in `readelf -Ws lib${name}64_.so.%{version} | awk '{print $8}' | grep -v GLIBC |grep -v GFORTRAN |grep -v "Name" `; do echo "$i" "64_$i"; done > ${name}-prefix.def.dirty
@@ -160,6 +186,14 @@ for name in blas cblas lapack; do
 	objcopy --redefine-syms ${name}-prefix.def lib${name}64_.so.%{version} lib${name}64_.so.%{version}.fixed
 	rm -rf lib${name}64_.so.%{version}
 	mv lib${name}64_.so.%{version}.fixed lib${name}64_.so.%{version}
+done
+
+for name in blas cblas lapack lapack_pic; do
+	for i in `nm lib${name}64_.a |grep " T " | awk '{print $3}'`; do echo "$i" "64_$i"; done > ${name}-static-prefix.def.dirty
+	sort -n ${name}-static-prefix.def.dirty | uniq > ${name}-static-prefix.def
+	objcopy --redefine-syms ${name}-static-prefix.def lib${name}64_.a lib${name}64_.a.fixed
+	rm -rf lib${name}64_.a
+	mv lib${name}64_.a.fixed lib${name}64_.a
 done
 popd
 
@@ -201,6 +235,18 @@ rm -rf %{buildroot}%{_libdir}/*.def*
 %{_libdir}/pkgconfig/lapack64.pc
 %{_libdir}/liblapack64_.so
 %{_libdir}/pkgconfig/lapack64_.pc
+%endif
+
+%files static
+%{_libdir}/liblapack.a
+%{_libdir}/liblapack_pic.a
+%{_libdir}/liblapacke.a
+%{_libdir}/libtmglib.a
+%if 0%{?arch64}
+%{_libdir}/liblapack64.a
+%{_libdir}/liblapack_pic64.a
+%{_libdir}/liblapack64_.a
+%{_libdir}/liblapack_pic64_.a
 %endif
 
 %files -n blas
@@ -251,6 +297,9 @@ rm -rf %{buildroot}%{_libdir}/*.def*
 %endif
 
 %changelog
+* Wed Aug 16 2023 Archana Choudhary <archana1@microsoft.com> - 3.10.0-7
+- Adds static files
+
 * Thu Mar 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.10.0-6
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - Removing manpages to fix build hangs.
