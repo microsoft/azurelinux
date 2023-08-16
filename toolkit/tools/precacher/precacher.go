@@ -188,6 +188,15 @@ func createChroot(workerTar, chrootDir string, leaveChrootOnDisk bool) (queryChr
 		return
 	}
 
+	defer func() {
+		if err != nil {
+			closeErr := queryChroot.Close(leaveChrootOnDisk)
+			if closeErr != nil {
+				logger.Log.Errorf("Failed to close chroot, err: %s", closeErr)
+			}
+		}
+	}()
+
 	// We will need network to install the repoquery package
 	files := []safechroot.FileToCopy{
 		{Src: "/etc/resolv.conf", Dest: "/etc/resolv.conf"},
@@ -195,7 +204,6 @@ func createChroot(workerTar, chrootDir string, leaveChrootOnDisk bool) (queryChr
 	err = queryChroot.AddFiles(files...)
 	if err != nil {
 		err = fmt.Errorf("failed to add files to chroot:\n%w", err)
-		queryChroot.Close(false)
 		return
 	}
 
@@ -210,7 +218,6 @@ func createChroot(workerTar, chrootDir string, leaveChrootOnDisk bool) (queryChr
 	})
 	if err != nil {
 		err = fmt.Errorf("failed to install '%s' in chroot:\n%w", dnfUtilsPackageName, err)
-		queryChroot.Close(false)
 		return
 	}
 	return
