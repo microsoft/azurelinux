@@ -12,14 +12,14 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           msft-golang
-Version:        1.19.10
+Version:        1.19.12
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://github.com/microsoft/go
-Source0:        https://github.com/microsoft/go/releases/download/v1.19.10-1/go.20230606.2.src.tar.gz
+Source0:        https://github.com/microsoft/go/releases/download/v1.19.12-1/go.20230802.5.src.tar.gz
 Source1:        https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
 Conflicts:      go
@@ -115,6 +115,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Tue Aug 16 2023 Brian Fjeldstad <bfjelds@microsoft.com> - 1.19.12-2
+- Upgrade to 1.19.12 to fix CVE-2023-39533
+
 * Tue Jun 06 2023 Bala <balakumaran.kannan@microsoft.com> - 1.19.10-1
 - Upgrade to 1.19.10 to fix CVE-2023-29404
 
