@@ -46,7 +46,6 @@ cp -r pyrpm $RPM_BUILD_ROOT/%{python3_sitelib}/
 %files -n python3-rpm-spec
 %license LICENSE
 %doc README.md
-# For noarch packages: sitelib
 %{python3_sitelib}/*
 
 
