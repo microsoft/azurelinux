@@ -17,7 +17,7 @@ clean: clean-precache
 clean-precache:
 	@echo Verifying no mountpoints present in $(precache_chroot_dir)
 	$(SCRIPTS_DIR)/safeunmount.sh "$(precache_chroot_dir)" && \
-	rm -rf $(precache_chroot_dir)
+	rm -rf $(precache_state_dir)
 
 # We always want to run the precache script, it will decide if it needs to download anything and update the flag file if
 # it does, so add the phony target as a dependency to the flag file
