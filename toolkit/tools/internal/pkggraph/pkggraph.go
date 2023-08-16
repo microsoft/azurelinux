@@ -222,12 +222,12 @@ func NewPkgGraph() *PkgGraph {
 func (g *PkgGraph) initLookup() {
 	g.nodeLookup = make(map[string][]*LookupNode)
 
-	// Scan all nodes, start with only the run nodes to properly initialize the lookup structures
-	// (they always expect a run node to be present)
+	// Scan all nodes, start with only the run and test nodes to properly initialize the lookup structures
+	// (they always expect a run or test node to be present)
 	remainingLookupNodes := []*PkgNode{}
 	for _, n := range graph.NodesOf(g.Nodes()) {
 		pkgNode := n.(*PkgNode)
-		if pkgNode.Type == TypeLocalRun || pkgNode.Type == TypeRemoteRun {
+		if pkgNode.Type == TypeLocalRun || pkgNode.Type == TypeRemoteRun || pkgNode.Type == TypeTest {
 			g.addToLookup(pkgNode, true)
 		} else if lookupNodesTypes[pkgNode.Type] {
 			remainingLookupNodes = append(remainingLookupNodes, pkgNode)
@@ -578,10 +578,15 @@ func (g *PkgGraph) FindExactPkgNodeFromPkg(pkgVer *pkgjson.PackageVer) (lookupEn
 			return
 		}
 
-		nodeInterval, err = node.RunNode.VersionedPkg.Interval()
+		if node.RunNode != nil {
+			nodeInterval, err = node.RunNode.VersionedPkg.Interval()
+		} else {
+			nodeInterval, err = node.TestNode.VersionedPkg.Interval()
+		}
 		if err != nil {
 			return
 		}
+
 		//Exact lookup must match the exact node, including conditionals.
 		if requestInterval.Equal(&nodeInterval) {
 			lookupEntry = node
