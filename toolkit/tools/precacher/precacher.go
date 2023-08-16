@@ -115,7 +115,7 @@ func rpmSnapshotFromFile(snapshotFile string) (rpmSnapshot *repocloner.RepoConte
 
 // getAllRepoData returns a map of package names to URLs for all packages available in the given repos. It uses
 // a chroot to run repoquery.
-func getAllRepoData(repoUrls []string, workerTar, buildDir string) (namesToUrls map[string]string, err error) {
+func getAllRepoData(repoURLs []string, workerTar, buildDir string) (namesToURLs map[string]string, err error) {
 	const (
 		leaveChrootOnDisk = false
 	)
@@ -145,11 +145,11 @@ func getAllRepoData(repoUrls []string, workerTar, buildDir string) (namesToUrls 
 	defer queryChroot.Close(leaveChrootOnDisk)
 
 	namesToUrls = make(map[string]string)
-	for _, repoUrl := range repoUrls {
+	for _, repoURL := range repoURLs {
 		// Use the chroot to query each repo for the packages it contains
 		var packages []string
 		err = queryChroot.Run(func() (chrootErr error) {
-			packages, chrootErr = getRepoPackages(repoUrl)
+			packageRepoPaths, chrootErr = getPackageRepoPaths(repoURL)
 			return chrootErr
 		})
 		if err != nil {
@@ -158,13 +158,13 @@ func getAllRepoData(repoUrls []string, workerTar, buildDir string) (namesToUrls 
 
 		// We will be searching by the name: "<name>-<version>.<distro>.<arch>", the results from the repoquery will be
 		// in the form of "<PARTIAL_URL>/<name>-<version>.<distro>.<arch>.rpm"
-		for _, pkgUrl := range packages {
-			name := path.Base(pkgUrl)
-			name = strings.TrimSuffix(name, ".rpm")
+		for _, packageRepoPath := range packageRepoPaths {
+			packageName := path.Base(packageRepoPath)
+			packageName = strings.TrimSuffix(packageName, ".rpm")
 
-			// We need to prepend the repoUrl to the partial URL to get the full URL
-			pkgUrl = fmt.Sprintf("%s/%s", repoUrl, pkgUrl)
-			namesToUrls[name] = pkgUrl
+			// We need to prepend the repoURL to the partial URL to get the full URL
+			pkgURL = fmt.Sprintf("%s/%s", repoURL, packageRepoPath)
+			namesToUrls[name] = pkgURL
 		}
 	}
 	return
@@ -222,9 +222,7 @@ func getRepoPackages(repoUrl string) (packages []string, err error) {
 		reqoqueryTool    = "repoquery"
 		randomNameLength = 10
 	)
-	var (
-		queryCommonArgList = []string{"-y", "-q", "--disablerepo=*", "-a", "--qf", "%{location}"}
-	)
+	var queryCommonArgList = []string{"-y", "-q", "--disablerepo=*", "-a", "--qf", "%{location}"}
 
 	logger.Log.Infof("Getting package data from %s", repoUrl)
 
@@ -269,7 +267,7 @@ func downloadMissingPackages(rpmSnapshot *repocloner.RepoContents, availablePack
 	results := make(chan downloadResult)
 	doneChannel := make(chan struct{})
 
-	// Spawn a worker for each package, they will all do preliminary checks in parrallel before synchronizing on the semaphore.
+	// Spawn a worker for each package, they will all do preliminary checks in parallel before synchronizing on the semaphore.
 	// Each worker is responsible for adding and removing itself from the wait group.
 	for _, pkg := range rpmSnapshot.Repo {
 		wg.Add(1)
@@ -291,11 +289,12 @@ func downloadMissingPackages(rpmSnapshot *repocloner.RepoContents, availablePack
 // monitorProgress will wait for results from the downloadResult channel and update the progress counter accordingly. If
 // no more results are available we expect the done channel to be closed, at which point we will return.
 func monitorProgress(total int, results chan downloadResult, doneChannel chan struct{}) (downloadedPackages []string) {
+	const progressIncrement = 10.0
+
 	downloaded := 0
 	skipped := 0
 	failed := 0
 	unavailable := 0
-	progressIncrement := 10.0
 	lastProgressUpdate := progressIncrement * -1
 
 	for done := false; !done; {
