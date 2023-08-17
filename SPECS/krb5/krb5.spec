@@ -12,7 +12,7 @@ Group:          System Environment/Security
 URL:            https://web.mit.edu/kerberos/
 Source0:        https://kerberos.org/dist/%{name}/%{maj_version}/%{name}-%{version}.tar.gz
 Source1:        krb5.conf
-Patch0:    CVE-2023-36054.patch
+Patch0:         CVE-2023-36054.patch
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  openssl-devel
 Requires:       e2fsprogs-libs
@@ -41,8 +41,7 @@ Requires:       %{name} = %{version}-%{release}
 These are the additional language files of krb5.
 
 %prep
-%setup -q
-%patch0 -p1
+%autosetup -p1
 
 %build
 cd src
