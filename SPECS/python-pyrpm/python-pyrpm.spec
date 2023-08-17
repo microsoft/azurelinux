@@ -1,5 +1,5 @@
 Summary:        A Python library for parsing RPM spec files.
-Name:           python-rpm-spec
+Name:           python-pyrpm
 Version:        0.14.1
 Release:        1%{?dist}
 License:        MIT
@@ -12,10 +12,10 @@ BuildArch:      noarch
 %description
 A Python library for parsing RPM spec files.
 
-%package -n       python3-rpm-spec
+%package -n       python3-pyrpm
 Summary:        A Python library for parsing RPM spec files.
 
-%description -n python3-rpm-spec
+%description -n python3-pyrpm
 python-rpm-spec is a Python library for parsing RPM spec files.
 tl;dr If you want to quickly parse a spec file on the command line you might want to give rpmspec --parse a try.
 rpmspec --parse file.spec | awk '/Source/ {print $2}'
@@ -32,7 +32,7 @@ mkdir -p %{buildroot}/%{python3_sitelib}/
 cp -r pyrpm %{buildroot}/%{python3_sitelib}/
 
 
-%files -n python3-rpm-spec
+%files -n python3-pyrpm
 %license LICENSE
 %doc README.md
 %{python3_sitelib}/*
