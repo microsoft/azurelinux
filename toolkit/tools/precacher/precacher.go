@@ -134,7 +134,7 @@ func getAllRepoData(repoURLs []string, workerTar, buildDir string) (namesToURLs 
 
 	err = os.MkdirAll(buildDir, 0755)
 	if err != nil {
-		err = fmt.Errorf("failed to create directory %s:\n%w", buildDir, err)
+		err = fmt.Errorf("failed to create directory '%s':\n%w", buildDir, err)
 		return nil, err
 	}
 
@@ -185,7 +185,7 @@ func createChroot(workerTar, chrootDir string, leaveChrootOnDisk bool) (queryChr
 	queryChroot = safechroot.NewChroot(chrootDir, true)
 	err = queryChroot.Initialize(workerTar, nil, nil)
 	if err != nil {
-		err = fmt.Errorf("failed to initialize chroot: %w", err)
+		err = fmt.Errorf("failed to initialize chroot:\n%w", err)
 		return
 	}
 
@@ -269,7 +269,7 @@ func downloadMissingPackages(rpmSnapshot *repocloner.RepoContents, packagesAvail
 
 	err = os.MkdirAll(outDir, 0755)
 	if err != nil {
-		err = fmt.Errorf("failed to create directory %s:\n%w", outDir, err)
+		err = fmt.Errorf("failed to create directory '%s':\n%w", outDir, err)
 		return nil, err
 	}
 
