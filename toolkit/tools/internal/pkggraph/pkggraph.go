@@ -246,7 +246,7 @@ func (g *PkgGraph) initLookup() {
 		// 1. Pure meta nodes created by cycles may, in some cases, create build nodes,
 		//    which have no associated run node after passing into a subgraph.
 		//    The subgraph only requires one of the cycle members but will get all of their build nodes.
-		// 2. Subgraphs for builds, which only require test runs will contain test-build node pairs
+		// 2. Subgraphs for builds, which only require test runs will contain (build, test) node pairs
 		//    while the run nodes are optional.
 		endOfValidData := 0
 		for _, n := range g.nodeLookup[idx] {
