@@ -11,6 +11,7 @@ precache_downloaded_files = $(precache_state_dir)/downloaded_files.txt
 precache_chroot_dir = $(precache_state_dir)/chroot
 
 $(call create_folder,$(precache_state_dir))
+$(call create_folder,$(precache_chroot_dir))
 
 clean-cache: clean-precache
 clean: clean-precache
@@ -31,7 +32,7 @@ $(STATUS_FLAGS_DIR)/precache.flag: $(go-precacher) $(chroot_worker) $(rpms_snaps
 	[ -f $@ ] || touch $@ # Create the flag file if it doesn't exist in case we don't download anything
 	$(go-precacher) \
 		--snapshot "$(rpms_snapshot)" \
-		--output-dir "$(rpm_cache_cache_dir)" \
+		--output-dir "$(remote_rpms_cache_dir)" \
 		--output-summary-file "$(precache_downloaded_files)" \
 		$(foreach url,$(PACKAGE_URL_LIST), --repo-url "$(url)") \
 		--worker-tar $(chroot_worker) \

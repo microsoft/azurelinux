@@ -26,8 +26,8 @@ pkggen_rpms     = $(call shell_real_build_only, find $(RPMS_DIR)/*  2>/dev/null 
 cache_working_dir      = $(PKGBUILD_DIR)/tdnf_cache_worker
 parse_working_dir      = $(BUILD_DIR)/spec_parsing
 rpmbuilding_logs_dir   = $(LOGS_DIR)/pkggen/rpmbuilding
-rpm_cache_cache_dir    = $(CACHED_RPMS_DIR)/cache
-rpm_cache_files        = $(call shell_real_build_only, find $(rpm_cache_cache_dir))
+remote_rpms_cache_dir  = $(CACHED_RPMS_DIR)/cache
+cached_remote_rpms        = $(call shell_real_build_only, find $(remote_rpms_cache_dir))
 validate-pkggen-config = $(STATUS_FLAGS_DIR)/validate-image-config-pkggen.flag
 
 # Outputs
@@ -159,11 +159,11 @@ ifeq ($(PRECACHE),y)
 $(cached_file): $(STATUS_FLAGS_DIR)/precache.flag
 endif
 
-$(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(rpm_cache_files) $(TOOLCHAIN_MANIFEST) $(toolchain_rpms)
-	mkdir -p $(rpm_cache_cache_dir) && \
+$(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(cached_remote_rpms) $(TOOLCHAIN_MANIFEST) $(toolchain_rpms)
+	mkdir -p $(remote_rpms_cache_dir) && \
 	$(go-graphpkgfetcher) \
 		--input=$(graph_file) \
-		--output-dir=$(rpm_cache_cache_dir) \
+		--output-dir=$(remote_rpms_cache_dir) \
 		--rpm-dir=$(RPMS_DIR) \
 		--toolchain-rpms-dir="$(TOOLCHAIN_RPMS_DIR)" \
 		--tmp-dir=$(cache_working_dir) \
@@ -239,7 +239,7 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-
 		--rpm-dir="$(RPMS_DIR)" \
 		--toolchain-rpms-dir="$(TOOLCHAIN_RPMS_DIR)" \
 		--srpm-dir="$(SRPMS_DIR)" \
-		--cache-dir="$(rpm_cache_cache_dir)" \
+		--cache-dir="$(remote_rpms_cache_dir)" \
 		--ccache-dir="$(CCACHE_DIR)" \
 		--build-logs-dir="$(rpmbuilding_logs_dir)" \
 		--dist-tag="$(DIST_TAG)" \
