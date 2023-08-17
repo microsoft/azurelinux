@@ -5,7 +5,7 @@
             "MaxSize": 5000,
             "Artifacts": [
                 {
-                    "Name": "cblmariner-gen1",
+                    "Name": "cblmariner-gen1-fips",
                     "Type": "vhd"
                 }
             ],
@@ -71,7 +71,8 @@
                 "default": "kernel"
             },
             "KernelCommandLine": {
-                "ExtraCommandLine": "fips=1 console=ttyS0"
+                "EnableFIPS": true,
+                "ExtraCommandLine": "console=ttyS0"
             },
             "Hostname": "cbl-mariner"
         }
