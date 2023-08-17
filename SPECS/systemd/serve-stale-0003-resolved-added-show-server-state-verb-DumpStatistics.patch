@@ -1,256 +1,167 @@
-From 17433ffc10fd82a7e7dc61123896fa38c64bc18a Mon Sep 17 00:00:00 2001
-From: Kiran Vemula <vemulakiran@gmail.com>
-Date: Fri, 7 Jul 2023 18:09:20 +0530
-Subject: [PATCH] resolved: added show-server-state verb and DumpStatistics 
- varlink method
-
-Added show-server-state verb to resolvectl
-Added DumpStatistics and ResetStatistics  methods to varlink
----
- man/resolvectl.xml                     |   7 +
- src/resolve/resolvectl.c               | 340 +++++++++++++++++++++----
- src/resolve/resolved-bus.c             |   6 +-
- src/resolve/resolved-dns-server.c      |  24 ++
- src/resolve/resolved-dns-server.h      |   3 +
- src/resolve/resolved-dns-transaction.c |  20 ++
- src/resolve/resolved-dns-transaction.h |   2 +
- src/resolve/resolved-manager.c         |  50 ++++
- src/resolve/resolved-manager.h         |   9 +
- src/resolve/resolved-varlink.c         |  97 ++++++-
- test/units/testsuite-75.sh             |  41 +++
- 11 files changed, 542 insertions(+), 57 deletions(-)
-
-diff --git a/man/resolvectl.xml b/man/resolvectl.xml
-index ed3918307c0e..c6a878cc10fb 100644
---- a/man/resolvectl.xml
-+++ b/man/resolvectl.xml
-@@ -219,6 +219,13 @@
-         output.</para></listitem>
+diff -ru systemd-stable-250.3_stable_patch/man/resolvectl.xml systemd-stable-250.3_PR#28327/man/resolvectl.xml
+--- systemd-stable-250.3_stable_patch/man/resolvectl.xml	2023-08-14 16:42:38.449380101 +0530
++++ systemd-stable-250.3_PR#28327/man/resolvectl.xml	2023-08-14 16:55:52.542913320 +0530
+@@ -198,7 +198,19 @@
+         <command>nta</command>. Note that when a network interface disappears all configuration is lost
+         automatically, an explicit reverting is not necessary in that case.</para></listitem>
        </varlistentry>
++	<varlistentry>
++        <term><command>show-cache</command></term>
  
++        <listitem><para>Show current cache content, per scope. Use <option>--json=</option> to enable JSON
++        output.</para></listitem>
++      </varlistentry>
++
 +      <varlistentry>
 +        <term><command>show-server-state</command></term>
 +
 +        <listitem><para>Show detailed server state information, per DNS Server. Use <option>--json=</option>
 +        to enable JSON output.</para></listitem>
 +      </varlistentry>
-+
        <xi:include href="systemctl.xml" xpointer="log-level" />
      </variablelist>
    </refsect1>
-diff --git a/src/resolve/resolvectl.c b/src/resolve/resolvectl.c
-index 72aa77879259..35c649096e29 100644
---- a/src/resolve/resolvectl.c
-+++ b/src/resolve/resolvectl.c
-@@ -1071,60 +1071,106 @@ static int verb_tlsa(int argc, char **argv, void *userdata) {
+diff -ru systemd-stable-250.3_stable_patch/src/basic/glyph-util.h systemd-stable-250.3_PR#28327/src/basic/glyph-util.h
+--- systemd-stable-250.3_stable_patch/src/basic/glyph-util.h	2023-08-14 16:42:38.581491953 +0530
++++ systemd-stable-250.3_PR#28327/src/basic/glyph-util.h	2023-08-14 16:38:58.944184254 +0530
+@@ -20,7 +20,9 @@
+         SPECIAL_GLYPH_MU,
+         SPECIAL_GLYPH_CHECK_MARK,
+         SPECIAL_GLYPH_CROSS_MARK,
+-        SPECIAL_GLYPH_ARROW,
++        SPECIAL_GLYPH_ARROW_LEFT,
++        SPECIAL_GLYPH_ARROW_RIGHT,
++	SPECIAL_GLYPH_ARROW,
+         SPECIAL_GLYPH_ELLIPSIS,
+         SPECIAL_GLYPH_LIGHT_SHADE,
+         SPECIAL_GLYPH_DARK_SHADE,
+Only in systemd-stable-250.3_stable_patch/src/libsystemd/sd-bus: test-bus-vtable-cc.cc
+diff -ru systemd-stable-250.3_stable_patch/src/resolve/resolvectl.c systemd-stable-250.3_PR#28327/src/resolve/resolvectl.c
+--- systemd-stable-250.3_stable_patch/src/resolve/resolvectl.c	2023-08-14 16:42:38.701593658 +0530
++++ systemd-stable-250.3_PR#28327/src/resolve/resolvectl.c	2023-08-14 16:38:37.547993721 +0530
+@@ -9,17 +9,20 @@
+ 
+ #include "af-list.h"
+ #include "alloc-util.h"
++#include "build.h"
+ #include "bus-common-errors.h"
+ #include "bus-error.h"
+ #include "bus-locator.h"
+ #include "bus-map-properties.h"
+ #include "bus-message-util.h"
+ #include "dns-domain.h"
++#include "errno-list.h"
+ #include "escape.h"
+ #include "format-table.h"
+ #include "format-util.h"
+ #include "gcrypt-util.h"
+ #include "hostname-util.h"
++#include "json.h"
+ #include "main-func.h"
+ #include "missing_network.h"
+ #include "netlink-util.h"
+@@ -30,6 +33,7 @@
+ #include "pretty-print.h"
+ #include "process-util.h"
+ #include "resolvconf-compat.h"
++#include "resolve-util.h"
+ #include "resolvectl.h"
+ #include "resolved-def.h"
+ #include "resolved-dns-packet.h"
+@@ -41,6 +45,7 @@
+ #include "strv.h"
+ #include "terminal-util.h"
+ #include "utf8.h"
++#include "varlink.h"
+ #include "verb-log-control.h"
+ #include "verbs.h"
+ 
+@@ -51,6 +56,7 @@
+ static uint16_t arg_class = 0;
+ static bool arg_legend = true;
+ static uint64_t arg_flags = 0;
++static JsonFormatFlags arg_json_format_flags = JSON_FORMAT_OFF;
+ static PagerFlags arg_pager_flags = 0;
+ bool arg_ifindex_permissive = false; /* If true, don't generate an error if the specified interface index doesn't exist */
+ static const char *arg_service_family = NULL;
+@@ -1042,7 +1048,6 @@
+ 
+         return r;
  }
- 
- static int show_statistics(int argc, char **argv, void *userdata) {
--        _cleanup_(sd_bus_error_free) sd_bus_error error = SD_BUS_ERROR_NULL;
--        _cleanup_(sd_bus_message_unrefp) sd_bus_message *reply = NULL;
-         _cleanup_(table_unrefp) Table *table = NULL;
--        sd_bus *bus = ASSERT_PTR(userdata);
--        uint64_t n_current_transactions, n_total_transactions,
--                cache_size, n_cache_hit, n_cache_miss,
--                n_dnssec_secure, n_dnssec_insecure, n_dnssec_bogus, n_dnssec_indeterminate;
--        int r, dnssec_supported;
-+        JsonVariant *reply = NULL, *stats = NULL;
-+        _cleanup_(varlink_unrefp) Varlink *vl = NULL;
-+        int r;
- 
--        r = bus_get_property_trivial(bus, bus_resolve_mgr, "DNSSECSupported", &error, 'b', &dnssec_supported);
-+        r = varlink_connect_address(&vl, "/run/systemd/resolve/io.systemd.Resolve.Monitor");
-         if (r < 0)
--                return log_error_errno(r, "Failed to get DNSSEC supported state: %s", bus_error_message(&error, r));
 -
--        printf("DNSSEC supported by current servers: %s%s%s\n\n",
--               ansi_highlight(),
--               yes_no(dnssec_supported),
--               ansi_normal());
-+                return log_error_errno(r, "Failed to connect to query monitoring service /run/systemd/resolve/io.systemd.Resolve.Monitor: %m");
- 
--        r = bus_get_property(bus, bus_resolve_mgr, "TransactionStatistics", &error, &reply, "(tt)");
-+        r = varlink_call(vl, "io.systemd.Resolve.Monitor.DumpStatistics", NULL, &reply, NULL, 0);
+ static int show_statistics(int argc, char **argv, void *userdata) {
+         _cleanup_(sd_bus_error_free) sd_bus_error error = SD_BUS_ERROR_NULL;
+         _cleanup_(sd_bus_message_unrefp) sd_bus_message *reply = NULL;
+@@ -1101,49 +1106,50 @@
          if (r < 0)
--                return log_error_errno(r, "Failed to get transaction statistics: %s", bus_error_message(&error, r));
-+                return log_error_errno(r, "Failed to issue DumpStatistics() varlink call: %m");
+                 return bus_log_parse_error(r);
  
--        r = sd_bus_message_read(reply, "(tt)",
--                                &n_current_transactions,
--                                &n_total_transactions);
--        if (r < 0)
--                return bus_log_parse_error(r);
-+        stats = json_variant_by_key(reply, "statistics");
-+        if (!stats)
-+                return log_error_errno(SYNTHETIC_ERRNO(ENOTRECOVERABLE),
-+                                       "DumpStatistics() response is missing 'statistics' key.");
-+
-+        if (!json_variant_is_object(stats))
-+                return log_error_errno(SYNTHETIC_ERRNO(ENOTRECOVERABLE),
-+                                       "DumpStatistics() response 'statistics' field not an object");
+-        table = table_new("key", "value");
+-        if (!table)
++        //table = table_new_vertical();
++         table = table_new("key", "value");
++	if (!table)
+                 return log_oom();
  
--        reply = sd_bus_message_unref(reply);
-+        if (!FLAGS_SET(arg_json_format_flags, JSON_FORMAT_OFF))
-+                return json_variant_dump(stats, arg_json_format_flags, NULL, NULL);
- 
--        r = bus_get_property(bus, bus_resolve_mgr, "CacheStatistics", &error, &reply, "(ttt)");
-+        struct statistics {
-+                JsonVariant *transactions;
-+                JsonVariant *cache;
-+                JsonVariant *dnssec;
-+        } statistics;
-+
-+        static const JsonDispatch statistics_dispatch_table[] = {
-+                { "transactions",       JSON_VARIANT_OBJECT,    json_dispatch_variant_noref,    offsetof(struct statistics, transactions),      JSON_MANDATORY },
-+                { "cache",              JSON_VARIANT_OBJECT,    json_dispatch_variant_noref,    offsetof(struct statistics, cache),             JSON_MANDATORY },
-+                { "dnssec",             JSON_VARIANT_OBJECT,    json_dispatch_variant_noref,    offsetof(struct statistics, dnssec),            JSON_MANDATORY },
-+                {},
-+        };
-+
-+        r = json_dispatch(stats, statistics_dispatch_table, NULL, JSON_LOG, &statistics);
-         if (r < 0)
--                return log_error_errno(r, "Failed to get cache statistics: %s", bus_error_message(&error, r));
-+                return r;
-+
-+        struct transactions {
-+                uint64_t n_current_transactions;
-+                uint64_t n_transactions_total;
-+                uint64_t n_timeouts_total;
-+                uint64_t n_timeouts_served_stale_total;
-+                uint64_t n_failure_responses_total;
-+                uint64_t n_failure_responses_served_stale_total;
-+        } transactions;
-+
-+        static const JsonDispatch transactions_dispatch_table[] = {
-+                { "currentTransactions",                JSON_VARIANT_UNSIGNED,  json_dispatch_uint64,   offsetof(struct transactions, n_current_transactions),                  JSON_MANDATORY },
-+                { "totalTransactions",                  JSON_VARIANT_UNSIGNED,  json_dispatch_uint64,   offsetof(struct transactions, n_transactions_total),                    JSON_MANDATORY },
-+                { "totalTimeouts",                      JSON_VARIANT_UNSIGNED,  json_dispatch_uint64,   offsetof(struct transactions, n_timeouts_total),                        JSON_MANDATORY },
-+                { "totalTimeoutsServedStale",           JSON_VARIANT_UNSIGNED,  json_dispatch_uint64,   offsetof(struct transactions, n_timeouts_served_stale_total),           JSON_MANDATORY },
-+                { "totalFailedResponses",               JSON_VARIANT_UNSIGNED,  json_dispatch_uint64,   offsetof(struct transactions, n_failure_responses_total),               JSON_MANDATORY },
-+                { "totalFailedResponsesServedStale",    JSON_VARIANT_UNSIGNED,  json_dispatch_uint64,   offsetof(struct transactions, n_failure_responses_served_stale_total),  JSON_MANDATORY },
-+                {},
-+        };
- 
--        r = sd_bus_message_read(reply, "(ttt)",
--                                &cache_size,
--                                &n_cache_hit,
--                                &n_cache_miss);
-+        r = json_dispatch(statistics.transactions, transactions_dispatch_table, NULL, JSON_LOG, &transactions);
-         if (r < 0)
--                return bus_log_parse_error(r);
-+                return r;
- 
--        reply = sd_bus_message_unref(reply);
-+        struct cache {
-+                uint64_t cache_size;
-+                uint64_t n_cache_hit;
-+                uint64_t n_cache_miss;
-+        } cache;
- 
--        r = bus_get_property(bus, bus_resolve_mgr, "DNSSECStatistics", &error, &reply, "(tttt)");
-+        static const JsonDispatch cache_dispatch_table[] = {
-+                { "size",       JSON_VARIANT_UNSIGNED,  json_dispatch_uint64,   offsetof(struct cache, cache_size),     JSON_MANDATORY },
-+                { "hits",       JSON_VARIANT_UNSIGNED,  json_dispatch_uint64,   offsetof(struct cache, n_cache_hit),    JSON_MANDATORY },
-+                { "misses",     JSON_VARIANT_UNSIGNED,  json_dispatch_uint64,   offsetof(struct cache, n_cache_miss),   JSON_MANDATORY },
-+                {},
-+        };
-+
-+        r = json_dispatch(statistics.cache, cache_dispatch_table, NULL, JSON_LOG, &cache);
-         if (r < 0)
--                return log_error_errno(r, "Failed to get DNSSEC statistics: %s", bus_error_message(&error, r));
-+                return r;
-+
-+        struct dnsssec {
-+                uint64_t n_dnssec_secure;
-+                uint64_t n_dnssec_insecure;
-+                uint64_t n_dnssec_bogus;
-+                uint64_t n_dnssec_indeterminate;
-+        } dnsssec;
-+
-+        static const JsonDispatch dnssec_dispatch_table[] = {
-+                { "secure",             JSON_VARIANT_UNSIGNED,  json_dispatch_uint64,   offsetof(struct dnsssec, n_dnssec_secure),              JSON_MANDATORY },
-+                { "insecure",           JSON_VARIANT_UNSIGNED,  json_dispatch_uint64,   offsetof(struct dnsssec, n_dnssec_insecure),            JSON_MANDATORY },
-+                { "bogus",              JSON_VARIANT_UNSIGNED,  json_dispatch_uint64,   offsetof(struct dnsssec, n_dnssec_bogus),               JSON_MANDATORY },
-+                { "indeterminate",      JSON_VARIANT_UNSIGNED,  json_dispatch_uint64,   offsetof(struct dnsssec, n_dnssec_indeterminate),       JSON_MANDATORY },
-+                {},
-+        };
- 
--        r = sd_bus_message_read(reply, "(tttt)",
--                                &n_dnssec_secure,
--                                &n_dnssec_insecure,
--                                &n_dnssec_bogus,
--                                &n_dnssec_indeterminate);
-+        r = json_dispatch(statistics.dnssec, dnssec_dispatch_table, NULL, JSON_LOG, &dnsssec);
-         if (r < 0)
--                return bus_log_parse_error(r);
-+                return r;
- 
-         table = table_new_vertical();
-         if (!table)
-@@ -1137,10 +1183,10 @@ static int show_statistics(int argc, char **argv, void *userdata) {
+-        table_set_header(table, false);
+-
+         r = table_add_many(table,
+                            TABLE_STRING, "Transactions",
+                            TABLE_SET_COLOR, ansi_highlight(),
++                           TABLE_SET_ALIGN_PERCENT, 0,
                             TABLE_EMPTY,
-                            TABLE_FIELD, "Current Transactions",
+-                           TABLE_STRING, "Current Transactions:",
++                           TABLE_STRING, "Current Transactions",
                             TABLE_SET_ALIGN_PERCENT, 100,
--                           TABLE_UINT64, n_current_transactions,
-+                           TABLE_UINT64, transactions.n_current_transactions,
-                            TABLE_SET_ALIGN_PERCENT, 100,
-                            TABLE_FIELD, "Total Transactions",
--                           TABLE_UINT64, n_total_transactions,
-+                           TABLE_UINT64, transactions.n_transactions_total,
+                            TABLE_UINT64, n_current_transactions,
+-                           TABLE_STRING, "Total Transactions:",
++                           TABLE_SET_ALIGN_PERCENT, 100,
++                           TABLE_STRING, "Total Transactions",
+                            TABLE_UINT64, n_total_transactions,
                             TABLE_EMPTY, TABLE_EMPTY,
                             TABLE_STRING, "Cache",
                             TABLE_SET_COLOR, ansi_highlight(),
-@@ -1148,11 +1194,25 @@ static int show_statistics(int argc, char **argv, void *userdata) {
+                            TABLE_SET_ALIGN_PERCENT, 0,
                             TABLE_EMPTY,
-                            TABLE_FIELD, "Current Cache Size",
+-                           TABLE_STRING, "Current Cache Size:",
++                           TABLE_STRING, "Current Cache Size",
                             TABLE_SET_ALIGN_PERCENT, 100,
--                           TABLE_UINT64, cache_size,
-+                           TABLE_UINT64, cache.cache_size,
-                            TABLE_FIELD, "Cache Hits",
--                           TABLE_UINT64, n_cache_hit,
-+                           TABLE_UINT64, cache.n_cache_hit,
-                            TABLE_FIELD, "Cache Misses",
--                           TABLE_UINT64, n_cache_miss,
-+                           TABLE_UINT64, cache.n_cache_miss,
-+                           TABLE_EMPTY, TABLE_EMPTY,
-+                           TABLE_STRING, "Failure Transactions",
-+                           TABLE_SET_COLOR, ansi_highlight(),
-+                           TABLE_SET_ALIGN_PERCENT, 0,
-+                           TABLE_EMPTY,
-+                           TABLE_FIELD, "Total Timeouts",
-+                           TABLE_SET_ALIGN_PERCENT, 100,
-+                           TABLE_UINT64, transactions.n_timeouts_total,
-+                           TABLE_FIELD, "Total Timeouts (Stale Data Served)",
-+                           TABLE_UINT64, transactions.n_timeouts_served_stale_total,
-+                           TABLE_FIELD, "Total Failure Responses",
-+                           TABLE_UINT64, transactions.n_failure_responses_total,
-+                           TABLE_FIELD, "Total Failure Responses (Stale Data Served)",
-+                           TABLE_UINT64, transactions.n_failure_responses_served_stale_total,
+                            TABLE_UINT64, cache_size,
+-                           TABLE_STRING, "Cache Hits:",
++                           TABLE_STRING, "Cache Hits",
+                            TABLE_UINT64, n_cache_hit,
+-                           TABLE_STRING, "Cache Misses:",
++                           TABLE_STRING, "Cache Misses",
+                            TABLE_UINT64, n_cache_miss,
                             TABLE_EMPTY, TABLE_EMPTY,
                             TABLE_STRING, "DNSSEC Verdicts",
                             TABLE_SET_COLOR, ansi_highlight(),
-@@ -1160,13 +1220,14 @@ static int show_statistics(int argc, char **argv, void *userdata) {
+                            TABLE_SET_ALIGN_PERCENT, 0,
                             TABLE_EMPTY,
-                            TABLE_FIELD, "Secure",
+-                           TABLE_STRING, "Secure:",
++                           TABLE_STRING, "Secure",
                             TABLE_SET_ALIGN_PERCENT, 100,
--                           TABLE_UINT64, n_dnssec_secure,
-+                           TABLE_UINT64, dnsssec.n_dnssec_secure,
-                            TABLE_FIELD, "Insecure",
--                           TABLE_UINT64, n_dnssec_insecure,
-+                           TABLE_UINT64, dnsssec.n_dnssec_insecure,
-                            TABLE_FIELD, "Bogus",
--                           TABLE_UINT64, n_dnssec_bogus,
-+                           TABLE_UINT64, dnsssec.n_dnssec_bogus,
-                            TABLE_FIELD, "Indeterminate",
--                           TABLE_UINT64, n_dnssec_indeterminate);
-+                           TABLE_UINT64, dnsssec.n_dnssec_indeterminate
-+                          );
+                            TABLE_UINT64, n_dnssec_secure,
+-                           TABLE_STRING, "Insecure:",
++                           TABLE_STRING, "Insecure",
+                            TABLE_UINT64, n_dnssec_insecure,
+-                           TABLE_STRING, "Bogus:",
++                           TABLE_STRING, "Bogus",
+                            TABLE_UINT64, n_dnssec_bogus,
+-                           TABLE_STRING, "Indeterminate:",
++                           TABLE_STRING, "Indeterminate",
+                            TABLE_UINT64, n_dnssec_indeterminate);
          if (r < 0)
-                 return table_log_add_error(r);
+-                table_log_add_error(r);
++                return table_log_add_error(r);
  
-@@ -1178,13 +1239,25 @@ static int show_statistics(int argc, char **argv, void *userdata) {
+         r = table_print(table, NULL);
+         if (r < 0)
+@@ -1152,14 +1158,27 @@
+         return 0;
  }
  
++
  static int reset_statistics(int argc, char **argv, void *userdata) {
 -        _cleanup_(sd_bus_error_free) sd_bus_error error = SD_BUS_ERROR_NULL;
 -        sd_bus *bus = userdata;
@@ -260,12 +171,12 @@ index 72aa77879259..35c649096e29 100644
  
 -        r = bus_call_method(bus, bus_resolve_mgr, "ResetStatistics", &error, NULL, NULL);
 +        r = varlink_connect_address(&vl, "/run/systemd/resolve/io.systemd.Resolve.Monitor");
-         if (r < 0)
--                return log_error_errno(r, "Failed to reset statistics: %s", bus_error_message(&error, r));
++        if (r < 0)
 +                return log_error_errno(r, "Failed to connect to query monitoring service /run/systemd/resolve/io.systemd.Resolve.Monitor: %m");
 +
 +        r = varlink_call(vl, "io.systemd.Resolve.Monitor.ResetStatistics", NULL, &reply, NULL, 0);
-+        if (r < 0)
+         if (r < 0)
+-                return log_error_errno(r, "Failed to reset statistics: %s", bus_error_message(&error, r));
 +                return log_error_errno(r, "Failed to issue ResetStatistics() varlink call: %m");
 +
 +        s = json_variant_by_key(reply, "success");
@@ -278,10 +189,161 @@ index 72aa77879259..35c649096e29 100644
  
          return 0;
  }
-@@ -2930,6 +3003,169 @@ static int verb_show_cache(int argc, char *argv[], void *userdata) {
-         return json_variant_dump(d, arg_json_format_flags, NULL, NULL);
- }
+@@ -2545,6 +2564,320 @@
  
+         return verb_log_control_common(bus, "org.freedesktop.resolve1", argv[0], argc == 2 ? argv[1] : NULL);
+ }
++static int dump_cache_item(JsonVariant *item) {
++
++        struct item_info {
++                JsonVariant *key;
++                JsonVariant *rrs;
++                const char *type;
++                uint64_t until;
++        } item_info = {};
++
++        static const JsonDispatch dispatch_table[] = {
++                { "key",   JSON_VARIANT_OBJECT,   json_dispatch_variant_noref, offsetof(struct item_info, key),   JSON_MANDATORY },
++                { "rrs",   JSON_VARIANT_ARRAY,    json_dispatch_variant_noref, offsetof(struct item_info, rrs),   0              },
++                { "type",  JSON_VARIANT_STRING,   json_dispatch_const_string,  offsetof(struct item_info, type),  0              },
++                { "until", JSON_VARIANT_UNSIGNED, json_dispatch_uint64,        offsetof(struct item_info, until), 0              },
++                {},
++        };
++
++        _cleanup_(dns_resource_key_unrefp) DnsResourceKey *k = NULL;
++        int r, c = 0;
++
++        r = json_dispatch(item, dispatch_table, NULL, JSON_LOG, &item_info);
++        if (r < 0)
++                return r;
++
++        r = dns_resource_key_from_json(item_info.key, &k);
++        if (r < 0)
++                return log_error_errno(r, "Failed to turn JSON data to resource key: %m");
++
++        if (item_info.type)
++                printf("%s %s%s%s\n", DNS_RESOURCE_KEY_TO_STRING(k), ansi_highlight_red(), item_info.type, ansi_normal());
++        else {
++                JsonVariant *i;
++
++                JSON_VARIANT_ARRAY_FOREACH(i, item_info.rrs) {
++                        _cleanup_(dns_resource_record_unrefp) DnsResourceRecord *rr = NULL;
++                        _cleanup_free_ void *data = NULL;
++                        JsonVariant *raw;
++                        size_t size;
++
++                        raw = json_variant_by_key(i, "raw");
++                        if (!raw)
++                                return log_error_errno(SYNTHETIC_ERRNO(ENOTRECOVERABLE), "raw field missing from RR JSON data.");
++
++                        r = json_variant_unbase64(raw, &data, &size);
++                        if (r < 0)
++                                return log_error_errno(r, "Unable to decode raw RR JSON data: %m");
++
++                        r = dns_resource_record_new_from_raw(&rr, data, size);
++                        if (r < 0)
++                                return log_error_errno(r, "Failed to parse DNS data: %m");
++
++                        printf("%s\n", dns_resource_record_to_string(rr));
++                        c++;
++                }
++        }
++
++        return c;
++}
++
++static int dump_cache_scope(JsonVariant *scope) {
++
++        struct scope_info {
++                const char *protocol;
++                int family;
++                int ifindex;
++                const char *ifname;
++                JsonVariant *cache;
++        } scope_info = {
++                .family = AF_UNSPEC,
++        };
++        JsonVariant *i;
++        int r, c = 0;
++
++        static const JsonDispatch dispatch_table[] = {
++                { "protocol", JSON_VARIANT_STRING,  json_dispatch_const_string,  offsetof(struct scope_info, protocol), JSON_MANDATORY },
++                { "family",   JSON_VARIANT_INTEGER, json_dispatch_int,           offsetof(struct scope_info, family),   0              },
++                { "ifindex",  JSON_VARIANT_INTEGER, json_dispatch_int,           offsetof(struct scope_info, ifindex),  0              },
++                { "ifname",   JSON_VARIANT_STRING,  json_dispatch_const_string,  offsetof(struct scope_info, ifname),   0              },
++                { "cache",    JSON_VARIANT_ARRAY,   json_dispatch_variant_noref, offsetof(struct scope_info, cache),    JSON_MANDATORY },
++                {},
++        };
++
++        r = json_dispatch(scope, dispatch_table, NULL, JSON_LOG, &scope_info);
++        if (r < 0)
++                return r;
++
++        printf("%sScope protocol=%s", ansi_underline(), scope_info.protocol);
++
++        if (scope_info.family != AF_UNSPEC)
++                printf(" family=%s", af_to_name(scope_info.family));
++
++        if (scope_info.ifindex > 0)
++                printf(" ifindex=%i", scope_info.ifindex);
++        if (scope_info.ifname)
++                printf(" ifname=%s", scope_info.ifname);
++
++        printf("%s\n", ansi_normal());
++
++        JSON_VARIANT_ARRAY_FOREACH(i, scope_info.cache) {
++                r = dump_cache_item(i);
++                if (r < 0)
++                        return r;
++
++                c += r;
++        }
++
++        if (c == 0)
++                printf("%sNo entries.%s\n\n", ansi_grey(), ansi_normal());
++        else
++                printf("\n");
++
++        return 0;
++}
++
++static int verb_show_cache(int argc, char *argv[], void *userdata) {
++        _cleanup_(json_variant_unrefp) JsonVariant *d = NULL, *reply = NULL;
++        _cleanup_(varlink_unrefp) Varlink *vl = NULL;
++        int r;
++
++        r = varlink_connect_address(&vl, "/run/systemd/resolve/io.systemd.Resolve.Monitor");
++        if (r < 0)
++                return log_error_errno(r, "Failed to connect to query monitoring service /run/systemd/resolve/io.systemd.Resolve.Monitor: %m");
++
++        r = varlink_call(vl, "io.systemd.Resolve.Monitor.DumpCache", NULL, &reply, NULL, 0);
++        if (r < 0)
++                return log_error_errno(r, "Failed to issue DumpCache() varlink call: %m");
++
++        d = json_variant_by_key(reply, "dump");
++        if (!d)
++                return log_error_errno(SYNTHETIC_ERRNO(ENOTRECOVERABLE),
++                                       "DumpCache() response is missing 'dump' key.");
++
++        if (!json_variant_is_array(d))
++                return log_error_errno(SYNTHETIC_ERRNO(ENOTRECOVERABLE),
++                                       "DumpCache() response 'dump' field not an array");
++
++        if (FLAGS_SET(arg_json_format_flags, JSON_FORMAT_OFF)) {
++                JsonVariant *i;
++
++                JSON_VARIANT_ARRAY_FOREACH(i, d) {
++                        r = dump_cache_scope(i);
++                        if (r < 0)
++                                return r;
++                }
++
++                return 0;
++        }
++
++        return json_variant_dump(d, arg_json_format_flags, NULL, NULL);
++}
++
 +static int dump_server_state(JsonVariant *server) {
 +        _cleanup_(table_unrefp) Table *table = NULL;
 +        TableCell *cell;
@@ -302,7 +364,7 @@ index 72aa77879259..35c649096e29 100644
 +                bool packet_rrsig_missing;
 +                bool packet_invalid;
 +                bool packet_do_off;
-+        } server_state;
++        } server_state = {};
 +
 +        int r;
 +
@@ -329,7 +391,8 @@ index 72aa77879259..35c649096e29 100644
 +        if (r < 0)
 +                return r;
 +
-+        table = table_new_vertical();
++        //table = table_new_vertical();
++	table = table_new("key", "value");
 +        if (!table)
 +                return log_oom();
 +
@@ -343,7 +406,7 @@ index 72aa77879259..35c649096e29 100644
 +
 +        r = table_add_many(table,
 +                           TABLE_EMPTY,
-+                           TABLE_FIELD, "Type",
++                           TABLE_STRING, "Type",
 +                           TABLE_SET_ALIGN_PERCENT, 100,
 +                           TABLE_STRING, server_state.type);
 +        if (r < 0)
@@ -351,7 +414,7 @@ index 72aa77879259..35c649096e29 100644
 +
 +        if (server_state.ifname) {
 +                r = table_add_many(table,
-+                                   TABLE_FIELD, "Interface",
++                                   TABLE_STRING, "Interface",
 +                                   TABLE_SET_ALIGN_PERCENT, 100,
 +                                   TABLE_STRING, server_state.ifname);
 +                if (r < 0)
@@ -360,7 +423,7 @@ index 72aa77879259..35c649096e29 100644
 +
 +        if (server_state.verified_feature_level) {
 +                r = table_add_many(table,
-+                                   TABLE_FIELD, "Verified feature level",
++                                   TABLE_STRING, "Verified feature level",
 +                                   TABLE_STRING, server_state.verified_feature_level);
 +                if (r < 0)
 +                        return table_log_add_error(r);
@@ -368,32 +431,32 @@ index 72aa77879259..35c649096e29 100644
 +
 +        if (server_state.possible_feature_level) {
 +                r = table_add_many(table,
-+                                   TABLE_FIELD, "Possible feature level",
++                                   TABLE_STRING, "Possible feature level",
 +                                   TABLE_STRING, server_state.possible_feature_level);
 +                if (r < 0)
 +                        return table_log_add_error(r);
 +        }
 +
 +        r = table_add_many(table,
-+                           TABLE_FIELD, "DNSSEC Mode",
++                           TABLE_STRING, "DNSSEC Mode",
 +                           TABLE_STRING, server_state.dnssec_mode,
-+                           TABLE_FIELD, "Can do DNSSEC",
++                           TABLE_STRING, "Can do DNSSEC",
 +                           TABLE_STRING, yes_no(server_state.can_do_dnssec),
-+                           TABLE_FIELD, "Maximum UDP fragment size received",
++                           TABLE_STRING, "Maximum UDP fragment size received",
 +                           TABLE_UINT64, server_state.received_udp_fragment_max,
-+                           TABLE_FIELD, "Failed UDP attempts",
++                           TABLE_STRING, "Failed UDP attempts",
 +                           TABLE_UINT64, server_state.n_failed_udp,
-+                           TABLE_FIELD, "Failed TCP attempts",
++                           TABLE_STRING, "Failed TCP attempts",
 +                           TABLE_UINT64, server_state.n_failed_tcp,
-+                           TABLE_FIELD, "Seen truncated packet",
++                           TABLE_STRING, "Seen truncated packet",
 +                           TABLE_STRING, yes_no(server_state.packet_truncated),
-+                           TABLE_FIELD, "Seen OPT RR getting lost",
++                           TABLE_STRING, "Seen OPT RR getting lost",
 +                           TABLE_STRING, yes_no(server_state.packet_bad_opt),
-+                           TABLE_FIELD, "Seen RRSIG RR missing",
++                           TABLE_STRING, "Seen RRSIG RR missing",
 +                           TABLE_STRING, yes_no(server_state.packet_rrsig_missing),
-+                           TABLE_FIELD, "Seen invalid packet",
++                           TABLE_STRING, "Seen invalid packet",
 +                           TABLE_STRING, yes_no(server_state.packet_invalid),
-+                           TABLE_FIELD, "Server dropped DO flag",
++                           TABLE_STRING, "Server dropped DO flag",
 +                           TABLE_STRING, yes_no(server_state.packet_do_off),
 +                           TABLE_SET_ALIGN_PERCENT, 0,
 +                           TABLE_EMPTY, TABLE_EMPTY);
@@ -444,31 +507,84 @@ index 72aa77879259..35c649096e29 100644
 +
 +        return json_variant_dump(d, arg_json_format_flags, NULL, NULL);
 +}
-+
+ 
  static void help_protocol_types(void) {
          if (arg_legend)
-                 puts("Known protocol types:");
-@@ -3037,6 +3273,7 @@ static int native_help(void) {
+@@ -2645,6 +2978,8 @@
+                "  reset-statistics             Reset resolver statistics\n"
+                "  flush-caches                 Flush all local DNS caches\n"
                 "  reset-server-features        Forget learnt DNS server feature levels\n"
-                "  monitor                      Monitor DNS queries\n"
-                "  show-cache                   Show cache contents\n"
++               "  show-cache                   Show cache contents\n"
 +               "  show-server-state            Show servers state\n"
                 "  dns [LINK [SERVER...]]       Get/set per-interface DNS server address\n"
                 "  domain [LINK [DOMAIN...]]    Get/set per-interface search domain\n"
                 "  default-route [LINK [BOOL]]  Get/set per-interface default route flag\n"
-@@ -3694,6 +3931,7 @@ static int native_main(int argc, char *argv[], sd_bus *bus) {
+@@ -2679,6 +3014,9 @@
+                "     --search=BOOL             Use search domains for single-label names (default: yes)\n"
+                "     --raw[=payload|packet]    Dump the answer as binary data\n"
+                "     --legend=BOOL             Print headers and additional info (default: yes)\n"
++               "     --json=MODE               Output as JSON\n"
++               "  -j                           Same as --json=pretty on tty, --json=short\n"
++               "                               otherwise\n"
+                "\nSee the %s for details.\n",
+                program_invocation_short_name,
+                ansi_highlight(),
+@@ -3025,7 +3363,8 @@
+                 ARG_RAW,
+                 ARG_SEARCH,
+                 ARG_NO_PAGER,
+-                ARG_STALE_DATA
++                ARG_JSON,
++		ARG_STALE_DATA
+         };
+ 
+         static const struct option options[] = {
+@@ -3048,6 +3387,7 @@
+                 { "raw",                   optional_argument, NULL, ARG_RAW                   },
+                 { "search",                required_argument, NULL, ARG_SEARCH                },
+                 { "no-pager",              no_argument,       NULL, ARG_NO_PAGER              },
++		{ "json",                  required_argument, NULL, ARG_JSON		      }, 
+                 { "stale-data",            required_argument, NULL, ARG_STALE_DATA            },
+                 {}
+         };
+@@ -3239,6 +3579,17 @@
+                         arg_pager_flags |= PAGER_DISABLE;
+                         break;
+ 
++                case ARG_JSON:
++                        r = parse_json_argument(optarg, &arg_json_format_flags);
++                        if (r <= 0)
++                                return r;
++
++                        break;
++
++                case 'j':
++                        arg_json_format_flags = JSON_FORMAT_PRETTY_AUTO|JSON_FORMAT_COLOR_AUTO;
++                        break;
++
+                 case '?':
+                         return -EINVAL;
+ 
+@@ -3282,6 +3633,8 @@
+                 { "nta",                   VERB_ANY, VERB_ANY, 0,            verb_nta              },
+                 { "revert",                VERB_ANY, 2,        0,            verb_revert_link      },
                  { "log-level",             VERB_ANY, 2,        0,            verb_log_level        },
-                 { "monitor",               VERB_ANY, 1,        0,            verb_monitor          },
-                 { "show-cache",            VERB_ANY, 1,        0,            verb_show_cache       },
++                { "show-cache",            VERB_ANY, 1,        0,            verb_show_cache       },
 +                { "show-server-state",     VERB_ANY, 1,        0,            verb_show_server_state},
                  {}
          };
  
-diff --git a/src/resolve/resolved-bus.c b/src/resolve/resolved-bus.c
-index 459adfec5c00..3079c74038d4 100644
---- a/src/resolve/resolved-bus.c
-+++ b/src/resolve/resolved-bus.c
-@@ -1712,11 +1712,7 @@ static int bus_method_reset_statistics(sd_bus_message *message, void *userdata,
+diff -ru systemd-stable-250.3_stable_patch/src/resolve/resolved-bus.c systemd-stable-250.3_PR#28327/src/resolve/resolved-bus.c
+--- systemd-stable-250.3_stable_patch/src/resolve/resolved-bus.c	2023-08-14 16:42:38.701593658 +0530
++++ systemd-stable-250.3_PR#28327/src/resolve/resolved-bus.c	2023-08-14 16:38:37.531970176 +0530
+@@ -1694,18 +1694,13 @@
+ 
+ static int bus_method_reset_statistics(sd_bus_message *message, void *userdata, sd_bus_error *error) {
+         Manager *m = userdata;
+-        DnsScope *s;
+ 
+         assert(message);
+         assert(m);
  
          bus_client_log(message, "statistics reset");
  
@@ -481,12 +597,496 @@ index 459adfec5c00..3079c74038d4 100644
  
          return sd_bus_reply_method_return(message, NULL);
  }
-diff --git a/src/resolve/resolved-dns-server.c b/src/resolve/resolved-dns-server.c
-index e1eeaacad329..184a655b995e 100644
---- a/src/resolve/resolved-dns-server.c
-+++ b/src/resolve/resolved-dns-server.c
-@@ -1095,3 +1095,27 @@ static const char* const dns_server_feature_level_table[_DNS_SERVER_FEATURE_LEVE
-         [DNS_SERVER_FEATURE_LEVEL_TLS_DO]    = "TLS+EDNS0+DO",
+diff -ru systemd-stable-250.3_stable_patch/src/resolve/resolved-dns-cache.c systemd-stable-250.3_PR#28327/src/resolve/resolved-dns-cache.c
+--- systemd-stable-250.3_stable_patch/src/resolve/resolved-dns-cache.c	2023-08-14 16:42:38.701593658 +0530
++++ systemd-stable-250.3_PR#28327/src/resolve/resolved-dns-cache.c	2023-08-14 16:38:37.511940745 +0530
+@@ -1380,6 +1380,87 @@
+         }
+ }
+ 
++int dns_cache_dump_to_json(DnsCache *cache, JsonVariant **ret) {
++        _cleanup_(json_variant_unrefp) JsonVariant *c = NULL;
++        DnsCacheItem *i;
++        int r;
++
++        assert(cache);
++        assert(ret);
++
++        HASHMAP_FOREACH(i, cache->by_key) {
++                _cleanup_(json_variant_unrefp) JsonVariant *d = NULL, *k = NULL;
++
++                r = dns_resource_key_to_json(i->key, &k);
++                if (r < 0)
++                        return r;
++
++                if (i->rr) {
++                        _cleanup_(json_variant_unrefp) JsonVariant *l = NULL;
++
++                        DnsCacheItem *j;
++			LIST_FOREACH(by_key, j, i) {
++                                _cleanup_(json_variant_unrefp) JsonVariant *rj = NULL, *item = NULL;
++
++                                assert(j->rr);
++
++                                r = dns_resource_record_to_json(j->rr, &rj);
++                                if (r < 0)
++                                        return r;
++
++                                r = dns_resource_record_to_wire_format(j->rr, /* canonical= */ false); /* don't use DNSSEC canonical format, since it removes casing, but we want that for DNS_SD compat */
++                                if (r < 0)
++                                        return r;
++
++                                r = json_build(&item, JSON_BUILD_OBJECT(
++                                                               JSON_BUILD_PAIR_VARIANT("rr", rj),
++                                                               JSON_BUILD_PAIR_BASE64("raw", j->rr->wire_format, j->rr->wire_format_size)));
++                                if (r < 0)
++                                        return r;
++
++                                r = json_variant_append_array(&l, item);
++                                if (r < 0)
++                                        return r;
++                        }
++
++                        if (!l) {
++                                r = json_variant_new_array(&l, NULL, 0);
++                                if (r < 0)
++                                        return r;
++                        }
++
++                        r = json_build(&d,
++                                       JSON_BUILD_OBJECT(
++                                                       JSON_BUILD_PAIR_VARIANT("key", k),
++                                                       JSON_BUILD_PAIR_VARIANT("rrs", l),
++                                                       JSON_BUILD_PAIR_UNSIGNED("until", i->until)));
++                } else if (i->type == DNS_CACHE_NODATA) {
++                        r = json_build(&d,
++                                       JSON_BUILD_OBJECT(
++                                                       JSON_BUILD_PAIR_VARIANT("key", k),
++                                                       JSON_BUILD_PAIR_EMPTY_ARRAY("rrs"),
++                                                       JSON_BUILD_PAIR_UNSIGNED("until", i->until)));
++                } else
++                        r = json_build(&d,
++                                       JSON_BUILD_OBJECT(
++                                                       JSON_BUILD_PAIR_VARIANT("key", k),
++                                                       JSON_BUILD_PAIR_STRING("type", dns_cache_item_type_to_string(i)),
++                                                       JSON_BUILD_PAIR_UNSIGNED("until", i->until)));
++                if (r < 0)
++                        return r;
++
++                r = json_variant_append_array(&c, d);
++                if (r < 0)
++                        return r;
++        }
++
++        if (!c)
++                return json_variant_new_array(ret, NULL, 0);
++
++        *ret = TAKE_PTR(c);
++        return 0;
++}
++
+ bool dns_cache_is_empty(DnsCache *cache) {
+         if (!cache)
+                 return true;
+diff -ru systemd-stable-250.3_stable_patch/src/resolve/resolved-dns-cache.h systemd-stable-250.3_PR#28327/src/resolve/resolved-dns-cache.h
+--- systemd-stable-250.3_stable_patch/src/resolve/resolved-dns-cache.h	2023-08-14 16:42:38.701593658 +0530
++++ systemd-stable-250.3_PR#28327/src/resolve/resolved-dns-cache.h	2023-08-14 16:38:37.315652322 +0530
+@@ -50,6 +50,8 @@
+ int dns_cache_check_conflicts(DnsCache *cache, DnsResourceRecord *rr, int owner_family, const union in_addr_union *owner_address);
+ 
+ void dns_cache_dump(DnsCache *cache, FILE *f);
++int dns_cache_dump_to_json(DnsCache *cache, JsonVariant **ret);
++
+ bool dns_cache_is_empty(DnsCache *cache);
+ 
+ unsigned dns_cache_size(DnsCache *cache);
+diff -ru systemd-stable-250.3_stable_patch/src/resolve/resolved-dns-rr.c systemd-stable-250.3_PR#28327/src/resolve/resolved-dns-rr.c
+--- systemd-stable-250.3_stable_patch/src/resolve/resolved-dns-rr.c	2023-08-14 16:42:38.701593658 +0530
++++ systemd-stable-250.3_PR#28327/src/resolve/resolved-dns-rr.c	2023-08-14 16:38:37.527964290 +0530
+@@ -1847,6 +1847,308 @@
+         return 0;
+ }
+ 
++int dns_resource_record_new_from_raw(DnsResourceRecord **ret, const void *data, size_t size) {
++        _cleanup_(dns_packet_unrefp) DnsPacket *p = NULL;
++        int r;
++
++        r = dns_packet_new(&p, DNS_PROTOCOL_DNS, 0, DNS_PACKET_SIZE_MAX);
++        if (r < 0)
++                return r;
++
++        p->refuse_compression = true;
++
++        r = dns_packet_append_blob(p, data, size, NULL);
++        if (r < 0)
++                return r;
++
++        return dns_packet_read_rr(p, ret, NULL, NULL);
++}
++
++int dns_resource_key_to_json(DnsResourceKey *key, JsonVariant **ret) {
++        assert(key);
++        assert(ret);
++
++        return json_build(ret,
++                          JSON_BUILD_OBJECT(
++                                          JSON_BUILD_PAIR("class", JSON_BUILD_INTEGER(key->class)),
++                                          JSON_BUILD_PAIR("type", JSON_BUILD_INTEGER(key->type)),
++                                          JSON_BUILD_PAIR("name", JSON_BUILD_STRING(dns_resource_key_name(key)))));
++}
++
++int dns_resource_key_from_json(JsonVariant *v, DnsResourceKey **ret) {
++        _cleanup_(dns_resource_key_unrefp) DnsResourceKey *key = NULL;
++        uint16_t type = 0, class = 0;
++        const char *name = NULL;
++        int r;
++
++        JsonDispatch dispatch_table[] = {
++                { "class", JSON_VARIANT_INTEGER, json_dispatch_uint16,       PTR_TO_SIZE(&class), JSON_MANDATORY },
++                { "type",  JSON_VARIANT_INTEGER, json_dispatch_uint16,       PTR_TO_SIZE(&type),  JSON_MANDATORY },
++                { "name",  JSON_VARIANT_STRING,  json_dispatch_const_string, PTR_TO_SIZE(&name),  JSON_MANDATORY },
++                {}
++        };
++
++        assert(v);
++        assert(ret);
++
++        r = json_dispatch(v, dispatch_table, NULL, 0, NULL);
++        if (r < 0)
++                return r;
++
++        key = dns_resource_key_new(class, type, name);
++        if (!key)
++                return -ENOMEM;
++
++        *ret = TAKE_PTR(key);
++        return 0;
++}
++
++static int type_bitmap_to_json(Bitmap *b, JsonVariant **ret) {
++        _cleanup_(json_variant_unrefp) JsonVariant *l = NULL;
++        unsigned t;
++        int r;
++
++        assert(ret);
++
++        BITMAP_FOREACH(t, b) {
++                _cleanup_(json_variant_unrefp) JsonVariant *v = NULL;
++
++                r = json_variant_new_unsigned(&v, t);
++                if (r < 0)
++                        return r;
++
++                r = json_variant_append_array(&l, v);
++                if (r < 0)
++                        return r;
++        }
++
++        if (!l)
++                return json_variant_new_array(ret, NULL, 0);
++
++        *ret = TAKE_PTR(l);
++        return 0;
++}
++static int txt_to_json(DnsTxtItem *items, JsonVariant **ret) {
++        JsonVariant **elements = NULL;
++        size_t n = 0;
++        int r;
++
++        assert(ret);
++	{
++	DnsTxtItem *i;
++        LIST_FOREACH(items, i, items) {
++                if (!GREEDY_REALLOC(elements, n + 1)) {
++                        r = -ENOMEM;
++                        goto finalize;
++                }
++
++                r = json_variant_new_octescape(elements + n, i->data, i->length);
++                if (r < 0)
++                        goto finalize;
++
++                n++;
++        }
++	}
++
++        r = json_variant_new_array(ret, elements, n);
++
++finalize:
++        for (size_t i = 0; i < n; i++)
++                json_variant_unref(elements[i]);
++
++        free(elements);
++        return r;
++}
++
++int dns_resource_record_to_json(DnsResourceRecord *rr, JsonVariant **ret) {
++        _cleanup_(json_variant_unrefp) JsonVariant *k = NULL;
++        int r;
++
++        assert(rr);
++        assert(ret);
++
++        r = dns_resource_key_to_json(rr->key, &k);
++        if (r < 0)
++                return r;
++
++        switch (rr->unparsable ? _DNS_TYPE_INVALID : rr->key->type) {
++
++        case DNS_TYPE_SRV:
++                return json_build(ret,
++                                  JSON_BUILD_OBJECT(
++                                                  JSON_BUILD_PAIR("key", JSON_BUILD_VARIANT(k)),
++                                                  JSON_BUILD_PAIR("priority", JSON_BUILD_UNSIGNED(rr->srv.priority)),
++                                                  JSON_BUILD_PAIR("weight", JSON_BUILD_UNSIGNED(rr->srv.weight)),
++                                                  JSON_BUILD_PAIR("port", JSON_BUILD_UNSIGNED(rr->srv.port)),
++                                                  JSON_BUILD_PAIR("name", JSON_BUILD_STRING(rr->srv.name))));
++
++        case DNS_TYPE_PTR:
++        case DNS_TYPE_NS:
++        case DNS_TYPE_CNAME:
++        case DNS_TYPE_DNAME:
++                return json_build(ret,
++                                  JSON_BUILD_OBJECT(
++                                                  JSON_BUILD_PAIR("key", JSON_BUILD_VARIANT(k)),
++                                                  JSON_BUILD_PAIR("name", JSON_BUILD_STRING(rr->ptr.name))));
++
++        case DNS_TYPE_HINFO:
++                return json_build(ret,
++                                  JSON_BUILD_OBJECT(
++                                                  JSON_BUILD_PAIR("key", JSON_BUILD_VARIANT(k)),
++                                                  JSON_BUILD_PAIR("cpu", JSON_BUILD_STRING(rr->hinfo.cpu)),
++                                                  JSON_BUILD_PAIR("os", JSON_BUILD_STRING(rr->hinfo.os))));
++
++        case DNS_TYPE_SPF:
++        case DNS_TYPE_TXT: {
++                _cleanup_(json_variant_unrefp) JsonVariant *l = NULL;
++
++                r = txt_to_json(rr->txt.items, &l);
++                if (r < 0)
++                        return r;
++
++                return json_build(ret,
++                                  JSON_BUILD_OBJECT(
++                                                  JSON_BUILD_PAIR("key", JSON_BUILD_VARIANT(k)),
++                                                  JSON_BUILD_PAIR("items", JSON_BUILD_VARIANT(l))));
++        }
++
++        case DNS_TYPE_A:
++                return json_build(ret,
++                                  JSON_BUILD_OBJECT(
++                                                  JSON_BUILD_PAIR("key", JSON_BUILD_VARIANT(k)),
++                                                  JSON_BUILD_PAIR("address", JSON_BUILD_IN4_ADDR(&rr->a.in_addr))));
++
++        case DNS_TYPE_AAAA:
++                return json_build(ret,
++                                  JSON_BUILD_OBJECT(
++                                                  JSON_BUILD_PAIR("key", JSON_BUILD_VARIANT(k)),
++                                                  JSON_BUILD_PAIR("address", JSON_BUILD_IN6_ADDR(&rr->aaaa.in6_addr))));
++
++        case DNS_TYPE_SOA:
++                return json_build(ret,
++                                  JSON_BUILD_OBJECT(
++                                                  JSON_BUILD_PAIR("key", JSON_BUILD_VARIANT(k)),
++                                                  JSON_BUILD_PAIR("mname", JSON_BUILD_STRING(rr->soa.mname)),
++                                                  JSON_BUILD_PAIR("rname", JSON_BUILD_STRING(rr->soa.rname)),
++                                                  JSON_BUILD_PAIR("serial", JSON_BUILD_UNSIGNED(rr->soa.serial)),
++                                                  JSON_BUILD_PAIR("refresh", JSON_BUILD_UNSIGNED(rr->soa.refresh)),
++                                                  JSON_BUILD_PAIR("expire", JSON_BUILD_UNSIGNED(rr->soa.retry)),
++                                                  JSON_BUILD_PAIR("minimum", JSON_BUILD_UNSIGNED(rr->soa.minimum))));
++
++        case DNS_TYPE_MX:
++                return json_build(ret,
++                                  JSON_BUILD_OBJECT(
++                                                  JSON_BUILD_PAIR("key", JSON_BUILD_VARIANT(k)),
++                                                  JSON_BUILD_PAIR("priority", JSON_BUILD_UNSIGNED(rr->mx.priority)),
++                                                  JSON_BUILD_PAIR("exchange", JSON_BUILD_STRING(rr->mx.exchange))));
++        case DNS_TYPE_LOC:
++                return json_build(ret,
++                                  JSON_BUILD_OBJECT(
++                                                  JSON_BUILD_PAIR("key", JSON_BUILD_VARIANT(k)),
++                                                  JSON_BUILD_PAIR("version", JSON_BUILD_UNSIGNED(rr->loc.version)),
++                                                  JSON_BUILD_PAIR("size", JSON_BUILD_UNSIGNED(rr->loc.size)),
++                                                  JSON_BUILD_PAIR("horiz_pre", JSON_BUILD_UNSIGNED(rr->loc.horiz_pre)),
++                                                  JSON_BUILD_PAIR("vert_pre", JSON_BUILD_UNSIGNED(rr->loc.vert_pre)),
++                                                  JSON_BUILD_PAIR("latitude", JSON_BUILD_UNSIGNED(rr->loc.latitude)),
++                                                  JSON_BUILD_PAIR("longitude", JSON_BUILD_UNSIGNED(rr->loc.longitude)),
++                                                  JSON_BUILD_PAIR("altitude", JSON_BUILD_UNSIGNED(rr->loc.altitude))));
++
++        case DNS_TYPE_DS:
++                return json_build(ret,
++                                  JSON_BUILD_OBJECT(
++                                                  JSON_BUILD_PAIR("key", JSON_BUILD_VARIANT(k)),
++                                                  JSON_BUILD_PAIR("keyTag", JSON_BUILD_UNSIGNED(rr->ds.key_tag)),
++                                                  JSON_BUILD_PAIR("algorithm", JSON_BUILD_UNSIGNED(rr->ds.algorithm)),
++                                                  JSON_BUILD_PAIR("digestType", JSON_BUILD_UNSIGNED(rr->ds.digest_type)),
++                                                  JSON_BUILD_PAIR("digest", JSON_BUILD_HEX(rr->ds.digest, rr->ds.digest_size))));
++
++        case DNS_TYPE_SSHFP:
++                return json_build(ret,
++                                  JSON_BUILD_OBJECT(
++                                                  JSON_BUILD_PAIR("key", JSON_BUILD_VARIANT(k)),
++                                                  JSON_BUILD_PAIR("algorithm", JSON_BUILD_UNSIGNED(rr->sshfp.algorithm)),
++                                                  JSON_BUILD_PAIR("fptype", JSON_BUILD_UNSIGNED(rr->sshfp.fptype)),
++                                                  JSON_BUILD_PAIR("fingerprint", JSON_BUILD_HEX(rr->sshfp.fingerprint, rr->sshfp.fingerprint_size))));
++
++        case DNS_TYPE_DNSKEY:
++                return json_build(ret,
++                                  JSON_BUILD_OBJECT(
++                                                  JSON_BUILD_PAIR("key", JSON_BUILD_VARIANT(k)),
++                                                  JSON_BUILD_PAIR("flags", JSON_BUILD_UNSIGNED(rr->dnskey.flags)),
++                                                  JSON_BUILD_PAIR("protocol", JSON_BUILD_UNSIGNED(rr->dnskey.protocol)),
++                                                  JSON_BUILD_PAIR("algorithm", JSON_BUILD_UNSIGNED(rr->dnskey.algorithm)),
++                                                  JSON_BUILD_PAIR("dnskey", JSON_BUILD_BASE64(rr->dnskey.key, rr->dnskey.key_size))));
++
++
++        case DNS_TYPE_RRSIG:
++                return json_build(ret,
++                                  JSON_BUILD_OBJECT(
++                                                  JSON_BUILD_PAIR("key", JSON_BUILD_VARIANT(k)),
++                                                  JSON_BUILD_PAIR("signer", JSON_BUILD_STRING(rr->rrsig.signer)),
++                                                  JSON_BUILD_PAIR("typeCovered", JSON_BUILD_UNSIGNED(rr->rrsig.type_covered)),
++                                                  JSON_BUILD_PAIR("algorithm", JSON_BUILD_UNSIGNED(rr->rrsig.algorithm)),
++                                                  JSON_BUILD_PAIR("labels", JSON_BUILD_UNSIGNED(rr->rrsig.labels)),
++                                                  JSON_BUILD_PAIR("originalTtl", JSON_BUILD_UNSIGNED(rr->rrsig.original_ttl)),
++                                                  JSON_BUILD_PAIR("expiration", JSON_BUILD_UNSIGNED(rr->rrsig.expiration)),
++                                                  JSON_BUILD_PAIR("inception", JSON_BUILD_UNSIGNED(rr->rrsig.inception)),
++                                                  JSON_BUILD_PAIR("keyTag", JSON_BUILD_UNSIGNED(rr->rrsig.key_tag)),
++                                                  JSON_BUILD_PAIR("signature", JSON_BUILD_BASE64(rr->rrsig.signature, rr->rrsig.signature_size))));
++
++        case DNS_TYPE_NSEC: {
++                _cleanup_(json_variant_unrefp) JsonVariant *bm = NULL;
++
++                r = type_bitmap_to_json(rr->nsec.types, &bm);
++                if (r < 0)
++                        return r;
++
++                return json_build(ret,
++                                  JSON_BUILD_OBJECT(
++                                                  JSON_BUILD_PAIR("key", JSON_BUILD_VARIANT(k)),
++                                                  JSON_BUILD_PAIR("nextDomain", JSON_BUILD_STRING(rr->nsec.next_domain_name)),
++                                                  JSON_BUILD_PAIR("types", JSON_BUILD_VARIANT(bm))));
++        }
++
++        case DNS_TYPE_NSEC3: {
++                _cleanup_(json_variant_unrefp) JsonVariant *bm = NULL;
++
++                r = type_bitmap_to_json(rr->nsec3.types, &bm);
++                if (r < 0)
++                        return r;
++
++                return json_build(ret,
++                                  JSON_BUILD_OBJECT(
++                                                  JSON_BUILD_PAIR("key", JSON_BUILD_VARIANT(k)),
++                                                  JSON_BUILD_PAIR("algorithm", JSON_BUILD_UNSIGNED(rr->nsec3.algorithm)),
++                                                  JSON_BUILD_PAIR("flags", JSON_BUILD_UNSIGNED(rr->nsec3.flags)),
++                                                  JSON_BUILD_PAIR("iterations", JSON_BUILD_UNSIGNED(rr->nsec3.iterations)),
++                                                  JSON_BUILD_PAIR("salt", JSON_BUILD_HEX(rr->nsec3.salt, rr->nsec3.salt_size)),
++                                                  JSON_BUILD_PAIR("hash", JSON_BUILD_BASE32HEX(rr->nsec3.next_hashed_name, rr->nsec3.next_hashed_name_size)),
++                                                  JSON_BUILD_PAIR("types", JSON_BUILD_VARIANT(bm))));
++        }
++
++        case DNS_TYPE_TLSA:
++                return json_build(ret,
++                                  JSON_BUILD_OBJECT(
++                                                  JSON_BUILD_PAIR("key", JSON_BUILD_VARIANT(k)),
++                                                  JSON_BUILD_PAIR("certUsage", JSON_BUILD_UNSIGNED(rr->tlsa.cert_usage)),
++                                                  JSON_BUILD_PAIR("selector", JSON_BUILD_UNSIGNED(rr->tlsa.selector)),
++                                                  JSON_BUILD_PAIR("matchingType", JSON_BUILD_UNSIGNED(rr->tlsa.matching_type)),
++                                                  JSON_BUILD_PAIR("data", JSON_BUILD_HEX(rr->tlsa.data, rr->tlsa.data_size))));
++
++        case DNS_TYPE_CAA:
++                return json_build(ret,
++                                  JSON_BUILD_OBJECT(
++                                                  JSON_BUILD_PAIR("key", JSON_BUILD_VARIANT(k)),
++                                                  JSON_BUILD_PAIR("flags", JSON_BUILD_UNSIGNED(rr->caa.flags)),
++                                                  JSON_BUILD_PAIR("tag", JSON_BUILD_STRING(rr->caa.tag)),
++                                                  JSON_BUILD_PAIR("value", JSON_BUILD_OCTESCAPE(rr->caa.value, rr->caa.value_size))));
++
++        default:
++                /* Can't provide broken-down format */
++                *ret = NULL;
++                return 0;
++        }
++}
+ static const char* const dnssec_algorithm_table[_DNSSEC_ALGORITHM_MAX_DEFINED] = {
+         /* Mnemonics as listed on https://www.iana.org/assignments/dns-sec-alg-numbers/dns-sec-alg-numbers.xhtml */
+         [DNSSEC_ALGORITHM_RSAMD5]             = "RSAMD5",
+diff -ru systemd-stable-250.3_stable_patch/src/resolve/resolved-dns-rr.h systemd-stable-250.3_PR#28327/src/resolve/resolved-dns-rr.h
+--- systemd-stable-250.3_stable_patch/src/resolve/resolved-dns-rr.h	2023-08-14 16:42:38.701593658 +0530
++++ systemd-stable-250.3_PR#28327/src/resolve/resolved-dns-rr.h	2023-08-14 16:38:37.275593460 +0530
+@@ -8,6 +8,7 @@
+ #include "dns-type.h"
+ #include "hashmap.h"
+ #include "in-addr-util.h"
++#include "json.h"
+ #include "list.h"
+ #include "string-util.h"
+ #include "time-util.h"
+@@ -307,6 +308,9 @@
+ char* dns_resource_key_to_string(const DnsResourceKey *key, char *buf, size_t buf_size);
+ ssize_t dns_resource_record_payload(DnsResourceRecord *rr, void **out);
+ 
++#define DNS_RESOURCE_KEY_TO_STRING(key) \
++        dns_resource_key_to_string(key, (char[DNS_RESOURCE_KEY_STRING_MAX]) {}, DNS_RESOURCE_KEY_STRING_MAX)
++
+ DEFINE_TRIVIAL_CLEANUP_FUNC(DnsResourceKey*, dns_resource_key_unref);
+ 
+ static inline bool dns_key_is_shared(const DnsResourceKey *key) {
+@@ -346,6 +350,12 @@
+ DnsTxtItem *dns_txt_item_copy(DnsTxtItem *i);
+ int dns_txt_item_new_empty(DnsTxtItem **ret);
+ 
++int dns_resource_record_new_from_raw(DnsResourceRecord **ret, const void *data, size_t size);
++
++int dns_resource_key_to_json(DnsResourceKey *key, JsonVariant **ret);
++int dns_resource_key_from_json(JsonVariant *v, DnsResourceKey **ret);
++int dns_resource_record_to_json(DnsResourceRecord *rr, JsonVariant **ret);
++
+ void dns_resource_record_hash_func(const DnsResourceRecord *i, struct siphash *state);
+ int dns_resource_record_compare_func(const DnsResourceRecord *x, const DnsResourceRecord *y);
+ 
+diff -ru systemd-stable-250.3_stable_patch/src/resolve/resolved-dns-scope.c systemd-stable-250.3_PR#28327/src/resolve/resolved-dns-scope.c
+--- systemd-stable-250.3_stable_patch/src/resolve/resolved-dns-scope.c	2023-08-14 16:42:38.701593658 +0530
++++ systemd-stable-250.3_PR#28327/src/resolve/resolved-dns-scope.c	2023-08-14 16:38:37.427817135 +0530
+@@ -1610,3 +1610,23 @@
+          * volunteer as default route. */
+         return !dns_scope_has_route_only_domains(scope);
+ }
++
++int dns_scope_dump_cache_to_json(DnsScope *scope, JsonVariant **ret) {
++        _cleanup_(json_variant_unrefp) JsonVariant *cache = NULL;
++        int r;
++
++        assert(scope);
++        assert(ret);
++
++        r = dns_cache_dump_to_json(&scope->cache, &cache);
++        if (r < 0)
++                return r;
++
++        return json_build(ret,
++                          JSON_BUILD_OBJECT(
++                                          JSON_BUILD_PAIR_STRING("protocol", dns_protocol_to_string(scope->protocol)),
++                                          JSON_BUILD_PAIR_CONDITION(scope->family != AF_UNSPEC, "family", JSON_BUILD_INTEGER(scope->family)),
++                                          JSON_BUILD_PAIR_CONDITION(scope->link, "ifindex", JSON_BUILD_INTEGER(scope->link ? scope->link->ifindex : 0)),
++                                          JSON_BUILD_PAIR_CONDITION(scope->link, "ifname", JSON_BUILD_STRING(scope->link ? scope->link->ifname : NULL)),
++                                          JSON_BUILD_PAIR_VARIANT("cache", cache)));
++}
+diff -ru systemd-stable-250.3_stable_patch/src/resolve/resolved-dns-scope.h systemd-stable-250.3_PR#28327/src/resolve/resolved-dns-scope.h
+--- systemd-stable-250.3_stable_patch/src/resolve/resolved-dns-scope.h	2023-08-14 16:42:38.701593658 +0530
++++ systemd-stable-250.3_PR#28327/src/resolve/resolved-dns-scope.h	2023-08-14 16:38:37.503928973 +0530
+@@ -110,3 +110,5 @@
+ int dns_scope_remove_dnssd_services(DnsScope *scope);
+ 
+ bool dns_scope_is_default_route(DnsScope *scope);
++
++int dns_scope_dump_cache_to_json(DnsScope *scope, JsonVariant **ret);
+diff -ru systemd-stable-250.3_stable_patch/src/resolve/resolved-dns-server.c systemd-stable-250.3_PR#28327/src/resolve/resolved-dns-server.c
+--- systemd-stable-250.3_stable_patch/src/resolve/resolved-dns-server.c	2023-08-14 16:42:38.701593658 +0530
++++ systemd-stable-250.3_PR#28327/src/resolve/resolved-dns-server.c	2023-08-14 16:38:37.543987835 +0530
+@@ -1093,3 +1093,27 @@
+         [DNS_SERVER_FEATURE_LEVEL_TLS_DO]    = "TLS+EDNS0+D0",
  };
  DEFINE_STRING_TABLE_LOOKUP(dns_server_feature_level, DnsServerFeatureLevel);
 +
@@ -513,10 +1113,9 @@ index e1eeaacad329..184a655b995e 100644
 +                                        JSON_BUILD_PAIR_BOOLEAN("seenInvalidPacket", server->packet_invalid),
 +                                        JSON_BUILD_PAIR_BOOLEAN("serverDroppedDOFlag", server->packet_do_off)));
 +}
-diff --git a/src/resolve/resolved-dns-server.h b/src/resolve/resolved-dns-server.h
-index f939b534c3fd..ed6560fa9d8a 100644
---- a/src/resolve/resolved-dns-server.h
-+++ b/src/resolve/resolved-dns-server.h
+diff -ru systemd-stable-250.3_stable_patch/src/resolve/resolved-dns-server.h systemd-stable-250.3_PR#28327/src/resolve/resolved-dns-server.h
+--- systemd-stable-250.3_stable_patch/src/resolve/resolved-dns-server.h	2023-08-14 16:42:38.701593658 +0530
++++ systemd-stable-250.3_PR#28327/src/resolve/resolved-dns-server.h	2023-08-14 16:38:37.331675867 +0530
 @@ -2,6 +2,7 @@
  #pragma once
  
@@ -525,17 +1124,16 @@ index f939b534c3fd..ed6560fa9d8a 100644
  #include "list.h"
  #include "resolve-util.h"
  #include "time-util.h"
-@@ -172,3 +173,5 @@ void dns_server_dump(DnsServer *s, FILE *f);
+@@ -172,3 +173,5 @@
  void dns_server_unref_stream(DnsServer *s);
  
  DnsScope *dns_server_scope(DnsServer *s);
 +
 +int dns_server_dump_state_to_json(DnsServer *server, JsonVariant **ret);
-diff --git a/src/resolve/resolved-dns-transaction.c b/src/resolve/resolved-dns-transaction.c
-index a5293357c01b..83051afa03e4 100644
---- a/src/resolve/resolved-dns-transaction.c
-+++ b/src/resolve/resolved-dns-transaction.c
-@@ -1039,6 +1039,13 @@ void dns_transaction_process_reply(DnsTransaction *t, DnsPacket *p, bool encrypt
+diff -ru systemd-stable-250.3_stable_patch/src/resolve/resolved-dns-transaction.c systemd-stable-250.3_PR#28327/src/resolve/resolved-dns-transaction.c
+--- systemd-stable-250.3_stable_patch/src/resolve/resolved-dns-transaction.c	2023-08-14 16:42:38.701593658 +0530
++++ systemd-stable-250.3_PR#28327/src/resolve/resolved-dns-transaction.c	2023-08-14 16:38:37.323664095 +0530
+@@ -1052,6 +1052,13 @@
          if (t->state != DNS_TRANSACTION_PENDING)
                  return;
  
@@ -549,16 +1147,16 @@ index a5293357c01b..83051afa03e4 100644
          /* Note that this call might invalidate the query. Callers
           * should hence not attempt to access the query or transaction
           * after calling this function. */
-@@ -1476,6 +1483,8 @@ static int on_transaction_timeout(sd_event_source *s, usec_t usec, void *userdat
- 
+@@ -1533,6 +1540,8 @@
          assert(s);
+         assert(t);
  
 +        t->seen_timeout = true;
 +
          if (t->initial_jitter_scheduled && !t->initial_jitter_elapsed) {
                  log_debug("Initial jitter phase for transaction %" PRIu16 " elapsed.", t->id);
                  t->initial_jitter_elapsed = true;
-@@ -1600,6 +1609,9 @@ static int dns_transaction_prepare(DnsTransaction *t, usec_t ts) {
+@@ -1629,6 +1638,9 @@
  
          dns_transaction_stop_timeout(t);
  
@@ -568,7 +1166,7 @@ index a5293357c01b..83051afa03e4 100644
          if (!dns_scope_network_good(t->scope)) {
                  dns_transaction_complete(t, DNS_TRANSACTION_NETWORK_DOWN);
                  return 0;
-@@ -1726,6 +1738,14 @@ static int dns_transaction_prepare(DnsTransaction *t, usec_t ts) {
+@@ -1755,6 +1767,14 @@
                                  dns_transaction_reset_answer(t);
                          else {
                                  if (t->n_attempts > 1 && !FLAGS_SET(query_flags, SD_RESOLVED_NO_STALE)) {
@@ -582,12 +1180,11 @@ index a5293357c01b..83051afa03e4 100644
 +
                                          char key_str[DNS_RESOURCE_KEY_STRING_MAX];
                                          log_debug("Serve Stale response rcode=%s for %s",
-                                                 FORMAT_DNS_RCODE(t->answer_rcode),
-diff --git a/src/resolve/resolved-dns-transaction.h b/src/resolve/resolved-dns-transaction.h
-index dd3b897a67ab..2fd8720e2407 100644
---- a/src/resolve/resolved-dns-transaction.h
-+++ b/src/resolve/resolved-dns-transaction.h
-@@ -109,6 +109,8 @@ struct DnsTransaction {
+                                                 dns_rcode_to_string(t->answer_rcode),
+diff -ru systemd-stable-250.3_stable_patch/src/resolve/resolved-dns-transaction.h systemd-stable-250.3_PR#28327/src/resolve/resolved-dns-transaction.h
+--- systemd-stable-250.3_stable_patch/src/resolve/resolved-dns-transaction.h	2023-08-14 16:42:38.701593658 +0530
++++ systemd-stable-250.3_PR#28327/src/resolve/resolved-dns-transaction.h	2023-08-14 16:38:37.415799477 +0530
+@@ -112,6 +112,8 @@
  
          bool probing:1;
  
@@ -596,11 +1193,10 @@ index dd3b897a67ab..2fd8720e2407 100644
          /* Query candidates this transaction is referenced by and that
           * shall be notified about this specific transaction
           * completing. */
-diff --git a/src/resolve/resolved-manager.c b/src/resolve/resolved-manager.c
-index 96899ed0ad68..b77ae60d273b 100644
---- a/src/resolve/resolved-manager.c
-+++ b/src/resolve/resolved-manager.c
-@@ -1799,3 +1799,53 @@ int socket_disable_pmtud(int fd, int af) {
+diff -ru systemd-stable-250.3_stable_patch/src/resolve/resolved-manager.c systemd-stable-250.3_PR#28327/src/resolve/resolved-manager.c
+--- systemd-stable-250.3_stable_patch/src/resolve/resolved-manager.c	2023-08-14 16:42:38.701593658 +0530
++++ systemd-stable-250.3_PR#28327/src/resolve/resolved-manager.c	2023-08-14 16:38:37.219511053 +0530
+@@ -1709,3 +1709,55 @@
                  return -EAFNOSUPPORT;
          }
  }
@@ -610,7 +1206,8 @@ index 96899ed0ad68..b77ae60d273b 100644
 +
 +        assert(m);
 +        assert(ret);
-+
++	
++        DnsScope *s;
 +        LIST_FOREACH(scopes, s, m->dns_scopes) {
 +                size += dns_cache_size(&s->cache);
 +                hit += s->cache.n_hit;
@@ -644,7 +1241,8 @@ index 96899ed0ad68..b77ae60d273b 100644
 +
 +        assert(m);
 +
-+        LIST_FOREACH(scopes, s, m->dns_scopes)
++        DnsScope *s;
++	LIST_FOREACH(scopes, s, m->dns_scopes)
 +                s->cache.n_hit = s->cache.n_miss = 0;
 +
 +        m->n_transactions_total = 0;
@@ -654,11 +1252,10 @@ index 96899ed0ad68..b77ae60d273b 100644
 +        m->n_failure_responses_served_stale_total = 0;
 +        zero(m->n_dnssec_verdict);
 +}
-diff --git a/src/resolve/resolved-manager.h b/src/resolve/resolved-manager.h
-index 46f6b4fedca2..1cd9c3e51485 100644
---- a/src/resolve/resolved-manager.h
-+++ b/src/resolve/resolved-manager.h
-@@ -128,6 +128,11 @@ struct Manager {
+diff -ru systemd-stable-250.3_stable_patch/src/resolve/resolved-manager.h systemd-stable-250.3_PR#28327/src/resolve/resolved-manager.h
+--- systemd-stable-250.3_stable_patch/src/resolve/resolved-manager.h	2023-08-14 16:42:38.701593658 +0530
++++ systemd-stable-250.3_PR#28327/src/resolve/resolved-manager.h	2023-08-14 16:38:37.439834794 +0530
+@@ -127,6 +127,11 @@
          sd_event_source *sigrtmin1_event_source;
  
          unsigned n_transactions_total;
@@ -670,7 +1267,16 @@ index 46f6b4fedca2..1cd9c3e51485 100644
          unsigned n_dnssec_verdict[_DNSSEC_VERDICT_MAX];
  
          /* Data from /etc/hosts */
-@@ -219,3 +224,7 @@ bool manager_next_dnssd_names(Manager *m);
+@@ -148,6 +153,8 @@
+         Hashmap *polkit_registry;
+ 
+         VarlinkServer *varlink_server;
++	VarlinkServer *varlink_monitor_server;
++	Set *varlink_subscription;
+ 
+         sd_event_source *clock_change_event_source;
+ 
+@@ -212,3 +219,7 @@
  bool manager_server_is_stub(Manager *m, DnsServer *s);
  
  int socket_disable_pmtud(int fd, int af);
@@ -678,14 +1284,87 @@ index 46f6b4fedca2..1cd9c3e51485 100644
 +int dns_manager_dump_statistics_json(Manager *m, JsonVariant **ret);
 +
 +void dns_manager_reset_satistics(Manager *m);
-diff --git a/src/resolve/resolved-varlink.c b/src/resolve/resolved-varlink.c
-index 99022f5d2dee..dffdfb0cd02e 100644
---- a/src/resolve/resolved-varlink.c
-+++ b/src/resolve/resolved-varlink.c
-@@ -598,6 +598,98 @@ static int vl_method_dump_cache(Varlink *link, JsonVariant *parameters, VarlinkM
-                                               JSON_BUILD_PAIR("dump", JSON_BUILD_VARIANT(list))));
+diff -ru systemd-stable-250.3_stable_patch/src/resolve/resolved-varlink.c systemd-stable-250.3_PR#28327/src/resolve/resolved-varlink.c
+--- systemd-stable-250.3_stable_patch/src/resolve/resolved-varlink.c	2023-08-14 16:42:38.701593658 +0530
++++ systemd-stable-250.3_PR#28327/src/resolve/resolved-varlink.c	2023-08-14 16:38:37.335681753 +0530
+@@ -1,5 +1,5 @@
+ /* SPDX-License-Identifier: LGPL-2.1-or-later */
+-
++#include "glyph-util.h"
+ #include "in-addr-util.h"
+ #include "resolved-dns-synthesize.h"
+ #include "resolved-varlink.h"
+@@ -519,7 +519,219 @@
+         return r;
  }
  
+-int manager_varlink_init(Manager *m) {
++static int vl_method_subscribe_dns_resolves(Varlink *link, JsonVariant *parameters, VarlinkMethodFlags flags, void *userdata) {
++        Manager *m;
++        int r;
++
++        assert(link);
++
++        m = varlink_server_get_userdata(varlink_get_server(link));
++
++        /* if the client didn't set the more flag, it is using us incorrectly */
++        if (!FLAGS_SET(flags, VARLINK_METHOD_MORE))
++                return varlink_error_invalid_parameter(link, NULL);
++
++        if (json_variant_elements(parameters) > 0)
++                return varlink_error_invalid_parameter(link, parameters);
++
++        /* Send a ready message to the connecting client, to indicate that we are now listinening, and all
++         * queries issued after the point the client sees this will also be reported to the client. */
++        r = varlink_notifyb(link,
++                            JSON_BUILD_OBJECT(JSON_BUILD_PAIR("ready", JSON_BUILD_BOOLEAN(true))));
++        if (r < 0)
++                return log_error_errno(r, "Failed to report monitor to be established: %m");
++
++        r = set_ensure_put(&m->varlink_subscription, NULL, link);
++        if (r < 0)
++                return log_error_errno(r, "Failed to add subscription to set: %m");
++        varlink_ref(link);
++
++        log_debug("%u clients now attached for varlink notifications", set_size(m->varlink_subscription));
++
++        return 1;
++}
++
++static int vl_method_dump_cache(Varlink *link, JsonVariant *parameters, VarlinkMethodFlags flags, void *userdata) {
++        _cleanup_(json_variant_unrefp) JsonVariant *list = NULL;
++        Manager *m;
++        int r;
++
++        assert(link);
++
++        if (json_variant_elements(parameters) > 0)
++                return varlink_error_invalid_parameter(link, parameters);
++
++        m = (varlink_server_get_userdata(varlink_get_server(link)));
++	DnsScope *s;
++        LIST_FOREACH(scopes, s, m->dns_scopes) {
++                _cleanup_(json_variant_unrefp) JsonVariant *j = NULL;
++
++                r = dns_scope_dump_cache_to_json(s, &j);
++                if (r < 0)
++                        return r;
++
++                r = json_variant_append_array(&list, j);
++                if (r < 0)
++                        return r;
++        }
++
++        if (!list) {
++                r = json_variant_new_array(&list, NULL, 0);
++                if (r < 0)
++                        return r;
++        }
++
++        return varlink_replyb(link, JSON_BUILD_OBJECT(
++                                              JSON_BUILD_PAIR("dump", JSON_BUILD_VARIANT(list))));
++}
++
 +static int dns_server_dump_state_to_json_list(DnsServer *server, JsonVariant **list) {
 +        _cleanup_(json_variant_unrefp) JsonVariant *j = NULL;
 +        int r;
@@ -705,13 +1384,13 @@ index 99022f5d2dee..dffdfb0cd02e 100644
 +        Manager *m;
 +        int r;
 +        Link *l;
-+
++	DnsServer *server;
 +        assert(link);
 +
 +        if (json_variant_elements(parameters) > 0)
 +                return varlink_error_invalid_parameter(link, parameters);
 +
-+        m = ASSERT_PTR(varlink_server_get_userdata(varlink_get_server(link)));
++        m = (varlink_server_get_userdata(varlink_get_server(link)));
 +
 +        LIST_FOREACH(servers, server, m->dns_servers) {
 +                r = dns_server_dump_state_to_json_list(server, &list);
@@ -752,7 +1431,7 @@ index 99022f5d2dee..dffdfb0cd02e 100644
 +        if (json_variant_elements(parameters) > 0)
 +                return varlink_error_invalid_parameter(link, parameters);
 +
-+        m = ASSERT_PTR(varlink_server_get_userdata(varlink_get_server(link)));
++        m = (varlink_server_get_userdata(varlink_get_server(link)));
 +
 +        r = dns_manager_dump_statistics_json(m, &j);
 +        if (r < 0)
@@ -762,6 +1441,18 @@ index 99022f5d2dee..dffdfb0cd02e 100644
 +                                              JSON_BUILD_PAIR("statistics", JSON_BUILD_VARIANT(j))));
 +}
 +
++static void vl_on_notification_disconnect(VarlinkServer *s, Varlink *link, void *userdata) {
++        Manager *m = (userdata);
++
++        assert(s);
++        assert(link);
++
++        Varlink *removed_link = set_remove(m->varlink_subscription, link);
++        if (removed_link) {
++                varlink_unref(removed_link);
++                log_debug("%u monitor clients remain active", set_size(m->varlink_subscription));
++        }
++}
 +static int vl_method_reset_statistics(Varlink *link, JsonVariant *parameters, VarlinkMethodFlags flags, void *userdata) {
 +        Manager *m;
 +
@@ -770,7 +1461,7 @@ index 99022f5d2dee..dffdfb0cd02e 100644
 +        if (json_variant_elements(parameters) > 0)
 +                return varlink_error_invalid_parameter(link, parameters);
 +
-+        m = ASSERT_PTR(varlink_server_get_userdata(varlink_get_server(link)));
++        m = (varlink_server_get_userdata(varlink_get_server(link)));
 +
 +        dns_manager_reset_satistics(m);
 +
@@ -778,69 +1469,203 @@ index 99022f5d2dee..dffdfb0cd02e 100644
 +                                              JSON_BUILD_PAIR("success", JSON_BUILD_BOOLEAN(true))));
 +}
 +
- static int varlink_monitor_server_init(Manager *m) {
-         _cleanup_(varlink_server_unrefp) VarlinkServer *server = NULL;
-         int r;
-@@ -616,7 +708,10 @@ static int varlink_monitor_server_init(Manager *m) {
-         r = varlink_server_bind_method_many(
-                         server,
-                         "io.systemd.Resolve.Monitor.SubscribeQueryResults", vl_method_subscribe_dns_resolves,
--                        "io.systemd.Resolve.Monitor.DumpCache", vl_method_dump_cache);
++static int varlink_monitor_server_init(Manager *m) {
++        _cleanup_(varlink_server_unrefp) VarlinkServer *server = NULL;
++        int r;
++
++        assert(m);
++
++        if (m->varlink_monitor_server)
++                return 0;
++
++        r = varlink_server_new(&server, VARLINK_SERVER_ROOT_ONLY);
++        if (r < 0)
++                return log_error_errno(r, "Failed to allocate varlink server object: %m");
++
++        varlink_server_set_userdata(server, m);
++
++        r = varlink_server_bind_method_many(
++                        server,
++                        "io.systemd.Resolve.Monitor.SubscribeQueryResults", vl_method_subscribe_dns_resolves,
 +                        "io.systemd.Resolve.Monitor.DumpCache", vl_method_dump_cache,
 +                        "io.systemd.Resolve.Monitor.DumpServerState", vl_method_dump_server_state,
 +                        "io.systemd.Resolve.Monitor.DumpStatistics", vl_method_dump_statistics,
 +                        "io.systemd.Resolve.Monitor.ResetStatistics", vl_method_reset_statistics);
-         if (r < 0)
-                 return log_error_errno(r, "Failed to register varlink methods: %m");
++        if (r < 0)
++                return log_error_errno(r, "Failed to register varlink methods: %m");
++
++        r = varlink_server_bind_disconnect(server, vl_on_notification_disconnect);
++        if (r < 0)
++                return log_error_errno(r, "Failed to register varlink disconnect handler: %m");
++
++        r = varlink_server_listen_address(server, "/run/systemd/resolve/io.systemd.Resolve.Monitor", 0600);
++        if (r < 0)
++                return log_error_errno(r, "Failed to bind to varlink socket: %m");
++
++        r = varlink_server_attach_event(server, m->event, SD_EVENT_PRIORITY_NORMAL);
++        if (r < 0)
++                return log_error_errno(r, "Failed to attach varlink connection to event loop: %m");
++
++        m->varlink_monitor_server = TAKE_PTR(server);
++
++        return 0;
++}
++
++static int varlink_main_server_init(Manager *m) {
+         _cleanup_(varlink_server_unrefp) VarlinkServer *s = NULL;
+         int r;
  
-diff --git a/test/units/testsuite-75.sh b/test/units/testsuite-75.sh
-index c9d4ca16d87f..6a14ce63ad2c 100755
---- a/test/units/testsuite-75.sh
-+++ b/test/units/testsuite-75.sh
-@@ -579,5 +579,46 @@ else
-     echo "nftables is not installed. Skipped serve stale feature test."
- fi
+@@ -557,8 +769,23 @@
+         return 0;
+ }
  
-+### Test resolvectl show-server-state ###
-+run resolvectl show-server-state
-+grep -qF "10.0.0.1" "$RUN_OUT"
-+grep -qF "Interface" "$RUN_OUT"
++int manager_varlink_init(Manager *m) {
++        int r;
 +
-+run resolvectl show-server-state --json=short
-+grep -qF "10.0.0.1" "$RUN_OUT"
-+grep -qF "interface" "$RUN_OUT"
++        r = varlink_main_server_init(m);
++        if (r < 0)
++                return r;
 +
-+run resolvectl show-server-state --json=pretty
-+grep -qF "10.0.0.1" "$RUN_OUT"
-+grep -qF "interface" "$RUN_OUT"
++        r = varlink_monitor_server_init(m);
++        if (r < 0)
++                return r;
 +
-+### Test resolvectl statistics ###
-+run resolvectl statistics
-+grep -qF "Transactions" "$RUN_OUT"
-+grep -qF "Cache" "$RUN_OUT"
-+grep -qF "Failure Transactions" "$RUN_OUT"
-+grep -qF "DNSSEC Verdicts" "$RUN_OUT"
++        return 0;
++}
 +
-+run resolvectl statistics --json=short
-+grep -qF "transactions" "$RUN_OUT"
-+grep -qF "cache" "$RUN_OUT"
-+grep -qF "dnssec" "$RUN_OUT"
+ void manager_varlink_done(Manager *m) {
+         assert(m);
+ 
+         m->varlink_server = varlink_server_unref(m->varlink_server);
++        m->varlink_monitor_server = varlink_server_unref(m->varlink_monitor_server);
+ }
+diff -ru systemd-stable-250.3_stable_patch/src/shared/json.c systemd-stable-250.3_PR#28327/src/shared/json.c
+--- systemd-stable-250.3_stable_patch/src/shared/json.c	2023-08-14 16:42:38.773654668 +0530
++++ systemd-stable-250.3_PR#28327/src/shared/json.c	2023-08-14 16:38:34.494829664 +0530
+@@ -8,7 +8,7 @@
+ #include <sys/types.h>
+ 
+ #include "sd-messages.h"
+-
++#include "escape.h"
+ #include "alloc-util.h"
+ #include "errno-util.h"
+ #include "fd-util.h"
+@@ -452,6 +452,19 @@
+         return json_variant_new_stringn(ret, s, n*2);
+ }
+ 
++int json_variant_new_octescape(JsonVariant **ret, const void *p, size_t n) {
++        _cleanup_free_ char *s = NULL;
 +
-+run resolvectl statistics --json=pretty
-+grep -qF "transactions" "$RUN_OUT"
-+grep -qF "cache" "$RUN_OUT"
-+grep -qF "dnssec" "$RUN_OUT"
++        assert_return(ret, -EINVAL);
++        assert_return(n == 0 || p, -EINVAL);
 +
-+### Test resolvectl reset-statistics ###
-+run resolvectl reset-statistics
++        s = octescape(p, n);
++        if (!s)
++                return -ENOMEM;
 +
-+run resolvectl reset-statistics --json=pretty
-+grep -qF "success" "$RUN_OUT"
-+grep -qF "true" "$RUN_OUT"
++        return json_variant_new_string(ret, s);
++}
 +
-+run resolvectl reset-statistics --json=short
-+grep -qF "success" "$RUN_OUT"
-+grep -qF "true" "$RUN_OUT"
+ int json_variant_new_id128(JsonVariant **ret, sd_id128_t id) {
+         return json_variant_new_string(ret, SD_ID128_TO_STRING(id));
+ }
+@@ -4376,6 +4389,14 @@
+         return 0;
+ }
+ 
++int json_dispatch_variant_noref(const char *name, JsonVariant *variant, JsonDispatchFlags flags, void *userdata) {
++        JsonVariant **p = userdata;
++        assert(variant);
 +
- touch /testok
- rm /failed
++        /* Doesn't take a reference */
++        *p = variant;
++        return 0;
++}
+ int json_dispatch_int64(const char *name, JsonVariant *variant, JsonDispatchFlags flags, void *userdata) {
+         int64_t *i = userdata;
+ 
+@@ -4434,6 +4455,36 @@
+         return 0;
+ }
+ 
++int json_dispatch_int16(const char *name, JsonVariant *variant, JsonDispatchFlags flags, void *userdata) {
++        int16_t *i = userdata;
++
++        assert(variant);
++
++        if (!json_variant_is_integer(variant))
++                return json_log(variant, flags, SYNTHETIC_ERRNO(EINVAL), "JSON field '%s' is not an integer.", strna(name));
++
++        if (json_variant_integer(variant) < INT16_MIN || json_variant_integer(variant) > INT16_MAX)
++                return json_log(variant, flags, SYNTHETIC_ERRNO(ERANGE), "JSON field '%s' out of bounds.", strna(name));
++
++        *i = (int16_t) json_variant_integer(variant);
++        return 0;
++}
++
++int json_dispatch_uint16(const char *name, JsonVariant *variant, JsonDispatchFlags flags, void *userdata) {
++        uint16_t *i = userdata;
++
++        assert(variant);
++
++        if (!json_variant_is_unsigned(variant))
++                return json_log(variant, flags, SYNTHETIC_ERRNO(EINVAL), "JSON field '%s' is not an unsigned integer.", strna(name));
++
++        if (json_variant_unsigned(variant) > UINT16_MAX)
++                return json_log(variant, flags, SYNTHETIC_ERRNO(ERANGE), "JSON field '%s' out of bounds.", strna(name));
++
++        *i = (uint16_t) json_variant_unsigned(variant);
++        return 0;
++}
++
+ int json_dispatch_string(const char *name, JsonVariant *variant, JsonDispatchFlags flags, void *userdata) {
+         char **s = userdata;
+         int r;
+diff -ru systemd-stable-250.3_stable_patch/src/shared/json.h systemd-stable-250.3_PR#28327/src/shared/json.h
+--- systemd-stable-250.3_stable_patch/src/shared/json.h	2023-08-14 16:42:38.773654668 +0530
++++ systemd-stable-250.3_PR#28327/src/shared/json.h	2023-08-14 16:38:33.196135087 +0530
+@@ -62,7 +62,9 @@
+ 
+ int json_variant_new_stringn(JsonVariant **ret, const char *s, size_t n);
+ int json_variant_new_base64(JsonVariant **ret, const void *p, size_t n);
++int json_variant_new_base32hex(JsonVariant **ret, const void *p, size_t n);
+ int json_variant_new_hex(JsonVariant **ret, const void *p, size_t n);
++int json_variant_new_octescape(JsonVariant **ret, const void *p, size_t n);
+ int json_variant_new_integer(JsonVariant **ret, int64_t i);
+ int json_variant_new_unsigned(JsonVariant **ret, uint64_t u);
+ int json_variant_new_real(JsonVariant **ret, double d);
+@@ -237,7 +239,9 @@
+         _JSON_BUILD_LITERAL,
+         _JSON_BUILD_STRV,
+         _JSON_BUILD_BASE64,
++        _JSON_BUILD_BASE32HEX,
+         _JSON_BUILD_HEX,
++        _JSON_BUILD_OCTESCAPE,
+         _JSON_BUILD_ID128,
+         _JSON_BUILD_BYTE_ARRAY,
+         _JSON_BUILD_HW_ADDR,
+@@ -272,7 +276,9 @@
+ #define JSON_BUILD_LITERAL(l) _JSON_BUILD_LITERAL, (const char*) { l }
+ #define JSON_BUILD_STRV(l) _JSON_BUILD_STRV, (char**) { l }
+ #define JSON_BUILD_BASE64(p, n) _JSON_BUILD_BASE64, (const void*) { p }, (size_t) { n }
++#define JSON_BUILD_BASE32HEX(p, n) _JSON_BUILD_BASE32HEX, (const void*) { p }, (size_t) { n }
+ #define JSON_BUILD_HEX(p, n) _JSON_BUILD_HEX, (const void*) { p }, (size_t) { n }
++#define JSON_BUILD_OCTESCAPE(p, n) _JSON_BUILD_OCTESCAPE, (const void*) { p }, (size_t) { n }
+ #define JSON_BUILD_ID128(id) _JSON_BUILD_ID128, (const sd_id128_t*) { &(id) }
+ #define JSON_BUILD_BYTE_ARRAY(v, n) _JSON_BUILD_BYTE_ARRAY, (const void*) { v }, (size_t) { n }
+ #define JSON_BUILD_CONST_STRING(s) _JSON_BUILD_VARIANT, JSON_VARIANT_STRING_CONST(s)
+@@ -354,8 +360,11 @@
+ int json_dispatch_boolean(const char *name, JsonVariant *variant, JsonDispatchFlags flags, void *userdata);
+ int json_dispatch_tristate(const char *name, JsonVariant *variant, JsonDispatchFlags flags, void *userdata);
+ int json_dispatch_variant(const char *name, JsonVariant *variant, JsonDispatchFlags flags, void *userdata);
++int json_dispatch_variant_noref(const char *name, JsonVariant *variant, JsonDispatchFlags flags, void *userdata);
+ int json_dispatch_int64(const char *name, JsonVariant *variant, JsonDispatchFlags flags, void *userdata);
+ int json_dispatch_uint64(const char *name, JsonVariant *variant, JsonDispatchFlags flags, void *userdata);
++int json_dispatch_uint16(const char *name, JsonVariant *variant, JsonDispatchFlags flags, void *userdata);
++int json_dispatch_int16(const char *name, JsonVariant *variant, JsonDispatchFlags flags, void *userdata);
+ int json_dispatch_uint32(const char *name, JsonVariant *variant, JsonDispatchFlags flags, void *userdata);
+ int json_dispatch_int32(const char *name, JsonVariant *variant, JsonDispatchFlags flags, void *userdata);
+ int json_dispatch_uid_gid(const char *name, JsonVariant *variant, JsonDispatchFlags flags, void *userdata);
+Only in systemd-stable-250.3_stable_patch/units: system-systemd\x2dcryptsetup.slice
