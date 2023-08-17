@@ -1,15 +1,3 @@
-%global goroot          %{_libdir}/golang
-%global gopath          %{_datadir}/gocode
-%ifarch aarch64
-%global gohostarch      arm64
-%else
-%global gohostarch      amd64
-%endif
-%define debug_package %{nil}
-%define __strip /bin/true
-# rpmbuild magic to keep from having meta dependency on libc.so.6
-%define _use_internal_dependency_generator 0
-%define __find_requires %{nil}
 Summary:        Go
 Name:           msft-golang
 Version:        1.19.12
@@ -22,6 +10,18 @@ URL:            https://github.com/microsoft/go
 Source0:        https://github.com/microsoft/go/releases/download/v1.19.12-1/go.20230802.5.src.tar.gz
 Source1:        https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
+%global goroot          %{_libdir}/golang
+%global gopath          %{_datadir}/gocode
+%ifarch aarch64
+%global gohostarch      arm64
+%else
+%global gohostarch      amd64
+%endif
+%define debug_package %{nil}
+%define __strip /bin/true
+# rpmbuild magic to keep from having meta dependency on libc.so.6
+%define _use_internal_dependency_generator 0
+%define __find_requires %{nil}
 Conflicts:      go
 Conflicts:      golang
 
