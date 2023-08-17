@@ -505,7 +505,7 @@ func buildAllSpecsList(baseDir string) (specPaths []string, err error) {
 	return
 }
 
-// filterCompatibleSpecs filters a list of spec files in the chroot's SPECs directory that are compatible with the build arch. Paths
+// filterCompatibleSpecs filters a list of spec files in the chroot's SPECs directory that are compatible with the build arch.
 func filterCompatibleSpecs(inputSpecPaths []string, defines map[string]string) (filteredSpecPaths []string, err error) {
 	var specCompatible bool
 
