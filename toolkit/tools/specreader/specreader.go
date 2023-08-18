@@ -250,7 +250,7 @@ func findSpecFiles(specsDir string, specListSet map[string]bool) (specFiles []st
 		var specSearch string
 		specSearch, err = filepath.Abs(filepath.Join(specsDir, "**/*.spec"))
 		if err != nil {
-			err = fmt.Errorf("invalid spec path: '%s'. Error: %w", specsDir, err)
+			err = fmt.Errorf("invalid spec dir: '%s'. Error:\n%w", specsDir, err)
 			return nil, err
 		}
 		specFiles, err = filepath.Glob(specSearch)
