@@ -947,7 +947,7 @@ func InstallGrubEnv(installRoot string) (err error) {
 // - kernelCommandLine contains additional kernel parameters which may be optionally set
 // Note: this boot partition could be different than the boot partition specified in the bootloader.
 // This boot partition specifically indicates where to find the kernel, config files, and initrd
-func InstallGrubCfg(installRoot, rootDevice, bootUUID, bootPrefix string, encryptedRoot diskutils.EncryptedRootDevice, kernelCommandLine configuration.KernelCommandLine, readOnlyRoot diskutils.VerityDevice) (err error) {
+func InstallGrubCfg(installRoot, rootDevice, bootUUID, bootPrefix string, encryptedRoot diskutils.EncryptedRootDevice, kernelCommandLine configuration.KernelCommandLine, readOnlyRoot diskutils.VerityDevice, isBootSeparatePartition bool) (err error) {
 	const (
 		assetGrubcfgFile = "/installer/grub2/grub.cfg"
 		grubCfgFile      = "boot/grub2/grub.cfg"
@@ -1015,7 +1015,7 @@ func InstallGrubCfg(installRoot, rootDevice, bootUUID, bootPrefix string, encryp
 	}
 
 	// Configure FIPS
-	err = setGrubCfgFIPS(bootUUID, installGrubCfgFile, kernelCommandLine)
+	err = setGrubCfgFIPS(isBootSeparatePartition, bootUUID, installGrubCfgFile, kernelCommandLine)
 	if err != nil {
 		logger.Log.Warnf("Failed to set FIPS in grub.cfg: %v", err)
 		return
@@ -2045,7 +2045,7 @@ func setGrubCfgSELinux(grubPath string, kernelCommandline configuration.KernelCo
 	return
 }
 
-func setGrubCfgFIPS(bootUUID, grubPath string, kernelCommandline configuration.KernelCommandLine) (err error) {
+func setGrubCfgFIPS(isBootSeparatePartition bool, bootUUID, grubPath string, kernelCommandline configuration.KernelCommandLine) (err error) {
 	const (
 		enableFIPSPattern = "{{.FIPS}}"
 		enableFIPS        = "fips=1"
@@ -2053,10 +2053,15 @@ func setGrubCfgFIPS(bootUUID, grubPath string, kernelCommandline configuration.K
 		uuidPrefix        = "UUID="
 	)
 
-	// If EnableFIPS is set, add "fips=1 boot=UUID=<bootUUID value>" to the kernel cmdline in grub.cfg
+	// If EnableFIPS is set, always add "fips=1" to the kernel cmdline.
+	// If /boot is a dedicated partition from the root partition, add "boot=UUID=<bootUUID value>" as well to the kernel cmdline in grub.cfg.
+	// This second step is required for fips boot-time self tests to find the kernel's .hmac file in the /boot partition.
 	fipsKernelArgument := ""
 	if kernelCommandline.EnableFIPS {
-		fipsKernelArgument = fmt.Sprintf("%s %s%s%s", enableFIPS, bootPrefix, uuidPrefix, bootUUID)
+		fipsKernelArgument = fmt.Sprintf("%s", enableFIPS)
+		if isBootSeparatePartition {
+			fipsKernelArgument = fmt.Sprintf("%s %s%s%s", fipsKernelArgument, bootPrefix, uuidPrefix, bootUUID)
+		}
 	}
 
 	logger.Log.Debugf("Adding EnableFIPS('%s') to '%s'", fipsKernelArgument, grubPath)
