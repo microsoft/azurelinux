@@ -45,7 +45,7 @@ type parseResult struct {
 var (
 	app                     = kingpin.New("specreader", "A tool to parse spec dependencies into JSON")
 	specsDir                = exe.InputDirFlag(app, "Directory to scan for SPECS")
-	specListFile            = app.Flag("parse-list", "Path to a list of SPECs to parse. If empty will parse all SPECs.").ExistingFile()
+	specListFile            = app.Flag("spec-list", "Path to a list of SPECs to parse. If empty will parse all SPECs.").ExistingFile()
 	output                  = exe.OutputFlag(app, "Output file to export the JSON")
 	workers                 = app.Flag("workers", "Number of concurrent goroutines to parse with").Default(defaultWorkerCount).Int()
 	buildDir                = app.Flag("build-dir", "Directory to store temporary files while parsing.").String()
@@ -231,6 +231,7 @@ func findSpecFiles(specsDir string, specListSet map[string]bool) (specFiles []st
 
 			// If a SPEC is in the parse list, it should be parsed.
 			if err != nil {
+				err = fmt.Errorf("spec search failed on '%s'. Error:\n%w", specSearch, err)
 				return nil, err
 			}
 			if len(matchingSpecFiles) != 1 {
