@@ -271,7 +271,7 @@ func findSpecFiles(specsDir string, specListSet map[string]bool) (specFiles []st
 				return nil, err
 			}
 			if len(matchingSpecFiles) != 1 {
-				err = fmt.Errorf("unexpected number of matches (%d) for spec file (%s)", len(matchingSpecFiles), specName)
+				err = fmt.Errorf("unexpected number of matches '%d' for spec file '%s'", len(matchingSpecFiles), specName)
 				return nil, err
 			}
 			specFiles = append(specFiles, matchingSpecFiles[0])
