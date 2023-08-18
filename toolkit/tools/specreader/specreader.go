@@ -33,8 +33,6 @@ import (
 )
 
 const (
-	defaultWorkerCount = "100"
-
 	// Spaces added on purpose to simplify substring matching.
 	andCondition  = " and "
 	ifCondition   = " if "
@@ -63,6 +61,10 @@ type parseResult struct {
 	packages []*pkgjson.Package
 	err      error
 }
+
+const (
+	defaultWorkerCount = "100"
+)
 
 var (
 	app                     = kingpin.New("specreader", "A tool to parse spec dependencies into JSON")
