@@ -298,9 +298,13 @@ func (g *PkgGraph) validateNodeForLookup(pkgNode *PkgNode) (valid bool, err erro
 		switch pkgNode.Type {
 		case TypeLocalBuild:
 			haveDuplicateNode = existingLookup.BuildNode != nil
-		// For the purposes of lookup, a "Remote" node provides the same utility as a "Run" node
-		case TypeLocalRun, TypeRemoteRun:
-			haveDuplicateNode = existingLookup.RunNode != nil
+		case TypeLocalRun:
+			haveDuplicateNode = (existingLookup.RunNode != nil) && (existingLookup.RunNode.Type == TypeLocalRun)
+		case TypeRemoteRun:
+			// It is possible that
+			// 1. LocalRun and RemoteRun co-exist in a graph
+			// 2. Multiple RemoteRun nodes can exist in a graph
+			haveDuplicateNode = false
 		case TypeTest:
 			haveDuplicateNode = existingLookup.TestNode != nil
 		}
@@ -369,9 +373,14 @@ func (g *PkgGraph) addToLookup(pkgNode *PkgNode, deferSort bool) (err error) {
 	switch pkgNode.Type {
 	case TypeLocalBuild:
 		existingLookup.BuildNode = pkgNode.This
-		// For the purposes of lookup, a "Remote" node provides the same utility as a "Run" node
-	case TypeLocalRun, TypeRemoteRun:
+	case TypeLocalRun:
+		// Prefer LocalRun over RemoteRun
 		existingLookup.RunNode = pkgNode.This
+	case TypeRemoteRun:
+		// Update only if RunNoe is nil
+		if existingLookup.RunNode == nil {
+			existingLookup.RunNode = pkgNode.This
+		}
 	case TypeTest:
 		existingLookup.TestNode = pkgNode.This
 	}
@@ -620,6 +629,17 @@ func (g *PkgGraph) AllNodesFrom(rootNode *PkgNode) []*PkgNode {
 
 // AllRunNodes returns a list of all run nodes in the graph
 func (g *PkgGraph) AllRunNodes() []*PkgNode {
+	nodes := make([]*PkgNode, 0, g.Nodes().Len())
+	for _, n := range g.AllNodes() {
+		if n.Type == TypeLocalRun || n.Type == TypeRemoteRun {
+			nodes = append(nodes, n)
+		}
+	}
+	return nodes
+}
+
+// Returns all RunNodes in the LookupTable
+func (g *PkgGraph) AllPreferredRunNodes() []*PkgNode {
 	return g.allNodesOfType(func(n *LookupNode) *PkgNode {
 		return n.RunNode
 	})
@@ -1249,7 +1269,7 @@ func (g *PkgGraph) buildGoalSet(packageVers []*pkgjson.PackageVer, nodeType Node
 		if nodeType == TypeTest {
 			goalSet = pkgNodesListToPackageVerSet(g.AllTestNodes())
 		} else {
-			goalSet = pkgNodesListToPackageVerSet(g.AllRunNodes())
+			goalSet = pkgNodesListToPackageVerSet(g.AllPreferredRunNodes())
 		}
 	}
 
@@ -1403,9 +1423,9 @@ func (g *PkgGraph) replaceSRPMBuildDependency(replacedNode, newNode *PkgNode, de
 				logger.Log.Errorf("Adding edge failed for %v -> %v", parentNode, newNode)
 				return
 			}
-			logger.Log.Infof("Successful\nReplaced %v with %v", replacedNode, newNode)
 		}
 	}
+	logger.Log.Infof("Successful\nUpdated dependency to %v for nodes depending on %v", newNode, replacedNode)
 }
 
 func (g *PkgGraph) cloneAndReplaceRunToRemote(runNode *PkgNode, buildNodeToUpdate *PkgNode) {
@@ -1531,30 +1551,6 @@ func formatCycleErrorMessage(cycle []*PkgNode, err error) error {
 	return fmt.Errorf("cycles detected in dependency graph")
 }
 
-// NodesProvidedBySRPM returns all RPMs produced from a SRPM file.
-func NodesProvidedBySRPM(srpmPath string, pkgGraph *PkgGraph, graphMutex *sync.RWMutex) (rpmNodes []*PkgNode) {
-	if graphMutex != nil {
-		graphMutex.RLock()
-		defer graphMutex.RUnlock()
-	}
-
-	/*allocating 10 nodes initially. append will allocate more nodes if required*/
-	rpmNodes = make([]*PkgNode, 0, 10)
-	runNodes := pkgGraph.AllRunNodes()
-	for _, node := range runNodes {
-		if node.SrpmPath != srpmPath {
-			continue
-		}
-
-		if node.RpmPath == "" || node.RpmPath == "<NO_RPM_PATH>" {
-			continue
-		}
-
-		rpmNodes = append(rpmNodes, node)
-	}
-	return
-}
-
 // pkgNodesListToPackageVerSet converts a list of "*PkgNode" elements to a set of "*PackageVer" elements.
 func pkgNodesListToPackageVerSet(nodes []*PkgNode) (packageVerSet map[*pkgjson.PackageVer]bool) {
 	packageVerSet = make(map[*pkgjson.PackageVer]bool)
@@ -1580,7 +1576,7 @@ func rpmsProvidedBySRPM(srpmPath string, pkgGraph *PkgGraph, graphMutex *sync.RW
 	}
 
 	rpmsMap := make(map[string]bool)
-	runNodes := pkgGraph.AllRunNodes()
+	runNodes := pkgGraph.AllPreferredRunNodes()
 	for _, node := range runNodes {
 		if node.SrpmPath != srpmPath {
 			continue
@@ -1617,7 +1613,7 @@ func findMissingFiles(filePaths []string) (missingFiles []string) {
 func (g *PkgGraph) breakCycleAtThisNodeUsingUpstream(previousNode, currentNode *PkgNode, ignoreVersionToResolveSelfDep bool, cloner *rpmrepocloner.RpmRepoCloner) (isCycleBroken bool) {
 	isCycleBroken = false
 
-	isAvailableUpstream, err := findAllRPMSUpstream([]*PkgNode{currentNode}, false, cloner)
+	isAvailableUpstream, err := findAllRPMSUpstream([]*PkgNode{currentNode}, ignoreVersionToResolveSelfDep, cloner)
 	// Cloner errors are not fatal - may return one when the RPM is not found.
 	if err != nil {
 		logger.Log.Debugf("Error while checking if SRPM is available upstream: %v", err)
