@@ -2053,17 +2053,14 @@ func setGrubCfgFIPS(bootUUID, grubPath string, kernelCommandline configuration.K
 		uuidPrefix        = "UUID="
 	)
 
-	var fips string
-
 	// If EnableFIPS is set, add "fips=1 boot=UUID=<bootUUID value>" to the kernel cmdline in grub.cfg
+	fipsKernelArgument := ""
 	if kernelCommandline.EnableFIPS {
-		fips = fmt.Sprintf("%s %s%s%s", enableFIPS, bootPrefix, uuidPrefix, bootUUID)
-	} else {
-		fips = ""
+		fipsKernelArgument = fmt.Sprintf("%s %s%s%s", enableFIPS, bootPrefix, uuidPrefix, bootUUID)
 	}
 
-	logger.Log.Debugf("Adding EnableFIPS('%s') to '%s'", fips, grubPath)
-	err = sed(enableFIPSPattern, fips, kernelCommandline.GetSedDelimeter(), grubPath)
+	logger.Log.Debugf("Adding EnableFIPS('%s') to '%s'", fipsKernelArgument, grubPath)
+	err = sed(enableFIPSPattern, fipsKernelArgument, kernelCommandline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set grub.cfg's EnableFIPS setting: %v", err)
 	}
