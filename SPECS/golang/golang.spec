@@ -12,7 +12,7 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.19.11
+Version:        1.19.12
 Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
@@ -22,6 +22,7 @@ URL:            https://golang.org
 Source0:        https://golang.org/dl/go%{version}.src.tar.gz
 Source1:        https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
+Patch1:         permit-requests-with-invalid-header.patch
 Obsoletes:      %{name} < %{version}
 Provides:       %{name} = %{version}
 Provides:       go = %{version}-%{release}
@@ -37,6 +38,7 @@ patch -Np1 --ignore-whitespace < %{PATCH0}
 mv -v go go-bootstrap
 
 %setup -q -n go
+%patch1 -p1
 
 %build
 # Build go 1.4 bootstrap
@@ -117,6 +119,10 @@ fi
 %{_bindir}/*
 
 %changelog
+* Tue Aug 15 2023 Muhammad Falak <mwani@microsoft.com> - 1.19.12-1
+- Auto-upgrade to 1.19.12 to address CVE-2023-29409
+- Introduce patch to permit requests with invalid header
+
 * Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.19.11-1
 - Auto-upgrade to 1.19.11 - Fix CVE-2023-29406
 
