@@ -87,16 +87,6 @@ func main() {
 		logger.Log.Fatalf("Failed to read graph to file: %s", err)
 	}
 
-	/*If there is an existing runNode and then there is one more remote node, donot throw dup error, instead replace the run node with remote node*/
-	for _, pkgNode := range dependencyGraph.AllNodes() {
-		if pkgNode.Type == pkggraph.TypeRemoteRun {
-			locErr := dependencyGraph.AddRemoteToLookup(pkgNode)
-			if locErr != nil {
-				logger.Log.Infof("Failed to add remote to lookup: %s", locErr)
-			}
-		}
-	}
-
 	hasUnresolvedNodes := hasUnresolvedNodes(dependencyGraph)
 	if hasUnresolvedNodes || *tryDownloadDeltaRPMs {
 		err = fetchPackages(dependencyGraph, hasUnresolvedNodes, *tryDownloadDeltaRPMs)
