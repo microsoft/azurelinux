@@ -53,9 +53,10 @@ endef
 ######## VARIABLE DEPENDENCY TRACKING ########
 
 # List of variables to watch for changes.
-watch_vars=PACKAGE_BUILD_LIST PACKAGE_REBUILD_LIST PACKAGE_IGNORE_LIST REPO_LIST CONFIG_FILE STOP_ON_PKG_FAIL TOOLCHAIN_ARCHIVE REBUILD_TOOLCHAIN SRPM_PACK_LIST SPECS_DIR
+watch_vars=PACKAGE_BUILD_LIST PACKAGE_REBUILD_LIST PACKAGE_IGNORE_LIST REPO_LIST CONFIG_FILE STOP_ON_PKG_FAIL TOOLCHAIN_ARCHIVE REBUILD_TOOLCHAIN SRPM_PACK_LIST SPECS_DIR RUN_CHECK TEST_RUN_LIST TEST_RERUN_LIST TEST_IGNORE_LIST
 # Current list: $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST) $(depend_REPO_LIST) $(depend_CONFIG_FILE) $(depend_STOP_ON_PKG_FAIL)
-#					$(depend_TOOLCHAIN_ARCHIVE) $(depend_REBUILD_TOOLCHAIN) $(depend_SRPM_PACK_LIST) $(depend_SPECS_DIR)
+#					$(depend_TOOLCHAIN_ARCHIVE) $(depend_REBUILD_TOOLCHAIN) $(depend_SRPM_PACK_LIST) $(depend_SPECS_DIR) $(depend_RUN_CHECK) $(depend_TEST_RUN_LIST) $(depend_TEST_RERUN_LIST)
+#					$(depend_TEST_IGNORE_LIST)
 
 .PHONY: variable_depends_on_phony clean-variable_depends_on_phony
 clean: clean-variable_depends_on_phony
@@ -89,3 +90,7 @@ endef
 
 # Invoke the above rule for each tracked variable
 $(foreach var,$(watch_vars),$(eval $(call depend_on_var,$(var))))
+
+# Host's extended ACLs influence the default permissions of the
+# files inside the built RPMs. Disabling them for the build directory.
+$(call shell_real_build_only, setfacl -bnR $(PROJECT_ROOT))

@@ -77,7 +77,7 @@ func main() {
 	}
 
 	// Add a default "ALL" goal to build everything local
-	_, err = depGraph.AddGoalNode(goalNodeName, nil, *strictGoals)
+	_, err = depGraph.AddGoalNode(goalNodeName, nil, nil, *strictGoals)
 	if err != nil {
 		logger.Log.Panic(err)
 	}
@@ -133,7 +133,7 @@ func addUnresolvedPackage(g *pkggraph.PkgGraph, pkgVer *pkgjson.PackageVer) (new
 	}
 
 	// Create a new node
-	newRunNode, err = g.AddPkgNode(pkgVer, pkggraph.StateUnresolved, pkggraph.TypeRemoteRun, "<NO_SRPM_PATH>", "<NO_RPM_PATH>", "<NO_SPEC_PATH>", "<NO_SOURCE_PATH>", "<NO_ARCHITECTURE>", "<NO_REPO>")
+	newRunNode, err = g.AddPkgNode(pkgVer, pkggraph.StateUnresolved, pkggraph.TypeRemoteRun, pkggraph.NoSRPMPath, pkggraph.NoRPMPath, pkggraph.NoSpecPath, pkggraph.NoSourceDir, pkggraph.NoArchitecture, pkggraph.NoSourceRepo)
 	if err != nil {
 		return
 	}
@@ -143,47 +143,74 @@ func addUnresolvedPackage(g *pkggraph.PkgGraph, pkgVer *pkgjson.PackageVer) (new
 	return
 }
 
-// addNodesForPackage creates a "Run" and "Build" node for the package described
-// in the PackageVer structure. Returns pointers to the build and run Nodes
+// addNodesForPackage creates a "Run", "Build", and "Test" node for the package described
+// in the Package structure. Returns pointers to the build and run Nodes
 // created, or an error if one of the nodes could not be created.
-func addNodesForPackage(g *pkggraph.PkgGraph, pkgVer *pkgjson.PackageVer, pkg *pkgjson.Package) (newRunNode *pkggraph.PkgNode, newBuildNode *pkggraph.PkgNode, err error) {
-	nodes, err := g.FindExactPkgNodeFromPkg(pkgVer)
+func addNodesForPackage(g *pkggraph.PkgGraph, pkg *pkgjson.Package) (err error) {
+	var (
+		newRunNode   *pkggraph.PkgNode
+		newBuildNode *pkggraph.PkgNode
+		newTestNode  *pkggraph.PkgNode
+	)
+
+	nodes, err := g.FindExactPkgNodeFromPkg(pkg.Provides)
 	if err != nil {
 		return
 	}
+
 	if nodes != nil {
-		logger.Log.Warnf(`Duplicate package name for package %+v read from SRPM "%s" (Previous: %+v)`, pkgVer, pkg.SrpmPath, nodes.RunNode)
-		err = nil
-		if nodes.RunNode != nil {
-			newRunNode = nodes.RunNode
-		}
-		if nodes.BuildNode != nil {
-			newBuildNode = nodes.BuildNode
-		}
+		logger.Log.Warnf(`Duplicate package name for package %+v read from SRPM "%s" (Previous: %+v)`, pkg.Provides, pkg.SrpmPath, nodes.RunNode)
+		newRunNode = nodes.RunNode
+		newBuildNode = nodes.BuildNode
+		newTestNode = nodes.TestNode
 	}
 
 	if newRunNode == nil {
 		// Add "Run" node
-		newRunNode, err = g.AddPkgNode(pkgVer, pkggraph.StateMeta, pkggraph.TypeLocalRun, pkg.SrpmPath, pkg.RpmPath, pkg.SpecPath, pkg.SourceDir, pkg.Architecture, "<LOCAL>")
-		logger.Log.Debugf("Adding run node %s with id %d\n", newRunNode.FriendlyName(), newRunNode.ID())
+		newRunNode, err = g.AddPkgNode(pkg.Provides, pkggraph.StateMeta, pkggraph.TypeLocalRun, pkg.SrpmPath, pkg.RpmPath, pkg.SpecPath, pkg.SourceDir, pkg.Architecture, pkggraph.LocalRepo)
 		if err != nil {
 			return
 		}
+		logger.Log.Debugf("Adding run node %s with id %d\n", newRunNode.FriendlyName(), newRunNode.ID())
 	}
 
 	if newBuildNode == nil {
 		// Add "Build" node
-		newBuildNode, err = g.AddPkgNode(pkgVer, pkggraph.StateBuild, pkggraph.TypeLocalBuild, pkg.SrpmPath, pkg.RpmPath, pkg.SpecPath, pkg.SourceDir, pkg.Architecture, "<LOCAL>")
-		logger.Log.Debugf("Adding build node %s with id %d\n", newBuildNode.FriendlyName(), newBuildNode.ID())
+		newBuildNode, err = g.AddPkgNode(pkg.Provides, pkggraph.StateBuild, pkggraph.TypeLocalBuild, pkg.SrpmPath, pkg.RpmPath, pkg.SpecPath, pkg.SourceDir, pkg.Architecture, pkggraph.LocalRepo)
 		if err != nil {
 			return
 		}
+		logger.Log.Debugf("Adding build node %s with id %d\n", newBuildNode.FriendlyName(), newBuildNode.ID())
 	}
 
-	// A "run" node has an implicit dependency on its coresponding "build" node, encode that here.
+	// A "run" node has an implicit dependency on its corresponding "build" node, encode that here.
 	err = g.AddEdge(newRunNode, newBuildNode)
 	if err != nil {
-		logger.Log.Errorf("Adding edge failed for %+v", pkgVer)
+		logger.Log.Errorf("Adding run -> build edge failed for %+v", pkg.Provides)
+		return
+	}
+
+	if !pkg.RunTests {
+		logger.Log.Debugf("Skipping adding a test node for package %+v", pkg)
+		return
+	}
+
+	if newTestNode == nil {
+		// Add "Test" node
+		newTestNode, err = g.AddPkgNode(pkg.Provides, pkggraph.StateBuild, pkggraph.TypeTest, pkg.SrpmPath, pkggraph.NoRPMPath, pkg.SpecPath, pkg.SourceDir, pkg.Architecture, pkggraph.LocalRepo)
+		if err != nil {
+			return
+		}
+		logger.Log.Debugf("Adding test node %s with id %d\n", newTestNode.FriendlyName(), newTestNode.ID())
+	}
+
+	// A "test" node has a dependency on its corresponding "build" node. This dependency is required
+	// to guarantee we will first check if the build node needs to be built or not before we make
+	// any decisions about running the tests.
+	err = g.AddEdge(newTestNode, newBuildNode)
+	if err != nil {
+		logger.Log.Errorf("Adding test -> build edge failed for %+v", pkg.Provides)
+		return
 	}
 
 	return
@@ -237,37 +264,24 @@ func addSingleDependency(g *pkggraph.PkgGraph, packageNode *pkggraph.PkgNode, de
 	return err
 }
 
-// addLocalPackage adds the package provided by the Package structure, and
-// updates the SRPM path name
-func addLocalPackage(g *pkggraph.PkgGraph, pkg *pkgjson.Package) error {
-	_, _, err := addNodesForPackage(g, pkg.Provides, pkg)
-	return err
-}
-
-// addDependencies adds edges for both build and runtime requirements for the
+// addDependencies adds edges for run-, build-, and test-time requirements for the
 // package described in the Package structure. Returns an error if the edges
 // could not be created.
 func addPkgDependencies(g *pkggraph.PkgGraph, pkg *pkgjson.Package) (dependenciesAdded int, err error) {
-	provide := pkg.Provides
-	runDependencies := pkg.Requires
-	buildDependencies := pkg.BuildRequires
-
 	// Find the current node in the lookup list.
 	logger.Log.Debugf("Adding dependencies for package %s", pkg.SrpmPath)
-	nodes, err := g.FindExactPkgNodeFromPkg(provide)
+	nodes, err := g.FindExactPkgNodeFromPkg(pkg.Provides)
 	if err != nil {
 		return
 	}
 	if nodes == nil {
 		return dependenciesAdded, fmt.Errorf("can't add dependencies to a missing package %+v", pkg)
 	}
-	runNode := nodes.RunNode
-	buildNode := nodes.BuildNode
 
-	// For each run time and build time dependency, add the edges
+	// For each run-, build-, and test-time dependency, add the edges
 	logger.Log.Tracef("Adding run dependencies")
-	for _, dependency := range runDependencies {
-		err = addSingleDependency(g, runNode, dependency)
+	for _, dependency := range pkg.Requires {
+		err = addSingleDependency(g, nodes.RunNode, dependency)
 		if err != nil {
 			logger.Log.Errorf("Unable to add run-time dependencies for %+v", pkg)
 			return
@@ -276,10 +290,25 @@ func addPkgDependencies(g *pkggraph.PkgGraph, pkg *pkgjson.Package) (dependencie
 	}
 
 	logger.Log.Tracef("Adding build dependencies")
-	for _, dependency := range buildDependencies {
-		err = addSingleDependency(g, buildNode, dependency)
+	for _, dependency := range pkg.BuildRequires {
+		err = addSingleDependency(g, nodes.BuildNode, dependency)
 		if err != nil {
 			logger.Log.Errorf("Unable to add build-time dependencies for %+v", pkg)
+			return
+		}
+		dependenciesAdded++
+	}
+
+	if nodes.TestNode == nil {
+		logger.Log.Debugf("No test node for package %+v, skipping test dependencies", pkg)
+		return
+	}
+
+	logger.Log.Tracef("Adding test dependencies")
+	for _, dependency := range pkg.TestRequires {
+		err = addSingleDependency(g, nodes.TestNode, dependency)
+		if err != nil {
+			logger.Log.Errorf("Unable to add test-time dependencies for %+v", pkg)
 			return
 		}
 		dependenciesAdded++
@@ -300,10 +329,8 @@ func populateGraph(graph *pkggraph.PkgGraph, repo *pkgjson.PackageRepo) (err err
 
 	// Scan and add each package we know about
 	logger.Log.Infof("Adding all packages from %s", *input)
-	// NOTE: range iterates by value, not reference. Manually access slice
-	for idx := range packages {
-		pkg := packages[idx]
-		err = addLocalPackage(graph, pkg)
+	for _, pkg := range packages {
+		err = addNodesForPackage(graph, pkg)
 		if err != nil {
 			logger.Log.Errorf("Failed to add local package %+v", pkg)
 			return err

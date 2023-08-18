@@ -16,16 +16,32 @@ MARINER_BUILD_DIR=$1
 # Only remove our tagged containers, as we may have running containers in another build
 containers=$(docker ps -aq --filter label="marinertoolchain"="${MARINER_BUILD_DIR}" | sort -u)
 if [ -n "${containers}" ]; then
-    echo "Removing containers: '${containers}'"
+    echo "Removing toolchain containers: '${containers}'"
     docker rm --force ${containers} 2>&1 || true
 else
     echo "No containers found for 'marinertoolchain=${MARINER_BUILD_DIR}'"
 fi
 
+containers=$(docker ps -aq --filter label="containerized-rpmbuild"="${MARINER_BUILD_DIR}" | sort -u)
+if [ -n "${containers}" ]; then
+    echo "Removing containerized-rpmbuild containers: '${containers}'"
+    docker rm --force ${containers} 2>&1 || true
+else
+    echo "No containers found for 'containerized-rpmbuild=${MARINER_BUILD_DIR}'"
+fi
+
 images="$(docker images -aq --filter label="marinertoolchain"="${MARINER_BUILD_DIR}" | sort -u)"
 if [ -n "${images}" ]; then
-    echo "Removing images: '${images}'"
+    echo "Removing toolchain images: '${images}'"
     docker image rm --force ${images} 2>&1 || true
 else
     echo "No images found for 'marinertoolchain=${MARINER_BUILD_DIR}'"
+fi
+
+images="$(docker images -aq --filter label="containerized-rpmbuild"="${MARINER_BUILD_DIR}" | sort -u)"
+if [ -n "${images}" ]; then
+    echo "Removing containerized-rpmbuild images: '${images}'"
+    docker image rm --force ${images} 2>&1 || true
+else
+    echo "No images found for 'containerized-rpmbuild=${MARINER_BUILD_DIR}'"
 fi

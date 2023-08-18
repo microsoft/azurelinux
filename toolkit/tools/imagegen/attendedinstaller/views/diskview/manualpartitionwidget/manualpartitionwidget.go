@@ -17,6 +17,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/randomization"
 )
 
 const (
@@ -654,7 +655,7 @@ func (mp *ManualPartitionWidget) mountPointInputValidation(textToCheck string, l
 		return false
 	}
 
-	if lastChar != '/' && !strings.ContainsRune(uitext.AlphaNumeric, lastChar) {
+	if lastChar != '/' && !strings.ContainsRune(randomization.LegalCharactersAlphaNum, lastChar) {
 		mp.formNavBar.SetUserFeedback(uitext.MountPointInvalidCharacterError, tview.Styles.TertiaryTextColor)
 		return false
 	}
@@ -667,7 +668,7 @@ func (mp *ManualPartitionWidget) nameInputValidation(textToCheck string, lastCha
 		return false
 	}
 
-	if !strings.ContainsRune(uitext.AlphaNumeric, lastChar) {
+	if !strings.ContainsRune(randomization.LegalCharactersAlphaNum, lastChar) {
 		mp.formNavBar.SetUserFeedback(uitext.NameInvalidCharacterError, tview.Styles.TertiaryTextColor)
 		return false
 	}

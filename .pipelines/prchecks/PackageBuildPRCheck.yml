@@ -97,13 +97,12 @@ extends:
                       isCustom: true
                       name: ${{ configuration.agentPool }}
                     variables:
-                      ob_artifactBaseName: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}_$(System.JobDisplayName)
+                      ob_artifactBaseName: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}_${{ packageBuildJob.name }}
                       ob_outputDirectory: $(Build.ArtifactStagingDirectory)
                     steps:
                       - template: .pipelines/templates/PackageBuild.yml@self
                         parameters:
-                          customToolchainArtifactBuild: $(toolchainArtifactNameBase)_${{ configuration.name }}
-                          customToolchainEnabled: true
+                          customToolchainArtifactName: $(toolchainArtifactNameBase)_${{ configuration.name }}
                           isCheckBuild: ${{ packageBuildJob.runCheck }}
                           isDeltaBuild: true
                           outputArtifactsFolder: $(ob_outputDirectory)
@@ -111,7 +110,7 @@ extends:
 
                       - task: PublishPipelineArtifact@1
                         inputs:
-                          artifact: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}_$(System.JobDisplayName)
+                          artifact: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}_${{ packageBuildJob.name }}
                           targetPath: $(ob_outputDirectory)
                         condition: always()
                         displayName: "Publish packages build artifacts"

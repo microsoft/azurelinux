@@ -8,22 +8,22 @@ package logger
 import (
 	"bufio"
 	"io"
-	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
+	"runtime"
+	"strings"
 	"sync"
 
-	log "github.com/sirupsen/logrus"
-
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger/hooks/writerhook"
+	"github.com/sirupsen/logrus"
 )
 
 var (
 	// Log contains the shared Logger
-	Log *log.Logger
+	Log *logrus.Logger
 
-	stderrHook *writerhook.WriterHook
-	fileHook   *writerhook.WriterHook
+	stderrHook *writerHook
+	fileHook   *writerHook
 
 	// Valid log levels
 	levelsArray = []string{"panic", "fatal", "error", "warn", "info", "debug", "trace"}
@@ -45,13 +45,17 @@ const (
 	// FileFlagHelp is the suggested help message for the logfile flag
 	FileFlagHelp = "Path to the image's log file."
 
-	defaultLogFileLevel   = log.DebugLevel
-	defaultStderrLogLevel = log.InfoLevel
+	defaultLogFileLevel   = logrus.DebugLevel
+	defaultStderrLogLevel = logrus.InfoLevel
+	parentCallerLevel     = 1
 )
 
-// InitLogFile initializes the common logger with a file
-func InitLogFile(filePath string) (err error) {
-	const useColors = false
+// initLogFile initializes the common logger with a file
+func initLogFile(filePath string) (err error) {
+	const (
+		noToolName = ""
+		useColors  = false
+	)
 
 	err = os.MkdirAll(filepath.Dir(filePath), os.ModePerm)
 	if err != nil {
@@ -63,7 +67,7 @@ func InitLogFile(filePath string) (err error) {
 		return
 	}
 
-	fileHook = writerhook.NewWriterHook(file, defaultLogFileLevel, useColors)
+	fileHook = newWriterHook(file, defaultLogFileLevel, useColors, noToolName)
 	Log.Hooks.Add(fileHook)
 	Log.SetLevel(defaultLogFileLevel)
 
@@ -72,15 +76,12 @@ func InitLogFile(filePath string) (err error) {
 
 // InitStderrLog initializes the logger to print to stderr
 func InitStderrLog() {
-	const useColors = true
+	_, callerFilePath, _, ok := runtime.Caller(parentCallerLevel)
+	if !ok {
+		log.Panic("Failed to get caller info.")
+	}
 
-	Log = log.New()
-
-	// By default send all log messages through stderrHook
-	stderrHook = writerhook.NewWriterHook(os.Stderr, defaultStderrLogLevel, useColors)
-	Log.AddHook(stderrHook)
-	Log.SetLevel(defaultStderrLogLevel)
-	Log.SetOutput(ioutil.Discard)
+	initStderrLogInternal(callerFilePath)
 }
 
 // SetFileLogLevel sets the lowest log level for file output
@@ -99,10 +100,15 @@ func InitBestEffort(path string, level string) {
 		level = defaultStderrLogLevel.String()
 	}
 
-	InitStderrLog()
+	_, callerFilePath, _, ok := runtime.Caller(parentCallerLevel)
+	if !ok {
+		log.Panic("Failed to get caller info.")
+	}
+
+	initStderrLogInternal(callerFilePath)
 
 	if path != "" {
-		PanicOnError(InitLogFile(path), "Failed while setting log file (%s).", path)
+		PanicOnError(initLogFile(path), "Failed while setting log file (%s).", path)
 	}
 
 	PanicOnError(SetStderrLogLevel(level), "Failed while setting log level.")
@@ -169,12 +175,27 @@ func ReplaceStderrWriter(newOut io.Writer) (oldOut io.Writer) {
 }
 
 // ReplaceStderrFormatter replaces the stderr formatter and returns the old formatter
-func ReplaceStderrFormatter(newFormatter log.Formatter) (oldFormatter log.Formatter) {
+func ReplaceStderrFormatter(newFormatter logrus.Formatter) (oldFormatter logrus.Formatter) {
 	return stderrHook.ReplaceFormatter(newFormatter)
 }
 
-func setHookLogLevel(hook *writerhook.WriterHook, level string) (err error) {
-	logLevel, err := log.ParseLevel(level)
+func initStderrLogInternal(callerFilePath string) {
+	const useColors = true
+
+	Log = logrus.New()
+	Log.ReportCaller = true
+
+	toolName := strings.TrimSuffix(filepath.Base(callerFilePath), ".go")
+
+	// By default send all log messages through stderrHook
+	stderrHook = newWriterHook(os.Stderr, defaultStderrLogLevel, useColors, toolName)
+	Log.AddHook(stderrHook)
+	Log.SetLevel(defaultStderrLogLevel)
+	Log.SetOutput(io.Discard)
+}
+
+func setHookLogLevel(hook *writerHook, level string) (err error) {
+	logLevel, err := logrus.ParseLevel(level)
 	if err != nil {
 		return
 	}

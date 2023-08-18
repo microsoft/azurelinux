@@ -8,6 +8,7 @@ package specarchchecker
 import (
 	"fmt"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
@@ -35,10 +36,10 @@ func (a *ArchChecker) CleanUp() error {
 
 // FilterSpecsByArch converts a list of spec names to those that are compatible with the current architecture. Will create
 // and destroy a chroot environment in the process.
-func (a *ArchChecker) FilterSpecsByArch(specFiles []string, distTag string) (validSpecs []string, err error) {
+func (a *ArchChecker) FilterSpecsByArch(specFiles []string, distTag string, testOnly bool) (validSpecs []string, err error) {
 	err = a.simpleToolChroot.RunInChroot(func() error {
 		var runErr error
-		validSpecs, runErr = a.filterListInChroot(specFiles, distTag)
+		validSpecs, runErr = a.filterListInChroot(specFiles, distTag, testOnly)
 		return runErr
 	})
 	if err != nil {
@@ -71,10 +72,8 @@ func (a *ArchChecker) buildAllSpecsListFromNames(specNames []string) (specPaths 
 	return
 }
 
-func (a *ArchChecker) filterListInChroot(specFileNames []string, distTag string) (filteredSpecNames []string, err error) {
-	const runChecks = false
-
-	defines := rpm.DefaultDefinesWithDist(runChecks, distTag)
+func (a *ArchChecker) filterListInChroot(specFileNames []string, distTag string, testOnly bool) (filteredSpecNames []string, err error) {
+	defines := rpm.DefaultDefinesWithDist(testOnly, distTag)
 	specPaths, err := a.buildAllSpecsListFromNames(specFileNames)
 	if err != nil {
 		err = fmt.Errorf("failed to translate names to specs inside (%s). Error:\n%w", a.simpleToolChroot.ChrootRelativeSpecDir(), err)
@@ -86,6 +85,15 @@ func (a *ArchChecker) filterListInChroot(specFileNames []string, distTag string)
 		err = fmt.Errorf("failed to retrieve a list of compatible  specs inside (%s). Error:\n%w", a.simpleToolChroot.ChrootRelativeSpecDir(), err)
 		return
 	}
+
+	if testOnly {
+		filteredSpecs, err = filterOutSpecsWithoutTests(filteredSpecs, distTag)
+		if err != nil {
+			err = fmt.Errorf("failed to filter out specs without tests. Error:\n%w", err)
+			return
+		}
+	}
+
 	logger.Log.Debugf("Got filtered specs: %v.", filteredSpecs)
 
 	for _, filteredSpec := range filteredSpecs {
@@ -93,6 +101,31 @@ func (a *ArchChecker) filterListInChroot(specFileNames []string, distTag string)
 		specName := filepath.Base(filteredSpec)
 		specName = strings.TrimSuffix(specName, ".spec")
 		filteredSpecNames = append(filteredSpecNames, specName)
+	}
+
+	return
+}
+
+func filterOutSpecsWithoutTests(specPaths []string, distTag string) (filteredSpecNames []string, err error) {
+	const runChecks = true
+
+	buildArch, err := rpm.GetRpmArch(runtime.GOARCH)
+	if err != nil {
+		err = fmt.Errorf("failed to get RPM architecture. Error:\n%w", err)
+		return nil, err
+	}
+
+	defines := rpm.DefaultDefinesWithDist(runChecks, distTag)
+	for _, specPath := range specPaths {
+		hasCheckSection, err := rpm.SpecHasCheckSection(specPath, filepath.Dir(specPath), buildArch, defines)
+		if err != nil {
+			err = fmt.Errorf("failed to check if spec (%s) has a check section. Error:\n%w", specPath, err)
+			return nil, err
+		}
+
+		if hasCheckSection {
+			filteredSpecNames = append(filteredSpecNames, specPath)
+		}
 	}
 
 	return

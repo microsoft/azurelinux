@@ -17,7 +17,7 @@
 %define config_source %{SOURCE1}
 Summary:        Linux Kernel for HCI
 Name:           kernel-hci
-Version:        5.15.122.1
+Version:        5.15.126.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -54,6 +54,7 @@ Patch23:        0024-net-mlx5-Bridge-extract-VLAN-push-pop-actions-creati.patch
 Patch24:        0025-net-mlx5-Bridge-implement-infrastructure-for-VLAN-pr.patch
 Patch25:        0026-net-mlx5-Bridge-implement-QinQ-support.patch
 Patch26:        0027-mstflint-This-driver-enables-under-the-secure-boot.patch
+Patch27:        0028-net-mlx5-Bridge-use-debug-not-warn-if-entry-not-found.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -196,6 +197,7 @@ manipulation of eBPF programs and maps.
 %patch24 -p1
 %patch25 -p1
 %patch26 -p1
+%patch27 -p1
 
 make mrproper
 
@@ -429,6 +431,26 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Mon Aug 14 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.126.1-1
+- Auto-upgrade to 5.15.126.1
+
+* Wed Aug 09 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.125.1-1
+- Auto-upgrade to 5.15.125.1
+
+* Mon Aug 07 2023 Lanze Liu <lanzeliu@microsoft.com> - 5.15.123.1-2
+- Add patch (0028) to enable DM multipath Kernel configurations
+-   Changed CONFIG options:
+-       Enabled DM multipath QLogic support (`CONFIG_DM_MULTIPATH_QL=m`)
+-       Enabled DM multipath SCSI device handler (`CONFIG_DM_MULTIPATH_ST=m`)
+-       Enabled DM multipath hardware-specific module (`CONFIG_DM_MULTIPATH_HST=m`)
+-       Enabled DM multipath I/O ASCII storage (`CONFIG_DM_MULTIPATH_IOA=m`)
+
+* Tue Aug 01 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.123.1-1
+- Auto-upgrade to 5.15.123.1
+
+* Fri Jul 28 2023 Vince Perri <viperri@microsoft.com> - 5.15.122.1-2
+- Add net/mlx5 patch (27) switching warn message to debug
+
 * Wed Jul 26 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.122.1-1
 - Auto-upgrade to 5.15.122.1
 
