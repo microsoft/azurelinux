@@ -23683,6 +23683,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-pyrpm",
+          "version": "0.14.1",
+          "downloadUrl": "https://github.com/bkircher/python-rpm-spec/archive/refs/tags/v0.14.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-pyrsistent",
           "version": "0.17.3",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pyrsistent/pyrsistent-0.17.3.tar.gz"

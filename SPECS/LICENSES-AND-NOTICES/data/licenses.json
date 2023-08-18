@@ -2255,6 +2255,7 @@
                 "python-nocasedict",
                 "python-opt-einsum",
                 "python-pecan",
+                "python-pyrpm",
                 "python-remoto",
                 "python-repoze-lru",
                 "python-routes",
