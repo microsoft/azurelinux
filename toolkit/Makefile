@@ -21,6 +21,9 @@ PACKAGE_BUILD_LIST      ?=
 PACKAGE_REBUILD_LIST    ?=
 PACKAGE_IGNORE_LIST     ?=
 SRPM_PACK_LIST          ?=
+TEST_RUN_LIST           ?=
+TEST_RERUN_LIST         ?=
+TEST_IGNORE_LIST        ?=
 
 ######## SET INCREMENTAL BUILD FLAGS ########
 
@@ -59,6 +62,7 @@ REBUILD_DEP_CHAINS              ?= y
 HYDRATED_BUILD                  ?= n
 TARGET_ARCH                     ?=
 ALLOW_TOOLCHAIN_REBUILDS        ?= n
+CACHED_PACKAGES_ARCHIVE         ?=
 
 # Tracing & Profiling support: https://go.dev/doc/diagnostics
 ENABLE_CPU_PROFILE              ?= n
@@ -176,6 +180,10 @@ include $(SCRIPTS_DIR)/tools.mk
 # Create SRPMS from local SPECS with:
 #   input-srpms, clean-input-srpms
 include $(SCRIPTS_DIR)/srpm_pack.mk
+
+# Create local build env for building RPMs with:
+#   containerized-rpmbuild containerized-rpmbuild-help
+include $(SCRIPTS_DIR)/containerized-build.mk
 
 # Expand local SRPMS into sources and SPECS with:
 #   expand-specs clean-expand-specs

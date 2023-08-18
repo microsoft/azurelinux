@@ -34,6 +34,28 @@ import (
 
 const (
 	defaultWorkerCount = "100"
+
+	// Spaces added on purpose to simplify substring matching.
+	andCondition  = " and "
+	ifCondition   = " if "
+	orCondition   = " or "
+	withCondition = " with "
+)
+
+var (
+	supportedBooleanConditions = []string{
+		andCondition,
+		ifCondition,
+		orCondition,
+		withCondition,
+	}
+
+	// Spaces added on purpose to simplify substring matching.
+	unsupportedBooleanConditions = []string{
+		" else ",
+		" unless ",
+		" without ",
+	}
 )
 
 // parseResult holds the worker results from parsing a SPEC file.
@@ -327,22 +349,22 @@ func sortPackages(packageRepo *pkgjson.PackageRepo) {
 	}
 }
 
-// readspec is a goroutine that takes a full filepath to a spec file and scrapes it into the Specdef structure
+// readSpecWorker is a goroutine that takes a full filepath to a spec file and scrapes it into the Specdef structure
 // Concurrency is limited by the size of the semaphore channel passed in. Too many goroutines at once can deplete
-// available filehandles.
+// available file handles.
 func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel <-chan struct{}, wg *sync.WaitGroup, distTag, rpmsDir, srpmsDir, toolchainDir string, toolchainRPMs []string, runCheck bool, arch string, tsRoot *timestamp.TimeStamp) {
 	const (
-		emptyQueryFormat      = ``
 		querySrpm             = `%{NAME}-%{VERSION}-%{RELEASE}.src.rpm`
 		queryProvidedPackages = `rpm %{ARCH}/%{nvra}.rpm\n[provides %{PROVIDENEVRS}\n][requires %{REQUIRENEVRS}\n][arch %{ARCH}\n]`
 	)
 
 	defer wg.Done()
 
-	defines := rpm.DefaultDefinesWithDist(runCheck, distTag)
+	noCheckDefines := rpm.DefaultDefinesWithDist(false, distTag)
+	checkDefines := rpm.DefaultDefinesWithDist(true, distTag)
 
 	var ts *timestamp.TimeStamp = nil
-	for specfile := range requests {
+	for specFile := range requests {
 		select {
 		case <-cancel:
 			logger.Log.Debug("Cancellation signal received")
@@ -355,82 +377,82 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 			timestamp.StopEvent(ts)
 			ts = nil
 		}
-		ts, _ = timestamp.StartEvent(filepath.Base(specfile), tsRoot)
-
-		result := &parseResult{}
+		ts, _ = timestamp.StartEvent(filepath.Base(specFile), tsRoot)
 
 		providerList := []*pkgjson.Package{}
-		buildRequiresList := []*pkgjson.PackageVer{}
-		sourcedir := filepath.Dir(specfile)
+		sourceDir := filepath.Dir(specFile)
+		testBuildRequiresList := []*pkgjson.PackageVer{}
 
 		// Find the SRPM associated with the SPEC.
-		srpmResults, err := rpm.QuerySPEC(specfile, sourcedir, querySrpm, arch, defines, rpm.QueryHeaderArgument)
+		srpmResults, err := rpm.QuerySPEC(specFile, sourceDir, querySrpm, arch, noCheckDefines, rpm.QueryHeaderArgument)
 		if err != nil {
-			result.err = err
-			results <- result
+			sendEmptyResult(results, err)
 			continue
 		}
 
 		srpmPath := filepath.Join(srpmsDir, srpmResults[0])
 
-		isCompatible, err := rpm.SpecArchIsCompatible(specfile, sourcedir, arch, defines)
+		isCompatible, err := rpm.SpecArchIsCompatible(specFile, sourceDir, arch, noCheckDefines)
 		if err != nil {
-			result.err = err
-			results <- result
+			sendEmptyResult(results, err)
 			continue
 		}
 
 		if !isCompatible {
-			logger.Log.Debugf(`Skipping (%s) since it cannot be built on current architecture.`, specfile)
-			results <- result
+			logger.Log.Debugf(`Skipping (%s) since it cannot be built on current architecture.`, specFile)
+			sendEmptyResult(results, err)
 			continue
 		}
 
 		// Find every package that the spec provides
-		queryResults, err := rpm.QuerySPEC(specfile, sourcedir, queryProvidedPackages, arch, defines, rpm.QueryBuiltRPMHeadersArgument)
-		if err == nil && len(queryResults) != 0 {
+		queryResults, err := rpm.QuerySPEC(specFile, sourceDir, queryProvidedPackages, arch, noCheckDefines, rpm.QueryBuiltRPMHeadersArgument)
+		if err != nil {
+			sendEmptyResult(results, err)
+			continue
+		}
+
+		if len(queryResults) != 0 {
 			providerList, err = parseProvides(rpmsDir, toolchainDir, toolchainRPMs, srpmPath, queryResults)
 			if err != nil {
-				result.err = err
-				results <- result
+				sendEmptyResult(results, err)
 				continue
 			}
 		}
 
 		// Query the BuildRequires fields from this spec and turn them into an array of PackageVersions
-		queryResults, err = rpm.QuerySPEC(specfile, sourcedir, emptyQueryFormat, arch, defines, rpm.BuildRequiresArgument)
-		if err == nil && len(queryResults) != 0 {
-			buildRequiresList, err = parsePackageVersionList(queryResults)
+		buildRequiresList, err := readBuildRequires(specFile, sourceDir, arch, noCheckDefines)
+		if err != nil {
+			sendEmptyResult(results, err)
+			continue
+		}
+
+		specHasCheckSection, err := rpm.SpecHasCheckSection(specFile, sourceDir, arch, checkDefines)
+		if err != nil {
+			sendEmptyResult(results, err)
+			continue
+		}
+
+		readTestDependencies := runCheck && specHasCheckSection
+		if readTestDependencies {
+			// Query the test BuildRequires fields from this spec and turn them into an array of PackageVersions
+			testBuildRequiresList, err = readBuildRequires(specFile, sourceDir, arch, checkDefines)
 			if err != nil {
-				result.err = err
-				results <- result
+				sendEmptyResult(results, err)
 				continue
 			}
 		}
 
 		// Every package provided by a spec will have the same BuildRequires and SrpmPath
-		for i := range providerList {
-			providerList[i].SpecPath = specfile
-			providerList[i].SourceDir = sourcedir
-			providerList[i].Requires, err = condensePackageVersionArray(providerList[i].Requires, specfile)
-			if err != nil {
-				break
-			}
-
-			providerList[i].BuildRequires, err = condensePackageVersionArray(buildRequiresList, specfile)
-			if err != nil {
-				break
-			}
-		}
-
-		if err != nil {
-			result.err = err
-		} else {
-			result.packages = providerList
+		for _, provider := range providerList {
+			provider.BuildRequires = buildRequiresList
+			provider.SourceDir = sourceDir
+			provider.SpecPath = specFile
+			provider.TestRequires = testBuildRequiresList
+			provider.RunTests = readTestDependencies
 		}
 
 		// Submit the result to the main thread, the deferred function will clear the semaphore.
-		results <- result
+		results <- &parseResult{packages: providerList}
 	}
 	if ts != nil {
 		timestamp.StopEvent(ts)
@@ -515,6 +537,12 @@ func parseProvides(rpmsDir, toolchainDir string, toolchainRPMs []string, srpmPat
 				return
 			}
 
+			reqlist, err = dedupPackageVersionArray(reqlist)
+			if err != nil {
+				err = fmt.Errorf("failed to dedup run-time PackageVer array for SRPM (%s):\n%w", srpmPath, err)
+				return
+			}
+
 			isToolchain := schedulerutils.IsReservedFile(rpmPath, toolchainRPMs)
 			if isToolchain {
 				rpmPath = convertToToolchainRpmPath(rpmPath, packagearch, toolchainDir)
@@ -538,40 +566,23 @@ func parseProvides(rpmsDir, toolchainDir string, toolchainRPMs []string, srpmPat
 	return
 }
 
-// parsePackageVersions takes a package name and splits it into a set of PackageVer structures.
+// parsePackageVersions takes a package string and splits it into a set of PackageVer structures.
 // Normally a list of length 1 is returned, however parsePackageVersions is also responsible for
 // identifying if the package name is an "or" condition and returning all options.
-func parsePackageVersions(packagename string) (newpkgs []*pkgjson.PackageVer, err error) {
-	const (
-		NameField      = iota
-		ConditionField = iota
-		VersionField   = iota
-	)
+func parsePackageVersions(packageString string) (newPackages []*pkgjson.PackageVer, err error) {
+	packageString = strings.TrimSpace(packageString)
 
-	packageSplit := strings.Split(packagename, " ")
-	err = minSliceLength(packageSplit, 1)
+	// If the first character of the packageString is a "(" then it's an "or" condition.
+	if packageString[0] == '(' {
+		return parseRichDependency(packageString)
+	}
+
+	pkgVer, err := pkgjson.PackageStringToPackageVer(packageString)
 	if err != nil {
 		return
 	}
 
-	// If first character of the packagename is a "(" then its an "or" condition
-	if packagename[0] == '(' {
-		return parseOrCondition(packagename)
-	}
-
-	newpkg := &pkgjson.PackageVer{Name: packageSplit[NameField]}
-	if len(packageSplit) == 1 {
-		// Nothing to do, no condition or version was found.
-	} else if packageSplit[ConditionField] != "or" {
-		newpkg.Condition = packageSplit[ConditionField]
-		newpkg.Version = packageSplit[VersionField]
-	} else {
-		// Replace the name with the first name that appears in (foo or bar)
-		substr := packageSplit[NameField][1:]
-		newpkg.Name = substr
-	}
-
-	newpkgs = append(newpkgs, newpkg)
+	newPackages = append(newPackages, pkgVer)
 	return
 }
 
@@ -589,10 +600,10 @@ func parsePackageVersionList(pkgList []string) (pkgVerList []*pkgjson.PackageVer
 	return
 }
 
-// condensePackageVersionArray deduplicates entries in an array of Package Versions
+// dedupPackageVersionArray deduplicates entries in an array of Package Versions
 // and represents double conditionals in a single PackageVersion structure.
-// If a non-blank package version is specified more than twice in a SPEC then return an error.
-func condensePackageVersionArray(packagelist []*pkgjson.PackageVer, specfile string) (processedPkgList []*pkgjson.PackageVer, err error) {
+// If a non-blank package version is specified more than twice, return an error.
+func dedupPackageVersionArray(packagelist []*pkgjson.PackageVer) (processedPkgList []*pkgjson.PackageVer, err error) {
 	for _, pkg := range packagelist {
 		nameMatch := false
 		for i, processedPkg := range processedPkgList {
@@ -613,7 +624,7 @@ func condensePackageVersionArray(packagelist []*pkgjson.PackageVer, specfile str
 					processedPkgList[i].SCondition = pkg.Condition
 					break
 				} else {
-					err = fmt.Errorf("spec (%s) attempted to set more than two conditions for package (%s)", specfile, processedPkg.Name)
+					err = fmt.Errorf("attempting to set more than two conditions for package (%s)", processedPkg.Name)
 					return
 				}
 			}
@@ -627,26 +638,63 @@ func condensePackageVersionArray(packagelist []*pkgjson.PackageVer, specfile str
 	return
 }
 
-// parseOrCondition splits a package name like (foo or bar) and returns both foo and bar as separate requirements.
-func parseOrCondition(packagename string) (versions []*pkgjson.PackageVer, err error) {
-	logger.Log.Warnf("'OR' clause found (%s), make sure both packages are available. Please refer to 'docs/how_it_works/3_package_building.md#or-clauses' for explanation of limitations.", packagename)
-	packagename = strings.ReplaceAll(packagename, "(", "")
-	packagename = strings.ReplaceAll(packagename, ")", "")
+// parseRichDependency splits a package name like '(foo or bar)' and returns both foo and bar as separate requirements.
+func parseRichDependency(richDependency string) (versions []*pkgjson.PackageVer, err error) {
+	const documentationHint = "Please refer to 'docs/how_it_works/3_package_building.md#rich-dependencies' for explanation of limitations"
 
-	packageSplit := strings.Split(packagename, " or ")
-	err = minSliceLength(packageSplit, 1)
+	// All single condition strings are surrounded by spaces to match full words.
+	for _, singleCondition := range unsupportedBooleanConditions {
+		if strings.Contains(richDependency, singleCondition) {
+			err = fmt.Errorf("found unsupported boolean condition '%s' inside '%s'. %s", singleCondition, richDependency, documentationHint)
+			return
+		}
+	}
+
+	conditionsCount := 0
+	// All single condition strings are surrounded by spaces to match full words.
+	for _, singleCondition := range supportedBooleanConditions {
+		conditionsCount += strings.Count(richDependency, singleCondition)
+	}
+	if conditionsCount > 1 {
+		err = fmt.Errorf("found more than one boolean condition inside '%s'. %s", richDependency, documentationHint)
+		return
+	}
+
+	richDependency = strings.ReplaceAll(richDependency, "(", "")
+	richDependency = strings.ReplaceAll(richDependency, ")", "")
+
+	packageStrings := []string{}
+	// All single condition strings are surrounded by spaces to match full words.
+	for _, singleCondition := range supportedBooleanConditions {
+		if strings.Contains(richDependency, singleCondition) {
+			packageStrings = strings.Split(richDependency, singleCondition)
+			break
+		}
+	}
+	err = minSliceLength(packageStrings, 2)
 	if err != nil {
 		return
 	}
 
-	versions = make([]*pkgjson.PackageVer, 0, len(packageSplit))
-	for _, condition := range packageSplit {
-		var parsedPkgVers []*pkgjson.PackageVer
-		parsedPkgVers, err = parsePackageVersions(condition)
+	switch {
+	case strings.Contains(richDependency, andCondition) || strings.Contains(richDependency, orCondition) || strings.Contains(richDependency, withCondition):
+		logger.Log.Warnf("Found a boolean condition '%s', make sure both packages are available. %s.", richDependency, documentationHint)
+	case strings.Contains(richDependency, ifCondition):
+		logger.Log.Warnf("Found a boolean condition '%s', make sure the packages on the left is available. %s.", richDependency, documentationHint)
+		packageStrings = []string{packageStrings[0]}
+	default:
+		err = fmt.Errorf("found a unsupported boolean condition inside '%s'. %s", richDependency, documentationHint)
+		return
+	}
+
+	versions = make([]*pkgjson.PackageVer, 0, len(packageStrings))
+	for _, packageString := range packageStrings {
+		pkgVer, err := pkgjson.PackageStringToPackageVer(packageString)
 		if err != nil {
-			return
+			return nil, err
 		}
-		versions = append(versions, parsedPkgVers...)
+
+		versions = append(versions, pkgVer)
 	}
 
 	return
@@ -693,4 +741,29 @@ func convertToToolchainRpmPath(currentRpmPath, arch, toolchainDir string) (toolc
 	toolchainPath = filepath.Join(toolchainPath, rpmFileName)
 	logger.Log.Debugf("Toolchain changing '%s' to '%s'.", currentRpmPath, toolchainPath)
 	return toolchainPath
+}
+
+func readBuildRequires(specFile, sourceDir, arch string, defines map[string]string) (result []*pkgjson.PackageVer, err error) {
+	const emptyQueryFormat = ``
+
+	queryResults, err := rpm.QuerySPEC(specFile, sourceDir, emptyQueryFormat, arch, defines, rpm.BuildRequiresArgument)
+	if err != nil {
+		return
+	}
+
+	result, err = parsePackageVersionList(queryResults)
+	if err != nil {
+		return
+	}
+
+	result, err = dedupPackageVersionArray(result)
+	if err != nil {
+		err = fmt.Errorf("failed to dedup build-time PackageVer array for spec (%s):\n%w", specFile, err)
+	}
+
+	return
+}
+
+func sendEmptyResult(results chan<- *parseResult, err error) {
+	results <- &parseResult{err: err}
 }

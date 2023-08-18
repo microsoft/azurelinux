@@ -37,20 +37,21 @@ type BuildRequest struct {
 	Node           *pkggraph.PkgNode
 	PkgGraph       *pkggraph.PkgGraph
 	AncillaryNodes []*pkggraph.PkgNode
-	CanUseCache    bool
+	ExpectedFiles  []string
+	UseCache       bool
 	IsDelta        bool
 }
 
 // BuildResult represents the results of a build agent trying to build a given node.
 type BuildResult struct {
-	AncillaryNodes []*pkggraph.PkgNode
-	BuiltFiles     []string
-	Err            error
-	LogFile        string
-	Node           *pkggraph.PkgNode
-	Skipped        bool
-	UsedCache      bool
-	WasDelta       bool
+	AncillaryNodes []*pkggraph.PkgNode // For SRPM builds: other nodes stemming from the same SRPM. Empty otherwise.
+	BuiltFiles     []string            // List of RPMs built by this node.
+	Err            error               // Error encountered during the build.
+	LogFile        string              // Path to the log file from the build.
+	Node           *pkggraph.PkgNode   // The main node being analyzed for the build.
+	Ignored        bool                // Indicator if the build was ignored by user request.
+	UsedCache      bool                // Indicator if we used the cached artifacts (external or earlier local build) instead of building the node.
+	WasDelta       bool                // Indicator if we used a pre-built component from an external repository instead of building the node.
 }
 
 // selectNextBuildRequest selects a job based on priority:
@@ -94,26 +95,36 @@ func selectNextBuildRequest(channels *BuildChannels) (req *BuildRequest, finish 
 }
 
 // BuildNodeWorker process all build requests, can be run concurrently with multiple instances.
-func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, graphMutex *sync.RWMutex, buildAttempts int, checkAttempts int, ignoredPackages []*pkgjson.PackageVer) {
+func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, graphMutex *sync.RWMutex, buildAttempts int, checkAttempts int, ignoredPackages, ignoredTests []*pkgjson.PackageVer) {
 	// Track the time a worker spends waiting on a task. We will add a timing node each time we finish processing a request, and stop
 	// it when we pick up the next request
 	for req, cancelled := selectNextBuildRequest(channels); !cancelled && req != nil; req, cancelled = selectNextBuildRequest(channels) {
 		res := &BuildResult{
 			Node:           req.Node,
 			AncillaryNodes: req.AncillaryNodes,
+			UsedCache:      req.UseCache,
 			WasDelta:       req.IsDelta,
 		}
 
 		switch req.Node.Type {
 		case pkggraph.TypeLocalBuild:
-			res.UsedCache, res.Skipped, res.BuiltFiles, res.LogFile, res.Err = buildBuildNode(req.Node, req.PkgGraph, graphMutex, agent, req.CanUseCache, buildAttempts, checkAttempts, ignoredPackages)
+			res.Ignored, res.BuiltFiles, res.LogFile, res.Err = buildNode(req, graphMutex, agent, buildAttempts, ignoredPackages)
 			if res.Err == nil {
-				setAncillaryBuildNodesStatus(req, pkggraph.StateUpToDate)
+				setAncillaryBuildNodesStatus(req, graphMutex, pkggraph.StateUpToDate)
 			} else {
-				setAncillaryBuildNodesStatus(req, pkggraph.StateBuildError)
+				setAncillaryBuildNodesStatus(req, graphMutex, pkggraph.StateBuildError)
 			}
+
+		case pkggraph.TypeTest:
+			res.Ignored, res.LogFile, res.Err = testNode(req, graphMutex, agent, checkAttempts, ignoredTests)
+			if res.Err == nil {
+				setAncillaryBuildNodesStatus(req, graphMutex, pkggraph.StateUpToDate)
+			} else {
+				setAncillaryBuildNodesStatus(req, graphMutex, pkggraph.StateBuildError)
+			}
+
 		case pkggraph.TypeLocalRun, pkggraph.TypeGoal, pkggraph.TypeRemoteRun, pkggraph.TypePureMeta, pkggraph.TypePreBuilt:
-			res.UsedCache = req.CanUseCache
+			res.UsedCache = req.UseCache
 
 		case pkggraph.TypeUnknown:
 			fallthrough
@@ -128,35 +139,50 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 	logger.Log.Debug("Worker done")
 }
 
-// buildBuildNode builds a TypeBuild node, either used a cached copy if possible or building the corresponding SRPM.
-func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, canUseCache bool, buildAttempts int, checkAttempts int, ignoredPackages []*pkgjson.PackageVer) (usedCache, skipped bool, builtFiles []string, logFile string, err error) {
-	var missingFiles []string
-
+// buildNode builds a TypeLocalBuild node, either used a cached copy if possible or building the corresponding SRPM.
+func buildNode(request *BuildRequest, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, buildAttempts int, ignoredPackages []*pkgjson.PackageVer) (ignored bool, builtFiles []string, logFile string, err error) {
+	node := request.Node
 	baseSrpmName := node.SRPMFileName()
-	usedCache, builtFiles, missingFiles = pkggraph.IsSRPMPrebuilt(node.SrpmPath, pkgGraph, graphMutex)
-	skipped = sliceutils.Contains(ignoredPackages, node.VersionedPkg, sliceutils.PackageVerMatch)
+	ignored = sliceutils.Contains(ignoredPackages, node.VersionedPkg, sliceutils.PackageVerMatch)
 
-	if skipped {
-		logger.Log.Debugf("%s explicitly marked to be skipped.", baseSrpmName)
+	if ignored {
+		logger.Log.Debugf("%s explicitly marked to be ignored.", baseSrpmName)
 		return
 	}
 
-	if canUseCache && usedCache {
+	if request.UseCache {
 		logger.Log.Debugf("%s is prebuilt, skipping", baseSrpmName)
+		builtFiles = request.ExpectedFiles
 		return
 	}
 
-	// Print a message if a package is partially built but needs to be regenerated because its missing something.
-	if len(missingFiles) > 0 && len(builtFiles) != len(missingFiles) {
-		logger.Log.Infof("SRPM '%s' is being rebuilt due to partially missing components: %v", node.SrpmPath, missingFiles)
+	dependencies := getBuildDependencies(node, request.PkgGraph, graphMutex)
+
+	logger.Log.Infof("Building: %s", baseSrpmName)
+	builtFiles, logFile, err = buildSRPMFile(agent, buildAttempts, node.SrpmPath, node.Architecture, dependencies)
+	return
+}
+
+// testNode tests a TypeTest node.
+func testNode(request *BuildRequest, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, checkAttempts int, ignoredTests []*pkgjson.PackageVer) (ignored bool, logFile string, err error) {
+	node := request.Node
+	baseSrpmName := node.SRPMFileName()
+	ignored = sliceutils.Contains(ignoredTests, node.VersionedPkg, sliceutils.PackageVerMatch)
+
+	if ignored {
+		logger.Log.Debugf("%s (test) explicitly marked to be ignored.", baseSrpmName)
+		return
 	}
 
-	usedCache = false
+	if request.UseCache {
+		logger.Log.Debugf("Using cache for '%s', skipping its test run as well.", baseSrpmName)
+		return
+	}
 
-	dependencies := getBuildDependencies(node, pkgGraph, graphMutex)
+	dependencies := getBuildDependencies(node, request.PkgGraph, graphMutex)
 
-	logger.Log.Infof("Building %s", baseSrpmName)
-	builtFiles, logFile, err = buildSRPMFile(agent, buildAttempts, checkAttempts, node.SrpmPath, node.Architecture, dependencies)
+	logger.Log.Infof("Testing: %s", baseSrpmName)
+	logFile, err = testSRPMFile(agent, checkAttempts, node.SrpmPath, node.Architecture, dependencies)
 	return
 }
 
@@ -180,7 +206,7 @@ func getBuildDependencies(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, g
 		dependencyNode := n.(*pkggraph.PkgNode)
 
 		rpmPath := dependencyNode.RpmPath
-		if rpmPath == "" || rpmPath == "<NO_RPM_PATH>" || rpmPath == node.RpmPath {
+		if rpmPath == "" || rpmPath == pkggraph.NoRPMPath || rpmPath == node.RpmPath {
 			return
 		}
 
@@ -210,11 +236,11 @@ func parseCheckSection(logFile string) (err error) {
 			if strings.Contains(currLine, "EXIT STATUS 0") {
 				return
 			}
-			failedLogFile := strings.TrimSuffix(logFile, ".log")
+			failedLogFile := strings.TrimSuffix(logFile, ".test.log")
 			failedLogFile = fmt.Sprintf("%s-FAILED_TEST-%d.log", failedLogFile, time.Now().UnixMilli())
 			err = file.Copy(logFile, failedLogFile)
 			if err != nil {
-				logger.Log.Errorf("Log file rename failed. Error: %v", err)
+				logger.Log.Errorf("Log file copy failed. Error: %v", err)
 				return
 			}
 			err = fmt.Errorf("package test failed. Test status line: %s", currLine)
@@ -225,47 +251,59 @@ func parseCheckSection(logFile string) (err error) {
 }
 
 // buildSRPMFile sends an SRPM to a build agent to build.
-func buildSRPMFile(agent buildagents.BuildAgent, buildAttempts int, checkAttempts int, srpmFile, outArch string, dependencies []string) (builtFiles []string, logFile string, err error) {
+func buildSRPMFile(agent buildagents.BuildAgent, buildAttempts int, srpmFile, outArch string, dependencies []string) (builtFiles []string, logFile string, err error) {
 	const (
 		retryDuration = time.Second
+		runCheck      = false
+	)
+
+	logBaseName := filepath.Base(srpmFile) + ".log"
+	err = retry.Run(func() (buildErr error) {
+		builtFiles, logFile, buildErr = agent.BuildPackage(srpmFile, logBaseName, outArch, runCheck, dependencies)
+		return
+	}, buildAttempts, retryDuration)
+
+	return
+}
+
+// testSRPMFile sends an SRPM to a build agent to test.
+func testSRPMFile(agent buildagents.BuildAgent, checkAttempts int, srpmFile string, outArch string, dependencies []string) (logFile string, err error) {
+	const (
+		retryDuration = time.Second
+		runCheck      = true
 	)
 
 	// checkFailed is a flag to see if a non-null buildErr is from the %check section
 	checkFailed := false
-	logBaseName := filepath.Base(srpmFile) + ".log"
-	// temporary solution; potential fix: build normally for buildAttempts, then run rmpbuild -bi --short-circuit to just do the checks
-	// relevant bug https://microsoft.visualstudio.com/OS/_workitems/edit/43454529
-	maxAttempts := buildAttempts
-	if checkAttempts > maxAttempts {
-		maxAttempts = checkAttempts
-	}
-
+	logBaseName := filepath.Base(srpmFile) + ".test.log"
 	err = retry.Run(func() (buildErr error) {
-		builtFiles, logFile, buildErr = agent.BuildPackage(srpmFile, logBaseName, outArch, dependencies)
-		// If the package builds with no errors and RUN_CHECK=y, check logs to see if the %check section passed, and if not, return as the build error.
+		checkFailed = false
+
+		_, logFile, buildErr = agent.BuildPackage(srpmFile, logBaseName, outArch, runCheck, dependencies)
 		if buildErr != nil {
+			logger.Log.Warnf("Test build for '%s' failed on a non-test build issue. Error: %s", srpmFile, err)
 			return
 		}
 
-		if agent.Config().RunCheck {
-			buildErr = parseCheckSection(logFile)
-			checkFailed = (buildErr != nil)
-		}
+		buildErr = parseCheckSection(logFile)
+		checkFailed = (buildErr != nil)
 		return
-	}, maxAttempts, retryDuration)
+	}, checkAttempts, retryDuration)
 
-	// temporary solution; potential fix: once stable, fail builds if %check section fails?
 	if err != nil && checkFailed {
-		logger.Log.Warnf("Tests failed for '%s'. Ignoring since the package built correctly. Error: %v", srpmFile, err)
+		logger.Log.Warnf("Tests failed for '%s'. Error: %s", srpmFile, err)
 		err = nil
 	}
 	return
 }
 
-// setAncillaryBuildNodesStatus sets the NodeState for all of the request's ancillary nodes.
-func setAncillaryBuildNodesStatus(req *BuildRequest, nodeState pkggraph.NodeState) {
+// setAncillaryBuildNodesStatus sets the NodeState for all of the request's ancillary build and test nodes.
+func setAncillaryBuildNodesStatus(req *BuildRequest, graphMutex *sync.RWMutex, nodeState pkggraph.NodeState) {
+	graphMutex.Lock()
+	defer graphMutex.Unlock()
+
 	for _, node := range req.AncillaryNodes {
-		if node.Type == pkggraph.TypeLocalBuild {
+		if node.Type == pkggraph.TypeLocalBuild || node.Type == pkggraph.TypeTest {
 			node.State = nodeState
 		}
 	}

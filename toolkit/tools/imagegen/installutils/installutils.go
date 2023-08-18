@@ -352,7 +352,7 @@ func PackageNamesFromConfig(config configuration.Config) (packageList []*pkgjson
 		for _, pkg := range packagesToInstall {
 			var packageVer *pkgjson.PackageVer
 
-			packageVer, err = pkgjson.PackagesListEntryToPackageVer(pkg)
+			packageVer, err = pkgjson.PackageStringToPackageVer(pkg)
 			if err != nil {
 				logger.Log.Errorf("Failed to parse packages list from system config \"%s\".", systemCfg.Name)
 				return
@@ -1150,7 +1150,6 @@ func createUserWithPassword(installChroot *safechroot.Chroot, user configuration
 		rootHomeDir       = "/root"
 		userHomeDirPrefix = "/home"
 		postfixLength     = 12
-		alphaNumeric      = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	)
 
 	var (
@@ -1165,7 +1164,7 @@ func createUserWithPassword(installChroot *safechroot.Chroot, user configuration
 	if user.PasswordHashed {
 		hashedPassword = user.Password
 	} else {
-		salt, err = randomization.RandomString(postfixLength, alphaNumeric)
+		salt, err = randomization.RandomString(postfixLength, randomization.LegalCharactersAlphaNum)
 		if err != nil {
 			return
 		}
@@ -1838,19 +1837,26 @@ func installEfiBootloader(encryptEnabled bool, installRoot, bootUUID, bootPrefix
 }
 
 func copyAdditionalFiles(installChroot *safechroot.Chroot, config configuration.SystemConfig) (err error) {
+	return copyAdditionalFilesHelper(installChroot, config.AdditionalFiles)
+}
+
+func copyAdditionalFilesHelper(installChroot *safechroot.Chroot, additionalFiles map[string]configuration.FileConfigList) (err error) {
 	ReportAction("Copying additional files")
 	timestamp.StartEvent("Copying additional files", nil)
 	defer timestamp.StopEvent(nil)
 
-	for srcFile, dstFile := range config.AdditionalFiles {
-		fileToCopy := safechroot.FileToCopy{
-			Src:  srcFile,
-			Dest: dstFile,
-		}
+	for srcFile, dstFileConfigs := range additionalFiles {
+		for _, dstFileConfig := range dstFileConfigs {
+			fileToCopy := safechroot.FileToCopy{
+				Src:         srcFile,
+				Dest:        dstFileConfig.Path,
+				Permissions: (*os.FileMode)(dstFileConfig.Permissions),
+			}
 
-		err = installChroot.AddFiles(fileToCopy)
-		if err != nil {
-			return
+			err = installChroot.AddFiles(fileToCopy)
+			if err != nil {
+				return
+			}
 		}
 	}
 

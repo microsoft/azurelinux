@@ -1,7 +1,7 @@
 Summary:        Google's data interchange format
 Name:           protobuf
 Version:        3.17.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -59,17 +59,25 @@ This contains protobuf python3 libraries.
 %build
 %configure --disable-silent-rules
 %make_build
+
+# build python subpackage
 pushd python
 %py3_build
 popd
 
 %install
 %make_install
+
+# install python subpackage
 pushd python
 %py3_install
 popd
 
 %ldconfig_scriptlets
+
+%check
+# run C++ unit tests
+%make_build check
 
 %files
 %defattr(-,root,root)
@@ -100,6 +108,9 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Mon Mar 20 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.17.3-2
+- Added check section for running tests
+
 * Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 3.17.3-1
 - Upgrade to latest upstream version, using upstream release tarball
 - Add soname version to %%file packaging

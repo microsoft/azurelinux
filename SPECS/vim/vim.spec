@@ -2,7 +2,7 @@
 Summary:        Text editor
 Name:           vim
 Version:        9.0.1562
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,6 +14,7 @@ BuildRequires:  python3-devel
 Requires(post): sed
 Provides:       vi = %{version}-%{release}
 Provides:       %{name}-minimal = %{version}-%{release}
+Patch0:         CVE-2023-3896.patch
 
 %description
 The Vim package contains a powerful text editor.
@@ -197,6 +198,9 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Wed Aug 16 2023 Bala <balakumaran.kannan@microsoft.com> - 9.0.1562-2
+- Patch CVE-2023-3896
+
 * Wed May 17 2023 Muhammad Falak <mwani@microsoft.com> - 9.0.1562-1
 - Bump version to address CVE-2023-2609 & CVE-2023-2610
 

@@ -68,7 +68,9 @@ type Package struct {
 	Architecture  string        `json:"Architecture"`  // The architecture of the package
 	Requires      []*PackageVer `json:"Requires"`      // List of targets this spec requires to install
 	BuildRequires []*PackageVer `json:"BuildRequires"` // List of targets this spec requires to build
+	TestRequires  []*PackageVer `json:"TestRequires"`  // List of targets this spec requires to run tests.
 	IsToolchain   bool          `json:"IsToolchain"`   // Is this package part of the toolchain
+	RunTests      bool          `json:"RunTests"`      // Should we run tests for this package.
 }
 
 // ParsePackageJSON reads a package list json file
@@ -249,12 +251,13 @@ func (pkgVer *PackageVer) String() string {
 	return fmt.Sprintf("%s:C:'%s'V:'%s',C2:'%s'V2:'%s'", pkgVer.Name, pkgVer.Condition, pkgVer.Version, pkgVer.SCondition, pkgVer.SVersion)
 }
 
-// PackagesListEntryToPackageVer converts an entry from the packages list JSON into an instance of PackageVer.
-// The entries may contain only the name of the package or also include a single package version constraint.
+// PackageStringToPackageVer converts a package string into an instance of PackageVer.
+// The string may contain only the name of the package or also include a single package version constraint.
 // Examples:
 //   - "gcc"
 //   - "gcc=9.1.0"
-func PackagesListEntryToPackageVer(packageString string) (pkgVer *PackageVer, err error) {
+//   - "gcc < 9.1.0"
+func PackageStringToPackageVer(packageString string) (pkgVer *PackageVer, err error) {
 	matches := packageWithVersionRegex.FindStringSubmatch(packageString)
 	if len(matches) != packageWithVersionExpectedMatches {
 		err = fmt.Errorf("packages list entry \"%s\" does not match the '[name][optional_condition][optional_version]' format", packageString)

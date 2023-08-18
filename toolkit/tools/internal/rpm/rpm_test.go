@@ -107,7 +107,7 @@ func TestArchShouldFailForExcludedArchitectures(t *testing.T) {
 
 func TestShouldListOnlySubpackageWithArchitectureInRPMsList(t *testing.T) {
 	expectedArchSuffix := fmt.Sprintf(".%s", buildArch)
-	specFilePath := filepath.Join(specsDir, "no_default_package.spec")
+	specFilePath := filepath.Join(specsDir, "no_default_package_or_check.spec")
 
 	builtRPMs, err := QuerySPECForBuiltRPMs(specFilePath, specsDir, buildArch, defines)
 	assert.NoError(t, err)
@@ -117,7 +117,7 @@ func TestShouldListOnlySubpackageWithArchitectureInRPMsList(t *testing.T) {
 
 func TestShouldNotListPackageEpochForEpochZero(t *testing.T) {
 	expectedNameWithVersion := fmt.Sprintf("subpackage_name-1.0.0-1%s", defines[definesDistKey])
-	specFilePath := filepath.Join(specsDir, "no_default_package.spec")
+	specFilePath := filepath.Join(specsDir, "no_default_package_or_check.spec")
 
 	builtRPMs, err := QuerySPECForBuiltRPMs(specFilePath, specsDir, buildArch, defines)
 	assert.NoError(t, err)
@@ -127,11 +127,27 @@ func TestShouldNotListPackageEpochForEpochZero(t *testing.T) {
 
 func TestShouldListPackageEpochForEpochOne(t *testing.T) {
 	expectedRPMs := []string{
-		fmt.Sprintf("with_epoch-1:1.0.0-1%s.%s", defines[definesDistKey], buildArch),
+		fmt.Sprintf("with_epoch_and_check-1:1.0.0-1%s.%s", defines[definesDistKey], buildArch),
 	}
-	specFilePath := filepath.Join(specsDir, "with_epoch.spec")
+	specFilePath := filepath.Join(specsDir, "with_epoch_and_check.spec")
 
 	builtRPMs, err := QuerySPECForBuiltRPMs(specFilePath, specsDir, buildArch, defines)
 	assert.NoError(t, err)
 	assert.EqualValues(t, expectedRPMs, builtRPMs)
+}
+
+func TestShouldFindCheckSectionInSpecWithCheckSection(t *testing.T) {
+	specFilePath := filepath.Join(specsDir, "with_epoch_and_check.spec")
+
+	hasCheckSection, err := SpecHasCheckSection(specFilePath, specsDir, buildArch, defines)
+	assert.NoError(t, err)
+	assert.True(t, hasCheckSection)
+}
+
+func TestShouldNotFindCheckSectionInSpecWithoutCheckSection(t *testing.T) {
+	specFilePath := filepath.Join(specsDir, "no_default_package_or_check.spec")
+
+	hasCheckSection, err := SpecHasCheckSection(specFilePath, specsDir, buildArch, defines)
+	assert.NoError(t, err)
+	assert.False(t, hasCheckSection)
 }

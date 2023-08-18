@@ -374,3 +374,12 @@ func TestShouldFailParsingUnexpectedBootType_SystemConfig(t *testing.T) {
 	assert.Error(t, err)
 	assert.Equal(t, "invalid [BootType]: uefi. Expecting values of either 'efi', 'legacy', 'none' or empty string", err.Error())
 }
+
+func TestShouldFaiInvalidAdditionalFiles_SystemConfig(t *testing.T) {
+	systemConfig := validSystemConfig
+	systemConfig.AdditionalFiles = map[string]FileConfigList{"a.txt": {}}
+
+	err := systemConfig.IsValid()
+	assert.Error(t, err)
+	assert.Equal(t, "invalid [AdditionalFiles]: (a.txt): list is empty", err.Error())
+}

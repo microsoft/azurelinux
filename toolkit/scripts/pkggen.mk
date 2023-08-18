@@ -26,7 +26,7 @@ pkggen_rpms     = $(call shell_real_build_only, find $(RPMS_DIR)/*  2>/dev/null 
 cache_working_dir      = $(PKGBUILD_DIR)/tdnf_cache_worker
 parse_working_dir      = $(BUILD_DIR)/spec_parsing
 rpmbuilding_logs_dir   = $(LOGS_DIR)/pkggen/rpmbuilding
-rpm_cache_files        = $(call shell_real_build_only, find $(CACHED_RPMS_DIR)/)
+rpm_cache_files        = $(call shell_real_build_only, find $(CACHED_RPMS_DIR))
 validate-pkggen-config = $(STATUS_FLAGS_DIR)/validate-image-config-pkggen.flag
 
 # Outputs
@@ -79,7 +79,7 @@ analyze-built-graph: $(go-graphanalytics)
 # We look at the same pack list as the srpmpacker tool via the target $(srpm_pack_list_file), which
 # is build from the contents of $(SRPM_PACK_LIST) if it is set. We only parse the spec files we will
 # actually pack.
-$(specs_file): $(chroot_worker) $(SPECS_DIR) $(build_specs) $(build_spec_dirs) $(go-specreader) $(depend_SPECS_DIR) $(srpm_pack_list_file)
+$(specs_file): $(chroot_worker) $(SPECS_DIR) $(build_specs) $(build_spec_dirs) $(go-specreader) $(depend_SPECS_DIR) $(srpm_pack_list_file) $(depend_RUN_CHECK)
 	$(go-specreader) \
 		--dir $(SPECS_DIR) \
 		$(if $(SRPM_PACK_LIST),--spec-list=$(srpm_pack_list_file)) \
@@ -153,9 +153,12 @@ graphpkgfetcher_extra_flags += --ignored-packages="$(PACKAGE_IGNORE_LIST)"
 graphpkgfetcher_extra_flags += --packages="$(PACKAGE_BUILD_LIST)"
 graphpkgfetcher_extra_flags += --rebuild-packages="$(PACKAGE_REBUILD_LIST)"
 graphpkgfetcher_extra_flags += --image-config-file="$(CONFIG_FILE)"
+graphpkgfetcher_extra_flags += --ignored-tests="$(TEST_IGNORE_LIST)"
+graphpkgfetcher_extra_flags += --tests="$(TEST_RUN_LIST)"
+graphpkgfetcher_extra_flags += --rerun-tests="$(TEST_RERUN_LIST)"
 graphpkgfetcher_extra_flags += --try-download-delta-rpms
 graphpkgfetcher_extra_flags += $(if $(CONFIG_FILE),--base-dir="$(CONFIG_BASE_DIR)")
-$(cached_file): $(depend_CONFIG_FILE) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST)
+$(cached_file): $(depend_CONFIG_FILE) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST) $(depend_TEST_RUN_LIST) $(depend_TEST_RERUN_LIST) $(depend_TEST_IGNORE_LIST)
 endif
 
 $(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(rpm_cache_files) $(TOOLCHAIN_MANIFEST) $(toolchain_rpms)
@@ -226,7 +229,7 @@ $(RPMS_DIR):
 	@touch $@
 endif
 
-$(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-scheduler) $(go-pkgworker) $(depend_STOP_ON_PKG_FAIL) $(CONFIG_FILE) $(depend_CONFIG_FILE) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST) $(pkggen_rpms) $(srpms) $(BUILD_SRPMS_DIR)
+$(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-scheduler) $(go-pkgworker) $(depend_STOP_ON_PKG_FAIL) $(CONFIG_FILE) $(depend_CONFIG_FILE) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST) $(depend_TEST_RUN_LIST) $(depend_TEST_RERUN_LIST) $(depend_TEST_IGNORE_LIST) $(pkggen_rpms) $(srpms) $(BUILD_SRPMS_DIR)
 	$(go-scheduler) \
 		--input="$(preprocessed_file)" \
 		--output="$(built_file)" \
@@ -252,6 +255,9 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-
 		--ignored-packages="$(PACKAGE_IGNORE_LIST)" \
 		--packages="$(PACKAGE_BUILD_LIST)" \
 		--rebuild-packages="$(PACKAGE_REBUILD_LIST)" \
+		--ignored-tests="$(TEST_IGNORE_LIST)" \
+		--tests="$(TEST_RUN_LIST)" \
+		--rerun-tests="$(TEST_RERUN_LIST)" \
 		--image-config-file="$(CONFIG_FILE)" \
 		--cpu-prof-file=$(PROFILE_DIR)/scheduler.cpu.pprof \
 		--mem-prof-file=$(PROFILE_DIR)/scheduler.mem.pprof \
@@ -262,7 +268,6 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-
 		--timestamp-file=$(TIMESTAMP_DIR)/scheduler.jsonl \
 		--toolchain-manifest="$(TOOLCHAIN_MANIFEST)" \
 		$(if $(CONFIG_FILE),--base-dir="$(CONFIG_BASE_DIR)") \
-		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		$(if $(filter y,$(STOP_ON_PKG_FAIL)),--stop-on-failure) \
 		$(if $(filter-out y,$(USE_PACKAGE_BUILD_CACHE)),--no-cache) \
 		$(if $(filter-out y,$(CLEANUP_PACKAGE_BUILDS)),--no-cleanup) \
@@ -285,8 +290,17 @@ compress-srpms:
 	tar -cvp -f $(BUILD_DIR)/temp_srpms_tarball.tar.gz -C $(SRPMS_DIR)/.. $(notdir $(SRPMS_DIR))
 	mv $(BUILD_DIR)/temp_srpms_tarball.tar.gz $(srpms_archive)
 
+# Seed the cached RPMs folder files from the archive.
+hydrate-cached-rpms:
+	$(if $(CACHED_PACKAGES_ARCHIVE),,$(error Must set CACHED_PACKAGES_ARCHIVE=<path>))
+	@echo Unpacking cache RPMs from $(CACHED_PACKAGES_ARCHIVE) into $(CACHED_RPMS_DIR)
+	@tar -xf $(CACHED_PACKAGES_ARCHIVE) -C $(CACHED_RPMS_DIR) --strip-components 1 --skip-old-files --touch --checkpoint=100000 --checkpoint-action=echo="%T"
+# The cached RPMs directory has a flat structure, so we need to move the RPMs into the cache's root directory.
+	@find $(CACHED_RPMS_DIR) -mindepth 2 -name "*.rpm" -exec mv {} $(CACHED_RPMS_DIR) \;
+	@find $(CACHED_RPMS_DIR) -mindepth 1 -type d -and ! -name repodata -exec rm -fr {} +
+
 # Seed the RPMs folder with the any missing files from the archive.
 hydrate-rpms:
-	$(if $(PACKAGE_ARCHIVE),,$(error Must set PACKAGE_ARCHIVE=))
+	$(if $(PACKAGE_ARCHIVE),,$(error Must set PACKAGE_ARCHIVE=<path>))
 	@echo Unpacking RPMs from $(PACKAGE_ARCHIVE) into $(RPMS_DIR)
 	tar -xf $(PACKAGE_ARCHIVE) -C $(RPMS_DIR) --strip-components 1 --skip-old-files --touch --checkpoint=100000 --checkpoint-action=echo="%T"

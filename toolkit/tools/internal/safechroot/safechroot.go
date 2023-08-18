@@ -28,8 +28,9 @@ const BindMountPointFlags = unix.MS_BIND | unix.MS_MGC_VAL
 
 // FileToCopy represents a file to copy into a chroot using AddFiles. Dest is relative to the chroot directory.
 type FileToCopy struct {
-	Src  string
-	Dest string
+	Src         string
+	Dest        string
+	Permissions *os.FileMode
 }
 
 // MountPoint represents a system mount point used by a Chroot.
@@ -262,7 +263,12 @@ func (c *Chroot) AddFiles(filesToCopy ...FileToCopy) (err error) {
 	for _, f := range filesToCopy {
 		dest := filepath.Join(c.rootDir, f.Dest)
 		logger.Log.Debugf("Copying '%s' to worker '%s'", f.Src, dest)
-		err = file.Copy(f.Src, dest)
+
+		if f.Permissions != nil {
+			err = file.CopyAndChangeMode(f.Src, dest, os.ModePerm, *f.Permissions)
+		} else {
+			err = file.Copy(f.Src, dest)
+		}
 		if err != nil {
 			logger.Log.Errorf("Error provisioning worker with '%s'", f.Src)
 			return
