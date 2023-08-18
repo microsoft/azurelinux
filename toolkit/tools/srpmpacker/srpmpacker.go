@@ -98,8 +98,6 @@ type specState struct {
 	err      error
 }
 
-var errPackerCancelReceived = fmt.Errorf("packer cancel signal received")
-
 var (
 	app = kingpin.New("srpmpacker", "A tool to package a SRPM.")
 
@@ -600,9 +598,8 @@ func packSRPMs(specStates []*specState, distTag, buildDir string, templateSrcCon
 		result := <-results
 
 		if result.err != nil {
-			logger.Log.Errorf("Failed to pack (%s). Error: %s", result.specFile, result.err)
+			logger.Log.Errorf("Failed to pack (%s). Cancelling outstanding workers. Error: %s", result.specFile, result.err)
 			err = result.err
-			logger.Log.Warn("Cancelling outstanding workers")
 			close(cancel)
 			break
 		}
@@ -886,8 +883,6 @@ func hydrateFiles(fileTypeToHydrate fileType, specFile, workingDir string, srcCo
 
 	if hydrateRemotely && srcConfig.sourceURL != "" {
 		err = hydrateFromRemoteSource(fileHydrationState, newSourceDir, srcConfig, skipSignatureHandling, currentSignatures, cancel, netOpsSemaphore)
-		// Most errors are non-fatal and are handled inside the function (encoded inside fileHydrationState), cancellation
-		// however will return and error that should cause an early exit.
 		if err != nil {
 			return
 		}
@@ -957,6 +952,7 @@ func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir st
 		failureBackoffBase    = 2.0
 		downloadRetryDuration = time.Second
 	)
+	var errPackerCancelReceived = fmt.Errorf("packer cancel signal received")
 
 	for fileName, alreadyHydrated := range fileHydrationState {
 		if alreadyHydrated {
