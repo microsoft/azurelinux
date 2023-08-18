@@ -23,7 +23,7 @@ If you write Python, have no %{_bindir}/rpm around, or want to do something slig
 RPMs are build from a package's sources along with a spec file. The spec file controls how the RPM is built. This library allows you to parse spec files and gives you simple access to various bits of information that is contained in the spec file.
 
 %prep
-%setup -q
+%autosetup -n python-rpm-spec-%{version}
 
 %build
 
