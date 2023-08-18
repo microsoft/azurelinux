@@ -247,8 +247,7 @@ func createChroot(workerTar, buildDir, specsDir, srpmsDir string) (chroot *safec
 func findSpecFiles(specsDir string, specListSet map[string]bool) (specFiles []string, err error) {
 	// Find the filepath for each spec in the SPECS directory.
 	if len(specListSet) == 0 {
-		var specSearch string
-		specSearch, err = filepath.Abs(filepath.Join(specsDir, "**/*.spec"))
+		specSearch, err := filepath.Abs(filepath.Join(specsDir, "**/*.spec"))
 		if err != nil {
 			err = fmt.Errorf("invalid spec dir: '%s'. Error:\n%w", specsDir, err)
 			return nil, err
@@ -260,10 +259,8 @@ func findSpecFiles(specsDir string, specListSet map[string]bool) (specFiles []st
 		}
 	} else {
 		for specName := range specListSet {
-			var matchingSpecFiles []string
-
 			specSearch := filepath.Join(specsDir, fmt.Sprintf("**/%s.spec", specName))
-			matchingSpecFiles, err = filepath.Glob(specSearch)
+			matchingSpecFiles, err := filepath.Glob(specSearch)
 
 			// If a SPEC is in the parse list, it should be parsed.
 			if err != nil {
