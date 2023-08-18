@@ -59,7 +59,7 @@ clean-spec-parse:
 	@echo Verifying no mountpoints present in $(parse_working_dir)
 	$(SCRIPTS_DIR)/safeunmount.sh "$(parse_working_dir)" && \
 	rm -rf $(parse_working_dir)
-	rm -rf $(specs_file)*
+	rm -rf $(specs_file)
 clean-ccache:
 	rm -rf $(CCACHE_DIR)
 
