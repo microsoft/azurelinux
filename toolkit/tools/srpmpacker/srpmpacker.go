@@ -4,7 +4,6 @@
 package main
 
 import (
-	"bufio"
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
@@ -25,6 +24,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/network"
+	packagelist "github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packlist"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/rpm"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
@@ -189,44 +189,11 @@ func main() {
 
 	// A pack list may be provided, if so only pack this subset.
 	// If non is provided, pack all srpms.
-	packList, err := parsePackListFile(*packListFile)
+	packList, err := packagelist.ParsePackageListFile(*packListFile)
 	logger.PanicOnError(err)
 
 	err = createAllSRPMsWrapper(*specsDir, *distTag, *buildDir, *outDir, *workerTar, *workers, *nestedSourcesDir, *repackAll, *runCheck, packList, templateSrcConfig)
 	logger.PanicOnError(err)
-}
-
-// parsePackListFile will parse a list of packages to pack if one is specified.
-// Duplicate list entries in the file will be removed.
-func parsePackListFile(packListFile string) (packList map[string]bool, err error) {
-	timestamp.StartEvent("parse list", nil)
-	defer timestamp.StopEvent(nil)
-
-	if packListFile == "" {
-		return
-	}
-
-	packList = make(map[string]bool)
-
-	file, err := os.Open(packListFile)
-	if err != nil {
-		return
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		line := strings.TrimSpace(scanner.Text())
-		if line != "" {
-			packList[line] = true
-		}
-	}
-
-	if len(packList) == 0 {
-		err = fmt.Errorf("cannot have empty pack list (%s)", packListFile)
-	}
-
-	return
 }
 
 // createAllSRPMsWrapper wraps createAllSRPMs to conditionally run it inside a chroot.

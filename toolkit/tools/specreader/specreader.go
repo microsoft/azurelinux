@@ -6,7 +6,6 @@
 package main
 
 import (
-	"bufio"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -21,6 +20,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	packagelist "github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packlist"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/rpm"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
@@ -86,7 +86,7 @@ func main() {
 
 	// A parse list may be provided, if so only parse this subset.
 	// If none is provided, parse all specs.
-	specListSet, err := parseSpecListFile(*specListFile)
+	specListSet, err := packagelist.ParsePackageListFile(*specListFile)
 	logger.PanicOnError(err)
 
 	// Convert specsDir to an absolute path
@@ -95,39 +95,6 @@ func main() {
 
 	err = parseSPECsWrapper(*buildDir, specsAbsDir, *rpmsDir, *srpmsDir, *existingToolchainRpmDir, *distTag, *output, *workerTar, specListSet, toolchainRPMs, *workers, *runCheck)
 	logger.PanicOnError(err)
-}
-
-// parsePackListFile will parse a list of packages to pack if one is specified.
-// Duplicate list entries in the file will be removed.
-func parseSpecListFile(specListFile string) (specListSet map[string]bool, err error) {
-	timestamp.StartEvent("parse list", nil)
-	defer timestamp.StopEvent(nil)
-
-	if specListFile == "" {
-		return
-	}
-
-	specListSet = make(map[string]bool)
-
-	file, err := os.Open(specListFile)
-	if err != nil {
-		return
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		line := strings.TrimSpace(scanner.Text())
-		if line != "" {
-			specListSet[line] = true
-		}
-	}
-
-	if len(specListSet) == 0 {
-		err = fmt.Errorf("cannot have empty parse list (%s)", specListFile)
-	}
-
-	return
 }
 
 // parseSPECsWrapper wraps parseSPECs to conditionally run it inside a chroot.
