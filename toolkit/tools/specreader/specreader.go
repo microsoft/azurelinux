@@ -255,10 +255,9 @@ func findSpecFiles(specsDir string, specListSet map[string]bool) (specFiles []st
 		}
 		specFiles, err = filepath.Glob(specSearch)
 		if err != nil {
-			err = fmt.Errorf("failed to find *.spec files. Check that %s is the correct directory. Error: %w", specsDir, err)
+			err = fmt.Errorf("failed to find *.spec files. Check that '%s' is the correct directory. Error:\n%w", specsDir, err)
 			return nil, err
 		}
-		return
 	} else {
 		for specName := range specListSet {
 			var matchingSpecFiles []string
