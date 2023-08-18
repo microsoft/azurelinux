@@ -15,6 +15,7 @@ import (
 // ParsePackageListFile will parse a list of packages to pack or parse, if one is specified.
 // Duplicate list entries in the file will be removed.
 // If no path is specified, nil will be returned.
+// A set of [package name] -> [true] will be returned.
 func ParsePackageListFile(packageListFile string) (packageList map[string]bool, err error) {
 	timestamp.StartEvent("parse list", nil)
 	defer timestamp.StopEvent(nil)
