@@ -673,6 +673,7 @@
                 "liblangtag",
                 "libldb",
                 "libldm",
+                "liblerc",
                 "liblockfile",
                 "liblognorm",
                 "liblouis",
