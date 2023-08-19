@@ -1,5 +1,7 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+%global		gittag	1_8_0
+
 Name:          gpsbabel
 Version:       1.8.0
 Release:       4%{?dist}
@@ -45,7 +47,7 @@ Qt GUI interface for GPSBabel
 %endif
 
 %prep
-%setup -q -n %{name}-%{version}
+%setup -q -n %{name}-%{name}_%{gittag}
 
 %patch2 -p1
 
