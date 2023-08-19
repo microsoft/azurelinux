@@ -60,7 +60,7 @@ TCL wrapper for OGDI.
 
 
 %prep
-%autosetup -p1 -n %{name}-%{name}_%{gittag}
+%autosetup -p1 -n %{name}-%{version}
 
 # include documentation
 %{__cp} -p %{SOURCE1} .
