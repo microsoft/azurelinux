@@ -7,7 +7,7 @@ Summary:	Validating XML Parser
 
 License:	ASL 2.0
 URL:		http://xml.apache.org/xerces-c/
-Source0:	https://downloads.apache.org/xerces/c/3/sources/xerces-c-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:	https://downloads.apache.org/xerces/c/3/sources/%{name}-%{version}.tar.gz
 
 BuildRequires: make
 BuildRequires:	gcc-c++
