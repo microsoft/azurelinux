@@ -23,7 +23,7 @@ Release:        19%{?dist}
 License:        MPL-1.1 OR GPL-2.0-or-later OR LGPL-2.1-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            http://www.gaia-gis.it/FreeXL
+URL:            https://www.gaia-gis.it/FreeXL
 Source0:        http://www.gaia-gis.it/gaia-sins/freexl-sources/freexl-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 %global so_version 1
 BuildRequires:  gcc

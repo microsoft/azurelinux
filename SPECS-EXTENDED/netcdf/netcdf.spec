@@ -14,7 +14,7 @@ Release:        4%{?dist}
 License:        NetCDF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            http://www.unidata.ucar.edu/software/netcdf/
+URL:            https://www.unidata.ucar.edu/software/netcdf/
 Source0:        https://github.com/Unidata/netcdf-c/archive/v%{version}/%{name}-%{version}.tar.gz
 # Fix plugins - https://github.com/Unidata/netcdf-c/pull/2431
 Patch0:         netcdf-plugin.patch
