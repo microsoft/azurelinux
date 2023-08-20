@@ -16,7 +16,7 @@ steps:
 
       echo "Using following version of Mariner:"
 
-      if ! make -sC "$toolkit_dir" CONFIG_FILE="" get-release-major; then
+      if ! sudo make -sC "$toolkit_dir" CONFIG_FILE="" get-release-major; then
         echo "ERROR: version check failed!" >&2
         exit 1
       fi
