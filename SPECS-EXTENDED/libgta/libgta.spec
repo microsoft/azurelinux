@@ -7,7 +7,7 @@ Release:   9%{?dist}
 Summary:   Library that implements the Generic Tagged Arrays file format
 License:   LGPLv2+
 URL:       https://marlam.de/gta/
-Source0:   https://marlam.de/gta/releases/%{name}-%{version}.tar.xz3#/%{name}-%{version}.tar.xz
+Source0:   https://marlam.de/gta/releases/%{name}-%{version}.tar.xz#/%{name}-%{version}.tar.xz
 BuildRequires: cmake
 BuildRequires: gcc
 BuildRequires: doxygen
