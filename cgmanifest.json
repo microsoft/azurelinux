@@ -4169,6 +4169,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "gdal",
+          "version": "3.6.3",
+          "downloadUrl": "https://github.com/OSGeo/gdal/releases/download/v3.6.3/gdal-3.6.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "gdb",
           "version": "11.2",
           "downloadUrl": "https://ftp.gnu.org/gnu/gdb/gdb-11.2.tar.xz"
@@ -4832,6 +4842,16 @@
           "name": "gpm",
           "version": "1.20.7",
           "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/gpm-1.20.7.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "gpsbabel",
+          "version": "1.8.0",
+          "downloadUrl": "https://github.com/GPSBabel/gpsbabel/archive/refs/tags/gpsbabel_1_8_0.tar.gz"
         }
       }
     },
@@ -9542,7 +9562,7 @@
         "other": {
           "name": "libgta",
           "version": "1.2.1",
-          "downloadUrl": "https://marlam.de/gta/releases/libgta-1.2.1.tar.xz3"
+          "downloadUrl": "https://marlam.de/gta/releases/libgta-1.2.1.tar.xz"
         }
       }
     },
@@ -29913,7 +29933,7 @@
         "other": {
           "name": "xerces-c",
           "version": "3.2.4",
-          "downloadUrl": "https://downloads.apache.org/xerces/c/3/sources/xerces-c-3.2.4.tar.xz"
+          "downloadUrl": "https://downloads.apache.org/xerces/c/3/sources/xerces-c-3.2.4.tar.gz"
         }
       }
     },
