@@ -5,7 +5,7 @@ Distribution:   Mariner
 %define so_ver 2
 Name:           shapelib
 Version:        1.5.0
-Release:        2.7
+Release:        3%{?dist}
 Summary:        Library for ESRI Shapefile Handling
 License:        GPL-2.0-or-later AND (LGPL-2.0-or-later OR MIT) AND SUSE-Public-Domain
 Group:          Productivity/Graphics/Other
@@ -114,8 +114,12 @@ make %{?_smp_mflags} check ||:
 %{_libdir}/libshp.so.%{so_ver}*
 
 %changelog
+* Sun Aug 20 2023 Archana Choudhary <archana1@microsoft.com> - 1.5.0-3
+- Update 'Release' tag format to '[number]%{?dist}'
+
 * Thu Aug 10 2023 Archana Choudhary <archana1@microsoft.com> - 1.5.0-2.7
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
+- License verified
 
 * Mon Feb 21 2022 Dirk Stoecker <opensuse@dstoecker.de>
 - fix CVE-2022-0699, patch c75b9281a5b9452d92e1682bdfe6019a13ed819f.diff
