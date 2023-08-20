@@ -1156,6 +1156,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "blosc",
+          "version": "1.21.4",
+          "downloadUrl": "https://github.com/Blosc/c-blosc/archive/v1.21.4/blosc-1.21.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "bluez",
           "version": "5.63",
           "downloadUrl": "http://www.kernel.org/pub/linux/bluetooth/bluez-5.63.tar.xz"
@@ -1596,6 +1606,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "cfitsio",
+          "version": "4.0.0",
+          "downloadUrl": "http://heasarc.gsfc.nasa.gov/FTP/software/fitsio/c/cfitsio-4.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "cgdcbxd",
           "version": "1.0.2",
           "downloadUrl": "https://github.com/jrfastab/cgdcbxd/archive/v1.0.2.tar.gz"
@@ -1619,6 +1639,16 @@
           "name": "chan",
           "version": "0.0.4",
           "downloadUrl": "https://github.com/tylertreat/chan/archive/0.0.4/chan-0.0.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "CharLS",
+          "version": "2.0.0",
+          "downloadUrl": "https://github.com/team-charls/charls/archive/2.0.0/CharLS-2.0.0.tar.gz"
         }
       }
     },
@@ -3919,6 +3949,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "freexl",
+          "version": "1.0.6",
+          "downloadUrl": "http://www.gaia-gis.it/gaia-sins/freexl-sources/freexl-1.0.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "fribidi",
           "version": "1.0.12",
           "downloadUrl": "https://github.com/fribidi/fribidi/releases/download/v1.0.12/fribidi-1.0.12.tar.xz"
@@ -5192,6 +5232,16 @@
           "name": "hawtjni-runtime",
           "version": "1.17",
           "downloadUrl": "https://github.com/fusesource/hawtjni/archive/hawtjni-project-1.17.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "hdf",
+          "version": "4.2.15",
+          "downloadUrl": "https://support.hdfgroup.org/ftp/HDF/releases/HDF4.2.15/src/hdf-4.2.15.tar.bz2"
         }
       }
     },
@@ -9370,6 +9420,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libgeotiff",
+          "version": "1.7.1",
+          "downloadUrl": "http://download.osgeo.org/geotiff/libgeotiff/libgeotiff-1.7.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libgexiv2",
           "version": "0.12.1",
           "downloadUrl": "https://download.gnome.org/sources/gexiv2/0.12/gexiv2-0.12.1.tar.xz"
@@ -9473,6 +9533,16 @@
           "name": "libgsystem",
           "version": "2015.2",
           "downloadUrl": "https://src.fedoraproject.org/repo/pkgs/libgsystem/libgsystem-2015.2.tar.xz/e388e3ad3c2b527479cc8512f6ad9a37/libgsystem-2015.2.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libgta",
+          "version": "1.2.1",
+          "downloadUrl": "https://marlam.de/gta/releases/libgta-1.2.1.tar.xz3"
         }
       }
     },
@@ -9793,6 +9863,16 @@
           "name": "libkkc-data",
           "version": "0.2.7",
           "downloadUrl": "https://github.com/ueno/libkkc/releases/download/v0.3.5/libkkc-data-0.2.7.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libkml",
+          "version": "1.3.0",
+          "downloadUrl": "https://github.com/libkml/libkml/archive/1.3.0/libkml-1.3.0.tar.gz"
         }
       }
     },
@@ -14012,6 +14092,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "netcdf",
+          "version": "4.9.0",
+          "downloadUrl": "https://github.com/Unidata/netcdf-c/archive/v4.9.0/netcdf-4.9.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "netcf",
           "version": "0.2.8",
           "downloadUrl": "https://fedorahosted.org/released/netcf/netcf-0.2.8.tar.gz"
@@ -15076,6 +15166,16 @@
           "name": "ofed-scripts",
           "version": "5.6",
           "downloadUrl": "https://linux.mellanox.com/public/repo/doca/1.3.0/extras/mlnx_ofed/5.6-1.0.3.3/SOURCES/ofed-scripts_5.6.orig.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ogdi",
+          "version": "4.1.0",
+          "downloadUrl": "https://github.com/libogdi/ogdi/archive/ogdi_4_1_0.tar.gz"
         }
       }
     },
@@ -25103,6 +25203,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "qt5-qtserialport",
+          "version": "5.15.9",
+          "downloadUrl": "https://download.qt.io/official_releases/qt/5.15/5.15.9/submodules/qtserialport-everywhere-opensource-src-5.15.9.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "qt5-qtsvg",
           "version": "5.12.11",
           "downloadUrl": "https://download.qt.io/archive/qt/5.12/5.12.11/submodules/qtsvg-everywhere-src-5.12.11.tar.xz"
@@ -27506,6 +27616,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "shapelib",
+          "version": "1.5.0",
+          "downloadUrl": "http://download.osgeo.org/shapelib/shapelib-1.5.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "shared-mime-info",
           "version": "2.0",
           "downloadUrl": "https://gitlab.freedesktop.org/xdg/shared-mime-info/uploads/0440063a2e6823a4b1a6fb2f2af8350f/shared-mime-info-2.0.tar.xz"
@@ -28956,6 +29076,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "uriparser",
+          "version": "0.9.7",
+          "downloadUrl": "https://github.com/uriparser/uriparser/releases/download/uriparser-0.9.7/uriparser-0.9.7.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "urlview",
           "version": "0.9",
           "downloadUrl": "https://github.com/sigpipe/urlview/archive/08767a/urlview-08767a.tar.gz"
@@ -29764,6 +29894,16 @@
           "name": "xdg-utils",
           "version": "1.1.3",
           "downloadUrl": "https://people.freedesktop.org/~rdieter/xdg-utils/xdg-utils-1.1.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "xerces-c",
+          "version": "3.2.4",
+          "downloadUrl": "https://downloads.apache.org/xerces/c/3/sources/xerces-c-3.2.4.tar.xz"
         }
       }
     },
