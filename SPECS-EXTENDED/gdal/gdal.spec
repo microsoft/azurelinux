@@ -33,7 +33,7 @@ License:       MIT
 URL:           http://www.gdal.org
 
 
-Source0:       %{name}-%{version}.tar.gz
+Source0:       https://github.com/OSGeo/gdal/releases/download/v3.6.3/%{name}-%{version}.tar.gz
 Source1:       %{name}autotest-%{version}.tar.gz
 # Multilib compatible cpl-config.h header
 Source2:       cpl-config.h

@@ -11,7 +11,7 @@ License:       GPLv2+
 URL:           http://www.gpsbabel.org
 # Upstream's website hides tarball behind some ugly php script
 # Original repo is at https://github.com/gpsbabel/gpsbabel
-Source0:       GPSBabel-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:       https://github.com/GPSBabel/gpsbabel/archive/refs/tags/%{name}_%{gittag}.tar.gz#/%{name}-%{version}.tar.gz
 Source2:       %{name}.png
 
 # No automatic phone home by default (RHBZ 668865)
