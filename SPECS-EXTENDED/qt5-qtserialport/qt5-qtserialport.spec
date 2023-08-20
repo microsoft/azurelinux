@@ -1,7 +1,8 @@
+%if 1
 %global qt_module qtserialport
 %global majmin %(echo %{version} | cut -d. -f1-2)
 %{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
-
+%endif
 Summary:        Qt5 - SerialPort component
 Name:           qt5-%{qt_module}
 Version:        5.15.9
