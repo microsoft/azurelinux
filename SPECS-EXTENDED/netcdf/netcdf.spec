@@ -1,39 +1,3 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-%global sover 19
-
-Name:           netcdf
-Version:        4.9.0
-Release:        4%{?dist}
-Summary:        Libraries for the Unidata network Common Data Form
-
-License:        NetCDF
-URL:            http://www.unidata.ucar.edu/software/netcdf/
-Source0:        https://github.com/Unidata/netcdf-c/archive/v%{version}/%{name}-%{version}.tar.gz
-# Fix plugins - https://github.com/Unidata/netcdf-c/pull/2431
-Patch0:         netcdf-plugin.patch
-
-BuildRequires:  libtool
-BuildRequires:  make
-BuildRequires:  chrpath
-BuildRequires:  doxygen
-BuildRequires:  blosc-devel
-BuildRequires:  hdf-static
-BuildRequires:  hdf5-devel
-BuildRequires:  gawk
-BuildRequires:  curl-devel
-BuildRequires:  libxml2-devel
-BuildRequires:  libzstd-devel
-BuildRequires:  m4
-BuildRequires:  zlib-devel
-%ifarch %{valgrind_arches}
-BuildRequires:  valgrind
-%endif
-#mpiexec segfaults if ssh is not present
-#https://trac.mcs.anl.gov/projects/mpich2/ticket/1576
-BuildRequires:  openssh-clients
-Requires:       hdf5%{?_isa} = %{_hdf5_version}
-
 # build without mpich and openmpi support
 %bcond_with mpich
 %bcond_with openmpi
@@ -43,18 +7,50 @@ Requires:       hdf5%{?_isa} = %{_hdf5_version}
 %if %{with openmpi}
 %global mpi_list %{?mpi_list} openmpi
 %endif
+Summary:        Libraries for the Unidata network Common Data Form
+Name:           netcdf
+Version:        4.9.0
+Release:        4%{?dist}
+License:        NetCDF
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            http://www.unidata.ucar.edu/software/netcdf/
+Source0:        https://github.com/Unidata/netcdf-c/archive/v%{version}/%{name}-%{version}.tar.gz
+# Fix plugins - https://github.com/Unidata/netcdf-c/pull/2431
+Patch0:         netcdf-plugin.patch
+%global sover 19
+BuildRequires:  blosc-devel
+BuildRequires:  chrpath
+BuildRequires:  curl-devel
+BuildRequires:  doxygen
+BuildRequires:  gawk
+BuildRequires:  hdf-static
+BuildRequires:  hdf5-devel
+BuildRequires:  libtool
+BuildRequires:  libxml2-devel
+BuildRequires:  libzstd-devel
+BuildRequires:  m4
+BuildRequires:  make
+#mpiexec segfaults if ssh is not present
+#https://trac.mcs.anl.gov/projects/mpich2/ticket/1576
+BuildRequires:  openssh-clients
+BuildRequires:  zlib-devel
+Requires:       hdf5%{?_isa} = %{_hdf5_version}
+%ifarch %{valgrind_arches}
+BuildRequires:  valgrind
+%endif
 
 %description
-NetCDF (network Common Data Form) is an interface for array-oriented 
-data access and a freely-distributed collection of software libraries 
-for C, Fortran, C++, and perl that provides an implementation of the 
-interface.  The NetCDF library also defines a machine-independent 
-format for representing scientific data.  Together, the interface, 
-library, and format support the creation, access, and sharing of 
-scientific data. The NetCDF software was developed at the Unidata 
+NetCDF (network Common Data Form) is an interface for array-oriented
+data access and a freely-distributed collection of software libraries
+for C, Fortran, C++, and perl that provides an implementation of the
+interface.  The NetCDF library also defines a machine-independent
+format for representing scientific data.  Together, the interface,
+library, and format support the creation, access, and sharing of
+scientific data. The NetCDF software was developed at the Unidata
 Program Center in Boulder, Colorado.
 
-NetCDF data is: 
+NetCDF data is:
 
    o Self-Describing: A NetCDF file includes information about the
      data it contains.
@@ -75,18 +71,16 @@ NetCDF data is:
    o Sharable:  One writer and multiple readers may simultaneously
      access the same NetCDF file.
 
-
 %package devel
 Summary:        Development files for netcdf
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       pkgconfig%{?_isa}
-Requires:       hdf5-devel%{?_isa}
 Requires:       curl-devel%{?_isa}
+Requires:       hdf5-devel%{?_isa}
+Requires:       pkgconfig%{?_isa}
 
 %description devel
-This package contains the netCDF C header files, shared devel libs, and 
+This package contains the netCDF C header files, shared devel libs, and
 man pages.
-
 
 %package static
 Summary:        Static libs for netcdf
@@ -95,38 +89,35 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 %description static
 This package contains the netCDF C static libs.
 
-
 %if %{with mpich}
 %package mpich
-Summary: NetCDF mpich libraries
-Requires: hdf5-mpich%{?_isa} = %{_hdf5_version}
-BuildRequires: mpich-devel
-BuildRequires: hdf5-mpich-devel >= 1.8.4
-Provides: %{name}-mpich2 = %{version}-%{release}
-Obsoletes: %{name}-mpich2 < 4.3.0-4
+Summary:        NetCDF mpich libraries
+BuildRequires:  hdf5-mpich-devel >= 1.8.4
+BuildRequires:  mpich-devel
+Requires:       hdf5-mpich%{?_isa} = %{_hdf5_version}
+Provides:       %{name}-mpich2 = %{version}-%{release}
+Obsoletes:      %{name}-mpich2 < 4.3.0-4
 
 %description mpich
 NetCDF parallel mpich libraries
 
-
 %package mpich-devel
-Summary: NetCDF mpich development files
-Requires: %{name}-mpich%{?_isa} = %{version}-%{release}
-Requires: pkgconfig%{?_isa}
-Requires: hdf5-mpich-devel%{?_isa}
-Requires: curl-devel%{?_isa}
-Provides: %{name}-mpich2-devel = %{version}-%{release}
-Obsoletes: %{name}-mpich2-devel < 4.3.0-4
+Summary:        NetCDF mpich development files
+Requires:       %{name}-mpich%{?_isa} = %{version}-%{release}
+Requires:       curl-devel%{?_isa}
+Requires:       hdf5-mpich-devel%{?_isa}
+Requires:       pkgconfig%{?_isa}
+Provides:       %{name}-mpich2-devel = %{version}-%{release}
+Obsoletes:      %{name}-mpich2-devel < 4.3.0-4
 
 %description mpich-devel
 NetCDF parallel mpich development files
 
-
 %package mpich-static
-Summary: NetCDF mpich static libraries
-Requires: %{name}-mpich-devel%{?_isa} = %{version}-%{release}
-Provides: %{name}-mpich2-static = %{version}-%{release}
-Obsoletes: %{name}-mpich2-static < 4.3.0-4
+Summary:        NetCDF mpich static libraries
+Requires:       %{name}-mpich-devel%{?_isa} = %{version}-%{release}
+Provides:       %{name}-mpich2-static = %{version}-%{release}
+Obsoletes:      %{name}-mpich2-static < 4.3.0-4
 
 %description mpich-static
 NetCDF parallel mpich static libraries
@@ -135,30 +126,28 @@ NetCDF parallel mpich static libraries
 
 %if %{with openmpi}
 %package openmpi
-Summary: NetCDF openmpi libraries
-Requires: hdf5-openmpi%{?_isa} = %{_hdf5_version}
-BuildRequires: openmpi-devel
-BuildRequires: hdf5-openmpi-devel >= 1.8.4
+Summary:        NetCDF openmpi libraries
+BuildRequires:  hdf5-openmpi-devel >= 1.8.4
+BuildRequires:  openmpi-devel
+Requires:       hdf5-openmpi%{?_isa} = %{_hdf5_version}
 
 %description openmpi
 NetCDF parallel openmpi libraries
 
-
 %package openmpi-devel
-Summary: NetCDF openmpi development files
-Requires: %{name}-openmpi%{_isa} = %{version}-%{release}
-Requires: openmpi-devel%{?_isa}
-Requires: pkgconfig%{?_isa}
-Requires: hdf5-openmpi-devel%{?_isa}
-Requires: curl-devel%{?_isa}
+Summary:        NetCDF openmpi development files
+Requires:       %{name}-openmpi%{_isa} = %{version}-%{release}
+Requires:       curl-devel%{?_isa}
+Requires:       hdf5-openmpi-devel%{?_isa}
+Requires:       openmpi-devel%{?_isa}
+Requires:       pkgconfig%{?_isa}
 
 %description openmpi-devel
 NetCDF parallel openmpi development files
 
-
 %package openmpi-static
-Summary: NetCDF openmpi static libraries
-Requires: %{name}-openmpi-devel%{?_isa} = %{version}-%{release}
+Summary:        NetCDF openmpi static libraries
+Requires:       %{name}-openmpi-devel%{?_isa} = %{version}-%{release}
 
 %description openmpi-static
 NetCDF parallel openmpi static libraries
@@ -235,17 +224,17 @@ done
 %endif
 
 %install
-make -C build install DESTDIR=${RPM_BUILD_ROOT}
-/bin/rm -f ${RPM_BUILD_ROOT}%{_libdir}/*.la
-chrpath --delete ${RPM_BUILD_ROOT}/%{_bindir}/nc{copy,dump,gen,gen3}
-/bin/rm -f ${RPM_BUILD_ROOT}%{_infodir}/dir
+make -C build install DESTDIR=%{buildroot}
+find %{buildroot} -type f -name "*.la" -delete -print
+chrpath --delete %{buildroot}/%{_bindir}/nc{copy,dump,gen,gen3}
+/bin/rm -f %{buildroot}%{_infodir}/dir
 %if %{with mpich} || %{with openmpi}
 for mpi in %{mpi_list}
 do
   module load mpi/$mpi-%{_arch}
-  make -C $mpi install DESTDIR=${RPM_BUILD_ROOT}
-  rm $RPM_BUILD_ROOT/%{_libdir}/$mpi/lib/*.la
-  chrpath --delete ${RPM_BUILD_ROOT}/%{_libdir}/$mpi/bin/nc{copy,dump,gen,gen3}
+  make -C $mpi install DESTDIR=%{buildroot}
+find %{buildroot} -type f -name "*.la" -delete -print
+  chrpath --delete %{buildroot}/%{_libdir}/$mpi/bin/nc{copy,dump,gen,gen3}
   module purge
 done
 %endif

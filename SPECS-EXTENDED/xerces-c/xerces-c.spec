@@ -1,19 +1,17 @@
+Summary:        Validating XML Parser
+Name:           xerces-c
+Version:        3.2.4
+Release:        1%{?dist}
+License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Name:		xerces-c
-Version:	3.2.4
-Release:	1%{?dist}
-Summary:	Validating XML Parser
+URL:            https://xml.apache.org/xerces-c/
+Source0:        https://downloads.apache.org/xerces/c/3/sources/%{name}-%{version}.tar.gz
+BuildRequires:  dos2unix
+BuildRequires:  gcc-c++
+BuildRequires:  make
 
-License:	ASL 2.0
-URL:		http://xml.apache.org/xerces-c/
-Source0:	https://downloads.apache.org/xerces/c/3/sources/%{name}-%{version}.tar.gz
-
-BuildRequires: make
-BuildRequires:	gcc-c++
-BuildRequires:	dos2unix
-
-%description 
+%description
 Xerces-C is a validating XML parser written in a portable
 subset of C++. Xerces-C makes it easy to give your application the
 ability to read and write XML data. A shared library is provided for
@@ -25,8 +23,8 @@ DOM Level 3.0 Load and Save, SAX 1.0 and SAX 2.0, Namespaces in XML,
 Namespaces in XML 1.1, XML Schema, XML Inclusions).
 
 %package	devel
-Summary:	Header files, libraries and development documentation for %{name}
-Requires:	%{name}%{?_isa} = %{version}-%{release}
+Summary:        Header files, libraries and development documentation for %{name}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description devel
 This package contains the header files, static libraries and development
@@ -34,8 +32,8 @@ documentation for %{name}. If you like to develop programs using %{name},
 you will need to install %{name}-devel.
 
 %package doc
-Summary:	Documentation for Xerces-C++ validating XML parser
-BuildArch:	noarch
+Summary:        Documentation for Xerces-C++ validating XML parser
+BuildArch:      noarch
 
 %description doc
 Documentation for Xerces-C++.
@@ -46,7 +44,7 @@ write XML data. A shared library is provided for parsing, generating,
 manipulating, and validating XML documents.
 
 %prep
-%setup -q 
+%setup -q
 # Copy samples before build to avoid including built binaries in -doc package
 mkdir -p _docs
 cp -a samples/ _docs/
@@ -55,7 +53,7 @@ cp -a samples/ _docs/
 # --disable-sse2 makes sure explicit -msse2 isn't passed to gcc so
 # the binaries would be compatible with non-SSE2 i686 hardware.
 # This only affects i686, as on x86_64 the compiler uses SSE2 by default.
-export CFLAGS="$RPM_OPT_FLAGS -fno-strict-aliasing"
+export CFLAGS="%{optflags} -fno-strict-aliasing"
 export CXXFLAGS="$CFLAGS"
 %configure --disable-static \
   --disable-sse2
@@ -68,9 +66,9 @@ iconv -f iso8859-1 -t utf-8 CREDITS > CREDITS.tmp && mv -f CREDITS.tmp CREDITS
 # Correct errors in line endings
 pushd doc; dos2unix -k *.xml; popd
 # Remove unwanted binaries
-rm -rf $RPM_BUILD_ROOT%{_bindir}
+rm -rf %{buildroot}%{_bindir}
 # Remove .la files
-rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %files
 %license LICENSE

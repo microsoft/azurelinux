@@ -1,22 +1,20 @@
+Summary:        High performance compressor optimized for binary data
+Name:           blosc
+Version:        1.21.4
+Release:        2%{?dist}
+License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-
-Summary: High performance compressor optimized for binary data
-Name: blosc
-Version: 1.21.4
-Release: 2%{?dist}
-License: MIT
-Source: https://github.com/Blosc/c-blosc/archive/v%{version}/blosc-%{version}.tar.gz
-Patch0: %{name}-gcc11.patch
-
-URL:  https://github.com/Blosc/c-blosc
-BuildRequires: gcc
-BuildRequires: gcc-c++
-BuildRequires: cmake
-BuildRequires: lz4-devel
-BuildRequires: snappy-devel
-BuildRequires: zlib-devel
-BuildRequires: libzstd-devel
+URL:            https://github.com/Blosc/c-blosc
+Source:         https://github.com/Blosc/c-blosc/archive/v%{version}/blosc-%{version}.tar.gz
+Patch0:         %{name}-gcc11.patch
+BuildRequires:  cmake
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
+BuildRequires:  libzstd-devel
+BuildRequires:  lz4-devel
+BuildRequires:  snappy-devel
+BuildRequires:  zlib-devel
 
 %description
 Blosc is a compression library designed to transmit data to the processor
@@ -26,8 +24,8 @@ Blosc is meant not only to reduce the size of large datasets on-disk or
 in-memory, but also to accelerate memory-bound computations.
 
 %package devel
-Summary: Header files and libraries for Blosc development
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Summary:        Header files and libraries for Blosc development
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description devel
 The blosc-devel package contains the header files and libraries needed
@@ -47,7 +45,7 @@ sed -i '1i  set\(CMAKE_POSITION_INDEPENDENT_CODE TRUE\)' CMakeLists.txt
 sed -i 's|lib/pkgconfig|%{_lib}/pkgconfig|' CMakeLists.txt
 
 # Add python shebang and permission
-sed -i '1i  #!/usr/bin/python3' bench/plot-speeds.py
+sed -i '1i  #!%{_bindir}/python3' bench/plot-speeds.py
 
 %build
 # Use the proper library path and SSE2 instruction on 64bits systems
@@ -85,7 +83,6 @@ export LD_LIBRARY_PATH=%{buildroot}%{_libdir}
 %{_libdir}/pkgconfig/blosc.pc
 %{_includedir}/blosc.h
 %{_includedir}/blosc-export.h
-
 
 %changelog
 * Thu Aug 10 2023 Archana Choudhary <archana1@microsoft.com> - 1.21.4-2
@@ -172,6 +169,7 @@ export LD_LIBRARY_PATH=%{buildroot}%{_libdir}
 - Update to latest version (#1536731)
 
 * Thu Jan 18 2018 Jan Beran <jberan@redhat.com> - 1.13.1-1
+
 * New version using Python 3
 
 * Wed Aug 02 2017 Fedora Release Engineering <releng@fedoraproject.org> - 1.11.3-3
@@ -271,4 +269,3 @@ export LD_LIBRARY_PATH=%{buildroot}%{_libdir}
 
 * Fri Mar 22 2013 Thibault North <tnorth@fedoraproject.org> - 1.1.6-1
 - Initial package
-

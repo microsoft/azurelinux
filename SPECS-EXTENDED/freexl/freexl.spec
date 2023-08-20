@@ -1,21 +1,14 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-
 # Doxygen HTML help is not suitable for packaging due to a minified JavaScript
 # bundle inserted by Doxygen itself. See discussion at
 # https://bugzilla.redhat.com/show_bug.cgi?id=2006555.
 #
 # We can enable the Doxygen PDF documentation as a substitute.
 %bcond_with doc_pdf
-
 %bcond_without autoreconf
-
+Summary:        Library to extract data from within an Excel spreadsheet
 Name:           freexl
 Version:        1.0.6
-%global so_version 1
 Release:        19%{?dist}
-Summary:        Library to extract data from within an Excel spreadsheet
-
 # The entire source is triply-licensed as (MPL-1.1 OR GPL-2.0-or-later OR
 # LGPL-2.1-or-later), except for some build-system files that do not contribute
 # to the license of the binary RPMs:
@@ -28,17 +21,18 @@ Summary:        Library to extract data from within an Excel spreadsheet
 #   - install-sh is X11
 #   - m4/libtool.m4 is (FSFULLR AND GPL-2.0-or-later)
 License:        MPL-1.1 OR GPL-2.0-or-later OR LGPL-2.1-or-later
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            http://www.gaia-gis.it/FreeXL
 Source0:        http://www.gaia-gis.it/gaia-sins/freexl-sources/freexl-%{version}.tar.gz#/%{name}-%{version}.tar.gz
-
+%global so_version 1
+BuildRequires:  gcc
+BuildRequires:  make
 %if %{with autoreconf}
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libtool
 %endif
-
-BuildRequires:  gcc
-BuildRequires:  make
 
 %description
 FreeXL is a library to extract valid data from within spreadsheets.
@@ -49,12 +43,9 @@ Design goals:
   • to be easily and universally portable
   • completely ignoring any GUI-related oddity
 
-
 %package doc
 Summary:        Documentation and examples for FreeXL
-
 BuildArch:      noarch
-
 %if %{with doc_pdf}
 BuildRequires:  doxygen
 BuildRequires:  doxygen-latex
@@ -63,16 +54,13 @@ BuildRequires:  doxygen-latex
 %description doc
 %{summary}.
 
-
 %package devel
-Summary:  Development Libraries for FreeXL
-
-Requires: freexl%{?_isa} = %{version}-%{release}
+Summary:        Development Libraries for FreeXL
+Requires:       freexl%{?_isa} = %{version}-%{release}
 
 %description devel
 The freexl-devel package contains libraries and header files for
 developing applications that use freexl.
-
 
 %prep
 %autosetup
@@ -128,12 +116,10 @@ find '%{buildroot}' -type f -name '*.la' -print -delete
 %{_libdir}/libfreexl.so.%{so_version}
 %{_libdir}/libfreexl.so.%{so_version}.*
 
-
 %files devel
 %{_includedir}/freexl.h
 %{_libdir}/libfreexl.so
 %{_libdir}/pkgconfig/freexl.pc
-
 
 %files doc
 %license COPYING
@@ -146,12 +132,11 @@ find '%{buildroot}' -type f -name '*.la' -print -delete
 %doc latex/FreeXL.pdf
 %endif
 
-
 %changelog
 * Wed Aug 09 2023 Archana Choudhary <archana1@microsoft.com> - 1.0.6-19
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
 - Disable doc_pdf
-- License verified 
+- License verified
 
 * Mon Aug 01 2022 Benjamin A. Beasley <code@musicinmybrain.net> 1.0.6-18
 - Update License field to SPDX
@@ -289,4 +274,3 @@ find '%{buildroot}' -type f -name '*.la' -print -delete
 
 * Fri Nov 26 2010 Peter Hopfgartber <peter.hopfgartner@r3-gis.com> 1.0.0a-0.1
 - Initial packaging
-

@@ -1,13 +1,10 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-
-
-%define so_ver 2
+Summary:        Library for ESRI Shapefile Handling
 Name:           shapelib
 Version:        1.5.0
 Release:        3%{?dist}
-Summary:        Library for ESRI Shapefile Handling
 License:        GPL-2.0-or-later AND (LGPL-2.0-or-later OR MIT) AND SUSE-Public-Domain
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Group:          Productivity/Graphics/Other
 URL:            http://shapelib.maptools.org/
 Source0:        http://download.osgeo.org/shapelib/%{name}-%{version}.tar.gz
@@ -16,6 +13,7 @@ Source0:        http://download.osgeo.org/shapelib/%{name}-%{version}.tar.gz
 Patch0:         rpmlint-errors.patch
 # PATCH-Fix-UPSTREAM double free, CVE-2022-0699, https://github.com/OSGeo/shapelib/issues/39
 Patch1:         https://github.com/OSGeo/shapelib/commit/c75b9281a5b9452d92e1682bdfe6019a13ed819f.diff
+%define so_ver 2
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
 BuildRequires:  pkgconfig
@@ -123,6 +121,7 @@ make %{?_smp_mflags} check ||:
 
 * Mon Feb 21 2022 Dirk Stoecker <opensuse@dstoecker.de>
 - fix CVE-2022-0699, patch c75b9281a5b9452d92e1682bdfe6019a13ed819f.diff
+
 * Sat Mar 30 2019 Atri Bhattacharya <badshah400@gmail.com>
 - Update to version 1.5.0:
   * shpopen.c: resync with GDAL internal shapelib to avoid being
@@ -146,6 +145,7 @@ make %{?_smp_mflags} check ||:
 - Rebase rpmlint-errors.patch for current version.
 - Drop proj4 Requires and BuildRequires: functionality dropped by
   upstream.
+
 * Wed Jul 25 2018 mpluskal@suse.com
 - Update to version 1.4.1:
   * See ChangeLog for details
@@ -153,17 +153,21 @@ make %{?_smp_mflags} check ||:
   * shapelib_autotools.patch
   * shapelib_backports.patch
 - Refresh rpmlint-errors.patch
+
 * Fri May 29 2015 tchvatal@suse.com
 - Add patch to fix bunch of rpmlint errors:
   * rpmlint-errors.patch
 - Refresh autotools patch to actually pass the testsuite:
   * shapelib_autotools.patch
+
 * Thu May 28 2015 dgutu@suse.com
 - Re-enabled the post build check now everything fails because of
   coding issues
 - This needs to be fixed not hidden
+
 * Wed May 27 2015 dgutu@suse.com
 - Called spec-cleaner against spec file
+
 * Wed May 28 2014 asterios.dramis@gmail.com
 - Update to version 1.3.0:
   * See ChangeLog for details.
@@ -178,8 +182,10 @@ make %{?_smp_mflags} check ||:
     shapelib)
 - Removed gcc and make build requirements (not needed).
 - Added gcc-c++ and pkg-config build requirements.
+
 * Tue Apr  2 2013 opensuse@dstoecker.de
 - fix license
+
 * Mon Jul 21 2008 Dirk Stöcker <opensuse@dstoecker.de>
 - some BuildService and rpmlint fixes
   Wed Jan 11 00:00:00 UTC 2006 Pascal Bleser

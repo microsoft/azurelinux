@@ -1,36 +1,31 @@
+Summary:        A tool to convert between various formats used by GPS devices
+Name:           gpsbabel
+Version:        1.8.0
+Release:        4%{?dist}
+License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-%global		gittag	1_8_0
-
-Name:          gpsbabel
-Version:       1.8.0
-Release:       4%{?dist}
-Summary:       A tool to convert between various formats used by GPS devices
-
-License:       GPLv2+
-URL:           http://www.gpsbabel.org
+URL:            https://www.gpsbabel.org
 # Upstream's website hides tarball behind some ugly php script
 # Original repo is at https://github.com/gpsbabel/gpsbabel
-Source0:       https://github.com/GPSBabel/gpsbabel/archive/refs/tags/%{name}_%{gittag}.tar.gz#/%{name}-%{version}.tar.gz
-Source2:       %{name}.png
-
+Source0:        https://github.com/GPSBabel/gpsbabel/archive/refs/tags/%{name}_%{gittag}.tar.gz#/%{name}-%{version}.tar.gz
+Source2:        %{name}.png
 # No automatic phone home by default (RHBZ 668865)
-Patch2:        0002-No-solicitation.patch
-
-BuildRequires: libusb1-devel
-BuildRequires: zlib-devel
-BuildRequires: desktop-file-utils
-BuildRequires: shapelib-devel
-BuildRequires: cmake
-
-BuildRequires: qt5-qtbase-devel
-BuildRequires: qt5-qtserialport-devel
+Patch2:         0002-No-solicitation.patch
+%global		gittag	1_8_0
 %ifarch %{qt5_qtwebengine_arches}
 # HACK: Don't build GUI on archs not supported by qtwebengine
 %global build_gui 1
-BuildRequires: qt5-qtwebchannel-devel
-BuildRequires: qt5-qtwebengine-devel
+BuildRequires:  qt5-qtwebchannel-devel
+BuildRequires:  qt5-qtwebengine-devel
 %endif
+BuildRequires:  cmake
+BuildRequires:  desktop-file-utils
+BuildRequires:  libusb1-devel
+BuildRequires:  qt5-qtbase-devel
+BuildRequires:  qt5-qtserialport-devel
+BuildRequires:  shapelib-devel
+BuildRequires:  zlib-devel
 
 %description
 Converts GPS waypoint, route, and track data from one format type
@@ -39,7 +34,6 @@ to another.
 %if 0%{?build_gui}
 %package gui
 Summary:        Qt GUI interface for GPSBabel
-License:        GPLv2+
 Requires:       %{name} = %{version}-%{release}
 
 %description gui
@@ -108,7 +102,7 @@ install -m 0644 -p %{SOURCE2} %{buildroot}%{_datadir}/icons/hicolor/256x256/apps
 %changelog
 * Wed Aug 09 2023 Archana Choudhary <archana1@microsoft.com> - 1.8.0-4
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
-- License verified 
+- License verified
 
 * Tue Aug 02 2022 Fedora Release Engineering <corsepiu@fedoraproject.org> - 1.8.0-3
 - Build against libusb1 instead of libusb (F37FTBS, RHBZ#2113432).

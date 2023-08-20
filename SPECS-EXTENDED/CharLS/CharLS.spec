@@ -1,16 +1,15 @@
+Summary:        An optimized implementation of the JPEG-LS standard
+Name:           CharLS
+Version:        2.0.0
+Release:        10%{?dist}
+License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Name:		CharLS
-Version:	2.0.0
-Release:	10%{?dist}
-Summary:	An optimized implementation of the JPEG-LS standard
-License:	BSD
-URL:		https://github.com/team-charls/charls
-Source0:	https://github.com/team-charls/charls/archive/%{version}/%{name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
-
-BuildRequires:	gcc
-BuildRequires:	gcc-c++
-BuildRequires:	cmake >= 2.6.0
+URL:            https://github.com/team-charls/charls
+Source0:        https://github.com/team-charls/charls/archive/%{version}/%{name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+BuildRequires:  cmake >= 2.6.0
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
 
 %description
 An optimized implementation of the JPEG-LS standard for loss less and
@@ -25,16 +24,15 @@ loss less JPEG than to JPEG 2000, but interestingly the two different techniques
 result in vastly different performance characteristics.
 
 %package devel
-Summary:	Libraries and headers for CharLS
-Requires:	%{name}%{?_isa} = %{version}-%{release}
+Summary:        Libraries and headers for CharLS
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description devel
 CharLS Library Header Files and Link Libraries.
 
-
 %prep
 %autosetup -n charls-%{version}
-%{__rm} CharLS*.sln* -v
+rm CharLS*.sln* -v
 
 %build
 %cmake -DBUILD_SHARED_LIBS:BOOL=ON\
@@ -60,7 +58,6 @@ popd
 %license License.txt
 %{_libdir}/lib%{name}.so.2
 %{_libdir}/lib%{name}.so.2.0
-
 
 %files devel
 %dir %{_includedir}/%{name}/

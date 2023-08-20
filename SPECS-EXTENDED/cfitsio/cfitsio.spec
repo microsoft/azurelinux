@@ -1,63 +1,61 @@
+Summary:        Library for manipulating FITS data files
+Name:           cfitsio
+Version:        4.0.0
+Release:        5%{?dist}
+License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Name: cfitsio
-Version: 4.0.0
-Release: 5%{?dist}
-Summary: Library for manipulating FITS data files
-
-License: MIT
-URL: http://heasarc.gsfc.nasa.gov/fitsio/
-Source0: http://heasarc.gsfc.nasa.gov/FTP/software/fitsio/c/cfitsio-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+URL:            https://heasarc.gsfc.nasa.gov/fitsio/
+Source0:        http://heasarc.gsfc.nasa.gov/FTP/software/fitsio/c/cfitsio-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Remove soname version check
-Patch1: cfitsio-noversioncheck.patch
+Patch1:         cfitsio-noversioncheck.patch
 # Some rearrangements in pkg-config file
-Patch2: cfitsio-pkgconfig.patch
+Patch2:         cfitsio-pkgconfig.patch
 # Use builder linker flags
-Patch3: cfitsio-ldflags.patch
+Patch3:         cfitsio-ldflags.patch
 # Remove rpath
-Patch4: cfitsio-remove-rpath.patch
-
-BuildRequires: gcc-gfortran
-BuildRequires: make
-BuildRequires: zlib-devel
-BuildRequires: bzip2-devel
-BuildRequires: curl-devel
+Patch4:         cfitsio-remove-rpath.patch
+BuildRequires:  bzip2-devel
+BuildRequires:  curl-devel
+BuildRequires:  gcc-gfortran
+BuildRequires:  make
+BuildRequires:  zlib-devel
 ##BuildRequires: pkgconfig(curl)
 
 %description
-CFITSIO is a library of C and FORTRAN subroutines for reading and writing 
-data files in FITS (Flexible Image Transport System) data format. CFITSIO 
-simplifies the task of writing software that deals with FITS files by 
-providing an easy to use set of high-level routines that insulate the 
-programmer from the internal complexities of the FITS file format. At the 
-same time, CFITSIO provides many advanced features that have made it the 
-most widely used FITS file programming interface in the astronomical 
+CFITSIO is a library of C and FORTRAN subroutines for reading and writing
+data files in FITS (Flexible Image Transport System) data format. CFITSIO
+simplifies the task of writing software that deals with FITS files by
+providing an easy to use set of high-level routines that insulate the
+programmer from the internal complexities of the FITS file format. At the
+same time, CFITSIO provides many advanced features that have made it the
+most widely used FITS file programming interface in the astronomical
 community.
 
 %package devel
-Summary: Headers required when building programs against cfitsio
-Requires: %{name} = %{version}-%{release}
-Requires: pkgconfig
+Summary:        Headers required when building programs against cfitsio
+Requires:       %{name} = %{version}-%{release}
+Requires:       pkgconfig
 
 %description devel
 Headers required when building a program against the cfitsio library.
 
 %package static
-Summary: Static cfitsio library
+Summary:        Static cfitsio library
 
 %description static
 Static cfitsio library; avoid use if possible.
 
 %package docs
-Summary: Documentation for cfitsio
-BuildArch:  noarch
+Summary:        Documentation for cfitsio
+BuildArch:      noarch
 
 %description docs
 Stand-alone documentation for cfitsio.
 
 %package -n fpack
-Summary: FITS image compression and decompression utilities
-Requires: %{name} = %{version}-%{release}
+Summary:        FITS image compression and decompression utilities
+Requires:       %{name} = %{version}-%{release}
 
 %description -n fpack
 fpack optimally compresses FITS format images and funpack restores them
@@ -67,7 +65,7 @@ to the original state.
 compression algorithm.
     * typically 30% better compression than GZIP
     * about 3 times faster compression speed than GZIP
-    * about the same uncompression speed as GUNZIP 
+    * about the same uncompression speed as GUNZIP
 
 * Floating-point format images are compressed with a lossy algorithm
     * truncates the image pixel noise by a user-specified amount to
@@ -77,7 +75,7 @@ compression algorithm.
        amount of compression
 
 %prep
-%setup -q 
+%setup -q
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
@@ -107,7 +105,8 @@ chmod 755 %{buildroot}%{_bindir}/f{,un}pack
 %ldconfig_scriptlets
 
 %files
-%doc README License.txt docs/changes.txt
+%license License.txt
+%doc README docs/changes.txt
 %{_libdir}/libcfitsio.so.9*
 
 %files devel
@@ -117,14 +116,16 @@ chmod 755 %{buildroot}%{_bindir}/f{,un}pack
 %{_libdir}/pkgconfig/cfitsio.pc
 
 %files static
-%doc License.txt
+%license License.txt
 %{_libdir}/libcfitsio.a
 
 %files docs
-%doc docs/fitsio.doc docs/fitsio.pdf docs/cfitsio.pdf License.txt
+%license License.txt
+%doc docs/fitsio.doc docs/fitsio.pdf docs/cfitsio.pdf
 
 %files -n fpack
-%doc docs/fpackguide.pdf License.txt
+%license License.txt
+%doc docs/fpackguide.pdf
 %{_bindir}/fpack
 %{_bindir}/funpack
 
@@ -421,7 +422,7 @@ chmod 755 %{buildroot}%{_bindir}/f{,un}pack
 * Sun Mar 19 2006 Matthew Truch <matt at truch.net> - 3.006-4
 - Don't use macro {buildroot} in build, only in install as per 
   appended comments to Bugzilla bug 172042
-  
+
 * Fri Mar 10 2006 Matthew Truch <matt at truch.net> - 3.006-3
 - Point to f95 instead of g95 as per bugzilla bug 185107
 
@@ -479,4 +480,3 @@ chmod 755 %{buildroot}%{_bindir}/f{,un}pack
 
 * Sat Oct 29 2005 Matthew Truch <matt at truch.net> - 3.004-0.1.b
 - Initial spec file for Fedora Extras.
-

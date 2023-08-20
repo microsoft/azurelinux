@@ -1,42 +1,40 @@
+Summary:        Qt5 - SerialPort component
+Name:           qt5-%{qt_module}
+Version:        5.15.9
+Release:        2%{?dist}
+# See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
+License:        LGPL-3.0-only OR GPL-3.0-only WITH Qt-GPL-exception-1.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+URL:            https://www.qt.io
+Source0:        https://download.qt.io/official_releases/qt/%{majmin}/%{version}/submodules/%{qt_module}-everywhere-opensource-src-%{version}.tar.xz#/%{name}-%{version}.tar.xz
 %global qt_module qtserialport
-
-Summary: Qt5 - SerialPort component
-Name:    qt5-%{qt_module}
-Version: 5.15.9
-Release: 2%{?dist}
-
-# See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
-License: LGPL-3.0-only OR GPL-3.0-only WITH Qt-GPL-exception-1.0
-Url:     http://www.qt.io
 %global majmin %(echo %{version} | cut -d. -f1-2)
-Source0: https://download.qt.io/official_releases/qt/%{majmin}/%{version}/submodules/%{qt_module}-everywhere-opensource-src-%{version}.tar.xz#/%{name}-%{version}.tar.xz
-
-BuildRequires: make
-BuildRequires: qt5-qtbase-devel >= %{version}
-BuildRequires: pkgconfig(libudev)
-
-BuildRequires: qt5-qtbase-private-devel
 %{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
+BuildRequires:  make
+BuildRequires:  pkgconfig
+BuildRequires:  qt5-qtbase-devel >= %{version}
+BuildRequires:  qt5-qtbase-private-devel
+BuildRequires:  pkgconfig(libudev)
 
 %description
 Qt Serial Port provides the basic functionality, which includes configuring,
 I/O operations, getting and setting the control signals of the RS-232 pinouts.
 
 %package devel
-Summary: Development files for %{name}
-Requires: %{name}%{?_isa} = %{version}-%{release}
-Requires: qt5-qtbase-devel%{?_isa}
+Summary:        Development files for %{name}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       qt5-qtbase-devel%{?_isa}
+
 %description devel
 %{summary}.
 
 %package examples
-Summary: Programming examples for %{name}
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Summary:        Programming examples for %{name}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+
 %description examples
 %{summary}.
-
 
 %prep
 %setup -q -n %{qt_module}-everywhere-src-%{version}

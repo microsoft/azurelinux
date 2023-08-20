@@ -1,16 +1,28 @@
+Summary:        GIS file format library
+#global pre rc1
+Name:           gdal
+Version:        3.6.3
+Release:        2%{?dist}
+License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+URL:            https://www.gdal.org
+Source0:        https://github.com/OSGeo/gdal/releases/download/v3.6.3/%{name}-%{version}.tar.gz
+Source1:        %{name}autotest-%{version}.tar.gz
+# Multilib compatible cpl-config.h header
+Source2:        cpl-config.h
+# Multilib compatible gdal-config script
+Source3:        gdal-config
+# Add some utils to the default install target
+Patch0:         gdal_utils.patch
 %global run_tests 1
-
 %global bashcompletiondir %(pkg-config --variable=compatdir bash-completion)
-
 # We have multilib triage
 %if "%{_lib}" == "lib"
   %global cpuarch 32
 %else
   %global cpuarch 64
 %endif
-
 %global with_mysql 0
 %global mysql --without-mysql
 %global with_poppler 0
@@ -21,102 +33,74 @@ Distribution:   Mariner
 %global python3 --with-python3
 %global with_java 0
 %global java --without-java
-
-#global pre rc1
-
-
-Name:          gdal
-Version:       3.6.3
-Release:       2%{?dist}
-Summary:       GIS file format library
-License:       MIT
-URL:           http://www.gdal.org
-
-
-Source0:       https://github.com/OSGeo/gdal/releases/download/v3.6.3/%{name}-%{version}.tar.gz
-Source1:       %{name}autotest-%{version}.tar.gz
-# Multilib compatible cpl-config.h header
-Source2:       cpl-config.h
-# Multilib compatible gdal-config script
-Source3:       gdal-config
-
-# Add some utils to the default install target
-Patch0:        gdal_utils.patch
-
-BuildRequires: cmake
-BuildRequires: gcc-c++
-
-BuildRequires: bison
-BuildRequires: cfitsio-devel
-BuildRequires: CharLS-devel
-BuildRequires: curl-devel
-BuildRequires: expat-devel
-BuildRequires: freexl-devel
-BuildRequires: geos-devel
-BuildRequires: giflib-devel
-BuildRequires: gtest-devel
-BuildRequires: hdf-devel
-BuildRequires: hdf5-devel
-BuildRequires: json-c-devel
-BuildRequires: libdap-devel
-BuildRequires: libgeotiff-devel
-BuildRequires: libgta-devel
-BuildRequires: libjpeg-devel
-BuildRequires: libkml-devel
-BuildRequires: liblerc-devel
-BuildRequires: libpng-devel
-BuildRequires: libpq-devel
+BuildRequires:  CharLS-devel
+BuildRequires:  bison
+BuildRequires:  cfitsio-devel
+BuildRequires:  cmake
+BuildRequires:  curl-devel
+BuildRequires:  expat-devel
+BuildRequires:  freexl-devel
+BuildRequires:  gcc-c++
+BuildRequires:  geos-devel
+BuildRequires:  giflib-devel
+BuildRequires:  gtest-devel
+BuildRequires:  hdf-devel
+BuildRequires:  hdf5-devel
+BuildRequires:  json-c-devel
+BuildRequires:  libdap-devel
+BuildRequires:  libgeotiff-devel
+BuildRequires:  libgta-devel
+BuildRequires:  libjpeg-devel
+BuildRequires:  libkml-devel
+BuildRequires:  liblerc-devel
+BuildRequires:  libpng-devel
+BuildRequires:  libpq-devel
+BuildRequires:  libtiff-devel
+BuildRequires:  libtirpc-devel
+BuildRequires:  libwebp-devel
+BuildRequires:  libzstd-devel
+BuildRequires:  netcdf-devel
+BuildRequires:  ogdi-devel
+BuildRequires:  openexr-devel
+BuildRequires:  openjpeg2-devel
+BuildRequires:  pcre2-devel
+BuildRequires:  proj >= 5.2.0
+BuildRequires:  proj-devel >= 5.2.0
+BuildRequires:  qhull-devel
+BuildRequires:  sqlite-devel
+BuildRequires:  swig
+BuildRequires:  unixODBC-devel
+BuildRequires:  xerces-c-devel
+BuildRequires:  xz-devel
+BuildRequires:  zlib-devel
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+# Run time dependency for gpsbabel driver
+Requires:       gpsbabel
 %if %{with_spatialite}
-BuildRequires: libspatialite-devel
+BuildRequires:  libspatialite-devel
 %endif
-BuildRequires: libtiff-devel
-BuildRequires: libtirpc-devel
-BuildRequires: libwebp-devel
-BuildRequires: libzstd-devel
 %if 0%{?with_mysql}
-BuildRequires: mariadb-connector-c-devel
+BuildRequires:  mariadb-connector-c-devel
 %endif
-BuildRequires: netcdf-devel
-BuildRequires: ogdi-devel
-BuildRequires: openexr-devel
-BuildRequires: openjpeg2-devel
-BuildRequires: pcre2-devel
 %if 0%{?with_poppler}
-BuildRequires: poppler-devel
+BuildRequires:  poppler-devel
 %endif
-BuildRequires: proj >= 5.2.0
-BuildRequires: proj-devel >= 5.2.0
-BuildRequires: qhull-devel
-BuildRequires: sqlite-devel
-BuildRequires: swig
-BuildRequires: unixODBC-devel
-BuildRequires: xerces-c-devel
-BuildRequires: xz-devel
-BuildRequires: zlib-devel
-
 # Python
 %if 0%{?with_python3}
-BuildRequires: python3-devel
-BuildRequires: python3-numpy
-BuildRequires: python3-setuptools
-BuildRequires: python3dist(pytest) >= 3.6
-BuildRequires: python3dist(lxml) >= 4.5.1
-
+BuildRequires:  python3-devel
+BuildRequires:  python3-numpy
+BuildRequires:  python3-setuptools
+BuildRequires:  python3dist(lxml) >= 4.5.1
+BuildRequires:  python3dist(pytest) >= 3.6
 %endif
-
 # Java
 %if 0%{?with_java}
 # For 'mvn_artifact' and 'mvn_install'
-BuildRequires: ant
-BuildRequires: java-devel >= 1:1.6.0
-BuildRequires: javapackages-local
-BuildRequires: jpackage-utils
+BuildRequires:  ant
+BuildRequires:  java-devel >= 1:1.6.0
+BuildRequires:  javapackages-local
+BuildRequires:  jpackage-utils
 %endif
-
-# Run time dependency for gpsbabel driver
-Requires:      gpsbabel
-Requires:      %{name}-libs%{?_isa} = %{version}-%{release}
-
 
 %description
 Geospatial Data Abstraction Library (GDAL/OGR) is a cross platform
@@ -128,35 +112,31 @@ useful commandline utilities for data translation and processing.
 It provides the primary data access engine for many applications.
 GDAL/OGR is the most widely used geospatial data access library.
 
-
 %package devel
-Summary:       Development files for the GDAL file format library
-Requires:      %{name}-libs%{?_isa} = %{version}-%{release}
+Summary:        Development files for the GDAL file format library
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description devel
 This package contains development files for GDAL.
 
-
 %package libs
-Summary:       GDAL file format library
+Summary:        GDAL file format library
 # See frmts/grib/degrib/README.TXT
-Provides:      bundled(g2lib) = 1.6.0
-Provides:      bundled(degrib) = 2.14
+Provides:       bundled(g2lib) = 1.6.0
+Provides:       bundled(degrib) = 2.14
 
 %description libs
 This package contains the GDAL file format library.
-
 
 # No complete java yet in EL8
 %if 0%{?with_java}
 %package java
 Summary:        Java modules for the GDAL file format library
-Requires:       jpackage-utils
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+Requires:       jpackage-utils
 
 %description java
 The GDAL Java modules provide support to handle multiple GIS file formats.
-
 
 %package javadoc
 Summary:        Javadocs for %{name}
@@ -170,14 +150,13 @@ This package contains the API documentation for %{name}.
 
 %if 0%{?with_python3}
 %package -n python3-gdal
-%{?python_provide:%python_provide python3-gdal}
 Summary:        Python modules for the GDAL file format library
-Requires:       python3-numpy
+%{?python_provide:%python_provide python3-gdal}
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+Requires:       python3-numpy
 
 %description -n python3-gdal
 The GDAL Python 3 modules provide support to handle multiple GIS file formats.
-
 
 %package python-tools
 Summary:        Python tools for the GDAL file format library
@@ -186,7 +165,6 @@ Requires:       python3-gdal
 %description python-tools
 The GDAL Python package provides number of tools for programming and
 manipulating GDAL file format library
-
 
 # We don't want to provide private Python extension libs
 %global __provides_exclude_from ^%{python3_sitearch}/.*\.so$
@@ -301,7 +279,6 @@ ctest -E "autotest_osr|autotest_alg|autotest_gdrivers|autotest_gcore"
 %{_libdir}/pkgconfig/%{name}.pc
 %{_mandir}/man1/gdal-config.1*
 
-
 %if 0%{?with_python3}
 %files -n python3-gdal
 %doc swig/python/README.rst
@@ -349,9 +326,8 @@ ctest -E "autotest_osr|autotest_alg|autotest_gdrivers|autotest_gcore"
 - Initial CBL-Mariner import from Fedora 38 (license: MIT).
 - License verified.
 - Excludes failing test suites as pytest>=6.0.0 is required
-- Excludes osr test suite as the test file incorrectly replaces assertion 
-  string for PROJ >= 9.0.1
-- Excludes gcore test suite as 'tmp_path' fixture not present  
+- Excludes osr test suite as the test file incorrectly replaces assertion
+- Excludes gcore test suite as 'tmp_path' fixture not present
 - Excludes alg and gdrivers test suite due to TypeError in pluggy requirement
 
 * Tue Mar 14 2023 Sandro Mani <manisandro@gmail.com> - 3.6.3-1
@@ -612,6 +588,7 @@ ctest -E "autotest_osr|autotest_alg|autotest_gdrivers|autotest_gcore"
 - Update to 3.1.0
 
 * Sat May 09 2020 Markus Neteler <neteler@mundialis.de> - 3.0.4-5
+
 * disabled JAVA and LaTeX support for EPEL8, due to (yet) missing dependencies
 
 * Wed Apr 22 2020 Björn Esser <besser82@fedoraproject.org> - 3.0.4-4

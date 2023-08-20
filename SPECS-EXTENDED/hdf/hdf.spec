@@ -1,55 +1,59 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 # No more Java on i686
 %ifarch %{java_arches}
 %bcond_without java
 %else
 %bcond_with java
 %endif
-
-Name: hdf
-Version: 4.2.15
-Release: 13%{?dist}
-Summary: A general purpose library and file format for storing scientific data
-License: BSD
-URL: https://portal.hdfgroup.org/
-Source0: https://support.hdfgroup.org/ftp/HDF/releases/HDF%{version}/src/%{name}-%{version}.tar.bz2#/%{name}-%{version}.tar.bz2
-Source1: h4comp
-Patch0: hdf-4.2.5-maxavailfiles.patch
-Patch1: hdf-ppc.patch
-Patch2: hdf-4.2.4-sparc.patch
-Patch3: hdf-s390.patch
-Patch4: hdf-arm.patch
+Summary:        A general purpose library and file format for storing scientific data
+Name:           hdf
+Version:        4.2.15
+Release:        13%{?dist}
+License:        BSD
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://portal.hdfgroup.org/
+Source0:        https://support.hdfgroup.org/ftp/HDF/releases/HDF%{version}/src/%{name}-%{version}.tar.bz2#/%{name}-%{version}.tar.bz2
+Source1:        h4comp
+Patch0:         hdf-4.2.5-maxavailfiles.patch
+Patch1:         hdf-ppc.patch
+Patch2:         hdf-4.2.4-sparc.patch
+Patch3:         hdf-s390.patch
+Patch4:         hdf-arm.patch
 # Support DESTDIR in install-examples
-Patch5: hdf-destdir.patch
+Patch5:         hdf-destdir.patch
 # Install examples into the right location
-Patch6: hdf-examplesdir.patch
+Patch6:         hdf-examplesdir.patch
 # Add AArch64 definitions
-Patch8: hdf-aarch64.patch
+Patch8:         hdf-aarch64.patch
 # ppc64le support
 # https://bugzilla.redhat.com/show_bug.cgi?id=1134385
-Patch9: hdf-ppc64le.patch
+Patch9:         hdf-ppc64le.patch
 # Fix java build
-Patch11: hdf-build.patch
-
+Patch11:        hdf-build.patch
+BuildRequires:  %{!?el6:libaec-devel}
 # For destdir/examplesdir patches
-BuildRequires: automake, libtool, gcc, gcc-c++
-BuildRequires: chrpath
-BuildRequires: flex byacc libjpeg-devel zlib-devel %{!?el6:libaec-devel}
-BuildRequires: libtirpc-devel
-BuildRequires: gcc-gfortran, gcc
+BuildRequires:  automake
+BuildRequires:  byacc
+BuildRequires:  chrpath
+BuildRequires:  flex
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
+BuildRequires:  gcc-gfortran
+BuildRequires:  hamcrest
+BuildRequires:  junit
+BuildRequires:  libjpeg-devel
+BuildRequires:  libtirpc-devel
+BuildRequires:  libtool
+BuildRequires:  make
+BuildRequires:  slf4j
+BuildRequires:  zlib-devel
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 %if %{with java}
-BuildRequires: java-devel
-BuildRequires: javapackages-tools
+BuildRequires:  java-devel
+BuildRequires:  javapackages-tools
 %else
-Obsoletes:     java-hdf < %{version}-%{release}
+Obsoletes:      java-hdf < %{version}-%{release}
 %endif
-BuildRequires: hamcrest
-BuildRequires: junit
-BuildRequires: slf4j
-BuildRequires: make
-Requires: %{name}-libs%{?_isa} = %{version}-%{release}
-
 
 %description
 HDF4 is a general purpose library and file format for storing scientific data.
@@ -60,39 +64,35 @@ objects, one can create and store almost any kind of scientific data
 structure, such as images, arrays of vectors, and structured and unstructured
 grids. You can also mix and match them in HDF4 files according to your needs.
 
-
 %package devel
-Summary: HDF4 development files
-Provides: %{name}-static = %{version}-%{release}
-Requires: %{name}-libs%{?_isa} = %{version}-%{release}
-Requires: libjpeg-devel%{?_isa}
-Requires: libtirpc-devel%{?_isa}
-Requires: zlib-devel%{?_isa}
+Summary:        HDF4 development files
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+Requires:       libjpeg-devel%{?_isa}
+Requires:       libtirpc-devel%{?_isa}
+Requires:       zlib-devel%{?_isa}
+Provides:       %{name}-static = %{version}-%{release}
 
 %description devel
 HDF4 development headers and libraries.
 
-
 %package libs
-Summary: HDF4 shared libraries
+Summary:        HDF4 shared libraries
 
 %description libs
 HDF4 shared libraries.
 
-
 %package static
-Summary: HDF4 static libraries
-Requires: %{name}-devel = %{version}-%{release}
+Summary:        HDF4 static libraries
+Requires:       %{name}-devel = %{version}-%{release}
 
 %description static
 HDF4 static libraries.
 
-
 %if %{with java}
 %package -n java-hdf
-Summary: HDF4 java library
-Requires:  slf4j
-Obsoletes: jhdf < 3.3.1-2
+Summary:        HDF4 java library
+Requires:       slf4j
+Obsoletes:      jhdf < 3.3.1-2
 
 %description -n java-hdf
 HDF4 java library
@@ -125,7 +125,7 @@ find . -name "*.jar" -delete
 ln -s %{_javadir}/hamcrest/core.jar java/lib/hamcrest-core.jar
 ln -s %{_javadir}/junit.jar java/lib/junit.jar
 # Fix test output
-junit_ver=$(sed -n '/<version>/{s/^.*>\([0-9]\.[0-9.]*\)<.*/\1/;p;q}' /usr/share/maven-poms/junit.pom)
+junit_ver=$(sed -n '/<version>/{s/^.*>\([0-9]\.[0-9.]*\)<.*/\1/;p;q}' %{_datadir}/maven-poms/junit.pom)
 sed -i -e "s/JUnit version .*/JUnit version $junit_ver/" java/test/testfiles/JUnit-*.txt
 %endif
 ln -s %{_javadir}/slf4j/api.jar java/lib/slf4j-api-1.7.25.jar
@@ -189,8 +189,8 @@ chrpath --delete --keepgoing %{buildroot}%{_bindir}/* %{buildroot}%{_libdir}/%{n
 
 install -pm 644 MANIFEST README.txt release_notes/*.txt %{buildroot}%{_pkgdocdir}/
 
-rm -f %{buildroot}%{_libdir}/%{name}/*.la
-rm -f %{buildroot}%{_libdir}/*.la
+find %{buildroot} -type f -name "*.la" -delete -print
+find %{buildroot} -type f -name "*.la" -delete -print
 
 #Don't conflict with netcdf
 for file in ncdump ncgen; do
@@ -219,7 +219,7 @@ for x in h4cc h4fc
 do
   mv %{buildroot}%{_bindir}/${x} \
      %{buildroot}%{_bindir}/${x}-64
-  install -m 0755 %SOURCE1 %{buildroot}%{_bindir}/${x}
+  install -m 0755 %{SOURCE1} %{buildroot}%{_bindir}/${x}
 done
 %else
 #sed -i -e s/H5pubconf.h/H5pubconf-32.h/ %{buildroot}%{_includedir}/H5public.h
@@ -229,7 +229,7 @@ for x in h4cc h4fc
 do
   mv %{buildroot}%{_bindir}/${x} \
      %{buildroot}%{_bindir}/${x}-32
-  install -m 0755 %SOURCE1 %{buildroot}%{_bindir}/${x}
+  install -m 0755 %{SOURCE1} %{buildroot}%{_bindir}/${x}
 done
 %endif
 

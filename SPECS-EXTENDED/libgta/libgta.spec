@@ -1,41 +1,38 @@
+Summary:        Library that implements the Generic Tagged Arrays file format
+Name:           libgta
+Version:        1.2.1
+Release:        9%{?dist}
+License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Name:      libgta
-Version:   1.2.1
+URL:            https://marlam.de/gta/
+Source0:        https://marlam.de/gta/releases/%{name}-%{version}.tar.xz#/%{name}-%{version}.tar.xz
 %global so_version 1
-Release:   9%{?dist}
-Summary:   Library that implements the Generic Tagged Arrays file format
-License:   LGPLv2+
-URL:       https://marlam.de/gta/
-Source0:   https://marlam.de/gta/releases/%{name}-%{version}.tar.xz#/%{name}-%{version}.tar.xz
-BuildRequires: cmake
-BuildRequires: gcc
-BuildRequires: doxygen
+BuildRequires:  cmake
+BuildRequires:  doxygen
+BuildRequires:  gcc
 
 %description
 Libgta is a portable library that implements the GTA (Generic Tagged Arrays)
 file format. It provides interfaces for C and C++.
 
-
 %package devel
-Summary:  Development Libraries for %{name}
-Requires: %{name}%{?_isa} = %{version}-%{release}
-Requires: pkgconfig
+Summary:        Development Libraries for %{name}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       pkgconfig
 
 %description devel
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
-
 %package doc
-Summary:  API documentation for %{name}
-Requires: %{name} = %{version}-%{release}
-BuildArch: noarch
+Summary:        API documentation for %{name}
+Requires:       %{name} = %{version}-%{release}
+BuildArch:      noarch
 
 %description doc
 The %{name}-doc package contains HTML API documentation and
 examples for %{name}.
-
 
 %prep
 %setup -q
@@ -58,8 +55,9 @@ rm -rf %{buildroot}%{_docdir}
 %ldconfig_scriptlets
 
 
-%files 
-%doc COPYING AUTHORS README
+%files
+%license COPYING
+%doc AUTHORS README
 %{_libdir}/%{name}.so.%{so_version}
 %{_libdir}/%{name}.so.%{so_version}.*
 
@@ -71,7 +69,6 @@ rm -rf %{buildroot}%{_docdir}
 
 %files doc
 %doc doc/example*
-
 
 %changelog
 * Wed Aug 09 2023 Archana Choudhary <archana1@microsoft.com> - 1.2.1-9

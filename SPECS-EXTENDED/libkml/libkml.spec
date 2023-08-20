@@ -1,22 +1,16 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-# Parallel build broken
-%global _smp_mflags -j1
-
 %bcond_with java
-
+Summary:        Reference implementation of OGC KML 2.2
 Name:           libkml
 Version:        1.3.0
 Release:        41%{?dist}
-Summary:        Reference implementation of OGC KML 2.2
-
 License:        BSD
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/libkml/libkml
 Source0:        https://github.com/libkml/libkml/archive/%{version}/libkml-%{version}.tar.gz
 # TODO: Port to minizip-2.x, meanwhile bundle version 1.3.0
 # wget -O minizip-1.3.0.tar.gz http://sourceforge.net/projects/libkml-files/files/1.3.0/minizip.tar.gz/download
 Source1:        minizip-1.3.0.tar.gz
-
 ## See https://github.com/libkml/libkml/pull/239
 Patch0:         0001-Fix-build-failure-due-to-failure-to-convert-pointer-.patch
 Patch1:         0002-Fix-mistaken-use-of-std-cerr-instead-of-std-endl.patch
@@ -34,43 +28,39 @@ Patch7:         libkml-bundle-minizip.patch
 Patch8:         libkml_test_strcmp.patch
 # MinGW build fixes
 Patch9:         libkml_mingw.patch
-
+# Parallel build broken
+%global _smp_mflags -j1
+%global __requires_exclude_from ^%{_docdir}/.*$
+%global __provides_exclude_from ^%{python3_sitearch}/.*\\.so$
+BuildRequires:  boost-devel
 BuildRequires:  cmake
 BuildRequires:  curl-devel
-BuildRequires:  boost-devel
 BuildRequires:  expat-devel
-BuildRequires:  gtest-devel
 BuildRequires:  gcc-c++
+BuildRequires:  gtest-devel
 BuildRequires:  make
 BuildRequires:  python3-devel
 BuildRequires:  swig
 BuildRequires:  uriparser-devel
 BuildRequires:  zlib-devel
+Provides:       bundled(minizip) = 1.3.0
 %if %{with java}
 BuildRequires:  java-devel
 BuildRequires:  junit
 %endif
-
-Provides:       bundled(minizip) = 1.3.0
-
-%global __requires_exclude_from ^%{_docdir}/.*$
-%global __provides_exclude_from ^%{python3_sitearch}/.*\\.so$
-
 
 %description
 Reference implementation of OGC KML 2.2.
 It also includes implementations of Google's gx: extensions used by Google
 Earth, as well as several utility libraries for working with other formats.
 
-
 %package -n python3-%{name}
 Summary:        Python 3 bindings for %{name}
-Requires:       %{name}%{?_isa} = %{version}-%{release}
 %{?python_provide:%python_provide python3-%{name}}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description -n python3-%{name}
 The python3-%{name} package contains Python 3 bindings for %{name}.
-
 
 %if %{with java}
 %package java
@@ -91,7 +81,6 @@ Requires:       expat-devel
 %description    devel
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
-
 
 %prep
 %autosetup -p1 -a1
@@ -152,7 +141,6 @@ ls -la minizip
 %{_libdir}/libkml*.so
 %{_libdir}/pkgconfig/%{name}.pc
 %{_libdir}/cmake/%{name}/
-
 
 %changelog
 * Wed Aug 16 2023 Archana Choudhary <archana1@microsoft.com> - 1.3.0-41

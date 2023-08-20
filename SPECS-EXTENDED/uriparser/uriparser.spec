@@ -1,29 +1,24 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-
+Summary:        URI parsing library - RFC 3986
 Name:           uriparser
 Version:        0.9.7
 Release:        2%{?dist}
-Summary:        URI parsing library - RFC 3986
-
 License:        BSD
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://uriparser.github.io/
 Source0:        https://github.com/%{name}/%{name}/releases/download/%{name}-%{version}/%{name}-%{version}.tar.bz2
-
 BuildRequires:  cmake
 BuildRequires:  doxygen
 BuildRequires:  gcc-c++
+BuildRequires:  gmock-devel
 BuildRequires:  graphviz
 BuildRequires:  gtest-devel
-BuildRequires:  gmock-devel
 BuildRequires:  make
-
 
 %description
 Uriparser is a strictly RFC 3986 compliant URI parsing library written
 in C. uriparser is cross-platform, fast, supports Unicode and is
 licensed under the New BSD license.
-
 
 %package devel
 Summary:        Development files for %{name}
@@ -33,14 +28,12 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
-
 %package doc
 Summary:        HTML documentation for %{name}
 BuildArch:      noarch
 
 %description doc
 The %{name}-doc package contains HTML documentation files for %{name}.
-
 
 %prep
 %autosetup -p1
@@ -78,7 +71,6 @@ sed -i 's/GENERATE_QHP\ =\ yes/GENERATE_QHP\ =\ no/g' doc/Doxyfile.in
 %files doc
 %license COPYING
 %doc %{_docdir}/%{name}/html
-
 
 %changelog
 * Wed Aug 16 2023 Archana Choudhary <archana1@microsoft.com> - 0.9.7-2

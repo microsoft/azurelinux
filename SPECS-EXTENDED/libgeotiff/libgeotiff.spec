@@ -1,27 +1,24 @@
+Summary:        GeoTIFF format library
+Name:           libgeotiff
+Version:        1.7.1
+Release:        5%{?dist}
+License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-
-Name:          libgeotiff
-Version:       1.7.1
-Release:       5%{?dist}
-
-Summary:       GeoTIFF format library
-License:       MIT
-URL:           http://trac.osgeo.org/geotiff/
-Source:        http://download.osgeo.org/geotiff/%{name}/%{name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+URL:            https://trac.osgeo.org/geotiff/
+Source:         http://download.osgeo.org/geotiff/%{name}/%{name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Honour LIB_SUFFIX
 # Honour GEOTIFF_INCLUDE_SUBDIR
 # Add version suffix to mingw library
 # Fix cmake module install dir
 # Don't install docs
-Patch0:        libgeotiff_cmake.patch
-
-BuildRequires: cmake
-BuildRequires: gcc-c++
-BuildRequires: libtiff-devel
-BuildRequires: libjpeg-devel
-BuildRequires: proj-devel
-BuildRequires: zlib-devel
+Patch0:         libgeotiff_cmake.patch
+BuildRequires:  cmake
+BuildRequires:  gcc-c++
+BuildRequires:  libjpeg-devel
+BuildRequires:  libtiff-devel
+BuildRequires:  proj-devel
+BuildRequires:  zlib-devel
 
 %description
 GeoTIFF represents an effort by over 160 different remote sensing,
@@ -30,13 +27,13 @@ to establish a TIFF based interchange format for georeferenced
 raster imagery.
 
 %package devel
-Summary:	Development library and header for the GeoTIFF file format library
-Requires:	pkgconfig libtiff-devel
-Requires:	%{name}%{?_isa} = %{version}-%{release}
+Summary:        Development library and header for the GeoTIFF file format library
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       libtiff-devel
+Requires:       pkgconfig
 
 %description devel
 The GeoTIFF library provides support for development of geotiff image format.
-
 
 %prep
 %autosetup -p1 -n %{name}-%{version}
@@ -86,7 +83,6 @@ EOF
 %{_libdir}/%{name}.so
 %{_libdir}/pkgconfig/%{name}.pc
 %{_libdir}/cmake/GeoTIFF/
-
 
 %changelog
 * Wed Aug 09 2023 Archana Choudhary <archana1@microsoft.com> - 1.7.1-5
