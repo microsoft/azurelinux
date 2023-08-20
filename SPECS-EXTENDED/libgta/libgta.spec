@@ -6,7 +6,7 @@ License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://marlam.de/gta/
-Source0:        https://marlam.de/gta/releases/%{name}-%{version}.tar.xz#/%{name}-%{version}.tar.xz
+Source0:        https://marlam.de/gta/releases/%{name}-%{version}.tar.xz
 %global so_version 1
 BuildRequires:  cmake
 BuildRequires:  doxygen

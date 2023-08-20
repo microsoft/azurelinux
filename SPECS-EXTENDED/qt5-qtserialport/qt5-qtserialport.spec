@@ -1,3 +1,7 @@
+%global qt_module qtserialport
+%global majmin %(echo %{version} | cut -d. -f1-2)
+%{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
+
 Summary:        Qt5 - SerialPort component
 Name:           qt5-%{qt_module}
 Version:        5.15.9
@@ -8,9 +12,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.qt.io
 Source0:        https://download.qt.io/official_releases/qt/%{majmin}/%{version}/submodules/%{qt_module}-everywhere-opensource-src-%{version}.tar.xz#/%{name}-%{version}.tar.xz
-%global qt_module qtserialport
-%global majmin %(echo %{version} | cut -d. -f1-2)
-%{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
 BuildRequires:  make
 BuildRequires:  pkgconfig
 BuildRequires:  qt5-qtbase-devel >= %{version}

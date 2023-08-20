@@ -7,11 +7,10 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://ogdi.sourceforge.net/
 # new project location is https://github.com/libogdi/ogdi
-Source0:        https://github.com/libogdi/ogdi/archive/%{name}_%{gittag}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/libogdi/ogdi/archive/%{name}_4_1_0.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        http://ogdi.sourceforge.net/ogdi.pdf
 # https://bugzilla.redhat.com/show_bug.cgi?id=1470896
 Patch0:         ogdi-%{version}-sailer.patch
-%global		gittag	4_1_0
 BuildRequires:  expat-devel
 BuildRequires:  gcc
 BuildRequires:  libtirpc-devel

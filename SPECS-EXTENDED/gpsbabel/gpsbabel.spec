@@ -8,11 +8,10 @@ Distribution:   Mariner
 URL:            https://www.gpsbabel.org
 # Upstream's website hides tarball behind some ugly php script
 # Original repo is at https://github.com/gpsbabel/gpsbabel
-Source0:        https://github.com/GPSBabel/gpsbabel/archive/refs/tags/%{name}_%{gittag}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/GPSBabel/gpsbabel/archive/refs/tags/%{name}_1_8_0.tar.gz#/%{name}-%{version}.tar.gz
 Source2:        %{name}.png
 # No automatic phone home by default (RHBZ 668865)
 Patch2:         0002-No-solicitation.patch
-%global		gittag	1_8_0
 %ifarch %{qt5_qtwebengine_arches}
 # HACK: Don't build GUI on archs not supported by qtwebengine
 %global build_gui 1
