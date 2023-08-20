@@ -12,7 +12,7 @@ Source0:        https://github.com/GPSBabel/gpsbabel/archive/refs/tags/%{name}_1
 Source2:        %{name}.png
 # No automatic phone home by default (RHBZ 668865)
 Patch2:         0002-No-solicitation.patch
-%global gittag _1_8_0
+%global gittag 1_8_0
 %ifarch %{qt5_qtwebengine_arches}
 # HACK: Don't build GUI on archs not supported by qtwebengine
 %global build_gui 1

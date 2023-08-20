@@ -225,7 +225,9 @@ done
 
 %install
 make -C build install DESTDIR=%{buildroot}
-find %{buildroot} -type f -name "*.la" -delete -print
+pushd %{buildroot}%{_libdir}
+/bin/rm -f *.la
+popd
 chrpath --delete %{buildroot}/%{_bindir}/nc{copy,dump,gen,gen3}
 /bin/rm -f %{buildroot}%{_infodir}/dir
 %if %{with mpich} || %{with openmpi}
@@ -233,7 +235,9 @@ for mpi in %{mpi_list}
 do
   module load mpi/$mpi-%{_arch}
   make -C $mpi install DESTDIR=%{buildroot}
-find %{buildroot} -type f -name "*.la" -delete -print
+  pushd %{buildroot}%{_libdir}/%{_libdir}/$mpi/lib
+  rm *.la
+  popd
   chrpath --delete %{buildroot}/%{_libdir}/$mpi/bin/nc{copy,dump,gen,gen3}
   module purge
 done
