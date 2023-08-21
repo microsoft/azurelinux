@@ -1,0 +1,189 @@
+diff -up hdf-4.2.15/hdf/src/hdfi.h.ppc hdf-4.2.15/hdf/src/hdfi.h
+--- hdf-4.2.15/hdf/src/hdfi.h.ppc	2020-03-03 10:40:50.000000000 -0700
++++ hdf-4.2.15/hdf/src/hdfi.h	2020-04-30 21:04:01.529561298 -0600
+@@ -75,6 +75,7 @@
+ #define     DFMT_IA64           0x4441
+ #define     DFMT_LINUX64        0x4441
+ #define     DFMT_POWERPC64      0x1111
++#define     DFMT_LINUXPPC       0x1111
+ 
+ /* I/O library constants */
+ #define UNIXUNBUFIO 1
+@@ -1017,6 +1018,57 @@ typedef long              hdf_pint_t;
+ 
+ #endif /*Linux 64 */
+ 
++/* Linux PPC */
++#if defined __powerpc__ && !defined __powerpc64__
++
++#ifdef GOT_MACHINE
++If you get an error on this line more than one machine type has been defined.
++Please check your Makefile.
++#endif
++#define GOT_MACHINE
++
++#include <sys/file.h>               /* for unbuffered i/o stuff */
++#include <sys/stat.h>
++#define DF_MT             DFMT_LINUXPPC
++typedef void              VOID;
++typedef void              *VOIDP;
++typedef char              *_fcd;
++typedef char              char8;
++typedef unsigned char     uchar8;
++typedef char              int8;
++typedef unsigned char     uint8;
++typedef short int         int16;
++typedef unsigned short int uint16;
++typedef int               int32;
++typedef unsigned int      uint32;
++typedef int               intn;
++typedef unsigned int      uintn;
++typedef int               intf;     /* size of INTEGERs in Fortran compiler */
++typedef float             float32;
++typedef double            float64;
++typedef long              hdf_pint_t;   /* an integer the same size as a pointer */
++#define FNAME_POST_UNDERSCORE
++#define _fcdtocp(desc) (desc)
++#ifdef  HAVE_FMPOOL
++#define FILELIB PAGEBUFIO  /* enable page buffering */
++#else
++#define FILELIB UNIXBUFIO
++#endif
++
++/* JPEG #define's - Look in the JPEG docs before changing - (Q) */
++
++/* Determine the memory manager we are going to use. Valid values are: */
++/*  MEM_DOS, MEM_ANSI, MEM_NAME, MEM_NOBS.  See the JPEG docs for details on */
++/*  what each does */
++#define JMEMSYS         MEM_ANSI
++
++#ifdef __GNUC__
++#define HAVE_STDC
++#define INCLUDES_ARE_ANSI
++#endif
++
++#endif /*Linux PPC */
++
+ /*-----------------------------------------------------*/
+ /* 64-bit Free BSD */
+ 
+diff -up hdf-4.2.15/mfhdf/fortran/jackets.c.in.ppc hdf-4.2.15/mfhdf/fortran/jackets.c.in
+--- hdf-4.2.15/mfhdf/fortran/jackets.c.in.ppc	2020-03-03 10:40:50.000000000 -0700
++++ hdf-4.2.15/mfhdf/fortran/jackets.c.in	2020-04-30 21:06:39.500403641 -0600
+@@ -34,7 +34,7 @@
+ 
+ struct ncfils {            /* This will be a common block from Fortran */
+     double dd;
+-#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__
++#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__
+     int ll;
+ #else
+     long ll;
+@@ -65,7 +65,7 @@ struct ncfils {            /* This will
+ 
+ struct ncfils {            /* This will be a common block from Fortran */
+     double dd;
+-#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__
++#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__
+     int ll;
+ #else
+     long ll;
+@@ -420,7 +420,7 @@ stoig(shorts, ints, dims, basis, ndims)
+ }
+ #endif /* FORTRAN_HAS_NO_SHORT */
+ 
+-#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__
++#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__
+ /*
+  * Convert multi-dimensional array of NCLONGs stored in ints to packed
+  * array of longs, in malloc'ed space.  Returns pointer to longs or NULL
+@@ -908,7 +908,7 @@ nncvpt1(cdfid, varid, indices, value, rc
+     return;
+     }                /* else */
+ #endif                /* FORTRAN_HAS_NO_SHORT */
+-#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__
++#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__
+ #ifdef HDF
+     if ((nc_type) datatype == NC_LONG && handle->file_type!=HDF_FILE) {
+     long          longs = *(int *)value;
+@@ -1022,7 +1022,7 @@ nncvpt(cdfid, varid, start, count, value
+     return;
+     }                /* else */
+ #endif                /* FORTRAN_HAS_NO_SHORT */
+-#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__
++#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__
+ #ifdef HDF
+     if ((nc_type) datatype == NC_LONG && handle->file_type!=HDF_FILE) {
+     long *longs = itol (value, ncount, ndims);
+@@ -1133,7 +1133,7 @@ nncvptg(cdfid, varid, start, count, stri
+     tmpbasis    = nctypelen(NC_LONG);
+     else
+ #endif
+-#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__
++#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__
+     if (datatype == NC_LONG)
+     tmpbasis    = sizeof(int);
+     else
+@@ -1190,7 +1190,7 @@ nncvptg(cdfid, varid, start, count, stri
+     return;
+     }                /* else */
+ #endif                /* FORTRAN_HAS_NO_SHORT */
+-#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__
++#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__
+ #ifdef HDF
+     if ((nc_type) datatype == NC_LONG && handle->file_type!=HDF_FILE) {
+     long *longs = itolg (value, ncount, nbasis, ndims);
+@@ -1326,7 +1326,7 @@ nncvgt1(cdfid, varid, indices, value, rc
+     return;
+     }                /* else */
+ #endif                /* FORTRAN_HAS_NO_SHORT */
+-#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__
++#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__
+ #ifdef HDF
+     if ((nc_type) datatype == NC_LONG && handle->file_type!=HDF_FILE) {
+     long          longs;
+@@ -1468,7 +1468,7 @@ nncvgt(cdfid, varid, start, count, value
+     return;
+     }                /* else */
+ #endif                /* FORTRAN_HAS_NO_SHORT */
+-#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__
++#if defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__
+ #ifdef HDF
+     if ((nc_type) datatype == NC_LONG && handle->file_type!=HDF_FILE) {
+     long iocount = dimprod (ncount, ndims);    /* product of dimensions */
+@@ -1606,7 +1606,7 @@ nncvgtg(cdfid, varid, start, count, stri
+     tmpbasis    = nctypelen(NC_LONG);
+     else
+ #endif
+-#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__
++#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__
+     if (datatype == NC_LONG)
+     tmpbasis    = sizeof(int);
+     else
+@@ -1677,7 +1677,7 @@ nncvgtg(cdfid, varid, start, count, stri
+     return;
+     }                /* else */
+ #endif                /* FORTRAN_HAS_NO_SHORT */
+-#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__
++#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__
+ #ifdef HDF
+     if ((nc_type) datatype == NC_LONG && handle->file_type!=HDF_FILE) {
+     long iocount = dimprod (ncount, ndims);    /* product of dimensions */
+@@ -1843,7 +1843,7 @@ nncapt(cdfid, varid, attname, datatype,
+     return;
+     }                /* else */
+ #endif                /* FORTRAN_HAS_NO_SHORT */
+-#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__
++#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__
+ #ifdef HDF
+     if ((nc_type) *datatype == NC_LONG && handle->file_type!=HDF_FILE) {
+     long *longs = itol (value, attlen, 1);
+@@ -2008,7 +2008,7 @@ nncagt(cdfid, varid, attname, value, rco
+     return;
+     }                /* else */
+ #endif                /* FORTRAN_HAS_NO_SHORT */
+-#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__
++#if  defined __alpha || (_MIPS_SZLONG == 64) || defined __ia64 || (defined __sun && defined _LP64) || defined AIX5L64 || defined __x86_64__ || defined __powerpc64__
+ #ifdef HDF
+     if ((nc_type) datatype == NC_LONG && handle->file_type!=HDF_FILE) {
+ /* EIP  We need to use int buffer to read data in on the platforms where long is 8 bytes
