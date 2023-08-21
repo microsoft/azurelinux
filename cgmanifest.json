@@ -1626,6 +1626,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "CharLS",
+          "version": "2.0.0",
+          "downloadUrl": "https://github.com/team-charls/charls/archive/2.0.0/CharLS-2.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "check",
           "version": "0.15.2",
           "downloadUrl": "https://github.com/libcheck/check/archive/refs/tags/0.15.2.tar.gz"
