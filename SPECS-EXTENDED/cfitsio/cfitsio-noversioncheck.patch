@@ -1,0 +1,13 @@
+diff -Naur cfitsio/longnam.h cfitsio.noversioncheck/longnam.h
+--- cfitsio/longnam.h	2017-09-20 21:40:41.000000000 +0200
++++ cfitsio.noversioncheck/longnam.h	2018-02-23 14:42:36.246522445 +0100
+@@ -19,7 +19,8 @@
+    that was used to build the CFITSIO library is compatible with the version
+    as included when compiling the application program
+ */
+-#define fits_open_file(A, B, C, D)  ffopentest( CFITSIO_SONAME, A, B, C, D)
++/*#define fits_open_file(A, B, C, D)  ffopentest( CFITSIO_SONAME, A, B, C, D)*/
++#define fits_open_file  ffopen
+ 
+ #define fits_open_data      ffdopn
+ #define fits_open_extlist   ffeopn
