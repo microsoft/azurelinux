@@ -50,15 +50,15 @@ type BuildRequest struct {
 
 // BuildResult represents the results of a build agent trying to build a given node.
 type BuildResult struct {
-	AncillaryNodes  []*pkggraph.PkgNode
-	BuiltFiles      []string
-	Err             error
-	LogFile         string
-	Node            *pkggraph.PkgNode
-	Skipped         bool
-	UsedCache       bool
-	WasDelta        bool
-	ActualFreshness int
+	AncillaryNodes  []*pkggraph.PkgNode // All build nodes associated with the same SRPM as the node
+	BuiltFiles      []string            // List of files that were built
+	Err             error               // Any error from the build agent
+	LogFile         string              // Path to the build log file
+	Node            *pkggraph.PkgNode   // Main node that was processed
+	Skipped         bool                // Whether the node was explicitly skipped by user request
+	UsedCache       bool                // Whether the node was 'built' using a cached copy
+	WasDelta        bool                // Whether the node was built using a pre-downloaded
+	ActualFreshness int                 // How 'fresh' the node is (aka, how recently was a dependency forced to rebuild)
 }
 
 // selectNextBuildRequest selects a job based on priority:
