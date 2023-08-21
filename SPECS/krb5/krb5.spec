@@ -127,7 +127,7 @@ make check
 %{_datarootdir}/locale/*
 
 %changelog
-* Wed Aug 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.19.4-2
+* Mon Aug 21 2023 Tobias Brick <tobiasb@microsoft.com> - 1.19.4-2
 - Add patch for CVE-2023-36054
 
 * Fri Jan 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.19.4-1
