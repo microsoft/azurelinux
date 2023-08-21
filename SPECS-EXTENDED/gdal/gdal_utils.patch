@@ -1,0 +1,39 @@
+diff -rupN --no-dereference gdal-3.6.3-fedora/frmts/iso8211/CMakeLists.txt gdal-3.6.3-fedora-new/frmts/iso8211/CMakeLists.txt
+--- gdal-3.6.3-fedora/frmts/iso8211/CMakeLists.txt	2023-03-07 18:14:55.000000000 +0100
++++ gdal-3.6.3-fedora-new/frmts/iso8211/CMakeLists.txt	2023-03-14 09:21:05.455845507 +0100
+@@ -15,15 +15,18 @@ gdal_standard_includes(gdal_iso8211)
+ 
+ # Because linking an OBJECT library
+ if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.12)
+-    add_executable(8211dump EXCLUDE_FROM_ALL 8211dump.cpp)
++    add_executable(8211dump 8211dump.cpp)
+     target_include_directories(8211dump PRIVATE $<TARGET_PROPERTY:gdal_iso8211,SOURCE_DIR>)
+     target_link_libraries(8211dump PRIVATE $<TARGET_NAME:${GDAL_LIB_TARGET_NAME}> gdal_iso8211)
++    install(TARGETS 8211dump RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+ 
+-    add_executable(8211view EXCLUDE_FROM_ALL 8211view.cpp)
++    add_executable(8211view 8211view.cpp)
+     target_include_directories(8211view PRIVATE $<TARGET_PROPERTY:gdal_iso8211,SOURCE_DIR>)
+     target_link_libraries(8211view PRIVATE $<TARGET_NAME:${GDAL_LIB_TARGET_NAME}> gdal_iso8211)
++    install(TARGETS 8211view RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+ 
+-    add_executable(8211createfromxml EXCLUDE_FROM_ALL 8211createfromxml.cpp)
++    add_executable(8211createfromxml 8211createfromxml.cpp)
+     target_include_directories(8211createfromxml PRIVATE $<TARGET_PROPERTY:gdal_iso8211,SOURCE_DIR>)
+     target_link_libraries(8211createfromxml PRIVATE $<TARGET_NAME:${GDAL_LIB_TARGET_NAME}> gdal_iso8211)
++    install(TARGETS 8211createfromxml RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+ endif ()
+diff -rupN --no-dereference gdal-3.6.3-fedora/ogr/ogrsf_frmts/s57/CMakeLists.txt gdal-3.6.3-fedora-new/ogr/ogrsf_frmts/s57/CMakeLists.txt
+--- gdal-3.6.3-fedora/ogr/ogrsf_frmts/s57/CMakeLists.txt	2023-03-07 18:14:55.000000000 +0100
++++ gdal-3.6.3-fedora-new/ogr/ogrsf_frmts/s57/CMakeLists.txt	2023-03-14 09:21:05.455845507 +0100
+@@ -17,8 +17,9 @@ target_include_directories(ogr_S57 PRIVA
+ gdal_standard_includes(ogr_S57)
+ 
+ if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.12)
+-  add_executable(s57dump EXCLUDE_FROM_ALL s57dump.cpp)
++  add_executable(s57dump s57dump.cpp)
+   gdal_standard_includes(s57dump)
+   target_include_directories(s57dump PRIVATE $<TARGET_PROPERTY:gdal_iso8211,SOURCE_DIR>)
+   target_link_libraries(s57dump PRIVATE $<TARGET_NAME:${GDAL_LIB_TARGET_NAME}> ogr_S57 gdal_iso8211)
++  install(TARGETS s57dump RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+ endif ()
