@@ -4630,6 +4630,16 @@
         "type": "other",
         "other": {
           "name": "golang",
+          "version": "1.19.12",
+          "downloadUrl": "https://golang.org/dl/go1.19.12.src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "golang",
           "version": "1.20.7",
           "downloadUrl": "https://golang.org/dl/go1.20.7.src.tar.gz"
         }
