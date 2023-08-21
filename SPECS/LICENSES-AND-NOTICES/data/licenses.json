@@ -253,6 +253,7 @@
                 "GConf2",
                 "gcovr",
                 "gcr",
+                "gdal",
                 "gdisk",
                 "gdk-pixbuf2",
                 "generic-logos",
