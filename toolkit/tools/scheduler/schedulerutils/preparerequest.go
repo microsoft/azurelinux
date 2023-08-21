@@ -16,16 +16,28 @@ import (
 // ConvertNodesToRequests converts a slice of nodes into a slice of build requests.
 // - It will determine if the cache can be used for prebuilt nodes.
 // - It will group similar build nodes together into AncillaryNodes.
-func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, nodesToBuild []*pkggraph.PkgNode, packagesToRebuild []*pkgjson.PackageVer, buildState *GraphBuildState, isCacheAllowed bool) (requests []*BuildRequest) {
+//
+// Explanation of handling of the test nodes:
+//  1. The virtual B -> T edge guarantees the build node are unblocked and analyzed first.
+//  2. Once the build node is unblocked, analyze its partner test node in partnerTestNodesToRequest().
+//     We remove the virtual edge and the test node either gets immediately queued or is blocked on some extra dependencies.
+//     Blocking is decided by canUseCacheForNode().
+//  3. If the test node ends up being blocked, it gets re-analyzed later once its dependencies are done.
+//     The test nodes unblocked this way end up inside the 'testNodes' list in ConvertNodesToRequests()
+//     and are queued for building in the testNodesToRequests() function.
+//     At this point the partner build nodes for these test nodes have either already finished building or are being built,
+//     thus the check for active and cached SRPMs inside testNodesToRequests().
+func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, nodesToBuild []*pkggraph.PkgNode, packagesToRebuild, testsToRerun []*pkgjson.PackageVer, buildState *GraphBuildState, isCacheAllowed bool) (requests []*BuildRequest) {
 	timestamp.StartEvent("generate requests", nil)
 	defer timestamp.StopEvent(nil)
 
 	graphMutex.RLock()
 	defer graphMutex.RUnlock()
 
-	// Group build nodes together as they will be unblocked all at once for any given SRPM,
+	// Group build and test nodes together as they will be unblocked all at once for any given SRPM,
 	// and building a single build node will result in all of them becoming available.
 	buildNodes := make(map[string][]*pkggraph.PkgNode)
+	testNodes := make(map[string][]*pkggraph.PkgNode)
 
 	for _, node := range nodesToBuild {
 		if node.Type == pkggraph.TypeLocalBuild {
@@ -33,54 +45,152 @@ func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMute
 			continue
 		}
 
-		req := &BuildRequest{
-			Node:              node,
-			PkgGraph:          pkgGraph,
-			AncillaryNodes:    []*pkggraph.PkgNode{node},
-			IsDelta:           node.State == pkggraph.StateDelta,
-			ExpectedFreshness: buildState.GetMaxFreshness(),
+		if node.Type == pkggraph.TypeTest {
+			testNodes[node.SrpmPath] = append(testNodes[node.SrpmPath], node)
+			continue
 		}
 
-		requiredRebuild := isRequiredRebuild(req.Node, packagesToRebuild)
-		if !requiredRebuild && isCacheAllowed {
-			// We might be able to use the cache, set the freshness based on the node's dependencies.
-			req.CanUseCache, req.ExpectedFreshness = canUseCacheForNode(pkgGraph, req.Node, buildState)
-		}
-		logger.Log.Tracef("Preparing non-build request: requiredRebuild: %v, isCacheAllowed: %v, canUseCache: %v, freshness: %v", requiredRebuild, isCacheAllowed, req.CanUseCache, req.ExpectedFreshness)
+		ancillaryNodes := []*pkggraph.PkgNode{node}
+		isDelta := node.State == pkggraph.StateDelta
+		req := buildRequest(pkgGraph, buildState, packagesToRebuild, node, ancillaryNodes, isCacheAllowed, isDelta)
 
 		requests = append(requests, req)
 	}
 
-	// For each SRPM path, process the list of build nodes associated with it.
-	for _, nodes := range buildNodes {
-		const defaultNode = 0
+	requests = append(requests, buildNodesToRequests(pkgGraph, buildState, packagesToRebuild, testsToRerun, buildNodes, isCacheAllowed)...)
+	requests = append(requests, testNodesToRequests(pkgGraph, buildState, testsToRerun, testNodes)...)
 
-		// Check if any of the nodes in buildNodes is a delta node and mark it. We will use this to determine if the
+	return
+}
+
+func buildNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, packagesToRebuild, testsToRerun []*pkgjson.PackageVer, buildNodesLists map[string][]*pkggraph.PkgNode, isCacheAllowed bool) (requests []*BuildRequest) {
+	for _, buildNodes := range buildNodesLists {
+		// Check if any of the build nodes is a delta node and mark it. We will use this to determine if the
 		// build is a delta build that might have pre-built .rpm files available.
 		hasADeltaNode := false
-		for _, node := range nodes {
+		for _, node := range buildNodes {
 			if node.State == pkggraph.StateDelta {
 				hasADeltaNode = true
 				break
 			}
 		}
 
-		req := &BuildRequest{
-			Node:              nodes[defaultNode],
-			PkgGraph:          pkgGraph,
-			AncillaryNodes:    nodes,
-			IsDelta:           hasADeltaNode,
-			ExpectedFreshness: buildState.GetMaxFreshness(),
-		}
+		defaultNode := buildNodes[0]
+		req := buildRequest(pkgGraph, buildState, packagesToRebuild, defaultNode, buildNodes, isCacheAllowed, hasADeltaNode)
 
-		requiredRebuild := isRequiredRebuild(req.Node, packagesToRebuild)
-		if !requiredRebuild && isCacheAllowed {
-			// We might be able to use the cache, set the freshness based on node's dependencies.
-			req.CanUseCache, req.ExpectedFreshness = canUseCacheForNode(pkgGraph, req.Node, buildState)
+		if req.UseCache {
+			expectedFiles, missingFiles := pkggraph.FindRPMFiles(defaultNode.SrpmPath, pkgGraph, nil)
+			if len(missingFiles) > 0 && len(missingFiles) < len(expectedFiles) {
+				logger.Log.Infof("SRPM '%s' will be rebuilt due to partially missing components: %v", defaultNode.SRPMFileName(), missingFiles)
+				logger.Log.Debug("Resetting freshness due to missing files.")
+				req.ExpectedFreshness = buildState.GetMaxFreshness()
+			}
+
+			req.ExpectedFiles = expectedFiles
+			req.UseCache = len(missingFiles) == 0
 		}
-		logger.Log.Tracef("Preparing build request: requiredRebuild: %v, isCacheAllowed: %v, canUseCache: %v, freshness: %v", requiredRebuild, isCacheAllowed, req.CanUseCache, req.ExpectedFreshness)
 
 		requests = append(requests, req)
+
+		partnerTestNodeRequest := partnerTestNodesToRequest(pkgGraph, buildState, testsToRerun, buildNodes, req.UseCache)
+		if partnerTestNodeRequest != nil {
+			requests = append(requests, partnerTestNodeRequest)
+		}
+	}
+
+	return
+}
+
+func buildNodeToTestNode(pkgGraph *pkggraph.PkgGraph, buildNode *pkggraph.PkgNode) (testNode *pkggraph.PkgNode) {
+	dependents := pkgGraph.To(buildNode.ID())
+	for dependents.Next() {
+		dependent := dependents.Node().(*pkggraph.PkgNode)
+
+		if dependent.Type == pkggraph.TypeTest {
+			testNode = dependent
+			break
+		}
+	}
+
+	return
+}
+
+func buildRequest(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, packagesToRebuild []*pkgjson.PackageVer, builtNode *pkggraph.PkgNode, ancillaryNodes []*pkggraph.PkgNode, isCacheAllowed, isDelta bool) (request *BuildRequest) {
+	request = &BuildRequest{
+		Node:              builtNode,
+		PkgGraph:          pkgGraph,
+		AncillaryNodes:    ancillaryNodes,
+		IsDelta:           isDelta,
+		ExpectedFreshness: buildState.GetMaxFreshness(),
+	}
+
+	requiredRebuild := isRequiredRebuild(request.Node, packagesToRebuild)
+	if !requiredRebuild && isCacheAllowed {
+		// We might be able to use the cache, set the freshness based on node's dependencies.
+		request.UseCache, request.ExpectedFreshness = canUseCacheForNode(pkgGraph, request.Node, buildState)
+	}
+	return
+}
+
+func partnerTestNodesToRequest(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, testsToRerun []*pkgjson.PackageVer, buildNodes []*pkggraph.PkgNode, buildUsesCache bool) (request *BuildRequest) {
+	const isDelta = false
+
+	defaultBuildNode := buildNodes[0]
+	testNode := buildNodeToTestNode(pkgGraph, defaultBuildNode)
+	if testNode == nil {
+		return
+	}
+
+	ancillaryTestNodes := []*pkggraph.PkgNode{}
+	for _, buildNode := range buildNodes {
+		testNode = buildNodeToTestNode(pkgGraph, buildNode)
+
+		// Removing edges even if tests are blocked by other dependencies,
+		// so that they can get unblocked once these other dependencies are available.
+		pkgGraph.RemoveEdge(testNode.ID(), buildNode.ID())
+
+		ancillaryTestNodes = append(ancillaryTestNodes, testNode)
+	}
+
+	if !isNodeUnblocked(pkgGraph, buildState, testNode) {
+		return
+	}
+
+	request = &BuildRequest{
+		Node:              testNode,
+		PkgGraph:          pkgGraph,
+		AncillaryNodes:    ancillaryTestNodes,
+		IsDelta:           isDelta,
+		ExpectedFreshness: buildState.GetMaxFreshness(),
+	}
+
+	requiredRebuild := isRequiredRebuild(request.Node, testsToRerun)
+	if !requiredRebuild && buildUsesCache {
+		// We might be able to use the cache, set the freshness based on node's dependencies.
+		request.UseCache, request.ExpectedFreshness = canUseCacheForNode(pkgGraph, testNode, buildState)
+	}
+	return
+}
+
+// testNodesToRequests converts lists of test nodes into test build requests.
+// The function is expected to be only called for test nodes corresponding to build nodes,
+// which have already been queued to build or finished building.
+//
+// NOTE: the caller must guarantee the build state does not change while this function is running.
+func testNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, testsToRerun []*pkgjson.PackageVer, testNodesLists map[string][]*pkggraph.PkgNode) (requests []*BuildRequest) {
+	const isDelta = false
+
+	for _, testNodes := range testNodesLists {
+		defaultTestNode := testNodes[0]
+		srpmFileName := defaultTestNode.SRPMFileName()
+
+		buildUsedCache := buildState.IsSRPMCached(srpmFileName)
+		if buildRequest := buildState.ActiveBuildFromSRPM(srpmFileName); buildRequest != nil {
+			buildUsedCache = buildRequest.UseCache
+		}
+
+		testRequest := buildRequest(pkgGraph, buildState, testsToRerun, defaultTestNode, testNodes, buildUsedCache, isDelta)
+		requests = append(requests, testRequest)
 	}
 
 	return
