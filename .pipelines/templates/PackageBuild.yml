@@ -120,26 +120,34 @@ steps:
         $run_check_arg
     displayName: "Build packages"
 
-  - script: |
-      sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" compress-rpms
-    displayName: "Compress RPMs"
+  - ${{ if parameters.outputArtifactsFolder }}:
+    - ${{ if parameters.rpmsTarballName }}:
+      - script: |
+          sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" compress-rpms
+        displayName: "Compress RPMs"
 
-  - script: |
-      sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" compress-srpms
-    displayName: "Compress SRPMs"
+      - bash: |
+          published_artifacts_dir="${{ parameters.outputArtifactsFolder }}/ARTIFACTS"
+          mkdir -p "$published_artifacts_dir"
+          cp "${{ parameters.buildRepoRoot }}"/out/rpms.tar.gz "$published_artifacts_dir/${{ parameters.rpmsTarballName }}"
+        displayName: "Copy RPMs for publishing"
 
-  - bash: |
-      published_artifacts_dir="${{ parameters.outputArtifactsFolder }}/ARTIFACTS"
-      mkdir -p "$published_artifacts_dir"
-      cp "${{ parameters.buildRepoRoot }}"/out/rpms.tar.gz "$published_artifacts_dir/${{ parameters.rpmsTarballName }}"
-      cp "${{ parameters.buildRepoRoot }}"/out/srpms.tar.gz "$published_artifacts_dir/${{ parameters.srpmsTarballName }}"
-    displayName: "Copy artifacts for publishing"
+    - ${{ if parameters.srpmsTarballName }}:
+      - script: |
+          sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" compress-srpms
+        displayName: "Compress SRPMs"
 
-  - bash: |
-      published_logs_dir="${{ parameters.outputArtifactsFolder }}/LOGS"
-      mkdir -p "$published_logs_dir"
-      tar -C "${{ parameters.buildRepoRoot }}/build/logs/pkggen" -czf "$published_logs_dir/pkggen.logs.tar.gz" .
-      tar -C "${{ parameters.buildRepoRoot }}/build/pkg_artifacts" -czf "$published_logs_dir/pkg_artifacts.tar.gz" .
-      tar -C "${{ parameters.buildRepoRoot }}/build/timestamp" -czf "$published_logs_dir/timestamp.tar.gz" .
-    condition: always()
-    displayName: "Copy logs for publishing"
+      - bash: |
+          published_artifacts_dir="${{ parameters.outputArtifactsFolder }}/ARTIFACTS"
+          mkdir -p "$published_artifacts_dir"
+          cp "${{ parameters.buildRepoRoot }}"/out/srpms.tar.gz "$published_artifacts_dir/${{ parameters.srpmsTarballName }}"
+        displayName: "Copy SRPMs for publishing"
+
+    - bash: |
+        published_logs_dir="${{ parameters.outputArtifactsFolder }}/LOGS"
+        mkdir -p "$published_logs_dir"
+        tar -C "${{ parameters.buildRepoRoot }}/build/logs/pkggen" -czf "$published_logs_dir/pkggen.logs.tar.gz" .
+        tar -C "${{ parameters.buildRepoRoot }}/build/pkg_artifacts" -czf "$published_logs_dir/pkg_artifacts.tar.gz" .
+        tar -C "${{ parameters.buildRepoRoot }}/build/timestamp" -czf "$published_logs_dir/timestamp.tar.gz" .
+      condition: always()
+      displayName: "Copy logs for publishing"
