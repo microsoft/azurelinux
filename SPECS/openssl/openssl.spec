@@ -360,6 +360,9 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 * Mon Aug 21 2023 Dallas Delaney <dadelan@microsoft.com> - 1.1.1k-26
 - Patch CVE-2023-3817
 
+* Mon Aug 21 2023 Aadhar Agarwal <aadagarwal@microsoft.com> -  1.1.1k-25
+- Apply patch for CVE-2023-2650, the patch was added in 1.1.1k-24, but was not applied
+
 * Tue Jun 06 2023 Daniel McIlvaney <damcilva@microsoft.com> -  1.1.1k-24
 - Patch CVE-2023-2650
 
