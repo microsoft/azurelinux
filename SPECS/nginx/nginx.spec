@@ -60,6 +60,7 @@ tar -C nginx-njs -xf %{SOURCE2}
 mkdir otel-cpp-contrib
 tar -C otel-cpp-contrib -xf %{SOURCE3}
 # The following change is a build break in upstream and a PR has been raised to fix it.
+# PR: https://github.com/open-telemetry/opentelemetry-cpp-contrib/pull/314
 sed -i \
         '/\#include <opentelemetry\/sdk\/trace\/processor.h>$/a \#include <opentelemetry\/sdk\/trace\/batch_span_processor_options.h>' \
         otel-cpp-contrib/opentelemetry-cpp-contrib-%{opentelemetry_cpp_contrib_git_commit}/instrumentation/nginx/src/otel_ngx_module.cpp
