@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1k
-Release:        25%{?dist}
+Release:        26%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -166,6 +166,8 @@ cp %{SOURCE4} test/
 %patch33 -p1
 %patch34 -p1
 %patch35 -p1
+%patch36 -p1
+%patch37 -p1
 
 %build
 # Add -Wa,--noexecstack here so that libcrypto's assembler modules will be
@@ -355,7 +357,7 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 %postun libs -p /sbin/ldconfig
 
 %changelog
-* Mon Aug 21 2023 Dallas Delaney <dadelan@microsoft.com> - 1.1.1k-25
+* Mon Aug 21 2023 Dallas Delaney <dadelan@microsoft.com> - 1.1.1k-26
 - Patch CVE-2023-3817
 
 * Tue Jun 06 2023 Daniel McIlvaney <damcilva@microsoft.com> -  1.1.1k-24
