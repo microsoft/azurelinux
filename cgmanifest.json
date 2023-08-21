@@ -15073,6 +15073,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "ogdi",
+          "version": "4.1.0",
+          "downloadUrl": "https://github.com/libogdi/ogdi/archive/ogdi_4_1_0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "omping",
           "version": "0.0.4",
           "downloadUrl": "https://github.com/jfriesse/omping/releases/download/0.0.4/omping-0.0.4.tar.gz"
