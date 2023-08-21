@@ -4,6 +4,7 @@
 package schedulerutils
 
 import (
+	"fmt"
 	"math"
 	"path/filepath"
 	"sort"
@@ -50,10 +51,10 @@ func NewGraphBuildState(reservedFiles []string, maxFreshness int) (g *GraphBuild
 		filesMap[file] = true
 	}
 
-	//Use max int to represent infinity. This will cause unbounded cascading rebuilds so long as we build less that 2^31
-	// or more likely 2^63 packages (i.e., ~2.3 billion packages)
+	// If we select negative maxFreshness this means we want unbounded cascading. Use max int to represent infinity.
+	// (2^31 or 2^63 packages is much more than the size of our graph, so this has the desired effect)
 	if maxFreshness < 0 {
-		logger.Log.Debugf("maxFreshness was set to %d, unbounded cascading rebuilds (maxFreshness = %d)", maxFreshness, NodeFreshnessAbsoluteMax)
+		logger.Log.Debugf("maxFreshness was set to '%d', negative freshness selects unbounded cascading rebuilds (setting maxFreshness to '%d')", maxFreshness, NodeFreshnessAbsoluteMax)
 		maxFreshness = NodeFreshnessAbsoluteMax
 	}
 

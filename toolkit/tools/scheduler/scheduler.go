@@ -117,11 +117,6 @@ func main() {
 		logger.Log.Fatalf("Value in --build-attempts must be greater than zero. Found %d.", *buildAttempts)
 	}
 
-	if *maxCascadingRebuilds < 0 {
-		logger.Log.Infof("--max-cascading-rebuilds (%d) is negative, setting to unbounded cascading rebuilds.", *maxCascadingRebuilds)
-		*maxCascadingRebuilds = schedulerutils.NodeFreshnessAbsoluteMax
-	}
-
 	dependencyGraph, err := pkggraph.ReadDOTGraphFile(*inputGraphFile)
 	if err != nil {
 		logger.Log.Fatalf("Failed to read DOT graph with error:\n%s", err)
