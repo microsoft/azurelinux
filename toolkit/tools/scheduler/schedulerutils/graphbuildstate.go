@@ -211,13 +211,10 @@ func (g *GraphBuildState) RecordBuildResult(res *BuildResult, allowToolchainRebu
 	// 'NodeFreshnessRebuildRequired' is a special value that indicates that the node was rebuilt due to  missing files
 	// (user requested rebuilds are already at the max freshness). In this case, we want to reset the freshness to the
 	// max, so that subsequent dependant nodes will be rebuilt. Also ensure that the freshness is not greater than the max.
-	freshness := res.ActualFreshness
+	freshness := res.Freshness
 	if freshness < 0 || freshness > g.GetMaxFreshness() {
-		if freshness != NodeFreshnessRebuildRequired {
-			err = fmt.Errorf("unexpected freshness value of '%d' for node '%s'. Should be: 'NodeFreshnessRebuildRequired'(%d), > 0, <= %d", freshness, res.Node.FriendlyName(), NodeFreshnessRebuildRequired, g.GetMaxFreshness())
-			return
-		}
-		freshness = g.GetMaxFreshness()
+		err = fmt.Errorf("unexpected freshness value of '%d' for node '%s'. Should be: (0 < %d <= %d)", freshness, res.Node.FriendlyName(), freshness, g.GetMaxFreshness())
+		return
 	}
 
 	state := &nodeState{
@@ -241,4 +238,5 @@ func (g *GraphBuildState) RecordBuildResult(res *BuildResult, allowToolchainRebu
 	} else {
 		logger.Log.Tracef("Skipping checking toolchain conflicts since this is either not a built node (%v) or the ALLOW_TOOLCHAIN_REBUILDS flag was set to 'y'.", res.Node)
 	}
+	return
 }

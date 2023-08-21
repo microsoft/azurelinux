@@ -32,35 +32,28 @@ type BuildChannels struct {
 	Done             <-chan struct{}
 }
 
-// BuildRequest represents the results of a build agent trying to build a given node.
-// - Node: The node to process
-// - PkgGraph: The graph of all packages
-// - AncillaryNodes: All additional build nodes that share a common SRPM (will be processed together)
-// - CanUseCache: If the scheduler is allowed to use a cached/already built copy of this package instead of building it
-// - IsDelta: Is this a pre-downloaded rpm (not traditional cache) that we may be able to skip rebuilding
-// - ExpectedFreshness: The expected freshness of the node (used to determine if we can skip building future nodes)
+// BuildRequest represents a work-order to a build agent asking it to build a given node.
 type BuildRequest struct {
-	Node              *pkggraph.PkgNode
-	PkgGraph          *pkggraph.PkgGraph
-	AncillaryNodes    []*pkggraph.PkgNode
-	ExpectedFiles     []string
-	WasMissingFiles   bool
-	UseCache          bool
-	IsDelta           bool
-	ExpectedFreshness int
+	Node           *pkggraph.PkgNode   // The main node being analyzed for the build.
+	PkgGraph       *pkggraph.PkgGraph  // The graph of all packages
+	AncillaryNodes []*pkggraph.PkgNode // For SRPM builds: other nodes stemming from the same SRPM. Empty otherwise.
+	ExpectedFiles  []string            // List of RPMs built by this node.
+	UseCache       bool                // Can we use a cached copy of this package instead of building it
+	IsDelta        bool                // Is this a pre-downloaded rpm (not traditional cache) that we may be able to skip rebuilding
+	Freshness      int                 // The freshness of the node (used to determine if we can skip building future nodes)
 }
 
 // BuildResult represents the results of a build agent trying to build a given node.
 type BuildResult struct {
-	AncillaryNodes  []*pkggraph.PkgNode // For SRPM builds: other nodes stemming from the same SRPM. Empty otherwise.
-	BuiltFiles      []string            // List of RPMs built by this node.
-	Err             error               // Error encountered during the build.
-	LogFile         string              // Path to the log file from the build.
-	Node            *pkggraph.PkgNode   // The main node being analyzed for the build.
-	Ignored         bool                // Indicator if the build was ignored by user request.
-	UsedCache       bool                // Indicator if we used the cached artifacts (external or earlier local build) instead of building the node.
-	WasDelta        bool                // Indicator if we used a pre-built component from an external repository instead of building the node.
-	ActualFreshness int                 // How 'fresh' the node is (aka, how recently was a dependency forced to rebuild)
+	AncillaryNodes []*pkggraph.PkgNode // For SRPM builds: other nodes stemming from the same SRPM. Empty otherwise.
+	BuiltFiles     []string            // List of RPMs built by this node.
+	Err            error               // Error encountered during the build.
+	LogFile        string              // Path to the log file from the build.
+	Node           *pkggraph.PkgNode   // The main node being analyzed for the build.
+	Ignored        bool                // Indicator if the build was ignored by user request.
+	UsedCache      bool                // Indicator if we used the cached artifacts (external or earlier local build) instead of building the node.
+	WasDelta       bool                // Indicator if we used a pre-built component from an external repository instead of building the node.
+	Freshness      int                 // The freshness of the node (used to determine if we can skip building future nodes)
 }
 
 // selectNextBuildRequest selects a job based on priority:
@@ -109,11 +102,11 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 	// it when we pick up the next request
 	for req, cancelled := selectNextBuildRequest(channels); !cancelled && req != nil; req, cancelled = selectNextBuildRequest(channels) {
 		res := &BuildResult{
-			Node:            req.Node,
-			AncillaryNodes:  req.AncillaryNodes,
-			UsedCache:       req.UseCache,
-			WasDelta:        req.IsDelta,
-			ActualFreshness: req.ExpectedFreshness,
+			Node:           req.Node,
+			AncillaryNodes: req.AncillaryNodes,
+			UsedCache:      req.UseCache,
+			WasDelta:       req.IsDelta,
+			Freshness:      req.Freshness,
 		}
 
 		switch req.Node.Type {
