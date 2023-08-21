@@ -9420,6 +9420,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libgeotiff",
+          "version": "1.7.1",
+          "downloadUrl": "https://download.osgeo.org/geotiff/libgeotiff/libgeotiff-1.7.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libgexiv2",
           "version": "0.12.1",
           "downloadUrl": "https://download.gnome.org/sources/gexiv2/0.12/gexiv2-0.12.1.tar.xz"
