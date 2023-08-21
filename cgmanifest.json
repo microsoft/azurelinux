@@ -5259,6 +5259,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "hdf",
+          "version": "4.2.15",
+          "downloadUrl": "https://support.hdfgroup.org/ftp/HDF/releases/HDF4.2.15/src/hdf-4.2.15.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "hdf5",
           "version": "1.12.1",
           "downloadUrl": "https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.1/src/hdf5-1.12.1.tar.bz2"
