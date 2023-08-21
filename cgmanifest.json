@@ -4849,6 +4849,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "gpsbabel",
+          "version": "1.8.0",
+          "downloadUrl": "https://github.com/GPSBabel/gpsbabel/archive/refs/tags/gpsbabel_1_8_0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "gptfdisk",
           "version": "1.0.8",
           "downloadUrl": "https://downloads.sourceforge.net/project/gptfdisk/gptfdisk/1.0.8/gptfdisk-1.0.8.tar.gz"
