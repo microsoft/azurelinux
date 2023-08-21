@@ -7,7 +7,6 @@ import (
 	"bufio"
 	"crypto/tls"
 	"crypto/x509"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -975,7 +974,8 @@ func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir st
 			}
 		}
 
-		err = retry.RunWithExpBackoff(func() error {
+		cancelled := false
+		cancelled, err = retry.RunWithExpBackoff(func() error {
 			err := network.DownloadFile(url, destinationFile, srcConfig.caCerts, srcConfig.tlsCerts)
 			if err != nil {
 				logger.Log.Warnf("Failed to download (%s). Error: %s", url, err)
@@ -989,12 +989,13 @@ func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir st
 			<-netOpsSemaphore
 		}
 
+		if cancelled {
+			err = errPackerCancelReceived
+			return
+		}
+
 		if err != nil {
 			// We may intentionally fail early due to a cancellation signal, stop immediately if that is the case.
-			if errors.Is(err, retry.ErrRetryCancelled) {
-				err = errPackerCancelReceived
-				return
-			}
 			continue
 		}
 

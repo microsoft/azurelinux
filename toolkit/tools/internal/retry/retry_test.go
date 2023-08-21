@@ -1,7 +1,6 @@
 package retry
 
 import (
-	"errors"
 	"fmt"
 	"testing"
 	"time"
@@ -81,11 +80,12 @@ func TestCalcDelayExpBase2(t *testing.T) {
 func TestTotalRunTimeWithFailuresLinear(t *testing.T) {
 	attempts := 3
 	startTime := time.Now()
-	err := RunWithLinearBackoff(func() error {
+	cancelled, err := RunWithLinearBackoff(func() error {
 		return fmt.Errorf("test error")
 	}, attempts, defaultTestTime, nil)
 	endTime := time.Now()
 	assert.NotNil(t, err)
+	assert.False(t, cancelled)
 	// Delays should be 0 seconds, <attempt>, .1 second, <attempt>, .2 seconds, <attempt>
 	// for a total of .3 seconds.
 	idealTime := time.Millisecond * 300
@@ -117,11 +117,12 @@ func TestTotalRunTimeWithFailuresBase2(t *testing.T) {
 	tries := 3
 	base := 2.0
 	startTime := time.Now()
-	err := RunWithExpBackoff(func() error {
+	cancelled, err := RunWithExpBackoff(func() error {
 		return fmt.Errorf("test error")
 	}, tries, defaultTestTime, base, nil)
 	endTime := time.Now()
 	assert.NotNil(t, err)
+	assert.False(t, cancelled)
 	// Delays should be 0 seconds, <attempt>, .1 second, <attempt>, .2 seconds, <attempt>
 	// for a total of .3 seconds.
 	idealTime := time.Millisecond * 300
@@ -135,11 +136,12 @@ func TestTotalRunTimeWithSuccess(t *testing.T) {
 	tries := 3
 	base := 2.0
 	startTime := time.Now()
-	err := RunWithExpBackoff(func() error {
+	cancelled, err := RunWithExpBackoff(func() error {
 		return nil
 	}, tries, time.Second, base, nil)
 	endTime := time.Now()
 	assert.Nil(t, err)
+	assert.False(t, cancelled)
 	// Delays should be 0 seconds, <attempt>
 	// for a total of 0 seconds.
 	maxDelay := timingFudgeFactor
@@ -155,12 +157,14 @@ func TestCancelsEarlyWithSignalImmediately(t *testing.T) {
 	// Send a signal immediately
 	close(cancelSignal)
 
-	err := RunWithExpBackoff(func() error {
+	cancelled, err := RunWithExpBackoff(func() error {
 		return fmt.Errorf("test error")
 	}, tries, defaultTestTime, base, cancelSignal)
 
 	endTime := time.Now()
-	assert.NotNil(t, err)
+	// Error should be nil since we never ran the function before cancelling.
+	assert.Nil(t, err)
+	assert.True(t, cancelled)
 	// Delays should be 0 seconds, <attempt>
 	// for a total of 0 seconds.
 	maxDelay := timingFudgeFactor
@@ -180,12 +184,14 @@ func TestCancelsEarlyWithSignalAfterDelay(t *testing.T) {
 		close(cancelSignal)
 	}()
 
-	err := RunWithExpBackoff(func() error {
+	cancelled, err := RunWithExpBackoff(func() error {
 		return fmt.Errorf("test error")
 	}, tries, defaultTestTime, base, cancelSignal)
 
 	endTime := time.Now()
+	// Error should still be set since we ran the function at least once.
 	assert.NotNil(t, err)
+	assert.True(t, cancelled)
 
 	// Delay should be 0.2 seconds before the signal is received
 	idealTime := cancelTime
@@ -195,29 +201,14 @@ func TestCancelsEarlyWithSignalAfterDelay(t *testing.T) {
 	assert.LessOrEqual(t, endTime.Sub(startTime), maxDelay)
 }
 
-func TestCancelGivesCorrectError(t *testing.T) {
-	tries := 3
-	base := 2.0
-	cancelSignal := make(chan struct{})
-
-	// Send a signal immediately
-	close(cancelSignal)
-
-	err := RunWithExpBackoff(func() error {
-		return fmt.Errorf("test error")
-	}, tries, defaultTestTime, base, cancelSignal)
-
-	assert.NotNil(t, err)
-	assert.True(t, errors.Is(err, ErrRetryCancelled))
-}
-
 func TestNonCancelGivesCorrectError(t *testing.T) {
 	tries := 1
 	base := 2.0
-	err := RunWithExpBackoff(func() error {
+	cancelled, err := RunWithExpBackoff(func() error {
 		return fmt.Errorf("test error")
 	}, tries, defaultTestTime, base, nil)
 
 	assert.NotNil(t, err)
 	assert.Equal(t, "test error", err.Error())
+	assert.False(t, cancelled)
 }

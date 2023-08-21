@@ -4,12 +4,9 @@
 package retry
 
 import (
-	"fmt"
 	"math"
 	"time"
 )
-
-var ErrRetryCancelled = fmt.Errorf("retry cancelled")
 
 // calculateDelay calculates the delay for the given failure count, sleep duration, and backoff exponent base.
 // If the base is positive, it will calculate an exponential backoff.
@@ -49,29 +46,29 @@ func backoffSleep(delay time.Duration, cancel <-chan struct{}) (cancelled bool) 
 // runWithBackoffInternal runs function up to 'attempts' times, waiting delayCalc(failCount) before each i-th attempt.
 // delayCalc(0) is expected to return 0.
 // The function will return early if the cancel channel is closed.
-func runWithBackoffInternal(function func() error, delayCalc func(failCount int) time.Duration, attempts int, cancel <-chan struct{}) (err error) {
+func runWithBackoffInternal(function func() error, delayCalc func(failCount int) time.Duration, attempts int, cancel <-chan struct{}) (wasCancelled bool, err error) {
 	for failures := 0; failures < attempts; failures++ {
 		delayTime := delayCalc(failures)
-		cancelled := backoffSleep(delayTime, cancel)
-		if cancelled {
-			err = fmt.Errorf("%w after %d tries", ErrRetryCancelled, failures)
+		wasCancelled = backoffSleep(delayTime, cancel)
+		if wasCancelled {
 			break
 		}
 		if err = function(); err == nil {
 			break
 		}
 	}
-	return err
+	return wasCancelled, err
 }
 
 // Run runs function up to 'attempts' times, waiting i * sleep duration before each i-th attempt.
 func Run(function func() error, attempts int, sleep time.Duration) (err error) {
-	return RunWithLinearBackoff(function, attempts, sleep, nil)
+	_, err = RunWithLinearBackoff(function, attempts, sleep, nil)
+	return
 }
 
 // RunWithLinearBackoff runs function up to 'attempts' times, waiting i * sleep duration before each i-th attempt. An
 // optional cancel channel can be provided to cancel the retry loop immediately by closing the channel.
-func RunWithLinearBackoff(function func() error, attempts int, sleep time.Duration, cancel <-chan struct{}) (err error) {
+func RunWithLinearBackoff(function func() error, attempts int, sleep time.Duration, cancel <-chan struct{}) (wasCancelled bool, err error) {
 	return runWithBackoffInternal(function, func(failCount int) time.Duration {
 		return calculateLinearDelay(failCount, sleep)
 	}, attempts, cancel)
@@ -79,7 +76,7 @@ func RunWithLinearBackoff(function func() error, attempts int, sleep time.Durati
 
 // RunWithExpBackoff runs function up to 'attempts' times, waiting 'backoffExponentBase^(i-1) * sleep' duration before
 // each i-th attempt. An optional cancel channel can be provided to cancel the retry loop immediately by closing the channel.
-func RunWithExpBackoff(function func() error, attempts int, sleep time.Duration, backoffExponentBase float64, cancel <-chan struct{}) (err error) {
+func RunWithExpBackoff(function func() error, attempts int, sleep time.Duration, backoffExponentBase float64, cancel <-chan struct{}) (wasCancelled bool, err error) {
 	return runWithBackoffInternal(function, func(failCount int) time.Duration {
 		return calculateExpDelay(failCount, sleep, backoffExponentBase)
 	}, attempts, cancel)
