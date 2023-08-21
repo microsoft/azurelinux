@@ -9840,6 +9840,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "liblerc",
+          "version": "4.0.0",
+          "downloadUrl": "https://github.com/Esri/lerc/archive/v4.0.0/lerc-4.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "liblockfile",
           "version": "1.14",
           "downloadUrl": "http://ftp.de.debian.org/debian/pool/main/libl/liblockfile/liblockfile_1.14.orig.tar.gz"
