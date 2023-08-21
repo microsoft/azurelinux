@@ -166,7 +166,7 @@ func (g *GraphBuildState) isConflictWithToolchain(fileToCheck string) (hadConfli
 // RecordBuildResult records a build result in the graph build state.
 // - It will record the result as a failure if applicable.
 // - It will record all ancillary nodes of the result.
-func (g *GraphBuildState) RecordBuildResult(res *BuildResult, allowToolchainRebuilds bool) {
+func (g *GraphBuildState) RecordBuildResult(res *BuildResult, allowToolchainRebuilds bool) (err error) {
 
 	logger.Log.Debugf("Recording build result: %s", res.Node.FriendlyName())
 
@@ -182,7 +182,8 @@ func (g *GraphBuildState) RecordBuildResult(res *BuildResult, allowToolchainRebu
 	freshness := res.ActualFreshness
 	if freshness < 0 || freshness > g.GetMaxFreshness() {
 		if freshness != NodeFreshnessRebuildRequired {
-			logger.Log.Debugf("Unexpected freshness value of '%d' for node '%s'. Defaulting to max freshness '%d'", freshness, res.Node.FriendlyName(), g.GetMaxFreshness())
+			err = fmt.Errorf("unexpected freshness value of '%d' for node '%s'. Should be: 'NodeFreshnessRebuildRequired'(%d), > 0, <= %d", freshness, res.Node.FriendlyName(), NodeFreshnessRebuildRequired, g.GetMaxFreshness())
+			return
 		}
 		freshness = g.GetMaxFreshness()
 	}

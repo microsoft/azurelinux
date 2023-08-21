@@ -354,7 +354,12 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild []*pkgjson
 		res := <-channels.Results
 
 		schedulerutils.PrintBuildResult(res)
-		buildState.RecordBuildResult(res, allowToolchainRebuilds)
+		err = buildState.RecordBuildResult(res, allowToolchainRebuilds)
+		if err != nil {
+			// Failures to manipulate the graph or build state are fatal.
+			err = fmt.Errorf("error recording build result:\n%w", err)
+			stopBuilding = true
+		}
 
 		if !stopBuilding {
 			if res.Err == nil {
