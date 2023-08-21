@@ -126,7 +126,7 @@ fi
 %{_unitdir}/*
 
 %changelog
-* Sat Aug 08 2023 Muhammad Falak <mwani@microsoft.com> - 20.10.25-1
+* Thu Aug 17 2023 Muhammad Falak <mwani@microsoft.com> - 20.10.25-1
 - Bump version to 20.10.25
 
 * Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 20.10.24-4
