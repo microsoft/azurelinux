@@ -119,7 +119,7 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 			res.UsedCache, res.Skipped, hadMissingFiles, res.BuiltFiles, res.LogFile, res.Err = buildBuildNode(req.Node, req.PkgGraph, graphMutex, agent, req.CanUseCache, buildAttempts, checkAttempts, ignoredPackages)
 			if hadMissingFiles {
 				res.ActualFreshness = NodeFreshnessRebuildRequired
-				logger.Log.Debugf("Resetting freshness to %d for %s", res.ActualFreshness, res.Node.FriendlyName())
+				logger.Log.Debugf("Resetting freshness for %s due to missing files.", res.Node.FriendlyName())
 			} else {
 				logger.Log.Debugf("Keeping freshness at %d for %s", res.ActualFreshness, res.Node.FriendlyName())
 			}
@@ -163,12 +163,12 @@ func buildBuildNode(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, graphMu
 	}
 
 	// Print a message if a package is partially built but needs to be regenerated because its missing something.
-	if len(missingFiles) > 0 && len(builtFiles) != len(missingFiles) {
+	hadMissingFiles = len(missingFiles) > 0
+	if hadMissingFiles && len(builtFiles) != len(missingFiles) {
 		logger.Log.Infof("SRPM '%s' is being rebuilt due to partially missing components: %v", node.SrpmPath, missingFiles)
 	}
 
 	usedCache = false
-	hadMissingFiles = len(missingFiles) > 0
 
 	dependencies := getBuildDependencies(node, pkgGraph, graphMutex)
 
