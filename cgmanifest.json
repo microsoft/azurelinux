@@ -4639,6 +4639,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "golang",
+          "version": "1.20.7",
+          "downloadUrl": "https://golang.org/dl/go1.20.7.src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "golang-crypto",
           "version": "c07d793c2f9aacf728fe68cbd7acd73adbd04159",
           "downloadUrl": "https://github.com/golang/crypto/archive/golang-crypto-c07d793c2f9aacf728fe68cbd7acd73adbd04159.tar.gz"
@@ -13233,8 +13243,8 @@
         "type": "other",
         "other": {
           "name": "moby-cli",
-          "version": "20.10.24",
-          "downloadUrl": "https://github.com/docker/cli/archive/v20.10.24.tar.gz"
+          "version": "20.10.25",
+          "downloadUrl": "https://github.com/docker/cli/archive/v20.10.25.tar.gz"
         }
       }
     },
@@ -13253,8 +13263,8 @@
         "type": "other",
         "other": {
           "name": "moby-containerd",
-          "version": "1.6.18",
-          "downloadUrl": "https://github.com/containerd/containerd/archive/v1.6.18.tar.gz"
+          "version": "1.6.22",
+          "downloadUrl": "https://github.com/containerd/containerd/archive/v1.6.22.tar.gz"
         }
       }
     },
@@ -13273,8 +13283,8 @@
         "type": "other",
         "other": {
           "name": "moby-engine",
-          "version": "20.10.24",
-          "downloadUrl": "https://github.com/moby/moby/archive/v20.10.24.tar.gz"
+          "version": "20.10.25",
+          "downloadUrl": "https://github.com/moby/moby/archive/v20.10.25.tar.gz"
         }
       }
     },
@@ -13283,8 +13293,8 @@
         "type": "other",
         "other": {
           "name": "moby-runc",
-          "version": "1.1.5",
-          "downloadUrl": "https://github.com/opencontainers/runc/archive/v1.1.5.tar.gz"
+          "version": "1.1.9",
+          "downloadUrl": "https://github.com/opencontainers/runc/archive/v1.1.9.tar.gz"
         }
       }
     },
