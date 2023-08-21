@@ -115,7 +115,7 @@ steps:
         REBUILD_TOOLS=y \
         REPO_LIST="${{ parameters.extraPackageRepos }}" \
         SPECS_DIR="${{ parameters.buildRepoRoot }}/${{ parameters.specsFolderPath }}" \
-        SPRM_PACK_LIST="${{ parameters.srpmPackList }}" \
+        SRPM_PACK_LIST="${{ parameters.srpmPackList }}" \
         $delta_fetch_arg \
         $run_check_arg
     displayName: "Build packages"
