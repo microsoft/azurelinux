@@ -14132,6 +14132,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "netcdf",
+          "version": "4.9.0",
+          "downloadUrl": "https://github.com/Unidata/netcdf-c/archive/v4.9.0/netcdf-4.9.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "netcf",
           "version": "0.2.8",
           "downloadUrl": "https://fedorahosted.org/released/netcf/netcf-0.2.8.tar.gz"
