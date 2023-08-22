@@ -30,6 +30,10 @@ parameters:
     type: string
     default: "$(Build.ArtifactStagingDirectory)"
 
+  - name: publishLogs
+    type: boolean
+    default: true
+
   - name: rpmsCacheArtifactName
     type: string
     default: ""
@@ -143,11 +147,12 @@ steps:
           cp "${{ parameters.buildRepoRoot }}"/out/srpms.tar.gz "$published_artifacts_dir/${{ parameters.srpmsTarballName }}"
         displayName: "Copy SRPMs for publishing"
 
-    - bash: |
-        published_logs_dir="${{ parameters.outputArtifactsFolder }}/LOGS"
-        mkdir -p "$published_logs_dir"
-        tar -C "${{ parameters.buildRepoRoot }}/build/logs/pkggen" -czf "$published_logs_dir/pkggen.logs.tar.gz" .
-        tar -C "${{ parameters.buildRepoRoot }}/build/pkg_artifacts" -czf "$published_logs_dir/pkg_artifacts.tar.gz" .
-        tar -C "${{ parameters.buildRepoRoot }}/build/timestamp" -czf "$published_logs_dir/timestamp.tar.gz" .
-      condition: always()
-      displayName: "Copy logs for publishing"
+    - ${{ if parameters.publishLogs }}:
+      - bash: |
+          published_logs_dir="${{ parameters.outputArtifactsFolder }}/LOGS"
+          mkdir -p "$published_logs_dir"
+          tar -C "${{ parameters.buildRepoRoot }}/build/logs/pkggen" -czf "$published_logs_dir/pkggen.logs.tar.gz" .
+          tar -C "${{ parameters.buildRepoRoot }}/build/pkg_artifacts" -czf "$published_logs_dir/pkg_artifacts.tar.gz" .
+          tar -C "${{ parameters.buildRepoRoot }}/build/timestamp" -czf "$published_logs_dir/timestamp.tar.gz" .
+        condition: always()
+        displayName: "Copy logs for publishing"
