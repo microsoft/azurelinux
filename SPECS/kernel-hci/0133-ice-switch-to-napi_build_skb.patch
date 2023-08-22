@@ -1,0 +1,43 @@
+From 2ff7c2c036d04fa1eff6e845c48b2c508253f73c Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Tue, 23 Nov 2021 18:18:36 +0100
+Subject: [NET-NEXT 133/254] ice: switch to napi_build_skb()
+
+From: Alexander Lobakin <alexandr.lobakin@intel.com>
+
+napi_build_skb() reuses per-cpu NAPI skbuff_head cache in order
+to save some cycles on freeing/allocating skbuff_heads on every
+new Rx or completed Tx.
+ice driver runs Tx completion polling cycle right before the Rx
+one and uses napi_consume_skb() to feed the cache with skbuff_heads
+of completed entries, so it's never empty and always warm at that
+moment. Switch to the napi_build_skb() to relax mm pressure on
+heavy Rx.
+
+Backported from upstream commit 5ce666315848
+
+Signed-off-by: Alexander Lobakin <alexandr.lobakin@intel.com>
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Tested-by: Gurucharan G <gurucharanx.g@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_txrx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
+index 3987a0dd0e11..d21f1c946767 100644
+--- a/drivers/net/ethernet/intel/ice/ice_txrx.c
++++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
+@@ -941,7 +941,7 @@ ice_build_skb(struct ice_rx_ring *rx_ring, struct ice_rx_buf *rx_buf,
+ 	 */
+ 	net_prefetch(xdp->data_meta);
+ 	/* build an skb around the page buffer */
+-	skb = build_skb(xdp->data_hard_start, truesize);
++	skb = napi_build_skb(xdp->data_hard_start, truesize);
+ 	if (unlikely(!skb))
+ 		return NULL;
+ 
+-- 
+2.34.1
+

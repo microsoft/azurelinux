@@ -1,0 +1,40 @@
+From 85d6a81d9fd82cac47d7b204d14e0b8b499ce6c5 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Mon, 18 Oct 2021 13:30:32 +0200
+Subject: [NET-NEXT 085/254] ice: Add support for changing MTU on PR in
+ switchdev mode
+
+From: Marcin Szycik <marcin.szycik@intel.com>
+
+This change adds support for changing MTU on port representor in
+switchdev mode, by setting the min/max MTU values on port representor
+netdev. Before it was possible to change the MTU only in a limited,
+default range (68-1500).
+
+Backported from upstream commit e984c4408fc9
+
+Signed-off-by: Marcin Szycik <marcin.szycik@intel.com>
+Tested-by: Sandeep Penigalapati <sandeep.penigalapati@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_repr.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_repr.c b/drivers/net/ethernet/intel/ice/ice_repr.c
+index c49eeea7cb67..af8e6ef5f571 100644
+--- a/drivers/net/ethernet/intel/ice/ice_repr.c
++++ b/drivers/net/ethernet/intel/ice/ice_repr.c
+@@ -267,6 +267,9 @@ static int ice_repr_add(struct ice_vf *vf)
+ 	if (err)
+ 		goto err_devlink;
+ 
++	repr->netdev->min_mtu = ETH_MIN_MTU;
++	repr->netdev->max_mtu = ICE_MAX_MTU;
++
+ 	err = ice_repr_reg_netdev(repr->netdev);
+ 	if (err)
+ 		goto err_netdev;
+-- 
+2.34.1
+

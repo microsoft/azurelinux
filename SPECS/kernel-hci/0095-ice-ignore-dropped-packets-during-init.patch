@@ -1,0 +1,44 @@
+From 9d576577560690f2d94716886547bf6bafe94ac0 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Fri, 22 Oct 2021 17:28:17 -0700
+Subject: [NET-NEXT 095/254] ice: ignore dropped packets during init
+
+From: Jesse Brandeburg <jesse.brandeburg@intel.com>
+
+If the hardware is constantly receiving unicast or broadcast packets
+during driver load, the device previously counted many GLV_RDPC (VSI
+dropped packets) events during init. This causes confusing dropped
+packet statistics during driver load. The dropped packets counter
+incrementing does stop once the driver finishes loading.
+
+Avoid this problem by baselining our statistics at the end of driver
+open instead of the end of probe.
+
+Backported from upstream commit 28dc1b86f8ea
+
+Fixes: cdedef59deb0 ("ice: Configure VSIs for Tx/Rx")
+Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+Tested-by: Gurucharan G <gurucharanx.g@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_main.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 00768746ab9b..3d35ef2a8e4c 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -7381,6 +7381,9 @@ static void ice_tx_timeout(struct net_device *netdev, unsigned int txqueue)
+ 		break;
+ 	}
+ 
++	/* clear this now, and the first stats read will be used as baseline */
++	vsi->stat_offsets_loaded = false;
++
+ 	ice_service_task_schedule(pf);
+ 	pf->tx_timeout_recovery_level++;
+ }
+-- 
+2.34.1
+

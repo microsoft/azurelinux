@@ -1,0 +1,65 @@
+From 6607440a8c6fdf3287ca66d207825774f5f9abbd Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Fri, 16 Jul 2021 15:16:37 -0700
+Subject: [NET-NEXT 229/254] iavf: Enable setting RSS hash key
+
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+
+Driver support for changing the RSS hash key exists, however, checks
+have caused it to be reported as unsupported. Remove the check and
+allow the hash key to be specified.
+
+Backported from upstream commit b231b59a2f96
+
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Tested-by: Tony Brelinski <tony.brelinski@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/iavf/iavf_ethtool.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_ethtool.c b/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
+index 5af3ae68b7a1..84eff4acb7a6 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
++++ b/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
+@@ -1923,7 +1923,7 @@ static int iavf_get_rxfh(struct net_device *netdev, u32 *indir, u8 *key,
+  * @key: hash key
+  * @hfunc: hash function to use
+  *
+- * Returns -EINVAL if the table specifies an inavlid queue id, otherwise
++ * Returns -EINVAL if the table specifies an invalid queue id, otherwise
+  * returns 0 after programming the table.
+  **/
+ static int iavf_set_rxfh(struct net_device *netdev, const u32 *indir,
+@@ -1932,19 +1932,21 @@ static int iavf_set_rxfh(struct net_device *netdev, const u32 *indir,
+ 	struct iavf_adapter *adapter = netdev_priv(netdev);
+ 	u16 i;
+ 
+-	/* We do not allow change in unsupported parameters */
+-	if (key ||
+-	    (hfunc != ETH_RSS_HASH_NO_CHANGE && hfunc != ETH_RSS_HASH_TOP))
++	/* Only support toeplitz hash function */
++	if (hfunc != ETH_RSS_HASH_NO_CHANGE && hfunc != ETH_RSS_HASH_TOP)
+ 		return -EOPNOTSUPP;
+-	if (!indir)
++
++	if (!key && !indir)
+ 		return 0;
+ 
+ 	if (key)
+ 		memcpy(adapter->rss_key, key, adapter->rss_key_size);
+ 
+-	/* Each 32 bits pointed by 'indir' is stored with a lut entry */
+-	for (i = 0; i < adapter->rss_lut_size; i++)
+-		adapter->rss_lut[i] = (u8)(indir[i]);
++	if (indir) {
++		/* Each 32 bits pointed by 'indir' is stored with a lut entry */
++		for (i = 0; i < adapter->rss_lut_size; i++)
++			adapter->rss_lut[i] = (u8)(indir[i]);
++	}
+ 
+ 	return iavf_config_rss(adapter);
+ }
+-- 
+2.34.1
+

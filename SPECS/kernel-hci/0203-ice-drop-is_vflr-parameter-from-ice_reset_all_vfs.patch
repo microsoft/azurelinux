@@ -1,0 +1,101 @@
+From f3e41ff417877209a41122fb51e523b7f8394069 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Tue, 22 Feb 2022 16:27:04 -0800
+Subject: [NET-NEXT 203/254] ice: drop is_vflr parameter from ice_reset_all_vfs
+
+From: Jacob Keller <jacob.e.keller@intel.com>
+
+The ice_reset_all_vfs function takes a parameter to handle whether its
+operating after a VFLR event or not. This is not necessary as every
+caller always passes true. Simplify the interface by removing the
+parameter.
+
+Backported from upstream commit dac57288751c
+
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+Tested-by: Konrad Jankowski <konrad0.jankowski@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_main.c   | 4 ++--
+ drivers/net/ethernet/intel/ice/ice_vf_lib.c | 5 ++---
+ drivers/net/ethernet/intel/ice/ice_vf_lib.h | 4 ++--
+ 3 files changed, 6 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 933da57b49d9..17b4ea1cd550 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -634,7 +634,7 @@ static void ice_do_reset(struct ice_pf *pf, enum ice_reset_req reset_type)
+ 		clear_bit(ICE_PREPARED_FOR_RESET, pf->state);
+ 		clear_bit(ICE_PFR_REQ, pf->state);
+ 		wake_up(&pf->reset_wait_queue);
+-		ice_reset_all_vfs(pf, true);
++		ice_reset_all_vfs(pf);
+ 	}
+ }
+ 
+@@ -685,7 +685,7 @@ static void ice_reset_subtask(struct ice_pf *pf)
+ 			clear_bit(ICE_CORER_REQ, pf->state);
+ 			clear_bit(ICE_GLOBR_REQ, pf->state);
+ 			wake_up(&pf->reset_wait_queue);
+-			ice_reset_all_vfs(pf, true);
++			ice_reset_all_vfs(pf);
+ 		}
+ 
+ 		return;
+diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.c b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
+index 282be49dbfed..996d84a3303d 100644
+--- a/drivers/net/ethernet/intel/ice/ice_vf_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
+@@ -356,7 +356,6 @@ ice_vf_clear_vsi_promisc(struct ice_vf *vf, struct ice_vsi *vsi, u8 promisc_m)
+ /**
+  * ice_reset_all_vfs - reset all allocated VFs in one go
+  * @pf: pointer to the PF structure
+- * @is_vflr: true if VFLR was issued, false if not
+  *
+  * First, tell the hardware to reset each VF, then do all the waiting in one
+  * chunk, and finally finish restoring each VF after the wait. This is useful
+@@ -365,7 +364,7 @@ ice_vf_clear_vsi_promisc(struct ice_vf *vf, struct ice_vsi *vsi, u8 promisc_m)
+  *
+  * Returns true if any VFs were reset, and false otherwise.
+  */
+-bool ice_reset_all_vfs(struct ice_pf *pf, bool is_vflr)
++bool ice_reset_all_vfs(struct ice_pf *pf)
+ {
+ 	struct device *dev = ice_pf_to_dev(pf);
+ 	struct ice_hw *hw = &pf->hw;
+@@ -393,7 +392,7 @@ bool ice_reset_all_vfs(struct ice_pf *pf, bool is_vflr)
+ 
+ 	/* Begin reset on all VFs at once */
+ 	ice_for_each_vf(pf, bkt, vf)
+-		ice_trigger_vf_reset(vf, is_vflr, true);
++		ice_trigger_vf_reset(vf, true, true);
+ 
+ 	/* HW requires some time to make sure it can flush the FIFO for a VF
+ 	 * when it resets it. Now that we've triggered all of the VFs, iterate
+diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.h b/drivers/net/ethernet/intel/ice/ice_vf_lib.h
+index e3f4c3d88d27..69c6eba408f3 100644
+--- a/drivers/net/ethernet/intel/ice/ice_vf_lib.h
++++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.h
+@@ -213,7 +213,7 @@ ice_vf_set_vsi_promisc(struct ice_vf *vf, struct ice_vsi *vsi, u8 promisc_m);
+ int
+ ice_vf_clear_vsi_promisc(struct ice_vf *vf, struct ice_vsi *vsi, u8 promisc_m);
+ bool ice_reset_vf(struct ice_vf *vf, bool is_vflr);
+-bool ice_reset_all_vfs(struct ice_pf *pf, bool is_vflr);
++bool ice_reset_all_vfs(struct ice_pf *pf);
+ #else /* CONFIG_PCI_IOV */
+ static inline struct ice_vf *ice_get_vf_by_id(struct ice_pf *pf, u16 vf_id)
+ {
+@@ -275,7 +275,7 @@ static inline bool ice_reset_vf(struct ice_vf *vf, bool is_vflr)
+ 	return true;
+ }
+ 
+-static inline bool ice_reset_all_vfs(struct ice_pf *pf, bool is_vflr)
++static inline bool ice_reset_all_vfs(struct ice_pf *pf)
+ {
+ 	return true;
+ }
+-- 
+2.34.1
+

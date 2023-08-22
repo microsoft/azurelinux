@@ -1,0 +1,43 @@
+From 57045c71ad23f3d27115b7b75ac5d93a871a85ac Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Thu, 3 Feb 2022 12:45:16 -0500
+Subject: [NET-NEXT 183/254] ice: change "can't set link" message to dbg level
+
+From: Jonathan Toppins <jtoppins@redhat.com>
+
+In the case where the link is owned by manageability, the firmware is
+not allowed to set the link state, so an error code is returned.
+This however is non-fatal and there is nothing the operator can do,
+so instead of confusing the operator with messages they can do nothing
+about hide this message behind the debug log level.
+
+Backported from upstream commit ad24d99ebc446
+
+Signed-off-by: Jonathan Toppins <jtoppins@redhat.com>
+Tested-by: Gurucharan G <gurucharanx.g@intel.com> (A Contingent worker at Intel)
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_lib.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
+index 49392d1c6b26..e8291a351190 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_lib.c
+@@ -3963,9 +3963,9 @@ int ice_set_link(struct ice_vsi *vsi, bool ena)
+ 	 */
+ 	if (status == -EIO) {
+ 		if (hw->adminq.sq_last_status == ICE_AQ_RC_EMODE)
+-			dev_warn(dev, "can't set link to %s, err %d aq_err %s. not fatal, continuing\n",
+-				 (ena ? "ON" : "OFF"), status,
+-				 ice_aq_str(hw->adminq.sq_last_status));
++			dev_dbg(dev, "can't set link to %s, err %d aq_err %s. not fatal, continuing\n",
++				(ena ? "ON" : "OFF"), status,
++				ice_aq_str(hw->adminq.sq_last_status));
+ 	} else if (status) {
+ 		dev_err(dev, "can't set link to %s, err %d aq_err %s\n",
+ 			(ena ? "ON" : "OFF"), status,
+-- 
+2.34.1
+

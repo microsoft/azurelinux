@@ -1,0 +1,39 @@
+From 9bf41f76de2f7f96380c016dcf3e0b26c4830cfa Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Sat, 2 Apr 2022 10:17:15 +0800
+Subject: [NET-NEXT 222/254] ice: Fix memory leak in ice_get_orom_civd_data()
+
+From: Jianglei Nie <niejianglei2021@163.com>
+
+Backported from upstream commit 7c8881b77908
+
+A memory chunk was allocated for orom_data in ice_get_orom_civd_data()
+by vzmalloc(). But when ice_read_flash_module() fails, the allocated
+memory is not freed, which will lead to a memory leak.
+
+We can fix it by freeing the orom_data when ce_read_flash_module() fails.
+
+Fixes: af18d8866c80 ("ice: reduce time to read Option ROM CIVD data")
+Signed-off-by: Jianglei Nie <niejianglei2021@163.com>
+Tested-by: Gurucharan <gurucharanx.g@intel.com> (A Contingent worker at Intel)
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_nvm.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_nvm.c b/drivers/net/ethernet/intel/ice/ice_nvm.c
+index f3fe6829c3df..5517b6585adf 100644
+--- a/drivers/net/ethernet/intel/ice/ice_nvm.c
++++ b/drivers/net/ethernet/intel/ice/ice_nvm.c
+@@ -639,6 +639,7 @@ ice_get_orom_civd_data(struct ice_hw *hw, enum ice_bank_select bank,
+ 	status = ice_read_flash_module(hw, bank, ICE_SR_1ST_OROM_BANK_PTR, 0,
+ 				       orom_data, hw->flash.banks.orom_size);
+ 	if (status) {
++		vfree(orom_data);
+ 		ice_debug(hw, ICE_DBG_NVM, "Unable to read Option ROM data\n");
+ 		return status;
+ 	}
+-- 
+2.34.1
+

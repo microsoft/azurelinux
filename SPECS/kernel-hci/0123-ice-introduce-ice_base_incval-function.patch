@@ -1,0 +1,82 @@
+From 456aa9e32d8c98e733bfc6173c37d639f0c001bc Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Wed, 13 Oct 2021 08:47:20 -0700
+Subject: [NET-NEXT 123/254] ice: introduce ice_base_incval function
+
+From: Jacob Keller <jacob.e.keller@intel.com>
+
+A future change will add additional possible increment values for the
+E822 device support. To handle this, we want to look up the increment
+value to use instead of hard coding it to the nominal value for E810
+devices. Introduce ice_base_incval as a function to get the best nominal
+increment value to use.
+
+For now, it just returns the E810 value, but will be refactored in the
+future to look up the value based on the device type and configured
+clock frequency.
+
+Backported from upstream commit 78267d0c9cab
+
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+Tested-by: Gurucharan G <gurucharanx.g@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_ptp.c | 20 +++++++++++++++++---
+ 1 file changed, 17 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
+index ee0479673abe..d8aa13565f46 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp.c
++++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
+@@ -691,6 +691,20 @@ static int ice_ptp_write_adj(struct ice_pf *pf, s32 adj)
+ 	return ice_ptp_adj_clock(hw, adj);
+ }
+ 
++/**
++ * ice_base_incval - Get base timer increment value
++ * @pf: Board private structure
++ *
++ * Look up the base timer increment value for this device. The base increment
++ * value is used to define the nominal clock tick rate. This increment value
++ * is programmed during device initialization. It is also used as the basis
++ * for calculating adjustments using scaled_ppm.
++ */
++static u64 ice_base_incval(struct ice_pf *pf)
++{
++	return ICE_PTP_NOMINAL_INCVAL_E810;
++}
++
+ /**
+  * ice_ptp_adjfine - Adjust clock increment rate
+  * @info: the driver's PTP info structure
+@@ -708,7 +722,7 @@ static int ice_ptp_adjfine(struct ptp_clock_info *info, long scaled_ppm)
+ 	int neg_adj = 0;
+ 	int err;
+ 
+-	incval = ICE_PTP_NOMINAL_INCVAL_E810;
++	incval = ice_base_incval(pf);
+ 
+ 	if (scaled_ppm < 0) {
+ 		neg_adj = 1;
+@@ -1838,7 +1852,7 @@ void ice_ptp_reset(struct ice_pf *pf)
+ 	}
+ 
+ 	/* Write the increment time value to PHY and LAN */
+-	err = ice_ptp_write_incval(hw, ICE_PTP_NOMINAL_INCVAL_E810);
++	err = ice_ptp_write_incval(hw, ice_base_incval(pf));
+ 	if (err) {
+ 		ice_ptp_unlock(hw);
+ 		goto err;
+@@ -1954,7 +1968,7 @@ static int ice_ptp_init_owner(struct ice_pf *pf)
+ 	}
+ 
+ 	/* Write the increment time value to PHY and LAN */
+-	err = ice_ptp_write_incval(hw, ICE_PTP_NOMINAL_INCVAL_E810);
++	err = ice_ptp_write_incval(hw, ice_base_incval(pf));
+ 	if (err) {
+ 		ice_ptp_unlock(hw);
+ 		goto err_exit;
+-- 
+2.34.1
+

@@ -1,0 +1,111 @@
+From 1169962d9292ce7ecc7326c50fd7f972a9a051b9 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Thu, 21 Jul 2022 10:03:09 +0200
+Subject: [NET-NEXT 257/273] ice: Fix VSIs unable to share unicast MAC
+
+From: Anirudh Venkataramanan <anirudh.venkataramanan@intel.com>
+
+commit 5c8e3c7ff3e7bd7b938659be704f75cc746b697f upstream.
+
+The driver currently does not allow two VSIs in the same PF domain
+to have the same unicast MAC address. This is incorrect in the sense
+that a policy decision is being made in the driver when it must be
+left to the user. This approach was causing issues when rebooting
+the system with VFs spawned not being able to change their MAC addresses.
+Such errors were present in dmesg:
+
+[ 7921.068237] ice 0000:b6:00.2 ens2f2: Unicast MAC 6a:0d:e4:70:ca:d1 already
+exists on this PF. Preventing setting VF 7 unicast MAC address to 6a:0d:e4:70:ca:d1
+
+Fix that by removing this restriction. Doing this also allows
+us to remove some additional code that's checking if a unicast MAC
+filter already exists.
+
+Fixes: 47ebc7b02485 ("ice: Check if unicast MAC exists before setting VF MAC")
+Signed-off-by: Anirudh Venkataramanan <anirudh.venkataramanan@intel.com>
+Signed-off-by: Sylwester Dziedziuch <sylwesterx.dziedziuch@intel.com>
+Signed-off-by: Mateusz Palczewski <mateusz.palczewski@intel.com>
+Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+Tested-by: Marek Szlosek <marek.szlosek@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_main.c  |  2 ++
+ drivers/net/ethernet/intel/ice/ice_sriov.c | 40 ----------------------
+ 2 files changed, 2 insertions(+), 40 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index af1aba372d86..dab4d8e4bd7e 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -4644,6 +4644,8 @@ ice_probe(struct pci_dev *pdev, const struct pci_device_id __always_unused *ent)
+ 		ice_set_safe_mode_caps(hw);
+ 	}
+ 
++	hw->ucast_shared = true;
++
+ 	err = ice_init_pf(pf);
+ 	if (err) {
+ 		dev_err(dev, "ice_init_pf failed: %d\n", err);
+diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.c b/drivers/net/ethernet/intel/ice/ice_sriov.c
+index e9bfcdf3c1c4..0c8e0689fc18 100644
+--- a/drivers/net/ethernet/intel/ice/ice_sriov.c
++++ b/drivers/net/ethernet/intel/ice/ice_sriov.c
+@@ -1291,39 +1291,6 @@ ice_get_vf_cfg(struct net_device *netdev, int vf_id, struct ifla_vf_info *ivi)
+ 	return ret;
+ }
+ 
+-/**
+- * ice_unicast_mac_exists - check if the unicast MAC exists on the PF's switch
+- * @pf: PF used to reference the switch's rules
+- * @umac: unicast MAC to compare against existing switch rules
+- *
+- * Return true on the first/any match, else return false
+- */
+-static bool ice_unicast_mac_exists(struct ice_pf *pf, u8 *umac)
+-{
+-	struct ice_sw_recipe *mac_recipe_list =
+-		&pf->hw.switch_info->recp_list[ICE_SW_LKUP_MAC];
+-	struct ice_fltr_mgmt_list_entry *list_itr;
+-	struct list_head *rule_head;
+-	struct mutex *rule_lock; /* protect MAC filter list access */
+-
+-	rule_head = &mac_recipe_list->filt_rules;
+-	rule_lock = &mac_recipe_list->filt_rule_lock;
+-
+-	mutex_lock(rule_lock);
+-	list_for_each_entry(list_itr, rule_head, list_entry) {
+-		u8 *existing_mac = &list_itr->fltr_info.l_data.mac.mac_addr[0];
+-
+-		if (ether_addr_equal(existing_mac, umac)) {
+-			mutex_unlock(rule_lock);
+-			return true;
+-		}
+-	}
+-
+-	mutex_unlock(rule_lock);
+-
+-	return false;
+-}
+-
+ /**
+  * ice_set_vf_mac
+  * @netdev: network interface device structure
+@@ -1358,13 +1325,6 @@ int ice_set_vf_mac(struct net_device *netdev, int vf_id, u8 *mac)
+ 	if (ret)
+ 		goto out_put_vf;
+ 
+-	if (ice_unicast_mac_exists(pf, mac)) {
+-		netdev_err(netdev, "Unicast MAC %pM already exists on this PF. Preventing setting VF %u unicast MAC address to %pM\n",
+-			   mac, vf_id, mac);
+-		ret = -EINVAL;
+-		goto out_put_vf;
+-	}
+-
+ 	mutex_lock(&vf->cfg_lock);
+ 
+ 	/* VF is notified of its new MAC via the PF's response to the
+-- 
+2.34.1
+

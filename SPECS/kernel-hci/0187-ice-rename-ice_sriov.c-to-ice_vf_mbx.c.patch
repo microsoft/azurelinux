@@ -1,0 +1,105 @@
+From f647c47ff83f2e98e28c19d089ef62eccfcdbe53 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Tue, 22 Feb 2022 16:26:48 -0800
+Subject: [NET-NEXT 187/254] ice: rename ice_sriov.c to ice_vf_mbx.c
+
+From: Jacob Keller <jacob.e.keller@intel.com>
+
+The ice_sriov.c file primarily contains code which handles the logic for
+mailbox overflow detection and some other utility functions related to
+the virtualization mailbox.
+
+The bulk of the SR-IOV implementation is actually found in
+ice_virtchnl_pf.c, and this file isn't strictly SR-IOV specific.
+
+In the future, the ice driver will support an additional virtualization
+scheme known as Scalable IOV, and the code in this file will be used
+for this alternative implementation.
+
+Rename this file (and its associated header) to ice_vf_mbx.c, so that we
+can later re-use the ice_sriov.c file as the SR-IOV specific file.
+
+Backported from upstream commit d775155a8661
+
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+Tested-by: Konrad Jankowski <konrad0.jankowski@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/Makefile                     | 2 +-
+ drivers/net/ethernet/intel/ice/ice.h                        | 2 +-
+ .../net/ethernet/intel/ice/{ice_sriov.c => ice_vf_mbx.c}    | 2 +-
+ .../net/ethernet/intel/ice/{ice_sriov.h => ice_vf_mbx.h}    | 6 +++---
+ 4 files changed, 6 insertions(+), 6 deletions(-)
+ rename drivers/net/ethernet/intel/ice/{ice_sriov.c => ice_vf_mbx.c} (99%)
+ rename drivers/net/ethernet/intel/ice/{ice_sriov.h => ice_vf_mbx.h} (95%)
+
+diff --git a/drivers/net/ethernet/intel/ice/Makefile b/drivers/net/ethernet/intel/ice/Makefile
+index 44b8464b7663..451098e25023 100644
+--- a/drivers/net/ethernet/intel/ice/Makefile
++++ b/drivers/net/ethernet/intel/ice/Makefile
+@@ -36,7 +36,7 @@ ice-y := ice_main.o	\
+ ice-$(CONFIG_PCI_IOV) +=	\
+ 	ice_virtchnl_allowlist.o \
+ 	ice_virtchnl_fdir.o	\
+-	ice_sriov.o		\
++	ice_vf_mbx.o		\
+ 	ice_vf_vsi_vlan_ops.o	\
+ 	ice_virtchnl_pf.o
+ ice-$(CONFIG_PTP_1588_CLOCK) += ice_ptp.o ice_ptp_hw.o
+diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
+index 3150047fa95b..7eadc185a882 100644
+--- a/drivers/net/ethernet/intel/ice/ice.h
++++ b/drivers/net/ethernet/intel/ice/ice.h
+@@ -64,7 +64,7 @@
+ #include "ice_sched.h"
+ #include "ice_idc_int.h"
+ #include "ice_virtchnl_pf.h"
+-#include "ice_sriov.h"
++#include "ice_vf_mbx.h"
+ #include "ice_ptp.h"
+ #include "ice_fdir.h"
+ #include "ice_xsk.h"
+diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.c b/drivers/net/ethernet/intel/ice/ice_vf_mbx.c
+similarity index 99%
+rename from drivers/net/ethernet/intel/ice/ice_sriov.c
+rename to drivers/net/ethernet/intel/ice/ice_vf_mbx.c
+index 52c6bac41bf7..fc8c93fa4455 100644
+--- a/drivers/net/ethernet/intel/ice/ice_sriov.c
++++ b/drivers/net/ethernet/intel/ice/ice_vf_mbx.c
+@@ -2,7 +2,7 @@
+ /* Copyright (c) 2018, Intel Corporation. */
+ 
+ #include "ice_common.h"
+-#include "ice_sriov.h"
++#include "ice_vf_mbx.h"
+ 
+ /**
+  * ice_aq_send_msg_to_vf
+diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.h b/drivers/net/ethernet/intel/ice/ice_vf_mbx.h
+similarity index 95%
+rename from drivers/net/ethernet/intel/ice/ice_sriov.h
+rename to drivers/net/ethernet/intel/ice/ice_vf_mbx.h
+index 68686a3fd7e8..582716e6d5f9 100644
+--- a/drivers/net/ethernet/intel/ice/ice_sriov.h
++++ b/drivers/net/ethernet/intel/ice/ice_vf_mbx.h
+@@ -1,8 +1,8 @@
+ /* SPDX-License-Identifier: GPL-2.0 */
+ /* Copyright (c) 2018, Intel Corporation. */
+ 
+-#ifndef _ICE_SRIOV_H_
+-#define _ICE_SRIOV_H_
++#ifndef _ICE_VF_MBX_H_
++#define _ICE_VF_MBX_H_
+ 
+ #include "ice_type.h"
+ #include "ice_controlq.h"
+@@ -49,4 +49,4 @@ ice_conv_link_speed_to_virtchnl(bool __always_unused adv_link_support,
+ }
+ 
+ #endif /* CONFIG_PCI_IOV */
+-#endif /* _ICE_SRIOV_H_ */
++#endif /* _ICE_VF_MBX_H_ */
+-- 
+2.34.1
+

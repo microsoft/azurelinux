@@ -1,0 +1,91 @@
+From e258fe970480ca08952d2b1c80c3aa35e77c6e6b Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Tue, 7 Jun 2022 08:54:57 +0200
+Subject: [NET-NEXT 267/273] ice: Sync VLAN filtering features for DVM
+
+From: Roman Storozhenko <roman.storozhenko@intel.com>
+
+[ Upstream commit 9542ef4fba8c73e176b8aa18a8adf04aecb889e5 ]
+
+VLAN filtering features, that is C-Tag and S-Tag, in DVM mode must be
+both enabled or disabled.
+In case of turning off/on only one of the features, another feature must
+be turned off/on automatically with issuing an appropriate message to
+the kernel log.
+
+Fixes: 1babaf77f49d ("ice: Advertise 802.1ad VLAN filtering and offloads for PF netdev")
+Signed-off-by: Roman Storozhenko <roman.storozhenko@intel.com>
+Co-developed-by: Anatolii Gerasymenko <anatolii.gerasymenko@intel.com>
+Signed-off-by: Anatolii Gerasymenko <anatolii.gerasymenko@intel.com>
+Tested-by: Gurucharan <gurucharanx.g@intel.com> (A Contingent worker at Intel)
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_main.c | 49 ++++++++++++++---------
+ 1 file changed, 31 insertions(+), 18 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index d9c6cd731548..9c0a5549c164 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -5753,25 +5753,38 @@ static netdev_features_t
+ ice_fix_features(struct net_device *netdev, netdev_features_t features)
+ {
+ 	struct ice_netdev_priv *np = netdev_priv(netdev);
+-	netdev_features_t supported_vlan_filtering;
+-	netdev_features_t requested_vlan_filtering;
+-	struct ice_vsi *vsi = np->vsi;
+-
+-	requested_vlan_filtering = features & NETIF_VLAN_FILTERING_FEATURES;
+-
+-	/* make sure supported_vlan_filtering works for both SVM and DVM */
+-	supported_vlan_filtering = NETIF_F_HW_VLAN_CTAG_FILTER;
+-	if (ice_is_dvm_ena(&vsi->back->hw))
+-		supported_vlan_filtering |= NETIF_F_HW_VLAN_STAG_FILTER;
+-
+-	if (requested_vlan_filtering &&
+-	    requested_vlan_filtering != supported_vlan_filtering) {
+-		if (requested_vlan_filtering & NETIF_F_HW_VLAN_CTAG_FILTER) {
+-			netdev_warn(netdev, "cannot support requested VLAN filtering settings, enabling all supported VLAN filtering settings\n");
+-			features |= supported_vlan_filtering;
++	netdev_features_t req_vlan_fltr, cur_vlan_fltr;
++	bool cur_ctag, cur_stag, req_ctag, req_stag;
++
++	cur_vlan_fltr = netdev->features & NETIF_VLAN_FILTERING_FEATURES;
++	cur_ctag = cur_vlan_fltr & NETIF_F_HW_VLAN_CTAG_FILTER;
++	cur_stag = cur_vlan_fltr & NETIF_F_HW_VLAN_STAG_FILTER;
++
++	req_vlan_fltr = features & NETIF_VLAN_FILTERING_FEATURES;
++	req_ctag = req_vlan_fltr & NETIF_F_HW_VLAN_CTAG_FILTER;
++	req_stag = req_vlan_fltr & NETIF_F_HW_VLAN_STAG_FILTER;
++
++	if (req_vlan_fltr != cur_vlan_fltr) {
++		if (ice_is_dvm_ena(&np->vsi->back->hw)) {
++			if (req_ctag && req_stag) {
++				features |= NETIF_VLAN_FILTERING_FEATURES;
++			} else if (!req_ctag && !req_stag) {
++				features &= ~NETIF_VLAN_FILTERING_FEATURES;
++			} else if ((!cur_ctag && req_ctag && !cur_stag) ||
++				   (!cur_stag && req_stag && !cur_ctag)) {
++				features |= NETIF_VLAN_FILTERING_FEATURES;
++				netdev_warn(netdev,  "802.1Q and 802.1ad VLAN filtering must be either both on or both off. VLAN filtering has been enabled for both types.\n");
++			} else if ((cur_ctag && !req_ctag && cur_stag) ||
++				   (cur_stag && !req_stag && cur_ctag)) {
++				features &= ~NETIF_VLAN_FILTERING_FEATURES;
++				netdev_warn(netdev,  "802.1Q and 802.1ad VLAN filtering must be either both on or both off. VLAN filtering has been disabled for both types.\n");
++			}
+ 		} else {
+-			netdev_warn(netdev, "cannot support requested VLAN filtering settings, clearing all supported VLAN filtering settings\n");
+-			features &= ~supported_vlan_filtering;
++			if (req_vlan_fltr & NETIF_F_HW_VLAN_STAG_FILTER)
++				netdev_warn(netdev, "cannot support requested 802.1ad filtering setting in SVM mode\n");
++
++			if (req_vlan_fltr & NETIF_F_HW_VLAN_CTAG_FILTER)
++				features |= NETIF_F_HW_VLAN_CTAG_FILTER;
+ 		}
+ 	}
+ 
+-- 
+2.34.1
+

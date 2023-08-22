@@ -1,0 +1,77 @@
+From b7bd797f57954e77e4784225bd6078b326fb1b5f Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Mon, 18 Oct 2021 18:16:01 -0500
+Subject: [NET-NEXT 099/254] devlink: Add 'enable_iwarp' generic device param
+
+From: Shiraz Saleem <shiraz.saleem@intel.com>
+
+Add a new device generic parameter to enable and disable
+iWARP functionality on a multi-protocol RDMA device.
+
+Backported from upstream commit 325e0d0aa683
+
+Signed-off-by: Shiraz Saleem <shiraz.saleem@intel.com>
+Tested-by: Leszek Kaliszczuk <leszek.kaliszczuk@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ Documentation/networking/devlink/devlink-params.rst | 3 +++
+ include/net/devlink.h                               | 4 ++++
+ net/core/devlink.c                                  | 5 +++++
+ 3 files changed, 12 insertions(+)
+
+diff --git a/Documentation/networking/devlink/devlink-params.rst b/Documentation/networking/devlink/devlink-params.rst
+index 4878907e9232..b7dfe693a332 100644
+--- a/Documentation/networking/devlink/devlink-params.rst
++++ b/Documentation/networking/devlink/devlink-params.rst
+@@ -109,6 +109,9 @@ own name.
+      - Boolean
+      - When enabled, the device driver will instantiate VDPA networking
+        specific auxiliary device of the devlink device.
++   * - ``enable_iwarp``
++     - Boolean
++     - Enable handling of iWARP traffic in the device.
+    * - ``internal_err_reset``
+      - Boolean
+      - When enabled, the device driver will reset the device on internal
+diff --git a/include/net/devlink.h b/include/net/devlink.h
+index 154cf0dbca37..ac8b6d96e9bd 100644
+--- a/include/net/devlink.h
++++ b/include/net/devlink.h
+@@ -524,6 +524,7 @@ enum devlink_param_generic_id {
+ 	DEVLINK_PARAM_GENERIC_ID_ENABLE_ETH,
+ 	DEVLINK_PARAM_GENERIC_ID_ENABLE_RDMA,
+ 	DEVLINK_PARAM_GENERIC_ID_ENABLE_VNET,
++	DEVLINK_PARAM_GENERIC_ID_ENABLE_IWARP,
+ 
+ 	/* add new param generic ids above here*/
+ 	__DEVLINK_PARAM_GENERIC_ID_MAX,
+@@ -573,6 +574,9 @@ enum devlink_param_generic_id {
+ #define DEVLINK_PARAM_GENERIC_ENABLE_VNET_NAME "enable_vnet"
+ #define DEVLINK_PARAM_GENERIC_ENABLE_VNET_TYPE DEVLINK_PARAM_TYPE_BOOL
+ 
++#define DEVLINK_PARAM_GENERIC_ENABLE_IWARP_NAME "enable_iwarp"
++#define DEVLINK_PARAM_GENERIC_ENABLE_IWARP_TYPE DEVLINK_PARAM_TYPE_BOOL
++
+ #define DEVLINK_PARAM_GENERIC(_id, _cmodes, _get, _set, _validate)	\
+ {									\
+ 	.id = DEVLINK_PARAM_GENERIC_ID_##_id,				\
+diff --git a/net/core/devlink.c b/net/core/devlink.c
+index b4d7a7f749c1..06eb25304959 100644
+--- a/net/core/devlink.c
++++ b/net/core/devlink.c
+@@ -4350,6 +4350,11 @@ static const struct devlink_param devlink_param_generic[] = {
+ 		.name = DEVLINK_PARAM_GENERIC_ENABLE_VNET_NAME,
+ 		.type = DEVLINK_PARAM_GENERIC_ENABLE_VNET_TYPE,
+ 	},
++	{
++		.id = DEVLINK_PARAM_GENERIC_ID_ENABLE_IWARP,
++		.name = DEVLINK_PARAM_GENERIC_ENABLE_IWARP_NAME,
++		.type = DEVLINK_PARAM_GENERIC_ENABLE_IWARP_TYPE,
++	},
+ };
+ 
+ static int devlink_param_generic_verify(const struct devlink_param *param)
+-- 
+2.34.1
+

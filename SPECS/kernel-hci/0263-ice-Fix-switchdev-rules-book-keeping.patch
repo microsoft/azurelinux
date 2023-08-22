@@ -1,0 +1,41 @@
+From 345ba72db0a1a6bfa3f738ae0eec6d45461514f9 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Mon, 23 May 2022 11:41:55 +0200
+Subject: [NET-NEXT 263/273] ice: Fix switchdev rules book keeping
+
+From: Wojciech Drewek <wojciech.drewek@intel.com>
+
+[ Upstream commit 3578dc90013b1fa20da996cdadd8515802716132 ]
+
+Adding two filters with same matching criteria ends up with
+one rule in hardware with act = ICE_FWD_TO_VSI_LIST.
+In order to remove them properly we have to keep the
+information about vsi handle which is used in VSI bitmap
+(ice_adv_fltr_mgmt_list_entry::vsi_list_info::vsi_map).
+
+Fixes: 0d08a441fb1a ("ice: ndo_setup_tc implementation for PF")
+Reported-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
+Signed-off-by: Wojciech Drewek <wojciech.drewek@intel.com>
+Tested-by: Sandeep Penigalapati <sandeep.penigalapati@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_tc_lib.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_tc_lib.c b/drivers/net/ethernet/intel/ice/ice_tc_lib.c
+index 9202cb7f096a..dc040eca5f82 100644
+--- a/drivers/net/ethernet/intel/ice/ice_tc_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_tc_lib.c
+@@ -481,6 +481,7 @@ ice_eswitch_add_tc_fltr(struct ice_vsi *vsi, struct ice_tc_flower_fltr *fltr)
+ 	 */
+ 	fltr->rid = rule_added.rid;
+ 	fltr->rule_id = rule_added.rule_id;
++	fltr->dest_id = rule_added.vsi_handle;
+ 
+ exit:
+ 	kfree(list);
+-- 
+2.34.1
+

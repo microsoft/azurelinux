@@ -1,0 +1,50 @@
+From be72781072505f3cd2abd7118e9861ba3db8af59 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Sun, 5 Sep 2021 08:50:20 +0200
+Subject: [NET-NEXT 034/254] ice: Prefer kcalloc over open coded arithmetic
+
+From: Len Baker <len.baker@gmx.com>
+
+As noted in the "Deprecated Interfaces, Language Features, Attributes,
+and Conventions" documentation [1], size calculations (especially
+multiplication) should not be performed in memory allocator (or similar)
+function arguments due to the risk of them overflowing. This could lead
+to values wrapping around and a smaller allocation being made than the
+caller was expecting. Using those allocations could lead to linear
+overflows of heap memory and other misbehaviors.
+
+In this case this is not actually dynamic sizes: both sides of the
+multiplication are constant values. However it is best to refactor this
+anyway, just to keep the open-coded math idiom out of code.
+
+So, use the purpose specific kcalloc() function instead of the argument
+size * count in the kzalloc() function.
+
+[1] https://www.kernel.org/doc/html/v5.14/process/deprecated.html#open-coded-arithmetic-in-allocator-arguments
+
+Backported from upstream commit 30cba287eb21
+
+Signed-off-by: Len Baker <len.baker@gmx.com>
+Reviewed-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_arfs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_arfs.c b/drivers/net/ethernet/intel/ice/ice_arfs.c
+index 88d98c9e5f91..3071b8e79499 100644
+--- a/drivers/net/ethernet/intel/ice/ice_arfs.c
++++ b/drivers/net/ethernet/intel/ice/ice_arfs.c
+@@ -513,7 +513,7 @@ void ice_init_arfs(struct ice_vsi *vsi)
+ 	if (!vsi || vsi->type != ICE_VSI_PF)
+ 		return;
+ 
+-	arfs_fltr_list = kzalloc(sizeof(*arfs_fltr_list) * ICE_MAX_ARFS_LIST,
++	arfs_fltr_list = kcalloc(ICE_MAX_ARFS_LIST, sizeof(*arfs_fltr_list),
+ 				 GFP_KERNEL);
+ 	if (!arfs_fltr_list)
+ 		return;
+-- 
+2.34.1
+

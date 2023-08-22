@@ -1,0 +1,50 @@
+From 2565aded40ebcd2c37a4c4b5229ae8c2911d247d Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Sun, 9 Jan 2022 19:24:08 +0100
+Subject: [NET-NEXT 243/254] iavf: Remove useless DMA-32 fallback configuration
+
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+
+As stated in [1], dma_set_mask() with a 64-bit mask never fails if
+dev->dma_mask is non-NULL.
+So, if it fails, the 32 bits case will also fail for the same reason.
+
+Simplify code and remove some dead code accordingly.
+
+[1]: https://lkml.org/lkml/2021/6/7/398
+
+Backported from upstream commit 9498d4affd61
+
+Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Alexander Lobakin <alexandr.lobakin@intel.com>
+Tested-by: Konrad Jankowski <konrad0.jankowski@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/iavf/iavf_main.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
+index 76fcdc2be2f7..04b5868c089b 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_main.c
++++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
+@@ -4590,12 +4590,9 @@ static int iavf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 
+ 	err = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
+ 	if (err) {
+-		err = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32));
+-		if (err) {
+-			dev_err(&pdev->dev,
+-				"DMA configuration failed: 0x%x\n", err);
+-			goto err_dma;
+-		}
++		dev_err(&pdev->dev,
++			"DMA configuration failed: 0x%x\n", err);
++		goto err_dma;
+ 	}
+ 
+ 	err = pci_request_regions(pdev, iavf_driver_name);
+-- 
+2.34.1
+

@@ -1,0 +1,98 @@
+From 90bda583f9b6afdffe66dbe632f648da3b712a2b Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Tue, 19 Apr 2022 16:22:21 +0200
+Subject: [NET-NEXT 224/254] ice: Protect vf_state check by cfg_lock in
+ ice_vc_process_vf_msg()
+
+From: Ivan Vecera <ivecera@redhat.com>
+
+Backported from upstream commit 77d64d285be5
+
+Previous patch labelled "ice: Fix incorrect locking in
+ice_vc_process_vf_msg()"  fixed an issue with ignored messages
+sent by VF driver but a small race window still left.
+
+Recently caught trace during 'ip link set ... vf 0 vlan ...' operation:
+
+[ 7332.995625] ice 0000:3b:00.0: Clearing port VLAN on VF 0
+[ 7333.001023] iavf 0000:3b:01.0: Reset indication received from the PF
+[ 7333.007391] iavf 0000:3b:01.0: Scheduling reset task
+[ 7333.059575] iavf 0000:3b:01.0: PF returned error -5 (IAVF_ERR_PARAM) to our request 3
+[ 7333.059626] ice 0000:3b:00.0: Invalid message from VF 0, opcode 3, len 4, error -1
+
+Setting of VLAN for VF causes a reset of the affected VF using
+ice_reset_vf() function that runs with cfg_lock taken:
+
+1. ice_notify_vf_reset() informs IAVF driver that reset is needed and
+   IAVF schedules its own reset procedure
+2. Bit ICE_VF_STATE_DIS is set in vf->vf_state
+3. Misc initialization steps
+4. ice_sriov_post_vsi_rebuild() -> ice_vf_set_initialized() and that
+   clears ICE_VF_STATE_DIS in vf->vf_state
+
+Step 3 is mentioned race window because IAVF reset procedure runs in
+parallel and one of its step is sending of VIRTCHNL_OP_GET_VF_RESOURCES
+message (opcode==3). This message is handled in ice_vc_process_vf_msg()
+and if it is received during the mentioned race window then it's
+marked as invalid and error is returned to VF driver.
+
+Protect vf_state check in ice_vc_process_vf_msg() by cfg_lock to avoid
+this race condition.
+
+Fixes: e6ba5273d4ed ("ice: Fix race conditions between virtchnl handling and VF ndo ops")
+Tested-by: Fei Liu <feliu@redhat.com>
+Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+Tested-by: Konrad Jankowski <konrad0.jankowski@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl.c b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
+index 5612c032f15a..b72606c9e6d0 100644
+--- a/drivers/net/ethernet/intel/ice/ice_virtchnl.c
++++ b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
+@@ -3625,6 +3625,8 @@ void ice_vc_process_vf_msg(struct ice_pf *pf, struct ice_rq_event_info *event)
+ 		return;
+ 	}
+ 
++	mutex_lock(&vf->cfg_lock);
++
+ 	/* Check if VF is disabled. */
+ 	if (test_bit(ICE_VF_STATE_DIS, vf->vf_states)) {
+ 		err = -EPERM;
+@@ -3648,19 +3650,14 @@ void ice_vc_process_vf_msg(struct ice_pf *pf, struct ice_rq_event_info *event)
+ 				      NULL, 0);
+ 		dev_err(dev, "Invalid message from VF %d, opcode %d, len %d, error %d\n",
+ 			vf_id, v_opcode, msglen, err);
+-		ice_put_vf(vf);
+-		return;
++		goto finish;
+ 	}
+ 
+-	mutex_lock(&vf->cfg_lock);
+-
+ 	if (!ice_vc_is_opcode_allowed(vf, v_opcode)) {
+ 		ice_vc_send_msg_to_vf(vf, v_opcode,
+ 				      VIRTCHNL_STATUS_ERR_NOT_SUPPORTED, NULL,
+ 				      0);
+-		mutex_unlock(&vf->cfg_lock);
+-		ice_put_vf(vf);
+-		return;
++		goto finish;
+ 	}
+ 
+ 	switch (v_opcode) {
+@@ -3773,6 +3770,7 @@ void ice_vc_process_vf_msg(struct ice_pf *pf, struct ice_rq_event_info *event)
+ 			 vf_id, v_opcode, err);
+ 	}
+ 
++finish:
+ 	mutex_unlock(&vf->cfg_lock);
+ 	ice_put_vf(vf);
+ }
+-- 
+2.34.1
+

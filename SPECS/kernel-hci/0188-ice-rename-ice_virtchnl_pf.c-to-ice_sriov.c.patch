@@ -1,0 +1,162 @@
+From 833fd2d5577bb0ff6db00ed86bcf80ebd7a4dd4d Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Tue, 22 Feb 2022 16:26:49 -0800
+Subject: [NET-NEXT 188/254] ice: rename ice_virtchnl_pf.c to ice_sriov.c
+
+From: Jacob Keller <jacob.e.keller@intel.com>
+
+The ice_virtchnl_pf.c and ice_virtchnl_pf.h files are where most of the
+code for implementing Single Root IOV virtualization resides. This code
+includes support for bringing up and tearing down VFs, hooks into the
+kernel SR-IOV netdev operations, and for handling virtchnl messages from
+VFs.
+
+In the future, we plan to support Scalable IOV in addition to Single
+Root IOV as an alternative virtualization scheme. This implementation
+will re-use some but not all of the code in ice_virtchnl_pf.c
+
+To prepare for this future, we want to refactor and split up the code in
+ice_virtchnl_pf.c into the following scheme:
+
+ * ice_vf_lib.[ch]
+
+   Basic VF structures and accessors. This is where scheme-independent
+   code will reside.
+
+ * ice_virtchnl.[ch]
+
+   Virtchnl message handling. This is where the bulk of the logic for
+   processing messages from VFs using the virtchnl messaging scheme will
+   reside. This is separated from ice_vf_lib.c because it is distinct
+   and has a bulk of the processing code.
+
+ * ice_sriov.[ch]
+
+   Single Root IOV implementation, including initialization and the
+   routines for interacting with SR-IOV based netdev operations.
+
+ * (future) ice_siov.[ch]
+
+   Scalable IOV implementation.
+
+As a first step, lets assume that all of the code in
+ice_virtchnl_pf.[ch] is for Single Root IOV. Rename this file to
+ice_sriov.c and its header to ice_sriov.h
+
+Future changes will further split out the code in these files following
+the plan outlined here.
+
+Backported from upstream commit 0deb0bf70c3f
+
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+Tested-by: Konrad Jankowski <konrad0.jankowski@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/Makefile                     | 2 +-
+ drivers/net/ethernet/intel/ice/ice.h                        | 2 +-
+ drivers/net/ethernet/intel/ice/ice_base.c                   | 2 +-
+ drivers/net/ethernet/intel/ice/ice_repr.c                   | 2 +-
+ .../ethernet/intel/ice/{ice_virtchnl_pf.c => ice_sriov.c}   | 0
+ .../ethernet/intel/ice/{ice_virtchnl_pf.h => ice_sriov.h}   | 6 +++---
+ drivers/net/ethernet/intel/ice/ice_vf_vsi_vlan_ops.c        | 2 +-
+ 7 files changed, 8 insertions(+), 8 deletions(-)
+ rename drivers/net/ethernet/intel/ice/{ice_virtchnl_pf.c => ice_sriov.c} (100%)
+ rename drivers/net/ethernet/intel/ice/{ice_virtchnl_pf.h => ice_sriov.h} (99%)
+
+diff --git a/drivers/net/ethernet/intel/ice/Makefile b/drivers/net/ethernet/intel/ice/Makefile
+index 451098e25023..816e81832b7f 100644
+--- a/drivers/net/ethernet/intel/ice/Makefile
++++ b/drivers/net/ethernet/intel/ice/Makefile
+@@ -38,7 +38,7 @@ ice-$(CONFIG_PCI_IOV) +=	\
+ 	ice_virtchnl_fdir.o	\
+ 	ice_vf_mbx.o		\
+ 	ice_vf_vsi_vlan_ops.o	\
+-	ice_virtchnl_pf.o
++	ice_sriov.o
+ ice-$(CONFIG_PTP_1588_CLOCK) += ice_ptp.o ice_ptp_hw.o
+ ice-$(CONFIG_TTY) += ice_gnss.o
+ ice-$(CONFIG_DCB) += ice_dcb.o ice_dcb_nl.o ice_dcb_lib.o
+diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
+index 7eadc185a882..75139ab64e0b 100644
+--- a/drivers/net/ethernet/intel/ice/ice.h
++++ b/drivers/net/ethernet/intel/ice/ice.h
+@@ -63,7 +63,7 @@
+ #include "ice_flow.h"
+ #include "ice_sched.h"
+ #include "ice_idc_int.h"
+-#include "ice_virtchnl_pf.h"
++#include "ice_sriov.h"
+ #include "ice_vf_mbx.h"
+ #include "ice_ptp.h"
+ #include "ice_fdir.h"
+diff --git a/drivers/net/ethernet/intel/ice/ice_base.c b/drivers/net/ethernet/intel/ice/ice_base.c
+index 92c65825ca2c..1e3243808178 100644
+--- a/drivers/net/ethernet/intel/ice/ice_base.c
++++ b/drivers/net/ethernet/intel/ice/ice_base.c
+@@ -5,7 +5,7 @@
+ #include "ice_base.h"
+ #include "ice_lib.h"
+ #include "ice_dcb_lib.h"
+-#include "ice_virtchnl_pf.h"
++#include "ice_sriov.h"
+ 
+ /**
+  * __ice_vsi_get_qs_contig - Assign a contiguous chunk of queues to VSI
+diff --git a/drivers/net/ethernet/intel/ice/ice_repr.c b/drivers/net/ethernet/intel/ice/ice_repr.c
+index f8db3ca521da..e0be27657569 100644
+--- a/drivers/net/ethernet/intel/ice/ice_repr.c
++++ b/drivers/net/ethernet/intel/ice/ice_repr.c
+@@ -4,7 +4,7 @@
+ #include "ice.h"
+ #include "ice_eswitch.h"
+ #include "ice_devlink.h"
+-#include "ice_virtchnl_pf.h"
++#include "ice_sriov.h"
+ #include "ice_tc_lib.h"
+ 
+ /**
+diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c b/drivers/net/ethernet/intel/ice/ice_sriov.c
+similarity index 100%
+rename from drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c
+rename to drivers/net/ethernet/intel/ice/ice_sriov.c
+diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.h b/drivers/net/ethernet/intel/ice/ice_sriov.h
+similarity index 99%
+rename from drivers/net/ethernet/intel/ice/ice_virtchnl_pf.h
+rename to drivers/net/ethernet/intel/ice/ice_sriov.h
+index 7f16ed9c70d6..bf42f7792d68 100644
+--- a/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.h
++++ b/drivers/net/ethernet/intel/ice/ice_sriov.h
+@@ -1,8 +1,8 @@
+ /* SPDX-License-Identifier: GPL-2.0 */
+ /* Copyright (c) 2018, Intel Corporation. */
+ 
+-#ifndef _ICE_VIRTCHNL_PF_H_
+-#define _ICE_VIRTCHNL_PF_H_
++#ifndef _ICE_SRIOV_H_
++#define _ICE_SRIOV_H_
+ #include "ice.h"
+ #include "ice_virtchnl_fdir.h"
+ #include "ice_vsi_vlan_ops.h"
+@@ -434,4 +434,4 @@ static inline bool ice_vf_is_port_vlan_ena(struct ice_vf __always_unused *vf)
+ 	return false;
+ }
+ #endif /* CONFIG_PCI_IOV */
+-#endif /* _ICE_VIRTCHNL_PF_H_ */
++#endif /* _ICE_SRIOV_H_ */
+diff --git a/drivers/net/ethernet/intel/ice/ice_vf_vsi_vlan_ops.c b/drivers/net/ethernet/intel/ice/ice_vf_vsi_vlan_ops.c
+index b16f946185f2..5ecc0ee9a78e 100644
+--- a/drivers/net/ethernet/intel/ice/ice_vf_vsi_vlan_ops.c
++++ b/drivers/net/ethernet/intel/ice/ice_vf_vsi_vlan_ops.c
+@@ -6,7 +6,7 @@
+ #include "ice_vlan_mode.h"
+ #include "ice.h"
+ #include "ice_vf_vsi_vlan_ops.h"
+-#include "ice_virtchnl_pf.h"
++#include "ice_sriov.h"
+ 
+ static int
+ noop_vlan_arg(struct ice_vsi __always_unused *vsi,
+-- 
+2.34.1
+

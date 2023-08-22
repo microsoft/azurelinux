@@ -1,0 +1,45 @@
+From 6441efd5c211856fcb163ce61d644779cf82e8ce Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Wed, 22 Sep 2021 20:59:46 +0800
+Subject: [NET-NEXT 074/254] ice: Make use of the helper function
+ devm_add_action_or_reset()
+
+From: Cai Huoqing <caihuoqing@baidu.com>
+
+The helper function devm_add_action_or_reset() will internally
+call devm_add_action(), and if devm_add_action() fails then it will
+execute the action mentioned and return the error code. So
+use devm_add_action_or_reset() instead of devm_add_action()
+to simplify the error handling, reduce the code.
+
+Signed-off-by: Cai Huoqing <caihuoqing@baidu.com>
+Tested-by: Gurucharan G <gurucharanx.g@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+
+Backported from upstream commit 7c1b694adab1
+
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_devlink.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_devlink.c b/drivers/net/ethernet/intel/ice/ice_devlink.c
+index 2d51743fe80e..965dea66a249 100644
+--- a/drivers/net/ethernet/intel/ice/ice_devlink.c
++++ b/drivers/net/ethernet/intel/ice/ice_devlink.c
+@@ -452,10 +452,8 @@ struct ice_pf *ice_allocate_pf(struct device *dev)
+ 		return NULL;
+ 
+ 	/* Add an action to teardown the devlink when unwinding the driver */
+-	if (devm_add_action(dev, ice_devlink_free, devlink)) {
+-		devlink_free(devlink);
++	if (devm_add_action_or_reset(dev, ice_devlink_free, devlink))
+ 		return NULL;
+-	}
+ 
+ 	return devlink_priv(devlink);
+ }
+-- 
+2.34.1
+

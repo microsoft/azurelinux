@@ -1,0 +1,53 @@
+From fe14d9d251709dd997597cc31f2a2c0c4aeb43d5 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Fri, 16 Jul 2021 15:16:39 -0700
+Subject: [NET-NEXT 031/254] ice: Fix link mode handling
+
+From: Anirudh Venkataramanan <anirudh.venkataramanan@intel.com>
+
+The messaging for unsupported module detection is different for
+lenient mode and strict mode. Update the code to print the right
+messaging for a given link mode.
+
+Media topology conflict is not an error in lenient mode, so return
+an error code only if not in lenient mode.
+
+Backported from net commit 4fc5fbee5cb7
+
+Signed-off-by: Anirudh Venkataramanan <anirudh.venkataramanan@intel.com>
+Tested-by: Gurucharan G <gurucharanx.g@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_main.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 9b4a508f508a..5ad9a3f51240 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -624,7 +624,10 @@ static void ice_print_topo_conflict(struct ice_vsi *vsi)
+ 		netdev_info(vsi->netdev, "Potential misconfiguration of the Ethernet port detected. If it was not intended, please use the Intel (R) Ethernet Port Configuration Tool to address the issue.\n");
+ 		break;
+ 	case ICE_AQ_LINK_TOPO_UNSUPP_MEDIA:
+-		netdev_info(vsi->netdev, "Rx/Tx is disabled on this device because an unsupported module type was detected. Refer to the Intel(R) Ethernet Adapters and Devices User Guide for a list of supported modules.\n");
++		if (test_bit(ICE_FLAG_LINK_LENIENT_MODE_ENA, vsi->back->flags))
++			netdev_warn(vsi->netdev, "An unsupported module type was detected. Refer to the Intel(R) Ethernet Adapters and Devices User Guide for a list of supported modules\n");
++		else
++			netdev_err(vsi->netdev, "Rx/Tx is disabled on this device because an unsupported module type was detected. Refer to the Intel(R) Ethernet Adapters and Devices User Guide for a list of supported modules.\n");
+ 		break;
+ 	default:
+ 		break;
+@@ -1967,7 +1970,8 @@ static int ice_configure_phy(struct ice_vsi *vsi)
+ 
+ 	ice_print_topo_conflict(vsi);
+ 
+-	if (phy->link_info.topo_media_conflict == ICE_AQ_LINK_TOPO_UNSUPP_MEDIA)
++	if (!test_bit(ICE_FLAG_LINK_LENIENT_MODE_ENA, pf->flags) &&
++	    phy->link_info.topo_media_conflict == ICE_AQ_LINK_TOPO_UNSUPP_MEDIA)
+ 		return -EPERM;
+ 
+ 	if (test_bit(ICE_FLAG_LINK_DOWN_ON_CLOSE_ENA, pf->flags))
+-- 
+2.34.1
+

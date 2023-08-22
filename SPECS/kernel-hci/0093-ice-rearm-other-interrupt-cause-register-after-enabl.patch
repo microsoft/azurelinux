@@ -1,0 +1,43 @@
+From 48d21a5150fcd196902fc1bde4836c3acf9f6e44 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Mon, 12 Jul 2021 07:54:25 -0400
+Subject: [NET-NEXT 093/254] ice: rearm other interrupt cause register after
+ enabling VFs
+
+From: Paul Greenwalt <paul.greenwalt@intel.com>
+
+The other interrupt cause register (OICR), global interrupt 0, is
+disabled when enabling VFs to prevent handling VFLR. If the OICR is
+not rearmed then the VF cannot communicate with the PF.
+
+Rearm the OICR after enabling VFs.
+
+Backported from upstream commit 2657e16d8c52
+
+Fixes: 916c7fdf5e93 ("ice: Separate VF VSI initialization/creation from reset flow")
+Signed-off-by: Paul Greenwalt <paul.greenwalt@intel.com>
+Tested-by: Tony Brelinski <tony.brelinski@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c b/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c
+index e6b7d3dcb000..9acac7852f3c 100644
+--- a/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c
++++ b/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c
+@@ -2029,6 +2029,10 @@ static int ice_ena_vfs(struct ice_pf *pf, u16 num_vfs)
+ 	if (ret)
+ 		goto err_unroll_sriov;
+ 
++	/* rearm global interrupts */
++	if (test_and_clear_bit(ICE_OICR_INTR_DIS, pf->state))
++		ice_irq_dynamic_ena(hw, NULL, NULL);
++
+ 	return 0;
+ 
+ err_unroll_sriov:
+-- 
+2.34.1
+

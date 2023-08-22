@@ -1,0 +1,48 @@
+From 1841ece0b2dbe730a87e8d19a36b57631439e423 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Mon, 3 Jan 2022 07:41:21 +0100
+Subject: [NET-NEXT 142/254] ice: fix setting l4 port flag when adding filter
+
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+
+Accidentally filter flag for none encapsulated l4 port field is always
+set. Even if user wants to add encapsulated l4 port field.
+
+Remove this unnecessary flag setting.
+
+Backported from upstream commit 932645c298c4
+
+Fixes: 9e300987d4a81 ("ice: VXLAN and Geneve TC support")
+Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Tested-by: Sandeep Penigalapati <sandeep.penigalapati@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_tc_lib.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_tc_lib.c b/drivers/net/ethernet/intel/ice/ice_tc_lib.c
+index e8aab664270a..65cf32eb4046 100644
+--- a/drivers/net/ethernet/intel/ice/ice_tc_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_tc_lib.c
+@@ -709,7 +709,7 @@ ice_tc_set_port(struct flow_match_ports match,
+ 			fltr->flags |= ICE_TC_FLWR_FIELD_ENC_DEST_L4_PORT;
+ 		else
+ 			fltr->flags |= ICE_TC_FLWR_FIELD_DEST_L4_PORT;
+-		fltr->flags |= ICE_TC_FLWR_FIELD_DEST_L4_PORT;
++
+ 		headers->l4_key.dst_port = match.key->dst;
+ 		headers->l4_mask.dst_port = match.mask->dst;
+ 	}
+@@ -718,7 +718,7 @@ ice_tc_set_port(struct flow_match_ports match,
+ 			fltr->flags |= ICE_TC_FLWR_FIELD_ENC_SRC_L4_PORT;
+ 		else
+ 			fltr->flags |= ICE_TC_FLWR_FIELD_SRC_L4_PORT;
+-		fltr->flags |= ICE_TC_FLWR_FIELD_SRC_L4_PORT;
++
+ 		headers->l4_key.src_port = match.key->src;
+ 		headers->l4_mask.src_port = match.mask->src;
+ 	}
+-- 
+2.34.1
+

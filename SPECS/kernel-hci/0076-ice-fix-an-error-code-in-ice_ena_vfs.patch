@@ -1,0 +1,40 @@
+From 9a74e7e5d34ee18d41eeef53470aa1360bfd5579 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Wed, 13 Oct 2021 11:00:12 +0300
+Subject: [NET-NEXT 076/254] ice: fix an error code in ice_ena_vfs()
+
+From: Dan Carpenter <dan.carpenter@oracle.com>
+
+Return the error code if ice_eswitch_configure() fails.  Don't return
+success.
+
+Fixes: 1c54c839935b ("ice: enable/disable switchdev when managing VFs")
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+Reviewed-by: Simon Horman <simon.horman@corigine.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+
+Backported from upstream commit 8702ed0b0de1
+
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c b/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c
+index 8c40821a713c..8a2416020b58 100644
+--- a/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c
++++ b/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c
+@@ -2025,7 +2025,8 @@ static int ice_ena_vfs(struct ice_pf *pf, u16 num_vfs)
+ 
+ 	clear_bit(ICE_VF_DIS, pf->state);
+ 
+-	if (ice_eswitch_configure(pf))
++	ret = ice_eswitch_configure(pf);
++	if (ret)
+ 		goto err_unroll_sriov;
+ 
+ 	return 0;
+-- 
+2.34.1
+

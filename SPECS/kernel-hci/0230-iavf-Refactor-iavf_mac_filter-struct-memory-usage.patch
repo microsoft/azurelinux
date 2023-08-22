@@ -1,0 +1,47 @@
+From bcef8be90a8122afd49eaf83292d664fedae5012 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Mon, 30 Aug 2021 08:25:36 +0000
+Subject: [NET-NEXT 230/254] iavf: Refactor iavf_mac_filter struct memory usage
+
+From: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+
+iavf_mac_filter struct contained couple boolean
+flags using up more memory than is necessary.
+Change the flags to be bitfields in an anonymous struct
+so all the flags now fit in one byte.
+
+Backported from upstream commit 4d0dbd9678ad
+
+Signed-off-by: Sylwester Dziedziuch <sylwesterx.dziedziuch@intel.com>
+Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+Tested-by: Konrad Jankowski <konrad0.jankowski@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/iavf/iavf.h | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/iavf/iavf.h b/drivers/net/ethernet/intel/iavf/iavf.h
+index 478a292ac803..7b1b920870d5 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf.h
++++ b/drivers/net/ethernet/intel/iavf/iavf.h
+@@ -138,9 +138,13 @@ struct iavf_q_vector {
+ struct iavf_mac_filter {
+ 	struct list_head list;
+ 	u8 macaddr[ETH_ALEN];
+-	bool is_new_mac;	/* filter is new, wait for PF decision */
+-	bool remove;		/* filter needs to be removed */
+-	bool add;		/* filter needs to be added */
++	struct {
++		u8 is_new_mac:1;    /* filter is new, wait for PF decision */
++		u8 remove:1;        /* filter needs to be removed */
++		u8 add:1;           /* filter needs to be added */
++		u8 is_primary:1;    /* filter is a default VF MAC */
++		u8 padding:4;
++	};
+ };
+ 
+ struct iavf_vlan_filter {
+-- 
+2.34.1
+

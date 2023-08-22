@@ -1,0 +1,113 @@
+From 892b6b0511697b2331f68b3e4b4ccad65392f71f Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Tue, 22 Feb 2022 16:27:06 -0800
+Subject: [NET-NEXT 205/254] ice: convert ice_reset_vf to standard error codes
+
+From: Jacob Keller <jacob.e.keller@intel.com>
+
+The ice_reset_vf function returns a boolean value indicating whether or
+not the VF reset. This is a bit confusing since it means that callers
+need to know how to interpret the return value when needing to indicate
+an error.
+
+Refactor the function and call sites to report a regular error code. We
+still report success (i.e. return 0) in cases where the reset is in
+progress or is disabled.
+
+Existing callers don't care because they do not check the return value.
+We keep the error code anyways instead of a void return because we
+expect future code which may care about or at least report the error
+value.
+
+Backported from upstream commit 4fe193cc9dd0
+
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+Tested-by: Konrad Jankowski <konrad0.jankowski@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_vf_lib.c | 15 ++++++++-------
+ drivers/net/ethernet/intel/ice/ice_vf_lib.h |  6 +++---
+ 2 files changed, 11 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.c b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
+index 6f9e8383c69b..d37232197bde 100644
+--- a/drivers/net/ethernet/intel/ice/ice_vf_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
+@@ -446,10 +446,11 @@ void ice_reset_all_vfs(struct ice_pf *pf)
+  * @vf: pointer to the VF structure
+  * @is_vflr: true if VFLR was issued, false if not
+  *
+- * Returns true if the VF is currently in reset, resets successfully, or resets
+- * are disabled and false otherwise.
++ * Returns 0 if the VF is currently in reset, if the resets are disabled, or
++ * if the VF resets successfully. Returns an error code if the VF fails to
++ * rebuild.
+  */
+-bool ice_reset_vf(struct ice_vf *vf, bool is_vflr)
++int ice_reset_vf(struct ice_vf *vf, bool is_vflr)
+ {
+ 	struct ice_pf *pf = vf->pf;
+ 	struct ice_vsi *vsi;
+@@ -466,13 +467,13 @@ bool ice_reset_vf(struct ice_vf *vf, bool is_vflr)
+ 	if (test_bit(ICE_VF_RESETS_DISABLED, pf->state)) {
+ 		dev_dbg(dev, "Trying to reset VF %d, but all VF resets are disabled\n",
+ 			vf->vf_id);
+-		return true;
++		return 0;
+ 	}
+ 
+ 	if (ice_is_vf_disabled(vf)) {
+ 		dev_dbg(dev, "VF is already disabled, there is no need for resetting it, telling VM, all is fine %d\n",
+ 			vf->vf_id);
+-		return true;
++		return 0;
+ 	}
+ 
+ 	/* Set VF disable bit state here, before triggering reset */
+@@ -532,7 +533,7 @@ bool ice_reset_vf(struct ice_vf *vf, bool is_vflr)
+ 	if (vf->vf_ops->vsi_rebuild(vf)) {
+ 		dev_err(dev, "Failed to release and setup the VF%u's VSI\n",
+ 			vf->vf_id);
+-		return false;
++		return -EFAULT;
+ 	}
+ 
+ 	vf->vf_ops->post_vsi_rebuild(vf);
+@@ -546,7 +547,7 @@ bool ice_reset_vf(struct ice_vf *vf, bool is_vflr)
+ 		dev_dbg(dev, "failed to clear malicious VF state for VF %u\n",
+ 			vf->vf_id);
+ 
+-	return true;
++	return 0;
+ }
+ 
+ /**
+diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.h b/drivers/net/ethernet/intel/ice/ice_vf_lib.h
+index f7906111aeb3..811b6cc8ad67 100644
+--- a/drivers/net/ethernet/intel/ice/ice_vf_lib.h
++++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.h
+@@ -212,7 +212,7 @@ int
+ ice_vf_set_vsi_promisc(struct ice_vf *vf, struct ice_vsi *vsi, u8 promisc_m);
+ int
+ ice_vf_clear_vsi_promisc(struct ice_vf *vf, struct ice_vsi *vsi, u8 promisc_m);
+-bool ice_reset_vf(struct ice_vf *vf, bool is_vflr);
++int ice_reset_vf(struct ice_vf *vf, bool is_vflr);
+ void ice_reset_all_vfs(struct ice_pf *pf);
+ #else /* CONFIG_PCI_IOV */
+ static inline struct ice_vf *ice_get_vf_by_id(struct ice_pf *pf, u16 vf_id)
+@@ -270,9 +270,9 @@ ice_vf_clear_vsi_promisc(struct ice_vf *vf, struct ice_vsi *vsi, u8 promisc_m)
+ 	return -EOPNOTSUPP;
+ }
+ 
+-static inline bool ice_reset_vf(struct ice_vf *vf, bool is_vflr)
++static inline int ice_reset_vf(struct ice_vf *vf, bool is_vflr)
+ {
+-	return true;
++	return 0;
+ }
+ 
+ static inline void ice_reset_all_vfs(struct ice_pf *pf)
+-- 
+2.34.1
+

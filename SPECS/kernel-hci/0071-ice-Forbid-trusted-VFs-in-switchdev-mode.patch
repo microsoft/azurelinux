@@ -1,0 +1,54 @@
+From 9cebb83a10f87204f3afe98f898fe06551838bf6 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Fri, 15 Oct 2021 10:27:19 +0200
+Subject: [NET-NEXT 071/254] ice: Forbid trusted VFs in switchdev mode
+
+From: Wojciech Drewek <wojciech.drewek@intel.com>
+
+Merge issues caused the check for switchdev mode has been inserted
+in wrong place. It should be in ice_set_vf_trust not in ice_set_vf_mac.
+
+Trusted VFs are forbidden in switchdev mode because they should
+be configured only from the host side.
+
+Backported from upstream commit 1281b7459657
+
+Fixes: 1c54c839935b ("ice: enable/disable switchdev when managing VFs")
+Signed-off-by: Wojciech Drewek <wojciech.drewek@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c b/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c
+index 6542d1a327f2..8c40821a713c 100644
+--- a/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c
++++ b/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c
+@@ -4850,11 +4850,6 @@ int ice_set_vf_mac(struct net_device *netdev, int vf_id, u8 *mac)
+ 	struct ice_vf *vf;
+ 	int ret;
+ 
+-	if (ice_is_eswitch_mode_switchdev(pf)) {
+-		dev_info(ice_pf_to_dev(pf), "Trusted VF is forbidden in switchdev mode\n");
+-		return -EOPNOTSUPP;
+-	}
+-
+ 	if (ice_validate_vf_id(pf, vf_id))
+ 		return -EINVAL;
+ 
+@@ -4917,6 +4912,11 @@ int ice_set_vf_trust(struct net_device *netdev, int vf_id, bool trusted)
+ 	struct ice_vf *vf;
+ 	int ret;
+ 
++	if (ice_is_eswitch_mode_switchdev(pf)) {
++		dev_info(ice_pf_to_dev(pf), "Trusted VF is forbidden in switchdev mode\n");
++		return -EOPNOTSUPP;
++	}
++
+ 	if (ice_validate_vf_id(pf, vf_id))
+ 		return -EINVAL;
+ 
+-- 
+2.34.1
+

@@ -1,0 +1,36 @@
+From 4c147b83e37ef9128d2e5e9a552ed4be5da4b973 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Wed, 17 Nov 2021 15:55:05 -0800
+Subject: [NET-NEXT 113/254] ice: Remove unused ICE_FLOW_SEG_HDRS_L2_MASK
+
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+
+Remove the unused define ICE_FLOW_SEG_HDRS_L2_MASK.
+
+Backported from upstream commit f8a3bccceb422
+
+Reported-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Acked-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Tested-by: Gurucharan G <gurucharanx.g@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_flow.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_flow.c b/drivers/net/ethernet/intel/ice/ice_flow.c
+index b17b984196a2..2c5332953679 100644
+--- a/drivers/net/ethernet/intel/ice/ice_flow.c
++++ b/drivers/net/ethernet/intel/ice/ice_flow.c
+@@ -609,8 +609,6 @@ struct ice_flow_prof_params {
+ 	ICE_FLOW_SEG_HDR_ESP | ICE_FLOW_SEG_HDR_AH | \
+ 	ICE_FLOW_SEG_HDR_NAT_T_ESP)
+ 
+-#define ICE_FLOW_SEG_HDRS_L2_MASK	\
+-	(ICE_FLOW_SEG_HDR_ETH | ICE_FLOW_SEG_HDR_VLAN)
+ #define ICE_FLOW_SEG_HDRS_L3_MASK	\
+ 	(ICE_FLOW_SEG_HDR_IPV4 | ICE_FLOW_SEG_HDR_IPV6 | ICE_FLOW_SEG_HDR_ARP)
+ #define ICE_FLOW_SEG_HDRS_L4_MASK	\
+-- 
+2.34.1
+

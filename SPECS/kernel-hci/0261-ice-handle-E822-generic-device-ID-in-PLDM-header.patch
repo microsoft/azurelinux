@@ -1,0 +1,176 @@
+From 42f6c06ae39487c1c45582655fda4a1ac4e172e1 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Wed, 8 Jun 2022 14:09:52 -0700
+Subject: [NET-NEXT 261/273] ice: handle E822 generic device ID in PLDM header
+
+From: Paul M Stillwell Jr <paul.m.stillwell.jr@intel.com>
+
+[ Upstream commit f52d166819a4d8e0d5cca07d8a8dd6397c96dcf1 ]
+
+The driver currently presumes that the record data in the PLDM header
+of the firmware image will match the device ID of the running device.
+This is true for E810 devices. It appears that for E822 devices that
+this is not guaranteed to be true.
+
+Fix this by adding a check for the generic E822 device.
+
+Fixes: d69ea414c9b4 ("ice: implement device flash update via devlink")
+Signed-off-by: Paul M Stillwell Jr <paul.m.stillwell.jr@intel.com>
+Tested-by: Gurucharan <gurucharanx.g@intel.com> (A Contingent worker at Intel)
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_devids.h   |  1 +
+ .../net/ethernet/intel/ice/ice_fw_update.c    | 96 ++++++++++++++++++-
+ drivers/net/ethernet/intel/ice/ice_main.c     |  1 +
+ 3 files changed, 96 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_devids.h b/drivers/net/ethernet/intel/ice/ice_devids.h
+index 61dd2f18dee8..b41bc3dc1745 100644
+--- a/drivers/net/ethernet/intel/ice/ice_devids.h
++++ b/drivers/net/ethernet/intel/ice/ice_devids.h
+@@ -5,6 +5,7 @@
+ #define _ICE_DEVIDS_H_
+ 
+ /* Device IDs */
++#define ICE_DEV_ID_E822_SI_DFLT         0x1888
+ /* Intel(R) Ethernet Connection E823-L for backplane */
+ #define ICE_DEV_ID_E823L_BACKPLANE	0x124C
+ /* Intel(R) Ethernet Connection E823-L for SFP */
+diff --git a/drivers/net/ethernet/intel/ice/ice_fw_update.c b/drivers/net/ethernet/intel/ice/ice_fw_update.c
+index 665a344fb9c0..3dc5662d62a6 100644
+--- a/drivers/net/ethernet/intel/ice/ice_fw_update.c
++++ b/drivers/net/ethernet/intel/ice/ice_fw_update.c
+@@ -736,7 +736,87 @@ static int ice_finalize_update(struct pldmfw *context)
+ 	return 0;
+ }
+ 
+-static const struct pldmfw_ops ice_fwu_ops = {
++struct ice_pldm_pci_record_id {
++	u32 vendor;
++	u32 device;
++	u32 subsystem_vendor;
++	u32 subsystem_device;
++};
++
++/**
++ * ice_op_pci_match_record - Check if a PCI device matches the record
++ * @context: PLDM fw update structure
++ * @record: list of records extracted from the PLDM image
++ *
++ * Determine if the PCI device associated with this device matches the record
++ * data provided.
++ *
++ * Searches the descriptor TLVs and extracts the relevant descriptor data into
++ * a pldm_pci_record_id. This is then compared against the PCI device ID
++ * information.
++ *
++ * Returns: true if the device matches the record, false otherwise.
++ */
++static bool
++ice_op_pci_match_record(struct pldmfw *context, struct pldmfw_record *record)
++{
++	struct pci_dev *pdev = to_pci_dev(context->dev);
++	struct ice_pldm_pci_record_id id = {
++		.vendor = PCI_ANY_ID,
++		.device = PCI_ANY_ID,
++		.subsystem_vendor = PCI_ANY_ID,
++		.subsystem_device = PCI_ANY_ID,
++	};
++	struct pldmfw_desc_tlv *desc;
++
++	list_for_each_entry(desc, &record->descs, entry) {
++		u16 value;
++		int *ptr;
++
++		switch (desc->type) {
++		case PLDM_DESC_ID_PCI_VENDOR_ID:
++			ptr = &id.vendor;
++			break;
++		case PLDM_DESC_ID_PCI_DEVICE_ID:
++			ptr = &id.device;
++			break;
++		case PLDM_DESC_ID_PCI_SUBVENDOR_ID:
++			ptr = &id.subsystem_vendor;
++			break;
++		case PLDM_DESC_ID_PCI_SUBDEV_ID:
++			ptr = &id.subsystem_device;
++			break;
++		default:
++			/* Skip unrelated TLVs */
++			continue;
++		}
++
++		value = get_unaligned_le16(desc->data);
++		/* A value of zero for one of the descriptors is sometimes
++		 * used when the record should ignore this field when matching
++		 * device. For example if the record applies to any subsystem
++		 * device or vendor.
++		 */
++		if (value)
++			*ptr = value;
++		else
++			*ptr = PCI_ANY_ID;
++	}
++
++	/* the E822 device can have a generic device ID so check for that */
++	if ((id.vendor == PCI_ANY_ID || id.vendor == pdev->vendor) &&
++	    (id.device == PCI_ANY_ID || id.device == pdev->device ||
++	    id.device == ICE_DEV_ID_E822_SI_DFLT) &&
++	    (id.subsystem_vendor == PCI_ANY_ID ||
++	    id.subsystem_vendor == pdev->subsystem_vendor) &&
++	    (id.subsystem_device == PCI_ANY_ID ||
++	    id.subsystem_device == pdev->subsystem_device))
++		return true;
++
++	return false;
++}
++
++static const struct pldmfw_ops ice_fwu_ops_e810 = {
+ 	.match_record = &pldmfw_op_pci_match_record,
+ 	.send_package_data = &ice_send_package_data,
+ 	.send_component_table = &ice_send_component_table,
+@@ -744,6 +824,14 @@ static const struct pldmfw_ops ice_fwu_ops = {
+ 	.finalize_update = &ice_finalize_update,
+ };
+ 
++static const struct pldmfw_ops ice_fwu_ops_e822 = {
++	.match_record = &ice_op_pci_match_record,
++	.send_package_data = &ice_send_package_data,
++	.send_component_table = &ice_send_component_table,
++	.flash_component = &ice_flash_component,
++	.finalize_update = &ice_finalize_update,
++};
++
+ /**
+  * ice_get_pending_updates - Check if the component has a pending update
+  * @pf: the PF driver structure
+@@ -921,7 +1009,11 @@ int ice_devlink_flash_update(struct devlink *devlink,
+ 
+ 	memset(&priv, 0, sizeof(priv));
+ 
+-	priv.context.ops = &ice_fwu_ops;
++	/* the E822 device needs a slightly different ops */
++	if (hw->mac_type == ICE_MAC_GENERIC)
++		priv.context.ops = &ice_fwu_ops_e822;
++	else
++		priv.context.ops = &ice_fwu_ops_e810;
+ 	priv.context.dev = dev;
+ 	priv.extack = extack;
+ 	priv.pf = pf;
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 30c279a06d41..d9c6cd731548 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -5403,6 +5403,7 @@ static const struct pci_device_id ice_pci_tbl[] = {
+ 	{ PCI_VDEVICE(INTEL, ICE_DEV_ID_E823L_10G_BASE_T), 0 },
+ 	{ PCI_VDEVICE(INTEL, ICE_DEV_ID_E823L_1GBE), 0 },
+ 	{ PCI_VDEVICE(INTEL, ICE_DEV_ID_E823L_QSFP), 0 },
++	{ PCI_VDEVICE(INTEL, ICE_DEV_ID_E822_SI_DFLT), 0 },
+ 	/* required last entry */
+ 	{ 0, }
+ };
+-- 
+2.34.1
+

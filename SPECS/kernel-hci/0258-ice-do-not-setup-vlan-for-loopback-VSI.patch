@@ -1,0 +1,44 @@
+From 04e499293b0ac1f800422be15a2cb1f337260acf Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Thu, 7 Jul 2022 12:20:43 +0200
+Subject: [NET-NEXT 258/273] ice: do not setup vlan for loopback VSI
+
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+
+commit cc019545a238518fa9da1e2a889f6e1bb1005a63 upstream.
+
+Currently loopback test is failiing due to the error returned from
+ice_vsi_vlan_setup(). Skip calling it when preparing loopback VSI.
+
+Fixes: 0e674aeb0b77 ("ice: Add handler for ethtool selftest")
+Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Tested-by: George Kuruvinakunnel <george.kuruvinakunnel@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_main.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index dab4d8e4bd7e..30c279a06d41 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -5986,9 +5986,11 @@ int ice_vsi_cfg(struct ice_vsi *vsi)
+ 	if (vsi->netdev && vsi->type == ICE_VSI_PF) {
+ 		ice_set_rx_mode(vsi->netdev);
+ 
+-		err = ice_vsi_vlan_setup(vsi);
+-		if (err)
+-			return err;
++		if (vsi->type != ICE_VSI_LB) {
++			err = ice_vsi_vlan_setup(vsi);
++			if (err)
++				return err;
++		}
+ 	}
+ 	ice_vsi_cfg_dcb_rings(vsi);
+ 
+-- 
+2.34.1
+

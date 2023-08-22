@@ -1,0 +1,39 @@
+From 7e0943705d3dfca5c2816a325aa7230ea073eab0 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Thu, 19 Aug 2021 14:00:00 +0200
+Subject: [NET-NEXT 062/254] ice: do not create xdp_frame on XDP_TX
+
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+
+xdp_frame is not needed for XDP_TX data path in ice driver case.
+For this data path cleaning of sent descriptor will not happen anywhere
+outside of the driver, which means that carrying the information about
+the underlying memory model via xdp_frame will not be used. Therefore,
+this conversion can be simply dropped, which would relieve CPU a bit.
+
+Backported from upstream commit a55e16fa330a
+
+Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Tested-by: George Kuruvinakunnel <george.kuruvinakunnel@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_txrx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
+index b031f754c5cb..7739cd379052 100644
+--- a/drivers/net/ethernet/intel/ice/ice_txrx.c
++++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
+@@ -554,7 +554,7 @@ ice_run_xdp(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp,
+ 		return ICE_XDP_PASS;
+ 	case XDP_TX:
+ 		xdp_ring = rx_ring->vsi->xdp_rings[smp_processor_id()];
+-		result = ice_xmit_xdp_buff(xdp, xdp_ring);
++		result = ice_xmit_xdp_ring(xdp->data, xdp->data_end - xdp->data, xdp_ring);
+ 		if (result == ICE_XDP_CONSUMED)
+ 			goto out_failure;
+ 		return result;
+-- 
+2.34.1
+

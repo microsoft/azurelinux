@@ -1,0 +1,72 @@
+From 19adf8937aff96d1b60a668f7ab52bf69b94d67a Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Mon, 30 Aug 2021 14:26:14 +0200
+Subject: [NET-NEXT 055/254] ice: Refactor ice_aqc_link_topo_addr
+
+From: Maciej Machnikowski <maciej.machnikowski@intel.com>
+
+Separate link topo parameters in struct ice_aqc_link_topo_addr into
+new struct ice_aqc_link_topo_params.
+This keeps input parameters for the get_link_topo command in a separate
+structure and is required by future commands that operate only on link
+topo params without the node handle.
+
+Backported from upstream commit e88ae1a2aaf2
+
+Signed-off-by: Maciej Machnikowski <maciej.machnikowski@intel.com>
+Tested-by: Sunitha Mekala <sunithax.d.mekala@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_adminq_cmd.h | 6 +++++-
+ drivers/net/ethernet/intel/ice/ice_common.c     | 8 +++++---
+ 2 files changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+index 2b4437dc112f..9f6edfa59770 100644
+--- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
++++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+@@ -1279,7 +1279,7 @@ struct ice_aqc_set_mac_lb {
+ 	u8 reserved[15];
+ };
+ 
+-struct ice_aqc_link_topo_addr {
++struct ice_aqc_link_topo_params {
+ 	u8 lport_num;
+ 	u8 lport_num_valid;
+ #define ICE_AQC_LINK_TOPO_PORT_NUM_VALID	BIT(0)
+@@ -1305,6 +1305,10 @@ struct ice_aqc_link_topo_addr {
+ #define ICE_AQC_LINK_TOPO_NODE_CTX_PROVIDED	4
+ #define ICE_AQC_LINK_TOPO_NODE_CTX_OVERRIDE	5
+ 	u8 index;
++};
++
++struct ice_aqc_link_topo_addr {
++	struct ice_aqc_link_topo_params topo_params;
+ 	__le16 handle;
+ #define ICE_AQC_LINK_TOPO_HANDLE_S	0
+ #define ICE_AQC_LINK_TOPO_HANDLE_M	(0x3FF << ICE_AQC_LINK_TOPO_HANDLE_S)
+diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
+index 51987417561b..7edf8b3db34c 100644
+--- a/drivers/net/ethernet/intel/ice/ice_common.c
++++ b/drivers/net/ethernet/intel/ice/ice_common.c
+@@ -242,11 +242,13 @@ ice_aq_get_link_topo_handle(struct ice_port_info *pi, u8 node_type,
+ 
+ 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_get_link_topo);
+ 
+-	cmd->addr.node_type_ctx = (ICE_AQC_LINK_TOPO_NODE_CTX_PORT <<
+-				   ICE_AQC_LINK_TOPO_NODE_CTX_S);
++	cmd->addr.topo_params.node_type_ctx =
++		(ICE_AQC_LINK_TOPO_NODE_CTX_PORT <<
++		 ICE_AQC_LINK_TOPO_NODE_CTX_S);
+ 
+ 	/* set node type */
+-	cmd->addr.node_type_ctx |= (ICE_AQC_LINK_TOPO_NODE_TYPE_M & node_type);
++	cmd->addr.topo_params.node_type_ctx |=
++		(ICE_AQC_LINK_TOPO_NODE_TYPE_M & node_type);
+ 
+ 	return ice_aq_send_cmd(pi->hw, &desc, NULL, 0, cd);
+ }
+-- 
+2.34.1
+

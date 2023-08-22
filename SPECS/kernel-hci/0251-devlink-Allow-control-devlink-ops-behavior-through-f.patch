@@ -1,0 +1,113 @@
+From 0db3fad0533c1c2085e45be606560a1df2a5267d Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Tue, 12 Oct 2021 16:15:24 +0300
+Subject: [NET-NEXT 251/254] devlink: Allow control devlink ops behavior
+ through feature mask
+
+From: Leon Romanovsky <leonro@nvidia.com>
+
+Introduce new devlink call to set feature mask to control devlink
+behavior during device initialization phase after devlink_alloc()
+is already called.
+
+This allows us to set reload ops based on device property which
+is not known at the beginning of driver initialization.
+
+For the sake of simplicity, this API lacks any type of locking and
+needs to be called before devlink_register() to make sure that no
+parallel access to the ops is possible at this stage.
+
+Backported from upstream commit bd032e35c568, slightly modified
+to make necessary devlink changes needed for ice driver,
+no additional driver changes applied
+
+Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ include/net/devlink.h |  7 +++++++
+ net/core/devlink.c    | 22 ++++++++++++++++++++--
+ 2 files changed, 27 insertions(+), 2 deletions(-)
+
+diff --git a/include/net/devlink.h b/include/net/devlink.h
+index ac8b6d96e9bd..076c3d1afd2a 100644
+--- a/include/net/devlink.h
++++ b/include/net/devlink.h
+@@ -47,6 +47,7 @@ struct devlink {
+ 	struct list_head trap_group_list;
+ 	struct list_head trap_policer_list;
+ 	const struct devlink_ops *ops;
++	u64 features;
+ 	struct xarray snapshot_ids;
+ 	struct devlink_dev_stats stats;
+ 	struct device *dev;
+@@ -1228,6 +1229,11 @@ enum devlink_trap_group_generic_id {
+ 		.min_burst = _min_burst,				      \
+ 	}
+ 
++enum {
++	/* device supports reload operations */
++	DEVLINK_F_RELOAD = 1UL << 0,
++};
++
+ struct devlink_ops {
+ 	/**
+ 	 * @supported_flash_update_params:
+@@ -1570,6 +1576,7 @@ static inline struct devlink *devlink_alloc(const struct devlink_ops *ops,
+ {
+ 	return devlink_alloc_ns(ops, priv_size, &init_net, dev);
+ }
++void devlink_set_features(struct devlink *devlink, u64 features);
+ int devlink_register(struct devlink *devlink);
+ void devlink_unregister(struct devlink *devlink);
+ void devlink_reload_enable(struct devlink *devlink);
+diff --git a/net/core/devlink.c b/net/core/devlink.c
+index 06eb25304959..cb615f4bbc86 100644
+--- a/net/core/devlink.c
++++ b/net/core/devlink.c
+@@ -3952,7 +3952,7 @@ static int devlink_reload(struct devlink *devlink, struct net *dest_net,
+ 	struct net *curr_net;
+ 	int err;
+ 
+-	if (!devlink->reload_enabled)
++	if (!devlink->reload_enabled || !(devlink->features & DEVLINK_F_RELOAD))
+ 		return -EOPNOTSUPP;
+ 
+ 	memcpy(remote_reload_stats, devlink->stats.remote_reload_stats,
+@@ -8902,6 +8902,24 @@ static bool devlink_reload_actions_valid(const struct devlink_ops *ops)
+ 	return true;
+ }
+ 
++/**
++ *	devlink_set_features - Set devlink supported features
++ *
++ *	@devlink: devlink
++ *	@features: devlink support features
++ *
++ *	This interface allows us to set reload ops separatelly from
++ *	the devlink_alloc.
++ */
++void devlink_set_features(struct devlink *devlink, u64 features)
++{
++
++	WARN_ON(features & DEVLINK_F_RELOAD &&
++		!devlink_reload_supported(devlink->ops));
++	devlink->features = features;
++}
++EXPORT_SYMBOL_GPL(devlink_set_features);
++
+ /**
+  *	devlink_alloc_ns - Allocate new devlink instance resources
+  *	in specific namespace
+@@ -8987,7 +9005,7 @@ void devlink_unregister(struct devlink *devlink)
+ 	wait_for_completion(&devlink->comp);
+ 
+ 	mutex_lock(&devlink_mutex);
+-	WARN_ON(devlink_reload_supported(devlink->ops) &&
++	WARN_ON(devlink->features & DEVLINK_F_RELOAD &&
+ 		devlink->reload_enabled);
+ 	devlink_notify(devlink, DEVLINK_CMD_DEL);
+ 	xa_clear_mark(&devlinks, devlink->index, DEVLINK_REGISTERED);
+-- 
+2.34.1
+

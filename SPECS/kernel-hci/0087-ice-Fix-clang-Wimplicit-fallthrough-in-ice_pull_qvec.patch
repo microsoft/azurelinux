@@ -1,0 +1,53 @@
+From a786cb632016334836cfa61c0885010af6e0b8e4 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Mon, 18 Oct 2021 18:42:03 -0700
+Subject: [NET-NEXT 087/254] ice: Fix clang -Wimplicit-fallthrough in
+ ice_pull_qvec_from_rc()
+
+From: Nathan Chancellor <nathan@kernel.org>
+
+Clang warns:
+
+drivers/net/ethernet/intel/ice/ice_lib.c:1906:2: error: unannotated fall-through between switch labels [-Werror,-Wimplicit-fallthrough]
+        default:
+        ^
+drivers/net/ethernet/intel/ice/ice_lib.c:1906:2: note: insert 'break;' to avoid fall-through
+        default:
+        ^
+        break;
+1 error generated.
+
+Clang is a little more pedantic than GCC, which does not warn when
+falling through to a case that is just break or return. Clang's version
+is more in line with the kernel's own stance in deprecated.rst, which
+states that all switch/case blocks must end in either break,
+fallthrough, continue, goto, or return. Add the missing break to silence
+the warning.
+
+Backported from upstream commit 370764e60b18
+
+Link: https://github.com/ClangBuiltLinux/linux/issues/1482
+Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+Tested-by: Gurucharan G <gurucharanx.g@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_lib.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
+index f483d25db48c..0f630f3913e3 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_lib.c
+@@ -1995,6 +1995,7 @@ static struct ice_q_vector *ice_pull_qvec_from_rc(struct ice_ring_container *rc)
+ 	case ICE_TX_CONTAINER:
+ 		if (rc->tx_ring)
+ 			return rc->tx_ring->q_vector;
++		break;
+ 	default:
+ 		break;
+ 	}
+-- 
+2.34.1
+

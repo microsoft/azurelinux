@@ -1,0 +1,45 @@
+From 8267b149b4b74359435a0e00347ff82337d268fe Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Mon, 4 Jul 2022 15:46:12 +0200
+Subject: [NET-NEXT 259/273] ice: Fix max VLANs available for VF
+
+From: Przemyslaw Patynowski <przemyslawx.patynowski@intel.com>
+
+commit 1e308c6fb7127371f48a0fb9770ea0b30a6b5698 upstream.
+
+Legacy VLAN implementation allows for untrusted VF to have 8 VLAN
+filters, not counting VLAN 0 filters. Current VLAN_V2 implementation
+lowers available filters for VF, by counting in VLAN 0 filter for both
+TPIDs.
+Fix this by counting only non zero VLAN filters.
+Without this patch, untrusted VF would not be able to access 8 VLAN
+filters.
+
+Fixes: cc71de8fa133 ("ice: Add support for VIRTCHNL_VF_OFFLOAD_VLAN_V2")
+Signed-off-by: Przemyslaw Patynowski <przemyslawx.patynowski@intel.com>
+Signed-off-by: Mateusz Palczewski <mateusz.palczewski@intel.com>
+Tested-by: Marek Szlosek <marek.szlosek@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl.c b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
+index 2889e050a4c9..9478e469346c 100644
+--- a/drivers/net/ethernet/intel/ice/ice_virtchnl.c
++++ b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
+@@ -2962,7 +2962,8 @@ ice_vc_validate_add_vlan_filter_list(struct ice_vsi *vsi,
+ 				     struct virtchnl_vlan_filtering_caps *vfc,
+ 				     struct virtchnl_vlan_filter_list_v2 *vfl)
+ {
+-	u16 num_requested_filters = vsi->num_vlan + vfl->num_elements;
++	u16 num_requested_filters = ice_vsi_num_non_zero_vlans(vsi) +
++		vfl->num_elements;
+ 
+ 	if (num_requested_filters > vfc->max_filters)
+ 		return false;
+-- 
+2.34.1
+

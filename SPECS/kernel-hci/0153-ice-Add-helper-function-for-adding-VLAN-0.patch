@@ -1,0 +1,103 @@
+From a1a9a88d4588c7d35ac99aff269023a9f3aa9665 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Thu, 2 Dec 2021 08:38:40 -0800
+Subject: [NET-NEXT 153/254] ice: Add helper function for adding VLAN 0
+
+From: Brett Creeley <brett.creeley@intel.com>
+
+There are multiple places where VLAN 0 is being added. Create a function
+to be called in order to minimize changes as the implementation is expanded
+to support double VLAN and avoid duplicated code.
+
+Backported from upstream commit 3e0b59714bd4
+Signed-off-by: Brett Creeley <brett.creeley@intel.com>
+Tested-by: Gurucharan G <gurucharanx.g@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_eswitch.c     |  4 ++--
+ drivers/net/ethernet/intel/ice/ice_lib.c         | 11 ++++++++++-
+ drivers/net/ethernet/intel/ice/ice_lib.h         |  2 +-
+ drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c |  2 +-
+ 4 files changed, 14 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.c b/drivers/net/ethernet/intel/ice/ice_eswitch.c
+index 73edc24d81d5..55b9e7d97d0b 100644
+--- a/drivers/net/ethernet/intel/ice/ice_eswitch.c
++++ b/drivers/net/ethernet/intel/ice/ice_eswitch.c
+@@ -127,7 +127,7 @@ static int ice_eswitch_setup_env(struct ice_pf *pf)
+ 	__dev_mc_unsync(uplink_netdev, NULL);
+ 	netif_addr_unlock_bh(uplink_netdev);
+ 
+-	if (ice_vsi_add_vlan(uplink_vsi, 0, ICE_FWD_TO_VSI))
++	if (ice_vsi_add_vlan_zero(uplink_vsi))
+ 		goto err_def_rx;
+ 
+ 	if (!ice_is_dflt_vsi_in_use(uplink_vsi->vsw)) {
+@@ -231,7 +231,7 @@ static int ice_eswitch_setup_reprs(struct ice_pf *pf)
+ 			goto err;
+ 		}
+ 
+-		if (ice_vsi_add_vlan(vsi, 0, ICE_FWD_TO_VSI)) {
++		if (ice_vsi_add_vlan_zero(vsi)) {
+ 			ice_fltr_add_mac_and_broadcast(vsi,
+ 						       vf->hw_lan_addr.addr,
+ 						       ICE_FWD_TO_VSI);
+diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
+index 0fb0fc4a5215..9d1670397c46 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_lib.c
+@@ -2670,7 +2670,7 @@ ice_vsi_setup(struct ice_pf *pf, struct ice_port_info *pi,
+ 		 * so this handles those cases (i.e. adding the PF to a bridge
+ 		 * without the 8021q module loaded).
+ 		 */
+-		ret = ice_vsi_add_vlan(vsi, 0, ICE_FWD_TO_VSI);
++		ret = ice_vsi_add_vlan_zero(vsi);
+ 		if (ret)
+ 			goto unroll_clear_rings;
+ 
+@@ -4120,6 +4120,15 @@ int ice_set_link(struct ice_vsi *vsi, bool ena)
+ 	return 0;
+ }
+ 
++/**
++ * ice_vsi_add_vlan_zero - add VLAN 0 filter(s) for this VSI
++ * @vsi: VSI used to add VLAN filters
++ */
++int ice_vsi_add_vlan_zero(struct ice_vsi *vsi)
++{
++	return ice_vsi_add_vlan(vsi, 0, ICE_FWD_TO_VSI);
++}
++
+ /**
+  * ice_is_feature_supported
+  * @pf: pointer to the struct ice_pf instance
+diff --git a/drivers/net/ethernet/intel/ice/ice_lib.h b/drivers/net/ethernet/intel/ice/ice_lib.h
+index b2ed189527d6..9a554bee4b03 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lib.h
++++ b/drivers/net/ethernet/intel/ice/ice_lib.h
+@@ -132,7 +132,7 @@ void ice_vsi_ctx_clear_antispoof(struct ice_vsi_ctx *ctx);
+ void ice_vsi_ctx_set_allow_override(struct ice_vsi_ctx *ctx);
+ 
+ void ice_vsi_ctx_clear_allow_override(struct ice_vsi_ctx *ctx);
+-
++int ice_vsi_add_vlan_zero(struct ice_vsi *vsi);
+ bool ice_is_feature_supported(struct ice_pf *pf, enum ice_feature f);
+ void ice_clear_feature_support(struct ice_pf *pf, enum ice_feature f);
+ void ice_init_feature_support(struct ice_pf *pf);
+diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c b/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c
+index 54f1c1847d17..2f192d9cc5ed 100644
+--- a/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c
++++ b/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c
+@@ -1864,7 +1864,7 @@ static int ice_init_vf_vsi_res(struct ice_vf *vf)
+ 	if (!vsi)
+ 		return -ENOMEM;
+ 
+-	err = ice_vsi_add_vlan(vsi, 0, ICE_FWD_TO_VSI);
++	err = ice_vsi_add_vlan_zero(vsi);
+ 	if (err) {
+ 		dev_warn(dev, "Failed to add VLAN 0 filter for VF %d\n",
+ 			 vf->vf_id);
+-- 
+2.34.1
+

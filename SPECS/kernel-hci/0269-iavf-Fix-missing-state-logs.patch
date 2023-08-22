@@ -1,0 +1,48 @@
+From 2a246795169fc23181975f856e47a97ea164930f Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Wed, 15 Jun 2022 13:57:20 -0400
+Subject: [NET-NEXT 270/273] iavf: Fix missing state logs
+
+From: Przemyslaw Patynowski <przemyslawx.patynowski@intel.com>
+
+[ Upstream commit d8fa2fd791a72087c1ce3336fbeefec4057c37c8 ]
+
+Fix debug prints, by adding missing state prints.
+
+Extend iavf_state_str by strings for __IAVF_INIT_EXTENDED_CAPS and
+__IAVF_INIT_CONFIG_ADAPTER.
+
+Without this patch, when enabling debug prints for iavf.h, user will
+see:
+iavf 0000:06:0e.0: state transition from:__IAVF_INIT_GET_RESOURCES to:__IAVF_UNKNOWN_STATE
+iavf 0000:06:0e.0: state transition from:__IAVF_UNKNOWN_STATE to:__IAVF_UNKNOWN_STATE
+
+Fixes: 605ca7c5c670 ("iavf: Fix kernel BUG in free_msi_irqs")
+Signed-off-by: Przemyslaw Patynowski <przemyslawx.patynowski@intel.com>
+Signed-off-by: Jun Zhang <xuejun.zhang@intel.com>
+Tested-by: Konrad Jankowski <konrad0.jankowski@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/iavf/iavf.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/net/ethernet/intel/iavf/iavf.h b/drivers/net/ethernet/intel/iavf/iavf.h
+index c90834cb1670..9c56d5b63a9f 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf.h
++++ b/drivers/net/ethernet/intel/iavf/iavf.h
+@@ -467,6 +467,10 @@ static inline const char *iavf_state_str(enum iavf_state_t state)
+ 		return "__IAVF_INIT_VERSION_CHECK";
+ 	case __IAVF_INIT_GET_RESOURCES:
+ 		return "__IAVF_INIT_GET_RESOURCES";
++	case __IAVF_INIT_EXTENDED_CAPS:
++		return "__IAVF_INIT_EXTENDED_CAPS";
++	case __IAVF_INIT_CONFIG_ADAPTER:
++		return "__IAVF_INIT_CONFIG_ADAPTER";
+ 	case __IAVF_INIT_SW:
+ 		return "__IAVF_INIT_SW";
+ 	case __IAVF_INIT_FAILED:
+-- 
+2.34.1
+

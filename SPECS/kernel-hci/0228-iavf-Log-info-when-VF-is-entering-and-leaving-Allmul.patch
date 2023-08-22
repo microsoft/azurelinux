@@ -1,0 +1,60 @@
+From f974c1266ee07007ceded0cf7779065da0cf8f1f Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Fri, 4 Jun 2021 09:53:32 -0700
+Subject: [NET-NEXT 228/254] iavf: Log info when VF is entering and leaving
+ Allmulti mode
+
+From: Grzegorz Szczurek <grzegorzx.szczurek@intel.com>
+
+Add log when VF is entering and leaving Allmulti mode.
+The change of VF state is visible in dmesg now.
+Without this commit, entering and leaving Allmulti mode
+is not logged in dmesg.
+
+Backported from upstream commit f1db020ba4ef
+
+Signed-off-by: Grzegorz Szczurek <grzegorzx.szczurek@intel.com>
+Tested-by: George Kuruvinakunnel <george.kuruvinakunnel@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ .../net/ethernet/intel/iavf/iavf_virtchnl.c   | 20 +++++++++++++------
+ 1 file changed, 14 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+index 262482c69458..dfcbc6a25915 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
++++ b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+@@ -765,15 +765,23 @@ void iavf_set_promiscuous(struct iavf_adapter *adapter, int flags)
+ 	if (flags & FLAG_VF_MULTICAST_PROMISC) {
+ 		adapter->flags |= IAVF_FLAG_ALLMULTI_ON;
+ 		adapter->aq_required &= ~IAVF_FLAG_AQ_REQUEST_ALLMULTI;
+-		dev_info(&adapter->pdev->dev, "Entering multicast promiscuous mode\n");
++		dev_info(&adapter->pdev->dev, "%s is entering multicast promiscuous mode\n",
++			 adapter->netdev->name);
+ 	}
+ 
+ 	if (!flags) {
+-		adapter->flags &= ~(IAVF_FLAG_PROMISC_ON |
+-				    IAVF_FLAG_ALLMULTI_ON);
+-		adapter->aq_required &= ~(IAVF_FLAG_AQ_RELEASE_PROMISC |
+-					  IAVF_FLAG_AQ_RELEASE_ALLMULTI);
+-		dev_info(&adapter->pdev->dev, "Leaving promiscuous mode\n");
++		if (adapter->flags & IAVF_FLAG_PROMISC_ON) {
++			adapter->flags &= ~IAVF_FLAG_PROMISC_ON;
++			adapter->aq_required &= ~IAVF_FLAG_AQ_RELEASE_PROMISC;
++			dev_info(&adapter->pdev->dev, "Leaving promiscuous mode\n");
++		}
++
++		if (adapter->flags & IAVF_FLAG_ALLMULTI_ON) {
++			adapter->flags &= ~IAVF_FLAG_ALLMULTI_ON;
++			adapter->aq_required &= ~IAVF_FLAG_AQ_RELEASE_ALLMULTI;
++			dev_info(&adapter->pdev->dev, "%s is leaving multicast promiscuous mode\n",
++				 adapter->netdev->name);
++		}
+ 	}
+ 
+ 	adapter->current_op = VIRTCHNL_OP_CONFIG_PROMISCUOUS_MODE;
+-- 
+2.34.1
+

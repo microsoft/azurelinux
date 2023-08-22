@@ -1,0 +1,79 @@
+From 56d562c49c2769098ec821cdc94d505f77eea7a9 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Fri, 17 Dec 2021 12:36:25 +0100
+Subject: [NET-NEXT 141/254] ice: Match on all profiles in slow-path
+
+From: Wojciech Drewek <wojciech.drewek@intel.com>
+
+In switchdev mode, slow-path rules need to match all protocols, in order
+to correctly redirect unfiltered or missed packets to the uplink. To set
+this up for the virtual function to uplink flow, the rule that redirects
+packets to the control VSI must have the tunnel type set to
+ICE_SW_TUN_AND_NON_TUN. As a result of that new tunnel type being set,
+ice_get_compat_fv_bitmap will select ICE_PROF_ALL. At that point all
+profiles would be selected for this rule, resulting in the desired
+behavior. Without this change slow-path would not work with
+tunnel protocols.
+
+Backported from upstream commit b70bc066d77b
+
+Fixes: 8b032a55c1bd ("ice: low level support for tunnels")
+Signed-off-by: Wojciech Drewek <wojciech.drewek@intel.com>
+Tested-by: Sandeep Penigalapati <sandeep.penigalapati@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_eswitch.c       | 1 +
+ drivers/net/ethernet/intel/ice/ice_protocol_type.h | 1 +
+ drivers/net/ethernet/intel/ice/ice_switch.c        | 4 +++-
+ 3 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.c b/drivers/net/ethernet/intel/ice/ice_eswitch.c
+index 864692b157b6..73edc24d81d5 100644
+--- a/drivers/net/ethernet/intel/ice/ice_eswitch.c
++++ b/drivers/net/ethernet/intel/ice/ice_eswitch.c
+@@ -44,6 +44,7 @@ ice_eswitch_add_vf_mac_rule(struct ice_pf *pf, struct ice_vf *vf, const u8 *mac)
+ 				       ctrl_vsi->rxq_map[vf->vf_id];
+ 	rule_info.flags_info.act |= ICE_SINGLE_ACT_LB_ENABLE;
+ 	rule_info.flags_info.act_valid = true;
++	rule_info.tun_type = ICE_SW_TUN_AND_NON_TUN;
+ 
+ 	err = ice_add_adv_rule(hw, list, lkups_cnt, &rule_info,
+ 			       vf->repr->mac_rule);
+diff --git a/drivers/net/ethernet/intel/ice/ice_protocol_type.h b/drivers/net/ethernet/intel/ice/ice_protocol_type.h
+index dc1b0e9e6df5..695b6dd61dc2 100644
+--- a/drivers/net/ethernet/intel/ice/ice_protocol_type.h
++++ b/drivers/net/ethernet/intel/ice/ice_protocol_type.h
+@@ -47,6 +47,7 @@ enum ice_protocol_type {
+ 
+ enum ice_sw_tunnel_type {
+ 	ICE_NON_TUN = 0,
++	ICE_SW_TUN_AND_NON_TUN,
+ 	ICE_SW_TUN_VXLAN,
+ 	ICE_SW_TUN_GENEVE,
+ 	ICE_SW_TUN_NVGRE,
+diff --git a/drivers/net/ethernet/intel/ice/ice_switch.c b/drivers/net/ethernet/intel/ice/ice_switch.c
+index c5437355a5d1..8461522449f1 100644
+--- a/drivers/net/ethernet/intel/ice/ice_switch.c
++++ b/drivers/net/ethernet/intel/ice/ice_switch.c
+@@ -4537,6 +4537,7 @@ ice_get_compat_fv_bitmap(struct ice_hw *hw, struct ice_adv_rule_info *rinfo,
+ 	case ICE_SW_TUN_NVGRE:
+ 		prof_type = ICE_PROF_TUN_GRE;
+ 		break;
++	case ICE_SW_TUN_AND_NON_TUN:
+ 	default:
+ 		prof_type = ICE_PROF_ALL;
+ 		break;
+@@ -5305,7 +5306,8 @@ ice_add_adv_rule(struct ice_hw *hw, struct ice_adv_lkup_elem *lkups,
+ 	if (status)
+ 		goto err_ice_add_adv_rule;
+ 
+-	if (rinfo->tun_type != ICE_NON_TUN) {
++	if (rinfo->tun_type != ICE_NON_TUN &&
++	    rinfo->tun_type != ICE_SW_TUN_AND_NON_TUN) {
+ 		status = ice_fill_adv_packet_tun(hw, rinfo->tun_type,
+ 						 s_rule->pdata.lkup_tx_rx.hdr,
+ 						 pkt_offsets);
+-- 
+2.34.1
+

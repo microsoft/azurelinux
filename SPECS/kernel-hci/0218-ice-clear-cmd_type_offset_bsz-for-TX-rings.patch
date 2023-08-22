@@ -1,0 +1,44 @@
+From 8fc52dc30423b9de59e4e09f6123bf63b09f44a3 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Thu, 17 Mar 2022 19:36:29 +0100
+Subject: [NET-NEXT 218/254] ice: clear cmd_type_offset_bsz for TX rings
+
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+
+Backported from upstream commit e19778e6c911
+
+Currently when XDP rings are created, each descriptor gets its DD bit
+set, which turns out to be the wrong approach as it can lead to a
+situation where more descriptors get cleaned than it was supposed to,
+e.g. when AF_XDP busy poll is run with a large batch size. In this
+situation, the driver would request for more buffers than it is able to
+handle.
+
+Fix this by not setting the DD bits in ice_xdp_alloc_setup_rings(). They
+should be initialized to zero instead.
+
+Fixes: 9610bd988df9 ("ice: optimize XDP_TX workloads")
+Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Tested-by: Shwetha Nagaraju <shwetha.nagaraju@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 5a1924c64ddb..85bd155feb39 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -2560,7 +2560,7 @@ static int ice_xdp_alloc_setup_rings(struct ice_vsi *vsi)
+ 		spin_lock_init(&xdp_ring->tx_lock);
+ 		for (j = 0; j < xdp_ring->count; j++) {
+ 			tx_desc = ICE_TX_DESC(xdp_ring, j);
+-			tx_desc->cmd_type_offset_bsz = cpu_to_le64(ICE_TX_DESC_DTYPE_DESC_DONE);
++			tx_desc->cmd_type_offset_bsz = 0;
+ 		}
+ 	}
+ 
+-- 
+2.34.1
+

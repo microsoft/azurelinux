@@ -1,0 +1,51 @@
+From f3c3d96d6585475f9a1af5f58783984d5122fc46 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Tue, 21 Dec 2021 15:05:38 -0800
+Subject: [NET-NEXT 132/254] ice: trivial: fix odd indenting
+
+From: Jesse Brandeburg <jesse.brandeburg@intel.com>
+
+Fix an odd indent where some code was left indented, and causes smatch
+to warn:
+ice_log_pkg_init() warn: inconsistent indenting
+
+While here, for consistency, add a break after the default case.
+
+This commit has a Fixes: but we caught this while it was only in net-next.
+
+Backported from upstream commit 0092db5fac22
+
+Fixes: 247dd97d713c ("ice: Refactor status flow for DDP load")
+Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+Link: https://lore.kernel.org/r/20211221230538.2546315-1-jesse.brandeburg@intel.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_main.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 76df1f65d3a7..674b0ed2fe4f 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -4157,13 +4157,14 @@ static void ice_log_pkg_init(struct ice_hw *hw, enum ice_ddp_state state)
+ 		break;
+ 	case ICE_DDP_PKG_LOAD_ERROR:
+ 		dev_err(dev, "An error occurred on the device while loading the DDP package.  The device will be reset.\n");
+-			/* poll for reset to complete */
+-			if (ice_check_reset(hw))
+-				dev_err(dev, "Error resetting device. Please reload the driver\n");
++		/* poll for reset to complete */
++		if (ice_check_reset(hw))
++			dev_err(dev, "Error resetting device. Please reload the driver\n");
+ 		break;
+ 	case ICE_DDP_PKG_ERR:
+ 	default:
+ 		dev_err(dev, "An unknown error occurred when loading the DDP package.  Entering Safe Mode.\n");
++		break;
+ 	}
+ }
+ 
+-- 
+2.34.1
+

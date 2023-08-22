@@ -1,0 +1,71 @@
+From 5b8561e67e6c81149f624e042e39e5877a468b56 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Fri, 1 Apr 2022 12:40:52 +0200
+Subject: [NET-NEXT 223/254] ice: Fix incorrect locking in
+ ice_vc_process_vf_msg()
+
+From: Ivan Vecera <ivecera@redhat.com>
+
+Backported from upstream commit aaf461af729b
+
+Usage of mutex_trylock() in ice_vc_process_vf_msg() is incorrect
+because message sent from VF is ignored and never processed.
+
+Use mutex_lock() instead to fix the issue. It is safe because this
+mutex is used to prevent races between VF related NDOs and
+handlers processing request messages from VF and these handlers
+are running in ice_service_task() context. Additionally move this
+mutex lock prior ice_vc_is_opcode_allowed() call to avoid potential
+races during allowlist access.
+
+Fixes: e6ba5273d4ed ("ice: Fix race conditions between virtchnl handling and VF ndo ops")
+Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+Tested-by: Konrad Jankowski <konrad0.jankowski@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c | 21 +++++++------------
+ 1 file changed, 7 insertions(+), 14 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl.c b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
+index 69ff4b929772..5612c032f15a 100644
+--- a/drivers/net/ethernet/intel/ice/ice_virtchnl.c
++++ b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
+@@ -3642,14 +3642,6 @@ void ice_vc_process_vf_msg(struct ice_pf *pf, struct ice_rq_event_info *event)
+ 			err = -EINVAL;
+ 	}
+ 
+-	if (!ice_vc_is_opcode_allowed(vf, v_opcode)) {
+-		ice_vc_send_msg_to_vf(vf, v_opcode,
+-				      VIRTCHNL_STATUS_ERR_NOT_SUPPORTED, NULL,
+-				      0);
+-		ice_put_vf(vf);
+-		return;
+-	}
+-
+ error_handler:
+ 	if (err) {
+ 		ice_vc_send_msg_to_vf(vf, v_opcode, VIRTCHNL_STATUS_ERR_PARAM,
+@@ -3660,12 +3652,13 @@ void ice_vc_process_vf_msg(struct ice_pf *pf, struct ice_rq_event_info *event)
+ 		return;
+ 	}
+ 
+-	/* VF is being configured in another context that triggers a VFR, so no
+-	 * need to process this message
+-	 */
+-	if (!mutex_trylock(&vf->cfg_lock)) {
+-		dev_info(dev, "VF %u is being configured in another context that will trigger a VFR, so there is no need to handle this message\n",
+-			 vf->vf_id);
++	mutex_lock(&vf->cfg_lock);
++
++	if (!ice_vc_is_opcode_allowed(vf, v_opcode)) {
++		ice_vc_send_msg_to_vf(vf, v_opcode,
++				      VIRTCHNL_STATUS_ERR_NOT_SUPPORTED, NULL,
++				      0);
++		mutex_unlock(&vf->cfg_lock);
+ 		ice_put_vf(vf);
+ 		return;
+ 	}
+-- 
+2.34.1
+

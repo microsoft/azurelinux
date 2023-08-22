@@ -1,0 +1,103 @@
+From ea7afdae97fdd1957ba610fab9c4f08e3571a88d Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Tue, 22 Feb 2022 16:26:53 -0800
+Subject: [NET-NEXT 192/254] ice: rename ICE_MAX_VF_COUNT to avoid confusion
+
+From: Jacob Keller <jacob.e.keller@intel.com>
+
+The ICE_MAX_VF_COUNT field is defined in ice_sriov.h. This count is true
+for SR-IOV but will not be true for all VF implementations, such as when
+the ice driver supports Scalable IOV.
+
+Rename this definition to clearly indicate ICE_MAX_SRIOV_VFS.
+
+Backported from upstream commit dc36796eadca
+
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+Tested-by: Konrad Jankowski <konrad0.jankowski@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_main.c  | 2 +-
+ drivers/net/ethernet/intel/ice/ice_sriov.c | 8 ++++----
+ drivers/net/ethernet/intel/ice/ice_sriov.h | 4 ++--
+ 3 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 5efca876165c..933da57b49d9 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -3760,7 +3760,7 @@ static void ice_set_pf_caps(struct ice_pf *pf)
+ 	if (func_caps->common_cap.sr_iov_1_1) {
+ 		set_bit(ICE_FLAG_SRIOV_CAPABLE, pf->flags);
+ 		pf->vfs.num_supported = min_t(int, func_caps->num_allocd_vfs,
+-					      ICE_MAX_VF_COUNT);
++					      ICE_MAX_SRIOV_VFS);
+ 	}
+ 	clear_bit(ICE_FLAG_RSS_ENA, pf->flags);
+ 	if (func_caps->common_cap.rss_table_size)
+diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.c b/drivers/net/ethernet/intel/ice/ice_sriov.c
+index b6554d894f7a..43ddf338be0f 100644
+--- a/drivers/net/ethernet/intel/ice/ice_sriov.c
++++ b/drivers/net/ethernet/intel/ice/ice_sriov.c
+@@ -661,7 +661,7 @@ void ice_free_vfs(struct ice_pf *pf)
+ 
+ 		/* clear malicious info since the VF is getting released */
+ 		if (ice_mbx_clear_malvf(&hw->mbx_snapshot, pf->vfs.malvfs,
+-					ICE_MAX_VF_COUNT, vf->vf_id))
++					ICE_MAX_SRIOV_VFS, vf->vf_id))
+ 			dev_dbg(dev, "failed to clear malicious VF state for VF %u\n",
+ 				vf->vf_id);
+ 
+@@ -1591,7 +1591,7 @@ bool ice_reset_all_vfs(struct ice_pf *pf, bool is_vflr)
+ 	/* clear all malicious info if the VFs are getting reset */
+ 	ice_for_each_vf(pf, bkt, vf)
+ 		if (ice_mbx_clear_malvf(&hw->mbx_snapshot, pf->vfs.malvfs,
+-					ICE_MAX_VF_COUNT, vf->vf_id))
++					ICE_MAX_SRIOV_VFS, vf->vf_id))
+ 			dev_dbg(dev, "failed to clear malicious VF state for VF %u\n",
+ 				vf->vf_id);
+ 
+@@ -1805,7 +1805,7 @@ bool ice_reset_vf(struct ice_vf *vf, bool is_vflr)
+ 
+ 	/* if the VF has been reset allow it to come up again */
+ 	if (ice_mbx_clear_malvf(&hw->mbx_snapshot, pf->vfs.malvfs,
+-				ICE_MAX_VF_COUNT, vf->vf_id))
++				ICE_MAX_SRIOV_VFS, vf->vf_id))
+ 		dev_dbg(dev, "failed to clear malicious VF state for VF %u\n", i);
+ 
+ 	return true;
+@@ -6623,7 +6623,7 @@ ice_is_malicious_vf(struct ice_pf *pf, struct ice_rq_event_info *event,
+ 		 * know about it, then let them know now
+ 		 */
+ 		status = ice_mbx_report_malvf(&pf->hw, pf->vfs.malvfs,
+-					      ICE_MAX_VF_COUNT, vf_id,
++					      ICE_MAX_SRIOV_VFS, vf_id,
+ 					      &report_vf);
+ 		if (status)
+ 			dev_dbg(dev, "Error reporting malicious VF\n");
+diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.h b/drivers/net/ethernet/intel/ice/ice_sriov.h
+index 699690c1f6a0..b40e74cfb694 100644
+--- a/drivers/net/ethernet/intel/ice/ice_sriov.h
++++ b/drivers/net/ethernet/intel/ice/ice_sriov.h
+@@ -22,7 +22,7 @@
+ #define ICE_PCI_CIAD_WAIT_DELAY_US	1
+ 
+ /* VF resource constraints */
+-#define ICE_MAX_VF_COUNT		256
++#define ICE_MAX_SRIOV_VFS		256
+ #define ICE_MIN_QS_PER_VF		1
+ #define ICE_NONQ_VECS_VF		1
+ #define ICE_MAX_RSS_QS_PER_VF		16
+@@ -147,7 +147,7 @@ struct ice_vfs {
+ 	u16 num_qps_per;		/* number of queue pairs per VF */
+ 	u16 num_msix_per;		/* number of MSI-X vectors per VF */
+ 	unsigned long last_printed_mdd_jiffies;	/* MDD message rate limit */
+-	DECLARE_BITMAP(malvfs, ICE_MAX_VF_COUNT); /* malicious VF indicator */
++	DECLARE_BITMAP(malvfs, ICE_MAX_SRIOV_VFS); /* malicious VF indicator */
+ };
+ 
+ /* VF information structure */
+-- 
+2.34.1
+

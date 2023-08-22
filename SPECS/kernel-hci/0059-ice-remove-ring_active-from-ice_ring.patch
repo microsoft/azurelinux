@@ -1,0 +1,70 @@
+From 02f97fd6ea9e2c46f0523e2406813ac2d7427dc9 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Thu, 19 Aug 2021 13:59:56 +0200
+Subject: [NET-NEXT 059/254] ice: remove ring_active from ice_ring
+
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+
+This field is dead and driver is not making any use of it. Simply remove
+it.
+
+Backported from upstream commit e93d1c37a85b
+
+Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Tested-by: Gurucharan G <gurucharanx.g@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_lib.c  | 2 --
+ drivers/net/ethernet/intel/ice/ice_main.c | 1 -
+ drivers/net/ethernet/intel/ice/ice_txrx.h | 2 --
+ 3 files changed, 5 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
+index 5afc5ed722fc..5653650fd497 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_lib.c
+@@ -1343,7 +1343,6 @@ static int ice_vsi_alloc_rings(struct ice_vsi *vsi)
+ 
+ 		ring->q_index = i;
+ 		ring->reg_idx = vsi->txq_map[i];
+-		ring->ring_active = false;
+ 		ring->vsi = vsi;
+ 		ring->tx_tstamps = &pf->ptp.port.tx;
+ 		ring->dev = dev;
+@@ -1363,7 +1362,6 @@ static int ice_vsi_alloc_rings(struct ice_vsi *vsi)
+ 
+ 		ring->q_index = i;
+ 		ring->reg_idx = vsi->rxq_map[i];
+-		ring->ring_active = false;
+ 		ring->vsi = vsi;
+ 		ring->netdev = vsi->netdev;
+ 		ring->dev = dev;
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index bc9c6451c97f..9214efd6681d 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -2419,7 +2419,6 @@ static int ice_xdp_alloc_setup_rings(struct ice_vsi *vsi)
+ 
+ 		xdp_ring->q_index = xdp_q_idx;
+ 		xdp_ring->reg_idx = vsi->txq_map[xdp_q_idx];
+-		xdp_ring->ring_active = false;
+ 		xdp_ring->vsi = vsi;
+ 		xdp_ring->netdev = NULL;
+ 		xdp_ring->dev = dev;
+diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.h b/drivers/net/ethernet/intel/ice/ice_txrx.h
+index 4d4481da1973..01397871ef49 100644
+--- a/drivers/net/ethernet/intel/ice/ice_txrx.h
++++ b/drivers/net/ethernet/intel/ice/ice_txrx.h
+@@ -269,8 +269,6 @@ struct ice_ring {
+ 	u16 q_index;			/* Queue number of ring */
+ 	u16 q_handle;			/* Queue handle per TC */
+ 
+-	u8 ring_active:1;		/* is ring online or not */
+-
+ 	u16 count;			/* Number of descriptors */
+ 	u16 reg_idx;			/* HW register index of the ring */
+ 
+-- 
+2.34.1
+

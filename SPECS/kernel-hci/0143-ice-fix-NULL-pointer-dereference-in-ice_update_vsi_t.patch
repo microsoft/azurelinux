@@ -1,0 +1,48 @@
+From 55a868fd512d37afee5be1ce65f08427aae35e23 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Mon, 7 Mar 2022 18:47:39 +0100
+Subject: [NET-NEXT 143/254] ice: fix NULL pointer dereference in
+ ice_update_vsi_tx_ring_stats()
+
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+
+It is possible to do NULL pointer dereference in routine that updates
+Tx ring stats. Currently only stats and bytes are updated when ring
+pointer is valid, but later on ring is accessed to propagate gathered Tx
+stats onto VSI stats.
+
+Change the existing logic to move to next ring when ring is NULL.
+
+Backported from upstream commit f153546913ba
+
+Fixes: e72bba21355d ("ice: split ice_ring onto Tx/Rx separate structs")
+Reported-by: kernel test robot <lkp@intel.com>
+Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
+Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Acked-by: Alexander Lobakin <alexandr.lobakin@intel.com>
+Tested-by: Gurucharan G <gurucharanx.g@intel.com> (A Contingent worker at Intel)
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_main.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 143e8ddcd220..37542b0bf76f 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -5978,8 +5978,9 @@ ice_update_vsi_tx_ring_stats(struct ice_vsi *vsi,
+ 		u64 pkts = 0, bytes = 0;
+ 
+ 		ring = READ_ONCE(rings[i]);
+-		if (ring)
+-			ice_fetch_u64_stats_per_ring(&ring->syncp, ring->stats, &pkts, &bytes);
++		if (!ring)
++			continue;
++		ice_fetch_u64_stats_per_ring(&ring->syncp, ring->stats, &pkts, &bytes);
+ 		vsi_stats->tx_packets += pkts;
+ 		vsi_stats->tx_bytes += bytes;
+ 		vsi->tx_restart += ring->tx_stats.restart_q;
+-- 
+2.34.1
+

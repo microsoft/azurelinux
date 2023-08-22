@@ -1,0 +1,69 @@
+From f44d85860418e6aabf4ce056c76bdb9a8d5895cd Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Mon, 25 Oct 2021 17:08:25 -0700
+Subject: [NET-NEXT 120/254] ice: tighter control over VSI_DOWN state
+
+From: Jesse Brandeburg <jesse.brandeburg@intel.com>
+
+The driver had comments to the effect of: This flag should be set before
+calling this function. While reviewing code it was found that there were
+several violations of this policy, which could introduce hard to find
+bugs or races.
+
+Fix the violations of the "VSI DOWN state must be set before calling
+ice_down" and make checking the state into code with a WARN_ON.
+
+Backported from upstream commit 21c6e36b1e55
+
+Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+Tested-by: Gurucharan G <gurucharanx.g@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_ethtool.c | 6 ++++--
+ drivers/net/ethernet/intel/ice/ice_main.c    | 7 ++++---
+ 2 files changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+index eed90aa95255..6d6f83fe4399 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
++++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+@@ -1281,8 +1281,10 @@ static int ice_set_priv_flags(struct net_device *netdev, u32 flags)
+ 	}
+ 	if (test_bit(ICE_FLAG_LEGACY_RX, change_flags)) {
+ 		/* down and up VSI so that changes of Rx cfg are reflected. */
+-		ice_down(vsi);
+-		ice_up(vsi);
++		if (!test_and_set_bit(ICE_VSI_DOWN, vsi->state)) {
++			ice_down(vsi);
++			ice_up(vsi);
++		}
+ 	}
+ 	/* don't allow modification of this flag when a single VF is in
+ 	 * promiscuous mode because it's not supported
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 6c86df8d4875..08f56d97e2a6 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -6268,14 +6268,15 @@ static void ice_napi_disable_all(struct ice_vsi *vsi)
+ /**
+  * ice_down - Shutdown the connection
+  * @vsi: The VSI being stopped
++ *
++ * Caller of this function is expected to set the vsi->state ICE_DOWN bit
+  */
+ int ice_down(struct ice_vsi *vsi)
+ {
+ 	int i, tx_err, rx_err, link_err = 0;
+ 
+-	/* Caller of this function is expected to set the
+-	 * vsi->state ICE_DOWN bit
+-	 */
++	WARN_ON(!test_bit(ICE_VSI_DOWN, vsi->state));
++
+ 	if (vsi->netdev && vsi->type == ICE_VSI_PF) {
+ 		netif_carrier_off(vsi->netdev);
+ 		netif_tx_disable(vsi->netdev);
+-- 
+2.34.1
+

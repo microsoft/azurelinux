@@ -1,0 +1,64 @@
+From ef4c34588e27d7397afee15c2ed269d1a146b60d Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Thu, 31 Mar 2022 09:20:07 -0700
+Subject: [NET-NEXT 214/254] ice: Fix MAC address setting
+
+From: Ivan Vecera <ivecera@redhat.com>
+
+Backported from upstream commit 2c0069f3f91f
+
+Commit 2ccc1c1ccc671b ("ice: Remove excess error variables") merged
+the usage of 'status' and 'err' variables into single one in
+function ice_set_mac_address(). Unfortunately this causes
+a regression when call of ice_fltr_add_mac() returns -EEXIST because
+this return value does not indicate an error in this case but
+value of 'err' remains to be -EEXIST till the end of the function
+and is returned to caller.
+
+Prior mentioned commit this does not happen because return value of
+ice_fltr_add_mac() was stored to 'status' variable first and
+if it was -EEXIST then 'err' remains to be zero.
+
+Fix the problem by reset 'err' to zero when ice_fltr_add_mac()
+returns -EEXIST.
+
+Fixes: 2ccc1c1ccc671b ("ice: Remove excess error variables")
+Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+Acked-by: Alexander Lobakin <alexandr.lobakin@intel.com>
+Signed-off-by: Alice Michael <alice.michael@intel.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_main.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 407c766ac630..7f220eeea9b2 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -5484,16 +5484,19 @@ static int ice_set_mac_address(struct net_device *netdev, void *pi)
+ 
+ 	/* Add filter for new MAC. If filter exists, return success */
+ 	err = ice_fltr_add_mac(vsi, mac, ICE_FWD_TO_VSI);
+-	if (err == -EEXIST)
++	if (err == -EEXIST) {
+ 		/* Although this MAC filter is already present in hardware it's
+ 		 * possible in some cases (e.g. bonding) that dev_addr was
+ 		 * modified outside of the driver and needs to be restored back
+ 		 * to this value.
+ 		 */
+ 		netdev_dbg(netdev, "filter for MAC %pM already exists\n", mac);
+-	else if (err)
++
++		return 0;
++	} else if (err) {
+ 		/* error if the new filter addition failed */
+ 		err = -EADDRNOTAVAIL;
++	}
+ 
+ err_update_filters:
+ 	if (err) {
+-- 
+2.34.1
+

@@ -1,0 +1,216 @@
+From fc28a1f80bb987efd211071437c7ed774da56b1d Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Fri, 10 Jun 2022 14:15:54 +0200
+Subject: [NET-NEXT 272/273] iavf: Fix VLAN_V2 addition/rejection
+
+From: Przemyslaw Patynowski <przemyslawx.patynowski@intel.com>
+
+[ Upstream commit 968996c070ef080ee7d6150faa98a4e562ce4625 ]
+
+Fix VLAN addition, so that PF driver does not reject whole VLAN batch.
+Add VLAN reject handling, so rejected VLANs, won't litter VLAN filter
+list. Fix handling of active_(c/s)vlans, so it will be possible to
+re-add VLAN filters for user.
+Without this patch, after changing trust to off, with VLAN filters
+saturated, no VLAN is added, due to PF rejecting addition.
+
+Fixes: 92fc50859872 ("iavf: Restrict maximum VLAN filters for VIRTCHNL_VF_OFFLOAD_VLAN_V2")
+Signed-off-by: Przemyslaw Patynowski <przemyslawx.patynowski@intel.com>
+Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+Tested-by: Konrad Jankowski <konrad0.jankowski@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/iavf/iavf.h        |  9 ++-
+ drivers/net/ethernet/intel/iavf/iavf_main.c   | 10 ++-
+ .../net/ethernet/intel/iavf/iavf_virtchnl.c   | 65 ++++++++++++++++++-
+ 3 files changed, 74 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/iavf/iavf.h b/drivers/net/ethernet/intel/iavf/iavf.h
+index 31c929aed8f5..c44d8b13c3d8 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf.h
++++ b/drivers/net/ethernet/intel/iavf/iavf.h
+@@ -159,8 +159,12 @@ struct iavf_vlan {
+ struct iavf_vlan_filter {
+ 	struct list_head list;
+ 	struct iavf_vlan vlan;
+-	bool remove;		/* filter needs to be removed */
+-	bool add;		/* filter needs to be added */
++	struct {
++		u8 is_new_vlan:1;	/* filter is new, wait for PF answer */
++		u8 remove:1;		/* filter needs to be removed */
++		u8 add:1;		/* filter needs to be added */
++		u8 padding:5;
++	};
+ };
+ 
+ #define IAVF_MAX_TRAFFIC_CLASS	4
+@@ -529,6 +533,7 @@ int iavf_get_vf_config(struct iavf_adapter *adapter);
+ int iavf_get_vf_vlan_v2_caps(struct iavf_adapter *adapter);
+ int iavf_send_vf_offload_vlan_v2_msg(struct iavf_adapter *adapter);
+ void iavf_set_queue_vlan_tag_loc(struct iavf_adapter *adapter);
++u16 iavf_get_num_vlans_added(struct iavf_adapter *adapter);
+ void iavf_irq_enable(struct iavf_adapter *adapter, bool flush);
+ void iavf_configure_queues(struct iavf_adapter *adapter);
+ void iavf_deconfigure_queues(struct iavf_adapter *adapter);
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
+index 77b1fe4d522e..925649068ca9 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_main.c
++++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
+@@ -840,7 +840,7 @@ static void iavf_restore_filters(struct iavf_adapter *adapter)
+  * iavf_get_num_vlans_added - get number of VLANs added
+  * @adapter: board private structure
+  */
+-static u16 iavf_get_num_vlans_added(struct iavf_adapter *adapter)
++u16 iavf_get_num_vlans_added(struct iavf_adapter *adapter)
+ {
+ 	return bitmap_weight(adapter->vsi.active_cvlans, VLAN_N_VID) +
+ 		bitmap_weight(adapter->vsi.active_svlans, VLAN_N_VID);
+@@ -903,11 +903,6 @@ static int iavf_vlan_rx_add_vid(struct net_device *netdev,
+ 	if (!iavf_add_vlan(adapter, IAVF_VLAN(vid, be16_to_cpu(proto))))
+ 		return -ENOMEM;
+ 
+-	if (proto == cpu_to_be16(ETH_P_8021Q))
+-		set_bit(vid, adapter->vsi.active_cvlans);
+-	else
+-		set_bit(vid, adapter->vsi.active_svlans);
+-
+ 	return 0;
+ }
+ 
+@@ -3035,6 +3030,9 @@ static void iavf_reset_task(struct work_struct *work)
+ 	adapter->aq_required |= IAVF_FLAG_AQ_ADD_CLOUD_FILTER;
+ 	iavf_misc_irq_enable(adapter);
+ 
++	bitmap_clear(adapter->vsi.active_cvlans, 0, VLAN_N_VID);
++	bitmap_clear(adapter->vsi.active_svlans, 0, VLAN_N_VID);
++
+ 	mod_delayed_work(iavf_wq, &adapter->watchdog_task, 2);
+ 
+ 	/* We were running when the reset started, so we need to restore some
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+index 118b66a8a4d8..24f4dea9aee6 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
++++ b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+@@ -629,6 +629,33 @@ static void iavf_mac_add_reject(struct iavf_adapter *adapter)
+ 	spin_unlock_bh(&adapter->mac_vlan_list_lock);
+ }
+ 
++/**
++ * iavf_vlan_add_reject
++ * @adapter: adapter structure
++ *
++ * Remove VLAN filters from list based on PF response.
++ **/
++static void iavf_vlan_add_reject(struct iavf_adapter *adapter)
++{
++	struct iavf_vlan_filter *f, *ftmp;
++
++	spin_lock_bh(&adapter->mac_vlan_list_lock);
++	list_for_each_entry_safe(f, ftmp, &adapter->vlan_filter_list, list) {
++		if (f->is_new_vlan) {
++			if (f->vlan.tpid == ETH_P_8021Q)
++				clear_bit(f->vlan.vid,
++					  adapter->vsi.active_cvlans);
++			else
++				clear_bit(f->vlan.vid,
++					  adapter->vsi.active_svlans);
++
++			list_del(&f->list);
++			kfree(f);
++		}
++	}
++	spin_unlock_bh(&adapter->mac_vlan_list_lock);
++}
++
+ /**
+  * iavf_add_vlans
+  * @adapter: adapter structure
+@@ -686,6 +713,7 @@ void iavf_add_vlans(struct iavf_adapter *adapter)
+ 				vvfl->vlan_id[i] = f->vlan.vid;
+ 				i++;
+ 				f->add = false;
++				f->is_new_vlan = true;
+ 				if (i == count)
+ 					break;
+ 			}
+@@ -698,10 +726,18 @@ void iavf_add_vlans(struct iavf_adapter *adapter)
+ 		iavf_send_pf_msg(adapter, VIRTCHNL_OP_ADD_VLAN, (u8 *)vvfl, len);
+ 		kfree(vvfl);
+ 	} else {
++		u16 max_vlans = adapter->vlan_v2_caps.filtering.max_filters;
++		u16 current_vlans = iavf_get_num_vlans_added(adapter);
+ 		struct virtchnl_vlan_filter_list_v2 *vvfl_v2;
+ 
+ 		adapter->current_op = VIRTCHNL_OP_ADD_VLAN_V2;
+ 
++		if ((count + current_vlans) > max_vlans &&
++		    current_vlans < max_vlans) {
++			count = max_vlans - iavf_get_num_vlans_added(adapter);
++			more = true;
++		}
++
+ 		len = sizeof(*vvfl_v2) + ((count - 1) *
+ 					  sizeof(struct virtchnl_vlan_filter));
+ 		if (len > IAVF_MAX_AQ_BUF_SIZE) {
+@@ -728,6 +764,9 @@ void iavf_add_vlans(struct iavf_adapter *adapter)
+ 					&adapter->vlan_v2_caps.filtering.filtering_support;
+ 				struct virtchnl_vlan *vlan;
+ 
++				if (i == count)
++					break;
++
+ 				/* give priority over outer if it's enabled */
+ 				if (filtering_support->outer)
+ 					vlan = &vvfl_v2->filters[i].outer;
+@@ -739,8 +778,7 @@ void iavf_add_vlans(struct iavf_adapter *adapter)
+ 
+ 				i++;
+ 				f->add = false;
+-				if (i == count)
+-					break;
++				f->is_new_vlan = true;
+ 			}
+ 		}
+ 
+@@ -2083,6 +2121,11 @@ void iavf_virtchnl_completion(struct iavf_adapter *adapter,
+ 			 */
+ 			iavf_netdev_features_vlan_strip_set(netdev, true);
+ 			break;
++		case VIRTCHNL_OP_ADD_VLAN_V2:
++			iavf_vlan_add_reject(adapter);
++			dev_warn(&adapter->pdev->dev, "Failed to add VLAN filter, error %s\n",
++				 iavf_stat_str(&adapter->hw, v_retval));
++			break;
+ 		default:
+ 			dev_err(&adapter->pdev->dev, "PF returned error %d (%s) to our request %d\n",
+ 				v_retval, iavf_stat_str(&adapter->hw, v_retval),
+@@ -2342,6 +2385,24 @@ void iavf_virtchnl_completion(struct iavf_adapter *adapter,
+ 		spin_unlock_bh(&adapter->adv_rss_lock);
+ 		}
+ 		break;
++	case VIRTCHNL_OP_ADD_VLAN_V2: {
++		struct iavf_vlan_filter *f;
++
++		spin_lock_bh(&adapter->mac_vlan_list_lock);
++		list_for_each_entry(f, &adapter->vlan_filter_list, list) {
++			if (f->is_new_vlan) {
++				f->is_new_vlan = false;
++				if (f->vlan.tpid == ETH_P_8021Q)
++					set_bit(f->vlan.vid,
++						adapter->vsi.active_cvlans);
++				else
++					set_bit(f->vlan.vid,
++						adapter->vsi.active_svlans);
++			}
++		}
++		spin_unlock_bh(&adapter->mac_vlan_list_lock);
++		}
++		break;
+ 	case VIRTCHNL_OP_ENABLE_VLAN_STRIPPING:
+ 		/* PF enabled vlan strip on this VF.
+ 		 * Update netdev->features if needed to be in sync with ethtool.
+-- 
+2.34.1
+

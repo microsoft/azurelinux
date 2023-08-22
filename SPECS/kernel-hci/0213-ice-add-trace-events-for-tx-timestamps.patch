@@ -1,0 +1,161 @@
+From 9960957b0dc1555f51fbdde27d2a5f9ce56882a0 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Tue, 1 Mar 2022 15:02:28 -0800
+Subject: [NET-NEXT 213/254] ice: add trace events for tx timestamps
+
+From: Jacob Keller <jacob.e.keller@intel.com>
+
+We've previously run into many issues related to the latency of a Tx
+timestamp completion with the ice hardware. It can be difficult to
+determine the root cause of a slow Tx timestamp. To aid in this,
+introduce new trace events which capture timing data about when the
+driver reaches certain points while processing a transmit timestamp
+
+ * ice_tx_tstamp_request: Trace when the stack initiates a new timestamp
+   request.
+
+ * ice_tx_tstamp_fw_req: Trace when the driver begins a read of the
+   timestamp register in the work thread.
+
+ * ice_tx_tstamp_fw_done: Trace when the driver finishes reading a
+   timestamp register in the work thread.
+
+ * ice_tx_tstamp_complete: Trace when the driver submits the skb back to
+   the stack with a completed Tx timestamp.
+
+These trace events can be enabled using the standard trace event
+subsystem exposed by the ice driver. If they are disabled, they become
+no-ops with no run time cost.
+
+The following is a simple GNU AWK script which can highlight one
+potential way to use the trace events to capture latency data from the
+trace buffer about how long the driver takes to process a timestamp:
+
+-----
+  BEGIN {
+      PREC=256
+  }
+
+  # Detect requests
+  /tx_tstamp_request/ {
+      time=strtonum($4)
+      skb=$7
+
+      # Store the time of request for this skb
+      requests[skb] = time
+      printf("skb %s: idx %d at %.6f\n", skb, idx, time)
+  }
+
+  # Detect completions
+  /tx_tstamp_complete/ {
+      time=strtonum($4)
+      skb=$7
+      idx=$9
+
+      if (skb in requests) {
+          latency = (time - requests[skb]) * 1000
+          printf("skb %s: %.3f to complete\n", skb, latency)
+          if (latency > 4) {
+              printf(">>> HIGH LATENCY <<<\n")
+          }
+          printf("\n")
+      } else {
+          printf("!!! skb %s (idx %d) at %.6f\n", skb, idx, time)
+      }
+  }
+-----
+
+Backported from upstream commit 4c1202189e35
+
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+Tested-by: Gurucharan <gurucharanx.g@intel.com> (A Contingent worker at Intel)
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_ptp.c   |  8 ++++++++
+ drivers/net/ethernet/intel/ice/ice_trace.h | 24 ++++++++++++++++++++++
+ 2 files changed, 32 insertions(+)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
+index 3a13a8f168f2..9fb84a201e9c 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp.c
++++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
+@@ -3,6 +3,7 @@
+ 
+ #include "ice.h"
+ #include "ice_lib.h"
++#include "ice_trace.h"
+ 
+ #define E810_OUT_PROP_DELAY_NS 1
+ 
+@@ -2077,11 +2078,15 @@ static void ice_ptp_tx_tstamp_work(struct kthread_work *work)
+ 		struct sk_buff *skb;
+ 		int err;
+ 
++		ice_trace(tx_tstamp_fw_req, tx->tstamps[idx].skb, idx);
++
+ 		err = ice_read_phy_tstamp(hw, tx->quad, phy_idx,
+ 					  &raw_tstamp);
+ 		if (err)
+ 			continue;
+ 
++		ice_trace(tx_tstamp_fw_done, tx->tstamps[idx].skb, idx);
++
+ 		/* Check if the timestamp is invalid or stale */
+ 		if (!(raw_tstamp & ICE_PTP_TS_VALID) ||
+ 		    raw_tstamp == tx->tstamps[idx].cached_tstamp)
+@@ -2107,6 +2112,8 @@ static void ice_ptp_tx_tstamp_work(struct kthread_work *work)
+ 		tstamp = ice_ptp_extend_40b_ts(pf, raw_tstamp);
+ 		shhwtstamps.hwtstamp = ns_to_ktime(tstamp);
+ 
++		ice_trace(tx_tstamp_complete, skb, idx);
++
+ 		skb_tstamp_tx(skb, &shhwtstamps);
+ 		dev_kfree_skb_any(skb);
+ 	}
+@@ -2145,6 +2152,7 @@ s8 ice_ptp_request_ts(struct ice_ptp_tx *tx, struct sk_buff *skb)
+ 		tx->tstamps[idx].start = jiffies;
+ 		tx->tstamps[idx].skb = skb_get(skb);
+ 		skb_shinfo(skb)->tx_flags |= SKBTX_IN_PROGRESS;
++		ice_trace(tx_tstamp_request, skb, idx);
+ 	}
+ 
+ 	spin_unlock(&tx->lock);
+diff --git a/drivers/net/ethernet/intel/ice/ice_trace.h b/drivers/net/ethernet/intel/ice/ice_trace.h
+index cf685247c07a..ae98d5a8ff60 100644
+--- a/drivers/net/ethernet/intel/ice/ice_trace.h
++++ b/drivers/net/ethernet/intel/ice/ice_trace.h
+@@ -216,6 +216,30 @@ DEFINE_EVENT(ice_xmit_template, name, \
+ DEFINE_XMIT_TEMPLATE_OP_EVENT(ice_xmit_frame_ring);
+ DEFINE_XMIT_TEMPLATE_OP_EVENT(ice_xmit_frame_ring_drop);
+ 
++DECLARE_EVENT_CLASS(ice_tx_tstamp_template,
++		    TP_PROTO(struct sk_buff *skb, int idx),
++
++		    TP_ARGS(skb, idx),
++
++		    TP_STRUCT__entry(__field(void *, skb)
++				     __field(int, idx)),
++
++		    TP_fast_assign(__entry->skb = skb;
++				   __entry->idx = idx;),
++
++		    TP_printk("skb %pK idx %d",
++			      __entry->skb, __entry->idx)
++);
++#define DEFINE_TX_TSTAMP_OP_EVENT(name) \
++DEFINE_EVENT(ice_tx_tstamp_template, name, \
++	     TP_PROTO(struct sk_buff *skb, int idx), \
++	     TP_ARGS(skb, idx))
++
++DEFINE_TX_TSTAMP_OP_EVENT(ice_tx_tstamp_request);
++DEFINE_TX_TSTAMP_OP_EVENT(ice_tx_tstamp_fw_req);
++DEFINE_TX_TSTAMP_OP_EVENT(ice_tx_tstamp_fw_done);
++DEFINE_TX_TSTAMP_OP_EVENT(ice_tx_tstamp_complete);
++
+ /* End tracepoints */
+ 
+ #endif /* _ICE_TRACE_H_ */
+-- 
+2.34.1
+

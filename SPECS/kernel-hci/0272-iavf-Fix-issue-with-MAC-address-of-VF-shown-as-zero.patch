@@ -1,0 +1,56 @@
+From 36c8d7bded482893bedd8d7a68911cde89f3cd92 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Fri, 20 May 2022 13:19:27 +0200
+Subject: [NET-NEXT 273/273] iavf: Fix issue with MAC address of VF shown as
+ zero
+
+From: Michal Wilczynski <michal.wilczynski@intel.com>
+
+[ Upstream commit 645603844270b69175899268be68b871295764fe ]
+
+After reinitialization of iavf, ice driver gets VIRTCHNL_OP_ADD_ETH_ADDR
+message with incorrectly set type of MAC address. Hardware address should
+have is_primary flag set as true. This way ice driver knows what it has
+to set as a MAC address.
+
+Check if the address is primary in iavf_add_filter function and set flag
+accordingly.
+
+To test set all-zero MAC on a VF. This triggers iavf re-initialization
+and VIRTCHNL_OP_ADD_ETH_ADDR message gets sent to PF.
+For example:
+
+ip link set dev ens785 vf 0 mac 00:00:00:00:00:00
+
+This triggers re-initialization of iavf. New MAC should be assigned.
+Now check if MAC is non-zero:
+
+ip link show dev ens785
+
+Fixes: a3e839d539e0 ("iavf: Add usage of new virtchnl format to set default MAC")
+Signed-off-by: Michal Wilczynski <michal.wilczynski@intel.com>
+Reviewed-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Tested-by: Konrad Jankowski <konrad0.jankowski@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/iavf/iavf_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
+index 925649068ca9..ef62d8b511a8 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_main.c
++++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
+@@ -976,7 +976,7 @@ struct iavf_mac_filter *iavf_add_filter(struct iavf_adapter *adapter,
+ 		list_add_tail(&f->list, &adapter->mac_filter_list);
+ 		f->add = true;
+ 		f->is_new_mac = true;
+-		f->is_primary = false;
++		f->is_primary = ether_addr_equal(macaddr, adapter->hw.mac.addr);
+ 		adapter->aq_required |= IAVF_FLAG_AQ_ADD_MAC_FILTER;
+ 	} else {
+ 		f->remove = false;
+-- 
+2.34.1
+

@@ -1,0 +1,39 @@
+From 2a320afe7d311d2e927c7b171b20f70e28cbb5ef Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Fri, 4 Jun 2021 09:53:30 -0700
+Subject: [NET-NEXT 227/254] iavf: Add change MTU message
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+From: Patryk Małek <patryk.malek@intel.com>
+
+Add a netdev_dbg log entry in case of a change of MTU so that user is
+notified about this change in the same manner as in case of pf driver.
+
+Backported from upstream commit aeb5d11fd1ef
+
+Signed-off-by: Patryk Małek <patryk.malek@intel.com>
+Tested-by: George Kuruvinakunnel <george.kuruvinakunnel@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/iavf/iavf_main.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
+index a87f4f1ae684..953a9254a52d 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_main.c
++++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
+@@ -3645,6 +3645,8 @@ static int iavf_change_mtu(struct net_device *netdev, int new_mtu)
+ {
+ 	struct iavf_adapter *adapter = netdev_priv(netdev);
+ 
++	netdev_dbg(netdev, "changing MTU from %d to %d\n",
++		   netdev->mtu, new_mtu);
+ 	netdev->mtu = new_mtu;
+ 	if (CLIENT_ENABLED(adapter)) {
+ 		iavf_notify_client_l2_params(&adapter->vsi);
+-- 
+2.34.1
+

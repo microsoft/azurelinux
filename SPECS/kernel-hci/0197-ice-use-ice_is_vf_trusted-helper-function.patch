@@ -1,0 +1,71 @@
+From b58914b69bd0cfded39c7d6008bf3e55aa8d92ca Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Tue, 22 Feb 2022 16:26:58 -0800
+Subject: [NET-NEXT 197/254] ice: use ice_is_vf_trusted helper function
+
+From: Jacob Keller <jacob.e.keller@intel.com>
+
+The ice_vc_cfg_promiscuous_mode_msg function directly checks
+ICE_VIRTCHNL_VF_CAP_PRIVILEGE, instead of using the existing helper
+function ice_is_vf_trusted. Switch this to use the helper function so
+that all trusted checks are consistent. This aids in any potential
+future refactor by ensuring consistent code.
+
+Backported from upstream commit 1261691dda6b
+
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+Tested-by: Konrad Jankowski <konrad0.jankowski@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_sriov.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.c b/drivers/net/ethernet/intel/ice/ice_sriov.c
+index 4084cd95f1af..0422cd941b61 100644
+--- a/drivers/net/ethernet/intel/ice/ice_sriov.c
++++ b/drivers/net/ethernet/intel/ice/ice_sriov.c
+@@ -3147,6 +3147,15 @@ int ice_set_vf_spoofchk(struct net_device *netdev, int vf_id, bool ena)
+ 	return ret;
+ }
+ 
++/**
++ * ice_is_vf_trusted
++ * @vf: pointer to the VF info
++ */
++static bool ice_is_vf_trusted(struct ice_vf *vf)
++{
++	return test_bit(ICE_VIRTCHNL_VF_CAP_PRIVILEGE, &vf->vf_caps);
++}
++
+ /**
+  * ice_is_any_vf_in_promisc - check if any VF(s) are in promiscuous mode
+  * @pf: PF structure for accessing VF(s)
+@@ -3211,7 +3220,7 @@ static int ice_vc_cfg_promiscuous_mode_msg(struct ice_vf *vf, u8 *msg)
+ 	}
+ 
+ 	dev = ice_pf_to_dev(pf);
+-	if (!test_bit(ICE_VIRTCHNL_VF_CAP_PRIVILEGE, &vf->vf_caps)) {
++	if (!ice_is_vf_trusted(vf)) {
+ 		dev_err(dev, "Unprivileged VF %d is attempting to configure promiscuous mode\n",
+ 			vf->vf_id);
+ 		/* Leave v_ret alone, lie to the VF on purpose. */
+@@ -3861,15 +3870,6 @@ static int ice_vc_cfg_qs_msg(struct ice_vf *vf, u8 *msg)
+ 				     NULL, 0);
+ }
+ 
+-/**
+- * ice_is_vf_trusted
+- * @vf: pointer to the VF info
+- */
+-static bool ice_is_vf_trusted(struct ice_vf *vf)
+-{
+-	return test_bit(ICE_VIRTCHNL_VF_CAP_PRIVILEGE, &vf->vf_caps);
+-}
+-
+ /**
+  * ice_can_vf_change_mac
+  * @vf: pointer to the VF info
+-- 
+2.34.1
+

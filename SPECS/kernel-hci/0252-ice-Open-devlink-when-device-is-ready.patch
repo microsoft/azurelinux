@@ -1,0 +1,66 @@
+From a46d16bced0bf1c834908cbf733c394d1bec0fe1 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Sat, 25 Sep 2021 14:22:46 +0300
+Subject: [NET-NEXT 252/254] ice: Open devlink when device is ready
+
+From: Leon Romanovsky <leonro@nvidia.com>
+
+Move devlink_registration routine to be the last command, when the
+device is fully initialized.
+
+Backported from upstream commit 838cefd5e52c
+
+Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_main.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 8c1fe9e38301..ac5d200f5827 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -4610,7 +4610,6 @@ ice_probe(struct pci_dev *pdev, const struct pci_device_id __always_unused *ent)
+ 
+ 	pf->msg_enable = netif_msg_init(debug, ICE_DFLT_NETIF_M);
+ 
+-	err = ice_devlink_register(pf);
+ 	if (err) {
+ 		dev_err(dev, "ice_devlink_register failed: %d\n", err);
+ 		goto err_exit_unroll;
+@@ -4858,6 +4857,7 @@ ice_probe(struct pci_dev *pdev, const struct pci_device_id __always_unused *ent)
+ 		dev_warn(dev, "RDMA is not supported on this device\n");
+ 	}
+ 
++	err = ice_devlink_register(pf);
+ 	return 0;
+ 
+ err_init_aux_unroll:
+@@ -4883,7 +4883,6 @@ ice_probe(struct pci_dev *pdev, const struct pci_device_id __always_unused *ent)
+ 	ice_devlink_destroy_regions(pf);
+ 	ice_deinit_hw(hw);
+ err_exit_unroll:
+-	ice_devlink_unregister(pf);
+ 	pci_disable_pcie_error_reporting(pdev);
+ 	pci_disable_device(pdev);
+ 	return err;
+@@ -4959,6 +4958,7 @@ static void ice_remove(struct pci_dev *pdev)
+ 	struct ice_pf *pf = pci_get_drvdata(pdev);
+ 	int i;
+ 
++	ice_devlink_unregister(pf);
+ 	for (i = 0; i < ICE_MAX_RESET_WAIT; i++) {
+ 		if (!ice_is_reset_in_progress(pf->state))
+ 			break;
+@@ -5001,7 +5001,6 @@ static void ice_remove(struct pci_dev *pdev)
+ 	ice_deinit_pf(pf);
+ 	ice_devlink_destroy_regions(pf);
+ 	ice_deinit_hw(&pf->hw);
+-	ice_devlink_unregister(pf);
+ 
+ 	/* Issue a PFR as part of the prescribed driver unload flow.  Do not
+ 	 * do it via ice_schedule_reset() since there is no need to rebuild
+-- 
+2.34.1
+

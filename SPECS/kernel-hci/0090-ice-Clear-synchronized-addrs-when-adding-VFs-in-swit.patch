@@ -1,0 +1,65 @@
+From a02d20922362fa41a0a9e3be643822fea5c9852f Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Tue, 26 Oct 2021 17:46:28 +0200
+Subject: [NET-NEXT 090/254] ice: Clear synchronized addrs when adding VFs in
+ switchdev mode
+
+From: Marcin Szycik <marcin.szycik@linux.intel.com>
+
+When spawning VFs in switchdev mode, internal filter list of VSIs is
+cleared, which includes MAC rules. However MAC entries stay on netdev's
+multicast list, which causes error message when bringing link up after
+spawning VFs ("Failed to delete MAC filters"). __dev_mc_sync() is
+called and tries to unsync addresses that were already removed
+internally when adding VFs.
+
+This can be reproduced with:
+1) Load ice driver
+2) Change PF to switchdev mode
+3) Bring PF link up
+4) Bring PF link down
+5) Create a VF on PF
+6) Bring PF link up
+
+Added clearing of netdev's multicast (and also unicast) list when
+spawning VFs in switchdev mode, so the state of internal rule list and
+netdev's MAC list is consistent.
+
+Backported from upstream commit c79bb28e19cc
+
+Fixes: 1a1c40df2e80 ("ice: set and release switchdev environment")
+Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+Tested-by: Sandeep Penigalapati <sandeep.penigalapati@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_eswitch.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.c b/drivers/net/ethernet/intel/ice/ice_eswitch.c
+index 6cb50653b18d..d1d7389b0bff 100644
+--- a/drivers/net/ethernet/intel/ice/ice_eswitch.c
++++ b/drivers/net/ethernet/intel/ice/ice_eswitch.c
+@@ -19,6 +19,7 @@
+ static int ice_eswitch_setup_env(struct ice_pf *pf)
+ {
+ 	struct ice_vsi *uplink_vsi = pf->switchdev.uplink_vsi;
++	struct net_device *uplink_netdev = uplink_vsi->netdev;
+ 	struct ice_vsi *ctrl_vsi = pf->switchdev.control_vsi;
+ 	struct ice_port_info *pi = pf->hw.port_info;
+ 	bool rule_added = false;
+@@ -27,6 +28,11 @@ static int ice_eswitch_setup_env(struct ice_pf *pf)
+ 
+ 	ice_remove_vsi_fltr(&pf->hw, uplink_vsi->idx);
+ 
++	netif_addr_lock_bh(uplink_netdev);
++	__dev_uc_unsync(uplink_netdev, NULL);
++	__dev_mc_unsync(uplink_netdev, NULL);
++	netif_addr_unlock_bh(uplink_netdev);
++
+ 	if (ice_vsi_add_vlan(uplink_vsi, 0, ICE_FWD_TO_VSI))
+ 		goto err_def_rx;
+ 
+-- 
+2.34.1
+

@@ -1,0 +1,48 @@
+From d610b994166b78334dab93bc1b6e480b760766ee Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Thu, 20 Jan 2022 16:27:56 -0800
+Subject: [NET-NEXT 140/254] ice: Avoid RTNL lock when re-creating auxiliary
+ device
+
+From: Dave Ertman <david.m.ertman@intel.com>
+
+If a call to re-create the auxiliary device happens in a context that has
+already taken the RTNL lock, then the call flow that recreates auxiliary
+device can hang if there is another attempt to claim the RTNL lock by the
+auxiliary driver.
+
+To avoid this, any call to re-create auxiliary devices that comes from
+an source that is holding the RTNL lock (e.g. netdev notifier when
+interface exits a bond) should execute in a separate thread.  To
+accomplish this, add a flag to the PF that will be evaluated in the
+service task and dealt with there.
+
+Backported and adapted slightly from upstream commit 5dbbbd01cbba
+
+Fixes: f9f5301e7e2d ("ice: Register auxiliary device to provide RDMA")
+Signed-off-by: Dave Ertman <david.m.ertman@intel.com>
+Reviewed-by: Jonathan Toppins <jtoppins@redhat.com>
+Tested-by: Gurucharan G <gurucharanx.g@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_main.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 7f41a994fe34..143e8ddcd220 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -2289,6 +2289,9 @@ static void ice_service_task(struct work_struct *work)
+ 		}
+ 	}
+ 
++	if (test_and_clear_bit(ICE_FLAG_PLUG_AUX_DEV, pf->flags))
++		ice_plug_aux_dev(pf);
++
+ 	ice_clean_adminq_subtask(pf);
+ 	ice_check_media_subtask(pf);
+ 	ice_check_for_hang_subtask(pf);
+-- 
+2.34.1
+

@@ -1,0 +1,45 @@
+From ec8391d1e88c40faf88e49891305784aad8b4c60 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Thu, 10 Mar 2022 10:46:52 -0800
+Subject: [NET-NEXT 144/254] ice: destroy flow director filter mutex after
+ releasing VSIs
+
+From: Sudheer Mogilappagari <sudheer.mogilappagari@intel.com>
+
+Currently fdir_fltr_lock is accessed in ice_vsi_release_all() function
+after it is destroyed. Instead destroy mutex after ice_vsi_release_all.
+
+Backported from upstream commit 1b4ae7d925c6
+
+Fixes: 40319796b732 ("ice: Add flow director support for channel mode")
+Signed-off-by: Sudheer Mogilappagari <sudheer.mogilappagari@intel.com>
+Tested-by: Bharathi Sreenivas <bharathi.sreenivas@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 37542b0bf76f..5cbbe5fad1d3 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -4893,7 +4893,6 @@ static void ice_remove(struct pci_dev *pdev)
+ 	ice_devlink_unregister_params(pf);
+ 	set_bit(ICE_DOWN, pf->state);
+ 
+-	mutex_destroy(&(&pf->hw)->fdir_fltr_lock);
+ 	ice_deinit_lag(pf);
+ 	if (test_bit(ICE_FLAG_PTP_SUPPORTED, pf->flags))
+ 		ice_ptp_release(pf);
+@@ -4901,6 +4900,7 @@ static void ice_remove(struct pci_dev *pdev)
+ 		ice_remove_arfs(pf);
+ 	ice_setup_mc_magic_wake(pf);
+ 	ice_vsi_release_all(pf);
++	mutex_destroy(&(&pf->hw)->fdir_fltr_lock);
+ 	ice_set_wake(pf);
+ 	ice_free_irq_msix_misc(pf);
+ 	ice_for_each_vsi(pf, i) {
+-- 
+2.34.1
+

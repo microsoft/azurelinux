@@ -1,0 +1,641 @@
+From 2aed93be226db600947e7c74f28b4247136d6700 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Mon, 13 Sep 2021 11:22:19 -0700
+Subject: [NET-NEXT 067/254] ice: Add support for VF rate limiting
+
+From: Brett Creeley <brett.creeley@intel.com>
+
+Implement ndo_set_vf_rate to support setting of min_tx_rate and
+max_tx_rate; set the appropriate bandwidth in the scheduler for the
+node representing the specified VF VSI.
+
+Backported from upstream commit 4ecc8633056b
+
+Co-developed-by: Tarun Singh <tarun.k.singh@intel.com>
+Signed-off-by: Tarun Singh <tarun.k.singh@intel.com>
+Signed-off-by: Brett Creeley <brett.creeley@intel.com>
+Tested-by: Konrad Jankowski <konrad0.jankowski@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_lib.c      | 174 ++++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_lib.h      |   4 +-
+ drivers/net/ethernet/intel/ice/ice_main.c     |   1 +
+ drivers/net/ethernet/intel/ice/ice_sched.c    | 130 +++++++++++++
+ drivers/net/ethernet/intel/ice/ice_sched.h    |   6 +
+ .../net/ethernet/intel/ice/ice_virtchnl_pf.c  | 160 +++++++++++++++-
+ .../net/ethernet/intel/ice/ice_virtchnl_pf.h  |  15 +-
+ 7 files changed, 486 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
+index 41956c8a8f97..db12d1b27bff 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_lib.c
+@@ -3623,6 +3623,180 @@ int ice_clear_dflt_vsi(struct ice_sw *sw)
+ 	return 0;
+ }
+ 
++/**
++ * ice_get_link_speed_mbps - get link speed in Mbps
++ * @vsi: the VSI whose link speed is being queried
++ *
++ * Return current VSI link speed and 0 if the speed is unknown.
++ */
++int ice_get_link_speed_mbps(struct ice_vsi *vsi)
++{
++	switch (vsi->port_info->phy.link_info.link_speed) {
++	case ICE_AQ_LINK_SPEED_100GB:
++		return SPEED_100000;
++	case ICE_AQ_LINK_SPEED_50GB:
++		return SPEED_50000;
++	case ICE_AQ_LINK_SPEED_40GB:
++		return SPEED_40000;
++	case ICE_AQ_LINK_SPEED_25GB:
++		return SPEED_25000;
++	case ICE_AQ_LINK_SPEED_20GB:
++		return SPEED_20000;
++	case ICE_AQ_LINK_SPEED_10GB:
++		return SPEED_10000;
++	case ICE_AQ_LINK_SPEED_5GB:
++		return SPEED_5000;
++	case ICE_AQ_LINK_SPEED_2500MB:
++		return SPEED_2500;
++	case ICE_AQ_LINK_SPEED_1000MB:
++		return SPEED_1000;
++	case ICE_AQ_LINK_SPEED_100MB:
++		return SPEED_100;
++	case ICE_AQ_LINK_SPEED_10MB:
++		return SPEED_10;
++	case ICE_AQ_LINK_SPEED_UNKNOWN:
++	default:
++		return 0;
++	}
++}
++
++/**
++ * ice_get_link_speed_kbps - get link speed in Kbps
++ * @vsi: the VSI whose link speed is being queried
++ *
++ * Return current VSI link speed and 0 if the speed is unknown.
++ */
++static int ice_get_link_speed_kbps(struct ice_vsi *vsi)
++{
++	int speed_mbps;
++
++	speed_mbps = ice_get_link_speed_mbps(vsi);
++
++	return speed_mbps * 1000;
++}
++
++/**
++ * ice_set_min_bw_limit - setup minimum BW limit for Tx based on min_tx_rate
++ * @vsi: VSI to be configured
++ * @min_tx_rate: min Tx rate in Kbps to be configured as BW limit
++ *
++ * If the min_tx_rate is specified as 0 that means to clear the minimum BW limit
++ * profile, otherwise a non-zero value will force a minimum BW limit for the VSI
++ * on TC 0.
++ */
++int ice_set_min_bw_limit(struct ice_vsi *vsi, u64 min_tx_rate)
++{
++	struct ice_pf *pf = vsi->back;
++	enum ice_status status;
++	struct device *dev;
++	int speed;
++
++	dev = ice_pf_to_dev(pf);
++	if (!vsi->port_info) {
++		dev_dbg(dev, "VSI %d, type %u specified doesn't have valid port_info\n",
++			vsi->idx, vsi->type);
++		return -EINVAL;
++	}
++
++	speed = ice_get_link_speed_kbps(vsi);
++	if (min_tx_rate > (u64)speed) {
++		dev_err(dev, "invalid min Tx rate %llu Kbps specified for %s %d is greater than current link speed %u Kbps\n",
++			min_tx_rate, ice_vsi_type_str(vsi->type), vsi->idx,
++			speed);
++		return -EINVAL;
++	}
++
++	/* Configure min BW for VSI limit */
++	if (min_tx_rate) {
++		status = ice_cfg_vsi_bw_lmt_per_tc(vsi->port_info, vsi->idx, 0,
++						   ICE_MIN_BW, min_tx_rate);
++		if (status) {
++			dev_err(dev, "failed to set min Tx rate(%llu Kbps) for %s %d\n",
++				min_tx_rate, ice_vsi_type_str(vsi->type),
++				vsi->idx);
++			return -EIO;
++		}
++
++		dev_dbg(dev, "set min Tx rate(%llu Kbps) for %s\n",
++			min_tx_rate, ice_vsi_type_str(vsi->type));
++	} else {
++		status = ice_cfg_vsi_bw_dflt_lmt_per_tc(vsi->port_info,
++							vsi->idx, 0,
++							ICE_MIN_BW);
++		if (status) {
++			dev_err(dev, "failed to clear min Tx rate configuration for %s %d\n",
++				ice_vsi_type_str(vsi->type), vsi->idx);
++			return -EIO;
++		}
++
++		dev_dbg(dev, "cleared min Tx rate configuration for %s %d\n",
++			ice_vsi_type_str(vsi->type), vsi->idx);
++	}
++
++	return 0;
++}
++
++/**
++ * ice_set_max_bw_limit - setup maximum BW limit for Tx based on max_tx_rate
++ * @vsi: VSI to be configured
++ * @max_tx_rate: max Tx rate in Kbps to be configured as BW limit
++ *
++ * If the max_tx_rate is specified as 0 that means to clear the maximum BW limit
++ * profile, otherwise a non-zero value will force a maximum BW limit for the VSI
++ * on TC 0.
++ */
++int ice_set_max_bw_limit(struct ice_vsi *vsi, u64 max_tx_rate)
++{
++	struct ice_pf *pf = vsi->back;
++	enum ice_status status;
++	struct device *dev;
++	int speed;
++
++	dev = ice_pf_to_dev(pf);
++	if (!vsi->port_info) {
++		dev_dbg(dev, "VSI %d, type %u specified doesn't have valid port_info\n",
++			vsi->idx, vsi->type);
++		return -EINVAL;
++	}
++
++	speed = ice_get_link_speed_kbps(vsi);
++	if (max_tx_rate > (u64)speed) {
++		dev_err(dev, "invalid max Tx rate %llu Kbps specified for %s %d is greater than current link speed %u Kbps\n",
++			max_tx_rate, ice_vsi_type_str(vsi->type), vsi->idx,
++			speed);
++		return -EINVAL;
++	}
++
++	/* Configure max BW for VSI limit */
++	if (max_tx_rate) {
++		status = ice_cfg_vsi_bw_lmt_per_tc(vsi->port_info, vsi->idx, 0,
++						   ICE_MAX_BW, max_tx_rate);
++		if (status) {
++			dev_err(dev, "failed setting max Tx rate(%llu Kbps) for %s %d\n",
++				max_tx_rate, ice_vsi_type_str(vsi->type),
++				vsi->idx);
++			return -EIO;
++		}
++
++		dev_dbg(dev, "set max Tx rate(%llu Kbps) for %s %d\n",
++			max_tx_rate, ice_vsi_type_str(vsi->type), vsi->idx);
++	} else {
++		status = ice_cfg_vsi_bw_dflt_lmt_per_tc(vsi->port_info,
++							vsi->idx, 0,
++							ICE_MAX_BW);
++		if (status) {
++			dev_err(dev, "failed clearing max Tx rate configuration for %s %d\n",
++				ice_vsi_type_str(vsi->type), vsi->idx);
++			return -EIO;
++		}
++
++		dev_dbg(dev, "cleared max Tx rate configuration for %s %d\n",
++			ice_vsi_type_str(vsi->type), vsi->idx);
++	}
++
++	return 0;
++}
++
+ /**
+  * ice_set_link - turn on/off physical link
+  * @vsi: VSI to modify physical link on
+diff --git a/drivers/net/ethernet/intel/ice/ice_lib.h b/drivers/net/ethernet/intel/ice/ice_lib.h
+index b6c429c5875d..d395bd590e84 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lib.h
++++ b/drivers/net/ethernet/intel/ice/ice_lib.h
+@@ -116,7 +116,9 @@ bool ice_is_vsi_dflt_vsi(struct ice_sw *sw, struct ice_vsi *vsi);
+ int ice_set_dflt_vsi(struct ice_sw *sw, struct ice_vsi *vsi);
+ 
+ int ice_clear_dflt_vsi(struct ice_sw *sw);
+-
++int ice_set_min_bw_limit(struct ice_vsi *vsi, u64 min_tx_rate);
++int ice_set_max_bw_limit(struct ice_vsi *vsi, u64 max_tx_rate);
++int ice_get_link_speed_mbps(struct ice_vsi *vsi);
+ int
+ ice_vsi_update_security(struct ice_vsi *vsi, void (*fill)(struct ice_vsi_ctx *));
+ 
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index fa2d176cd50e..5b8d5c703a31 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -7451,6 +7451,7 @@ static const struct net_device_ops ice_netdev_ops = {
+ 	.ndo_set_vf_vlan = ice_set_vf_port_vlan,
+ 	.ndo_set_vf_link_state = ice_set_vf_link_state,
+ 	.ndo_get_vf_stats = ice_get_vf_stats,
++	.ndo_set_vf_rate = ice_set_vf_bw,
+ 	.ndo_vlan_rx_add_vid = ice_vlan_rx_add_vid,
+ 	.ndo_vlan_rx_kill_vid = ice_vlan_rx_kill_vid,
+ 	.ndo_setup_tc = ice_setup_tc,
+diff --git a/drivers/net/ethernet/intel/ice/ice_sched.c b/drivers/net/ethernet/intel/ice/ice_sched.c
+index 0b61fde44915..486cbd38c51d 100644
+--- a/drivers/net/ethernet/intel/ice/ice_sched.c
++++ b/drivers/net/ethernet/intel/ice/ice_sched.c
+@@ -3785,6 +3785,136 @@ ice_cfg_q_bw_dflt_lmt(struct ice_port_info *pi, u16 vsi_handle, u8 tc,
+ 				      ICE_SCHED_DFLT_BW);
+ }
+ 
++/**
++ * ice_sched_get_node_by_id_type - get node from ID type
++ * @pi: port information structure
++ * @id: identifier
++ * @agg_type: type of aggregator
++ * @tc: traffic class
++ *
++ * This function returns node identified by ID of type aggregator, and
++ * based on traffic class (TC). This function needs to be called with
++ * the scheduler lock held.
++ */
++static struct ice_sched_node *
++ice_sched_get_node_by_id_type(struct ice_port_info *pi, u32 id,
++			      enum ice_agg_type agg_type, u8 tc)
++{
++	struct ice_sched_node *node = NULL;
++
++	switch (agg_type) {
++	case ICE_AGG_TYPE_VSI: {
++		struct ice_vsi_ctx *vsi_ctx;
++		u16 vsi_handle = (u16)id;
++
++		if (!ice_is_vsi_valid(pi->hw, vsi_handle))
++			break;
++		/* Get sched_vsi_info */
++		vsi_ctx = ice_get_vsi_ctx(pi->hw, vsi_handle);
++		if (!vsi_ctx)
++			break;
++		node = vsi_ctx->sched.vsi_node[tc];
++		break;
++	}
++
++	case ICE_AGG_TYPE_AGG: {
++		struct ice_sched_node *tc_node;
++
++		tc_node = ice_sched_get_tc_node(pi, tc);
++		if (tc_node)
++			node = ice_sched_get_agg_node(pi, tc_node, id);
++		break;
++	}
++
++	default:
++		break;
++	}
++
++	return node;
++}
++
++/**
++ * ice_sched_set_node_bw_lmt_per_tc - set node BW limit per TC
++ * @pi: port information structure
++ * @id: ID (software VSI handle or AGG ID)
++ * @agg_type: aggregator type (VSI or AGG type node)
++ * @tc: traffic class
++ * @rl_type: min or max
++ * @bw: bandwidth in Kbps
++ *
++ * This function sets BW limit of VSI or Aggregator scheduling node
++ * based on TC information from passed in argument BW.
++ */
++static enum ice_status
++ice_sched_set_node_bw_lmt_per_tc(struct ice_port_info *pi, u32 id,
++				 enum ice_agg_type agg_type, u8 tc,
++				 enum ice_rl_type rl_type, u32 bw)
++{
++	enum ice_status status = ICE_ERR_PARAM;
++	struct ice_sched_node *node;
++
++	if (!pi)
++		return status;
++
++	if (rl_type == ICE_UNKNOWN_BW)
++		return status;
++
++	mutex_lock(&pi->sched_lock);
++	node = ice_sched_get_node_by_id_type(pi, id, agg_type, tc);
++	if (!node) {
++		ice_debug(pi->hw, ICE_DBG_SCHED, "Wrong id, agg type, or tc\n");
++		goto exit_set_node_bw_lmt_per_tc;
++	}
++	if (bw == ICE_SCHED_DFLT_BW)
++		status = ice_sched_set_node_bw_dflt_lmt(pi, node, rl_type);
++	else
++		status = ice_sched_set_node_bw_lmt(pi, node, rl_type, bw);
++
++exit_set_node_bw_lmt_per_tc:
++	mutex_unlock(&pi->sched_lock);
++	return status;
++}
++
++/**
++ * ice_cfg_vsi_bw_lmt_per_tc - configure VSI BW limit per TC
++ * @pi: port information structure
++ * @vsi_handle: software VSI handle
++ * @tc: traffic class
++ * @rl_type: min or max
++ * @bw: bandwidth in Kbps
++ *
++ * This function configures BW limit of VSI scheduling node based on TC
++ * information.
++ */
++enum ice_status
++ice_cfg_vsi_bw_lmt_per_tc(struct ice_port_info *pi, u16 vsi_handle, u8 tc,
++			  enum ice_rl_type rl_type, u32 bw)
++{
++	return ice_sched_set_node_bw_lmt_per_tc(pi, vsi_handle,
++						ICE_AGG_TYPE_VSI,
++						tc, rl_type, bw);
++}
++
++/**
++ * ice_cfg_vsi_bw_dflt_lmt_per_tc - configure default VSI BW limit per TC
++ * @pi: port information structure
++ * @vsi_handle: software VSI handle
++ * @tc: traffic class
++ * @rl_type: min or max
++ *
++ * This function configures default BW limit of VSI scheduling node based on TC
++ * information.
++ */
++enum ice_status
++ice_cfg_vsi_bw_dflt_lmt_per_tc(struct ice_port_info *pi, u16 vsi_handle, u8 tc,
++			       enum ice_rl_type rl_type)
++{
++	return ice_sched_set_node_bw_lmt_per_tc(pi, vsi_handle,
++						ICE_AGG_TYPE_VSI,
++						tc, rl_type,
++						ICE_SCHED_DFLT_BW);
++}
++
+ /**
+  * ice_cfg_rl_burst_size - Set burst size value
+  * @hw: pointer to the HW struct
+diff --git a/drivers/net/ethernet/intel/ice/ice_sched.h b/drivers/net/ethernet/intel/ice/ice_sched.h
+index fdf7a5882f07..11ad8336899f 100644
+--- a/drivers/net/ethernet/intel/ice/ice_sched.h
++++ b/drivers/net/ethernet/intel/ice/ice_sched.h
+@@ -104,6 +104,12 @@ ice_cfg_q_bw_lmt(struct ice_port_info *pi, u16 vsi_handle, u8 tc,
+ enum ice_status
+ ice_cfg_q_bw_dflt_lmt(struct ice_port_info *pi, u16 vsi_handle, u8 tc,
+ 		      u16 q_handle, enum ice_rl_type rl_type);
++enum ice_status
++ice_cfg_vsi_bw_lmt_per_tc(struct ice_port_info *pi, u16 vsi_handle, u8 tc,
++			  enum ice_rl_type rl_type, u32 bw);
++enum ice_status
++ice_cfg_vsi_bw_dflt_lmt_per_tc(struct ice_port_info *pi, u16 vsi_handle, u8 tc,
++			       enum ice_rl_type rl_type);
+ enum ice_status ice_cfg_rl_burst_size(struct ice_hw *hw, u32 bytes);
+ void ice_sched_replay_agg_vsi_preinit(struct ice_hw *hw);
+ void ice_sched_replay_agg(struct ice_hw *hw);
+diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c b/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c
+index d28e45ce4266..6542d1a327f2 100644
+--- a/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c
++++ b/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c
+@@ -5,6 +5,7 @@
+ #include "ice_base.h"
+ #include "ice_lib.h"
+ #include "ice_fltr.h"
++#include "ice_dcb_lib.h"
+ #include "ice_flow.h"
+ #include "ice_eswitch.h"
+ #include "ice_virtchnl_allowlist.h"
+@@ -886,6 +887,40 @@ static int ice_calc_vf_first_vector_idx(struct ice_pf *pf, struct ice_vf *vf)
+ 	return pf->sriov_base_vector + vf->vf_id * pf->num_msix_per_vf;
+ }
+ 
++/**
++ * ice_vf_rebuild_host_tx_rate_cfg - re-apply the Tx rate limiting configuration
++ * @vf: VF to re-apply the configuration for
++ *
++ * Called after a VF VSI has been re-added/rebuild during reset. The PF driver
++ * needs to re-apply the host configured Tx rate limiting configuration.
++ */
++static int ice_vf_rebuild_host_tx_rate_cfg(struct ice_vf *vf)
++{
++	struct device *dev = ice_pf_to_dev(vf->pf);
++	struct ice_vsi *vsi = ice_get_vf_vsi(vf);
++	int err;
++
++	if (vf->min_tx_rate) {
++		err = ice_set_min_bw_limit(vsi, (u64)vf->min_tx_rate * 1000);
++		if (err) {
++			dev_err(dev, "failed to set min Tx rate to %d Mbps for VF %u, error %d\n",
++				vf->min_tx_rate, vf->vf_id, err);
++			return err;
++		}
++	}
++
++	if (vf->max_tx_rate) {
++		err = ice_set_max_bw_limit(vsi, (u64)vf->max_tx_rate * 1000);
++		if (err) {
++			dev_err(dev, "failed to set max Tx rate to %d Mbps for VF %u, error %d\n",
++				vf->max_tx_rate, vf->vf_id, err);
++			return err;
++		}
++	}
++
++	return 0;
++}
++
+ /**
+  * ice_vf_rebuild_host_vlan_cfg - add VLAN 0 filter or rebuild the Port VLAN
+  * @vf: VF to add MAC filters for
+@@ -1422,6 +1457,11 @@ static void ice_vf_rebuild_host_cfg(struct ice_vf *vf)
+ 	if (ice_vf_rebuild_host_vlan_cfg(vf))
+ 		dev_err(dev, "failed to rebuild VLAN configuration for VF %u\n",
+ 			vf->vf_id);
++
++	if (ice_vf_rebuild_host_tx_rate_cfg(vf))
++		dev_err(dev, "failed to rebuild Tx rate limiting configuration for VF %u\n",
++			vf->vf_id);
++
+ 	/* rebuild aggregator node config for main VF VSI */
+ 	ice_vf_rebuild_aggregator_node_cfg(vsi);
+ }
+@@ -4758,8 +4798,8 @@ ice_get_vf_cfg(struct net_device *netdev, int vf_id, struct ifla_vf_info *ivi)
+ 		ivi->linkstate = IFLA_VF_LINK_STATE_ENABLE;
+ 	else
+ 		ivi->linkstate = IFLA_VF_LINK_STATE_DISABLE;
+-	ivi->max_tx_rate = vf->tx_rate;
+-	ivi->min_tx_rate = 0;
++	ivi->max_tx_rate = vf->max_tx_rate;
++	ivi->min_tx_rate = vf->min_tx_rate;
+ 	return 0;
+ }
+ 
+@@ -4944,6 +4984,122 @@ int ice_set_vf_link_state(struct net_device *netdev, int vf_id, int link_state)
+ 	return 0;
+ }
+ 
++/**
++ * ice_calc_all_vfs_min_tx_rate - calculate cumulative min Tx rate on all VFs
++ * @pf: PF associated with VFs
++ */
++static int ice_calc_all_vfs_min_tx_rate(struct ice_pf *pf)
++{
++	int rate = 0, i;
++
++	ice_for_each_vf(pf, i)
++		rate += pf->vf[i].min_tx_rate;
++
++	return rate;
++}
++
++/**
++ * ice_min_tx_rate_oversubscribed - check if min Tx rate causes oversubscription
++ * @vf: VF trying to configure min_tx_rate
++ * @min_tx_rate: min Tx rate in Mbps
++ *
++ * Check if the min_tx_rate being passed in will cause oversubscription of total
++ * min_tx_rate based on the current link speed and all other VFs configured
++ * min_tx_rate
++ *
++ * Return true if the passed min_tx_rate would cause oversubscription, else
++ * return false
++ */
++static bool
++ice_min_tx_rate_oversubscribed(struct ice_vf *vf, int min_tx_rate)
++{
++	int link_speed_mbps = ice_get_link_speed_mbps(ice_get_vf_vsi(vf));
++	int all_vfs_min_tx_rate = ice_calc_all_vfs_min_tx_rate(vf->pf);
++
++	/* this VF's previous rate is being overwritten */
++	all_vfs_min_tx_rate -= vf->min_tx_rate;
++
++	if (all_vfs_min_tx_rate + min_tx_rate > link_speed_mbps) {
++		dev_err(ice_pf_to_dev(vf->pf), "min_tx_rate of %d Mbps on VF %u would cause oversubscription of %d Mbps based on the current link speed %d Mbps\n",
++			min_tx_rate, vf->vf_id,
++			all_vfs_min_tx_rate + min_tx_rate - link_speed_mbps,
++			link_speed_mbps);
++		return true;
++	}
++
++	return false;
++}
++
++/**
++ * ice_set_vf_bw - set min/max VF bandwidth
++ * @netdev: network interface device structure
++ * @vf_id: VF identifier
++ * @min_tx_rate: Minimum Tx rate in Mbps
++ * @max_tx_rate: Maximum Tx rate in Mbps
++ */
++int
++ice_set_vf_bw(struct net_device *netdev, int vf_id, int min_tx_rate,
++	      int max_tx_rate)
++{
++	struct ice_pf *pf = ice_netdev_to_pf(netdev);
++	struct ice_vsi *vsi;
++	struct device *dev;
++	struct ice_vf *vf;
++	int ret;
++
++	dev = ice_pf_to_dev(pf);
++	if (ice_validate_vf_id(pf, vf_id))
++		return -EINVAL;
++
++	vf = &pf->vf[vf_id];
++	ret = ice_check_vf_ready_for_cfg(vf);
++	if (ret)
++		return ret;
++
++	vsi = ice_get_vf_vsi(vf);
++
++	/* when max_tx_rate is zero that means no max Tx rate limiting, so only
++	 * check if max_tx_rate is non-zero
++	 */
++	if (max_tx_rate && min_tx_rate > max_tx_rate) {
++		dev_err(dev, "Cannot set min Tx rate %d Mbps greater than max Tx rate %d Mbps\n",
++			min_tx_rate, max_tx_rate);
++		return -EINVAL;
++	}
++
++	if (min_tx_rate && ice_is_dcb_active(pf)) {
++		dev_err(dev, "DCB on PF is currently enabled. VF min Tx rate limiting not allowed on this PF.\n");
++		return -EOPNOTSUPP;
++	}
++
++	if (ice_min_tx_rate_oversubscribed(vf, min_tx_rate))
++		return -EINVAL;
++
++	if (vf->min_tx_rate != (unsigned int)min_tx_rate) {
++		ret = ice_set_min_bw_limit(vsi, (u64)min_tx_rate * 1000);
++		if (ret) {
++			dev_err(dev, "Unable to set min-tx-rate for VF %d\n",
++				vf->vf_id);
++			return ret;
++		}
++
++		vf->min_tx_rate = min_tx_rate;
++	}
++
++	if (vf->max_tx_rate != (unsigned int)max_tx_rate) {
++		ret = ice_set_max_bw_limit(vsi, (u64)max_tx_rate * 1000);
++		if (ret) {
++			dev_err(dev, "Unable to set max-tx-rate for VF %d\n",
++				vf->vf_id);
++			return ret;
++		}
++
++		vf->max_tx_rate = max_tx_rate;
++	}
++
++	return 0;
++}
++
+ /**
+  * ice_get_vf_stats - populate some stats for the VF
+  * @netdev: the netdev of the PF
+diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.h b/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.h
+index 232f850495ac..f33c0889a5d4 100644
+--- a/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.h
++++ b/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.h
+@@ -129,7 +129,8 @@ struct ice_vf {
+ 	 * the main LAN VSI for the PF.
+ 	 */
+ 	u16 lan_vsi_num;		/* ID as used by firmware */
+-	unsigned int tx_rate;		/* Tx bandwidth limit in Mbps */
++	unsigned int min_tx_rate;	/* Minimum Tx bandwidth limit in Mbps */
++	unsigned int max_tx_rate;	/* Maximum Tx bandwidth limit in Mbps */
+ 	DECLARE_BITMAP(vf_states, ICE_VF_STATES_NBITS);	/* VF runtime states */
+ 
+ 	unsigned long vf_caps;		/* VF's adv. capabilities */
+@@ -174,6 +175,10 @@ int
+ ice_set_vf_port_vlan(struct net_device *netdev, int vf_id, u16 vlan_id, u8 qos,
+ 		     __be16 vlan_proto);
+ 
++int
++ice_set_vf_bw(struct net_device *netdev, int vf_id, int min_tx_rate,
++	      int max_tx_rate);
++
+ int ice_set_vf_trust(struct net_device *netdev, int vf_id, bool trusted);
+ 
+ int ice_set_vf_link_state(struct net_device *netdev, int vf_id, int link_state);
+@@ -305,6 +310,14 @@ ice_set_vf_link_state(struct net_device __always_unused *netdev,
+ 	return -EOPNOTSUPP;
+ }
+ 
++static inline int
++ice_set_vf_bw(struct net_device __always_unused *netdev,
++	      int __always_unused vf_id, int __always_unused min_tx_rate,
++	      int __always_unused max_tx_rate)
++{
++	return -EOPNOTSUPP;
++}
++
+ static inline int
+ ice_calc_vf_reg_idx(struct ice_vf __always_unused *vf,
+ 		    struct ice_q_vector __always_unused *q_vector)
+-- 
+2.34.1
+

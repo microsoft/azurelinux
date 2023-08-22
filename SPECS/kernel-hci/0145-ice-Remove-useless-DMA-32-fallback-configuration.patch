@@ -1,0 +1,43 @@
+From b07549912df39c49fdeb261fe3e2174802ce4264 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Sun, 9 Jan 2022 19:25:05 +0100
+Subject: [NET-NEXT 145/254] ice: Remove useless DMA-32 fallback configuration
+
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+
+As stated in [1], dma_set_mask() with a 64-bit mask never fails if
+dev->dma_mask is non-NULL.
+So, if it fails, the 32 bits case will also fail for the same reason.
+
+Simplify code and remove some dead code accordingly.
+
+[1]: https://lkml.org/lkml/2021/6/7/398
+
+Backported from upstream commit 9c3e54a63263
+
+Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Alexander Lobakin <alexandr.lobakin@intel.com>
+Tested-by: Gurucharan G <gurucharanx.g@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_main.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 5cbbe5fad1d3..e6bdbe42dff4 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -4493,8 +4493,6 @@ ice_probe(struct pci_dev *pdev, const struct pci_device_id __always_unused *ent)
+ 
+ 	/* set up for high or low DMA */
+ 	err = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64));
+-	if (err)
+-		err = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(32));
+ 	if (err) {
+ 		dev_err(dev, "DMA configuration failed: 0x%x\n", err);
+ 		return err;
+-- 
+2.34.1
+

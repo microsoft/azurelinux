@@ -1,0 +1,70 @@
+From 77de410322bdecbedbc3254e4215db0f5dae7eee Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Fri, 24 Jun 2022 14:13:11 +0200
+Subject: [NET-NEXT 255/273] net/ice: fix initializing the bitmap in the switch
+ code
+
+From: Alexander Lobakin <alexandr.lobakin@intel.com>
+
+[ Upstream commit 2f7ee2a72ccec8b85a05c4644d7ec9f40c1c50c8 ]
+
+Kbuild spotted the following bug during the testing of one of
+the optimizations:
+
+In file included from include/linux/cpumask.h:12,
+[...]
+                from drivers/net/ethernet/intel/ice/ice_switch.c:4:
+drivers/net/ethernet/intel/ice/ice_switch.c: In function 'ice_find_free_recp_res_idx.constprop':
+include/linux/bitmap.h:447:22: warning: 'possible_idx[0]' is used uninitialized [-Wuninitialized]
+  447 |                 *map |= GENMASK(start + nbits - 1, start);
+      |                      ^~
+In file included from drivers/net/ethernet/intel/ice/ice.h:7,
+                 from drivers/net/ethernet/intel/ice/ice_lib.h:7,
+                 from drivers/net/ethernet/intel/ice/ice_switch.c:4:
+drivers/net/ethernet/intel/ice/ice_switch.c:4929:24: note: 'possible_idx[0]' was declared here
+ 4929 |         DECLARE_BITMAP(possible_idx, ICE_MAX_FV_WORDS);
+      |                        ^~~~~~~~~~~~
+include/linux/types.h:11:23: note: in definition of macro 'DECLARE_BITMAP'
+   11 |         unsigned long name[BITS_TO_LONGS(bits)]
+      |                       ^~~~
+
+%ICE_MAX_FV_WORDS is 48, so bitmap_set() here was initializing only
+48 bits, leaving a junk in the rest 16.
+It was previously hidden due to that filling 48 bits makes
+bitmap_set() call external __bitmap_set(), but after making it use
+plain bit arithmetics on small bitmaps, compilers started seeing
+the issue. It was still working because those 16 weren't used
+anywhere anyhow.
+bitmap_{clear,set}() are not really intended to initialize bitmaps,
+rather to modify already initialized ones, as they don't do anything
+past the passed number of bits. The correct function to do this in
+that particular case is bitmap_fill(), so use it here. It will do
+`*possible_idx = ~0UL` instead of `*possible_idx |= GENMASK(47, 0)`,
+not leaving anything in an undefined state.
+
+Fixes: fd2a6b71e300 ("ice: create advanced switch recipe")
+Reported-by: kernel test robot <lkp@intel.com>
+Signed-off-by: Alexander Lobakin <alexandr.lobakin@intel.com>
+Signed-off-by: Yury Norov <yury.norov@gmail.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_switch.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_switch.c b/drivers/net/ethernet/intel/ice/ice_switch.c
+index dca50d8e3321..76361c3b39db 100644
+--- a/drivers/net/ethernet/intel/ice/ice_switch.c
++++ b/drivers/net/ethernet/intel/ice/ice_switch.c
+@@ -4381,7 +4381,7 @@ ice_find_free_recp_res_idx(struct ice_hw *hw, const unsigned long *profiles,
+ 	bitmap_zero(recipes, ICE_MAX_NUM_RECIPES);
+ 	bitmap_zero(used_idx, ICE_MAX_FV_WORDS);
+ 
+-	bitmap_set(possible_idx, 0, ICE_MAX_FV_WORDS);
++	bitmap_fill(possible_idx, ICE_MAX_FV_WORDS);
+ 
+ 	/* For each profile we are going to associate the recipe with, add the
+ 	 * recipes that are associated with that profile. This will give us
+-- 
+2.34.1
+

@@ -1,0 +1,42 @@
+From 7443cfb06cc02b4175dcefc1ee4cb385612ca237 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Fri, 29 Jul 2022 18:17:54 +0800
+Subject: [NET-NEXT 256/273] net: ice: fix error NETIF_F_HW_VLAN_CTAG_FILTER
+ check in ice_vsi_sync_fltr()
+
+From: Jian Shen <shenjian15@huawei.com>
+
+[ Upstream commit 7dc839fe47611e6995f370cae37b9797cf7d2672 ]
+
+vsi->current_netdev_flags is used store the current net device
+flags, not the active netdevice features. So it should use
+vsi->netdev->featurs, rather than vsi->current_netdev_flags
+to check NETIF_F_HW_VLAN_CTAG_FILTER.
+
+Fixes: 1babaf77f49d ("ice: Advertise 802.1ad VLAN filtering and offloads for PF netdev")
+Signed-off-by: Jian Shen <shenjian15@huawei.com>
+Signed-off-by: Guangbin Huang <huangguangbin2@huawei.com>
+Acked-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index ba9c5b77eaf3..af1aba372d86 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -419,7 +419,7 @@ static int ice_vsi_sync_fltr(struct ice_vsi *vsi)
+ 						IFF_PROMISC;
+ 					goto out_promisc;
+ 				}
+-				if (vsi->current_netdev_flags &
++				if (vsi->netdev->features &
+ 				    NETIF_F_HW_VLAN_CTAG_FILTER)
+ 					vlan_ops->ena_rx_filtering(vsi);
+ 			}
+-- 
+2.34.1
+

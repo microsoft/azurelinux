@@ -1,0 +1,39 @@
+From ebd345070d437dfbf8929b75bddecfd714887647 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Wed, 24 Nov 2021 06:41:35 -0600
+Subject: [NET-NEXT 101/254] net/ice: Fix boolean assignment
+
+From: Shiraz Saleem <shiraz.saleem@intel.com>
+
+vbool in ice_devlink_enable_roce_get can be assigned to a
+non-0/1 constant.
+
+Fix this assignment of vbool to be 0/1.
+
+Backported from upstream commit 7b62483f64dd
+
+Fixes: e523af4ee560 ("net/ice: Add support for enable_iwarp and enable_roce devlink param")
+Suggested-by: Parav Pandit <parav@nvidia.com>
+Signed-off-by: Shiraz Saleem <shiraz.saleem@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_devlink.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_devlink.c b/drivers/net/ethernet/intel/ice/ice_devlink.c
+index 449905d75a5a..ceb4a8ed50a7 100644
+--- a/drivers/net/ethernet/intel/ice/ice_devlink.c
++++ b/drivers/net/ethernet/intel/ice/ice_devlink.c
+@@ -436,7 +436,7 @@ ice_devlink_enable_roce_get(struct devlink *devlink, u32 id,
+ {
+ 	struct ice_pf *pf = devlink_priv(devlink);
+ 
+-	ctx->val.vbool = pf->rdma_mode & IIDC_RDMA_PROTOCOL_ROCEV2;
++	ctx->val.vbool = pf->rdma_mode & IIDC_RDMA_PROTOCOL_ROCEV2 ? true : false;
+ 
+ 	return 0;
+ }
+-- 
+2.34.1
+

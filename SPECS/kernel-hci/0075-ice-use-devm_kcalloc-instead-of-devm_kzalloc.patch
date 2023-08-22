@@ -1,0 +1,70 @@
+From 301fa35eefcf4089fd0c5af98ea51bf78ef5ae67 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Wed, 6 Oct 2021 13:09:08 -0500
+Subject: [NET-NEXT 075/254] ice: use devm_kcalloc() instead of devm_kzalloc()
+
+From: Gustavo A. R. Silva <gustavoars@kernel.org>
+
+Use 2-factor multiplication argument form devm_kcalloc() instead
+of devm_kzalloc().
+
+Link: https://github.com/KSPP/linux/issues/162
+Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+
+Backported from upstream commit 7c1b694adab1
+
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c | 4 ++--
+ drivers/net/ethernet/intel/ice/ice_txrx.c         | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c b/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c
+index 0106ea3519a0..51061d03fa3b 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c
++++ b/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c
+@@ -706,7 +706,7 @@ ice_create_init_fdir_rule(struct ice_pf *pf, enum ice_fltr_ptype flow)
+ 	if (!seg)
+ 		return -ENOMEM;
+ 
+-	tun_seg = devm_kzalloc(dev, sizeof(*seg) * ICE_FD_HW_SEG_MAX,
++	tun_seg = devm_kcalloc(dev, sizeof(*seg), ICE_FD_HW_SEG_MAX,
+ 			       GFP_KERNEL);
+ 	if (!tun_seg) {
+ 		devm_kfree(dev, seg);
+@@ -1068,7 +1068,7 @@ ice_cfg_fdir_xtrct_seq(struct ice_pf *pf, struct ethtool_rx_flow_spec *fsp,
+ 	if (!seg)
+ 		return -ENOMEM;
+ 
+-	tun_seg = devm_kzalloc(dev, sizeof(*seg) * ICE_FD_HW_SEG_MAX,
++	tun_seg = devm_kcalloc(dev, sizeof(*seg), ICE_FD_HW_SEG_MAX,
+ 			       GFP_KERNEL);
+ 	if (!tun_seg) {
+ 		devm_kfree(dev, seg);
+diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
+index 8f908af9bdd5..bc3ba19dc88f 100644
+--- a/drivers/net/ethernet/intel/ice/ice_txrx.c
++++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
+@@ -343,7 +343,7 @@ int ice_setup_tx_ring(struct ice_tx_ring *tx_ring)
+ 	/* warn if we are about to overwrite the pointer */
+ 	WARN_ON(tx_ring->tx_buf);
+ 	tx_ring->tx_buf =
+-		devm_kzalloc(dev, sizeof(*tx_ring->tx_buf) * tx_ring->count,
++		devm_kcalloc(dev, sizeof(*tx_ring->tx_buf), tx_ring->count,
+ 			     GFP_KERNEL);
+ 	if (!tx_ring->tx_buf)
+ 		return -ENOMEM;
+@@ -475,7 +475,7 @@ int ice_setup_rx_ring(struct ice_rx_ring *rx_ring)
+ 	/* warn if we are about to overwrite the pointer */
+ 	WARN_ON(rx_ring->rx_buf);
+ 	rx_ring->rx_buf =
+-		devm_kzalloc(dev, sizeof(*rx_ring->rx_buf) * rx_ring->count,
++		devm_kcalloc(dev, sizeof(*rx_ring->rx_buf), rx_ring->count,
+ 			     GFP_KERNEL);
+ 	if (!rx_ring->rx_buf)
+ 		return -ENOMEM;
+-- 
+2.34.1
+

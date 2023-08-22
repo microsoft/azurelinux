@@ -1,0 +1,41 @@
+From f5e27b02a6c5a00ed04cee2ef4343401a1f6375d Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Tue, 22 Feb 2022 16:27:02 -0800
+Subject: [NET-NEXT 201/254] ice: fix a long line warning in ice_reset_vf
+
+From: Jacob Keller <jacob.e.keller@intel.com>
+
+We're about to move ice_reset_vf out of ice_sriov.c and into
+ice_vf_lib.c
+
+One of the dev_err statements has a checkpatch.pl violation due to
+putting the vf->vf_id on the same line as the dev_err. Fix this style
+issue first before moving the code.
+
+Backported from upstream commit 5de95744ff6a
+
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+Tested-by: Konrad Jankowski <konrad0.jankowski@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_sriov.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.c b/drivers/net/ethernet/intel/ice/ice_sriov.c
+index 68b1e74249ac..bfe9c0592982 100644
+--- a/drivers/net/ethernet/intel/ice/ice_sriov.c
++++ b/drivers/net/ethernet/intel/ice/ice_sriov.c
+@@ -1251,7 +1251,8 @@ bool ice_reset_vf(struct ice_vf *vf, bool is_vflr)
+ 	ice_vf_pre_vsi_rebuild(vf);
+ 
+ 	if (vf->vf_ops->vsi_rebuild(vf)) {
+-		dev_err(dev, "Failed to release and setup the VF%u's VSI\n", vf->vf_id);
++		dev_err(dev, "Failed to release and setup the VF%u's VSI\n",
++			vf->vf_id);
+ 		return false;
+ 	}
+ 
+-- 
+2.34.1
+

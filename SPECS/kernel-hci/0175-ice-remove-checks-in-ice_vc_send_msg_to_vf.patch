@@ -1,0 +1,108 @@
+From 6b31cbbd98c4083a8f03df5456de5f45909ee6c6 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Wed, 16 Feb 2022 13:37:33 -0800
+Subject: [NET-NEXT 175/254] ice: remove checks in ice_vc_send_msg_to_vf
+
+From: Jacob Keller <jacob.e.keller@intel.com>
+
+The ice_vc_send_msg_to_vf function is used by the PF to send a response
+to a VF. This function has overzealous checks to ensure its not passed a
+NULL VF pointer and to ensure that the passed in struct ice_vf has a
+valid vf_id sub-member.
+
+These checks have existed since commit 1071a8358a28 ("ice: Implement
+virtchnl commands for AVF support") and function as simple sanity
+checks.
+
+We are planning to refactor the ice driver to use a hash table along
+with appropriate locks in a future refactor. This change will modify how
+the ice_validate_vf_id function works. Instead of a simple >= check to
+ensure the VF ID is between some range, it will check the hash table to
+see if the specified VF ID is actually in the table. This requires that
+the function properly lock the table to prevent race conditions.
+
+The checks may seem ok at first glance, but they don't really provide
+much benefit.
+
+In order for ice_vc_send_msg_to_vf to have these checks fail, the
+callers must either (1) pass NULL as the VF, (2) construct an invalid VF
+pointer manually, or (3) be using a VF pointer which becomes invalid
+after they obtain it properly using ice_get_vf_by_id.
+
+For (1), a cursory glance over callers of ice_vc_send_msg_to_vf can show
+that in most cases the functions already operate assuming their VF
+pointer is valid, such as by derferencing vf->pf or other members.
+
+They obtain the VF pointer by accessing the VF array using the VF ID,
+which can never produce a NULL value (since its a simple address
+operation on the array it will not be NULL.
+
+The sole exception for (1) is that ice_vc_process_vf_msg will forward a
+NULL VF pointer to this function as part of its goto error handler
+logic. This requires some minor cleanup to simply exit immediately when
+an invalid VF ID is detected (Rather than use the same error flow as
+the rest of the function).
+
+For (2), it is unexpected for a flow to construct a VF pointer manually
+instead of accessing the VF array. Defending against this is likely to
+just hide bad programming.
+
+For (3), it is definitely true that VF pointers could become invalid,
+for example if a thread is processing a VF message while the VF gets
+removed. However, the correct solution is not to add additional checks
+like this which do not guarantee to prevent the race. Instead we plan to
+solve the root of the problem by preventing the possibility entirely.
+
+This solution will require the change to a hash table with proper
+locking and reference counts of the VF structures. When this is done,
+ice_validate_vf_id will require locking of the hash table. This will be
+problematic because all of the callers of ice_vc_send_msg_to_vf will
+already have to take the lock to obtain the VF pointer anyways. With a
+mutex, this leads to a double lock that could hang the kernel thread.
+
+Avoid this by removing the checks which don't provide much value, so
+that we can safely add the necessary protections properly.
+
+Backported from upstream commit 59e1f857e377
+
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+Tested-by: Konrad Jankowski <konrad0.jankowski@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c | 11 +++--------
+ 1 file changed, 3 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c b/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c
+index 4bf69b968663..150698725bed 100644
+--- a/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c
++++ b/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c
+@@ -2207,13 +2207,7 @@ ice_vc_send_msg_to_vf(struct ice_vf *vf, u32 v_opcode,
+ 	struct ice_pf *pf;
+ 	int aq_ret;
+ 
+-	if (!vf)
+-		return -EINVAL;
+-
+ 	pf = vf->pf;
+-	if (ice_validate_vf_id(pf, vf->vf_id))
+-		return -EINVAL;
+-
+ 	dev = ice_pf_to_dev(pf);
+ 
+ 	aq_ret = ice_aq_send_msg_to_vf(&pf->hw, vf->vf_id, v_opcode, v_retval,
+@@ -5707,8 +5701,9 @@ void ice_vc_process_vf_msg(struct ice_pf *pf, struct ice_rq_event_info *event)
+ 
+ 	dev = ice_pf_to_dev(pf);
+ 	if (ice_validate_vf_id(pf, vf_id)) {
+-		err = -EINVAL;
+-		goto error_handler;
++		dev_err(dev, "Unable to locate VF for message from VF ID %d, opcode %d, len %d\n",
++			vf_id, v_opcode, msglen);
++		return;
+ 	}
+ 
+ 	vf = &pf->vf[vf_id];
+-- 
+2.34.1
+

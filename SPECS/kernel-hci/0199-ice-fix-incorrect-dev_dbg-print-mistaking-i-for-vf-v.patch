@@ -1,0 +1,40 @@
+From 2a31410aac1975989b5562492b19df154fccc22b Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Tue, 22 Feb 2022 16:27:00 -0800
+Subject: [NET-NEXT 199/254] ice: fix incorrect dev_dbg print mistaking 'i' for
+ vf->vf_id
+
+From: Jacob Keller <jacob.e.keller@intel.com>
+
+If we fail to clear the malicious VF indication after a VF reset, the
+dev_dbg message which is printed uses the local variable 'i' when it
+meant to use vf->vf_id. Fix this.
+
+Backported from upstream commit f5840e0da639
+
+Fixes: 0891c89674e8 ("ice: warn about potentially malicious VFs")
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+Tested-by: Konrad Jankowski <konrad0.jankowski@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_sriov.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.c b/drivers/net/ethernet/intel/ice/ice_sriov.c
+index 5d959b950403..8a4bc57f8c79 100644
+--- a/drivers/net/ethernet/intel/ice/ice_sriov.c
++++ b/drivers/net/ethernet/intel/ice/ice_sriov.c
+@@ -1381,7 +1381,8 @@ bool ice_reset_vf(struct ice_vf *vf, bool is_vflr)
+ 	/* if the VF has been reset allow it to come up again */
+ 	if (ice_mbx_clear_malvf(&hw->mbx_snapshot, pf->vfs.malvfs,
+ 				ICE_MAX_SRIOV_VFS, vf->vf_id))
+-		dev_dbg(dev, "failed to clear malicious VF state for VF %u\n", i);
++		dev_dbg(dev, "failed to clear malicious VF state for VF %u\n",
++			vf->vf_id);
+ 
+ 	return true;
+ }
+-- 
+2.34.1
+

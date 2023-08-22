@@ -1,0 +1,162 @@
+From 06e0d990c6e11c281050849ac5752fd66eda6a37 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Fri, 16 Jul 2021 15:16:41 -0700
+Subject: [NET-NEXT 030/254] ice: Add feature bitmap, helpers and a check for
+ DSCP
+
+From: Anirudh Venkataramanan <anirudh.venkataramanan@intel.com>
+
+DSCP a.k.a L3 QoS is only supported on certain devices. To enforce this,
+this patch introduces a bitmap of features and helper functions.
+
+The feature bitmap is set based on device IDs on driver init. Currently,
+DSCP is the only feature in this bitmap, but there will be more in the
+future. In the DCB netlink flow, check if the feature bit is set before
+exercising DSCP.
+
+Backported from net commit 40b247608bc5
+
+Signed-off-by: Anirudh Venkataramanan <anirudh.venkataramanan@intel.com>
+Tested-by: Gurucharan G <gurucharanx.g@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice.h        |  6 +++
+ drivers/net/ethernet/intel/ice/ice_dcb_nl.c |  8 +++-
+ drivers/net/ethernet/intel/ice/ice_lib.c    | 47 +++++++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_lib.h    |  2 +
+ drivers/net/ethernet/intel/ice/ice_main.c   |  2 +
+ 5 files changed, 63 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
+index 43fe91213aa5..d08b0d3479b8 100644
+--- a/drivers/net/ethernet/intel/ice/ice.h
++++ b/drivers/net/ethernet/intel/ice/ice.h
+@@ -155,6 +155,11 @@
+ 
+ #define ice_pf_to_dev(pf) (&((pf)->pdev->dev))
+ 
++enum ice_feature {
++	ICE_F_DSCP,
++	ICE_F_MAX
++};
++
+ struct ice_txq_meta {
+ 	u32 q_teid;	/* Tx-scheduler element identifier */
+ 	u16 q_id;	/* Entry in VSI's txq_map bitmap */
+@@ -442,6 +447,7 @@ struct ice_pf {
+ 	/* used to ratelimit the MDD event logging */
+ 	unsigned long last_printed_mdd_jiffies;
+ 	DECLARE_BITMAP(malvfs, ICE_MAX_VF_COUNT);
++	DECLARE_BITMAP(features, ICE_F_MAX);
+ 	DECLARE_BITMAP(state, ICE_STATE_NBITS);
+ 	DECLARE_BITMAP(flags, ICE_PF_FLAGS_NBITS);
+ 	unsigned long *avail_txqs;	/* bitmap to track PF Tx queue usage */
+diff --git a/drivers/net/ethernet/intel/ice/ice_dcb_nl.c b/drivers/net/ethernet/intel/ice/ice_dcb_nl.c
+index 0121dbc62c8a..7fdeb411b6df 100644
+--- a/drivers/net/ethernet/intel/ice/ice_dcb_nl.c
++++ b/drivers/net/ethernet/intel/ice/ice_dcb_nl.c
+@@ -710,6 +710,9 @@ static int ice_dcbnl_setapp(struct net_device *netdev, struct dcb_app *app)
+ 	if (!(pf->dcbx_cap & DCB_CAP_DCBX_VER_IEEE))
+ 		return -EINVAL;
+ 
++	if (!ice_is_feature_supported(pf, ICE_F_DSCP))
++		return -EOPNOTSUPP;
++
+ 	if (app->protocol >= ICE_DSCP_NUM_VAL) {
+ 		netdev_err(netdev, "DSCP value 0x%04X out of range\n",
+ 			   app->protocol);
+@@ -861,8 +864,9 @@ static int ice_dcbnl_delapp(struct net_device *netdev, struct dcb_app *app)
+ 		new_cfg->app[j].priority = old_cfg->app[j + 1].priority;
+ 	}
+ 
+-	/* if not a DSCP APP TLV, then we are done */
+-	if (app->selector != IEEE_8021QAZ_APP_SEL_DSCP) {
++	/* if not a DSCP APP TLV or DSCP is not supported, we are done */
++	if (app->selector != IEEE_8021QAZ_APP_SEL_DSCP ||
++	    !ice_is_feature_supported(pf, ICE_F_DSCP)) {
+ 		ret = ICE_DCB_HW_CHG;
+ 		goto delapp_out;
+ 	}
+diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
+index 4417238b0e64..f2addcb4c6cc 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_lib.c
+@@ -3597,3 +3597,50 @@ int ice_set_link(struct ice_vsi *vsi, bool ena)
+ 
+ 	return 0;
+ }
++
++/**
++ * ice_is_feature_supported
++ * @pf: pointer to the struct ice_pf instance
++ * @f: feature enum to be checked
++ *
++ * returns true if feature is supported, false otherwise
++ */
++bool ice_is_feature_supported(struct ice_pf *pf, enum ice_feature f)
++{
++	if (f < 0 || f >= ICE_F_MAX)
++		return false;
++
++	return test_bit(f, pf->features);
++}
++
++/**
++ * ice_set_feature_support
++ * @pf: pointer to the struct ice_pf instance
++ * @f: feature enum to set
++ */
++static void ice_set_feature_support(struct ice_pf *pf, enum ice_feature f)
++{
++	if (f < 0 || f >= ICE_F_MAX)
++		return;
++
++	set_bit(f, pf->features);
++}
++
++/**
++ * ice_init_feature_support
++ * @pf: pointer to the struct ice_pf instance
++ *
++ * called during init to setup supported feature
++ */
++void ice_init_feature_support(struct ice_pf *pf)
++{
++	switch (pf->hw.device_id) {
++	case ICE_DEV_ID_E810C_BACKPLANE:
++	case ICE_DEV_ID_E810C_QSFP:
++	case ICE_DEV_ID_E810C_SFP:
++		ice_set_feature_support(pf, ICE_F_DSCP);
++		break;
++	default:
++		break;
++	}
++}
+diff --git a/drivers/net/ethernet/intel/ice/ice_lib.h b/drivers/net/ethernet/intel/ice/ice_lib.h
+index d5a28bf0fc2c..4512c8513178 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lib.h
++++ b/drivers/net/ethernet/intel/ice/ice_lib.h
+@@ -116,4 +116,6 @@ bool ice_is_vsi_dflt_vsi(struct ice_sw *sw, struct ice_vsi *vsi);
+ int ice_set_dflt_vsi(struct ice_sw *sw, struct ice_vsi *vsi);
+ 
+ int ice_clear_dflt_vsi(struct ice_sw *sw);
++bool ice_is_feature_supported(struct ice_pf *pf, enum ice_feature f);
++void ice_init_feature_support(struct ice_pf *pf);
+ #endif /* !_ICE_LIB_H_ */
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 58e51c6e8a06..9b4a508f508a 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -4326,6 +4326,8 @@ ice_probe(struct pci_dev *pdev, const struct pci_device_id __always_unused *ent)
+ 		goto err_exit_unroll;
+ 	}
+ 
++	ice_init_feature_support(pf);
++
+ 	ice_request_fw(pf);
+ 
+ 	/* if ice_request_fw fails, ICE_FLAG_ADV_FEATURES bit won't be
+-- 
+2.34.1
+

@@ -1,0 +1,91 @@
+From 2cf62e22f5013e65373cf90b6b212b326e337b3c Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Tue, 22 Feb 2022 16:27:05 -0800
+Subject: [NET-NEXT 204/254] ice: make ice_reset_all_vfs void
+
+From: Jacob Keller <jacob.e.keller@intel.com>
+
+The ice_reset_all_vfs function returns true if any VFs were reset, and
+false otherwise. However, no callers check the return value.
+
+Drop this return value and make the function void since the callers do
+not care about this.
+
+Backported from upstream commit fe99d1c06c16
+
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+Tested-by: Konrad Jankowski <konrad0.jankowski@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_vf_lib.c | 8 +++-----
+ drivers/net/ethernet/intel/ice/ice_vf_lib.h | 5 ++---
+ 2 files changed, 5 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.c b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
+index 996d84a3303d..6f9e8383c69b 100644
+--- a/drivers/net/ethernet/intel/ice/ice_vf_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
+@@ -364,7 +364,7 @@ ice_vf_clear_vsi_promisc(struct ice_vf *vf, struct ice_vsi *vsi, u8 promisc_m)
+  *
+  * Returns true if any VFs were reset, and false otherwise.
+  */
+-bool ice_reset_all_vfs(struct ice_pf *pf)
++void ice_reset_all_vfs(struct ice_pf *pf)
+ {
+ 	struct device *dev = ice_pf_to_dev(pf);
+ 	struct ice_hw *hw = &pf->hw;
+@@ -373,7 +373,7 @@ bool ice_reset_all_vfs(struct ice_pf *pf)
+ 
+ 	/* If we don't have any VFs, then there is nothing to reset */
+ 	if (!ice_has_vfs(pf))
+-		return false;
++		return;
+ 
+ 	mutex_lock(&pf->vfs.table_lock);
+ 
+@@ -387,7 +387,7 @@ bool ice_reset_all_vfs(struct ice_pf *pf)
+ 	/* If VFs have been disabled, there is no need to reset */
+ 	if (test_and_set_bit(ICE_VF_DIS, pf->state)) {
+ 		mutex_unlock(&pf->vfs.table_lock);
+-		return false;
++		return;
+ 	}
+ 
+ 	/* Begin reset on all VFs at once */
+@@ -439,8 +439,6 @@ bool ice_reset_all_vfs(struct ice_pf *pf)
+ 	clear_bit(ICE_VF_DIS, pf->state);
+ 
+ 	mutex_unlock(&pf->vfs.table_lock);
+-
+-	return true;
+ }
+ 
+ /**
+diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.h b/drivers/net/ethernet/intel/ice/ice_vf_lib.h
+index 69c6eba408f3..f7906111aeb3 100644
+--- a/drivers/net/ethernet/intel/ice/ice_vf_lib.h
++++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.h
+@@ -213,7 +213,7 @@ ice_vf_set_vsi_promisc(struct ice_vf *vf, struct ice_vsi *vsi, u8 promisc_m);
+ int
+ ice_vf_clear_vsi_promisc(struct ice_vf *vf, struct ice_vsi *vsi, u8 promisc_m);
+ bool ice_reset_vf(struct ice_vf *vf, bool is_vflr);
+-bool ice_reset_all_vfs(struct ice_pf *pf);
++void ice_reset_all_vfs(struct ice_pf *pf);
+ #else /* CONFIG_PCI_IOV */
+ static inline struct ice_vf *ice_get_vf_by_id(struct ice_pf *pf, u16 vf_id)
+ {
+@@ -275,9 +275,8 @@ static inline bool ice_reset_vf(struct ice_vf *vf, bool is_vflr)
+ 	return true;
+ }
+ 
+-static inline bool ice_reset_all_vfs(struct ice_pf *pf)
++static inline void ice_reset_all_vfs(struct ice_pf *pf)
+ {
+-	return true;
+ }
+ #endif /* !CONFIG_PCI_IOV */
+ 
+-- 
+2.34.1
+

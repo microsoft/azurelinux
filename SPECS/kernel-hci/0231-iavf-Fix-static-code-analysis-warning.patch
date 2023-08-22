@@ -1,0 +1,37 @@
+From b837871c5def9182083f89fe789163b0689e3cf9 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Mon, 30 Aug 2021 10:38:01 +0200
+Subject: [NET-NEXT 231/254] iavf: Fix static code analysis warning
+
+From: Karen Sornek <karen.sornek@intel.com>
+
+Change min() to min_t() to fix static code analysis warning of possible
+overflow.
+
+Backported from upstream commit 349181b7b863
+
+Signed-off-by: Paul Greenwalt <paul.greenwalt@intel.com>
+Signed-off-by: Karen Sornek <karen.sornek@intel.com>
+Tested-by: Konrad Jankowski <konrad0.jankowski@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/iavf/iavf_txrx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_txrx.c b/drivers/net/ethernet/intel/iavf/iavf_txrx.c
+index 643dbe5bf997..4d2968f83838 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_txrx.c
++++ b/drivers/net/ethernet/intel/iavf/iavf_txrx.c
+@@ -1768,7 +1768,7 @@ int iavf_napi_poll(struct napi_struct *napi, int budget)
+ 	if (likely(napi_complete_done(napi, work_done)))
+ 		iavf_update_enable_itr(vsi, q_vector);
+ 
+-	return min(work_done, budget - 1);
++	return min_t(int, work_done, budget - 1);
+ }
+ 
+ /**
+-- 
+2.34.1
+

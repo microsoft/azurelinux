@@ -1,0 +1,51 @@
+From 0e3ccf594071c029f8463f1a790e851a5bea33e3 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Tue, 25 Jan 2022 17:04:40 +0100
+Subject: [NET-NEXT 151/254] ice: xsk: Force rings to be sized to power of 2
+
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+
+With the upcoming introduction of batching to XSK data path,
+performance wise it will be the best to have the ring descriptor count
+to be aligned to power of 2.
+
+Check if ring sizes that user is going to attach the XSK socket fulfill
+the condition above. For Tx side, although check is being done against
+the Tx queue and in the end the socket will be attached to the XDP
+queue, it is fine since XDP queues get the ring->count setting from Tx
+queues.
+
+Backported from upstream commit 296f13ff3854
+
+Suggested-by: Alexander Lobakin <alexandr.lobakin@intel.com>
+Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+Reviewed-by: Alexander Lobakin <alexandr.lobakin@intel.com>
+Acked-by: Magnus Karlsson <magnus.karlsson@intel.com>
+Link: https://lore.kernel.org/bpf/20220125160446.78976-3-maciej.fijalkowski@intel.com
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_xsk.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_xsk.c b/drivers/net/ethernet/intel/ice/ice_xsk.c
+index d4a010962451..d9ad94794674 100644
+--- a/drivers/net/ethernet/intel/ice/ice_xsk.c
++++ b/drivers/net/ethernet/intel/ice/ice_xsk.c
+@@ -337,6 +337,13 @@ int ice_xsk_pool_setup(struct ice_vsi *vsi, struct xsk_buff_pool *pool, u16 qid)
+ 		goto failure;
+ 	}
+ 
++	if (!is_power_of_2(vsi->rx_rings[qid]->count) ||
++	    !is_power_of_2(vsi->tx_rings[qid]->count)) {
++		netdev_err(vsi->netdev, "Please align ring sizes to power of 2\n");
++		pool_failure = -EINVAL;
++		goto failure;
++	}
++
+ 	if_running = netif_running(vsi->netdev) && ice_is_xdp_ena_vsi(vsi);
+ 
+ 	if (if_running) {
+-- 
+2.34.1
+

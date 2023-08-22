@@ -1,0 +1,52 @@
+From 1f365d5d7dbad8a67c473448a2dc7ea0483bbd59 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Wed, 3 May 2023 08:39:35 -0700
+Subject: [NET-NEXT 250/254] ice: block LAN in case of VF to VF offload
+
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+
+VF to VF traffic shouldn't go outside. To enforce it, set only the loopback
+enable bit in case of all ingress type rules added via the tc tool.
+
+Backported from stable commit 9f699b71c2f3
+
+Fixes: 0d08a441fb1a ("ice: ndo_setup_tc implementation for PF")
+Reported-by: Sujai Buvaneswaran <Sujai.Buvaneswaran@intel.com>
+Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Tested-by: George Kuruvinakunnel <george.kuruvinakunnel@intel.com>
+Reviewed-by: Simon Horman <simon.horman@corigine.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_tc_lib.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_tc_lib.c b/drivers/net/ethernet/intel/ice/ice_tc_lib.c
+index fedc310c376c..9202cb7f096a 100644
+--- a/drivers/net/ethernet/intel/ice/ice_tc_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_tc_lib.c
+@@ -449,17 +449,18 @@ ice_eswitch_add_tc_fltr(struct ice_vsi *vsi, struct ice_tc_flower_fltr *fltr)
+ 	 * results into order of switch rule evaluation.
+ 	 */
+ 	rule_info.priority = 7;
++	rule_info.flags_info.act_valid = true;
+ 
+ 	if (fltr->direction == ICE_ESWITCH_FLTR_INGRESS) {
+ 		rule_info.sw_act.flag |= ICE_FLTR_RX;
+ 		rule_info.sw_act.src = hw->pf_id;
+ 		rule_info.rx = true;
++		rule_info.flags_info.act = ICE_SINGLE_ACT_LB_ENABLE;
+ 	} else {
+ 		rule_info.sw_act.flag |= ICE_FLTR_TX;
+ 		rule_info.sw_act.src = vsi->idx;
+ 		rule_info.rx = false;
+ 		rule_info.flags_info.act = ICE_SINGLE_ACT_LAN_ENABLE;
+-		rule_info.flags_info.act_valid = true;
+ 	}
+ 
+ 	/* specify the cookie as filter_rule_id */
+-- 
+2.34.1
+

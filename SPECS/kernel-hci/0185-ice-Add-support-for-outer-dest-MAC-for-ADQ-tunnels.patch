@@ -1,0 +1,99 @@
+From cdc3fc13151fa2985249f64953868853bd2819d6 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Tue, 8 Feb 2022 17:06:05 -0800
+Subject: [NET-NEXT 185/254] ice: Add support for outer dest MAC for ADQ
+ tunnels
+
+From: Amritha Nambiar <amritha.nambiar@intel.com>
+
+TC flower does not support matching on user specified
+outer MAC address for tunnels. For ADQ tunnels, the driver
+adds outer destination MAC address as lower netdev's
+active unicast MAC address to filter out packets with
+unrelated MAC address being delivered to ADQ VSIs.
+
+Example:
+- create tunnel device
+ip l add $VXLAN_DEV type vxlan id $VXLAN_VNI dstport $VXLAN_PORT \
+dev $PF
+- add TC filter (in ADQ mode)
+
+$tc filter add dev $VXLAN_DEV protocol ip parent ffff: flower \
+ dst_ip $INNER_DST_IP ip_proto tcp dst_port $INNER_DST_PORT \
+ enc_key_id $VXLAN_VNI hw_tc $ADQ_TC
+
+Note: Filters with wild-card tunnel ID (when user does not
+specify tunnel key) are also supported.
+
+Backported from upstream commit 02ddec1986ff
+
+Signed-off-by: Amritha Nambiar <amritha.nambiar@intel.com>
+Tested-by: Bharathi Sreenivas <bharathi.sreenivas@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_tc_lib.c | 32 ++++++++++++++++++---
+ 1 file changed, 28 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_tc_lib.c b/drivers/net/ethernet/intel/ice/ice_tc_lib.c
+index 424c74ca7d69..fedc310c376c 100644
+--- a/drivers/net/ethernet/intel/ice/ice_tc_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_tc_lib.c
+@@ -24,6 +24,9 @@ ice_tc_count_lkups(u32 flags, struct ice_tc_flower_lyr_2_4_hdrs *headers,
+ 	if (flags & ICE_TC_FLWR_FIELD_TENANT_ID)
+ 		lkups_cnt++;
+ 
++	if (flags & ICE_TC_FLWR_FIELD_ENC_DST_MAC)
++		lkups_cnt++;
++
+ 	if (flags & (ICE_TC_FLWR_FIELD_ENC_SRC_IPV4 |
+ 		     ICE_TC_FLWR_FIELD_ENC_DEST_IPV4 |
+ 		     ICE_TC_FLWR_FIELD_ENC_SRC_IPV6 |
+@@ -148,6 +151,15 @@ ice_tc_fill_tunnel_outer(u32 flags, struct ice_tc_flower_fltr *fltr,
+ 		}
+ 	}
+ 
++	if (flags & ICE_TC_FLWR_FIELD_ENC_DST_MAC) {
++		list[i].type = ice_proto_type_from_mac(false);
++		ether_addr_copy(list[i].h_u.eth_hdr.dst_addr,
++				hdr->l2_key.dst_mac);
++		ether_addr_copy(list[i].m_u.eth_hdr.dst_addr,
++				hdr->l2_mask.dst_mac);
++		i++;
++	}
++
+ 	if (flags & (ICE_TC_FLWR_FIELD_ENC_SRC_IPV4 |
+ 		     ICE_TC_FLWR_FIELD_ENC_DEST_IPV4)) {
+ 		list[i].type = ice_proto_type_from_ipv4(false);
+@@ -1064,12 +1076,24 @@ ice_handle_tclass_action(struct ice_vsi *vsi,
+ 	 * this code won't do anything
+ 	 * 2. For non-tunnel, if user didn't specify MAC address, add implicit
+ 	 * dest MAC to be lower netdev's active unicast MAC address
++	 * 3. For tunnel,  as of now TC-filter through flower classifier doesn't
++	 * have provision for user to specify outer DMAC, hence driver to
++	 * implicitly add outer dest MAC to be lower netdev's active unicast
++	 * MAC address.
+ 	 */
+-	if (!(fltr->flags & ICE_TC_FLWR_FIELD_DST_MAC)) {
+-		ether_addr_copy(fltr->outer_headers.l2_key.dst_mac,
+-				main_vsi->netdev->dev_addr);
+-		eth_broadcast_addr(fltr->outer_headers.l2_mask.dst_mac);
++	if (fltr->tunnel_type != TNL_LAST &&
++	    !(fltr->flags & ICE_TC_FLWR_FIELD_ENC_DST_MAC))
++		fltr->flags |= ICE_TC_FLWR_FIELD_ENC_DST_MAC;
++
++	if (fltr->tunnel_type == TNL_LAST &&
++	    !(fltr->flags & ICE_TC_FLWR_FIELD_DST_MAC))
+ 		fltr->flags |= ICE_TC_FLWR_FIELD_DST_MAC;
++
++	if (fltr->flags & (ICE_TC_FLWR_FIELD_DST_MAC |
++			   ICE_TC_FLWR_FIELD_ENC_DST_MAC)) {
++		ether_addr_copy(fltr->outer_headers.l2_key.dst_mac,
++				vsi->netdev->dev_addr);
++		memset(fltr->outer_headers.l2_mask.dst_mac, 0xff, ETH_ALEN);
+ 	}
+ 
+ 	/* validate specified dest MAC address, make sure either it belongs to
+-- 
+2.34.1
+

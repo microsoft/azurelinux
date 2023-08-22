@@ -1,0 +1,36 @@
+From 118172b1ab28e17fcd2a4bd3639576fe62d09f55 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Sun, 26 Dec 2021 15:38:57 +0100
+Subject: [NET-NEXT 139/254] ice: Use bitmap_free() to free bitmap
+
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+
+kfree() and bitmap_free() are the same. But using the latter is more
+consistent when freeing memory allocated with bitmap_zalloc().
+
+Backported from upstream commit 0dbc41621875
+
+Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Tested-by: Gurucharan G <gurucharanx.g@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_ptp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
+index f37907620dc9..3a13a8f168f2 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp.c
++++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
+@@ -2246,7 +2246,7 @@ ice_ptp_release_tx_tracker(struct ice_pf *pf, struct ice_ptp_tx *tx)
+ 	kfree(tx->tstamps);
+ 	tx->tstamps = NULL;
+ 
+-	kfree(tx->in_use);
++	bitmap_free(tx->in_use);
+ 	tx->in_use = NULL;
+ 
+ 	tx->len = 0;
+-- 
+2.34.1
+

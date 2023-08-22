@@ -1,0 +1,56 @@
+From 72a8bdda2566ca324c0d0ca776432f9da20a31e0 Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Wed, 5 May 2021 14:17:57 -0700
+Subject: [NET-NEXT 092/254] ice: Remove toggling of antispoof for VF trusted
+ promiscuous mode
+
+From: Brett Creeley <brett.creeley@intel.com>
+
+Currently when a trusted VF enables promiscuous mode spoofchk will be
+disabled. This is wrong and should only be modified from the
+ndo_set_vf_spoofchk callback. Fix this by removing the call to toggle
+spoofchk for trusted VFs.
+
+Backported from upstream commit 0299faeaf8eb
+
+Fixes: 01b5e89aab49 ("ice: Add VF promiscuous support")
+Signed-off-by: Brett Creeley <brett.creeley@intel.com>
+Tested-by: Tony Brelinski <tony.brelinski@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ .../net/ethernet/intel/ice/ice_virtchnl_pf.c   | 18 ------------------
+ 1 file changed, 18 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c b/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c
+index 5b308d5b1902..e6b7d3dcb000 100644
+--- a/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c
++++ b/drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c
+@@ -3052,24 +3052,6 @@ static int ice_vc_cfg_promiscuous_mode_msg(struct ice_vf *vf, u8 *msg)
+ 	rm_promisc = !allmulti && !alluni;
+ 
+ 	if (vsi->num_vlan || vf->port_vlan_info) {
+-		struct ice_vsi *pf_vsi = ice_get_main_vsi(pf);
+-		struct net_device *pf_netdev;
+-
+-		if (!pf_vsi) {
+-			v_ret = VIRTCHNL_STATUS_ERR_PARAM;
+-			goto error_param;
+-		}
+-
+-		pf_netdev = pf_vsi->netdev;
+-
+-		ret = ice_set_vf_spoofchk(pf_netdev, vf->vf_id, rm_promisc);
+-		if (ret) {
+-			dev_err(dev, "Failed to update spoofchk to %s for VF %d VSI %d when setting promiscuous mode\n",
+-				rm_promisc ? "ON" : "OFF", vf->vf_id,
+-				vsi->vsi_num);
+-			v_ret = VIRTCHNL_STATUS_ERR_PARAM;
+-		}
+-
+ 		if (rm_promisc)
+ 			ret = ice_cfg_vlan_pruning(vsi, true);
+ 		else
+-- 
+2.34.1
+

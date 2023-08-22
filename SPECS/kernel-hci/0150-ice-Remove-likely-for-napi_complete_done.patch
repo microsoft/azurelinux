@@ -1,0 +1,39 @@
+From 279fb28427f63be7babdbf79443eeb87493a0c9b Mon Sep 17 00:00:00 2001
+From: Carolyn Wyborny <carolyn.wyborny@intel.com>
+Date: Tue, 25 Jan 2022 17:04:39 +0100
+Subject: [NET-NEXT 150/254] ice: Remove likely for napi_complete_done
+
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+
+Remove the likely before napi_complete_done as this is the unlikely case
+when busy-poll is used. Removing this has a positive performance impact
+for busy-poll and no negative impact to the regular case.
+
+Backported from upstream commit a4e186693cbe
+
+Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+Reviewed-by: Alexander Lobakin <alexandr.lobakin@intel.com>
+Acked-by: Magnus Karlsson <magnus.karlsson@intel.com>
+Link: https://lore.kernel.org/bpf/20220125160446.78976-2-maciej.fijalkowski@intel.com
+Signed-off-by: Carolyn Wyborny <carolyn.wyborny@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_txrx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
+index 89d159ccce95..2c57f3ab2c8a 100644
+--- a/drivers/net/ethernet/intel/ice/ice_txrx.c
++++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
+@@ -1513,7 +1513,7 @@ int ice_napi_poll(struct napi_struct *napi, int budget)
+ 	/* Exit the polling mode, but don't re-enable interrupts if stack might
+ 	 * poll us due to busy-polling
+ 	 */
+-	if (likely(napi_complete_done(napi, work_done))) {
++	if (napi_complete_done(napi, work_done)) {
+ 		ice_net_dim(q_vector);
+ 		ice_enable_interrupt(q_vector);
+ 	} else {
+-- 
+2.34.1
+
