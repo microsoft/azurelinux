@@ -1,11 +1,11 @@
 %define         upstream_name runc
-%define         commit_hash a916309fff0f838eb94e928713dbc3c0d0ac7aa4
+%define         commit_hash ccaecfcbc907d70a7aa870a6650887b901b25b82
 
 Summary:        CLI tool for spawning and running containers per OCI spec.
 Name:           moby-%{upstream_name}
 # update "commit_hash" above when upgrading version
-Version:        1.1.5
-Release:        3%{?dist}
+Version:        1.1.9
+Release:        1%{?dist}
 License:        ASL 2.0
 URL:            https://github.com/opencontainers/runc
 Group:          Virtualization/Libraries
@@ -13,7 +13,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
 Source0:        https://github.com/opencontainers/runc/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:         0001-cgroups-cpuset-fix-byte-order-while-parsing-cpuset-r.patch
 
 BuildRequires:  git
 BuildRequires:  golang => 1.16
@@ -37,7 +36,6 @@ runC is a CLI tool for spawning and running containers according to the OCI spec
 
 %prep
 %setup -q -n %{upstream_name}-%{version}
-%patch0 -p1
 
 %build
 export CGO_ENABLED=1
@@ -59,6 +57,12 @@ make install-man DESTDIR="%{buildroot}" PREFIX="%{_prefix}"
 %{_mandir}/*
 
 %changelog
+* Tue Aug 15 2023 Muhammad Falak <mwani@microsoft.com> - 1.1.9-1
+- Bump version to 1.1.9
+
+* Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.5-4
+- Bump release to rebuild with go 1.19.12
+
 * Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.5-3
 - Bump release to rebuild with go 1.19.11
 

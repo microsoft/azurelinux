@@ -13,6 +13,8 @@ BUILD_NUMBER       ?= $(call shell_real_build_only, if [ -n "$$UID" ] && [ "$$UI
 ifeq ($(BUILD_NUMBER),)
    BUILD_NUMBER = non-git
 endif
+# Staticly define BUILD_NUMBER so it is set only once
+BUILD_NUMBER := $(BUILD_NUMBER)
 RELEASE_MAJOR_ID   ?= 2.0
 # use minor ID defined in file (if exist) otherwise define it
 # note this file must be single line
@@ -22,6 +24,10 @@ else
    RELEASE_MINOR_ID ?= .$(shell date +'%Y%m%d.%H%M')
 endif
 RELEASE_VERSION    ?= $(RELEASE_MAJOR_ID)$(RELEASE_MINOR_ID)
+
+# Re-assign RELEASE_VERSION so it is set statically only once
+# This is to prevent the version from changing as time passes during the build
+RELEASE_VERSION := $(RELEASE_VERSION)
 
 # Image tag - empty by default. Does not apply to the initrd.
 IMAGE_TAG          ?=
