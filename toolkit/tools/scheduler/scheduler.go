@@ -69,7 +69,6 @@ var (
 	rpmmacrosFile              = app.Flag("rpmmacros-file", "Optional file path to an rpmmacros file for rpmbuild to use.").ExistingFile()
 	buildAttempts              = app.Flag("build-attempts", "Sets the number of times to try building a package.").Default(defaultBuildAttempts).Int()
 	checkAttempts              = app.Flag("check-attempts", "Sets the minimum number of times to test a package if the tests fail.").Default(defaultCheckAttempts).Int()
-	runCheck                   = app.Flag("run-check", "Run the check during package builds.").Bool()
 	noCleanup                  = app.Flag("no-cleanup", "Whether or not to delete the chroot folder after the build is done").Bool()
 	noCache                    = app.Flag("no-cache", "Disables using prebuilt cached packages.").Bool()
 	stopOnFailure              = app.Flag("stop-on-failure", "Stop on failed build").Bool()
@@ -88,6 +87,10 @@ var (
 
 	pkgsToBuild   = app.Flag("packages", "Space separated list of top-level packages that should be built. Omit this argument to build all packages.").String()
 	pkgsToRebuild = app.Flag("rebuild-packages", "Space separated list of base package names packages that should be rebuilt.").String()
+
+	testsToIgnore = app.Flag("ignored-tests", "Space separated list of package tests that should not be ran.").String()
+	testsToRun    = app.Flag("tests", "Space separated list of tests that should be ran. Omit this argument to run package tests.").String()
+	testsToRerun  = app.Flag("rerun-tests", "Space separated list of package tests that should be re-ran.").String()
 
 	logFile       = exe.LogFileFlag(app)
 	logLevel      = exe.LogLevelFlag(app)
@@ -120,9 +123,14 @@ func main() {
 		logger.Log.Fatalf("Failed to read DOT graph with error:\n%s", err)
 	}
 
-	finalPackagesToBuild, packagesToRebuild, packagesToIgnore, err := schedulerutils.ParseAndGeneratePackageList(dependencyGraph, exe.ParseListArgument(*pkgsToBuild), exe.ParseListArgument(*pkgsToRebuild), exe.ParseListArgument(*pkgsToIgnore), *imageConfig, *baseDirPath)
+	finalPackagesToBuild, packagesToRebuild, packagesToIgnore, err := schedulerutils.ParseAndGeneratePackageBuildList(dependencyGraph, exe.ParseListArgument(*pkgsToBuild), exe.ParseListArgument(*pkgsToRebuild), exe.ParseListArgument(*pkgsToIgnore), *imageConfig, *baseDirPath)
 	if err != nil {
 		logger.Log.Fatalf("Failed to generate package list with error:\n%s", err)
+	}
+
+	finalTestsToRun, testsToRerun, ignoredTests, err := schedulerutils.ParseAndGeneratePackageTestList(dependencyGraph, exe.ParseListArgument(*testsToRun), exe.ParseListArgument(*testsToRerun), exe.ParseListArgument(*testsToIgnore), *imageConfig, *baseDirPath)
+	if err != nil {
+		logger.Log.Fatalf("Failed to generate tests list with error:\n%s", err)
 	}
 
 	toolchainPackages, err := schedulerutils.ReadReservedFilesList(*toolchainManifest)
@@ -148,7 +156,6 @@ func main() {
 		RpmmacrosFile:        *rpmmacrosFile,
 
 		NoCleanup: *noCleanup,
-		RunCheck:  *runCheck,
 		UseCcache: *useCcache,
 		MaxCpu:    *maxCPU,
 
@@ -174,7 +181,7 @@ func main() {
 	signal.Notify(signals, unix.SIGINT, unix.SIGTERM)
 	go cancelBuildsOnSignal(signals, agent)
 
-	err = buildGraph(*inputGraphFile, *outputGraphFile, agent, *workers, *buildAttempts, *checkAttempts, *stopOnFailure, !*noCache, finalPackagesToBuild, packagesToRebuild, packagesToIgnore, toolchainPackages, *optimizeWithCachedImplicit, *allowToolchainRebuilds)
+	err = buildGraph(*inputGraphFile, *outputGraphFile, agent, *workers, *buildAttempts, *checkAttempts, *stopOnFailure, !*noCache, finalPackagesToBuild, packagesToRebuild, packagesToIgnore, finalTestsToRun, testsToRerun, ignoredTests, toolchainPackages, *optimizeWithCachedImplicit, *allowToolchainRebuilds)
 	if err != nil {
 		logger.Log.Fatalf("Unable to build package graph.\nFor details see the build summary section above.\nError: %s.", err)
 	}
@@ -202,7 +209,7 @@ func cancelBuildsOnSignal(signals chan os.Signal, agent buildagents.BuildAgent) 
 
 // buildGraph builds all packages in the dependency graph requested.
 // It will save the resulting graph to outputFile.
-func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, workers, buildAttempts int, checkAttempts int, stopOnFailure, canUseCache bool, packagesToBuild, packagesToRebuild, ignoredPackages []*pkgjson.PackageVer, toolchainPackages []string, optimizeWithCachedImplicit bool, allowToolchainRebuilds bool) (err error) {
+func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, workers, buildAttempts int, checkAttempts int, stopOnFailure, canUseCache bool, packagesToBuild, packagesToRebuild, ignoredPackages, testsToRun, testsToRerun, ignoredTests []*pkgjson.PackageVer, toolchainPackages []string, optimizeWithCachedImplicit bool, allowToolchainRebuilds bool) (err error) {
 	// graphMutex guards pkgGraph from concurrent reads and writes during build.
 	var graphMutex sync.RWMutex
 
@@ -210,7 +217,7 @@ func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, work
 	// try to avoid using the cached implicit dependencies until we have no other choice during the build, but since the graph is pruned, we will
 	// avoid building packages that are not needed. Obviously we can only do this if the cache is enabled.
 	allowEarlyImplicitOptimization := (canUseCache && optimizeWithCachedImplicit)
-	_, pkgGraph, goalNode, err := schedulerutils.InitializeGraphFromFile(inputFile, packagesToBuild, allowEarlyImplicitOptimization)
+	_, pkgGraph, goalNode, err := schedulerutils.InitializeGraphFromFile(inputFile, packagesToBuild, testsToRun, allowEarlyImplicitOptimization)
 	if err != nil {
 		return
 	}
@@ -218,11 +225,11 @@ func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, work
 	// Setup and start the worker pool and scheduler routine.
 	numberOfNodes := pkgGraph.Nodes().Len()
 
-	channels := startWorkerPool(agent, workers, buildAttempts, checkAttempts, numberOfNodes, &graphMutex, ignoredPackages)
+	channels := startWorkerPool(agent, workers, buildAttempts, checkAttempts, numberOfNodes, &graphMutex, ignoredPackages, ignoredTests)
 	logger.Log.Infof("Building %d nodes with %d workers", numberOfNodes, workers)
 
 	// After this call pkgGraph will be given to multiple routines and accessing it requires acquiring the mutex.
-	builtGraph, err := buildAllNodes(stopOnFailure, canUseCache, packagesToRebuild, pkgGraph, &graphMutex, goalNode, channels, toolchainPackages, allowToolchainRebuilds)
+	builtGraph, err := buildAllNodes(stopOnFailure, canUseCache, packagesToRebuild, testsToRerun, pkgGraph, &graphMutex, goalNode, channels, toolchainPackages, allowToolchainRebuilds)
 
 	if builtGraph != nil {
 		graphMutex.RLock()
@@ -239,7 +246,7 @@ func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, work
 
 // startWorkerPool starts the worker pool and returns the communication channels between the workers and the scheduler.
 // channelBufferSize controls how many entries in the channels can be buffered before blocking writes to them.
-func startWorkerPool(agent buildagents.BuildAgent, workers, buildAttempts, checkAttempts, channelBufferSize int, graphMutex *sync.RWMutex, ignoredPackages []*pkgjson.PackageVer) (channels *schedulerChannels) {
+func startWorkerPool(agent buildagents.BuildAgent, workers, buildAttempts, checkAttempts, channelBufferSize int, graphMutex *sync.RWMutex, ignoredPackages, ignoredTests []*pkgjson.PackageVer) (channels *schedulerChannels) {
 	channels = &schedulerChannels{
 		Requests:         make(chan *schedulerutils.BuildRequest, channelBufferSize),
 		PriorityRequests: make(chan *schedulerutils.BuildRequest, channelBufferSize),
@@ -260,7 +267,7 @@ func startWorkerPool(agent buildagents.BuildAgent, workers, buildAttempts, check
 	// Start the workers now so they begin working as soon as a new job is queued.
 	for i := 0; i < workers; i++ {
 		logger.Log.Debugf("Starting worker #%d", i)
-		go schedulerutils.BuildNodeWorker(directionalChannels, agent, graphMutex, buildAttempts, checkAttempts, ignoredPackages)
+		go schedulerutils.BuildNodeWorker(directionalChannels, agent, graphMutex, buildAttempts, checkAttempts, ignoredPackages, ignoredTests)
 	}
 
 	return
@@ -275,7 +282,7 @@ func startWorkerPool(agent buildagents.BuildAgent, workers, buildAttempts, check
 // - Attempts to satisfy any unresolved dynamic dependencies with new implicit provides from the build result.
 // - Attempts to subgraph the graph to only contain the requested packages if possible.
 // - Repeat.
-func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild []*pkgjson.PackageVer, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, goalNode *pkggraph.PkgNode, channels *schedulerChannels, reservedFiles []string, allowToolchainRebuilds bool) (builtGraph *pkggraph.PkgGraph, err error) {
+func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRerun []*pkgjson.PackageVer, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, goalNode *pkggraph.PkgNode, channels *schedulerChannels, reservedFiles []string, allowToolchainRebuilds bool) (builtGraph *pkggraph.PkgGraph, err error) {
 	var (
 		// stopBuilding tracks if the build has entered a failed state and this routine should stop as soon as possible.
 		stopBuilding bool
@@ -295,13 +302,14 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild []*pkgjson
 	// Start the build at the leaf nodes.
 	// The build will bubble up through the graph as it processes nodes.
 	buildState := schedulerutils.NewGraphBuildState(reservedFiles)
+	buildRunsTests := len(pkgGraph.AllTestNodes()) > 0
 	nodesToBuild := schedulerutils.LeafNodes(pkgGraph, graphMutex, goalNode, buildState, useCachedImplicit)
 
 	for {
-		logger.Log.Debugf("Found %d unblocked nodes", len(nodesToBuild))
+		logger.Log.Debugf("Found %d unblocked nodes: %v.", len(nodesToBuild), nodesToBuild)
 
 		// Each node that is ready to build must be converted into a build request and submitted to the worker pool.
-		newRequests := schedulerutils.ConvertNodesToRequests(pkgGraph, graphMutex, nodesToBuild, packagesToRebuild, buildState, canUseCache)
+		newRequests := schedulerutils.ConvertNodesToRequests(pkgGraph, graphMutex, nodesToBuild, packagesToRebuild, testsToRerun, buildState, canUseCache)
 		for _, req := range newRequests {
 			buildState.RecordBuildRequest(req)
 			// Decide which priority the build should be. Generally we want to get any remote or prebuilt nodes out of the
@@ -415,14 +423,18 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild []*pkgjson
 
 		activeSRPMs := buildState.ActiveSRPMs()
 		activeSRPMsCount := len(activeSRPMs)
-		if stopBuilding {
-			if activeSRPMsCount == 0 {
-				break
-			}
+		if stopBuilding && activeSRPMsCount == 0 {
+			break
 		}
 
-		if res.Node.Type == pkggraph.TypeLocalBuild {
+		if res.Node.Type == pkggraph.TypeLocalBuild || res.Node.Type == pkggraph.TypeTest {
 			logger.Log.Infof("%d currently active build(s): %v.", activeSRPMsCount, activeSRPMs)
+
+			if buildRunsTests {
+				activeTests := buildState.ActiveTests()
+
+				logger.Log.Infof("%d currently active test(s): %v.", len(activeTests), activeTests)
+			}
 		}
 
 	}

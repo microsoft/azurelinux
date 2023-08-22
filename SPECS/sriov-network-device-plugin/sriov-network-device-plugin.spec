@@ -1,7 +1,7 @@
 Summary:        Plugin for discovering and advertising networking resources
 Name:           sriov-network-device-plugin
 Version:        3.4.0
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -34,6 +34,9 @@ install -D -m0755 images/ddptool-1.0.1.12.tar.gz %{buildroot}/usr/share/%{name}/
 /usr/share/%{name}/ddptool-1.0.1.12.tar.gz
 
 %changelog
+* Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.4.0-12
+- Bump release to rebuild with go 1.19.12
+
 * Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.4.0-11
 - Bump release to rebuild with go 1.19.11
 

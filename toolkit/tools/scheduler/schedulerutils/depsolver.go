@@ -8,6 +8,7 @@ import (
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
 	"github.com/sirupsen/logrus"
 	"gonum.org/v1/gonum/graph"
 	"gonum.org/v1/gonum/graph/path"
@@ -119,36 +120,25 @@ func FindUnblockedNodesFromResult(res *BuildResult, pkgGraph *pkggraph.PkgGraph,
 	// Since all the ancillary nodes are marked as available already, there may be duplicate nodes returned by the below loop.
 	// e.g. If a meta node requires two build nodes for the same SPEC, then that meta node will be reported twice.
 	// Filter the nodes to ensure no duplicates.
-	var unfilteredUnblockedNodes []*pkggraph.PkgNode
 	unblockedNodesMap := make(map[*pkggraph.PkgNode]bool)
 	for _, node := range res.AncillaryNodes {
-		unfilteredUnblockedNodes = append(unfilteredUnblockedNodes, findUnblockedNodesFromNode(pkgGraph, buildState, node)...)
+		findUnblockedNodesFromNode(pkgGraph, buildState, node, unblockedNodesMap)
 	}
 
-	for _, node := range unfilteredUnblockedNodes {
-		_, found := unblockedNodesMap[node]
-		if !found {
-			unblockedNodesMap[node] = true
-			unblockedNodes = append(unblockedNodes, node)
-		}
-	}
-
-	return
+	return sliceutils.SetToSlice(unblockedNodesMap)
 }
 
 // findUnblockedNodesFromNode takes a built node and returns a list of nodes that are now unblocked by it.
-func findUnblockedNodesFromNode(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, builtNode *pkggraph.PkgNode) (unblockedNodes []*pkggraph.PkgNode) {
+func findUnblockedNodesFromNode(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, builtNode *pkggraph.PkgNode, unblockedNodes map[*pkggraph.PkgNode]bool) {
 	dependents := pkgGraph.To(builtNode.ID())
 
 	for dependents.Next() {
 		dependent := dependents.Node().(*pkggraph.PkgNode)
 
 		if isNodeUnblocked(pkgGraph, buildState, dependent) {
-			unblockedNodes = append(unblockedNodes, dependent)
+			unblockedNodes[dependent] = true
 		}
 	}
-
-	return
 }
 
 // isNodeUnblocked returns true if all nodes required to build `node` are UpToDate and do not need to be built.
