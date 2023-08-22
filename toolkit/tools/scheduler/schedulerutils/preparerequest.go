@@ -88,7 +88,7 @@ func buildNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildSta
 			if len(missingFiles) != 0 {
 				req.UseCache = false
 				req.Freshness = buildState.GetMaxFreshness()
-				logger.Log.Debugf("Resetting freshness to '%d'due to missing files.", req.Freshness)
+				logger.Log.Debugf("Resetting freshness to %d due to missing files.", req.Freshness)
 			}
 		}
 
