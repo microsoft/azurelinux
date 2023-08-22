@@ -82,12 +82,14 @@ func buildNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildSta
 			expectedFiles, missingFiles := pkggraph.FindRPMFiles(defaultNode.SrpmPath, pkgGraph, nil)
 			if len(missingFiles) > 0 && len(missingFiles) < len(expectedFiles) {
 				logger.Log.Infof("SRPM '%s' will be rebuilt due to partially missing components: %v", defaultNode.SRPMFileName(), missingFiles)
-				logger.Log.Debug("Resetting freshness due to missing files.")
-				req.Freshness = buildState.GetMaxFreshness()
 			}
 
 			req.ExpectedFiles = expectedFiles
-			req.UseCache = len(missingFiles) == 0
+			if len(missingFiles) != 0 {
+				req.UseCache = false
+				req.Freshness = buildState.GetMaxFreshness()
+				logger.Log.Debugf("Resetting freshness to '%d'due to missing files.", req.Freshness)
+			}
 		}
 
 		requests = append(requests, req)
@@ -222,7 +224,7 @@ func canUseCacheForNode(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, bui
 	for dependencies.Next() {
 		dependency := dependencies.Node().(*pkggraph.PkgNode)
 
-		inheritedFreshness, shouldRebuild := calculateExpectedFreshness(node, dependency, buildState)
+		inheritedFreshness, shouldRebuild := calculateExpectedFreshness(dependency, buildState)
 		if inheritedFreshness > freshness {
 			freshness = inheritedFreshness
 		}
@@ -239,7 +241,7 @@ func canUseCacheForNode(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, bui
 // calculateExpectedFreshness calculates how "fresh" a node will be based on one of its dependencies, and if that
 // dependency should cause a rebuild. This function will determine if the freshness should be attenuated based on
 // the dependency type.
-func calculateExpectedFreshness(currentNode, dependencyNode *pkggraph.PkgNode, buildState *GraphBuildState) (expectedFreshness int, shouldRebuild bool) {
+func calculateExpectedFreshness(dependencyNode *pkggraph.PkgNode, buildState *GraphBuildState) (expectedFreshness int, shouldRebuild bool) {
 	// Remote nodes are always 'stale' and should never generate a rebuild.
 	if dependencyNode.Type == pkggraph.TypeRemoteRun {
 		return 0, false
