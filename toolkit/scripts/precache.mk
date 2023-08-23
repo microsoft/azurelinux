@@ -12,6 +12,7 @@ precache_chroot_dir = $(precache_state_dir)/chroot
 
 $(call create_folder,$(precache_state_dir))
 $(call create_folder,$(precache_chroot_dir))
+$(call create_folder,$(remote_rpms_cache_dir))
 
 clean-cache: clean-precache
 clean: clean-precache

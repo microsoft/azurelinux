@@ -56,12 +56,12 @@ var (
 	profFlags     = exe.SetupProfileFlags(app)
 	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
 
-	outDir            = exe.OutputDirFlag(app, "Directory to download packages into.")
+	outDir            = app.Flag("output-dir", "Directory to download packages into.").Required().ExistingDir()
 	snapshot          = app.Flag("snapshot", "Path to the rpm snapshot .json file.").ExistingFile()
 	outputSummaryFile = app.Flag("output-summary-file", "Path to save the summary of packages downloaded").String()
 	repoUrls          = app.Flag("repo-url", "URLs of the repos to download from.").Strings()
 	workerTar         = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz").Required().ExistingFile()
-	buildDir          = app.Flag("worker-dir", "Directory to store chroot while running repo query.").String()
+	buildDir          = app.Flag("worker-dir", "Directory to store chroot while running repo query.").Required().ExistingDir()
 
 	concurrentNetOps = app.Flag("concurrent-net-ops", "Number of concurrent network operations to perform.").Default(defaultNetOpsCount).Uint()
 )
@@ -131,12 +131,6 @@ func getAllRepoData(repoURLs []string, workerTar, buildDir string) (namesToURLs 
 	)
 	timestamp.StartEvent("pull available package data from repos", nil)
 	defer timestamp.StopEvent(nil)
-
-	err = os.MkdirAll(buildDir, 0755)
-	if err != nil {
-		err = fmt.Errorf("failed to create directory '%s':\n%w", buildDir, err)
-		return nil, err
-	}
 
 	queryChroot, err := createChroot(workerTar, buildDir, leaveChrootOnDisk)
 	if err != nil {
@@ -267,12 +261,6 @@ func downloadMissingPackages(rpmSnapshot *repocloner.RepoContents, packagesAvail
 	timestamp.StartEvent("download missing packages", nil)
 	defer timestamp.StopEvent(nil)
 
-	err = os.MkdirAll(outDir, 0755)
-	if err != nil {
-		err = fmt.Errorf("failed to create directory '%s':\n%w", outDir, err)
-		return nil, err
-	}
-
 	// We will be downloading packages concurrently, so we need to keep track of when they are all done via a wait group. To
 	// simplify the code just use goroutines with a semaphore channel to limit the number of concurrent network operations. Each
 	// goroutine will handle a single package and will send the result of the download to a results channel. The main thread will
@@ -369,7 +357,7 @@ func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map
 	fileName := fmt.Sprintf("%s.rpm", pkgName)
 	fullFilePath := path.Join(outDir, fileName)
 	result := downloadResult{
-		pkgName: fileName,
+		pkgName:    fileName,
 		resultType: downloadResultTypeFailure,
 	}
 
@@ -379,7 +367,12 @@ func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map
 	}()
 
 	// Bail out early if the file already exists
-	if exists, _ := file.PathExists(fullFilePath); exists {
+	exists, err := file.PathExists(fullFilePath)
+	if err != nil {
+		logger.Log.Warnf("Failed to check if file exists: %s", err)
+		return
+	}
+	if exists {
 		result.resultType = downloadResultTypeSkipped
 		return
 	}
@@ -399,7 +392,7 @@ func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map
 	}()
 
 	logger.Log.Debugf("Pre-caching '%s' from '%s'", fileName, url)
-	err := retry.Run(func() error {
+	err = retry.Run(func() error {
 		err := network.DownloadFile(url, fullFilePath, nil, nil)
 		if err != nil {
 			logger.Log.Warnf("Attempt to download (%s) failed. Error: %s", url, err)
