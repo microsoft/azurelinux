@@ -76,6 +76,7 @@ tmp_dir=${script_dir%'/toolkit'*}/build/containerized-rpmbuild/tmp
 mkdir -p ${tmp_dir}
 topdir=/usr/src/mariner
 enable_local_repo=false
+specs_dir=""
 
 while (( "$#")); do
   case "$1" in
@@ -84,6 +85,7 @@ while (( "$#")); do
     -p ) repo_path="$(realpath $2)"; shift 2 ;;
     -mo ) extra_mounts="$2"; shift 2 ;;
     -r ) enable_local_repo=true; shift ;;
+    -s ) specs_dir="$(realpath $2)"; shift 2;;
     -h ) help; exit 1 ;;
     ? ) echo -e "ERROR: INVALID OPTION.\n\n"; help; exit 1 ;;
   esac
@@ -149,7 +151,7 @@ echo "Setting up mounts..."
 mounts="${mounts} ${repo_path}/out/RPMS:/mnt/RPMS ${tmp_dir}:/mariner_setup_dir"
 # Add extra 'build' mounts
 if [[ "${mode}" == "build" ]]; then
-    mounts="${mounts} ${repo_path}/build/INTERMEDIATE_SRPMS:/mnt/INTERMEDIATE_SRPMS ${repo_path}/SPECS:${topdir}/SPECS"
+    mounts="${mounts} ${repo_path}/build/INTERMEDIATE_SRPMS:/mnt/INTERMEDIATE_SRPMS $specs_dir:${topdir}/SPECS"
 fi
 
 # Replace comma with space as delimiter
