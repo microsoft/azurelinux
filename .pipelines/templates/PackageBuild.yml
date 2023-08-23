@@ -38,6 +38,10 @@ parameters:
     type: string
     default: ""
 
+  - name: rpmsCacheTarballName
+    type: string
+    default: "rpms.tar.gz"
+
   - name: rpmsTarballName
     type: string
     default: "rpms.tar.gz"
@@ -85,7 +89,7 @@ steps:
         displayName: "Download RPM cache"
         inputs:
           artifact: "${{ parameters.rpmsCacheArtifactName }}"
-          patterns: "**/rpms*.tar.gz"
+          patterns: "**/${{ parameters.rpmsCacheTarballName }}"
 
       - script: |
           rpms_archive="$(find "$(Pipeline.Workspace)" -name rpms*.tar.gz)"
