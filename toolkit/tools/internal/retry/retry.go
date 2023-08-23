@@ -35,10 +35,17 @@ func calculateLinearDelay(failCount int, sleep time.Duration) time.Duration {
 // backoffSleep sleeps for the given duration, unless the cancel channel is triggered or closed first. The cancel channel
 // may be nil in which case the sleep will always complete.
 func backoffSleep(delay time.Duration, cancel <-chan struct{}) (cancelled bool) {
+	// The first call to backoffSleep will always sleep for 0 seconds, so to avoid a non-deterministic result where we may
+	// pick cancel OR time.After(0) we should first check just the cancel channel.
 	select {
-	case <-time.After(delay):
 	case <-cancel:
 		cancelled = true
+	default:
+		select {
+		case <-time.After(delay):
+		case <-cancel:
+			cancelled = true
+		}
 	}
 	return
 }
