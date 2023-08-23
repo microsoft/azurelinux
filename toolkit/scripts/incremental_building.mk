@@ -62,6 +62,7 @@ DELTA_BUILD    = y
 USE_CCACHE             ?= y
 REBUILD_TOOLS          ?= y
 DELTA_FETCH            ?= y
+PRECACHE               ?= y
 # We also want to try and limit pointless rebuilds, so set EXTRA_BUILD_LAYERS to 1 if it's not already set.
 MAX_CASCADING_REBUILDS ?= 1
 endif
@@ -76,6 +77,7 @@ DELTA_BUILD                     ?= n
 CLEAN_TOOLCHAIN_CONTAINERS      ?= y
 MAX_CPU                         ?=
 DELTA_FETCH                     ?= n
+PRECACHE                        ?= n
 MAX_CASCADING_REBUILDS          ?=
 
 ######## HANDLE INCREMENTAL_TOOLCHAIN DEPRECATION ########

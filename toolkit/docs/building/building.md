@@ -522,6 +522,16 @@ If that is not desired all remote sources can be disabled by clearing the follow
 
 > Try to download pre-built packages if the versions match the local spec files.
 
+#### `PRECACHE=...`
+
+##### `PRECACHE=`**`n`** *(default)*
+
+> Don't pre-load the cache from upstream sources
+
+##### `PRECACHE=y`
+
+> Load the cache with RPMs from the upstream repos before starting to build.
+
 #### `ALLOW_TOOLCHAIN_DOWNLOAD_FAIL=...`
 
 ##### `ALLOW_TOOLCHAIN_DOWNLOAD_FAIL=`**`n`** *(default)*
