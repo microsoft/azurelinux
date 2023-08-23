@@ -26,10 +26,9 @@ clean-precache:
 pre-cache: $(STATUS_FLAGS_DIR)/precache.flag
 $(STATUS_FLAGS_DIR)/precache.flag: $(go-precacher) $(chroot_worker) $(rpms_snapshot) precache_always_run_phony 
 	@if [ "$(DISABLE_UPSTREAM_REPOS)" = "y" ]; then \
-		echo "ERROR: Upstream repos are disabled (DISABLE_UPSTREAM_REPOS=y), cannot precache rpms"; \
+		echo "ERROR: Upstream repos are disabled (DISABLE_UPSTREAM_REPOS=y), cannot precache RPMs"; \
 		exit 1; \
 	fi
-	[ -f $@ ] || touch $@ # Create the flag file if it doesn't exist in case we don't download anything
 	$(go-precacher) \
 		--snapshot "$(rpms_snapshot)" \
 		--output-dir "$(remote_rpms_cache_dir)" \
@@ -46,6 +45,6 @@ $(STATUS_FLAGS_DIR)/precache.flag: $(go-precacher) $(chroot_worker) $(rpms_snaps
 		$(if $(filter y,$(ENABLE_MEM_PROFILE)),--enable-mem-prof) \
 		$(if $(filter y,$(ENABLE_TRACE)),--enable-trace) \
 		--timestamp-file=$(TIMESTAMP_DIR)/precacher.jsonl && \
-	if [ -s "$(precache_downloaded_files)" ]; then \
+	if [ ! -f $@ || -s "$(precache_downloaded_files)" ]; then \
 		touch $@; \
 	fi
