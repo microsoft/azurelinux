@@ -1,4 +1,4 @@
-%global _default_patch_fuzz 1
+%global _default_patch_fuzz 2
 
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
@@ -149,6 +149,7 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 %changelog
 * Wed Aug 23 2023 Rachel Menge <rachelmenge@microsoft.com> - 3.5.4-10
 - Backport patch for CVE-2023-32082
+- Update patch fuzz to 2 for backporting patch
 
 * Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.4-9
 - Bump release to rebuild with go 1.19.12
