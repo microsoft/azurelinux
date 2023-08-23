@@ -46,6 +46,6 @@ $(STATUS_FLAGS_DIR)/precache.flag: $(go-precacher) $(chroot_worker) $(rpms_snaps
 		$(if $(filter y,$(ENABLE_MEM_PROFILE)),--enable-mem-prof) \
 		$(if $(filter y,$(ENABLE_TRACE)),--enable-trace) \
 		--timestamp-file=$(TIMESTAMP_DIR)/precacher.jsonl && \
-	if [ ! -f $@ || -s "$(precache_downloaded_files)" ]; then \
+	if [ ! -f $@ ] || [ -s "$(precache_downloaded_files)" ]; then \
 		touch $@; \
 	fi
