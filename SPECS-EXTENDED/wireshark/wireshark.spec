@@ -1,12 +1,11 @@
 %global with_lua 1
-%global with_maxminddb 1
-%global plugins_version 3.4
+%global plugins_version 3.6
 
 Summary:        Network traffic analyzer
 Name:           wireshark
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Version:        3.4.16
+Version:        3.6.8
 Release:        1%{?dist}
 License:        BSD and GPLv2
 Url:            https://www.wireshark.org/
@@ -31,6 +30,7 @@ Patch7:         wireshark-0007-cmakelists.patch
 BuildRequires:  bzip2-devel
 BuildRequires:  bison
 BuildRequires:  c-ares-devel
+BuildRequires:  pcre2-devel
 Buildrequires:  cmake
 BuildRequires:  elfutils-devel
 BuildRequires:  flex
@@ -101,7 +101,7 @@ and plugins.
 %cmake -G "Unix Makefiles" \
   -DCMAKE_INSTALL_PREFIX="%{_prefix}" \
   -DDISABLE_WERROR=ON \
-  -DENABLE_LUA=OFF \
+  -DENABLE_LUA=ON \
   -DENABLE_LIBXML2=ON \
   -DENABLE_NETLINK=ON \
   -DENABLE_NGHTTP2=ON \
@@ -115,10 +115,10 @@ and plugins.
   -DBUILD_wireshark=OFF \
   .
 
-make %{?_smp_mflags}
+%cmake_build
 
 %install
-make DESTDIR=%{buildroot} install
+%cmake_install
 
 
 #install devel files (inspired by debian/wireshark-dev.header-files)
@@ -141,7 +141,6 @@ install -m 644 epan/crypt/*.h "${IDIR}/epan/crypt"
 install -m 644 epan/ftypes/*.h "${IDIR}/epan/ftypes"
 install -m 644 epan/dfilter/*.h "${IDIR}/epan/dfilter"
 install -m 644 epan/dissectors/*.h "${IDIR}/epan/dissectors"
-install -m 644 epan/wmem/*.h "${IDIR}/epan/wmem"
 install -m 644 wiretap/*.h "${IDIR}/wiretap"
 install -m 644 wsutil/*.h "${IDIR}/wsutil"
 install -m 644 ws_diag_control.h "${IDIR}/"
@@ -169,7 +168,7 @@ fi
 
 %files
 %{_bindir}/wireshark
-%{_mandir}/man1/wireshark.*
+#%{_mandir}/man1/wireshark.*
 
 %files cli
 %license COPYING
@@ -205,29 +204,29 @@ fi
 %{_libdir}/wireshark/plugins/%{plugins_version}/epan/*.so
 %{_libdir}/wireshark/plugins/%{plugins_version}/wiretap/*.so
 %{_libdir}/wireshark/plugins/%{plugins_version}/codecs/*.so
-%{_mandir}/man1/editcap.*
-%{_mandir}/man1/tshark.*
-%{_mandir}/man1/mergecap.*
-%{_mandir}/man1/text2pcap.*
-%{_mandir}/man1/capinfos.*
-%{_mandir}/man1/dumpcap.*
-%{_mandir}/man4/wireshark-filter.*
-%{_mandir}/man1/rawshark.*
-%{_mandir}/man1/dftest.*
-%{_mandir}/man1/randpkt.*
-%{_mandir}/man1/reordercap.*
-%{_mandir}/man1/sshdump.*
-%{_mandir}/man1/udpdump.*
-%{_mandir}/man1/androiddump.*
-%{_mandir}/man1/captype.*
-%{_mandir}/man1/ciscodump.*
-%{_mandir}/man1/randpktdump.*
-%{_mandir}/man1/dpauxmon.*
-%{_mandir}/man1/sdjournal.*
-%{_mandir}/man4/extcap.*
+#%{_mandir}/man1/editcap.*
+#%{_mandir}/man1/tshark.*
+#%{_mandir}/man1/mergecap.*
+#%{_mandir}/man1/text2pcap.*
+#%{_mandir}/man1/capinfos.*
+#%{_mandir}/man1/dumpcap.*
+#%{_mandir}/man4/wireshark-filter.*
+#%{_mandir}/man1/rawshark.*
+#%{_mandir}/man1/dftest.*
+#%{_mandir}/man1/randpkt.*
+#%{_mandir}/man1/reordercap.*
+#%{_mandir}/man1/sshdump.*
+#%{_mandir}/man1/udpdump.*
+#%{_mandir}/man1/androiddump.*
+#%{_mandir}/man1/captype.*
+#%{_mandir}/man1/ciscodump.*
+#%{_mandir}/man1/randpktdump.*
+#%{_mandir}/man1/dpauxmon.*
+#%{_mandir}/man1/sdjournal.*
+#%{_mandir}/man4/extcap.*
 %dir %{_datadir}/wireshark
 %{_datadir}/wireshark/*
-%{_docdir}/wireshark/*.html
+#%{_docdir}/wireshark/*.html
 
 %files devel
 %doc doc/README.* ChangeLog

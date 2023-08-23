@@ -5,16 +5,16 @@ index 0367cd1..6382a2c 100644
 @@ -69,6 +69,7 @@ set(WSUTIL_PUBLIC_HEADERS
  	ws_mempbrk_int.h
  	ws_pipe.h
- 	ws_printf.h
+ 	ws_roundup.h
 +	wstmpdir.h
  	wsjson.h
+ 	wslog.h
  	xtea.h
- )
 @@ -118,6 +118,7 @@ set(WSUTIL_COMMON_FILES
- 	unicode-utils.c
+ 	ws_getopt.c
  	ws_mempbrk.c
  	ws_pipe.c
 +	wstmpdir.c
  	wsgcrypt.c
  	wsjson.c
- 	xtea.c
+ 	wslog.c

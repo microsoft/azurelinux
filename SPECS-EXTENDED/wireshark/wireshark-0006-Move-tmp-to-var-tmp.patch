@@ -64,52 +64,27 @@ index ee4e5fd..fe17a95 100644
      rev_tempfile_ = new QTemporaryFile(tempname, this);
      rev_tempfile_->open();
  
-diff --git a/ui/qt/rtp_analysis_dialog.cpp b/ui/qt/rtp_analysis_dialog.cpp
-index 5d82e46..8008984 100644
---- a/ui/qt/rtp_analysis_dialog.cpp
-+++ b/ui/qt/rtp_analysis_dialog.cpp
-@@ -37,6 +37,7 @@
+diff --git a/ui/qt/utils/rtp_audio_file.cpp b/ui/qt/utils/rtp_audio_file.cpp
+index 591a63b..203f5c5 100644
+--- a/ui/qt/utils/rtp_audio_file.cpp
++++ b/ui/qt/utils/rtp_audio_file.cpp
+@@ -31,6 +31,7 @@
  
- #include <wsutil/g711.h>
- #include <wsutil/pint.h>
+ #include "rtp_audio_file.h"
+ #include <ws_attributes.h>
 +#include <wsutil/wstmpdir.h> /* for get_tmp_dir() */
  
- #include <QMessageBox>
- #include <QPushButton>
-@@ -331,10 +332,10 @@ RtpAnalysisDialog::RtpAnalysisDialog(QWidget &parent, CaptureFile &cf, struct _r
+ RtpAudioFile::RtpAudioFile(bool use_disk_for_temp, bool use_disk_for_frames):
+       real_pos_(0)
+@@ -45,7 +46,7 @@ RtpAudioFile::RtpAudioFile(bool use_disk_for_temp, bool use_disk_for_frames):
  
-     // We keep our temp files open for the lifetime of the dialog. The GTK+
-     // UI opens and closes at various points.
--    QString tempname = QString("%1/wireshark_rtp_f").arg(QDir::tempPath());
-+    QString tempname = QString("%1/wireshark_rtp_f").arg(get_tmp_dir());
-     fwd_tempfile_ = new QTemporaryFile(tempname, this);
-     fwd_tempfile_->open();
--    tempname = QString("%1/wireshark_rtp_r").arg(QDir::tempPath());
-+    tempname = QString("%1/wireshark_rtp_r").arg(get_tmp_dir());
-     rev_tempfile_ = new QTemporaryFile(tempname, this);
-     rev_tempfile_->open();
- 
-diff --git a/ui/qt/rtp_audio_stream.cpp b/ui/qt/rtp_audio_stream.cpp
-index fde66c8..b9531d2 100644
---- a/ui/qt/rtp_audio_stream.cpp
-+++ b/ui/qt/rtp_audio_stream.cpp
-@@ -37,6 +37,7 @@
- #include <ui/rtp_stream.h>
- 
- #include <wsutil/nstime.h>
-+#include <wsutil/wstmpdir.h> /* for get_tmp_dir() */
- 
- #include <QAudioFormat>
- #include <QAudioOutput>
-@@ -76,7 +77,7 @@ RtpAudioStream::RtpAudioStream(QObject *parent, _rtp_stream_info *rtp_stream) :
-                                                 visual_sample_rate_, SPEEX_RESAMPLER_QUALITY_MIN, NULL);
-     speex_resampler_skip_zeros(visual_resampler_);
- 
--    QString tempname = QString("%1/wireshark_rtp_stream").arg(QDir::tempPath());
-+    QString tempname = QString("%1/wireshark_rtp_stream").arg(get_tmp_dir());
-     tempfile_ = new QTemporaryFile(tempname, this);
-     tempfile_->open();
- 
+     tempname = "memory";
+     if (use_disk_for_temp) {
+-        tempname = QString("%1/wireshark_rtp_stream").arg(QDir::tempPath());
++        tempname = QString("%1/wireshark_rtp_stream").arg(get_tmp_dir());
+         sample_file_ = new QTemporaryFile(tempname, this);
+     } else {
+         sample_file_ = new QBuffer(this);
 diff --git a/wsutil/tempfile.c b/wsutil/tempfile.c
 index 5082452..f751a7c 100644
 --- a/wsutil/tempfile.c
@@ -292,4 +267,3 @@ index 0000000..07ac583
 +#endif
 -- 
 2.13.0
-

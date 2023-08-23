@@ -7,10 +7,10 @@ because of permissions.
 
 Signed-off-by: Jan Safranek <jsafrane@redhat.com>
 
-diff --git a/capchild/capture_sync.c b/capchild/capture_sync.c
+diff --git a/capture/capture_sync.c b/capture/capture_sync.c
 index 2f9d2cc..b18e47f 100644
---- a/capchild/capture_sync.c
-+++ b/capchild/capture_sync.c
+--- a/capture/capture_sync.c
++++ b/capture/capture_sync.c
 @@ -375,6 +375,7 @@ sync_pipe_start(capture_options *capture_opts, capture_session *cap_session, voi
      gchar *signal_pipe_name;
  #else
