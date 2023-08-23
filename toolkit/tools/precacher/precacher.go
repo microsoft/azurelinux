@@ -364,20 +364,23 @@ func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map
 		downloadRetryDuration = time.Second
 	)
 
-	defer wg.Done()
-
 	// File names are of the form "<name>-<version>.<distro>.<arch>.rpm"
 	pkgName := fmt.Sprintf("%s-%s.%s.%s", pkg.Name, pkg.Version, pkg.Distribution, pkg.Architecture)
 	fileName := fmt.Sprintf("%s.rpm", pkgName)
 	fullFilePath := path.Join(outDir, fileName)
 	result := downloadResult{
 		pkgName: fileName,
+		resultType: downloadResultTypeFailure,
 	}
+
+	defer func() {
+		results <- result
+		wg.Done()
+	}()
 
 	// Bail out early if the file already exists
 	if exists, _ := file.PathExists(fullFilePath); exists {
 		result.resultType = downloadResultTypeSkipped
-		results <- result
 		return
 	}
 
@@ -385,7 +388,6 @@ func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map
 	url, ok := packagesAvailableFromRepos[pkgName]
 	if !ok {
 		result.resultType = donwloadResultTypeUnavailable
-		results <- result
 		return
 	}
 
@@ -404,15 +406,11 @@ func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map
 		}
 		return err
 	}, downloadRetryAttempts, downloadRetryDuration)
-
 	if err != nil {
-		result.resultType = downloadResultTypeFailure
-		results <- result
 		return
 	}
 
 	result.resultType = downloadResultTypeSuccess
-	results <- result
 }
 
 func writeSummaryFile(summaryFile string, downloadedPackages []string) (err error) {
