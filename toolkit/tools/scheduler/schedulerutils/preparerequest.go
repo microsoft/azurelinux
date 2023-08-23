@@ -214,7 +214,7 @@ func isRequiredRebuild(node *pkggraph.PkgNode, packagesToRebuild []*pkgjson.Pack
 //   - If all dependencies are cached (freshness == 0, aka stale) then the node will keep freshness 0 and may use the cache.
 //   - If any dependency is fresh (aka freshness > 0) then the node can't use the cache and will inherit the freshness of
 //     the freshest dependency (possibly adjusted by -1 for certain edges).
-func canUseCacheForNode(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, buildState *GraphBuildState) (canUseCache bool, freshness int) {
+func canUseCacheForNode(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, buildState *GraphBuildState) (canUseCache bool, freshness uint) {
 	freshness = 0
 	canUseCache = true
 
@@ -241,7 +241,7 @@ func canUseCacheForNode(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, bui
 // calculateExpectedFreshness calculates how "fresh" a node will be based on one of its dependencies, and if that
 // dependency should cause a rebuild. This function will determine if the freshness should be attenuated based on
 // the dependency type.
-func calculateExpectedFreshness(dependencyNode *pkggraph.PkgNode, buildState *GraphBuildState) (expectedFreshness int, shouldRebuild bool) {
+func calculateExpectedFreshness(dependencyNode *pkggraph.PkgNode, buildState *GraphBuildState) (expectedFreshness uint, shouldRebuild bool) {
 	// Remote nodes are always 'stale' and should never generate a rebuild.
 	if dependencyNode.Type == pkggraph.TypeRemoteRun {
 		return 0, false

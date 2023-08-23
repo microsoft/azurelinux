@@ -40,7 +40,7 @@ type BuildRequest struct {
 	ExpectedFiles  []string            // List of RPMs built by this node.
 	UseCache       bool                // Can we use a cached copy of this package instead of building it.
 	IsDelta        bool                // Is this a pre-downloaded RPM (not traditional cache) that we may be able to skip rebuilding.
-	Freshness      int                 // The freshness of the node (used to determine if we can skip building future nodes).
+	Freshness      uint                // The freshness of the node (used to determine if we can skip building future nodes).
 }
 
 // BuildResult represents the results of a build agent trying to build a given node.
@@ -53,7 +53,7 @@ type BuildResult struct {
 	Ignored        bool                // Indicator if the build was ignored by user request.
 	UsedCache      bool                // Indicator if we used the cached artifacts (external or earlier local build) instead of building the node.
 	WasDelta       bool                // Indicator if we used a pre-built component from an external repository instead of building the node.
-	Freshness      int                 // The freshness of the node (used to determine if we can skip building future nodes).
+	Freshness      uint                // The freshness of the node (used to determine if we can skip building future nodes).
 }
 
 // selectNextBuildRequest selects a job based on priority:

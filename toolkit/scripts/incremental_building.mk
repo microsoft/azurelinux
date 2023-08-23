@@ -76,7 +76,7 @@ DELTA_BUILD                     ?= n
 CLEAN_TOOLCHAIN_CONTAINERS      ?= y
 MAX_CPU                         ?=
 DELTA_FETCH                     ?= n
-MAX_CASCADING_REBUILDS          ?= -1
+MAX_CASCADING_REBUILDS          ?=
 
 ######## HANDLE INCREMENTAL_TOOLCHAIN DEPRECATION ########
 

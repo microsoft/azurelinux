@@ -19,19 +19,19 @@ type nodeState struct {
 	available bool
 	cached    bool
 	usedDelta bool
-	freshness int
+	freshness uint
 }
 
 const (
 	// The highest possible freshness value, used to force unbounded cascading rebuilds.
-	NodeFreshnessAbsoluteMax int = math.MaxInt
+	NodeFreshnessAbsoluteMax uint64 = math.MaxUint64
 )
 
 // GraphBuildState represents the build state of a graph.
 type GraphBuildState struct {
 	activeBuilds     map[int64]*BuildRequest
 	nodeToState      map[*pkggraph.PkgNode]*nodeState
-	maxFreshness     int
+	maxFreshness     uint
 	failures         []*BuildResult
 	reservedFiles    map[string]bool
 	conflictingRPMs  map[string]bool
@@ -43,17 +43,10 @@ type GraphBuildState struct {
 //   - maxFreshness is how fresh a newly rebuilt node is. Each dependant node will have a freshness of 'n-1', etc. until
 //     '0' where the subsequent nodes will no longer be rebuilt. 'maxFreshness < 0' will cause unbounded cascading rebuilds,
 //     while 'maxFreshness = 0' will cause no cascading rebuilds.
-func NewGraphBuildState(reservedFiles []string, maxFreshness int) (g *GraphBuildState) {
+func NewGraphBuildState(reservedFiles []string, maxFreshness uint) (g *GraphBuildState) {
 	filesMap := make(map[string]bool)
 	for _, file := range reservedFiles {
 		filesMap[file] = true
-	}
-
-	// If we select negative maxFreshness this means we want unbounded cascading. Use max int to represent infinity.
-	// (2^31 or 2^63 packages is much more than the size of our graph, so this has the desired effect)
-	if maxFreshness < 0 {
-		logger.Log.Debugf("maxFreshness was set to '%d', negative freshness selects unbounded cascading rebuilds (setting maxFreshness to '%d')", maxFreshness, NodeFreshnessAbsoluteMax)
-		maxFreshness = NodeFreshnessAbsoluteMax
 	}
 
 	return &GraphBuildState{
@@ -91,12 +84,12 @@ func (g *GraphBuildState) IsNodeCached(node *pkggraph.PkgNode) bool {
 
 // GetMaxFreshness returns the maximum freshness a node can have. (ie if a package is directly rebuilt due to user
 // request, or missing files, it will have this freshness. Each dependant node will have a freshness of 'n-1', etc.
-func (g *GraphBuildState) GetMaxFreshness() int {
+func (g *GraphBuildState) GetMaxFreshness() uint {
 	return g.maxFreshness
 }
 
 // GetFreshnessOfNode returns the freshness of a node.
-func (g *GraphBuildState) GetFreshnessOfNode(node *pkggraph.PkgNode) int {
+func (g *GraphBuildState) GetFreshnessOfNode(node *pkggraph.PkgNode) uint {
 	return g.nodeToState[node].freshness
 }
 
@@ -212,8 +205,8 @@ func (g *GraphBuildState) RecordBuildResult(res *BuildResult, allowToolchainRebu
 	// (user requested rebuilds are already at the max freshness). In this case, we want to reset the freshness to the
 	// max, so that subsequent dependant nodes will be rebuilt. Also ensure that the freshness is not greater than the max.
 	freshness := res.Freshness
-	if freshness < 0 || freshness > g.GetMaxFreshness() {
-		err = fmt.Errorf("unexpected freshness value of %d for node '%s'. Should be: (0 <= <freshness> <= %d)", freshness, res.Node.FriendlyName(), g.GetMaxFreshness())
+	if freshness > g.GetMaxFreshness() {
+		err = fmt.Errorf("unexpected freshness value of %d for node '%s'. Should be: (<freshness> <= %d)", freshness, res.Node.FriendlyName(), g.GetMaxFreshness())
 		return
 	}
 
