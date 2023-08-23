@@ -1,11 +1,11 @@
 %global with_lua 1
-%global plugins_version 3.6
+%global plugins_version 4.0
 
 Summary:        Network traffic analyzer
 Name:           wireshark
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Version:        3.6.8
+Version:        4.0.7
 Release:        1%{?dist}
 License:        BSD and GPLv2
 Url:            https://www.wireshark.org/
@@ -23,6 +23,9 @@ Patch5:         wireshark-0005-Fix-paths-in-a-wireshark.desktop-file.patch
 # Fedora-specific
 Patch6:         wireshark-0006-Move-tmp-to-var-tmp.patch
 Patch7:         wireshark-0007-cmakelists.patch
+Patch8:         wireshark-0008-glib2-g_strdup-build.patch
+Patch9:         wireshark-0009-fix-asn2wrs-cmake.patch
+Patch10:        wireshark-0010-ripemd-fips-core-dump.patch
 
 #install tshark together with wireshark GUI
 
@@ -135,7 +138,6 @@ mkdir -p "${IDIR}/wsutil"
 mkdir -p %{buildroot}%{_udevrulesdir}
 install -m 644 config.h epan/register.h "${IDIR}/"
 install -m 644 cfile.h file.h "${IDIR}/"
-install -m 644 ws_symbol_export.h "${IDIR}/"
 install -m 644 epan/*.h "${IDIR}/epan/"
 install -m 644 epan/crypt/*.h "${IDIR}/epan/crypt"
 install -m 644 epan/ftypes/*.h "${IDIR}/epan/ftypes"
@@ -143,7 +145,6 @@ install -m 644 epan/dfilter/*.h "${IDIR}/epan/dfilter"
 install -m 644 epan/dissectors/*.h "${IDIR}/epan/dissectors"
 install -m 644 wiretap/*.h "${IDIR}/wiretap"
 install -m 644 wsutil/*.h "${IDIR}/wsutil"
-install -m 644 ws_diag_control.h "${IDIR}/"
 install -m 644 %{SOURCE1} %{buildroot}%{_udevrulesdir}
 
 
@@ -191,6 +192,7 @@ fi
 %dir %{_libdir}/wireshark/plugins
 %{_libdir}/wireshark/extcap/ciscodump
 %{_libdir}/wireshark/extcap/udpdump
+%{_libdir}/wireshark/extcap/wifidump
 %{_libdir}/wireshark/extcap/sshdump
 %{_libdir}/wireshark/extcap/sdjournal
 %{_libdir}/wireshark/extcap/dpauxmon
