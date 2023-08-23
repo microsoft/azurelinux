@@ -88,7 +88,7 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %defattr(-,root,root)
 
 %changelog
-* Fri Dec 28 2023 Andy Zaugg <azaugg@linkedin.com> - 5.15-1
+* Fri Jul 28 2023 Andy Zaugg <azaugg@linkedin.com> - 5.15-1
 - Updated to version 5.15
 
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.0.0-3
