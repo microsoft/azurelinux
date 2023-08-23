@@ -6,12 +6,27 @@
 #	- Chroot Utilities
 
 $(call create_folder,$(RPMS_DIR))
-$(call create_folder,$(CACHED_RPMS_DIR))
+$(call create_folder,$(CACHED_RPMS_DIR)/cache)
 $(call create_folder,$(CCACHE_DIR))
 $(call create_folder,$(TOOL_BINS_DIR))
 $(call create_folder,$(BUILD_DIR)/tools)
 
 ######## GO TOOLS ########
+
+# The version as held in the go.mod file (a line like 'go 1.19'). Add "go" to the front of the version number
+# so that it matches the output of 'go version' (e.g. 'go1.19').
+go_min_version = go$(shell grep -E '^go [0-9]+\.[0-9]+' $(TOOLS_DIR)/go.mod | awk '{print $$2}')
+
+# Check if the go version is high enough to build the tools. The 'sort' command is used to compare the versions
+# (with -V which sorts by version number). If the lowest version in the sort is the same as the minimum version, then
+# the installed version must be greater than or equal to the minimum version and we are fine.
+ifeq ($(REBUILD_TOOLS),y)
+go_current_version = $(shell go version | awk '{print $$3}')
+go_version_check = $(shell printf '%s\n%s\n' "$(go_min_version)" "$(go_current_version)" | sort -V | head -n1)
+ifneq ($(go_version_check),$(go_min_version))
+$(error Go version '$(go_current_version)' is less than minimum required version '$(go_min_version)')
+endif
+endif
 
 # List of go utilities in tools/ directory
 go_tool_list = \
@@ -194,7 +209,7 @@ macro_manifest = $(TOOLCHAIN_MANIFESTS_DIR)/macro_packages.txt
 macro-tools: $(macro_rpmrc)
 
 $(macro_rpmrc): $(toolchain_rpms)
-	$(SCRIPTS_DIR)/preparemacros.sh $(MACRO_DIR) $(CACHED_RPMS_DIR) $(macro_manifest)
+	$(SCRIPTS_DIR)/preparemacros.sh $(MACRO_DIR) $(CACHED_RPMS_DIR)/cache $(macro_manifest)
 
 clean: clean-macro-tools
 clean-macro-tools:

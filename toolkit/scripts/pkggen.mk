@@ -18,7 +18,7 @@ pkggen_local_repo           = $(MANIFESTS_DIR)/package/local.repo
 graphpkgfetcher_cloned_repo = $(MANIFESTS_DIR)/package/fetcher.repo
 
 # SPECs and Built RPMs
-build_specs     = $(call shell_real_build_only, find $(BUILD_SPECS_DIR)/ -type f -name '*.spec')
+build_specs     = $(call shell_real_build_only, find $(SPECS_DIR)/ -type f -name '*.spec')
 build_spec_dirs = $(foreach spec,$(build_specs),$(dir $(spec)))
 pkggen_rpms     = $(call shell_real_build_only, find $(RPMS_DIR)/*  2>/dev/null )
 
@@ -60,6 +60,7 @@ clean-spec-parse:
 	@echo Verifying no mountpoints present in $(parse_working_dir)
 	$(SCRIPTS_DIR)/safeunmount.sh "$(parse_working_dir)" && \
 	rm -rf $(parse_working_dir)
+	rm -rf $(specs_file)
 clean-ccache:
 	rm -rf $(CCACHE_DIR)
 
@@ -75,10 +76,14 @@ analyze-built-graph: $(go-graphanalytics)
 		exit 1; \
 	fi
 
-# Parse all specs in $(BUILD_SPECS_DIR) and generate a specs.json file encoding all dependency information
-$(specs_file): $(chroot_worker) $(BUILD_SPECS_DIR) $(build_specs) $(build_spec_dirs) $(go-specreader)
+# Parse specs in $(SPECS_DIR) and generate a specs.json file encoding all dependency information
+# We look at the same pack list as the srpmpacker tool via the target $(srpm_pack_list_file), which
+# is build from the contents of $(SRPM_PACK_LIST) if it is set. We only parse the spec files we will
+# actually pack.
+$(specs_file): $(chroot_worker) $(SPECS_DIR) $(build_specs) $(build_spec_dirs) $(go-specreader) $(depend_SPECS_DIR) $(srpm_pack_list_file) $(depend_RUN_CHECK)
 	$(go-specreader) \
-		--dir $(BUILD_SPECS_DIR) \
+		--dir $(SPECS_DIR) \
+		$(if $(SRPM_PACK_LIST),--spec-list=$(srpm_pack_list_file)) \
 		--build-dir $(parse_working_dir) \
 		--srpm-dir $(BUILD_SRPMS_DIR) \
 		--rpm-dir $(RPMS_DIR) \
@@ -149,9 +154,12 @@ graphpkgfetcher_extra_flags += --ignored-packages="$(PACKAGE_IGNORE_LIST)"
 graphpkgfetcher_extra_flags += --packages="$(PACKAGE_BUILD_LIST)"
 graphpkgfetcher_extra_flags += --rebuild-packages="$(PACKAGE_REBUILD_LIST)"
 graphpkgfetcher_extra_flags += --image-config-file="$(CONFIG_FILE)"
+graphpkgfetcher_extra_flags += --ignored-tests="$(TEST_IGNORE_LIST)"
+graphpkgfetcher_extra_flags += --tests="$(TEST_RUN_LIST)"
+graphpkgfetcher_extra_flags += --rerun-tests="$(TEST_RERUN_LIST)"
 graphpkgfetcher_extra_flags += --try-download-delta-rpms
 graphpkgfetcher_extra_flags += $(if $(CONFIG_FILE),--base-dir="$(CONFIG_BASE_DIR)")
-$(cached_file): $(depend_CONFIG_FILE) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST)
+$(cached_file): $(depend_CONFIG_FILE) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST) $(depend_TEST_RUN_LIST) $(depend_TEST_RERUN_LIST) $(depend_TEST_IGNORE_LIST)
 endif
 
 ifeq ($(PRECACHE),y)
@@ -227,7 +235,7 @@ $(RPMS_DIR):
 	@touch $@
 endif
 
-$(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-scheduler) $(go-pkgworker) $(depend_STOP_ON_PKG_FAIL) $(CONFIG_FILE) $(depend_CONFIG_FILE) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST) $(pkggen_rpms)
+$(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-scheduler) $(go-pkgworker) $(depend_STOP_ON_PKG_FAIL) $(CONFIG_FILE) $(depend_CONFIG_FILE) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST) $(depend_TEST_RUN_LIST) $(depend_TEST_RERUN_LIST) $(depend_TEST_IGNORE_LIST) $(pkggen_rpms) $(srpms) $(BUILD_SRPMS_DIR)
 	$(go-scheduler) \
 		--input="$(preprocessed_file)" \
 		--output="$(built_file)" \
@@ -253,6 +261,9 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-
 		--ignored-packages="$(PACKAGE_IGNORE_LIST)" \
 		--packages="$(PACKAGE_BUILD_LIST)" \
 		--rebuild-packages="$(PACKAGE_REBUILD_LIST)" \
+		--ignored-tests="$(TEST_IGNORE_LIST)" \
+		--tests="$(TEST_RUN_LIST)" \
+		--rerun-tests="$(TEST_RERUN_LIST)" \
 		--image-config-file="$(CONFIG_FILE)" \
 		--cpu-prof-file=$(PROFILE_DIR)/scheduler.cpu.pprof \
 		--mem-prof-file=$(PROFILE_DIR)/scheduler.mem.pprof \
@@ -263,7 +274,6 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(preprocessed_file) $(chroot_worker) $(go-
 		--timestamp-file=$(TIMESTAMP_DIR)/scheduler.jsonl \
 		--toolchain-manifest="$(TOOLCHAIN_MANIFEST)" \
 		$(if $(CONFIG_FILE),--base-dir="$(CONFIG_BASE_DIR)") \
-		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		$(if $(filter y,$(STOP_ON_PKG_FAIL)),--stop-on-failure) \
 		$(if $(filter-out y,$(USE_PACKAGE_BUILD_CACHE)),--no-cache) \
 		$(if $(filter-out y,$(CLEANUP_PACKAGE_BUILDS)),--no-cleanup) \

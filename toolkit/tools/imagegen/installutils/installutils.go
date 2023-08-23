@@ -352,7 +352,7 @@ func PackageNamesFromConfig(config configuration.Config) (packageList []*pkgjson
 		for _, pkg := range packagesToInstall {
 			var packageVer *pkgjson.PackageVer
 
-			packageVer, err = pkgjson.PackagesListEntryToPackageVer(pkg)
+			packageVer, err = pkgjson.PackageStringToPackageVer(pkg)
 			if err != nil {
 				logger.Log.Errorf("Failed to parse packages list from system config \"%s\".", systemCfg.Name)
 				return
