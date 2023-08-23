@@ -35,12 +35,12 @@ type BuildChannels struct {
 // BuildRequest represents a work-order to a build agent asking it to build a given node.
 type BuildRequest struct {
 	Node           *pkggraph.PkgNode   // The main node being analyzed for the build.
-	PkgGraph       *pkggraph.PkgGraph  // The graph of all packages
+	PkgGraph       *pkggraph.PkgGraph  // The graph of all packages.
 	AncillaryNodes []*pkggraph.PkgNode // For SRPM builds: other nodes stemming from the same SRPM. Empty otherwise.
 	ExpectedFiles  []string            // List of RPMs built by this node.
-	UseCache       bool                // Can we use a cached copy of this package instead of building it
-	IsDelta        bool                // Is this a pre-downloaded rpm (not traditional cache) that we may be able to skip rebuilding
-	Freshness      int                 // The freshness of the node (used to determine if we can skip building future nodes)
+	UseCache       bool                // Can we use a cached copy of this package instead of building it.
+	IsDelta        bool                // Is this a pre-downloaded RPM (not traditional cache) that we may be able to skip rebuilding.
+	Freshness      int                 // The freshness of the node (used to determine if we can skip building future nodes).
 }
 
 // BuildResult represents the results of a build agent trying to build a given node.
@@ -53,7 +53,7 @@ type BuildResult struct {
 	Ignored        bool                // Indicator if the build was ignored by user request.
 	UsedCache      bool                // Indicator if we used the cached artifacts (external or earlier local build) instead of building the node.
 	WasDelta       bool                // Indicator if we used a pre-built component from an external repository instead of building the node.
-	Freshness      int                 // The freshness of the node (used to determine if we can skip building future nodes)
+	Freshness      int                 // The freshness of the node (used to determine if we can skip building future nodes).
 }
 
 // selectNextBuildRequest selects a job based on priority:
