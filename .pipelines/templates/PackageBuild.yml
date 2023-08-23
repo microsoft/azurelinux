@@ -30,6 +30,14 @@ parameters:
     type: boolean
     default: false
 
+  - name: isQuickPackageBuild
+    type: boolean
+    default: false
+
+  - name: isUseCCache
+    type: boolean
+    default: false
+
   - name: outputArtifactsFolder
     type: string
     default: "$(Build.ArtifactStagingDirectory)"
@@ -116,9 +124,19 @@ steps:
         delta_fetch_arg="DELTA_FETCH=y"
       fi
 
+      quick_rebuild_packages_arg="QUICK_REBUILD_PACKAGES=n"
+      if [[ ${{ parameters.isQuickPackageBuild }} =~ [Tt]rue ]]; then
+        quick_rebuild_packages_arg="QUICK_REBUILD_PACKAGES=y"
+      fi
+
       run_check_arg="RUN_CHECK=n"
       if [[ ${{ parameters.isCheckBuild }} =~ [Tt]rue ]]; then
         run_check_arg="RUN_CHECK=y"
+      fi
+
+      use_ccache_arg="USE_CCACHE=n"
+      if [[ ${{ parameters.isUseCCache }} =~ [Tt]rue ]]; then
+        use_ccache_arg="USE_CCACHE=y"
       fi
 
       sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
@@ -129,7 +147,9 @@ steps:
         SPECS_DIR="${{ parameters.buildRepoRoot }}/${{ parameters.specsFolderPath }}" \
         SRPM_PACK_LIST="${{ parameters.srpmPackList }}" \
         $delta_fetch_arg \
-        $run_check_arg
+        $quick_rebuild_packages_arg \
+        $run_check_arg \
+        $use_ccache_arg
     displayName: "Build packages"
 
   - ${{ if parameters.outputArtifactsFolder }}:

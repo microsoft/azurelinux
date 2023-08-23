@@ -92,7 +92,7 @@ extends:
                     parameters:
                       customToolchainArtifactName: $(toolchainArtifactNameBase)_${{ configuration.name }}
                       isCheckBuild: true
-                      isDeltaBuild: true
+                      isQuickPackageBuild: true
                       outputArtifactsFolder: $(ob_outputDirectory)
                       selfRepoName: self
 
