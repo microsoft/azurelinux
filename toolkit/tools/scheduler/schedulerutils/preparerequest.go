@@ -158,19 +158,7 @@ func partnerTestNodesToRequest(pkgGraph *pkggraph.PkgGraph, buildState *GraphBui
 		return
 	}
 
-	request = &BuildRequest{
-		Node:           testNode,
-		PkgGraph:       pkgGraph,
-		AncillaryNodes: ancillaryTestNodes,
-		IsDelta:        isDelta,
-		Freshness:      buildState.GetMaxFreshness(),
-	}
-
-	requiredRebuild := isRequiredRebuild(request.Node, testsToRerun)
-	if !requiredRebuild && buildUsesCache {
-		// We might be able to use the cache, set the freshness based on node's dependencies.
-		request.UseCache, request.Freshness = canUseCacheForNode(pkgGraph, testNode, buildState)
-	}
+	request = buildRequest(pkgGraph, buildState, testsToRerun, testNode, ancillaryTestNodes, buildUsesCache, isDelta)
 	return
 }
 
@@ -230,7 +218,7 @@ func canUseCacheForNode(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, bui
 		}
 
 		if shouldRebuild {
-			logger.Log.Debugf("Can't use cached version of %v because %v is rebuilding", node.FriendlyName(), dependency.FriendlyName())
+			logger.Log.Debugf("Can't use cached version of %v because %v has been rebuilt with a freshness of %d", node.FriendlyName(), dependency.FriendlyName(), inheritedFreshness)
 			canUseCache = false
 		}
 	}
