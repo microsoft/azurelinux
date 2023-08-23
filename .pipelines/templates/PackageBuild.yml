@@ -14,6 +14,10 @@ parameters:
     type: string
     default: ""
 
+  - name: customToolchainTarballName
+    type: string
+    default: "toolchain_built_rpms_all.tar.gz"
+
   - name: extraPackageRepos
     type: string
     default: ""
@@ -72,10 +76,10 @@ steps:
         displayName: "Download toolchain"
         inputs:
           artifact: "${{ parameters.customToolchainArtifactName }}"
-          patterns: "**/toolchain_built_rpms_all.tar.gz"
+          patterns: "**/${{ parameters.customToolchainTarballName }}"
 
       - script: |
-          toolchain_archive="$(find "$(Pipeline.Workspace)" -name toolchain_built_rpms_all.tar.gz)"
+          toolchain_archive="$(find "$(Pipeline.Workspace)" -name "${{ parameters.customToolchainTarballName }}" -print -quit)"
           if [[ ! -f "$toolchain_archive" ]]; then
             echo "ERROR: toolchain archive not found!" >&2
             exit 1
@@ -92,7 +96,7 @@ steps:
           patterns: "**/${{ parameters.rpmsCacheTarballName }}"
 
       - script: |
-          rpms_archive="$(find "$(Pipeline.Workspace)" -name rpms*.tar.gz)"
+          rpms_archive="$(find "$(Pipeline.Workspace)" -name "${{ parameters.rpmsCacheTarballName }}" -print -quit)"
           if [[ ! -f "$rpms_archive" ]]; then
             echo "ERROR: RPMs cache archive not found!" >&2
             exit 1
