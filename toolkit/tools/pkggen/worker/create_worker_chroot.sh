@@ -133,8 +133,8 @@ fi
 
 echo "Done installing all packages, creating $chroot_archive." | tee -a "$chroot_log"
 if command -v pigz &>/dev/null ; then
-    tar -I pigz -cvf "$chroot_archive" -C "$chroot_base/$chroot_name" . >> "$chroot_log"
+    tar --warning='no-file-ignored' -I pigz -cvf "$chroot_archive" -C "$chroot_base/$chroot_name" . >> "$chroot_log"
 else
-    tar -I gzip -cvf "$chroot_archive" -C "$chroot_base/$chroot_name" . >> "$chroot_log"
+    tar --warning='no-file-ignored' -I gzip -cvf "$chroot_archive" -C "$chroot_base/$chroot_name" . >> "$chroot_log"
 fi
 echo "Done creating $chroot_archive." | tee -a "$chroot_log"
