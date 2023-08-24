@@ -113,11 +113,6 @@ steps:
           sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" hydrate-cached-rpms CACHED_PACKAGES_ARCHIVE="$rpms_archive"
         displayName: "Populate RPMs cache"
 
-  # Workaround until the toolkit is updated, so that SRPMs from previous builds don't pollute other ones.
-  - script: |
-      sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" clean-expand-specs clean-input-srpms
-    displayName: "Clean leftover SRPMs"
-
   - script: |
       delta_fetch_arg="DELTA_FETCH=n"
       if [[ ${{ parameters.isDeltaBuild }} =~ [Tt]rue ]]; then
