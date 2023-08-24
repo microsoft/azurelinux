@@ -354,6 +354,7 @@ func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map
 		failureBackoffBase    = 2.0
 		downloadRetryDuration = time.Second
 	)
+	var noCancel chan struct{} = nil
 
 	// File names are of the form "<name>-<version>.<distro>.<arch>.rpm"
 	pkgName := fmt.Sprintf("%s-%s.%s.%s", pkg.Name, pkg.Version, pkg.Distribution, pkg.Architecture)
@@ -401,7 +402,7 @@ func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map
 			logger.Log.Warnf("Attempt to download (%s) failed. Error: %s", url, err)
 		}
 		return err
-	}, downloadRetryAttempts, downloadRetryDuration, failureBackoffBase, nil)
+	}, downloadRetryAttempts, downloadRetryDuration, failureBackoffBase, noCancel)
 	if err != nil {
 		return
 	}
