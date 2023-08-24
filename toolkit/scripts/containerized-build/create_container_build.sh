@@ -23,7 +23,7 @@ print_error() {
 help() {
 echo "
 Usage:
-sudo make containerized-rpmbuild [REPO_PATH=/path/to/CBL-Mariner] [MODE=test|build] [VERSION=1.0|2.0] [MOUNTS= /src/path:/dst/path] [ENABLE_REPO=y]
+sudo make containerized-rpmbuild [REPO_PATH=/path/to/CBL-Mariner] [MODE=test|build] [VERSION=1.0|2.0] [MOUNTS=/path/in/host:/path/in/container] [ENABLE_REPO=y]
 
 Starts a docker container with the specified version of mariner.
 
@@ -33,8 +33,8 @@ Optional arguments:
                         In 'test' mode it will use a pre-built mariner chroot image.
                         In 'build' mode it will use the latest published container.
     VERISION        1.0 or 2.0. default: "2.0"
-    MOUNTS          mount a directory into the container. Should be of the form '/src/dir:/dest/dir'. For multiple mounts, please use ',' as delimiter
-                        e.g. MOUNTS=/src/dir1:/dest/dir1,/src/dir2:/dest/dir2
+    MOUNTS          mount a host directory into the container. Should be of the form '/host/dir:/container/dir'. For multiple mounts, please use ',' as delimiter
+                        e.g. MOUNTS=/host/dir1:/container/dir1,/host/dir2:/container/dir2
     ENABLE_REPO:    Set to 'y' to use local RPMs to satisfy package dependencies. default: "n"
 
 To see help, run 'sudo make containerized-rpmbuild-help'
@@ -67,8 +67,8 @@ build_graph() {
 
 # exit if not running as root
 if [ "$EUID" -ne 0 ]; then
-  echo -e "\033[31mThis requires running as root\033[0m "
-  exit
+  echo -e "\033[31mERROR: This requires running as root\033[0m "
+  exit 1
 fi
 
 script_dir=$(realpath $(dirname "${BASH_SOURCE[0]}"))
@@ -115,11 +115,13 @@ fi
 
 # ============ Populate SRPMS ============
 # Populate ${repo_path}/build/INTERMEDIATE_SRPMS with SRPMs, that can be used to build RPMs in the container
-pushd "${repo_path}/toolkit"
-echo "Populating Intermediate SRPMs..."
-if [[ ( ! -f "${repo_path}/toolkit/out/tools/srpmpacker" ) ]]; then build_tools; fi
-make input-srpms SRPM_FILE_SIGNATURE_HANDLING="update" > /dev/null
-popd
+if [[ "${mode}" == "build" ]]; then
+    pushd "${repo_path}/toolkit"
+    echo "Populating Intermediate SRPMs..."
+    if [[ ( ! -f "${repo_path}/toolkit/out/tools/srpmpacker" ) ]]; then build_tools; fi
+    make input-srpms SRPM_FILE_SIGNATURE_HANDLING="update" > /dev/null
+    popd
+fi
 
 # ============ Map chroot mount ============
 if [[ "${mode}" == "build" ]]; then
@@ -157,13 +159,16 @@ extra_mounts=${extra_mounts//,/ }
 
 rm -f ${tmp_dir}/mounts.txt
 for mount in $mounts $extra_mounts; do
-    if [[ -d "${mount%%:*}" ]]; then
-        echo "${mount%%:*}' -> '${mount##*:}"  >> "${tmp_dir}/mounts.txt"
+    host_mount_path=$(realpath ${mount%%:*})
+    container_mount_path="${mount##*:}"
+    if [[ -d $host_mount_path ]]; then
+        echo "$host_mount_path -> $container_mount_path"  >> "${tmp_dir}/mounts.txt"
     else
-        echo "WARNING: '${mount%%:*}' does not exist. Skipping mount."  >> "${tmp_dir}/mounts.txt"
+        echo "WARNING: '$host_mount_path' does not exist. Skipping mount."
+        echo "WARNING: '$host_mount_path' does not exist. Skipping mount."  >> "${tmp_dir}/mounts.txt"
         continue
     fi
-    mount_arg=" $mount_arg -v '$mount' "
+    mount_arg=" $mount_arg -v '$host_mount_path:$container_mount_path' "
 done
 
 # Copy resources into container
@@ -204,6 +209,7 @@ docker build -q \
                 --build-arg version="$version" \
                 --build-arg enable_local_repo="$enable_local_repo" \
                 --build-arg mariner_repo="$repo_path" \
+                --build-arg mode="$mode" \
                 .
 
 echo "docker_image_tag is ${docker_image_tag}"

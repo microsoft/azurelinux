@@ -18,6 +18,7 @@ do
   MACROS+=("--load=$macro_file")
 done
 
+# Enhance rpm() with ability to
 # Create symlink from SPECS/ to SOURCES/ when rpm is called
 rpm() {
     local args=("$@")
@@ -62,9 +63,11 @@ show_help() {
     echo "******************************************************************************************"
 }
 
+# Enhance rpmbuild() with ability to
 # Refresh repo cache with newly built RPM, use Mariner specific DEFINES
 rpmbuild() {
     local args=("$@")
+    mkdir -p $SOURCES_DIR
     command "$FUNCNAME" "${DEFINES[@]}" "${args[@]}"
     if [[ ${IS_REPO_ENABLED} = true ]] ; then
         refresh_local_repo
@@ -139,6 +142,7 @@ install_dependencies() {
     done
 }
 
+# Enhance rpmspec() with ability to
 # use Mariner specific DEFINES
 rpmspec() {
     local args=("$@")
