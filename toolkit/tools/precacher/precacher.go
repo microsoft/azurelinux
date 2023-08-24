@@ -348,7 +348,10 @@ func monitorProgress(total int, results chan downloadResult, doneChannel chan st
 // network operations semaphore to minimize the time spent holding it.
 func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map[string]string, outDir string, wg *sync.WaitGroup, results chan<- downloadResult, netOpsSemaphore chan struct{}) {
 	const (
-		downloadRetryAttempts = 2
+		// With 5 attempts, initial delay of 1 second, and a backoff factor of 2.0 the total time spent retrying will be
+		// ~30 seconds.
+		downloadRetryAttempts = 5
+		failureBackoffBase    = 2.0
 		downloadRetryDuration = time.Second
 	)
 
@@ -392,13 +395,13 @@ func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map
 	}()
 
 	logger.Log.Debugf("Pre-caching '%s' from '%s'", fileName, url)
-	err = retry.Run(func() error {
+	_, err = retry.RunWithExpBackoff(func() error {
 		err := network.DownloadFile(url, fullFilePath, nil, nil)
 		if err != nil {
 			logger.Log.Warnf("Attempt to download (%s) failed. Error: %s", url, err)
 		}
 		return err
-	}, downloadRetryAttempts, downloadRetryDuration)
+	}, downloadRetryAttempts, downloadRetryDuration, failureBackoffBase, nil)
 	if err != nil {
 		return
 	}
