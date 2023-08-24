@@ -28,7 +28,7 @@
 Summary:        Linux Kernel
 Name:           kernel-azure
 Version:        5.15.126.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -416,6 +416,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Wed Aug 23 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.126.1-2
+- Disable SCSI_DPT_I2O for CVE-2023-2007
+
 * Mon Aug 14 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.126.1-1
 - Auto-upgrade to 5.15.126.1
 

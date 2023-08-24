@@ -1114,6 +1114,37 @@
                 "PR": [
                     "https://github.com/torvalds/linux/commit/b561275d633bcd8e0e8055ab86f1a13df75a0269"
                 ]
+            },
+            "CONFIG_SCSI_DPT_I2O": {
+                "value": [
+                    "is not set"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "This is a deprecated driver that should not be turned on as referenced in CVE-2023-2007",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6057"
+                ]
+            }
+        }
+    },
+    "kernel-azure": {
+        "required-configs":
+        {
+            "CONFIG_SCSI_DPT_I2O": {
+                "value": [
+                    "is not set"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "This is a deprecated driver that should not be turned on as referenced in CVE-2023-2007",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6057"
+                ]
             }
         }
     }
