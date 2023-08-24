@@ -208,6 +208,7 @@ After=network.target remote-fs.target nss-lookup.target
 [Service]
 Type=forking
 PIDFile=/run/httpd/httpd.pid
+RuntimeDirectory=httpd
 ExecStart=%{_sbindir}/httpd -k start
 ExecStop=%{_sbindir}/httpd -k stop
 ExecReload=%{_sbindir}/httpd -k graceful
