@@ -23,7 +23,7 @@ print_error() {
 help() {
 echo "
 Usage:
-sudo make containerized-rpmbuild [REPO_PATH=/path/to/CBL-Mariner] [MODE=test|build] [VERSION=1.0|2.0] [MOUNTS= /src/path:/dst/path] [ENABLE_REPO=y] [SPECS_DIR=/path/to/SPECS_DIR/to/use]
+sudo make containerized-rpmbuild [REPO_PATH=/path/to/CBL-Mariner] [MODE=test|build] [VERSION=1.0|2.0] [MOUNTS=/path/in/host:/path/in/container] [ENABLE_REPO=y] [SPECS_DIR=/path/to/SPECS_DIR/to/use]
 
 Starts a docker container with the specified version of mariner.
 
@@ -35,8 +35,8 @@ Optional arguments:
                         In 'test' mode it will use a pre-built mariner chroot image.
                         In 'build' mode it will use the latest published container.
     VERISION        1.0 or 2.0. default: "2.0"
-    MOUNTS          mount a directory into the container. Should be of the form '/src/dir:/dest/dir'. For multiple mounts, please use ',' as delimiter
-                        e.g. MOUNTS=/src/dir1:/dest/dir1,/src/dir2:/dest/dir2
+    MOUNTS          Mount a host directory into container. Should be of form '/host/dir:/container/dir'. For multiple mounts, please use space (\" \") as delimiter
+                        e.g. MOUNTS=\"/host/dir1:/container/dir1 /host/dir2:/container/dir2\"
     ENABLE_REPO:    Set to 'y' to use local RPMs to satisfy package dependencies. default: "n"
 
 To see help, run 'sudo make containerized-rpmbuild-help'
@@ -156,18 +156,17 @@ if [[ "${mode}" == "build" ]]; then
     mounts="${mounts} ${repo_path}/build/INTERMEDIATE_SRPMS:/mnt/INTERMEDIATE_SRPMS $specs_dir:${topdir}/SPECS"
 fi
 
-# Replace comma with space as delimiter
-extra_mounts=${extra_mounts//,/ }
-
 rm -f ${tmp_dir}/mounts.txt
 for mount in $mounts $extra_mounts; do
-    if [[ -d "${mount%%:*}" ]]; then
-        echo "${mount%%:*}' -> '${mount##*:}"  >> "${tmp_dir}/mounts.txt"
+    host_mount_path=$(realpath ${mount%%:*}) #remove suffix starting with ":"
+    container_mount_path="${mount##*:}"      #remove prefix ending in ":"
+    if [[ -d $host_mount_path ]]; then
+        echo "$host_mount_path -> $container_mount_path"  >> "${tmp_dir}/mounts.txt"
+        mount_arg=" $mount_arg -v '$host_mount_path:$container_mount_path' "
     else
-        echo "WARNING: '${mount%%:*}' does not exist. Skipping mount."  >> "${tmp_dir}/mounts.txt"
-        continue
+        echo "WARNING: '$host_mount_path' does not exist. Skipping mount."
+        echo "WARNING: '$host_mount_path' does not exist. Skipping mount."  >> "${tmp_dir}/mounts.txt"
     fi
-    mount_arg=" $mount_arg -v '$mount' "
 done
 
 # Copy resources into container
