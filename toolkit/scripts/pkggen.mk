@@ -27,7 +27,7 @@ cache_working_dir      = $(PKGBUILD_DIR)/tdnf_cache_worker
 parse_working_dir      = $(BUILD_DIR)/spec_parsing
 rpmbuilding_logs_dir   = $(LOGS_DIR)/pkggen/rpmbuilding
 remote_rpms_cache_dir  = $(CACHED_RPMS_DIR)/cache
-cached_remote_rpms        = $(call shell_real_build_only, find $(remote_rpms_cache_dir))
+cached_remote_rpms     = $(call shell_real_build_only, find $(remote_rpms_cache_dir))
 validate-pkggen-config = $(STATUS_FLAGS_DIR)/validate-image-config-pkggen.flag
 
 # Outputs
