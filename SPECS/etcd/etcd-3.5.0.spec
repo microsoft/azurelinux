@@ -40,7 +40,7 @@ Source1:        etcd.service
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source2:        %{name}-%{version}-vendor.tar.gz
 Patch0:         CVE-2021-28235.patch
-Patch1:         CVE-2023-32082-v3.5.0.patch 
+Patch1:         CVE-2023-32082-v3.5.0.patch
 BuildRequires:  golang >= 1.16
 
 %description
