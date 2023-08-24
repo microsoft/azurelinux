@@ -8,6 +8,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"sort"
 	"strconv"
@@ -20,6 +21,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repocloner"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/randomization"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
@@ -27,6 +29,28 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/tdnf"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
+)
+
+var (
+	// Every valid line will be of the form: <package_name>.<architecture> <version>.<dist> <repo_id>
+	// For:
+	//     X.aarch64	1.1b.8_X-22~rc1.cm2		fetcher-cloned-repo
+	//
+	// We'd get:
+	//   - package_name:    X
+	//   - architecture:    aarch64
+	//   - version:         1.1b.8_X-22~rc1
+	//   - dist:            cm2
+	listedPackageRegex = regexp.MustCompile(`^\s*([[:alnum:]_.+-]+)\s+([[:alnum:]_+-]+)\s+([[:alnum:]._+~-]+)\.([[:alpha:]]+[[:digit:]]+)`)
+)
+
+const (
+	listMatchSubString    = iota
+	installPackageName    = iota
+	installPackageArch    = iota
+	installPackageVersion = iota
+	installPackageDist    = iota
+	listMaxMatchLen       = iota
 )
 
 const (
@@ -415,10 +439,11 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 	}
 
 	// Calculate how many packages need to be installed so an accurate percent complete can be reported
-	totalPackages, err := calculateTotalPackages(packagesToInstall, installRoot)
+	installedPackages, err := calculateTotalPackages(packagesToInstall, installRoot)
 	if err != nil {
 		return
 	}
+	totalPackages := len(installedPackages.Repo)
 
 	// Keep a running total of how many packages have been installed through all the `TdnfInstallWithProgress` invocations
 	packagesInstalled := 0
@@ -631,11 +656,11 @@ func configureSystemFiles(installChroot *safechroot.Chroot, hostname string, con
 	return
 }
 
-func calculateTotalPackages(packages []string, installRoot string) (totalPackages int, err error) {
+func calculateTotalPackages(packages []string, installRoot string) (installedPackages *repocloner.RepoContents, err error) {
 	var (
 		releaseverCliArg string
 	)
-	allPackageNames := make(map[string]bool)
+	installedPackages = &repocloner.RepoContents{}
 	const tdnfAssumeNoStdErr = "Error(1032) : Operation aborted.\n"
 
 	releaseverCliArg, err = tdnf.GetReleaseverCliArg()
@@ -644,6 +669,7 @@ func calculateTotalPackages(packages []string, installRoot string) (totalPackage
 	}
 
 	// For every package calculate what dependencies would also be installed from it.
+	foundPackages := make(map[string]bool)
 	for _, pkg := range packages {
 		var (
 			stdout string
@@ -667,39 +693,38 @@ func calculateTotalPackages(packages []string, installRoot string) (totalPackage
 		// Search for the list of packages to be installed,
 		// it will be prefixed with a line "Installing:" and will
 		// end with an empty line.
-		inPackageList := false
 		for _, line := range splitStdout {
-			const (
-				packageListPrefix    = "Installing:"
-				packageNameDelimiter = " "
-			)
-
-			const (
-				packageNameIndex      = iota
-				extraInformationIndex = iota
-				totalPackageNameParts = iota
-			)
-
-			if !inPackageList {
-				inPackageList = strings.HasPrefix(line, packageListPrefix)
+			matches := listedPackageRegex.FindStringSubmatch(line)
+			if len(matches) != listMaxMatchLen {
+				// This line contains output other than a package information; skip it
 				continue
-			} else if strings.TrimSpace(line) == "" {
-				break
 			}
 
-			// Each package to be installed will list its name, followed by a space and then various extra information
-			pkgSplit := strings.SplitN(line, packageNameDelimiter, totalPackageNameParts)
-			if len(pkgSplit) != totalPackageNameParts {
-				err = fmt.Errorf("unexpected TDNF package name output: %s", line)
-				return
+			pkg := &repocloner.RepoPackage{
+				Name:         matches[installPackageName],
+				Version:      matches[installPackageVersion],
+				Architecture: matches[installPackageArch],
+				Distribution: matches[installPackageDist],
 			}
 
-			allPackageNames[pkgSplit[packageNameIndex]] = true
+			pkgID := pkg.ID()
+			if foundPackages[pkgID] {
+				logger.Log.Tracef("Skipping duplicate package: %s", line)
+				continue
+			}
+			foundPackages[pkgID] = true
+
+			logger.Log.Debugf("Added installedPackages entry for: %v-%v.%v.%v", pkg.Name, pkg.Version, pkg.Distribution, pkg.Architecture)
+
+			installedPackages.Repo = append(installedPackages.Repo, pkg)
 		}
 	}
 
-	totalPackages = len(allPackageNames)
-	logger.Log.Debugf("All packages to be installed (%d): %v", totalPackages, allPackageNames)
+	logger.Log.Debugf("Total number of packages to be installed: %d", len(installedPackages.Repo))
+
+	// Write out JSON file with list of packages included in the image
+	err = jsonutils.WriteJSONFile("/installroot/image_pkg_manifest_temp1.json", installedPackages)
+
 	return
 }
 

@@ -277,6 +277,17 @@ func (c *Chroot) AddFiles(filesToCopy ...FileToCopy) (err error) {
 	return
 }
 
+// ExtractFile copies file 'srcPath' in the chroot to the host at 'destPath'
+func (c *Chroot) ExtractFile(srcPath string, destPath string) (err error) {
+	srcPathFull := filepath.Join(c.rootDir, srcPath)
+	err = file.Copy(srcPathFull, destPath)
+	if err != nil {
+		logger.Log.Errorf("Error copying file '%s'", err)
+		return
+	}
+	return
+}
+
 // Run runs a given function inside the Chroot. This function will synchronize
 // with all other Chroots to ensure only one Chroot command is executed at a given time.
 func (c *Chroot) Run(toRun func() error) (err error) {
