@@ -47,7 +47,7 @@ make %{?_smp_mflags}
 %install
 [ %{buildroot} != "/"] && rm -rf %{buildroot}/*
 make install DESTDIR=%{buildroot}
-install -v -dm755 %{buildroot}/%{_docdir}/
+install -v -dm755 %{buildroot}/%{_docdir}/%{name}-%{version}
 find %{buildroot}/%{_libdir} -name '*.la' -delete
 find %{buildroot}/%{_libdir} -name '*.so~' -delete
 # Add default user to sudoers group BEFORE the @includedir
