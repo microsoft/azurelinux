@@ -381,8 +381,7 @@ func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map
 		return
 	}
 
-	// Get the url for the package, or bail out if it is not available. Try verbatim first so we can print a warning if
-	// if an epoch is used.
+	// Get the url for the package, or bail out if it is not available.
 	url, ok := packagesAvailableFromRepos[pkgName]
 	if !ok {
 		result.resultType = donwloadResultTypeUnavailable
