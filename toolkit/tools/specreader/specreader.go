@@ -20,6 +20,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	packagelist "github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packlist"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/rpm"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
@@ -62,12 +63,13 @@ type parseResult struct {
 }
 
 const (
-	defaultWorkerCount = "10"
+	defaultWorkerCount = "100"
 )
 
 var (
 	app                     = kingpin.New("specreader", "A tool to parse spec dependencies into JSON")
 	specsDir                = exe.InputDirFlag(app, "Directory to scan for SPECS")
+	specListFile            = app.Flag("spec-list", "Path to a list of SPECs to parse. If empty will parse all SPECs.").ExistingFile()
 	output                  = exe.OutputFlag(app, "Output file to export the JSON")
 	workers                 = app.Flag("workers", "Number of concurrent goroutines to parse with").Default(defaultWorkerCount).Int()
 	buildDir                = app.Flag("build-dir", "Directory to store temporary files while parsing.").String()
@@ -106,13 +108,22 @@ func main() {
 	toolchainRPMs, err := schedulerutils.ReadReservedFilesList(*toolchainManifest)
 	logger.PanicOnError(err, "Unable to read toolchain manifest file '%s': %s", *toolchainManifest, err)
 
-	err = parseSPECsWrapper(*buildDir, *specsDir, *rpmsDir, *srpmsDir, *existingToolchainRpmDir, *distTag, *output, *workerTar, toolchainRPMs, *workers, *runCheck)
+	// A parse list may be provided, if so only parse this subset.
+	// If none is provided, parse all specs.
+	specListSet, err := packagelist.ParsePackageListFile(*specListFile)
+	logger.PanicOnError(err)
+
+	// Convert specsDir to an absolute path
+	specsAbsDir, err := filepath.Abs(*specsDir)
+	logger.PanicOnError(err, "Unable to get absolute path for specs directory '%s': %s", *specsDir, err)
+
+	err = parseSPECsWrapper(*buildDir, specsAbsDir, *rpmsDir, *srpmsDir, *existingToolchainRpmDir, *distTag, *output, *workerTar, specListSet, toolchainRPMs, *workers, *runCheck)
 	logger.PanicOnError(err)
 }
 
 // parseSPECsWrapper wraps parseSPECs to conditionally run it inside a chroot.
 // If workerTar is non-empty, parsing will occur inside a chroot, otherwise it will run on the host system.
-func parseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, outputFile, workerTar string, toolchainRPMs []string, workers int, runCheck bool) (err error) {
+func parseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, outputFile, workerTar string, specListSet map[string]bool, toolchainRPMs []string, workers int, runCheck bool) (err error) {
 	var (
 		chroot      *safechroot.Chroot
 		packageRepo *pkgjson.PackageRepo
@@ -136,13 +147,13 @@ func parseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, toolchainDir, dist
 		var parseError error
 
 		if *targetArch == "" {
-			packageRepo, parseError = parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, buildArch, toolchainRPMs, workers, runCheck)
+			packageRepo, parseError = parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, buildArch, specListSet, toolchainRPMs, workers, runCheck)
 			if parseError != nil {
 				err := fmt.Errorf("failed to parse native specs (%w)", parseError)
 				return err
 			}
 		} else {
-			packageRepo, parseError = parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, *targetArch, toolchainRPMs, workers, runCheck)
+			packageRepo, parseError = parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, *targetArch, specListSet, toolchainRPMs, workers, runCheck)
 			if parseError != nil {
 				err := fmt.Errorf("failed to parse cross specs (%w)", parseError)
 				return err
@@ -224,8 +235,41 @@ func createChroot(workerTar, buildDir, specsDir, srpmsDir string) (chroot *safec
 	return
 }
 
+func findSpecFiles(specsDir string, specListSet map[string]bool) (specFiles []string, err error) {
+	// Find the filepath for each spec in the SPECS directory.
+	if len(specListSet) == 0 {
+		specSearch, err := filepath.Abs(filepath.Join(specsDir, "**/*.spec"))
+		if err != nil {
+			err = fmt.Errorf("invalid spec dir: '%s'. Error:\n%w", specsDir, err)
+			return nil, err
+		}
+		specFiles, err = filepath.Glob(specSearch)
+		if err != nil {
+			err = fmt.Errorf("failed to find *.spec files. Check that '%s' is the correct directory. Error:\n%w", specsDir, err)
+			return nil, err
+		}
+	} else {
+		for specName := range specListSet {
+			specSearch := filepath.Join(specsDir, fmt.Sprintf("**/%s.spec", specName))
+			matchingSpecFiles, err := filepath.Glob(specSearch)
+
+			// If a SPEC is in the parse list, it should be parsed.
+			if err != nil {
+				err = fmt.Errorf("spec search failed on '%s'. Error:\n%w", specSearch, err)
+				return nil, err
+			}
+			if len(matchingSpecFiles) != 1 {
+				err = fmt.Errorf("unexpected number of matches '%d' for spec file '%s'", len(matchingSpecFiles), specName)
+				return nil, err
+			}
+			specFiles = append(specFiles, matchingSpecFiles[0])
+		}
+	}
+	return
+}
+
 // parseSPECs will parse all specs in specsDir and return a summary of the SPECs.
-func parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, arch string, toolchainRPMs []string, workers int, runCheck bool) (packageRepo *pkgjson.PackageRepo, err error) {
+func parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, arch string, specListSet map[string]bool, toolchainRPMs []string, workers int, runCheck bool) (packageRepo *pkgjson.PackageRepo, err error) {
 	var (
 		packageList []*pkgjson.Package
 		wg          sync.WaitGroup
@@ -234,11 +278,7 @@ func parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, arch string,
 
 	packageRepo = &pkgjson.PackageRepo{}
 
-	// Find the filepath for each spec in the SPECS directory.
-	specSearch, err := filepath.Abs(filepath.Join(specsDir, "**/*.spec"))
-	if err == nil {
-		specFiles, err = filepath.Glob(specSearch)
-	}
+	specFiles, err = findSpecFiles(specsDir, specListSet)
 	if err != nil {
 		logger.Log.Errorf("Failed to find *.spec files. Check that %s is the correct directory. Error: %v", specsDir, err)
 		return
@@ -311,22 +351,22 @@ func sortPackages(packageRepo *pkgjson.PackageRepo) {
 	}
 }
 
-// readspec is a goroutine that takes a full filepath to a spec file and scrapes it into the Specdef structure
+// readSpecWorker is a goroutine that takes a full filepath to a spec file and scrapes it into the Specdef structure
 // Concurrency is limited by the size of the semaphore channel passed in. Too many goroutines at once can deplete
-// available filehandles.
+// available file handles.
 func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel <-chan struct{}, wg *sync.WaitGroup, distTag, rpmsDir, srpmsDir, toolchainDir string, toolchainRPMs []string, runCheck bool, arch string, tsRoot *timestamp.TimeStamp) {
 	const (
-		emptyQueryFormat      = ``
 		querySrpm             = `%{NAME}-%{VERSION}-%{RELEASE}.src.rpm`
 		queryProvidedPackages = `rpm %{ARCH}/%{nvra}.rpm\n[provides %{PROVIDENEVRS}\n][requires %{REQUIRENEVRS}\n][arch %{ARCH}\n]`
 	)
 
 	defer wg.Done()
 
-	defines := rpm.DefaultDefinesWithDist(runCheck, distTag)
+	noCheckDefines := rpm.DefaultDefinesWithDist(false, distTag)
+	checkDefines := rpm.DefaultDefinesWithDist(true, distTag)
 
 	var ts *timestamp.TimeStamp = nil
-	for specfile := range requests {
+	for specFile := range requests {
 		select {
 		case <-cancel:
 			logger.Log.Debug("Cancellation signal received")
@@ -339,82 +379,82 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 			timestamp.StopEvent(ts)
 			ts = nil
 		}
-		ts, _ = timestamp.StartEvent(filepath.Base(specfile), tsRoot)
-
-		result := &parseResult{}
+		ts, _ = timestamp.StartEvent(filepath.Base(specFile), tsRoot)
 
 		providerList := []*pkgjson.Package{}
-		buildRequiresList := []*pkgjson.PackageVer{}
-		sourcedir := filepath.Dir(specfile)
+		sourceDir := filepath.Dir(specFile)
+		testBuildRequiresList := []*pkgjson.PackageVer{}
 
 		// Find the SRPM associated with the SPEC.
-		srpmResults, err := rpm.QuerySPEC(specfile, sourcedir, querySrpm, arch, defines, rpm.QueryHeaderArgument)
+		srpmResults, err := rpm.QuerySPEC(specFile, sourceDir, querySrpm, arch, noCheckDefines, rpm.QueryHeaderArgument)
 		if err != nil {
-			result.err = err
-			results <- result
+			sendEmptyResult(results, err)
 			continue
 		}
 
 		srpmPath := filepath.Join(srpmsDir, srpmResults[0])
 
-		isCompatible, err := rpm.SpecArchIsCompatible(specfile, sourcedir, arch, defines)
+		isCompatible, err := rpm.SpecArchIsCompatible(specFile, sourceDir, arch, noCheckDefines)
 		if err != nil {
-			result.err = err
-			results <- result
+			sendEmptyResult(results, err)
 			continue
 		}
 
 		if !isCompatible {
-			logger.Log.Debugf(`Skipping (%s) since it cannot be built on current architecture.`, specfile)
-			results <- result
+			logger.Log.Debugf(`Skipping (%s) since it cannot be built on current architecture.`, specFile)
+			sendEmptyResult(results, err)
 			continue
 		}
 
 		// Find every package that the spec provides
-		queryResults, err := rpm.QuerySPEC(specfile, sourcedir, queryProvidedPackages, arch, defines, rpm.QueryBuiltRPMHeadersArgument)
-		if err == nil && len(queryResults) != 0 {
+		queryResults, err := rpm.QuerySPEC(specFile, sourceDir, queryProvidedPackages, arch, noCheckDefines, rpm.QueryBuiltRPMHeadersArgument)
+		if err != nil {
+			sendEmptyResult(results, err)
+			continue
+		}
+
+		if len(queryResults) != 0 {
 			providerList, err = parseProvides(rpmsDir, toolchainDir, toolchainRPMs, srpmPath, queryResults)
 			if err != nil {
-				result.err = err
-				results <- result
+				sendEmptyResult(results, err)
 				continue
 			}
 		}
 
 		// Query the BuildRequires fields from this spec and turn them into an array of PackageVersions
-		queryResults, err = rpm.QuerySPEC(specfile, sourcedir, emptyQueryFormat, arch, defines, rpm.BuildRequiresArgument)
-		if err == nil && len(queryResults) != 0 {
-			buildRequiresList, err = parsePackageVersionList(queryResults)
+		buildRequiresList, err := readBuildRequires(specFile, sourceDir, arch, noCheckDefines)
+		if err != nil {
+			sendEmptyResult(results, err)
+			continue
+		}
+
+		specHasCheckSection, err := rpm.SpecHasCheckSection(specFile, sourceDir, arch, checkDefines)
+		if err != nil {
+			sendEmptyResult(results, err)
+			continue
+		}
+
+		readTestDependencies := runCheck && specHasCheckSection
+		if readTestDependencies {
+			// Query the test BuildRequires fields from this spec and turn them into an array of PackageVersions
+			testBuildRequiresList, err = readBuildRequires(specFile, sourceDir, arch, checkDefines)
 			if err != nil {
-				result.err = err
-				results <- result
+				sendEmptyResult(results, err)
 				continue
 			}
 		}
 
 		// Every package provided by a spec will have the same BuildRequires and SrpmPath
-		for i := range providerList {
-			providerList[i].SpecPath = specfile
-			providerList[i].SourceDir = sourcedir
-			providerList[i].Requires, err = condensePackageVersionArray(providerList[i].Requires, specfile)
-			if err != nil {
-				break
-			}
-
-			providerList[i].BuildRequires, err = condensePackageVersionArray(buildRequiresList, specfile)
-			if err != nil {
-				break
-			}
-		}
-
-		if err != nil {
-			result.err = err
-		} else {
-			result.packages = providerList
+		for _, provider := range providerList {
+			provider.BuildRequires = buildRequiresList
+			provider.SourceDir = sourceDir
+			provider.SpecPath = specFile
+			provider.TestRequires = testBuildRequiresList
+			provider.RunTests = readTestDependencies
 		}
 
 		// Submit the result to the main thread, the deferred function will clear the semaphore.
-		results <- result
+		results <- &parseResult{packages: providerList}
 	}
 	if ts != nil {
 		timestamp.StopEvent(ts)
@@ -499,6 +539,12 @@ func parseProvides(rpmsDir, toolchainDir string, toolchainRPMs []string, srpmPat
 				return
 			}
 
+			reqlist, err = dedupPackageVersionArray(reqlist)
+			if err != nil {
+				err = fmt.Errorf("failed to dedup run-time PackageVer array for SRPM (%s):\n%w", srpmPath, err)
+				return
+			}
+
 			isToolchain := schedulerutils.IsReservedFile(rpmPath, toolchainRPMs)
 			if isToolchain {
 				rpmPath = convertToToolchainRpmPath(rpmPath, packagearch, toolchainDir)
@@ -556,10 +602,10 @@ func parsePackageVersionList(pkgList []string) (pkgVerList []*pkgjson.PackageVer
 	return
 }
 
-// condensePackageVersionArray deduplicates entries in an array of Package Versions
+// dedupPackageVersionArray deduplicates entries in an array of Package Versions
 // and represents double conditionals in a single PackageVersion structure.
-// If a non-blank package version is specified more than twice in a SPEC then return an error.
-func condensePackageVersionArray(packagelist []*pkgjson.PackageVer, specfile string) (processedPkgList []*pkgjson.PackageVer, err error) {
+// If a non-blank package version is specified more than twice, return an error.
+func dedupPackageVersionArray(packagelist []*pkgjson.PackageVer) (processedPkgList []*pkgjson.PackageVer, err error) {
 	for _, pkg := range packagelist {
 		nameMatch := false
 		for i, processedPkg := range processedPkgList {
@@ -580,7 +626,7 @@ func condensePackageVersionArray(packagelist []*pkgjson.PackageVer, specfile str
 					processedPkgList[i].SCondition = pkg.Condition
 					break
 				} else {
-					err = fmt.Errorf("spec (%s) attempted to set more than two conditions for package (%s)", specfile, processedPkg.Name)
+					err = fmt.Errorf("attempting to set more than two conditions for package (%s)", processedPkg.Name)
 					return
 				}
 			}
@@ -697,4 +743,29 @@ func convertToToolchainRpmPath(currentRpmPath, arch, toolchainDir string) (toolc
 	toolchainPath = filepath.Join(toolchainPath, rpmFileName)
 	logger.Log.Debugf("Toolchain changing '%s' to '%s'.", currentRpmPath, toolchainPath)
 	return toolchainPath
+}
+
+func readBuildRequires(specFile, sourceDir, arch string, defines map[string]string) (result []*pkgjson.PackageVer, err error) {
+	const emptyQueryFormat = ``
+
+	queryResults, err := rpm.QuerySPEC(specFile, sourceDir, emptyQueryFormat, arch, defines, rpm.BuildRequiresArgument)
+	if err != nil {
+		return
+	}
+
+	result, err = parsePackageVersionList(queryResults)
+	if err != nil {
+		return
+	}
+
+	result, err = dedupPackageVersionArray(result)
+	if err != nil {
+		err = fmt.Errorf("failed to dedup build-time PackageVer array for spec (%s):\n%w", specFile, err)
+	}
+
+	return
+}
+
+func sendEmptyResult(results chan<- *parseResult, err error) {
+	results <- &parseResult{err: err}
 }

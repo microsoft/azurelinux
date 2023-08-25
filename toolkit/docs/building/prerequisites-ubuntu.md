@@ -13,6 +13,7 @@ sudo apt-get update
 # Install required dependencies.
 # Recommended but not required: `pigz` for faster compression operations.
 sudo apt -y install \
+    acl \
     curl \
     gawk \
     genisoimage \

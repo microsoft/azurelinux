@@ -37,7 +37,7 @@ func (g *PkgGraph) FindAnyDirectedCycle() (nodes []*PkgNode, err error) {
 
 	// Create a temporary root node, by using a constant goalNodeName, it will act as a mutex against concurrent
 	// cycle searches on a given graph as this below call will fail if there is already a goal node with the same value.
-	rootNode, err := g.AddGoalNode(goalNodeName, nil, false)
+	rootNode, err := g.AddGoalNode(goalNodeName, nil, nil, false)
 	if err != nil {
 		return
 	}
