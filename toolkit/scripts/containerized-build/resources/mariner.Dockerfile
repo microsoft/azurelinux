@@ -17,3 +17,6 @@ RUN if [[ "${enable_local_repo}" == "true" ]]; then echo "enable_local_repo" >> 
 RUN echo "cat /mariner_setup_dir/splash.txt"                     >> /root/.bashrc && \
     echo "show_help"                                             >> /root/.bashrc && \
     echo "cd /usr/src/mariner/ || { echo \"ERROR: Could not change directory to /usr/src/mariner/ \"; exit 1; }"  >> /root/.bashrc
+
+# Install vim & git in the build env
+RUN tdnf --releasever=$version install -y vim git
