@@ -28,8 +28,6 @@ Source0:        %{name}-%{version}.tar.gz
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
-# errors.Join is an utility introduced into Golang starting from v1.20+. Remove this patch once Golang is upgraded to v1.20+
-Patch1:         revert-errors-join-implementation.patch
 BuildRequires:  golang
 Obsoletes: nvidia-container-runtime <= 3.5.0-1, nvidia-container-runtime-hook <= 1.4.0-2
 Provides: nvidia-container-runtime
