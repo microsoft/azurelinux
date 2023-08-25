@@ -59,7 +59,7 @@ var (
 	outDir            = app.Flag("output-dir", "Directory to download packages into.").Required().ExistingDir()
 	snapshot          = app.Flag("snapshot", "Path to the rpm snapshot .json file.").ExistingFile()
 	outputSummaryFile = app.Flag("output-summary-file", "Path to save the summary of packages downloaded").String()
-	repoSummaryFile   = app.Flag("repo-summary-file", "Path to save the list of packages available in the repos").String()
+	repoUrlsFile      = app.Flag("repo-urls-file", "Path to save the list of package URLs available in the repos").String()
 	repoUrls          = app.Flag("repo-url", "URLs of the repos to download from.").Strings()
 	workerTar         = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz").Required().ExistingFile()
 	buildDir          = app.Flag("worker-dir", "Directory to store chroot while running repo query.").Required().ExistingDir()
@@ -86,7 +86,7 @@ func main() {
 		logger.PanicOnError(err)
 	}
 
-	packagesAvailableFromRepos, err := getAllRepoData(*repoUrls, *workerTar, *buildDir, *repoSummaryFile)
+	packagesAvailableFromRepos, err := getAllRepoData(*repoUrls, *workerTar, *buildDir, *repoUrlsFile)
 	if err != nil {
 		logger.PanicOnError(err)
 	}
@@ -126,7 +126,7 @@ func rpmSnapshotFromFile(snapshotFile string) (rpmSnapshot *repocloner.RepoConte
 
 // getAllRepoData returns a map of package names to URLs for all packages available in the given repos. It uses
 // a chroot to run repoquery.
-func getAllRepoData(repoURLs []string, workerTar, buildDir, listFile string) (namesToURLs map[string]string, err error) {
+func getAllRepoData(repoURLs []string, workerTar, buildDir, repoUrlsFile string) (namesToURLs map[string]string, err error) {
 	const (
 		leaveChrootOnDisk = false
 	)
@@ -165,7 +165,7 @@ func getAllRepoData(repoURLs []string, workerTar, buildDir, listFile string) (na
 			URLList = append(URLList, packageRepoPath)
 		}
 	}
-	file.WriteLines(URLList, listFile)
+	err = file.WriteLines(URLList, repoUrlsFile)
 
 	return
 }
@@ -355,12 +355,10 @@ func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map
 	const (
 		downloadRetryAttempts = 2
 		downloadRetryDuration = time.Second
-		stripEpoch            = false
-		leaveEpoch            = true
 	)
 
 	// File names are of the form "<name>-<version>.<distro>.<arch>.rpm"
-	pkgName, fileName := formatName(pkg, leaveEpoch)
+	pkgName, fileName := formatName(pkg)
 	result := downloadResult{
 		pkgName:    fileName,
 		resultType: downloadResultTypeFailure,
@@ -375,19 +373,7 @@ func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map
 	// if an epoch is used.
 	url, ok := packagesAvailableFromRepos[pkgName]
 	if !ok {
-		// RPMs may omit the epoch in the filename, try to strip the epoch out of the URL and try again.
-		pkgName, fileName = formatName(pkg, stripEpoch)
-		result.pkgName = fileName
-		url, ok = packagesAvailableFromRepos[pkgName]
-	}
-	if !ok {
 		result.resultType = donwloadResultTypeUnavailable
-		return
-	}
-
-	// Print an error if the actual filename has ':' in it, this will break our tools
-	if strings.Contains(fileName, ":") {
-		logger.Log.Warnf("Found ':' in filename '%s', this will break Make. Refusing to download", fileName)
 		return
 	}
 	fullFilePath := path.Join(outDir, fileName)
@@ -425,10 +411,10 @@ func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map
 	result.resultType = downloadResultTypeSuccess
 }
 
-func formatName(pkg *repocloner.RepoPackage, stripEpoch bool) (pkgName, fileName string) {
-	// Strip everything before the ":"" in the string. "Version": "0:1.2-3", becomes "1.2-3"
+func formatName(pkg *repocloner.RepoPackage) (pkgName, fileName string) {
+	// Names should not contain the epoch, strip everything before the ":"" in the string. "Version": "0:1.2-3", becomes "1.2-3"
 	version := pkg.Version
-	if strings.Contains(version, ":") && stripEpoch {
+	if strings.Contains(version, ":") {
 		version = strings.Split(version, ":")[1]
 	}
 

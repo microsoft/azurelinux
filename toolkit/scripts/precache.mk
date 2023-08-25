@@ -8,7 +8,7 @@
 
 precache_state_dir = $(CACHED_RPMS_DIR)/precache
 precache_downloaded_files = $(precache_state_dir)/downloaded_files.txt
-repo_summary_file = $(precache_state_dir)/repo_summary.txt
+repo_urls_file = $(precache_state_dir)/repo_urls.txt
 precache_chroot_dir = $(precache_state_dir)/chroot
 
 $(call create_folder,$(precache_state_dir))
@@ -35,7 +35,7 @@ $(STATUS_FLAGS_DIR)/precache.flag: $(go-precacher) $(chroot_worker) $(rpms_snaps
 		--snapshot "$(rpms_snapshot)" \
 		--output-dir "$(remote_rpms_cache_dir)" \
 		--output-summary-file "$(precache_downloaded_files)" \
-		--repo-summary-file "$(repo_summary_file)" \
+		--repo-urls-file "$(repo_urls_file)" \
 		$(foreach url,$(PACKAGE_URL_LIST), --repo-url "$(url)") \
 		--worker-tar $(chroot_worker) \
 		--worker-dir $(precache_chroot_dir) \
