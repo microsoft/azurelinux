@@ -1,7 +1,7 @@
-From c08a5fa413a34111c9a37fd9e545de27ab0978b1 Mon Sep 17 00:00:00 2001
+From ede3e278ae8df8ce1beec4b251dbaa68b8d2ad48 Mon Sep 17 00:00:00 2001
 From: Damien Neil <dneil@google.com>
 Date: Wed, 19 Jul 2023 10:30:46 -0700
-Subject: [PATCH] [release-branch.go1.19] net/http: permit requests with
+Subject: [PATCH] [release-branch.go1.20] net/http: permit requests with
  invalid Host headers
 
 Historically, the Transport has silently truncated invalid
@@ -20,7 +20,7 @@ without a Host.
 
 For #60374
 Fixes #61431
-Fixes #61825
+Fixes #61826
 
 Change-Id: If170c7dd860aa20eb58fe32990fc93af832742b6
 Reviewed-on: https://go-review.googlesource.com/c/go/+/511155
@@ -28,10 +28,10 @@ TryBot-Result: Gopher Robot <gobot@golang.org>
 Reviewed-by: Roland Shoemaker <roland@golang.org>
 Run-TryBot: Damien Neil <dneil@google.com>
 (cherry picked from commit b9153f6ef338baee5fe02a867c8fbc83a8b29dd1)
-Reviewed-on: https://go-review.googlesource.com/c/go/+/518855
+Reviewed-on: https://go-review.googlesource.com/c/go/+/518756
 Auto-Submit: Dmitri Shuralyov <dmitshur@google.com>
-Run-TryBot: Roland Shoemaker <roland@golang.org>
 Reviewed-by: Russ Cox <rsc@golang.org>
+Run-TryBot: Roland Shoemaker <roland@golang.org>
 Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
 ---
  src/net/http/request.go      | 23 ++++++++++++++++++++++-
@@ -39,10 +39,10 @@ Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
  2 files changed, 34 insertions(+), 6 deletions(-)
 
 diff --git a/src/net/http/request.go b/src/net/http/request.go
-index 3100037386..91cb8a66b9 100644
+index 9c888b3768..2cf96b4417 100644
 --- a/src/net/http/request.go
 +++ b/src/net/http/request.go
-@@ -582,8 +582,29 @@ func (r *Request) write(w io.Writer, usingProxy bool, extraHeaders Header, waitF
+@@ -586,8 +586,29 @@ func (r *Request) write(w io.Writer, usingProxy bool, extraHeaders Header, waitF
  	if err != nil {
  		return err
  	}
@@ -74,10 +74,10 @@ index 3100037386..91cb8a66b9 100644
  
  	// According to RFC 6874, an HTTP client, proxy, or other
 diff --git a/src/net/http/request_test.go b/src/net/http/request_test.go
-index fddc85d6a9..dd1e2dc2a1 100644
+index 86c68e470e..a9343cd935 100644
 --- a/src/net/http/request_test.go
 +++ b/src/net/http/request_test.go
-@@ -770,16 +770,23 @@ func TestRequestWriteBufferedWriter(t *testing.T) {
+@@ -766,16 +766,23 @@ func TestRequestWriteBufferedWriter(t *testing.T) {
  	}
  }
  
@@ -108,3 +108,4 @@ index fddc85d6a9..dd1e2dc2a1 100644
  
 -- 
 2.41.0
+
