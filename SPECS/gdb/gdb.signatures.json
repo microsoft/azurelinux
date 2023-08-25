@@ -1,5 +1,7 @@
 {
  "Signatures": {
-  "gdb-13.2.tar.xz": "fd5bebb7be1833abdb6e023c2f498a354498281df9d05523d8915babeb893f0a"
+  "gdb-13.2.tar.xz": "fd5bebb7be1833abdb6e023c2f498a354498281df9d05523d8915babeb893f0a",
+  "binutils-common.exp": "330e4911ff7fffdc1c520b9b421bcb0ad5bc606dbaee96f8252fe832a82a719b",
+  "ld-lib.exp": "05ad5e293758c45d3606babdc4dcdd8c0bb155d207a6ead9e520599076e30d3e",
  }
 }

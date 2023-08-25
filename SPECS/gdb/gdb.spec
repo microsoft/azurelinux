@@ -8,6 +8,9 @@ Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://www.gnu.org/software/gdb
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
+Source1:        binutils-common.exp
+Source2:        ld-lib.exp
+Patch0:         gdb-libctf-test-common-lib-import.patch
 BuildRequires:  expat-devel
 BuildRequires:  gcc-c++
 BuildRequires:  gcc-gfortran
@@ -45,6 +48,7 @@ another program was doing at the moment it crashed.
     --with-system-zlib \
     --disable-sim \
     --with-python=%{python3}
+
 %make_build
 
 %install
@@ -68,6 +72,8 @@ rm -vf %{buildroot}%{_libdir}/libaarch64-unknown-linux-gnu-sim.a
 %endif
 
 %find_lang %{name} --all-name
+cp %{SOURCE1} %{_builddir}/gdb-13.2/libctf/testsuite/lib/binutils-common.exp
+cp %{SOURCE2} %{_builddir}/gdb-13.2/libctf/testsuite/lib/ld-lib.exp
 
 %check
 # disable security hardening for tests
@@ -96,6 +102,7 @@ rm -f $(dirname $(gcc -print-libgcc-file-name))/../specs
 
 * Wed Aug 16 2023 Andy Zaugg <azaugg@linkedin.com> - 13.2
 - Upgrade to gdb 13.2
+- Fix the make checks
 
 * Wed May 11 2022 Fanzhe Lyu <falyu@microsoft.com> - 11.2
 - Upgrade to gdb 11.2
