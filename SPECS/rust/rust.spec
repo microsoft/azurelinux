@@ -9,7 +9,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.68.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -165,6 +165,9 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %{_mandir}/man1/*
 
 %changelog
+* Tue Aug 22 2023 Rachel Menge <rachelmenge@microsoft.com> - 1.68.2-5
+- Bump release to rebuild against openssl 1.1.1k-26
+
 * Wed Jul 05 2023 Andrew Phelps <anphel@microsoft.com> - 1.68.2-4
 - Bump release to rebuild against glibc 2.35-4
 

@@ -1,4 +1,7 @@
 %global debug_package %{nil}
+
+%define local_n_release 1
+
 %define srcdir cassandra-%{name}-%{version}
 %define bower_components reaper-bower-components-%{version}.tar.gz
 %define srcui_node_modules reaper-srcui-node-modules-%{version}.tar.gz
@@ -6,12 +9,12 @@
 %define maven_cache reaper-m2-cache-%{version}.tar.gz
 %define npm_cache reaper-npm-cache-%{version}.tar.gz
 %define local_lib_node_modules reaper-local-lib-node-modules-%{version}.tar.gz
-%define local_n reaper-local-n-%{version}.tar.gz
+%define local_n reaper-local-n-%{version}-%{local_n_release}.tar.gz
 
 Summary:        Reaper for cassandra is a tool for running Apache Cassandra repairs against single or multi-site clusters.
 Name:           reaper
 Version:        3.1.1
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -45,6 +48,7 @@ BuildRequires:  msopenjdk-11
 BuildRequires:  nodejs
 BuildRequires:  python3
 BuildRequires:  systemd-rpm-macros
+BuildRequires:  openssl-devel
 Requires:       msopenjdk-11
 Requires(pre):  %{_sbindir}/groupadd
 Requires(pre):  %{_sbindir}/useradd
@@ -179,6 +183,9 @@ fi
 %{_unitdir}/cassandra-%{name}.service
 
 %changelog
+* Thu Aug 17 2023 Bala <balakumaran.kannan@microsoft.com> - 3.1.1-7
+- Make openssl as BR and remove openssl from local-n bundle to fix CVE-2023-0286
+
 * Fri Aug 04 2023 Sumedh Sharma <sumsharma@microsoft.com> - 3.1.1-6
 - Patch CVE-2018-11694 in libsass module
 
