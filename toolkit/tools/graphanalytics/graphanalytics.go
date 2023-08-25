@@ -73,7 +73,9 @@ func printIndirectlyMostUnresolved(pkgGraph *pkggraph.PkgGraph, maxResults int) 
 	unresolvedPackageDependents := make(map[string][]string)
 
 	for _, node := range pkgGraph.AllNodes() {
-		if node.Type != pkggraph.TypeLocalRun && node.Type != pkggraph.TypeLocalBuild {
+		if node.Type != pkggraph.TypeLocalRun &&
+			node.Type != pkggraph.TypeLocalBuild &&
+			node.Type != pkggraph.TypeTest {
 			continue
 		}
 
@@ -230,7 +232,7 @@ func printIndirectlyClosestToBeingUnblocked(pkgGraph *pkggraph.PkgGraph, maxResu
 func nodeDependencyName(node *pkggraph.PkgNode) (name string) {
 	// Prefer the SRPM name if possible, otherwise use the unversioned package name
 	name = node.SRPMFileName()
-	if name == "" || name == "<NO_SRPM_PATH>" {
+	if name == "" || name == pkggraph.NoSRPMPath {
 		name = node.VersionedPkg.Name
 	}
 
@@ -241,7 +243,7 @@ func nodeDependencyName(node *pkggraph.PkgNode) (name string) {
 func nodeRPMName(node *pkggraph.PkgNode) (name string) {
 	// Prefer the SRPM name if possible, otherwise use the unversioned package name
 	name = filepath.Base(node.RpmPath)
-	if name == "" || name == "<NO_RPM_PATH>" {
+	if name == "" || name == pkggraph.NoRPMPath {
 		name = node.VersionedPkg.Name
 	}
 

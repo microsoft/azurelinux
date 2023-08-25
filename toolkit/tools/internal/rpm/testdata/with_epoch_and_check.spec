@@ -1,5 +1,5 @@
 Summary:        Test spec file with with no default package
-Name:           with_epoch
+Name:           with_epoch_and_check
 Epoch:          1
 Version:        1.0.0
 Release:        1%{?dist}
@@ -10,13 +10,18 @@ Vendor:         Microsoft
 Distribution:   Mariner
 
 %description
-Test spec. Make sure the default package is built and the 'Epoch' equals 1!
+Test spec. Make sure:
+- The default package is built.
+- The 'Epoch' equals 1!
+- The '%check' section is present.
 
 %prep
 
 %build
 
 %install
+
+%check
 
 %files
 %defattr(-,root,root)
