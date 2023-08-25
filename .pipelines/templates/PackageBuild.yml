@@ -24,31 +24,35 @@ parameters:
 
   - name: isCheckBuild
     type: string
-    default: ""
+    default: "default"
     values:
-      - "true"
+      - "default"
       - "false"
+      - "true"
 
   - name: isDeltaBuild
     type: string
-    default: ""
+    default: "default"
     values:
-      - "true"
+      - "default"
       - "false"
+      - "true"
 
   - name: isQuickRebuildPackages
     type: string
-    default: ""
+    default: "default"
     values:
-      - "true"
+      - "default"
       - "false"
+      - "true"
 
   - name: isUseCCache
     type: string
-    default: ""
+    default: "default"
     values:
-      - "true"
+      - "default"
       - "false"
+      - "true"
 
   - name: outputArtifactsFolder
     type: string
