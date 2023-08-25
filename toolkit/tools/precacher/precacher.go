@@ -59,6 +59,7 @@ var (
 	outDir            = app.Flag("output-dir", "Directory to download packages into.").Required().ExistingDir()
 	snapshot          = app.Flag("snapshot", "Path to the rpm snapshot .json file.").ExistingFile()
 	outputSummaryFile = app.Flag("output-summary-file", "Path to save the summary of packages downloaded").String()
+	repoSummaryFile   = app.Flag("repo-summary-file", "Path to save the list of packages available in the repos").String()
 	repoUrls          = app.Flag("repo-url", "URLs of the repos to download from.").Strings()
 	workerTar         = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz").Required().ExistingFile()
 	buildDir          = app.Flag("worker-dir", "Directory to store chroot while running repo query.").Required().ExistingDir()
@@ -85,7 +86,7 @@ func main() {
 		logger.PanicOnError(err)
 	}
 
-	packagesAvailableFromRepos, err := getAllRepoData(*repoUrls, *workerTar, *buildDir)
+	packagesAvailableFromRepos, err := getAllRepoData(*repoUrls, *workerTar, *buildDir, *repoSummaryFile)
 	if err != nil {
 		logger.PanicOnError(err)
 	}
@@ -125,7 +126,7 @@ func rpmSnapshotFromFile(snapshotFile string) (rpmSnapshot *repocloner.RepoConte
 
 // getAllRepoData returns a map of package names to URLs for all packages available in the given repos. It uses
 // a chroot to run repoquery.
-func getAllRepoData(repoURLs []string, workerTar, buildDir string) (namesToURLs map[string]string, err error) {
+func getAllRepoData(repoURLs []string, workerTar, buildDir, listFile string) (namesToURLs map[string]string, err error) {
 	const (
 		leaveChrootOnDisk = false
 	)
@@ -140,6 +141,7 @@ func getAllRepoData(repoURLs []string, workerTar, buildDir string) (namesToURLs 
 	defer queryChroot.Close(leaveChrootOnDisk)
 
 	namesToURLs = make(map[string]string)
+	URLList := []string{}
 	for _, repoURL := range repoURLs {
 		// Use the chroot to query each repo for the packages it contains
 		var packageRepoPaths []string
@@ -160,8 +162,11 @@ func getAllRepoData(repoURLs []string, workerTar, buildDir string) (namesToURLs 
 			// We need to prepend the repoURL to the partial URL to get the full URL
 			packageRepoPath = fmt.Sprintf("%s/%s", repoURL, packageRepoPath)
 			namesToURLs[packageName] = packageRepoPath
+			URLList = append(URLList, packageRepoPath)
 		}
 	}
+	file.WriteLines(URLList, listFile)
+
 	return
 }
 
@@ -350,12 +355,12 @@ func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map
 	const (
 		downloadRetryAttempts = 2
 		downloadRetryDuration = time.Second
+		stripEpoch            = false
+		leaveEpoch            = true
 	)
 
 	// File names are of the form "<name>-<version>.<distro>.<arch>.rpm"
-	pkgName := fmt.Sprintf("%s-%s.%s.%s", pkg.Name, pkg.Version, pkg.Distribution, pkg.Architecture)
-	fileName := fmt.Sprintf("%s.rpm", pkgName)
-	fullFilePath := path.Join(outDir, fileName)
+	pkgName, fileName := formatName(pkg, leaveEpoch)
 	result := downloadResult{
 		pkgName:    fileName,
 		resultType: downloadResultTypeFailure,
@@ -366,6 +371,27 @@ func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map
 		wg.Done()
 	}()
 
+	// Get the url for the package, or bail out if it is not available. Try verbatim first so we can print a warning if
+	// if an epoch is used.
+	url, ok := packagesAvailableFromRepos[pkgName]
+	if !ok {
+		// RPMs may omit the epoch in the filename, try to strip the epoch out of the URL and try again.
+		pkgName, fileName = formatName(pkg, stripEpoch)
+		result.pkgName = fileName
+		url, ok = packagesAvailableFromRepos[pkgName]
+	}
+	if !ok {
+		result.resultType = donwloadResultTypeUnavailable
+		return
+	}
+
+	// Print an error if the actual filename has ':' in it, this will break our tools
+	if strings.Contains(fileName, ":") {
+		logger.Log.Warnf("Found ':' in filename '%s', this will break Make. Refusing to download", fileName)
+		return
+	}
+	fullFilePath := path.Join(outDir, fileName)
+
 	// Bail out early if the file already exists
 	exists, err := file.PathExists(fullFilePath)
 	if err != nil {
@@ -374,13 +400,6 @@ func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map
 	}
 	if exists {
 		result.resultType = downloadResultTypeSkipped
-		return
-	}
-
-	// Get the url for the package, or bail out if it is not available
-	url, ok := packagesAvailableFromRepos[pkgName]
-	if !ok {
-		result.resultType = donwloadResultTypeUnavailable
 		return
 	}
 
@@ -404,6 +423,18 @@ func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map
 	}
 
 	result.resultType = downloadResultTypeSuccess
+}
+
+func formatName(pkg *repocloner.RepoPackage, stripEpoch bool) (pkgName, fileName string) {
+	// Strip everything before the ":"" in the string. "Version": "0:1.2-3", becomes "1.2-3"
+	version := pkg.Version
+	if strings.Contains(version, ":") && stripEpoch {
+		version = strings.Split(version, ":")[1]
+	}
+
+	pkgName = fmt.Sprintf("%s-%s.%s.%s", pkg.Name, version, pkg.Distribution, pkg.Architecture)
+	fileName = fmt.Sprintf("%s.rpm", pkgName)
+	return
 }
 
 func writeSummaryFile(summaryFile string, downloadedPackages []string) (err error) {
