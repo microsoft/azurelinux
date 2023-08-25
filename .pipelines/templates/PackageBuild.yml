@@ -30,7 +30,7 @@ parameters:
     type: boolean
     default: false
 
-  - name: isQuickPackageBuild
+  - name: isQuickRebuildPackages
     type: boolean
     default: false
 
@@ -120,7 +120,7 @@ steps:
       fi
 
       quick_rebuild_packages_arg="QUICK_REBUILD_PACKAGES=n"
-      if [[ ${{ parameters.isQuickPackageBuild }} =~ [Tt]rue ]]; then
+      if [[ ${{ parameters.isQuickRebuildPackages }} =~ [Tt]rue ]]; then
         quick_rebuild_packages_arg="QUICK_REBUILD_PACKAGES=y"
       fi
 
