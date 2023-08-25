@@ -359,6 +359,7 @@ func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map
 
 	// File names are of the form "<name>-<version>.<distro>.<arch>.rpm"
 	pkgName, fileName := formatName(pkg)
+	fullFilePath := path.Join(outDir, fileName)
 	result := downloadResult{
 		pkgName:    fileName,
 		resultType: downloadResultTypeFailure,
@@ -369,15 +370,6 @@ func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map
 		wg.Done()
 	}()
 
-	// Get the url for the package, or bail out if it is not available. Try verbatim first so we can print a warning if
-	// if an epoch is used.
-	url, ok := packagesAvailableFromRepos[pkgName]
-	if !ok {
-		result.resultType = donwloadResultTypeUnavailable
-		return
-	}
-	fullFilePath := path.Join(outDir, fileName)
-
 	// Bail out early if the file already exists
 	exists, err := file.PathExists(fullFilePath)
 	if err != nil {
@@ -386,6 +378,14 @@ func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map
 	}
 	if exists {
 		result.resultType = downloadResultTypeSkipped
+		return
+	}
+
+	// Get the url for the package, or bail out if it is not available. Try verbatim first so we can print a warning if
+	// if an epoch is used.
+	url, ok := packagesAvailableFromRepos[pkgName]
+	if !ok {
+		result.resultType = donwloadResultTypeUnavailable
 		return
 	}
 
