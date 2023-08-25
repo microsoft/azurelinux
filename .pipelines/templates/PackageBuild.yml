@@ -28,7 +28,6 @@ parameters:
     values:
       - "true"
       - "false"
-      - ""
 
   - name: isDeltaBuild
     type: string
@@ -36,7 +35,6 @@ parameters:
     values:
       - "true"
       - "false"
-      - ""
 
   - name: isQuickRebuildPackages
     type: string
@@ -44,7 +42,6 @@ parameters:
     values:
       - "true"
       - "false"
-      - ""
 
   - name: isUseCCache
     type: string
@@ -52,7 +49,6 @@ parameters:
     values:
       - "true"
       - "false"
-      - ""
 
   - name: outputArtifactsFolder
     type: string
