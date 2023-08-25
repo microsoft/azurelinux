@@ -86,7 +86,7 @@ rm -f $(dirname $(gcc -print-libgcc-file-name))/../specs
 %license COPYING
 %exclude %{_datadir}/locale
 %exclude %{_includedir}/*.h
-%{_libdir}/libsframe.a
+%exclude %{_libdir}/libsframe.a
 %{_includedir}/gdb/*.h
 %{_libdir}/*.so
 %{_infodir}/*.gz
