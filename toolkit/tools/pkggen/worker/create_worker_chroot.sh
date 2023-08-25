@@ -75,10 +75,6 @@ mknod -m 600 $chroot_builder_folder/dev/console c 5 1
 mknod -m 666 $chroot_builder_folder/dev/null c 1 3
 mknod -m 444 $chroot_builder_folder/dev/urandom c 1 9
 
-# Start with filesystem, then macros, then everything else
-install_one_toolchain_rpm "$(cat "$packages" | grep "^filesystem-.*rpm$")"
-install_one_toolchain_rpm "$(cat "$packages" | grep "^mariner-rpm-macros-.*rpm$")"
-
 while read -r package || [ -n "$package" ]; do
     install_one_toolchain_rpm "$package"
 done < "$packages"
