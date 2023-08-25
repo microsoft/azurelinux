@@ -1,8 +1,8 @@
 {
-  "Signatures": {
-    "docker.service": "b150b3ce0947a65c655ed09dfe4e48b7464c60542f9f9902330288bbf87af38e",
-    "docker.socket": "51a06786cae46bc63b7314c25d0bd5bb2e676120d80874b99e35bf60d0b0ffa8",
-    "moby-engine-20.10.24.tar.gz": "5c586d9f352bbe3a16bce27dd4856baa0ef02de58433bb3e1af9976c04c7eaae",
-    "moby-libnetwork-20.10.24.tar.gz": "669cf428b381dfd8e774890c908773d4f843f695cdc6f07c2711c9bec369ad4f"
-  }
+ "Signatures": {
+  "docker.service": "b150b3ce0947a65c655ed09dfe4e48b7464c60542f9f9902330288bbf87af38e",
+  "docker.socket": "51a06786cae46bc63b7314c25d0bd5bb2e676120d80874b99e35bf60d0b0ffa8",
+  "moby-engine-20.10.25.tar.gz": "dbd19da08d716cf17866d77ad5022d8b1288cf6ba498fdf67895b1abf1719916",
+  "moby-libnetwork-20.10.25.tar.gz": "3d76ad1fd3a29b34c86501ceb3e43f2e74dc4cd16a61a9a1eff2df0a7adfc0ec"
+ }
 }

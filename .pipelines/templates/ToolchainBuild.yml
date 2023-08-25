@@ -34,7 +34,7 @@ steps:
   - bash: |
       published_artifacts_dir="${{ parameters.outputArtifactsFolder }}/ARTIFACTS"
       mkdir -p "$published_artifacts_dir"
-      cp "${{ parameters.buildRepoRoot }}"/build/toolchain/toolchain_built_{,s}rpms_all.tar.gz "$published_artifacts_dir"
+      cp "${{ parameters.buildRepoRoot }}"/build/toolchain/toolchain_built_{,s}rpms_*.tar.gz "$published_artifacts_dir"
     displayName: "Copy artifacts for publishing"
 
   - bash: |

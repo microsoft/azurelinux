@@ -21,6 +21,9 @@ PACKAGE_BUILD_LIST      ?=
 PACKAGE_REBUILD_LIST    ?=
 PACKAGE_IGNORE_LIST     ?=
 SRPM_PACK_LIST          ?=
+TEST_RUN_LIST           ?=
+TEST_RERUN_LIST         ?=
+TEST_IGNORE_LIST        ?=
 
 ######## SET INCREMENTAL BUILD FLAGS ########
 
@@ -59,6 +62,7 @@ REBUILD_DEP_CHAINS              ?= y
 HYDRATED_BUILD                  ?= n
 TARGET_ARCH                     ?=
 ALLOW_TOOLCHAIN_REBUILDS        ?= n
+CACHED_PACKAGES_ARCHIVE         ?=
 
 # Tracing & Profiling support: https://go.dev/doc/diagnostics
 ENABLE_CPU_PROFILE              ?= n
@@ -177,9 +181,21 @@ include $(SCRIPTS_DIR)/tools.mk
 #   input-srpms, clean-input-srpms
 include $(SCRIPTS_DIR)/srpm_pack.mk
 
+# Create local build env for building RPMs with:
+#   containerized-rpmbuild containerized-rpmbuild-help
+include $(SCRIPTS_DIR)/containerized-build.mk
+
 # Expand local SRPMS into sources and SPECS with:
 #   expand-specs clean-expand-specs
 include $(SCRIPTS_DIR)/srpm_expand.mk
+
+# Create self contained toolkit archive contianing all the required tools with:
+#   package-toolkit, clean-package-toolkit
+include $(SCRIPTS_DIR)/toolkit.mk
+
+# Fill the cache with rpms from the package server without using package manager or chroot with:
+#   pre-cache
+include $(SCRIPTS_DIR)/precache.mk
 
 # Create a package build workplan with:
 #   workplan, clean-workplan clean-cache
@@ -192,10 +208,6 @@ include $(SCRIPTS_DIR)/pkggen.mk
 # Create images with:
 #   image, iso, clean-imggen
 include $(SCRIPTS_DIR)/imggen.mk
-
-# Create self contained toolkit archive contianing all the required tools with:
-#   package-toolkit, clean-package-toolkit
-include $(SCRIPTS_DIR)/toolkit.mk
 
 # Each component provides specific clean implementations which clean depends on.
 # They are guaranteed to run first and will verify there are no existing mount points

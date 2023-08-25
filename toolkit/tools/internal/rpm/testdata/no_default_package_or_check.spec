@@ -1,5 +1,5 @@
 Summary:        Test spec file with with no default package
-Name:           no_default_package
+Name:           no_default_package_or_check
 Version:        1.0.0
 Release:        1%{?dist}
 License:        MIT
@@ -9,7 +9,10 @@ Vendor:         Microsoft
 Distribution:   Mariner
 
 %description
-Test spec. Make sure the default package is not built and 'Epoch' is not set!
+Test spec. Make sure:
+- The default package is not built.
+- The 'Epoch' tag is not set.
+- The '%check' section is not present.
 
 %package -n subpackage_name
 Summary:        Actually built subpackage

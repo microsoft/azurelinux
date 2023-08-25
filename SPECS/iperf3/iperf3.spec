@@ -1,13 +1,13 @@
 Summary:        A network performance benchmark tool.
 Name:           iperf3
-Version:        3.11
+Version:        3.14
 Release:        1%{?dist}
 License:        BSD and MIT and Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://github.com/esnet/iperf
-Source0:        https://github.com/esnet/iperf/archive/%{version}.tar.gz#/iperf-%{version}.tar.gz
+Source0:        https://github.com/esnet/iperf/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch1:         disablepg.patch
 BuildRequires:  autoconf >= 2.71
 BuildRequires:  automake
@@ -66,6 +66,9 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/libiperf.3.gz
 
 %changelog
+* Tue Aug 01 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.14-1
+- Updating to 3.14 to fix CVE-2023-38403.
+
 * Tue Mar 15 2022 Rachel Menge <rachelmenge@microsoft.com> - 3.11-1
 - Update to 3.11
 
