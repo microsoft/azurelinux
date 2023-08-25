@@ -175,7 +175,7 @@ func filterExternalPackagesOnly(packageVersionsInConfig []*pkgjson.PackageVer, i
 		//    which means it will not be in the graph.
 		// 2) pkgNode will be of 'StateUnresolved'. This will be the case if a local package has it listed as
 		//    a Requires or BuildRequires.
-		if pkgNode == nil || pkgNode.RunNode.State == pkggraph.StateUnresolved {
+		if pkgNode == nil || (pkgNode.RunNode != nil && pkgNode.RunNode.State == pkggraph.StateUnresolved) {
 			filteredPackages = append(filteredPackages, pkgVer)
 		}
 	}

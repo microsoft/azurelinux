@@ -22,120 +22,51 @@ func PrintBuildResult(res *BuildResult) {
 		return
 	}
 
-	if res.Node.Type == pkggraph.TypeLocalBuild {
-		if res.Skipped {
-			logger.Log.Warnf("Skipped build for '%s' per user request. RPMs expected to be present: %v", baseSRPMName, res.BuiltFiles)
+	switch res.Node.Type {
+	case pkggraph.TypeLocalBuild:
+		if res.Ignored {
+			logger.Log.Warnf("Ignored build for '%s' per user request. RPMs expected to be present: %v", baseSRPMName, res.BuiltFiles)
 		} else if res.UsedCache {
 			logger.Log.Infof("Prebuilt: %s -> %v", baseSRPMName, res.BuiltFiles)
 		} else {
 			logger.Log.Infof("Built: %s -> %v", baseSRPMName, res.BuiltFiles)
 		}
-	} else {
+	case pkggraph.TypeTest:
+		if res.Ignored {
+			logger.Log.Warnf("Ignored test for '%s' per user request.", baseSRPMName)
+		} else if res.UsedCache {
+			logger.Log.Infof("Skipped test: %s", baseSRPMName)
+		} else {
+			logger.Log.Infof("Tested: %s", baseSRPMName)
+		}
+	default:
 		logger.Log.Debugf("Processed node %s", res.Node.FriendlyName())
 	}
 }
 
 // RecordBuildSummary stores the summary in to a csv.
 func RecordBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, buildState *GraphBuildState, outputPath string) {
-
 	graphMutex.RLock()
 	defer graphMutex.RUnlock()
 
-	failedSRPMs := make(map[string]*pkggraph.PkgNode)
-	failures := buildState.BuildFailures()
-	for _, failure := range failures {
-		failedSRPMs[failure.Node.SrpmPath] = failure.Node
-	}
+	failedSRPMs, prebuiltSRPMs, prebuiltDeltaSRPMs, builtSRPMs, blockedSRPMs := getSRPMsState(pkgGraph, buildState)
+	failedBuildNodes := buildResultsSetToNodesSet(failedSRPMs)
 
-	prebuiltSRPMs := make(map[string]*pkggraph.PkgNode)
-	prebuiltDeltaSRPMS := make(map[string]*pkggraph.PkgNode)
-	builtSRPMs := make(map[string]*pkggraph.PkgNode)
-	unbuiltSRPMs := make(map[string]*pkggraph.PkgNode)
-	unresolvedDependencies := make(map[string]bool)
+	failedSRPMsTests, _, testedSRPMs, blockedSRPMsTests := getSRPMsTestsState(pkgGraph, buildState)
+	failedTestNodes := buildResultsSetToNodesSet(failedSRPMsTests)
 
-	buildNodes := pkgGraph.AllBuildNodes()
-	for _, node := range buildNodes {
+	csvBlob := [][]string{{"Package", "State", "Blocker", "IsTest"}}
 
-		//  node can be a delta if it was build or cached. If it was cached we used the cached rpm. If it is not cached
-		// that means it was built and we discard the delta rpm.
-		if buildState.IsNodeCached(node) {
-			if buildState.IsNodeDelta(node) {
-				prebuiltDeltaSRPMS[node.SrpmPath] = node
-			} else {
-				prebuiltSRPMs[node.SrpmPath] = node
-			}
-			continue
-		} else if buildState.IsNodeAvailable(node) {
-			builtSRPMs[node.SrpmPath] = node
-			continue
-		}
+	csvBlob = append(csvBlob, successfulPackagesCSVRows(builtSRPMs, "Built", false)...)
+	csvBlob = append(csvBlob, successfulPackagesCSVRows(prebuiltSRPMs, "PreBuilt", false)...)
+	csvBlob = append(csvBlob, successfulPackagesCSVRows(prebuiltDeltaSRPMs, "PreBuiltDelta", false)...)
+	// Failed nodes shouldn't have any blockers
+	csvBlob = append(csvBlob, unbuiltPackagesCSVRows(pkgGraph, failedBuildNodes, failedBuildNodes, blockedSRPMs, false)...)
+	csvBlob = append(csvBlob, unbuiltPackagesCSVRows(pkgGraph, blockedSRPMs, failedBuildNodes, blockedSRPMs, false)...)
 
-		_, found := failedSRPMs[node.SrpmPath]
-		if !found {
-			unbuiltSRPMs[node.SrpmPath] = node
-		}
-	}
-
-	for _, node := range pkgGraph.AllRunNodes() {
-		if node.State == pkggraph.StateUnresolved {
-			unresolvedDependencies[node.VersionedPkg.String()] = true
-		}
-	}
-
-	csvBlob := [][]string{{"Package", "State", "Blocker"}}
-
-	for srpm := range builtSRPMs {
-		csvBlob = append(csvBlob, []string{filepath.Base(builtSRPMs[srpm].SrpmPath), "Built"})
-	}
-
-	for srpm := range prebuiltSRPMs {
-		csvBlob = append(csvBlob, []string{filepath.Base(prebuiltSRPMs[srpm].SrpmPath), "PreBuilt"})
-	}
-
-	for srpm := range prebuiltDeltaSRPMS {
-		csvBlob = append(csvBlob, []string{filepath.Base(prebuiltDeltaSRPMS[srpm].SrpmPath), "PreBuiltDelta"})
-	}
-
-	for srpm := range failedSRPMs {
-		node := failedSRPMs[srpm]
-		csvRow := []string{filepath.Base(node.SrpmPath), "Failed"}
-
-		// Failed nodes shouldn't have any blockers
-		blocking_nodes_str := ""
-		fromNodes := pkgGraph.From(node.ID())
-		for fromNodes.Next() {
-			fromNode := fromNodes.Node().(*pkggraph.PkgNode)
-			if _, found := failedSRPMs[fromNode.SrpmPath]; found {
-				blocking_nodes_str += filepath.Base(fromNode.SrpmPath) + "-FAIL "
-			}
-			if _, found := unbuiltSRPMs[fromNode.SrpmPath]; found {
-				blocking_nodes_str += filepath.Base(fromNode.SrpmPath) + "-UNBUILT "
-			}
-		}
-
-		csvRow = append(csvRow, blocking_nodes_str)
-		csvBlob = append(csvBlob, csvRow)
-	}
-
-	for srpm := range unbuiltSRPMs {
-		node := unbuiltSRPMs[srpm]
-		csvRow := []string{filepath.Base(node.SrpmPath), "Unbuilt"}
-
-		blocking_nodes_str := ""
-		fromNodes := pkgGraph.From(node.ID())
-		for fromNodes.Next() {
-			fromNode := fromNodes.Node().(*pkggraph.PkgNode)
-			if _, found := failedSRPMs[fromNode.SrpmPath]; found {
-				blocking_nodes_str += filepath.Base(fromNode.SrpmPath) + "-FAIL "
-			}
-			if _, found := unbuiltSRPMs[fromNode.SrpmPath]; found {
-				blocking_nodes_str += filepath.Base(fromNode.SrpmPath) + "-UNBUILT "
-			}
-		}
-
-		csvRow = append(csvRow, blocking_nodes_str)
-		csvBlob = append(csvBlob, csvRow)
-	}
+	csvBlob = append(csvBlob, successfulPackagesCSVRows(testedSRPMs, "Built", true)...)
+	csvBlob = append(csvBlob, unbuiltPackagesCSVRows(pkgGraph, failedTestNodes, failedTestNodes, blockedSRPMsTests, true)...)
+	csvBlob = append(csvBlob, unbuiltPackagesCSVRows(pkgGraph, blockedSRPMsTests, failedTestNodes, blockedSRPMsTests, true)...)
 
 	csvFile, err := os.Create(outputPath)
 	if err != nil {
@@ -156,16 +87,9 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	graphMutex.RLock()
 	defer graphMutex.RUnlock()
 
-	failedSRPMs := make(map[string]bool)
-	failures := buildState.BuildFailures()
-	for _, failure := range failures {
-		failedSRPMs[failure.Node.SrpmPath] = true
-	}
+	failedSRPMs, prebuiltSRPMs, prebuiltDeltaSRPMs, builtSRPMs, blockedSRPMs := getSRPMsState(pkgGraph, buildState)
+	failedSRPMsTests, skippedSRPMsTests, testedSRPMs, blockedSRPMsTests := getSRPMsTestsState(pkgGraph, buildState)
 
-	prebuiltSRPMs := make(map[string]bool)
-	prebuiltDeltaSRPMS := make(map[string]bool)
-	builtSRPMs := make(map[string]bool)
-	unbuiltSRPMs := make(map[string]bool)
 	unresolvedDependencies := make(map[string]bool)
 	rpmConflicts := buildState.ConflictingRPMs()
 	srpmConflicts := buildState.ConflictingSRPMs()
@@ -173,26 +97,6 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	conflictsLogger := logger.Log.Errorf
 	if allowToolchainRebuilds || (len(rpmConflicts) == 0 && len(srpmConflicts) == 0) {
 		conflictsLogger = logger.Log.Infof
-	}
-
-	buildNodes := pkgGraph.AllBuildNodes()
-	for _, node := range buildNodes {
-		if buildState.IsNodeCached(node) {
-			if buildState.IsNodeDelta(node) {
-				prebuiltDeltaSRPMS[node.SrpmPath] = true
-			} else {
-				prebuiltSRPMs[node.SrpmPath] = true
-			}
-			continue
-		} else if buildState.IsNodeAvailable(node) {
-			builtSRPMs[node.SrpmPath] = true
-			continue
-		}
-
-		_, found := failedSRPMs[node.SrpmPath]
-		if !found {
-			unbuiltSRPMs[node.SrpmPath] = true
-		}
 	}
 
 	for _, node := range pkgGraph.AllRunNodes() {
@@ -206,10 +110,14 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	logger.Log.Info("---------------------------")
 
 	logger.Log.Infof("Number of built SRPMs:             %d", len(builtSRPMs))
+	logger.Log.Infof("Number of tested SRPMs:            %d", len(testedSRPMs))
 	logger.Log.Infof("Number of prebuilt SRPMs:          %d", len(prebuiltSRPMs))
-	logger.Log.Infof("Number of prebuilt delta SRPMs:    %d", len(prebuiltDeltaSRPMS))
-	logger.Log.Infof("Number of failed SRPMs:            %d", len(failures))
-	logger.Log.Infof("Number of blocked SRPMs:           %d", len(unbuiltSRPMs))
+	logger.Log.Infof("Number of prebuilt delta SRPMs:    %d", len(prebuiltDeltaSRPMs))
+	logger.Log.Infof("Number of skipped SRPMs tests:     %d", len(skippedSRPMsTests))
+	logger.Log.Infof("Number of failed SRPMs:            %d", len(failedSRPMs))
+	logger.Log.Infof("Number of failed SRPMs tests:      %d", len(failedSRPMsTests))
+	logger.Log.Infof("Number of blocked SRPMs:           %d", len(blockedSRPMs))
+	logger.Log.Infof("Number of blocked SRPMs tests:     %d", len(blockedSRPMsTests))
 	logger.Log.Infof("Number of unresolved dependencies: %d", len(unresolvedDependencies))
 
 	if allowToolchainRebuilds && (len(rpmConflicts) > 0 || len(srpmConflicts) > 0) {
@@ -228,6 +136,13 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 		}
 	}
 
+	if len(testedSRPMs) != 0 {
+		logger.Log.Info("Tested SRPMs:")
+		for srpm := range testedSRPMs {
+			logger.Log.Infof("--> %s", filepath.Base(srpm))
+		}
+	}
+
 	if len(prebuiltSRPMs) != 0 {
 		logger.Log.Info("Prebuilt SRPMs:")
 		for srpm := range prebuiltSRPMs {
@@ -235,23 +150,44 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 		}
 	}
 
-	if len(prebuiltDeltaSRPMS) != 0 {
+	if len(prebuiltDeltaSRPMs) != 0 {
 		logger.Log.Info("Skipped SRPMs (i.e., delta mode is on, packages are already available in a repo):")
-		for srpm := range prebuiltDeltaSRPMS {
+		for srpm := range prebuiltDeltaSRPMs {
 			logger.Log.Infof("--> %s", filepath.Base(srpm))
 		}
 	}
 
-	if len(failures) != 0 {
+	if len(skippedSRPMsTests) != 0 {
+		logger.Log.Info("Skipped SRPMs tests:")
+		for srpm := range skippedSRPMsTests {
+			logger.Log.Infof("--> %s", filepath.Base(srpm))
+		}
+	}
+
+	if len(failedSRPMs) != 0 {
 		logger.Log.Info("Failed SRPMs:")
-		for _, failure := range failures {
+		for _, failure := range failedSRPMs {
 			logger.Log.Infof("--> %s , error: %s, for details see: %s", failure.Node.SRPMFileName(), failure.Err, failure.LogFile)
 		}
 	}
 
-	if len(unbuiltSRPMs) != 0 {
+	if len(failedSRPMsTests) != 0 {
+		logger.Log.Info("Failed SRPMs tests:")
+		for _, failure := range failedSRPMsTests {
+			logger.Log.Infof("--> %s , error: %s, for details see: %s", failure.Node.SRPMFileName(), failure.Err, failure.LogFile)
+		}
+	}
+
+	if len(blockedSRPMs) != 0 {
 		logger.Log.Info("Blocked SRPMs:")
-		for srpm := range unbuiltSRPMs {
+		for srpm := range blockedSRPMs {
+			logger.Log.Infof("--> %s", filepath.Base(srpm))
+		}
+	}
+
+	if len(blockedSRPMsTests) != 0 {
+		logger.Log.Info("Blocked SRPMs tests:")
+		for srpm := range blockedSRPMsTests {
 			logger.Log.Infof("--> %s", filepath.Base(srpm))
 		}
 	}
@@ -276,4 +212,125 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 			conflictsLogger("--> %s", conflict)
 		}
 	}
+}
+
+func buildResultsSetToNodesSet(statesSet map[string]*BuildResult) (result map[string]*pkggraph.PkgNode) {
+	result = make(map[string]*pkggraph.PkgNode, len(statesSet))
+	for srpm, state := range statesSet {
+		result[srpm] = state.Node
+	}
+
+	return
+}
+
+func getSRPMsState(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState) (failedSRPMs map[string]*BuildResult, prebuiltSRPMs, prebuiltDeltaSRPMs, builtSRPMs map[string]bool, blockedSRPMs map[string]*pkggraph.PkgNode) {
+	failedSRPMs = make(map[string]*BuildResult)
+	prebuiltSRPMs = make(map[string]bool)
+	prebuiltDeltaSRPMs = make(map[string]bool)
+	builtSRPMs = make(map[string]bool)
+	blockedSRPMs = make(map[string]*pkggraph.PkgNode)
+
+	for _, failure := range buildState.BuildFailures() {
+		if failure.Node.Type == pkggraph.TypeLocalBuild {
+			failedSRPMs[failure.Node.SrpmPath] = failure
+		}
+	}
+
+	for _, node := range pkgGraph.AllBuildNodes() {
+		// A node can be a delta if it was build or cached. If it was cached we used the cached rpm. If it is not cached
+		// that means it was built and we discard the delta rpm.
+		if buildState.IsNodeCached(node) {
+			if buildState.IsNodeDelta(node) {
+				prebuiltDeltaSRPMs[node.SrpmPath] = true
+			} else {
+				prebuiltSRPMs[node.SrpmPath] = true
+			}
+			continue
+		} else if buildState.IsNodeAvailable(node) {
+			builtSRPMs[node.SrpmPath] = true
+			continue
+		}
+
+		_, found := failedSRPMs[node.SrpmPath]
+		if !found {
+			blockedSRPMs[node.SrpmPath] = node
+		}
+	}
+
+	return
+}
+
+func getSRPMsTestsState(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState) (failedSRPMsTests map[string]*BuildResult, skippedSRPMsTests, testedSRPMs map[string]bool, blockedSRPMsTests map[string]*pkggraph.PkgNode) {
+	failedSRPMsTests = make(map[string]*BuildResult)
+	skippedSRPMsTests = make(map[string]bool)
+	testedSRPMs = make(map[string]bool)
+	blockedSRPMsTests = make(map[string]*pkggraph.PkgNode)
+
+	for _, failure := range buildState.BuildFailures() {
+		if failure.Node.Type == pkggraph.TypeTest {
+			failedSRPMsTests[failure.Node.SrpmPath] = failure
+		}
+	}
+
+	for _, node := range pkgGraph.AllTestNodes() {
+		if buildState.IsNodeCached(node) {
+			skippedSRPMsTests[node.SrpmPath] = true
+			continue
+		} else if buildState.IsNodeAvailable(node) {
+			testedSRPMs[node.SrpmPath] = true
+			continue
+		}
+
+		_, found := failedSRPMsTests[node.SrpmPath]
+		if !found {
+			blockedSRPMsTests[node.SrpmPath] = node
+		}
+	}
+
+	return
+}
+
+func successfulPackagesCSVRows(unblockedPackages map[string]bool, state string, isTest bool) (csvRows [][]string) {
+	const emptyBlockers = ""
+
+	isTestCell := testCellValue(isTest)
+
+	csvRows = [][]string{}
+	for srpm := range unblockedPackages {
+		csvRows = append(csvRows, []string{filepath.Base(srpm), state, emptyBlockers, isTestCell})
+	}
+
+	return
+}
+
+func testCellValue(isTest bool) string {
+	if isTest {
+		return "1"
+	}
+
+	return "0"
+}
+
+func unbuiltPackagesCSVRows(pkgGraph *pkggraph.PkgGraph, unbuiltPackages, failedPackages, blockedPackages map[string]*pkggraph.PkgNode, isTest bool) (csvRows [][]string) {
+	isTestCell := testCellValue(isTest)
+
+	csvRows = [][]string{}
+	for srpm, node := range unbuiltPackages {
+		blockingNodesCell := ""
+		fromNodes := pkgGraph.From(node.ID())
+		for fromNodes.Next() {
+			fromNode := fromNodes.Node().(*pkggraph.PkgNode)
+			if _, found := failedPackages[fromNode.SrpmPath]; found {
+				blockingNodesCell += filepath.Base(fromNode.SrpmPath) + "-FAIL "
+			}
+			if _, found := blockedPackages[fromNode.SrpmPath]; found {
+				blockingNodesCell += filepath.Base(fromNode.SrpmPath) + "-UNBUILT "
+			}
+		}
+
+		csvRow := []string{filepath.Base(srpm), "Failed", blockingNodesCell, isTestCell}
+		csvRows = append(csvRows, csvRow)
+	}
+
+	return
 }

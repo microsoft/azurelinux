@@ -24,10 +24,7 @@ const (
 //   - If canUseCachedImplicit is true, it will use cached nodes to resolve implicit dependencies instead of waiting for
 //     them to be built in the graph (This can allow the graph to be optimized immediately instead of waiting for the
 //     implicit nodes to be resolved by an unknown package later in the build).
-func InitializeGraphFromFile(inputFile string, packagesToBuild []*pkgjson.PackageVer, canUseCachedImplicit bool) (isOptimized bool, pkgGraph *pkggraph.PkgGraph, goalNode *pkggraph.PkgNode, err error) {
-	const (
-		strictGoalNode = true
-	)
+func InitializeGraphFromFile(inputFile string, packagesToBuild, testsToRun []*pkgjson.PackageVer, canUseCachedImplicit bool) (isOptimized bool, pkgGraph *pkggraph.PkgGraph, goalNode *pkggraph.PkgNode, err error) {
 	timestamp.StartEvent("graph initialization", nil)
 	defer timestamp.StopEvent(nil)
 
@@ -36,7 +33,7 @@ func InitializeGraphFromFile(inputFile string, packagesToBuild []*pkgjson.Packag
 		return
 	}
 
-	return PrepareGraphForBuild(pkgGraph, packagesToBuild, canUseCachedImplicit)
+	return PrepareGraphForBuild(pkgGraph, packagesToBuild, testsToRun, canUseCachedImplicit)
 }
 
 // PrepareGraphForBuild takes a graph and prepares it for package building.
@@ -44,12 +41,12 @@ func InitializeGraphFromFile(inputFile string, packagesToBuild []*pkgjson.Packag
 //   - If canUseCachedImplicit is true, it will use cached nodes to resolve implicit dependencies instead of waiting for
 //     them to be built in the graph (This can allow the graph to be optimized immediately instead of waiting for the
 //     implicit nodes to be resolved by an unknown package later in the build).
-func PrepareGraphForBuild(pkgGraph *pkggraph.PkgGraph, packagesToBuild []*pkgjson.PackageVer, canUseCachedImplicit bool) (isOptimized bool, preparedGraph *pkggraph.PkgGraph, goalNode *pkggraph.PkgNode, err error) {
+func PrepareGraphForBuild(pkgGraph *pkggraph.PkgGraph, packagesToBuild, testsToRun []*pkgjson.PackageVer, canUseCachedImplicit bool) (isOptimized bool, preparedGraph *pkggraph.PkgGraph, goalNode *pkggraph.PkgNode, err error) {
 	const (
 		strictGoalNode = true
 	)
 
-	_, err = pkgGraph.AddGoalNode(buildGoalNodeName, packagesToBuild, strictGoalNode)
+	_, err = pkgGraph.AddGoalNode(buildGoalNodeName, packagesToBuild, testsToRun, strictGoalNode)
 	if err != nil {
 		return
 	}
@@ -89,7 +86,7 @@ func OptimizeGraph(pkgGraph *pkggraph.PkgGraph, canUseCachedImplicit bool) (opti
 		}
 
 		// Create a solvable ALL goal node
-		goalNode, err = optimizedGraph.AddGoalNode(allGoalNodeName, nil, true)
+		goalNode, err = optimizedGraph.AddGoalNode(allGoalNodeName, nil, nil, true)
 		if err != nil {
 			logger.Log.Warnf("Failed to add goal node (%s), error: %s", allGoalNodeName, err)
 			return
