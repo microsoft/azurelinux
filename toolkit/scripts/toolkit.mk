@@ -119,6 +119,7 @@ $(valid_arch_spec_names): $(go-specarchchecker) $(chroot_worker) $(local_specs) 
 		--packages="$(PACKAGE_BUILD_LIST)" \
 		--rebuild-packages="$(PACKAGE_REBUILD_LIST)" \
 		--build-dir="$(valid_arch_spec_names_build_dir)" \
+		$(if $(filter y,$(RUN_CHECK)),--test-only) \
 		--dist-tag=$(DIST_TAG) \
 		--worker-tar="$(chroot_worker)" \
 		--log-level=$(LOG_LEVEL) \

@@ -1,7 +1,6 @@
 [Unit]
 Description=IP sets for iptables
 Before=iptables.service
-Before=ip6tables.service
 
 [Service]
 Type=oneshot

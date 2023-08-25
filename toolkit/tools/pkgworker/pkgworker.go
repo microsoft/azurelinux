@@ -27,7 +27,6 @@ import (
 )
 
 const (
-	chrootRpmBuildRoot      = "/usr/src/mariner"
 	chrootLocalRpmsDir      = "/localrpms"
 	chrootLocalToolchainDir = "/toolchainrpms"
 	chrootLocalRpmsCacheDir = "/upstream-cached-rpms"
@@ -61,12 +60,7 @@ var (
 )
 
 var (
-	brPackageNameRegex        = regexp.MustCompile(`^[^\s]+`)
-	equalToRegex              = regexp.MustCompile(` '?='? `)
-	greaterThanOrEqualRegex   = regexp.MustCompile(` '?>='? [^ ]*`)
-	installedPackageNameRegex = regexp.MustCompile(`^(.+)(-[^-]+-[^-]+)`)
-	lessThanOrEqualToRegex    = regexp.MustCompile(` '?<='? `)
-	packageUnavailableRegex   = regexp.MustCompile(`^No package \\x1b\[1m\\x1b\[30m(.+) \\x1b\[0mavailable`)
+	packageUnavailableRegex = regexp.MustCompile(`^No package \\x1b\[1m\\x1b\[30m(.+) \\x1b\[0mavailable`)
 )
 
 func main() {
@@ -83,8 +77,7 @@ func main() {
 	srpmsDirAbsPath, err := filepath.Abs(*srpmsDirPath)
 	logger.PanicOnError(err, "Unable to find absolute path for SRPMs directory '%s'", *srpmsDirPath)
 
-	srpmName := strings.TrimSuffix(filepath.Base(*srpmFile), ".src.rpm")
-	chrootDir := filepath.Join(*workDir, srpmName)
+	chrootDir := buildChrootDirPath(*workDir, *srpmFile, *runCheck)
 
 	defines := rpm.DefaultDefinesWithDist(*runCheck, *distTag)
 	defines[rpm.DistroReleaseVersionDefine] = *distroReleaseVersion
@@ -105,12 +98,12 @@ func main() {
 
 	// On success write a comma-seperated list of RPMs built to stdout that can be parsed by the invoker.
 	// Any output from logger will be on stderr so stdout will only contain this output.
-	fmt.Printf(strings.Join(builtRPMs, ","))
+	if !*runCheck {
+		fmt.Print(strings.Join(builtRPMs, ","))
+	}
 }
 
 func copySRPMToOutput(srpmFilePath, srpmOutputDirPath string) (err error) {
-	const srpmsDirName = "SRPMS"
-
 	srpmFileName := filepath.Base(srpmFilePath)
 	srpmOutputFilePath := filepath.Join(srpmOutputDirPath, srpmFileName)
 
@@ -119,17 +112,24 @@ func copySRPMToOutput(srpmFilePath, srpmOutputDirPath string) (err error) {
 	return
 }
 
+func buildChrootDirPath(workDir, srpmFilePath string, runCheck bool) (chrootDirPath string) {
+	buildDirName := strings.TrimSuffix(filepath.Base(*srpmFile), ".src.rpm")
+	if runCheck {
+		buildDirName += "_TEST_BUILD"
+	}
+
+	return filepath.Join(workDir, buildDirName)
+}
+
 func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmFile, repoFile, rpmmacrosFile, outArch string, defines map[string]string, noCleanup, runCheck bool, packagesToInstall []string, useCcache bool) (builtRPMs []string, err error) {
 	const (
 		buildHeartbeatTimeout = 30 * time.Minute
 
 		existingChrootDir = false
-		squashErrors      = false
 
 		overlaySource           = ""
 		overlayWorkDirRpms      = "/overlaywork_rpms"
 		overlayWorkDirToolchain = "/overlaywork_toolchain"
-		rpmDirName              = "RPMS"
 	)
 
 	srpmBaseName := filepath.Base(srpmFile)
@@ -184,8 +184,9 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 		return
 	}
 
-	rpmBuildOutputDir := filepath.Join(chroot.RootDir(), chrootRpmBuildRoot, rpmDirName)
-	builtRPMs, err = moveBuiltRPMs(rpmBuildOutputDir, rpmDirPath)
+	if !runCheck {
+		builtRPMs, err = moveBuiltRPMs(chroot.RootDir(), rpmDirPath)
+	}
 
 	return
 }
@@ -229,16 +230,21 @@ func buildRPMFromSRPMInChroot(srpmFile, outArch string, runCheck bool, defines m
 
 	// Build the SRPM
 	if runCheck {
-		err = rpm.BuildRPMFromSRPM(srpmFile, outArch, defines)
+		err = rpm.TestRPMFromSRPM(srpmFile, outArch, defines)
 	} else {
-		err = rpm.BuildRPMFromSRPM(srpmFile, outArch, defines, "--nocheck")
+		err = rpm.BuildRPMFromSRPM(srpmFile, outArch, defines)
 	}
 
 	return
 }
 
-func moveBuiltRPMs(rpmOutDir, dstDir string) (builtRPMs []string, err error) {
-	const rpmExtension = ".rpm"
+func moveBuiltRPMs(chrootRootDir, dstDir string) (builtRPMs []string, err error) {
+	const (
+		chrootRpmBuildDir = "/usr/src/mariner/RPMS"
+		rpmExtension      = ".rpm"
+	)
+
+	rpmOutDir := filepath.Join(chrootRootDir, chrootRpmBuildDir)
 	err = filepath.Walk(rpmOutDir, func(path string, info os.FileInfo, fileErr error) (err error) {
 		if fileErr != nil {
 			return fileErr
