@@ -23,38 +23,36 @@ print_error() {
 help() {
 echo "
 Usage:
-sudo make containerized-rpmbuild [REPO_PATH=/path/to/CBL-Mariner] [MODE=test|build] [VERSION=1.0|2.0] [MOUNTS=/path/in/host:/path/in/container] [ENABLE_REPO=y]
+sudo make containerized-rpmbuild [REPO_PATH=/path/to/CBL-Mariner] [MODE=test|build] [VERSION=1.0|2.0] [MOUNTS=/path/in/host:/path/in/container] [BUILD_MOUNT=/path/to/build/chroot/mount] [ENABLE_REPO=y]
 
 Starts a docker container with the specified version of mariner.
 
 Optional arguments:
-    REPO_PATH:      path to the CBL-Mariner repo root directory. default: "current directory"
-    MODE            build or test. default:"build"
-                        In 'test' mode it will use a pre-built mariner chroot image.
-                        In 'build' mode it will use the latest published container.
-    VERISION        1.0 or 2.0. default: "2.0"
-    MOUNTS          mount a host directory into the container. Should be of the form '/host/dir:/container/dir'. For multiple mounts, please use ',' as delimiter
-                        e.g. MOUNTS=/host/dir1:/container/dir1,/host/dir2:/container/dir2
-    ENABLE_REPO:    Set to 'y' to use local RPMs to satisfy package dependencies. default: "n"
+    REPO_PATH:      path to the CBL-Mariner repo root directory. default: current directory
+    MODE            build or test. default: build
+                        In 'build' mode it will use a pre-built Mariner chroot image.
+                        In 'test' mode it will use the latest Mariner published container.
+    VERISION        1.0 or 2.0. default: 2.0
+    MOUNTS          mount a host directory into the container. Should be of the form '/host/dir:/container/dir'. For multiple mounts, please use \" \" as delimiter
+                        e.g. MOUNTS=\"/host/dir1:/container/dir1 /host/dir2:/container/dir2\"
+    BUILD_MOUNT     path to mountpoint for container's BUILD and BUILDROOT directories. default \$REPO_PATH/build
+    ENABLE_REPO:    Set to 'y' to use local RPMs to satisfy package dependencies. default: n
 
 To see help, run 'sudo make containerized-rpmbuild-help'
 "
 }
 
-build_chroot() {
+build_worker_chroot() {
     pushd "${repo_path}/toolkit"
     echo "Building worker chroot..."
-    make graph-cache REBUILD_TOOLS=y > /dev/null
+    make chroot-tools REBUILD_TOOLS=y > /dev/null
     popd
 }
 
 build_tools() {
     pushd "${repo_path}/toolkit"
     echo "Building required tools..."
-    make go-srpmpacker REBUILD_TOOLS=y > /dev/null
-    make go-depsearch REBUILD_TOOLS=y > /dev/null
-    make go-grapher REBUILD_TOOLS=y > /dev/null
-    make go-specreader REBUILD_TOOLS=y > /dev/null
+    make go-srpmpacker go-depsearch go-grapher go-specreader REBUILD_TOOLS=y > /dev/null
     popd
 }
 
@@ -83,6 +81,7 @@ while (( "$#")); do
     -v ) version="$2"; shift 2 ;;
     -p ) repo_path="$(realpath $2)"; shift 2 ;;
     -mo ) extra_mounts="$2"; shift 2 ;;
+    -bm ) build_mount_dir="$(realpath $2)"; shift 2;;
     -r ) enable_local_repo=true; shift ;;
     -h ) help; exit 1 ;;
     ? ) echo -e "ERROR: INVALID OPTION.\n\n"; help; exit 1 ;;
@@ -94,6 +93,8 @@ done
 [[ ! -d "${repo_path}" ]] && { print_error " Directory ${repo_path} does not exist"; exit 1; }
 [[ -z "${mode}" ]] && mode="build"
 [[ -z "${version}" ]] && version="2.0"
+[[ -z "${build_mount_dir}" ]] && build_mount_dir="${repo_path}/build"
+[[ ! -d "${build_mount_dir}" ]] && { print_error " Directory ${build_mount_dir} does not exist"; exit 1; }
 
 cd "${script_dir}"  || { echo "ERROR: Could not change directory to ${script_dir}"; exit 1; }
 
@@ -114,7 +115,7 @@ else
 fi
 
 # ============ Populate SRPMS ============
-# Populate ${repo_path}/build/INTERMEDIATE_SRPMS with SRPMs, that can be used to build RPMs in the container
+# Populate ${repo_path}/build/INTERMEDIATE_SRPMS with SRPMs, that can be used to build RPMs in the container (only required in build mode)
 if [[ "${mode}" == "build" ]]; then
     pushd "${repo_path}/toolkit"
     echo "Populating Intermediate SRPMs..."
@@ -126,8 +127,8 @@ fi
 # ============ Map chroot mount ============
 if [[ "${mode}" == "build" ]]; then
     # Create a new directory and map it to chroot directory in container
-    build_mount="${repo_path}/build/container-build"
-    buildroot_mount="${repo_path}/build/container-buildroot"
+    build_mount="${build_mount_dir}/container-build"
+    buildroot_mount="${build_mount_dir}/container-buildroot"
     if [ -d "${build_mount}" ]; then rm -Rf ${build_mount}; fi
     if [ -d "${buildroot_mount}" ]; then rm -Rf ${buildroot_mount}; fi
     mkdir ${build_mount}
@@ -154,9 +155,6 @@ if [[ "${mode}" == "build" ]]; then
     mounts="${mounts} ${repo_path}/build/INTERMEDIATE_SRPMS:/mnt/INTERMEDIATE_SRPMS ${repo_path}/SPECS:${topdir}/SPECS"
 fi
 
-# Replace comma with space as delimiter
-extra_mounts=${extra_mounts//,/ }
-
 rm -f ${tmp_dir}/mounts.txt
 for mount in $mounts $extra_mounts; do
     host_mount_path=$(realpath ${mount%%:*})
@@ -175,6 +173,7 @@ done
 cp resources/welcome.txt $tmp_dir
 sed -i "s~<REPO_PATH>~${repo_path}~" $tmp_dir/welcome.txt
 sed -i "s~<REPO_BRANCH>~${repo_branch}~" $tmp_dir/welcome.txt
+sed -i "s~<AARCH>~$(uname -m)~" $tmp_dir/welcome.txt
 cp resources/setup_functions.sh $tmp_dir/setup_functions.sh
 sed -i "s~<TOPDIR>~${topdir}~" $tmp_dir/setup_functions.sh
 
@@ -184,7 +183,7 @@ dockerfile="${script_dir}/resources/mariner.Dockerfile"
 if [[ "${mode}" == "build" ]]; then # Configure base image
     echo "Importing chroot into docker..."
     chroot_file="${repo_path}/build/worker/worker_chroot.tar.gz"
-    if [[ ! -f "${chroot_file}" ]]; then build_chroot; fi
+    if [[ ! -f "${chroot_file}" ]]; then build_worker_chroot; fi
     chroot_hash=$(sha256sum "${chroot_file}" | cut -d' ' -f1)
     # Check if the chroot file's hash has changed since the last build
     if [[ ! -f "${tmp_dir}/hash" ]] || [[ "$(cat "${tmp_dir}/hash")" != "${chroot_hash}" ]]; then

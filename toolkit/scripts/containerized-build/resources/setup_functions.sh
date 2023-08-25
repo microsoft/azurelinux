@@ -10,13 +10,17 @@ RPMS_DIR=$TOPDIR/RPMS
 SRPMS_DIR=$TOPDIR/SRPMS
 IS_REPO_ENABLED=false
 
-# Mariner macro files used during spec parsing (as defined in toolkit/scripts/rpmops.sh)
+# General setup
+## Mariner macro files used during spec parsing (as defined in toolkit/scripts/rpmops.sh)
 DEFINES=(-D "with_check 1")
 MACROS=()
 for macro_file in "$SPECS_DIR"/mariner-rpm-macros/macros* "$SPECS_DIR"/pyproject-rpm-macros/macros.pyproject "$SPECS_DIR"/perl/macros.perl
 do
   MACROS+=("--load=$macro_file")
 done
+
+## Create SOURCES_DIR
+mkdir -p SOURCES_DIR
 
 # Enhance rpm() with ability to
 # Create symlink from SPECS/ to SOURCES/ when rpm is called
@@ -31,7 +35,6 @@ rpm() {
                 SPEC=${SPEC%-*} #remove last suffix of type -*
                 SPEC=${SPEC%-*} #remove last suffix of type -*
                 SPEC=${SPEC%\**}
-                mkdir -p $SOURCES_DIR
                 ln -sf $SPECS_DIR/$SPEC/* $SOURCES_DIR/
             fi
         done
@@ -67,7 +70,6 @@ show_help() {
 # Refresh repo cache with newly built RPM, use Mariner specific DEFINES
 rpmbuild() {
     local args=("$@")
-    mkdir -p $SOURCES_DIR
     command "$FUNCNAME" "${DEFINES[@]}" "${args[@]}"
     if [[ ${IS_REPO_ENABLED} = true ]] ; then
         refresh_local_repo

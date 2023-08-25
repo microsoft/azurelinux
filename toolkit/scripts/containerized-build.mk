@@ -7,7 +7,7 @@
 ######## CONTAINER ENV ########
 
 # General targets
-.PHONY: containerized-rpmbuild containerized-rpmbuild-help
+.PHONY: containerized-rpmbuild containerized-rpmbuild-help clean-containerized-rpmbuild
 
 containerized_build_args :=
 ifneq ($(MODE),)
@@ -23,7 +23,11 @@ containerized_build_args += -v ${VERSION}
 endif
 
 ifneq ($(MOUNTS),)
-containerized_build_args += -mo ${MOUNTS}
+containerized_build_args += -mo "$(MOUNTS)"
+endif
+
+ifneq ($(BUILD_MOUNT),)
+containerized_build_args += -bm "$(BUILD_MOUNT)"
 endif
 
 ifeq ($(ENABLE_REPO),y)
@@ -35,3 +39,8 @@ containerized-rpmbuild:
 
 containerized-rpmbuild-help:
 	$(SCRIPTS_DIR)/containerized-build/create_container_build.sh -h
+
+clean: clean-containerized-rpmbuild
+
+clean-containerized-rpmbuild:
+	$(SCRIPTS_DIR)/containerized-build/containerized-build_clean.sh $(BUILD_DIR)
