@@ -6,7 +6,7 @@ License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/team-charls/charls
-Source0:        https://github.com/team-charls/charls/archive/%{version}/%{name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/team-charls/charls/archive/%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  cmake >= 2.6.0
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
