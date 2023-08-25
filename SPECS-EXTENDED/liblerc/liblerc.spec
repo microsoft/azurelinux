@@ -43,6 +43,10 @@ sed -i 's/\r$//' NOTICE README.md doc/MORE.md
 %install
 %cmake_install
 
+%check
+# Run your C++ program
+g++ -o test src/LercTest/main.cpp -L. -lLerc
+./test
 
 %files
 %license LICENSE
