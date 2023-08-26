@@ -642,7 +642,7 @@ func configureSystemFiles(installChroot *safechroot.Chroot, hostname string, con
 	return
 }
 
-// calculateTotalPackages() will simulate installing the provided list of packages in the installRoot.
+// calculateTotalPackages will simulate installing the provided list of packages in the installRoot.
 // all packages that will be installed are returned in installedPackages, and a manifest with these packages
 // is generated under build/imagegen/$config_name/image_pkg_manifest.json
 func calculateTotalPackages(packages []string, installRoot string) (installedPackages *repocloner.RepoContents, err error) {
