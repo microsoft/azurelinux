@@ -32,25 +32,25 @@ import (
 )
 
 var (
-	// Every valid line will be of the form: <package_name>.<architecture> <version>.<dist> <repo_id>
+	// Every valid line will be of the form: <package_name> <architecture> <version>.<dist> <repo_id>
 	// For:
-	//     X.aarch64	1.1b.8_X-22~rc1.cm2		fetcher-cloned-repo
+	//     X aarch64	1.1b.8_X-22~rc1.cm2		fetcher-cloned-repo
 	//
 	// We'd get:
 	//   - package_name:    X
 	//   - architecture:    aarch64
 	//   - version:         1.1b.8_X-22~rc1
 	//   - dist:            cm2
-	listedPackageRegex = regexp.MustCompile(`^\s*([[:alnum:]_.+-]+)\s+([[:alnum:]_+-]+)\s+([[:alnum:]._+~-]+)\.([[:alpha:]]+[[:digit:]]+)`)
+	installPackageRegex = regexp.MustCompile(`^\s*([[:alnum:]_.+-]+)\s+([[:alnum:]_+-]+)\s+([[:alnum:]._+~-]+)\.([[:alpha:]]+[[:digit:]]+)`)
 )
 
 const (
-	listMatchSubString    = iota
+	installMatchSubString = iota
 	installPackageName    = iota
 	installPackageArch    = iota
 	installPackageVersion = iota
 	installPackageDist    = iota
-	listMaxMatchLen       = iota
+	installMaxMatchLen    = iota
 )
 
 const (
@@ -672,7 +672,8 @@ func calculateTotalPackages(packages []string, installRoot string) (installedPac
 	}
 
 	// For every package calculate what dependencies would also be installed from it.
-	foundPackages := make(map[string]bool)
+	// checkedPackageSet contains a mapping of all package IDs (name, version, etc) to avoid calculating duplicates
+	checkedPackageSet := make(map[string]bool)
 	for _, pkg := range packages {
 		var (
 			stdout string
@@ -697,8 +698,8 @@ func calculateTotalPackages(packages []string, installRoot string) (installedPac
 		// it will be prefixed with a line "Installing:" and will
 		// end with an empty line.
 		for _, line := range splitStdout {
-			matches := listedPackageRegex.FindStringSubmatch(line)
-			if len(matches) != listMaxMatchLen {
+			matches := installPackageRegex.FindStringSubmatch(line)
+			if len(matches) != installMaxMatchLen {
 				// This line contains output other than a package information; skip it
 				continue
 			}
@@ -711,13 +712,13 @@ func calculateTotalPackages(packages []string, installRoot string) (installedPac
 			}
 
 			pkgID := pkg.ID()
-			if foundPackages[pkgID] {
+			if checkedPackageSet[pkgID] {
 				logger.Log.Tracef("Skipping duplicate package: %s", line)
 				continue
 			}
-			foundPackages[pkgID] = true
+			checkedPackageSet[pkgID] = true
 
-			logger.Log.Debugf("Added installedPackages entry for: %v-%v.%v.%v", pkg.Name, pkg.Version, pkg.Distribution, pkg.Architecture)
+			logger.Log.Debugf("Added installedPackages entry for: %v", pkgID)
 
 			installedPackages.Repo = append(installedPackages.Repo, pkg)
 		}
