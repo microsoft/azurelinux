@@ -11,6 +11,28 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 )
 
+var (
+	// Every valid line will be of the form: <package_name> <architecture> <version>.<dist> <repo_id>
+	// For:
+	//     X aarch64	1.1b.8_X-22~rc1.cm2		fetcher-cloned-repo
+	//
+	// We'd get:
+	//   - package_name:    X
+	//   - architecture:    aarch64
+	//   - version:         1.1b.8_X-22~rc1
+	//   - dist:            cm2
+	InstallPackageRegex = regexp.MustCompile(`^\s*([[:alnum:]_.+-]+)\s+([[:alnum:]_+-]+)\s+([[:alnum:]._+~-]+)\.([[:alpha:]]+[[:digit:]]+)`)
+)
+
+const (
+	InstallMatchSubString = iota
+	InstallPackageName    = iota
+	InstallPackageArch    = iota
+	InstallPackageVersion = iota
+	InstallPackageDist    = iota
+	InstallMaxMatchLen    = iota
+)
+
 const (
 	// ReleaseverArgument specifies the release version argument to be used with tdnf
 	releaseverArgument = "--releasever"

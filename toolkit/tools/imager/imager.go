@@ -272,7 +272,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 		}
 
 		// Extract image package manifest from the 'setuproot' chroot
-		setupChroot.MoveOutFile("image_pkg_manifest_setuproot.json", imgContentFile)
+		setupChroot.MoveOutFile(installutils.PackageManifestRelativePath, imgContentFile)
 
 		err = cleanupExtraFilesInChroot(setupChroot)
 		if err != nil {
@@ -604,9 +604,6 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 		err = fmt.Errorf("failed to populate image contents: %s", err)
 		return
 	}
-
-	// Copy image package manifest from 'installroot' chroot to 'setuproot' chroot
-	installChroot.MoveOutFile("image_pkg_manifest_installroot.json", "/image_pkg_manifest_setuproot.json")
 
 	// Only configure the bootloader or read only partitions for actual disks, a rootfs does not need these
 	if !isRootFS {

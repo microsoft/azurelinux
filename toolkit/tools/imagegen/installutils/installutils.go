@@ -8,7 +8,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"regexp"
 	"runtime"
 	"sort"
 	"strconv"
@@ -31,29 +30,9 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 )
 
-var (
-	// Every valid line will be of the form: <package_name> <architecture> <version>.<dist> <repo_id>
-	// For:
-	//     X aarch64	1.1b.8_X-22~rc1.cm2		fetcher-cloned-repo
-	//
-	// We'd get:
-	//   - package_name:    X
-	//   - architecture:    aarch64
-	//   - version:         1.1b.8_X-22~rc1
-	//   - dist:            cm2
-	installPackageRegex = regexp.MustCompile(`^\s*([[:alnum:]_.+-]+)\s+([[:alnum:]_+-]+)\s+([[:alnum:]._+~-]+)\.([[:alpha:]]+[[:digit:]]+)`)
-)
-
 const (
-	installMatchSubString = iota
-	installPackageName    = iota
-	installPackageArch    = iota
-	installPackageVersion = iota
-	installPackageDist    = iota
-	installMaxMatchLen    = iota
-)
+	PackageManifestRelativePath = "image_pkg_manifest_installroot.json"
 
-const (
 	// NullDevice represents the /dev/null device used as a mount device for overlay images.
 	NullDevice     = "/dev/null"
 	overlay        = "overlay"
@@ -445,6 +424,13 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 	}
 	totalPackages := len(installedPackages.Repo)
 
+	// Write out JSON file with list of packages included in the image
+	packageManifestPath := filepath.Join("/", PackageManifestRelativePath)
+	err = jsonutils.WriteJSONFile(packageManifestPath, installedPackages)
+	if err != nil {
+		return
+	}
+
 	// Keep a running total of how many packages have been installed through all the `TdnfInstallWithProgress` invocations
 	packagesInstalled := 0
 
@@ -698,17 +684,17 @@ func calculateTotalPackages(packages []string, installRoot string) (installedPac
 		// it will be prefixed with a line "Installing:" and will
 		// end with an empty line.
 		for _, line := range splitStdout {
-			matches := installPackageRegex.FindStringSubmatch(line)
-			if len(matches) != installMaxMatchLen {
+			matches := tdnf.InstallPackageRegex.FindStringSubmatch(line)
+			if len(matches) != tdnf.InstallMaxMatchLen {
 				// This line contains output other than a package information; skip it
 				continue
 			}
 
 			pkg := &repocloner.RepoPackage{
-				Name:         matches[installPackageName],
-				Version:      matches[installPackageVersion],
-				Architecture: matches[installPackageArch],
-				Distribution: matches[installPackageDist],
+				Name:         matches[tdnf.InstallPackageName],
+				Version:      matches[tdnf.InstallPackageVersion],
+				Architecture: matches[tdnf.InstallPackageArch],
+				Distribution: matches[tdnf.InstallPackageDist],
 			}
 
 			pkgID := pkg.ID()
@@ -725,9 +711,6 @@ func calculateTotalPackages(packages []string, installRoot string) (installedPac
 	}
 
 	logger.Log.Debugf("Total number of packages to be installed: %d", len(installedPackages.Repo))
-
-	// Write out JSON file with list of packages included in the image
-	err = jsonutils.WriteJSONFile("/installroot/image_pkg_manifest_installroot.json", installedPackages)
 
 	return
 }
