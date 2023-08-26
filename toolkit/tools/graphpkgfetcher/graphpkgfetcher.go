@@ -286,24 +286,28 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile stri
 	fetchedPackages := make(map[string]bool)
 	prebuiltPackages := make(map[string]bool)
 	unresolvedNodes := findUnresolvedNodes(dependencyGraph.AllRunNodes())
+	unresolvedNodesCount := len(unresolvedNodes)
 
 	timestamp.StartEvent("clone graph", nil)
 	for i, n := range unresolvedNodes {
+		progressHeader := fmt.Sprintf("Cache progress %d%%", (i*100)/unresolvedNodesCount)
 		resolveErr := resolveSingleNode(cloner, n, downloadDependencies, toolchainPackages, fetchedPackages, prebuiltPackages, *outDir)
-		logger.Log.Infof("Cache progress %d%%: choosing '%s' to provide '%s'.", ((i * 100) / len(unresolvedNodes)), filepath.Base(n.RpmPath), n.VersionedPkg.Name)
+		if resolveErr == nil {
+			logger.Log.Infof("%s: choosing '%s' to provide '%s'.", progressHeader, filepath.Base(n.RpmPath), n.VersionedPkg.Name)
+			continue
+		}
+
 		// Failing to clone a dependency should not halt a build.
 		// The build should continue and attempt best effort to build as many packages as possible.
-		if resolveErr != nil {
-			logger.Log.Warnf("Failed to resolve graph node '%s':\n%s", n, resolveErr)
-			cachingSucceeded = false
-			errorMessage := strings.Builder{}
-			errorMessage.WriteString(fmt.Sprintf("Failed to resolve all nodes in the graph while resolving '%s'\n", n))
-			errorMessage.WriteString("Nodes which have this as a dependency:\n")
-			for _, dependant := range graph.NodesOf(dependencyGraph.To(n.ID())) {
-				errorMessage.WriteString(fmt.Sprintf("\t'%s' depends on '%s'\n", dependant.(*pkggraph.PkgNode), n))
-			}
-			logger.Log.Debugf(errorMessage.String())
+		logger.Log.Warnf("%s: failed to resolve graph node '%s':\n%s", progressHeader, n, resolveErr)
+		cachingSucceeded = false
+		errorMessage := strings.Builder{}
+		errorMessage.WriteString(fmt.Sprintf("Failed to resolve all nodes in the graph while resolving '%s'\n", n))
+		errorMessage.WriteString("Nodes which have this as a dependency:\n")
+		for _, dependant := range graph.NodesOf(dependencyGraph.To(n.ID())) {
+			errorMessage.WriteString(fmt.Sprintf("\t'%s' depends on '%s'\n", dependant.(*pkggraph.PkgNode), n))
 		}
+		logger.Log.Debugf(errorMessage.String())
 	}
 	timestamp.StopEvent(nil) // clone graph
 	if stopOnFailure && !cachingSucceeded {
