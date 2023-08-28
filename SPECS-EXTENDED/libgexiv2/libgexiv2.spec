@@ -1,13 +1,13 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           libgexiv2
-Version:        0.12.1
-Release:        3%{?dist}
+Version:        0.14.2
+Release:        1%{?dist}
 Summary:        Gexiv2 is a GObject-based wrapper around the Exiv2 library
 
 License:        GPLv2+
 URL:            https://wiki.gnome.org/Projects/gexiv2
-Source0:        https://download.gnome.org/sources/gexiv2/0.12/gexiv2-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/gexiv2/0.14/gexiv2-%{version}.tar.xz
 
 BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:  exiv2-devel
@@ -44,7 +44,6 @@ This package contains the python3 bindings for %{name}
 %build
 %meson \
   -Dgtk_doc=false \
-  -Dpython3_girdir=%{python3_sitearch}/gi/overrides \
   %{nil}
 %meson_build
 
