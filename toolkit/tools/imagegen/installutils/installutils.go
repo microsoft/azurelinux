@@ -943,8 +943,10 @@ func InstallGrubEnv(installRoot string) (err error) {
 // - installRoot is the base install directory
 // - rootDevice holds the root partition
 // - bootUUID is the UUID for the boot partition
+// - bootPrefix is the path to the /boot grub configs based on the mountpoints (i.e., if /boot is a separate partition from the rootfs partition, bootPrefix="").
 // - encryptedRoot holds the encrypted root information if encrypted root is enabled
 // - kernelCommandLine contains additional kernel parameters which may be optionally set
+// - readOnlyRoot holds the dm-verity read-only root partition information if dm-verity is enabled.
 // - isBootPartitionSeparate is a boolean value which is true if the /boot partition is separate from the root partition
 // Note: this boot partition could be different than the boot partition specified in the bootloader.
 // This boot partition specifically indicates where to find the kernel, config files, and initrd
