@@ -26,6 +26,7 @@ import (
 // - imageConfig: the path to the image config file. Used to extract additional packages to build.
 // - baseDirPath: the path to the base directory for the image. Used to resolve relative paths in the image config.
 func ParseAndGeneratePackageBuildList(dependencyGraph *pkggraph.PkgGraph, pkgsToBuild, pkgsToRebuild, pkgsToIgnore []string, imageConfig, baseDirPath string) (finalPackagesToBuild, packagesToRebuild, packagesToIgnore []*pkgjson.PackageVer, err error) {
+	isBuildList := true
 	logger.Log.Debug("Generating a package list for build nodes.")
 
 	buildNodeGetter := func(node *pkggraph.LookupNode) *pkggraph.PkgNode {
@@ -34,7 +35,7 @@ func ParseAndGeneratePackageBuildList(dependencyGraph *pkggraph.PkgGraph, pkgsTo
 		}
 		return nil
 	}
-	return parseAndGeneratePackageList(dependencyGraph, pkgsToBuild, pkgsToRebuild, pkgsToIgnore, imageConfig, baseDirPath, dependencyGraph.AllBuildNodes(), buildNodeGetter)
+	return parseAndGeneratePackageList(dependencyGraph, pkgsToBuild, pkgsToRebuild, pkgsToIgnore, imageConfig, baseDirPath, dependencyGraph.AllBuildNodes(), buildNodeGetter, isBuildList)
 }
 
 // ParseAndGeneratePackageTestList parses the common package request arguments and generates a list of packages to test based on the given dependency graph.
@@ -47,13 +48,14 @@ func ParseAndGeneratePackageBuildList(dependencyGraph *pkggraph.PkgGraph, pkgsTo
 func ParseAndGeneratePackageTestList(dependencyGraph *pkggraph.PkgGraph, testsToRun, testsToRerun, testsToIgnore []string, imageConfig, baseDirPath string) (finalPackagesToBuild, packagesToRebuild, packagesToIgnore []*pkgjson.PackageVer, err error) {
 	logger.Log.Debug("Generating a package list for test nodes.")
 
+	isBuildList := false
 	testNodeGetter := func(node *pkggraph.LookupNode) *pkggraph.PkgNode {
 		if node != nil {
 			return node.TestNode
 		}
 		return nil
 	}
-	return parseAndGeneratePackageList(dependencyGraph, testsToRun, testsToRerun, testsToIgnore, imageConfig, baseDirPath, dependencyGraph.AllTestNodes(), testNodeGetter)
+	return parseAndGeneratePackageList(dependencyGraph, testsToRun, testsToRerun, testsToIgnore, imageConfig, baseDirPath, dependencyGraph.AllTestNodes(), testNodeGetter, isBuildList)
 }
 
 // ReadReservedFilesList reads the list of reserved files (such as toolchain RPMs) from the manifest file passed in.
@@ -107,22 +109,24 @@ func IsReservedFile(rpmPath string, reservedRPMs []string) bool {
 //   - packagesNamesToRebuild,
 //   - local packages listed in the image config, and
 //   - kernels in the image config (if built locally).
-func calculatePackagesToBuild(packagesNamesToBuild, packagesNamesToRebuild []*pkgjson.PackageVer, imageConfig, baseDirPath string, dependencyGraph *pkggraph.PkgGraph) (packageVersToBuild []*pkgjson.PackageVer, err error) {
+func calculatePackagesToBuild(packagesNamesToBuild, packagesNamesToRebuild []*pkgjson.PackageVer, imageConfig, baseDirPath string, dependencyGraph *pkggraph.PkgGraph, isBuildList bool) (packageVersToBuild []*pkgjson.PackageVer, err error) {
 	packageVersToBuild = append(packagesNamesToBuild, packagesNamesToRebuild...)
 
-	packageVersFromConfig, err := extractPackagesFromConfig(imageConfig, baseDirPath)
-	if err != nil {
-		err = fmt.Errorf("failed to extract packages from the image config, error:\n%w", err)
-		return
+	packageVersFromConfig := []*pkgjson.PackageVer{}
+	err = nil
+	if isBuildList {
+		packageVersFromConfig, err = extractPackagesFromConfig(imageConfig, baseDirPath)
+		if err != nil {
+			err = fmt.Errorf("failed to extract packages from the image config, error:\n%w", err)
+			return
+		}
+		packageVersFromConfig, err = filterLocalPackagesOnly(packageVersFromConfig, dependencyGraph)
+		if err != nil {
+			err = fmt.Errorf("failed to filter local packages from the image config, error:\n%w", err)
+			return
+		}
+		packageVersToBuild = append(packageVersToBuild, packageVersFromConfig...)
 	}
-
-	packageVersFromConfig, err = filterLocalPackagesOnly(packageVersFromConfig, dependencyGraph)
-	if err != nil {
-		err = fmt.Errorf("failed to filter local packages from the image config, error:\n%w", err)
-		return
-	}
-
-	packageVersToBuild = append(packageVersToBuild, packageVersFromConfig...)
 	packageVersToBuild = removePackageVersDuplicates(packageVersToBuild)
 
 	return
@@ -240,7 +244,7 @@ func packageNamesToPackages(packageOrSpecNames []string, analyzedNodes []*pkggra
 // - ignoreList: a list of package/spec names to ignore.
 // - imageConfig: the path to the image config file. Used to extract additional packages to build.
 // - baseDirPath: the path to the base directory for the image. Used to resolve relative paths in the image config.
-func parseAndGeneratePackageList(dependencyGraph *pkggraph.PkgGraph, buildList, rebuiltList, ignoreList []string, imageConfig, baseDirPath string, analyzedNodes []*pkggraph.PkgNode, nodeGetter func(*pkggraph.LookupNode) *pkggraph.PkgNode) (finalPackagesToBuild, packagesToRebuild, packagesToIgnore []*pkgjson.PackageVer, err error) {
+func parseAndGeneratePackageList(dependencyGraph *pkggraph.PkgGraph, buildList, rebuiltList, ignoreList []string, imageConfig, baseDirPath string, analyzedNodes []*pkggraph.PkgNode, nodeGetter func(*pkggraph.LookupNode) *pkggraph.PkgNode, isBuildList bool) (finalPackagesToBuild, packagesToRebuild, packagesToIgnore []*pkgjson.PackageVer, err error) {
 	packagesToBuild, err := packageNamesToPackages(buildList, analyzedNodes, nodeGetter, dependencyGraph)
 	if err != nil {
 		err = fmt.Errorf("unable to find nodes for the packages from the build list, error:\n%s", err)
@@ -275,7 +279,7 @@ func parseAndGeneratePackageList(dependencyGraph *pkggraph.PkgGraph, buildList, 
 		return
 	}
 
-	finalPackagesToBuild, err = calculatePackagesToBuild(packagesToBuild, packagesToRebuild, imageConfig, baseDirPath, dependencyGraph)
+	finalPackagesToBuild, err = calculatePackagesToBuild(packagesToBuild, packagesToRebuild, imageConfig, baseDirPath, dependencyGraph, isBuildList)
 	if err != nil {
 		err = fmt.Errorf("unable to generate the final package build list, error:\n%s", err)
 		return
