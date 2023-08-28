@@ -39,7 +39,6 @@ func DownloadFile(url, dst string, caCerts *x509.CertPool, tlsCerts []tls.Certif
 	if err != nil {
 		return
 	}
-	defer dstFile.Close()
 	defer func() {
 		// If there was an error, ensure that the file is removed
 		if err != nil {
@@ -49,6 +48,7 @@ func DownloadFile(url, dst string, caCerts *x509.CertPool, tlsCerts []tls.Certif
 			}
 		}
 	}()
+	defer dstFile.Close()
 
 	tlsConfig := &tls.Config{
 		RootCAs:      caCerts,
