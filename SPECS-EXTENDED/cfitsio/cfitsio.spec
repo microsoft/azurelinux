@@ -6,7 +6,7 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://heasarc.gsfc.nasa.gov/fitsio/
-Source0:        http://heasarc.gsfc.nasa.gov/FTP/software/fitsio/c/cfitsio-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        http://heasarc.gsfc.nasa.gov/FTP/software/fitsio/c/%{name}-%{version}.tar.gz
 # Remove soname version check
 Patch1:         cfitsio-noversioncheck.patch
 # Some rearrangements in pkg-config file
@@ -75,11 +75,7 @@ compression algorithm.
        amount of compression
 
 %prep
-%setup -q
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
+%autosetup
 
 %build
 %configure --enable-reentrant -with-bzip2
