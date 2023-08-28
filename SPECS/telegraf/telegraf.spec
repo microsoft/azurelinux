@@ -75,6 +75,9 @@ fi
 %dir %{_sysconfdir}/%{name}/telegraf.d
 
 %changelog
+* Mon Aug 28 2023 Cameron Baird <cameronbaird@microsoft.com> - 1.27.3-2
+- Bump release to rebuild with go 1.20.7
+
 * Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.27.3-1
 - Auto-upgrade to 1.27.3 - resolve vulnerability with jaeger v1.38.0
 
