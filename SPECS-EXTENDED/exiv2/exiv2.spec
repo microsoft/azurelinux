@@ -1,7 +1,7 @@
 
 Summary:        Exif and Iptc metadata manipulation library
 Name:           exiv2
-Version:        0.27.5
+Version:        0.28.0
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
@@ -18,6 +18,7 @@ BuildRequires:  graphviz
 BuildRequires:  libssh2-devel
 BuildRequires:  libxslt
 BuildRequires:  zlib-devel
+BuildRequires:  inih-devel
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description
@@ -99,7 +100,7 @@ test -x %{buildroot}%{_libdir}/libexiv2.so
 %ldconfig_scriptlets libs
 
 %files libs
-%{_libdir}/libexiv2.so.27*
+%{_libdir}/libexiv2.so.28*
 %{_libdir}/libexiv2.so.%{version}
 
 %files devel
@@ -107,8 +108,6 @@ test -x %{buildroot}%{_libdir}/libexiv2.so
 %{_libdir}/libexiv2.so
 %{_libdir}/pkgconfig/exiv2.pc
 %{_libdir}/cmake/exiv2/
-# todo: -static subpkg?  -- rex
-%{_libdir}/libexiv2-xmp.a
 
 %files doc
 %{_pkgdocdir}/
