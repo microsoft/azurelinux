@@ -947,7 +947,7 @@ func InstallGrubEnv(installRoot string) (err error) {
 // - kernelCommandLine contains additional kernel parameters which may be optionally set
 // Note: this boot partition could be different than the boot partition specified in the bootloader.
 // This boot partition specifically indicates where to find the kernel, config files, and initrd
-func InstallGrubCfg(installRoot, rootDevice, bootUUID, bootPrefix string, encryptedRoot diskutils.EncryptedRootDevice, kernelCommandLine configuration.KernelCommandLine, readOnlyRoot diskutils.VerityDevice, isBootSeparatePartition bool) (err error) {
+func InstallGrubCfg(installRoot, rootDevice, bootUUID, bootPrefix string, encryptedRoot diskutils.EncryptedRootDevice, kernelCommandLine configuration.KernelCommandLine, readOnlyRoot diskutils.VerityDevice, isBootPartitionSeparate bool) (err error) {
 	const (
 		assetGrubcfgFile = "/installer/grub2/grub.cfg"
 		grubCfgFile      = "boot/grub2/grub.cfg"
@@ -1015,7 +1015,7 @@ func InstallGrubCfg(installRoot, rootDevice, bootUUID, bootPrefix string, encryp
 	}
 
 	// Configure FIPS
-	err = setGrubCfgFIPS(isBootSeparatePartition, bootUUID, installGrubCfgFile, kernelCommandLine)
+	err = setGrubCfgFIPS(isBootPartitionSeparate, bootUUID, installGrubCfgFile, kernelCommandLine)
 	if err != nil {
 		logger.Log.Warnf("Failed to set FIPS in grub.cfg: %v", err)
 		return
@@ -2045,7 +2045,7 @@ func setGrubCfgSELinux(grubPath string, kernelCommandline configuration.KernelCo
 	return
 }
 
-func setGrubCfgFIPS(isBootSeparatePartition bool, bootUUID, grubPath string, kernelCommandline configuration.KernelCommandLine) (err error) {
+func setGrubCfgFIPS(isBootPartitionSeparate bool, bootUUID, grubPath string, kernelCommandline configuration.KernelCommandLine) (err error) {
 	const (
 		enableFIPSPattern = "{{.FIPS}}"
 		enableFIPS        = "fips=1"
@@ -2059,7 +2059,7 @@ func setGrubCfgFIPS(isBootSeparatePartition bool, bootUUID, grubPath string, ker
 	fipsKernelArgument := ""
 	if kernelCommandline.EnableFIPS {
 		fipsKernelArgument = fmt.Sprintf("%s", enableFIPS)
-		if isBootSeparatePartition {
+		if isBootPartitionSeparate {
 			fipsKernelArgument = fmt.Sprintf("%s %s%s%s", fipsKernelArgument, bootPrefix, uuidPrefix, bootUUID)
 		}
 	}

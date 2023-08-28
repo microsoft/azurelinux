@@ -660,12 +660,10 @@ func configureDiskBootloader(systemConfig configuration.SystemConfig, installChr
 	var rootDevice string
 
 	// Add bootloader. Prefer a separate boot partition if one exists.
-	bootDevice, ok := installMap[bootMountPoint]
+	bootDevice, isBootPartitionSeparate := installMap[bootMountPoint]
 	bootPrefix := ""
-	isBootSeparatePartition := true
-	if !ok {
+	if !isBootPartitionSeparate {
 		bootDevice = installMap[rootMountPoint]
-		isBootSeparatePartition = false
 		// If we do not have a separate boot partition we will need to add a prefix to all paths used in the configs.
 		bootPrefix = "/boot"
 	}
@@ -719,7 +717,7 @@ func configureDiskBootloader(systemConfig configuration.SystemConfig, installChr
 	}
 
 	// Grub will always use filesystem UUID, never PARTUUID or PARTLABEL
-	err = installutils.InstallGrubCfg(installChroot.RootDir(), rootDevice, bootUUID, bootPrefix, encryptedRoot, systemConfig.KernelCommandLine, readOnlyRoot, isBootSeparatePartition)
+	err = installutils.InstallGrubCfg(installChroot.RootDir(), rootDevice, bootUUID, bootPrefix, encryptedRoot, systemConfig.KernelCommandLine, readOnlyRoot, isBootPartitionSeparate)
 	if err != nil {
 		err = fmt.Errorf("failed to install main grub config file: %s", err)
 		return
