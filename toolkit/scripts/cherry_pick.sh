@@ -5,7 +5,14 @@
 set -e
 
 function help {
-    echo "hello, world"
+    echo "Cherry-pick commit to a specific branch and create Github PR"
+    echo "Usage:"
+    echo "-b TARGET_BRANCH -> target branch to cherry pick commit to"
+    echo "-c COMMIT_HASH"
+    echo "-l LOG_FILE -> log file to output conflicts in case cherry-pick fails, or to output URL to new PR"
+    echo "-o ORIGINAL_PR_URL -> original PR that triggers this script"
+    echo "-r REPOSITORY -> name of the repository"
+    echo "-t TITLE -> title of the original PR"
 }
 
 function cherry_pick {

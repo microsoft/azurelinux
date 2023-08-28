@@ -1,12 +1,22 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
+# This action cherry-picks CVE fix commits from fast-track branches to corresponding
+# development branches for each version of Mariner.
+# To use this action, create a comment in a merged PR to any 'fasttrack/*' branch:
+#   /cherry-pick <target-branch-1>, <target-branch-2>, etc
+# The author of the comment must be a member or owner of the repository for the action
+# to work.
+# After cherry-pick succeeds for a branch, a new PR will be created to merge the commit
+# to that target branch, and a label will be added to the original PR to indicate that
+# the commit has been cherry-picked to that branch.
 name: Cherry pick commits from PR
 on:
   issue_comment:
     types:
       - created
 jobs:
+  # Basic information extraction and validation
   pr_info:
     if: |
       github.event.issue.pull_request &&
@@ -32,7 +42,7 @@ jobs:
           echo "base_ref=$(gh pr view ${{ github.event.issue.number }} --repo ${{ github.repository }} --json baseRefName --jq '.baseRefName')" >> $GITHUB_OUTPUT
           echo "merge_commit=$(gh pr view ${{ github.event.issue.number }} --repo ${{ github.repository }} --json mergeCommit --jq '.mergeCommit.oid')" >> $GITHUB_OUTPUT
 
-      - name: Post workflow run to PR
+      - name: Check that PR satisfies requirements for cherry-pick action and notify if not
         run: |
           if [[ "${{ steps.pr_info.outputs.status }}" != "MERGED" ]] || [[ "${{ steps.pr_info.outputs.base_ref }}" != fasttrack/* ]]; then
             gh pr comment ${{ github.event.issue.number }} \
@@ -40,6 +50,7 @@ jobs:
               --body 'Cherry pick action is only enabled for merged pull requests to `fasttrack/*` branches'
           fi
 
+  # Actual cherry-pick work for each target branch
   cherry_pick_commit:
     needs: pr_info
     if: |
@@ -58,7 +69,6 @@ jobs:
       - name: Workflow trigger checkout
         uses: actions/checkout@v3
         with:
-          # ref: ${{ needs.pr_info.outputs.base_ref }}
           fetch-depth: 0
 
       - name: Validate and extract cherry pick target from comment
@@ -68,7 +78,7 @@ jobs:
           IFS=", " read -ra target_branches <<< "$branches_list"
           echo "cherry_pick_target_branches=${target_branches[*]}" >> $GITHUB_ENV
 
-      - name: Configure git
+      - name: Configure local git repo
         run: |
           git config --local user.email "$GIT_USER_EMAIL"
           git config --local user.name "$GIT_USER_NAME"
@@ -76,9 +86,12 @@ jobs:
           GIT_USER_EMAIL: "cblmargh@microsoft.com"
           GIT_USER_NAME: "CBL-Mariner Servicing Account"
 
+      # Run cherry-pick for each target branch and create new PR for it. If cherry-pick fails,
+      # output conflicts to the action logs and notify in the original PR.
       - name: Run cherry-pick action
         run: |
           cp toolkit/scripts/cherry_pick.sh ${{ runner.temp }}/cherry_pick.sh
+
           for target_branch in ${{ env.cherry_pick_target_branches }}; do
             echo "Cherry picking commit to $target_branch"
 
