@@ -26,7 +26,8 @@ import (
 // - imageConfig: the path to the image config file. Used to extract additional packages to build.
 // - baseDirPath: the path to the base directory for the image. Used to resolve relative paths in the image config.
 func ParseAndGeneratePackageBuildList(dependencyGraph *pkggraph.PkgGraph, pkgsToBuild, pkgsToRebuild, pkgsToIgnore []string, imageConfig, baseDirPath string) (finalPackagesToBuild, packagesToRebuild, packagesToIgnore []*pkgjson.PackageVer, err error) {
-	isBuildList := true
+	const isBuildList = true
+
 	logger.Log.Debug("Generating a package list for build nodes.")
 
 	buildNodeGetter := func(node *pkggraph.LookupNode) *pkggraph.PkgNode {
@@ -46,9 +47,10 @@ func ParseAndGeneratePackageBuildList(dependencyGraph *pkggraph.PkgGraph, pkgsTo
 // - imageConfig: the path to the image config file. Used to extract additional packages to test.
 // - baseDirPath: the path to the base directory for the image. Used to resolve relative paths in the image config.
 func ParseAndGeneratePackageTestList(dependencyGraph *pkggraph.PkgGraph, testsToRun, testsToRerun, testsToIgnore []string, imageConfig, baseDirPath string) (finalPackagesToBuild, packagesToRebuild, packagesToIgnore []*pkgjson.PackageVer, err error) {
+	const isBuildList = false
+
 	logger.Log.Debug("Generating a package list for test nodes.")
 
-	isBuildList := false
 	testNodeGetter := func(node *pkggraph.LookupNode) *pkggraph.PkgNode {
 		if node != nil {
 			return node.TestNode
@@ -112,21 +114,19 @@ func IsReservedFile(rpmPath string, reservedRPMs []string) bool {
 func calculatePackagesToBuild(packagesNamesToBuild, packagesNamesToRebuild []*pkgjson.PackageVer, imageConfig, baseDirPath string, dependencyGraph *pkggraph.PkgGraph, isBuildList bool) (packageVersToBuild []*pkgjson.PackageVer, err error) {
 	packageVersToBuild = append(packagesNamesToBuild, packagesNamesToRebuild...)
 
-	packageVersFromConfig := []*pkgjson.PackageVer{}
-	err = nil
-	if isBuildList {
-		packageVersFromConfig, err = extractPackagesFromConfig(imageConfig, baseDirPath)
-		if err != nil {
-			err = fmt.Errorf("failed to extract packages from the image config, error:\n%w", err)
-			return
-		}
-		packageVersFromConfig, err = filterLocalPackagesOnly(packageVersFromConfig, dependencyGraph)
-		if err != nil {
-			err = fmt.Errorf("failed to filter local packages from the image config, error:\n%w", err)
-			return
-		}
-		packageVersToBuild = append(packageVersToBuild, packageVersFromConfig...)
+	packageVersFromConfig, err := extractPackagesFromConfig(imageConfig, baseDirPath)
+	if err != nil {
+		err = fmt.Errorf("failed to extract packages from the image config, error:\n%w", err)
+		return
 	}
+
+	packageVersFromConfig, err = filterLocalPackagesOnly(packageVersFromConfig, dependencyGraph, isBuildList)
+	if err != nil {
+		err = fmt.Errorf("failed to filter local packages from the image config, error:\n%w", err)
+		return
+	}
+
+	packageVersToBuild = append(packageVersToBuild, packageVersFromConfig...)
 	packageVersToBuild = removePackageVersDuplicates(packageVersToBuild)
 
 	return
@@ -157,7 +157,7 @@ func extractPackagesFromConfig(configFile, baseDirPath string) (packageList []*p
 }
 
 // filterLocalPackagesOnly returns the subset of packageVersionsInConfig that only contains local packages.
-func filterLocalPackagesOnly(packageVersionsInConfig []*pkgjson.PackageVer, dependencyGraph *pkggraph.PkgGraph) (filteredPackages []*pkgjson.PackageVer, err error) {
+func filterLocalPackagesOnly(packageVersionsInConfig []*pkgjson.PackageVer, dependencyGraph *pkggraph.PkgGraph, isBuildList bool) (filteredPackages []*pkgjson.PackageVer, err error) {
 	logger.Log.Debug("Filtering out external packages from list of packages extracted from the image config file.")
 
 	for _, pkgVer := range packageVersionsInConfig {
@@ -166,11 +166,19 @@ func filterLocalPackagesOnly(packageVersionsInConfig []*pkgjson.PackageVer, depe
 		// A pkgNode for a local package has the following characteristics:
 		// 1) The pkgNode exists in the graph (is not nil).
 		// 2) The pkgNode has a build node. External packages will only have a run node.
-		if pkgNode != nil && pkgNode.BuildNode != nil {
-			filteredPackages = append(filteredPackages, pkgVer)
-		} else {
-			logger.Log.Debugf("Found external package to filter out: %v.", pkgVer)
+		if pkgNode != nil {
+			checkedNode := pkgNode.TestNode
+			if isBuildList {
+				checkedNode = pkgNode.BuildNode
+			}
+
+			if checkedNode != nil {
+				filteredPackages = append(filteredPackages, pkgVer)
+				continue
+			}
 		}
+
+		logger.Log.Debugf("Found external package to filter out: %v.", pkgVer)
 	}
 
 	return
