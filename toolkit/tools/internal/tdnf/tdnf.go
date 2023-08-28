@@ -22,6 +22,39 @@ var (
 	//   - version:         1.1b.8_X-22~rc1
 	//   - dist:            cm2
 	InstallPackageRegex = regexp.MustCompile(`^\s*([[:alnum:]_.+-]+)\s+([[:alnum:]_+-]+)\s+([[:alnum:]._+~-]+)\.([[:alpha:]]+[[:digit:]]+)`)
+
+	// Every valid line pair will be of the form:
+	//		<package>-<version>.<arch> : <Description>
+	//		Repo	: [repo_name]
+	//
+	// NOTE: we ignore packages installed in the build environment denoted by "Repo	: @System".
+	PackageLookupNameMatchRegex = regexp.MustCompile(`([^:\s]+(x86_64|aarch64|noarch))\s*:[^\n]*\nRepo\s+:\s+[^@]`)
+	PackageNameIndex            = 1
+
+	// Every line containing a repo ID will be of the form:
+	//		[<repo_name>]
+	// For:
+	//
+	//		[fetcher-cloned-repo]
+	//
+	// We'd get:
+	//   - repo_name:    fetcher-cloned-repo
+	//
+	// The non-capturing groups are used to ignore the brackets.
+	RepoIDRegex = regexp.MustCompile(`(?:\[)([^]]+)(?:\])`)
+	RepoIDIndex = 1
+
+	// Every valid line will be of the form: <package_name>.<architecture> <version>.<dist> <repo_id>
+	// For:
+	//
+	//		COOL_package2-extended++.aarch64	1.1b.8_X-22~rc1.cm1		fetcher-cloned-repo
+	//
+	// We'd get:
+	//   - package_name:    COOL_package2-extended++
+	//   - architecture:    aarch64
+	//   - version:         1.1b.8_X-22~rc1
+	//   - dist:            cm1
+	ListedPackageRegex = regexp.MustCompile(`^\s*([[:alnum:]_.+-]+)\.([[:alnum:]_+-]+)\s+([[:alnum:]._+~-]+)\.([[:alpha:]]+[[:digit:]]+)`)
 )
 
 const (
@@ -31,6 +64,15 @@ const (
 	InstallPackageVersion = iota
 	InstallPackageDist    = iota
 	InstallMaxMatchLen    = iota
+)
+
+const (
+	ListMatchSubString = iota
+	ListPackageName    = iota
+	ListPackageArch    = iota
+	ListPackageVersion = iota
+	ListPackageDist    = iota
+	ListMaxMatchLen    = iota
 )
 
 const (
