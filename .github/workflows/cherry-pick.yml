@@ -1,0 +1,115 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+name: Cherry pick commits from PR
+on:
+  issue_comment:
+    types:
+      - created
+jobs:
+  pr_info:
+    if: |
+      github.event.issue.pull_request &&
+        startsWith(github.event.comment.body, '/cherry-pick ') &&
+        (github.event.comment.author_association == 'MEMBER' ||
+         github.event.comment.author_association == 'OWNER')
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    outputs:
+      status: ${{ steps.pr_info.outputs.status }}
+      base_ref: ${{ steps.pr_info.outputs.base_ref }}
+      merge_commit: ${{ steps.pr_info.outputs.merge_commit }}
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Extract PR information
+        id: pr_info
+        run: |
+          echo "status=$(gh pr view ${{ github.event.issue.number }} --repo ${{ github.repository }} --json state --jq '.state')" >> $GITHUB_OUTPUT
+          echo "base_ref=$(gh pr view ${{ github.event.issue.number }} --repo ${{ github.repository }} --json baseRefName --jq '.baseRefName')" >> $GITHUB_OUTPUT
+          echo "merge_commit=$(gh pr view ${{ github.event.issue.number }} --repo ${{ github.repository }} --json mergeCommit --jq '.mergeCommit.oid')" >> $GITHUB_OUTPUT
+
+      - name: Post workflow run to PR
+        run: |
+          if [[ "${{ steps.pr_info.outputs.status }}" != "MERGED" ]] || [[ "${{ steps.pr_info.outputs.base_ref }}" != fasttrack/* ]]; then
+            gh pr comment ${{ github.event.issue.number }} \
+              --repo ${{ github.repository }} \
+              --body 'Cherry pick action is only enabled for merged pull requests to `fasttrack/*` branches'
+          fi
+
+  cherry_pick_commit:
+    needs: pr_info
+    if: |
+      needs.pr_info.outputs.status == 'MERGED' &&
+        startsWith(needs.pr_info.outputs.base_ref, 'fasttrack/')
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    defaults:
+      run:
+        shell: bash
+    name: Cherry pick
+    steps:
+      - name: Workflow trigger checkout
+        uses: actions/checkout@v3
+        with:
+          # ref: ${{ needs.pr_info.outputs.base_ref }}
+          fetch-depth: 0
+
+      - name: Validate and extract cherry pick target from comment
+        run: |
+          pr_comment="${{ github.event.comment.body }}"
+          branches_list=${pr_comment#'/cherry-pick '}
+          IFS=", " read -ra target_branches <<< "$branches_list"
+          echo "cherry_pick_target_branches=${target_branches[*]}" >> $GITHUB_ENV
+
+      - name: Configure git
+        run: |
+          git config --local user.email "$GIT_USER_EMAIL"
+          git config --local user.name "$GIT_USER_NAME"
+        env:
+          GIT_USER_EMAIL: "cblmargh@microsoft.com"
+          GIT_USER_NAME: "CBL-Mariner Servicing Account"
+
+      - name: Run cherry-pick action
+        run: |
+          cp toolkit/scripts/cherry_pick.sh ${{ runner.temp }}/cherry_pick.sh
+          for target_branch in ${{ env.cherry_pick_target_branches }}; do
+            echo "Cherry picking commit to $target_branch"
+
+            log_file="${{ runner.temp }}/$target_branch.txt"
+
+            git reset --hard
+            git clean -df
+            git checkout -- .
+
+            ${{ runner.temp }}/cherry_pick.sh \
+              -b "$target_branch" \
+              -c "${{ needs.pr_info.outputs.merge_commit }}" \
+              -o "${{ github.event.issue.pull_request.html_url }}" \
+              -l "$log_file" \
+              -r "${{ github.repository }}" \
+              -t "${{ github.event.issue.title }}" \
+              || rc=$?
+            if [ ${rc:-0} -ne 0 ]; then
+              gh pr comment ${{ github.event.issue.number }} \
+                --repo ${{ github.repository }} \
+                --body "Cherry-pick failed for branch $target_branch. See run log for more details: $RUN_URL"
+            else
+              gh pr comment ${{ github.event.issue.number }} \
+                --repo ${{ github.repository }} \
+                --body "Cherry-pick succeeded for branch $target_branch. See pull request $(cat $log_file)"
+              gh pr edit ${{ github.event.issue.number }} \
+                --repo ${{ github.repository }} \
+                --add-label "cherry_pick-$target_branch"
+            fi
+            echo "=============================================================="
+          done
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
