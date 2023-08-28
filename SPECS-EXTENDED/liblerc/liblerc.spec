@@ -7,7 +7,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/Esri/lerc
 Source0:        https://github.com/Esri/lerc/archive/v%{version}/lerc-%{version}.tar.gz#/%{name}-%{version}.tar.gz
-
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
 BuildRequires:  python3-devel
