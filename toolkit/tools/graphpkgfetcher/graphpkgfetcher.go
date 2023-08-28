@@ -423,6 +423,8 @@ func downloadSingleDeltaRPM(realDependencyGraph *pkggraph.PkgGraph, buildNode *p
 			logger.Log.Warnf("Can't find delta RPM to download for %s: %s (local copy may be newer than published version)", fullyQualifiedRpmName, err)
 			return nil
 		}
+	} else {
+		logger.Log.Debugf("Found pre-cached delta RPM for %s, skipping download", fullyQualifiedRpmName)
 	}
 
 	foundCacheRPM, err = file.PathExists(cachedRPMPath)
