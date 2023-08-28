@@ -2333,7 +2333,7 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 * Wed Oct 26 2022 Olivia Crain <oliviacrain@microsoft.com> - 6.2.0-10
 - Have virtiofsd subpackage obsolete qemu-common from 6.1.0 releases
 
-* Tue Sep 28 2022 Saul Paredes <saulparedes@microsoft.com> - 6.2.0-9
+* Wed Sep 28 2022 Saul Paredes <saulparedes@microsoft.com> - 6.2.0-9
 - Address CVE-2022-2962
 
 * Fri Sep 09 2022 Muhammad Falak <mwani@microsoft.com> - 6.2.0-8
