@@ -179,7 +179,6 @@ class PackageTestAnalyzer:
             TestSuite.to_file(f, [test_suite], prettyprint=True)
 
 
-# Entry point
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     required_args = parser.add_argument_group('mandatory arguments')
