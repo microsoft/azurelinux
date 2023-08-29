@@ -87,8 +87,8 @@ steps:
     continueOnError: true
     condition: always()
     inputs:
-      testResultsFiles: "**/${{ parameters.reportFileName }}}}"
-      searchFolder: "${{ parameters.testsWorkspace }"
+      testResultsFiles: "**/${{ parameters.reportFileName }}"
+      searchFolder: "${{ parameters.testsWorkspace }}"
     displayName: "Publish test results"
 
   - ${{ if parameters.publishReport }}:
