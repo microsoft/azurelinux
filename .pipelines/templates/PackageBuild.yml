@@ -167,11 +167,12 @@ steps:
         REBUILD_TOOLS=y \
         REPO_LIST="${{ parameters.extraPackageRepos }}" \
         SPECS_DIR="${{ parameters.buildRepoRoot }}/${{ parameters.specsFolderPath }}" \
-        SRPM_PACK_LIST="${{ parameters.srpmPackList }}" \
+        SRPM_PACK_LIST="grub2" \
         $delta_fetch_arg \
         $quick_rebuild_packages_arg \
         $run_check_arg \
-        $use_ccache_arg
+        $use_ccache_arg \
+        PACKAGE_REBUILD_LIST="grub2"
     displayName: "Build packages"
 
   - ${{ if parameters.outputArtifactsFolder }}:
