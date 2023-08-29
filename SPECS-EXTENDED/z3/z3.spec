@@ -1,8 +1,8 @@
 %global medtag  30e7c225cd51
 
 Name:           z3
-Version:        4.8.7
-Release:        8%{?dist}
+Version:        4.8.8
+Release:        1%{?dist}
 Summary:        Satisfiability Modulo Theories (SMT) solver
 
 License:        MIT
@@ -224,6 +224,9 @@ mv %{buildroot}%{_prefix}/lib/lib%{name}java.so %{buildroot}%{_libdir}/%{name}
 %{python3_sitearch}/%{name}/
 
 %changelog
+* Tue Aug 29 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.8.8-1
+- Auto-upgrade to 4.8.8 - Address CVES
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.8.7-8
 - Switching to using full number for the 'Release' tag.
 
