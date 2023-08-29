@@ -30,7 +30,7 @@ parameters:
 steps:
   - bash: |
       set -e
-      ./pkgtest.py -j "${{ parameters.testsWorkspace }}/${{ parameters.reportFileName }}" -b $(Build.BuildId) -p "${{ parameters.buildRepoRoot }}/build/logs/pkggen/rpmbuilding" -v
+      .pipelines/templates/pkgtest.py -j "${{ parameters.testsWorkspace }}/${{ parameters.reportFileName }}" -b $(Build.BuildId) -p "${{ parameters.buildRepoRoot }}/build/logs/pkggen/rpmbuilding" -v
     displayName: "Analyze test results"
 
   # - task: PythonScript@0
