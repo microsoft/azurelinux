@@ -18,20 +18,28 @@ func TestMain(m *testing.M) {
 	os.Exit(retVal)
 }
 
+// testFileName returns a file name in a temporary directory. This path will
+// be different for EVERY call to this function.
 func testFileName(t *testing.T) string {
 	return filepath.Join(t.TempDir(), t.Name())
 }
 
 func TestRemoveFileIfExistsValid(t *testing.T) {
+	fileName := testFileName(t)
 	// Create a file to remove
-	err := Write("test", testFileName(t))
+	err := Write("test", fileName)
 	assert.NoError(t, err)
 
-	err = RemoveFileIfExists(testFileName(t))
+	err = RemoveFileIfExists(fileName)
 	assert.NoError(t, err)
+
+	exists, err := PathExists(fileName)
+	assert.NoError(t, err)
+	assert.False(t, exists)
 }
 
 func TestRemoveFileDoesNotExist(t *testing.T) {
-	err := RemoveFileIfExists(testFileName(t))
+	fileName := testFileName(t)
+	err := RemoveFileIfExists(fileName)
 	assert.NoError(t, err)
 }
