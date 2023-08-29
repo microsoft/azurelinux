@@ -628,6 +628,8 @@ func (g *PkgGraph) AllNodesFrom(rootNode *PkgNode) []*PkgNode {
 }
 
 // AllRunNodes returns a list of all run nodes in the graph
+// It traverses the graph and returns all nodes of type TypeLocalRun and
+// TypeRemoteRun
 func (g *PkgGraph) AllRunNodes() []*PkgNode {
 	nodes := make([]*PkgNode, 0, g.Nodes().Len())
 	for _, n := range g.AllNodes() {
@@ -638,7 +640,13 @@ func (g *PkgGraph) AllRunNodes() []*PkgNode {
 	return nodes
 }
 
-// Returns all RunNodes in the LookupTable
+// AllPreferredRunNodes returns all RunNodes in the LookupTable
+// Though a graph can contain both LocalRun and RemoteRun node for a single
+// package-version, the LookupTable will have,
+// 1. LocalRun Node if only LocalRun node is present in the graph
+// 2. RemoteRun Node if only RemoteRun node is present in the graph
+// 3. LocalRun Node if both LocalRun and RemoteRun nodes are present in the graph
+// This function will return all RunNodes in the LookupTable.
 func (g *PkgGraph) AllPreferredRunNodes() []*PkgNode {
 	return g.allNodesOfType(func(n *LookupNode) *PkgNode {
 		return n.RunNode
