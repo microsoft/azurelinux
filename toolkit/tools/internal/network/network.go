@@ -42,13 +42,13 @@ func DownloadFile(url, dst string, caCerts *x509.CertPool, tlsCerts []tls.Certif
 	defer func() {
 		// If there was an error, ensure that the file is removed
 		if err != nil {
-			cleanupErr := removeFileIfExists(dst)
+			cleanupErr := file.RemoveFileIfExists(dst)
 			if cleanupErr != nil {
 				logger.Log.Errorf("Failed to remove failed network download file '%s': %s", dst, err)
 			}
 		}
+		dstFile.Close()
 	}()
-	defer dstFile.Close()
 
 	tlsConfig := &tls.Config{
 		RootCAs:      caCerts,
@@ -72,22 +72,6 @@ func DownloadFile(url, dst string, caCerts *x509.CertPool, tlsCerts []tls.Certif
 
 	_, err = io.Copy(dstFile, response.Body)
 
-	return
-}
-
-func removeFileIfExists(fullPath string) (err error) {
-	exists, err := file.PathExists(fullPath)
-	if err != nil {
-		err = fmt.Errorf("failed to check if file exists:\n%w", err)
-		return
-	}
-	if exists {
-		err = os.Remove(fullPath)
-		if err != nil {
-			err = fmt.Errorf("failed to remove file:\n%w", err)
-			return
-		}
-	}
 	return
 }
 
