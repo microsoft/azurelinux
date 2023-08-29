@@ -4,9 +4,9 @@ Distribution:   Mariner
 %global __requires_exclude_from %{_docdir}
 Summary: Secure imap and pop3 server
 Name: dovecot
-Version: 2.3.13
+Version: 2.3.20
 %global prever %{nil}
-Release: 5%{?dist}
+Release: 1%{?dist}
 #dovecot itself is MIT, a few sources are PD, pigeonhole is LGPLv2
 License: MIT and LGPLv2
 
@@ -449,6 +449,9 @@ make check
 %{_libdir}/%{name}/dict/libdriver_pgsql.so
 
 %changelog
+* Tue Aug 29 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.3.20-1
+- Auto-upgrade to 2.3.20 - Fix CVEs
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 2.3.13-5
 - Remove epoch
 
