@@ -1,3 +1,5 @@
+%define majmin %(echo %{version} | cut -d. -f1-2)
+
 Summary:        Qt5 - Support for rendering and displaying SVG
 Name:           qt5-qtsvg
 Version:        5.12.11
@@ -14,7 +16,6 @@ Patch101:       CVE-2018-21035.nopatch
 # Vulnerability is limited to the Windows OS.
 Patch102:       CVE-2022-25634.nopatch
 Patch103:       CVE-2023-32573.patch
-%define majmin %(echo %{version} | cut -d. -f1-2)
 %{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
 BuildRequires:  qt5-qtbase-devel >= %{version}
 BuildRequires:  qt5-qtbase-private-devel
@@ -85,6 +86,7 @@ popd
 %changelog
 * Mon Aug 28 2023 Andrew Phelps <anphel@microsoft.com> - 5.12.11-6
 - Bump release to rebuild with qt5-qtbase >= 5.12.11-9, which contains fix for CVE-2023-37369
+- Lint spec.
 
 * Fri May 26 2023 Thien Trung Vuong <tvuong@microsoft.com> - 5.12.11-5
 - Add patch for CVE-2023-32573
