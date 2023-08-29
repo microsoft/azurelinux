@@ -3,7 +3,7 @@
 Summary:        Qt5 - Support for rendering and displaying SVG
 Name:           qt5-qtsvg
 Version:        5.12.11
-Release:        5%{?dist}
+Release:        6%{?dist}
 # See LICENSE.GPL3-EXCEPT.txt, for exception details
 License:        GFDL AND GPLv2+ with exceptions AND LGPLv2.1+
 Vendor:         Microsoft Corporation
@@ -86,6 +86,9 @@ popd
 %{_qt5_examplesdir}/
 
 %changelog
+* Mon Aug 28 2023 Andrew Phelps <anphel@microsoft.com> - 5.12.11-6
+- Bump release to rebuild with qt5-qtbase >= 5.12.11-9, which contains fix for CVE-2023-37369
+
 * Fri May 26 2023 Thien Trung Vuong <tvuong@microsoft.com> - 5.12.11-5
 - Add patch for CVE-2023-32573
 
