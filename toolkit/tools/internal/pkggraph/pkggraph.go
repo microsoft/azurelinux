@@ -304,7 +304,7 @@ func (g *PkgGraph) validateNodeForLookup(pkgNode *PkgNode) (valid bool, err erro
 			// It is possible that
 			// 1. LocalRun and RemoteRun co-exist in a graph
 			// 2. Multiple RemoteRun nodes can exist in a graph
-			haveDuplicateNode = false
+			// So, this is not considered as a duplicate node
 		case TypeTest:
 			haveDuplicateNode = existingLookup.TestNode != nil
 		}
