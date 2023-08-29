@@ -129,7 +129,7 @@ fi
 %dir %attr(-,clamav,clamav) %{_sharedstatedir}/clamav
 
 %changelog
-* Wed Aug 16 2023 Tobias Brick <tobiasb@microsoft.com> -- 0.105.2-2
+* Tue Aug 29 2023 Tobias Brick <tobiasb@microsoft.com> - 0.105.2-2
 - Patch CVE-2022-48579
 
 * Fri Feb 17 2023 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 0.105.2-1
