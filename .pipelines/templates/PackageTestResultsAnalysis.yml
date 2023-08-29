@@ -1,0 +1,100 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+parameters:
+  - name: buildRepoRoot
+    type: string
+    default: "$(Build.SourcesDirectory)"
+
+  - name: outputArtifactsFolder
+    type: string
+    default: "$(Build.ArtifactStagingDirectory)"
+
+  - name: publishReport
+    type: boolean
+    default: true
+
+  - name: selfRepoName
+    type: string
+    default: "CBL-Mariner"
+
+  # Local constants. Can't use variables in a template without jobs or stages.
+  - name: reportFileName
+    type: string
+    default: "pkgtest_report_junit.xml"
+
+  - name: testsWorkspace
+    type: string
+    default: "$(Agent.TempDirectory)"
+
+steps:
+  - bash: |
+      set -e
+      ./pkgtest.py -j "${{ parameters.testsWorkspace }}/${{ parameters.reportFileName }}" -b $(Build.BuildId) -p "${{ parameters.buildRepoRoot }}/build/logs/pkggen/rpmbuilding" -v
+    displayName: "Analyze test results"
+
+  # - task: PythonScript@0
+  #   inputs:
+  #     scriptSource: "inline"
+  #     script: |
+  #       import os
+  #       import sys
+  #       import xml.etree.ElementTree as ET
+
+  #       # Get the test results file
+  #       test_results_file = os.path.join(os.getenv("BUILD_ARTIFACTSTAGINGDIRECTORY"), "pkgtest", "pkgtest_report_junit.xml")
+
+  #       # Parse the test results file
+  #       tree = ET.parse(test_results_file)
+  #       root = tree.getroot()
+
+  #       # Get the test results
+  #       test_results = root.findall("./testcase")
+
+  #       # Get the number of tests
+  #       num_tests = len(test_results)
+
+  #       # Get the number of failures
+  #       num_failures = 0
+  #       for test_result in test_results:
+  #         if test_result.findall("./failure"):
+  #           num_failures += 1
+
+  #       # Get the number of skipped tests
+  #       num_skipped = 0
+  #       for test_result in test_results:
+  #         if test_result.findall("./skipped"):
+  #           num_skipped += 1
+
+  #       # Get the number of errors
+  #       num_errors = 0
+  #       for test_result in test_results:
+  #         if test_result.findall("./error"):
+  #           num_errors += 1
+
+  #       # Get the number of passed tests
+  #       num_passed = num_tests - num_failures - num_skipped - num_errors
+
+  #       # Print the test results
+  #       print("##vso[task.setvariable variable=NumTests;isOutput=true]{}".format(num_tests))
+  #       print("##vso[task.setvariable variable=NumFailures;isOutput=true]{}".format(num_failures))
+  #       print("##vso[task.setvariable variable=NumSkipped;isOutput=true]{}".format(num_skipped))
+  #       print("##vso[task.setvariable variable=NumErrors;isOutput=true]{}".format(num_errors))
+  #       print("##vso[task.setvariable variable=NumPassed;isOutput=true]{}".format(num_passed))
+  #     displayName: "Parse test results"
+
+  - task: PublishTestResults@2
+    continueOnError: true
+    condition: always()
+    inputs:
+      testResultsFiles: "**/${{ parameters.reportFileName }}}}"
+      searchFolder: "${{ parameters.testsWorkspace }"
+    displayName: "Publish test results"
+
+  - ${{ if parameters.publishReport }}:
+      - bash: |
+          published_tests_dir="${{ parameters.outputArtifactsFolder }}/TESTS"
+          mkdir -p "$published_tests_dir"
+          cp "${{ parameters.testsWorkspace }}/${{ parameters.reportFileName }}" "$published_tests_dir"
+        condition: always()
+        displayName: "Copy test results output directory"
