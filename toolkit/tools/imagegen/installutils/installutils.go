@@ -955,11 +955,14 @@ func InstallGrubEnv(installRoot string) (err error) {
 // - installRoot is the base install directory
 // - rootDevice holds the root partition
 // - bootUUID is the UUID for the boot partition
+// - bootPrefix is the path to the /boot grub configs based on the mountpoints (i.e., if /boot is a separate partition from the rootfs partition, bootPrefix="").
 // - encryptedRoot holds the encrypted root information if encrypted root is enabled
 // - kernelCommandLine contains additional kernel parameters which may be optionally set
+// - readOnlyRoot holds the dm-verity read-only root partition information if dm-verity is enabled.
+// - isBootPartitionSeparate is a boolean value which is true if the /boot partition is separate from the root partition
 // Note: this boot partition could be different than the boot partition specified in the bootloader.
 // This boot partition specifically indicates where to find the kernel, config files, and initrd
-func InstallGrubCfg(installRoot, rootDevice, bootUUID, bootPrefix string, encryptedRoot diskutils.EncryptedRootDevice, kernelCommandLine configuration.KernelCommandLine, readOnlyRoot diskutils.VerityDevice) (err error) {
+func InstallGrubCfg(installRoot, rootDevice, bootUUID, bootPrefix string, encryptedRoot diskutils.EncryptedRootDevice, kernelCommandLine configuration.KernelCommandLine, readOnlyRoot diskutils.VerityDevice, isBootPartitionSeparate bool) (err error) {
 	const (
 		assetGrubcfgFile = "/installer/grub2/grub.cfg"
 		grubCfgFile      = "boot/grub2/grub.cfg"
@@ -1023,6 +1026,13 @@ func InstallGrubCfg(installRoot, rootDevice, bootUUID, bootPrefix string, encryp
 	err = setGrubCfgSELinux(installGrubCfgFile, kernelCommandLine)
 	if err != nil {
 		logger.Log.Warnf("Failed to set SELinux in grub.cfg: %v", err)
+		return
+	}
+
+	// Configure FIPS
+	err = setGrubCfgFIPS(isBootPartitionSeparate, bootUUID, installGrubCfgFile, kernelCommandLine)
+	if err != nil {
+		logger.Log.Warnf("Failed to set FIPS in grub.cfg: %v", err)
 		return
 	}
 
@@ -2047,6 +2057,33 @@ func setGrubCfgSELinux(grubPath string, kernelCommandline configuration.KernelCo
 		logger.Log.Warnf("Failed to set grub.cfg's SELinux setting: %v", err)
 	}
 
+	return
+}
+
+func setGrubCfgFIPS(isBootPartitionSeparate bool, bootUUID, grubPath string, kernelCommandline configuration.KernelCommandLine) (err error) {
+	const (
+		enableFIPSPattern = "{{.FIPS}}"
+		enableFIPS        = "fips=1"
+		bootPrefix        = "boot="
+		uuidPrefix        = "UUID="
+	)
+
+	// If EnableFIPS is set, always add "fips=1" to the kernel cmdline.
+	// If /boot is a dedicated partition from the root partition, add "boot=UUID=<bootUUID value>" as well to the kernel cmdline in grub.cfg.
+	// This second step is required for fips boot-time self tests to find the kernel's .hmac file in the /boot partition.
+	fipsKernelArgument := ""
+	if kernelCommandline.EnableFIPS {
+		fipsKernelArgument = fmt.Sprintf("%s", enableFIPS)
+		if isBootPartitionSeparate {
+			fipsKernelArgument = fmt.Sprintf("%s %s%s%s", fipsKernelArgument, bootPrefix, uuidPrefix, bootUUID)
+		}
+	}
+
+	logger.Log.Debugf("Adding EnableFIPS('%s') to '%s'", fipsKernelArgument, grubPath)
+	err = sed(enableFIPSPattern, fipsKernelArgument, kernelCommandline.GetSedDelimeter(), grubPath)
+	if err != nil {
+		logger.Log.Warnf("Failed to set grub.cfg's EnableFIPS setting: %v", err)
+	}
 	return
 }
 
