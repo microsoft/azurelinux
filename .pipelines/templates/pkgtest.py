@@ -1,7 +1,7 @@
 #!/bin/python3
 
-# Tool to inspect the Mariner rpm build log to collect
-# the package test status and generate the CSV report
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 
 import argparse
 import os
@@ -165,8 +165,8 @@ class PackageTestAnalyzer:
         '''
         test_cases = []
         with open(junit_xml_filename, "w") as junit_fd:
-            with os.scandir(path) as dentry:
-                for file in dentry:
+            with os.scandir(path) as dir_entry:
+                for file in dir_entry:
                     if file.is_file() and file.name.endswith('src.rpm.test.log'):
                         self.logger.log_debug(f"Processing : {file.name}")
                         fpath = f"{path}/{file.name}"
@@ -186,8 +186,8 @@ if __name__ == "__main__":
     parser.add_argument('-j', '--junit', action='store', required=False,
                         default="pkgtest_report_junit.xml", help="JUnit XML report filename")
     required_args.add_argument('-p', '--path', action='store', required=True,
-                        help="Path of the rpmbuild log directory")
-    parser.add_argument('-t', '--testname', action='store', required=False,
+                        help="Path of the 'rpmbuild' log directory")
+    parser.add_argument('-t', '--test_name', action='store', required=False,
                         default="Package-Test", help="High-level test name for display")
 
     args = parser.parse_args()
@@ -198,4 +198,4 @@ if __name__ == "__main__":
 
     # Instantiate the ptest object and process the package test logs
     analyzer = PackageTestAnalyzer(logger)
-    analyzer.scan_pkg_test_logs(args.path, args.junit, args.testname)
+    analyzer.scan_pkg_test_logs(args.path, args.junit, args.test_name)
