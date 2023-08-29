@@ -133,7 +133,7 @@ func addUnresolvedPackage(g *pkggraph.PkgGraph, pkgVer *pkgjson.PackageVer) (new
 	}
 
 	// Create a new node
-	newRunNode, err = g.AddPkgNode(pkgVer, pkggraph.StateUnresolved, pkggraph.TypeRemoteRun, pkggraph.NoSRPMPath, pkggraph.NoRPMPath, pkggraph.NoSpecPath, pkggraph.NoSourceDir, pkggraph.NoArchitecture, pkggraph.NoSourceRepo)
+	newRunNode, err = g.AddRemoteUnresolvedNode(pkgVer)
 	if err != nil {
 		return
 	}
