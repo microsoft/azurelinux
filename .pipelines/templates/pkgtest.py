@@ -6,87 +6,74 @@
 import argparse
 import os
 import re
-import csv
 import inspect
 from dateutil.parser import parse
 from junit_xml import TestSuite, TestCase
-MARINER_PKG_TEST_TABLENAME="Mariner_Package_Test"
-PKG_TEST_COMPOSITE_KEY = ["BuildID", "PackageName", "Version"]
-
-PKGTEST_TOOL_PREFIX="PKGTEST::"
 
 # Markers of package test for detecting pass/fail
-PACKAGE_TEST_IGNORE_ID  = "echo"
-PACKAGE_TEST_END_ID     = "====== CHECK DONE"
-PACKAGE_TEST_START_ID   = "====== CHECK START"
-PACKAGE_TEST_SKIP_ID    = "====== SKIPPING CHECK"
+PACKAGE_TEST_END_REGEX     = re.compile(r'(?<=msg=")====== CHECK DONE .*\. EXIT STATUS (\d+)')
+PACKAGE_TEST_IGNORE_REGEX  = re.compile(r'msg="\+ echo')
+PACKAGE_TEST_SKIP_REGEX    = re.compile(r'(?<=msg=")====== SKIPPING CHECK')
+PACKAGE_TEST_START_REGEX   = re.compile(r'(?<=msg=")====== CHECK START')
+PACKAGE_TEST_STATUS_INDEX  = 0
 
-# CSV header for package test report
-report_header = ["BuildID", "PackageName", "Version", "ExecutionTime", "Results"]
+TEST_FILE_REGEX = re.compile(r'(.*/)*(.*)-(.*)-(.*?)(\.src.rpm.test.log)')
+TEST_FILE_PACKAGE_NAME_INDEX = 1
+TEST_FILE_PACKAGE_VERSION_INDEX = 2
+TEST_FILE_PACKAGE_RELEASE_INDEX = 3
 
-class dlogger:
-    '''
-    '''
-    def __init__(self, verbose):
-        self.verbose = verbose
-
-    def print_debug_logs(self, msg):
+class PipelineLogger:
+    def log_debug(self, msg):
         '''
-        Debug logger for pkgtest utility
+        Debug logger for the package test analyzer.
         '''
-        if self.verbose == False:
-            return
         current_frame = inspect.currentframe()
         caller_frame = inspect.getouterframes(current_frame, 2)
         caller = caller_frame[1][3]
-        caller_log = "%s::" % (caller)
-        print(PKGTEST_TOOL_PREFIX, caller_log, msg)
+        print(f"##[debug]PACKAGE_TESTS::{caller}::{msg}")
 
-#class db:
 
-class pkgtest:
+class PackageTestAnalyzer:
     '''
     Package test class to expose all the required functionality for parsing
     the Mariner package build logs.
     '''
     def __init__(self, logger):
-        self.debug_log = logger
+        self.logger = logger
 
 
     def _get_pkg_details(self, filename):
         '''
         Fetch the package details from the log filename
         '''
-        g = re.search(r'(.*/)*(.*)-(.*)-(.*?)(\.src.rpm.test.log)', filename)
-        pkgname  = g.groups()[1]
-        version = g.groups()[2] + "-" + g.groups()[3]
-        self.debug_log.print_debug_logs("Package: %s  Version: %s" % (pkgname, version))
+        matched_groups = TEST_FILE_REGEX.search(filename).groups()
+        package_name  = matched_groups[TEST_FILE_PACKAGE_NAME_INDEX]
+        version = f"{matched_groups[TEST_FILE_PACKAGE_VERSION_INDEX]}-{matched_groups[TEST_FILE_PACKAGE_RELEASE_INDEX]}"
+        self.logger.log_debug(f"Package: {package_name}  Version: {version}")
 
-        return pkgname, version
+        return package_name, version
 
-    def _get_timestamp(self, log):
+    def _get_timestamp(self, line):
         '''
-        Get the timestamp from the log. Time is converted to epoch time
+        Get the timestamp from the log. Time is converted to epoch time.
         '''
         try:
-            timestamp = parse((log.split(" ")[0].split("=")[1]).replace('"', ''))
+            timestamp = parse((line.split(" ")[0].split("=")[1]).replace('"', ''))
         except ValueError as err:
-            self.debug_log.print_debug_logs("Timestamp parsing failed, line: \"%s\". Error: \"%s\"" % (log, str(err)))
+            self.logger.log_debug(f"Timestamp parsing failed. Line: '{line}'. Error: '{str(err)}'.")
             return None
         # return epoch time
         return timestamp.timestamp()
 
-    def _get_test_status(self, line):
+    def _get_test_status(self, status):
         '''
-        Get the test status from the log
+        Get the test status from the log.
         '''
-        status = int((line.split("EXIT STATUS ")[1]).replace('"', ''))
-        self.debug_log.print_debug_logs("STATUS => %d" % status)
-        if status == 0:
-            return "Pass"
-        return "Fail"
+        self.logger.log_debug("STATUS => {status}.")
 
-    def _check_test_status(self, fp):
+        return "Pass" if status == "0" else "Fail"
+
+    def _get_test_details(self, fp):
         '''
         Check the package test status
         '''
@@ -94,19 +81,22 @@ class pkgtest:
         status = "Not Supported"
         for line in fp:
             line = line.strip("\n")
-            if re.search(PACKAGE_TEST_IGNORE_ID, line):
+            if PACKAGE_TEST_IGNORE_REGEX.search(line):
                     continue
 
-            if re.search(PACKAGE_TEST_START_ID, line):
-                self.debug_log.print_debug_logs(line)
+            if PACKAGE_TEST_START_REGEX.search(line):
+                self.logger.log_debug(line)
                 start_time = self._get_timestamp(line)
-            if re.search(PACKAGE_TEST_END_ID, line):
-                self.debug_log.print_debug_logs(line)
+
+            end_line_match = PACKAGE_TEST_END_REGEX.search(line)
+            if end_line_match:
+                self.logger.log_debug(line)
                 end_time = self._get_timestamp(line)
-                status = self._get_test_status(line)
+                status = self._get_test_status(end_line_match.groups()[PACKAGE_TEST_STATUS_INDEX])
                 break
-            if re.search(PACKAGE_TEST_SKIP_ID, line):
-                self.debug_log.print_debug_logs(line)
+
+            if PACKAGE_TEST_SKIP_REGEX.search(line):
+                self.logger.log_debug(line)
                 status = "Skipped"
                 break
         if start_time != None and end_time == None:
@@ -115,54 +105,49 @@ class pkgtest:
 
     def _analyze_pkg_test_log(self, filename):
         '''
-        Scrape the pkg test log and detect the different status of
-        test like pass/fail/skipped/aborted/not supported
+        Scrape the package test log and detect the test status.
         '''
         start_time = end_time = status = None
         elapsed_time = 0
-        with open(filename, 'r') as fp:
-            status, start_time, end_time = self._check_test_status(fp)
+        with open(filename, 'r') as f:
+            status, start_time, end_time = self._get_test_details(f)
+
         if start_time != None and end_time != None:
             elapsed_time = end_time - start_time
 
-        dbg_msg = "status: %s start time: %s end time: %s" % (status, start_time, end_time)
-        self.debug_log.print_debug_logs(dbg_msg)
-        fp.close()
-        return status,elapsed_time
+        self.logger.log_debug(f"Status: {status}. Start time: {start_time}. End time: {end_time}.")
+        return status, elapsed_time
 
-    def _get_failure_log(self, fpath):
-        '''
-        '''
+    def _get_test_output(self, fpath):
         start_log = False
         contents = []
-        with open(fpath, 'r') as fp:
-            for line in fp:
-                if re.search(PACKAGE_TEST_IGNORE_ID, line):
+        with open(fpath, 'r') as f:
+            for line in f:
+                if PACKAGE_TEST_IGNORE_REGEX.search(line):
                     continue
+
+                if PACKAGE_TEST_START_REGEX.search(line):
+                    start_log = True
+
                 if start_log:
                     contents.append(line)
-                if re.search(PACKAGE_TEST_START_ID, line):
-                    contents.append(line)
-                    start_log = True
-                if re.search(PACKAGE_TEST_END_ID, line):
-                    contents.append(line)
-                    break
-            fp.close()
-        return(" ".join(contents))
 
-    def _get_junit_test_status(self, pkgname, version, status, time, fpath, testname):
-        '''
-        '''
+                if PACKAGE_TEST_END_REGEX.search(line):
+                    break
+            f.close()
+        return " ".join(contents)
+
+    def _build_junit_test_case(self, package_name, status, time, fpath, test_name):
+        stdout = None
         if status == "Fail":
-            stdout = self._get_failure_log(fpath)
-            stderr = None
-        else:
-            stdout = stderr = None
-        tc = TestCase(pkgname, testname, time, stdout, stderr)
+            stdout = self._get_test_output(fpath)
+
+        tc = TestCase(package_name, test_name, time, stdout)
 
         if status == "Pass":
             return tc
-        elif status == "Fail":
+
+        if status == "Fail":
             tc.add_failure_info("TEST FAILED. CHECK ATTACHMENTS TAB FOR FAILURE LOG")
         elif status == "Skipped":
             tc.add_skipped_info("PACKAGE TEST SKIPPED")
@@ -170,6 +155,7 @@ class pkgtest:
             tc.add_skipped_info("PACKAGE TEST NOT SUPPORTED")
         else:
             tc.add_error_info(status)
+
         return tc
 
 
@@ -177,43 +163,39 @@ class pkgtest:
         '''
         Scan the rpm build log folder and generate the package test report.
         '''
-        testcases = []
+        test_cases = []
         with open(junit_xml_filename, "w") as junit_fd:
             with os.scandir(path) as dentry:
                 for file in dentry:
                     if file.is_file() and file.name.endswith('src.rpm.test.log'):
-                        self.debug_log.print_debug_logs("Processing : %s" % file.name)
-                        fpath = "%s/%s" % (path, file.name)
-                        pkgname, version = self._get_pkg_details(file.name)
-                        status, time = self._analyze_pkg_test_log(fpath)
-                        testcases.append(self._get_junit_test_status(pkgname, version, status, time, fpath, test_name))
-                        dbg_msg = "pkgname: %s version: %s test status: %s duration: %s\n" % (pkgname, version, status, time)
-                        self.debug_log.print_debug_logs(dbg_msg)
-            testsuite = TestSuite(test_name, testcases)
-            TestSuite.to_file(junit_fd, [testsuite], prettyprint=True)
+                        self.logger.log_debug(f"Processing : {file.name}")
+                        fpath = f"{path}/{file.name}"
+                        package_name, version = self._get_pkg_details(file.name)
+                        status, elapsed_time = self._analyze_pkg_test_log(fpath)
+                        test_cases.append(self._build_junit_test_case(package_name, status, elapsed_time, fpath, test_name))
+                        self.logger.log_debug(f"Package name: {package_name}. Version: {version}. Test status: {status}. Duration: {elapsed_time}.")
+            test_suite = TestSuite(test_name, test_cases)
+            TestSuite.to_file(junit_fd, [test_suite], prettyprint=True)
 
 
 # Entry point
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    requires_args = parser.add_argument_group('mandatory arguments')
+    required_args = parser.add_argument_group('mandatory arguments')
 
     parser.add_argument('-j', '--junit', action='store', required=False,
-                        default="pkgtest_report_junit.xml", help="junit xml (default: pkgtest_report_junit.xml)")
-    requires_args.add_argument('-p', '--path', action='store', required=True,
-                        help="path of rpmbuild log directory")
+                        default="pkgtest_report_junit.xml", help="JUnit XML report filename")
+    required_args.add_argument('-p', '--path', action='store', required=True,
+                        help="Path of the rpmbuild log directory")
     parser.add_argument('-t', '--testname', action='store', required=False,
                         default="Package-Test", help="High-level test name for display")
-    parser.add_argument('-v', '--verbose', action='store_true',
-                        help="enable verbose")
 
     args = parser.parse_args()
 
     # Custom logger for ptest to log debug messages
-    logger = dlogger(args.verbose)
-    logger.print_debug_logs("Path: %s" % args.path)
+    logger = PipelineLogger()
+    logger.log_debug(f"Path: {args.path}")
 
     # Instantiate the ptest object and process the package test logs
-    ptest = pkgtest(logger)
-    ptest.scan_pkg_test_logs(args.path, args.junit, args.testname)
-
+    analyzer = PackageTestAnalyzer(logger)
+    analyzer.scan_pkg_test_logs(args.path, args.junit, args.testname)
