@@ -2,6 +2,10 @@
 # Licensed under the MIT License.
 
 parameters:
+  - name: authenticateToPip
+    type: boolean
+    default: true
+
   - name: buildRepoRoot
     type: string
     default: "$(Build.SourcesDirectory)"
@@ -28,6 +32,16 @@ parameters:
     default: "$(Agent.TempDirectory)"
 
 steps:
+  - ${{ if parameters.authenticateToPip }}:
+      - task: PipAuthenticate@1
+        inputs:
+          artifactFeeds: 'mariner/Mariner-Pypi-Feed'
+        displayName: "Authenticate to pip"
+
+  - bash: |
+      pip3 install junit_xml python-dateutil
+    displayName: "Install Python dependencies"
+
   - bash: |
       set -e
       .pipelines/templates/pkgtest.py -j "${{ parameters.testsWorkspace }}/${{ parameters.reportFileName }}" -b $(Build.BuildId) -p "${{ parameters.buildRepoRoot }}/build/logs/pkggen/rpmbuilding" -v
