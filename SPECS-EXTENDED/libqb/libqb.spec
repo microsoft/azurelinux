@@ -4,7 +4,7 @@ Distribution:   Mariner
 
 Name:           libqb
 Version:        1.0.5
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        Library providing high performance logging, tracing, ipc, and poll
 
 License:        LGPLv2+
@@ -14,6 +14,8 @@ Patch0:         IPC-avoid-temporary-channel-priority-loss.patch
 # https://github.com/ClusterLabs/libqb/pull/383
 Patch1:         libqb-fix-list-handling-gcc10.patch
 Patch2:         libqb-fix-list-handling-gcc10-2.patch
+Patch3:    CVE-2023-39976.patch
+Patch4:    CVE-2023-39976-1.patch
 
 BuildRequires:  autoconf automake libtool
 BuildRequires:  check-devel
@@ -74,6 +76,9 @@ developing applications that use %{name}.
 %{_mandir}/man3/qb*3*
 
 %changelog
+* Tue Aug 29 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0.5-8
+- Add patch for CVE-2023-39976
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.5-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
