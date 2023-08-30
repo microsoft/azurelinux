@@ -171,13 +171,6 @@ steps:
         $use_ccache_arg
     displayName: "Build packages"
 
-  - ${{ if parameters.isCheckBuild }}:
-      - template: PackageTestResultsAnalysis.yml@${{ parameters.selfRepoName }}
-        parameters:
-          buildRepoRoot: ${{ parameters.buildRepoRoot }}
-          failOnTestFailures: ${{ parameters.failOnTestFailures }}
-          outputArtifactsFolder: ${{ parameters.outputArtifactsFolder }}
-
   - ${{ if parameters.outputArtifactsFolder }}:
       - ${{ if parameters.rpmsTarballName }}:
           - script: |
@@ -210,3 +203,10 @@ steps:
               tar -C "${{ parameters.buildRepoRoot }}/build/timestamp" -czf "$published_logs_dir/timestamp.tar.gz" .
             condition: always()
             displayName: "Copy logs for publishing"
+
+  - ${{ if parameters.isCheckBuild }}:
+      - template: PackageTestResultsAnalysis.yml@${{ parameters.selfRepoName }}
+        parameters:
+          buildRepoRoot: ${{ parameters.buildRepoRoot }}
+          failOnTestFailures: ${{ parameters.failOnTestFailures }}
+          outputArtifactsFolder: ${{ parameters.outputArtifactsFolder }}
