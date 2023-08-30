@@ -1101,6 +1101,19 @@
                 "PR": [
                     "https://github.com/microsoft/CBL-Mariner/pull/5972"
                 ]
+            },
+            "CONFIG_MCTP": {
+                "value": [
+                    "is not set"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "Do not enable mctp unless fix for CVE-2023-3439 is present",
+                "PR": [
+                    "https://github.com/torvalds/linux/commit/b561275d633bcd8e0e8055ab86f1a13df75a0269"
+                ]
             }
         }
     }
