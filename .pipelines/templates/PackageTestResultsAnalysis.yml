@@ -35,7 +35,7 @@ steps:
   - ${{ if parameters.authenticateToPip }}:
       - task: PipAuthenticate@1
         inputs:
-          artifactFeeds: 'mariner/Mariner-Pypi-Feed'
+          artifactFeeds: "mariner/Mariner-Pypi-Feed"
         displayName: "Authenticate to pip"
 
   - bash: |
