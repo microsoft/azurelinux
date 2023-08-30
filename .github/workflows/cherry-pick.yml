@@ -10,7 +10,8 @@
 # Note the list of target branches is space-separated, and the commenter must be a
 # member or owner of the repository for the action to work.
 # After cherry-pick succeeds for a branch, a new PR will be created to merge the commit
-# to that target branch.
+# to that target branch, and a label will be added to the original PR to indicate that
+# the commit has been cherry-picked to that branch.
 name: Cherry pick commits from PR
 on:
   pull_request:

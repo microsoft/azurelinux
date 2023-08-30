@@ -59,6 +59,9 @@ function cherry_pick {
         gh pr comment "$pr_number" \
             --repo "$repo" \
             --body "Cherry-pick succeeded for branch \`$target_branch\`. See pull request #$new_pr"
+        gh pr edit "$pr_number" \
+            --repo "$repo" \
+            --add-label "cherry_pick-$target_branch"
     fi
 }
 
