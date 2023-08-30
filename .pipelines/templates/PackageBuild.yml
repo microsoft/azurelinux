@@ -22,6 +22,10 @@ parameters:
     type: string
     default: ""
 
+  - name: failOnTestFailures
+    type: boolean
+    default: true
+
   - name: isCheckBuild
     type: string
     default: "default"
@@ -171,6 +175,7 @@ steps:
       - template: PackageTestResultsAnalysis.yml@${{ parameters.selfRepoName }}
         parameters:
           buildRepoRoot: ${{ parameters.buildRepoRoot }}
+          failOnTestFailures: ${{ parameters.failOnTestFailures }}
           outputArtifactsFolder: ${{ parameters.outputArtifactsFolder }}
 
   - ${{ if parameters.outputArtifactsFolder }}:

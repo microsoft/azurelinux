@@ -10,6 +10,10 @@ parameters:
     type: string
     default: "$(Build.SourcesDirectory)"
 
+  - name: failOnTestFailures
+    type: boolean
+    default: true
+
   - name: outputArtifactsFolder
     type: string
     default: "$(Build.ArtifactStagingDirectory)"
@@ -269,10 +273,9 @@ steps:
           logs_dir_path,
           report_path,
           test_suit_name)
-    displayName: "Parse test results"
+    displayName: "Convert test logs to a JUnit report"
 
   - task: PublishTestResults@2
-    continueOnError: true
     inputs:
       testResultsFiles: "**/${{ parameters.reportFileName }}"
       searchFolder: "${{ parameters.testsWorkspace }}"
@@ -283,4 +286,18 @@ steps:
           published_tests_dir="${{ parameters.outputArtifactsFolder }}/TESTS"
           mkdir -p "$published_tests_dir"
           cp "${{ parameters.testsWorkspace }}/${{ parameters.reportFileName }}" "$published_tests_dir"
-        displayName: "Copy test results output directory"
+        displayName: "Copy test results to the output directory"
+
+  - ${{ if parameters.failOnTestFailures }}:
+      - bash: |
+            report_path="${{ parameters.testsWorkspace }}/${{ parameters.reportFileName }}"
+            if [[ ! -f "$report_path" ]]; then
+                echo "##[error]Test report not found at '$report_path'."
+                exit 1
+            fi
+
+            if ! grep -q '^<testsuites.*failures="0"' "$report_path"; then
+                echo "##[error]Test report has failing tests. See the 'Tests' tab for details."
+                exit 1
+            fi
+        displayName: "Verify all tests passed"
