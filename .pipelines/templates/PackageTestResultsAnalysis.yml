@@ -42,11 +42,6 @@ steps:
       pip3 install junit_xml
     displayName: "Install Python dependencies"
 
-  - bash: |
-      set -e
-      .pipelines/templates/pkgtest.py -j "${{ parameters.testsWorkspace }}/${{ parameters.reportFileName }}" -p "${{ parameters.buildRepoRoot }}/build/logs/pkggen/rpmbuilding"
-    displayName: "Analyze test results"
-
   - task: PythonScript@0
     inputs:
       pythonInterpreter: "/bin/python3"
