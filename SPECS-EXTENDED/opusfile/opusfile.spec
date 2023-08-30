@@ -2,11 +2,12 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:          opusfile
 Version:       0.12
-Release:       2%{?dist}
+Release:       3%{?dist}
 Summary:       A high-level API for decoding and seeking within .opus files
 License:       BSD
 URL:           https://www.opus-codec.org/
 Source0:       https://downloads.xiph.org/releases/opus/%{name}-%{version}.tar.gz
+Patch0:    CVE-2022-47021.patch
 
 BuildRequires: gcc
 BuildRequires: libogg-devel
@@ -35,6 +36,7 @@ Files for development with %{name}.
 
 %prep
 %setup -q
+%patch0 -p1
 
 %build
 %configure --disable-static
@@ -64,6 +66,9 @@ find %{buildroot} -type f -name "*.la" -delete
 %{_libdir}/libopusurl.so
 
 %changelog
+* Wed Aug 30 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.12-3
+- Add patch for CVE-2022-47021
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.12-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
