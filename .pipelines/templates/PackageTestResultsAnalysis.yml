@@ -39,7 +39,7 @@ steps:
         displayName: "Authenticate to pip"
 
   - bash: |
-      pip3 install junit_xml python-dateutil
+      pip3 install junit_xml
     displayName: "Install Python dependencies"
 
   # - bash: |
