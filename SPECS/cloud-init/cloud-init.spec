@@ -1,7 +1,7 @@
 Summary:        Cloud instance init scripts
 Name:           cloud-init
 Version:        23.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -74,8 +74,6 @@ Cloud-init configuration for Hyper-V telemetry
 %prep
 %autosetup -p1 -n %{name}-%{version}
 
-find systemd -name "cloud*.service*" | xargs sed -i s/StandardOutput=journal+console/StandardOutput=journal/g
-
 %build
 python3 setup.py build
 
@@ -145,6 +143,9 @@ make check %{?_smp_mflags}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
+* Thu Aug 24 2023 Minghe Ren <mingheren@microsoft.com> - 23.2-3
+- Remove the line prohibits cloud-init log dumping to serial console 
+
 * Fri Aug 11 2023 Minghe Ren <mingheren@microsoft.com> - 23.2-2
 - Add patch for unit test failure
 
