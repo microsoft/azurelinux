@@ -102,7 +102,7 @@ fi
 * Fri Aug 25 2023 Andy Zaugg <azaugg@linkedin.com> - 1.9.14p3-1
 - Bump version to 1.9.14p3
 
-* Thu May 08 2023 Andy Zaugg <azaugg@linkedin.com> - 1.9.13p3-2
+* Mon May 08 2023 Andy Zaugg <azaugg@linkedin.com> - 1.9.13p3-2
 - Add config option to sudo build to allow configuration of sudo via LDAP.
 
 * Thu Mar 16 2023 Thien Trung Vuong <tvuong@microsoft.com> - 1.9.13p3-1
