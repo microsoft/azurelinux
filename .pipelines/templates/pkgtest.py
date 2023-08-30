@@ -70,7 +70,7 @@ class PackageTestAnalyzer:
         '''
         Get the test status from the log.
         '''
-        self.logger.log_debug("STATUS => {status}.")
+        self.logger.log_debug(f"STATUS => {status}.")
 
         return "Pass" if status == "0" else "Fail"
 

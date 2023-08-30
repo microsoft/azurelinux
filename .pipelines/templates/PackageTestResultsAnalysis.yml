@@ -42,6 +42,9 @@ steps:
       pip3 install junit_xml
     displayName: "Install Python dependencies"
 
+  - task: UsePythonVersion@0
+    displayName: "Set used Python version"
+
   - bash: |
       set -e
       .pipelines/templates/pkgtest.py -j "${{ parameters.testsWorkspace }}/${{ parameters.reportFileName }}" -p "${{ parameters.buildRepoRoot }}/build/logs/pkggen/rpmbuilding"
@@ -119,7 +122,7 @@ steps:
                 '''
                 Get the test status from the log.
                 '''
-                self.logger.log_debug("STATUS => {status}.")
+                self.logger.log_debug(f"STATUS => {status}.")
 
                 return "Pass" if status == "0" else "Fail"
 
