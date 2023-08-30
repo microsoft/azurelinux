@@ -93,6 +93,7 @@ extends:
                       customToolchainArtifactName: $(toolchainArtifactNameBase)_${{ configuration.name }}
                       isCheckBuild: true
                       isQuickRebuildPackages: true
+                      isUseCCache: false
                       outputArtifactsFolder: $(ob_outputDirectory)
                       selfRepoName: self
 
