@@ -8,7 +8,7 @@ Distribution:   Mariner
 URL:            https://ogdi.sourceforge.net/
 # new project location is https://github.com/libogdi/ogdi
 Source0:        https://github.com/libogdi/ogdi/archive/%{name}_4_1_0.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        http://ogdi.sourceforge.net/ogdi.pdf
+Source1:        https://ogdi.sourceforge.net/ogdi.pdf
 # https://bugzilla.redhat.com/show_bug.cgi?id=1470896
 Patch0:         ogdi-%{version}-sailer.patch
 BuildRequires:  expat-devel
