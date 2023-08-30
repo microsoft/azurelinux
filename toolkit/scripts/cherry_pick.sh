@@ -46,7 +46,6 @@ function cherry_pick {
         gh pr comment "$pr_number" \
             --repo "$repo" \
             --body "Cherry-pick failed for branch \`$target_branch\`. See run logs for more details: $RUN_URL"
-        exit 1
     else
         echo "pushing to remote"
         git push -u origin "$tmp_branch"
@@ -84,5 +83,3 @@ fi
 
 collect_pr_info "$repo" "$pr_number"
 cherry_pick "$commit_hash" "$target_branch" "$repo" "$pr_number" "$original_pr_title"
-echo "================================================================================"
-echo "================================================================================"

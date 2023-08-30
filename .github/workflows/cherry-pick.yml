@@ -1,7 +1,16 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-# TODO
+# This action cherry-picks CVE fix commits from fast-track branches to corresponding
+# development branches for each version of Mariner. By default, the workflow is run
+# whenever a CVE fix PR to a fast-track branch is merged. Additional target branches
+# for cherry-pick can be specified by adding a comment to the original PR with the
+# following syntax:
+#   /cherry-pick <target-branch-1> <target-branch-2>
+# Note the list of target branches is space-separated, and the commenter must be a
+# member or owner of the repository for the action to work.
+# After cherry-pick succeeds for a branch, a new PR will be created to merge the commit
+# to that target branch.
 name: Cherry pick commits from PR
 on:
   pull_request:
@@ -22,7 +31,7 @@ defaults:
     shell: bash
 
 env:
-  CHERRY_PICK_BRANCH_MAPPING: '{"fasttrack/1.0": "tvuong/test-1.0-dev", "fasttrack/2.0": "tvuong/test-main"}'
+  CHERRY_PICK_BRANCH_MAPPING: '{"fasttrack/1.0": "1.0-dev", "fasttrack/2.0": "main"}'
 
 jobs:
   # Scans the PR for cherry pick comments, in addition to the default cherry pick target
@@ -35,11 +44,11 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      # create an array of target branches
-      # add the default one to the list
-      # scan PR comments for cherry pick commands, parse and add them to list
-      # dedup list
-      # write output
+      # Collect target branches in a list. The list includes:
+      # - default target branch
+      # - any branch specified in PR comments with the syntax
+      #     /cherry-pick <branch-1> <branch-2>
+      # The final list will only contain unique branches
       - name: Create list of target branches
         id: target_branches
         run: |
@@ -84,14 +93,12 @@ jobs:
       # output conflicts to the action logs and notify in the original PR.
       - name: Run cherry-pick action
         run: |
-          # TODO: remove this
-          cp toolkit/scripts/cherry_pick.sh ${{ runner.temp }}/cherry_pick.sh
-
           for target_branch in ${{ needs.collect_target_branches.outputs.cherry_pick_target_branches }}; do
-            ${{ runner.temp }}/cherry_pick.sh \
+          toolkit/scripts/cherry_pick.sh \
               -r "${{ github.repository }}" \
               -p "${{ github.event.pull_request.number }}" \
               -t "$target_branch" || true
+            echo "================================================================================"
           done
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
