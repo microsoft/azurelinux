@@ -23,12 +23,14 @@ print_error() {
 help() {
 echo "
 Usage:
-sudo make containerized-rpmbuild [REPO_PATH=/path/to/CBL-Mariner] [MODE=test|build] [VERSION=1.0|2.0] [MOUNTS= /src/path:/dst/path] [ENABLE_REPO=y]
+sudo make containerized-rpmbuild [REPO_PATH=/path/to/CBL-Mariner] [MODE=test|build] [VERSION=1.0|2.0] [MOUNTS= /src/path:/dst/path] [ENABLE_REPO=y] [SPECS_DIR=/path/to/SPECS_DIR/to/use]
 
 Starts a docker container with the specified version of mariner.
 
 Optional arguments:
     REPO_PATH:      path to the CBL-Mariner repo root directory. default: "current directory"
+    SPECS_DIR:      The SPECS_DIR variable is reused from base Makefile. By Default it points to 'CBL-Mariner/SPECS'
+                    We can override the SPECS_DIR to extended e.g by appeneding: SPECS_DIR=path/to/SPECS-EXTENDED
     MODE            build or test. default:"build"
                         In 'test' mode it will use a pre-built mariner chroot image.
                         In 'build' mode it will use the latest published container.
