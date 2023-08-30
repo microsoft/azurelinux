@@ -23,15 +23,36 @@ TEST_FILE_PACKAGE_NAME_INDEX    = 1
 TEST_FILE_PACKAGE_VERSION_INDEX = 2
 TEST_FILE_PACKAGE_RELEASE_INDEX = 3
 
-class PipelineLogger:
+class ADOPipelineLogger:
     def log_debug(self, msg):
         '''
-        Debug logger for the package test analyzer.
+        Debug log for an ADO pipeline.
         '''
         current_frame = inspect.currentframe()
         caller_frame = inspect.getouterframes(current_frame, 2)
         caller = caller_frame[1][3]
         print(f"##[debug]PACKAGE_TESTS::{caller}::{msg}")
+
+
+    def log_group_begin(self, msg):
+        '''
+        Group begin log for an ADO pipeline.
+        '''
+        print(f"##[group]{msg}")
+
+
+    def log_group_end(self):
+        '''
+        Group end log for an ADO pipeline.
+        '''
+        print("##[endgroup]")
+
+
+    def log_progress(self, percentage):
+        '''
+        Task progress indicator for an ADO pipeline.
+        '''
+        print(f"##vso[task.setprogress value={percentage};]Log parsing progress")
 
 
 class PackageTestAnalyzer:
@@ -165,15 +186,19 @@ class PackageTestAnalyzer:
         Scan the RPM build log folder and generate the package test report.
         '''
         test_cases = []
+        test_logs = glob(f"{logs_path}/*.src.rpm.test.log")
+        test_logs_count = len(test_logs)
         with open(junit_xml_filename, "w") as f:
-            for log_path in glob(f"{logs_path}/*.src.rpm.test.log"):
-                self.logger.log_debug(f"Processing : {basename(log_path)}")
+            for index, log_path in enumerate(test_logs):
+                self.logger.log_group_begin(f"Processing : {basename(log_path)}")
+                self.logger.log_progress((index + 1) * 100 / test_logs_count)
 
                 package_name, version = self._get_package_details(log_path)
                 status, elapsed_time = self._analyze_package_test_log(log_path)
                 test_cases.append(self._build_junit_test_case(package_name, status, elapsed_time, log_path, test_name))
 
                 self.logger.log_debug(f"Package name: {package_name}. Version: {version}. Test status: {status}. Duration: {elapsed_time}.")
+                self.logger.log_group_end()
 
             test_suite = TestSuite(test_name, test_cases)
             TestSuite.to_file(f, [test_suite], prettyprint=True)
@@ -193,7 +218,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Custom logger for ptest to log debug messages
-    logger = PipelineLogger()
+    logger = ADOPipelineLogger()
     logger.log_debug(f"Path: {args.logs_path}")
 
     # Instantiate the ptest object and process the package test logs
