@@ -455,6 +455,7 @@ make check
 - Update patch #6 and #8
 - Remove patch #16 as it is not needed
 - Update files
+- Verified license
 
 * Tue Aug 29 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.3.20-1
 - Auto-upgrade to 2.3.20
