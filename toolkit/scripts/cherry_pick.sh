@@ -45,7 +45,7 @@ function cherry_pick {
         git diff --diff-filter=U
         gh pr comment "$pr_number" \
             --repo "$repo" \
-            --body "Cherry-pick failed for branch `$target_branch`. See run logs for more details: $RUN_URL"
+            --body "Cherry-pick failed for branch \`$target_branch\`. See run logs for more details: $RUN_URL"
         exit 1
     else
         echo "pushing to remote"
@@ -59,7 +59,7 @@ function cherry_pick {
             --body "This is an auto-generated pull request to cherry pick commit $commit_hash to $target_branch. Original PR: #$pr_number")
         gh pr comment "$pr_number" \
             --repo "$repo" \
-            --body "Cherry-pick succeeded for branch `$target_branch`. See pull request #$new_pr"
+            --body "Cherry-pick succeeded for branch \`$target_branch\`. See pull request #$new_pr"
     fi
 }
 

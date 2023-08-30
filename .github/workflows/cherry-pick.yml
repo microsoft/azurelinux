@@ -84,8 +84,11 @@ jobs:
       # output conflicts to the action logs and notify in the original PR.
       - name: Run cherry-pick action
         run: |
+          # TODO: remove this
+          cp toolkit/scripts/cherry_pick.sh ${{ runner.temp }}/cherry_pick.sh
+
           for target_branch in ${{ needs.collect_target_branches.outputs.cherry_pick_target_branches }}; do
-            toolkit/scripts/cherry_pick.sh \
+            ${{ runner.temp }}/cherry_pick.sh \
               -r "${{ github.repository }}" \
               -p "${{ github.event.pull_request.number }}" \
               -t "$target_branch" || true
