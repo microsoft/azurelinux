@@ -61,10 +61,10 @@ steps:
         from os.path import basename
 
         # Markers of package test for detecting pass/fail
-        PACKAGE_TEST_END_REGEX     = re.compile(r'(?<=msg=")====== CHECK DONE .*\. EXIT STATUS (\d+)')
+        PACKAGE_TEST_END_REGEX     = re.compile(r'msg="====== CHECK DONE .*\. EXIT STATUS (\d+)')
         PACKAGE_TEST_IGNORE_REGEX  = re.compile(r'msg="\+ echo')
-        PACKAGE_TEST_SKIP_REGEX    = re.compile(r'(?<=msg=")====== SKIPPING CHECK')
-        PACKAGE_TEST_START_REGEX   = re.compile(r'(?<=msg=")====== CHECK START')
+        PACKAGE_TEST_SKIP_REGEX    = re.compile(r'msg="====== SKIPPING CHECK')
+        PACKAGE_TEST_START_REGEX   = re.compile(r'msg="====== CHECK START')
         PACKAGE_TEST_STATUS_INDEX  = 0
 
         TEST_FILE_REGEX                 = re.compile(r'(.*/)*(.*)-(.*)-(.*?)(\.src.rpm.test.log)')
