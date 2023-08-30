@@ -19,10 +19,6 @@ on:
       - closed
     branches:
       - 'fasttrack/*'
-    paths:
-      - 'SPECS/**'
-      - 'SPECS-EXTENDED/**'
-      - 'SPECS-SIGNED/**'
 
 permissions:
   contents: read
@@ -32,7 +28,7 @@ defaults:
     shell: bash
 
 env:
-  CHERRY_PICK_BRANCH_MAPPING: '{"fasttrack/1.0": "1.0-dev", "fasttrack/2.0": "main"}'
+  CHERRY_PICK_BRANCH_MAPPING: '{"fasttrack/2.0": "main"}'
 
 jobs:
   # Scans the PR for cherry pick comments, in addition to the default cherry pick target
@@ -95,7 +91,7 @@ jobs:
       - name: Run cherry-pick action
         run: |
           for target_branch in ${{ needs.collect_target_branches.outputs.cherry_pick_target_branches }}; do
-          toolkit/scripts/cherry_pick.sh \
+            toolkit/scripts/cherry_pick.sh \
               -r "${{ github.repository }}" \
               -p "${{ github.event.pull_request.number }}" \
               -t "$target_branch" || true

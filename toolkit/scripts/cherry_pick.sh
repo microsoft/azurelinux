@@ -29,7 +29,7 @@ function cherry_pick {
 
     tmp_branch="cherry-pick-$target_branch-$commit_hash"
 
-    echo "Cherry picking commit ($commit_hash) to target branch $target_branch"
+    echo "Cherry picking commit ($commit_hash) to target branch ($target_branch)"
 
     # reset the current working tree to clean state
     git reset --hard
@@ -47,9 +47,9 @@ function cherry_pick {
             --repo "$repo" \
             --body "Cherry-pick failed for branch \`$target_branch\`. See run logs for more details: $RUN_URL"
     else
-        echo "pushing to remote"
+        echo "Pushing to remote"
         git push -u origin "$tmp_branch"
-        echo "done pushing to remote"
+        echo "Done pushing to remote"
         new_pr=$(gh pr create \
             -B "$target_branch" \
             -H "$tmp_branch" \
@@ -79,7 +79,7 @@ while getopts "r:p:t:d:" opt; do
 done
 
 if [[ -z "$repo" ]] || [[ -z "$pr_number" ]] || [[ -z "$target_branch" ]]; then
-    echo -e "Error: missing required arguments"
+    echo "Error: missing required arguments"
     help
     exit 1
 fi
