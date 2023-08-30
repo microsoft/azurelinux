@@ -4,9 +4,9 @@ Distribution:   Mariner
 %global __requires_exclude_from %{_docdir}
 Summary: Secure imap and pop3 server
 Name: dovecot
-Version: 2.3.13
+Version: 2.3.20
 %global prever %{nil}
-Release: 5%{?dist}
+Release: 1%{?dist}
 #dovecot itself is MIT, a few sources are PD, pigeonhole is LGPLv2
 License: MIT and LGPLv2
 
@@ -14,7 +14,7 @@ URL: http://www.dovecot.org/
 Source: http://www.dovecot.org/releases/2.3/%{name}-%{version}%{?prever}.tar.gz
 Source1: dovecot.init
 Source2: dovecot.pam
-%global pigeonholever 0.5.13
+%global pigeonholever 0.5.20
 Source8: http://pigeonhole.dovecot.org/releases/2.3/dovecot-2.3-pigeonhole-%{pigeonholever}.tar.gz
 Source9: dovecot.sysconfig
 Source10: dovecot.tmpfilesd
@@ -34,7 +34,6 @@ Patch8: dovecot-2.2.20-initbysystemd.patch
 Patch9: dovecot-2.2.22-systemd_w_protectsystem.patch
 Patch10: dovecot-2.3.0.1-libxcrypt.patch
 Patch15: dovecot-2.3.11-bigkey.patch
-Patch16: dovecot-2.3.13-bigtvsec.patch
 
 Source15: prestartscript
 
@@ -125,7 +124,7 @@ This package provides the development files for dovecot.
 #patch13 -p1 -b .ftbfs2
 #patch14 -p1 -b .gssapi
 %patch15 -p1 -b .bigkey
-%patch16 -p1 -b .bigtvsec
+#%patch16 -p1 -b .bigtvsec
 
 #pushd dovecot-2*3-pigeonhole-%{pigeonholever}
 #popd
@@ -164,8 +163,8 @@ autoreconf -I . -fiv #required for aarch64 support
     --with-ssl=openssl           \
     --with-ssldir=%{ssldir}      \
     --with-solr                  \
-    --with-systemdsystemunitdir=%{_unitdir}  \
-    --with-docs
+    --with-docs                  \
+    systemdsystemunitdir=%{_unitdir}
 
 sed -i 's|/etc/ssl|/etc/pki/dovecot|' doc/mkcert.sh doc/example-config/conf.d/10-ssl.conf
 
@@ -328,6 +327,7 @@ make check
 %config(noreplace) %{_sysconfdir}/dovecot/conf.d/10-logging.conf
 %config(noreplace) %{_sysconfdir}/dovecot/conf.d/10-mail.conf
 %config(noreplace) %{_sysconfdir}/dovecot/conf.d/10-master.conf
+%config(noreplace) %{_sysconfdir}/dovecot/conf.d/10-metrics.conf
 %config(noreplace) %{_sysconfdir}/dovecot/conf.d/10-ssl.conf
 %config(noreplace) %{_sysconfdir}/dovecot/conf.d/15-lda.conf
 %config(noreplace) %{_sysconfdir}/dovecot/conf.d/15-mailboxes.conf
@@ -449,6 +449,18 @@ make check
 %{_libdir}/%{name}/dict/libdriver_pgsql.so
 
 %changelog
+* Wed Aug 30 2023 Archana Choudhary <archana1@microsoft.com> - 2.3.20-1
+- Upgrade to 2.3.20
+- Resolves: CVE-2021-33515 CVE-2021-29157 CVE-2022-30550 CVE-2020-28200
+- Update patch #6 and #8
+- Remove patch #16 as it is not needed
+- Update files
+
+* Tue Aug 29 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.3.20-1
+- Auto-upgrade to 2.3.20
+- Update patch #6 and #8
+- Comment out patch #16 as its unnecessary 
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 2.3.13-5
 - Remove epoch
 
