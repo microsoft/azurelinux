@@ -18,10 +18,6 @@ parameters:
     type: string
     default: "$(Build.ArtifactStagingDirectory)"
 
-  - name: selfRepoName
-    type: string
-    default: "CBL-Mariner"
-
   # Local constants. Can't use variables in a template without jobs or stages.
   - name: reportFileName
     type: string
