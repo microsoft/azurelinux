@@ -54,7 +54,7 @@ function cherry_pick {
             -B "$target_branch" \
             -H "$tmp_branch" \
             --repo "$repo" \
-            --title "[AUTO-CHERRY-PICK] $pr_title - branch $target_branch" \
+            --title "[AUTO-CHERRY-PICK] $original_pr_title - branch $target_branch" \
             --body "This is an auto-generated pull request to cherry pick commit $commit_hash to $target_branch. Original PR: #$pr_number")
         gh pr comment "$pr_number" \
             --repo "$repo" \
