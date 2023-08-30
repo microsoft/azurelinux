@@ -7,71 +7,82 @@ set -e
 function help {
     echo "Cherry-pick commit to a specific branch and create Github PR"
     echo "Usage:"
-    echo "-b TARGET_BRANCH -> target branch to cherry pick commit to"
-    echo "-c COMMIT_HASH"
-    echo "-l LOG_FILE -> log file to output conflicts in case cherry-pick fails, or to output URL to new PR"
-    echo "-o ORIGINAL_PR_URL -> original PR that triggers this script"
-    echo "-r REPOSITORY -> name of the repository"
-    echo "-t TITLE -> title of the original PR"
+    echo "[MANDATORY] -r REPOSITORY -> name of the repository in the format <owner>/<repo-name>"
+    echo "[MANDATORY] -p PR_NUMBER -> number of the PR to cherry-pick commit from"
+    echo "[MANDATORY] -t TARGET_BRANCH -> target branch to cherry-pick commit to"
+}
+
+function collect_pr_info {
+    repo=$1
+    pr_number=$2
+
+    commit_hash=$(gh pr view $pr_number --repo $repo --json mergeCommit --jq '.mergeCommit.oid')
+    original_pr_title=$(gh pr view $pr_number --repo $repo --json title --jq '.title')
 }
 
 function cherry_pick {
     commit_hash=$1
     target_branch=$2
-    log_file=$3
-    pr_title=$4
-    original_pr_url=$5
-    repo=$6
+    repo=$3
+    pr_number=$4
+    original_pr_title=$5
+
     tmp_branch="cherry-pick-$target_branch-$commit_hash"
 
-    echo "Commit hash = $commit_hash"
-    echo "Target branch = $target_branch"
+    echo "Cherry picking commit ($commit_hash) to target branch $target_branch"
 
+    # reset the current working tree to clean state
+    git reset --hard
+    git clean -df
+    git checkout -- .
+
+    # create a temporary branch from target branch to perform cherry pick
     git fetch --all
     git checkout -b "$tmp_branch" origin/"$target_branch"
 
-    git cherry-pick -x "$commit_hash" || rc=$?
-    if [ ${rc:-0} -ne 0 ]; then
+    if ! git cherry-pick -x "$commit_hash"; then
         echo "Cherry pick failed. Displaying conflicts below"
         git diff --diff-filter=U
+        gh pr comment "$pr_number" \
+            --repo "$repo" \
+            --body "Cherry-pick failed for branch `$target_branch`. See run logs for more details: $RUN_URL"
         exit 1
     else
         echo "pushing to remote"
         git push -u origin "$tmp_branch"
         echo "done pushing to remote"
-        gh pr create \
+        new_pr=$(gh pr create \
             -B "$target_branch" \
             -H "$tmp_branch" \
-            --repo $repo \
+            --repo "$repo" \
             --title "[AUTO-CHERRY-PICK] $pr_title - branch $target_branch" \
-            --body "This is an auto-generated pull request to cherry pick commit $commit_hash to $target_branch. Original PR: $original_pr_url" \
-            > $log_file
+            --body "This is an auto-generated pull request to cherry pick commit $commit_hash to $target_branch. Original PR: #$pr_number")
+        gh pr comment "$pr_number" \
+            --repo "$repo" \
+            --body "Cherry-pick succeeded for branch `$target_branch`. See pull request #$new_pr"
     fi
 }
 
-commit_hash=
-target_branch=
-original_pr_url=
-log_file=
 repo=
-pr_title=
+pr_number=
+target_branch=
 
-while getopts "b:c:l:o:r:t:" opt; do
+while getopts "r:p:t:d:" opt; do
     case ${opt} in
-    b ) target_branch="$OPTARG" ;;
-    c ) commit_hash="$OPTARG" ;;
-    l ) log_file="$OPTARG" ;;
-    o ) original_pr_url="$OPTARG" ;;
     r ) repo="$OPTARG" ;;
-    t ) pr_title="${OPTARG,,}" ;;
+    p ) pr_number="$OPTARG" ;;
+    t ) target_branch="$OPTARG" ;;
     ? ) echo -e "ERROR: Invalid option.\n\n"; help; exit 1 ;;
     esac
 done
 
-if [[ -z "$commit_hash" ]] || [[ -z "$target_branch" ]]; then
-    echo -e "Error: arguments -c and -b are required"
+if [[ -z "$repo" ]] || [[ -z "$pr_number" ]] || [[ -z "$target_branch" ]]; then
+    echo -e "Error: missing required arguments"
     help
     exit 1
 fi
 
-cherry_pick "$commit_hash" "$target_branch" "$log_file" "$pr_title" "$original_pr_url" "$repo"
+collect_pr_info "$repo" "$pr_number"
+cherry_pick "$commit_hash" "$target_branch" "$repo" "$pr_number" "$original_pr_title"
+echo "================================================================================"
+echo "================================================================================"
