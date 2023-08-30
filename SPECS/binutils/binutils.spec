@@ -1,7 +1,7 @@
 Summary:        Contains a linker, an assembler, and other tools
 Name:           binutils
-Version:        2.37
-Release:        5%{?dist}
+Version:        2.40
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,12 +10,6 @@ URL:            https://www.gnu.org/software/binutils
 Source0:        https://ftp.gnu.org/gnu/binutils/%{name}-%{version}.tar.xz
 # Patch was derived from source: https://src.fedoraproject.org/rpms/binutils/blob/f34/f/binutils-export-demangle.h.patch
 Patch0:         export-demangle-header.patch
-# Patch1 Source https://sourceware.org/git/?p=binutils-gdb.git;a=commit;h=6b86da53d5ee2022b9065f445d23356190380746
-Patch1:         linker-script-readonly-keyword-support.patch
-Patch2:         thin_archive_descriptor.patch
-Patch3:         CVE-2021-45078.patch
-Patch4:         CVE-2022-38533.patch
-Patch5:         CVE-2022-4285.patch
 Provides:       bundled(libiberty)
 
 %description
@@ -29,6 +23,32 @@ Requires:       %{name} = %{version}
 %description    devel
 It contains the libraries and header files to create applications
 for handling compiled objects.
+
+# Default: build binutils-gprofng package.
+%bcond_without gprofng
+
+# GprofNG currenly onlly supports the x86 and AArch64 architectures.
+%ifnarch %{ix86} x86_64 aarch64
+%undefine with_gprofng
+%endif
+
+%if %{with gprofng}
+
+%package gprofng
+Summary: Next Generating code profiling tool
+Provides: gprofng = %{version}-%{release}
+Requires: binutils >= %{version}
+
+%description gprofng
+Gprofng is the GNU Next Generation profiler for analyzing the performance 
+of Linux applications.
+%endif
+
+%if %{with gprofng}
+  --enable-gprofng=yes \
+%else
+  --enable-gprofng=no \
+%endif
 
 %prep
 %autosetup -p1
@@ -130,7 +150,33 @@ sed -i 's/testsuite/ /g' gold/Makefile
 %{_libdir}/libopcodes.a
 %{_libdir}/libopcodes.so
 
+%if %{with gprofng}
+%files gprofng
+%{_bindir}/gp-*
+%{_bindir}/gprofng
+%{_mandir}/man1/gp-*
+%{_mandir}/man1/gprofng*
+%dir %{_libdir}/gprofng
+%{_includedir}/sframe.h
+%{_includedir}/sframe-api.h
+%{_includedir}/collectorAPI.h
+%{_includedir}/libcollector.h
+%{_includedir}/libfcollector.h
+%{_libdir}/gprofng/*
+%{_libdir}/libsframe.a
+%{_libdir}/libsframe.so
+%{_libdir}/libsframe.so.0
+%{_libdir}/libsframe.so.0.*
+
+%dir %{_exec_prefix}/lib/debug/%{_libdir}/gprofng
+%{_exec_prefix}/lib/debug/%{_libdir}/gprofng/libgp*
+%{_sysconfdir}/gprofng.rc
+%endif
+
 %changelog
+* Wed Aug 30 2023 Sindhu Karri <lakarri@microsoft.com> - 2.40-1
+- Upgrade version to 2.40 to fix CVE-2021-46174,CVE-2022-44840,CVE-2022-45703,CVE-2022-47007,CVE-2022-47008,CVE-2022-47010,CVE-2022-47011,CVE-2022-47673,CVE-2022-47695,CVE-2022-47696,CVE-2022-48063,CVE-2022-48064,CVE-2022-48065
+
 * Wed Feb 08 2023 Rachel Menge <rachelmenge@microsoft.com> - 2.37-5
 - Backport upstream patch to fix CVE-2022-4285
 
