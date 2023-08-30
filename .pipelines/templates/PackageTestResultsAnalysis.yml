@@ -269,7 +269,6 @@ steps:
 
   - task: PublishTestResults@2
     continueOnError: true
-    condition: always()
     inputs:
       testResultsFiles: "**/${{ parameters.reportFileName }}"
       searchFolder: "${{ parameters.testsWorkspace }}"
@@ -280,5 +279,4 @@ steps:
           published_tests_dir="${{ parameters.outputArtifactsFolder }}/TESTS"
           mkdir -p "$published_tests_dir"
           cp "${{ parameters.testsWorkspace }}/${{ parameters.reportFileName }}" "$published_tests_dir"
-        condition: always()
         displayName: "Copy test results output directory"
