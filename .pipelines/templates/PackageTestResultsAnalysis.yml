@@ -74,6 +74,13 @@ steps:
         TEST_FILE_PACKAGE_RELEASE_INDEX = 3
 
         class ADOPipelineLogger:
+            def log(self, msg):
+                '''
+                Regular message log for an ADO pipeline.
+                '''
+                print(msg)
+
+
             def log_debug(self, msg):
                 '''
                 Debug log for an ADO pipeline.
@@ -254,15 +261,19 @@ steps:
                     TestSuite.to_file(f, [test_suite], prettyprint=True)
 
 
+        logs_dir_path = "${{ parameters.buildRepoRoot }}/build/logs/pkggen/rpmbuilding"
+        report_path = "${{ parameters.testsWorkspace }}/${{ parameters.reportFileName }}"
+        test_suit_name = "Package-Test"
+
         logger = ADOPipelineLogger()
-        logger.log_debug(f"Path: {args.logs_path}")
+        logger.log(f"Analyzing tests results inside '{logs_dir_path}'.")
 
         # Instantiate the ptest object and process the package test logs
         analyzer = PackageTestAnalyzer(logger)
         analyzer.scan_package_test_logs(
-          "${{ parameters.buildRepoRoot }}/build/logs/pkggen/rpmbuilding",
-          "${{ parameters.testsWorkspace }}/${{ parameters.reportFileName }}",
-          "Package-Test")
+          logs_dir_path,
+          report_path,
+          test_suit_name)
     displayName: "Parse test results"
 
   - task: PublishTestResults@2

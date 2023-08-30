@@ -24,6 +24,13 @@ TEST_FILE_PACKAGE_VERSION_INDEX = 2
 TEST_FILE_PACKAGE_RELEASE_INDEX = 3
 
 class ADOPipelineLogger:
+    def log(self, msg):
+        '''
+        Regular message log for an ADO pipeline.
+        '''
+        print(msg)
+
+
     def log_debug(self, msg):
         '''
         Debug log for an ADO pipeline.
@@ -219,7 +226,7 @@ if __name__ == "__main__":
 
     # Custom logger for ptest to log debug messages
     logger = ADOPipelineLogger()
-    logger.log_debug(f"Path: {args.logs_path}")
+    logger.log(f"Path: {args.logs_path}")
 
     # Instantiate the ptest object and process the package test logs
     analyzer = PackageTestAnalyzer(logger)
