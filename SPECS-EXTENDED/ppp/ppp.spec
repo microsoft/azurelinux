@@ -4,7 +4,7 @@ Distribution:   Mariner
 
 Name:    ppp
 Version: 2.4.7
-Release: 36%{?dist}
+Release: 37%{?dist}
 Summary: The Point-to-Point Protocol daemon
 License: BSD and LGPLv2+ and GPLv2+ and Public Domain
 URL:     http://www.samba.org/ppp
@@ -188,6 +188,9 @@ install -p %{SOURCE11} %{buildroot}%{_sysconfdir}/sysconfig/network-scripts/ifdo
 %doc PLUGINS
 
 %changelog
+* Wed Aug 30 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.7-37
+- Add patch for CVE-2022-4603
+
 * Thu Mar 25 2021 Thomas Crain <thcrain@microsoft.com> - 2.4.7-36
 - Remove epoch from minimum supported libpcap version
 
