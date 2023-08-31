@@ -12,6 +12,7 @@ bash-lang-5.1.8-3.cm2.aarch64.rpm
 binutils-2.40-1.cm2.aarch64.rpm
 binutils-debuginfo-2.40-1.cm2.aarch64.rpm
 binutils-devel-2.40-1.cm2.aarch64.rpm
+binutils-gprofng-2.40-1.cm2.aarch64.rpm
 bison-3.7.6-1.cm2.aarch64.rpm
 bison-debuginfo-3.7.6-1.cm2.aarch64.rpm
 bzip2-1.0.8-1.cm2.aarch64.rpm
