@@ -109,7 +109,7 @@ jobs:
       # all cherry-picks succeed.
       - name: Run cherry-pick action
         run: |
-          cp toolkit/script/cherry_pick.sh ${{ runner.temp }}/cherry_pick.sh
+          cp toolkit/scripts/cherry_pick.sh ${{ runner.temp }}/cherry_pick.sh
 
           for target_branch in ${{ needs.collect_target_branches.outputs.cherry_pick_target_branches }}; do
             if ${{ runner.temp }}/cherry_pick.sh \
