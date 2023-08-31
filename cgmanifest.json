@@ -2939,7 +2939,7 @@
         "other": {
           "name": "dovecot",
           "version": "2.3.20",
-          "downloadUrl": "http://www.dovecot.org/releases/2.3/dovecot-2.3.20.tar.gz"
+          "downloadUrl": "https://www.dovecot.org/releases/2.3/dovecot-2.3.20.tar.gz"
         }
       }
     },
