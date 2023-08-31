@@ -8,14 +8,16 @@ set -o pipefail
 # $1 path to create worker base
 # $2 path to text file containing the worker core packages
 # $3 path to find RPMs. May be in PATH/<arch>/*.rpm
-# $4 path to log directory
+# $4 unmount tool
+# $5 path to log directory
 
-[ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ] && [ -n "$4" ] || { echo "Usage: create_worker.sh <./worker_base_folder> <rpms_to_install.txt> <./path_to_rpms> <./log_dir>"; exit; }
+[ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ] && [ -n "$4" ] && [ -n "$5" ] || { echo "Usage: create_worker.sh <./worker_base_folder> <rpms_to_install.txt> <./path_to_rpms> <./log_dir>"; exit; }
 
 chroot_base=$1
 packages=$2
 rpm_path=$3
-log_path=$4
+unmount_tool=$4
+log_path=$5
 
 chroot_name="worker_chroot"
 chroot_builder_folder=$chroot_base/$chroot_name
@@ -44,11 +46,15 @@ install_one_toolchain_rpm () {
     fi
 }
 
+$unmount_tool "$chroot_builder_folder" | tee -a "$chroot_log"
 rm -rf "$chroot_builder_folder"
 rm -f "$chroot_archive"
 rm -f "$chroot_log"
 mkdir -p "$chroot_builder_folder"
 mkdir -p "$log_path"
+
+# Create tmpfs in chroot_builder_folder
+mount -t tmpfs -o size=1500M tmpfs "$chroot_builder_folder"
 
 ORIGINAL_HOME=$HOME
 HOME=/root
@@ -118,3 +124,7 @@ else
     tar -I gzip -cvf "$chroot_archive" -C "$chroot_base/$chroot_name" . >> "$chroot_log"
 fi
 echo "Done creating $chroot_archive." | tee -a "$chroot_log"
+
+$unmount_tool "$chroot_builder_folder" >> "$chroot_log" # Don't tee this, it prints warnings for expected events
+echo "Done unmounting $chroot_builder_folder."
+

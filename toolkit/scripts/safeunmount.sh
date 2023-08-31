@@ -4,6 +4,10 @@
 
 # $1 path to recursively scan for mount points which must be cleaned up
 dir=${1}
+
+# If dir does not exist, exit
+if [ ! -d "${dir}" ] ; then exit 0 ; fi
+
 for dir in $(find ${dir} -type d | sort) ; do
     if [[ -d $dir ]]; then
         if  mountpoint -q ${dir} ; then
