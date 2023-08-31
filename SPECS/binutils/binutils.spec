@@ -26,21 +26,18 @@ for handling compiled objects.
 
 # Default: build binutils-gprofng package.
 %bcond_without gprofng
-
 # GprofNG currenly onlly supports the x86 and AArch64 architectures.
 %ifnarch %{ix86} x86_64 aarch64
 %undefine with_gprofng
 %endif
-
 %if %{with gprofng}
-
 %package gprofng
-Summary: Next Generating code profiling tool
-Provides: gprofng = %{version}-%{release}
-Requires: binutils >= %{version}
+Summary:        Next Generating code profiling tool
+Requires:       binutils >= %{version}
+Provides:       gprofng = %{version}-%{release}
 
 %description gprofng
-Gprofng is the GNU Next Generation profiler for analyzing the performance 
+Gprofng is the GNU Next Generation profiler for analyzing the performance
 of Linux applications.
 %endif
 
@@ -168,8 +165,8 @@ sed -i 's/testsuite/ /g' gold/Makefile
 %{_libdir}/libsframe.so.0
 %{_libdir}/libsframe.so.0.*
 
-%dir %{_exec_prefix}/lib/debug/%{_libdir}/gprofng
-%{_exec_prefix}/lib/debug/%{_libdir}/gprofng/libgp*
+%dir %{_libdir}/debug/%{_libdir}/gprofng
+%{_libdir}/debug/%{_libdir}/gprofng/libgp*
 %{_sysconfdir}/gprofng.rc
 %endif
 
