@@ -1,0 +1,132 @@
+From 06151a48e0dbd24475b8d3aea55548d79cd072b0 Mon Sep 17 00:00:00 2001
+From: Luke Howard <lukeh@padl.com>
+Date: Thu, 20 Oct 2022 13:27:31 +1300
+Subject: [PATCH 3/3] kdc: avoid re-encoding KDC-REQ-BODY
+
+Use --preserve-binary=KDC-REQ-BODY option to ASN.1 compiler to avoid
+re-encoding KDC-REQ-BODYs for verification in GSS preauth, TGS and PKINIT.
+
+[abartlet@samba.org adapted from Heimdal commit
+ ebfd48e40a1b61bf5a6b8d00fe5c581e24652b6e
+ by removing references to FAST and GSS-pre-auth.
+
+ This fixes the Windows 11 22H2 issue with TGS-REQ
+ as seen at https:github.com/heimdal/heimdal/issues/1011 and so
+ removes the knownfail file for this test]
+
+FIXES: 1011
+
+Signed-off-by: Andrew Bartlett <abartlet@samba.org>
+(cherry picked from commit 4cd3926e14eca91ca10a9ec87200c8bd717b66e4)
+Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
+---
+ kdc/krb5tgs.c     | 24 ++----------------------
+ kdc/pkinit.c      | 16 ++--------------
+ lib/asn1/krb5.opt |  1 +
+ 3 files changed, 5 insertions(+), 36 deletions(-)
+
+diff --git a/kdc/krb5tgs.c b/kdc/krb5tgs.c
+index 5dd8baf82..1c5195822 100644
+--- a/kdc/krb5tgs.c
++++ b/kdc/krb5tgs.c
+@@ -1078,9 +1078,6 @@ tgs_check_authenticator(krb5_context context,
+ 			krb5_keyblock *key)
+ {
+     krb5_authenticator auth;
+-    size_t len = 0;
+-    unsigned char *buf;
+-    size_t buf_size;
+     krb5_error_code ret;
+     krb5_crypto crypto;
+ 
+@@ -1106,25 +1103,9 @@ tgs_check_authenticator(krb5_context context,
+ 	goto out;
+     }
+ 
+-    /* XXX should not re-encode this */
+-    ASN1_MALLOC_ENCODE(KDC_REQ_BODY, buf, buf_size, b, &len, ret);
+-    if(ret){
+-	const char *msg = krb5_get_error_message(context, ret);
+-	kdc_log(context, config, 0, "Failed to encode KDC-REQ-BODY: %s", msg);
+-	krb5_free_error_message(context, msg);
+-	goto out;
+-    }
+-    if(buf_size != len) {
+-	free(buf);
+-	kdc_log(context, config, 0, "Internal error in ASN.1 encoder");
+-	*e_text = "KDC internal error";
+-	ret = KRB5KRB_ERR_GENERIC;
+-	goto out;
+-    }
+     ret = krb5_crypto_init(context, key, 0, &crypto);
+     if (ret) {
+ 	const char *msg = krb5_get_error_message(context, ret);
+-	free(buf);
+ 	kdc_log(context, config, 0, "krb5_crypto_init failed: %s", msg);
+ 	krb5_free_error_message(context, msg);
+ 	goto out;
+@@ -1132,10 +1113,9 @@ tgs_check_authenticator(krb5_context context,
+     ret = krb5_verify_checksum(context,
+ 			       crypto,
+ 			       KRB5_KU_TGS_REQ_AUTH_CKSUM,
+-			       buf,
+-			       len,
++			       b->_save.data,
++			       b->_save.length,
+ 			       auth->cksum);
+-    free(buf);
+     krb5_crypto_destroy(context, crypto);
+     if(ret){
+ 	const char *msg = krb5_get_error_message(context, ret);
+diff --git a/kdc/pkinit.c b/kdc/pkinit.c
+index 39b08f960..c79c960aa 100644
+--- a/kdc/pkinit.c
++++ b/kdc/pkinit.c
+@@ -111,10 +111,7 @@ pk_check_pkauthenticator(krb5_context context,
+ 			 PKAuthenticator *a,
+ 			 const KDC_REQ *req)
+ {
+-    u_char *buf = NULL;
+-    size_t buf_size;
+     krb5_error_code ret;
+-    size_t len = 0;
+     krb5_timestamp now;
+     Checksum checksum;
+ 
+@@ -126,22 +123,13 @@ pk_check_pkauthenticator(krb5_context context,
+ 	return KRB5KRB_AP_ERR_SKEW;
+     }
+ 
+-    ASN1_MALLOC_ENCODE(KDC_REQ_BODY, buf, buf_size, &req->req_body, &len, ret);
+-    if (ret) {
+-	krb5_clear_error_message(context);
+-	return ret;
+-    }
+-    if (buf_size != len)
+-	krb5_abortx(context, "Internal error in ASN.1 encoder");
+-
+     ret = krb5_create_checksum(context,
+ 			       NULL,
+ 			       0,
+ 			       CKSUMTYPE_SHA1,
+-			       buf,
+-			       len,
++			       req->req_body._save.data,
++			       req->req_body._save.length,
+ 			       &checksum);
+-    free(buf);
+     if (ret) {
+ 	krb5_clear_error_message(context);
+ 	return ret;
+diff --git a/lib/asn1/krb5.opt b/lib/asn1/krb5.opt
+index 1d6d5e898..5acc596d3 100644
+--- a/lib/asn1/krb5.opt
++++ b/lib/asn1/krb5.opt
+@@ -4,3 +4,4 @@
+ --sequence=METHOD-DATA
+ --sequence=ETYPE-INFO
+ --sequence=ETYPE-INFO2
++--preserve-binary=KDC-REQ-BODY
+-- 
+2.42.0
+

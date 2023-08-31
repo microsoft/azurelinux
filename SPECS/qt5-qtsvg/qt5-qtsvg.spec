@@ -3,9 +3,9 @@
 Summary:        Qt5 - Support for rendering and displaying SVG
 Name:           qt5-qtsvg
 Version:        5.12.11
-Release:        5%{?dist}
+Release:        6%{?dist}
 # See LICENSE.GPL3-EXCEPT.txt, for exception details
-License:        GFDL AND GPLv2+ with exceptions AND LGPLv2.1+
+License:        GFDL AND GPLv2+ WITH exceptions AND LGPLv2.1+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.qt.io
@@ -16,12 +16,10 @@ Patch101:       CVE-2018-21035.nopatch
 # Vulnerability is limited to the Windows OS.
 Patch102:       CVE-2022-25634.nopatch
 Patch103:       CVE-2023-32573.patch
-
+%{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
 BuildRequires:  qt5-qtbase-devel >= %{version}
 BuildRequires:  qt5-qtbase-private-devel
 BuildRequires:  zlib-devel
-
-%{?_qt5:Requires: %{_qt5}%{?_isa} = %{_qt5_version}}
 
 %description
 Scalable Vector Graphics (SVG) is an XML-based language for describing
@@ -86,6 +84,10 @@ popd
 %{_qt5_examplesdir}/
 
 %changelog
+* Mon Aug 28 2023 Andrew Phelps <anphel@microsoft.com> - 5.12.11-6
+- Bump release to rebuild with qt5-qtbase >= 5.12.11-9, which contains fix for CVE-2023-37369
+- Lint spec.
+
 * Fri May 26 2023 Thien Trung Vuong <tvuong@microsoft.com> - 5.12.11-5
 - Add patch for CVE-2023-32573
 
