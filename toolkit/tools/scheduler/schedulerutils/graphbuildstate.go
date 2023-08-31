@@ -4,6 +4,8 @@
 package schedulerutils
 
 import (
+	"fmt"
+	"math"
 	"path/filepath"
 	"sort"
 
@@ -17,12 +19,19 @@ type nodeState struct {
 	available bool
 	cached    bool
 	usedDelta bool
+	freshness uint
 }
+
+const (
+	// The highest possible freshness value, used to force unbounded cascading rebuilds.
+	NodeFreshnessAbsoluteMax uint64 = math.MaxUint64
+)
 
 // GraphBuildState represents the build state of a graph.
 type GraphBuildState struct {
 	activeBuilds     map[int64]*BuildRequest
 	nodeToState      map[*pkggraph.PkgNode]*nodeState
+	maxFreshness     uint
 	failures         []*BuildResult
 	reservedFiles    map[string]bool
 	conflictingRPMs  map[string]bool
@@ -30,18 +39,23 @@ type GraphBuildState struct {
 }
 
 // NewGraphBuildState returns a new GraphBuildState.
-// - reservedFiles is a list of reserved files which should NOT be rebuilt. Any files that ARE rebuilt will be recorded.
-func NewGraphBuildState(reservedFiles []string) (g *GraphBuildState) {
+//   - reservedFiles is a list of reserved files which should NOT be rebuilt. Any files that ARE rebuilt will be recorded.
+//   - maxFreshness is how fresh a newly rebuilt node is. Each dependant node will have a freshness of 'n-1', etc. until
+//     '0' where the subsequent nodes will no longer be rebuilt. 'maxFreshness < 0' will cause unbounded cascading rebuilds,
+//     while 'maxFreshness = 0' will cause no cascading rebuilds.
+func NewGraphBuildState(reservedFiles []string, maxFreshness uint) (g *GraphBuildState) {
 	filesMap := make(map[string]bool)
 	for _, file := range reservedFiles {
 		filesMap[file] = true
 	}
+
 	return &GraphBuildState{
 		activeBuilds:     make(map[int64]*BuildRequest),
 		nodeToState:      make(map[*pkggraph.PkgNode]*nodeState),
 		reservedFiles:    filesMap,
 		conflictingRPMs:  make(map[string]bool),
 		conflictingSRPMs: make(map[string]bool),
+		maxFreshness:     maxFreshness,
 	}
 }
 
@@ -66,6 +80,17 @@ func (g *GraphBuildState) IsNodeAvailable(node *pkggraph.PkgNode) bool {
 func (g *GraphBuildState) IsNodeCached(node *pkggraph.PkgNode) bool {
 	state := g.nodeToState[node]
 	return state != nil && state.cached
+}
+
+// GetMaxFreshness returns the maximum freshness a node can have. (ie if a package is directly rebuilt due to user
+// request, or missing files, it will have this freshness. Each dependant node will have a freshness of 'n-1', etc.
+func (g *GraphBuildState) GetMaxFreshness() uint {
+	return g.maxFreshness
+}
+
+// GetFreshnessOfNode returns the freshness of a node.
+func (g *GraphBuildState) GetFreshnessOfNode(node *pkggraph.PkgNode) uint {
+	return g.nodeToState[node].freshness
 }
 
 // IsNodeDelta returns true if the requested node was pre-downloaded as a delta package.
@@ -167,7 +192,7 @@ func (g *GraphBuildState) isConflictWithToolchain(fileToCheck string) (hadConfli
 // RecordBuildResult records a build result in the graph build state.
 // - It will record the result as a failure if applicable.
 // - It will record all ancillary nodes of the result.
-func (g *GraphBuildState) RecordBuildResult(res *BuildResult, allowToolchainRebuilds bool) {
+func (g *GraphBuildState) RecordBuildResult(res *BuildResult, allowToolchainRebuilds bool) (err error) {
 	logger.Log.Debugf("Recording build result: %s", res.Node.FriendlyName())
 
 	delete(g.activeBuilds, res.Node.ID())
@@ -176,10 +201,20 @@ func (g *GraphBuildState) RecordBuildResult(res *BuildResult, allowToolchainRebu
 		g.failures = append(g.failures, res)
 	}
 
+	// 'NodeFreshnessRebuildRequired' is a special value that indicates that the node was rebuilt due to  missing files
+	// (user requested rebuilds are already at the max freshness). In this case, we want to reset the freshness to the
+	// max, so that subsequent dependant nodes will be rebuilt. Also ensure that the freshness is not greater than the max.
+	freshness := res.Freshness
+	if freshness > g.GetMaxFreshness() {
+		err = fmt.Errorf("unexpected freshness value of %d for node '%s'. Should be: (<freshness> <= %d)", freshness, res.Node.FriendlyName(), g.GetMaxFreshness())
+		return
+	}
+
 	state := &nodeState{
 		available: res.Err == nil,
 		cached:    res.UsedCache,
 		usedDelta: res.WasDelta,
+		freshness: freshness,
 	}
 
 	for _, node := range res.AncillaryNodes {
@@ -196,4 +231,5 @@ func (g *GraphBuildState) RecordBuildResult(res *BuildResult, allowToolchainRebu
 	} else {
 		logger.Log.Tracef("Skipping checking toolchain conflicts since this is either not a built node (%v) or the ALLOW_TOOLCHAIN_REBUILDS flag was set to 'y'.", res.Node)
 	}
+	return
 }

@@ -149,7 +149,7 @@ func searchForGoal(graph *pkggraph.PkgGraph, goals []string) (list []*pkggraph.P
 }
 
 func searchForPkg(graph *pkggraph.PkgGraph, packages []string) (list []*pkggraph.PkgNode) {
-	for _, n := range graph.AllRunNodes() {
+	for _, n := range graph.AllPreferredRunNodes() {
 		nodeName := n.VersionedPkg.Name
 		for _, searchName := range packages {
 			if nodeName == searchName {
@@ -161,7 +161,7 @@ func searchForPkg(graph *pkggraph.PkgGraph, packages []string) (list []*pkggraph
 }
 
 func searchForSpec(graph *pkggraph.PkgGraph, specs []string) (list []*pkggraph.PkgNode) {
-	for _, n := range graph.AllRunNodes() {
+	for _, n := range graph.AllPreferredRunNodes() {
 		nodeSpec := n.SpecName()
 		for _, searchSpec := range specs {
 			if nodeSpec == searchSpec {
