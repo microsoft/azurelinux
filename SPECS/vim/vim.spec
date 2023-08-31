@@ -2,7 +2,7 @@
 Summary:        Text editor
 Name:           vim
 Version:        9.0.1562
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -198,6 +198,9 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Thu Aug 31 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 9.0.1562-4
+- Another release bump to force rebuild.
+
 * Thu Aug 31 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 9.0.1562-3
 - Release bump to force rebuild.
 
