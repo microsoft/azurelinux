@@ -1,0 +1,33 @@
+--- a/contrib/gdal/gdalbridge.c.orig	2017-07-13 20:51:22.011367003 +0200
++++ b/contrib/gdal/gdalbridge.c	2017-07-13 20:52:07.545483445 +0200
+@@ -124,7 +124,7 @@
+ 
+         if( pfnTest == NULL )
+         {
+-            sprintf( szPath, papszSOFilenames[iSOFile] );
++            strcpy( szPath, papszSOFilenames[iSOFile] );
+             pfnTest = GBGetSymbol( szPath, "GDALOpen" );
+         }
+     }
+--- a/ogdi/driver/vrf/feature.c.sailer	2007-05-09 22:46:28.000000000 +0200
++++ b/ogdi/driver/vrf/feature.c	2017-07-13 21:01:57.790235052 +0200
+@@ -1385,7 +1385,8 @@
+ 	  return NULL;
+ 	}
+ 	strcat(returnString,"{ ");
+-	strcat(returnString,ptr1);
++	if (ptr1)
++	  strcat(returnString,ptr1);
+ 	strcat(returnString," } ");
+ 	free(ptr1);
+       }    
+@@ -1414,7 +1415,8 @@
+ 	  return NULL;
+ 	}
+ 	strcat(returnString,"{ ");
+-	strcat(returnString,ptr1);
++	if (ptr1)
++	  strcat(returnString,ptr1);
+ 	strcat(returnString," } ");
+ 	free(ptr1);
+       }    

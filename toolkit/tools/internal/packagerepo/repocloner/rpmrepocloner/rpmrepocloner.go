@@ -9,7 +9,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strings"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/buildpipeline"
@@ -46,50 +45,6 @@ const (
 	repoIDCacheRegular   = "fetcher-cloned-repo"
 	repoIDPreview        = "mariner-preview"
 	repoIDToolchain      = "toolchain-repo"
-)
-
-var (
-	// Every valid line pair will be of the form:
-	//		<package>-<version>.<arch> : <Description>
-	//		Repo	: [repo_name]
-	//
-	// NOTE: we ignore packages installed in the build environment denoted by "Repo	: @System".
-	packageLookupNameMatchRegex = regexp.MustCompile(`([^:\s]+(x86_64|aarch64|noarch))\s*:[^\n]*\nRepo\s+:\s+[^@]`)
-	packageNameIndex            = 1
-
-	// Every line containing a repo ID will be of the form:
-	//		[<repo_name>]
-	// For:
-	//
-	//		[fetcher-cloned-repo]
-	//
-	// We'd get:
-	//   - repo_name:    fetcher-cloned-repo
-	//
-	// The non-capturing groups are used to ignore the brackets.
-	repoIDRegex = regexp.MustCompile(`(?:\[)([^]]+)(?:\])`)
-	repoIDIndex = 1
-
-	// Every valid line will be of the form: <package_name>.<architecture> <version>.<dist> <repo_id>
-	// For:
-	//
-	//		COOL_package2-extended++.aarch64	1.1b.8_X-22~rc1.cm1		fetcher-cloned-repo
-	//
-	// We'd get:
-	//   - package_name:    COOL_package2-extended++
-	//   - architecture:    aarch64
-	//   - version:         1.1b.8_X-22~rc1
-	//   - dist:            cm1
-	listedPackageRegex = regexp.MustCompile(`^\s*([[:alnum:]_.+-]+)\.([[:alnum:]_+-]+)\s+([[:alnum:]._+~-]+)\.([[:alpha:]]+[[:digit:]]+)`)
-)
-
-const (
-	listMatchSubString = iota
-	listPackageName    = iota
-	listPackageArch    = iota
-	listPackageVersion = iota
-	listPackageDist    = iota
-	listMaxMatchLen    = iota
 )
 
 // RpmRepoCloner represents an RPM repository cloner.
@@ -466,8 +421,8 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 			// MUST keep order of packages printed by TDNF.
 			// TDNF will print the packages starting from the highest version, which allows us to work around an RPM bug:
 			// https://github.com/rpm-software-management/rpm/issues/2359
-			for _, matches := range packageLookupNameMatchRegex.FindAllStringSubmatch(stdout, -1) {
-				packageName := matches[packageNameIndex]
+			for _, matches := range tdnf.PackageLookupNameMatchRegex.FindAllStringSubmatch(stdout, -1) {
+				packageName := matches[tdnf.PackageNameIndex]
 				packageNames = append(packageNames, packageName)
 				logger.Log.Debugf("'%s' is available from package '%s'", pkgVer.Name, packageName)
 			}
@@ -542,16 +497,16 @@ func (r *RpmRepoCloner) ClonedRepoContents() (repoContents *repocloner.RepoConte
 		}
 
 		line := args[0].(string)
-		matches := listedPackageRegex.FindStringSubmatch(line)
-		if len(matches) != listMaxMatchLen {
+		matches := tdnf.ListedPackageRegex.FindStringSubmatch(line)
+		if len(matches) != tdnf.ListMaxMatchLen {
 			return
 		}
 
 		pkg := &repocloner.RepoPackage{
-			Name:         matches[listPackageName],
-			Version:      matches[listPackageVersion],
-			Architecture: matches[listPackageArch],
-			Distribution: matches[listPackageDist],
+			Name:         matches[tdnf.ListPackageName],
+			Version:      matches[tdnf.ListPackageVersion],
+			Architecture: matches[tdnf.ListPackageArch],
+			Distribution: matches[tdnf.ListPackageDist],
 		}
 
 		pkgID := pkg.ID()
@@ -778,12 +733,12 @@ func readRepoIDs(repoFilePath string) (repoIDs []string, err error) {
 
 	scanner := bufio.NewScanner(repoFile)
 	for scanner.Scan() {
-		matches := repoIDRegex.FindStringSubmatch(scanner.Text())
-		if len(matches) <= repoIDIndex {
+		matches := tdnf.RepoIDRegex.FindStringSubmatch(scanner.Text())
+		if len(matches) <= tdnf.RepoIDIndex {
 			continue
 		}
 
-		repoID := matches[repoIDIndex]
+		repoID := matches[tdnf.RepoIDIndex]
 		repoIDs = append(repoIDs, repoID)
 
 		logger.Log.Debugf("Found repo ID: %s", repoID)

@@ -125,11 +125,15 @@ func addNodesForPackage(g *pkggraph.PkgGraph, pkg *pkgjson.Package) (err error) 
 		return
 	}
 
+	skipNewTestNode := false
 	if nodes != nil {
 		logger.Log.Warnf(`Duplicate package name for package %+v read from SRPM "%s" (Previous: %+v)`, pkg.Provides, pkg.SrpmPath, nodes.RunNode)
 		newRunNode = nodes.RunNode
 		newBuildNode = nodes.BuildNode
 		newTestNode = nodes.TestNode
+
+		// Test nodes must be assigned to the build nodes of their true origin and not a duplicate from a potentially different SRPM.
+		skipNewTestNode = true
 	}
 
 	if newRunNode == nil {
@@ -157,7 +161,7 @@ func addNodesForPackage(g *pkggraph.PkgGraph, pkg *pkgjson.Package) (err error) 
 		return
 	}
 
-	if !pkg.RunTests {
+	if skipNewTestNode || !pkg.RunTests {
 		logger.Log.Debugf("Skipping adding a test node for package %+v", pkg)
 		return
 	}
