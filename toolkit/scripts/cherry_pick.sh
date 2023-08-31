@@ -66,7 +66,7 @@ pr_number=
 target_branch=
 workflow_run_url=
 
-while getopts "r:p:t:d:" opt; do
+while getopts "r:p:t:w:" opt; do
     case ${opt} in
     r ) repo="$OPTARG" ;;
     p ) pr_number="$OPTARG" ;;
