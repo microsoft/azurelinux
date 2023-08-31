@@ -8,8 +8,10 @@ import (
 	"crypto/sha1"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 
@@ -157,6 +159,15 @@ func Append(data string, dst string) (err error) {
 	defer dstFile.Close()
 
 	_, err = dstFile.WriteString(data)
+	return
+}
+
+// RemoveFileIfExists will delete a file if it exists on disk.
+func RemoveFileIfExists(path string) (err error) {
+	removeErr := os.Remove(path)
+	if removeErr != nil && !errors.Is(removeErr, fs.ErrNotExist) {
+		err = fmt.Errorf("failed to remove file (%s):\n%w", path, err)
+	}
 	return
 }
 
