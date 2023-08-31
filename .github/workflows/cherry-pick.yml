@@ -28,7 +28,7 @@ defaults:
     shell: bash
 
 env:
-  CHERRY_PICK_BRANCH_MAPPING: '{"fasttrack/2.0": "tvuong/test-main"}'
+  CHERRY_PICK_BRANCH_MAPPING: '{"fasttrack/2.0": "main"}'
 
 jobs:
   # Scans the PR for cherry pick comments, in addition to the default cherry pick target
