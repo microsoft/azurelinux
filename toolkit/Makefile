@@ -28,7 +28,7 @@ TEST_IGNORE_LIST        ?=
 ######## SET INCREMENTAL BUILD FLAGS ########
 
 # Logic to auto configure build options for optimized builds
-# These will set the default values for: REBUILD_TOOLS, USE_CCACHE, MAX_CPU, REBUILD_TOOLCHAIN, DELTA_BUILD, INCREMENTAL_TOOLCHAIN, ALLOW_TOOLCHAIN_DOWNLOAD_FAIL, and CLEAN_TOOLCHAIN_CONTAINERS
+# These will set the default values for: REBUILD_TOOLS, MAX_CPU, REBUILD_TOOLCHAIN, DELTA_BUILD, INCREMENTAL_TOOLCHAIN, ALLOW_TOOLCHAIN_DOWNLOAD_FAIL, and CLEAN_TOOLCHAIN_CONTAINERS
 include $(SCRIPTS_DIR)/incremental_building.mk
 
 ######## SET REMAINING FLAGS ########
@@ -63,6 +63,7 @@ HYDRATED_BUILD                  ?= n
 TARGET_ARCH                     ?=
 ALLOW_TOOLCHAIN_REBUILDS        ?= n
 CACHED_PACKAGES_ARCHIVE         ?=
+USE_CCACHE                      ?= n
 
 # Tracing & Profiling support: https://go.dev/doc/diagnostics
 ENABLE_CPU_PROFILE              ?= n

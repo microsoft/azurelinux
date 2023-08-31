@@ -1,0 +1,191 @@
+From f452eea6f2aa4df7f4f60c56902a4c2c510c103a Mon Sep 17 00:00:00 2001
+From: Joseph Sutton <josephsutton@catalyst.net.nz>
+Date: Thu, 16 Jun 2022 15:26:07 +1200
+Subject: [PATCH 2/3] kdc: Check generate_pac() return code
+
+If the function fails, we should not issue a ticket missing the PAC.
+
+(cherry picked from commit 05e589d2473a1bd225b0fc4670c75ba24091644d)
+(cherry picked from commit d1e077c50b6b6e6108d70a0301b97f6904c45ca7)
+Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
+---
+ kdc/kerberos5.c | 44 +++++++++++++++++++++++---------------------
+ 1 file changed, 23 insertions(+), 21 deletions(-)
+
+diff --git a/kdc/kerberos5.c b/kdc/kerberos5.c
+index a06dc7d2a..f04472ef7 100644
+--- a/kdc/kerberos5.c
++++ b/kdc/kerberos5.c
+@@ -359,10 +359,10 @@ pa_pkinit_validate(kdc_request_t r, const PA_DATA *pa)
+ 		   r->client_name);
+ 	goto out;
+     }
+-    
++
+     ret = _kdc_pk_check_client(r->context,
+ 			       r->config,
+-			       r->clientdb, 
++			       r->clientdb,
+ 			       r->client,
+ 			       pkp,
+ 			       &client_cert);
+@@ -460,7 +460,7 @@ pa_enc_chal_validate(kdc_request_t r, const PA_DATA *pa)
+     int i;
+ 
+     heim_assert(r->armor_crypto != NULL, "ENC-CHAL called for non FAST");
+-    
++
+     if (_kdc_is_anon_request(&r->req)) {
+ 	ret = KRB5KRB_AP_ERR_BAD_INTEGRITY;
+ 	kdc_log(r->context, r->config, 0, "ENC-CHALL doesn't support anon");
+@@ -491,23 +491,23 @@ pa_enc_chal_validate(kdc_request_t r, const PA_DATA *pa)
+ 	PA_ENC_TS_ENC p;
+ 
+ 	k = &r->client->entry.keys.val[i];
+-	
++
+ 	ret = krb5_crypto_init(r->context, &k->key, 0, &longtermcrypto);
+ 	if (ret)
+-	    continue;			
+-	
++	    continue;
++
+ 	ret = krb5_crypto_fx_cf2(r->context, r->armor_crypto, longtermcrypto,
+ 				 &pepper1, &pepper2, aenctype,
+ 				 &challangekey);
+ 	krb5_crypto_destroy(r->context, longtermcrypto);
+ 	if (ret)
+ 	    continue;
+-	
++
+ 	ret = krb5_crypto_init(r->context, &challangekey, 0,
+ 			       &challangecrypto);
+ 	if (ret)
+ 	    continue;
+-	
++
+ 	ret = krb5_decrypt_EncryptedData(r->context, challangecrypto,
+ 					 KRB5_KU_ENC_CHALLENGE_CLIENT,
+ 					 &enc_data,
+@@ -530,7 +530,7 @@ pa_enc_chal_validate(kdc_request_t r, const PA_DATA *pa)
+ 
+ 	    continue;
+ 	}
+-	
++
+ 	ret = decode_PA_ENC_TS_ENC(ts_data.data,
+ 				   ts_data.length,
+ 				   &p,
+@@ -571,7 +571,7 @@ pa_enc_chal_validate(kdc_request_t r, const PA_DATA *pa)
+ 	krb5_crypto_destroy(r->context, challangecrypto);
+ 	if (ret)
+ 	    goto out;
+-					    
++
+ 	set_salt_padata(&r->outpadata, k->salt);
+ 	krb5_free_keyblock_contents(r->context,  &r->reply_key);
+ 	ret = krb5_copy_keyblock_contents(r->context, &k->key, &r->reply_key);
+@@ -609,7 +609,7 @@ pa_enc_ts_validate(kdc_request_t r, const PA_DATA *pa)
+     size_t len;
+     Key *pa_key;
+     char *str;
+-	
++
+     ret = decode_EncryptedData(pa->padata_value.data,
+ 			       pa->padata_value.length,
+ 			       &enc_data,
+@@ -620,7 +620,7 @@ pa_enc_ts_validate(kdc_request_t r, const PA_DATA *pa)
+ 		   r->client_name);
+ 	goto out;
+     }
+-	
++
+     ret = hdb_enctype2key(r->context, &r->client->entry, NULL,
+ 			  enc_data.etype, &pa_key);
+     if(ret){
+@@ -704,7 +704,7 @@ pa_enc_ts_validate(kdc_request_t r, const PA_DATA *pa)
+     }
+     if (labs(kdc_time - p.patimestamp) > r->context->max_skew) {
+ 	char client_time[100];
+-		
++
+ 	krb5_format_time(r->context, p.patimestamp,
+ 			 client_time, sizeof(client_time), TRUE);
+ 
+@@ -776,7 +776,7 @@ static const struct kdc_patypes pat[] = {
+     { KRB5_PADATA_PKINIT_KX, "Anonymous PK-INIT", 0, NULL },
+ #endif
+     { KRB5_PADATA_PA_PK_OCSP_RESPONSE , "OCSP", 0, NULL },
+-    { 
++    {
+ 	KRB5_PADATA_ENC_TIMESTAMP , "ENC-TS",
+ 	PA_ANNOUNCE,
+ 	pa_enc_ts_validate
+@@ -800,7 +800,7 @@ log_patypes(krb5_context context,
+     struct rk_strpool *p = NULL;
+     char *str;
+     size_t n, m;
+-	
++
+     for (n = 0; n < padata->len; n++) {
+ 	for (m = 0; m < sizeof(pat) / sizeof(pat[0]); m++) {
+ 	    if (padata->val[n].padata_type == pat[m].type) {
+@@ -1569,7 +1569,7 @@ generate_pac(kdc_request_t r, Key *skey)
+ 		   r->client_name);
+ 	return ret;
+     }
+-    
++
+     ret = _kdc_tkt_add_if_relevant_ad(r->context, &r->et,
+ 				      KRB5_AUTHDATA_WIN2K_PAC,
+ 				      &data);
+@@ -1638,7 +1638,7 @@ add_enc_pa_rep(kdc_request_t r)
+ 			  KRB5_PADATA_REQ_ENC_PA_REP, cdata.data, cdata.length);
+     if (ret)
+ 	return ret;
+-    
++
+     return krb5_padata_add(r->context, r->ek.encrypted_pa_data,
+ 			   KRB5_PADATA_FX_FAST, NULL, 0);
+ }
+@@ -1899,7 +1899,7 @@ _kdc_as_rep(kdc_request_t r,
+ 		goto out;
+ 	}
+ 
+-	/* 
++	/*
+ 	 * send requre preauth is its required or anon is requested,
+ 	 * anon is today only allowed via preauth mechanisms.
+ 	 */
+@@ -1921,7 +1921,7 @@ _kdc_as_rep(kdc_request_t r,
+     }
+ 
+     if (r->clientdb->hdb_auth_status) {
+-	r->clientdb->hdb_auth_status(context, r->clientdb, r->client, 
++	r->clientdb->hdb_auth_status(context, r->clientdb, r->client,
+ 				     HDB_AUTH_SUCCESS);
+     }
+ 
+@@ -2038,7 +2038,7 @@ _kdc_as_rep(kdc_request_t r,
+     {
+ 	time_t start;
+ 	time_t t;
+-	
++
+ 	start = r->et.authtime = kdc_time;
+ 
+ 	if(f.postdated && req->req_body.from){
+@@ -2199,7 +2199,9 @@ _kdc_as_rep(kdc_request_t r,
+ 
+     /* Add the PAC */
+     if (send_pac_p(context, req) && !r->et.flags.anonymous) {
+-	generate_pac(r, skey);
++	ret = generate_pac(r, skey);
++	if (ret)
++	    goto out;
+     }
+ 
+     _kdc_log_timestamp(context, config, "AS-REQ", r->et.authtime, r->et.starttime,
+-- 
+2.42.0
+
