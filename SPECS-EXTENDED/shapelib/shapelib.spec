@@ -1,3 +1,5 @@
+%define so_ver 2
+
 Summary:        Library for ESRI Shapefile Handling
 Name:           shapelib
 Version:        1.5.0
@@ -6,14 +8,14 @@ License:        GPL-2.0-or-later AND (LGPL-2.0-or-later OR MIT) AND SUSE-Public-
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Productivity/Graphics/Other
-URL:            http://shapelib.maptools.org/
-Source0:        http://download.osgeo.org/shapelib/%{name}-%{version}.tar.gz
+URL:            https://shapelib.maptools.org/
+Source0:        https://download.osgeo.org/shapelib/%{name}-%{version}.tar.gz
 # PATCH-FIX-UPSTREAM rpmlint-errors.patch -- Fix some of the rpmlint errors
 # to get package acceptable to Factory
 Patch0:         rpmlint-errors.patch
 # PATCH-Fix-UPSTREAM double free, CVE-2022-0699, https://github.com/OSGeo/shapelib/issues/39
-Patch1:         https://github.com/OSGeo/shapelib/commit/c75b9281a5b9452d92e1682bdfe6019a13ed819f.diff
-%define so_ver 2
+Patch1:         CVE-2022-0699.patch
+
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
 BuildRequires:  pkgconfig
@@ -52,9 +54,7 @@ associated attribute file (.dbf).
 This package contains the dynamic link library for shapelib project.
 
 %prep
-%setup -q
-%patch0 -p1
-%patch1 -p1
+%autosetup -p1
 
 # Fix rpmlint warning "wrong-file-end-of-line-encoding"
 sed -i 's/\r$//' contrib/doc/shpsort.txt
@@ -63,7 +63,7 @@ sed -i 's/\r$//' contrib/doc/shpsort.txt
 %configure \
   --disable-static \
   --disable-silent-rules
-make %{?_smp_mflags}
+%make_build
 
 %install
 %make_install
@@ -73,7 +73,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
 # Contrib tests fail
-make %{?_smp_mflags} check ||:
+%make_build check ||:
 
 %post -n libshp%{so_ver} -p /sbin/ldconfig
 %postun -n libshp%{so_ver} -p /sbin/ldconfig
