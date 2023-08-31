@@ -1,6 +1,5 @@
-%if 1
 %global qt_module qtserialport
-%endif
+
 Summary:        Qt5 - SerialPort component
 Name:           qt5-%{qt_module}
 Version:        5.15.9
@@ -38,7 +37,7 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 %{summary}.
 
 %prep
-%setup -q -n %{qt_module}-everywhere-src-%{version}
+%autosetup -n %{qt_module}-everywhere-src-%{version}
 
 
 %build
@@ -50,7 +49,7 @@ rm -rf examples
 
 
 %install
-make install INSTALL_ROOT=%{buildroot}
+%make_install INSTALL_ROOT=%{buildroot}
 
 ## .prl/.la file love
 # nuke .prl reference(s) to %%buildroot, excessive (.la-like) libs
