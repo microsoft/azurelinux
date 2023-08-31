@@ -1,0 +1,15 @@
+diff --git a/config.layout b/config.layout
+index a29351ef14..2a1a4c81ef 100644
+--- a/config.layout
++++ b/config.layout
+@@ -28,8 +28,8 @@
+     cgidir:        ${datadir}/cgi-bin
+     includedir:    ${prefix}/include
+     localstatedir: ${prefix}
+-    runtimedir:    ${localstatedir}/logs
+-    logfiledir:    ${localstatedir}/logs
++    runtimedir:    ${localstatedir}/log
++    logfiledir:    ${localstatedir}/log
+     proxycachedir: ${localstatedir}/proxy
+ </Layout>
+

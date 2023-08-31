@@ -20,6 +20,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repocloner"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/randomization"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
@@ -30,6 +31,8 @@ import (
 )
 
 const (
+	PackageManifestRelativePath = "image_pkg_manifest_installroot.json"
+
 	// NullDevice represents the /dev/null device used as a mount device for overlay images.
 	NullDevice     = "/dev/null"
 	overlay        = "overlay"
@@ -415,7 +418,15 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 	}
 
 	// Calculate how many packages need to be installed so an accurate percent complete can be reported
-	totalPackages, err := calculateTotalPackages(packagesToInstall, installRoot)
+	installedPackages, err := calculateTotalPackages(packagesToInstall, installRoot)
+	if err != nil {
+		return
+	}
+	totalPackages := len(installedPackages.Repo)
+
+	// Write out JSON file with list of packages included in the image
+	packageManifestPath := filepath.Join("/", PackageManifestRelativePath)
+	err = jsonutils.WriteJSONFile(packageManifestPath, installedPackages)
 	if err != nil {
 		return
 	}
@@ -631,11 +642,14 @@ func configureSystemFiles(installChroot *safechroot.Chroot, hostname string, con
 	return
 }
 
-func calculateTotalPackages(packages []string, installRoot string) (totalPackages int, err error) {
+// calculateTotalPackages will simulate installing the provided list of packages in the installRoot.
+// all packages that will be installed are returned in installedPackages, and a manifest with these packages
+// is generated under build/imagegen/$config_name/image_pkg_manifest.json
+func calculateTotalPackages(packages []string, installRoot string) (installedPackages *repocloner.RepoContents, err error) {
 	var (
 		releaseverCliArg string
 	)
-	allPackageNames := make(map[string]bool)
+	installedPackages = &repocloner.RepoContents{}
 	const tdnfAssumeNoStdErr = "Error(1032) : Operation aborted.\n"
 
 	releaseverCliArg, err = tdnf.GetReleaseverCliArg()
@@ -644,6 +658,8 @@ func calculateTotalPackages(packages []string, installRoot string) (totalPackage
 	}
 
 	// For every package calculate what dependencies would also be installed from it.
+	// checkedPackageSet contains a mapping of all package IDs (name, version, etc) to avoid calculating duplicates
+	checkedPackageSet := make(map[string]bool)
 	for _, pkg := range packages {
 		var (
 			stdout string
@@ -667,39 +683,35 @@ func calculateTotalPackages(packages []string, installRoot string) (totalPackage
 		// Search for the list of packages to be installed,
 		// it will be prefixed with a line "Installing:" and will
 		// end with an empty line.
-		inPackageList := false
 		for _, line := range splitStdout {
-			const (
-				packageListPrefix    = "Installing:"
-				packageNameDelimiter = " "
-			)
-
-			const (
-				packageNameIndex      = iota
-				extraInformationIndex = iota
-				totalPackageNameParts = iota
-			)
-
-			if !inPackageList {
-				inPackageList = strings.HasPrefix(line, packageListPrefix)
+			matches := tdnf.InstallPackageRegex.FindStringSubmatch(line)
+			if len(matches) != tdnf.InstallMaxMatchLen {
+				// This line contains output other than a package information; skip it
 				continue
-			} else if strings.TrimSpace(line) == "" {
-				break
 			}
 
-			// Each package to be installed will list its name, followed by a space and then various extra information
-			pkgSplit := strings.SplitN(line, packageNameDelimiter, totalPackageNameParts)
-			if len(pkgSplit) != totalPackageNameParts {
-				err = fmt.Errorf("unexpected TDNF package name output: %s", line)
-				return
+			pkg := &repocloner.RepoPackage{
+				Name:         matches[tdnf.InstallPackageName],
+				Version:      matches[tdnf.InstallPackageVersion],
+				Architecture: matches[tdnf.InstallPackageArch],
+				Distribution: matches[tdnf.InstallPackageDist],
 			}
 
-			allPackageNames[pkgSplit[packageNameIndex]] = true
+			pkgID := pkg.ID()
+			if checkedPackageSet[pkgID] {
+				logger.Log.Tracef("Skipping duplicate package: %s", line)
+				continue
+			}
+			checkedPackageSet[pkgID] = true
+
+			logger.Log.Debugf("Added installedPackages entry for: %v", pkgID)
+
+			installedPackages.Repo = append(installedPackages.Repo, pkg)
 		}
 	}
 
-	totalPackages = len(allPackageNames)
-	logger.Log.Debugf("All packages to be installed (%d): %v", totalPackages, allPackageNames)
+	logger.Log.Debugf("Total number of packages to be installed: %d", len(installedPackages.Repo))
+
 	return
 }
 
@@ -943,11 +955,14 @@ func InstallGrubEnv(installRoot string) (err error) {
 // - installRoot is the base install directory
 // - rootDevice holds the root partition
 // - bootUUID is the UUID for the boot partition
+// - bootPrefix is the path to the /boot grub configs based on the mountpoints (i.e., if /boot is a separate partition from the rootfs partition, bootPrefix="").
 // - encryptedRoot holds the encrypted root information if encrypted root is enabled
 // - kernelCommandLine contains additional kernel parameters which may be optionally set
+// - readOnlyRoot holds the dm-verity read-only root partition information if dm-verity is enabled.
+// - isBootPartitionSeparate is a boolean value which is true if the /boot partition is separate from the root partition
 // Note: this boot partition could be different than the boot partition specified in the bootloader.
 // This boot partition specifically indicates where to find the kernel, config files, and initrd
-func InstallGrubCfg(installRoot, rootDevice, bootUUID, bootPrefix string, encryptedRoot diskutils.EncryptedRootDevice, kernelCommandLine configuration.KernelCommandLine, readOnlyRoot diskutils.VerityDevice) (err error) {
+func InstallGrubCfg(installRoot, rootDevice, bootUUID, bootPrefix string, encryptedRoot diskutils.EncryptedRootDevice, kernelCommandLine configuration.KernelCommandLine, readOnlyRoot diskutils.VerityDevice, isBootPartitionSeparate bool) (err error) {
 	const (
 		assetGrubcfgFile = "/installer/grub2/grub.cfg"
 		grubCfgFile      = "boot/grub2/grub.cfg"
@@ -1011,6 +1026,13 @@ func InstallGrubCfg(installRoot, rootDevice, bootUUID, bootPrefix string, encryp
 	err = setGrubCfgSELinux(installGrubCfgFile, kernelCommandLine)
 	if err != nil {
 		logger.Log.Warnf("Failed to set SELinux in grub.cfg: %v", err)
+		return
+	}
+
+	// Configure FIPS
+	err = setGrubCfgFIPS(isBootPartitionSeparate, bootUUID, installGrubCfgFile, kernelCommandLine)
+	if err != nil {
+		logger.Log.Warnf("Failed to set FIPS in grub.cfg: %v", err)
 		return
 	}
 
@@ -2035,6 +2057,33 @@ func setGrubCfgSELinux(grubPath string, kernelCommandline configuration.KernelCo
 		logger.Log.Warnf("Failed to set grub.cfg's SELinux setting: %v", err)
 	}
 
+	return
+}
+
+func setGrubCfgFIPS(isBootPartitionSeparate bool, bootUUID, grubPath string, kernelCommandline configuration.KernelCommandLine) (err error) {
+	const (
+		enableFIPSPattern = "{{.FIPS}}"
+		enableFIPS        = "fips=1"
+		bootPrefix        = "boot="
+		uuidPrefix        = "UUID="
+	)
+
+	// If EnableFIPS is set, always add "fips=1" to the kernel cmdline.
+	// If /boot is a dedicated partition from the root partition, add "boot=UUID=<bootUUID value>" as well to the kernel cmdline in grub.cfg.
+	// This second step is required for fips boot-time self tests to find the kernel's .hmac file in the /boot partition.
+	fipsKernelArgument := ""
+	if kernelCommandline.EnableFIPS {
+		fipsKernelArgument = fmt.Sprintf("%s", enableFIPS)
+		if isBootPartitionSeparate {
+			fipsKernelArgument = fmt.Sprintf("%s %s%s%s", fipsKernelArgument, bootPrefix, uuidPrefix, bootUUID)
+		}
+	}
+
+	logger.Log.Debugf("Adding EnableFIPS('%s') to '%s'", fipsKernelArgument, grubPath)
+	err = sed(enableFIPSPattern, fipsKernelArgument, kernelCommandline.GetSedDelimeter(), grubPath)
+	if err != nil {
+		logger.Log.Warnf("Failed to set grub.cfg's EnableFIPS setting: %v", err)
+	}
 	return
 }
 
