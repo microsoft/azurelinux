@@ -42,14 +42,14 @@ To see help, run 'sudo make containerized-rpmbuild-help'
 }
 
 build_chroot() {
-    pushd "${repo_path}/toolkit"
+    pushd $toolkit_root
     echo "Building worker chroot..."
     make graph-cache REBUILD_TOOLS=y > /dev/null
     popd
 }
 
 build_tools() {
-    pushd "${repo_path}/toolkit"
+    pushd $toolkit_root
     echo "Building required tools..."
     make go-srpmpacker REBUILD_TOOLS=y > /dev/null
     make go-depsearch REBUILD_TOOLS=y > /dev/null
@@ -59,7 +59,7 @@ build_tools() {
 }
 
 build_graph() {
-    pushd "${repo_path}/toolkit"
+    pushd $toolkit_root
     echo "Building dependency graph..."
     make workplan > /dev/null
     popd
@@ -95,6 +95,19 @@ done
 [[ -z "${mode}" ]] && mode="build"
 [[ -z "${version}" ]] && version="2.0"
 
+# Set relevant folder definitions using Makefile that can be overriden by user
+PROJECT_ROOT=$repo_path
+toolkit_root="$PROJECT_ROOT/toolkit"
+pushd $toolkit_root
+BUILD_DIR=$(make -s printvar-BUILD_DIR  2> /dev/null)
+OUT_DIR=$(make -s printvar-OUT_DIR 2> /dev/null)
+SPECS_DIR=$(make -s printvar-SPECS_DIR 2> /dev/null)
+BUILD_SRPMS_DIR=$(make -s printvar-BUILD_SRPMS_DIR 2> /dev/null)   #INTERMEDIATE_SRPMS
+RPMS_DIR=$(make -s printvar-RPMS_DIR 2> /dev/null)
+TOOL_BINS_DIR=$(make -s printvar-TOOL_BINS_DIR 2> /dev/null)       #out/tools
+PKGBUILD_DIR=$(make -s printvar-PKGBUILD_DIR 2> /dev/null)         #build/pkg_artifacts
+popd
+
 cd "${script_dir}"  || { echo "ERROR: Could not change directory to ${script_dir}"; exit 1; }
 
 # ==================== Setup ====================
@@ -114,18 +127,18 @@ else
 fi
 
 # ============ Populate SRPMS ============
-# Populate ${repo_path}/build/INTERMEDIATE_SRPMS with SRPMs, that can be used to build RPMs in the container
-pushd "${repo_path}/toolkit"
+# Populate $BUILD_SRPMS_DIR with SRPMs, that can be used to build RPMs in the container
+pushd $toolkit_root
 echo "Populating Intermediate SRPMs..."
-if [[ ( ! -f "${repo_path}/toolkit/out/tools/srpmpacker" ) ]]; then build_tools; fi
+if [[ ( ! -f "$TOOL_BINS_DIR/srpmpacker" ) ]]; then build_tools; fi
 make input-srpms SRPM_FILE_SIGNATURE_HANDLING="update" > /dev/null
 popd
 
 # ============ Map chroot mount ============
 if [[ "${mode}" == "build" ]]; then
     # Create a new directory and map it to chroot directory in container
-    build_mount="${repo_path}/build/container-build"
-    buildroot_mount="${repo_path}/build/container-buildroot"
+    build_mount="$BUILD_DIR/container-build"
+    buildroot_mount="$BUILD_DIR/container-buildroot"
     if [ -d "${build_mount}" ]; then rm -Rf ${build_mount}; fi
     if [ -d "${buildroot_mount}" ]; then rm -Rf ${buildroot_mount}; fi
     mkdir ${build_mount}
@@ -134,22 +147,22 @@ if [[ "${mode}" == "build" ]]; then
 fi
 
 # ============ Setup tools ============
-# Copy relavant build tool executables from ${repo_path}/tools/out
+# Copy relavant build tool executables from $TOOL_BINS_DIR
 echo "Setting up tools..."
-if [[ ( ! -f "${repo_path}/toolkit/out/tools/depsearch" ) || ( ! -f "${repo_path}/toolkit/out/tools/grapher" ) || ( ! -f "${repo_path}/toolkit/out/tools/specreader" ) ]]; then build_tools; fi
-if [[ ! -f "${repo_path}/build/pkg_artifacts/graph.dot" ]]; then build_graph; fi
-cp ${repo_path}/toolkit/out/tools/depsearch ${tmp_dir}/
-cp ${repo_path}/toolkit/out/tools/grapher ${tmp_dir}/
-cp ${repo_path}/toolkit/out/tools/specreader ${tmp_dir}/
-cp ${repo_path}/build/pkg_artifacts/graph.dot ${tmp_dir}/
+if [[ ( ! -f "$TOOL_BINS_DIR/depsearch" ) || ( ! -f "$TOOL_BINS_DIR/grapher" ) || ( ! -f "$TOOL_BINS_DIR/specreader" ) ]]; then build_tools; fi
+if [[ ! -f "$PKGBUILD_DIR/graph.dot" ]]; then build_graph; fi
+cp $TOOL_BINS_DIR/depsearch ${tmp_dir}/
+cp $TOOL_BINS_DIR/grapher ${tmp_dir}/
+cp $TOOL_BINS_DIR/specreader ${tmp_dir}/
+cp $PKGBUILD_DIR/graph.dot ${tmp_dir}/
 
 # ========= Setup mounts =========
 echo "Setting up mounts..."
 
-mounts="${mounts} ${repo_path}/out/RPMS:/mnt/RPMS ${tmp_dir}:/mariner_setup_dir"
+mounts="${mounts} $RPMS_DIR:/mnt/RPMS ${tmp_dir}:/mariner_setup_dir"
 # Add extra 'build' mounts
 if [[ "${mode}" == "build" ]]; then
-    mounts="${mounts} ${repo_path}/build/INTERMEDIATE_SRPMS:/mnt/INTERMEDIATE_SRPMS ${repo_path}/SPECS:${topdir}/SPECS"
+    mounts="${mounts} $BUILD_SRPMS_DIR:/mnt/INTERMEDIATE_SRPMS $SPECS_DIR:${topdir}/SPECS"
 fi
 
 # Replace comma with space as delimiter
@@ -178,7 +191,7 @@ dockerfile="${script_dir}/resources/mariner.Dockerfile"
 
 if [[ "${mode}" == "build" ]]; then # Configure base image
     echo "Importing chroot into docker..."
-    chroot_file="${repo_path}/build/worker/worker_chroot.tar.gz"
+    chroot_file="$BUILD_DIR/worker/worker_chroot.tar.gz"
     if [[ ! -f "${chroot_file}" ]]; then build_chroot; fi
     chroot_hash=$(sha256sum "${chroot_file}" | cut -d' ' -f1)
     # Check if the chroot file's hash has changed since the last build
@@ -211,4 +224,4 @@ echo "docker_image_tag is ${docker_image_tag}"
 bash -c "docker run --rm \
                     ${mount_arg} \
                     -it ${docker_image_tag} /bin/bash; \
-                    [[ -d ${repo_path}/out/RPMS/repodata ]] && { rm -r ${repo_path}/out/RPMS/repodata; echo 'Clearing repodata' ; }"
+                    [[ -d $RPMS_DIR/repodata ]] && { rm -r $RPMS_DIR/repodata; echo 'Clearing repodata' ; }"
