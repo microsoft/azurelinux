@@ -5,7 +5,7 @@ Distribution:   Mariner
 
 Summary:        A screen manager that supports multiple logins on one terminal
 Name:           screen
-Version:        4.9.0
+Version:        4.9.1
 Release:        1%{?dist}
 License:        GPLv3+
 URL:            http://www.gnu.org/software/screen
@@ -117,6 +117,9 @@ rm -f $RPM_BUILD_ROOT%{_infodir}/dir
 %endif
 
 %changelog
+* Thu Aug 31 2023 Muhammad Falak <mwani@microsoft.com> - 4.9.1-1
+- Upgrade version to adress CVE-2021-20230
+
 * Wed Nov 09 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.9.0-1
 - Auto-upgrade to 4.9.0 - CVE-2021-26937
 
