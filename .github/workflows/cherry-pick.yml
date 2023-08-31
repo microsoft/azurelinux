@@ -80,8 +80,8 @@ jobs:
                                               | . += ["${{ fromJSON(env.CHERRY_PICK_BRANCH_MAPPING)[github.base_ref] }}"]
                                               | unique')
           branches_list=$(echo $cherry_pick_branches_json | jq -r @sh | tr -d "'")
-          IFS=" " read -ra target_branches <<< "$branches_list"
-          echo "cherry_pick_target_branches=${target_branches[*]}" >> $GITHUB_OUTPUT
+          # IFS=" " read -ra target_branches <<< "$branches_list"
+          echo "cherry_pick_target_branches=$branches_list" >> $GITHUB_OUTPUT
 
   # Actual cherry-pick work for each target branch
   cherry_pick_commit:
