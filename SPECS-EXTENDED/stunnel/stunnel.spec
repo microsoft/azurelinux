@@ -11,24 +11,23 @@ Distribution:   Mariner
 
 Summary: A TLS-encrypting socket wrapper
 Name: stunnel
-Version: 5.56
-Release: 8%{?dist}
+Version: 5.70
+Release: 1%{?dist}
 License: GPLv2
 URL: http://www.stunnel.org/
 Source0: https://www.stunnel.org/downloads/stunnel-%{version}.tar.gz
-Source1: https://www.stunnel.org/downloads/stunnel-%{version}.tar.gz.asc
 Source2: Certificate-Creation
 Source3: sfinger.xinetd
 Source4: stunnel-sfinger.conf
 Source5: pop3-redirect.xinetd
 Source6: stunnel-pop3s-client.conf
 Source7: stunnel@.service
-Patch0: stunnel-5.50-authpriv.patch
-Patch1: stunnel-5.50-systemd-service.patch
-Patch3: stunnel-5.56-system-ciphers.patch
-Patch4: stunnel-5.56-coverity.patch
-Patch5: stunnel-5.56-default-tls-version.patch
-Patch6: stunnel-5.56-curves-doc-update.patch
+#Patch0: stunnel-5.50-authpriv.patch
+#Patch1: stunnel-5.50-systemd-service.patch
+#Patch3: stunnel-5.56-system-ciphers.patch
+#Patch4: stunnel-5.56-coverity.patch
+#Patch5: stunnel-5.56-default-tls-version.patch
+#Patch6: stunnel-5.56-curves-doc-update.patch
 # util-linux is needed for rename
 BuildRequires: gcc
 BuildRequires: openssl-devel, pkgconfig, util-linux
@@ -50,19 +49,13 @@ to ordinary applications. For example, it can be used in
 conjunction with imapd to create a TLS secure IMAP server.
 
 %prep
-%setup -q
-%patch0 -p1 -b .authpriv
-%patch1 -p1 -b .systemd-service
-%patch3 -p1 -b .system-ciphers
-%patch4 -p1 -b .coverity
-%patch5 -p1 -b .default-tls-version
-%patch6 -p1 -b .curves-doc-update
+%autosetup -S gendiff -p1
 
 # Fix the configure script output for FIPS mode and stack protector flag
-sed -i '/yes).*result: no/,+1{s/result: no/result: yes/;s/as_echo "no"/as_echo "yes"/};s/-fstack-protector/-fstack-protector-strong/' configure
+# sed -i '/yes).*result: no/,+1{s/result: no/result: yes/;s/as_echo "no"/as_echo "yes"/};s/-fstack-protector/-fstack-protector-strong/' configure
 
 # Fix a testcase with system-ciphers support
-sed -i '/client = yes/a \\  ciphers = PSK' tests/recipes/014_PSK_secrets
+# sed -i '/client = yes/a \\  ciphers = PSK' tests/recipes/014_PSK_secrets
 
 %build
 #autoreconf -v
