@@ -28,7 +28,7 @@ defaults:
     shell: bash
 
 env:
-  CHERRY_PICK_BRANCH_MAPPING: '{"fasttrack/2.0": "main"}'
+  CHERRY_PICK_BRANCH_MAPPING: '{"fasttrack/2.0": "tvuong/test-main"}'
 
 jobs:
   # Scans the PR for cherry pick comments, in addition to the default cherry pick target
@@ -45,7 +45,25 @@ jobs:
       # - default target branch
       # - any branch specified in PR comments with the syntax
       #     /cherry-pick <branch-1> <branch-2>
-      # The final list will only contain unique branches
+      # The final list will only contain unique branches.
+      # The jq filter does the following from a JSON list of comments
+      #     [{"author": "a", "authorAssociation": "MEMBER", "body": "hello"},
+      #      {"author": "c", "authorAssociation": "CONTRIBUTOR", "body": "hi"},
+      #      {"author": "a", "authorAssociation": "MEMBER", "body": "/cherry-pick a b c"},
+      #      {"author": "b", "authorAssociation": "MEMBER", "body": "/cherry-pick a b"}]
+      # - Select only comments where the author is a member or owner of the repository
+      # - Collect all comments body to a list of string
+      # - Select only comments that starts with "/cherry-pick "
+      # - Remove the "/cherry-pick " prefix from each comment
+      #     ["a b c", "a b"]
+      # - Split the remaining content of each comment by whitespace into a list
+      #     [["a", "b", "c"], ["a", "b"]]
+      # - Flatten the list
+      #     ["a", "b", "c", "a", "b"]
+      # - Add the default target branch to the list
+      #     ["a", "b", "c", "a", "b", "default-target"]
+      # - Remove all duplicate values
+      #     ["a", "b", "c", "default-target"]
       - name: Create list of target branches
         id: target_branches
         run: |
@@ -68,7 +86,6 @@ jobs:
   # Actual cherry-pick work for each target branch
   cherry_pick_commit:
     needs: collect_target_branches
-    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -87,16 +104,27 @@ jobs:
           git config --local user.name "CBL-Mariner Servicing Account"
 
       # Run cherry-pick for each target branch and create new PR for it. If cherry-pick fails,
-      # output conflicts to the action logs and notify in the original PR.
+      # output conflicts to the action logs and notify in the original PR. We want to run the
+      # cherry-pick script for all target branch, even if one fails. This step will succeed if
+      # all cherry-picks succeed.
       - name: Run cherry-pick action
         run: |
+          cp toolkit/script/cherry_pick.sh ${{ runner.temp }}/cherry_pick.sh
+
           for target_branch in ${{ needs.collect_target_branches.outputs.cherry_pick_target_branches }}; do
-            toolkit/scripts/cherry_pick.sh \
-              -r "${{ github.repository }}" \
-              -p "${{ github.event.pull_request.number }}" \
-              -t "$target_branch" || true
+            if ${{ runner.temp }}/cherry_pick.sh \
+                -r "${{ github.repository }}" \
+                -p "${{ github.event.pull_request.number }}" \
+                -t "$target_branch" \
+                -w $RUN_URL; then
+              failed=1
+            fi
             echo "================================================================================"
           done
+          if [[ $failed == 1 ]]; then
+            echo "Cherry-pick failed for at least 1 target branch"
+            exit 1
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
