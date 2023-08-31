@@ -43,10 +43,10 @@ To see help, run 'sudo make containerized-rpmbuild-help'
 "
 }
 
-build_chroot() {
+build_worker_chroot() {
     pushd "${repo_path}/toolkit"
     echo "Building worker chroot..."
-    make graph-cache REBUILD_TOOLS=y > /dev/null
+    make chroot-tools REBUILD_TOOLS=y > /dev/null
     popd
 }
 
@@ -183,7 +183,7 @@ dockerfile="${script_dir}/resources/mariner.Dockerfile"
 if [[ "${mode}" == "build" ]]; then # Configure base image
     echo "Importing chroot into docker..."
     chroot_file="${repo_path}/build/worker/worker_chroot.tar.gz"
-    if [[ ! -f "${chroot_file}" ]]; then build_chroot; fi
+    if [[ ! -f "${chroot_file}" ]]; then build_worker_chroot; fi
     chroot_hash=$(sha256sum "${chroot_file}" | cut -d' ' -f1)
     # Check if the chroot file's hash has changed since the last build
     if [[ ! -f "${tmp_dir}/hash" ]] || [[ "$(cat "${tmp_dir}/hash")" != "${chroot_hash}" ]]; then
