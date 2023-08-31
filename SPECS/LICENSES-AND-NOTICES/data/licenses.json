@@ -2562,6 +2562,7 @@
                 "rook",
                 "servletapi4",
                 "servletapi5",
+                "shapelib",
                 "slf4j",
                 "trilead-ssh2",
                 "xalan-j2",
