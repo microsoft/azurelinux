@@ -1156,6 +1156,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "blosc",
+          "version": "1.21.4",
+          "downloadUrl": "https://github.com/Blosc/c-blosc/archive/v1.21.4/blosc-1.21.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "bluez",
           "version": "5.63",
           "downloadUrl": "http://www.kernel.org/pub/linux/bluetooth/bluez-5.63.tar.xz"
