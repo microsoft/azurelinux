@@ -1826,6 +1826,7 @@
                 "qt5-qtconnectivity",
                 "qt5-qtdeclarative",
                 "qt5-qtsensors",
+                "qt5-qtserialport",
                 "qt5-qtsvg",
                 "qt5-qttools",
                 "qt5-rpm-macros",
