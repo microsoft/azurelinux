@@ -80,7 +80,6 @@ jobs:
                                               | . += ["${{ fromJSON(env.CHERRY_PICK_BRANCH_MAPPING)[github.base_ref] }}"]
                                               | unique')
           branches_list=$(echo $cherry_pick_branches_json | jq -r @sh | tr -d "'")
-          # IFS=" " read -ra target_branches <<< "$branches_list"
           echo "cherry_pick_target_branches=$branches_list" >> $GITHUB_OUTPUT
 
   # Actual cherry-pick work for each target branch
@@ -112,7 +111,7 @@ jobs:
           cp toolkit/scripts/cherry_pick.sh ${{ runner.temp }}/cherry_pick.sh
 
           for target_branch in ${{ needs.collect_target_branches.outputs.cherry_pick_target_branches }}; do
-            if ${{ runner.temp }}/cherry_pick.sh \
+            if ! ${{ runner.temp }}/cherry_pick.sh \
                 -r "${{ github.repository }}" \
                 -p "${{ github.event.pull_request.number }}" \
                 -t "$target_branch" \
