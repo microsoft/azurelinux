@@ -66,12 +66,6 @@ export LD_LIBRARY_PATH=%{buildroot}%{_libdir}
 %install
 %cmake_install
 
-# install -p bench/plot-speeds.py* -Dt %{buildroot}/%{_pkgdocdir}/bench/
-# install -pm 0644 bench/*.c %{buildroot}/%{_pkgdocdir}/bench
-
-# install -p %{_vpath_builddir}/bench/bench -D %{buildroot}/%{_bindir}/%{name}-bench
-# install -p bench/plot-speeds.py %{buildroot}/%{_bindir}/%{name}-plot-times
-
 %files
 %exclude %{_pkgdocdir}/bench/
 %license LICENSES/*
