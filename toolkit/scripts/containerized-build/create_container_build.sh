@@ -208,6 +208,7 @@ docker build -q \
                 --build-arg version="$version" \
                 --build-arg enable_local_repo="$enable_local_repo" \
                 --build-arg mariner_repo="$repo_path" \
+                --build-arg mode="$mode" \
                 .
 
 echo "docker_image_tag is ${docker_image_tag}"
