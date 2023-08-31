@@ -9520,6 +9520,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libgta",
+          "version": "1.2.1",
+          "downloadUrl": "https://marlam.de/gta/releases/libgta-1.2.1.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libgudev",
           "version": "237",
           "downloadUrl": "https://download.gnome.org/sources/libgudev/237/libgudev-237.tar.xz"
