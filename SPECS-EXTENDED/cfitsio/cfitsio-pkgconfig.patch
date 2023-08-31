@@ -1,0 +1,12 @@
+diff -ur cfitsio-4.0.0/cfitsio.pc.in cfitsio-4.0.0.pc/cfitsio.pc.in
+--- cfitsio-4.0.0/cfitsio.pc.in	2021-05-20 03:18:54.000000000 +0200
++++ cfitsio-4.0.0.pc/cfitsio.pc.in	2021-12-03 17:38:32.302407819 +0100
+@@ -1,7 +1,7 @@
+ prefix=@prefix@
+ exec_prefix=@exec_prefix@
+ libdir=@libdir@
+-includedir=@includedir@
++includedir=@includedir@/cfitsio
+ 
+ Name: cfitsio
+ Description: FITS File Subroutine Library

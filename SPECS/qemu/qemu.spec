@@ -217,7 +217,7 @@ Obsoletes: %{name}-system-unicore32-core <= %{version}-%{release}
 Summary:        QEMU is a FAST! processor emulator
 Name:           qemu
 Version:        6.2.0
-Release:        16%{?dist}
+Release:        17%{?dist}
 License:        BSD AND CC-BY AND GPLv2+ AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -273,6 +273,7 @@ Patch1013:      CVE-2022-3165.patch
 # CVE-2021-3750 fix is not in a release yet
 # https://gitlab.com/qemu-project/qemu/-/issues/541
 Patch1014:      CVE-2021-3750.patch
+Patch1015:      CVE-2022-36648.patch
 
 # alsa audio output
 BuildRequires:  alsa-lib-devel
@@ -2307,6 +2308,9 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 
 
 %changelog
+* Mon Aug 28 2023 Brian Fjeldstad <bfjelds@microsoft.com> - 6.2.0-17
+- Address CVE-2022-36648
+
 * Thu Jun 15 2023 Dylan Garrett <dylang@microsoft.com> - 6.2.0-16
 - Address CVE-2021-3750
 
@@ -2329,7 +2333,7 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 * Wed Oct 26 2022 Olivia Crain <oliviacrain@microsoft.com> - 6.2.0-10
 - Have virtiofsd subpackage obsolete qemu-common from 6.1.0 releases
 
-* Tue Sep 28 2022 Saul Paredes <saulparedes@microsoft.com> - 6.2.0-9
+* Wed Sep 28 2022 Saul Paredes <saulparedes@microsoft.com> - 6.2.0-9
 - Address CVE-2022-2962
 
 * Fri Sep 09 2022 Muhammad Falak <mwani@microsoft.com> - 6.2.0-8
