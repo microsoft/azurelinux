@@ -1,3 +1,5 @@
+%global so_version 1
+
 Summary:        Library that implements the Generic Tagged Arrays file format
 Name:           libgta
 Version:        1.2.1
@@ -7,7 +9,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://marlam.de/gta/
 Source0:        https://marlam.de/gta/releases/%{name}-%{version}.tar.xz
-%global so_version 1
 BuildRequires:  cmake
 BuildRequires:  doxygen
 BuildRequires:  gcc
