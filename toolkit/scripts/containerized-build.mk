@@ -26,6 +26,10 @@ ifneq ($(MOUNTS),)
 containerized_build_args += -mo ${MOUNTS}
 endif
 
+ifneq ($(BUILD_MOUNT),)
+containerized_build_args += -b ${BUILD_MOUNT}
+endif
+
 ifeq ($(ENABLE_REPO),y)
 containerized_build_args += -r
 endif
