@@ -4,7 +4,7 @@ Distribution:   Mariner
 
 Name:		%{srcname}
 Version:	5.2.2
-Release:	2%{?dist}
+Release:	3%{?dist}
 Summary:	Python client library for PostgreSQL
 
 URL:		http://www.pygresql.org/
@@ -23,7 +23,8 @@ BuildRequires:	python3-devel
 
 # For testsuite
 %if %{with_check}
-BuildRequires:	postgresql-test-rpm-macros
+# Missing test dependencies:
+# BuildRequires:	postgresql-test-rpm-macros
 %endif
 
 %global _description\
@@ -83,6 +84,9 @@ EOF
 
 
 %changelog
+* Thu Aug 31 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.2.2-3
+- Disabling missing test dependency.
+
 * Sat Jul 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.2.2-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Disabling BR on 'postgresql-test-rpm-macros' for non-test builds.
