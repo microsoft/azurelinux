@@ -119,6 +119,20 @@ func SetMacroDir(newMacroDir string) (origenv []string, err error) {
 	return
 }
 
+// ExtractNameFromRPMPath strips the version from an RPM file name. i.e. pkg-name-1.2.3-4.cm2.x86_64.rpm -> pkg-name
+func ExtractNameFromRPMPath(rpmFile string) (strippedFile string) {
+	baseName := filepath.Base(rpmFile)
+
+	// If the path is invalid, return empty string. We consider any string that has at least 1 '-' characters valid.
+	if !strings.Contains(baseName, "-") {
+		return
+	}
+
+	rpmFileSplit := strings.Split(baseName, "-")
+	strippedFile = strings.Join(rpmFileSplit[:len(rpmFileSplit)-2], "-")
+	return
+}
+
 // getCommonBuildArgs will generate arguments to pass to 'rpmbuild'.
 func getCommonBuildArgs(outArch, srpmFile string, defines map[string]string) (buildArgs []string, err error) {
 	const (

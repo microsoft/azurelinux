@@ -39,11 +39,12 @@ var defaultFreshness = fmt.Sprintf("%d", schedulerutils.NodeFreshnessAbsoluteMax
 // Unlike BuildChannels, schedulerChannels holds bidirectional channels that
 // only the top-level scheduler should have. BuildChannels contains directional channels.
 type schedulerChannels struct {
-	Requests         chan *schedulerutils.BuildRequest
-	PriorityRequests chan *schedulerutils.BuildRequest
-	Results          chan *schedulerutils.BuildResult
-	Cancel           chan struct{}
-	Done             chan struct{}
+	LowPriorityRequests    chan *schedulerutils.BuildRequest
+	MediumPriorityRequests chan *schedulerutils.BuildRequest
+	HighPriorityRequests   chan *schedulerutils.BuildRequest
+	Results                chan *schedulerutils.BuildResult
+	Cancel                 chan struct{}
+	Done                   chan struct{}
 }
 
 var (
@@ -252,20 +253,22 @@ func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, work
 // channelBufferSize controls how many entries in the channels can be buffered before blocking writes to them.
 func startWorkerPool(agent buildagents.BuildAgent, workers, buildAttempts, checkAttempts, channelBufferSize int, graphMutex *sync.RWMutex, ignoredPackages, ignoredTests []*pkgjson.PackageVer) (channels *schedulerChannels) {
 	channels = &schedulerChannels{
-		Requests:         make(chan *schedulerutils.BuildRequest, channelBufferSize),
-		PriorityRequests: make(chan *schedulerutils.BuildRequest, channelBufferSize),
-		Results:          make(chan *schedulerutils.BuildResult, channelBufferSize),
-		Cancel:           make(chan struct{}),
-		Done:             make(chan struct{}),
+		LowPriorityRequests:    make(chan *schedulerutils.BuildRequest, channelBufferSize),
+		MediumPriorityRequests: make(chan *schedulerutils.BuildRequest, channelBufferSize),
+		HighPriorityRequests:   make(chan *schedulerutils.BuildRequest, channelBufferSize),
+		Results:                make(chan *schedulerutils.BuildResult, channelBufferSize),
+		Cancel:                 make(chan struct{}),
+		Done:                   make(chan struct{}),
 	}
 
 	// Downcast the bidirectional scheduler channels into directional channels for the build workers.
 	directionalChannels := &schedulerutils.BuildChannels{
-		Requests:         channels.Requests,
-		PriorityRequests: channels.PriorityRequests,
-		Results:          channels.Results,
-		Cancel:           channels.Cancel,
-		Done:             channels.Done,
+		LowPriorityRequests:    channels.LowPriorityRequests,
+		MediumPriorityRequests: channels.MediumPriorityRequests,
+		HighPriorityRequests:   channels.HighPriorityRequests,
+		Results:                channels.Results,
+		Cancel:                 channels.Cancel,
+		Done:                   channels.Done,
 	}
 
 	// Start the workers now so they begin working as soon as a new job is queued.
@@ -318,13 +321,27 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 		// by using cached implicit provides to satisfy unresolved dynamic dependencies during the first pass of the optimizer.
 		useCachedImplicit bool
 		isGraphOptimized  bool
+
+		// allowLowPriorityNodes tracks if low priority nodes can be built. Ideally the scheduler will be able to build all
+		// medium and high priority nodes without needing to build any low priority nodes. However, if the scheduler is unable
+		// to resolve an implicit provide, it will need to fall back to building low priority nodes to try and find a provider.
+		allowLowPriorityNodes bool
 	)
 
 	// Start the build at the leaf nodes.
 	// The build will bubble up through the graph as it processes nodes.
-	buildState := schedulerutils.NewGraphBuildState(reservedFiles, maxCascadingRebuilds)
+
+	// Calculate the priority so we can optimize the build ordering.
+	priorityBuildSet, activeBuildGraph, err := schedulerutils.BuildNodeResolutionPriorityMap(pkgGraph, graphMutex)
+	_ = activeBuildGraph
+	if err != nil {
+		err = fmt.Errorf("error building implicit node resolution priority set:\n%w", err)
+		return
+	}
+	buildState := schedulerutils.NewGraphBuildState(reservedFiles, priorityBuildSet, maxCascadingRebuilds)
 	buildRunsTests := len(pkgGraph.AllTestNodes()) > 0
-	nodesToBuild := schedulerutils.LeafNodes(pkgGraph, graphMutex, goalNode, buildState, useCachedImplicit)
+	nodesToBuild := schedulerutils.LeafNodes(pkgGraph, graphMutex, goalNode, buildState, useCachedImplicit, allowLowPriorityNodes)
+	lowPriorityNodes := make([]*pkggraph.PkgNode, 0)
 
 	for {
 		logger.Log.Debugf("Found %d unblocked nodes: %v.", len(nodesToBuild), nodesToBuild)
@@ -337,23 +354,37 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 			// way as quickly as possible since they may help us optimize the graph early.
 			// Meta nodes may also be blocking something we want to examine and give higher priority (priority inheritance from
 			// the hypothetical high priority node hidden further into the tree)
-			switch req.Node.Type {
-			case pkggraph.TypePreBuilt:
-				channels.PriorityRequests <- req
 
-				// For now all build nodes are of equal priority
-			case pkggraph.TypeGoal:
-				fallthrough
-			case pkggraph.TypePureMeta:
-				fallthrough
-			case pkggraph.TypeLocalRun:
-				fallthrough
-			case pkggraph.TypeRemoteRun:
-				fallthrough
-			case pkggraph.TypeLocalBuild:
+			// Some nodes will be marked as high priority and should be preferentially queued in the the high-pri queue
+			// no matter what (generally those nodes that we hope will satisfy unresolved dynamic dependencies)
+			switch buildState.GetNodePriority(req.Node) {
+			case schedulerutils.HighNodePriority:
+				logger.Log.Tracef("Priority priority request (%d) for node '%s'", buildState.GetNodePriority(req.Node), req.Node.FriendlyName())
+				channels.HighPriorityRequests <- req
+			case schedulerutils.MediumNodePriority:
+				logger.Log.Tracef("Medium priority request (%d) for node '%s'", buildState.GetNodePriority(req.Node), req.Node.FriendlyName())
+				channels.MediumPriorityRequests <- req
+			case schedulerutils.LowNodePriority:
 				fallthrough
 			default:
-				channels.Requests <- req
+				switch req.Node.Type {
+				// Any nodes that can be handled without a build should be processed as soon as possible, so use
+				// medium priority for them.
+				case pkggraph.TypePreBuilt:
+					fallthrough
+				case pkggraph.TypeGoal:
+					fallthrough
+				case pkggraph.TypePureMeta:
+					fallthrough
+				case pkggraph.TypeLocalRun:
+					fallthrough
+				case pkggraph.TypeRemoteRun:
+					logger.Log.Tracef("Medium priority request (%d) for node '%s'", buildState.GetNodePriority(req.Node), req.Node.FriendlyName())
+					channels.MediumPriorityRequests <- req
+				default:
+					logger.Log.Tracef("Low priority request (%d) for node '%s'", buildState.GetNodePriority(req.Node), req.Node.FriendlyName())
+					channels.LowPriorityRequests <- req
+				}
 			}
 		}
 		nodesToBuild = nil
@@ -361,16 +392,23 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 		// If there are no active builds running or results waiting to check try enabling cached packages for unresolved
 		// dynamic dependencies to unblock more nodes. Otherwise, there is nothing left that can be built.
 		if len(buildState.ActiveBuilds()) == 0 && len(channels.Results) == 0 {
-			if useCachedImplicit {
+			if !allowLowPriorityNodes {
+				logger.Log.Warnf("Enabling low priority packages to satisfy unresolved dynamic dependencies.")
+				allowLowPriorityNodes = true
+				nodesToBuild = schedulerutils.LeafNodes(pkgGraph, graphMutex, goalNode, buildState, useCachedImplicit, allowLowPriorityNodes)
+				nodesToBuild = append(nodesToBuild, lowPriorityNodes...)
+				lowPriorityNodes = nil
+				continue
+			} else if !useCachedImplicit {
+				logger.Log.Warn("Enabling cached packages to satisfy unresolved dynamic dependencies.")
+				useCachedImplicit = true
+				nodesToBuild = schedulerutils.LeafNodes(pkgGraph, graphMutex, goalNode, buildState, useCachedImplicit, allowLowPriorityNodes)
+				continue
+			} else {
 				err = fmt.Errorf("could not build all packages")
 				// Temporarily print debug information about the stuck node.
 				debugStuckNode(buildState, pkgGraph, goalNode, 0)
 				break
-			} else {
-				logger.Log.Warn("Enabling cached packages to satisfy unresolved dynamic dependencies.")
-				useCachedImplicit = true
-				nodesToBuild = schedulerutils.LeafNodes(pkgGraph, graphMutex, goalNode, buildState, useCachedImplicit)
-				continue
 			}
 		}
 
@@ -419,10 +457,29 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 						// When querying their edges, the graph library will return an empty iterator (graph.Empty).
 						pkgGraph = newGraph
 						goalNode = newGoalNode
+
+						// No need to consider low/high priority nodes anymore. There are only two cases here:
+						// 1. The graph was optimized based on the predicted implicit provides and is now solvable (allowLowPriorityNodes == false).
+						//     - No low priority nodes were needed, and there is no expectation we will need them. Everything
+						//       should be solvable with the predicted medium/high priority nodes already selected.
+						//     - Any low priority nodes we set aside can be discarded.
+						// 2. The graph could not be optimized based on the predicted implicit provides and we needed to fall (allowLowPriorityNodes == true)
+						//    back to the a random walk of the low priority nodes.
+						//     - In this case, we will have already released all of the low priority nodes back into the build
+						//       pool and they will be built as needed.
+						// Either way, we should leave here with no tracked low priority nodes, and with low proirity nodes enabled so that the scheduler can
+						// fully build the new solvable graph as quickly as possible.
+						if !allowLowPriorityNodes {
+							// Discard the low priority nodes that were set aside since the graph has been optimized and clearly they were not actually needed.
+							lowPriorityNodes = nil
+							allowLowPriorityNodes = true
+						}
 					}
 				}
 
-				nodesToBuild = schedulerutils.FindUnblockedNodesFromResult(res, pkgGraph, graphMutex, buildState)
+				var newLowPiorityNodes []*pkggraph.PkgNode
+				nodesToBuild, newLowPiorityNodes = schedulerutils.FindUnblockedNodesFromResult(res, pkgGraph, graphMutex, buildState, allowLowPriorityNodes)
+				lowPriorityNodes = append(lowPriorityNodes, newLowPiorityNodes...)
 			} else if stopOnFailure {
 				stopBuilding = true
 				err = res.Err
@@ -431,7 +488,7 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 
 		// stopBuilding will be set to true here only if the build has failed. We also set it to true if the goal node is available
 		// but only after this check is made. In that case we will call doneBuild() instead.
-		if stopBuilding {
+		if stopBuilding && err != nil {
 			// If the build has failed, stop all outstanding builds.
 			stopBuild(channels, buildState)
 			err = fmt.Errorf("fatal error building package graph:\n%w", err)
@@ -444,13 +501,15 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 		// There may still be outstanding builds if the graph was recently subgraphed
 		// due to an unresolved implicit provide being satisfied and nodes that are no
 		// longer in the graph are building.
-		if buildState.IsNodeAvailable(goalNode) {
-			logger.Log.Infof("All packages built")
-			stopBuilding = true
-		}
-
 		activeSRPMs := buildState.ActiveSRPMs()
 		activeSRPMsCount := len(activeSRPMs)
+		if buildState.IsNodeAvailable(goalNode) {
+			logger.Log.Infof("All packages built")
+			if activeSRPMsCount > 0 {
+				logger.Log.Infof("%d workers still running. Waiting for them to finish.", activeSRPMsCount)
+			}
+			stopBuilding = true
+		}
 		if stopBuilding && activeSRPMsCount == 0 {
 			break
 		}
@@ -551,14 +610,18 @@ func drainChannels(channels *schedulerChannels, buildState *schedulerutils.Graph
 	// For any workers that are current parked with no buffered requests, close the
 	// requests channel to wake up any build workers waiting on a request to be buffered.
 	// Upon being woken up by a closed requests channel, the build worker will stop.
-	close(channels.Requests)
-	close(channels.PriorityRequests)
+	close(channels.LowPriorityRequests)
+	close(channels.MediumPriorityRequests)
+	close(channels.HighPriorityRequests)
 
 	// Drain the request buffers to sync the build state with the new number of outstanding builds.
-	for req := range channels.PriorityRequests {
+	for req := range channels.LowPriorityRequests {
 		buildState.RemoveBuildRequest(req)
 	}
-	for req := range channels.Requests {
+	for req := range channels.MediumPriorityRequests {
+		buildState.RemoveBuildRequest(req)
+	}
+	for req := range channels.HighPriorityRequests {
 		buildState.RemoveBuildRequest(req)
 	}
 }

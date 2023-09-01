@@ -599,6 +599,40 @@ func (g *PkgGraph) FindExactPkgNodeFromPkg(pkgVer *pkgjson.PackageVer) (lookupEn
 	return
 }
 
+// GetRunNodeFromBuildNode returns the run node associated with a build node in the graph.
+func (g *PkgGraph) GetRunNodeFromBuildNode(buildNode *PkgNode) (runNode *PkgNode, err error) {
+	lookupEntry, err := g.FindExactPkgNodeFromPkg(buildNode.VersionedPkg)
+	if err != nil {
+		err = fmt.Errorf("failed to find lookup entry for build node %s", buildNode)
+		return
+	}
+
+	if lookupEntry != nil {
+		runNode = lookupEntry.RunNode
+	} else {
+		err = fmt.Errorf("no lookup entry found for build node %s", buildNode)
+		return
+	}
+	return
+}
+
+// GetBuildNodeFromRunNode returns the build node associated with a run node in the graph.
+func (g *PkgGraph) GetBuildNodeFromRunNode(runNode *PkgNode) (buildNode *PkgNode, err error) {
+	lookupEntry, err := g.FindExactPkgNodeFromPkg(runNode.VersionedPkg)
+	if err != nil {
+		err = fmt.Errorf("failed to find lookup entry for run node %s", runNode)
+		return
+	}
+
+	if lookupEntry != nil {
+		buildNode = lookupEntry.BuildNode
+	} else {
+		err = fmt.Errorf("no lookup entry found for run node %s", runNode)
+		return
+	}
+	return
+}
+
 // FindBestPkgNode will search the lookup table to see if a node which satisfies the
 // PackageVer structure has already been created. Returns nil if no lookup entry
 // is found.
@@ -669,6 +703,15 @@ func (g *PkgGraph) AllBuildNodes() []*PkgNode {
 func (g *PkgGraph) AllTestNodes() []*PkgNode {
 	return g.allNodesOfType(func(n *LookupNode) *PkgNode {
 		return n.TestNode
+	})
+}
+
+func (g *PkgGraph) AllImplicitNodes() []*PkgNode {
+	return g.allNodesOfType(func(n *LookupNode) *PkgNode {
+		if n.RunNode != nil && n.RunNode.Implicit {
+			return n.RunNode
+		}
+		return nil
 	})
 }
 
@@ -1084,6 +1127,42 @@ func (g *PkgGraph) AddGoalNode(goalName string, packages, tests []*pkgjson.Packa
 	err = g.connectGoalEdges(goalNode, testsGoalSet, strict, TypeTest)
 	if err != nil {
 		return
+	}
+
+	return
+}
+
+func (g *PkgGraph) AddGoalNodeFromNodes(goalName string, packages []*PkgNode) (goalNode *PkgNode, err error) {
+	// Check if we already have a goal node with the requested name
+	if g.FindGoalNode(goalName) != nil {
+		err = fmt.Errorf("can't have two goal nodes named %s", goalName)
+		return
+	}
+
+	logger.Log.Debugf("Adding a goal node '%s'.", goalName)
+
+	// Create goal node and add an edge to all requested packages
+	goalNode = &PkgNode{
+		State:      StateMeta,
+		Type:       TypeGoal,
+		SrpmPath:   NoSRPMPath,
+		RpmPath:    NoRPMPath,
+		SourceRepo: NoSourceRepo,
+		nodeID:     g.NewNode().ID(),
+		GoalName:   goalName,
+	}
+	goalNode.This = goalNode
+
+	err = g.safeAddNode(goalNode)
+	if err != nil {
+		return
+	}
+
+	for _, pkgNode := range packages {
+		err = g.AddEdge(goalNode, pkgNode)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return

@@ -8,7 +8,6 @@ import (
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
 	"github.com/sirupsen/logrus"
 	"gonum.org/v1/gonum/graph"
 	"gonum.org/v1/gonum/graph/path"
@@ -21,6 +20,7 @@ func CanSubGraph(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, useCachedI
 	search := traverse.BreadthFirst{}
 
 	foundUnsolvableNode := false
+	unsolvedNodes := make([]*pkggraph.PkgNode, 0)
 
 	// Walk entire graph and print list of any/all unsolvable nodes
 	search.Walk(pkgGraph, node, func(n graph.Node, d int) (stopSearch bool) {
@@ -42,7 +42,8 @@ func CanSubGraph(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, useCachedI
 		}
 
 		// This node is not yet solvable
-		logger.Log.Warnf("Could not subgraph due to node: %v", pkgNode)
+		logger.Log.Debugf("Could not subgraph due to node: %v", pkgNode)
+		unsolvedNodes = append(unsolvedNodes, pkgNode)
 
 		// If we are in trace mode, print the path from the root node to the unsolvable node
 		if logger.Log.IsLevelEnabled(logrus.TraceLevel) {
@@ -61,11 +62,18 @@ func CanSubGraph(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, useCachedI
 		return
 	})
 
+	if len(unsolvedNodes) > 0 {
+		logger.Log.Warnf("Found %d unsolved implicit nodes, cannot optimize subgraph yet...", len(unsolvedNodes))
+		if len(unsolvedNodes) <= 3 {
+			logger.Log.Infof("\tUnsolvable nodes: %v", unsolvedNodes)
+		}
+	}
+
 	return foundUnsolvableNode == false
 }
 
 // LeafNodes returns a slice of all leaf nodes in the graph.
-func LeafNodes(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, goalNode *pkggraph.PkgNode, buildState *GraphBuildState, useCachedImplicit bool) (leafNodes []*pkggraph.PkgNode) {
+func LeafNodes(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, goalNode *pkggraph.PkgNode, buildState *GraphBuildState, useCachedImplicit, allowLowPriorityNodes bool) (leafNodes []*pkggraph.PkgNode) {
 	graphMutex.RLock()
 	defer graphMutex.RUnlock()
 
@@ -76,6 +84,11 @@ func LeafNodes(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, goalNode *
 
 		// Skip nodes that have already been processed
 		if buildState.IsNodeProcessed(pkgNode) {
+			return
+		}
+
+		// Only let low priority nodes through if allowLowPriorityNodes is set
+		if !(allowLowPriorityNodes || buildState.IsNodeElevatedPriority(pkgNode)) {
 			return
 		}
 
@@ -97,19 +110,19 @@ func LeafNodes(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, goalNode *
 			return
 		}
 
-		logger.Log.Debugf("Found leaf node: %v", pkgNode)
+		logger.Log.Infof("Found leaf node: %v", pkgNode)
 		leafNodes = append(leafNodes, pkgNode)
 
 		return
 	})
 
-	logger.Log.Debugf("Discovered %d leaf nodes", len(leafNodes))
+	logger.Log.Infof("Discovered %d leaf nodes", len(leafNodes))
 
 	return
 }
 
 // FindUnblockedNodesFromResult takes a package build result and returns a list of nodes that are now unblocked for building.
-func FindUnblockedNodesFromResult(res *BuildResult, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, buildState *GraphBuildState) (unblockedNodes []*pkggraph.PkgNode) {
+func FindUnblockedNodesFromResult(res *BuildResult, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, buildState *GraphBuildState, allowLowPriorityNodes bool) (unblockedNodes []*pkggraph.PkgNode, unblockedLowPriorityNodes []*pkggraph.PkgNode) {
 	if res.Err != nil {
 		return
 	}
@@ -125,7 +138,15 @@ func FindUnblockedNodesFromResult(res *BuildResult, pkgGraph *pkggraph.PkgGraph,
 		findUnblockedNodesFromNode(pkgGraph, buildState, node, unblockedNodesMap)
 	}
 
-	return sliceutils.SetToSlice(unblockedNodesMap)
+	for node := range unblockedNodesMap {
+		if buildState.IsNodeElevatedPriority(node) || allowLowPriorityNodes {
+			unblockedNodes = append(unblockedNodes, node)
+		} else {
+			// If the scheduler isn't queueing low prioirity nodes then stash them away for later
+			unblockedLowPriorityNodes = append(unblockedLowPriorityNodes, node)
+		}
+	}
+	return
 }
 
 // findUnblockedNodesFromNode takes a built node and returns a list of nodes that are now unblocked by it.
