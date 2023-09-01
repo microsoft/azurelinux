@@ -91,6 +91,6 @@ endef
 # Invoke the above rule for each tracked variable
 $(foreach var,$(watch_vars),$(eval $(call depend_on_var,$(var))))
 
-# Host's extended ACLs influence the default permissions of the
+# Host's ACLs influence the default permissions of the
 # files inside the built RPMs. Disabling them for the build directory.
-$(call shell_real_build_only, setfacl -bnR $(PROJECT_ROOT))
+$(call shell_real_build_only, if command -v setfacl &>/dev/null; then setfacl -bnR $(PROJECT_ROOT); fi)
