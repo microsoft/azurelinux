@@ -2,8 +2,8 @@
 
 Name: libuser
 Version: 0.63
-Release: 9%{?dist}
-License: LGPLv2+
+Release: 10%{?dist}
+License: GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL: https://pagure.io/libuser
@@ -23,8 +23,10 @@ BuildRequires: gcc
 %if 0%{?with_check}
 #BuildRequires: fakeroot
 BuildRequires: openldap-clients
-BuildRequires: openldap-servers
 BuildRequires: openssl
+
+# Missing test dependencies:
+# BuildRequires: openldap-servers
 %endif
 BuildRequires: make
 BuildRequires: bison
@@ -147,6 +149,10 @@ export PYTHONPATH
 %endif
 
 %changelog
+* Thu Aug 31 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.63-10
+- Disabling missing test dependency.
+- License verified.
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 0.63-9
 - Remove epoch
 
