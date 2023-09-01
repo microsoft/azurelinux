@@ -58,7 +58,7 @@ watch_vars=PACKAGE_BUILD_LIST PACKAGE_REBUILD_LIST PACKAGE_IGNORE_LIST REPO_LIST
 #					$(depend_TOOLCHAIN_ARCHIVE) $(depend_REBUILD_TOOLCHAIN) $(depend_SRPM_PACK_LIST) $(depend_SPECS_DIR) $(depend_MAX_CASCADING_REBUILDS) $(depend_RUN_CHECK) $(depend_TEST_RUN_LIST)
 #					$(depend_TEST_RERUN_LIST) $(depend_TEST_IGNORE_LIST)
 
-.PHONY: variable_depends_on_phony clean-variable_depends_on_phony
+.PHONY: variable_depends_on_phony clean-variable_depends_on_phony no_repo_acl
 clean: clean-variable_depends_on_phony
 
 $(call create_folder,$(STATUS_FLAGS_DIR))
@@ -93,4 +93,5 @@ $(foreach var,$(watch_vars),$(eval $(call depend_on_var,$(var))))
 
 # Host's ACLs influence the default permissions of the
 # files inside the built RPMs. Disabling them for the build directory.
-$(call shell_real_build_only, if command -v setfacl &>/dev/null; then setfacl -bnR $(PROJECT_ROOT); fi)
+no_repo_acl:
+	@setfacl -bnR $(PROJECT_ROOT)
