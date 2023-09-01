@@ -92,6 +92,6 @@ endef
 $(foreach var,$(watch_vars),$(eval $(call depend_on_var,$(var))))
 
 # Host's ACLs influence the default permissions of the
-# files inside the built RPMs. Disabling them for the build directory.
+# files inside the built RPMs. Disabling them for the repository.
 no_repo_acl:
 	@setfacl -bnR $(PROJECT_ROOT)
