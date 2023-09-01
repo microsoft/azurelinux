@@ -22,12 +22,25 @@ Source4: stunnel-sfinger.conf
 Source5: pop3-redirect.xinetd
 Source6: stunnel-pop3s-client.conf
 Source7: stunnel@.service
-#Patch0: stunnel-5.50-authpriv.patch
-#Patch1: stunnel-5.50-systemd-service.patch
-#Patch3: stunnel-5.56-system-ciphers.patch
-#Patch4: stunnel-5.56-coverity.patch
-#Patch5: stunnel-5.56-default-tls-version.patch
-#Patch6: stunnel-5.56-curves-doc-update.patch
+# Apply patch stunnel-5.50-authpriv.patch
+Patch0:   stunnel-5.50-authpriv.patch
+# Apply patch stunnel-5.61-systemd-service.patch
+Patch1:   stunnel-5.61-systemd-service.patch
+# Use cipher configuration from crypto-policies
+# 
+# On Fedora, CentOS and RHEL, the system's crypto policies are the best
+# source to determine which cipher suites to accept in TLS. On these
+# platforms, OpenSSL supports the PROFILE=SYSTEM setting to use those
+# policies. Change stunnel to default to this setting.
+Patch3:   stunnel-5.69-system-ciphers.patch
+# Apply patch stunnel-5.56-coverity.patch
+Patch4:   stunnel-5.56-coverity.patch
+# Apply patch stunnel-5.69-default-tls-version.patch
+Patch5:   stunnel-5.69-default-tls-version.patch
+# Apply patch stunnel-5.56-curves-doc-update.patch
+Patch6:   stunnel-5.56-curves-doc-update.patch
+# Limit curves defaults in FIPS mode
+Patch8:   stunnel-5.62-disabled-curves.patch
 # util-linux is needed for rename
 BuildRequires: gcc
 BuildRequires: openssl-devel, pkgconfig, util-linux
