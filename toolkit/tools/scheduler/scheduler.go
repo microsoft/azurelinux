@@ -505,7 +505,7 @@ func setAssociatedDeltaPaths(res *schedulerutils.BuildResult, pkgGraph *pkggraph
 	}
 
 	// Now we can scan for all the run nodes that use the cached RPM path and update them to the actual RPM path.
-	for _, node := range pkgGraph.AllRunNodes() {
+	for _, node := range pkgGraph.AllPreferredRunNodes() {
 		// Get base path of the .rpm for the node and find the built file in the map
 		rpmBasePath := filepath.Base(node.RpmPath)
 		builtFile, ok := builtFileMap[rpmBasePath]

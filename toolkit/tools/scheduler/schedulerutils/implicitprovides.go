@@ -59,7 +59,7 @@ func replaceNodesWithProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph, pro
 	// Find a local run node that is backed by the same rpm as the one providing the implicit provide.
 	// Make this node the parent node for the new implicit provide node.
 	// - By making a run node the parent node, it will inherit the identical runtime dependencies of the already setup node.
-	for _, node := range pkgGraph.AllRunNodes() {
+	for _, node := range pkgGraph.AllPreferredRunNodes() {
 		// We need to filter out any non-local run nodes since cached remote nodes are not acceptable parent nodes for collapsed nodes.
 		if node.Type == pkggraph.TypeLocalRun && rpmFileProviding == node.RpmPath {
 			logger.Log.Debugf("Linked implicit provide (%s) to run node (%s) using file (%s)", provides, node.FriendlyName(), rpmFileProviding)
@@ -101,7 +101,7 @@ func implicitPackagesToUnresolvedNodesInGraph(pkgGraph *pkggraph.PkgGraph, useCa
 	// --> foo >= 3.0 -- create unresolved node
 	// Unresolved nodes for foo: 3
 
-	for _, n := range pkgGraph.AllRunNodes() {
+	for _, n := range pkgGraph.AllPreferredRunNodes() {
 		if !n.Implicit {
 			continue
 		}
