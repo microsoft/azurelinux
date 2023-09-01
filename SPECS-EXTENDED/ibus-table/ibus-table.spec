@@ -158,6 +158,7 @@ fi
 %changelog
 * Thu Aug 31 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.12.4-3
 - Disabling missing test dependency.
+- License verified.
 
 * Thu Jun 17 2021 Thomas Crain <thcrain@microsoft.com> - 1.12.4-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

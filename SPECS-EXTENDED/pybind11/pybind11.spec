@@ -102,6 +102,7 @@ PYBIND11_USE_CMAKE=true %py3_install "--install-purelib" "%{python3_sitearch}"
 %changelog
 * Thu Aug 31 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.6.2-3
 - Disabling missing test dependency.
+- License verified.
 
 * Thu Sep 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.6.2-2
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).

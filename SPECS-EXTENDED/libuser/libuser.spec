@@ -3,7 +3,7 @@
 Name: libuser
 Version: 0.63
 Release: 10%{?dist}
-License: LGPLv2+
+License: GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL: https://pagure.io/libuser
@@ -151,6 +151,7 @@ export PYTHONPATH
 %changelog
 * Thu Aug 31 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.63-10
 - Disabling missing test dependency.
+- License veriified
 
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 0.63-9
 - Remove epoch
