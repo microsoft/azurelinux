@@ -73,5 +73,5 @@ func TestGenerateInvalidInput(t *testing.T) {
 	}
 	emptySnapshotGenerator := SnapshotGenerator{}
 	_, err := emptySnapshotGenerator.convertResultsToRepoContents(input)
-	assert.EqualError(t, err, "RPM package name (pkg-no-version) doesn't match the regular expression ("+rpmSpecBuiltRPMRegex.String()+")")
+	assert.EqualError(t, err, "RPM package name ("+input[0]+") doesn't match the regular expression ("+rpmSpecBuiltRPMRegex.String()+")")
 }
