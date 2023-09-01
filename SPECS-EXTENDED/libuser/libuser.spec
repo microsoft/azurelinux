@@ -151,7 +151,7 @@ export PYTHONPATH
 %changelog
 * Thu Aug 31 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.63-10
 - Disabling missing test dependency.
-- License veriified
+- License verified.
 
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 0.63-9
 - Remove epoch
