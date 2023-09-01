@@ -47,7 +47,7 @@ $(call create_folder,$(rpmbuilding_logs_dir))
 graph-cache: $(cached_file)
 workplan: $(graph_file)
 clean: clean-workplan clean-cache clean-spec-parse
-clean-workplan: clean-cache clean-spec-parse
+clean-workplan: clean-cache clean-spec-parse clean-grapher-cache-worker
 	rm -rf $(PKGBUILD_DIR)
 	rm -rf $(LOGS_DIR)/pkggen/workplan
 clean-grapher-cache-worker:
@@ -134,7 +134,6 @@ $(graph_file): $(specs_file) $(go-grapher) $(toolchain_rpms) $(TOOLCHAIN_MANIFES
 		--output-dir=$(CACHED_RPMS_DIR)/cache \
 		--rpm-dir=$(RPMS_DIR) \
 		--toolchain-rpms-dir=$(TOOLCHAIN_RPMS_DIR) \
-		--toolchain-manifest=$(TOOLCHAIN_MANIFEST) \
 		--tls-cert=$(TLS_CERT) \
 		--tls-key=$(TLS_KEY) \
 		--tmp-dir=$(grapher_working_dir) \
