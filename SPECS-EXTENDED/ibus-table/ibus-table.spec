@@ -6,12 +6,11 @@ Distribution:   Mariner
 
 Name:       ibus-table
 Version:    1.12.4
-Release:    2%{?dist}
+Release:    3%{?dist}
 Summary:    The Table engine for IBus platform
 License:    LGPLv2+
 URL:        https://github.com/mike-fabian/ibus-table
-# Source0:  https://github.com/mike-fabian/ibus-table/archive/refs/tags/1.12.4.tar.gz
-Source0:    https://github.com/mike-fabian/ibus-table/archive/refs/tags/%{name}-%{version}.tar.gz
+Source0:    https://github.com/mike-fabian/ibus-table/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Requires:       ibus > 1.3.0
 Requires:       python(abi) >= 3.3
 %{?__python3:Requires: %{__python3}}
@@ -20,7 +19,6 @@ BuildRequires:  ibus-devel > 1.3.0
 BuildRequires:  python3-devel
 # for the unit tests
 %if %{with_check}
-BuildRequires:  appstream
 BuildRequires:  libappstream-glib
 BuildRequires:  desktop-file-utils
 BuildRequires:  python3-mock
@@ -31,12 +29,15 @@ BuildRequires:  xorg-x11-server-Xvfb
 BuildRequires:  ibus-table-chinese-wubi-jidian
 BuildRequires:  ibus-table-chinese-cangjie
 BuildRequires:  ibus-table-chinese-stroke5
-BuildRequires:  ibus-table-code
-BuildRequires:  ibus-table-latin
-BuildRequires:  ibus-table-translit
-BuildRequires:  ibus-table-tv
+
+# Missing test dependencies:
+# BuildRequires:  appstream
+# BuildRequires:  ibus-table-code
+# BuildRequires:  ibus-table-latin
+# BuildRequires:  ibus-table-translit
+# BuildRequires:  ibus-table-tv
 # A window manger is needed for the GUI test
-BuildRequires:  i3
+# BuildRequires:  i3
 %endif
 
 Obsoletes:   ibus-table-additional < 1.2.0.20100111-5
@@ -154,6 +155,10 @@ fi
 %{_datadir}/installed-tests/%{name}
 
 %changelog
+* Thu Aug 31 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.12.4-3
+- Disabling missing test dependency.
+- License verified.
+
 * Thu Jun 17 2021 Thomas Crain <thcrain@microsoft.com> - 1.12.4-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Gate build-time check requirements behind the %%with_check macro
