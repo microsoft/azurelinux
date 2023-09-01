@@ -522,6 +522,16 @@ If that is not desired all remote sources can be disabled by clearing the follow
 
 > Try to download pre-built packages if the versions match the local spec files.
 
+#### `PRECACHE=...`
+
+##### `PRECACHE=`**`n`** *(default)*
+
+> Don't pre-load the cache from upstream sources
+
+##### `PRECACHE=y`
+
+> Load the cache with RPMs from the upstream repos before starting to build.
+
 #### `ALLOW_TOOLCHAIN_DOWNLOAD_FAIL=...`
 
 ##### `ALLOW_TOOLCHAIN_DOWNLOAD_FAIL=`**`n`** *(default)*
@@ -807,6 +817,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | ALLOW_TOOLCHAIN_REBUILDS      | n                                                                                                      | Do not treat rebuilds of toolchain packages during regular package build phase as errors.
 |  PACKAGE_BUILD_RETRIES        | 1                                                                                                      | Number of build retries for each package
 | CHECK_BUILD_RETRIES           | 1                                                                                                      | Minimum number of check section retries for each package if RUN_CHECK=y and tests fail.
+| MAX_CASCADING_REBUILDS        |                                                                                                        | When a package rebuilds, how many additional layers of dependent packages will be forced to rebuild (leave unset for unbounded, i.e., all downstream packages will rebuild)
 | IMAGE_TAG                     | (empty)                                                                                                | Text appended to a resulting image name - empty by default. Does not apply to the initrd. The text will be prepended with a hyphen.
 | CONCURRENT_PACKAGE_BUILDS     | 0                                                                                                      | The maximum number of concurrent package builds that are allowed at once. If set to 0 this defaults to the number of logical CPUs.
 | CLEANUP_PACKAGE_BUILDS        | y                                                                                                      | Cleanup a package build's working directory when it finishes. Note that `build` directory will still be removed on a successful package build even when this is turned off.

@@ -1,0 +1,81 @@
+Index: shapelib-1.5.0/contrib/shpcentrd.c
+===================================================================
+--- shapelib-1.5.0.orig/contrib/shpcentrd.c
++++ shapelib-1.5.0/contrib/shpcentrd.c
+@@ -156,4 +156,6 @@ int main( int argc, char ** argv )
+     DBFClose( old_DBF );
+     DBFClose( new_DBF );
+     printf ("\n");
++
++    return 0;
+ }
+Index: shapelib-1.5.0/contrib/shpdata.c
+===================================================================
+--- shapelib-1.5.0.orig/contrib/shpdata.c
++++ shapelib-1.5.0/contrib/shpdata.c
+@@ -131,4 +131,6 @@ int main( int argc, char ** argv )
+     DBFClose( old_DBF );
+ 
+     printf ("\n");
++
++    return 0;
+ }
+Index: shapelib-1.5.0/contrib/shpdxf.c
+===================================================================
+--- shapelib-1.5.0.orig/contrib/shpdxf.c
++++ shapelib-1.5.0/contrib/shpdxf.c
+@@ -331,6 +331,8 @@ main (int argc, char **argv)
+     SHPClose (shp);
+     DBFClose (dbf);
+     fclose (dxf);
++
++    return 0;
+ }
+ 
+ 
+Index: shapelib-1.5.0/contrib/shpfix.c
+===================================================================
+--- shapelib-1.5.0.orig/contrib/shpfix.c
++++ shapelib-1.5.0/contrib/shpfix.c
+@@ -107,4 +107,6 @@ int main( int argc, char ** argv )
+ 
+     SHPClose ( hSHP );
+     SHPClose ( cSHP );
++
++    return 0;
+ }
+Index: shapelib-1.5.0/contrib/shpinfo.c
+===================================================================
+--- shapelib-1.5.0.orig/contrib/shpinfo.c
++++ shapelib-1.5.0/contrib/shpinfo.c
+@@ -115,4 +115,6 @@ int main( int argc, char ** argv )
+ 
+ 
+     SHPClose( hSHP );
++
++    return 0;
+ }
+Index: shapelib-1.5.0/contrib/shpwkb.c
+===================================================================
+--- shapelib-1.5.0.orig/contrib/shpwkb.c
++++ shapelib-1.5.0/contrib/shpwkb.c
+@@ -126,4 +126,6 @@ int main( int argc, char ** argv )
+     if ( wkb_file )  fclose ( wkb_file );
+ 
+     printf ("\n");
++
++    return 0;
+ }
+Index: shapelib-1.5.0/shputils.c
+===================================================================
+--- shapelib-1.5.0.orig/shputils.c
++++ shapelib-1.5.0/shputils.c
+@@ -902,6 +902,8 @@ int clip_boundary()
+         if (i2 == 0) return(0); /** SKIP  RECORD **/
+         else    return(1); /** WRITE RECORD **/
+     }  /** End CUT **/
++
++    return 0; /** SKIP RECORD **/
+ }
+ 
+ 

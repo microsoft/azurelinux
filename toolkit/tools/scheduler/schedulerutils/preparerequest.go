@@ -85,7 +85,11 @@ func buildNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildSta
 			}
 
 			req.ExpectedFiles = expectedFiles
-			req.UseCache = len(missingFiles) == 0
+			if len(missingFiles) != 0 {
+				req.UseCache = false
+				req.Freshness = buildState.GetMaxFreshness()
+				logger.Log.Debugf("Resetting freshness to %d due to missing files.", req.Freshness)
+			}
 		}
 
 		requests = append(requests, req)
@@ -119,9 +123,14 @@ func buildRequest(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, pack
 		PkgGraph:       pkgGraph,
 		AncillaryNodes: ancillaryNodes,
 		IsDelta:        isDelta,
+		Freshness:      buildState.GetMaxFreshness(),
 	}
 
-	request.UseCache = isCacheAllowed && canUseCacheForNode(pkgGraph, request.Node, packagesToRebuild, buildState)
+	requiredRebuild := isRequiredRebuild(request.Node, packagesToRebuild)
+	if !requiredRebuild && isCacheAllowed {
+		// We might be able to use the cache, set the freshness based on node's dependencies.
+		request.UseCache, request.Freshness = canUseCacheForNode(pkgGraph, request.Node, buildState)
+	}
 	return
 }
 
@@ -149,13 +158,8 @@ func partnerTestNodesToRequest(pkgGraph *pkggraph.PkgGraph, buildState *GraphBui
 		return
 	}
 
-	return &BuildRequest{
-		Node:           testNode,
-		PkgGraph:       pkgGraph,
-		AncillaryNodes: ancillaryTestNodes,
-		IsDelta:        isDelta,
-		UseCache:       buildUsesCache && canUseCacheForNode(pkgGraph, testNode, testsToRerun, buildState),
-	}
+	request = buildRequest(pkgGraph, buildState, testsToRerun, testNode, ancillaryTestNodes, buildUsesCache, isDelta)
+	return
 }
 
 // testNodesToRequests converts lists of test nodes into test build requests.
@@ -182,36 +186,65 @@ func testNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildStat
 	return
 }
 
-// canUseCacheForNode checks if the cache can be used for a given node.
-// - It will check if the node corresponds to an entry in packagesToRebuild.
-// - It will check if all dependencies of the node were also cached. Exceptions:
-//   - "TypePreBuilt" nodes must use the cache and have no dependencies to check.
-func canUseCacheForNode(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, packagesToRebuild []*pkgjson.PackageVer, buildState *GraphBuildState) (canUseCache bool) {
-	// The "TypePreBuilt" nodes always use the cache.
-	if node.Type == pkggraph.TypePreBuilt {
-		canUseCache = true
-		return
-	}
-
-	// Check if the node corresponds to an entry in packagesToRebuild
+// isRequiredRebuild checks if a node is required to be rebuilt based  on the packagesToRebuild list.
+func isRequiredRebuild(node *pkggraph.PkgNode, packagesToRebuild []*pkgjson.PackageVer) (requiredRebuild bool) {
 	packageVer := node.VersionedPkg
-	canUseCache = !sliceutils.Contains(packagesToRebuild, packageVer, sliceutils.PackageVerMatch)
-	if !canUseCache {
-		logger.Log.Debugf("Marking node (type: %s, version: %s) for rebuild per user request", node.Type, packageVer)
-		return
+	requiredRebuild = sliceutils.Contains(packagesToRebuild, packageVer, sliceutils.PackageVerMatch)
+	if requiredRebuild {
+		logger.Log.Debugf("Marking (%s) for rebuild per user request", packageVer)
 	}
+	return
+}
 
-	// If any of the node's dependencies were built instead of being cached then a build is required.
+// canUseCacheForNode checks if the cache can be used for a given node by:
+//   - Assume the node is stale to begin (freshness == 0).
+//   - Check if all dependencies of the node were cached, and calculate the expected freshness of the node based on the freshest dependency.
+//   - If all dependencies are cached (freshness == 0, aka stale) then the node will keep freshness 0 and may use the cache.
+//   - If any dependency is fresh (aka freshness > 0) then the node can't use the cache and will inherit the freshness of
+//     the freshest dependency (possibly adjusted by -1 for certain edges).
+func canUseCacheForNode(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, buildState *GraphBuildState) (canUseCache bool, freshness uint) {
+	freshness = 0
+	canUseCache = true
+
+	// If any of the node's dependencies were built instead of being cached then a build is required. We treat any node
+	// with a freshness > 0 as being built. Each layer of the build completed will decrement the freshness of the node by 1.
 	dependencies := pkgGraph.From(node.ID())
 	for dependencies.Next() {
 		dependency := dependencies.Node().(*pkggraph.PkgNode)
 
-		if !buildState.IsNodeCached(dependency) {
-			logger.Log.Debugf("Can't use cached version of %v because %v is rebuilding", node.FriendlyName(), dependency.FriendlyName())
+		inheritedFreshness, shouldRebuild := calculateExpectedFreshness(dependency, buildState)
+		if inheritedFreshness > freshness {
+			freshness = inheritedFreshness
+		}
+
+		if shouldRebuild {
+			logger.Log.Debugf("Can't use cached version of %v because %v has been rebuilt with a freshness of %d", node.FriendlyName(), dependency.FriendlyName(), inheritedFreshness)
 			canUseCache = false
-			break
 		}
 	}
 
 	return
+}
+
+// calculateExpectedFreshness calculates how "fresh" a node will be based on one of its dependencies, and if that
+// dependency should cause a rebuild. This function will determine if the freshness should be attenuated based on
+// the dependency type.
+func calculateExpectedFreshness(dependencyNode *pkggraph.PkgNode, buildState *GraphBuildState) (expectedFreshness uint, shouldRebuild bool) {
+	// Remote nodes are always 'stale' and should never generate a rebuild.
+	if dependencyNode.Type == pkggraph.TypeRemoteRun {
+		return 0, false
+	}
+
+	expectedFreshness = buildState.GetFreshnessOfNode(dependencyNode)
+	shouldRebuild = expectedFreshness > 0
+	// The transition from (* -> run) nodes is sufficient to attenuate the freshness throughout the graph. For BuildRequires,
+	// each build node will always be accompanied by a run node (i.e., no other nodes depend directly on the build
+	// node, and we would like the associated run node to inherit its build node's freshness). We also want to
+	// attenuate for runtime requires which again will generally be a (run -> run) transition. Meta nodes may be interposed
+	// between any nodes so we pass the freshness through unchanged everywhere else.
+	if dependencyNode.Type == pkggraph.TypeLocalRun && expectedFreshness != 0 {
+		expectedFreshness -= 1
+	}
+
+	return expectedFreshness, shouldRebuild
 }

@@ -28,7 +28,7 @@ TEST_IGNORE_LIST        ?=
 ######## SET INCREMENTAL BUILD FLAGS ########
 
 # Logic to auto configure build options for optimized builds
-# These will set the default values for: REBUILD_TOOLS, USE_CCACHE, MAX_CPU, REBUILD_TOOLCHAIN, DELTA_BUILD, INCREMENTAL_TOOLCHAIN, ALLOW_TOOLCHAIN_DOWNLOAD_FAIL, and CLEAN_TOOLCHAIN_CONTAINERS
+# These will set the default values for: REBUILD_TOOLS, MAX_CPU, REBUILD_TOOLCHAIN, DELTA_BUILD, INCREMENTAL_TOOLCHAIN, ALLOW_TOOLCHAIN_DOWNLOAD_FAIL, and CLEAN_TOOLCHAIN_CONTAINERS
 include $(SCRIPTS_DIR)/incremental_building.mk
 
 ######## SET REMAINING FLAGS ########
@@ -64,6 +64,8 @@ TARGET_ARCH                          ?=
 ALLOW_TOOLCHAIN_REBUILDS             ?= n
 RESOLVE_CYCLES_FROM_UPSTREAM         ?= n
 IGNORE_VERSION_TO_RESOLVE_SELFDEP    ?= n
+CACHED_PACKAGES_ARCHIVE              ?=
+USE_CCACHE                           ?= n
 
 # Tracing & Profiling support: https://go.dev/doc/diagnostics
 ENABLE_CPU_PROFILE              ?= n
@@ -190,6 +192,14 @@ include $(SCRIPTS_DIR)/containerized-build.mk
 #   expand-specs clean-expand-specs
 include $(SCRIPTS_DIR)/srpm_expand.mk
 
+# Create self contained toolkit archive contianing all the required tools with:
+#   package-toolkit, clean-package-toolkit
+include $(SCRIPTS_DIR)/toolkit.mk
+
+# Fill the cache with rpms from the package server without using package manager or chroot with:
+#   pre-cache
+include $(SCRIPTS_DIR)/precache.mk
+
 # Create a package build workplan with:
 #   workplan, clean-workplan clean-cache
 # Build a package with:
@@ -201,10 +211,6 @@ include $(SCRIPTS_DIR)/pkggen.mk
 # Create images with:
 #   image, iso, clean-imggen
 include $(SCRIPTS_DIR)/imggen.mk
-
-# Create self contained toolkit archive contianing all the required tools with:
-#   package-toolkit, clean-package-toolkit
-include $(SCRIPTS_DIR)/toolkit.mk
 
 # Each component provides specific clean implementations which clean depends on.
 # They are guaranteed to run first and will verify there are no existing mount points

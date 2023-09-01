@@ -1,0 +1,24 @@
+From 4e9e44e5258dee7654f74948b0dd5da39c28beec Mon Sep 17 00:00:00 2001
+From: Marc <34656315+MarcT512@users.noreply.github.com>
+Date: Fri, 7 Aug 2020 10:49:45 +0100
+Subject: [PATCH] Fix read past end of buffer
+
+Resolves https://github.com/json-c/json-c/issues/654
+---
+ apps/json_parse.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/apps/json_parse.c b/apps/json_parse.c
+index bba4622183..72b31a860a 100644
+--- a/apps/json_parse.c
++++ b/apps/json_parse.c
+@@ -82,7 +82,8 @@ static int parseit(int fd, int (*callback)(struct json_object *))
+ 			int parse_end = json_tokener_get_parse_end(tok);
+ 			if (obj == NULL && jerr != json_tokener_continue)
+ 			{
+-				char *aterr = &buf[start_pos + parse_end];
++				char *aterr = (start_pos + parse_end < sizeof(buf)) ?
++					&buf[start_pos + parse_end] : "";
+ 				fflush(stdout);
+ 				int fail_offset = total_read - ret + start_pos + parse_end;
+ 				fprintf(stderr, "Failed at offset %d: %s %c\n", fail_offset,

@@ -1,9 +1,9 @@
-%global _default_patch_fuzz 1
+%global _default_patch_fuzz 2
 
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
 Version:        3.5.0
-Release:        16%{?dist}
+Release:        17%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -40,6 +40,7 @@ Source1:        etcd.service
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source2:        %{name}-%{version}-vendor.tar.gz
 Patch0:         CVE-2021-28235.patch
+Patch1:         CVE-2023-32082-v3.5.0.patch
 BuildRequires:  golang >= 1.16
 
 %description
@@ -141,6 +142,10 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 /%{_docdir}/%{name}-%{version}-tools/*
 
 %changelog
+* Wed Aug 23 2023 Rachel Menge <rachelmenge@microsoft.com> - 3.5.0-17
+- Backport patch for CVE-2023-32082
+- Update patch fuzz to 2 for backporting patch
+
 * Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.0-16
 - Bump release to rebuild with go 1.19.12
 
