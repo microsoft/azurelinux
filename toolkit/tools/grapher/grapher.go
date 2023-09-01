@@ -42,7 +42,6 @@ var (
 	repoFiles                     = app.Flag("repo-file", "Full path to a repo file").Required().ExistingFiles()
 	usePreviewRepo                = app.Flag("use-preview-repo", "Pull packages from the upstream preview repo").Bool()
 	disableDefaultRepos           = app.Flag("disable-default-repos", "Disable pulling packages from PMC repos").Bool()
-	toolchainManifest             = app.Flag("toolchain-manifest", "Path to a list of RPMs which are created by the toolchain. Will mark RPMs from this list as prebuilt.").ExistingFile()
 	ignoreVersionToResolveSelfDep = app.Flag("ignore-version-to-resolve-selfdep", "Ignore package version while downloading package from upstream when resolving cycle").Bool()
 
 	depGraph = pkggraph.NewPkgGraph()
