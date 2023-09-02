@@ -36,11 +36,7 @@ Prints a shell command for setting the appropriate environment variables to
 indicate the current size of the window from which the command is run.
 
 %prep
-%setup -q -n %{name}-snapshots-%{name}-%{version}
-
-%patch1 -p1 -b .defaults
-%patch2 -p1 -b .desk
-%patch3 -p1 -b .man-paths
+%autosetup -n %{name}-snapshots-%{name}-%{version} -p1
 
 for f in THANKS; do
 	iconv -f iso8859-1 -t utf8 -o ${f}{_,} &&
@@ -103,6 +99,11 @@ install -m644 -p xterm.appdata.xml $RPM_BUILD_ROOT%{_datadir}/appdata
 %{_mandir}/man1/resize.1*
 
 %changelog
+* Fri Aug 12 2022 Muhammad Falak <mwani@microsoft.com> - 380-1
+- Bump version to address CVE-2022-45063 & CVE-2023-40359
+- Refresh all patches to apply cleanly
+- Switch to autosetup
+
 * Fri Aug 12 2022 Muhammad Falak <mwani@microsoft.com> - 372-1
 - Bump version to address CVE-2021-27135
 - Refresh all patches to apply cleanly
