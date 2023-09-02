@@ -15,9 +15,9 @@ Recommends:     xorg-x11-fonts-misc
 Source0:        https://github.com/ThomasDickey/xterm-snapshots/archive/refs/tags/%{name}-%{version}.tar.gz
 Source1:        http://ftp.invisible-island.net/archives/xterm/16colors.txt
 
-#Patch1:         xterm-defaults.patch
-#Patch2:         xterm-desktop.patch
-#Patch3:         xterm-man-paths.patch
+Patch1:         xterm-defaults.patch
+Patch2:         xterm-desktop.patch
+Patch3:         xterm-man-paths.patch
 
 %bcond_with trace
 
@@ -38,9 +38,9 @@ indicate the current size of the window from which the command is run.
 %prep
 %setup -q -n %{name}-snapshots-%{name}-%{version}
 
-#%patch1 -p1 -b .defaults
-#%patch2 -p1 -b .desk
-#%patch3 -p1 -b .man-paths
+%patch1 -p1 -b .defaults
+%patch2 -p1 -b .desk
+%patch3 -p1 -b .man-paths
 
 for f in THANKS; do
 	iconv -f iso8859-1 -t utf8 -o ${f}{_,} &&
