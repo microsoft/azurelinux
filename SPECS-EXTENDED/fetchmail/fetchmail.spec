@@ -5,7 +5,6 @@ Name: fetchmail
 Version: 6.4.22
 Release: 1%{?dist}
 Source0: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.xz
-Source1: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.xz.asc
 # systemd service file
 Source2: fetchmail.service
 # example configuration file
