@@ -64,7 +64,7 @@ done
 	--disable-full-tgetent \
 	--enable-sixel-graphics
 
-make %{?_smp_mflags}
+%make_build
 
 %install
 make DESTDIR=%{buildroot} install
@@ -107,6 +107,7 @@ install -m644 -p xterm.appdata.xml %{buildroot}%{_datadir}/appdata
 - Refresh all patches to apply cleanly
 - Use https instead of http for urls
 - Switch to autosetup
+- Switch to %make_build
 
 * Fri Aug 12 2022 Muhammad Falak <mwani@microsoft.com> - 372-1
 - Bump version to address CVE-2021-27135
