@@ -1,0 +1,12 @@
+diff --git a/contrib/shpsort.c b/contrib/shpsort.c
+index e21e9e0..920cd8c 100644
+--- a/contrib/shpsort.c
++++ b/contrib/shpsort.c
+@@ -113,7 +113,6 @@ static char ** split(const char *arg, const char *delim) {
+ 	free(result[--i]);
+       }
+       free(result);
+-      free(copy);
+       return NULL;
+     }
+     result = tmp;

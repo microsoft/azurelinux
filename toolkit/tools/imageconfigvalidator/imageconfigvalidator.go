@@ -157,7 +157,7 @@ func validatePackages(config configuration.Config) (err error) {
 				return fmt.Errorf("%s: [ReadOnlyVerityRoot] and [TmpfsOverlayDebugEnabled] selected, but '%s' package is not included in the package lists", validateError, verityDebugPkgName)
 			}
 		}
-		if strings.Contains(kernelCmdLineString, fipsKernelCmdLine) {
+		if strings.Contains(kernelCmdLineString, fipsKernelCmdLine) || systemConfig.KernelCommandLine.EnableFIPS {
 			if !foundDracutFipsPackage {
 				return fmt.Errorf("%s: 'fips=1' provided on kernel cmdline, but '%s' package is not included in the package lists", validateError, dracutFipsPkgName)
 			}

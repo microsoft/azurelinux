@@ -277,6 +277,28 @@ func (c *Chroot) AddFiles(filesToCopy ...FileToCopy) (err error) {
 	return
 }
 
+// CopyOutFile copies file 'srcPath' in the chroot to the host at 'destPath'
+func (c *Chroot) CopyOutFile(srcPath string, destPath string) (err error) {
+	srcPathFull := filepath.Join(c.rootDir, srcPath)
+	err = file.Copy(srcPathFull, destPath)
+	if err != nil {
+		logger.Log.Errorf("Error copying file '%s'", err)
+		return
+	}
+	return
+}
+
+// MoveOutFile moves file 'srcPath' in the chroot to the host at 'destPath', deleting the 'srcPath' file.
+func (c *Chroot) MoveOutFile(srcPath string, destPath string) (err error) {
+	srcPathFull := filepath.Join(c.rootDir, srcPath)
+	err = file.Move(srcPathFull, destPath)
+	if err != nil {
+		logger.Log.Errorf("Error moving file '%s'", err)
+		return
+	}
+	return
+}
+
 // Run runs a given function inside the Chroot. This function will synchronize
 // with all other Chroots to ensure only one Chroot command is executed at a given time.
 func (c *Chroot) Run(toRun func() error) (err error) {

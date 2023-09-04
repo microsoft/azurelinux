@@ -9,6 +9,7 @@ import (
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repocloner/rpmrepocloner"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
@@ -22,12 +23,26 @@ var (
 	input  = exe.InputFlag(app, "Input json listing all local SRPMs")
 	output = exe.OutputFlag(app, "Output file to export the graph to")
 
-	logFile          = exe.LogFileFlag(app)
-	logLevel         = exe.LogLevelFlag(app)
-	profFlags        = exe.SetupProfileFlags(app)
-	strictGoals      = app.Flag("strict-goals", "Don't allow missing goal packages").Bool()
-	strictUnresolved = app.Flag("strict-unresolved", "Don't allow missing unresolved packages").Bool()
-	timestampFile    = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
+	logFile               = exe.LogFileFlag(app)
+	logLevel              = exe.LogLevelFlag(app)
+	profFlags             = exe.SetupProfileFlags(app)
+	strictGoals           = app.Flag("strict-goals", "Don't allow missing goal packages").Bool()
+	strictUnresolved      = app.Flag("strict-unresolved", "Don't allow missing unresolved packages").Bool()
+	timestampFile         = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
+	usePMCtoResolveCycles = app.Flag("usePMCtoresolvecycles", "Cycles will be resolved by downloading rpm packages from PMC if locally unavailable").Bool()
+	tlsClientCert         = app.Flag("tls-cert", "TLS client certificate to use when downloading files.").String()
+	tlsClientKey          = app.Flag("tls-key", "TLS client key to use when downloading files.").String()
+
+	resolveCyclesFromUpstream     = app.Flag("resolve-cycles-from-upstream", "Let grapher resolve cycles by marking rpms available in repo as remote").Bool()
+	outDir                        = exe.OutputDirFlag(app, "Directory to download packages into.")
+	existingRpmsDir               = app.Flag("rpm-dir", "Directory that contains already built RPMs. Should contain top level directories for architecture.").Required().ExistingDir()
+	existingToolchainRpmDir       = app.Flag("toolchain-rpms-dir", "Directory that contains already built toolchain RPMs. Should contain top level directories for architecture.").Required().ExistingDir()
+	tmpDir                        = app.Flag("tmp-dir", "Directory to store temporary files while downloading.").String()
+	workerTar                     = app.Flag("tdnf-worker", "Full path to worker_chroot.tar.gz").Required().ExistingFile()
+	repoFiles                     = app.Flag("repo-file", "Full path to a repo file").Required().ExistingFiles()
+	usePreviewRepo                = app.Flag("use-preview-repo", "Pull packages from the upstream preview repo").Bool()
+	disableDefaultRepos           = app.Flag("disable-default-repos", "Disable pulling packages from PMC repos").Bool()
+	ignoreVersionToResolveSelfDep = app.Flag("ignore-version-to-resolve-selfdep", "Ignore package version while downloading package from upstream when resolving cycle").Bool()
 
 	depGraph = pkggraph.NewPkgGraph()
 )
@@ -66,8 +81,25 @@ func main() {
 		logger.Log.Panic(err)
 	}
 
+	var cloner *rpmrepocloner.RpmRepoCloner = nil
+	if *resolveCyclesFromUpstream {
+		cloner, err = rpmrepocloner.ConstructCloner(*outDir, *tmpDir, *workerTar, *existingRpmsDir, *existingToolchainRpmDir, *tlsClientCert, *tlsClientKey, *repoFiles)
+		if err != nil {
+			logger.Log.Panic(err)
+		}
+		enabledRepos := rpmrepocloner.RepoFlagAll
+		if !*usePreviewRepo {
+			enabledRepos = enabledRepos & ^rpmrepocloner.RepoFlagPreview
+		}
+		if *disableDefaultRepos {
+			enabledRepos = enabledRepos & ^rpmrepocloner.RepoFlagMarinerDefaults
+		}
+		cloner.SetEnabledRepos(enabledRepos)
+
+		defer cloner.Close()
+	}
 	logger.Log.Info("Running cycle resolution to fix any cycles in the dependency graph")
-	err = depGraph.MakeDAG()
+	err = depGraph.MakeDAGUsingUpstreamRepos(*resolveCyclesFromUpstream, *ignoreVersionToResolveSelfDep, cloner)
 	if err != nil {
 		logger.Log.Panic(err)
 	}
@@ -100,7 +132,7 @@ func addUnresolvedPackage(g *pkggraph.PkgGraph, pkgVer *pkgjson.PackageVer) (new
 	}
 
 	// Create a new node
-	newRunNode, err = g.AddPkgNode(pkgVer, pkggraph.StateUnresolved, pkggraph.TypeRemoteRun, pkggraph.NoSRPMPath, pkggraph.NoRPMPath, pkggraph.NoSpecPath, pkggraph.NoSourceDir, pkggraph.NoArchitecture, pkggraph.NoSourceRepo)
+	newRunNode, err = g.AddRemoteUnresolvedNode(pkgVer)
 	if err != nil {
 		return
 	}

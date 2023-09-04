@@ -1156,6 +1156,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "blosc",
+          "version": "1.21.4",
+          "downloadUrl": "https://github.com/Blosc/c-blosc/archive/v1.21.4/blosc-1.21.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "bluez",
           "version": "5.63",
           "downloadUrl": "http://www.kernel.org/pub/linux/bluetooth/bluez-5.63.tar.xz"
@@ -1596,6 +1606,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "cfitsio",
+          "version": "4.0.0",
+          "downloadUrl": "http://heasarc.gsfc.nasa.gov/FTP/software/fitsio/c/cfitsio-4.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "cgdcbxd",
           "version": "1.0.2",
           "downloadUrl": "https://github.com/jrfastab/cgdcbxd/archive/v1.0.2.tar.gz"
@@ -1619,6 +1639,16 @@
           "name": "chan",
           "version": "0.0.4",
           "downloadUrl": "https://github.com/tylertreat/chan/archive/0.0.4/chan-0.0.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "CharLS",
+          "version": "2.0.0",
+          "downloadUrl": "https://github.com/team-charls/charls/archive/2.0.0/CharLS-2.0.0.tar.gz"
         }
       }
     },
@@ -7071,7 +7101,7 @@
         "other": {
           "name": "ibus-table",
           "version": "1.12.4",
-          "downloadUrl": "https://github.com/mike-fabian/ibus-table/archive/refs/tags/ibus-table-1.12.4.tar.gz"
+          "downloadUrl": "https://github.com/mike-fabian/ibus-table/archive/refs/tags/1.12.4.tar.gz"
         }
       }
     },
@@ -7233,6 +7263,16 @@
           "name": "influxdb",
           "version": "2.6.1",
           "downloadUrl": "https://github.com/influxdata/influxdb/archive/refs/tags/v2.6.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "inih",
+          "version": "57",
+          "downloadUrl": "https://github.com/benhoyt/inih/archive/refs/tags/r57.tar.gz"
         }
       }
     },
@@ -9490,6 +9530,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libgta",
+          "version": "1.2.1",
+          "downloadUrl": "https://marlam.de/gta/releases/libgta-1.2.1.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libgudev",
           "version": "237",
           "downloadUrl": "https://download.gnome.org/sources/libgudev/237/libgudev-237.tar.xz"
@@ -9843,6 +9893,16 @@
           "name": "libldm",
           "version": "0.2.4",
           "downloadUrl": "https://github.com/mdbooth/libldm/archive/libldm-0.2.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "liblerc",
+          "version": "4.0.0",
+          "downloadUrl": "https://github.com/Esri/lerc/archive/v4.0.0/lerc-4.0.0.tar.gz"
         }
       }
     },
@@ -10271,8 +10331,8 @@
         "type": "other",
         "other": {
           "name": "libnvidia-container",
-          "version": "1.11.0",
-          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.11.0.tar.gz"
+          "version": "1.13.5",
+          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.13.5.tar.gz"
         }
       }
     },
@@ -14433,8 +14493,8 @@
         "type": "other",
         "other": {
           "name": "nvidia-container-runtime",
-          "version": "3.11.0",
-          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-runtime/archive/v3.11.0.tar.gz"
+          "version": "3.13.0",
+          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-runtime/archive/v3.13.0.tar.gz"
         }
       }
     },
@@ -14443,8 +14503,8 @@
         "type": "other",
         "other": {
           "name": "nvidia-container-toolkit",
-          "version": "1.11.0",
-          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.11.0.tar.gz"
+          "version": "1.13.5",
+          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.13.5.tar.gz"
         }
       }
     },
@@ -15093,6 +15153,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "ogdi",
+          "version": "4.1.0",
+          "downloadUrl": "https://github.com/libogdi/ogdi/archive/ogdi_4_1_0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "omping",
           "version": "0.0.4",
           "downloadUrl": "https://github.com/jfriesse/omping/releases/download/0.0.4/omping-0.0.4.tar.gz"
@@ -15386,6 +15456,16 @@
           "name": "opentelemetry-cpp",
           "version": "1.10.0",
           "downloadUrl": "https://github.com/open-telemetry/opentelemetry-cpp/archive/refs/tags/v1.10.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "opentelemetry-cpp-contrib",
+          "version": "37e4466d882cbddff6f607a20fe327060de76166",
+          "downloadUrl": "https://github.com/open-telemetry/opentelemetry-cpp-contrib/archive/37e4466d882cbddff6f607a20fe327060de76166.tar.gz"
         }
       }
     },
@@ -20904,8 +20984,8 @@
         "type": "other",
         "other": {
           "name": "php",
-          "version": "8.1.16",
-          "downloadUrl": "https://www.php.net/distributions/php-8.1.16.tar.xz"
+          "version": "8.1.22",
+          "downloadUrl": "https://www.php.net/distributions/php-8.1.22.tar.xz"
         }
       }
     },
@@ -25123,6 +25203,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "qt5-qtserialport",
+          "version": "5.15.9",
+          "downloadUrl": "https://download.qt.io/official_releases/qt/5.15/5.15.9/submodules/qtserialport-everywhere-opensource-src-5.15.9.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "qt5-qtsvg",
           "version": "5.12.11",
           "downloadUrl": "https://download.qt.io/archive/qt/5.12/5.12.11/submodules/qtsvg-everywhere-src-5.12.11.tar.xz"
@@ -27526,6 +27616,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "shapelib",
+          "version": "1.5.0",
+          "downloadUrl": "https://download.osgeo.org/shapelib/shapelib-1.5.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "shared-mime-info",
           "version": "2.0",
           "downloadUrl": "https://gitlab.freedesktop.org/xdg/shared-mime-info/uploads/0440063a2e6823a4b1a6fb2f2af8350f/shared-mime-info-2.0.tar.xz"
@@ -28976,6 +29076,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "uriparser",
+          "version": "0.9.7",
+          "downloadUrl": "https://github.com/uriparser/uriparser/releases/download/uriparser-0.9.7/uriparser-0.9.7.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "urlview",
           "version": "0.9",
           "downloadUrl": "https://github.com/sigpipe/urlview/archive/08767a/urlview-08767a.tar.gz"
@@ -29865,8 +29975,8 @@
         "type": "other",
         "other": {
           "name": "xfsprogs",
-          "version": "5.0.0",
-          "downloadUrl": "https://kernel.org/pub/linux/utils/fs/xfs/xfsprogs/xfsprogs-5.0.0.tar.xz"
+          "version": "5.15.0",
+          "downloadUrl": "https://kernel.org/pub/linux/utils/fs/xfs/xfsprogs/xfsprogs-5.15.0.tar.xz"
         }
       }
     },

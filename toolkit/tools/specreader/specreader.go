@@ -20,6 +20,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	packagelist "github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packlist"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/rpm"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
@@ -62,12 +63,13 @@ type parseResult struct {
 }
 
 const (
-	defaultWorkerCount = "10"
+	defaultWorkerCount = "100"
 )
 
 var (
 	app                     = kingpin.New("specreader", "A tool to parse spec dependencies into JSON")
 	specsDir                = exe.InputDirFlag(app, "Directory to scan for SPECS")
+	specListFile            = app.Flag("spec-list", "Path to a list of SPECs to parse. If empty will parse all SPECs.").ExistingFile()
 	output                  = exe.OutputFlag(app, "Output file to export the JSON")
 	workers                 = app.Flag("workers", "Number of concurrent goroutines to parse with").Default(defaultWorkerCount).Int()
 	buildDir                = app.Flag("build-dir", "Directory to store temporary files while parsing.").String()
@@ -106,13 +108,22 @@ func main() {
 	toolchainRPMs, err := schedulerutils.ReadReservedFilesList(*toolchainManifest)
 	logger.PanicOnError(err, "Unable to read toolchain manifest file '%s': %s", *toolchainManifest, err)
 
-	err = parseSPECsWrapper(*buildDir, *specsDir, *rpmsDir, *srpmsDir, *existingToolchainRpmDir, *distTag, *output, *workerTar, toolchainRPMs, *workers, *runCheck)
+	// A parse list may be provided, if so only parse this subset.
+	// If none is provided, parse all specs.
+	specListSet, err := packagelist.ParsePackageListFile(*specListFile)
+	logger.PanicOnError(err)
+
+	// Convert specsDir to an absolute path
+	specsAbsDir, err := filepath.Abs(*specsDir)
+	logger.PanicOnError(err, "Unable to get absolute path for specs directory '%s': %s", *specsDir, err)
+
+	err = parseSPECsWrapper(*buildDir, specsAbsDir, *rpmsDir, *srpmsDir, *existingToolchainRpmDir, *distTag, *output, *workerTar, specListSet, toolchainRPMs, *workers, *runCheck)
 	logger.PanicOnError(err)
 }
 
 // parseSPECsWrapper wraps parseSPECs to conditionally run it inside a chroot.
 // If workerTar is non-empty, parsing will occur inside a chroot, otherwise it will run on the host system.
-func parseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, outputFile, workerTar string, toolchainRPMs []string, workers int, runCheck bool) (err error) {
+func parseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, outputFile, workerTar string, specListSet map[string]bool, toolchainRPMs []string, workers int, runCheck bool) (err error) {
 	var (
 		chroot      *safechroot.Chroot
 		packageRepo *pkgjson.PackageRepo
@@ -136,13 +147,13 @@ func parseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, toolchainDir, dist
 		var parseError error
 
 		if *targetArch == "" {
-			packageRepo, parseError = parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, buildArch, toolchainRPMs, workers, runCheck)
+			packageRepo, parseError = parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, buildArch, specListSet, toolchainRPMs, workers, runCheck)
 			if parseError != nil {
 				err := fmt.Errorf("failed to parse native specs (%w)", parseError)
 				return err
 			}
 		} else {
-			packageRepo, parseError = parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, *targetArch, toolchainRPMs, workers, runCheck)
+			packageRepo, parseError = parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, *targetArch, specListSet, toolchainRPMs, workers, runCheck)
 			if parseError != nil {
 				err := fmt.Errorf("failed to parse cross specs (%w)", parseError)
 				return err
@@ -224,8 +235,41 @@ func createChroot(workerTar, buildDir, specsDir, srpmsDir string) (chroot *safec
 	return
 }
 
+func findSpecFiles(specsDir string, specListSet map[string]bool) (specFiles []string, err error) {
+	// Find the filepath for each spec in the SPECS directory.
+	if len(specListSet) == 0 {
+		specSearch, err := filepath.Abs(filepath.Join(specsDir, "**/*.spec"))
+		if err != nil {
+			err = fmt.Errorf("invalid spec dir: '%s'. Error:\n%w", specsDir, err)
+			return nil, err
+		}
+		specFiles, err = filepath.Glob(specSearch)
+		if err != nil {
+			err = fmt.Errorf("failed to find *.spec files. Check that '%s' is the correct directory. Error:\n%w", specsDir, err)
+			return nil, err
+		}
+	} else {
+		for specName := range specListSet {
+			specSearch := filepath.Join(specsDir, fmt.Sprintf("**/%s.spec", specName))
+			matchingSpecFiles, err := filepath.Glob(specSearch)
+
+			// If a SPEC is in the parse list, it should be parsed.
+			if err != nil {
+				err = fmt.Errorf("spec search failed on '%s'. Error:\n%w", specSearch, err)
+				return nil, err
+			}
+			if len(matchingSpecFiles) != 1 {
+				err = fmt.Errorf("unexpected number of matches '%d' for spec file '%s'", len(matchingSpecFiles), specName)
+				return nil, err
+			}
+			specFiles = append(specFiles, matchingSpecFiles[0])
+		}
+	}
+	return
+}
+
 // parseSPECs will parse all specs in specsDir and return a summary of the SPECs.
-func parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, arch string, toolchainRPMs []string, workers int, runCheck bool) (packageRepo *pkgjson.PackageRepo, err error) {
+func parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, arch string, specListSet map[string]bool, toolchainRPMs []string, workers int, runCheck bool) (packageRepo *pkgjson.PackageRepo, err error) {
 	var (
 		packageList []*pkgjson.Package
 		wg          sync.WaitGroup
@@ -234,11 +278,7 @@ func parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, arch string,
 
 	packageRepo = &pkgjson.PackageRepo{}
 
-	// Find the filepath for each spec in the SPECS directory.
-	specSearch, err := filepath.Abs(filepath.Join(specsDir, "**/*.spec"))
-	if err == nil {
-		specFiles, err = filepath.Glob(specSearch)
-	}
+	specFiles, err = findSpecFiles(specsDir, specListSet)
 	if err != nil {
 		logger.Log.Errorf("Failed to find *.spec files. Check that %s is the correct directory. Error: %v", specsDir, err)
 		return

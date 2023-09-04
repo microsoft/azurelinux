@@ -5,9 +5,9 @@ name: Livepatch specs check
 
 on:
   push:
-    branches: [2.0]
+    branches: [2.0, fasttrack/*]
   pull_request:
-    branches: [2.0]
+    branches: [2.0, fasttrack/*]
 
 jobs:
   spec-check:
