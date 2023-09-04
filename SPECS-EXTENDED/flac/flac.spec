@@ -1,26 +1,16 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-# Disable if you don't need xmms
-%global with_xmms 0
-
-%if %{with_xmms}
-%define xmms_inputdir %(xmms-config --input-plugin-dir 2>/dev/null || echo %{_libdir}/xmms/General)
-%endif
-
 Summary: An encoder/decoder for the Free Lossless Audio Codec
 Name: flac
-Version: 1.3.4
+Version: 1.4.3
 Release: 1%{?dist}
-License: BSD and GPLv2+ and GFDL
+License: BSD-3-Clause AND GPL-2.0-or-later AND GFDL-1.1-or-later
 Source0: https://downloads.xiph.org/releases/flac/flac-%{version}.tar.xz
 URL: https://www.xiph.org/flac/
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 BuildRequires: libogg-devel
 BuildRequires: gcc gcc-c++ automake autoconf libtool gettext-devel doxygen
-%if %{with_xmms}
-BuildRequires: xmms-devel desktop-file-utils
-Source1: xmms-flac.desktop
-%endif
+
 %ifarch %{ix86}
 # 2.0 supports symbol visibility
 BuildRequires: nasm >= 2.0
@@ -62,21 +52,9 @@ Requires: pkgconfig
 This package contains all the files needed to develop applications that
 will use the Free Lossless Audio Codec.
 
-%if %{with_xmms}
-%package -n xmms-flac
-Summary: XMMS plugin needed to play FLAC (Free Lossless Audio Codec) files
-# The entire FLAC sources are covered by multiple licenses, but the xmms plugin
-# is only GPLv2+
-License: GPLv2+
-
-%description -n xmms-flac
-FLAC is a Free Lossless Audio Codec. The FLAC format supports streaming,
-seeking, and archival, and gives 25-75% compression on typical CD audio.
-This is the input plugin for XMMS to be able to read FLAC files.
-%endif
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 # use our libtool to avoid problems with RPATH
@@ -86,33 +64,20 @@ This is the input plugin for XMMS to be able to read FLAC files.
 export CFLAGS="%{optflags} -funroll-loops"
 %configure \
     --htmldir=%{_docdir}/flac/html \
-%if %{with_xmms}
-    --enable-xmms-plugin \
-%else
     --disable-xmms-plugin \
-%endif
     --disable-silent-rules \
     --disable-thorough-tests
 
-make %{?_smp_mflags}
+%make_build
 
 %install
-make install DESTDIR=%{buildroot}
+%make_install
 
-%if %{with_xmms} 
-desktop-file-install --dir=%{buildroot}%{_datadir}/applications %{SOURCE1}
-%endif
 
-# split documentation
 mv %{buildroot}%{_docdir}/flac* ./flac-doc
-mkdir -p flac-doc-devel
-mv flac-doc{/html/api,-devel}
 rm flac-doc/FLAC.tag
 
 rm %{buildroot}%{_libdir}/*.la
-%if %{with_xmms}
-rm %{buildroot}%{xmms_inputdir}/*.la
-%endif
 
 %check
 useradd test
@@ -128,23 +93,17 @@ sudo -u test make check && userdel test
 %{_mandir}/man1/*
 
 %files libs
-%doc AUTHORS COPYING* README
-%{_libdir}/libFLAC.so.8*
-%{_libdir}/libFLAC++.so.6*
+%doc AUTHORS README.md CHANGELOG.md
+%license COPYING.*
+%{_libdir}/libFLAC.so.12*
+%{_libdir}/libFLAC++.so.10*
 
 %files devel
-%doc flac-doc-devel/*
 %{_includedir}/*
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*
 %{_datadir}/aclocal/*.m4
 
-%if %{with_xmms}
-%files -n xmms-flac
-%license COPYING.GPL
-%{_datadir}/applications/xmms-flac.desktop
-%{xmms_inputdir}/libxmms-flac.so
-%endif
 
 %changelog
 * Mon Aug 22 2022 Muhammad Falak <mwani@microsoft.com> - 1.3.4-1
