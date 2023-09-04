@@ -16,13 +16,13 @@ Distribution:   Mariner
 %global httpd_pkg_cache_dir /var/cache/httpd/mod_auth_openidc
 
 Name:		mod_auth_openidc
-Version:	2.4.2.1
-Release:	2%{?dist}
+Version:	2.4.14.2
+Release:	1%{?dist}
 Summary:	OpenID Connect auth module for Apache HTTP Server
 
 License:	ASL 2.0
-URL:		https://github.com/zmartzone/mod_auth_openidc
-Source0:	https://github.com/zmartzone/mod_auth_openidc/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+URL:		https://github.com/OpenIDC/mod_auth_openidc
+Source0:	https://github.com/OpenIDC/mod_auth_openidc/releases/download/v%{version}/%{name}-%{version}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:	httpd-devel
@@ -63,7 +63,7 @@ export APXS2_OPTS='-S LIBEXECDIR=${MODULES_DIR}'
 
 %install
 mkdir -p $RPM_BUILD_ROOT%{_httpd_moddir}
-make install MODULES_DIR=$RPM_BUILD_ROOT%{_httpd_moddir}
+make install DESTDIR=$RPM_BUILD_ROOT MODULES_DIR=$RPM_BUILD_ROOT%{_httpd_moddir}
 
 install -m 755 -d $RPM_BUILD_ROOT%{_httpd_modconfdir}
 echo 'LoadModule auth_openidc_module modules/mod_auth_openidc.so' > \
@@ -95,6 +95,11 @@ install -m 700 -d $RPM_BUILD_ROOT%{httpd_pkg_cache_dir}/cache
 %dir %attr(0700, apache, apache) %{httpd_pkg_cache_dir}/cache
 
 %changelog
+* Tue Sep 05 2023 Archana Choudhary <archana1@microsoft.com> - 2.4.14.2-1
+- Upgrade to 2.4.14.2 - CVE-2021-20718, CVE-2021-39191, CVE-2022-23527, CVE-2023-28625
+- Add DESTDIR to resolve mod_auth_openidc.so filepath
+- Update source URL 
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.2.1-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
