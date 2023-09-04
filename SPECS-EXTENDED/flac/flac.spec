@@ -1,23 +1,27 @@
+Summary:        An encoder/decoder for the Free Lossless Audio Codec
+Name:           flac
+Version:        1.4.3
+Release:        1%{?dist}
+License:        BSD-3-Clause AND GPL-2.0-or-later AND GFDL-1.1-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Summary: An encoder/decoder for the Free Lossless Audio Codec
-Name: flac
-Version: 1.4.3
-Release: 1%{?dist}
-License: BSD-3-Clause AND GPL-2.0-or-later AND GFDL-1.1-or-later
-Source0: https://downloads.xiph.org/releases/flac/flac-%{version}.tar.xz
-URL: https://www.xiph.org/flac/
-Requires: %{name}-libs%{?_isa} = %{version}-%{release}
-BuildRequires: libogg-devel
-BuildRequires: gcc gcc-c++ automake autoconf libtool gettext-devel doxygen
-
+URL:            https://www.xiph.org/flac/
+Source0:        https://downloads.xiph.org/releases/flac/flac-%{version}.tar.xz
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  doxygen
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
+BuildRequires:  gettext-devel
+BuildRequires:  libogg-devel
+BuildRequires:  libtool
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 %ifarch %{ix86}
 # 2.0 supports symbol visibility
-BuildRequires: nasm >= 2.0
+BuildRequires:  nasm >= 2.0
 %endif
-
 %if %{with_check}
-BuildRequires: sudo
+BuildRequires:  sudo
 %endif
 
 %description
@@ -31,8 +35,8 @@ various music players.
 This package contains the command-line tools and documentation.
 
 %package libs
-Summary: Libraries for the Free Lossless Audio Codec
-Obsoletes: flac < 1.2.1-11
+Summary:        Libraries for the Free Lossless Audio Codec
+Obsoletes:      flac < 1.2.1-11
 
 %description libs
 FLAC stands for Free Lossless Audio Codec. Grossly oversimplified, FLAC
@@ -44,14 +48,13 @@ various music players.
 This package contains the FLAC libraries.
 
 %package devel
-Summary: Development libraries and header files from FLAC
-Requires: %{name}-libs%{?_isa} = %{version}-%{release}
-Requires: pkgconfig
+Summary:        Development libraries and header files from FLAC
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+Requires:       pkgconfig
 
 %description devel
 This package contains all the files needed to develop applications that
 will use the Free Lossless Audio Codec.
-
 
 %prep
 %autosetup -p1
@@ -77,7 +80,7 @@ export CFLAGS="%{optflags} -funroll-loops"
 mv %{buildroot}%{_docdir}/flac* ./flac-doc
 rm flac-doc/FLAC.tag
 
-rm %{buildroot}%{_libdir}/*.la
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
 useradd test
@@ -104,11 +107,11 @@ sudo -u test make check && userdel test
 %{_libdir}/pkgconfig/*
 %{_datadir}/aclocal/*.m4
 
-
 %changelog
 * Mon Sep 04 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 1.4.3-1
 - Upgrade version to address CVE-2020-22219
 - Use SPDX short identifier for license tag
+- Lint spec
 
 * Mon Aug 22 2022 Muhammad Falak <mwani@microsoft.com> - 1.3.4-1
 - Bump version
