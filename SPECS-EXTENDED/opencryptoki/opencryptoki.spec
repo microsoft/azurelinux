@@ -221,8 +221,13 @@ fi
 %{_unitdir}/pkcsslotd.service
 %{_sbindir}/pkcsconf
 %{_sbindir}/pkcsslotd
+%{_sbindir}/p11sak
+%{_sbindir}/pkcstok_migrate
 %{_mandir}/man1/pkcsconf.1*
+%{_mandir}/man1/p11sak.1*
+%{_mandir}/man1/pkcstok_migrate.1*
 %{_mandir}/man5/%{name}.conf.5*
+%{_mandir}/man5/p11sak_defined_attrs.conf.5*
 %{_mandir}/man7/%{name}.7*
 %{_mandir}/man8/pkcsslotd.8*
 %{_libdir}/opencryptoki/methods
