@@ -1,16 +1,15 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           tang
-Version:        7
-Release:        7%{?dist}
+Version:        14
+Release:        0%{?dist}
 Summary:        Network Presence Binding Daemon
 
-License:        GPLv3+
+License:        GPL-3.0-or-later
 URL:            https://github.com/latchset/%{name}
 Source0:        https://github.com/latchset/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.bz2
+Source1:        tang.sysusers
 
-Patch0001: 0001-Move-build-system-to-meson.patch
-Patch0002: 0002-Move-key-handling-to-tang-itself.patch
 
 BuildRequires:  gcc
 BuildRequires:  meson
@@ -52,6 +51,7 @@ Tang is a small daemon for binding data to the presence of a third party.
 
 %install
 %meson_install
+install -p -D -m 0644 %{SOURCE1} %{buildroot}%{_sysusersdir}/tang.conf
 echo "User=%{name}" >> $RPM_BUILD_ROOT/%{_unitdir}/%{name}d@.service
 %{__mkdir_p} $RPM_BUILD_ROOT/%{_localstatedir}/db/%{name}
 
