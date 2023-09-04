@@ -311,8 +311,8 @@ fi
 
 
 %changelog
-* Mon Sep 04 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.17.0-1
-- Auto-upgrade to 3.17.0 - to address CVE-2021-3798
+* Mon Sep 04 2023 Muhammad Falak <mwani@microsoft.com> - 3.17.0-1
+- Upgrade version to address CVE-2021-3798
 
 * Thu Mar 18 2021 Henry Li <lihl@microsoft.com> - 3.13.0-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
