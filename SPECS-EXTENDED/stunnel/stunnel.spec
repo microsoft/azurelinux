@@ -151,7 +151,7 @@ make test || (for i in tests/logs/*.log ; do echo "$i": ; cat "$i" ; done)
 * Mon Sep 04 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 5.70-1
 - Upgrade version to address CVE-2021-20230
 - Lint spec
-- Verify License
+- Verified License
 
 * Fri Mar 26 2021 Henry Li <lihl@microsoft.com> - 5.56-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
