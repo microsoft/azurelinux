@@ -55,7 +55,8 @@ rm -f $RPM_BUILD_ROOT%{python3_sitelib}/__pycache__/fetchmailconf*
 %find_lang %name
 
 %files -f %{name}.lang
-%doc COPYING FAQ FEATURES NEWS NOTES README README.SSL TODO
+%license COPYING 
+%doc FAQ FEATURES NEWS NOTES README README.SSL TODO
 %{_bindir}/fetchmail
 %{_mandir}/man1/fetchmail.1*
 %{_unitdir}/fetchmail.service
@@ -64,6 +65,7 @@ rm -f $RPM_BUILD_ROOT%{python3_sitelib}/__pycache__/fetchmailconf*
 %changelog
 * Thu Aug 31 2023 Muhammad Falak <mwani@microsoft.com> - 6.4.22-1
 - Upgrade version to address CVE-2021-39272 & CVE-2021-36386
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.4.8-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
