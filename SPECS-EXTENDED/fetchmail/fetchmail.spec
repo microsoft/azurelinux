@@ -31,17 +31,27 @@ Install fetchmail if you need to retrieve mail over SLIP or PPP
 connections.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
-%configure --enable-POP3 --enable-IMAP --with-ssl --without-hesiod \
-	--enable-ETRN --enable-NTLM --enable-SDPS --enable-RPA \
-	--enable-nls --with-kerberos5 --with-gssapi \
-	--enable-fallback=no
-make
+%configure \
+    --enable-ETRN \
+    --enable-IMAP \
+    --enable-NTLM \
+    --enable-POP3 \
+    --enable-RPA \
+    --enable-SDPS \
+    --enable-fallback=no \
+    --enable-nls\
+    --with-gssapi \
+    --with-kerberos5 \
+    --with-ssl \
+    --without-hesiod 
+
+%make_build
 
 %install
-make install DESTDIR=%{buildroot}
+%make_install DESTDIR=%{buildroot}
 
 # install example systemd unit
 mkdir -p %{buildroot}%{_unitdir}
@@ -72,6 +82,7 @@ rm -f %{buildroot}%{python3_sitelib}/__pycache__/fetchmailconf*
 - Upgrade version to address CVE-2021-39272 & CVE-2021-36386
 - License verified
 - Lint spec
+- Switch to %autosetup, %make_build & %make_install
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.4.8-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
