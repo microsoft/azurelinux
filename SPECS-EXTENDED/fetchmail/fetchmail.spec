@@ -62,8 +62,8 @@ rm -f $RPM_BUILD_ROOT%{python3_sitelib}/__pycache__/fetchmailconf*
 %config(noreplace) %attr(0600, mail, mail) %{_sysconfdir}/fetchmailrc.example
 
 %changelog
-* Thu Aug 31 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.4.22-1
-- Auto-upgrade to 6.4.22 - Address CVE-2021-39272 & CVE-2021-36386
+* Thu Aug 31 2023 Muhammad Falak <mwani@microsoft.com> - 6.4.22-1
+- Upgrade version to address CVE-2021-39272 & CVE-2021-36386
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.4.8-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
