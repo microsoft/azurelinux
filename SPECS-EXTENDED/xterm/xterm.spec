@@ -10,7 +10,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://invisible-island.net/xterm
 Source0:        https://github.com/ThomasDickey/xterm-snapshots/archive/refs/tags/%{name}-%{version}.tar.gz
-Source1:        http://ftp.invisible-island.net/archives/xterm/16colors.txt
+Source1:        https://ftp.invisible-island.net/archives/xterm/16colors.txt
 Patch1:         xterm-defaults.patch
 Patch2:         xterm-desktop.patch
 Patch3:         xterm-man-paths.patch
@@ -105,6 +105,7 @@ install -m644 -p xterm.appdata.xml %{buildroot}%{_datadir}/appdata
 * Fri Aug 12 2022 Muhammad Falak <mwani@microsoft.com> - 380-1
 - Bump version to address CVE-2022-45063 & CVE-2023-40359
 - Refresh all patches to apply cleanly
+- Use https instead of http for urls
 - Switch to autosetup
 
 * Fri Aug 12 2022 Muhammad Falak <mwani@microsoft.com> - 372-1
