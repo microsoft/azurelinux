@@ -6,8 +6,8 @@ Release:        1%{?dist}
 License:        GPL+ AND Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            http://www.fetchmail.info/
-Source0:        http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.xz
+URL:            https://www.fetchmail.info/
+Source0:        https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.xz
 # systemd service file
 Source2:        fetchmail.service
 # example configuration file
