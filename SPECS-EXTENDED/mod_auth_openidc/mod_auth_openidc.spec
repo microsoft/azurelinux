@@ -99,6 +99,7 @@ install -m 700 -d $RPM_BUILD_ROOT%{httpd_pkg_cache_dir}/cache
 - Upgrade to 2.4.14.2 - CVE-2021-20718, CVE-2021-39191, CVE-2022-23527, CVE-2023-28625
 - Add DESTDIR to resolve mod_auth_openidc.so filepath
 - Update source URL 
+- Verified license
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.2.1-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
