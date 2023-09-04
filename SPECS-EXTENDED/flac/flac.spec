@@ -106,6 +106,10 @@ sudo -u test make check && userdel test
 
 
 %changelog
+* Mon Sep 04 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 1.4.3-1
+- Upgrade version to address CVE-2020-22219
+- Use SPDX short identifier for license tag
+
 * Mon Aug 22 2022 Muhammad Falak <mwani@microsoft.com> - 1.3.4-1
 - Bump version
 - Run `%check` section via a non-root user to enable ptest
