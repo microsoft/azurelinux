@@ -1,27 +1,30 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+%bcond_with trace
+%global x11_app_defaults_dir %(pkg-config --variable appdefaultdir xt)
+
 Summary:        Terminal emulator for the X Window System
 Name:           xterm
 Version:        380
 Release:        1%{?dist}
-URL:            https://invisible-island.net/xterm
 License:        MIT
-BuildRequires:  gcc pkgconfig ncurses-devel libutempter-devel
-BuildRequires:  libXft-devel libXaw-devel libXext-devel desktop-file-utils
-BuildRequires:  libxkbfile-devel xorg-x11-apps
-Requires:       xterm-resize = %{version}-%{release}
-Recommends:     xorg-x11-fonts-misc
-
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://invisible-island.net/xterm
 Source0:        https://github.com/ThomasDickey/xterm-snapshots/archive/refs/tags/%{name}-%{version}.tar.gz
 Source1:        http://ftp.invisible-island.net/archives/xterm/16colors.txt
-
 Patch1:         xterm-defaults.patch
 Patch2:         xterm-desktop.patch
 Patch3:         xterm-man-paths.patch
-
-%bcond_with trace
-
-%global x11_app_defaults_dir %(pkg-config --variable appdefaultdir xt)
+BuildRequires:  desktop-file-utils
+BuildRequires:  gcc
+BuildRequires:  libXaw-devel
+BuildRequires:  libXext-devel
+BuildRequires:  libXft-devel
+BuildRequires:  libutempter-devel
+BuildRequires:  libxkbfile-devel
+BuildRequires:  ncurses-devel
+BuildRequires:  pkgconfig
+BuildRequires:  xorg-x11-apps
+Requires:       xterm-resize = %{version}-%{release}
 
 %description
 The xterm program is a terminal emulator for the X Window System. It
@@ -29,7 +32,7 @@ provides DEC VT102 and Tektronix 4014 compatible terminals for
 programs that can't use the window system directly.
 
 %package resize
-Summary: Set environment and terminal settings to current window size
+Summary:        Set environment and terminal settings to current window size
 
 %description resize
 Prints a shell command for setting the appropriate environment variables to
@@ -64,7 +67,7 @@ done
 make %{?_smp_mflags}
 
 %install
-make DESTDIR=$RPM_BUILD_ROOT install
+make DESTDIR=%{buildroot} install
 
 cp -fp %{SOURCE1} 16colors.txt
 
@@ -72,11 +75,11 @@ desktop-file-install \
 %if 0%{?fedora} && 0%{?fedora} < 19
 	--vendor=fedora \
 %endif
-	--dir=$RPM_BUILD_ROOT%{_datadir}/applications \
+	--dir=%{buildroot}%{_datadir}/applications \
 	xterm.desktop
 
-mkdir -p $RPM_BUILD_ROOT%{_datadir}/appdata
-install -m644 -p xterm.appdata.xml $RPM_BUILD_ROOT%{_datadir}/appdata
+mkdir -p %{buildroot}%{_datadir}/appdata
+install -m644 -p xterm.appdata.xml %{buildroot}%{_datadir}/appdata
 
 %files
 %doc xterm.log.html ctlseqs.txt 16colors.txt README.i18n THANKS
@@ -549,18 +552,18 @@ install -m644 -p xterm.appdata.xml $RPM_BUILD_ROOT%{_datadir}/appdata
 - Upgrade to upstream version 213 (fixes bug 192627)
 - fix bug 189161 : make -r/-rv do reverseVideo with or without
   xterm*{fore,back}ground set
- 
+
 * Thu Apr 13 2006 Jason Vas Dias <jvdias@redhat.com> - 212-1
 - Upgrade to upstream version 212
 - fix bug 188031 : paths in man-page
- 
+
 * Wed Mar 29 2006 Jason Vas Dias <jvdias@redhat.com> - 211-4
 - fix bug 186935: cursor GCs must be freed with XtReleaseGC
 
 * Tue Mar 21 2006 Jason Vas Dias <jvdias@redhat.com> - 211-1
 - Upgrade to upstream version 211 (fixes bug 186094).
 - Enable new 'utf8Title' resource by default
- 
+
 * Tue Mar 07 2006 Jason Vas Dias <jvdias@redhat.com> - 209-4
 - fix bug 183993: call set_cursor_gcs in ReverseVideo
 
@@ -613,17 +616,17 @@ install -m644 -p xterm.appdata.xml $RPM_BUILD_ROOT%{_datadir}/appdata
 * Wed Oct 12 2005 Jason Vas Dias <jvdias@redhat.com> 205-1
 - Upgrade to upstream version 205 
   fixes bugs: 124421, 129146, 159562, 161894, 169347
- 
+
 * Sat Sep 24 2005 Mike A. Harris <mharris@redhat.com> 200-10
 - Updated xterm-resources-redhat.patch to add "xterm*ttyModes: erase ^?"
   resource to fix bug (#155538,160354,163812,162549)
-  
+
 * Wed Sep 14 2005 Mike A. Harris <mharris@redhat.com> 200-9
 - Updated xterm-resources-redhat.patch to remove utf8 resource which was
   added in the 200-7 build, as it was incorrectly set to 'true' instead
   of '1', and bug #138681 turned out to be a gdm bug instead of an xterm
   bug.  This fixes bug (#163568).
-  
+
 * Mon Aug 29 2005 Mike A. Harris <mharris@redhat.com> 200-8
 - Added --disable-tek4014 to ./configure flags, to disable tek support
   for bug (#164210)
@@ -664,7 +667,7 @@ install -m644 -p xterm.appdata.xml $RPM_BUILD_ROOT%{_datadir}/appdata
   it no longer applies cleanly.  Hopefully we can just ship stock xterm
   resources now, although I realize that is more likely to be a pie in the
   sky fantasy once the bug reports trickle in from this change.  ;o)
-  
+
 * Tue Jun 15 2004 Elliot Lee <sopwith@redhat.com> 179-8
 - rebuilt
 
