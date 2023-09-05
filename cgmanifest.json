@@ -28107,8 +28107,8 @@
         "type": "other",
         "other": {
           "name": "stunnel",
-          "version": "5.56",
-          "downloadUrl": "https://www.stunnel.org/downloads/stunnel-5.56.tar.gz"
+          "version": "5.70",
+          "downloadUrl": "https://www.stunnel.org/downloads/stunnel-5.70.tar.gz"
         }
       }
     },
