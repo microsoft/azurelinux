@@ -7,7 +7,7 @@ Summary:        Network Presence Binding Daemon
 
 License:        GPL-3.0-or-later
 URL:            https://github.com/latchset/%{name}
-Source0:        https://github.com/latchset/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.bz2
+Source0:        https://github.com/latchset/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        tang.sysusers
 
 
@@ -28,8 +28,10 @@ BuildRequires:  curl
 
 BuildRequires:  asciidoc
 BuildRequires:  coreutils
+BuildRequires:  socat
 BuildRequires:  grep
 BuildRequires:  sed
+BuildRequires:  iproute
 
 %{?systemd_requires}
 Requires:       coreutils
@@ -80,10 +82,13 @@ exit 0
 %{_unitdir}/%{name}d@.service
 %{_unitdir}/%{name}d.socket
 %{_libexecdir}/%{name}d-keygen
+%{_libexecdir}/%{name}d-rotate-keys
 %{_libexecdir}/%{name}d
 %{_mandir}/man8/tang.8*
 %{_bindir}/%{name}-show-keys
 %{_mandir}/man1/tang-show-keys.1*
+%{_mandir}/man1/tangd-rotate-keys.1.*
+%{_sysusersdir}/tang.conf
 
 %changelog
 * Fri Apr 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 7-7
