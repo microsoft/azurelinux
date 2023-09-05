@@ -1,68 +1,72 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global __provides_exclude_from %{_docdir}
 %global __requires_exclude_from %{_docdir}
-Summary: Secure imap and pop3 server
-Name: dovecot
-Version: 2.3.13
 %global prever %{nil}
-Release: 5%{?dist}
+%global pigeonholever 0.5.20
+
+Summary:        Secure imap and pop3 server
+Name:           dovecot
+Version:        2.3.20
+Release:        1%{?dist}
 #dovecot itself is MIT, a few sources are PD, pigeonhole is LGPLv2
-License: MIT and LGPLv2
-
-URL: http://www.dovecot.org/
-Source: http://www.dovecot.org/releases/2.3/%{name}-%{version}%{?prever}.tar.gz
-Source1: dovecot.init
-Source2: dovecot.pam
-%global pigeonholever 0.5.13
-Source8: http://pigeonhole.dovecot.org/releases/2.3/dovecot-2.3-pigeonhole-%{pigeonholever}.tar.gz
-Source9: dovecot.sysconfig
-Source10: dovecot.tmpfilesd
-
+License:        MIT AND LGPLv2
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://www.dovecot.org/
+Source:         https://www.dovecot.org/releases/2.3/%{name}-%{version}%{?prever}.tar.gz
+Source1:        dovecot.init
+Source2:        dovecot.pam
+Source8:        https://pigeonhole.dovecot.org/releases/2.3/dovecot-2.3-pigeonhole-%{pigeonholever}.tar.gz
+Source9:        dovecot.sysconfig
+Source10:       dovecot.tmpfilesd
 #our own
-Source14: dovecot.conf.5
-
+Source14:       dovecot.conf.5
+Source15:       prestartscript
 # 3x Fedora/RHEL specific
-Patch1: dovecot-2.0-defaultconfig.patch
-Patch2: dovecot-1.0.beta2-mkcert-permissions.patch
-Patch3: dovecot-1.0.rc7-mkcert-paths.patch
-
+Patch1:         dovecot-2.0-defaultconfig.patch
+Patch2:         dovecot-1.0.beta2-mkcert-permissions.patch
+Patch3:         dovecot-1.0.rc7-mkcert-paths.patch
 #wait for network
-Patch6: dovecot-2.1.10-waitonline.patch
+Patch6:         dovecot-2.1.10-waitonline.patch
+Patch8:         dovecot-2.2.20-initbysystemd.patch
+Patch9:         dovecot-2.2.22-systemd_w_protectsystem.patch
+Patch10:        dovecot-2.3.0.1-libxcrypt.patch
+Patch15:        dovecot-2.3.11-bigkey.patch
 
-Patch8: dovecot-2.2.20-initbysystemd.patch
-Patch9: dovecot-2.2.22-systemd_w_protectsystem.patch
-Patch10: dovecot-2.3.0.1-libxcrypt.patch
-Patch15: dovecot-2.3.11-bigkey.patch
-Patch16: dovecot-2.3.13-bigtvsec.patch
-
-Source15: prestartscript
-
-BuildRequires: gcc, gcc-c++, openssl-devel, pam-devel, zlib-devel, bzip2-devel, libcap-devel
-BuildRequires: libtool, autoconf, automake, pkgconfig
-BuildRequires: sqlite-devel
-BuildRequires: libpq-devel
-BuildRequires: mariadb-connector-c-devel
-BuildRequires: libxcrypt-devel
-BuildRequires: openldap-devel
-BuildRequires: krb5-devel
-BuildRequires: quota-devel
-BuildRequires: xz-devel
-BuildRequires: lz4-devel
-BuildRequires: libzstd-devel
-BuildRequires: libsodium-devel
-BuildRequires: libicu-devel
-BuildRequires: libexttextcat-devel
-BuildRequires: libstemmer-devel
-BuildRequires: systemd-rpm-macros
-
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  bzip2-devel
+BuildRequires:  clucene-core-devel
+BuildRequires:  expat-devel
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
 # gettext-devel is needed for running autoconf because of the
 # presence of AM_ICONV
-BuildRequires: gettext-devel
-
+BuildRequires:  gettext-devel
+BuildRequires:  krb5-devel
+BuildRequires:  libcap-devel
+BuildRequires:  libcurl-devel
+BuildRequires:  libexttextcat-devel
+BuildRequires:  libicu-devel
+BuildRequires:  libpq-devel
+BuildRequires:  libsodium-devel
+BuildRequires:  libstemmer-devel
+BuildRequires:  libtool
+BuildRequires:  libxcrypt-devel
+BuildRequires:  libzstd-devel
+BuildRequires:  lz4-devel
+BuildRequires:  make
+BuildRequires:  mariadb-connector-c-devel
+BuildRequires:  openldap-devel
+BuildRequires:  openssl-devel
+BuildRequires:  pam-devel
+BuildRequires:  pkgconfig
+BuildRequires:  quota-devel
+BuildRequires:  sqlite-devel
+BuildRequires:  systemd-rpm-macros
+BuildRequires:  xz-devel
+BuildRequires:  zlib-devel
 # Explicit Runtime Requirements for executalbe
-Requires: openssl >= 0.9.7f-4
-
+Requires:       openssl >= 0.9.7f-4
 # Package includes an initscript service file, needs to require initscripts package
 Requires(pre): shadow-utils
 Requires: systemd
@@ -70,45 +74,41 @@ Requires(post): systemd-units
 Requires(preun): systemd-units
 Requires(postun): systemd-units
 
-BuildRequires: clucene-core-devel
-
 %global ssldir %{_sysconfdir}/pki/%{name}
-
-BuildRequires: libcurl-devel expat-devel
-BuildRequires: make
-
 %global restart_flag /run/%{name}/%{name}-restart-after-rpm-install
 
 %description
-Dovecot is an IMAP server for Linux/UNIX-like systems, written with security 
-primarily in mind.  It also contains a small POP3 server.  It supports mail 
+Dovecot is an IMAP server for Linux/UNIX-like systems, written with security
+primarily in mind.  It also contains a small POP3 server.  It supports mail
 in either of maildir or mbox formats.
 
 The SQL drivers and authentication plug-ins are in their subpackages.
 
 %package pigeonhole
-Requires: %{name} = %{version}-%{release}
-Summary: Sieve and managesieve plug-in for dovecot
-License: MIT and LGPLv2
+Summary:        Sieve and managesieve plug-in for dovecot
+Requires:       %{name} = %{version}-%{release}
 
 %description pigeonhole
 This package provides sieve and managesieve plug-in for dovecot LDA.
 
 %package pgsql
-Requires: %{name} = %{version}-%{release}
-Summary: Postgres SQL back end for dovecot
+Summary:        Postgres SQL back end for dovecot
+Requires:       %{name} = %{version}-%{release}
+
 %description pgsql
 This package provides the Postgres SQL back end for dovecot-auth etc.
 
 %package mysql
-Requires: %{name} = %{version}-%{release}
-Summary: MySQL back end for dovecot
+Summary:        MySQL back end for dovecot
+Requires:       %{name} = %{version}-%{release}
+
 %description mysql
 This package provides the MySQL back end for dovecot-auth etc.
 
 %package devel
-Requires: %{name} = %{version}-%{release}
-Summary: Development files for dovecot
+Summary:        Development files for dovecot
+Requires:       %{name} = %{version}-%{release}
+
 %description devel
 This package provides the development files for dovecot.
 
@@ -120,12 +120,7 @@ This package provides the development files for dovecot.
 %patch6 -p1 -b .waitonline
 %patch8 -p1 -b .initbysystemd
 %patch9 -p1 -b .systemd_w_protectsystem
-#%patch10 -p1 -b .libxcrypt
-#patch12 -p1 -b .ftbfs1
-#patch13 -p1 -b .ftbfs2
-#patch14 -p1 -b .gssapi
 %patch15 -p1 -b .bigkey
-%patch16 -p1 -b .bigtvsec
 
 #pushd dovecot-2*3-pigeonhole-%{pigeonholever}
 #popd
@@ -164,8 +159,8 @@ autoreconf -I . -fiv #required for aarch64 support
     --with-ssl=openssl           \
     --with-ssldir=%{ssldir}      \
     --with-solr                  \
-    --with-systemdsystemunitdir=%{_unitdir}  \
-    --with-docs
+    --with-docs                  \
+    systemdsystemunitdir=%{_unitdir}
 
 sed -i 's|/etc/ssl|/etc/pki/dovecot|' doc/mkcert.sh doc/example-config/conf.d/10-ssl.conf
 
@@ -248,7 +243,7 @@ popd
 
 
 %pre
-#dovecot uid and gid are reserved, see /usr/share/doc/setup-*/uidgid 
+#dovecot uid and gid are reserved, see /usr/share/doc/setup-*/uidgid
 getent group dovecot >/dev/null || groupadd -r --gid 97 dovecot
 getent passwd dovecot >/dev/null || \
 useradd -r --uid 97 -g dovecot -d /usr/libexec/dovecot -s /usr/sbin/nologin -c "Dovecot IMAP server" dovecot
@@ -328,6 +323,7 @@ make check
 %config(noreplace) %{_sysconfdir}/dovecot/conf.d/10-logging.conf
 %config(noreplace) %{_sysconfdir}/dovecot/conf.d/10-mail.conf
 %config(noreplace) %{_sysconfdir}/dovecot/conf.d/10-master.conf
+%config(noreplace) %{_sysconfdir}/dovecot/conf.d/10-metrics.conf
 %config(noreplace) %{_sysconfdir}/dovecot/conf.d/10-ssl.conf
 %config(noreplace) %{_sysconfdir}/dovecot/conf.d/15-lda.conf
 %config(noreplace) %{_sysconfdir}/dovecot/conf.d/15-mailboxes.conf
@@ -449,6 +445,14 @@ make check
 %{_libdir}/%{name}/dict/libdriver_pgsql.so
 
 %changelog
+* Wed Aug 30 2023 Archana Choudhary <archana1@microsoft.com> - 2.3.20-1
+- Upgrade to 2.3.20
+- Resolves: CVE-2021-33515 CVE-2021-29157 CVE-2022-30550 CVE-2020-28200
+- Update patch #6 and #8
+- Remove patch #16 as it is not needed
+- Update files
+- Verified license
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 2.3.13-5
 - Remove epoch
 
@@ -527,7 +531,6 @@ make check
       submission-login and lmtp processes.
 - fixes CVE-2020-7957: Specially crafted mail can crash snippet generation.
 
-
 * Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.3.9.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
 
@@ -592,7 +595,6 @@ make check
 - virtual plugin: Some searches used 100% CPU for many seconds 
 - dsync assert-crashed with acl plugin in some situations. 
 - imapc: Fixed various assert-crashes when reconnecting to server. 
-
 
 * Tue Oct 02 2018 Michal Hlavinka <mhlavink@redhat.com> - 1:2.3.2.1-4
 - fix dovecot-init service syntax error (#1635017)
@@ -864,7 +866,6 @@ make check
 - fts-lucene: Fixed crash on index rescan.
 - dict-ldap: Various fixes
 - dict-sql: NULL values crashed. Now they're treated as "not found".
-
 
 * Wed Apr 27 2016 Michal Hlavinka <mhlavink@redhat.com> - 1:2.2.24-1
 - dovecot updated to 2.2.24
@@ -1339,7 +1340,6 @@ make check
 - imapc: Fixed a crash when message had more than 8 keywords.
 - imapc: Don't crash on APPEND/COPY if server doesn't support UIDPLUS.
 
-
 * Mon Jul 02 2012 Michal Hlavinka <mhlavink@redhat.com> - 1:2.1.7-5
 - make quota work with NFS mounted mailboxes
 
@@ -1431,7 +1431,6 @@ make check
   temporarily, not permanently (avoids hangs with process_limit=1
   services)
 - auth: passdb imap crashed for non-login authentication (e.g. smtp).
-
 
 * Mon Feb 20 2012 Michal Hlavinka <mhlavink@redhat.com> - 1:2.1.0-1
 - updated to 2.1.0 (no major changes since .rc6)
@@ -2398,12 +2397,10 @@ make check
 - MySQL compiling got broken in last release
 - More PostgreSQL reconnection fixing
 
-
 * Mon Jul 26 2004 John Dennis <jdennis@redhat.com> 0.99.10.7-1,FC3,1
 - enable postgres and mySQL in build
 - fix configure to look for mysql in alternate locations
 - nuke configure script in tar file, recreate from configure.in using autoconf
-
 - bring up to latest upstream, which included:
 - Added outlook-pop3-no-nuls workaround to fix Outlook hang in mails with NULs.
 - Config file lines can now contain quoted strings ("value ")
@@ -2411,7 +2408,6 @@ make check
   Dovecot closed the connection. This was supposed to work so that
   if client hasn't read data at all in 30 seconds, it's disconnected.
 - Maildir: LIST now doesn't skip symlinks
-
 
 * Wed Jun 30 2004 John Dennis <jdennis@redhat.com>
 - bump rev for build
