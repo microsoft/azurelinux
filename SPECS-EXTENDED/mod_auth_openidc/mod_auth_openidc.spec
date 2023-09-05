@@ -75,11 +75,7 @@ install -m 700 -d %{buildroot}%{httpd_pkg_cache_dir}/cache
 
 
 %files
-%if 0%{?rhel} && 0%{?rhel} < 7
 %license LICENSE.txt
-%else
-%license LICENSE.txt
-%endif
 %doc ChangeLog
 %doc AUTHORS
 %doc README.md
