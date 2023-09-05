@@ -1,45 +1,37 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        Network Presence Binding Daemon
 Name:           tang
 Version:        14
 Release:        1%{?dist}
-Summary:        Network Presence Binding Daemon
-
 License:        GPL-3.0-or-later
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/latchset/%{name}
 Source0:        https://github.com/latchset/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        tang.sysusers
-
-
-BuildRequires:  gcc
-BuildRequires:  meson
-BuildRequires:  git-core
-BuildRequires:  jose >= 8
-BuildRequires:  libjose-devel >= 8
-BuildRequires:  libjose-zlib-devel >= 8
-BuildRequires:  libjose-openssl-devel >= 8
-
-BuildRequires:  http-parser-devel >= 2.7.1-3
-BuildRequires:  systemd-devel
-BuildRequires:  pkgconfig
-
-BuildRequires:  systemd
-BuildRequires:  curl
-
 BuildRequires:  asciidoc
 BuildRequires:  coreutils
-BuildRequires:  socat
+BuildRequires:  curl
+BuildRequires:  gcc
+BuildRequires:  git-core
 BuildRequires:  grep
-BuildRequires:  sed
+BuildRequires:  http-parser-devel >= 2.7.1-3
 BuildRequires:  iproute
-
-%{?systemd_requires}
+BuildRequires:  jose >= 8
+BuildRequires:  libjose-devel >= 8
+BuildRequires:  libjose-openssl-devel >= 8
+BuildRequires:  libjose-zlib-devel >= 8
+BuildRequires:  meson
+BuildRequires:  pkgconfig
+BuildRequires:  sed
+BuildRequires:  socat
+BuildRequires:  systemd
+BuildRequires:  systemd-devel
 Requires:       coreutils
-Requires:       jose >= 8
 Requires:       grep
+Requires:       jose >= 8
 Requires:       sed
-
 Requires(pre):  shadow-utils
+%{?systemd_requires}
 
 %description
 Tang is a small daemon for binding data to the presence of a third party.
@@ -54,8 +46,8 @@ Tang is a small daemon for binding data to the presence of a third party.
 %install
 %meson_install
 install -p -D -m 0644 %{SOURCE1} %{buildroot}%{_sysusersdir}/tang.conf
-echo "User=%{name}" >> $RPM_BUILD_ROOT/%{_unitdir}/%{name}d@.service
-%{__mkdir_p} $RPM_BUILD_ROOT/%{_localstatedir}/db/%{name}
+echo "User=%{name}" >> %{buildroot}/%{_unitdir}/%{name}d@.service
+mkdir -p %{buildroot}/%{_localstatedir}/db/%{name}
 
 %check
 %meson_test
@@ -63,7 +55,7 @@ echo "User=%{name}" >> $RPM_BUILD_ROOT/%{_unitdir}/%{name}d@.service
 %pre
 getent group %{name} >/dev/null || groupadd -r %{name}
 getent passwd %{name} >/dev/null || \
-    useradd -r -g %{name} -d %{_localstatedir}/cache/%{name} -s /usr/sbin/nologin \
+    useradd -r -g %{name} -d %{_localstatedir}/cache/%{name} -s %{_sbindir}/nologin \
     -c "Tang Network Presence Daemon user" %{name}
 exit 0
 
@@ -93,6 +85,8 @@ exit 0
 %changelog
 * Tue Sep 05 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 14-1
 - Upgrade version to address CVE-2023-1672
+- Lint spec
+- License verified
 
 * Fri Apr 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 7-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
