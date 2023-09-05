@@ -62,6 +62,9 @@ parameters:
     type: string
     default: "$(Build.ArtifactStagingDirectory)"
 
+  - name: pipArtifactFeeds
+    type: string
+
   - name: publishLogs
     type: boolean
     default: true
@@ -210,3 +213,4 @@ steps:
           buildRepoRoot: ${{ parameters.buildRepoRoot }}
           failOnTestFailures: ${{ parameters.failOnTestFailures }}
           outputArtifactsFolder: ${{ parameters.outputArtifactsFolder }}
+          pipArtifactFeeds: ${{ parameters.pipArtifactFeeds }}

@@ -2,10 +2,6 @@
 # Licensed under the MIT License.
 
 parameters:
-  - name: authenticateToPip
-    type: boolean
-    default: true
-
   - name: buildRepoRoot
     type: string
     default: "$(Build.SourcesDirectory)"
@@ -18,6 +14,9 @@ parameters:
     type: string
     default: "$(Build.ArtifactStagingDirectory)"
 
+  - name: pipArtifactFeeds
+    type: string
+
   # Local constants. Can't use variables in a template without jobs or stages.
   - name: reportFileName
     type: string
@@ -28,11 +27,11 @@ parameters:
     default: "$(Agent.TempDirectory)"
 
 steps:
-  - ${{ if parameters.authenticateToPip }}:
+  - ${{ if parameters.pipArtifactFeeds }}:
       - task: PipAuthenticate@1
         inputs:
-          artifactFeeds: "mariner/Mariner-Pypi-Feed"
-        displayName: "Authenticate to pip"
+          artifactFeeds: "${{ parameters.pipArtifactFeeds }}"
+        displayName: "Authenticate to custom pip artifact feeds"
 
   - bash: |
       pip3 install junit_xml
