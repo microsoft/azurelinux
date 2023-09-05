@@ -30507,8 +30507,8 @@
         "type": "other",
         "other": {
           "name": "xterm",
-          "version": "372",
-          "downloadUrl": "http://ftp.invisible-island.net/archives/xterm/xterm-372.tgz"
+          "version": "380",
+          "downloadUrl": "https://github.com/ThomasDickey/xterm-snapshots/archive/refs/tags/xterm-380.tar.gz"
         }
       }
     },
