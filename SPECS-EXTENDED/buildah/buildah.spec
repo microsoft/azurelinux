@@ -123,10 +123,13 @@ cp imgtype %{buildroot}/%{_bindir}/%{name}-imgtype
 %{_datadir}/%{name}/test
 
 %changelog
+* Tue Sep 05 2023 Brian Fjeldstad <bfjelds@microsoft.com> - 1.18.0-17
+- Address CVE-2022-2990
+
 * Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.18.0-16
 - Bump release to rebuild with go 1.19.12
 
-* Wed Jul 14 2023 Andrew Phelps <anphel@microsoft.com> - 1.18.0-15
+* Fri Jul 14 2023 Andrew Phelps <anphel@microsoft.com> - 1.18.0-15
 - Bump release to rebuild against glibc 2.35-4
 
 * Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.18.0-14
