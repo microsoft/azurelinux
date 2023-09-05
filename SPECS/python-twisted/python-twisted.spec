@@ -12,22 +12,20 @@ Source0:        https://github.com/twisted/twisted/archive/twisted-%{version}.ta
 # Disabling UDP multicast test, which failes in container environments.
 # For more details, see: https://twistedmatrix.com/trac/ticket/7494
 Patch0:         disable_multicast_test.patch
-
 BuildRequires:  python3-devel
 BuildRequires:  python3-incremental
 BuildRequires:  python3-pyOpenSSL
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 BuildRequires:  python3-zope-interface
+AutoReqProv:    no
 %if %{with_check}
-BuildRequires:  python3-pip
+BuildRequires:  git
 BuildRequires:  net-tools
+BuildRequires:  python3-pip
 BuildRequires:  sudo
 BuildRequires:  tzdata
-BuildRequires:  git
 %endif
-
-AutoReqProv:    no
 
 %description
 An asynchronous networking framework written in Python
