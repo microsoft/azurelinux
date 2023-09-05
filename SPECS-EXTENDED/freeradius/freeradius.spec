@@ -869,6 +869,7 @@ EOF
 - Update Patch2 & Patch4
 - Add Patch6 to address build error
 - Add Source105 for user management during installation
+- License verified
 
 * Fri Apr 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.21-9
 - Making binaries paths compatible with CBL-Mariner's paths.
