@@ -68,6 +68,7 @@ ln -sf hping3 %{buildroot}%{_sbindir}/hping2
 %changelog
 * Mon Sep 04 2023 Ameet Porwal <ameetporwal@microsoft.com> - 0.0.20051105-41
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
+- License verified
 
 * Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.0.20051105-40
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
