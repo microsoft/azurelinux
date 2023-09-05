@@ -1,7 +1,6 @@
 {
  "Signatures": {
-  "fetchmail-6.4.8.tar.xz": "26cd936ece146e056cdf79a676a33738b4eab0a5ae2edf3fce5ba034721b09bd",
-  "fetchmail-6.4.8.tar.xz.asc": "6cec3103a56ee680f0c63458e48f765980274a32aeb5ab1460ca4271a4bc3f9b",
+  "fetchmail-6.4.22.tar.xz": "cc6818bd59435602169fa292d6d163d56b21c7f53112829470a3aceabe612c84",
   "fetchmail.service": "4af07f619128c721a3d54b484b85f99ce80f95551c4a40e877e2397f7a5c3431",
   "fetchmailrc.example": "6736c2f3ea47899f138ff191e9f8e9c1a2c21262d98327d42262e1ce17dd9d15"
  }
