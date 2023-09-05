@@ -2,8 +2,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Summary: High-performance and highly configurable free RADIUS server
 Name: freeradius
-Version: 3.0.21
-Release: 9%{?dist}
+Version: 3.2.3
+Release: 1%{?dist}
 License: GPLv2+ and LGPLv2+
 URL: http://www.freeradius.org/
 
@@ -17,12 +17,14 @@ Source100: radiusd.service
 Source102: freeradius-logrotate
 Source103: freeradius-pam-conf
 Source104: freeradius-tmpfiles.conf
+Source105: freeradius.sysusers
 
 Patch1: freeradius-Adjust-configuration-to-fit-Red-Hat-specifics.patch
 Patch2: freeradius-Use-system-crypto-policy-by-default.patch
 Patch3: freeradius-bootstrap-create-only.patch
 Patch4: freeradius-no-buildtime-cert-gen.patch
 Patch5: freeradius-bootstrap-make-permissions.patch
+Patch6: fix-error-for-expansion-of-macro-in-thread.h.patch
 
 %global docdir %{?_pkgdocdir}%{!?_pkgdocdir:%{_docdir}/%{name}-%{version}}
 
@@ -186,8 +188,9 @@ This plugin provides the REST support for the FreeRADIUS server project.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
-%patch4 -p1
+%patch4 -p1 -F 2
 %patch5 -p1
+%patch6 -p1
 
 %build
 # Force compile/link options, extra security for network facing daemon
@@ -254,6 +257,7 @@ mkdir -p %{buildroot}%{_localstatedir}/run/
 install -d -m 0710 %{buildroot}%{_localstatedir}/run/radiusd/
 install -d -m 0700 %{buildroot}%{_localstatedir}/run/radiusd/tmp
 install -m 0644 %{SOURCE104} %{buildroot}%{_tmpfilesdir}/radiusd.conf
+install -p -D -m 0644 %{SOURCE105} %{buildroot}%{_sysusersdir}/freeradius.conf
 
 # install SNMP MIB files
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/snmp/mibs/
@@ -328,20 +332,13 @@ EOF
 
 # Make sure our user/group is present prior to any package or subpackage installation
 %pre
-getent group  radiusd >/dev/null || /usr/sbin/groupadd -r -g 95 radiusd > /dev/null 2>&1
-getent passwd radiusd >/dev/null || /usr/sbin/useradd  -r -g radiusd -u 95 -c "radiusd user" -d %{_localstatedir}/lib/radiusd -s /usr/sbin/nologin radiusd > /dev/null 2>&1
-exit 0
+%sysusers_create_compat %{SOURCE105}
 
 %preun
 %systemd_preun radiusd.service
 
 %postun
 %systemd_postun_with_restart radiusd.service
-if [ $1 -eq 0 ]; then           # uninstall
-  getent passwd radiusd >/dev/null && /usr/sbin/userdel  radiusd > /dev/null 2>&1
-  getent group  radiusd >/dev/null && /usr/sbin/groupdel radiusd > /dev/null 2>&1
-fi
-exit 0
 
 /bin/systemctl try-restart radiusd.service >/dev/null 2>&1 || :
 
@@ -359,6 +356,7 @@ exit 0
 %config(noreplace) %{_sysconfdir}/logrotate.d/radiusd
 %{_unitdir}/radiusd.service
 %{_tmpfilesdir}/radiusd.conf
+%{_sysusersdir}/freeradius.conf
 %dir %attr(710,radiusd,radiusd) %{_localstatedir}/run/radiusd
 %dir %attr(700,radiusd,radiusd) %{_localstatedir}/run/radiusd/tmp
 %dir %attr(755,radiusd,radiusd) %{_localstatedir}/lib/radiusd
@@ -391,7 +389,7 @@ exit 0
 %dir %attr(770,root,radiusd) /etc/raddb/certs
 %config(noreplace) /etc/raddb/certs/Makefile
 %config(noreplace) /etc/raddb/certs/passwords.mk
-/etc/raddb/certs/README
+/etc/raddb/certs/README.md
 %config(noreplace) /etc/raddb/certs/xpextensions
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/certs/*.cnf
 %attr(750,root,radiusd) /etc/raddb/certs/bootstrap
@@ -405,6 +403,7 @@ exit 0
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/files/*
 %dir %attr(750,root,radiusd) /etc/raddb/mods-config/preprocess
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/preprocess/*
+%attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/realm/freeradius-naptr-to-home-server.sh
 
 %dir %attr(750,root,radiusd) /etc/raddb/mods-config/sql
 %dir %attr(750,root,radiusd) /etc/raddb/mods-config/sql/counter
@@ -416,6 +415,8 @@ exit 0
 # sites-available
 %dir %attr(750,root,radiusd) /etc/raddb/sites-available
 /etc/raddb/sites-available/README
+%attr(640,root,radiusd) %config(noreplace) /etc/raddb/sites-available/aws-nlb
+%attr(640,root,radiusd) %config(noreplace) /etc/raddb/sites-available/resource-check
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/sites-available/control-socket
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/sites-available/decoupled-accounting
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/sites-available/robust-proxy-accounting
@@ -437,8 +438,11 @@ exit 0
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/sites-available/copy-acct-to-home-server
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/sites-available/buffered-sql
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/sites-available/tls
+%attr(640,root,radiusd) %config(noreplace) /etc/raddb/sites-available/totp
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/sites-available/channel_bindings
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/sites-available/challenge
+%attr(640,root,radiusd) %config(noreplace) /etc/raddb/sites-available/google-ldap-auth
+%attr(640,root,radiusd) %config(noreplace) /etc/raddb/sites-available/tls-cache
 
 # sites-enabled
 # symlink: /etc/raddb/sites-enabled/xxx -> ../sites-available/xxx
@@ -452,7 +456,7 @@ exit 0
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/always
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/attr_filter
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/cache
-%attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/cache_eap
+%attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/cache_auth
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/chap
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/counter
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/cui
@@ -461,6 +465,9 @@ exit 0
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/detail.example.com
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/detail.log
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/dhcp
+%attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/dhcp_files
+%attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/dhcp_passwd
+%attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/dhcp_sql
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/dhcp_sqlippool
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/digest
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/dynamic_clients
@@ -474,6 +481,8 @@ exit 0
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/idn
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/inner-eap
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/ippool
+%attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/json
+%attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/ldap_google
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/linelog
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/logintime
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/mac2ip
@@ -481,7 +490,6 @@ exit 0
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/mschap
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/ntlm_auth
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/opendirectory
-%attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/otp
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/pam
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/pap
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/passwd
@@ -498,9 +506,11 @@ exit 0
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/soh
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/sometimes
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/sql
+%attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/sql_map
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/sqlcounter
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/sqlippool
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/sradutmp
+%attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/totp
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/unix
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/unpack
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/utf8
@@ -512,7 +522,6 @@ exit 0
 %dir %attr(750,root,radiusd) /etc/raddb/mods-enabled
 %config(missingok) /etc/raddb/mods-enabled/always
 %config(missingok) /etc/raddb/mods-enabled/attr_filter
-%config(missingok) /etc/raddb/mods-enabled/cache_eap
 %config(missingok) /etc/raddb/mods-enabled/chap
 %config(missingok) /etc/raddb/mods-enabled/date
 %config(missingok) /etc/raddb/mods-enabled/detail
@@ -537,6 +546,7 @@ exit 0
 %config(missingok) /etc/raddb/mods-enabled/replicate
 %config(missingok) /etc/raddb/mods-enabled/soh
 %config(missingok) /etc/raddb/mods-enabled/sradutmp
+%config(missingok) /etc/raddb/mods-enabled/totp
 %config(missingok) /etc/raddb/mods-enabled/unix
 %config(missingok) /etc/raddb/mods-enabled/unpack
 %config(missingok) /etc/raddb/mods-enabled/utf8
@@ -585,7 +595,6 @@ exit 0
 %{_libdir}/freeradius/rlm_cache_rbtree.so
 %{_libdir}/freeradius/rlm_chap.so
 %{_libdir}/freeradius/rlm_counter.so
-%{_libdir}/freeradius/rlm_cram.so
 %{_libdir}/freeradius/rlm_date.so
 %{_libdir}/freeradius/rlm_detail.so
 %{_libdir}/freeradius/rlm_dhcp.so
@@ -594,7 +603,6 @@ exit 0
 %{_libdir}/freeradius/rlm_eap.so
 %{_libdir}/freeradius/rlm_eap_fast.so
 %{_libdir}/freeradius/rlm_eap_gtc.so
-%{_libdir}/freeradius/rlm_eap_leap.so
 %{_libdir}/freeradius/rlm_eap_md5.so
 %{_libdir}/freeradius/rlm_eap_mschapv2.so
 %{_libdir}/freeradius/rlm_eap_peap.so
@@ -609,10 +617,10 @@ exit 0
 %{_libdir}/freeradius/rlm_expr.so
 %{_libdir}/freeradius/rlm_files.so
 %{_libdir}/freeradius/rlm_ippool.so
+%{_libdir}/freeradius/rlm_json.so
 %{_libdir}/freeradius/rlm_linelog.so
 %{_libdir}/freeradius/rlm_logintime.so
 %{_libdir}/freeradius/rlm_mschap.so
-%{_libdir}/freeradius/rlm_otp.so
 %{_libdir}/freeradius/rlm_pam.so
 %{_libdir}/freeradius/rlm_pap.so
 %{_libdir}/freeradius/rlm_passwd.so
@@ -625,7 +633,9 @@ exit 0
 %{_libdir}/freeradius/rlm_sql.so
 %{_libdir}/freeradius/rlm_sqlcounter.so
 %{_libdir}/freeradius/rlm_sqlippool.so
+%{_libdir}/freeradius/rlm_sql_map.so
 %{_libdir}/freeradius/rlm_sql_null.so
+%{_libdir}/freeradius/rlm_totp.so
 %{_libdir}/freeradius/rlm_unix.so
 %{_libdir}/freeradius/rlm_unpack.so
 %{_libdir}/freeradius/rlm_utf8.so
@@ -651,6 +661,7 @@ exit 0
 %doc %{_mandir}/man5/rlm_passwd.5.gz
 %doc %{_mandir}/man5/rlm_realm.5.gz
 %doc %{_mandir}/man5/rlm_sql.5.gz
+%doc %{_mandir}/man5/rlm_unbound.5.gz
 %doc %{_mandir}/man5/rlm_unix.5.gz
 %doc %{_mandir}/man5/unlang.5.gz
 %doc %{_mandir}/man5/users.5.gz
@@ -658,6 +669,7 @@ exit 0
 %doc %{_mandir}/man8/radiusd.8.gz
 %doc %{_mandir}/man8/radmin.8.gz
 %doc %{_mandir}/man8/radrelay.8.gz
+%doc %{_mandir}/man8/rlm_sqlippool_tool.8.gz
 
 # MIB files
 %{_datadir}/snmp/mibs/*RADIUS*.mib
@@ -711,6 +723,7 @@ exit 0
 %dir %attr(750,root,radiusd) /etc/raddb/mods-config/sql/counter/mysql
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/sql/counter/mysql/dailycounter.conf
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/sql/counter/mysql/expire_on_login.conf
+%attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/sql/counter/mysql/weeklycounter.conf
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/sql/counter/mysql/monthlycounter.conf
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/sql/counter/mysql/noresetcounter.conf
 
@@ -718,14 +731,49 @@ exit 0
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/sql/cui/mysql/queries.conf
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/sql/cui/mysql/schema.sql
 
+%dir %attr(750,root,radiusd) /etc/raddb/mods-config/sql/dhcp/mssql
+%attr(640,root,radiusd) /etc/raddb/mods-config/sql/dhcp/mssql/queries.conf
+%attr(640,root,radiusd) /etc/raddb/mods-config/sql/dhcp/mssql/schema.sql
+
+%dir %attr(750,root,radiusd) /etc/raddb/mods-config/sql/dhcp/mysql
+%attr(640,root,radiusd) /etc/raddb/mods-config/sql/dhcp/mysql/queries.conf
+%attr(640,root,radiusd) /etc/raddb/mods-config/sql/dhcp/mysql/schema.sql
+%attr(640,root,radiusd) /etc/raddb/mods-config/sql/dhcp/mysql/setup.sql
+
+%dir %attr(750,root,radiusd) /etc/raddb/mods-config/sql/dhcp/oracle
+%attr(640,root,radiusd) /etc/raddb/mods-config/sql/dhcp/oracle/queries.conf
+%attr(640,root,radiusd) /etc/raddb/mods-config/sql/dhcp/oracle/schema.sql
+
+%dir %attr(750,root,radiusd) /etc/raddb/mods-config/sql/dhcp/postgresql
+%attr(640,root,radiusd) /etc/raddb/mods-config/sql/dhcp/postgresql/queries.conf
+%attr(640,root,radiusd) /etc/raddb/mods-config/sql/dhcp/postgresql/schema.sql
+%attr(640,root,radiusd) /etc/raddb/mods-config/sql/dhcp/postgresql/setup.sql
+
+%dir %attr(750,root,radiusd) /etc/raddb/mods-config/sql/dhcp/sqlite
+%attr(640,root,radiusd) /etc/raddb/mods-config/sql/dhcp/sqlite/queries.conf
+%attr(640,root,radiusd) /etc/raddb/mods-config/sql/dhcp/sqlite/schema.sql
+
 %dir %attr(750,root,radiusd) /etc/raddb/mods-config/sql/ippool/mysql
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/sql/ippool/mysql/queries.conf
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/sql/ippool/mysql/schema.sql
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/sql/ippool/mysql/procedure.sql
+%attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/sql/ippool/mysql/procedure-no-skip-locked.sql
 
 %dir %attr(750,root,radiusd) /etc/raddb/mods-config/sql/ippool-dhcp/mysql
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/sql/ippool-dhcp/mysql/queries.conf
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/sql/ippool-dhcp/mysql/schema.sql
+%attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/sql/ippool-dhcp/mysql/procedure.sql
+%attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/sql/ippool-dhcp/mysql/procedure-no-skip-locked.sql
+
+%dir %attr(750,root,radiusd) /etc/raddb/mods-config/sql/ippool-dhcp/mssql
+%attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/sql/ippool-dhcp/mssql/procedure.sql
+%attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/sql/ippool-dhcp/mssql/queries.conf
+%attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/sql/ippool-dhcp/mssql/schema.sql
+
+%dir %attr(750,root,radiusd) /etc/raddb/mods-config/sql/ippool-dhcp/postgresql
+%attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/sql/ippool-dhcp/postgresql/procedure.sql
+%attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/sql/ippool-dhcp/postgresql/queries.conf
+%attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/sql/ippool-dhcp/postgresql/schema.sql
 
 %dir %attr(750,root,radiusd) /etc/raddb/mods-config/sql/main/mysql
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/sql/main/mysql/setup.sql
@@ -749,6 +797,7 @@ exit 0
 %dir %attr(750,root,radiusd) /etc/raddb/mods-config/sql/counter/postgresql
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/sql/counter/postgresql/dailycounter.conf
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/sql/counter/postgresql/expire_on_login.conf
+%attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/sql/counter/postgresql/weeklycounter.conf
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/sql/counter/postgresql/monthlycounter.conf
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/sql/counter/postgresql/noresetcounter.conf
 
@@ -777,6 +826,7 @@ exit 0
 %dir %attr(750,root,radiusd) /etc/raddb/mods-config/sql/counter/sqlite
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/sql/counter/sqlite/dailycounter.conf
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/sql/counter/sqlite/expire_on_login.conf
+%attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/sql/counter/sqlite/weeklycounter.conf
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/sql/counter/sqlite/monthlycounter.conf
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/sql/counter/sqlite/noresetcounter.conf
 
@@ -795,8 +845,9 @@ exit 0
 %dir %attr(750,root,radiusd) /etc/raddb/mods-config/sql/main/sqlite
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/sql/main/sqlite/queries.conf
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/sql/main/sqlite/schema.sql
-%attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/sql/main/sqlite/process-radacct-refresh.sh
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/sql/main/sqlite/process-radacct-schema.sql
+%attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/sql/main/sqlite/process-radacct-close-after-reload.pl
+%attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/sql/main/sqlite/process-radacct-new-data-usage-period.sh
 
 %{_libdir}/freeradius/rlm_sql_sqlite.so
 
@@ -812,6 +863,13 @@ exit 0
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/rest
 
 %changelog
+* Tue Sep 05 2023 Archana Choudhary <archana1@microsoft.com> - 3.2.3-1
+- Upgrade to 3.2.3 
+- Address CVE-2022-41860, CVE-2022-41861, CVE-2002-0318, CVE-2011-4966
+- Update Patch2 & Patch4
+- Add Patch6 to address build error
+- Add Source105 for user management during installation
+
 * Fri Apr 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.21-9
 - Making binaries paths compatible with CBL-Mariner's paths.
 
