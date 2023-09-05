@@ -27,6 +27,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://%{name}.io
 Source:         %{download_url}#/%{name}-%{version}.tar.gz
+Patch0:         CVE-2022-2990.patch
 BuildRequires:  btrfs-progs-devel
 BuildRequires:  device-mapper-devel
 BuildRequires:  git
@@ -73,7 +74,7 @@ Requires:       podman
 This package contains system tests for %{name}
 
 %prep
-%autosetup -Sgit -n %{name}-%{built_tag_strip}
+%autosetup -Sgit -n %{name}-%{built_tag_strip} -p1
 sed -i 's/GOMD2MAN =/GOMD2MAN ?=/' docs/Makefile
 sed -i '/docs install/d' Makefile
 
