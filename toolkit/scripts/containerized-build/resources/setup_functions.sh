@@ -86,15 +86,19 @@ enable_local_repo() {
     IS_REPO_ENABLED=true
     tdnf install -y createrepo
     mv /etc/yum.repos.d/local_repo.disabled_repo /etc/yum.repos.d/local_repo.repo
-    pushd /repo
-    createrepo .
-    popd
-    mkdir -p $RPMS_DIR
-    pushd $RPMS_DIR
-    createrepo .
-    popd
-    echo "-------- the local repo is enabled ---------"
-    echo "--- Package dependencies will be installed from $RPMS_DIR, /repo and upstream server ---"
+    url_list=""
+    baseurls=$(cat /etc/yum.repos.d/local_repo.repo | grep baseurl | cut -d '=' -f 2)
+    for url in $baseurls
+    do
+        url="${url#*file://}" #remove 'file://' prefix
+        mkdir -p $url
+        pushd $url
+        createrepo .
+        popd
+        url_list+=" $url"
+    done
+    echo "-------- The local repo is enabled ---------"
+    echo "--- Package dependencies will be installed from $url_list and upstream server ---"
     #echo "You can install the following packages from it:"
     #tdnf repoquery --repoid=local_build_repo 2>/dev/null
 }
