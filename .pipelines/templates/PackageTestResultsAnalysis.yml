@@ -42,6 +42,7 @@ steps:
       pythonInterpreter: "/bin/python3"
       scriptSource: "inline"
       script: |
+        from platform import machine
         import argparse
         import inspect
         import re
@@ -253,7 +254,7 @@ steps:
 
         logs_dir_path = "${{ parameters.buildRepoRoot }}/build/logs/pkggen/rpmbuilding"
         report_path = "${{ parameters.testsWorkspace }}/${{ parameters.reportFileName }}"
-        test_suit_name = "Package-Test"
+        test_suit_name = f"[{machine()}] Package test"
 
         logger = ADOPipelineLogger()
         logger.log(f"Analyzing tests results inside '{logs_dir_path}'.")
