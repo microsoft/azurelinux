@@ -28377,8 +28377,8 @@
         "type": "other",
         "other": {
           "name": "tang",
-          "version": "7",
-          "downloadUrl": "https://github.com/latchset/tang/releases/download/v7/tang-7.tar.bz2"
+          "version": "14",
+          "downloadUrl": "https://github.com/latchset/tang/archive/refs/tags/v14.tar.gz"
         }
       }
     },
