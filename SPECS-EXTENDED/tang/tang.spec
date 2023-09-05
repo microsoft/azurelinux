@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           tang
 Version:        14
-Release:        0%{?dist}
+Release:        1%{?dist}
 Summary:        Network Presence Binding Daemon
 
 License:        GPL-3.0-or-later
@@ -91,6 +91,9 @@ exit 0
 %{_sysusersdir}/tang.conf
 
 %changelog
+* Tue Sep 05 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 14-1
+- Upgrade version to address CVE-2023-1672
+
 * Fri Apr 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 7-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Making binaries paths compatible with CBL-Mariner's paths.
