@@ -284,7 +284,7 @@ func testSRPMFile(agent buildagents.BuildAgent, checkAttempts int, srpmFile stri
 
 		_, logFile, buildErr = agent.BuildPackage(srpmFile, logBaseName, outArch, runCheck, dependencies)
 		if buildErr != nil {
-			logger.Log.Warnf("Test build for '%s' failed on a non-test build issue. Error: %s", srpmFile, err)
+			logger.Log.Warnf("Test build for '%s' failed on a non-test build issue. Error: %s", srpmFile, buildErr)
 			return
 		}
 
