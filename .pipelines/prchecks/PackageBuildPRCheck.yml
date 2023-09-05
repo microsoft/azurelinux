@@ -94,6 +94,7 @@ extends:
                       isCheckBuild: true
                       isQuickRebuildPackages: true
                       outputArtifactsFolder: $(ob_outputDirectory)
+                      pipArtifactFeeds: "mariner/Mariner-Pypi-Feed"
                       selfRepoName: self
 
                   - task: PublishPipelineArtifact@1
