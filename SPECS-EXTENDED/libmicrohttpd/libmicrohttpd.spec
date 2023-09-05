@@ -113,6 +113,7 @@ fi
 * Thu Sep 05 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 0.9.76-1
 - Upgrade to 0.9.76 to address CVE-2023-27371
 - Lint spec
+- License verified
 
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 0.9.71-3
 - Remove epoch
