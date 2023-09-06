@@ -5,8 +5,8 @@ Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            http://www.wavpack.com/
-Source:         http://www.wavpack.com/%{name}-%{version}.tar.bz2
+URL:            https://www.wavpack.com/
+Source:         https://www.wavpack.com/%{name}-%{version}.tar.bz2
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libtool
