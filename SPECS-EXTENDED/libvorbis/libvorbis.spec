@@ -4,8 +4,8 @@ Distribution:   Mariner
 
 Summary:	The Vorbis General Audio Compression Codec
 Name:		libvorbis
-Version:	1.3.6
-Release:	8%{?dist}
+Version:	1.3.7
+Release:	1%{?dist}
 License:	BSD
 URL:		https://www.xiph.org/
 Source:		https://downloads.xiph.org/releases/vorbis/%{name}-%{version}.tar.xz
@@ -92,6 +92,9 @@ make check
 %ldconfig_scriptlets
 
 %changelog
+* Wed Sep 06 2023 Archana Choudhary <archana1@microsoft.com> - 1.3.7-1
+- Auto-upgrade to 1.3.7 - CVE-2018-10392 CVE-2018-10393
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 1.3.6-8
 - Remove epoch
 
