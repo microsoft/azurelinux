@@ -3538,8 +3538,8 @@
         "type": "other",
         "other": {
           "name": "fapolicyd",
-          "version": "1.0.2",
-          "downloadUrl": "https://people.redhat.com/sgrubb/fapolicyd/fapolicyd-1.0.2.tar.gz"
+          "version": "1.3.2",
+          "downloadUrl": "https://people.redhat.com/sgrubb/fapolicyd/fapolicyd-1.3.2.tar.gz"
         }
       }
     },
