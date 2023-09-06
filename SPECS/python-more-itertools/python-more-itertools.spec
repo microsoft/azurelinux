@@ -1,3 +1,8 @@
+%global _description %{expand:
+Python's itertools library is a gem - you can compose elegant solutions for
+a variety of problems with the functions it provides. In more-itertools we
+collect additional building blocks, recipes, and routines for working with
+Python iterables.}
 Summary:        More routines for operating on Python iterables, beyond itertools
 Name:           python-more-itertools
 Version:        8.13.0
@@ -7,11 +12,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/erikrose/more-itertools
 Source0:        %{pypi_source more-itertools}
-%global _description %{expand:
-Python's itertools library is a gem - you can compose elegant solutions for
-a variety of problems with the functions it provides. In more-itertools we
-collect additional building blocks, recipes, and routines for working with
-Python iterables.}
 BuildRequires:  python3-devel
 BuildRequires:  python3-flit-core
 BuildRequires:  python3-pip
