@@ -4,8 +4,8 @@ Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
-Version:        16.20.1
-Release:        2%{?dist}
+Version:        16.20.2
+Release:        1%{?dist}
 License:        BSD AND MIT AND Public Domain AND NAIST-2003 AND Artistic-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -114,6 +114,9 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
+* Wed Sep 06 2023 Brian Fjeldstad <bfjelds@microsoft.com> - 16.20.2-1
+- Patch CVE-2023-32002 CVE-2023-32006 CVE-2023-32559
+
 * Wed Jul 12 2023 Olivia Crain <oliviacrain@microsoft.com> - 16.20.1-2
 - Backport upstream patches to fix CVE-2022-25883
 

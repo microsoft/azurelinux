@@ -5,8 +5,8 @@ Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs18
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
-Version:        18.16.0
-Release:        3%{?dist}
+Version:        18.17.1
+Release:        1%{?dist}
 License:        BSD and MIT and Public Domain and NAIST-2003 and Artistic-2.0
 Group:          Applications/System
 Vendor:         Microsoft Corporation
@@ -117,6 +117,9 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
+* Wed Sep 06 2023 Brian Fjeldstad <bfjelds@microsoft.com> - 18.17.1-1
+- Patch CVE-2023-32002 CVE-2023-32006 CVE-2023-32559
+
 * Tue Jul 11 2023 Muhammad Falak <mwani@microsoft.com> - 18.16.0-3
 - Patch CVE-2022-25883
 
