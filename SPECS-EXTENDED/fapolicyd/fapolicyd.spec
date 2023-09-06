@@ -228,6 +228,7 @@ fi
 %changelog
 * Wed Sep 06 2023 Archana Choudhary <archana1@microsoft.com> - 1.3.2-1
 - Upgrade to 1.3.2 - CVE-2022-1117
+- License verified
 
 * Thu Aug 12 2021 Thomas Crain <thcrain@microsoft.com> - 1.0.2-3
 - Disable selinux subpackage build
