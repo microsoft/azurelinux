@@ -2,8 +2,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:		wavpack
 Summary:	A completely open audiocodec
-Version:	5.4.0
-Release:	2%{?dist}
+Version:	5.6.0
+Release:	1%{?dist}
 License:	BSD
 Url:		http://www.wavpack.com/
 Source:		http://www.wavpack.com/%{name}-%{version}.tar.bz2
@@ -68,6 +68,9 @@ rm -f %{buildroot}/%{_libdir}/*.la
 %doc ChangeLog doc/WavPack5PortingGuide.pdf doc/WavPack5LibraryDoc.pdf doc/WavPack5FileFormat.pdf
 
 %changelog
+* Wed Sep 06 2023 Archana Choudhary <archana1@microsoft.com> - 5.6.0-1
+- Auto-upgrade to 5.6.0 - CVE-2021-44269 CVE-2022-2476
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.4.0-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 
