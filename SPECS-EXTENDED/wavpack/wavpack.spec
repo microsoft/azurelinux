@@ -1,17 +1,17 @@
+Summary:        A completely open audiocodec
+Name:           wavpack
+Version:        5.6.0
+Release:        1%{?dist}
+License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Name:		wavpack
-Summary:	A completely open audiocodec
-Version:	5.6.0
-Release:	1%{?dist}
-License:	BSD
-Url:		http://www.wavpack.com/
-Source:		http://www.wavpack.com/%{name}-%{version}.tar.bz2
-# For autoreconf
-BuildRequires: make
+URL:            http://www.wavpack.com/
+Source:         http://www.wavpack.com/%{name}-%{version}.tar.bz2
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libtool
+# For autoreconf
+BuildRequires:  make
 
 %description
 WavPack is a completely open audio compression format providing lossless,
@@ -21,9 +21,9 @@ version 4 format has been designed from the ground up to offer unparalleled
 performance and functionality.
 
 %package devel
-Summary:	WavPack - development files
-Requires:	%{name}%{?_isa} = %{version}-%{release}
-Requires:	pkgconfig
+Summary:        WavPack - development files
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       pkgconfig
 
 %description devel
 Files needed for developing apps using wavpack
@@ -62,7 +62,7 @@ rm -rf %{buildroot}/%{_docdir}/
 %{_mandir}/man1/wvtag.1*
 %doc AUTHORS doc/wavpack_doc.html doc/style.css
 %license COPYING
- 
+
 %files devel
 %{_includedir}/*
 %{_libdir}/pkgconfig/*
@@ -245,4 +245,3 @@ rm -rf %{buildroot}/%{_docdir}/
 * Sun Nov 13 2005 Peter Lemenkov <lemenkov@newmail.ru> 4.3-1
 - Initial build for FC-Extras
 - Version 4.3
-
