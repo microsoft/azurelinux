@@ -3,7 +3,7 @@
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
 Version:        3.5.5
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -46,6 +46,7 @@ Source1:        etcd.service
 Source2:        %{name}-%{version}-vendor.tar.gz
 Patch0:         CVE-2021-28235.patch
 Patch1:         CVE-2023-32082.patch
+Patch2:         CVE-2022-34038.patch
 BuildRequires:  golang >= 1.16
 
 %description
@@ -147,6 +148,9 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 /%{_docdir}/%{name}-%{version}-tools/*
 
 %changelog
+* Wed Sep 6 2023 Betty Lakes <bettylakes@microsoft.com> - 3.5.5-11
+- Patch for CVE-2023-34038
+
 * Wed Aug 23 2023 Rachel Menge <rachelmenge@microsoft.com> - 3.5.5-10
 - Patch CVE-2023-32082
 - Update patch fuzz to 2 for backporting patch
