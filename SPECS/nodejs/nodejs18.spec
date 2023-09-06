@@ -18,7 +18,7 @@ URL:            https://github.com/nodejs/node
 Source0:        https://nodejs.org/download/release/v%{version}/node-v%{version}.tar.xz
 Patch0:         disable-tlsv1-tlsv1-1.patch
 Patch1:         CVE-2022-25883-v18.patch
-Patch2:         CVE-2023-35945.patch
+Patch2:         CVE-2023-35945-v18.patch
 
 BuildRequires:  brotli-devel
 BuildRequires:  coreutils >= 8.22
