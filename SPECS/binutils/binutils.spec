@@ -17,17 +17,15 @@ Patch3:          CVE-2021-45078.patch
 Patch4:          CVE-2022-38533.patch
 Patch5:          CVE-2022-4285.patch
 Patch6:          CVE-2021-46174.patch
-Patch7:          CVE-2022-45703.patch
-Patch8:          CVE-2022-47007.patch
-Patch9:          CVE-2022-47008.patch
-Patch10:         CVE-2022-47010.patch
-Patch11:         CVE-2022-47011.patch
-Patch12:         CVE-2022-47673.patch
-Patch13:         CVE-2022-47695.patch
-Patch14:         CVE-2022-47696.patch
-Patch15:         CVE-2022-48063.patch
-Patch16:         CVE-2022-48064.patch
-Patch17:         CVE-2022-48065.patch
+Patch7:          CVE-2022-47007.patch
+Patch8:          CVE-2022-47008.patch
+Patch9:          CVE-2022-47010.patch
+Patch10:         CVE-2022-47011.patch
+Patch11:         CVE-2022-47695.patch
+Patch12:         CVE-2022-47696.patch
+Patch13:         CVE-2022-48063.patch
+Patch14:         CVE-2022-48064.patch
+Patch15:         CVE-2022-48065.patch
 
 Provides:       bundled(libiberty)
 %description
@@ -143,8 +141,8 @@ sed -i 's/testsuite/ /g' gold/Makefile
 %{_libdir}/libopcodes.so
 
 %changelog
-* Wed Sep 05 2023 Sindhu Karri <lakarri@microsoft.com> - 2.37-6
-- Backport upstream patches to fix CVE-2021-46174,CVE-2022-45703,CVE-2022-47007,CVE-2022-47008,CVE-2022-47010,CVE-2022-47011,CVE-2022-47673,CVE-2022-47695,CVE-2022-47696,CVE-2022-48063,CVE-2022-48064,CVE-2022-48065
+* Tue Sep 05 2023 Sindhu Karri <lakarri@microsoft.com> - 2.37-6
+- Backport upstream patches to fix CVE-2021-46174, CVE-2022-47007, CVE-2022-47008, CVE-2022-47010, CVE-2022-47011, CVE-2022-47695, CVE-2022-47696, CVE-2022-48063, CVE-2022-48064, CVE-2022-48065
 
 * Wed Feb 08 2023 Rachel Menge <rachelmenge@microsoft.com> - 2.37-5
 - Backport upstream patch to fix CVE-2022-4285
