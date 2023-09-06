@@ -29,7 +29,7 @@ resources:
       ref: refs/heads/main
 
 variables:
-  - group: "Agent pools"
+  - group: "Agent pools (DEV)"
   - name: rpmsArtifactNameBase
     value: RPMs
   - name: toolchainArtifactNameBase
