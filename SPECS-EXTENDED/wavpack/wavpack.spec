@@ -48,6 +48,8 @@ make %{?_smp_mflags}
 %install
 %make_install
 rm -f %{buildroot}/%{_libdir}/*.la
+# Documentation installed through the %doc macro
+rm -rf %{buildroot}/%{_docdir}/
 
 %ldconfig_scriptlets
 
@@ -58,9 +60,9 @@ rm -f %{buildroot}/%{_libdir}/*.la
 %{_mandir}/man1/wvgain.1*
 %{_mandir}/man1/wvunpack.1*
 %{_mandir}/man1/wvtag.1*
-%doc AUTHORS doc/wavpack_doc.html
+%doc AUTHORS doc/wavpack_doc.html doc/style.css
 %license COPYING
-
+ 
 %files devel
 %{_includedir}/*
 %{_libdir}/pkgconfig/*
@@ -69,7 +71,7 @@ rm -f %{buildroot}/%{_libdir}/*.la
 
 %changelog
 * Wed Sep 06 2023 Archana Choudhary <archana1@microsoft.com> - 5.6.0-1
-- Auto-upgrade to 5.6.0 - CVE-2021-44269 CVE-2022-2476
+- Upgrade to 5.6.0 - CVE-2021-44269 CVE-2022-2476
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.4.0-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
