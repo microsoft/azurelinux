@@ -1,52 +1,62 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global selinuxtype targeted
 %global moduletype contrib
 %define semodule_version 0.6
 
 %bcond_with selinux
- 
-Summary: Application Whitelisting Daemon
-Name: fapolicyd
-Version: 1.3.2
-Release: 1%{?dist}
-License: GPLv3+
-URL: http://people.redhat.com/sgrubb/fapolicyd
-Source0: https://people.redhat.com/sgrubb/fapolicyd/%{name}-%{version}.tar.gz
+
+Summary:        Application Whitelisting Daemon
+Name:           fapolicyd
+Version:        1.3.2
+Release:        1%{?dist}
+License:        GPLv3+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://people.redhat.com/sgrubb/fapolicyd
+Source0:        https://people.redhat.com/sgrubb/fapolicyd/%{name}-%{version}.tar.gz
+
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  file
+BuildRequires:  file-devel
 # Source1: https://github.com/linux-application-whitelisting/%{name}-selinux/releases/download/v%{semodule_version}/%{name}-selinux-%{semodule_version}.tar.gz
-BuildRequires: gcc
-BuildRequires: kernel-headers
-BuildRequires: autoconf automake make gcc libtool
-BuildRequires: systemd systemd-devel openssl-devel rpm-devel file-devel file
-BuildRequires: libcap-ng-devel libseccomp-devel lmdb-devel
-BuildRequires: python3-devel
-BuildRequires: uthash-devel	
-Requires: %{name}-plugin
-Recommends: %{name}-selinux
-Requires(pre): shadow-utils
+BuildRequires:  gcc
+BuildRequires:  kernel-headers
+BuildRequires:  libcap-ng-devel
+BuildRequires:  libseccomp-devel
+BuildRequires:  libtool
+BuildRequires:  lmdb-devel
+BuildRequires:  make
+BuildRequires:  openssl-devel
+BuildRequires:  python3-devel
+BuildRequires:  rpm-devel
+BuildRequires:  systemd
+BuildRequires:  systemd-devel
+BuildRequires:  uthash-devel
+Requires:       %{name}-plugin
+Requires(pre):  shadow-utils
 Requires(post): systemd-units
 Requires(preun): systemd-units
 Requires(postun): systemd-units
- 
+
 # Patch1: selinux.patch
- 
+
 %description
 Fapolicyd (File Access Policy Daemon) implements application whitelisting
 to decide file access rights. Applications that are known via a reputation
 source are allowed access while unknown applications are not. The daemon
 makes use of the kernel's fanotify interface to determine file access rights.
- 
+
 %if %{with selinux}
 %package        selinux
 Summary:        Fapolicyd selinux
 Group:          Applications/System
+BuildRequires:  selinux-policy-devel
 Requires:       %{name} = %{version}-%{release}
 Requires:       selinux-policy-%{selinuxtype}
 Requires(post): selinux-policy-%{selinuxtype}
-BuildRequires:  selinux-policy-devel
-BuildArch: noarch
+BuildArch:      noarch
 %{?selinux_requires}
- 
+
 %description    selinux
 The %{name}-selinux package contains selinux policy for the %{name} daemon.
 %endif
@@ -55,36 +65,36 @@ The %{name}-selinux package contains selinux policy for the %{name} daemon.
 Summary:        Fapolicyd dnf plugin
 Group:          Applications/System
 Requires:       %{name} = %{version}-%{release}
-BuildArch: noarch
-Provides: %{name}-plugin
+Provides:       %{name}-plugin
+BuildArch:      noarch
 
 %description    dnf-plugin
 The %{name}-dnf-plugin notifies %{name} daemon about dnf update.
 The dnf plugin will be replaced with rpm plugin later.
 Don't use dnf and rpm plugin together.
 
- 
+
 %prep
- 
+
 %setup -q
- 
+
 # selinux
 # %setup -q -D -T -a 1
 # %patch 1 -b .selinux
- 
+
 # generate rules for python
 sed -i "s/%python2_path%/`readlink -f %{__python2} | sed 's/\//\\\\\//g'`/g" rules.d/*.rules
 sed -i "s/%python3_path%/`readlink -f %{__python3} | sed 's/\//\\\\\//g'`/g" rules.d/*.rules
- 
+
 # Detect run time linker directly from bash
 interpret=`readelf -e /usr/bin/bash \
     | grep Requesting \
     | sed 's/.$//' \
     | rev | cut -d" " -f1 \
     | rev`
- 
+
 sed -i "s|%ld_so_path%|`realpath $interpret`|g" rules.d/*.rules
- 
+
 %build
 cp INSTALL INSTALL.tmp
 ./autogen.sh
@@ -92,7 +102,7 @@ cp INSTALL INSTALL.tmp
     --with-audit \
     --with-rpm \
     --disable-shared
- 
+
 make
 
 %if %{with selinux}
@@ -101,16 +111,16 @@ pushd %{name}-selinux-%{semodule_version}
 make
 popd
 %endif
- 
+
 %check
 make check
- 
+
 %if %{with selinux}
 # selinux
 %pre selinux
 %selinux_relabel_pre -s %{selinuxtype}
 %endif
- 
+
 %install
 %make_install
 mkdir -p %{buildroot}/%{python3_sitelib}/dnf-plugins/
@@ -120,7 +130,7 @@ mkdir -p %{buildroot}/%{_localstatedir}/lib/%{name}
 mkdir -p %{buildroot}/run/%{name}
 mkdir -p %{buildroot}%{_sysconfdir}/%{name}/trust.d
 mkdir -p %{buildroot}%{_sysconfdir}/%{name}/rules.d
- 
+
 %if %{with selinux}
 # selinux
 install -d %{buildroot}%{_datadir}/selinux/packages/%{selinuxtype}
@@ -128,13 +138,13 @@ install -m 0644 %{name}-selinux-%{semodule_version}/%{name}.pp.bz2 %{buildroot}%
 install -d -p %{buildroot}%{_datadir}/selinux/devel/include/%{moduletype}
 install -p -m 644 %{name}-selinux-%{semodule_version}/%{name}.if %{buildroot}%{_datadir}/selinux/devel/include/%{moduletype}/ipp-%{name}.if
 %endif
- 
+
 #cleanup
 find %{buildroot} \( -name '*.la' -o -name '*.a' \) -delete
- 
+
 %pre
 getent passwd %{name} >/dev/null || useradd -r -M -d %{_localstatedir}/lib/%{name} -s /sbin/nologin -c "Application Whitelisting Daemon" %{name}
- 
+
 %post
 # if no pre-existing rule file
 if [ ! -e %{_sysconfdir}/%{name}/%{name}.rules ] ; then
@@ -162,13 +172,13 @@ if [ ! -e %{_sysconfdir}/%{name}/%{name}.rules ] ; then
  fi
 fi
 %systemd_post %{name}.service
- 
+
 %preun
 %systemd_preun %{name}.service
- 
+
 %postun
 %systemd_postun_with_restart %{name}.service
- 
+
 %files
 %doc README.md
 %{!?_licensedir:%global license %%doc}
@@ -200,22 +210,22 @@ fi
 %ghost %attr(660,root,%{name}) /run/%{name}/%{name}.fifo
 %ghost %attr(660,%{name},%{name}) %verify(not md5 size mtime) %{_localstatedir}/lib/%{name}/data.mdb
 %ghost %attr(660,%{name},%{name}) %verify(not md5 size mtime) %{_localstatedir}/lib/%{name}/lock.mdb
- 
+
 %if %{with selinux}
 %files selinux
 %{_datadir}/selinux/packages/%{selinuxtype}/%{name}.pp.bz2
 %ghost %verify(not md5 size mode mtime) %{_sharedstatedir}/selinux/%{selinuxtype}/active/modules/200/%{name}
 %{_datadir}/selinux/devel/include/%{moduletype}/ipp-%{name}.if
- 
+
 %post selinux
 %selinux_modules_install -s %{selinuxtype} %{_datadir}/selinux/packages/%{selinuxtype}/%{name}.pp.bz2
 %selinux_relabel_post -s %{selinuxtype}
- 
+
 %postun selinux
 if [ $1 -eq 0 ]; then
     %selinux_modules_uninstall -s %{selinuxtype} %{name}
 fi
- 
+
 %posttrans selinux
 %selinux_relabel_post -s %{selinuxtype}
 %endif
@@ -223,7 +233,6 @@ fi
 %files dnf-plugin
 %{python3_sitelib}/dnf-plugins/%{name}-dnf-plugin.py
 %{python3_sitelib}/dnf-plugins/__pycache__/%{name}-dnf-plugin.*.pyc
-
 
 %changelog
 * Wed Sep 06 2023 Archana Choudhary <archana1@microsoft.com> - 1.3.2-1
@@ -337,7 +346,6 @@ Resolves: rhbz#1834674
 
 * Thu Jan 31 2019 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.7-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
-
 
 * Wed Oct 03 2018 Steve Grubb <sgrubb@redhat.com> 0.8.7-1
 - New upstream bugfix release
