@@ -64,6 +64,7 @@ parameters:
 
   - name: pipArtifactFeeds
     type: string
+    default: ""
 
   - name: publishLogs
     type: boolean
