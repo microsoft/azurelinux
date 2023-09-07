@@ -51,9 +51,9 @@ build_pkg() {
 
 # Show help on useful commands
 show_help() {
-    cat /mariner_setup_dir/welcome.txt
+    echo -e "`cat /mariner_setup_dir/welcome.txt`"
     cat /mariner_setup_dir/mounts.txt
-    echo -e "* \n* Local repo information:"
+    echo -e "* \n* \e[31mLocal repo information:\e[0m"
     if [[ "${IS_REPO_ENABLED}" == "true" ]]; then
         echo -e "*\tLocal repo is enabled. Package dependencies will be installed from $RPMS_DIR, /repo and upstream server"
     else
