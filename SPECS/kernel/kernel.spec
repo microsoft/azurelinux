@@ -28,7 +28,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.15.131.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -39,6 +39,8 @@ Source1:        config
 Source2:        config_aarch64
 Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20211013.pem
+Source5:        cpupower
+Source6:        cpupower.service
 Patch0:         nvme_multipath_default_false.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
@@ -61,6 +63,7 @@ BuildRequires:  pam-devel
 BuildRequires:  procps-ng-devel
 BuildRequires:  python3-devel
 BuildRequires:  sed
+BuildRequires:  systemd-rpm-macros
 %ifarch x86_64
 BuildRequires:  pciutils-devel
 %endif
@@ -225,6 +228,12 @@ install -vdm 700 %{buildroot}/boot
 install -vdm 755 %{buildroot}%{_defaultdocdir}/linux-%{uname_r}
 install -vdm 755 %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}
 install -vdm 755 %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}
+
+install -d -m 755 %{buildroot}%{_libexecdir}/%{_sysconfdir}/sysconfig
+install -c -m 644 %{SOURCE5} %{buildroot}%{_libexecdir}/%{_sysconfdir}/sysconfig/cpupower
+install -d -m 755 %{buildroot}%{_unitdir}
+install -c -m 644 %{SOURCE6} %{buildroot}%{_unitdir}/cpupower.service
+
 make INSTALL_MOD_PATH=%{buildroot} modules_install
 
 %ifarch x86_64
@@ -278,6 +287,7 @@ find arch/%{archdir}/include Module.symvers include scripts -type f | xargs  sh 
 install -vsm 755 tools/objtool/objtool %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/tools/objtool/
 install -vsm 755 tools/objtool/fixdep %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/tools/objtool/
 %endif
+
 
 cp .config %{buildroot}%{_prefix}/src/linux-headers-%{uname_r} # copy .config manually to be where it's expected to be
 ln -sf "%{_prefix}/src/linux-headers-%{uname_r}" "%{buildroot}/lib/modules/%{uname_r}/build"
@@ -408,6 +418,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_libdir}/perf/examples/bpf/*
 %{_libdir}/perf/include/bpf/*
 %{_includedir}/perf/perf_dlfilter.h
+%{_unitdir}/cpupower.service
+%{_sysconfdir}/sysconfig/cpupower
 
 %files -n python3-perf
 %{python3_sitearch}/*
@@ -422,6 +434,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Fri Sep 15 2023 Andy Zaugg <azaugg@linkedin.com> - 5.15.131.1-2
+- Include a  cpupower systemd unit file, allowing cpupower service to start on boot
+
 * Fri Sep 08 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.131.1-1
 - Auto-upgrade to 5.15.131.1
 
