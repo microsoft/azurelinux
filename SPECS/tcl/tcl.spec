@@ -9,6 +9,7 @@ Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            http://tcl.sourceforge.net/
 Source0:        http://downloads.sourceforge.net/sourceforge/tcl/tcl-core%{version}-src.tar.gz
+Patch0:         CVE-2023-36328.patch
 BuildRequires:  cmake
 Provides:       tcl(abi) = %{majorver}
 Provides:       tcl-tcldict = %{version}
@@ -31,6 +32,7 @@ Headers and development libraries for tcl
 
 %prep
 %setup -q -n %{name}%{version}
+%patch0 -p1
 
 %build
 cd unix
