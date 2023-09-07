@@ -5,7 +5,7 @@ Summary:        Network traffic analyzer
 Name:           wireshark
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Version:        4.0.7
+Version:        4.0.8
 Release:        1%{?dist}
 License:        BSD and GPLv2
 Url:            https://www.wireshark.org/
