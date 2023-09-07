@@ -233,6 +233,11 @@ fi
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Thu Sep 07 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 4.0.8-1
+- Upgrade version to address CVEs
+- Swith to SPDX identifiers
+- Fix source URL
+
 * Thu Oct 13 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.4.16-1
 - Upgrade to 3.4.16
 
