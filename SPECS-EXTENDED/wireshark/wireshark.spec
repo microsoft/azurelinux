@@ -26,6 +26,7 @@ Patch7:         wireshark-0007-cmakelists.patch
 Patch8:         wireshark-0008-glib2-g_strdup-build.patch
 Patch9:         wireshark-0009-fix-asn2wrs-cmake.patch
 Patch10:        wireshark-0010-ripemd-fips-core-dump.patch
+Patch11:        wireshark-0011-manage-interfaces-crash.patch
 
 #install tshark together with wireshark GUI
 
