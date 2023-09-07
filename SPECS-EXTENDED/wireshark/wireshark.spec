@@ -3,15 +3,14 @@
 
 Summary:        Network traffic analyzer
 Name:           wireshark
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 Version:        4.0.8
 Release:        1%{?dist}
-License:	BSD-1-Clause AND BSD-2-Clause AND BSD-3-Clause AND MIT AND GPL-2.0-or-later AND LGPL-2.0-or-later AND Zlib AND ISC AND (BSD-3-Clause OR GPL-2.0-only) AND (GPL-2.0-or-later AND Zlib)
-Url:            https://www.wireshark.org/
-Source0:	https://wireshark.org/download/src/%{name}-%{version}.tar.xz
+License:        BSD-1-Clause AND BSD-2-Clause AND BSD-3-Clause AND MIT AND GPL-2.0-or-later AND LGPL-2.0-or-later AND Zlib AND ISC AND (BSD-3-Clause OR GPL-2.0-only) AND (GPL-2.0-or-later AND Zlib)
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://www.wireshark.org/
+Source0:        https://wireshark.org/download/src/%{name}-%{version}.tar.xz
 Source1:        90-wireshark-usbmon.rules
-
 Patch2:         wireshark-0002-Customize-permission-denied-error.patch
 Patch3:         wireshark-0003-fix-string-overrun-in-plugins-profinet.patch
 Patch4:         wireshark-0004-Restore-Fedora-specific-groups.patch
@@ -22,14 +21,10 @@ Patch8:         wireshark-0008-glib2-g_strdup-build.patch
 Patch9:         wireshark-0009-fix-asn2wrs-cmake.patch
 Patch10:        wireshark-0010-ripemd-fips-core-dump.patch
 Patch11:        wireshark-0011-manage-interfaces-crash.patch
-
-
-
-BuildRequires:  bzip2-devel
 BuildRequires:  bison
+BuildRequires:  bzip2-devel
 BuildRequires:  c-ares-devel
-BuildRequires:  pcre2-devel
-Buildrequires:  cmake
+BuildRequires:  cmake
 BuildRequires:  elfutils-devel
 BuildRequires:  flex
 BuildRequires:  gcc-c++
@@ -39,29 +34,30 @@ BuildRequires:  gnutls-devel
 BuildRequires:  krb5-devel
 BuildRequires:  libcap-devel
 BuildRequires:  libgcrypt-devel
-BuildRequires:  libnl3-devel
 BuildRequires:  libnghttp2-devel
+BuildRequires:  libnl3-devel
 BuildRequires:  libpcap-devel >= 0.9
 BuildRequires:  libselinux-devel
 BuildRequires:  libsmi-devel
 BuildRequires:  libssh-devel
 BuildRequires:  openssl-devel
 BuildRequires:  pcre-devel
+BuildRequires:  pcre2-devel
+BuildRequires:  python3
+BuildRequires:  python3-devel
+BuildRequires:  systemd-devel
+BuildRequires:  xdg-utils
+BuildRequires:  zlib-devel
 BuildRequires:  perl(English)
 BuildRequires:  perl(Pod::Html)
 BuildRequires:  perl(Pod::Man)
 BuildRequires:  perl(open)
-BuildRequires:  python3
-Buildrequires:  python3-devel
-BuildRequires:  systemd-devel
-BuildRequires:  xdg-utils
-BuildRequires:  zlib-devel
+#install tshark together with wireshark GUI
+Requires:       %{name}-cli = %{version}-%{release}
 Requires:       c-ares
 Requires:       glib2
 Requires:       systemd-libs
 Requires:       zlib
-#install tshark together with wireshark GUI
-Requires:       %{name}-cli = %{version}-%{release}
 
 %description
 Wireshark allows you to examine protocol data stored in files or as it is
@@ -75,23 +71,24 @@ example, view a complete TCP stream, save the contents of a file which was
 transferred over HTTP or CIFS, or play back an RTP audio stream.
 
 %package        cli
-Summary:          Network traffic analyzer
-Requires(pre):    shadow-utils
-Requires(post):   systemd-udev
+Summary:        Network traffic analyzer
+Requires(post): systemd-udev
+Requires(pre):  shadow-utils
 
 %description    cli
 This package contains command-line utilities, plugins, and documentation for
 Wireshark.
 
 %package        devel
-Summary:          Development headers and libraries for wireshark
-Requires:         %{name} = %{version}-%{release} glibc-devel glib2-devel
+Summary:        Development headers and libraries for wireshark
+Requires:       %{name} = %{version}-%{release}
+Requires:       glib2-devel
+Requires:       glibc-devel
 
 %description devel
 The wireshark-devel package contains the header files, developer
 documentation, and libraries required for development of wireshark scripts
 and plugins.
-
 
 %prep
 %autosetup -S git
@@ -147,7 +144,7 @@ install -m 644 %{SOURCE1} %{buildroot}%{_udevrulesdir}
 touch %{buildroot}%{_bindir}/%{name}
 
 # Remove libtool archives and static libs
-find %{buildroot} -type f -name "*.la" -delete
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %pre cli
 getent group wireshark >/dev/null || groupadd -r wireshark
@@ -158,7 +155,7 @@ getent group usbmon >/dev/null || groupadd -r usbmon
 # skip triggering if udevd isn't even accessible, e.g. containers or
 # rpm-ostree-based systems
 if [ -S /run/udev/control ]; then
-  /usr/bin/udevadm trigger --subsystem-match=usbmon
+  %{_bindir}/udevadm trigger --subsystem-match=usbmon
 fi
 
 %ldconfig_postun cli
@@ -237,6 +234,7 @@ fi
 - Upgrade version to address CVEs
 - Swith to SPDX identifiers
 - Fix source URL
+- Lint spec
 
 * Thu Oct 13 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.4.16-1
 - Upgrade to 3.4.16
@@ -246,7 +244,6 @@ fi
 - Disabled Android Dump.
 - Removed unused/disabled features.
 - Fixed Formatting.
-
 
 * Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.4.4-5
 - License verified.
@@ -866,7 +863,6 @@ fi
 * Fri Sep  9 2011 Jan Safranek <jsafrane@redhat.com> - 1.6.2-1
 - upgrade to 1.6.2
 - see https://www.wireshark.org/docs/relnotes/wireshark-1.6.2.html
-
 
 * Thu Jul 21 2011 Jan Safranek <jsafrane@redhat.com> - 1.6.1-1
 - upgrade to 1.6.1
