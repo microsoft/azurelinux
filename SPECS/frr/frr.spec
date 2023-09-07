@@ -16,7 +16,6 @@ Patch1:         0001-enable-openssl.patch
 Patch2:         0002-disable-eigrp-crypto.patch
 Patch3:         0003-fips-mode.patch
 Patch4:         0004-remove-grpc-test.patch
-Patch5:         CVE-2023-31490.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  bison
