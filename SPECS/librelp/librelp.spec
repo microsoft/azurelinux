@@ -26,8 +26,8 @@ for Reliable Event Logging Protocol) is a general-purpose, extensible
 logging protocol.
 
 %package        devel
-Summary:	    Development libraries and header files for librelp
-Requires:	    %{name} = %{version}-%{release}
+Summary:        Development libraries and header files for librelp
+Requires:       %{name} = %{version}-%{release}
 
 %description    devel
 The package contains libraries and header files for
