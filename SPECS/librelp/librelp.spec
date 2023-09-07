@@ -14,7 +14,6 @@ BuildRequires:  automake
 BuildRequires:  gnutls-devel
 BuildRequires:  libtool
 Requires:       gnutls
-
 %if %{with_check}
 BuildRequires:  glibc-debuginfo
 BuildRequires:  valgrind
