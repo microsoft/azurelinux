@@ -2,8 +2,8 @@
 
 Summary:        Routing daemon
 Name:           frr
-Version:        8.5.1
-Release:        2%{?dist}
+Version:        8.5.3
+Release:        1%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -198,6 +198,9 @@ rm tests/lib/*grpc*
 %{_sysusersdir}/%{name}.conf
 
 %changelog
+* Thu Sep 07 2023 Brian Fjeldstad <bfjelds@microsoft.com> - 8.5.3-1
+- Bump version to bring fixes for CVE-2023-41358 CVE-2023-41359 CVE-2023-41360
+
 * Mon May 22 2023 Suresh Thelkar <sthelkar@microsoft.com> - 8.5.1-2
 - Fix for CVE-2023-31490
 
