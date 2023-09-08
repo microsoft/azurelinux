@@ -16,10 +16,6 @@ BuildRequires:  gettext-devel
 BuildRequires:  libogg-devel
 BuildRequires:  libtool
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
-%ifarch %{ix86}
-# 2.0 supports symbol visibility
-BuildRequires:  nasm >= 2.0
-%endif
 %if %{with_check}
 BuildRequires:  sudo
 %endif
@@ -112,6 +108,7 @@ sudo -u test make check && userdel test
 - Upgrade version to address CVE-2020-22219
 - Use SPDX short identifier for license tag
 - Lint spec
+- Drop BR on nasm
 
 * Mon Aug 22 2022 Muhammad Falak <mwani@microsoft.com> - 1.3.4-1
 - Bump version
