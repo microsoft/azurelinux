@@ -213,6 +213,7 @@ docker build -q \
 echo "docker_image_tag is ${docker_image_tag}"
 
 bash -c "docker run --rm \
-                    ${mount_arg} \
-                    -it ${docker_image_tag} /bin/bash; \
-                    [[ -d ${repo_path}/out/RPMS/repodata ]] && { rm -r ${repo_path}/out/RPMS/repodata; echo 'Clearing repodata' ; }"
+    ${mount_arg} \
+    -it ${docker_image_tag} /bin/bash; \
+    if [[ -d ${repo_path}/out/RPMS/repodata ]]; then { rm -r ${repo_path}/out/RPMS/repodata; echo 'Clearing repodata' ; }; fi
+    "
