@@ -214,3 +214,9 @@ $(macro_rpmrc): $(toolchain_rpms)
 clean: clean-macro-tools
 clean-macro-tools:
 	rm -rf $(MACRO_DIR)
+
+######## HOST TOOLING ########
+# This section contains a check for the host tooling required by the toolkit.
+__DUMMY_VAR := $(foreach exec,awk curl docker genisoimage git go setfacl tar wget, \
+	$(if $(call shell_real_build_only,which $(exec)),some string,$(error "Tool '$(exec)' missing! Please install it before using the toolkit.")) \
+)
