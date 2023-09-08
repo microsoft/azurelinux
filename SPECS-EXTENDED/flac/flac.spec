@@ -32,7 +32,6 @@ This package contains the command-line tools and documentation.
 
 %package libs
 Summary:        Libraries for the Free Lossless Audio Codec
-Obsoletes:      flac < 1.2.1-11
 
 %description libs
 FLAC stands for Free Lossless Audio Codec. Grossly oversimplified, FLAC
@@ -109,6 +108,7 @@ sudo -u test make check && userdel test
 - Use SPDX short identifier for license tag
 - Lint spec
 - Drop BR on nasm
+- Drop Obsoletes
 
 * Mon Aug 22 2022 Muhammad Falak <mwani@microsoft.com> - 1.3.4-1
 - Bump version
