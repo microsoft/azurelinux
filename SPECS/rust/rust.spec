@@ -3,13 +3,13 @@
 
 # Release date and version of stage 0 compiler can be found in "src/stage0.json" inside the extracted "Source0".
 # Look for "date:" and "rustc:".
-%define release_date 2023-02-09
-%define stage0_version 1.67.1
+%define release_date 2023-07-13
+%define stage0_version 1.71.0
 
 Summary:        Rust Programming Language
 Name:           rust
-Version:        1.68.2
-Release:        5%{?dist}
+Version:        1.72.0
+Release:        1%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -28,18 +28,19 @@ Source0:        https://static.rust-lang.org/dist/rustc-%{version}-src.tar.xz
 #   wget https://static.rust-lang.org/dist/rustc-1.68.2-src.tar.xz
 # - Create a directory to store the output from the script:
 #   mkdir rustOutputDir
+# - Get prereqs for the script (for a mariner container):
+#   tdnf -y install rust wget jq tar ca-certificates
 # - Run the script:
 #   ./generate_source_tarball --srcTarball path/to/rustc-1.68.2-src.tar.xz --outFolder path/to/rustOutputDir --pkgVersion 1.68.2
 #
 
 Source1:        rustc-%{version}-src-cargo.tar.gz
-Source2:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-x86_64-unknown-linux-gnu.tar.gz
-Source3:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-x86_64-unknown-linux-gnu.tar.gz
-Source4:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-x86_64-unknown-linux-gnu.tar.gz
-Source5:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-aarch64-unknown-linux-gnu.tar.gz
-Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-aarch64-unknown-linux-gnu.tar.gz
-Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.gz
-Patch0:         CVE-2023-27477.patch
+Source2:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-x86_64-unknown-linux-gnu.tar.xz
+Source3:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-x86_64-unknown-linux-gnu.tar.xz
+Source4:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-x86_64-unknown-linux-gnu.tar.xz
+Source5:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
+Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
+Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 BuildRequires:  binutils
 BuildRequires:  cmake
 # make sure rust relies on curl from CBL-Mariner (instead of using its vendored flavor)
@@ -84,11 +85,6 @@ pushd $HOME
 tar -xf %{SOURCE1} --no-same-owner
 popd
 %autosetup -p1 -n rustc-%{version}-src
-
-# Rust doesn't recognize our .tar.gz bootstrap files when XZ support is enabled
-# This causes stage 0 bootstrap to look online for sources
-# So, we remove XZ support detection in the bootstrap program
-sed -i "s/tarball_suffix = '.tar.xz' if support_xz() else '.tar.gz'/tarball_suffix = '.tar.gz'/g" src/bootstrap/bootstrap.py
 
 # Setup build/cache directory
 BUILD_CACHE_DIR="build/cache/%{release_date}"
@@ -165,6 +161,9 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %{_mandir}/man1/*
 
 %changelog
+* Wed Sep 06 2023 Daniel McIlvaney <damcilva@microsoft.com> - 1.72.2-1
+- Bump to version 1.72.2 to address CVE-2023-38497, CVE-2023-40030
+
 * Tue Aug 22 2023 Rachel Menge <rachelmenge@microsoft.com> - 1.68.2-5
 - Bump release to rebuild against openssl 1.1.1k-26
 
