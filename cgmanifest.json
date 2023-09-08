@@ -14303,8 +14303,8 @@
         "type": "other",
         "other": {
           "name": "nodejs",
-          "version": "16.20.1",
-          "downloadUrl": "https://nodejs.org/download/release/v16.20.1/node-v16.20.1.tar.xz"
+          "version": "16.20.2",
+          "downloadUrl": "https://nodejs.org/download/release/v16.20.2/node-v16.20.2.tar.xz"
         }
       }
     },
@@ -14333,8 +14333,8 @@
         "type": "other",
         "other": {
           "name": "nodejs18",
-          "version": "18.16.0",
-          "downloadUrl": "https://nodejs.org/download/release/v18.16.0/node-v18.16.0.tar.xz"
+          "version": "18.17.1",
+          "downloadUrl": "https://nodejs.org/download/release/v18.17.1/node-v18.17.1.tar.xz"
         }
       }
     },
