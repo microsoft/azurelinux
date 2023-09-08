@@ -64,6 +64,8 @@ out/
 
 # Builds may generate a CCache directory.
 ccache/
+ccache-downloads/
+ccache-uploads/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
