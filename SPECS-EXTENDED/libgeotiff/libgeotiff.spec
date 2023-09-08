@@ -6,7 +6,7 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://trac.osgeo.org/geotiff/
-Source:         https://download.osgeo.org/geotiff/%{name}/%{name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source:         https://download.osgeo.org/geotiff/%{name}/%{name}-%{version}.tar.gz
 # Honour LIB_SUFFIX
 # Honour GEOTIFF_INCLUDE_SUBDIR
 # Add version suffix to mingw library
