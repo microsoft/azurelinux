@@ -1,7 +1,7 @@
 Summary:        Open source antivirus engine
 Name:           clamav
 Version:        0.105.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0 AND BSD AND bzip2-1.0.4 AND GPLv2 AND LGPLv2+ AND MIT AND Public Domain AND UnRar
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -129,6 +129,9 @@ fi
 %dir %attr(-,clamav,clamav) %{_sharedstatedir}/clamav
 
 %changelog
+* Thu Sep 07 2023 Daniel McIlvaney <damcilva@microsoft.com> - 0.105.2-3
+- Bump package to rebuild with rust 1.72.0
+
 * Tue Aug 29 2023 Tobias Brick <tobiasb@microsoft.com> - 0.105.2-2
 - Patch CVE-2022-48579
 

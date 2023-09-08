@@ -22,7 +22,7 @@
 Summary:        Influx data language
 Name:           flux
 Version:        0.191.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -137,6 +137,9 @@ RUSTFLAGS=%{rustflags} cargo test --release
 %{_includedir}/influxdata/flux.h
 
 %changelog
+* Thu Sep 07 2023 Daniel McIlvaney <damcilva@microsoft.com> - 0.191.0-2
+- Bump package to rebuild with rust 1.72.0
+
 * Mon Jan 30 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.191.0-1
 - Upgrade to version 0.191.0
 - Added patches to fix libflux.so file linking issues
