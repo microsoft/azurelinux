@@ -279,6 +279,7 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(no_repo_acl) $(preprocessed_file) $(chroo
 		--srpm-dir="$(SRPMS_DIR)" \
 		--cache-dir="$(remote_rpms_cache_dir)" \
 		--ccache-dir="$(CCACHE_DIR)" \
+		--ccache-config="$(CCACHE_CONFIG)" \
 		--build-logs-dir="$(rpmbuilding_logs_dir)" \
 		--dist-tag="$(DIST_TAG)" \
 		--distro-release-version="$(RELEASE_VERSION)" \

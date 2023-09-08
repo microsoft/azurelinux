@@ -12,6 +12,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/ccachemanager"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
@@ -61,6 +62,7 @@ var (
 	srpmDir          = app.Flag("srpm-dir", "The output directory for source RPM packages").Required().String()
 	cacheDir         = app.Flag("cache-dir", "The cache directory containing downloaded dependency RPMS from Mariner Base").Required().ExistingDir()
 	ccacheDir        = app.Flag("ccache-dir", "The directory used to store ccache outputs").Required().ExistingDir()
+	ccacheConfig     = app.Flag("ccache-config", "The ccache configuration file path.").Required().String()
 	buildLogsDir     = app.Flag("build-logs-dir", "Directory to store package build logs").Required().ExistingDir()
 
 	imageConfig = app.Flag("image-config-file", "Optional image config file to extract a package list from.").String()
@@ -147,6 +149,7 @@ func main() {
 		Program:      *buildAgentProgram,
 		CacheDir:     *cacheDir,
 		CCacheDir:    *ccacheDir,
+		CCacheConfig: *ccacheConfig,
 		RepoFile:     *repoFile,
 		RpmDir:       *rpmDir,
 		ToolchainDir: *toolchainDirPath,
@@ -188,6 +191,19 @@ func main() {
 	err = buildGraph(*inputGraphFile, *outputGraphFile, agent, *workers, *buildAttempts, *checkAttempts, *maxCascadingRebuilds, *stopOnFailure, !*noCache, finalPackagesToBuild, packagesToRebuild, packagesToIgnore, finalTestsToRun, testsToRerun, ignoredTests, toolchainPackages, *optimizeWithCachedImplicit, *allowToolchainRebuilds)
 	if err != nil {
 		logger.Log.Fatalf("Unable to build package graph.\nFor details see the build summary section above.\nError: %s.", err)
+	}
+
+	if *useCcache {
+		logger.Log.Infof("  ccache is enabled. processing multi-package groups under (%s)...", *ccacheDir)
+		ccacheManager, err := ccachemanagerpkg.CreateManager(*ccacheDir, *ccacheConfig)
+		if err == nil {
+			err = ccacheManager.UploadMultiPkgGroupCCaches()
+			if err != nil {
+				logger.Log.Warnf("Failed to archive CCache artifacts. Error: %v.", err)
+			}
+		} else {
+			logger.Log.Warnf("Failed to initialize the ccache manager. Error: %v", err)
+		}
 	}
 }
 
@@ -464,7 +480,6 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 				logger.Log.Infof("%d currently active test(s): %v.", len(activeTests), activeTests)
 			}
 		}
-
 	}
 
 	// Let the workers know they are done
