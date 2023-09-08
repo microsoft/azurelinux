@@ -1,0 +1,13 @@
+# upstream fix: https://github.com/torvalds/linux/commit/d08c84e01afa7a7eee6badab25d5420fa847f783
+diff -urN a/tools/perf/builtin-sched.c b/tools/perf/builtin-sched.c
+--- a/tools/perf/builtin-sched.c	2021-11-18 01:52:47.247110827 +0000
++++ b/tools/perf/builtin-sched.c	2021-11-18 01:54:03.106749252 +0000
+@@ -670,7 +670,7 @@
+ 	err = pthread_attr_init(&attr);
+ 	BUG_ON(err);
+ 	err = pthread_attr_setstacksize(&attr,
+-			(size_t) max(16 * 1024, PTHREAD_STACK_MIN));
++			(size_t) max(16 * 1024, (int)PTHREAD_STACK_MIN));
+ 	BUG_ON(err);
+ 	err = pthread_mutex_lock(&sched->start_work_mutex);
+ 	BUG_ON(err);
