@@ -228,13 +228,16 @@ clean:
 
 ######## VARIABLE PRINTING ########
 
-# Display Makefile usage help
+# Display Makefile usage help; please consult $(SCRIPTS_DIR)/help.mk for documentation
+# on the format of the comment annotations being extracted here.
 help:
 	@sed -ne '/@sed/!s/##help:desc://p' $(MAKEFILE_LIST)
 	@sed -ne '/@sed/!s/##help:target-heading://p' $(MAKEFILE_LIST)
-	@grep -h "\#\#help:target:" $(MAKEFILE_LIST) | sed -e "s/\#\#help:target:\([^=]\+\)=\(.*\)/\1|\2/" | sort | awk -F'|' '{ printf("  \033[3m%-26s\033[0m %s\n", $$1, $$2)}'
+	@grep -h "^##help:target:" $(MAKEFILE_LIST) | sed -e "s/^##help:target:\([^=]\+\)=\(.*\)/\1|\2/" | sort | awk -F'|' '{ printf("  \033[3m%-26s\033[0m %s\n", $$1, $$2)}'
 	@sed -ne '/@sed/!s/##help:var-heading://p' $(MAKEFILE_LIST)
-	@grep -h "\#\#help:var:" $(MAKEFILE_LIST) | sed -e "s/\#\#help:var:\([^:]\+\):\([^=]*\)=\(.*\)/\1|\2|\3/" | sort | awk -F'|' '{ printf("  \033[3m%s\033[0m=%s\n      %s\n", $$1, $$2, $$3) }'
+	@grep -h "^##help:var:" $(MAKEFILE_LIST) | sed -e "s/^##help:var:\([^:]\+\):\([^=]*\)=\(.*\)/\1|\2|\3/" | sort | awk -F'|' '{ printf("  \033[3m%s\033[0m=%s\n      %s\n", $$1, $$2, $$3) }'
+	@sed -ne '/@sed/!s/##help:example-heading://p' $(MAKEFILE_LIST)
+	@grep -h "^##help:example:" $(MAKEFILE_LIST) | sed -e "s/^##help:example:\(.*\)/  \1/"
 
 # Some common version information that is useful to gather. Generally should be run with the Make flag --quiet
 get-version: printvar-RELEASE_VERSION
