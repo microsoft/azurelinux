@@ -12,11 +12,14 @@ toolkit_root := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 SCRIPTS_DIR  ?= $(toolkit_root)/scripts
 
 # Build targets
+##help:var:CONFIG_FILE:<config_path>=Path to image configuration file to use.
 CONFIG_FILE             ?= ""
 CONFIG_BASE_DIR         ?= $(dir $(CONFIG_FILE))
 PACKAGE_BUILD_LIST      ?=
+##help:var:PACKAGE_REBUILD_LIST:<spec_list>=List of spec basenames to force rebuild.
 PACKAGE_REBUILD_LIST    ?=
 PACKAGE_IGNORE_LIST     ?=
+##help:var:SRPM_PACK_LIST:<spec_list>=List of spec basenames to build into SRPMs; if empty, all found specs will be packed.
 SRPM_PACK_LIST          ?=
 TEST_RUN_LIST           ?=
 TEST_RERUN_LIST         ?=
@@ -139,6 +142,7 @@ CA_CERT     ?=
 TLS_CERT    ?=
 TLS_KEY     ?=
 
+##help:var:LOG_LEVEL:{panic,fatal,error,warn,info,debug,trace}=Set logging level for toolkit.
 # panic,fatal,error,warn,info,debug,trace
 LOG_LEVEL          ?= info
 STOP_ON_WARNING    ?= n
@@ -151,6 +155,10 @@ STOP_ON_FETCH_FAIL ?= n
 all: toolchain go-tools chroot-tools
 
 ######## SUBMAKE INCLUDES ########
+
+# General help information used by 'help' target; this should be included first so
+# its help will be displayed at the top of the help output.
+include $(SCRIPTS_DIR)/help.mk
 
 # Misc function defines
 # Variable prerequisite tracking
@@ -209,6 +217,7 @@ include $(SCRIPTS_DIR)/pkggen.mk
 #   image, iso, clean-imggen
 include $(SCRIPTS_DIR)/imggen.mk
 
+##help:target:clean=Clean all built files.
 # Each component provides specific clean implementations which clean depends on.
 # They are guaranteed to run first and will verify there are no existing mount points
 # left after a chroot.
@@ -218,6 +227,14 @@ clean:
 	rm -rf $(toolkit_root)/out
 
 ######## VARIABLE PRINTING ########
+
+# Display Makefile usage help
+help:
+	@sed -ne '/@sed/!s/##help:desc://p' $(MAKEFILE_LIST)
+	@sed -ne '/@sed/!s/##help:target-heading://p' $(MAKEFILE_LIST)
+	@grep -h "\#\#help:target:" $(MAKEFILE_LIST) | sed -e "s/\#\#help:target:\([^=]\+\)=\(.*\)/\1|\2/" | sort | awk -F'|' '{ printf("  \033[3m%-26s\033[0m %s\n", $$1, $$2)}'
+	@sed -ne '/@sed/!s/##help:var-heading://p' $(MAKEFILE_LIST)
+	@grep -h "\#\#help:var:" $(MAKEFILE_LIST) | sed -e "s/\#\#help:var:\([^:]\+\):\([^=]*\)=\(.*\)/\1|\2|\3/" | sort | awk -F'|' '{ printf("  \033[3m%s\033[0m=%s\n      %s\n", $$1, $$2, $$3) }'
 
 # Some common version information that is useful to gather. Generally should be run with the Make flag --quiet
 get-version: printvar-RELEASE_VERSION

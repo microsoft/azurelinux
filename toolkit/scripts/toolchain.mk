@@ -49,6 +49,8 @@ $(call create_folder,$(toolchain_downloads_logs_dir))
 $(call create_folder,$(toolchain_from_repos))
 $(call create_folder,$(populated_toolchain_chroot))
 
+##help:target:raw-toolchain=Build the initial toolchain bootstrap stage.
+##help:target:toolchain=Ensure all toolchain RPMs are present.
 .PHONY: raw-toolchain toolchain clean-toolchain clean-toolchain-containers check-manifests check-aarch64-manifests check-x86_64-manifests
 raw-toolchain: $(raw_toolchain)
 toolchain: $(toolchain_rpms)

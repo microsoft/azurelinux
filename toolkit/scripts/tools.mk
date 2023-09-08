@@ -78,6 +78,7 @@ $(tool): $(call shell_real_build_only, find $(TOOLS_DIR)/$(notdir $(tool))/ -typ
 endef
 $(foreach tool,$(go_tool_targets),$(eval $(go_util_rule)))
 
+##help:target:go-tools=Preps all go tools (ensure `REBUILD_TOOLS=y` to rebuild).
 .PHONY: go-tools clean-go-tools go-tidy-all go-test-coverage
 go-tools: $(go_tool_targets)
 
@@ -129,13 +130,16 @@ $(STATUS_FLAGS_DIR)/got_go_deps.flag:
 		fi && \
 		touch $@
 
+##help:target:go-tidy-all=Runs `go-fmt-all` and `go-mod-tidy`.
 # Return a list of all directories inside tools/ which contains a *.go file in
 # the form of "go-fmt-<directory>"
 go-tidy-all: go-mod-tidy go-fmt-all
+##help:target:go-mod-tidy=Tidy the go module files.
 # Updates the go module file
 go-mod-tidy:
 	rm -f $(TOOLS_DIR)/go.sum
 	cd $(TOOLS_DIR) && go mod tidy
+##help:target:go-fmt-all=Auto format all `*.go` files.
 # Runs go fmt inside each matching directory
 go-fmt-all:
 	cd $(TOOLS_DIR) && go fmt ./...
@@ -146,6 +150,7 @@ $(BUILD_DIR)/tools/all_tools.coverage: $(call shell_real_build_only, find $(TOOL
 	cd $(TOOLS_DIR) && go test -coverpkg=./... -covermode=atomic -coverprofile=$@ ./...
 $(test_coverage_report): $(BUILD_DIR)/tools/all_tools.coverage
 	cd $(TOOLS_DIR) && go tool cover -html=$(BUILD_DIR)/tools/all_tools.coverage -o $@
+##help:target:go-test-coverage=Run and publish test coverage for all go tools.
 go-test-coverage: $(test_coverage_report)
 	@echo Coverage report available at: $(test_coverage_report)
 
@@ -153,6 +158,7 @@ go-test-coverage: $(test_coverage_report)
 
 chroot_worker = $(BUILD_DIR)/worker/worker_chroot.tar.gz
 
+##help:target:chroot-tools=Create the chroot working from the toolchain RPMs.
 .PHONY: chroot-tools clean-chroot-tools validate-chroot
 chroot-tools: $(chroot_worker)
 
@@ -206,6 +212,7 @@ macro_rpmrc = $(RPMRC_DIR)/rpmrc
 
 macro_manifest = $(TOOLCHAIN_MANIFESTS_DIR)/macro_packages.txt
 
+##help:target:macro-tools=Create the directory with expanded rpm macros.
 .PHONY: macro-tools clean-macro-tools
 macro-tools: $(macro_rpmrc)
 

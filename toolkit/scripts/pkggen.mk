@@ -43,6 +43,7 @@ logging_command = --log-file=$(LOGS_DIR)/pkggen/workplan/$(notdir $@).log --log-
 $(call create_folder,$(LOGS_DIR)/pkggen/workplan)
 $(call create_folder,$(rpmbuilding_logs_dir))
 
+##help:target:workplan=Create the package build workplan.
 .PHONY: clean-workplan clean-cache clean-cache-worker clean-grapher-cache-worker clean-spec-parse clean-ccache graph-cache analyze-built-graph workplan
 graph-cache: $(cached_file)
 workplan: $(graph_file)
@@ -231,6 +232,7 @@ srpms_archive  	= $(OUT_DIR)/srpms.tar.gz
 
 .PHONY: build-packages clean-build-packages hydrate-rpms compress-rpms clean-compress-rpms compress-srpms clean-compress-srpms
 
+##help:target:build-packages=Build requested .rpm files.
 # Execute the package build scheduler.
 build-packages: $(RPMS_DIR)
 
@@ -307,12 +309,14 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: no_repo_acl $(preprocessed_file) $(chroot_w
 		$(logging_command) && \
 	touch $@
 
+##help:target:compress-rpms=Compresses all RPMs in `../out/RPMS` into `../out/rpms.tar.gz`. See `hydrate-rpms` target.
 # use temp tarball to avoid tar warning "file changed as we read it"
 # that can sporadically occur when tarball is the dir that is compressed
 compress-rpms:
 	tar -cvp -f $(BUILD_DIR)/temp_rpms_tarball.tar.gz -C $(RPMS_DIR)/.. $(notdir $(RPMS_DIR))
 	mv $(BUILD_DIR)/temp_rpms_tarball.tar.gz $(pkggen_archive)
 
+##help:target:compress-srpms=Compresses all SRPMs in `../out/SRPMS` into `../out/srpms.tar.gz`.
 # use temp tarball to avoid tar warning "file changed as we read it"
 # that can sporadically occur when tarball is the dir that is compressed
 compress-srpms:
@@ -329,6 +333,7 @@ hydrate-cached-rpms:
 	@find $(remote_rpms_cache_dir) -mindepth 2 -name "*.rpm" -exec mv {} $(remote_rpms_cache_dir) \;
 	@find $(remote_rpms_cache_dir) -mindepth 1 -type d -and ! -name repodata -exec rm -fr {} +
 
+##help:target:hydrate-rpms=Hydrates the `../out/RPMS` directory from `rpms.tar.gz`. See `compress-rpms` target.
 # Seed the RPMs folder with the any missing files from the archive.
 hydrate-rpms:
 	$(if $(PACKAGE_ARCHIVE),,$(error Must set PACKAGE_ARCHIVE=<path>))
