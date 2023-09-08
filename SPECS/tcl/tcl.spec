@@ -7,8 +7,8 @@ License:        TCL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
-URL:            http://tcl.sourceforge.net/
-Source0:        http://downloads.sourceforge.net/sourceforge/tcl/tcl-core%{version}-src.tar.gz
+URL:            https://tcl.sourceforge.net/
+Source0:        https://downloads.sourceforge.net/sourceforge/tcl/tcl-core%{version}-src.tar.gz
 Patch0:         CVE-2023-36328.patch
 BuildRequires:  cmake
 Provides:       tcl(abi) = %{majorver}
@@ -31,8 +31,7 @@ Requires:       %{name} = %{version}-%{release}
 Headers and development libraries for tcl
 
 %prep
-%setup -q -n %{name}%{version}
-%patch0 -p1
+%autosetup -n %{name}%{version} -p1
 
 %build
 cd unix
