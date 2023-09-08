@@ -26,8 +26,7 @@ The %{name}-devel package contains libraries and header files for developing
 applications that use %{name}.
 
 %prep
-%setup -q
-%patch0 -p1
+%autosetup -p1
 # Fix permissions on installed library
 sed -i -e 's/644 $(LIBNAME)/755 $(LIBNAME)/g' makefile.shared
 # Fix pkgconfig path
