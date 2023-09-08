@@ -119,6 +119,7 @@ make cctest
 %changelog
 * Wed Sep 06 2023 Brian Fjeldstad <bfjelds@microsoft.com> - 18.17.1-1
 - Patch CVE-2023-32002 CVE-2023-32006 CVE-2023-32559
+- Refresh patch CVE-2022-25883-v18
 
 * Tue Jul 11 2023 Muhammad Falak <mwani@microsoft.com> - 18.16.0-3
 - Patch CVE-2022-25883
