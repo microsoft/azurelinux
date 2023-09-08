@@ -6044,11 +6044,16 @@ CONFIG_IIO_ST_ACCEL_I2C_3AXIS=m
 # CONFIG_MAX9611 is not set
 # CONFIG_MCP3422 is not set
 # CONFIG_NAU7802 is not set
-# CONFIG_STX104 is not set
 # CONFIG_TI_ADC081C is not set
 # CONFIG_TI_ADS1015 is not set
 # CONFIG_XILINX_XADC is not set
 # end of Analog to digital converters
+
+#
+# Analog to digital and digital to analog converters
+#
+# CONFIG_STX104 is not set
+# end of Analog to digital and digital to analog converters
 
 #
 # Analog Front Ends
