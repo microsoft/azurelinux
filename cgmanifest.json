@@ -29597,8 +29597,8 @@
         "type": "other",
         "other": {
           "name": "wireshark",
-          "version": "3.4.16",
-          "downloadUrl": "https://2.na.dl.wireshark.org/src/all-versions/wireshark-3.4.16.tar.xz"
+          "version": "4.0.8",
+          "downloadUrl": "https://wireshark.org/download/src/wireshark-4.0.8.tar.xz"
         }
       }
     },
