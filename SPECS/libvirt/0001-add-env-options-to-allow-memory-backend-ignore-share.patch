@@ -1,0 +1,116 @@
+From 6ffa7cd53e4a978e6f534133fdba26fd4ff21669 Mon Sep 17 00:00:00 2001
+From: Brian Fjeldstad <bfjelds@microsoft.com>
+Date: Mon, 11 Sep 2023 11:10:29 -0700
+Subject: [PATCH] add env options to allow memory-backend/ignore-shared control
+
+---
+ src/qemu/qemu_command.c          |  6 ++++++
+ src/qemu/qemu_migration.c        | 22 +++++++---------------
+ src/qemu/qemu_migration_params.c |  7 +++++++
+ src/qemu/qemu_migration_params.h |  1 +
+ 4 files changed, 21 insertions(+), 15 deletions(-)
+
+diff --git a/src/qemu/qemu_command.c b/src/qemu/qemu_command.c
+index c47998aabd..7824fbff25 100644
+--- a/src/qemu/qemu_command.c
++++ b/src/qemu/qemu_command.c
+@@ -7045,6 +7045,7 @@ qemuBuildMachineCommandLine(virCommand *cmd,
+     virCPUDef *cpu = def->cpu;
+     g_auto(virBuffer) buf = VIR_BUFFER_INITIALIZER;
+     size_t i;
++    const char *skipAppendMmemoryBackend = NULL;
+ 
+     virCommandAddArg(cmd, "-machine");
+     virBufferAdd(&buf, def->os.machine, -1);
+@@ -7236,6 +7237,11 @@ qemuBuildMachineCommandLine(virCommand *cmd,
+     if (virDomainNumaHasHMAT(def->numa))
+         virBufferAddLit(&buf, ",hmat=on");
+ 
++    skipAppendMmemoryBackend = getenv("SKIP_MACHINE_MEMORY_BACKEND_APPEND");
++    if (skipAppendMmemoryBackend && STREQ(skipAppendMmemoryBackend, "true")) {
++        return 0;
++    }
++
+     if (!virDomainNumaGetNodeCount(def->numa)) {
+         const char *defaultRAMid = NULL;
+ 
+diff --git a/src/qemu/qemu_migration.c b/src/qemu/qemu_migration.c
+index 8001792f5a..0ae3aae6ab 100644
+--- a/src/qemu/qemu_migration.c
++++ b/src/qemu/qemu_migration.c
+@@ -5914,28 +5914,20 @@ qemuMigrationSrcToFile(virQEMUDriver *driver, virDomainObj *vm,
+ 
+     /* Increase migration bandwidth to unlimited since target is a file.
+      * Failure to change migration speed is not fatal. */
+-    if (bwParam) {
+-        if (!(migParams = qemuMigrationParamsNew()))
+-            return -1;
++    if (!(migParams = qemuMigrationParamsNew()))
++        return -1;
+ 
++    if (bwParam) {
+         if (qemuMigrationParamsSetULL(migParams,
+                                       QEMU_MIGRATION_PARAM_MAX_BANDWIDTH,
+                                       QEMU_DOMAIN_MIG_BANDWIDTH_MAX * 1024 * 1024) < 0)
+             return -1;
++    }
+ 
+-        if (qemuMigrationParamsApply(driver, vm, asyncJob, migParams) < 0)
+-            return -1;
++    if (qemuMigrationParamsApply(driver, vm, asyncJob, migParams) < 0)
++        return -1;
+ 
+-        priv->migMaxBandwidth = QEMU_DOMAIN_MIG_BANDWIDTH_MAX;
+-    } else {
+-        if (qemuDomainObjEnterMonitorAsync(driver, vm, asyncJob) == 0) {
+-            qemuMonitorSetMigrationSpeed(priv->mon,
+-                                         QEMU_DOMAIN_MIG_BANDWIDTH_MAX);
+-            priv->migMaxBandwidth = QEMU_DOMAIN_MIG_BANDWIDTH_MAX;
+-            if (qemuDomainObjExitMonitor(driver, vm) < 0)
+-                return -1;
+-        }
+-    }
++    priv->migMaxBandwidth = QEMU_DOMAIN_MIG_BANDWIDTH_MAX;
+ 
+     if (!virDomainObjIsActive(vm)) {
+         virReportError(VIR_ERR_INTERNAL_ERROR, "%s",
+diff --git a/src/qemu/qemu_migration_params.c b/src/qemu/qemu_migration_params.c
+index 8df7aac93a..d47395d4d9 100644
+--- a/src/qemu/qemu_migration_params.c
++++ b/src/qemu/qemu_migration_params.c
+@@ -90,6 +90,7 @@ VIR_ENUM_IMPL(qemuMigrationCapability,
+               "late-block-activate",
+               "multifd",
+               "dirty-bitmaps",
++              "x-ignore-shared",
+ );
+ 
+ 
+@@ -827,6 +828,12 @@ qemuMigrationParamsApply(virQEMUDriver *driver,
+     g_autoptr(virJSONValue) caps = NULL;
+     qemuMigrationParam xbzrle = QEMU_MIGRATION_PARAM_XBZRLE_CACHE_SIZE;
+     int ret = -1;
++    const char *addMigrationIgnoreSharedCap = NULL;
++
++    addMigrationIgnoreSharedCap = getenv("MIGRATION_IGNORE_SHARED");
++    if (addMigrationIgnoreSharedCap && STREQ(addMigrationIgnoreSharedCap, "true")) {
++        virBitmapSetBit(migParams->caps, QEMU_MIGRATION_CAP_IGNORE_SHARED);
++    }
+ 
+     if (qemuDomainObjEnterMonitorAsync(driver, vm, asyncJob) < 0)
+         return -1;
+diff --git a/src/qemu/qemu_migration_params.h b/src/qemu/qemu_migration_params.h
+index f770bd2576..70c33c3612 100644
+--- a/src/qemu/qemu_migration_params.h
++++ b/src/qemu/qemu_migration_params.h
+@@ -40,6 +40,7 @@ typedef enum {
+     QEMU_MIGRATION_CAP_LATE_BLOCK_ACTIVATE,
+     QEMU_MIGRATION_CAP_MULTIFD,
+     QEMU_MIGRATION_CAP_BLOCK_DIRTY_BITMAPS,
++    QEMU_MIGRATION_CAP_IGNORE_SHARED,
+ 
+     QEMU_MIGRATION_CAP_LAST
+ } qemuMigrationCapability;
+-- 
+2.17.1
+

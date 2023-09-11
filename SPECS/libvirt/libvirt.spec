@@ -9,7 +9,7 @@
 Summary:        Virtualization API library that supports KVM, QEMU, Xen, ESX etc
 Name:           libvirt
 Version:        7.10.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -18,6 +18,7 @@ URL:            https://libvirt.org/
 Source0:        https://libvirt.org/sources/%{name}-%{version}.tar.xz
 # CVE-2023-2700 is fixed by https://gitlab.com/libvirt/libvirt/-/commit/6425a311b8ad19d6f9c0b315bf1d722551ea3585
 Patch1:         CVE-2023-2700.patch
+Patch2:         0001-add-env-options-to-allow-memory-backend-ignore-share.patch
 
 BuildRequires:  audit-libs-devel
 BuildRequires:  augeas
@@ -1055,6 +1056,9 @@ exit 0
 %{_libdir}/libnss_libvirt_guest.so.2
 
 %changelog
+* Mon Sep 11 2023 Brian Fjeldstad <bfjelds@microsoft.com> - 7.10.0-6
+- Enable VMPHU by enabling NUMA memdev and x-ignore-shared
+
 * Wed May 25 2023 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 7.10.0-5
 - Patch CVE-2023-2700
 
