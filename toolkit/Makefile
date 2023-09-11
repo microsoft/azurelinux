@@ -12,17 +12,21 @@ toolkit_root := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 SCRIPTS_DIR  ?= $(toolkit_root)/scripts
 
 # Build targets
-##help:var:CONFIG_FILE:<config_path>=Path to image configuration file to use.
+##help:var:CONFIG_FILE:<config_path>=Path to image configuration file to use. Will add package dependencies and define final image generated.
 CONFIG_FILE             ?= ""
 CONFIG_BASE_DIR         ?= $(dir $(CONFIG_FILE))
 PACKAGE_BUILD_LIST      ?=
-##help:var:PACKAGE_REBUILD_LIST:<spec_list>=List of spec basenames to force rebuild.
+##help:var:PACKAGE_REBUILD_LIST:<spec_list>=List of space-separated spec folders to force rebuild. Must not overlap with "PACKAGE_IGNORE_LIST". Example: PACKAGE_REBUILD_LIST="kernel go which".
 PACKAGE_REBUILD_LIST    ?=
+##help:var:PACKAGE_IGNORE_LIST:<spec_list>=List of space-separated spec folders to ignore during the build. Must not overlap with "PACKAGE_REBUILD_LIST", may overlap with "PACKAGE_BUILD_LIST". Example: PACKAGE_IGNORE_LIST="zlib".
 PACKAGE_IGNORE_LIST     ?=
-##help:var:SRPM_PACK_LIST:<spec_list>=List of spec basenames to build into SRPMs; if empty, all found specs will be packed.
+##help:var:SRPM_PACK_LIST:<spec_list>=List of space-separated spec folders inside "SPECS_DIR" to analyze for the build. If empty, all items inside the "SPECS_DIR" will be analyzed. Example: SRPM_PACK_LIST="kernel go which".
 SRPM_PACK_LIST          ?=
+##help:var:TEST_RUN_LIST:<spec_list>=List of space-separated spec folders to consider for package tests. Specs from the listed folders MUST contain the "%check" section. If empty, all testable items from "SRPM_PACK_LIST" will be considered. Will not re-test previously built packages. Example: TEST_RUN_LIST="libguestfs zlib".
 TEST_RUN_LIST           ?=
+##help:var:TEST_RERUN_LIST:<spec_list>=List of space-separated spec folders to force running a package test for. Specs from the listed folders MUST contain the "%check" section. Must not overlap with "TEST_IGNORE_LIST". Example: TEST_RERUN_LIST="libguestfs zlib".
 TEST_RERUN_LIST         ?=
+##help:var:TEST_IGNORE_LIST:<spec_list>=List of space-separated spec folders to ignore for package tests. Must not overlap with "TEST_RERUN_LIST", may overlap with "TEST_RUN_LIST". Example: TEST_IGNORE_LIST="acl".
 TEST_IGNORE_LIST        ?=
 
 ######## SET INCREMENTAL BUILD FLAGS ########
