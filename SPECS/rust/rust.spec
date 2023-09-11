@@ -56,7 +56,7 @@ BuildRequires:  ninja-build
 BuildRequires:  openssl-devel
 BuildRequires:  python3
 %if %{with_check}
-BuildRequires:  glibc-static >= 2.35-4%{?dist}
+BuildRequires:  glibc-static
 %endif
 # rustc uses a C compiler to invoke the linker, and links to glibc in most cases
 Requires:       binutils
@@ -90,14 +90,14 @@ popd
 BUILD_CACHE_DIR="build/cache/%{release_date}"
 mkdir -pv "$BUILD_CACHE_DIR"
 %ifarch x86_64
-mv %{SOURCE2} "$BUILD_CACHE_DIR"
-mv %{SOURCE3} "$BUILD_CACHE_DIR"
-mv %{SOURCE4} "$BUILD_CACHE_DIR"
+cp %{SOURCE2} "$BUILD_CACHE_DIR"
+cp %{SOURCE3} "$BUILD_CACHE_DIR"
+cp %{SOURCE4} "$BUILD_CACHE_DIR"
 %endif
 %ifarch aarch64
-mv %{SOURCE5} "$BUILD_CACHE_DIR"
-mv %{SOURCE6} "$BUILD_CACHE_DIR"
-mv %{SOURCE7} "$BUILD_CACHE_DIR"
+cp %{SOURCE5} "$BUILD_CACHE_DIR"
+cp %{SOURCE6} "$BUILD_CACHE_DIR"
+cp %{SOURCE7} "$BUILD_CACHE_DIR"
 %endif
 
 %build
@@ -108,7 +108,7 @@ export CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/ -g//'`"
 sh ./configure \
     --prefix=%{_prefix} \
     --enable-extended \
-    --tools="cargo,clippy,rustfmt" \
+    --tools="cargo,clippy,rustfmt,rust-analyzer-proc-macro-srv" \
     --release-channel="stable" \
     --release-description="CBL-Mariner %{version}-%{release}"
 
@@ -117,6 +117,9 @@ sh ./configure \
 USER=root SUDO_USER=root %make_build
 
 %check
+# We expect to generate dynamic CI contents in this folder, but it will fail since the .github folder is not included
+# with the published sources.
+mkdir -p .github/workflows
 ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage2-tools-bin/rustfmt %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage0/bin/
 ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/vendor/ /root/vendor
 # remove rustdoc ui flaky test issue-98690.rs (which is tagged with 'unstable-options')
