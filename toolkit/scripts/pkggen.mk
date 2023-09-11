@@ -232,7 +232,7 @@ srpms_archive  	= $(OUT_DIR)/srpms.tar.gz
 
 .PHONY: build-packages clean-build-packages hydrate-rpms compress-rpms clean-compress-rpms compress-srpms clean-compress-srpms
 
-##help:target:build-packages=Build requested .rpm files.
+##help:target:build-packages=Build .rpm packages selected by PACKAGE_(RE)BUILD_LIST= and IMAGE_CONFIG=.
 # Execute the package build scheduler.
 build-packages: $(RPMS_DIR)
 

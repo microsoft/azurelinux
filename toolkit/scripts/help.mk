@@ -81,13 +81,13 @@
 #
 
 ##help:target-heading:
-##help:target-heading:[1;4;34mTargets:[0m
+##help:target-heading:[4;95mTargets:[0m
 
 ##help:var-heading:
-##help:var-heading:[1;4;34mVariables:[0m
+##help:var-heading:[4;95mVariables:[0m
 
 ##help:example-heading:
-##help:example-heading:[1;4;34mExamples:[0m
+##help:example-heading:[4;95mExamples:[0m
 
 #
 # Examples.
@@ -98,7 +98,7 @@
 ##help:example:
 
 ##help:example:Force rebuild my-package.spec after having already built it:
-##help:example:    [3msudo make -j$(nproc) build-packages SRPM_PACK_LIST="my-package" PACKAGE_REBUILD_LIST="my-package" REFRESH_WORKER_CHROOT=n[0m
+##help:example:    [3msudo make -j$(nproc) build-packages SRPM_PACK_LIST="my-package" PACKAGE_REBUILD_LIST="my-package"[0m
 ##help:example:
 
 ##help:example:Build an image using a specific JSON config file:

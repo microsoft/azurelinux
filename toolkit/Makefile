@@ -240,7 +240,7 @@ help:
 	@sed -ne '/@sed/!s/##help:target-heading://p' $(MAKEFILE_LIST)
 	@grep -h "^##help:target:" $(MAKEFILE_LIST) | sed -e "s/^##help:target:\([^=]\+\)=\(.*\)/\1|\2/" | sort | awk -F'|' '{ printf("  \033[3m%-26s\033[0m %s\n", $$1, $$2)}'
 	@sed -ne '/@sed/!s/##help:var-heading://p' $(MAKEFILE_LIST)
-	@grep -h "^##help:var:" $(MAKEFILE_LIST) | sed -e "s/^##help:var:\([^:]\+\):\([^=]*\)=\(.*\)/\1|\2|\3/" | sort | awk -F'|' '{ printf("  \033[3m%s\033[0m=%s\n      %s\n", $$1, $$2, $$3) }'
+	@grep -h "^##help:var:" $(MAKEFILE_LIST) | sed -e "s/^##help:var:\([^:]\+\):\([^=]*\)=\(.*\)/\1|\2|\3/" | sort | awk -F'|' '{ printf("  \033[92;3m%s\033[0m=%s\n      %s\n\n", $$1, $$2, $$3) }'
 	@sed -ne '/@sed/!s/##help:example-heading://p' $(MAKEFILE_LIST)
 	@grep -h "^##help:example:" $(MAKEFILE_LIST) | sed -e "s/^##help:example:\(.*\)/  \1/"
 
