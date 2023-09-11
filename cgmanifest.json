@@ -3949,6 +3949,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "freexl",
+          "version": "1.0.6",
+          "downloadUrl": "https://www.gaia-gis.it/gaia-sins/freexl-sources/freexl-1.0.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "fribidi",
           "version": "1.0.12",
           "downloadUrl": "https://github.com/fribidi/fribidi/releases/download/v1.0.12/fribidi-1.0.12.tar.xz"
