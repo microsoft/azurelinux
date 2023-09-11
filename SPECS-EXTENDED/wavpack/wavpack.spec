@@ -43,7 +43,7 @@ autoreconf -ivf
     --disable-asm \
 %endif
 
-make %{?_smp_mflags}
+%make_build
 
 %install
 %make_install
