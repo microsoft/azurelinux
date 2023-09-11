@@ -72,6 +72,7 @@ rm -rf %{buildroot}/%{_docdir}/
 %changelog
 * Wed Sep 06 2023 Archana Choudhary <archana1@microsoft.com> - 5.6.0-1
 - Upgrade to 5.6.0 - CVE-2021-44269 CVE-2022-2476
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.4.0-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
