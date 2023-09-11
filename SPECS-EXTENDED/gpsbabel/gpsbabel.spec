@@ -43,9 +43,7 @@ Qt GUI interface for GPSBabel
 %endif
 
 %prep
-%setup -q -n %{name}-%{name}_%{gittag}
-
-%patch2 -p1
+%autosetup -n %{name}-%{name}_%{gittag} -p1
 
 %build
 %cmake \
