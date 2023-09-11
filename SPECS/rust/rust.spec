@@ -56,7 +56,7 @@ BuildRequires:  ninja-build
 BuildRequires:  openssl-devel
 BuildRequires:  python3
 %if %{with_check}
-BuildRequires:  glibc-static
+BuildRequires:  glibc-static >= 2.35-4%{?dist}
 %endif
 # rustc uses a C compiler to invoke the linker, and links to glibc in most cases
 Requires:       binutils
