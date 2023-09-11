@@ -850,7 +850,7 @@ EOF
 %changelog
 * Tue Sep 05 2023 Archana Choudhary <archana1@microsoft.com> - 3.2.3-1
 - Upgrade to 3.2.3
-- Address CVE-2022-41860, CVE-2022-41861, CVE-2002-0318, CVE-2011-4966
+- Address CVE-2022-41860, CVE-2022-41861
 - Update Patch2 & Patch4
 - Add Patch6 to address build error
 - Add Source105 for user management during installation
