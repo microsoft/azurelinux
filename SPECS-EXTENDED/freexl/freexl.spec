@@ -25,7 +25,7 @@ License:        MPL-1.1 OR GPL-2.0-or-later OR LGPL-2.1-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.gaia-gis.it/FreeXL
-Source0:        https://www.gaia-gis.it/gaia-sins/freexl-sources/freexl-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://www.gaia-gis.it/gaia-sins/freexl-sources/%{name}-%{version}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  make
@@ -113,7 +113,6 @@ find '%{buildroot}' -type f -name '*.la' -print -delete
 
 %files
 %license COPYING
-
 %{_libdir}/libfreexl.so.%{so_version}
 %{_libdir}/libfreexl.so.%{so_version}.*
 
@@ -124,10 +123,8 @@ find '%{buildroot}' -type f -name '*.la' -print -delete
 
 %files doc
 %license COPYING
-
 %doc AUTHORS
 %doc README
-
 %doc clean/examples
 %if %{with doc_pdf}
 %doc latex/FreeXL.pdf
