@@ -230,6 +230,7 @@ clean:
 
 # Display Makefile usage help; please consult $(SCRIPTS_DIR)/help.mk for documentation
 # on the format of the comment annotations being extracted here.
+.PHONY: help
 help:
 	@sed -ne '/@sed/!s/##help:desc://p' $(MAKEFILE_LIST)
 	@sed -ne '/@sed/!s/##help:target-heading://p' $(MAKEFILE_LIST)
