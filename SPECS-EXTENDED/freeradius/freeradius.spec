@@ -1,54 +1,45 @@
+%global _default_patch_fuzz 2
+
+Summary:        High-performance and highly configurable free RADIUS server
+Name:           freeradius
+Version:        3.2.3
+Release:        1%{?dist}
+License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Summary: High-performance and highly configurable free RADIUS server
-Name: freeradius
-Version: 3.2.3
-Release: 1%{?dist}
-License: GPLv2+ and LGPLv2+
-URL: http://www.freeradius.org/
-
-# Is elliptic curve cryptography supported?
-%global HAVE_EC_CRYPTO 1
+URL:            https://freeradius.org/
 
 %global dist_base freeradius-server-%{version}
-
-Source0: ftp://ftp.freeradius.org/pub/radius/%{dist_base}.tar.bz2
-Source100: radiusd.service
-Source102: freeradius-logrotate
-Source103: freeradius-pam-conf
-Source104: freeradius-tmpfiles.conf
-Source105: freeradius.sysusers
-
-Patch1: freeradius-Adjust-configuration-to-fit-Red-Hat-specifics.patch
-Patch2: freeradius-Use-system-crypto-policy-by-default.patch
-Patch3: freeradius-bootstrap-create-only.patch
-Patch4: freeradius-no-buildtime-cert-gen.patch
-Patch5: freeradius-bootstrap-make-permissions.patch
-Patch6: fix-error-for-expansion-of-macro-in-thread.h.patch
-
+Source0:        ftp://ftp.freeradius.org/pub/radius/%{dist_base}.tar.bz2
+Source100:      radiusd.service
+Source102:      freeradius-logrotate
+Source103:      freeradius-pam-conf
+Source104:      freeradius-tmpfiles.conf
+Source105:      freeradius.sysusers
+Patch1:         freeradius-Adjust-configuration-to-fit-Red-Hat-specifics.patch
+Patch2:         freeradius-Use-system-crypto-policy-by-default.patch
+Patch3:         freeradius-bootstrap-create-only.patch
+Patch4:         freeradius-no-buildtime-cert-gen.patch
+Patch5:         freeradius-bootstrap-make-permissions.patch
+Patch6:         fix-error-for-expansion-of-macro-in-thread.h.patch
+# Is elliptic curve cryptography supported?
+%global HAVE_EC_CRYPTO 1
 %global docdir %{?_pkgdocdir}%{!?_pkgdocdir:%{_docdir}/%{name}-%{version}}
-
-BuildRequires: autoconf
-BuildRequires: make
-BuildRequires: gcc
-BuildRequires: gdbm-devel
-BuildRequires: openssl
-BuildRequires: openssl-devel
-BuildRequires: pam-devel
-BuildRequires: zlib-devel
-BuildRequires: net-snmp-devel
-BuildRequires: net-snmp-utils
-BuildRequires: readline-devel
-BuildRequires: libpcap-devel
-BuildRequires: systemd-units
-BuildRequires: libtalloc-devel
-BuildRequires: pcre-devel
-
-%if ! 0%{?rhel}
-BuildRequires: libyubikey-devel
-BuildRequires: ykclient-devel
-%endif
-
+BuildRequires:  autoconf
+BuildRequires:  gcc
+BuildRequires:  gdbm-devel
+BuildRequires:  libpcap-devel
+BuildRequires:  libtalloc-devel
+BuildRequires:  make
+BuildRequires:  net-snmp-devel
+BuildRequires:  net-snmp-utils
+BuildRequires:  openssl
+BuildRequires:  openssl-devel
+BuildRequires:  pam-devel
+BuildRequires:  pcre-devel
+BuildRequires:  readline-devel
+BuildRequires:  systemd-units
+BuildRequires:  zlib-devel
 # Require OpenSSL version we built with, or newer, to avoid startup failures
 # due to runtime OpenSSL version checks.
 Requires: openssl >= %(rpm -q --queryformat '%%{VERSION}' openssl)
@@ -59,6 +50,10 @@ Requires(post): systemd-units
 Requires(post): make
 Requires(preun): systemd-units
 Requires(postun): systemd-units
+%if ! 0%{?rhel}
+BuildRequires:  libyubikey-devel
+BuildRequires:  ykclient-devel
+%endif
 
 %description
 The FreeRADIUS Server Project is a high performance and highly configurable
@@ -76,16 +71,16 @@ be centralized, and minimizes the amount of re-configuration which has to be
 done when adding or deleting new users.
 
 %package doc
-Summary: FreeRADIUS documentation
+Summary:        FreeRADIUS documentation
 
 %description doc
 All documentation supplied by the FreeRADIUS project is included
 in this package.
 
 %package utils
-Summary: FreeRADIUS utilities
-Requires: %{name} = %{version}-%{release}
-Requires: libpcap >= 0.9.4
+Summary:        FreeRADIUS utilities
+Requires:       %{name} = %{version}-%{release}
+Requires:       libpcap >= 0.9.4
 
 %description utils
 The FreeRADIUS server has a number of features found in other servers,
@@ -97,100 +92,92 @@ Support for RFC and VSA Attributes Additional server configuration
 attributes Selecting a particular configuration Authentication methods
 
 %package devel
-Summary: FreeRADIUS development files
-Requires: %{name} = %{version}-%{release}
+Summary:        FreeRADIUS development files
+Requires:       %{name} = %{version}-%{release}
 
 %description devel
 Development headers and libraries for FreeRADIUS.
 
 %package ldap
-Summary: LDAP support for freeradius
-Requires: %{name} = %{version}-%{release}
-BuildRequires: openldap-devel
+Summary:        LDAP support for freeradius
+BuildRequires:  openldap-devel
+Requires:       %{name} = %{version}-%{release}
 
 %description ldap
 This plugin provides the LDAP support for the FreeRADIUS server project.
 
 %package krb5
-Summary: Kerberos 5 support for freeradius
-Requires: %{name} = %{version}-%{release}
-BuildRequires: krb5-devel
+Summary:        Kerberos 5 support for freeradius
+BuildRequires:  krb5-devel
+Requires:       %{name} = %{version}-%{release}
 
 %description krb5
 This plugin provides the Kerberos 5 support for the FreeRADIUS server project.
 
 %package perl
-Summary: Perl support for freeradius
-Requires: %{name} = %{version}-%{release}
-Requires: perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
+Summary:        Perl support for freeradius
 %{?fedora:BuildRequires: perl-devel}
-BuildRequires: perl-devel
-BuildRequires: perl-generators
-BuildRequires: perl(ExtUtils::Embed)
+BuildRequires:  perl-devel
+BuildRequires:  perl-generators
+BuildRequires:  perl(ExtUtils::Embed)
+Requires:       %{name} = %{version}-%{release}
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %description perl
 This plugin provides the Perl support for the FreeRADIUS server project.
 
 %package -n python3-freeradius
-Summary: Python 3 support for freeradius
-Requires: %{name} = %{version}-%{release}
-BuildRequires: python3-devel
+Summary:        Python 3 support for freeradius
 %{?python_provide:%python_provide python3-freeradius}
+BuildRequires:  python3-devel
+Requires:       %{name} = %{version}-%{release}
 
 %description -n python3-freeradius
 This plugin provides the Python 3 support for the FreeRADIUS server project.
 
 %package mysql
-Summary: MySQL support for freeradius
-Requires: %{name} = %{version}-%{release}
-BuildRequires: mariadb-connector-c-devel
+Summary:        MySQL support for freeradius
+BuildRequires:  mariadb-connector-c-devel
+Requires:       %{name} = %{version}-%{release}
 
 %description mysql
 This plugin provides the MySQL support for the FreeRADIUS server project.
 
 %package postgresql
-Summary: Postgresql support for freeradius
-Requires: %{name} = %{version}-%{release}
-BuildRequires: libpq-devel
+Summary:        Postgresql support for freeradius
+BuildRequires:  libpq-devel
+Requires:       %{name} = %{version}-%{release}
 
 %description postgresql
 This plugin provides the postgresql support for the FreeRADIUS server project.
 
 %package sqlite
-Summary: SQLite support for freeradius
-Requires: %{name} = %{version}-%{release}
-BuildRequires: sqlite-devel
+Summary:        SQLite support for freeradius
+BuildRequires:  sqlite-devel
+Requires:       %{name} = %{version}-%{release}
 
 %description sqlite
 This plugin provides the SQLite support for the FreeRADIUS server project.
 
 %package unixODBC
-Summary: Unix ODBC support for freeradius
-Requires: %{name} = %{version}-%{release}
-BuildRequires: unixODBC-devel
+Summary:        Unix ODBC support for freeradius
+BuildRequires:  unixODBC-devel
+Requires:       %{name} = %{version}-%{release}
 
 %description unixODBC
 This plugin provides the unixODBC support for the FreeRADIUS server project.
 
 %package rest
-Summary: REST support for freeradius
-Requires: %{name} = %{version}-%{release}
-BuildRequires: libcurl-devel
-BuildRequires: json-c-devel
+Summary:        REST support for freeradius
+BuildRequires:  json-c-devel
+BuildRequires:  libcurl-devel
+Requires:       %{name} = %{version}-%{release}
 
 %description rest
 This plugin provides the REST support for the FreeRADIUS server project.
 
 %prep
-%setup -q -n %{dist_base}
-# Note: We explicitly do not make patch backup files because 'make install'
-# mistakenly includes the backup files, especially problematic for raddb config files.
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1 -F 2
-%patch5 -p1
-%patch6 -p1
+%autosetup -p1 -n %{dist_base}
 
 %build
 # Force compile/link options, extra security for network facing daemon
@@ -341,7 +328,6 @@ EOF
 %systemd_postun_with_restart radiusd.service
 
 /bin/systemctl try-restart radiusd.service >/dev/null 2>&1 || :
-
 
 %files
 
@@ -643,33 +629,33 @@ EOF
 %{_libdir}/freeradius/rlm_yubikey.so
 
 # main man pages
-%doc %{_mandir}/man5/clients.conf.5.gz
-%doc %{_mandir}/man5/dictionary.5.gz
-%doc %{_mandir}/man5/radiusd.conf.5.gz
-%doc %{_mandir}/man5/radrelay.conf.5.gz
-%doc %{_mandir}/man5/rlm_always.5.gz
-%doc %{_mandir}/man5/rlm_attr_filter.5.gz
-%doc %{_mandir}/man5/rlm_chap.5.gz
-%doc %{_mandir}/man5/rlm_counter.5.gz
-%doc %{_mandir}/man5/rlm_detail.5.gz
-%doc %{_mandir}/man5/rlm_digest.5.gz
-%doc %{_mandir}/man5/rlm_expr.5.gz
-%doc %{_mandir}/man5/rlm_files.5.gz
-%doc %{_mandir}/man5/rlm_idn.5.gz
-%doc %{_mandir}/man5/rlm_mschap.5.gz
-%doc %{_mandir}/man5/rlm_pap.5.gz
-%doc %{_mandir}/man5/rlm_passwd.5.gz
-%doc %{_mandir}/man5/rlm_realm.5.gz
-%doc %{_mandir}/man5/rlm_sql.5.gz
-%doc %{_mandir}/man5/rlm_unbound.5.gz
-%doc %{_mandir}/man5/rlm_unix.5.gz
-%doc %{_mandir}/man5/unlang.5.gz
-%doc %{_mandir}/man5/users.5.gz
-%doc %{_mandir}/man8/raddebug.8.gz
-%doc %{_mandir}/man8/radiusd.8.gz
-%doc %{_mandir}/man8/radmin.8.gz
-%doc %{_mandir}/man8/radrelay.8.gz
-%doc %{_mandir}/man8/rlm_sqlippool_tool.8.gz
+%{_mandir}/man5/clients.conf.5.gz
+%{_mandir}/man5/dictionary.5.gz
+%{_mandir}/man5/radiusd.conf.5.gz
+%{_mandir}/man5/radrelay.conf.5.gz
+%{_mandir}/man5/rlm_always.5.gz
+%{_mandir}/man5/rlm_attr_filter.5.gz
+%{_mandir}/man5/rlm_chap.5.gz
+%{_mandir}/man5/rlm_counter.5.gz
+%{_mandir}/man5/rlm_detail.5.gz
+%{_mandir}/man5/rlm_digest.5.gz
+%{_mandir}/man5/rlm_expr.5.gz
+%{_mandir}/man5/rlm_files.5.gz
+%{_mandir}/man5/rlm_idn.5.gz
+%{_mandir}/man5/rlm_mschap.5.gz
+%{_mandir}/man5/rlm_pap.5.gz
+%{_mandir}/man5/rlm_passwd.5.gz
+%{_mandir}/man5/rlm_realm.5.gz
+%{_mandir}/man5/rlm_sql.5.gz
+%{_mandir}/man5/rlm_unbound.5.gz
+%{_mandir}/man5/rlm_unix.5.gz
+%{_mandir}/man5/unlang.5.gz
+%{_mandir}/man5/users.5.gz
+%{_mandir}/man8/raddebug.8.gz
+%{_mandir}/man8/radiusd.8.gz
+%{_mandir}/man8/radmin.8.gz
+%{_mandir}/man8/radrelay.8.gz
+%{_mandir}/man8/rlm_sqlippool_tool.8.gz
 
 # MIB files
 %{_datadir}/snmp/mibs/*RADIUS*.mib
@@ -677,7 +663,6 @@ EOF
 %files doc
 
 %doc %{docdir}/
-
 
 %files utils
 /usr/bin/*
@@ -864,7 +849,7 @@ EOF
 
 %changelog
 * Tue Sep 05 2023 Archana Choudhary <archana1@microsoft.com> - 3.2.3-1
-- Upgrade to 3.2.3 
+- Upgrade to 3.2.3
 - Address CVE-2022-41860, CVE-2022-41861, CVE-2002-0318, CVE-2011-4966
 - Update Patch2 & Patch4
 - Add Patch6 to address build error
@@ -1350,7 +1335,6 @@ EOF
     config test on restart.
   * Added cache config item to rlm_krb5. When set to "no" ticket
     caching is disabled which may increase performance.
-
   Bug fixes
   * Fix CVE-2012-3547.  All users of 2.1.10, 2.1.11, 2.1.12,
     and 802.1X should upgrade immediately.
@@ -1470,7 +1454,6 @@ EOF
     radclient continues to be more flexible.
   * Updated Oracle schema and queries
   * Added SecurID module.  See src/modules/rlm_securid/README
-
   Bug fixes
   * Fix memory leak in rlm_detail
   * Fix "failed to insert event"
@@ -1544,7 +1527,6 @@ EOF
     "foo", "authorize" method.
   * Produce errors in more situations when the configuration files
     have invalid syntax.
-
   Bug fixes
   * Ignore pre/post-proxy sections if proxying is disabled
   * Add configure checks for pcap_fopen*.
@@ -1690,7 +1672,6 @@ EOF
     in sql{} section.
   * Added %%{tolower: ...string ... }, which returns the lowercase
     version of the string.  Also added %%{toupper: ... } for uppercase.
-
   Bug fixes
   * Fix endless loop when there are multiple sub-options for
     DHCP option 82.
@@ -1807,7 +1788,6 @@ EOF
   * Added documentation for CoA.  See raddb/sites-available/coa
   * Add sub-option support for Option 82.  See dictionary.dhcp
   * Add "server" field to default SQL NAS table, and documented it.
-
   Bug fixes
   * Reset "received ping" counter for Status-Server checks.  In some
     corner cases it was not getting reset.
@@ -1893,7 +1873,6 @@ EOF
   * Allow accounting packets to be written to a detail file, even
     if they were read from a different detail file.
   * Added OpenSSL license exception (src/LICENSE.openssl)
-
   Bug fixes
   * DHCP sockets can now set the broadcast flag before binding to a
     socket.  You need to set "broadcast = yes" in the DHCP listener.
@@ -2145,7 +2124,6 @@ EOF
     * Remove macro that was causing build issues on some platforms.
     * Fixed issues with dead home servers.  Bug noted by Chris Moules.
     * Fixed "access after free" with some dynamic clients.
-
 - fix packaging bug, some directories missing execute permission
   /etc/raddb/dictionary now readable by all.
 
