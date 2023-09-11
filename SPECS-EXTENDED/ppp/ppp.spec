@@ -1,28 +1,26 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global _hardened_build 1
 
-Name:    ppp
-Version: 2.4.7
-Release: 37%{?dist}
-Summary: The Point-to-Point Protocol daemon
-License: BSD and LGPLv2+ and GPLv2+ and Public Domain
-URL:     http://www.samba.org/ppp
-
-Source0: ftp://ftp.samba.org/pub/ppp/ppp-%{version}.tar.gz
-Source1: ppp-pam.conf
-Source2: ppp-logrotate.conf
-Source3: ppp-tmpfiles.conf
-Source4: ip-down
-Source5: ip-down.ipv6to4
-Source6: ip-up
-Source7: ip-up.ipv6to4
-Source8: ipv6-down
-Source9: ipv6-up
-Source10: ifup-ppp
-Source11: ifdown-ppp
-Source12: ppp-watch.tar.xz
-
+Summary:        The Point-to-Point Protocol daemon
+Name:           ppp
+Version:        2.4.7
+Release:        37%{?dist}
+License:        BSD AND LGPLv2+ AND GPLv2+ AND Public Domain
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://www.samba.org/ppp
+Source0:        ftp://ftp.samba.org/pub/ppp/ppp-%{version}.tar.gz
+Source1:        ppp-pam.conf
+Source2:        ppp-logrotate.conf
+Source3:        ppp-tmpfiles.conf
+Source4:        ip-down
+Source5:        ip-down.ipv6to4
+Source6:        ip-up
+Source7:        ip-up.ipv6to4
+Source8:        ipv6-down
+Source9:        ipv6-up
+Source10:       ifup-ppp
+Source11:       ifdown-ppp
+Source12:       ppp-watch.tar.xz
 # Fedora-specific
 Patch0001:      0001-build-sys-use-gcc-as-our-compiler-of-choice.patch
 Patch0002:      0002-build-sys-enable-PAM-support.patch
@@ -51,21 +49,27 @@ Patch0025:      0025-pppd-install-pppd-binary-using-standard-perms-755.patch
 # https://www.nikhef.nl/~janjust/ppp/ppp-2.4.7-eaptls-mppe-1.300.patch
 Patch0026:      ppp-2.4.7-eaptls-mppe-1.300.patch
 Patch0028:      0028-pppoe-include-netinet-in.h-before-linux-in.h.patch
-
 # rhbz#1556132
 Patch0029:      ppp-2.4.7-DES-openssl.patch
 # https://github.com/paulusmack/ppp/pull/95
 Patch0030:      ppp-2.4.7-honor-ldflags.patch
 Patch0031:      ppp-2.4.7-coverity-scan-fixes.patch
 Patch0032:      ppp-2.4.7-CVE-2020-8597.patch
+Patch0033:      CVE-2022-4603.patch
 
-BuildRequires: gcc
-BuildRequires: pam-devel, libpcap-devel, systemd, systemd-devel, glib2-devel
-BuildRequires: openssl-devel
-
-Requires: glibc >= 2.0.6, /etc/pam.d/system-auth, libpcap >= 0.8.3-6, systemd
-Requires(pre): /usr/bin/getent
-Requires(pre): /usr/sbin/groupadd
+BuildRequires:  gcc
+BuildRequires:  glib2-devel
+BuildRequires:  libpcap-devel
+BuildRequires:  openssl-devel
+BuildRequires:  pam-devel
+BuildRequires:  systemd
+BuildRequires:  systemd-devel
+Requires:       %{_sysconfdir}/pam.d/system-auth
+Requires:       glibc >= 2.0.6
+Requires:       libpcap >= 0.8.3-6
+Requires:       systemd
+Requires(pre):  %{_bindir}/getent
+Requires(pre):  %{_sbindir}/groupadd
 
 %description
 The ppp package contains the PPP (Point-to-Point Protocol) daemon and
@@ -75,17 +79,16 @@ usually used to dial in to an ISP (Internet Service Provider) or other
 organization over a modem and phone line.
 
 %package -n network-scripts-%{name}
-Summary: PPP legacy network service support
-Requires: network-scripts
-Supplements: (%{name} and network-scripts)
+Summary:        PPP legacy network service support
+Requires:       network-scripts
 
 %description -n network-scripts-%{name}
 This provides the ifup and ifdown scripts for use with the legacy network
 service.
 
 %package devel
-Summary: Headers for ppp plugin development
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Summary:        Headers for ppp plugin development
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description devel
 This package contains the header files for building plugins for ppp.
@@ -188,8 +191,9 @@ install -p %{SOURCE11} %{buildroot}%{_sysconfdir}/sysconfig/network-scripts/ifdo
 %doc PLUGINS
 
 %changelog
-* Wed Aug 30 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.7-37
+* Mon Sep 11 2023 Archana Choudhary <archana1@microsoft.com> - 2.4.7-37
 - Add patch for CVE-2022-4603
+- License verified
 
 * Thu Mar 25 2021 Thomas Crain <thcrain@microsoft.com> - 2.4.7-36
 - Remove epoch from minimum supported libpcap version
