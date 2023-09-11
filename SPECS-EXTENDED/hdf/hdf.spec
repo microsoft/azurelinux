@@ -12,9 +12,8 @@ License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://portal.hdfgroup.org/
-Source0:        https://support.hdfgroup.org/ftp/HDF/releases/HDF%{version}/src/%{name}-%{version}.tar.bz2#/%{name}-%{version}.tar.bz2
+Source0:        https://support.hdfgroup.org/ftp/HDF/releases/HDF%{version}/src/%{name}-%{version}.tar.bz2
 Source1:        h4comp
-Patch0:         hdf-4.2.5-maxavailfiles.patch
 Patch1:         hdf-ppc.patch
 Patch2:         hdf-4.2.4-sparc.patch
 Patch3:         hdf-s390.patch
@@ -100,34 +99,18 @@ HDF4 java library
 
 
 %prep
-%setup -q
-
-#patch0 -p1 -b .maxavailfiles
-%patch1 -p1 -b .ppc
-%patch2 -p1 -b .sparc
-%patch3 -p1 -b .s390
-%patch4 -p1 -b .arm
-%patch5 -p1 -b .destdir
-%patch6 -p1 -b .examplesdir
-%patch8 -p1 -b .aarch64
-%patch9 -p1 -b .ppc64le
-%patch11 -p1 -b .build
+%autosetup -p1 -S gendiff
 
 %if %{with java}
 # Replace jars with system versions
 # hamcrest-core is obsoleted in hamcrest-2.2
 # Junit tests are failing with junit-4.13.1
-%if 0%{?rhel} >= 9 || 0%{?fedora}
-find . ! -name junit.jar -name "*.jar" -delete
-ln -s %{_javadir}/hamcrest/hamcrest.jar java/lib/hamcrest-core.jar
-%else
 find . -name "*.jar" -delete
 ln -s %{_javadir}/hamcrest/core.jar java/lib/hamcrest-core.jar
 ln -s %{_javadir}/junit.jar java/lib/junit.jar
 # Fix test output
 junit_ver=$(sed -n '/<version>/{s/^.*>\([0-9]\.[0-9.]*\)<.*/\1/;p;q}' %{_datadir}/maven-poms/junit.pom)
 sed -i -e "s/JUnit version .*/JUnit version $junit_ver/" java/test/testfiles/JUnit-*.txt
-%endif
 ln -s %{_javadir}/slf4j/api.jar java/lib/slf4j-api-1.7.25.jar
 ln -s %{_javadir}/slf4j/nop.jar java/lib/ext/slf4j-nop-1.7.25.jar
 ln -s %{_javadir}/slf4j/simple.jar java/lib/ext/slf4j-simple-1.7.25.jar
@@ -137,7 +120,7 @@ find . -type f -name "*.h" -exec chmod 0644 '{}' \;
 find . -type f -name "*.c" -exec chmod 0644 '{}' \;
 
 # restore include file timestamps modified by patching
-touch -c -r ./hdf/src/hdfi.h.ppc ./hdf/src/hdfi.h
+touch -c -r ./hdf/src/hdfi.h.1 ./hdf/src/hdfi.h
 
 
 %build
