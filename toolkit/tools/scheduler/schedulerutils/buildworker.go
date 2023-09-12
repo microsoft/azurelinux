@@ -146,6 +146,14 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 func buildNode(request *BuildRequest, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, buildAttempts int, ignoredPackages []*pkgjson.PackageVer) (ignored bool, builtFiles []string, logFile string, err error) {
 	node := request.Node
 	baseSrpmName := node.SRPMFileName()
+
+	baseName := filepath.Base(node.SpecPath)
+	fileExtension := filepath.Ext(baseName)
+	fileNameWithoutExtension := baseName[:len(baseName)-len(fileExtension)]
+	fmt.Println("Full Path:", node.SpecPath)
+	fmt.Println("File Name without Extension:", fileNameWithoutExtension)
+	basePackageName := fileNameWithoutExtension
+
 	ignored = sliceutils.Contains(ignoredPackages, node.VersionedPkg, sliceutils.PackageVerMatch)
 
 	if ignored {
@@ -162,7 +170,7 @@ func buildNode(request *BuildRequest, graphMutex *sync.RWMutex, agent buildagent
 	dependencies := getBuildDependencies(node, request.PkgGraph, graphMutex)
 
 	logger.Log.Infof("Building: %s", baseSrpmName)
-	builtFiles, logFile, err = buildSRPMFile(agent, buildAttempts, node.SrpmPath, node.Architecture, dependencies)
+	builtFiles, logFile, err = buildSRPMFile(agent, buildAttempts, basePackageName, node.SrpmPath, node.Architecture, dependencies)
 	return
 }
 
@@ -170,6 +178,14 @@ func buildNode(request *BuildRequest, graphMutex *sync.RWMutex, agent buildagent
 func testNode(request *BuildRequest, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, checkAttempts int, ignoredTests []*pkgjson.PackageVer) (ignored bool, logFile string, err error) {
 	node := request.Node
 	baseSrpmName := node.SRPMFileName()
+
+	baseName := filepath.Base(node.SpecPath)
+	fileExtension := filepath.Ext(baseName)
+	fileNameWithoutExtension := baseName[:len(baseName)-len(fileExtension)]
+	fmt.Println("Full Path:", node.SpecPath)
+	fmt.Println("File Name without Extension:", fileNameWithoutExtension)
+	basePackageName := fileNameWithoutExtension
+
 	ignored = sliceutils.Contains(ignoredTests, node.VersionedPkg, sliceutils.PackageVerMatch)
 
 	if ignored {
@@ -185,7 +201,7 @@ func testNode(request *BuildRequest, graphMutex *sync.RWMutex, agent buildagents
 	dependencies := getBuildDependencies(node, request.PkgGraph, graphMutex)
 
 	logger.Log.Infof("Testing: %s", baseSrpmName)
-	logFile, err = testSRPMFile(agent, checkAttempts, node.SrpmPath, node.Architecture, dependencies)
+	logFile, err = testSRPMFile(agent, checkAttempts, basePackageName, node.SrpmPath, node.Architecture, dependencies)
 	return
 }
 
@@ -254,7 +270,7 @@ func parseCheckSection(logFile string) (err error) {
 }
 
 // buildSRPMFile sends an SRPM to a build agent to build.
-func buildSRPMFile(agent buildagents.BuildAgent, buildAttempts int, srpmFile, outArch string, dependencies []string) (builtFiles []string, logFile string, err error) {
+func buildSRPMFile(agent buildagents.BuildAgent, buildAttempts int, basePackageName, srpmFile, outArch string, dependencies []string) (builtFiles []string, logFile string, err error) {
 	const (
 		retryDuration = time.Second
 		runCheck      = false
@@ -262,7 +278,7 @@ func buildSRPMFile(agent buildagents.BuildAgent, buildAttempts int, srpmFile, ou
 
 	logBaseName := filepath.Base(srpmFile) + ".log"
 	err = retry.Run(func() (buildErr error) {
-		builtFiles, logFile, buildErr = agent.BuildPackage(srpmFile, logBaseName, outArch, runCheck, dependencies)
+		builtFiles, logFile, buildErr = agent.BuildPackage(basePackageName, srpmFile, logBaseName, outArch, runCheck, dependencies)
 		return
 	}, buildAttempts, retryDuration)
 
@@ -270,7 +286,7 @@ func buildSRPMFile(agent buildagents.BuildAgent, buildAttempts int, srpmFile, ou
 }
 
 // testSRPMFile sends an SRPM to a build agent to test.
-func testSRPMFile(agent buildagents.BuildAgent, checkAttempts int, srpmFile string, outArch string, dependencies []string) (logFile string, err error) {
+func testSRPMFile(agent buildagents.BuildAgent, checkAttempts int, basePackageName string, srpmFile string, outArch string, dependencies []string) (logFile string, err error) {
 	const (
 		retryDuration = time.Second
 		runCheck      = true
@@ -282,7 +298,7 @@ func testSRPMFile(agent buildagents.BuildAgent, checkAttempts int, srpmFile stri
 	err = retry.Run(func() (buildErr error) {
 		checkFailed = false
 
-		_, logFile, buildErr = agent.BuildPackage(srpmFile, logBaseName, outArch, runCheck, dependencies)
+		_, logFile, buildErr = agent.BuildPackage(basePackageName, srpmFile, logBaseName, outArch, runCheck, dependencies)
 		if buildErr != nil {
 			logger.Log.Warnf("Test build for '%s' failed on a non-test build issue. Error: %s", srpmFile, buildErr)
 			return

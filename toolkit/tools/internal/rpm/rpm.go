@@ -280,7 +280,9 @@ func BuildRPMFromSRPM(srpmFile, outArch string, defines map[string]string) (err 
 	args := []string{"--nocheck", "--rebuild"}
 	args = append(args, commonBuildArgs...)
 
-	return shell.ExecuteLive(squashErrors, rpmBuildProgram, args...)
+	// temporary hack to do quick builds...
+	return shell.ExecuteLive(squashErrors, "echo", args...)
+	// return shell.ExecuteLive(squashErrors, rpmBuildProgram, args...)
 }
 
 // GenerateSRPMFromSPEC generates an SRPM for the given SPEC file

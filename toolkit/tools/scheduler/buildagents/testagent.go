@@ -28,7 +28,7 @@ func (t *TestAgent) Initialize(config *BuildAgentConfig) (err error) {
 }
 
 // BuildPackage simply sleeps and then returns success for TestAgent.
-func (t *TestAgent) BuildPackage(inputFile, logName, outArch string, runCheck bool, dependencies []string) (builtFiles []string, logFile string, err error) {
+func (t *TestAgent) BuildPackage(basePackageName, inputFile, logName, outArch string, runCheck bool, dependencies []string) (builtFiles []string, logFile string, err error) {
 	const sleepDuration = time.Second * 5
 	time.Sleep(sleepDuration)
 

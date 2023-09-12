@@ -43,7 +43,10 @@ var (
 	srpmsDirPath         = app.Flag("srpm-dir", "The output directory for source RPM packages").Required().String()
 	toolchainDirPath     = app.Flag("toolchain-rpms-dir", "Directory that contains already built toolchain RPMs. Should contain a top level directory for each architecture.").Required().ExistingDir()
 	cacheDir             = app.Flag("cache-dir", "The cache directory containing downloaded dependency RPMS from CBL-Mariner Base").Required().ExistingDir()
-	ccacheDir            = app.Flag("ccache-dir", "The directory used to store ccache outputs").Required().ExistingDir()
+	ccacheDirTarsIn      = app.Flag("ccache-dir-tars-in", "<ToDo>").Required().String()
+	ccacheDirTarsOut     = app.Flag("ccache-dir-tars-out", "<ToDo>").Required().String()
+	ccacheDir            = app.Flag("ccache-dir", "The directory used to store ccache outputs").Required().String()
+	basePackageName      = app.Flag("base-pkg-name", "<ToDo>").Required().String()
 	noCleanup            = app.Flag("no-cleanup", "Whether or not to delete the chroot folder after the build is done").Bool()
 	distTag              = app.Flag("dist-tag", "The distribution tag the SPEC will be built with.").Required().String()
 	distroReleaseVersion = app.Flag("distro-release-version", "The distro release version that the SRPM will be built with").Required().String()
@@ -154,6 +157,49 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 		quit <- true
 	}()
 
+	if useCcache {
+		// ensure the following are set:
+		// - ccacheDirTarsIn
+		// - ccacheDirTarsOut
+		// - ccacheDir
+		logger.Log.Infof("Ensuring ccache working folder exists and clean (%s).", *ccacheDir)
+		_, err := os.Stat(*ccacheDir)
+		if err == nil {
+			logger.Log.Infof("Cleaning ccache working folder (%s).", *ccacheDir)
+			err = os.RemoveAll(*ccacheDir)
+			if err != nil {
+				logger.Log.Warnf("Unable rermove ccache working directory. Error: %v", err)
+			}
+		}
+
+		err = os.Mkdir(*ccacheDir, 0755)
+		if err != nil {
+			logger.Log.Warnf("Unable create ccache oworking folder. Error: %v", err)
+		}
+
+		// untar ccache...
+		ccacheInputTarFullPath := *ccacheDirTarsIn + "/" + *basePackageName + "-ccache.tar.gz"
+		logger.Log.Infof("Looking for ccache tar input file (%s).", ccacheInputTarFullPath)
+		_, err = os.Stat(ccacheInputTarFullPath)
+		if err == nil {
+			logger.Log.Infof("Found (%s).", ccacheInputTarFullPath)
+			logger.Log.Infof("Uncompressing (%s) into (%s).", ccacheInputTarFullPath, *ccacheDir)
+			tarArgs := []string{
+				"xf",
+				ccacheInputTarFullPath,
+				"-C",
+				*ccacheDir,
+				"."}
+		
+			_, stderr, err := shell.Execute("tar", tarArgs...)
+			if err != nil {
+				logger.Log.Warnf("Unable extract ccache files from archive. Error: %v", stderr)
+			}
+		} else {
+			logger.Log.Infof("Could not find (%s).", ccacheInputTarFullPath)	
+		}
+	}
+
 	// Create the chroot used to build the SRPM
 	chroot := safechroot.NewChroot(chrootDir, existingChrootDir)
 
@@ -188,6 +234,58 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 		builtRPMs, err = moveBuiltRPMs(chroot.RootDir(), rpmDirPath)
 	}
 
+	if useCcache {
+		// ensure the following are set:
+		// - ccacheDirTarsIn
+		// - ccacheDirTarsOut
+		// - ccacheDir
+		
+		// tar ccache...
+		ccacheOutputTarFullPath := *ccacheDirTarsOut + "/" + *basePackageName + "-ccache.tar.gz"
+		// Check if the folder exists...
+		logger.Log.Infof("Looking for ccache tar output folder (%s).", *ccacheDirTarsOut)
+		_, err := os.Stat(*ccacheDirTarsOut)
+		if err != nil {
+			if os.IsNotExist(err) {
+				// If not, create it...
+				err = os.Mkdir(*ccacheDirTarsOut, 0755)
+				if err != nil {
+					logger.Log.Warnf("Unable create ccache out tar folder. Error: %v", err)
+				}
+			} else {
+				logger.Log.Warnf("An error occured while check if ccache out tar folder exists. Error: %v", err)
+			}
+		}
+
+		logger.Log.Infof("Looking for ccache tar output file (%s).", ccacheOutputTarFullPath)
+		_, err = os.Stat(ccacheOutputTarFullPath)
+		if err == nil {
+			logger.Log.Infof("Found ccache tar output file (%s). Removing...", ccacheOutputTarFullPath)
+			err = os.Remove(ccacheOutputTarFullPath)
+			if err != nil {
+				logger.Log.Warnf("Unable delete ccache out tar. Error: %v", err)
+			}
+		}
+		
+		logger.Log.Infof("Compressing (%s) into (%s).", *ccacheDir, ccacheOutputTarFullPath)
+		tarArgs := []string{
+			"cf",
+			ccacheOutputTarFullPath,
+			"-C",
+			*ccacheDir,
+			"."}
+	
+		_, stderr, err := shell.Execute("tar", tarArgs...)
+		if err != nil {
+			logger.Log.Warnf("Unable compress ccache files itno archive. Error: %v", stderr)
+		}
+
+		logger.Log.Infof("Cleaning ccache working folder (%s).", *ccacheDir)	
+		err = os.RemoveAll(*ccacheDir)
+		if err != nil {
+			logger.Log.Warnf("Unable rermove ccache working directory. Error: %v", err)
+		}
+	}
 	return
 }
 
