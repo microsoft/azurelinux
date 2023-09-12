@@ -10,7 +10,7 @@ URL:            https://wiki.gnome.org/Projects/gexiv2
 Source0:        https://download.gnome.org/sources/gexiv2/0.14/gexiv2-%{version}.tar.xz
 
 BuildRequires:  %{_bindir}/xsltproc
-BuildRequires:  exiv2-devel
+BuildRequires:  exiv2-devel >= 0.28.0
 BuildRequires:  gcc-c++
 BuildRequires:  gobject-introspection-devel
 BuildRequires:  meson
@@ -82,6 +82,9 @@ This package contains the python3 bindings for %{name}
 %{python3_sitearch}/gi/overrides/__pycache__/GExiv2*
 
 %changelog
+* Mon Sep 18 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 0.14.2-1
+- Upgrade version to enable build with exiv2 >= 0.28.0
+
 * Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.12.1-3
 - Adding BR on '%%{_bindir}/xsltproc'.
 - Disabled gtk doc generation to remove network dependency during build-time.
