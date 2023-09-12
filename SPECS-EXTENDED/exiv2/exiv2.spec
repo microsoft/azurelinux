@@ -114,6 +114,17 @@ test -x %{buildroot}%{_libdir}/libexiv2.so
 
 
 %changelog
+* Mon Sep 18 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 0.28.0-1
+- Upgrade version to address 24 CVE:
+  CVE-2019-13504, CVE-2019-17402, CVE-2019-20421, 
+  CVE-2021-3482, CVE-2021-29457, CVE-2021-29458, 
+  CVE-2021-29463, CVE-2021-29464, CVE-2021-29470,
+  CVE-2021-29473, CVE-2021-29623, CVE-2021-32617,
+  CVE-2021-32815, CVE-2021-34334, CVE-2021-34335,
+  CVE-2021-37615, CVE-2021-37616, CVE-2021-37617,
+  CVE-2021-37618, CVE-2021-37619, CVE-2021-37620,
+  CVE-2021-37621, CVE-2021-37622, CVE-2021-37623,
+
 * Thu Jun 09 2022 Jon Slobodzian <joslobo@microsoft.com> - 0.27.5-1
 - Fixing CVEs
 - License Verified.
