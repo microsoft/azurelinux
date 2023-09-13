@@ -53,10 +53,7 @@ build_chroot() {
 build_tools() {
     pushd "${repo_path}/toolkit"
     echo "Building required tools..."
-    make go-srpmpacker REBUILD_TOOLS=y > /dev/null
-    make go-depsearch REBUILD_TOOLS=y > /dev/null
-    make go-grapher REBUILD_TOOLS=y > /dev/null
-    make go-specreader REBUILD_TOOLS=y > /dev/null
+    make go-srpmpacker go-depsearch go-grapher go-specreader REBUILD_TOOLS=y > /dev/null
     popd
 }
 
