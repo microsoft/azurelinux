@@ -115,12 +115,14 @@ else
 fi
 
 # ============ Populate SRPMS ============
-# Populate ${repo_path}/build/INTERMEDIATE_SRPMS with SRPMs, that can be used to build RPMs in the container
-pushd "${repo_path}/toolkit"
-echo "Populating Intermediate SRPMs..."
-if [[ ( ! -f "${repo_path}/toolkit/out/tools/srpmpacker" ) ]]; then build_tools; fi
-make input-srpms SRPM_FILE_SIGNATURE_HANDLING="update" > /dev/null
-popd
+# Populate ${repo_path}/build/INTERMEDIATE_SRPMS with SRPMs, that can be used to build RPMs in the container (only required in build mode)
+if [[ "${mode}" == "build" ]]; then
+    pushd "${repo_path}/toolkit"
+    echo "Populating Intermediate SRPMs..."
+    if [[ ( ! -f "${repo_path}/toolkit/out/tools/srpmpacker" ) ]]; then build_tools; fi
+    make input-srpms SRPM_FILE_SIGNATURE_HANDLING="update" > /dev/null
+    popd
+fi
 
 # ============ Map chroot mount ============
 if [[ "${mode}" == "build" ]]; then
