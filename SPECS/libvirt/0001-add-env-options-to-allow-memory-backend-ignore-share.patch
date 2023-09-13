@@ -1,15 +1,82 @@
-From 6ffa7cd53e4a978e6f534133fdba26fd4ff21669 Mon Sep 17 00:00:00 2001
+From dd7c7a16f754b66c0594eec080b216364a837867 Mon Sep 17 00:00:00 2001
 From: Brian Fjeldstad <bfjelds@microsoft.com>
 Date: Mon, 11 Sep 2023 11:10:29 -0700
 Subject: [PATCH] add env options to allow memory-backend/ignore-shared control
 
 ---
+ src/libvirt-domain.c             |  3 ++-
+ src/qemu/qemu_capabilities.c     |  2 ++
+ src/qemu/qemu_capabilities.h     |  1 +
  src/qemu/qemu_command.c          |  6 ++++++
- src/qemu/qemu_migration.c        | 22 +++++++---------------
- src/qemu/qemu_migration_params.c |  7 +++++++
+ src/qemu/qemu_driver.c           |  3 +++
+ src/qemu/qemu_migration.c        | 36 +++++++++++++++++++-------------
+ src/qemu/qemu_migration_params.c | 10 +++++++++
  src/qemu/qemu_migration_params.h |  1 +
- 4 files changed, 21 insertions(+), 15 deletions(-)
+ src/qemu/qemu_process.c          |  5 +++++
+ src/qemu/qemu_saveimage.c        |  1 +
+ tools/virsh-domain.c             | 10 +++++++--
+ 11 files changed, 60 insertions(+), 18 deletions(-)
 
+diff --git a/src/libvirt-domain.c b/src/libvirt-domain.c
+index ce7cafde36..91a4e0ade3 100644
+--- a/src/libvirt-domain.c
++++ b/src/libvirt-domain.c
+@@ -32,7 +32,6 @@ VIR_LOG_INIT("libvirt.domain");
+ 
+ #define VIR_FROM_THIS VIR_FROM_DOMAIN
+ 
+-
+ /**
+  * virConnectListDomains:
+  * @conn: pointer to the hypervisor connection
+@@ -812,6 +811,7 @@ virDomainSave(virDomainPtr domain, const char *to)
+ {
+     virConnectPtr conn;
+ 
++    VIR_DOMAIN_DEBUG(domain, "bfjelds: virDomainSave called %s\n", to);
+     VIR_DOMAIN_DEBUG(domain, "to=%s", to);
+ 
+     virResetLastError();
+@@ -895,6 +895,7 @@ virDomainSaveFlags(virDomainPtr domain, const char *to,
+ {
+     virConnectPtr conn;
+ 
++    VIR_DOMAIN_DEBUG(domain, "bfjelds: virDomainSaveFlags called %s\n", to);
+     VIR_DOMAIN_DEBUG(domain, "to=%s, dxml=%s, flags=0x%x",
+                      to, NULLSTR(dxml), flags);
+ 
+diff --git a/src/qemu/qemu_capabilities.c b/src/qemu/qemu_capabilities.c
+index 30a557706b..3ef072d7d8 100644
+--- a/src/qemu/qemu_capabilities.c
++++ b/src/qemu/qemu_capabilities.c
+@@ -651,6 +651,7 @@ VIR_ENUM_IMPL(virQEMUCaps,
+               "device.json", /* QEMU_CAPS_DEVICE_JSON */
+               "query-dirty-rate", /* QEMU_CAPS_QUERY_DIRTY_RATE */
+               "rbd-encryption", /* QEMU_CAPS_RBD_ENCRYPTION */
++              "x-ignore-shared", /* X_QEMU_CAPS_MIGRATE_IGNORE_SHARED */
+     );
+ 
+ 
+@@ -1184,6 +1185,7 @@ struct virQEMUCapsStringFlags virQEMUCapsCommands[] = {
+ 
+ struct virQEMUCapsStringFlags virQEMUCapsMigration[] = {
+     { "rdma-pin-all", QEMU_CAPS_MIGRATE_RDMA },
++    { "x-ignore-shared", X_QEMU_CAPS_MIGRATE_IGNORE_SHARED },
+ };
+ 
+ /* Use virQEMUCapsQMPSchemaQueries for querying parameters of events */
+diff --git a/src/qemu/qemu_capabilities.h b/src/qemu/qemu_capabilities.h
+index 61bdbdb2ac..43794f106b 100644
+--- a/src/qemu/qemu_capabilities.h
++++ b/src/qemu/qemu_capabilities.h
+@@ -631,6 +631,7 @@ typedef enum { /* virQEMUCapsFlags grouping marker for syntax-check */
+     QEMU_CAPS_DEVICE_JSON, /* -device accepts JSON */
+     QEMU_CAPS_QUERY_DIRTY_RATE, /* accepts query-dirty-rate */
+     QEMU_CAPS_RBD_ENCRYPTION, /* Ceph RBD encryption support */
++    X_QEMU_CAPS_MIGRATE_IGNORE_SHARED, /* x-ignore-shared */
+ 
+     QEMU_CAPS_LAST /* this must always be the last item */
+ } virQEMUCapsFlags;
 diff --git a/src/qemu/qemu_command.c b/src/qemu/qemu_command.c
 index c47998aabd..7824fbff25 100644
 --- a/src/qemu/qemu_command.c
@@ -34,11 +101,69 @@ index c47998aabd..7824fbff25 100644
      if (!virDomainNumaGetNodeCount(def->numa)) {
          const char *defaultRAMid = NULL;
  
+diff --git a/src/qemu/qemu_driver.c b/src/qemu/qemu_driver.c
+index 4e680bc0a7..6c91b0ce33 100644
+--- a/src/qemu/qemu_driver.c
++++ b/src/qemu/qemu_driver.c
+@@ -2760,6 +2760,7 @@ qemuDomainSaveInternal(virQEMUDriver *driver,
+     virQEMUSaveData *data = NULL;
+     g_autoptr(qemuDomainSaveCookie) cookie = NULL;
+ 
++    VIR_INFO("bfjelds: qemuDomainSaveInternal called %s\n", path);
+     if (!qemuMigrationSrcIsAllowed(driver, vm, false, 0))
+         goto cleanup;
+ 
+@@ -2892,6 +2893,7 @@ qemuDomainSaveFlags(virDomainPtr dom, const char *path, const char *dxml,
+     if (!(vm = qemuDomainObjFromDomain(dom)))
+         goto cleanup;
+ 
++    VIR_INFO("bfjelds: qemuDomainSaveFlags called %s\n", path);
+     if (virDomainSaveFlagsEnsureACL(dom->conn, vm->def) < 0)
+         goto cleanup;
+ 
+@@ -2909,6 +2911,7 @@ qemuDomainSaveFlags(virDomainPtr dom, const char *path, const char *dxml,
+ static int
+ qemuDomainSave(virDomainPtr dom, const char *path)
+ {
++    VIR_INFO("bfjelds: qemuDomainSave called %s\n", path);
+     return qemuDomainSaveFlags(dom, path, NULL, 0);
+ }
+ 
 diff --git a/src/qemu/qemu_migration.c b/src/qemu/qemu_migration.c
-index 8001792f5a..0ae3aae6ab 100644
+index 8001792f5a..8c32a58f5f 100644
 --- a/src/qemu/qemu_migration.c
 +++ b/src/qemu/qemu_migration.c
-@@ -5914,28 +5914,20 @@ qemuMigrationSrcToFile(virQEMUDriver *driver, virDomainObj *vm,
+@@ -2130,10 +2130,23 @@ qemuMigrationDstRun(virQEMUDriver *driver,
+                     qemuDomainAsyncJob asyncJob)
+ {
+     qemuDomainObjPrivate *priv = vm->privateData;
++    g_autoptr(qemuMigrationParams) migParams = NULL;
+     int rv;
+ 
+     VIR_DEBUG("Setting up incoming migration with URI %s", uri);
+ 
++    VIR_DEBUG("bfjelds: setting up incoming migration parameters %s", uri);
++    if (!(migParams = qemuMigrationParamsNew())) {
++        VIR_DEBUG("bfjelds: setting up incoming migration parameters failed %s", uri);
++        return -1;
++    }
++
++    VIR_DEBUG("bfjelds: applying incoming migration parameters %s", uri);
++    if (qemuMigrationParamsApply(driver, vm, asyncJob, migParams) < 0) {
++        VIR_DEBUG("bfjelds: applying incoming migration parameters failed %s", uri);
++        return -1;
++    }
++
+     if (qemuDomainObjEnterMonitorAsync(driver, vm, asyncJob) < 0)
+         return -1;
+ 
+@@ -5909,33 +5922,26 @@ qemuMigrationSrcToFile(virQEMUDriver *driver, virDomainObj *vm,
+     virErrorPtr orig_err = NULL;
+     g_autoptr(qemuMigrationParams) migParams = NULL;
+ 
++    VIR_DEBUG("bfjelds: qemuMigrationSrcToFile called [%s]\n", "yay");
+     if (qemuMigrationSetDBusVMState(driver, vm) < 0)
+         return -1;
  
      /* Increase migration bandwidth to unlimited since target is a file.
       * Failure to change migration speed is not fatal. */
@@ -75,7 +200,7 @@ index 8001792f5a..0ae3aae6ab 100644
      if (!virDomainObjIsActive(vm)) {
          virReportError(VIR_ERR_INTERNAL_ERROR, "%s",
 diff --git a/src/qemu/qemu_migration_params.c b/src/qemu/qemu_migration_params.c
-index 8df7aac93a..d47395d4d9 100644
+index 8df7aac93a..5bff413c45 100644
 --- a/src/qemu/qemu_migration_params.c
 +++ b/src/qemu/qemu_migration_params.c
 @@ -90,6 +90,7 @@ VIR_ENUM_IMPL(qemuMigrationCapability,
@@ -86,16 +211,19 @@ index 8df7aac93a..d47395d4d9 100644
  );
  
  
-@@ -827,6 +828,12 @@ qemuMigrationParamsApply(virQEMUDriver *driver,
+@@ -827,6 +828,15 @@ qemuMigrationParamsApply(virQEMUDriver *driver,
      g_autoptr(virJSONValue) caps = NULL;
      qemuMigrationParam xbzrle = QEMU_MIGRATION_PARAM_XBZRLE_CACHE_SIZE;
      int ret = -1;
-+    const char *addMigrationIgnoreSharedCap = NULL;
++    // const char *addMigrationIgnoreSharedCap = NULL;
 +
-+    addMigrationIgnoreSharedCap = getenv("MIGRATION_IGNORE_SHARED");
-+    if (addMigrationIgnoreSharedCap && STREQ(addMigrationIgnoreSharedCap, "true")) {
++    // addMigrationIgnoreSharedCap = getenv("MIGRATION_IGNORE_SHARED");
++    // if (addMigrationIgnoreSharedCap && STREQ(addMigrationIgnoreSharedCap, "true")) {
++        VIR_DEBUG("bfjelds: adding x-ignore-shared capability [%s]\n", "true");
 +        virBitmapSetBit(migParams->caps, QEMU_MIGRATION_CAP_IGNORE_SHARED);
-+    }
++    // } else {
++    //     VIR_DEBUG("bfjelds: NOT adding x-ignore-shared capability [%s]\n", addMigrationIgnoreSharedCap);
++    // }
  
      if (qemuDomainObjEnterMonitorAsync(driver, vm, asyncJob) < 0)
          return -1;
@@ -111,6 +239,76 @@ index f770bd2576..70c33c3612 100644
  
      QEMU_MIGRATION_CAP_LAST
  } qemuMigrationCapability;
+diff --git a/src/qemu/qemu_process.c b/src/qemu/qemu_process.c
+index c355a39e15..1e70f14243 100644
+--- a/src/qemu/qemu_process.c
++++ b/src/qemu/qemu_process.c
+@@ -5646,6 +5646,10 @@ qemuProcessPrepareQEMUCaps(virDomainObj *vm,
+     if (processStartFlags & VIR_QEMU_PROCESS_START_STANDALONE)
+         virQEMUCapsClear(priv->qemuCaps, QEMU_CAPS_CHARDEV_FD_PASS_COMMANDLINE);
+ 
++    VIR_DEBUG("bfjelds: is x-ignore-shared set? %d\n", virQEMUCapsGet(priv->qemuCaps, X_QEMU_CAPS_MIGRATE_IGNORE_SHARED));
++    virQEMUCapsSet(priv->qemuCaps, X_QEMU_CAPS_MIGRATE_IGNORE_SHARED);
++    VIR_DEBUG("bfjelds: is x-ignore-shared set after being force set? %d\n", virQEMUCapsGet(priv->qemuCaps, X_QEMU_CAPS_MIGRATE_IGNORE_SHARED));
++
+     /* Update qemu capabilities according to lists passed in via namespace */
+     if (qemuProcessStartUpdateCustomCaps(vm) < 0)
+         return -1;
+@@ -5653,6 +5657,7 @@ qemuProcessPrepareQEMUCaps(virDomainObj *vm,
+     /* re-process capability lockouts since we might have removed capabilities */
+     virQEMUCapsInitProcessCapsInterlock(priv->qemuCaps);
+ 
++    VIR_DEBUG("bfjelds: is x-ignore-shared set at end of qemuProcessPrepareQEMUCaps? %d\n", virQEMUCapsGet(priv->qemuCaps, X_QEMU_CAPS_MIGRATE_IGNORE_SHARED));
+     return 0;
+ }
+ 
+diff --git a/src/qemu/qemu_saveimage.c b/src/qemu/qemu_saveimage.c
+index e14e2987f1..67b0275130 100644
+--- a/src/qemu/qemu_saveimage.c
++++ b/src/qemu/qemu_saveimage.c
+@@ -269,6 +269,7 @@ qemuSaveImageCreate(virQEMUDriver *driver,
+     virFileWrapperFd *wrapperFd = NULL;
+     unsigned int wrapperFlags = VIR_FILE_WRAPPER_NON_BLOCKING;
+ 
++    VIR_DEBUG("bfjelds: qemuSaveImageCreate called [%s]\n", path);
+     /* Obtain the file handle.  */
+     if ((flags & VIR_DOMAIN_SAVE_BYPASS_CACHE)) {
+         wrapperFlags |= VIR_FILE_WRAPPER_BYPASS_CACHE;
+diff --git a/tools/virsh-domain.c b/tools/virsh-domain.c
+index e179e24ca9..065d955335 100644
+--- a/tools/virsh-domain.c
++++ b/tools/virsh-domain.c
+@@ -4190,6 +4190,8 @@ doSave(void *opaque)
+         goto out_sig;
+ #endif /* !WIN32 */
+ 
++    vshPrintExtra(ctl, _("bfjelds: doSave %s\n"), "yay");
++
+     if (vshCommandOptStringReq(ctl, cmd, "file", &to) < 0)
+         goto out;
+ 
+@@ -4449,6 +4451,8 @@ cmdSave(vshControl *ctl, const vshCmd *cmd)
+         .ret = -1,
+     };
+ 
++    vshPrintExtra(ctl, _("\nbfjelds: cmdSave %s\n"), "yay");
++
+     if (!(dom = virshCommandOptDomain(ctl, cmd, &name)))
+         return false;
+ 
+@@ -4469,8 +4473,10 @@ cmdSave(vshControl *ctl, const vshCmd *cmd)
+ 
+     virThreadJoin(&workerThread);
+ 
+-    if (!data.ret)
+-        vshPrintExtra(ctl, _("\nDomain '%s' saved to %s\n"), name, to);
++    if (!data.ret) {
++        vshPrintExtra(ctl, _("\nbfjelds: Domain '%s' saved to %s\n"), name, to);
++        vshPrintExtra(ctl, _("\nDomain (bfjelds) '%s' saved to %s\n"), name, to);
++    }
+ 
+     return !data.ret;
+ }
 -- 
 2.17.1
 
