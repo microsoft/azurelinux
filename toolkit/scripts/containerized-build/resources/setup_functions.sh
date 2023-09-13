@@ -88,10 +88,11 @@ enable_local_repo() {
     mv /etc/yum.repos.d/local_repo.disabled_repo /etc/yum.repos.d/local_repo.repo
     url_list=""
     baseurls=$(cat /etc/yum.repos.d/local_repo.repo | grep baseurl | cut -d '=' -f 2)
-    for url in $baseurls
+    prefixToRemove="file://"
+    for urlWithPrefix in $baseurls
     do
-        url="${url#*file://}" #remove 'file://' prefix
-        mkdir -p $url
+        url="${urlWithPrefix#$prefixToRemove}" #remove 'file://' prefix
+        mkdir -p $url || { echo -e "\033[31m WARNING: Could not mkdir at $url, continuing\033[0m"; continue; }
         pushd $url
         createrepo .
         popd
