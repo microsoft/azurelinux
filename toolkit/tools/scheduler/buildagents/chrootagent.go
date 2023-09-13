@@ -38,7 +38,7 @@ func (c *ChrootAgent) Initialize(config *BuildAgentConfig) (err error) {
 // - outArch is the target architecture to build for.
 // - runCheck is true if the package should run the "%check" section during the build
 // - dependencies is a list of dependencies that need to be installed before building.
-func (c *ChrootAgent) BuildPackage(basePackageName, inputFile, logName, outArch string, runCheck bool, dependencies []string) (builtFiles []string, logFile string, err error) {
+func (c *ChrootAgent) BuildPackage(packageCCacheGroupName, inputFile, logName, outArch string, runCheck bool, dependencies []string) (builtFiles []string, logFile string, err error) {
 	// On success, pkgworker will print a comma-seperated list of all RPMs built to stdout.
 	// This will be the last stdout line written.
 	const delimiter = ","
@@ -55,7 +55,7 @@ func (c *ChrootAgent) BuildPackage(basePackageName, inputFile, logName, outArch 
 		logger.Log.Trace(lastStdoutLine)
 	}
 
-	args := serializeChrootBuildAgentConfig(c.config, basePackageName, inputFile, logFile, outArch, runCheck, dependencies)
+	args := serializeChrootBuildAgentConfig(c.config, packageCCacheGroupName, inputFile, logFile, outArch, runCheck, dependencies)
 	err = shell.ExecuteLiveWithCallback(onStdout, logger.Log.Trace, true, c.config.Program, args...)
 
 	if err == nil && lastStdoutLine != "" {
@@ -76,7 +76,7 @@ func (c *ChrootAgent) Close() (err error) {
 }
 
 // serializeChrootBuildAgentConfig serializes a BuildAgentConfig into arguments usable by pkgworker for the sake of building the package.
-func serializeChrootBuildAgentConfig(config *BuildAgentConfig, basePackageName, inputFile, logFile, outArch string, runCheck bool, dependencies []string) (serializedArgs []string) {
+func serializeChrootBuildAgentConfig(config *BuildAgentConfig, packageCCacheGroupName, inputFile, logFile, outArch string, runCheck bool, dependencies []string) (serializedArgs []string) {
 	serializedArgs = []string{
 		fmt.Sprintf("--input=%s", inputFile),
 		fmt.Sprintf("--work-dir=%s", config.WorkDir),
@@ -86,14 +86,14 @@ func serializeChrootBuildAgentConfig(config *BuildAgentConfig, basePackageName, 
 		fmt.Sprintf("--toolchain-rpms-dir=%s", config.ToolchainDir),
 		fmt.Sprintf("--srpm-dir=%s", config.SrpmDir),
 		fmt.Sprintf("--cache-dir=%s", config.CacheDir),
-		// this folder must have a file named basePackageName-ccache.tar.gz
+		// this folder must have a file named packageCCacheGroupName-ccache.tar.gz
 		fmt.Sprintf("--ccache-dir-tars-in=%s", config.CCacheDir + "-tars-in"),
 		// should we make tar'ing again optional? or done at a higher level?
 		fmt.Sprintf("--ccache-dir-tars-out=%s", config.CCacheDir + "-tars-out"),
 		// this is just the work directory - it will be created if it does not exist.
-		fmt.Sprintf("--ccache-dir=%s", config.CCacheDir + "-" + basePackageName),
+		fmt.Sprintf("--ccache-dir=%s", config.CCacheDir + "-" + packageCCacheGroupName),
 		// basePackageName
-		fmt.Sprintf("--base-pkg-name=%s", basePackageName),
+		fmt.Sprintf("--ccache-group-name=%s", packageCCacheGroupName),
 		fmt.Sprintf("--dist-tag=%s", config.DistTag),
 		fmt.Sprintf("--distro-release-version=%s", config.DistroReleaseVersion),
 		fmt.Sprintf("--distro-build-number=%s", config.DistroBuildNumber),
@@ -115,7 +115,7 @@ func serializeChrootBuildAgentConfig(config *BuildAgentConfig, basePackageName, 
 		serializedArgs = append(serializedArgs, "--run-check")
 	}
 
-	if config.UseCcache {
+	if config.UseCcache && packageCCacheGroupName != "" {
 		serializedArgs = append(serializedArgs, "--use-ccache")
 	}
 

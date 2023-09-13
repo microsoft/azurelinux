@@ -1,0 +1,11 @@
+{
+  "groups": [
+    {
+      "name": "kernel",
+      "packageNames": [
+        "kernel",
+        "kernel-hci"
+      ]
+    }
+  ]
+}
