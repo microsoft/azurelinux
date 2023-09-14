@@ -137,7 +137,7 @@ func addUnresolvedPackage(g *pkggraph.PkgGraph, pkgVer *pkgjson.PackageVer) (new
 		return
 	}
 
-	logger.Log.Infof("Adding unresolved node %s\n", newRunNode.FriendlyName())
+	logger.Log.Infof("Adding unresolved node '%s'.", newRunNode.FriendlyName())
 
 	return
 }
@@ -145,7 +145,7 @@ func addUnresolvedPackage(g *pkggraph.PkgGraph, pkgVer *pkgjson.PackageVer) (new
 // addNodesForPackage creates a "Run", "Build", and "Test" node for the package described
 // in the Package structure. Returns pointers to the build and run Nodes
 // created, or an error if one of the nodes could not be created.
-func addNodesForPackage(g *pkggraph.PkgGraph, pkg *pkgjson.Package) (err error) {
+func addNodesForPackage(g *pkggraph.PkgGraph, pkg *pkgjson.Package) (foundDuplicate bool, err error) {
 	var (
 		newRunNode   *pkggraph.PkgNode
 		newBuildNode *pkggraph.PkgNode
@@ -157,34 +157,23 @@ func addNodesForPackage(g *pkggraph.PkgGraph, pkg *pkgjson.Package) (err error) 
 		return
 	}
 
-	skipNewTestNode := false
 	if nodes != nil {
-		logger.Log.Warnf(`Duplicate package name for package %+v read from SRPM "%s" (Previous: %+v)`, pkg.Provides, pkg.SrpmPath, nodes.RunNode)
-		newRunNode = nodes.RunNode
-		newBuildNode = nodes.BuildNode
-		newTestNode = nodes.TestNode
-
-		// Test nodes must be assigned to the build nodes of their true origin and not a duplicate from a potentially different SRPM.
-		skipNewTestNode = true
+		logger.Log.Warnf(`Skipping duplicate package name for package %+v read from SRPM "%s". Original: %+v.`, pkg.Provides, pkg.SrpmPath, nodes.RunNode)
+		foundDuplicate = true
+		return
 	}
 
-	if newRunNode == nil {
-		// Add "Run" node
-		newRunNode, err = g.AddPkgNode(pkg.Provides, pkggraph.StateMeta, pkggraph.TypeLocalRun, pkg.SrpmPath, pkg.RpmPath, pkg.SpecPath, pkg.SourceDir, pkg.Architecture, pkggraph.LocalRepo)
-		if err != nil {
-			return
-		}
-		logger.Log.Debugf("Adding run node %s with id %d\n", newRunNode.FriendlyName(), newRunNode.ID())
+	newRunNode, err = g.AddPkgNode(pkg.Provides, pkggraph.StateMeta, pkggraph.TypeLocalRun, pkg.SrpmPath, pkg.RpmPath, pkg.SpecPath, pkg.SourceDir, pkg.Architecture, pkggraph.LocalRepo)
+	if err != nil {
+		return
 	}
+	logger.Log.Debugf("Adding run node '%s' with id %d.", newRunNode.FriendlyName(), newRunNode.ID())
 
-	if newBuildNode == nil {
-		// Add "Build" node
-		newBuildNode, err = g.AddPkgNode(pkg.Provides, pkggraph.StateBuild, pkggraph.TypeLocalBuild, pkg.SrpmPath, pkg.RpmPath, pkg.SpecPath, pkg.SourceDir, pkg.Architecture, pkggraph.LocalRepo)
-		if err != nil {
-			return
-		}
-		logger.Log.Debugf("Adding build node %s with id %d\n", newBuildNode.FriendlyName(), newBuildNode.ID())
+	newBuildNode, err = g.AddPkgNode(pkg.Provides, pkggraph.StateBuild, pkggraph.TypeLocalBuild, pkg.SrpmPath, pkg.RpmPath, pkg.SpecPath, pkg.SourceDir, pkg.Architecture, pkggraph.LocalRepo)
+	if err != nil {
+		return
 	}
+	logger.Log.Debugf("Adding build node '%s' with id %d.", newBuildNode.FriendlyName(), newBuildNode.ID())
 
 	// A "run" node has an implicit dependency on its corresponding "build" node, encode that here.
 	err = g.AddEdge(newRunNode, newBuildNode)
@@ -193,19 +182,16 @@ func addNodesForPackage(g *pkggraph.PkgGraph, pkg *pkgjson.Package) (err error) 
 		return
 	}
 
-	if skipNewTestNode || !pkg.RunTests {
+	if !pkg.RunTests {
 		logger.Log.Debugf("Skipping adding a test node for package %+v", pkg)
 		return
 	}
 
-	if newTestNode == nil {
-		// Add "Test" node
-		newTestNode, err = g.AddPkgNode(pkg.Provides, pkggraph.StateBuild, pkggraph.TypeTest, pkg.SrpmPath, pkggraph.NoRPMPath, pkg.SpecPath, pkg.SourceDir, pkg.Architecture, pkggraph.LocalRepo)
-		if err != nil {
-			return
-		}
-		logger.Log.Debugf("Adding test node %s with id %d\n", newTestNode.FriendlyName(), newTestNode.ID())
+	newTestNode, err = g.AddPkgNode(pkg.Provides, pkggraph.StateBuild, pkggraph.TypeTest, pkg.SrpmPath, pkggraph.NoRPMPath, pkg.SpecPath, pkg.SourceDir, pkg.Architecture, pkggraph.LocalRepo)
+	if err != nil {
+		return
 	}
+	logger.Log.Debugf("Adding test node '%s' with id %d.", newTestNode.FriendlyName(), newTestNode.ID())
 
 	// A "test" node has a dependency on its corresponding "build" node. This dependency is required
 	// to guarantee we will first check if the build node needs to be built or not before we make
@@ -332,11 +318,16 @@ func populateGraph(graph *pkggraph.PkgGraph, repo *pkgjson.PackageRepo) (err err
 
 	// Scan and add each package we know about
 	logger.Log.Infof("Adding all packages from %s", *input)
+	uniquePackages := make(map[*pkgjson.Package]bool)
 	for _, pkg := range packages {
-		err = addNodesForPackage(graph, pkg)
+		foundDuplicate, err := addNodesForPackage(graph, pkg)
 		if err != nil {
 			logger.Log.Errorf("Failed to add local package %+v", pkg)
 			return err
+		}
+
+		if !foundDuplicate {
+			uniquePackages[pkg] = true
 		}
 	}
 	logger.Log.Infof("\tAdded %d packages", len(packages))
@@ -347,11 +338,10 @@ func populateGraph(graph *pkggraph.PkgGraph, repo *pkgjson.PackageRepo) (err err
 	// Rescan and add all the dependencies
 	logger.Log.Infof("Adding all dependencies from %s", *input)
 	dependenciesAdded := 0
-	for idx := range packages {
-		pkg := packages[idx]
-		num, err := addPkgDependencies(graph, pkg)
+	for uniquePkg := range uniquePackages {
+		num, err := addPkgDependencies(graph, uniquePkg)
 		if err != nil {
-			logger.Log.Errorf("Failed to add dependency %+v", pkg)
+			logger.Log.Errorf("Failed to add dependency %+v", uniquePkg)
 			return err
 		}
 		dependenciesAdded += num
