@@ -338,10 +338,10 @@ func populateGraph(graph *pkggraph.PkgGraph, repo *pkgjson.PackageRepo) (err err
 	// Rescan and add all the dependencies
 	logger.Log.Infof("Adding all dependencies from %s", *input)
 	dependenciesAdded := 0
-	for pkg := range uniquePackages {
-		num, err := addPkgDependencies(graph, pkg)
+	for uniquePkg := range uniquePackages {
+		num, err := addPkgDependencies(graph, uniquePkg)
 		if err != nil {
-			logger.Log.Errorf("Failed to add dependency %+v", pkg)
+			logger.Log.Errorf("Failed to add dependency %+v", uniquePkg)
 			return err
 		}
 		dependenciesAdded += num
