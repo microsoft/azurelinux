@@ -132,6 +132,7 @@ mv %{buildroot}%{_docdir}/%{name}/LICENSE-THIRD-PARTY .
 rm %{buildroot}%{_docdir}/%{name}/{COPYRIGHT,LICENSE-APACHE,LICENSE-MIT}
 rm %{buildroot}%{_docdir}/%{name}/html/.lock
 rm %{buildroot}%{_docdir}/%{name}/*.old
+rm %{buildroot}%{_bindir}/*.old
 
 %ldconfig_scriptlets
 
