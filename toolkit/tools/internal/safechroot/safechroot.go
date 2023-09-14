@@ -504,7 +504,7 @@ func (c *Chroot) unmountAndRemove(leaveOnDisk, isFinalAttempt bool) (err error) 
 		}
 
 		_, err = retry.RunWithExpBackoff(func() error {
-			logger.Log.Warnf("Calling unmount (%s, %v)", fullPath, unmountFlags)
+			logger.Log.Debugf("Calling unmount (%s, %v)", fullPath, unmountFlags)
 			umountErr := unix.Unmount(fullPath, unmountFlags)
 			if isFinalAttempt && umountErr != nil {
 				logger.Log.Warnf(errMsg, fullPath, err.Error())
