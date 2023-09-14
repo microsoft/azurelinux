@@ -137,7 +137,7 @@ func addUnresolvedPackage(g *pkggraph.PkgGraph, pkgVer *pkgjson.PackageVer) (new
 		return
 	}
 
-	logger.Log.Infof("Adding unresolved node %s.", newRunNode.FriendlyName())
+	logger.Log.Infof("Adding unresolved node '%s'.", newRunNode.FriendlyName())
 
 	return
 }
@@ -167,13 +167,13 @@ func addNodesForPackage(g *pkggraph.PkgGraph, pkg *pkgjson.Package) (foundDuplic
 	if err != nil {
 		return
 	}
-	logger.Log.Debugf("Adding run node %s with id %d.", newRunNode.FriendlyName(), newRunNode.ID())
+	logger.Log.Debugf("Adding run node '%s' with id %d.", newRunNode.FriendlyName(), newRunNode.ID())
 
 	newBuildNode, err = g.AddPkgNode(pkg.Provides, pkggraph.StateBuild, pkggraph.TypeLocalBuild, pkg.SrpmPath, pkg.RpmPath, pkg.SpecPath, pkg.SourceDir, pkg.Architecture, pkggraph.LocalRepo)
 	if err != nil {
 		return
 	}
-	logger.Log.Debugf("Adding build node %s with id %d.", newBuildNode.FriendlyName(), newBuildNode.ID())
+	logger.Log.Debugf("Adding build node '%s' with id %d.", newBuildNode.FriendlyName(), newBuildNode.ID())
 
 	// A "run" node has an implicit dependency on its corresponding "build" node, encode that here.
 	err = g.AddEdge(newRunNode, newBuildNode)
@@ -191,7 +191,7 @@ func addNodesForPackage(g *pkggraph.PkgGraph, pkg *pkgjson.Package) (foundDuplic
 	if err != nil {
 		return
 	}
-	logger.Log.Debugf("Adding test node %s with id %d.", newTestNode.FriendlyName(), newTestNode.ID())
+	logger.Log.Debugf("Adding test node '%s' with id %d.", newTestNode.FriendlyName(), newTestNode.ID())
 
 	// A "test" node has a dependency on its corresponding "build" node. This dependency is required
 	// to guarantee we will first check if the build node needs to be built or not before we make
