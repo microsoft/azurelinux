@@ -446,6 +446,7 @@ func cleanupAllChroots() {
 	inChrootMutex.Lock()
 
 	// mount is only supported in regular pipeline
+	failedToUnmount := false
 	if buildpipeline.IsRegularBuild() {
 		// Cleanup chroots in LIFO order incase any are interdependent (e.g. nested safe chroots)
 		logger.Log.Info("Cleaning up all active chroots")
@@ -456,11 +457,16 @@ func cleanupAllChroots() {
 			// even if one fails.
 			if err != nil {
 				logger.Log.Errorf("Failed to unmount chroot (%s)", activeChroots[i].rootDir)
+				failedToUnmount = true
 			}
 		}
 	}
 
-	logger.Log.Info("Cleanup finished")
+	if failedToUnmount {
+		logger.Log.Fatalf("Failed to unmount a chroot, manual unmount required")
+	} else {
+		logger.Log.Info("Cleanup finished")
+	}
 }
 
 // unmountAndRemove retries to unmount directories that were mounted into
@@ -507,11 +513,7 @@ func (c *Chroot) unmountAndRemove(leaveOnDisk, isFinalAttempt bool) (err error) 
 		}, totalAttempts, retryDuration, 2.0, nil)
 
 		if err != nil {
-			if isFinalAttempt {
-				logger.Log.Fatalf(errMsg, fullPath, err)
-			} else {
-				logger.Log.Warnf(errMsg, fullPath, err)
-			}
+			logger.Log.Warnf(errMsg, fullPath, err)
 			return
 		}
 	}
