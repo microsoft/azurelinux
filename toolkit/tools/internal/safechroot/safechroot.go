@@ -81,6 +81,11 @@ var defaultChrootEnv = []string{
 	"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
 }
 
+const (
+	isNotFinalAttempt = false
+	isFinalAttempt    = true
+)
+
 // init will always be called if this package is loaded
 func init() {
 	registerSIGTERMCleanup()
@@ -194,8 +199,8 @@ func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMoun
 		if err != nil {
 			if buildpipeline.IsRegularBuild() {
 				// mount/unmount is only supported in regular pipeline
-				// Best effort cleanup in case mountpoint creation failed mid-way through
-				cleanupErr := c.unmountAndRemove(leaveChrootOnDisk)
+				// Best effort cleanup in case mountpoint creation failed mid-way through. We will not try again so treat as final attempt.
+				cleanupErr := c.unmountAndRemove(leaveChrootOnDisk, isFinalAttempt)
 				if cleanupErr != nil {
 					logger.Log.Warnf("Failed to cleanup chroot (%s) during failed initialization. Error: %s", c.rootDir, cleanupErr)
 				}
@@ -370,7 +375,7 @@ func (c *Chroot) Close(leaveOnDisk bool) (err error) {
 
 	if buildpipeline.IsRegularBuild() {
 		// mount is only supported in regular pipeline
-		err = c.unmountAndRemove(leaveOnDisk)
+		err = c.unmountAndRemove(leaveOnDisk, isNotFinalAttempt)
 		if err == nil {
 			const emptyLen = 0
 			// Remove this chroot from the list of active ones since it has now been cleaned up.
@@ -446,7 +451,7 @@ func cleanupAllChroots() {
 		logger.Log.Info("Cleaning up all active chroots")
 		for i := len(activeChroots) - 1; i >= 0; i-- {
 			logger.Log.Infof("Cleaning up chroot (%s)", activeChroots[i].rootDir)
-			err := activeChroots[i].unmountAndRemove(leaveChrootOnDisk)
+			err := activeChroots[i].unmountAndRemove(leaveChrootOnDisk, isFinalAttempt)
 			// Perform best effort cleanup: unmount as many chroots as possible,
 			// even if one fails.
 			if err != nil {
@@ -462,12 +467,25 @@ func cleanupAllChroots() {
 // the chroot until the unmounts succeed or too many failed attempts.
 // This is to avoid leaving folders like /dev mounted when the chroot folder is forcefully deleted in cleanup.
 // Iff all mounts were successfully unmounted, the chroot's root directory will be removed if requested.
-func (c *Chroot) unmountAndRemove(leaveOnDisk bool) (err error) {
+func (c *Chroot) unmountAndRemove(leaveOnDisk, isFinalAttempt bool) (err error) {
 	const (
-		totalAttempts = 3
-		retryDuration = time.Second
-		unmountFlags  = 0
+		retryDuration       = time.Second
+		totalAttemptsNormal = 3
+		totalAttemptsFinal  = 5
+		unmountFlagsNormal  = 0
+		// Do a lazy unmount on the final attempt. This will allow the unmount to succeed even if the mount point is busy.
+		// This is to avoid leaving folders like /dev mounted if the chroot folder is forcefully deleted by the user. Even
+		// if the mount is busy at least it will be detached from the filesystem and will not damage the host.
+		unmountFlagsFinal = unix.MNT_DETACH
+		errMsg            = "Failed to unmount (%s). Error: %s"
 	)
+	totalAttempts := totalAttemptsNormal
+	unmountFlags := unmountFlagsNormal
+	if isFinalAttempt {
+		logger.Log.Warnf("Final attempt to unmount chroot (%s)", c.rootDir)
+		totalAttempts = totalAttemptsFinal
+		unmountFlags = unmountFlagsFinal
+	}
 
 	for _, mountPoint := range c.mountPoints {
 		fullPath := filepath.Join(c.rootDir, mountPoint.target)
@@ -479,12 +497,21 @@ func (c *Chroot) unmountAndRemove(leaveOnDisk bool) (err error) {
 			continue
 		}
 
-		err = retry.Run(func() error {
-			return unix.Unmount(fullPath, unmountFlags)
-		}, totalAttempts, retryDuration)
+		_, err = retry.RunWithExpBackoff(func() error {
+			logger.Log.Warnf("Calling unmount (%s, %v)", fullPath, unmountFlags)
+			umountErr := unix.Unmount(fullPath, unmountFlags)
+			if isFinalAttempt && umountErr != nil {
+				logger.Log.Warnf(errMsg, fullPath, err.Error())
+			}
+			return umountErr
+		}, totalAttempts, retryDuration, 2.0, nil)
 
 		if err != nil {
-			logger.Log.Warnf("Failed to unmount (%s). Error: %s", fullPath, err)
+			if isFinalAttempt {
+				logger.Log.Fatalf(errMsg, fullPath, err)
+			} else {
+				logger.Log.Warnf(errMsg, fullPath, err)
+			}
 			return
 		}
 	}
