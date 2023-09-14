@@ -18,7 +18,7 @@ URL:            https://libvirt.org/
 Source0:        https://libvirt.org/sources/%{name}-%{version}.tar.xz
 # CVE-2023-2700 is fixed by https://gitlab.com/libvirt/libvirt/-/commit/6425a311b8ad19d6f9c0b315bf1d722551ea3585
 Patch1:         CVE-2023-2700.patch
-Patch2:         0001-add-env-options-to-allow-memory-backend-ignore-share.patch
+Patch2:         0001-add-caps-for-numa-and-ignore-shared.patch
 
 BuildRequires:  audit-libs-devel
 BuildRequires:  augeas
@@ -1038,7 +1038,7 @@ exit 0
 
 %{_datadir}/libvirt/cpu_map/*.xml
 
-%{_datadir}/libvirt/test-screenshot.png
+/home/bfjelds/kubevirt/CBL-Mariner/SPECS/libqmi%{_datadir}/libvirt/test-screenshot.png
 
 %files lock-sanlock
 %config(noreplace) %{_sysconfdir}/libvirt/qemu-sanlock.conf

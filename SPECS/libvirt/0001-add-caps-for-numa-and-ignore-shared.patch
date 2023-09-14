@@ -1,0 +1,208 @@
+From 1bfca162c83c575eee9f409650dfe0afc26b1520 Mon Sep 17 00:00:00 2001
+From: Brian Fjeldstad <bfjelds@microsoft.com>
+Date: Mon, 11 Sep 2023 11:10:29 -0700
+Subject: [PATCH] add env options to allow memory-backend/ignore-shared control
+
+---
+ src/libvirt-domain.c             |  1 -
+ src/qemu/qemu_capabilities.c     |  3 +++
+ src/qemu/qemu_capabilities.h     |  2 ++
+ src/qemu/qemu_command.c          |  2 +-
+ src/qemu/qemu_migration.c        | 39 ++++++++++++++++++++------------
+ src/qemu/qemu_migration_params.c | 13 +++++++++++
+ src/qemu/qemu_migration_params.h |  5 ++++
+ 7 files changed, 49 insertions(+), 16 deletions(-)
+
+diff --git a/src/libvirt-domain.c b/src/libvirt-domain.c
+index ce7cafde36..ae02d9fe8e 100644
+--- a/src/libvirt-domain.c
++++ b/src/libvirt-domain.c
+@@ -32,7 +32,6 @@ VIR_LOG_INIT("libvirt.domain");
+ 
+ #define VIR_FROM_THIS VIR_FROM_DOMAIN
+ 
+-
+ /**
+  * virConnectListDomains:
+  * @conn: pointer to the hypervisor connection
+diff --git a/src/qemu/qemu_capabilities.c b/src/qemu/qemu_capabilities.c
+index 30a557706b..7ae5566116 100644
+--- a/src/qemu/qemu_capabilities.c
++++ b/src/qemu/qemu_capabilities.c
+@@ -651,6 +651,8 @@ VIR_ENUM_IMPL(virQEMUCaps,
+               "device.json", /* QEMU_CAPS_DEVICE_JSON */
+               "query-dirty-rate", /* QEMU_CAPS_QUERY_DIRTY_RATE */
+               "rbd-encryption", /* QEMU_CAPS_RBD_ENCRYPTION */
++              "x-ignore-shared", /* X_QEMU_CAPS_MIGRATE_IGNORE_SHARED */
++              "manually-set-memory-backend", /* QEMU_CAPS_MANUALLY_SET_MEMORY_BACKEND */
+     );
+ 
+ 
+@@ -1184,6 +1186,7 @@ struct virQEMUCapsStringFlags virQEMUCapsCommands[] = {
+ 
+ struct virQEMUCapsStringFlags virQEMUCapsMigration[] = {
+     { "rdma-pin-all", QEMU_CAPS_MIGRATE_RDMA },
++    { "x-ignore-shared", X_QEMU_CAPS_MIGRATE_IGNORE_SHARED },
+ };
+ 
+ /* Use virQEMUCapsQMPSchemaQueries for querying parameters of events */
+diff --git a/src/qemu/qemu_capabilities.h b/src/qemu/qemu_capabilities.h
+index 61bdbdb2ac..5355d509d0 100644
+--- a/src/qemu/qemu_capabilities.h
++++ b/src/qemu/qemu_capabilities.h
+@@ -631,6 +631,8 @@ typedef enum { /* virQEMUCapsFlags grouping marker for syntax-check */
+     QEMU_CAPS_DEVICE_JSON, /* -device accepts JSON */
+     QEMU_CAPS_QUERY_DIRTY_RATE, /* accepts query-dirty-rate */
+     QEMU_CAPS_RBD_ENCRYPTION, /* Ceph RBD encryption support */
++    X_QEMU_CAPS_MIGRATE_IGNORE_SHARED, /* x-ignore-shared */
++    QEMU_CAPS_MANUALLY_SET_MEMORY_BACKEND, /* do not automatically set machine memory-backend */
+ 
+     QEMU_CAPS_LAST /* this must always be the last item */
+ } virQEMUCapsFlags;
+diff --git a/src/qemu/qemu_command.c b/src/qemu/qemu_command.c
+index c47998aabd..f975fd8ab0 100644
+--- a/src/qemu/qemu_command.c
++++ b/src/qemu/qemu_command.c
+@@ -7236,7 +7236,7 @@ qemuBuildMachineCommandLine(virCommand *cmd,
+     if (virDomainNumaHasHMAT(def->numa))
+         virBufferAddLit(&buf, ",hmat=on");
+ 
+-    if (!virDomainNumaGetNodeCount(def->numa)) {
++    if (!virDomainNumaGetNodeCount(def->numa) && !virQEMUCapsGet(qemuCaps, QEMU_CAPS_MANUALLY_SET_MEMORY_BACKEND)) {
+         const char *defaultRAMid = NULL;
+ 
+         /* QEMU is obsoleting -mem-path and -mem-prealloc. That means we have
+diff --git a/src/qemu/qemu_migration.c b/src/qemu/qemu_migration.c
+index 8001792f5a..5f88557d53 100644
+--- a/src/qemu/qemu_migration.c
++++ b/src/qemu/qemu_migration.c
+@@ -2130,10 +2130,24 @@ qemuMigrationDstRun(virQEMUDriver *driver,
+                     qemuDomainAsyncJob asyncJob)
+ {
+     qemuDomainObjPrivate *priv = vm->privateData;
++    g_autoptr(qemuMigrationParams) migParams = NULL;
+     int rv;
+ 
+     VIR_DEBUG("Setting up incoming migration with URI %s", uri);
+ 
++    if (!(migParams = qemuMigrationParamsNew())) {
++        return -1;
++    }
++
++    if (virQEMUCapsGet(priv->qemuCaps, X_QEMU_CAPS_MIGRATE_IGNORE_SHARED)) {
++        if (qemuMigrationCapSet(migParams, QEMU_MIGRATION_CAP_IGNORE_SHARED) < 0)
++            return -1;
++    }
++
++    if (qemuMigrationParamsApply(driver, vm, asyncJob, migParams) < 0) {
++        return -1;
++    }
++
+     if (qemuDomainObjEnterMonitorAsync(driver, vm, asyncJob) < 0)
+         return -1;
+ 
+@@ -5914,29 +5928,26 @@ qemuMigrationSrcToFile(virQEMUDriver *driver, virDomainObj *vm,
+ 
+     /* Increase migration bandwidth to unlimited since target is a file.
+      * Failure to change migration speed is not fatal. */
+-    if (bwParam) {
+-        if (!(migParams = qemuMigrationParamsNew()))
+-            return -1;
++    if (!(migParams = qemuMigrationParamsNew()))
++        return -1;
+ 
++    if (bwParam) {
+         if (qemuMigrationParamsSetULL(migParams,
+                                       QEMU_MIGRATION_PARAM_MAX_BANDWIDTH,
+                                       QEMU_DOMAIN_MIG_BANDWIDTH_MAX * 1024 * 1024) < 0)
+             return -1;
++    }
+ 
+-        if (qemuMigrationParamsApply(driver, vm, asyncJob, migParams) < 0)
++    if (virQEMUCapsGet(priv->qemuCaps, X_QEMU_CAPS_MIGRATE_IGNORE_SHARED)) {
++        if (qemuMigrationCapSet(migParams, QEMU_MIGRATION_CAP_IGNORE_SHARED) < 0)
+             return -1;
+-
+-        priv->migMaxBandwidth = QEMU_DOMAIN_MIG_BANDWIDTH_MAX;
+-    } else {
+-        if (qemuDomainObjEnterMonitorAsync(driver, vm, asyncJob) == 0) {
+-            qemuMonitorSetMigrationSpeed(priv->mon,
+-                                         QEMU_DOMAIN_MIG_BANDWIDTH_MAX);
+-            priv->migMaxBandwidth = QEMU_DOMAIN_MIG_BANDWIDTH_MAX;
+-            if (qemuDomainObjExitMonitor(driver, vm) < 0)
+-                return -1;
+-        }
+     }
+ 
++    if (qemuMigrationParamsApply(driver, vm, asyncJob, migParams) < 0)
++        return -1;
++
++    priv->migMaxBandwidth = QEMU_DOMAIN_MIG_BANDWIDTH_MAX;
++
+     if (!virDomainObjIsActive(vm)) {
+         virReportError(VIR_ERR_INTERNAL_ERROR, "%s",
+                        _("guest unexpectedly quit"));
+diff --git a/src/qemu/qemu_migration_params.c b/src/qemu/qemu_migration_params.c
+index 8df7aac93a..634c3e99c6 100644
+--- a/src/qemu/qemu_migration_params.c
++++ b/src/qemu/qemu_migration_params.c
+@@ -90,6 +90,7 @@ VIR_ENUM_IMPL(qemuMigrationCapability,
+               "late-block-activate",
+               "multifd",
+               "dirty-bitmaps",
++              "x-ignore-shared",
+ );
+ 
+ 
+@@ -828,6 +829,10 @@ qemuMigrationParamsApply(virQEMUDriver *driver,
+     qemuMigrationParam xbzrle = QEMU_MIGRATION_PARAM_XBZRLE_CACHE_SIZE;
+     int ret = -1;
+ 
++    if (virQEMUCapsGet(priv->qemuCaps, QEMU_MIGRATION_CAP_IGNORE_SHARED)) {
++        virBitmapSetBit(migParams->caps, QEMU_MIGRATION_CAP_IGNORE_SHARED);
++    }
++
+     if (qemuDomainObjEnterMonitorAsync(driver, vm, asyncJob) < 0)
+         return -1;
+ 
+@@ -1104,6 +1109,14 @@ qemuMigrationParamsSetULL(qemuMigrationParams *migParams,
+ }
+ 
+ 
++int
++qemuMigrationCapSet(qemuMigrationParams *migParams,
++                    qemuMigrationCapability cap)
++{
++    return virBitmapSetBit(migParams->caps, cap);
++}
++
++
+ /**
+  * Returns -1 on error,
+  *          0 on success,
+diff --git a/src/qemu/qemu_migration_params.h b/src/qemu/qemu_migration_params.h
+index f770bd2576..2d409b2723 100644
+--- a/src/qemu/qemu_migration_params.h
++++ b/src/qemu/qemu_migration_params.h
+@@ -40,6 +40,7 @@ typedef enum {
+     QEMU_MIGRATION_CAP_LATE_BLOCK_ACTIVATE,
+     QEMU_MIGRATION_CAP_MULTIFD,
+     QEMU_MIGRATION_CAP_BLOCK_DIRTY_BITMAPS,
++    QEMU_MIGRATION_CAP_IGNORE_SHARED,
+ 
+     QEMU_MIGRATION_CAP_LAST
+ } qemuMigrationCapability;
+@@ -127,6 +128,10 @@ qemuMigrationParamsSetULL(qemuMigrationParams *migParams,
+                           qemuMigrationParam param,
+                           unsigned long long value);
+ 
++int
++qemuMigrationCapSet(qemuMigrationParams *migParams,
++                    qemuMigrationCapability cap);
++
+ int
+ qemuMigrationParamsGetULL(qemuMigrationParams *migParams,
+                           qemuMigrationParam param,
+-- 
+2.17.1
+
