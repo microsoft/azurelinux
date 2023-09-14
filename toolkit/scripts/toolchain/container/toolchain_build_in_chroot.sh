@@ -333,6 +333,7 @@ case $(uname -m) in
 esac
 # disable no-pie for gcc binaries
 sed -i '/^NO_PIE_CFLAGS = /s/@NO_PIE_CFLAGS@//' gcc/Makefile.in
+patch -Np1 -i /tools/CVE-2023-4039.patch
 # LFS 7.4:  Workaround a bug so that GCC doesn't install libiberty.a, which is already provided by Binutils:
 # sed -i 's/install_to_$(INSTALL_DEST) //' libiberty/Makefile.in
 # Need to remove this link to /tools/lib/gcc as the final gcc includes will be installed here.
