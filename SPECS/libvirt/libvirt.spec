@@ -1038,7 +1038,7 @@ exit 0
 
 %{_datadir}/libvirt/cpu_map/*.xml
 
-/home/bfjelds/kubevirt/CBL-Mariner/SPECS/libqmi%{_datadir}/libvirt/test-screenshot.png
+%{_datadir}/libvirt/test-screenshot.png
 
 %files lock-sanlock
 %config(noreplace) %{_sysconfdir}/libvirt/qemu-sanlock.conf
