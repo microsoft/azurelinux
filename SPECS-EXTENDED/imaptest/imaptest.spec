@@ -1,15 +1,19 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 Summary:        Generic IMAP server compliancy tester
 Name:           imaptest
 # Upstream is not really planning on adding version numbers
-Version:        20210305
-Release:        2%{?dist}
+Version:        20210511
+Release:        1%{?dist}
 License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://www.imapwiki.org/ImapTest
 Source0:        https://dovecot.org/nightly/%{name}/%{name}-%{version}.tar.gz
-BuildRequires:  gcc, make, dovecot-devel >= 2.3.0
-BuildRequires:  autoconf, automake, libtool
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  dovecot-devel >= 2.3.15
+BuildRequires:  gcc
+BuildRequires:  libtool
+BuildRequires:  make
 
 %description
 ImapTest is a generic IMAP server compliancy tester that works with all IMAP
@@ -36,11 +40,11 @@ sed -e 's@\(^LIBDOVECOT .*\)@\1 -Wl,-rpath -Wl,%{_libdir}/dovecot@' -i src/Makef
 %make_install
 
 # Copy test files for later shipping
-mkdir -p $RPM_BUILD_ROOT%{_datadir}/%{name}/
-cp -pr src/tests/ $RPM_BUILD_ROOT%{_datadir}/%{name}/
+mkdir -p %{buildroot}%{_datadir}/%{name}/
+cp -pr src/tests/ %{buildroot}%{_datadir}/%{name}/
 
 %check
-$RPM_BUILD_ROOT%{_bindir}/%{name} --help
+%{buildroot}%{_bindir}/%{name} --help
 
 %files
 %license COPYING COPYING.MIT
@@ -49,6 +53,10 @@ $RPM_BUILD_ROOT%{_bindir}/%{name} --help
 %{_datadir}/%{name}/
 
 %changelog
+* Thu Sep 14 2023 Archana Choudhary <archana1@microsoft.com> - 20210511-1
+- Upgrade to 20210511 to support dovecot>=2.3.15
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20210305-2
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 
