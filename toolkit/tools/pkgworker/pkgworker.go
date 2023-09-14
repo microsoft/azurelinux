@@ -6,6 +6,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -22,6 +23,9 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/tdnf"
+
+	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
+	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -124,6 +128,50 @@ func buildChrootDirPath(workDir, srpmFilePath string, runCheck bool) (chrootDirP
 	return filepath.Join(workDir, buildDirName)
 }
 
+func upload(
+	theClient *azblob.Client,
+	fullFileName string,
+	containerName string,
+	blobName string) (err error) {
+
+	localFile, err := os.OpenFile(fullFileName, os.O_RDONLY, 0)
+	if err != nil {
+		fmt.Printf("Failed to open local file for upload. Error: %v", err)
+		return err
+	}
+	defer localFile.Close()
+
+	_, err = theClient.UploadFile(context.Background(), containerName, blobName, localFile, nil)
+	if err != nil {
+		fmt.Printf("Failed to upload local file to blob. Error: %v.", err)
+		return err
+	}
+
+	return nil
+}
+
+func download(
+	theClient *azblob.Client,
+	containerName string,
+	blobName string,
+	fullFileName string) (err error) {
+
+	localFile, err := os.Create(fullFileName)
+	if err != nil {
+		fmt.Printf("Failed to create local file for download. Error: %v", err)
+		return err
+	}
+	defer localFile.Close()
+
+	_, err = theClient.DownloadFile(context.Background(), containerName, blobName, localFile, nil)
+	if err != nil {
+		fmt.Printf("Failed to download blob to local file. Error: %v.", err)
+		return err
+	}
+
+	return nil
+}
+
 func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmFile, repoFile, rpmmacrosFile, outArch string, defines map[string]string, noCleanup, runCheck bool, packagesToInstall []string, useCcache bool) (builtRPMs []string, err error) {
 	const (
 		buildHeartbeatTimeout = 30 * time.Minute
@@ -157,14 +205,32 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 		quit <- true
 	}()
 
+	var theClient *azblob.Client
+	var containerName = "testcontainer"
+	var blobName = "kernel-ccache.tar.gz"
+
 	if useCcache {
 		// ensure the following are set:
 		// - ccacheDirTarsIn
 		// - ccacheDirTarsOut
 		// - ccacheDir
 
+
+		var storageAccountName = "gmilekamarinerbld"
+		url := "https://" + storageAccountName + ".blob.core.windows.net/"
+	
+		credential, err := azidentity.NewDefaultAzureCredential(nil)
+		if err != nil {
+			logger.Log.Warnf("Unable to init azure identity. Error: %v", err)
+		}
+	
+		theClient, err := azblob.NewClient(url, credential, nil)
+		if err != nil {
+			logger.Log.Warnf("Unable to init azure blob storage client. Error: %v", err)
+		}
+	
 		logger.Log.Infof("Ensuring ccache working folder exists (%s).", *ccacheDir)
-		_, err := os.Stat(*ccacheDir)
+		_, err = os.Stat(*ccacheDir)
 		if err != nil {
 			// It might contain files from building other packages that belong
 			// to the same ccache group...
@@ -177,11 +243,30 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 
 			err = os.Mkdir(*ccacheDir, 0755)
 			if err != nil {
-				logger.Log.Warnf("Unable create ccache oworking folder. Error: %v", err)
+				logger.Log.Warnf("Unable to create ccache working folder. Error: %v", err)
 			}			
 
-			// untar ccache...
+			_, err := os.Stat(*ccacheDirTarsIn)
+			if err != nil {
+				err = os.Mkdir(*ccacheDirTarsIn, 0755)
+				if err != nil {
+					logger.Log.Warnf("Unable to create ccache working folder. Error: %v", err)
+				}			
+			}
+
 			ccacheInputTarFullPath := *ccacheDirTarsIn + "/" + *ccacheGroupName + "-ccache.tar.gz"
+
+			// test downloading
+			downloadStartTime := time.Now()
+			err = download(theClient, containerName, blobName, ccacheInputTarFullPath)
+			if err != nil {
+				logger.Log.Warnf("Unable to download ccache archive. Error: %v", err)
+			}
+			downloadEndTime := time.Now()
+			downloadTime := downloadEndTime.Sub(downloadStartTime)
+			fmt.Println("Download Time:", downloadTime)
+
+			// untar ccache...
 			logger.Log.Infof("Looking for ccache tar input file (%s).", ccacheInputTarFullPath)
 			_, err = os.Stat(ccacheInputTarFullPath)
 			if err == nil {
@@ -283,6 +368,19 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 		if err != nil {
 			logger.Log.Warnf("Unable compress ccache files itno archive. Error: %v", stderr)
 		}
+
+		// ** Temporary ** Uploading should take place at the end of the build
+		// because other package family group members may update it.
+		//
+		// Test uploading
+		uploadStartTime := time.Now()
+		err = upload(theClient, ccacheOutputTarFullPath, containerName, blobName + "-1")
+		if err != nil {
+			logger.Log.Warnf("Unable to upload ccache archive. Error: %v", err)
+		}
+		uploadEndTime := time.Now()
+		uploadTime := uploadEndTime.Sub(uploadStartTime)
+		fmt.Println("Upload Time:", uploadTime)
 
 		// Do no clean it because it might be used by other packages in the same
 		// ccache group...
