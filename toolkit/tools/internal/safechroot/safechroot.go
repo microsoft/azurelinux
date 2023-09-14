@@ -19,6 +19,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/systemdependency"
 
+	"github.com/moby/sys/mountinfo"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/sys/unix"
 )
@@ -376,6 +377,10 @@ func (c *Chroot) Close(leaveOnDisk bool) (err error) {
 	if buildpipeline.IsRegularBuild() {
 		// mount is only supported in regular pipeline
 		err = c.unmountAndRemove(leaveOnDisk, isNotFinalAttempt)
+		if err != nil {
+			logger.Log.Warnf("Chroot cleanup failed, will retry with lazy unmount. Error: %s", err)
+			err = c.unmountAndRemove(leaveOnDisk, isFinalAttempt)
+		}
 		if err == nil {
 			const emptyLen = 0
 			// Remove this chroot from the list of active ones since it has now been cleaned up.
@@ -496,6 +501,17 @@ func (c *Chroot) unmountAndRemove(leaveOnDisk, isFinalAttempt bool) (err error) 
 	for _, mountPoint := range c.mountPoints {
 		fullPath := filepath.Join(c.rootDir, mountPoint.target)
 
+		isMounted := true
+		isMounted, err = mountinfo.Mounted(fullPath)
+		if err != nil {
+			err = fmt.Errorf("failed to check if mount point (%s) is mounted. Error: %s", fullPath, err)
+			return err
+		}
+		if !isMounted {
+			logger.Log.Debugf("Skipping unmount of (%s) because it is not mounted", fullPath)
+			continue
+		}
+
 		logger.Log.Debugf("Unmounting (%s)", fullPath)
 
 		// Skip mount points if they were not successfully created
@@ -507,7 +523,7 @@ func (c *Chroot) unmountAndRemove(leaveOnDisk, isFinalAttempt bool) (err error) 
 			logger.Log.Debugf("Calling unmount (%s, %v)", fullPath, unmountFlags)
 			umountErr := unix.Unmount(fullPath, unmountFlags)
 			if isFinalAttempt && umountErr != nil {
-				logger.Log.Warnf(errMsg, fullPath, err.Error())
+				logger.Log.Warnf(errMsg, fullPath, umountErr.Error())
 			}
 			return umountErr
 		}, totalAttempts, retryDuration, 2.0, nil)
