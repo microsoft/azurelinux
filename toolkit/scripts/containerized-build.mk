@@ -23,7 +23,7 @@ containerized_build_args += -v ${VERSION}
 endif
 
 ifneq ($(MOUNTS),)
-containerized_build_args += -mo ${MOUNTS}
+containerized_build_args += -mo "$(MOUNTS)"
 endif
 
 ifneq ($(BUILD_MOUNT),)
