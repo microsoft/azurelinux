@@ -14,6 +14,7 @@ import (
 	"strings"
 	"time"
 
+    "github.com/microsoft/CBL-Mariner/toolkit/tools/internal/ccache"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
@@ -128,20 +129,36 @@ func buildChrootDirPath(workDir, srpmFilePath string, runCheck bool) (chrootDirP
 	return filepath.Join(workDir, buildDirName)
 }
 
+// https://pkg.go.dev/github.com/Azure/azure-sdk-for-go/sdk/storage/azblob#section-readme
 func upload(
 	theClient *azblob.Client,
+	ctx context.Context,
 	fullFileName string,
 	containerName string,
 	blobName string) (err error) {
+
+	logger.Log.Infof("Uploading %s...", fullFileName)
 
 	localFile, err := os.OpenFile(fullFileName, os.O_RDONLY, 0)
 	if err != nil {
 		fmt.Printf("Failed to open local file for upload. Error: %v", err)
 		return err
 	}
+	if localFile == nil {
+		fmt.Printf("Failed to open local file for upload 2.")
+	}
 	defer localFile.Close()
 
-	_, err = theClient.UploadFile(context.Background(), containerName, blobName, localFile, nil)
+	// close the file after it is no longer required.
+	// defer func(file *os.File) {
+	// 	err = file.Close()
+	// 	handleError(err)
+	// }(fileHandler)
+
+	logger.Log.Infof("Container %s", containerName)
+	logger.Log.Infof("blob %s", blobName)
+
+	_, err = theClient.UploadFile(ctx, containerName, blobName, localFile, nil)
 	if err != nil {
 		fmt.Printf("Failed to upload local file to blob. Error: %v.", err)
 		return err
@@ -152,6 +169,7 @@ func upload(
 
 func download(
 	theClient *azblob.Client,
+	ctx context.Context,
 	containerName string,
 	blobName string,
 	fullFileName string) (err error) {
@@ -163,13 +181,206 @@ func download(
 	}
 	defer localFile.Close()
 
-	_, err = theClient.DownloadFile(context.Background(), containerName, blobName, localFile, nil)
+	_, err = theClient.DownloadFile(ctx, containerName, blobName, localFile, nil)
 	if err != nil {
 		fmt.Printf("Failed to download blob to local file. Error: %v.", err)
 		return err
 	}
 
 	return nil
+}
+
+func createContainerClient(remoteStore ccache.RemoteStore) (client *azblob.Client, err error ) {
+	credential, err := azidentity.NewClientSecretCredential(remoteStore.TenantId, remoteStore.UserName, remoteStore.Password, nil)
+	if err != nil {
+		logger.Log.Warnf("Unable to init azure identity. Error: %v", err)
+		return nil, err
+	}
+
+	url := "https://" + remoteStore.StorageAccount + ".blob.core.windows.net/"
+
+	client, err = azblob.NewClient(url, credential, nil)
+	if err != nil {
+		logger.Log.Warnf("Unable to init azure blob storage client. Error: %v", err)
+		return nil, err
+	}
+
+	return client, nil
+}
+
+const (
+	CCacheTarSuffix = "-ccache.tar.gz"
+)
+// ensure the following are set:
+// - ccacheDirTarsIn
+// - ccacheDirTarsOut
+// - ccacheDir
+func installCCache(ccacheDirTarsIn string, ccacheGroupName string) (err error) {
+
+	logger.Log.Infof("ccache is enabled - Installing --------------------")
+	logger.Log.Infof("  retrieving remote store information...")
+	remoteStore, err := ccache.GetCCacheRemoteStore()
+	if err != nil {
+		logger.Log.Warnf("Unable to get ccache remote store configuration. Error: %v", err)
+		return err
+	}
+
+	var ccacheInputTarFullPath = ccacheDirTarsIn + "/" + ccacheGroupName + CCacheTarSuffix
+	var blobName = ccacheGroupName + CCacheTarSuffix
+	var inputBlobName = remoteStore.InputFolder + "/" + blobName
+
+	logger.Log.Infof("  creating container client...")
+	theClient, err := createContainerClient(remoteStore)
+	if err != nil {
+		logger.Log.Warnf("Unable to init azure blob storage client. Error: %v", err)
+		return err
+	}
+
+	logger.Log.Infof("  ensuring ccache working folder (%s) exists.", *ccacheDir)
+	_, err = os.Stat(*ccacheDir)
+	if err == nil {
+		logger.Log.Infof("  CCache working folder does exists. Returning...")
+		return nil
+	}
+
+	logger.Log.Infof(" creating ccache working folder...")
+	err = os.Mkdir(*ccacheDir, 0755)
+	if err != nil {
+		logger.Log.Warnf("Unable to create ccache working folder. Error: %v", err)
+		return err
+	}
+
+	logger.Log.Infof("  ensuring ccache tars input folder (%s) exists.", ccacheDirTarsIn)
+	_, err = os.Stat(ccacheDirTarsIn)
+	if err != nil {
+		logger.Log.Infof(" creating ccache tars input folder...")
+		err = os.Mkdir(ccacheDirTarsIn, 0755)
+		if err != nil {
+			logger.Log.Warnf("Unable to create ccache working folder. Error: %v", err)
+			return err
+		}			
+	}
+
+	ccacheInputTarFullPath = ccacheDirTarsIn + "/" + ccacheGroupName + "-ccache.tar.gz"
+	logger.Log.Infof("  downloading  to (%s)...", ccacheInputTarFullPath)
+
+	downloadStartTime := time.Now()
+	err = download(theClient, context.Background(), remoteStore.ContainerName, inputBlobName, ccacheInputTarFullPath)
+	if err != nil {
+		logger.Log.Warnf("Unable to download ccache archive. Error: %v", err)
+		return err
+	}
+	downloadEndTime := time.Now()
+	logger.Log.Infof("  download time: %v", downloadEndTime.Sub(downloadStartTime))
+
+	logger.Log.Infof("  uncompressing (%s) into (%s).", ccacheInputTarFullPath, *ccacheDir)
+	tarArgs := []string{
+		"xf",
+		ccacheInputTarFullPath,
+		"-C",
+		*ccacheDir,
+		"."}
+
+	_, stderr, err := shell.Execute("tar", tarArgs...)
+	if err != nil {
+		logger.Log.Warnf("Unable extract ccache files from archive. Error: %v", stderr)
+		return err
+	}
+
+	return nil
+}
+
+// ensure the following are set:
+// - ccacheDirTarsIn
+// - ccacheDirTarsOut
+// - ccacheDir
+	func archiveCCache(ccacheDirTarsOut string, ccacheGroupName string) (err error) {
+
+	logger.Log.Infof("ccache is enabled - Capturing --------------------")
+    remoteStore, err := ccache.GetCCacheRemoteStore()
+	if err != nil {
+		logger.Log.Warnf("Unable to get ccache remote store configuration. Error: %v", err)
+		return err
+	}
+
+	var blobName = ccacheGroupName + CCacheTarSuffix
+	var outputBlobName = remoteStore.OutputFolder + "/" + blobName
+	
+	// tar ccache...
+	ccacheOutputTarFullPath := ccacheDirTarsOut + "/" + ccacheGroupName + CCacheTarSuffix
+	// Check if the folder exists...
+	logger.Log.Infof("  ensuring ccache tar output folder (%s) exists..", ccacheDirTarsOut)
+	_, err = os.Stat(ccacheDirTarsOut)
+	if err != nil {
+		if os.IsNotExist(err) {
+			// If not, create it...
+			err = os.Mkdir(ccacheDirTarsOut, 0755)
+			if err != nil {
+				logger.Log.Warnf("Unable create ccache out tar folder. Error: %v", err)
+				return err
+			}
+		} else {
+			logger.Log.Warnf("An error occured while check if ccache out tar folder exists. Error: %v", err)
+			return err
+		}
+	}
+
+	logger.Log.Infof("  removing older ccache tar output file (%s) if it exists...", ccacheOutputTarFullPath)
+	_, err = os.Stat(ccacheOutputTarFullPath)
+	if err == nil {
+		logger.Log.Infof("  found ccache tar output file (%s). Removing...", ccacheOutputTarFullPath)
+		err = os.Remove(ccacheOutputTarFullPath)
+		if err != nil {
+			logger.Log.Warnf("  unable to delete ccache out tar. Error: %v", err)
+			return err
+		}
+	}
+	
+	logger.Log.Infof("  compressing (%s) into (%s).", *ccacheDir, ccacheOutputTarFullPath)
+	tarArgs := []string{
+		"cf",
+		ccacheOutputTarFullPath,
+		"-C",
+		*ccacheDir,
+		"."}
+
+	_, stderr, err := shell.Execute("tar", tarArgs...)
+	if err != nil {
+		logger.Log.Warnf("Unable compress ccache files itno archive. Error: %v", stderr)
+		return err	
+	}
+
+	// ** Temporary ** Uploading should take place at the end of the build
+	// because other package family group members may update it.
+	//
+
+	// Test uploading
+	logger.Log.Infof("  connecting to azure storage blob...")
+	theClient, err := createContainerClient(remoteStore)
+	if err != nil {
+		logger.Log.Warnf("Unable create azure blob storage client. Error: %v", stderr)
+		return err
+	}
+
+	uploadStartTime := time.Now()
+	err = upload(theClient, context.Background(), ccacheOutputTarFullPath, remoteStore.ContainerName, outputBlobName)
+	if err != nil {
+		logger.Log.Warnf("Unable to upload ccache archive. Error: %v", err)
+		return err
+	}
+	uploadEndTime := time.Now()
+	logger.Log.Infof("Upload Time: %s", uploadEndTime.Sub(uploadStartTime))
+
+	// Do no clean it because it might be used by other packages in the same
+	// ccache group...
+	//
+	// logger.Log.Infof("Cleaning ccache working folder (%s).", *ccacheDir)	
+	// err = os.RemoveAll(*ccacheDir)
+	// if err != nil {
+	// 	logger.Log.Warnf("Unable rermove ccache working directory. Error: %v", err)
+	// }
+
+	return
 }
 
 func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmFile, repoFile, rpmmacrosFile, outArch string, defines map[string]string, noCleanup, runCheck bool, packagesToInstall []string, useCcache bool) (builtRPMs []string, err error) {
@@ -205,90 +416,15 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 		quit <- true
 	}()
 
-	var theClient *azblob.Client
-	var containerName = "testcontainer"
-	var blobName = "kernel-ccache.tar.gz"
+	logger.Log.Infof("** Running ccache POC. **")
 
 	if useCcache {
-		// ensure the following are set:
-		// - ccacheDirTarsIn
-		// - ccacheDirTarsOut
-		// - ccacheDir
-
-
-		var storageAccountName = "gmilekamarinerbld"
-		url := "https://" + storageAccountName + ".blob.core.windows.net/"
-	
-		credential, err := azidentity.NewDefaultAzureCredential(nil)
+		err = installCCache(*ccacheDirTarsIn, *ccacheGroupName)
 		if err != nil {
-			logger.Log.Warnf("Unable to init azure identity. Error: %v", err)
-		}
-	
-		theClient, err := azblob.NewClient(url, credential, nil)
-		if err != nil {
-			logger.Log.Warnf("Unable to init azure blob storage client. Error: %v", err)
-		}
-	
-		logger.Log.Infof("Ensuring ccache working folder exists (%s).", *ccacheDir)
-		_, err = os.Stat(*ccacheDir)
-		if err != nil {
-			// It might contain files from building other packages that belong
-			// to the same ccache group...
-			//
-			// logger.Log.Infof("Cleaning ccache working folder (%s).", *ccacheDir)
-			// err = os.RemoveAll(*ccacheDir)
-			// if err != nil {
-			// 	logger.Log.Warnf("Unable rermove ccache working directory. Error: %v", err)
-			// }
-
-			err = os.Mkdir(*ccacheDir, 0755)
-			if err != nil {
-				logger.Log.Warnf("Unable to create ccache working folder. Error: %v", err)
-			}			
-
-			_, err := os.Stat(*ccacheDirTarsIn)
-			if err != nil {
-				err = os.Mkdir(*ccacheDirTarsIn, 0755)
-				if err != nil {
-					logger.Log.Warnf("Unable to create ccache working folder. Error: %v", err)
-				}			
-			}
-
-			ccacheInputTarFullPath := *ccacheDirTarsIn + "/" + *ccacheGroupName + "-ccache.tar.gz"
-
-			// test downloading
-			downloadStartTime := time.Now()
-			err = download(theClient, containerName, blobName, ccacheInputTarFullPath)
-			if err != nil {
-				logger.Log.Warnf("Unable to download ccache archive. Error: %v", err)
-			}
-			downloadEndTime := time.Now()
-			downloadTime := downloadEndTime.Sub(downloadStartTime)
-			fmt.Println("Download Time:", downloadTime)
-
-			// untar ccache...
-			logger.Log.Infof("Looking for ccache tar input file (%s).", ccacheInputTarFullPath)
-			_, err = os.Stat(ccacheInputTarFullPath)
-			if err == nil {
-				logger.Log.Infof("Found (%s).", ccacheInputTarFullPath)
-				logger.Log.Infof("Uncompressing (%s) into (%s).", ccacheInputTarFullPath, *ccacheDir)
-				tarArgs := []string{
-					"xf",
-					ccacheInputTarFullPath,
-					"-C",
-					*ccacheDir,
-					"."}
-			
-				_, stderr, err := shell.Execute("tar", tarArgs...)
-				if err != nil {
-					logger.Log.Warnf("Unable extract ccache files from archive. Error: %v", stderr)
-				}
-			} else {
-				logger.Log.Infof("Could not find (%s).", ccacheInputTarFullPath)	
-			}
+			logger.Log.Warnf("CCache will be disabled.")
 		}
 	}
-
+	
 	// Create the chroot used to build the SRPM
 	chroot := safechroot.NewChroot(chrootDir, existingChrootDir)
 
@@ -324,72 +460,10 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 	}
 
 	if useCcache {
-		// ensure the following are set:
-		// - ccacheDirTarsIn
-		// - ccacheDirTarsOut
-		// - ccacheDir
-		
-		// tar ccache...
-		ccacheOutputTarFullPath := *ccacheDirTarsOut + "/" + *ccacheGroupName + "-ccache.tar.gz"
-		// Check if the folder exists...
-		logger.Log.Infof("Looking for ccache tar output folder (%s).", *ccacheDirTarsOut)
-		_, err := os.Stat(*ccacheDirTarsOut)
+		err = archiveCCache(*ccacheDirTarsOut, *ccacheGroupName)
 		if err != nil {
-			if os.IsNotExist(err) {
-				// If not, create it...
-				err = os.Mkdir(*ccacheDirTarsOut, 0755)
-				if err != nil {
-					logger.Log.Warnf("Unable create ccache out tar folder. Error: %v", err)
-				}
-			} else {
-				logger.Log.Warnf("An error occured while check if ccache out tar folder exists. Error: %v", err)
-			}
+			logger.Log.Warnf("CCache will not be archived.")
 		}
-
-		logger.Log.Infof("Looking for ccache tar output file (%s).", ccacheOutputTarFullPath)
-		_, err = os.Stat(ccacheOutputTarFullPath)
-		if err == nil {
-			logger.Log.Infof("Found ccache tar output file (%s). Removing...", ccacheOutputTarFullPath)
-			err = os.Remove(ccacheOutputTarFullPath)
-			if err != nil {
-				logger.Log.Warnf("Unable delete ccache out tar. Error: %v", err)
-			}
-		}
-		
-		logger.Log.Infof("Compressing (%s) into (%s).", *ccacheDir, ccacheOutputTarFullPath)
-		tarArgs := []string{
-			"cf",
-			ccacheOutputTarFullPath,
-			"-C",
-			*ccacheDir,
-			"."}
-	
-		_, stderr, err := shell.Execute("tar", tarArgs...)
-		if err != nil {
-			logger.Log.Warnf("Unable compress ccache files itno archive. Error: %v", stderr)
-		}
-
-		// ** Temporary ** Uploading should take place at the end of the build
-		// because other package family group members may update it.
-		//
-		// Test uploading
-		uploadStartTime := time.Now()
-		err = upload(theClient, ccacheOutputTarFullPath, containerName, blobName + "-1")
-		if err != nil {
-			logger.Log.Warnf("Unable to upload ccache archive. Error: %v", err)
-		}
-		uploadEndTime := time.Now()
-		uploadTime := uploadEndTime.Sub(uploadStartTime)
-		fmt.Println("Upload Time:", uploadTime)
-
-		// Do no clean it because it might be used by other packages in the same
-		// ccache group...
-		//
-		// logger.Log.Infof("Cleaning ccache working folder (%s).", *ccacheDir)	
-		// err = os.RemoveAll(*ccacheDir)
-		// if err != nil {
-		// 	logger.Log.Warnf("Unable rermove ccache working directory. Error: %v", err)
-		// }
 	}
 	return
 }

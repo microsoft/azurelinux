@@ -1,4 +1,14 @@
 {
+  "remoteStore": {
+    "type": "azure-blob-storage",
+    "tenantId": "<tenant-id>",
+    "username": "<user-name>",
+    "password": "<password>",
+    "storageAccount": "<storageAccount>",
+    "containerName": "<containerName>",
+    "inputFolder": "<inputFolder>",
+    "outputFolder": "<outputFolder>"
+  },
   "groups": [
     {
       "name": "kernel",

@@ -12,8 +12,8 @@ import (
 	"sync"
 	"time"
 
+    "github.com/microsoft/CBL-Mariner/toolkit/tools/internal/ccache"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
@@ -143,57 +143,21 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 	logger.Log.Debug("Worker done")
 }
 
-type CCacheGroup struct {
-	Name     string `json:"name"`
-    PackageNames []string `json:"packageNames"`
-}
-
-type CCacheConfiguration struct {
-	Groups   []CCacheGroup  `json:"groups"`
+func findBasePackageName(specPath string) (basePackageName string) {
+	baseName := filepath.Base(specPath)
+	fileExtension := filepath.Ext(baseName)
+	basePackageName = baseName[:len(baseName)-len(fileExtension)]
+	logger.Log.Infof("spec full path : %s", specPath)
+	logger.Log.Infof("basePackageName: %s", basePackageName)
+	return basePackageName
 }
 
 // buildNode builds a TypeLocalBuild node, either used a cached copy if possible or building the corresponding SRPM.
 func buildNode(request *BuildRequest, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, buildAttempts int, ignoredPackages []*pkgjson.PackageVer) (ignored bool, builtFiles []string, logFile string, err error) {
 	node := request.Node
 	baseSrpmName := node.SRPMFileName()
-
-	baseName := filepath.Base(node.SpecPath)
-	fileExtension := filepath.Ext(baseName)
-	fileNameWithoutExtension := baseName[:len(baseName)-len(fileExtension)]
-	fmt.Println("Full Path:", node.SpecPath)
-	fmt.Println("File Name without Extension:", fileNameWithoutExtension)
-	basePackageName := fileNameWithoutExtension
-
-	// find target ccache group name
-	var packageCCacheGroupName string
-	ccacheGroupsFile := "resources/manifests/package/ccache_configuration.json"
-	fmt.Println("Loading ccache configuration file:", ccacheGroupsFile)
-	var ccacheConfiguration CCacheConfiguration
-	err = jsonutils.ReadJSONFile(ccacheGroupsFile, &ccacheConfiguration)
-	if err != nil {
-		fmt.Println("Failed to load file.", err)
-	} else {
-		fmt.Println("Loaded file.")
-		for _, group := range ccacheConfiguration.Groups {
-			fmt.Println("Found group:", group.Name)
-			for _, packageName := range group.PackageNames {
-				fmt.Println("  Found package:", packageName)
-				if packageName == basePackageName {
-					packageCCacheGroupName = group.Name
-					break
-				}
-			}
-			if packageCCacheGroupName != "" {
-				break
-			}
-		}
-	}
-
-	if packageCCacheGroupName != "" {
-		fmt.Println("Found ccache group:", packageCCacheGroupName)
-	} else {
-		fmt.Println("Did not find ccache group.")
-	}
+	basePackageName := findBasePackageName(node.SpecPath)
+	packageCCacheGroupName := ccache.FindCCacheGroup(basePackageName)
 
 	ignored = sliceutils.Contains(ignoredPackages, node.VersionedPkg, sliceutils.PackageVerMatch)
 
