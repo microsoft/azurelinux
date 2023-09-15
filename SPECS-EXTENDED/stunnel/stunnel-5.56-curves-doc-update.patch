@@ -1,66 +1,98 @@
---- stunnel-5.56/doc/stunnel.8.in.curves-doc-update	2020-04-16 17:12:48.171590017 +0200
-+++ stunnel-5.56/doc/stunnel.8.in	2020-04-16 17:16:07.001603122 +0200
-@@ -473,6 +473,8 @@ This file contains multiple CRLs, used w
+From e951a8a7edc87dbd608043f8aab67ef12979e3ca Mon Sep 17 00:00:00 2001
+From: Sahana Prasad <sahana@redhat.com>
+Date: Mon, 12 Sep 2022 11:07:38 +0200
+Subject: [PATCH 6/8] Apply patch stunnel-5.56-curves-doc-update.patch
+
+Patch-name: stunnel-5.56-curves-doc-update.patch
+Patch-id: 6
+From-dist-git-commit: 70b3076eb09912b3a11f371b8c523303114fffa3
+---
+ doc/stunnel.8.in       | 2 ++
+ doc/stunnel.html.in    | 2 ++
+ doc/stunnel.pl.8.in    | 2 ++
+ doc/stunnel.pl.html.in | 2 ++
+ doc/stunnel.pl.pod.in  | 2 ++
+ doc/stunnel.pod.in     | 2 ++
+ 6 files changed, 12 insertions(+)
+
+diff --git a/doc/stunnel.8.in b/doc/stunnel.8.in
+index a56f0b7..977a1a4 100644
+--- a/doc/stunnel.8.in
++++ b/doc/stunnel.8.in
+@@ -475,6 +475,8 @@ This file contains multiple CRLs, used with the \fIverifyChain\fR and
  .IX Item "curves = list"
  \&\s-1ECDH\s0 curves separated with ':'
  .Sp
 +Note: This option is supported for server mode sockets only.
 +.Sp
- Only a single curve name is allowed for OpenSSL older than 1.1.0.
+ Only a single curve name is allowed for OpenSSL older than 1.1.1.
  .Sp
  To get a list of supported curves use:
---- stunnel-5.56/doc/stunnel.html.in.curves-doc-update	2020-04-16 17:13:25.664962696 +0200
-+++ stunnel-5.56/doc/stunnel.html.in	2020-04-16 17:16:55.897111302 +0200
-@@ -568,6 +568,8 @@
+diff --git a/doc/stunnel.html.in b/doc/stunnel.html.in
+index 608afa9..cecc81a 100644
+--- a/doc/stunnel.html.in
++++ b/doc/stunnel.html.in
+@@ -570,6 +570,8 @@
  
  <p>ECDH curves separated with &#39;:&#39;</p>
  
 +<p>Note: This option is supported for server mode sockets only.</p>
 +
- <p>Only a single curve name is allowed for OpenSSL older than 1.1.0.</p>
+ <p>Only a single curve name is allowed for OpenSSL older than 1.1.1.</p>
  
  <p>To get a list of supported curves use:</p>
---- stunnel-5.56/doc/stunnel.pod.in.curves-doc-update	2020-04-16 17:13:43.412139122 +0200
-+++ stunnel-5.56/doc/stunnel.pod.in	2020-04-16 17:17:25.414418073 +0200
-@@ -499,6 +499,8 @@ I<verifyPeer> options.
- 
- ECDH curves separated with ':'
- 
-+Note: This option is supported for server mode sockets only.
-+
- Only a single curve name is allowed for OpenSSL older than 1.1.0.
- 
- To get a list of supported curves use:
---- stunnel-5.56/doc/stunnel.pl.pod.in.curves-doc-update	2020-04-16 17:25:22.631934496 +0200
-+++ stunnel-5.56/doc/stunnel.pl.pod.in	2020-04-16 17:47:46.872353210 +0200
-@@ -507,6 +507,8 @@ przez opcje I<verifyChain> i I<verifyPee
- 
- krzywe ECDH odddzielone ':'
- 
-+Uwaga: ta opcja wpływa tylko na gniazda w trybie serwera.
-+
- Wersje OpenSSL starsze niż 1.1.0 pozwalają na użycie tylko jednej krzywej.
- 
- Listę dostępnych krzywych można uzyskać poleceniem:
---- stunnel-5.56/doc/stunnel.pl.html.in.curves-doc-update	2020-04-16 17:24:46.857579674 +0200
-+++ stunnel-5.56/doc/stunnel.pl.html.in	2020-04-16 17:46:13.385404626 +0200
-@@ -564,6 +564,8 @@
- 
- <p>krzywe ECDH odddzielone &#39;:&#39;</p>
- 
-+<p>Uwaga: ta opcja wpływa tylko na gniazda w trybie serwera.</p>
-+
- <p>Wersje OpenSSL starsze ni&#x17C; 1.1.0 pozwalaj&#x105; na u&#x17C;ycie tylko jednej krzywej.</p>
- 
- <p>List&#x119; dost&#x119;pnych krzywych mo&#x17C;na uzyska&#x107; poleceniem:</p>
---- stunnel-5.56/doc/stunnel.pl.8.in.curves-doc-update	2020-04-16 17:24:25.665369474 +0200
-+++ stunnel-5.56/doc/stunnel.pl.8.in	2020-04-16 17:45:14.141792786 +0200
-@@ -483,6 +483,8 @@ przez opcje \fIverifyChain\fR i \fIverif
+diff --git a/doc/stunnel.pl.8.in b/doc/stunnel.pl.8.in
+index e2e6622..eae88f8 100644
+--- a/doc/stunnel.pl.8.in
++++ b/doc/stunnel.pl.8.in
+@@ -492,6 +492,8 @@ przez opcje \fIverifyChain\fR i \fIverifyPeer\fR.
  .IX Item "curves = lista"
  krzywe \s-1ECDH\s0 odddzielone ':'
  .Sp
 +Uwaga: ta opcja wpływa tylko na gniazda w trybie serwera.
 +.Sp
- Wersje OpenSSL starsze niż 1.1.0 pozwalają na użycie tylko jednej krzywej.
+ Wersje OpenSSL starsze niż 1.1.1 pozwalają na użycie tylko jednej krzywej.
  .Sp
  Listę dostępnych krzywych można uzyskać poleceniem:
+diff --git a/doc/stunnel.pl.html.in b/doc/stunnel.pl.html.in
+index 7be87f1..7fd7a7c 100644
+--- a/doc/stunnel.pl.html.in
++++ b/doc/stunnel.pl.html.in
+@@ -568,6 +568,8 @@
+ 
+ <p>krzywe ECDH odddzielone &#39;:&#39;</p>
+ 
++<p>Uwaga: ta opcja wpływa tylko na gniazda w trybie serwera.</p>
++
+ <p>Wersje OpenSSL starsze ni&#x17C; 1.1.1 pozwalaj&#x105; na u&#x17C;ycie tylko jednej krzywej.</p>
+ 
+ <p>List&#x119; dost&#x119;pnych krzywych mo&#x17C;na uzyska&#x107; poleceniem:</p>
+diff --git a/doc/stunnel.pl.pod.in b/doc/stunnel.pl.pod.in
+index dc6b255..712f751 100644
+--- a/doc/stunnel.pl.pod.in
++++ b/doc/stunnel.pl.pod.in
+@@ -516,6 +516,8 @@ przez opcje I<verifyChain> i I<verifyPeer>.
+ 
+ krzywe ECDH odddzielone ':'
+ 
++Uwaga: ta opcja wpływa tylko na gniazda w trybie serwera.
++
+ Wersje OpenSSL starsze niż 1.1.1 pozwalają na użycie tylko jednej krzywej.
+ 
+ Listę dostępnych krzywych można uzyskać poleceniem:
+diff --git a/doc/stunnel.pod.in b/doc/stunnel.pod.in
+index 840c708..85cc199 100644
+--- a/doc/stunnel.pod.in
++++ b/doc/stunnel.pod.in
+@@ -501,6 +501,8 @@ I<verifyPeer> options.
+ 
+ ECDH curves separated with ':'
+ 
++Note: This option is supported for server mode sockets only.
++
+ Only a single curve name is allowed for OpenSSL older than 1.1.1.
+ 
+ To get a list of supported curves use:
+-- 
+2.37.3
+

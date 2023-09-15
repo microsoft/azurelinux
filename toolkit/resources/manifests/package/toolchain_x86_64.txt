@@ -30,8 +30,8 @@ check-debuginfo-0.15.2-1.cm2.x86_64.rpm
 chkconfig-1.20-3.cm2.x86_64.rpm
 chkconfig-debuginfo-1.20-3.cm2.x86_64.rpm
 chkconfig-lang-1.20-3.cm2.x86_64.rpm
-cmake-3.21.4-7.cm2.x86_64.rpm
-cmake-debuginfo-3.21.4-7.cm2.x86_64.rpm
+cmake-3.21.4-8.cm2.x86_64.rpm
+cmake-debuginfo-3.21.4-8.cm2.x86_64.rpm
 coreutils-8.32-6.cm2.x86_64.rpm
 coreutils-debuginfo-8.32-6.cm2.x86_64.rpm
 coreutils-lang-8.32-6.cm2.x86_64.rpm
@@ -136,7 +136,7 @@ intltool-0.51.0-7.cm2.noarch.rpm
 itstool-2.0.6-4.cm2.noarch.rpm
 kbd-2.2.0-1.cm2.x86_64.rpm
 kbd-debuginfo-2.2.0-1.cm2.x86_64.rpm
-kernel-headers-5.15.126.1-1.cm2.noarch.rpm
+kernel-headers-5.15.131.1-1.cm2.noarch.rpm
 kmod-29-1.cm2.x86_64.rpm
 kmod-debuginfo-29-1.cm2.x86_64.rpm
 kmod-devel-29-1.cm2.x86_64.rpm

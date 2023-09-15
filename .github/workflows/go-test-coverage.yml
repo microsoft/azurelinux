@@ -5,9 +5,9 @@ name: Go Test Coverage
 
 on:
   push:
-    branches: [main, dev, 1.0*, 2.0*]
+    branches: [main, dev, 1.0*, 2.0*, fasttrack/*]
   pull_request:
-    branches: [main, dev, 1.0*, 2.0*]
+    branches: [main, dev, 1.0*, 2.0*, fasttrack/*]
 
 jobs:
 
@@ -23,7 +23,7 @@ jobs:
       id: go
 
     - name: Check out code into the Go module directory
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Check for bad go formatting
       run: |

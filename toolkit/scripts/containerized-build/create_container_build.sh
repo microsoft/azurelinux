@@ -23,7 +23,7 @@ print_error() {
 help() {
 echo "
 Usage:
-sudo make containerized-rpmbuild [REPO_PATH=/path/to/CBL-Mariner] [MODE=test|build] [VERSION=1.0|2.0] [MOUNTS=/path/in/host:/path/in/container] [ENABLE_REPO=y] [SPECS_DIR=/path/to/SPECS_DIR/to/use]
+sudo make containerized-rpmbuild [REPO_PATH=/path/to/CBL-Mariner] [MODE=test|build] [VERSION=1.0|2.0] [MOUNTS=/path/in/host:/path/in/container ...] [ENABLE_REPO=y] [SPECS_DIR=/path/to/SPECS_DIR/to/use] [BUILD_MOUNT=/path/to/build/chroot/mount]
 
 Starts a docker container with the specified version of mariner.
 
@@ -37,26 +37,25 @@ Optional arguments:
     VERISION        1.0 or 2.0. default: "2.0"
     MOUNTS          Mount a host directory into container. Should be of form '/host/dir:/container/dir'. For multiple mounts, please use space (\" \") as delimiter
                         e.g. MOUNTS=\"/host/dir1:/container/dir1 /host/dir2:/container/dir2\"
-    ENABLE_REPO:    Set to 'y' to use local RPMs to satisfy package dependencies. default: "n"
+    BUILD_MOUNT     path to folder to create mountpoints for container's BUILD and BUILDROOT directories.
+                        Mountpoints will be ${BUILD_MOUNT}/container-build and ${BUILD_MOUNT}/container-buildroot. default: $REPO_PATH/build
+    ENABLE_REPO:    Set to 'y' to use local RPMs to satisfy package dependencies. default: n
 
 To see help, run 'sudo make containerized-rpmbuild-help'
 "
 }
 
-build_chroot() {
+build_worker_chroot() {
     pushd "${repo_path}/toolkit"
     echo "Building worker chroot..."
-    make graph-cache REBUILD_TOOLS=y > /dev/null
+    make chroot-tools REBUILD_TOOLS=y > /dev/null
     popd
 }
 
 build_tools() {
     pushd "${repo_path}/toolkit"
     echo "Building required tools..."
-    make go-srpmpacker REBUILD_TOOLS=y > /dev/null
-    make go-depsearch REBUILD_TOOLS=y > /dev/null
-    make go-grapher REBUILD_TOOLS=y > /dev/null
-    make go-specreader REBUILD_TOOLS=y > /dev/null
+    make go-srpmpacker go-depsearch go-grapher go-specreader REBUILD_TOOLS=y > /dev/null
     popd
 }
 
@@ -86,6 +85,7 @@ while (( "$#")); do
     -v ) version="$2"; shift 2 ;;
     -p ) repo_path="$(realpath $2)"; shift 2 ;;
     -mo ) extra_mounts="$2"; shift 2 ;;
+    -b ) build_mount_dir="$(realpath $2)"; shift 2;;
     -r ) enable_local_repo=true; shift ;;
     -s ) specs_dir="$(realpath $2)"; shift 2;;
     -h ) help; exit 1 ;;
@@ -98,6 +98,8 @@ done
 [[ ! -d "${repo_path}" ]] && { print_error " Directory ${repo_path} does not exist"; exit 1; }
 [[ -z "${mode}" ]] && mode="build"
 [[ -z "${version}" ]] && version="2.0"
+[[ -z "${build_mount_dir}" ]] && build_mount_dir="${repo_path}/build"
+[[ ! -d "${build_mount_dir}" ]] && { print_error " Directory ${build_mount_dir} does not exist"; exit 1; }
 
 cd "${script_dir}"  || { echo "ERROR: Could not change directory to ${script_dir}"; exit 1; }
 
@@ -118,18 +120,20 @@ else
 fi
 
 # ============ Populate SRPMS ============
-# Populate ${repo_path}/build/INTERMEDIATE_SRPMS with SRPMs, that can be used to build RPMs in the container
-pushd "${repo_path}/toolkit"
-echo "Populating Intermediate SRPMs..."
-if [[ ( ! -f "${repo_path}/toolkit/out/tools/srpmpacker" ) ]]; then build_tools; fi
-make input-srpms SRPM_FILE_SIGNATURE_HANDLING="update" > /dev/null
-popd
+# Populate ${repo_path}/build/INTERMEDIATE_SRPMS with SRPMs, that can be used to build RPMs in the container (only required in build mode)
+if [[ "${mode}" == "build" ]]; then
+    pushd "${repo_path}/toolkit"
+    echo "Populating Intermediate SRPMs..."
+    if [[ ( ! -f "${repo_path}/toolkit/out/tools/srpmpacker" ) ]]; then build_tools; fi
+    make input-srpms SRPM_FILE_SIGNATURE_HANDLING="update" > /dev/null
+    popd
+fi
 
 # ============ Map chroot mount ============
 if [[ "${mode}" == "build" ]]; then
     # Create a new directory and map it to chroot directory in container
-    build_mount="${repo_path}/build/container-build"
-    buildroot_mount="${repo_path}/build/container-buildroot"
+    build_mount="${build_mount_dir}/container-build"
+    buildroot_mount="${build_mount_dir}/container-buildroot"
     if [ -d "${build_mount}" ]; then rm -Rf ${build_mount}; fi
     if [ -d "${buildroot_mount}" ]; then rm -Rf ${buildroot_mount}; fi
     mkdir ${build_mount}
@@ -182,7 +186,7 @@ dockerfile="${script_dir}/resources/mariner.Dockerfile"
 if [[ "${mode}" == "build" ]]; then # Configure base image
     echo "Importing chroot into docker..."
     chroot_file="${repo_path}/build/worker/worker_chroot.tar.gz"
-    if [[ ! -f "${chroot_file}" ]]; then build_chroot; fi
+    if [[ ! -f "${chroot_file}" ]]; then build_worker_chroot; fi
     chroot_hash=$(sha256sum "${chroot_file}" | cut -d' ' -f1)
     # Check if the chroot file's hash has changed since the last build
     if [[ ! -f "${tmp_dir}/hash" ]] || [[ "$(cat "${tmp_dir}/hash")" != "${chroot_hash}" ]]; then
@@ -212,6 +216,7 @@ docker build -q \
 echo "docker_image_tag is ${docker_image_tag}"
 
 bash -c "docker run --rm \
-                    ${mount_arg} \
-                    -it ${docker_image_tag} /bin/bash; \
-                    [[ -d ${repo_path}/out/RPMS/repodata ]] && { rm -r ${repo_path}/out/RPMS/repodata; echo 'Clearing repodata' ; }"
+    ${mount_arg} \
+    -it ${docker_image_tag} /bin/bash; \
+    if [[ -d ${repo_path}/out/RPMS/repodata ]]; then { rm -r ${repo_path}/out/RPMS/repodata; echo 'Clearing repodata' ; }; fi
+    "
