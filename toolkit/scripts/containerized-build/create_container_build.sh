@@ -23,7 +23,7 @@ print_error() {
 help() {
 echo "
 Usage:
-sudo make containerized-rpmbuild [REPO_PATH=/path/to/CBL-Mariner] [MODE=test|build] [VERSION=1.0|2.0] [MOUNTS= /src/path:/dst/path] [ENABLE_REPO=y] [SPECS_DIR=/path/to/SPECS_DIR/to/use]
+sudo make containerized-rpmbuild [REPO_PATH=/path/to/CBL-Mariner] [MODE=test|build] [VERSION=1.0|2.0] [MOUNTS= /src/path:/dst/path] [ENABLE_REPO=y] [SPECS_DIR=/path/to/SPECS_DIR/to/use] [BUILD_MOUNT=/path/to/build/chroot/mount]
 
 Starts a docker container with the specified version of mariner.
 
@@ -37,7 +37,9 @@ Optional arguments:
     VERISION        1.0 or 2.0. default: "2.0"
     MOUNTS          mount a directory into the container. Should be of the form '/src/dir:/dest/dir'. For multiple mounts, please use ',' as delimiter
                         e.g. MOUNTS=/src/dir1:/dest/dir1,/src/dir2:/dest/dir2
-    ENABLE_REPO:    Set to 'y' to use local RPMs to satisfy package dependencies. default: "n"
+    BUILD_MOUNT     path to folder to create mountpoints for container's BUILD and BUILDROOT directories.
+                        Mountpoints will be ${BUILD_MOUNT}/container-build and ${BUILD_MOUNT}/container-buildroot. default: $REPO_PATH/build
+    ENABLE_REPO:    Set to 'y' to use local RPMs to satisfy package dependencies. default: n
 
 To see help, run 'sudo make containerized-rpmbuild-help'
 "
@@ -83,6 +85,7 @@ while (( "$#")); do
     -v ) version="$2"; shift 2 ;;
     -p ) repo_path="$(realpath $2)"; shift 2 ;;
     -mo ) extra_mounts="$2"; shift 2 ;;
+    -b ) build_mount_dir="$(realpath $2)"; shift 2;;
     -r ) enable_local_repo=true; shift ;;
     -s ) specs_dir="$(realpath $2)"; shift 2;;
     -h ) help; exit 1 ;;
@@ -95,6 +98,8 @@ done
 [[ ! -d "${repo_path}" ]] && { print_error " Directory ${repo_path} does not exist"; exit 1; }
 [[ -z "${mode}" ]] && mode="build"
 [[ -z "${version}" ]] && version="2.0"
+[[ -z "${build_mount_dir}" ]] && build_mount_dir="${repo_path}/build"
+[[ ! -d "${build_mount_dir}" ]] && { print_error " Directory ${build_mount_dir} does not exist"; exit 1; }
 
 cd "${script_dir}"  || { echo "ERROR: Could not change directory to ${script_dir}"; exit 1; }
 
@@ -127,8 +132,8 @@ fi
 # ============ Map chroot mount ============
 if [[ "${mode}" == "build" ]]; then
     # Create a new directory and map it to chroot directory in container
-    build_mount="${repo_path}/build/container-build"
-    buildroot_mount="${repo_path}/build/container-buildroot"
+    build_mount="${build_mount_dir}/container-build"
+    buildroot_mount="${build_mount_dir}/container-buildroot"
     if [ -d "${build_mount}" ]; then rm -Rf ${build_mount}; fi
     if [ -d "${buildroot_mount}" ]; then rm -Rf ${buildroot_mount}; fi
     mkdir ${build_mount}
