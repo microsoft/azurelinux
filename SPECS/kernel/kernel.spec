@@ -229,8 +229,8 @@ install -vdm 755 %{buildroot}%{_defaultdocdir}/linux-%{uname_r}
 install -vdm 755 %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}
 install -vdm 755 %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}
 
-install -d -m 755 %{buildroot}%{_libexecdir}/%{_sysconfdir}/sysconfig
-install -c -m 644 %{SOURCE5} %{buildroot}%{_libexecdir}/%{_sysconfdir}/sysconfig/cpupower
+install -d -m 755 %{buildroot}%{_sysconfdir}/sysconfig
+install -c -m 644 %{SOURCE5} %{buildroot}/%{_sysconfdir}/sysconfig/cpupower
 install -d -m 755 %{buildroot}%{_unitdir}
 install -c -m 644 %{SOURCE6} %{buildroot}%{_unitdir}/cpupower.service
 
