@@ -5,7 +5,7 @@ Distribution:   Mariner
 
 Name:     lldpd
 Version:  1.0.14
-Release:  1%{?dist}
+Release:  2%{?dist}
 Summary:  ISC-licensed implementation of LLDP
 
 License:  ISC
@@ -16,6 +16,7 @@ Source2:  %{name}-tmpfiles
 Source3:  %{name}-fedora.sysconfig
 Source4:  %{name}-el6.init
 Source5:  %{name}-el7.service
+Patch0:   CVE-2023-41910.patch
 
 BuildRequires: gcc
 BuildRequires: readline-devel
@@ -51,7 +52,7 @@ Summary: %{summary}
 %{name} development libraries and headers
 
 %prep
-%autosetup
+%autosetup -p1
 
 
 %build
@@ -162,6 +163,9 @@ fi
 
 
 %changelog
+* Tue Sep 12 2023 Suresh Thelkar <sthelkar@microsoft.com> - 1.0.14-2
+- Backport patch to address CVE-2023-41910
+
 * Tue Aug 16 2022 Muhammad Falak <mwani@microsoft.com> - 1.0.14-1
 - Bump version to address CVE-2020-27827
 
