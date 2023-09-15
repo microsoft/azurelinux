@@ -3,7 +3,7 @@
 Summary:        The Apache HTTP Server
 Name:           httpd
 Version:        2.4.56
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -153,6 +153,7 @@ Security (TLS) protocols.
             --enable-mpms-shared=all               \
             --enable-ssl                           \
             --exec-prefix=%{_prefix}               \
+            --includedir=%{_includedir}/httpd      \
             --libexecdir=%{_libdir}/httpd/modules  \
             --prefix=%{_sysconfdir}/httpd          \
             --sysconfdir=%{_confdir}/httpd/conf    \
@@ -274,7 +275,7 @@ fi
 %{_bindir}/apxs
 %{_bindir}/dbmmanage
 %{_mandir}/man1/apxs.1*
-%{_includedir}/*
+%{_includedir}/httpd/*
 %{_rpmconfigdir}/macros.d/macros.httpd
 
 %files docs
@@ -345,7 +346,10 @@ fi
 %{_libexecdir}/httpd-ssl-pass-dialog
 
 %changelog
-* Wed Aug 16 2023 Andy Zaugg <azaugg@linkedin.com> - 2.4.56-1
+* Wed Aug 16 2023 Andy Zaugg <azaugg@linkedin.com> - 2.4.56-3
+- Namespace httpd-devel include files into a httpd directory
+
+* Wed Aug 16 2023 Andy Zaugg <azaugg@linkedin.com> - 2.4.56-2
 - Patch config.layout and provide and provide a real log path
 - Fix PIDfile reference to /run/httpd/httpd.pid
 
