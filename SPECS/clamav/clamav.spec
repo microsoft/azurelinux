@@ -11,7 +11,10 @@ Source0:        https://github.com/Cisco-Talos/clamav/archive/refs/tags/%{name}-
 # Note: the %%{name}-%%{name}-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
 # To update the cache run:
 #   [repo_root]/toolkit/scripts/build_cargo_cache.sh %%{name}-%%{version}.tar.gz %%{name}-%%{name}-%%{version}
-Source1:        %{name}-%{name}-%{version}-cargo.tar.gz
+
+# Note: Required an updated cargo cache when rust was updated to 1.72.0, added "-rev2" to the filename to indicate the new cache for this
+# specific event. Revert back to the original filename when a new cache is created for a different version.
+Source1:        %{name}-%{name}-%{version}-cargo-rev2.tar.gz
 Patch0:         CVE-2022-48579.patch
 BuildRequires:  bzip2-devel
 BuildRequires:  check-devel
