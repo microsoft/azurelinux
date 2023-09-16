@@ -219,6 +219,9 @@ ln -sf ./muttrc.5 %{buildroot}%{_mandir}/man5/muttrc.local.5
 
 
 %changelog
+* Fri Sep 15 2023 Henry Li <lihl@microsoft.com> - 2.0.5-5
+- Add patch to resolve CVE-2023-4874
+
 * Tue Nov 29 2022 Muhammad Falak <mwani@microsoft.com> - 2.0.5-4
 - Patch CVE-2021-32055
 - License verified
