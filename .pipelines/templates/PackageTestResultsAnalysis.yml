@@ -34,7 +34,7 @@ steps:
         displayName: "Authenticate to custom pip artifact feeds"
 
   - bash: |
-      pip3 install junit_xml
+      python3 -m pip install junit_xml
     displayName: "Install Python dependencies"
 
   - task: PythonScript@0
