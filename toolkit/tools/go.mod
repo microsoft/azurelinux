@@ -18,6 +18,7 @@ require (
 	golang.org/x/sys v0.11.0
 	gonum.org/v1/gonum v0.11.0
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
+	github.com/microsoft/CBL-Mariner/toolkit/tools/internal/ccache v1.0.0
 )
 
 require (
@@ -47,4 +48,8 @@ require (
 	golang.org/x/text v0.12.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+)
+
+replace (
+	github.com/microsoft/CBL-Mariner/toolkit/tools/internal/ccache => ./internal/ccache
 )

@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-    "github.com/microsoft/CBL-Mariner/toolkit/tools/internal/ccache"
+    // "github.com/microsoft/CBL-Mariner/toolkit/tools/internal/ccache"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
@@ -28,8 +28,57 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
+
 	"gopkg.in/alecthomas/kingpin.v2"
 )
+
+
+
+type CCacheGroup struct {
+	Name     string `json:"name"`
+    PackageNames []string `json:"packageNames"`
+}
+
+type RemoteStore struct {
+	Type           string `json:"type"`
+	TenantId       string `json:"tenantId"`
+	UserName       string `json:"userName"`
+	Password       string `json:"password"`
+	StorageAccount string `json:"storageAccount"`
+	ContainerName  string `json:"containerName"`
+	InputFolder    string `json:"inputFolder"`
+	OutputFolder   string `json:"outputFolder"`
+}
+
+type CCacheConfiguration struct {
+	RemoteStore RemoteStore `json:"remoteStore"`
+	Groups   []CCacheGroup  `json:"groups"`
+}
+
+
+func GetCCacheRemoteStore() (remoteStore RemoteStore, err error) {
+	ccacheGroupsFile := "resources/manifests/package/ccache_configuration.json"
+	logger.Log.Infof("Loading ccache configuration file: %s", ccacheGroupsFile)
+	var ccacheConfiguration CCacheConfiguration
+	err = jsonutils.ReadJSONFile(ccacheGroupsFile, &ccacheConfiguration)
+	if err != nil {
+		logger.Log.Infof("Failed to load file. %v", err)
+	} else {
+		logger.Log.Infof("Loaded file.")
+
+		logger.Log.Infof("  Type          : %s", ccacheConfiguration.RemoteStore.Type)
+		logger.Log.Infof("  TenantId      : %s", ccacheConfiguration.RemoteStore.TenantId)
+		logger.Log.Infof("  UserName      : %s", ccacheConfiguration.RemoteStore.UserName)
+		// logger.Log.Infof("  Password      : %s", ccacheConfiguration.RemoteStore.Password)
+		logger.Log.Infof("  StorageAccount: %s", ccacheConfiguration.RemoteStore.StorageAccount)
+		logger.Log.Infof("  ContainerName : %s", ccacheConfiguration.RemoteStore.ContainerName)
+		logger.Log.Infof("  InputFolder   : %s", ccacheConfiguration.RemoteStore.InputFolder)
+		logger.Log.Infof("  OutputFolder  : %s", ccacheConfiguration.RemoteStore.OutputFolder)
+	}
+
+	return ccacheConfiguration.RemoteStore, err	
+}
 
 const (
 	chrootLocalRpmsDir      = "/localrpms"
@@ -190,7 +239,7 @@ func download(
 	return nil
 }
 
-func createContainerClient(remoteStore ccache.RemoteStore) (client *azblob.Client, err error ) {
+func createContainerClient(remoteStore RemoteStore) (client *azblob.Client, err error ) {
 	credential, err := azidentity.NewClientSecretCredential(remoteStore.TenantId, remoteStore.UserName, remoteStore.Password, nil)
 	if err != nil {
 		logger.Log.Warnf("Unable to init azure identity. Error: %v", err)
@@ -219,7 +268,7 @@ func installCCache(ccacheDirTarsIn string, ccacheGroupName string) (err error) {
 
 	logger.Log.Infof("ccache is enabled - Installing --------------------")
 	logger.Log.Infof("  retrieving remote store information...")
-	remoteStore, err := ccache.GetCCacheRemoteStore()
+	remoteStore, err := GetCCacheRemoteStore()
 	if err != nil {
 		logger.Log.Warnf("Unable to get ccache remote store configuration. Error: %v", err)
 		return err
@@ -297,7 +346,7 @@ func installCCache(ccacheDirTarsIn string, ccacheGroupName string) (err error) {
 	func archiveCCache(ccacheDirTarsOut string, ccacheGroupName string) (err error) {
 
 	logger.Log.Infof("ccache is enabled - Capturing --------------------")
-    remoteStore, err := ccache.GetCCacheRemoteStore()
+    remoteStore, err := GetCCacheRemoteStore()
 	if err != nil {
 		logger.Log.Warnf("Unable to get ccache remote store configuration. Error: %v", err)
 		return err
