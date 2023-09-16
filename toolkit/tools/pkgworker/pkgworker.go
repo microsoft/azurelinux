@@ -323,6 +323,7 @@ func installCCache(ccacheDirTarsIn string, ccacheGroupName string) (err error) {
 	logger.Log.Infof("  download time: %v", downloadEndTime.Sub(downloadStartTime))
 
 	logger.Log.Infof("  uncompressing (%s) into (%s).", ccacheInputTarFullPath, *ccacheDir)
+	uncompressStartTime := time.Now()
 	tarArgs := []string{
 		"xf",
 		ccacheInputTarFullPath,
@@ -335,6 +336,8 @@ func installCCache(ccacheDirTarsIn string, ccacheGroupName string) (err error) {
 		logger.Log.Warnf("Unable extract ccache files from archive. Error: %v", stderr)
 		return err
 	}
+	uncompressEndTime := time.Now()
+	logger.Log.Infof("  uncompress time: %v", uncompressEndTime.Sub(uncompressStartTime))
 
 	return nil
 }
@@ -386,6 +389,7 @@ func installCCache(ccacheDirTarsIn string, ccacheGroupName string) (err error) {
 	}
 	
 	logger.Log.Infof("  compressing (%s) into (%s).", *ccacheDir, ccacheOutputTarFullPath)
+	compressStartTime := time.Now()
 	tarArgs := []string{
 		"cf",
 		ccacheOutputTarFullPath,
@@ -398,6 +402,8 @@ func installCCache(ccacheDirTarsIn string, ccacheGroupName string) (err error) {
 		logger.Log.Warnf("Unable compress ccache files itno archive. Error: %v", stderr)
 		return err	
 	}
+	compressEndTime := time.Now()
+	logger.Log.Infof("  compress time: %s", compressEndTime.Sub(compressStartTime))
 
 	// ** Temporary ** Uploading should take place at the end of the build
 	// because other package family group members may update it.
@@ -418,7 +424,7 @@ func installCCache(ccacheDirTarsIn string, ccacheGroupName string) (err error) {
 		return err
 	}
 	uploadEndTime := time.Now()
-	logger.Log.Infof("Upload Time: %s", uploadEndTime.Sub(uploadStartTime))
+	logger.Log.Infof("  upload Time: %s", uploadEndTime.Sub(uploadStartTime))
 
 	// Do no clean it because it might be used by other packages in the same
 	// ccache group...
