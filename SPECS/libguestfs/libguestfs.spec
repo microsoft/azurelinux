@@ -25,7 +25,7 @@
 Summary:        Access and modify virtual machine disk images
 Name:           libguestfs
 Version:        1.44.0
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -63,7 +63,6 @@ BuildRequires:  augeas-devel >= 1.7.0
 BuildRequires:  augeas-libs
 BuildRequires:  bash
 BuildRequires:  bash-completion
-BuildRequires:  binutils
 BuildRequires:  bison
 BuildRequires:  btrfs-progs
 BuildRequires:  bzip2
@@ -1234,6 +1233,9 @@ rm ocaml/html/.gitignore
 %endif
 
 %changelog
+* Fri Sep 15 2023 Andrew Phelps <anphel@microsoft.com> - 1.44.0-14
+- Remove binutils from BR
+
 * Wed Jul 05 2023 Andrew Phelps <anphel@microsoft.com> - 1.44.0-13
 - Bump release to rebuild against glibc 2.35-4
 
