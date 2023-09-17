@@ -61,69 +61,37 @@ BuildRequires:  acl
 BuildRequires:  attr
 BuildRequires:  augeas-devel >= 1.7.0
 BuildRequires:  augeas-libs
-BuildRequires:  bash
 BuildRequires:  bash-completion
-BuildRequires:  bison
 BuildRequires:  btrfs-progs
-BuildRequires:  bzip2
-BuildRequires:  coreutils
-BuildRequires:  cpio
-BuildRequires:  createrepo_c
 BuildRequires:  cryptsetup
-BuildRequires:  curl
 BuildRequires:  dhclient
-BuildRequires:  diffutils
 BuildRequires:  dosfstools
-BuildRequires:  e2fsprogs
-BuildRequires:  file
-BuildRequires:  file-devel
-BuildRequires:  findutils
-BuildRequires:  flex
 BuildRequires:  fuse
 BuildRequires:  fuse-devel
-BuildRequires:  gawk
 # Basic build requirements for the library and virt tools.
-BuildRequires:  gcc
-BuildRequires:  gcc-c++
 BuildRequires:  gdisk
 BuildRequires:  genisoimage
 BuildRequires:  gfs2-utils
-BuildRequires:  glibc-static >= 2.35-4%{?dist}
 BuildRequires:  gobject-introspection-devel
-BuildRequires:  gperf
-BuildRequires:  grep
-BuildRequires:  gzip
 BuildRequires:  hivex
 BuildRequires:  hivex-devel >= 1.3.10
 BuildRequires:  iproute
 BuildRequires:  iputils
 BuildRequires:  jansson-devel
 BuildRequires:  kernel
-BuildRequires:  kmod
 BuildRequires:  kpartx
-BuildRequires:  less
 BuildRequires:  libacl-devel
-BuildRequires:  libcap
-BuildRequires:  libcap-devel
 BuildRequires:  libconfig-devel
 BuildRequires:  libdb-utils
 BuildRequires:  libldm
 BuildRequires:  libldm-devel
-BuildRequires:  libselinux
-BuildRequires:  libselinux-devel
-BuildRequires:  libselinux-utils
 BuildRequires:  libtirpc-devel
 BuildRequires:  libvirt-daemon-kvm >= 5.3.0
 BuildRequires:  libvirt-devel
-BuildRequires:  libxml2
-BuildRequires:  libxml2-devel
 BuildRequires:  lsof
 BuildRequires:  lsscsi
-BuildRequires:  lua
-BuildRequires:  lua-devel
 BuildRequires:  lvm2
 BuildRequires:  lzop
-BuildRequires:  make
 BuildRequires:  mdadm
 BuildRequires:  ntfs-3g
 BuildRequires:  ntfs-3g-system-compression
@@ -138,26 +106,17 @@ BuildRequires:  ocaml-ounit-devel
 BuildRequires:  openssh-clients
 BuildRequires:  parted
 BuildRequires:  pciutils
-BuildRequires:  pcre
-BuildRequires:  pcre-devel
-BuildRequires:  perl-devel
-BuildRequires:  perl-generators
-BuildRequires:  perl-libintl-perl
-BuildRequires:  perl-macros
 BuildRequires:  policycoreutils
 BuildRequires:  procps
 BuildRequires:  psmisc
-BuildRequires:  python3-devel
 BuildRequires:  python3-libvirt
 BuildRequires:  qemu-img
 BuildRequires:  qemu-kvm
-BuildRequires:  readline-devel
 BuildRequires:  rpcgen
 BuildRequires:  rsync
 BuildRequires:  ruby-devel
 BuildRequires:  rubygem-rake
 BuildRequires:  scrub
-BuildRequires:  sed
 BuildRequires:  sleuthkit
 BuildRequires:  squashfs-tools
 BuildRequires:  strace
@@ -165,25 +124,15 @@ BuildRequires:  supermin-devel >= 5.1.18
 BuildRequires:  systemd
 BuildRequires:  systemd-devel
 BuildRequires:  systemd-units
-BuildRequires:  tar
-BuildRequires:  tdnf
 BuildRequires:  udev
-BuildRequires:  unzip
-BuildRequires:  util-linux
 BuildRequires:  vala
 BuildRequires:  vim
-BuildRequires:  which
 BuildRequires:  xfsprogs
-BuildRequires:  xz
-BuildRequires:  xz-devel
 BuildRequires:  yajl
 BuildRequires:  zerofree
-BuildRequires:  zip
 BuildRequires:  perl(Expect)
-BuildRequires:  perl(ExtUtils::CBuilder)
 BuildRequires:  perl(Module::Build)
 BuildRequires:  perl(Pod::Man)
-BuildRequires:  perl(Pod::Simple)
 BuildRequires:  perl(Sys::Virt)
 BuildRequires:  perl(Test::More)
 BuildRequires:  perl(Test::Pod) >= 1.00
@@ -197,9 +146,6 @@ BuildRequires:  rubygem(rdoc)
 BuildRequires:  rubygem(test-unit)
 
 %if 0%{patches_touch_autotools}
-BuildRequires:  autoconf
-BuildRequires:  automake
-BuildRequires:  gettext-devel
 BuildRequires:  libtool
 %endif
 
@@ -760,36 +706,19 @@ tdnf install --downloadonly -y --disablerepo=* \
     acl \
     attr \
     augeas-libs \
-    bash \
     btrfs-progs \
-    bzip2 \
-    coreutils \
-    cpio \
     cryptsetup \
-    curl \
     dhclient \
-    diffutils \
     dosfstools \
-    e2fsprogs \
-    file \
-    findutils \
-    gawk \
     gdisk \
     genisoimage \
     gfs2-utils \
-    grep \
-    gzip \
     hivex \
     iproute \
     iputils \
     kernel \
-    kmod \
     kpartx \
-    less \
-    libcap \
     libldm \
-    libselinux \
-    libxml2 \
     lsof \
     lsscsi \
     lvm2 \
@@ -800,14 +729,12 @@ tdnf install --downloadonly -y --disablerepo=* \
     openssh-clients \
     parted \
     pciutils \
-    pcre \
     policycoreutils \
     procps \
     psmisc \
     qemu-img \
     rsync \
     scrub \
-    sed \
     sleuthkit \
     squashfs-tools \
     strace \
@@ -816,13 +743,9 @@ tdnf install --downloadonly -y --disablerepo=* \
     syslinux-devel \
 %endif
     systemd \
-    tar \
     udev \
-    util-linux \
     vim \
-    which \
     xfsprogs \
-    xz \
     yajl \
     zerofree \
 %ifnarch aarch64
@@ -1233,7 +1156,7 @@ rm ocaml/html/.gitignore
 
 %changelog
 * Fri Sep 15 2023 Andrew Phelps <anphel@microsoft.com> - 1.44.0-14
-- Remove binutils from BR to fix build break
+- Remove toolchain packages from BR and tdnf install to fix build break
 
 * Wed Jul 05 2023 Andrew Phelps <anphel@microsoft.com> - 1.44.0-13
 - Bump release to rebuild against glibc 2.35-4
