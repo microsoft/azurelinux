@@ -83,6 +83,7 @@ COPY [ "./.bashrc", \
 USER lfs
 COPY [ "./toolchain_build_temp_tools.sh", \
        "./coreutils-fix-get-sys_getdents-aarch64.patch", \
+       "./CVE-2023-4039.patch", \
        "$LFS/tools/" ]
 
 USER root
