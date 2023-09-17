@@ -107,7 +107,6 @@ BuildRequires:  openssh-clients
 BuildRequires:  parted
 BuildRequires:  pciutils
 BuildRequires:  policycoreutils
-BuildRequires:  procps
 BuildRequires:  psmisc
 BuildRequires:  python3-libvirt
 BuildRequires:  qemu-img
@@ -730,7 +729,6 @@ tdnf install --downloadonly -y --disablerepo=* \
     parted \
     pciutils \
     policycoreutils \
-    procps \
     psmisc \
     qemu-img \
     rsync \
