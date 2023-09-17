@@ -761,7 +761,6 @@ tdnf install --downloadonly -y --disablerepo=* \
     attr \
     augeas-libs \
     bash \
-    binutils \
     btrfs-progs \
     bzip2 \
     coreutils \
@@ -1234,7 +1233,7 @@ rm ocaml/html/.gitignore
 
 %changelog
 * Fri Sep 15 2023 Andrew Phelps <anphel@microsoft.com> - 1.44.0-14
-- Remove binutils from BR
+- Remove binutils from BR to fix build break
 
 * Wed Jul 05 2023 Andrew Phelps <anphel@microsoft.com> - 1.44.0-13
 - Bump release to rebuild against glibc 2.35-4
