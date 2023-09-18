@@ -37,6 +37,7 @@ $(STATUS_FLAGS_DIR)/precache.flag: $(go-precacher) $(chroot_worker) $(rpms_snaps
 		--output-summary-file "$(precache_downloaded_files)" \
 		--repo-urls-file "$(repo_urls_file)" \
 		$(foreach url,$(PACKAGE_URL_LIST), --repo-url "$(url)") \
+		$(foreach repofile,$(REPO_LIST), --repo-file "$(repofile)") \
 		--worker-tar $(chroot_worker) \
 		--worker-dir $(precache_chroot_dir) \
 		--log-file=$(SRPM_BUILD_LOGS_DIR)/precacher.log \
