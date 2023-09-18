@@ -34,8 +34,6 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
-
-
 type CCacheGroup struct {
 	Name     string `json:"name"`
     PackageNames []string `json:"packageNames"`
@@ -58,7 +56,6 @@ type CCacheConfiguration struct {
 	RemoteStore RemoteStore `json:"remoteStore"`
 	Groups   []CCacheGroup  `json:"groups"`
 }
-
 
 func GetCCacheRemoteStore() (remoteStore RemoteStore, err error) {
 	ccacheGroupsFile := "resources/manifests/package/ccache_configuration.json"

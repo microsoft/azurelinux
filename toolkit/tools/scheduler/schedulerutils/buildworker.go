@@ -26,8 +26,6 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
 )
 
-
-
 type CCacheGroup struct {
 	Name     string `json:"name"`
     PackageNames []string `json:"packageNames"`
@@ -40,8 +38,10 @@ type RemoteStore struct {
 	Password       string `json:"password"`
 	StorageAccount string `json:"storageAccount"`
 	ContainerName  string `json:"containerName"`
+	VersionsFolder string `json:"versionsFolder"`
 	InputFolder    string `json:"inputFolder"`
-	OutputFolder   string `json:"outputFolder"`
+	UpdateEnabled  bool   `json:"updateEnabled"`
+	UpdateFolder   string `json:"updateFolder"`
 }
 
 type CCacheConfiguration struct {
