@@ -82,11 +82,6 @@ var defaultChrootEnv = []string{
 	"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
 }
 
-const (
-	isNotFinalAttempt = false
-	isFinalAttempt    = true
-)
-
 // init will always be called if this package is loaded
 func init() {
 	registerSIGTERMCleanup()
@@ -201,7 +196,7 @@ func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMoun
 			if buildpipeline.IsRegularBuild() {
 				// mount/unmount is only supported in regular pipeline
 				// Best effort cleanup in case mountpoint creation failed mid-way through. We will not try again so treat as final attempt.
-				cleanupErr := c.unmountAndRemove(leaveChrootOnDisk, isFinalAttempt)
+				cleanupErr := c.unmountAndRemove(leaveChrootOnDisk, true)
 				if cleanupErr != nil {
 					logger.Log.Warnf("Failed to cleanup chroot (%s) during failed initialization. Error: %s", c.rootDir, cleanupErr)
 				}
@@ -376,10 +371,10 @@ func (c *Chroot) Close(leaveOnDisk bool) (err error) {
 
 	if buildpipeline.IsRegularBuild() {
 		// mount is only supported in regular pipeline
-		err = c.unmountAndRemove(leaveOnDisk, isNotFinalAttempt)
+		err = c.unmountAndRemove(leaveOnDisk, false)
 		if err != nil {
 			logger.Log.Warnf("Chroot cleanup failed, will retry with lazy unmount. Error: %s", err)
-			err = c.unmountAndRemove(leaveOnDisk, isFinalAttempt)
+			err = c.unmountAndRemove(leaveOnDisk, true)
 		}
 		if err == nil {
 			const emptyLen = 0
@@ -457,7 +452,7 @@ func cleanupAllChroots() {
 		logger.Log.Info("Cleaning up all active chroots")
 		for i := len(activeChroots) - 1; i >= 0; i-- {
 			logger.Log.Infof("Cleaning up chroot (%s)", activeChroots[i].rootDir)
-			err := activeChroots[i].unmountAndRemove(leaveChrootOnDisk, isFinalAttempt)
+			err := activeChroots[i].unmountAndRemove(leaveChrootOnDisk, true)
 			// Perform best effort cleanup: unmount as many chroots as possible,
 			// even if one fails.
 			if err != nil {
@@ -480,21 +475,18 @@ func cleanupAllChroots() {
 // Iff all mounts were successfully unmounted, the chroot's root directory will be removed if requested.
 func (c *Chroot) unmountAndRemove(leaveOnDisk, isFinalAttempt bool) (err error) {
 	const (
-		retryDuration       = time.Second
-		totalAttemptsNormal = 3
-		totalAttemptsFinal  = 5
-		unmountFlagsNormal  = 0
+		retryDuration      = time.Second
+		totalAttempts      = 3
+		unmountFlagsNormal = 0
 		// Do a lazy unmount on the final attempt. This will allow the unmount to succeed even if the mount point is busy.
 		// This is to avoid leaving folders like /dev mounted if the chroot folder is forcefully deleted by the user. Even
 		// if the mount is busy at least it will be detached from the filesystem and will not damage the host.
 		unmountFlagsFinal = unix.MNT_DETACH
 		errMsg            = "Failed to unmount (%s). Error: %s"
 	)
-	totalAttempts := totalAttemptsNormal
 	unmountFlags := unmountFlagsNormal
 	if isFinalAttempt {
 		logger.Log.Warnf("Final attempt to unmount chroot (%s)", c.rootDir)
-		totalAttempts = totalAttemptsFinal
 		unmountFlags = unmountFlagsFinal
 	}
 
