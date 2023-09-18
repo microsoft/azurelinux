@@ -14,9 +14,6 @@ parameters:
     type: string
     default: "$(Build.ArtifactStagingDirectory)"
 
-  - name: pipArtifactFeeds
-    type: string
-
   # Local constants. Can't use variables in a template without jobs or stages.
   - name: reportFileName
     type: string
@@ -27,12 +24,6 @@ parameters:
     default: "$(Agent.TempDirectory)"
 
 steps:
-  - ${{ if parameters.pipArtifactFeeds }}:
-      - task: PipAuthenticate@1
-        inputs:
-          artifactFeeds: "${{ parameters.pipArtifactFeeds }}"
-        displayName: "Authenticate to custom pip artifact feeds"
-
   - bash: |
       python3 -m pip install junit_xml
     displayName: "Install Python dependencies"
