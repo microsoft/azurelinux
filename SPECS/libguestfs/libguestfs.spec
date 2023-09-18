@@ -1236,7 +1236,7 @@ rm ocaml/html/.gitignore
 %endif
 
 %changelog
-* Fri Sep 15 2023 Andrew Phelps anphel@microsoft.com - 1.44.0-14
+* Fri Sep 15 2023 Andrew Phelps <anphel@microsoft.com> - 1.44.0-14
 - Enable toolchain-repo with tdnf download command to fix build break
 
 * Wed Jul 05 2023 Andrew Phelps <anphel@microsoft.com> - 1.44.0-13
