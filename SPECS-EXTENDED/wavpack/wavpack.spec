@@ -1,17 +1,17 @@
+Summary:        A completely open audiocodec
+Name:           wavpack
+Version:        5.6.0
+Release:        1%{?dist}
+License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Name:		wavpack
-Summary:	A completely open audiocodec
-Version:	5.4.0
-Release:	2%{?dist}
-License:	BSD
-Url:		http://www.wavpack.com/
-Source:		http://www.wavpack.com/%{name}-%{version}.tar.bz2
-# For autoreconf
-BuildRequires: make
+URL:            https://www.wavpack.com/
+Source:         https://www.wavpack.com/%{name}-%{version}.tar.bz2
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libtool
+# For autoreconf
+BuildRequires:  make
 
 %description
 WavPack is a completely open audio compression format providing lossless,
@@ -21,9 +21,9 @@ version 4 format has been designed from the ground up to offer unparalleled
 performance and functionality.
 
 %package devel
-Summary:	WavPack - development files
-Requires:	%{name}%{?_isa} = %{version}-%{release}
-Requires:	pkgconfig
+Summary:        WavPack - development files
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       pkgconfig
 
 %description devel
 Files needed for developing apps using wavpack
@@ -43,11 +43,13 @@ autoreconf -ivf
     --disable-asm \
 %endif
 
-make %{?_smp_mflags}
+%make_build
 
 %install
 %make_install
 rm -f %{buildroot}/%{_libdir}/*.la
+# Documentation installed through the %doc macro
+rm -rf %{buildroot}/%{_docdir}/
 
 %ldconfig_scriptlets
 
@@ -58,7 +60,7 @@ rm -f %{buildroot}/%{_libdir}/*.la
 %{_mandir}/man1/wvgain.1*
 %{_mandir}/man1/wvunpack.1*
 %{_mandir}/man1/wvtag.1*
-%doc AUTHORS doc/wavpack_doc.html
+%doc AUTHORS doc/wavpack_doc.html doc/style.css
 %license COPYING
 
 %files devel
@@ -68,6 +70,10 @@ rm -f %{buildroot}/%{_libdir}/*.la
 %doc ChangeLog doc/WavPack5PortingGuide.pdf doc/WavPack5LibraryDoc.pdf doc/WavPack5FileFormat.pdf
 
 %changelog
+* Wed Sep 06 2023 Archana Choudhary <archana1@microsoft.com> - 5.6.0-1
+- Upgrade to 5.6.0 - CVE-2021-44269 CVE-2022-2476
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.4.0-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 
@@ -240,4 +246,3 @@ rm -f %{buildroot}/%{_libdir}/*.la
 * Sun Nov 13 2005 Peter Lemenkov <lemenkov@newmail.ru> 4.3-1
 - Initial build for FC-Extras
 - Version 4.3
-

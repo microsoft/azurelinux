@@ -29517,8 +29517,8 @@
         "type": "other",
         "other": {
           "name": "wavpack",
-          "version": "5.4.0",
-          "downloadUrl": "http://www.wavpack.com/wavpack-5.4.0.tar.bz2"
+          "version": "5.6.0",
+          "downloadUrl": "https://www.wavpack.com/wavpack-5.6.0.tar.bz2"
         }
       }
     },
