@@ -65,7 +65,7 @@ var (
 	repoUrls          = app.Flag("repo-url", "URLs of the repos to download from.").Strings()
 	repoFiles         = app.Flag("repo-file", "Files containing URLs of the repos to download from.").ExistingFiles()
 	workerTar         = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz").Required().ExistingFile()
-	buildDir          = app.Flag("worker-dir", "Directory to store chroot while running repo query.").Required().ExistingDir()
+	buildDir          = app.Flag("worker-dir", "Directory to store chroot while running repo query.").Required().String()
 
 	concurrentNetOps = app.Flag("concurrent-net-ops", "Number of concurrent network operations to perform.").Default(defaultNetOpsCount).Uint()
 )
@@ -209,7 +209,7 @@ func createChroot(workerTar, chrootDir string, leaveChrootOnDisk bool) (queryChr
 	defer timestamp.StopEvent(nil)
 	logger.Log.Info("Creating chroot for repoquery")
 
-	queryChroot = safechroot.NewChroot(chrootDir, true)
+	queryChroot = safechroot.NewChroot(chrootDir, false)
 	err = queryChroot.Initialize(workerTar, nil, nil)
 	if err != nil {
 		err = fmt.Errorf("failed to initialize chroot:\n%w", err)
