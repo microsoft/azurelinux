@@ -1,12 +1,12 @@
-Summary: Tool for generating C-based recognizers from regular expressions
-Name: re2c
-Version: 1.1.1
-Release: 5%{?dist}
-License: Public Domain
+Summary:        Tool for generating C-based recognizers from regular expressions
+Name:           re2c
+Version:        2.0
+Release:        1%{?dist}
+License:        Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL: http://re2c.org/
-Source: https://github.com/skvadrik/re2c/releases/download/%{version}/re2c-%{version}.tar.gz
+URL:            http://re2c.org/
+Source:         https://github.com/skvadrik/re2c/releases/download/%{version}/re2c-%{version}.tar.xz
 
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
@@ -32,19 +32,21 @@ quality.
 %install
 %make_install
 
-
 %check
 make tests
 
 
 %files
-%license README
-%doc CHANGELOG README examples/ doc/*
+%doc CHANGELOG examples/ doc/*
 %{_bindir}/re2c
 %{_mandir}/man1/re2c.1*
+/usr/share/re2c/stdlib/unicode_categories.re
 
 
 %changelog
+* Mon Sep 18 2023 Andrew Phelps <anphel@microsoft.com> - 2.0-1
+- Upgrade to version 2.0
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.1-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
