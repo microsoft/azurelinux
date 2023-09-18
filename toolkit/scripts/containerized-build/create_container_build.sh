@@ -41,7 +41,7 @@ Optional arguments:
 
     * User can override Mariner make definitions. Some useful overrides could be
                     SPECS_DIR: build specs from another directory like SPECS-EXTENDED by providing SPECS_DIR=path/to/SPECS-EXTENDED. default: $REPO_PATH/SPECS
-                    SRPM_PACK_LIST: provide a list of SRPMS to build by providing SRPM_PACK_LIST="srpm1 srpm2 ...". default: builds all SRPMS from $SPECS_DIR
+                    SRPM_PACK_LIST: provide a list of SRPMS to build by providing SRPM_PACK_LIST=\"srpm1 srpm2 ...\". default: builds all SRPMS from $SPECS_DIR
                     RPMS_DIR: choose which built RPMs to mount into container by providing RPMS_DIR=path/to/custom/out/RPMS. default: $REPO_PATH/out/RPMS
                     Refer to toolkit/Makefile for default definitions.
 To see help, run 'sudo make containerized-rpmbuild-help'
