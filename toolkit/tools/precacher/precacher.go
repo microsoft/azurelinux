@@ -160,9 +160,8 @@ func getAllRepoData(repoURLs, repoFiles []string, workerTar, buildDir, repoUrlsF
 
 	// Use the chroot to query each repo for the packages it contains
 	for _, repoFile := range repoFiles {
-		var packageRepoUrls []string
-
 		// Replace the existing repo file (if it exists) with the one that we want to query
+		logger.Log.Infof("Will query package data from %s", repoFile)
 		destFile := path.Join(chrootRepoDir, path.Base(repoFile))
 		chrootRepoFile := []safechroot.FileToCopy{
 			{Src: repoFile, Dest: destFile},
@@ -172,16 +171,17 @@ func getAllRepoData(repoURLs, repoFiles []string, workerTar, buildDir, repoUrlsF
 			err = fmt.Errorf("failed to add files to chroot:\n%w", err)
 			return
 		}
-
-		err = queryChroot.Run(func() (chrootErr error) {
-			packageRepoUrls, chrootErr = getPackageRepoUrlsFromRepoFile(destFile)
-			return chrootErr
-		})
-		if err != nil {
-			return nil, err
-		}
-		allPackageURLs = append(allPackageURLs, packageRepoUrls...)
 	}
+
+	var packageRepoUrls []string
+	err = queryChroot.Run(func() (chrootErr error) {
+		packageRepoUrls, chrootErr = getPackageRepoUrlsFromRepoFile()
+		return chrootErr
+	})
+	if err != nil {
+		return nil, err
+	}
+	allPackageURLs = append(allPackageURLs, packageRepoUrls...)
 
 	// We will be searching by the name: "<name>-<version>.<distro>.<arch>", the results from the repoquery will be
 	// in the form of "<PARTIAL_URL>/<name>-<version>.<distro>.<arch>.rpm"
@@ -290,8 +290,8 @@ func getPackageRepoPathsFromUrl(repoUrl string) (packageURLs []string, err error
 	return
 }
 
-// getPackageRepoPathsFromUrl returns a list of packages available in the given repoUrl by running repoquery
-func getPackageRepoUrlsFromRepoFile(repoFilePath string) (packageURLs []string, err error) {
+// getPackageRepoUrlsFromRepoFile returns a list of packages available in the given repoUrl by running repoquery
+func getPackageRepoUrlsFromRepoFile() (packageURLs []string, err error) {
 	const (
 		reqoqueryTool    = "repoquery"
 		randomNameLength = 10
@@ -300,7 +300,7 @@ func getPackageRepoUrlsFromRepoFile(repoFilePath string) (packageURLs []string, 
 	// We have removed all other repo files from the chroot, so we can blindly enable all repos to get the full list of packages
 	var queryCommonArgList = []string{"-y", "-q", "--enablerepo=*", "-a", "--location"}
 
-	logger.Log.Infof("Getting package data from %s", repoFilePath)
+	logger.Log.Info("Getting package data from repo files")
 
 	onStdout := func(args ...interface{}) {
 		line := args[0].(string)
