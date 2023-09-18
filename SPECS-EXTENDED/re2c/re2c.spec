@@ -5,9 +5,8 @@ Release:        1%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            http://re2c.org/
+URL:            https://re2c.org/
 Source:         https://github.com/skvadrik/re2c/releases/download/%{version}/re2c-%{version}.tar.xz
-
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 
@@ -34,7 +33,7 @@ make tests
 
 %files
 %license LICENSE
-%doc CHANGELOG LICENSE README.md examples/ doc/*
+%doc CHANGELOG README.md examples/ doc/*
 %{_bindir}/re2c
 %{_mandir}/man1/re2c.1*
 %{_datadir}/re2c/stdlib/unicode_categories.re
@@ -42,6 +41,8 @@ make tests
 %changelog
 * Mon Sep 18 2023 Andrew Phelps <anphel@microsoft.com> - 2.0-1
 - Upgrade to version 2.0
+- Lint spec
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.1-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
@@ -147,4 +148,3 @@ make tests
 
 * Thu May 03 2007 Dag Wieers <dag@wieers.com> - 0.12.0-1
 - Initial version.
-
