@@ -6,7 +6,8 @@
     "password": "<password>",
     "storageAccount": "<storageAccount>",
     "containerName": "<containerName>",
-    "inputFolder": "<inputFolder>",
+    "versionsFolder": "versions",
+    "inputFolder": "latest",
     "outputFolder": "<outputFolder>"
   },
   "groups": [
