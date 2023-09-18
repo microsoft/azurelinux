@@ -25404,8 +25404,8 @@
         "type": "other",
         "other": {
           "name": "re2c",
-          "version": "1.1.1",
-          "downloadUrl": "https://github.com/skvadrik/re2c/releases/download/1.1.1/re2c-1.1.1.tar.gz"
+          "version": "2.0",
+          "downloadUrl": "https://github.com/skvadrik/re2c/releases/download/2.0/re2c-2.0.tar.xz"
         }
       }
     },

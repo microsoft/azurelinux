@@ -19,15 +19,12 @@ any traditional lexer offers. And Last but not least re2c generates warning
 free code that is equal to hand-written code in terms of size, speed and
 quality.
 
-
 %prep
 %setup -q
-
 
 %build
 %configure --disable-silent-rules
 %make_build
-
 
 %install
 %make_install
@@ -35,13 +32,12 @@ quality.
 %check
 make tests
 
-
 %files
-%doc CHANGELOG examples/ doc/*
+%license LICENSE
+%doc CHANGELOG LICENSE README.md examples/ doc/*
 %{_bindir}/re2c
 %{_mandir}/man1/re2c.1*
-/usr/share/re2c/stdlib/unicode_categories.re
-
+%{_datadir}/re2c/stdlib/unicode_categories.re
 
 %changelog
 * Mon Sep 18 2023 Andrew Phelps <anphel@microsoft.com> - 2.0-1
