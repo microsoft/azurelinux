@@ -50,7 +50,8 @@ type RemoteStore struct {
 	ContainerName  string `json:"containerName"`
 	VersionsFolder string `json:"versionsFolder"`
 	InputFolder    string `json:"inputFolder"`
-	OutputFolder   string `json:"outputFolder"`
+	UpdateEnabled  bool   `json:"updateEnabled"`
+	UpdateFolder   string `json:"updateFolder"`
 }
 
 type CCacheConfiguration struct {
@@ -77,7 +78,8 @@ func GetCCacheRemoteStore() (remoteStore RemoteStore, err error) {
 		logger.Log.Infof("  ContainerName : %s", ccacheConfiguration.RemoteStore.ContainerName)
 		logger.Log.Infof("  Versionsfolder: %s", ccacheConfiguration.RemoteStore.VersionsFolder)
 		logger.Log.Infof("  InputFolder   : %s", ccacheConfiguration.RemoteStore.InputFolder)
-		logger.Log.Infof("  OutputFolder  : %s", ccacheConfiguration.RemoteStore.OutputFolder)
+		logger.Log.Infof("  UpdateEnabled : %v", ccacheConfiguration.RemoteStore.UpdateEnabled)
+		logger.Log.Infof("  UpdateFolder  : %s", ccacheConfiguration.RemoteStore.UpdateFolder)
 	}
 
 	return ccacheConfiguration.RemoteStore, err	
@@ -380,7 +382,7 @@ func installCCache(ccacheDirTarsIn string, ccacheGroupName string) (err error) {
 // - ccacheDirTarsIn
 // - ccacheDirTarsOut
 // - ccacheDir
-	func archiveCCache(ccacheDirTarsOut string, ccacheGroupName string) (err error) {
+func archiveCCache(ccacheDirTarsOut string, ccacheGroupName string) (err error) {
 
 	logger.Log.Infof("ccache is enabled - Capturing --------------------")
     remoteStore, err := GetCCacheRemoteStore()
@@ -389,12 +391,12 @@ func installCCache(ccacheDirTarsIn string, ccacheGroupName string) (err error) {
 		return err
 	}
 
-	var blobName = ccacheGroupName + CCacheTarSuffix
-	var outputBlobName = remoteStore.OutputFolder + "/" + blobName
-	
-	// tar ccache...
-	ccacheOutputTarFullPath := ccacheDirTarsOut + "/" + ccacheGroupName + CCacheTarSuffix
-	// Check if the folder exists...
+	if !remoteStore.UpdateEnabled {
+		logger.Log.Infof("CCache update is disabled for this build.")
+		return
+	}
+
+	// Ensure the output folder exists...
 	logger.Log.Infof("  ensuring ccache tar output folder (%s) exists..", ccacheDirTarsOut)
 	_, err = os.Stat(ccacheDirTarsOut)
 	if err != nil {
@@ -411,6 +413,9 @@ func installCCache(ccacheDirTarsIn string, ccacheGroupName string) (err error) {
 		}
 	}
 
+	// Ensure the output file does not exist...
+	ccacheOutputTarFullPath := ccacheDirTarsOut + "/" + ccacheGroupName + CCacheTarSuffix
+
 	logger.Log.Infof("  removing older ccache tar output file (%s) if it exists...", ccacheOutputTarFullPath)
 	_, err = os.Stat(ccacheOutputTarFullPath)
 	if err == nil {
@@ -422,6 +427,7 @@ func installCCache(ccacheDirTarsIn string, ccacheGroupName string) (err error) {
 		}
 	}
 	
+	// Create the archive...
 	logger.Log.Infof("  compressing (%s) into (%s).", *ccacheDir, ccacheOutputTarFullPath)
 	compressStartTime := time.Now()
 	tarArgs := []string{
@@ -451,6 +457,11 @@ func installCCache(ccacheDirTarsIn string, ccacheGroupName string) (err error) {
 		return err
 	}
 
+	// Upload the ccache archive
+	var outputBlobName = remoteStore.UpdateFolder + "/" + ccacheGroupName + CCacheTarSuffix
+
+	logger.Log.Infof("  uploading ccache archive (%s) to (%s)...", ccacheOutputTarFullPath, outputBlobName)
+
 	uploadStartTime := time.Now()
 	err = upload(theClient, context.Background(), ccacheOutputTarFullPath, remoteStore.ContainerName, outputBlobName)
 	if err != nil {
@@ -458,6 +469,37 @@ func installCCache(ccacheDirTarsIn string, ccacheGroupName string) (err error) {
 		return err
 	}
 	uploadEndTime := time.Now()
+	logger.Log.Infof("  upload Time: %s", uploadEndTime.Sub(uploadStartTime))
+
+	// Create the latest version file...
+
+	logger.Log.Infof("  creating a temporary version file with content: (%s)...", remoteStore.UpdateFolder)
+
+	tempFile, err := ioutil.TempFile("", ccacheGroupName + CCacheVersionSuffix)
+	if err != nil {
+		logger.Log.Warnf("Unable to create temporary file to hold new version information. Error: %v", err)
+		return err
+	}
+	defer tempFile.Close()
+
+	_, err = tempFile.WriteString(remoteStore.UpdateFolder)
+	if err != nil {
+		logger.Log.Warnf("Unable to write version information to temporary file. Error: %v", err)
+		return err
+	}	
+
+    // Upload the latest version file...
+	var ccacheVersionFullBlobName = remoteStore.VersionsFolder + "/" + ccacheGroupName + CCacheVersionSuffix
+
+	logger.Log.Infof("  uploading latest version (%s) to (%s)...", tempFile.Name(), ccacheVersionFullBlobName)
+
+	uploadStartTime = time.Now()
+	err = upload(theClient, context.Background(), tempFile.Name(), remoteStore.ContainerName, ccacheVersionFullBlobName)
+	if err != nil {
+		logger.Log.Warnf("Unable to upload ccache archive. Error: %v", err)
+		return err
+	}
+	uploadEndTime = time.Now()
 	logger.Log.Infof("  upload Time: %s", uploadEndTime.Sub(uploadStartTime))
 
 	// Do no clean it because it might be used by other packages in the same

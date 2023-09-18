@@ -7,8 +7,9 @@
     "storageAccount": "<storageAccount>",
     "containerName": "<containerName>",
     "versionsFolder": "versions",
-    "inputFolder": "latest",
-    "outputFolder": "<outputFolder>"
+    "inputFolder": "<inputFolder>",
+    "updateEnabled": "<updateEnabled>",
+    "updateFolder": "<updateFolder>"
   },
   "groups": [
     {
