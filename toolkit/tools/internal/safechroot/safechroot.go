@@ -463,7 +463,7 @@ func cleanupAllChroots() {
 	}
 
 	if failedToUnmount {
-		logger.Log.Fatalf("Failed to unmount a chroot, manual unmount required")
+		logger.Log.Fatalf("Failed to unmount a chroot, manual unmount required. See above errors for details on which mounts failed.")
 	} else {
 		logger.Log.Info("Cleanup finished")
 	}
