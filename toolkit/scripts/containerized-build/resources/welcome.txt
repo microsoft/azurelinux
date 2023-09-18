@@ -25,7 +25,7 @@
 *     Changes to /usr/src/mariner/SOURCES will not be available on host machine
 *     RPMs built in the container are stored at /usr/src/mariner/RPMS, and will not be available on host machine
 *     RPMs from host's <CBL-Mariner>/out/RPMs will be available in /repo
-*     Individual packages may be installed directly via\e[32m tdnf install /repo/x86_64/pkg.rpm and /repo/noarch/pkg.rpm\e[0m
+*     Individual packages may be installed directly via\e[32m tdnf install /repo/<AARCH>/pkg.rpm and /repo/noarch/pkg.rpm\e[0m
 *
 * \e[31mDirectory information:\e[0m
 *     Mariner repo path:          <REPO_PATH>
