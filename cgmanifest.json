@@ -9880,6 +9880,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libkml",
+          "version": "1.3.0",
+          "downloadUrl": "https://github.com/libkml/libkml/archive/1.3.0/libkml-1.3.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libksba",
           "version": "1.6.3",
           "downloadUrl": "https://www.gnupg.org/ftp/gcrypt/libksba/libksba-1.6.3.tar.bz2"
