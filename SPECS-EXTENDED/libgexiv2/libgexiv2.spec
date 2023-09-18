@@ -7,7 +7,7 @@ Summary:        Gexiv2 is a GObject-based wrapper around the Exiv2 library
 
 License:        GPLv2+
 URL:            https://wiki.gnome.org/Projects/gexiv2
-Source0:        https://download.gnome.org/sources/gexiv2/0.14/gexiv2-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/gexiv2/0.14/gexiv2-%{version}.tar.xz#/%{name}-%{version}.tar.xz
 
 BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:  exiv2-devel >= 0.28.0
