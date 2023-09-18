@@ -72,7 +72,7 @@ func SetToSlice[T comparable](inputSet map[T]bool) []T {
 	return outputSlice[:index]
 }
 
-// StringsSliceToSet converts a slice of K to a map[K]bool.
+// SliceToSet converts a slice of K to a map[K]bool.
 func SliceToSet[K comparable](inputSlice []K) (outputSet map[K]bool) {
 	outputSet = make(map[K]bool, len(inputSlice))
 	for _, element := range inputSlice {
