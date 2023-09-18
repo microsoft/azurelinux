@@ -8,7 +8,7 @@
     "containerName": "<containerName>",
     "versionsFolder": "versions",
     "inputFolder": "<inputFolder>",
-    "updateEnabled": "<updateEnabled>",
+    "updateEnabled": <updateEnabled>,
     "updateFolder": "<updateFolder>"
   },
   "groups": [
