@@ -7,6 +7,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -241,28 +242,50 @@ func download(
 	return nil
 }
 
-func createContainerClient(remoteStore RemoteStore) (client *azblob.Client, err error ) {
-	credential, err := azidentity.NewClientSecretCredential(remoteStore.TenantId, remoteStore.UserName, remoteStore.Password, nil)
-	if err != nil {
-		logger.Log.Warnf("Unable to init azure identity. Error: %v", err)
-		return nil, err
-	}
-
-	url := "https://" + remoteStore.StorageAccount + ".blob.core.windows.net/"
-
-	client, err = azblob.NewClient(url, credential, nil)
-	if err != nil {
-		logger.Log.Warnf("Unable to init azure blob storage client. Error: %v", err)
-		return nil, err
-	}
-
-	return client, nil
-}
-
 const (
 	CCacheVersionSuffix = "-latest-build.txt"
 	CCacheTarSuffix = "-ccache.tar.gz"
+	AnonymousAccess = 0
+	AuthenticatedAccess = 1
 )
+
+func createContainerClient(remoteStore RemoteStore, authenticationType int) (client *azblob.Client, err error ) {
+
+	url := "https://" + remoteStore.StorageAccount + ".blob.core.windows.net/"
+
+	if authenticationType == AnonymousAccess {
+
+		client, err := azblob.NewClientWithNoCredential(url, nil)
+		if err != nil {
+			logger.Log.Warnf("Unable to init azure blob storage read-only client. Error: %v", err)
+			return nil, err
+		}
+
+		return client, nil
+
+	} else if authenticationType == AuthenticatedAccess {
+
+		credential, err := azidentity.NewClientSecretCredential(remoteStore.TenantId, remoteStore.UserName, remoteStore.Password, nil)
+		if err != nil {
+			logger.Log.Warnf("Unable to init azure identity. Error: %v", err)
+			return nil, err
+		}
+
+		client, err = azblob.NewClient(url, credential, nil)
+		if err != nil {
+			logger.Log.Warnf("Unable to init azure blob storage read-write client. Error: %v", err)
+			return nil, err
+		}
+
+		return client, nil
+
+	} else {
+		logger.Log.Warnf("Unknown authentication type.")
+		return nil, errors.New("Unknown authentication type.")
+	}
+}
+
+
 // ensure the following are set:
 // - ccacheDirTarsIn
 // - ccacheDirTarsOut
@@ -305,7 +328,7 @@ func installCCache(ccacheDirTarsIn string, ccacheGroupName string) (err error) {
 
 	// Connect to blob storage...
 	logger.Log.Infof("  creating container client...")
-	theClient, err := createContainerClient(remoteStore)
+	theClient, err := createContainerClient(remoteStore, AnonymousAccess)
 	if err != nil {
 		logger.Log.Warnf("Unable to init azure blob storage client. Error: %v", err)
 		return err
@@ -448,7 +471,7 @@ func archiveCCache(ccacheDirTarsOut string, ccacheGroupName string) (err error) 
 
 	// Test uploading
 	logger.Log.Infof("  connecting to azure storage blob...")
-	theClient, err := createContainerClient(remoteStore)
+	theClient, err := createContainerClient(remoteStore, AuthenticatedAccess)
 	if err != nil {
 		logger.Log.Warnf("Unable create azure blob storage client. Error: %v", stderr)
 		return err
