@@ -358,7 +358,7 @@ If `DISABLE_UPSTREAM_REPOS=y` is set, any repo that is accessed through the netw
 If supplying custom endpoints for source/SRPM/package servers, accessing these resources may require keys and certificates. The keys and certificates can be set using:
 
 ```bash
-sudo make image CA_CERT=/path/to/rootca.crt TLS_CERT=/path/to/user.crt TLS_KEY=/path/to/user.key
+sudo make image CONFIG_FILE="./imageconfigs/core-efi.json" CA_CERT=/path/to/rootca.crt TLS_CERT=/path/to/user.crt TLS_KEY=/path/to/user.key
 ```
 
 ## Building Everything From Scratch
@@ -413,7 +413,7 @@ sudo make toolchain PACKAGE_URL_LIST="" REPO_LIST="" DISABLE_UPSTREAM_REPOS=y RE
 # - DOWNLOAD_SRPMS=y (will download pre-packages sources from SRPM_URL_LIST=...)
 # - manually placing the correct sources in each /SPECS/* package folder
 #     (SRPM_FILE_SIGNATURE_HANDLING=update must be used if the new sources files to not match the existing hashes)
-sudo make image PACKAGE_URL_LIST="" REPO_LIST="" DISABLE_UPSTREAM_REPOS=y REBUILD_TOOLCHAIN=y REBUILD_PACKAGES=y REBUILD_TOOLS=y
+sudo make image CONFIG_FILE="./imageconfigs/core-efi.json" PACKAGE_URL_LIST="" REPO_LIST="" DISABLE_UPSTREAM_REPOS=y REBUILD_TOOLCHAIN=y REBUILD_PACKAGES=y REBUILD_TOOLS=y
 ```
 
 ### Local Build Variables
