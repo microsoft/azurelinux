@@ -60,14 +60,12 @@ type CCacheConfiguration struct {
 
 func GetCCacheRemoteStore() (remoteStore RemoteStore, err error) {
 	ccacheGroupsFile := "resources/manifests/package/ccache_configuration.json"
-	logger.Log.Infof("Loading ccache configuration file: %s", ccacheGroupsFile)
+	logger.Log.Infof("  loading ccache configuration file: %s", ccacheGroupsFile)
 	var ccacheConfiguration CCacheConfiguration
 	err = jsonutils.ReadJSONFile(ccacheGroupsFile, &ccacheConfiguration)
 	if err != nil {
 		logger.Log.Infof("Failed to load file. %v", err)
 	} else {
-		logger.Log.Infof("Loaded file.")
-
 		logger.Log.Infof("  Type          : %s", ccacheConfiguration.RemoteStore.Type)
 		logger.Log.Infof("  TenantId      : %s", ccacheConfiguration.RemoteStore.TenantId)
 		logger.Log.Infof("  UserName      : %s", ccacheConfiguration.RemoteStore.UserName)
@@ -189,7 +187,7 @@ func upload(
 	containerName string,
 	blobName string) (err error) {
 
-	logger.Log.Infof("Uploading %s...", fullFileName)
+	logger.Log.Infof("  uploading %s...", fullFileName)
 
 	localFile, err := os.OpenFile(fullFileName, os.O_RDONLY, 0)
 	if err != nil {
@@ -200,15 +198,6 @@ func upload(
 		fmt.Printf("Failed to open local file for upload 2.")
 	}
 	defer localFile.Close()
-
-	// close the file after it is no longer required.
-	// defer func(file *os.File) {
-	// 	err = file.Close()
-	// 	handleError(err)
-	// }(fileHandler)
-
-	logger.Log.Infof("Container %s", containerName)
-	logger.Log.Infof("blob %s", blobName)
 
 	_, err = theClient.UploadFile(ctx, containerName, blobName, localFile, nil)
 	if err != nil {
@@ -495,7 +484,7 @@ func archiveCCache(ccacheDirTarsOut string, ccacheGroupName string) (err error) 
 
 	logger.Log.Infof("  creating a temporary version file with content: (%s)...", remoteStore.UpdateFolder)
 
-	tempFile, err := ioutil.TempFile("", ccacheGroupName + CCacheVersionSuffix)
+	tempFile, err := ioutil.TempFile("", ccacheGroupName + CCacheVersionSuffix + "-")
 	if err != nil {
 		logger.Log.Warnf("Unable to create temporary file to hold new version information. Error: %v", err)
 		return err

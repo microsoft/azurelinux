@@ -52,7 +52,7 @@ type CCacheConfiguration struct {
 func FindCCacheGroup(basePackageName string) (packageCCacheGroupName string) {
 
 	ccacheGroupsFile := "resources/manifests/package/ccache_configuration.json"
-	logger.Log.Infof("Loading ccache configuration file: %s", ccacheGroupsFile)
+	logger.Log.Infof("  loading ccache configuration file: %s", ccacheGroupsFile)
 	var ccacheConfiguration CCacheConfiguration
 	err := jsonutils.ReadJSONFile(ccacheGroupsFile, &ccacheConfiguration)
 	if err != nil {
