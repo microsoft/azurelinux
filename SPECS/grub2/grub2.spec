@@ -15,6 +15,7 @@ URL:            https://www.gnu.org/software/grub
 Source0:        https://git.savannah.gnu.org/cgit/grub.git/snapshot/grub-%{version}.tar.gz
 Source1:        https://git.savannah.gnu.org/cgit/gnulib.git/snapshot/gnulib-%{gnulibversion}.tar.gz
 Source2:        sbat.csv.in
+Source3:        macros.grub2
 # Incorporate relevant patches from Fedora 34
 # EFI Secure Boot / Handover Protocol patches
 Patch0001:      0001-Add-support-for-Linux-EFI-stub-loading.patch
@@ -136,6 +137,14 @@ Group:          System Environment/Base
 %description efi-binary-noprefix
 GRUB UEFI bootloader binaries with no prefix directory set
 
+%package rpm-macros
+Summary:        GRUB RPM Macros
+Group:          System Environment/Base
+
+%description rpm-macros
+GRUB RPM Macros for enabling package updates supporting
+the grub2-mkconfig flow on AzureLinux
+
 %prep
 # Remove module_info.ld script due to error "grub2-install: error: Decompressor is too big"
 LDFLAGS="`echo " %{build_ldflags} " | sed 's#-Wl,-dT,%{_topdir}/BUILD/module_info.ld##'`"
@@ -254,6 +263,10 @@ GRUB_MODULE_SOURCE=
 
 install -d $EFI_BOOT_DIR
 
+# Install grub2 macros
+mkdir -p %{buildroot}%{_rpmconfigdir}/macros.d
+install -m 644 %{SOURCE3} %{buildroot}/%{_rpmconfigdir}/macros.d
+
 %ifarch x86_64
 GRUB_MODULE_NAME=grubx64.efi
 GRUB_PXE_MODULE_NAME=grubx64-noprefix.efi
@@ -278,6 +291,7 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %defattr(-,root,root)
 %license COPYING
 %dir %{_sysconfdir}/grub.d
+%dir %{_sysconfdir}/default/grub.d
 %dir /boot/%{name}
 %config() %{_sysconfdir}/bash_completion.d/grub
 %config() %{_sysconfdir}/grub.d/00_header
@@ -327,9 +341,13 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %{_libdir}/grub/*
 %endif
 
+%files rpm-macros
+%{_rpmconfigdir}/macros.d/macros.grub2
+
 %changelog
 * Fri Aug 11 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.06-11
 - Enable support for grub2-mkconfig grub.cfg generation
+- Introduce rpm-macros subpackage
 - The Mariner /etc/default/grub now sources files from /etc/default/grub.d
     before the remainder of grub2-mkconfig runs. This allows RPM to 
     install package-specific configurations that the users can safely

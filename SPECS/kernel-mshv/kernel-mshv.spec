@@ -247,6 +247,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner-mshv.cfg
 * Wed Aug 23 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.110.mshv2-5
 - Enable grub2-mkconfig-based boot path by installing 
     50_mariner_mshv.cfg 
+- Call grub2-mkconfig to regenerate configs only if the user has 
+    previously used grub2-mkconfig for boot configuration. 
 
 * Thu Jun 22 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.110.mshv2-4
 - Don't include duplicate systemd parameters in mariner-mshv.cfg; should be read from
