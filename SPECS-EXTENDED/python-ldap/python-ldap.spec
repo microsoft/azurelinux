@@ -6,8 +6,8 @@ Distribution:   Mariner
 %global openldap_version 2.4.45-4
 
 Name: python-ldap
-Version: 3.3.1
-Release: 2%{?dist}
+Version: 3.4.0
+Release: 1%{?dist}
 License: Python
 Summary: An object-oriented API to access LDAP directory servers
 URL: http://python-ldap.org/
@@ -88,6 +88,9 @@ TOXENV=py%{python3_version_nodots} LOGLEVEL=10 tox --sitepackages
 %{python3_sitearch}/python_ldap-%{version}%{?prerelease}-py%{python3_version}.egg-info/
 
 %changelog
+* Tue Sep 19 2023 Archana Choudhary <archana1@microsoft.com> - 3.4.0-1
+- Auto-upgrade to 3.4.0 - CVE-2021-46823
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.3.1-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
