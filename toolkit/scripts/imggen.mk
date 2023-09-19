@@ -43,6 +43,7 @@ validate-config                      = $(STATUS_FLAGS_DIR)/validate-image-config
 meta_user_data_tmp_dir               = $(IMAGEGEN_DIR)/meta-user-data_tmp
 image_package_cache_summary          = $(imggen_config_dir)/image_deps.json
 image_external_package_cache_summary = $(imggen_config_dir)/image_external_deps.json
+image_package_manifest               = $(imggen_config_dir)/image_pkg_manifest.json
 
 # Outputs
 artifact_dir             = $(IMAGES_DIR)/$(config_name)
@@ -151,6 +152,7 @@ $(STATUS_FLAGS_DIR)/imager_disk_output.flag: $(go-imager) $(image_package_cache_
 		--local-repo $(local_and_external_rpm_cache) \
 		--tdnf-worker $(chroot_worker) \
 		--repo-file=$(imggen_local_repo) \
+		--output-image-contents=$(image_package_manifest) \
 		--assets $(assets_dir) \
 		--output-dir $(imager_disk_output_dir) \
 		--cpu-prof-file=$(PROFILE_DIR)/imager.cpu.pprof \

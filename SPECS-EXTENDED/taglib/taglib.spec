@@ -1,46 +1,36 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-
 ## 1.11 currently disables tests with BUILD_SHARED_LIBS=ON
 #bcond_without tests
 #bcond_without doc
 %global apidocdir __api-doc_fedora
-
-Name:       taglib	
-Summary:    Audio Meta-Data Library
-Version:    1.11.1
-Release:    13%{?dist}
-
-License:    LGPLv2 or MPLv1.1
-#URL:       http://launchpad.net/taglib
-URL:        http://taglib.github.io/
-%if 0%{?snap:1}
-Source0:    taglib-%{version}-%{snap}.tar.gz
-%else
-Source0:    http://taglib.github.io/releases/taglib-%{version}%{?beta}.tar.gz
-%endif
+Summary:        Audio Meta-Data Library
+Name:           taglib
+Version:        1.13.1
+Release:        1%{?dist}
+License:        LGPLv2 OR MPLv1.1
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://taglib.github.io/
 # The snapshot tarballs generated with the following script:
-Source1:    taglib-snapshot.sh
-
+Source1:        taglib-snapshot.sh
 # http://bugzilla.redhat.com/343241
-Patch102:   taglib-1.5rc1-multilib.patch
+Patch102:       taglib-1.13.1-multilib.patch
 
-## upstream patches
-# sbooth fork/pull-request
-# https://github.com/taglib/taglib/pull/831/commits/eb9ded1206f18f2c319157337edea2533a40bea6
-Patch1: 0001-Don-t-assume-TDRC-is-an-instance-of-TextIdentificati.patch
-
+BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
-BuildRequires: cmake
-BuildRequires: pkgconfig
-BuildRequires: zlib-devel
+BuildRequires:  pkgconfig
+BuildRequires:  zlib-devel
+%if 0%{?snap:1}
+Source0:        taglib-%{version}-%{snap}.tar.gz
+%else
+Source0:        http://taglib.github.io/releases/taglib-%{version}%{?beta}.tar.gz
+%endif
 %if %{with tests}
-BuildRequires: cppunit-devel
+BuildRequires:  cppunit-devel
 %endif
 %if %{with doc}
-BuildRequires: doxygen
-BuildRequires: graphviz
+BuildRequires:  doxygen
+BuildRequires:  graphviz
 %endif
 
 %description
@@ -50,20 +40,21 @@ files, Ogg Vorbis comments and ID3 tags and Vorbis comments in FLAC, MPC,
 Speex, WavPack, TrueAudio files, as well as APE Tags.
 
 %package doc
-Summary: API Documentation for %{name}
-BuildArch: noarch
+Summary:        API Documentation for %{name}
+BuildArch:      noarch
+
 %description doc
 This is API documentation generated from the TagLib source code.
 
 %package devel
-Summary: Development files for %{name} 
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Summary:        Development files for %{name}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 %if ! %{with doc}
-Obsoletes: %{name}-doc
+Obsoletes:      %{name}-doc
 %endif
+
 %description devel
 Files needed when building software with %{name}.
-
 
 %prep
 %autosetup -n taglib-%{version}%{?beta} -p1
@@ -72,7 +63,7 @@ Files needed when building software with %{name}.
 %build
 mkdir %{_target_platform}
 pushd %{_target_platform}
-%{cmake} .. \
+%cmake .. \
 %if %{with tests}
   -DBUILD_TESTS:BOOL=ON \
 %endif
@@ -131,6 +122,10 @@ make check -C %{_target_platform}
 
 
 %changelog
+* Mon Sep 18 2023 Archana Choudhary <archana1@microsoft.com> - 1.13.1-1
+- Upgrade to 1.13.1 - CVE-2018-11439, CVE-2017-12678
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.11.1-13
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
@@ -245,7 +240,6 @@ make check -C %{_target_platform}
 
 * Thu Sep 06 2012 Rex Dieter <rdieter@fedoraproject.org> 1.8-1
 - taglib-1.8
-
 -* Sat Jul 21 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.7.2-2
 -- Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 

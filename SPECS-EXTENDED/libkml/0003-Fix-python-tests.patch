@@ -1,0 +1,71 @@
+From b728c0815edc06c826fb5be8cd25cbb7f3b816b3 Mon Sep 17 00:00:00 2001
+From: Sandro Mani <manisandro@gmail.com>
+Date: Fri, 8 Apr 2016 23:22:12 +0200
+Subject: [PATCH 3/4] Fix python tests
+
+---
+ tests/swig/CMakeLists.txt    | 6 ++++++
+ tests/swig/kmldom_test.py    | 2 +-
+ tests/swig/kmlengine_test.py | 3 ++-
+ 3 files changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/tests/swig/CMakeLists.txt b/tests/swig/CMakeLists.txt
+index 52e398e..5ba1cd1 100644
+--- a/tests/swig/CMakeLists.txt
++++ b/tests/swig/CMakeLists.txt
+@@ -1,12 +1,18 @@
+ if(WITH_PYTHON)
+ add_test(NAME test_python_kmlbase
+   COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/kmlbase_test.py)
++set_tests_properties(test_python_kmlbase
++     PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}/src/swig:${CMAKE_BINARY_DIR}/lib")
+ 
+ add_test(NAME test_python_kmldom
+   COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/kmldom_test.py)
++set_tests_properties(test_python_kmldom
++     PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}/src/swig:${CMAKE_BINARY_DIR}/lib")
+ 
+ add_test(NAME test_python_kmlengine
+   COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/kmlengine_test.py)
++set_tests_properties(test_python_kmlengine
++     PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}/src/swig:${CMAKE_BINARY_DIR}/lib")
+ endif()
+ 
+ if(WITH_JAVA)
+diff --git a/tests/swig/kmldom_test.py b/tests/swig/kmldom_test.py
+index e18c5a7..4762d6e 100644
+--- a/tests/swig/kmldom_test.py
++++ b/tests/swig/kmldom_test.py
+@@ -753,7 +753,7 @@ def TestColorStyle(colorstyle):
+   color = kmlbase.Color32(0xf0f0c80f)
+   colorstyle.set_color(color)
+   assert colorstyle.has_color()
+-  assert color == colorstyle.get_color()
++  assert color.to_string_argb() == colorstyle.get_color().to_string_argb()
+   # Clear <color> and verify has_
+   colorstyle.clear_color()
+   assert not colorstyle.has_color()
+diff --git a/tests/swig/kmlengine_test.py b/tests/swig/kmlengine_test.py
+index 8850221..7eb3c09 100644
+--- a/tests/swig/kmlengine_test.py
++++ b/tests/swig/kmlengine_test.py
+@@ -32,6 +32,7 @@ This file contains unit tests for the KML Engine Python SWIG bindings.
+ import unittest
+ import kmldom
+ import kmlengine
++import os
+ 
+ # These VerySimple tests really only verify that the function/class exists.
+ 
+@@ -239,7 +240,7 @@ class BasicKmlFileSerializeToStringTestCase(unittest.TestCase):
+ 
+ class BasicKmzFileTestCase(unittest.TestCase):
+   def runTest(self):
+-    kmz_filepath = '../../testdata/kmz/model-macky.kmz'
++    kmz_filepath = os.path.join(os.path.dirname(__file__), '../../testdata/kmz/model-macky.kmz')
+     kmzfile = kmlengine.KmzFile.OpenFromFile(kmz_filepath)
+     assert kmzfile
+     (ok, kml) = kmzfile.ReadKml()
+-- 
+2.8.1
+

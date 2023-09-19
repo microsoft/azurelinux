@@ -23,14 +23,18 @@ containerized_build_args += -v ${VERSION}
 endif
 
 ifneq ($(MOUNTS),)
-containerized_build_args += -mo ${MOUNTS}
+containerized_build_args += -mo "$(MOUNTS)"
+endif
+
+ifneq ($(BUILD_MOUNT),)
+containerized_build_args += -b ${BUILD_MOUNT}
 endif
 
 ifeq ($(ENABLE_REPO),y)
 containerized_build_args += -r
 endif
 
-containerized-rpmbuild:
+containerized-rpmbuild: no_repo_acl
 	$(SCRIPTS_DIR)/containerized-build/create_container_build.sh $(containerized_build_args)
 
 containerized-rpmbuild-help:

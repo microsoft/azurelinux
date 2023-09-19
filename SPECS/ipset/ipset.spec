@@ -1,7 +1,7 @@
 Summary:        administration tool for IP sets
 Name:           ipset
 Version:        7.15
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -104,6 +104,9 @@ fi
 %dir %{_sysconfdir}/%{name}
 
 %changelog
+* Thu Jun 15 2023 Andy Zaugg <azaugg@linkedin.com> - 7.15-2
+- Fix ipset systemd unit file
+
 * Tue Feb 01 2022 Rachel Menge <rachelmenge@microsoft.com> - 7.15-1
 - Update source to 7.15
 - Remove check section since testsuite depends on kernel module

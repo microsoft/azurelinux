@@ -1,0 +1,27 @@
+From 6cb73d824ac204f5680e469b0474855aaa6b8ddc Mon Sep 17 00:00:00 2001
+From: Clemens Lang <cllang@redhat.com>
+Date: Mon, 12 Sep 2022 11:07:38 +0200
+Subject: [PATCH 2/8] Apply patch stunnel-5.61-systemd-service.patch
+
+Patch-name: stunnel-5.61-systemd-service.patch
+Patch-id: 1
+From-dist-git-commit: 70b3076eb09912b3a11f371b8c523303114fffa3
+---
+ tools/stunnel.service.in | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tools/stunnel.service.in b/tools/stunnel.service.in
+index fa98996..0c5a216 100644
+--- a/tools/stunnel.service.in
++++ b/tools/stunnel.service.in
+@@ -6,6 +6,7 @@ After=syslog.target network-online.target
+ ExecStart=@bindir@/stunnel
+ ExecReload=/bin/kill -HUP $MAINPID
+ Type=forking
++PrivateTmp=true
+ 
+ [Install]
+ WantedBy=multi-user.target
+-- 
+2.37.3
+

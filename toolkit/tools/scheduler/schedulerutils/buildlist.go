@@ -107,7 +107,7 @@ func IsReservedFile(rpmPath string, reservedRPMs []string) bool {
 //   - packagesNamesToRebuild,
 //   - local packages listed in the image config, and
 //   - kernels in the image config (if built locally).
-func calculatePackagesToBuild(packagesNamesToBuild, packagesNamesToRebuild []*pkgjson.PackageVer, imageConfig, baseDirPath string, dependencyGraph *pkggraph.PkgGraph) (packageVersToBuild []*pkgjson.PackageVer, err error) {
+func calculatePackagesToBuild(packagesNamesToBuild, packagesNamesToRebuild []*pkgjson.PackageVer, imageConfig, baseDirPath string, dependencyGraph *pkggraph.PkgGraph, nodeGetter func(*pkggraph.LookupNode) *pkggraph.PkgNode) (packageVersToBuild []*pkgjson.PackageVer, err error) {
 	packageVersToBuild = append(packagesNamesToBuild, packagesNamesToRebuild...)
 
 	packageVersFromConfig, err := extractPackagesFromConfig(imageConfig, baseDirPath)
@@ -116,14 +116,14 @@ func calculatePackagesToBuild(packagesNamesToBuild, packagesNamesToRebuild []*pk
 		return
 	}
 
-	packageVersFromConfig, err = filterLocalPackagesOnly(packageVersFromConfig, dependencyGraph)
+	packageVersFromConfig, err = filterLocalPackagesOnly(packageVersFromConfig, dependencyGraph, nodeGetter)
 	if err != nil {
 		err = fmt.Errorf("failed to filter local packages from the image config, error:\n%w", err)
 		return
 	}
 
 	packageVersToBuild = append(packageVersToBuild, packageVersFromConfig...)
-	packageVersToBuild = removePackageVersDuplicates(packageVersToBuild)
+	packageVersToBuild = sliceutils.RemoveDuplicatesFromSlice(packageVersToBuild)
 
 	return
 }
@@ -153,7 +153,7 @@ func extractPackagesFromConfig(configFile, baseDirPath string) (packageList []*p
 }
 
 // filterLocalPackagesOnly returns the subset of packageVersionsInConfig that only contains local packages.
-func filterLocalPackagesOnly(packageVersionsInConfig []*pkgjson.PackageVer, dependencyGraph *pkggraph.PkgGraph) (filteredPackages []*pkgjson.PackageVer, err error) {
+func filterLocalPackagesOnly(packageVersionsInConfig []*pkgjson.PackageVer, dependencyGraph *pkggraph.PkgGraph, nodeGetter func(*pkggraph.LookupNode) *pkggraph.PkgNode) (filteredPackages []*pkgjson.PackageVer, err error) {
 	logger.Log.Debug("Filtering out external packages from list of packages extracted from the image config file.")
 
 	for _, pkgVer := range packageVersionsInConfig {
@@ -162,7 +162,8 @@ func filterLocalPackagesOnly(packageVersionsInConfig []*pkgjson.PackageVer, depe
 		// A pkgNode for a local package has the following characteristics:
 		// 1) The pkgNode exists in the graph (is not nil).
 		// 2) The pkgNode has a build node. External packages will only have a run node.
-		if pkgNode != nil && pkgNode.BuildNode != nil {
+		filteredNode := nodeGetter(pkgNode)
+		if filteredNode != nil {
 			filteredPackages = append(filteredPackages, pkgVer)
 		} else {
 			logger.Log.Debugf("Found external package to filter out: %v.", pkgVer)
@@ -170,16 +171,6 @@ func filterLocalPackagesOnly(packageVersionsInConfig []*pkgjson.PackageVer, depe
 	}
 
 	return
-}
-
-func removePackageVersDuplicates(packageVers []*pkgjson.PackageVer) []*pkgjson.PackageVer {
-	uniquePackageVersToBuild := make(map[*pkgjson.PackageVer]bool)
-
-	for _, packageVer := range packageVers {
-		uniquePackageVersToBuild[packageVer] = true
-	}
-
-	return sliceutils.SetToSlice(uniquePackageVersToBuild)
 }
 
 // packageNamesToPackages converts the input strings to PackageVer structures that are understood by the graph.
@@ -275,7 +266,7 @@ func parseAndGeneratePackageList(dependencyGraph *pkggraph.PkgGraph, buildList, 
 		return
 	}
 
-	finalPackagesToBuild, err = calculatePackagesToBuild(packagesToBuild, packagesToRebuild, imageConfig, baseDirPath, dependencyGraph)
+	finalPackagesToBuild, err = calculatePackagesToBuild(packagesToBuild, packagesToRebuild, imageConfig, baseDirPath, dependencyGraph, nodeGetter)
 	if err != nil {
 		err = fmt.Errorf("unable to generate the final package build list, error:\n%s", err)
 		return

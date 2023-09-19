@@ -22,7 +22,7 @@ Distribution:   Mariner
 Summary: A text mode mail user agent
 Name: mutt
 Version: 2.0.5
-Release: 4%{?dist}
+Release: 5%{?dist}
 # The entire source code is GPLv2+ except
 # pgpewrap.c setenv.c sha1.c wcwidth.c which are Public Domain
 License: GPLv2+ and Public Domain
@@ -41,6 +41,7 @@ Patch12: mutt-1.9.5-nodotlock.patch
 Patch13: mutt-1.12.1-optusegpgagent.patch
 Patch14: mutt_disable_ssl_enforce.patch
 Patch15: CVE-2021-32055.patch
+Patch16: CVE-2023-4874.patch
 
 Url: http://www.mutt.org
 Requires: mailcap, urlview
@@ -99,6 +100,7 @@ autoreconf --install
 %patch13 -p1 -b .optusegpgagent
 %patch14 -p1
 %patch15 -p1
+%patch16 -p1
 
 sed -i -r 's/`$GPGME_CONFIG --libs`/"\0 -lgpg-error"/' configure
 
@@ -217,6 +219,9 @@ ln -sf ./muttrc.5 %{buildroot}%{_mandir}/man5/muttrc.local.5
 
 
 %changelog
+* Fri Sep 15 2023 Henry Li <lihl@microsoft.com> - 2.0.5-5
+- Add patch to resolve CVE-2023-4874
+
 * Tue Nov 29 2022 Muhammad Falak <mwani@microsoft.com> - 2.0.5-4
 - Patch CVE-2021-32055
 - License verified

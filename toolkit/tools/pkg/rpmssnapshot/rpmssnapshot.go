@@ -39,12 +39,12 @@ const (
 //
 //	^(.*)			<-- [index 1] package name
 //	-				<-- second-to-last hyphen separating the package name from its version
-//	([^-]+-\d+)		<-- [index 2] package version and package release number connected by the last hyphen
+//	([^-]+-[^-]+)		<-- [index 2] package version and package release number connected by the last hyphen
 //	\.				<-- second-to-last period separating the package release number from the distribution tag
 //	([^.]+)			<-- [index 3] the distribution tag
 //	\.				<-- last period separating the distribution tag from the architecture string
 //	([^.]+)$		<-- [index 4] the architecture string
-var rpmSpecBuiltRPMRegex = regexp.MustCompile(`^(.*)-([^-]+-\d+)\.([^.]+)\.([^.]+)$`)
+var rpmSpecBuiltRPMRegex = regexp.MustCompile(`^(.*)-([^-]+-[^-]+)\.([^.]+)\.([^.]+)$`)
 
 const (
 	rpmSpecBuiltRPMRegexNameIndex = iota + 1

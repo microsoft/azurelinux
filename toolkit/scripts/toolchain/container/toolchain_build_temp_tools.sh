@@ -84,6 +84,7 @@ case $(uname -m) in
     sed -e '/mabi.lp64=/s/lib64/lib/' -i.orig gcc/config/aarch64/t-aarch64-linux
   ;;
 esac
+patch -Np1 -i /tools/CVE-2023-4039.patch
 mkdir -v build
 cd       build
 ../configure                                       \
@@ -262,6 +263,7 @@ tar -xf ../gmp-6.2.1.tar.xz
 mv -v gmp-6.2.1 gmp
 tar -xf ../mpc-1.2.1.tar.gz
 mv -v mpc-1.2.1 mpc
+patch -Np1 -i /tools/CVE-2023-4039.patch
 mkdir -v build
 cd       build
 CC=$LFS_TGT-gcc                                    \
