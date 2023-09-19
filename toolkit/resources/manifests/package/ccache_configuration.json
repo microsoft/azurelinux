@@ -7,9 +7,10 @@
     "storageAccount": "<storageAccount>",
     "containerName": "<containerName>",
     "versionsFolder": "versions",
-    "inputFolder": "<inputFolder>",
-    "updateEnabled": <updateEnabled>,
-    "updateFolder": "<updateFolder>"
+    "downloadEnabled": <downloadEnabled>,
+    "downloadFolder": "<downloadFolder>",
+    "uploadEnabled": <uploadEnabled>,
+    "uploadFolder": "<uploadFolder>"
   },
   "groups": [
     {

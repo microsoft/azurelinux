@@ -40,45 +40,49 @@ type CCacheGroup struct {
     PackageNames []string `json:"packageNames"`
 }
 
-type RemoteStore struct {
-	Type           string `json:"type"`
-	TenantId       string `json:"tenantId"`
-	UserName       string `json:"userName"`
-	Password       string `json:"password"`
-	StorageAccount string `json:"storageAccount"`
-	ContainerName  string `json:"containerName"`
-	VersionsFolder string `json:"versionsFolder"`
-	InputFolder    string `json:"inputFolder"`
-	UpdateEnabled  bool   `json:"updateEnabled"`
-	UpdateFolder   string `json:"updateFolder"`
+type RemoteStoreConfig struct {
+	Type            string `json:"type"`
+	TenantId        string `json:"tenantId"`
+	UserName        string `json:"userName"`
+	Password        string `json:"password"`
+	StorageAccount  string `json:"storageAccount"`
+	ContainerName   string `json:"containerName"`
+	VersionsFolder  string `json:"versionsFolder"`
+	DownloadEnabled bool   `json:"downloadEnabled"`
+	DownloadFolder  string `json:"downloadFolder"`
+	UploadEnabled   bool   `json:"uploadEnabled"`
+	UploadFolder    string `json:"uploadFolder"`
 }
 
 type CCacheConfiguration struct {
-	RemoteStore RemoteStore `json:"remoteStore"`
-	Groups   []CCacheGroup  `json:"groups"`
+	RemoteStoreConfig RemoteStoreConfig `json:"remoteStore"`
+	Groups            []CCacheGroup     `json:"groups"`
 }
 
-func GetCCacheRemoteStore() (remoteStore RemoteStore, err error) {
-	ccacheGroupsFile := "resources/manifests/package/ccache_configuration.json"
+func GetCCacheRemoteStoreConfig() (remoteStoreConfig RemoteStoreConfig, err error) {
+
+	ccacheGroupsFile := "./resources/manifests/package/ccache_configuration.json"
+
 	logger.Log.Infof("  loading ccache configuration file: %s", ccacheGroupsFile)
 	var ccacheConfiguration CCacheConfiguration
 	err = jsonutils.ReadJSONFile(ccacheGroupsFile, &ccacheConfiguration)
 	if err != nil {
 		logger.Log.Infof("Failed to load file. %v", err)
 	} else {
-		logger.Log.Infof("  Type          : %s", ccacheConfiguration.RemoteStore.Type)
-		logger.Log.Infof("  TenantId      : %s", ccacheConfiguration.RemoteStore.TenantId)
-		logger.Log.Infof("  UserName      : %s", ccacheConfiguration.RemoteStore.UserName)
-		// logger.Log.Infof("  Password      : %s", ccacheConfiguration.RemoteStore.Password)
-		logger.Log.Infof("  StorageAccount: %s", ccacheConfiguration.RemoteStore.StorageAccount)
-		logger.Log.Infof("  ContainerName : %s", ccacheConfiguration.RemoteStore.ContainerName)
-		logger.Log.Infof("  Versionsfolder: %s", ccacheConfiguration.RemoteStore.VersionsFolder)
-		logger.Log.Infof("  InputFolder   : %s", ccacheConfiguration.RemoteStore.InputFolder)
-		logger.Log.Infof("  UpdateEnabled : %v", ccacheConfiguration.RemoteStore.UpdateEnabled)
-		logger.Log.Infof("  UpdateFolder  : %s", ccacheConfiguration.RemoteStore.UpdateFolder)
+		logger.Log.Infof("  Type           : %s", ccacheConfiguration.RemoteStoreConfig.Type)
+		logger.Log.Infof("  TenantId       : %s", ccacheConfiguration.RemoteStoreConfig.TenantId)
+		logger.Log.Infof("  UserName       : %s", ccacheConfiguration.RemoteStoreConfig.UserName)
+		// logger.Log.Infof("  Password      : %s", ccacheConfiguration.RemoteStoreConfig.Password)
+		logger.Log.Infof("  StorageAccount : %s", ccacheConfiguration.RemoteStoreConfig.StorageAccount)
+		logger.Log.Infof("  ContainerName  : %s", ccacheConfiguration.RemoteStoreConfig.ContainerName)
+		logger.Log.Infof("  Versionsfolder : %s", ccacheConfiguration.RemoteStoreConfig.VersionsFolder)
+		logger.Log.Infof("  DownloadEnabled: %v", ccacheConfiguration.RemoteStoreConfig.DownloadEnabled)
+		logger.Log.Infof("  DownloadFolder : %s", ccacheConfiguration.RemoteStoreConfig.DownloadFolder)
+		logger.Log.Infof("  UploadEnabled  : %v", ccacheConfiguration.RemoteStoreConfig.UploadEnabled)
+		logger.Log.Infof("  UploadFolder   : %s", ccacheConfiguration.RemoteStoreConfig.UploadFolder)
 	}
 
-	return ccacheConfiguration.RemoteStore, err	
+	return ccacheConfiguration.RemoteStoreConfig, err	
 }
 
 const (
@@ -238,9 +242,9 @@ const (
 	AuthenticatedAccess = 1
 )
 
-func createContainerClient(remoteStore RemoteStore, authenticationType int) (client *azblob.Client, err error ) {
+func createContainerClient(remoteStoreConfig RemoteStoreConfig, authenticationType int) (client *azblob.Client, err error ) {
 
-	url := "https://" + remoteStore.StorageAccount + ".blob.core.windows.net/"
+	url := "https://" + remoteStoreConfig.StorageAccount + ".blob.core.windows.net/"
 
 	if authenticationType == AnonymousAccess {
 
@@ -254,7 +258,7 @@ func createContainerClient(remoteStore RemoteStore, authenticationType int) (cli
 
 	} else if authenticationType == AuthenticatedAccess {
 
-		credential, err := azidentity.NewClientSecretCredential(remoteStore.TenantId, remoteStore.UserName, remoteStore.Password, nil)
+		credential, err := azidentity.NewClientSecretCredential(remoteStoreConfig.TenantId, remoteStoreConfig.UserName, remoteStoreConfig.Password, nil)
 		if err != nil {
 			logger.Log.Warnf("Unable to init azure identity. Error: %v", err)
 			return nil, err
@@ -274,11 +278,6 @@ func createContainerClient(remoteStore RemoteStore, authenticationType int) (cli
 	}
 }
 
-
-// ensure the following are set:
-// - ccacheDirTarsIn
-// - ccacheDirTarsOut
-// - ccacheDir
 func installCCache(ccacheDirTarsIn string, ccacheGroupName string) (err error) {
 
 	logger.Log.Infof("ccache is enabled - Installing --------------------")
@@ -286,7 +285,7 @@ func installCCache(ccacheDirTarsIn string, ccacheGroupName string) (err error) {
 	logger.Log.Infof("  checking if ccache working folder (%s) exists.", *ccacheDir)
 	_, err = os.Stat(*ccacheDir)
 	if err == nil {
-		logger.Log.Infof("  CCache working folder does exists. Re-using...")
+		logger.Log.Infof("  ccache working folder does exists. Re-using...")
 		return nil
 	}
 
@@ -297,43 +296,48 @@ func installCCache(ccacheDirTarsIn string, ccacheGroupName string) (err error) {
 		return err
 	}
 
-	logger.Log.Infof("  checking if ccache tars input folder (%s) exists.", ccacheDirTarsIn)
-	_, err = os.Stat(ccacheDirTarsIn)
-	if err != nil {
-		logger.Log.Infof("  creating ccache tars input folder...")
-		err = os.Mkdir(ccacheDirTarsIn, 0755)
-		if err != nil {
-			logger.Log.Warnf("Unable to create ccache working folder. Error: %v", err)
-			return err
-		}			
-	}
-
 	logger.Log.Infof("  retrieving remote store information...")
-	remoteStore, err := GetCCacheRemoteStore()
+	remoteStoreConfig, err := GetCCacheRemoteStoreConfig()
 	if err != nil {
 		logger.Log.Warnf("Unable to get ccache remote store configuration. Error: %v", err)
 		return err
 	}
 
+	if remoteStoreConfig.DownloadEnabled {
+		logger.Log.Infof("  Downloading archived ccache artifacts is disabled. Skipping download...")
+		return nil
+	}
+
+	logger.Log.Infof("  checking if ccache archive download folder (%s) exists.", ccacheDirTarsIn)
+	_, err = os.Stat(ccacheDirTarsIn)
+	if err != nil {
+		logger.Log.Infof("  creating ccache archive download folder...")
+		err = os.Mkdir(ccacheDirTarsIn, 0755)
+		if err != nil {
+			logger.Log.Warnf("Unable to create ccache archive download folder. Error: %v", err)
+			return err
+		}			
+	}
+
 	// Connect to blob storage...
 	logger.Log.Infof("  creating container client...")
-	theClient, err := createContainerClient(remoteStore, AnonymousAccess)
+	theClient, err := createContainerClient(remoteStoreConfig, AnonymousAccess)
 	if err != nil {
 		logger.Log.Warnf("Unable to init azure blob storage client. Error: %v", err)
 		return err
 	}
 
-	if remoteStore.InputFolder == "latest" {
+	if remoteStoreConfig.DownloadFolder == "latest" {
 
 		logger.Log.Infof("  ccache is configured to use the latest...")
 
 		// Download the versions file...
-		var ccacheVersionFullBlobName = remoteStore.VersionsFolder + "/" + ccacheGroupName + CCacheVersionSuffix
+		var ccacheVersionFullBlobName = remoteStoreConfig.VersionsFolder + "/" + ccacheGroupName + CCacheVersionSuffix
 		var ccacheInputVersionFullPath = ccacheDirTarsIn + "/" + ccacheGroupName + CCacheVersionSuffix
 
 		logger.Log.Infof("  downloading  (%s) to (%s)...", ccacheVersionFullBlobName, ccacheInputVersionFullPath)
 		downloadStartTime := time.Now()
-		err = download(theClient, context.Background(), remoteStore.ContainerName, ccacheVersionFullBlobName, ccacheInputVersionFullPath)
+		err = download(theClient, context.Background(), remoteStoreConfig.ContainerName, ccacheVersionFullBlobName, ccacheInputVersionFullPath)
 		if err != nil {
 			logger.Log.Warnf("Unable to download ccache archive. Error: %v", err)
 			return err
@@ -348,18 +352,18 @@ func installCCache(ccacheDirTarsIn string, ccacheGroupName string) (err error) {
 			return err
 		}
 
-		remoteStore.InputFolder = string(ccacheInputVersionBuffer) 
-
-		logger.Log.Infof("  ccache latest build is (%s)...", remoteStore.InputFolder)
+		// Adjust the download folder to the newly found value...
+		remoteStoreConfig.DownloadFolder = string(ccacheInputVersionBuffer) 
+		logger.Log.Infof("  ccache latest archive folder is (%s)...", remoteStoreConfig.DownloadFolder)
 	}
 
 	// Download the actual cache...
-	var ccacheFullBlobName = remoteStore.InputFolder + "/" + ccacheGroupName + CCacheTarSuffix
+	var ccacheFullBlobName = remoteStoreConfig.DownloadFolder + "/" + ccacheGroupName + CCacheTarSuffix
 	var ccacheInputTarFullPath = ccacheDirTarsIn + "/" + ccacheGroupName + CCacheTarSuffix
 
 	logger.Log.Infof("  downloading (%s) to (%s)...", ccacheFullBlobName, ccacheInputTarFullPath)
 	downloadStartTime := time.Now()
-	err = download(theClient, context.Background(), remoteStore.ContainerName, ccacheFullBlobName, ccacheInputTarFullPath)
+	err = download(theClient, context.Background(), remoteStoreConfig.ContainerName, ccacheFullBlobName, ccacheInputTarFullPath)
 	if err != nil {
 		logger.Log.Warnf("Unable to download ccache archive. Error: %v", err)
 		return err
@@ -387,21 +391,17 @@ func installCCache(ccacheDirTarsIn string, ccacheGroupName string) (err error) {
 	return nil
 }
 
-// ensure the following are set:
-// - ccacheDirTarsIn
-// - ccacheDirTarsOut
-// - ccacheDir
 func archiveCCache(ccacheDirTarsOut string, ccacheGroupName string) (err error) {
 
 	logger.Log.Infof("ccache is enabled - Capturing --------------------")
-    remoteStore, err := GetCCacheRemoteStore()
+    remoteStoreConfig, err := GetCCacheRemoteStoreConfig()
 	if err != nil {
 		logger.Log.Warnf("Unable to get ccache remote store configuration. Error: %v", err)
 		return err
 	}
 
-	if !remoteStore.UpdateEnabled {
-		logger.Log.Infof("CCache update is disabled for this build.")
+	if !remoteStoreConfig.UploadEnabled {
+		logger.Log.Infof("ccache update is disabled for this build.")
 		return
 	}
 
@@ -460,29 +460,28 @@ func archiveCCache(ccacheDirTarsOut string, ccacheGroupName string) (err error) 
 
 	// Test uploading
 	logger.Log.Infof("  connecting to azure storage blob...")
-	theClient, err := createContainerClient(remoteStore, AuthenticatedAccess)
+	theClient, err := createContainerClient(remoteStoreConfig, AuthenticatedAccess)
 	if err != nil {
 		logger.Log.Warnf("Unable create azure blob storage client. Error: %v", stderr)
 		return err
 	}
 
 	// Upload the ccache archive
-	var outputBlobName = remoteStore.UpdateFolder + "/" + ccacheGroupName + CCacheTarSuffix
+	var outputBlobName = remoteStoreConfig.UploadFolder + "/" + ccacheGroupName + CCacheTarSuffix
 
 	logger.Log.Infof("  uploading ccache archive (%s) to (%s)...", ccacheOutputTarFullPath, outputBlobName)
 
 	uploadStartTime := time.Now()
-	err = upload(theClient, context.Background(), ccacheOutputTarFullPath, remoteStore.ContainerName, outputBlobName)
+	err = upload(theClient, context.Background(), ccacheOutputTarFullPath, remoteStoreConfig.ContainerName, outputBlobName)
 	if err != nil {
 		logger.Log.Warnf("Unable to upload ccache archive. Error: %v", err)
 		return err
 	}
 	uploadEndTime := time.Now()
-	logger.Log.Infof("  upload Time: %s", uploadEndTime.Sub(uploadStartTime))
+	logger.Log.Infof("  upload time: %s", uploadEndTime.Sub(uploadStartTime))
 
 	// Create the latest version file...
-
-	logger.Log.Infof("  creating a temporary version file with content: (%s)...", remoteStore.UpdateFolder)
+	logger.Log.Infof("  creating a temporary version file with content: (%s)...", remoteStoreConfig.UploadFolder)
 
 	tempFile, err := ioutil.TempFile("", ccacheGroupName + CCacheVersionSuffix + "-")
 	if err != nil {
@@ -491,25 +490,25 @@ func archiveCCache(ccacheDirTarsOut string, ccacheGroupName string) (err error) 
 	}
 	defer tempFile.Close()
 
-	_, err = tempFile.WriteString(remoteStore.UpdateFolder)
+	_, err = tempFile.WriteString(remoteStoreConfig.UploadFolder)
 	if err != nil {
 		logger.Log.Warnf("Unable to write version information to temporary file. Error: %v", err)
 		return err
 	}	
 
     // Upload the latest version file...
-	var ccacheVersionFullBlobName = remoteStore.VersionsFolder + "/" + ccacheGroupName + CCacheVersionSuffix
+	var ccacheVersionFullBlobName = remoteStoreConfig.VersionsFolder + "/" + ccacheGroupName + CCacheVersionSuffix
 
 	logger.Log.Infof("  uploading latest version (%s) to (%s)...", tempFile.Name(), ccacheVersionFullBlobName)
 
 	uploadStartTime = time.Now()
-	err = upload(theClient, context.Background(), tempFile.Name(), remoteStore.ContainerName, ccacheVersionFullBlobName)
+	err = upload(theClient, context.Background(), tempFile.Name(), remoteStoreConfig.ContainerName, ccacheVersionFullBlobName)
 	if err != nil {
 		logger.Log.Warnf("Unable to upload ccache archive. Error: %v", err)
 		return err
 	}
 	uploadEndTime = time.Now()
-	logger.Log.Infof("  upload Time: %s", uploadEndTime.Sub(uploadStartTime))
+	logger.Log.Infof("  upload time: %s", uploadEndTime.Sub(uploadStartTime))
 
 	// Do no clean it because it might be used by other packages in the same
 	// ccache group...
@@ -561,7 +560,7 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 	if useCcache {
 		err = installCCache(*ccacheDirTarsIn, *ccacheGroupName)
 		if err != nil {
-			logger.Log.Warnf("CCache will be disabled.")
+			logger.Log.Warnf("ccache will be disabled.")
 		}
 	}
 	
@@ -602,7 +601,7 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 	if useCcache {
 		err = archiveCCache(*ccacheDirTarsOut, *ccacheGroupName)
 		if err != nil {
-			logger.Log.Warnf("CCache will not be archived.")
+			logger.Log.Warnf("ccache will not be archived.")
 		}
 	}
 	return

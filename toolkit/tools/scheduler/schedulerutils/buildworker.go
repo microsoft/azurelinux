@@ -32,16 +32,17 @@ type CCacheGroup struct {
 }
 
 type RemoteStore struct {
-	Type           string `json:"type"`
-	TenantId       string `json:"tenantId"`
-	UserName       string `json:"userName"`
-	Password       string `json:"password"`
-	StorageAccount string `json:"storageAccount"`
-	ContainerName  string `json:"containerName"`
-	VersionsFolder string `json:"versionsFolder"`
-	InputFolder    string `json:"inputFolder"`
-	UpdateEnabled  bool   `json:"updateEnabled"`
-	UpdateFolder   string `json:"updateFolder"`
+	Type            string `json:"type"`
+	TenantId        string `json:"tenantId"`
+	UserName        string `json:"userName"`
+	Password        string `json:"password"`
+	StorageAccount  string `json:"storageAccount"`
+	ContainerName   string `json:"containerName"`
+	VersionsFolder  string `json:"versionsFolder"`
+	DownloadEnabled bool   `json:"downloadEnabled"`
+	DownloadFolder  string `json:"downloadFolder"`
+	UploadEnabled   bool   `json:"uploadEnabled"`
+	UploadFolder    string `json:"uploadFolder"`
 }
 
 type CCacheConfiguration struct {
