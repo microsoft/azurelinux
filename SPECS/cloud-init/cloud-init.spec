@@ -1,7 +1,7 @@
 Summary:        Cloud instance init scripts
 Name:           cloud-init
 Version:        23.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,7 @@ URL:            https://launchpad.net/cloud-init
 Source0:        https://launchpad.net/cloud-init/trunk/%{version}/+download/%{name}-%{version}.tar.gz
 Source1:        10-azure-kvp.cfg
 Patch0:         testGetInterfacesUnitTest.patch
+Patch1:         overrideDatasourceDetection.patch
 %define cl_services cloud-config.service cloud-config.target cloud-final.service cloud-init.service cloud-init.target cloud-init-local.service
 BuildRequires:  automake
 BuildRequires:  dbus
@@ -145,6 +146,9 @@ make check %{?_smp_mflags}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
+* Wed Sep 13 2023 Minghe Ren <mingheren@microsoft.com> - 23.2-3
+- Add patch overrideDatasourceDetection bug from upstream
+
 * Fri Aug 11 2023 Minghe Ren <mingheren@microsoft.com> - 23.2-2
 - Add patch for unit test failure
 

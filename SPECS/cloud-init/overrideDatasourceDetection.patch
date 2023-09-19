@@ -1,0 +1,15 @@
+diff -ruN a/cloudinit/sources/__init__.py b/cloudinit/sources/__init__.py
+--- a/cloudinit/sources/__init__.py	2023-08-28 09:20:24.000000000 -0700
++++ b/cloudinit/sources/__init__.py	2023-09-13 15:00:23.287549869 -0700
+@@ -352,10 +352,7 @@
+                 self,
+             )
+             return True
+-        elif self.sys_cfg.get("datasource_list", []) in (
+-            [self.dsname],
+-            [self.dsname, "None"],
+-        ):
++        elif self.sys_cfg.get("datasource_list", []) == [self.dsname]:
+             LOG.debug(
+                 "Machine is configured to run on single datasource %s.", self
+             )
