@@ -82,6 +82,11 @@ var defaultChrootEnv = []string{
 	"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
 }
 
+const (
+	doLazyUnmount   = true
+	doNormalUnmount = !doLazyUnmount
+)
+
 // init will always be called if this package is loaded
 func init() {
 	registerSIGTERMCleanup()
@@ -196,7 +201,7 @@ func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMoun
 			if buildpipeline.IsRegularBuild() {
 				// mount/unmount is only supported in regular pipeline
 				// Best effort cleanup in case mountpoint creation failed mid-way through. We will not try again so treat as final attempt.
-				cleanupErr := c.unmountAndRemove(leaveChrootOnDisk, true)
+				cleanupErr := c.unmountAndRemove(leaveChrootOnDisk, doLazyUnmount)
 				if cleanupErr != nil {
 					logger.Log.Warnf("Failed to cleanup chroot (%s) during failed initialization. Error: %s", c.rootDir, cleanupErr)
 				}
@@ -371,10 +376,10 @@ func (c *Chroot) Close(leaveOnDisk bool) (err error) {
 
 	if buildpipeline.IsRegularBuild() {
 		// mount is only supported in regular pipeline
-		err = c.unmountAndRemove(leaveOnDisk, false)
+		err = c.unmountAndRemove(leaveOnDisk, doNormalUnmount)
 		if err != nil {
 			logger.Log.Warnf("Chroot cleanup failed, will retry with lazy unmount. Error: %s", err)
-			err = c.unmountAndRemove(leaveOnDisk, true)
+			err = c.unmountAndRemove(leaveOnDisk, doLazyUnmount)
 		}
 		if err == nil {
 			const emptyLen = 0
@@ -452,7 +457,7 @@ func cleanupAllChroots() {
 		logger.Log.Info("Cleaning up all active chroots")
 		for i := len(activeChroots) - 1; i >= 0; i-- {
 			logger.Log.Infof("Cleaning up chroot (%s)", activeChroots[i].rootDir)
-			err := activeChroots[i].unmountAndRemove(leaveChrootOnDisk, true)
+			err := activeChroots[i].unmountAndRemove(leaveChrootOnDisk, doLazyUnmount)
 			// Perform best effort cleanup: unmount as many chroots as possible,
 			// even if one fails.
 			if err != nil {
@@ -473,21 +478,22 @@ func cleanupAllChroots() {
 // the chroot until the unmounts succeed or too many failed attempts.
 // This is to avoid leaving folders like /dev mounted when the chroot folder is forcefully deleted in cleanup.
 // Iff all mounts were successfully unmounted, the chroot's root directory will be removed if requested.
-func (c *Chroot) unmountAndRemove(leaveOnDisk, isFinalAttempt bool) (err error) {
+// If doLazyUnmount is true, use the lazy unmount flag which will allow the unmount to succeed even if the mount point is busy.
+func (c *Chroot) unmountAndRemove(leaveOnDisk, doLazyUnmount bool) (err error) {
 	const (
 		retryDuration      = time.Second
 		totalAttempts      = 3
 		unmountFlagsNormal = 0
-		// Do a lazy unmount on the final attempt. This will allow the unmount to succeed even if the mount point is busy.
+		// Do a lazy unmount as a fallback. This will allow the unmount to succeed even if the mount point is busy.
 		// This is to avoid leaving folders like /dev mounted if the chroot folder is forcefully deleted by the user. Even
 		// if the mount is busy at least it will be detached from the filesystem and will not damage the host.
-		unmountFlagsFinal = unix.MNT_DETACH
-		errMsg            = "Failed to unmount (%s). Error: %s"
+		unmountFlagsLazy = unix.MNT_DETACH
+		errMsg           = "Failed to unmount (%s). Error: %s"
 	)
 	unmountFlags := unmountFlagsNormal
-	if isFinalAttempt {
-		logger.Log.Warnf("Final attempt to unmount chroot (%s)", c.rootDir)
-		unmountFlags = unmountFlagsFinal
+	if doLazyUnmount {
+		logger.Log.Warnf("Final attempt to unmount chroot (%s), using a lazy unmount", c.rootDir)
+		unmountFlags = unmountFlagsLazy
 	}
 
 	for _, mountPoint := range c.mountPoints {
