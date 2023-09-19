@@ -18,7 +18,7 @@ Source1:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{n
 Source2:      %{name}-%{version}-cargo.tar.gz
 Source3:      mariner-coco-build-uvm.sh
 Patch0:       0001-tardev-snapshotter-enable-feature-impl_trait_in_asso.patch
-Patch1:       drop-mut-for-variables-tahat-are-not-mutated.patch
+Patch1:       drop-mut-for-variables-that-are-not-mutated.patch
 
 ExclusiveArch: x86_64
 
