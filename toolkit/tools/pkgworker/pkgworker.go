@@ -303,7 +303,7 @@ func installCCache(ccacheDirTarsIn string, ccacheGroupName string) (err error) {
 		return err
 	}
 
-	if remoteStoreConfig.DownloadEnabled {
+	if !remoteStoreConfig.DownloadEnabled {
 		logger.Log.Infof("  Downloading archived ccache artifacts is disabled. Skipping download...")
 		return nil
 	}
