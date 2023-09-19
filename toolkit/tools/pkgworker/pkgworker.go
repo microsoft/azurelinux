@@ -16,7 +16,7 @@ import (
 	"strings"
 	"time"
 
-    // "github.com/microsoft/CBL-Mariner/toolkit/tools/internal/ccache"
+    "github.com/microsoft/CBL-Mariner/toolkit/tools/internal/ccache"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
@@ -30,11 +30,11 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
+	// "github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
-
+/*
 type CCacheGroup struct {
 	Name     string `json:"name"`
     PackageNames []string `json:"packageNames"`
@@ -84,7 +84,7 @@ func GetCCacheRemoteStoreConfig() (remoteStoreConfig RemoteStoreConfig, err erro
 
 	return ccacheConfiguration.RemoteStoreConfig, err	
 }
-
+*/
 const (
 	chrootLocalRpmsDir      = "/localrpms"
 	chrootLocalToolchainDir = "/toolchainrpms"
@@ -242,7 +242,7 @@ const (
 	AuthenticatedAccess = 1
 )
 
-func createContainerClient(remoteStoreConfig RemoteStoreConfig, authenticationType int) (client *azblob.Client, err error ) {
+func createContainerClient(remoteStoreConfig ccache.RemoteStoreConfig, authenticationType int) (client *azblob.Client, err error ) {
 
 	url := "https://" + remoteStoreConfig.StorageAccount + ".blob.core.windows.net/"
 
@@ -297,7 +297,7 @@ func installCCache(ccacheDirTarsIn string, ccacheGroupName string) (err error) {
 	}
 
 	logger.Log.Infof("  retrieving remote store information...")
-	remoteStoreConfig, err := GetCCacheRemoteStoreConfig()
+	remoteStoreConfig, err := ccache.GetCCacheRemoteStoreConfig()
 	if err != nil {
 		logger.Log.Warnf("Unable to get ccache remote store configuration. Error: %v", err)
 		return err
@@ -394,7 +394,7 @@ func installCCache(ccacheDirTarsIn string, ccacheGroupName string) (err error) {
 func archiveCCache(ccacheDirTarsOut string, ccacheGroupName string) (err error) {
 
 	logger.Log.Infof("ccache is enabled - Capturing --------------------")
-    remoteStoreConfig, err := GetCCacheRemoteStoreConfig()
+    remoteStoreConfig, err := ccache.GetCCacheRemoteStoreConfig()
 	if err != nil {
 		logger.Log.Warnf("Unable to get ccache remote store configuration. Error: %v", err)
 		return err

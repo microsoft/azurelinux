@@ -18,7 +18,6 @@ require (
 	golang.org/x/sys v0.11.0
 	gonum.org/v1/gonum v0.11.0
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
-	github.com/microsoft/CBL-Mariner/toolkit/tools/internal/ccache v1.0.0
 )
 
 require (

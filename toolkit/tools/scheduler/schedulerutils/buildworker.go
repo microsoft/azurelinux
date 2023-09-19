@@ -12,7 +12,7 @@ import (
 	"sync"
 	"time"
 
-    // "github.com/microsoft/CBL-Mariner/toolkit/tools/internal/ccache"
+    "github.com/microsoft/CBL-Mariner/toolkit/tools/internal/ccache"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
@@ -23,9 +23,9 @@ import (
 	"gonum.org/v1/gonum/graph"
 	"gonum.org/v1/gonum/graph/traverse"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
+	// "github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
 )
-
+/*
 type CCacheGroup struct {
 	Name     string `json:"name"`
     PackageNames []string `json:"packageNames"`
@@ -84,7 +84,7 @@ func FindCCacheGroup(basePackageName string) (packageCCacheGroupName string) {
 
 	return packageCCacheGroupName
 }
-
+*/
 
 // BuildChannels represents the communicate channels used by a build agent.
 type BuildChannels struct {
@@ -219,7 +219,7 @@ func buildNode(request *BuildRequest, graphMutex *sync.RWMutex, agent buildagent
 	node := request.Node
 	baseSrpmName := node.SRPMFileName()
 	basePackageName := findBasePackageName(node.SpecPath)
-	packageCCacheGroupName := FindCCacheGroup(basePackageName)
+	packageCCacheGroupName := ccache.FindCCacheGroup(basePackageName)
 
 	ignored = sliceutils.Contains(ignoredPackages, node.VersionedPkg, sliceutils.PackageVerMatch)
 
