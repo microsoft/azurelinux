@@ -30,61 +30,9 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 
-	// "github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
-
 	"gopkg.in/alecthomas/kingpin.v2"
 )
-/*
-type CCacheGroup struct {
-	Name     string `json:"name"`
-    PackageNames []string `json:"packageNames"`
-}
 
-type RemoteStoreConfig struct {
-	Type            string `json:"type"`
-	TenantId        string `json:"tenantId"`
-	UserName        string `json:"userName"`
-	Password        string `json:"password"`
-	StorageAccount  string `json:"storageAccount"`
-	ContainerName   string `json:"containerName"`
-	VersionsFolder  string `json:"versionsFolder"`
-	DownloadEnabled bool   `json:"downloadEnabled"`
-	DownloadFolder  string `json:"downloadFolder"`
-	UploadEnabled   bool   `json:"uploadEnabled"`
-	UploadFolder    string `json:"uploadFolder"`
-}
-
-type CCacheConfiguration struct {
-	RemoteStoreConfig RemoteStoreConfig `json:"remoteStore"`
-	Groups            []CCacheGroup     `json:"groups"`
-}
-
-func GetCCacheRemoteStoreConfig() (remoteStoreConfig RemoteStoreConfig, err error) {
-
-	ccacheGroupsFile := "./resources/manifests/package/ccache_configuration.json"
-
-	logger.Log.Infof("  loading ccache configuration file: %s", ccacheGroupsFile)
-	var ccacheConfiguration CCacheConfiguration
-	err = jsonutils.ReadJSONFile(ccacheGroupsFile, &ccacheConfiguration)
-	if err != nil {
-		logger.Log.Infof("Failed to load file. %v", err)
-	} else {
-		logger.Log.Infof("  Type           : %s", ccacheConfiguration.RemoteStoreConfig.Type)
-		logger.Log.Infof("  TenantId       : %s", ccacheConfiguration.RemoteStoreConfig.TenantId)
-		logger.Log.Infof("  UserName       : %s", ccacheConfiguration.RemoteStoreConfig.UserName)
-		// logger.Log.Infof("  Password      : %s", ccacheConfiguration.RemoteStoreConfig.Password)
-		logger.Log.Infof("  StorageAccount : %s", ccacheConfiguration.RemoteStoreConfig.StorageAccount)
-		logger.Log.Infof("  ContainerName  : %s", ccacheConfiguration.RemoteStoreConfig.ContainerName)
-		logger.Log.Infof("  Versionsfolder : %s", ccacheConfiguration.RemoteStoreConfig.VersionsFolder)
-		logger.Log.Infof("  DownloadEnabled: %v", ccacheConfiguration.RemoteStoreConfig.DownloadEnabled)
-		logger.Log.Infof("  DownloadFolder : %s", ccacheConfiguration.RemoteStoreConfig.DownloadFolder)
-		logger.Log.Infof("  UploadEnabled  : %v", ccacheConfiguration.RemoteStoreConfig.UploadEnabled)
-		logger.Log.Infof("  UploadFolder   : %s", ccacheConfiguration.RemoteStoreConfig.UploadFolder)
-	}
-
-	return ccacheConfiguration.RemoteStoreConfig, err	
-}
-*/
 const (
 	chrootLocalRpmsDir      = "/localrpms"
 	chrootLocalToolchainDir = "/toolchainrpms"
