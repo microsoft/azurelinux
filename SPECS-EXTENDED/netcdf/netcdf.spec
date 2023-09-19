@@ -8,16 +8,6 @@
 %global mpi_list %{?mpi_list} openmpi
 %endif
 %global sover 19
-%global _configure ../configure
-%global configure_opts \\\
-           --enable-shared \\\
-           --enable-netcdf-4 \\\
-           --enable-dap \\\
-           --enable-extra-example-tests \\\
-           CPPFLAGS="-I%{_includedir}/hdf -DH5_USE_110_API" \\\
-           LIBS="-ltirpc" \\\
-           --enable-hdf4 \\\
-           --disable-dap-remote-tests \\\
 
 Summary:        Libraries for the Unidata network Common Data Form
 Name:           netcdf
@@ -174,11 +164,19 @@ NetCDF parallel openmpi static libraries
 
 %build
 #Do out of tree builds
-
+%global _configure ../configure
 #Common configure options
 export LDFLAGS="%{__global_ldflags} -L%{_libdir}/hdf"
 export CFLAGS="%{optflags} -fno-strict-aliasing"
-
+%global configure_opts \\\
+           --enable-shared \\\
+           --enable-netcdf-4 \\\
+           --enable-dap \\\
+           --enable-extra-example-tests \\\
+           CPPFLAGS="-I%{_includedir}/hdf -DH5_USE_110_API" \\\
+           LIBS="-ltirpc" \\\
+           --enable-hdf4 \\\
+           --disable-dap-remote-tests \\\
 %{nil}
 
 # Serial build
