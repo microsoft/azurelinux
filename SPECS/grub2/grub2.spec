@@ -6,7 +6,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -224,6 +224,7 @@ cp -a install-for-pc/. %{buildroot}/.
 %endif
 mkdir %{buildroot}%{_sysconfdir}/default
 touch %{buildroot}%{_sysconfdir}/default/grub
+mkdir %{buildroot}%{_sysconfdir}/default/grub.d
 mkdir %{buildroot}%{_sysconfdir}/sysconfig
 ln -sf %{_sysconfdir}/default/grub %{buildroot}%{_sysconfdir}/sysconfig/grub
 install -vdm 700 %{buildroot}/boot/%{name}
@@ -291,7 +292,7 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %{_bindir}/*
 %{_datarootdir}/grub/*
 %{_sysconfdir}/sysconfig/grub
-%{_sysconfdir}/default/grub
+%attr(0644,root,root) %ghost %config(noreplace) %{_sysconfdir}/default/grub
 %ghost %config(noreplace) /boot/%{name}/grub.cfg
 
 %ifarch x86_64
@@ -327,6 +328,13 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %endif
 
 %changelog
+* Fri Aug 11 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.06-11
+- Enable support for grub2-mkconfig grub.cfg generation
+- The Mariner /etc/default/grub now sources files from /etc/default/grub.d
+    before the remainder of grub2-mkconfig runs. This allows RPM to 
+    install package-specific configurations that the users can safely
+    override.
+
 * Thu Jun 08 2023 Daniel McIlvaney <damcilva@microsoft.com> - 2.06-10
 - CVE-2022-3775
 

@@ -966,87 +966,97 @@ func InstallGrubCfg(installRoot, rootDevice, bootUUID, bootPrefix string, encryp
 	const (
 		assetGrubcfgFile = "/installer/grub2/grub.cfg"
 		grubCfgFile      = "boot/grub2/grub.cfg"
+		assetGrubDefFile = "/installer/grub2/grub"
+		grubDefFile      = "etc/default/grub"
 	)
 
 	// Copy the bootloader's grub.cfg and set the file permission
 	installGrubCfgFile := filepath.Join(installRoot, grubCfgFile)
+	installGrubDefFile := filepath.Join(installRoot, grubDefFile)
+
 	err = file.CopyAndChangeMode(assetGrubcfgFile, installGrubCfgFile, bootDirectoryDirMode, bootDirectoryFileMode)
 	if err != nil {
 		return
 	}
-
-	// Add in bootUUID
-	err = setGrubCfgBootUUID(bootUUID, installGrubCfgFile)
+	err = file.CopyAndChangeMode(assetGrubDefFile, installGrubDefFile, bootDirectoryDirMode, bootDirectoryFileMode)
 	if err != nil {
-		logger.Log.Warnf("Failed to set bootUUID in grub.cfg: %v", err)
 		return
 	}
 
-	// Add in bootPrefix
-	err = setGrubCfgBootPrefix(bootPrefix, installGrubCfgFile)
-	if err != nil {
-		logger.Log.Warnf("Failed to set bootPrefix in grub.cfg: %v", err)
-		return
-	}
+	for _, installedFile := range []string{installGrubCfgFile, installGrubDefFile} {
+		// Add in bootUUID
+		err = setGrubCfgBootUUID(bootUUID, installedFile)
+		if err != nil {
+			logger.Log.Warnf("Failed to set bootUUID in grub.cfg: %v", err)
+			return
+		}
 
-	// Add in rootDevice
-	err = setGrubCfgRootDevice(rootDevice, installGrubCfgFile, encryptedRoot.LuksUUID)
-	if err != nil {
-		logger.Log.Warnf("Failed to set rootDevice in grub.cfg: %v", err)
-		return
-	}
+		// Add in bootPrefix
+		err = setGrubCfgBootPrefix(bootPrefix, installedFile)
+		if err != nil {
+			logger.Log.Warnf("Failed to set bootPrefix in grub.cfg: %v", err)
+			return
+		}
 
-	// Add in rootLuksUUID
-	err = setGrubCfgLuksUUID(installGrubCfgFile, encryptedRoot.LuksUUID)
-	if err != nil {
-		logger.Log.Warnf("Failed to set luksUUID in grub.cfg: %v", err)
-		return
-	}
+		// Add in rootDevice
+		err = setGrubCfgRootDevice(rootDevice, installedFile, encryptedRoot.LuksUUID)
+		if err != nil {
+			logger.Log.Warnf("Failed to set rootDevice in grub.cfg: %v", err)
+			return
+		}
 
-	// Add in logical volumes to active
-	err = setGrubCfgLVM(installGrubCfgFile, encryptedRoot.LuksUUID)
-	if err != nil {
-		logger.Log.Warnf("Failed to set lvm.lv in grub.cfg: %v", err)
-		return
-	}
+		// Add in rootLuksUUID
+		err = setGrubCfgLuksUUID(installedFile, encryptedRoot.LuksUUID)
+		if err != nil {
+			logger.Log.Warnf("Failed to set luksUUID in grub.cfg: %v", err)
+			return
+		}
 
-	// Configure IMA policy
-	err = setGrubCfgIMA(installGrubCfgFile, kernelCommandLine)
-	if err != nil {
-		logger.Log.Warnf("Failed to set ima_policy in grub.cfg: %v", err)
-		return
-	}
+		// Add in logical volumes to active
+		err = setGrubCfgLVM(installedFile, encryptedRoot.LuksUUID)
+		if err != nil {
+			logger.Log.Warnf("Failed to set lvm.lv in grub.cfg: %v", err)
+			return
+		}
 
-	err = setGrubCfgReadOnlyVerityRoot(installGrubCfgFile, readOnlyRoot)
-	if err != nil {
-		logger.Log.Warnf("Failed to set verity root in grub.cfg: %v", err)
-		return
-	}
+		// Configure IMA policy
+		err = setGrubCfgIMA(installedFile, kernelCommandLine)
+		if err != nil {
+			logger.Log.Warnf("Failed to set ima_policy in grub.cfg: %v", err)
+			return
+		}
 
-	err = setGrubCfgSELinux(installGrubCfgFile, kernelCommandLine)
-	if err != nil {
-		logger.Log.Warnf("Failed to set SELinux in grub.cfg: %v", err)
-		return
-	}
+		err = setGrubCfgReadOnlyVerityRoot(installedFile, readOnlyRoot)
+		if err != nil {
+			logger.Log.Warnf("Failed to set verity root in grub.cfg: %v", err)
+			return
+		}
 
-	// Configure FIPS
-	err = setGrubCfgFIPS(isBootPartitionSeparate, bootUUID, installGrubCfgFile, kernelCommandLine)
-	if err != nil {
-		logger.Log.Warnf("Failed to set FIPS in grub.cfg: %v", err)
-		return
-	}
+		err = setGrubCfgSELinux(installedFile, kernelCommandLine)
+		if err != nil {
+			logger.Log.Warnf("Failed to set SELinux in grub.cfg: %v", err)
+			return
+		}
 
-	err = setGrubCfgCGroup(installGrubCfgFile, kernelCommandLine)
-	if err != nil {
-		logger.Log.Warnf("Failed to set CGroup configuration in grub.cfg: %v", err)
-		return
-	}
+		// Configure FIPS
+		err = setGrubCfgFIPS(isBootPartitionSeparate, bootUUID, installedFile, kernelCommandLine)
+		if err != nil {
+			logger.Log.Warnf("Failed to set FIPS in grub.cfg: %v", err)
+			return
+		}
 
-	// Append any additional command line parameters
-	err = setGrubCfgAdditionalCmdLine(installGrubCfgFile, kernelCommandLine)
-	if err != nil {
-		logger.Log.Warnf("Failed to append extra command line parameterse in grub.cfg: %v", err)
-		return
+		err = setGrubCfgCGroup(installedFile, kernelCommandLine)
+		if err != nil {
+			logger.Log.Warnf("Failed to set CGroup configuration in grub.cfg: %v", err)
+			return
+		}
+
+		// Append any additional command line parameters
+		err = setGrubCfgAdditionalCmdLine(installedFile, kernelCommandLine)
+		if err != nil {
+			logger.Log.Warnf("Failed to append extra command line parameters in grub.cfg: %v", err)
+			return
+		}
 	}
 
 	return

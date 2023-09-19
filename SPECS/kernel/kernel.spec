@@ -50,6 +50,7 @@ BuildRequires:  elfutils-libelf-devel
 BuildRequires:  flex
 BuildRequires:  gettext
 BuildRequires:  glib-devel
+BuildRequires:  grub2-rpm-macros
 BuildRequires:  kbd
 BuildRequires:  kmod-devel
 BuildRequires:  libcap-devel
@@ -326,10 +327,12 @@ then
           test -n "$list" && ln -sf "$list" /boot/mariner.cfg
      fi
 fi
+%grub2_postun
 
 %post
 /sbin/depmod -a %{uname_r}
 ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
+%grub2_post
 
 %post drivers-accessibility
 /sbin/depmod -a %{uname_r}

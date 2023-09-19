@@ -1,7 +1,7 @@
 Summary:        Systemd-250
 Name:           systemd
 Version:        250.3
-Release:        17%{?dist}
+Release:        18%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,6 +12,7 @@ Source1:        50-security-hardening.conf
 Source2:        systemd.cfg
 Source3:        99-dhcp-en.network
 Source4:        99-mariner.preset
+Source5:        20_systemd.cfg
 Patch0:         fix-journald-audit-logging.patch
 # Patch1 can be removed once we update systemd to a version containing the following commit:
 # https://github.com/systemd/systemd/commit/19193b489841a7bcccda7122ac0849cf6efe59fd
@@ -33,6 +34,7 @@ BuildRequires:  docbook-dtd-xml
 BuildRequires:  docbook-style-xsl
 BuildRequires:  gettext
 BuildRequires:  glib-devel
+BuildRequires:  grub2-rpm-macros
 BuildRequires:  gperf
 BuildRequires:  intltool
 BuildRequires:  kbd
@@ -175,6 +177,9 @@ install -dm 0755 %{buildroot}/%{_sysconfdir}/systemd/network
 install -m 0644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/systemd/network
 install -D -m 0644 %{SOURCE4} %{buildroot}%{_libdir}/systemd/system-preset/99-mariner.preset
 
+mkdir -p %{buildroot}%{_sysconfdir}/default/grub.d
+install -m 750 %{SOURCE5} %{buildroot}%{_sysconfdir}/default/grub.d/20_systemd.cfg
+
 %find_lang %{name} ../%{name}.lang
 
 %check
@@ -190,8 +195,11 @@ meson test -C build
 if [ $1 -eq 1 ]; then
      systemctl preset-all
 fi
+%grub2_post
 
-%postun -p /sbin/ldconfig
+%postun
+/sbin/ldconfig
+%grub2_postun
 
 %files
 %defattr(-,root,root)
@@ -208,6 +216,7 @@ fi
 %{_sysconfdir}/sysctl.d/50-security-hardening.conf
 %{_sysconfdir}/xdg/systemd
 %{_sysconfdir}/rc.d/init.d/README
+%config(noreplace) %{_sysconfdir}/default/grub.d/20_systemd.cfg
 %config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.systemd1.conf
 %config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.hostname1.conf
 %config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.login1.conf
@@ -283,6 +292,9 @@ fi
 %files lang -f %{name}.lang
 
 %changelog
+* Wed Aug 23 2023 Cameron Baird <cameronbaird@microsoft.com> - 250.3-18
+- Enable grub2-mkconfig-based boot path
+
 * Fri Jul 07 2023 Dan Streetman <ddstreet@ieee.org> - 250.3-17
 - Add support to systemd-resolved to serve stale dns data
 
