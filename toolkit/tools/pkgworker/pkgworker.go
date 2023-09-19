@@ -519,7 +519,7 @@ func archiveCCache(ccacheDirTarsOut string, ccacheGroupName string) (err error) 
 	// 	logger.Log.Warnf("Unable rermove ccache working directory. Error: %v", err)
 	// }
 
-	return
+	return nil
 }
 
 func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmFile, repoFile, rpmmacrosFile, outArch string, defines map[string]string, noCleanup, runCheck bool, packagesToInstall []string, useCcache bool) (builtRPMs []string, err error) {
