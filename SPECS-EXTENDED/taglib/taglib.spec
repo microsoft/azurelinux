@@ -123,7 +123,8 @@ make check -C %{_target_platform}
 
 %changelog
 * Mon Sep 18 2023 Archana Choudhary <archana1@microsoft.com> - 1.13.1-1
-- Auto-upgrade to 1.13.1 - CVE-2018-11439 CVE-2017-12678
+- Upgrade to 1.13.1 - CVE-2018-11439, CVE-2017-12678
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.11.1-13
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
