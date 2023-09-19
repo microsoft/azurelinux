@@ -3458,8 +3458,8 @@
         "type": "other",
         "other": {
           "name": "exiv2",
-          "version": "0.27.5",
-          "downloadUrl": "https://github.com/Exiv2/exiv2/archive/refs/tags/v0.27.5.tar.gz"
+          "version": "0.28.0",
+          "downloadUrl": "https://github.com/Exiv2/exiv2/archive/refs/tags/v0.28.0.tar.gz"
         }
       }
     },
@@ -9461,8 +9461,8 @@
         "type": "other",
         "other": {
           "name": "libgexiv2",
-          "version": "0.12.1",
-          "downloadUrl": "https://download.gnome.org/sources/gexiv2/0.12/gexiv2-0.12.1.tar.xz"
+          "version": "0.14.2",
+          "downloadUrl": "https://download.gnome.org/sources/gexiv2/0.14/gexiv2-0.14.2.tar.xz"
         }
       }
     },
