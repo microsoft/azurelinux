@@ -23,7 +23,7 @@ Source0:    http://taglib.github.io/releases/taglib-%{version}%{?beta}.tar.gz
 Source1:    taglib-snapshot.sh
 
 # http://bugzilla.redhat.com/343241
-Patch102:   taglib-1.5rc1-multilib.patch
+Patch102:   taglib-1.12-multilib.patch
 
 ## upstream patches
 # sbooth fork/pull-request
