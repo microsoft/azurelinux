@@ -34,9 +34,6 @@ ifeq ($(ENABLE_REPO),y)
 containerized_build_args += -r
 endif
 
-# SPECS_DIR is always set
-containerized_build_args += -s ${SPECS_DIR}
-
 containerized-rpmbuild: no_repo_acl
 	$(SCRIPTS_DIR)/containerized-build/create_container_build.sh $(containerized_build_args)
 
