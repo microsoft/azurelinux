@@ -479,7 +479,7 @@ func cleanupAllChroots() {
 // This is to avoid leaving folders like /dev mounted when the chroot folder is forcefully deleted in cleanup.
 // Iff all mounts were successfully unmounted, the chroot's root directory will be removed if requested.
 // If doLazyUnmount is true, use the lazy unmount flag which will allow the unmount to succeed even if the mount point is busy.
-func (c *Chroot) unmountAndRemove(leaveOnDisk, doLazyUnmount bool) (err error) {
+func (c *Chroot) unmountAndRemove(leaveOnDisk, lazyUnmount bool) (err error) {
 	const (
 		retryDuration      = time.Second
 		totalAttempts      = 3
@@ -491,7 +491,7 @@ func (c *Chroot) unmountAndRemove(leaveOnDisk, doLazyUnmount bool) (err error) {
 		errMsg           = "Failed to unmount (%s). Error: %s"
 	)
 	unmountFlags := unmountFlagsNormal
-	if doLazyUnmount {
+	if lazyUnmount {
 		logger.Log.Warnf("Final attempt to unmount chroot (%s), using a lazy unmount", c.rootDir)
 		unmountFlags = unmountFlagsLazy
 	}
