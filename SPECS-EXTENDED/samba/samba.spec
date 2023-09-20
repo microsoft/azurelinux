@@ -85,7 +85,7 @@
 
 Name:           samba
 Version:        4.12.5
-Release:        4%{?dist}
+Release:        5%{?dist}
 
 
 %define samba_depver %{version}-%{release}
@@ -193,7 +193,7 @@ BuildRequires: xfsprogs-devel
 BuildRequires: xz
 BuildRequires: zlib-devel >= 1.2.3
 
-BuildRequires: pkgconfig(libsystemd)
+BuildRequires: systemd-devel
 
 %if %{with_vfs_glusterfs}
 BuildRequires: glusterfs-api-devel >= 3.4.0.16
@@ -3436,6 +3436,9 @@ fi
 %endif
 
 %changelog
+* Tue Sep 19 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.12.5-5
+- Fix build issue for systemd/systemd-bootstrap confusion
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 4.12.5-4
 - Remove epoch
 
