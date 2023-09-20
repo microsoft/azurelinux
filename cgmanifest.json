@@ -23125,7 +23125,7 @@
         "other": {
           "name": "python-ldap",
           "version": "3.4.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/41/e2/6b12190c171b78d1cd8c9d0d3380d18b85959aecb2b1267f7bdd5b66cd8f/python-ldap-3.4.0.tar.gz"
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/python-ldap/python-ldap-3.4.0.tar.gz"
         }
       }
     },
