@@ -10,7 +10,8 @@
     "downloadEnabled": <downloadEnabled>,
     "downloadFolder": "<downloadFolder>",
     "uploadEnabled": <uploadEnabled>,
-    "uploadFolder": "<uploadFolder>"
+    "uploadFolder": "<uploadFolder>",
+    "updateLatest": <updateLatest>
   },
   "groups": [
     {

@@ -187,9 +187,9 @@ func testNode(request *BuildRequest, graphMutex *sync.RWMutex, agent buildagents
 	baseName := filepath.Base(node.SpecPath)
 	fileExtension := filepath.Ext(baseName)
 	fileNameWithoutExtension := baseName[:len(baseName)-len(fileExtension)]
-	fmt.Println("Full Path:", node.SpecPath)
-	fmt.Println("File Name without Extension:", fileNameWithoutExtension)
 	basePackageName := fileNameWithoutExtension
+	logger.Log.Infof("Full Path: %s", node.SpecPath)
+	logger.Log.Infof("File Name without Extension: %s", fileNameWithoutExtension)
 
 	ignored = sliceutils.Contains(ignoredTests, node.VersionedPkg, sliceutils.PackageVerMatch)
 
