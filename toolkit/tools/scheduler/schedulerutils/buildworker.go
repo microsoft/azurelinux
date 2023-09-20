@@ -12,7 +12,7 @@ import (
 	"sync"
 	"time"
 
-    "github.com/microsoft/CBL-Mariner/toolkit/tools/internal/ccache"
+    "github.com/microsoft/CBL-Mariner/toolkit/tools/internal/ccachemanager"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
@@ -157,7 +157,7 @@ func buildNode(request *BuildRequest, graphMutex *sync.RWMutex, agent buildagent
 	node := request.Node
 	baseSrpmName := node.SRPMFileName()
 	basePackageName := findBasePackageName(node.SpecPath)
-	packageCCacheGroupName := ccache.FindCCacheGroup(basePackageName)
+	packageCCacheGroupName := ccachemanager.FindCCacheGroup(basePackageName)
 
 	ignored = sliceutils.Contains(ignoredPackages, node.VersionedPkg, sliceutils.PackageVerMatch)
 

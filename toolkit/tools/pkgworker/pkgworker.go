@@ -16,7 +16,7 @@ import (
 	"strings"
 	"time"
 
-    "github.com/microsoft/CBL-Mariner/toolkit/tools/internal/ccache"
+    "github.com/microsoft/CBL-Mariner/toolkit/tools/internal/ccachemanager"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
@@ -190,7 +190,7 @@ const (
 	AuthenticatedAccess = 1
 )
 
-func createContainerClient(remoteStoreConfig ccache.RemoteStoreConfig, authenticationType int) (client *azblob.Client, err error ) {
+func createContainerClient(remoteStoreConfig ccachemanager.RemoteStoreConfig, authenticationType int) (client *azblob.Client, err error ) {
 
 	url := "https://" + remoteStoreConfig.StorageAccount + ".blob.core.windows.net/"
 
@@ -245,7 +245,7 @@ func installCCache(ccacheDirTarsIn string, ccacheGroupName string, architecture 
 	}
 
 	logger.Log.Infof("  retrieving remote store information...")
-	remoteStoreConfig, err := ccache.GetCCacheRemoteStoreConfig()
+	remoteStoreConfig, err := ccachemanager.GetCCacheRemoteStoreConfig()
 	if err != nil {
 		logger.Log.Warnf("Unable to get ccache remote store configuration. Error: %v", err)
 		return err
@@ -342,7 +342,7 @@ func installCCache(ccacheDirTarsIn string, ccacheGroupName string, architecture 
 func archiveCCache(ccacheDirTarsOut string, ccacheGroupName string, architecture string) (err error) {
 
 	logger.Log.Infof("ccache is enabled - Capturing --------------------")
-    remoteStoreConfig, err := ccache.GetCCacheRemoteStoreConfig()
+    remoteStoreConfig, err := ccachemanager.GetCCacheRemoteStoreConfig()
 	if err != nil {
 		logger.Log.Warnf("Unable to get ccache remote store configuration. Error: %v", err)
 		return err
