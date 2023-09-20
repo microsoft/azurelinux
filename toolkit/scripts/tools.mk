@@ -215,9 +215,3 @@ $(macro_rpmrc): $(toolchain_rpms)
 clean: clean-macro-tools
 clean-macro-tools:
 	rm -rf $(MACRO_DIR)
-
-######## HOST TOOLING ########
-# This section contains a check for the host tooling required by the toolkit.
-$(foreach exec,awk curl docker git go setfacl tar wget, \
-	$(if $(call shell_real_build_only,command -v $(exec)),,$(error "Tool '$(exec)' missing! Please install it before using the toolkit.")) \
-)
