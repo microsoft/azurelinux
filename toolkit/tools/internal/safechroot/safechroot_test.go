@@ -42,7 +42,13 @@ func TestMain(m *testing.M) {
 	testDir = filepath.Join(workingDir, "testdata")
 	tmpDir = filepath.Join(workingDir, "_tmp")
 
-	retVal := m.Run()
+	var retVal int
+	if os.Geteuid() != 0 {
+		logger.Log.Warn("safechroot tests must be run as root; skipping...")
+		retVal = 0
+	} else {
+		retVal = m.Run()
+	}
 
 	err = os.RemoveAll(tmpDir)
 	if err != nil {
