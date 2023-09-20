@@ -44,6 +44,7 @@ Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
 Requires(postun): coreutils
+%grub2_configuration_requires
 
 %description
 The Mariner kernel that has MSHV Host support
@@ -244,7 +245,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner-mshv.cfg
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
-* Wed Aug 23 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.110.mshv2-5
+* Tue Sep 19 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.110.mshv2-5
 - Enable grub2-mkconfig-based boot path by installing 
     50_mariner_mshv.cfg 
 - Call grub2-mkconfig to regenerate configs only if the user has 

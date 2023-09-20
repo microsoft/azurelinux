@@ -145,6 +145,14 @@ Group:          System Environment/Base
 GRUB RPM Macros for enabling package updates supporting
 the grub2-mkconfig flow on AzureLinux
 
+%package configuration
+Summary:        Location for local grub configurations
+Group:          System Environment/Base
+
+%description configuration
+Directory for package-specific boot configurations
+to be persistently stored on AzureLinux
+
 %prep
 # Remove module_info.ld script due to error "grub2-install: error: Decompressor is too big"
 LDFLAGS="`echo " %{build_ldflags} " | sed 's#-Wl,-dT,%{_topdir}/BUILD/module_info.ld##'`"
@@ -291,7 +299,6 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %defattr(-,root,root)
 %license COPYING
 %dir %{_sysconfdir}/grub.d
-%dir %{_sysconfdir}/default/grub.d
 %dir /boot/%{name}
 %config() %{_sysconfdir}/bash_completion.d/grub
 %config() %{_sysconfdir}/grub.d/00_header
@@ -344,10 +351,14 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %files rpm-macros
 %{_rpmconfigdir}/macros.d/macros.grub2
 
+%files configuration
+%{_sysconfdir}/default/grub.d
+%{_rpmconfigdir}/macros.d/macros.grub2
+
 %changelog
 * Fri Aug 11 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.06-11
 - Enable support for grub2-mkconfig grub.cfg generation
-- Introduce rpm-macros subpackage
+- Introduce rpm-macros, configuration subpackage
 - The Mariner /etc/default/grub now sources files from /etc/default/grub.d
     before the remainder of grub2-mkconfig runs. This allows RPM to 
     install package-specific configurations that the users can safely
