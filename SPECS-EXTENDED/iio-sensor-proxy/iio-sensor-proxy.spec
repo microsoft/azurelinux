@@ -12,7 +12,6 @@ Source0:        https://gitlab.freedesktop.org/hadess/%{name}/uploads/de965bcb44
 BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:  make
 BuildRequires:  gcc
-BuildRequires:  pkgconfig(udev)
 BuildRequires:  pkgconfig(gio-2.0)
 BuildRequires:  pkgconfig(gudev-1.0)
 BuildRequires:  systemd
