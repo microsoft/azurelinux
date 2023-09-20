@@ -44,7 +44,7 @@ Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
 Requires(postun): coreutils
-%grub2_configuration_requires
+%{?grub2_configuration_requires}
 
 %description
 The Mariner kernel that has MSHV Host support
