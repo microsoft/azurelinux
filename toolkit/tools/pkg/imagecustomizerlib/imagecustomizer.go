@@ -7,12 +7,19 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
+	"strings"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safemount.go"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
+)
+
+var (
+	rootfsPartitionRegex = regexp.MustCompile(`(?m)^search -n -u ([a-zA-Z0-9\-]+) -s$`)
 )
 
 func CustomizeImageWithConfigFile(buildDir string, configFile string, imageFile string,
@@ -47,6 +54,12 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 		return err
 	}
 
+	// Validate config.
+	err = validateConfig(baseConfigPath, config)
+	if err != nil {
+		return fmt.Errorf("invalid image config: %w", err)
+	}
+
 	// Normalize 'buildDir' path.
 	buildDirAbs, err := filepath.Abs(buildDir)
 	if err != nil {
@@ -57,12 +70,6 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 	err = os.MkdirAll(buildDirAbs, os.ModePerm)
 	if err != nil {
 		return err
-	}
-
-	// Validate config.
-	err = validateConfig(baseConfigPath, config)
-	if err != nil {
-		return fmt.Errorf("invalid image config: %w", err)
 	}
 
 	// Convert image file to raw format, so that a kernel loop device can be used to make changes to the image.
@@ -80,6 +87,9 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 	}
 
 	// Create final output image file.
+	outDir := filepath.Dir(outputImageFile)
+	os.MkdirAll(outDir, os.ModePerm)
+
 	_, _, err = shell.Execute("qemu-img", "convert", "-O", qemuOutputImageFormat, buildImageFile, outputImageFile)
 	if err != nil {
 		return fmt.Errorf("failed to convert image file to format: %s: %w", outputImageFormat, err)
@@ -134,9 +144,9 @@ func customizeImageHelper(buildDir string, baseConfigPath string, config *imagec
 	}
 
 	// Look for all the partitions on the image.
-	newMountDirectories, mountPoints, err := findPartitions(diskDevPath)
+	newMountDirectories, mountPoints, err := findPartitions(buildDir, diskDevPath)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to find disk partitions: %w", err)
 	}
 
 	// Create chroot environment.
@@ -158,14 +168,134 @@ func customizeImageHelper(buildDir string, baseConfigPath string, config *imagec
 	return nil
 }
 
-func findPartitions(diskDevice string) ([]string, []*safechroot.MountPoint, error) {
-	newMountDirectories := []string{}
+func findPartitions(buildDir string, diskDevice string) ([]string, []*safechroot.MountPoint, error) {
+	var err error
 
-	// TODO: Dynamically find partitions instead of hardcoding the mappings.
-	mountPoints := []*safechroot.MountPoint{
-		safechroot.NewPreDefaultsMountPoint(fmt.Sprintf("%sp2", diskDevice), "/", "ext4", 0, ""),
-		safechroot.NewMountPoint(fmt.Sprintf("%sp1", diskDevice), "/boot", "vfat", 0, ""),
+	diskPartitions, err := diskutils.GetDiskPartitions(diskDevice)
+	if err != nil {
+		return nil, nil, err
 	}
 
-	return newMountDirectories, mountPoints, nil
+	// Look for the boot partition (i.e. EFI system partition).
+	var efiSystemPartition *diskutils.PartitionInfo
+	for _, diskPartition := range diskPartitions {
+		if diskPartition.PartitionTypeUuid == "c12a7328-f81f-11d2-ba4b-00a0c93ec93b" {
+			efiSystemPartition = &diskPartition
+			break
+		}
+	}
+
+	if efiSystemPartition == nil {
+		return nil, nil, fmt.Errorf("failed to find EFI system partition (%s)", diskDevice)
+	}
+
+	// Mount the boot partition.
+	tmpDir := filepath.Join(buildDir, "tmppartition")
+
+	efiSystemPartitionMount, err := safemount.NewMount(efiSystemPartition.Path, tmpDir, efiSystemPartition.FileSystemType, 0, "", true)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to mount EFI system partition: %w", err)
+	}
+	defer efiSystemPartitionMount.Close()
+
+	// Read the grub.cfg file.
+	grubConfigFilePath := filepath.Join(tmpDir, "boot/grub2/grub.cfg")
+	grubConfigFile, err := os.ReadFile(grubConfigFilePath)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to read grub.cfg file: %w", err)
+	}
+
+	// Close the boot partition mount.
+	err = efiSystemPartitionMount.Close()
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to close EFI system partition mount: %w", err)
+	}
+
+	// Look for the rootfs declaration line in the grub.cfg file.
+	match := rootfsPartitionRegex.FindStringSubmatch(string(grubConfigFile))
+	if match == nil {
+		return nil, nil, fmt.Errorf("failed to find rootfs partition in grub.cfg file")
+	}
+
+	rootfsUuid := match[1]
+
+	var rootfsPartition *diskutils.PartitionInfo
+	for _, diskPartition := range diskPartitions {
+		if diskPartition.Uuid == rootfsUuid {
+			rootfsPartition = &diskPartition
+			break
+		}
+	}
+
+	// Temporarily mount the rootfs partition so that the fstab file can be read.
+	rootfsPartitionMount, err := safemount.NewMount(rootfsPartition.Path, tmpDir, rootfsPartition.FileSystemType, 0, "", true)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to mount rootfs partition: %w", err)
+	}
+	defer rootfsPartitionMount.Close()
+
+	// Read the fstab file.
+	fstabPath := filepath.Join(tmpDir, "/etc/fstab")
+	fstabEntries, err := diskutils.ReadFstabFile(fstabPath)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// Close the rootfs partition mount.
+	err = rootfsPartitionMount.Close()
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to close rootfs partition mount: %w", err)
+	}
+
+	// Convert fstab entries into mount points.
+	var mountPoints []*safechroot.MountPoint
+	var foundRoot bool
+	for _, fstabEntry := range fstabEntries {
+		// Ignore special partitions.
+		switch fstabEntry.FsType {
+		case "devtmpfs", "proc", "sysfs", "devpts", "tmpfs":
+			continue
+		}
+
+		source, err := findSourcePartition(fstabEntry.Source, diskPartitions)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		var mountPoint *safechroot.MountPoint
+		if fstabEntry.Target == "/" {
+			mountPoint = safechroot.NewPreDefaultsMountPoint(
+				source, fstabEntry.Target, fstabEntry.FsType,
+				uintptr(fstabEntry.Options), fstabEntry.FsOptions)
+
+			foundRoot = true
+		} else {
+			mountPoint = safechroot.NewMountPoint(
+				source, fstabEntry.Target, fstabEntry.FsType,
+				uintptr(fstabEntry.Options), fstabEntry.FsOptions)
+		}
+
+		mountPoints = append(mountPoints, mountPoint)
+	}
+
+	if !foundRoot {
+		return nil, nil, fmt.Errorf("image has invalid fstab file: no root partition found")
+	}
+
+	return nil, mountPoints, nil
+}
+
+func findSourcePartition(source string, partitions []diskutils.PartitionInfo) (string, error) {
+	partUuid, isPartUuid := strings.CutPrefix(source, "PARTUUID=")
+	if isPartUuid {
+		for _, partition := range partitions {
+			if partition.PartUuid == partUuid {
+				return partition.Path, nil
+			}
+		}
+
+		return "", fmt.Errorf("partition not found: %s", source)
+	}
+
+	return "", fmt.Errorf("unknown fstab source type: %s", source)
 }

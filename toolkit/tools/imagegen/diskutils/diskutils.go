@@ -39,6 +39,20 @@ type SystemBlockDevice struct {
 	Model       string // Example: Virtual Disk
 }
 
+type partitionInfoOutput struct {
+	Devices []PartitionInfo `json:"blockdevices"`
+}
+
+type PartitionInfo struct {
+	Name              string `json:"name"`       // Example: nbd0p1
+	Path              string `json:"path"`       // Example: /dev/nbd0p1
+	PartitionTypeUuid string `json:"parttype"`   // Example: c12a7328-f81f-11d2-ba4b-00a0c93ec93b
+	FileSystemType    string `json:"fstype"`     // Example: vfat
+	Uuid              string `json:"uuid"`       // Example: 4BD9-3A78
+	PartUuid          string `json:"partuuid"`   // Example: 7b1367a6-5845-43f2-99b1-a742d873f590
+	Mountpoint        string `json:"mountpoint"` // Example: /mnt/os/boot
+}
+
 const (
 	// AutoEndSize is used as the disk's "End" value to indicate it should be picked automatically
 	AutoEndSize = 0
@@ -672,6 +686,28 @@ func SystemBlockDevices() (systemDevices []SystemBlockDevice, err error) {
 	}
 
 	return
+}
+
+func GetDiskPartitions(diskDevPath string) ([]PartitionInfo, error) {
+	// Just in case the disk was only recently connected, wait for the OS to finish processing it.
+	_, _, err := shell.Execute("udevadm", "settle")
+	if err != nil {
+		return nil, fmt.Errorf("failed to list disk (%s) partitions: udevadm settle: %w", diskDevPath, err)
+	}
+
+	// Read the disk's partitions.
+	jsonString, _, err := shell.Execute("lsblk", diskDevPath, "--output", "NAME,PATH,PARTTYPE,FSTYPE,UUID,MOUNTPOINT,PARTUUID", "--json", "--list")
+	if err != nil {
+		return nil, fmt.Errorf("failed to list disk (%s) partitions: %w", diskDevPath, err)
+	}
+
+	var output partitionInfoOutput
+	err = json.Unmarshal([]byte(jsonString), &output)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list disk (%s) partitions: unexpected JSON format: %w", diskDevPath, err)
+	}
+
+	return output.Devices, err
 }
 
 func createExtendedPartition(diskDevPath string, partitionTableType string, partitions []configuration.Partition, partIDToFsTypeMap, partDevPathMap map[string]string) (err error) {
