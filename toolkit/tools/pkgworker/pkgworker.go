@@ -283,7 +283,7 @@ func installCCache(ccacheDirTarsIn string, ccacheGroupName string, architecture 
 		var ccacheVersionFullBlobName = architecture + "/" + remoteStoreConfig.VersionsFolder + "/" + ccacheGroupName + CCacheVersionSuffix
 		var ccacheInputVersionFullPath = ccacheDirTarsIn + "/" + ccacheGroupName + CCacheVersionSuffix
 
-		logger.Log.Infof("  downloading  (%s) to (%s)...", ccacheVersionFullBlobName, ccacheInputVersionFullPath)
+		logger.Log.Infof("  downloading (%s) to (%s)...", ccacheVersionFullBlobName, ccacheInputVersionFullPath)
 		downloadStartTime := time.Now()
 		err = download(theClient, context.Background(), remoteStoreConfig.ContainerName, ccacheVersionFullBlobName, ccacheInputVersionFullPath)
 		if err != nil {
@@ -509,7 +509,7 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 	if useCcache {
 		err = installCCache(*ccacheDirTarsIn, *ccacheGroupName, outArch)
 		if err != nil {
-			logger.Log.Warnf("ccache will be disabled.")
+			logger.Log.Warnf("ccache will not be able to use previously generated artifacts.")
 		}
 	}
 	
