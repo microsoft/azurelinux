@@ -20,8 +20,8 @@ Distribution:   Mariner
 
 Summary: A widely used Mail Transport Agent (MTA)
 Name: sendmail
-Version: 8.15.2
-Release: 46%{?dist}
+Version: 8.17.2
+Release: 1%{?dist}
 License: Sendmail
 URL: http://www.sendmail.org/
 
@@ -708,6 +708,9 @@ exit 0
 
 
 %changelog
+* Wed Sep 20 2023 Archana Choudhary <archana1@microsoft.com> - 8.17.2-1
+- Upgrade to 8.17.2 - CVE-2021-3618
+
 * Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.15.2-46
 - Removing dependency on 'ghostscript'.
 - License verified.

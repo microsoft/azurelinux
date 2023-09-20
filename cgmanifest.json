@@ -27525,8 +27525,8 @@
         "type": "other",
         "other": {
           "name": "sendmail",
-          "version": "8.15.2",
-          "downloadUrl": "ftp://ftp.sendmail.org/pub/sendmail/sendmail.8.15.2.tar.gz"
+          "version": "8.17.2",
+          "downloadUrl": "ftp://ftp.sendmail.org/pub/sendmail/sendmail.8.17.2.tar.gz"
         }
       }
     },
