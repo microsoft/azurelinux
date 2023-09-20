@@ -1,7 +1,7 @@
 Summary:        Open source remote procedure call (RPC) framework
 Name:           grpc
-Version:        1.42.0
-Release:        6%{?dist}
+Version:        1.55.3
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -33,7 +33,6 @@ BuildRequires:      python3-six
 BuildRequires:      python3-wheel
 BuildRequires:      python3-setuptools
 BuildRequires:      python3-protobuf
-
 
 %description
 gRPC is a modern, open source, high-performance remote procedure call (RPC) framework that can run anywhere. It enables client and server applications to communicate transparently, and simplifies the building of connected systems.
@@ -148,6 +147,9 @@ export GRPC_PYTHON_BUILD_SYSTEM_ABSL=True
 
 
 %changelog
+* Wed Sep 20 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.55.3-1
+- Bumping version to patch CVE-2023-4785.
+
 * Thu Jun 22 2023 Reuben Olinsky <reubeno@microsoft.com> - 1.42.0-6
 - Add cmake modules to grpc-devel package.
 

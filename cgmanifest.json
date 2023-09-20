@@ -4900,8 +4900,8 @@
         "type": "other",
         "other": {
           "name": "grpc",
-          "version": "1.42.0",
-          "downloadUrl": "https://github.com/grpc/grpc/archive/v1.42.0/grpc-1.42.0.tar.gz"
+          "version": "1.55.3",
+          "downloadUrl": "https://github.com/grpc/grpc/archive/v1.55.3/grpc-1.55.3.tar.gz"
         }
       }
     },
