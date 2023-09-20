@@ -71,6 +71,7 @@ Libraries and headers for libsubid
 %setup -q -n shadow-%{version}
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 autoreconf -fiv
 
@@ -177,7 +178,7 @@ chmod 000 %{_sysconfdir}/shadow
 %{_libdir}/libsubid.so
 
 %changelog
-* Wed Sept 20 2023 Kanika Nema <kanikanema@microsoft.com> - 4.9-13
+* Wed Sep 20 2023 Kanika Nema <kanikanema@microsoft.com> - 4.9-13
 - Address CVE-2023-29383
 
 * Wed May 24 2023 Tobias Brick <tobiasb@microsoft.com> - 4.9-12
