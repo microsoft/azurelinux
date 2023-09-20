@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           systemd-bootchart
 Version:        233
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        Boot performance graphing tool
 
 License:        GPLv2+ and LGPLv2+
@@ -11,7 +11,7 @@ Source0:        https://github.com/systemd/%{name}/releases/download/v%{version}
 
 BuildRequires:  gcc
 BuildRequires:  systemd
-BuildRequires:  pkgconfig(libsystemd) >= 221
+BuildRequires:  systemd-devel
 BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:  docbook-style-xsl
 %{?systemd_requires}
@@ -54,6 +54,10 @@ are displayed separately.
 %{_mandir}/man5/bootchart.conf.d.5*
 
 %changelog
+* Tue Sep 19 2023 Jon Slobodzian <joslobo@microsoft.com> - 233-8
+- Fix build issue for systemd/systemd-bootstrap confusion
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 233-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

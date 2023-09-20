@@ -27156,7 +27156,7 @@
         "other": {
           "name": "samba",
           "version": "4.12.5",
-          "downloadUrl": "https://ftp.samba.org/pub/samba/samba-4.12.5.tar.gz"
+          "downloadUrl": "https://ftp.samba.org/pub/samba/stable/samba-4.12.5.tar.gz"
         }
       }
     },
