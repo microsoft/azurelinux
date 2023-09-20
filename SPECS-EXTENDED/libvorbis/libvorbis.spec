@@ -12,20 +12,6 @@ Source:		https://downloads.xiph.org/releases/vorbis/%{name}-%{version}.tar.xz
 BuildRequires:  gcc
 BuildRequires:	pkgconfig(ogg) >= 1.0
 
-# sync with git as of
-#
-# commit 46e70fa6573e206c2555cd99a53204ffd6bf58fd
-# Author: Minmin Gong <gongminmin@msn.com>
-# Date:   Wed Jul 4 21:37:54 2018 -0700
-#
-#     Fix the compiling errors on msvc ARM64 configuration.
-#
-# Fixes:
-# CVE-2017-14160
-# CVE-2018-10392
-# CVE-2018-10393
-Patch0: libvorbis-1.3.6-git.patch
-
 %description
 Ogg Vorbis is a fully open, non-proprietary, patent- and royalty-free,
 general-purpose compressed audio format for audio and music at fixed
@@ -53,7 +39,6 @@ Documentation for developing applications with libvorbis.
 %prep
 
 %setup -q
-%patch0 -p1
 sed -i "s|-O20|$RPM_OPT_FLAGS|" configure
 sed -i "s/-ffast-math//" configure
 sed -i "s/-mcpu=750//" configure
@@ -93,7 +78,8 @@ make check
 
 %changelog
 * Wed Sep 06 2023 Archana Choudhary <archana1@microsoft.com> - 1.3.7-1
-- Auto-upgrade to 1.3.7 - CVE-2018-10392 CVE-2018-10393
+- Upgrade to 1.3.7 - CVE-2018-10392 CVE-2018-10393
+- Remove patch libvorbis-1.3.6-git.patch
 
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 1.3.6-8
 - Remove epoch
