@@ -8,7 +8,6 @@
 # This list of skip_check_%{name} entries will cause %check to return immediately
 # on the specified spec.
 
-%skip_check_libsoup 1
 %skip_check_ant 1
 %skip_check_python_lxml 1
 %skip_check_socat 1
@@ -19,16 +18,9 @@
 %skip_check_gtk_doc 1
 %skip_check_tdnf 1
 %skip_check_vim 1
-%skip_check_gnutls 1
-
-# JNA requires X11 dependencies which are only available in toolchain build environment
-%skip_check_jna 1
 
 # We are missing many of the dependency packages for the Dracut tests
 %skip_check_dracut 1
-
-# Strongswan's rsa testsuite occasionally hangs
-%skip_check_strongswan 1
 
 # asciidoc tests require the "source-highlight" package which is not available
 %skip_check_asciidoc 1
