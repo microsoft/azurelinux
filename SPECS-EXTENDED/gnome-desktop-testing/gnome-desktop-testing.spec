@@ -41,6 +41,7 @@ make install DESTDIR=$RPM_BUILD_ROOT
 %changelog
 * Tue Sep 19 2023 Jon Slobodzian <joslobo@microsoft.com> - 2018.1-4
 - Fix build issue for systemd/systemd-bootstrap confusion
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2018.1-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

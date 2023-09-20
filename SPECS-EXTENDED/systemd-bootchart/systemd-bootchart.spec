@@ -56,6 +56,7 @@ are displayed separately.
 %changelog
 * Tue Sep 19 2023 Jon Slobodzian <joslobo@microsoft.com> - 233-8
 - Fix build issue for systemd/systemd-bootstrap confusion
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 233-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).

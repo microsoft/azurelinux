@@ -3438,6 +3438,7 @@ fi
 %changelog
 * Tue Sep 19 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.12.5-5
 - Fix build issue for systemd/systemd-bootstrap confusion
+- License verified
 
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 4.12.5-4
 - Remove epoch
