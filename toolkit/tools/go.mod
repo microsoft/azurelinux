@@ -3,6 +3,8 @@ module github.com/microsoft/CBL-Mariner/toolkit/tools
 go 1.19
 
 require (
+	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.3.1
+	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.1.0
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d
 	github.com/bendahl/uinput v1.4.0
 	github.com/cavaliercoder/go-cpio v0.0.0-20180626203310-925f9528c45e
@@ -22,9 +24,7 @@ require (
 
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.7.1 // indirect
-	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.3.1 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/internal v1.3.0 // indirect
-	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.1.0 // indirect
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.1.1 // indirect
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751 // indirect
 	github.com/alecthomas/units v0.0.0-20190924025748-f65c72e2690d // indirect
