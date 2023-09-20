@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "usbguard-1.0.0.tar.gz": "5617986cd5dd1a2d311041648a1977d836cf4e33a4121d7f82599f21496abc42",
-  "usbguard-daemon.conf": "5909f3c6f04defae3d7b680c23d3526728b74bd11ff31129b025c6a5ff462407"
- }
+  "Signatures": {
+    "usbguard-daemon.conf": "5909f3c6f04defae3d7b680c23d3526728b74bd11ff31129b025c6a5ff462407",
+    "usbguard-1.1.0.tar.gz": "a39104042b0c57f969c4e6580f6d80ad7066551eda966600695e644081128a2d"
+  }
 }

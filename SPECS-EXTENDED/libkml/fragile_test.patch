@@ -1,0 +1,13 @@
+diff --git a/tests/kml/engine/feature_view_test.cc b/tests/kml/engine/feature_view_test.cc
+index ce572bb..0b53851 100644
+--- a/tests/kml/engine/feature_view_test.cc
++++ b/tests/kml/engine/feature_view_test.cc
+@@ -144,7 +144,7 @@ TEST(FeatureViewTest, TestComputeBboxLookAt) {
+   // These fields are expected to be set to these values.
+   ASSERT_DOUBLE_EQ(-86.032775, lookat->get_longitude());
+   ASSERT_DOUBLE_EQ(35.78925, lookat->get_latitude());
+-  ASSERT_DOUBLE_EQ(712928.68603440293, lookat->get_range());
++  ASSERT_NEAR(712928.68603440, lookat->get_range(), 0.0000001);
+   // These fields are not set by ComputeBboxLookAt.
+   ASSERT_FALSE(lookat->has_altitude());
+   ASSERT_FALSE(lookat->has_heading());

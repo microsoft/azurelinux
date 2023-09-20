@@ -1,0 +1,91 @@
+From 2382618c2de489b860228b74283a581b4333030d Mon Sep 17 00:00:00 2001
+From: Sandro Mani <manisandro@gmail.com>
+Date: Fri, 8 Apr 2016 23:23:20 +0200
+Subject: [PATCH 4/4] Correctly build and run java test
+
+---
+ cmake/JUnit.cmake         | 38 ++++++++++++++++++++++++++++++++++++++
+ tests/swig/CMakeLists.txt | 23 +++++++++++++++++------
+ 2 files changed, 55 insertions(+), 6 deletions(-)
+ create mode 100644 cmake/JUnit.cmake
+
+diff --git a/cmake/JUnit.cmake b/cmake/JUnit.cmake
+new file mode 100644
+index 0000000..3c114fd
+--- /dev/null
++++ b/cmake/JUnit.cmake
+@@ -0,0 +1,38 @@
++include(FindJava)
++
++#   add_junit_test(<target name> 
++#       CLASSPATH [path1 ...]
++#       TESTS [class1 ...]
++#   )
++function(add_junit_test TARGET_NAME)
++
++   if (WIN32 AND NOT CYGWIN)
++      set(SEPARATOR ";")
++   else (WIN32 AND NOT CYGWIN)
++      set(SEPARATOR ":")
++   endif(WIN32 AND NOT CYGWIN)
++
++   foreach (ARG ${ARGN})
++      if (ARG MATCHES "CLASSPATH" OR ARG MATCHES "TESTS" OR ARG MATCHES "JVMARGS")
++         set(TYPE ${ARG})
++
++      else ()
++
++         if (TYPE MATCHES "CLASSPATH")
++            set(CLASSPATH "${CLASSPATH}${SEPARATOR}${ARG}")
++
++         elseif (TYPE MATCHES "TESTS")
++            set(TESTS ${TESTS} ${ARG})
++
++         elseif (TYPE MATCHES "JVMARGS")
++            set(JVMARGS ${JVMARGS} ${ARG})
++
++         endif()
++
++      endif()
++
++   endforeach(ARG)
++
++   add_test(NAME ${TARGET_NAME} COMMAND ${Java_JAVA_EXECUTABLE} ${JVMARGS} -classpath ${CLASSPATH} org.junit.runner.JUnitCore ${TESTS})
++
++endfunction(add_junit_test)
+diff --git a/tests/swig/CMakeLists.txt b/tests/swig/CMakeLists.txt
+index 5ba1cd1..c859d4d 100644
+--- a/tests/swig/CMakeLists.txt
++++ b/tests/swig/CMakeLists.txt
+@@ -16,10 +16,21 @@ set_tests_properties(test_python_kmlengine
+ endif()
+ 
+ if(WITH_JAVA)
+-add_test( NAME test_java_kmlbase
+-  COMMAND
+-  ${Java_JAVA_EXECUTABLE}
+-  -cp "${CMAKE_JAVA_INCLUDE_PATH}${PATH_SEPARATOR}${CMAKE_BINARY_DIR}/src/swig/LibKML.jar;${CMAKE_CURRENT_BINARY_DIR}"
+-  KmlBaseTest )
++include(UseJava)
++include(JUnit)
++find_file(JUNIT_JAR NAMES junit.jar PATHS ${JAVA_LIB_INSTALL_DIR} /usr/share/java)
++find_file(HAMCREST_JAR NAMES hamcrest/core.jar PATHS ${JAVA_LIB_INSTALL_DIR} /usr/share/java)
+ 
+-endif()
+\ No newline at end of file
++add_jar(KmlBaseTest KmlBaseTest.java INCLUDE_JARS /usr/share/java/junit.jar ${CMAKE_BINARY_DIR}/src/swig/LibKML.jar)
++add_dependencies(KmlBaseTest LibKML_jar)
++
++if(WIN32 AND NOT CYGWIN)
++    set(PATH_SEPARATOR ";")
++else(WIN32 AND NOT CYGWIN)
++    set(PATH_SEPARATOR ":")
++endif(WIN32 AND NOT CYGWIN)
++
++add_junit_test(test_java_kmlbase CLASSPATH "${JUNIT_JAR}${PATH_SEPARATOR}${HAMCREST_JAR}${PATH_SEPARATOR}${CMAKE_BINARY_DIR}/src/swig/LibKML.jar${PATH_SEPARATOR}${CMAKE_CURRENT_BINARY_DIR}/KmlBaseTest.jar" TESTS KmlBaseTest)
++set_tests_properties(test_java_kmlbase
++     PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_BINARY_DIR}/lib")
++endif()
+-- 
+2.8.1
+

@@ -85,7 +85,7 @@
 
 Name:           samba
 Version:        4.12.5
-Release:        4%{?dist}
+Release:        5%{?dist}
 
 
 %define samba_depver %{version}-%{release}
@@ -97,8 +97,8 @@ Distribution:   Mariner
 URL:            https://www.samba.org
 
 # This is a xz recompressed file of https://ftp.samba.org/pub/samba/samba-%%{version}%%{pre_release}.tar.gz
-Source0:        https://ftp.samba.org/pub/samba/samba-%{version}%{pre_release}.tar.gz#/samba-%{version}%{pre_release}.tar.xz
-Source1:        https://ftp.samba.org/pub/samba/samba-%{version}%{pre_release}.tar.asc
+Source0:        https://ftp.samba.org/pub/samba/stable/samba-%{version}%{pre_release}.tar.gz#/samba-%{version}%{pre_release}.tar.xz
+Source1:        https://ftp.samba.org/pub/samba/stable/samba-%{version}%{pre_release}.tar.asc
 Source2:        gpgkey-52FBC0B86D954B0843324CDC6F33915B6568B7EA.gpg
 
 # Red Hat specific replacement-files
@@ -193,7 +193,7 @@ BuildRequires: xfsprogs-devel
 BuildRequires: xz
 BuildRequires: zlib-devel >= 1.2.3
 
-BuildRequires: pkgconfig(libsystemd)
+BuildRequires: systemd-devel
 
 %if %{with_vfs_glusterfs}
 BuildRequires: glusterfs-api-devel >= 3.4.0.16
@@ -3436,6 +3436,10 @@ fi
 %endif
 
 %changelog
+* Tue Sep 19 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.12.5-5
+- Fix build issue for systemd/systemd-bootstrap confusion
+- License verified
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 4.12.5-4
 - Remove epoch
 
