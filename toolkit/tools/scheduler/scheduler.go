@@ -205,7 +205,7 @@ func main() {
 		} else {
 			for _, architecture := range architectures {
 				logger.Log.Infof("  found ccache architecture (%s)...", architecture)
-				groupNames, err := getChildFolders(architecture)
+				groupNames, err := getChildFolders(filepath.Join(*ccacheDir, architecture))
 				if err != nil {
 					logger.Log.Warnf("failed to enumerate child folders under (%s)...", *ccacheDir)
 				} else {

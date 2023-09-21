@@ -86,7 +86,7 @@ func FindCCacheGroup(basePackageName string) (packageCCacheGroupName string) {
 		for _, group := range ccacheConfiguration.Groups {
 			for _, packageName := range group.PackageNames {
 				if packageName == basePackageName {
-					logger.Log.Infof("  found group (%s) for (%s)...", group.Name, basePackageName)
+					logger.Log.Infof("  found group (%s) for base package (%s)...", group.Name, basePackageName)
 					packageCCacheGroupName = group.Name
 					break
 				}
