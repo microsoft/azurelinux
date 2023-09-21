@@ -48,8 +48,6 @@ func TestCustomizeImageEmptyConfig(t *testing.T) {
 func TestCustomizeImageCopyFiles(t *testing.T) {
 	var err error
 
-	t.Skip("Unreliable test")
-
 	if !buildpipeline.IsRegularBuild() {
 		t.Skip("loopback block device not available")
 	}
