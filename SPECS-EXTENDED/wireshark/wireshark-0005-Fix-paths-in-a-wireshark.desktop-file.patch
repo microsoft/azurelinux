@@ -1,16 +1,16 @@
 From: Kenneth Soerensen <knnthsrnsn@gmail.com>
 Date: Wed, 29 Jan 2014 16:04:12 +0400
-Subject: [PATCH] Fix paths in a wireshark.desktop file
+Subject: [PATCH] Fix paths in a org.wireshark.Wireshark.desktop file
 
 
-diff --git a/wireshark.desktop b/wireshark.desktop
-index 669c6f1..f7df1f3 100644
---- a/wireshark.desktop
-+++ b/wireshark.desktop
+diff --git a/resources/freedesktop/org.wireshark.Wireshark.desktop b/resources/freedesktop/org.wireshark.Wireshark.desktop
+index a880a50a33..54b3595d55 100644
+--- a/resources/freedesktop/org.wireshark.Wireshark.desktop
++++ b/resources/freedesktop/org.wireshark.Wireshark.desktop
 @@ -102,8 +102,8 @@ Comment[tr]=Ağ trafiği çözümleyicisi
  Comment[vi]=Trình phân tích giao thông mạng
  Comment[uk]=Аналізатор мережевого трафіку
- Icon=wireshark
+ Icon=org.wireshark.Wireshark
 -TryExec=wireshark
 -Exec=wireshark %f
 +TryExec=/usr/bin/wireshark

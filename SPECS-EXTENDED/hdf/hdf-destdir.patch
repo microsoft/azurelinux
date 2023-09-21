@@ -1,0 +1,70 @@
+diff -up hdf-4.2.11/config/examples.am.destdir hdf-4.2.11/config/examples.am
+--- hdf-4.2.11/config/examples.am.destdir	2015-02-09 09:43:05.000000000 -0700
++++ hdf-4.2.11/config/examples.am	2015-02-13 13:24:09.008230956 -0700
+@@ -44,7 +44,7 @@ CHECK_CLEANFILES+= *.hdf
+ CLEANFILES=$(EXAMPLE_PROG)
+ 
+ # How to create EXAMPLEDIR if it doesn't already exist
+-$(EXAMPLEDIR):
++$(DESTDIR)$(EXAMPLEDIR):
+ 	mkdir -p $@
+ 
+ # Install and uninstall rules.  We install the source files, not the
+@@ -54,42 +54,42 @@ install-data-local:
+ uninstall-local:
+ 	@$(MAKE) $(AM_MAKEFLAGS) uninstall-examples
+ 
+-install-examples: $(EXAMPLEDIR) 
++install-examples: $(DESTDIR)$(EXAMPLEDIR) 
+ 	@for f in X $(INSTALL_FILES); do                                     \
+ 	  if test $$f != X; then                                             \
+-	    (set -x; $(INSTALL) $(srcdir)/$$f $(EXAMPLEDIR)/. || exit 1);    \
+-	    chmod a-x $(EXAMPLEDIR)/$$f;                                     \
++	    (set -x; $(INSTALL) $(srcdir)/$$f $(DESTDIR)$(EXAMPLEDIR)/. || exit 1);    \
++	    chmod a-x $(DESTDIR)$(EXAMPLEDIR)/$$f;                                     \
+ 	  fi;                                                                \
+ 	done
+ 	@for f in X $(INSTALL_SCRIPT_FILES); do                              \
+ 	  if test $$f != X; then                                             \
+-	    (set -x; $(INSTALL) $(srcdir)/$$f $(EXAMPLEDIR)/. || exit 1);    \
++	    (set -x; $(INSTALL) $(srcdir)/$$f $(DESTDIR)$(EXAMPLEDIR)/. || exit 1);    \
+ 	  fi;                                                                \
+ 	done
+ 	@for f in X $(INSTALL_TOP_FILES); do                                 \
+ 	  if test $$f != X; then                                             \
+-	    (set -x; $(INSTALL) $(srcdir)/$$f $(EXAMPLETOPDIR)/. || exit 1); \
+-	    chmod a-x $(EXAMPLETOPDIR)/$$f;                                  \
++	    (set -x; $(INSTALL) $(srcdir)/$$f $(DESTDIR)$(EXAMPLETOPDIR)/. || exit 1); \
++	    chmod a-x $(DESTDIR)$(EXAMPLETOPDIR)/$$f;                                  \
+ 	  fi;                                                                \
+ 	done
+ 	@for f in X $(INSTALL_TOP_SCRIPT_FILES); do                          \
+ 	  if test $$f != X; then                                             \
+-	    (set -x; $(INSTALL) $(srcdir)/$$f $(EXAMPLETOPDIR)/. || exit 1); \
++	    (set -x; $(INSTALL) $(srcdir)/$$f $(DESTDIR)$(EXAMPLETOPDIR)/. || exit 1); \
+ 	  fi;                                                                \
+ 	done
+ 
+ uninstall-examples:
+-	@if test -n "$(INSTALL_FILES)" -a -d $(EXAMPLEDIR); then           \
+-	  set -x; cd $(EXAMPLEDIR) && $(RM) $(INSTALL_FILES);              \
++	@if test -n "$(INSTALL_FILES)" -a -d $(DESTDIR)$(EXAMPLEDIR); then           \
++	  set -x; cd $(DESTDIR)$(EXAMPLEDIR) && $(RM) $(INSTALL_FILES);              \
+ 	fi
+-	@if test -n "$(INSTALL_SCRIPT_FILES)" -a -d $(EXAMPLEDIR); then    \
+-	  set -x; cd $(EXAMPLEDIR) && $(RM) $(INSTALL_SCRIPT_FILES);       \
++	@if test -n "$(INSTALL_SCRIPT_FILES)" -a -d $(DESTDIR)$(EXAMPLEDIR); then    \
++	  set -x; cd $(DESTDIR)$(EXAMPLEDIR) && $(RM) $(INSTALL_SCRIPT_FILES);       \
+ 	fi
+-	@if test -n "$(INSTALL_TOP_FILES)" -a -d $(EXAMPLETOPDIR); then    \
+-	  set -x; cd $(EXAMPLETOPDIR) && $(RM) $(INSTALL_TOP_FILES);       \
++	@if test -n "$(INSTALL_TOP_FILES)" -a -d $(DESTDIR)$(EXAMPLETOPDIR); then    \
++	  set -x; cd $$(DESTDIR)(EXAMPLETOPDIR) && $(RM) $(INSTALL_TOP_FILES);       \
+ 	fi
+-	@if test -n "$(INSTALL_TOP_SCRIPT_FILES)" -a -d $(EXAMPLETOPDIR); then    \
+-	  set -x; cd $(EXAMPLETOPDIR) && $(RM) $(INSTALL_TOP_SCRIPT_FILES);       \
++	@if test -n "$(INSTALL_TOP_SCRIPT_FILES)" -a -d $(DESTDIR)$(EXAMPLETOPDIR); then    \
++	  set -x; cd $(DESTDIR)$(EXAMPLETOPDIR) && $(RM) $(INSTALL_TOP_SCRIPT_FILES);       \
+ 	fi
+ 
+ installcheck-local:

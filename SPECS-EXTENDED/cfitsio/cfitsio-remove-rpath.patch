@@ -1,0 +1,12 @@
+diff -ur cfitsio-3.49/configure cfitsio-3.49.rpath/configure
+--- cfitsio-3.49/configure	2021-08-01 10:11:12.159237384 +0200
++++ cfitsio-3.49.rpath/configure	2021-08-01 10:24:32.504218725 +0200
+@@ -4673,7 +4673,7 @@
+         $as_echo "#define _FILE_OFFSET_BITS 64" >>confdefs.h
+ 
+         # LDFLAGS used by utilities:
+-        LDFLAGS_BIN="$LDFLAGS_BIN -Wl,-rpath,\${CFITSIO_LIB}"
++        LDFLAGS_BIN="$LDFLAGS_BIN"
+ 	;;
+     *mingw32*)
+         { $as_echo "$as_me:${as_lineno-$LINENO}: checking for large file support" >&5

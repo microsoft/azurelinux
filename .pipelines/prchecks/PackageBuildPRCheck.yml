@@ -1,9 +1,10 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 # Since we're boosting our builds by using a private, pre-compiled raw toolchain
 # the pipeline requires defining the following variables outside of the YAML:
 # - rawToolchainCacheURL_AMD64
 # - rawToolchainCacheURL_ARM64
-# - agentPool_AMD64
-# - agentPool_ARM64
 
 trigger: none
 
@@ -12,25 +13,13 @@ parameters:
     type: object
     default:
       - name: "AMD64"
-        agentPool: "$(agentPool_AMD64)"
+        agentPool: "$(DEV_AMD64_Managed)" # Pool defined inside the "Agent pools (DEV)" variable group.
         rawToolchainCacheURL: "$(rawToolchainCacheURL_AMD64)"
         rawToolchainExpectedHash: "f56df34b90915c93f772d3961bf5e9eeb8c1233db43dd92070214e4ce6b72894"
-        packageBuildJobs:
-          - scenario1:
-            name: Build
-            runCheck: false
-          - scenario2:
-            name: Test
-            runCheck: true
       - name: "ARM64"
-        agentPool: "$(agentPool_ARM64)"
+        agentPool: "$(DEV_ARM64_Managed)" # Pool defined inside the "Agent pools (DEV)" variable group.
         rawToolchainCacheURL: "$(rawToolchainCacheURL_ARM64)"
         rawToolchainExpectedHash: "65de43b3bdcfdaac71df1f11fd1f830a8109b1eb9d7cb6cbc2e2d0e929d0ef76"
-        packageBuildJobs:
-          - name: Build
-            runCheck: false
-          - name: Test
-            runCheck: true
 
 resources:
   repositories:
@@ -40,8 +29,11 @@ resources:
       ref: refs/heads/main
 
 variables:
-  rpmsArtifactNameBase: RPMs
-  toolchainArtifactNameBase: Toolchain
+  - group: "Agent pools (DEV)"
+  - name: rpmsArtifactNameBase
+    value: RPMs
+  - name: toolchainArtifactNameBase
+    value: Toolchain
 
 extends:
   template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates
@@ -88,29 +80,27 @@ extends:
           - stage: RPMs_${{ configuration.name }}
             dependsOn: Toolchain_${{ configuration.name }}
             jobs:
-              # Using configuration object instead of the matrix strategy because the 'isCheckBuild' parameter must be set
-              # during YAML parsing and the matrix strategy arguments are available later during run-time.
-              - ${{ each packageBuildJob in configuration.packageBuildJobs }}:
-                  - job: ${{ packageBuildJob.name }}
-                    pool:
-                      type: linux
-                      isCustom: true
-                      name: ${{ configuration.agentPool }}
-                    variables:
-                      ob_artifactBaseName: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}_${{ packageBuildJob.name }}
-                      ob_outputDirectory: $(Build.ArtifactStagingDirectory)
-                    steps:
-                      - template: .pipelines/templates/PackageBuild.yml@self
-                        parameters:
-                          customToolchainArtifactName: $(toolchainArtifactNameBase)_${{ configuration.name }}
-                          isCheckBuild: ${{ packageBuildJob.runCheck }}
-                          isDeltaBuild: true
-                          outputArtifactsFolder: $(ob_outputDirectory)
-                          selfRepoName: self
+              - job: BuildAndTest
+                pool:
+                  type: linux
+                  isCustom: true
+                  name: ${{ configuration.agentPool }}
+                variables:
+                  ob_artifactBaseName: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}
+                  ob_outputDirectory: $(Build.ArtifactStagingDirectory)
+                steps:
+                  - template: .pipelines/templates/PackageBuild.yml@self
+                    parameters:
+                      customToolchainArtifactName: $(toolchainArtifactNameBase)_${{ configuration.name }}
+                      isCheckBuild: true
+                      isQuickRebuildPackages: true
+                      outputArtifactsFolder: $(ob_outputDirectory)
+                      pipArtifactFeeds: "mariner/Mariner-Pypi-Feed"
+                      selfRepoName: self
 
-                      - task: PublishPipelineArtifact@1
-                        inputs:
-                          artifact: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}_${{ packageBuildJob.name }}
-                          targetPath: $(ob_outputDirectory)
-                        condition: always()
-                        displayName: "Publish packages build artifacts"
+                  - task: PublishPipelineArtifact@1
+                    inputs:
+                      artifact: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}
+                      targetPath: $(ob_outputDirectory)
+                    condition: always()
+                    displayName: "Publish packages build artifacts"

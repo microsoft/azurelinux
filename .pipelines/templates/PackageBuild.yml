@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 parameters:
   - name: buildRepoRoot
     type: string
@@ -11,25 +14,69 @@ parameters:
     type: string
     default: ""
 
+  - name: customToolchainTarballName
+    type: string
+    default: "toolchain_built_rpms_all.tar.gz"
+
   - name: extraPackageRepos
     type: string
     default: ""
 
-  - name: isCheckBuild
+  - name: failOnTestFailures
     type: boolean
-    default: false
+    default: true
+
+  - name: isCheckBuild
+    type: string
+    default: "default"
+    values:
+      - "default"
+      - "false"
+      - "true"
 
   - name: isDeltaBuild
-    type: boolean
-    default: false
+    type: string
+    default: "default"
+    values:
+      - "default"
+      - "false"
+      - "true"
+
+  - name: isQuickRebuildPackages
+    type: string
+    default: "default"
+    values:
+      - "default"
+      - "false"
+      - "true"
+
+  - name: isUseCCache
+    type: string
+    default: "default"
+    values:
+      - "default"
+      - "false"
+      - "true"
 
   - name: outputArtifactsFolder
     type: string
     default: "$(Build.ArtifactStagingDirectory)"
 
+  - name: pipArtifactFeeds
+    type: string
+    default: ""
+
+  - name: publishLogs
+    type: boolean
+    default: true
+
   - name: rpmsCacheArtifactName
     type: string
     default: ""
+
+  - name: rpmsCacheTarballName
+    type: string
+    default: "rpms.tar.gz"
 
   - name: rpmsTarballName
     type: string
@@ -43,6 +90,10 @@ parameters:
     type: string
     default: "SPECS"
 
+  - name: srpmPackList
+    type: string
+    default: ""
+
   - name: srpmsTarballName
     type: string
     default: "srpms.tar.gz"
@@ -52,15 +103,21 @@ steps:
     parameters:
       buildRepoRoot: ${{ parameters.buildRepoRoot }}
 
+  - ${{ if parameters.pipArtifactFeeds }}:
+      - task: PipAuthenticate@1
+        inputs:
+          artifactFeeds: "${{ parameters.pipArtifactFeeds }}"
+        displayName: "Authenticate to custom pip artifact feeds"
+
   - ${{ if parameters.customToolchainArtifactName }}:
       - task: DownloadPipelineArtifact@2
         displayName: "Download toolchain"
         inputs:
           artifact: "${{ parameters.customToolchainArtifactName }}"
-          patterns: "**/toolchain_built_rpms_all.tar.gz"
+          patterns: "**/${{ parameters.customToolchainTarballName }}"
 
       - script: |
-          toolchain_archive="$(find "$(Pipeline.Workspace)" -name toolchain_built_rpms_all.tar.gz)"
+          toolchain_archive="$(find "$(Pipeline.Workspace)" -name "${{ parameters.customToolchainTarballName }}" -print -quit)"
           if [[ ! -f "$toolchain_archive" ]]; then
             echo "ERROR: toolchain archive not found!" >&2
             exit 1
@@ -74,10 +131,10 @@ steps:
         displayName: "Download RPM cache"
         inputs:
           artifact: "${{ parameters.rpmsCacheArtifactName }}"
-          patterns: "**/rpms*.tar.gz"
+          patterns: "**/${{ parameters.rpmsCacheTarballName }}"
 
       - script: |
-          rpms_archive="$(find "$(Pipeline.Workspace)" -name rpms*.tar.gz)"
+          rpms_archive="$(find "$(Pipeline.Workspace)" -name "${{ parameters.rpmsCacheTarballName }}" -print -quit)"
           if [[ ! -f "$rpms_archive" ]]; then
             echo "ERROR: RPMs cache archive not found!" >&2
             exit 1
@@ -87,14 +144,28 @@ steps:
         displayName: "Populate RPMs cache"
 
   - script: |
-      delta_fetch_arg="DELTA_FETCH=n"
-      if [[ ${{ parameters.isDeltaBuild }} =~ [Tt]rue ]]; then
+      if [[ ${{ parameters.isDeltaBuild }} == "true" ]]; then
         delta_fetch_arg="DELTA_FETCH=y"
+      elif [[ ${{ parameters.isDeltaBuild }} == "false" ]]; then
+        delta_fetch_arg="DELTA_FETCH=n"
       fi
 
-      run_check_arg="RUN_CHECK=n"
-      if [[ ${{ parameters.isCheckBuild }} =~ [Tt]rue ]]; then
+      if [[ ${{ parameters.isQuickRebuildPackages }} == "true" ]]; then
+        quick_rebuild_packages_arg="QUICK_REBUILD_PACKAGES=y"
+      elif [[ ${{ parameters.isQuickRebuildPackages }} == "false" ]]; then
+        quick_rebuild_packages_arg="QUICK_REBUILD_PACKAGES=n"
+      fi
+
+      if [[ ${{ parameters.isCheckBuild }} == "true" ]]; then
         run_check_arg="RUN_CHECK=y"
+      elif [[ ${{ parameters.isCheckBuild }} == "false" ]]; then
+        run_check_arg="RUN_CHECK=n"
+      fi
+
+      if [[ ${{ parameters.isUseCCache }} == "true" ]]; then
+        use_ccache_arg="USE_CCACHE=y"
+      elif [[ ${{ parameters.isUseCCache }} == "false" ]]; then
+        use_ccache_arg="USE_CCACHE=n"
       fi
 
       sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
@@ -103,30 +174,49 @@ steps:
         REBUILD_TOOLS=y \
         REPO_LIST="${{ parameters.extraPackageRepos }}" \
         SPECS_DIR="${{ parameters.buildRepoRoot }}/${{ parameters.specsFolderPath }}" \
+        SRPM_PACK_LIST="${{ parameters.srpmPackList }}" \
         $delta_fetch_arg \
-        $run_check_arg
+        $quick_rebuild_packages_arg \
+        $run_check_arg \
+        $use_ccache_arg
     displayName: "Build packages"
 
-  - script: |
-      sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" compress-rpms
-    displayName: "Compress RPMs"
+  - ${{ if parameters.outputArtifactsFolder }}:
+      - ${{ if parameters.rpmsTarballName }}:
+          - script: |
+              sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" compress-rpms
+            displayName: "Compress RPMs"
 
-  - script: |
-      sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" compress-srpms
-    displayName: "Compress SRPMs"
+          - bash: |
+              published_artifacts_dir="${{ parameters.outputArtifactsFolder }}/ARTIFACTS"
+              mkdir -p "$published_artifacts_dir"
+              cp "${{ parameters.buildRepoRoot }}"/out/rpms.tar.gz "$published_artifacts_dir/${{ parameters.rpmsTarballName }}"
+            displayName: "Copy RPMs for publishing"
 
-  - bash: |
-      published_artifacts_dir="${{ parameters.outputArtifactsFolder }}/ARTIFACTS"
-      mkdir -p "$published_artifacts_dir"
-      cp "${{ parameters.buildRepoRoot }}"/out/rpms.tar.gz "$published_artifacts_dir/${{ parameters.rpmsTarballName }}"
-      cp "${{ parameters.buildRepoRoot }}"/out/srpms.tar.gz "$published_artifacts_dir/${{ parameters.srpmsTarballName }}"
-    displayName: "Copy artifacts for publishing"
+      - ${{ if parameters.srpmsTarballName }}:
+          - script: |
+              sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" compress-srpms
+            displayName: "Compress SRPMs"
 
-  - bash: |
-      published_logs_dir="${{ parameters.outputArtifactsFolder }}/LOGS"
-      mkdir -p "$published_logs_dir"
-      tar -C "${{ parameters.buildRepoRoot }}/build/logs/pkggen" -czf "$published_logs_dir/pkggen.logs.tar.gz" .
-      tar -C "${{ parameters.buildRepoRoot }}/build/pkg_artifacts" -czf "$published_logs_dir/pkg_artifacts.tar.gz" .
-      tar -C "${{ parameters.buildRepoRoot }}/build/timestamp" -czf "$published_logs_dir/timestamp.tar.gz" .
-    condition: always()
-    displayName: "Copy logs for publishing"
+          - bash: |
+              published_artifacts_dir="${{ parameters.outputArtifactsFolder }}/ARTIFACTS"
+              mkdir -p "$published_artifacts_dir"
+              cp "${{ parameters.buildRepoRoot }}"/out/srpms.tar.gz "$published_artifacts_dir/${{ parameters.srpmsTarballName }}"
+            displayName: "Copy SRPMs for publishing"
+
+      - ${{ if parameters.publishLogs }}:
+          - bash: |
+              published_logs_dir="${{ parameters.outputArtifactsFolder }}/LOGS"
+              mkdir -p "$published_logs_dir"
+              tar -C "${{ parameters.buildRepoRoot }}/build/logs/pkggen" -czf "$published_logs_dir/pkggen.logs.tar.gz" .
+              tar -C "${{ parameters.buildRepoRoot }}/build/pkg_artifacts" -czf "$published_logs_dir/pkg_artifacts.tar.gz" .
+              tar -C "${{ parameters.buildRepoRoot }}/build/timestamp" -czf "$published_logs_dir/timestamp.tar.gz" .
+            condition: always()
+            displayName: "Copy logs for publishing"
+
+  - ${{ if parameters.isCheckBuild }}:
+      - template: PackageTestResultsAnalysis.yml@${{ parameters.selfRepoName }}
+        parameters:
+          buildRepoRoot: ${{ parameters.buildRepoRoot }}
+          failOnTestFailures: ${{ parameters.failOnTestFailures }}
+          outputArtifactsFolder: ${{ parameters.outputArtifactsFolder }}

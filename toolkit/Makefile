@@ -12,10 +12,7 @@ toolkit_root := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 SCRIPTS_DIR  ?= $(toolkit_root)/scripts
 
 # Build targets
-ifeq ($(origin CONFIG_FILE), undefined)
-CONFIG_FILE             = $(toolkit_root)/imageconfigs/core-efi.json
-$(warning CONFIG_FILE is undefined, defaulting to toolkit's core-efi.json.)
-endif
+CONFIG_FILE             ?= ""
 CONFIG_BASE_DIR         ?= $(dir $(CONFIG_FILE))
 PACKAGE_BUILD_LIST      ?=
 PACKAGE_REBUILD_LIST    ?=
@@ -28,41 +25,44 @@ TEST_IGNORE_LIST        ?=
 ######## SET INCREMENTAL BUILD FLAGS ########
 
 # Logic to auto configure build options for optimized builds
-# These will set the default values for: REBUILD_TOOLS, USE_CCACHE, MAX_CPU, REBUILD_TOOLCHAIN, DELTA_BUILD, INCREMENTAL_TOOLCHAIN, ALLOW_TOOLCHAIN_DOWNLOAD_FAIL, and CLEAN_TOOLCHAIN_CONTAINERS
+# These will set the default values for: REBUILD_TOOLS, MAX_CPU, REBUILD_TOOLCHAIN, DELTA_BUILD, INCREMENTAL_TOOLCHAIN, ALLOW_TOOLCHAIN_DOWNLOAD_FAIL, and CLEAN_TOOLCHAIN_CONTAINERS
 include $(SCRIPTS_DIR)/incremental_building.mk
 
 ######## SET REMAINING FLAGS ########
 
-UPDATE_TOOLCHAIN_LIST           ?= n
-REBUILD_PACKAGES                ?= y
-DOWNLOAD_SRPMS                  ?= n
-ALLOW_SRPM_DOWNLOAD_FAIL        ?= n
-RUN_CHECK                       ?= n
-USE_PREVIEW_REPO                ?= n
-DISABLE_UPSTREAM_REPOS          ?= n
-DISABLE_DEFAULT_REPOS           ?= n
-TOOLCHAIN_CONTAINER_ARCHIVE     ?=
-TOOLCHAIN_ARCHIVE               ?=
-TOOLCHAIN_SOURCES_ARCHIVE       ?=
-CACHE_DIR                       ?=
-PACKAGE_CACHE_SUMMARY           ?=
-IMAGE_CACHE_SUMMARY             ?=
-INITRD_CACHE_SUMMARY            ?=
-PACKAGE_ARCHIVE                 ?=
-PACKAGE_BUILD_RETRIES           ?= 1
-CHECK_BUILD_RETRIES             ?= 1
-REFRESH_WORKER_CHROOT           ?= y
+UPDATE_TOOLCHAIN_LIST                ?= n
+REBUILD_PACKAGES                     ?= y
+DOWNLOAD_SRPMS                       ?= n
+ALLOW_SRPM_DOWNLOAD_FAIL             ?= n
+RUN_CHECK                            ?= n
+USE_PREVIEW_REPO                     ?= n
+DISABLE_UPSTREAM_REPOS               ?= n
+DISABLE_DEFAULT_REPOS                ?= n
+TOOLCHAIN_CONTAINER_ARCHIVE          ?=
+TOOLCHAIN_ARCHIVE                    ?=
+TOOLCHAIN_SOURCES_ARCHIVE            ?=
+CACHE_DIR                            ?=
+PACKAGE_CACHE_SUMMARY                ?=
+IMAGE_CACHE_SUMMARY                  ?=
+INITRD_CACHE_SUMMARY                 ?=
+PACKAGE_ARCHIVE                      ?=
+PACKAGE_BUILD_RETRIES                ?= 1
+CHECK_BUILD_RETRIES                  ?= 1
+REFRESH_WORKER_CHROOT                ?= y
 # Set to 0 to use the number of logical CPUs.
-CONCURRENT_PACKAGE_BUILDS       ?= 0
+CONCURRENT_PACKAGE_BUILDS            ?= 0
 # Set to 0 to print all available results.
-NUM_OF_ANALYTICS_RESULTS        ?= 10
-CLEANUP_PACKAGE_BUILDS          ?= y
-USE_PACKAGE_BUILD_CACHE         ?= y
-REBUILD_DEP_CHAINS              ?= y
-HYDRATED_BUILD                  ?= n
-TARGET_ARCH                     ?=
-ALLOW_TOOLCHAIN_REBUILDS        ?= n
-CACHED_PACKAGES_ARCHIVE         ?=
+NUM_OF_ANALYTICS_RESULTS             ?= 10
+CLEANUP_PACKAGE_BUILDS               ?= y
+USE_PACKAGE_BUILD_CACHE              ?= y
+REBUILD_DEP_CHAINS                   ?= y
+HYDRATED_BUILD                       ?= n
+TARGET_ARCH                          ?=
+ALLOW_TOOLCHAIN_REBUILDS             ?= n
+RESOLVE_CYCLES_FROM_UPSTREAM         ?= n
+IGNORE_VERSION_TO_RESOLVE_SELFDEP    ?= n
+CACHED_PACKAGES_ARCHIVE              ?=
+USE_CCACHE                           ?= n
 
 # Tracing & Profiling support: https://go.dev/doc/diagnostics
 ENABLE_CPU_PROFILE              ?= n

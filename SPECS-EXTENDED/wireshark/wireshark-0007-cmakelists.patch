@@ -1,20 +1,20 @@
 diff --git a/wsutil/CMakeLists.txt b/wsutil/CMakeLists.txt
-index 0367cd1..6382a2c 100644
+index a55086c..0149801 100644
 --- a/wsutil/CMakeLists.txt
 +++ b/wsutil/CMakeLists.txt
-@@ -69,6 +69,7 @@ set(WSUTIL_PUBLIC_HEADERS
- 	ws_mempbrk_int.h
- 	ws_pipe.h
- 	ws_printf.h
+@@ -80,6 +80,7 @@ set(WSUTIL_PUBLIC_HEADERS
+ 	ws_roundup.h
+ 	ws_return.h
+ 	wsgcrypt.h
 +	wstmpdir.h
  	wsjson.h
+ 	wslog.h
  	xtea.h
- )
-@@ -118,6 +118,7 @@ set(WSUTIL_COMMON_FILES
- 	unicode-utils.c
+@@ -135,6 +136,7 @@ set(WSUTIL_COMMON_FILES
  	ws_mempbrk.c
  	ws_pipe.c
-+	wstmpdir.c
  	wsgcrypt.c
++	wstmpdir.c
  	wsjson.c
+ 	wslog.c
  	xtea.c

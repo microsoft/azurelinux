@@ -1,0 +1,81 @@
+diff -up hdf-4.2.10/hdf/src/hconv.h.arm hdf-4.2.10/hdf/src/hconv.h
+--- hdf-4.2.10/hdf/src/hconv.h.arm	2014-02-14 09:28:56.692514796 -0700
++++ hdf-4.2.10/hdf/src/hconv.h	2014-02-14 09:30:03.882212944 -0700
+@@ -59,7 +59,7 @@
+ /* CONSTANT DEFINITIONS                                                      */
+ /*****************************************************************************/
+ /* Generally Big-Endian machines */
+-#if !defined(INTEL86) && !defined(MIPSEL) && !defined(DEC_ALPHA) && !defined(I860) && !defined(SUN386) && !(defined(__ia64) && !(defined(hpux) || defined(__hpux))) && !defined(__x86_64__)
++#if !defined(INTEL86) && !defined(MIPSEL) && !defined(DEC_ALPHA) && !defined(I860) && !defined(SUN386) && !(defined(__ia64) && !(defined(hpux) || defined(__hpux))) && !defined(__x86_64__) && !defined(__arm__)
+ #       define UI8_IN     DFKnb1b   /* Unsigned Integer, 8 bits */
+ #       define UI8_OUT    DFKnb1b
+ #       define SI16_IN    DFKnb2b   /* S = Signed */
+diff -up hdf-4.2.10/hdf/src/hdfi.h.arm hdf-4.2.10/hdf/src/hdfi.h
+--- hdf-4.2.10/hdf/src/hdfi.h.arm	2014-02-14 09:28:56.685514824 -0700
++++ hdf-4.2.10/hdf/src/hdfi.h	2014-02-14 09:28:56.693514792 -0700
+@@ -78,6 +78,7 @@
+ #define     DFMT_LINUXPPC       0x1111
+ #define     DFMT_LINUXSPARC     0x1111
+ #define     DFMT_LINUX390       0x1111
++#define     DFMT_LINUXARM       0x4441
+ 
+ /* I/O library constants */
+ #define UNIXUNBUFIO 1
+@@ -1187,6 +1188,57 @@ typedef int               hdf_pint_t;
+ 
+ #endif /* Linux s390/s390x */
+ 
++/* Linux ARM */
++#if defined __arm__
++
++#ifdef GOT_MACHINE
++If you get an error on this line more than one machine type has been defined.
++Please check your Makefile.
++#endif
++#define GOT_MACHINE
++
++#include <sys/file.h>               /* for unbuffered i/o stuff */
++#include <sys/stat.h>
++#define DF_MT             DFMT_LINUXARM
++typedef void              VOID;
++typedef void              *VOIDP;
++typedef char              *_fcd;
++typedef char              char8;
++typedef unsigned char     uchar8;
++typedef char              int8;
++typedef unsigned char     uint8;
++typedef short int         int16;
++typedef unsigned short int uint16;
++typedef long int          int32;
++typedef unsigned long int uint32;
++typedef int               intn;
++typedef unsigned int      uintn;
++typedef int               intf;     /* size of INTEGERs in Fortran compiler */
++typedef float             float32;
++typedef double            float64;
++typedef int               hdf_pint_t;   /* an integer the same size as a pointer */
++#define FNAME_POST_UNDERSCORE
++#define _fcdtocp(desc) (desc)
++#ifdef  HAVE_FMPOOL
++#define FILELIB PAGEBUFIO  /* enable page buffering */
++#else
++#define FILELIB UNIXBUFIO
++#endif
++
++/* JPEG #define's - Look in the JPEG docs before changing - (Q) */
++
++/* Determine the memory manager we are going to use. Valid values are: */
++/*  MEM_DOS, MEM_ANSI, MEM_NAME, MEM_NOBS.  See the JPEG docs for details on */
++/*  what each does */
++#define JMEMSYS         MEM_ANSI
++
++#ifdef __GNUC__
++#define HAVE_STDC
++#define INCLUDES_ARE_ANSI
++#endif
++
++#endif /* Linux ARM */
++
+ /*-----------------------------------------------------*/
+ /* 64-bit Free BSD */
+ 

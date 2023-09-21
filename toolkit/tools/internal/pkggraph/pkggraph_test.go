@@ -400,7 +400,7 @@ func TestAddMultipleNodes(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, len(runNodes)+len(buildNodes), len(g.AllNodes()))
-	assert.Equal(t, len(runNodes), len(g.AllRunNodes()))
+	assert.Equal(t, len(runNodes), len(g.AllPreferredRunNodes()))
 	assert.Equal(t, len(buildNodes), len(g.AllBuildNodes()))
 }
 

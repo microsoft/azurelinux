@@ -8,11 +8,11 @@ name: Kernel Required Configs Check
 
 on:
   push:
-    branches: [main, 1.0*, 2.0*]
+    branches: [main, 1.0*, 2.0*, fasttrack/*]
     paths:
       - 'SPECS/kernel*/config*'
   pull_request:
-    branches: [main, 1.0*, 2.0*]
+    branches: [main, 1.0*, 2.0*, fasttrack/*]
     paths:
       - 'SPECS/kernel*/config*'
 
@@ -24,7 +24,7 @@ jobs:
     steps:
       # Checkout the branch of our repo that triggered this action
       - name: Workflow trigger checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         
       - name: Get base commit for PRs
         if: ${{ github.event_name == 'pull_request' }}

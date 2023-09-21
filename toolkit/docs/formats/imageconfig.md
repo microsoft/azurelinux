@@ -396,6 +396,9 @@ KernelCommandLine is an optional key which allows additional parameters to be pa
 #### ImaPolicy
 ImaPolicy is a list of Integrity Measurement Architecture (IMA) policies to enable, they may be any combination of `tcb`, `appraise_tcb`, `secure_boot`.
 
+#### EnableFIPS
+EnableFIPS is a optional boolean option that controls whether the image tools create the image with FIPS mode enabled or not. If EnableFIPS is specificed, only valid values are `true` and `false`.
+
 #### ExtraCommandLine
 ExtraCommandLine is a string which will be appended to the end of the kernel command line and may contain any additional parameters desired. The `` ` `` character is reserved and may not be used. **Note: Some kernel command line parameters are already configured by default in [grub.cfg](../../resources/assets/grub2/grub.cfg). Many command line options may be overwritten by passing a new value. If a specific argument must be removed from the existing grub template a `FinalizeImageScript` is currently required.
 

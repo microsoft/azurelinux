@@ -7,9 +7,9 @@ name: Spec License Map Check
 
 on:
   push:
-    branches: [main, dev, 1.0*, 2.0*]
+    branches: [main, dev, 1.0*, 2.0*, fasttrack/*]
   pull_request:
-    branches: [main, dev, 1.0*, 2.0*]
+    branches: [main, dev, 1.0*, 2.0*, fasttrack/*]
 
 jobs:
   check:
@@ -19,7 +19,7 @@ jobs:
     steps:
       # Checkout the branch of our repo that triggered this action
       - name: Workflow trigger checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Python 3.9
         uses: actions/setup-python@v4
