@@ -1,4 +1,6 @@
 %global _default_patch_fuzz 2
+# Is elliptic curve cryptography supported?
+%global HAVE_EC_CRYPTO 1
 
 Summary:        High-performance and highly configurable free RADIUS server
 Name:           freeradius
@@ -10,6 +12,7 @@ Distribution:   Mariner
 URL:            https://freeradius.org/
 
 %global dist_base freeradius-server-%{version}
+%global docdir %{?_pkgdocdir}%{!?_pkgdocdir:%{_docdir}/%{name}-%{version}}
 Source0:        ftp://ftp.freeradius.org/pub/radius/%{dist_base}.tar.bz2
 Source100:      radiusd.service
 Source102:      freeradius-logrotate
@@ -22,9 +25,6 @@ Patch3:         freeradius-bootstrap-create-only.patch
 Patch4:         freeradius-no-buildtime-cert-gen.patch
 Patch5:         freeradius-bootstrap-make-permissions.patch
 Patch6:         fix-error-for-expansion-of-macro-in-thread.h.patch
-# Is elliptic curve cryptography supported?
-%global HAVE_EC_CRYPTO 1
-%global docdir %{?_pkgdocdir}%{!?_pkgdocdir:%{_docdir}/%{name}-%{version}}
 BuildRequires:  autoconf
 BuildRequires:  gcc
 BuildRequires:  gdbm-devel
@@ -50,10 +50,6 @@ Requires(post): systemd-units
 Requires(post): make
 Requires(preun): systemd-units
 Requires(postun): systemd-units
-%if ! 0%{?rhel}
-BuildRequires:  libyubikey-devel
-BuildRequires:  ykclient-devel
-%endif
 
 %description
 The FreeRADIUS Server Project is a high performance and highly configurable
