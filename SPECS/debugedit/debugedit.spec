@@ -22,7 +22,7 @@ Source0:      https://sourceware.org/ftp/%{name}/%{version}/%{name}-%{version}.t
 %make_install
 
 %check
-%make build_check
+make check-local
 
 %files
 %defattr(-,root,root)
