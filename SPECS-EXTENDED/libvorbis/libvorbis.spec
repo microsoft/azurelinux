@@ -80,6 +80,7 @@ make check
 * Wed Sep 06 2023 Archana Choudhary <archana1@microsoft.com> - 1.3.7-1
 - Upgrade to 1.3.7 - CVE-2018-10392 CVE-2018-10393
 - Remove patch libvorbis-1.3.6-git.patch
+- License verified
 
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 1.3.6-8
 - Remove epoch
