@@ -7,6 +7,8 @@ package ccachemanager
 
 import (
 	"context"
+	"errors"
+	"path/filepath"
 	"io/ioutil"
 	"os"
 	"time"
@@ -332,14 +334,75 @@ func ArchiveCCache(ccacheDir string, ccacheDirTarsOut string, ccacheGroupName st
 		}
 	}
 
-	// Do no clean it because it might be used by other packages in the same
-	// ccache group...
-	//
-	// logger.Log.Infof("Cleaning ccache working folder (%s).", ccacheDir)
-	// err = os.RemoveAll(ccacheDir)
-	// if err != nil {
-	// 	logger.Log.Warnf("Unable rermove ccache working directory. Error: %v", err)
-	// }
+	return nil
+}
 
+func getChildFolders(parentFolder string) ([]string, error) {
+	childFolders := []string{}
+
+	dir, err := os.Open(parentFolder)
+	if err != nil {
+		logger.Log.Infof("  error opening parent folder. Error: (%v)", err)
+		return nil, err
+	}
+	defer dir.Close()
+
+	children, err := dir.Readdirnames(-1)
+	if err != nil {
+		logger.Log.Infof("  error enumerating children. Error: (%v)", err)
+		return nil, err
+	}
+
+	for _, child := range children {
+		childPath := filepath.Join(parentFolder, child)
+
+		info, err := os.Stat(childPath)
+		if err != nil {
+			logger.Log.Infof("  error retrieving child attributes. Error: (%v)", err)
+			continue
+		}
+
+		if info.IsDir() {
+			childFolders = append(childFolders, child)
+		}
+	}
+
+	return childFolders, nil
+}
+
+func ArchiveCCacheAll(ccacheRootDir string) (err error) {
+	ccacheDirTarsOut := ccacheRootDir + "-tars-out"
+	architectures, err := getChildFolders(ccacheRootDir)
+	errorsOccured := false
+	if err != nil {
+		logger.Log.Warnf("failed to enumerate child folders under (%s)...", ccacheRootDir)
+		errorsOccured = true
+	} else {
+		for _, architecture := range architectures {
+			logger.Log.Infof("  found ccache architecture (%s)...", architecture)
+			groupNames, err := getChildFolders(filepath.Join(ccacheRootDir, architecture))
+			if err != nil {
+				logger.Log.Warnf("failed to enumerate child folders under (%s)...", ccacheRootDir)
+				errorsOccured = true
+			} else {
+				for _, groupName := range groupNames {
+					logger.Log.Infof("  found group (%s)...", groupName)
+
+					groupCCacheDir := GetCCacheFolder(ccacheRootDir, architecture, groupName)
+					logger.Log.Infof("  processing ccache folder (%s)...", groupCCacheDir)
+
+					err = ArchiveCCache(groupCCacheDir, ccacheDirTarsOut, groupName, architecture)
+					if err != nil {
+						errorsOccured = true
+						logger.Log.Warnf("CCache will not be archived for (%s) (%s)...", architecture, groupName)
+					}
+				}
+			}
+		}
+	}
+
+	if errorsOccured {
+		return errors.New("CCache archiving and upload failed. See above warning for more details.")
+	}
 	return nil
 }

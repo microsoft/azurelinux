@@ -168,19 +168,15 @@ func main() {
 		LogLevel: *logLevel,
 	}
 
-	logger.Log.Infof("  george schedules 1")
-
 	agent, err := buildagents.BuildAgentFactory(*buildAgent)
 	if err != nil {
 		logger.Log.Fatalf("Unable to select build agent, error: %s.", err)
 	}
-	logger.Log.Infof("  george schedules 2")
 
 	err = agent.Initialize(buildAgentConfig)
 	if err != nil {
 		logger.Log.Fatalf("Unable to initialize build agent, error: %s.", err)
 	}
-	logger.Log.Infof("  george schedules 3")
 
 	// Setup cleanup routines to ensure no builds are left running when scheduler is exiting.
 	// Ensure no outstanding agents are running on graceful exit
@@ -194,69 +190,14 @@ func main() {
 	if err != nil {
 		logger.Log.Fatalf("Unable to build package graph.\nFor details see the build summary section above.\nError: %s.", err)
 	}
-	logger.Log.Infof("  george schedules 4")
 
 	if *useCcache {
 		logger.Log.Infof("  ccache is enabled. processing created artifacts under (%s)...", *ccacheDir)
-		ccacheDirTarsOut := *ccacheDir + "-tars-out"
-		architectures, err := getChildFolders(*ccacheDir)
+		err = ccachemanager.ArchiveCCacheAll(*ccacheDir)
 		if err != nil {
-			logger.Log.Warnf("failed to enumerate child folders under (%s)...", *ccacheDir)
-		} else {
-			for _, architecture := range architectures {
-				logger.Log.Infof("  found ccache architecture (%s)...", architecture)
-				groupNames, err := getChildFolders(filepath.Join(*ccacheDir, architecture))
-				if err != nil {
-					logger.Log.Warnf("failed to enumerate child folders under (%s)...", *ccacheDir)
-				} else {
-					for _, groupName := range groupNames {
-						logger.Log.Infof("  found group (%s)...", groupName)
-
-						groupCCacheDir := ccachemanager.GetCCacheFolder(*ccacheDir, architecture, groupName)
-						logger.Log.Infof("  processing ccache folder (%s)...", groupCCacheDir)
-
-						err = ccachemanager.ArchiveCCache(groupCCacheDir, ccacheDirTarsOut, groupName, architecture)
-						if err != nil {
-							logger.Log.Warnf("ccache will not be archived for (%s) (%s)...", architecture, groupName)
-						}
-					}
-				}
-			}
+			logger.Log.Warnf("Failed to archive CCache artifacts.\nError: %s.", err)
 		}
 	}
-}
-
-func getChildFolders(parentFolder string) ([]string, error) {
-	childFolders := []string{}
-
-	dir, err := os.Open(parentFolder)
-	if err != nil {
-		logger.Log.Infof("  error opening parent folder. Error: (%v)", err)
-		return nil, err
-	}
-	defer dir.Close()
-
-	children, err := dir.Readdirnames(-1)
-	if err != nil {
-		logger.Log.Infof("  error enumerating children. Error: (%v)", err)
-		return nil, err
-	}
-
-	for _, child := range children {
-		childPath := filepath.Join(parentFolder, child)
-
-		info, err := os.Stat(childPath)
-		if err != nil {
-			logger.Log.Infof("  error retrieving child attributes. Error: (%v)", err)
-			continue
-		}
-
-		if info.IsDir() {
-			childFolders = append(childFolders, child)
-		}
-	}
-
-	return childFolders, nil
 }
 
 // cancelOutstandingBuilds stops any builds that are currently running.
