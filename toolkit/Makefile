@@ -12,7 +12,7 @@ toolkit_root := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 SCRIPTS_DIR  ?= $(toolkit_root)/scripts
 
 # Build targets
-CONFIG_FILE             ?= ""
+CONFIG_FILE             ?=
 CONFIG_BASE_DIR         ?= $(dir $(CONFIG_FILE))
 PACKAGE_BUILD_LIST      ?=
 PACKAGE_REBUILD_LIST    ?=
