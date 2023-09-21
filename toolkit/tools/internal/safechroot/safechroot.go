@@ -83,8 +83,8 @@ var defaultChrootEnv = []string{
 }
 
 const (
-	doLazyUnmount   = true
-	doNormalUnmount = !doLazyUnmount
+	unmountTypeLazy   = true
+	unmountTypeNormal = !unmountTypeLazy
 )
 
 // init will always be called if this package is loaded
@@ -201,7 +201,7 @@ func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMoun
 			if buildpipeline.IsRegularBuild() {
 				// mount/unmount is only supported in regular pipeline
 				// Best effort cleanup in case mountpoint creation failed mid-way through. We will not try again so treat as final attempt.
-				cleanupErr := c.unmountAndRemove(leaveChrootOnDisk, doLazyUnmount)
+				cleanupErr := c.unmountAndRemove(leaveChrootOnDisk, unmountTypeLazy)
 				if cleanupErr != nil {
 					logger.Log.Warnf("Failed to cleanup chroot (%s) during failed initialization. Error: %s", c.rootDir, cleanupErr)
 				}
@@ -376,10 +376,10 @@ func (c *Chroot) Close(leaveOnDisk bool) (err error) {
 
 	if buildpipeline.IsRegularBuild() {
 		// mount is only supported in regular pipeline
-		err = c.unmountAndRemove(leaveOnDisk, doNormalUnmount)
+		err = c.unmountAndRemove(leaveOnDisk, unmountTypeNormal)
 		if err != nil {
 			logger.Log.Warnf("Chroot cleanup failed, will retry with lazy unmount. Error: %s", err)
-			err = c.unmountAndRemove(leaveOnDisk, doLazyUnmount)
+			err = c.unmountAndRemove(leaveOnDisk, unmountTypeLazy)
 		}
 		if err == nil {
 			const emptyLen = 0
@@ -457,7 +457,7 @@ func cleanupAllChroots() {
 		logger.Log.Info("Cleaning up all active chroots")
 		for i := len(activeChroots) - 1; i >= 0; i-- {
 			logger.Log.Infof("Cleaning up chroot (%s)", activeChroots[i].rootDir)
-			err := activeChroots[i].unmountAndRemove(leaveChrootOnDisk, doLazyUnmount)
+			err := activeChroots[i].unmountAndRemove(leaveChrootOnDisk, unmountTypeLazy)
 			// Perform best effort cleanup: unmount as many chroots as possible,
 			// even if one fails.
 			if err != nil {
