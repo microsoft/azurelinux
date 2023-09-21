@@ -1,7 +1,7 @@
 Summary:      Debugedit - obtain debug information from binaries.
 Name:         debugedit
 Version:      5.0
-Release:      2%{?dist}
+Release:      3%{?dist}
 License:      GPLv3+
 URL:          https://sourceware.org/debugedit/
 Vendor:       Microsoft Corporation
@@ -22,7 +22,7 @@ Source0:      https://sourceware.org/ftp/%{name}/%{version}/%{name}-%{version}.t
 %make_install
 
 %check
-%make_build_check
+%make build_check
 
 %files
 %defattr(-,root,root)
@@ -31,6 +31,9 @@ Source0:      https://sourceware.org/ftp/%{name}/%{version}/%{name}-%{version}.t
 %{_mandir}/*/*
 
 %changelog
+* Thu Sep 21 2023 Osama Esmail <osamaesmail@microsoft.com> - 5.0-3
+- Replace make_build_check with make build_check
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.0-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
