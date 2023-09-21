@@ -13,7 +13,7 @@ SCRIPTS_DIR  ?= $(toolkit_root)/scripts
 
 # Build targets
 ##help:var:CONFIG_FILE:<config_path>=Path to image configuration file to use. Will add package dependencies and define final image generated.
-CONFIG_FILE             ?= ""
+CONFIG_FILE             ?=
 CONFIG_BASE_DIR         ?= $(dir $(CONFIG_FILE))
 PACKAGE_BUILD_LIST      ?=
 ##help:var:PACKAGE_REBUILD_LIST:<spec_list>=List of space-separated spec folders to force rebuild. Must not overlap with "PACKAGE_IGNORE_LIST". Example: PACKAGE_REBUILD_LIST="kernel go which".
