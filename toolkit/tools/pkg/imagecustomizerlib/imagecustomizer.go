@@ -179,7 +179,7 @@ func findPartitions(buildDir string, diskDevice string) ([]string, []*safechroot
 	// Look for the boot partition (i.e. EFI system partition).
 	var efiSystemPartition *diskutils.PartitionInfo
 	for _, diskPartition := range diskPartitions {
-		if diskPartition.PartitionTypeUuid == "c12a7328-f81f-11d2-ba4b-00a0c93ec93b" {
+		if diskPartition.PartitionTypeUuid == diskutils.EfiSystemPartitionUuid {
 			efiSystemPartition = &diskPartition
 			break
 		}
