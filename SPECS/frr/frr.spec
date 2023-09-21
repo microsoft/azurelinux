@@ -25,8 +25,6 @@ BuildRequires:  flex
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  groff
-BuildRequires:  grpc-devel
-BuildRequires:  grpc-plugins
 BuildRequires:  json-c-devel
 BuildRequires:  libcap-devel
 BuildRequires:  libtool
@@ -97,7 +95,7 @@ autoreconf -ivf
     --with-moduledir=%{_libdir}/frr/modules \
     --with-crypto=openssl \
     --enable-fpm \
-    --enable-grpc
+    --disable-grpc
 
 %make_build MAKEINFO="makeinfo --no-split" PYTHON=python3
 
@@ -166,7 +164,7 @@ fi
 %check
 %{python3} -m pip install atomicwrites attrs docutils pluggy pygments six more-itertools
 #this should be temporary, the grpc test is just badly designed
-rm tests/lib/*grpc*
+rm -f tests/lib/*grpc*
 %make_build check PYTHON=python3
 
 %files
@@ -199,7 +197,7 @@ rm tests/lib/*grpc*
 
 %changelog
 * Wed Sep 20 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.5.1-3
-- Release bump to build with updated 'grpc'.
+- Disabling 'grpc' after updating it to a newer version.
 
 * Mon May 22 2023 Suresh Thelkar <sthelkar@microsoft.com> - 8.5.1-2
 - Fix for CVE-2023-31490
