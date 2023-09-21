@@ -1,0 +1,74 @@
+From 2d55e5672b07a8a102024e0af66e821bba51213b Mon Sep 17 00:00:00 2001
+From: Gerald Combs <gerald@wireshark.org>
+Date: Sun, 27 Aug 2023 14:47:52 -0700
+Subject: [PATCH] Qt: Fix ManageInterfacesDialog cleanup
+
+Handle our ManageInterfacesDialog cleanup tasks inside our destructor.
+If we try to handle them in on_buttonBox_accepted we run into a race
+condition with WA_DeleteOnClose.
+
+Fixes #19287
+---
+ ui/qt/manage_interfaces_dialog.cpp | 25 ++++++++++++-------------
+ ui/qt/manage_interfaces_dialog.h   |  2 --
+ 2 files changed, 12 insertions(+), 15 deletions(-)
+
+diff --git a/ui/qt/manage_interfaces_dialog.cpp b/ui/qt/manage_interfaces_dialog.cpp
+index cb9da8697b5..a8529e265a9 100644
+--- a/ui/qt/manage_interfaces_dialog.cpp
++++ b/ui/qt/manage_interfaces_dialog.cpp
+@@ -209,6 +209,18 @@ ManageInterfacesDialog::ManageInterfacesDialog(QWidget *parent) :
+ 
+ ManageInterfacesDialog::~ManageInterfacesDialog()
+ {
++    if (result() == QDialog::Accepted) {
++#ifdef HAVE_LIBPCAP
++        sourceModel->save();
++#endif
++#ifdef HAVE_PCAP_REMOTE
++        remoteAccepted();
++#endif
++        prefs_main_write();
++        mainApp->refreshLocalInterfaces();
++        emit ifsChanged();
++    }
++
+     delete ui;
+ }
+ 
+@@ -252,19 +264,6 @@ void ManageInterfacesDialog::updateWidgets()
+     ui->hintLabel->setText(hint);
+ }
+ 
+-void ManageInterfacesDialog::on_buttonBox_accepted()
+-{
+-#ifdef HAVE_LIBPCAP
+-    sourceModel->save();
+-#endif
+-#ifdef HAVE_PCAP_REMOTE
+-    remoteAccepted();
+-#endif
+-    prefs_main_write();
+-    mainApp->refreshLocalInterfaces();
+-    emit ifsChanged();
+-}
+-
+ #ifdef HAVE_LIBPCAP
+ void ManageInterfacesDialog::on_addPipe_clicked()
+ {
+diff --git a/ui/qt/manage_interfaces_dialog.h b/ui/qt/manage_interfaces_dialog.h
+index 80b78afbe7a..79e9d0d9bfa 100644
+--- a/ui/qt/manage_interfaces_dialog.h
++++ b/ui/qt/manage_interfaces_dialog.h
+@@ -59,8 +59,6 @@ signals:
+ private slots:
+     void updateWidgets();
+ 
+-    void on_buttonBox_accepted();
+-
+ #ifdef HAVE_LIBPCAP
+     void on_addPipe_clicked();
+     void on_delPipe_clicked();
+-- 
+GitLab
+

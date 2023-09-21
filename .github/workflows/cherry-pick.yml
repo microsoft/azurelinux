@@ -92,7 +92,7 @@ jobs:
     name: Cherry pick
     steps:
       - name: Workflow trigger checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.base_ref }}
           fetch-depth: 0

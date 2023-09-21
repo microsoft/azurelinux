@@ -1,7 +1,7 @@
 Summary:        Bluetooth utilities
 Name:           bluez
 Version:        5.63
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -271,6 +271,9 @@ install emulator/btvirt %{buildroot}/%{_libexecdir}/bluetooth/
 %{_userunitdir}/obex.service
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.63-3
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Jul 13 2022 Dallas Delaney <dadelan@microsoft.com> - 5.63-2
 - Promote to Mariner base repo
 - Lint spec

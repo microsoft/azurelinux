@@ -1,7 +1,7 @@
 Summary:        Irqbalance daemon
 Name:           irqbalance
 Version:        1.8.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 URL:            https://github.com/Irqbalance/irqbalance
 Group:          System Environment/Services
@@ -57,6 +57,9 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_datadir}/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.8.0-3
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Fri Jun 17 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.8.0-2
 - Add upstream patch to fix -Werror=format-security errors after ncurses 6.3 upgrade
 

@@ -1,7 +1,7 @@
 Summary:        The OpenSource IPsec-based VPN Solution
 Name:           strongswan
 Version:        5.9.10
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -51,6 +51,9 @@ make check
 %{_datadir}/strongswan/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.9.10-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Apr 26 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.9.10-1
 - Auto-upgrade to 5.9.10 - Fix: Upgrade strongswan to fix CVE-2023-26463
 

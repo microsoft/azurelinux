@@ -1,7 +1,7 @@
 Summary:        Utilities for managing filesystem extended attributes
 Name:           attr
 Version:        2.5.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -109,6 +109,9 @@ ln -fs ../sys/xattr.h %{buildroot}%{_includedir}/attr/xattr.h
 %config(noreplace) %{_sysconfdir}/xattr.conf
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.5.1-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Nov 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.5.1-1
 - Updating to version 2.5.1.
 - License verified.

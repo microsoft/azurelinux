@@ -10,7 +10,7 @@
 Summary:        Linux Test Project
 Name:           ltp
 Version:        20230127
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL-2.0-only
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -92,6 +92,9 @@ rm -rf %{ltp_prefix}/{output,results,testcases/bin/[0-9]*}
 %{_mandir}/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 20230127-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Feb 08 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 20230127-1
 - Updating to version 20230127.
 - Fixed project URL.

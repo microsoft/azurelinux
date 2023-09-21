@@ -1,7 +1,7 @@
 Summary:        NFS client utils
 Name:           nfs-utils
 Version:        2.5.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT and GPLv2 and GPLv2+ and BSD
 URL:            https://linux-nfs.org/
 Group:          Applications/Nfs-utils-client
@@ -167,6 +167,9 @@ fi
 %{_libdir}/libnfsidmap.so
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.5.4-3
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Tue Nov 30 2021 Thomas Crain <thcrain@microsoft.com> - 2.5.4-2
 - Remove python shebang line fixes (fixed upstream)
 

@@ -52,7 +52,7 @@
 Summary:        Mesa graphics libraries
 Name:           mesa
 Version:        21.0.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -588,6 +588,9 @@ popd
 %endif
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 21.0.0-4
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Oct 27 2021 Muhammad Falak <mwani@microsft.com> - 21.0.0-3
 - Remove epoch
 

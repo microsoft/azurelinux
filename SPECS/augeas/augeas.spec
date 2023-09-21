@@ -1,7 +1,7 @@
 Summary:        A library for changing configuration files
 Name:           augeas
 Version:        1.12.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -106,6 +106,9 @@ rm -f %{buildroot}%{_bindir}/dump
 %{_libdir}/pkgconfig/augeas.pc
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.12.0-5
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Mon Jul 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.12.0-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Removed the 'augeas-static' subpackage.

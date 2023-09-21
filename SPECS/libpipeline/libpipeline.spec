@@ -1,7 +1,7 @@
 Summary:        Library for manipulating pipelines
 Name:           libpipeline
 Version:        1.5.5
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -54,6 +54,9 @@ make -C tests check
 %{_mandir}/man3/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.5.5-3
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 1.5.5-2
 - Remove manual pkgconfig(*) provides in toolchain specs
 

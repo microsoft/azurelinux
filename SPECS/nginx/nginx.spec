@@ -7,7 +7,7 @@ Name:           nginx
 # Currently on "stable" version of nginx from https://nginx.org/en/download.html.
 # Note: Stable versions are even (1.20), mainline versions are odd (1.21)
 Version:        1.22.1
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -144,6 +144,9 @@ exit 0
 %{_sysconfdir}/%{name}/modules/otel_ngx_module.so
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.22.1-10
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Thu Aug 17 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 1.22.1-9
 - Add otel_ngx_module subpackage
 

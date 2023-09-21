@@ -3,13 +3,14 @@
 Summary:        Contains the GNU compiler collection
 Name:           gcc
 Version:        11.2.0
-Release:        4%{?dist}
+Release:        6%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://gcc.gnu.org/
 Source0:        https://ftp.gnu.org/gnu/gcc/%{name}-%{version}/%{name}-%{version}.tar.xz
+Patch0:         CVE-2023-4039.patch
 Requires:       gcc-c++ = %{version}-%{release}
 Requires:       gmp
 Requires:       libgcc-atomic = %{version}-%{release}
@@ -136,7 +137,7 @@ An implementation of OpenMP for the C, C++, and Fortran 95 compilers in the GNU 
 This package contains development headers and static library for libgomp
 
 %prep
-%setup -q
+%autosetup -p1
 # disable no-pie for gcc binaries
 sed -i '/^NO_PIE_CFLAGS = /s/@NO_PIE_CFLAGS@//' gcc/Makefile.in
 
@@ -286,6 +287,12 @@ make %{?_smp_mflags} check-gcc
 %{_lib64dir}/libgomp.spec
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 11.2.0-6
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
+* Wed Sep 13 2023 Andrew Phelps <anphel@microsoft.com> - 11.2.0-5
+- Add CVE-2023-4039.patch
+
 * Fri Dec 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 11.2.0-4
 - Removing libbacktrace.a from the default package.
 

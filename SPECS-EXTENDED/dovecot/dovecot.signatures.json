@@ -1,7 +1,7 @@
 {
  "Signatures": {
-  "dovecot-2.3-pigeonhole-0.5.13.tar.gz": "911fe566da5b638eab1b11105314300bc9049cc3832d4bd2aed44c265013bf17",
-  "dovecot-2.3.13.tar.gz": "a3f875b80ec11a452480690108660030978c94fa8e796ad6d943a874b496f1c4",
+  "dovecot-2.3-pigeonhole-0.5.20.tar.gz": "ae32bd4870ea2c1328ae09ba206e9ec12128046d6afca52fbbc9ef7f75617c98",
+  "dovecot-2.3.20.tar.gz": "caa832eb968148abdf35ee9d0f534b779fa732c0ce4a913d9ab8c3469b218552",
   "dovecot.conf.5": "ba515faa75acd6c190fadd8b61dd7eed2a732edd204bc29f739a7fab6670bff1",
   "dovecot.init": "7c27ffed83a672343d91ca7e485ba5001a1e4ced37be72bafcd3efcff665870d",
   "dovecot.pam": "b5403e70f7e9198bf373cd4ed00f3398a8690da311c0dd8265a35f6896ce5515",
