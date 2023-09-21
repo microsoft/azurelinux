@@ -229,24 +229,31 @@ func main() {
 func getChildFolders(parentFolder string) ([]string, error) {
 	childFolders := []string{}
 
-	visit := func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			logger.Log.Infof("  error enumerating child folders. Error: (%v)", err)
-			return err
-		}
+	dir, err := os.Open(parentFolder)
+	if err != nil {
+		logger.Log.Infof("  error opening parent folder. Error: (%v)", err)
+		return nil, err
+	}
+	defer dir.Close()
 
-		if info.IsDir() && path != parentFolder {
-			relativePath, _ := filepath.Rel(parentFolder, path)
-			childFolders = append(childFolders, relativePath)
-		}
-
-		return nil
+	children, err := dir.Readdirnames(-1)
+	if err != nil {
+		logger.Log.Infof("  error enumerating children. Error: (%v)", err)
+		return nil, err
 	}
 
-	err := filepath.Walk(parentFolder, visit)
-	if err != nil {
-		logger.Log.Infof("  error enumerating child folders. Error: (%v)", err)
-		return nil, err
+	for _, child := range children {
+		childPath := filepath.Join(parentFolder, child)
+
+		info, err := os.Stat(childPath)
+		if err != nil {
+			logger.Log.Infof("  error retrieving child attributes. Error: (%v)", err)
+			continue
+		}
+
+		if info.IsDir() {
+			childFolders = append(childFolders, child)
+		}
 	}
 
 	return childFolders, nil
