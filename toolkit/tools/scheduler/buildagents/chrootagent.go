@@ -91,7 +91,7 @@ func serializeChrootBuildAgentConfig(config *BuildAgentConfig, packageCCacheGrou
 		// should we make tar'ing again optional? or done at a higher level?
 		fmt.Sprintf("--ccache-dir-tars-out=%s", config.CCacheDir + "-tars-out"),
 		// this is just the work directory - it will be created if it does not exist.
-		fmt.Sprintf("--ccache-dir=%s", config.CCacheDir + "-" + packageCCacheGroupName),
+		fmt.Sprintf("--ccache-root-dir=%s", config.CCacheDir),
 		// basePackageName
 		fmt.Sprintf("--ccache-group-name=%s", packageCCacheGroupName),
 		fmt.Sprintf("--dist-tag=%s", config.DistTag),

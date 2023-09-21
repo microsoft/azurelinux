@@ -6,10 +6,7 @@
 package main
 
 import (
-	"context"
-	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -26,9 +23,6 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/tdnf"
-
-	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
-	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -52,7 +46,7 @@ var (
 	cacheDir             = app.Flag("cache-dir", "The cache directory containing downloaded dependency RPMS from CBL-Mariner Base").Required().ExistingDir()
 	ccacheDirTarsIn      = app.Flag("ccache-dir-tars-in", "<ToDo>").Required().String()
 	ccacheDirTarsOut     = app.Flag("ccache-dir-tars-out", "<ToDo>").Required().String()
-	ccacheDir            = app.Flag("ccache-dir", "The directory used to store ccache outputs").Required().String()
+	ccacheRootDir        = app.Flag("ccache-root-dir", "The directory used to store ccache outputs").Required().String()
 	ccacheGroupName      = app.Flag("ccache-group-name", "<ToDo>").Required().String()
 	noCleanup            = app.Flag("no-cleanup", "Whether or not to delete the chroot folder after the build is done").Bool()
 	distTag              = app.Flag("dist-tag", "The distribution tag the SPEC will be built with.").Required().String()
@@ -131,346 +125,6 @@ func buildChrootDirPath(workDir, srpmFilePath string, runCheck bool) (chrootDirP
 	return filepath.Join(workDir, buildDirName)
 }
 
-// https://pkg.go.dev/github.com/Azure/azure-sdk-for-go/sdk/storage/azblob#section-readme
-func upload(
-	theClient *azblob.Client,
-	ctx context.Context,
-	fullFileName string,
-	containerName string,
-	blobName string) (err error) {
-
-	logger.Log.Infof("  uploading %s...", fullFileName)
-
-	localFile, err := os.OpenFile(fullFileName, os.O_RDONLY, 0)
-	if err != nil {
-		fmt.Printf("Failed to open local file for upload. Error: %v", err)
-		return err
-	}
-	if localFile == nil {
-		fmt.Printf("Failed to open local file for upload 2.")
-	}
-	defer localFile.Close()
-
-	_, err = theClient.UploadFile(ctx, containerName, blobName, localFile, nil)
-	if err != nil {
-		fmt.Printf("Failed to upload local file to blob. Error: %v.", err)
-		return err
-	}
-
-	return nil
-}
-
-func download(
-	theClient *azblob.Client,
-	ctx context.Context,
-	containerName string,
-	blobName string,
-	fullFileName string) (err error) {
-
-	localFile, err := os.Create(fullFileName)
-	if err != nil {
-		fmt.Printf("Failed to create local file for download. Error: %v", err)
-		return err
-	}
-	defer localFile.Close()
-
-	_, err = theClient.DownloadFile(ctx, containerName, blobName, localFile, nil)
-	if err != nil {
-		fmt.Printf("Failed to download blob to local file. Error: %v.", err)
-		return err
-	}
-
-	return nil
-}
-
-const (
-	CCacheVersionSuffix = "-latest-build.txt"
-	CCacheTarSuffix = "-ccache.tar.gz"
-	AnonymousAccess = 0
-	AuthenticatedAccess = 1
-)
-
-func createContainerClient(remoteStoreConfig ccachemanager.RemoteStoreConfig, authenticationType int) (client *azblob.Client, err error ) {
-
-	url := "https://" + remoteStoreConfig.StorageAccount + ".blob.core.windows.net/"
-
-	if authenticationType == AnonymousAccess {
-
-		client, err := azblob.NewClientWithNoCredential(url, nil)
-		if err != nil {
-			logger.Log.Warnf("Unable to init azure blob storage read-only client. Error: %v", err)
-			return nil, err
-		}
-
-		return client, nil
-
-	} else if authenticationType == AuthenticatedAccess {
-
-		credential, err := azidentity.NewClientSecretCredential(remoteStoreConfig.TenantId, remoteStoreConfig.UserName, remoteStoreConfig.Password, nil)
-		if err != nil {
-			logger.Log.Warnf("Unable to init azure identity. Error: %v", err)
-			return nil, err
-		}
-
-		client, err = azblob.NewClient(url, credential, nil)
-		if err != nil {
-			logger.Log.Warnf("Unable to init azure blob storage read-write client. Error: %v", err)
-			return nil, err
-		}
-
-		return client, nil
-
-	} else {
-		logger.Log.Warnf("Unknown authentication type.")
-		return nil, errors.New("Unknown authentication type.")
-	}
-}
-
-func installCCache(ccacheDirTarsIn string, ccacheGroupName string, architecture string) (err error) {
-
-	logger.Log.Infof("ccache is enabled - Installing --------------------")
-
-	logger.Log.Infof("  checking if ccache working folder (%s) exists.", *ccacheDir)
-	_, err = os.Stat(*ccacheDir)
-	if err == nil {
-		logger.Log.Infof("  ccache working folder does exists. Re-using...")
-		return nil
-	}
-
-	logger.Log.Infof("  creating ccache working folder...")
-	err = os.Mkdir(*ccacheDir, 0755)
-	if err != nil {
-		logger.Log.Warnf("Unable to create ccache working folder. Error: %v", err)
-		return err
-	}
-
-	logger.Log.Infof("  retrieving remote store information...")
-	remoteStoreConfig, err := ccachemanager.GetCCacheRemoteStoreConfig()
-	if err != nil {
-		logger.Log.Warnf("Unable to get ccache remote store configuration. Error: %v", err)
-		return err
-	}
-
-	if !remoteStoreConfig.DownloadEnabled {
-		logger.Log.Infof("  Downloading archived ccache artifacts is disabled. Skipping download...")
-		return nil
-	}
-
-	logger.Log.Infof("  checking if ccache archive download folder (%s) exists.", ccacheDirTarsIn)
-	_, err = os.Stat(ccacheDirTarsIn)
-	if err != nil {
-		logger.Log.Infof("  creating ccache archive download folder...")
-		err = os.Mkdir(ccacheDirTarsIn, 0755)
-		if err != nil {
-			logger.Log.Warnf("Unable to create ccache archive download folder. Error: %v", err)
-			return err
-		}			
-	}
-
-	// Connect to blob storage...
-	logger.Log.Infof("  creating container client...")
-	theClient, err := createContainerClient(remoteStoreConfig, AnonymousAccess)
-	if err != nil {
-		logger.Log.Warnf("Unable to init azure blob storage client. Error: %v", err)
-		return err
-	}
-
-	if remoteStoreConfig.DownloadFolder == "latest" {
-
-		logger.Log.Infof("  ccache is configured to use the latest...")
-
-		// Download the versions file...
-		var ccacheVersionFullBlobName = architecture + "/" + remoteStoreConfig.VersionsFolder + "/" + ccacheGroupName + CCacheVersionSuffix
-		var ccacheInputVersionFullPath = ccacheDirTarsIn + "/" + ccacheGroupName + CCacheVersionSuffix
-
-		logger.Log.Infof("  downloading (%s) to (%s)...", ccacheVersionFullBlobName, ccacheInputVersionFullPath)
-		downloadStartTime := time.Now()
-		err = download(theClient, context.Background(), remoteStoreConfig.ContainerName, ccacheVersionFullBlobName, ccacheInputVersionFullPath)
-		if err != nil {
-			logger.Log.Warnf("Unable to download ccache archive. Error: %v", err)
-			return err
-		}
-		downloadEndTime := time.Now()
-		logger.Log.Infof("  download time: %v", downloadEndTime.Sub(downloadStartTime))
-
-		// Read the text contents...
-		ccacheInputVersionBuffer, err := ioutil.ReadFile(ccacheInputVersionFullPath)
-		if err != nil {
-			logger.Log.Warnf("Unable to read ccache version file contents. Error: %v", err)
-			return err
-		}
-
-		// Adjust the download folder to the newly found value...
-		remoteStoreConfig.DownloadFolder = string(ccacheInputVersionBuffer) 
-		logger.Log.Infof("  ccache latest archive folder is (%s)...", remoteStoreConfig.DownloadFolder)
-	}
-
-	// Download the actual cache...
-	var ccacheFullBlobName = architecture + "/" + remoteStoreConfig.DownloadFolder + "/" + ccacheGroupName + CCacheTarSuffix
-	var ccacheInputTarFullPath = ccacheDirTarsIn + "/" + ccacheGroupName + CCacheTarSuffix
-
-	logger.Log.Infof("  downloading (%s) to (%s)...", ccacheFullBlobName, ccacheInputTarFullPath)
-	downloadStartTime := time.Now()
-	err = download(theClient, context.Background(), remoteStoreConfig.ContainerName, ccacheFullBlobName, ccacheInputTarFullPath)
-	if err != nil {
-		logger.Log.Warnf("Unable to download ccache archive. Error: %v", err)
-		return err
-	}
-	downloadEndTime := time.Now()
-	logger.Log.Infof("  download time: %v", downloadEndTime.Sub(downloadStartTime))
-
-	logger.Log.Infof("  uncompressing (%s) into (%s).", ccacheInputTarFullPath, *ccacheDir)
-	uncompressStartTime := time.Now()
-	tarArgs := []string{
-		"xf",
-		ccacheInputTarFullPath,
-		"-C",
-		*ccacheDir,
-		"."}
-
-	_, stderr, err := shell.Execute("tar", tarArgs...)
-	if err != nil {
-		logger.Log.Warnf("Unable extract ccache files from archive. Error: %v", stderr)
-		return err
-	}
-	uncompressEndTime := time.Now()
-	logger.Log.Infof("  uncompress time: %v", uncompressEndTime.Sub(uncompressStartTime))
-
-	return nil
-}
-
-func archiveCCache(ccacheDirTarsOut string, ccacheGroupName string, architecture string) (err error) {
-
-	logger.Log.Infof("ccache is enabled - Capturing --------------------")
-    remoteStoreConfig, err := ccachemanager.GetCCacheRemoteStoreConfig()
-	if err != nil {
-		logger.Log.Warnf("Unable to get ccache remote store configuration. Error: %v", err)
-		return err
-	}
-
-	if !remoteStoreConfig.UploadEnabled {
-		logger.Log.Infof("ccache update is disabled for this build.")
-		return
-	}
-
-	// Ensure the output folder exists...
-	logger.Log.Infof("  ensuring ccache tar output folder (%s) exists..", ccacheDirTarsOut)
-	_, err = os.Stat(ccacheDirTarsOut)
-	if err != nil {
-		if os.IsNotExist(err) {
-			// If not, create it...
-			err = os.Mkdir(ccacheDirTarsOut, 0755)
-			if err != nil {
-				logger.Log.Warnf("Unable create ccache out tar folder. Error: %v", err)
-				return err
-			}
-		} else {
-			logger.Log.Warnf("An error occured while check if ccache out tar folder exists. Error: %v", err)
-			return err
-		}
-	}
-
-	// Ensure the output file does not exist...
-	ccacheOutputTarFullPath := ccacheDirTarsOut + "/" + ccacheGroupName + CCacheTarSuffix
-
-	logger.Log.Infof("  removing older ccache tar output file (%s) if it exists...", ccacheOutputTarFullPath)
-	_, err = os.Stat(ccacheOutputTarFullPath)
-	if err == nil {
-		logger.Log.Infof("  found ccache tar output file (%s). Removing...", ccacheOutputTarFullPath)
-		err = os.Remove(ccacheOutputTarFullPath)
-		if err != nil {
-			logger.Log.Warnf("  unable to delete ccache out tar. Error: %v", err)
-			return err
-		}
-	}
-	
-	// Create the archive...
-	logger.Log.Infof("  compressing (%s) into (%s).", *ccacheDir, ccacheOutputTarFullPath)
-	compressStartTime := time.Now()
-	tarArgs := []string{
-		"cf",
-		ccacheOutputTarFullPath,
-		"-C",
-		*ccacheDir,
-		"."}
-
-	_, stderr, err := shell.Execute("tar", tarArgs...)
-	if err != nil {
-		logger.Log.Warnf("Unable compress ccache files itno archive. Error: %v", stderr)
-		return err	
-	}
-	compressEndTime := time.Now()
-	logger.Log.Infof("  compress time: %s", compressEndTime.Sub(compressStartTime))
-
-	// ** Temporary ** Uploading should take place at the end of the build
-	// because other package family group members may update it.
-	//
-
-	logger.Log.Infof("  connecting to azure storage blob...")
-	theClient, err := createContainerClient(remoteStoreConfig, AuthenticatedAccess)
-	if err != nil {
-		logger.Log.Warnf("Unable create azure blob storage client. Error: %v", stderr)
-		return err
-	}
-
-	// Upload the ccache archive
-	var ccacheFullBlobName = architecture + "/" + remoteStoreConfig.UploadFolder + "/" + ccacheGroupName + CCacheTarSuffix
-
-	logger.Log.Infof("  uploading ccache archive (%s) to (%s)...", ccacheOutputTarFullPath, ccacheFullBlobName)
-
-	uploadStartTime := time.Now()
-	err = upload(theClient, context.Background(), ccacheOutputTarFullPath, remoteStoreConfig.ContainerName, ccacheFullBlobName)
-	if err != nil {
-		logger.Log.Warnf("Unable to upload ccache archive. Error: %v", err)
-		return err
-	}
-	uploadEndTime := time.Now()
-	logger.Log.Infof("  upload time: %s", uploadEndTime.Sub(uploadStartTime))
-
-	if remoteStoreConfig.UpdateLatest {
-		// Create the latest version file...
-		logger.Log.Infof("  creating a temporary version file with content: (%s)...", remoteStoreConfig.UploadFolder)
-
-		tempFile, err := ioutil.TempFile("", ccacheGroupName + CCacheVersionSuffix + "-")
-		if err != nil {
-			logger.Log.Warnf("Unable to create temporary file to hold new version information. Error: %v", err)
-			return err
-		}
-		defer tempFile.Close()
-
-		_, err = tempFile.WriteString(remoteStoreConfig.UploadFolder)
-		if err != nil {
-			logger.Log.Warnf("Unable to write version information to temporary file. Error: %v", err)
-			return err
-		}	
-
-		// Upload the latest version file...
-		var ccacheVersionFullBlobName = architecture + "/" + remoteStoreConfig.VersionsFolder + "/" + ccacheGroupName + CCacheVersionSuffix
-
-		logger.Log.Infof("  uploading latest version (%s) to (%s)...", tempFile.Name(), ccacheVersionFullBlobName)
-
-		uploadStartTime = time.Now()
-		err = upload(theClient, context.Background(), tempFile.Name(), remoteStoreConfig.ContainerName, ccacheVersionFullBlobName)
-		if err != nil {
-			logger.Log.Warnf("Unable to upload ccache archive. Error: %v", err)
-			return err
-		}
-		uploadEndTime = time.Now()
-		logger.Log.Infof("  upload time: %s", uploadEndTime.Sub(uploadStartTime))
-	}
-
-	// Do no clean it because it might be used by other packages in the same
-	// ccache group...
-	//
-	// logger.Log.Infof("Cleaning ccache working folder (%s).", *ccacheDir)	
-	// err = os.RemoveAll(*ccacheDir)
-	// if err != nil {
-	// 	logger.Log.Warnf("Unable rermove ccache working directory. Error: %v", err)
-	// }
-
-	return nil
-}
-
 func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmFile, repoFile, rpmmacrosFile, outArch string, defines map[string]string, noCleanup, runCheck bool, packagesToInstall []string, useCcache bool) (builtRPMs []string, err error) {
 	const (
 		buildHeartbeatTimeout = 30 * time.Minute
@@ -506,8 +160,10 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 
 	logger.Log.Infof("** Running ccache POC. **")
 
+	ccacheDir := ccachemanager.GetCCacheFolder(*ccacheRootDir, *ccacheGroupName)
+
 	if useCcache {
-		err = installCCache(*ccacheDirTarsIn, *ccacheGroupName, outArch)
+		err = ccachemanager.InstallCCache(ccacheDir, *ccacheDirTarsIn, *ccacheGroupName, outArch)
 		if err != nil {
 			logger.Log.Warnf("ccache will not be able to use previously generated artifacts.")
 		}
@@ -519,7 +175,7 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 	outRpmsOverlayMount, outRpmsOverlayExtraDirs := safechroot.NewOverlayMountPoint(chroot.RootDir(), overlaySource, chrootLocalRpmsDir, rpmDirPath, chrootLocalRpmsDir, overlayWorkDirRpms)
 	toolchainRpmsOverlayMount, toolchainRpmsOverlayExtraDirs := safechroot.NewOverlayMountPoint(chroot.RootDir(), overlaySource, chrootLocalToolchainDir, toolchainDirPath, chrootLocalToolchainDir, overlayWorkDirToolchain)
 	rpmCacheMount := safechroot.NewMountPoint(*cacheDir, chrootLocalRpmsCacheDir, "", safechroot.BindMountPointFlags, "")
-	ccacheMount := safechroot.NewMountPoint(*ccacheDir, chrootCcacheDir, "", safechroot.BindMountPointFlags, "")
+	ccacheMount := safechroot.NewMountPoint(ccacheDir, chrootCcacheDir, "", safechroot.BindMountPointFlags, "")
 	mountPoints := []*safechroot.MountPoint{outRpmsOverlayMount, toolchainRpmsOverlayMount, rpmCacheMount, ccacheMount}
 	extraDirs := append(outRpmsOverlayExtraDirs, chrootLocalRpmsCacheDir, chrootCcacheDir)
 	extraDirs = append(extraDirs, toolchainRpmsOverlayExtraDirs...)
@@ -548,7 +204,7 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 	}
 
 	if useCcache {
-		err = archiveCCache(*ccacheDirTarsOut, *ccacheGroupName, outArch)
+		err = ccachemanager.ArchiveCCache(ccacheDir, *ccacheDirTarsOut, *ccacheGroupName, outArch)
 		if err != nil {
 			logger.Log.Warnf("ccache will not be archived.")
 		}
