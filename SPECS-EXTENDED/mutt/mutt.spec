@@ -34,9 +34,9 @@ Patch2: mutt-1.8.0-cabundle.patch
 # https://dev.mutt.org/trac/ticket/3569
 Patch3: mutt-1.7.0-syncdebug.patch
 # FIXME make it to upstream
-Patch8: mutt-1.5.23-system_certs.patch
+Patch8: mutt-2.2.12-system_certs.patch
 Patch9: mutt-1.9.0-ssl_ciphers.patch
-Patch10: mutt-1.9.4-lynx_no_backscapes.patch
+Patch10: mutt-2.2.12-lynx_no_backscapes.patch
 Patch12: mutt-1.9.5-nodotlock.patch
 Patch13: mutt-1.12.1-optusegpgagent.patch
 Patch14: mutt_disable_ssl_enforce.patch
@@ -217,6 +217,7 @@ ln -sf ./muttrc.5 %{buildroot}%{_mandir}/man5/muttrc.local.5
 %changelog
 * Wed Sep 20 2023 Archana Choudhary <archana1@microsoft.com> - 2.2.12-1
 - Upgrade to 2.2.12 -  CVE-2022-1328 CVE-2023-4875  CVE-2023-4874
+- Update Patches
 
 * Fri Sep 15 2023 Henry Li <lihl@microsoft.com> - 2.0.5-5
 - Add patch to resolve CVE-2023-4874
