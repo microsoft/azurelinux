@@ -505,10 +505,7 @@ install -m 755 %{SOURCE5} %{buildroot}%{_libexecdir}/ypbind-post-waitbind
 
 * Tue Oct 21 2008 Vitezslav Crhonek <vcrhonek@redhat.com> - 3:1.20.4-9
 - Merge Review - remove dot from end of the summary, convert all tags
-  in %%changelog
-* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.7.2-11
-- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
- to utf-8, escape %% character in changelog, fix
+  in changelog to utf-8, escape %% character in changelog, fix
   requires and scriptlets, remove %%makeinstall, do not mark init
   script file as config, remove unused patches
   Resolves: #226663

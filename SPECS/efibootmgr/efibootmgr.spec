@@ -32,6 +32,7 @@ gzip -9 %{buildroot}%{_mandir}/man8/efibootdump.8
 %license COPYING
 %{_sbindir}/*
 %{_mandir}/man8/*
+
 %changelog
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 16-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)

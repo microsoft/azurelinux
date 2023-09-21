@@ -182,10 +182,7 @@ install -d %{buildroot}/%{_udevrulesdir}
 - Fix PairedID entry causing a debug message in the udev rules
 
 * Fri Feb 09 2018 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 0.28-2
-- Escape macros in %%changelog
-* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.6-5
-- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
-
+- Escape macros in changelog
 
 * Thu Feb 08 2018 Peter Hutterer <peter.hutterer@redhat.com> 0.28-1
 - libwacom 0.28
