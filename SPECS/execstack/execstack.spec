@@ -4,7 +4,7 @@
 Summary:        Utility to set/clear/query executable stack bit
 Name:           execstack
 Version:        0.5.0
-Release:        20%{?dist}
+Release:        21%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -61,6 +61,9 @@ install -Dm0644 doc/execstack.8 %{buildroot}%{_mandir}/man8/execstack.8
 %{_mandir}/man8/execstack.8.*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.5.0-21
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Fri Apr 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.5.0-20
 - Cleaning-up spec. License verified.
 

@@ -1,7 +1,7 @@
 Summary:        GIO-based library with Unix/Linux specific API
 Name:           libgsystem
 Version:        2015.2
-Release:        7%{?dist}
+Release:        8%{?dist}
 Group:          Development/Libraries
 Source0:        https://src.fedoraproject.org/repo/pkgs/%{name}/%{name}-%{version}.tar.xz/e388e3ad3c2b527479cc8512f6ad9a37/%{name}-%{version}.tar.xz
 License:        LGPLv2+
@@ -84,6 +84,9 @@ make %{?_smp_mflags} check
 %{_datadir}/gir-*/*.gir
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2015.2-8
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2015.2-7
 - Removing the explicit %%clean stage.
 

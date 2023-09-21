@@ -1,7 +1,7 @@
 Summary:        Programs for handling passwords in a secure way
 Name:           shadow-utils
 Version:        4.9
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -176,6 +176,9 @@ chmod 000 %{_sysconfdir}/shadow
 %{_libdir}/libsubid.so
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.9-13
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed May 24 2023 Tobias Brick <tobiasb@microsoft.com> - 4.9-12
 - Add SETUID bit to passwd binary
 

@@ -1,7 +1,7 @@
 Summary:	    Standard Linux utility for controlling network drivers and hardware
 Name:		    ethtool
 Version:        5.16
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:	    GPLv2
 URL:		    https://www.kernel.org/pub/software/network/ethtool/
 Group:		    Productivity/Networking/Diagnostic
@@ -38,6 +38,9 @@ make %{?_smp_mflags} check
 %{_datadir}/bash-completion/completions/ethtool
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.16-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 *   Mon Jan 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.16-1
 -   Update version to 5.16
 
