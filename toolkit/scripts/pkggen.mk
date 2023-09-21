@@ -236,7 +236,6 @@ build-packages: $(RPMS_DIR)
 
 clean: clean-build-packages clean-compress-rpms clean-compress-srpms
 
-# Empty rule for clean-build-packages-workers, we will append more rules to this later via the $(eval) function below
 clean-build-packages-workers:
 	@echo Verifying no mountpoints present in $(CHROOT_DIR)
 	$(SCRIPTS_DIR)/safeunmount.sh "$(CHROOT_DIR)"/* && \
