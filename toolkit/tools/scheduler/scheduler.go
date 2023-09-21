@@ -168,15 +168,19 @@ func main() {
 		LogLevel: *logLevel,
 	}
 
+	logger.Log.Infof("  george schedules 1")
+
 	agent, err := buildagents.BuildAgentFactory(*buildAgent)
 	if err != nil {
 		logger.Log.Fatalf("Unable to select build agent, error: %s.", err)
 	}
+	logger.Log.Infof("  george schedules 2")
 
 	err = agent.Initialize(buildAgentConfig)
 	if err != nil {
 		logger.Log.Fatalf("Unable to initialize build agent, error: %s.", err)
 	}
+	logger.Log.Infof("  george schedules 3")
 
 	// Setup cleanup routines to ensure no builds are left running when scheduler is exiting.
 	// Ensure no outstanding agents are running on graceful exit
@@ -190,6 +194,7 @@ func main() {
 	if err != nil {
 		logger.Log.Fatalf("Unable to build package graph.\nFor details see the build summary section above.\nError: %s.", err)
 	}
+	logger.Log.Infof("  george schedules 4")
 
 	if *useCcache {
 		logger.Log.Infof("  ccache is enabled. processing created artifacts under (%s)...", *ccacheDir)
