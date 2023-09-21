@@ -43,9 +43,9 @@ logging_command = --log-file=$(LOGS_DIR)/pkggen/workplan/$(notdir $@).log --log-
 $(call create_folder,$(LOGS_DIR)/pkggen/workplan)
 $(call create_folder,$(rpmbuilding_logs_dir))
 
-##help:target:workplan=Create the package build workplan.
 .PHONY: clean-workplan clean-cache clean-cache-worker clean-grapher-cache-worker clean-spec-parse clean-ccache graph-cache analyze-built-graph workplan
 graph-cache: $(cached_file)
+##help:target:workplan=Create the package build workplan.
 workplan: $(graph_file)
 clean: clean-workplan clean-cache clean-spec-parse
 clean-workplan: clean-cache clean-spec-parse clean-grapher-cache-worker

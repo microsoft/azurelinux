@@ -78,8 +78,8 @@ $(tool): $(call shell_real_build_only, find $(TOOLS_DIR)/$(notdir $(tool))/ -typ
 endef
 $(foreach tool,$(go_tool_targets),$(eval $(go_util_rule)))
 
-##help:target:go-tools=Preps all go tools (ensure `REBUILD_TOOLS=y` to rebuild).
 .PHONY: go-tools clean-go-tools go-tidy-all go-test-coverage
+##help:target:go-tools=Preps all go tools (ensure `REBUILD_TOOLS=y` to rebuild).
 go-tools: $(go_tool_targets)
 
 clean: clean-go-tools
@@ -158,8 +158,8 @@ go-test-coverage: $(test_coverage_report)
 
 chroot_worker = $(BUILD_DIR)/worker/worker_chroot.tar.gz
 
-##help:target:chroot-tools=Create the chroot working from the toolchain RPMs.
 .PHONY: chroot-tools clean-chroot-tools validate-chroot
+##help:target:chroot-tools=Create the chroot working from the toolchain RPMs.
 chroot-tools: $(chroot_worker)
 
 clean: clean-chroot-tools
@@ -212,8 +212,8 @@ macro_rpmrc = $(RPMRC_DIR)/rpmrc
 
 macro_manifest = $(TOOLCHAIN_MANIFESTS_DIR)/macro_packages.txt
 
-##help:target:macro-tools=Create the directory with expanded rpm macros.
 .PHONY: macro-tools clean-macro-tools
+##help:target:macro-tools=Create the directory with expanded rpm macros.
 macro-tools: $(macro_rpmrc)
 
 $(macro_rpmrc): $(toolchain_rpms)

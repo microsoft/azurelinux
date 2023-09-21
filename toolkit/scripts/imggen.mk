@@ -75,8 +75,9 @@ clean-imagegen:
 	rm -rf $(IMAGEGEN_DIR)
 
 ##help:target:fetch-image-packages=Locate and download all packages required for an image build.
-##help:target:fetch-external-image-packages=Download all external packages required for an image build.
 fetch-image-packages: $(image_package_cache_summary)
+
+##help:target:fetch-external-image-packages=Download all external packages required for an image build.
 fetch-external-image-packages: $(image_external_package_cache_summary)
 
 ##help:target:validate-image-config=Validate the selected image config.
