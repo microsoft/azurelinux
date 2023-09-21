@@ -235,7 +235,6 @@ srpms_archive  	= $(OUT_DIR)/srpms.tar.gz
 build-packages: $(RPMS_DIR)
 
 clean: clean-build-packages clean-compress-rpms clean-compress-srpms
-
 clean-build-packages-workers:
 	@echo Verifying no mountpoints present in $(CHROOT_DIR)
 	$(SCRIPTS_DIR)/safeunmount.sh "$(CHROOT_DIR)"/* && \
