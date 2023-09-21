@@ -1,7 +1,7 @@
 Summary:        Library for low-level netlink programming interface to the in-kernel nf_tables subsystem
 Name:           libnftnl
 Version:        1.2.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -56,6 +56,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_includedir}/%{name}
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.2.1-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Tue Jan 11 2022 Henry Li <lihl@microsoft.com> - 1.2.1-1
 - Upgrade to version 1.2.1
 - Verified License

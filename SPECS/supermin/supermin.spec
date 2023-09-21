@@ -21,7 +21,7 @@
 Summary:        Tool for creating supermin appliances
 Name:           supermin
 Version:        5.2.1
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -129,6 +129,9 @@ make check || {
 %{_rpmconfigdir}/supermin-find-requires
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.2.1-7
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Fri Sep 15 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.2.1-6
 - Removing 'exit 1' from the '%%check' section.
 

@@ -1,7 +1,7 @@
 Summary:        Embedded Linux library
 Name:           libell
 Version:        0.48
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -51,6 +51,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/ell.pc
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.48-3
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Jul 13 2022 Dallas Delaney <dadelan@microsoft.com> - 0.48-2
 - Promote to Mariner base repo
 - Lint spec

@@ -1,7 +1,7 @@
 Summary:        Library to support the Advanced Forensic Format
 Name:           afflib
 Version:        3.7.19
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        BSD WITH advertising AND Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -121,6 +121,9 @@ cd pyaff
 %{python3_sitearch}/pyaff*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.7.19-7
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Fri Apr 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.7.19-6
 - Cleaning-up spec. License verified.
 

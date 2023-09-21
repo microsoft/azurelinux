@@ -3,7 +3,7 @@
 %global _python_bytecompile_extra 1
 Name:           fish
 Version:        3.5.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Friendly interactive shell
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -125,6 +125,9 @@ fi
 %{_pkgdocdir}
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.5.0-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Fri Jul 01 2022 Daniel McIlvaney <damcilva@microsft.com> - 3.5.0-1
 - Update to 3.5.0 to reslove CVE-2022-20001
 

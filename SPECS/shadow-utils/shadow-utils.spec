@@ -179,6 +179,7 @@ chmod 000 %{_sysconfdir}/shadow
 
 %changelog
 * Wed Sep 20 2023 Kanika Nema <kanikanema@microsoft.com> - 4.9-13
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 - Address CVE-2023-29383
 
 * Wed May 24 2023 Tobias Brick <tobiasb@microsoft.com> - 4.9-12

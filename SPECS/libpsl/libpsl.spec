@@ -1,7 +1,7 @@
 Summary:        libpsl - C library to handle the Public Suffix List
 Name:           libpsl
 Version:        0.21.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -92,6 +92,9 @@ make check
 %{_libdir}/pkgconfig/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.21.1-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Jan 12 2022 Henry Li <lihl@microsoft.com> - 0.21.1-1
 - Upgrade to version 0.21.1
 - Use python3 as BR instead of python2

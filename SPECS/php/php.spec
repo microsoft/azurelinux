@@ -33,7 +33,7 @@
 Summary:        PHP scripting language for creating dynamic web sites
 Name:           php
 Version:        8.1.22
-Release:        1%{?dist}
+Release:        2%{?dist}
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
 # TSRM is licensed under BSD
@@ -1515,6 +1515,9 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 %dir %{_datadir}/php/preload
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 8.1.22-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Tue Aug 22 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.1.22-1
 - Auto-upgrade to 8.1.22 - CVE-2023-3824
 
@@ -3253,7 +3256,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 * Thu Feb 15 2007 Joe Orton <jorton@redhat.com> 5.2.1-2
 - update to 5.2.1
 - add Requires(pre) for httpd
-- trim %%changelog to versions >= 5.0.0
+- trim changelog to versions >= 5.0.0
 
 * Thu Feb  8 2007 Joe Orton <jorton@redhat.com> 5.2.0-10
 - bump default memory_limit to 32M (#220821)
