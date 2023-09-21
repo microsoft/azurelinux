@@ -1,7 +1,7 @@
 Summary:      Qt5 - QtDeclarative component
 Name:         qt5-qtdeclarative
 Version:      5.12.5
-Release:      4%{?dist}
+Release:      5%{?dist}
 Vendor:       Microsoft Corporation
 Distribution: Mariner
 
@@ -141,7 +141,7 @@ popd
 
 
 %changelog
-* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.12.5-
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.12.5-5
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
 * Mon Nov 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.12.5-4
