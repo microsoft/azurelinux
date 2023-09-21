@@ -1,3 +1,16 @@
+%global bashcompletiondir %(pkg-config --variable=compatdir bash-completion)
+%global cpuarch 64
+%global with_mysql 0
+%global mysql --without-mysql
+%global with_poppler 0
+%global poppler --without-poppler
+%global with_spatialite 0
+%global spatialite --without-spatialite
+%global with_python3 1
+%global python3 --with-python3
+%global with_java 0
+%global java --without-java
+
 Summary:        GIS file format library
 #global pre rc1
 Name:           gdal
@@ -15,24 +28,7 @@ Source2:        cpl-config.h
 Source3:        gdal-config
 # Add some utils to the default install target
 Patch0:         gdal_utils.patch
-%global run_tests 1
-%global bashcompletiondir %(pkg-config --variable=compatdir bash-completion)
-# We have multilib triage
-%if "%{_lib}" == "lib"
-  %global cpuarch 32
-%else
-  %global cpuarch 64
-%endif
-%global with_mysql 0
-%global mysql --without-mysql
-%global with_poppler 0
-%global poppler --without-poppler
-%global with_spatialite 0
-%global spatialite --without-spatialite
-%global with_python3 1
-%global python3 --with-python3
-%global with_java 0
-%global java --without-java
+
 BuildRequires:  CharLS-devel
 BuildRequires:  bison
 BuildRequires:  cfitsio-devel
@@ -220,11 +216,8 @@ cp -a %{SOURCE2} %{buildroot}%{_includedir}/%{name}/cpl_config.h
 mv %{buildroot}%{_bindir}/%{name}-config %{buildroot}%{_bindir}/%{name}-config-%{cpuarch}
 cp -a %{SOURCE3} %{buildroot}%{_bindir}/%{name}-config
 
-
-%if 0%{run_tests}
 %check
 ctest -E "autotest_osr|autotest_alg|autotest_gdrivers|autotest_gcore"
-%endif
 
 
 %files -f gdal_python_manpages_excludes.txt
@@ -325,7 +318,6 @@ ctest -E "autotest_osr|autotest_alg|autotest_gdrivers|autotest_gcore"
 * Thu Aug 17 2023 Archana Choudhary <archana1@microsoft.com> - 3.6.3-2
 - Initial CBL-Mariner import from Fedora 38 (license: MIT).
 - License verified.
-- Excludes failing test suites as pytest>=6.0.0 is required
 - Excludes osr test suite as the test file incorrectly replaces assertion
 - Excludes gcore test suite as 'tmp_path' fixture not present
 - Excludes alg and gdrivers test suite due to TypeError in pluggy requirement
