@@ -16,13 +16,13 @@ Source0:      https://sourceware.org/ftp/%{name}/%{version}/%{name}-%{version}.t
 
 %build
 %configure
-%make_build
+make
 
 %install
 %make_install
 
 %check
-make check-local
+make check
 
 %files
 %defattr(-,root,root)
