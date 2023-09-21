@@ -97,8 +97,6 @@ autoreconf --install
 %patch9 -p1 -b .ssl_ciphers
 %patch13 -p1 -b .optusegpgagent
 %patch14 -p1
-%patch15 -p1
-%patch16 -p1
 
 sed -i -r 's/`$GPGME_CONFIG --libs`/"\0 -lgpg-error"/' configure
 
