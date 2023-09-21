@@ -80,6 +80,11 @@ func TestCustomizeImageCopyFiles(t *testing.T) {
 	}
 	defer diskutils.DetachLoopbackDevice(diskDevPath)
 
+	err = diskutils.WaitForDevicesToSettle()
+	if !assert.NoError(t, err) {
+		return
+	}
+
 	imageChroot := safechroot.NewChroot(filepath.Join(buildDir, "imageroot"), false)
 	err = imageChroot.Initialize("", newMountDirectories, mountPoints)
 	if !assert.NoError(t, err) {

@@ -690,9 +690,9 @@ func SystemBlockDevices() (systemDevices []SystemBlockDevice, err error) {
 
 func GetDiskPartitions(diskDevPath string) ([]PartitionInfo, error) {
 	// Just in case the disk was only recently connected, wait for the OS to finish processing it.
-	_, _, err := shell.Execute("udevadm", "settle")
+	err := WaitForDevicesToSettle()
 	if err != nil {
-		return nil, fmt.Errorf("failed to list disk (%s) partitions: udevadm settle: %w", diskDevPath, err)
+		return nil, fmt.Errorf("failed to list disk (%s) partitions: %w", diskDevPath, err)
 	}
 
 	// Read the disk's partitions.
@@ -704,7 +704,7 @@ func GetDiskPartitions(diskDevPath string) ([]PartitionInfo, error) {
 	var output partitionInfoOutput
 	err = json.Unmarshal([]byte(jsonString), &output)
 	if err != nil {
-		return nil, fmt.Errorf("failed to list disk (%s) partitions: unexpected JSON format: %w", diskDevPath, err)
+		return nil, fmt.Errorf("failed to parse disk (%s) partitions JSON: %w", diskDevPath, err)
 	}
 
 	return output.Devices, err
