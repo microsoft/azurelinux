@@ -474,25 +474,47 @@ func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNo
 	}
 
 	preBuilt := false
+	// We will try to clone each package. We need at least one to succeed.
+	foundAtLeastOneSource := false
+	cloneErr := error(nil)
+	successfullyFetchedPackages := make([]string, 0, len(resolvedPackages))
 	for _, resolvedPackage := range resolvedPackages {
 		if !fetchedPackages[resolvedPackage] {
 			desiredPackage := &pkgjson.PackageVer{
 				Name: resolvedPackage,
 			}
 
-			preBuilt, err = cloner.Clone(cloneDeps, desiredPackage)
-			if err != nil {
-				err = fmt.Errorf("failed to clone '%s' from RPM repo:\n%w", resolvedPackage, err)
-				return
+			preBuilt, cloneErr = cloner.Clone(cloneDeps, desiredPackage)
+			if cloneErr != nil {
+				// There may be cases were certain packages are broken and can't be cloned. In this case we should
+				// continue to try to clone other packages. (e.g. a package is in the repo but a dependency is missing)
+				logger.Log.Warnf("failed to clone a possible candidate package '%s' from RPM repo: %s", resolvedPackage, cloneErr.Error())
+				if err == nil {
+					// Capture the first error we see, but continue to try to clone other packages.
+					err = cloneErr
+				}
+				continue
+			} else {
+				foundAtLeastOneSource = true
 			}
 			fetchedPackages[resolvedPackage] = true
 			prebuiltPackages[resolvedPackage] = preBuilt
+			successfullyFetchedPackages = append(successfullyFetchedPackages, resolvedPackage)
 
 			logger.Log.Debugf("Fetched '%s' as potential candidate (is pre-built: %v).", resolvedPackage, prebuiltPackages[resolvedPackage])
 		}
 	}
 
-	err = assignRPMPath(node, outDir, resolvedPackages)
+	// If we failed to clone any packages, return the first error we saw.
+	if err != nil && !foundAtLeastOneSource {
+		err = fmt.Errorf("failed to clone any packages providing '%v':\n%w", node.VersionedPkg, err)
+		return
+	} else {
+		// Reset the error since we found at least one source and can continue.
+		err = nil
+	}
+
+	err = assignRPMPath(node, outDir, successfullyFetchedPackages)
 	if err != nil {
 		err = fmt.Errorf("failed to find an RPM to provide '%s':\n%w", node.VersionedPkg.Name, err)
 		return
