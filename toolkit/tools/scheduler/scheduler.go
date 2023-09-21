@@ -12,6 +12,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/ccachemanager"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
@@ -189,6 +190,61 @@ func main() {
 	if err != nil {
 		logger.Log.Fatalf("Unable to build package graph.\nFor details see the build summary section above.\nError: %s.", err)
 	}
+
+	if *useCcache {
+		logger.Log.Infof("  ccache is enabled. processing created artifacts under (%s)...", *ccacheDir)
+		ccacheDirTarsOut := *ccacheDir + "-tars-out"
+		architectures, err := getChildFolders(*ccacheDir)
+		if err != nil {
+			logger.Log.Warnf("failed to enumerate child folders under (%s)...", *ccacheDir)
+		} else {
+			for _, architecture := range architectures {
+				logger.Log.Infof("  found ccache architecture (%s)...", architecture)
+				groupNames, err := getChildFolders(architecture)
+				if err != nil {
+					logger.Log.Warnf("failed to enumerate child folders under (%s)...", *ccacheDir)
+				} else {
+					for _, groupName := range groupNames {
+						logger.Log.Infof("  found group (%s)...", groupName)
+
+						groupCCacheDir := ccachemanager.GetCCacheFolder(*ccacheDir, architecture, groupName)
+						logger.Log.Infof("  processing ccache folder (%s)...", groupCCacheDir)
+
+						err = ccachemanager.ArchiveCCache(groupCCacheDir, ccacheDirTarsOut, groupName, architecture)
+						if err != nil {
+							logger.Log.Warnf("ccache will not be archived for (%s) (%s)...", architecture, groupName)
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+func getChildFolders(parentFolder string) ([]string, error) {
+	childFolders := []string{}
+
+	visit := func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			logger.Log.Infof("  error enumerating child folders. Error: (%v)", err)
+			return err
+		}
+
+		if info.IsDir() && path != parentFolder {
+			relativePath, _ := filepath.Rel(parentFolder, path)
+			childFolders = append(childFolders, relativePath)
+		}
+
+		return nil
+	}
+
+	err := filepath.Walk(parentFolder, visit)
+	if err != nil {
+		logger.Log.Infof("  error enumerating child folders. Error: (%v)", err)
+		return nil, err
+	}
+
+	return childFolders, nil
 }
 
 // cancelOutstandingBuilds stops any builds that are currently running.

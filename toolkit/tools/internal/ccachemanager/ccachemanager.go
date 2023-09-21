@@ -104,8 +104,8 @@ func FindCCacheGroup(basePackageName string) (packageCCacheGroupName string) {
 	return packageCCacheGroupName
 }
 
-func GetCCacheFolder(ccacheRootDir string, ccacheGroupName string) (string) {
-	return ccacheRootDir + "/" + ccacheGroupName
+func GetCCacheFolder(ccacheRootDir string, architecture string, ccacheGroupName string) (string) {
+	return ccacheRootDir + "/" + architecture + "/" + ccacheGroupName
 }
 
 func InstallCCache(ccacheDir string, ccacheDirTarsIn string, ccacheGroupName string, architecture string) (err error) {

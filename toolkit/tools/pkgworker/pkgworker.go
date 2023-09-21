@@ -160,7 +160,7 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 
 	logger.Log.Infof("** Running ccache POC. **")
 
-	ccacheDir := ccachemanager.GetCCacheFolder(*ccacheRootDir, *ccacheGroupName)
+	ccacheDir := ccachemanager.GetCCacheFolder(*ccacheRootDir, outArch, *ccacheGroupName)
 
 	if useCcache {
 		err = ccachemanager.InstallCCache(ccacheDir, *ccacheDirTarsIn, *ccacheGroupName, outArch)
@@ -203,12 +203,12 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 		builtRPMs, err = moveBuiltRPMs(chroot.RootDir(), rpmDirPath)
 	}
 
-	if useCcache {
-		err = ccachemanager.ArchiveCCache(ccacheDir, *ccacheDirTarsOut, *ccacheGroupName, outArch)
-		if err != nil {
-			logger.Log.Warnf("ccache will not be archived.")
-		}
-	}
+	// if useCcache {
+	// 	err = ccachemanager.ArchiveCCache(ccacheDir, *ccacheDirTarsOut, *ccacheGroupName, outArch)
+	// 	if err != nil {
+	// 		logger.Log.Warnf("ccache will not be archived.")
+	// 	}
+	// }
 	return
 }
 
