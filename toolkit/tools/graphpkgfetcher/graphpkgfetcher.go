@@ -511,6 +511,7 @@ func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNo
 		return
 	} else {
 		// Reset the error since we found at least one source and can continue.
+		logger.Log.Warn("Some candidate downloads failed, but at least one package was successfully cloned, continuing.")
 		err = nil
 	}
 
