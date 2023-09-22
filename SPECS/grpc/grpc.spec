@@ -1,7 +1,7 @@
 Summary:        Open source remote procedure call (RPC) framework
 Name:           grpc
-Version:        1.42.0
-Release:        6%{?dist}
+Version:        1.55.3
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -148,6 +148,9 @@ export GRPC_PYTHON_BUILD_SYSTEM_ABSL=True
 
 
 %changelog
+* Fri Sep 22 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.55.3-1
+- Auto-upgrade to 1.55.3 - Upgrade to address CVE-2023-4785
+
 * Thu Jun 22 2023 Reuben Olinsky <reubeno@microsoft.com> - 1.42.0-6
 - Add cmake modules to grpc-devel package.
 
