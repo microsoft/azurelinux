@@ -4169,6 +4169,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "gdal",
+          "version": "3.6.3",
+          "downloadUrl": "https://github.com/OSGeo/gdal/releases/download/v3.6.3/gdal-3.6.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "gdb",
           "version": "11.2",
           "downloadUrl": "https://ftp.gnu.org/gnu/gdb/gdb-11.2.tar.xz"
