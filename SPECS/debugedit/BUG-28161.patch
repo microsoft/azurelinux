@@ -1,19 +1,14 @@
+From ae27211cbbfb63a0ad3c141cd1310d7f583ec40e Mon Sep 17 00:00:00 2001
+From: Mark Wielaard <mark@klomp.org>
+Date: Fri, 30 Jul 2021 18:09:46 +0200
+Subject: [PATCH] tests: Handle zero directory entry in .debug_line DWARF5
+ debugedit.at
+
 We were skipping the zero directory entry, because it was always
 the same as the directory entry at position one. But that isn't
 true anymore with gcc 11.2.1. There the zero dir entry is unique.
 Fix the debugedit.at .debug_line testcases using DWARF5 to also
 include dir entry zero.
-
-Also add a configure check to make sure -gdwarf-5 also generates
-version 5 .debug_line tables. Depending on whether binutils gas
-supports generating version 5 line tables gcc might still generate
-version 3 line tables even with -gdwarf-5.
-
-	* configure.ac: Add DWARF_5_DEBUGLINE check
-	* tests/atlocal.in: Add DWARF_5_DEBUGLINE substitution
-	* tests/debugedit.at: skip .debug_line DWARF5 tests if
-	DWARF_5_DEBUGLINE is no. Update tests to include directory
-	zero.
 
 Signed-off-by: Mark Wielaard <mark@klomp.org>
 ---
@@ -131,4 +126,4 @@ index 0311d26..725e68e 100644
  
  AT_CLEANUP
 -- 
-2.18.4
+2.39.3
