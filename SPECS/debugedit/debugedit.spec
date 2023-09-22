@@ -23,6 +23,7 @@ make
 
 %check
 make check
+cat tests/testsuite.log
 
 %files
 %defattr(-,root,root)
