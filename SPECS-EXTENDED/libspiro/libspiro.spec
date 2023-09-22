@@ -1,20 +1,19 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        Library to simplify the drawing of beautiful curves
 Name:           libspiro
 Version:        20221101
 Release:        1%{?dist}
-Summary:        Library to simplify the drawing of beautiful curves
-
 License:        GPL-3.0-or-later
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/fontforge/libspiro/
 Source0:        https://github.com/fontforge/libspiro/releases/download/%{version}/libspiro-dist-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  gcc
 BuildRequires:  make
 
 %description
-This library will take an array of spiro control points and 
-convert them into a series of bézier splines which can then 
-be used in the myriad of ways the world has come to use béziers. 
+This library will take an array of spiro control points and
+convert them into a series of bézier splines which can then
+be used in the myriad of ways the world has come to use béziers.
 
 %package        devel
 Summary:        Development files for %{name}
@@ -33,7 +32,7 @@ developing applications that use %{name}.
 
 %install
 %make_install
-find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %files
 %doc README* ChangeLog AUTHORS
@@ -49,6 +48,7 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 %changelog
 * Fri Oct 15 2021 Muhammad Falak <mwani@microsoft.com> - 20221101-1
 - Bump version to address CVE-2019-19847
+- Lint spec
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20190731-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
