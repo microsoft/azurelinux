@@ -321,6 +321,17 @@ func DetachLoopbackDevice(diskDevPath string) (err error) {
 	return
 }
 
+// WaitForDevicesToSettle waits for all udev events to be processed on the system.
+// This can be used to wait for partitions to be discovered after mounting a disk.
+func WaitForDevicesToSettle() error {
+	logger.Log.Debugf("Waiting for devices to settle")
+	_, _, err := shell.Execute("udevadm", "settle")
+	if err != nil {
+		return fmt.Errorf("failed to wait for devices to settle: %w", err)
+	}
+	return nil
+}
+
 // CreatePartitions creates partitions on the specified disk according to the disk config
 func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryption configuration.RootEncryption, readOnlyRootConfig configuration.ReadOnlyVerityRoot) (partDevPathMap map[string]string, partIDToFsTypeMap map[string]string, encryptedRoot EncryptedRootDevice, readOnlyRoot VerityDevice, err error) {
 	const timeoutInSeconds = "5"

@@ -1,7 +1,7 @@
 Summary:        The NIS daemon which binds NIS clients to an NIS domain
 Name:           ypbind
 Version:        2.7.2
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -112,6 +112,9 @@ install -m 755 %{SOURCE5} %{buildroot}%{_libexecdir}/ypbind-post-waitbind
 %doc README NEWS
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.7.2-11
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Aug 24 2022 Zhichun Wan <zhichunwan@microsoft.com> - 2.7.2-10
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
 - Removed epoch
@@ -502,7 +505,7 @@ install -m 755 %{SOURCE5} %{buildroot}%{_libexecdir}/ypbind-post-waitbind
 
 * Tue Oct 21 2008 Vitezslav Crhonek <vcrhonek@redhat.com> - 3:1.20.4-9
 - Merge Review - remove dot from end of the summary, convert all tags
-  in %%changelog to utf-8, escape %% character in changelog, fix
+  in changelog to utf-8, escape %% character in changelog, fix
   requires and scriptlets, remove %%makeinstall, do not mark init
   script file as config, remove unused patches
   Resolves: #226663

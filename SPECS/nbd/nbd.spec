@@ -1,7 +1,7 @@
 Summary:        Network Block Device user-space tools (TCP version)
 Name:           nbd
 Version:        3.20
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -70,6 +70,9 @@ install -pDm644 %{S:2} %{buildroot}%{_sysconfdir}/sysconfig/nbd-server
 %{_unitdir}/nbd@.service.d
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.20-6
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Fri Jul 15 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.20-5
 - Promote to Mariner base repo
 - Modify test disabling in a way that's more friendly to our package test log parser

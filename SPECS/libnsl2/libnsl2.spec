@@ -1,7 +1,7 @@
 Summary:        Libraries for the public client interface for NIS(YP) and NIS+.
 Name:           libnsl2
 Version:        2.0.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD AND GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -53,6 +53,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/*.a
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.0.0-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Jan 12 2022 Henry Li <lihl@microsoft.com> - 2.0.0-1
 - Upgrade to version 2.0.0
 - Modify Source0 field to use macros

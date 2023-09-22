@@ -1,7 +1,7 @@
 Summary:        Interface for Python to call C code
 Name:           python-cffi
 Version:        1.15.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -50,6 +50,9 @@ pip3 install pytest==7.1.2
 %{python3_sitelib}/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.15.0-3
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Oct 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.15.0-2
 - Freezing 'pytest' test dependency to version 7.1.2.
 

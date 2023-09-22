@@ -48,8 +48,8 @@ ERROR: license not verified.
     Make sure the package's license matches the information provided inside the 'License' tag.
     Once that's done, indicate that through a changelog entry "License verified" or "Verified license".
 
-    NOTE: for the 'License' tag please use the names from the "Short Name" column inside Fedora's licensing guidelines:
-          https://fedoraproject.org/wiki/Licensing:Main?rd=Licensing#Good_Licenses
+    NOTE: For the 'License' tag, please use SPDX license expressions:
+          https://spdx.dev/learn/handling-license-info/
 """)
         return False
 

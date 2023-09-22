@@ -151,8 +151,11 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man3/*
 
 %changelog
-* Wed Sep 20 2023 Andrew Phelps <anphel@microsoft.com> - 2.37.4-7
+* Wed Sep 21 2023 Andrew Phelps <anphel@microsoft.com> - 2.37.4-8
 - Add su-l file for PAM
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.37.4-7
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
 * Wed May 24 2023 Tobias Brick <tobiasb@microsoft.com> - 2.37.4-6
 - Add SETUID bit to mount and umount.

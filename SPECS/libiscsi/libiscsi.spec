@@ -8,7 +8,7 @@
 Summary:        iSCSI client library
 Name:           libiscsi
 Version:        1.18.0
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -108,6 +108,9 @@ rm %{buildroot}/%{_bindir}/ld_iscsi.so
 %{_mandir}/man1/iscsi-test-cu.1.gz
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.18.0-11
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.18.0-10
 - Initial CBL-Mariner import from Fedora 31 (license: MIT).
 - License verified.

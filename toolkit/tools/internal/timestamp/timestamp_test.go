@@ -15,45 +15,17 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const (
-	testDataDir   = "./testdata/"
-	testOutputDir = "./testout/"
-)
-
 var (
 	defaultStartTime = time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC)
 	defaultEndTime   = time.Date(2023, 1, 1, 1, 0, 0, 0, time.UTC)
 )
 
-func setUp() {
+func TestMain(m *testing.M) {
 	// init logger to be used by the timestamp tool
 	logger.InitStderrLog()
 
-	if _, err := os.Stat(testOutputDir); os.IsNotExist(err) {
-		err = os.Mkdir(testOutputDir, 0755)
-		if err != nil {
-			panic(err)
-		}
-	}
-}
-
-func tearDown() {
-	timestampRecordFiles, err := filepath.Glob(testOutputDir + "*.jsonl")
-	if err != nil {
-		panic(err)
-	}
-	for _, file := range timestampRecordFiles {
-		err = os.Remove(file)
-		if err != nil {
-			panic(err)
-		}
-	}
-}
-
-func TestMain(m *testing.M) {
-	setUp()
 	retVal := m.Run()
-	tearDown()
+
 	os.Exit(retVal)
 }
 
@@ -143,7 +115,7 @@ func TestTimeStampComplete(t *testing.T) {
 func TestCreateTimeStampFile(t *testing.T) {
 	assert := assert.New(t)
 
-	testFile := testOutputDir + "test_create_timestamp_file.jsonl"
+	testFile := filepath.Join(t.TempDir(), "test_create_timestamp_file.jsonl")
 	_, err := BeginTiming("test", testFile)
 	defer CompleteTiming()
 
@@ -154,7 +126,7 @@ func TestCreateTimeStampFile(t *testing.T) {
 func TestResumeAndAppend(t *testing.T) {
 	assert := assert.New(t)
 
-	testFile := testOutputDir + "test_resume_and_append.jsonl"
+	testFile := filepath.Join(t.TempDir(), "test_resume_and_append.jsonl")
 	_, err := BeginTiming("test", testFile)
 	FlushAndCleanUpResources()
 
@@ -187,7 +159,7 @@ func TestResumeAndAppend(t *testing.T) {
 func TestStartStopEvent(t *testing.T) {
 	assert := assert.New(t)
 
-	testFile := testOutputDir + "test_start_stop_event.jsonl"
+	testFile := filepath.Join(t.TempDir(), "test_start_stop_event.jsonl")
 	root, err := BeginTiming("test", testFile)
 
 	assert.NoError(err)
@@ -226,7 +198,7 @@ func TestStartStopEvent(t *testing.T) {
 func TestPauseResumeEvent(t *testing.T) {
 	assert := assert.New(t)
 
-	testFile := testOutputDir + "test_pause_resume_event.jsonl"
+	testFile := filepath.Join(t.TempDir(), "test_pause_resume_event.jsonl")
 	root, _ := BeginTiming("test", testFile)
 
 	ts, _ := StartEvent("A", root)

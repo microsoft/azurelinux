@@ -3,7 +3,7 @@
 Summary:        Ruby FFI
 Name:           rubygem-ffi
 Version:        1.15.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -35,6 +35,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.15.5-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.15.5-1
 - Update to v1.15.5.
 - Build from .tar.gz source.

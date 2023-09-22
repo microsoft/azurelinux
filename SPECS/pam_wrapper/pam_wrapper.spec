@@ -1,6 +1,6 @@
 Name:           pam_wrapper
 Version:        1.1.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A tool to test PAM applications and PAM modules
 License:        GPLv3+
 URL:            https://cwrap.org/
@@ -139,6 +139,9 @@ popd
 %{python3_sitearch}/pypamtest.so
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.1.4-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Mon Jul 25 2022 Sumedh Sharma <sumsharma@microsoft.com> - 1.1.4-1
 - Bumping version to 1.1.4.
 - Remove gpg signature verification
