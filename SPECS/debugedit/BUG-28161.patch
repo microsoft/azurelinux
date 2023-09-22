@@ -1,0 +1,134 @@
+We were skipping the zero directory entry, because it was always
+the same as the directory entry at position one. But that isn't
+true anymore with gcc 11.2.1. There the zero dir entry is unique.
+Fix the debugedit.at .debug_line testcases using DWARF5 to also
+include dir entry zero.
+
+Also add a configure check to make sure -gdwarf-5 also generates
+version 5 .debug_line tables. Depending on whether binutils gas
+supports generating version 5 line tables gcc might still generate
+version 3 line tables even with -gdwarf-5.
+
+	* configure.ac: Add DWARF_5_DEBUGLINE check
+	* tests/atlocal.in: Add DWARF_5_DEBUGLINE substitution
+	* tests/debugedit.at: skip .debug_line DWARF5 tests if
+	DWARF_5_DEBUGLINE is no. Update tests to include directory
+	zero.
+
+Signed-off-by: Mark Wielaard <mark@klomp.org>
+---
+ configure.ac       | 14 ++++++++++++++
+ tests/atlocal.in   |  1 +
+ tests/debugedit.at | 18 ++++++++++++------
+ 3 files changed, 27 insertions(+), 6 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index e5c9230..6a53365 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -87,6 +87,20 @@ CFLAGS="$save_CFLAGS"
+ GDWARF_5_FLAG=$ac_cv_gdwarf_5
+ AC_SUBST([GDWARF_5_FLAG])
+ 
++AC_CACHE_CHECK([whether -gdwarf-5 produced DWARF5 .debug_line], ac_cv_dwarf_5_debugline, [dnl
++save_CFLAGS="$CFLAGS"
++CFLAGS="-gdwarf-5"
++AC_COMPILE_IFELSE([AC_LANG_SOURCE([[int i=0;]],[[/* empty main */]])],
++  [if $READELF --debug-dump=line conftest.o 2>&1 | \
++   grep "DWARF Version:" 2>&1 | grep "5" > /dev/null 2>&1; \
++     then ac_cv_dwarf_5_debugline=yes; \
++     else ac_cv_dwarf_5_debugline=no; fi],
++  ac_cv_dwarf_5_debugline=no)
++CFLAGS="$save_CFLAGS"
++])
++DWARF_5_DEBUGLINE=$ac_cv_dwarf_5_debugline
++AC_SUBST([DWARF_5_DEBUGLINE])
++
+ AC_CACHE_CHECK([whether gcc supports -gz=none], ac_cv_gz_none, [dnl
+ save_CFLAGS="$CFLAGS"
+ CFLAGS="-gz=none"
+diff --git a/tests/atlocal.in b/tests/atlocal.in
+index 8399f8d..d916301 100644
+--- a/tests/atlocal.in
++++ b/tests/atlocal.in
+@@ -13,3 +13,4 @@ READELF="@READELF@"
+ 
+ GDWARF_5_FLAG=@GDWARF_5_FLAG@
+ GZ_NONE_FLAG=@GZ_NONE_FLAG@
++DWARF_5_DEBUGLINE=@DWARF_5_DEBUGLINE@
+diff --git a/tests/debugedit.at b/tests/debugedit.at
+index 0311d26..725e68e 100644
+--- a/tests/debugedit.at
++++ b/tests/debugedit.at
+@@ -488,10 +488,12 @@ AT_CLEANUP
+ AT_SETUP([debugedit .debug_line objects DWARF5])
+ AT_KEYWORDS([debuginfo] [debugedit])
+ AT_SKIP_IF([test "$GDWARF_5_FLAG" = "no"])
++AT_SKIP_IF([test "$DWARF_5_DEBUGLINE" = "no"])
+ DEBUGEDIT_SETUP([-gdwarf-5])
+ 
+ AT_DATA([expout],
+ [foo/bar/baz
++foo/bar/baz/subdir_bar
+ foo/bar/baz/subdir_headers
+ ])
+ 
+@@ -500,8 +502,8 @@ AT_CHECK([[debugedit -b $(pwd) -d /foo/bar/baz ./subdir_bar/bar.o]])
+ AT_CHECK([[debugedit -b $(pwd) -d /foo/bar/baz ./baz.o]])
+ AT_CHECK([[
+ $READELF --debug-dump=line foo.o subdir_bar/bar.o baz.o \
+-        | grep -A5 "The Directory Table" | grep "^  [123]" \
+-	| cut -f2- -d/ | grep ^foo/ | sort
++	| grep -A5 "The Directory Table" | grep "^  [0123]" \
++	| cut -f2- -d/ | grep ^foo/ | sort -u
+ ]],[0],[expout])
+ 
+ AT_CLEANUP
+@@ -535,18 +537,20 @@ AT_CLEANUP
+ AT_SETUP([debugedit .debug_line partial DWARF5])
+ AT_KEYWORDS([debuginfo] [debugedit])
+ AT_SKIP_IF([test "$GDWARF_5_FLAG" = "no"])
++AT_SKIP_IF([test "$DWARF_5_DEBUGLINE" = "no"])
+ DEBUGEDIT_SETUP([-gdwarf-5])
+ 
+ AT_DATA([expout],
+ [foo/bar/baz
++foo/bar/baz/subdir_bar
+ foo/bar/baz/subdir_headers
+ ])
+ 
+ AT_CHECK([[debugedit -b $(pwd) -d /foo/bar/baz ./foobarbaz.part.o]])
+ AT_CHECK([[
+ $READELF --debug-dump=line ./foobarbaz.part.o \
+-        | grep -A5 "The Directory Table" | grep "^  [123]" \
+-	| cut -f2- -d/ | grep ^foo/ | sort
++	| grep -A5 "The Directory Table" | grep "^  [0123]" \
++	| cut -f2- -d/ | grep ^foo/ | sort -u
+ ]],[0],[expout])
+ 
+ AT_CLEANUP
+@@ -580,18 +584,20 @@ AT_CLEANUP
+ AT_SETUP([debugedit .debug_line exe DWARF5])
+ AT_KEYWORDS([debuginfo] [debugedit])
+ AT_SKIP_IF([test "$GDWARF_5_FLAG" = "no"])
++AT_SKIP_IF([test "$DWARF_5_DEBUGLINE" = "no"])
+ DEBUGEDIT_SETUP([-gdwarf-5])
+ 
+ AT_DATA([expout],
+ [foo/bar/baz
++foo/bar/baz/subdir_bar
+ foo/bar/baz/subdir_headers
+ ])
+ 
+ AT_CHECK([[debugedit -b $(pwd) -d /foo/bar/baz ./foobarbaz.exe]])
+ AT_CHECK([[
+ $READELF --debug-dump=line ./foobarbaz.exe \
+-        | grep -A5 "The Directory Table" | grep "^  [123]" \
+-	| cut -f2- -d/ | grep ^foo/ | sort
++	| grep -A5 "The Directory Table" | grep "^  [0123]" \
++	| cut -f2- -d/ | grep ^foo/ | sort -u
+ ]],[0],[expout])
+ 
+ AT_CLEANUP
+-- 
+2.18.4
