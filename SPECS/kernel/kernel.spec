@@ -28,7 +28,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.15.131.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -425,6 +425,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Sep 19 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.110.mshv2-5
+- Call grub2-mkconfig to regenerate configs only if the user has 
+    previously used grub2-mkconfig for boot configuration. 
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.15.131.1-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
