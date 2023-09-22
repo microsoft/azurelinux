@@ -49,6 +49,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Fri Oct 15 2021 Muhammad Falak <mwani@microsoft.com> - 20221101-1
 - Bump version to address CVE-2019-19847
 - Lint spec
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20190731-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
