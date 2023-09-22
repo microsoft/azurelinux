@@ -30,6 +30,8 @@ var (
 	distTag      = app.Flag("dist-tag", "The distribution tag.").Required().String()
 	workerTar    = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz.").Required().ExistingFile()
 
+	testOnly = app.Flag("test-only", "Whether or not to run the filter out specs which don't run tests.").Bool()
+
 	logFile  = exe.LogFileFlag(app)
 	logLevel = exe.LogLevelFlag(app)
 )
@@ -61,7 +63,7 @@ func main() {
 	logger.Log.Infof("Filtering spec list in (%s).", *specsDirPath)
 	logger.Log.Debugf("Distribution tag: %s.", *distTag)
 	logger.Log.Debugf("Input list: %v.", specNames)
-	filteredSpecNames, err := archChecker.FilterSpecsByArch(specNames, *distTag)
+	filteredSpecNames, err := archChecker.FilterSpecsByArch(specNames, *distTag, *testOnly)
 	if err != nil {
 		logger.Log.Fatalf("Failed to filter specs folder (%s) Error:\n%s", *specsDirPath, err)
 	}

@@ -1,3 +1,4 @@
+%global bootstrap_compiler_version 1.19.12
 %global goroot          %{_libdir}/golang
 %global gopath          %{_datadir}/gocode
 %ifarch aarch64
@@ -12,7 +13,7 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.19.11
+Version:        1.20.7
 Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
@@ -21,7 +22,9 @@ Group:          System Environment/Security
 URL:            https://golang.org
 Source0:        https://golang.org/dl/go%{version}.src.tar.gz
 Source1:        https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
+Source2:        https://dl.google.com/go/go%{bootstrap_compiler_version}.src.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
+Patch1:         permit-requests-with-invalid-header.patch
 Obsoletes:      %{name} < %{version}
 Provides:       %{name} = %{version}
 Provides:       go = %{version}-%{release}
@@ -37,14 +40,37 @@ patch -Np1 --ignore-whitespace < %{PATCH0}
 mv -v go go-bootstrap
 
 %setup -q -n go
+%patch1 -p1
 
 %build
+# (go >= 1.20 bootstraps with go >= 1.17)
+# This condition makes go compiler >= 1.20 build a 3 step process:
+# - Build the bootstrap compiler 1.4 (bootstrap bits in c)
+# - Use the 1.4 compiler to build %{bootstrap_compiler_version}
+# - Use the %{bootstrap_compiler_version} compiler to build go >= 1.20 compiler
+# PS: Since go compiles fairly quickly, the extra overhead is arounnd 2-3 minutes
+#     on a reasonable machine.
+
 # Build go 1.4 bootstrap
 pushd %{_topdir}/BUILD/go-bootstrap/src
 CGO_ENABLED=0 ./make.bash
 popd
 mv -v %{_topdir}/BUILD/go-bootstrap %{_libdir}/golang
 export GOROOT=%{_libdir}/golang
+
+# Use go1.4 bootstrap to compile go%{bootstrap_compiler_version} (bootstrap)
+export GOROOT_BOOTSTRAP=%{_libdir}/golang
+mkdir -p %{_topdir}/BUILD/go%{bootstrap_compiler_version}
+tar xf %{SOURCE2} -C %{_topdir}/BUILD/go%{bootstrap_compiler_version} --strip-components=1
+pushd %{_topdir}/BUILD/go%{bootstrap_compiler_version}/src
+CGO_ENABLED=0 ./make.bash
+popd
+
+# Nuke the older go1.4 bootstrap
+rm -rf %{_libdir}/golang
+
+# Make go%{bootstrap_compiler_version} as the new bootstrapper
+mv -v %{_topdir}/BUILD/go1.19.12 %{_libdir}/golang
 
 # Build current go version
 export GOHOSTOS=linux
@@ -117,6 +143,14 @@ fi
 %{_bindir}/*
 
 %changelog
+* Tue Aug 15 2023 Muhammad Falak <mwani@microsoft.com> - 1.20.7-1
+- Bump version to 1.20.7
+- Introduce patch to permit requests with invalid host header
+
+* Tue Aug 15 2023 Muhammad Falak <mwani@microsoft.com> - 1.19.12-1
+- Auto-upgrade to 1.19.12 to address CVE-2023-29409
+- Introduce patch to permit requests with invalid header
+
 * Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.19.11-1
 - Auto-upgrade to 1.19.11 - Fix CVE-2023-29406
 

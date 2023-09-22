@@ -2,7 +2,7 @@
 Summary:        Low-level libraries useful for providing data structure handling for C.
 Name:           glib
 Version:        2.71.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -122,6 +122,9 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 %doc %{_datadir}/gtk-doc/html/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.71.0-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Thu Feb 10 2022 Henry Li <lihl@microsoft.com> - 2.71.0-1
 - Upgrade to version 2.71.0
 - Add python3-pygments as BR

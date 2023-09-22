@@ -1,7 +1,7 @@
 Summary:    Library for netfilter related kernel/userspace communication
 Name:       libnfnetlink
 Version:    1.0.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:    GPLv2+
 URL:        http://www.netfilter.org/projects/libnfnetlink/index.html
 Group:      System Environment/Libraries
@@ -50,6 +50,9 @@ find %{buildroot} -type f -name '*.la' -exec rm -f {} ';'
 %{_libdir}/*.so
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.0.1-6
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 1.0.1-5
 - Remove unused `%%define sha1` lines
 - License verified

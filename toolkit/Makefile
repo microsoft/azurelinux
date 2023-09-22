@@ -12,54 +12,64 @@ toolkit_root := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 SCRIPTS_DIR  ?= $(toolkit_root)/scripts
 
 # Build targets
-ifeq ($(origin CONFIG_FILE), undefined)
-CONFIG_FILE             = $(toolkit_root)/imageconfigs/core-efi.json
-$(warning CONFIG_FILE is undefined, defaulting to toolkit's core-efi.json.)
-endif
+##help:var:CONFIG_FILE:<config_path>=Path to image configuration file to use. Will add package dependencies and define final image generated.
+CONFIG_FILE             ?=
 CONFIG_BASE_DIR         ?= $(dir $(CONFIG_FILE))
 PACKAGE_BUILD_LIST      ?=
+##help:var:PACKAGE_REBUILD_LIST:<spec_list>=List of space-separated spec folders to force rebuild. Must not overlap with "PACKAGE_IGNORE_LIST". Example: PACKAGE_REBUILD_LIST="kernel go which".
 PACKAGE_REBUILD_LIST    ?=
+##help:var:PACKAGE_IGNORE_LIST:<spec_list>=List of space-separated spec folders to ignore during the build. Must not overlap with "PACKAGE_REBUILD_LIST", may overlap with "PACKAGE_BUILD_LIST". Example: PACKAGE_IGNORE_LIST="zlib".
 PACKAGE_IGNORE_LIST     ?=
+##help:var:SRPM_PACK_LIST:<spec_list>=List of space-separated spec folders inside "SPECS_DIR" to analyze for the build. If empty, all items inside the "SPECS_DIR" will be analyzed. Example: SRPM_PACK_LIST="kernel go which".
 SRPM_PACK_LIST          ?=
+##help:var:TEST_RUN_LIST:<spec_list>=List of space-separated spec folders to consider for package tests. Specs from the listed folders MUST contain the "%check" section. If empty, all testable items from "SRPM_PACK_LIST" will be considered. Will not re-test previously built packages. Example: TEST_RUN_LIST="libguestfs zlib".
+TEST_RUN_LIST           ?=
+##help:var:TEST_RERUN_LIST:<spec_list>=List of space-separated spec folders to force running a package test for. Specs from the listed folders MUST contain the "%check" section. Must not overlap with "TEST_IGNORE_LIST". Example: TEST_RERUN_LIST="libguestfs zlib".
+TEST_RERUN_LIST         ?=
+##help:var:TEST_IGNORE_LIST:<spec_list>=List of space-separated spec folders to ignore for package tests. Must not overlap with "TEST_RERUN_LIST", may overlap with "TEST_RUN_LIST". Example: TEST_IGNORE_LIST="acl".
+TEST_IGNORE_LIST        ?=
 
 ######## SET INCREMENTAL BUILD FLAGS ########
 
 # Logic to auto configure build options for optimized builds
-# These will set the default values for: REBUILD_TOOLS, USE_CCACHE, MAX_CPU, REBUILD_TOOLCHAIN, DELTA_BUILD, INCREMENTAL_TOOLCHAIN, ALLOW_TOOLCHAIN_DOWNLOAD_FAIL, and CLEAN_TOOLCHAIN_CONTAINERS
+# These will set the default values for: REBUILD_TOOLS, MAX_CPU, REBUILD_TOOLCHAIN, DELTA_BUILD, INCREMENTAL_TOOLCHAIN, ALLOW_TOOLCHAIN_DOWNLOAD_FAIL, and CLEAN_TOOLCHAIN_CONTAINERS
 include $(SCRIPTS_DIR)/incremental_building.mk
 
 ######## SET REMAINING FLAGS ########
 
-UPDATE_TOOLCHAIN_LIST           ?= n
-REBUILD_PACKAGES                ?= y
-DOWNLOAD_SRPMS                  ?= n
-ALLOW_SRPM_DOWNLOAD_FAIL        ?= n
-RUN_CHECK                       ?= n
-USE_PREVIEW_REPO                ?= n
-DISABLE_UPSTREAM_REPOS          ?= n
-DISABLE_DEFAULT_REPOS           ?= n
-TOOLCHAIN_CONTAINER_ARCHIVE     ?=
-TOOLCHAIN_ARCHIVE               ?=
-TOOLCHAIN_SOURCES_ARCHIVE       ?=
-CACHE_DIR                       ?=
-PACKAGE_CACHE_SUMMARY           ?=
-IMAGE_CACHE_SUMMARY             ?=
-INITRD_CACHE_SUMMARY            ?=
-PACKAGE_ARCHIVE                 ?=
-PACKAGE_BUILD_RETRIES           ?= 1
-CHECK_BUILD_RETRIES             ?= 1
-REFRESH_WORKER_CHROOT           ?= y
+UPDATE_TOOLCHAIN_LIST                ?= n
+REBUILD_PACKAGES                     ?= y
+DOWNLOAD_SRPMS                       ?= n
+ALLOW_SRPM_DOWNLOAD_FAIL             ?= n
+RUN_CHECK                            ?= n
+USE_PREVIEW_REPO                     ?= n
+DISABLE_UPSTREAM_REPOS               ?= n
+DISABLE_DEFAULT_REPOS                ?= n
+TOOLCHAIN_CONTAINER_ARCHIVE          ?=
+TOOLCHAIN_ARCHIVE                    ?=
+TOOLCHAIN_SOURCES_ARCHIVE            ?=
+CACHE_DIR                            ?=
+PACKAGE_CACHE_SUMMARY                ?=
+IMAGE_CACHE_SUMMARY                  ?=
+INITRD_CACHE_SUMMARY                 ?=
+PACKAGE_ARCHIVE                      ?=
+PACKAGE_BUILD_RETRIES                ?= 1
+CHECK_BUILD_RETRIES                  ?= 1
+REFRESH_WORKER_CHROOT                ?= y
 # Set to 0 to use the number of logical CPUs.
-CONCURRENT_PACKAGE_BUILDS       ?= 0
+CONCURRENT_PACKAGE_BUILDS            ?= 0
 # Set to 0 to print all available results.
-NUM_OF_ANALYTICS_RESULTS        ?= 10
-CLEANUP_PACKAGE_BUILDS          ?= y
-USE_PACKAGE_BUILD_CACHE         ?= y
-REBUILD_DEP_CHAINS              ?= y
-HYDRATED_BUILD                  ?= n
-TARGET_ARCH                     ?=
-ALLOW_TOOLCHAIN_REBUILDS        ?= n
-CACHED_PACKAGES_ARCHIVE         ?=
+NUM_OF_ANALYTICS_RESULTS             ?= 10
+CLEANUP_PACKAGE_BUILDS               ?= y
+USE_PACKAGE_BUILD_CACHE              ?= y
+REBUILD_DEP_CHAINS                   ?= y
+HYDRATED_BUILD                       ?= n
+TARGET_ARCH                          ?=
+ALLOW_TOOLCHAIN_REBUILDS             ?= n
+RESOLVE_CYCLES_FROM_UPSTREAM         ?= n
+IGNORE_VERSION_TO_RESOLVE_SELFDEP    ?= n
+CACHED_PACKAGES_ARCHIVE              ?=
+USE_CCACHE                           ?= n
 
 # Tracing & Profiling support: https://go.dev/doc/diagnostics
 ENABLE_CPU_PROFILE              ?= n
@@ -136,6 +146,7 @@ CA_CERT     ?=
 TLS_CERT    ?=
 TLS_KEY     ?=
 
+##help:var:LOG_LEVEL:{panic,fatal,error,warn,info,debug,trace}=Set logging level for toolkit.
 # panic,fatal,error,warn,info,debug,trace
 LOG_LEVEL          ?= info
 STOP_ON_WARNING    ?= n
@@ -148,6 +159,10 @@ STOP_ON_FETCH_FAIL ?= n
 all: toolchain go-tools chroot-tools
 
 ######## SUBMAKE INCLUDES ########
+
+# General help information used by 'help' target; this should be included first so
+# its help will be displayed at the top of the help output.
+include $(SCRIPTS_DIR)/help.mk
 
 # Misc function defines
 # Variable prerequisite tracking
@@ -186,6 +201,14 @@ include $(SCRIPTS_DIR)/containerized-build.mk
 #   expand-specs clean-expand-specs
 include $(SCRIPTS_DIR)/srpm_expand.mk
 
+# Create self contained toolkit archive contianing all the required tools with:
+#   package-toolkit, clean-package-toolkit
+include $(SCRIPTS_DIR)/toolkit.mk
+
+# Fill the cache with rpms from the package server without using package manager or chroot with:
+#   pre-cache
+include $(SCRIPTS_DIR)/precache.mk
+
 # Create a package build workplan with:
 #   workplan, clean-workplan clean-cache
 # Build a package with:
@@ -198,10 +221,7 @@ include $(SCRIPTS_DIR)/pkggen.mk
 #   image, iso, clean-imggen
 include $(SCRIPTS_DIR)/imggen.mk
 
-# Create self contained toolkit archive contianing all the required tools with:
-#   package-toolkit, clean-package-toolkit
-include $(SCRIPTS_DIR)/toolkit.mk
-
+##help:target:clean=Clean all built files.
 # Each component provides specific clean implementations which clean depends on.
 # They are guaranteed to run first and will verify there are no existing mount points
 # left after a chroot.
@@ -211,6 +231,18 @@ clean:
 	rm -rf $(toolkit_root)/out
 
 ######## VARIABLE PRINTING ########
+
+# Display Makefile usage help; please consult $(SCRIPTS_DIR)/help.mk for documentation
+# on the format of the comment annotations being extracted here.
+.PHONY: help
+help:
+	@sed -ne '/@sed/!s/##help:desc://p' $(MAKEFILE_LIST)
+	@sed -ne '/@sed/!s/##help:target-heading://p' $(MAKEFILE_LIST)
+	@grep -h "^##help:target:" $(MAKEFILE_LIST) | sed -e "s/^##help:target:\([^=]\+\)=\(.*\)/\1|\2/" | sort | awk -F'|' '{ printf("  \033[3m%-26s\033[0m %s\n", $$1, $$2)}'
+	@sed -ne '/@sed/!s/##help:var-heading://p' $(MAKEFILE_LIST)
+	@grep -h "^##help:var:" $(MAKEFILE_LIST) | sed -e "s/^##help:var:\([^:]\+\):\([^=]*\)=\(.*\)/\1|\2|\3/" | sort | awk -F'|' '{ printf("  \033[92;3m%s\033[0m=%s\n      %s\n\n", $$1, $$2, $$3) }'
+	@sed -ne '/@sed/!s/##help:example-heading://p' $(MAKEFILE_LIST)
+	@grep -h "^##help:example:" $(MAKEFILE_LIST) | sed -e "s/^##help:example:\(.*\)/  \1/"
 
 # Some common version information that is useful to gather. Generally should be run with the Make flag --quiet
 get-version: printvar-RELEASE_VERSION

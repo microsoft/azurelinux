@@ -24,7 +24,6 @@ type BuildAgentConfig struct {
 	RpmmacrosFile        string
 
 	NoCleanup bool
-	RunCheck  bool
 	UseCcache bool
 	MaxCpu    string
 
@@ -40,9 +39,10 @@ type BuildAgent interface {
 	// BuildPackage builds a given file and returns the output files or error.
 	// - inputFile is the SRPM to build.
 	// - logName is the file name to save the package build log to.
-	// - outArch is the machine architecture where the output binary will run
+	// - outArch is the target architecture to build for.
+	// - runCheck is true if the package should run the "%check" section during the build
 	// - dependencies is a list of dependencies that need to be installed before building.
-	BuildPackage(inputFile, logName, outArch string, dependencies []string) ([]string, string, error)
+	BuildPackage(inputFile, logName, outArch string, runCheck bool, dependencies []string) ([]string, string, error)
 
 	// Config returns a copy of the agent's configuration.
 	Config() BuildAgentConfig

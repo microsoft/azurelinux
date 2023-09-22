@@ -2,7 +2,7 @@
 Summary:        A utility for setting up encrypted disks
 Name:           cryptsetup
 Version:        2.4.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -161,6 +161,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %endif
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.4.3-4
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed May 31 2023 Vince Perri <viperri@microsoft.com> - 2.4.3-3
 - Disable ssh-token subpackage since requiring libssh-devel creates a circular
 - dependency.

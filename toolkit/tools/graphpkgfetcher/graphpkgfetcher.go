@@ -55,6 +55,10 @@ var (
 	pkgsToBuild          = app.Flag("packages", "Space separated list of top-level packages that should be built. Omit this argument to build all packages.").String()
 	pkgsToRebuild        = app.Flag("rebuild-packages", "Space separated list of base package names packages that should be rebuilt.").String()
 
+	testsToIgnore = app.Flag("ignored-tests", "Space separated list of package tests that should not be ran.").String()
+	testsToRun    = app.Flag("tests", "Space separated list of package tests that should be ran. Omit this argument to run all package tests.").String()
+	testsToRerun  = app.Flag("rerun-tests", "Space separated list of package tests that should be re-ran.").String()
+
 	inputSummaryFile  = app.Flag("input-summary-file", "Path to a file with the summary of packages cloned to be restored").String()
 	outputSummaryFile = app.Flag("output-summary-file", "Path to save the summary of packages cloned").String()
 
@@ -198,7 +202,15 @@ func downloadDeltaNodes(dependencyGraph *pkggraph.PkgGraph, cloner *rpmrepoclone
 
 	// Generate the list of packages that need to be built. If none are requested then all packages will be built. We
 	// don't care about explicit rebuilds here since we are going to rebuild them anyway.
-	packageVersToBuild, _, _, err := schedulerutils.ParseAndGeneratePackageList(dependencyGraph, exe.ParseListArgument(*pkgsToBuild), exe.ParseListArgument(*pkgsToRebuild), exe.ParseListArgument(*pkgsToIgnore), *imageConfig, *baseDirPath)
+	packageVersToBuild, _, _, err := schedulerutils.ParseAndGeneratePackageBuildList(dependencyGraph, exe.ParseListArgument(*pkgsToBuild), exe.ParseListArgument(*pkgsToRebuild), exe.ParseListArgument(*pkgsToIgnore), *imageConfig, *baseDirPath)
+	if err != nil {
+		err = fmt.Errorf("unable to generate package build list to calculate delta downloads:\n%w", err)
+		return
+	}
+
+	// Generate the list of tests that need to be ran. If none are requested then all packages will be built. We
+	// don't care about explicit rebuilds here since we are going to rebuild them anyway.
+	testVersToRun, _, _, err := schedulerutils.ParseAndGeneratePackageTestList(dependencyGraph, exe.ParseListArgument(*testsToRun), exe.ParseListArgument(*testsToRerun), exe.ParseListArgument(*testsToIgnore), *imageConfig, *baseDirPath)
 	if err != nil {
 		err = fmt.Errorf("unable to generate package build list to calculate delta downloads:\n%w", err)
 		return
@@ -211,7 +223,7 @@ func downloadDeltaNodes(dependencyGraph *pkggraph.PkgGraph, cloner *rpmrepoclone
 		return
 	}
 
-	isGraphOptimized, deltaPkgGraphCopy, _, err := schedulerutils.PrepareGraphForBuild(deltaPkgGraphCopy, packageVersToBuild, useImplicitForOptimization)
+	isGraphOptimized, deltaPkgGraphCopy, _, err := schedulerutils.PrepareGraphForBuild(deltaPkgGraphCopy, packageVersToBuild, testVersToRun, useImplicitForOptimization)
 	if err != nil {
 		err = fmt.Errorf("failed to initialize graph for delta package downloading:\n%w", err)
 		return
@@ -274,24 +286,28 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile stri
 	fetchedPackages := make(map[string]bool)
 	prebuiltPackages := make(map[string]bool)
 	unresolvedNodes := findUnresolvedNodes(dependencyGraph.AllRunNodes())
+	unresolvedNodesCount := len(unresolvedNodes)
 
 	timestamp.StartEvent("clone graph", nil)
 	for i, n := range unresolvedNodes {
+		progressHeader := fmt.Sprintf("Cache progress %d%%", (i*100)/unresolvedNodesCount)
 		resolveErr := resolveSingleNode(cloner, n, downloadDependencies, toolchainPackages, fetchedPackages, prebuiltPackages, *outDir)
-		logger.Log.Infof("Cache progress %d%%: choosing '%s' to provide '%s'.", ((i * 100) / len(unresolvedNodes)), filepath.Base(n.RpmPath), n.VersionedPkg.Name)
+		if resolveErr == nil {
+			logger.Log.Infof("%s: choosing '%s' to provide '%s'.", progressHeader, filepath.Base(n.RpmPath), n.VersionedPkg.Name)
+			continue
+		}
+
 		// Failing to clone a dependency should not halt a build.
 		// The build should continue and attempt best effort to build as many packages as possible.
-		if resolveErr != nil {
-			logger.Log.Warnf("Failed to resolve graph node '%s':\n%s", n, resolveErr)
-			cachingSucceeded = false
-			errorMessage := strings.Builder{}
-			errorMessage.WriteString(fmt.Sprintf("Failed to resolve all nodes in the graph while resolving '%s'\n", n))
-			errorMessage.WriteString("Nodes which have this as a dependency:\n")
-			for _, dependant := range graph.NodesOf(dependencyGraph.To(n.ID())) {
-				errorMessage.WriteString(fmt.Sprintf("\t'%s' depends on '%s'\n", dependant.(*pkggraph.PkgNode), n))
-			}
-			logger.Log.Debugf(errorMessage.String())
+		logger.Log.Warnf("%s: failed to resolve graph node '%s':\n%s", progressHeader, n, resolveErr)
+		cachingSucceeded = false
+		errorMessage := strings.Builder{}
+		errorMessage.WriteString(fmt.Sprintf("Failed to resolve all nodes in the graph while resolving '%s'\n", n))
+		errorMessage.WriteString("Nodes which have this as a dependency:\n")
+		for _, dependant := range graph.NodesOf(dependencyGraph.To(n.ID())) {
+			errorMessage.WriteString(fmt.Sprintf("\t'%s' depends on '%s'\n", dependant.(*pkggraph.PkgNode), n))
 		}
+		logger.Log.Debugf(errorMessage.String())
 	}
 	timestamp.StopEvent(nil) // clone graph
 	if stopOnFailure && !cachingSucceeded {
@@ -407,6 +423,8 @@ func downloadSingleDeltaRPM(realDependencyGraph *pkggraph.PkgGraph, buildNode *p
 			logger.Log.Warnf("Can't find delta RPM to download for %s: %s (local copy may be newer than published version)", fullyQualifiedRpmName, err)
 			return nil
 		}
+	} else {
+		logger.Log.Debugf("Found pre-cached delta RPM for %s, skipping download", fullyQualifiedRpmName)
 	}
 
 	foundCacheRPM, err = file.PathExists(cachedRPMPath)

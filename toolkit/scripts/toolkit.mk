@@ -64,6 +64,7 @@ clean-rpms-snapshot:
 	rm -rf $(rpms_snapshot_build_dir)
 	rm -f $(rpms_snapshot_logs_path)
 
+##help:target:package-toolkit=Create this toolkit.
 package-toolkit: $(toolkit_archive_versioned_compressed)
 	@echo "Toolkit packed under '$(toolkit_archive_versioned_compressed)'."
 
@@ -119,6 +120,7 @@ $(valid_arch_spec_names): $(go-specarchchecker) $(chroot_worker) $(local_specs) 
 		--packages="$(PACKAGE_BUILD_LIST)" \
 		--rebuild-packages="$(PACKAGE_REBUILD_LIST)" \
 		--build-dir="$(valid_arch_spec_names_build_dir)" \
+		$(if $(filter y,$(RUN_CHECK)),--test-only) \
 		--dist-tag=$(DIST_TAG) \
 		--worker-tar="$(chroot_worker)" \
 		--log-level=$(LOG_LEVEL) \

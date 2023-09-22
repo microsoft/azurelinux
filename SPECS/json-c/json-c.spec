@@ -3,13 +3,14 @@
 Summary:        A JSON implementation in C
 Name:           json-c
 Version:        0.15
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/json-c/json-c
 Source0:        %{url}/archive/%{name}-%{version}-%{publishdate}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         CVE-2021-32292.patch
 
 BuildRequires: cmake
 
@@ -25,7 +26,7 @@ The package contains libraries and header files for
 developing applications that use json-c.
 
 %prep
-%setup -q -n %{name}-%{name}-%{version}-%{publishdate}
+%autosetup -p1 -n %{name}-%{name}-%{version}-%{publishdate}
 
 %build
 mkdir build
@@ -58,6 +59,9 @@ make %{?_smp_mflags} test
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Mon Aug 28 2023 Henry Beberman <henry.beberman@microsoft.com> - 0.15-2
+- Patch CVE-2021-32292
+
 * Thu Feb 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 0.15-1
 - Update source to v0.15
 - Remove CVE-2020-12762.patch, Fix-CVE-2020-12762.patch (found in release source)

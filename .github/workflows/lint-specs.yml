@@ -7,11 +7,11 @@ on:
   push:
     paths:
       - '**.spec'
-    branches: [main, dev, 1.0*, 2.0*]
+    branches: [main, dev, 1.0*, 2.0*, fasttrack/*]
   pull_request:
     paths:
       - '**.spec'
-    branches: [main, dev, 1.0*, 2.0*]
+    branches: [main, dev, 1.0*, 2.0*, fasttrack/*]
 
 jobs:
   spec-lint:
@@ -21,7 +21,7 @@ jobs:
     steps:
       # Checkout the branch of our repo that triggered this action
       - name: Workflow trigger checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Get base commit for PRs
         if: ${{ github.event_name == 'pull_request' }}
@@ -45,7 +45,7 @@ jobs:
           echo "updated-specs=$(echo ${changed_specs})" >> $GITHUB_ENV
 
       - name: Main branch checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: 'main'
           path: 'main-checkout'
@@ -53,7 +53,7 @@ jobs:
       # Our linter is based on the spec-cleaner tool from the folks at openSUSE
       # We apply a patch to modify it for CBL-Mariner's needs
       - name: spec-cleaner checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: 'rpm-software-management/spec-cleaner'
           ref: 'spec-cleaner-1.2.0'

@@ -4,16 +4,11 @@ Distribution:   Mariner
 
 Name:		%{srcname}
 Version:	5.2.2
-Release:	2%{?dist}
+Release:	3%{?dist}
 Summary:	Python client library for PostgreSQL
 
 URL:		http://www.pygresql.org/
-# Author states his intention is to dual license under PostgreSQL or Python
-# licenses --- this is not too clear from the current tarball documentation,
-# but hopefully will be clearer in future releases.
-# The PostgreSQL license is very similar to other MIT licenses, but the OSI
-# recognizes it as an independent license, so we do as well.
-License:	PostgreSQL or Python
+License:	PostgreSQL
 
 Source0:	https://github.com/PyGreSQL/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
 
@@ -23,7 +18,8 @@ BuildRequires:	python3-devel
 
 # For testsuite
 %if %{with_check}
-BuildRequires:	postgresql-test-rpm-macros
+# Missing test dependencies:
+# BuildRequires:	postgresql-test-rpm-macros
 %endif
 
 %global _description\
@@ -83,6 +79,10 @@ EOF
 
 
 %changelog
+* Thu Aug 31 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.2.2-3
+- Disabling missing test dependency.
+- License verified.
+
 * Sat Jul 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.2.2-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Disabling BR on 'postgresql-test-rpm-macros' for non-test builds.

@@ -1,7 +1,7 @@
 Summary:        Contains a parser generator
 Name:           bison
 Version:        3.7.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -55,6 +55,9 @@ make %{?_smp_mflags} check
 %{_docdir}/bison/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.7.6-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Fri Nov 05 2021 Andrew Phelps <anphel@microsoft.com> 3.7.6-1
 - Update to version 3.7.6
 
