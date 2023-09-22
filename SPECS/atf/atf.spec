@@ -1,6 +1,6 @@
 Name:          atf
 Version:       0.21
-Release:       1%{?dist}
+Release:       2%{?dist}
 License:       BSD
 Summary:       Automated Testing Framework
 Vendor:        Microsoft Corporation
@@ -195,6 +195,9 @@ applications that use the ATF POSIX shell bindings.
 %{_mandir}/man3/atf-sh-api.3.gz
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.21-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Thu Jan 06 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 0.21-1
 - Upgrade to version 0.21.
 

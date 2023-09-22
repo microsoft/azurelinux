@@ -5,7 +5,7 @@ Distribution:   Mariner
 
 Name:     lldpd
 Version:  1.0.14
-Release:  2%{?dist}
+Release:  3%{?dist}
 Summary:  ISC-licensed implementation of LLDP
 
 License:  ISC
@@ -163,6 +163,9 @@ fi
 
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.0.14-3
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Tue Sep 12 2023 Suresh Thelkar <sthelkar@microsoft.com> - 1.0.14-2
 - Backport patch to address CVE-2023-41910
 

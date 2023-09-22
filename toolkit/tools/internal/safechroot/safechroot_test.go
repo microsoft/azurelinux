@@ -24,29 +24,26 @@ const (
 )
 
 var (
-	testDir    string
-	tmpDir     string
-	workingDir string
+	testDir string
 )
 
 func TestMain(m *testing.M) {
-	var err error
-
 	logger.InitStderrLog()
 
-	workingDir, err = os.Getwd()
-	if err != nil {
-		logger.Log.Panicf("Failed to get working directory, error: %s", err)
-	}
+	var retVal int
+	if os.Geteuid() != 0 {
+		// We're not running as root; we need to skip all tests in this file.
+		logger.Log.Warn("safechroot tests must be run as root; skipping...")
+		retVal = 0
+	} else {
+		// We're running as root; let's proceed with test setup and testing.
+		var err error
+		testDir, err = filepath.Abs("testdata")
+		if err != nil {
+			logger.Log.Panicf("Failed to get path to test data, error: %s", err)
+		}
 
-	testDir = filepath.Join(workingDir, "testdata")
-	tmpDir = filepath.Join(workingDir, "_tmp")
-
-	retVal := m.Run()
-
-	err = os.RemoveAll(tmpDir)
-	if err != nil {
-		logger.Log.Warnf("Failed to cleanup tmp dir (%s). Error: %s", tmpDir, err)
+		retVal = m.Run()
 	}
 
 	os.Exit(retVal)
@@ -56,7 +53,7 @@ func TestInitializeShouldCreateRoot(t *testing.T) {
 	extraMountPoints := []*MountPoint{}
 	extraDirectories := []string{}
 
-	dir := filepath.Join(tmpDir, "TestInitializeShouldCreateRoot")
+	dir := filepath.Join(t.TempDir(), "TestInitializeShouldCreateRoot")
 	chroot := NewChroot(dir, isExistingDir)
 
 	err := chroot.Initialize(emptyPath, extraDirectories, extraMountPoints)
@@ -72,7 +69,7 @@ func TestCloseShouldRemoveRoot(t *testing.T) {
 	extraMountPoints := []*MountPoint{}
 	extraDirectories := []string{}
 
-	dir := filepath.Join(tmpDir, "TestCloseShouldRemoveRoot")
+	dir := filepath.Join(t.TempDir(), "TestCloseShouldRemoveRoot")
 	chroot := NewChroot(dir, isExistingDir)
 
 	err := chroot.Initialize(emptyPath, extraDirectories, extraMountPoints)
@@ -102,7 +99,7 @@ func TestCloseShouldLeaveRootOnRequest(t *testing.T) {
 		extraMountPoints := []*MountPoint{}
 		extraDirectories := []string{}
 
-		dir := filepath.Join(tmpDir, "TestCloseShouldLeaveRootOnRequest")
+		dir := filepath.Join(t.TempDir(), "TestCloseShouldLeaveRootOnRequest")
 		chroot := NewChroot(dir, isExistingDir)
 
 		err := chroot.Initialize(emptyPath, extraDirectories, extraMountPoints)
@@ -124,7 +121,7 @@ func TestCloseShouldLeaveRootOnRequest(t *testing.T) {
 func TestRootDirShouldReturnRootDir(t *testing.T) {
 	if buildpipeline.IsRegularBuild() {
 		// this test only apply to "regular build" pipeline
-		dir := filepath.Join(tmpDir, "TestRootDirShouldReturnRootDir")
+		dir := filepath.Join(t.TempDir(), "TestRootDirShouldReturnRootDir")
 		chroot := NewChroot(dir, isExistingDir)
 		assert.Equal(t, dir, chroot.RootDir())
 	}
@@ -134,7 +131,7 @@ func TestRunShouldReturnCorrectError(t *testing.T) {
 	extraMountPoints := []*MountPoint{}
 	extraDirectories := []string{}
 
-	dir := filepath.Join(tmpDir, "TestRunShouldReturnCorrectError")
+	dir := filepath.Join(t.TempDir(), "TestRunShouldReturnCorrectError")
 	chroot := NewChroot(dir, isExistingDir)
 
 	err := chroot.Initialize(emptyPath, extraDirectories, extraMountPoints)
@@ -153,7 +150,7 @@ func TestRunShouldChangeCWD(t *testing.T) {
 	extraMountPoints := []*MountPoint{}
 	extraDirectories := []string{}
 
-	dir := filepath.Join(tmpDir, "TestRunShouldChangeCWD")
+	dir := filepath.Join(t.TempDir(), "TestRunShouldChangeCWD")
 	chroot := NewChroot(dir, isExistingDir)
 
 	err := chroot.Initialize(emptyPath, extraDirectories, extraMountPoints)
@@ -178,14 +175,14 @@ func TestShouldRestoreCWD(t *testing.T) {
 	extraMountPoints := []*MountPoint{}
 	extraDirectories := []string{}
 
-	dir := filepath.Join(tmpDir, "TestShouldRestoreCWD")
+	dir := filepath.Join(t.TempDir(), "TestShouldRestoreCWD")
 	chroot := NewChroot(dir, isExistingDir)
 
 	err := chroot.Initialize(emptyPath, extraDirectories, extraMountPoints)
 	assert.NoError(t, err)
 	defer chroot.Close(defaultLeaveOnDisk)
 
-	expectedWorkingDirectory := workingDir
+	expectedWorkingDirectory, err := os.Getwd()
 	assert.NoError(t, err)
 
 	err = chroot.Run(func() (err error) {
@@ -205,7 +202,7 @@ func TestInitializeShouldExtractTar(t *testing.T) {
 	extraMountPoints := []*MountPoint{}
 	extraDirectories := []string{}
 
-	dir := filepath.Join(tmpDir, "TestInitializeShouldExtractTar")
+	dir := filepath.Join(t.TempDir(), "TestInitializeShouldExtractTar")
 	chroot := NewChroot(dir, isExistingDir)
 
 	err := chroot.Initialize(tarPath, extraDirectories, extraMountPoints)
@@ -228,7 +225,7 @@ func TestInitializeShouldCreateCustomMountPoints(t *testing.T) {
 			NewMountPoint(srcMount, "custom-mount", "", BindMountPointFlags, emptyPath),
 		}
 
-		dir := filepath.Join(tmpDir, "TestInitializeShouldCreateCustomMountPoints")
+		dir := filepath.Join(t.TempDir(), "TestInitializeShouldCreateCustomMountPoints")
 		chroot := NewChroot(dir, isExistingDir)
 
 		err := chroot.Initialize(emptyPath, extraDirectories, extraMountPoints)
@@ -251,7 +248,7 @@ func TestInitializeShouldCleanupOnBadMountPoint(t *testing.T) {
 			NewMountPoint(invalidMountPointSource, "custom-mount", "", emptyFlags, emptyPath),
 		}
 
-		dir := filepath.Join(tmpDir, "TestInitializeShouldCleanupOnBadMountPoint")
+		dir := filepath.Join(t.TempDir(), "TestInitializeShouldCleanupOnBadMountPoint")
 		chroot := NewChroot(dir, isExistingDir)
 
 		err := chroot.Initialize(emptyPath, extraDirectories, extraMountPoints)
@@ -268,7 +265,7 @@ func TestInitializeShouldCreateExtraDirectories(t *testing.T) {
 	extraDirectories := []string{expectedExtraDirectory}
 	extraMountPoints := []*MountPoint{}
 
-	dir := filepath.Join(tmpDir, "TestInitializeShouldCreateExtraDirectories")
+	dir := filepath.Join(t.TempDir(), "TestInitializeShouldCreateExtraDirectories")
 	chroot := NewChroot(dir, isExistingDir)
 
 	err := chroot.Initialize(emptyPath, extraDirectories, extraMountPoints)

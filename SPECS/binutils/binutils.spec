@@ -1,7 +1,7 @@
 Summary:        Contains a linker, an assembler, and other tools
 Name:           binutils
 Version:        2.37
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -131,6 +131,9 @@ sed -i 's/testsuite/ /g' gold/Makefile
 %{_libdir}/libopcodes.so
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.37-7
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Tue Aug 29 2023 Andy Zaugg <azaugg@linkedin.com> - 2.37-6
 - Use the pic'ed libiberty.a version
 

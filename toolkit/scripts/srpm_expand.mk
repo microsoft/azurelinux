@@ -16,6 +16,7 @@ srpm_expand_log = $(srpm_expand_logs_dir)/srpm_expand.log
 $(call create_folder, $(srpm_expand_logs_dir))
 
 .PHONY: expand-specs clean-expand-specs
+##help:target:expand-specs=Extract working copies of the `*.spec` files from the local `*.src.rpm` files.
 expand-specs: $(BUILD_SPECS_DIR)
 
 clean: clean-expand-specs
