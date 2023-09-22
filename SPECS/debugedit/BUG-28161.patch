@@ -1,7 +1,7 @@
 From ae27211cbbfb63a0ad3c141cd1310d7f583ec40e Mon Sep 17 00:00:00 2001
 From: Mark Wielaard <mark@klomp.org>
 Date: Fri, 30 Jul 2021 18:09:46 +0200
-Subject: [PATCH] tests: Handle zero directory entry in .debug_line DWARF5
+Subject: [PATCH 1/1] tests: Handle zero directory entry in .debug_line DWARF5
  debugedit.at
 
 We were skipping the zero directory entry, because it was always
