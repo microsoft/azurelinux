@@ -151,7 +151,7 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man3/*
 
 %changelog
-* Wed Sep 21 2023 Andrew Phelps <anphel@microsoft.com> - 2.37.4-8
+* Thu Sep 21 2023 Andrew Phelps <anphel@microsoft.com> - 2.37.4-8
 - Add su-l file for PAM
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.37.4-7
