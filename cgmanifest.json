@@ -3920,8 +3920,8 @@
         "type": "other",
         "other": {
           "name": "freeradius",
-          "version": "3.0.21",
-          "downloadUrl": "ftp://ftp.freeradius.org/pub/radius/freeradius-server-3.0.21.tar.bz2"
+          "version": "3.2.3",
+          "downloadUrl": "ftp://ftp.freeradius.org/pub/radius/freeradius-server-3.2.3.tar.bz2"
         }
       }
     },
