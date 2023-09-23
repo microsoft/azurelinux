@@ -98,7 +98,7 @@ $(foreach var,$(watch_vars),$(eval $(call depend_on_var,$(var))))
 #
 # NOTE: we depend on a phony target and create the flag only once becase we want
 #       to always run the "setfacl" command but not trigger a re-run of the targets
-#	    depending on this target.
+#       depending on this target.
 $(no_repo_acl): setfacl_always_run_phony
 	@setfacl -bnR $(PROJECT_ROOT) &>/dev/null && \
 	if [ ! -f $@ ]; then \
