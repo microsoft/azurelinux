@@ -277,6 +277,25 @@ func startWorkerPool(agent buildagents.BuildAgent, workers, buildAttempts, check
 	return
 }
 
+func debugStuckNode(buildState *schedulerutils.GraphBuildState, pkgGraph *pkggraph.PkgGraph, stuckNode *pkggraph.PkgNode, indent int) {
+	isStuck := !buildState.IsNodeAvailable(stuckNode)
+	indentSpaces := ""
+	for i := 0; i < indent; i++ {
+		indentSpaces += "  "
+	}
+	if isStuck {
+		logger.Log.Errorf("DEBUG: %s**STUCK** (%s)", indentSpaces, stuckNode.FriendlyName())
+
+		// Iterate over all the nodes that are blocking the stuck node.
+		dependency := pkgGraph.From(stuckNode.ID())
+		for dependency.Next() {
+			dependent := dependency.Node().(*pkggraph.PkgNode)
+			debugStuckNode(buildState, pkgGraph, dependent, indent+1)
+		}
+
+	}
+}
+
 // buildAllNodes will build all nodes in a given dependency graph.
 // This routine only contains control flow logic for build scheduling.
 // It iteratively:
@@ -346,6 +365,7 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 		if len(buildState.ActiveBuilds()) == 0 && len(channels.Results) == 0 {
 			if useCachedImplicit {
 				err = fmt.Errorf("could not build all packages")
+				debugStuckNode(buildState, pkgGraph, goalNode, 0)
 				break
 			} else {
 				logger.Log.Warn("Enabling cached packages to satisfy unresolved dynamic dependencies.")
@@ -400,6 +420,7 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 						// When querying their edges, the graph library will return an empty iterator (graph.Empty).
 						pkgGraph = newGraph
 						goalNode = newGoalNode
+						logger.Log.Errorf("DEBUG: Updated goal node!")
 					}
 				}
 
