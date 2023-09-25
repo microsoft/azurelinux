@@ -117,6 +117,9 @@ install -vdm 755 %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}
 install -vdm 755 %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}
 make INSTALL_MOD_PATH=%{buildroot} modules_install
 
+# Add kernel-mshv-specific boot configurations to /etc/default/grub.d
+# This configuration contains additional boot parameters required in our
+# Linux-Dom0-based images. 
 mkdir -p %{buildroot}%{_sysconfdir}/default/grub.d
 install -m 750 %{SOURCE3} %{buildroot}%{_sysconfdir}/default/grub.d/50_mariner_mshv.cfg
 
