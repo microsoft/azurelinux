@@ -343,7 +343,7 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 
 		// If there are no active builds running or results waiting to check try enabling cached packages for unresolved
 		// dynamic dependencies to unblock more nodes. Otherwise, there is nothing left that can be built.
-		if len(buildState.ActiveBuilds()) == 0 && len(channels.Results) == 0 {
+		if len(buildState.ActiveBuilds()) == 0 {
 			if useCachedImplicit {
 				err = fmt.Errorf("could not build all packages")
 				break
