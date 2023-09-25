@@ -6,7 +6,7 @@
 Summary:        The kexec/kdump userspace component
 Name:           kexec-tools
 Version:        2.0.23
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -37,6 +37,7 @@ Source26: live-image-kdump-howto.txt
 Source27: early-kdump-howto.txt
 Source28: kdump-udev-throttler
 Source29: kdump.sysconfig.aarch64
+Source30: 51_kexec_tools.cfg
 
 #######################################
 # These are sources for mkdumpramfs
@@ -62,6 +63,7 @@ Requires: ethtool
 Requires: awk
 Requires: dhcp-client
 Requires: squashfs-tools
+%{?grub2_configuration_requires}
 
 BuildRequires: zlib-devel
 BuildRequires: zlib
@@ -76,6 +78,7 @@ BuildRequires: snappy-devel
 BuildRequires: pkg-config
 BuildRequires: intltool
 BuildRequires: gettext
+BuildRequires: grub2-rpm-macros
 BuildRequires: systemd
 BuildRequires: automake
 BuildRequires: autoconf
@@ -215,6 +218,11 @@ cp %{SOURCE109} $RPM_BUILD_ROOT/etc/kdump-adv-conf/kdump_dracut_modules/99earlyk
 chmod 755 $RPM_BUILD_ROOT/etc/kdump-adv-conf/kdump_dracut_modules/99earlykdump/%{remove_dracut_prefix %{SOURCE108}}
 chmod 755 $RPM_BUILD_ROOT/etc/kdump-adv-conf/kdump_dracut_modules/99earlykdump/%{remove_dracut_early_kdump_prefix %{SOURCE109}}
 
+# Add kexec-tools-specific boot configurations to /etc/default/grub.d
+# This configuration sets the crashkernel space allocated at boot
+# to the AzureLinux default value of 256M
+mkdir -p %{buildroot}%{_sysconfdir}/default/grub.d
+install -m 750 %{SOURCE30} %{buildroot}%{_sysconfdir}/default/grub.d/51_kexec_tools.cfg
 
 %define dracutlibdir %{_prefix}/lib/dracut
 #and move the custom dracut modules to the dracut directory
@@ -224,6 +232,7 @@ mv $RPM_BUILD_ROOT/etc/kdump-adv-conf/kdump_dracut_modules/* $RPM_BUILD_ROOT/%{d
 %post
 # Initial installation
 %systemd_post kdump.service
+%grub2_post
 
 touch /etc/kdump.conf
 # This portion of the script is temporary.  Its only here
@@ -251,6 +260,7 @@ fi
 
 %postun
 %systemd_postun_with_restart kdump.service
+%grub2_postun
 
 %preun
 # Package removal, not upgrade
@@ -300,6 +310,7 @@ done
 %{_sysconfdir}/makedumpfile.conf.sample
 %config(noreplace,missingok) %{_sysconfdir}/sysconfig/kdump
 %config(noreplace,missingok) %verify(not mtime) %{_sysconfdir}/kdump.conf
+%config(noreplace) %{_sysconfdir}/default/grub.d/51_kexec_tools.cfg
 %config %{_udevrulesdir}
 %{_udevrulesdir}/../kdump-udev-throttler
 %{dracutlibdir}/modules.d/*
@@ -324,6 +335,12 @@ done
 /usr/share/makedumpfile/
 
 %changelog
+* Tue Sep 25 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.0.23-4
+- Enable grub2-mkconfig-based boot path by installing 
+    51_kexec_tools.cfg 
+- Call grub2-mkconfig to regenerate configs only if the user has 
+    previously used grub2-mkconfig for boot configuration. 
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.0.23-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
