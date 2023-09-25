@@ -156,7 +156,7 @@ A sample `ParitionSettings` entry using `rdiff` algorithm:
     "ID": "boot",
     "MountPoint": "/boot/efi",
     "MountOptions" : "umask=0077",
-    "RdiffBaseImage" : "../out/images/core-efi/core-efi-1.0.20200918.1751.ext4"
+    "RdiffBaseImage" : "../out/images/core-efi/core-efi-2.0.20230924.1751.ext4"
 },
  ```
 
@@ -166,7 +166,7 @@ A sample `ParitionSettings` entry using `overlay` algorithm:
 {
    "ID": "rootfs",
    "MountPoint": "/",
-   "OverlayBaseImage" : "../out/images/core-efi/core-efi-rootfs-1.0.20200918.1751.ext4"
+   "OverlayBaseImage" : "../out/images/core-efi/core-efi-rootfs-2.0.20230924.1751.ext4"
 }
 
 ```
@@ -522,12 +522,12 @@ A sample image configuration, producing a VHDX disk image:
                     "ID": "boot",
                     "MountPoint": "/boot/efi",
                     "MountOptions" : "umask=0077",
-                    "RdiffBaseImage" : "../out/images/core-efi/core-efi-1.0.20200918.1751.ext4"
+                    "RdiffBaseImage" : "../out/images/core-efi/core-efi-2.0.20230924.1751.ext4"
                 },
                 {
                     "ID": "rootfs",
                     "MountPoint": "/",
-                     "OverlayBaseImage" : "../out/images/core-efi/core-efi-rootfs-1.0.20200918.1751.ext4"
+                     "OverlayBaseImage" : "../out/images/core-efi/core-efi-rootfs-2.0.20230924.1751.ext4"
                 }
             ],
             "PackageLists": [

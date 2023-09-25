@@ -21,7 +21,6 @@
       - [Ignoring Packages](#ignoring-packages)
       - [Source Hashes](#source-hashes)
   - [packages.microsoft.com Repository Structure](#packagesmicrosoftcom-repository-structure)
-      - [CBL-Mariner 1.0](#cbl-mariner-10)
       - [CBL-Mariner 2.0](#cbl-mariner-20)
   - [Keys, Certs, and Remote Sources](#keys-certs-and-remote-sources)
     - [Sources](#sources)
@@ -119,7 +118,7 @@ cd CBL-Mariner/toolkit
 git checkout 2.0-stable
 ```
 
-**IMPORTANT:** The 2.0-stable tag always points to the latest known good build of CBL-Mariner of the 2.0 branch. A similar tag, 1.0-stable, exists for the 1.0 branch. Other branchses are also buildable but not guarnateed to be stable.  The 1.0 and 2.0 branches are periodically updated with bug fixes, security vulnerability fixes or occasional feature enhancements.  As those fixes are integrated into the branch the head of a branch may be temporarily unstable.  The 2.0-stable tag will remain fixed until the tip of the branch is validated and the latest source and binary packages (SRPMs and RPMs) are published.  At that point, the 2.0-stable tag is advanced.  To ensure you have the latest invoke _git fetch --tags_ before building.
+**IMPORTANT:** The 2.0-stable tag always points to the latest known good build of CBL-Mariner of the 2.0 branch. Other branchses are also buildable but not guarnateed to be stable.  The stable branches are periodically updated with bug fixes, security vulnerability fixes or occasional feature enhancements.  As those fixes are integrated into the branch the head of a branch may be temporarily unstable.  The x.0-stable tag (e.g. 2.0-stable) will remain fixed until the tip of the branch is validated and the latest source and binary packages (SRPMs and RPMs) are published.  At that point, the 2.0-stable tag is advanced.  To ensure you have the latest invoke _git fetch --tags_ before building.
 
 It is also possible to build an older version of CBL-Mariner from the 2.0 branch.  CBL-Mariner may be updated at any time, but an aggregate release is declared monthly and [tagged in github](https://github.com/microsoft/CBL-Mariner/releases).  These monthly builds are stable and their tags can be substituted for the 2.0-stable label above.
 
@@ -301,20 +300,9 @@ sudo make input-srpms SRPM_FILE_SIGNATURE_HANDLING=update
 
 ### packages.microsoft.com Repository Structure
 
-CBL-Mariner packages are available on [packages.microsoft.com](https://packages.microsoft.com/cbl-mariner/). The CBL-Mariner repositories are divided into major release folders (1.0, 2.0, etc). Each top level folder is subdivided into "preview" and "production" (prod) repositories.
+CBL-Mariner packages are available on [packages.microsoft.com](https://packages.microsoft.com/cbl-mariner/). The CBL-Mariner repositories are divided into major release folders (e.g 2.0, 3.0 etc). Each top level folder is subdivided into "preview" and "production" (prod) repositories.
 
 The "preview" and "production" folders are further subdivided into purpose, and then again for architecture. This includes locations for source-rpms.
-
-#### CBL-Mariner 1.0
-
-For CBL-Mariner 1.0, the repositories are structured as follows:
-
-- **Base:** Packages released with CBL-Mariner 1.0.
-- **Update:** Base packages added or updated since CBL-Mariner 1.0's release date.
-- **CoreUI:** Targeted UI related packages.
-- **Extras:** CBL-Mariner 1.0 packages that are built by Microsoft and are closed source.
-- **NVIDIA:** Specially licensed NVIDIA packages.
-- **Microsoft:** Packages built by other, non-CBL-Mariner, Microsoft teams.
 
 #### CBL-Mariner 2.0
 
