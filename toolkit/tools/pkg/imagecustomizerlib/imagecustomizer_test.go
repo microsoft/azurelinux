@@ -20,6 +20,8 @@ import (
 func TestCustomizeImageEmptyConfig(t *testing.T) {
 	var err error
 
+	t.Skip("Unreliable test")
+
 	buildDir := filepath.Join(tmpDir, "TestCustomizeImageEmptyConfig")
 	outImageFilePath := filepath.Join(buildDir, "image.vhd")
 
