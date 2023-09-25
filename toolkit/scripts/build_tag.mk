@@ -6,7 +6,7 @@
 
 ######## BUILD DEFINES ########
 
-DIST_TAG           ?= .cm2
+DIST_TAG           ?= .azl3
 # Running 'git' as the owner of the repo, so it doesn't complain about the repo not belonging to root.
 BUILD_NUMBER       ?= $(call shell_real_build_only, if [ -n "$$UID" ] && [ "$$UID" -eq 0 ]; then runuser -u $$(stat -c "%U" $(PROJECT_ROOT)) -- git rev-parse --short HEAD; else git rev-parse --short HEAD; fi)
 # an empty BUILD_NUMBER breaks the build later on
@@ -15,7 +15,7 @@ ifeq ($(BUILD_NUMBER),)
 endif
 # Staticly define BUILD_NUMBER so it is set only once
 BUILD_NUMBER := $(BUILD_NUMBER)
-RELEASE_MAJOR_ID   ?= 2.0
+RELEASE_MAJOR_ID   ?= 3.0
 # use minor ID defined in file (if exist) otherwise define it
 # note this file must be single line
 ifneq ($(wildcard $(OUT_DIR)/version-minor-id.config),)
