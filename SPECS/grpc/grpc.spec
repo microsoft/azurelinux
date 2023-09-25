@@ -68,8 +68,8 @@ Python language bindings for gRPC.
 
 
 %prep
-%autosetup -n %{name}-%{version} -a 1
-%patch0 -p1
+%autosetup -p1 -q -n %{name}-%{version}
+%setup -T -D -a 1
 
 %build
 # Updating used C++ version to be compatible with the build dependencies.
