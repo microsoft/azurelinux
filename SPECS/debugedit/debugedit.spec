@@ -8,6 +8,7 @@ Vendor:       Microsoft Corporation
 Distribution: Mariner
 Source0:      https://sourceware.org/ftp/%{name}/%{version}/%{name}-%{version}.tar.xz
 Patch0:       BUG-28161.patch
+BuildRequires: binutils
 
 %description
 %{summary}
