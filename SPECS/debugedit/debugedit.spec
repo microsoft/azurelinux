@@ -18,11 +18,10 @@ BuildRequires: binutils
 %autosetup -p1
 
 %build
-%configure
-make
+./configure && make
 
 %install
-%make_install
+make install
 
 %check
 make check
