@@ -422,8 +422,6 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 						// When querying their edges, the graph library will return an empty iterator (graph.Empty).
 						pkgGraph = newGraph
 						goalNode = newGoalNode
-						// Temporarily print debug information about the stuck nodes.
-						logger.Log.Debugf("DEBUG: Updated goal node!")
 					}
 				}
 
