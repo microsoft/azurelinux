@@ -126,7 +126,7 @@ COMPONENT_KEY_NAME_AND_VERSION = cmp_to_key(
     components_compare_name_and_version)
 
 # Can't rely on Python's 'pyrpm.spec' module - it's not as good with parsing the spec as 'rpmspec' and may leave unexpanded macros.
-RPMSPEC_COMMAND_COMMON = "rpmspec --parse -D 'forgemeta %{{nil}}' -D 'py3_dist X' -D 'with_check 0' -D 'dist .cm2' -D '__python3 python3' -D '_sourcedir {source_dir}' -D 'fillup_prereq fillup'"
+RPMSPEC_COMMAND_COMMON = "rpmspec --parse -D 'forgemeta %{{nil}}' -D 'py3_dist X' -D 'with_check 0' -D 'dist .azl3' -D '__python3 python3' -D '_sourcedir {source_dir}' -D 'fillup_prereq fillup'"
 SOURCE0_LINE_REGEX = re.compile(r"^\s*Source0*:")
 SOURCE_VALUE_REGEX = re.compile(r"(?<=[\s:])[^\s#]+")
 

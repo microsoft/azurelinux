@@ -9,7 +9,7 @@ Fixes: Bug 24144834: TDNF does not support $basearch and $releasever in .repo fi
 
 By default, determine $ basearch and $ releasever from this package:
 mariner_user@mariner-aks [ /etc/tdnf ]$ sudo tdnf --refresh list installed | grep mariner
-mariner-release.noarch                      1.0-1.cm1                @System
+mariner-release.noarch                      1.0-1.azl3                @System
 
 Workaround: add the following to /etc/tdnf/tdnf.conf
 distroverpkg=mariner-release

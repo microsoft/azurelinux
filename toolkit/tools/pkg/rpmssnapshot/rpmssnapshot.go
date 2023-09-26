@@ -26,8 +26,8 @@ const (
 // Regular expression to extract package name, version, distribution, and architecture from values returned by 'rpmspec --builtrpms'.
 // Examples:
 //
-//	kernel-5.15.63.1-1.cm2.x86_64		->	Name: kernel, Version: 5.15.63.1-1, Distribution: cm2, Architecture: x86_64
-//	python3-perf-5.15.63.1-1.cm2.x86_64	->	Name: python3-perf, Version: 5.15.63.1-1, Distribution: cm2, Architecture: x86_64
+//	kernel-5.15.63.1-1.azl3.x86_64		->	Name: kernel, Version: 5.15.63.1-1, Distribution: azl3, Architecture: x86_64
+//	python3-perf-5.15.63.1-1.azl3.x86_64	->	Name: python3-perf, Version: 5.15.63.1-1, Distribution: azl3, Architecture: x86_64
 //
 // NOTE: regular expression based on following assumptions:
 //   - Package version and release values are not allowed to contain a hyphen character.
