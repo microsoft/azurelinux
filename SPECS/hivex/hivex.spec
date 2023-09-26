@@ -186,7 +186,7 @@ if ! make check -k; then
         cat $f
         echo
     done
-    exit 1
+    false
 fi
 
 %files -f %{name}.lang

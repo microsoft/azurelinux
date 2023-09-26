@@ -95,7 +95,7 @@ make install DESTDIR=$RPM_BUILD_ROOT
 %check
 if ! make check ; then
     cat test-suite.log
-    exit 1
+    false
 fi
 
 %files

@@ -67,8 +67,7 @@ install -pm 0644 extras/man/%{name}.1 %{buildroot}%{_mandir}/man1
 
 %check
 pushd tests
-./xml-checks.sh || exit 2
-popd
+./xml-checks.sh
 
 
 %files

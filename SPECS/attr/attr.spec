@@ -70,7 +70,7 @@ sed -e 's|test/root/getfattr.test||' \
 %make_build
 
 %check
-%make_build check || exit $?
+%make_build check
 
 %install
 %make_install

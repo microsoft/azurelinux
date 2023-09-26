@@ -515,10 +515,12 @@ done
 %endif
 
 %check
+tests_ok=true
 for file in %{buildroot}%{_datadir}/%{name}/*/*VARS.secboot.fd; do
     test -f "$file" || continue
-    virt-fw-vars --input $file --print | grep "SecureBootEnable.*ON" || exit 1
+    virt-fw-vars --input $file --print | grep "SecureBootEnable.*ON" || tests_ok=false
 done
+$tests_ok
 
 %global common_files \
   %%license License.txt License.OvmfPkg.txt License-History.txt LICENSE.openssl \

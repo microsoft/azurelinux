@@ -192,12 +192,13 @@ install -pDm 0644 source/tools/examples/* %{buildroot}%{_docdir}/acpica-tools/ex
 %check
 cd tests
 
+tests_ok=true
+
 # ASL tests
-./aslts.sh                         # relies on non-zero exit
-[ $? -eq 0 ] || exit 1
+./aslts.sh || tests_ok=false
 
 # misc tests
-./run-misc-tests.sh %{buildroot}%{_bindir} %{version}
+./run-misc-tests.sh %{buildroot}%{_bindir} %{version} || tests_ok=false
 
 # Template tests
 cd templates
@@ -206,10 +207,10 @@ if [ -f diff.log ]
 then
     if [ -s diff.log ]
     then
-        exit 1                  # implies errors occurred
+        tests_ok=false                  # implies errors occurred
     fi
 fi
-cd ..
+$tests_ok
 
 %pre
 if [ -e %{_bindir}/acpixtract-acpica ]

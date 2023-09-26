@@ -46,7 +46,7 @@ Recommends:     kmod(gfs2.ko)
 make %{_smp_mflags} V=1
 
 %check
-make check || { cat tests/testsuite.log; exit 1; }
+make check || { cat tests/testsuite.log; false; }
 
 %install
 make -C gfs2 install DESTDIR=%{buildroot}

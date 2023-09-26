@@ -94,7 +94,7 @@ rm -f %{buildroot}%{_bindir}/xorriso-tcltk
 %check
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:%{buildroot}%{_libdir}"
 cd releng
-./run_all_auto -x ../xorriso/xorriso || (cat releng_generated_data/log.*; exit 1)
+./run_all_auto -x ../xorriso/xorriso || (cat releng_generated_data/log.*; false)
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig

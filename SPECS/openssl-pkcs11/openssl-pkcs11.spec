@@ -82,7 +82,7 @@ rm -f %{buildroot}%{enginesdir}/*.la
 rm -rf %{buildroot}%{_docdir}/libp11/
 
 %check
-make check %{?_smp_mflags} || if [ $? -ne 0 ]; then cat tests/*.log; exit 1; fi;
+make check %{?_smp_mflags} || { cat tests/*.log; false; }
 
 %ldconfig_scriptlets
 

@@ -44,7 +44,7 @@ developing applications that use %{name}.
 # This should be %%meson_test but the macro expands with a multiple
 # embedded newlines for no obvious reason
 ninja -C %{_vpath_builddir} test || \
-    (cat %{_vpath_builddir}/meson-logs/testlog.txt ; exit 1)
+    (cat %{_vpath_builddir}/meson-logs/testlog.txt ; false)
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig

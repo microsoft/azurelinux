@@ -89,7 +89,7 @@ make V=1 %{?_smp_mflags}
 
 if ! make check; then
     cat test-suite.log
-    exit 1
+    false
 fi
 
 
