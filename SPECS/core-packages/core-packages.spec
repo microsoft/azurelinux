@@ -1,7 +1,7 @@
 Summary:        Metapackage with core sets of packages
 Name:           core-packages
 Version:        2.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -78,6 +78,24 @@ Requires:       zlib
 %description    container
 %{summary}
 
+%package        kata-cc
+Summary:        Metapackage to install the set of packages used for kata confidential container.
+Requires:       cloud-hypervisor
+Requires:       cloud-hypervisor-cvm
+Requires:       hvloader
+Requires:       kata-containers
+Requires:       kata-containers-cc
+Requires:       kernel-mshv
+Requires:       kernel-uvm
+Requires:       kernel-uvm-cvm
+Requires:       kernel-uvm-devel
+Requires:       moby-containerd-cc
+Requires:       mshv
+Requires:       mshv-bootloader-lx
+
+%description    kata-cc
+%{summary}
+
 %prep
 
 %build
@@ -86,7 +104,12 @@ Requires:       zlib
 
 %files container
 
+%files kata-cc
+
 %changelog
+* Tue Sep 26 2023 Mitch Zhu <pawelwi@microsoft.com> - 2.0-9
+- Add kata-cc meta-package.
+
 * Wed Jun 28 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-8
 - Moving 'curl' and 'grep' to the 'core-packages-container' package.
 
