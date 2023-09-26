@@ -488,22 +488,20 @@ func (c *Chroot) unmountAndRemove(leaveOnDisk, lazyUnmount bool) (err error) {
 		// This is to avoid leaving folders like /dev mounted if the chroot folder is forcefully deleted by the user. Even
 		// if the mount is busy at least it will be detached from the filesystem and will not damage the host.
 		unmountFlagsLazy = unix.MNT_DETACH
-		errMsg           = "Failed to unmount (%s). Error: %s"
 	)
 	unmountFlags := unmountFlagsNormal
 	if lazyUnmount {
-		logger.Log.Warnf("Final attempt to unmount chroot (%s), using a lazy unmount", c.rootDir)
 		unmountFlags = unmountFlagsLazy
 	}
 
 	for _, mountPoint := range c.mountPoints {
 		fullPath := filepath.Join(c.rootDir, mountPoint.target)
 
-		isMounted := true
+		var isMounted bool
 		isMounted, err = mountinfo.Mounted(fullPath)
 		if err != nil {
 			err = fmt.Errorf("failed to check if mount point (%s) is mounted. Error: %s", fullPath, err)
-			return err
+			return
 		}
 		if !isMounted {
 			logger.Log.Debugf("Skipping unmount of (%s) because it is not mounted", fullPath)
@@ -518,13 +516,13 @@ func (c *Chroot) unmountAndRemove(leaveOnDisk, lazyUnmount bool) (err error) {
 		}
 
 		_, err = retry.RunWithExpBackoff(func() error {
-			logger.Log.Debugf("Calling unmount (%s, %v)", fullPath, unmountFlags)
+			logger.Log.Debugf("Calling unmount on path(%s) with flags (%v)", fullPath, unmountFlags)
 			umountErr := unix.Unmount(fullPath, unmountFlags)
 			return umountErr
 		}, totalAttempts, retryDuration, 2.0, nil)
 
 		if err != nil {
-			logger.Log.Warnf(errMsg, fullPath, err)
+			logger.Log.Warnf("Failed to unmount (%s). Error: %s", fullPath, err)
 			return
 		}
 	}
