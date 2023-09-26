@@ -175,7 +175,7 @@ func getAllRepoData(repoURLs, repoFiles []string, workerTar, buildDir, repoUrlsF
 
 	var packageRepoUrls []string
 	err = queryChroot.Run(func() (chrootErr error) {
-		packageRepoUrls, chrootErr = getPackageRepoUrlsFromRepoFile()
+		packageRepoUrls, chrootErr = getPackageRepoUrlsFromRepoFiles()
 		return chrootErr
 	})
 	if err != nil {
