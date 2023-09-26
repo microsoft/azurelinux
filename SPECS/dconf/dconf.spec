@@ -3,7 +3,7 @@
 Summary:        A configuration system
 Name:           dconf
 Version:        0.36.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,6 +17,10 @@ BuildRequires:  glib2-devel >= %{glib2_version}
 BuildRequires:  gtk-doc
 BuildRequires:  meson
 BuildRequires:  vala
+BuildRequires:  libxslt
+BuildRequires:  docbook-dtd-xml
+BuildRequires:  docbook-style-xsl
+BuildRequires:  python3-pygments
 Requires:       dbus
 Requires:       glib2 >= %{glib2_version}
 

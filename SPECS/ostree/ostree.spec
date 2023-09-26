@@ -1,7 +1,7 @@
 Summary:        Git for operating system binaries
 Name:           ostree
 Version:        2022.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -33,6 +33,10 @@ BuildRequires:  libcap-devel
 BuildRequires:  libpsl-devel
 BuildRequires:  libsoup-devel
 BuildRequires:  libtool
+BuildRequires:  libxslt
+BuildRequires:  docbook-dtd-xml
+BuildRequires:  docbook-style-xsl
+BuildRequires:  python3-pygments
 BuildRequires:  openssl-devel
 BuildRequires:  sqlite-devel
 BuildRequires:  systemd-devel

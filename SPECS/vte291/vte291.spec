@@ -11,7 +11,7 @@
 Summary:        Terminal emulator library
 Name:           vte291
 Version:        0.66.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        CC-BY AND GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -29,6 +29,10 @@ BuildRequires:  gtk-doc
 BuildRequires:  meson
 BuildRequires:  pkg-config
 BuildRequires:  systemd-rpm-macros
+BuildRequires:  libxslt
+BuildRequires:  docbook-dtd-xml
+BuildRequires:  docbook-style-xsl
+BuildRequires:  python3-pygments
 BuildRequires:  vala
 BuildRequires:  pkgconfig(fribidi) >= %{fribidi_version}
 BuildRequires:  pkgconfig(gio-2.0) >= %{glib2_version}

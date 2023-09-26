@@ -15,7 +15,7 @@
 Summary:        GTK+ graphical user interface library
 Name:           gtk2
 Version:        2.24.32
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -41,6 +41,10 @@ BuildRequires:  automake
 BuildRequires:  cairo-devel
 BuildRequires:  cups-devel
 BuildRequires:  gettext
+BuildRequires:  libxslt
+BuildRequires:  docbook-dtd-xml
+BuildRequires:  docbook-style-xsl
+BuildRequires:  python3-pygments
 # Bootstrap requirements
 BuildRequires:  gtk-doc
 BuildRequires:  libtool
