@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           acpica-tools
 Version:        20190509
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        ACPICA tools for the development and debug of ACPI tables
 
 License:        GPLv2
@@ -242,6 +242,9 @@ fi
 
 
 %changelog
+* Tue Sep 26 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 20190509-8
+- Removing 'exit' calls from the '%%check' section.
+
 * Tue May 02 2023 Cameron Baird <cameronbaird@microsoft.com> - 20190509-7
 - Moved to SPECS
 - License verified
@@ -742,4 +745,3 @@ fi
 - Set up acpixtract from this package as an alternative to the same command
   in the pmtools package
 - Run the check step once built
-

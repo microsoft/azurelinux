@@ -1,7 +1,7 @@
 Summary:        epoxy runtime library
 Name:           libepoxy
 Version:        1.5.10
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -60,6 +60,9 @@ ninja -C %{_vpath_builddir} test || \
 %{_libdir}/pkgconfig/epoxy.pc
 
 %changelog
+* Tue Sep 26 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.10-2
+- Removing 'exit' calls from the '%%check' section.
+
 * Thu May 19 2022 Sriram Nambakam <snambakam@microsoft.com> - 1.5.10-1
 - Update to version 1.5.10
 

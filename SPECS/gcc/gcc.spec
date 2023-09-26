@@ -3,7 +3,7 @@
 Summary:        Contains the GNU compiler collection
 Name:           gcc
 Version:        11.2.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -289,6 +289,9 @@ $tests_ok
 %{_lib64dir}/libgomp.spec
 
 %changelog
+* Tue Sep 26 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 11.2.0-7
+- Removing 'exit' calls from the '%%check' section.
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 11.2.0-6
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
