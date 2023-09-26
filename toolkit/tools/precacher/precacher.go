@@ -290,8 +290,8 @@ func getPackageRepoPathsFromUrl(repoUrl string) (packageURLs []string, err error
 	return
 }
 
-// getPackageRepoUrlsFromRepoFile returns a list of packages available in the given repoUrl by running repoquery
-func getPackageRepoUrlsFromRepoFile() (packageURLs []string, err error) {
+// getPackageRepoUrlsFromRepoFiles returns a list of packages available in all RPM repos listed in the system's .repo files.
+func getPackageRepoUrlsFromRepoFiles() (packageURLs []string, err error) {
 	const (
 		reqoqueryTool    = "repoquery"
 		randomNameLength = 10
