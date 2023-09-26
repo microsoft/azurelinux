@@ -4930,8 +4930,8 @@
         "type": "other",
         "other": {
           "name": "grpc",
-          "version": "1.42.0",
-          "downloadUrl": "https://github.com/grpc/grpc/archive/v1.42.0/grpc-1.42.0.tar.gz"
+          "version": "1.58.1",
+          "downloadUrl": "https://github.com/grpc/grpc/archive/v1.58.1/grpc-1.58.1.tar.gz"
         }
       }
     },
