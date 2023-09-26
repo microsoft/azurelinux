@@ -14,6 +14,10 @@ parameters:
     type: string
     default: "$(Build.ArtifactStagingDirectory)"
 
+  - name: testSuiteName
+    type: string
+    default: "Package test"
+
   # Local constants. Can't use variables in a template without jobs or stages.
   - name: reportFileName
     type: string
@@ -245,7 +249,7 @@ steps:
 
         logs_dir_path = "${{ parameters.buildRepoRoot }}/build/logs/pkggen/rpmbuilding"
         report_path = "${{ parameters.testsWorkspace }}/${{ parameters.reportFileName }}"
-        test_suit_name = f"[{machine()}] Package test"
+        test_suit_name = "${{ parameters.testSuiteName }}"
 
         logger = ADOPipelineLogger()
         logger.log(f"Analyzing tests results inside '{logs_dir_path}'.")
