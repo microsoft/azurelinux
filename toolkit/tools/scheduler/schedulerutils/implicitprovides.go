@@ -111,7 +111,7 @@ func implicitPackagesToUnresolvedNodesInGraph(pkgGraph *pkggraph.PkgGraph, useCa
 		// Only consider these as resolved if useCachedImplicit is set.
 		if n.State == pkggraph.StateCached {
 			if useCachedImplicit {
-				logger.Log.Warnf("Implicit node (%s) was already cached and may have been used to satisfy another node (useCachedImplicit=%v). Updating implicit path regardless!", n.FriendlyName(), useCachedImplicit)
+				logger.Log.Warnf("Implicit node (%s) was already cached and may have been used to satisfy another node (useCachedImplicit=true). Updating implicit path regardless!", n.FriendlyName())
 			}
 		} else if n.State != pkggraph.StateUnresolved {
 			continue
