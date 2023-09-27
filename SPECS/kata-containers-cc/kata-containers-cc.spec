@@ -17,6 +17,8 @@ Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/cc-
 Source1:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{name}-%{version}.tar.gz
 Source2:      %{name}-%{version}-cargo.tar.gz
 Source3:      mariner-coco-build-uvm.sh
+Patch0:       0001-tardev-snapshotter-enable-feature-impl_trait_in_asso.patch
+Patch1:       drop-mut-for-variables-that-are-not-mutated.patch
 
 ExclusiveArch: x86_64
 
@@ -308,6 +310,13 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 
 *   Tue Aug 8 2023 Manuel Huber <mahuber@microsoft.com> 0.6.1.alpha-1
 -   Update to 0.6.1-alpha, using cloud-hypervisor-cvm and kernel-uvm-cm
+
+*   Thu Sep 14 2023 Muhammad Falak <mwani@microsoft.com> - 0.6.0-4
+-   Introduce patch to drop mut for immutable vars
+-   Introduce patch enabling feature(impl_trait_in_assoc_type) to unblock build
+
+*   Thu Sep 07 2023 Daniel McIlvaney <damcilva@microsoft.com> - 0.6.0-3
+-   Bump package to rebuild with rust 1.72.0
 
 *   Mon Aug 7 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.6.0-2
 -   Bump release to rebuild with go 1.19.12
