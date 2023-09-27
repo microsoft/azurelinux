@@ -1,7 +1,7 @@
 Summary:        Open source remote procedure call (RPC) framework
 Name:           grpc
-Version:        1.42.0
-Release:        6%{?dist}
+Version:        1.54.3
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -114,27 +114,28 @@ export GRPC_PYTHON_BUILD_SYSTEM_ABSL=True
 
 %files
 %license LICENSE
-%{_libdir}/*.so.*
 %{_datadir}/grpc/roots.pem
+%{_libdir}/*.so.*
 
 %files devel
 %{_includedir}/grpc
 %{_includedir}/grpc++
 %{_includedir}/grpcpp
+%{_libdir}/cmake/*
 %{_libdir}/libaddress_sorting.so
 %{_libdir}/libgpr.so
-%{_libdir}/libgrpc++.so
+%{_libdir}/libgrpc_authorization_provider.so
+%{_libdir}/libgrpc_plugin_support.so
+%{_libdir}/libgrpc_unsecure.so
+%{_libdir}/libgrpc.so
 %{_libdir}/libgrpc++_alts.so
 %{_libdir}/libgrpc++_error_details.so
 %{_libdir}/libgrpc++_reflection.so
 %{_libdir}/libgrpc++_unsecure.so
-%{_libdir}/libgrpc.so
-%{_libdir}/libgrpc_plugin_support.so
-%{_libdir}/libgrpc_unsecure.so
+%{_libdir}/libgrpc++.so
 %{_libdir}/libgrpcpp_channelz.so
 %{_libdir}/libupb.so
 %{_libdir}/pkgconfig/*.pc
-%{_libdir}/cmake/*
 
 %files plugins
 %license LICENSE
@@ -148,6 +149,9 @@ export GRPC_PYTHON_BUILD_SYSTEM_ABSL=True
 
 
 %changelog
+* Tue Sep 26 2023 Betty Lakes <bettylakes@microsoft.com> - 1.54.3-1
+- Bump grpc version to 1.54.3
+
 * Thu Jun 22 2023 Reuben Olinsky <reubeno@microsoft.com> - 1.42.0-6
 - Add cmake modules to grpc-devel package.
 

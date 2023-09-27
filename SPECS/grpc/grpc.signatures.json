@@ -1,6 +1,6 @@
 {
     "Signatures": {
-    "grpc-1.42.0.tar.gz": "b2f2620c762427bfeeef96a68c1924319f384e877bc0e084487601e4cc6e434c",
-    "grpc-1.42.0-submodules.tar.gz":"89adc6d52d4b75c9b623749106460d8be8f88524b5f8ea26b7fba3d69f1a8f32"
+    "grpc-1.54.3.tar.gz": "17e4e1b100657b88027721220cbfb694d86c4b807e9257eaf2fb2d273b41b1b1",
+    "grpc-1.54.3-submodules.tar.gz":"6573826292b5c280d18a7f80645234bda12e76bef120bec6b1c28f8d9175f23a"
     }
    }
