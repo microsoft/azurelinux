@@ -234,7 +234,6 @@ cp -r bin/dnssec{,-pkcs11}
 cp -r lib/dns{,-pkcs11}
 cp -r lib/ns{,-pkcs11}
 %patch10 -p1 -b .dist_pkcs11
-%patch11 -p1
 
 libtoolize -c -f; aclocal -I libtool.m4 --force; autoconf -f
 
