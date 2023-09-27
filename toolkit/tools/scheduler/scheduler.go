@@ -279,21 +279,18 @@ func startWorkerPool(agent buildagents.BuildAgent, workers, buildAttempts, check
 
 // debugStuckNode is a debugging function that will print out the stuck node and all nodes that are blocking it.
 func debugStuckNode(buildState *schedulerutils.GraphBuildState, pkgGraph *pkggraph.PkgGraph, stuckNode *pkggraph.PkgNode, indent int) {
-	isStuck := !buildState.IsNodeAvailable(stuckNode)
-	indentSpaces := ""
-	for i := 0; i < indent; i++ {
-		indentSpaces += "  "
+	if buildState.IsNodeAvailable(stuckNode) {
+		return
 	}
-	if isStuck {
-		logger.Log.Debugf("DEBUG: %s**STUCK** (%s)", indentSpaces, stuckNode.FriendlyName())
 
-		// Iterate over all the nodes that are blocking the stuck node.
-		dependency := pkgGraph.From(stuckNode.ID())
-		for dependency.Next() {
-			dependent := dependency.Node().(*pkggraph.PkgNode)
-			debugStuckNode(buildState, pkgGraph, dependent, indent+1)
-		}
+	nodeName := fmt.Sprintf("(%s)", stuckNode.FriendlyName())
+	logger.Log.Debugf("%*s", indent, nodeName)
 
+	// Iterate over all the nodes that are blocking the stuck node.
+	dependency := pkgGraph.From(stuckNode.ID())
+	for dependency.Next() {
+		dependent := dependency.Node().(*pkggraph.PkgNode)
+		debugStuckNode(buildState, pkgGraph, dependent, indent+1)
 	}
 }
 
