@@ -7,6 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.x.org
 Source0:        https://xorg.freedesktop.org/archive/individual/lib/%{name}-%{version}.tar.bz2
+
 Patch0:         0001-xt-Work-around-a-compiler-issue-with-gcc-10.patch
 
 BuildRequires:  autoconf
