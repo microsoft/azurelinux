@@ -123,6 +123,9 @@ sed -i -e "/^vte_systemduserunitdir =/s|vte_prefix|'/usr'|" meson.build
 %{_sysconfdir}/profile.d/vte.sh
 
 %changelog
+* Wed Sep 27 2023 Andrew Phelps <anphel@microsoft.com> - 0.66.2-3
+- Add BR for docbook-dtd-xml, docbook-style-xsl, libxslt and python3-pygments
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.66.2-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

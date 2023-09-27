@@ -18,6 +18,8 @@ BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  bison
 BuildRequires:  curl-devel
+BuildRequires:  docbook-dtd-xml
+BuildRequires:  docbook-style-xsl
 BuildRequires:  dracut
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  fuse-devel
@@ -34,10 +36,8 @@ BuildRequires:  libpsl-devel
 BuildRequires:  libsoup-devel
 BuildRequires:  libtool
 BuildRequires:  libxslt
-BuildRequires:  docbook-dtd-xml
-BuildRequires:  docbook-style-xsl
-BuildRequires:  python3-pygments
 BuildRequires:  openssl-devel
+BuildRequires:  python3-pygments
 BuildRequires:  sqlite-devel
 BuildRequires:  systemd-devel
 BuildRequires:  which
@@ -159,6 +159,9 @@ install -vdm 755 %{buildroot}%{_sysconfdir}/ostree/remotes.d
 %{_libexecdir}/libostree/grub2*
 
 %changelog
+* Wed Sep 27 2023 Andrew Phelps <anphel@microsoft.com> - 2022.1-4
+- Add BR for docbook-dtd-xml, docbook-style-xsl, libxslt and python3-pygments
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2022.1-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

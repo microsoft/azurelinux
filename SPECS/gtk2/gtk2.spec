@@ -41,14 +41,14 @@ BuildRequires:  automake
 BuildRequires:  cairo-devel
 BuildRequires:  cups-devel
 BuildRequires:  gettext
-BuildRequires:  libxslt
+# Bootstrap Requirements
 BuildRequires:  docbook-dtd-xml
 BuildRequires:  docbook-style-xsl
-BuildRequires:  python3-pygments
-# Bootstrap requirements
 BuildRequires:  gtk-doc
+BuildRequires:  libxslt
 BuildRequires:  libtool
 BuildRequires:  pkg-config
+BuildRequires:  python3-pygments
 # For setting shebang of gtk-builder-convert:
 BuildRequires:  python3-devel
 BuildRequires:  pkgconfig(atk) >= %{atk_version}
@@ -321,6 +321,9 @@ gtk-query-immodules-2.0-%{__isa_bits} --update-cache
 %doc tmpdocs/examples
 
 %changelog
+* Wed Sep 27 2023 Andrew Phelps <anphel@microsoft.com> - 2.24.32-12
+- Add BR for docbook-dtd-xml, docbook-style-xsl, libxslt and python3-pygments
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.24.32-11
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

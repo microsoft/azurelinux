@@ -1,16 +1,17 @@
 Summary:        X.Org X11 libXt runtime library
 Name:           libXt
 Version:        1.2.0
-Release:        6%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.x.org
 Source0:        https://xorg.freedesktop.org/archive/individual/lib/%{name}-%{version}.tar.bz2
+Patch0:         0001-xt-Work-around-a-compiler-issue-with-gcc-10.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
-BuildRequires:  libX11-devel
+BuildRequires:  libX11-devel >= 1.6
 BuildRequires:  libtool
 BuildRequires:  pkg-config
 BuildRequires:  xorg-x11-util-macros
@@ -19,7 +20,7 @@ BuildRequires:  pkgconfig(sm)
 BuildRequires:  pkgconfig(x11)
 BuildRequires:  pkgconfig(xproto)
 
-Requires:       libX11%{?_isa}
+Requires:       libX11%{?_isa} >= 1.6
 
 %description
 X.Org X11 libXt runtime library

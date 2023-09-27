@@ -11,16 +11,16 @@ URL:            https://wiki.gnome.org/Projects/dconf
 Source0:        https://download.gnome.org/sources/dconf/%{majmin}/%{name}-%{version}.tar.xz
 Patch1:         dconf-override.patch
 BuildRequires:  bash-completion
+BuildRequires:  docbook-dtd-xml
+BuildRequires:  docbook-style-xsl
 BuildRequires:  dbus-devel
 BuildRequires:  gcc
 BuildRequires:  glib2-devel >= %{glib2_version}
 BuildRequires:  gtk-doc
-BuildRequires:  meson
-BuildRequires:  vala
 BuildRequires:  libxslt
-BuildRequires:  docbook-dtd-xml
-BuildRequires:  docbook-style-xsl
+BuildRequires:  meson
 BuildRequires:  python3-pygments
+BuildRequires:  vala
 Requires:       dbus
 Requires:       glib2 >= %{glib2_version}
 
@@ -94,6 +94,9 @@ dconf update
 %{_datadir}/vala
 
 %changelog
+* Wed Sep 27 2023 Andrew Phelps <anphel@microsoft.com> - 0.36.0-5
+- Add BR for docbook-dtd-xml, docbook-style-xsl, libxslt and python3-pygments
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.36.0-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
