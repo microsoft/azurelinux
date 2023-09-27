@@ -1,7 +1,7 @@
 Summary:        Connector for espeak and speakup
 Name:           espeakup
 Version:        0.80
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -52,6 +52,9 @@ install -m755 %{SOURCE2} %{buildroot}%{_libdir}/systemd/system/%{name}.service
 %{_mandir}/man8/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.80-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Thu Jan 07 2021 Thomas Crain <thcrain@microsoft.com> - 0.80-1
 - Original version for CBL-Mariner (license: MIT)
 - License verified

@@ -1,7 +1,7 @@
 Summary:        GNU Parted manipulates partition tables
 Name:           parted
 Version:        3.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -53,6 +53,9 @@ rm -rf %{buildroot}%{_infodir}/dir
 %{_datadir}/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.4-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Tue Dec 21 2021 Max Brodeur-Urbas <maxbr@microsoft.com> - 3.4-1
 - Upgrading to 3.4
 - Adding 0001-freelocale-bug-fix.patch.

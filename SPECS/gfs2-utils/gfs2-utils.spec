@@ -12,7 +12,7 @@
 Summary:        Utilities for managing the global file system (GFS2)
 Name:           gfs2-utils
 Version:        3.2.0
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -78,6 +78,9 @@ modifying, and correcting inconsistencies in GFS2 file systems.
 %{_libdir}/udev/rules.d/82-gfs2-withdraw.rules
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.2.0-11
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Fri Jun 17 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.2.0-10
 - Add upstream patch to fix -Werror=format-security errors after ncurses 6.3 upgrade
 

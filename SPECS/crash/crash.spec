@@ -1,6 +1,6 @@
 Name:          crash
 Version:       8.0.1
-Release:       1%{?dist}
+Release:       2%{?dist}
 Summary:       kernel crash analysis utility for live systems, netdump, diskdump, kdump, LKCD or mcore dumpfiles
 Group:         Development/Tools
 Vendor:        Microsoft Corporation
@@ -58,6 +58,9 @@ cp -p defs.h %{buildroot}%{_includedir}/crash
 %{_includedir}/crash/*.h
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 8.0.1-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Apr 27 2022 Mateusz Malisz <mamalisz@microsoft.com> - 8.0.1-1
 - Update to 8.0.1
 

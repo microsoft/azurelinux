@@ -12,14 +12,21 @@ toolkit_root := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 SCRIPTS_DIR  ?= $(toolkit_root)/scripts
 
 # Build targets
-CONFIG_FILE             ?= ""
+##help:var:CONFIG_FILE:<config_path>=Path to image configuration file to use. Will add package dependencies and define final image generated.
+CONFIG_FILE             ?=
 CONFIG_BASE_DIR         ?= $(dir $(CONFIG_FILE))
 PACKAGE_BUILD_LIST      ?=
+##help:var:PACKAGE_REBUILD_LIST:<spec_list>=List of space-separated spec folders to force rebuild. Must not overlap with "PACKAGE_IGNORE_LIST". Example: PACKAGE_REBUILD_LIST="kernel go which".
 PACKAGE_REBUILD_LIST    ?=
+##help:var:PACKAGE_IGNORE_LIST:<spec_list>=List of space-separated spec folders to ignore during the build. Must not overlap with "PACKAGE_REBUILD_LIST", may overlap with "PACKAGE_BUILD_LIST". Example: PACKAGE_IGNORE_LIST="zlib".
 PACKAGE_IGNORE_LIST     ?=
+##help:var:SRPM_PACK_LIST:<spec_list>=List of space-separated spec folders inside "SPECS_DIR" to analyze for the build. If empty, all items inside the "SPECS_DIR" will be analyzed. Example: SRPM_PACK_LIST="kernel go which".
 SRPM_PACK_LIST          ?=
+##help:var:TEST_RUN_LIST:<spec_list>=List of space-separated spec folders to consider for package tests. Specs from the listed folders MUST contain the "%check" section. If empty, all testable items from "SRPM_PACK_LIST" will be considered. Will not re-test previously built packages. Example: TEST_RUN_LIST="libguestfs zlib".
 TEST_RUN_LIST           ?=
+##help:var:TEST_RERUN_LIST:<spec_list>=List of space-separated spec folders to force running a package test for. Specs from the listed folders MUST contain the "%check" section. Must not overlap with "TEST_IGNORE_LIST". Example: TEST_RERUN_LIST="libguestfs zlib".
 TEST_RERUN_LIST         ?=
+##help:var:TEST_IGNORE_LIST:<spec_list>=List of space-separated spec folders to ignore for package tests. Must not overlap with "TEST_RERUN_LIST", may overlap with "TEST_RUN_LIST". Example: TEST_IGNORE_LIST="acl".
 TEST_IGNORE_LIST        ?=
 
 ######## SET INCREMENTAL BUILD FLAGS ########
@@ -139,6 +146,7 @@ CA_CERT     ?=
 TLS_CERT    ?=
 TLS_KEY     ?=
 
+##help:var:LOG_LEVEL:{panic,fatal,error,warn,info,debug,trace}=Set logging level for toolkit.
 # panic,fatal,error,warn,info,debug,trace
 LOG_LEVEL          ?= info
 STOP_ON_WARNING    ?= n
@@ -151,6 +159,10 @@ STOP_ON_FETCH_FAIL ?= n
 all: toolchain go-tools chroot-tools
 
 ######## SUBMAKE INCLUDES ########
+
+# General help information used by 'help' target; this should be included first so
+# its help will be displayed at the top of the help output.
+include $(SCRIPTS_DIR)/help.mk
 
 # Misc function defines
 # Variable prerequisite tracking
@@ -209,6 +221,7 @@ include $(SCRIPTS_DIR)/pkggen.mk
 #   image, iso, clean-imggen
 include $(SCRIPTS_DIR)/imggen.mk
 
+##help:target:clean=Clean all built files.
 # Each component provides specific clean implementations which clean depends on.
 # They are guaranteed to run first and will verify there are no existing mount points
 # left after a chroot.
@@ -218,6 +231,18 @@ clean:
 	rm -rf $(toolkit_root)/out
 
 ######## VARIABLE PRINTING ########
+
+# Display Makefile usage help; please consult $(SCRIPTS_DIR)/help.mk for documentation
+# on the format of the comment annotations being extracted here.
+.PHONY: help
+help:
+	@sed -ne '/@sed/!s/##help:desc://p' $(MAKEFILE_LIST)
+	@sed -ne '/@sed/!s/##help:target-heading://p' $(MAKEFILE_LIST)
+	@grep -h "^##help:target:" $(MAKEFILE_LIST) | sed -e "s/^##help:target:\([^=]\+\)=\(.*\)/\1|\2/" | sort | awk -F'|' '{ printf("  \033[3m%-26s\033[0m %s\n", $$1, $$2)}'
+	@sed -ne '/@sed/!s/##help:var-heading://p' $(MAKEFILE_LIST)
+	@grep -h "^##help:var:" $(MAKEFILE_LIST) | sed -e "s/^##help:var:\([^:]\+\):\([^=]*\)=\(.*\)/\1|\2|\3/" | sort | awk -F'|' '{ printf("  \033[92;3m%s\033[0m=%s\n      %s\n\n", $$1, $$2, $$3) }'
+	@sed -ne '/@sed/!s/##help:example-heading://p' $(MAKEFILE_LIST)
+	@grep -h "^##help:example:" $(MAKEFILE_LIST) | sed -e "s/^##help:example:\(.*\)/  \1/"
 
 # Some common version information that is useful to gather. Generally should be run with the Make flag --quiet
 get-version: printvar-RELEASE_VERSION

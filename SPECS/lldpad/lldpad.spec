@@ -3,7 +3,7 @@
 Summary:        Intel LLDP Agent
 Name:           lldpad
 Version:        1.1.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -68,6 +68,9 @@ mv %{buildroot}/%{_libdir}/systemd/system/lldpad.socket  \
 /lib/systemd/system/lldpad.socket
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.1.0-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Thu Nov 11 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.0-1
 - Upgrade to latest upstream version
 

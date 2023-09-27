@@ -40,6 +40,7 @@ $(call create_folder,$(BUILD_SRPMS_DIR))
 $(call create_folder,$(SRPM_BUILD_CHROOT_DIR))
 
 # General targets
+##help:target:input-srpms=Scan the local `*.spec` files, locate sources, and create `*.src.rpm` files. Limit via SRPM_PACK_LIST.
 .PHONY: toolchain-input-srpms input-srpms clean-input-srpms
 input-srpms: $(BUILD_SRPMS_DIR)
 toolchain-input-srpms: $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag

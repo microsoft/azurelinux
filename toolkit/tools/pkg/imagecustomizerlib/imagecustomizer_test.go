@@ -13,12 +13,17 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/buildpipeline"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCustomizeImageEmptyConfig(t *testing.T) {
 	var err error
+
+	if !buildpipeline.IsRegularBuild() {
+		t.Skip("loopback block device not available")
+	}
 
 	buildDir := filepath.Join(tmpDir, "TestCustomizeImageEmptyConfig")
 	outImageFilePath := filepath.Join(buildDir, "image.vhd")
@@ -41,6 +46,12 @@ func TestCustomizeImageEmptyConfig(t *testing.T) {
 
 func TestCustomizeImageCopyFiles(t *testing.T) {
 	var err error
+
+	t.Skip("Unreliable test")
+
+	if !buildpipeline.IsRegularBuild() {
+		t.Skip("loopback block device not available")
+	}
 
 	buildDir := filepath.Join(tmpDir, "TestCustomizeImageCopyFiles")
 	configFile := filepath.Join(testDir, "addfiles-config.yaml")

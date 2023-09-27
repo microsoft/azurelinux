@@ -2,7 +2,7 @@
 Summary:        BPF Compiler Collection (BCC)
 Name:           bcc
 Version:        0.27.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -122,6 +122,9 @@ find %{buildroot}%{_lib64dir} -name '*.a' -delete
 %{_datadir}/%{name}/man/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.27.0-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Fri Apr 28 2023 Muhammad Falak <mwani@microsoft.com> - 0.27.0-1
 - Add an explicit BR on zip
 - Update to 0.27.0

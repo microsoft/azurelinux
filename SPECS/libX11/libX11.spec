@@ -1,7 +1,7 @@
 Summary:        Core X11 protocol client library
 Name:           libX11
 Version:        1.6.12
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -122,6 +122,9 @@ make %{?_smp_mflags} check
 %{_mandir}/man5/*.5*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.6.12-7
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Sun Jul 09 2023 Muhammad Falak <mwani@microsoft.com> - 1.6.12-6
 - Address CVE-2023-3138
 
