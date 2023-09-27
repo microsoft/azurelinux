@@ -44,7 +44,7 @@
 Summary:        Kata Containers version 2.x repository
 Name:           kata-containers
 Version:        3.1.0
-Release:        5%{?dist}
+Release:        7%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 URL:            https://github.com/%{name}/%{name}
@@ -58,8 +58,9 @@ Patch2:         0003-Merged-PR-9805-Add-support-for-MSHV.patch
 Patch3:         0004-Merged-PR-9806-Fix-enable_debug-for-hypervisor.clh.patch
 Patch4:         0005-Merged-PR-9956-shim-avoid-memory-hotplug-timeout.patch
 Patch5:         runtime-reduce-uvm-high-mem-footprint.patch
-Patch6:         0001-osbuilder-Add-support-for-CBL-Mariner.patch
-Patch7:         0001-Append-systemd-kernel-cmdline-params-for-initrd.patch
+Patch6:         drop-mut-for-variables-that-are-not-mutated.patch
+Patch7:         0001-osbuilder-Add-support-for-CBL-Mariner.patch
+Patch8:         0001-Append-systemd-kernel-cmdline-params-for-initrd.patch
 
 BuildRequires:  golang
 BuildRequires:  git-core
@@ -229,8 +230,14 @@ ln -sf %{_bindir}/kata-runtime %{buildroot}%{_prefix}/local/bin/kata-runtime
 %exclude %{kataosbuilderdir}/rootfs-builder/ubuntu
 
 %changelog
-* Mon Jul 17 2023 Dallas Delaney <dadelan@microsoft.com> 3.1.0-5
+* Wed Sep 27 2023 Dallas Delaney <dadelan@microsoft.com> 3.1.0-7
 - Refactor UVM build script and add -tools subpackage
+
+* Thu Sep 14 2023 Muhammad Falak <mwani@microsoft.com> - 3.1.0-6
+- Introduce patch to drop mut for variables to unblock build
+
+* Thu Sep 07 2023 Daniel McIlvaney <damcilva@microsoft.com> - 3.1.0-5
+- Bump package to rebuild with rust 1.72.0
 
 * Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.1.0-4
 - Bump release to rebuild with go 1.19.12

@@ -151,8 +151,11 @@ cargo build --release --target=%{rust_musl_target} --package vhost_user_block %{
 %license LICENSE-BSD-3-Clause
 
 %changelog
-* Mon Jul 31 2023 Saul Paredes <saulparedes@microsoft.com> - 32.0-1
+* Wed Sep 27 2023 Saul Paredes <saulparedes@microsoft.com> - 32.0-1
 - Update to v32.0
+
+* Thu Sep 07 2023 Daniel McIlvaney <damcilva@microsoft.com> - 31.1-2
+- Bump package to rebuild with rust 1.72.0
 
 * Fri May 12 2023 Saul Paredes <saulparedes@microsoft.com> - 31.1-1
 - Update to v31.1
