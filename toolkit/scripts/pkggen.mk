@@ -235,21 +235,22 @@ $(preprocessed_file): $(cached_file) $(go-graphPreprocessor)
 pkggen_archive	= $(OUT_DIR)/rpms.tar.gz
 srpms_archive  	= $(OUT_DIR)/srpms.tar.gz
 
-.PHONY: build-packages clean-build-packages hydrate-rpms compress-rpms clean-compress-rpms compress-srpms clean-compress-srpms
+.PHONY: build-packages clean-build-packages hydrate-rpms compress-rpms clean-compress-rpms compress-srpms clean-compress-srpms clean-build-packages-workers
 
 ##help:target:build-packages=Build .rpm packages selected by PACKAGE_(RE)BUILD_LIST= and IMAGE_CONFIG=.
 # Execute the package build scheduler.
 build-packages: $(RPMS_DIR)
 
 clean: clean-build-packages clean-compress-rpms clean-compress-srpms
-clean-build-packages:
+clean-build-packages-workers:
+	@echo Verifying no mountpoints present in $(CHROOT_DIR)
+	$(SCRIPTS_DIR)/safeunmount.sh "$(CHROOT_DIR)"/* && \
+	rm -rf $(CHROOT_DIR)
+clean-build-packages: clean-build-packages-workers
 	rm -rf $(RPMS_DIR)
 	rm -rf $(LOGS_DIR)/pkggen/failures.txt
 	rm -rf $(rpmbuilding_logs_dir)
 	rm -rf $(STATUS_FLAGS_DIR)/build-rpms.flag
-	@echo Verifying no mountpoints present in $(CHROOT_DIR)
-	$(SCRIPTS_DIR)/safeunmount.sh "$(CHROOT_DIR)" && \
-	rm -rf $(CHROOT_DIR)
 clean-compress-rpms:
 	rm -rf $(pkggen_archive)
 clean-compress-srpms:
