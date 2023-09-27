@@ -18,6 +18,7 @@ BuildRequires: binutils
 %autosetup -p1
 
 %build
+automake --add-missing
 ./configure && make
 
 %install
