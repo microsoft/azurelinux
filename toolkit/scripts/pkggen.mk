@@ -45,7 +45,7 @@ $(call create_folder,$(rpmbuilding_logs_dir))
 
 .PHONY: clean-workplan clean-cache clean-cache-worker clean-grapher-cache-worker clean-spec-parse clean-ccache graph graph-cache graph-preprocessed analyze-built-graph workplan
 ##help:target:parsed-specs=Parse package specs and generate a specs.json file encoding all dependency information.
-parsed-specs: $(specs_file)
+parse-specs: $(specs_file)
 ##help:target:graph-cache=Resolve package dependencies and cache the results.
 graph-cache: $(cached_file)
 ##help:target:graph=Create the initial package build graph.
