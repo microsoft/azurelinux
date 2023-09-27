@@ -17,18 +17,18 @@ mkdir -p "$sodiff_out_dir"
 
 common_options="-c $repo_file_path --releasever $mariner_version"
 current_os=$(cat /etc/os-release | grep ^ID | cut -d'=' -f2)
-if [[ $current_os == mariner ]]; then
-    # Mariner uses DNF repoquery command
-    DNF_COMMAND=dnf
-    # Cache RPM metadata
-    >/dev/null dnf $common_options -y makecache
-else
+#if [[ $current_os == mariner ]]; then
+# Mariner uses DNF repoquery command
+DNF_COMMAND=dnf
+# Cache RPM metadata
+>/dev/null dnf $common_options -y makecache
+#else
     # Ubuntu uses repoquery command from yum-utils
-    DNF_COMMAND=
+#    DNF_COMMAND=
     # Cache RPM metadata
     # Ubuntu does not come with gpgcheck plugin for yum
-    >/dev/null yum $common_options -y --nogpgcheck makecache
-fi
+#    >/dev/null yum $common_options -y --nogpgcheck makecache
+#fi
 
 # Empty the log file
 echo > "$sodiff_log_file"

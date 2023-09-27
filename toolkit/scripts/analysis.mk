@@ -19,9 +19,9 @@ BUILT_PACKAGES_FILE=$(SODIFF_OUTPUT_FOLDER)/built-packages.txt
 ifneq ($(build_arch),x86_64)
 # Microsoft repository only exists for x86_64 - skip that .repo file;
 # otherwise package manager will signal an error due to being unable to make contact
-SODIFF_REPO_SOURCES="mariner-official-base.repo mariner-official-update.repo"
+SODIFF_REPO_SOURCES="mariner-official-base.repo"
 else
-SODIFF_REPO_SOURCES="mariner-official-base.repo mariner-official-update.repo mariner-microsoft.repo"
+SODIFF_REPO_SOURCES="mariner-official-base.repo mariner-microsoft.repo"
 endif
 
 SODIFF_REPO_FILE=$(SCRIPTS_DIR)/sodiff/sodiff.repo
@@ -67,6 +67,13 @@ fake-built-packages-list: | $(SODIFF_OUTPUT_FOLDER)
 
 $(SODIFF_REPO_FILE):
 	echo $(SODIFF_REPO_SOURCES) | sed -E 's:([^ ]+[.]repo):$(SPECS_DIR)/mariner-repos/\1:g' | xargs cat > $(SODIFF_REPO_FILE)
+
+#populate gpg-keys from for mariner official repos
+.PHONY: sodiff-setup
+sodiff-setup:
+	mkdir -p /etc/pki/rpm-gpg
+	cp $(SPECS_DIR)/mariner-repos/MICROSOFT-RPM-GPG-KEY /etc/pki/rpm-gpg/
+	cp $(SPECS_DIR)/mariner-repos/MICROSOFT-METADATA-GPG-KEY /etc/pki/rpm-gpg/
 
 # sodiff-check: runs check in a mariner container. Each failed package will be listed in $(SODIFF_OUTPUT_FOLDER).
 .SILENT .PHONY: sodiff-check
