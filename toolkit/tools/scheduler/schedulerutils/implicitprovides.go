@@ -79,8 +79,9 @@ func replaceNodesWithProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph, pro
 	return
 }
 
-// implicitPackagesToUnresolvedNodesInGraph returns a map of package names to implicit nodes.
-func implicitPackagesToUnresolvedNodesInGraph(pkgGraph *pkggraph.PkgGraph, useCachedImplicit bool) (nameToNodes map[string][]*pkggraph.PkgNode) {
+// implicitPackageNamesToNodesInGraph returns a map of package names to implicit nodes. These nodes will either be unresolved,
+// or in the cache.
+func implicitPackageNamesToNodesInGraph(pkgGraph *pkggraph.PkgGraph, useCachedImplicit bool) (nameToNodes map[string][]*pkggraph.PkgNode) {
 	nameToNodes = make(map[string][]*pkggraph.PkgNode)
 
 	// Depending on the node order that the graph was created, there may be multiple unresolved nodes for a single package.
@@ -128,7 +129,7 @@ func implicitPackagesToUnresolvedNodesInGraph(pkgGraph *pkggraph.PkgGraph, useCa
 // matchProvidesToUnresolvedNodes matches a list of provides to unresolved nodes that they satisfy in the graph.
 func matchProvidesToUnresolvedNodes(provides []*pkgjson.PackageVer, pkgGraph *pkggraph.PkgGraph, useCachedImplicit bool) (matches map[*pkgjson.PackageVer][]*pkggraph.PkgNode, err error) {
 	matches = make(map[*pkgjson.PackageVer][]*pkggraph.PkgNode)
-	implicitPackagesToUnresolvedNodes := implicitPackagesToUnresolvedNodesInGraph(pkgGraph, useCachedImplicit)
+	implicitPackagesToUnresolvedNodes := implicitPackageNamesToNodesInGraph(pkgGraph, useCachedImplicit)
 
 	// An unresolved node can only be satisfied by a single provide, prevent duplicate matching
 	nodeToSatisfier := make(map[*pkggraph.PkgNode]*pkgjson.PackageVer)
