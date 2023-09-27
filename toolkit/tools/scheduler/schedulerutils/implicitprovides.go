@@ -79,7 +79,7 @@ func replaceNodesWithProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph, pro
 	return
 }
 
-// implicitPackagesToUnresolvedNodesInGraph returns a map of package names to unresolved implicit nodes.
+// implicitPackagesToUnresolvedNodesInGraph returns a map of package names to implicit nodes.
 func implicitPackagesToUnresolvedNodesInGraph(pkgGraph *pkggraph.PkgGraph, useCachedImplicit bool) (nameToNodes map[string][]*pkggraph.PkgNode) {
 	nameToNodes = make(map[string][]*pkggraph.PkgNode)
 
@@ -107,8 +107,10 @@ func implicitPackagesToUnresolvedNodesInGraph(pkgGraph *pkggraph.PkgGraph, useCa
 		}
 
 		// When graphpkgfetcher runs, it will attempt to resolve all unresolved nodes.
-		// Some of these may be implicit and it may find an upstream package that satisfies it.
-		// Only consider these as resolved if useCachedImplicit is set.
+		// Some of these may be implicit and it may find an upstream package that satisfies it. The scheduler will have
+		// done its best to avoid using these nodes, but may eventually have to use them if there are no other options.
+		// We will allow these nodes to be switched even after the scheduler starts to use them since some packages may
+		// end up needing to install multiple versions of the same package if we don't unify them.
 		if n.State == pkggraph.StateCached {
 			if useCachedImplicit {
 				logger.Log.Warnf("Implicit node (%s) was already cached and may have been used to satisfy another node (useCachedImplicit=true). Updating implicit path regardless!", n.FriendlyName())
