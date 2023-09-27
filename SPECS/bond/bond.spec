@@ -29,7 +29,6 @@ Development files for %{name}
 
 %prep
 %setup -q
-chmod u+x %{SOURCE1} %{SOURCE2}
 
 %build
 CMAKE_OPTS="\
