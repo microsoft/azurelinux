@@ -1,26 +1,23 @@
-
 %global security_hardening none
-%global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
-%define uname_r %{version}-%{release}
+%global debug_package %{nil}
+%define uname_r %{version}-%{release}-cvm
+
 %ifarch x86_64
 %define arch x86_64
 %define archdir x86
 %define config_source %{SOURCE1}
 %endif
 
-Summary:        Mariner kernel that has MSHV Host support
-Name:           kernel-mshv
-Version:        5.15.126.mshv3
+Summary:        Linux Kernel for SEV SNP enabled Kata UVMs
+Name:           kernel-uvm-cvm
+Version:        6.1.0.mshv11
 Release:        1%{?dist}
 License:        GPLv2
-Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
+Group:          System Environment/Kernel
+Source0:        %{_mariner_sources_url}/kernel-uvm-%{version}.tar.gz
 Source1:        config
-Source2:        cbl-mariner-ca-20211013.pem
-Source3:        50_mariner_mshv.cfg
-ExclusiveArch:  x86_64
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -28,7 +25,6 @@ BuildRequires:  diffutils
 BuildRequires:  dwarves
 BuildRequires:  elfutils-libelf-devel
 BuildRequires:  glib-devel
-BuildRequires:  grub2-rpm-macros
 BuildRequires:  kbd
 BuildRequires:  kmod-devel
 BuildRequires:  libdnet-devel
@@ -43,120 +39,89 @@ Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
 Requires(postun): coreutils
-%{?grub2_configuration_requires}
+ExclusiveArch:  x86_64
 
-%description
-The Mariner kernel that has MSHV Host support
+# Config file is only an inmutable copy from default config in lsg dom0 sources (arch/x86/configs/mshv_default_config)
+# to make permanent changes to config, make a PR for mshv_default_config in https://microsoft.visualstudio.com/DefaultCollection/LSG/_git/linux-dom0
 
-%package devel
-Summary:        MSHV kernel Dev
-Group:          System Environment/Kernel
-Requires:       %{name} = %{version}-%{release}
-Requires:       gawk
-Requires:       python3
-
-%description devel
-This package contains the MSHV kernel dev files
-
-%package docs
-Summary:        MSHV kernel docs
-Group:          System Environment/Kernel
-Requires:       python3
-
-%description docs
-This package contains the MSHV kernel doc files
-
-%package tools
-Summary:        This package contains the 'perf' performance analysis tools for MSHV kernel
-Group:          System/Tools
-Requires:       %{name} = %{version}-%{release}
-Requires:       audit
-
-%description tools
-This package contains the 'perf' performance analysis tools for MSHV kernel.
-
-%prep
-%autosetup -p1
-
-make mrproper
-cp %{SOURCE1} .config
-
-# Add CBL-Mariner cert into kernel's trusted keyring
-cp %{SOURCE2} certs/mariner.pem
-sed -i 's#CONFIG_SYSTEM_TRUSTED_KEYS=""#CONFIG_SYSTEM_TRUSTED_KEYS="certs/mariner.pem"#' .config
-
-sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' .config
-make LC_ALL=  ARCH=%{arch} olddefconfig
-
-%build
-make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags}
-
-%define __modules_install_post \
-for MODULE in `find %{buildroot}/lib/modules/%{uname_r} -name *.ko` ; do \
-    ./scripts/sign-file sha512 certs/signing_key.pem certs/signing_key.x509 $MODULE \
-    rm -f $MODULE.{sig,dig} \
-    xz $MODULE \
-    done \
-%{nil}
-
-# We want to compress modules after stripping. Extra step is added to
-# the default __spec_install_post.
-%define __spec_install_post\
-    %{?__debug_package:%{__debug_install_post}}\
-    %{__arch_install_post}\
-    %{__os_install_post}\
-    %{__modules_install_post}\
-%{nil}
-
-%install
-install -vdm 755 %{buildroot}%{_sysconfdir}
-install -vdm 700 %{buildroot}/boot
-install -vdm 755 %{buildroot}%{_defaultdocdir}/linux-%{uname_r}
-install -vdm 755 %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}
-install -vdm 755 %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}
-make INSTALL_MOD_PATH=%{buildroot} modules_install
-
-# Add kernel-mshv-specific boot configurations to /etc/default/grub.d
-# This configuration contains additional boot parameters required in our
-# Linux-Dom0-based images. 
-mkdir -p %{buildroot}%{_sysconfdir}/default/grub.d
-install -m 750 %{SOURCE3} %{buildroot}%{_sysconfdir}/default/grub.d/50_mariner_mshv.cfg
+# To make temporary changes:
+# When updating the config files it is important to sanitize them.
+# Steps for updating a config file:
+#  1. Extract the linux sources into a folder
+#  2. Add the current config file to the folder
+#  3. Run `make menuconfig` to edit the file (Manually editing is not recommended)
+#     * You might have to install the following dependencies: libncurses5-dev flex
+#  4. Save the config file
+#  5. Copy the config file back into the kernel spec folder
+#  6. Revert any undesired changes (GCC related changes, etc)
+#  8. Build the kernel package
+#  9. Apply the changes listed in the log file (if any) to the config file
+#  10. Verify the rest of the config file looks ok
+# If there are significant changes to the config file, disable the config check and build the
+# kernel rpm. The final config file is included in /boot in the rpm.
 
 %ifarch x86_64
-install -vm 600 arch/x86/boot/bzImage %{buildroot}/boot/vmlinuz-%{uname_r}
-mkdir -p %{buildroot}/boot/efi
-install -vm 600 arch/x86/boot/bzImage %{buildroot}/boot/efi/vmlinuz-%{uname_r}
+%define image_fname vmlinux.bin
+%define image arch/x86/boot/compressed/%{image_fname}
+%if 0%{?centos_version} && 0%{?centos_version} < 900
+%define kcflags %{nil}
+%else
+%define kcflags -Wa,-mx86-used-note=no
+%endif
+%define arch x86_64
 %endif
 
-# Restrict the permission on System.map-X file
-install -vm 400 System.map %{buildroot}/boot/System.map-%{uname_r}
-install -vm 600 .config %{buildroot}/boot/config-%{uname_r}
-cp -r Documentation/*        %{buildroot}%{_defaultdocdir}/linux-%{uname_r}
-install -vm 644 vmlinux %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux-%{uname_r}
-# `perf test vmlinux` needs it
-ln -s vmlinux-%{uname_r} %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux
+%description
+The kernel UVM CVM package contains the Linux kernel for SEV SNP enabled UVMs.
 
-cat > %{buildroot}/boot/linux-%{uname_r}.cfg << "EOF"
-# GRUB Environment Block
-mariner_cmdline_mshv=rd.auto=1 lockdown=integrity sysctl.kernel.unprivileged_bpf_disabled=1 init=/lib/systemd/systemd ro no-vmw-sta crashkernel=128M audit=0 console=ttyS0,115200n8 earlyprintk
-mariner_linux_mshv=vmlinuz-%{uname_r}
-mariner_initrd_mshv=initrd.img-%{uname_r}
-EOF
-chmod 600 %{buildroot}/boot/linux-%{uname_r}.cfg
+%package devel
+Summary:        Lightweight kernel Devel package
+Group:          System Environment/Kernel
+Requires:       %{name} = %{version}-%{release}
 
-# Register myself to initramfs
-mkdir -p %{buildroot}/%{_localstatedir}/lib/initramfs/kernel
-cat > %{buildroot}/%{_localstatedir}/lib/initramfs/kernel/%{uname_r} << "EOF"
---add-drivers "xen-scsifront xen-blkfront xen-acpi-processor xen-evtchn xen-gntalloc xen-gntdev xen-privcmd xen-pciback xenfs hv_utils hv_vmbus hv_storvsc hv_netvsc hv_sock hv_balloon virtio_blk virtio-rng virtio_console virtio_crypto virtio_mem vmw_vsock_virtio_transport vmw_vsock_virtio_transport_common 9pnet_virtio vrf"
-EOF
+%description devel
+This package contains the kernel UVM CVM devel files
 
-# Symlink /lib/modules/uname/vmlinuz to boot partition
-mkdir -p %{buildroot}/lib/modules/%{uname_r}
-ln -s /boot/vmlinuz-%{uname_r} %{buildroot}/lib/modules/%{uname_r}/vmlinuz
+%prep
+tar xf %{SOURCE0} --strip-components=1
 
-#    Cleanup dangling symlinks
-rm -rf %{buildroot}/lib/modules/%{uname_r}/source
-rm -rf %{buildroot}/lib/modules/%{uname_r}/build
+make mrproper
+
+cp %{config_source} .config
+cp .config current_config
+make LC_ALL= ARCH=%{arch} oldconfig
+
+# Verify the config files match
+cp .config new_config
+sed -i 's/CONFIG_LOCALVERSION=".*"/CONFIG_LOCALVERSION=""/' new_config
+diff --unified new_config current_config > config_diff || true
+if [ -s config_diff ]; then
+    printf "\n\n\n\n\n\n\n\n"
+    cat config_diff
+    printf "\n\n\n\n\n\n\n\n"
+    echo "Config file has unexpected changes"
+    echo "Update config file to set changed values explicitly"
+
+#  (DISABLE THIS IF INTENTIONALLY UPDATING THE CONFIG FILE)
+    # exit 1
+fi
+
+%build
+%ifarch x86_64
+KCFLAGS="%{kcflags}" make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags}
+%endif
+
+%install
+install -vdm 755 %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}
+install -vdm 755 %{buildroot}/lib/modules/%{uname_r}
+
+D=%{buildroot}%{_datadir}/cloud-hypervisor-cvm
+install -D -m 644 %{image} $D/%{image_fname}
+install -D -m 644 arch/%{arch}/boot/bzImage $D/bzImage
+%ifarch x86_64
+mkdir -p %{buildroot}/lib/modules/%{name}
+ln -s %{_datadir}/cloud-hypervisor-cvm/%{image_fname} %{buildroot}/lib/modules/%{name}/vmlinux
+%endif
 
 find . -name Makefile* -o -name Kconfig* -o -name *.pl | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
 find arch/%{archdir}/include include scripts -type f | xargs  sh -c 'cp --parents "$@" %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}' copy
@@ -170,141 +135,68 @@ install -vsm 755 tools/objtool/fixdep %{buildroot}%{_prefix}/src/linux-headers-%
 
 cp .config %{buildroot}%{_prefix}/src/linux-headers-%{uname_r} # copy .config manually to be where it's expected to be
 ln -sf "%{_prefix}/src/linux-headers-%{uname_r}" "%{buildroot}/lib/modules/%{uname_r}/build"
-find %{buildroot}/lib/modules -name '*.ko' -print0 | xargs -0 chmod u+x
-
-# disable (JOBS=1) parallel build to fix this issue:
-# fixdep: error opening depfile: ./.plugin_cfg80211.o.d: No such file or directory
-# Linux version that was affected is 4.4.26
-make -C tools JOBS=1 DESTDIR=%{buildroot} prefix=%{_prefix} perf_install
-
-# Remove trace (symlink to perf). This file causes duplicate identical debug symbols
-rm -vf %{buildroot}%{_bindir}/trace
-
-%triggerin -- initramfs
-mkdir -p %{_localstatedir}/lib/rpm-state/initramfs/pending
-touch %{_localstatedir}/lib/rpm-state/initramfs/pending/%{uname_r}
-echo "initrd generation of kernel %{uname_r} will be triggered later" >&2
-
-%triggerun -- initramfs
-rm -rf %{_localstatedir}/lib/rpm-state/initramfs/pending/%{uname_r}
-rm -rf /boot/efi/initrd.img-%{uname_r}
-echo "initrd of kernel %{uname_r} removed" >&2
-
-%postun
-if [ ! -e /boot/mariner-mshv.cfg ]
-then
-     ls /boot/linux-*.cfg 1> /dev/null 2>&1
-     if [ $? -eq 0 ]
-     then
-          list=`ls -tu /boot/linux-*.cfg | head -n1`
-          test -n "$list" && ln -sf "$list" /boot/mariner-mshv.cfg
-     fi
-fi
-%grub2_postun
-
-%post
-/sbin/depmod -a %{uname_r}
-ln -sf linux-%{uname_r}.cfg /boot/mariner-mshv.cfg
-%grub2_post
+find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 
 %files
 %defattr(-,root,root)
 %license COPYING
-%exclude %dir /usr/lib/debug
-/boot/System.map-%{uname_r}
-/boot/config-%{uname_r}
-/boot/vmlinuz-%{uname_r}
-/boot/efi/vmlinuz-%{uname_r}
-%config(noreplace) /boot/linux-%{uname_r}.cfg
-%config(noreplace) %{_sysconfdir}/default/grub.d/50_mariner_mshv.cfg
-%config %{_localstatedir}/lib/initramfs/kernel/%{uname_r}
-%defattr(0644,root,root)
-/lib/modules/%{uname_r}/*
-%exclude /lib/modules/%{uname_r}/build
+%{_datadir}/cloud-hypervisor-cvm/%{image_fname}
+%{_datadir}/cloud-hypervisor-cvm/bzImage
+%dir %{_datadir}/cloud-hypervisor-cvm
+%ifarch x86_64
+/lib/modules/%{name}/vmlinux
+%endif
 
 %files devel
 %defattr(-,root,root)
 /lib/modules/%{uname_r}/build
 %{_prefix}/src/linux-headers-%{uname_r}
 
-%files docs
-%defattr(-,root,root)
-%{_defaultdocdir}/linux-%{uname_r}/*
-
-%files tools
-%defattr(-,root,root)
-%{_libexecdir}
-%exclude %dir %{_libdir}/debug
-%{_lib64dir}/traceevent
-%{_lib64dir}/libperf-jvmti.so
-%{_bindir}
-%{_sysconfdir}/bash_completion.d/*
-%{_datadir}/perf-core/strace/groups/file
-%{_datadir}/perf-core/strace/groups/string
-%{_docdir}/*
-%{_libdir}/perf/examples/bpf/*
-%{_libdir}/perf/include/bpf/*
-%{_includedir}/perf/perf_dlfilter.h
-
 %changelog
-* Thu Sep 21 2023 Saul Paredes <saulparedes@microsoft.com> - 5.15.126.mshv3-1
-- Update to v5.15.126.mshv3
+* Thu Sep 15 2023 Saul Paredes <saulparedes@microsoft.com> - 6.1.0.mshv11-1
+- Update to v6.1.0.mshv11
 
-* Tue Sep 19 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.110.mshv2-5
-- Enable grub2-mkconfig-based boot path by installing 
-    50_mariner_mshv.cfg 
-- Call grub2-mkconfig to regenerate configs only if the user has 
-    previously used grub2-mkconfig for boot configuration. 
+* Fri Sep 15 2023 Saul Paredes <saulparedes@microsoft.com> - 6.1.0.mshv10-1
+- Update to v6.1.0.mshv10
 
-* Thu Jun 22 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.110.mshv2-4
-- Don't include duplicate systemd parameters in mariner-mshv.cfg; should be read from
-    systemd.cfg which is packaged in systemd
+* Mon Aug 28 2023 Saul Paredes <saulparedes@microsoft.com> - 6.1.0.mshv8-1
+- Update to v6.1.0.mshv8
 
-* Tue May 30 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.110.mshv2-3
-- Align mariner_cmdline_mshv with the working configuration from 
-    old loader's linuxloader.conf
+* Wed Aug 18 2023 Dallas Delaney <dadelan@microsoft.com> - 5.15.110.mshv2-5
+- Add back debug logs for config change warning
 
-* Wed May 24 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.110.mshv2-2
-- Add temporary 0001-Support-new-HV-loader... patch to support lxhvloader. 
-- Can be reverted once the kernel patch is upstreamed.
-- Introduce mariner-mshv.cfg symlink to improve grub menuentry
+* Wed Aug 18 2023 Dallas Delaney <dadelan@microsoft.com> - 5.15.110.mshv2-4
+- Align config with UVM from LSG
+
+* Wed May 31 2023 Dallas Delaney <dadelan@microsoft.com> - 5.15.110.mshv2-2
+- Enable dm-verity
 
 * Fri May 12 2023 Saul Paredes <saulparedes@microsoft.com> - 5.15.110.mshv2-1
 - Update to v5.15.110.mshv2
 
-* Thu Mar 30 2023 Saul Paredes <saulparedes@microsoft.com> - 5.15.98.mshv1-3
-- Add back config
+* Mon May 1 2023 Dallas Delaney <dadelan@microsoft.com> - 5.15.98.mshv1-4
+- Install the bzImage
 
-* Fri Mar 24 2023 Saul Paredes <saulparedes@microsoft.com> - 5.15.98.mshv1-2
-- Consume config from LSG source
+* Thu Apr 6 2023 Chris Co <chrco@microsoft.com> - 5.15.98.mshv1-3
+- Generate devel subpackage and enable loadable kernel module support
 
-* Tue Mar 21 2023 Mitch Zhu <mitchzhu@microsoft.com> - 5.15.98.mshv1-1
-- Update to v5.15.98.mshv1
+* Thu Apr 6 2023 Saul Paredes <saulparedes@microsoft.com> 5.15.98.mshv1-2
+- Remove aarch64 build instructions
 
-* Tue Feb 28 2023 Saul Paredes <saulparedes@microsoft.com> - 5.15.92.mshv1-1
-- Update to v5.15.92.mshv2.
+* Fri Mar 24 2023 Saul Paredes <saulparedes@microsoft.com> 5.15.98.mshv1-1
+- Consume source and config from dom0
 
-* Tue Feb 21 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.86.mshv2-2
-- Install vmlinux as root executable for debuginfo
+* Thu Feb 23 2023 Aurélien Bombo <abombo@microsoft.com> - 5.15.48.1-9
+- Enable Hyper-V enlightenments.
 
-* Tue Jan 24 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.86.mshv2-1
-- Update to v5.15.86.mshv2.
+* Mon Sep 12 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.48.1-8
+- Create modules folder and copy vmlinux
 
-* Fri Dec 09 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.80.mshv2-1
-- Update to v5.15.80.mshv2.
-- Update initramfs triggerun to remove initrd from /boot/efi
+* Tue Aug 30 2022 Chris Co <chrco@microsoft.com> - 5.15.48.1-7
+- Trim spec to only necessary components for UVM
 
-* Mon Dec 05 2022 Saul Paredes <saulparedes@microsoft.com> - 5.15.72.mshv2-2
-- Enable transparent hugepage
-
-* Thu Oct 27 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.72.mshv2-1
-- Update to v5.15.72.mshv2.
-
-* Wed Sep 21 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.34.1-2
-- Copy vmlinuz to /boot/efi partition.
-
-* Thu Aug 11 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.34.1-1
-- Trim spec to only necessary components for MSHV Host support kernel.
+* Fri Aug 26 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 5.15.48.1-6
+- Creating kernel configuration specifically for kata uvm purposes
 
 * Fri Jul 08 2022 Francis Laniel <flaniel@linux.microsoft.com> - 5.15.48.1-5
 - Add back CONFIG_FTRACE_SYSCALLS to enable eBPF CO-RE syscalls tracers.
