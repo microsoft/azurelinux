@@ -599,40 +599,6 @@ func (g *PkgGraph) FindExactPkgNodeFromPkg(pkgVer *pkgjson.PackageVer) (lookupEn
 	return
 }
 
-// GetRunNodeFromBuildNode returns the run node associated with a build node in the graph.
-func (g *PkgGraph) GetRunNodeFromBuildNode(buildNode *PkgNode) (runNode *PkgNode, err error) {
-	lookupEntry, err := g.FindExactPkgNodeFromPkg(buildNode.VersionedPkg)
-	if err != nil {
-		err = fmt.Errorf("failed to find lookup entry for build node %s", buildNode)
-		return
-	}
-
-	if lookupEntry != nil {
-		runNode = lookupEntry.RunNode
-	} else {
-		err = fmt.Errorf("no lookup entry found for build node %s", buildNode)
-		return
-	}
-	return
-}
-
-// GetBuildNodeFromRunNode returns the build node associated with a run node in the graph.
-func (g *PkgGraph) GetBuildNodeFromRunNode(runNode *PkgNode) (buildNode *PkgNode, err error) {
-	lookupEntry, err := g.FindExactPkgNodeFromPkg(runNode.VersionedPkg)
-	if err != nil {
-		err = fmt.Errorf("failed to find lookup entry for run node %s", runNode)
-		return
-	}
-
-	if lookupEntry != nil {
-		buildNode = lookupEntry.BuildNode
-	} else {
-		err = fmt.Errorf("no lookup entry found for run node %s", runNode)
-		return
-	}
-	return
-}
-
 // FindBestPkgNode will search the lookup table to see if a node which satisfies the
 // PackageVer structure has already been created. Returns nil if no lookup entry
 // is found.

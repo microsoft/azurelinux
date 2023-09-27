@@ -332,8 +332,7 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 	// The build will bubble up through the graph as it processes nodes.
 
 	// Calculate the priority so we can optimize the build ordering.
-	priorityBuildSet, activeBuildGraph, err := schedulerutils.BuildNodeResolutionPriorityMap(pkgGraph, graphMutex)
-	_ = activeBuildGraph
+	priorityBuildSet, err := schedulerutils.BuildNodeResolutionPriorityMap(pkgGraph, graphMutex)
 	if err != nil {
 		err = fmt.Errorf("error building implicit node resolution priority set:\n%w", err)
 		return

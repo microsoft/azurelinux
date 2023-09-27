@@ -30,8 +30,6 @@ const (
 	LowNodePriority    int = 0
 	MediumNodePriority int = 1
 	HighNodePriority   int = 2
-
-	priorityBuildGoalNodeName = "PriorityPackagesToBuild"
 )
 
 type NodePriorityMap struct {
@@ -41,7 +39,7 @@ type NodePriorityMap struct {
 // BuildNodeResolutionPriorityMap will build a map of node priorities for the given graph. The graph is expected to
 // contain a goal node named "PackagesToBuild" that lists the packages that should be built. A priority map will be
 // generated as described above for each node in the graph.
-func BuildNodeResolutionPriorityMap(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex) (nodePriorityMap *NodePriorityMap, priorityGraph *pkggraph.PkgGraph, err error) {
+func BuildNodeResolutionPriorityMap(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex) (nodePriorityMap *NodePriorityMap, err error) {
 	graphMutex.RLock()
 	defer graphMutex.RUnlock()
 
@@ -76,10 +74,10 @@ func BuildNodeResolutionPriorityMap(pkgGraph *pkggraph.PkgGraph, graphMutex *syn
 	implicitNodes := subgraph.AllImplicitNodes()
 	satisfyingNodes := []*pkggraph.PkgNode{}
 	for _, implicitNode := range implicitNodes {
-		satisfyingNodesForImplicitNode, err := findMatchesForImplicit(implicitNode, pkgGraph)
-		if err != nil {
-			err = fmt.Errorf("failed to find match for implicit node (%s):\n%w", implicitNode.FriendlyName(), err)
-			return nil, nil, err
+		satisfyingNodesForImplicitNode, findErr := findMatchesForImplicit(implicitNode, pkgGraph)
+		if findErr != nil {
+			err = fmt.Errorf("failed to find match for implicit node (%s):\n%w", implicitNode.FriendlyName(), findErr)
+			return
 		}
 		if len(satisfyingNodesForImplicitNode) > 0 {
 			logger.Log.Debugf("For implicit (%s), we found (%v) to likely provides it.", implicitNode.FriendlyName(), satisfyingNodesForImplicitNode)
@@ -89,29 +87,21 @@ func BuildNodeResolutionPriorityMap(pkgGraph *pkggraph.PkgGraph, graphMutex *syn
 
 	// For each real node we found, we want to prioritize it and all of its dependencies at high.
 	for _, realBuildNode := range satisfyingNodes {
-		realRunNode, err := pkgGraph.GetRunNodeFromBuildNode(realBuildNode)
-		if err != nil {
-			err = fmt.Errorf("failed to find run node for build node (%s):\n%w", realBuildNode.FriendlyName(), err)
-			return nil, nil, err
-		}
-		// Set the lower priority run nodes first
-		//nodePriorityMap.SetSubgraphPriority(pkgGraph, realRunNode, MediumNodePriority)
-		_ = realRunNode
-		// Then overwrite the build nodes with a higher priority
+		// Overwrite the build nodes' depednecy tree with a higher priority
 		nodePriorityMap.SetSubgraphPriority(pkgGraph, realBuildNode, HighNodePriority)
 	}
 
-	priorityGoalNode, err := pkgGraph.AddGoalNodeFromNodes(priorityBuildGoalNodeName, append(satisfyingNodes, buildGoalNode))
-	if err != nil {
-		err = fmt.Errorf("failed to add priority goal node (%s):\n%w", priorityBuildGoalNodeName, err)
-		return nil, nil, err
-	}
+	// priorityGoalNode, err := pkgGraph.AddGoalNodeFromNodes(priorityBuildGoalNodeName, append(satisfyingNodes, buildGoalNode))
+	// if err != nil {
+	// 	err = fmt.Errorf("failed to add priority goal node (%s):\n%w", priorityBuildGoalNodeName, err)
+	// 	return nil, nil, err
+	// }
 
-	priorityGraph, err = pkgGraph.CreateSubGraph(priorityGoalNode)
-	if err != nil {
-		err = fmt.Errorf("failed to create priority subgraph:\n%w", err)
-		return nil, nil, err
-	}
+	// priorityGraph, err = pkgGraph.CreateSubGraph(priorityGoalNode)
+	// if err != nil {
+	// 	err = fmt.Errorf("failed to create priority subgraph:\n%w", err)
+	// 	return nil, nil, err
+	// }
 
 	return
 }
