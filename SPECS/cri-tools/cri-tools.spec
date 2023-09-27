@@ -1,4 +1,9 @@
 %define debug_package %{nil}
+%ifarch aarch64
+%global gohostarch      arm64
+%elifarch x86_64
+%global gohostarch      amd64
+%endif
 Summary:        CRI tools
 Name:           cri-tools
 Version:        1.28.0
@@ -26,9 +31,10 @@ export VERSION="%{version}"
 %make_build
 
 %install
+export BUILD_FOLDER="./build/bin/linux/%{gohostarch}"
 install -m 755 -d %{buildroot}%{_bindir}
-install -p -m 755 -t %{buildroot}%{_bindir} ./build/bin/crictl
-install -p -m 755 -t %{buildroot}%{_bindir} ./build/bin/critest
+install -p -m 755 -t %{buildroot}%{_bindir} "${BUILD_FOLDER}/crictl"
+install -p -m 755 -t %{buildroot}%{_bindir} "${BUILD_FOLDER}/critest"
 
 %files
 %license LICENSE
