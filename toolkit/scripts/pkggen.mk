@@ -43,10 +43,15 @@ logging_command = --log-file=$(LOGS_DIR)/pkggen/workplan/$(notdir $@).log --log-
 $(call create_folder,$(LOGS_DIR)/pkggen/workplan)
 $(call create_folder,$(rpmbuilding_logs_dir))
 
-.PHONY: clean-workplan clean-cache clean-cache-worker clean-grapher-cache-worker clean-spec-parse clean-ccache graph-cache analyze-built-graph workplan
+.PHONY: clean-workplan clean-cache clean-cache-worker clean-grapher-cache-worker clean-spec-parse clean-ccache graph graph-cache graph-preprocessed analyze-built-graph workplan
+##help:target:parsed-specs=Parse package specs and generate a specs.json file encoding all dependency information.
+parse-specs: $(specs_file)
+##help:target:graph-cache=Resolve package dependencies and cache the results.
 graph-cache: $(cached_file)
-##help:target:workplan=Create the package build workplan.
-workplan: $(graph_file)
+##help:target:graph=Create the initial package build graph.
+workplan graph: $(graph_file)
+graph-preprocessed: $(preprocessed_file)
+
 clean: clean-workplan clean-cache clean-spec-parse
 clean-workplan: clean-cache clean-spec-parse clean-grapher-cache-worker
 	rm -rf $(PKGBUILD_DIR)
