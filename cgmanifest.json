@@ -2397,8 +2397,8 @@
         "type": "other",
         "other": {
           "name": "curl",
-          "version": "8.2.1",
-          "downloadUrl": "https://curl.haxx.se/download/curl-8.2.1.tar.gz"
+          "version": "8.3.0",
+          "downloadUrl": "https://curl.haxx.se/download/curl-8.3.0.tar.gz"
         }
       }
     },
@@ -8281,8 +8281,8 @@
         "type": "other",
         "other": {
           "name": "KeysInUse-OpenSSL",
-          "version": "0.3.3",
-          "downloadUrl": "https://github.com/microsoft/KeysInUse-OpenSSL/archive/v0.3.3.tar.gz"
+          "version": "0.3.4",
+          "downloadUrl": "https://github.com/microsoft/KeysInUse-OpenSSL/archive/v0.3.4.tar.gz"
         }
       }
     },
@@ -11521,8 +11521,8 @@
         "type": "other",
         "other": {
           "name": "libvorbis",
-          "version": "1.3.6",
-          "downloadUrl": "https://downloads.xiph.org/releases/vorbis/libvorbis-1.3.6.tar.xz"
+          "version": "1.3.7",
+          "downloadUrl": "https://downloads.xiph.org/releases/vorbis/libvorbis-1.3.7.tar.xz"
         }
       }
     },
