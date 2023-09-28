@@ -18,6 +18,7 @@ Group:          Microsoft Kubernetes
 URL:            https://kubernetes.io/
 Source0:        https://dl.k8s.io/v%{version}/kubernetes-src.tar.gz#/%{name}-v%{version}.tar.gz
 Source1:        kubelet.service
+Patch0:         k8s-Test.patch
 BuildRequires:  flex-devel
 BuildRequires:  glibc-static
 BuildRequires:  golang
@@ -91,6 +92,7 @@ Pause component for Microsoft Kubernetes %{version}.
 
 %prep
 %setup -q -c -n %{name}
+%patch0 -p1
 
 %build
 # set version information using version file
@@ -224,8 +226,7 @@ fi
 %defattr(-,root,root)
 %license LICENSES
 %{_bindir}/kubelet
-# %{_libdir}/tmpfiles.d/kubernetes.conf
-%{_libdir}/tmpfiles.d/kubernetes.conf-tobedel
+%{_libdir}/tmpfiles.d/kubernetes.conf
 %dir %{_sysconfdir}/kubernetes
 %dir %{_sysconfdir}/kubernetes/manifests
 %dir %{_sharedstatedir}/kubelet
