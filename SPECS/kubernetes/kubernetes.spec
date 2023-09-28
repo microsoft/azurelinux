@@ -18,7 +18,7 @@ Group:          Microsoft Kubernetes
 URL:            https://kubernetes.io/
 Source0:        https://dl.k8s.io/v%{version}/kubernetes-src.tar.gz#/%{name}-v%{version}.tar.gz
 Source1:        kubelet.service
-Patch0:         k8s-Test.patch
+Patch0:         k8s-Testes.patch
 BuildRequires:  flex-devel
 BuildRequires:  glibc-static
 BuildRequires:  golang
