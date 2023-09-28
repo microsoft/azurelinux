@@ -1,7 +1,7 @@
 Summary:        C debugger
 Name:           gdb
 Version:        11.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -88,6 +88,9 @@ rm -f $(dirname $(gcc -print-libgcc-file-name))/../specs
 %{_mandir}/*/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 11.2-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed May 11 2022 Fanzhe Lyu <falyu@microsoft.com> - 11.2
 - Upgrade to gdb 11.2
 

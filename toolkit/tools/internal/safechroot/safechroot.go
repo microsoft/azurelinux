@@ -19,6 +19,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/systemdependency"
 
+	"github.com/moby/sys/mountinfo"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/sys/unix"
 )
@@ -43,7 +44,8 @@ type MountPoint struct {
 	flags  uintptr
 	data   string
 
-	isMounted bool
+	isMounted           bool
+	mountBeforeDefaults bool
 }
 
 // Chroot represents a Chroot environment with automatic synchronization protections
@@ -81,6 +83,11 @@ var defaultChrootEnv = []string{
 	"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
 }
 
+const (
+	unmountTypeLazy   = true
+	unmountTypeNormal = !unmountTypeLazy
+)
+
 // init will always be called if this package is loaded
 func init() {
 	registerSIGTERMCleanup()
@@ -95,6 +102,18 @@ func NewMountPoint(source, target, fstype string, flags uintptr, data string) (m
 		fstype: fstype,
 		flags:  flags,
 		data:   data,
+	}
+}
+
+// NewPreDefaultsMountPoint creates a new MountPoint struct to be created by a Chroot but before the default mount points.
+func NewPreDefaultsMountPoint(source, target, fstype string, flags uintptr, data string) (mountPoint *MountPoint) {
+	return &MountPoint{
+		source:              source,
+		target:              target,
+		fstype:              fstype,
+		flags:               flags,
+		data:                data,
+		mountBeforeDefaults: true,
 	}
 }
 
@@ -194,8 +213,8 @@ func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMoun
 		if err != nil {
 			if buildpipeline.IsRegularBuild() {
 				// mount/unmount is only supported in regular pipeline
-				// Best effort cleanup in case mountpoint creation failed mid-way through
-				cleanupErr := c.unmountAndRemove(leaveChrootOnDisk)
+				// Best effort cleanup in case mountpoint creation failed mid-way through. We will not try again so treat as final attempt.
+				cleanupErr := c.unmountAndRemove(leaveChrootOnDisk, unmountTypeLazy)
 				if cleanupErr != nil {
 					logger.Log.Warnf("Failed to cleanup chroot (%s) during failed initialization. Error: %s", c.rootDir, cleanupErr)
 				}
@@ -230,7 +249,21 @@ func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMoun
 	// mount is only supported in regular pipeline
 	if buildpipeline.IsRegularBuild() {
 		// Create kernel mountpoints
-		allMountPoints := append(defaultMountPoints(), extraMountPoints...)
+		allMountPoints := []*MountPoint{}
+
+		for _, mountPoint := range extraMountPoints {
+			if mountPoint.mountBeforeDefaults {
+				allMountPoints = append(allMountPoints, mountPoint)
+			}
+		}
+
+		allMountPoints = append(allMountPoints, defaultMountPoints()...)
+
+		for _, mountPoint := range extraMountPoints {
+			if !mountPoint.mountBeforeDefaults {
+				allMountPoints = append(allMountPoints, mountPoint)
+			}
+		}
 
 		// Mount with the original unsorted order. Assumes the order of mounts is important.
 		err = c.createMountPoints(allMountPoints)
@@ -269,6 +302,7 @@ func (c *Chroot) AddFiles(filesToCopy ...FileToCopy) (err error) {
 		} else {
 			err = file.Copy(f.Src, dest)
 		}
+
 		if err != nil {
 			logger.Log.Errorf("Error provisioning worker with '%s'", f.Src)
 			return
@@ -370,7 +404,11 @@ func (c *Chroot) Close(leaveOnDisk bool) (err error) {
 
 	if buildpipeline.IsRegularBuild() {
 		// mount is only supported in regular pipeline
-		err = c.unmountAndRemove(leaveOnDisk)
+		err = c.unmountAndRemove(leaveOnDisk, unmountTypeNormal)
+		if err != nil {
+			logger.Log.Warnf("Chroot cleanup failed, will retry with lazy unmount. Error: %s", err)
+			err = c.unmountAndRemove(leaveOnDisk, unmountTypeLazy)
+		}
 		if err == nil {
 			const emptyLen = 0
 			// Remove this chroot from the list of active ones since it has now been cleaned up.
@@ -441,36 +479,62 @@ func cleanupAllChroots() {
 	inChrootMutex.Lock()
 
 	// mount is only supported in regular pipeline
+	failedToUnmount := false
 	if buildpipeline.IsRegularBuild() {
 		// Cleanup chroots in LIFO order incase any are interdependent (e.g. nested safe chroots)
 		logger.Log.Info("Cleaning up all active chroots")
 		for i := len(activeChroots) - 1; i >= 0; i-- {
 			logger.Log.Infof("Cleaning up chroot (%s)", activeChroots[i].rootDir)
-			err := activeChroots[i].unmountAndRemove(leaveChrootOnDisk)
+			err := activeChroots[i].unmountAndRemove(leaveChrootOnDisk, unmountTypeLazy)
 			// Perform best effort cleanup: unmount as many chroots as possible,
 			// even if one fails.
 			if err != nil {
 				logger.Log.Errorf("Failed to unmount chroot (%s)", activeChroots[i].rootDir)
+				failedToUnmount = true
 			}
 		}
 	}
 
-	logger.Log.Info("Cleanup finished")
+	if failedToUnmount {
+		logger.Log.Fatalf("Failed to unmount a chroot, manual unmount required. See above errors for details on which mounts failed.")
+	} else {
+		logger.Log.Info("Cleanup finished")
+	}
 }
 
 // unmountAndRemove retries to unmount directories that were mounted into
 // the chroot until the unmounts succeed or too many failed attempts.
 // This is to avoid leaving folders like /dev mounted when the chroot folder is forcefully deleted in cleanup.
 // Iff all mounts were successfully unmounted, the chroot's root directory will be removed if requested.
-func (c *Chroot) unmountAndRemove(leaveOnDisk bool) (err error) {
+// If doLazyUnmount is true, use the lazy unmount flag which will allow the unmount to succeed even if the mount point is busy.
+func (c *Chroot) unmountAndRemove(leaveOnDisk, lazyUnmount bool) (err error) {
 	const (
-		totalAttempts = 3
-		retryDuration = time.Second
-		unmountFlags  = 0
+		retryDuration      = time.Second
+		totalAttempts      = 3
+		unmountFlagsNormal = 0
+		// Do a lazy unmount as a fallback. This will allow the unmount to succeed even if the mount point is busy.
+		// This is to avoid leaving folders like /dev mounted if the chroot folder is forcefully deleted by the user. Even
+		// if the mount is busy at least it will be detached from the filesystem and will not damage the host.
+		unmountFlagsLazy = unix.MNT_DETACH
 	)
+	unmountFlags := unmountFlagsNormal
+	if lazyUnmount {
+		unmountFlags = unmountFlagsLazy
+	}
 
 	for _, mountPoint := range c.mountPoints {
 		fullPath := filepath.Join(c.rootDir, mountPoint.target)
+
+		var isMounted bool
+		isMounted, err = mountinfo.Mounted(fullPath)
+		if err != nil {
+			err = fmt.Errorf("failed to check if mount point (%s) is mounted. Error: %s", fullPath, err)
+			return
+		}
+		if !isMounted {
+			logger.Log.Debugf("Skipping unmount of (%s) because it is not mounted", fullPath)
+			continue
+		}
 
 		logger.Log.Debugf("Unmounting (%s)", fullPath)
 
@@ -479,9 +543,11 @@ func (c *Chroot) unmountAndRemove(leaveOnDisk bool) (err error) {
 			continue
 		}
 
-		err = retry.Run(func() error {
-			return unix.Unmount(fullPath, unmountFlags)
-		}, totalAttempts, retryDuration)
+		_, err = retry.RunWithExpBackoff(func() error {
+			logger.Log.Debugf("Calling unmount on path(%s) with flags (%v)", fullPath, unmountFlags)
+			umountErr := unix.Unmount(fullPath, unmountFlags)
+			return umountErr
+		}, totalAttempts, retryDuration, 2.0, nil)
 
 		if err != nil {
 			logger.Log.Warnf("Failed to unmount (%s). Error: %s", fullPath, err)
@@ -561,7 +627,7 @@ func (c *Chroot) createMountPoints(allMountPoints []*MountPoint) (err error) {
 
 		err = unix.Mount(mountPoint.source, fullPath, mountPoint.fstype, mountPoint.flags, mountPoint.data)
 		if err != nil {
-			logger.Log.Errorf("Mount failed on (%s). Error: %s", fullPath, err)
+			logger.Log.Errorf("Mount of (%s) to (%s) failed. Error: %s", mountPoint.source, fullPath, err)
 			return
 		}
 

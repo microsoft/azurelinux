@@ -1,7 +1,7 @@
 Summary:        Python cryptography library
 Name:           python-cryptography
 Version:        3.3.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -64,6 +64,9 @@ pip3 install pretend pytest hypothesis iso8601 cryptography_vectors pytz
 %{python3_sitelib}/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.3.2-5
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Feb 15 2023 Suresh Thelkar <sthelkar@microsoft.com> - 3.3.2-4
 - Patch CVE-2023-25193
 - License verified.

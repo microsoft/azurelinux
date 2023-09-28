@@ -1,7 +1,7 @@
 Summary:        Berkeley Packet Filter Tracing Language
 Name:           bpftrace
 Version:        0.16.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -78,6 +78,9 @@ install -p -m 644 tools/*.txt %{buildroot}%{_datadir}/bpftrace/tools/doc
 %{_datadir}/bpftrace/tools
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.16.0-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Tue Oct 04 2022 Muhammad Falak <mwani@microsoft.com> - 0.16.0-1
 - Bump version to 0.16.0
 

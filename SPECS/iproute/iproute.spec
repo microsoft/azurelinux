@@ -1,7 +1,7 @@
 Summary:        Basic and advanced IPV4-based networking
 Name:           iproute
 Version:        5.15.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 URL:            https://www.kernel.org/pub/linux/utils/net/iproute2
 Group:          Applications/System
@@ -71,6 +71,9 @@ sed -i 's/\"libnetlink.h\"/"..\/include\/libnetlink.h\"/g' ../lib/libnetlink.c
 %{_mandir}/man3/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.15.0-3
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Feb 02 2022 Muhammad Falak <mwani@microsoft.com> - 5.15.0-2
 - Add an explict BR on 'sudo' & 'libmnl-devel' to enable check section
 

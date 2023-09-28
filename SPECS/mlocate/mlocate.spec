@@ -1,6 +1,6 @@
 Name:           mlocate
 Version:        0.26
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        An utility for finding files by name.
 License:        GPLv2
 URL:            https://pagure.io/mlocate
@@ -47,6 +47,9 @@ mv %{buildroot}/%{_mandir}/man1/locate.1 %{buildroot}/%{_mandir}/man1/%{name}.1
 %{_localstatedir}/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.26-6
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 0.26-5
 - Remove unused `%%define sha1` lines
 - License verified

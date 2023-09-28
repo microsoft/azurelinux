@@ -43,9 +43,15 @@ logging_command = --log-file=$(LOGS_DIR)/pkggen/workplan/$(notdir $@).log --log-
 $(call create_folder,$(LOGS_DIR)/pkggen/workplan)
 $(call create_folder,$(rpmbuilding_logs_dir))
 
-.PHONY: clean-workplan clean-cache clean-cache-worker clean-grapher-cache-worker clean-spec-parse clean-ccache graph-cache analyze-built-graph workplan
+.PHONY: clean-workplan clean-cache clean-cache-worker clean-grapher-cache-worker clean-spec-parse clean-ccache graph graph-cache graph-preprocessed analyze-built-graph workplan
+##help:target:parsed-specs=Parse package specs and generate a specs.json file encoding all dependency information.
+parse-specs: $(specs_file)
+##help:target:graph-cache=Resolve package dependencies and cache the results.
 graph-cache: $(cached_file)
-workplan: $(graph_file)
+##help:target:graph=Create the initial package build graph.
+workplan graph: $(graph_file)
+graph-preprocessed: $(preprocessed_file)
+
 clean: clean-workplan clean-cache clean-spec-parse
 clean-workplan: clean-cache clean-spec-parse clean-grapher-cache-worker
 	rm -rf $(PKGBUILD_DIR)
@@ -229,20 +235,22 @@ $(preprocessed_file): $(cached_file) $(go-graphPreprocessor)
 pkggen_archive	= $(OUT_DIR)/rpms.tar.gz
 srpms_archive  	= $(OUT_DIR)/srpms.tar.gz
 
-.PHONY: build-packages clean-build-packages hydrate-rpms compress-rpms clean-compress-rpms compress-srpms clean-compress-srpms
+.PHONY: build-packages clean-build-packages hydrate-rpms compress-rpms clean-compress-rpms compress-srpms clean-compress-srpms clean-build-packages-workers
 
+##help:target:build-packages=Build .rpm packages selected by PACKAGE_(RE)BUILD_LIST= and IMAGE_CONFIG=.
 # Execute the package build scheduler.
 build-packages: $(RPMS_DIR)
 
 clean: clean-build-packages clean-compress-rpms clean-compress-srpms
-clean-build-packages:
+clean-build-packages-workers:
+	@echo Verifying no mountpoints present in $(CHROOT_DIR)
+	$(SCRIPTS_DIR)/safeunmount.sh "$(CHROOT_DIR)"/* && \
+	rm -rf $(CHROOT_DIR)
+clean-build-packages: clean-build-packages-workers
 	rm -rf $(RPMS_DIR)
 	rm -rf $(LOGS_DIR)/pkggen/failures.txt
 	rm -rf $(rpmbuilding_logs_dir)
 	rm -rf $(STATUS_FLAGS_DIR)/build-rpms.flag
-	@echo Verifying no mountpoints present in $(CHROOT_DIR)
-	$(SCRIPTS_DIR)/safeunmount.sh "$(CHROOT_DIR)" && \
-	rm -rf $(CHROOT_DIR)
 clean-compress-rpms:
 	rm -rf $(pkggen_archive)
 clean-compress-srpms:
@@ -257,7 +265,7 @@ $(RPMS_DIR):
 	@touch $@
 endif
 
-$(STATUS_FLAGS_DIR)/build-rpms.flag: no_repo_acl $(preprocessed_file) $(chroot_worker) $(go-scheduler) $(go-pkgworker) $(depend_STOP_ON_PKG_FAIL) $(CONFIG_FILE) $(depend_CONFIG_FILE) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST) $(depend_MAX_CASCADING_REBUILDS) $(depend_TEST_RUN_LIST) $(depend_TEST_RERUN_LIST) $(depend_TEST_IGNORE_LIST) $(pkggen_rpms) $(srpms) $(BUILD_SRPMS_DIR)
+$(STATUS_FLAGS_DIR)/build-rpms.flag: $(no_repo_acl) $(preprocessed_file) $(chroot_worker) $(go-scheduler) $(go-pkgworker) $(depend_STOP_ON_PKG_FAIL) $(CONFIG_FILE) $(depend_CONFIG_FILE) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST) $(depend_MAX_CASCADING_REBUILDS) $(depend_TEST_RUN_LIST) $(depend_TEST_RERUN_LIST) $(depend_TEST_IGNORE_LIST) $(pkggen_rpms) $(srpms) $(BUILD_SRPMS_DIR)
 	$(go-scheduler) \
 		--input="$(preprocessed_file)" \
 		--output="$(built_file)" \
@@ -307,12 +315,14 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: no_repo_acl $(preprocessed_file) $(chroot_w
 		$(logging_command) && \
 	touch $@
 
+##help:target:compress-rpms=Compresses all RPMs in `../out/RPMS` into `../out/rpms.tar.gz`. See `hydrate-rpms` target.
 # use temp tarball to avoid tar warning "file changed as we read it"
 # that can sporadically occur when tarball is the dir that is compressed
 compress-rpms:
 	tar -cvp -f $(BUILD_DIR)/temp_rpms_tarball.tar.gz -C $(RPMS_DIR)/.. $(notdir $(RPMS_DIR))
 	mv $(BUILD_DIR)/temp_rpms_tarball.tar.gz $(pkggen_archive)
 
+##help:target:compress-srpms=Compresses all SRPMs in `../out/SRPMS` into `../out/srpms.tar.gz`.
 # use temp tarball to avoid tar warning "file changed as we read it"
 # that can sporadically occur when tarball is the dir that is compressed
 compress-srpms:
@@ -329,6 +339,7 @@ hydrate-cached-rpms:
 	@find $(remote_rpms_cache_dir) -mindepth 2 -name "*.rpm" -exec mv {} $(remote_rpms_cache_dir) \;
 	@find $(remote_rpms_cache_dir) -mindepth 1 -type d -and ! -name repodata -exec rm -fr {} +
 
+##help:target:hydrate-rpms=Hydrates the `../out/RPMS` directory from `rpms.tar.gz`. See `compress-rpms` target.
 # Seed the RPMs folder with the any missing files from the archive.
 hydrate-rpms:
 	$(if $(PACKAGE_ARCHIVE),,$(error Must set PACKAGE_ARCHIVE=<path>))

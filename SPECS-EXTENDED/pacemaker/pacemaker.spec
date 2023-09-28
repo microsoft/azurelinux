@@ -92,7 +92,7 @@
 Summary:        Scalable High-Availability cluster resource manager
 Name:           pacemaker
 Version:        2.1.5
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2+ and LGPLv2+
 Url:            https://www.clusterlabs.org/
 Source0:        https://github.com/ClusterLabs/pacemaker/archive/refs/tags/Pacemaker-2.1.5.tar.gz#/%{name}-%{version}.tar.gz
@@ -148,7 +148,7 @@ BuildRequires:  asciidoc
 BuildRequires:  inkscape
 BuildRequires:  %{python_name}-sphinx
 %endif
-BuildRequires:  pkgconfig(systemd)
+BuildRequires:  systemd
 Requires:       corosync >= 2.0.0
 # Booth requires this
 Provides:       pacemaker-ticket-support = 2.0
@@ -602,6 +602,9 @@ exit 0
 %{_datadir}/pkgconfig/pacemaker-schemas.pc
 
 %changelog
+* Tue Sep 19 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.1.5-5
+- Fix build issue for systemd/systemd-bootstrap confusion
+
 * Wed Mar 08 2023 Sumedh Sharma <sumsharma@microsoft.com> - 2.1.5-4
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
 - Disable nagios-plugins-metadata

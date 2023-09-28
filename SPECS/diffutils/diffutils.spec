@@ -1,7 +1,7 @@
 Summary:        Programs that show the differences between files or directories
 Name:           diffutils
 Version:        3.8
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 URL:            http://www.gnu.org/software/diffutils
 Group:          System Environment/Base
@@ -42,6 +42,9 @@ make %{?_smp_mflags} check
 %{_mandir}/*/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.8-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Oct 20 2021 Andrew Phelps <anphel@microsoft.com> 3.8-1
 - Update to version 3.8
 - License verified

@@ -2,7 +2,7 @@
 Summary:        DBus for systemd
 Name:           dbus
 Version:        1.15.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+ OR AFL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -86,6 +86,9 @@ make %{?_smp_mflags} check
 %{_libdir}/*.so
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.15.2-4
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Tue Jun 27 2023 Chris Gunn <chrisgun@microsoft.com> - 1.15.2-3
 - Enable audit integration
 

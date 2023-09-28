@@ -5,45 +5,45 @@ Subject: [PATCH] Move /tmp to /var/tmp
 
 Fedora is using tmpfs which is limited by the size of RAM, thus we need
 to use different directory on different filesystem.
+
 ---
  ui/qt/about_dialog.cpp         |  3 +-
- ui/qt/iax2_analysis_dialog.cpp |  5 +--
- ui/qt/rtp_analysis_dialog.cpp  |  5 +--
- ui/qt/rtp_audio_stream.cpp     |  3 +-
- wsutil/tempfile.c              |  9 +++---
- wsutil/tempfile.h              |  4 +--
- wsutil/wstmpdir.c              | 70 ++++++++++++++++++++++++++++++++++++++++++
- wsutil/wstmpdir.h              | 39 +++++++++++++++++++++++
- 8 files changed, 132 insertions(+), 11 deletions(-)
+ ui/qt/iax2_analysis_dialog.cpp |  5 ++-
+ ui/qt/utils/rtp_audio_file.cpp |  3 +-
+ wsutil/tempfile.c              | 18 +++++++-
+ wsutil/tempfile.h              |  2 +-
+ wsutil/wstmpdir.c              | 71 ++++++++++++++++++++++++++++++++++
+ wsutil/wstmpdir.h              | 39 +++++++++++++++++++
+ 7 files changed, 134 insertions(+), 7 deletions(-)
  create mode 100644 wsutil/wstmpdir.c
  create mode 100644 wsutil/wstmpdir.h
 
 diff --git a/ui/qt/about_dialog.cpp b/ui/qt/about_dialog.cpp
-index 31dc581..2f74285 100644
+index 752b669ac4..42c2be0fca 100644
 --- a/ui/qt/about_dialog.cpp
 +++ b/ui/qt/about_dialog.cpp
-@@ -26,6 +26,7 @@
+@@ -14,6 +14,7 @@
  
- #include "wireshark_application.h"
+ #include "main_application.h"
  #include <wsutil/filesystem.h>
 +#include <wsutil/wstmpdir.h> /* for get_tmp_dir() */
  
  #include <QDesktopServices>
  #include <QUrl>
-@@ -206,7 +206,7 @@ FolderListModel::FolderListModel(QObject * parent):
+@@ -185,7 +186,7 @@ FolderListModel::FolderListModel(QObject * parent):
      appendRow(QStringList() << tr("\"File\" dialogs") << get_last_open_dir() << tr("capture files"));
  
      /* temp */
--    appendRow(QStringList() << tr("Temp") << g_get_tmp_dir() << tr("untitled capture files"));
-+    appendRow(QStringList() << tr("Temp") << get_tmp_dir() << tr("untitled capture files"));
+-    appendRow(QStringList() << tr("Temp") << (global_capture_opts.temp_dir && global_capture_opts.temp_dir[0] ? global_capture_opts.temp_dir : g_get_tmp_dir()) << tr("untitled capture files"));
++    appendRow(QStringList() << tr("Temp") << (global_capture_opts.temp_dir && global_capture_opts.temp_dir[0] ? global_capture_opts.temp_dir : get_tmp_dir()) << tr("untitled capture files"));
  
      /* pers conf */
      appendRow(QStringList() << tr("Personal configuration")
 diff --git a/ui/qt/iax2_analysis_dialog.cpp b/ui/qt/iax2_analysis_dialog.cpp
-index ee4e5fd..fe17a95 100644
+index 07b9b42e01..fb09de989b 100644
 --- a/ui/qt/iax2_analysis_dialog.cpp
 +++ b/ui/qt/iax2_analysis_dialog.cpp
-@@ -37,6 +37,7 @@
+@@ -25,6 +25,7 @@
  #include "ui/rtp_stream.h"
  #endif
  #include <wsutil/utf8_entities.h>
@@ -51,7 +51,7 @@ index ee4e5fd..fe17a95 100644
  
  #include <wsutil/g711.h>
  #include <wsutil/pint.h>
-@@ -271,10 +272,10 @@ Iax2AnalysisDialog::Iax2AnalysisDialog(QWidget &parent, CaptureFile &cf) :
+@@ -255,10 +256,10 @@ Iax2AnalysisDialog::Iax2AnalysisDialog(QWidget &parent, CaptureFile &cf) :
  
      // We keep our temp files open for the lifetime of the dialog. The GTK+
      // UI opens and closes at various points.
@@ -64,113 +64,89 @@ index ee4e5fd..fe17a95 100644
      rev_tempfile_ = new QTemporaryFile(tempname, this);
      rev_tempfile_->open();
  
-diff --git a/ui/qt/rtp_analysis_dialog.cpp b/ui/qt/rtp_analysis_dialog.cpp
-index 5d82e46..8008984 100644
---- a/ui/qt/rtp_analysis_dialog.cpp
-+++ b/ui/qt/rtp_analysis_dialog.cpp
-@@ -37,6 +37,7 @@
+diff --git a/ui/qt/utils/rtp_audio_file.cpp b/ui/qt/utils/rtp_audio_file.cpp
+index 591a63bbf3..203f5c5286 100644
+--- a/ui/qt/utils/rtp_audio_file.cpp
++++ b/ui/qt/utils/rtp_audio_file.cpp
+@@ -31,6 +31,7 @@
  
- #include <wsutil/g711.h>
- #include <wsutil/pint.h>
+ #include "rtp_audio_file.h"
+ #include <ws_attributes.h>
 +#include <wsutil/wstmpdir.h> /* for get_tmp_dir() */
  
- #include <QMessageBox>
- #include <QPushButton>
-@@ -331,10 +332,10 @@ RtpAnalysisDialog::RtpAnalysisDialog(QWidget &parent, CaptureFile &cf, struct _r
+ RtpAudioFile::RtpAudioFile(bool use_disk_for_temp, bool use_disk_for_frames):
+       real_pos_(0)
+@@ -45,7 +46,7 @@ RtpAudioFile::RtpAudioFile(bool use_disk_for_temp, bool use_disk_for_frames):
  
-     // We keep our temp files open for the lifetime of the dialog. The GTK+
-     // UI opens and closes at various points.
--    QString tempname = QString("%1/wireshark_rtp_f").arg(QDir::tempPath());
-+    QString tempname = QString("%1/wireshark_rtp_f").arg(get_tmp_dir());
-     fwd_tempfile_ = new QTemporaryFile(tempname, this);
-     fwd_tempfile_->open();
--    tempname = QString("%1/wireshark_rtp_r").arg(QDir::tempPath());
-+    tempname = QString("%1/wireshark_rtp_r").arg(get_tmp_dir());
-     rev_tempfile_ = new QTemporaryFile(tempname, this);
-     rev_tempfile_->open();
- 
-diff --git a/ui/qt/rtp_audio_stream.cpp b/ui/qt/rtp_audio_stream.cpp
-index fde66c8..b9531d2 100644
---- a/ui/qt/rtp_audio_stream.cpp
-+++ b/ui/qt/rtp_audio_stream.cpp
-@@ -37,6 +37,7 @@
- #include <ui/rtp_stream.h>
- 
- #include <wsutil/nstime.h>
-+#include <wsutil/wstmpdir.h> /* for get_tmp_dir() */
- 
- #include <QAudioFormat>
- #include <QAudioOutput>
-@@ -76,7 +77,7 @@ RtpAudioStream::RtpAudioStream(QObject *parent, _rtp_stream_info *rtp_stream) :
-                                                 visual_sample_rate_, SPEEX_RESAMPLER_QUALITY_MIN, NULL);
-     speex_resampler_skip_zeros(visual_resampler_);
- 
--    QString tempname = QString("%1/wireshark_rtp_stream").arg(QDir::tempPath());
-+    QString tempname = QString("%1/wireshark_rtp_stream").arg(get_tmp_dir());
-     tempfile_ = new QTemporaryFile(tempname, this);
-     tempfile_->open();
- 
+     tempname = "memory";
+     if (use_disk_for_temp) {
+-        tempname = QString("%1/wireshark_rtp_stream").arg(QDir::tempPath());
++        tempname = QString("%1/wireshark_rtp_stream").arg(get_tmp_dir());
+         sample_file_ = new QTemporaryFile(tempname, this);
+     } else {
+         sample_file_ = new QBuffer(this);
 diff --git a/wsutil/tempfile.c b/wsutil/tempfile.c
-index 5082452..f751a7c 100644
+index f93f96d538..73964a1def 100644
 --- a/wsutil/tempfile.c
 +++ b/wsutil/tempfile.c
-@@ -12,10 +12,12 @@
-
- #include <glib.h>
+@@ -14,10 +14,12 @@
+ 
  #include "tempfile.h"
+ #include "file_util.h"
 +#include <wsutil/file_util.h>
 +#include <wsutil/wstmpdir.h> /* for get_tmp_dir() */
-
+ 
   /**
   * Create a tempfile with the given prefix (e.g. "wireshark"). The path
 - * is created using g_file_open_tmp.
 + * is created using get_tmp_dir.
   *
+  * @param tempdir [in] If not NULL, the directory in which to create the file.
   * @param namebuf [in,out] If not NULL, receives the full path of the temp file.
-  *                Must be freed.
-@@ -30,6 +31,9 @@ create_tempfile(gchar **namebuf, const char *pfx, const char *sfx, GError **err)
+@@ -33,6 +33,9 @@ create_tempfile(const char *tempdir, gchar **namebuf, const char *pfx, const cha
  {
    int fd;
    gchar *safe_pfx = NULL;
 +  gchar *tmp_file;
 +  const char *tmp_dir;
 +  int old_mask;
-
+ 
    if (pfx) {
      /* The characters in "delimiters" come from:
-@@ -49,7 +53,15 @@ create_tempfile(gchar **namebuf, const char *pfx, const char *sfx, GError **err)
-   gchar* filetmpl = g_strdup_printf("%sXXXXXX%s", safe_pfx ? safe_pfx : "", sfx ? sfx : "");
-   g_free(safe_pfx);
-
--  fd = g_file_open_tmp(filetmpl, namebuf, err);
-+  tmp_dir = get_tmp_dir();
-+  tmp_file = g_strconcat(tmp_dir, "/", filetmpl, NULL);
+@@ -54,7 +57,16 @@ create_tempfile(const char *tempdir, gchar **namebuf, const char *pfx, const cha
+     gchar* filetmpl = ws_strdup_printf("%sXXXXXX%s", safe_pfx ? safe_pfx : "", sfx ? sfx : "");
+     g_free(safe_pfx);
+ 
+-    fd = g_file_open_tmp(filetmpl, namebuf, err);
++    tmp_dir = get_tmp_dir();
++    tmp_file = g_strconcat(tmp_dir, "/", filetmpl, NULL);
 +
-+  if (namebuf)
-+    *namebuf = tmp_file;
++    if (namebuf)
++      *namebuf = tmp_file;
 +
-+  old_mask = ws_umask(0077);
-+  fd = mkstemps(tmp_file, sfx ? (int) strlen(sfx) : 0);
-+  ws_umask(old_mask);
-
-   g_free(filetmpl);
-   return fd;
++    old_mask = ws_umask(0077);
++    fd = mkstemps(tmp_file, sfx ? (int) strlen(sfx) : 0);
++    ws_umask(old_mask);
++
+     g_free(filetmpl);
+   }
+   else {
 diff --git a/wsutil/tempfile.h b/wsutil/tempfile.h
-index 1dca2df..bb3160c 100644
+index 70031b5419..72011e265a 100644
 --- a/wsutil/tempfile.h
 +++ b/wsutil/tempfile.h
-@@ -45,7 +45,7 @@ WS_DLL_PUBLIC char *get_tempfile_path(const char *filename);
+@@ -23,7 +23,7 @@ extern "C" {
  
  /**
   * Create a tempfile with the given prefix (e.g. "wireshark"). The path
 - * is created using g_file_open_tmp.
 + * is created using get_tmp_dir and mkstemp.
   *
+  * @param tempdir [in] If not NULL, the directory in which to create the file.
   * @param namebuf [in,out] If not NULL, receives the full path of the temp file.
-  *                Must be freed.
 diff --git a/wsutil/wstmpdir.c b/wsutil/wstmpdir.c
 new file mode 100644
-index 0000000..d8b733b
+index 0000000000..9128d354ce
 --- /dev/null
 +++ b/wsutil/wstmpdir.c
 @@ -0,0 +1,71 @@
@@ -247,7 +223,7 @@ index 0000000..d8b733b
 +}
 diff --git a/wsutil/wstmpdir.h b/wsutil/wstmpdir.h
 new file mode 100644
-index 0000000..07ac583
+index 0000000000..07ac5837ac
 --- /dev/null
 +++ b/wsutil/wstmpdir.h
 @@ -0,0 +1,39 @@
@@ -291,5 +267,5 @@ index 0000000..07ac583
 +
 +#endif
 -- 
-2.13.0
+2.37.3
 

@@ -1,41 +1,37 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %{!?_httpd_mmn: %{expand: %%global _httpd_mmn %%(cat %{_includedir}/httpd/.mmn || echo 0-0)}}
 %{!?_httpd_moddir: %{expand: %%global _httpd_moddir %%{_libdir}/httpd/modules}}
 %{!?_httpd_confdir: %{expand: %%global _httpd_confdir %{_sysconfdir}/httpd/conf.d}}
-
 # Optionally build with hiredis if --with hiredis is passed
 %{!?_with_hiredis: %{!?_without_hiredis: %global _without_hiredis --without-hiredis}}
 # It is an error if both or neither required options exist.
 %{?_with_hiredis: %{?_without_hiredis: %{error: both _with_hiredis and _without_hiredis}}}
 %{!?_with_hiredis: %{!?_without_hiredis: %{error: neither _with_hiredis nor _without_hiredis}}}
-
 # /etc/httpd/conf.d with httpd < 2.4 and defined as /etc/httpd/conf.modules.d with httpd >= 2.4
 %{!?_httpd_modconfdir: %{expand: %%global _httpd_modconfdir %%{_sysconfdir}/httpd/conf.d}}
+%global httpd_pkg_cache_dir %{_var}/cache/httpd/mod_auth_openidc
 
-%global httpd_pkg_cache_dir /var/cache/httpd/mod_auth_openidc
+Summary:        OpenID Connect auth module for Apache HTTP Server
+Name:           mod_auth_openidc
+Version:        2.4.14.2
+Release:        1%{?dist}
+License:        ASL 2.0
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://github.com/OpenIDC/mod_auth_openidc
+Source0:        https://github.com/OpenIDC/mod_auth_openidc/releases/download/v%{version}/%{name}-%{version}.tar.gz
 
-Name:		mod_auth_openidc
-Version:	2.4.2.1
-Release:	2%{?dist}
-Summary:	OpenID Connect auth module for Apache HTTP Server
-
-License:	ASL 2.0
-URL:		https://github.com/zmartzone/mod_auth_openidc
-Source0:	https://github.com/zmartzone/mod_auth_openidc/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-
-BuildRequires:  gcc
-BuildRequires:	httpd-devel
-BuildRequires:	openssl-devel
-BuildRequires:	curl-devel
-BuildRequires:	jansson-devel
-BuildRequires:	pcre-devel
-BuildRequires:	autoconf
-BuildRequires:	automake
-BuildRequires:	cjose-devel
-BuildRequires:	jq-devel
 %{?_with_hiredis:BuildRequires: hiredis-devel}
-Requires:	httpd-mmn
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  cjose-devel
+BuildRequires:  curl-devel
+BuildRequires:  gcc
+BuildRequires:  httpd-devel
+BuildRequires:  jansson-devel
+BuildRequires:  jq-devel
+BuildRequires:  openssl-devel
+BuildRequires:  pcre-devel
+Requires:       httpd-mmn
 
 %description
 This module enables an Apache 2.x web server to operate as
@@ -54,36 +50,32 @@ autoreconf
   %{?_with_hiredis} \
   %{?_without_hiredis}
 
-%{make_build}
+%make_build
 
 %check
 export MODULES_DIR=%{_httpd_moddir}
 export APXS2_OPTS='-S LIBEXECDIR=${MODULES_DIR}'
-%{make_build} test
+%make_build test
 
 %install
-mkdir -p $RPM_BUILD_ROOT%{_httpd_moddir}
-make install MODULES_DIR=$RPM_BUILD_ROOT%{_httpd_moddir}
+mkdir -p %{buildroot}%{_httpd_moddir}
+make install DESTDIR=%{buildroot} MODULES_DIR=%{buildroot}%{_httpd_moddir}
 
-install -m 755 -d $RPM_BUILD_ROOT%{_httpd_modconfdir}
+install -m 755 -d %{buildroot}%{_httpd_modconfdir}
 echo 'LoadModule auth_openidc_module modules/mod_auth_openidc.so' > \
-	$RPM_BUILD_ROOT%{_httpd_modconfdir}/10-auth_openidc.conf
+	%{buildroot}%{_httpd_modconfdir}/10-auth_openidc.conf
 
-install -m 755 -d $RPM_BUILD_ROOT%{_httpd_confdir}
-install -m 644 auth_openidc.conf $RPM_BUILD_ROOT%{_httpd_confdir}
+install -m 755 -d %{buildroot}%{_httpd_confdir}
+install -m 644 auth_openidc.conf %{buildroot}%{_httpd_confdir}
 # Adjust httpd cache location in install config file
-sed -i 's!/var/cache/apache2/!/var/cache/httpd/!' $RPM_BUILD_ROOT%{_httpd_confdir}/auth_openidc.conf
-install -m 700 -d $RPM_BUILD_ROOT%{httpd_pkg_cache_dir}
-install -m 700 -d $RPM_BUILD_ROOT%{httpd_pkg_cache_dir}/metadata
-install -m 700 -d $RPM_BUILD_ROOT%{httpd_pkg_cache_dir}/cache
+sed -i 's!%{_var}/cache/apache2/!%{_var}/cache/httpd/!' %{buildroot}%{_httpd_confdir}/auth_openidc.conf
+install -m 700 -d %{buildroot}%{httpd_pkg_cache_dir}
+install -m 700 -d %{buildroot}%{httpd_pkg_cache_dir}/metadata
+install -m 700 -d %{buildroot}%{httpd_pkg_cache_dir}/cache
 
 
 %files
-%if 0%{?rhel} && 0%{?rhel} < 7
-%doc LICENSE.txt
-%else
 %license LICENSE.txt
-%endif
 %doc ChangeLog
 %doc AUTHORS
 %doc README.md
@@ -95,6 +87,12 @@ install -m 700 -d $RPM_BUILD_ROOT%{httpd_pkg_cache_dir}/cache
 %dir %attr(0700, apache, apache) %{httpd_pkg_cache_dir}/cache
 
 %changelog
+* Tue Sep 05 2023 Archana Choudhary <archana1@microsoft.com> - 2.4.14.2-1
+- Upgrade to 2.4.14.2 - CVE-2021-20718, CVE-2021-39191, CVE-2022-23527, CVE-2023-28625
+- Add DESTDIR to resolve mod_auth_openidc.so filepath
+- Update source URL
+- Verified license
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.2.1-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
@@ -178,7 +176,6 @@ install -m 700 -d $RPM_BUILD_ROOT%{httpd_pkg_cache_dir}/cache
 
 * Mon Mar 21 2016 John Dennis <jdennis@redhat.com> - 1.8.8-2
 - Add missing unpackaged files/directories
-
   Add to doc: README.md, DISCLAIMER, AUTHORS
   Add to httpd/conf.d: auth_openidc.conf
   Add to /var/cache: /var/cache/httpd/mod_auth_openidc/cache
