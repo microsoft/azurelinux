@@ -6,10 +6,8 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/microsoft/bond
-#Source0:       %{url}/archive/%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
-Source1:        gbc-0.11.0.3-aarch64
-Source2:        gbc-0.11.0.3-x86_64
+Source0:        https://github.com/microsoft/bond/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source1:        gbc-0.11.0.3-x86_64
 BuildRequires:  boost-devel
 BuildRequires:  clang
 BuildRequires:  cmake
@@ -17,6 +15,8 @@ BuildRequires:  gmp-devel
 BuildRequires:  ncurses-devel
 BuildRequires:  rapidjson-devel
 BuildRequires:  zlib-devel
+
+ExclusiveArch:  x86_64
 
 %description
 Bond is an open-source, cross-platform framework for working with schematized data.
@@ -32,7 +32,7 @@ Development files for %{name}
 
 %prep
 %setup -q
-chmod u+x %{SOURCE1} %{SOURCE2}
+chmod u+x %{SOURCE1}
 
 %build
 CMAKE_OPTS="\
@@ -40,11 +40,7 @@ CMAKE_OPTS="\
     -DBOND_FIND_RAPIDJSON=TRUE \
     -DBOND_SKIP_CORE_TESTS=TRUE \
     -DBOND_SKIP_GBC_TESTS=TRUE \
-%ifarch aarch64
     -DBOND_GBC_PATH=%{SOURCE1} \
-%else
-    -DBOND_GBC_PATH=%{SOURCE2} \
-%endif
     -DCMAKE_INSTALL_PREFIX=%{_prefix} \
 "
 
@@ -69,7 +65,7 @@ chmod 0755 %{buildroot}%{_bindir}/gbc
 
 %changelog
 * Wed Sep 27 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 8.0.1-6
-- Update to 10.0.0
+- Provide bond 8.0.1 for CBL-Mariner 2.0.
 
 * Tue Nov 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.0.1-5
 - Updating package build steps.
