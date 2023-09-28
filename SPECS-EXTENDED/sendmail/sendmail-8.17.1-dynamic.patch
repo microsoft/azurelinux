@@ -1,0 +1,35 @@
+--- sendmail-8.14.4/devtools/OS/Linux		2010-01-03 22:55:35.000000000 +0100
++++ sendmail-8.14.4/devtools/OS/Linux.dynamic	2010-01-03 22:59:03.000000000 +0100
+@@ -7,7 +7,7 @@
+ define(`confCCOPTS_SO', `-fPIC')
+ define(`confSM_OS_HEADER', `sm_os_linux')
+ define(`confMANROOT', `/usr/share/man/man')
+-define(`confLIBS', `-ldl')
++define(`confLIBS', `-pie -ldl')
+ define(`confEBINDIR', `/usr/sbin')
+ APPENDDEF(`confLIBSEARCH', `crypt nsl')
+ 
+@@ -22,19 +22,19 @@
+ ifelse(confBLDVARIANT, `DEBUG',
+ dnl Debug build
+ `
+-	define(`confOPTIMIZE',`-g -Wall')
++	define(`confOPTIMIZE',`-g -Wall -fpie')
+ ',
+ dnl Optimized build
+ confBLDVARIANT, `OPTIMIZED',
+ `
+-	define(`confOPTIMIZE',`-O2')
++	define(`confOPTIMIZE',`-O2 -fpie')
+ ',
+ dnl Purify build
+ confBLDVARIANT, `PURIFY',
+ `
+-	define(`confOPTIMIZE',`-g')
++	define(`confOPTIMIZE',`-g -fpie')
+ ',
+ dnl default
+ `
+-	define(`confOPTIMIZE',`-O2')
++	define(`confOPTIMIZE',`-O2 -fpie')
+ ')

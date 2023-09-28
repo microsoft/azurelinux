@@ -1,0 +1,13 @@
+diff --git a/sendmail/conf.c b/sendmail/conf.c
+index e7a9615..f1bc1b2 100644
+--- a/sendmail/conf.c
++++ b/sendmail/conf.c
+@@ -1044,7 +1044,7 @@ switch_map_find(service, maptype, mapreturn)
+ 				if (p != NULL)
+ 					*p = '\0';
+ # ifndef SM_NSSWITCH_DELIMS
+-#  define SM_NSSWITCH_DELIMS	" \t"
++#  define SM_NSSWITCH_DELIMS	" \t:"
+ # endif
+ 				p = strpbrk(buf, SM_NSSWITCH_DELIMS);
+ 				if (p != NULL)

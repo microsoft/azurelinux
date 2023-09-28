@@ -165,18 +165,18 @@ diff -up sendmail-8.14.3/smrsh/smrsh.c.smrsh_paths sendmail-8.14.3/smrsh/smrsh.c
 @@ -77,7 +77,7 @@ SM_IDSTR(id, "@(#)$Id: smrsh.c,v 8.65 20
  # ifdef SMRSH_CMDDIR
  #  define CMDDIR	SMRSH_CMDDIR
- # else /* SMRSH_CMDDIR */
+ # else
 -#  define CMDDIR	"/usr/adm/sm.bin"
 +#  define CMDDIR	"/etc/smrsh"
- # endif /* SMRSH_CMDDIR */
+ # endif
  #endif /* ! CMDDIR */
  
 @@ -89,7 +89,7 @@ SM_IDSTR(id, "@(#)$Id: smrsh.c,v 8.65 20
  # ifdef SMRSH_PATH
  #  define PATH		SMRSH_PATH
- # else /* SMRSH_PATH */
+ # else
 -#  define PATH		"/bin:/usr/bin:/usr/ucb"
 +#  define PATH		"/bin:/usr/bin"
- # endif /* SMRSH_PATH */
+ # endif
  #endif /* ! PATH */
  

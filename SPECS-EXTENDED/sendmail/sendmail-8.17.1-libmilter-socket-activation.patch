@@ -1,10 +1,8 @@
-Description: systemd-like socket activation support for libmilter
-Author: Mikhail Gusarov <dottedmag@debian.org
 diff --git a/libmilter/docs/smfi_setconn.html b/libmilter/docs/smfi_setconn.html
-index eba7c5b..5b272a0 100644
+index 8897f5a..0e04120 100644
 --- a/libmilter/docs/smfi_setconn.html
 +++ b/libmilter/docs/smfi_setconn.html
-@@ -43,6 +43,7 @@ Set the socket through which this filter should communicate with sendmail.
+@@ -44,6 +44,7 @@ Set the socket through which this filter should communicate with sendmail.
  	<LI><CODE>{unix|local}:/path/to/file</CODE> -- A named pipe.
  	<LI><CODE>inet:port@{hostname|ip-address}</CODE> -- An IPV4 socket.
  	<LI><CODE>inet6:port@{hostname|ip-address}</CODE> -- An IPV6 socket.
@@ -13,7 +11,7 @@ index eba7c5b..5b272a0 100644
  	</TD></TR>
      </TABLE>
 diff --git a/libmilter/listener.c b/libmilter/listener.c
-index 11d92bb..2ab533d 100644
+index 25ff895..23cec0a 100644
 --- a/libmilter/listener.c
 +++ b/libmilter/listener.c
 @@ -197,6 +197,11 @@ mi_milteropen(conn, backlog, rmsocket, name)
@@ -54,7 +52,7 @@ index 11d92bb..2ab533d 100644
 @@ -466,6 +485,7 @@ mi_milteropen(conn, backlog, rmsocket, name)
  #if NETUNIX
  	    addr.sa.sa_family != AF_UNIX &&
- #endif /* NETUNIX */
+ #endif
 +	    addr.sa.sa_family != AF_UNSPEC &&
  	    setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (void *) &sockopt,
  		       sizeof(sockopt)) == -1)
@@ -70,9 +68,9 @@ index 11d92bb..2ab533d 100644
  		smi_log(SMI_LOG_ERR,
  			"%s: Unable to bind to port %s: %s",
 @@ -818,7 +839,7 @@ mi_listener(conn, dbg, smfi, timeout, backlog)
- # ifdef BSD4_4_SOCKADDR
+ #ifdef BSD4_4_SOCKADDR
  		     cliaddr.sa.sa_len == 0 ||
- # endif /* BSD4_4_SOCKADDR */
+ #endif
 -		     cliaddr.sa.sa_family != L_family))
 +		     (L_family != AF_UNSPEC && cliaddr.sa.sa_family != L_family)))
  		{
