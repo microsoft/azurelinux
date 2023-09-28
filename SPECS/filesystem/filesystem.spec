@@ -1,7 +1,7 @@
 Summary:      Default file system
 Name:         filesystem
 Version:      1.1
-Release:      15%{?dist}
+Release:      16%{?dist}
 License:      GPLv3
 Group:        System Environment/Base
 Vendor:       Microsoft Corporation
@@ -31,6 +31,7 @@ install -vdm 755 %{buildroot}/{dev,run/{media/{floppy,cdrom},lock}}
 install -vdm 755 %{buildroot}/{etc/{opt,sysconfig},home,mnt}
 install -vdm 700 %{buildroot}/boot
 install -vdm 755 %{buildroot}/{var}
+install -vdm 755 %{buildroot}/opt
 install -dv -m 0750 %{buildroot}/root
 install -dv -m 1777 %{buildroot}/tmp %{buildroot}/var/tmp
 install -vdm 755 %{buildroot}/usr/{,local/}{bin,include,lib,sbin,src}
@@ -568,6 +569,7 @@ return 0
 %dir /etc
 %dir /home
 /lib
+%dir /opt
 
 /media
 %dir /mnt
@@ -709,6 +711,9 @@ return 0
 %config(noreplace) /etc/modprobe.d/tipc.conf
 
 %changelog
+* Thu Sep 28 2023 Chris PeBenito <chpebeni@microsoft.com> - 1.1-16
+- Restore the /opt directory.
+
 * Thu Jun 29 2023 Tobias Brick <tobiasb@microsoft.com> - 1.1-15
 - Revert: Remove setting umask from /etc/profile and add it to a separate file in /etc/profile.d
 
