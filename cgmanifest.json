@@ -21335,7 +21335,7 @@
         "other": {
           "name": "ppp",
           "version": "2.4.7",
-          "downloadUrl": "ftp://ftp.samba.org/pub/ppp/ppp-2.4.7.tar.gz"
+          "downloadUrl": "https://ftp.samba.org/pub/ppp/ppp-2.4.7.tar.gz"
         }
       }
     },

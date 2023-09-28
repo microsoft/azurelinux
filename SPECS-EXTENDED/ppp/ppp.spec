@@ -8,7 +8,7 @@ License:        BSD AND LGPLv2+ AND GPLv2+ AND Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.samba.org/ppp
-Source0:        ftp://ftp.samba.org/pub/ppp/ppp-%{version}.tar.gz
+Source0:        https://ftp.samba.org/pub/ppp/ppp-%{version}.tar.gz
 Source1:        ppp-pam.conf
 Source2:        ppp-logrotate.conf
 Source3:        ppp-tmpfiles.conf
