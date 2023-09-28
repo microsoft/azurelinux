@@ -198,14 +198,15 @@ done
 sed -i 's|/usr/local/bin/perl|%{_bindir}/perl|' contrib/*.pl
 
 %build
+%set_build_flags
 # generate redhat config file
 cat > redhat.config.m4 << EOF
-define(\`confMAPDEF', \`-DNEWDB -DNIS -DMAP_REGEX -DSOCKETMAP -DNAMED_BIND=1')
-define(\`confOPTIMIZE', \`\`\`\`${RPM_OPT_FLAGS}'''')
-define(\`confENVDEF', \`-I%{_includedir}/libdb -I%{_prefix}/kerberos/include -Wall -DXDEBUG=0 -DNETINET6 -DHES_GETMAILHOST -DUSE_VENDOR_CF_PATH=1 -D_FFR_LINUX_MHNL -D_FFR_QOS -D_FILE_OFFSET_BITS=64 -DHAS_GETHOSTBYNAME2')
+define(\`confMAPDEF', \`-DNEWDB -DCDB %{?nis_cflags} -DMAP_REGEX -DSOCKETMAP -DNAMED_BIND=1')
+define(\`confOPTIMIZE', \`\`\`\`${CFLAGS}'''')
+define(\`confENVDEF', \`-I%{_includedir}/libdb -I%{_prefix}/kerberos/include -Wall -DXDEBUG=0 -DNETINET6 -DHES_GETMAILHOST -DUSE_VENDOR_CF_PATH=1 -D_FFR_LINUX_MHNL -D_FFR_QOS -D_FILE_OFFSET_BITS=64 -DHAS_GETHOSTBYNAME2 -DHASFLOCK')
 define(\`confLIBDIRS', \`-L%{_prefix}/kerberos/%{_lib}')
-define(\`confLIBS', \`-lnsl -lcrypt -ldb -lresolv')
-%{?_hardened_build:define(\`confLDOPTS', \`-Xlinker -z -Xlinker relro -Xlinker -z -Xlinker now')}
+define(\`confLIBS', \`%{?nis_ldadd} -lcrypt -ldb -lcdb -lresolv')
+%{?_hardened_build:define(\`confLDOPTS', \`${LDFLAGS}')}
 define(\`confMANOWN', \`root')
 define(\`confMANGRP', \`root')
 define(\`confMANMODE', \`644')
@@ -215,6 +216,7 @@ define(\`confMAN8SRC', \`8')
 define(\`confSTDIR', \`%{stdir}')
 define(\`STATUS_FILE', \`%{stdir}/statistics')
 define(\`confLIBSEARCH', \`db resolv 44bsd')
+define(\`confCC', \`${CC}')
 EOF
 #'
 
@@ -240,7 +242,7 @@ EOF
 
 %if "%{with_tls}" == "yes"
 cat >> redhat.config.m4 << EOF
-APPENDDEF(\`conf_sendmail_ENVDEF', \`-DSTARTTLS -D_FFR_TLS_1 -D_FFR_TLS_EC -D_FFR_TLS_USE_CERTIFICATE_CHAIN_FILE')dnl
+APPENDDEF(\`conf_sendmail_ENVDEF', \`-DSTARTTLS -D_FFR_TLS_1 -DTLS_EC -D_FFR_TLS_USE_CERTIFICATE_CHAIN_FILE -DDANE')dnl
 APPENDDEF(\`conf_sendmail_LIBS', \`-lssl -lcrypto')dnl
 EOF
 %endif
@@ -278,6 +280,8 @@ for i in $DIRS; do
 	sh Build -f ../redhat.config.m4
 	popd
 done
+
+make -C doc/op op.pdf
 
 %install
 # create directories
@@ -345,6 +349,7 @@ install -p -m 644 RELEASE_NOTES %{buildroot}%{_docdir}/sendmail
 gzip -9 %{buildroot}%{_docdir}/sendmail/RELEASE_NOTES
 
 # install docs for sendmail-doc
+install -m 644 doc/op/op.pdf %{buildroot}%{_docdir}/sendmail
 install -p -m 644 sendmail/README %{buildroot}%{_docdir}/sendmail/README.sendmail
 install -p -m 644 sendmail/SECURITY %{buildroot}%{_docdir}/sendmail
 install -p -m 644 smrsh/README %{buildroot}%{_docdir}/sendmail/README.smrsh
@@ -634,12 +639,12 @@ exit 0
 %config(noreplace) %{maildir}/virtusertable
 
 %ghost %{maildir}/aliasesdb-stamp
-%ghost %{maildir}/virtusertable.db
-%ghost %{maildir}/access.db
-%ghost %{maildir}/domaintable.db
-%ghost %{maildir}/mailertable.db
+%ghost %attr(0640, root,root) %verify(not md5 size mtime) %{maildir}/virtusertable.db
+%ghost %attr(0640, root,root) %verify(not md5 size mtime) %{maildir}/access.db
+%ghost %attr(0640, root,root) %verify(not md5 size mtime) %{maildir}/domaintable.db
+%ghost %attr(0640, root,root) %verify(not md5 size mtime) %{maildir}/mailertable.db
 
-%ghost %{spooldir}/clientmqueue/sm-client.st
+%ghost %attr(0660, smmsp, smmsp) %verify(not md5 size mtime) %{spooldir}/clientmqueue/sm-client.st
 
 %{_unitdir}/sendmail.service
 %{_unitdir}/sm-client.service
@@ -682,6 +687,7 @@ exit 0
 %{_docdir}/sendmail/README.sendmail
 %{_docdir}/sendmail/README.smrsh
 %{_docdir}/sendmail/SECURITY
+%{_docdir}/sendmail/op.pdf
 %dir %{_docdir}/sendmail/contrib
 %attr(0644,root,root) %{_docdir}/sendmail/contrib/*
 
