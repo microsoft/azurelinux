@@ -65,8 +65,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libopusurl.so
 
 %changelog
-* Wed Aug 30 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.12-3
+* Thu Sep 28 2023 Archana Choudhary <archana1@microsoft.com> - 0.12-3
 - Add patch for CVE-2022-47021
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.12-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
