@@ -1,17 +1,14 @@
 diff -ru orig/cmd/kubeadm/app/constants/constants.go new/cmd/kubeadm/app/constants/constants.go
 --- orig/cmd/kubeadm/app/constants/constants.go	2023-09-13 02:29:06.000000000 -0700
 +++ new/cmd/kubeadm/app/constants/constants.go	2023-09-28 12:58:00.509382432 -0700
-@@ -342,6 +342,8 @@
+@@ -342,7 +342,9 @@
  
  	// CoreDNSVersion is the version of CoreDNS to be deployed if it is used
- 	CoreDNSVersion = "v1.10.1"
+ 	CoreDNSVersion = "v21.10.1" // -> v1.10.1 <- patch apply issue
+	// patch apply issue
 +	// NicoGbg Test
 +	BlahBlahVersion = "vx.y.z"
  
  	// ClusterConfigurationKind is the string kind value for the ClusterConfiguration struct
  	ClusterConfigurationKind = "ClusterConfiguration"
-Only in orig: .generated_files
-Only in orig: .gitattributes
-Only in orig: .github
-Only in orig: .gitignore
-Only in orig: .go-version
+
