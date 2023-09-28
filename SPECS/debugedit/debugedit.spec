@@ -19,10 +19,11 @@ BuildRequires: binutils
 
 %build
 autoreconf -fvvi
-# make
+%configure
+%make_build
 
 %install
-make install
+%make_install
 
 %check
 make check
@@ -30,7 +31,7 @@ cat tests/testsuite.log
 
 %files
 %defattr(-,root,root)
-%license COPYING3
+%license COPYING COPYING3 COPYING.LIB
 %{_bindir}/*
 %{_mandir}/*/*
 
