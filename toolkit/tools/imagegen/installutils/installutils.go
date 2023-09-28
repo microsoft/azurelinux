@@ -80,13 +80,13 @@ func GetRequiredPackagesForInstall() []*pkgjson.PackageVer {
 // - mountPointToFsTypeMap is a map of mountpoint to filesystem type
 // - mountPointToMountArgsMap is a map of mountpoint to mount arguments to be passed on a call to mount
 // - diffDiskBuild is a flag that denotes whether this is a diffdisk build or not
-func CreateMountPointPartitionMap(partDevPathMap, partIDToFsTypeMap map[string]string, config configuration.SystemConfig) (mountPointDevPathMap, mountPointToFsTypeMap, mountPointToMountArgsMap map[string]string, diffDiskBuild bool) {
+func CreateMountPointPartitionMap(partDevPathMap, partIDToFsTypeMap map[string]string, partitionSettings []configuration.PartitionSetting) (mountPointDevPathMap, mountPointToFsTypeMap, mountPointToMountArgsMap map[string]string, diffDiskBuild bool) {
 	mountPointDevPathMap = make(map[string]string)
 	mountPointToFsTypeMap = make(map[string]string)
 	mountPointToMountArgsMap = make(map[string]string)
 
 	// Go through each PartitionSetting
-	for _, partitionSetting := range config.PartitionSettings {
+	for _, partitionSetting := range partitionSettings {
 		logger.Log.Tracef("%v[%v]", partitionSetting.ID, partitionSetting.MountPoint)
 		partDevPath, ok := partDevPathMap[partitionSetting.ID]
 		if ok {
@@ -628,7 +628,7 @@ func configureSystemFiles(installChroot *safechroot.Chroot, hostname string, con
 	}
 
 	// Update fstab
-	err = updateFstab(installChroot.RootDir(), config, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, hidepidEnabled)
+	err = UpdateFstab(installChroot.RootDir(), config.PartitionSettings, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, hidepidEnabled)
 	if err != nil {
 		return
 	}
@@ -791,7 +791,7 @@ func updateInitramfsForEncrypt(installChroot *safechroot.Chroot) (err error) {
 	return
 }
 
-func updateFstab(installRoot string, config configuration.SystemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string, hidepidEnabled bool) (err error) {
+func UpdateFstab(installRoot string, partitionSettings []configuration.PartitionSetting, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string, hidepidEnabled bool) (err error) {
 	const (
 		doPseudoFsMount = true
 	)
@@ -799,7 +799,7 @@ func updateFstab(installRoot string, config configuration.SystemConfig, installM
 
 	for mountPoint, devicePath := range installMap {
 		if mountPoint != "" && devicePath != NullDevice {
-			partSetting := config.GetMountpointPartitionSetting(mountPoint)
+			partSetting := configuration.FindMountpointPartitionSetting(partitionSettings, mountPoint)
 			if partSetting == nil {
 				err = fmt.Errorf("unable to find PartitionSetting for '%s", mountPoint)
 				return
