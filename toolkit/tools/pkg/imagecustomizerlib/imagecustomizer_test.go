@@ -240,11 +240,6 @@ func createFakeEfiImage(buildDir string) (string, []string, []*safechroot.MountP
 	}
 
 	// Write a fake fstab file so that the partition discovery logic works.
-	err = os.Mkdir(filepath.Join(imageChroot.RootDir(), "etc"), os.ModePerm)
-	if err != nil {
-		return "", nil, nil, fmt.Errorf("failed to add /etc dir: %w", err)
-	}
-
 	mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, _ := installutils.CreateMountPointPartitionMap(
 		partIDToDevPathMap, partIDToFsTypeMap, partitionSettings,
 	)
