@@ -1197,8 +1197,8 @@
         "type": "other",
         "other": {
           "name": "bond",
-          "version": "10.0.0",
-          "downloadUrl": "https://github.com/microsoft/bond/archive/refs/tags/10.0.0.tar.gz"
+          "version": "8.0.1",
+          "downloadUrl": "https://github.com/microsoft/bond/archive/refs/tags/8.0.1.tar.gz"
         }
       }
     },
