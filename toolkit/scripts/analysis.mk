@@ -68,7 +68,7 @@ fake-built-packages-list: | $(SODIFF_OUTPUT_FOLDER)
 $(SODIFF_REPO_FILE):
 	echo $(SODIFF_REPO_SOURCES) | sed -E 's:([^ ]+[.]repo):$(SPECS_DIR)/mariner-repos/\1:g' | xargs cat > $(SODIFF_REPO_FILE)
 
-#populate gpg-keys from for mariner official repos
+# sodiff-setup: populate gpg-keys from SPECS/mariner-repos for mariner official repos for ubuntu
 .PHONY: sodiff-setup
 sodiff-setup:
 	mkdir -p /etc/pki/rpm-gpg

@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # Required binaries:
-# rpm and dnf on Mariner
-# yum and yum-utils on Ubuntu
+# rpm and dnf
 
 rpms_folder="$1"
 repo_file_path="$2"
@@ -16,21 +15,12 @@ mkdir -p "$sodiff_out_dir"
 # Prepare mariner/ubuntu compatibility calls
 
 common_options="-c $repo_file_path --releasever $mariner_version"
-current_os=$(cat /etc/os-release | grep ^ID | cut -d'=' -f2)
-#if [[ $current_os == mariner ]]; then
-# Mariner uses DNF repoquery command
+
 DNF_COMMAND=dnf
 # Cache RPM metadata
 >/dev/null dnf $common_options -y makecache
-#else
-    # Ubuntu uses repoquery command from yum-utils
-#    DNF_COMMAND=
-    # Cache RPM metadata
-    # Ubuntu does not come with gpgcheck plugin for yum
-#    >/dev/null yum $common_options -y --nogpgcheck makecache
-#fi
 
-# Empty the log file
+# Create and/or empty the log file
 echo > "$sodiff_log_file"
 
 # Get packages from stdin
