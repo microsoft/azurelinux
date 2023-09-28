@@ -18,7 +18,7 @@ BuildRequires: binutils
 %autosetup -p1
 
 %build
-autoreconf -vv
+autoreconf -fvvi
 # make
 
 %install
