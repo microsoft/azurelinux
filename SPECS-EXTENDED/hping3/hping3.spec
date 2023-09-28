@@ -1,26 +1,26 @@
+%define  cvs 20051105
+Summary:        TCP/IP stack auditing and much more
+Name:           hping3
+Version:        0.0.%{cvs}
+Release:        41%{?dist}
+License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-%define  cvs 20051105
-Name:    hping3
-Version: 0.0.%{cvs}
-Release: 40%{?dist}
-Summary: TCP/IP stack auditing and much more
-
-License: GPLv2
-URL: http://www.hping.org/
-Source0: https://src.fedoraproject.org/lookaside/pkgs/hping3/hping3-20051105.tar.gz/ca4ea4e34bcc2162aedf25df8b2d1747/hping3-20051105.tar.gz
-Patch0: hping3-include.patch
-Patch1: hping3-bytesex.patch
-Patch2: hping3-getifnamedebug.patch
-Patch3: hping3-cflags.patch
-Patch4: hping3-man.patch
-Patch5: hping3-20051105-typo.patch
-Patch6: hping3-common.patch
+URL:            http://www.hping.org/
+Source0:        https://src.fedoraproject.org/lookaside/pkgs/hping3/hping3-20051105.tar.gz/ca4ea4e34bcc2162aedf25df8b2d1747/hping3-20051105.tar.gz
+Patch0:         hping3-include.patch
+Patch1:         hping3-bytesex.patch
+Patch2:         hping3-getifnamedebug.patch
+Patch3:         hping3-cflags.patch
+Patch4:         hping3-man.patch
+Patch5:         hping3-20051105-typo.patch
+Patch6:         hping3-common.patch
 BuildRequires:  gcc
-BuildRequires: libpcap-devel, tcl-devel
-BuildRequires: make
-Obsoletes: hping2
-Provides: hping2
+BuildRequires:  libpcap-devel
+BuildRequires:  make
+BuildRequires:  tcl-devel
+Obsoletes:      hping2
+Provides:       hping2
 
 %description
 hping3 is a network tool able to send custom TCP/IP packets and to
@@ -31,12 +31,12 @@ Since version 3, hping implements scripting capabilties
 
 %prep
 
-%setup -q  -n hping3-20051105
-%patch0 -p0 -b .include
-%patch1 -p0 -b .bytesex
+%setup -q -n hping3-20051105
+%patch0  -b .include
+%patch1  -b .bytesex
 %patch2 -p1 -b .getifnamedebug
-%patch3 -p0 -b .cflags
-%patch4 -p0 -b .man
+%patch3  -b .cflags
+%patch4  -b .man
 %patch5 -p1
 %patch6 -p1 -b .common
 
@@ -45,24 +45,31 @@ Since version 3, hping implements scripting capabilties
 make %{?_smp_mflags}
 
 %install
-rm -rf $RPM_BUILD_ROOT
 
 install -d $RPM_BUILD_ROOT{%{_sbindir},%{_mandir}/man8}
 
-install -m0755 hping3 $RPM_BUILD_ROOT%{_sbindir}
-install -m0644 docs/hping3.8 $RPM_BUILD_ROOT%{_mandir}/man8
+install -m0755 hping3 %{buildroot}%{_sbindir}
+install -m0644 docs/hping3.8 %{buildroot}%{_mandir}/man8
 
-ln -sf hping3 $RPM_BUILD_ROOT%{_sbindir}/hping
-ln -sf hping3 $RPM_BUILD_ROOT%{_sbindir}/hping2
+ln -sf hping3 %{buildroot}%{_sbindir}/hping
+ln -sf hping3 %{buildroot}%{_sbindir}/hping2
+
+%check
+# no upstream tests available yet
 
 %files
-%doc COPYING *BUGS CHANGES README TODO docs/AS-BACKDOOR docs/HPING2-HOWTO.txt
+%license COPYING
+%doc *BUGS CHANGES README TODO docs/AS-BACKDOOR docs/HPING2-HOWTO.txt
 %doc docs/HPING2-IS-OPEN docs/MORE-FUN-WITH-IPID docs/SPOOFED_SCAN.txt
 %doc docs/HPING3.txt
 %attr(755,root,root) %{_sbindir}/*
 %{_mandir}/man8/*
 
 %changelog
+* Thu Sep 28 2023 Ameet Porwal <ameetporwal@microsoft.com> - 0.0.20051105-41
+- Initial CBL-Mariner import from Fedora 38 (license: MIT).
+- License verified
+
 * Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.0.20051105-40
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
 
