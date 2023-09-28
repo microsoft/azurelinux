@@ -8,7 +8,7 @@
 
 Name:         kata-containers-cc
 Version:      0.6.0
-Release:      2%{?dist}
+Release:      4%{?dist}
 Summary:      Kata Confidential Containers
 License:      ASL 2.0
 Vendor:       Microsoft Corporation
@@ -17,6 +17,8 @@ Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/cc-
 Source1:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{name}-%{version}.tar.gz
 Source2:      %{name}-%{version}-cargo.tar.gz
 Source3:      mariner-coco-build-uvm.sh
+Patch0:       0001-tardev-snapshotter-enable-feature-impl_trait_in_asso.patch
+Patch1:       drop-mut-for-variables-that-are-not-mutated.patch
 
 ExclusiveArch: x86_64
 
@@ -240,8 +242,15 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 
 
 %changelog
-* Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.6.0-2
-- Bump release to rebuild with go 1.19.12
+*   Thu Sep 14 2023 Muhammad Falak <mwani@microsoft.com> - 0.6.0-4
+-   Introduce patch to drop mut for immutable vars
+-   Introduce patch enabling feature(impl_trait_in_assoc_type) to unblock build
+
+*   Thu Sep 07 2023 Daniel McIlvaney <damcilva@microsoft.com> - 0.6.0-3
+-   Bump package to rebuild with rust 1.72.0
+
+*   Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.6.0-2
+-   Bump release to rebuild with go 1.19.12
 
 *   Tue Jul 11 2023 Dallas Delaney <dadelan@microsoft.com> 0.6.0-1
 -   Upgrade to version 0.6.0
