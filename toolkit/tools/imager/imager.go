@@ -223,7 +223,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 	setupChrootDir := filepath.Join(buildDir, setupRoot)
 
 	// Create Parition to Mountpoint map
-	mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, diffDiskBuild := installutils.CreateMountPointPartitionMap(partIDToDevPathMap, partIDToFsTypeMap, systemConfig)
+	mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, diffDiskBuild := installutils.CreateMountPointPartitionMap(partIDToDevPathMap, partIDToFsTypeMap, systemConfig.PartitionSettings)
 	if diffDiskBuild {
 		timestamp.StartEvent("creating delta disk", nil)
 		mountPointToOverlayMap, err = installutils.UpdatePartitionMapWithOverlays(partIDToDevPathMap, partIDToFsTypeMap, mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, systemConfig)
