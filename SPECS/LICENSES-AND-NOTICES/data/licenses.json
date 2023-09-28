@@ -2146,6 +2146,7 @@
                 "blobfuse",
                 "blobfuse2",
                 "bmon",
+                "bond",
                 "bpftrace",
                 "ccache",
                 "cert-manager",
