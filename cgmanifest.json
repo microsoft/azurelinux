@@ -5351,7 +5351,7 @@
         "other": {
           "name": "hping3",
           "version": "0.0.20051105",
-          "downloadUrl": "http://www.hping.org/hping3-20051105.tar.gz"
+          "downloadUrl": "https://src.fedoraproject.org/lookaside/pkgs/hping3/hping3-20051105.tar.gz/ca4ea4e34bcc2162aedf25df8b2d1747/hping3-20051105.tar.gz"
         }
       }
     },
