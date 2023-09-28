@@ -62,6 +62,8 @@ const (
 	// kickstartPartitionFile is the file that includes the partitioning schema used by
 	// kickstart installation
 	kickstartPartitionFile = "/tmp/part-include"
+
+	assetsMountPoint = "/installer"
 )
 
 func main() {
@@ -119,7 +121,6 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 	defer timestamp.StopEvent(nil)
 
 	const (
-		assetsMountPoint      = "/installer"
 		localRepoMountPoint   = "/mnt/cdrom/RPMS"
 		repoFileMountPoint    = "/etc/yum.repos.d"
 		setupRoot             = "/setuproot"
@@ -686,7 +687,7 @@ func configureDiskBootloader(systemConfig configuration.SystemConfig, installChr
 	}
 
 	bootType := systemConfig.BootType
-	err = installutils.InstallBootloader(installChroot, systemConfig.Encryption.Enable, bootType, bootUUID, bootPrefix, diskDevPath)
+	err = installutils.InstallBootloader(installChroot, systemConfig.Encryption.Enable, bootType, bootUUID, bootPrefix, diskDevPath, assetsMountPoint)
 	if err != nil {
 		err = fmt.Errorf("failed to install bootloader: %s", err)
 		return
@@ -722,13 +723,13 @@ func configureDiskBootloader(systemConfig configuration.SystemConfig, installChr
 	}
 
 	// Grub will always use filesystem UUID, never PARTUUID or PARTLABEL
-	err = installutils.InstallGrubCfg(installChroot.RootDir(), rootDevice, bootUUID, bootPrefix, encryptedRoot, systemConfig.KernelCommandLine, readOnlyRoot, isBootPartitionSeparate)
+	err = installutils.InstallGrubCfg(installChroot.RootDir(), rootDevice, bootUUID, bootPrefix, assetsMountPoint, encryptedRoot, systemConfig.KernelCommandLine, readOnlyRoot, isBootPartitionSeparate)
 	if err != nil {
 		err = fmt.Errorf("failed to install main grub config file: %s", err)
 		return
 	}
 
-	err = installutils.InstallGrubEnv(installChroot.RootDir())
+	err = installutils.InstallGrubEnv(installChroot.RootDir(), assetsMountPoint)
 	if err != nil {
 		err = fmt.Errorf("failed to install grubenv file: %s", err)
 		return
