@@ -176,8 +176,7 @@ install -p -m 755 -t %{buildroot}%{_exec_prefix}/local/bin %{name}/node/bin/paus
 
 # install service files
 install -d -m 0755 %{buildroot}/%{_libdir}/systemd/system
-# install -p -m 644 -t %{buildroot}%{_libdir}/systemd/system %{SOURCE1}
-install -p -m 644 -t %{buildroot}%{_libdir}-tobedel/systemd/system %{SOURCE1}
+install -p -m 644 -t %{buildroot}%{_libdir}/systemd/system %{SOURCE1}
 
 # install config files
 install -d -m 0755 %{buildroot}%{_sysconfdir}/kubernetes
@@ -225,7 +224,8 @@ fi
 %defattr(-,root,root)
 %license LICENSES
 %{_bindir}/kubelet
-%{_libdir}/tmpfiles.d/kubernetes.conf
+# %{_libdir}/tmpfiles.d/kubernetes.conf
+%{_libdir}/tmpfiles.d/kubernetes.conf-tobedel
 %dir %{_sysconfdir}/kubernetes
 %dir %{_sysconfdir}/kubernetes/manifests
 %dir %{_sharedstatedir}/kubelet
