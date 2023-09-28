@@ -1,12 +1,15 @@
 Summary:        Microsoft Bond Library
 Name:           bond
 Version:        8.0.1
-Release:        1%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/microsoft/bond
-Source0:        https://github.com/microsoft/bond/archive/refs/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+#Source0:       %{url}/archive/%{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
+Source1:        gbc-0.11.0.3-aarch64
+Source2:        gbc-0.11.0.3-x86_64
 BuildRequires:  boost-devel
 BuildRequires:  clang
 BuildRequires:  cmake
@@ -29,12 +32,19 @@ Development files for %{name}
 
 %prep
 %setup -q
+chmod u+x %{SOURCE1} %{SOURCE2}
 
 %build
 CMAKE_OPTS="\
     -DBOND_ENABLE_GRPC=FALSE \
     -DBOND_FIND_RAPIDJSON=TRUE \
     -DBOND_SKIP_CORE_TESTS=TRUE \
+    -DBOND_SKIP_GBC_TESTS=TRUE \
+%ifarch aarch64
+    -DBOND_GBC_PATH=%{SOURCE1} \
+%else
+    -DBOND_GBC_PATH=%{SOURCE2} \
+%endif
     -DCMAKE_INSTALL_PREFIX=%{_prefix} \
 "
 
@@ -58,7 +68,7 @@ chmod 0755 %{buildroot}%{_bindir}/gbc
 %{_libdir}/%{name}/*
 
 %changelog
-* Wed Sep 27 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 10.0.0-1
+* Wed Sep 27 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 8.0.1-6
 - Update to 10.0.0
 
 * Tue Nov 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.0.1-5
