@@ -1,6 +1,6 @@
 Summary:        TCP/IP stack auditing and much more
 Name:           hping3
-Version:        0.0.%{cvs}
+Version:        0.0.20051105
 Release:        41%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -14,7 +14,6 @@ Patch3:         hping3-cflags.patch
 Patch4:         hping3-man.patch
 Patch5:         hping3-20051105-typo.patch
 Patch6:         hping3-common.patch
-%define  cvs 20051105
 BuildRequires:  gcc
 BuildRequires:  libpcap-devel
 BuildRequires:  make
