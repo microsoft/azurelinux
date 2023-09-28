@@ -47,7 +47,7 @@
             "PackageLists": [
                 "packagelists/core-packages-image.json",
                 "packagelists/cloud-init-packages.json",
-                "packagelists/qemu-packages.json"
+                "packagelists/qemu-guest-packages.json"
             ],
             "KernelCommandLine": {
                 "ExtraCommandLine": "console=tty0 console=ttyS0",
