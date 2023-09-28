@@ -102,7 +102,7 @@ $(TOOL_BINS_DIR)/%:
 	touch $@
 else
 # Rebuild the go tools as needed
-$(TOOL_BINS_DIR)/%: $(go_common_files) $(STATUS_FLAGS_DIR)/got_go_deps.flag
+$(TOOL_BINS_DIR)/%: $(go_common_files)
 	cd $(TOOLS_DIR)/$* && \
 		go test -covermode=atomic -coverprofile=$(BUILD_DIR)/tools/$*.test_coverage ./... && \
 		CGO_ENABLED=0 go build \

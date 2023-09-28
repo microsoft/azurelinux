@@ -43,10 +43,15 @@ logging_command = --log-file=$(LOGS_DIR)/pkggen/workplan/$(notdir $@).log --log-
 $(call create_folder,$(LOGS_DIR)/pkggen/workplan)
 $(call create_folder,$(rpmbuilding_logs_dir))
 
-.PHONY: clean-workplan clean-cache clean-cache-worker clean-grapher-cache-worker clean-spec-parse clean-ccache graph-cache analyze-built-graph workplan
+.PHONY: clean-workplan clean-cache clean-cache-worker clean-grapher-cache-worker clean-spec-parse clean-ccache graph graph-cache graph-preprocessed analyze-built-graph workplan
+##help:target:parsed-specs=Parse package specs and generate a specs.json file encoding all dependency information.
+parse-specs: $(specs_file)
+##help:target:graph-cache=Resolve package dependencies and cache the results.
 graph-cache: $(cached_file)
-##help:target:workplan=Create the package build workplan.
-workplan: $(graph_file)
+##help:target:graph=Create the initial package build graph.
+workplan graph: $(graph_file)
+graph-preprocessed: $(preprocessed_file)
+
 clean: clean-workplan clean-cache clean-spec-parse
 clean-workplan: clean-cache clean-spec-parse clean-grapher-cache-worker
 	rm -rf $(PKGBUILD_DIR)
@@ -230,21 +235,22 @@ $(preprocessed_file): $(cached_file) $(go-graphPreprocessor)
 pkggen_archive	= $(OUT_DIR)/rpms.tar.gz
 srpms_archive  	= $(OUT_DIR)/srpms.tar.gz
 
-.PHONY: build-packages clean-build-packages hydrate-rpms compress-rpms clean-compress-rpms compress-srpms clean-compress-srpms
+.PHONY: build-packages clean-build-packages hydrate-rpms compress-rpms clean-compress-rpms compress-srpms clean-compress-srpms clean-build-packages-workers
 
 ##help:target:build-packages=Build .rpm packages selected by PACKAGE_(RE)BUILD_LIST= and IMAGE_CONFIG=.
 # Execute the package build scheduler.
 build-packages: $(RPMS_DIR)
 
 clean: clean-build-packages clean-compress-rpms clean-compress-srpms
-clean-build-packages:
+clean-build-packages-workers:
+	@echo Verifying no mountpoints present in $(CHROOT_DIR)
+	$(SCRIPTS_DIR)/safeunmount.sh "$(CHROOT_DIR)"/* && \
+	rm -rf $(CHROOT_DIR)
+clean-build-packages: clean-build-packages-workers
 	rm -rf $(RPMS_DIR)
 	rm -rf $(LOGS_DIR)/pkggen/failures.txt
 	rm -rf $(rpmbuilding_logs_dir)
 	rm -rf $(STATUS_FLAGS_DIR)/build-rpms.flag
-	@echo Verifying no mountpoints present in $(CHROOT_DIR)
-	$(SCRIPTS_DIR)/safeunmount.sh "$(CHROOT_DIR)" && \
-	rm -rf $(CHROOT_DIR)
 clean-compress-rpms:
 	rm -rf $(pkggen_archive)
 clean-compress-srpms:
