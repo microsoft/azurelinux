@@ -50,8 +50,7 @@
                 "packagelists/qemu-guest-packages.json"
             ],
             "KernelCommandLine": {
-                "ExtraCommandLine": "console=tty0 console=ttyS0",
-                "SELinux": "permissive"
+                "ExtraCommandLine": "console=tty0 console=ttyS0"
             },
             "KernelOptions": {
                 "default": "kernel-hci"
