@@ -112,6 +112,8 @@ func toQemuImageFormat(imageFormat string) (string, error) {
 }
 
 func validateConfig(baseConfigPath string, config *imagecustomizerapi.SystemConfig) error {
+	var err error
+
 	for sourceFile := range config.AdditionalFiles {
 		sourceFileFullPath := filepath.Join(baseConfigPath, sourceFile)
 		isFile, err := file.IsFile(sourceFileFullPath)
@@ -122,6 +124,30 @@ func validateConfig(baseConfigPath string, config *imagecustomizerapi.SystemConf
 		if !isFile {
 			return fmt.Errorf("invalid AdditionalFiles source file (%s): not a file", sourceFile)
 		}
+	}
+
+	for i, script := range config.PostInstallScripts {
+		err = validateScript(baseConfigPath, &script)
+		if err != nil {
+			return fmt.Errorf("invalid PostInstallScripts item at index %d: %w", i, err)
+		}
+	}
+
+	for i, script := range config.FinalizeImageScripts {
+		err = validateScript(baseConfigPath, &script)
+		if err != nil {
+			return fmt.Errorf("invalid FinalizeImageScripts item at index %d: %w", i, err)
+		}
+	}
+
+	return nil
+}
+
+func validateScript(baseConfigPath string, script *imagecustomizerapi.Script) error {
+	// Ensure that install scripts sit under the config file's parent directory.
+	// This allows the install script to be run in the chroot environment by bind mounting the config directory.
+	if !filepath.IsLocal(script.Path) {
+		return fmt.Errorf("install script (%s) is not under config directory (%s)", script.Path, baseConfigPath)
 	}
 
 	return nil
