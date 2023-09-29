@@ -129,6 +129,44 @@ func TestValidateConfigdditionalFilesIsDir(t *testing.T) {
 	assert.Error(t, err)
 }
 
+func TestValidateConfigScript(t *testing.T) {
+	err := validateConfig(testDir, &imagecustomizerapi.SystemConfig{
+		PostInstallScripts: []imagecustomizerapi.Script{
+			{
+				Path: "scripts/postinstallscript.sh",
+			},
+		},
+		FinalizeImageScripts: []imagecustomizerapi.Script{
+			{
+				Path: "scripts/finalizeimagescript.sh",
+			},
+		},
+	})
+	assert.NoError(t, err)
+}
+
+func TestValidateConfigScriptNonLocalFile(t *testing.T) {
+	err := validateConfig(testDir, &imagecustomizerapi.SystemConfig{
+		PostInstallScripts: []imagecustomizerapi.Script{
+			{
+				Path: "../a.sh",
+			},
+		},
+	})
+	assert.Error(t, err)
+}
+
+func TestValidateConfigScriptNonExecutable(t *testing.T) {
+	err := validateConfig(testDir, &imagecustomizerapi.SystemConfig{
+		FinalizeImageScripts: []imagecustomizerapi.Script{
+			{
+				Path: "files/a.txt",
+			},
+		},
+	})
+	assert.Error(t, err)
+}
+
 func createFakeEfiImage(buildDir string) (string, []string, []*safechroot.MountPoint, error) {
 	var err error
 

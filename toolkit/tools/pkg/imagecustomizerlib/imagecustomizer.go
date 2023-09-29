@@ -150,6 +150,19 @@ func validateScript(baseConfigPath string, script *imagecustomizerapi.Script) er
 		return fmt.Errorf("install script (%s) is not under config directory (%s)", script.Path, baseConfigPath)
 	}
 
+	// Verify that the file exists.
+	fullPath := filepath.Join(baseConfigPath, script.Path)
+
+	scriptStat, err := os.Stat(fullPath)
+	if err != nil {
+		return fmt.Errorf("couldn't read install script (%s):\n%w", script.Path, err)
+	}
+
+	// Verify that the file has an executable bit set.
+	if scriptStat.Mode()&0111 == 0 {
+		return fmt.Errorf("install script (%s) does not have executable bit set", script.Path)
+	}
+
 	return nil
 }
 
