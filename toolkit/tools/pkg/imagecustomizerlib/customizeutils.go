@@ -22,6 +22,9 @@ const (
 func doCustomizations(baseConfigPath string, config *imagecustomizerapi.SystemConfig, imageChroot *safechroot.Chroot) error {
 	var err error
 
+	// Note: The ordering of the customization steps here should try to mirror the order of the equivalent steps in imager
+	// tool as closely as possible.
+
 	err = copyAdditionalFiles(baseConfigPath, config.AdditionalFiles, imageChroot)
 	if err != nil {
 		return err
