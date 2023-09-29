@@ -5,10 +5,14 @@ package imagecustomizerapi
 
 import (
 	"fmt"
+	"strings"
+
+	"github.com/asaskevich/govalidator"
 )
 
 // SystemConfig defines how each system present on the image is supposed to be configured.
 type SystemConfig struct {
+	Hostname             string                    `yaml:"Hostname"`
 	AdditionalFiles      map[string]FileConfigList `yaml:"AdditionalFiles"`
 	PostInstallScripts   []Script                  `yaml:"PostInstallScripts"`
 	FinalizeImageScripts []Script                  `yaml:"FinalizeImageScripts"`
@@ -16,6 +20,12 @@ type SystemConfig struct {
 
 func (s *SystemConfig) IsValid() error {
 	var err error
+
+	if s.Hostname != "" {
+		if !govalidator.IsDNSName(s.Hostname) || strings.Contains(s.Hostname, "_") {
+			return fmt.Errorf("invalid hostname: %s", s.Hostname)
+		}
+	}
 
 	for sourcePath, fileConfigList := range s.AdditionalFiles {
 		err = fileConfigList.IsValid()
