@@ -291,25 +291,8 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 
 %changelog
 *   Mon Sep 18 2023 Dallas Delaney <dadelan@microsoft.com> 0.6.1-1
+-   Update to use cloud-hypervisor-cvm and kernel-uvm-cm
 -   Pull in latest source for genpolicy, utarfs, and overlay changes
-
-*   Thu Sep 14 2023 Dallas Delaney <dadelan@microsoft.com> 0.6.1.beta-3
--   Update source to build dm-verity enabled image as a disk in the UVM guest
-
-*   Thu Sep 9 2023 Dallas Delaney <dadelan@microsoft.com> 0.6.1.beta-2
--   Upgrade to use alpha2 tag. This enables seccomp in the config
-
-*   Wed Aug 30 2023 Saul Paredes <saulparedes@microsoft.com> 0.6.1.beta-1
--   Update source to cc-0.6.1-beta
-
-*   Tue Aug 15 2023 Dallas Delaney <dadelan@microsoft.com> 0.6.1.alpha-3
--   Change uvm tooling path and add files back to the -tools subpackage
-
-*   Fri Aug 11 2023 Dallas Delaney <dadelan@microsoft.com> 0.6.1.alpha-2
--   Update vendored sources
-
-*   Tue Aug 8 2023 Manuel Huber <mahuber@microsoft.com> 0.6.1.alpha-1
--   Update to 0.6.1-alpha, using cloud-hypervisor-cvm and kernel-uvm-cm
 
 *   Thu Sep 14 2023 Muhammad Falak <mwani@microsoft.com> - 0.6.0-4
 -   Introduce patch to drop mut for immutable vars
@@ -318,7 +301,7 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 *   Thu Sep 07 2023 Daniel McIlvaney <damcilva@microsoft.com> - 0.6.0-3
 -   Bump package to rebuild with rust 1.72.0
 
-*   Mon Aug 7 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.6.0-2
+*   Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.6.0-2
 -   Bump release to rebuild with go 1.19.12
 
 *   Tue Jul 11 2023 Dallas Delaney <dadelan@microsoft.com> 0.6.0-1
