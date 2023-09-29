@@ -1,8 +1,8 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           cjose
-Version:        0.6.1
-Release:        6%{?dist}
+Version:        0.6.2.2
+Release:        1%{?dist}
 Summary:        C library implementing the Javascript Object Signing and Encryption (JOSE)
 
 License:        MIT
@@ -64,6 +64,9 @@ make check || (cat test/test-suite.log; exit 1)
 
 
 %changelog
+* Fri Sep 29 2023 Archana Choudhary <archana1@microsoft.com> - 0.6.2.2-1
+- Upgrade to 0.6.2.2 - CVE-2023-37464
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.6.1-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
