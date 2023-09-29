@@ -87,8 +87,10 @@ Patch23: sendmail-8.17.2-sasl2-in-etc.patch
 Patch25: sendmail-8.17.2-qos.patch
 Patch26: sendmail-8.17.1-libmilter-socket-activation.patch
 
+BuildRequires: make
 BuildRequires: libdb-devel
 BuildRequires: libnsl2-devel
+BuildRequires: tinycdb-devel
 BuildRequires: groff
 BuildRequires: m4
 BuildRequires: systemd
@@ -198,15 +200,14 @@ done
 sed -i 's|/usr/local/bin/perl|%{_bindir}/perl|' contrib/*.pl
 
 %build
-%set_build_flags
 # generate redhat config file
 cat > redhat.config.m4 << EOF
-define(\`confMAPDEF', \`-DNEWDB -DCDB %{?nis_cflags} -DMAP_REGEX -DSOCKETMAP -DNAMED_BIND=1')
-define(\`confOPTIMIZE', \`\`\`\`${CFLAGS}'''')
+define(\`confMAPDEF', \`-DNEWDB -DCDB -DNIS -DMAP_REGEX -DSOCKETMAP -DNAMED_BIND=1')
+define(\`confOPTIMIZE', \`\`\`\`${RPM_OPT_FLAGS}'''')
 define(\`confENVDEF', \`-I%{_includedir}/libdb -I%{_prefix}/kerberos/include -Wall -DXDEBUG=0 -DNETINET6 -DHES_GETMAILHOST -DUSE_VENDOR_CF_PATH=1 -D_FFR_LINUX_MHNL -D_FFR_QOS -D_FILE_OFFSET_BITS=64 -DHAS_GETHOSTBYNAME2 -DHASFLOCK')
 define(\`confLIBDIRS', \`-L%{_prefix}/kerberos/%{_lib}')
-define(\`confLIBS', \`%{?nis_ldadd} -lcrypt -ldb -lcdb -lresolv')
-%{?_hardened_build:define(\`confLDOPTS', \`${LDFLAGS}')}
+define(\`confLIBS', \`-lnsl -lcrypt -ldb -lcdb -lresolv')
+%{?_hardened_build:define(\`confLDOPTS', \`-Xlinker -z -Xlinker relro -Xlinker -z -Xlinker now')}
 define(\`confMANOWN', \`root')
 define(\`confMANGRP', \`root')
 define(\`confMANMODE', \`644')
@@ -216,7 +217,6 @@ define(\`confMAN8SRC', \`8')
 define(\`confSTDIR', \`%{stdir}')
 define(\`STATUS_FILE', \`%{stdir}/statistics')
 define(\`confLIBSEARCH', \`db resolv 44bsd')
-define(\`confCC', \`${CC}')
 EOF
 #'
 
@@ -280,8 +280,6 @@ for i in $DIRS; do
 	sh Build -f ../redhat.config.m4
 	popd
 done
-
-make -C doc/op op.pdf
 
 %install
 # create directories
@@ -349,7 +347,6 @@ install -p -m 644 RELEASE_NOTES %{buildroot}%{_docdir}/sendmail
 gzip -9 %{buildroot}%{_docdir}/sendmail/RELEASE_NOTES
 
 # install docs for sendmail-doc
-install -m 644 doc/op/op.pdf %{buildroot}%{_docdir}/sendmail
 install -p -m 644 sendmail/README %{buildroot}%{_docdir}/sendmail/README.sendmail
 install -p -m 644 sendmail/SECURITY %{buildroot}%{_docdir}/sendmail
 install -p -m 644 smrsh/README %{buildroot}%{_docdir}/sendmail/README.smrsh
@@ -687,7 +684,6 @@ exit 0
 %{_docdir}/sendmail/README.sendmail
 %{_docdir}/sendmail/README.smrsh
 %{_docdir}/sendmail/SECURITY
-%{_docdir}/sendmail/op.pdf
 %dir %{_docdir}/sendmail/contrib
 %attr(0644,root,root) %{_docdir}/sendmail/contrib/*
 
