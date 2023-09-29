@@ -427,6 +427,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %changelog
 * Tue Sep 26 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.133.1-1
 - Auto-upgrade to 5.15.133.1
+- Remove CONFIG_NET_CLS_RSVP and CONFIG_NET_CLS_RSVP6 that don't apply to the new version
+- Nopatch CVE-2023-4921
 
 * Tue Sep 19 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.131.1-3
 - Call grub2-mkconfig to regenerate configs only if the user has 
