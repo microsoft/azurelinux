@@ -15,7 +15,7 @@ import (
 )
 
 func TestCopyAdditionalFiles(t *testing.T) {
-	proposedDir := filepath.Join(tmpDir, "chroot", "TestCopyAdditionalFiles")
+	proposedDir := filepath.Join(tmpDir, "TestCopyAdditionalFiles")
 	chroot := safechroot.NewChroot(proposedDir, false)
 	baseConfigPath := testDir
 
