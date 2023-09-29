@@ -30770,8 +30770,8 @@
         "type": "other",
         "other": {
           "name": "z3",
-          "version": "4.8.7",
-          "downloadUrl": "https://github.com/Z3Prover/z3/archive/z3-4.8.7.tar.gz"
+          "version": "4.12.2",
+          "downloadUrl": "https://github.com/Z3Prover/z3/archive/z3-4.12.2.tar.gz"
         }
       }
     },
