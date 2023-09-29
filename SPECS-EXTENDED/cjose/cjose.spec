@@ -1,25 +1,21 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Summary:        C library implementing the Javascript Object Signing and Encryption (JOSE)
 Name:           cjose
 Version:        0.6.2.2
 Release:        1%{?dist}
-Summary:        C library implementing the Javascript Object Signing and Encryption (JOSE)
-
 License:        MIT
-URL:            https://github.com/cisco/cjose
-Source0:  	https://github.com/cisco/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
-
-Patch1: concatkdf.patch
-
-BuildRequires:  gcc
-BuildRequires:  doxygen
-BuildRequires:  openssl-devel
-BuildRequires:  jansson-devel
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://github.com/OpenIDC/cjose
+Source0:        https://github.com/OpenIDC/cjose/releases/download/v%{version}/cjose-%{version}.tar.gz
 BuildRequires:  check-devel
+BuildRequires:  doxygen
+BuildRequires:  gcc
+BuildRequires:  jansson-devel
+BuildRequires:  make
+BuildRequires:  openssl-devel
 
 %description
 Implementation of JOSE for C/C++
-
 
 %package        devel
 Summary:        Development files for %{name}
@@ -29,7 +25,6 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
-
 %prep
 %autosetup -n %{name}-%{version} -p1
 
@@ -37,15 +32,13 @@ developing applications that use %{name}.
 %configure
 %make_build
 
-
 %install
 %make_install
 find %{buildroot} -name '*.a' -exec rm -f {} ';'
-find %{buildroot} -name '*.la' -exec rm -f {} ';'
+find %{buildroot} -type f -name "*.la" -delete -print
 
 
 %ldconfig_scriptlets
-
 
 %check
 make check || (cat test/test-suite.log; exit 1)
@@ -53,15 +46,13 @@ make check || (cat test/test-suite.log; exit 1)
 %files
 %license LICENSE
 %doc CHANGELOG.md README.md
-%doc /usr/share/doc/cjose
+%doc %{_docdir}/cjose
 %{_libdir}/*.so.*
-
 
 %files devel
 %{_includedir}/*
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/cjose.pc
-
 
 %changelog
 * Fri Sep 29 2023 Archana Choudhary <archana1@microsoft.com> - 0.6.2.2-1

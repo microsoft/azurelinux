@@ -1748,7 +1748,7 @@
         "other": {
           "name": "cjose",
           "version": "0.6.2.2",
-          "downloadUrl": "https://github.com/cisco/cjose/archive/0.6.0/cjose-0.6.0.tar.gz"
+          "downloadUrl": "https://github.com/OpenIDC/cjose/releases/download/v0.6.2.2/cjose-0.6.2.2.tar.gz"
         }
       }
     },
