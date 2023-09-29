@@ -50,7 +50,7 @@ func (m *Mount) newMountHelper(source, target, fstype string, flags uintptr, dat
 		// Create the mount target directory.
 		err = os.MkdirAll(target, os.ModePerm)
 		if err != nil {
-			return fmt.Errorf("failed to create mount directory (%s): %w", target, err)
+			return fmt.Errorf("failed to create mount directory (%s):\n%w", target, err)
 		}
 
 		m.dirCreated = true
@@ -59,7 +59,7 @@ func (m *Mount) newMountHelper(source, target, fstype string, flags uintptr, dat
 	// Create the mount.
 	err = unix.Mount(source, target, fstype, flags, data)
 	if err != nil {
-		return fmt.Errorf("failed to mount (%s) to (%s): %w", source, target, err)
+		return fmt.Errorf("failed to mount (%s) to (%s):\n%w", source, target, err)
 	}
 
 	m.isMounted = true
@@ -81,7 +81,7 @@ func (m *Mount) Close() error {
 	if m.isMounted {
 		err = unix.Unmount(m.target, 0)
 		if err != nil {
-			return fmt.Errorf("failed to unmount (%s): %w", m.target, err)
+			return fmt.Errorf("failed to unmount (%s):\n%w", m.target, err)
 		}
 
 		m.isMounted = false
@@ -92,7 +92,7 @@ func (m *Mount) Close() error {
 		// (This is unlikely. But "belt and braces".)
 		err = os.Remove(m.target)
 		if err != nil {
-			return fmt.Errorf("failed to delete source rpms mount directory (%s): %w", m.target, err)
+			return fmt.Errorf("failed to delete source rpms mount directory (%s):\n%w", m.target, err)
 		}
 
 		m.dirCreated = false

@@ -18,7 +18,7 @@ func (s *SystemConfig) IsValid() error {
 	for sourcePath, fileConfigList := range s.AdditionalFiles {
 		err = fileConfigList.IsValid()
 		if err != nil {
-			return fmt.Errorf("invalid file configs for (%s): %w", sourcePath, err)
+			return fmt.Errorf("invalid file configs for (%s):\n%w", sourcePath, err)
 		}
 	}
 

@@ -57,7 +57,7 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 	// Validate config.
 	err = validateConfig(baseConfigPath, config)
 	if err != nil {
-		return fmt.Errorf("invalid image config: %w", err)
+		return fmt.Errorf("invalid image config:\n%w", err)
 	}
 
 	// Normalize 'buildDir' path.
@@ -77,7 +77,7 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 
 	_, _, err = shell.Execute("qemu-img", "convert", "-O", "raw", imageFile, buildImageFile)
 	if err != nil {
-		return fmt.Errorf("failed to convert image file to raw format: %w", err)
+		return fmt.Errorf("failed to convert image file to raw format:\n%w", err)
 	}
 
 	// Customize the raw image file.
@@ -92,7 +92,7 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 
 	_, _, err = shell.Execute("qemu-img", "convert", "-O", qemuOutputImageFormat, buildImageFile, outputImageFile)
 	if err != nil {
-		return fmt.Errorf("failed to convert image file to format: %s: %w", outputImageFormat, err)
+		return fmt.Errorf("failed to convert image file to format: %s:\n%w", outputImageFormat, err)
 	}
 
 	return nil
@@ -116,7 +116,7 @@ func validateConfig(baseConfigPath string, config *imagecustomizerapi.SystemConf
 		sourceFileFullPath := filepath.Join(baseConfigPath, sourceFile)
 		isFile, err := file.IsFile(sourceFileFullPath)
 		if err != nil {
-			return fmt.Errorf("invalid AdditionalFiles source file (%s): %w", sourceFile, err)
+			return fmt.Errorf("invalid AdditionalFiles source file (%s):\n%w", sourceFile, err)
 		}
 
 		if !isFile {
@@ -133,7 +133,7 @@ func customizeImageHelper(buildDir string, baseConfigPath string, config *imagec
 	// Mount the raw disk image file.
 	diskDevPath, err := diskutils.SetupLoopbackDevice(buildImageFile)
 	if err != nil {
-		return fmt.Errorf("failed to mount raw disk (%s) as a loopback device: %w", buildImageFile, err)
+		return fmt.Errorf("failed to mount raw disk (%s) as a loopback device:\n%w", buildImageFile, err)
 	}
 	defer diskutils.DetachLoopbackDevice(diskDevPath)
 
@@ -146,7 +146,7 @@ func customizeImageHelper(buildDir string, baseConfigPath string, config *imagec
 	// Look for all the partitions on the image.
 	newMountDirectories, mountPoints, err := findPartitions(buildDir, diskDevPath)
 	if err != nil {
-		return fmt.Errorf("failed to find disk partitions: %w", err)
+		return fmt.Errorf("failed to find disk partitions:\n%w", err)
 	}
 
 	// Create chroot environment.
@@ -194,7 +194,7 @@ func findPartitions(buildDir string, diskDevice string) ([]string, []*safechroot
 
 	efiSystemPartitionMount, err := safemount.NewMount(efiSystemPartition.Path, tmpDir, efiSystemPartition.FileSystemType, 0, "", true)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to mount EFI system partition: %w", err)
+		return nil, nil, fmt.Errorf("failed to mount EFI system partition:\n%w", err)
 	}
 	defer efiSystemPartitionMount.Close()
 
@@ -202,13 +202,13 @@ func findPartitions(buildDir string, diskDevice string) ([]string, []*safechroot
 	grubConfigFilePath := filepath.Join(tmpDir, "boot/grub2/grub.cfg")
 	grubConfigFile, err := os.ReadFile(grubConfigFilePath)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to read grub.cfg file: %w", err)
+		return nil, nil, fmt.Errorf("failed to read grub.cfg file:\n%w", err)
 	}
 
 	// Close the boot partition mount.
 	err = efiSystemPartitionMount.Close()
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to close EFI system partition mount: %w", err)
+		return nil, nil, fmt.Errorf("failed to close EFI system partition mount:\n%w", err)
 	}
 
 	// Look for the rootfs declaration line in the grub.cfg file.
@@ -230,7 +230,7 @@ func findPartitions(buildDir string, diskDevice string) ([]string, []*safechroot
 	// Temporarily mount the rootfs partition so that the fstab file can be read.
 	rootfsPartitionMount, err := safemount.NewMount(rootfsPartition.Path, tmpDir, rootfsPartition.FileSystemType, 0, "", true)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to mount rootfs partition: %w", err)
+		return nil, nil, fmt.Errorf("failed to mount rootfs partition:\n%w", err)
 	}
 	defer rootfsPartitionMount.Close()
 
@@ -244,7 +244,7 @@ func findPartitions(buildDir string, diskDevice string) ([]string, []*safechroot
 	// Close the rootfs partition mount.
 	err = rootfsPartitionMount.Close()
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to close rootfs partition mount: %w", err)
+		return nil, nil, fmt.Errorf("failed to close rootfs partition mount:\n%w", err)
 	}
 
 	// Convert fstab entries into mount points.

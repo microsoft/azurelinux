@@ -32,7 +32,7 @@ func (f *MountFlags) UnmarshalJSON(b []byte) (err error) {
 	var stringValue string
 	err = json.Unmarshal(b, &stringValue)
 	if err != nil {
-		return fmt.Errorf("failed to parse MountFlags: %w", err)
+		return fmt.Errorf("failed to parse MountFlags:\n%w", err)
 	}
 
 	var value MountFlags
@@ -134,13 +134,13 @@ func ReadFstabFile(fstabPath string) ([]FstabEntry, error) {
 	jsonString, _, err := shell.Execute("findmnt", "--fstab", "--tab-file", fstabPath,
 		"--json", "--output", "source,target,fstype,vfs-options,fs-options,freq,passno")
 	if err != nil {
-		return nil, fmt.Errorf("failed to read fstab file (%s): %w", fstabPath, err)
+		return nil, fmt.Errorf("failed to read fstab file (%s):\n%w", fstabPath, err)
 	}
 
 	var output findmntOutput
 	err = json.Unmarshal([]byte(jsonString), &output)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read fstab file (%s): json parse error: %w", fstabPath, err)
+		return nil, fmt.Errorf("failed to read fstab file (%s): json parse error:\n%w", fstabPath, err)
 	}
 
 	return output.FileSystems, nil

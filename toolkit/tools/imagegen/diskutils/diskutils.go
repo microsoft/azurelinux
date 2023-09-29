@@ -343,7 +343,7 @@ func WaitForDevicesToSettle() error {
 	logger.Log.Debugf("Waiting for devices to settle")
 	_, _, err := shell.Execute("udevadm", "settle")
 	if err != nil {
-		return fmt.Errorf("failed to wait for devices to settle: %w", err)
+		return fmt.Errorf("failed to wait for devices to settle:\n%w", err)
 	}
 	return nil
 }
@@ -694,19 +694,19 @@ func GetDiskPartitions(diskDevPath string) ([]PartitionInfo, error) {
 	// Just in case the disk was only recently connected, wait for the OS to finish processing it.
 	err := WaitForDevicesToSettle()
 	if err != nil {
-		return nil, fmt.Errorf("failed to list disk (%s) partitions: %w", diskDevPath, err)
+		return nil, fmt.Errorf("failed to list disk (%s) partitions:\n%w", diskDevPath, err)
 	}
 
 	// Read the disk's partitions.
 	jsonString, _, err := shell.Execute("lsblk", diskDevPath, "--output", "NAME,PATH,PARTTYPE,FSTYPE,UUID,MOUNTPOINT,PARTUUID", "--json", "--list")
 	if err != nil {
-		return nil, fmt.Errorf("failed to list disk (%s) partitions: %w", diskDevPath, err)
+		return nil, fmt.Errorf("failed to list disk (%s) partitions:\n%w", diskDevPath, err)
 	}
 
 	var output partitionInfoOutput
 	err = json.Unmarshal([]byte(jsonString), &output)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse disk (%s) partitions JSON: %w", diskDevPath, err)
+		return nil, fmt.Errorf("failed to parse disk (%s) partitions JSON:\n%w", diskDevPath, err)
 	}
 
 	return output.Devices, err
