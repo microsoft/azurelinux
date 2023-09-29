@@ -27,8 +27,7 @@ autoreconf -fvvi
 %make_install
 
 %check
-make check
-cat tests/testsuite.log
+make check || { cat tests/testsuite.log; exit 1; }
 
 %files
 %defattr(-,root,root)
