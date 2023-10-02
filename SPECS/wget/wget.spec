@@ -66,7 +66,7 @@ make  %{?_smp_mflags} check || { cat "tests/test-suite.log"; exit 1 }
 
 %changelog
 * Thu Sep 28 2023 Osama Esmail <osamaesmail@microsoft.com> - 
-- Trying to fix tests
+- Adding missing perl-* dependencies for %check
 
 * Wed Jan 26 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.21.2-1
 - Update to version 1.21.2.
