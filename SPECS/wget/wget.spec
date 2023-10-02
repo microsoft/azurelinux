@@ -11,6 +11,10 @@ Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.gz
 BuildRequires:  openssl-devel
 %if %{with_check}
 BuildRequires:  perl
+BuildRequires:  perl-HTTP-Daemon
+BuildRequires:  perl-English
+BuildRequires:  perl-IO-Socket-SSL
+BuildRequires:  perl-lib
 %endif
 Requires:       openssl
 
@@ -50,7 +54,7 @@ rm -rf %{buildroot}/%{_infodir}
 export PERL_MM_USE_DEFAULT=1
 cpan local::lib
 cpan HTTP::Daemon
-make  %{?_smp_mflags} check
+make  %{?_smp_mflags} check || { cat "tests/test-suite.log"; exit 1 }
 
 %files -f %{name}.lang
 %defattr(-,root,root)
@@ -61,6 +65,9 @@ make  %{?_smp_mflags} check
 %{_datadir}/locale/*/LC_MESSAGES/*.mo
 
 %changelog
+* Thu Sep 28 2023 Osama Esmail <osamaesmail@microsoft.com> - 
+- Trying to fix tests
+
 * Wed Jan 26 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.21.2-1
 - Update to version 1.21.2.
 
