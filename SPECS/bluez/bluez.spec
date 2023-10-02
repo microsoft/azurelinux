@@ -1,7 +1,7 @@
 Summary:        Bluetooth utilities
 Name:           bluez
 Version:        5.63
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -23,6 +23,7 @@ Patch6:         0002-Use-g_memdup2-everywhere.patch
 # Both patches have one rediff necessary to apply to 5.63
 Patch7:         0001-hog-Fix-read-order-of-attributes-rediffed.patch
 Patch8:         0002-hog-Add-input-queue-while-uhid-device-has-not-been-c-rediffed.patch
+Patch9:         CVE-2022-3563.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 # For printing
@@ -271,6 +272,9 @@ install emulator/btvirt %{buildroot}/%{_libexecdir}/bluetooth/
 %{_userunitdir}/obex.service
 
 %changelog
+* Mon Oct 02 2023 Minghe Ren <dadelan@microsoft.com> - 5.63-3
+- Add patch for CVE-2022-3563
+
 * Wed Jul 13 2022 Dallas Delaney <dadelan@microsoft.com> - 5.63-2
 - Promote to Mariner base repo
 - Lint spec
