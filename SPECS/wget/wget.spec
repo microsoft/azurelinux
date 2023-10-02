@@ -14,7 +14,7 @@ BuildRequires:  perl
 BuildRequires:  perl-HTTP-Daemon
 BuildRequires:  perl-English
 BuildRequires:  perl-IO-Socket-SSL
-BuildRequires:  perl-lib
+BuildRequires:  perl-local-lib
 %endif
 Requires:       openssl
 
@@ -54,7 +54,7 @@ rm -rf %{buildroot}/%{_infodir}
 export PERL_MM_USE_DEFAULT=1
 cpan local::lib
 cpan HTTP::Daemon
-make  %{?_smp_mflags} check || { cat "tests/test-suite.log"; exit 1 }
+make %{?_smp_mflags} check || { cat "tests/test-suite.log"; exit 1 }
 
 %files -f %{name}.lang
 %defattr(-,root,root)
