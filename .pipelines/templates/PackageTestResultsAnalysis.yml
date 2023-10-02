@@ -25,7 +25,24 @@ parameters:
 
 steps:
   - bash: |
-      pip3 install -i $PIP_INDEX_URL junit_xml
+      pip3 config debug
+      pip3 config list
+    displayName: "Print pip config"
+
+  - bash: |
+      pip3 debug
+    displayName: "Print pip debug"
+
+  - bash: |
+      published_tests_dir="${{ parameters.outputArtifactsFolder }}/TESTS"
+      mkdir -p "$published_tests_dir"
+      pip3 inspect > "${{ parameters.outputArtifactsFolder }}/TESTS/pip_inspect.json"
+    displayName: "Get 'pip inspect' output"
+
+  - bash: |
+      if ! pip3 install --debug --report pip_report.json junit_xml; then
+          mv pip_report.json "${{ parameters.outputArtifactsFolder }}/TESTS"
+      fi
     displayName: "Install Python dependencies"
 
   - task: PythonScript@0
