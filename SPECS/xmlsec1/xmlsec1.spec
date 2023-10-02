@@ -11,7 +11,7 @@ Source0:        %{url}/download/%{name}-%{version}.tar.gz
 BuildRequires:  gnutls-devel
 BuildRequires:  libgcrypt-devel
 BuildRequires:  libltdl-devel
-BuildRequires:  libslt-devel
+BuildRequires:  libxslt-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  nss-devel
 Requires:       libltdl
