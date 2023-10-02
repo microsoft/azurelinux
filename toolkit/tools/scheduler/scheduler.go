@@ -84,7 +84,7 @@ var (
 	useCcache                  = app.Flag("use-ccache", "Automatically install and use ccache during package builds").Bool()
 	allowToolchainRebuilds     = app.Flag("allow-toolchain-rebuilds", "Allow toolchain packages to rebuild without causing an error.").Bool()
 	maxCPU                     = app.Flag("max-cpu", "Max number of CPUs used for package building").Default("").String()
-	timeout                    = app.Flag("max-timeout", "Max duration for any individual package build/test").Default(defaultTimeout).Duration()
+	timeout                    = app.Flag("timeout", "Max duration for any individual package build/test").Default(defaultTimeout).Duration()
 
 	validBuildAgentFlags = []string{buildagents.TestAgentFlag, buildagents.ChrootAgentFlag}
 	buildAgent           = app.Flag("build-agent", "Type of build agent to build packages with.").PlaceHolder(exe.PlaceHolderize(validBuildAgentFlags)).Required().Enum(validBuildAgentFlags...)
