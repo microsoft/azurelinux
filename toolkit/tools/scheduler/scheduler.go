@@ -33,7 +33,10 @@ const (
 	defaultMaxCascadingRebuilds = "-1"
 )
 
-var defaultFreshness = fmt.Sprintf("%d", schedulerutils.NodeFreshnessAbsoluteMax)
+var (
+	defaultFreshness = fmt.Sprintf("%d", schedulerutils.NodeFreshnessAbsoluteMax)
+	defaultTimeout   = "3h"
+)
 
 // schedulerChannels represents the communication channels used by a build agent.
 // Unlike BuildChannels, schedulerChannels holds bidirectional channels that
@@ -81,6 +84,7 @@ var (
 	useCcache                  = app.Flag("use-ccache", "Automatically install and use ccache during package builds").Bool()
 	allowToolchainRebuilds     = app.Flag("allow-toolchain-rebuilds", "Allow toolchain packages to rebuild without causing an error.").Bool()
 	maxCPU                     = app.Flag("max-cpu", "Max number of CPUs used for package building").Default("").String()
+	timeout                    = app.Flag("max-timeout", "Max duration for any individual package build/test").Default(defaultTimeout).Duration()
 
 	validBuildAgentFlags = []string{buildagents.TestAgentFlag, buildagents.ChrootAgentFlag}
 	buildAgent           = app.Flag("build-agent", "Type of build agent to build packages with.").PlaceHolder(exe.PlaceHolderize(validBuildAgentFlags)).Required().Enum(validBuildAgentFlags...)
@@ -162,6 +166,7 @@ func main() {
 		NoCleanup: *noCleanup,
 		UseCcache: *useCcache,
 		MaxCpu:    *maxCPU,
+		Timeout:   *timeout,
 
 		LogDir:   *buildLogsDir,
 		LogLevel: *logLevel,
