@@ -1,7 +1,7 @@
 Summary:        RNG deamon and tools
 Name:           rng-tools
 Version:        6.14
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -58,6 +58,9 @@ make  %{?_smp_mflags} check
 %{_mandir}/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 6.14-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Tue Feb 08 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 6.14-1
 - Update to version 6.14.
 - Remove LICENSE.PTR file

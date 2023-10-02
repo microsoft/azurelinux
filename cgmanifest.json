@@ -1087,8 +1087,8 @@
         "type": "other",
         "other": {
           "name": "bind",
-          "version": "9.16.37",
-          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.16.37/bind-9.16.37.tar.xz"
+          "version": "9.16.44",
+          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.16.44/bind-9.16.44.tar.xz"
         }
       }
     },
@@ -1797,8 +1797,8 @@
         "type": "other",
         "other": {
           "name": "cloud-hypervisor",
-          "version": "31.1",
-          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/refs/tags/v31.1.tar.gz"
+          "version": "32.0",
+          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/refs/tags/v32.0.tar.gz"
         }
       }
     },
@@ -2287,8 +2287,8 @@
         "type": "other",
         "other": {
           "name": "cri-tools",
-          "version": "1.23.0",
-          "downloadUrl": "https://github.com/kubernetes-sigs/cri-tools/archive/v1.23.0.tar.gz"
+          "version": "1.28.0",
+          "downloadUrl": "https://github.com/kubernetes-sigs/cri-tools/archive/v1.28.0.tar.gz"
         }
       }
     },
@@ -2397,8 +2397,8 @@
         "type": "other",
         "other": {
           "name": "curl",
-          "version": "8.2.1",
-          "downloadUrl": "https://curl.haxx.se/download/curl-8.2.1.tar.gz"
+          "version": "8.3.0",
+          "downloadUrl": "https://curl.haxx.se/download/curl-8.3.0.tar.gz"
         }
       }
     },
@@ -3920,8 +3920,8 @@
         "type": "other",
         "other": {
           "name": "freeradius",
-          "version": "3.0.21",
-          "downloadUrl": "ftp://ftp.freeradius.org/pub/radius/freeradius-server-3.0.21.tar.bz2"
+          "version": "3.2.3",
+          "downloadUrl": "ftp://ftp.freeradius.org/pub/radius/freeradius-server-3.2.3.tar.bz2"
         }
       }
     },
@@ -4162,6 +4162,16 @@
           "name": "gd",
           "version": "2.3.3",
           "downloadUrl": "https://github.com/libgd/libgd/releases/download/gd-2.3.3/libgd-2.3.3.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "gdal",
+          "version": "3.6.3",
+          "downloadUrl": "https://github.com/OSGeo/gdal/releases/download/v3.6.3/gdal-3.6.3.tar.gz"
         }
       }
     },
@@ -6590,8 +6600,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.131.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.131.1.tar.gz"
+          "version": "5.15.133.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.133.1.tar.gz"
         }
       }
     },
@@ -8101,8 +8111,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers-cc",
-          "version": "0.6.0",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/cc-0.6.0.tar.gz"
+          "version": "0.6.1",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/cc-0.6.1.tar.gz"
         }
       }
     },
@@ -8171,8 +8181,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.131.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.131.1.tar.gz"
+          "version": "5.15.133.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.133.1.tar.gz"
         }
       }
     },
@@ -8181,8 +8191,8 @@
         "type": "other",
         "other": {
           "name": "kernel-azure",
-          "version": "5.15.131.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.131.1.tar.gz"
+          "version": "5.15.133.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.133.1.tar.gz"
         }
       }
     },
@@ -8191,8 +8201,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hci",
-          "version": "5.15.131.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.131.1.tar.gz"
+          "version": "5.15.133.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.133.1.tar.gz"
         }
       }
     },
@@ -8201,8 +8211,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.131.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.131.1.tar.gz"
+          "version": "5.15.133.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.133.1.tar.gz"
         }
       }
     },
@@ -8211,8 +8221,8 @@
         "type": "other",
         "other": {
           "name": "kernel-mshv",
-          "version": "5.15.110.mshv2",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.110.mshv2.tar.gz"
+          "version": "5.15.126.mshv3",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.126.mshv3.tar.gz"
         }
       }
     },
@@ -8231,8 +8241,18 @@
         "type": "other",
         "other": {
           "name": "kernel-uvm",
-          "version": "5.15.110.mshv2",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.110.mshv2.tar.gz"
+          "version": "6.1.0.mshv11",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-uvm-6.1.0.mshv11.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "kernel-uvm-cvm",
+          "version": "6.1.0.mshv11",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-uvm-6.1.0.mshv11.tar.gz"
         }
       }
     },
@@ -8271,8 +8291,8 @@
         "type": "other",
         "other": {
           "name": "KeysInUse-OpenSSL",
-          "version": "0.3.3",
-          "downloadUrl": "https://github.com/microsoft/KeysInUse-OpenSSL/archive/v0.3.3.tar.gz"
+          "version": "0.3.4",
+          "downloadUrl": "https://github.com/microsoft/KeysInUse-OpenSSL/archive/v0.3.4.tar.gz"
         }
       }
     },
@@ -11511,8 +11531,8 @@
         "type": "other",
         "other": {
           "name": "libvorbis",
-          "version": "1.3.6",
-          "downloadUrl": "https://downloads.xiph.org/releases/vorbis/libvorbis-1.3.6.tar.xz"
+          "version": "1.3.7",
+          "downloadUrl": "https://downloads.xiph.org/releases/vorbis/libvorbis-1.3.7.tar.xz"
         }
       }
     },
@@ -11541,8 +11561,8 @@
         "type": "other",
         "other": {
           "name": "libwebp",
-          "version": "1.2.2",
-          "downloadUrl": "https://github.com/webmproject/libwebp/archive/v1.2.2.tar.gz"
+          "version": "1.3.2",
+          "downloadUrl": "https://github.com/webmproject/libwebp/archive/v1.3.2.tar.gz"
         }
       }
     },
@@ -12191,6 +12211,16 @@
         "type": "other",
         "other": {
           "name": "livepatch-5.15.131.1-1.cm2",
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.131.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "livepatch-5.15.131.1-3.cm2",
           "version": "1.0.0",
           "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.131.1.tar.gz"
         }
@@ -13763,8 +13793,8 @@
         "type": "other",
         "other": {
           "name": "mutt",
-          "version": "2.0.5",
-          "downloadUrl": "ftp://ftp.mutt.org/pub/mutt/mutt-2.0.5.tar.gz"
+          "version": "2.2.12",
+          "downloadUrl": "ftp://ftp.mutt.org/pub/mutt/mutt-2.2.12.tar.gz"
         }
       }
     },
@@ -21294,8 +21324,8 @@
         "type": "other",
         "other": {
           "name": "pmix",
-          "version": "4.1.2",
-          "downloadUrl": "https://github.com/pmix/pmix/releases/download/v4.1.2/pmix-4.1.2.tar.bz2"
+          "version": "4.1.3",
+          "downloadUrl": "https://github.com/openpmix/openpmix/releases/download/v4.1.3/pmix-4.1.3.tar.bz2"
         }
       }
     },
@@ -27145,8 +27175,8 @@
         "type": "other",
         "other": {
           "name": "rust",
-          "version": "1.68.2",
-          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.68.2-src.tar.xz"
+          "version": "1.72.0",
+          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.72.0-src.tar.xz"
         }
       }
     },
@@ -28097,8 +28127,8 @@
         "type": "other",
         "other": {
           "name": "sriov-network-device-plugin",
-          "version": "3.4.0",
-          "downloadUrl": "https://github.com/k8snetworkplumbingwg/sriov-network-device-plugin/archive/refs/tags/v3.4.0.tar.gz"
+          "version": "3.5.1",
+          "downloadUrl": "https://github.com/k8snetworkplumbingwg/sriov-network-device-plugin/archive/refs/tags/v3.5.1.tar.gz"
         }
       }
     },

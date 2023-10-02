@@ -1130,6 +1130,32 @@
                 "PR": [
                     "https://github.com/microsoft/CBL-Mariner/pull/6196"
                 ]
+            },
+            "CONFIG_NET_CLS_RSVP": {
+                "value": [
+                    "<missing>"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "Needed for update to 5.15.133.1",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6286"
+                ]
+            },
+            "CONFIG_NET_CLS_RSVP6": {
+                "value": [
+                    "<missing>"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "Needed for update to 5.15.133.1",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6286"
+                ]
             }
         }
     }

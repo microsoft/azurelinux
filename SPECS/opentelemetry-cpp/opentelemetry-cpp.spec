@@ -1,7 +1,7 @@
 Summary:        The OpenTelemetry C++ Client
 Name:           opentelemetry-cpp
 Version:        1.10.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -86,6 +86,9 @@ mkdir build && cd build
 %{_libdir}/cmake/opentelemetry-cpp/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.10.0-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Mon Jul 17 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 1.10.0-1
 - Original version for CBL-Mariner
 - License Verified

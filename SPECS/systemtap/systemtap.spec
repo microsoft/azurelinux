@@ -9,7 +9,7 @@
 Summary:        Programmable system-wide instrumentation system
 Name:           systemtap
 Version:        4.5
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -349,6 +349,9 @@ fi
 %{_mandir}/man8/systemtap-service.8*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.5-3
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Tue Oct 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.5-2
 - Fixing default log location.
 

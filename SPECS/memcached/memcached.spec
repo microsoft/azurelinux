@@ -7,7 +7,7 @@
 Summary:        High Performance, Distributed Memory Object Cache
 Name:           memcached
 Version:        1.6.13
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -120,6 +120,9 @@ exit 0
 %{_includedir}/memcached/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.6.13-4
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Tue Apr 18 2023 Bala <balakumaran.kannan@microsoft.com> - 1.6.13-3
 - Patch CVE-2021-45985 on integrated lua source code
 

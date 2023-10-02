@@ -1,7 +1,7 @@
 Summary:        Package manager
 Name:           rpm
 Version:        4.18.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -281,6 +281,9 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.18.0-4
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Thu Jun 15 2023 Andrew Phelps <anphel@microsoft.com> - 4.18.0-3
 - Remove brp-strip-debug-symbols and brp-strip-unneeded scripts
 

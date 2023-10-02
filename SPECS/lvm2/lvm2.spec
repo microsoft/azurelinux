@@ -3,7 +3,7 @@
 Summary:        Userland logical volume management tools
 Name:           lvm2
 Version:        2.03.15
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2 AND BSD 2-Clause AND LGPLv2.1
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -335,6 +335,9 @@ echo "disable lvm2-monitor.service" >> %{buildroot}%{_libdir}/systemd/system-pre
 %ghost %{_sysconfdir}/lvm/cache/.cache
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.03.15-3
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Thu Apr 21 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.03.15-2
 - Fix double-packaging of dbusd files in main package
 - Remove manual pkgconfig provide

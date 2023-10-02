@@ -685,6 +685,7 @@ These are the useful build targets:
 | go-test-coverage                 | Run and publish test coverage for all go tools.
 | go-tidy-all                      | Runs `go-fmt-all` and `go-mod-tidy`.
 | go-tools                         | Preps all go tools (ensure `REBUILD_TOOLS=y` to rebuild).
+| help                             | Display basic usage information for most commonly used build targets and variables.
 | hydrate-rpms                     | Hydrates the `../out/RPMS` directory from `rpms.tar.gz`. See `compress-rpms` target.
 | image                            | Generate an image (see [Images](#images)).
 | initrd                           | Create the initrd for the ISO installer.
