@@ -272,7 +272,7 @@ install emulator/btvirt %{buildroot}/%{_libexecdir}/bluetooth/
 %{_userunitdir}/obex.service
 
 %changelog
-* Mon Oct 02 2023 Minghe Ren <dadelan@microsoft.com> - 5.63-4
+* Mon Oct 02 2023 Minghe Ren <mingheren@microsoft.com> - 5.63-4
 - Add patch for CVE-2022-3563
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.63-3
