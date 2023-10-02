@@ -35,7 +35,7 @@ const (
 
 var (
 	defaultFreshness = fmt.Sprintf("%d", schedulerutils.NodeFreshnessAbsoluteMax)
-	defaultTimeout   = "3h"
+	defaultTimeout   = "99h"
 )
 
 // schedulerChannels represents the communication channels used by a build agent.
