@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safemount.go"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
@@ -25,6 +26,11 @@ func doCustomizations(baseConfigPath string, config *imagecustomizerapi.SystemCo
 	// Note: The ordering of the customization steps here should try to mirror the order of the equivalent steps in imager
 	// tool as closely as possible.
 
+	err = updateHostname(config.Hostname, imageChroot)
+	if err != nil {
+		return err
+	}
+
 	err = copyAdditionalFiles(baseConfigPath, config.AdditionalFiles, imageChroot)
 	if err != nil {
 		return err
@@ -38,6 +44,22 @@ func doCustomizations(baseConfigPath string, config *imagecustomizerapi.SystemCo
 	err = runScripts(baseConfigPath, config.FinalizeImageScripts, imageChroot)
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func updateHostname(hostname string, imageChroot *safechroot.Chroot) error {
+	var err error
+
+	if hostname == "" {
+		return nil
+	}
+
+	hostnameFilePath := filepath.Join(imageChroot.RootDir(), "etc/hostname")
+	err = file.Write(hostname, hostnameFilePath)
+	if err != nil {
+		return fmt.Errorf("failed to write hostname file: %w", err)
 	}
 
 	return nil
