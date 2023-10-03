@@ -60,10 +60,14 @@ $(RPM_BUILD_LOGS_DIR) $(SODIFF_OUTPUT_FOLDER):
 
 # fake-built-packages-list: Generates a fake list of built packages by producing a file listing all present RPM files in the RPM directory.
 .PHONY: fake-built-packages-list
-fake-built-packages-list: | $(SODIFF_OUTPUT_FOLDER)
+fake-built-packages-sourceslist: | $(SODIFF_OUTPUT_FOLDER)
 	touch $(RPM_BUILD_LOGS_DIR)
 	touch $(BUILD_SUMMARY_FILE)
 	find $(RPMS_DIR) -type f -name '*.rpm' -exec basename {} \; > $(BUILT_PACKAGES_FILE)
+
+# sodiff-repo: Generate just the sodiff.repo file
+.PHONY: sodiff-repo
+sodiff-repo: $(SODIFF_REPO_FILE)
 
 $(SODIFF_REPO_FILE):
 	echo $(SODIFF_REPO_SOURCES) | sed -E 's:([^ ]+[.]repo):$(SPECS_DIR)/mariner-repos/\1:g' | xargs cat > $(SODIFF_REPO_FILE)

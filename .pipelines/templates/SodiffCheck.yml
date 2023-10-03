@@ -1,0 +1,66 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+parameters:
+  - name: buildRepoRoot
+    type: string
+    default: "$(Build.SourcesDirectory)"
+
+  - name: marinerVersion
+    type: string
+    values:
+      - 2.0
+
+  - name: inputArtifactName
+    type: string
+
+  - name: inputSourcesTarballName
+    type: string
+    default: "sources.tar.gz"
+
+  - name: sourcesWorkspace
+    type: string
+    default: "$(Agent.TempDirectory)/SourcesWorkspace"
+
+steps:
+  - task: DownloadPipelineArtifact@2
+    displayName: "Download sources for signing"
+    inputs:
+      artifact: ${{ parameters.inputArtifactName }}
+      patterns: |
+        **/${{ parameters.inputSourcesTarballName }}
+      targetPath: "$(Agent.TempDirectory)"
+
+  - script: |
+      set -e
+
+      mkdir -p "${{ parameters.sourcesWorkspace }}"
+      find "$(Agent.TempDirectory)" -name "${{ parameters.inputSourcesTarballName }}" -print0 | xargs -0 -n 1 tar -C "${{ parameters.sourcesWorkspace }}" -xkf
+    displayName: "Extract sources tarball"
+
+  - script: |
+      toolkit_dir="${{ parameters.buildRepoRoot }}/toolkit"
+      if [[ ! -d "$toolkit_dir" ]]; then
+        echo "ERROR: toolkit not found! Expected under '$toolkit_dir'." >&2
+        exit 1
+      fi
+
+      sodiff_rpms_dir="${{ parameters.sourcesWorkspace }}/RPMS"
+      if [[ ! -d "$sodiff_rpms_dir" ]]; then
+        echo "ERROR: RPMS dir not found! Expected under '$sodiff_rpms_dir'." >&2
+        exit 1
+      fi
+
+      sodiff_out_dir="${{ parameters.buildRepoRoot }}/out/sodiff"
+      mkdir -p $sodiff_out_dir
+
+      #generate repo file
+      sudo make -sC "$toolkit_dir" sodiff-repo
+
+      #ensure we have the correct keys in place
+      #sudo make -sC "$toolkit_dir" sodiff-setup
+
+      ls $sodiff_rpms_dir | $toolkit_dir/scripts/sodiff/mariner-sodiff.sh $sodiff_rpms_dir/ $toolkit_dir/scripts/sodiff/sodiff.repo ${{ parameters.marinerVersion }} $sodiff_out_dir
+
+
+    displayName: "Sodiff check"
