@@ -9,7 +9,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.72.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -56,7 +56,7 @@ BuildRequires:  ninja-build
 BuildRequires:  openssl-devel
 BuildRequires:  python3
 %if %{with_check}
-BuildRequires:  glibc-static >= 2.35-4%{?dist}
+BuildRequires:  glibc-static >= 2.35-5%{?dist}
 %endif
 # rustc uses a C compiler to invoke the linker, and links to glibc in most cases
 Requires:       binutils
@@ -167,6 +167,9 @@ rm %{buildroot}%{_bindir}/*.old
 %{_mandir}/man1/*
 
 %changelog
+* Tue Oct 03 2023 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.72.2-2
+- Bump release to rebuild against glibc 2.35-5
+
 * Wed Sep 06 2023 Daniel McIlvaney <damcilva@microsoft.com> - 1.72.2-1
 - Bump to version 1.72.2 to address CVE-2023-38497, CVE-2023-40030
 
