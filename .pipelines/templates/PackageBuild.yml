@@ -180,7 +180,7 @@ steps:
         SPECS_DIR="${{ parameters.buildRepoRoot }}/${{ parameters.specsFolderPath }}" \
         SRPM_PACK_LIST="${{ parameters.srpmPackList }}" \
         PACKAGE_REBUILD_LIST="${{ parameters.srpmPackList }}" \
-		$delta_fetch_arg \
+        $delta_fetch_arg \
         $quick_rebuild_packages_arg \
         $run_check_arg \
         $use_ccache_arg
