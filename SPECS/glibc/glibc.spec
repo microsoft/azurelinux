@@ -27,7 +27,7 @@ Patch3:         CVE-2020-1751.nopatch
 # Rationale: Exploit requires crafted pattern in regex compiler meant only for trusted content
 Patch4:         CVE-2018-20796.nopatch
 Patch5:         glibc-2.34_pthread_cond_wait.patch
-Patch6:			CVE-2023-4911.patch
+Patch6:         CVE-2023-4911.patch
 BuildRequires:  bison
 BuildRequires:  gawk
 BuildRequires:  gettext
