@@ -1,0 +1,9 @@
+Users:
+- name: root
+  password: password
+
+- name: test
+  password: $6$aEzRqlIsXn8I$uvdD6RgzdAao5qUxap/Edc/ABW2Qfvqe4ZK7AjoguwS1rX2Q5l72/4L4OW5lqOdY5pIIahBco3hdR32NAuZ/O1
+  passwordhashed: true
+  secondarygroups:
+  - sudo

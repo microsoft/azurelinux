@@ -16,6 +16,7 @@ type SystemConfig struct {
 	AdditionalFiles      map[string]FileConfigList `yaml:"AdditionalFiles"`
 	PostInstallScripts   []Script                  `yaml:"PostInstallScripts"`
 	FinalizeImageScripts []Script                  `yaml:"FinalizeImageScripts"`
+	Users                []User                    `yaml:"Users"`
 }
 
 func (s *SystemConfig) IsValid() error {
@@ -45,6 +46,13 @@ func (s *SystemConfig) IsValid() error {
 		err = script.IsValid()
 		if err != nil {
 			return fmt.Errorf("invalid FinalizeImageScripts item at index %d: %w", i, err)
+		}
+	}
+
+	for i, user := range s.Users {
+		err = user.IsValid()
+		if err != nil {
+			return fmt.Errorf("invalid Users item at index %d: %w", i, err)
 		}
 	}
 
