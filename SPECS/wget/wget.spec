@@ -9,6 +9,12 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.gz
 BuildRequires:  openssl-devel
+# BuildRequires:  perl(JSON::PP)
+# BuildRequires:  perl(Module::Runtime)
+# BuildRequires:  perl(Pod::Coverage)
+# BuildRequires:  perl(Sub::Name)
+# BuildRequires:  perl(YAML)
+# BuildRequires:  perl(autodie)
 %if %{with_check}
 BuildRequires:  perl
 BuildRequires:  perl-cpan
@@ -16,7 +22,10 @@ BuildRequires:  perl-HTTP-Daemon
 BuildRequires:  perl-English
 BuildRequires:  perl-IO-Socket-SSL
 BuildRequires:  perl-local-lib
+# BuildRequires:  perl(CPAN::Meta)
 BuildRequires:  perl(CPAN::Meta::Requirements)
+# BuildRequires:  perl(LWP::UserAgent)
+BuildRequires:  perl(Module::Build::Tiny)
 %endif
 Requires:       openssl
 
