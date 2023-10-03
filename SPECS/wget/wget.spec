@@ -16,6 +16,7 @@ BuildRequires:  perl-HTTP-Daemon
 BuildRequires:  perl-English
 BuildRequires:  perl-IO-Socket-SSL
 BuildRequires:  perl-local-lib
+BuildRequires:  perl(CPAN::Meta::Requirements)
 %endif
 Requires:       openssl
 
