@@ -11071,8 +11071,8 @@
         "type": "other",
         "other": {
           "name": "libspiro",
-          "version": "20190731",
-          "downloadUrl": "https://github.com/fontforge/libspiro/releases/download/20190731/libspiro-20190731.tar.gz"
+          "version": "20221101",
+          "downloadUrl": "https://github.com/fontforge/libspiro/releases/download/20221101/libspiro-dist-20221101.tar.gz"
         }
       }
     },
