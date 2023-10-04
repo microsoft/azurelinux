@@ -30,7 +30,7 @@ for rpmpackage in $pkgs; do
     echo ".so's provided: $package_provides"
     for sofile in $package_provides; do
         # Query local metadata for provides
-        sos_found=$( $DNF_COMMAND repoquery $common_options --whatprovides $sofile | wc -l )
+        sos_found=$( 2>/dev/null $DNF_COMMAND repoquery $common_options --whatprovides $sofile | wc -l )
         echo "Number of .so files found: $sos_found"
         if [ "$sos_found" -eq 0 ] ; then
             # SO file not found, meaning this might be a new .SO
@@ -41,14 +41,14 @@ for rpmpackage in $pkgs; do
             sofile_no_ver=$(echo "$sofile" | sed -E 's/[.]so[(.].+/.so/')
 
             # check for generic .so in the repo
-            sos_found=$( $DNF_COMMAND repoquery $common_options --whatprovides "${sofile_no_ver}*" | wc -l )
+            sos_found=$( 2>/dev/null $DNF_COMMAND repoquery $common_options --whatprovides "${sofile_no_ver}*" | wc -l )
             echo "Number of non-versioned .so files found: $sos_found"
             if ! [ "$sos_found" -eq 0 ] ; then
                 # Generic version of SO was found.
                 # This means it's a new version of a preexisting SO.
                 # Log which packages depend on this functionality
                 echo "Packages that require $sofile_no_ver:"
-                $DNF_COMMAND repoquery $common_options -s --whatrequires "${sofile_no_ver}*" | sed -E 's/[.][^.]+[.]src[.]rpm//' | tee "$sodiff_out_dir"/"require_${sofile}"
+                2>/dev/null $DNF_COMMAND repoquery $common_options -s --whatrequires "${sofile_no_ver}*" | sed -E 's/[.][^.]+[.]src[.]rpm//' | tee "$sodiff_out_dir"/"require_${sofile}"
             fi
         fi
     done
