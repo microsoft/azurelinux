@@ -1,0 +1,8 @@
+PackagesToRemove:
+- which
+
+PackagesToAdd:
+- setools-console
+
+PackagesToAddLists:
+- lists/dracut-fips.yaml
