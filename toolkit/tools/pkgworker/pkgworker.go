@@ -22,6 +22,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/tdnf"
+	"golang.org/x/sys/unix"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -54,6 +55,7 @@ var (
 	outArch              = app.Flag("out-arch", "Architecture of resulting package").String()
 	useCcache            = app.Flag("use-ccache", "Automatically install and use ccache during package builds").Bool()
 	maxCPU               = app.Flag("max-cpu", "Max number of CPUs used for package building").Default("").String()
+	timeout              = app.Flag("timeout", "Timeout for package building").Required().Duration()
 
 	logFile  = exe.LogFileFlag(app)
 	logLevel = exe.LogLevelFlag(app)
@@ -90,7 +92,7 @@ func main() {
 		defines[rpm.MaxCPUDefine] = *maxCPU
 	}
 
-	builtRPMs, err := buildSRPMInChroot(chrootDir, rpmsDirAbsPath, toolchainDirAbsPath, *workerTar, *srpmFile, *repoFile, *rpmmacrosFile, *outArch, defines, *noCleanup, *runCheck, *packagesToInstall, *useCcache)
+	builtRPMs, err := buildSRPMInChroot(chrootDir, rpmsDirAbsPath, toolchainDirAbsPath, *workerTar, *srpmFile, *repoFile, *rpmmacrosFile, *outArch, defines, *noCleanup, *runCheck, *packagesToInstall, *useCcache, *timeout)
 	logger.PanicOnError(err, "Failed to build SRPM '%s'. For details see log file: %s .", *srpmFile, *logFile)
 
 	err = copySRPMToOutput(*srpmFile, srpmsDirAbsPath)
@@ -121,7 +123,7 @@ func buildChrootDirPath(workDir, srpmFilePath string, runCheck bool) (chrootDirP
 	return filepath.Join(workDir, buildDirName)
 }
 
-func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmFile, repoFile, rpmmacrosFile, outArch string, defines map[string]string, noCleanup, runCheck bool, packagesToInstall []string, useCcache bool) (builtRPMs []string, err error) {
+func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmFile, repoFile, rpmmacrosFile, outArch string, defines map[string]string, noCleanup, runCheck bool, packagesToInstall []string, useCcache bool, timeout time.Duration) (builtRPMs []string, err error) {
 	const (
 		buildHeartbeatTimeout = 30 * time.Minute
 
@@ -177,9 +179,23 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 		return
 	}
 
-	err = chroot.Run(func() (err error) {
-		return buildRPMFromSRPMInChroot(srpmFileInChroot, outArch, runCheck, defines, packagesToInstall, useCcache)
-	})
+	// Run the build in a go routine so we can monitor and kill it if it takes too long.
+	results := make(chan error)
+	go func() {
+		buildErr := chroot.Run(func() (err error) {
+			return buildRPMFromSRPMInChroot(srpmFileInChroot, outArch, runCheck, defines, packagesToInstall, useCcache)
+		})
+		results <- buildErr
+	}()
+
+	select {
+	case err = <-results:
+	case <-time.After(timeout):
+		logger.Log.Errorf("Timeout after %v: killing all processes in chroot...", timeout)
+		shell.PermanentlyStopAllChildProcesses(unix.SIGKILL)
+		err = fmt.Errorf("build timed out after %s", timeout)
+	}
+
 	if err != nil {
 		return
 	}

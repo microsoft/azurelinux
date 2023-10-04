@@ -93,6 +93,7 @@ func serializeChrootBuildAgentConfig(config *BuildAgentConfig, inputFile, logFil
 		fmt.Sprintf("--log-level=%s", config.LogLevel),
 		fmt.Sprintf("--out-arch=%s", outArch),
 		fmt.Sprintf("--max-cpu=%s", config.MaxCpu),
+		fmt.Sprintf("--timeout=%s", config.Timeout.String()),
 	}
 
 	if config.RpmmacrosFile != "" {

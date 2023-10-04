@@ -475,7 +475,7 @@ func cleanupAllChroots() {
 	// Acquire and permanently hold the global inChrootMutex lock to ensure this application is not
 	// inside any Chroot.
 	logger.Log.Info("Waiting for outstanding chroot commands to finish")
-	shell.PermanentlyStopAllProcesses(stopSignal)
+	shell.PermanentlyStopAllChildProcesses(stopSignal)
 	inChrootMutex.Lock()
 
 	// mount is only supported in regular pipeline

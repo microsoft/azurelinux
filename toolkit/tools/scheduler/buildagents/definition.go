@@ -3,7 +3,10 @@
 
 package buildagents
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 // BuildAgentConfig represents configuration options a BuildAgent would need to successfully build a given package.
 type BuildAgentConfig struct {
@@ -26,6 +29,7 @@ type BuildAgentConfig struct {
 	NoCleanup bool
 	UseCcache bool
 	MaxCpu    string
+	Timeout   time.Duration
 
 	LogDir   string
 	LogLevel string

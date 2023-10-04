@@ -38,10 +38,10 @@ func CurrentEnvironment() []string {
 	return currentEnv
 }
 
-// PermanentlyStopAllProcesses will send the provided signal to all processes spawned by this package,
+// PermanentlyStopAllChildProcesses will send the provided signal to all processes spawned by this package,
 // and all of those process's children.
 // Invoking this will also block future process creation, causing the Execute methods to return an error.
-func PermanentlyStopAllProcesses(signal unix.Signal) {
+func PermanentlyStopAllChildProcesses(signal unix.Signal) {
 	// Acquire the global activeCommandsMutex to ensure no
 	// new commands are executed during this teardown routine
 	logger.Log.Info("Waiting for outstanding processes to be created")
