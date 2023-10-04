@@ -231,7 +231,7 @@ func formatNode(n *pkggraph.PkgNode, verbosity int) string {
 	case 3:
 		return fmt.Sprintf("'%s' from node '%s'", filepath.Base(n.RpmPath), n.FriendlyName())
 	case 4:
-		return fmt.Sprintf("'%s'", n)
+		return fmt.Sprintf("(%v)'%#v'", n.VersionedPkg, *n)
 	default:
 		logger.Log.Fatalf("Invalid verbosity level %v", verbosity)
 	}

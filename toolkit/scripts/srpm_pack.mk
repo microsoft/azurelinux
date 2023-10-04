@@ -49,6 +49,7 @@ clean: clean-input-srpms
 clean-input-srpms:
 	rm -rf $(BUILD_SRPMS_DIR)
 	rm -rf $(STATUS_FLAGS_DIR)/build_srpms.flag
+	rm -rf $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag
 	@echo Verifying no mountpoints present in $(SRPM_BUILD_CHROOT_DIR)
 	$(SCRIPTS_DIR)/safeunmount.sh "$(SRPM_BUILD_CHROOT_DIR)" && \
 	rm -rf $(SRPM_BUILD_CHROOT_DIR)

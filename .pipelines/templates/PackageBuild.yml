@@ -98,6 +98,10 @@ parameters:
     type: string
     default: "srpms.tar.gz"
 
+  - name: testSuiteName
+    type: string
+    default: "Package test"
+
 steps:
   - template: ToolkitCheck.yml@${{ parameters.selfRepoName }}
     parameters:
@@ -220,3 +224,4 @@ steps:
           buildRepoRoot: ${{ parameters.buildRepoRoot }}
           failOnTestFailures: ${{ parameters.failOnTestFailures }}
           outputArtifactsFolder: ${{ parameters.outputArtifactsFolder }}
+          testSuiteName: ${{ parameters.testSuiteName }}
