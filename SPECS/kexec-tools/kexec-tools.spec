@@ -6,7 +6,7 @@
 Summary:        The kexec/kdump userspace component
 Name:           kexec-tools
 Version:        2.0.23
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -324,6 +324,9 @@ done
 /usr/share/makedumpfile/
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.0.23-3
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Fri Mar 17 2023 Andy Zaugg <azaugg@linkedin.com> - 2.0.23-2
 - Required binary grep missing from squashfs
 - kdumpctl support for the version of hostname being shipped with Mariner
@@ -599,7 +602,7 @@ done
 - dracut-module-setup.sh: pass correct ip= param for ipv6
 
 * Fri Feb 09 2018 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 2.0.16-5
-- Escape macros in %%changelog
+- Escape macros in changelog
 
 * Wed Feb 7 2018 Dave Young <dyoung@redhat.com> - 2.0.16-4
 - update anaconda addon migrate with Anaconda changes.
@@ -1072,7 +1075,7 @@ done
 
 * Sat Dec 21 2013 Ville Skyttä <ville.skytta@iki.fi> - 2.0.4-15
 - Fix Tamil (India) locale subdir name.
-- Fix bogus date in %%changelog.
+- Fix bogus date in changelog
 
 * Tue Dec 03 2013 WANG Chao <chaowang@redhat.com> - 2.0.4-14
 - Add rd.memdebug in kdump module

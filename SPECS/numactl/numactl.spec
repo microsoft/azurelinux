@@ -1,7 +1,7 @@
 Summary:        NUMA support for Linux
 Name:           numactl
 Version:        2.0.14
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -72,6 +72,9 @@ mv %{buildroot}%{_mandir}/man2/move_pages.2 %{buildroot}%{_mandir}/man2/numa-mov
 %{_mandir}/man3/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.0.14-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Tue Feb 1 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.0.14-1
 - Upgrading to 2.0.14
 

@@ -98,10 +98,20 @@ parameters:
     type: string
     default: "srpms.tar.gz"
 
+  - name: testSuiteName
+    type: string
+    default: "Package test"
+
 steps:
   - template: ToolkitCheck.yml@${{ parameters.selfRepoName }}
     parameters:
       buildRepoRoot: ${{ parameters.buildRepoRoot }}
+
+  - ${{ if parameters.pipArtifactFeeds }}:
+      - task: PipAuthenticate@1
+        inputs:
+          artifactFeeds: "${{ parameters.pipArtifactFeeds }}"
+        displayName: "Authenticate to custom pip artifact feeds"
 
   - ${{ if parameters.customToolchainArtifactName }}:
       - task: DownloadPipelineArtifact@2
@@ -214,4 +224,4 @@ steps:
           buildRepoRoot: ${{ parameters.buildRepoRoot }}
           failOnTestFailures: ${{ parameters.failOnTestFailures }}
           outputArtifactsFolder: ${{ parameters.outputArtifactsFolder }}
-          pipArtifactFeeds: ${{ parameters.pipArtifactFeeds }}
+          testSuiteName: ${{ parameters.testSuiteName }}

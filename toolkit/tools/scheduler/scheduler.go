@@ -33,7 +33,10 @@ const (
 	defaultMaxCascadingRebuilds = "-1"
 )
 
-var defaultFreshness = fmt.Sprintf("%d", schedulerutils.NodeFreshnessAbsoluteMax)
+var (
+	defaultFreshness = fmt.Sprintf("%d", schedulerutils.NodeFreshnessAbsoluteMax)
+	defaultTimeout   = "99h"
+)
 
 // schedulerChannels represents the communication channels used by a build agent.
 // Unlike BuildChannels, schedulerChannels holds bidirectional channels that
@@ -81,6 +84,7 @@ var (
 	useCcache                  = app.Flag("use-ccache", "Automatically install and use ccache during package builds").Bool()
 	allowToolchainRebuilds     = app.Flag("allow-toolchain-rebuilds", "Allow toolchain packages to rebuild without causing an error.").Bool()
 	maxCPU                     = app.Flag("max-cpu", "Max number of CPUs used for package building").Default("").String()
+	timeout                    = app.Flag("timeout", "Max duration for any individual package build/test").Default(defaultTimeout).Duration()
 
 	validBuildAgentFlags = []string{buildagents.TestAgentFlag, buildagents.ChrootAgentFlag}
 	buildAgent           = app.Flag("build-agent", "Type of build agent to build packages with.").PlaceHolder(exe.PlaceHolderize(validBuildAgentFlags)).Required().Enum(validBuildAgentFlags...)
@@ -162,6 +166,7 @@ func main() {
 		NoCleanup: *noCleanup,
 		UseCcache: *useCcache,
 		MaxCpu:    *maxCPU,
+		Timeout:   *timeout,
 
 		LogDir:   *buildLogsDir,
 		LogLevel: *logLevel,
@@ -199,7 +204,7 @@ func cancelOutstandingBuilds(agent buildagents.BuildAgent) {
 	}
 
 	// Issue a SIGINT to all children processes to allow them to gracefully exit.
-	shell.PermanentlyStopAllProcesses(unix.SIGINT)
+	shell.PermanentlyStopAllChildProcesses(unix.SIGINT)
 }
 
 // cancelBuildsOnSignal will stop any builds running on SIGINT/SIGTERM.
@@ -277,6 +282,23 @@ func startWorkerPool(agent buildagents.BuildAgent, workers, buildAttempts, check
 	return
 }
 
+// debugStuckNode is a debugging function that will print out the stuck node and all nodes that are blocking it.
+func debugStuckNode(buildState *schedulerutils.GraphBuildState, pkgGraph *pkggraph.PkgGraph, stuckNode *pkggraph.PkgNode, indent int) {
+	if buildState.IsNodeAvailable(stuckNode) {
+		return
+	}
+
+	nodeName := fmt.Sprintf("(%s)", stuckNode.FriendlyName())
+	logger.Log.Debugf("%*s", indent, nodeName)
+
+	// Iterate over all the nodes that are blocking the stuck node.
+	dependency := pkgGraph.From(stuckNode.ID())
+	for dependency.Next() {
+		dependent := dependency.Node().(*pkggraph.PkgNode)
+		debugStuckNode(buildState, pkgGraph, dependent, indent+1)
+	}
+}
+
 // buildAllNodes will build all nodes in a given dependency graph.
 // This routine only contains control flow logic for build scheduling.
 // It iteratively:
@@ -346,6 +368,8 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 		if len(buildState.ActiveBuilds()) == 0 && len(channels.Results) == 0 {
 			if useCachedImplicit {
 				err = fmt.Errorf("could not build all packages")
+				// Temporarily print debug information about the stuck node.
+				debugStuckNode(buildState, pkgGraph, goalNode, 0)
 				break
 			} else {
 				logger.Log.Warn("Enabling cached packages to satisfy unresolved dynamic dependencies.")

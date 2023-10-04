@@ -7,7 +7,7 @@
 Summary:        Perl extension interface for libcurl
 Name:           perl-WWW-Curl
 Version:        4.17
-Release:        14%{?dist}
+Release:        15%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -83,6 +83,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.17-15
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Thu Apr 27 2023 Olivia Crain <oliviacrain@microsoft.com> - 4.17-14
 - Fix package test by adding check-time requirement on perl(Test::More), perl(File::Temp)
 

@@ -1,7 +1,7 @@
 Summary:        OSS implementation of the TCG TPM2 Software Stack (TSS2)
 Name:           tpm2-tss
 Version:        2.4.6
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -89,6 +89,9 @@ fi
 %{_mandir}/man7/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.4.6-3
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Feb 08 2023 Rachel Menge <rachelmenge@microsoft.com> - 2.4.6-2
 - Add patch to resolve CVE-2023-22745
 
