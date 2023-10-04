@@ -8,6 +8,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
@@ -182,8 +183,21 @@ func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageC
 			return err
 		}
 	} else {
+		var uidStr string
+		if user.UID != nil {
+			uidStr = strconv.Itoa(*user.UID)
+		}
+
 		// Add the user.
-		err = userutils.AddUser(user.Name, hashedPassword, user.UID, imageChroot)
+		err = userutils.AddUser(user.Name, hashedPassword, uidStr, imageChroot)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Set user's password expiry.
+	if user.PasswordExpiresDays != nil {
+		err = installutils.Chage(imageChroot, *user.PasswordExpiresDays, user.Name)
 		if err != nil {
 			return err
 		}

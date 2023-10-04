@@ -84,3 +84,41 @@ func UserHomeDirectory(username string) string {
 		return filepath.Join(UserHomeDirPrefix, username)
 	}
 }
+
+// NameIsValid returns an error if the User name is empty
+func NameIsValid(name string) (err error) {
+	if strings.TrimSpace(name) == "" {
+		return fmt.Errorf("invalid value for name (%s), name cannot be empty", name)
+	}
+	return
+}
+
+// UIDIsValid returns an error if the UID is outside bounds
+// UIDs 1-999 are system users and 1000-60000 are normal users
+// Bounds can be checked using:
+// $grep -E '^UID_MIN|^UID_MAX' /etc/login.defs
+func UIDIsValid(uid int) error {
+	const (
+		uidLowerBound = 0 // root user
+		uidUpperBound = 60000
+	)
+
+	if uid < uidLowerBound || uid > uidUpperBound {
+		return fmt.Errorf("invalid value for UID (%d), not within [%d, %d]", uid, uidLowerBound, uidUpperBound)
+	}
+
+	return nil
+}
+
+// PasswordExpiresDaysISValid returns an error if the expire days is not
+// within bounds set by the chage -M command
+func PasswordExpiresDaysIsValid(passwordExpiresDays int64) error {
+	const (
+		noExpiration    = -1 //no expiration
+		upperBoundChage = 99999
+	)
+	if passwordExpiresDays < noExpiration || passwordExpiresDays > upperBoundChage {
+		return fmt.Errorf("invalid value for PasswordExpiresDays (%d), not within [%d, %d]", passwordExpiresDays, noExpiration, upperBoundChage)
+	}
+	return nil
+}

@@ -1167,7 +1167,7 @@ func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err
 			logger.Log.Debugf("No shadow file to update. Skipping setting password to never expire.")
 			return
 		}
-		err = Chage(-1, "root")
+		err = Chage(installChroot, -1, "root")
 	}
 	return
 }
@@ -1234,7 +1234,7 @@ func createUserWithPassword(installChroot *safechroot.Chroot, user configuration
 			return
 		}
 
-		err = Chage(user.PasswordExpiresDays, user.Name)
+		err = Chage(installChroot, user.PasswordExpiresDays, user.Name)
 	}
 
 	return
@@ -1242,13 +1242,15 @@ func createUserWithPassword(installChroot *safechroot.Chroot, user configuration
 
 // chage works in the same way as invoking "chage -M passwordExpirationInDays username"
 // i.e. it sets the maximum password expiration date.
-func Chage(passwordExpirationInDays int64, username string) (err error) {
+func Chage(installChroot *safechroot.Chroot, passwordExpirationInDays int64, username string) (err error) {
 	var (
 		shadow            []string
 		usernameWithColon = fmt.Sprintf("%s:", username)
 	)
 
-	shadow, err = file.ReadLines(ShadowFile)
+	installChrootShadowFile := filepath.Join(installChroot.RootDir(), ShadowFile)
+
+	shadow, err = file.ReadLines(installChrootShadowFile)
 	if err != nil {
 		return
 	}
@@ -1317,7 +1319,7 @@ func Chage(passwordExpirationInDays int64, username string) (err error) {
 			if done {
 				// Create and save new shadow file including potential changes from above.
 				shadow[n] = strings.Join(fields, ":")
-				err = file.Write(strings.Join(shadow, "\n"), ShadowFile)
+				err = file.Write(strings.Join(shadow, "\n"), installChrootShadowFile)
 				return
 			}
 		}
