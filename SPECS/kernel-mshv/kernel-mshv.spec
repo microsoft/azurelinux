@@ -10,8 +10,8 @@
 
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
-Version:        5.15.110.mshv2
-Release:        5%{?dist}
+Version:        5.15.126.mshv3
+Release:        1%{?dist}
 License:        GPLv2
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
@@ -20,7 +20,6 @@ Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
 Source1:        config
 Source2:        cbl-mariner-ca-20211013.pem
 Source3:        50_mariner_mshv.cfg
-Patch0:         0001-Implement-dom0-kernel-patch-for-loader-as-of-0524.patch
 ExclusiveArch:  x86_64
 BuildRequires:  audit-devel
 BuildRequires:  bash
@@ -248,6 +247,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner-mshv.cfg
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Thu Sep 21 2023 Saul Paredes <saulparedes@microsoft.com> - 5.15.126.mshv3-1
+- Update to v5.15.126.mshv3
+
 * Tue Sep 19 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.110.mshv2-5
 - Enable grub2-mkconfig-based boot path by installing 
     50_mariner_mshv.cfg 
