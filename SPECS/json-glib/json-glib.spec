@@ -1,7 +1,7 @@
 Summary:        Library providing serialization and deserialization support for the JSON format
 Name:           json-glib
 Version:        1.6.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Group:          Development/Libraries
 Source0:        https://ftp.gnome.org/pub/GNOME/sources/json-glib/1.6/%{name}-%{version}.tar.xz
@@ -72,6 +72,9 @@ export LDFLAGS="-Wl,-z,relro,-z,now"
 %{_mandir}/man1/json-glib-validate.1*
 
 %changelog
+* Wed Oct 04 2023 Sam Meluch <sammeluch@microsoft.com> - 1.6.6-2
+- Bump version for testing
+
 * Thu Feb 10 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.6.6-1
 - Update to v1.6.6
 - Disabled docs until gi-docgen is a supported package
