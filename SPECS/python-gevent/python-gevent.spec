@@ -1,7 +1,7 @@
 Summary:        Coroutine-based network library
 Name:           python-gevent
 Version:        1.3.6
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,6 +9,7 @@ Group:          Development/Languages/Python
 URL:            https://www.gevent.org
 #Source0:       https://github.com/gevent/gevent/archive/%{version}.tar.gz
 Source0:        gevent-%{version}.tar.gz
+Patch0:    CVE-2023-41419.patch
 Patch0:         python-gevent-makecheck.patch
 
 %description
@@ -61,6 +62,9 @@ nosetests
 %{python3_sitelib}/*
 
 %changelog
+* Wed Oct 04 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.3.6-9
+- Add patch for CVE-2023-41419
+
 * Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 1.3.6-8
 - Regenerate C sources at build-time to fix build break with Python 3.9
 
