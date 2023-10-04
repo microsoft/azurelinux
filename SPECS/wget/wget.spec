@@ -46,7 +46,7 @@ downloading of files from the Web.
     --libdir=%{_libdir} \
     --sysconfdir=/etc \
     --with-ssl=openssl
-make %{?_smp_mflags} build
+%cmake_build %{?_smp_mflags}
 
 %install
 [ %{buildroot} != "/"] && rm -rf %{buildroot}/*
