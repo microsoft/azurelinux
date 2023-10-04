@@ -9,8 +9,8 @@ Group:          Development/Languages/Python
 URL:            https://www.gevent.org
 #Source0:       https://github.com/gevent/gevent/archive/%{version}.tar.gz
 Source0:        gevent-%{version}.tar.gz
-Patch0:    CVE-2023-41419.patch
 Patch0:         python-gevent-makecheck.patch
+Patch1:         CVE-2023-41419.patch
 
 %description
 gevent is a coroutine-based Python networking library.
