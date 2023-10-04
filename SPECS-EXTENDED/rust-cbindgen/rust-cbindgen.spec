@@ -21,11 +21,6 @@ Source2:        cargo_config
 %global rustflags '-Clink-arg=-Wl,-z,relro,-z,now'
 %global _description %{expand:
 A tool for generating C bindings to Rust code.}
-%if 0%{?fedora} >= 39
-%bcond_with check
-%else
-%bcond_without check
-%endif
 BuildRequires:  cargo >= 1.45
 BuildRequires:  rust >= 1.45
 
