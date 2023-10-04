@@ -20,19 +20,18 @@ DNF_COMMAND=dnf
 # Cache RPM metadata
 >/dev/null dnf $common_options -y makecache
 
-# Create and/or empty the log file
-echo > "$sodiff_log_file"
-
 # Get packages from stdin
 pkgs=`cat`
 
 for rpmpackage in $pkgs; do
     package_path=$(find "$rpms_folder" -name "$rpmpackage" -type f)
     package_provides=`2>/dev/null rpm -qP "$package_path" | grep -E '[.]so[(.]' `
-    echo "Processing ${rpmpackage}..." >> "$sodiff_log_file"
+    echo "Processing ${rpmpackage}..."
+    echo ".so's provided: $package_provides"
     for sofile in $package_provides; do
         # Query local metadata for provides
         sos_found=$( $DNF_COMMAND repoquery $common_options --whatprovides $sofile | wc -l )
+        echo "Number of .so files found: $sos_found"
         if [ "$sos_found" -eq 0 ] ; then
             # SO file not found, meaning this might be a new .SO
             # or a new version of a preexisting .SO.
@@ -43,21 +42,23 @@ for rpmpackage in $pkgs; do
 
             # check for generic .so in the repo
             sos_found=$( $DNF_COMMAND repoquery $common_options --whatprovides "${sofile_no_ver}*" | wc -l )
-
+            echo "Number of non-versioned .so files found: $sos_found"
             if ! [ "$sos_found" -eq 0 ] ; then
                 # Generic version of SO was found.
                 # This means it's a new version of a preexisting SO.
                 # Log which packages depend on this functionality
-                $DNF_COMMAND repoquery $common_options -s --whatrequires "${sofile_no_ver}*" | sed -E 's/[.][^.]+[.]src[.]rpm//' > "$sodiff_out_dir"/"require_${sofile}"
+                echo "Packages that require $sofile_no_ver:"
+                $DNF_COMMAND repoquery $common_options -s --whatrequires "${sofile_no_ver}*" | sed -E 's/[.][^.]+[.]src[.]rpm//' | tee "$sodiff_out_dir"/"require_${sofile}"
             fi
         fi
     done
+    echo ""
 done
 
 # Obtain a list of unique packages to be updated
 2>/dev/null cat "$sodiff_out_dir"/require* | sort -u > "$sodiff_out_dir"/sodiff-intermediate-summary.txt
 
-rm -f "$sodiff_out_dir"/sodiff-summary.txt
+rm "$sodiff_out_dir"/require*
 
 # Remove packages that have been dash-rolled already.
 echo "$pkgs" > "$sodiff_out_dir/sodiff-built-packages.txt"
@@ -75,5 +76,11 @@ for package in $( cat "$sodiff_out_dir"/sodiff-intermediate-summary.txt ); do
     # else:
     # the version is higher(dash-rolled) (guaranteed as we are not releasing older packages).
 done
+
+echo ""
+echo "The Following Packages Are in Need of an Update:"
+cat "$sodiff_out_dir"/sodiff-summary.txt
+
+rm "$sodiff_out_dir"/sodiff-summary.txt
 
 rm "$sodiff_out_dir"/sodiff-built-packages.txt
