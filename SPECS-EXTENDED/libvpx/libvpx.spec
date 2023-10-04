@@ -7,8 +7,8 @@ Distribution:   Mariner
 
 Name:			libvpx
 Summary:		VP8/VP9 Video Codec SDK
-Version:		1.8.2
-Release:		4%{?dist}
+Version:		1.13.1
+Release:		1%{?dist}
 License:		BSD
 Source0:		https://github.com/webmproject/libvpx/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:		vpx_config.h
@@ -232,6 +232,9 @@ rm -rf %{buildroot}%{_prefix}/src
 %{_bindir}/*
 
 %changelog
+* Wed Oct 04 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.13.1-1
+- Auto-upgrade to 1.13.1 - to fix CVE
+
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.8.2-4
 - Updating source URLs.
 - License verified.
