@@ -39,28 +39,35 @@ steps:
     displayName: "Extract sources tarball"
 
   - script: |
+      echo "Validate Toolkit dir"
       toolkit_dir="${{ parameters.buildRepoRoot }}/toolkit"
       if [[ ! -d "$toolkit_dir" ]]; then
         echo "ERROR: toolkit not found! Expected under '$toolkit_dir'." >&2
         exit 1
       fi
 
+      echo "Validate RPMS folder exists"
       sodiff_rpms_dir="${{ parameters.sourcesWorkspace }}/RPMS"
       if [[ ! -d "$sodiff_rpms_dir" ]]; then
         echo "ERROR: RPMS dir not found! Expected under '$sodiff_rpms_dir'." >&2
         exit 1
       fi
 
+
       sodiff_out_dir="${{ parameters.buildRepoRoot }}/out/sodiff"
       mkdir -p $sodiff_out_dir
 
       #generate repo file
+      echo "Generate sodiff.repo file"
       sudo make -sC "$toolkit_dir" sodiff-repo
 
       #ensure we have the correct keys in place
       #sudo make -sC "$toolkit_dir" sodiff-setup
 
-      ls $sodiff_rpms_dir | $toolkit_dir/scripts/sodiff/mariner-sodiff.sh $sodiff_rpms_dir/ $toolkit_dir/scripts/sodiff/sodiff.repo ${{ parameters.marinerVersion }} $sodiff_out_dir
+      echo "Generate input file"
+      find $sodiff_rpms_dir -type f -name '*.rpm' -exec basename {} \; > ./sodiff-rpms
+
+      $toolkit_dir/scripts/sodiff/mariner-sodiff.sh $sodiff_rpms_dir/ $toolkit_dir/scripts/sodiff/sodiff.repo ${{ parameters.marinerVersion }} $sodiff_out_dir < ./sodiff-rpms
 
 
     displayName: "Sodiff check"
