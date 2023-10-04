@@ -5389,6 +5389,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "hping3",
+          "version": "0.0.20051105",
+          "downloadUrl": "https://src.fedoraproject.org/lookaside/pkgs/hping3/hping3-20051105.tar.gz/ca4ea4e34bcc2162aedf25df8b2d1747/hping3-20051105.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "hsakmt",
           "version": "1.0.6",
           "downloadUrl": "https://github.com/RadeonOpenCompute/ROCT-Thunk-Interface/archive/roc-2.0.0.tar.gz"

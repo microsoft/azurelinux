@@ -1,0 +1,13 @@
+diff --git a/hping2.h b/hping2.h
+index 70e2035..3766e1d 100644
+--- a/hping2.h
++++ b/hping2.h
+@@ -353,7 +353,7 @@ struct delaytable_element {
+ 	int status;
+ };
+ 
+-volatile struct delaytable_element delaytable[TABLESIZE];
++extern volatile struct delaytable_element delaytable[TABLESIZE];
+ 
+ /* protos */
+ void	nop(void);				/* nop */
