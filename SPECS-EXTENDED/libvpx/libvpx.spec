@@ -1,6 +1,6 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-%global somajor 6
+%global somajor 8
 %global sominor 0
 %global sotiny  0
 %global soversion %{somajor}.%{sominor}.%{sotiny}
@@ -215,7 +215,7 @@ rm -rf %{buildroot}%{_prefix}/src
 %files
 %license LICENSE
 %doc AUTHORS CHANGELOG README
-%{_libdir}/libvpx.so.%{somajor}*
+%{_libdir}/libvpx.so.*
 
 %files devel
 # These are SDK docs, not really useful to an end-user.
