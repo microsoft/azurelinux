@@ -191,9 +191,6 @@ cat << EOF >> %{buildroot}/%{_libdir}/tmpfiles.d/kubernetes.conf
 d %{_var}/run/kubernetes 0755 kube kube -
 EOF
 
-%clean
-rm -rf %{buildroot}/*
-
 %pre
 if [ $1 -eq 1 ]; then
     # Initial installation.
