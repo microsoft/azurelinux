@@ -28,7 +28,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.15.133.1
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -425,9 +425,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Wed Oct 04 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 5.15.133.1-2
-- Fix changelog date inversion by changing date to keep versioning order
-
 * Tue Sep 26 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.133.1-1
 - Auto-upgrade to 5.15.133.1
 - Remove CONFIG_NET_CLS_RSVP and CONFIG_NET_CLS_RSVP6 that don't apply to the new version
