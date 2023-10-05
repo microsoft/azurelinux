@@ -2537,7 +2537,6 @@
                 "junit",
                 "junitperf",
                 "jzlib",
-                "kubernetes",
                 "kubevirt",
                 "kured",
                 "libcontainers-common",
