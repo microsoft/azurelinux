@@ -27,7 +27,7 @@ import (
 //     and are queued for building in the testNodesToRequests() function.
 //     At this point the partner build nodes for these test nodes have either already finished building or are being built,
 //     thus the check for active and cached SRPMs inside testNodesToRequests().
-func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, nodesToBuild []*pkggraph.PkgNode, packagesToRebuild, testsToRerun []*pkgjson.PackageVer, buildState *GraphBuildState, isCacheAllowed bool) (requests []*BuildRequest) {
+func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, nodesToBuild []*pkggraph.PkgNode, packagesToRebuild, testsToRerun []*pkgjson.PackageVer, buildState *GraphBuildState, isCacheAllowed, isLowPriorityAllowed bool) (requests []*BuildRequest) {
 	timestamp.StartEvent("generate requests", nil)
 	defer timestamp.StopEvent(nil)
 
@@ -42,11 +42,18 @@ func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMute
 	for _, node := range nodesToBuild {
 		if node.Type == pkggraph.TypeLocalBuild {
 			buildNodes[node.SrpmPath] = append(buildNodes[node.SrpmPath], node)
+			logger.Log.Warnf("Skipping req for %s because it is a build node", node.FriendlyName())
 			continue
 		}
 
 		if node.Type == pkggraph.TypeTest {
 			testNodes[node.SrpmPath] = append(testNodes[node.SrpmPath], node)
+			logger.Log.Warnf("Skipping req for %s because it is a test node", node.FriendlyName())
+			continue
+		}
+
+		if !buildState.IsNodeElevatedPriority(node) && !isLowPriorityAllowed {
+			logger.Log.Warnf("Skipping req for %s because it is a low priority node", node.FriendlyName())
 			continue
 		}
 
@@ -57,22 +64,38 @@ func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMute
 		requests = append(requests, req)
 	}
 
-	requests = append(requests, buildNodesToRequests(pkgGraph, buildState, packagesToRebuild, testsToRerun, buildNodes, isCacheAllowed)...)
-	requests = append(requests, testNodesToRequests(pkgGraph, buildState, testsToRerun, testNodes)...)
+	requests = append(requests, buildNodesToRequests(pkgGraph, buildState, packagesToRebuild, testsToRerun, buildNodes, isCacheAllowed, isLowPriorityAllowed)...)
+	requests = append(requests, testNodesToRequests(pkgGraph, buildState, testsToRerun, testNodes, isLowPriorityAllowed)...)
 
 	return
 }
 
-func buildNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, packagesToRebuild, testsToRerun []*pkgjson.PackageVer, buildNodesLists map[string][]*pkggraph.PkgNode, isCacheAllowed bool) (requests []*BuildRequest) {
+func buildNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, packagesToRebuild, testsToRerun []*pkgjson.PackageVer, buildNodesLists map[string][]*pkggraph.PkgNode, isCacheAllowed, isLowPriorityAllowed bool) (requests []*BuildRequest) {
 	for _, buildNodes := range buildNodesLists {
 		// Check if any of the build nodes is a delta node and mark it. We will use this to determine if the
 		// build is a delta build that might have pre-built .rpm files available.
 		hasADeltaNode := false
+		isOnlyLowPriority := true
 		for _, node := range buildNodes {
 			if node.State == pkggraph.StateDelta {
 				hasADeltaNode = true
 				break
 			}
+			if buildState.IsNodeElevatedPriority(node) {
+				logger.Log.Warnf("At least one build node (%v) is elevated priority", node)
+				isOnlyLowPriority = false
+			} else {
+				logger.Log.Warnf("(%v) is low priority", node)
+			}
+		}
+
+		if isOnlyLowPriority && !isLowPriorityAllowed {
+			continue // Skip low priority nodes
+		}
+
+		logger.Log.Warnf("Build nodes:")
+		for _, node := range buildNodes {
+			logger.Log.Warnf("    %s", node.FriendlyName())
 		}
 
 		defaultNode := buildNodes[0]
@@ -167,10 +190,22 @@ func partnerTestNodesToRequest(pkgGraph *pkggraph.PkgGraph, buildState *GraphBui
 // which have already been queued to build or finished building.
 //
 // NOTE: the caller must guarantee the build state does not change while this function is running.
-func testNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, testsToRerun []*pkgjson.PackageVer, testNodesLists map[string][]*pkggraph.PkgNode) (requests []*BuildRequest) {
+func testNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, testsToRerun []*pkgjson.PackageVer, testNodesLists map[string][]*pkggraph.PkgNode, isLowPriorityAllowed bool) (requests []*BuildRequest) {
 	const isDelta = false
 
 	for _, testNodes := range testNodesLists {
+
+		isAllLowPriority := true
+		for _, node := range testNodes {
+			if buildState.IsNodeElevatedPriority(node) {
+				isAllLowPriority = false
+			}
+		}
+
+		if isAllLowPriority && !isLowPriorityAllowed {
+			continue // Skip low priority nodes
+		}
+
 		defaultTestNode := testNodes[0]
 		srpmFileName := defaultTestNode.SRPMFileName()
 

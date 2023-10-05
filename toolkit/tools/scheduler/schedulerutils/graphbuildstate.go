@@ -226,6 +226,7 @@ func (g *GraphBuildState) RecordBuildResult(res *BuildResult, allowToolchainRebu
 	}
 
 	for _, node := range res.AncillaryNodes {
+		logger.Log.Warnf("Recording ancillary node: %s", node.FriendlyName())
 		g.nodeToState[node] = state
 	}
 

@@ -12,6 +12,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/rpm"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 	"gonum.org/v1/gonum/graph"
 	"gonum.org/v1/gonum/graph/traverse"
 )
@@ -40,6 +41,9 @@ type NodePriorityMap struct {
 // contain a goal node named "PackagesToBuild" that lists the packages that should be built. A priority map will be
 // generated as described above for each node in the graph.
 func BuildNodeResolutionPriorityMap(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex) (nodePriorityMap *NodePriorityMap, err error) {
+	timestamp.StartEvent("generate priority map", nil)
+	defer timestamp.StopEvent(nil)
+
 	graphMutex.RLock()
 	defer graphMutex.RUnlock()
 
@@ -50,6 +54,7 @@ func BuildNodeResolutionPriorityMap(pkgGraph *pkggraph.PkgGraph, graphMutex *syn
 	}
 
 	// Create a fake optimized subgraph, this should be the bulk of the packages we expect to need. Set these to medium.
+	logger.Log.Infof("Setting priority for requested nodes")
 	buildGoalNode := pkgGraph.FindGoalNode(buildGoalNodeName)
 	if buildGoalNode == nil {
 		err = fmt.Errorf("could not find goal node %s", buildGoalNodeName)
@@ -71,6 +76,7 @@ func BuildNodeResolutionPriorityMap(pkgGraph *pkggraph.PkgGraph, graphMutex *syn
 	// This process is best-effort and does not guarantee that all implicit nodes will be satisfied, or that the
 	// predicted package will be the one that actually provides the implicit provide. If the prediction is incorrect
 	// the scheduler can still rely on the low-priority nodes to eventually provide the correct result.
+	logger.Log.Infof("Setting priority for implicit provider nodes")
 	implicitNodes := subgraph.AllImplicitNodes()
 	satisfyingNodes := []*pkggraph.PkgNode{}
 	for _, implicitNode := range implicitNodes {
@@ -113,7 +119,7 @@ func (s NodePriorityMap) IsElevatedPriority(node *pkggraph.PkgNode) bool {
 
 func (s NodePriorityMap) IncreaseNodePriority(node *pkggraph.PkgNode, priority int) {
 	if s.priorities[node] < priority {
-		logger.Log.Warnf("Setting %s to priority %d", node.FriendlyName(), MediumNodePriority)
+		logger.Log.Warnf("Setting %s to priority %d", node.FriendlyName(), priority)
 		s.priorities[node] = priority
 	} else {
 		logger.Log.Warnf("LEAVING %s at existing priority %d", node.FriendlyName(), s.priorities[node])

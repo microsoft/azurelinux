@@ -73,7 +73,7 @@ func CanSubGraph(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, useCachedI
 }
 
 // LeafNodes returns a slice of all leaf nodes in the graph.
-func LeafNodes(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, goalNode *pkggraph.PkgNode, buildState *GraphBuildState, useCachedImplicit, allowLowPriorityNodes bool) (leafNodes []*pkggraph.PkgNode) {
+func LeafNodes(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, goalNode *pkggraph.PkgNode, buildState *GraphBuildState, useCachedImplicit, allowLowPriorityNodes bool) (leafNodes, lowPriorityLeafNodes []*pkggraph.PkgNode) {
 	graphMutex.RLock()
 	defer graphMutex.RUnlock()
 
@@ -81,24 +81,42 @@ func LeafNodes(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, goalNode *
 
 	search.Walk(pkgGraph, goalNode, func(n graph.Node, d int) (stopSearch bool) {
 		pkgNode := n.(*pkggraph.PkgNode)
+		isLowPriority := false
+
+		isBadNode := n.ID() == 1
+		if isBadNode {
+			logger.Log.Warnf("Found bad node: %v", pkgNode)
+		}
 
 		// Skip nodes that have already been processed
 		if buildState.IsNodeProcessed(pkgNode) {
+			if isBadNode {
+				logger.Log.Warn("    PROCESSED")
+			}
 			return
 		}
 
 		// Only let low priority nodes through if allowLowPriorityNodes is set
 		if !(allowLowPriorityNodes || buildState.IsNodeElevatedPriority(pkgNode)) {
-			return
+			if isBadNode {
+				logger.Log.Warn("    LOW PRIORITY")
+			}
+			//isLowPriority = true
 		}
 
 		if pkgNode.State == pkggraph.StateUnresolved {
+			if isBadNode {
+				logger.Log.Warn("    UNRESOLVED")
+			}
 			return
 		}
 
 		dependencies := pkgGraph.From(n.ID())
 
 		if dependencies.Len() != 0 {
+			if isBadNode {
+				logger.Log.Warn("    DEPENDENCIES")
+			}
 			return
 		}
 
@@ -111,7 +129,11 @@ func LeafNodes(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, goalNode *
 		}
 
 		logger.Log.Infof("Found leaf node: %v", pkgNode)
-		leafNodes = append(leafNodes, pkgNode)
+		if isLowPriority {
+			lowPriorityLeafNodes = append(lowPriorityLeafNodes, pkgNode)
+		} else {
+			leafNodes = append(leafNodes, pkgNode)
+		}
 
 		return
 	})
@@ -154,6 +176,7 @@ func findUnblockedNodesFromNode(pkgGraph *pkggraph.PkgGraph, buildState *GraphBu
 	dependents := pkgGraph.To(builtNode.ID())
 
 	for dependents.Next() {
+		logger.Log.Debugf("Checking if %v is unblocked by %v", dependents.Node(), builtNode)
 		dependent := dependents.Node().(*pkggraph.PkgNode)
 
 		if isNodeUnblocked(pkgGraph, buildState, dependent) {

@@ -325,13 +325,11 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 		// allowLowPriorityNodes tracks if low priority nodes can be built. Ideally the scheduler will be able to build all
 		// medium and high priority nodes without needing to build any low priority nodes. However, if the scheduler is unable
 		// to resolve an implicit provide, it will need to fall back to building low priority nodes to try and find a provider.
-		allowLowPriorityNodes bool
+		allowLowPriorityNodes bool = false
 	)
 
 	// Start the build at the leaf nodes.
 	// The build will bubble up through the graph as it processes nodes.
-
-	// Calculate the priority so we can optimize the build ordering.
 	priorityBuildSet, err := schedulerutils.BuildNodeResolutionPriorityMap(pkgGraph, graphMutex)
 	if err != nil {
 		err = fmt.Errorf("error building implicit node resolution priority set:\n%w", err)
@@ -339,23 +337,21 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 	}
 	buildState := schedulerutils.NewGraphBuildState(reservedFiles, priorityBuildSet, maxCascadingRebuilds)
 	buildRunsTests := len(pkgGraph.AllTestNodes()) > 0
-	nodesToBuild := schedulerutils.LeafNodes(pkgGraph, graphMutex, goalNode, buildState, useCachedImplicit, allowLowPriorityNodes)
-	lowPriorityNodes := make([]*pkggraph.PkgNode, 0)
+	nodesToBuild, lowPriorityNodes := schedulerutils.LeafNodes(pkgGraph, graphMutex, goalNode, buildState, useCachedImplicit, allowLowPriorityNodes)
+	fullGraph := pkgGraph
 
 	for {
 		logger.Log.Debugf("Found %d unblocked nodes: %v.", len(nodesToBuild), nodesToBuild)
 
 		// Each node that is ready to build must be converted into a build request and submitted to the worker pool.
-		newRequests := schedulerutils.ConvertNodesToRequests(pkgGraph, graphMutex, nodesToBuild, packagesToRebuild, testsToRerun, buildState, canUseCache)
+		newRequests := schedulerutils.ConvertNodesToRequests(pkgGraph, graphMutex, nodesToBuild, packagesToRebuild, testsToRerun, buildState, canUseCache, allowLowPriorityNodes)
 		for _, req := range newRequests {
 			buildState.RecordBuildRequest(req)
-			// Decide which priority the build should be. Generally we want to get any remote or prebuilt nodes out of the
-			// way as quickly as possible since they may help us optimize the graph early.
-			// Meta nodes may also be blocking something we want to examine and give higher priority (priority inheritance from
-			// the hypothetical high priority node hidden further into the tree)
-
-			// Some nodes will be marked as high priority and should be preferentially queued in the the high-pri queue
-			// no matter what (generally those nodes that we hope will satisfy unresolved dynamic dependencies)
+			// Queue nodes based on how likely they are to help optimize the build.
+			// - High priority nodes are expected to resolve implicit provides that are needed to build other packages.
+			// - Medium priority nodes are our desired build goal.
+			// - Low priority nodes are packages that are not needed to build the desired goal, but may be needed to
+			//    resolve implicit provides that are needed to build the desired goal.
 			switch buildState.GetNodePriority(req.Node) {
 			case schedulerutils.HighNodePriority:
 				logger.Log.Tracef("Priority priority request (%d) for node '%s'", buildState.GetNodePriority(req.Node), req.Node.FriendlyName())
@@ -366,42 +362,29 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 			case schedulerutils.LowNodePriority:
 				fallthrough
 			default:
-				switch req.Node.Type {
-				// Any nodes that can be handled without a build should be processed as soon as possible, so use
-				// medium priority for them.
-				case pkggraph.TypePreBuilt:
-					fallthrough
-				case pkggraph.TypeGoal:
-					fallthrough
-				case pkggraph.TypePureMeta:
-					fallthrough
-				case pkggraph.TypeLocalRun:
-					fallthrough
-				case pkggraph.TypeRemoteRun:
-					logger.Log.Tracef("Medium priority request (%d) for node '%s'", buildState.GetNodePriority(req.Node), req.Node.FriendlyName())
-					channels.MediumPriorityRequests <- req
-				default:
-					logger.Log.Tracef("Low priority request (%d) for node '%s'", buildState.GetNodePriority(req.Node), req.Node.FriendlyName())
-					channels.LowPriorityRequests <- req
-				}
+				logger.Log.Tracef("Low priority request (%d) for node '%s'", buildState.GetNodePriority(req.Node), req.Node.FriendlyName())
+				channels.LowPriorityRequests <- req
 			}
 		}
 		nodesToBuild = nil
 
-		// If there are no active builds running or results waiting to check try enabling cached packages for unresolved
-		// dynamic dependencies to unblock more nodes. Otherwise, there is nothing left that can be built.
+		// If there are no active builds running or results waiting to check try enabling low priority nodes  to unblock
+		// more nodes, then cached packages for unresolved dynamic dependencies. Otherwise, there is nothing left that can be built.
 		if len(buildState.ActiveBuilds()) == 0 && len(channels.Results) == 0 {
 			if !allowLowPriorityNodes {
 				logger.Log.Warnf("Enabling low priority packages to satisfy unresolved dynamic dependencies.")
 				allowLowPriorityNodes = true
-				nodesToBuild = schedulerutils.LeafNodes(pkgGraph, graphMutex, goalNode, buildState, useCachedImplicit, allowLowPriorityNodes)
+				// We will get no new low priority nodes, ignore return
+				nodesToBuild, _ = schedulerutils.LeafNodes(pkgGraph, graphMutex, goalNode, buildState, useCachedImplicit, allowLowPriorityNodes)
+				lowPriorityNodes = filterLowPriorityNodesAgainstGraph(pkgGraph, graphMutex, buildState, lowPriorityNodes)
 				nodesToBuild = append(nodesToBuild, lowPriorityNodes...)
 				lowPriorityNodes = nil
 				continue
 			} else if !useCachedImplicit {
 				logger.Log.Warn("Enabling cached packages to satisfy unresolved dynamic dependencies.")
 				useCachedImplicit = true
-				nodesToBuild = schedulerutils.LeafNodes(pkgGraph, graphMutex, goalNode, buildState, useCachedImplicit, allowLowPriorityNodes)
+				// We will get no new low priority nodes, ignore return
+				nodesToBuild, _ = schedulerutils.LeafNodes(pkgGraph, graphMutex, goalNode, buildState, useCachedImplicit, allowLowPriorityNodes)
 				continue
 			} else {
 				err = fmt.Errorf("could not build all packages")
@@ -457,22 +440,22 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 						pkgGraph = newGraph
 						goalNode = newGoalNode
 
-						// No need to consider low/high priority nodes anymore. There are only two cases here:
+						// No need to consider low/high priority nodes anymore. There are two cases here:
 						// 1. The graph was optimized based on the predicted implicit provides and is now solvable (allowLowPriorityNodes == false).
-						//     - No low priority nodes were needed, and there is no expectation we will need them. Everything
-						//       should be solvable with the predicted medium/high priority nodes already selected.
+						//     - No low priority nodes were needed, and there is no expectation we will need them. Everything should be solvable
+						//       with the predicted medium/high priority nodes already selected.
 						//     - Any low priority nodes we set aside can be discarded.
+						// TODO What about run requires for implicit nodes?
 						// 2. The graph could not be optimized based on the predicted implicit provides and we needed to fall (allowLowPriorityNodes == true)
 						//    back to the a random walk of the low priority nodes.
 						//     - In this case, we will have already released all of the low priority nodes back into the build
 						//       pool and they will be built as needed.
 						// Either way, we should leave here with no tracked low priority nodes, and with low proirity nodes enabled so that the scheduler can
 						// fully build the new solvable graph as quickly as possible.
-						if !allowLowPriorityNodes {
-							// Discard the low priority nodes that were set aside since the graph has been optimized and clearly they were not actually needed.
-							lowPriorityNodes = nil
-							allowLowPriorityNodes = true
-						}
+						logger.Log.Infof("Graph optimized. No longer considering low priority nodes.")
+						logger.Log.Infof("Filtering")
+						// Discard the low priority nodes that were set aside since the graph has been optimized and clearly they were not actually needed.
+						lowPriorityNodes = filterLowPriorityNodesAgainstGraph(pkgGraph, graphMutex, buildState, lowPriorityNodes)
 					}
 				}
 
@@ -533,12 +516,31 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 	time.Sleep(time.Second)
 
 	builtGraph = pkgGraph
-	schedulerutils.PrintBuildSummary(builtGraph, graphMutex, buildState, allowToolchainRebuilds)
+	schedulerutils.PrintBuildSummary(fullGraph, builtGraph, graphMutex, buildState, allowToolchainRebuilds)
 	schedulerutils.RecordBuildSummary(builtGraph, graphMutex, buildState, *outputCSVFile)
 	if !allowToolchainRebuilds && (len(buildState.ConflictingRPMs()) > 0 || len(buildState.ConflictingSRPMs()) > 0) {
 		err = fmt.Errorf("toolchain packages rebuilt. See build summary for details. Use 'ALLOW_TOOLCHAIN_REBUILDS=y' to suppress this error if rebuilds were expected")
 	}
 	return
+}
+
+func filterLowPriorityNodesAgainstGraph(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, buildState *schedulerutils.GraphBuildState, lowPriorityNodes []*pkggraph.PkgNode) (filteredLowPriorityNodes []*pkggraph.PkgNode) {
+	graphMutex.RLock()
+	defer graphMutex.RUnlock()
+
+	filteredLowPriorityNodes = make([]*pkggraph.PkgNode, 0, len(lowPriorityNodes))
+	for _, node := range lowPriorityNodes {
+		inGraph := pkgGraph.IsNodeInGraph(node)
+		processed := buildState.IsNodeProcessed(node)
+
+		if inGraph && !processed {
+			logger.Log.Infof("Keeping low priority node '%s' in new graph", node)
+			filteredLowPriorityNodes = append(filteredLowPriorityNodes, node)
+		} else {
+			logger.Log.Infof("Discarding low priority node '%s' from new graph because: inGraph=%t, processed=%t", node, inGraph, processed)
+		}
+	}
+	return filteredLowPriorityNodes
 }
 
 // updateGraphWithImplicitProvides will update the graph with new implicit provides if available.

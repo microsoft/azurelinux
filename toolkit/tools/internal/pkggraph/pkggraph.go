@@ -608,6 +608,27 @@ func (g *PkgGraph) FindBestPkgNode(pkgVer *pkgjson.PackageVer) (lookupEntry *Loo
 	return
 }
 
+// Function to check if a node object is in the current graph:
+
+func (g *PkgGraph) IsNodeInGraph(pkgNode *PkgNode) bool {
+	if pkgNode == nil {
+		return false
+	}
+	nodeWithSameId := g.Node(pkgNode.ID())
+	if nodeWithSameId == nil {
+		return false
+	} else {
+		// Check if they are the same node
+		same := nodeWithSameId.(*PkgNode) == pkgNode
+		if same {
+			logger.Log.Infof("Node %s is the same as %s", pkgNode, nodeWithSameId)
+		} else {
+			logger.Log.Infof("Node %s is not the same as %s", pkgNode, nodeWithSameId)
+		}
+		return same
+	}
+}
+
 // AllNodes returns a list of all nodes in the graph.
 func (g *PkgGraph) AllNodes() []*PkgNode {
 	count := g.Nodes().Len()
@@ -672,6 +693,7 @@ func (g *PkgGraph) AllTestNodes() []*PkgNode {
 	})
 }
 
+// AllImplicitNodes returns a list of all implicit remote nodes in the graph
 func (g *PkgGraph) AllImplicitNodes() []*PkgNode {
 	return g.allNodesOfType(func(n *LookupNode) *PkgNode {
 		if n.RunNode != nil && n.RunNode.Implicit {
@@ -1098,7 +1120,8 @@ func (g *PkgGraph) AddGoalNode(goalName string, packages, tests []*pkgjson.Packa
 	return
 }
 
-func (g *PkgGraph) AddGoalNodeFromNodes(goalName string, packages []*PkgNode) (goalNode *PkgNode, err error) {
+// AddGoalNodeFromNodes adds a goal node to the graph which links to a list of existing nodes.
+func (g *PkgGraph) AddGoalNodeFromNodes(goalName string, existingNodes []*PkgNode) (goalNode *PkgNode, err error) {
 	// Check if we already have a goal node with the requested name
 	if g.FindGoalNode(goalName) != nil {
 		err = fmt.Errorf("can't have two goal nodes named %s", goalName)
@@ -1107,7 +1130,7 @@ func (g *PkgGraph) AddGoalNodeFromNodes(goalName string, packages []*PkgNode) (g
 
 	logger.Log.Debugf("Adding a goal node '%s'.", goalName)
 
-	// Create goal node and add an edge to all requested packages
+	// Create goal node and add an edge to all the other requested nodes
 	goalNode = &PkgNode{
 		State:      StateMeta,
 		Type:       TypeGoal,
@@ -1124,8 +1147,8 @@ func (g *PkgGraph) AddGoalNodeFromNodes(goalName string, packages []*PkgNode) (g
 		return
 	}
 
-	for _, pkgNode := range packages {
-		err = g.AddEdge(goalNode, pkgNode)
+	for _, node := range existingNodes {
+		err = g.AddEdge(goalNode, node)
 		if err != nil {
 			return nil, err
 		}
