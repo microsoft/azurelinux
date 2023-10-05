@@ -2,8 +2,8 @@
 
 Summary:        Fast and flexible DNS server
 Name:           coredns
-Version:        1.9.3
-Release:        8%{?dist}
+Version:        1.11.1
+Release:        1%{?dist}
 License:        Apache License 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -30,7 +30,7 @@ Source0:        %{name}-%{version}.tar.gz
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
-Patch0:         makefile-buildoption-commitnb-1.9.patch
+Patch0:         makefile-buildoption-commitnb.patch
 
 BuildRequires:  golang >= 1.12
 
@@ -45,7 +45,7 @@ CoreDNS is a fast and flexible DNS server.
 tar -xf %{SOURCE1} --no-same-owner
 export BUILDOPTS="-mod=vendor -v"
 # set commit number that correspond to the github tag for that version
-export GITCOMMIT="13a9191efb0574cc92ed5ffd55a1f144b840d668"
+export GITCOMMIT="ae2bbc29be1aaae0b3ded5d188968a6c97bb3144"
 make
 
 %install
@@ -58,6 +58,9 @@ install -p -m 755 -t %{buildroot}%{_bindir} %{name}
 %{_bindir}/%{name}
 
 %changelog
+* Thu Oct 5 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 1.11.1-1
+- Upgrade to 1.11.1 to match version required by kubernetes
+
 * Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.9.3-8
 - Bump release to rebuild with go 1.19.12
 

@@ -2,8 +2,8 @@
 
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
-Version:        3.5.0
-Release:        17%{?dist}
+Version:        3.5.9
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,12 +20,13 @@ Source1:        etcd.service
 #      and create tarball containting 'vendor' folder for each
 #      (naming rule for tarball is 'vendor-[component].tar.gz', e.g.: 'vendor-server.tar.gz')
 #   3. create 'vendor' tarballs for dump tools
-#       a. cd 'etcd-dump-db' folder, create 'go.mod' file ('go mod init go.etcd.io/etcd/tools/etcd-dump-db/v3')
+#       a. cd 'tools/etcd-dump-db' folder, create 'go.mod' file ('go mod init go.etcd.io/etcd/tools/etcd-dump-db/v3')
 #       b. populate 'go.mod' file ('go mod tidy')
-#       c. add replace rules in 'go.mod' making sure that each etcd dependency is taken locally, e.g.:
+#       c. add replace rules in 'go.mod' making sure that each etcd dependency is taken locally, 
+#          e.g. add the following (and remove them from require section):
 #          replace (
-#               go.etcd.io/etcd/api/v3 => ../../api
-#               go.etcd.io/etcd/server/v3 => ../../server
+#               go.etcd.io/etcd/api/v3 v3.5.1 => ../../api
+#               go.etcd.io/etcd/server/v3 v3.5.1 => ../../server
 #          )
 #       d. create vendor folder ('go mod vendor')
 #       e. create tarball containing 'vendor' folder and 'go.mod' and 'go.sum' files
@@ -37,10 +38,12 @@ Source1:        etcd.service
 #       - You require GNU tar version 1.28+.
 #       - The additional options enable generation of a tarball with the same hash every time regardless of the environment.
 #         See: https://reproducible-builds.org/docs/archives/
-#       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
+#       - You can use the following tar command to create the tarballs
+#         tar --sort=name --mtime="2021-11-10 00:00Z" \
+#             --owner=0 --group=0 --numeric-owner \
+#             --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+#             -cJf [tarball name] [folder to tar]
 Source2:        %{name}-%{version}-vendor.tar.gz
-Patch0:         CVE-2021-28235.patch
-Patch1:         CVE-2023-32082-v3.5.0.patch
 BuildRequires:  golang >= 1.16
 
 %description
@@ -142,52 +145,70 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 /%{_docdir}/%{name}-%{version}-tools/*
 
 %changelog
-* Wed Aug 23 2023 Rachel Menge <rachelmenge@microsoft.com> - 3.5.0-17
-- Backport patch for CVE-2023-32082
+* Thu Oct 5 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 3.5.9-1
+- Upgrade to 3.5.9 to match version required by kubernetes
+
+* Wed Aug 23 2023 Rachel Menge <rachelmenge@microsoft.com> - 3.5.6-10
+- Patch CVE-2023-32082
 - Update patch fuzz to 2 for backporting patch
 
-* Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.0-16
+* Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.6-9
 - Bump release to rebuild with go 1.19.12
 
-* Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.0-15
+* Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.6-8
 - Bump release to rebuild with go 1.19.11
 
-* Thu Jun 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.0-14
+* Thu Jun 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.6-7
 - Bump release to rebuild with go 1.19.10
 
-* Wed Apr 19 2023 Bala <balakumaran.kannan@microsoft.com> - 3.5.0-13
+* Wed Apr 19 2023 Bala <balakumaran.kannan@microsoft.com> - 3.5.6-6
 - Patch CVE-2021-28235
 - Update patch fuzz to 1 for backporting patch
 
-* Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.0-12
+* Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.6-5
 - Bump release to rebuild with go 1.19.8
 
-* Tue Mar 28 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.0-11
+* Tue Mar 28 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.6-4
 - Bump release to rebuild with go 1.19.7
 
-* Wed Mar 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.0-10
+* Wed Mar 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.6-3
 - Bump release to rebuild with go 1.19.6
 
-* Fri Feb 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.0-9
+* Fri Feb 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.6-2
 - Bump release to rebuild with go 1.19.5
 
-* Wed Jan 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.0-8
+* Thu Jan 19 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.6-1
+- Auto-upgrade to 3.5.6 - version required by Kubernetes
+
+* Thu Jan 19 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.5-1
+- Auto-upgrade to 3.5.5 - version required by Kubernetes
+
+* Thu Jan 19 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.4-1
+- Auto-upgrade to 3.5.4 - version required by Kubernetes
+
+* Thu Jan 19 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.3-1
+- Auto-upgrade to 3.5.3 - version required by Kubernetes
+
+* Wed Jan 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.1-6
 - Bump release to rebuild with go 1.19.4
 
-* Fri Dec 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 3.5.0-7
-- Bump release to rebuild with go 1.18.8 with patch for CVE-2022-41717
+*   Fri Dec 16 2022 Daniel McIlvaney <damcilva@microsoft.com> - 3.5.1-5
+-   Bump release to rebuild with go 1.18.8 with patch for CVE-2022-41717.
 
-* Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.5.0-6
-- Bump release to rebuild with go 1.18.8
+*   Tue Nov 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.5.1-4
+-   Bump release to rebuild with go 1.18.8
 
-* Mon Aug 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.5.0-5
-- Bump release to rebuild against Go 1.18.5
+*   Mon Aug 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.5.1-3
+-   Bump release to rebuild against Go 1.18.5
 
-* Tue Jun 14 2022 Muhammad Falak <mwani@microsoft.com> - 3.5.0-4
-- Bump release to rebuild with golang 1.18.3
+*   Tue Jun 14 2022 Muhammad Falak <mwani@microsoft.com> - 3.5.1-2
+-   Bump release to rebuild with golang 1.18.3
 
-* Tue Feb 08 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 3.5.0-3
-- Remove clean section
+*   Thu Apr 21 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 3.5.1-1
+-   Upgrade to 3.5.1
+
+*   Tue Feb 08 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 3.5.0-3
+-   Remove clean section
 
 *   Wed Jan 19 2022 Henry Li <lihl@microsoft.com> - 3.5.0-2
 -   Increment release for force republishing using golang 1.16.12
