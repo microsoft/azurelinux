@@ -2,7 +2,7 @@
 Summary:        Text editor
 Name:           vim
 Version:        9.0.1897
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -197,6 +197,9 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Thu Oct 05 2023 Thien Trung Vuong <tvuong@microsoft.com> - 9.0.1897-2
+- Test bump release number
+
 * Tue Sep 12 2023 Henry Li <lihl@microsoft.com> - 9.0.1897-1
 - Upgrade version to resolve CVE-2023-4738, CVE-2023-4750, CVE-2023-4781,
   CVE-2023-4752 and CVE-2023-4733
