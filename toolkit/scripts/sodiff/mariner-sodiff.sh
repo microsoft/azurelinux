@@ -59,9 +59,11 @@ done
 2>/dev/null cat "$sodiff_out_dir"/require* | sort -u > "$sodiff_out_dir"/sodiff-intermediate-summary.txt
 
 rm "$sodiff_out_dir"/require*
+touch "$sodiff_out_dir"/sodiff-summary.txt
 
 # Remove packages that have been dash-rolled already.
 echo "$pkgs" > "$sodiff_out_dir/sodiff-built-packages.txt"
+pkgsFound=0
 for package in $( cat "$sodiff_out_dir"/sodiff-intermediate-summary.txt ); do
     # Remove version and release
     package_stem=$(echo "$package" | rev | cut -f1,2 -d'-' --complement | rev)
@@ -72,15 +74,20 @@ for package in $( cat "$sodiff_out_dir"/sodiff-intermediate-summary.txt ); do
     if [[ "$package" == "$highest_build_ver_pkg" ]]; then
         # They do not: the version is not dash-rolled - report.
         echo "$highest_build_ver_pkg" >> "$sodiff_out_dir"/sodiff-summary.txt
+        ((pkgsFound+=1))
     fi
     # else:
     # the version is higher(dash-rolled) (guaranteed as we are not releasing older packages).
 done
 
-echo ""
-echo "The Following Packages Are in Need of an Update:"
-cat "$sodiff_out_dir"/sodiff-summary.txt
-
-rm "$sodiff_out_dir"/sodiff-summary.txt
-
 rm "$sodiff_out_dir"/sodiff-built-packages.txt
+
+echo "######################"
+if [[ $pkgsFound -gt 0 ]] then
+    echo "The Following Packages Are in Need of an Update:"
+    cat "$sodiff_out_dir"/sodiff-summary.txt
+    return 1
+else
+    echo "No Packages with Conflicting .so Files Found."
+fi
+
