@@ -15,12 +15,6 @@ from spec_source_attributions import get_spec_source, KNOWN_SOURCE_ORIGINS
 # Packages with specs not present in any "SPECS*" directory, which still need to be included in the list.
 spec_exceptions = {
     "Microsoft": {
-        "kubernetes-1.18.14",
-        "kubernetes-1.18.17",
-        "kubernetes-1.19.7",
-        "kubernetes-1.19.9",
-        "kubernetes-1.20.2",
-        "kubernetes-1.20.5"
         }
     }
 
