@@ -83,7 +83,7 @@ done
 rm "$sodiff_out_dir"/sodiff-built-packages.txt
 
 echo "######################"
-if [[ $pkgsFound -gt 0 ]] then
+if [[ $pkgsFound -gt 0 ]]; then
     echo "The Following Packages Are in Need of an Update:"
     cat "$sodiff_out_dir"/sodiff-summary.txt
     return 1
