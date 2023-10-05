@@ -23,7 +23,7 @@ var (
 	outputImageFile          = app.Flag("output-image-file", "Path to write the customized image to.").Required().String()
 	outputImageFormat        = app.Flag("output-image-format", "Format of output image. Supported: vhd, vhdx, qcow2, raw.").Required().Enum("vhd", "vhdx", "qcow2", "raw")
 	configFile               = app.Flag("config-file", "Path of the image customization config file.").Required().String()
-	rpmSources               = app.Flag("rpm-source", "Path to a RPMs tarball or a directory containing RPMs.").Strings()
+	rpmSources               = app.Flag("rpm-source", "Path to a RPM repo config file or a directory containing RPMs.").Strings()
 	disableBaseImageRpmRepos = app.Flag("disable-base-image-rpm-repos", "Disable the base image's RPM repos as an RPM source").Bool()
 	logFile                  = exe.LogFileFlag(app)
 	logLevel                 = exe.LogLevelFlag(app)
