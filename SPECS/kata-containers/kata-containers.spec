@@ -299,7 +299,7 @@ ln -sf %{_bindir}/kata-runtime %{buildroot}%{_prefix}/local/bin/kata-runtime
 * Tue Sep 06 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.5.0-4
 - Set DEFSANDBOXCGROUPONLY="false".
 
-* Wed Sep 02 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.5.0-3
+* Fri Sep 02 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.5.0-3
 - Add kernel config to match guest and host cgroup setup.
 - Add patch to expose devices from kata.
 
