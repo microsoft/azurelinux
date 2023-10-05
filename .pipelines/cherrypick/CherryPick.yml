@@ -1,0 +1,41 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+name: Cherry Pick commits from PR
+
+trigger:
+- fasttrack/*
+pr: none
+
+resources:
+  repositories:
+    - repository: CBL-Mariner-Pipelines
+      type: git
+      name: mariner/CBL-Mariner-Pipelines
+      ref:
+
+parameters:
+
+variables:
+
+pool: mariner-core-x64-1es-mariner2
+
+jobs:
+- job: 'Prerequisites'
+  timeoutInMinutes: 15
+  displayName: 'Installing prerequisites'
+
+  steps:
+    - checkout: CBL-Mariner-Pipelines
+      displayName: "Check out CBL-Mariner-Pipelines"
+
+- job: 'CollectPRInformation'
+  timeoutInMinutes: 15
+  displayName: 'Collect PR information'
+
+- job: 'CherryPick'
+  dependsOn:
+    - CollectPRInformation
+  # condition: and(succeeded())
+  timeoutInMinutes: 15
+  displayName: 'Cherry pick commit'
