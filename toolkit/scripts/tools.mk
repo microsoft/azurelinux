@@ -37,6 +37,7 @@ go_tool_list = \
 	graphanalytics \
 	graphPreprocessor \
 	imageconfigvalidator \
+	imagecustomizer \
 	imagepkgfetcher \
 	imager \
 	isomaker \
