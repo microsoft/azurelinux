@@ -264,6 +264,7 @@ fi
 %changelog
 * Wdd Sep 20 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 1.28.2-1
 - Upgrade to 1.28.2
+- License verified.
 
 * Wed Jul 12 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.26.3-4
 - Force re-build by bumping release number
@@ -417,4 +418,6 @@ fi
 - Rename spec file
 
 * Wed Dec 02 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 1.19.1-1
-- Original version for CBL-Mariner of K8s 1.19.1.
+- Original version for CBL-Mariner
+
+
