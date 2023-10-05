@@ -16,7 +16,7 @@ packages and tools, to fit the requirements of your application. CBL-Mariner und
 ## Who's using CBL-Mariner today?
 
 CBL-Mariner is used internally by Microsoft and several
-derivative versions are used by various teams within Microsoft.
+derivative versions are used by various teams within Microsoft.  
 
 These include:
 
@@ -25,6 +25,8 @@ These include:
 - [AKS HCI](https://docs.microsoft.com/en-us/azure-stack/aks-hci/) - Azure
   Kubernetes Service on Azure Stack HCI - quick way to get started hosting
   Windows and Linux containers in your data center.
+
+  Customers external to Microsoft can use CBL-Mariner via [AKS as a node OS](https://aka.ms/azure-linux-docs). 
 
 ![CBL-Mariner Composition](images/MarinerComposition.png)
 
@@ -117,173 +119,7 @@ your derivative to an /etc/os-subrelease file.
 
 ### Using CBL-Mariner With AKS
 
-CBL-Mariner can be also used as an AKS container host. This is accomplished through
-a combination of az-cli and Kubernetes services.
-
-First, install kubectl through az-cli:
-
-    az aks install-cli
-
-Deploying CBL-Mariner on AKS is described in detail in the following resources:
-
-- [Microsoft Container Service: Managed Clusters](https://docs.microsoft.com/en-us/azure/templates/microsoft.containerservice/managedclusters?tabs=json)
-- [Network Policies Setup](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
-
-Below is an example of deploying AKS CBL-Mariner cluster with an ARM template:
-
-1. First, create template file named `marineraksarm.yml`:
-
-    {
-      "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-      "contentVersion": "1.0.0.1",
-      "parameters": {
-        "clusterName": {
-          "type": "string",
-          "defaultValue": "marinerakscluster",
-          "metadata": {
-            "description": "The name of the Managed Cluster resource."
-          }
-        },
-        "location": {
-          "type": "string",
-          "defaultValue": "[resourceGroup().location]",
-          "metadata": {
-            "description": "The location of the Managed Cluster resource."
-          }
-        },
-        "dnsPrefix": {
-          "type": "string",
-          "metadata": {
-            "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN."
-          }
-        },
-        "osDiskSizeGB": {
-          "type": "int",
-          "defaultValue": 0,
-          "minValue": 0,
-          "maxValue": 1023,
-          "metadata": {
-            "description": "Disk size (in GB) to provision for each of the agent pool nodes. This value ranges from 0 to 1023. Specifying 0 will apply the default disk size for that agentVMSize."
-          }
-        },
-        "agentCount": {
-          "type": "int",
-          "defaultValue": 3,
-          "minValue": 1,
-          "maxValue": 50,
-          "metadata": {
-            "description": "The number of nodes for the cluster."
-          }
-        },
-        "agentVMSize": {
-          "type": "string",
-          "defaultValue": "Standard_DS2_v2",
-          "metadata": {
-            "description": "The size of the Virtual Machine."
-          }
-        },
-        "linuxAdminUsername": {
-          "type": "string",
-          "metadata": {
-            "description": "User name for the Linux Virtual Machines."
-          }
-        },
-        "sshRSAPublicKey": {
-          "type": "string",
-          "metadata": {
-            "description": "Configure all linux machines with the SSH RSA public key string. Your key should include three parts, for example 'ssh-rsa AAAAB...snip...UcyupgH azureuser@linuxvm'"
-          }
-        },
-        "osType": {
-          "type": "string",
-          "defaultValue": "Linux",
-          "allowedValues": [
-            "Linux"
-          ],
-          "metadata": {
-            "description": "The type of operating system."
-          }
-        },
-        "osSKU": {
-          "type": "string",
-          "defaultValue": "CBLMariner",
-          "allowedValues": [
-            "CBLMariner",
-            "Ubuntu",
-          ],
-          "metadata": {
-            "description": "The Linux SKU to use."
-          }
-        }
-      },
-      "resources": [
-        {
-          "type": "Microsoft.ContainerService/managedClusters",
-          "apiVersion": "2021-03-01",
-          "name": "[parameters('clusterName')]",
-          "location": "[parameters('location')]",
-          "properties": {
-            "dnsPrefix": "[parameters('dnsPrefix')]",
-            "agentPoolProfiles": [
-              {
-                "name": "agentpool",
-                "mode": "System",
-                "osDiskSizeGB": "[parameters('osDiskSizeGB')]",
-                "count": "[parameters('agentCount')]",
-                "vmSize": "[parameters('agentVMSize')]",
-                "osType": "[parameters('osType')]",
-                "osSKU": "[parameters('osSKU')]",
-                "storageProfile": "ManagedDisks"
-              }
-            ],
-            "linuxProfile": {
-              "adminUsername": "[parameters('linuxAdminUsername')]",
-              "ssh": {
-                "publicKeys": [
-                  {
-                    "keyData": "[parameters('sshRSAPublicKey')]"
-                  }
-                ]
-              }
-            }
-          },
-          "identity": {
-              "type": "SystemAssigned"
-          }
-        }
-      ],
-      "outputs": {
-        "controlPlaneFQDN": {
-          "type": "string",
-          "value": "[reference(parameters('clusterName')).fqdn]"
-        }
-      }
-    }
-
-2. Deploying a CBL-Mariner cluster with az-cli requires the latest release of the aks-preview extension:
-
-    az extension remove --name aks-preview
-    az extension add --name aks-preview
-
-3. Once you have the latest aks-preview extension installed, you can create a CBL-Mariner cluster with the following commands:
-
-    az group create --name cblmarinertestrg --location centraluseuap
-    az deployment group create --resource-group cblmarinertestrg --template-file marineraksarm.yml --parameters clusterName=testcblmarinercluster dnsPrefix=cblmarineraks1 linuxAdminUsername=azureuser sshRSAPublicKey='<contents of your id_rsa.pub>'
-    az aks get-credentials --resource-group cblmarinertestrg --name testcblmarinercluster
-    kubectl get pods --all-namespaces
-
-4. To deploy a CBL-Mariner container, use the following set of commands:
-
-    az group create --name cblmarinertestrg --location centraluseuap
-    az aks create --name testcblmarinercluster --resource-group cblmarinertestrg --os-sku CBL-Mariner --ssh-key-value <path to id_rsa.pub>
-    az aks get-credentials --resource-group cblmarinertestrg --name testcblmarinercluster
-    kubectl get pods --all-namespaces
-
-![kubernetes pods](images/kubernetes-output.jpg)
-
-5. You may need to restart the pods in the kube-system namespace:
-
-    kubectl -n kube-system rollout restart deploy
+Instructions on how to use CBL-Mariner (Azure Linux) with AKS is available on our [public documentation](https://aka.ms/azure-linux-docs).
 
 ## System Administration
 
