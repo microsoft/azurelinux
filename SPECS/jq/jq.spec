@@ -1,7 +1,7 @@
 Summary:        jq is a lightweight and flexible command-line JSON processor.
 Name:           jq
 Version:        1.6
-Release:        2%{?dist}
+Release:        3%{?dist}
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 License:        MIT
@@ -58,6 +58,9 @@ make check
 %{_includedir}/*
 
 %changelog
+* Wed Oct 04 2023 Sam Meluch <sammeluch@microsoft.com> - 1.6-3
+- Bump version for testing
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.6-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
