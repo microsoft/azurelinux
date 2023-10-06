@@ -28,6 +28,7 @@ BuildRequires:  curl-devel
 BuildRequires:  lsof
 BuildRequires:  openssl-devel
 BuildRequires:  python3-test
+BuildRequires:  python3-pip
 %endif
 
 %description -n python3-gevent
