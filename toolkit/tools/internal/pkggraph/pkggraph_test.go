@@ -1008,6 +1008,96 @@ func TestEncodingSubGraph(t *testing.T) {
 	assert.Equal(t, len(component), len(gCopy.AllNodes()))
 }
 
+func TestHasNode(t *testing.T) {
+	g := NewPkgGraph()
+	assert.NotNil(t, g)
+	n, err := addNodeToGraphHelper(g, pkgARun)
+	assert.NotNil(t, n)
+	assert.NoError(t, err)
+
+	assert.True(t, g.HasNode(n))
+	assert.False(t, g.HasNode(pkgBRun))
+}
+
+func TestHasNodeCopyGraph(t *testing.T) {
+	g := NewPkgGraph()
+	assert.NotNil(t, g)
+	n, err := addNodeToGraphHelper(g, pkgARun)
+	assert.NotNil(t, n)
+	assert.NoError(t, err)
+
+	// A deep copy should have different objects, and should returnf alse
+	gCopy, err := g.DeepCopy()
+	assert.NoError(t, err)
+	assert.False(t, gCopy.HasNode(n))
+}
+
+func TestHasNodeCopyNode(t *testing.T) {
+	g := NewPkgGraph()
+	assert.NotNil(t, g)
+	n, err := addNodeToGraphHelper(g, pkgARun)
+	assert.NotNil(t, n)
+	assert.NoError(t, err)
+
+	// A deep copy should have different objects, and should return false
+	nCopy := n.Copy()
+	assert.False(t, g.HasNode(nCopy))
+}
+
+func TestHasNodeSubgraph(t *testing.T) {
+	g, err := buildTestGraphHelper()
+	assert.NoError(t, err)
+	assert.NotNil(t, g)
+
+	root, err := g.FindBestPkgNode(&pkgjson.PackageVer{Name: "B"})
+	assert.NoError(t, err)
+	subGraph, err := g.CreateSubGraph(root.RunNode)
+	assert.NoError(t, err)
+	assert.NotNil(t, subGraph)
+
+	getRealNode := func(t *testing.T, n *PkgNode) *PkgNode {
+		t.Helper()
+		realNode, err := g.FindExactPkgNodeFromPkg(n.VersionedPkg)
+		assert.NoError(t, err)
+		assert.NotNil(t, realNode)
+		if n.Type == TypeLocalBuild {
+			assert.NotNil(t, realNode.BuildNode)
+			return realNode.BuildNode
+		} else {
+			assert.NotNil(t, realNode.RunNode)
+			return realNode.RunNode
+		}
+	}
+
+	inSubgraph := []*PkgNode{
+		pkgBRun,
+		pkgBBuild,
+		pkgCRun,
+		pkgCBuild,
+		pkgD2Unresolved,
+		pkgD3Unresolved,
+	}
+
+	outsideSubgraph := []*PkgNode{
+		pkgARun,
+		pkgABuild,
+		pkgD1Unresolved,
+		pkgD4Unresolved,
+		pkgD5Unresolved,
+		pkgD6Unresolved,
+		pkgC2Run,
+		pkgC2Build,
+	}
+
+	for _, n := range inSubgraph {
+		assert.True(t, subGraph.HasNode(getRealNode(t, n)))
+	}
+
+	for _, n := range outsideSubgraph {
+		assert.False(t, subGraph.HasNode(getRealNode(t, n)))
+	}
+}
+
 func TestShouldSucceedMakeDAGWithGoalNode(t *testing.T) {
 	gOut, err := buildTestGraphHelper()
 	assert.NoError(t, err)

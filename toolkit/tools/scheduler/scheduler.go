@@ -530,7 +530,7 @@ func filterLowPriorityNodesAgainstGraph(pkgGraph *pkggraph.PkgGraph, graphMutex 
 
 	filteredLowPriorityNodes = make([]*pkggraph.PkgNode, 0, len(lowPriorityNodes))
 	for _, node := range lowPriorityNodes {
-		inGraph := pkgGraph.IsNodeInGraph(node)
+		inGraph := pkgGraph.HasNode(node)
 		processed := buildState.IsNodeProcessed(node)
 
 		if inGraph && !processed {

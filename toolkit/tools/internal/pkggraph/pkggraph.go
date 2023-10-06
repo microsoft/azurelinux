@@ -608,9 +608,9 @@ func (g *PkgGraph) FindBestPkgNode(pkgVer *pkgjson.PackageVer) (lookupEntry *Loo
 	return
 }
 
-// Function to check if a node object is in the current graph:
-
-func (g *PkgGraph) IsNodeInGraph(pkgNode *PkgNode) bool {
+// HasNode returns true if pkgNode points to a node that is present in the graph.
+// If the object is not the same, but the ID is the same, it will return false (i.e., the node is a copy)
+func (g *PkgGraph) HasNode(pkgNode *PkgNode) bool {
 	if pkgNode == nil {
 		return false
 	}
@@ -618,14 +618,8 @@ func (g *PkgGraph) IsNodeInGraph(pkgNode *PkgNode) bool {
 	if nodeWithSameId == nil {
 		return false
 	} else {
-		// Check if they are the same node
-		same := nodeWithSameId.(*PkgNode) == pkgNode
-		if same {
-			logger.Log.Infof("Node %s is the same as %s", pkgNode, nodeWithSameId)
-		} else {
-			logger.Log.Infof("Node %s is not the same as %s", pkgNode, nodeWithSameId)
-		}
-		return same
+		// Check if they are the same node object
+		return nodeWithSameId.(*PkgNode) == pkgNode
 	}
 }
 

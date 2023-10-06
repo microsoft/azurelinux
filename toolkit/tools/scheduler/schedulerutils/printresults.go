@@ -255,7 +255,7 @@ func getSRPMsState(fullGraph, optimizedGraph *pkggraph.PkgGraph, buildState *Gra
 
 	for _, node := range fullGraph.AllBuildNodes() {
 		// check if path was used in the optimized graph
-		nodeInOptimizedGraph := optimizedGraph.IsNodeInGraph(node)
+		nodeInOptimizedGraph := optimizedGraph.HasNode(node)
 		srpmUsed := optimizedSrpmPaths[node.SrpmPath]
 		if !nodeInOptimizedGraph {
 			if !srpmUsed && buildState.IsNodeAvailable(node) {
