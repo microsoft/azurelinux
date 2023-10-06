@@ -57,12 +57,8 @@ func (s *SystemConfig) IsValid() error {
 		}
 	}
 
-	allServices := append(s.Services.Enable, s.Services.Disable...)
-	for i, service := range allServices {
-		err = service.IsValid()
-		if err != nil {
-			return fmt.Errorf("invalid Service item at index %d: %w", i, err)
-		}
+	if err := s.Services.IsValid(); err != nil {
+		return err
 	}
 
 	return nil

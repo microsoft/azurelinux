@@ -46,17 +46,17 @@ func doCustomizations(baseConfigPath string, config *imagecustomizerapi.SystemCo
 		return err
 	}
 
+	err = enableOrDisableServices(config.Services, baseConfigPath, imageChroot)
+	if err != nil {
+		return err
+	}
+
 	err = runScripts(baseConfigPath, config.PostInstallScripts, imageChroot)
 	if err != nil {
 		return err
 	}
 
 	err = runScripts(baseConfigPath, config.FinalizeImageScripts, imageChroot)
-	if err != nil {
-		return err
-	}
-
-	err = enableOrDisableServices(config.Services, baseConfigPath, imageChroot)
 	if err != nil {
 		return err
 	}
@@ -239,7 +239,7 @@ func enableOrDisableServices(services imagecustomizerapi.Services, baseConfigPat
 		err = imageChroot.UnsafeRun(func() error {
 			err := shell.ExecuteLive(false, "systemctl", "enable", service.Name)
 			if err != nil {
-				return fmt.Errorf("failed to enable service (%s): %w", service.Name, err)
+				return fmt.Errorf("failed to enable service (%s): \n%w", service.Name, err)
 			}
 
 			return nil

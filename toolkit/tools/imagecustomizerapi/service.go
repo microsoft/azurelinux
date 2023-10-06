@@ -23,3 +23,19 @@ func (s *Service) IsValid() error {
 
 	return nil
 }
+
+func (s *Services) IsValid() error {
+	for i, service := range s.Enable {
+		if err := service.IsValid(); err != nil {
+			return fmt.Errorf("invalid Service.Enable item at index %d: %w", i, err)
+		}
+	}
+
+	for i, service := range s.Disable {
+		if err := service.IsValid(); err != nil {
+			return fmt.Errorf("invalid Service.Disable item at index %d: %w", i, err)
+		}
+	}
+
+	return nil
+}
