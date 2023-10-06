@@ -97,6 +97,7 @@ extends:
                       outputArtifactsFolder: $(ob_outputDirectory)
                       pipArtifactFeeds: "mariner/Mariner-Pypi-Feed"
                       selfRepoName: self
+                      testSuiteName: "[${{ configuration.name }}] Package test"
 
                   - task: PublishPipelineArtifact@1
                     inputs:

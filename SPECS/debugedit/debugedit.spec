@@ -1,20 +1,25 @@
-Summary:      Debugedit - obtain debug information from binaries.
-Name:         debugedit
-Version:      5.0
-Release:      2%{?dist}
-License:      GPLv3+
-URL:          https://sourceware.org/debugedit/
-Vendor:       Microsoft Corporation
-Distribution: Mariner
-Source0:      https://sourceware.org/ftp/%{name}/%{version}/%{name}-%{version}.tar.xz
+Summary:        Debugedit - obtain debug information from binaries.
+Name:           debugedit
+Version:        5.0
+Release:        3%{?dist}
+License:        GPLv3+
+URL:            https://sourceware.org/debugedit/
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+Source0:        https://sourceware.org/ftp/%{name}/%{version}/%{name}-%{version}.tar.xz
+Patch0:         BUG-28161.patch
+BuildRequires:  automake
+BuildRequires:  binutils
+BuildRequires:  help2man
 
 %description
 %{summary}
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
+autoreconf -fvvi
 %configure
 %make_build
 
@@ -22,15 +27,18 @@ Source0:      https://sourceware.org/ftp/%{name}/%{version}/%{name}-%{version}.t
 %make_install
 
 %check
-%make_build_check
+make check || { cat tests/testsuite.log; false; }
 
 %files
 %defattr(-,root,root)
-%license COPYING3
+%license COPYING COPYING3 COPYING.LIB
 %{_bindir}/*
 %{_mandir}/*/*
 
 %changelog
+* Thu Sep 21 2023 Osama Esmail <osamaesmail@microsoft.com> - 5.0-3
+- Replace make_build_check with make build_check
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.0-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
