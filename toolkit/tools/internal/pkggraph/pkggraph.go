@@ -1142,6 +1142,7 @@ func (g *PkgGraph) addGoalNodeLayers(goalNode *PkgNode, layers int) {
 
 	// Add the new edges if they are missing
 	for _, expandedNode := range expandedGoalNodes {
+		// Ensure we don't create a cycle by adding an edge from the goal node to itself
 		if expandedNode == goalNode {
 			continue
 		}
@@ -1176,8 +1177,8 @@ func (g *PkgGraph) getNextGoalLayer(expandedGoalNodesSet map[*PkgNode]bool, curr
 		// care about adding goals to run nodes. We ignore goal nodes since they should have no dependents, and may
 		// potentially pull in unrelated parts of the graph.
 		dependentNodes := graph.NodesOf(g.To(goalNode.ID()))
-		for _, dependentNeighbor := range dependentNodes {
-			dependentNode := dependentNeighbor.(*PkgNode)
+		for _, dependentNeighborGraphNode := range dependentNodes {
+			dependentNode := dependentNeighborGraphNode.(*PkgNode)
 			switch dependentNode.Type {
 			case TypeLocalRun:
 				logger.Log.Debugf("Adding '%s' to expanded goal nodes", dependentNode.FriendlyName())
