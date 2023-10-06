@@ -210,6 +210,9 @@ mv %{buildroot}%{_prefix}/src/vpx_scale %{buildroot}%{_includedir}/
 
 rm -rf %{buildroot}%{_prefix}/src
 
+%check
+make test
+
 %ldconfig_scriptlets
 
 %files
@@ -233,7 +236,8 @@ rm -rf %{buildroot}%{_prefix}/src
 
 %changelog
 * Wed Oct 04 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.13.1-1
-- Auto-upgrade to 1.13.1 - to fix CVE
+- Auto-upgrade to 1.13.1 - to fix CVE.
+- Add %check section.
 
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.8.2-4
 - Updating source URLs.
