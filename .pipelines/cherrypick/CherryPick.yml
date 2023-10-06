@@ -5,37 +5,18 @@ name: Cherry Pick commits from PR
 
 trigger:
 - fasttrack/*
+- tvuong/fasttrack/*
 pr: none
 
 resources:
   repositories:
-    - repository: CBL-Mariner-Pipelines
+    - repository: templates
       type: git
       name: mariner/CBL-Mariner-Pipelines
-      ref:
-
-parameters:
-
-variables:
-
-pool: mariner-core-x64-1es-mariner2
+      ref: refs/heads/tvuong/cherry-pick
 
 jobs:
-- job: 'Prerequisites'
-  timeoutInMinutes: 15
-  displayName: 'Installing prerequisites'
-
-  steps:
-    - checkout: CBL-Mariner-Pipelines
-      displayName: "Check out CBL-Mariner-Pipelines"
-
-- job: 'CollectPRInformation'
-  timeoutInMinutes: 15
-  displayName: 'Collect PR information'
-
-- job: 'CherryPick'
-  dependsOn:
-    - CollectPRInformation
-  # condition: and(succeeded())
-  timeoutInMinutes: 15
-  displayName: 'Cherry pick commit'
+  - template: spec-auto-patch-update/pipelines/CherryPick.yml@templates
+    parameters:
+      commitId: $(Build.SourceVersion)
+      sourceBranch: $(Build.SourceBranchName)
