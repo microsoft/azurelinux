@@ -76,6 +76,10 @@ var (
 		"arm64": "aarch64",
 	}
 
+	// checkSectionRegex is used to determine if a SPEC file has a '%check' section.
+	// It works multi-line strings containing the whole file content, thus the need for the 'm' flag.
+	checkSectionRegex = regexp.MustCompile(`(?m)^\s*%check`)
+
 	// Output from 'rpm' prints installed RPMs in a line with the following format:
 	//
 	//	D: ========== +++ [name]-[version]-[release].[distribution] [architecture]-linux [hex_value]
@@ -115,6 +119,32 @@ func SetMacroDir(newMacroDir string) (origenv []string, err error) {
 	return
 }
 
+// getCommonBuildArgs will generate arguments to pass to 'rpmbuild'.
+func getCommonBuildArgs(outArch, srpmFile string, defines map[string]string) (buildArgs []string, err error) {
+	const (
+		os          = "linux"
+		queryFormat = ""
+		vendor      = "mariner"
+	)
+
+	buildArgs = []string{"--nodeps"}
+
+	// buildArch is the arch of the build machine
+	// outArch is the arch of the machine that will run the resulting binary
+	buildArch, err := GetRpmArch(runtime.GOARCH)
+	if err != nil {
+		return
+	}
+
+	if buildArch != outArch && outArch != "noarch" {
+		tuple := outArch + "-" + vendor + "-" + os
+		logger.Log.Debugf("Applying RPM target tuple (%s)", tuple)
+		buildArgs = append(buildArgs, TargetArgument, tuple)
+	}
+
+	return formatCommandArgs(buildArgs, srpmFile, queryFormat, defines), nil
+}
+
 // sanitizeOutput will take the raw output from an RPM command and split by new line,
 // trimming whitespace and removing blank lines.
 func sanitizeOutput(rawResults string) (sanitizedOutput []string) {
@@ -135,7 +165,6 @@ func sanitizeOutput(rawResults string) (sanitizedOutput []string) {
 // formatCommand will generate an RPM command to execute.
 func formatCommandArgs(extraArgs []string, file, queryFormat string, defines map[string]string) (commandArgs []string) {
 	commandArgs = append(commandArgs, extraArgs...)
-	commandArgs = append(commandArgs, file)
 
 	if queryFormat != "" {
 		commandArgs = append(commandArgs, "--qf", queryFormat)
@@ -145,12 +174,21 @@ func formatCommandArgs(extraArgs []string, file, queryFormat string, defines map
 		commandArgs = append(commandArgs, "-D", fmt.Sprintf(`%s %s`, k, v))
 	}
 
+	commandArgs = append(commandArgs, file)
+
 	return
 }
 
 // executeRpmCommand will execute an RPM command and return its output split
 // by new line and whitespace trimmed.
 func executeRpmCommand(program string, args ...string) (results []string, err error) {
+	stdout, err := executeRpmCommandRaw(program, args...)
+
+	return sanitizeOutput(stdout), err
+}
+
+// executeRpmCommandRaw will execute an RPM command and return stdout in form of unmodified strings.
+func executeRpmCommandRaw(program string, args ...string) (stdout string, err error) {
 	stdout, stderr, err := shell.Execute(program, args...)
 	if err != nil {
 		// When dealing with a SPEC/package intended for a different architecture, explicitly set the error message
@@ -163,11 +201,8 @@ func executeRpmCommand(program string, args ...string) (results []string, err er
 		} else {
 			logger.Log.Warn(stderr)
 		}
-
-		return
 	}
 
-	results = sanitizeOutput(stdout)
 	return
 }
 
@@ -205,25 +240,12 @@ func GetInstalledPackages() (result []string, err error) {
 func QuerySPEC(specFile, sourceDir, queryFormat, arch string, defines map[string]string, extraArgs ...string) (result []string, err error) {
 	const queryArg = "-q"
 
-	var allDefines map[string]string
-
 	extraArgs = append(extraArgs, queryArg)
 
 	// Apply --target arch argument
 	extraArgs = append(extraArgs, TargetArgument, arch)
 
-	// To query some SPECs the source directory must be set
-	// since the SPEC file may use `%include` on a source file
-	if sourceDir == "" {
-		allDefines = defines
-	} else {
-		allDefines = make(map[string]string)
-		for k, v := range defines {
-			allDefines[k] = v
-		}
-
-		allDefines[SourceDirDefine] = sourceDir
-	}
+	allDefines := updateSourceDirDefines(defines, sourceDir)
 
 	args := formatCommandArgs(extraArgs, specFile, queryFormat, allDefines)
 	return executeRpmCommand(rpmSpecProgram, args...)
@@ -246,31 +268,18 @@ func QueryPackage(packageFile, queryFormat string, defines map[string]string, ex
 	return executeRpmCommand(rpmProgram, args...)
 }
 
-// BuildRPMFromSRPM builds an RPM from the given SRPM file
-func BuildRPMFromSRPM(srpmFile, outArch string, defines map[string]string, extraArgs ...string) (err error) {
-	const (
-		queryFormat  = ""
-		squashErrors = true
-		vendor       = "mariner"
-		os           = "linux"
-	)
+// BuildRPMFromSRPM builds an RPM from the given SRPM file but does not run its '%check' section.
+func BuildRPMFromSRPM(srpmFile, outArch string, defines map[string]string) (err error) {
+	const squashErrors = true
 
-	extraArgs = append(extraArgs, "--rebuild", "--nodeps")
-
-	// buildArch is the arch of the build machine
-	// outArch is the arch of the machine that will run the resulting binary
-	buildArch, err := GetRpmArch(runtime.GOARCH)
+	commonBuildArgs, err := getCommonBuildArgs(outArch, srpmFile, defines)
 	if err != nil {
 		return
 	}
 
-	if buildArch != outArch && "noarch" != outArch {
-		tuple := outArch + "-" + vendor + "-" + os
-		logger.Log.Debugf("Applying RPM target tuple (%s)", tuple)
-		extraArgs = append(extraArgs, TargetArgument, tuple)
-	}
+	args := []string{"--nocheck", "--rebuild"}
+	args = append(args, commonBuildArgs...)
 
-	args := formatCommandArgs(extraArgs, srpmFile, queryFormat, defines)
 	return shell.ExecuteLive(squashErrors, rpmBuildProgram, args...)
 }
 
@@ -431,6 +440,26 @@ func SpecArchIsCompatible(specfile, sourcedir, arch string, defines map[string]s
 	return
 }
 
+// SpecHasCheckSection verifies if the spec has the '%check' section.
+func SpecHasCheckSection(specFile, sourceDir, arch string, defines map[string]string) (hasCheckSection bool, err error) {
+	const (
+		parseSwitch = "--parse"
+		queryFormat = ""
+	)
+
+	basicArgs := []string{
+		parseSwitch,
+		TargetArgument,
+		arch,
+	}
+	allDefines := updateSourceDirDefines(defines, sourceDir)
+	args := formatCommandArgs(basicArgs, specFile, queryFormat, allDefines)
+
+	stdout, err := executeRpmCommandRaw(rpmSpecProgram, args...)
+
+	return checkSectionRegex.MatchString(stdout), err
+}
+
 // BuildCompatibleSpecsList builds a list of spec files in a directory that are compatible with the build arch. Paths
 // are relative to the 'baseDir' directory. This function should generally be used from inside a chroot to ensure the
 // correct defines are available.
@@ -448,6 +477,22 @@ func BuildCompatibleSpecsList(baseDir string, inputSpecPaths []string, defines m
 	return filterCompatibleSpecs(specPaths, defines)
 }
 
+// TestRPMFromSRPM builds an RPM from the given SRPM and runs its '%check' section SRPM file
+// but it does not generate any RPM packages.
+func TestRPMFromSRPM(srpmFile, outArch string, defines map[string]string) (err error) {
+	const squashErrors = true
+
+	commonBuildArgs, err := getCommonBuildArgs(outArch, srpmFile, defines)
+	if err != nil {
+		return
+	}
+
+	args := []string{"-ri"}
+	args = append(args, commonBuildArgs...)
+
+	return shell.ExecuteLive(squashErrors, rpmBuildProgram, args...)
+}
+
 // buildAllSpecsList builds a list of all spec files in the directory. Paths are relative to the base directory.
 func buildAllSpecsList(baseDir string) (specPaths []string, err error) {
 	specFilesGlob := filepath.Join(baseDir, "**", "*.spec")
@@ -460,7 +505,7 @@ func buildAllSpecsList(baseDir string) (specPaths []string, err error) {
 	return
 }
 
-// filterCompatibleSpecs filters a list of spec files in the chroot's SPECs directory that are compatible with the build arch. Paths
+// filterCompatibleSpecs filters a list of spec files in the chroot's SPECs directory that are compatible with the build arch.
 func filterCompatibleSpecs(inputSpecPaths []string, defines map[string]string) (filteredSpecPaths []string, err error) {
 	var specCompatible bool
 
@@ -469,18 +514,54 @@ func filterCompatibleSpecs(inputSpecPaths []string, defines map[string]string) (
 		return
 	}
 
+	type specArchResult struct {
+		compatible bool
+		path       string
+		err        error
+	}
+	resultsChannel := make(chan specArchResult, len(inputSpecPaths))
+
 	for _, specFilePath := range inputSpecPaths {
 		specDirPath := filepath.Dir(specFilePath)
 
-		specCompatible, err = SpecArchIsCompatible(specFilePath, specDirPath, buildArch, defines)
-		if err != nil {
-			logger.Log.Errorf("Failed while querrying spec (%s). Error: %v.", specFilePath, err)
+		go func(pathIter string) {
+			specCompatible, err = SpecArchIsCompatible(pathIter, specDirPath, buildArch, defines)
+			if err != nil {
+				err = fmt.Errorf("failed while querrying spec (%s). Error: %v.", pathIter, err)
+			}
+			resultsChannel <- specArchResult{
+				compatible: specCompatible,
+				path:       pathIter,
+				err:        err,
+			}
+		}(specFilePath)
+	}
+
+	for i := 0; i < len(inputSpecPaths); i++ {
+		result := <-resultsChannel
+		if result.err != nil {
+			err = result.err
 			return
 		}
-
-		if specCompatible {
-			filteredSpecPaths = append(filteredSpecPaths, specFilePath)
+		if result.compatible {
+			filteredSpecPaths = append(filteredSpecPaths, result.path)
 		}
+	}
+
+	return
+}
+
+// updateSourceDirDefines adds the source directory to the defines map if it is not empty.
+// To query some SPECs the source directory must be set
+// since the SPEC file may use `%include` on a source file.
+func updateSourceDirDefines(defines map[string]string, sourceDir string) (updatedDefines map[string]string) {
+	updatedDefines = make(map[string]string)
+	for key, value := range defines {
+		updatedDefines[key] = value
+	}
+
+	if sourceDir != "" {
+		updatedDefines[SourceDirDefine] = sourceDir
 	}
 
 	return

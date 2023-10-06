@@ -6,7 +6,7 @@ package pkggraph
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"testing"
 
@@ -98,8 +98,7 @@ func TestMain(m *testing.M) {
 
 // buildRunNode creates a new 'Run' PkgNode based on a PackageVer struct
 func buildRunNodeHelper(pkg *pkgjson.PackageVer) (node *PkgNode) {
-	var pkgCopy pkgjson.PackageVer
-	pkgCopy = *pkg
+	pkgCopy := *pkg
 	node = &PkgNode{
 		VersionedPkg: &pkgCopy,
 		State:        StateMeta,
@@ -117,8 +116,7 @@ func buildRunNodeHelper(pkg *pkgjson.PackageVer) (node *PkgNode) {
 
 // buildBuildNode creates a new 'Build' PkgNode based on a PackageVer struct
 func buildBuildNodeHelper(pkg *pkgjson.PackageVer) (node *PkgNode) {
-	var pkgCopy pkgjson.PackageVer
-	pkgCopy = *pkg
+	pkgCopy := *pkg
 	node = &PkgNode{
 		VersionedPkg: &pkgCopy,
 		State:        StateBuild,
@@ -136,8 +134,7 @@ func buildBuildNodeHelper(pkg *pkgjson.PackageVer) (node *PkgNode) {
 
 // buildBuildNode creates a new 'Unresolved' PkgNode based on a PackageVer struct
 func buildUnresolvedNodeHelper(pkg *pkgjson.PackageVer) (node *PkgNode) {
-	var pkgCopy pkgjson.PackageVer
-	pkgCopy = *pkg
+	pkgCopy := *pkg
 	node = &PkgNode{
 		VersionedPkg: &pkgCopy,
 		State:        StateUnresolved,
@@ -303,7 +300,7 @@ func TestNodeStateString(t *testing.T) {
 	var s NodeState
 	s = -1
 	assert.Panics(t, func() { _ = s.String() })
-	for s = StateUnknown + 1; s <= StateMAX; s++ {
+	for s = StateUnknown + 1; s < StateMAX; s++ {
 		assert.NotPanics(t, func() { _ = s.String() })
 	}
 }
@@ -316,10 +313,11 @@ func TestNodeTypeString(t *testing.T) {
 	assert.Equal(t, "Remote", TypeRemoteRun.String())
 	assert.Equal(t, "PureMeta", TypePureMeta.String())
 	assert.Equal(t, "PreBuilt", TypePreBuilt.String())
+	assert.Equal(t, "Test", TypeTest.String())
 	var tp NodeType
 	tp = -1
 	assert.Panics(t, func() { _ = tp.String() })
-	for tp = TypeUnknown + 1; tp <= TypeMAX; tp++ {
+	for tp = TypeUnknown + 1; tp < TypeMAX; tp++ {
 		assert.NotPanics(t, func() { _ = tp.String() })
 	}
 }
@@ -330,8 +328,8 @@ func TestDOTColor(t *testing.T) {
 		st NodeState
 		tp NodeType
 	)
-	for st = StateUnknown + 1; st <= StateMAX; st++ {
-		for tp = TypeUnknown + 1; tp <= TypeMAX; tp++ {
+	for st = StateUnknown + 1; st < StateMAX; st++ {
+		for tp = TypeUnknown + 1; tp < TypeMAX; tp++ {
 			n := PkgNode{State: st, Type: tp}
 			assert.NotPanics(t, func() { n.DOTColor() })
 			assert.True(t, len(n.DOTColor()) > 0)
@@ -350,7 +348,7 @@ func TestDOTID(t *testing.T) {
 	assert.Equal(t, "D--REMOTE<Unresolved> (ID=0,TYPE=Remote,STATE=Unresolved)", pkgD1Unresolved.DOTID())
 
 	g := NewPkgGraph()
-	goal, err := g.AddGoalNode("test", nil, false)
+	goal, err := g.AddGoalNode("test", nil, nil, false)
 	assert.NoError(t, err)
 	assert.Equal(t, "test (ID=0,TYPE=Goal,STATE=Meta)", goal.DOTID())
 
@@ -405,7 +403,7 @@ func TestAddMultipleNodes(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, len(runNodes)+len(buildNodes), len(g.AllNodes()))
-	assert.Equal(t, len(runNodes), len(g.AllRunNodes()))
+	assert.Equal(t, len(runNodes), len(g.AllPreferredRunNodes()))
 	assert.Equal(t, len(buildNodes), len(g.AllBuildNodes()))
 }
 
@@ -690,12 +688,12 @@ func TestLookupWithoutRunNodes(t *testing.T) {
 // Add a goal node
 func TestAddGoalToEmptyGraph(t *testing.T) {
 	g := NewPkgGraph()
-	goal, err := g.AddGoalNode("test", nil, false)
+	goal, err := g.AddGoalNode("test", nil, nil, false)
 	assert.NoError(t, err)
 	assert.NotNil(t, goal)
 	assert.Equal(t, "test", goal.GoalName)
 
-	goal, err = g.AddGoalNode("test2", nil, true)
+	goal, err = g.AddGoalNode("test2", nil, nil, true)
 	assert.NoError(t, err)
 	assert.NotNil(t, goal)
 	assert.Equal(t, "test2", goal.GoalName)
@@ -704,12 +702,12 @@ func TestAddGoalToEmptyGraph(t *testing.T) {
 // Make sure we can't add duplicate goal nodes
 func TestDuplicateGoal(t *testing.T) {
 	g := NewPkgGraph()
-	goal, err := g.AddGoalNode("test", nil, false)
+	goal, err := g.AddGoalNode("test", nil, nil, false)
 	assert.NoError(t, err)
 	assert.NotNil(t, goal)
 	assert.Equal(t, "test", goal.GoalName)
 
-	_, err = g.AddGoalNode("test", nil, false)
+	_, err = g.AddGoalNode("test", nil, nil, false)
 	assert.Error(t, err)
 }
 
@@ -720,7 +718,7 @@ func TestGoalWithPackages(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, g)
 
-	goal, err := g.AddGoalNode("test", pkgVersions, false)
+	goal, err := g.AddGoalNode("test", pkgVersions, nil, false)
 	assert.NoError(t, err)
 	assert.NotNil(t, goal)
 	assert.Equal(t, len(allNodes)+1, len(g.AllNodes()))
@@ -728,9 +726,9 @@ func TestGoalWithPackages(t *testing.T) {
 	assert.Equal(t, len(runNodes)+len(unresolvedNodes), len(goalNodes))
 
 	goal, err = g.AddGoalNode("test2", []*pkgjson.PackageVer{
-		&pkgjson.PackageVer{Name: "A"},
-		&pkgjson.PackageVer{Name: "B"},
-	}, false)
+		{Name: "A"},
+		{Name: "B"},
+	}, nil, false)
 	assert.NoError(t, err)
 	assert.NotNil(t, goal)
 	assert.Equal(t, len(allNodes)+2, len(g.AllNodes()))
@@ -745,7 +743,7 @@ func TestStrictGoalNodes(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, g)
 
-	_, err = g.AddGoalNode("test", []*pkgjson.PackageVer{&pkgjson.PackageVer{Name: "Not a package"}}, true)
+	_, err = g.AddGoalNode("test", []*pkgjson.PackageVer{{Name: "Not a package"}}, nil, true)
 	assert.Error(t, err)
 }
 
@@ -754,7 +752,7 @@ func TestGoalWithLevelZero(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, g)
 
-	goal, err := g.AddGoalNode("test_0", []*pkgjson.PackageVer{&pkgC}, false)
+	goal, err := g.AddGoalNode("test_0", []*pkgjson.PackageVer{&pkgC}, nil, false)
 	assert.NoError(t, err)
 	assert.NotNil(t, goal)
 	nodesInGoal := []*PkgNode{}
@@ -779,7 +777,7 @@ func TestGoalWithLevelOne(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, g)
 
-	goal, err := g.AddGoalNodeWithExtraLayers("test_1", []*pkgjson.PackageVer{&pkgC}, false, 1)
+	goal, err := g.AddGoalNodeWithExtraLayers("test_1", []*pkgjson.PackageVer{&pkgC}, nil, false, 1)
 	assert.NoError(t, err)
 	assert.NotNil(t, goal)
 	nodesInGoal := []*PkgNode{}
@@ -808,7 +806,7 @@ func TestGoalWithLevelTwo(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, g)
 
-	goal, err := g.AddGoalNodeWithExtraLayers("test_2", []*pkgjson.PackageVer{&pkgC}, false, 2)
+	goal, err := g.AddGoalNodeWithExtraLayers("test_2", []*pkgjson.PackageVer{&pkgC}, nil, false, 2)
 	assert.NoError(t, err)
 	assert.NotNil(t, goal)
 	nodesInGoal := []*PkgNode{}
@@ -930,7 +928,7 @@ func TestGoalWithLevelOneAndMeta(t *testing.T) {
 	assert.NoError(t, err)
 	meta := g.AddMetaNode([]*PkgNode{c2.RunNode}, []*PkgNode{c1.RunNode})
 
-	goal, err := g.AddGoalNodeWithExtraLayers("test_1meta", []*pkgjson.PackageVer{&pkgC}, false, 1)
+	goal, err := g.AddGoalNodeWithExtraLayers("test_1meta", []*pkgjson.PackageVer{&pkgC}, nil, false, 1)
 	assert.NoError(t, err)
 	assert.NotNil(t, goal)
 	nodesInGoal := []*PkgNode{}
@@ -967,7 +965,7 @@ func TestGoalWithMultipleGoalsAndOneExtraLayer(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, g)
 
-	goal, err := g.AddGoalNodeWithExtraLayers("test_1multi", []*pkgjson.PackageVer{&pkgC, &pkgD4}, false, 1)
+	goal, err := g.AddGoalNodeWithExtraLayers("test_1multi", []*pkgjson.PackageVer{&pkgC, &pkgD4}, nil, false, 1)
 	assert.NoError(t, err)
 	assert.NotNil(t, goal)
 	nodesInGoal := []*PkgNode{}
@@ -1091,13 +1089,15 @@ func TestReferenceDOTFile(t *testing.T) {
 	assert.NoError(t, err)
 
 	f, err := os.Open("test_graph_reference.dot")
-	defer f.Close()
+	if err == nil {
+		defer f.Close()
+	}
 	assert.NoError(t, err)
 
 	// Compare the bytes from the reference file against a fresh encoding
-	bytesFromCode, err := ioutil.ReadAll(&buf)
+	bytesFromCode, err := io.ReadAll(&buf)
 	assert.NoError(t, err)
-	bytesFromFile, err := ioutil.ReadAll(f)
+	bytesFromFile, err := io.ReadAll(f)
 	assert.NoError(t, err)
 	assert.True(t, len(bytesFromCode) > 0)
 	assert.True(t, len(bytesFromFile) > 0)
@@ -1149,6 +1149,7 @@ func TestEncodingSubGraph(t *testing.T) {
 
 	// Copy uses the encode/decode flow
 	gCopy, err := subGraph.DeepCopy()
+	assert.NoError(t, err)
 
 	component := []*PkgNode{
 		pkgCRun,
@@ -1171,7 +1172,7 @@ func TestShouldSucceedMakeDAGWithGoalNode(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, gOut)
 
-	goalNode, err := gOut.AddGoalNode("test", nil, true)
+	goalNode, err := gOut.AddGoalNode("test", nil, nil, true)
 	assert.NotNil(t, goalNode)
 	assert.NoError(t, err)
 

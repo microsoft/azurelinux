@@ -45,7 +45,7 @@ ExclusiveArch: x86_64
 
 Name:       edk2
 Version:    %{GITDATE}git%{GITCOMMIT}
-Release:    34%{?dist}
+Release:    35%{?dist}
 Summary:    UEFI firmware for 64-bit virtual machines
 License:    BSD-2-Clause-Patent and OpenSSL and MIT
 URL:        http://www.tianocore.org
@@ -515,10 +515,12 @@ done
 %endif
 
 %check
+tests_ok=true
 for file in %{buildroot}%{_datadir}/%{name}/*/*VARS.secboot.fd; do
     test -f "$file" || continue
-    virt-fw-vars --input $file --print | grep "SecureBootEnable.*ON" || exit 1
+    virt-fw-vars --input $file --print | grep "SecureBootEnable.*ON" || tests_ok=false
 done
+$tests_ok
 
 %global common_files \
   %%license License.txt License.OvmfPkg.txt License-History.txt LICENSE.openssl \
@@ -685,6 +687,9 @@ done
 
 
 %changelog
+* Tue Sep 26 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 20230301gitf80f052277c8-35
+- Removing 'exit' calls from the '%%check' section.
+
 * Wed Jun 21 2023 Vince Perri <viperri@microsoft.com> - 20230301gitf80f052277c8-34
 - Add nvram-template mapping to ovmf x64 config.
 
@@ -1102,4 +1107,3 @@ done
 
 * Thu May 2 2013 Paolo Bonzini <pbonzini@redhat.com> 20130502.g732d199-1
 - Create.
-

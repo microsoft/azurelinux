@@ -12,18 +12,6 @@ import sys
 
 from spec_source_attributions import get_spec_source, KNOWN_SOURCE_ORIGINS
 
-# Packages with specs not present in any "SPECS*" directory, which still need to be included in the list.
-spec_exceptions = {
-    "Microsoft": {
-        "kubernetes-1.18.14",
-        "kubernetes-1.18.17",
-        "kubernetes-1.19.7",
-        "kubernetes-1.19.9",
-        "kubernetes-1.20.2",
-        "kubernetes-1.20.5"
-        }
-    }
-
 # Expected Schema:
 # class LicenseCollection:
 #     header: str
@@ -91,9 +79,6 @@ def retrieve_license_info(file_paths, license_collection):
     for origin, specs_in_files_for_origin in specs_in_files.items():
         specs_not_in_json[origin] = specs_in_files_for_origin - specs_in_json[origin]
         specs_not_in_files[origin] = specs_in_json[origin] - specs_in_files_for_origin
-
-    for origin, specs_exceptions_for_origin in spec_exceptions.items():
-        specs_not_in_files[origin] -= specs_exceptions_for_origin
 
     return specs_not_in_json, specs_not_in_files, specs_unknown_distro, updated_license_collection
 

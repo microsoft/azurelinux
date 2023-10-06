@@ -229,7 +229,7 @@ func validateFQDN(fqdn string) (err error) {
 func randomHostname(prefix string) (hostname string, err error) {
 	const postfixLength = 12
 
-	postfix, err := randomization.RandomString(postfixLength, uitext.AlphaNumeric)
+	postfix, err := randomization.RandomString(postfixLength, randomization.LegalCharactersAlphaNum)
 	if err != nil {
 		return
 	}

@@ -10,6 +10,13 @@ import (
 	"strings"
 )
 
+const (
+	// LegalCharactersAlphaNum is the set of legal characters for generating random alphanumeric strings
+	LegalCharactersAlphaNum = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	// LegalCharactersHex is the set of legal characters for generating random hexadecimal strings
+	LegalCharactersHex = "0123456789abcdef"
+)
+
 // RandomString generates a random string consisting of "length" runes
 // randomly selected from the provided legalCharacters.  crypto.rand is more secure
 // than math.rand and does not need to be seeded.

@@ -21,17 +21,18 @@
 Summary:        A command line tool used for creating OCI Images
 Name:           buildah
 Version:        1.18.0
-Release:        15%{?dist}
+Release:        18%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://%{name}.io
 Source:         %{download_url}#/%{name}-%{version}.tar.gz
+Patch0:         CVE-2022-2990.patch
 BuildRequires:  btrfs-progs-devel
 BuildRequires:  device-mapper-devel
 BuildRequires:  git
 BuildRequires:  glib2-devel
-BuildRequires:  glibc-static >= 2.35-4%{?dist}
+BuildRequires:  glibc-static >= 2.35-5%{?dist}
 BuildRequires:  go-md2man
 BuildRequires:  go-rpm-macros
 BuildRequires:  golang
@@ -73,7 +74,7 @@ Requires:       podman
 This package contains system tests for %{name}
 
 %prep
-%autosetup -Sgit -n %{name}-%{built_tag_strip}
+%autosetup -Sgit -n %{name}-%{built_tag_strip} -p1
 sed -i 's/GOMD2MAN =/GOMD2MAN ?=/' docs/Makefile
 sed -i '/docs install/d' Makefile
 
@@ -122,7 +123,16 @@ cp imgtype %{buildroot}/%{_bindir}/%{name}-imgtype
 %{_datadir}/%{name}/test
 
 %changelog
-* Wed Jul 14 2023 Andrew Phelps <anphel@microsoft.com> - 1.18.0-15
+* Tue Oct 03 2023 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.18.0-18
+- Bump release to rebuild against glibc 2.35-5
+
+* Tue Sep 05 2023 Brian Fjeldstad <bfjelds@microsoft.com> - 1.18.0-17
+- Address CVE-2022-2990
+
+* Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.18.0-16
+- Bump release to rebuild with go 1.19.12
+
+* Fri Jul 14 2023 Andrew Phelps <anphel@microsoft.com> - 1.18.0-15
 - Bump release to rebuild against glibc 2.35-4
 
 * Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.18.0-14

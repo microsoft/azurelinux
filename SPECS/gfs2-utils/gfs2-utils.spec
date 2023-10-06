@@ -12,7 +12,7 @@
 Summary:        Utilities for managing the global file system (GFS2)
 Name:           gfs2-utils
 Version:        3.2.0
-Release:        10%{?dist}
+Release:        12%{?dist}
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -46,7 +46,7 @@ Recommends:     kmod(gfs2.ko)
 make %{_smp_mflags} V=1
 
 %check
-make check || { cat tests/testsuite.log; exit 1; }
+make check || { cat tests/testsuite.log; false; }
 
 %install
 make -C gfs2 install DESTDIR=%{buildroot}
@@ -78,6 +78,12 @@ modifying, and correcting inconsistencies in GFS2 file systems.
 %{_libdir}/udev/rules.d/82-gfs2-withdraw.rules
 
 %changelog
+* Tue Sep 26 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.2.0-12
+- Removing 'exit' calls from the '%%check' section.
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.2.0-11
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Fri Jun 17 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.2.0-10
 - Add upstream patch to fix -Werror=format-security errors after ncurses 6.3 upgrade
 

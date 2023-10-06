@@ -1,7 +1,7 @@
 Summary:        Commit RPMs to an OSTree repository
 Name:           rpm-ostree
 Version:        2022.1
-Release:        4%{?dist}
+Release:        6%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,7 @@ Patch0:         rpm-ostree-libdnf-build.patch
 Patch1:         rpm-ostree-disable-selinux.patch
 Patch2:         CVE-2022-31394.patch
 Patch3:         rpm-ostree-drop-lint-which-treats-warning-as-error.patch
+Patch4:         CVE-2022-47085.patch
 BuildRequires:  attr-devel
 BuildRequires:  autoconf
 BuildRequires:  autogen
@@ -156,6 +157,12 @@ make check
 %{_datadir}/gir-1.0/*-1.0.gir
 
 %changelog
+* Thu Sep 07 2023 Daniel McIlvaney <damcilva@microsoft.com> - 2022.1-6
+- Bump package to rebuild with rust 1.72.0
+
+* Tue Aug 01 2023 Sumedh Sharma <sumsharma@microsoft.com> - 2022.1-5
+- Apply patch for CVE-2022-47085
+
 * Mon Mar 20 2023 Muhammad Falak <mwani@microsoft.com> - 2022.1-4
 - Drop a lint which treats a warning as error to enable build with rust 1.68.0
 
@@ -171,7 +178,6 @@ make check
 - Remove patches that no longer apply
 - Fix rpm-ostree-disable-selinux.patch
 - Add new files to main package due to the version upgrade
-
 
 * Mon Nov 29 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 2020.4-3
 - Fix build issue due to gcc 11.2

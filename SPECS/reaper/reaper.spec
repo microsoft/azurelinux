@@ -1,28 +1,26 @@
 %global debug_package %{nil}
 
-%define srcdir cassandra-%{name}-%{version}
+%define local_n_release 1
 
+%define srcdir cassandra-%{name}-%{version}
 %define bower_components reaper-bower-components-%{version}.tar.gz
 %define srcui_node_modules reaper-srcui-node-modules-%{version}.tar.gz
 %define bower_cache reaper-bower-cache-%{version}.tar.gz
 %define maven_cache reaper-m2-cache-%{version}.tar.gz
 %define npm_cache reaper-npm-cache-%{version}.tar.gz
 %define local_lib_node_modules reaper-local-lib-node-modules-%{version}.tar.gz
-%define local_n reaper-local-n-%{version}.tar.gz
+%define local_n reaper-local-n-%{version}-%{local_n_release}.tar.gz
 
+Summary:        Reaper for cassandra is a tool for running Apache Cassandra repairs against single or multi-site clusters.
 Name:           reaper
 Version:        3.1.1
-Release:        5%{?dist}
-Summary:        Reaper for cassandra is a tool for running Apache Cassandra repairs against single or multi-site clusters.
+Release:        7%{?dist}
 License:        ASL 2.0
-Distribution:   Mariner
 Vendor:         Microsoft Corporation
+Distribution:   Mariner
 Group:          Applications/System
 URL:            https://cassandra-reaper.io/
 Source0:        https://github.com/thelastpickle/cassandra-reaper/archive/refs/tags/%{version}.tar.gz#/cassandra-reaper-%{version}.tar.gz
-# Building reaper only for x86_64 architecture for now, as build caches are x86_64 specific.
-ExclusiveArch:  x86_64
-
 # Building reaper from sources downloads artifacts related to maven/node/etc. These artifacts need to be downloaded as caches in order to build reaper using maven in offline mode.
 # Below is the list of cached sources.
 # bower-components downloaded under src/ui
@@ -42,7 +40,7 @@ Source6:        %{local_lib_node_modules}
 Source7:        %{local_n}
 Patch0:         CVE-2022-37601.patch
 Patch1:         CVE-2023-28155.patch
-
+Patch2:         CVE-2018-11694.patch
 BuildRequires:  git
 BuildRequires:  javapackages-tools
 BuildRequires:  maven
@@ -50,16 +48,19 @@ BuildRequires:  msopenjdk-11
 BuildRequires:  nodejs
 BuildRequires:  python3
 BuildRequires:  systemd-rpm-macros
+BuildRequires:  openssl-devel
 Requires:       msopenjdk-11
 Requires(pre):  %{_sbindir}/groupadd
 Requires(pre):  %{_sbindir}/useradd
 Provides:       reaper = %{version}-%{release}
+# Building reaper only for x86_64 architecture for now, as build caches are x86_64 specific.
+ExclusiveArch:  x86_64
 
 %description
 Cassandra reaper is an open source tool that aims to schedule and orchestrate repairs of Apache Cassandra clusters.
 
 %prep
-%setup -n %{srcdir}
+%setup -q -n %{srcdir}
 
 %build
 export JAVA_HOME="%{_libdir}/jvm/msopenjdk-11"
@@ -111,6 +112,7 @@ echo "Installing npm_modules"
 tar fx %{SOURCE2}
 patch -p1 --input %{PATCH0}
 patch -p1 --input %{PATCH1}
+patch -p1 --input %{PATCH2}
 popd
 
 # Building using maven in offline mode.
@@ -181,6 +183,12 @@ fi
 %{_unitdir}/cassandra-%{name}.service
 
 %changelog
+* Thu Aug 17 2023 Bala <balakumaran.kannan@microsoft.com> - 3.1.1-7
+- Make openssl as BR and remove openssl from local-n bundle to fix CVE-2023-0286
+
+* Fri Aug 04 2023 Sumedh Sharma <sumsharma@microsoft.com> - 3.1.1-6
+- Patch CVE-2018-11694 in libsass module
+
 * Thu May 25 2023 Tobias Brick <tobiasb@microsoft.com> - 3.1.1-5
 - Patch CVE-2023-28155 for request npm module
 

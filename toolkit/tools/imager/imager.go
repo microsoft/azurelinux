@@ -33,6 +33,7 @@ var (
 	assets          = app.Flag("assets", "Path to assets directory.").ExistingDir()
 	baseDirPath     = app.Flag("base-dir", "Base directory for relative file paths from the config. Defaults to config's directory.").ExistingDir()
 	outputDir       = app.Flag("output-dir", "Path to directory to place final image.").ExistingDir()
+	imgContentFile  = app.Flag("output-image-contents", "File that stores list of packages used to compose the image.").String()
 	liveInstallFlag = app.Flag("live-install", "Enable to perform a live install to the disk specified in config file.").Bool()
 	emitProgress    = app.Flag("emit-progress", "Write progress updates to stdout, such as percent complete and current action.").Bool()
 	timestampFile   = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
@@ -61,6 +62,8 @@ const (
 	// kickstartPartitionFile is the file that includes the partitioning schema used by
 	// kickstart installation
 	kickstartPartitionFile = "/tmp/part-include"
+
+	assetsMountPoint = "/installer"
 )
 
 func main() {
@@ -108,17 +111,16 @@ func main() {
 		timestamp.StopEvent(nil) // applying kickstart
 	}
 
-	err = buildSystemConfig(systemConfig, config.Disks, *outputDir, *buildDir)
+	err = buildSystemConfig(systemConfig, config.Disks, *outputDir, *buildDir, *imgContentFile)
 	logger.PanicOnError(err, "Failed to build system configuration")
 }
 
-func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configuration.Disk, outputDir, buildDir string) (err error) {
+func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configuration.Disk, outputDir, buildDir string, imgContentFile string) (err error) {
 	logger.Log.Infof("Building system configuration (%s)", systemConfig.Name)
 	timestamp.StartEvent("building system config", nil)
 	defer timestamp.StopEvent(nil)
 
 	const (
-		assetsMountPoint      = "/installer"
 		localRepoMountPoint   = "/mnt/cdrom/RPMS"
 		repoFileMountPoint    = "/etc/yum.repos.d"
 		setupRoot             = "/setuproot"
@@ -221,7 +223,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 	setupChrootDir := filepath.Join(buildDir, setupRoot)
 
 	// Create Parition to Mountpoint map
-	mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, diffDiskBuild := installutils.CreateMountPointPartitionMap(partIDToDevPathMap, partIDToFsTypeMap, systemConfig)
+	mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, diffDiskBuild := installutils.CreateMountPointPartitionMap(partIDToDevPathMap, partIDToFsTypeMap, systemConfig.PartitionSettings)
 	if diffDiskBuild {
 		timestamp.StartEvent("creating delta disk", nil)
 		mountPointToOverlayMap, err = installutils.UpdatePartitionMapWithOverlays(partIDToDevPathMap, partIDToFsTypeMap, mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, systemConfig)
@@ -263,12 +265,15 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 		timestamp.StopEvent(nil) // create offline install env
 
 		err = setupChroot.Run(func() error {
-			return buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, mountPointToOverlayMap, packagesToInstall, systemConfig, diskDevPath, isRootFS, encryptedRoot, readOnlyRoot, diffDiskBuild)
+			return buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, mountPointToOverlayMap, packagesToInstall, systemConfig, diskDevPath, isRootFS, encryptedRoot, readOnlyRoot, diffDiskBuild, imgContentFile)
 		})
 		if err != nil {
 			logger.Log.Error("Failed to build image")
 			return
 		}
+
+		// Extract image package manifest from the 'setuproot' chroot
+		setupChroot.MoveOutFile(installutils.PackageManifestRelativePath, imgContentFile)
 
 		err = cleanupExtraFilesInChroot(setupChroot)
 		if err != nil {
@@ -295,7 +300,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 			}
 		}
 	} else {
-		err = buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, mountPointToOverlayMap, packagesToInstall, systemConfig, diskDevPath, isRootFS, encryptedRoot, readOnlyRoot, diffDiskBuild)
+		err = buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, mountPointToOverlayMap, packagesToInstall, systemConfig, diskDevPath, isRootFS, encryptedRoot, readOnlyRoot, diffDiskBuild, imgContentFile)
 		if err != nil {
 			logger.Log.Error("Failed to build image")
 			return
@@ -325,10 +330,10 @@ func setupDiskEncryption(systemConfig *configuration.SystemConfig, encryptedRoot
 
 		// Copy the default keyfile into the image
 		if len(systemConfig.AdditionalFiles) == 0 {
-			systemConfig.AdditionalFiles = make(map[string]string)
+			systemConfig.AdditionalFiles = make(map[string]configuration.FileConfigList)
 		}
 
-		systemConfig.AdditionalFiles[encryptedRoot.HostKeyFile] = diskutils.DefaultKeyFilePath
+		systemConfig.AdditionalFiles[encryptedRoot.HostKeyFile] = configuration.FileConfigList{{Path: diskutils.DefaultKeyFilePath}}
 		logger.Log.Infof("Adding default key file to systemConfig additional files")
 	}
 
@@ -455,8 +460,8 @@ func fixupExtraFilesIntoChroot(installChroot *safechroot.Chroot, config *configu
 		}
 	}
 
-	fixedUpAdditionalFiles := make(map[string]string)
-	for srcFile, dstFile := range config.AdditionalFiles {
+	fixedUpAdditionalFiles := make(map[string]configuration.FileConfigList)
+	for srcFile, dstFileConfigs := range config.AdditionalFiles {
 		newFilePath := filepath.Join(additionalFilesTempDirectory, srcFile)
 
 		fileToCopy := safechroot.FileToCopy{
@@ -464,7 +469,7 @@ func fixupExtraFilesIntoChroot(installChroot *safechroot.Chroot, config *configu
 			Dest: newFilePath,
 		}
 
-		fixedUpAdditionalFiles[newFilePath] = dstFile
+		fixedUpAdditionalFiles[newFilePath] = dstFileConfigs
 		filesToCopy = append(filesToCopy, fileToCopy)
 	}
 	config.AdditionalFiles = fixedUpAdditionalFiles
@@ -518,7 +523,8 @@ func cleanupExtraFilesInChroot(chroot *safechroot.Chroot) (err error) {
 	})
 	return
 }
-func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string, mountPointToOverlayMap map[string]*installutils.Overlay, packagesToInstall []string, systemConfig configuration.SystemConfig, diskDevPath string, isRootFS bool, encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice, diffDiskBuild bool) (err error) {
+
+func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string, mountPointToOverlayMap map[string]*installutils.Overlay, packagesToInstall []string, systemConfig configuration.SystemConfig, diskDevPath string, isRootFS bool, encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice, diffDiskBuild bool, imgContentFile string) (err error) {
 	timestamp.StartEvent("building image", nil)
 	defer timestamp.StopEvent(nil)
 	const (
@@ -660,9 +666,9 @@ func configureDiskBootloader(systemConfig configuration.SystemConfig, installChr
 	var rootDevice string
 
 	// Add bootloader. Prefer a separate boot partition if one exists.
-	bootDevice, ok := installMap[bootMountPoint]
+	bootDevice, isBootPartitionSeparate := installMap[bootMountPoint]
 	bootPrefix := ""
-	if !ok {
+	if !isBootPartitionSeparate {
 		bootDevice = installMap[rootMountPoint]
 		// If we do not have a separate boot partition we will need to add a prefix to all paths used in the configs.
 		bootPrefix = "/boot"
@@ -681,7 +687,7 @@ func configureDiskBootloader(systemConfig configuration.SystemConfig, installChr
 	}
 
 	bootType := systemConfig.BootType
-	err = installutils.InstallBootloader(installChroot, systemConfig.Encryption.Enable, bootType, bootUUID, bootPrefix, diskDevPath)
+	err = installutils.InstallBootloader(installChroot, systemConfig.Encryption.Enable, bootType, bootUUID, bootPrefix, diskDevPath, assetsMountPoint)
 	if err != nil {
 		err = fmt.Errorf("failed to install bootloader: %s", err)
 		return
@@ -717,13 +723,13 @@ func configureDiskBootloader(systemConfig configuration.SystemConfig, installChr
 	}
 
 	// Grub will always use filesystem UUID, never PARTUUID or PARTLABEL
-	err = installutils.InstallGrubCfg(installChroot.RootDir(), rootDevice, bootUUID, bootPrefix, encryptedRoot, systemConfig.KernelCommandLine, readOnlyRoot)
+	err = installutils.InstallGrubCfg(installChroot.RootDir(), rootDevice, bootUUID, bootPrefix, assetsMountPoint, encryptedRoot, systemConfig.KernelCommandLine, readOnlyRoot, isBootPartitionSeparate)
 	if err != nil {
 		err = fmt.Errorf("failed to install main grub config file: %s", err)
 		return
 	}
 
-	err = installutils.InstallGrubEnv(installChroot.RootDir())
+	err = installutils.InstallGrubEnv(installChroot.RootDir(), assetsMountPoint)
 	if err != nil {
 		err = fmt.Errorf("failed to install grubenv file: %s", err)
 		return

@@ -4,8 +4,8 @@
 Summary:        Prometheus monitoring system and time series database
 Name:           prometheus
 Version:        2.37.0
-Release:        7%{?dist}
-License:        ASL 2.0
+Release:        9%{?dist}
+License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/prometheus/prometheus
@@ -25,6 +25,13 @@ Requires(pre):  %{_bindir}/systemd-sysusers
 
 %description
 The Prometheus monitoring system and time series database
+
+%package docs
+Summary:        prometheus docs
+Requires:       %{name} = %{version}-%{release}
+
+%description docs
+Documentation for prometheus.
 
 %prep
 %autosetup -p1
@@ -108,8 +115,6 @@ fi
 
 %files
 %license LICENSE NOTICE
-%doc docs CHANGELOG.md MAINTAINERS.md CODE_OF_CONDUCT.md CONTRIBUTING.md
-%doc README.md RELEASE.md documentation
 %dir %{_sysconfdir}/prometheus/
 %dir %{_sysconfdir}/prometheus/consoles
 %dir %{_sysconfdir}/prometheus/console_libraries
@@ -121,7 +126,17 @@ fi
 %{_sysusersdir}/prometheus.conf
 %attr(0755,prometheus,prometheus) %{_sharedstatedir}/prometheus
 
+%files docs
+%doc docs CHANGELOG.md MAINTAINERS.md CODE_OF_CONDUCT.md CONTRIBUTING.md
+%doc README.md RELEASE.md documentation
+
 %changelog
+* Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.37.0-9
+- Bump release to rebuild with go 1.19.12
+
+* Wed Jul 26 2023 Osama Esmail <osamaesmail@microsoft.com> - 2.37.0-8
+- Making docs a separate package
+
 * Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.37.0-7
 - Bump release to rebuild with go 1.19.11
 

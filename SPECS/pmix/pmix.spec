@@ -1,12 +1,12 @@
 Summary:        Process Management Interface Exascale (PMIx)
 Name:           pmix
-Version:        4.1.2
+Version:        4.1.3
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://pmix.org/
-Source0:        https://github.com/pmix/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.bz2
+Source0:        https://github.com/openpmix/openpmix/releases/download/v%{version}/%{name}-%{version}.tar.bz2
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  flex
@@ -58,7 +58,7 @@ based starters (e.g., mpirun).
 * pevent - inject an event into the system
 
 %prep
-%setup -q
+%autosetup -p1
 
 echo touching lexer sources to recompile them ...
 find src -name \*.l -print -exec touch --no-create {} \;
@@ -103,6 +103,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %files devel
 %{_datadir}/%{name}/*.supp
 %{_includedir}/pmix*.h
+%{_includedir}/pmix/
 %{_libdir}/libpmix.so
 %{_libdir}/pkgconfig/*.pc
 
@@ -110,6 +111,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_bindir}/*
 
 %changelog
+* Thu Sep 21 2023 Sumedh Sharma <sumsharma@microsoft.com> - 4.1.3-1
+- Bump version to address CVE-2023-41915
+
 * Thu Feb 02 2023 Riken Maharjan <rmaharjan@microsoft.com> - 4.1.2-1
 - Move from Extended to core
 - Update to 4.1.2 (from Fedora 38 (license: MIT))

@@ -824,6 +824,338 @@
                 "PR": [
                     "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/commit/a9ad05e35412cfa69ff93603500e97b7f29a90ca"
                 ]
+            },
+            "CONFIG_MELLANOX_PLATFORM": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for Mellanox DPUs",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
+                ]
+            },
+            "CONFIG_MLXREG_HOTPLUG": {
+                "value": [
+                    "m"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for Mellanox DPUs",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
+                ]
+            },
+            "CONFIG_MLXREG_IO": {
+                "value": [
+                    "m"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for Mellanox DPUs",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
+                ]
+            },
+            "CONFIG_MLXBF_TMFIFO": {
+                "value": [
+                    "m"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for Mellanox DPUs",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
+                ]
+            },
+            "CONFIG_MLXBF_BOOTCTL": {
+                "value": [
+                    "m"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for Mellanox DPUs",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
+                ]
+            },
+            "CONFIG_MLXBF_PMC": {
+                "value": [
+                    "m"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for Mellanox DPUs",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
+                ]
+            },
+            "CONFIG_MLXBF_GIGE": {
+                "value": [
+                    "m"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for Mellanox DPUs",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
+                ]
+            },
+            "CONFIG_MMC_DW": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for Mellanox DPUs",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
+                ]
+            },
+            "CONFIG_MMC_DW_PLTFM": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for Mellanox DPUs",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
+                ]
+            },
+            "CONFIG_MMC_DW_BLUEFIELD": {
+                "value": [
+                    "m"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for Mellanox DPUs",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
+                ]
+            },
+            "CONFIG_I2C_MLXBF": {
+                "value": [
+                    "m"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for Mellanox DPUs",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
+                ]
+            },
+            "CONFIG_GPIO_MLXBF2": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for Mellanox DPUs",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
+                ]
+            },
+	    "CONFIG_EDAC_BLUEFIELD": {
+                "value": [
+                    "is not set"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for Mellanox DPUs",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
+                ]
+            },
+            "CONFIG_GPIO_MLXBF": {
+                "value": [
+                    "is not set"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for Mellanox DPUs",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
+                ]
+            },
+            "CONFIG_MLX_WDT": {
+                "value": [
+                    "is not set"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for Mellanox DPUs",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
+                ]
+            },
+            "CONFIG_SENSORS_MLXREG_FAN": {
+                "value": [
+                    "is not set"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for Mellanox DPUs",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
+                ]
+            },
+            "CONFIG_ARM64_WORKAROUND_TSB_FLUSH_FAILURE": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for kernel upgrade 5.15.123.1",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5916"
+                ]
+            },
+            "CONFIG_ARM64_ERRATUM_2054223": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for kernel upgrade 5.15.123.1",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5916"
+                ]
+            },
+            "CONFIG_ARM64_ERRATUM_2067961": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for kernel upgrade 5.15.123.1",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5916"
+                ]
+            },
+            "CONFIG_CPU_SRSO": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for kernel upgrade 5.15.125.1. Enables the SRSO mitigation for speculative RAS overflow",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5964"
+                ]
+            },
+            "CONFIG_GDS_FORCE_MITIGATION": {
+                "value": [
+                    "is not set"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for kernel upgrade 5.15.125.1. Off to prevent AVX being disabled",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5964"
+                ]
+            },
+            "CONFIG_ARCH_HAS_CPU_FINALIZE_INIT": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for kernel upgrade 5.15.125.1",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5964"
+                ]
+            },
+            "CONFIG_BLK_DEV_NBD": {
+                "value": [
+                    "m"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "Add nbd module for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5972"
+                ]
+            },
+            "CONFIG_MCTP": {
+                "value": [
+                    "is not set"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "Do not enable mctp unless fix for CVE-2023-3439 is present",
+                "PR": [
+                    "https://github.com/torvalds/linux/commit/b561275d633bcd8e0e8055ab86f1a13df75a0269"
+                ]
+            },
+            "CONFIG_STX104": {
+                "value": [
+                    "is not set",
+                    "y",
+                    "m",
+                    "<missing>"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "Needed for update to 5.15.131.1",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6196"
+                ]
+            },
+            "CONFIG_NET_CLS_RSVP": {
+                "value": [
+                    "<missing>"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "Needed for update to 5.15.133.1",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6286"
+                ]
+            },
+            "CONFIG_NET_CLS_RSVP6": {
+                "value": [
+                    "<missing>"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "Needed for update to 5.15.133.1",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6286"
+                ]
             }
         }
     }

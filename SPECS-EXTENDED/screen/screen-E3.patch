@@ -1,15 +1,27 @@
-Clear scrollback buffer when locking terminal
+From 036bf692ea8c4e821a8af8bff8304e683c06ffa4 Mon Sep 17 00:00:00 2001
+From: Muhammad Falak R Wani <falakreyaz@gmail.com>
+Date: Sat, 2 Sep 2023 10:28:37 +0530
+Subject: [PATCH 3/5] Clear scrollback buffer when locking terminal
     
 Linux kernel 3.0 adds a new command to clear the scrollback buffer in
 the linux console. It's available in the ncurses terminfo entry as
 extended capability E3. This is useful to prevent an attacker to read
 content of a locked terminal via Shift-PgUp key.
 
+
+Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
+---
+ display.c | 6 ++++++
+ extern.h  | 1 +
+ screen.c  | 1 +
+ term.c    | 1 +
+ 4 files changed, 9 insertions(+)
+
 diff --git a/display.c b/display.c
-index d0ed6a4..7b534c0 100644
+index a1afbe6..1c56b3e 100644
 --- a/display.c
 +++ b/display.c
-@@ -4079,4 +4079,10 @@ char **cmdv;
+@@ -4080,4 +4080,10 @@ char **cmdv;
  
  #endif /* BLANKER_PRG */
  
@@ -33,10 +45,10 @@ index d4e57df..4564581 100644
  /* resize.c */
  extern int   ChangeWindowSize __P((struct win *, int, int, int));
 diff --git a/screen.c b/screen.c
-index 7dcb9af..c934d75 100644
+index 7653cd1..85d52ac 100644
 --- a/screen.c
 +++ b/screen.c
-@@ -1952,6 +1952,7 @@ void Detach(int mode)
+@@ -1970,6 +1970,7 @@ void Detach(int mode)
  
      case D_LOCK:
        ClearAll();
@@ -56,3 +68,6 @@ index c7a13c9..f49b3a7 100644
  
  /* initialise */
    { "is", T_STR  },
+-- 
+2.40.1
+

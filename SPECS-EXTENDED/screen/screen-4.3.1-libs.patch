@@ -1,8 +1,18 @@
+From 6ec99107916b9d7b6486ea5fadbd8071eef1388f Mon Sep 17 00:00:00 2001
+From: Muhammad Falak R Wani <falakreyaz@gmail.com>
+Date: Sat, 2 Sep 2023 10:26:24 +0530
+Subject: [PATCH 1/5] patch1
+
+Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
+---
+ configure.ac | 18 +++++-------------
+ 1 file changed, 5 insertions(+), 13 deletions(-)
+
 diff --git a/configure.ac b/configure.ac
-index c0f02df..b76c8f5 100644
+index 1a12c04..5b3a883 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -188,7 +188,8 @@ AC_EGREP_CPP(yes,
+@@ -189,7 +189,8 @@ AC_EGREP_CPP(yes,
  ], AC_NOTE(- you have a SVR4 system) AC_DEFINE(SVR4) svr4=1)
  if test -n "$svr4" ; then
  oldlibs="$LIBS"
@@ -10,17 +20,20 @@ index c0f02df..b76c8f5 100644
 +# Humm we don't actually need to link against libelf for Linux
 +LIBS="$LIBS"
  AC_CHECKING(SVR4)
- AC_TRY_LINK([#include <utmpx.h>
+ AC_TRY_LINK([
+     #include <utmpx.h>
+@@ -669,17 +670,13 @@ AC_TRY_LINK([
+     tgetent((char *)0, (char *)0);
  ],,
-@@ -626,14 +627,10 @@ dnl
- AC_CHECKING(for tgetent)
- AC_TRY_LINK(,tgetent((char *)0, (char *)0);,,
  olibs="$LIBS"
 -LIBS="-lcurses $olibs"
 -AC_CHECKING(libcurses)
 +LIBS="-ltinfo $olibs"
 +AC_CHECKING(libtinfo)
- AC_TRY_LINK(,[
+ AC_TRY_LINK([
+     #include <curses.h>
+     #include <term.h>
+ ],[
 -#ifdef __hpux
 -__sorry_hpux_libcurses_is_totally_broken_in_10_10();
 -#else
@@ -29,16 +42,16 @@ index c0f02df..b76c8f5 100644
  ],,
  LIBS="-ltermcap $olibs"
  AC_CHECKING(libtermcap)
-@@ -658,7 +655,7 @@ AC_MSG_ERROR(!!! no tgetent - no screen)))))))))
- AC_TRY_RUN([
+@@ -739,7 +736,7 @@ AC_TRY_RUN([
+ int
  main()
  {
-- exit(strcmp(tgoto("%p1%d", 0, 1), "1") ? 0 : 1);
+- return(strcmp(tgoto("%p1%d", 0, 1), "1") ? 0 : 1);
 +    return 1;
  }], AC_NOTE(- you use the termcap database),
  AC_NOTE(- you use the terminfo database) AC_DEFINE(TERMINFO),
  AC_NOTE(- skipping check because we are cross compiling; assuming terminfo database is used) AC_DEFINE(TERMINFO))
-@@ -864,11 +861,6 @@ fi
+@@ -953,11 +950,6 @@ fi
  dnl
  dnl    ****  loadav  ****
  dnl
@@ -49,4 +62,8 @@ index c0f02df..b76c8f5 100644
 -fi
  
  AC_CHECKING(getloadavg)
- AC_TRY_LINK(,[getloadavg((double *)0, 0);],
+ AC_TRY_LINK([
+-- 
+2.40.1
+
+

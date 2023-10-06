@@ -1,18 +1,21 @@
-Name:           libmicrohttpd
-Version:        0.9.71
-Release:        3%{?dist}
 Summary:        Lightweight library for embedding a webserver in applications
+Name:           libmicrohttpd
+Version:        0.9.76
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            http://www.gnu.org/software/libmicrohttpd/
+URL:            https://www.gnu.org/software/libmicrohttpd/
 Source0:        https://ftp.gnu.org/gnu/libmicrohttpd/%{name}-%{version}.tar.gz
 Patch0:         gnutls-utilize-system-crypto-policy.patch
-
-BuildRequires:  autoconf, automake, libtool, gettext-devel
-BuildRequires:  texinfo
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  doxygen
+BuildRequires:  gettext-devel
 BuildRequires:  gnutls-devel
-BuildRequires:  doxygen graphviz
+BuildRequires:  graphviz
+BuildRequires:  libtool
+BuildRequires:  texinfo
 Requires(post): info
 Requires(preun): info
 
@@ -66,7 +69,7 @@ make -C doc/doxygen full
 %install
 %make_install
 
-rm -f %{buildroot}%{_libdir}/*.la
+find %{buildroot} -type f -name "*.la" -delete -print
 rm -f %{buildroot}%{_infodir}/dir
 rm -f %{buildroot}%{_bindir}/demo
 
@@ -78,13 +81,13 @@ install -m 644 doc/examples/*.c examples
 cp -R doc/doxygen/html html
 
 %post doc
-/usr/bin/install-info %{_infodir}/libmicrohttpd.info.gz %{_infodir}/dir || :
-/usr/bin/install-info %{_infodir}/libmicrohttpd-tutorial.info.gz %{_infodir}/dir || :
+%{_bindir}/install-info %{_infodir}/libmicrohttpd.info.gz %{_infodir}/dir || :
+%{_bindir}/install-info %{_infodir}/libmicrohttpd-tutorial.info.gz %{_infodir}/dir || :
 
 %preun doc
 if [ $1 = 0 ] ; then
-/usr/bin/install-info --delete %{_infodir}/libmicrohttpd.info.gz %{_infodir}/dir || :
-/usr/bin/install-info --delete %{_infodir}/libmicrohttpd-tutorial.info.gz %{_infodir}/dir || :
+%{_bindir}/install-info --delete %{_infodir}/libmicrohttpd.info.gz %{_infodir}/dir || :
+%{_bindir}/install-info --delete %{_infodir}/libmicrohttpd-tutorial.info.gz %{_infodir}/dir || :
 fi
 
 %files
@@ -107,6 +110,11 @@ fi
 %doc html
 
 %changelog
+* Thu Sep 05 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 0.9.76-1
+- Upgrade to 0.9.76 to address CVE-2023-27371
+- Lint spec
+- License verified
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 0.9.71-3
 - Remove epoch
 
@@ -359,4 +367,3 @@ fi
 
 * Tue Aug 5 2008 Erik van Pienbroek <info@nntpgrab.nl> - 0.3.1-1
 - Initial release
-

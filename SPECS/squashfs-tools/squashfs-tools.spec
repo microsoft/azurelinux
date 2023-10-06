@@ -1,7 +1,7 @@
 Summary:        Utility for the creation of squashfs filesystems
 Name:           squashfs-tools
 Version:        4.5.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -46,6 +46,9 @@ install -m 644 %{SOURCE2} %{buildroot}%{_mandir}/man1/unsquashfs.1
 %{_sbindir}/unsquashfs
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.5.1-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Tue Apr 12 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 4.5.1-1
 - Update to version 4.5.1 to address CVE-2021-41072 and CVE-2021-40153.
 

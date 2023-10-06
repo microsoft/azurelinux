@@ -1,0 +1,14 @@
+diff -Naur cfitsio/configure cfitsio.ldflags/configure
+--- cfitsio/configure	2018-05-09 21:16:00.000000000 +0200
++++ cfitsio.ldflags/configure	2018-05-23 17:17:18.452431657 +0200
+@@ -4215,8 +4215,8 @@
+ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ ac_compiler_gnu=$ac_cv_c_compiler_gnu
+ 
+-LDFLAGS="$CFLAGS"
+-LDFLAGS_BIN="$LDFLAGS"
++# LDFLAGS="$CFLAGS"
++LDFLAGS_BIN="$CFLAGS"
+ 
+ if test "x$FC" = "xnone" ; then
+   { $as_echo "$as_me:${as_lineno-$LINENO}: cfitsio: == Fortran compiler search has been overridden" >&5

@@ -1,23 +1,22 @@
 
 # Build Requirements on `Ubuntu`
 
-## Requirements were validated on `Ubuntu 18.04`
+## Requirements were validated on `Ubuntu 22.04`
 
-This page lists host machine requirements for building with the CBL-Mariner toolkit. They cover building the toolchain, packages, and images on an Ubuntu 18.04 host.
+This page lists host machine requirements for building with the CBL-Mariner toolkit. They cover building the toolchain, packages, and images on an Ubuntu 22.04 host.
 
 ```bash
-# Add a backports repo in order to install the latest version of Go.
-sudo add-apt-repository ppa:longsleep/golang-backports
 sudo apt-get update
 
 # Install required dependencies.
 # Recommended but not required: `pigz` for faster compression operations.
 sudo apt -y install \
+    acl \
     curl \
     gawk \
     genisoimage \
     git \
-    golang-1.19-go \
+    golang-1.20-go \
     make \
     parted \
     pigz \
@@ -27,8 +26,9 @@ sudo apt -y install \
     wget \
     xfsprogs
 
-# Fix go 1.19 link
-sudo ln -vsf /usr/lib/go-1.19/bin/go /usr/bin/go
+# Fix go 1.20 link
+sudo ln -vsf /usr/lib/go-1.20/bin/go /usr/bin/go
+sudo ln -vsf /usr/lib/go-1.20/bin/gofmt /usr/bin/gofmt
 
 # Install and configure Docker.
 curl -fsSL https://get.docker.com -o get-docker.sh

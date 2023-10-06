@@ -1,7 +1,7 @@
-Summary:	    Dynamic host configuration protocol
-Name:		    dhcp
-Version:	    4.4.2
-Release:        4%{?dist}
+Summary:        Dynamic host configuration protocol
+Name:           dhcp
+Version:        4.4.2
+Release:        6%{?dist}
 License:        MPLv2.0
 Url:            https://www.isc.org/dhcp/
 Source0:        ftp://ftp.isc.org/isc/dhcp/%{version}/%{name}-%{version}.tar.gz
@@ -40,8 +40,6 @@ The ISC DHCP Client, dhclient, provides a means for configuring one or more netw
 
 %prep
 %autosetup -p1
-
-%setup -qn %{name}-%{version}
 
 %build
 CFLAGS="$CFLAGS \
@@ -172,6 +170,12 @@ mkdir -p %{buildroot}%{_localstatedir}/lib/dhclient/
 %{_mandir}/man8/dhclient.8.gz
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.4.2-6
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
+* Fri Jul 28 2023 Suresh Thelkar <sthelkar@microsoft.com> - 4.4.2-5
+- Fix a bug in applying earlier patches.
+
 * Wed Nov 10 2021 Pawel Winogrodzki <pawel.winogrodzki@microsoft.com> - 4.4.2-4
 - Modified "CFLAGS" to include CBL-Mariner defaults.
 

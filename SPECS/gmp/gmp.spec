@@ -1,7 +1,7 @@
 Summary:        Math libraries
 Name:           gmp
 Version:        6.2.1
-Release:        2%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+ AND GPLv3+ AND LGPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -32,7 +32,8 @@ cp -v configfsf.sub   config.sub
     --prefix=%{_prefix} \
     --disable-silent-rules \
     --disable-static \
-    --disable-assembly
+    --disable-assembly \
+    --enable-cxx
 make %{?_smp_mflags}
 
 %install
@@ -55,14 +56,24 @@ make %{?_smp_mflags} check
 
 %files devel
 %{_includedir}/gmp.h
+%{_includedir}/gmpxx.h
 %{_libdir}/libgmp.so
+%{_libdir}/libgmpxx.so
+%{_libdir}/libgmpxx.so.*
 %{_libdir}/pkgconfig/gmp.pc
+%{_libdir}/pkgconfig/gmpxx.pc
 %{_docdir}/%{name}-%{version}/tasks.html
 %{_docdir}/%{name}-%{version}/projects.html
 %{_docdir}/%{name}-%{version}/configuration
 %{_docdir}/%{name}-%{version}/isa_abi_headache
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 6.2.1-4
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
+* Wed Jul 26 2023 Archana Choudhary <archana1@microsoft.com> - 6.2.1-3
+- Added c++ support in gmp-devel package
+
 * Fri Nov 19 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.2.1-2
 - Adding a patch to fix CVE-2021-43618.
 - Added missing licensing information.

@@ -20,21 +20,23 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repocloner"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/randomization"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/tdnf"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/userutils"
 )
 
 const (
+	PackageManifestRelativePath = "image_pkg_manifest_installroot.json"
+
 	// NullDevice represents the /dev/null device used as a mount device for overlay images.
 	NullDevice     = "/dev/null"
 	overlay        = "overlay"
 	rootMountPoint = "/"
-	rootUser       = "root"
 
 	// rpmDependenciesDirectory is the directory which contains RPM database. It is not required for images that do not contain RPM.
 	rpmDependenciesDirectory = "/var/lib/rpm"
@@ -45,7 +47,7 @@ const (
 	// /boot directory should be only accesible by root. The directories need the execute bit as well.
 	bootDirectoryFileMode = 0400
 	bootDirectoryDirMode  = 0700
-	shadowFile            = "/etc/shadow"
+	ShadowFile            = "/etc/shadow"
 )
 
 // PackageList represents the list of packages to install into an image
@@ -77,13 +79,13 @@ func GetRequiredPackagesForInstall() []*pkgjson.PackageVer {
 // - mountPointToFsTypeMap is a map of mountpoint to filesystem type
 // - mountPointToMountArgsMap is a map of mountpoint to mount arguments to be passed on a call to mount
 // - diffDiskBuild is a flag that denotes whether this is a diffdisk build or not
-func CreateMountPointPartitionMap(partDevPathMap, partIDToFsTypeMap map[string]string, config configuration.SystemConfig) (mountPointDevPathMap, mountPointToFsTypeMap, mountPointToMountArgsMap map[string]string, diffDiskBuild bool) {
+func CreateMountPointPartitionMap(partDevPathMap, partIDToFsTypeMap map[string]string, partitionSettings []configuration.PartitionSetting) (mountPointDevPathMap, mountPointToFsTypeMap, mountPointToMountArgsMap map[string]string, diffDiskBuild bool) {
 	mountPointDevPathMap = make(map[string]string)
 	mountPointToFsTypeMap = make(map[string]string)
 	mountPointToMountArgsMap = make(map[string]string)
 
 	// Go through each PartitionSetting
-	for _, partitionSetting := range config.PartitionSettings {
+	for _, partitionSetting := range partitionSettings {
 		logger.Log.Tracef("%v[%v]", partitionSetting.ID, partitionSetting.MountPoint)
 		partDevPath, ok := partDevPathMap[partitionSetting.ID]
 		if ok {
@@ -352,7 +354,7 @@ func PackageNamesFromConfig(config configuration.Config) (packageList []*pkgjson
 		for _, pkg := range packagesToInstall {
 			var packageVer *pkgjson.PackageVer
 
-			packageVer, err = pkgjson.PackagesListEntryToPackageVer(pkg)
+			packageVer, err = pkgjson.PackageStringToPackageVer(pkg)
 			if err != nil {
 				logger.Log.Errorf("Failed to parse packages list from system config \"%s\".", systemCfg.Name)
 				return
@@ -415,7 +417,15 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 	}
 
 	// Calculate how many packages need to be installed so an accurate percent complete can be reported
-	totalPackages, err := calculateTotalPackages(packagesToInstall, installRoot)
+	installedPackages, err := calculateTotalPackages(packagesToInstall, installRoot)
+	if err != nil {
+		return
+	}
+	totalPackages := len(installedPackages.Repo)
+
+	// Write out JSON file with list of packages included in the image
+	packageManifestPath := filepath.Join("/", PackageManifestRelativePath)
+	err = jsonutils.WriteJSONFile(packageManifestPath, installedPackages)
 	if err != nil {
 		return
 	}
@@ -617,7 +627,7 @@ func configureSystemFiles(installChroot *safechroot.Chroot, hostname string, con
 	}
 
 	// Update fstab
-	err = updateFstab(installChroot.RootDir(), config, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, hidepidEnabled)
+	err = UpdateFstab(installChroot.RootDir(), config.PartitionSettings, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, hidepidEnabled)
 	if err != nil {
 		return
 	}
@@ -631,11 +641,14 @@ func configureSystemFiles(installChroot *safechroot.Chroot, hostname string, con
 	return
 }
 
-func calculateTotalPackages(packages []string, installRoot string) (totalPackages int, err error) {
+// calculateTotalPackages will simulate installing the provided list of packages in the installRoot.
+// all packages that will be installed are returned in installedPackages, and a manifest with these packages
+// is generated under build/imagegen/$config_name/image_pkg_manifest.json
+func calculateTotalPackages(packages []string, installRoot string) (installedPackages *repocloner.RepoContents, err error) {
 	var (
 		releaseverCliArg string
 	)
-	allPackageNames := make(map[string]bool)
+	installedPackages = &repocloner.RepoContents{}
 	const tdnfAssumeNoStdErr = "Error(1032) : Operation aborted.\n"
 
 	releaseverCliArg, err = tdnf.GetReleaseverCliArg()
@@ -644,6 +657,8 @@ func calculateTotalPackages(packages []string, installRoot string) (totalPackage
 	}
 
 	// For every package calculate what dependencies would also be installed from it.
+	// checkedPackageSet contains a mapping of all package IDs (name, version, etc) to avoid calculating duplicates
+	checkedPackageSet := make(map[string]bool)
 	for _, pkg := range packages {
 		var (
 			stdout string
@@ -667,39 +682,35 @@ func calculateTotalPackages(packages []string, installRoot string) (totalPackage
 		// Search for the list of packages to be installed,
 		// it will be prefixed with a line "Installing:" and will
 		// end with an empty line.
-		inPackageList := false
 		for _, line := range splitStdout {
-			const (
-				packageListPrefix    = "Installing:"
-				packageNameDelimiter = " "
-			)
-
-			const (
-				packageNameIndex      = iota
-				extraInformationIndex = iota
-				totalPackageNameParts = iota
-			)
-
-			if !inPackageList {
-				inPackageList = strings.HasPrefix(line, packageListPrefix)
+			matches := tdnf.InstallPackageRegex.FindStringSubmatch(line)
+			if len(matches) != tdnf.InstallMaxMatchLen {
+				// This line contains output other than a package information; skip it
 				continue
-			} else if strings.TrimSpace(line) == "" {
-				break
 			}
 
-			// Each package to be installed will list its name, followed by a space and then various extra information
-			pkgSplit := strings.SplitN(line, packageNameDelimiter, totalPackageNameParts)
-			if len(pkgSplit) != totalPackageNameParts {
-				err = fmt.Errorf("unexpected TDNF package name output: %s", line)
-				return
+			pkg := &repocloner.RepoPackage{
+				Name:         matches[tdnf.InstallPackageName],
+				Version:      matches[tdnf.InstallPackageVersion],
+				Architecture: matches[tdnf.InstallPackageArch],
+				Distribution: matches[tdnf.InstallPackageDist],
 			}
 
-			allPackageNames[pkgSplit[packageNameIndex]] = true
+			pkgID := pkg.ID()
+			if checkedPackageSet[pkgID] {
+				logger.Log.Tracef("Skipping duplicate package: %s", line)
+				continue
+			}
+			checkedPackageSet[pkgID] = true
+
+			logger.Log.Debugf("Added installedPackages entry for: %v", pkgID)
+
+			installedPackages.Repo = append(installedPackages.Repo, pkg)
 		}
 	}
 
-	totalPackages = len(allPackageNames)
-	logger.Log.Debugf("All packages to be installed (%d): %v", totalPackages, allPackageNames)
+	logger.Log.Debugf("Total number of packages to be installed: %d", len(installedPackages.Repo))
+
 	return
 }
 
@@ -779,7 +790,7 @@ func updateInitramfsForEncrypt(installChroot *safechroot.Chroot) (err error) {
 	return
 }
 
-func updateFstab(installRoot string, config configuration.SystemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string, hidepidEnabled bool) (err error) {
+func UpdateFstab(installRoot string, partitionSettings []configuration.PartitionSetting, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string, hidepidEnabled bool) (err error) {
 	const (
 		doPseudoFsMount = true
 	)
@@ -787,7 +798,7 @@ func updateFstab(installRoot string, config configuration.SystemConfig, installM
 
 	for mountPoint, devicePath := range installMap {
 		if mountPoint != "" && devicePath != NullDevice {
-			partSetting := config.GetMountpointPartitionSetting(mountPoint)
+			partSetting := configuration.FindMountpointPartitionSetting(partitionSettings, mountPoint)
 			if partSetting == nil {
 				err = fmt.Errorf("unable to find PartitionSetting for '%s", mountPoint)
 				return
@@ -924,13 +935,14 @@ func addEntryToCrypttab(installRoot string, devicePath string, encryptedRoot dis
 }
 
 // InstallGrubEnv installs an empty grubenv f
-func InstallGrubEnv(installRoot string) (err error) {
+func InstallGrubEnv(installRoot, assetsDir string) (err error) {
 	const (
-		assetGrubEnvFile = "/installer/grub2/grubenv"
+		assetGrubEnvFile = "grub2/grubenv"
 		grubEnvFile      = "boot/grub2/grubenv"
 	)
+	assetGrubEnvFileFullPath := filepath.Join(assetsDir, assetGrubEnvFile)
 	installGrubEnvFile := filepath.Join(installRoot, grubEnvFile)
-	err = file.CopyAndChangeMode(assetGrubEnvFile, installGrubEnvFile, bootDirectoryDirMode, bootDirectoryFileMode)
+	err = file.CopyAndChangeMode(assetGrubEnvFileFullPath, installGrubEnvFile, bootDirectoryDirMode, bootDirectoryFileMode)
 	if err != nil {
 		logger.Log.Warnf("Failed to copy and change mode of grubenv: %v", err)
 		return
@@ -943,88 +955,111 @@ func InstallGrubEnv(installRoot string) (err error) {
 // - installRoot is the base install directory
 // - rootDevice holds the root partition
 // - bootUUID is the UUID for the boot partition
+// - bootPrefix is the path to the /boot grub configs based on the mountpoints (i.e., if /boot is a separate partition from the rootfs partition, bootPrefix="").
 // - encryptedRoot holds the encrypted root information if encrypted root is enabled
 // - kernelCommandLine contains additional kernel parameters which may be optionally set
+// - readOnlyRoot holds the dm-verity read-only root partition information if dm-verity is enabled.
+// - isBootPartitionSeparate is a boolean value which is true if the /boot partition is separate from the root partition
 // Note: this boot partition could be different than the boot partition specified in the bootloader.
 // This boot partition specifically indicates where to find the kernel, config files, and initrd
-func InstallGrubCfg(installRoot, rootDevice, bootUUID, bootPrefix string, encryptedRoot diskutils.EncryptedRootDevice, kernelCommandLine configuration.KernelCommandLine, readOnlyRoot diskutils.VerityDevice) (err error) {
+func InstallGrubCfg(installRoot, rootDevice, bootUUID, bootPrefix, assetsDir string, encryptedRoot diskutils.EncryptedRootDevice, kernelCommandLine configuration.KernelCommandLine, readOnlyRoot diskutils.VerityDevice, isBootPartitionSeparate bool) (err error) {
 	const (
-		assetGrubcfgFile = "/installer/grub2/grub.cfg"
+		assetGrubcfgFile = "grub2/grub.cfg"
 		grubCfgFile      = "boot/grub2/grub.cfg"
+		assetGrubDefFile = "grub2/grub"
+		grubDefFile      = "etc/default/grub"
 	)
 
 	// Copy the bootloader's grub.cfg and set the file permission
+	assetGrubcfgFileFullPath := filepath.Join(assetsDir, assetGrubcfgFile)
 	installGrubCfgFile := filepath.Join(installRoot, grubCfgFile)
-	err = file.CopyAndChangeMode(assetGrubcfgFile, installGrubCfgFile, bootDirectoryDirMode, bootDirectoryFileMode)
+
+	assetGrubDefFileFullPath := filepath.Join(assetsDir, assetGrubDefFile)
+	installGrubDefFile := filepath.Join(installRoot, grubDefFile)
+
+	err = file.CopyAndChangeMode(assetGrubcfgFileFullPath, installGrubCfgFile, bootDirectoryDirMode, bootDirectoryFileMode)
+	if err != nil {
+		return
+	}
+	err = file.CopyAndChangeMode(assetGrubDefFileFullPath, installGrubDefFile, bootDirectoryDirMode, bootDirectoryFileMode)
 	if err != nil {
 		return
 	}
 
-	// Add in bootUUID
-	err = setGrubCfgBootUUID(bootUUID, installGrubCfgFile)
-	if err != nil {
-		logger.Log.Warnf("Failed to set bootUUID in grub.cfg: %v", err)
-		return
-	}
+	for _, installedFile := range []string{installGrubCfgFile, installGrubDefFile} {
+		// Add in bootUUID
+		err = setGrubCfgBootUUID(bootUUID, installedFile)
+		if err != nil {
+			logger.Log.Warnf("Failed to set bootUUID in grub.cfg: %v", err)
+			return
+		}
 
-	// Add in bootPrefix
-	err = setGrubCfgBootPrefix(bootPrefix, installGrubCfgFile)
-	if err != nil {
-		logger.Log.Warnf("Failed to set bootPrefix in grub.cfg: %v", err)
-		return
-	}
+		// Add in bootPrefix
+		err = setGrubCfgBootPrefix(bootPrefix, installedFile)
+		if err != nil {
+			logger.Log.Warnf("Failed to set bootPrefix in grub.cfg: %v", err)
+			return
+		}
 
-	// Add in rootDevice
-	err = setGrubCfgRootDevice(rootDevice, installGrubCfgFile, encryptedRoot.LuksUUID)
-	if err != nil {
-		logger.Log.Warnf("Failed to set rootDevice in grub.cfg: %v", err)
-		return
-	}
+		// Add in rootDevice
+		err = setGrubCfgRootDevice(rootDevice, installedFile, encryptedRoot.LuksUUID)
+		if err != nil {
+			logger.Log.Warnf("Failed to set rootDevice in grub.cfg: %v", err)
+			return
+		}
 
-	// Add in rootLuksUUID
-	err = setGrubCfgLuksUUID(installGrubCfgFile, encryptedRoot.LuksUUID)
-	if err != nil {
-		logger.Log.Warnf("Failed to set luksUUID in grub.cfg: %v", err)
-		return
-	}
+		// Add in rootLuksUUID
+		err = setGrubCfgLuksUUID(installedFile, encryptedRoot.LuksUUID)
+		if err != nil {
+			logger.Log.Warnf("Failed to set luksUUID in grub.cfg: %v", err)
+			return
+		}
 
-	// Add in logical volumes to active
-	err = setGrubCfgLVM(installGrubCfgFile, encryptedRoot.LuksUUID)
-	if err != nil {
-		logger.Log.Warnf("Failed to set lvm.lv in grub.cfg: %v", err)
-		return
-	}
+		// Add in logical volumes to active
+		err = setGrubCfgLVM(installedFile, encryptedRoot.LuksUUID)
+		if err != nil {
+			logger.Log.Warnf("Failed to set lvm.lv in grub.cfg: %v", err)
+			return
+		}
 
-	// Configure IMA policy
-	err = setGrubCfgIMA(installGrubCfgFile, kernelCommandLine)
-	if err != nil {
-		logger.Log.Warnf("Failed to set ima_policy in grub.cfg: %v", err)
-		return
-	}
+		// Configure IMA policy
+		err = setGrubCfgIMA(installedFile, kernelCommandLine)
+		if err != nil {
+			logger.Log.Warnf("Failed to set ima_policy in grub.cfg: %v", err)
+			return
+		}
 
-	err = setGrubCfgReadOnlyVerityRoot(installGrubCfgFile, readOnlyRoot)
-	if err != nil {
-		logger.Log.Warnf("Failed to set verity root in grub.cfg: %v", err)
-		return
-	}
+		err = setGrubCfgReadOnlyVerityRoot(installedFile, readOnlyRoot)
+		if err != nil {
+			logger.Log.Warnf("Failed to set verity root in grub.cfg: %v", err)
+			return
+		}
 
-	err = setGrubCfgSELinux(installGrubCfgFile, kernelCommandLine)
-	if err != nil {
-		logger.Log.Warnf("Failed to set SELinux in grub.cfg: %v", err)
-		return
-	}
+		err = setGrubCfgSELinux(installedFile, kernelCommandLine)
+		if err != nil {
+			logger.Log.Warnf("Failed to set SELinux in grub.cfg: %v", err)
+			return
+		}
 
-	err = setGrubCfgCGroup(installGrubCfgFile, kernelCommandLine)
-	if err != nil {
-		logger.Log.Warnf("Failed to set CGroup configuration in grub.cfg: %v", err)
-		return
-	}
+		// Configure FIPS
+		err = setGrubCfgFIPS(isBootPartitionSeparate, bootUUID, installedFile, kernelCommandLine)
+		if err != nil {
+			logger.Log.Warnf("Failed to set FIPS in grub.cfg: %v", err)
+			return
+		}
 
-	// Append any additional command line parameters
-	err = setGrubCfgAdditionalCmdLine(installGrubCfgFile, kernelCommandLine)
-	if err != nil {
-		logger.Log.Warnf("Failed to append extra command line parameterse in grub.cfg: %v", err)
-		return
+		err = setGrubCfgCGroup(installedFile, kernelCommandLine)
+		if err != nil {
+			logger.Log.Warnf("Failed to set CGroup configuration in grub.cfg: %v", err)
+			return
+		}
+
+		// Append any additional command line parameters
+		err = setGrubCfgAdditionalCmdLine(installedFile, kernelCommandLine)
+		if err != nil {
+			logger.Log.Warnf("Failed to append extra command line parameters in grub.cfg: %v", err)
+			return
+		}
 	}
 
 	return
@@ -1085,10 +1120,6 @@ func addGroups(installChroot *safechroot.Chroot, groups []configuration.Group) (
 }
 
 func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err error) {
-	const (
-		squashErrors = false
-	)
-
 	rootUserAdded := false
 
 	for _, user := range users {
@@ -1096,11 +1127,10 @@ func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err
 		ReportActionf("Adding user: %s", user.Name)
 
 		var (
-			homeDir string
-			isRoot  bool
+			isRoot bool
 		)
 
-		homeDir, isRoot, err = createUserWithPassword(installChroot, user)
+		isRoot, err = createUserWithPassword(installChroot, user)
 		if err != nil {
 			return
 		}
@@ -1108,17 +1138,17 @@ func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err
 			rootUserAdded = true
 		}
 
-		err = configureUserGroupMembership(installChroot, user)
+		err = ConfigureUserGroupMembership(installChroot, user.Name, user.PrimaryGroup, user.SecondaryGroups)
 		if err != nil {
 			return
 		}
 
-		err = provisionUserSSHCerts(installChroot, user, homeDir)
+		err = ProvisionUserSSHCerts(installChroot, user.Name, user.SSHPubKeyPaths)
 		if err != nil {
 			return
 		}
 
-		err = configureUserStartupCommand(installChroot, user)
+		err = ConfigureUserStartupCommand(installChroot, user.Name, user.StartupCommand)
 		if err != nil {
 			return
 		}
@@ -1129,7 +1159,7 @@ func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err
 		logger.Log.Debugf("No root user entry found in config file. Setting root password to never expire.")
 
 		// Ignore updating if there is no shadow file to update in the target image
-		installChrootShadowFile := filepath.Join(installChroot.RootDir(), shadowFile)
+		installChrootShadowFile := filepath.Join(installChroot.RootDir(), ShadowFile)
 		if exists, ferr := file.PathExists(installChrootShadowFile); ferr != nil {
 			logger.Log.Error("Error accessing shadow file.")
 			return ferr
@@ -1137,47 +1167,25 @@ func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err
 			logger.Log.Debugf("No shadow file to update. Skipping setting password to never expire.")
 			return
 		}
-		err = installChroot.UnsafeRun(func() error {
-			return chage(-1, "root")
-		})
+		err = Chage(installChroot, -1, "root")
 	}
 	return
 }
 
-func createUserWithPassword(installChroot *safechroot.Chroot, user configuration.User) (homeDir string, isRoot bool, err error) {
-	const (
-		squashErrors      = false
-		rootHomeDir       = "/root"
-		userHomeDirPrefix = "/home"
-		postfixLength     = 12
-		alphaNumeric      = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-	)
-
+func createUserWithPassword(installChroot *safechroot.Chroot, user configuration.User) (isRoot bool, err error) {
 	var (
 		hashedPassword          string
-		stdout                  string
-		stderr                  string
-		salt                    string
-		installChrootShadowFile = filepath.Join(installChroot.RootDir(), shadowFile)
+		installChrootShadowFile = filepath.Join(installChroot.RootDir(), ShadowFile)
 	)
 
 	// Get the hashed password for the user
 	if user.PasswordHashed {
 		hashedPassword = user.Password
 	} else {
-		salt, err = randomization.RandomString(postfixLength, alphaNumeric)
+		hashedPassword, err = userutils.HashPassword(user.Password)
 		if err != nil {
 			return
 		}
-		// Generate hashed password based on salt value provided.
-		// -6 option indicates to use the SHA256/SHA512 algorithm
-		stdout, stderr, err = shell.Execute("openssl", "passwd", "-6", "-salt", salt, user.Password)
-		if err != nil {
-			logger.Log.Warnf("Failed to generate hashed password")
-			logger.Log.Warn(stderr)
-			return
-		}
-		hashedPassword = strings.TrimSpace(stdout)
 	}
 	logger.Log.Tracef("hashed password: %v", hashedPassword)
 
@@ -1187,11 +1195,9 @@ func createUserWithPassword(installChroot *safechroot.Chroot, user configuration
 	}
 
 	// Create the user with the given hashed password
-	if user.Name == rootUser {
-		homeDir = rootHomeDir
-
+	if user.Name == userutils.RootUser {
 		if user.UID != "" {
-			logger.Log.Warnf("Ignoring UID for (%s) user, using default", rootUser)
+			logger.Log.Warnf("Ignoring UID for (%s) user, using default", userutils.RootUser)
 		}
 
 		if exists, ferr := file.PathExists(installChrootShadowFile); ferr != nil {
@@ -1202,7 +1208,7 @@ func createUserWithPassword(installChroot *safechroot.Chroot, user configuration
 			logger.Log.Debugf("No shadow file to update. Skipping updating user password..")
 		} else {
 			// Update shadow file
-			err = updateUserPassword(installChroot.RootDir(), user.Name, hashedPassword)
+			err = UpdateUserPassword(installChroot.RootDir(), user.Name, hashedPassword)
 			if err != nil {
 				logger.Log.Warnf("Encountered a problem when updating root user password: %s", err)
 				return
@@ -1210,20 +1216,10 @@ func createUserWithPassword(installChroot *safechroot.Chroot, user configuration
 		}
 		isRoot = true
 	} else {
-		homeDir = filepath.Join(userHomeDirPrefix, user.Name)
-
-		var args = []string{user.Name, "-m", "-p", hashedPassword}
-		if user.UID != "" {
-			args = append(args, "-u", user.UID)
+		err = userutils.AddUser(user.Name, hashedPassword, user.UID, installChroot)
+		if err != nil {
+			return
 		}
-
-		err = installChroot.UnsafeRun(func() error {
-			return shell.ExecuteLive(squashErrors, "useradd", args...)
-		})
-	}
-
-	if err != nil {
-		return
 	}
 
 	// Update password expiration
@@ -1238,9 +1234,7 @@ func createUserWithPassword(installChroot *safechroot.Chroot, user configuration
 			return
 		}
 
-		err = installChroot.UnsafeRun(func() error {
-			return chage(user.PasswordExpiresDays, user.Name)
-		})
+		err = Chage(installChroot, user.PasswordExpiresDays, user.Name)
 	}
 
 	return
@@ -1248,13 +1242,15 @@ func createUserWithPassword(installChroot *safechroot.Chroot, user configuration
 
 // chage works in the same way as invoking "chage -M passwordExpirationInDays username"
 // i.e. it sets the maximum password expiration date.
-func chage(passwordExpirationInDays int64, username string) (err error) {
+func Chage(installChroot *safechroot.Chroot, passwordExpirationInDays int64, username string) (err error) {
 	var (
 		shadow            []string
 		usernameWithColon = fmt.Sprintf("%s:", username)
 	)
 
-	shadow, err = file.ReadLines(shadowFile)
+	installChrootShadowFile := filepath.Join(installChroot.RootDir(), ShadowFile)
+
+	shadow, err = file.ReadLines(installChrootShadowFile)
 	if err != nil {
 		return
 	}
@@ -1285,7 +1281,7 @@ func chage(passwordExpirationInDays int64, username string) (err error) {
 			fields := strings.Split(entry, ":")
 			// Any value other than totalFieldsCount indicates error in parsing
 			if len(fields) != totalFieldsCount {
-				return fmt.Errorf(`invalid shadow entry "%v" for user "%s": %d fields expected, but %d found.`, fields, username, totalFieldsCount, len(fields))
+				return fmt.Errorf("invalid shadow entry (%v) for user (%s): %d fields expected, but %d found", fields, username, totalFieldsCount, len(fields))
 			}
 
 			if passwordExpirationInDays == passwordNeverExpiresValue {
@@ -1298,7 +1294,7 @@ func chage(passwordExpirationInDays int64, username string) (err error) {
 				done = true
 			} else if passwordExpirationInDays < passwordNeverExpiresValue {
 				// Values smaller than -1 make no sense
-				return fmt.Errorf(`invalid value for maximum user's "%s" password expiration:(%d); should be greater than %d`, username, passwordExpirationInDays, passwordNeverExpiresValue)
+				return fmt.Errorf("invalid value for maximum user's (%s) password expiration: %d; should be greater than %d", username, passwordExpirationInDays, passwordNeverExpiresValue)
 			} else {
 				// If passwordExpirationInDays has any other value, it's the maximum expiration date: set it accordingly
 				// To do so, we need to ensure that passwordChangedField holds a valid value and then sum it with passwordExpirationInDays.
@@ -1323,7 +1319,7 @@ func chage(passwordExpirationInDays int64, username string) (err error) {
 			if done {
 				// Create and save new shadow file including potential changes from above.
 				shadow[n] = strings.Join(fields, ":")
-				err = file.Write(strings.Join(shadow, "\n"), shadowFile)
+				err = file.Write(strings.Join(shadow, "\n"), installChrootShadowFile)
 				return
 			}
 		}
@@ -1332,13 +1328,15 @@ func chage(passwordExpirationInDays int64, username string) (err error) {
 	return fmt.Errorf(`user "%s" not found when trying to change the password expiration date`, username)
 }
 
-func configureUserGroupMembership(installChroot *safechroot.Chroot, user configuration.User) (err error) {
+func ConfigureUserGroupMembership(installChroot *safechroot.Chroot, username string, primaryGroup string,
+	secondaryGroups []string,
+) (err error) {
 	const squashErrors = false
 
 	// Update primary group
-	if user.PrimaryGroup != "" {
+	if primaryGroup != "" {
 		err = installChroot.UnsafeRun(func() error {
-			return shell.ExecuteLive(squashErrors, "usermod", "-g", user.PrimaryGroup, user.Name)
+			return shell.ExecuteLive(squashErrors, "usermod", "-g", primaryGroup, username)
 		})
 
 		if err != nil {
@@ -1347,10 +1345,10 @@ func configureUserGroupMembership(installChroot *safechroot.Chroot, user configu
 	}
 
 	// Update secondary groups
-	if len(user.SecondaryGroups) != 0 {
-		allGroups := strings.Join(user.SecondaryGroups, ",")
+	if len(secondaryGroups) != 0 {
+		allGroups := strings.Join(secondaryGroups, ",")
 		err = installChroot.UnsafeRun(func() error {
-			return shell.ExecuteLive(squashErrors, "usermod", "-a", "-G", allGroups, user.Name)
+			return shell.ExecuteLive(squashErrors, "usermod", "-a", "-G", allGroups, username)
 		})
 
 		if err != nil {
@@ -1361,30 +1359,31 @@ func configureUserGroupMembership(installChroot *safechroot.Chroot, user configu
 	return
 }
 
-func configureUserStartupCommand(installChroot *safechroot.Chroot, user configuration.User) (err error) {
+func ConfigureUserStartupCommand(installChroot *safechroot.Chroot, username string, startupCommand string) (err error) {
 	const (
 		passwdFilePath = "etc/passwd"
 		sedDelimiter   = "|"
 	)
 
-	if user.StartupCommand == "" {
+	if startupCommand == "" {
 		return
 	}
 
-	logger.Log.Debugf("Updating user '%s' startup command to '%s'.", user.Name, user.StartupCommand)
+	logger.Log.Debugf("Updating user '%s' startup command to '%s'.", username, startupCommand)
 
-	findPattern := fmt.Sprintf(`^\(%s.*\):[^:]*$`, user.Name)
-	replacePattern := fmt.Sprintf(`\1:%s`, user.StartupCommand)
+	findPattern := fmt.Sprintf(`^\(%s.*\):[^:]*$`, username)
+	replacePattern := fmt.Sprintf(`\1:%s`, startupCommand)
 	filePath := filepath.Join(installChroot.RootDir(), passwdFilePath)
 	err = sed(findPattern, replacePattern, sedDelimiter, filePath)
 	if err != nil {
-		logger.Log.Errorf("Failed to update user's startup command.")
+		err = fmt.Errorf("failed to update user's (%s) startup command (%s):\n%w", username, startupCommand, err)
 		return
 	}
+
 	return
 }
 
-func provisionUserSSHCerts(installChroot *safechroot.Chroot, user configuration.User, homeDir string) (err error) {
+func ProvisionUserSSHCerts(installChroot *safechroot.Chroot, username string, sshPubKeyPaths []string) (err error) {
 	var (
 		pubKeyData []string
 		exists     bool
@@ -1396,10 +1395,11 @@ func provisionUserSSHCerts(installChroot *safechroot.Chroot, user configuration.
 
 	// Skip user SSH directory generation when not provided with public keys
 	// Let SSH handle the creation of this folder on its first use
-	if len(user.SSHPubKeyPaths) == 0 {
+	if len(sshPubKeyPaths) == 0 {
 		return
 	}
 
+	homeDir := userutils.UserHomeDirectory(username)
 	userSSHKeyDir := filepath.Join(homeDir, ".ssh")
 	authorizedKeysFile := filepath.Join(userSSHKeyDir, "authorized_keys")
 
@@ -1424,8 +1424,8 @@ func provisionUserSSHCerts(installChroot *safechroot.Chroot, user configuration.
 	}
 	defer os.Remove(authorizedKeysTempFile)
 
-	for _, pubKey := range user.SSHPubKeyPaths {
-		logger.Log.Infof("Adding ssh key (%s) to user (%s)", filepath.Base(pubKey), user.Name)
+	for _, pubKey := range sshPubKeyPaths {
+		logger.Log.Infof("Adding ssh key (%s) to user (%s)", filepath.Base(pubKey), username)
 		relativeDst := filepath.Join(userSSHKeyDir, filepath.Base(pubKey))
 
 		fileToCopy := safechroot.FileToCopy{
@@ -1438,7 +1438,7 @@ func provisionUserSSHCerts(installChroot *safechroot.Chroot, user configuration.
 			return
 		}
 
-		logger.Log.Infof("Adding ssh key (%s) to user (%s) .ssh/authorized_users", filepath.Base(pubKey), user.Name)
+		logger.Log.Infof("Adding ssh key (%s) to user (%s) .ssh/authorized_users", filepath.Base(pubKey), username)
 		pubKeyData, err = file.ReadLines(pubKey)
 		if err != nil {
 			logger.Log.Warnf("Failed to read from SSHPubKey : %v", err)
@@ -1469,16 +1469,16 @@ func provisionUserSSHCerts(installChroot *safechroot.Chroot, user configuration.
 	// Change ownership of the folder to belong to the user and their primary group
 	err = installChroot.UnsafeRun(func() (err error) {
 		// Find the primary group of the user
-		stdout, stderr, err := shell.Execute("id", "-g", user.Name)
+		stdout, stderr, err := shell.Execute("id", "-g", username)
 		if err != nil {
 			logger.Log.Warnf(stderr)
 			return
 		}
 
 		primaryGroup := strings.TrimSpace(stdout)
-		logger.Log.Debugf("Primary group for user (%s) is (%s)", user.Name, primaryGroup)
+		logger.Log.Debugf("Primary group for user (%s) is (%s)", username, primaryGroup)
 
-		ownership := fmt.Sprintf("%s:%s", user.Name, primaryGroup)
+		ownership := fmt.Sprintf("%s:%s", username, primaryGroup)
 		err = shell.ExecuteLive(squashErrors, "chown", "-R", ownership, userSSHKeyDir)
 		if err != nil {
 			return
@@ -1495,15 +1495,16 @@ func provisionUserSSHCerts(installChroot *safechroot.Chroot, user configuration.
 	return
 }
 
-func updateUserPassword(installRoot, username, password string) (err error) {
+func UpdateUserPassword(installRoot, username, hashedPassword string) (err error) {
 	const sedDelimiter = "|"
 
 	findPattern := fmt.Sprintf("%v:x:", username)
-	replacePattern := fmt.Sprintf("%v:%v:", username, password)
-	filePath := filepath.Join(installRoot, shadowFile)
+	replacePattern := fmt.Sprintf("%v:%v:", username, hashedPassword)
+	filePath := filepath.Join(installRoot, ShadowFile)
+
 	err = sed(findPattern, replacePattern, sedDelimiter, filePath)
 	if err != nil {
-		logger.Log.Warnf("Failed to write hashed password to shadow file")
+		err = fmt.Errorf("failed to write (%s) hashed password to shadow file (%s):\n%w", username, filePath, err)
 		return
 	}
 	return
@@ -1638,7 +1639,7 @@ func getPackagesFromJSON(file string) (pkgList PackageList, err error) {
 // - bootUUID is the UUID of the boot partition
 // Note: this boot partition could be different than the boot partition specified in the main grub config.
 // This boot partition specifically indicates where to find the main grub cfg
-func InstallBootloader(installChroot *safechroot.Chroot, encryptEnabled bool, bootType, bootUUID, bootPrefix, bootDevPath string) (err error) {
+func InstallBootloader(installChroot *safechroot.Chroot, encryptEnabled bool, bootType, bootUUID, bootPrefix, bootDevPath, assetsDir string) (err error) {
 	const (
 		efiMountPoint  = "/boot/efi"
 		efiBootType    = "efi"
@@ -1656,7 +1657,7 @@ func InstallBootloader(installChroot *safechroot.Chroot, encryptEnabled bool, bo
 		}
 	case efiBootType:
 		efiPath := filepath.Join(installChroot.RootDir(), efiMountPoint)
-		err = installEfiBootloader(encryptEnabled, efiPath, bootUUID, bootPrefix)
+		err = installEfiBootloader(encryptEnabled, efiPath, bootUUID, bootPrefix, assetsDir)
 		if err != nil {
 			return
 		}
@@ -1791,18 +1792,18 @@ func enableCryptoDisk() (err error) {
 // installRoot/boot/efi folder
 // It is expected that shim (bootx64.efi) and grub2 (grub2.efi) are installed
 // into the EFI directory via the package list installation mechanism.
-func installEfiBootloader(encryptEnabled bool, installRoot, bootUUID, bootPrefix string) (err error) {
+func installEfiBootloader(encryptEnabled bool, installRoot, bootUUID, bootPrefix, assetsDir string) (err error) {
 	const (
 		defaultCfgFilename = "grub.cfg"
 		encryptCfgFilename = "grubEncrypt.cfg"
-		grubAssetDir       = "/installer/efi/grub"
+		grubAssetDir       = "efi/grub"
 		grubFinalDir       = "boot/grub2"
 	)
 
 	// Copy the bootloader's grub.cfg
-	grubAssetPath := filepath.Join(grubAssetDir, defaultCfgFilename)
+	grubAssetPath := filepath.Join(assetsDir, grubAssetDir, defaultCfgFilename)
 	if encryptEnabled {
-		grubAssetPath = filepath.Join(grubAssetDir, encryptCfgFilename)
+		grubAssetPath = filepath.Join(assetsDir, grubAssetDir, encryptCfgFilename)
 	}
 	grubFinalPath := filepath.Join(installRoot, grubFinalDir, defaultCfgFilename)
 	err = file.CopyAndChangeMode(grubAssetPath, grubFinalPath, bootDirectoryDirMode, bootDirectoryFileMode)
@@ -1838,19 +1839,26 @@ func installEfiBootloader(encryptEnabled bool, installRoot, bootUUID, bootPrefix
 }
 
 func copyAdditionalFiles(installChroot *safechroot.Chroot, config configuration.SystemConfig) (err error) {
+	return copyAdditionalFilesHelper(installChroot, config.AdditionalFiles)
+}
+
+func copyAdditionalFilesHelper(installChroot *safechroot.Chroot, additionalFiles map[string]configuration.FileConfigList) (err error) {
 	ReportAction("Copying additional files")
 	timestamp.StartEvent("Copying additional files", nil)
 	defer timestamp.StopEvent(nil)
 
-	for srcFile, dstFile := range config.AdditionalFiles {
-		fileToCopy := safechroot.FileToCopy{
-			Src:  srcFile,
-			Dest: dstFile,
-		}
+	for srcFile, dstFileConfigs := range additionalFiles {
+		for _, dstFileConfig := range dstFileConfigs {
+			fileToCopy := safechroot.FileToCopy{
+				Src:         srcFile,
+				Dest:        dstFileConfig.Path,
+				Permissions: (*os.FileMode)(dstFileConfig.Permissions),
+			}
 
-		err = installChroot.AddFiles(fileToCopy)
-		if err != nil {
-			return
+			err = installChroot.AddFiles(fileToCopy)
+			if err != nil {
+				return
+			}
 		}
 	}
 
@@ -2029,6 +2037,33 @@ func setGrubCfgSELinux(grubPath string, kernelCommandline configuration.KernelCo
 		logger.Log.Warnf("Failed to set grub.cfg's SELinux setting: %v", err)
 	}
 
+	return
+}
+
+func setGrubCfgFIPS(isBootPartitionSeparate bool, bootUUID, grubPath string, kernelCommandline configuration.KernelCommandLine) (err error) {
+	const (
+		enableFIPSPattern = "{{.FIPS}}"
+		enableFIPS        = "fips=1"
+		bootPrefix        = "boot="
+		uuidPrefix        = "UUID="
+	)
+
+	// If EnableFIPS is set, always add "fips=1" to the kernel cmdline.
+	// If /boot is a dedicated partition from the root partition, add "boot=UUID=<bootUUID value>" as well to the kernel cmdline in grub.cfg.
+	// This second step is required for fips boot-time self tests to find the kernel's .hmac file in the /boot partition.
+	fipsKernelArgument := ""
+	if kernelCommandline.EnableFIPS {
+		fipsKernelArgument = fmt.Sprintf("%s", enableFIPS)
+		if isBootPartitionSeparate {
+			fipsKernelArgument = fmt.Sprintf("%s %s%s%s", fipsKernelArgument, bootPrefix, uuidPrefix, bootUUID)
+		}
+	}
+
+	logger.Log.Debugf("Adding EnableFIPS('%s') to '%s'", fipsKernelArgument, grubPath)
+	err = sed(enableFIPSPattern, fipsKernelArgument, kernelCommandline.GetSedDelimeter(), grubPath)
+	if err != nil {
+		logger.Log.Warnf("Failed to set grub.cfg's EnableFIPS setting: %v", err)
+	}
 	return
 }
 

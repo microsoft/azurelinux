@@ -8,8 +8,10 @@ import (
 	"crypto/sha1"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 
@@ -127,6 +129,25 @@ func Write(data string, dst string) (err error) {
 	return
 }
 
+// WriteLines writes each string to the same file, separated by lineSeparator (e.g. "\n").
+func WriteLines(dataLines []string, destinationPath string) (err error) {
+	logger.Log.Debugf("Writing to (%s)", destinationPath)
+
+	dstFile, err := os.Create(destinationPath)
+	if err != nil {
+		return
+	}
+	defer dstFile.Close()
+
+	for _, line := range dataLines {
+		_, err = fmt.Fprintln(dstFile, line)
+		if err != nil {
+			return
+		}
+	}
+	return
+}
+
 // Append appends a string to the end of file dst.
 func Append(data string, dst string) (err error) {
 	logger.Log.Debugf("Appending to file (%s): (%s)", dst, data)
@@ -138,6 +159,15 @@ func Append(data string, dst string) (err error) {
 	defer dstFile.Close()
 
 	_, err = dstFile.WriteString(data)
+	return
+}
+
+// RemoveFileIfExists will delete a file if it exists on disk.
+func RemoveFileIfExists(path string) (err error) {
+	removeErr := os.Remove(path)
+	if removeErr != nil && !errors.Is(removeErr, fs.ErrNotExist) {
+		err = fmt.Errorf("failed to remove file (%s):\n%w", path, err)
+	}
 	return
 }
 

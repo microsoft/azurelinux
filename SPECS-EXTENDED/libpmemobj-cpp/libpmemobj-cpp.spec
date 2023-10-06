@@ -5,7 +5,7 @@ Distribution:   Mariner
 
 Name:		libpmemobj-cpp
 Version:	1.9
-Release:	2%{?dist}
+Release:	4%{?dist}
 Summary:	C++ bindings for libpmemobj
 # Note: tests/external/libcxx is dual licensed using University of Illinois "BSD-Like" license and the MIT license. It's used only during development/testing and is NOT part of the binary RPM.
 License:	BSD
@@ -22,14 +22,17 @@ BuildRequires:	doxygen
 BuildRequires:	perl-Encode
 BuildRequires:	gdb
 
-# optional dependencies, used only in tests
-%if %{with_check}
-BuildRequires:	ncurses-devel
-BuildRequires:	libunwind-devel
-BuildRequires:	valgrind-devel
-BuildRequires:	tbb-devel
-BuildRequires:	SFML-devel
-%endif
+# Test dependencies break the package build.
+# Disabling until fixed.
+# %if %{with_check}
+# BuildRequires:	ncurses-devel
+# BuildRequires:	libunwind-devel
+# BuildRequires:	valgrind-devel
+# BuildRequires:	tbb-devel
+
+# Missing test dependencies:
+# BuildRequires:	SFML-devel
+# %endif
 
 # There's nothing x86-64 specific in this package, but we have
 # to duplicate what spec for pmdk/libpmemobj has at the moment.
@@ -116,6 +119,13 @@ cd build
 ctest -V %{?_smp_mflags} -E concurrent_hash_map_rehash_0_helgrind -E concurrent_hash_map_insert_lookup_0_helgrind
 
 %changelog
+* Fri Sep 01 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9-4
+- Disabling test dependencies due to build failures.
+
+* Thu Aug 31 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9-3
+- Disabling missing test dependency.
+- License verified.
+
 * Wed Jun 23 2021 Thomas Crain <thcrain@microsoft.com> - 1.9-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Conditionally require check dependencies at build time

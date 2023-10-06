@@ -1,7 +1,7 @@
 Summary:        Programs for finding and viewing man pages
 Name:           man-db
 Version:        2.10.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 URL:            https://nongnu.org/man-db
 Group:          Applications/System
@@ -81,6 +81,9 @@ fi
 %{_libdir}/tmpfiles.d/man-db.conf
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.10.1-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Thu Feb 10 2022 Max Brodeur-Urbas <maxbr@microsoft.com> 2.10.1-1
 - Upgrading to v2.10.1
 - Correcting COPYING path in file section.

@@ -95,7 +95,6 @@ func (v *VerityDevice) AddRootVerityFilesToInitramfs(workingFolder, initramfsPat
 
 func (v *VerityDevice) createVerityDisk(verityDirectory string) (err error) {
 	const (
-		hexChars   = "0123456789abcdef"
 		saltLength = 64
 		hashAlg    = "sha256"
 	)
@@ -120,7 +119,7 @@ func (v *VerityDevice) createVerityDisk(verityDirectory string) (err error) {
 	}
 	defer rootHashFile.Close()
 
-	salt, err := randomization.RandomString(64, hexChars)
+	salt, err := randomization.RandomString(64, randomization.LegalCharactersHex)
 	if err != nil {
 		return
 	}

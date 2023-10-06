@@ -1,7 +1,7 @@
 Summary:        One-time password components
 Name:           oath-toolkit
 Version:        2.6.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+ and LGPLv2+
 URL:            https://www.nongnu.org/oath-toolkit/
 Vendor:         Microsoft Corporation
@@ -186,6 +186,9 @@ mkdir -p -m 0600 %{buildroot}%{_sysconfdir}/liboath
 %{_libdir}/security/pam_oath.so
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.6.7-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Fri Feb 18 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.6.7-1
 - Upgrading to v2.6.7
 

@@ -1,7 +1,7 @@
 Summary:        Utilities for loading kernel modules
 Name:           kmod
 Version:        29
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2.1+ AND GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -66,6 +66,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/*.so
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 29-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Mon Dec 27 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 29-1
 - Updated to version 29
 - Verified license.

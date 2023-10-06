@@ -39,9 +39,25 @@ type SystemBlockDevice struct {
 	Model       string // Example: Virtual Disk
 }
 
+type partitionInfoOutput struct {
+	Devices []PartitionInfo `json:"blockdevices"`
+}
+
+type PartitionInfo struct {
+	Name              string `json:"name"`       // Example: nbd0p1
+	Path              string `json:"path"`       // Example: /dev/nbd0p1
+	PartitionTypeUuid string `json:"parttype"`   // Example: c12a7328-f81f-11d2-ba4b-00a0c93ec93b
+	FileSystemType    string `json:"fstype"`     // Example: vfat
+	Uuid              string `json:"uuid"`       // Example: 4BD9-3A78
+	PartUuid          string `json:"partuuid"`   // Example: 7b1367a6-5845-43f2-99b1-a742d873f590
+	Mountpoint        string `json:"mountpoint"` // Example: /mnt/os/boot
+}
+
 const (
 	// AutoEndSize is used as the disk's "End" value to indicate it should be picked automatically
 	AutoEndSize = 0
+
+	EfiSystemPartitionUuid = "c12a7328-f81f-11d2-ba4b-00a0c93ec93b"
 )
 
 const (
@@ -196,17 +212,18 @@ func CreateEmptyDisk(workDirPath, diskName string, disk configuration.Disk) (dis
 
 	// Assume that Disk.MaxSize is given
 	maxSize := disk.MaxSize
-	err = ZeroDisk(diskFilePath, defautBlockSize, maxSize)
+	err = sparseDisk(diskFilePath, defautBlockSize, maxSize)
 	return
 }
 
-// ZeroDisk applies zeroes to the disk specified by diskpath
-func ZeroDisk(diskPath string, blockSize, size uint64) (err error) {
+// sparseDisk creates an empty sparse disk file.
+func sparseDisk(diskPath string, blockSize, size uint64) (err error) {
 	ddArgs := []string{
 		"if=/dev/zero",                  // Input file.
 		fmt.Sprintf("of=%s", diskPath),  // Output file.
 		fmt.Sprintf("bs=%d", blockSize), // Size of one copied block.
-		fmt.Sprintf("count=%d", size),   // Number of blocks to copy to the output file.
+		fmt.Sprintf("seek=%d", size),    // Size of the image.
+		"count=0",                       // Number of blocks to copy to the output file.
 	}
 
 	_, stderr, err := shell.Execute("dd", ddArgs...)
@@ -318,6 +335,17 @@ func DetachLoopbackDevice(diskDevPath string) (err error) {
 		logger.Log.Warnf("Failed to detach loopback device using losetup: %v", stderr)
 	}
 	return
+}
+
+// WaitForDevicesToSettle waits for all udev events to be processed on the system.
+// This can be used to wait for partitions to be discovered after mounting a disk.
+func WaitForDevicesToSettle() error {
+	logger.Log.Debugf("Waiting for devices to settle")
+	_, _, err := shell.Execute("udevadm", "settle")
+	if err != nil {
+		return fmt.Errorf("failed to wait for devices to settle:\n%w", err)
+	}
+	return nil
 }
 
 // CreatePartitions creates partitions on the specified disk according to the disk config
@@ -660,6 +688,28 @@ func SystemBlockDevices() (systemDevices []SystemBlockDevice, err error) {
 	}
 
 	return
+}
+
+func GetDiskPartitions(diskDevPath string) ([]PartitionInfo, error) {
+	// Just in case the disk was only recently connected, wait for the OS to finish processing it.
+	err := WaitForDevicesToSettle()
+	if err != nil {
+		return nil, fmt.Errorf("failed to list disk (%s) partitions:\n%w", diskDevPath, err)
+	}
+
+	// Read the disk's partitions.
+	jsonString, _, err := shell.Execute("lsblk", diskDevPath, "--output", "NAME,PATH,PARTTYPE,FSTYPE,UUID,MOUNTPOINT,PARTUUID", "--json", "--list")
+	if err != nil {
+		return nil, fmt.Errorf("failed to list disk (%s) partitions:\n%w", diskDevPath, err)
+	}
+
+	var output partitionInfoOutput
+	err = json.Unmarshal([]byte(jsonString), &output)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse disk (%s) partitions JSON:\n%w", diskDevPath, err)
+	}
+
+	return output.Devices, err
 }
 
 func createExtendedPartition(diskDevPath string, partitionTableType string, partitions []configuration.Partition, partIDToFsTypeMap, partDevPathMap map[string]string) (err error) {

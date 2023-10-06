@@ -1,7 +1,7 @@
 Summary:        Database servers made by the original developers of MySQL.
 Name:           mariadb
 Version:        10.6.9
-Release:        3%{?dist}
+Release:        5%{?dist}
 License:        GPLv2 WITH exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -98,6 +98,9 @@ cmake -DCMAKE_BUILD_TYPE=Release                        \
       -DMYSQL_UNIX_ADDR="%{_sharedstatedir}/mysql/mysqld.sock" \
       -DWITH_EXTRA_CHARSETS=complex                     \
       -DWITH_EMBEDDED_SERVER=ON                         \
+      -DWITH_PCRE=system                                \
+      -DWITH_SSL=system                                 \
+      -DWITH_ZLIB=system                                \
       -DSKIP_TESTS=ON                                   \
       -DTOKUDB_OK=0                                     \
       -DUPDATE_SUBMODULES=OFF                           \
@@ -459,6 +462,12 @@ fi
 %{_datadir}/mysql/hindi/errmsg.sys
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 10.6.9-5
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
+* Mon Jul 31 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 10.6.9-4
+- Explicitly using the system versions of PCRE2, openSSL, and zlib.
+
 * Thu Feb 09 2023 Rachel Menge <rachelmenge@microsoft.com> - 10.6.9-3
 - Add patch for CVE-2022-47015
 

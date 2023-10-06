@@ -1,7 +1,7 @@
 Summary:        Programs for compressing and decompressing files
 Name:           gzip
 Version:        1.12
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -42,6 +42,9 @@ make %{?_smp_mflags} check
 %{_mandir}/*/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.12-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Tue Sep 20 2022 Betty Lakes <bettylakes@microsoft.com> - 1.12-1
 - Upgrade to 1.12
 
