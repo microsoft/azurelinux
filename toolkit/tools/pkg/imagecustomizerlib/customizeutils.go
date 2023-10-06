@@ -56,6 +56,11 @@ func doCustomizations(baseConfigPath string, config *imagecustomizerapi.SystemCo
 		return err
 	}
 
+	err = enableOrDisableServices(config.Services, baseConfigPath, imageChroot)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -219,6 +224,46 @@ func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageC
 	err = installutils.ConfigureUserStartupCommand(imageChroot, user.Name, user.StartupCommand)
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func enableOrDisableServices(services imagecustomizerapi.Services, baseConfigPath string, imageChroot *safechroot.Chroot) error {
+	var err error
+
+	// Handle enabling services
+	for _, service := range services.Enable {
+		logger.Log.Infof("Enabling service (%s)", service.Name)
+
+		err = imageChroot.UnsafeRun(func() error {
+			err := shell.ExecuteLive(false, "systemctl", "enable", service.Name)
+			if err != nil {
+				return fmt.Errorf("failed to enable service (%s): %w", service.Name, err)
+			}
+
+			return nil
+		})
+		if err != nil {
+			return err
+		}
+	}
+
+	// Handle disabling services
+	for _, service := range services.Disable {
+		logger.Log.Infof("Disabling service (%s)", service.Name)
+
+		err = imageChroot.UnsafeRun(func() error {
+			err := shell.ExecuteLive(false, "systemctl", "disable", service.Name)
+			if err != nil {
+				return fmt.Errorf("failed to disable service (%s): %w", service.Name, err)
+			}
+
+			return nil
+		})
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
