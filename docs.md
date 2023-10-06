@@ -26,7 +26,8 @@ These include:
   Kubernetes Service on Azure Stack HCI - quick way to get started hosting
   Windows and Linux containers in your data center.
 
-  Customers external to Microsoft can use CBL-Mariner via [AKS as a node OS](https://aka.ms/azure-linux-docs). 
+   
+Customers external to Microsoft can use CBL-Mariner via [AKS as a node OS](https://aka.ms/azure-linux-docs). 
 
 ![CBL-Mariner Composition](images/MarinerComposition.png)
 
