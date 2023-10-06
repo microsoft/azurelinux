@@ -33,10 +33,7 @@ steps:
       pip3 debug
     displayName: "Print pip debug"
 
-  - bash: |
-      if ! pip3 install --debug --report pip_report.json junit_xml; then
-          mv pip_report.json "${{ parameters.outputArtifactsFolder }}/TESTS"
-      fi
+  - bash: pip3 install --debug junit-xml
     displayName: "Install Python dependencies"
 
   - task: PythonScript@0
