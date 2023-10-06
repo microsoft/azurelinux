@@ -162,6 +162,7 @@ ln -sf libvpx.so.%{soversion} libvpx.so
 ln -sf libvpx.so.%{soversion} libvpx.so.%{somajor}
 ln -sf libvpx.so.%{soversion} libvpx.so.%{somajor}.%{sominor}
 popd
+ln -sf %{buildroot}%{_libdir}/libvpx.so.%{somajor} /usr/lib/libvpx.so.%{somajor}
 %endif
 
 pushd %{buildroot}
@@ -210,10 +211,10 @@ mv %{buildroot}%{_prefix}/src/vpx_scale %{buildroot}%{_includedir}/
 
 rm -rf %{buildroot}%{_prefix}/src
 
+%ldconfig_scriptlets
+
 %check
 make test
-
-%ldconfig_scriptlets
 
 %files
 %license LICENSE
