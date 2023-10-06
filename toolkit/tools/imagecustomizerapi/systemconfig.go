@@ -14,12 +14,12 @@ import (
 type SystemConfig struct {
 	Hostname                string                    `yaml:"Hostname"`
 	UpdateBaseImagePackages bool                      `yaml:"UpdateBaseImagePackages"`
-	PackagesToAddLists      []string                  `yaml:"PackagesToAddLists"`
-	PackagesToAdd           []string                  `yaml:"PackagesToAdd"`
-	PackagesToRemoveLists   []string                  `yaml:"PackagesToRemoveLists"`
-	PackagesToRemove        []string                  `yaml:"PackagesToRemove"`
-	PackagesToUpdateLists   []string                  `yaml:"PackagesToUpdateLists"`
-	PackagesToUpdate        []string                  `yaml:"PackagesToUpdate"`
+	PackageListsInstall     []string                  `yaml:"PackageListsInstall"`
+	PackagesInstall         []string                  `yaml:"PackagesInstall"`
+	PackageListsRemove      []string                  `yaml:"PackageListsRemove"`
+	PackagesRemove          []string                  `yaml:"PackagesRemove"`
+	PackageListsUpdate      []string                  `yaml:"PackageListsUpdate"`
+	PackagesUpdate          []string                  `yaml:"PackagesUpdate"`
 	AdditionalFiles         map[string]FileConfigList `yaml:"AdditionalFiles"`
 	PostInstallScripts      []Script                  `yaml:"PostInstallScripts"`
 	FinalizeImageScripts    []Script                  `yaml:"FinalizeImageScripts"`

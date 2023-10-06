@@ -19,22 +19,22 @@ func addRemoveAndUpdatePackages(buildDir string, baseConfigPath string, config *
 ) error {
 	var err error
 
-	allPackagesToRemove, err := collectPackagesList(baseConfigPath, config.PackagesToRemoveLists, config.PackagesToRemove)
+	allPackagesRemove, err := collectPackagesList(baseConfigPath, config.PackageListsRemove, config.PackagesRemove)
 	if err != nil {
 		return err
 	}
 
-	allPackagesToAdd, err := collectPackagesList(baseConfigPath, config.PackagesToAddLists, config.PackagesToAdd)
+	allPackagesInstall, err := collectPackagesList(baseConfigPath, config.PackageListsInstall, config.PackagesInstall)
 	if err != nil {
 		return err
 	}
 
-	allPackagesToUpdate, err := collectPackagesList(baseConfigPath, config.PackagesToUpdateLists, config.PackagesToUpdate)
+	allPackagesUpdate, err := collectPackagesList(baseConfigPath, config.PackageListsUpdate, config.PackagesUpdate)
 	if err != nil {
 		return err
 	}
 
-	needRpmsSources := len(allPackagesToAdd) > 0 || len(allPackagesToUpdate) > 0 || config.UpdateBaseImagePackages
+	needRpmsSources := len(allPackagesInstall) > 0 || len(allPackagesUpdate) > 0 || config.UpdateBaseImagePackages
 
 	// Mount RPM sources.
 	var mounts *rpmSourcesMounts
@@ -50,7 +50,7 @@ func addRemoveAndUpdatePackages(buildDir string, baseConfigPath string, config *
 		defer mounts.close()
 	}
 
-	err = removePackages(allPackagesToRemove, imageChroot)
+	err = removePackages(allPackagesRemove, imageChroot)
 	if err != nil {
 		return err
 	}
@@ -62,12 +62,12 @@ func addRemoveAndUpdatePackages(buildDir string, baseConfigPath string, config *
 		}
 	}
 
-	err = installOrUpdatePackages("install", allPackagesToAdd, imageChroot)
+	err = installOrUpdatePackages("install", allPackagesInstall, imageChroot)
 	if err != nil {
 		return err
 	}
 
-	err = installOrUpdatePackages("update", allPackagesToUpdate, imageChroot)
+	err = installOrUpdatePackages("update", allPackagesUpdate, imageChroot)
 	if err != nil {
 		return err
 	}

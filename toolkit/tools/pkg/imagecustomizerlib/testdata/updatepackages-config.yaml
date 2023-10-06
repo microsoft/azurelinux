@@ -1,13 +1,13 @@
 UpdateBaseImagePackages: true
 
-PackagesToRemove:
+PackagesRemove:
 - which
 
-PackagesToAdd:
+PackagesInstall:
 - setools-console
 
-PackagesToAddLists:
+PackageListsInstall:
 - lists/dracut-fips.yaml
 
-PackagesToUpdate:
+PackagesUpdate:
 - setools-console
