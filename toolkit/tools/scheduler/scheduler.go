@@ -27,11 +27,10 @@ import (
 
 const (
 	// default worker count to 0 to automatically scale with the number of logical CPUs.
-	defaultWorkerCount          = "0"
-	defaultBuildAttempts        = "1"
-	defaultCheckAttempts        = "1"
-	defaultExtraLayers          = "0"
-	defaultMaxCascadingRebuilds = "-1"
+	defaultWorkerCount   = "0"
+	defaultBuildAttempts = "1"
+	defaultCheckAttempts = "1"
+	defaultExtraLayers   = "0"
 )
 
 var (
