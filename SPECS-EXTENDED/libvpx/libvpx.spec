@@ -8,7 +8,7 @@ Distribution:   Mariner
 Name:			libvpx
 Summary:		VP8/VP9 Video Codec SDK
 Version:		1.8.2
-Release:		4%{?dist}
+Release:		5%{?dist}
 License:		BSD
 Source0:		https://github.com/webmproject/libvpx/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:		vpx_config.h
@@ -23,6 +23,7 @@ BuildRequires:		yasm
 BuildRequires:		doxygen, php-cli, perl(Getopt::Long)
 # Do not disable FORTIFY_SOURCE=2
 Patch0:			libvpx-1.7.0-leave-fortify-source-on.patch
+Patch1:			CVE-2023-5217.patch
 
 %description
 libvpx provides the VP8/VP9 SDK, which allows you to integrate your applications 
@@ -210,6 +211,9 @@ mv %{buildroot}%{_prefix}/src/vpx_scale %{buildroot}%{_includedir}/
 
 rm -rf %{buildroot}%{_prefix}/src
 
+%check
+make test
+
 %ldconfig_scriptlets
 
 %files
@@ -232,6 +236,10 @@ rm -rf %{buildroot}%{_prefix}/src
 %{_bindir}/*
 
 %changelog
+* Fri Oct 06 2023 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.8.2-5
+- Patch CVE-2023-5217.
+- Add %check.
+
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.8.2-4
 - Updating source URLs.
 - License verified.
