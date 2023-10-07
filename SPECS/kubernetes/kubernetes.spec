@@ -262,7 +262,7 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
-* Fir Oct 06 2023 Henry Beberman <henry.beberman@microsoft.com> - 1.28.2-2
+* Fri Oct 06 2023 Henry Beberman <henry.beberman@microsoft.com> - 1.28.2-2
 - Bump release to rebuild against glibc 2.35-6
 
 * Wdd Sep 20 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 1.28.2-1
