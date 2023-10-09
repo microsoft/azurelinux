@@ -807,7 +807,7 @@ func TestGoalWithNodes(t *testing.T) {
 	assert.Equal(t, 2, len(goalNodes))
 }
 
-func TestDuplicateGoalWitNodes(t *testing.T) {
+func TestDuplicateGoalWithNodes(t *testing.T) {
 	g := NewPkgGraph()
 	goal, err := g.AddGoalNode("test", nil, nil, false)
 	assert.NoError(t, err)
@@ -816,6 +816,19 @@ func TestDuplicateGoalWitNodes(t *testing.T) {
 
 	_, err = g.AddGoalNodeFromNodes("test", nil, 0)
 	assert.Error(t, err)
+}
+
+func TestGoalWithNodeOutsideGraph(t *testing.T) {
+	g := NewPkgGraph()
+	err := addNodesHelper(g, allNodes)
+	assert.NoError(t, err)
+	assert.NotNil(t, g)
+
+	nodeList := []*PkgNode{pkgARun, pkgBRun}
+
+	goal, err := g.AddGoalNodeFromNodes("test", nodeList, 0)
+	assert.Error(t, err)
+	assert.Nil(t, goal)
 }
 
 func TestGoalWithLevelZero(t *testing.T) {
