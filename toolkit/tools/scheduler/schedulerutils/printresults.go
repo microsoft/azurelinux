@@ -49,7 +49,7 @@ func RecordBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, b
 	graphMutex.RLock()
 	defer graphMutex.RUnlock()
 
-	failedSRPMs, prebuiltSRPMs, prebuiltDeltaSRPMs, builtSRPMs, blockedSRPMs := getSRPMsState(pkgGraph, buildState)
+	failedSRPMs, prebuiltSRPMs, prebuiltDeltaSRPMs, builtSRPMs, blockedSRPMs, _ := getSRPMsState(pkgGraph, pkgGraph, buildState)
 	failedBuildNodes := buildResultsSetToNodesSet(failedSRPMs)
 
 	failedSRPMsTests, _, testedSRPMs, blockedSRPMsTests := getSRPMsTestsState(pkgGraph, buildState)
@@ -83,12 +83,12 @@ func RecordBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, b
 }
 
 // PrintBuildSummary prints the summary of the entire build to the logger.
-func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, buildState *GraphBuildState, allowToolchainRebuilds bool) {
+func PrintBuildSummary(fullPkgGraph, optimizedPkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, buildState *GraphBuildState, allowToolchainRebuilds bool) {
 	graphMutex.RLock()
 	defer graphMutex.RUnlock()
 
-	failedSRPMs, prebuiltSRPMs, prebuiltDeltaSRPMs, builtSRPMs, blockedSRPMs := getSRPMsState(pkgGraph, buildState)
-	failedSRPMsTests, skippedSRPMsTests, testedSRPMs, blockedSRPMsTests := getSRPMsTestsState(pkgGraph, buildState)
+	failedSRPMs, prebuiltSRPMs, prebuiltDeltaSRPMs, builtSRPMs, blockedSRPMs, wastedSRPMs := getSRPMsState(fullPkgGraph, optimizedPkgGraph, buildState)
+	failedSRPMsTests, skippedSRPMsTests, testedSRPMs, blockedSRPMsTests := getSRPMsTestsState(optimizedPkgGraph, buildState)
 
 	unresolvedDependencies := make(map[string]bool)
 	rpmConflicts := buildState.ConflictingRPMs()
@@ -99,7 +99,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 		conflictsLogger = logger.Log.Infof
 	}
 
-	for _, node := range pkgGraph.AllRunNodes() {
+	for _, node := range fullPkgGraph.AllRunNodes() {
 		if node.State == pkggraph.StateUnresolved {
 			unresolvedDependencies[node.VersionedPkg.String()] = true
 		}
@@ -110,6 +110,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	logger.Log.Info("---------------------------")
 
 	logger.Log.Infof("Number of built SRPMs:             %d", len(builtSRPMs))
+	logger.Log.Infof("Number of wasted SRPMs:            %d", len(wastedSRPMs))
 	logger.Log.Infof("Number of tested SRPMs:            %d", len(testedSRPMs))
 	logger.Log.Infof("Number of prebuilt SRPMs:          %d", len(prebuiltSRPMs))
 	logger.Log.Infof("Number of prebuilt delta SRPMs:    %d", len(prebuiltDeltaSRPMs))
@@ -127,6 +128,13 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	if len(rpmConflicts) > 0 || len(srpmConflicts) > 0 {
 		conflictsLogger("Number of toolchain RPM conflicts: %d", len(rpmConflicts))
 		conflictsLogger("Number of toolchain SRPM conflicts: %d", len(srpmConflicts))
+	}
+
+	if len(wastedSRPMs) != 0 {
+		logger.Log.Info("Wasted SRPMs:")
+		for srpm := range wastedSRPMs {
+			logger.Log.Infof("--> %s", filepath.Base(srpm))
+		}
 	}
 
 	if len(builtSRPMs) != 0 {
@@ -223,12 +231,13 @@ func buildResultsSetToNodesSet(statesSet map[string]*BuildResult) (result map[st
 	return
 }
 
-func getSRPMsState(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState) (failedSRPMs map[string]*BuildResult, prebuiltSRPMs, prebuiltDeltaSRPMs, builtSRPMs map[string]bool, blockedSRPMs map[string]*pkggraph.PkgNode) {
+func getSRPMsState(fullGraph, optimizedGraph *pkggraph.PkgGraph, buildState *GraphBuildState) (failedSRPMs map[string]*BuildResult, prebuiltSRPMs, prebuiltDeltaSRPMs, builtSRPMs map[string]bool, blockedSRPMs map[string]*pkggraph.PkgNode, wastedSRPMs map[string]bool) {
 	failedSRPMs = make(map[string]*BuildResult)
 	prebuiltSRPMs = make(map[string]bool)
 	prebuiltDeltaSRPMs = make(map[string]bool)
 	builtSRPMs = make(map[string]bool)
 	blockedSRPMs = make(map[string]*pkggraph.PkgNode)
+	wastedSRPMs = make(map[string]bool)
 
 	for _, failure := range buildState.BuildFailures() {
 		if failure.Node.Type == pkggraph.TypeLocalBuild {
@@ -236,7 +245,24 @@ func getSRPMsState(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState) (fa
 		}
 	}
 
-	for _, node := range pkgGraph.AllBuildNodes() {
+	optimizedSrpmPaths := make(map[string]bool)
+	for _, node := range optimizedGraph.AllBuildNodes() {
+		logger.Log.Warnf("%v:%v", buildState.nodeToState[node], node)
+		if buildState.IsNodeProcessed(node) {
+			optimizedSrpmPaths[node.SrpmPath] = true
+		}
+	}
+
+	for _, node := range fullGraph.AllBuildNodes() {
+		// check if path was used in the optimized graph
+		nodeInOptimizedGraph := optimizedGraph.HasNode(node)
+		srpmUsed := optimizedSrpmPaths[node.SrpmPath]
+		if !nodeInOptimizedGraph {
+			if !srpmUsed && buildState.IsNodeAvailable(node) {
+				wastedSRPMs[node.SrpmPath] = true
+			}
+			continue
+		}
 		// A node can be a delta if it was build or cached. If it was cached we used the cached rpm. If it is not cached
 		// that means it was built and we discard the delta rpm.
 		if buildState.IsNodeCached(node) {

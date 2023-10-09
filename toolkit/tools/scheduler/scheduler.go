@@ -330,7 +330,7 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 	// The build will bubble up through the graph as it processes nodes.
 	buildState := schedulerutils.NewGraphBuildState(reservedFiles, maxCascadingRebuilds)
 	buildRunsTests := len(pkgGraph.AllTestNodes()) > 0
-	nodesToBuild := schedulerutils.LeafNodes(pkgGraph, graphMutex, goalNode, buildState, useCachedImplicit)
+	fullGraph := pkgGraph
 
 	for {
 		logger.Log.Debugf("Found %d unblocked nodes: %v.", len(nodesToBuild), nodesToBuild)
@@ -481,7 +481,7 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 	time.Sleep(time.Second)
 
 	builtGraph = pkgGraph
-	schedulerutils.PrintBuildSummary(builtGraph, graphMutex, buildState, allowToolchainRebuilds)
+	schedulerutils.PrintBuildSummary(fullGraph, builtGraph, graphMutex, buildState, allowToolchainRebuilds)
 	schedulerutils.RecordBuildSummary(builtGraph, graphMutex, buildState, *outputCSVFile)
 	if !allowToolchainRebuilds && (len(buildState.ConflictingRPMs()) > 0 || len(buildState.ConflictingSRPMs()) > 0) {
 		err = fmt.Errorf("toolchain packages rebuilt. See build summary for details. Use 'ALLOW_TOOLCHAIN_REBUILDS=y' to suppress this error if rebuilds were expected")
