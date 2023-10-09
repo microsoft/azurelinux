@@ -151,3 +151,45 @@ func TestShouldNotFindCheckSectionInSpecWithoutCheckSection(t *testing.T) {
 	assert.NoError(t, err)
 	assert.False(t, hasCheckSection)
 }
+
+func TestExtractNameFromRPMPath(t *testing.T) {
+	tests := []struct {
+		name     string
+		rpmFile  string
+		expected string
+		err      error
+	}{
+		{
+			name:     "valid rpm file",
+			rpmFile:  "/path/to/pkg-1.0.0-1.noarch.rpm",
+			expected: "pkg",
+			err:      nil,
+		},
+		{
+			name:     "valid rpm file with complex name",
+			rpmFile:  "/path/to/pkg-name-1.0.0-1.noarch.rpm",
+			expected: "pkg-name",
+			err:      nil,
+		},
+		{
+			name:     "invalid rpm file",
+			rpmFile:  "/path/to/garbage.rpm",
+			expected: "",
+			err:      fmt.Errorf("invalid RPM file name '%s', can't extract name", "/path/to/garbage.rpm"),
+		},
+		{
+			name:     "empty rpm file",
+			rpmFile:  "",
+			expected: "",
+			err:      fmt.Errorf("invalid RPM file name '%s', can't extract name", ""),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			actual, err := ExtractNameFromRPMPath(tt.rpmFile)
+			assert.Equal(t, tt.err, err)
+			assert.Equal(t, tt.expected, actual)
+		})
+	}
+}
