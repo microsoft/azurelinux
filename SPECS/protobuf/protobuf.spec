@@ -1,6 +1,6 @@
 Summary:        Google's data interchange format
 Name:           protobuf
-Version:        3.17.3
+Version:        3.18.3
 Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -83,9 +83,9 @@ popd
 %defattr(-,root,root)
 %license LICENSE
 %{_bindir}/protoc
-%{_libdir}/libprotobuf-lite.so.28*
-%{_libdir}/libprotobuf.so.28*
-%{_libdir}/libprotoc.so.28*
+%{_libdir}/libprotobuf-lite.so.29*
+%{_libdir}/libprotobuf.so.29*
+%{_libdir}/libprotoc.so.29*
 
 %files devel
 %defattr(-,root,root)
@@ -108,6 +108,9 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Mon Oct 09 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 3.18.3-1
+- upgrade to version 3.18.3 to fix CVE-2022-1941
+
 * Mon Mar 20 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.17.3-2
 - Added check section for running tests
 
