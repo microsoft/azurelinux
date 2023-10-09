@@ -36,6 +36,7 @@ type GraphBuildState struct {
 	reservedFiles    map[string]bool
 	conflictingRPMs  map[string]bool
 	conflictingSRPMs map[string]bool
+	priorityNodes    *NodePriorityMap
 }
 
 // NewGraphBuildState returns a new GraphBuildState.
@@ -43,7 +44,7 @@ type GraphBuildState struct {
 //   - maxFreshness is how fresh a newly rebuilt node is. Each dependant node will have a freshness of 'n-1', etc. until
 //     '0' where the subsequent nodes will no longer be rebuilt. 'maxFreshness < 0' will cause unbounded cascading rebuilds,
 //     while 'maxFreshness = 0' will cause no cascading rebuilds.
-func NewGraphBuildState(reservedFiles []string, maxFreshness uint) (g *GraphBuildState) {
+func NewGraphBuildState(reservedFiles []string, priorityNodes *NodePriorityMap, maxFreshness uint) (g *GraphBuildState) {
 	filesMap := sliceutils.SliceToSet[string](reservedFiles)
 
 	return &GraphBuildState{
@@ -53,6 +54,7 @@ func NewGraphBuildState(reservedFiles []string, maxFreshness uint) (g *GraphBuil
 		conflictingRPMs:  make(map[string]bool),
 		conflictingSRPMs: make(map[string]bool),
 		maxFreshness:     maxFreshness,
+		priorityNodes:    priorityNodes,
 	}
 }
 
@@ -77,6 +79,16 @@ func (g *GraphBuildState) IsNodeAvailable(node *pkggraph.PkgNode) bool {
 func (g *GraphBuildState) IsNodeCached(node *pkggraph.PkgNode) bool {
 	state := g.nodeToState[node]
 	return state != nil && state.cached
+}
+
+// GetNodePriority returns the priority of the node.
+func (g *GraphBuildState) GetNodePriority(node *pkggraph.PkgNode) int {
+	return g.priorityNodes.GetPriority(node)
+}
+
+// IsNodeElevatedPriority returns true if the requested node is a high priority node.
+func (g *GraphBuildState) IsNodeElevatedPriority(node *pkggraph.PkgNode) bool {
+	return g.priorityNodes.IsElevatedPriority(node)
 }
 
 // GetMaxFreshness returns the maximum freshness a node can have. (ie if a package is directly rebuilt due to user

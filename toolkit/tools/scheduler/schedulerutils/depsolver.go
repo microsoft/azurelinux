@@ -133,7 +133,7 @@ func LeafNodes(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, goalNode *
 }
 
 // FindUnblockedNodesFromResult takes a package build result and returns a list of nodes that are now unblocked for building.
-func FindUnblockedNodesFromResult(res *BuildResult, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, buildState *GraphBuildState) (unblockedNodes []*pkggraph.PkgNode) {
+func FindUnblockedNodesFromResult(res *BuildResult, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, buildState *GraphBuildState, allowLowPriorityNodes bool) (unblockedNodes []*pkggraph.PkgNode, unblockedLowPriorityNodes []*pkggraph.PkgNode) {
 	if res.Err != nil {
 		return
 	}
@@ -149,7 +149,15 @@ func FindUnblockedNodesFromResult(res *BuildResult, pkgGraph *pkggraph.PkgGraph,
 		findUnblockedNodesFromNode(pkgGraph, buildState, node, unblockedNodesMap)
 	}
 
-	return sliceutils.SetToSlice(unblockedNodesMap)
+	for node := range unblockedNodesMap {
+		if buildState.IsNodeElevatedPriority(node) || allowLowPriorityNodes {
+			unblockedNodes = append(unblockedNodes, node)
+		} else {
+			// If the scheduler isn't queueing low prioirity nodes then stash them away for later
+			unblockedLowPriorityNodes = append(unblockedLowPriorityNodes, node)
+		}
+	}
+	return
 }
 
 // findUnblockedNodesFromNode takes a built node and returns a list of nodes that are now unblocked by it.

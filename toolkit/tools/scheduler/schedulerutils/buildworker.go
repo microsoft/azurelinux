@@ -26,11 +26,12 @@ import (
 
 // BuildChannels represents the communicate channels used by a build agent.
 type BuildChannels struct {
-	Requests         <-chan *BuildRequest
-	PriorityRequests <-chan *BuildRequest
-	Results          chan<- *BuildResult
-	Cancel           <-chan struct{}
-	Done             <-chan struct{}
+	LowPriorityRequests    <-chan *BuildRequest
+	MediumPriorityRequests <-chan *BuildRequest
+	HighPriorityRequests   <-chan *BuildRequest
+	Results                chan<- *BuildResult
+	Cancel                 <-chan struct{}
+	Done                   <-chan struct{}
 }
 
 // BuildRequest represents a work-order to a build agent asking it to build a given node.
@@ -60,41 +61,51 @@ type BuildResult struct {
 
 // selectNextBuildRequest selects a job based on priority:
 //  1. Bail out if the jobs are cancelled
-//  2. There is something in the priority queue
-//  3. Any job in either normal OR priority queue
-//     OR are the jobs done/cancelled
+//  2. There is something in the high priority queue
+//  3. Any job in either medium OR high priority queues
+//  4. Any job in any queue, OR are the jobs done/cancelled (This will block until we have a job or are cancelled)
 func selectNextBuildRequest(channels *BuildChannels) (req *BuildRequest, finish bool) {
 	select {
 	case <-channels.Cancel:
 		logger.Log.Warn("Cancellation signal received")
 		return nil, true
 	default:
-		select {
-		case req = <-channels.PriorityRequests:
-			if req != nil {
-				logger.Log.Tracef("PRIORITY REQUEST: %v", *req)
-			}
-			return req, false
-		default:
-			select {
-			case req = <-channels.PriorityRequests:
-				if req != nil {
-					logger.Log.Tracef("PRIORITY REQUEST: %v", *req)
-				}
-				return req, false
-			case req = <-channels.Requests:
-				if req != nil {
-					logger.Log.Tracef("normal REQUEST: %v", *req)
-				}
-				return req, false
-			case <-channels.Cancel:
-				logger.Log.Warn("Cancellation signal received")
-				return nil, true
-			case <-channels.Done:
-				logger.Log.Debug("Worker finished signal received")
-				return nil, true
-			}
-		}
+		// Continue to next block which allows: high priority requests
+	}
+
+	select {
+	// High priority requests only
+	case req = <-channels.HighPriorityRequests:
+		return req, false
+	default:
+		// Continue to next block which allows: high + medium priority requests
+	}
+
+	// High and medium priority requests
+	select {
+	case req = <-channels.MediumPriorityRequests:
+		return req, false
+	case req = <-channels.HighPriorityRequests:
+		return req, false
+	default:
+		// Continue to next block which will block until we have any request or are cancelled
+	}
+
+	select {
+	// Any request, or cancellation
+	// Will block until a request is available, or the worker is cancelled
+	case req = <-channels.LowPriorityRequests:
+		return req, false
+	case req = <-channels.MediumPriorityRequests:
+		return req, false
+	case req = <-channels.HighPriorityRequests:
+		return req, false
+	case <-channels.Cancel:
+		logger.Log.Warn("Cancellation signal received")
+		return nil, true
+	case <-channels.Done:
+		logger.Log.Debug("Worker finished signal received")
+		return nil, true
 	}
 }
 
