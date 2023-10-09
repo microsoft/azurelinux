@@ -1,7 +1,7 @@
 Summary:        Google's data interchange format
 Name:           protobuf
-Version:        3.17.3
-Release:        2%{?dist}
+Version:        3.18.3
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -108,6 +108,9 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Mon Oct 09 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.18.3-1
+- Auto-upgrade to 3.18.3 - fix CVE-2022-1941
+
 * Mon Mar 20 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.17.3-2
 - Added check section for running tests
 
