@@ -1175,6 +1175,10 @@ func (g *PkgGraph) AddGoalNodeFromNodes(goalName string, existingNodes []*PkgNod
 	}
 
 	for _, node := range existingNodes {
+		if !g.HasNode(node) {
+			err = fmt.Errorf("can't add goal node '%s' from node '%s' which is not in the graph", goalName, node.FriendlyName())
+			return nil, err
+		}
 		err = g.AddEdge(goalNode, node)
 		if err != nil {
 			return nil, err
