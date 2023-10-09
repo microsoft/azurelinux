@@ -165,6 +165,8 @@ ln -sf libvpx.so.%{soversion} libvpx.so.%{somajor}.%{sominor}
 popd
 %endif
 
+ln -sf %{buildroot}%{_libdir}/libvpx.so.%{somajor} /usr/lib/libvpx.so.%{somajor}
+
 pushd %{buildroot}
 # Stuff we don't need.
 rm -rf .%{_prefix}/build/ .%{_prefix}/md5sums.txt .%{_libdir}*/*.a .%{_prefix}/CHANGELOG .%{_prefix}/README
@@ -211,10 +213,10 @@ mv %{buildroot}%{_prefix}/src/vpx_scale %{buildroot}%{_includedir}/
 
 rm -rf %{buildroot}%{_prefix}/src
 
+%ldconfig_scriptlets
+
 %check
 make test
-
-%ldconfig_scriptlets
 
 %files
 %license LICENSE
