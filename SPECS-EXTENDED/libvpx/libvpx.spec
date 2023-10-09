@@ -23,7 +23,7 @@ BuildRequires:		yasm
 BuildRequires:		doxygen, php-cli, perl(Getopt::Long)
 # Do not disable FORTIFY_SOURCE=2
 Patch0:			libvpx-1.7.0-leave-fortify-source-on.patch
-Patch1:			CVE-2023-5217.patch
+# Patch1:			CVE-2023-5217.patch
 
 %description
 libvpx provides the VP8/VP9 SDK, which allows you to integrate your applications 
