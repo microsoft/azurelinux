@@ -608,6 +608,21 @@ func (g *PkgGraph) FindBestPkgNode(pkgVer *pkgjson.PackageVer) (lookupEntry *Loo
 	return
 }
 
+// HasNode returns true if pkgNode points to a node that is present in the graph.
+// If the object is not the same, but the ID is the same, it will return false (i.e., the node is a copy)
+func (g *PkgGraph) HasNode(pkgNode *PkgNode) bool {
+	if pkgNode == nil {
+		return false
+	}
+	nodeWithSameId := g.Node(pkgNode.ID())
+	if nodeWithSameId == nil {
+		return false
+	} else {
+		// Check if they are the same node object
+		return nodeWithSameId.(*PkgNode) == pkgNode
+	}
+}
+
 // AllNodes returns a list of all nodes in the graph.
 func (g *PkgGraph) AllNodes() []*PkgNode {
 	count := g.Nodes().Len()
@@ -669,6 +684,16 @@ func (g *PkgGraph) AllBuildNodes() []*PkgNode {
 func (g *PkgGraph) AllTestNodes() []*PkgNode {
 	return g.allNodesOfType(func(n *LookupNode) *PkgNode {
 		return n.TestNode
+	})
+}
+
+// AllImplicitNodes returns a list of all implicit remote nodes in the graph
+func (g *PkgGraph) AllImplicitNodes() []*PkgNode {
+	return g.allNodesOfType(func(n *LookupNode) *PkgNode {
+		if n.RunNode != nil && n.RunNode.Implicit {
+			return n.RunNode
+		}
+		return nil
 	})
 }
 
@@ -1112,6 +1137,48 @@ func (g *PkgGraph) AddGoalNodeWithExtraLayers(goalName string, packages, tests [
 	err = g.connectGoalEdges(goalNode, testsGoalSet, strict, TypeTest)
 	if err != nil {
 		return
+	}
+
+	// Expand the goal node if requested
+	if extraLayers > 0 {
+		g.addGoalNodeLayers(goalNode, extraLayers)
+	}
+
+	return
+}
+
+// AddGoalNodeFromNodes adds a goal node to the graph which links to a list of existing nodes.
+func (g *PkgGraph) AddGoalNodeFromNodes(goalName string, existingNodes []*PkgNode, extraLayers int) (goalNode *PkgNode, err error) {
+	// Check if we already have a goal node with the requested name
+	if g.FindGoalNode(goalName) != nil {
+		err = fmt.Errorf("can't have two goal nodes named %s", goalName)
+		return
+	}
+
+	logger.Log.Debugf("Adding a goal node '%s'.", goalName)
+
+	// Create goal node and add an edge to all the other requested nodes
+	goalNode = &PkgNode{
+		State:      StateMeta,
+		Type:       TypeGoal,
+		SrpmPath:   NoSRPMPath,
+		RpmPath:    NoRPMPath,
+		SourceRepo: NoSourceRepo,
+		nodeID:     g.NewNode().ID(),
+		GoalName:   goalName,
+	}
+	goalNode.This = goalNode
+
+	err = g.safeAddNode(goalNode)
+	if err != nil {
+		return
+	}
+
+	for _, node := range existingNodes {
+		err = g.AddEdge(goalNode, node)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	// Expand the goal node if requested
