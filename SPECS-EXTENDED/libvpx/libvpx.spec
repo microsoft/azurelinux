@@ -162,8 +162,9 @@ ln -sf libvpx.so.%{soversion} libvpx.so
 ln -sf libvpx.so.%{soversion} libvpx.so.%{somajor}
 ln -sf libvpx.so.%{soversion} libvpx.so.%{somajor}.%{sominor}
 popd
-ln -sf %{buildroot}%{_libdir}/libvpx.so.%{somajor} /usr/lib/libvpx.so.%{somajor}
 %endif
+
+ln -sf %{buildroot}%{_libdir}/libvpx.so.%{somajor} /usr/lib/libvpx.so.%{somajor}
 
 pushd %{buildroot}
 # Stuff we don't need.
