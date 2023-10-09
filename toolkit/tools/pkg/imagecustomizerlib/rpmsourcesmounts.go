@@ -108,7 +108,7 @@ func (m *rpmSourcesMounts) mountRpmSourcesHelper(buildDir string, imageChroot *s
 		case "dir":
 			err = m.createRepoFromDirectory(rpmSource, allReposConfig, imageChroot)
 
-		case "conf":
+		case "repo":
 			err = m.createRepoFromRepoConfig(rpmSource, true, allReposConfig, imageChroot)
 
 		default:
@@ -175,13 +175,22 @@ func (m *rpmSourcesMounts) createRepoFromRepoConfig(rpmSource string, isHostConf
 
 	// Iterate through the list of repos.
 	for _, repoConfig := range reposConfig.Sections() {
-		if repoConfig.Name() == "" {
-			return fmt.Errorf("rpm repo config files must not contain nameless sections (%s)", rpmSource)
+		if repoConfig.Name() == ini.DefaultSection {
+			if len(repoConfig.Keys()) > 0 {
+				return fmt.Errorf("rpm repo config files must not contain a default section (%s)", rpmSource)
+			}
+
+			continue
 		}
 
 		if isHostConfig {
+			baseUrlKey, err := repoConfig.GetKey("baseurl")
+			if err != nil {
+				return fmt.Errorf("invalid repo config (%s):\n%w", rpmSource, err)
+			}
+
 			// Check if the repo points to a local directory.
-			baseurl := repoConfig.Key("baseurl").String()
+			baseurl := baseUrlKey.String()
 			filePath, hasFilePrefix := strings.CutPrefix(baseurl, "file://")
 			if hasFilePrefix {
 				// Mount the directory in the chroot.
@@ -200,7 +209,7 @@ func (m *rpmSourcesMounts) createRepoFromRepoConfig(rpmSource string, isHostConf
 		// Copy over the repo details to the all-repos config.
 		err := appendIniSection(allReposConfig, repoConfig)
 		if err != nil {
-			return fmt.Errorf("failed to append repo config:\n%w", err)
+			return fmt.Errorf("failed to append repo config (%s):\n%w", rpmSource, err)
 		}
 	}
 
@@ -284,8 +293,8 @@ func getRpmSourceFileType(rpmSourcePath string) (string, error) {
 	}
 
 	switch fileExt {
-	case ".conf":
-		return "conf", nil
+	case ".repo":
+		return "repo", nil
 
 	default:
 		return "", nil
