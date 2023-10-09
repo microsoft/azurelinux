@@ -151,3 +151,24 @@ func TestShouldNotFindCheckSectionInSpecWithoutCheckSection(t *testing.T) {
 	assert.NoError(t, err)
 	assert.False(t, hasCheckSection)
 }
+
+func TestShouldExtractSimpleName(t *testing.T) {
+	testPath := "/path/to/pkg-1.0.0-1.noarch.rpm"
+	expectedName := "pkg"
+	name := ExtractNameFromRPMPath(testPath)
+	assert.Equal(t, expectedName, name)
+}
+
+func TestShouldExtractComplexName(t *testing.T) {
+	testPath := "/path/to/pkg-name-1.0.0-1.noarch.rpm"
+	expectedName := "pkg-name"
+	name := ExtractNameFromRPMPath(testPath)
+	assert.Equal(t, expectedName, name)
+}
+
+func TestShouldHandleExtractingGarbageName(t *testing.T) {
+	testPath := "/path/to/garbage.rpm"
+	expectedName := ""
+	name := ExtractNameFromRPMPath(testPath)
+	assert.Equal(t, expectedName, name)
+}
