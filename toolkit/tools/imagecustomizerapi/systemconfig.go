@@ -24,6 +24,7 @@ type SystemConfig struct {
 	PostInstallScripts      []Script                  `yaml:"PostInstallScripts"`
 	FinalizeImageScripts    []Script                  `yaml:"FinalizeImageScripts"`
 	Users                   []User                    `yaml:"Users"`
+	Services                Services                  `yaml:"Services"`
 }
 
 func (s *SystemConfig) IsValid() error {
@@ -61,6 +62,10 @@ func (s *SystemConfig) IsValid() error {
 		if err != nil {
 			return fmt.Errorf("invalid Users item at index %d: %w", i, err)
 		}
+	}
+
+	if err := s.Services.IsValid(); err != nil {
+		return err
 	}
 
 	return nil
