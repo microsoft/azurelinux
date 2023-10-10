@@ -1,16 +1,3 @@
-%global bootstrap_compiler_version 1.19.12
-%global goroot          %{_libdir}/golang
-%global gopath          %{_datadir}/gocode
-%ifarch aarch64
-%global gohostarch      arm64
-%else
-%global gohostarch      amd64
-%endif
-%define debug_package %{nil}
-%define __strip /bin/true
-# rpmbuild magic to keep from having meta dependency on libc.so.6
-%define _use_internal_dependency_generator 0
-%define __find_requires %{nil}
 Summary:        Go
 Name:           golang
 Version:        1.20.7
@@ -25,6 +12,19 @@ Source1:        https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
 Source2:        https://dl.google.com/go/go%{bootstrap_compiler_version}.src.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
 Patch1:         permit-requests-with-invalid-header.patch
+%global bootstrap_compiler_version 1.19.12
+%global goroot          %{_libdir}/golang
+%global gopath          %{_datadir}/gocode
+%ifarch aarch64
+%global gohostarch      arm64
+%else
+%global gohostarch      amd64
+%endif
+%define debug_package %{nil}
+%define __strip /bin/true
+# rpmbuild magic to keep from having meta dependency on libc.so.6
+%define _use_internal_dependency_generator 0
+%define __find_requires %{nil}
 Obsoletes:      %{name} < %{version}
 Provides:       %{name} = %{version}
 Provides:       go = %{version}-%{release}
