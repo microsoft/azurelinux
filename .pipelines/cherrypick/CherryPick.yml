@@ -23,13 +23,18 @@ resources:
       ref: refs/heads/tvuong/cherry-pick
 
 jobs:
-  - job:
+  - job: 'CherryPick'
+    pool: mariner-core-x64-1es-ubuntu-22.04
+    timeoutInMinutes: 15
+    displayName: 'Cherry-pick commit'
+
     steps:
     - checkout: CBL-Mariner-Pipelines
       path: $(pipelinesRepoFolder)
+      displayName: 'Checkout CBL-Mariner'
 
-  - template: spec-auto-patch-update/pipelines/CherryPick.yml@CBL-Mariner-Pipelines
-    parameters:
-      commitId: $(Build.SourceVersion)
-      sourceBranch: $(Build.SourceBranchName)
-      repoRootPath: $(pipelinesRepoRoot)
+    - template: spec-auto-patch-update/pipelines/CherryPick.yml@CBL-Mariner-Pipelines
+      parameters:
+        commitId: $(Build.SourceVersion)
+        sourceBranch: $(Build.SourceBranchName)
+        repoRootPath: $(pipelinesRepoRoot)
