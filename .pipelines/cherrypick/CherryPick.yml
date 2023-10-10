@@ -23,7 +23,7 @@ resources:
       ref: refs/heads/tvuong/cherry-pick
 
 jobs:
-  - job: 'Checkout CBL-Mariner-Pipelines'
+  - job:
     steps:
     - checkout: CBL-Mariner-Pipelines
       path: $(pipelinesRepoFolder)
