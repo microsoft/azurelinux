@@ -64,7 +64,18 @@ func TestShouldFailEmptyConfig(t *testing.T) {
 
 	err := ValidateConfiguration(config)
 	assert.Error(t, err)
-	assert.Equal(t, "config file must provide at least one system configuration inside the [SystemConfigs] field", err.Error())
+	assert.Equal(t, "config file must provide at least one system configuration inside either [SystemConfig] or [SystemConfigs] field", err.Error())
+}
+
+func TestShouldFailDoubleSystemConfig(t *testing.T) {
+	config := configuration.Config{
+		SystemConfigs: []configuration.SystemConfig{{}},
+		SystemConfig:  &configuration.SystemConfig{},
+	}
+
+	err := ValidateConfiguration(config)
+	assert.Error(t, err)
+	assert.Equal(t, "config file must not have both [SystemConfig] and [SystemConfigs] fields", err.Error())
 }
 
 func TestShouldFailEmptySystemConfig(t *testing.T) {

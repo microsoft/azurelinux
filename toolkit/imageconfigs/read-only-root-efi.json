@@ -48,60 +48,58 @@
             ]
         }
     ],
-    "SystemConfigs": [
-        {
-            "Name": "ReadOnly",
-            "BootType": "efi",
-            "PartitionSettings": [
-                {
-                    "ID": "boot",
-                    "MountPoint": "/boot"
-                },
-                {
-                    "ID": "efi",
-                    "MountPoint": "/boot/efi",
-                    "MountOptions" : "umask=0077"
-                },
-                {
-                    "ID": "rootfs",
-                    "MountPoint": "/"
-                },
-                {
-                    "ID": "data",
-                    "MountPoint": "/data"
-                }
+    "SystemConfig": {
+        "Name": "ReadOnly",
+        "BootType": "efi",
+        "PartitionSettings": [
+            {
+                "ID": "boot",
+                "MountPoint": "/boot"
+            },
+            {
+                "ID": "efi",
+                "MountPoint": "/boot/efi",
+                "MountOptions" : "umask=0077"
+            },
+            {
+                "ID": "rootfs",
+                "MountPoint": "/"
+            },
+            {
+                "ID": "data",
+                "MountPoint": "/data"
+            }
+        ],
+        "PackageLists": [
+            "packagelists/hyperv-packages.json",
+            "packagelists/core-packages-image.json",
+            "packagelists/read-only-root-packages.json",
+            "packagelists/core-tools-packages.json",
+            "packagelists/selinux.json"
+        ],
+        "KernelOptions": {
+            "default": "kernel"
+        },
+        "ReadOnlyVerityRoot": {
+            "Enable": true,
+            "TmpfsOverlays": [
+                "/var"
             ],
-            "PackageLists": [
-                "packagelists/hyperv-packages.json",
-                "packagelists/core-packages-image.json",
-                "packagelists/read-only-root-packages.json",
-                "packagelists/core-tools-packages.json",
-                "packagelists/selinux.json"
-            ],
-            "KernelOptions": {
-                "default": "kernel"
-            },
-            "ReadOnlyVerityRoot": {
-                "Enable": true,
-                "TmpfsOverlays": [
-                    "/var"
-                ],
-                "TmpfsOverlayDebugEnabled": false,
-                "VerityErrorBehavior": "restart"
-            },
-            "KernelCommandLine": {
-                "ExtraCommandLine": "console=tty0 console=ttyS0=9800 rd.shell=0 rd.emergency=reboot",
-                "SELinux": "permissive"
-            },
-            "Hostname": "cbl-mariner",
-            "Users": [
-                {
-                    "Name": "root",
-                    "Password": "$6$20m6y6nwlU1K$hKgyNYjVSKPJOTFaAzAf/fwACUV/dZ1NPy5cGNkhvRzKJiKDBKofuvDpdl81Jak4ep756DnZmVm7JfGRMO/n90",
-                    "PasswordHashed": true,
-                    "_comment": "This password was generated with 'openssl passwd -6 -salt <YOUR_SALT> <YOUR_PASSWORD>'. You may also use the json key 'SSHPubKeyPaths' to use an SSH key for login"
-                }
-            ]
-        }
-    ]
+            "TmpfsOverlayDebugEnabled": false,
+            "VerityErrorBehavior": "restart"
+        },
+        "KernelCommandLine": {
+            "ExtraCommandLine": "console=tty0 console=ttyS0=9800 rd.shell=0 rd.emergency=reboot",
+            "SELinux": "permissive"
+        },
+        "Hostname": "cbl-mariner",
+        "Users": [
+            {
+                "Name": "root",
+                "Password": "$6$20m6y6nwlU1K$hKgyNYjVSKPJOTFaAzAf/fwACUV/dZ1NPy5cGNkhvRzKJiKDBKofuvDpdl81Jak4ep756DnZmVm7JfGRMO/n90",
+                "PasswordHashed": true,
+                "_comment": "This password was generated with 'openssl passwd -6 -salt <YOUR_SALT> <YOUR_PASSWORD>'. You may also use the json key 'SSHPubKeyPaths' to use an SSH key for login"
+            }
+        ]
+    }
 }

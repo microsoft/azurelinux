@@ -28,39 +28,37 @@
             ]
         }
     ],
-    "SystemConfigs": [
-        {
-            "Name": "Standard",
-            "BootType": "legacy",
-            "PartitionSettings": [
-                {
-                    "ID": "boot",
-                    "MountPoint": ""
-                },
-                {
-                    "ID": "rootfs",
-                    "MountPoint": "/"
-                }
-            ],
-            "PackageLists": [
-                "packagelists/hyperv-packages.json",
-                "packagelists/core-packages-image.json",
-                "packagelists/cloud-init-packages.json",
-                "packagelists/core-tools-packages.json",
-                "packagelists/selinux.json"
-            ],
-            "Hostname": "mariner",
-            "KernelOptions": {
-                "default": "kernel"
+    "SystemConfig": {
+        "Name": "Standard",
+        "BootType": "legacy",
+        "PartitionSettings": [
+            {
+                "ID": "boot",
+                "MountPoint": ""
             },
-            "KernelCommandLine": {
-                "SELinux": "permissive"
-            },
-            "Users": [
-                {
-                    "Name": "root"
-                }
-            ]
-        }
-    ]
+            {
+                "ID": "rootfs",
+                "MountPoint": "/"
+            }
+        ],
+        "PackageLists": [
+            "packagelists/hyperv-packages.json",
+            "packagelists/core-packages-image.json",
+            "packagelists/cloud-init-packages.json",
+            "packagelists/core-tools-packages.json",
+            "packagelists/selinux.json"
+        ],
+        "Hostname": "mariner",
+        "KernelOptions": {
+            "default": "kernel"
+        },
+        "KernelCommandLine": {
+            "SELinux": "permissive"
+        },
+        "Users": [
+            {
+                "Name": "root"
+            }
+        ]
+    }
 }

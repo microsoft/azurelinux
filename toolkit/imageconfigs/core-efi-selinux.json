@@ -29,34 +29,32 @@
             ]
         }
     ],
-    "SystemConfigs": [
-        {
-            "Name": "Standard",
-            "BootType": "efi",
-            "PartitionSettings": [
-                {
-                    "ID": "boot",
-                    "MountPoint": "/boot/efi",
-                    "MountOptions" : "umask=0077"
-                },
-                {
-                    "ID": "rootfs",
-                    "MountPoint": "/"
-                }
-            ],
-            "PackageLists": [
-                "packagelists/hyperv-packages.json",
-                "packagelists/core-packages-image.json",
-                "packagelists/cloud-init-packages.json",
-                "packagelists/selinux-full.json"
-            ],
-            "KernelCommandLine": {
-                "SELinux": "permissive"
+    "SystemConfig": {
+        "Name": "Standard",
+        "BootType": "efi",
+        "PartitionSettings": [
+            {
+                "ID": "boot",
+                "MountPoint": "/boot/efi",
+                "MountOptions" : "umask=0077"
             },
-            "KernelOptions": {
-                "default": "kernel"
-            },
-            "Hostname": "cbl-mariner"
-        }
-    ]
+            {
+                "ID": "rootfs",
+                "MountPoint": "/"
+            }
+        ],
+        "PackageLists": [
+            "packagelists/hyperv-packages.json",
+            "packagelists/core-packages-image.json",
+            "packagelists/cloud-init-packages.json",
+            "packagelists/selinux-full.json"
+        ],
+        "KernelCommandLine": {
+            "SELinux": "permissive"
+        },
+        "KernelOptions": {
+            "default": "kernel"
+        },
+        "Hostname": "cbl-mariner"
+    }
 }

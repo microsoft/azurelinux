@@ -29,35 +29,33 @@
             ]
         }
     ],
-    "SystemConfigs": [
-        {
-            "Name": "Standard",
-            "BootType": "efi",
-            "PartitionSettings": [
-                {
-                    "ID": "boot",
-                    "MountPoint": "/boot/efi",
-                    "MountOptions": "umask=0077"
-                },
-                {
-                    "ID": "rootfs",
-                    "MountPoint": "/"
-                }
-            ],
-            "PackageLists": [
-                "packagelists/baremetal-packages.json",
-                "packagelists/cloud-init-packages.json",
-                "packagelists/core-packages-image.json",
-                "packagelists/selinux-full.json"
-            ],
-            "KernelCommandLine": {
-                "ExtraCommandLine": "console=tty0 console=ttyS0",
-                "SELinux": "enforcing"
+    "SystemConfig": {
+        "Name": "Standard",
+        "BootType": "efi",
+        "PartitionSettings": [
+            {
+                "ID": "boot",
+                "MountPoint": "/boot/efi",
+                "MountOptions": "umask=0077"
             },
-            "KernelOptions": {
-                "default": "kernel-hci"
-            },
-            "Hostname": "azure-linux"
-        }
-    ]
+            {
+                "ID": "rootfs",
+                "MountPoint": "/"
+            }
+        ],
+        "PackageLists": [
+            "packagelists/baremetal-packages.json",
+            "packagelists/cloud-init-packages.json",
+            "packagelists/core-packages-image.json",
+            "packagelists/selinux-full.json"
+        ],
+        "KernelCommandLine": {
+            "ExtraCommandLine": "console=tty0 console=ttyS0",
+            "SELinux": "enforcing"
+        },
+        "KernelOptions": {
+            "default": "kernel-hci"
+        },
+        "Hostname": "azure-linux"
+    }
 }

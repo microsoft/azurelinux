@@ -9,14 +9,12 @@
             ]
         }
     ],
-    "SystemConfigs": [
-        {
-            "Name": "Standard",
-            "PackageLists": [
-                "packagelists/distroless-packages-container.json",
-                "packagelists/distroless-packages-debug.json"
-            ],
-            "RemoveRpmDb": true
-        }
-    ]
+    "SystemConfig": {
+        "Name": "Standard",
+        "PackageLists": [
+            "packagelists/distroless-packages-container.json",
+            "packagelists/distroless-packages-debug.json"
+        ],
+        "RemoveRpmDb": true
+    }
 }

@@ -30,30 +30,28 @@
             ]
         }
     ],
-    "SystemConfigs": [
-        {
-            "Name": "Standard",
-            "BootType": "efi",
-            "PartitionSettings": [
-                {
-                    "ID": "boot",
-                    "MountPoint": "/boot/efi",
-                    "MountOptions" : "umask=0077"
-                },
-                {
-                    "ID": "rootfs",
-                    "MountPoint": "/"
-                }
-            ],
-            "PackageLists": [
-                "packagelists/core-packages-image.json",
-                "packagelists/core-tools-packages.json",
-                "packagelists/hyperv-packages.json"
-            ],
-            "KernelOptions": {
-                "default": "kernel"
+    "SystemConfig": {
+        "Name": "Standard",
+        "BootType": "efi",
+        "PartitionSettings": [
+            {
+                "ID": "boot",
+                "MountPoint": "/boot/efi",
+                "MountOptions" : "umask=0077"
             },
-            "Hostname": "swuvm"
-        }
-    ]
+            {
+                "ID": "rootfs",
+                "MountPoint": "/"
+            }
+        ],
+        "PackageLists": [
+            "packagelists/core-packages-image.json",
+            "packagelists/core-tools-packages.json",
+            "packagelists/hyperv-packages.json"
+        ],
+        "KernelOptions": {
+            "default": "kernel"
+        },
+        "Hostname": "swuvm"
+    }
 }

@@ -36,48 +36,46 @@
             ]
         }
     ],
-    "SystemConfigs": [
-        {
-            "Name": "Standard",
-            "BootType": "efi",
-            "PartitionSettings": [
-                {
-                    "ID": "efi",
-                    "MountPoint": "/boot/efi",
-                    "MountOptions" : "umask=0077"
-                },
-                {
-                    "ID": "boot",
-                    "MountPoint": "/boot"
-                },
-                {
-                    "ID": "rootfs",
-                    "MountPoint": "/"
-                }
-            ],
-            "PackageLists": [
-                "packagelists/core-packages-image.json",
-                "packagelists/marketplace-tools-packages.json",
-                "packagelists/azurevm-packages.json"
-            ],
-            "AdditionalFiles": {
-                "additionalconfigs/cloud-init.cfg": "/etc/cloud/cloud.cfg",
-                "additionalconfigs/chrony.cfg": "/etc/chrony.conf",
-                "additionalconfigs/wait-for-ptp-hyperv.conf": "/etc/systemd/system/chronyd.service.d/wait-for-ptp-hyperv.conf",
-                "additionalconfigs/51-ptp-hyperv.rules": "/etc/udev/rules.d/51-ptp-hyperv.rules"
+    "SystemConfig": {
+        "Name": "Standard",
+        "BootType": "efi",
+        "PartitionSettings": [
+            {
+                "ID": "efi",
+                "MountPoint": "/boot/efi",
+                "MountOptions" : "umask=0077"
             },
-            "PostInstallScripts": [
-                {
-                    "Path": "additionalconfigs/configure-image.sh"
-                }
-            ],
-            "KernelOptions": {
-                "default": "kernel"
+            {
+                "ID": "boot",
+                "MountPoint": "/boot"
             },
-            "KernelCommandLine": {
-                "ExtraCommandLine": "console=ttyS0"
-            },
-            "Hostname": "cbl-mariner"
-        }
-    ]
+            {
+                "ID": "rootfs",
+                "MountPoint": "/"
+            }
+        ],
+        "PackageLists": [
+            "packagelists/core-packages-image.json",
+            "packagelists/marketplace-tools-packages.json",
+            "packagelists/azurevm-packages.json"
+        ],
+        "AdditionalFiles": {
+            "additionalconfigs/cloud-init.cfg": "/etc/cloud/cloud.cfg",
+            "additionalconfigs/chrony.cfg": "/etc/chrony.conf",
+            "additionalconfigs/wait-for-ptp-hyperv.conf": "/etc/systemd/system/chronyd.service.d/wait-for-ptp-hyperv.conf",
+            "additionalconfigs/51-ptp-hyperv.rules": "/etc/udev/rules.d/51-ptp-hyperv.rules"
+        },
+        "PostInstallScripts": [
+            {
+                "Path": "additionalconfigs/configure-image.sh"
+            }
+        ],
+        "KernelOptions": {
+            "default": "kernel"
+        },
+        "KernelCommandLine": {
+            "ExtraCommandLine": "console=ttyS0"
+        },
+        "Hostname": "cbl-mariner"
+    }
 }

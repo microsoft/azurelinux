@@ -29,30 +29,28 @@
             ]
         }
     ],
-    "SystemConfigs": [
-        {
-            "Name": "Standard",
-            "BootType": "efi",
-            "PartitionSettings": [
-                {
-                    "ID": "boot",
-                    "MountPoint": "/boot/efi",
-                    "MountOptions" : "umask=0077"
-                },
-                {
-                    "ID": "rootfs",
-                    "MountPoint": "/"
-                }
-            ],
-            "PackageLists": [
-                "packagelists/hyperv-packages.json",
-                "packagelists/core-packages-image-aarch64.json",
-                "packagelists/cloud-init-packages.json"
-            ],
-            "KernelOptions": {
-                "default": "kernel"
+    "SystemConfig": {
+        "Name": "Standard",
+        "BootType": "efi",
+        "PartitionSettings": [
+            {
+                "ID": "boot",
+                "MountPoint": "/boot/efi",
+                "MountOptions" : "umask=0077"
             },
-            "Hostname": "cbl-mariner"
-        }
-    ]
+            {
+                "ID": "rootfs",
+                "MountPoint": "/"
+            }
+        ],
+        "PackageLists": [
+            "packagelists/hyperv-packages.json",
+            "packagelists/core-packages-image-aarch64.json",
+            "packagelists/cloud-init-packages.json"
+        ],
+        "KernelOptions": {
+            "default": "kernel"
+        },
+        "Hostname": "cbl-mariner"
+    }
 }

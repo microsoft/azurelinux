@@ -29,33 +29,31 @@
             ]
         }
     ],
-    "SystemConfigs": [
-        {
-            "Name": "Standard",
-            "BootType": "efi",
-            "PartitionSettings": [
-                {
-                    "ID": "boot",
-                    "MountPoint": "/boot/efi",
-                    "MountOptions": "umask=0077"
-                },
-                {
-                    "ID": "rootfs",
-                    "MountPoint": "/"
-                }
-            ],
-            "PackageLists": [
-                "packagelists/core-packages-image.json",
-                "packagelists/cloud-init-packages.json",
-                "packagelists/qemu-guest-packages.json"
-            ],
-            "KernelCommandLine": {
-                "ExtraCommandLine": "console=tty0 console=ttyS0"
+    "SystemConfig": {
+        "Name": "Standard",
+        "BootType": "efi",
+        "PartitionSettings": [
+            {
+                "ID": "boot",
+                "MountPoint": "/boot/efi",
+                "MountOptions": "umask=0077"
             },
-            "KernelOptions": {
-                "default": "kernel-hci"
-            },
-            "Hostname": "azure-linux"
-        }
-    ]
+            {
+                "ID": "rootfs",
+                "MountPoint": "/"
+            }
+        ],
+        "PackageLists": [
+            "packagelists/core-packages-image.json",
+            "packagelists/cloud-init-packages.json",
+            "packagelists/qemu-guest-packages.json"
+        ],
+        "KernelCommandLine": {
+            "ExtraCommandLine": "console=tty0 console=ttyS0"
+        },
+        "KernelOptions": {
+            "default": "kernel-hci"
+        },
+        "Hostname": "azure-linux"
+    }
 }

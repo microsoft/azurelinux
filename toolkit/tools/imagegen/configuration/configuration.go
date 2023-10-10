@@ -66,6 +66,9 @@ type Config struct {
 	Disks         []Disk         `json:"Disks"`
 	SystemConfigs []SystemConfig `json:"SystemConfigs"`
 
+	// Shorthand for when there is only a single SystemConfig value.
+	SystemConfig *SystemConfig `json:"SystemConfig"`
+
 	// Computed values not present in the config JSON.
 	DefaultSystemConfig *SystemConfig // A system configuration with the "IsDefault" field set or the first system configuration if there is no explicit default.
 }
@@ -258,14 +261,24 @@ func (c *Config) IsValid() (err error) {
 		return fmt.Errorf("invalid [Config]: %w", err)
 	}
 
-	if len(c.SystemConfigs) == 0 {
-		return fmt.Errorf("config file must provide at least one system configuration inside the [SystemConfigs] field")
+	if len(c.SystemConfigs) > 0 && c.SystemConfig != nil {
+		return fmt.Errorf("config file must not have both [SystemConfig] and [SystemConfigs] fields")
+	} else if len(c.SystemConfigs) == 0 && c.SystemConfig == nil {
+		return fmt.Errorf("config file must provide at least one system configuration inside either [SystemConfig] or [SystemConfigs] field")
 	}
+
+	if c.SystemConfig != nil {
+		if err = c.SystemConfig.IsValid(); err != nil {
+			return fmt.Errorf("invalid [SystemConfig]: %w", err)
+		}
+	}
+
 	for _, sysConfig := range c.SystemConfigs {
 		if err = sysConfig.IsValid(); err != nil {
 			return fmt.Errorf("invalid [SystemConfigs]: %w", err)
 		}
 	}
+
 	defaultFound := false
 	for _, sysConfig := range c.SystemConfigs {
 		if sysConfig.IsDefault {
@@ -406,6 +419,13 @@ func resolveBaseDirPath(baseDirPath, configFilePath string) (absoluteBaseDirPath
 }
 
 func (c *Config) SetDefaultConfig() {
+	if c.SystemConfig != nil {
+		// Copy `SystemConfig` into `SystemConfigs` so that other code only needs to deal with
+		// the `SystemConfigs` property.
+		c.SystemConfigs = []SystemConfig{*c.SystemConfig}
+		c.SystemConfig = nil
+	}
+
 	c.DefaultSystemConfig = &c.SystemConfigs[0]
 	for i, systemConfig := range c.SystemConfigs {
 		if systemConfig.IsDefault {
