@@ -1,7 +1,7 @@
 Summary:        Library to control and monitor control groups
 Name:           libcgroup
 Version:        2.0.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -188,7 +188,7 @@ getent group cgred >/dev/null || groupadd -r cgred
 /tests/gunit/.libs/lt-gtest
 
 %changelog
-* Tue Aug 29 2023 Andy Zaugg <azaugg@linkedin.com> - 2.0.1-24
+* Tue Aug 29 2023 Andy Zaugg <azaugg@linkedin.com> - 2.0.1-2
 - Create CGCONFIG_CONF_DIR directories on package install
 
 * Tue Mar 15 2022 Nicolas Guibourge <nicolasg@microsoft.com> 2.0.1-23
