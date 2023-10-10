@@ -41,7 +41,7 @@
 Summary:        Kata Containers version 2.x repository
 Name:           kata-containers
 Version:        3.1.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 URL:            https://github.com/%{name}/%{name}
@@ -223,6 +223,9 @@ ln -sf %{_bindir}/kata-runtime %{buildroot}%{_prefix}/local/bin/kata-runtime
 %exclude %{kataosbuilderdir}/rootfs-builder/ubuntu
 
 %changelog
+* Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 3.1.0-5
+- Bump release to rebuild with updated version of Go.
+
 * Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.1.0-4
 - Bump release to rebuild with go 1.19.12
 

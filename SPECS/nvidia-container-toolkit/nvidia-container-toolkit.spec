@@ -2,7 +2,7 @@
 Summary:        NVIDIA container runtime hook
 Name:           nvidia-container-toolkit
 Version:        1.13.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ALS2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -94,6 +94,9 @@ rm -f %{_bindir}/nvidia-container-toolkit
 %{_bindir}/nvidia-ctk
 
 %changelog
+* Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 1.13.5-2
+- Bump release to rebuild with updated version of Go.
+
 * Thu Aug 24 2023 Henry Li <lihl@microsoft.com> - 1.13.5-1
 - Upgrade to version 1.13.5
 - Enforce golang to be equal to or greater than v1.20.7
