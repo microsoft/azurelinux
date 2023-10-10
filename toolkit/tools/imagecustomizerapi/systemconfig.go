@@ -24,7 +24,7 @@ type SystemConfig struct {
 	PostInstallScripts      []Script                  `yaml:"PostInstallScripts"`
 	FinalizeImageScripts    []Script                  `yaml:"FinalizeImageScripts"`
 	Users                   []User                    `yaml:"Users"`
-  Services                Services                  `yaml:"Services"`
+	Services                Services                  `yaml:"Services"`
 }
 
 func (s *SystemConfig) IsValid() error {
