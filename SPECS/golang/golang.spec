@@ -14,7 +14,7 @@
 Summary:        Go
 Name:           golang
 Version:        1.20.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -79,7 +79,7 @@ export GOROOT_BOOTSTRAP=%{goroot}
 
 export GOROOT="`pwd`"
 export GOPATH=%{gopath}
-export GOROOT_FINAL=%{_bindir}/go
+export GOROOT_FINAL=%{goroot}
 rm -f  %{gopath}/src/runtime/*.c
 pushd src
 ./make.bash --no-clean
@@ -143,6 +143,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Tue Oct 10 2023 Brian Goff <brgoff@microsoft.com> - 1.20.7-2
+- Fix GOROOT_FINAL to point at libdir/golang instead of bindir/go
+
 * Tue Aug 15 2023 Muhammad Falak <mwani@microsoft.com> - 1.20.7-1
 - Bump version to 1.20.7
 - Introduce patch to permit requests with invalid host header
