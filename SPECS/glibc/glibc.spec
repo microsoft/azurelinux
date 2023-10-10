@@ -114,6 +114,9 @@ Requires:       %{name} = %{version}-%{release}
 Conflicts:      libxcrypt
 Provides:       libcrypt
 
+%description libcrypt
+Contains the libcrypt library
+
 %prep
 %autosetup -p1
 sed -i 's/\\$$(pwd)/`pwd`/' timezone/Makefile
