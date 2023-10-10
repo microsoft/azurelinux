@@ -61,6 +61,7 @@ cp -p defs.h %{buildroot}%{_includedir}/crash
 %changelog
 * Mon Oct 09 2023 Chris Co <chrco@microsoft.com> - 8.0.1-3
 - Add patch to enable lzo, snappy, zstd compression support
+- Remove unused crash printk fix patch
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 8.0.1-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
