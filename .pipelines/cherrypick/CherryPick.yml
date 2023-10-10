@@ -23,9 +23,10 @@ resources:
       ref: refs/heads/tvuong/cherry-pick
 
 jobs:
-  steps:
-  - checkout: CBL-Mariner-Pipelines
-    path: $(pipelinesRepoFolder)
+  - job: 'Checkout CBL-Mariner-Pipelines'
+    steps:
+    - checkout: CBL-Mariner-Pipelines
+      path: $(pipelinesRepoFolder)
 
   - template: spec-auto-patch-update/pipelines/CherryPick.yml@CBL-Mariner-Pipelines
     parameters:
