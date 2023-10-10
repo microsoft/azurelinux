@@ -8,15 +8,26 @@ trigger:
 - tvuong/fasttrack/*
 pr: none
 
+variables:
+  - name: pipelinesRepoFolder
+    value: 'CBL-Mariner-Pipelines'
+
+  - name: pipelinesRepoRoot
+    value: $(Agent.BuildDirectory)/$(pipelinesRepoFolder)
+
 resources:
   repositories:
-    - repository: templates
+    - repository: CBL-Mariner-Pipelines
       type: git
       name: mariner/CBL-Mariner-Pipelines
       ref: refs/heads/tvuong/cherry-pick
 
 jobs:
-  - template: spec-auto-patch-update/pipelines/CherryPick.yml@templates
+  - checkout: CBL-Mariner-Pipelines
+    path: $(pipelinesRepoFolder)
+
+  - template: spec-auto-patch-update/pipelines/CherryPick.yml@CBL-Mariner-Pipelines
     parameters:
       commitId: $(Build.SourceVersion)
       sourceBranch: $(Build.SourceBranchName)
+      repoRootPath: $(pipelinesRepoRoot)
