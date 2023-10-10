@@ -3,9 +3,9 @@ Name:           debugedit
 Version:        5.0
 Release:        3%{?dist}
 License:        GPLv3+
-URL:            https://sourceware.org/debugedit/
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+URL:            https://sourceware.org/debugedit/
 Source0:        https://sourceware.org/ftp/%{name}/%{version}/%{name}-%{version}.tar.xz
 Patch0:         BUG-28161.patch
 BuildRequires:  automake
