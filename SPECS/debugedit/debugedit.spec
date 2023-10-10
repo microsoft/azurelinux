@@ -10,7 +10,9 @@ Source0:        https://sourceware.org/ftp/%{name}/%{version}/%{name}-%{version}
 Patch0:         BUG-28161.patch
 BuildRequires:  automake
 BuildRequires:  binutils
+%if %{with_check}
 BuildRequires:  help2man
+%endif
 
 %description
 %{summary}
