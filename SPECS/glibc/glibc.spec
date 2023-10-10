@@ -7,7 +7,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.35
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        BSD AND GPLv2+ AND Inner-Net AND ISC AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -36,6 +36,7 @@ BuildRequires:  gettext
 BuildRequires:  kernel-headers
 BuildRequires:  texinfo
 Requires:       filesystem
+Requires:       pkgconfig(libcrypt)
 Provides:       %{name}-common = %{version}-%{release}
 Provides:       /sbin/ldconfig
 Provides:       nss_db = %{version}-%{release}
@@ -106,6 +107,12 @@ Requires:       %{name} = %{version}-%{release}
 
 %description nscd
 Name Service Cache Daemon
+
+%package libcrypt
+Summary:        libcrypt library from glibc
+Requires:       %{name} = %{version}-%{release}
+Conflicts:      libxcrypt
+Provides:       libcrypt
 
 %prep
 %autosetup -p1
@@ -257,6 +264,7 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %config(noreplace) %{_sysconfdir}/rpc
 %config(missingok,noreplace) %{_sysconfdir}/ld.so.cache
 %config %{_sysconfdir}/locale-gen.conf
+%exclude /%{_lib64}/libcrypt.so.1 
 /lib64/*
 %ifarch aarch64
 /lib/ld-linux-aarch64.so.1
@@ -298,6 +306,9 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %{_sbindir}/nscd
 %dir %{_localstatedir}/cache/nscd
 
+%files libcrypt
+/%{_lib64}/libcrypt.so.1
+
 %files i18n
 %defattr(-,root,root)
 %{_datadir}/i18n/charmaps/*.gz
@@ -322,6 +333,10 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %defattr(-,root,root)
 
 %changelog
+* Mon Oct 09 2023 Chris Co <chrco@microsoft.com> - 2.35-7
+- Separate libcrypt into its own subpackage
+- Ensure only one version of libcrypt can be installed at a time
+
 * Wed Oct 04 2023 Minghe Ren <mingheren@microsoft.com> - 2.35-6
 - Add patches for CVE-2023-4806 and CVE-2023-5156
 
