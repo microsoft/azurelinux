@@ -12,7 +12,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.9.14
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -27,7 +27,8 @@ Patch3:         CVE-2022-37454.patch
 Patch4:         CVE-2022-45061.patch
 Patch5:         CVE-2022-42919.patch
 # Patch for setuptools, resolved in 65.5.1
-Patch1000:        CVE-2022-40897.patch
+Patch1000:      CVE-2022-40897.patch
+Patch1001:      CVE-2023-24329.patch
 
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
@@ -321,6 +322,9 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Wed Oct 11 2023 Amrita Kohli <amritakohli@microsoft.com> - 3.9.14-8
+- Patch for CVE-2023-24329
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.9.14-7
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
