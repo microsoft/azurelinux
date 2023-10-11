@@ -1,7 +1,7 @@
 Summary:        Cloud instance init scripts
 Name:           cloud-init
 Version:        23.3
-Release:        1{?dist}
+Release:        1%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
