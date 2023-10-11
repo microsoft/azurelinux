@@ -10,6 +10,7 @@ require (
 	github.com/jinzhu/copier v0.3.2
 	github.com/juliangruber/go-intersect v1.1.0
 	github.com/klauspost/pgzip v1.2.5
+	github.com/moby/sys/mountinfo v0.6.2
 	github.com/muesli/crunchy v0.4.0
 	github.com/rivo/tview v0.0.0-20200219135020-0ba8301b415c
 	github.com/sirupsen/logrus v1.9.3

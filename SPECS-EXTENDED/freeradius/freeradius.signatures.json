@@ -2,8 +2,9 @@
  "Signatures": {
   "freeradius-logrotate": "d9f040861ee70def0c6fd6bad8b901503e1b48b5283cd319f72b28c6493ba29d",
   "freeradius-pam-conf": "5e7dc31dd832ee6365c32bbe8042863ef8381cb1f076dfad72caa2e86d7050d7",
-  "freeradius-server-3.0.21.tar.bz2": "c22dad43954b0cbc957564d3f8cbb942ff09853852d2c2155d54e6bd641a4e7d",
+  "freeradius-server-3.2.3.tar.bz2": "4a16aeffbfa1424e1f317fdf71d17e5523a4fd9564d87c747a60595ef93c5d1f",
   "freeradius-tmpfiles.conf": "125b30adfdee54a4ae3865e7a75ad71b91c1385190a2d3fb876cf20cfc923a08",
+  "freeradius.sysusers": "313b1c8868c014ae368861a92356818f16fabae594ba6483981097b2d815efe2",
   "radiusd.service": "300647599fcd3f96d2a8065dd49bfeab086a6353c6f97bd32edc698e3550e312"
  }
 }

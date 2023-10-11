@@ -6,7 +6,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,6 +15,7 @@ URL:            https://www.gnu.org/software/grub
 Source0:        https://git.savannah.gnu.org/cgit/grub.git/snapshot/grub-%{version}.tar.gz
 Source1:        https://git.savannah.gnu.org/cgit/gnulib.git/snapshot/gnulib-%{gnulibversion}.tar.gz
 Source2:        sbat.csv.in
+Source3:        macros.grub2
 # Incorporate relevant patches from Fedora 34
 # EFI Secure Boot / Handover Protocol patches
 Patch0001:      0001-Add-support-for-Linux-EFI-stub-loading.patch
@@ -136,6 +137,22 @@ Group:          System Environment/Base
 %description efi-binary-noprefix
 GRUB UEFI bootloader binaries with no prefix directory set
 
+%package rpm-macros
+Summary:        GRUB RPM Macros
+Group:          System Environment/Base
+
+%description rpm-macros
+GRUB RPM Macros for enabling package updates supporting
+the grub2-mkconfig flow on AzureLinux
+
+%package configuration
+Summary:        Location for local grub configurations
+Group:          System Environment/Base
+
+%description configuration
+Directory for package-specific boot configurations
+to be persistently stored on AzureLinux
+
 %prep
 # Remove module_info.ld script due to error "grub2-install: error: Decompressor is too big"
 LDFLAGS="`echo " %{build_ldflags} " | sed 's#-Wl,-dT,%{_topdir}/BUILD/module_info.ld##'`"
@@ -224,6 +241,7 @@ cp -a install-for-pc/. %{buildroot}/.
 %endif
 mkdir %{buildroot}%{_sysconfdir}/default
 touch %{buildroot}%{_sysconfdir}/default/grub
+mkdir %{buildroot}%{_sysconfdir}/default/grub.d
 mkdir %{buildroot}%{_sysconfdir}/sysconfig
 ln -sf %{_sysconfdir}/default/grub %{buildroot}%{_sysconfdir}/sysconfig/grub
 install -vdm 700 %{buildroot}/boot/%{name}
@@ -252,6 +270,10 @@ GRUB_MODULE_NAME=
 GRUB_MODULE_SOURCE=
 
 install -d $EFI_BOOT_DIR
+
+# Install grub2 macros
+mkdir -p %{buildroot}%{_rpmconfigdir}/macros.d
+install -m 644 %{SOURCE3} %{buildroot}/%{_rpmconfigdir}/macros.d
 
 %ifarch x86_64
 GRUB_MODULE_NAME=grubx64.efi
@@ -291,7 +313,7 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %{_bindir}/*
 %{_datarootdir}/grub/*
 %{_sysconfdir}/sysconfig/grub
-%{_sysconfdir}/default/grub
+%attr(0644,root,root) %ghost %config(noreplace) %{_sysconfdir}/default/grub
 %ghost %config(noreplace) /boot/%{name}/grub.cfg
 
 %ifarch x86_64
@@ -326,7 +348,21 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %{_libdir}/grub/*
 %endif
 
+%files rpm-macros
+%{_rpmconfigdir}/macros.d/macros.grub2
+
+%files configuration
+%{_sysconfdir}/default/grub.d
+
 %changelog
+* Fri Aug 11 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.06-11
+- Enable support for grub2-mkconfig grub.cfg generation
+- Introduce rpm-macros, configuration subpackage
+- The Mariner /etc/default/grub now sources files from /etc/default/grub.d
+    before the remainder of grub2-mkconfig runs. This allows RPM to 
+    install package-specific configurations that the users can safely
+    override.
+
 * Thu Jun 08 2023 Daniel McIlvaney <damcilva@microsoft.com> - 2.06-10
 - CVE-2022-3775
 

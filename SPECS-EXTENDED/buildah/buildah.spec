@@ -21,7 +21,7 @@
 Summary:        A command line tool used for creating OCI Images
 Name:           buildah
 Version:        1.18.0
-Release:        18%{?dist}
+Release:        19%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -32,7 +32,7 @@ BuildRequires:  btrfs-progs-devel
 BuildRequires:  device-mapper-devel
 BuildRequires:  git
 BuildRequires:  glib2-devel
-BuildRequires:  glibc-static >= 2.35-4%{?dist}
+BuildRequires:  glibc-static >= 2.35-5%{?dist}
 BuildRequires:  go-md2man
 BuildRequires:  go-rpm-macros
 BuildRequires:  golang
@@ -123,8 +123,11 @@ cp imgtype %{buildroot}/%{_bindir}/%{name}-imgtype
 %{_datadir}/%{name}/test
 
 %changelog
-* Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 1.18.0-18
+* Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 1.18.0-19
 - Bump release to rebuild with updated version of Go.
+
+* Tue Oct 03 2023 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.18.0-18
+- Bump release to rebuild against glibc 2.35-5
 
 * Tue Sep 05 2023 Brian Fjeldstad <bfjelds@microsoft.com> - 1.18.0-17
 - Address CVE-2022-2990
