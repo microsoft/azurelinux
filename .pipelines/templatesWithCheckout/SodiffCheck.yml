@@ -6,17 +6,12 @@ parameters:
     type: string
     default: "$(Build.SourcesDirectory)"
 
-  - name: marinerVersion
-    type: string
-    values:
-      - 2.0
-
   - name: inputArtifactName
     type: string
 
-  - name: inputSourcesTarballName
+  - name: inputRPMsTarballName
     type: string
-    default: "sources.tar.gz"
+    default: "rpms.tar.gz"
 
   - name: sourcesWorkspace
     type: string
@@ -28,14 +23,14 @@ steps:
     inputs:
       artifact: ${{ parameters.inputArtifactName }}
       patterns: |
-        **/${{ parameters.inputSourcesTarballName }}
+        **/${{ parameters.inputRPMsTarballName }}
       targetPath: "$(Agent.TempDirectory)"
 
   - script: |
       set -e
 
       mkdir -p "${{ parameters.sourcesWorkspace }}"
-      find "$(Agent.TempDirectory)" -name "${{ parameters.inputSourcesTarballName }}" -print0 | xargs -0 -n 1 tar -C "${{ parameters.sourcesWorkspace }}" -xkf
+      find "$(Agent.TempDirectory)" -name "${{ parameters.inputRPMsTarballName }}" -print0 | xargs -0 -n 1 tar -C "${{ parameters.sourcesWorkspace }}" -xkf
     displayName: "Extract sources tarball"
 
   - script: |
@@ -57,17 +52,15 @@ steps:
       sodiff_out_dir="${{ parameters.buildRepoRoot }}/out/sodiff"
       mkdir -p $sodiff_out_dir
 
-      #generate repo file
       echo "Generate sodiff.repo file"
       sudo make -sC "$toolkit_dir" sodiff-repo
-
-      #ensure we have the correct keys in place
-      #sudo make -sC "$toolkit_dir" sodiff-setup
 
       echo "Generate input file"
       find $sodiff_rpms_dir -type f -name '*.rpm' -exec basename {} \; > ./sodiff-rpms
 
-      $toolkit_dir/scripts/sodiff/mariner-sodiff.sh $sodiff_rpms_dir/ $toolkit_dir/scripts/sodiff/sodiff.repo ${{ parameters.marinerVersion }} $sodiff_out_dir < ./sodiff-rpms
+      sodiff_release_ver=`cat ${{ parameteres.buildRepoRoot }}/SPECS/mariner-release/mariner-release.spec | grep "Version:" | cut -d " " -f 1 --complement`
+
+      $toolkit_dir/scripts/sodiff/mariner-sodiff.sh $sodiff_rpms_dir/ $toolkit_dir/scripts/sodiff/sodiff.repo $sodiff_release_ver $sodiff_out_dir < ./sodiff-rpms
 
 
     displayName: "Sodiff check"

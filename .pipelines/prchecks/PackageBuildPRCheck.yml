@@ -105,3 +105,17 @@ extends:
                       targetPath: $(ob_outputDirectory)
                     condition: always()
                     displayName: "Publish packages build artifacts"
+
+          - stage: sodiff_${{ configureation.name }}
+            dependsOn: RPMs+${{ configuration.name }}
+            jobs:
+              - job: Sodiff_Check
+                pool:
+                  type: linux
+                  isCustom: true
+                  name: ${{ configuration.agentPool }}
+                steps:
+                  - template: .pipelines/templatesWithCheckout/SodiffCheck.yml@self
+                    parameters:
+                      buildRepoRoot: ${{ parameters.coreRepoRoot }}
+                      inputArtifactName: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}
