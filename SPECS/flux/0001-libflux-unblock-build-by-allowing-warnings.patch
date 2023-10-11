@@ -1,0 +1,23 @@
+From 714740fafd5876f4239b095a4d7e000249c65c5d Mon Sep 17 00:00:00 2001
+From: Muhammad Falak R Wani <falakreyaz@gmail.com>
+Date: Thu, 14 Sep 2023 13:49:14 +0530
+Subject: [PATCH] libflux: unblock build by allowing warnings
+
+Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
+---
+ libflux/flux/src/lib.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libflux/flux/src/lib.rs b/libflux/flux/src/lib.rs
+index 3fdf407..ae7153a 100644
+--- a/libflux/flux/src/lib.rs
++++ b/libflux/flux/src/lib.rs
+@@ -1,4 +1,4 @@
+-#![cfg_attr(feature = "strict", deny(warnings, missing_docs))]
++#![cfg_attr(feature = "strict", deny(missing_docs))]
+ 
+ //! This module provides the public facing API for Flux's Go runtime, including formatting,
+ //! parsing, and standard library analysis.
+-- 
+2.40.1
+

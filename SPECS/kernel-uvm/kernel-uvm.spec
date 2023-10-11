@@ -10,14 +10,13 @@
 
 Summary:        Linux Kernel for Kata UVM
 Name:           kernel-uvm
-Version:        5.15.110.mshv2
-Release:        2%{?dist}
+Version:        6.1.0.mshv11
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Kernel
-# uses same source as kernel-mshv
-Source0:       %{_mariner_sources_url}/kernel-mshv-%{version}.tar.gz
+Source0:        %{_mariner_sources_url}/kernel-uvm-%{version}.tar.gz
 Source1:        config
 BuildRequires:  audit-devel
 BuildRequires:  bash
@@ -154,6 +153,18 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %{_prefix}/src/linux-headers-%{uname_r}
 
 %changelog
+* Thu Sep 15 2023 Saul Paredes <saulparedes@microsoft.com> - 6.1.0.mshv11-1
+- Update to v6.1.0.mshv11
+
+* Fri Sep 15 2023 Saul Paredes <saulparedes@microsoft.com> - 6.1.0.mshv10-1
+- Update to v6.1.0.mshv10
+
+* Mon Aug 28 2023 Saul Paredes <saulparedes@microsoft.com> - 5.15.123.mshv4-1
+- Update to v5.15.123.mshv4
+
+* Thu Jun 22 2023 Saul Paredes <saulparedes@microsoft.com> - 5.15.118.mshv4-1
+- Update to v5.15.118.mshv4
+
 * Wed May 31 2023 Dallas Delaney <dadelan@microsoft.com> - 5.15.110.mshv2-2
 - Enable dm-verity
 
