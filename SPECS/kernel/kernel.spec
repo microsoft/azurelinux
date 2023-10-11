@@ -28,7 +28,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.15.133.1
-Release:        1%{?dist}
+Release:        89%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
