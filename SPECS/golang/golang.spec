@@ -25,7 +25,7 @@ Source1:        https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
 Source2:        https://dl.google.com/go/go%{bootstrap_compiler_version}.src.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
 Patch1:         permit-requests-with-invalid-header.patch
-Patch2:         go1.20.9-CVE-2023-44487.patch
+Patch2:         CVE-2023-44487.patch
 Obsoletes:      %{name} < %{version}
 Provides:       %{name} = %{version}
 Provides:       go = %{version}-%{release}
