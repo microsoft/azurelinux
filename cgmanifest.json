@@ -1907,8 +1907,8 @@
         "type": "other",
         "other": {
           "name": "cni-plugins",
-          "version": "0.9.1",
-          "downloadUrl": "https://github.com/containernetworking/plugins/archive/v0.9.1.tar.gz"
+          "version": "1.3.0",
+          "downloadUrl": "https://github.com/containernetworking/plugins/archive/v1.3.0.tar.gz"
         }
       }
     },
