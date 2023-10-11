@@ -1070,3 +1070,36 @@ func TestShouldGetSRPMNameFromEmptySRPMPath(t *testing.T) {
 
 	assert.Equal(t, ".", node.SRPMFileName())
 }
+
+func TestShouldGetAllBuildNodesWithFilter(t *testing.T) {
+	gOut, err := buildTestGraphHelper()
+	assert.NoError(t, err)
+	assert.NotNil(t, gOut)
+
+	foundNodes := gOut.NodesMatchingFilter(func(node *PkgNode) bool {
+		return node.Type == TypeLocalBuild
+	})
+	assert.ElementsMatch(t, buildNodes, foundNodes)
+}
+
+func TestShouldGetAllRunNodesWithFilter(t *testing.T) {
+	gOut, err := buildTestGraphHelper()
+	assert.NoError(t, err)
+	assert.NotNil(t, gOut)
+
+	foundNodes := gOut.NodesMatchingFilter(func(node *PkgNode) bool {
+		return node.Type == TypeLocalRun
+	})
+	assert.ElementsMatch(t, runNodes, foundNodes)
+}
+
+func TestShouldGetAllUnresolvedNodesWithFilter(t *testing.T) {
+	gOut, err := buildTestGraphHelper()
+	assert.NoError(t, err)
+	assert.NotNil(t, gOut)
+
+	foundNodes := gOut.NodesMatchingFilter(func(node *PkgNode) bool {
+		return node.State == StateUnresolved
+	})
+	assert.ElementsMatch(t, unresolvedNodes, foundNodes)
+}
