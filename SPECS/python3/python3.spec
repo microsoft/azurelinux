@@ -8,7 +8,6 @@
 # See Lib/ensurepip/__init__.py in Source0 for these version numbers
 %global pip_version 22.0.4
 %global setuptools_version 58.1.0
-
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.9.14
@@ -29,7 +28,6 @@ Patch5:         CVE-2022-42919.patch
 Patch6:         CVE-2023-24329.patch
 # Patch for setuptools, resolved in 65.5.1
 Patch1000:      CVE-2022-40897.patch
-
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
 BuildRequires:  libffi-devel >= 3.0.13
@@ -39,9 +37,9 @@ BuildRequires:  pkg-config >= 0.28
 BuildRequires:  readline-devel
 BuildRequires:  sqlite-devel
 BuildRequires:  xz-devel
+Requires:       %{name}-libs = %{version}-%{release}
 Requires:       ncurses
 Requires:       openssl
-Requires:       %{name}-libs = %{version}-%{release}
 Requires:       readline
 Requires:       xz
 Provides:       python
@@ -86,8 +84,8 @@ provides the libraries needed for python 3 applications.
 %package        curses
 Summary:        Python module interface for NCurses Library
 Group:          Applications/System
-Requires:       ncurses
 Requires:       %{name}-libs = %{version}-%{release}
+Requires:       ncurses
 Provides:       python%{majmin}-curses = %{version}-%{release}
 Provides:       python%{majmin_nodots}-curses = %{version}-%{release}
 
@@ -97,9 +95,9 @@ The python3-curses package provides interface for ncurses library.
 %package        devel
 Summary:        The libraries and header files needed for Python development.
 Group:          Development/Libraries
-Requires:       expat-devel >= 2.1.0
 Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-setuptools = %{version}-%{release}
+Requires:       expat-devel >= 2.1.0
 Provides:       python%{majmin}-devel = %{version}-%{release}
 Provides:       python%{majmin_nodots}-devel = %{version}-%{release}
 
