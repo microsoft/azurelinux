@@ -26,9 +26,9 @@ Patch2:         0001-gh-95231-Disable-md5-crypt-modules-if-FIPS-is-enable.patch
 Patch3:         CVE-2022-37454.patch
 Patch4:         CVE-2022-45061.patch
 Patch5:         CVE-2022-42919.patch
+Patch6:         CVE-2023-24329.patch
 # Patch for setuptools, resolved in 65.5.1
 Patch1000:      CVE-2022-40897.patch
-Patch1001:      CVE-2023-24329.patch
 
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
@@ -169,6 +169,7 @@ The test package contains all regression tests for Python as well as the modules
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
+%patch6 -p1
 
 %build
 # Remove GCC specs and build environment linker scripts
