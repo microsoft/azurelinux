@@ -77,7 +77,7 @@ type CCachePkgGroup struct {
 type CCacheManager struct {
 	ConfigFileName    string
 	Configuration     *CCacheConfiguration
-	RootCCacheDir     string
+	RootWorkDir       string
 	LocalDownloadsDir string
 	LocalUploadsDir   string
 	CurrentPkgGroup   *CCachePkgGroup
@@ -349,7 +349,6 @@ func getChildFolders(parentFolder string) ([]string, error) {
 }
 
 func CreateManager(rootDir string, configFileName string) (m *CCacheManager, err error) {
-
 	logger.Log.Infof("* Creating a ccache manager instance *")
 	logger.Log.Infof("  ccache root folder         : (%s)", rootDir)
 	logger.Log.Infof("  ccache remote configuration: (%s)", configFileName)
@@ -386,14 +385,21 @@ func CreateManager(rootDir string, configFileName string) (m *CCacheManager, err
 		return nil, err
 	}
 
-	localDownloadsDir := rootDir + "-downloads"
+	rootWorkDir := rootDir + "/work"
+	err = ensureDirExists(rootWorkDir)
+	if err != nil {
+		logger.Log.Warnf("  cannot create ccache work folder.")
+		return nil, err
+	}
+
+	localDownloadsDir := rootDir + "/downloads"
 	err = ensureDirExists(localDownloadsDir)
 	if err != nil {
 		logger.Log.Warnf("  cannot create ccache downloads folder.")
 		return nil, err
 	}
 
-	localUploadsDir := rootDir + "-uploads"
+	localUploadsDir := rootDir + "/uploads"
 	err = ensureDirExists(localUploadsDir)
 	if err != nil {
 		logger.Log.Warnf("  cannot create ccache uploads folder.")
@@ -403,7 +409,7 @@ func CreateManager(rootDir string, configFileName string) (m *CCacheManager, err
 	ccacheManager := &CCacheManager{
 		ConfigFileName    : configFileName,
 		Configuration     : configuration,
-		RootCCacheDir     : rootDir,
+		RootWorkDir     : rootWorkDir,
 		LocalDownloadsDir : localDownloadsDir,
 		LocalUploadsDir   : localUploadsDir,
 		AzureBlobStorage  : azureBlobStorage,
@@ -480,7 +486,7 @@ func (m *CCacheManager) buildPkgCCacheDir(pkgCCacheGroupName string, pkgArchitec
 	if pkgCCacheGroupName == "" {
 		return "", errors.New("CCache package group name cannot be empty.")
 	}
-	return m.RootCCacheDir + "/" + pkgArchitecture + "/" + pkgCCacheGroupName, nil
+	return m.RootWorkDir + "/" + pkgArchitecture + "/" + pkgCCacheGroupName, nil
 }
 
 func (m *CCacheManager) DownloadPkgGroupCCache() (err error) {
@@ -608,13 +614,16 @@ func (m *CCacheManager) UploadPkgGroupCCache() (err error) {
 // After building a package or more, the ccache folder is expected to look as
 // follows:
 //
-// <m.RootCCacheDir>
-//   x86_64
-//     <groupName-1>
-//     <groupName-2>
-//   noarch
-//     <groupName-3>
-//     <groupName-4>
+// <rootDir> (i.e. /ccache)
+//   <m.LocalDownloadsDir>
+//   <m.LocalUploadsDir>
+//   <m.RootWorkDir>
+//     x86_64
+//       <groupName-1>
+//       <groupName-2>
+//     noarch
+//       <groupName-3>
+//       <groupName-4>
 //
 // This function is typically called at the end of the build - after all
 // packages have completed building.
@@ -627,16 +636,16 @@ func (m *CCacheManager) UploadPkgGroupCCache() (err error) {
 //
 func (m *CCacheManager) UploadMultiPkgGroupCCaches() (err error) {
 
-	architectures, err := getChildFolders(m.RootCCacheDir)
+	architectures, err := getChildFolders(m.RootWorkDir)
 	errorsOccured := false
 	if err != nil {
-		return errors.New(fmt.Sprintf("failed to enumerate ccache child folders under (%s)...", m.RootCCacheDir))
+		return errors.New(fmt.Sprintf("failed to enumerate ccache child folders under (%s)...", m.RootWorkDir))
 	} 
 
 	for _, architecture := range architectures {
-		groupNames, err := getChildFolders(filepath.Join(m.RootCCacheDir, architecture))
+		groupNames, err := getChildFolders(filepath.Join(m.RootWorkDir, architecture))
 		if err != nil {
-			logger.Log.Warnf("failed to enumerate child folders under (%s)...", m.RootCCacheDir)
+			logger.Log.Warnf("failed to enumerate child folders under (%s)...", m.RootWorkDir)
 			errorsOccured = true
 		} else {
 			for _, groupName := range groupNames {
