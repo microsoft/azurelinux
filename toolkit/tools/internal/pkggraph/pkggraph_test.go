@@ -1096,6 +1096,17 @@ func TestShouldGetAllBuildNodesWithFilter(t *testing.T) {
 	assert.ElementsMatch(t, buildNodes, foundNodes)
 }
 
+func TestShouldGetAllNodesWithFilter(t *testing.T) {
+	gOut, err := buildTestGraphHelper()
+	assert.NoError(t, err)
+	assert.NotNil(t, gOut)
+
+	foundNodes := gOut.NodesMatchingFilter(func(node *PkgNode) bool {
+		return true
+	})
+	assert.ElementsMatch(t, allNodes, foundNodes)
+}
+
 func TestShouldGetAllRunNodesWithFilter(t *testing.T) {
 	gOut, err := buildTestGraphHelper()
 	assert.NoError(t, err)
