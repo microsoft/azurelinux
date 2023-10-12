@@ -51,7 +51,7 @@ func (abs *AzureBlobStorage) Upload(
 	return nil
 }
 
-func (abs *AzureBlobStorage) Download(
+func (abs *AzureBlobStorage) downloadInternal(
 	ctx context.Context,
 	containerName string,
 	blobName string,
@@ -68,12 +68,44 @@ func (abs *AzureBlobStorage) Download(
 
 	_, err = abs.theClient.DownloadFile(ctx, containerName, blobName, localFile, nil)
 	if err != nil {
+
 		logger.Log.Infof("  failed to download blob to local file. Error: %v", err)
 		return err
 	}
 
 	downloadEndTime := time.Now()
 	logger.Log.Infof("  download time: %v", downloadEndTime.Sub(downloadStartTime))
+
+	return nil
+}
+
+func (abs *AzureBlobStorage) Download(
+	ctx context.Context,
+	containerName string,
+	blobName string,
+	localFileName string) (err error) {
+
+	err = abs.downloadInternal(ctx, containerName, blobName, localFileName)
+	if err != nil {
+		os.Remove(localFileName)
+	}
+
+	return err
+}
+
+func (abs *AzureBlobStorage) Delete(
+	ctx context.Context,
+	containerName string,
+	blobName string) (err error) {
+
+	deleteStartTime := time.Now()
+	_, err = abs.theClient.DeleteBlob(ctx, containerName, blobName, nil)
+	if err != nil {
+		logger.Log.Infof("  failed to delete blob. Error: %v", err)
+		return err
+	}	
+	deleteEndTime := time.Now()
+	logger.Log.Infof("  delete time: %v", deleteEndTime.Sub(deleteStartTime))
 
 	return nil
 }

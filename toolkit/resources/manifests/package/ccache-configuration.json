@@ -8,10 +8,12 @@
     "containerName": "20-stable",
     "tagsFolder": "tags",
     "downloadEnabled": true,
-    "downloadFolder": "latest",
+    "downloadLatest": true,
+    "downloadFolder": "",
     "uploadEnabled": false,
     "uploadFolder": "",
-    "updateLatest": false
+    "updateLatest": false,
+    "keepLatestOnly": false
   },
   "groups": [
     {

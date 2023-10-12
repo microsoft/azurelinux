@@ -19,9 +19,8 @@ import (
 )
 
 const (
-	// This is the value that the download source folder can be set to in the
-	// config to indicate the desire to download the latest.
-	LatestTagMarker = "latest"
+	CCacheTarSuffix = "-ccache.tar.gz"
+	CCacheTagSuffix = "-latest-build.txt"
 	// This are just place holders when constructing a new manager object.
 	UninitializedGroupName = "unknown"
 	UninitializedGroupSize = 0
@@ -37,10 +36,12 @@ type RemoteStoreConfig struct {
 	ContainerName   string `json:"containerName"`
 	TagsFolder      string `json:"tagsFolder"`
 	DownloadEnabled bool   `json:"downloadEnabled"`
+	DownloadLatest  bool   `json:"downloadLatest"`
 	DownloadFolder  string `json:"downloadFolder"`
 	UploadEnabled   bool   `json:"uploadEnabled"`
 	UploadFolder    string `json:"uploadFolder"`
 	UpdateLatest    bool   `json:"updateLatest"`
+	KeepLatestOnly  bool   `json:"keepLatestOnly"`
 }
 
 type CCacheGroupConfig struct {
@@ -80,33 +81,28 @@ type CCacheManager struct {
 	LocalDownloadsDir string
 	LocalUploadsDir   string
 	CurrentPkgGroup   *CCachePkgGroup
+	AzureBlobStorage  *azureblobstoragepkg.AzureBlobStorage
 }
 
-func (g *CCachePkgGroup) UpdatePaths(remoteStoreConfig *RemoteStoreConfig, localDownloadsDir string, localUploadsDir string) {
+func buildRemotePath(arch, folder, name, suffix string) (string) {
+	return arch + "/" + folder + "/" + name + suffix
+}
 
-	CCacheTarSuffix := "-ccache.tar.gz"
+func (g *CCachePkgGroup) buildTarRemotePath(folder string) (string) {
+	return buildRemotePath(g.Arch, folder, g.Name, CCacheTarSuffix)
+}
 
-	tarFile := &CCacheArchive{
-		LocalSourcePath : localDownloadsDir + "/" + g.Name + CCacheTarSuffix,
-		RemoteSourcePath : g.Arch + "/" + remoteStoreConfig.DownloadFolder + "/" + g.Name + CCacheTarSuffix,
-		LocalTargetPath : localUploadsDir + "/" + g.Name + CCacheTarSuffix,
-		RemoteTargetPath : g.Arch + "/" + remoteStoreConfig.UploadFolder + "/" + g.Name + CCacheTarSuffix,
-	}
+func (g *CCachePkgGroup) buildTagRemotePath(folder string) (string) {
+	return buildRemotePath(g.Arch, folder, g.Name, CCacheTagSuffix)
+}
 
-	logger.Log.Infof("  tar local source  : (%s)", tarFile.LocalSourcePath)
-	logger.Log.Infof("  tar remote source : (%s)", tarFile.RemoteSourcePath)
-	logger.Log.Infof("  tar local target  : (%s)", tarFile.LocalTargetPath)
-	logger.Log.Infof("  tar remote target : (%s)", tarFile.RemoteTargetPath)
-
-	g.TarFile = tarFile
-
-	CCacheTagSuffix := "-latest-build.txt"
+func (g *CCachePkgGroup) UpdateTagsPaths(remoteStoreConfig *RemoteStoreConfig, localDownloadsDir string, localUploadsDir string) {
 
 	tagFile := &CCacheArchive{
 		LocalSourcePath : localDownloadsDir + "/" + g.Name + CCacheTagSuffix,
-		RemoteSourcePath : g.Arch + "/" + remoteStoreConfig.TagsFolder + "/" + g.Name + CCacheTagSuffix,
+		RemoteSourcePath : g.buildTagRemotePath(remoteStoreConfig.TagsFolder),
 		LocalTargetPath : localUploadsDir + "/" + g.Name + CCacheTagSuffix,
-		RemoteTargetPath : g.Arch + "/" + remoteStoreConfig.TagsFolder + "/" + g.Name + CCacheTagSuffix,
+		RemoteTargetPath : g.buildTagRemotePath(remoteStoreConfig.TagsFolder),
 	}
 
 	logger.Log.Infof("  tag local source  : (%s)", tagFile.LocalSourcePath)
@@ -115,6 +111,46 @@ func (g *CCachePkgGroup) UpdatePaths(remoteStoreConfig *RemoteStoreConfig, local
 	logger.Log.Infof("  tag remote target : (%s)", tagFile.RemoteTargetPath)
 
 	g.TagFile = tagFile
+}
+
+func (g *CCachePkgGroup) UpdateTarPaths(remoteStoreConfig *RemoteStoreConfig, localDownloadsDir string, localUploadsDir string) {
+
+	tarFile := &CCacheArchive{
+		LocalSourcePath : localDownloadsDir + "/" + g.Name + CCacheTarSuffix,
+		RemoteSourcePath : g.buildTarRemotePath(remoteStoreConfig.DownloadFolder),
+		LocalTargetPath : localUploadsDir + "/" + g.Name + CCacheTarSuffix,
+		RemoteTargetPath : g.buildTarRemotePath(remoteStoreConfig.UploadFolder),
+	}
+
+	logger.Log.Infof("  tar local source  : (%s)", tarFile.LocalSourcePath)
+	logger.Log.Infof("  tar remote source : (%s)", tarFile.RemoteSourcePath)
+	logger.Log.Infof("  tar local target  : (%s)", tarFile.LocalTargetPath)
+	logger.Log.Infof("  tar remote target : (%s)", tarFile.RemoteTargetPath)
+
+	g.TarFile = tarFile
+}
+
+func (g *CCachePkgGroup) getLatestTag(azureBlobStorage *azureblobstoragepkg.AzureBlobStorage, containerName string) (string, error) {
+
+	logger.Log.Infof("  checking if (%s) already exists...", g.TagFile.LocalSourcePath)
+	_, err := os.Stat(g.TagFile.LocalSourcePath)
+	if err != nil {
+		// If file is not available locally, try downloading it...
+		logger.Log.Infof("  downloading (%s) to (%s)...", g.TagFile.RemoteSourcePath, g.TagFile.LocalSourcePath)
+		err = azureBlobStorage.Download(context.Background(), containerName, g.TagFile.RemoteSourcePath, g.TagFile.LocalSourcePath)
+		if err != nil {
+			logger.Log.Warnf("  unable to download ccache tag file.")
+			return "", err
+		}
+	}
+
+	latestBuildTagData, err := ioutil.ReadFile(g.TagFile.LocalSourcePath)
+	if err != nil {
+		logger.Log.Warnf("Unable to read ccache tag file contents. Error: %v", err)
+		return "", err
+	}
+
+	return string(latestBuildTagData), nil
 }
 
 // SetCurrentPkgGroup() is called once per package.
@@ -149,10 +185,31 @@ func (m *CCacheManager) setCurrentPkgGroupInternal(groupName string, groupEnable
 		logger.Log.Infof("  ccache pkg folder : (%s)", ccachePkgGroup.CCacheDir)
 		err = ensureDirExists(ccachePkgGroup.CCacheDir)
 		if err != nil {
-			logger.Log.Warnf("Cannot create ccache download folder. Error: %v", err)
+			logger.Log.Warnf("Cannot create ccache download folder.")
 			return err
 		}
-		ccachePkgGroup.UpdatePaths(m.Configuration.RemoteStoreConfig, m.LocalDownloadsDir, m.LocalUploadsDir)
+
+		ccachePkgGroup.UpdateTagsPaths(m.Configuration.RemoteStoreConfig, m.LocalDownloadsDir, m.LocalUploadsDir)
+
+		if m.Configuration.RemoteStoreConfig.DownloadLatest {
+
+			logger.Log.Infof("  ccache is configured to use the latest from the remote store...")
+			latestTag, err := ccachePkgGroup.getLatestTag(m.AzureBlobStorage, m.Configuration.RemoteStoreConfig.ContainerName)
+			if err == nil {
+				// Adjust the download folder from 'latest' to the tag loaded from the file...
+				logger.Log.Infof("  updating (%s) to (%s)...", m.Configuration.RemoteStoreConfig.DownloadFolder, latestTag)
+				m.Configuration.RemoteStoreConfig.DownloadFolder = latestTag
+			} else {
+				logger.Log.Warnf("  unable to get the latest ccache tag. Might be the first run and no ccache tag has been uploaded before.")
+			}
+		}
+
+		if m.Configuration.RemoteStoreConfig.DownloadFolder == "" {
+			logger.Log.Infof("  ccache archive source download folder is an empty string. Disabling ccache download.")
+			m.Configuration.RemoteStoreConfig.DownloadEnabled = false
+		}
+
+		ccachePkgGroup.UpdateTarPaths(m.Configuration.RemoteStoreConfig, m.LocalDownloadsDir, m.LocalUploadsDir)
 	}
 
 	m.CurrentPkgGroup = ccachePkgGroup
@@ -293,7 +350,7 @@ func getChildFolders(parentFolder string) ([]string, error) {
 
 func CreateManager(rootDir string, configFileName string) (m *CCacheManager, err error) {
 
-	logger.Log.Infof("** Creating a ccache manager instance **")
+	logger.Log.Infof("* Creating a ccache manager instance *")
 	logger.Log.Infof("  ccache root folder         : (%s)", rootDir)
 	logger.Log.Infof("  ccache remote configuration: (%s)", configFileName)
 
@@ -311,12 +368,45 @@ func CreateManager(rootDir string, configFileName string) (m *CCacheManager, err
 		return nil, err
 	}
 
+	logger.Log.Infof("  creating blob storage client...")
+	accessType := azureblobstoragepkg.AnonymousAccess
+	if configuration.RemoteStoreConfig.UploadEnabled {
+		accessType = azureblobstoragepkg.AuthenticatedAccess
+	}
+
+	azureBlobStorage, err := azureblobstoragepkg.Create(configuration.RemoteStoreConfig.TenantId, configuration.RemoteStoreConfig.UserName, configuration.RemoteStoreConfig.Password, configuration.RemoteStoreConfig.StorageAccount, accessType)
+	if err != nil {
+		logger.Log.Warnf("Unable to init azure blob storage client.")
+		return nil, err
+	}
+
+	err = ensureDirExists(rootDir)
+	if err != nil {
+		logger.Log.Warnf("  cannot create ccache working folder.")
+		return nil, err
+	}
+
+	localDownloadsDir := rootDir + "-downloads"
+	err = ensureDirExists(localDownloadsDir)
+	if err != nil {
+		logger.Log.Warnf("  cannot create ccache downloads folder.")
+		return nil, err
+	}
+
+	localUploadsDir := rootDir + "-uploads"
+	err = ensureDirExists(localUploadsDir)
+	if err != nil {
+		logger.Log.Warnf("  cannot create ccache uploads folder.")
+		return nil, err
+	}
+
 	ccacheManager := &CCacheManager{
 		ConfigFileName    : configFileName,
 		Configuration     : configuration,
 		RootCCacheDir     : rootDir,
-		LocalDownloadsDir : rootDir + "-downloads",
-		LocalUploadsDir   : rootDir + "-uploads",
+		LocalDownloadsDir : localDownloadsDir,
+		LocalUploadsDir   : localUploadsDir,
+		AzureBlobStorage  : azureBlobStorage,
 	}
 
 	ccacheManager.setCurrentPkgGroupInternal(UninitializedGroupName, false, UninitializedGroupSize, UninitializedGroupArchitecture)
@@ -395,7 +485,7 @@ func (m *CCacheManager) buildPkgCCacheDir(pkgCCacheGroupName string, pkgArchitec
 
 func (m *CCacheManager) DownloadPkgGroupCCache() (err error) {
 
-	logger.Log.Infof("** processing download of ccache artifacts...")
+	logger.Log.Infof("* processing download of ccache artifacts...")
 
 	remoteStoreConfig := m.Configuration.RemoteStoreConfig
 	if !remoteStoreConfig.DownloadEnabled {
@@ -403,59 +493,16 @@ func (m *CCacheManager) DownloadPkgGroupCCache() (err error) {
 		return nil
 	}
 
-	logger.Log.Infof("  downloading and expanding...")
-	err = ensureDirExists(m.LocalDownloadsDir)
-	if err != nil {
-		logger.Log.Warnf("Cannot create ccache download folder. Error: %v", err)
-		return err
-	}
-
-	logger.Log.Infof("  creating container client...")
-	azureblobstorage, err := azureblobstoragepkg.Create(remoteStoreConfig.TenantId, remoteStoreConfig.UserName, remoteStoreConfig.Password, remoteStoreConfig.StorageAccount, azureblobstoragepkg.AnonymousAccess)
-	if err != nil {
-		logger.Log.Warnf("Unable to init azure blob storage client. Error: %v", err)
-		return err
-	}
-
-	if remoteStoreConfig.DownloadFolder == LatestTagMarker {
-
-		logger.Log.Infof("  ccache is configured to use the latest...")
-
-		// Download the tags file...
-		logger.Log.Infof("  downloading (%s) to (%s)...", m.CurrentPkgGroup.TagFile.RemoteSourcePath, m.CurrentPkgGroup.TagFile.LocalSourcePath)
-		err = azureblobstorage.Download(context.Background(), remoteStoreConfig.ContainerName, m.CurrentPkgGroup.TagFile.RemoteSourcePath, m.CurrentPkgGroup.TagFile.LocalSourcePath)
-		if err != nil {
-			logger.Log.Warnf("  unable to download ccache archive. Error: %v", err)
-			return err
-		}
-
-		// Read the text contents...
-		latestBuildTagData, err := ioutil.ReadFile(m.CurrentPkgGroup.TagFile.LocalSourcePath)
-		if err != nil {
-			logger.Log.Warnf("Unable to read ccache tag file contents. Error: %v", err)
-			return err
-		}
-
-		latestBuildTag := string(latestBuildTagData)
-
-		// Adjust the download folder from 'latest' to the tag loaded from the file...
-		logger.Log.Infof("  updating (%s) to (%s)...", remoteStoreConfig.DownloadFolder, latestBuildTag)
-		remoteStoreConfig.DownloadFolder = latestBuildTag
-
-		m.CurrentPkgGroup.UpdatePaths(remoteStoreConfig, m.LocalDownloadsDir, m.LocalUploadsDir)
-	}
-
-	// Download the actual cache...
 	logger.Log.Infof("  downloading (%s) to (%s)...", m.CurrentPkgGroup.TarFile.RemoteSourcePath, m.CurrentPkgGroup.TarFile.LocalSourcePath)
-	err = azureblobstorage.Download(context.Background(), remoteStoreConfig.ContainerName, m.CurrentPkgGroup.TarFile.RemoteSourcePath, m.CurrentPkgGroup.TarFile.LocalSourcePath)
+	err = m.AzureBlobStorage.Download(context.Background(), remoteStoreConfig.ContainerName, m.CurrentPkgGroup.TarFile.RemoteSourcePath, m.CurrentPkgGroup.TarFile.LocalSourcePath)
 	if err != nil {
-		logger.Log.Warnf("Unable to download ccache archive. Error: %v", err)
+		logger.Log.Warnf("  unable to download ccache archive.")
 		return err
 	}
 
 	err = uncompressFile(m.CurrentPkgGroup.TarFile.LocalSourcePath, m.CurrentPkgGroup.CCacheDir)
 	if err != nil {
-		logger.Log.Warnf("Unable uncompress ccache files from archive. Error: %v", err)
+		logger.Log.Warnf("Unable uncompress ccache files from archive.")
 		return err
 	}
 
@@ -464,14 +511,14 @@ func (m *CCacheManager) DownloadPkgGroupCCache() (err error) {
 
 func (m *CCacheManager) UploadPkgGroupCCache() (err error) {
 
-	logger.Log.Infof("** processing upload of ccache artifacts...")
+	logger.Log.Infof("* processing upload of ccache artifacts...")
 
 	// Check if ccache has actually generated any content.
 	// If it has, it would have created a specific folder structure - so,
 	// checking for folders is reasonable enough.
 	pkgCCacheDirContents, err := getChildFolders(m.CurrentPkgGroup.CCacheDir)
 	if err != nil {
-		logger.Log.Warnf("Failed to enumerate the contents of (%s). Error: %v", m.CurrentPkgGroup.CCacheDir, err)
+		logger.Log.Warnf("Failed to enumerate the contents of (%s).", m.CurrentPkgGroup.CCacheDir)
 	}
 	if len(pkgCCacheDirContents) == 0 {
 		logger.Log.Infof("  %s is empty. Nothing to archive and upload. Skipping...", m.CurrentPkgGroup.CCacheDir)
@@ -484,35 +531,46 @@ func (m *CCacheManager) UploadPkgGroupCCache() (err error) {
 		return nil
 	}
 
-	logger.Log.Infof("  archiving and uploading...")
-	err = ensureDirExists(m.LocalUploadsDir)
-	if err != nil {
-		logger.Log.Warnf("Cannot create ccache download folder. Error: %v", err)
-		return err
-	}
-
 	err = compressDir(m.CurrentPkgGroup.CCacheDir, m.CurrentPkgGroup.TarFile.LocalTargetPath)
 	if err != nil {
-		logger.Log.Warnf("Unable compress ccache files itno archive. Error: %v", err)
-		return err
-	}
-
-	logger.Log.Infof("  connecting to azure storage blob...")
-	azureblobstorage, err := azureblobstoragepkg.Create(remoteStoreConfig.TenantId, remoteStoreConfig.UserName, remoteStoreConfig.Password, remoteStoreConfig.StorageAccount, azureblobstoragepkg.AuthenticatedAccess)
-	if err != nil {
-		logger.Log.Warnf("Unable create azure blob storage client. Error: %v", err)
+		logger.Log.Warnf("Unable compress ccache files itno archive.")
 		return err
 	}
 
 	// Upload the ccache archive
 	logger.Log.Infof("  uploading ccache archive (%s) to (%s)...", m.CurrentPkgGroup.TarFile.LocalTargetPath, m.CurrentPkgGroup.TarFile.RemoteTargetPath)
-	err = azureblobstorage.Upload(context.Background(), m.CurrentPkgGroup.TarFile.LocalTargetPath, remoteStoreConfig.ContainerName, m.CurrentPkgGroup.TarFile.RemoteTargetPath)
+	err = m.AzureBlobStorage.Upload(context.Background(), m.CurrentPkgGroup.TarFile.LocalTargetPath, remoteStoreConfig.ContainerName, m.CurrentPkgGroup.TarFile.RemoteTargetPath)
 	if err != nil {
-		logger.Log.Warnf("Unable to upload ccache archive. Error: %v", err)
+		logger.Log.Warnf("Unable to upload ccache archive.")
 		return err
 	}
 
 	if remoteStoreConfig.UpdateLatest {
+		logger.Log.Infof("  update latest is enabled.")
+		// If KeepLatestOnly is true, we need to capture the current source
+		// ccache archive path which is about to be dereferenced. That way,
+		// we can delete it after we update the latest tag to point to the
+		// new ccache archive.
+		//
+		// First we assume it does not exist (i.e. first time to run).
+		//
+		previousLatestTarSourcePath := ""
+		if remoteStoreConfig.KeepLatestOnly {
+			logger.Log.Infof("  keep latest only is enabled. Capturing path to previous ccache archive if it exists...")
+			// getLatestTag() will check locally first if the tag file has
+			// been downloaded and use it. If not, it will attempt to
+			// download it. If not, then there is no way to get to the
+			// previous latest tar (if it exists at all).
+			latestTag, err := m.CurrentPkgGroup.getLatestTag(m.AzureBlobStorage, m.Configuration.RemoteStoreConfig.ContainerName)
+			if err == nil {
+				// build the archive remote path based on the latestTag.
+				previousLatestTarSourcePath = m.CurrentPkgGroup.buildTarRemotePath(latestTag)
+				logger.Log.Infof("  (%s) is about to be de-referenced.", previousLatestTarSourcePath)
+			} else {
+				logger.Log.Warnf("  unable to get the latest ccache tag. This might be the first run and no latest ccache tag has been uploaded before.")
+			}
+		}
+
 		// Create the latest tag file...
 		logger.Log.Infof("  creating a tag file (%s) with content: (%s)...", m.CurrentPkgGroup.TagFile.LocalTargetPath, remoteStoreConfig.UploadFolder)
 		err = ioutil.WriteFile(m.CurrentPkgGroup.TagFile.LocalTargetPath, []byte(remoteStoreConfig.UploadFolder), 0644)
@@ -523,10 +581,23 @@ func (m *CCacheManager) UploadPkgGroupCCache() (err error) {
 
 		// Upload the latest tag file...
 		logger.Log.Infof("  uploading tag file (%s) to (%s)...", m.CurrentPkgGroup.TagFile.LocalTargetPath, m.CurrentPkgGroup.TagFile.RemoteTargetPath)
-		err = azureblobstorage.Upload(context.Background(), m.CurrentPkgGroup.TagFile.LocalTargetPath, remoteStoreConfig.ContainerName, m.CurrentPkgGroup.TagFile.RemoteTargetPath)
+		err = m.AzureBlobStorage.Upload(context.Background(), m.CurrentPkgGroup.TagFile.LocalTargetPath, remoteStoreConfig.ContainerName, m.CurrentPkgGroup.TagFile.RemoteTargetPath)
 		if err != nil {
-			logger.Log.Warnf("Unable to upload ccache archive. Error: %v", err)
+			logger.Log.Warnf("Unable to upload ccache archive.")
 			return err
+		}
+
+		if remoteStoreConfig.KeepLatestOnly {
+			logger.Log.Infof("  keep latest only is enabled. Removing previous ccache archive if it exists...")
+			if previousLatestTarSourcePath == "" {
+				logger.Log.Infof("  cannot remove old archive with an empty name. No previous ccache archive to remove.")
+			} else {
+				logger.Log.Infof("  removing ccache archive (%s) from remote store...", previousLatestTarSourcePath)
+				err = m.AzureBlobStorage.Delete(context.Background(), remoteStoreConfig.ContainerName, previousLatestTarSourcePath)
+				if err != nil {
+					logger.Log.Warnf("Unable to remove previous ccache archive.")
+				}
+			}
 		}
 	}
 
