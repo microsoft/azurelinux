@@ -27,7 +27,7 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.15.131.1
+Version:        5.15.133.1
 Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -425,7 +425,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Thu Oct 12 2023 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 5.15.131.1-2
+* Thu Oct 12 2023 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 5.15.132.1-2
 - Changes to enable boot as guest on MSHV/CH
 
 * Tue Sep 26 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.133.1-1
