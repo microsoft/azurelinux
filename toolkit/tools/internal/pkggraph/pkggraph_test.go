@@ -163,6 +163,9 @@ func addNodeToGraphHelper(g *PkgGraph, node *PkgNode) (newNode *PkgNode, err err
 		node.Architecture,
 		node.SourceRepo,
 	)
+
+	// Updating node's ID for the sake of equality testing.
+	node.nodeID = newNode.nodeID
 	return
 }
 
@@ -338,16 +341,23 @@ func TestDOTID(t *testing.T) {
 	for _, n := range allNodes {
 		assert.NotPanics(t, func() { n.DOTID() })
 	}
-	assert.Equal(t, "A-1-RUN<Meta> (ID=0,TYPE=Run,STATE=Meta)", pkgARun.DOTID())
-	assert.Equal(t, "D--REMOTE<Unresolved> (ID=0,TYPE=Remote,STATE=Unresolved)", pkgD1Unresolved.DOTID())
+
+	expectedARunDOTID := fmt.Sprintf("A-1-RUN<Meta> (ID=%d,TYPE=Run,STATE=Meta)", pkgARun.ID())
+	assert.Equal(t, expectedARunDOTID, pkgARun.DOTID())
+
+	expectedD1UnresolvedDOTID := fmt.Sprintf("D--REMOTE<Unresolved> (ID=%d,TYPE=Remote,STATE=Unresolved)", pkgD1Unresolved.ID())
+	assert.Equal(t, expectedD1UnresolvedDOTID, pkgD1Unresolved.DOTID())
 
 	g := NewPkgGraph()
 	goal, err := g.AddGoalNode("test", nil, nil, false)
 	assert.NoError(t, err)
-	assert.Equal(t, "test (ID=0,TYPE=Goal,STATE=Meta)", goal.DOTID())
+
+	expectedGoalDOTID := fmt.Sprintf("test (ID=%d,TYPE=Goal,STATE=Meta)", goal.ID())
+	assert.Equal(t, expectedGoalDOTID, goal.DOTID())
 
 	meta := g.AddMetaNode([]*PkgNode{}, []*PkgNode{})
-	assert.Equal(t, "Meta(1) (ID=1,TYPE=PureMeta,STATE=Meta)", meta.DOTID())
+	expectedMetaDOTID := fmt.Sprintf("Meta(1) (ID=%d,TYPE=PureMeta,STATE=Meta)", meta.ID())
+	assert.Equal(t, expectedMetaDOTID, meta.DOTID())
 
 	junk := PkgNode{State: -1, Type: -1}
 	assert.Panics(t, func() { junk.DOTID() })
@@ -355,10 +365,15 @@ func TestDOTID(t *testing.T) {
 
 // TestNodeString tests the built-in String() function for PkgNodes
 func TestNodeString(t *testing.T) {
-	assert.Equal(t, "A(1,):<ID:0 Type:Run State:Meta Rpm:A.rpm> from 'A.src.rpm' in 'test_repo'", pkgARun.String())
-	assert.Equal(t, "D(<1,):<ID:0 Type:Remote State:Unresolved Rpm:url://D.rpm> from 'url://D.src.rpm' in 'test_repo'", pkgD1Unresolved.String())
+	expectedARunString := fmt.Sprintf("A(1,):<ID:%d Type:Run State:Meta Rpm:A.rpm> from 'A.src.rpm' in 'test_repo'", pkgARun.ID())
+	assert.Equal(t, expectedARunString, pkgARun.String())
+
+	expectedD1UnresolvedString := fmt.Sprintf("D(<1,):<ID:%d Type:Remote State:Unresolved Rpm:url://D.rpm> from 'url://D.src.rpm' in 'test_repo'", pkgD1Unresolved.ID())
+	assert.Equal(t, expectedD1UnresolvedString, pkgD1Unresolved.String())
+
 	goalNode := PkgNode{GoalName: "goal", Type: TypeGoal, State: StateMeta}
 	assert.Equal(t, "goal():<ID:0 Type:Goal State:Meta Rpm:> from '' in ''", goalNode.String())
+
 	emptyNode := PkgNode{}
 	assert.Panics(t, func() { _ = emptyNode.String() })
 }
