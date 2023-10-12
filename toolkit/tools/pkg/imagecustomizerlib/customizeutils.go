@@ -26,7 +26,7 @@ const (
 	resolveConfPath            = "/etc/resolv.conf"
 )
 
-func doCustomizations(buildDir string, baseConfigPath string, config *imagecustomizerapi.SystemConfig,
+func doCustomizations(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
 	imageChroot *safechroot.Chroot, rpmsSources []string, useBaseImageRpmRepos bool,
 ) error {
 	var err error
@@ -39,37 +39,37 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
-	err = addRemoveAndUpdatePackages(buildDir, baseConfigPath, config, imageChroot, rpmsSources, useBaseImageRpmRepos)
+	err = addRemoveAndUpdatePackages(buildDir, baseConfigPath, &config.SystemConfig, imageChroot, rpmsSources, useBaseImageRpmRepos)
 	if err != nil {
 		return err
 	}
 
-	err = updateHostname(config.Hostname, imageChroot)
+	err = updateHostname(config.SystemConfig.Hostname, imageChroot)
 	if err != nil {
 		return err
 	}
 
-	err = copyAdditionalFiles(baseConfigPath, config.AdditionalFiles, imageChroot)
+	err = copyAdditionalFiles(baseConfigPath, config.SystemConfig.AdditionalFiles, imageChroot)
 	if err != nil {
 		return err
 	}
 
-	err = addOrUpdateUsers(config.Users, baseConfigPath, imageChroot)
+	err = addOrUpdateUsers(config.SystemConfig.Users, baseConfigPath, imageChroot)
 	if err != nil {
 		return err
 	}
 
-	err = enableOrDisableServices(config.Services, baseConfigPath, imageChroot)
+	err = enableOrDisableServices(config.SystemConfig.Services, baseConfigPath, imageChroot)
 	if err != nil {
 		return err
 	}
 
-	err = runScripts(baseConfigPath, config.PostInstallScripts, imageChroot)
+	err = runScripts(baseConfigPath, config.SystemConfig.PostInstallScripts, imageChroot)
 	if err != nil {
 		return err
 	}
 
-	err = runScripts(baseConfigPath, config.FinalizeImageScripts, imageChroot)
+	err = runScripts(baseConfigPath, config.SystemConfig.FinalizeImageScripts, imageChroot)
 	if err != nil {
 		return err
 	}

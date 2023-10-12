@@ -1,4 +1,4 @@
-filesystem-1.1-15.cm2.x86_64.rpm
+filesystem-1.1-17.cm2.x86_64.rpm
 kernel-headers-5.15.133.1-1.cm2.noarch.rpm
 glibc-2.35-6.cm2.x86_64.rpm
 glibc-devel-2.35-6.cm2.x86_64.rpm
@@ -172,7 +172,7 @@ openssl-perl-1.1.1k-27.cm2.x86_64.rpm
 openssl-static-1.1.1k-27.cm2.x86_64.rpm
 libcap-2.60-2.cm2.x86_64.rpm
 libcap-devel-2.60-2.cm2.x86_64.rpm
-debugedit-5.0-3.cm2.x86_64.rpm
+debugedit-5.0-2.cm2.x86_64.rpm
 libarchive-3.6.1-2.cm2.x86_64.rpm
 libarchive-devel-3.6.1-2.cm2.x86_64.rpm
 rpm-4.18.0-4.cm2.x86_64.rpm
@@ -189,10 +189,10 @@ libsolv-devel-0.7.24-1.cm2.x86_64.rpm
 libssh2-1.9.0-3.cm2.x86_64.rpm
 libssh2-devel-1.9.0-3.cm2.x86_64.rpm
 krb5-1.19.4-2.cm2.x86_64.rpm
-nghttp2-1.46.0-3.cm2.x86_64.rpm
-curl-8.3.0-1.cm2.x86_64.rpm
-curl-devel-8.3.0-1.cm2.x86_64.rpm
-curl-libs-8.3.0-1.cm2.x86_64.rpm
+nghttp2-1.57.0-1.cm2.x86_64.rpm
+curl-8.3.0-2.cm2.x86_64.rpm
+curl-devel-8.3.0-2.cm2.x86_64.rpm
+curl-libs-8.3.0-2.cm2.x86_64.rpm
 createrepo_c-0.17.5-1.cm2.x86_64.rpm
 libxml2-2.10.4-1.cm2.x86_64.rpm
 libxml2-devel-2.10.4-1.cm2.x86_64.rpm

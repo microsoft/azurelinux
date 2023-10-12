@@ -28,7 +28,7 @@ func CustomizeImageWithConfigFile(buildDir string, configFile string, imageFile 
 ) error {
 	var err error
 
-	var config imagecustomizerapi.SystemConfig
+	var config imagecustomizerapi.Config
 	err = imagecustomizerapi.UnmarshalYamlFile(configFile, &config)
 	if err != nil {
 		return err
@@ -45,7 +45,7 @@ func CustomizeImageWithConfigFile(buildDir string, configFile string, imageFile 
 	return nil
 }
 
-func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomizerapi.SystemConfig, imageFile string,
+func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config, imageFile string,
 	rpmsSources []string, outputImageFile string, outputImageFormat string, useBaseImageRpmRepos bool,
 ) error {
 	var err error
@@ -113,7 +113,18 @@ func toQemuImageFormat(imageFormat string) (string, error) {
 	}
 }
 
-func validateConfig(baseConfigPath string, config *imagecustomizerapi.SystemConfig) error {
+func validateConfig(baseConfigPath string, config *imagecustomizerapi.Config) error {
+	var err error
+
+	err = validateSystemConfig(baseConfigPath, &config.SystemConfig)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func validateSystemConfig(baseConfigPath string, config *imagecustomizerapi.SystemConfig) error {
 	var err error
 
 	for sourceFile := range config.AdditionalFiles {
@@ -168,7 +179,7 @@ func validateScript(baseConfigPath string, script *imagecustomizerapi.Script) er
 	return nil
 }
 
-func customizeImageHelper(buildDir string, baseConfigPath string, config *imagecustomizerapi.SystemConfig,
+func customizeImageHelper(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
 	buildImageFile string, rpmsSources []string, useBaseImageRpmRepos bool,
 ) error {
 	// Mount the raw disk image file.
