@@ -138,7 +138,7 @@ ln -s vmlinux-%{uname_r} %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vml
 
 cat > %{buildroot}/boot/linux-%{uname_r}.cfg << "EOF"
 # GRUB Environment Block
-mariner_cmdline_mshv=rd.auto=1 lockdown=integrity sysctl.kernel.unprivileged_bpf_disabled=1 init=/lib/systemd/systemd ro no-vmw-sta crashkernel=256M audit=0 console=ttyS0,115200n8 earlyprintk
+mariner_cmdline_mshv=rd.auto=1 lockdown=integrity sysctl.kernel.unprivileged_bpf_disabled=1 init=/lib/systemd/systemd ro no-vmw-sta crashkernel=512M audit=0 console=ttyS0,115200n8 earlyprintk
 mariner_linux_mshv=vmlinuz-%{uname_r}
 mariner_initrd_mshv=initrd.img-%{uname_r}
 EOF
@@ -248,7 +248,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner-mshv.cfg
 
 %changelog
 * Wed Oct 11 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.126.mshv3-2
-- Bump to 256M crashkernel allocation for legacy boot paths. 
+- Bump to 512M crashkernel allocation for legacy boot paths. 
 
 * Thu Sep 21 2023 Saul Paredes <saulparedes@microsoft.com> - 5.15.126.mshv3-1
 - Update to v5.15.126.mshv3
