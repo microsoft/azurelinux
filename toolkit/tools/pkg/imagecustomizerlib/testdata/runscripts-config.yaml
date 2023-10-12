@@ -1,0 +1,6 @@
+SystemConfig:
+  PostInstallScripts:
+  - Path: scripts/postinstallscript.sh
+
+  FinalizeImageScripts:
+  - Path: scripts/finalizeimagescript.sh

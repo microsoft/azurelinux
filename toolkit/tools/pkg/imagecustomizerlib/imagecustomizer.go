@@ -23,11 +23,12 @@ var (
 )
 
 func CustomizeImageWithConfigFile(buildDir string, configFile string, imageFile string,
-	outputImageFile string, outputImageFormat string,
+	rpmsSources []string, outputImageFile string, outputImageFormat string,
+	useBaseImageRpmRepos bool,
 ) error {
 	var err error
 
-	var config imagecustomizerapi.SystemConfig
+	var config imagecustomizerapi.Config
 	err = imagecustomizerapi.UnmarshalYamlFile(configFile, &config)
 	if err != nil {
 		return err
@@ -35,7 +36,8 @@ func CustomizeImageWithConfigFile(buildDir string, configFile string, imageFile 
 
 	baseConfigPath, _ := filepath.Split(configFile)
 
-	err = CustomizeImage(buildDir, baseConfigPath, &config, imageFile, outputImageFile, outputImageFormat)
+	err = CustomizeImage(buildDir, baseConfigPath, &config, imageFile, rpmsSources, outputImageFile, outputImageFormat,
+		useBaseImageRpmRepos)
 	if err != nil {
 		return err
 	}
@@ -43,8 +45,8 @@ func CustomizeImageWithConfigFile(buildDir string, configFile string, imageFile 
 	return nil
 }
 
-func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomizerapi.SystemConfig, imageFile string,
-	outputImageFile string, outputImageFormat string,
+func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config, imageFile string,
+	rpmsSources []string, outputImageFile string, outputImageFormat string, useBaseImageRpmRepos bool,
 ) error {
 	var err error
 
@@ -81,7 +83,7 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 	}
 
 	// Customize the raw image file.
-	err = customizeImageHelper(buildDirAbs, baseConfigPath, config, buildImageFile)
+	err = customizeImageHelper(buildDirAbs, baseConfigPath, config, buildImageFile, rpmsSources, useBaseImageRpmRepos)
 	if err != nil {
 		return err
 	}
@@ -111,7 +113,20 @@ func toQemuImageFormat(imageFormat string) (string, error) {
 	}
 }
 
-func validateConfig(baseConfigPath string, config *imagecustomizerapi.SystemConfig) error {
+func validateConfig(baseConfigPath string, config *imagecustomizerapi.Config) error {
+	var err error
+
+	err = validateSystemConfig(baseConfigPath, &config.SystemConfig)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func validateSystemConfig(baseConfigPath string, config *imagecustomizerapi.SystemConfig) error {
+	var err error
+
 	for sourceFile := range config.AdditionalFiles {
 		sourceFileFullPath := filepath.Join(baseConfigPath, sourceFile)
 		isFile, err := file.IsFile(sourceFileFullPath)
@@ -124,11 +139,48 @@ func validateConfig(baseConfigPath string, config *imagecustomizerapi.SystemConf
 		}
 	}
 
+	for i, script := range config.PostInstallScripts {
+		err = validateScript(baseConfigPath, &script)
+		if err != nil {
+			return fmt.Errorf("invalid PostInstallScripts item at index %d: %w", i, err)
+		}
+	}
+
+	for i, script := range config.FinalizeImageScripts {
+		err = validateScript(baseConfigPath, &script)
+		if err != nil {
+			return fmt.Errorf("invalid FinalizeImageScripts item at index %d: %w", i, err)
+		}
+	}
+
 	return nil
 }
 
-func customizeImageHelper(buildDir string, baseConfigPath string, config *imagecustomizerapi.SystemConfig,
-	buildImageFile string,
+func validateScript(baseConfigPath string, script *imagecustomizerapi.Script) error {
+	// Ensure that install scripts sit under the config file's parent directory.
+	// This allows the install script to be run in the chroot environment by bind mounting the config directory.
+	if !filepath.IsLocal(script.Path) {
+		return fmt.Errorf("install script (%s) is not under config directory (%s)", script.Path, baseConfigPath)
+	}
+
+	// Verify that the file exists.
+	fullPath := filepath.Join(baseConfigPath, script.Path)
+
+	scriptStat, err := os.Stat(fullPath)
+	if err != nil {
+		return fmt.Errorf("couldn't read install script (%s):\n%w", script.Path, err)
+	}
+
+	// Verify that the file has an executable bit set.
+	if scriptStat.Mode()&0111 == 0 {
+		return fmt.Errorf("install script (%s) does not have executable bit set", script.Path)
+	}
+
+	return nil
+}
+
+func customizeImageHelper(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
+	buildImageFile string, rpmsSources []string, useBaseImageRpmRepos bool,
 ) error {
 	// Mount the raw disk image file.
 	diskDevPath, err := diskutils.SetupLoopbackDevice(buildImageFile)
@@ -160,7 +212,7 @@ func customizeImageHelper(buildDir string, baseConfigPath string, config *imagec
 	defer imageChroot.Close(false)
 
 	// Do the actual customizations.
-	err = doCustomizations(baseConfigPath, config, imageChroot)
+	err = doCustomizations(buildDir, baseConfigPath, config, imageChroot, rpmsSources, useBaseImageRpmRepos)
 	if err != nil {
 		return err
 	}

@@ -10,6 +10,7 @@ precache_state_dir = $(CACHED_RPMS_DIR)/precache
 precache_downloaded_files = $(precache_state_dir)/downloaded_files.txt
 repo_urls_file = $(precache_state_dir)/repo_urls.txt
 precache_chroot_dir = $(precache_state_dir)/chroot
+precache_logs_path = $(LOGS_DIR)/precache/precache.log
 
 $(call create_folder,$(precache_state_dir))
 $(call create_folder,$(remote_rpms_cache_dir))
@@ -39,7 +40,7 @@ $(STATUS_FLAGS_DIR)/precache.flag: $(go-precacher) $(chroot_worker) $(rpms_snaps
 		$(foreach repofile,$(REPO_LIST), --repo-file "$(repofile)") \
 		--worker-tar $(chroot_worker) \
 		--worker-dir $(precache_chroot_dir) \
-		--log-file=$(SRPM_BUILD_LOGS_DIR)/precacher.log \
+		--log-file=$(precache_logs_path) \
 		--log-level=$(LOG_LEVEL) \
 		--cpu-prof-file=$(PROFILE_DIR)/precacher.cpu.pprof \
 		--mem-prof-file=$(PROFILE_DIR)/precacher.mem.pprof \

@@ -1,7 +1,7 @@
 Summary:        Coroutine-based network library
 Name:           python-gevent
 Version:        1.3.6
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,7 @@ URL:            https://www.gevent.org
 #Source0:       https://github.com/gevent/gevent/archive/%{version}.tar.gz
 Source0:        gevent-%{version}.tar.gz
 Patch0:         python-gevent-makecheck.patch
+Patch1:         CVE-2023-41419.patch
 
 %description
 gevent is a coroutine-based Python networking library.
@@ -27,6 +28,8 @@ BuildRequires:  curl-devel
 BuildRequires:  lsof
 BuildRequires:  openssl-devel
 BuildRequires:  python3-test
+BuildRequires:  python3-pip
+BuildRequires:  python3-greenlet
 %endif
 
 %description -n python3-gevent
@@ -61,6 +64,9 @@ nosetests
 %{python3_sitelib}/*
 
 %changelog
+* Wed Oct 04 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.3.6-9
+- Add patch for CVE-2023-41419
+
 * Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 1.3.6-8
 - Regenerate C sources at build-time to fix build break with Python 3.9
 

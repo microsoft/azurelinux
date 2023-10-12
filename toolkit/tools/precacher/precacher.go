@@ -174,12 +174,16 @@ func getAllRepoData(repoURLs, repoFiles []string, workerTar, buildDir, repoUrlsF
 	}
 
 	var packageRepoUrls []string
-	err = queryChroot.Run(func() (chrootErr error) {
-		packageRepoUrls, chrootErr = getPackageRepoUrlsFromRepoFiles()
-		return chrootErr
-	})
-	if err != nil {
-		return nil, err
+	// Only run repoquery if we have repo files to query. --enablerepo=* will not work if there are no repo files
+	// and will return "Error: Unknown repo: '*'"
+	if len(repoFiles) > 0 {
+		err = queryChroot.Run(func() (chrootErr error) {
+			packageRepoUrls, chrootErr = getPackageRepoUrlsFromRepoFiles()
+			return chrootErr
+		})
+		if err != nil {
+			return nil, err
+		}
 	}
 	allPackageURLs = append(allPackageURLs, packageRepoUrls...)
 

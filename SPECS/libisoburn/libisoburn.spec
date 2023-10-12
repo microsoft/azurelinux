@@ -1,7 +1,7 @@
 Summary:        Library to enable creation and expansion of ISO-9660 filesystems
 Name:           libisoburn
 Version:        1.5.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -94,7 +94,7 @@ rm -f %{buildroot}%{_bindir}/xorriso-tcltk
 %check
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:%{buildroot}%{_libdir}"
 cd releng
-./run_all_auto -x ../xorriso/xorriso || (cat releng_generated_data/log.*; exit 1)
+./run_all_auto -x ../xorriso/xorriso || (cat releng_generated_data/log.*; false)
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -122,6 +122,9 @@ cd releng
 %{_infodir}/xorriso*.info*
 
 %changelog
+* Tue Sep 26 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.4-3
+- Removing 'exit' calls from the '%%check' section.
+
 * Mon Apr 11 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.4-2
 - Fixing a typo in the source URL.
 

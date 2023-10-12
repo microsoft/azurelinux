@@ -514,17 +514,37 @@ func filterCompatibleSpecs(inputSpecPaths []string, defines map[string]string) (
 		return
 	}
 
+	type specArchResult struct {
+		compatible bool
+		path       string
+		err        error
+	}
+	resultsChannel := make(chan specArchResult, len(inputSpecPaths))
+
 	for _, specFilePath := range inputSpecPaths {
 		specDirPath := filepath.Dir(specFilePath)
 
-		specCompatible, err = SpecArchIsCompatible(specFilePath, specDirPath, buildArch, defines)
-		if err != nil {
-			logger.Log.Errorf("Failed while querrying spec (%s). Error: %v.", specFilePath, err)
+		go func(pathIter string) {
+			specCompatible, err = SpecArchIsCompatible(pathIter, specDirPath, buildArch, defines)
+			if err != nil {
+				err = fmt.Errorf("failed while querrying spec (%s). Error: %v.", pathIter, err)
+			}
+			resultsChannel <- specArchResult{
+				compatible: specCompatible,
+				path:       pathIter,
+				err:        err,
+			}
+		}(specFilePath)
+	}
+
+	for i := 0; i < len(inputSpecPaths); i++ {
+		result := <-resultsChannel
+		if result.err != nil {
+			err = result.err
 			return
 		}
-
-		if specCompatible {
-			filteredSpecPaths = append(filteredSpecPaths, specFilePath)
+		if result.compatible {
+			filteredSpecPaths = append(filteredSpecPaths, result.path)
 		}
 	}
 

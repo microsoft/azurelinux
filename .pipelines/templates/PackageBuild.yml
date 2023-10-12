@@ -224,4 +224,5 @@ steps:
           buildRepoRoot: ${{ parameters.buildRepoRoot }}
           failOnTestFailures: ${{ parameters.failOnTestFailures }}
           outputArtifactsFolder: ${{ parameters.outputArtifactsFolder }}
+          pipArtifactFeeds: ${{ parameters.pipArtifactFeeds }}
           testSuiteName: ${{ parameters.testSuiteName }}
