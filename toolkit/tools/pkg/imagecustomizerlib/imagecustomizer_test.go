@@ -22,8 +22,16 @@ import (
 func TestCustomizeImageEmptyConfig(t *testing.T) {
 	var err error
 
+	if testing.Short() {
+		t.Skip("Short mode enabled")
+	}
+
 	if !buildpipeline.IsRegularBuild() {
 		t.Skip("loopback block device not available")
+	}
+
+	if os.Geteuid() != 0 {
+		t.Skip("Test must be run as root because it uses a chroot")
 	}
 
 	buildDir := filepath.Join(tmpDir, "TestCustomizeImageEmptyConfig")
@@ -49,8 +57,16 @@ func TestCustomizeImageEmptyConfig(t *testing.T) {
 func TestCustomizeImageCopyFiles(t *testing.T) {
 	var err error
 
+	if testing.Short() {
+		t.Skip("Short mode enabled")
+	}
+
 	if !buildpipeline.IsRegularBuild() {
 		t.Skip("loopback block device not available")
+	}
+
+	if os.Geteuid() != 0 {
+		t.Skip("Test must be run as root because it uses a chroot")
 	}
 
 	buildDir := filepath.Join(tmpDir, "TestCustomizeImageCopyFiles")
