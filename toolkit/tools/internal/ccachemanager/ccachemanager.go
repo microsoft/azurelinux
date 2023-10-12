@@ -234,10 +234,12 @@ func loadConfiguration(configFileName string) (configuration *CCacheConfiguratio
 	logger.Log.Infof("    ContainerName  : %s", configuration.RemoteStoreConfig.ContainerName)
 	logger.Log.Infof("    Tagsfolder     : %s", configuration.RemoteStoreConfig.TagsFolder)
 	logger.Log.Infof("    DownloadEnabled: %v", configuration.RemoteStoreConfig.DownloadEnabled)
+	logger.Log.Infof("    DownloadLatest : %v", configuration.RemoteStoreConfig.DownloadLatest)
 	logger.Log.Infof("    DownloadFolder : %s", configuration.RemoteStoreConfig.DownloadFolder)
 	logger.Log.Infof("    UploadEnabled  : %v", configuration.RemoteStoreConfig.UploadEnabled)
 	logger.Log.Infof("    UploadFolder   : %s", configuration.RemoteStoreConfig.UploadFolder)
 	logger.Log.Infof("    UpdateLatest   : %v", configuration.RemoteStoreConfig.UpdateLatest)
+	logger.Log.Infof("    KeepLatestOnly : %v", configuration.RemoteStoreConfig.KeepLatestOnly)
 
 	return configuration, err	
 }
