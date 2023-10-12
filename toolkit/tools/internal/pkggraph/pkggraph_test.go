@@ -437,7 +437,6 @@ func TestAddMissingVersion(t *testing.T) {
 	n, err := addNodeToGraphHelper(g, pkgD2Unresolved)
 	assert.NoError(t, err)
 	assert.NotNil(t, n)
-
 }
 
 // Add a run node with an invalid version (for a run node)
