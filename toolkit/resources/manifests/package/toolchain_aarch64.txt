@@ -30,8 +30,8 @@ check-debuginfo-0.15.2-1.cm2.aarch64.rpm
 chkconfig-1.20-4.cm2.aarch64.rpm
 chkconfig-debuginfo-1.20-4.cm2.aarch64.rpm
 chkconfig-lang-1.20-4.cm2.aarch64.rpm
-cmake-3.21.4-8.cm2.aarch64.rpm
-cmake-debuginfo-3.21.4-8.cm2.aarch64.rpm
+cmake-3.21.4-9.cm2.aarch64.rpm
+cmake-debuginfo-3.21.4-9.cm2.aarch64.rpm
 coreutils-8.32-7.cm2.aarch64.rpm
 coreutils-debuginfo-8.32-7.cm2.aarch64.rpm
 coreutils-lang-8.32-7.cm2.aarch64.rpm
@@ -46,10 +46,10 @@ cracklib-lang-2.9.7-5.cm2.aarch64.rpm
 createrepo_c-0.17.5-1.cm2.aarch64.rpm
 createrepo_c-debuginfo-0.17.5-1.cm2.aarch64.rpm
 createrepo_c-devel-0.17.5-1.cm2.aarch64.rpm
-curl-8.3.0-1.cm2.aarch64.rpm
-curl-debuginfo-8.3.0-1.cm2.aarch64.rpm
-curl-devel-8.3.0-1.cm2.aarch64.rpm
-curl-libs-8.3.0-1.cm2.aarch64.rpm
+curl-8.3.0-2.cm2.aarch64.rpm
+curl-debuginfo-8.3.0-2.cm2.aarch64.rpm
+curl-devel-8.3.0-2.cm2.aarch64.rpm
+curl-libs-8.3.0-2.cm2.aarch64.rpm
 Cython-debuginfo-0.29.33-1.cm2.aarch64.rpm
 debugedit-5.0-2.cm2.aarch64.rpm
 debugedit-debuginfo-5.0-2.cm2.aarch64.rpm
