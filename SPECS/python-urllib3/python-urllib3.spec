@@ -55,7 +55,6 @@ nox --reuse-existing-virtualenvs --sessions test-%{python3_version}
 * Thu Oct 12 2023 Amrita Kohli <amritakohli@microsoft.com> - 1.26.9-2
 - Patch CVE-2023-43804
 
-%changelog
 * Fri Mar 25 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.26.9-1
 - Upgrade to 1.26.9
 
