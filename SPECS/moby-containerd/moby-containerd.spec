@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: moby-%{upstream_name}
 Version: 1.6.22
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -63,6 +63,7 @@ make VERSION="%{version}" REVISION="%{commit_hash}" DESTDIR="%{buildroot}" PREFI
 mkdir -p %{buildroot}/%{_unitdir}
 install -D -p -m 0644 %{SOURCE1} %{buildroot}%{_unitdir}/containerd.service
 install -D -p -m 0644 %{SOURCE2} %{buildroot}%{_sysconfdir}/containerd/config.toml
+install -vdm 755 %{buildroot}/opt/containerd/{bin,lib}
 
 %post
 %systemd_post containerd.service
@@ -84,8 +85,14 @@ fi
 %{_mandir}/*
 %config(noreplace) %{_unitdir}/containerd.service
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
+%dir /opt/containerd
+%dir /opt/containerd/bin
+%dir /opt/containerd/lib
 
 %changelog
+* Mon Oct 02 2023 Chris PeBenito <chpebeni@microsoft.com> - 1.6.22-2
+- Precreate /opt/containerd/{bin,lib} to ensure correct SELinux labeling.
+
 * Wed Aug 16 2023 Muhammad Falak <mwani@microsoft.com> - 1.6.22-1
 - Bump version to 1.6.22
 
@@ -142,7 +149,7 @@ fi
 - Default cgroup to 'systemd'
 
 * Wed Mar 23 2022 Anirudh Gopal <angop@microsoft.com> - 1.6.1-2
-- Always restart containerd service 
+- Always restart containerd service
 
 * Mon Mar 14 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.6.1-1
 - Update to version 1.6.1
