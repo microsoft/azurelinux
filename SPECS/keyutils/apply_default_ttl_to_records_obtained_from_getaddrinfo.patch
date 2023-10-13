@@ -418,7 +418,7 @@ index 4ac27d3..7a7ec42 100644
  	name++;
 
  	info("Query type: '%*.*s'", qtlen, qtlen, keyend);
--
+-	
 +
  	if ((qtlen == sizeof(a_query_type) - 1 &&
  	     memcmp(keyend, a_query_type, sizeof(a_query_type) - 1) == 0) ||
