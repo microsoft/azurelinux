@@ -51,7 +51,7 @@ Requires:       %{name} = %{version}-%{release}
  needed to build applications using syslog-ng APIs.
 
 %prep
-%autosetup
+%autosetup -p1
 rm -rf ../p3dir
 cp -a . ../p3dir
 
