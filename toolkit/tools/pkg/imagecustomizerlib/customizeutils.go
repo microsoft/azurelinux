@@ -15,7 +15,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safemount.go"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safemount"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/userutils"
 	"golang.org/x/sys/unix"
@@ -186,7 +186,7 @@ func runScripts(baseConfigPath string, scripts []imagecustomizerapi.Script, imag
 		}
 	}
 
-	err = mount.Close()
+	err = mount.CleanClose()
 	if err != nil {
 		return err
 	}

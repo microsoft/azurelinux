@@ -14,7 +14,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safemount.go"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safemount"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 )
 
@@ -193,12 +193,6 @@ func customizeImageHelper(buildDir string, baseConfigPath string, config *imagec
 	}
 	defer diskutils.DetachLoopbackDevice(diskDevPath)
 
-	// Wait for the partitions to show up.
-	err = diskutils.WaitForDevicesToSettle()
-	if err != nil {
-		return err
-	}
-
 	// Look for all the partitions on the image.
 	newMountDirectories, mountPoints, err := findPartitions(buildDir, diskDevPath)
 	if err != nil {
@@ -304,7 +298,7 @@ func findBootLoaderPartitionFromEsp(efiSystemPartition *diskutils.PartitionInfo,
 	}
 
 	// Close the EFI System Partition mount.
-	err = efiSystemPartitionMount.Close()
+	err = efiSystemPartitionMount.CleanClose()
 	if err != nil {
 		return nil, fmt.Errorf("failed to close EFI system partition mount:\n%w", err)
 	}
@@ -364,7 +358,7 @@ func findBootLoaderPartitionFromBiosBootPartition(biosBootLoaderPartition *disku
 			return nil, fmt.Errorf("failed to stat grub.cfg file (%s):\n%w", grubCfgPath, err)
 		}
 
-		err = partitionMount.Close()
+		err = partitionMount.CleanClose()
 		if err != nil {
 			return nil, fmt.Errorf("failed to unmount partition (%s):\n%w", diskPartition.Path, err)
 		}
@@ -404,7 +398,7 @@ func findMountsFromRootfs(rootfsPartition *diskutils.PartitionInfo, diskPartitio
 	}
 
 	// Close the rootfs partition mount.
-	err = rootfsPartitionMount.Close()
+	err = rootfsPartitionMount.CleanClose()
 	if err != nil {
 		return nil, fmt.Errorf("failed to close rootfs partition mount (%s):\n%w", rootfsPartition.Path, err)
 	}
