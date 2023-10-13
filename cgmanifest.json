@@ -27124,6 +27124,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rust-cbindgen",
+          "version": "0.24.3",
+          "downloadUrl": "https://github.com/mozilla/cbindgen/archive/refs/tags/v0.24.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "rust-packaging",
           "version": "14",
           "downloadUrl": "https://releases.pagure.org/fedora-rust/rust2rpm/rust2rpm-14.tar.xz"
