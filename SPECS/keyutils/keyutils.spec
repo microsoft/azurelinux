@@ -1,6 +1,6 @@
 Summary:        Linux Key Management Utilities
 Name:           keyutils
-Version:        1.6.2
+Version:        1.6.3
 Release:        1%{?dist}
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
@@ -73,8 +73,8 @@ find %{buildroot} -name '*.a'  -delete
 %{_mandir}/man3/*
 
 %changelog
-* Fri Oct 13 2023 Thien Trung Vuong <tvuong@microsoft.com> - 1.6.2-1
-- Update to version 1.6.2.
+* Fri Oct 13 2023 Thien Trung Vuong <tvuong@microsoft.com> - 1.6.3-1
+- Update to version 1.6.3
 - Update URL and Source0
 
 * Wed Nov 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.1-1
