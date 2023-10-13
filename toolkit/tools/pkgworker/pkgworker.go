@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"strings"
 	"time"
 
@@ -92,13 +93,20 @@ func main() {
 	ccacheManager, err := ccachemanagerpkg.CreateManager(*ccacheRootDir, *ccachConfig)
 	if err == nil {
 		if *useCcache {
-			err = ccacheManager.SetCurrentPkgGroup(*basePackageName, *outArch)
-			if err != nil {
-				logger.Log.Warnf("Failed to set package ccache configuration. Error (%v)", err)
-			}
-
-			if ccacheManager.CurrentPkgGroup.Enabled {
-				defines[rpm.MarinerCCacheDefine] = "true"
+			buildArch, err := rpm.GetRpmArch(runtime.GOARCH)
+			if err == nil {
+				err = ccacheManager.SetCurrentPkgGroup(*basePackageName, buildArch)
+				if err == nil {
+					if ccacheManager.CurrentPkgGroup.Enabled {
+						defines[rpm.MarinerCCacheDefine] = "true"
+					}
+				} else {
+					logger.Log.Warnf("Failed to set package ccache configuration.")
+					ccacheManager = nil
+				}
+			} else {
+				logger.Log.Warnf("Failed to get build architecture. Error: %v", err)
+				ccacheManager = nil
 			}
 		}
 	} else {
