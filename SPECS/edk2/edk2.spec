@@ -689,6 +689,9 @@ $tests_ok
 
 
 %changelog
+* Tue Oct 13 2023 Sindhu Karri <lakarri@microsoft.com> - 20230301gitf80f052277c8-36
+- Patch CVE-2023-3817 in bundled OpenSSL
+
 * Tue Sep 26 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 20230301gitf80f052277c8-35
 - Removing 'exit' calls from the '%%check' section.
 
