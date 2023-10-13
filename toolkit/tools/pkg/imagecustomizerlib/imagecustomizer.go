@@ -358,7 +358,7 @@ func findBootLoaderPartitionFromBiosBootPartition(biosBootLoaderPartition *disku
 			return nil, fmt.Errorf("failed to stat grub.cfg file (%s):\n%w", grubCfgPath, err)
 		}
 
-		err = partitionMount.Close()
+		err = partitionMount.CleanClose()
 		if err != nil {
 			return nil, fmt.Errorf("failed to unmount partition (%s):\n%w", diskPartition.Path, err)
 		}
