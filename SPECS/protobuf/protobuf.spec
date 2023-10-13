@@ -1,7 +1,7 @@
 Summary:        Google's data interchange format
 Name:           protobuf
 Version:        3.17.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
