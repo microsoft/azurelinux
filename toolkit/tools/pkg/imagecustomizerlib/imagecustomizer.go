@@ -18,6 +18,10 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 )
 
+const (
+	tmpParitionDirName = "tmppartition"
+)
+
 var (
 	rootfsPartitionRegex = regexp.MustCompile(`(?m)^search -n -u ([a-zA-Z0-9\-]+) -s$`)
 )
@@ -228,25 +232,67 @@ func findPartitions(buildDir string, diskDevice string) ([]string, []*safechroot
 		return nil, nil, err
 	}
 
-	// Look for the boot partition (i.e. EFI system partition).
-	var efiSystemPartition *diskutils.PartitionInfo
-	for _, diskPartition := range diskPartitions {
-		if diskPartition.PartitionTypeUuid == diskutils.EfiSystemPartitionUuid {
-			efiSystemPartition = &diskPartition
-			break
+	systemBootPartition, err := findSystemBootPartition(diskPartitions)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var bootLoaderPartition *diskutils.PartitionInfo
+
+	switch systemBootPartition.PartitionTypeUuid {
+	case diskutils.EfiSystemPartitionTypeUuid:
+		bootLoaderPartition, err = findBootLoaderPartitionFromEsp(systemBootPartition, diskPartitions, buildDir)
+		if err != nil {
+			return nil, nil, err
+		}
+
+	case diskutils.BiosBootPartitionTypeUuid:
+		bootLoaderPartition, err = findBootLoaderPartitionFromBiosBootPartition(systemBootPartition, diskPartitions, buildDir)
+		if err != nil {
+			return nil, nil, err
 		}
 	}
 
-	if efiSystemPartition == nil {
-		return nil, nil, fmt.Errorf("failed to find EFI system partition (%s)", diskDevice)
+	// Note: This code assumes that the bootloader is installed on the rootfs partition.
+	// However, technically the bootloader can sit on a dedicated partition separate from both the ESP
+	// and the rootfs partition.
+	mountPoints, err := findMountsFromRootfs(bootLoaderPartition, diskPartitions, buildDir)
+	if err != nil {
+		return nil, nil, err
 	}
 
-	// Mount the boot partition.
-	tmpDir := filepath.Join(buildDir, "tmppartition")
+	return nil, mountPoints, nil
+}
 
+func findSystemBootPartition(diskPartitions []diskutils.PartitionInfo) (*diskutils.PartitionInfo, error) {
+	// Look for all system boot partitions, including both EFI System Paritions (ESP) and BIOS boot partitions.
+	var bootPartitions []*diskutils.PartitionInfo
+	for i := range diskPartitions {
+		diskPartition := diskPartitions[i]
+
+		switch diskPartition.PartitionTypeUuid {
+		case diskutils.EfiSystemPartitionTypeUuid, diskutils.BiosBootPartitionTypeUuid:
+			bootPartitions = append(bootPartitions, &diskPartition)
+		}
+	}
+
+	if len(bootPartitions) > 1 {
+		return nil, fmt.Errorf("found more than one boot partition (ESP or BIOS boot parititon)")
+	} else if len(bootPartitions) < 1 {
+		return nil, fmt.Errorf("failed to find boot partition (ESP or BIOS boot parititon)")
+	}
+
+	bootPartition := bootPartitions[0]
+	return bootPartition, nil
+}
+
+func findBootLoaderPartitionFromEsp(efiSystemPartition *diskutils.PartitionInfo, diskPartitions []diskutils.PartitionInfo, buildDir string) (*diskutils.PartitionInfo, error) {
+	tmpDir := filepath.Join(buildDir, tmpParitionDirName)
+
+	// Mount the EFI System Partition.
 	efiSystemPartitionMount, err := safemount.NewMount(efiSystemPartition.Path, tmpDir, efiSystemPartition.FileSystemType, 0, "", true)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to mount EFI system partition:\n%w", err)
+		return nil, fmt.Errorf("failed to mount EFI system partition:\n%w", err)
 	}
 	defer efiSystemPartitionMount.Close()
 
@@ -254,35 +300,99 @@ func findPartitions(buildDir string, diskDevice string) ([]string, []*safechroot
 	grubConfigFilePath := filepath.Join(tmpDir, "boot/grub2/grub.cfg")
 	grubConfigFile, err := os.ReadFile(grubConfigFilePath)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to read grub.cfg file:\n%w", err)
+		return nil, fmt.Errorf("failed to read grub.cfg file:\n%w", err)
 	}
 
-	// Close the boot partition mount.
+	// Close the EFI System Partition mount.
 	err = efiSystemPartitionMount.Close()
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to close EFI system partition mount:\n%w", err)
+		return nil, fmt.Errorf("failed to close EFI system partition mount:\n%w", err)
 	}
 
-	// Look for the rootfs declaration line in the grub.cfg file.
+	// Look for the bootloader partition declaration line in the grub.cfg file.
 	match := rootfsPartitionRegex.FindStringSubmatch(string(grubConfigFile))
 	if match == nil {
-		return nil, nil, fmt.Errorf("failed to find rootfs partition in grub.cfg file")
+		return nil, fmt.Errorf("failed to find rootfs partition in grub.cfg file")
 	}
 
 	rootfsUuid := match[1]
 
-	var rootfsPartition *diskutils.PartitionInfo
-	for _, diskPartition := range diskPartitions {
+	var bootPartition *diskutils.PartitionInfo
+	for i := range diskPartitions {
+		diskPartition := diskPartitions[i]
+
 		if diskPartition.Uuid == rootfsUuid {
-			rootfsPartition = &diskPartition
+			bootPartition = &diskPartition
 			break
 		}
 	}
 
+	return bootPartition, nil
+}
+
+func findBootLoaderPartitionFromBiosBootPartition(biosBootLoaderPartition *diskutils.PartitionInfo,
+	diskPartitions []diskutils.PartitionInfo, buildDir string,
+) (*diskutils.PartitionInfo, error) {
+	tmpDir := filepath.Join(buildDir, tmpParitionDirName)
+
+	// The BIOS boot parition is just an executable blob that is uniquely built for each system/disk.
+	// So, there is not much that can be done to reliably extract the boot loader partition from it.
+	// So, instead, find the bootloader partition through brute force.
+
+	var grubPartitions []*diskutils.PartitionInfo
+	for _, diskPartition := range diskPartitions {
+		switch diskPartition.FileSystemType {
+		case "ext4", "vfat":
+
+		default:
+			// Skips file system types that aren't known to support the boot loader partition.
+			// (This list may be incomplete.)
+			continue
+		}
+
+		// Temporarily mount the partition.
+		partitionMount, err := safemount.NewMount(diskPartition.Path, tmpDir, diskPartition.FileSystemType, 0, "", true)
+		if err != nil {
+			return nil, fmt.Errorf("failed to mount partition (%s):\n%w", diskPartition.Path, err)
+		}
+		defer partitionMount.Close()
+
+		// Check if grub exists on the file system.
+		grubCfgPath := filepath.Join(tmpDir, "boot/grub2/grub.cfg")
+		grubCfgExists, err := file.PathExists(grubCfgPath)
+		if err != nil {
+			return nil, fmt.Errorf("failed to stat grub.cfg file (%s):\n%w", grubCfgPath, err)
+		}
+
+		err = partitionMount.Close()
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmount partition (%s):\n%w", diskPartition.Path, err)
+		}
+
+		if grubCfgExists {
+			grubPartitions = append(grubPartitions, &diskPartition)
+		}
+	}
+
+	if len(grubPartitions) > 1 {
+		return nil, fmt.Errorf("found too many boot loader partition candidates (%d)", len(grubPartitions))
+	} else if len(grubPartitions) < 1 {
+		return nil, fmt.Errorf("failed to find boot loader partition")
+	}
+
+	grubPartition := grubPartitions[0]
+	return grubPartition, nil
+}
+
+func findMountsFromRootfs(rootfsPartition *diskutils.PartitionInfo, diskPartitions []diskutils.PartitionInfo,
+	buildDir string,
+) ([]*safechroot.MountPoint, error) {
+	tmpDir := filepath.Join(buildDir, tmpParitionDirName)
+
 	// Temporarily mount the rootfs partition so that the fstab file can be read.
 	rootfsPartitionMount, err := safemount.NewMount(rootfsPartition.Path, tmpDir, rootfsPartition.FileSystemType, 0, "", true)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to mount rootfs partition:\n%w", err)
+		return nil, fmt.Errorf("failed to mount rootfs partition (%s):\n%w", rootfsPartition.Path, err)
 	}
 	defer rootfsPartitionMount.Close()
 
@@ -290,15 +400,24 @@ func findPartitions(buildDir string, diskDevice string) ([]string, []*safechroot
 	fstabPath := filepath.Join(tmpDir, "/etc/fstab")
 	fstabEntries, err := diskutils.ReadFstabFile(fstabPath)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	// Close the rootfs partition mount.
 	err = rootfsPartitionMount.Close()
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to close rootfs partition mount:\n%w", err)
+		return nil, fmt.Errorf("failed to close rootfs partition mount (%s):\n%w", rootfsPartition.Path, err)
 	}
 
+	mountPoints, err := fstabEntriesToMountPoints(fstabEntries, diskPartitions)
+	if err != nil {
+		return nil, err
+	}
+
+	return mountPoints, nil
+}
+
+func fstabEntriesToMountPoints(fstabEntries []diskutils.FstabEntry, diskPartitions []diskutils.PartitionInfo) ([]*safechroot.MountPoint, error) {
 	// Convert fstab entries into mount points.
 	var mountPoints []*safechroot.MountPoint
 	var foundRoot bool
@@ -311,7 +430,7 @@ func findPartitions(buildDir string, diskDevice string) ([]string, []*safechroot
 
 		source, err := findSourcePartition(fstabEntry.Source, diskPartitions)
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
 
 		var mountPoint *safechroot.MountPoint
@@ -331,10 +450,10 @@ func findPartitions(buildDir string, diskDevice string) ([]string, []*safechroot
 	}
 
 	if !foundRoot {
-		return nil, nil, fmt.Errorf("image has invalid fstab file: no root partition found")
+		return nil, fmt.Errorf("image has invalid fstab file: no root partition found")
 	}
 
-	return nil, mountPoints, nil
+	return mountPoints, nil
 }
 
 func findSourcePartition(source string, partitions []diskutils.PartitionInfo) (string, error) {
