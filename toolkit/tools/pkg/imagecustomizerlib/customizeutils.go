@@ -59,7 +59,12 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
-	err = enableOrDisableServices(config.SystemConfig.Services, baseConfigPath, imageChroot)
+	err = enableOrDisableServices(config.SystemConfig.Services, imageChroot)
+	if err != nil {
+		return err
+	}
+
+	err = loadOrUnloadModules(config.SystemConfig.Modules, baseConfigPath, imageChroot)
 	if err != nil {
 		return err
 	}
@@ -286,7 +291,7 @@ func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageC
 	return nil
 }
 
-func enableOrDisableServices(services imagecustomizerapi.Services, baseConfigPath string, imageChroot *safechroot.Chroot) error {
+func enableOrDisableServices(services imagecustomizerapi.Services, imageChroot *safechroot.Chroot) error {
 	var err error
 
 	// Handle enabling services
@@ -320,6 +325,33 @@ func enableOrDisableServices(services imagecustomizerapi.Services, baseConfigPat
 		})
 		if err != nil {
 			return err
+		}
+	}
+
+	return nil
+}
+
+func loadOrUnloadModules(modules imagecustomizerapi.Modules, baseConfigPath string, imageChroot *safechroot.Chroot) error {
+	var err error
+
+	for _, module := range modules.Load {
+		logger.Log.Infof("Loading module (%s)", module.Name)
+		moduleFileName := module.Name + ".conf"
+		moduleFilePath := filepath.Join(imageChroot.RootDir(), "/etc/modules-load.d/", moduleFileName)
+		err = file.Write(module.Name, moduleFilePath)
+		if err != nil {
+			return fmt.Errorf("failed to write module load configuration: %w", err)
+		}
+	}
+
+	for _, module := range modules.Unload {
+		logger.Log.Infof("Unloading module (%s)", module.Name)
+		moduleFileName := module.Name + ".conf"
+		moduleFilePath := filepath.Join(imageChroot.RootDir(), "/etc/modprobe.d/", moduleFileName)
+		data := fmt.Sprintf("blacklist %s\n", module.Name)
+		err = file.Write(data, moduleFilePath)
+		if err != nil {
+			return fmt.Errorf("failed to write module unload configuration: %w", err)
 		}
 	}
 
