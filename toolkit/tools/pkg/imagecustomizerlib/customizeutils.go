@@ -64,7 +64,7 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
-	err = loadOrUnloadModules(config.SystemConfig.Modules, baseConfigPath, imageChroot)
+	err = loadOrUnloadModules(config.SystemConfig.Modules, imageChroot)
 	if err != nil {
 		return err
 	}
@@ -331,7 +331,7 @@ func enableOrDisableServices(services imagecustomizerapi.Services, imageChroot *
 	return nil
 }
 
-func loadOrUnloadModules(modules imagecustomizerapi.Modules, baseConfigPath string, imageChroot *safechroot.Chroot) error {
+func loadOrUnloadModules(modules imagecustomizerapi.Modules, imageChroot *safechroot.Chroot) error {
 	var err error
 
 	for _, module := range modules.Load {
