@@ -8,7 +8,7 @@ Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://www.tensorflow.org/
 Source0:        https://github.com/tensorflow/tensorflow/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        %{name}-%{version}-cache.tar.gz
+Source1:        %{name}-2.11.0-cache.tar.gz
 BuildRequires:  bazel
 BuildRequires:  binutils
 BuildRequires:  build-essential
