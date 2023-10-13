@@ -1,7 +1,7 @@
 Summary:        Next generation system logger facilty
 Name:           syslog-ng
 Version:        3.33.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD AND GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,7 @@ URL:            https://syslog-ng.org/
 Source0:        https://github.com/balabit/%{name}/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
 Source1:        60-syslog-ng-journald.conf
 Source2:        syslog-ng.service
+Patch0:         CVE-2022-1941.patch
 BuildRequires:  glib-devel
 BuildRequires:  json-c-devel
 BuildRequires:  json-glib-devel
@@ -50,7 +51,7 @@ Requires:       %{name} = %{version}-%{release}
  needed to build applications using syslog-ng APIs.
 
 %prep
-%setup -q
+%autosetup -q
 rm -rf ../p3dir
 cp -a . ../p3dir
 
@@ -147,6 +148,9 @@ fi
 %{_libdir}/pkgconfig/*
 
 %changelog
+* Fri Oct 13 2023 Mykhailo Bykhovtsev <mbykhovtsev.com> - 3.33.2-5
+- Patched CVE-2022-1941s
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.33.2-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
