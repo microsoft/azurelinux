@@ -148,7 +148,7 @@ fi
 %{_libdir}/pkgconfig/*
 
 %changelog
-* Fri Oct 13 2023 Mykhailo Bykhovtsev <mbykhovtsev.com> - 3.33.2-5
+* Fri Oct 13 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.33.2-5
 - Patched CVE-2022-1941s
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.33.2-4
