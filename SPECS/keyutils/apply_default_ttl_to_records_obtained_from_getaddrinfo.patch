@@ -1,0 +1,531 @@
+author	David Howells <dhowells@redhat.com>	2020-04-14 16:07:26 +0100
+committer	David Howells <dhowells@redhat.com>	2020-07-06 17:21:18 +0100
+commit	75e7568dc516db698093b33ea273e1b4a30b70be (patch)
+tree	3f615a1f9aa9ec35b87d43d9f69f1f3cd7a5372c
+parent	d44a41376b17450c3908978b123e1f05a361885f (diff)
+
+dns: Apply a default TTL to records obtained from getaddrinfo()
+
+Address records obtained from getaddrinfo() don't come with any TTL
+information, even if they're obtained from the DNS, with the result that
+key.dns_resolver upcall program doesn't set an expiry time on dns_resolver
+records unless they include a component obtained directly from the DNS,
+such as an SRV or AFSDB record.
+
+Fix this to apply a default TTL of 10mins in the event that we haven't got
+one.  This can be configured in /etc/keyutils/key.dns_resolver.conf by
+adding the line:
+
+	default_ttl = <number-of-seconds>
+
+to the file.
+
+Backported by tvuong from upstream on 2023-10-13
+
+Signed-off-by: David Howells <dhowells@redhat.com>
+Reviewed-by: Ben Boeckel <me@benboeckel.net>
+Reviewed-by: Jeff Layton <jlayton@kernel.org>
+
+Signed-off by: Thien Trung Vuong <tvuong@microsoft.com>
+---
+
+diff --git a/Makefile b/Makefile
+index 6f79446..4d05570 100644
+--- a/Makefile
++++ b/Makefile
+@@ -202,6 +202,7 @@ endif
+ 	$(INSTALL) -D key.dns_resolver $(DESTDIR)$(SBINDIR)/key.dns_resolver
+ 	$(INSTALL) -D -m 0644 request-key.conf $(DESTDIR)$(ETCDIR)/request-key.conf
+ 	mkdir -p $(DESTDIR)$(ETCDIR)/request-key.d
++	mkdir -p $(DESTDIR)$(ETCDIR)/keyutils
+ 	mkdir -p $(DESTDIR)$(MAN1)
+ 	$(INSTALL) -m 0644 $(wildcard man/*.1) $(DESTDIR)$(MAN1)
+ 	mkdir -p $(DESTDIR)$(MAN3)
+diff --git a/dns.afsdb.c b/dns.afsdb.c
+index fa60e04..986c0f3 100644
+--- a/dns.afsdb.c
++++ b/dns.afsdb.c
+@@ -37,8 +37,6 @@
+  */
+ #include "key.dns.h"
+
+-static unsigned long afs_ttl = ULONG_MAX;
+-
+ /*
+  *
+  */
+@@ -114,8 +112,8 @@ static void afsdb_hosts_to_addrs(ns_msg handle, ns_sect section)
+ 		}
+ 	}
+
+-	afs_ttl = ttl;
+-	info("ttl: %u", ttl);
++	key_expiry = ttl;
++	info("ttl: %u", key_expiry);
+ }
+
+ /*
+@@ -203,8 +201,8 @@ static void srv_hosts_to_addrs(ns_msg handle, ns_sect section)
+ 		}
+ 	}
+
+-	afs_ttl = ttl;
+-	info("ttl: %u", ttl);
++	key_expiry = ttl;
++	info("ttl: %u", key_expiry);
+ }
+
+ /*
+@@ -240,7 +238,7 @@ static int dns_query_AFSDB(const char *cell)
+ 	/* look up the hostnames we've obtained to get the actual addresses */
+ 	afsdb_hosts_to_addrs(handle, ns_s_an);
+
+-	info("DNS query AFSDB RR results:%u ttl:%lu", payload_index, afs_ttl);
++	info("DNS query AFSDB RR results:%u ttl:%u", payload_index, key_expiry);
+ 	return 0;
+ }
+
+@@ -279,7 +277,7 @@ static int dns_query_VL_SRV(const char *cell)
+ 	/* look up the hostnames we've obtained to get the actual addresses */
+ 	srv_hosts_to_addrs(handle, ns_s_an);
+
+-	info("DNS query VL SRV RR results:%u ttl:%lu", payload_index, afs_ttl);
++	info("DNS query VL SRV RR results:%u ttl:%u", payload_index, key_expiry);
+ 	return 0;
+ }
+
+@@ -293,7 +291,7 @@ void afs_instantiate(const char *cell)
+
+ 	/* set the key's expiry time from the minimum TTL encountered */
+ 	if (!debug_mode) {
+-		ret = keyctl_set_timeout(key, afs_ttl);
++		ret = keyctl_set_timeout(key, key_expiry);
+ 		if (ret == -1)
+ 			error("%s: keyctl_set_timeout: %m", __func__);
+ 	}
+diff --git a/key.dns.h b/key.dns.h
+index b143f4a..33d0ab3 100644
+--- a/key.dns.h
++++ b/key.dns.h
+@@ -29,6 +29,7 @@
+ #include <stdlib.h>
+ #include <unistd.h>
+ #include <time.h>
++#include <ctype.h>
+
+ #define	MAX_VLS			15	/* Max Volume Location Servers Per-Cell */
+ #define	INET_IP4_ONLY		0x1
+@@ -42,6 +43,7 @@
+ extern key_serial_t key;
+ extern int debug_mode;
+ extern unsigned mask;
++extern unsigned int key_expiry;
+
+ #define N_PAYLOAD 256
+ extern struct iovec payload[N_PAYLOAD];
+@@ -52,6 +54,8 @@ void error(const char *fmt, ...);
+ extern __attribute__((format(printf, 1, 2)))
+ void _error(const char *fmt, ...);
+ extern __attribute__((format(printf, 1, 2)))
++void warning(const char *fmt, ...);
++extern __attribute__((format(printf, 1, 2)))
+ void info(const char *fmt, ...);
+ extern __attribute__((noreturn))
+ void nsError(int err, const char *domain);
+diff --git a/key.dns_resolver.c b/key.dns_resolver.c
+index 4ac27d3..7a7ec42 100644
+--- a/key.dns_resolver.c
++++ b/key.dns_resolver.c
+@@ -46,10 +46,13 @@ static const char key_type[] = "dns_resolver";
+ static const char a_query_type[] = "a";
+ static const char aaaa_query_type[] = "aaaa";
+ static const char afsdb_query_type[] = "afsdb";
++static const char *config_file = "/etc/keyutils/key.dns_resolver.conf";
++static bool config_specified = false;
+ key_serial_t key;
+ static int verbose;
+ int debug_mode;
+ unsigned mask = INET_ALL;
++unsigned int key_expiry = 5;
+
+
+ /*
+@@ -106,6 +109,23 @@ void _error(const char *fmt, ...)
+ }
+
+ /*
++ * Print a warning to stderr or the syslog
++ */
++void warning(const char *fmt, ...)
++{
++	va_list va;
++
++	va_start(va, fmt);
++	if (isatty(2)) {
++		vfprintf(stderr, fmt, va);
++		fputc('\n', stderr);
++	} else {
++		vsyslog(LOG_WARNING, fmt, va);
++	}
++	va_end(va);
++}
++
++/*
+  * Print status information
+  */
+ void info(const char *fmt, ...)
+@@ -272,6 +292,7 @@ void dump_payload(void)
+ 	}
+
+ 	info("The key instantiation data is '%s'", buf);
++	info("The expiry time is %us", key_expiry);
+ 	free(buf);
+ }
+
+@@ -412,6 +433,9 @@ int dns_query_a_or_aaaa(const char *hostname, char *options)
+
+ 	/* load the key with data key */
+ 	if (!debug_mode) {
++		ret = keyctl_set_timeout(key, key_expiry);
++		if (ret == -1)
++			error("%s: keyctl_set_timeout: %m", __func__);
+ 		ret = keyctl_instantiate_iov(key, payload, payload_index, 0);
+ 		if (ret == -1)
+ 			error("%s: keyctl_instantiate: %m", __func__);
+@@ -421,6 +445,157 @@ int dns_query_a_or_aaaa(const char *hostname, char *options)
+ }
+
+ /*
++ * Read the config file.
++ */
++static void read_config(void)
++{
++	FILE *f;
++	char buf[4096], *b, *p, *k, *v;
++	unsigned int line = 0, u;
++	int n;
++
++	info("READ CONFIG %s", config_file);
++
++	f = fopen(config_file, "r");
++	if (!f) {
++		if (errno == ENOENT && !config_specified) {
++			debug("%s: %m", config_file);
++			return;
++		}
++		error("%s: %m", config_file);
++	}
++
++	while (fgets(buf, sizeof(buf) - 1, f)) {
++		line++;
++
++		/* Trim off leading and trailing spaces and discard whole-line
++		 * comments.
++		 */
++		b = buf;
++		while (isspace(*b))
++			b++;
++		if (!*b || *b == '#')
++			continue;
++		p = strchr(b, '\n');
++		if (!p)
++			error("%s:%u: line missing newline or too long", config_file, line);
++		while (p > buf && isspace(p[-1]))
++			p--;
++		*p = 0;
++
++		/* Split into key[=value] pairs and trim spaces. */
++		k = b;
++		v = NULL;
++		b = strchr(b, '=');
++		if (b) {
++			char quote = 0;
++			bool esc = false;
++
++			if (b == k)
++				error("%s:%u: Unspecified key",
++				      config_file, line);
++
++			/* NUL-terminate the key. */
++			for (p = b - 1; isspace(*p); p--)
++				;
++			p[1] = 0;
++
++			/* Strip leading spaces */
++			b++;
++			while (isspace(*b))
++				b++;
++			if (!*b)
++				goto missing_value;
++
++			if (*b == '"' || *b == '\'') {
++				quote = *b;
++				b++;
++			}
++			v = p = b;
++			while (*b) {
++				if (esc) {
++					switch (*b) {
++					case ' ':
++					case '\t':
++					case '"':
++					case '\'':
++					case '\\':
++						break;
++					default:
++						goto invalid_escape_char;
++					}
++					esc = false;
++					*p++ = *b++;
++					continue;
++				}
++				if (*b == '\\') {
++					esc = true;
++					b++;
++					continue;
++				}
++				if (*b == quote) {
++					b++;
++					if (*b)
++						goto post_quote_data;
++					quote = 0;
++					break;
++				}
++				if (!quote && *b == '#')
++					break; /* Terminal comment */
++				*p++ = *b++;
++			}
++
++			if (esc)
++				error("%s:%u: Incomplete escape", config_file, line);
++			if (quote)
++				error("%s:%u: Unclosed quotes", config_file, line);
++			*p = 0;
++		}
++
++		if (strcmp(k, "default_ttl") == 0) {
++			if (!v)
++				goto missing_value;
++			if (sscanf(v, "%u%n", &u, &n) != 1)
++				goto bad_value;
++			if (v[n])
++				goto extra_data;
++			if (u < 1 || u > INT_MAX)
++				goto out_of_range;
++			key_expiry = u;
++		} else {
++			warning("%s:%u: Unknown option '%s'", config_file, line, k);
++		}
++	}
++
++	if (ferror(f) || fclose(f) == EOF)
++		error("%s: %m", config_file);
++	return;
++
++missing_value:
++	error("%s:%u: %s: Missing value", config_file, line, k);
++invalid_escape_char:
++	error("%s:%u: %s: Invalid char in escape", config_file, line, k);
++post_quote_data:
++	error("%s:%u: %s: Data after closing quote", config_file, line, k);
++bad_value:
++	error("%s:%u: %s: Bad value", config_file, line, k);
++extra_data:
++	error("%s:%u: %s: Extra data supplied", config_file, line, k);
++out_of_range:
++	error("%s:%u: %s: Value out of range", config_file, line, k);
++}
++
++/*
++ * Dump the configuration after parsing the config file.
++ */
++static __attribute__((noreturn))
++void config_dumper(void)
++{
++	printf("default_ttl = %u\n", key_expiry);
++	exit(0);
++}
++
++/*
+  * Print usage details,
+  */
+ static __attribute__((noreturn))
+@@ -428,22 +603,24 @@ void usage(void)
+ {
+ 	if (isatty(2)) {
+ 		fprintf(stderr,
+-			"Usage: %s [-vv] key_serial\n",
++			"Usage: %s [-vv] [-c config] key_serial\n",
+ 			prog);
+ 		fprintf(stderr,
+-			"Usage: %s -D [-vv] <desc> <calloutinfo>\n",
++			"Usage: %s -D [-vv] [-c config] <desc> <calloutinfo>\n",
+ 			prog);
+ 	} else {
+-		info("Usage: %s [-vv] key_serial", prog);
++		info("Usage: %s [-vv] [-c config] key_serial", prog);
+ 	}
+ 	exit(2);
+ }
+
+-const struct option long_options[] = {
+-	{ "debug",	0, NULL, 'D' },
+-	{ "verbose",	0, NULL, 'v' },
+-	{ "version",	0, NULL, 'V' },
+-	{ NULL,		0, NULL, 0 }
++static const struct option long_options[] = {
++	{ "config",		0, NULL, 'c' },
++	{ "debug",		0, NULL, 'D' },
++	{ "dump-config",	0, NULL, 2   },
++	{ "verbose",		0, NULL, 'v' },
++	{ "version",		0, NULL, 'V' },
++	{ NULL,			0, NULL, 0 }
+ };
+
+ /*
+@@ -455,11 +632,19 @@ int main(int argc, char *argv[])
+ 	char *keyend, *p;
+ 	char *callout_info = NULL;
+ 	char *buf = NULL, *name;
++	bool dump_config = false;
+
+ 	openlog(prog, 0, LOG_DAEMON);
+
+-	while ((ret = getopt_long(argc, argv, "vDV", long_options, NULL)) != -1) {
++	while ((ret = getopt_long(argc, argv, "c:vDV", long_options, NULL)) != -1) {
+ 		switch (ret) {
++		case 'c':
++			config_file = optarg;
++			config_specified = true;
++			continue;
++		case 2:
++			dump_config = true;
++			continue;
+ 		case 'D':
+ 			debug_mode = 1;
+ 			continue;
+@@ -481,6 +666,9 @@ int main(int argc, char *argv[])
+
+ 	argc -= optind;
+ 	argv += optind;
++	read_config();
++	if (dump_config)
++		config_dumper();
+
+ 	if (!debug_mode) {
+ 		if (argc != 1)
+@@ -542,7 +730,7 @@ int main(int argc, char *argv[])
+ 	name++;
+
+ 	info("Query type: '%*.*s'", qtlen, qtlen, keyend);
+-
++
+ 	if ((qtlen == sizeof(a_query_type) - 1 &&
+ 	     memcmp(keyend, a_query_type, sizeof(a_query_type) - 1) == 0) ||
+ 	    (qtlen == sizeof(aaaa_query_type) - 1 &&
+diff --git a/man/key.dns_resolver.8 b/man/key.dns_resolver.8
+index e1882e0..0b17edd 100644
+--- a/man/key.dns_resolver.8
++++ b/man/key.dns_resolver.8
+@@ -7,28 +7,41 @@
+ .\" as published by the Free Software Foundation; either version
+ .\" 2 of the License, or (at your option) any later version.
+ .\"
+-.TH KEY.DNS_RESOLVER 8 "04 Mar 2011" Linux "Linux Key Management Utilities"
++.TH KEY.DNS_RESOLVER 8 "18 May 2020" Linux "Linux Key Management Utilities"
+ .SH NAME
+ key.dns_resolver \- upcall for request\-key to handle dns_resolver keys
+ .SH SYNOPSIS
+ \fB/sbin/key.dns_resolver \fR<key>
+ .br
+-\fB/sbin/key.dns_resolver \fR\-D [\-v] [\-v] <keydesc> <calloutinfo>
++\fB/sbin/key.dns_resolver \fR--dump-config [\-c <configfile>]
++.br
++\fB/sbin/key.dns_resolver \fR\-D [\-v] [\-v] [\-c <configfile>] <desc>
++.br
++<calloutinfo>
+ .SH DESCRIPTION
+ This program is invoked by request\-key on behalf of the kernel when kernel
+ services (such as NFS, CIFS and AFS) want to perform a hostname lookup and the
+ kernel does not have the key cached.  It is not ordinarily intended to be
+ called directly.
+ .P
+-It can be called in debugging mode to test its functionality by passing a
+-\fB\-D\fR flag on the command line.  For this to work, the key description and
+-the callout information must be supplied.  Verbosity can be increased by
+-supplying one or more \fB\-v\fR flags.
++There program has internal parameters that can be changed with a configuration
++file (see key.dns_resolver.conf(5) for more information).  The default
++configuration file is in /etc, but this can be overridden with the \fB-c\fR
++flag.
++.P
++The program can be called in debugging mode to test its functionality by
++passing a \fB\-D\fR or \fB\--debug\fR flag on the command line.  For this to
++work, the key description and the callout information must be supplied.
++Verbosity can be increased by supplying one or more \fB\-v\fR flags.
++.P
++The program may also be called with \fB--dump-config\fR to show the values that
++configurable parameters will have after parsing the config file.
+ .SH ERRORS
+ All errors will be logged to the syslog.
+ .SH SEE ALSO
+ .ad l
+ .nh
++.BR key.dns_resolver.conf (5),
+ .BR request\-key.conf (5),
+ .BR keyrings (7),
+ .BR request\-key (8)
+diff --git a/man/key.dns_resolver.conf.5 b/man/key.dns_resolver.conf.5
+new file mode 100644
+index 0000000..c944ad5
+--- /dev/null
++++ b/man/key.dns_resolver.conf.5
+@@ -0,0 +1,48 @@
++.\" -*- nroff -*-
++.\" Copyright (C) 2020 Red Hat, Inc. All Rights Reserved.
++.\" Written by David Howells (dhowells@redhat.com)
++.\"
++.\" This program is free software; you can redistribute it and/or
++.\" modify it under the terms of the GNU General Public License
++.\" as published by the Free Software Foundation; either version
++.\" 2 of the License, or (at your option) any later version.
++.\"
++.TH KEY.DNS_RESOLVER.CONF 5 "18 May 2020" Linux "Linux Key Management Utilities"
++.SH NAME
++key.dns_resolver.conf \- Kernel DNS resolver config
++.SH DESCRIPTION
++This file is used by the key.dns_resolver(5) program to set parameters.
++Unless otherwise overridden with the \fB\-c\fR flag, the program reads:
++.IP
++/etc/key.dns_resolver.conf
++.P
++Configuration options are given in \fBkey[=value]\fR form, where \fBvalue\fR is
++optional.  If present, the value may be surrounded by a pair of single ('') or
++double quotes ("") which will be stripped off.  The special characters in the
++value may be escaped with a backslash to turn them into ordinary characters.
++.P
++Lines beginning with a '#' are considered comments and ignored.  A '#' symbol
++anywhere after the '=' makes the rest of the line into a comment unless the '#'
++is inside a quoted section or is escaped.
++.P
++Leading and trailing spaces and spaces around the '=' symbol will be stripped
++off.
++.P
++Available options include:
++.TP
++.B default_ttl=<number>
++The number of seconds to set as the expiration on a cached record.  This will
++be overridden if the program manages to retrieve TTL information along with
++the addresses (if, for example, it accesses the DNS directly).  The default is
++5 seconds.  The value must be in the range 1 to INT_MAX.
++.P
++The file can also include comments beginning with a '#' character unless
++otherwise suppressed by being inside a quoted value or being escaped with a
++backslash.
++
++.SH FILES
++.ul
++/etc/key.dns_resolver.conf
++.ul 0
++.SH SEE ALSO
++\fBkey.dns_resolver\fR(8)

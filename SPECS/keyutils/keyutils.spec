@@ -1,7 +1,7 @@
 Summary:        Linux Key Management Utilities
 Name:           keyutils
 Version:        1.6.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,6 +9,7 @@ Group:          System Environment/Base
 URL:            https://people.redhat.com/~dhowells/keyutils/
 Source0:        https://people.redhat.com/~dhowells/keyutils/%{name}-%{version}.tar.bz2
 Patch0:         tests_endianness_check_fix.patch
+Patch1:         apply_default_ttl_to_records_obtained_from_getaddrinfo.patch
 
 %if %{with_check}
 BuildRequires: lsb-release
@@ -74,6 +75,9 @@ find %{buildroot} -name '*.a'  -delete
 %{_mandir}/man3/*
 
 %changelog
+* Fri Oct 13 2023 Thien Trung Vuong <tvuong@microsoft.com> - 1.6.1-2
+- Add patch to apply default TTL to address records obtained from getaddrinfo()
+
 * Wed Nov 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.1-1
 - Update to version 1.6.1.
 - Enabled tests.
