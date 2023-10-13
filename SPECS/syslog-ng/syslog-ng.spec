@@ -10,7 +10,7 @@ URL:            https://syslog-ng.org/
 Source0:        https://github.com/balabit/%{name}/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
 Source1:        60-syslog-ng-journald.conf
 Source2:        syslog-ng.service
-Patch0:         CVE-2022-1941.patch
+Patch0:         CVE-2022-38725.patch
 BuildRequires:  glib-devel
 BuildRequires:  json-c-devel
 BuildRequires:  json-glib-devel
@@ -149,7 +149,7 @@ fi
 
 %changelog
 * Fri Oct 13 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.33.2-5
-- Patched CVE-2022-1941s
+- Patched CVE-2022-38725
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.33.2-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
