@@ -109,7 +109,7 @@ popd
 %{python3_sitelib}/*
 
 %changelog
-* Mon Oct 09 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 3.18.3-1
+* Mon Oct 09 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 3.17.3-3
 - add patch to fix CVE-2022-1941
 
 * Mon Mar 20 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.17.3-2
