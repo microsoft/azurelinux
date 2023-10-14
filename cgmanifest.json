@@ -28587,8 +28587,8 @@
         "type": "other",
         "other": {
           "name": "tensorflow",
-          "version": "2.11.0",
-          "downloadUrl": "https://github.com/tensorflow/tensorflow/archive/refs/tags/v2.11.0.tar.gz"
+          "version": "2.11.1",
+          "downloadUrl": "https://github.com/tensorflow/tensorflow/archive/refs/tags/v2.11.1.tar.gz"
         }
       }
     },
