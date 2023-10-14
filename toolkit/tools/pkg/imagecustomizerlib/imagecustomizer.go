@@ -334,9 +334,11 @@ func findBootLoaderPartitionFromBiosBootPartition(biosBootLoaderPartition *disku
 	// So, instead, find the bootloader partition through brute force.
 
 	var grubPartitions []*diskutils.PartitionInfo
-	for _, diskPartition := range diskPartitions {
+	for i := range diskPartitions {
+		diskPartition := diskPartitions[i]
+
 		switch diskPartition.FileSystemType {
-		case "ext4", "vfat":
+		case "ext4", "vfat", "xfs":
 
 		default:
 			// Skips file system types that aren't known to support the boot loader partition.
