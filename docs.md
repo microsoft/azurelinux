@@ -16,7 +16,7 @@ packages and tools, to fit the requirements of your application. CBL-Mariner und
 ## Who's using CBL-Mariner today?
 
 CBL-Mariner is used internally by Microsoft and several
-derivative versions are used by various teams within Microsoft.  
+derivative versions are used by various teams within Microsoft.
 
 These include:
 
