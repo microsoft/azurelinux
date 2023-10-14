@@ -225,6 +225,25 @@ func buildTestGraphHelper() (g *PkgGraph, err error) {
 	return
 }
 
+// Checks if two lists of nodes are equivalent (ignoring order and graph edges)
+func checkEqualComponents(t *testing.T, expected, actual []*PkgNode) {
+	t.Helper()
+	for _, mustHave := range expected {
+		foundPackage := false
+		for _, n := range actual {
+			foundPackage = foundPackage || mustHave.Equal(n)
+		}
+		assert.True(t, foundPackage, "expected to find %s in actual", mustHave.String())
+	}
+	for _, doHave := range actual {
+		foundPackage := false
+		for _, n := range expected {
+			foundPackage = foundPackage || doHave.Equal(n)
+		}
+		assert.True(t, foundPackage, "found %s in actual, but it was unexpected", doHave.String())
+	}
+}
+
 func checkTestGraph(t *testing.T, g *PkgGraph) {
 	// Make sure we got the same graph back!
 	assert.Equal(t, len(allNodes), len(g.AllNodes()))
@@ -1093,7 +1112,7 @@ func TestShouldGetAllBuildNodesWithFilter(t *testing.T) {
 	foundNodes := gOut.NodesMatchingFilter(func(node *PkgNode) bool {
 		return node.Type == TypeLocalBuild
 	})
-	assert.ElementsMatch(t, buildNodes, foundNodes)
+	checkEqualComponents(t, buildNodes, foundNodes)
 }
 
 func TestShouldGetAllNodesWithFilter(t *testing.T) {
@@ -1104,7 +1123,7 @@ func TestShouldGetAllNodesWithFilter(t *testing.T) {
 	foundNodes := gOut.NodesMatchingFilter(func(node *PkgNode) bool {
 		return true
 	})
-	assert.ElementsMatch(t, allNodes, foundNodes)
+	checkEqualComponents(t, allNodes, foundNodes)
 }
 
 func TestShouldGetAllRunNodesWithFilter(t *testing.T) {
@@ -1115,7 +1134,7 @@ func TestShouldGetAllRunNodesWithFilter(t *testing.T) {
 	foundNodes := gOut.NodesMatchingFilter(func(node *PkgNode) bool {
 		return node.Type == TypeLocalRun
 	})
-	assert.ElementsMatch(t, runNodes, foundNodes)
+	checkEqualComponents(t, runNodes, foundNodes)
 }
 
 func TestShouldGetAllUnresolvedNodesWithFilter(t *testing.T) {
@@ -1126,5 +1145,5 @@ func TestShouldGetAllUnresolvedNodesWithFilter(t *testing.T) {
 	foundNodes := gOut.NodesMatchingFilter(func(node *PkgNode) bool {
 		return node.State == StateUnresolved
 	})
-	assert.ElementsMatch(t, unresolvedNodes, foundNodes)
+	checkEqualComponents(t, unresolvedNodes, foundNodes)
 }
