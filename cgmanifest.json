@@ -955,8 +955,8 @@
         "type": "other",
         "other": {
           "name": "bash",
-          "version": "5.1.8",
-          "downloadUrl": "https://ftp.gnu.org/gnu/bash/bash-5.1.8.tar.gz"
+          "version": "5.2",
+          "downloadUrl": "https://ftp.gnu.org/gnu/bash/bash-5.2.tar.gz"
         }
       }
     },
