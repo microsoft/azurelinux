@@ -4490,8 +4490,8 @@
         "type": "other",
         "other": {
           "name": "gmp",
-          "version": "6.2.1",
-          "downloadUrl": "http://ftp.gnu.org/gnu/gmp/gmp-6.2.1.tar.xz"
+          "version": "6.3.0",
+          "downloadUrl": "http://ftp.gnu.org/gnu/gmp/gmp-6.3.0.tar.xz"
         }
       }
     },
