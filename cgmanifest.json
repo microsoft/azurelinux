@@ -13653,8 +13653,8 @@
         "type": "other",
         "other": {
           "name": "mpfr",
-          "version": "4.1.0",
-          "downloadUrl": "http://www.mpfr.org/mpfr-4.1.0/mpfr-4.1.0.tar.xz"
+          "version": "4.2.1",
+          "downloadUrl": "http://www.mpfr.org/mpfr-4.2.1/mpfr-4.2.1.tar.xz"
         }
       }
     },
