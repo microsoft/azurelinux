@@ -53,8 +53,8 @@ curl-libs-8.3.0-1.cm2.x86_64.rpm
 Cython-debuginfo-0.29.33-1.cm2.x86_64.rpm
 debugedit-5.0-2.cm2.x86_64.rpm
 debugedit-debuginfo-5.0-2.cm2.x86_64.rpm
-diffutils-3.8-2.cm2.x86_64.rpm
-diffutils-debuginfo-3.8-2.cm2.x86_64.rpm
+diffutils-3.10-1.cm2.x86_64.rpm
+diffutils-debuginfo-3.10-1.cm2.x86_64.rpm
 docbook-dtd-xml-4.5-11.cm2.noarch.rpm
 docbook-style-xsl-1.79.1-13.cm2.noarch.rpm
 dwz-0.14-2.cm2.x86_64.rpm

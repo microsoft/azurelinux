@@ -2658,8 +2658,8 @@
         "type": "other",
         "other": {
           "name": "diffutils",
-          "version": "3.8",
-          "downloadUrl": "https://ftp.gnu.org/gnu/diffutils/diffutils-3.8.tar.xz"
+          "version": "3.10",
+          "downloadUrl": "https://ftp.gnu.org/gnu/diffutils/diffutils-3.10.tar.xz"
         }
       }
     },

@@ -56,7 +56,7 @@ procps-ng-lang-3.3.17-2.cm2.aarch64.rpm
 m4-1.4.19-2.cm2.aarch64.rpm
 grep-3.11-1.cm2.aarch64.rpm
 grep-lang-3.11-1.cm2.aarch64.rpm
-diffutils-3.8-2.cm2.aarch64.rpm
+diffutils-3.10-1.cm2.aarch64.rpm
 gawk-5.1.0-2.cm2.aarch64.rpm
 findutils-4.8.0-5.cm2.aarch64.rpm
 findutils-lang-4.8.0-5.cm2.aarch64.rpm
