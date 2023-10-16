@@ -53,6 +53,15 @@ type PartitionInfo struct {
 	Mountpoint        string `json:"mountpoint"` // Example: /mnt/os/boot
 }
 
+type loopbackListOutput struct {
+	Devices []loopbackDevice `json:"loopdevices"`
+}
+
+type loopbackDevice struct {
+	Name        string `json:"name"`
+	BackingFile string `json:"back-file"`
+}
+
 const (
 	// AutoEndSize is used as the disk's "End" value to indicate it should be picked automatically
 	AutoEndSize = 0
@@ -205,14 +214,12 @@ func ApplyRawBinary(diskDevPath string, rawBinary configuration.RawBinary) (err 
 }
 
 // CreateEmptyDisk creates an empty raw disk in the given working directory as described in disk configuration
-func CreateEmptyDisk(workDirPath, diskName string, disk configuration.Disk) (diskFilePath string, err error) {
+func CreateEmptyDisk(workDirPath, diskName string, maxSize uint64) (diskFilePath string, err error) {
 	const (
 		defautBlockSize = MiB
 	)
 	diskFilePath = filepath.Join(workDirPath, diskName)
 
-	// Assume that Disk.MaxSize is given
-	maxSize := disk.MaxSize
 	err = sparseDisk(diskFilePath, defautBlockSize, maxSize)
 	return
 }
@@ -352,6 +359,44 @@ func DetachLoopbackDevice(diskDevPath string) (err error) {
 		logger.Log.Warnf("Failed to detach loopback device using losetup: %v", stderr)
 	}
 	return
+}
+
+func WaitForLoopbackToDetach(devicePath string, diskPath string) error {
+	if !filepath.IsAbs(diskPath) {
+		return fmt.Errorf("internal error: loopback disk path must be absolute (%s)", diskPath)
+	}
+
+	delay := 100 * time.Millisecond
+	attempts := 5
+	for failures := 0; failures < attempts; failures++ {
+		stdout, _, err := shell.Execute("losetup", "--list", "--json", "--output", "NAME,BACK-FILE")
+		if err != nil {
+			return fmt.Errorf("failed to read loopback list:\n%w", err)
+		}
+
+		var output loopbackListOutput
+		err = json.Unmarshal([]byte(stdout), &output)
+		if err != nil {
+			return fmt.Errorf("failed to parse loopback devices list JSON:\n%w", err)
+		}
+
+		found := false
+		for _, device := range output.Devices {
+			if device.Name == devicePath && device.BackingFile == diskPath {
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			return nil
+		}
+
+		time.Sleep(delay)
+		delay *= 2
+	}
+
+	return fmt.Errorf("timed out waiting for loopback device (%s) for disk (%s) to close", devicePath, diskPath)
 }
 
 // WaitForDevicesToSettle waits for all udev events to be processed on the system.

@@ -230,7 +230,7 @@ func createFakeEfiImage(buildDir string) (string, []string, []*safechroot.MountP
 	}
 
 	// Create raw disk image file.
-	rawDisk, err := diskutils.CreateEmptyDisk(buildDir, "disk.raw", diskConfig)
+	rawDisk, err := diskutils.CreateEmptyDisk(buildDir, "disk.raw", diskConfig.MaxSize)
 	if err != nil {
 		return "", nil, nil, fmt.Errorf("failed to create empty disk file in (%s):\n%w", buildDir, err)
 	}
