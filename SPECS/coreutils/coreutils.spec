@@ -1,7 +1,7 @@
 Summary:        Basic system utilities
 Name:           coreutils
-Version:        8.32
-Release:        7%{?dist}
+Version:        9.4
+Release:        1%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -103,6 +103,9 @@ LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8 make -k check
 %defattr(-,root,root)
 
 %changelog
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.4-1
+- Auto-upgrade to 9.4 - Azure Linux 3.0 - package upgrades
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 8.32-7
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
