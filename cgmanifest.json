@@ -3608,8 +3608,8 @@
         "type": "other",
         "other": {
           "name": "file",
-          "version": "5.40",
-          "downloadUrl": "http://ftp.astron.com/pub/file/file-5.40.tar.gz"
+          "version": "5.45",
+          "downloadUrl": "http://ftp.astron.com/pub/file/file-5.45.tar.gz"
         }
       }
     },

@@ -1,7 +1,7 @@
 Summary:        Contains a utility for determining file types
 Name:           file
-Version:        5.40
-Release:        2%{?dist}
+Version:        5.45
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -91,6 +91,9 @@ python3 setup.py install -O1 --skip-build --root %{buildroot}
 %{python3_sitelib}/__pycache__/*
 
 %changelog
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.45-1
+- Auto-upgrade to 5.45 - Azure Linux 3.0 - package upgrades
+
 * Tue Mar 15 2022 Bala <balakumaran.kannan@microsoft.com> - 5.40-2
 - Add patch to fix xz mime type reporting
 
