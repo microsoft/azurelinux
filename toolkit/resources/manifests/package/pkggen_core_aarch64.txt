@@ -70,10 +70,10 @@ util-linux-2.39.2-1.cm2.aarch64.rpm
 util-linux-devel-2.39.2-1.cm2.aarch64.rpm
 util-linux-libs-2.39.2-1.cm2.aarch64.rpm
 tar-1.34-2.cm2.aarch64.rpm
-xz-5.2.5-1.cm2.aarch64.rpm
-xz-devel-5.2.5-1.cm2.aarch64.rpm
-xz-lang-5.2.5-1.cm2.aarch64.rpm
-xz-libs-5.2.5-1.cm2.aarch64.rpm
+xz-5.4.4-1.cm2.aarch64.rpm
+xz-devel-5.4.4-1.cm2.aarch64.rpm
+xz-lang-5.4.4-1.cm2.aarch64.rpm
+xz-libs-5.4.4-1.cm2.aarch64.rpm
 zstd-1.5.5-1.cm2.aarch64.rpm
 zstd-devel-1.5.5-1.cm2.aarch64.rpm
 zstd-libs-1.5.5-1.cm2.aarch64.rpm

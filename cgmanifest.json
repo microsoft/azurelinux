@@ -30680,8 +30680,8 @@
         "type": "other",
         "other": {
           "name": "xz",
-          "version": "5.2.5",
-          "downloadUrl": "https://tukaani.org/xz/xz-5.2.5.tar.xz"
+          "version": "5.4.4",
+          "downloadUrl": "https://tukaani.org/xz/xz-5.4.4.tar.xz"
         }
       }
     },
