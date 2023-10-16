@@ -13,10 +13,78 @@ import (
 	"time"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/azureblobstorage"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/directory"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 )
+
+// CCacheManager
+//
+// CCacheManager is a central place to hold the ccache configuration and
+// abstract its work into easy to use functions.
+//
+// The configurations include:
+// - Whether ccache is enabled or not.
+// - Whether to download ccache artifacts from a previous build or not.
+// - Whether to upload the newly generated ccache artifacts or not.
+// - Other configuration like local working folders, etc.
+//
+// The main object exposed to the caller/user is CCacheManager and is
+// instantiated through the CreateManager() function.
+//
+// An instance of CCacheManager can then be set to a specific package family by
+// calling SetCurrentPkgGroup(). This function causes the CCacheManager to
+// calculate a number of settings for this particular package group.
+//
+// After a successful call to SetcurrentPkgGroup(), the user can then use the
+// DownloadPkgGroupCCache() or UploadPkgGroupCache() to download or upload
+// ccache artifacts respectively.
+//
+// UploadMultiPkgGroupCCaches() is provided to call at the end of the build
+// (where individual contexts for each pkg is not available) to enumerate
+// the generated ccache artifacts from the folders and upload those that have
+// not been uploaded - namely, package groups that have more than one package.
+//
+// Note that the design allows for storing multiple versions of the ccache
+// artifacts on the remote store. This also means that the user may choose to
+// download from any of these versions, and upload to a new location.
+//
+// The design supports a 'latest' notion - where the user can just indicate
+// that the download is to use  the 'latest' and the CCacheManager will find
+// out the latest version and download.
+//
+// Also, the user may choose to upload the artifacts generated in this build,
+// and marker them latest - so that a subsequent build can make use of them.
+//
+// The 'latest' flow is implemented by creating one text file per package
+// family that holds the folder where the latest artifacts are. On downloading
+// the latest, that file is read (downloaded from the blob storage and read).
+// On uploading, the file is created locally and uploaded (to overwrite the
+// existing version if it exists).
+//
+// While we can store the ccache artifacts from multiple builds, and consumer
+// builds can choose which ones to download from, this is not the typical
+// scenario.
+//
+// Instead, an official production build is to upload ccache artifacts and mark
+// them 'latest'. And consumer builds will just always pick-up the latest.
+//
+// This implies that we do not need to keep older ccache artifacts on the
+// remote store and we should delete them. To support that, there is a flag
+// 'KeepLatestOnly' that tells CCacheManager to delete unused older versions.
+// It identifies unused versions by capturing the latest version information
+// right before it updates it to the current build. Then, it knows that the
+// previous latest version is no longer in use and delete it.
+//
+// This has an implication if we keep switching the KeepLatestOnly flag on and
+// off. CCacheManager will not be able to delete older unused versions unless
+// they are the versions that we just switched away from. If this proves to be
+// a problem, we can always write a tool to enumerate all the versions in use
+// , and anything that is not in that list can be removed. This is not the
+// default behavior because such enumeration takes about 10 minutes and we do
+// not want this to be part of each build.
+//
 
 const (
 	CCacheTarSuffix = "-ccache.tar.gz"
@@ -27,23 +95,77 @@ const (
 	UninitializedGroupArchitecture = "unknown"
 )
 
+// RemoveStoreConfig holds the following:
+// - The remote store end-point and the necessary credentials.
+// - The behavior of the download from the remote store.
+// - The behavior of the upload to the remote store.
+// - The clean-up policy of the remote store.
 type RemoteStoreConfig struct {
+	// The remote store type. Currently, there is only one type support;
+	// Azure blob storage.
 	Type            string `json:"type"`
+
+	// Azure subscription tenant id.
 	TenantId        string `json:"tenantId"`
+
+	// Service principal client id with write-permissions to the Azure blob
+	// storage. This can be left empty if upload is disabled.
 	UserName        string `json:"userName"`
+
+	// Service principal secret with write-permissions to the Azure blob
+	// storage. This can be left empty if upload is disabled.
 	Password        string `json:"password"`
+
+	// Azure storage account name.
 	StorageAccount  string `json:"storageAccount"`
+
+	// Azure storage container name.
 	ContainerName   string `json:"containerName"`
+
+	// Tags folder is the location where the files holding information about
+	// the latest folders are kept.
 	TagsFolder      string `json:"tagsFolder"`
+
+	// If true, the build will download ccache artifacts from the remote store
+	// (before the package family builds).
 	DownloadEnabled bool   `json:"downloadEnabled"`
+
+	// If true, the build will determine the latest build and download its
+	// artifacts. If true, DownloadFolder does not need to be set.
 	DownloadLatest  bool   `json:"downloadLatest"`
+
+	// The folder on the remote store where the ccache artifacts to use are.
+	// There should be a folder for each build.
+	// If DownloadLatest is true, this does not need to be set.
 	DownloadFolder  string `json:"downloadFolder"`
+
+	// If true, the build will upload ccache artifacts to the remote store
+	// after the package family builds).
 	UploadEnabled   bool   `json:"uploadEnabled"`
+
+	// The folder on the remote store where the ccache artifacts are to be
+	// uploaded.
 	UploadFolder    string `json:"uploadFolder"`
+
+	// If true, the tags specifying the latest artifacts will be updated to
+	// point to the current upload.
 	UpdateLatest    bool   `json:"updateLatest"`
+
+	// If true, previous 'latest' ccache artifacts will be deleted from the
+	// remote store.
 	KeepLatestOnly  bool   `json:"keepLatestOnly"`
 }
 
+// CCacheGroupConfig is where package groups are defined.
+// A package group is a group of packages that can share the same ccache
+// artifacts. This is typical for packages like kernel and kernel-hci, for
+// example.
+// A package group can have an arbitrary name, and a list of package names
+// associated with it.
+// A package group can also be disabled if the ccache breaks its build. This
+// is usually a bug - and would need to be investigated further. The field
+// 'comment' can be used to clarify any configuration related to this package
+// family.
 type CCacheGroupConfig struct {
 	Name         string   `json:"name"`
 	Comment      string   `json:"comment"`
@@ -56,6 +178,12 @@ type CCacheConfiguration struct {
 	Groups            []CCacheGroupConfig `json:"groups"`
 }
 
+// Note that the design separate the artifacts we download (source) from those
+// that we upload (target).
+// What we start with (source), has a remote path on the remote storage, and is
+// downloaded to disk  at the local path).
+// What the generate (target), has a local path where we create the archive, and
+// uploaded to the remote store at the remote target path.
 type CCacheArchive struct {
 	LocalSourcePath  string
 	RemoteSourcePath string
@@ -63,6 +191,8 @@ type CCacheArchive struct {
 	RemoteTargetPath string
 }
 
+// CCachePkgGroup is calculated for each package as we encounter it during the
+// build. It is derived from the CCacheGroupConfig + runtime parameters.
 type CCachePkgGroup struct {
 	Name      string
 	Enabled   bool
@@ -74,13 +204,29 @@ type CCachePkgGroup struct {
 	TagFile   *CCacheArchive
 }
 
+// CCacheManager is the main object...
 type CCacheManager struct {
+	// Full path to the ccache json configuration file.
 	ConfigFileName    string
+
+	// The in-memory representation of the ConfigFile contents.
 	Configuration     *CCacheConfiguration
+
+	// ccache root folder as specified by build pipelines.
 	RootWorkDir       string
+
+	// Working folder where CCacheManager will download artifacts.
 	LocalDownloadsDir string
+
+	// Working folder where CCacheManager will create archives in preparation
+	// for uploading them.
 	LocalUploadsDir   string
+
+	// Pointer to the current active pkg group state/configuration.
 	CurrentPkgGroup   *CCachePkgGroup
+
+	// A utility helper for downloading/uploading archives from/to Azure blob
+	// storage.
 	AzureBlobStorage  *azureblobstoragepkg.AzureBlobStorage
 }
 
@@ -139,15 +285,13 @@ func (g *CCachePkgGroup) getLatestTag(azureBlobStorage *azureblobstoragepkg.Azur
 		logger.Log.Infof("  downloading (%s) to (%s)...", g.TagFile.RemoteSourcePath, g.TagFile.LocalSourcePath)
 		err = azureBlobStorage.Download(context.Background(), containerName, g.TagFile.RemoteSourcePath, g.TagFile.LocalSourcePath)
 		if err != nil {
-			logger.Log.Warnf("  unable to download ccache tag file.")
-			return "", err
+			return "", fmt.Errorf("Unable to download ccache tag file:\n%w", err)
 		}
 	}
 
 	latestBuildTagData, err := ioutil.ReadFile(g.TagFile.LocalSourcePath)
 	if err != nil {
-		logger.Log.Warnf("Unable to read ccache tag file contents. Error: %v", err)
-		return "", err
+		return "", fmt.Errorf("Unable to read ccache tag file contents:\n%w", err)
 	}
 
 	return string(latestBuildTagData), nil
@@ -175,7 +319,7 @@ func (m *CCacheManager) setCurrentPkgGroupInternal(groupName string, groupEnable
 
 	ccachePkgGroup.CCacheDir, err = m.buildPkgCCacheDir(ccachePkgGroup.Name, ccachePkgGroup.Arch)
 	if err != nil {
-		return errors.New(fmt.Sprintf("Failed to construct the ccache directory name. Error (%v)", err))
+		return fmt.Errorf("Failed to construct the ccache directory name:\n%w", err)
 	}
 
 	// Note that we create the ccache working folder here as opposed to the
@@ -183,10 +327,9 @@ func (m *CCacheManager) setCurrentPkgGroupInternal(groupName string, groupEnable
 	// to enable ccache, but does not download.
 	if ccachePkgGroup.Enabled {
 		logger.Log.Infof("  ccache pkg folder : (%s)", ccachePkgGroup.CCacheDir)
-		err = ensureDirExists(ccachePkgGroup.CCacheDir)
+		err = directory.EnsureDirExists(ccachePkgGroup.CCacheDir)
 		if err != nil {
-			logger.Log.Warnf("Cannot create ccache download folder.")
-			return err
+			return fmt.Errorf("Cannot create ccache download folder:\n%w", err)
 		}
 
 		ccachePkgGroup.UpdateTagsPaths(m.Configuration.RemoteStoreConfig, m.LocalDownloadsDir, m.LocalUploadsDir)
@@ -223,8 +366,7 @@ func loadConfiguration(configFileName string) (configuration *CCacheConfiguratio
 
 	err = jsonutils.ReadJSONFile(configFileName, &configuration)
 	if err != nil {
-		logger.Log.Infof("Failed to load file. %v", err)
-		return nil, err
+		return nil, fmt.Errorf("Failed to load file:\n%w", err)
 	}
 
 	logger.Log.Infof("    Type           : %s", configuration.RemoteStoreConfig.Type)
@@ -244,27 +386,6 @@ func loadConfiguration(configFileName string) (configuration *CCacheConfiguratio
 	return configuration, err	
 }
 
-func ensureDirExists(dirName string) (err error) {
-	_, err = os.Stat(dirName)
-	if err == nil {
-		return nil
-	}
-
-	if os.IsNotExist(err) {
-		err = os.MkdirAll(dirName, 0755)
-		if err != nil {
-			logger.Log.Warnf("Unable to create folder (%s). Error: %v", dirName, err)
-			return err
-		}
-	} else {
-		logger.Log.Warnf("An error occured while checking if (%s) exists. Error: %v", dirName, err)
-		return err
-	}
-
-	return nil
-}
-
-
 func compressDir(sourceDir string, archiveName string) (err error) {
 
 	// Ensure the output file does not exist...
@@ -272,8 +393,7 @@ func compressDir(sourceDir string, archiveName string) (err error) {
 	if err == nil {
 		err = os.Remove(archiveName)
 		if err != nil {
-			logger.Log.Warnf("  unable to delete ccache out tar. Error: %v", err)
-			return err
+			return fmt.Errorf("Unable to delete ccache out tar:\n%w", err)
 		}
 	}
 
@@ -289,8 +409,7 @@ func compressDir(sourceDir string, archiveName string) (err error) {
 
 	_, stderr, err := shell.Execute("tar", tarArgs...)
 	if err != nil {
-		logger.Log.Warnf("Unable compress ccache files itno archive. Error: %v", stderr)
-		return err
+		return fmt.Errorf("Unable compress ccache files itno archive:\n%s", stderr)
 	}
 	compressEndTime := time.Now()
 	logger.Log.Infof("  compress time: %s", compressEndTime.Sub(compressStartTime))	
@@ -309,45 +428,11 @@ func uncompressFile(archiveName string, targetDir string) (err error) {
 
 	_, stderr, err := shell.Execute("tar", tarArgs...)
 	if err != nil {
-		logger.Log.Warnf("Unable extract ccache files from archive. Error: %v", stderr)
-		return err
+		return fmt.Errorf("Unable extract ccache files from archive:\n%s", stderr)
 	}
 	uncompressEndTime := time.Now()
 	logger.Log.Infof("  uncompress time: %v", uncompressEndTime.Sub(uncompressStartTime))
 	return nil
-}
-
-func getChildFolders(parentFolder string) ([]string, error) {
-	childFolders := []string{}
-
-	dir, err := os.Open(parentFolder)
-	if err != nil {
-		logger.Log.Infof("  error opening parent folder. Error: (%v)", err)
-		return nil, err
-	}
-	defer dir.Close()
-
-	children, err := dir.Readdirnames(-1)
-	if err != nil {
-		logger.Log.Infof("  error enumerating children. Error: (%v)", err)
-		return nil, err
-	}
-
-	for _, child := range children {
-		childPath := filepath.Join(parentFolder, child)
-
-		info, err := os.Stat(childPath)
-		if err != nil {
-			logger.Log.Infof("  error retrieving child attributes. Error: (%v)", err)
-			continue
-		}
-
-		if info.IsDir() {
-			childFolders = append(childFolders, child)
-		}
-	}
-
-	return childFolders, nil
 }
 
 func CreateManager(rootDir string, configFileName string) (m *CCacheManager, err error) {
@@ -365,8 +450,7 @@ func CreateManager(rootDir string, configFileName string) (m *CCacheManager, err
 
 	configuration, err := loadConfiguration(configFileName)
 	if err != nil {
-		logger.Log.Infof("Failed to load remote store configuration. %v", err)
-		return nil, err
+		return nil, fmt.Errorf("Failed to load remote store configuration:\n%w", err)
 	}
 
 	logger.Log.Infof("  creating blob storage client...")
@@ -377,35 +461,30 @@ func CreateManager(rootDir string, configFileName string) (m *CCacheManager, err
 
 	azureBlobStorage, err := azureblobstoragepkg.Create(configuration.RemoteStoreConfig.TenantId, configuration.RemoteStoreConfig.UserName, configuration.RemoteStoreConfig.Password, configuration.RemoteStoreConfig.StorageAccount, accessType)
 	if err != nil {
-		logger.Log.Warnf("Unable to init azure blob storage client.")
-		return nil, err
+		return nil, fmt.Errorf("Unable to init azure blob storage client:\n%w", err)
 	}
 
-	err = ensureDirExists(rootDir)
+	err = directory.EnsureDirExists(rootDir)
 	if err != nil {
-		logger.Log.Warnf("  cannot create ccache working folder.")
-		return nil, err
+		return nil, fmt.Errorf("Cannot create ccache working folder:\n%w", err)
 	}
 
 	rootWorkDir := rootDir + "/work"
-	err = ensureDirExists(rootWorkDir)
+	err = directory.EnsureDirExists(rootWorkDir)
 	if err != nil {
-		logger.Log.Warnf("  cannot create ccache work folder.")
-		return nil, err
+		return nil, fmt.Errorf("Cannot create ccache work folder:\n%w", err)
 	}
 
 	localDownloadsDir := rootDir + "/downloads"
-	err = ensureDirExists(localDownloadsDir)
+	err = directory.EnsureDirExists(localDownloadsDir)
 	if err != nil {
-		logger.Log.Warnf("  cannot create ccache downloads folder.")
-		return nil, err
+		return nil, fmt.Errorf("Cannot create ccache downloads folder:\n%w", err)
 	}
 
 	localUploadsDir := rootDir + "/uploads"
-	err = ensureDirExists(localUploadsDir)
+	err = directory.EnsureDirExists(localUploadsDir)
 	if err != nil {
-		logger.Log.Warnf("  cannot create ccache uploads folder.")
-		return nil, err
+		return nil, fmt.Errorf("Cannot create ccache uploads folder:\n%w", err)
 	}
 
 	ccacheManager := &CCacheManager{
@@ -504,14 +583,12 @@ func (m *CCacheManager) DownloadPkgGroupCCache() (err error) {
 	logger.Log.Infof("  downloading (%s) to (%s)...", m.CurrentPkgGroup.TarFile.RemoteSourcePath, m.CurrentPkgGroup.TarFile.LocalSourcePath)
 	err = m.AzureBlobStorage.Download(context.Background(), remoteStoreConfig.ContainerName, m.CurrentPkgGroup.TarFile.RemoteSourcePath, m.CurrentPkgGroup.TarFile.LocalSourcePath)
 	if err != nil {
-		logger.Log.Warnf("  unable to download ccache archive.")
-		return err
+		return fmt.Errorf("Unable to download ccache archive:\n%w", err)
 	}
 
 	err = uncompressFile(m.CurrentPkgGroup.TarFile.LocalSourcePath, m.CurrentPkgGroup.CCacheDir)
 	if err != nil {
-		logger.Log.Warnf("Unable uncompress ccache files from archive.")
-		return err
+		return fmt.Errorf("Unable uncompress ccache files from archive:\n%w", err)
 	}
 
 	return nil
@@ -524,9 +601,9 @@ func (m *CCacheManager) UploadPkgGroupCCache() (err error) {
 	// Check if ccache has actually generated any content.
 	// If it has, it would have created a specific folder structure - so,
 	// checking for folders is reasonable enough.
-	pkgCCacheDirContents, err := getChildFolders(m.CurrentPkgGroup.CCacheDir)
+	pkgCCacheDirContents, err := directory.GetChildDirs(m.CurrentPkgGroup.CCacheDir)
 	if err != nil {
-		logger.Log.Warnf("Failed to enumerate the contents of (%s).", m.CurrentPkgGroup.CCacheDir)
+		return fmt.Errorf("Failed to enumerate the contents of (%s):\n%w", m.CurrentPkgGroup.CCacheDir, err)
 	}
 	if len(pkgCCacheDirContents) == 0 {
 		logger.Log.Infof("  %s is empty. Nothing to archive and upload. Skipping...", m.CurrentPkgGroup.CCacheDir)
@@ -541,16 +618,14 @@ func (m *CCacheManager) UploadPkgGroupCCache() (err error) {
 
 	err = compressDir(m.CurrentPkgGroup.CCacheDir, m.CurrentPkgGroup.TarFile.LocalTargetPath)
 	if err != nil {
-		logger.Log.Warnf("Unable compress ccache files itno archive.")
-		return err
+		return fmt.Errorf("Unable compress ccache files itno archive:\n%w", err)
 	}
 
 	// Upload the ccache archive
 	logger.Log.Infof("  uploading ccache archive (%s) to (%s)...", m.CurrentPkgGroup.TarFile.LocalTargetPath, m.CurrentPkgGroup.TarFile.RemoteTargetPath)
 	err = m.AzureBlobStorage.Upload(context.Background(), m.CurrentPkgGroup.TarFile.LocalTargetPath, remoteStoreConfig.ContainerName, m.CurrentPkgGroup.TarFile.RemoteTargetPath)
 	if err != nil {
-		logger.Log.Warnf("Unable to upload ccache archive.")
-		return err
+		return fmt.Errorf("Unable to upload ccache archive:\n%w", err)
 	}
 
 	if remoteStoreConfig.UpdateLatest {
@@ -583,16 +658,14 @@ func (m *CCacheManager) UploadPkgGroupCCache() (err error) {
 		logger.Log.Infof("  creating a tag file (%s) with content: (%s)...", m.CurrentPkgGroup.TagFile.LocalTargetPath, remoteStoreConfig.UploadFolder)
 		err = ioutil.WriteFile(m.CurrentPkgGroup.TagFile.LocalTargetPath, []byte(remoteStoreConfig.UploadFolder), 0644)
 		if err != nil {
-			logger.Log.Warnf("Unable to write tag information to temporary file. Error: %v", err)
-			return err
+			return fmt.Errorf("Unable to write tag information to temporary file:\n%w", err)
 		}
 
 		// Upload the latest tag file...
 		logger.Log.Infof("  uploading tag file (%s) to (%s)...", m.CurrentPkgGroup.TagFile.LocalTargetPath, m.CurrentPkgGroup.TagFile.RemoteTargetPath)
 		err = m.AzureBlobStorage.Upload(context.Background(), m.CurrentPkgGroup.TagFile.LocalTargetPath, remoteStoreConfig.ContainerName, m.CurrentPkgGroup.TagFile.RemoteTargetPath)
 		if err != nil {
-			logger.Log.Warnf("Unable to upload ccache archive.")
-			return err
+			return fmt.Errorf("Unable to upload ccache archive:\n%w", err)
 		}
 
 		if remoteStoreConfig.KeepLatestOnly {
@@ -603,7 +676,7 @@ func (m *CCacheManager) UploadPkgGroupCCache() (err error) {
 				logger.Log.Infof("  removing ccache archive (%s) from remote store...", previousLatestTarSourcePath)
 				err = m.AzureBlobStorage.Delete(context.Background(), remoteStoreConfig.ContainerName, previousLatestTarSourcePath)
 				if err != nil {
-					logger.Log.Warnf("Unable to remove previous ccache archive.")
+					return fmt.Errorf("Unable to remove previous ccache archive:\n%w", err)
 				}
 			}
 		}
@@ -638,16 +711,16 @@ func (m *CCacheManager) UploadPkgGroupCCache() (err error) {
 //
 func (m *CCacheManager) UploadMultiPkgGroupCCaches() (err error) {
 
-	architectures, err := getChildFolders(m.RootWorkDir)
+	architectures, err := directory.GetChildDirs(m.RootWorkDir)
 	errorsOccured := false
 	if err != nil {
-		return errors.New(fmt.Sprintf("failed to enumerate ccache child folders under (%s)...", m.RootWorkDir))
+		return fmt.Errorf("failed to enumerate ccache child folders under (%s):\n%w", m.RootWorkDir, err)
 	} 
 
 	for _, architecture := range architectures {
-		groupNames, err := getChildFolders(filepath.Join(m.RootWorkDir, architecture))
+		groupNames, err := directory.GetChildDirs(filepath.Join(m.RootWorkDir, architecture))
 		if err != nil {
-			logger.Log.Warnf("failed to enumerate child folders under (%s)...", m.RootWorkDir)
+			logger.Log.Warnf("failed to enumerate child folders under (%s):\n%v", m.RootWorkDir, err)
 			errorsOccured = true
 		} else {
 			for _, groupName := range groupNames {
@@ -674,7 +747,7 @@ func (m *CCacheManager) UploadMultiPkgGroupCCaches() (err error) {
 
 				groupCCacheDir, err := m.buildPkgCCacheDir(groupName, architecture)
 				if err != nil {
-					logger.Log.Warnf("Failed to get ccache dir for architecture (%s) and group name (%s)...", architecture, groupName)
+					logger.Log.Warnf("Failed to get ccache dir for architecture (%s) and group name (%s):\n%v", architecture, groupName, err)
 					errorsOccured = true
 				}				
 				logger.Log.Infof("  processing ccache folder (%s)...", groupCCacheDir)
@@ -684,14 +757,14 @@ func (m *CCacheManager) UploadMultiPkgGroupCCaches() (err error) {
 				err = m.UploadPkgGroupCCache()
 				if err != nil {
 					errorsOccured = true
-					logger.Log.Warnf("CCache will not be archived for (%s) (%s)...", architecture, groupName)
+					logger.Log.Warnf("CCache will not be archived for (%s) (%s):\n%v", architecture, groupName, err)
 				}
 			}
 		}
 	}
 
 	if errorsOccured {
-		return errors.New("CCache archiving and upload failed. See above warning for more details.")
+		return errors.New("CCache archiving and upload failed. See above warnings for more details.")
 	}
 	return nil
 }

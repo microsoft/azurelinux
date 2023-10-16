@@ -101,16 +101,16 @@ func main() {
 						defines[rpm.MarinerCCacheDefine] = "true"
 					}
 				} else {
-					logger.Log.Warnf("Failed to set package ccache configuration.")
+					logger.Log.Warnf("Failed to set package ccache configuration:\n%v", err)
 					ccacheManager = nil
 				}
 			} else {
-				logger.Log.Warnf("Failed to get build architecture. Error: %v", err)
+				logger.Log.Warnf("Failed to get build architecture:\n%v", err)
 				ccacheManager = nil
 			}
 		}
 	} else {
-		logger.Log.Warnf("Failed to initialize the ccache manager. Error (%v)", err)
+		logger.Log.Warnf("Failed to initialize the ccache manager:\n%v", err)
 		ccacheManager = nil
 	}
 
@@ -190,7 +190,7 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 	if isCCacheEnabled(ccacheManager) {
 		err = ccacheManager.DownloadPkgGroupCCache()
 		if err != nil {
-			logger.Log.Infof("  ccache will not be able to use previously generated artifacts.")
+			logger.Log.Infof("CCache will not be able to use previously generated artifacts:\n%v", err)
 		}
 	}
 	
@@ -250,7 +250,7 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 	if isCCacheEnabled(ccacheManager) && ccacheManager.CurrentPkgGroup.Size == 1 {
 		err = ccacheManager.UploadPkgGroupCCache()
 		if err != nil {
-			logger.Log.Infof("  unable to upload ccache archive. Error: %v", err)
+			logger.Log.Warnf("Unable to upload ccache archive:\n%v", err)
 		}
 	}
 
