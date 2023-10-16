@@ -248,44 +248,61 @@ func SetupLoopbackDevice(diskFilePath string) (devicePath string, err error) {
 
 // BlockOnDiskIO waits until all outstanding operations against a disk complete.
 func BlockOnDiskIO(diskDevPath string) (err error) {
-	const (
-		// Indices for values in /proc/diskstats
-		majIdx            = 0
-		minIdx            = 1
-		outstandingOpsIdx = 11
-	)
-	var blockDevices blockDevicesOutput
-
-	logger.Log.Infof("Flushing all IO to disk for %s", diskDevPath)
-	_, _, err = shell.Execute("sync")
+	maj, min, err := GetDiskIds(diskDevPath)
 	if err != nil {
 		return
 	}
 
+	return BlockOnDiskIOByIds(diskDevPath, maj, min)
+}
+
+func GetDiskIds(diskDevPath string) (maj string, min string, err error) {
 	rawDiskOutput, stderr, err := shell.Execute("lsblk", "--nodeps", "--json", "--output", "NAME,MAJ:MIN", diskDevPath)
 	if err != nil {
 		logger.Log.Warn(stderr)
+		err = fmt.Errorf("failed to find IDs for disk (%s):\n%w", diskDevPath, err)
 		return
 	}
 
 	bytes := []byte(rawDiskOutput)
+
+	var blockDevices blockDevicesOutput
 	err = json.Unmarshal(bytes, &blockDevices)
 	if err != nil {
 		return
 	}
 
 	if len(blockDevices.Devices) != 1 {
-		return fmt.Errorf("couldn't find disk IDs for %s (%s), expecting only one result", diskDevPath, rawDiskOutput)
+		err = fmt.Errorf("couldn't find disk IDs for %s (%s), expecting only one result", diskDevPath, rawDiskOutput)
+		return
 	}
 	// MAJ:MIN is returned in the form "1:2"
 	diskIDs := strings.Split(blockDevices.Devices[0].MajMin, ":")
 	if len(diskIDs) != 2 {
-		return fmt.Errorf("couldn't find disk IDs for %s (%s), couldn't parse MAJ:MIN", diskDevPath, rawDiskOutput)
+		err = fmt.Errorf("couldn't find disk IDs for %s (%s), couldn't parse MAJ:MIN", diskDevPath, rawDiskOutput)
+		return
 	}
-	maj := diskIDs[0]
-	min := diskIDs[1]
+	maj = diskIDs[0]
+	min = diskIDs[1]
+	return
+}
 
-	logger.Log.Tracef("Searching /proc/diskstats for %s (%s:%s)", blockDevices.Devices[0].Name, maj, min)
+// BlockOnDiskIOById waits until all outstanding operations against a disk complete.
+func BlockOnDiskIOByIds(debugName string, maj string, min string) (err error) {
+	const (
+		// Indices for values in /proc/diskstats
+		majIdx            = 0
+		minIdx            = 1
+		outstandingOpsIdx = 11
+	)
+
+	logger.Log.Infof("Flushing all IO to disk")
+	_, _, err = shell.Execute("sync")
+	if err != nil {
+		return
+	}
+
+	logger.Log.Tracef("Searching /proc/diskstats for %s (%s:%s)", debugName, maj, min)
 	for {
 		var (
 			foundEntry     = false
@@ -310,13 +327,12 @@ func BlockOnDiskIO(diskDevPath string) (err error) {
 
 		err = shell.ExecuteLiveWithCallback(onStdout, logger.Log.Error, true, "cat", "/proc/diskstats")
 		if err != nil {
-			logger.Log.Error(stderr)
 			return
 		}
 		if !foundEntry {
-			return fmt.Errorf("couldn't find entry for '%s' in /proc/diskstats", diskDevPath)
+			return fmt.Errorf("couldn't find entry for '%s' in /proc/diskstats", debugName)
 		}
-		logger.Log.Debugf("Outstanding operations on '%s': %s", diskDevPath, outstandingOps)
+		logger.Log.Debugf("Outstanding operations on '%s': %s", debugName, outstandingOps)
 
 		if outstandingOps == "0" {
 			break

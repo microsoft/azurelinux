@@ -14,6 +14,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safeloopback"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safemount"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 )
@@ -187,14 +188,14 @@ func customizeImageHelper(buildDir string, baseConfigPath string, config *imagec
 	buildImageFile string, rpmsSources []string, useBaseImageRpmRepos bool,
 ) error {
 	// Mount the raw disk image file.
-	diskDevPath, err := diskutils.SetupLoopbackDevice(buildImageFile)
+	loopback, err := safeloopback.NewLoopback(buildImageFile)
 	if err != nil {
 		return fmt.Errorf("failed to mount raw disk (%s) as a loopback device:\n%w", buildImageFile, err)
 	}
-	defer diskutils.DetachLoopbackDevice(diskDevPath)
+	defer loopback.Close()
 
 	// Look for all the partitions on the image.
-	newMountDirectories, mountPoints, err := findPartitions(buildDir, diskDevPath)
+	newMountDirectories, mountPoints, err := findPartitions(buildDir, loopback.DevicePath())
 	if err != nil {
 		return fmt.Errorf("failed to find disk partitions:\n%w", err)
 	}
@@ -202,15 +203,27 @@ func customizeImageHelper(buildDir string, baseConfigPath string, config *imagec
 	// Create chroot environment.
 	imageChrootDir := filepath.Join(buildDir, "imageroot")
 
-	imageChroot := safechroot.NewChroot(imageChrootDir, false)
+	chrootLeaveOnDisk := false
+	imageChroot := safechroot.NewChroot(imageChrootDir, chrootLeaveOnDisk)
 	err = imageChroot.Initialize("", newMountDirectories, mountPoints)
 	if err != nil {
 		return err
 	}
-	defer imageChroot.Close(false)
+	defer imageChroot.Close(chrootLeaveOnDisk)
 
 	// Do the actual customizations.
 	err = doCustomizations(buildDir, baseConfigPath, config, imageChroot, rpmsSources, useBaseImageRpmRepos)
+	if err != nil {
+		return err
+	}
+
+	// Close.
+	err = imageChroot.Close(chrootLeaveOnDisk)
+	if err != nil {
+		return err
+	}
+
+	err = loopback.CleanClose()
 	if err != nil {
 		return err
 	}
