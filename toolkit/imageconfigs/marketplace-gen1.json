@@ -68,7 +68,7 @@
                     "Path": "additionalconfigs/configure-image.sh"
                 },
                 {
-                    "Path": "additionalconfigs/remove-tdnf-cache.sh"
+                    "Path": "postinstallscripts/remove-tdnf-cache.sh"
                 }
             ],
             "KernelOptions": {

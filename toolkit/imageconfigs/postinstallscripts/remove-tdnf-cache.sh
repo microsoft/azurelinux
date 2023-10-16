@@ -1,2 +1,2 @@
-tdnf clean all
+tdnf -y clean all
 rm -rf /var/cache/tdnf
