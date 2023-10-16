@@ -55,7 +55,7 @@ Provides:       %{name}-python3 = %{version}-%{release}
 This contains protobuf python3 libraries.
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 %configure --disable-silent-rules
