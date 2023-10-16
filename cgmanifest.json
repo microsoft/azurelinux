@@ -10621,8 +10621,8 @@
         "type": "other",
         "other": {
           "name": "libpipeline",
-          "version": "1.5.5",
-          "downloadUrl": "http://download.savannah.gnu.org/releases/libpipeline/libpipeline-1.5.5.tar.gz"
+          "version": "1.5.7",
+          "downloadUrl": "http://download.savannah.gnu.org/releases/libpipeline/libpipeline-1.5.7.tar.gz"
         }
       }
     },

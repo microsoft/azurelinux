@@ -98,8 +98,8 @@ elfutils-libelf-lang-0.189-1.cm2.x86_64.rpm
 expat-2.5.0-1.cm2.x86_64.rpm
 expat-devel-2.5.0-1.cm2.x86_64.rpm
 expat-libs-2.5.0-1.cm2.x86_64.rpm
-libpipeline-1.5.5-3.cm2.x86_64.rpm
-libpipeline-devel-1.5.5-3.cm2.x86_64.rpm
+libpipeline-1.5.7-1.cm2.x86_64.rpm
+libpipeline-devel-1.5.7-1.cm2.x86_64.rpm
 gdbm-1.21-1.cm2.x86_64.rpm
 gdbm-devel-1.21-1.cm2.x86_64.rpm
 gdbm-lang-1.21-1.cm2.x86_64.rpm
