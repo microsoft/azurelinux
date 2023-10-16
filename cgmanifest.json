@@ -4910,8 +4910,8 @@
         "type": "other",
         "other": {
           "name": "grep",
-          "version": "3.7",
-          "downloadUrl": "https://ftp.gnu.org/gnu/grep/grep-3.7.tar.xz"
+          "version": "3.11",
+          "downloadUrl": "https://ftp.gnu.org/gnu/grep/grep-3.11.tar.xz"
         }
       }
     },

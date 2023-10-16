@@ -126,9 +126,9 @@ gperf-debuginfo-3.1-5.cm2.x86_64.rpm
 gpgme-1.16.0-2.cm2.x86_64.rpm
 gpgme-debuginfo-1.16.0-2.cm2.x86_64.rpm
 gpgme-devel-1.16.0-2.cm2.x86_64.rpm
-grep-3.7-2.cm2.x86_64.rpm
-grep-debuginfo-3.7-2.cm2.x86_64.rpm
-grep-lang-3.7-2.cm2.x86_64.rpm
+grep-3.11-1.cm2.x86_64.rpm
+grep-debuginfo-3.11-1.cm2.x86_64.rpm
+grep-lang-3.11-1.cm2.x86_64.rpm
 gtk-doc-1.33.2-1.cm2.noarch.rpm
 gzip-1.12-2.cm2.x86_64.rpm
 gzip-debuginfo-1.12-2.cm2.x86_64.rpm
