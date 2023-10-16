@@ -13,8 +13,8 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.20.7
-Release:        2%{?dist}
+Version:        1.20.9
+Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -145,6 +145,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.20.9-1
+- Auto-upgrade to 1.20.9 - Bump version to 1.20.9 to address CVE-2023-29409, CVE-2023-39318, CVE-2023-39319, CVE-2023-39323, CVE-2023-39533
+
 * Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 1.20.7-2
 - Patch CVE-2023-44487
 
