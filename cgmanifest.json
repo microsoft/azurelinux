@@ -9381,8 +9381,8 @@
         "type": "other",
         "other": {
           "name": "libffi",
-          "version": "3.4.2",
-          "downloadUrl": "https://github.com/libffi/libffi/releases/download/v3.4.2/libffi-3.4.2.tar.gz"
+          "version": "3.4.4",
+          "downloadUrl": "https://github.com/libffi/libffi/releases/download/v3.4.4/libffi-3.4.4.tar.gz"
         }
       }
     },

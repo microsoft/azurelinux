@@ -157,9 +157,9 @@ libcap-devel-2.60-2.cm2.x86_64.rpm
 libcap-ng-0.8.2-2.cm2.x86_64.rpm
 libcap-ng-debuginfo-0.8.2-2.cm2.x86_64.rpm
 libcap-ng-devel-0.8.2-2.cm2.x86_64.rpm
-libffi-3.4.2-3.cm2.x86_64.rpm
-libffi-debuginfo-3.4.2-3.cm2.x86_64.rpm
-libffi-devel-3.4.2-3.cm2.x86_64.rpm
+libffi-3.4.4-1.cm2.x86_64.rpm
+libffi-debuginfo-3.4.4-1.cm2.x86_64.rpm
+libffi-devel-3.4.4-1.cm2.x86_64.rpm
 libgcc-11.2.0-7.cm2.x86_64.rpm
 libgcc-atomic-11.2.0-7.cm2.x86_64.rpm
 libgcc-devel-11.2.0-7.cm2.x86_64.rpm
