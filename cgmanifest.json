@@ -4300,8 +4300,8 @@
         "type": "other",
         "other": {
           "name": "gettext",
-          "version": "0.21",
-          "downloadUrl": "https://ftp.gnu.org/gnu/gettext/gettext-0.21.tar.xz"
+          "version": "0.22",
+          "downloadUrl": "https://ftp.gnu.org/gnu/gettext/gettext-0.22.tar.xz"
         }
       }
     },
