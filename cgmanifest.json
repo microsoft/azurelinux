@@ -27545,8 +27545,8 @@
         "type": "other",
         "other": {
           "name": "sed",
-          "version": "4.8",
-          "downloadUrl": "https://ftp.gnu.org/gnu/sed/sed-4.8.tar.xz"
+          "version": "4.9",
+          "downloadUrl": "https://ftp.gnu.org/gnu/sed/sed-4.9.tar.xz"
         }
       }
     },
