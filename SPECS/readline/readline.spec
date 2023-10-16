@@ -1,6 +1,6 @@
 Summary:        Command-line editing and history capabilities
 Name:           readline
-Version:        8.1
+Version:        8.2
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
@@ -107,6 +107,9 @@ make %{?_smp_mflags} check
 %{_libdir}/pkgconfig/readline.pc
 
 %changelog
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.2-1
+- Auto-upgrade to 8.2 - Azure Linux 3.0 - package upgrades
+
 * Mon Nov 22 2021 Andrew Phelps <anphel@microsoft.com> 8.1-1
 - Update to version 8.1
 - License verified

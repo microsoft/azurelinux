@@ -530,9 +530,9 @@ python3-rpm-4.18.0-4.cm2.aarch64.rpm
 python3-setuptools-3.9.14-7.cm2.noarch.rpm
 python3-test-3.9.14-7.cm2.aarch64.rpm
 python3-tools-3.9.14-7.cm2.aarch64.rpm
-readline-8.1-1.cm2.aarch64.rpm
-readline-debuginfo-8.1-1.cm2.aarch64.rpm
-readline-devel-8.1-1.cm2.aarch64.rpm
+readline-8.2-1.cm2.aarch64.rpm
+readline-debuginfo-8.2-1.cm2.aarch64.rpm
+readline-devel-8.2-1.cm2.aarch64.rpm
 rpm-4.18.0-4.cm2.aarch64.rpm
 rpm-build-4.18.0-4.cm2.aarch64.rpm
 rpm-build-libs-4.18.0-4.cm2.aarch64.rpm

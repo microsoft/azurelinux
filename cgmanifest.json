@@ -25504,8 +25504,8 @@
         "type": "other",
         "other": {
           "name": "readline",
-          "version": "8.1",
-          "downloadUrl": "https://ftp.gnu.org/gnu/readline/readline-8.1.tar.gz"
+          "version": "8.2",
+          "downloadUrl": "https://ftp.gnu.org/gnu/readline/readline-8.2.tar.gz"
         }
       }
     },
