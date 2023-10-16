@@ -2147,8 +2147,8 @@
         "type": "other",
         "other": {
           "name": "cpio",
-          "version": "2.13",
-          "downloadUrl": "https://ftp.gnu.org/gnu/cpio/cpio-2.13.tar.bz2"
+          "version": "2.14",
+          "downloadUrl": "https://ftp.gnu.org/gnu/cpio/cpio-2.14.tar.bz2"
         }
       }
     },
