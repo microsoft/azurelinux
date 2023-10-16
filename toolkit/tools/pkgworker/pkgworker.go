@@ -149,7 +149,7 @@ func buildChrootDirPath(workDir, srpmFilePath string, runCheck bool) (chrootDirP
 	return filepath.Join(workDir, buildDirName)
 }
 
-func isCCacheEnabled(ccacheManager *ccachemanagerpkg.CCacheManager) (bool) {
+func isCCacheEnabled(ccacheManager *ccachemanagerpkg.CCacheManager) bool {
 	return ccacheManager != nil && ccacheManager.CurrentPkgGroup.Enabled
 }
 
@@ -193,7 +193,7 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 			logger.Log.Infof("CCache will not be able to use previously generated artifacts:\n%v", err)
 		}
 	}
-	
+
 	// Create the chroot used to build the SRPM
 	chroot := safechroot.NewChroot(chrootDir, existingChrootDir)
 

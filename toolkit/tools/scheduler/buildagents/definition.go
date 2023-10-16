@@ -27,10 +27,10 @@ type BuildAgentConfig struct {
 	DistroBuildNumber    string
 	RpmmacrosFile        string
 
-	NoCleanup            bool
-	UseCcache            bool
-	MaxCpu               string
-	Timeout              time.Duration
+	NoCleanup bool
+	UseCcache bool
+	MaxCpu    string
+	Timeout   time.Duration
 
 	LogDir   string
 	LogLevel string

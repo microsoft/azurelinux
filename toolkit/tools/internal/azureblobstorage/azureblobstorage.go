@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	AnonymousAccess = 0
+	AnonymousAccess     = 0
 	AuthenticatedAccess = 1
 )
 
@@ -94,7 +94,7 @@ func (abs *AzureBlobStorage) Delete(
 	_, err = abs.theClient.DeleteBlob(ctx, containerName, blobName, nil)
 	if err != nil {
 		return fmt.Errorf("Failed to delete blob:\n%w", err)
-	}	
+	}
 	deleteEndTime := time.Now()
 	logger.Log.Infof("  delete time: %v", deleteEndTime.Sub(deleteStartTime))
 

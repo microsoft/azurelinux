@@ -93,7 +93,6 @@ func EnsureDirExists(dirName string) (err error) {
 	return nil
 }
 
-
 func GetChildDirs(parentFolder string) ([]string, error) {
 	childFolders := []string{}
 
