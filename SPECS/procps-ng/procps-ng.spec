@@ -1,7 +1,7 @@
 Summary:        Programs for monitoring processes
 Name:           procps-ng
-Version:        3.3.17
-Release:        2%{?dist}
+Version:        4.0.4
+Release:        1%{?dist}
 License:        GPLv2 AND LGPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -111,6 +111,9 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.0.4-1
+- Auto-upgrade to 4.0.4 - Azure Linux 3.0 - package upgrades
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.3.17-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
