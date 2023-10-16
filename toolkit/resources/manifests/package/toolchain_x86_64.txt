@@ -566,8 +566,8 @@ tdnf-devel-3.5.2-2.cm2.x86_64.rpm
 tdnf-plugin-metalink-3.5.2-2.cm2.x86_64.rpm
 tdnf-plugin-repogpgcheck-3.5.2-2.cm2.x86_64.rpm
 tdnf-python-3.5.2-2.cm2.x86_64.rpm
-texinfo-6.8-1.cm2.x86_64.rpm
-texinfo-debuginfo-6.8-1.cm2.x86_64.rpm
+texinfo-7.0.3-1.cm2.x86_64.rpm
+texinfo-debuginfo-7.0.3-1.cm2.x86_64.rpm
 unzip-6.0-20.cm2.x86_64.rpm
 unzip-debuginfo-6.0-20.cm2.x86_64.rpm
 util-linux-2.37.4-8.cm2.x86_64.rpm

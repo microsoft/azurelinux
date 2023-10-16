@@ -161,7 +161,7 @@ perl-threads-2.26-488.cm2.aarch64.rpm
 perl-threads-shared-1.62-488.cm2.aarch64.rpm
 perl-vars-1.05-488.cm2.noarch.rpm
 perl-5.34.1-488.cm2.aarch64.rpm
-texinfo-6.8-1.cm2.aarch64.rpm
+texinfo-7.0.3-1.cm2.aarch64.rpm
 gtk-doc-1.33.2-1.cm2.noarch.rpm
 autoconf-2.71-3.cm2.noarch.rpm
 automake-1.16.5-1.cm2.noarch.rpm

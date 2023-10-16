@@ -1,6 +1,6 @@
 Summary:        Reading, writing, and converting info pages
 Name:           texinfo
-Version:        6.8
+Version:        7.0.3
 Release:        1%{?dist}
 License:        GPLv3+
 URL:            https://www.gnu.org/software/texinfo/
@@ -61,6 +61,9 @@ rm -rf %{buildroot}%{_infodir}
 %{_libdir}/texinfo/*
 
 %changelog
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 7.0.3-1
+- Auto-upgrade to 7.0.3 - Azure Linux 3.0 - package upgrades
+
 * Fri Oct 08 2021 Andrew Phelps <anphel@microsoft.com> 6.8-1
 - Update to version 6.8
 - Fix issue building with glibc 2.34

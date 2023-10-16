@@ -28667,8 +28667,8 @@
         "type": "other",
         "other": {
           "name": "texinfo",
-          "version": "6.8",
-          "downloadUrl": "http://ftp.gnu.org/gnu/texinfo/texinfo-6.8.tar.xz"
+          "version": "7.0.3",
+          "downloadUrl": "http://ftp.gnu.org/gnu/texinfo/texinfo-7.0.3.tar.xz"
         }
       }
     },
