@@ -1,7 +1,7 @@
 Summary:        Programs for processing and formatting text
 Name:           groff
-Version:        1.22.4
-Release:        2%{?dist}
+Version:        1.23.0
+Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -61,6 +61,9 @@ rm -rf %{buildroot}%{_infodir}
 %{_mandir}/*/*
 
 %changelog
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.23.0-1
+- Auto-upgrade to 1.23.0 - Azure Linux 3.0 - package upgrades
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.22.4-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
