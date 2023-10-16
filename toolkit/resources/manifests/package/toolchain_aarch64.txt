@@ -498,10 +498,10 @@ pkgconf-1.8.0-3.cm2.aarch64.rpm
 pkgconf-debuginfo-1.8.0-3.cm2.aarch64.rpm
 pkgconf-m4-1.8.0-3.cm2.noarch.rpm
 pkgconf-pkg-config-1.8.0-3.cm2.aarch64.rpm
-popt-1.18-1.cm2.aarch64.rpm
-popt-debuginfo-1.18-1.cm2.aarch64.rpm
-popt-devel-1.18-1.cm2.aarch64.rpm
-popt-lang-1.18-1.cm2.aarch64.rpm
+popt-1.19-1.cm2.aarch64.rpm
+popt-debuginfo-1.19-1.cm2.aarch64.rpm
+popt-devel-1.19-1.cm2.aarch64.rpm
+popt-lang-1.19-1.cm2.aarch64.rpm
 procps-ng-3.3.17-2.cm2.aarch64.rpm
 procps-ng-debuginfo-3.3.17-2.cm2.aarch64.rpm
 procps-ng-devel-3.3.17-2.cm2.aarch64.rpm

@@ -21424,8 +21424,8 @@
         "type": "other",
         "other": {
           "name": "popt",
-          "version": "1.18",
-          "downloadUrl": "http://ftp.rpm.org/popt/releases/popt-1.x/popt-1.18.tar.gz"
+          "version": "1.19",
+          "downloadUrl": "http://ftp.rpm.org/popt/releases/popt-1.x/popt-1.19.tar.gz"
         }
       }
     },
