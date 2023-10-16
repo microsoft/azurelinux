@@ -151,9 +151,9 @@ libassuan-2.5.5-2.cm2.aarch64.rpm
 libassuan-debuginfo-2.5.5-2.cm2.aarch64.rpm
 libassuan-devel-2.5.5-2.cm2.aarch64.rpm
 libbacktrace-static-13.2.0-1.cm2.aarch64.rpm
-libcap-2.60-2.cm2.aarch64.rpm
-libcap-debuginfo-2.60-2.cm2.aarch64.rpm
-libcap-devel-2.60-2.cm2.aarch64.rpm
+libcap-2.69-1.cm2.aarch64.rpm
+libcap-debuginfo-2.69-1.cm2.aarch64.rpm
+libcap-devel-2.69-1.cm2.aarch64.rpm
 libcap-ng-0.8.2-2.cm2.aarch64.rpm
 libcap-ng-debuginfo-0.8.2-2.cm2.aarch64.rpm
 libcap-ng-devel-0.8.2-2.cm2.aarch64.rpm

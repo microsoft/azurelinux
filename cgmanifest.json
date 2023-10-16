@@ -8851,8 +8851,8 @@
         "type": "other",
         "other": {
           "name": "libcap",
-          "version": "2.60",
-          "downloadUrl": "https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/libcap-2.60.tar.xz"
+          "version": "2.69",
+          "downloadUrl": "https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/libcap-2.69.tar.xz"
         }
       }
     },
