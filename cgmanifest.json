@@ -25745,8 +25745,8 @@
         "type": "other",
         "other": {
           "name": "rpm",
-          "version": "4.18.0",
-          "downloadUrl": "http://ftp.rpm.org/releases/rpm-4.18.x/rpm-4.18.0.tar.bz2"
+          "version": "4.18.1",
+          "downloadUrl": "http://ftp.rpm.org/releases/rpm-4.18.x/rpm-4.18.1.tar.bz2"
         }
       }
     },
