@@ -80,7 +80,7 @@ zstd-libs-1.5.5-1.cm2.aarch64.rpm
 libtool-2.4.6-8.cm2.aarch64.rpm
 flex-2.6.4-7.cm2.aarch64.rpm
 flex-devel-2.6.4-7.cm2.aarch64.rpm
-bison-3.7.6-2.cm2.aarch64.rpm
+bison-3.8.2-1.cm2.aarch64.rpm
 popt-1.18-1.cm2.aarch64.rpm
 popt-devel-1.18-1.cm2.aarch64.rpm
 popt-lang-1.18-1.cm2.aarch64.rpm
