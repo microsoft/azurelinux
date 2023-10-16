@@ -16,6 +16,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/buildpipeline"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safeloopback"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -89,16 +90,11 @@ func TestCustomizeImageCopyFiles(t *testing.T) {
 	checkFileType(t, outImageFilePath, "raw")
 
 	// Mount the output disk image so that its contents can be checked.
-	diskDevPath, err := diskutils.SetupLoopbackDevice(outImageFilePath)
+	loopback, err := safeloopback.NewLoopback(outImageFilePath)
 	if !assert.NoError(t, err) {
 		return
 	}
-	defer diskutils.DetachLoopbackDevice(diskDevPath)
-
-	err = diskutils.WaitForDevicesToSettle()
-	if !assert.NoError(t, err) {
-		return
-	}
+	defer loopback.Close()
 
 	imageChroot := safechroot.NewChroot(filepath.Join(buildDir, "imageroot"), false)
 	err = imageChroot.Initialize("", newMountDirectories, mountPoints)
@@ -240,22 +236,22 @@ func createFakeEfiImage(buildDir string) (string, []string, []*safechroot.MountP
 	}
 
 	// Connect raw disk image file.
-	diskDevPath, err := diskutils.SetupLoopbackDevice(rawDisk)
+	loopback, err := safeloopback.NewLoopback(rawDisk)
 	if err != nil {
 		return "", nil, nil, fmt.Errorf("failed to mount raw disk (%s) as a loopback device:\n%w", rawDisk, err)
 	}
-	defer diskutils.DetachLoopbackDevice(diskDevPath)
+	defer loopback.Close()
 
 	// Set up partitions.
-	partIDToDevPathMap, partIDToFsTypeMap, _, _, err := diskutils.CreatePartitions(diskDevPath, diskConfig,
+	partIDToDevPathMap, partIDToFsTypeMap, _, _, err := diskutils.CreatePartitions(loopback.DevicePath(), diskConfig,
 		configuration.RootEncryption{}, configuration.ReadOnlyVerityRoot{})
 	if err != nil {
-		return "", nil, nil, fmt.Errorf("failed to create partitions on disk (%s):\n%w", diskDevPath, err)
+		return "", nil, nil, fmt.Errorf("failed to create partitions on disk (%s):\n%w", loopback.DevicePath(), err)
 	}
 
 	// Create partition mount config.
-	bootPartitionDevPath := fmt.Sprintf("%sp1", diskDevPath)
-	osPartitionDevPath := fmt.Sprintf("%sp2", diskDevPath)
+	bootPartitionDevPath := fmt.Sprintf("%sp1", loopback.DevicePath())
+	osPartitionDevPath := fmt.Sprintf("%sp2", loopback.DevicePath())
 
 	newMountDirectories := []string{}
 	mountPoints := []*safechroot.MountPoint{
@@ -264,12 +260,13 @@ func createFakeEfiImage(buildDir string) (string, []string, []*safechroot.MountP
 	}
 
 	// Mount the partitions.
-	imageChroot := safechroot.NewChroot(filepath.Join(buildDir, "imageroot"), false)
+	chrootLeaveOnDisk := false
+	imageChroot := safechroot.NewChroot(filepath.Join(buildDir, "imageroot"), chrootLeaveOnDisk)
 	err = imageChroot.Initialize("", newMountDirectories, mountPoints)
 	if err != nil {
 		return "", nil, nil, err
 	}
-	defer imageChroot.Close(false)
+	defer imageChroot.Close(chrootLeaveOnDisk)
 
 	// Write a fake grub.cfg file so that the partition discovery logic works.
 	bootPrefix := "/boot"
@@ -310,6 +307,17 @@ func createFakeEfiImage(buildDir string) (string, []string, []*safechroot.MountP
 	)
 	if err != nil {
 		return "", nil, nil, fmt.Errorf("failed to install fstab file:\n%w", err)
+	}
+
+	// Close.
+	err = imageChroot.Close(chrootLeaveOnDisk)
+	if err != nil {
+		return "", nil, nil, err
+	}
+
+	err = loopback.CleanClose()
+	if err != nil {
+		return "", nil, nil, err
 	}
 
 	return rawDisk, newMountDirectories, mountPoints, nil
