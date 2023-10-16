@@ -91,7 +91,12 @@ func (l *Loopback) close(async bool) error {
 	if !async {
 		// The `losetup --detach` call happens asynchronously.
 		// So, need to wait for it to complete.
-		err := diskutils.BlockOnDiskIOByIds(l.devicePath, l.diskIdMaj, l.diskIdMin)
+		err := diskutils.WaitForLoopbackToDetach(l.devicePath, l.diskFilePath)
+		if err != nil {
+			return err
+		}
+
+		err = diskutils.BlockOnDiskIOByIds(l.devicePath, l.diskIdMaj, l.diskIdMin)
 		if err != nil {
 			return err
 		}
