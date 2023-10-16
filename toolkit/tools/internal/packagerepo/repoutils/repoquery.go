@@ -9,8 +9,8 @@ import (
 	"path"
 	"strings"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/randomization"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
@@ -20,7 +20,7 @@ import (
 )
 
 const (
-	chrootRepoDir      = "/etc/yum.repos.d/"
+	chrootRepoDir = "/etc/yum.repos.d/"
 )
 
 // GetAllRepoData returns a map of package names to URLs for all packages

@@ -4,8 +4,8 @@
 package main
 
 import (
-	"os"
 	"io/ioutil"
+	"os"
 	"strings"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
@@ -30,10 +30,10 @@ var (
 	profFlags     = exe.SetupProfileFlags(app)
 	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
 
-	repoUrls      = app.Flag("repo-url", "URLs of the repos to download from.").Strings()
-	repoFiles     = app.Flag("repo-file", "Files containing URLs of the repos to download from.").ExistingFiles()
-	workerTar     = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz").Required().ExistingFile()
-	buildDir      = app.Flag("worker-dir", "Directory to store chroot while running repo query.").Required().String()
+	repoUrls  = app.Flag("repo-url", "URLs of the repos to download from.").Strings()
+	repoFiles = app.Flag("repo-file", "Files containing URLs of the repos to download from.").ExistingFiles()
+	workerTar = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz").Required().ExistingFile()
+	buildDir  = app.Flag("worker-dir", "Directory to store chroot while running repo query.").Required().String()
 
 	queryCmd        = app.Flag("query-cmd", "The query commands to run. Available command is: 'find-present'.").Required().String()
 	queryInputFile  = app.Flag("query-input-file", "Path to a file with the query input data.").Required().String()
@@ -75,7 +75,7 @@ func main() {
 			inputRpmBaseName := strings.TrimSuffix(inputRpmName, ".rpm")
 			_, exists := packagesAvailableFromRepos[inputRpmBaseName]
 			if exists {
-					outputRpmNames = append(outputRpmNames, inputRpmName)
+				outputRpmNames = append(outputRpmNames, inputRpmName)
 			}
 		}
 
