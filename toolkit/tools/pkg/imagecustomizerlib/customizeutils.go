@@ -159,6 +159,10 @@ func copyAdditionalFiles(baseConfigPath string, additionalFiles map[string]image
 }
 
 func runScripts(baseConfigPath string, scripts []imagecustomizerapi.Script, imageChroot *safechroot.Chroot) error {
+	if len(scripts) <= 0 {
+		return nil
+	}
+
 	configDirMountPath := filepath.Join(imageChroot.RootDir(), configDirMountPathInChroot)
 
 	// Bind mount the config directory so that the scripts can access any required resources.

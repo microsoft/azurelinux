@@ -40,7 +40,12 @@ func CustomizeImageWithConfigFile(buildDir string, configFile string, imageFile 
 
 	baseConfigPath, _ := filepath.Split(configFile)
 
-	err = CustomizeImage(buildDir, baseConfigPath, &config, imageFile, rpmsSources, outputImageFile, outputImageFormat,
+	absBaseConfigPath, err := filepath.Abs(baseConfigPath)
+	if err != nil {
+		return fmt.Errorf("failed to get absolute path of config file directory:\n%w", err)
+	}
+
+	err = CustomizeImage(buildDir, absBaseConfigPath, &config, imageFile, rpmsSources, outputImageFile, outputImageFormat,
 		useBaseImageRpmRepos)
 	if err != nil {
 		return err
