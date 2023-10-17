@@ -409,7 +409,7 @@ func compressDir(sourceDir string, archiveName string) (err error) {
 
 	_, stderr, err := shell.Execute("tar", tarArgs...)
 	if err != nil {
-		return fmt.Errorf("Unable compress ccache files itno archive:\n%s", stderr)
+		return fmt.Errorf("Unable compress ccache files into archive:\n%s", stderr)
 	}
 	compressEndTime := time.Now()
 	logger.Log.Infof("  compress time: %s", compressEndTime.Sub(compressStartTime))
@@ -618,7 +618,7 @@ func (m *CCacheManager) UploadPkgGroupCCache() (err error) {
 
 	err = compressDir(m.CurrentPkgGroup.CCacheDir, m.CurrentPkgGroup.TarFile.LocalTargetPath)
 	if err != nil {
-		return fmt.Errorf("Unable compress ccache files itno archive:\n%w", err)
+		return fmt.Errorf("Unable compress ccache files into archive:\n%w", err)
 	}
 
 	// Upload the ccache archive
