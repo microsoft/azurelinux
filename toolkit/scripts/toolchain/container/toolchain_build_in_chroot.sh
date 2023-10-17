@@ -246,7 +246,6 @@ touch /logs/status_m4_complete
 echo Binutils-2.37
 tar xf binutils-2.37.tar.xz
 pushd binutils-2.37
-patch -p1 -i /tools/linker-script-readonly-keyword-support.patch
 sed -i '/@\tincremental_copy/d' gold/testsuite/Makefile.in
 mkdir -v build
 cd build
@@ -333,7 +332,6 @@ case $(uname -m) in
 esac
 # disable no-pie for gcc binaries
 sed -i '/^NO_PIE_CFLAGS = /s/@NO_PIE_CFLAGS@//' gcc/Makefile.in
-patch -Np1 -i /tools/CVE-2023-4039.patch
 # LFS 7.4:  Workaround a bug so that GCC doesn't install libiberty.a, which is already provided by Binutils:
 # sed -i 's/install_to_$(INSTALL_DEST) //' libiberty/Makefile.in
 # Need to remove this link to /tools/lib/gcc as the final gcc includes will be installed here.
@@ -799,12 +797,6 @@ touch /logs/status_python39_complete
 echo Coreutils-8.32
 tar xf coreutils-8.32.tar.xz
 pushd coreutils-8.32
-patch -Np1 -i ../coreutils-8.32-i18n-1.patch
-case $(uname -m) in
-    aarch64)
-        patch -Np1 -i /tools/coreutils-fix-get-sys_getdents-aarch64.patch
-    ;;
-esac
 autoreconf -fiv
 FORCE_UNSAFE_CONFIGURE=1 ./configure \
             --prefix=/usr            \
@@ -1027,8 +1019,6 @@ touch /logs/status_popt_complete
 echo cpio-2.13
 tar xjf cpio-2.13.tar.bz2
 pushd cpio-2.13
-patch -Np1 -i /tools/cpio_extern_nocommon.patch
-patch -Np1 -i /tools/CVE-2021-38185.patch
 ./configure --prefix=/usr \
         --bindir=/bin \
         --enable-mt   \
@@ -1115,7 +1105,7 @@ mv rpm-"$RPM_WITH_VERSION"-release "$RPM_FOLDER"
 pushd "$RPM_FOLDER"
 
 # Still not in the upstream
-patch -Np1 -i /tools/rpm-define-RPM-LD-FLAGS.patch
+#patch -Np1 -i /tools/rpm-define-RPM-LD-FLAGS.patch
 
 # Do not build docs - pandoc dependency is not supplied in the toolchain.
 sed -iE '/SUBDIRS/ s/docs //' Makefile.am

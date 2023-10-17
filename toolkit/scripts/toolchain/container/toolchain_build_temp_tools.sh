@@ -19,7 +19,6 @@ LFS_TGT=$(uname -m)-lfs-linux-gnu
 echo Binutils-2.37 - Pass 1
 tar xf binutils-2.37.tar.xz
 pushd binutils-2.37
-patch -p1 -i /tools/linker-script-readonly-keyword-support.patch
 mkdir -v build
 cd build
 ../configure --prefix=/tools \
@@ -84,7 +83,6 @@ case $(uname -m) in
     sed -e '/mabi.lp64=/s/lib64/lib/' -i.orig gcc/config/aarch64/t-aarch64-linux
   ;;
 esac
-patch -Np1 -i /tools/CVE-2023-4039.patch
 mkdir -v build
 cd       build
 ../configure                                       \
@@ -263,7 +261,6 @@ tar -xf ../gmp-6.2.1.tar.xz
 mv -v gmp-6.2.1 gmp
 tar -xf ../mpc-1.2.1.tar.gz
 mv -v mpc-1.2.1 mpc
-patch -Np1 -i /tools/CVE-2023-4039.patch
 mkdir -v build
 cd       build
 CC=$LFS_TGT-gcc                                    \
@@ -362,11 +359,6 @@ touch $LFS/logs/temptoolchain/status_bison_complete
 echo Coreutils-8.32
 tar xf coreutils-8.32.tar.xz
 pushd coreutils-8.32
-case $(uname -m) in
-    aarch64)
-        patch -Np1 -i /tools/coreutils-fix-get-sys_getdents-aarch64.patch
-    ;;
-esac
 ./configure --prefix=/tools --enable-install-program=hostname
 make -j$(nproc)
 make install
