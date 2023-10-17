@@ -1889,6 +1889,7 @@
                 "rubygem-rspec-support",
                 "rubygem-thread_order",
                 "rusers",
+                "rust-cbindgen",
                 "samba",
                 "sanlock",
                 "sassist",
