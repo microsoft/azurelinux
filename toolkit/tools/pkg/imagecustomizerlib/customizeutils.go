@@ -64,7 +64,7 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
-	err = loadOrUnloadModules(config.SystemConfig.Modules, imageChroot)
+	err = loadOrDisableModules(config.SystemConfig.Modules, imageChroot)
 	if err != nil {
 		return err
 	}
@@ -331,7 +331,7 @@ func enableOrDisableServices(services imagecustomizerapi.Services, imageChroot *
 	return nil
 }
 
-func loadOrUnloadModules(modules imagecustomizerapi.Modules, imageChroot *safechroot.Chroot) error {
+func loadOrDisableModules(modules imagecustomizerapi.Modules, imageChroot *safechroot.Chroot) error {
 	var err error
 
 	for _, module := range modules.Load {
@@ -344,14 +344,14 @@ func loadOrUnloadModules(modules imagecustomizerapi.Modules, imageChroot *safech
 		}
 	}
 
-	for _, module := range modules.Unload {
-		logger.Log.Infof("Unloading module (%s)", module.Name)
+	for _, module := range modules.Disable {
+		logger.Log.Infof("Disabling module (%s)", module.Name)
 		moduleFileName := module.Name + ".conf"
 		moduleFilePath := filepath.Join(imageChroot.RootDir(), "/etc/modprobe.d/", moduleFileName)
 		data := fmt.Sprintf("blacklist %s\n", module.Name)
 		err = file.Write(data, moduleFilePath)
 		if err != nil {
-			return fmt.Errorf("failed to write module unload configuration: %w", err)
+			return fmt.Errorf("failed to write module disable configuration: %w", err)
 		}
 	}
 

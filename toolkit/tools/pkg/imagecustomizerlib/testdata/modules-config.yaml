@@ -4,5 +4,5 @@ SystemConfig:
       - Name: br_netfilter
       - Name: ib_uverbs
       - Name: mlx5_ib
-    Unload:
+    Disable:
       - Name: mousedev
