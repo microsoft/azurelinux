@@ -1,13 +1,15 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
 Version:        8.3.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        curl
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/NetworkingLibraries
 URL:            https://curl.haxx.se
 Source0:        https://curl.haxx.se/download/%{name}-%{version}.tar.gz
+Patch1:         CVE-2023-38545.patch
+Patch2:         CVE-2023-38546.patch
 BuildRequires:  krb5-devel
 BuildRequires:  libssh2-devel
 BuildRequires:  nghttp2-devel
@@ -85,6 +87,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libcurl.so.*
 
 %changelog
+* Tue Oct 10 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 8.3.0-2
+- added patches to fix CVE-2023-38545, CVE-2023-38546
+
 * Thu Sep 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.3.0-1
 - Auto-upgrade to 8.3.0 - CVE-2023-38039
 

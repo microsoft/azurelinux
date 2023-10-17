@@ -16,14 +16,23 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/buildpipeline"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safeloopback"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCustomizeImageEmptyConfig(t *testing.T) {
 	var err error
 
+	if testing.Short() {
+		t.Skip("Short mode enabled")
+	}
+
 	if !buildpipeline.IsRegularBuild() {
 		t.Skip("loopback block device not available")
+	}
+
+	if os.Geteuid() != 0 {
+		t.Skip("Test must be run as root because it uses a chroot")
 	}
 
 	buildDir := filepath.Join(tmpDir, "TestCustomizeImageEmptyConfig")
@@ -36,7 +45,8 @@ func TestCustomizeImageEmptyConfig(t *testing.T) {
 	}
 
 	// Customize image.
-	err = CustomizeImage(buildDir, buildDir, &imagecustomizerapi.SystemConfig{}, diskFilePath, outImageFilePath, "vhd")
+	err = CustomizeImage(buildDir, buildDir, &imagecustomizerapi.Config{}, diskFilePath, nil, outImageFilePath,
+		"vhd", false)
 	if !assert.NoError(t, err) {
 		return
 	}
@@ -48,8 +58,16 @@ func TestCustomizeImageEmptyConfig(t *testing.T) {
 func TestCustomizeImageCopyFiles(t *testing.T) {
 	var err error
 
+	if testing.Short() {
+		t.Skip("Short mode enabled")
+	}
+
 	if !buildpipeline.IsRegularBuild() {
 		t.Skip("loopback block device not available")
+	}
+
+	if os.Geteuid() != 0 {
+		t.Skip("Test must be run as root because it uses a chroot")
 	}
 
 	buildDir := filepath.Join(tmpDir, "TestCustomizeImageCopyFiles")
@@ -63,7 +81,7 @@ func TestCustomizeImageCopyFiles(t *testing.T) {
 	}
 
 	// Customize image.
-	err = CustomizeImageWithConfigFile(buildDir, configFile, diskFilePath, outImageFilePath, "raw")
+	err = CustomizeImageWithConfigFile(buildDir, configFile, diskFilePath, nil, outImageFilePath, "raw", false)
 	if !assert.NoError(t, err) {
 		return
 	}
@@ -72,16 +90,11 @@ func TestCustomizeImageCopyFiles(t *testing.T) {
 	checkFileType(t, outImageFilePath, "raw")
 
 	// Mount the output disk image so that its contents can be checked.
-	diskDevPath, err := diskutils.SetupLoopbackDevice(outImageFilePath)
+	loopback, err := safeloopback.NewLoopback(outImageFilePath)
 	if !assert.NoError(t, err) {
 		return
 	}
-	defer diskutils.DetachLoopbackDevice(diskDevPath)
-
-	err = diskutils.WaitForDevicesToSettle()
-	if !assert.NoError(t, err) {
-		return
-	}
+	defer loopback.Close()
 
 	imageChroot := safechroot.NewChroot(filepath.Join(buildDir, "imageroot"), false)
 	err = imageChroot.Initialize("", newMountDirectories, mountPoints)
@@ -99,71 +112,77 @@ func TestCustomizeImageCopyFiles(t *testing.T) {
 func TestValidateConfigValidAdditionalFiles(t *testing.T) {
 	var err error
 
-	err = validateConfig(testDir, &imagecustomizerapi.SystemConfig{
-		AdditionalFiles: map[string]imagecustomizerapi.FileConfigList{
-			"files/a.txt": {{Path: "/a.txt"}},
-		},
-	})
+	err = validateConfig(testDir, &imagecustomizerapi.Config{
+		SystemConfig: imagecustomizerapi.SystemConfig{
+			AdditionalFiles: map[string]imagecustomizerapi.FileConfigList{
+				"files/a.txt": {{Path: "/a.txt"}},
+			},
+		}})
 	assert.NoError(t, err)
 }
 
 func TestValidateConfigMissingAdditionalFiles(t *testing.T) {
 	var err error
 
-	err = validateConfig(testDir, &imagecustomizerapi.SystemConfig{
-		AdditionalFiles: map[string]imagecustomizerapi.FileConfigList{
-			"files/missing_a.txt": {{Path: "/a.txt"}},
-		},
-	})
+	err = validateConfig(testDir, &imagecustomizerapi.Config{
+		SystemConfig: imagecustomizerapi.SystemConfig{
+			AdditionalFiles: map[string]imagecustomizerapi.FileConfigList{
+				"files/missing_a.txt": {{Path: "/a.txt"}},
+			},
+		}})
 	assert.Error(t, err)
 }
 
 func TestValidateConfigdditionalFilesIsDir(t *testing.T) {
 	var err error
 
-	err = validateConfig(testDir, &imagecustomizerapi.SystemConfig{
-		AdditionalFiles: map[string]imagecustomizerapi.FileConfigList{
-			"files": {{Path: "/a.txt"}},
-		},
-	})
+	err = validateConfig(testDir, &imagecustomizerapi.Config{
+		SystemConfig: imagecustomizerapi.SystemConfig{
+			AdditionalFiles: map[string]imagecustomizerapi.FileConfigList{
+				"files": {{Path: "/a.txt"}},
+			},
+		}})
 	assert.Error(t, err)
 }
 
 func TestValidateConfigScript(t *testing.T) {
-	err := validateConfig(testDir, &imagecustomizerapi.SystemConfig{
-		PostInstallScripts: []imagecustomizerapi.Script{
-			{
-				Path: "scripts/postinstallscript.sh",
+	err := validateConfig(testDir, &imagecustomizerapi.Config{
+		SystemConfig: imagecustomizerapi.SystemConfig{
+			PostInstallScripts: []imagecustomizerapi.Script{
+				{
+					Path: "scripts/postinstallscript.sh",
+				},
 			},
-		},
-		FinalizeImageScripts: []imagecustomizerapi.Script{
-			{
-				Path: "scripts/finalizeimagescript.sh",
+			FinalizeImageScripts: []imagecustomizerapi.Script{
+				{
+					Path: "scripts/finalizeimagescript.sh",
+				},
 			},
-		},
-	})
+		}})
 	assert.NoError(t, err)
 }
 
 func TestValidateConfigScriptNonLocalFile(t *testing.T) {
-	err := validateConfig(testDir, &imagecustomizerapi.SystemConfig{
-		PostInstallScripts: []imagecustomizerapi.Script{
-			{
-				Path: "../a.sh",
+	err := validateConfig(testDir, &imagecustomizerapi.Config{
+		SystemConfig: imagecustomizerapi.SystemConfig{
+			PostInstallScripts: []imagecustomizerapi.Script{
+				{
+					Path: "../a.sh",
+				},
 			},
-		},
-	})
+		}})
 	assert.Error(t, err)
 }
 
 func TestValidateConfigScriptNonExecutable(t *testing.T) {
-	err := validateConfig(testDir, &imagecustomizerapi.SystemConfig{
-		FinalizeImageScripts: []imagecustomizerapi.Script{
-			{
-				Path: "files/a.txt",
+	err := validateConfig(testDir, &imagecustomizerapi.Config{
+		SystemConfig: imagecustomizerapi.SystemConfig{
+			FinalizeImageScripts: []imagecustomizerapi.Script{
+				{
+					Path: "files/a.txt",
+				},
 			},
-		},
-	})
+		}})
 	assert.Error(t, err)
 }
 
@@ -211,28 +230,28 @@ func createFakeEfiImage(buildDir string) (string, []string, []*safechroot.MountP
 	}
 
 	// Create raw disk image file.
-	rawDisk, err := diskutils.CreateEmptyDisk(buildDir, "disk.raw", diskConfig)
+	rawDisk, err := diskutils.CreateEmptyDisk(buildDir, "disk.raw", diskConfig.MaxSize)
 	if err != nil {
 		return "", nil, nil, fmt.Errorf("failed to create empty disk file in (%s):\n%w", buildDir, err)
 	}
 
 	// Connect raw disk image file.
-	diskDevPath, err := diskutils.SetupLoopbackDevice(rawDisk)
+	loopback, err := safeloopback.NewLoopback(rawDisk)
 	if err != nil {
 		return "", nil, nil, fmt.Errorf("failed to mount raw disk (%s) as a loopback device:\n%w", rawDisk, err)
 	}
-	defer diskutils.DetachLoopbackDevice(diskDevPath)
+	defer loopback.Close()
 
 	// Set up partitions.
-	partIDToDevPathMap, partIDToFsTypeMap, _, _, err := diskutils.CreatePartitions(diskDevPath, diskConfig,
+	partIDToDevPathMap, partIDToFsTypeMap, _, _, err := diskutils.CreatePartitions(loopback.DevicePath(), diskConfig,
 		configuration.RootEncryption{}, configuration.ReadOnlyVerityRoot{})
 	if err != nil {
-		return "", nil, nil, fmt.Errorf("failed to create partitions on disk (%s):\n%w", diskDevPath, err)
+		return "", nil, nil, fmt.Errorf("failed to create partitions on disk (%s):\n%w", loopback.DevicePath(), err)
 	}
 
 	// Create partition mount config.
-	bootPartitionDevPath := fmt.Sprintf("%sp1", diskDevPath)
-	osPartitionDevPath := fmt.Sprintf("%sp2", diskDevPath)
+	bootPartitionDevPath := fmt.Sprintf("%sp1", loopback.DevicePath())
+	osPartitionDevPath := fmt.Sprintf("%sp2", loopback.DevicePath())
 
 	newMountDirectories := []string{}
 	mountPoints := []*safechroot.MountPoint{
@@ -241,12 +260,13 @@ func createFakeEfiImage(buildDir string) (string, []string, []*safechroot.MountP
 	}
 
 	// Mount the partitions.
-	imageChroot := safechroot.NewChroot(filepath.Join(buildDir, "imageroot"), false)
+	chrootLeaveOnDisk := false
+	imageChroot := safechroot.NewChroot(filepath.Join(buildDir, "imageroot"), chrootLeaveOnDisk)
 	err = imageChroot.Initialize("", newMountDirectories, mountPoints)
 	if err != nil {
 		return "", nil, nil, err
 	}
-	defer imageChroot.Close(false)
+	defer imageChroot.Close(chrootLeaveOnDisk)
 
 	// Write a fake grub.cfg file so that the partition discovery logic works.
 	bootPrefix := "/boot"
@@ -287,6 +307,17 @@ func createFakeEfiImage(buildDir string) (string, []string, []*safechroot.MountP
 	)
 	if err != nil {
 		return "", nil, nil, fmt.Errorf("failed to install fstab file:\n%w", err)
+	}
+
+	// Close.
+	err = imageChroot.Close(chrootLeaveOnDisk)
+	if err != nil {
+		return "", nil, nil, err
+	}
+
+	err = loopback.CleanClose()
+	if err != nil {
+		return "", nil, nil, err
 	}
 
 	return rawDisk, newMountDirectories, mountPoints, nil

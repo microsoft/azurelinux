@@ -9,7 +9,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.72.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -120,7 +120,7 @@ USER=root SUDO_USER=root %make_build
 # We expect to generate dynamic CI contents in this folder, but it will fail since the .github folder is not included
 # with the published sources.
 mkdir -p .github/workflows
-x.py run src/tools/expand-yaml-anchors
+./x.py run src/tools/expand-yaml-anchors
 
 ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage2-tools-bin/rustfmt %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage0/bin/
 ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/vendor/ /root/vendor
@@ -167,6 +167,9 @@ rm %{buildroot}%{_bindir}/*.old
 %{_mandir}/man1/*
 
 %changelog
+* Tue Oct 10 2023 Daniel McIlvaney <damcilva@microsoft.com> - 1.72.2-4
+- Explicitly call './x.py' instead of 'x.py'
+
 * Wed Oct 04 2023 Minghe Ren <mingheren@microsoft.com> - 1.72.2-3
 - Bump release to rebuild against glibc 2.35-6
 

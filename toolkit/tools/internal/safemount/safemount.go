@@ -30,10 +30,7 @@ func NewMount(source, target, fstype string, flags uintptr, data string, makeAnd
 	err = mount.newMountHelper(source, target, fstype, flags, data, makeAndDeleteDir)
 	if err != nil {
 		// Cleanup anything created during the failed mount.
-		cleanupErr := mount.Close()
-		if cleanupErr != nil {
-			logger.Log.Warnf("failed to cleanup failed mount: %s", cleanupErr)
-		}
+		mount.Close()
 		return nil, err
 	}
 
@@ -71,23 +68,48 @@ func (m *Mount) Target() string {
 	return m.target
 }
 
+// Close removes the system mount and fails if the device is still busy.
+// CleanClose and Close are safe to call multiple times.
+func (m *Mount) CleanClose() error {
+	return m.close(false /*async*/)
+}
+
 // Close removes the system mount.
-// This function is safe to call multiple times.
-func (m *Mount) Close() error {
+// The unmount is performed asynchronously. This reduces the likelihood of the unmount failing
+// (thus ensuring the user's system is left in a clean state). But it doesn't provide any
+// guarantees about the validity of the written bits.
+// CleanClose and Close are safe to call multiple times.
+func (m *Mount) Close() {
+	err := m.close(true /*async*/)
+	if err != nil {
+		logger.Log.Warnf("%s", err)
+	}
+}
+
+func (m *Mount) close(async bool) error {
 	var err error
 
-	logger.Log.Debugf("Unmounting (%s)", m.target)
-
 	if m.isMounted {
-		err = unix.Unmount(m.target, 0)
-		if err != nil {
-			return fmt.Errorf("failed to unmount (%s):\n%w", m.target, err)
+		if !async {
+			logger.Log.Debugf("Unmounting (%s)", m.target)
+			err = unix.Unmount(m.target, 0)
+			if err != nil {
+				return fmt.Errorf("failed to unmount (%s):\n%w", m.target, err)
+			}
+		} else {
+			logger.Log.Debugf("Asynchronously unmounting (%s)", m.target)
+			err = unix.Unmount(m.target, unix.MNT_DETACH)
+			if err != nil {
+				return fmt.Errorf("failed to asynchronously unmount (%s) (please manually unmount device):\n%w", m.target, err)
+			}
 		}
 
 		m.isMounted = false
 	}
 
 	if m.dirCreated {
+		logger.Log.Debugf("Deleting directory (%s)", m.target)
+
 		// Note: Do not use `RemoveAll` here in case the unmount silently failed.
 		// (This is unlikely. But "belt and braces".)
 		err = os.Remove(m.target)

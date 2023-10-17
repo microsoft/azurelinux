@@ -15,6 +15,10 @@ import (
 )
 
 func TestUpdateHostname(t *testing.T) {
+	if os.Geteuid() != 0 {
+		t.Skip("Test must be run as root because it uses a chroot")
+	}
+
 	// Setup environment.
 	proposedDir := filepath.Join(tmpDir, "TestUpdateHostname")
 	chroot := safechroot.NewChroot(proposedDir, false)
@@ -37,6 +41,10 @@ func TestUpdateHostname(t *testing.T) {
 }
 
 func TestCopyAdditionalFiles(t *testing.T) {
+	if os.Geteuid() != 0 {
+		t.Skip("Test must be run as root because it uses a chroot")
+	}
+
 	proposedDir := filepath.Join(tmpDir, "TestCopyAdditionalFiles")
 	chroot := safechroot.NewChroot(proposedDir, false)
 	baseConfigPath := testDir
