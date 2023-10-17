@@ -20,7 +20,7 @@ func (m *Module) IsValid() error {
 }
 
 type Modules struct {
-	Load   []Module `yaml:"Load"`
+	Load    []Module `yaml:"Load"`
 	Disable []Module `yaml:"Disable"`
 }
 
