@@ -11,7 +11,7 @@ newOutputFile=${3}
 
 usage() {
 	echo
-	echo "./update-target-if-output-changed.sh.sh <flag-file> <old-output-file> <new-output-file>"
+	echo "./update-target-if-output-changed.sh <flag-file> <old-output-file> <new-output-file>"
 	echo
 	echo "This is a helper script to create/update make flag files if the contents of an output file has changed."
 	echo
