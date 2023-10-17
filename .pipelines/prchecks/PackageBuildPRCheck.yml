@@ -118,5 +118,4 @@ extends:
                 steps:
                   - template: .pipelines/templatesWithCheckout/SodiffCheck.yml@self
                     parameters:
-                      buildRepoRoot: ${{ parameters.coreRepoRoot }}
                       inputArtifactName: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}
