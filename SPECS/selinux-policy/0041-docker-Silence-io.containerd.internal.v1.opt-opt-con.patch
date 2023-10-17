@@ -1,0 +1,88 @@
+From 9475c49702bbc028b67e4ddbd0fe3d5a81ad354a Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Tue, 17 Oct 2023 13:59:45 +0000
+Subject: [PATCH 42/42] docker: Silence io.containerd.internal.v1.opt
+ /opt/containerd creation.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/kernel/files.if    | 36 +++++++++++++++++++++++++++++++
+ policy/modules/services/docker.te |  6 ++++++
+ 2 files changed, 42 insertions(+)
+
+MSFT_TAG: pending
+
+diff --git a/policy/modules/kernel/files.if b/policy/modules/kernel/files.if
+index b95270960..487b9d1a5 100644
+--- a/policy/modules/kernel/files.if
++++ b/policy/modules/kernel/files.if
+@@ -2049,6 +2049,24 @@ interface(`files_dontaudit_rw_root_dir',`
+ 	dontaudit $1 root_t:dir rw_dir_perms;
+ ')
+ 
++########################################
++## <summary>
++##	Do not audit attempts to create root dirs.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain to not audit.
++##	</summary>
++## </param>
++#
++interface(`files_dontaudit_create_root_dirs',`
++	gen_require(`
++		type root_t;
++	')
++
++	dontaudit $1 root_t:dir create_dir_perms;
++')
++
+ ########################################
+ ## <summary>
+ ##	Watch the root directory.
+@@ -5310,6 +5328,24 @@ interface(`files_dontaudit_rw_usr_dirs',`
+ 	dontaudit $1 usr_t:dir rw_dir_perms;
+ ')
+ 
++########################################
++## <summary>
++##	Do not audit attempts to create generic directories in /usr.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain to not audit.
++##	</summary>
++## </param>
++#
++interface(`files_dontaudit_create_usr_dirs',`
++	gen_require(`
++		type usr_t;
++	')
++
++	dontaudit $1 usr_t:dir create_dir_perms;
++')
++
+ ########################################
+ ## <summary>
+ ##	Delete generic directories in /usr in the caller domain.
+diff --git a/policy/modules/services/docker.te b/policy/modules/services/docker.te
+index 320d8ce84..4d0e88bd3 100644
+--- a/policy/modules/services/docker.te
++++ b/policy/modules/services/docker.te
+@@ -46,6 +46,12 @@ files_search_mnt(dockerd_t)
+ # but only when btrfs support is disabled
+ files_read_kernel_symbol_table(dockerd_t)
+ files_dontaudit_write_usr_dirs(dockerd_t)
++# Silence /opt/containerd/{bin,lib} creation in io.containerd.internal.v1.opt
++# It does not use selabel to figure out how to label these dirs.
++files_dontaudit_create_root_dirs(dockerd_t)
++files_dontaudit_rw_root_dir(dockerd_t)
++files_dontaudit_create_usr_dirs(dockerd_t)
++files_dontaudit_rw_usr_dirs(dockerd_t)
+ 
+ kernel_relabelfrom_unlabeled_dirs(dockerd_t)
+ # docker wants to load binfmt_misc
+-- 
+2.34.1
+
