@@ -106,8 +106,8 @@ extends:
                     condition: always()
                     displayName: "Publish packages build artifacts"
 
-          - stage: sodiff_${{ configureation.name }}
-            dependsOn: RPMs+${{ configuration.name }}
+          - stage: sodiff_${{ configuration.name }}
+            dependsOn: RPMs_${{ configuration.name }}
             jobs:
               - job: Sodiff_Check
                 pool:
