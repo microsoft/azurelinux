@@ -44,6 +44,7 @@ go_tool_list = \
 	liveinstaller \
 	pkgworker \
 	precacher \
+	repoquerywrapper \
 	roast \
 	rpmssnapshot \
 	scheduler \
