@@ -110,6 +110,7 @@ Patch0016: 0016-OvmfPkg-Clarify-invariants-for-NestedInterruptTplLib.patch
 Patch0017: 0017-OvmfPkg-Relax-assertion-that-interrupts-do-not-occur.patch
 
 Patch1000: CVE-2023-0464.patch
+Patch1001: CVE-2023-3817.patch
 
 # python3-devel and libuuid-devel are required for building tools.
 # python3-devel is also needed for varstore template generation and
@@ -294,6 +295,7 @@ cp -a -- %{SOURCE1} .
 tar -C CryptoPkg/Library/OpensslLib -a -f %{SOURCE2} -x
 # Need to patch CVE-2023-0464 in the bundled openssl
 (cd CryptoPkg/Library/OpensslLib/openssl && patch -p1 ) < %{PATCH1000}
+(cd CryptoPkg/Library/OpensslLib/openssl && patch -p1 ) < %{PATCH1001}
 
 # extract softfloat into place
 tar -xf %{SOURCE3} --strip-components=1 --directory ArmPkg/Library/ArmSoftFloatLib/berkeley-softfloat-3/
@@ -687,6 +689,9 @@ $tests_ok
 
 
 %changelog
+* Tue Oct 13 2023 Sindhu Karri <lakarri@microsoft.com> - 20230301gitf80f052277c8-36
+- Patch CVE-2023-3817 in bundled OpenSSL
+
 * Tue Sep 26 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 20230301gitf80f052277c8-35
 - Removing 'exit' calls from the '%%check' section.
 
