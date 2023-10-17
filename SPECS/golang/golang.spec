@@ -13,7 +13,7 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.20.9
+Version:        1.20.10
 Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
@@ -143,8 +143,8 @@ fi
 %{_bindir}/*
 
 %changelog
-* Mon Oct 16 2023 Nan Liu <liunan@microsoft.com> - 1.20.9-1
-- Bump version to 1.20.9 to address CVE-2023-29409, CVE-2023-39318, CVE-2023-39319, CVE-2023-39323, CVE-2023-39533
+* Mon Oct 16 2023 Nan Liu <liunan@microsoft.com> - 1.20.10-1
+- Bump version to 1.20.10 to address CVE-2023-29409, CVE-2023-39318, CVE-2023-39319, CVE-2023-39323, CVE-2023-39533, CVE-2023-29406
 - Remove patch that no longer applies
 
 * Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 1.20.7-2
