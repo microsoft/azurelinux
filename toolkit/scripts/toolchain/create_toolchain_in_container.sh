@@ -27,6 +27,9 @@ if [ "$INCREMENTAL_TOOLCHAIN" != "y" ] || [ -z "$(docker images -q marinertoolch
     # docker rmi $(docker images -a -q)
     # docker rmi $(docker history marinertoolchain -q)
 
+    # RPM LD_FLAGS patch
+    cp -v $MARINER_SPECS_DIR/rpm/define-RPM_LD_FLAGS.patch ./container/rpm-define-RPM-LD-FLAGS.patch
+
     # Create .bashrc file for lfs user in the container
     cat > ./container/.bashrc << EOF
 umask 022
@@ -68,11 +71,11 @@ temporary_toolchain_container=$(docker create --name marinertoolchain-container-
 docker cp "${temporary_toolchain_container}":/temptoolchain/lfs .
 docker rm marinertoolchain-container-temp
 
-rm -rvf ./populated_toolchain
+rm -rf ./populated_toolchain
 mv ./lfs ./populated_toolchain
-rm -rvf ./populated_toolchain/.dockerenv
-rm -rvf ./populated_toolchain/sources
-rm -rvf ./populated_toolchain/tools/libexec/gcc
+rm -rf ./populated_toolchain/.dockerenv
+rm -rf ./populated_toolchain/sources
+rm -rf ./populated_toolchain/tools/libexec/gcc
 
 echo "Compressing toolchain_from_container.tar.gz"
 tar -I "$ARCHIVE_TOOL" -cf toolchain_from_container.tar.gz populated_toolchain
@@ -81,7 +84,8 @@ ls -la ./populated_toolchain
 popd
 
 # Cleanup patch files used in container
-rm -vf ./container/.bashrc
-rm -vf ./container/toolchain-local-wget-list
+rm -f ./container/rpm-define-RPM-LD-FLAGS.patch
+rm -f ./container/.bashrc
+rm -f ./container/toolchain-local-wget-list
 
 echo Raw toolchain build complete

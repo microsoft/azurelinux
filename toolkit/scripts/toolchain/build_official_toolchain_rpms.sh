@@ -431,6 +431,8 @@ build_rpm_in_chroot_no_install libxml2
 chroot_and_install_rpms libxml2
 
 # Download JDK rpms
+# msopenjdk-11-11.0.20.1-1.x86_64.rpm
+# msopenjdk-11-11.0.20.1-1.aarch64.rpm
 echo Download JDK rpms
 case $(uname -m) in
     x86_64)

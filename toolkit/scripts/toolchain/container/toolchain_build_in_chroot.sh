@@ -86,10 +86,10 @@ popd
 rm -rf man-pages-5.02
 touch /logs/status_man_pages_complete
 
-echo glibc-2.35
-tar xf glibc-2.35.tar.xz
-pushd glibc-2.35
-patch -Np1 -i ../glibc-2.35-fhs-1.patch
+echo glibc-2.38
+tar xf glibc-2.38.tar.xz
+pushd glibc-2.38
+patch -Np1 -i ../glibc-2.38-fhs-1.patch
 ln -sfv /tools/lib/gcc /usr/lib
 ls -la /usr/lib/gcc/
 case $(uname -m) in
@@ -130,7 +130,7 @@ include /etc/ld.so.conf.d/*.conf
 EOF
 mkdir -pv /etc/ld.so.conf.d
 popd
-rm -rf glibc-2.35
+rm -rf glibc-2.38
 
 touch /logs/status_glibc_complete
 
@@ -218,19 +218,20 @@ popd
 rm -rf file-5.40
 touch /logs/status_file_complete
 
-echo Readline-8.1
-tar xf readline-8.1.tar.gz
-pushd readline-8.1
+echo Readline-8.2
+tar xf readline-8.2.tar.gz
+pushd readline-8.2
 sed -i '/MV.*old/d' Makefile.in
 sed -i '/{OLDSUFF}/c:' support/shlib-install
+patch -Np1 -i ../readline-8.2-upstream_fix-1.patch
 ./configure --prefix=/usr    \
             --disable-static \
             --with-curses    \
-            --docdir=/usr/share/doc/readline-8.1
+            --docdir=/usr/share/doc/readline-8.2
 make SHLIB_LIBS="-L/tools/lib -lncursesw"
 make SHLIB_LIBS="-L/tools/lib -lncursesw" install
 popd
-rm -rf readline-8.1
+rm -rf readline-8.2
 touch /logs/status_readline_complete
 
 echo M4-1.4.19
@@ -243,9 +244,9 @@ popd
 rm -rf m4-1.4.19
 touch /logs/status_m4_complete
 
-echo Binutils-2.37
-tar xf binutils-2.37.tar.xz
-pushd binutils-2.37
+echo Binutils-2.41
+tar xf binutils-2.41.tar.xz
+pushd binutils-2.41
 sed -i '/@\tincremental_copy/d' gold/testsuite/Makefile.in
 mkdir -v build
 cd build
@@ -256,13 +257,14 @@ cd build
              --enable-shared     \
              --disable-werror    \
              --enable-64-bit-bfd \
-             --with-system-zlib
+             --with-system-zlib  \
+             --enable-gprofng=no
 #             --enable-install-libiberty
 # libiberty.a used to be in binutils. Now it is in GCC.
 make -j$(nproc) tooldir=/usr
 make tooldir=/usr install
 popd
-rm -rf binutils-2.37
+rm -rf binutils-2.41
 touch /logs/status_binutils_complete
 
 echo GMP-6.2.1
@@ -505,17 +507,14 @@ popd
 rm -rf sed-4.8
 touch /logs/status_sed_complete
 
-echo Bison-3.7.6
-tar xf bison-3.7.6.tar.xz
-pushd bison-3.7.6
-./configure --prefix=/usr --docdir=/usr/share/doc/bison-3.7.6
-# Build with single processor due to errors seen with parallel make
-#     cannot stat 'examples/c/reccalc/scan.stamp.tmp': No such file or directory
-# try parallel make with new version
+echo Bison-3.8.2
+tar xf bison-3.8.2.tar.xz
+pushd bison-3.8.2
+./configure --prefix=/usr --docdir=/usr/share/doc/bison-3.8.2
 make -j$(nproc)
 make install
 popd
-rm -rf bison-3.7.6
+rm -rf bison-3.8.2
 touch /logs/status_bison_complete
 
 echo Flex-2.6.4
@@ -541,17 +540,17 @@ popd
 rm -rf grep-3.7
 touch /logs/status_grep_complete
 
-echo Bash-5.1.8
-tar xf bash-5.1.8.tar.gz
-pushd bash-5.1.8
+echo Bash-5.2
+tar xf bash-5.2.tar.gz
+pushd bash-5.2
 ./configure --prefix=/usr                      \
-            --docdir=/usr/share/doc/bash-5.1.8 \
+            --docdir=/usr/share/doc/bash-5.2   \
             --without-bash-malloc              \
             --with-installed-readline
 make -j$(nproc)
 make install
 cd /sources
-rm -rf bash-5.1.8
+rm -rf bash-5.2
 touch /logs/status_bash_complete
 
 echo Libtool-2.4.6
@@ -794,9 +793,10 @@ popd
 rm -rf Python-3.9.13
 touch /logs/status_python39_complete
 
-echo Coreutils-8.32
-tar xf coreutils-8.32.tar.xz
-pushd coreutils-8.32
+echo Coreutils-9.4
+tar xf coreutils-9.4.tar.xz
+pushd coreutils-9.4
+#patch -Np1 -i ../coreutils-9.4-i18n-1.patch
 autoreconf -fiv
 FORCE_UNSAFE_CONFIGURE=1 ./configure \
             --prefix=/usr            \
@@ -807,7 +807,7 @@ mv -v /usr/bin/chroot /usr/sbin
 mv -v /usr/share/man/man1/chroot.1 /usr/share/man/man8/chroot.8
 sed -i s/\"1\"/\"8\"/1 /usr/share/man/man8/chroot.8
 popd
-rm -rf coreutils-8.32
+rm -rf coreutils-9.4
 touch /logs/status_coreutils_complete
 
 echo Diffutils-3.8
@@ -1105,7 +1105,7 @@ mv rpm-"$RPM_WITH_VERSION"-release "$RPM_FOLDER"
 pushd "$RPM_FOLDER"
 
 # Still not in the upstream
-#patch -Np1 -i /tools/rpm-define-RPM-LD-FLAGS.patch
+patch -Np1 -i /tools/rpm-define-RPM-LD-FLAGS.patch
 
 # Do not build docs - pandoc dependency is not supplied in the toolchain.
 sed -iE '/SUBDIRS/ s/docs //' Makefile.am

@@ -51,6 +51,7 @@ RUN tdnf install -y \
 COPY [ "./toolchain-sha256sums", \
        "./toolchain-remote-wget-list", \
        "./toolchain-local-wget-list", \
+       "./rpm-define-RPM-LD-FLAGS.patch", \
        "$LFS/tools/" ]
 
 # Download source, then create lfs user and group.
