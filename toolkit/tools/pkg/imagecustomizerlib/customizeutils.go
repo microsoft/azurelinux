@@ -335,7 +335,7 @@ func loadOrDisableModules(modules imagecustomizerapi.Modules, imageChroot *safec
 	var err error
 
 	for _, module := range modules.Load {
-		logger.Log.Infof("Loading module (%s)", module.Name)
+		logger.Log.Infof("Loading kernel module (%s)", module.Name)
 		moduleFileName := module.Name + ".conf"
 		moduleFilePath := filepath.Join(imageChroot.RootDir(), "/etc/modules-load.d/", moduleFileName)
 		err = file.Write(module.Name, moduleFilePath)
@@ -345,7 +345,7 @@ func loadOrDisableModules(modules imagecustomizerapi.Modules, imageChroot *safec
 	}
 
 	for _, module := range modules.Disable {
-		logger.Log.Infof("Disabling module (%s)", module.Name)
+		logger.Log.Infof("Disabling kernel module (%s)", module.Name)
 		moduleFileName := module.Name + ".conf"
 		moduleFilePath := filepath.Join(imageChroot.RootDir(), "/etc/modprobe.d/", moduleFileName)
 		data := fmt.Sprintf("blacklist %s\n", module.Name)
