@@ -98,7 +98,6 @@ extends:
                       pipArtifactFeeds: "mariner/Mariner-Pypi-Feed"
                       selfRepoName: self
                       testSuiteName: "[${{ configuration.name }}] Package test"
-                      srpmPackList: "jq json-glib protobuf"
 
                   - task: PublishPipelineArtifact@1
                     inputs:
