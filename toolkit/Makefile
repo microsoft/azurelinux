@@ -92,6 +92,7 @@ CCACHE_DIR       ?= $(PROJECT_ROOT)/ccache
 LOGS_DIR           ?= $(BUILD_DIR)/logs
 PKGBUILD_DIR       ?= $(BUILD_DIR)/pkg_artifacts
 CACHED_RPMS_DIR    ?= $(BUILD_DIR)/rpm_cache
+REPO_QUERY_DIR     ?= $(BUILD_DIR)/repo_query
 BUILD_SRPMS_DIR    ?= $(BUILD_DIR)/INTERMEDIATE_SRPMS
 MACRO_DIR          ?= $(BUILD_DIR)/macros
 BUILD_SPECS_DIR    ?= $(BUILD_DIR)/INTERMEDIATE_SPECS
@@ -208,6 +209,10 @@ include $(SCRIPTS_DIR)/toolkit.mk
 # Fill the cache with rpms from the package server without using package manager or chroot with:
 #   pre-cache
 include $(SCRIPTS_DIR)/precache.mk
+
+# Run repo query under chroot with:
+# repo-query
+include $(SCRIPTS_DIR)/repoquerywrapper.mk
 
 # Create a package build workplan with:
 #   workplan, clean-workplan clean-cache
