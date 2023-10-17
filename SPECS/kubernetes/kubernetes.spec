@@ -10,11 +10,7 @@
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.28.2
-<<<<<<< HEAD
-Release:        2%{?dist}
-=======
 Release:        3%{?dist}
->>>>>>> main
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
