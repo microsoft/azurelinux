@@ -387,9 +387,9 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %{_sysconfdir}/default/grub.d
 
 %changelog
-* Thr Oct 18 2023 Gary Swalling <gaswal@microsoft.com> - 2.06-12
+* Wed Oct 18 2023 Gary Swalling <gaswal@microsoft.com> - 2.06-12
 - CVE-2021-3695 CVE-2021-3696 CVE-2021-3697 CVE-2022-28733 CVE-2022-28734
-  CVE-2022-28735 CVE-2022-28736
+  CVE-2022-28735 CVE-2022-28736 and increment SBAT level to 2
 
 * Fri Aug 11 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.06-11
 - Enable support for grub2-mkconfig grub.cfg generation
