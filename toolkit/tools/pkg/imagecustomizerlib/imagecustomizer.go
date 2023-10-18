@@ -25,7 +25,7 @@ const (
 
 var (
 	bootPartitionRegex   = regexp.MustCompile(`(?m)^search -n -u ([a-zA-Z0-9\-]+) -s$`)
-	rootfsPartitionRegex = regexp.MustCompile(`(?m)^set rootdevice=PARTUUID=([a-zA-Z0-9\-]+)$`)
+	rootfsPartitionRegex = regexp.MustCompile(`(?m)^set rootdevice=([A-Z]*)=([a-zA-Z0-9\-]+)$`)
 )
 
 func CustomizeImageWithConfigFile(buildDir string, configFile string, imageFile string,
@@ -266,9 +266,6 @@ func findPartitions(buildDir string, diskDevice string) ([]string, []*safechroot
 		}
 	}
 
-	// Note: This code assumes that the bootloader is installed on the rootfs partition.
-	// However, technically the bootloader can sit on a dedicated partition separate from both the ESP
-	// and the rootfs partition.
 	mountPoints, err := findMountsFromRootfs(rootfsPartition, diskPartitions, buildDir)
 	if err != nil {
 		return nil, nil, err
@@ -450,21 +447,37 @@ func findRootfsPartitionFromGrubCfgFile(grubCfgFilePath string, diskPartitions [
 		return nil, fmt.Errorf("failed to find rootfs partition in grub.cfg file")
 	}
 
-	rootfsPartUuid := match[1]
+	rootfsType := match[1]
+	rootfsId := match[2]
 
 	// Search for the partition in the list of partitions.
 	var rootfsPartition *diskutils.PartitionInfo
 	for i := range diskPartitions {
 		diskPartition := diskPartitions[i]
 
-		if diskPartition.PartUuid == rootfsPartUuid {
+		var found bool
+		switch rootfsType {
+		case "UUID":
+			found = diskPartition.Uuid == rootfsId
+
+		case "PARTUUID":
+			found = diskPartition.PartUuid == rootfsId
+
+		case "PARTLABEL":
+			found = diskPartition.PartLabel == rootfsId
+
+		default:
+			return nil, fmt.Errorf("unknown rootdevice target type (%s) in grub.cfg (%s)", rootfsType, grubConfigFile)
+		}
+
+		if found {
 			rootfsPartition = &diskPartition
 			break
 		}
 	}
 
 	if rootfsPartition == nil {
-		return nil, fmt.Errorf("failed to find rootfs partition with PARTUUID (%s)", rootfsPartUuid)
+		return nil, fmt.Errorf("failed to find rootfs partition (%s=%s)", rootfsType, rootfsId)
 	}
 
 	return rootfsPartition, nil
