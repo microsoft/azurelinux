@@ -6,7 +6,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
