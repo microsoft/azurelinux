@@ -200,10 +200,10 @@ func main() {
 
 	if *useCcache {
 		logger.Log.Infof("  ccache is enabled. processing multi-package groups under (%s)...", *ccacheDir)
-		ccacheManager, err := ccachemanagerpkg.CreateManager(*ccacheDir, *ccacheConfig)
-		if err == nil {
-			err = ccacheManager.UploadMultiPkgGroupCCaches()
-			if err != nil {
+		ccacheManager, ccacheErr := ccachemanagerpkg.CreateManager(*ccacheDir, *ccacheConfig)
+		if ccacheErr == nil {
+			ccacheErr = ccacheManager.UploadMultiPkgGroupCCaches()
+			if ccacheErr != nil {
 				logger.Log.Warnf("Failed to archive CCache artifacts:\n%v.", err)
 			}
 		} else {

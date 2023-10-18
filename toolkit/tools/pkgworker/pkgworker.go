@@ -90,27 +90,27 @@ func main() {
 	defines[rpm.DistroBuildNumberDefine] = *distroBuildNumber
 	defines[rpm.MarinerModuleLdflagsDefine] = "-Wl,-dT,%{_topdir}/BUILD/module_info.ld"
 
-	ccacheManager, err := ccachemanagerpkg.CreateManager(*ccacheRootDir, *ccachConfig)
-	if err == nil {
+	ccacheManager, ccacheErr := ccachemanagerpkg.CreateManager(*ccacheRootDir, *ccachConfig)
+	if ccacheErr == nil {
 		if *useCcache {
-			buildArch, err := rpm.GetRpmArch(runtime.GOARCH)
-			if err == nil {
-				err = ccacheManager.SetCurrentPkgGroup(*basePackageName, buildArch)
-				if err == nil {
+			buildArch, ccacheErr := rpm.GetRpmArch(runtime.GOARCH)
+			if ccacheErr == nil {
+				ccacheErr = ccacheManager.SetCurrentPkgGroup(*basePackageName, buildArch)
+				if ccacheErr == nil {
 					if ccacheManager.CurrentPkgGroup.Enabled {
 						defines[rpm.MarinerCCacheDefine] = "true"
 					}
 				} else {
-					logger.Log.Warnf("Failed to set package ccache configuration:\n%v", err)
+					logger.Log.Warnf("Failed to set package ccache configuration:\n%v", ccacheErr)
 					ccacheManager = nil
 				}
 			} else {
-				logger.Log.Warnf("Failed to get build architecture:\n%v", err)
+				logger.Log.Warnf("Failed to get build architecture:\n%v", ccacheErr)
 				ccacheManager = nil
 			}
 		}
 	} else {
-		logger.Log.Warnf("Failed to initialize the ccache manager:\n%v", err)
+		logger.Log.Warnf("Failed to initialize the ccache manager:\n%v", ccacheErr)
 		ccacheManager = nil
 	}
 
@@ -188,9 +188,9 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 	}()
 
 	if isCCacheEnabled(ccacheManager) {
-		err = ccacheManager.DownloadPkgGroupCCache()
-		if err != nil {
-			logger.Log.Infof("CCache will not be able to use previously generated artifacts:\n%v", err)
+		ccacheErr := ccacheManager.DownloadPkgGroupCCache()
+		if ccacheErr != nil {
+			logger.Log.Infof("CCache will not be able to use previously generated artifacts:\n%v", ccacheErr)
 		}
 	}
 
@@ -248,9 +248,9 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 	// Only if the groupSize is 1 we can archive since no other packages will
 	// re-update this cache.
 	if isCCacheEnabled(ccacheManager) && ccacheManager.CurrentPkgGroup.Size == 1 {
-		err = ccacheManager.UploadPkgGroupCCache()
-		if err != nil {
-			logger.Log.Warnf("Unable to upload ccache archive:\n%v", err)
+		ccacheErr := ccacheManager.UploadPkgGroupCCache()
+		if ccacheErr != nil {
+			logger.Log.Warnf("Unable to upload ccache archive:\n%v", ccacheErr)
 		}
 	}
 
