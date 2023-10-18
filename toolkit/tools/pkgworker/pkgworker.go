@@ -188,15 +188,9 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 	}()
 
 	if isCCacheEnabled(ccacheManager) {
-<<<<<<< HEAD
 		ccacheErr := ccacheManager.DownloadPkgGroupCCache()
 		if ccacheErr != nil {
 			logger.Log.Infof("CCache will not be able to use previously generated artifacts:\n%v", ccacheErr)
-=======
-		err = ccacheManager.DownloadPkgGroupCCache()
-		if err != nil {
-			logger.Log.Infof("CCache will not be able to use previously generated artifacts:\n%v", err)
->>>>>>> 2134615ef (Performance Improvement: Add support for downloading/uploading ccache archives (#6314))
 		}
 	}
 
@@ -254,15 +248,9 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 	// Only if the groupSize is 1 we can archive since no other packages will
 	// re-update this cache.
 	if isCCacheEnabled(ccacheManager) && ccacheManager.CurrentPkgGroup.Size == 1 {
-<<<<<<< HEAD
 		ccacheErr := ccacheManager.UploadPkgGroupCCache()
 		if ccacheErr != nil {
 			logger.Log.Warnf("Unable to upload ccache archive:\n%v", ccacheErr)
-=======
-		err = ccacheManager.UploadPkgGroupCCache()
-		if err != nil {
-			logger.Log.Warnf("Unable to upload ccache archive:\n%v", err)
->>>>>>> 2134615ef (Performance Improvement: Add support for downloading/uploading ccache archives (#6314))
 		}
 	}
 
