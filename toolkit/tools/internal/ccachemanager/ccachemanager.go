@@ -669,9 +669,13 @@ func (m *CCacheManager) UploadPkgGroupCCache() (err error) {
 		}
 
 		if remoteStoreConfig.KeepLatestOnly {
-			logger.Log.Infof("  keep latest only is enabled. Removing previous ccache archive if it exists...")
+			logger.Log.Infof("  keep latest only is enabled. Checking if we need to remove previous latest archive...")
+			logger.Log.Infof("  - old: (%s)", previousLatestTarSourcePath)
+			logger.Log.Infof("  - new: (%s)", m.CurrentPkgGroup.TarFile.RemoteTargetPath)
 			if previousLatestTarSourcePath == "" {
 				logger.Log.Infof("  cannot remove old archive with an empty name. No previous ccache archive to remove.")
+			} else if previousLatestTarSourcePath == m.CurrentPkgGroup.TarFile.RemoteTargetPath {
+				logger.Log.Infof("  previous latest archive has been overwritten with the current latest archive. Nothing to remove.")
 			} else {
 				logger.Log.Infof("  removing ccache archive (%s) from remote store...", previousLatestTarSourcePath)
 				err = m.AzureBlobStorage.Delete(context.Background(), remoteStoreConfig.ContainerName, previousLatestTarSourcePath)
