@@ -1,6 +1,11 @@
 # Retrieved from 'deps/npm/package.json' inside the sources tarball.
 %define npm_version 9.8.1
 
+# Unfortunately our 'filesystem' package conflicts with /usr/lib/debug
+# and /usr/lib/debug/usr from any/all debuginfo packages, so I guess
+# we have to disable debuginfo for now
+%global debug_package %{nil}
+
 Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs18
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
