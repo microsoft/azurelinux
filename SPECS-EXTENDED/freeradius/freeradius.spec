@@ -5,7 +5,7 @@
 Summary:        High-performance and highly configurable free RADIUS server
 Name:           freeradius
 Version:        3.2.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -315,7 +315,7 @@ EOF
 
 # Make sure our user/group is present prior to any package or subpackage installation
 %pre
-%sysusers_create_compat %{SOURCE105}
+%sysusers_create_package %{name} %{SOURCE105}
 
 %preun
 %systemd_preun radiusd.service
@@ -844,6 +844,9 @@ EOF
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/rest
 
 %changelog
+* Wed Oct 18 2023 Archana Choudhary <archana1@microsoft.com> - 3.2.3-2
+- Correct unavailable sysusers_create_compat macro to available sysusers_create_package macro
+
 * Tue Sep 05 2023 Archana Choudhary <archana1@microsoft.com> - 3.2.3-1
 - Upgrade to 3.2.3
 - Address CVE-2022-41860, CVE-2022-41861
