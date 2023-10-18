@@ -227,8 +227,8 @@ lz4-debuginfo-1.9.3-1.cm2.x86_64.rpm
 lz4-devel-1.9.3-1.cm2.x86_64.rpm
 m4-1.4.19-2.cm2.x86_64.rpm
 m4-debuginfo-1.4.19-2.cm2.x86_64.rpm
-make-4.3-3.cm2.x86_64.rpm
-make-debuginfo-4.3-3.cm2.x86_64.rpm
+make-4.4.1-1.cm2.x86_64.rpm
+make-debuginfo-4.4.1-1.cm2.x86_64.rpm
 mariner-check-macros-2.0-23.cm2.noarch.rpm
 mariner-repos-2.0-8.cm2.noarch.rpm
 mariner-repos-debug-2.0-8.cm2.noarch.rpm
