@@ -1,6 +1,7 @@
 %global _default_patch_fuzz 2
 # Is elliptic curve cryptography supported?
 %global HAVE_EC_CRYPTO 1
+%global debug_package %{nil}
 
 Summary:        High-performance and highly configurable free RADIUS server
 Name:           freeradius
@@ -77,6 +78,7 @@ in this package.
 Summary:        FreeRADIUS utilities
 Requires:       %{name} = %{version}-%{release}
 Requires:       libpcap >= 0.9.4
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %description utils
 The FreeRADIUS server has a number of features found in other servers,
@@ -141,7 +143,7 @@ This plugin provides the MySQL support for the FreeRADIUS server project.
 
 %package postgresql
 Summary:        Postgresql support for freeradius
-BuildRequires:  libpq-devel
+BuildRequires:  postgresql-devel
 Requires:       %{name} = %{version}-%{release}
 
 %description postgresql
@@ -846,6 +848,9 @@ EOF
 %changelog
 * Wed Oct 18 2023 Archana Choudhary <archana1@microsoft.com> - 3.2.3-2
 - Correct unavailable sysusers_create_compat macro to available sysusers_create_package macro
+- Add runtime requirement for utils subpackage
+- Update build requirement for postgresql subpackage
+- Disable generation of debuginfo package as its files conflict with filsystem package
 
 * Tue Sep 05 2023 Archana Choudhary <archana1@microsoft.com> - 3.2.3-1
 - Upgrade to 3.2.3
