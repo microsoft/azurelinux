@@ -83,9 +83,9 @@ file-devel-5.45-1.cm2.x86_64.rpm
 file-libs-5.45-1.cm2.x86_64.rpm
 filesystem-1.1-15.cm2.x86_64.rpm
 filesystem-asc-1.1-15.cm2.x86_64.rpm
-findutils-4.8.0-5.cm2.x86_64.rpm
-findutils-debuginfo-4.8.0-5.cm2.x86_64.rpm
-findutils-lang-4.8.0-5.cm2.x86_64.rpm
+findutils-4.9.0-1.cm2.x86_64.rpm
+findutils-debuginfo-4.9.0-1.cm2.x86_64.rpm
+findutils-lang-4.9.0-1.cm2.x86_64.rpm
 flex-2.6.4-7.cm2.x86_64.rpm
 flex-debuginfo-2.6.4-7.cm2.x86_64.rpm
 flex-devel-2.6.4-7.cm2.x86_64.rpm

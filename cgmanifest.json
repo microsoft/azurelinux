@@ -3638,8 +3638,8 @@
         "type": "other",
         "other": {
           "name": "findutils",
-          "version": "4.8.0",
-          "downloadUrl": "https://ftp.gnu.org/gnu/findutils/findutils-4.8.0.tar.xz"
+          "version": "4.9.0",
+          "downloadUrl": "https://ftp.gnu.org/gnu/findutils/findutils-4.9.0.tar.xz"
         }
       }
     },
