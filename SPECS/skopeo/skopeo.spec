@@ -49,6 +49,9 @@ make test-unit-local
 * Tue Oct 17 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 1.13.3-1
 - Update to v1.13.3 to fix CVE-2023-33199 in rekor.
 
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.12.0-5
+- Bump release to rebuild with go 1.20.10
+
 * Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 1.12.0-4
 - Bump release to rebuild with updated version of Go.
 

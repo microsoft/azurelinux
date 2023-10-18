@@ -39,9 +39,12 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_default_cni_plugins_dir}/*
 
 %changelog
-* Wed Oct 13 2023 Mateusz Gozdek <mgozdek@microsoft.com> - 1.3.0-1
+* Wed Oct 18 2023 Mateusz Gozdek <mgozdek@microsoft.com> - 1.3.0-1
 - Make plugin binaries correctly print version
 - Upgrade to version 1.3.0
+
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.9.1-16
+- Bump release to rebuild with go 1.20.10
 
 * Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 0.9.1-15
 - Bump release to rebuild with updated version of Go.
