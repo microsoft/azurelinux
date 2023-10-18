@@ -1,0 +1,136 @@
+From 7a765bcaee6f6a26adabb8051459a8c49bf7dae2 Mon Sep 17 00:00:00 2001
+From: Darren Kenny <darren.kenny@oracle.com>
+Date: Tue, 29 Mar 2022 15:52:46 +0000
+Subject: [PATCH] fs/btrfs: Fix more ASAN and SEGV issues found with fuzzing
+
+The fuzzer is generating btrfs file systems that have chunks with
+invalid combinations of stripes and substripes for the given RAID
+configurations.
+
+After examining the Linux kernel fs/btrfs/tree-checker.c code, it
+appears that sub-stripes should only be applied to RAID10, and in that
+case there should only ever be 2 of them.
+
+Similarly, RAID single should only have 1 stripe, and RAID1/1C3/1C4
+should have 2. 3 or 4 stripes respectively, which is what redundancy
+corresponds.
+
+Some of the chunks ended up with a size of 0, which grub_malloc() still
+returned memory for and in turn generated ASAN errors later when
+accessed.
+
+While it would be possible to specifically limit the number of stripes,
+a more correct test was on the combination of the chunk item, and the
+number of stripes by the size of the chunk stripe structure in
+comparison to the size of the chunk itself.
+
+Signed-off-by: Darren Kenny <darren.kenny@oracle.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/fs/btrfs.c | 55 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 55 insertions(+)
+
+diff --git a/grub-core/fs/btrfs.c b/grub-core/fs/btrfs.c
+index eb9857d..b3d71cd 100644
+--- a/grub-core/fs/btrfs.c
++++ b/grub-core/fs/btrfs.c
+@@ -912,6 +912,12 @@ grub_btrfs_read_logical (struct grub_btrfs_data *data, grub_disk_addr_t addr,
+ 	return grub_error (GRUB_ERR_BAD_FS,
+ 			   "couldn't find the chunk descriptor");
+ 
++      if (!chsize)
++	{
++	  grub_dprintf ("btrfs", "zero-size chunk\n");
++	  return grub_error (GRUB_ERR_BAD_FS,
++			     "got an invalid zero-size chunk");
++	}
+       chunk = grub_malloc (chsize);
+       if (!chunk)
+ 	return grub_errno;
+@@ -970,6 +976,16 @@ grub_btrfs_read_logical (struct grub_btrfs_data *data, grub_disk_addr_t addr,
+ 	      stripe_length = grub_divmod64 (grub_le_to_cpu64 (chunk->size),
+ 					     nstripes,
+ 					     NULL);
++
++	      /* For single, there should be exactly 1 stripe. */
++	      if (grub_le_to_cpu16 (chunk->nstripes) != 1)
++		{
++		  grub_dprintf ("btrfs", "invalid RAID_SINGLE: nstripes != 1 (%u)\n",
++				grub_le_to_cpu16 (chunk->nstripes));
++		  return grub_error (GRUB_ERR_BAD_FS,
++				     "invalid RAID_SINGLE: nstripes != 1 (%u)",
++				      grub_le_to_cpu16 (chunk->nstripes));
++		}
+ 	      if (stripe_length == 0)
+ 		stripe_length = 512;
+ 	      stripen = grub_divmod64 (off, stripe_length, &stripe_offset);
+@@ -989,6 +1005,19 @@ grub_btrfs_read_logical (struct grub_btrfs_data *data, grub_disk_addr_t addr,
+ 	      stripen = 0;
+ 	      stripe_offset = off;
+ 	      csize = grub_le_to_cpu64 (chunk->size) - off;
++
++             /*
++	      * Redundancy, and substripes only apply to RAID10, and there
++	      * should be exactly 2 sub-stripes.
++	      */
++	     if (grub_le_to_cpu16 (chunk->nstripes) != redundancy)
++               {
++                 grub_dprintf ("btrfs", "invalid RAID1: nstripes != %u (%u)\n",
++                               redundancy, grub_le_to_cpu16 (chunk->nstripes));
++                 return grub_error (GRUB_ERR_BAD_FS,
++                                    "invalid RAID1: nstripes != %u (%u)",
++                                    redundancy, grub_le_to_cpu16 (chunk->nstripes));
++               }
+ 	      break;
+ 	    }
+ 	  case GRUB_BTRFS_CHUNK_TYPE_RAID0:
+@@ -1025,6 +1054,20 @@ grub_btrfs_read_logical (struct grub_btrfs_data *data, grub_disk_addr_t addr,
+ 	      stripe_offset = low + chunk_stripe_length
+ 		* high;
+ 	      csize = chunk_stripe_length - low;
++
++	      /*
++	       * Substripes only apply to RAID10, and there
++	       * should be exactly 2 sub-stripes.
++	       */
++	      if (grub_le_to_cpu16 (chunk->nsubstripes) != 2)
++		{
++		  grub_dprintf ("btrfs", "invalid RAID10: nsubstripes != 2 (%u)",
++				grub_le_to_cpu16 (chunk->nsubstripes));
++		  return grub_error (GRUB_ERR_BAD_FS,
++				     "invalid RAID10: nsubstripes != 2 (%u)",
++				     grub_le_to_cpu16 (chunk->nsubstripes));
++		}
++
+ 	      break;
+ 	    }
+ 	  case GRUB_BTRFS_CHUNK_TYPE_RAID5:
+@@ -1124,6 +1167,8 @@ grub_btrfs_read_logical (struct grub_btrfs_data *data, grub_disk_addr_t addr,
+ 
+ 	for (j = 0; j < 2; j++)
+ 	  {
++	    grub_size_t est_chunk_alloc = 0;
++
+ 	    grub_dprintf ("btrfs", "chunk 0x%" PRIxGRUB_UINT64_T
+ 			  "+0x%" PRIxGRUB_UINT64_T
+ 			  " (%d stripes (%d substripes) of %"
+@@ -1136,6 +1181,16 @@ grub_btrfs_read_logical (struct grub_btrfs_data *data, grub_disk_addr_t addr,
+ 	    grub_dprintf ("btrfs", "reading laddr 0x%" PRIxGRUB_UINT64_T "\n",
+ 			  addr);
+ 
++	    if (grub_mul (sizeof (struct grub_btrfs_chunk_stripe),
++			  grub_le_to_cpu16 (chunk->nstripes), &est_chunk_alloc) ||
++		grub_add (est_chunk_alloc,
++			  sizeof (struct grub_btrfs_chunk_item), &est_chunk_alloc) ||
++		est_chunk_alloc > chunk->size)
++	      {
++		err = GRUB_ERR_BAD_FS;
++		break;
++	      }
++
+ 	    if (is_raid56)
+ 	      {
+ 		err = btrfs_read_from_chunk (data, chunk, stripen,
+-- 
+2.34.1
+

@@ -1,0 +1,200 @@
+From 2d6dc71e56cf6fa7474f5d8ec21dd34cfe64066f Mon Sep 17 00:00:00 2001
+From: Daniel Axtens <dja@axtens.net>
+Date: Tue, 6 Jul 2021 14:02:55 +1000
+Subject: [PATCH] video/readers/png: Abort sooner if a read operation fails
+
+Fuzzing revealed some inputs that were taking a long time, potentially
+forever, because they did not bail quickly upon encountering an I/O error.
+
+Try to catch I/O errors sooner and bail out.
+
+Signed-off-by: Daniel Axtens <dja@axtens.net>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/video/readers/png.c | 55 ++++++++++++++++++++++++++++++-----
+ 1 file changed, 47 insertions(+), 8 deletions(-)
+
+diff --git a/grub-core/video/readers/png.c b/grub-core/video/readers/png.c
+index 0157ff7..e2a6b1c 100644
+--- a/grub-core/video/readers/png.c
++++ b/grub-core/video/readers/png.c
+@@ -142,6 +142,7 @@ static grub_uint8_t
+ grub_png_get_byte (struct grub_png_data *data)
+ {
+   grub_uint8_t r;
++  grub_ssize_t bytes_read = 0;
+ 
+   if ((data->inside_idat) && (data->idat_remain == 0))
+     {
+@@ -175,7 +176,14 @@ grub_png_get_byte (struct grub_png_data *data)
+     }
+ 
+   r = 0;
+-  grub_file_read (data->file, &r, 1);
++  bytes_read = grub_file_read (data->file, &r, 1);
++
++  if (bytes_read != 1)
++    {
++      grub_error (GRUB_ERR_BAD_FILE_TYPE,
++		  "png: unexpected end of data");
++      return 0;
++    }
+ 
+   if (data->inside_idat)
+     data->idat_remain--;
+@@ -231,15 +239,16 @@ grub_png_decode_image_palette (struct grub_png_data *data,
+   if (len == 0)
+     return GRUB_ERR_NONE;
+ 
+-  for (i = 0; 3 * i < len && i < 256; i++)
++  grub_errno = GRUB_ERR_NONE;
++  for (i = 0; 3 * i < len && i < 256 && grub_errno == GRUB_ERR_NONE; i++)
+     for (j = 0; j < 3; j++)
+       data->palette[i][j] = grub_png_get_byte (data);
+-  for (i *= 3; i < len; i++)
++  for (i *= 3; i < len && grub_errno == GRUB_ERR_NONE; i++)
+     grub_png_get_byte (data);
+ 
+   grub_png_get_dword (data);
+ 
+-  return GRUB_ERR_NONE;
++  return grub_errno;
+ }
+ 
+ static grub_err_t
+@@ -256,9 +265,13 @@ grub_png_decode_image_header (struct grub_png_data *data)
+     return grub_error (GRUB_ERR_BAD_FILE_TYPE, "png: invalid image size");
+ 
+   color_bits = grub_png_get_byte (data);
++  if (grub_errno != GRUB_ERR_NONE)
++    return grub_errno;
+   data->is_16bit = (color_bits == 16);
+ 
+   color_type = grub_png_get_byte (data);
++  if (grub_errno != GRUB_ERR_NONE)
++    return grub_errno;
+ 
+   /* According to PNG spec, no other types are valid.  */
+   if ((color_type & ~(PNG_COLOR_MASK_ALPHA | PNG_COLOR_MASK_COLOR))
+@@ -340,14 +353,20 @@ grub_png_decode_image_header (struct grub_png_data *data)
+   if (grub_png_get_byte (data) != PNG_COMPRESSION_BASE)
+     return grub_error (GRUB_ERR_BAD_FILE_TYPE,
+ 		       "png: compression method not supported");
++  if (grub_errno != GRUB_ERR_NONE)
++    return grub_errno;
+ 
+   if (grub_png_get_byte (data) != PNG_FILTER_TYPE_BASE)
+     return grub_error (GRUB_ERR_BAD_FILE_TYPE,
+ 		       "png: filter method not supported");
++  if (grub_errno != GRUB_ERR_NONE)
++    return grub_errno;
+ 
+   if (grub_png_get_byte (data) != PNG_INTERLACE_NONE)
+     return grub_error (GRUB_ERR_BAD_FILE_TYPE,
+ 		       "png: interlace method not supported");
++  if (grub_errno != GRUB_ERR_NONE)
++    return grub_errno;
+ 
+   /* Skip crc checksum.  */
+   grub_png_get_dword (data);
+@@ -449,7 +468,7 @@ grub_png_get_huff_code (struct grub_png_data *data, struct huff_table *ht)
+   int code, i;
+ 
+   code = 0;
+-  for (i = 0; i < ht->max_length; i++)
++  for (i = 0; i < ht->max_length && grub_errno == GRUB_ERR_NONE; i++)
+     {
+       code = (code << 1) + grub_png_get_bits (data, 1);
+       if (code < ht->maxval[i])
+@@ -504,8 +523,14 @@ grub_png_init_dynamic_block (struct grub_png_data *data)
+   grub_uint8_t lens[DEFLATE_HCLEN_MAX];
+ 
+   nl = DEFLATE_HLIT_BASE + grub_png_get_bits (data, 5);
++  if (grub_errno != GRUB_ERR_NONE)
++    return grub_errno;
+   nd = DEFLATE_HDIST_BASE + grub_png_get_bits (data, 5);
++  if (grub_errno != GRUB_ERR_NONE)
++    return grub_errno;
+   nb = DEFLATE_HCLEN_BASE + grub_png_get_bits (data, 4);
++  if (grub_errno != GRUB_ERR_NONE)
++    return grub_errno;
+ 
+   if ((nl > DEFLATE_HLIT_MAX) || (nd > DEFLATE_HDIST_MAX) ||
+       (nb > DEFLATE_HCLEN_MAX))
+@@ -533,7 +558,7 @@ grub_png_init_dynamic_block (struct grub_png_data *data)
+ 			    data->dist_offset);
+ 
+   prev = 0;
+-  for (i = 0; i < nl + nd; i++)
++  for (i = 0; i < nl + nd && grub_errno == GRUB_ERR_NONE; i++)
+     {
+       int n, code;
+       struct huff_table *ht;
+@@ -721,17 +746,21 @@ grub_png_read_dynamic_block (struct grub_png_data *data)
+ 	  len = cplens[n];
+ 	  if (cplext[n])
+ 	    len += grub_png_get_bits (data, cplext[n]);
++	  if (grub_errno != GRUB_ERR_NONE)
++	    return grub_errno;
+ 
+ 	  n = grub_png_get_huff_code (data, &data->dist_table);
+ 	  dist = cpdist[n];
+ 	  if (cpdext[n])
+ 	    dist += grub_png_get_bits (data, cpdext[n]);
++	  if (grub_errno != GRUB_ERR_NONE)
++	    return grub_errno;
+ 
+ 	  pos = data->wp - dist;
+ 	  if (pos < 0)
+ 	    pos += WSIZE;
+ 
+-	  while (len > 0)
++	  while (len > 0 && grub_errno == GRUB_ERR_NONE)
+ 	    {
+ 	      data->slide[data->wp] = data->slide[pos];
+ 	      grub_png_output_byte (data, data->slide[data->wp]);
+@@ -759,7 +788,11 @@ grub_png_decode_image_data (struct grub_png_data *data)
+   int final;
+ 
+   cmf = grub_png_get_byte (data);
++  if (grub_errno != GRUB_ERR_NONE)
++    return grub_errno;
+   flg = grub_png_get_byte (data);
++  if (grub_errno != GRUB_ERR_NONE)
++    return grub_errno;
+ 
+   if ((cmf & 0xF) != Z_DEFLATED)
+     return grub_error (GRUB_ERR_BAD_FILE_TYPE,
+@@ -774,7 +807,11 @@ grub_png_decode_image_data (struct grub_png_data *data)
+       int block_type;
+ 
+       final = grub_png_get_bits (data, 1);
++      if (grub_errno != GRUB_ERR_NONE)
++	return grub_errno;
+       block_type = grub_png_get_bits (data, 2);
++      if (grub_errno != GRUB_ERR_NONE)
++	return grub_errno;
+ 
+       switch (block_type)
+ 	{
+@@ -790,7 +827,7 @@ grub_png_decode_image_data (struct grub_png_data *data)
+ 	    grub_png_get_byte (data);
+ 	    grub_png_get_byte (data);
+ 
+-	    for (i = 0; i < len; i++)
++	    for (i = 0; i < len && grub_errno == GRUB_ERR_NONE; i++)
+ 	      grub_png_output_byte (data, grub_png_get_byte (data));
+ 
+ 	    break;
+@@ -1045,6 +1082,8 @@ grub_png_decode_png (struct grub_png_data *data)
+ 
+       len = grub_png_get_dword (data);
+       type = grub_png_get_dword (data);
++      if (grub_errno != GRUB_ERR_NONE)
++	break;
+       data->next_offset = data->file->offset + len + 4;
+ 
+       switch (type)
+-- 
+2.34.1
+

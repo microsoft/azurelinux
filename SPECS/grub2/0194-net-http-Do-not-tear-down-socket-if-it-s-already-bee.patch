@@ -1,0 +1,44 @@
+From 33b9c2a5433c5512e76e0069b4d191bf2dbeac87 Mon Sep 17 00:00:00 2001
+From: Daniel Axtens <dja@axtens.net>
+Date: Tue, 1 Mar 2022 23:14:15 +1100
+Subject: [PATCH] net/http: Do not tear down socket if it's already been torn
+ down
+
+It's possible for data->sock to get torn down in tcp error handling.
+If we unconditionally tear it down again we will end up doing writes
+to an offset of the NULL pointer when we go to tear it down again.
+
+Detect if it has been torn down and don't do it again.
+
+Signed-off-by: Daniel Axtens <dja@axtens.net>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/net/http.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/grub-core/net/http.c b/grub-core/net/http.c
+index b616cf4..833c99f 100644
+--- a/grub-core/net/http.c
++++ b/grub-core/net/http.c
+@@ -409,7 +409,7 @@ http_establish (struct grub_file *file, grub_off_t offset, int initial)
+       return err;
+     }
+ 
+-  for (i = 0; !data->headers_recv && i < 100; i++)
++  for (i = 0; data->sock && !data->headers_recv && i < 100; i++)
+     {
+       grub_net_tcp_retransmit ();
+       grub_net_poll_cards (300, &data->headers_recv);
+@@ -417,7 +417,8 @@ http_establish (struct grub_file *file, grub_off_t offset, int initial)
+ 
+   if (!data->headers_recv)
+     {
+-      grub_net_tcp_close (data->sock, GRUB_NET_TCP_ABORT);
++      if (data->sock)
++        grub_net_tcp_close (data->sock, GRUB_NET_TCP_ABORT);
+       if (data->err)
+ 	{
+ 	  char *str = data->errmsg;
+-- 
+2.34.1
+

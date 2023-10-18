@@ -1,0 +1,37 @@
+From 597f4cef5f140d9212af12f5010a211fe20ff9f1 Mon Sep 17 00:00:00 2001
+From: Daniel Axtens <dja@axtens.net>
+Date: Tue, 18 Jan 2022 14:29:20 +1100
+Subject: [PATCH] net/tftp: Avoid a trivial UAF
+
+Under tftp errors, we print a tftp error message from the tftp header.
+However, the tftph pointer is a pointer inside nb, the netbuff. Previously,
+we were freeing the nb and then dereferencing it. Don't do that, use it
+and then free it later.
+
+This isn't really _bad_ per se, especially as we're single-threaded, but
+it trips up fuzzers.
+
+Signed-off-by: Daniel Axtens <dja@axtens.net>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/net/tftp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/grub-core/net/tftp.c b/grub-core/net/tftp.c
+index 4ea8069..df8bf50 100644
+--- a/grub-core/net/tftp.c
++++ b/grub-core/net/tftp.c
+@@ -251,9 +251,9 @@ tftp_receive (grub_net_udp_socket_t sock __attribute__ ((unused)),
+       return GRUB_ERR_NONE;
+     case TFTP_ERROR:
+       data->have_oack = 1;
+-      grub_netbuff_free (nb);
+       grub_error (GRUB_ERR_IO, "%s", tftph->u.err.errmsg);
+       grub_error_save (&data->save_err);
++      grub_netbuff_free (nb);
+       return GRUB_ERR_NONE;
+     default:
+       grub_netbuff_free (nb);
+-- 
+2.34.1
+

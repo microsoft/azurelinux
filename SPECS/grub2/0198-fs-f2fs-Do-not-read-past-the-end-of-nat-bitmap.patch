@@ -1,0 +1,134 @@
+From e528f9e9ea9e05a17a2f76a7d4f765e0061fe089 Mon Sep 17 00:00:00 2001
+From: Sudhakar Kuppusamy <sudhakar@linux.ibm.com>
+Date: Wed, 6 Apr 2022 18:49:09 +0530
+Subject: [PATCH] fs/f2fs: Do not read past the end of nat bitmap
+
+A corrupt f2fs filesystem could have a block offset or a bitmap
+offset that would cause us to read beyond the bounds of the nat
+bitmap.
+
+Introduce the nat_bitmap_size member in grub_f2fs_data which holds
+the size of nat bitmap.
+
+Set the size when loading the nat bitmap in nat_bitmap_ptr(), and
+catch when an invalid offset would create a pointer past the end of
+the allocated space.
+
+Check against the bitmap size in grub_f2fs_test_bit() test bit to avoid
+reading past the end of the nat bitmap.
+
+Signed-off-by: Sudhakar Kuppusamy <sudhakar@linux.ibm.com>
+Signed-off-by: Daniel Axtens <dja@axtens.net>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/fs/f2fs.c | 33 +++++++++++++++++++++++++++------
+ 1 file changed, 27 insertions(+), 6 deletions(-)
+
+diff --git a/grub-core/fs/f2fs.c b/grub-core/fs/f2fs.c
+index 6370221..8898b23 100644
+--- a/grub-core/fs/f2fs.c
++++ b/grub-core/fs/f2fs.c
+@@ -122,6 +122,7 @@ GRUB_MOD_LICENSE ("GPLv3+");
+ #define F2FS_INLINE_DOTS          0x10  /* File having implicit dot dentries. */
+ 
+ #define MAX_VOLUME_NAME           512
++#define MAX_NAT_BITMAP_SIZE       3900
+ 
+ enum FILE_TYPE
+ {
+@@ -183,7 +184,7 @@ struct grub_f2fs_checkpoint
+   grub_uint32_t                   checksum_offset;
+   grub_uint64_t                   elapsed_time;
+   grub_uint8_t                    alloc_type[MAX_ACTIVE_LOGS];
+-  grub_uint8_t                    sit_nat_version_bitmap[3900];
++  grub_uint8_t                    sit_nat_version_bitmap[MAX_NAT_BITMAP_SIZE];
+   grub_uint32_t                   checksum;
+ } GRUB_PACKED;
+ 
+@@ -302,6 +303,7 @@ struct grub_f2fs_data
+ 
+   struct grub_f2fs_nat_journal    nat_j;
+   char                            *nat_bitmap;
++  grub_uint32_t                   nat_bitmap_size;
+ 
+   grub_disk_t                     disk;
+   struct grub_f2fs_node           *inode;
+@@ -377,15 +379,20 @@ sum_blk_addr (struct grub_f2fs_data *data, int base, int type)
+ }
+ 
+ static void *
+-nat_bitmap_ptr (struct grub_f2fs_data *data)
++nat_bitmap_ptr (struct grub_f2fs_data *data, grub_uint32_t *nat_bitmap_size)
+ {
+   struct grub_f2fs_checkpoint *ckpt = &data->ckpt;
+   grub_uint32_t offset;
++  *nat_bitmap_size = MAX_NAT_BITMAP_SIZE;
+ 
+   if (grub_le_to_cpu32 (data->sblock.cp_payload) > 0)
+     return ckpt->sit_nat_version_bitmap;
+ 
+   offset = grub_le_to_cpu32 (ckpt->sit_ver_bitmap_bytesize);
++  if (offset >= MAX_NAT_BITMAP_SIZE)
++     return NULL;
++
++  *nat_bitmap_size = *nat_bitmap_size - offset;
+ 
+   return ckpt->sit_nat_version_bitmap + offset;
+ }
+@@ -438,11 +445,15 @@ grub_f2fs_crc_valid (grub_uint32_t blk_crc, void *buf, const grub_uint32_t len)
+ }
+ 
+ static int
+-grub_f2fs_test_bit (grub_uint32_t nr, const char *p)
++grub_f2fs_test_bit (grub_uint32_t nr, const char *p, grub_uint32_t len)
+ {
+   int mask;
++  grub_uint32_t shifted_nr = (nr >> 3);
++
++  if (shifted_nr >= len)
++    return -1;
+ 
+-  p += (nr >> 3);
++  p += shifted_nr;
+   mask = 1 << (7 - (nr & 0x07));
+ 
+   return mask & *p;
+@@ -662,6 +673,7 @@ get_node_blkaddr (struct grub_f2fs_data *data, grub_uint32_t nid)
+   grub_uint32_t seg_off, block_off, entry_off, block_addr;
+   grub_uint32_t blkaddr = 0;
+   grub_err_t err;
++  int result_bit;
+ 
+   err = get_blkaddr_from_nat_journal (data, nid, &blkaddr);
+   if (err != GRUB_ERR_NONE)
+@@ -682,8 +694,15 @@ get_node_blkaddr (struct grub_f2fs_data *data, grub_uint32_t nid)
+         ((seg_off * data->blocks_per_seg) << 1) +
+         (block_off & (data->blocks_per_seg - 1));
+ 
+-  if (grub_f2fs_test_bit (block_off, data->nat_bitmap))
++  result_bit = grub_f2fs_test_bit (block_off, data->nat_bitmap,
++                                   data->nat_bitmap_size);
++  if (result_bit > 0)
+     block_addr += data->blocks_per_seg;
++  else if (result_bit == -1)
++    {
++      grub_free (nat_block);
++      return 0;
++    }
+ 
+   err = grub_f2fs_block_read (data, block_addr, nat_block);
+   if (err)
+@@ -833,7 +852,9 @@ grub_f2fs_mount (grub_disk_t disk)
+   if (err)
+     goto fail;
+ 
+-  data->nat_bitmap = nat_bitmap_ptr (data);
++  data->nat_bitmap = nat_bitmap_ptr (data, &data->nat_bitmap_size);
++  if (data->nat_bitmap == NULL)
++    goto fail;
+ 
+   err = get_nat_journal (data);
+   if (err)
+-- 
+2.34.1
+

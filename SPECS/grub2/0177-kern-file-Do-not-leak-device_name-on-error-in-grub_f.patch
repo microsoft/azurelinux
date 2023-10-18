@@ -1,0 +1,41 @@
+From 8a0bf1683fcb5631469d7dbdbe3224167b213628 Mon Sep 17 00:00:00 2001
+From: Daniel Axtens <dja@axtens.net>
+Date: Fri, 25 Jun 2021 02:19:05 +1000
+Subject: [PATCH] kern/file: Do not leak device_name on error in
+ grub_file_open()
+
+If we have an error in grub_file_open() before we free device_name, we
+will leak it.
+
+Free device_name in the error path and null out the pointer in the good
+path once we free it there.
+
+Signed-off-by: Daniel Axtens <dja@axtens.net>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/kern/file.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/grub-core/kern/file.c b/grub-core/kern/file.c
+index 5845445..ffdcaba 100644
+--- a/grub-core/kern/file.c
++++ b/grub-core/kern/file.c
+@@ -79,6 +79,7 @@ grub_file_open (const char *name, enum grub_file_type type)
+ 
+   device = grub_device_open (device_name);
+   grub_free (device_name);
++  device_name = NULL;
+   if (! device)
+     goto fail;
+ 
+@@ -131,6 +132,7 @@ grub_file_open (const char *name, enum grub_file_type type)
+   return file;
+ 
+  fail:
++  grub_free (device_name);
+   if (device)
+     grub_device_close (device);
+ 
+-- 
+2.34.1
+

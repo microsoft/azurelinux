@@ -1,0 +1,55 @@
+From ad632ccfbf7933ee3dce71c655ac547a30a0c801 Mon Sep 17 00:00:00 2001
+From: Daniel Axtens <dja@axtens.net>
+Date: Tue, 8 Mar 2022 23:47:46 +1100
+Subject: [PATCH] net/netbuff: Block overly large netbuff allocs
+
+A netbuff shouldn't be too huge. It's bounded by MTU and TCP segment
+reassembly. If we are asked to create one that is unreasonably big, refuse.
+
+This is a hardening measure: if we hit this code, there's a bug somewhere
+else that we should catch and fix.
+
+This commit:
+  - stops the bug propagating any further.
+  - provides a spot to instrument in e.g. fuzzing to try to catch these bugs.
+
+I have put instrumentation (e.g. __builtin_trap() to force a crash) here and
+have not been able to find any more crashes.
+
+Signed-off-by: Daniel Axtens <dja@axtens.net>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/net/netbuff.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/grub-core/net/netbuff.c b/grub-core/net/netbuff.c
+index dbeeefe..d5e9e9a 100644
+--- a/grub-core/net/netbuff.c
++++ b/grub-core/net/netbuff.c
+@@ -79,10 +79,23 @@ grub_netbuff_alloc (grub_size_t len)
+ 
+   COMPILE_TIME_ASSERT (NETBUFF_ALIGN % sizeof (grub_properly_aligned_t) == 0);
+ 
++  /*
++   * The largest size of a TCP packet is 64 KiB, and everything else
++   * should be a lot smaller - most MTUs are 1500 or less. Cap data
++   * size at 64 KiB + a buffer.
++   */
++  if (len > 0xffffUL + 0x1000UL)
++    {
++      grub_error (GRUB_ERR_BUG,
++                  "attempted to allocate a packet that is too big");
++      return NULL;
++    }
++
+   if (len < NETBUFFMINLEN)
+     len = NETBUFFMINLEN;
+ 
+   len = ALIGN_UP (len, NETBUFF_ALIGN);
++
+ #ifdef GRUB_MACHINE_EMU
+   data = grub_malloc (len + sizeof (*nb));
+ #else
+-- 
+2.34.1
+
