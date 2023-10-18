@@ -5,7 +5,7 @@
     "userName": "",
     "password": "",
     "storageAccount": "marinerccache",
-    "containerName": "20-stable",
+    "containerName": "30-stable",
     "tagsFolder": "tags",
     "downloadEnabled": true,
     "downloadLatest": true,
