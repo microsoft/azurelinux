@@ -6,7 +6,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -330,17 +330,8 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %files
 %defattr(-,root,root)
 %license COPYING
-%dir %{_sysconfdir}/grub.d
 %dir /boot/%{name}
 %config() %{_sysconfdir}/bash_completion.d/grub
-%config() %{_sysconfdir}/grub.d/00_header
-%config() %{_sysconfdir}/grub.d/10_linux
-%config() %{_sysconfdir}/grub.d/20_linux_xen
-%config() %{_sysconfdir}/grub.d/30_os-prober
-%config() %{_sysconfdir}/grub.d/30_uefi-firmware
-%config(noreplace) %{_sysconfdir}/grub.d/40_custom
-%config(noreplace) %{_sysconfdir}/grub.d/41_custom
-%{_sysconfdir}/grub.d/README
 /sbin/*
 %{_bindir}/*
 %{_datarootdir}/grub/*
@@ -384,9 +375,21 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %{_rpmconfigdir}/macros.d/macros.grub2
 
 %files configuration
-%{_sysconfdir}/default/grub.d
+%dir %{_sysconfdir}/grub.d
+%dir %{_sysconfdir}/default/grub.d
+%{_sysconfdir}/grub.d/README
+%config() %{_sysconfdir}/grub.d/00_header
+%config() %{_sysconfdir}/grub.d/10_linux
+%config() %{_sysconfdir}/grub.d/20_linux_xen
+%config() %{_sysconfdir}/grub.d/30_os-prober
+%config() %{_sysconfdir}/grub.d/30_uefi-firmware
+%config(noreplace) %{_sysconfdir}/grub.d/40_custom
+%config(noreplace) %{_sysconfdir}/grub.d/41_custom
 
 %changelog
+* Mon Nov 27 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.06-13
+- Move /etc/grub.d to the configuration subpackage
+
 * Wed Oct 18 2023 Gary Swalling <gaswal@microsoft.com> - 2.06-12
 - CVE-2021-3695 CVE-2021-3696 CVE-2021-3697 CVE-2022-28733 CVE-2022-28734
   CVE-2022-28735 CVE-2022-28736 and increment SBAT level to 2
