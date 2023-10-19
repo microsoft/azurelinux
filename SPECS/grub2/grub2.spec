@@ -6,7 +6,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -148,6 +148,7 @@ the grub2-mkconfig flow on AzureLinux
 %package configuration
 Summary:        Location for local grub configurations
 Group:          System Environment/Base
+Requires:       %{name} >= 2.06-12
 
 %description configuration
 Directory for package-specific boot configurations
@@ -298,17 +299,8 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %files
 %defattr(-,root,root)
 %license COPYING
-%dir %{_sysconfdir}/grub.d
 %dir /boot/%{name}
 %config() %{_sysconfdir}/bash_completion.d/grub
-%config() %{_sysconfdir}/grub.d/00_header
-%config() %{_sysconfdir}/grub.d/10_linux
-%config() %{_sysconfdir}/grub.d/20_linux_xen
-%config() %{_sysconfdir}/grub.d/30_os-prober
-%config() %{_sysconfdir}/grub.d/30_uefi-firmware
-%config(noreplace) %{_sysconfdir}/grub.d/40_custom
-%config(noreplace) %{_sysconfdir}/grub.d/41_custom
-%{_sysconfdir}/grub.d/README
 /sbin/*
 %{_bindir}/*
 %{_datarootdir}/grub/*
@@ -352,9 +344,21 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %{_rpmconfigdir}/macros.d/macros.grub2
 
 %files configuration
-%{_sysconfdir}/default/grub.d
+%dir %{_sysconfdir}/grub.d
+%dir %{_sysconfdir}/default/grub.d
+%{_sysconfdir}/grub.d/README
+%config() %{_sysconfdir}/grub.d/00_header
+%config() %{_sysconfdir}/grub.d/10_linux
+%config() %{_sysconfdir}/grub.d/20_linux_xen
+%config() %{_sysconfdir}/grub.d/30_os-prober
+%config() %{_sysconfdir}/grub.d/30_uefi-firmware
+%config(noreplace) %{_sysconfdir}/grub.d/40_custom
+%config(noreplace) %{_sysconfdir}/grub.d/41_custom
 
 %changelog
+* Fri Sep 28 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.06-12
+- Move /etc/grub.d to the configuration subpackage
+
 * Fri Aug 11 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.06-11
 - Enable support for grub2-mkconfig grub.cfg generation
 - Introduce rpm-macros, configuration subpackage
