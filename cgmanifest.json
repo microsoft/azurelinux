@@ -18903,6 +18903,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Net-IP",
+          "version": "1.26",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Net/Net-IP-1.26.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-Net-LibIDN2",
           "version": "1.01",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/T/TH/THOR/Net-LibIDN2-1.01.tar.gz"
