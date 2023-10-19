@@ -78,7 +78,7 @@ in this package.
 Summary:        FreeRADIUS utilities
 Requires:       %{name} = %{version}-%{release}
 Requires:       libpcap >= 0.9.4
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+Requires:       perl-Net-IP
 
 %description utils
 The FreeRADIUS server has a number of features found in other servers,
