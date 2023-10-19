@@ -7,8 +7,8 @@ glibc-iconv-2.35-6.cm2.aarch64.rpm
 glibc-lang-2.35-6.cm2.aarch64.rpm
 glibc-nscd-2.35-6.cm2.aarch64.rpm
 glibc-tools-2.35-6.cm2.aarch64.rpm
-zlib-1.2.13-1.cm2.aarch64.rpm
-zlib-devel-1.2.13-1.cm2.aarch64.rpm
+zlib-1.2.13-2.cm2.aarch64.rpm
+zlib-devel-1.2.13-2.cm2.aarch64.rpm
 file-5.40-2.cm2.aarch64.rpm
 file-devel-5.40-2.cm2.aarch64.rpm
 file-libs-5.40-2.cm2.aarch64.rpm
