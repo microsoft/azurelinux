@@ -42,7 +42,7 @@ steps:
           artifactFeeds: "${{ parameters.pipArtifactFeeds }}"
         displayName: "Authenticate to custom pip artifact feeds"
 
-  - bash: pip3 install junit_xml
+  - bash: pip3 install junit-xml==1.9
     displayName: "Install Python dependencies"
 
   - task: PythonScript@0
