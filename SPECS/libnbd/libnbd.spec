@@ -3,13 +3,13 @@
 Summary:        NBD client library in userspace
 Name:           libnbd
 Version:        1.12.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://gitlab.com/nbdkit/libnbd
 Source0:        https://libguestfs.org/download/libnbd/%{source_directory}/%{name}-%{version}.tar.gz
-
+Patch0:         CVE-2023-5215.patch
 # For the core library.
 BuildRequires:  gcc
 BuildRequires:  make
@@ -232,6 +232,9 @@ skip_test tests/connect-tcp6
 
 
 %changelog
+* Thu Oct 19 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 1.12.1-3
+- Add patch to fix CVE-2023-5215
+
 * Fri Jul 15 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.12.1-2
 - Promote to Mariner base repo
 - Lint spec
