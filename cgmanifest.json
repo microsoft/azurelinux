@@ -30821,7 +30821,7 @@
         "other": {
           "name": "zlib",
           "version": "1.2.13",
-          "downloadUrl": "https://www.zlib.net/zlib-1.2.13.tar.xz"
+          "downloadUrl": "https://github.com/madler/zlib/releases/download/v1.2.13/zlib-1.2.13.tar.xz"
         }
       }
     },
