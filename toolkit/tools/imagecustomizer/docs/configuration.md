@@ -27,11 +27,13 @@ Operation ordering:
 
 6. Enable/disable services. ([Services](#services))
 
-7. Run post-install scripts. ([PostInstallScripts](#postinstallscripts-script))
+7. Configure kernel modules.
 
-8. Run post-finalize scripts. ([FinalizeImageScripts](#finalizeimagescripts-script))
+8. Run post-install scripts. ([PostInstallScripts](#postinstallscripts-script))
 
-9. Delete `/etc/resolv.conf` file.
+9. Run post-finalize scripts. ([FinalizeImageScripts](#finalizeimagescripts-script))
+
+10. Delete `/etc/resolv.conf` file.
 
 Note: The `/etc/resolv.conf` file is overridden so that the package installation and
 customization scripts can have access to the network.
@@ -88,6 +90,51 @@ SystemConfig:
     files/a.txt:
     - Path: /a.txt
       Permissions: "664"
+```
+
+## Module
+
+Options for configuring a kernel module.
+
+### Name
+
+Name of the module.
+
+```yaml
+SystemConfig:
+  Modules:
+    Load:
+    - Name: br_netfilter
+```
+
+## Modules
+
+Options for configuring kernel modules.
+
+### Load [[Module](#module)[]]
+
+Sets kernel modules to be loaded automatically on boot.
+
+Implemented by adding an entry to `/etc/modules-load.d/`.
+
+```yaml
+SystemConfig:
+  Modules:
+    Load:
+    - Name: br_netfilter
+```
+
+### Disable [[Module](#module)[]]
+
+Disable kernel modules from being loaded.
+
+Implemented by adding a "blacklist" entry to `/etc/modprobe.d/`.
+
+```yaml
+SystemConfig:
+  Modules:
+    Disable:
+    - Name: mousedev
 ```
 
 ## PackageList
@@ -375,6 +422,10 @@ SystemConfig:
     Enable:
     - sshd
 ```
+
+### Modules [[Modules](#modules)]
+
+Options for configuration kernel modules.
 
 ## User
 
