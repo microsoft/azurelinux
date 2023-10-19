@@ -24,13 +24,11 @@ Required.
 
 The image format of the output customized image file.
 
-Options: vhd, vhdx, qcow2, and raw.
-
 ## --output-image-format=FORMAT
 
 Required.
 
-he image format of the output customized image file.
+The image format of the output customized image file.
 
 Options: vhd, vhdx, qcow2, and raw.
 
@@ -74,6 +72,8 @@ Disable the base image's installed RPM repos as a source of RPMs during package
 installation.
 
 ## --log-level=LEVEL
+
+Default: `info`
 
 The verbosity of logs the tool outputs.
 

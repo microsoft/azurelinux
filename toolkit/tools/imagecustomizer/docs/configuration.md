@@ -322,7 +322,7 @@ Example:
 
 ```yaml
 SystemConfig:
-  PackageListsRemove:
+  PackageListsUpdate:
   - lists/ssh.yaml
 ```
 
