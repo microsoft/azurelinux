@@ -17,10 +17,10 @@ func (m *Module) IsValid() error {
 		return fmt.Errorf("name of module may not be empty")
 	}
 
-	if len(m.Options) == 0 {
+	if m.Options != nil {
 		for key, value := range m.Options {
 			if key == "" || value == "" {
-				return fmt.Errorf("invalid key:value pair in options")
+				return fmt.Errorf("invalid key:value pair in options for module %s", m.Name)
 			}
 		}
 	}
