@@ -7,7 +7,7 @@ License:        zlib
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        https://www.zlib.net/%{name}-%{version}.tar.xz
+Source0:        https://github.com/madler/zlib/releases/download/v%{version}/%{name}-%{version}.tar.xz
 Patch0:         CVE-2023-45853.patch
 %description
 Compression and decompression routines
@@ -52,6 +52,7 @@ make  %{?_smp_mflags} check
 %changelog
 * Thu Oct 19 2023 Nan Liu <liunan@microsoft.com> - 1.2.13-2
 - Add patch to address CVE-2023-45853
+- Fix invalid source URL
 
 * Thu Apr 27 2023 Muhammad Falak <mwani@microsoft.com> - 1.2.13-1
 - Upgrade version to address java exception
