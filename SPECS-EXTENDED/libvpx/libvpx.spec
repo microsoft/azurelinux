@@ -164,6 +164,7 @@ ln -sf libvpx.so.%{soversion} libvpx.so.%{somajor}.%{sominor}
 popd
 %endif
 
+# This symbolic linking is needed for the tests to execute successfully.
 ln -sf %{buildroot}%{_libdir}/libvpx.so.%{somajor} /usr/lib/libvpx.so.%{somajor}
 
 pushd %{buildroot}
@@ -220,7 +221,7 @@ make test
 %files
 %license LICENSE
 %doc AUTHORS CHANGELOG README
-%{_libdir}/libvpx.so.*
+%{_libdir}/libvpx.so.%{somajor}*
 
 %files devel
 # These are SDK docs, not really useful to an end-user.
