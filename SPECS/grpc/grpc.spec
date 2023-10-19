@@ -1,7 +1,7 @@
 Summary:        Open source remote procedure call (RPC) framework
 Name:           grpc
 Version:        1.42.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -33,6 +33,8 @@ BuildRequires:      python3-six
 BuildRequires:      python3-wheel
 BuildRequires:      python3-setuptools
 BuildRequires:      python3-protobuf
+
+Patch0:             CVE-2023-22217.patch
 
 
 %description
@@ -69,6 +71,8 @@ Python language bindings for gRPC.
 %prep
 %setup -q -n %{name}-%{version}
 %setup -T -D -a 1
+
+%autopatch -p 1
 
 %build
 # Updating used C++ version to be compatible with the build dependencies.
@@ -148,6 +152,9 @@ export GRPC_PYTHON_BUILD_SYSTEM_ABSL=True
 
 
 %changelog
+* Thu Oct 19 2023 Francisco Huelsz Prince <frhuelsz@ieee.org> - 1.42.0-8
+- Add patch for CVE-2023-22217 in bundled c-ares.
+
 * Thu Oct 19 2023 Dan Streetman <ddstreet@ieee.org> - 1.42.0-7
 - Bump release to rebuild with updated version of Go.
 
