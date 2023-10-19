@@ -71,6 +71,8 @@ sodiff-repo: $(SODIFF_REPO_FILE)
 
 $(SODIFF_REPO_FILE):
 	echo $(SODIFF_REPO_SOURCES) | sed -E 's:([^ ]+[.]repo):$(SPECS_DIR)/mariner-repos/\1:g' | xargs cat > $(SODIFF_REPO_FILE)
+	awk '{if ($$0 ~ /enabled=0/) $$0="enabled=1"; print}' $(SODIFF_REPO_FILE) > $(SODIFF_REPO_FILE)_fixed
+	mv $(SODIFF_REPO_FILE)_fixed $(SODIFF_REPO_FILE)
 
 # sodiff-setup: populate gpg-keys from SPECS/mariner-repos for mariner official repos for ubuntu
 .PHONY: sodiff-setup

@@ -14,11 +14,11 @@ mkdir -p "$sodiff_out_dir"
 
 # Prepare mariner/ubuntu compatibility calls
 
-common_options="-c $repo_file_path --releasever $mariner_version"
+common_options="--disablerepo=\"*\" -c $repo_file_path --releasever $mariner_version"
 
 DNF_COMMAND=dnf
 # Cache RPM metadata
->/dev/null dnf $common_options -y makecache
+>/dev/null $DNF_COMMAND $common_options -y makecache
 
 # Get packages from stdin
 pkgs=`cat`
