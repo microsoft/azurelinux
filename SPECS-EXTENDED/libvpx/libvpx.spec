@@ -216,7 +216,7 @@ rm -rf %{buildroot}%{_prefix}/src
 %ldconfig_scriptlets
 
 %check
-make test
+make -j $(nproc) test
 
 %files
 %license LICENSE
