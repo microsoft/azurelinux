@@ -9,8 +9,6 @@ pr: none
 
 variables:
   - group: "Agent pools (DEV)"
-  - name: agentPool
-    value: "$(DEV_AMD64_Ubuntu_Managed)"
 
 resources:
   repositories:
@@ -23,7 +21,7 @@ jobs:
     pool:
       type: linux
       isCustom: true
-      name: "$(agentPool)"
+      name: "$(DEV_AMD64_Ubuntu_Managed)"
     timeoutInMinutes: 15
     displayName: 'Cherry-pick commit'
 
