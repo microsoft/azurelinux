@@ -8,12 +8,21 @@ import (
 )
 
 type Module struct {
-	Name string `yaml:"Name"`
+	Name    string            `yaml:"Name"`
+	Options map[string]string `yaml:"Options,omitempty"`
 }
 
 func (m *Module) IsValid() error {
 	if m.Name == "" {
 		return fmt.Errorf("name of module may not be empty")
+	}
+
+	if len(m.Options) == 0 {
+		for key, value := range m.Options {
+			if key == "" || value == "" {
+				return fmt.Errorf("invalid key:value pair in options")
+			}
+		}
 	}
 
 	return nil

@@ -4,5 +4,8 @@ SystemConfig:
       - Name: br_netfilter
       - Name: ib_uverbs
       - Name: mlx5_ib
+      - Name: vfio
+        Options:
+          enable_unsafe_noiommu_mode: "Y"
     Disable:
       - Name: mousedev

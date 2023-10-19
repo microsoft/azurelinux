@@ -8,6 +8,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 	"strconv"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
@@ -345,6 +346,21 @@ func loadOrDisableModules(modules imagecustomizerapi.Modules, imageChroot *safec
 		err = file.Write(module.Name, moduleFilePath)
 		if err != nil {
 			return fmt.Errorf("failed to write module load configuration: %w", err)
+		}
+
+		if module.Options != nil {
+			var options []string
+			for key, value := range module.Options {
+				options = append(options, fmt.Sprintf("%s=%s", key, value))
+			}
+
+			moduleOptionsFileName := module.Name + "-options.conf"
+			moduleOptionsFilePath := filepath.Join(imageChroot.RootDir(), "/etc/modprobe.d/", moduleOptionsFileName)
+			data := fmt.Sprintf("options %s %s\n", module.Name, strings.Join(options, " "))
+			err = file.Write(data, moduleOptionsFilePath)
+			if err != nil {
+				return fmt.Errorf("failed to write module options configuration: %w", err)
+			}
 		}
 	}
 
