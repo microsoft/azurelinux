@@ -22,7 +22,7 @@ Advantages:
 
 Disadvantages:
 
-- Not all Linux tools place nicely when run under chroot. (Though most of the most
+- Not all Linux tools play nicely when run under chroot. (Though most of the most
   common tools do play nicely since they are used to build Linux images under chroot.)
   So, some customizations aren't possible to do using MIC.
   (For example, initializing a Kubernetes cluster node.)
