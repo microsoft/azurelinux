@@ -52,6 +52,7 @@ COPY [ "./toolchain-sha256sums", \
        "./toolchain-remote-wget-list", \
        "./toolchain-local-wget-list", \
        "./rpm-define-RPM-LD-FLAGS.patch", \
+       "./linker-script-readonly-keyword-support.patch", \
        "$LFS/tools/" ]
 
 # Download source, then create lfs user and group.
@@ -81,6 +82,8 @@ COPY [ "./.bashrc", \
 
 USER lfs
 COPY [ "./toolchain_build_temp_tools.sh", \
+       "./coreutils-fix-get-sys_getdents-aarch64.patch", \
+       "./CVE-2023-4039.patch", \
        "$LFS/tools/" ]
 
 USER root
@@ -96,6 +99,8 @@ COPY [ "./toolchain_initial_chroot_setup.sh", \
        "./unmount_chroot.sh", \
        "./go14_bootstrap_aarch64.patch", \
        "./rpm-define-RPM-LD-FLAGS.patch", \
+       "./cpio_extern_nocommon.patch", \
+       "./CVE-2021-38185.patch", \
        "$LFS/tools/" ]
 
 USER root

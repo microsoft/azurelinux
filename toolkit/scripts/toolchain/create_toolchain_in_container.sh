@@ -27,8 +27,17 @@ if [ "$INCREMENTAL_TOOLCHAIN" != "y" ] || [ -z "$(docker images -q marinertoolch
     # docker rmi $(docker images -a -q)
     # docker rmi $(docker history marinertoolchain -q)
 
+    # CPIO patch
+    cp -v $MARINER_SPECS_DIR/cpio/cpio_extern_nocommon.patch ./container
+    cp -v $MARINER_SPECS_DIR/cpio/CVE-2021-38185.patch ./container
+    # Coreutils aarch64 patch
+    cp -v $MARINER_SPECS_DIR/coreutils/coreutils-fix-get-sys_getdents-aarch64.patch ./container
+    # Binutils readonly patch
+    cp -v $MARINER_SPECS_DIR/binutils/linker-script-readonly-keyword-support.patch ./container/linker-script-readonly-keyword-support.patch
     # RPM LD_FLAGS patch
     cp -v $MARINER_SPECS_DIR/rpm/define-RPM_LD_FLAGS.patch ./container/rpm-define-RPM-LD-FLAGS.patch
+    # GCC patch
+    cp -v $MARINER_SPECS_DIR/gcc/CVE-2023-4039.patch ./container/CVE-2023-4039.patch
 
     # Create .bashrc file for lfs user in the container
     cat > ./container/.bashrc << EOF
@@ -71,11 +80,11 @@ temporary_toolchain_container=$(docker create --name marinertoolchain-container-
 docker cp "${temporary_toolchain_container}":/temptoolchain/lfs .
 docker rm marinertoolchain-container-temp
 
-rm -rf ./populated_toolchain
+rm -rvf ./populated_toolchain
 mv ./lfs ./populated_toolchain
-rm -rf ./populated_toolchain/.dockerenv
-rm -rf ./populated_toolchain/sources
-rm -rf ./populated_toolchain/tools/libexec/gcc
+rm -rvf ./populated_toolchain/.dockerenv
+rm -rvf ./populated_toolchain/sources
+rm -rvf ./populated_toolchain/tools/libexec/gcc
 
 echo "Compressing toolchain_from_container.tar.gz"
 tar -I "$ARCHIVE_TOOL" -cf toolchain_from_container.tar.gz populated_toolchain
@@ -84,8 +93,13 @@ ls -la ./populated_toolchain
 popd
 
 # Cleanup patch files used in container
-rm -f ./container/rpm-define-RPM-LD-FLAGS.patch
-rm -f ./container/.bashrc
-rm -f ./container/toolchain-local-wget-list
+rm -vf ./container/rpm-define-RPM-LD-FLAGS.patch
+rm -vf ./container/coreutils-fix-get-sys_getdents-aarch64.patch
+rm -vf ./container/cpio_extern_nocommon.patch
+rm -vf ./container/CVE-2021-38185.patch
+rm -vf ./container/linker-script-readonly-keyword-support.patch
+rm -vf ./container/CVE-2023-4039.patch
+rm -vf ./container/.bashrc
+rm -vf ./container/toolchain-local-wget-list
 
 echo Raw toolchain build complete
