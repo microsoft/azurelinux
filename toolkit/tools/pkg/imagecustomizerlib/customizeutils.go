@@ -8,8 +8,8 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
-	"strings"
 	"strconv"
+	"strings"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
