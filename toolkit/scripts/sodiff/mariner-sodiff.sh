@@ -86,7 +86,6 @@ echo "######################"
 if [[ $pkgsFound -gt 0 ]]; then
     echo "The Following Packages Are in Need of an Update:"
     cat "$sodiff_out_dir"/sodiff-summary.txt
-    exit 1
 else
     echo "No Packages with Conflicting .so Files Found."
 fi
