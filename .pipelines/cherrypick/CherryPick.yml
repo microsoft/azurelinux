@@ -1,0 +1,32 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+name: Cherry Pick fast-track commits from PR
+
+trigger:
+- fasttrack/*
+pr: none
+
+variables:
+  - group: "Agent pools (DEV)"
+
+resources:
+  repositories:
+    - repository: CBL-Mariner-Pipelines
+      type: git
+      name: mariner/CBL-Mariner-Pipelines
+
+jobs:
+  - job: 'CherryPick'
+    pool:
+      type: linux
+      isCustom: true
+      name: "$(DEV_AMD64_Ubuntu_Managed)"
+    timeoutInMinutes: 15
+    displayName: 'Cherry-pick commit'
+
+    steps:
+    - template: spec-auto-patch-update/pipelines/CherryPick.yml@CBL-Mariner-Pipelines
+      parameters:
+        commitId: $(Build.SourceVersion)
+        sourceBranch: $(Build.SourceBranch)

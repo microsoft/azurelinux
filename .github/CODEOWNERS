@@ -5,7 +5,7 @@
 /.github/CODEOWNERS @microsoft/cbl-mariner-admins
 
 # Modifications to the build pipelines require admin approval.
-/pipelines/* @microsoft/cbl-mariner-admins
+/.pipelines/* @microsoft/cbl-mariner-admins
 
 # Modifications to the CredScan exceptions require admin approval.
 /.config/CredScanSuppressions.json @microsoft/cbl-mariner-admins
