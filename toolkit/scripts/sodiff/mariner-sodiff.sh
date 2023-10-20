@@ -14,7 +14,7 @@ mkdir -p "$sodiff_out_dir"
 
 # Prepare mariner/ubuntu compatibility calls
 
-common_options="--disablerepo=* -c $repo_file_path --releasever $mariner_version"
+common_options="-c $repo_file_path --releasever $mariner_version"
 
 DNF_COMMAND=dnf
 # Cache RPM metadata
