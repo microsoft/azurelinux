@@ -11481,8 +11481,8 @@
         "type": "other",
         "other": {
           "name": "libvpx",
-          "version": "1.8.2",
-          "downloadUrl": "https://github.com/webmproject/libvpx/archive/v1.8.2.tar.gz"
+          "version": "1.13.1",
+          "downloadUrl": "https://github.com/webmproject/libvpx/archive/v1.13.1.tar.gz"
         }
       }
     },

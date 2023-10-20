@@ -1,14 +1,14 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-%global somajor 6
+%global somajor 8
 %global sominor 0
 %global sotiny  0
 %global soversion %{somajor}.%{sominor}.%{sotiny}
 
 Name:			libvpx
 Summary:		VP8/VP9 Video Codec SDK
-Version:		1.8.2
-Release:		4%{?dist}
+Version:		1.13.1
+Release:		1%{?dist}
 License:		BSD
 Source0:		https://github.com/webmproject/libvpx/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:		vpx_config.h
@@ -212,6 +212,11 @@ rm -rf %{buildroot}%{_prefix}/src
 
 %ldconfig_scriptlets
 
+%check
+# This symbolic linking is needed for the tests to execute successfully.
+ln -sf %{buildroot}%{_libdir}/libvpx.so.%{somajor} /usr/lib/libvpx.so.%{somajor}
+make test
+
 %files
 %license LICENSE
 %doc AUTHORS CHANGELOG README
@@ -232,6 +237,10 @@ rm -rf %{buildroot}%{_prefix}/src
 %{_bindir}/*
 
 %changelog
+* Wed Oct 04 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.13.1-1
+- Auto-upgrade to 1.13.1 - to fix CVE.
+- Add %check section.
+
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.8.2-4
 - Updating source URLs.
 - License verified.
