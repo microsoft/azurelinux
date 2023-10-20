@@ -1,8 +1,9 @@
 # Mariner Image Customizer configuration
 
-Top-level type: [Config](#config)
+The Mariner Image Customizer is configured using a YAML (or JSON) file.
+The top level type for this YAML file is the [Config](#config-type) type.
 
-Operation ordering:
+### Operation ordering
 
 1. Override the `/etc/resolv.conf` file with the version from the host OS.
 
@@ -25,28 +26,48 @@ Operation ordering:
 
 5. Add/update users. ([Users](#users-user))
 
-6. Enable/disable services. ([Services](#services))
+6. Enable/disable services. ([Services](#services-type))
 
 7. Configure kernel modules.
 
 8. Run post-install scripts. ([PostInstallScripts](#postinstallscripts-script))
 
-9. Run post-finalize scripts. ([FinalizeImageScripts](#finalizeimagescripts-script))
+9. Run finalize image scripts. ([FinalizeImageScripts](#finalizeimagescripts-script))
 
 10. Delete `/etc/resolv.conf` file.
 
-Note: The `/etc/resolv.conf` file is overridden so that the package installation and
+### /etc/resolv.conf
+
+The `/etc/resolv.conf` file is overridden so that the package installation and
 customization scripts can have access to the network.
-It is assumed there is a process that runs on boot that will set the `/etc/resolv.conf`.
+It is assumed there is a process that runs on boot that will write the
+`/etc/resolv.conf` file.
 For example, `systemd-resolved`.
-Hence why the `/etc/resolv.conf` file is simply deleted at the end instead of being
+Hence, the `/etc/resolv.conf` file is simply deleted at the end instead of being
 restored to its original contents.
 
-## Config
+### Replacing packages
+
+If you wish to replace a package with conflicting package, then you can remove the
+existing package using [PackagesRemove](#packagesremove-string) and then install the
+new package with [PackagesInstall](#packagesinstall-string).
+
+Example:
+
+```yaml
+SystemConfig:
+  PackagesRemove:
+  - kernel
+
+  PackagesInstall:
+  - kernel-hci
+```
+
+## Config type
 
 The top-level type of the configuration.
 
-### SystemConfig [[SystemConfig](#systemconfig)]
+### SystemConfig [[SystemConfig](#systemconfig-type)]
 
 Contains the configuration options for the OS.
 
@@ -55,7 +76,7 @@ SystemConfig:
   Hostname: example-image
 ```
 
-## FileConfig
+## FileConfig type
 
 Specifies options for placing a file in the OS.
 
@@ -92,7 +113,7 @@ SystemConfig:
       Permissions: "664"
 ```
 
-## Module
+## Module type
 
 Options for configuring a kernel module.
 
@@ -107,11 +128,11 @@ SystemConfig:
     - Name: br_netfilter
 ```
 
-## Modules
+## Modules type
 
 Options for configuring kernel modules.
 
-### Load [[Module](#module)[]]
+### Load [[Module](#module-type)[]]
 
 Sets kernel modules to be loaded automatically on boot.
 
@@ -124,7 +145,7 @@ SystemConfig:
     - Name: br_netfilter
 ```
 
-### Disable [[Module](#module)[]]
+### Disable [[Module](#module-type)[]]
 
 Disable kernel modules from being loaded.
 
@@ -137,7 +158,7 @@ SystemConfig:
     - Name: mousedev
 ```
 
-## PackageList
+## PackageList type
 
 Used to split off lists of packages into a separate file.
 This is useful for sharing list of packages between different configuration files.
@@ -159,7 +180,7 @@ Packages:
 - openssh-server
 ```
 
-## Script
+## Script type
 
 Points to a script file (typically a Bash script) to be run during customization.
 
@@ -191,7 +212,7 @@ SystemConfig:
     Args: abc
 ```
 
-## Services
+## Services type
 
 Options for configuring systemd services.
 
@@ -223,7 +244,7 @@ SystemConfig:
     - sshd
 ```
 
-## SystemConfig
+## SystemConfig type
 
 Contains the configuration options for the OS.
 
@@ -258,7 +279,7 @@ SystemConfig:
 Same as [PackagesInstall](#packagesinstall-string) but the packages are specified in a
 separate YAML (or JSON) file.
 
-The other YAML file schema is specified by [PackageList](#packagelist).
+The other YAML file schema is specified by [PackageList](#packagelist-type).
 
 Example:
 
@@ -287,7 +308,7 @@ SystemConfig:
 Same as [PackagesRemove](#packagesremove-string) but the packages are specified in a
 separate YAML (or JSON) file.
 
-The other YAML file schema is specified by [PackageList](#packagelist).
+The other YAML file schema is specified by [PackageList](#packagelist-type).
 
 Example:
 
@@ -316,7 +337,7 @@ SystemConfig:
 Same as [PackagesUpdate](#packagesupdate-string) but the packages are specified in a
 separate YAML (or JSON) file.
 
-The other YAML file schema is specified by [PackageList](#packagelist).
+The other YAML file schema is specified by [PackageList](#packagelist-type).
 
 Example:
 
@@ -340,7 +361,7 @@ SystemConfig:
   - openssh-server
 ```
 
-### AdditionalFiles [Map\<string, [FileConfig](#fileconfig)[]>]
+### AdditionalFiles [Map\<string, [FileConfig](#fileconfig-type)[]>]
 
 Copy files into the OS image.
 
@@ -349,8 +370,8 @@ This property is a dictionary of source file paths to destination files.
 The destination files value can be one of:
 
 - The absolute path of a destination file.
-- A [FileConfig](#fileconfig) object.
-- A list containing a mixture of paths and [FileConfig](#fileconfig) objects.
+- A [FileConfig](#fileconfig-type) object.
+- A list containing a mixture of paths and [FileConfig](#fileconfig-type) objects.
 
 Example:
 
@@ -372,7 +393,7 @@ SystemConfig:
       Permissions: "664"
 ```
 
-### PostInstallScripts [[Script](#script)[]]
+### PostInstallScripts [[Script](#script-type)[]]
 
 Scripts to run against the image after the packages have been added and removed.
 
@@ -386,7 +407,7 @@ SystemConfig:
   - Path: scripts/a.sh
 ```
 
-### FinalizeImageScripts [[Script](#script)[]]
+### FinalizeImageScripts [[Script](#script-type)[]]
 
 Scripts to run against the image just before the image is finalized.
 
@@ -400,7 +421,7 @@ SystemConfig:
   - Path: scripts/a.sh
 ```
 
-### Users [[User](#user)]
+### Users [[User](#user-type)]
 
 Used to add and/or update user accounts.
 
@@ -412,7 +433,7 @@ SystemConfig:
   - Name: test
 ```
 
-### Services [[Services](#services)]
+### Services [[Services](#services-type)]
 
 Options for configuring systemd services.
 
@@ -423,11 +444,11 @@ SystemConfig:
     - sshd
 ```
 
-### Modules [[Modules](#modules)]
+### Modules [[Modules](#modules-type)]
 
 Options for configuration kernel modules.
 
-## User
+## User type
 
 Options for configuring a user account.
 
