@@ -11162,7 +11162,7 @@
         "other": {
           "name": "libtiff",
           "version": "4.6.0",
-          "downloadUrl": "https://gitlab.com/libtiff/libtiff/-/archive/v4.5.1/libtiff-v4.6.0.tar.gz"
+          "downloadUrl": "https://gitlab.com/libtiff/libtiff/-/archive/v4.6.0/libtiff-v4.6.0.tar.gz"
         }
       }
     },
