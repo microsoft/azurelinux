@@ -18,6 +18,7 @@ BuildRequires: lzo-devel
 BuildRequires: ncurses-devel
 BuildRequires: snappy-devel
 BuildRequires: zlib-devel
+BuildRequires: zstd-devel
 Requires:      binutils
 
 %description
