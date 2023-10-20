@@ -9,15 +9,15 @@ import (
 )
 
 type OSSubrelease struct {
-	Name          string `yaml:"Name" file:"NAME"`
-	Version       string `yaml:"Version" file:"VERSION"`
-	ID            string `yaml:"ID" file:"ID"`
-	IDLike        string `yaml:"IDLike" file:"ID_LIKE"`
-	PrettyName    string `yaml:"PrettyName" file:"PRETTY_NAME"`
-	VersionID     string `yaml:"VersionID" file:"VERSION_ID"`
-	BuilderName   string `yaml:"BuilderName" file:"BUILDER_NAME"`
-	BuildDate     string `yaml:"BuildDate" file:"BUILD_DATE"`
-	HomeURL       string `yaml:"HomeURL" file:"HOME_URL"`
+	Name          string `yaml:"Name"          file:"NAME"`
+	Version       string `yaml:"Version"       file:"VERSION"`
+	ID            string `yaml:"ID"            file:"ID"`
+	IDLike        string `yaml:"IDLike"        file:"ID_LIKE"`
+	PrettyName    string `yaml:"PrettyName"    file:"PRETTY_NAME"`
+	VersionID     string `yaml:"VersionID"     file:"VERSION_ID"`
+	BuilderName   string `yaml:"BuilderName"   file:"BUILDER_NAME"`
+	BuildDate     string `yaml:"BuildDate"     file:"BUILD_DATE"`
+	HomeURL       string `yaml:"HomeURL"       file:"HOME_URL"`
 	MarinerBranch string `yaml:"MarinerBranch" file:"MARINER_BRANCH"`
 }
 
