@@ -58,7 +58,6 @@ rm -rf %{buildroot}%{_infodir}
 %{_datarootdir}/texinfo/*
 %dir %{_datarootdir}/texmf
 %{_datarootdir}/texmf/*
-%{_libdir}/texinfo/*
 
 %changelog
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 7.0.3-1
@@ -95,9 +94,9 @@ rm -rf %{buildroot}%{_infodir}
 - Updated to version 6.3-2 due to perl build requires.
 * Tue Mar 28 2017 Xiaolin Li <xiaolinl@vmware.com> 6.3-1
 - Updated to version 6.3.
-* Mon Oct 04 2016 ChangLee <changlee@vmware.com> 6.1-4
+* Tue Oct 04 2016 ChangLee <changlee@vmware.com> 6.1-4
 - Modified %check
-* Wed Jun 27 2016 Divya Thaluru <dthaluru@vmware.com> 6.1-3
+* Mon Jun 27 2016 Divya Thaluru <dthaluru@vmware.com> 6.1-3
 - Removed packaging of debug files
 * Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 6.1-2
 - GA - Bump release of all rpms

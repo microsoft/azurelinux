@@ -85,6 +85,11 @@ make  %{?_smp_mflags}  check
 %{_bindir}/xzdec
 %{_mandir}/man1/*
 %{_mandir}/de/man1/*
+%{_mandir}/fr/man1/*
+%{_mandir}/ko/man1/*
+%{_mandir}/pt_BR/man1/*
+%{_mandir}/ro/man1/*
+%{_mandir}/uk/man1/*
 
 %files devel
 %{_includedir}/lzma.h
