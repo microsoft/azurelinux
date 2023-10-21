@@ -1,7 +1,7 @@
 Summary:        Contains a linker, an assembler, and other tools
 Name:           binutils
-Version:        2.41
-Release:        1%{?dist}
+Version:        2.37
+Release:        7%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,6 +13,9 @@ Patch0:         export-demangle-header.patch
 # Patch1 Source https://sourceware.org/git/?p=binutils-gdb.git;a=commit;h=6b86da53d5ee2022b9065f445d23356190380746
 Patch1:         linker-script-readonly-keyword-support.patch
 Patch2:         thin_archive_descriptor.patch
+Patch3:         CVE-2021-45078.patch
+Patch4:         CVE-2022-38533.patch
+Patch5:         CVE-2022-4285.patch
 Provides:       bundled(libiberty)
 
 %description
@@ -128,9 +131,6 @@ sed -i 's/testsuite/ /g' gold/Makefile
 %{_libdir}/libopcodes.so
 
 %changelog
-* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.41-1
-- Auto-upgrade to 2.41 - Azure Linux 3.0 - package upgrades
-
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.37-7
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
