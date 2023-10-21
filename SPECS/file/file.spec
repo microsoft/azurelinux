@@ -8,7 +8,6 @@ Distribution:   Mariner
 Group:          Applications/File
 URL:            https://www.darwinsys.com/file
 Source0:        http://ftp.astron.com/pub/file/%{name}-%{version}.tar.gz
-Patch1:         fix_xz_mime_type_reporting.patch
 Requires:       %{name}-libs = %{version}-%{release}
 Conflicts:      toybox
 

@@ -78,7 +78,7 @@ make %{?_smp_mflags} check
 
 %files -n libltdl
 %{_libdir}/libltdl.so.7
-%{_libdir}/libltdl.so.7.3.1
+%{_libdir}/libltdl.so.7.3.2
 
 %changelog
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.7-1
