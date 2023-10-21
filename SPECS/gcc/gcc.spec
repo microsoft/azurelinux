@@ -2,14 +2,15 @@
 %define _use_internal_dependency_generator 0
 Summary:        Contains the GNU compiler collection
 Name:           gcc
-Version:        13.2.0
-Release:        1%{?dist}
+Version:        11.2.0
+Release:        7%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://gcc.gnu.org/
 Source0:        https://ftp.gnu.org/gnu/gcc/%{name}-%{version}/%{name}-%{version}.tar.xz
+Patch0:         CVE-2023-4039.patch
 Requires:       gcc-c++ = %{version}-%{release}
 Requires:       gmp
 Requires:       libgcc-atomic = %{version}-%{release}
@@ -288,9 +289,6 @@ $tests_ok
 %{_lib64dir}/libgomp.spec
 
 %changelog
-* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 13.2.0-1
-- Auto-upgrade to 13.2.0 - Azure Linux 3.0 - package upgrades
-
 * Tue Sep 26 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 11.2.0-7
 - Removing 'exit' calls from the '%%check' section.
 

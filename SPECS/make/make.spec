@@ -1,7 +1,7 @@
 Summary:        Program for compiling packages
 Name:           make
-Version:        4.4.1
-Release:        1%{?dist}
+Version:        4.3
+Release:        3%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -43,9 +43,6 @@ rm -rf %{buildroot}%{_infodir}
 %{_mandir}/*/*
 
 %changelog
-* Wed Oct 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.4.1-1
-- Auto-upgrade to 4.4.1 - Azure Linux 3.0 - package upgrades
-
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.3-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
