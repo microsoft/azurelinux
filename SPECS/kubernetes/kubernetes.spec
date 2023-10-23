@@ -9,8 +9,8 @@
 %define container_image_components 'kube-proxy kube-apiserver kube-controller-manager kube-scheduler'
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
-Version:        1.28.2
-Release:        3%{?dist}
+Version:        1.28.3
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -262,6 +262,9 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
+* Mon Oct 23 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 1.28.3-1
+- Upgrade to 1.28.3 to address CVE-2023-44487 and CVE-2023-39325.
+
 * Thu Oct 12 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.28.2-3
 - Bump release to rebuild with updated version of Go.
 
