@@ -14443,8 +14443,8 @@
         "type": "other",
         "other": {
           "name": "nodejs18",
-          "version": "18.17.1",
-          "downloadUrl": "https://nodejs.org/download/release/v18.17.1/node-v18.17.1.tar.xz"
+          "version": "18.18.2",
+          "downloadUrl": "https://nodejs.org/download/release/v18.18.2/node-v18.18.2.tar.xz"
         }
       }
     },
