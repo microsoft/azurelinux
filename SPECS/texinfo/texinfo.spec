@@ -53,6 +53,7 @@ rm -rf %{buildroot}%{_infodir}
 %{_bindir}/pod2texi
 %{_bindir}/texi2any
 %{_bindir}/texindex
+%{_libdir}/texinfo/*
 %{_mandir}/*/*
 %dir %{_datarootdir}/texinfo
 %{_datarootdir}/texinfo/*
