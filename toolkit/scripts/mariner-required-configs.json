@@ -1208,7 +1208,7 @@
                     "AMD64",
                     "ARM64"
                 ],
-                "comment": "Needs to be off for CVE-2022-47940, CVE-2023-38431, CVE-2023-38430, CVE-2023-38427, CVE-2023-32258, CVE-2023-32257, CVE-2023-32254, CVE-2023-32252, CVE-2023-32250, CVE-2023-32247, CVE-2022-47940",
+                "comment": "Needs to be off for CVE-2023-38431, CVE-2023-38430, CVE-2023-38427, CVE-2023-32258, CVE-2023-32257, CVE-2023-32254, CVE-2023-32252, CVE-2023-32250, CVE-2023-32247, CVE-2022-47940",
                 "PR": [
                     "https://github.com/microsoft/CBL-Mariner/pull/6574"
                 ]
