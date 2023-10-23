@@ -211,14 +211,14 @@ if [[ "${mode}" == "build" ]]; then # Configure base image
     if [[ ! -f "${tmp_dir}/hash" ]] || [[ "$(cat "${tmp_dir}/hash")" != "${chroot_hash}" ]]; then
         echo "Chroot file has changed, updating..."
         echo "${chroot_hash}" > "${tmp_dir}/hash"
-        docker import "${chroot_file}" "mcr.microsoft.com/cbl-mariner/containerized-rpmbuild:${version}"
+        docker import "${chroot_file}" $container_img
     else
         echo "Chroot is up-to-date"
     fi
     # Build container_img if it does not exist
     if [[ ! $(docker image inspect --format="ignore me" $container_img 2> /dev/null) ]]; then
         echo "Building container image..."
-        docker import "${chroot_file}" "mcr.microsoft.com/cbl-mariner/containerized-rpmbuild:${version}"
+        docker import "${chroot_file}" $container_img
     fi
 else
     container_img="mcr.microsoft.com/cbl-mariner/base/core:${version}"
