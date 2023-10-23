@@ -167,17 +167,17 @@ rm %{buildroot}%{_bindir}/*.old
 %{_mandir}/man1/*
 
 %changelog
-* Tue Oct 10 2023 Daniel McIlvaney <damcilva@microsoft.com> - 1.72.0-4
+* Tue Oct 10 2023 Daniel McIlvaney <damcilva@microsoft.com> - 1.72.2-4
 - Explicitly call './x.py' instead of 'x.py'
 
-* Wed Oct 04 2023 Minghe Ren <mingheren@microsoft.com> - 1.72.0-3
+* Wed Oct 04 2023 Minghe Ren <mingheren@microsoft.com> - 1.72.2-3
 - Bump release to rebuild against glibc 2.35-6
 
-* Tue Oct 03 2023 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.72.0-2
+* Tue Oct 03 2023 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.72.2-2
 - Bump release to rebuild against glibc 2.35-5
 
-* Wed Sep 06 2023 Daniel McIlvaney <damcilva@microsoft.com> - 1.72.0-1
-- Bump to version 1.72.0 to address CVE-2023-38497, CVE-2023-40030
+* Wed Sep 06 2023 Daniel McIlvaney <damcilva@microsoft.com> - 1.72.2-1
+- Bump to version 1.72.2 to address CVE-2023-38497, CVE-2023-40030
 
 * Tue Aug 22 2023 Rachel Menge <rachelmenge@microsoft.com> - 1.68.2-5
 - Bump release to rebuild against openssl 1.1.1k-26
