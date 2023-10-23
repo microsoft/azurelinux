@@ -98,7 +98,7 @@ func UpdateUserPassword(installRoot, username, hashedPassword string) error {
 	}
 
 	// Find the line that starts with "<user>:<password>:..."
-	findUserEntry, err := regexp.Compile(fmt.Sprintf("(?m)^%s:[^:]:", regexp.QuoteMeta(username)))
+	findUserEntry, err := regexp.Compile(fmt.Sprintf("(?m)^%s:[^:]*:", regexp.QuoteMeta(username)))
 	if err != nil {
 		return fmt.Errorf("failed to compile user (%s) password update regex:\n%w", username, err)
 	}
@@ -111,14 +111,13 @@ func UpdateUserPassword(installRoot, username, hashedPassword string) error {
 
 	shadowFile := string(shadowFileBytes)
 
-	// Update the /etc/shadow file.
-	newEntry := fmt.Sprintf("%v:%v:", username, hashedPassword)
-	newShadowFile := findUserEntry.ReplaceAllLiteralString(shadowFile, newEntry)
-
-	// Check if an update was made.
-	if shadowFile == newShadowFile {
+	// Try to find the user's entry.
+	entryIndexes := findUserEntry.FindStringIndex(shadowFile)
+	if entryIndexes == nil {
 		return fmt.Errorf("failed to find user (%s) in shadow file (%s)", username, shadowFilePath)
 	}
+
+	newShadowFile := fmt.Sprintf("%s%s:%s:%s", shadowFile[:entryIndexes[0]], username, hashedPassword, shadowFile[entryIndexes[1]:])
 
 	// Write new /etc/shadow file.
 	err = file.Write(newShadowFile, shadowFilePath)
