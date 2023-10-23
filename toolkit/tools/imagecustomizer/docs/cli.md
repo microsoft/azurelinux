@@ -22,13 +22,13 @@ Supported image file formats: vhd, vhdx, qcow2, and raw.
 
 Required.
 
-The image format of the output customized image file.
+The file path to write the final customized image to.
 
 ## --output-image-format=FORMAT
 
 Required.
 
-The image format of the output customized image file.
+The image format of the the final customized image.
 
 Options: vhd, vhdx, qcow2, and raw.
 
