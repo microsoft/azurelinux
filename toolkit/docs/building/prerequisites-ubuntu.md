@@ -20,6 +20,7 @@ sudo apt -y install \
     make \
     parted \
     pigz \
+    openssl \
     qemu-utils \
     rpm \
     tar \

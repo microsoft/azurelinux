@@ -235,7 +235,7 @@ func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageC
 	// Hash the password.
 	hashedPassword := password
 	if !user.PasswordHashed {
-		hashedPassword, err = userutils.HashPassword(user.Password)
+		hashedPassword, err = userutils.HashPassword(password)
 		if err != nil {
 			return err
 		}
@@ -249,7 +249,7 @@ func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageC
 
 	if userExists {
 		// Update the user's password.
-		err = installutils.UpdateUserPassword(imageChroot.RootDir(), user.Name, hashedPassword)
+		err = userutils.UpdateUserPassword(imageChroot.RootDir(), user.Name, hashedPassword)
 		if err != nil {
 			return err
 		}

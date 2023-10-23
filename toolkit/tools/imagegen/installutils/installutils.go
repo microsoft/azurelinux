@@ -47,7 +47,6 @@ const (
 	// /boot directory should be only accesible by root. The directories need the execute bit as well.
 	bootDirectoryFileMode = 0400
 	bootDirectoryDirMode  = 0700
-	ShadowFile            = "/etc/shadow"
 )
 
 // PackageList represents the list of packages to install into an image
@@ -1159,7 +1158,7 @@ func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err
 		logger.Log.Debugf("No root user entry found in config file. Setting root password to never expire.")
 
 		// Ignore updating if there is no shadow file to update in the target image
-		installChrootShadowFile := filepath.Join(installChroot.RootDir(), ShadowFile)
+		installChrootShadowFile := filepath.Join(installChroot.RootDir(), userutils.ShadowFile)
 		if exists, ferr := file.PathExists(installChrootShadowFile); ferr != nil {
 			logger.Log.Error("Error accessing shadow file.")
 			return ferr
@@ -1175,7 +1174,7 @@ func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err
 func createUserWithPassword(installChroot *safechroot.Chroot, user configuration.User) (isRoot bool, err error) {
 	var (
 		hashedPassword          string
-		installChrootShadowFile = filepath.Join(installChroot.RootDir(), ShadowFile)
+		installChrootShadowFile = filepath.Join(installChroot.RootDir(), userutils.ShadowFile)
 	)
 
 	// Get the hashed password for the user
@@ -1208,7 +1207,7 @@ func createUserWithPassword(installChroot *safechroot.Chroot, user configuration
 			logger.Log.Debugf("No shadow file to update. Skipping updating user password..")
 		} else {
 			// Update shadow file
-			err = UpdateUserPassword(installChroot.RootDir(), user.Name, hashedPassword)
+			err = userutils.UpdateUserPassword(installChroot.RootDir(), user.Name, hashedPassword)
 			if err != nil {
 				logger.Log.Warnf("Encountered a problem when updating root user password: %s", err)
 				return
@@ -1248,7 +1247,7 @@ func Chage(installChroot *safechroot.Chroot, passwordExpirationInDays int64, use
 		usernameWithColon = fmt.Sprintf("%s:", username)
 	)
 
-	installChrootShadowFile := filepath.Join(installChroot.RootDir(), ShadowFile)
+	installChrootShadowFile := filepath.Join(installChroot.RootDir(), userutils.ShadowFile)
 
 	shadow, err = file.ReadLines(installChrootShadowFile)
 	if err != nil {
@@ -1492,21 +1491,6 @@ func ProvisionUserSSHCerts(installChroot *safechroot.Chroot, username string, ss
 		return
 	}
 
-	return
-}
-
-func UpdateUserPassword(installRoot, username, hashedPassword string) (err error) {
-	const sedDelimiter = "|"
-
-	findPattern := fmt.Sprintf("%v:x:", username)
-	replacePattern := fmt.Sprintf("%v:%v:", username, hashedPassword)
-	filePath := filepath.Join(installRoot, ShadowFile)
-
-	err = sed(findPattern, replacePattern, sedDelimiter, filePath)
-	if err != nil {
-		err = fmt.Errorf("failed to write (%s) hashed password to shadow file (%s):\n%w", username, filePath, err)
-		return
-	}
 	return
 }
 
