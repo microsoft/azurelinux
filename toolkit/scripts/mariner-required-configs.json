@@ -1156,6 +1156,62 @@
                 "PR": [
                     "https://github.com/microsoft/CBL-Mariner/pull/6286"
                 ]
+            },
+            "CONFIG_FPGA_DFL_AFU": {
+                "value": [
+                    "<missing>",
+                    "is not set"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "Needs to be off for CVE-2023-26242",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6286"
+                ]
+            },
+            "CONFIG_VCC": {
+                "value": [
+                    "<missing>",
+                    "is not set"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "Needs to be off for CVE-2023-23039",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6286"
+                ]
+            },
+            "CONFIG_PHY_TEGRA_XUSB": {
+                "value": [
+                    "<missing>",
+                    "is not set"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "Needs to be off for CVE-2023-23000",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6286"
+                ]
+            },
+            "CONFIG_SMB_SERVER": {
+                "value": [
+                    "<missing>",
+                    "is not set"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "Needs to be off for CVE-2023-32258, CVE-2023-32252 (and several others)",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6286"
+                ]
             }
         }
     }
