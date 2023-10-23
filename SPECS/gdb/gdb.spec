@@ -91,11 +91,11 @@ rm -f $(dirname $(gcc -print-libgcc-file-name))/../specs
 %{_mandir}/*/*
 
 %changelog
+* Wed Oct 23 2023 Andy Zaugg <azaugg@linkedin.com> - 13.2-1
+- Upgrade to gdb 13.2
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 11.2-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
-
-* Wed Aug 16 2023 Andy Zaugg <azaugg@linkedin.com> - 13.2
-- Upgrade to gdb 13.2
 
 * Wed May 11 2022 Fanzhe Lyu <falyu@microsoft.com> - 11.2
 - Upgrade to gdb 11.2
