@@ -1,13 +1,14 @@
 Summary:        Compressed file format
 Name:           zchunk
 Version:        1.1.16
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD 2-Clause AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://github.com/zchunk/zchunk
 Source0:        https://github.com/zchunk/zchunk/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         CVE-2023-46228.patch
 BuildRequires:  curl-devel
 BuildRequires:  meson
 BuildRequires:  openssl-devel
@@ -49,6 +50,7 @@ This package contains the headers necessary for building against the zchunk
 library, libzck.
 
 %prep
+%autosetup
 %setup -q
 # Remove bundled sha libraries
 rm -rf src/lib/hash/sha*
@@ -87,6 +89,9 @@ DESTDIR=%{buildroot}/ ninja install
 %{_includedir}/zck.h
 
 %changelog
+* Mon Oct 23 2023 Jonathan Behrens <jbehrens@microsoft.com> - 1.1.16-3
+- Patch CVE-2023-46228
+
 * Mon Apr 11 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.16-2
 - Fixing invalid source URL.
 
