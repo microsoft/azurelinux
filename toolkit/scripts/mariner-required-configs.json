@@ -94,7 +94,8 @@
                     "y"
                 ],
                 "arch": [
-                    "AMD64"
+                    "AMD64",
+                    "ARM64"
                 ],
                 "comment": "Needed for customer",
                 "PR": [
