@@ -1168,7 +1168,7 @@
                 ],
                 "comment": "Needs to be off for CVE-2023-26242",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/6286"
+                    "https://github.com/microsoft/CBL-Mariner/pull/6574"
                 ]
             },
             "CONFIG_VCC": {
@@ -1182,7 +1182,7 @@
                 ],
                 "comment": "Needs to be off for CVE-2023-23039",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/6286"
+                    "https://github.com/microsoft/CBL-Mariner/pull/6574"
                 ]
             },
             "CONFIG_PHY_TEGRA_XUSB": {
@@ -1196,7 +1196,7 @@
                 ],
                 "comment": "Needs to be off for CVE-2023-23000",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/6286"
+                    "https://github.com/microsoft/CBL-Mariner/pull/6574"
                 ]
             },
             "CONFIG_SMB_SERVER": {
@@ -1210,7 +1210,7 @@
                 ],
                 "comment": "Needs to be off for CVE-2023-32258, CVE-2023-32252 (and several others)",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/6286"
+                    "https://github.com/microsoft/CBL-Mariner/pull/6574"
                 ]
             }
         }
