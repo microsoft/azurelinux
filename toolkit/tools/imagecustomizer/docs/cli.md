@@ -16,6 +16,9 @@ Required.
 
 The base image file to customize.
 
+This file is typically one of the standard Mariner core images.
+But it can also be a Mariner image that has been customized.
+
 Supported image file formats: vhd, vhdx, qcow2, and raw.
 
 ## --output-image-file=FILE-PATH
