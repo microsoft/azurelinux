@@ -1,9 +1,9 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 #
-# Dockerfile to Mariner toolchain from scratch
+# Dockerfile to build Mariner toolchain from scratch
 #
-FROM mcr.microsoft.com/cbl-mariner/base/core:2.0.20230609
+FROM mcr.microsoft.com/cbl-mariner/base/core:2.0.20231004
 
 # Tag the layers so we can clean up all the containers associated with a build directory
 ARG MARINER_BUILD_DIR
@@ -51,8 +51,6 @@ RUN tdnf install -y \
 COPY [ "./toolchain-sha256sums", \
        "./toolchain-remote-wget-list", \
        "./toolchain-local-wget-list", \
-       "./rpm-define-RPM-LD-FLAGS.patch", \
-       "./linker-script-readonly-keyword-support.patch", \
        "$LFS/tools/" ]
 
 # Download source, then create lfs user and group.
@@ -83,7 +81,11 @@ COPY [ "./.bashrc", \
 USER lfs
 COPY [ "./toolchain_build_temp_tools.sh", \
        "./coreutils-fix-get-sys_getdents-aarch64.patch", \
+       "./cpio_extern_nocommon.patch", \
        "./CVE-2023-4039.patch", \
+       "./CVE-2021-38185.patch", \
+       "./linker-script-readonly-keyword-support.patch", \
+       "./rpm-define-RPM-LD-FLAGS.patch", \
        "$LFS/tools/" ]
 
 USER root
@@ -97,10 +99,6 @@ COPY [ "./toolchain_initial_chroot_setup.sh", \
        "./toolchain_build_in_chroot.sh", \
        "./mount_chroot_start_build.sh", \
        "./unmount_chroot.sh", \
-       "./go14_bootstrap_aarch64.patch", \
-       "./rpm-define-RPM-LD-FLAGS.patch", \
-       "./cpio_extern_nocommon.patch", \
-       "./CVE-2021-38185.patch", \
        "$LFS/tools/" ]
 
 USER root
