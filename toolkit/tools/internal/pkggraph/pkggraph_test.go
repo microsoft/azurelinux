@@ -949,6 +949,10 @@ func TestReadWriteGraph(t *testing.T) {
 
 // Validate the reference graph is valid, and that it matches the output of the test graph.
 func TestReferenceDOTFile(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Short mode enabled")
+	}
+
 	gIn, err := ReadDOTGraphFile("test_graph_reference.dot")
 	assert.NoError(t, err)
 
