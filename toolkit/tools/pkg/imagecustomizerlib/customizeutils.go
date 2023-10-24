@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"time"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
@@ -65,6 +66,11 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 	}
 
 	err = loadOrDisableModules(config.SystemConfig.Modules, imageChroot)
+	if err != nil {
+		return err
+	}
+
+	err = addCustomizerRelease(imageChroot)
 	if err != nil {
 		return err
 	}
@@ -357,6 +363,27 @@ func loadOrDisableModules(modules imagecustomizerapi.Modules, imageChroot *safec
 		if err != nil {
 			return fmt.Errorf("failed to write module disable configuration: %w", err)
 		}
+	}
+
+	return nil
+}
+
+func addCustomizerRelease(imageChroot *safechroot.Chroot) error {
+	var err error
+
+	logger.Log.Infof("Creating image customizer release file")
+	micVersion := "0.0.0"
+	currentTime := time.Now().Format("2023-10-24T23:30:45Z")
+
+	customizerreleaseFilePath := filepath.Join(imageChroot.RootDir(), "/etc/mariner-customizer-release")
+	err = file.Write(fmt.Sprintf("%s=\"%s\"", "VERSION", micVersion), customizerreleaseFilePath)
+	if err != nil {
+		return fmt.Errorf("error writing version to '%s': %w", customizerreleaseFilePath, err)
+	}
+
+	err = file.Write(fmt.Sprintf("%s=\"%s\"", "BUILD_DATE", currentTime), customizerreleaseFilePath)
+	if err != nil {
+		return fmt.Errorf("error writing build date to '%s': %w", customizerreleaseFilePath, err)
 	}
 
 	return nil
