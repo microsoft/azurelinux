@@ -51,7 +51,7 @@ func PrepareGraphForBuild(pkgGraph *pkggraph.PkgGraph, packagesToBuild, testsToR
 		return
 	}
 
-	optimizedGraph, goalNode, optimizeErr := OptimizeGraph(pkgGraph, canUseCachedImplicit, extraLayers)
+	optimizedGraph, goalNode, optimizeErr := OptimizeGraph(pkgGraph, canUseCachedImplicit)
 	if optimizeErr == nil {
 		logger.Log.Infof("Successfully created solvable subgraph")
 		isOptimized = true
@@ -70,7 +70,7 @@ func PrepareGraphForBuild(pkgGraph *pkggraph.PkgGraph, packagesToBuild, testsToR
 }
 
 // OptimizeGraph will attempt to create a solvable subgraph that satisfies the build goal node.
-func OptimizeGraph(pkgGraph *pkggraph.PkgGraph, canUseCachedImplicit bool, extraLayers int) (optimizedGraph *pkggraph.PkgGraph, goalNode *pkggraph.PkgNode, err error) {
+func OptimizeGraph(pkgGraph *pkggraph.PkgGraph, canUseCachedImplicit bool) (optimizedGraph *pkggraph.PkgGraph, goalNode *pkggraph.PkgNode, err error) {
 	buildGoalNode := pkgGraph.FindGoalNode(buildGoalNodeName)
 	if buildGoalNode == nil {
 		err = fmt.Errorf("could not find goal node %s", buildGoalNodeName)
@@ -86,7 +86,7 @@ func OptimizeGraph(pkgGraph *pkggraph.PkgGraph, canUseCachedImplicit bool, extra
 		}
 
 		// Create a solvable ALL goal node
-		goalNode, err = optimizedGraph.AddGoalNodeWithExtraLayers(allGoalNodeName, nil, nil, true, extraLayers)
+		goalNode, err = optimizedGraph.AddGoalNodeWithExtraLayers(allGoalNodeName, nil, nil, true, 0)
 		if err != nil {
 			logger.Log.Warnf("Failed to add goal node (%s), error: %s", allGoalNodeName, err)
 			return
