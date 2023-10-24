@@ -50,7 +50,7 @@ This package contains the headers necessary for building against the zchunk
 library, libzck.
 
 %prep
-%autosetup
+%autosetup -p1
 # Remove bundled sha libraries
 rm -rf src/lib/hash/sha*
 
