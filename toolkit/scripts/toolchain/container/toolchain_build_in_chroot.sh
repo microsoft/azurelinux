@@ -78,14 +78,6 @@ popd
 rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-${KERNEL_VERSION}
 touch /logs/status_kernel_headers_complete
 
-echo 6.8. Man-pages-5.02
-tar xf man-pages-5.02.tar.xz
-pushd man-pages-5.02
-make install
-popd
-rm -rf man-pages-5.02
-touch /logs/status_man_pages_complete
-
 echo glibc-2.35
 tar xf glibc-2.35.tar.xz
 pushd glibc-2.35
@@ -441,18 +433,20 @@ popd
 rm -rf bzip2-1.0.8
 touch /logs/status_bzip2_complete
 
-echo Pkg-config-0.29.2
-tar xf pkg-config-0.29.2.tar.gz
-pushd pkg-config-0.29.2
+echo Pkgconf-2.0.2
+tar xf pkgconf-2.0.2.tar.xz
+pushd pkgconf-2.0.2
 ./configure --prefix=/usr              \
-            --with-internal-glib       \
-            --disable-host-tool        \
-            --docdir=/usr/share/doc/pkg-config-0.29.2
+            --disable-static           \
+            --docdir=/usr/share/doc/pkgconf-2.0.2
 make -j$(nproc)
 make install
+# create symlinks for compatability with pkg-config
+ln -sv pkgconf   /usr/bin/pkg-config
+ln -sv pkgconf.1 /usr/share/man/man1/pkg-config.1
 popd
-rm -rf pkg-config-0.29.2
-touch /logs/status_pkgconfig_complete
+rm -rf pkgconf-2.0.2
+touch /logs/status_pkgconf_complete
 
 echo Ncurses-6.2
 tar xf ncurses-6.2.tar.gz
@@ -902,23 +896,6 @@ make install
 popd
 rm -rf patch-2.7.6
 touch /logs/status_patch_complete
-
-echo Man-DB-2.10.1
-tar xf man-db-2.10.1.tar.xz
-pushd man-db-2.10.1
-./configure --prefix=/usr                        \
-            --docdir=/usr/share/doc/man-db-2.10.1 \
-            --sysconfdir=/etc                    \
-            --disable-setuid                     \
-            --with-browser=/usr/bin/lynx         \
-            --with-systemdsystemunitdir=no       \
-            --with-vgrind=/usr/bin/vgrind        \
-            --with-grap=/usr/bin/grap
-make -j$(nproc)
-make install
-popd
-rm -rf man-db-2.10.1
-touch /logs/status_man_db_complete
 
 echo Tar-1.34
 tar xf tar-1.34.tar.xz
