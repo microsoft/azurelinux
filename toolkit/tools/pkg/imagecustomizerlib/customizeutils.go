@@ -8,7 +8,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
-	"reflect"
+	"time"
 	"strconv"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
@@ -70,7 +70,7 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
-	err = addOSSubrelease(config.SystemConfig.OSSubrelease, imageChroot)
+	err = addCustomizerRelease(imageChroot)
 	if err != nil {
 		return err
 	}
@@ -368,32 +368,22 @@ func loadOrDisableModules(modules imagecustomizerapi.Modules, imageChroot *safec
 	return nil
 }
 
-func addOSSubrelease(ossubrelease imagecustomizerapi.OSSubrelease, imageChroot *safechroot.Chroot) error {
+func addCustomizerRelease(imageChroot *safechroot.Chroot) error {
 	var err error
 
-	val := reflect.ValueOf(ossubrelease)
-	typ := reflect.TypeOf(ossubrelease)
+	logger.Log.Infof("Creating image customizer release file")
+	micVersion := "0.0.0"
+	currentTime := time.Now().Format("2023-10-24T23:30:45Z")
 
-	var lines []string
-
-	// Iterate over all fields of the OSSubrelease struct
-	for i := 0; i < val.NumField(); i++ {
-		fieldValue := val.Field(i)
-		fieldType := typ.Field(i)
-
-		fieldName := fieldType.Tag.Get("file")
-
-		// Construct the string and add it to the lines slice
-		line := fmt.Sprintf("%s=\"%s\"", fieldName, fieldValue)
-		lines = append(lines, line)
+	customizerreleaseFilePath := filepath.Join(imageChroot.RootDir(), "/etc/mariner-customizer-release")
+	err = file.Write(fmt.Sprintf("%s=\"%s\"", "VERSION", micVersion), customizerreleaseFilePath)
+	if err != nil {
+		return fmt.Errorf("error writing version to '%s': %w", customizerreleaseFilePath, err)
 	}
 
-	lines = append(lines, "")
-	ossubreleaseFilePath := filepath.Join(imageChroot.RootDir(), "/etc/os-subrelease")
-	logger.Log.Infof("Writing os-subrelease content to '%s'", ossubreleaseFilePath)
-	err = file.WriteLines(lines, ossubreleaseFilePath)
+	err = file.Write(fmt.Sprintf("%s=\"%s\"", "BUILD_DATE", currentTime), customizerreleaseFilePath)
 	if err != nil {
-		return fmt.Errorf("error writing os-subrelease content to '%s': %w", ossubreleaseFilePath, err)
+		return fmt.Errorf("error writing build date to '%s': %w", customizerreleaseFilePath, err)
 	}
 
 	return nil
