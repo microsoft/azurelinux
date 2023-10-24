@@ -1,17 +1,12 @@
 # Retrieved from 'deps/npm/package.json' inside the sources tarball.
 %define npm_version 9.8.1
 
-# Unfortunately our 'filesystem' package conflicts with /usr/lib/debug
-# and /usr/lib/debug/usr from any/all debuginfo packages, so I guess
-# we have to disable debuginfo for now
-%global debug_package %{nil}
-
 Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs18
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
 Version:        18.18.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD and MIT and Public Domain and NAIST-2003 and Artistic-2.0
 Group:          Applications/System
 Vendor:         Microsoft Corporation
@@ -121,6 +116,9 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
+* Thu Oct 19 2023 Dan Streetman <ddstreet@ieee.org> - 18.18.2-2
+- Re-enable building debuginfo. We can just ignore the dirs conflict failure in the pipelines! :)
+
 * Wed Oct 18 2023 Dan Streetman <ddstreet@ieee.org> - 18.18.2-1
 - Update to 18.18.2 to fix CVE-2023-44487
 

@@ -1,0 +1,16 @@
+--- ipcount
++++ ipcount
+@@ -1,4 +1,4 @@
+-#!perl -w
++#!/usr/bin/perl -w
+ 
+ # Copyright (c) 2000                            RIPE NCC
+ #
+--- iptab
++++ iptab
+@@ -1,4 +1,4 @@
+-#!perl
++#!/usr/bin/perl
+ 
+ use Net::IP;
+ use strict;

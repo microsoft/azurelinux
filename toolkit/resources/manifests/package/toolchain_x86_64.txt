@@ -30,8 +30,8 @@ check-debuginfo-0.15.2-1.cm2.x86_64.rpm
 chkconfig-1.20-4.cm2.x86_64.rpm
 chkconfig-debuginfo-1.20-4.cm2.x86_64.rpm
 chkconfig-lang-1.20-4.cm2.x86_64.rpm
-cmake-3.21.4-9.cm2.x86_64.rpm
-cmake-debuginfo-3.21.4-9.cm2.x86_64.rpm
+cmake-3.21.4-10.cm2.x86_64.rpm
+cmake-debuginfo-3.21.4-10.cm2.x86_64.rpm
 coreutils-8.32-7.cm2.x86_64.rpm
 coreutils-debuginfo-8.32-7.cm2.x86_64.rpm
 coreutils-lang-8.32-7.cm2.x86_64.rpm
@@ -89,8 +89,8 @@ findutils-lang-4.8.0-5.cm2.x86_64.rpm
 flex-2.6.4-7.cm2.x86_64.rpm
 flex-debuginfo-2.6.4-7.cm2.x86_64.rpm
 flex-devel-2.6.4-7.cm2.x86_64.rpm
-gawk-5.1.0-2.cm2.x86_64.rpm
-gawk-debuginfo-5.1.0-2.cm2.x86_64.rpm
+gawk-5.1.1-1.cm2.x86_64.rpm
+gawk-debuginfo-5.1.1-1.cm2.x86_64.rpm
 gcc-11.2.0-7.cm2.x86_64.rpm
 gcc-c++-11.2.0-7.cm2.x86_64.rpm
 gcc-debuginfo-11.2.0-7.cm2.x86_64.rpm

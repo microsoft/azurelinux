@@ -198,7 +198,7 @@ sed -i "s~<AARCH>~$(uname -m)~" $tmp_dir/welcome.txt
 cp resources/setup_functions.sh $tmp_dir/setup_functions.sh
 sed -i "s~<TOPDIR>~${topdir}~" $tmp_dir/setup_functions.sh
 
-# ============ Build the dockerfile ============
+# ============ Build the image ============
 dockerfile="${script_dir}/resources/mariner.Dockerfile"
 
 if [[ "${mode}" == "build" ]]; then # Configure base image
@@ -206,15 +206,20 @@ if [[ "${mode}" == "build" ]]; then # Configure base image
     chroot_file="$BUILD_DIR/worker/worker_chroot.tar.gz"
     if [[ ! -f "${chroot_file}" ]]; then build_worker_chroot; fi
     chroot_hash=$(sha256sum "${chroot_file}" | cut -d' ' -f1)
+    container_img="mcr.microsoft.com/cbl-mariner/containerized-rpmbuild:${version}"
     # Check if the chroot file's hash has changed since the last build
     if [[ ! -f "${tmp_dir}/hash" ]] || [[ "$(cat "${tmp_dir}/hash")" != "${chroot_hash}" ]]; then
         echo "Chroot file has changed, updating..."
         echo "${chroot_hash}" > "${tmp_dir}/hash"
-        docker import "${chroot_file}" "mcr.microsoft.com/cbl-mariner/containerized-rpmbuild:${version}"
+        docker import "${chroot_file}" $container_img
     else
         echo "Chroot is up-to-date"
     fi
-    container_img="mcr.microsoft.com/cbl-mariner/containerized-rpmbuild:${version}"
+    # Build container_img if it does not exist
+    if [[ ! $(docker image inspect --format="ignore me" $container_img 2> /dev/null) ]]; then
+        echo "Building container image..."
+        docker import "${chroot_file}" $container_img
+    fi
 else
     container_img="mcr.microsoft.com/cbl-mariner/base/core:${version}"
 fi
