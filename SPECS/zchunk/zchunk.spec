@@ -51,7 +51,6 @@ library, libzck.
 
 %prep
 %autosetup
-%setup -q
 # Remove bundled sha libraries
 rm -rf src/lib/hash/sha*
 
