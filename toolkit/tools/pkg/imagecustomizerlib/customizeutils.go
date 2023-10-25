@@ -372,18 +372,21 @@ func addCustomizerRelease(imageChroot *safechroot.Chroot) error {
 	var err error
 
 	logger.Log.Infof("Creating image customizer release file")
-	micVersion := "0.0.0"
-	currentTime := time.Now().Format("2023-10-24T23:30:45Z")
 
-	customizerreleaseFilePath := filepath.Join(imageChroot.RootDir(), "/etc/mariner-customizer-release")
-	err = file.Write(fmt.Sprintf("%s=\"%s\"", "VERSION", micVersion), customizerreleaseFilePath)
-	if err != nil {
-		return fmt.Errorf("error writing version to '%s': %w", customizerreleaseFilePath, err)
+	// TODO: update micVersion once the mic release process is in place
+	micVersion := "0.0.0"
+	currentTime := time.Now().Format("2006-01-02T15:04:05Z")
+
+	customizerReleaseFilePath := filepath.Join(imageChroot.RootDir(), "/etc/mariner-customizer-release")
+	lines := []string{
+		fmt.Sprintf("%s=\"%s\"", "VERSION", micVersion),
+		fmt.Sprintf("%s=\"%s\"", "BUILD_DATE", currentTime),
+		"",
 	}
 
-	err = file.Write(fmt.Sprintf("%s=\"%s\"", "BUILD_DATE", currentTime), customizerreleaseFilePath)
+	err = file.WriteLines(lines, customizerReleaseFilePath)
 	if err != nil {
-		return fmt.Errorf("error writing build date to '%s': %w", customizerreleaseFilePath, err)
+		return fmt.Errorf("error writing data to '%s': %w", customizerReleaseFilePath, err)
 	}
 
 	return nil
