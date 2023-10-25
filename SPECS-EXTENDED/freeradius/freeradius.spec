@@ -1,11 +1,12 @@
 %global _default_patch_fuzz 2
 # Is elliptic curve cryptography supported?
 %global HAVE_EC_CRYPTO 1
+%global debug_package %{nil}
 
 Summary:        High-performance and highly configurable free RADIUS server
 Name:           freeradius
 Version:        3.2.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -77,6 +78,7 @@ in this package.
 Summary:        FreeRADIUS utilities
 Requires:       %{name} = %{version}-%{release}
 Requires:       libpcap >= 0.9.4
+Requires:       perl-Net-IP
 
 %description utils
 The FreeRADIUS server has a number of features found in other servers,
@@ -141,7 +143,7 @@ This plugin provides the MySQL support for the FreeRADIUS server project.
 
 %package postgresql
 Summary:        Postgresql support for freeradius
-BuildRequires:  libpq-devel
+BuildRequires:  postgresql-devel
 Requires:       %{name} = %{version}-%{release}
 
 %description postgresql
@@ -315,7 +317,7 @@ EOF
 
 # Make sure our user/group is present prior to any package or subpackage installation
 %pre
-%sysusers_create_compat %{SOURCE105}
+%sysusers_create_package %{name} %{SOURCE105}
 
 %preun
 %systemd_preun radiusd.service
@@ -844,6 +846,12 @@ EOF
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/rest
 
 %changelog
+* Wed Oct 18 2023 Archana Choudhary <archana1@microsoft.com> - 3.2.3-2
+- Correct unavailable sysusers_create_compat macro to available sysusers_create_package macro
+- Add runtime requirement for utils subpackage
+- Update build requirement for postgresql subpackage
+- Disable generation of debuginfo package as its files conflict with filsystem package
+
 * Tue Sep 05 2023 Archana Choudhary <archana1@microsoft.com> - 3.2.3-1
 - Upgrade to 3.2.3
 - Address CVE-2022-41860, CVE-2022-41861
