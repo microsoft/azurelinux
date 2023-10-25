@@ -46,6 +46,11 @@ steps:
       published_artifacts_dir="${{ parameters.outputArtifactsFolder }}/${{ parameters.outputArtifactsPackagesSubfolder }}"
       mkdir -p "$published_artifacts_dir"
       cp "${{ parameters.buildRepoRoot }}"/build/toolchain/toolchain_built_{,s}rpms_*.tar.gz "$published_artifacts_dir"
+      if [[ -f "${{ parameters.buildRepoRoot }}"/build/logs/toolchain/built_specs_list.txt ]]; then
+        cp "${{ parameters.buildRepoRoot }}"/build/logs/toolchain/built_specs_list.txt "$published_artifacts_dir"
+      else
+        touch "$published_artifacts_dir"/built_specs_list.txt
+      fi
     displayName: "Copy artifacts for publishing"
 
   - bash: |
