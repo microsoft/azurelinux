@@ -188,10 +188,6 @@ install -D -m 0644 %{SOURCE4} %{buildroot}%{_libdir}/systemd/system-preset/99-ma
 %check
 # Generate machine-id using dbus
 %{_bindir}/dbus-uuidgen --ensure=%{_sysconfdir}/machine-id
-sudo su
-export LC_ALL=en_US.UTF-8
-export LANG=en_US.UTF-8
-export LANGUAGE=en_US.UTF-8
 meson test -C build
 
 # Enable default systemd units.
