@@ -339,31 +339,37 @@ func enableOrDisableServices(services imagecustomizerapi.Services, imageChroot *
 func loadOrDisableModules(modules imagecustomizerapi.Modules, imageChroot *safechroot.Chroot) error {
 	var err error
 
-	loadModuleMap := make(map[string]bool)
+	// Handle loading modules
+	modulesToLoadMap := make(map[string]bool)
+	var modulesToLoad []string
 	for _, module := range modules.Load {
-		if err := writeModuleLoadConfiguration(module, imageChroot); err != nil {
-			return fmt.Errorf("failed to write module load configuration: %w", err)
-		}
-		loadModuleMap[module] = true
+		logger.Log.Infof("Loading kernel module %s", module)
+		modulesToLoad = append(modulesToLoad, module)
+		modulesToLoadMap[module] = true
 	}
 
 	var modulesWithOptions []string
 	for module, moduleOptions := range modules.Options {
-		if !loadModuleMap[module] {
-			// load the module in options list if it is not specified in load list
-			if err := writeModuleLoadConfiguration(module, imageChroot); err != nil {
-				return fmt.Errorf("failed to write module load configuration: %w", err)
-			}
+		if !modulesToLoadMap[module] {
+			// Load module in options list if it is not specified in load list
+			logger.Log.Infof("Loading kernel module %s", module)
+			modulesToLoad = append(modulesToLoad, module)
 		}
 
 		var options []string
-		logger.Log.Infof("Loading kernel module options for (%s)", module)
+		logger.Log.Infof("Adding kernel module options for %s", module)
 		for key, value := range moduleOptions {
 			options = append(options, fmt.Sprintf("%s=%s", key, value))
 		}
 
 		data := fmt.Sprintf("options %s %s", module, strings.Join(options, " "))
 		modulesWithOptions = append(modulesWithOptions, data)
+	}
+
+	moduleLoadFilePath := filepath.Join(imageChroot.RootDir(), "/etc/modules-load.d/modules-load.conf")
+	err = file.WriteLines(modulesToLoad, moduleLoadFilePath)
+	if err != nil {
+		return fmt.Errorf("failed to write module load configuration: %w", err)
 	}
 
 	if len(modulesWithOptions) > 0 {
@@ -375,23 +381,20 @@ func loadOrDisableModules(modules imagecustomizerapi.Modules, imageChroot *safec
 		}
 	}
 
+	// Handle disabling modules
+	var modulesToDisable []string
+	moduleDisableFilePath := filepath.Join(imageChroot.RootDir(), "/etc/modprobe.d/modules-disabled.conf")
+
 	for _, module := range modules.Disable {
-		logger.Log.Infof("Disabling kernel module (%s)", module)
-		moduleFileName := module + ".conf"
-		moduleFilePath := filepath.Join(imageChroot.RootDir(), "/etc/modprobe.d/", moduleFileName)
+		logger.Log.Infof("Disabling kernel module %s", module)
 		data := fmt.Sprintf("blacklist %s\n", module)
-		err = file.Write(data, moduleFilePath)
-		if err != nil {
-			return fmt.Errorf("failed to write module disable configuration: %w", err)
-		}
+		modulesToDisable = append(modulesToDisable, data)
+	}
+
+	err = file.WriteLines(modulesToDisable, moduleDisableFilePath)
+	if err != nil {
+		return fmt.Errorf("failed to write module disable configuration: %w", err)
 	}
 
 	return nil
-}
-
-func writeModuleLoadConfiguration(module string, imageChroot *safechroot.Chroot) error {
-	logger.Log.Infof("Loading kernel module (%s)", module)
-	moduleFileName := module + ".conf"
-	moduleFilePath := filepath.Join(imageChroot.RootDir(), "/etc/modules-load.d/", moduleFileName)
-	return file.Write(module, moduleFilePath)
 }
