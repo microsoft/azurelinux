@@ -135,8 +135,8 @@ steps:
         inputs:
           artifact: "${{ parameters.customToolchainArtifactName }}"
           patterns: |
-            "**/${{ parameters.customToolchainTarballName }}"
-            "**/${{ parameters.customToolchainBuiltSpecsName }}"
+            **/${{ parameters.customToolchainTarballName }}
+            **/${{ parameters.customToolchainBuiltSpecsName }}
 
       - script: |
           toolchain_archive="$(find "$(Pipeline.Workspace)" -name "${{ parameters.customToolchainTarballName }}" -print -quit)"
