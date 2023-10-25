@@ -182,7 +182,7 @@ steps:
         run_check_arg="RUN_CHECK=y"
         toolchain_built_list="$(find "$(Pipeline.Workspace)" -name "${{ parameters.customToolchainBuiltSpecsName }}" -print -quit)"
         if [[ -f "$toolchain_built_list" ]]; then
-          rerun_toolchain_checks_arg=$(printf TEST_RERUN_LIST=\"%s\" "$(xargs --arg-file="test.txt")")
+          rerun_toolchain_checks_arg=$(printf TEST_RERUN_LIST='%s' $(xargs --arg-file="$toolchain_built_list"))
         fi
       elif [[ ${{ parameters.isCheckBuild }} == "false" ]]; then
         run_check_arg="RUN_CHECK=n"
