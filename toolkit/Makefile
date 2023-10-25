@@ -28,6 +28,8 @@ TEST_RUN_LIST           ?=
 TEST_RERUN_LIST         ?=
 ##help:var:TEST_IGNORE_LIST:<spec_list>=List of space-separated spec folders to ignore for package tests. Must not overlap with "TEST_RERUN_LIST", may overlap with "TEST_RUN_LIST". Example: TEST_IGNORE_LIST="acl".
 TEST_IGNORE_LIST        ?=
+# Skip over missing tests in lists. If set to 'y', any test in a TEST_(RE)RUN_LIST that is missing will be skipped.
+SKIP_MISSING_TESTS_IN_LISTS ?= n
 
 ######## SET INCREMENTAL BUILD FLAGS ########
 
