@@ -39,12 +39,12 @@ touch $LFS/logs/temptoolchain/status_binutils_pass1_complete
 echo GCC-11.2.0 - Pass 1
 tar xf gcc-11.2.0.tar.xz
 pushd gcc-11.2.0
-tar xf ../mpfr-4.1.0.tar.xz
-mv -v mpfr-4.1.0 mpfr
-tar xf ../gmp-6.2.1.tar.xz
-mv -v gmp-6.2.1 gmp
-tar xf ../mpc-1.2.1.tar.gz
-mv -v mpc-1.2.1 mpc
+tar xf ../mpfr-4.2.1.tar.xz
+mv -v mpfr-4.2.1 mpfr
+tar xf ../gmp-6.3.0.tar.xz
+mv -v gmp-6.3.0 gmp
+tar xf ../mpc-1.3.1.tar.gz
+mv -v mpc-1.3.1 mpc
 case $(uname -m) in
     x86_64)
       for file in gcc/config/{linux,i386/linux{,64}}.h
@@ -257,12 +257,12 @@ case $(uname -m) in
     sed -e '/mabi.lp64=/s/lib64/lib/' -i.orig gcc/config/aarch64/t-aarch64-linux
   ;;
 esac
-tar -xf ../mpfr-4.1.0.tar.xz
-mv -v mpfr-4.1.0 mpfr
-tar -xf ../gmp-6.2.1.tar.xz
-mv -v gmp-6.2.1 gmp
-tar -xf ../mpc-1.2.1.tar.gz
-mv -v mpc-1.2.1 mpc
+tar -xf ../mpfr-4.2.1.tar.xz
+mv -v mpfr-4.2.1 mpfr
+tar -xf ../gmp-6.3.0.tar.xz
+mv -v gmp-6.3.0 gmp
+tar -xf ../mpc-1.3.1.tar.gz
+mv -v mpc-1.3.1 mpc
 patch -Np1 -i /tools/CVE-2023-4039.patch
 mkdir -v build
 cd       build
@@ -538,9 +538,9 @@ rm -rf tar-1.35
 
 touch $LFS/logs/temptoolchain/status_tar_complete
 
-echo Texinfo-6.8
-tar xf texinfo-6.8.tar.xz
-pushd texinfo-6.8
+echo Texinfo-7.0.3
+tar xf texinfo-7.0.3.tar.xz
+pushd texinfo-7.0.3
 # fix issue building with glibc 2.34:
 sed -e 's/__attribute_nonnull__/__nonnull/' \
     -i gnulib/lib/malloc/dynarray-skeleton.c
@@ -548,7 +548,7 @@ sed -e 's/__attribute_nonnull__/__nonnull/' \
 make -j$(nproc)
 make install
 popd
-rm -rf texinfo-6.8
+rm -rf texinfo-7.0.3
 
 touch $LFS/logs/temptoolchain/status_texinfo_complete
 

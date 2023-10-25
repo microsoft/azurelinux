@@ -21,6 +21,7 @@ https://ftp.gnu.org/gnu/m4/m4-1.4.19.tar.gz
 https://ftp.gnu.org/gnu/make/make-4.3.tar.gz
 https://ftp.gnu.org/gnu/make/make-4.4.1.tar.gz
 https://ftp.gnu.org/gnu/mpc/mpc-1.2.1.tar.gz
+https://ftp.gnu.org/gnu/mpc/mpc-1.3.1.tar.gz
 https://www.mpfr.org/mpfr-4.1.0/mpfr-4.1.0.tar.xz
 https://www.mpfr.org/mpfr-4.2.1/mpfr-4.2.1.tar.xz
 https://invisible-mirror.net/archives/ncurses/ncurses-6.2.tar.gz
@@ -49,6 +50,7 @@ https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/python.attr
 https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/pythondeps.sh
 https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/pythondistdeps.py
 https://www.linuxfromscratch.org/patches/downloads/lua/lua-5.4.4-shared_library-2.patch
+https://www.linuxfromscratch.org/patches/downloads/lua/lua-5.4.6-shared_library-1.patch
 https://ftp.gnu.org/gnu/gcc/gcc-11.2.0/gcc-11.2.0.tar.xz
 https://ftp.gnu.org/gnu/gcc/gcc-13.2.0/gcc-13.2.0.tar.xz
 https://ftp.gnu.org/gnu/glibc/glibc-2.35.tar.xz

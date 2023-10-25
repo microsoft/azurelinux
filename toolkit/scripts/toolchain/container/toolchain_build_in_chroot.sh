@@ -258,52 +258,46 @@ popd
 rm -rf binutils-2.37
 touch /logs/status_binutils_complete
 
-echo GMP-6.2.1
-tar xf gmp-6.2.1.tar.xz
-pushd gmp-6.2.1
+echo GMP-6.3.0
+tar xf gmp-6.3.0.tar.xz
+pushd gmp-6.3.0
 # Remove optimizations
 cp -v configfsf.guess config.guess
 cp -v configfsf.sub   config.sub
 ./configure --prefix=/usr    \
             --enable-cxx     \
             --disable-static \
-            --docdir=/usr/share/doc/gmp-6.2.1 \
+            --docdir=/usr/share/doc/gmp-6.3.0 \
             --disable-assembly
 make -j$(nproc)
-make html
 make install
-make install-html
 popd
-rm -rf gmp-6.2.1
+rm -rf gmp-6.3.0
 touch /logs/status_gmp_complete
 
-echo MPFR-4.1.0
-tar xf mpfr-4.1.0.tar.xz
-pushd mpfr-4.1.0
+echo MPFR-4.2.1
+tar xf mpfr-4.2.1.tar.xz
+pushd mpfr-4.2.1
 ./configure --prefix=/usr        \
             --disable-static     \
             --enable-thread-safe \
-            --docdir=/usr/share/doc/mpfr-4.1.0
+            --docdir=/usr/share/doc/mpfr-4.2.1
 make -j$(nproc)
-make html
 make install
-make install-html
 popd
-rm -rf mpfr-4.1.0
+rm -rf mpfr-4.2.1
 touch /logs/status_mpfr_complete
 
-echo MPC-1.2.1
-tar xf mpc-1.2.1.tar.gz
-pushd mpc-1.2.1
+echo MPC-1.3.1
+tar xf mpc-1.3.1.tar.gz
+pushd mpc-1.3.1
 ./configure --prefix=/usr    \
             --disable-static \
-            --docdir=/usr/share/doc/mpc-1.2.1
+            --docdir=/usr/share/doc/mpc-1.3.1
 make -j$(nproc)
-make html
 make install
-make install-html
 popd
-rm -rf mpc-1.2.1
+rm -rf mpc-1.3.1
 touch /logs/status_libmpc_complete
 
 echo GCC-11.2.0
@@ -908,18 +902,17 @@ popd
 rm -rf tar-1.35
 touch /logs/status_tar_complete
 
-echo Texinfo-6.8
-tar xf texinfo-6.8.tar.xz
-pushd texinfo-6.8
+echo Texinfo-7.0.3
+tar xf texinfo-7.0.3.tar.xz
+pushd texinfo-7.0.3
 ./configure --prefix=/usr --disable-static
 # fix issue building with glibc 2.34:
 sed -e 's/__attribute_nonnull__/__nonnull/' \
     -i gnulib/lib/malloc/dynarray-skeleton.c
 make -j$(nproc)
 make install
-make TEXMF=/usr/share/texmf install-tex
 popd
-rm -rf texinfo-6.8
+rm -rf texinfo-7.0.3
 touch /logs/status_texinfo_complete
 
 echo Procps-ng-3.3.17
@@ -988,40 +981,30 @@ popd
 rm -rf sqlite-autoconf-3360000
 touch /logs/status_sqlite-autoconf_complete
 
-echo popt-1.18
-tar xf popt-1.18.tar.gz
-pushd popt-1.18
+echo popt-1.19
+tar xf popt-1.19.tar.gz
+pushd popt-1.19
 ./configure --prefix=/usr \
         --disable-static \
         --build=$BUILD_TARGET
 make -j$(nproc)
 make install
 popd
-rm -rf popt-1.18
+rm -rf popt-1.19
 touch /logs/status_popt_complete
 
-echo cpio-2.13
-tar xjf cpio-2.13.tar.bz2
-pushd cpio-2.13
-patch -Np1 -i /tools/cpio_extern_nocommon.patch
-patch -Np1 -i /tools/CVE-2021-38185.patch
+echo cpio-2.14
+tar xjf cpio-2.14.tar.bz2
+pushd cpio-2.14
 ./configure --prefix=/usr \
         --bindir=/bin \
         --enable-mt   \
         --with-rmt=/usr/libexec/rmt \
         --build=$BUILD_TARGET
 make -j$(nproc)
-makeinfo --html            -o doc/html      doc/cpio.texi
-makeinfo --html --no-split -o doc/cpio.html doc/cpio.texi
-makeinfo --plaintext       -o doc/cpio.txt  doc/cpio.texi
 make install
-install -v -m755 -d /usr/share/doc/cpio-2.13/html
-install -v -m644    doc/html/* \
-                /usr/share/doc/cpio-2.13/html
-install -v -m644    doc/cpio.{html,txt} \
-                /usr/share/doc/cpio-2.13
 popd
-rm -rf cpio-2.13
+rm -rf cpio-2.14
 touch /logs/status_cpio_complete
 
 echo libarchive-3.7.1
