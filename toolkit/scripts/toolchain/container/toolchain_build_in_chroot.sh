@@ -190,14 +190,14 @@ set -e
 echo End sanity check - raw toolchain - adjusting the toolchain
 touch /logs/status_adjusting_toolchain_complete
 
-echo Zlib-1.2.12
-tar xf zlib-1.2.12.tar.xz
-pushd zlib-1.2.12
+echo Zlib-1.3
+tar xf zlib-1.3.tar.xz
+pushd zlib-1.3
 ./configure --prefix=/usr
 make -j$(nproc)
 make install
 popd
-rm -rf zlib-1.2.12
+rm -rf zlib-1.3
 touch /logs/status_zlib_complete
 
 echo File-5.45
@@ -647,14 +647,14 @@ popd
 rm -rf xz-5.4.4
 touch /logs/status_xz_complete
 
-echo zstd-1.5.0
-tar xf zstd-1.5.0.tar.gz
-pushd zstd-1.5.0
+echo zstd-1.5.5
+tar xf zstd-1.5.5.tar.gz
+pushd zstd-1.5.5
 make -j$(nproc)
 make install prefix=/usr pkgconfigdir=/usr/lib/pkgconfig
 rm -v /usr/lib/libzstd.a
 popd
-rm -rf zstd-1.5.0
+rm -rf zstd-1.5.5
 touch /logs/status_zstd_complete
 
 echo Gettext-0.22
@@ -670,9 +670,9 @@ popd
 rm -rf gettext-0.22
 touch /logs/status_gettext_complete
 
-echo Elfutils-0.186
-tar xjf elfutils-0.186.tar.bz2
-pushd elfutils-0.186
+echo Elfutils-0.189
+tar xjf elfutils-0.189.tar.bz2
+pushd elfutils-0.189
 ./configure \
     --prefix=/usr \
     --disable-debuginfod \
@@ -685,7 +685,7 @@ make -C libdw install
 # Need to install (eu-strip) as well
 make install
 popd
-rm -rf elfutils-0.186
+rm -rf elfutils-0.189
 touch /logs/status_libelf_complete
 
 echo Libffi-3.4.2
@@ -1024,14 +1024,14 @@ popd
 rm -rf cpio-2.13
 touch /logs/status_cpio_complete
 
-echo libarchive-3.6.1
-tar xf libarchive-3.6.1.tar.gz
-pushd libarchive-3.6.1
+echo libarchive-3.7.1
+tar xf libarchive-3.7.1.tar.gz
+pushd libarchive-3.7.1
 ./configure --prefix=/usr --disable-static
 make -j$(nproc)
 make install
 popd
-rm -rf libarchive-3.6.1
+rm -rf libarchive-3.7.1
 touch /logs/status_libarchive_complete
 
 echo lua-5.4.4
