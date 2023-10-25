@@ -4,7 +4,6 @@ SystemConfig:
       - br_netfilter
       - ib_uverbs
       - mlx5_ib
-      - vfio
     Disable:
       - mousedev
     Options:

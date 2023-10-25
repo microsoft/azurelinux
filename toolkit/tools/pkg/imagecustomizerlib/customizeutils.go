@@ -341,11 +341,7 @@ func loadOrDisableModules(modules imagecustomizerapi.Modules, imageChroot *safec
 
 	loadModuleMap := make(map[string]bool)
 	for _, module := range modules.Load {
-		logger.Log.Infof("Loading kernel module (%s)", module)
-		moduleFileName := module + ".conf"
-		moduleFilePath := filepath.Join(imageChroot.RootDir(), "/etc/modules-load.d/", moduleFileName)
-		err = file.Write(module, moduleFilePath)
-		if err != nil {
+		if err := writeModuleLoadConfiguration(module, imageChroot); err != nil {
 			return fmt.Errorf("failed to write module load configuration: %w", err)
 		}
 		loadModuleMap[module] = true
@@ -354,7 +350,10 @@ func loadOrDisableModules(modules imagecustomizerapi.Modules, imageChroot *safec
 	var modulesWithOptions []string
 	for module, moduleOptions := range modules.Options {
 		if !loadModuleMap[module] {
-			return fmt.Errorf("module options specified for %s, but it's not in the Load list", module)
+			// load the module in options list if it is not specified in load list
+			if err := writeModuleLoadConfiguration(module, imageChroot); err != nil {
+				return fmt.Errorf("failed to write module load configuration: %w", err)
+			}
 		}
 
 		var options []string
@@ -388,4 +387,11 @@ func loadOrDisableModules(modules imagecustomizerapi.Modules, imageChroot *safec
 	}
 
 	return nil
+}
+
+func writeModuleLoadConfiguration(module string, imageChroot *safechroot.Chroot) error {
+	logger.Log.Infof("Loading kernel module (%s)", module)
+	moduleFileName := module + ".conf"
+	moduleFilePath := filepath.Join(imageChroot.RootDir(), "/etc/modules-load.d/", moduleFileName)
+	return file.Write(module, moduleFilePath)
 }
