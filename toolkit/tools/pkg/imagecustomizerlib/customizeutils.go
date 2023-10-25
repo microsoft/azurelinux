@@ -339,36 +339,48 @@ func enableOrDisableServices(services imagecustomizerapi.Services, imageChroot *
 func loadOrDisableModules(modules imagecustomizerapi.Modules, imageChroot *safechroot.Chroot) error {
 	var err error
 
+	loadModuleMap := make(map[string]bool)
 	for _, module := range modules.Load {
-		logger.Log.Infof("Loading kernel module (%s)", module.Name)
-		moduleFileName := module.Name + ".conf"
+		logger.Log.Infof("Loading kernel module (%s)", module)
+		moduleFileName := module + ".conf"
 		moduleFilePath := filepath.Join(imageChroot.RootDir(), "/etc/modules-load.d/", moduleFileName)
-		err = file.Write(module.Name, moduleFilePath)
+		err = file.Write(module, moduleFilePath)
 		if err != nil {
 			return fmt.Errorf("failed to write module load configuration: %w", err)
 		}
+		loadModuleMap[module] = true
+	}
 
-		if module.Options != nil {
-			var options []string
-			for key, value := range module.Options {
-				options = append(options, fmt.Sprintf("%s=%s", key, value))
-			}
+	var modulesWithOptions []string
+	for module, moduleOptions := range modules.Options {
+		if !loadModuleMap[module] {
+			return fmt.Errorf("module options specified for %s, but it's not in the Load list", module)
+		}
 
-			moduleOptionsFileName := module.Name + "-options.conf"
-			moduleOptionsFilePath := filepath.Join(imageChroot.RootDir(), "/etc/modprobe.d/", moduleOptionsFileName)
-			data := fmt.Sprintf("options %s %s\n", module.Name, strings.Join(options, " "))
-			err = file.Write(data, moduleOptionsFilePath)
-			if err != nil {
-				return fmt.Errorf("failed to write module options configuration: %w", err)
-			}
+		var options []string
+		logger.Log.Infof("Loading kernel module options for (%s)", module)
+		for key, value := range moduleOptions {
+			options = append(options, fmt.Sprintf("%s=%s", key, value))
+		}
+
+		data := fmt.Sprintf("options %s %s", module, strings.Join(options, " "))
+		modulesWithOptions = append(modulesWithOptions, data)
+	}
+
+	if len(modulesWithOptions) > 0 {
+		modulesWithOptions = append(modulesWithOptions, "")
+		moduleOptionsFilePath := filepath.Join(imageChroot.RootDir(), "/etc/modprobe.d/module-options.conf")
+		err = file.WriteLines(modulesWithOptions, moduleOptionsFilePath)
+		if err != nil {
+			return fmt.Errorf("failed to write module options configuration: %w", err)
 		}
 	}
 
 	for _, module := range modules.Disable {
-		logger.Log.Infof("Disabling kernel module (%s)", module.Name)
-		moduleFileName := module.Name + ".conf"
+		logger.Log.Infof("Disabling kernel module (%s)", module)
+		moduleFileName := module + ".conf"
 		moduleFilePath := filepath.Join(imageChroot.RootDir(), "/etc/modprobe.d/", moduleFileName)
-		data := fmt.Sprintf("blacklist %s\n", module.Name)
+		data := fmt.Sprintf("blacklist %s\n", module)
 		err = file.Write(data, moduleFilePath)
 		if err != nil {
 			return fmt.Errorf("failed to write module disable configuration: %w", err)

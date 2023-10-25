@@ -5,22 +5,41 @@ package imagecustomizerapi
 
 import (
 	"fmt"
+	"strings"
 )
 
-type Module struct {
-	Name    string            `yaml:"Name"`
-	Options map[string]string `yaml:"Options,omitempty"`
+type ModuleOptions map[string]string
+
+type Modules struct {
+	Load    []string                 `yaml:"Load"`
+	Disable []string                 `yaml:"Disable"`
+	Options map[string]ModuleOptions `yaml:"Options"`
 }
 
-func (m *Module) IsValid() error {
-	if m.Name == "" {
-		return fmt.Errorf("name of module may not be empty")
+func (m *Modules) IsValid() error {
+	for i, moduleName := range m.Load {
+		if err := validateModuleName(moduleName, "Load", i); err != nil {
+			return err
+		}
 	}
 
-	if m.Options != nil {
-		for key, value := range m.Options {
-			if key == "" || value == "" {
-				return fmt.Errorf("invalid key:value pair in options for module %s", m.Name)
+	for i, moduleName := range m.Disable {
+		if err := validateModuleName(moduleName, "Disable", i); err != nil {
+			return err
+		}
+	}
+	for moduleName, moduleOptions := range m.Options {
+		if moduleName == "" {
+			return fmt.Errorf("module name cannot be empty in Modules.Options")
+		}
+
+		for optionKey, optionValue := range moduleOptions {
+			if optionKey == "" || optionValue == "" {
+				return fmt.Errorf("option key or value cannot be empty for module %s", moduleName)
+			}
+
+			if strings.ContainsAny(optionKey, " \n") || strings.ContainsAny(optionValue, " \n") {
+				return fmt.Errorf("option key or value cannot contain spaces or newline characters for module %s", moduleName)
 			}
 		}
 	}
@@ -28,23 +47,12 @@ func (m *Module) IsValid() error {
 	return nil
 }
 
-type Modules struct {
-	Load    []Module `yaml:"Load"`
-	Disable []Module `yaml:"Disable"`
-}
-
-func (m *Modules) IsValid() error {
-	for i, module := range m.Load {
-		if err := module.IsValid(); err != nil {
-			return fmt.Errorf("invalid module '%s' in Modules.Load at index %d: %w", module.Name, i, err)
-		}
+func validateModuleName(moduleName string, source string, index int) error {
+	if moduleName == "" {
+		return fmt.Errorf("module name cannot be empty in Modules.%s at index %d", source, index)
 	}
-
-	for i, module := range m.Disable {
-		if err := module.IsValid(); err != nil {
-			return fmt.Errorf("invalid module '%s' in Modules.Disable at index %d: %w", module.Name, i, err)
-		}
+	if strings.ContainsAny(moduleName, " \n") {
+		return fmt.Errorf("module name cannot contain spaces or newline characters in Modules.%s at index %d", source, index)
 	}
-
 	return nil
 }

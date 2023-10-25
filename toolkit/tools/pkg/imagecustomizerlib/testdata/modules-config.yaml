@@ -1,11 +1,12 @@
 SystemConfig:
   Modules:
     Load:
-      - Name: br_netfilter
-      - Name: ib_uverbs
-      - Name: mlx5_ib
-      - Name: vfio
-        Options:
-          enable_unsafe_noiommu_mode: "Y"
+      - br_netfilter
+      - ib_uverbs
+      - mlx5_ib
+      - vfio
     Disable:
-      - Name: mousedev
+      - mousedev
+    Options:
+      vfio:
+        enable_unsafe_noiommu_mode: "Y"
