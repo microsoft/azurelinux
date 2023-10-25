@@ -315,9 +315,9 @@ rm -rf m4-1.4.19
 
 touch $LFS/logs/temptoolchain/status_m4_complete
 
-echo Ncurses-6.2
-tar xf ncurses-6.2.tar.gz
-pushd ncurses-6.2
+echo Ncurses-6.4
+tar xf ncurses-6.4.tar.gz
+pushd ncurses-6.4
 sed -i s/mawk// configure
 ./configure --prefix=/tools \
             --with-shared   \
@@ -327,9 +327,9 @@ sed -i s/mawk// configure
             --enable-overwrite
 make -j$(nproc)
 make install
-ln -s libncursesw.so /tools/lib/libncurses.so
+echo "INPUT(-lncursesw)" > /tools/lib/libncurses.so
 popd
-rm -rf ncurses-6.2
+rm -rf ncurses-6.4
 
 touch $LFS/logs/temptoolchain/status_ncurses_complete
 
@@ -345,9 +345,9 @@ rm -rf bash-5.1.8
 
 touch $LFS/logs/temptoolchain/status_bash_complete
 
-echo Bison-3.7.6
-tar xf bison-3.7.6.tar.xz
-pushd bison-3.7.6
+echo Bison-3.8.2
+tar xf bison-3.8.2.tar.xz
+pushd bison-3.8.2
 ./configure --prefix=/tools
 # Build with single processor due to errors seen with parallel make
 #     cannot stat 'examples/c/reccalc/scan.stamp.tmp': No such file or directory
@@ -355,7 +355,7 @@ pushd bison-3.7.6
 make -j$(nproc)
 make install
 popd
-rm -rf bison-3.7.6
+rm -rf bison-3.8.2
 
 touch $LFS/logs/temptoolchain/status_bison_complete
 
@@ -375,25 +375,25 @@ rm -rf coreutils-8.32
 
 touch $LFS/logs/temptoolchain/status_coreutils_complete
 
-echo Diffutils-3.8
-tar xf diffutils-3.8.tar.xz
-pushd diffutils-3.8
+echo Diffutils-3.10
+tar xf diffutils-3.10.tar.xz
+pushd diffutils-3.10
 ./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
-rm -rf diffutils-3.8
+rm -rf diffutils-3.10
 
 touch $LFS/logs/temptoolchain/status_diffutils_complete
 
-echo File-5.40
-tar xf file-5.40.tar.gz
-pushd file-5.40
+echo File-5.45
+tar xf file-5.45.tar.gz
+pushd file-5.45
 ./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
-rm -rf file-5.40
+rm -rf file-5.45
 
 touch $LFS/logs/temptoolchain/status_file_complete
 
@@ -411,58 +411,58 @@ rm -rf bzip2-1.0.8
 
 touch $LFS/logs/temptoolchain/status_bzip2_complete
 
-echo Findutils-4.8.0
-tar xf findutils-4.8.0.tar.xz
-pushd findutils-4.8.0
+echo Findutils-4.9.0
+tar xf findutils-4.9.0.tar.xz
+pushd findutils-4.9.0
 ./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
-rm -rf findutils-4.8.0
+rm -rf findutils-4.9.0
 
 touch $LFS/logs/temptoolchain/status_findutils_complete
 
-echo Gawk-5.1.0
-tar xf gawk-5.1.0.tar.xz
-pushd gawk-5.1.0
+echo Gawk-5.2.2
+tar xf gawk-5.2.2.tar.xz
+pushd gawk-5.2.2
 ./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
-rm -rf gawk-5.1.0
+rm -rf gawk-5.2.2
 
 touch $LFS/logs/temptoolchain/status_gawk_complete
 
-echo Gettext-0.19.8.1
-tar xf gettext-0.19.8.1.tar.xz
-pushd gettext-0.19.8.1
+echo Gettext-0.22
+tar xf gettext-0.22.tar.xz
+pushd gettext-0.22
 ./configure --disable-shared
 make -j$(nproc)
 cp -v gettext-tools/src/{msgfmt,msgmerge,xgettext} /tools/bin
 popd
-rm -rf gettext-0.19.8.1
+rm -rf gettext-0.22
 
 touch $LFS/logs/temptoolchain/status_gettext_complete
 
-echo Grep-3.7
-tar xf grep-3.7.tar.xz
-pushd grep-3.7
+echo Grep-3.11
+tar xf grep-3.11.tar.xz
+pushd grep-3.11
 ./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
-rm -rf grep-3.7
+rm -rf grep-3.11
 
 touch $LFS/logs/temptoolchain/status_grep_complete
 
-echo Gzip-1.11
-tar xf gzip-1.11.tar.xz
-pushd gzip-1.11
+echo Gzip-1.13
+tar xf gzip-1.13.tar.xz
+pushd gzip-1.13
 ./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
-rm -rf gzip-1.11
+rm -rf gzip-1.13
 
 touch $LFS/logs/temptoolchain/status_gzip_complete
 
@@ -516,25 +516,25 @@ rm -rf Python-3.9.13
 
 touch $LFS/logs/temptoolchain/status_python_complete
 
-echo Sed-4.8
-tar xf sed-4.8.tar.xz
-pushd sed-4.8
+echo Sed-4.9
+tar xf sed-4.9.tar.xz
+pushd sed-4.9
 ./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
-rm -rf sed-4.8
+rm -rf sed-4.9
 
 touch $LFS/logs/temptoolchain/status_sed_complete
 
-echo Tar-1.34
-tar xf tar-1.34.tar.xz
-pushd tar-1.34
+echo Tar-1.35
+tar xf tar-1.35.tar.xz
+pushd tar-1.35
 ./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
-rm -rf tar-1.34
+rm -rf tar-1.35
 
 touch $LFS/logs/temptoolchain/status_tar_complete
 
@@ -552,14 +552,14 @@ rm -rf texinfo-6.8
 
 touch $LFS/logs/temptoolchain/status_texinfo_complete
 
-echo Xz-5.2.5
-tar xf xz-5.2.5.tar.xz
-pushd xz-5.2.5
+echo Xz-5.4.4
+tar xf xz-5.4.4.tar.xz
+pushd xz-5.4.4
 ./configure --prefix=/tools
 make -j$(nproc)
 make install
 popd
-rm -rf xz-5.2.5
+rm -rf xz-5.4.4
 
 touch $LFS/logs/temptoolchain/status_xz_complete
 

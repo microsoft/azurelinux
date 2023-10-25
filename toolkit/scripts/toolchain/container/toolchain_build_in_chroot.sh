@@ -200,14 +200,14 @@ popd
 rm -rf zlib-1.2.12
 touch /logs/status_zlib_complete
 
-echo File-5.40
-tar xf file-5.40.tar.gz
-pushd file-5.40
+echo File-5.45
+tar xf file-5.45.tar.gz
+pushd file-5.45
 ./configure --prefix=/usr
 make -j$(nproc)
 make install
 popd
-rm -rf file-5.40
+rm -rf file-5.45
 touch /logs/status_file_complete
 
 echo Readline-8.1
@@ -448,21 +448,24 @@ popd
 rm -rf pkgconf-2.0.2
 touch /logs/status_pkgconf_complete
 
-echo Ncurses-6.2
-tar xf ncurses-6.2.tar.gz
-pushd ncurses-6.2
+echo Ncurses-6.4
+tar xf ncurses-6.4.tar.gz
+pushd ncurses-6.4
 sed -i '/LIBTOOL_INSTALL/d' c++/Makefile.in
 ./configure --prefix=/usr           \
             --mandir=/usr/share/man \
             --with-shared           \
             --without-debug         \
             --without-normal        \
+            --with-cxx-shared       \
             --enable-pc-files       \
-            --enable-widec
+            --enable-widec          \
+            --with-pkg-config-libdir=/usr/lib/pkgconfig
 make -j$(nproc)
-make install
-#mv -v /usr/lib/libncursesw.so.6* /lib
-#ln -sfv ../../lib/$(readlink /usr/lib/libncursesw.so) /usr/lib/libncursesw.so
+make DESTDIR=$PWD/dest install
+install -vm755 dest/usr/lib/libncursesw.so.6.4 /usr/lib
+rm -v  dest/usr/lib/libncursesw.so.6.4
+cp -av dest/* /
 for lib in ncurses form panel menu ; do
     rm -vf                    /usr/lib/lib${lib}.so
     echo "INPUT(-l${lib}w)" > /usr/lib/lib${lib}.so
@@ -471,11 +474,8 @@ done
 rm -vf                     /usr/lib/libcursesw.so
 echo "INPUT(-lncursesw)" > /usr/lib/libcursesw.so
 ln -sfv libncurses.so      /usr/lib/libcurses.so
-# Documentation
-mkdir -v       /usr/share/doc/ncurses-6.2
-cp -v -R doc/* /usr/share/doc/ncurses-6.2
 popd
-rm -rf ncurses-6.2
+rm -rf ncurses-6.4
 touch /logs/status_ncurses_complete
 
 echo libcap-2.60
@@ -491,27 +491,27 @@ popd
 rm -rf libcap-2.60
 touch /logs/status_libcap_complete
 
-echo Sed-4.8
-tar xf sed-4.8.tar.xz
-pushd sed-4.8
+echo Sed-4.9
+tar xf sed-4.9.tar.xz
+pushd sed-4.9
 ./configure --prefix=/usr --bindir=/bin
 make -j$(nproc)
 make install
 popd
-rm -rf sed-4.8
+rm -rf sed-4.9
 touch /logs/status_sed_complete
 
-echo Bison-3.7.6
-tar xf bison-3.7.6.tar.xz
-pushd bison-3.7.6
-./configure --prefix=/usr --docdir=/usr/share/doc/bison-3.7.6
+echo Bison-3.8.2
+tar xf bison-3.8.2.tar.xz
+pushd bison-3.8.2
+./configure --prefix=/usr --docdir=/usr/share/doc/bison-3.8.2
 # Build with single processor due to errors seen with parallel make
 #     cannot stat 'examples/c/reccalc/scan.stamp.tmp': No such file or directory
 # try parallel make with new version
 make -j$(nproc)
 make install
 popd
-rm -rf bison-3.7.6
+rm -rf bison-3.8.2
 touch /logs/status_bison_complete
 
 echo Flex-2.6.4
@@ -527,14 +527,14 @@ popd
 rm -rf flex-2.6.4
 touch /logs/status_flex_complete
 
-echo Grep-3.7
-tar xf grep-3.7.tar.xz
-pushd grep-3.7
+echo Grep-3.11
+tar xf grep-3.11.tar.xz
+pushd grep-3.11
 ./configure --prefix=/usr --bindir=/bin
 make -j$(nproc)
 make install
 popd
-rm -rf grep-3.7
+rm -rf grep-3.11
 touch /logs/status_grep_complete
 
 echo Bash-5.1.8
@@ -635,16 +635,16 @@ popd
 rm -rf automake-1.16.5
 touch /logs/status_automake_complete
 
-echo Xz-5.2.5
-tar xf xz-5.2.5.tar.xz
-pushd xz-5.2.5
+echo Xz-5.4.4
+tar xf xz-5.4.4.tar.xz
+pushd xz-5.4.4
 ./configure --prefix=/usr    \
             --disable-static \
-            --docdir=/usr/share/doc/xz-5.2.5
+            --docdir=/usr/share/doc/xz-5.4.4
 make -j$(nproc)
 make install
 popd
-rm -rf xz-5.2.5
+rm -rf xz-5.4.4
 touch /logs/status_xz_complete
 
 echo zstd-1.5.0
@@ -657,17 +657,17 @@ popd
 rm -rf zstd-1.5.0
 touch /logs/status_zstd_complete
 
-echo Gettext-0.19.8.1
-tar xf gettext-0.19.8.1.tar.xz
-pushd gettext-0.19.8.1
+echo Gettext-0.22
+tar xf gettext-0.22.tar.xz
+pushd gettext-0.22
 ./configure --prefix=/usr    \
             --disable-static \
-            --docdir=/usr/share/doc/gettext-0.19.8.1
+            --docdir=/usr/share/doc/gettext-0.22
 make -j$(nproc)
 make install
 chmod -v 0755 /usr/lib/preloadable_libintl.so
 popd
-rm -rf gettext-0.19.8.1
+rm -rf gettext-0.22
 touch /logs/status_gettext_complete
 
 echo Elfutils-0.186
@@ -812,69 +812,68 @@ popd
 rm -rf coreutils-8.32
 touch /logs/status_coreutils_complete
 
-echo Diffutils-3.8
-tar xf diffutils-3.8.tar.xz
-pushd diffutils-3.8
+echo Diffutils-3.10
+tar xf diffutils-3.10.tar.xz
+pushd diffutils-3.10
 ./configure --prefix=/usr
 make -j$(nproc)
 make install
 popd
-rm -rf diffutils-3.8
+rm -rf diffutils-3.10
 touch /logs/status_diffutils_complete
 
-echo Gawk-5.1.0
-tar xf gawk-5.1.0.tar.xz
-pushd gawk-5.1.0
+echo Gawk-5.2.2
+tar xf gawk-5.2.2.tar.xz
+pushd gawk-5.2.2
 sed -i 's/extras//' Makefile.in
 ./configure --prefix=/usr
 make -j$(nproc)
 make install
 popd
-rm -rf gawk-5.1.0
+rm -rf gawk-5.2.2
 touch /logs/status_gawk_complete
 
-echo Findutils-4.8.0
-tar xf findutils-4.8.0.tar.xz
-pushd findutils-4.8.0
+echo Findutils-4.9.0
+tar xf findutils-4.9.0.tar.xz
+pushd findutils-4.9.0
 ./configure --prefix=/usr --localstatedir=/var/lib/locate
 make -j$(nproc)
 make install
-#mv -v /usr/bin/find /bin
 sed -i 's|find:=${BINDIR}|find:=/bin|' /usr/bin/updatedb
 popd
-rm -rf findutils-4.8.0
+rm -rf findutils-4.9.0
 touch /logs/status_findutils_complete
 
-echo Groff-1.22.3
-tar xf groff-1.22.3.tar.gz
-pushd groff-1.22.3
+echo Groff-1.23.0
+tar xf groff-1.23.0.tar.gz
+pushd groff-1.23.0
 PAGE=letter ./configure --prefix=/usr
 # Build with single processor due to errors seen with parallel make
-make -j1
+#make -j1
+make -j$(nproc)
 make install
 popd
-rm -rf groff-1.22.3
+rm -rf groff-1.23.0
 touch /logs/status_groff_complete
 
-echo Gzip-1.11
-tar xf gzip-1.11.tar.xz
-pushd gzip-1.11
+echo Gzip-1.13
+tar xf gzip-1.13.tar.xz
+pushd gzip-1.13
 ./configure --prefix=/usr
 make -j$(nproc)
 make install
-#mv -v /usr/bin/gzip /bin
 popd
-rm -rf gzip-1.11
+rm -rf gzip-1.13
 touch /logs/status_gzip_complete
 
-echo Libpipeline-1.5.0
-tar xf libpipeline-1.5.0.tar.gz
-pushd libpipeline-1.5.0
+echo Libpipeline-1.5.7
+tar xf libpipeline-1.5.7.tar.gz
+pushd libpipeline-1.5.7
 ./configure --prefix=/usr
 make -j$(nproc)
 make install
 popd
-rm -rf libpipeline-1.5.0
+rm -rf libpipeline-1.5.7
 touch /logs/status_libpipeline_complete
 
 echo Make-4.3
@@ -897,16 +896,16 @@ popd
 rm -rf patch-2.7.6
 touch /logs/status_patch_complete
 
-echo Tar-1.34
-tar xf tar-1.34.tar.xz
-pushd tar-1.34
+echo Tar-1.35
+tar xf tar-1.35.tar.xz
+pushd tar-1.35
 FORCE_UNSAFE_CONFIGURE=1  \
 ./configure --prefix=/usr \
             --bindir=/bin
 make -j$(nproc)
 make install
 popd
-rm -rf tar-1.34
+rm -rf tar-1.35
 touch /logs/status_tar_complete
 
 echo Texinfo-6.8

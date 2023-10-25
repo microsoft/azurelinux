@@ -20,11 +20,11 @@ https://ftp.gnu.org/gnu/libtool/libtool-2.4.7.tar.xz
 https://ftp.gnu.org/gnu/m4/m4-1.4.19.tar.gz
 https://ftp.gnu.org/gnu/make/make-4.3.tar.gz
 https://ftp.gnu.org/gnu/make/make-4.4.1.tar.gz
-https://www.kernel.org/pub/linux/docs/man-pages/Archive/man-pages-5.02.tar.xz
 https://ftp.gnu.org/gnu/mpc/mpc-1.2.1.tar.gz
 https://www.mpfr.org/mpfr-4.1.0/mpfr-4.1.0.tar.xz
 https://www.mpfr.org/mpfr-4.2.1/mpfr-4.2.1.tar.xz
 https://invisible-mirror.net/archives/ncurses/ncurses-6.2.tar.gz
+https://invisible-mirror.net/archives/ncurses/ncurses-6.4.tar.gz
 https://ftp.gnu.org/gnu/patch/patch-2.7.6.tar.xz
 https://pkg-config.freedesktop.org/releases/pkg-config-0.29.2.tar.gz
 https://distfiles.ariadne.space/pkgconf/pkgconf-2.0.2.tar.xz
@@ -33,8 +33,8 @@ https://sourceforge.net/projects/procps-ng/files/Production/procps-ng-4.0.4.tar.
 https://www.python.org/ftp/python/3.9.13/Python-3.9.13.tar.xz
 https://tukaani.org/xz/xz-5.2.5.tar.xz
 https://tukaani.org/xz/xz-5.4.4.tar.xz
-https://src.fedoraproject.org/repo/pkgs/zlib/zlib-1.2.12.tar.xz/sha512/12940e81e988f7661da52fa20bdc333314ae86a621fdb748804a20840b065a1d6d984430f2d41f3a057de0effc6ff9bcf42f9ee9510b88219085f59cbbd082bd/zlib-1.2.12.tar.xz
 https://www.zlib.net/zlib-1.3.tar.xz
+https://src.fedoraproject.org/repo/pkgs/zlib/zlib-1.2.12.tar.xz/sha512/12940e81e988f7661da52fa20bdc333314ae86a621fdb748804a20840b065a1d6d984430f2d41f3a057de0effc6ff9bcf42f9ee9510b88219085f59cbbd082bd/zlib-1.2.12.tar.xz
 https://ftp.gnu.org/gnu/cpio/cpio-2.13.tar.bz2
 https://ftp.gnu.org/gnu/cpio/cpio-2.14.tar.bz2
 https://github.com/libarchive/libarchive/releases/download/v3.6.1/libarchive-3.6.1.tar.gz
@@ -59,12 +59,13 @@ https://ftp.gnu.org/gnu/readline/readline-8.1.tar.gz
 https://ftp.gnu.org/gnu/readline/readline-8.2.tar.gz
 https://www.linuxfromscratch.org/patches/downloads/readline/readline-8.2-upstream_fix-1.patch
 https://ftp.gnu.org/gnu/tar/tar-1.34.tar.xz
+https://ftp.gnu.org/gnu/tar/tar-1.35.tar.xz
 https://ftp.gnu.org/gnu/texinfo/texinfo-6.8.tar.xz
 https://ftp.gnu.org/gnu/texinfo/texinfo-7.0.3.tar.xz
 https://www.cpan.org/src/5.0/perl-5.32.0.tar.xz
 https://www.cpan.org/src/5.0/perl-5.38.0.tar.xz
 https://ftp.gnu.org/gnu/bash/bash-5.1.8.tar.gz
-https://ftp.gnu.org/gnu/bash/bash-5.2.tar.gz
+https://ftp.gnu.org/gnu/bash/bash-5.2.15.tar.gz
 https://ftp.gnu.org/gnu/bison/bison-3.7.6.tar.xz
 https://ftp.gnu.org/gnu/bison/bison-3.8.2.tar.xz
 https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz
@@ -91,8 +92,6 @@ https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/libcap-2.60.t
 https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/libcap-2.69.tar.xz
 https://download.savannah.gnu.org/releases/libpipeline/libpipeline-1.5.0.tar.gz
 https://download.savannah.gnu.org/releases/libpipeline/libpipeline-1.5.7.tar.gz
-https://download.savannah.gnu.org/releases/man-db/man-db-2.10.1.tar.xz
-https://download.savannah.gnu.org/releases/man-db/man-db-2.11.2.tar.xz
 https://cpan.metacpan.org/authors/id/E/ET/ETHER/Test-Warnings-0.028.tar.gz
 https://cpan.metacpan.org/authors/id/M/MS/MSCHOUT/Text-Template-1.51.tar.gz
 https://www.openssl.org/source/openssl-1.1.1k.tar.gz
