@@ -2,7 +2,7 @@
 Summary:        Tool Command Language - the language and library.
 Name:           tcl
 Version:        8.6.13
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        TCL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,7 @@ Group:          System Environment/Libraries
 URL:            https://tcl.sourceforge.net/
 Source0:        https://downloads.sourceforge.net/sourceforge/tcl/tcl-core%{version}-src.tar.gz
 Patch0:         CVE-2023-36328.patch
+Patch1:         CVE-2023-45853.patch
 BuildRequires:  cmake
 Provides:       tcl(abi) = %{majorver}
 Provides:       tcl-tcldict = %{version}
@@ -99,6 +100,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Wed Oct 25 2023 Rohit Rawat <rohitrawat@microsoft.com> - 8.6.13-3
+- Patch CVE-2023-45853 in zlib
+
 * Thu Sep 07 2023 Brian Fjeldstad <bfjelds@microsoft.com> - 8.6.13-2
 - Fix CVE-2023-36328
 
