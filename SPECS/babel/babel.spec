@@ -1,13 +1,14 @@
 Summary:        An integrated collection of utilities that assist in internationalizing and localizing Python applications
 Name:           babel
 Version:        2.9.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://babel.pocoo.org
 Source0:        https://files.pythonhosted.org/packages/17/e6/ec9aa6ac3d00c383a5731cc97ed7c619d3996232c977bb8326bcbb6c687e/Babel-%{version}.tar.gz
+Patch0:         CVE-2023-45133.patch
 BuildRequires:  python3-devel
 BuildRequires:  python3-pytest
 BuildRequires:  python3-pytz
@@ -34,7 +35,7 @@ The functionality Babel provides for internationalization (I18n) and localizatio
 2.A Python interface to the CLDR (Common Locale Data Repository), providing access to various locale display names, localized number and date formatting, etc.
 
 %prep
-%autosetup -n Babel-%{version}
+%autosetup -n Babel-%{version} -p1
 
 %build
 %py3_build
@@ -55,6 +56,9 @@ pip3 install pytest freezegun funcsigs pathlib2 pluggy utils
 %{python3_sitelib}/*
 
 %changelog
+* Wed Oct 25 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 2.9.1-2
+- Address CVE-2023-45133
+
 * Tue Mar 08 2022 Andrew Phelps <anphel@microsoft.com> - 2.9.1-1
 - Upgrade to version 2.9.1
 
