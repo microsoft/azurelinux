@@ -153,8 +153,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %exclude /module_info.ld
 
 %changelog
-* Tue Oct 24 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.136.1-1
-- Auto-upgrade to 5.15.136.1
+* Thu Oct 26 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.136.1-1
+- Upgrade to 5.15.136.1
 
 * Mon Oct 23 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.135.1-2
 - Bump release to match kernel

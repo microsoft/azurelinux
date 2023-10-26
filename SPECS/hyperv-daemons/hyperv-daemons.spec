@@ -219,8 +219,8 @@ fi
 %{_sbindir}/lsvmbus
 
 %changelog
-* Tue Oct 24 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.136.1-1
-- Auto-upgrade to 5.15.136.1
+* Thu Oct 26 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.136.1-1
+- Upgrade to 5.15.136.1
 
 * Tue Oct 17 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.135.1-1
 - Auto-upgrade to 5.15.135.1
