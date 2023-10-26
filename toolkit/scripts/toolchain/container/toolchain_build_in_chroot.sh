@@ -235,10 +235,9 @@ popd
 rm -rf m4-1.4.19
 touch /logs/status_m4_complete
 
-echo Binutils-2.37
-tar xf binutils-2.37.tar.xz
-pushd binutils-2.37
-patch -p1 -i /tools/linker-script-readonly-keyword-support.patch
+echo Binutils-2.41
+tar xf binutils-2.41.tar.xz
+pushd binutils-2.41
 sed -i '/@\tincremental_copy/d' gold/testsuite/Makefile.in
 mkdir -v build
 cd build
@@ -249,13 +248,14 @@ cd build
              --enable-shared     \
              --disable-werror    \
              --enable-64-bit-bfd \
-             --with-system-zlib
+             --with-system-zlib  \
+             --enable-gprofng=no
 #             --enable-install-libiberty
 # libiberty.a used to be in binutils. Now it is in GCC.
 make -j$(nproc) tooldir=/usr
 make tooldir=/usr install
 popd
-rm -rf binutils-2.37
+rm -rf binutils-2.41
 touch /logs/status_binutils_complete
 
 echo GMP-6.3.0

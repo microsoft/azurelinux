@@ -16,23 +16,24 @@ touch $LFS/logs/temptoolchain/status_temp_toolchain_build_started
 cat /home/lfs/.bashrc
 LFS_TGT=$(uname -m)-lfs-linux-gnu
 
-echo Binutils-2.37 - Pass 1
-tar xf binutils-2.37.tar.xz
-pushd binutils-2.37
-patch -p1 -i /tools/linker-script-readonly-keyword-support.patch
+echo Binutils-2.41 - Pass 1
+tar xf binutils-2.41.tar.xz
+pushd binutils-2.41
 mkdir -v build
 cd build
-../configure --prefix=/tools \
+../configure \
+    --prefix=/tools \
     --with-sysroot=$LFS \
     --with-lib-path=/tools/lib \
     --target=$LFS_TGT \
     --disable-nls \
-    --disable-werror
+    --disable-werror \
+    --enable-gprofng=no
 make -j$(nproc)
 mkdir -v /tools/lib && ln -sv lib /tools/lib64
 make install
 popd
-rm -rf binutils-2.37
+rm -rf binutils-2.41
 
 touch $LFS/logs/temptoolchain/status_binutils_pass1_complete
 
@@ -185,27 +186,28 @@ rm -rf gcc-11.2.0
 
 touch $LFS/logs/temptoolchain/status_libstdc++_complete
 
-echo Binutils-2.37 - Pass 2
-tar xf binutils-2.37.tar.xz
-pushd binutils-2.37
+echo Binutils-2.41 - Pass 2
+tar xf binutils-2.41.tar.xz
+pushd binutils-2.41
 mkdir -v build
 cd build
 CC=$LFS_TGT-gcc                  \
 AR=$LFS_TGT-ar                   \
 RANLIB=$LFS_TGT-ranlib           \
-../configure                   	 \
-	    --prefix=/tools            \
-	    --disable-nls              \
-	    --disable-werror           \
-	    --with-lib-path=/tools/lib \
-	    --with-sysroot
+../configure                       \
+        --prefix=/tools            \
+        --disable-nls              \
+        --disable-werror           \
+        --with-lib-path=/tools/lib \
+        --with-sysroot             \
+        --enable-gprofng=no
 make -j$(nproc)
 make install
 make -C ld clean
 make -C ld LIB_PATH=/usr/lib:/lib
 cp -v ld/ld-new /tools/bin
 popd
-rm -rf binutils-2.37
+rm -rf binutils-2.41
 
 touch $LFS/logs/temptoolchain/status_binutils_pass2_complete
 
