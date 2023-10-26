@@ -176,18 +176,13 @@ fi
 
 
 %preun
-# Save the symlink status, this can be removed, once tdnf has moved
-# past 3.5.2-3 as this is needed to help with transition
-readlink /usr/bin/yum > /tmp/tdnf-target
+if  [[ $(readlink $(rpm --eval %{_bindir})/yum) == $(rpm --eval %{_bindir})/tdnf ]]; then
+  rm $(rpm --eval %{_bindir})/yum
+fi
+
 
 %postun
 /sbin/ldconfig
-
-# Use the preserved symlink status from preun as package removal/uprade will take
-# the symlink withit , this can be removed, once tdnf has moved
-# past 3.5.2-3 as this is needed to help with transition
-ln -s $(cat /tmp/tdnf-target) $(rpm --eval %{_bindir})/yum
-rm -f /tmp/tdnf-target
 
 
 %files
