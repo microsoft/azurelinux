@@ -72,7 +72,53 @@ func CopyContents(srcDir, dstDir string) (err error) {
 			return
 		}
 	}
-
 	return
+}
 
+func EnsureDirExists(dirName string) (err error) {
+	_, err = os.Stat(dirName)
+	if err == nil {
+		return nil
+	}
+
+	if os.IsNotExist(err) {
+		err = os.MkdirAll(dirName, 0755)
+		if err != nil {
+			return err
+		}
+	} else {
+		return err
+	}
+
+	return nil
+}
+
+func GetChildDirs(parentFolder string) ([]string, error) {
+	childFolders := []string{}
+
+	dir, err := os.Open(parentFolder)
+	if err != nil {
+		return nil, err
+	}
+	defer dir.Close()
+
+	children, err := dir.Readdirnames(-1)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, child := range children {
+		childPath := filepath.Join(parentFolder, child)
+
+		info, err := os.Stat(childPath)
+		if err != nil {
+			continue
+		}
+
+		if info.IsDir() {
+			childFolders = append(childFolders, child)
+		}
+	}
+
+	return childFolders, nil
 }

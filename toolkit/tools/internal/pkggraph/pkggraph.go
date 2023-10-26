@@ -672,6 +672,20 @@ func (g *PkgGraph) AllTestNodes() []*PkgNode {
 	})
 }
 
+// NodesMatchingFilter returns a list of all nodes satisfying the input filter.
+func (g *PkgGraph) NodesMatchingFilter(filter func(*PkgNode) bool) (nodes []*PkgNode) {
+	foundNodes := 0
+	nodes = make([]*PkgNode, 0, g.Nodes().Len())
+	for _, n := range graph.NodesOf(g.Nodes()) {
+		pkgNode := n.(*PkgNode).This
+		if filter(pkgNode) {
+			nodes = append(nodes, pkgNode)
+			foundNodes++
+		}
+	}
+	return nodes[:foundNodes]
+}
+
 // DOTID generates an id for a DOT graph of the form
 // "pkg(ver:=xyz)<TYPE> (ID=x,STATE=state)""
 func (n PkgNode) DOTID() string {
@@ -1598,17 +1612,14 @@ func rpmsProvidedBySRPM(srpmPath string, pkgGraph *PkgGraph, graphMutex *sync.RW
 		defer graphMutex.RUnlock()
 	}
 
+	filteredNodes := pkgGraph.NodesMatchingFilter(func(node *PkgNode) bool {
+		return (node.SrpmPath == srpmPath) &&
+			(node.RpmPath != "") &&
+			(node.RpmPath != NoRPMPath)
+	})
+
 	rpmsMap := make(map[string]bool)
-	runNodes := pkgGraph.AllPreferredRunNodes()
-	for _, node := range runNodes {
-		if node.SrpmPath != srpmPath {
-			continue
-		}
-
-		if node.RpmPath == "" || node.RpmPath == NoRPMPath {
-			continue
-		}
-
+	for _, node := range filteredNodes {
 		rpmsMap[node.RpmPath] = true
 	}
 

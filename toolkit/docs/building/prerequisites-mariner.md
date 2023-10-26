@@ -23,6 +23,7 @@ sudo tdnf -y install \
     make \
     moby-cli \
     moby-engine \
+    openssl \
     parted \
     pigz \
     qemu-img \

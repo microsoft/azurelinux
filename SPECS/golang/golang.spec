@@ -14,7 +14,7 @@
 Summary:        Go
 Name:           golang
 Version:        1.20.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -25,6 +25,7 @@ Source1:        https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
 Source2:        https://dl.google.com/go/go%{bootstrap_compiler_version}.src.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
 Patch1:         permit-requests-with-invalid-header.patch
+Patch2:         CVE-2023-44487.patch
 Obsoletes:      %{name} < %{version}
 Provides:       %{name} = %{version}
 Provides:       go = %{version}-%{release}
@@ -41,6 +42,7 @@ mv -v go go-bootstrap
 
 %setup -q -n go
 %patch1 -p1
+%patch2 -p1
 
 %build
 # (go >= 1.20 bootstraps with go >= 1.17)
@@ -143,6 +145,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 1.20.7-2
+- Patch CVE-2023-44487
+
 * Tue Aug 15 2023 Muhammad Falak <mwani@microsoft.com> - 1.20.7-1
 - Bump version to 1.20.7
 - Introduce patch to permit requests with invalid host header
