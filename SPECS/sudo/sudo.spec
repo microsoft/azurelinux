@@ -1,7 +1,7 @@
 Summary:        Sudo
 Name:           sudo
-Version:        1.9.13p3
-Release:        2%{?dist}
+Version:        1.9.14p3
+Release:        1%{?dist}
 License:        ISC
 URL:            https://www.sudo.ws/
 Group:          System Environment/Security
@@ -99,7 +99,10 @@ fi
 %exclude  /etc/sudoers.dist
 
 %changelog
-* Thu May 08 2023 Andy Zaugg <azaugg@linkedin.com> - 1.9.13p3-2
+* Fri Aug 25 2023 Andy Zaugg <azaugg@linkedin.com> - 1.9.14p3-1
+- Bump version to 1.9.14p3
+
+* Mon May 08 2023 Andy Zaugg <azaugg@linkedin.com> - 1.9.13p3-2
 - Add config option to sudo build to allow configuration of sudo via LDAP.
 
 * Thu Mar 16 2023 Thien Trung Vuong <tvuong@microsoft.com> - 1.9.13p3-1
