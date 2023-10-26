@@ -1212,6 +1212,66 @@
                 "PR": [
                     "https://github.com/microsoft/CBL-Mariner/pull/6574"
                 ]
+            },
+            "CONFIG_DRM_AMD_DC_DCN": {
+                "value": [
+                    "<missing>"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for update to 5.15.136.1",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6593"
+                ]
+            },
+            "CONFIG_DRM_AMD_DC_HDCP": {
+                "value": [
+                    "<missing>"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for update to 5.15.136.1",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6593"
+                ]
+            },
+            "CONFIG_DRM_BUDDY": {
+                "value": [
+                    "<missing>"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for update to 5.15.136.1",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6593"
+                ]
+            },
+            "CONFIG_DRM_AMD_DC_FP": {
+                "value": [
+                    "<missing>"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for update to 5.15.136.1",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6593"
+                ]
+            },
+            "CONFIG_DRM_AMDGPU_WERROR": {
+                "value": [
+                    "<missing>"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for update to 5.15.136.1",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6593"
+                ]
             }
         }
     }
