@@ -183,6 +183,7 @@ steps:
         toolchain_built_list="$(find "$(Pipeline.Workspace)" -name "${{ parameters.customToolchainBuiltSpecsName }}" -print -quit)"
         if [[ -f "$toolchain_built_list" ]]; then
           rerun_toolchain_check_pkg_list=$(xargs --arg-file="$toolchain_built_list")
+          skip_check_arg=SKIP_MISSING_TESTS_IN_LISTS=y
         fi
       elif [[ ${{ parameters.isCheckBuild }} == "false" ]]; then
         run_check_arg="RUN_CHECK=n"
@@ -204,6 +205,7 @@ steps:
         $delta_fetch_arg \
         $quick_rebuild_packages_arg \
         $run_check_arg \
+        $skip_check_arg \
         TEST_RERUN_LIST="$rerun_toolchain_check_pkg_list" \
         $rerun_toolchain_checks_arg \
         $use_ccache_arg
