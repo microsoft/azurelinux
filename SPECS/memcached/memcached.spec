@@ -6,8 +6,8 @@
 %bcond_with seccomp
 Summary:        High Performance, Distributed Memory Object Cache
 Name:           memcached
-Version:        1.6.13
-Release:        4%{?dist}
+Version:        1.6.21
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,7 +15,6 @@ URL:            https://www.memcached.org/
 Source0:        https://www.memcached.org/files/%{name}-%{version}.tar.gz
 Source1:        memcached.sysconfig
 Patch0:         memcached-unit.patch
-Patch1:         CVE-2021-45985.patch
 BuildRequires:  gcc
 BuildRequires:  libevent-devel
 BuildRequires:  systemd-devel
@@ -120,6 +119,9 @@ exit 0
 %{_includedir}/memcached/*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.6.21-1
+- Auto-upgrade to 1.6.21 - Azure Linux 3.0 - package upgrades
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.6.13-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
