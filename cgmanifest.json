@@ -27667,8 +27667,8 @@
         "type": "other",
         "other": {
           "name": "socat",
-          "version": "1.7.4.3",
-          "downloadUrl": "http://www.dest-unreach.org/socat/download/socat-1.7.4.3.tar.gz"
+          "version": "1.7.4.4",
+          "downloadUrl": "http://www.dest-unreach.org/socat/download/socat-1.7.4.4.tar.gz"
         }
       }
     },
