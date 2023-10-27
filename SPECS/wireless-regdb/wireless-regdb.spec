@@ -1,7 +1,7 @@
 %global         _firmwarepath    /usr/lib/firmware
 
 Name:           wireless-regdb
-Version:        2022.08.12
+Version:        2023.05.03
 Release:        1%{?dist}
 Summary:        Regulatory database for 802.11 wireless networking
 Vendor:         Microsoft Corporation
@@ -63,6 +63,9 @@ rm -rf %{buildroot}/usr/lib/crda
 
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2023.05.03-1
+- Auto-upgrade to 2023.05.03 - Azure Linux 3.0 - package upgrades
+
 * Tue Oct 18 2022 Henry Li <lihl@microsoft.com> - 2022.08.12-1
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
 - License Verified
