@@ -1,6 +1,6 @@
 Name:         extra-cmake-modules
 Summary:      Additional modules for CMake build system
-Version:      5.90.0
+Version:      5.109.0
 Release:      1%{?dist}
 Vendor:       Microsoft Corporation
 Distribution: Mariner
@@ -66,6 +66,9 @@ make test ARGS="--output-on-failure --timeout 300" -C %{_target_platform} ||:
 
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.109.0-1
+- Auto-upgrade to 5.109.0 - Azure Linux 3.0 - package upgrades
+
 * Tue Jan 25 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.90.0-1
 - Update source to 5.90.0
 - License verified

@@ -3408,8 +3408,8 @@
         "type": "other",
         "other": {
           "name": "extra-cmake-modules",
-          "version": "5.90.0",
-          "downloadUrl": "https://download.kde.org/stable/frameworks/5.90/extra-cmake-modules-5.90.0.tar.xz"
+          "version": "5.109.0",
+          "downloadUrl": "https://download.kde.org/stable/frameworks/5.109/extra-cmake-modules-5.109.0.tar.xz"
         }
       }
     },
