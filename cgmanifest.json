@@ -25495,8 +25495,8 @@
         "type": "other",
         "other": {
           "name": "rpcbind",
-          "version": "1.2.5",
-          "downloadUrl": "http://downloads.sourceforge.net/rpcbind/rpcbind-1.2.5.tar.bz2"
+          "version": "1.2.6",
+          "downloadUrl": "http://downloads.sourceforge.net/rpcbind/rpcbind-1.2.6.tar.bz2"
         }
       }
     },
