@@ -1997,8 +1997,8 @@
         "type": "other",
         "other": {
           "name": "conmon",
-          "version": "2.1.0",
-          "downloadUrl": "https://github.com/containers/conmon/archive/v2.1.0.tar.gz"
+          "version": "2.1.8",
+          "downloadUrl": "https://github.com/containers/conmon/archive/v2.1.8.tar.gz"
         }
       }
     },
