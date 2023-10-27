@@ -19944,8 +19944,8 @@
         "type": "other",
         "other": {
           "name": "perl-Test-LeakTrace",
-          "version": "0.16",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Test/Test-LeakTrace-0.16.tar.gz"
+          "version": "0.17",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Test/Test-LeakTrace-0.17.tar.gz"
         }
       }
     },
