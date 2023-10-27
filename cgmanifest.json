@@ -9991,8 +9991,8 @@
         "type": "other",
         "other": {
           "name": "libmaxminddb",
-          "version": "1.6.0",
-          "downloadUrl": "https://github.com/maxmind/libmaxminddb/releases/download/1.6.0/libmaxminddb-1.6.0.tar.gz"
+          "version": "1.7.1",
+          "downloadUrl": "https://github.com/maxmind/libmaxminddb/releases/download/1.7.1/libmaxminddb-1.7.1.tar.gz"
         }
       }
     },
