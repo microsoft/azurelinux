@@ -1,7 +1,7 @@
 Summary:        ODBC driver manager
 Name:           unixODBC
-Version:        2.3.9
-Release:        2%{?dist}
+Version:        2.3.12
+Release:        1%{?dist}
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -72,6 +72,9 @@ rm -rf %{buildroot}%{_datadir}/libtool
 %{_libdir}/pkgconfig
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.3.12-1
+- Auto-upgrade to 2.3.12 - Azure Linux 3.0 - package upgrades
+
 * Thu May 26 2022 Evan Lee <evlee@microsoft.com> - 2.3.9-2
 - Require glibc-iconv as a runtime dependency for unixODBC.
 
