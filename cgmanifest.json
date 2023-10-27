@@ -10791,8 +10791,8 @@
         "type": "other",
         "other": {
           "name": "librsync",
-          "version": "2.3.2",
-          "downloadUrl": "https://github.com/librsync/librsync/archive/v2.3.2.tar.gz"
+          "version": "2.3.4",
+          "downloadUrl": "https://github.com/librsync/librsync/archive/v2.3.4.tar.gz"
         }
       }
     },
