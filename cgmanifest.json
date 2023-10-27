@@ -14253,8 +14253,8 @@
         "type": "other",
         "other": {
           "name": "nss_nis",
-          "version": "3.1",
-          "downloadUrl": "https://github.com/thkukuk/libnss_nis/archive/v3.1.tar.gz"
+          "version": "3.2",
+          "downloadUrl": "https://github.com/thkukuk/libnss_nis/archive/v3.2.tar.gz"
         }
       }
     },
