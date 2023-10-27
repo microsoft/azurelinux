@@ -13823,8 +13823,8 @@
         "type": "other",
         "other": {
           "name": "nano",
-          "version": "6.0",
-          "downloadUrl": "http://www.nano-editor.org/dist/v6/nano-6.0.tar.xz"
+          "version": "6.4",
+          "downloadUrl": "http://www.nano-editor.org/dist/v6/nano-6.4.tar.xz"
         }
       }
     },
