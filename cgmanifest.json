@@ -11741,8 +11741,8 @@
         "type": "other",
         "other": {
           "name": "libxkbcommon",
-          "version": "1.0.1",
-          "downloadUrl": "https://xkbcommon.org/download/libxkbcommon-1.0.1.tar.xz"
+          "version": "1.5.0",
+          "downloadUrl": "https://xkbcommon.org/download/libxkbcommon-1.5.0.tar.xz"
         }
       }
     },
