@@ -27777,8 +27777,8 @@
         "type": "other",
         "other": {
           "name": "span-lite",
-          "version": "0.10.0",
-          "downloadUrl": "https://github.com/martinmoene/span-lite/archive/v0.10.0.tar.gz"
+          "version": "0.10.3",
+          "downloadUrl": "https://github.com/martinmoene/span-lite/archive/v0.10.3.tar.gz"
         }
       }
     },

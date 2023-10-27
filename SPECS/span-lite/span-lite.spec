@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 Summary:        A single-file header-only version of a C++20-like span for C++98, C++11 and later
 Name:           span-lite
-Version:        0.10.0
+Version:        0.10.3
 Release:        1%{?dist}
 License:        Boost
 Vendor:         Microsoft Corporation
@@ -44,6 +44,9 @@ make test -C build
 %{_libdir}/cmake/span-lite
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.10.3-1
+- Auto-upgrade to 0.10.3 - Azure Linux 3.0 - package upgrades
+
 * Tue Feb 01 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.10.0-1
 - Update version to 0.10.0.
 
