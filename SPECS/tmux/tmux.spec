@@ -1,14 +1,13 @@
 Summary:        Terminal multiplexer
 Name:           tmux
-Version:        3.2a
-Release:        3%{?dist}
+Version:        3.3a
+Release:        1%{?dist}
 License:        ISC and BSD
 URL:            https://tmux.github.io/
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://github.com/tmux/tmux/releases/download/%{version}/%{name}-%{version}.tar.gz
-Patch0:         CVE-2022-47016.patch
 Requires:       libevent ncurses
 BuildRequires:  libevent-devel ncurses-devel
 
@@ -38,6 +37,9 @@ make  %{?_smp_mflags} check
 %exclude /usr/src
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.3a-1
+- Auto-upgrade to 3.3a - Azure Linux 3.0 - package upgrades
+
 * Fri Feb 10 2023 Rachel Menge <rachelmenge@microsoft.com> - 3.2a-3
 - Patch CVE-2022-47016
 
