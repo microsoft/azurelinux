@@ -22794,8 +22794,8 @@
         "type": "other",
         "other": {
           "name": "python-jmespath",
-          "version": "0.10.0",
-          "downloadUrl": "https://github.com/jmespath/jmespath.py/archive/refs/tags/0.10.0.tar.gz"
+          "version": "1.0.1",
+          "downloadUrl": "https://github.com/jmespath/jmespath.py/archive/refs/tags/1.0.1.tar.gz"
         }
       }
     },
