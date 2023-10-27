@@ -21614,8 +21614,8 @@
         "type": "other",
         "other": {
           "name": "pyOpenSSL",
-          "version": "18.0.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pyOpenSSL/pyOpenSSL-18.0.0.tar.gz"
+          "version": "23.2.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/be/df/75a6525d8988a89aed2393347e9db27a56cb38a3e864314fac223e905aef/pyOpenSSL-23.2.0.tar.gz"
         }
       }
     },
