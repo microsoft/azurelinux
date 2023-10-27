@@ -12221,8 +12221,8 @@
         "type": "other",
         "other": {
           "name": "lsb-release",
-          "version": "3.1",
-          "downloadUrl": "https://github.com/thkukuk/lsb-release_os-release/archive/refs/tags/v3.1.tar.gz"
+          "version": "3.2",
+          "downloadUrl": "https://github.com/thkukuk/lsb-release_os-release/archive/refs/tags/v3.2.tar.gz"
         }
       }
     },
