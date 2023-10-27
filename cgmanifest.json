@@ -7221,8 +7221,8 @@
         "type": "other",
         "other": {
           "name": "influx-cli",
-          "version": "2.6.1",
-          "downloadUrl": "https://github.com/influxdata/influx-cli/archive/refs/tags/v2.6.1.tar.gz"
+          "version": "2.7.3",
+          "downloadUrl": "https://github.com/influxdata/influx-cli/archive/refs/tags/v2.7.3.tar.gz"
         }
       }
     },
