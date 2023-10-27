@@ -11941,8 +11941,8 @@
         "type": "other",
         "other": {
           "name": "libyang",
-          "version": "2.1.55",
-          "downloadUrl": "https://github.com/CESNET/libyang/archive/refs/tags/v2.1.55.tar.gz"
+          "version": "2.1.111",
+          "downloadUrl": "https://github.com/CESNET/libyang/archive/refs/tags/v2.1.111.tar.gz"
         }
       }
     },
