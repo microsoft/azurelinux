@@ -1,8 +1,8 @@
 # Got the intial spec from Fedora and modified it
 Summary:        Read/Write YAML files with as little code as possible
 Name:           perl-YAML-Tiny
-Version:        1.73
-Release:        6%{?dist}
+Version:        1.74
+Release:        1%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/YAML-Tiny/
@@ -51,6 +51,9 @@ make test
 %{_mandir}/man3/YAML::Tiny.3*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.74-1
+- Auto-upgrade to 1.74 - Azure Linux 3.0 - package upgrades
+
 * Mon Aug 01 2022 Muhammad Falak <mwani@microsoft.com> - 1.73-6
 - Add BR on `perl(JSON::PP)` & `perl(Test::More)` to fix ptest
 

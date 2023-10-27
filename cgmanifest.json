@@ -20804,8 +20804,8 @@
         "type": "other",
         "other": {
           "name": "perl-YAML-Tiny",
-          "version": "1.73",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/E/ET/ETHER/YAML-Tiny-1.73.tar.gz"
+          "version": "1.74",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/E/ET/ETHER/YAML-Tiny-1.74.tar.gz"
         }
       }
     },
