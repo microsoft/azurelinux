@@ -6510,8 +6510,8 @@
         "type": "other",
         "other": {
           "name": "hwloc",
-          "version": "2.5.0",
-          "downloadUrl": "http://www.open-mpi.org/software/hwloc/v2.5/downloads/hwloc-2.5.0.tar.bz2"
+          "version": "2.9.2",
+          "downloadUrl": "http://www.open-mpi.org/software/hwloc/v2.9/downloads/hwloc-2.9.2.tar.bz2"
         }
       }
     },
