@@ -23564,8 +23564,8 @@
         "type": "other",
         "other": {
           "name": "python-pycosat",
-          "version": "0.6.3",
-          "downloadUrl": "https://github.com/ContinuumIO/pycosat/archive/0.6.3/pycosat-0.6.3.tar.gz"
+          "version": "0.6.4",
+          "downloadUrl": "https://github.com/ContinuumIO/pycosat/archive/0.6.4/pycosat-0.6.4.tar.gz"
         }
       }
     },
