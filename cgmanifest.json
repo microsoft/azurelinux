@@ -10661,8 +10661,8 @@
         "type": "other",
         "other": {
           "name": "libqmi",
-          "version": "1.30.2",
-          "downloadUrl": "https://www.freedesktop.org/software/libqmi/libqmi-1.30.2.tar.xz"
+          "version": "1.30.8",
+          "downloadUrl": "https://www.freedesktop.org/software/libqmi/libqmi-1.30.8.tar.xz"
         }
       }
     },
