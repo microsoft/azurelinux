@@ -2928,8 +2928,8 @@
         "type": "other",
         "other": {
           "name": "doxygen",
-          "version": "1.9.3",
-          "downloadUrl": "https://doxygen.nl/files/doxygen-1.9.3.src.tar.gz"
+          "version": "1.9.8",
+          "downloadUrl": "https://doxygen.nl/files/doxygen-1.9.8.src.tar.gz"
         }
       }
     },
