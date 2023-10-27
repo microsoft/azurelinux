@@ -11471,8 +11471,8 @@
         "type": "other",
         "other": {
           "name": "libvoikko",
-          "version": "4.1.1",
-          "downloadUrl": "http://www.puimula.org/voikko-sources/libvoikko/libvoikko-4.1.1.tar.gz"
+          "version": "4.3",
+          "downloadUrl": "http://www.puimula.org/voikko-sources/libvoikko/libvoikko-4.3.tar.gz"
         }
       }
     },
