@@ -7261,8 +7261,8 @@
         "type": "other",
         "other": {
           "name": "initscripts",
-          "version": "10.15",
-          "downloadUrl": "https://github.com/fedora-sysv/initscripts/archive/refs/tags/10.15.tar.gz"
+          "version": "10.19",
+          "downloadUrl": "https://github.com/fedora-sysv/initscripts/archive/refs/tags/10.19.tar.gz"
         }
       }
     },
