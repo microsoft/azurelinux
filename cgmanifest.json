@@ -2187,8 +2187,8 @@
         "type": "other",
         "other": {
           "name": "cpulimit",
-          "version": "2.8",
-          "downloadUrl": "https://downloads.sourceforge.net/limitcpu/cpulimit-2.8.tar.gz"
+          "version": "3.0",
+          "downloadUrl": "https://downloads.sourceforge.net/limitcpu/cpulimit-3.0.tar.gz"
         }
       }
     },
