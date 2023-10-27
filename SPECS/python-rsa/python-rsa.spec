@@ -3,7 +3,7 @@
 
 Summary:        Purely Python RSA implementation
 Name:           python-%{pkgname}
-Version:        4.7.2
+Version:        4.9
 Release:        1%{?dist}
 License:        ASL 2.0
 URL:            https://stuvel.eu/software/rsa/
@@ -45,6 +45,9 @@ python3 setup.py install --skip-build --root=%{buildroot}
 %{_bindir}/*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.9-1
+- Auto-upgrade to 4.9 - Azure Linux 3.0 - package upgrades
+
 * Fri May 21 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 4.7.2-1
 - Update package version to fix CVE-2020-25658
 
