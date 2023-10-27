@@ -2037,8 +2037,8 @@
         "type": "other",
         "other": {
           "name": "containerized-data-importer",
-          "version": "1.55.0",
-          "downloadUrl": "https://github.com/kubevirt/containerized-data-importer/archive/refs/tags/v1.55.0.tar.gz"
+          "version": "1.57.0",
+          "downloadUrl": "https://github.com/kubevirt/containerized-data-importer/archive/refs/tags/v1.57.0.tar.gz"
         }
       }
     },
