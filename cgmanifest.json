@@ -12301,8 +12301,8 @@
         "type": "other",
         "other": {
           "name": "lttng-ust",
-          "version": "2.13.1",
-          "downloadUrl": "https://lttng.org/files/lttng-ust/lttng-ust-2.13.1.tar.bz2"
+          "version": "2.13.6",
+          "downloadUrl": "https://lttng.org/files/lttng-ust/lttng-ust-2.13.6.tar.bz2"
         }
       }
     },
