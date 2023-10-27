@@ -12121,8 +12121,8 @@
         "type": "other",
         "other": {
           "name": "local-path-provisioner",
-          "version": "0.0.21",
-          "downloadUrl": "https://github.com/rancher/local-path-provisioner/archive/refs/tags/v0.0.21.tar.gz"
+          "version": "0.0.24",
+          "downloadUrl": "https://github.com/rancher/local-path-provisioner/archive/refs/tags/v0.0.24.tar.gz"
         }
       }
     },
