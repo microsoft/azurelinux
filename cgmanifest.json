@@ -29477,8 +29477,8 @@
         "type": "other",
         "other": {
           "name": "wireless-regdb",
-          "version": "2022.08.12",
-          "downloadUrl": "http://www.kernel.org/pub/software/network/wireless-regdb/wireless-regdb-2022.08.12.tar.xz"
+          "version": "2023.05.03",
+          "downloadUrl": "http://www.kernel.org/pub/software/network/wireless-regdb/wireless-regdb-2023.05.03.tar.xz"
         }
       }
     },
