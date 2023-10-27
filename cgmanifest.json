@@ -17734,8 +17734,8 @@
         "type": "other",
         "other": {
           "name": "perl-HTTP-Message",
-          "version": "6.22",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/O/OA/OALDERS/HTTP-Message-6.22.tar.gz"
+          "version": "6.44",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/O/OA/OALDERS/HTTP-Message-6.44.tar.gz"
         }
       }
     },
