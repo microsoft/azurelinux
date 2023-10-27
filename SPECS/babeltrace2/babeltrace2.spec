@@ -1,7 +1,7 @@
 Summary:        A trace manipulation toolkit
 Name:           babeltrace2
-Version:        2.0.4
-Release:        2%{?dist}
+Version:        2.0.5
+Release:        1%{?dist}
 License:        MIT AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -84,6 +84,9 @@ rm -fv %{buildroot}%{_docdir}/babeltrace2/*
 %{_libdir}/pkgconfig/babeltrace2-ctf-writer.pc
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.5-1
+- Auto-upgrade to 2.0.5 - Azure Linux 3.0 - package upgrades
+
 * Thu Feb 10 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 2.0.4-2
 - Re-add 00-fix-lttng-live-array-access.patch
 
