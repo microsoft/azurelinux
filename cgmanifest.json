@@ -28357,8 +28357,8 @@
         "type": "other",
         "other": {
           "name": "tcpdump",
-          "version": "4.99.1",
-          "downloadUrl": "https://www.tcpdump.org/release/tcpdump-4.99.1.tar.gz"
+          "version": "4.99.4",
+          "downloadUrl": "https://www.tcpdump.org/release/tcpdump-4.99.4.tar.gz"
         }
       }
     },
