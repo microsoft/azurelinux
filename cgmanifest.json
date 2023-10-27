@@ -29257,8 +29257,8 @@
         "type": "other",
         "other": {
           "name": "virt-what",
-          "version": "1.20",
-          "downloadUrl": "http://people.redhat.com/~rjones/virt-what/files/virt-what-1.20.tar.gz"
+          "version": "1.25",
+          "downloadUrl": "http://people.redhat.com/~rjones/virt-what/files/virt-what-1.25.tar.gz"
         }
       }
     },
