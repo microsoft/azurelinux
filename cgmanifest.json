@@ -4740,8 +4740,8 @@
         "type": "other",
         "other": {
           "name": "gperftools",
-          "version": "2.9.1",
-          "downloadUrl": "https://github.com/gperftools/gperftools/releases/download/gperftools-2.9.1/gperftools-2.9.1.tar.gz"
+          "version": "2.12",
+          "downloadUrl": "https://github.com/gperftools/gperftools/releases/download/gperftools-2.12/gperftools-2.12.tar.gz"
         }
       }
     },
