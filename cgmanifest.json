@@ -24044,8 +24044,8 @@
         "type": "other",
         "other": {
           "name": "python-rsa",
-          "version": "4.7.2",
-          "downloadUrl": "https://pypi.python.org/packages/source/r/rsa/rsa-4.7.2.tar.gz"
+          "version": "4.9",
+          "downloadUrl": "https://files.pythonhosted.org/packages/aa/65/7d973b89c4d2351d7fb232c2e452547ddfa243e93131e7cfa766da627b52/rsa-4.9.tar.gz"
         }
       }
     },
