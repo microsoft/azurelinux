@@ -2277,8 +2277,8 @@
         "type": "other",
         "other": {
           "name": "cronie",
-          "version": "1.5.7",
-          "downloadUrl": "https://github.com/cronie-crond/cronie/releases/download/cronie-1.5.7/cronie-1.5.7.tar.gz"
+          "version": "1.6.1",
+          "downloadUrl": "https://github.com/cronie-crond/cronie/releases/download/cronie-1.6.1/cronie-1.6.1.tar.gz"
         }
       }
     },
