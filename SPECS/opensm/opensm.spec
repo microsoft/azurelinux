@@ -1,8 +1,8 @@
 %global __remake_config 1
 Summary:        OpenIB InfiniBand Subnet Manager and management utilities
 Name:           opensm
-Version:        3.3.23
-Release:        3%{?dist}
+Version:        3.3.24
+Release:        1%{?dist}
 License:        GPLv2 OR BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -127,6 +127,9 @@ fi
 %{_libdir}/lib*.a
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.3.24-1
+- Auto-upgrade to 3.3.24 - Azure Linux 3.0 - package upgrades
+
 * Mon Feb 06 2023 Riken Maharjan <rmaharjan@microsoft.com> - 3.3.23-3
 - Move from Extended to Core.
 - License verified.
