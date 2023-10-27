@@ -11091,8 +11091,8 @@
         "type": "other",
         "other": {
           "name": "libtalloc",
-          "version": "2.3.3",
-          "downloadUrl": "https://www.samba.org/ftp/talloc/talloc-2.3.3.tar.gz"
+          "version": "2.4.1",
+          "downloadUrl": "https://www.samba.org/ftp/talloc/talloc-2.4.1.tar.gz"
         }
       }
     },
