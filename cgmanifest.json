@@ -7411,8 +7411,8 @@
         "type": "other",
         "other": {
           "name": "ipset",
-          "version": "7.15",
-          "downloadUrl": "https://ipset.netfilter.org/ipset-7.15.tar.bz2"
+          "version": "7.17",
+          "downloadUrl": "https://ipset.netfilter.org/ipset-7.17.tar.bz2"
         }
       }
     },
