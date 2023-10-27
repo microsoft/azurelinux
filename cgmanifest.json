@@ -30450,8 +30450,8 @@
         "type": "other",
         "other": {
           "name": "xxhash",
-          "version": "0.8.1",
-          "downloadUrl": "https://github.com/Cyan4973/xxHash/archive/refs/tags/v0.8.1.tar.gz"
+          "version": "0.8.2",
+          "downloadUrl": "https://github.com/Cyan4973/xxHash/archive/refs/tags/v0.8.2.tar.gz"
         }
       }
     },
