@@ -1,7 +1,7 @@
 Summary:        GNU Unicode string library
 Name:           libunistring
-Version:        0.9.10
-Release:        6%{?dist}
+Version:        1.1
+Release:        1%{?dist}
 License:        LGPLv3+
 Url:            http://www.gnu.org/software/libunistring/
 Source0:        http://ftp.gnu.org/gnu/libunistring/%{name}-%{version}.tar.xz
@@ -54,6 +54,9 @@ make %{?_smp_mflags} check
 %{_libdir}/*.so
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1-1
+- Auto-upgrade to 1.1 - Azure Linux 3.0 - package upgrades
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.9.10-6
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
