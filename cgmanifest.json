@@ -24564,8 +24564,8 @@
         "type": "other",
         "other": {
           "name": "python-tox-current-env",
-          "version": "0.0.7",
-          "downloadUrl": "https://github.com/fedora-python/tox-current-env/archive/refs/tags/v0.0.7.tar.gz"
+          "version": "0.0.11",
+          "downloadUrl": "https://github.com/fedora-python/tox-current-env/archive/refs/tags/v0.0.11.tar.gz"
         }
       }
     },
