@@ -8891,8 +8891,8 @@
         "type": "other",
         "other": {
           "name": "libcomps",
-          "version": "0.1.18",
-          "downloadUrl": "https://github.com/rpm-software-management/libcomps/archive/refs/tags/0.1.18.tar.gz"
+          "version": "0.1.19",
+          "downloadUrl": "https://github.com/rpm-software-management/libcomps/archive/refs/tags/0.1.19.tar.gz"
         }
       }
     },
