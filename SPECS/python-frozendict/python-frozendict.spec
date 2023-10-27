@@ -5,7 +5,7 @@ the complete mapping interface. It can be used as a drop-in
 replacement for dictionaries where immutability is desired.}
 Summary:        An immutable dictionary
 Name:           python-%{srcname}
-Version:        2.3.0
+Version:        2.3.8
 Release:        1%{?dist}
 License:        LGPLv3+
 Vendor:         Microsoft Corporation
@@ -49,6 +49,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} python3 -m pytest
 %{python3_sitelib}/%{srcname}/
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.3.8-1
+- Auto-upgrade to 2.3.8 - Azure Linux 3.0 - package upgrades
+
 * Mon Mar 14 2022 Thomas Crain <thcrain@microsoft.com> - 2.3.0-1
 - Upgrade to latest version in forked repo
 - Remove noarch specification (package now comes with a C extension)
