@@ -5240,8 +5240,8 @@
         "type": "other",
         "other": {
           "name": "help2man",
-          "version": "1.47.14",
-          "downloadUrl": "ftp://ftp.gnu.org/gnu/help2man/help2man-1.47.14.tar.xz"
+          "version": "1.49.3",
+          "downloadUrl": "ftp://ftp.gnu.org/gnu/help2man/help2man-1.49.3.tar.xz"
         }
       }
     },
