@@ -495,8 +495,8 @@
         "type": "other",
         "other": {
           "name": "application-gateway-kubernetes-ingress",
-          "version": "1.4.0",
-          "downloadUrl": "https://github.com/Azure/application-gateway-kubernetes-ingress/archive/refs/tags/1.4.0.tar.gz"
+          "version": "1.7.2",
+          "downloadUrl": "https://github.com/Azure/application-gateway-kubernetes-ingress/archive/refs/tags/1.7.2.tar.gz"
         }
       }
     },
