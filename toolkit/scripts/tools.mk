@@ -107,8 +107,10 @@ else
 $(TOOL_BINS_DIR)/%: $(go_common_files)
 	cd $(TOOLS_DIR)/$* && \
 		go test -test.short -covermode=atomic -coverprofile=$(BUILD_DIR)/tools/$*.test_coverage ./... && \
+		TOOLKIT_VER="-X github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe.ToolkitVersion=$(RELEASE_VERSION)" && \
+		IMGCUST_VER="-X github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/imagecustomizerlib.ToolVersion=$(IMAGE_CUSTOMIZER_FULL_VERSION)" && \
 		CGO_ENABLED=0 go build \
-			-ldflags="-X github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe.ToolkitVersion=$(RELEASE_VERSION)" \
+			-ldflags="$$TOOLKIT_VER $$IMGCUST_VER" \
 			-o $(TOOL_BINS_DIR)
 endif
 
@@ -190,8 +192,7 @@ worker_chroot_rpm_paths := $(shell sed -nr $(sed_regex_full_path) < $(worker_chr
 worker_chroot_deps := \
 	$(worker_chroot_manifest) \
 	$(worker_chroot_rpm_paths) \
-	$(PKGGEN_DIR)/worker/create_worker_chroot.sh \
-	$(no_repo_acl)
+	$(PKGGEN_DIR)/worker/create_worker_chroot.sh
 
 ifeq ($(REFRESH_WORKER_CHROOT),y)
 $(chroot_worker): $(worker_chroot_deps) $(depend_REBUILD_TOOLCHAIN) $(depend_TOOLCHAIN_ARCHIVE)

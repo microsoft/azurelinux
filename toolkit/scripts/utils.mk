@@ -100,8 +100,7 @@ $(foreach var,$(watch_vars),$(eval $(call depend_on_var,$(var))))
 #       to always run the "setfacl" command but not trigger a re-run of the targets
 #       depending on this target.
 $(no_repo_acl): setfacl_always_run_phony
-	setfacl -bnR $(PROJECT_ROOT) && \
-	setfacl -bnR $(CHROOT_DIR) && \
+	@setfacl -bnR $(PROJECT_ROOT) &>/dev/null && \
 	if [ ! -f $@ ]; then \
 		touch $@; \
 	fi
