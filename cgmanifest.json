@@ -21664,8 +21664,8 @@
         "type": "other",
         "other": {
           "name": "pytest",
-          "version": "3.8.2",
-          "downloadUrl": "https://files.pythonhosted.org/packages/5f/d2/7f77f406ac505abda02ab4afb50d06ebf304f6ea42fca34f8f37529106b2/pytest-3.8.2.tar.gz"
+          "version": "7.4.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/a7/f3/dadfbdbf6b6c8b5bd02adb1e08bc9fbb45ba51c68b0893fa536378cdf485/pytest-7.4.0.tar.gz"
         }
       }
     },

@@ -1,7 +1,7 @@
 Summary:        pytest is a mature full-featured Python testing tool that helps you write better programs
 Name:           pytest
-Version:        3.8.2
-Release:        10%{?dist}
+Version:        7.4.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -66,6 +66,9 @@ ln -snf py.test%{python3_version} %{buildroot}%{_bindir}/py.test3
 %{python3_sitelib}/*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 7.4.0-1
+- Auto-upgrade to 7.4.0 - Azure Linux 3.0 - package upgrades
+
 * Wed Jan 11 2023 Riken Maharjan <rmaharjan@microsoft.com> - 3.8.2-10
 - Adding missing runtime dependencies.
 
