@@ -28777,8 +28777,8 @@
         "type": "other",
         "other": {
           "name": "uclibc-ng",
-          "version": "1.0.43",
-          "downloadUrl": "https://downloads.uclibc-ng.org/releases/1.0.43/uClibc-ng-1.0.43.tar.xz"
+          "version": "1.0.44",
+          "downloadUrl": "https://downloads.uclibc-ng.org/releases/1.0.44/uClibc-ng-1.0.44.tar.xz"
         }
       }
     },
