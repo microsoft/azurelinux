@@ -21774,8 +21774,8 @@
         "type": "other",
         "other": {
           "name": "python-atomicwrites",
-          "version": "1.4.0",
-          "downloadUrl": "https://github.com/untitaker/python-atomicwrites/archive/1.4.0.tar.gz"
+          "version": "1.4.1",
+          "downloadUrl": "https://github.com/untitaker/python-atomicwrites/archive/1.4.1.tar.gz"
         }
       }
     },
