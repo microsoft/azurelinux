@@ -12831,8 +12831,8 @@
         "type": "other",
         "other": {
           "name": "mc",
-          "version": "4.8.27",
-          "downloadUrl": "http://ftp.midnight-commander.org/mc-4.8.27.tar.xz"
+          "version": "4.8.30",
+          "downloadUrl": "http://ftp.midnight-commander.org/mc-4.8.30.tar.xz"
         }
       }
     },
