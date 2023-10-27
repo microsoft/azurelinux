@@ -28917,8 +28917,8 @@
         "type": "other",
         "other": {
           "name": "unixODBC",
-          "version": "2.3.9",
-          "downloadUrl": "http://www.unixodbc.org/unixODBC-2.3.9.tar.gz"
+          "version": "2.3.12",
+          "downloadUrl": "http://www.unixodbc.org/unixODBC-2.3.12.tar.gz"
         }
       }
     },
