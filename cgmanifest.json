@@ -115,8 +115,8 @@
         "type": "other",
         "other": {
           "name": "afflib",
-          "version": "3.7.19",
-          "downloadUrl": "https://github.com/sshock/AFFLIBv3/archive/v3.7.19.tar.gz"
+          "version": "3.7.20",
+          "downloadUrl": "https://github.com/sshock/AFFLIBv3/archive/v3.7.20.tar.gz"
         }
       }
     },
