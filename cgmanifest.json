@@ -5220,8 +5220,8 @@
         "type": "other",
         "other": {
           "name": "heimdal",
-          "version": "7.7.1",
-          "downloadUrl": "https://github.com/heimdal/heimdal/releases/download/heimdal-7.7.1/heimdal-7.7.1.tar.gz"
+          "version": "7.8.0",
+          "downloadUrl": "https://github.com/heimdal/heimdal/releases/download/heimdal-7.8.0/heimdal-7.8.0.tar.gz"
         }
       }
     },
