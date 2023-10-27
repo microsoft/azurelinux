@@ -428,7 +428,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 * Tue Sep 26 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.133.1-1
 - Auto-upgrade to 5.15.133.1
 
-* Tue Sep 22 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.131.1-3
+* Thu Sep 21 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.131.1-3
 - Call grub2-mkconfig to regenerate configs only if the user has 
     previously used grub2-mkconfig for boot configuration. 
 
