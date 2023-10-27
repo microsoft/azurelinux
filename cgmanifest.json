@@ -23894,8 +23894,8 @@
         "type": "other",
         "other": {
           "name": "python-requests",
-          "version": "2.27.1",
-          "downloadUrl": "https://github.com/requests/requests/archive/v2.27.1/requests-v2.27.1.tar.gz"
+          "version": "2.31.0",
+          "downloadUrl": "https://github.com/requests/requests/archive/v2.31.0/requests-v2.31.0.tar.gz"
         }
       }
     },
