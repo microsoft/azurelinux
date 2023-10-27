@@ -13383,8 +13383,8 @@
         "type": "other",
         "other": {
           "name": "mokutil",
-          "version": "0.5.0",
-          "downloadUrl": "https://github.com/lcp/mokutil/archive/0.5.0.tar.gz"
+          "version": "0.6.0",
+          "downloadUrl": "https://github.com/lcp/mokutil/archive/0.6.0.tar.gz"
         }
       }
     },
