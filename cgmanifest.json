@@ -21964,8 +21964,8 @@
         "type": "other",
         "other": {
           "name": "python-click",
-          "version": "7.1.2",
-          "downloadUrl": "https://github.com/mitsuhiko/click/archive/7.1.2/python-click-7.1.2.tar.gz"
+          "version": "8.1.7",
+          "downloadUrl": "https://github.com/mitsuhiko/click/archive/8.1.7/python-click-8.1.7.tar.gz"
         }
       }
     },
