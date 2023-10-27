@@ -9151,8 +9151,8 @@
         "type": "other",
         "other": {
           "name": "libell",
-          "version": "0.48",
-          "downloadUrl": "https://www.kernel.org/pub/linux/libs/ell/ell-0.48.tar.xz"
+          "version": "0.58",
+          "downloadUrl": "https://www.kernel.org/pub/linux/libs/ell/ell-0.58.tar.xz"
         }
       }
     },
