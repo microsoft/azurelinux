@@ -28177,8 +28177,8 @@
         "type": "other",
         "other": {
           "name": "sysstat",
-          "version": "12.7.1",
-          "downloadUrl": "https://github.com/sysstat/sysstat/archive/v12.7.1.tar.gz"
+          "version": "12.7.4",
+          "downloadUrl": "https://github.com/sysstat/sysstat/archive/v12.7.4.tar.gz"
         }
       }
     },
