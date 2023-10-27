@@ -14783,8 +14783,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-ocamlbuild",
-          "version": "0.14.0",
-          "downloadUrl": "https://github.com/ocaml/ocamlbuild/archive/0.14.0.tar.gz"
+          "version": "0.14.2",
+          "downloadUrl": "https://github.com/ocaml/ocamlbuild/archive/0.14.2.tar.gz"
         }
       }
     },
