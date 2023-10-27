@@ -28727,8 +28727,8 @@
         "type": "other",
         "other": {
           "name": "tuna",
-          "version": "0.14.1",
-          "downloadUrl": "https://git.kernel.org/pub/scm/utils/tuna/tuna.git/snapshot/tuna-0.14.1.tar.gz"
+          "version": "0.19",
+          "downloadUrl": "https://git.kernel.org/pub/scm/utils/tuna/tuna.git/snapshot/tuna-0.19.tar.gz"
         }
       }
     },

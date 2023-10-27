@@ -1,8 +1,8 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name: tuna
-Version: 0.14.1
-Release: 4%{?dist}
+Version: 0.19
+Release: 1%{?dist}
 License: GPLv2
 Summary: Application tuning GUI & command line utility
 Source: https://git.kernel.org/pub/scm/utils/%{name}/%{name}.git/snapshot/%{name}-%{version}.tar.gz
@@ -67,6 +67,9 @@ done
 %{_datadir}/polkit-1/actions/org.tuna.policy
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.19-1
+- Auto-upgrade to 0.19 - Azure Linux 3.0 - package upgrades
+
 * Mon Apr 11 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.14.1-4
 - Fixing invalid source URL.
 
