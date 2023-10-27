@@ -274,6 +274,7 @@ Patch1013:      CVE-2022-3165.patch
 # https://gitlab.com/qemu-project/qemu/-/issues/541
 Patch1014:      CVE-2021-3750.patch
 Patch1015:      CVE-2022-36648.patch
+Patch1016:      CVE-2023-3354.patch
 
 # alsa audio output
 BuildRequires:  alsa-lib-devel
