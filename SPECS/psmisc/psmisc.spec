@@ -1,6 +1,6 @@
 Summary:        Displays information about running processes
 Name:           psmisc
-Version:        23.4
+Version:        23.6
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
@@ -41,6 +41,9 @@ make %{?_smp_mflags} check
 %{_mandir}/*/*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 23.6-1
+- Auto-upgrade to 23.6 - Azure Linux 3.0 - package upgrades
+
 * Wed Nov 10 2021 Chris Co <chrco@microsoft.com> - 23.4-1
 - Update to 23.4
 - Fix lint
