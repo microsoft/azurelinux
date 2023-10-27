@@ -1,7 +1,7 @@
 Summary:        YAML parser and emitter for Python
 Name:           PyYAML
-Version:        3.13
-Release:        8%{?dist}
+Version:        5.2
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -59,6 +59,9 @@ chmod a-x examples/yaml-highlight/yaml_hl.py
 %{python3_sitelib}/*
 
 %changelog
+* Fri Oct 27 2023 Xiaohong Deng <xiaohongdeng@microsoft.com> - 5.2-1
+- Upgrade to 5.2
+
 * Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 3.13-8
 - Rebuild C source files using Cython for Python 3.9 compatibility
 

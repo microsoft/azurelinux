@@ -9071,8 +9071,8 @@
         "type": "other",
         "other": {
           "name": "libdrm",
-          "version": "2.4.114",
-          "downloadUrl": "https://dri.freedesktop.org/libdrm/libdrm-2.4.114.tar.xz"
+          "version": "2.4.115",
+          "downloadUrl": "https://dri.freedesktop.org/libdrm/libdrm-2.4.115.tar.xz"
         }
       }
     },
@@ -25144,8 +25144,8 @@
         "type": "other",
         "other": {
           "name": "PyYAML",
-          "version": "3.13",
-          "downloadUrl": "https://pyyaml.org/download/pyyaml/PyYAML-3.13.tar.gz"
+          "version": "5.2",
+          "downloadUrl": "https://pyyaml.org/download/pyyaml/PyYAML-5.2.tar.gz"
         }
       }
     },
