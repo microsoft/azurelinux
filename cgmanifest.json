@@ -12521,8 +12521,8 @@
         "type": "other",
         "other": {
           "name": "mailcap",
-          "version": "2.1.53",
-          "downloadUrl": "https://pagure.io/releases/mailcap/mailcap-2.1.53.tar.xz"
+          "version": "2.1.54",
+          "downloadUrl": "https://pagure.io/releases/mailcap/mailcap-2.1.54.tar.xz"
         }
       }
     },
