@@ -12121,8 +12121,8 @@
         "type": "other",
         "other": {
           "name": "lmdb",
-          "version": "0.9.29",
-          "downloadUrl": "https://github.com/LMDB/lmdb/archive/LMDB_0.9.29.tar.gz"
+          "version": "0.9.31",
+          "downloadUrl": "https://github.com/LMDB/lmdb/archive/LMDB_0.9.31.tar.gz"
         }
       }
     },
