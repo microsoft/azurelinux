@@ -1,5 +1,5 @@
 {
- "Signatures": {
-  "libbpf-1.0.1.tar.gz": "3d6afde67682c909e341bf194678a8969f17628705af25f900d5f68bd299cb03"
- }
+  "Signatures": {
+    "libbpf-1.2.2.tar.gz": "32b0c41eabfbbe8e0c8aea784d7495387ff9171b5a338480a8fbaceb9da8d5e5"
+  }
 }
