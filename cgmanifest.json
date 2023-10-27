@@ -3488,8 +3488,8 @@
         "type": "other",
         "other": {
           "name": "fdupes",
-          "version": "2.1.2",
-          "downloadUrl": "https://github.com/adrianlopezroche/fdupes/releases/download/v2.1.2/fdupes-2.1.2.tar.gz"
+          "version": "2.2.1",
+          "downloadUrl": "https://github.com/adrianlopezroche/fdupes/releases/download/v2.2.1/fdupes-2.2.1.tar.gz"
         }
       }
     },

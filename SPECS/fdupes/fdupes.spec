@@ -2,7 +2,7 @@
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; /bin/echo $d)
 Summary:        Finds duplicate files in a given set of directories
 Name:           fdupes
-Version:        2.1.2
+Version:        2.2.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -77,6 +77,9 @@ install -Dpm 0644 %{SOURCE1} %{buildroot}%{macrosdir}/macros.%{name}
 %{macrosdir}/macros.fdupes
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.2.1-1
+- Auto-upgrade to 2.2.1 - Azure Linux 3.0 - package upgrades
+
 * Tue Jan 25 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.1.2-1
 - Update source to 2.1.2
 
