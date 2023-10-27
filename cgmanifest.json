@@ -5330,8 +5330,8 @@
         "type": "other",
         "other": {
           "name": "htop",
-          "version": "3.0.5",
-          "downloadUrl": "https://github.com/htop-dev/htop/archive/3.0.5.tar.gz"
+          "version": "3.2.2",
+          "downloadUrl": "https://github.com/htop-dev/htop/archive/3.2.2.tar.gz"
         }
       }
     },
