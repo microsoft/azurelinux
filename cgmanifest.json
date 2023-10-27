@@ -21544,8 +21544,8 @@
         "type": "other",
         "other": {
           "name": "pyelftools",
-          "version": "0.27",
-          "downloadUrl": "https://github.com/eliben/pyelftools/archive/v0.27/pyelftools-0.27.tar.gz"
+          "version": "0.29",
+          "downloadUrl": "https://github.com/eliben/pyelftools/archive/v0.29/pyelftools-0.29.tar.gz"
         }
       }
     },

@@ -4,8 +4,8 @@
 %global         debug_package %{nil}
 
 Name:           pyelftools
-Version:        0.27
-Release:        3%{?dist}
+Version:        0.29
+Release:        1%{?dist}
 Summary:        Pure-Python library for parsing and analyzing ELF files
 License:        Public Domain AND MIT
 Group:          Development/Languages/Python
@@ -68,6 +68,9 @@ python3 test/run_readelf_tests.py || :
 %{python3_sitelib}/pyelftools-*.egg-info
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.29-1
+- Auto-upgrade to 0.29 - Azure Linux 3.0 - package upgrades
+
 * Fri Jul 02 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.27-3
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - License verified
