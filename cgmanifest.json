@@ -4020,8 +4020,8 @@
         "type": "other",
         "other": {
           "name": "gc",
-          "version": "8.0.0",
-          "downloadUrl": "https://www.hboehm.info/gc/gc_source/gc-8.0.0.tar.gz"
+          "version": "8.2.2",
+          "downloadUrl": "https://www.hboehm.info/gc/gc_source/gc-8.2.2.tar.gz"
         }
       }
     },
