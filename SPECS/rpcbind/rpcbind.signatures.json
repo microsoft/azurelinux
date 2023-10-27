@@ -1,8 +1,8 @@
 {
- "Signatures": {
-  "rpcbind-1.2.5.tar.bz2": "2ce360683963b35c19c43f0ee2c7f18aa5b81ef41c3fdbd15ffcb00b8bffda7a",
-  "rpcbind.service": "d746db0a910f04c1a175f0e22ca5ac2c335d1b5e89d30c6dea9ec25de8421034",
-  "rpcbind.socket": "a6300d62826f275edb416e74e7601fd49f2708d60f9801f151137ab4ee4c0cb7",
-  "rpcbind.sysconfig": "85a9d23df0bdbdd10076bb5732fb6ebca1aaaddac9ce96f05216453c7bfe486d"
- }
+  "Signatures": {
+    "rpcbind.service": "d746db0a910f04c1a175f0e22ca5ac2c335d1b5e89d30c6dea9ec25de8421034",
+    "rpcbind.socket": "a6300d62826f275edb416e74e7601fd49f2708d60f9801f151137ab4ee4c0cb7",
+    "rpcbind.sysconfig": "85a9d23df0bdbdd10076bb5732fb6ebca1aaaddac9ce96f05216453c7bfe486d",
+    "rpcbind-1.2.6.tar.bz2": "5613746489cae5ae23a443bb85c05a11741a5f12c8f55d2bb5e83b9defeee8de"
+  }
 }
