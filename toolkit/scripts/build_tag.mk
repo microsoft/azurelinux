@@ -34,7 +34,15 @@ RELEASE_VERSION := $(RELEASE_VERSION)
 # Image tag - empty by default. Does not apply to the initrd.
 IMAGE_TAG          ?=
 
-# Image Customizer Version
+# Mariner Image Customizer version.
+# This is using semantic versioning.
+#
+# IMAGE_CUSTOMIZER_VERSION should have the format:
+#
+#   <major>.<minor>.<patch>
+#
+# and should hold the value of the next (or current) official release, not the previous official
+# release.
 IMAGE_CUSTOMIZER_VERSION ?= 0.1.0
 IMAGE_CUSTOMIZER_VERSION_PREVIEW ?= -dev.$(DATETIME_AS_VERSION)+$(GIT_COMMIT_ID)
 IMAGE_CUSTOMIZER_FULL_VERSION := $(IMAGE_CUSTOMIZER_VERSION)$(IMAGE_CUSTOMIZER_VERSION_PREVIEW)
