@@ -22824,8 +22824,8 @@
         "type": "other",
         "other": {
           "name": "python-jsonpointer",
-          "version": "2.2",
-          "downloadUrl": "https://github.com/stefankoegl/python-json-pointer/archive/refs/tags/v2.2.tar.gz"
+          "version": "2.4",
+          "downloadUrl": "https://github.com/stefankoegl/python-json-pointer/archive/refs/tags/v2.4.tar.gz"
         }
       }
     },
