@@ -1,0 +1,40 @@
+From cd65bd3869a655097e04e8956668156f8712b9c0 Mon Sep 17 00:00:00 2001
+From: Sudhakar Kuppusamy <sudhakar@linux.ibm.com>
+Date: Wed, 6 Apr 2022 18:17:43 +0530
+Subject: [PATCH] fs/f2fs: Do not copy file names that are too long
+
+A corrupt f2fs file system might specify a name length which is greater
+than the maximum name length supported by the GRUB f2fs driver.
+
+We will allocate enough memory to store the overly long name, but there
+are only F2FS_NAME_LEN bytes in the source, so we would read past the end
+of the source.
+
+While checking directory entries, do not copy a file name with an invalid
+length.
+
+Signed-off-by: Sudhakar Kuppusamy <sudhakar@linux.ibm.com>
+Signed-off-by: Daniel Axtens <dja@axtens.net>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/fs/f2fs.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/grub-core/fs/f2fs.c b/grub-core/fs/f2fs.c
+index 8898b23..df6beb5 100644
+--- a/grub-core/fs/f2fs.c
++++ b/grub-core/fs/f2fs.c
+@@ -1003,6 +1003,10 @@ grub_f2fs_check_dentries (struct grub_f2fs_dir_iter_ctx *ctx)
+ 
+       ftype = ctx->dentry[i].file_type;
+       name_len = grub_le_to_cpu16 (ctx->dentry[i].name_len);
++
++      if (name_len >= F2FS_NAME_LEN)
++        return 0;
++
+       filename = grub_malloc (name_len + 1);
+       if (!filename)
+         return 0;
+-- 
+2.34.1
+

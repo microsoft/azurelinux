@@ -1,0 +1,23 @@
+--- crash-8.0.1/Makefile.orig
++++ crash-8.0.1/Makefile
+@@ -256,7 +256,7 @@ all: make_configure
+ gdb_merge: force
+ 	@if [ ! -f ${GDB}/README ]; then \
+ 	  $(MAKE) gdb_unzip; fi
+-	@echo "${LDFLAGS} -lz -ldl -rdynamic" > ${GDB}/gdb/mergelibs
++	@echo "${LDFLAGS} -lz -llzo2 -lsnappy -lzstd -ldl -rdynamic" > ${GDB}/gdb/mergelibs
+ 	@echo "../../${PROGRAM} ../../${PROGRAM}lib.a" > ${GDB}/gdb/mergeobj
+ 	@rm -f ${PROGRAM}
+ 	@if [ ! -f ${GDB}/config.status ]; then \
+--- crash-8.0.1/diskdump.c.orig
++++ crash-8.0.1/diskdump.c
+@@ -23,6 +23,9 @@
+  * GNU General Public License for more details.
+  */
+ 
++#define LZO
++#define SNAPPY
++#define ZSTD
+ #include "defs.h"
+ #include "diskdump.h"
+ #include "xen_dom0.h"

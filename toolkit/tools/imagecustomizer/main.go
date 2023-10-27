@@ -34,6 +34,7 @@ var (
 func main() {
 	var err error
 
+	app.Version(imagecustomizerlib.ToolVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 
 	logger.InitBestEffort(*logFile, *logLevel)

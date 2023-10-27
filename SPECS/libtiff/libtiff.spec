@@ -1,6 +1,6 @@
 Summary:        TIFF libraries and associated utilities.
 Name:           libtiff
-Version:        4.5.1
+Version:        4.6.0
 Release:        1%{?dist}
 License:        libtiff
 Vendor:         Microsoft Corporation
@@ -60,6 +60,9 @@ make %{?_smp_mflags} -k check
 %{_docdir}/*
 
 %changelog
+* Fri Oct 20 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 4.6.0-1
+- Upgrade to v4.6.0 to fix CVE-2023-40745 and CVE-2023-41175
+
 * Sat Jul 08 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.5.1-1
 - Auto-upgrade to 4.5.1 - patch CVE-2023-26966
 
