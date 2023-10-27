@@ -4530,8 +4530,8 @@
         "type": "other",
         "other": {
           "name": "gnuplot",
-          "version": "5.4.3",
-          "downloadUrl": "http://downloads.sourceforge.net/gnuplot/gnuplot-5.4.3.tar.gz"
+          "version": "5.4.8",
+          "downloadUrl": "http://downloads.sourceforge.net/gnuplot/gnuplot-5.4.8.tar.gz"
         }
       }
     },
