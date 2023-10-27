@@ -2868,8 +2868,8 @@
         "type": "other",
         "other": {
           "name": "dos2unix",
-          "version": "7.4.2",
-          "downloadUrl": "https://waterlan.home.xs4all.nl/dos2unix/dos2unix-7.4.2.tar.gz"
+          "version": "7.5.1",
+          "downloadUrl": "https://waterlan.home.xs4all.nl/dos2unix/dos2unix-7.5.1.tar.gz"
         }
       }
     },
