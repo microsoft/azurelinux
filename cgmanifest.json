@@ -1025,8 +1025,8 @@
         "type": "other",
         "other": {
           "name": "bcc",
-          "version": "0.27.0",
-          "downloadUrl": "https://github.com/iovisor/bcc/releases/download/v0.27.0/bcc-src-with-submodule.tar.gz"
+          "version": "0.28.0",
+          "downloadUrl": "https://github.com/iovisor/bcc/releases/download/v0.28.0/bcc-src-with-submodule.tar.gz"
         }
       }
     },
