@@ -2668,8 +2668,8 @@
         "type": "other",
         "other": {
           "name": "dkms",
-          "version": "3.0.3",
-          "downloadUrl": "https://github.com/dell/dkms/archive/refs/tags/v3.0.3.tar.gz"
+          "version": "3.0.11",
+          "downloadUrl": "https://github.com/dell/dkms/archive/refs/tags/v3.0.11.tar.gz"
         }
       }
     },
