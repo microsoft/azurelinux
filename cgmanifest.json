@@ -24824,8 +24824,8 @@
         "type": "other",
         "other": {
           "name": "python-yamlloader",
-          "version": "1.1.0",
-          "downloadUrl": "https://github.com/Phynix/yamlloader/archive/1.1.0.tar.gz"
+          "version": "1.3.2",
+          "downloadUrl": "https://github.com/Phynix/yamlloader/archive/1.3.2.tar.gz"
         }
       }
     },

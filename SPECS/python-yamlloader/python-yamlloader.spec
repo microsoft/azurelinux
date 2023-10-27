@@ -4,8 +4,8 @@
 
 Summary:        Loaders and dumpers for PyYAML
 Name:           python-%{pkgname}
-Version:        1.1.0
-Release:        2%{?dist}
+Version:        1.3.2
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -49,6 +49,9 @@ python3 setup.py install --skip-build --root=%{buildroot}
 %{python3_sitelib}/*.egg-info
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.3.2-1
+- Auto-upgrade to 1.3.2 - Azure Linux 3.0 - package upgrades
+
 * Wed Apr 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.0-2
 - Updating source URL.
 
