@@ -1597,8 +1597,8 @@
         "type": "other",
         "other": {
           "name": "cf-cli",
-          "version": "8.4.0",
-          "downloadUrl": "https://github.com/cloudfoundry/cli/archive/refs/tags/v8.4.0.tar.gz"
+          "version": "8.7.3",
+          "downloadUrl": "https://github.com/cloudfoundry/cli/archive/refs/tags/v8.7.3.tar.gz"
         }
       }
     },
