@@ -28647,8 +28647,8 @@
         "type": "other",
         "other": {
           "name": "traceroute",
-          "version": "2.1.0",
-          "downloadUrl": "http://downloads.sourceforge.net/project/traceroute/traceroute/traceroute-2.1.0/traceroute-2.1.0.tar.gz"
+          "version": "2.1.3",
+          "downloadUrl": "http://downloads.sourceforge.net/project/traceroute/traceroute/traceroute-2.1.3/traceroute-2.1.3.tar.gz"
         }
       }
     },
