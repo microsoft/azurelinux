@@ -12231,8 +12231,8 @@
         "type": "other",
         "other": {
           "name": "lsof",
-          "version": "4.94.0",
-          "downloadUrl": "https://github.com/lsof-org/lsof/archive/4.94.0.tar.gz"
+          "version": "4.98.0",
+          "downloadUrl": "https://github.com/lsof-org/lsof/archive/4.98.0.tar.gz"
         }
       }
     },
