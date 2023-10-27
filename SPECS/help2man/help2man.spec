@@ -5,8 +5,8 @@
 
 Summary:        Create simple man pages from --help output
 Name:           help2man
-Version:        1.47.14
-Release:        2%{?dist}
+Version:        1.49.3
+Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -58,6 +58,9 @@ make install DESTDIR=%{buildroot}
 %endif
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.49.3-1
+- Auto-upgrade to 1.49.3 - Azure Linux 3.0 - package upgrades
+
 * Thu Sep 02 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.47.14-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - License verified.
