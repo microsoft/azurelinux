@@ -18704,8 +18704,8 @@
         "type": "other",
         "other": {
           "name": "perl-Net-HTTP",
-          "version": "6.19",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/O/OA/OALDERS/Net-HTTP-6.19.tar.gz"
+          "version": "6.23",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/O/OA/OALDERS/Net-HTTP-6.23.tar.gz"
         }
       }
     },
