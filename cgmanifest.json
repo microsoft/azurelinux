@@ -27987,8 +27987,8 @@
         "type": "other",
         "other": {
           "name": "strongswan",
-          "version": "5.9.10",
-          "downloadUrl": "https://download.strongswan.org/strongswan-5.9.10.tar.bz2"
+          "version": "5.9.11",
+          "downloadUrl": "https://download.strongswan.org/strongswan-5.9.11.tar.bz2"
         }
       }
     },
