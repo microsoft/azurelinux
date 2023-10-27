@@ -10851,8 +10851,8 @@
         "type": "other",
         "other": {
           "name": "libseccomp",
-          "version": "2.5.3",
-          "downloadUrl": "https://github.com/seccomp/libseccomp/releases/download/v2.5.3/libseccomp-2.5.3.tar.gz"
+          "version": "2.5.4",
+          "downloadUrl": "https://github.com/seccomp/libseccomp/releases/download/v2.5.4/libseccomp-2.5.4.tar.gz"
         }
       }
     },
