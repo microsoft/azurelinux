@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/userutils"
 )
 
 type User struct {
@@ -60,28 +62,20 @@ func (p *User) IsValid() (err error) {
 
 // NameIsValid returns an error if the User name is empty
 func (p *User) NameIsValid() (err error) {
-	if strings.TrimSpace(p.Name) == "" {
-		return fmt.Errorf("invalid value for name (%s), name cannot be empty", p.Name)
-	}
-	return
+	return userutils.NameIsValid(p.Name)
 }
 
-// UIDIsValid returns an error if the UID is outside bounds
-// UIDs 1-999 are system users and 1000-60000 are normal users
-// Bounds can be checked using:
-// $grep -E '^UID_MIN|^UID_MAX' /etc/login.defs
+// UIDIsValid returns an error if the UID is outside bounds.
 func (p *User) UIDIsValid() (err error) {
-	const (
-		uidLowerBound = 0 // root user
-		uidUpperBound = 60000
-	)
 	if strings.TrimSpace(p.UID) != "" {
 		uidNum, err := strconv.Atoi(p.UID)
 		if err != nil {
 			return fmt.Errorf("failed to convert UID (%s) to a number", p.UID)
 		}
-		if uidNum < uidLowerBound || uidNum > uidUpperBound {
-			return fmt.Errorf("invalid value for UID (%s), not within [%d, %d]", p.UID, uidLowerBound, uidUpperBound)
+
+		err = userutils.UIDIsValid(uidNum)
+		if err != nil {
+			return err
 		}
 	}
 	return
@@ -90,12 +84,5 @@ func (p *User) UIDIsValid() (err error) {
 // PasswordExpiresDaysISValid returns an error if the expire days is not
 // within bounds set by the chage -M command
 func (p *User) PasswordExpiresDaysIsValid() (err error) {
-	const (
-		noExpiration    = -1 //no expiration
-		upperBoundChage = 99999
-	)
-	if p.PasswordExpiresDays < noExpiration || p.PasswordExpiresDays > upperBoundChage {
-		return fmt.Errorf("invalid value for PasswordExpiresDays (%d), not within [%d, %d]", p.PasswordExpiresDays, noExpiration, upperBoundChage)
-	}
-	return
+	return userutils.PasswordExpiresDaysIsValid(p.PasswordExpiresDays)
 }

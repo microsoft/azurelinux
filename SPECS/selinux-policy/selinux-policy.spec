@@ -9,7 +9,7 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        3%{?dist}
+Release:        5%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -58,6 +58,8 @@ Patch36:        0036-iptables-Support-Mariner-non-standard-config-locatio.patch
 Patch37:        0037-cloudinit-Add-permissions-derived-from-sysadm.patch
 Patch38:        0038-systemd-Fix-run-systemd-shutdown-handling.patch
 Patch39:        0039-modutils-Temporary-fix-for-mkinitrd-dracut.patch
+Patch40:        0040-For-systemd-hostnamed-service-to-run.patch
+Patch41:        0041-docker-Silence-io.containerd.internal.v1.opt-opt-con.patch
 BuildRequires:  bzip2
 BuildRequires:  checkpolicy >= %{CHECKPOLICYVER}
 BuildRequires:  m4
@@ -343,6 +345,12 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
+* Tue Oct 17 2023 Chris PeBenito <chpebeni@microsoft.com> - 2.20221101-5
+- Silence noise in containerd io.containerd.internal.v1.opt plugin.
+
+* Thu Sep 28 2023 Chris PeBenito <chpebeni@microsoft.com> - 2.20221101-4
+- Cherry pick systemd-hostnamed fix for handling /run/systemd/default-hostname.
+
 * Tue May 16 2023 Chris PeBenito <chpebeni@microsoft.com> - 2.20221101-3
 - Fix missing role associations in cloud-init patch.
 - Fix missing require in mkinitrd patch.

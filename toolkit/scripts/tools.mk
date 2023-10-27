@@ -37,12 +37,14 @@ go_tool_list = \
 	graphanalytics \
 	graphPreprocessor \
 	imageconfigvalidator \
+	imagecustomizer \
 	imagepkgfetcher \
 	imager \
 	isomaker \
 	liveinstaller \
 	pkgworker \
 	precacher \
+	repoquerywrapper \
 	roast \
 	rpmssnapshot \
 	scheduler \
@@ -105,8 +107,10 @@ else
 $(TOOL_BINS_DIR)/%: $(go_common_files)
 	cd $(TOOLS_DIR)/$* && \
 		go test -test.short -covermode=atomic -coverprofile=$(BUILD_DIR)/tools/$*.test_coverage ./... && \
+		TOOLKIT_VER="-X github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe.ToolkitVersion=$(RELEASE_VERSION)" && \
+		IMGCUST_VER="-X github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/imagecustomizerlib.ToolVersion=$(IMAGE_CUSTOMIZER_FULL_VERSION)" && \
 		CGO_ENABLED=0 go build \
-			-ldflags="-X github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe.ToolkitVersion=$(RELEASE_VERSION)" \
+			-ldflags="$$TOOLKIT_VER $$IMGCUST_VER" \
 			-o $(TOOL_BINS_DIR)
 endif
 
@@ -147,7 +151,7 @@ go-fmt-all:
 # Formats the test coverage for the tools
 .PHONY: $(BUILD_DIR)/tools/all_tools.coverage
 $(BUILD_DIR)/tools/all_tools.coverage: $(call shell_real_build_only, find $(TOOLS_DIR)/ -type f -name '*.go') $(STATUS_FLAGS_DIR)/got_go_deps.flag
-	cd $(TOOLS_DIR) && go test -test.short -coverpkg=./... -covermode=atomic -coverprofile=$@ ./...
+	cd $(TOOLS_DIR) && go test -coverpkg=./... -test.short -covermode=atomic -coverprofile=$@ ./...
 $(test_coverage_report): $(BUILD_DIR)/tools/all_tools.coverage
 	cd $(TOOLS_DIR) && go tool cover -html=$(BUILD_DIR)/tools/all_tools.coverage -o $@
 ##help:target:go-test-coverage=Run and publish test coverage for all go tools.

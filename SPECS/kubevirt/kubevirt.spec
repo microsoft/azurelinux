@@ -19,7 +19,7 @@
 Summary:        Container native virtualization
 Name:           kubevirt
 Version:        0.59.0
-Release:        8%{?dist}
+Release:        10%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -34,7 +34,7 @@ Patch1:         Allocate-2-cpu-for-the-emulator-thread.patch
 Patch2:         Hotplug_detach_grace_period.patch
 %global debug_package %{nil}
 BuildRequires:  glibc-devel
-BuildRequires:  glibc-static >= 2.35-5%{?dist}
+BuildRequires:  glibc-static >= 2.35-6%{?dist}
 BuildRequires:  golang
 BuildRequires:  golang-packaging
 BuildRequires:  pkgconfig
@@ -211,6 +211,12 @@ install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-v
 %{_bindir}/virt-tests
 
 %changelog
+* Wed Oct 11 2023 Minghe Ren <mingheren@microsoft.com> - 0.59.0-10
+- Bump release to rebuild against glibc 2.35-6
+
+* Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 0.59.0-9
+- Bump release to rebuild with updated version of Go.
+
 * Tue Oct 03 2023 Mandeep Plaha <mandeepplaha@microsoft.com> - 0.59.0-8
 - Bump release to rebuild against glibc 2.35-5
 
