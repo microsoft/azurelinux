@@ -10641,8 +10641,8 @@
         "type": "other",
         "other": {
           "name": "libpwquality",
-          "version": "1.4.4",
-          "downloadUrl": "https://github.com/libpwquality/libpwquality/releases/download/libpwquality-1.4.4/libpwquality-1.4.4.tar.bz2"
+          "version": "1.4.5",
+          "downloadUrl": "https://github.com/libpwquality/libpwquality/releases/download/libpwquality-1.4.5/libpwquality-1.4.5.tar.bz2"
         }
       }
     },
