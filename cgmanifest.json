@@ -27937,8 +27937,8 @@
         "type": "other",
         "other": {
           "name": "sshpass",
-          "version": "1.09",
-          "downloadUrl": "http://downloads.sourceforge.net/project/sshpass/sshpass/1.09/sshpass-1.09.tar.gz"
+          "version": "1.10",
+          "downloadUrl": "http://downloads.sourceforge.net/project/sshpass/sshpass/1.10/sshpass-1.10.tar.gz"
         }
       }
     },
