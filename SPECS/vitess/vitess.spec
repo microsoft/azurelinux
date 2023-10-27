@@ -2,8 +2,8 @@
 %bcond_without check
 
 Name:           vitess
-Version:        16.0.2
-Release:        6%{?dist}
+Version:        17.0.2
+Release:        1%{?dist}
 Summary:        Database clustering system for horizontal scaling of MySQL
 # Upstream license specification: MIT and Apache-2.0
 License:        MIT and ASL 2.0
@@ -104,6 +104,9 @@ go check -t go/cmd \
 %{_bindir}/*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 17.0.2-1
+- Auto-upgrade to 17.0.2 - Azure Linux 3.0 - package upgrades
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 16.0.2-6
 - Bump release to rebuild with go 1.20.10
 
