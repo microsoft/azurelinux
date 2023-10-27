@@ -5210,8 +5210,8 @@
         "type": "other",
         "other": {
           "name": "hdparm",
-          "version": "9.63",
-          "downloadUrl": "http://downloads.sourceforge.net/hdparm/hdparm-9.63.tar.gz"
+          "version": "9.65",
+          "downloadUrl": "http://downloads.sourceforge.net/hdparm/hdparm-9.65.tar.gz"
         }
       }
     },
