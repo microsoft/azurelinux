@@ -20914,8 +20914,8 @@
         "type": "other",
         "other": {
           "name": "pigz",
-          "version": "2.6",
-          "downloadUrl": "https://github.com/madler/pigz/archive/v2.6.tar.gz"
+          "version": "2.8",
+          "downloadUrl": "https://github.com/madler/pigz/archive/v2.8.tar.gz"
         }
       }
     },
