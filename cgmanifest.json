@@ -13373,8 +13373,8 @@
         "type": "other",
         "other": {
           "name": "ModemManager",
-          "version": "1.18.6",
-          "downloadUrl": "https://www.freedesktop.org/software/ModemManager/ModemManager-1.18.6.tar.xz"
+          "version": "1.18.12",
+          "downloadUrl": "https://www.freedesktop.org/software/ModemManager/ModemManager-1.18.12.tar.xz"
         }
       }
     },
