@@ -12291,8 +12291,8 @@
         "type": "other",
         "other": {
           "name": "lttng-tools",
-          "version": "2.13.2",
-          "downloadUrl": "https://lttng.org/files/lttng-tools/lttng-tools-2.13.2.tar.bz2"
+          "version": "2.13.11",
+          "downloadUrl": "https://lttng.org/files/lttng-tools/lttng-tools-2.13.11.tar.bz2"
         }
       }
     },
