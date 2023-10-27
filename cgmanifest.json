@@ -11971,8 +11971,8 @@
         "type": "other",
         "other": {
           "name": "libzip",
-          "version": "1.8.0",
-          "downloadUrl": "https://libzip.org/download/libzip-1.8.0.tar.xz"
+          "version": "1.10.1",
+          "downloadUrl": "https://libzip.org/download/libzip-1.10.1.tar.xz"
         }
       }
     },
