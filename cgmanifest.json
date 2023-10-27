@@ -3800,8 +3800,8 @@
         "type": "other",
         "other": {
           "name": "fping",
-          "version": "5.0",
-          "downloadUrl": "https://github.com/schweikert/fping/releases/download/v5.0/fping-5.0.tar.gz"
+          "version": "5.1",
+          "downloadUrl": "https://github.com/schweikert/fping/releases/download/v5.1/fping-5.1.tar.gz"
         }
       }
     },
