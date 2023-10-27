@@ -24,6 +24,10 @@ const (
 )
 
 var (
+	// Version specifies the version of the Mariner Image Customizer tool.
+	// The value of this string is inserted during compilation via a linker flag.
+	ToolVersion = ""
+
 	bootPartitionRegex   = regexp.MustCompile(`(?m)^search -n -u ([a-zA-Z0-9\-]+) -s$`)
 	rootfsPartitionRegex = regexp.MustCompile(`(?m)^set rootdevice=([A-Z]*)=([a-zA-Z0-9\-]+)$`)
 )
