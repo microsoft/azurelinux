@@ -4630,8 +4630,8 @@
         "type": "other",
         "other": {
           "name": "golang-packaging",
-          "version": "15.0.15",
-          "downloadUrl": "https://github.com/openSUSE/golang-packaging/archive/refs/tags/v15.0.15.tar.gz"
+          "version": "15.0.17",
+          "downloadUrl": "https://github.com/openSUSE/golang-packaging/archive/refs/tags/v15.0.17.tar.gz"
         }
       }
     },
