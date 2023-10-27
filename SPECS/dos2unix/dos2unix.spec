@@ -1,6 +1,6 @@
 Summary:       Text file format converters
 Name:          dos2unix
-Version:       7.4.2
+Version:       7.5.1
 Release:       1%{?dist}
 License:       BSD
 URL:           https://waterlan.home.xs4all.nl/dos2unix.html
@@ -42,6 +42,9 @@ rm -rf $RPM_BUILD_ROOT%{_docdir}
 %{_mandir}/man1/*.1*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 7.5.1-1
+- Auto-upgrade to 7.5.1 - Azure Linux 3.0 - package upgrades
+
 * Fri Jan 21 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 7.4.2-1
 - Upgrade to 7.4.2
 
