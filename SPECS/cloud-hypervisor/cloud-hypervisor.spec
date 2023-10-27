@@ -4,8 +4,13 @@
 
 Summary:        Cloud Hypervisor is an open source Virtual Machine Monitor (VMM) that runs on top of KVM.
 Name:           cloud-hypervisor
+<<<<<<< HEAD
 Version:        32.0
 Release:        2%{?dist}
+=======
+Version:        35.0
+Release:        1%{?dist}
+>>>>>>> 40d78802d (Azure Linux 3.0 - package upgrades)
 License:        ASL 2.0 OR BSD-3-clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -155,8 +160,13 @@ cargo build --release --target=%{rust_musl_target} --package vhost_user_block %{
 %license LICENSE-BSD-3-Clause
 
 %changelog
+<<<<<<< HEAD
 * Mon Oct 23 2023 Rohit Rawat <rohitrawat@microsoft.com> - 32.0-2
 - Patch CVE-2023-45853 in vendor/libz-sys/src/zlib
+=======
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 35.0-1
+- Auto-upgrade to 35.0 - Azure Linux 3.0 - package upgrades
+>>>>>>> 40d78802d (Azure Linux 3.0 - package upgrades)
 
 * Wed Sep 27 2023 Saul Paredes <saulparedes@microsoft.com> - 32.0-1
 - Update to v32.0

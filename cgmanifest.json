@@ -1797,8 +1797,8 @@
         "type": "other",
         "other": {
           "name": "cloud-hypervisor",
-          "version": "32.0",
-          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/refs/tags/v32.0.tar.gz"
+          "version": "35.0",
+          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/refs/tags/v35.0.tar.gz"
         }
       }
     },
