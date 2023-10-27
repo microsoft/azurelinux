@@ -1,8 +1,8 @@
 {
- "Signatures": {
-  "99-loopback.conf": "82e03a3292ca327bcc86af3664a0d7b110cb1c39bca16d3cc703abd49c3c9a1b",
-  "build.sh": "1fc4529fae5bdf52cf6b9e5eb603c7703046f35e76c6c3a525085c63ef55a7ff",
-  "cni-1.0.1-vendor.tar.gz": "c837529a293115a9d2c7ac59eaf4600c62c7597dd998cf51e851eb5e1016ebf1",
-  "cni-1.0.1.tar.gz": "0e5376f70fb36c26935ddfb90b0da69736592ba8b577fbfb904750034c053d3b"
- }
+  "Signatures": {
+    "99-loopback.conf": "82e03a3292ca327bcc86af3664a0d7b110cb1c39bca16d3cc703abd49c3c9a1b",
+    "build.sh": "1fc4529fae5bdf52cf6b9e5eb603c7703046f35e76c6c3a525085c63ef55a7ff",
+    "cni-1.0.1-vendor.tar.gz": "c837529a293115a9d2c7ac59eaf4600c62c7597dd998cf51e851eb5e1016ebf1",
+    "cni-1.1.2.tar.gz": "7d4bcaf83acdd54b3dc216f7aa5b5e1b32cb797d9c6af601a2c26b97470ed743"
+  }
 }
