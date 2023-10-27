@@ -9301,8 +9301,8 @@
         "type": "other",
         "other": {
           "name": "libfastjson",
-          "version": "0.99.9",
-          "downloadUrl": "https://github.com/rsyslog/libfastjson/archive/v0.99.9.tar.gz"
+          "version": "1.2304.0",
+          "downloadUrl": "https://github.com/rsyslog/libfastjson/archive/v1.2304.0.tar.gz"
         }
       }
     },

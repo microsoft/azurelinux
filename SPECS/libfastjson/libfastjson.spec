@@ -1,6 +1,6 @@
 Summary:        A fast json library for C
 Name:           libfastjson
-Version:        0.99.9
+Version:        1.2304.0
 Release:        1%{?dist}
 License:        MIT
 URL:            https://github.com/rsyslog/libfastjson
@@ -53,6 +53,9 @@ make check
 
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.2304.0-1
+- Auto-upgrade to 1.2304.0 - Azure Linux 3.0 - package upgrades
+
 * Mon Mar 14 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 0.99.9-1
 - Upgrade to 0.99.9
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.99.8-4
