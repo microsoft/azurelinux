@@ -28577,8 +28577,8 @@
         "type": "other",
         "other": {
           "name": "toml11",
-          "version": "3.7.0",
-          "downloadUrl": "https://github.com/ToruNiina/toml11/archive/v3.7.0.tar.gz"
+          "version": "3.7.1",
+          "downloadUrl": "https://github.com/ToruNiina/toml11/archive/v3.7.1.tar.gz"
         }
       }
     },
