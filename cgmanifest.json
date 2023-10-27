@@ -25144,8 +25144,8 @@
         "type": "other",
         "other": {
           "name": "radvd",
-          "version": "2.18",
-          "downloadUrl": "http://www.litech.org/radvd/dist/radvd-2.18.tar.xz"
+          "version": "2.19",
+          "downloadUrl": "http://www.litech.org/radvd/dist/radvd-2.19.tar.xz"
         }
       }
     },
