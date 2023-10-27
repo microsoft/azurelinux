@@ -11351,8 +11351,8 @@
         "type": "other",
         "other": {
           "name": "libuv",
-          "version": "1.43.0",
-          "downloadUrl": "https://dist.libuv.org/dist/v1.43.0/libuv-v1.43.0.tar.gz"
+          "version": "1.46.0",
+          "downloadUrl": "https://dist.libuv.org/dist/v1.46.0/libuv-v1.46.0.tar.gz"
         }
       }
     },
