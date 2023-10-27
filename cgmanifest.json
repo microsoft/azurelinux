@@ -21404,8 +21404,8 @@
         "type": "other",
         "other": {
           "name": "psmisc",
-          "version": "23.4",
-          "downloadUrl": "http://prdownloads.sourceforge.net/psmisc/psmisc-23.4.tar.xz"
+          "version": "23.6",
+          "downloadUrl": "http://prdownloads.sourceforge.net/psmisc/psmisc-23.6.tar.xz"
         }
       }
     },
