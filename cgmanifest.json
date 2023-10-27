@@ -7341,8 +7341,8 @@
         "type": "other",
         "other": {
           "name": "IP2Location",
-          "version": "8.4.1",
-          "downloadUrl": "https://github.com/chrislim2888/IP2Location-C-Library/archive/8.4.1/IP2Location-8.4.1.tar.gz"
+          "version": "8.6.1",
+          "downloadUrl": "https://github.com/chrislim2888/IP2Location-C-Library/archive/8.6.1/IP2Location-8.6.1.tar.gz"
         }
       }
     },
