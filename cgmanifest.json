@@ -27637,8 +27637,8 @@
         "type": "other",
         "other": {
           "name": "smartmontools",
-          "version": "7.3",
-          "downloadUrl": "http://downloads.sourceforge.net/smartmontools/smartmontools-7.3.tar.gz"
+          "version": "7.4",
+          "downloadUrl": "http://downloads.sourceforge.net/smartmontools/smartmontools-7.4.tar.gz"
         }
       }
     },
