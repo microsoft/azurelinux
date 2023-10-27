@@ -418,7 +418,7 @@ func downloadSingleDeltaRPM(realDependencyGraph *pkggraph.PkgGraph, buildNode *p
 	// already have it in the cache.
 	if !foundCacheRPM {
 		// Avoid any processing since we know the exact RPM we want to download
-		_, err = cloner.CloneRawPackageNames(downloadDependencies, fullyQualifiedRpmName)
+		_, err = cloner.CloneRawPackageNames(downloadDependencies, false /*no transaction*/, fullyQualifiedRpmName)
 		if err != nil {
 			logger.Log.Warnf("Can't find delta RPM to download for %s: %s (local copy may be newer than published version)", fullyQualifiedRpmName, err)
 			return nil

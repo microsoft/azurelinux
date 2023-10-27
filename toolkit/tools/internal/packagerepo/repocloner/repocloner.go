@@ -27,6 +27,7 @@ type RepoPackage struct {
 // and their dependencies.
 type RepoCloner interface {
 	Clone(cloneDeps bool, packagesToClone ...*pkgjson.PackageVer) (allPackagesPrebuilt bool, err error)
+	CloneTransaction(cloneDeps bool, packagesToClone ...*pkgjson.PackageVer) (allPackagesPrebuilt bool, err error)
 	CloneDirectory() string
 	ClonedRepoContents() (repoContents *RepoContents, err error)
 	Close() error

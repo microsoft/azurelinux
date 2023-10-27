@@ -336,14 +336,28 @@ func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.Packag
 		logger.Log.Debugf("Cloning (%s).", packageToClone)
 		packageNames = append(packageNames, convertPackageVersionToTdnfArg(packageToClone))
 	}
-	return r.CloneRawPackageNames(cloneDeps, packageNames...)
+	return r.CloneRawPackageNames(cloneDeps, false, packageNames...)
+}
+
+// CloneTransaction clones the provided list of packages in a single transaction.
+// If cloneDeps is set, package dependencies will also be cloned.
+// It will automatically resolve packages that describe a provide or file from a package.
+// If all packages were pre-built, the cloner will set allPackagesPrebuilt = true.
+func (r *RpmRepoCloner) CloneTransaction(cloneDeps bool, packagesToClone ...*pkgjson.PackageVer) (allPackagesPrebuilt bool, err error) {
+	packageNames := []string{}
+	for _, packageToClone := range packagesToClone {
+		logger.Log.Debugf("Cloning (%s).", packageToClone)
+		packageNames = append(packageNames, convertPackageVersionToTdnfArg(packageToClone))
+	}
+	return r.CloneRawPackageNames(cloneDeps, true, packageNames...)
 }
 
 // CloneRawPackageNames clones the provided package name exactly as specified.
 // If cloneDeps is set, package dependencies will also be cloned.
+// If singleTransaction is true, all packages will be cloned in a single transaction.
 // This version of clone will not resolve provides or files from other packages beyond what tdnf is able to do itself.
 // If all packages were pre-built, the cloner will set allPackagesPrebuilt = true.
-func (r *RpmRepoCloner) CloneRawPackageNames(cloneDeps bool, rawPackageNames ...string) (allPackagesPrebuilt bool, err error) {
+func (r *RpmRepoCloner) CloneRawPackageNames(cloneDeps, singleTransaction bool, rawPackageNames ...string) (allPackagesPrebuilt bool, err error) {
 	timestamp.StartEvent("cloning packages", nil)
 	defer timestamp.StopEvent(nil)
 
@@ -363,11 +377,22 @@ func (r *RpmRepoCloner) CloneRawPackageNames(cloneDeps bool, rawPackageNames ...
 
 	logger.Log.Debugf("Will clone in total %d items.", len(rawPackageNames))
 
-	allPackagesPrebuilt = true
-	for _, packageNameToClone := range rawPackageNames {
-		logger.Log.Debugf("Cloning raw name (%s).", packageNameToClone)
+	// Create a list of lists for each transaction. Each transaction will be cloned separately. Generally either all
+	// packages will be cloned in a single transaction or each package will be cloned in its own transaction.
+	transactions := [][]string{}
+	if singleTransaction {
+		transactions = append(transactions, rawPackageNames)
+	} else {
+		for _, packageName := range rawPackageNames {
+			transactions = append(transactions, []string{packageName})
+		}
+	}
 
-		finalArgs := append(constantArgs, packageNameToClone)
+	allPackagesPrebuilt = true
+	for _, packageNamesToClone := range transactions {
+		logger.Log.Debugf("Cloning raw names (%v).", packageNamesToClone)
+
+		finalArgs := append(constantArgs, packageNamesToClone...)
 		err = r.chroot.Run(func() (chrootErr error) {
 			prebuilt, chrootErr := r.clonePackage(finalArgs)
 			if !prebuilt {
