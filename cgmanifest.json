@@ -15254,8 +15254,8 @@
         "type": "other",
         "other": {
           "name": "opensm",
-          "version": "3.3.23",
-          "downloadUrl": "https://github.com/linux-rdma/opensm/releases/download/3.3.23/opensm-3.3.23.tar.gz"
+          "version": "3.3.24",
+          "downloadUrl": "https://github.com/linux-rdma/opensm/releases/download/3.3.24/opensm-3.3.24.tar.gz"
         }
       }
     },
