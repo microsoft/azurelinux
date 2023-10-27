@@ -1677,8 +1677,8 @@
         "type": "other",
         "other": {
           "name": "checksec",
-          "version": "2.5.0",
-          "downloadUrl": "https://github.com/slimm609/checksec.sh/archive/2.5.0.tar.gz"
+          "version": "2.6.0",
+          "downloadUrl": "https://github.com/slimm609/checksec.sh/archive/2.6.0.tar.gz"
         }
       }
     },
