@@ -1,7 +1,7 @@
 Summary:        Development Libraries and headers for EFI
 Name:           gnu-efi
-Version:        3.0.9
-Release:        10%{?dist}
+Version:        3.0.17
+Release:        1%{?dist}
 License:        BSD
 URL:            https://sourceforge.net/projects/gnu-efi
 Vendor:         Microsoft Corporation
@@ -74,6 +74,9 @@ mv %{buildroot}/%{_libdir}/*.lds %{buildroot}/%{_libdir}/*.o %{buildroot}/%{_lib
 %{_includedir}/efi
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0.17-1
+- Auto-upgrade to 3.0.17 - Azure Linux 3.0 - package upgrades
+
 * Wed Mar 23 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.9-10
 - Updating 'Source' URL.
 

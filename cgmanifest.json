@@ -4480,8 +4480,8 @@
         "type": "other",
         "other": {
           "name": "gnu-efi",
-          "version": "3.0.9",
-          "downloadUrl": "https://sourceforge.net/projects/gnu-efi/files/gnu-efi-3.0.9.tar.bz2"
+          "version": "3.0.17",
+          "downloadUrl": "https://sourceforge.net/projects/gnu-efi/files/gnu-efi-3.0.17.tar.bz2"
         }
       }
     },

@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "LICENSE.PTR": "45ca2bd9403f895baf7904a5537a00e0dcad146268bda3e90131cb179fca44a2",
-  "gnu-efi-3.0.9.tar.bz2": "6715ea7eae1c7e4fc5041034bd3f107ec2911962ed284a081e491646b12277f0"
- }
+  "Signatures": {
+    "LICENSE.PTR": "45ca2bd9403f895baf7904a5537a00e0dcad146268bda3e90131cb179fca44a2",
+    "gnu-efi-3.0.17.tar.bz2": "7807e903349343a7a142ebb934703a2872235e89688cf586c032b0a1087bcaf4"
+  }
 }
