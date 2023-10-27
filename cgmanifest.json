@@ -22314,8 +22314,8 @@
         "type": "other",
         "other": {
           "name": "python-ecdsa",
-          "version": "0.17.0",
-          "downloadUrl": "https://github.com/tlsfuzzer/python-ecdsa/archive/refs/tags/python-ecdsa-0.17.0.tar.gz"
+          "version": "0.18.0",
+          "downloadUrl": "https://github.com/tlsfuzzer/python-ecdsa/archive/refs/tags/python-ecdsa-0.18.0.tar.gz"
         }
       }
     },
