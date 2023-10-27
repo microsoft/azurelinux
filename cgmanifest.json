@@ -8501,8 +8501,8 @@
         "type": "other",
         "other": {
           "name": "lcms2",
-          "version": "2.13.1",
-          "downloadUrl": "https://github.com/mm2/Little-CMS/archive/refs/tags/lcms2.13.1.tar.gz"
+          "version": "2.15",
+          "downloadUrl": "https://github.com/mm2/Little-CMS/archive/refs/tags/lcms2.15.tar.gz"
         }
       }
     },
