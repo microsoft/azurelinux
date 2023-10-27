@@ -29297,8 +29297,8 @@
         "type": "other",
         "other": {
           "name": "vnstat",
-          "version": "2.7",
-          "downloadUrl": "https://github.com/vergoh/vnstat/archive/v2.7.tar.gz"
+          "version": "2.11",
+          "downloadUrl": "https://github.com/vergoh/vnstat/archive/v2.11.tar.gz"
         }
       }
     },
