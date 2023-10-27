@@ -8360,9 +8360,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "kubernetes",
-          "version": "1.28.3",
-          "downloadUrl": "https://dl.k8s.io/v1.28.3/kubernetes-src.tar.gz"
+          "name": "kube-vip-cloud-provider",
+          "version": "0.0.2",
+          "downloadUrl": "https://github.com/kube-vip/kube-vip-cloud-provider/archive/refs/tags/v0.0.2.tar.gz"
         }
       }
     },
@@ -8370,9 +8370,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "kube-vip-cloud-provider",
-          "version": "0.0.2",
-          "downloadUrl": "https://github.com/kube-vip/kube-vip-cloud-provider/archive/refs/tags/v0.0.2.tar.gz"
+          "name": "kubernetes",
+          "version": "1.28.3",
+          "downloadUrl": "https://dl.k8s.io/v1.28.3/kubernetes-src.tar.gz"
         }
       }
     },
