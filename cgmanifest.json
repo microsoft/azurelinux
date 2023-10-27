@@ -9911,8 +9911,8 @@
         "type": "other",
         "other": {
           "name": "libldm",
-          "version": "0.2.4",
-          "downloadUrl": "https://github.com/mdbooth/libldm/archive/libldm-0.2.4.tar.gz"
+          "version": "0.2.5",
+          "downloadUrl": "https://github.com/mdbooth/libldm/archive/libldm-0.2.5.tar.gz"
         }
       }
     },
