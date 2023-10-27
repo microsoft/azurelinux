@@ -1,6 +1,6 @@
 Summary:        rcpsvc protocol.x files and headers
 Name:           rpcsvc-proto
-Version:        1.4.3
+Version:        1.4.4
 Release:        1%{?dist}
 License:        BSD-3
 Vendor:         Microsoft Corporation
@@ -43,6 +43,9 @@ make install DESTDIR=%{buildroot}
 %{_includedir}/rpcsvc/*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.4.4-1
+- Auto-upgrade to 1.4.4 - Azure Linux 3.0 - package upgrades
+
 * Fri Feb 04 2022 Chris Co <chrco@microsoft.com> - 1.4.3-1
 - Update to 1.4.3
 - License verified
