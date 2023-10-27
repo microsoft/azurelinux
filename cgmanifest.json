@@ -11311,8 +11311,8 @@
         "type": "other",
         "other": {
           "name": "libusb",
-          "version": "1.0.24",
-          "downloadUrl": "https://github.com/libusb/libusb/releases/download/v1.0.24/libusb-1.0.24.tar.bz2"
+          "version": "1.0.26",
+          "downloadUrl": "https://github.com/libusb/libusb/releases/download/v1.0.26/libusb-1.0.26.tar.bz2"
         }
       }
     },
