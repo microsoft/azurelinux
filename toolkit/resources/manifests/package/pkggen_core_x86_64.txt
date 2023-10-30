@@ -194,8 +194,8 @@ curl-8.3.0-2.cm2.x86_64.rpm
 curl-devel-8.3.0-2.cm2.x86_64.rpm
 curl-libs-8.3.0-2.cm2.x86_64.rpm
 createrepo_c-0.17.5-1.cm2.x86_64.rpm
-libxml2-2.10.4-1.cm2.x86_64.rpm
-libxml2-devel-2.10.4-1.cm2.x86_64.rpm
+libxml2-2.10.4-2.cm2.x86_64.rpm
+libxml2-devel-2.10.4-2.cm2.x86_64.rpm
 docbook-dtd-xml-4.5-11.cm2.noarch.rpm
 docbook-style-xsl-1.79.1-13.cm2.noarch.rpm
 libsepol-3.2-2.cm2.x86_64.rpm
