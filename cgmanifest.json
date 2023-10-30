@@ -11581,8 +11581,8 @@
         "type": "other",
         "other": {
           "name": "libX11",
-          "version": "1.6.12",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libX11-1.6.12.tar.bz2"
+          "version": "1.8.7",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libX11-1.8.7.tar.gz"
         }
       }
     },
@@ -30359,8 +30359,8 @@
         "type": "other",
         "other": {
           "name": "xorg-x11-proto-devel",
-          "version": "2019.1",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/xorgproto-2019.1.tar.bz2"
+          "version": "2023.2",
+          "downloadUrl": "https://www.x.org/pub/individual/proto/xorgproto-2023.2.tar.gz"
         }
       }
     },
