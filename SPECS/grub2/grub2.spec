@@ -92,6 +92,7 @@ BuildRequires:  systemd-devel
 BuildRequires:  xz-devel
 Requires:       device-mapper
 Requires:       xz
+Requires:       %{name}-configuration = %{version}-%{release}
 
 # Some distros split 'grub2' into more subpackages. For now we're bundling it all together
 # inside the default package and adding these 'Provides' to make installation more user-friendly
