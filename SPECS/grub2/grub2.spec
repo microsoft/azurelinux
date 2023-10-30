@@ -148,7 +148,6 @@ the grub2-mkconfig flow on AzureLinux
 %package configuration
 Summary:        Location for local grub configurations
 Group:          System Environment/Base
-Requires:       %{name} >= 2.06-12
 
 %description configuration
 Directory for package-specific boot configurations
