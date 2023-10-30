@@ -39,6 +39,7 @@ Source1:        config
 Source2:        config_aarch64
 Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20211013.pem
+Source5:        10_mariner_linux.cfg
 Patch0:         nvme_multipath_default_false.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
@@ -69,6 +70,8 @@ Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
 Requires(postun): coreutils
+%{?grub2_configuration_requires}
+
 # When updating the config files it is important to sanitize them.
 # Steps for updating a config file:
 #  1. Extract the linux sources into a folder
@@ -307,6 +310,11 @@ make -C tools DESTDIR=%{buildroot} prefix=%{_prefix} bash_compdir=%{_sysconfdir}
 # Remove trace (symlink to perf). This file causes duplicate identical debug symbols
 rm -vf %{buildroot}%{_bindir}/trace
 
+mkdir -p %{buildroot}%{_sysconfdir}/default/grub.d
+install -m 750 %{SOURCE5} %{buildroot}%{_sysconfdir}/default/grub.d/10_mariner_linux.cfg
+sed -i 's/<VERSION_SED_MARKER>/%{uname_r}/g' %{buildroot}%{_sysconfdir}/default/grub.d/10_mariner_linux.cfg
+
+
 %triggerin -- initramfs
 mkdir -p %{_localstatedir}/lib/rpm-state/initramfs/pending
 touch %{_localstatedir}/lib/rpm-state/initramfs/pending/%{uname_r}
@@ -352,6 +360,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 /boot/vmlinuz-%{uname_r}
 /boot/.vmlinuz-%{uname_r}.hmac
 %config(noreplace) /boot/linux-%{uname_r}.cfg
+%config(noreplace) %{_sysconfdir}/default/grub.d/10_mariner_linux.cfg
 %config %{_localstatedir}/lib/initramfs/kernel/%{uname_r}
 %defattr(0644,root,root)
 /lib/modules/%{uname_r}/*

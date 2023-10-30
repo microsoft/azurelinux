@@ -980,7 +980,7 @@ func InstallGrubCfg(installRoot, rootDevice, bootUUID, bootPrefix, assetsDir str
 	if err != nil {
 		return
 	}
-	err = file.CopyAndChangeMode(assetGrubDefFileFullPath, installGrubDefFile, bootDirectoryDirMode, bootDirectoryFileMode)
+	err = file.CopyAndChangeMode(assetGrubDefFileFullPath, installGrubDefFile, bootDirectoryDirMode, 0755)
 	if err != nil {
 		return
 	}
