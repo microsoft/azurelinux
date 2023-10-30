@@ -184,7 +184,7 @@ $(raw_toolchain): $(toolchain_files)
 # - ALLOW_TOOLCHAIN_DOWNLOAD_FAIL = n: This flag explicitly disables partial toolchain rehydration from repos
 # In these cases, we just create empty files for each possible rehydrated RPM.
 ifeq ($(strip $(INCREMENTAL_TOOLCHAIN))$(strip $(REBUILD_TOOLCHAIN))$(strip $(ALLOW_TOOLCHAIN_DOWNLOAD_FAIL)),yyy)
-$(toolchain_rpms_rehydrated): $(TOOLCHAIN_MANIFEST)
+$(toolchain_rpms_rehydrated): $(TOOLCHAIN_MANIFEST) $(go-downloader)
 	@rpm_filename="$(notdir $@)" && \
 	rpm_dir="$(dir $@)" && \
 	log_file="$(toolchain_downloads_logs_dir)/$$rpm_filename.log" && \
@@ -192,10 +192,10 @@ $(toolchain_rpms_rehydrated): $(TOOLCHAIN_MANIFEST)
 	mkdir -p $$rpm_dir && \
 	cd $$rpm_dir && \
 	for url in $(PACKAGE_URL_LIST); do \
-		wget -nv --no-clobber $$url/$$rpm_filename \
+		$(go-downloader) --no-verbose --no-clobber $$url/$$rpm_filename \
 			$(if $(TLS_CERT),--certificate=$(TLS_CERT)) \
 			$(if $(TLS_KEY),--private-key=$(TLS_KEY)) \
-			-a $$log_file && \
+			--log-file $$log_file && \
 		echo "Downloaded toolchain RPM: $$rpm_filename" >> $$log_file && \
 		echo "$$rpm_filename" >> $(toolchain_downloads_manifest) | tee -a "$$log_file" && \
 		touch $@ && \
@@ -303,7 +303,7 @@ $(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(STATUS_FLAGS_DIR)/toolchain_local_tem
 
 # No archive was selected, so download from online package server instead. All packages must be available for this step to succeed.
 else
-$(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(depend_REBUILD_TOOLCHAIN)
+$(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(depend_REBUILD_TOOLCHAIN) $(go-downloader)
 	@rpm_filename="$(notdir $@)" && \
 	rpm_dir="$(dir $@)" && \
 	log_file="$(toolchain_downloads_logs_dir)/$$rpm_filename.log" && \
@@ -311,10 +311,10 @@ $(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(depend_REBUILD_TOOLCHAIN)
 	mkdir -p $$rpm_dir && \
 	cd $$rpm_dir && \
 	for url in $(PACKAGE_URL_LIST); do \
-		wget -nv --no-clobber $$url/$$rpm_filename \
+		$(go-downloader) --no-verbose --no-clobber $$url/$$rpm_filename \
 			$(if $(TLS_CERT),--certificate=$(TLS_CERT)) \
 			$(if $(TLS_KEY),--private-key=$(TLS_KEY)) \
-			-a $$log_file && \
+			--log-file $$log_file && \
 		echo "Downloaded toolchain RPM: $$rpm_filename" >> $$log_file && \
 		touch $@ && \
 		break; \

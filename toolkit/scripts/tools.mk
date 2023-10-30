@@ -32,6 +32,7 @@ go_tool_list = \
 	bldtracker \
 	boilerplate \
 	depsearch \
+	downloader \
 	grapher \
 	graphpkgfetcher \
 	graphanalytics \
