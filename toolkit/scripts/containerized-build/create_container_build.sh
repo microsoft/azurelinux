@@ -23,7 +23,7 @@ print_error() {
 help() {
 echo "
 Usage:
-sudo make containerized-rpmbuild [REPO_PATH=/path/to/CBL-Mariner] [MODE=test|build] [VERSION=1.0|2.0] [MOUNTS=/path/in/host:/path/in/container ...] [ENABLE_REPO=y] [BUILD_MOUNT=/path/to/build/chroot/mount]
+sudo make containerized-rpmbuild [REPO_PATH=/path/to/CBL-Mariner] [MODE=test|build] [VERSION=1.0|2.0] [MOUNTS=/path/in/host:/path/in/container ...] [BUILD_MOUNT=/path/to/build/chroot/mount] [EXTRA_PACKAGES=pkg ...] [ENABLE_REPO=y]
 
 Starts a docker container with the specified version of mariner.
 
@@ -37,6 +37,7 @@ Optional arguments:
                         e.g. MOUNTS=\"/host/dir1:/container/dir1 /host/dir2:/container/dir2\"
     BUILD_MOUNT     path to folder to create mountpoints for container's BUILD and BUILDROOT directories.
                         Mountpoints will be ${BUILD_MOUNT}/container-build and ${BUILD_MOUNT}/container-buildroot. default: $REPO_PATH/build
+    EXTRA_PACKAGES  Space delimited list of packages to tdnf install in the container on startup. e.g. EXTRA_PACKAGES=\"pkg1 pkg2\" default: \"\"
     ENABLE_REPO:    Set to 'y' to use local RPMs to satisfy package dependencies. default: n
 
     * User can override Mariner make definitions. Some useful overrides could be
@@ -86,6 +87,7 @@ while (( "$#")); do
     -p ) repo_path="$(realpath $2)"; shift 2 ;;
     -mo ) extra_mounts="$2"; shift 2 ;;
     -b ) build_mount_dir="$(realpath $2)"; shift 2;;
+    -ep ) extra_packages="$2"; shift 2;;
     -r ) enable_local_repo=true; shift ;;
     -h ) help; exit 1 ;;
     ? ) echo -e "ERROR: INVALID OPTION.\n\n"; help; exit 1 ;;
@@ -230,6 +232,7 @@ docker build -q \
                 --build-arg enable_local_repo="$enable_local_repo" \
                 --build-arg mariner_repo="$repo_path" \
                 --build-arg mode="$mode" \
+                --build-arg extra_packages="$extra_packages" \
                 .
 
 echo "docker_image_tag is ${docker_image_tag}"
