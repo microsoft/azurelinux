@@ -61,6 +61,9 @@ func main() {
 	}
 
 	caCerts, err := x509.SystemCertPool()
+	if err != nil {
+		logger.Log.Fatalf("Failed to load system certificate pool. Error: %s", err)
+	}
 	if *caCertFile != "" {
 		newCACert, err := os.ReadFile(*caCertFile)
 		if err != nil {
