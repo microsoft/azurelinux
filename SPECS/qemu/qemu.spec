@@ -217,7 +217,7 @@ Obsoletes: %{name}-system-unicore32-core <= %{version}-%{release}
 Summary:        QEMU is a FAST! processor emulator
 Name:           qemu
 Version:        6.2.0
-Release:        18%{?dist}
+Release:        19%{?dist}
 License:        BSD AND CC-BY AND GPLv2+ AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -2309,6 +2309,9 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 
 
 %changelog
+* Mon Oct 30 2023 Jonathan Behrens <jbehrens@microsoft.com> - 6.2.0-19
+- Address CVE-2023-3354
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 6.2.0-18
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
