@@ -8,10 +8,6 @@ Distribution:   Mariner
 Group:          Development/Libraries
 URL:            https://pyyaml.org/
 Source0:        https://pyyaml.org/download/pyyaml/%{name}-%{version}.tar.gz
-Patch0:         PyYAML-CVE-2017-18342.patch
-Patch1:         ConstructorError_fix.patch
-Patch2:         change_default_loader.patch
-Patch3:         PyYAML-lib3-CVE-2017-18342.patch
 BuildRequires:  libyaml-devel
 BuildRequires:  python3
 BuildRequires:  python3-Cython
