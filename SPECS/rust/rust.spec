@@ -9,7 +9,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.72.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -167,6 +167,9 @@ rm %{buildroot}%{_bindir}/*.old
 %{_mandir}/man1/*
 
 %changelog
+* Mon Oct 30 2023 Rohit Rawat <rohitrawat@microsoft.com> - 1.72.0-3
+- Test comment, no changes made.
+
 * Tue Oct 03 2023 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.72.2-2
 - Bump release to rebuild against glibc 2.35-5
 
