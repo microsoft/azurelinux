@@ -52,7 +52,7 @@ func main() {
 	if *noClobber {
 		exists, err := file.PathExists(*dstFile)
 		if err != nil {
-			logger.Log.Fatalf("Failed to check if file (%s) exists. Error: %s", *dstFile, err)
+			logger.Log.Fatalf("Failed to check if file (%s) exists. Error:\n%s", *dstFile, err)
 		}
 		if exists {
 			logger.Log.Infof("File (%s) already exists, skipping download.", *dstFile)
@@ -62,12 +62,12 @@ func main() {
 
 	caCerts, err := x509.SystemCertPool()
 	if err != nil {
-		logger.Log.Fatalf("Failed to load system certificate pool. Error: %s", err)
+		logger.Log.Fatalf("Failed to load system certificate pool. Error:\n%s", err)
 	}
 	if *caCertFile != "" {
 		newCACert, err := os.ReadFile(*caCertFile)
 		if err != nil {
-			logger.Log.Fatalf("Invalid CA certificate (%s), error: %s", *caCertFile, err)
+			logger.Log.Fatalf("Invalid CA certificate (%s), Error:\n%s", *caCertFile, err)
 		}
 
 		caCerts.AppendCertsFromPEM(newCACert)
@@ -77,7 +77,7 @@ func main() {
 	if *tlsClientCert != "" && *tlsClientKey != "" {
 		cert, err := tls.LoadX509KeyPair(*tlsClientCert, *tlsClientKey)
 		if err != nil {
-			logger.Log.Fatalf("Invalid TLS client key pair (%s) (%s), error: %s", *tlsClientCert, *tlsClientKey, err)
+			logger.Log.Fatalf("Invalid TLS client key pair (%s) (%s), Error:\n%s", *tlsClientCert, *tlsClientKey, err)
 		}
 
 		tlsCerts = append(tlsCerts, cert)
@@ -92,7 +92,7 @@ func main() {
 		// strip query strings from url
 		u, err := url.Parse(*srcUrl)
 		if err != nil {
-			logger.Log.Fatalf("Invalid URL (%s), error: %s", *srcUrl, err)
+			logger.Log.Fatalf("Invalid URL (%s), Error:\n%s", *srcUrl, err)
 		}
 		*dstFile = filepath.Base(u.Path)
 		if *prefixDir != "" {
@@ -102,7 +102,7 @@ func main() {
 
 	err = downloadFile(*srcUrl, *dstFile, caCerts, tlsCerts)
 	if err != nil {
-		logger.Log.Fatalf("Failed to download (%s) to (%s). Error: %s", *srcUrl, *dstFile, err)
+		logger.Log.Fatalf("Failed to download (%s) to (%s). Error:\n%s", *srcUrl, *dstFile, err)
 	}
 }
 
