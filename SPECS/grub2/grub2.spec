@@ -6,7 +6,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -53,6 +53,38 @@ Patch0167:      0167-restore-umask-for-grub-config.patch
 Patch0170:      0170-fix-memory-alloc-errno-reset.patch
 Patch0171:      CVE-2022-2601.patch
 Patch0172:      CVE-2022-3775.patch
+# CVE-2021-3695 CVE-2021-3696 CVE-2021-3697 CVE-2022-28733 CVE-2022-28734
+# CVE-2022-28735 CVE-2022-28736
+Patch0173:      0173-loader-efi-chainloader-Simplify-the-loader-state.patch
+Patch0174:      0174-commands-boot-Add-API-to-pass-context-to-loader.patch
+Patch0175:      0175-loader-efi-chainloader-Use-grub_loader_set_ex.patch
+Patch0176:      0176-kern-efi-sb-Reject-non-kernel-files-in-the-shim_lock.patch
+Patch0177:      0177-kern-file-Do-not-leak-device_name-on-error-in-grub_f.patch
+Patch0178:      0178-video-readers-png-Abort-sooner-if-a-read-operation-f.patch
+Patch0179:      0179-video-readers-png-Refuse-to-handle-multiple-image-he.patch
+Patch0180:      0180-video-readers-png-Drop-greyscale-support-to-fix-heap.patch
+Patch0181:      0181-video-readers-png-Avoid-heap-OOB-R-W-inserting-huff-.patch
+Patch0182:      0182-video-readers-png-Sanity-check-some-huffman-codes.patch
+Patch0183:      0183-video-readers-jpeg-Abort-sooner-if-a-read-operation-.patch
+Patch0184:      0184-video-readers-jpeg-Do-not-reallocate-a-given-huff-ta.patch
+Patch0185:      0185-video-readers-jpeg-Refuse-to-handle-multiple-start-o.patch
+Patch0186:      0186-video-readers-jpeg-Block-int-underflow-wild-pointer-.patch
+Patch0187:      0187-normal-charset-Fix-array-out-of-bounds-formatting-un.patch
+Patch0188:      0188-net-ip-Do-IP-fragment-maths-safely.patch
+Patch0189:      0189-net-netbuff-Block-overly-large-netbuff-allocs.patch
+Patch0190:      0190-net-dns-Fix-double-free-addresses-on-corrupt-DNS-res.patch
+Patch0191:      0191-net-dns-Don-t-read-past-the-end-of-the-string-we-re-.patch
+Patch0192:      0192-net-tftp-Prevent-a-UAF-and-double-free-from-a-failed.patch
+Patch0193:      0193-net-tftp-Avoid-a-trivial-UAF.patch
+Patch0194:      0194-net-http-Do-not-tear-down-socket-if-it-s-already-bee.patch
+Patch0195:      0195-net-http-Fix-OOB-write-for-split-http-headers.patch
+Patch0196:      0196-net-http-Error-out-on-headers-with-LF-without-CR.patch
+Patch0197:      0197-fs-f2fs-Do-not-read-past-the-end-of-nat-journal-entr.patch
+Patch0198:      0198-fs-f2fs-Do-not-read-past-the-end-of-nat-bitmap.patch
+Patch0199:      0199-fs-f2fs-Do-not-copy-file-names-that-are-too-long.patch
+Patch0200:      0200-fs-btrfs-Fix-several-fuzz-issues-with-invalid-dir-it.patch
+Patch0201:      0201-fs-btrfs-Fix-more-ASAN-and-SEGV-issues-found-with-fu.patch
+Patch0202:      0202-fs-btrfs-Fix-more-fuzz-issues-related-to-chunks.patch
 BuildRequires:  autoconf
 BuildRequires:  device-mapper-devel
 BuildRequires:  python3
@@ -355,6 +387,10 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %{_sysconfdir}/default/grub.d
 
 %changelog
+* Wed Oct 18 2023 Gary Swalling <gaswal@microsoft.com> - 2.06-12
+- CVE-2021-3695 CVE-2021-3696 CVE-2021-3697 CVE-2022-28733 CVE-2022-28734
+  CVE-2022-28735 CVE-2022-28736 and increment SBAT level to 2
+
 * Fri Aug 11 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.06-11
 - Enable support for grub2-mkconfig grub.cfg generation
 - Introduce rpm-macros, configuration subpackage
