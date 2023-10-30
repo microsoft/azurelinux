@@ -46,7 +46,7 @@ func main() {
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(*logFile, *logLevel)
 	if *noVerbose {
-		logger.Log.SetLevel(logrus.ErrorLevel)
+		logger.Log.SetLevel(logrus.WarnLevel)
 	}
 
 	if *noClobber {
@@ -116,11 +116,19 @@ func downloadFile(srcUrl, dstFile string, caCerts *x509.CertPool, tlsCerts []tls
 	)
 	var noCancel chan struct{} = nil
 
+	retryNum := 1
 	_, err = retry.RunWithExpBackoff(func() error {
 		netErr := network.DownloadFile(srcUrl, dstFile, caCerts, tlsCerts)
 		if netErr != nil {
-			logger.Log.Warnf("Failed to download (%s). Error: %s", srcUrl, netErr)
+			// Check if the error contains the string "invalid response: 404", we should print a warning in that case so the
+			// sees it even if we are running with --no-verbose.
+			if netErr.Error() == "invalid response: 404" {
+				logger.Log.Warnf("Attempt %d/%d: Failed to download '%s' with error: '%s'", retryNum, downloadRetryAttempts, srcUrl, netErr)
+			} else {
+				logger.Log.Infof("Attempt %d/%d: Failed to download '%s' with error: '%s'", retryNum, downloadRetryAttempts, srcUrl, netErr)
+			}
 		}
+		retryNum++
 		return netErr
 	}, downloadRetryAttempts, downloadRetryDuration, failureBackoffBase, noCancel)
 
