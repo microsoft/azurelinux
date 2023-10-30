@@ -85,6 +85,9 @@ func main() {
 
 	// dst may be empty, in which case the file will be downloaded to the current directory. Generate dst from src's basename.
 	// The url may include query strings which should be stripped.
+	if *dstFile != "" && *prefixDir != "" {
+		logger.Log.Fatalf("Cannot specify both --output-file and --directory-prefix")
+	}
 	if *dstFile == "" {
 		// strip query strings from url
 		u, err := url.Parse(*srcUrl)
@@ -95,8 +98,6 @@ func main() {
 		if *prefixDir != "" {
 			*dstFile = filepath.Join(*prefixDir, *dstFile)
 		}
-	} else if *prefixDir != "" {
-		logger.Log.Fatalf("Cannot specify both --output-file and --directory-prefix")
 	}
 
 	err = downloadFile(*srcUrl, *dstFile, caCerts, tlsCerts)
