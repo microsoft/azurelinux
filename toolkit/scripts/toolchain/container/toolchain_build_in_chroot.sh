@@ -50,7 +50,8 @@ ls -la /usr/sbin
 ls -la /usr/bin
 ls -la /bin/bash
 ls -la /bin/sh
-echo sanity check - raw toolchain - before building - gcc -v
+
+echo "Sanity check 3 (raw toolchain - before building gcc)"
 find / -name ld-linux-x86-64.so.2
 ls -la /lib64/ld-linux-x86-64.so.2
 ls -la /tools/lib/ld-linux-x86-64.so.2
@@ -59,6 +60,7 @@ ls -la /lib64/ld-lsb-x86-64.so.3
 ls -la /lib64/ld-linux-x86-64.so.2
 file /tools/bin/gcc
 gcc -v
+echo "End sanity check 3"
 echo Finished printing debug info
 
 set -e
@@ -126,7 +128,7 @@ rm -rf glibc-2.35
 
 touch /logs/status_glibc_complete
 
-echo 6.10. Adjusting the Toolchain
+echo Adjusting the Toolchain
 find / -name ld-linux-x86-64.so.2
 # The final C library was just installed above. Ajust the toolchain to link newly compiled programs with it.
 mv -v /tools/bin/{ld,ld-old}
@@ -137,15 +139,16 @@ gcc -dumpspecs | sed -e 's@/tools@@g'                   \
     -e '/\*startfile_prefix_spec:/{n;s@.*@/usr/lib/ @}' \
     -e '/\*cpp:/{n;s@$@ -isystem /usr/include@}' >      \
     `dirname $(gcc --print-libgcc-file-name)`/specs
+
 # Sanity check for adjusted toolchain:
-echo sanity check - raw toolchain - adjusting the toolchain
+echo "Sanity check 4 (raw toolchain - adjusting the toolchain)"
 set +e
 echo 'int main(){}' > dummy.c
 cc dummy.c -v -Wl,--verbose &> dummy.log
 sleep 3
 sync
 # This sets errorlevel..
-readelf -l a.out | grep ': /lib'
+readelf -l a.out | grep ld-linux
 case $(uname -m) in
   x86_64)
     echo Expected: '[Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]'
@@ -187,7 +190,7 @@ esac
 # Cleanup
 rm -v dummy.c a.out dummy.log
 set -e
-echo End sanity check - raw toolchain - adjusting the toolchain
+echo "End sanity check 4"
 touch /logs/status_adjusting_toolchain_complete
 
 echo Zlib-1.3
@@ -353,7 +356,7 @@ ln -sfv ../../libexec/gcc/$(gcc -dumpmachine)/11.2.0/liblto_plugin.so /usr/lib/b
 
 # Sanity check
 set +e
-echo sanity check - raw toolchain - gcc 11.2.0
+echo "Sanity check 5 (raw toolchain - gcc)"
 ldconfig -v
 ldconfig -p
 ldconfig
@@ -363,7 +366,7 @@ echo 'int main(){}' > dummy.c
 cc dummy.c -v -Wl,--verbose &> dummy.log
 cat dummy.log
 readelf -l a.out
-readelf -l a.out | grep ': /lib'
+readelf -l a.out | grep ld-linux
 echo Expected output: '[Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]'
 # Expected output:
 # [Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]
@@ -398,7 +401,7 @@ echo Expected output: 'found ld-linux-x86-64.so.2 at /lib/ld-linux-x86-64.so.2'
 # Expected output:
 # found ld-linux-x86-64.so.2 at /lib/ld-linux-x86-64.so.2
 rm -v dummy.c a.out dummy.log
-echo End sanity check - raw toolchain - gcc 11.2.0
+echo "End sanity check 5"
 set -e
 
 mkdir -pv /usr/share/gdb/auto-load/usr/lib
@@ -499,9 +502,6 @@ echo Bison-3.8.2
 tar xf bison-3.8.2.tar.xz
 pushd bison-3.8.2
 ./configure --prefix=/usr --docdir=/usr/share/doc/bison-3.8.2
-# Build with single processor due to errors seen with parallel make
-#     cannot stat 'examples/c/reccalc/scan.stamp.tmp': No such file or directory
-# try parallel make with new version
 make -j$(nproc)
 make install
 popd
@@ -842,8 +842,6 @@ echo Groff-1.23.0
 tar xf groff-1.23.0.tar.gz
 pushd groff-1.23.0
 PAGE=letter ./configure --prefix=/usr
-# Build with single processor due to errors seen with parallel make
-#make -j1
 make -j$(nproc)
 make install
 popd
@@ -1107,7 +1105,8 @@ touch /logs/status_rpm_complete
 # Cleanup
 rm -rf /tmp/*
 
-echo sanity check - raw toolchain - after build complete - gcc -v
+echo "Sanity check 6 (raw toolchain - after build complete)"
 gcc -v
+echo "End sanity check 6"
 
 touch /logs/status_building_in_chroot_complete

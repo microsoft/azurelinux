@@ -145,11 +145,16 @@ cd       build
       libc_cv_c_cleanup=yes
 make -j$(nproc)
 make install
-echo sanity check - temptoolchain - glibc
+popd
+rm -rf glibc-2.35
+
+touch $LFS/logs/temptoolchain/status_glibc_complete
+
+echo "Sanity check 1 (temptoolchain - glibc)"
 set +e
 echo 'int main(){}' > dummy.c
 $LFS_TGT-gcc dummy.c
-readelf -l a.out | grep ': /tools'
+readelf -l a.out | grep ld-linux
 case $(uname -m) in
   x86_64)
     echo Expected: '[Requesting program interpreter: /tools/lib64/ld-linux-x86-64.so.2]'
@@ -160,11 +165,9 @@ case $(uname -m) in
 esac
 rm -v dummy.c a.out
 set -e
-echo End sanity check - temptoolchain - glibc
-popd
-rm -rf glibc-2.35
+echo "End sanity check 1"
 
-touch $LFS/logs/temptoolchain/status_glibc_complete
+touch $LFS/logs/temptoolchain/status_sanity_check_1_complete
 
 echo Libstdc++ from GCC-11.2.0
 tar xf gcc-11.2.0.tar.xz
@@ -284,12 +287,16 @@ RANLIB=$LFS_TGT-ranlib                             \
 make -j$(nproc)
 make install
 ln -sv gcc /tools/bin/cc
-# Sanity check
+popd
+rm -rf gcc-11.2.0
+
+touch $LFS/logs/temptoolchain/status_gcc_pass2_complete
+
+echo "Sanity check 2 (temptoolchain - gcc pass2)"
 set +e
-echo sanity check - temptoolchain - gcc 11.2.0 pass2
 echo 'int main(){}' > dummy.c
 cc dummy.c
-readelf -l a.out | grep ': /tools'
+readelf -l a.out | grep ld-linux
 case $(uname -m) in
   x86_64)
     echo Expected: '[Requesting program interpreter: /tools/lib64/ld-linux-x86-64.so.2]'
@@ -300,11 +307,9 @@ case $(uname -m) in
 esac
 rm -v dummy.c a.out
 set -e
-echo End sanity check - temptoolchain - gcc 11.2.0 pass2
-popd
-rm -rf gcc-11.2.0
+echo "End sanity check 2"
 
-touch $LFS/logs/temptoolchain/status_gcc_pass2_complete
+touch $LFS/logs/temptoolchain/status_sanity_check_2_complete
 
 echo M4-1.4.19
 tar xf m4-1.4.19.tar.gz
@@ -351,9 +356,6 @@ echo Bison-3.8.2
 tar xf bison-3.8.2.tar.xz
 pushd bison-3.8.2
 ./configure --prefix=/tools
-# Build with single processor due to errors seen with parallel make
-#     cannot stat 'examples/c/reccalc/scan.stamp.tmp': No such file or directory
-# try parallel make with new version
 make -j$(nproc)
 make install
 popd
@@ -578,6 +580,6 @@ rm -rf flex-2.6.4
 
 touch $LFS/logs/temptoolchain/status_flex_complete
 
-touch $LFS/logs/temptoolchain/temp_toolchain_complete
+touch $LFS/logs/temptoolchain/status_temp_toolchain_complete
 
 echo Done with script
