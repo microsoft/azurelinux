@@ -1188,11 +1188,6 @@ func createUserWithPassword(installChroot *safechroot.Chroot, user configuration
 	}
 	logger.Log.Tracef("hashed password: %v", hashedPassword)
 
-	if strings.TrimSpace(hashedPassword) == "" {
-		err = fmt.Errorf("empty password for user (%s) is not allowed", user.Name)
-		return
-	}
-
 	// Create the user with the given hashed password
 	if user.Name == userutils.RootUser {
 		if user.UID != "" {
