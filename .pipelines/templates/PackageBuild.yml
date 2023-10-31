@@ -160,6 +160,17 @@ steps:
         displayName: "Populate RPMs cache"
 
   - script: |
+      # Make sure toolchain_archive is empty
+      if [[ -n "$toolchain_archive" ]]; then
+        echo "ERROR: toolchain_archive is not empty!" >&2
+        exit 1
+      fi
+      toolchain_archive="$(find "$(Pipeline.Workspace)" -name "${{ parameters.customToolchainTarballName }}" -print -quit)"
+      if [[ ! -f "$toolchain_archive" ]]; then
+        echo "ERROR: toolchain archive not found!" >&2
+        exit 1
+      fi
+
       if [[ ${{ parameters.isDeltaBuild }} == "true" ]]; then
         delta_fetch_arg="DELTA_FETCH=y"
       elif [[ ${{ parameters.isDeltaBuild }} == "false" ]]; then
@@ -185,6 +196,7 @@ steps:
       fi
 
       sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
+        TOOLCHAIN_ARCHIVE="$toolchain_archive" \
         CONCURRENT_PACKAGE_BUILDS=${{ parameters.concurrentPackageBuilds }} \
         CONFIG_FILE="" \
         REBUILD_TOOLS=y \
