@@ -164,8 +164,11 @@ steps:
       if [[ -n "$toolchain_archive" ]]; then
         echo "ERROR: toolchain_archive is not empty!" >&2
         exit 1
+      else
+        echo "toolchain_archive is empty"
       fi
       toolchain_archive="$(find "$(Pipeline.Workspace)" -name "${{ parameters.customToolchainTarballName }}" -print -quit)"
+      echo "toolchain_archive: $toolchain_archive"
       if [[ ! -f "$toolchain_archive" ]]; then
         echo "ERROR: toolchain archive not found!" >&2
         exit 1
