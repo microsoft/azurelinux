@@ -49,17 +49,6 @@ func main() {
 		logger.Log.SetLevel(logrus.WarnLevel)
 	}
 
-	if *noClobber {
-		exists, err := file.PathExists(*dstFile)
-		if err != nil {
-			logger.Log.Fatalf("Failed to check if file (%s) exists. Error:\n%s", *dstFile, err)
-		}
-		if exists {
-			logger.Log.Infof("File (%s) already exists, skipping download.", *dstFile)
-			return
-		}
-	}
-
 	caCerts, err := x509.SystemCertPool()
 	if err != nil {
 		logger.Log.Fatalf("Failed to load system certificate pool. Error:\n%s", err)
@@ -97,6 +86,17 @@ func main() {
 		*dstFile = filepath.Base(u.Path)
 		if *prefixDir != "" {
 			*dstFile = filepath.Join(*prefixDir, *dstFile)
+		}
+	}
+
+	if *noClobber {
+		exists, err := file.PathExists(*dstFile)
+		if err != nil {
+			logger.Log.Fatalf("Failed to check if file (%s) exists. Error:\n%s", *dstFile, err)
+		}
+		if exists {
+			logger.Log.Infof("File (%s) already exists, skipping download.", *dstFile)
+			return
 		}
 	}
 
