@@ -2,11 +2,36 @@
 
 # Required binaries:
 # rpm and dnf
+sodiff_script_error=false
+while getopts "r:f:v:o:e:" opt; do
+    case $opt in
+        r) rpms_folder="$OPTARG";;
+        f) repo_file_path="$OPTARG";;
+        v) mariner_version="$OPTARG";;
+        o) sodiff_out_bdir="$OPTARG";;
+        e) sodiff_script_error="$OPTARG";;
+    esac
+done
 
-rpms_folder="$1"
-repo_file_path="$2"
-mariner_version="$3"
-sodiff_out_dir="$4"
+if [ -z "$rpms_folder"] then
+    echo "INVALID ARBUMENT: RPMS_FOLDER is empty"
+    exit 1
+fi 
+
+if [ -z "$repo_file_path"] then
+    echo "INVALID ARBUMENT: REPO_FILE_PATH is empty"
+    exit 1
+fi 
+
+if [ -z "$mariner_version"] then
+    echo "INVALID ARBUMENT: MARINER_VERSION is empty"
+    exit 1
+fi 
+
+if [ -z "$sodiff_out_dir"] then
+    echo "INVALID ARBUMENT: SODIFF_OUT_DIR is empty"
+    exit 1
+fi 
 sodiff_log_file="${sodiff_out_dir}/sodiff.log"
 
 # Setup output dir
@@ -86,6 +111,9 @@ echo "######################"
 if [[ $pkgsFound -gt 0 ]]; then
     echo "The Following Packages Are in Need of an Update:"
     cat "$sodiff_out_dir"/sodiff-summary.txt
+    if [ "$sodiff_script_error" -eq "true" ] then
+        exit 1
+    fi 
 else
     echo "No Packages with Conflicting .so Files Found."
 fi
