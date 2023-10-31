@@ -42,6 +42,7 @@ Source4:        cbl-mariner-ca-20211013.pem
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
+BuildRequires:  cpio
 BuildRequires:  diffutils
 BuildRequires:  dwarves
 BuildRequires:  elfutils-libelf-devel
@@ -421,6 +422,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %changelog
 * Thu Oct 26 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.136.1-1
 - Upgrade to 5.15.136.1
+- Include cpio as BR
 
 * Tue Oct 17 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.135.1-1
 - Auto-upgrade to 5.15.135.1
