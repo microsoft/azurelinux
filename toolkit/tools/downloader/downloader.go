@@ -114,7 +114,7 @@ func downloadFile(srcUrl, dstFile string, caCerts *x509.CertPool, tlsCerts []tls
 		failureBackoffBase    = 3.0
 		downloadRetryDuration = time.Second
 	)
-	var noCancel chan struct{} = nil
+	cancel := make(chan struct{})
 
 	retryNum := 1
 	_, err = retry.RunWithExpBackoff(func() error {
@@ -125,14 +125,14 @@ func downloadFile(srcUrl, dstFile string, caCerts *x509.CertPool, tlsCerts []tls
 			if netErr.Error() == "invalid response: 404" {
 				logger.Log.Warnf("Attempt %d/%d: Failed to download '%s' with error: '%s'", retryNum, downloadRetryAttempts, srcUrl, netErr)
 				logger.Log.Warnf("404 errors are likely unrecoverable, will not retry")
-				close(noCancel)
+				close(cancel)
 			} else {
 				logger.Log.Infof("Attempt %d/%d: Failed to download '%s' with error: '%s'", retryNum, downloadRetryAttempts, srcUrl, netErr)
 			}
 		}
 		retryNum++
 		return netErr
-	}, downloadRetryAttempts, downloadRetryDuration, failureBackoffBase, noCancel)
+	}, downloadRetryAttempts, downloadRetryDuration, failureBackoffBase, cancel)
 
 	if err != nil {
 		err = fmt.Errorf("failed to download (%s) to (%s). Error:\n%w", srcUrl, dstFile, err)
