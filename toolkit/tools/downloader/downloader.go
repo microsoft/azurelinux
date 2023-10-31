@@ -128,9 +128,11 @@ func downloadFile(srcUrl, dstFile string, caCerts *x509.CertPool, tlsCerts []tls
 		netErr := network.DownloadFile(srcUrl, dstFile, caCerts, tlsCerts)
 		if netErr != nil {
 			// Check if the error contains the string "invalid response: 404", we should print a warning in that case so the
-			// sees it even if we are running with --no-verbose.
+			// sees it even if we are running with --no-verbose. 404's are unlikely to fix themselves on retry, give up.
 			if netErr.Error() == "invalid response: 404" {
 				logger.Log.Warnf("Attempt %d/%d: Failed to download '%s' with error: '%s'", retryNum, downloadRetryAttempts, srcUrl, netErr)
+				logger.Log.Warnf("404 errors are likely unrecoverable, will not retry")
+				close(cancel)
 			} else {
 				logger.Log.Infof("Attempt %d/%d: Failed to download '%s' with error: '%s'", retryNum, downloadRetryAttempts, srcUrl, netErr)
 			}
