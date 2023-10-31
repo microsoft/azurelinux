@@ -40,6 +40,7 @@
         {
             "Name": "Standard",
             "BootType": "efi",
+            "EnableGrubMkconfig": true,
             "PartitionSettings": [
                 {
                     "ID": "efi",
