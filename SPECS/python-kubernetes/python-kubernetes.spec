@@ -1,5 +1,4 @@
 %global library kubernetes
-%global basehash 06191d321491abd87caaf0d049030dc87720684a
 
 Name:       python-%{library}
 Version:    28.1.0
@@ -8,7 +7,6 @@ Summary:    Python client for the kubernetes API.
 License:    ASL 2.0
 URL:        https://github.com/kubernetes-client/python
 Source0:    https://github.com/kubernetes-client/python/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:    https://github.com/kubernetes-client/python-base/archive/%{basehash}.tar.gz#/%{name}-base-%{version}.tar.gz
 BuildArch:  noarch
 
 %package -n python3-%{library}
@@ -44,13 +42,6 @@ Python client for the kubernetes API.
 
 %prep
 %autosetup -n python-%{version} -S git
-
-pushd kubernetes
-rm -rf base
-tar zxvf %{SOURCE1}
-mv python-base-%{basehash} base
-popd
-
 
 %build
 python3 setup.py build
