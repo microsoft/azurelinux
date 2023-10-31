@@ -354,7 +354,7 @@ func findRootfsPartitionFromEsp(efiSystemPartition *diskutils.PartitionInfo, dis
 		return nil, fmt.Errorf("failed to find rootfs partition using boot partition (%s)", bootPartition.Name)
 	}
 
-	return bootPartition, nil
+	return rootfsPartition, nil
 }
 
 func findRootfsPartitionFromBiosBootPartition(biosBootLoaderPartition *diskutils.PartitionInfo,
