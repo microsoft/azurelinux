@@ -44,6 +44,9 @@ sudo make image REBUILD_TOOLS=y REBUILD_PACKAGES=n CONFIG_FILE=./imageconfigs/co
 ```
 
 **Build the cloud-init configuration image**
+
+Note that the cloud-init configuration file does not build by default.  You will need to edit it to set a username and password or SSH Key.  The file is located in ./resources/assets/meta-user-data/user-data.
+
 ```Bash
 # Build the cloud-init configuration image
 # The output image is ../out/images/meta-user-data.iso
