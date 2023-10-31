@@ -15,7 +15,7 @@ parameters:
 
   - name: sodiffRepoCommand
     type: string
-    default: "sodiff-check"
+    default: "sodiff-repo"
 
   - name: sodiffRepoFile
     type: string
