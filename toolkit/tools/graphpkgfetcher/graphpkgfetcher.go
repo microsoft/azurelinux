@@ -418,7 +418,7 @@ func downloadSingleDeltaRPM(realDependencyGraph *pkggraph.PkgGraph, buildNode *p
 	// already have it in the cache.
 	if !foundCacheRPM {
 		// Avoid any processing since we know the exact RPM we want to download
-		_, err = cloner.CloneRawPackageNames(downloadDependencies, false /*no transaction*/, fullyQualifiedRpmName)
+		_, err = cloner.CloneByName(downloadDependencies, fullyQualifiedRpmName)
 		if err != nil {
 			logger.Log.Warnf("Can't find delta RPM to download for %s: %s (local copy may be newer than published version)", fullyQualifiedRpmName, err)
 			return nil
@@ -480,7 +480,7 @@ func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNo
 				Name: resolvedPackage,
 			}
 
-			preBuilt, err = cloner.Clone(cloneDeps, desiredPackage)
+			preBuilt, err = cloner.CloneByPackageVer(cloneDeps, desiredPackage)
 			if err != nil {
 				err = fmt.Errorf("failed to clone '%s' from RPM repo:\n%w", resolvedPackage, err)
 				return
