@@ -31,6 +31,7 @@ var (
 	logLevel  = exe.LogLevelFlag(app)
 	noClobber = app.Flag("no-clobber", "Do not overwrite existing files").Bool()
 	noVerbose = app.Flag("no-verbose", "Do not print verbose output").Bool()
+	timeout   = app.Flag("timeout", "Stops retrying after this duration (up to the max of 6 attempts)").Default("0").Duration()
 
 	caCertFile    = app.Flag("ca-certificate", "Root certificate authority to use when downloading files.").String()
 	tlsClientCert = app.Flag("certificate", "TLS client certificate to use when downloading files.").String()
@@ -100,13 +101,13 @@ func main() {
 		}
 	}
 
-	err = downloadFile(*srcUrl, *dstFile, caCerts, tlsCerts)
+	err = downloadFile(*srcUrl, *dstFile, caCerts, tlsCerts, *timeout)
 	if err != nil {
 		logger.Log.Fatalf("Failed to download (%s) to (%s). Error:\n%s", *srcUrl, *dstFile, err)
 	}
 }
 
-func downloadFile(srcUrl, dstFile string, caCerts *x509.CertPool, tlsCerts []tls.Certificate) (err error) {
+func downloadFile(srcUrl, dstFile string, caCerts *x509.CertPool, tlsCerts []tls.Certificate, timeout time.Duration) (err error) {
 	const (
 		// With 6 attempts, initial delay of 1 second, and a backoff factor of 3.0 the total time spent retrying will be
 		// 1 + 3 + 9 + 27 + 81 = 121 seconds.
@@ -114,10 +115,16 @@ func downloadFile(srcUrl, dstFile string, caCerts *x509.CertPool, tlsCerts []tls
 		failureBackoffBase    = 3.0
 		downloadRetryDuration = time.Second
 	)
-	var noCancel chan struct{} = nil
+	cancel := make(chan struct{})
+	if timeout > 0 {
+		go func() {
+			time.Sleep(timeout)
+			close(cancel)
+		}()
+	}
 
 	retryNum := 1
-	_, err = retry.RunWithExpBackoff(func() error {
+	timedOut, err := retry.RunWithExpBackoff(func() error {
 		netErr := network.DownloadFile(srcUrl, dstFile, caCerts, tlsCerts)
 		if netErr != nil {
 			// Check if the error contains the string "invalid response: 404", we should print a warning in that case so the
@@ -130,7 +137,12 @@ func downloadFile(srcUrl, dstFile string, caCerts *x509.CertPool, tlsCerts []tls
 		}
 		retryNum++
 		return netErr
-	}, downloadRetryAttempts, downloadRetryDuration, failureBackoffBase, noCancel)
+	}, downloadRetryAttempts, downloadRetryDuration, failureBackoffBase, cancel)
+
+	if timedOut {
+		err = fmt.Errorf("timed out downloading (%s) after %s", srcUrl, timeout)
+		return
+	}
 
 	if err != nil {
 		err = fmt.Errorf("failed to download (%s) to (%s). Error:\n%w", srcUrl, dstFile, err)
