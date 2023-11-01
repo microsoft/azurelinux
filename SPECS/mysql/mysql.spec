@@ -72,15 +72,15 @@ make test
 %files devel
 %{_libdir}/*.so
 %{_libdir}/*.a
-%{_libdir}/private/icudt69l/brkitr/*.res
-%{_libdir}/private/icudt69l/brkitr/*.brk
-%{_libdir}/private/icudt69l/brkitr/*.dict
-%{_libdir}/private/icudt69l/unames.icu
+%{_libdir}/private/icudt73l/brkitr/*.res
+%{_libdir}/private/icudt73l/brkitr/*.brk
+%{_libdir}/private/icudt73l/brkitr/*.dict
+%{_libdir}/private/icudt73l/unames.icu
 %{_includedir}/*
 %{_libdir}/pkgconfig/mysqlclient.pc
 
 %changelog
-* Mon Oct 31 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.0.34-1
+* Wed Nov 1 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.0.34-1
 - Auto-upgrade to 8.0.34 - address CVE-2023-22053, CVE-2023-22054, CVE-2023-22056, CVE-2023-22058, CVE-2023-22065, CVE-2023-22110, CVE-2023-22111, CVE-2023-22113, CVE-2023-22115
 
 * Mon Apr 24 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.0.33-1
