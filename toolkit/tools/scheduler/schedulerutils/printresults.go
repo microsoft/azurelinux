@@ -130,27 +130,11 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 		conflictsLogger("Number of toolchain SRPM conflicts: %d", len(srpmConflicts))
 	}
 
-	if len(builtSRPMs) != 0 {
-		logger.Log.Info("Built SRPMs:")
-		keys := getSortedKeys(builtSRPMs)
-		for _, builtSRPM := range keys {
-            logger.Log.Infof("--> %s", filepath.Base(builtSRPM))
-		}
-	}
-
 	if len(testedSRPMs) != 0 {
 		logger.Log.Info("Tested SRPMs:")
 		keys := getSortedKeys(testedSRPMs)
 		for _, testedSRPM := range keys {
-            logger.Log.Infof("--> %s", filepath.Base(testedSRPM))
-		}
-	}
-
-	if len(prebuiltSRPMs) != 0 {
-		logger.Log.Info("Prebuilt SRPMs:")
-		keys := getSortedKeys(prebuiltSRPMs)
-		for _, prebuiltSRPM := range keys {
-            logger.Log.Infof("--> %s", filepath.Base(prebuiltSRPM))
+			logger.Log.Infof("--> %s", filepath.Base(testedSRPM))
 		}
 	}
 
@@ -158,7 +142,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 		logger.Log.Info("Skipped SRPMs (i.e., delta mode is on, packages are already available in a repo):")
 		keys := getSortedKeys(prebuiltDeltaSRPMs)
 		for _, prebuiltDeltaSRPM := range keys {
-            logger.Log.Infof("--> %s", filepath.Base(prebuiltDeltaSRPM))
+			logger.Log.Infof("--> %s", filepath.Base(prebuiltDeltaSRPM))
 		}
 	}
 
@@ -166,25 +150,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 		logger.Log.Info("Skipped SRPMs tests:")
 		keys := getSortedKeys(skippedSRPMsTests)
 		for _, skippedSRPMsTest := range keys {
-            logger.Log.Infof("--> %s", filepath.Base(skippedSRPMsTest))
-		}
-	}
-
-	if len(failedSRPMs) != 0 {
-		logger.Log.Info("Failed SRPMs:")
-		keys := getSortedKeys(failedSRPMs)
-		for _, key := range keys {
-			failure := failedSRPMs[key]
-            logger.Log.Infof("--> %s , error: %s, for details see: %s", failure.Node.SRPMFileName(), failure.Err, failure.LogFile)
-		}
-	}
-
-	if len(failedSRPMsTests) != 0 {
-		logger.Log.Info("Failed SRPMs tests:")
-		keys := getSortedKeys(failedSRPMsTests)
-		for _, key := range keys {
-			failure := failedSRPMsTests[key]
-            logger.Log.Infof("--> %s , error: %s, for details see: %s", failure.Node.SRPMFileName(), failure.Err, failure.LogFile)
+			logger.Log.Infof("--> %s", filepath.Base(skippedSRPMsTest))
 		}
 	}
 
@@ -192,7 +158,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 		logger.Log.Info("Blocked SRPMs:")
 		keys := getSortedKeys(blockedSRPMs)
 		for _, blockedSRPM := range keys {
-            logger.Log.Infof("--> %s", filepath.Base(blockedSRPM))
+			logger.Log.Infof("--> %s", filepath.Base(blockedSRPM))
 		}
 	}
 
@@ -200,7 +166,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 		logger.Log.Info("Blocked SRPMs tests:")
 		keys := getSortedKeys(blockedSRPMsTests)
 		for _, blockedSRPMsTest := range keys {
-            logger.Log.Infof("--> %s", filepath.Base(blockedSRPMsTest))
+			logger.Log.Infof("--> %s", filepath.Base(blockedSRPMsTest))
 		}
 	}
 
@@ -208,7 +174,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 		logger.Log.Info("Unresolved dependencies:")
 		keys := getSortedKeys(unresolvedDependencies)
 		for _, unresolvedDependency := range keys {
-            logger.Log.Infof("--> %s", filepath.Base(unresolvedDependency))
+			logger.Log.Infof("--> %s", filepath.Base(unresolvedDependency))
 		}
 	}
 
@@ -227,6 +193,41 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 			conflictsLogger("--> %s", conflict)
 		}
 	}
+
+	if len(failedSRPMs) != 0 {
+		logger.Log.Info("Failed SRPMs:")
+		keys := getSortedKeys(failedSRPMs)
+		for _, key := range keys {
+			failure := failedSRPMs[key]
+			logger.Log.Infof("--> %s , error: %s, for details see: %s", failure.Node.SRPMFileName(), failure.Err, failure.LogFile)
+		}
+	}
+
+	if len(failedSRPMsTests) != 0 {
+		logger.Log.Info("Failed SRPMs tests:")
+		keys := getSortedKeys(failedSRPMsTests)
+		for _, key := range keys {
+			failure := failedSRPMsTests[key]
+			logger.Log.Infof("--> %s , error: %s, for details see: %s", failure.Node.SRPMFileName(), failure.Err, failure.LogFile)
+		}
+	}
+
+	if len(prebuiltSRPMs) != 0 {
+		logger.Log.Info("Prebuilt SRPMs:")
+		keys := getSortedKeys(prebuiltSRPMs)
+		for _, prebuiltSRPM := range keys {
+			logger.Log.Infof("--> %s", filepath.Base(prebuiltSRPM))
+		}
+	}
+
+	if len(builtSRPMs) != 0 {
+		logger.Log.Info("Built SRPMs:")
+		keys := getSortedKeys(builtSRPMs)
+		for _, builtSRPM := range keys {
+			logger.Log.Infof("--> %s", filepath.Base(builtSRPM))
+		}
+	}
+
 }
 
 func buildResultsSetToNodesSet(statesSet map[string]*BuildResult) (result map[string]*pkggraph.PkgNode) {
