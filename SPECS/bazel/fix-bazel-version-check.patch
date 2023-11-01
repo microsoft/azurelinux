@@ -2,7 +2,7 @@ diff --git a/scripts/packages/bazel.sh b/scripts/packages/bazel.sh
 index 1b353b9..7399c7e 100755
 --- a/scripts/packages/bazel.sh
 +++ b/scripts/packages/bazel.sh
-@@ -160,7 +160,7 @@ readonly bazel_real_path="${wrapper_dir}/bazel-real"
+@@ -161,7 +161,7 @@ readonly bazel_real_path="${wrapper_dir}/bazel-real"
  if [[ ! -x ${BAZEL_REAL} && -x ${bazel_real_path} ]]; then
    # Note that "bazel --version" is very fast and doesn't start the Bazel server,
    # as opposed to "bazel version".
