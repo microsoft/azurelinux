@@ -1,7 +1,7 @@
 Summary:        advanced key-value store
 Name:           redis
 Version:        6.2.13
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -84,6 +84,9 @@ exit 0
 %config(noreplace) %attr(0640, %{name}, %{name}) %{_sysconfdir}/redis.conf
 
 %changelog
+* Wed Nov 01 2023 Osama Esmail <osamaesmail@microsoft.com> - 6.2.13-3
+- Patching CVE-2023-45145
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 6.2.13-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
