@@ -7,6 +7,7 @@ import (
 	"encoding/csv"
 	"os"
 	"path/filepath"
+	"sort"
 	"sync"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
@@ -131,76 +132,89 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 
 	if len(builtSRPMs) != 0 {
 		logger.Log.Info("Built SRPMs:")
-		for srpm := range builtSRPMs {
-			logger.Log.Infof("--> %s", filepath.Base(srpm))
+		keys := getSortedKeys(builtSRPMs)
+		for _, builtSRPM := range keys {
+            logger.Log.Infof("--> %s", filepath.Base(builtSRPM))
 		}
 	}
 
 	if len(testedSRPMs) != 0 {
 		logger.Log.Info("Tested SRPMs:")
-		for srpm := range testedSRPMs {
-			logger.Log.Infof("--> %s", filepath.Base(srpm))
+		keys := getSortedKeys(testedSRPMs)
+		for _, testedSRPM := range keys {
+            logger.Log.Infof("--> %s", filepath.Base(testedSRPM))
 		}
 	}
 
 	if len(prebuiltSRPMs) != 0 {
 		logger.Log.Info("Prebuilt SRPMs:")
-		for srpm := range prebuiltSRPMs {
-			logger.Log.Infof("--> %s", filepath.Base(srpm))
+		keys := getSortedKeys(prebuiltSRPMs)
+		for _, prebuiltSRPM := range keys {
+            logger.Log.Infof("--> %s", filepath.Base(prebuiltSRPM))
 		}
 	}
 
 	if len(prebuiltDeltaSRPMs) != 0 {
 		logger.Log.Info("Skipped SRPMs (i.e., delta mode is on, packages are already available in a repo):")
-		for srpm := range prebuiltDeltaSRPMs {
-			logger.Log.Infof("--> %s", filepath.Base(srpm))
+		keys := getSortedKeys(prebuiltDeltaSRPMs)
+		for _, prebuiltDeltaSRPM := range keys {
+            logger.Log.Infof("--> %s", filepath.Base(prebuiltDeltaSRPM))
 		}
 	}
 
 	if len(skippedSRPMsTests) != 0 {
 		logger.Log.Info("Skipped SRPMs tests:")
-		for srpm := range skippedSRPMsTests {
-			logger.Log.Infof("--> %s", filepath.Base(srpm))
+		keys := getSortedKeys(skippedSRPMsTests)
+		for _, skippedSRPMsTest := range keys {
+            logger.Log.Infof("--> %s", filepath.Base(skippedSRPMsTest))
 		}
 	}
 
 	if len(failedSRPMs) != 0 {
 		logger.Log.Info("Failed SRPMs:")
-		for _, failure := range failedSRPMs {
-			logger.Log.Infof("--> %s , error: %s, for details see: %s", failure.Node.SRPMFileName(), failure.Err, failure.LogFile)
+		keys := getSortedKeys(failedSRPMs)
+		for _, key := range keys {
+			failure := failedSRPMs[key]
+            logger.Log.Infof("--> %s , error: %s, for details see: %s", failure.Node.SRPMFileName(), failure.Err, failure.LogFile)
 		}
 	}
 
 	if len(failedSRPMsTests) != 0 {
 		logger.Log.Info("Failed SRPMs tests:")
-		for _, failure := range failedSRPMsTests {
-			logger.Log.Infof("--> %s , error: %s, for details see: %s", failure.Node.SRPMFileName(), failure.Err, failure.LogFile)
+		keys := getSortedKeys(failedSRPMsTests)
+		for _, key := range keys {
+			failure := failedSRPMsTests[key]
+            logger.Log.Infof("--> %s , error: %s, for details see: %s", failure.Node.SRPMFileName(), failure.Err, failure.LogFile)
 		}
 	}
 
 	if len(blockedSRPMs) != 0 {
 		logger.Log.Info("Blocked SRPMs:")
-		for srpm := range blockedSRPMs {
-			logger.Log.Infof("--> %s", filepath.Base(srpm))
+		keys := getSortedKeys(blockedSRPMs)
+		for _, blockedSRPM := range keys {
+            logger.Log.Infof("--> %s", filepath.Base(blockedSRPM))
 		}
 	}
 
 	if len(blockedSRPMsTests) != 0 {
 		logger.Log.Info("Blocked SRPMs tests:")
-		for srpm := range blockedSRPMsTests {
-			logger.Log.Infof("--> %s", filepath.Base(srpm))
+		keys := getSortedKeys(blockedSRPMsTests)
+		for _, blockedSRPMsTest := range keys {
+            logger.Log.Infof("--> %s", filepath.Base(blockedSRPMsTest))
 		}
 	}
 
 	if len(unresolvedDependencies) != 0 {
 		logger.Log.Info("Unresolved dependencies:")
-		for dependency := range unresolvedDependencies {
-			logger.Log.Infof("--> %s", dependency)
+		keys := getSortedKeys(unresolvedDependencies)
+		for _, unresolvedDependency := range keys {
+            logger.Log.Infof("--> %s", filepath.Base(unresolvedDependency))
 		}
 	}
 
 	if len(rpmConflicts) != 0 {
 		conflictsLogger("RPM conflicts with toolchain: ")
+		sort.Strings(rpmConflicts)
 		for _, conflict := range rpmConflicts {
 			conflictsLogger("--> %s", conflict)
 		}
@@ -208,6 +222,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 
 	if len(srpmConflicts) != 0 {
 		conflictsLogger("SRPM conflicts with toolchain: ")
+		sort.Strings(srpmConflicts)
 		for _, conflict := range srpmConflicts {
 			conflictsLogger("--> %s", conflict)
 		}
@@ -332,5 +347,16 @@ func unbuiltPackagesCSVRows(pkgGraph *pkggraph.PkgGraph, unbuiltPackages, failed
 		csvRows = append(csvRows, csvRow)
 	}
 
+	return
+}
+
+// Helper function to return a sorted slice of a map's keys
+// Supports *pkggraph.PkgNode, bool and *BuildResult as map values
+func getSortedKeys[V *pkggraph.PkgNode | bool | *BuildResult](inputMap map[string]V) (keys []string) {
+	keys = make([]string, 0)
+	for k := range inputMap {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
 	return
 }
