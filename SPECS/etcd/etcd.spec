@@ -145,8 +145,11 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 /%{_docdir}/%{name}-%{version}-tools/*
 
 %changelog
-* Tue Oct 10 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 3.5.9-1
+* Tue Oct 18 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 3.5.9-1
 - Upgrade to 3.5.9 to match version required by kubernetes
+
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.6-12
+- Bump release to rebuild with go 1.20.10
 
 * Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 3.5.6-11
 - Bump release to rebuild with updated version of Go.
