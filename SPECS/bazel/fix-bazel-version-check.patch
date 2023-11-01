@@ -1,6 +1,6 @@
-diff -ru a/scripts/packages/bazel.sh b/scripts/packages/bazel.sh
---- a/scripts/packages/bazel.sh
-+++ b/scripts/packages/bazel.sh
+diff -ru bazel-6.4.0-orig/scripts/packages/bazel.sh bazel-6.4.0/scripts/packages/bazel.sh
+--- bazel-6.4.0-orig/scripts/packages/bazel.sh	2023-10-19 10:02:49.000000000 -0700
++++ bazel-6.4.0/scripts/packages/bazel.sh	2023-11-01 16:21:07.682680045 -0700
 @@ -162,7 +162,7 @@
  if [[ ! -x ${BAZEL_REAL} && -x ${bazel_real_path} ]]; then
    # Note that "bazel --version" is very fast and doesn't start the Bazel server,
