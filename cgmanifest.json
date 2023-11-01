@@ -4610,8 +4610,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.20.7",
-          "downloadUrl": "https://golang.org/dl/go1.20.7.src.tar.gz"
+          "version": "1.20.10",
+          "downloadUrl": "https://golang.org/dl/go1.20.10.src.tar.gz"
         }
       }
     },
@@ -8360,9 +8360,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "kubernetes",
-          "version": "1.28.2",
-          "downloadUrl": "https://dl.k8s.io/v1.28.2/kubernetes-src.tar.gz"
+          "name": "kube-vip-cloud-provider",
+          "version": "0.0.2",
+          "downloadUrl": "https://github.com/kube-vip/kube-vip-cloud-provider/archive/refs/tags/v0.0.2.tar.gz"
         }
       }
     },
@@ -8370,9 +8370,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "kube-vip-cloud-provider",
-          "version": "0.0.2",
-          "downloadUrl": "https://github.com/kube-vip/kube-vip-cloud-provider/archive/refs/tags/v0.0.2.tar.gz"
+          "name": "kubernetes",
+          "version": "1.28.3",
+          "downloadUrl": "https://dl.k8s.io/v1.28.3/kubernetes-src.tar.gz"
         }
       }
     },
@@ -9071,8 +9071,8 @@
         "type": "other",
         "other": {
           "name": "libdrm",
-          "version": "2.4.114",
-          "downloadUrl": "https://dri.freedesktop.org/libdrm/libdrm-2.4.114.tar.xz"
+          "version": "2.4.115",
+          "downloadUrl": "https://dri.freedesktop.org/libdrm/libdrm-2.4.115.tar.xz"
         }
       }
     },
@@ -11161,8 +11161,8 @@
         "type": "other",
         "other": {
           "name": "libtiff",
-          "version": "4.5.1",
-          "downloadUrl": "https://gitlab.com/libtiff/libtiff/-/archive/v4.5.1/libtiff-v4.5.1.tar.gz"
+          "version": "4.6.0",
+          "downloadUrl": "https://gitlab.com/libtiff/libtiff/-/archive/v4.6.0/libtiff-v4.6.0.tar.gz"
         }
       }
     },
@@ -11581,8 +11581,8 @@
         "type": "other",
         "other": {
           "name": "libX11",
-          "version": "1.6.12",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libX11-1.6.12.tar.bz2"
+          "version": "1.8.7",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libX11-1.8.7.tar.gz"
         }
       }
     },
@@ -24814,8 +24814,8 @@
         "type": "other",
         "other": {
           "name": "python-urllib3",
-          "version": "1.26.9",
-          "downloadUrl": "https://github.com/urllib3/urllib3/archive/1.26.9.tar.gz"
+          "version": "1.26.18",
+          "downloadUrl": "https://github.com/urllib3/urllib3/archive/1.26.18.tar.gz"
         }
       }
     },
@@ -25144,8 +25144,8 @@
         "type": "other",
         "other": {
           "name": "PyYAML",
-          "version": "3.13",
-          "downloadUrl": "https://pyyaml.org/download/pyyaml/PyYAML-3.13.tar.gz"
+          "version": "5.2",
+          "downloadUrl": "https://pyyaml.org/download/pyyaml/PyYAML-5.2.tar.gz"
         }
       }
     },
@@ -28207,8 +28207,8 @@
         "type": "other",
         "other": {
           "name": "sudo",
-          "version": "1.9.13p3",
-          "downloadUrl": "https://www.sudo.ws/sudo/dist/sudo-1.9.13p3.tar.gz"
+          "version": "1.9.14p3",
+          "downloadUrl": "https://www.sudo.ws/sudo/dist/sudo-1.9.14p3.tar.gz"
         }
       }
     },
@@ -30359,8 +30359,8 @@
         "type": "other",
         "other": {
           "name": "xorg-x11-proto-devel",
-          "version": "2019.1",
-          "downloadUrl": "https://www.x.org/pub/individual/proto/xorgproto-2019.1.tar.bz2"
+          "version": "2023.2",
+          "downloadUrl": "https://www.x.org/pub/individual/proto/xorgproto-2023.2.tar.gz"
         }
       }
     },
@@ -30821,7 +30821,7 @@
         "other": {
           "name": "zlib",
           "version": "1.2.13",
-          "downloadUrl": "https://www.zlib.net/zlib-1.2.13.tar.xz"
+          "downloadUrl": "https://github.com/madler/zlib/releases/download/v1.2.13/zlib-1.2.13.tar.xz"
         }
       }
     },

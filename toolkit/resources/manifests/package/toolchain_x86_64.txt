@@ -136,7 +136,7 @@ intltool-0.51.0-7.cm2.noarch.rpm
 itstool-2.0.6-4.cm2.noarch.rpm
 kbd-2.2.0-1.cm2.x86_64.rpm
 kbd-debuginfo-2.2.0-1.cm2.x86_64.rpm
-kernel-headers-5.15.135.1-1.cm2.noarch.rpm
+kernel-headers-5.15.135.1-2.cm2.noarch.rpm
 kmod-29-2.cm2.x86_64.rpm
 kmod-debuginfo-29-2.cm2.x86_64.rpm
 kmod-devel-29-2.cm2.x86_64.rpm
@@ -584,9 +584,9 @@ xz-lang-5.2.5-1.cm2.x86_64.rpm
 xz-libs-5.2.5-1.cm2.x86_64.rpm
 zip-3.0-5.cm2.x86_64.rpm
 zip-debuginfo-3.0-5.cm2.x86_64.rpm
-zlib-1.2.13-1.cm2.x86_64.rpm
-zlib-debuginfo-1.2.13-1.cm2.x86_64.rpm
-zlib-devel-1.2.13-1.cm2.x86_64.rpm
+zlib-1.2.13-2.cm2.x86_64.rpm
+zlib-debuginfo-1.2.13-2.cm2.x86_64.rpm
+zlib-devel-1.2.13-2.cm2.x86_64.rpm
 zstd-1.5.0-1.cm2.x86_64.rpm
 zstd-debuginfo-1.5.0-1.cm2.x86_64.rpm
 zstd-devel-1.5.0-1.cm2.x86_64.rpm
