@@ -27,6 +27,7 @@ import (
 // - baseDirPath: the path to the base directory for the image. Used to resolve relative paths in the image config.
 func ParseAndGeneratePackageBuildList(dependencyGraph *pkggraph.PkgGraph, pkgsToBuild, pkgsToRebuild, pkgsToIgnore []string, imageConfig, baseDirPath string) (finalPackagesToBuild, packagesToRebuild, packagesToIgnore []*pkgjson.PackageVer, err error) {
 	logger.Log.Debug("Generating a package list for build nodes.")
+	const doNotSkipMissingPackages = false
 
 	buildNodeGetter := func(node *pkggraph.LookupNode) *pkggraph.PkgNode {
 		if node != nil {
@@ -34,7 +35,7 @@ func ParseAndGeneratePackageBuildList(dependencyGraph *pkggraph.PkgGraph, pkgsTo
 		}
 		return nil
 	}
-	return parseAndGeneratePackageList(dependencyGraph, pkgsToBuild, pkgsToRebuild, pkgsToIgnore, imageConfig, baseDirPath, dependencyGraph.AllBuildNodes(), buildNodeGetter, false /* don't skip missing packageS */)
+	return parseAndGeneratePackageList(dependencyGraph, pkgsToBuild, pkgsToRebuild, pkgsToIgnore, imageConfig, baseDirPath, dependencyGraph.AllBuildNodes(), buildNodeGetter, doNotSkipMissingPackages)
 }
 
 // ParseAndGeneratePackageTestList parses the common package request arguments and generates a list of packages to test based on the given dependency graph.
