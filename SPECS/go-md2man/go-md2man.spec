@@ -7,8 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Tools/Container
 URL:            https://github.com/cpuguy83/go-md2man
-#Source0:       https://github.com/cpuguy83/go-md2man/archive/v2.0.1.tar.gz
-Source0:        go-md2man-%{version}.tar.gz
+Source0:        https://github.com/cpuguy83/go-md2man/archive/v%{version}.tar.gz#/go-md2man-%{version}.tar.gz
 BuildRequires:  golang
 BuildRequires:  which
 # required packages on install

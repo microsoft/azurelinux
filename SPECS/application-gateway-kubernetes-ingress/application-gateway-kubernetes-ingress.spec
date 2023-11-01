@@ -8,8 +8,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Networking
 URL:            https://github.com/Azure/application-gateway-kubernetes-ingress
-#Source0:       https://github.com/Azure/application-gateway-kubernetes-ingress/archive/refs/tags/1.4.0.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/Azure/application-gateway-kubernetes-ingress/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
 # We're using vendored Go modules from this tarball, since network is disabled during build time.
 # How to re-build this file:

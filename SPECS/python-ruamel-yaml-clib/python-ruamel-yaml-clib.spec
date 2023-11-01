@@ -8,8 +8,7 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://pypi.org/project/ruamel.yaml.clib/
-# Repository lives on https://sourceforge.net/projects/ruamel-yaml-clib/; however, the snapshot is an unreliable link
-Source0:        https://files.pythonhosted.org/packages/6a/6c/7b461053ce5be0d7c8b12dcae9a7c10e8012238a00f6fcd98643ee66d2de/%{pypi_name}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/92/28/612085de3fae9f82d62d80255d9f4cf05b1b341db1e180adcf28c1bf748d/%{pypi_name}-%{version}.tar.gz
 BuildRequires:  gcc
 BuildRequires:  libyaml-devel
 
