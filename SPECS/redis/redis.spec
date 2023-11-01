@@ -10,6 +10,7 @@ URL:            https://redis.io/
 Source0:        https://download.redis.io/releases/%{name}-%{version}.tar.gz
 Patch0:         redis-conf.patch
 Patch1:         disable_active_defrag_big_keys.patch
+Patch2:         CVE-2023-45145.patch
 BuildRequires:  gcc
 BuildRequires:  make
 BuildRequires:  systemd
