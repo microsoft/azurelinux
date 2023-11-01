@@ -6,7 +6,7 @@ License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.open-mpi.org/projects/hwloc/
-Source0:        http://www.open-mpi.org/software/hwloc/v2.5/downloads/%{name}-%{version}.tar.bz2
+Source0:        http://www.open-mpi.org/software/hwloc/v2.9/downloads/%{name}-%{version}.tar.bz2
 BuildRequires:  gcc
 # C++ only for hwloc-hello-cpp test:
 BuildRequires:  gcc-c++
