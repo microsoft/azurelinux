@@ -1,7 +1,7 @@
 Summary:        Compression and decompression routines
 Name:           zlib
 Version:        1.2.13
-Release:        3%{?dist}
+Release:        2%{?dist}
 URL:            https://www.zlib.net/
 License:        zlib
 Group:          Applications/System
@@ -50,9 +50,6 @@ make  %{?_smp_mflags} check
 %{_mandir}/man3/zlib.3.gz
 
 %changelog
-* Wed Oct 25 2023 Daniel McIlvaney <damcilva@microsoft.com> - 1.2.13-3
-- Test bump release
-
 * Thu Oct 19 2023 Nan Liu <liunan@microsoft.com> - 1.2.13-2
 - Add patch to address CVE-2023-45853
 - Fix invalid source URL

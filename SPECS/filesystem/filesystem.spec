@@ -1,7 +1,7 @@
 Summary:      Default file system
 Name:         filesystem
 Version:      1.1
-Release:      16%{?dist}
+Release:      15%{?dist}
 License:      GPLv3
 Group:        System Environment/Base
 Vendor:       Microsoft Corporation
@@ -709,9 +709,6 @@ return 0
 %config(noreplace) /etc/modprobe.d/tipc.conf
 
 %changelog
-* Wed Oct 25 2023 Daniel McIlvaney <damcilva@microsoft.com> - 1.1-16
-- Test bump release
-
 * Thu Jun 29 2023 Tobias Brick <tobiasb@microsoft.com> - 1.1-15
 - Revert: Remove setting umask from /etc/profile and add it to a separate file in /etc/profile.d
 
