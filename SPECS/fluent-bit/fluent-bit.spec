@@ -66,7 +66,7 @@ Development files for %{name}
 %license LICENSE
 %doc README.md
 %exclude %{_prefix}/src/debug
-/lib/systemd/system/fluent-bit.service
+%{_unitdir}/fluent-bit.service
 %{_bindir}/*
 %{_prefix}%{_sysconfdir}/fluent-bit/*
 
