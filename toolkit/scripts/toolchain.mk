@@ -195,7 +195,7 @@ $(toolchain_rpms_rehydrated): $(TOOLCHAIN_MANIFEST) $(go-downloader)
 		$(go-downloader) --no-verbose --no-clobber $$url/$$rpm_filename \
 			$(if $(TLS_CERT),--certificate=$(TLS_CERT)) \
 			$(if $(TLS_KEY),--private-key=$(TLS_KEY)) \
-			--log-file $$log_file && \
+			--log-file $$log_file 2>/dev/null && \
 		echo "Downloaded toolchain RPM: $$rpm_filename" >> $$log_file && \
 		echo "$$rpm_filename" >> $(toolchain_downloads_manifest) | tee -a "$$log_file" && \
 		touch $@ && \
@@ -314,7 +314,7 @@ $(toolchain_rpms): $(TOOLCHAIN_MANIFEST) $(depend_REBUILD_TOOLCHAIN) $(go-downlo
 		$(go-downloader) --no-verbose --no-clobber $$url/$$rpm_filename \
 			$(if $(TLS_CERT),--certificate=$(TLS_CERT)) \
 			$(if $(TLS_KEY),--private-key=$(TLS_KEY)) \
-			--log-file $$log_file && \
+			--log-file $$log_file 2>/dev/null && \
 		echo "Downloaded toolchain RPM: $$rpm_filename" >> $$log_file && \
 		touch $@ && \
 		break; \
