@@ -13,22 +13,22 @@ while getopts "r:f:v:o:e:" opt; do
     esac
 done
 
-if [ -z "$rpms_folder"] then
+if [[ -z "$rpms_folder"]]; then
     echo "INVALID ARBUMENT: RPMS_FOLDER is empty"
     exit 1
 fi
 
-if [ -z "$repo_file_path"] then
+if [[ -z "$repo_file_path"]]; then
     echo "INVALID ARBUMENT: REPO_FILE_PATH is empty"
     exit 1
 fi
 
-if [ -z "$mariner_version"] then
+if [[ -z "$mariner_version"]]; then
     echo "INVALID ARBUMENT: MARINER_VERSION is empty"
     exit 1
 fi
 
-if [ -z "$sodiff_out_dir"] then
+if [[ -z "$sodiff_out_dir"]]; then
     echo "INVALID ARBUMENT: SODIFF_OUT_DIR is empty"
     exit 1
 fi
@@ -93,7 +93,7 @@ for package in $( cat "$sodiff_out_dir"/sodiff-intermediate-summary.txt ); do
     # Remove version and release
     package_stem=$(echo "$package" | rev | cut -f1,2 -d'-' --complement | rev)
     # Find a highest version of package built during this run and remove .$ARCH.rpm ending
-    highest_build_ver_pkg=$(grep -E "$package_stem-[0-9]" "$sodiff_out_dir"/sodiff-built-packages.txt | sort -Vr | head -n 1 | rev | cut -f1,2,3 -d'.' --complement | rev)
+    highest_build_ver_pkg=$(grPACKAGE_REBUILD_LIST="${{ parameters.srpmPackList }}" \ep -E "$package_stem-[0-9]" "$sodiff_out_dir"/sodiff-built-packages.txt | sort -Vr | head -n 1 | rev | cut -f1,2,3 -d'.' --complement | rev)
 
     # Check if versions differ
     if [[ "$package" == "$highest_build_ver_pkg" ]]; then
