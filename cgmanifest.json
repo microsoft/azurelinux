@@ -225,8 +225,8 @@
         "type": "other",
         "other": {
           "name": "ant",
-          "version": "1.10.11",
-          "downloadUrl": "https://archive.apache.org/dist/ant/source/apache-ant-1.10.11-src.tar.gz"
+          "version": "1.10.14",
+          "downloadUrl": "https://archive.apache.org/dist/ant/source/apache-ant-1.10.14-src.tar.gz"
         }
       }
     },
