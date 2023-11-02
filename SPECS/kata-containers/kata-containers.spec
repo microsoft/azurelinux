@@ -53,10 +53,10 @@ Source1:        https://github.com/%{name}/%{name}/releases/download/%{version}/
 Source2:        50-kata
 Source3:        mariner-build-uvm.sh
 Patch0:         0001-Merged-PR-9607-Allow-10-seconds-for-VM-creation-star.patch
-Patch3:         0004-Merged-PR-9806-Fix-enable_debug-for-hypervisor.clh.patch
-Patch4:         0005-Merged-PR-9956-shim-avoid-memory-hotplug-timeout.patch
-Patch5:         runtime-reduce-uvm-high-mem-footprint.patch
-Patch8:         0001-Append-systemd-kernel-cmdline-params-for-initrd.patch
+Patch1:         0004-Merged-PR-9806-Fix-enable_debug-for-hypervisor.clh.patch
+Patch2:         0005-Merged-PR-9956-shim-avoid-memory-hotplug-timeout.patch
+Patch3:         runtime-reduce-uvm-high-mem-footprint.patch
+Patch4:         0001-Append-systemd-kernel-cmdline-params-for-initrd.patch
 
 BuildRequires:  golang
 BuildRequires:  git-core
