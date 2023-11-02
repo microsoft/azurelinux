@@ -26515,8 +26515,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-prometheus-client",
-          "version": "4.0.0",
-          "downloadUrl": "https://github.com/prometheus/client_ruby/archive/refs/tags/v4.0.0.tar.gz"
+          "version": "4.2.1",
+          "downloadUrl": "https://github.com/prometheus/client_ruby/archive/refs/tags/v4.2.1.tar.gz"
         }
       }
     },
