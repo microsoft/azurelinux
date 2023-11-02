@@ -25935,8 +25935,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-excon",
-          "version": "0.92.2",
-          "downloadUrl": "https://github.com/excon/excon/archive/refs/tags/v0.92.2.tar.gz"
+          "version": "0.102.0",
+          "downloadUrl": "https://github.com/excon/excon/archive/refs/tags/v0.102.0.tar.gz"
         }
       }
     },
