@@ -25885,8 +25885,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-digest-crc",
-          "version": "0.6.4",
-          "downloadUrl": "https://github.com/postmodern/digest-crc/archive/refs/tags/v0.6.4.tar.gz"
+          "version": "0.6.5",
+          "downloadUrl": "https://github.com/postmodern/digest-crc/archive/refs/tags/v0.6.5.tar.gz"
         }
       }
     },
