@@ -9291,8 +9291,8 @@
         "type": "other",
         "other": {
           "name": "libfabric",
-          "version": "1.12.0",
-          "downloadUrl": "https://github.com/ofiwg/libfabric/releases/download/v1.12.0/libfabric-1.12.0.tar.bz2"
+          "version": "1.18.2",
+          "downloadUrl": "https://github.com/ofiwg/libfabric/releases/download/v1.18.2/libfabric-1.18.2.tar.bz2"
         }
       }
     },
