@@ -1,8 +1,8 @@
 {
  "Signatures": {
   "50-kata": "fb108c6337b3d3bf80b43ab04f2bf9a3bdecd29075ebd16320aefe8f81c502a7",
-  "kata-containers-3.1.0-vendor.tar.gz": "d14032fc30e0f8e1bd9afc57264ed703df6cdf48ad2b1845b02e046763ac3352",
-  "kata-containers-3.1.0.tar.gz": "9785078a2250a784c30692f156de4a1a2cfa754a38b48b755ece7517902ffed3",
+  "kata-containers-3.2.0-vendor.tar.gz": "8b1a5424a14389860bf34779da3f6475dbc12a8540f17c1166ebf7d45637eeac",
+  "kata-containers-3.2.0.tar.gz": "9d73b91c98b0eaccd71add65d1224c02b5dacaff21333ca5b42286528c88e206",
   "mariner-build-uvm.sh": "a0fbee4def82ee492eab64a8b5a948c2fef125fa1ca5686aafa0a80c64144068"
  }
 }
