@@ -10291,8 +10291,8 @@
         "type": "other",
         "other": {
           "name": "libnl3",
-          "version": "3.5.0",
-          "downloadUrl": "https://github.com/thom311/libnl/releases/download/libnl3_5_0/libnl-3.5.0.tar.gz"
+          "version": "3.7.0",
+          "downloadUrl": "https://github.com/thom311/libnl/releases/download/libnl3_7_0/libnl-3.7.0.tar.gz"
         }
       }
     },
