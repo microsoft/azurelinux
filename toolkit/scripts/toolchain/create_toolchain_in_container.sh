@@ -80,11 +80,11 @@ temporary_toolchain_container=$(docker create --name marinertoolchain-container-
 docker cp "${temporary_toolchain_container}":/temptoolchain/lfs .
 docker rm marinertoolchain-container-temp
 
-rm -rvf ./populated_toolchain
+rm -rf ./populated_toolchain
 mv ./lfs ./populated_toolchain
-rm -rvf ./populated_toolchain/.dockerenv
-rm -rvf ./populated_toolchain/sources
-rm -rvf ./populated_toolchain/tools/libexec/gcc
+rm -rf ./populated_toolchain/.dockerenv
+rm -rf ./populated_toolchain/sources
+rm -rf ./populated_toolchain/tools/libexec/gcc
 
 echo "Compressing toolchain_from_container.tar.gz"
 tar -I "$ARCHIVE_TOOL" -cf toolchain_from_container.tar.gz populated_toolchain

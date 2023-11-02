@@ -20,7 +20,7 @@ echo Binutils-2.41 - Pass 1
 tar xf binutils-2.41.tar.xz
 pushd binutils-2.41
 mkdir -v build
-cd build
+cd       build
 ../configure \
     --prefix=/tools \
     --with-sysroot=$LFS \
@@ -28,6 +28,7 @@ cd build
     --target=$LFS_TGT \
     --disable-nls \
     --disable-werror \
+    --without-zstd \
     --enable-gprofng=no
 make -j$(nproc)
 mkdir -v /tools/lib && ln -sv lib /tools/lib64
@@ -37,9 +38,9 @@ rm -rf binutils-2.41
 
 touch $LFS/logs/temptoolchain/status_binutils_pass1_complete
 
-echo GCC-11.2.0 - Pass 1
-tar xf gcc-11.2.0.tar.xz
-pushd gcc-11.2.0
+echo GCC-13.2.0 - Pass 1
+tar xf gcc-13.2.0.tar.xz
+pushd gcc-13.2.0
 tar xf ../mpfr-4.2.1.tar.xz
 mv -v mpfr-4.2.1 mpfr
 tar xf ../gmp-6.3.0.tar.xz
@@ -78,25 +79,26 @@ case $(uname -m) in
 esac
 case $(uname -m) in
   x86_64)
-    sed -e '/m64=/s/lib64/lib/' \
-        -i.orig gcc/config/i386/t-linux64
+    sed -e '/m64=/s/lib64/lib/' -i.orig gcc/config/i386/t-linux64
   ;;
   aarch64)
     sed -e '/mabi.lp64=/s/lib64/lib/' -i.orig gcc/config/aarch64/t-aarch64-linux
   ;;
 esac
-patch -Np1 -i /tools/CVE-2023-4039.patch
+#patch -Np1 -i /tools/CVE-2023-4039.patch
 mkdir -v build
 cd       build
 ../configure                                       \
     --target=$LFS_TGT                              \
     --prefix=/tools                                \
-    --with-glibc-version=2.11                      \
+    --with-glibc-version=2.38                      \
     --with-sysroot=$LFS                            \
     --with-newlib                                  \
     --without-headers                              \
     --with-local-prefix=/tools                     \
     --with-native-system-header-dir=/tools/include \
+    --enable-default-pie                           \
+    --enable-default-ssp                           \
     --disable-nls                                  \
     --disable-shared                               \
     --disable-multilib                             \
@@ -105,14 +107,19 @@ cd       build
     --disable-libatomic                            \
     --disable-libgomp                              \
     --disable-libquadmath                          \
-    --disable-libssp                               \
+    --disable-libsanitizer                         \
     --disable-libvtv                               \
     --disable-libstdcxx                            \
+    --without-zstd                                 \
+    --disable-libssp                               \
     --enable-languages=c,c++
 make -j$(nproc)
 make install
+cd ..
+cat gcc/limitx.h gcc/glimits.h gcc/limity.h > \
+  `dirname $($LFS_TGT-gcc -print-libgcc-file-name)`/include/limits.h
 popd
-rm -rf gcc-11.2.0
+rm -rf gcc-13.2.0
 
 touch $LFS/logs/temptoolchain/status_gcc_pass1_complete
 
@@ -128,30 +135,34 @@ rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-${KERNEL_VERSION}
 
 touch $LFS/logs/temptoolchain/status_kernel_headers_complete
 
-echo glibc-2.35
-tar xf glibc-2.35.tar.xz
-pushd glibc-2.35
-patch -Np1 -i ../glibc-2.35-fhs-1.patch
+echo glibc-2.38
+tar xf glibc-2.38.tar.xz
+pushd glibc-2.38
+patch -Np1 -i ../glibc-2.38-fhs-1.patch
+patch -Np1 -i ../glibc-2.38-memalign_fix-1.patch
 mkdir -v build
 cd       build
+echo "rootsbindir=/tools/sbin" > configparms
 ../configure                             \
       --prefix=/tools                    \
       --disable-werror                   \
       --host=$LFS_TGT                    \
       --build=$(../scripts/config.guess) \
-      --enable-kernel=3.2                \
+      --enable-kernel=4.14               \
       --with-headers=/tools/include      \
-      libc_cv_forced_unwind=yes          \
-      libc_cv_c_cleanup=yes
+      libc_cv_slibdir=/tools/lib
 make -j$(nproc)
 make install
+# Fix a hard coded path to the executable loader in the ldd script:
+sed '/RTLDLIST=/s@/usr@@g' -i /tools/bin/ldd
 popd
-rm -rf glibc-2.35
+rm -rf glibc-2.38
 
 touch $LFS/logs/temptoolchain/status_glibc_complete
 
 echo "Sanity check 1 (temptoolchain - glibc)"
 set +e
+$LFS_TGT-gcc -v
 echo 'int main(){}' > dummy.c
 $LFS_TGT-gcc dummy.c
 readelf -l a.out | grep ld-linux
@@ -169,9 +180,9 @@ echo "End sanity check 1"
 
 touch $LFS/logs/temptoolchain/status_sanity_check_1_complete
 
-echo Libstdc++ from GCC-11.2.0
-tar xf gcc-11.2.0.tar.xz
-pushd gcc-11.2.0
+echo Libstdc++ from GCC-13.2.0
+tar xf gcc-13.2.0.tar.xz
+pushd gcc-13.2.0
 mkdir -v build
 cd       build
 ../libstdc++-v3/configure           \
@@ -181,11 +192,11 @@ cd       build
     --disable-nls                   \
     --disable-libstdcxx-threads     \
     --disable-libstdcxx-pch         \
-    --with-gxx-include-dir=/tools/$LFS_TGT/include/c++/11.2.0
+    --with-gxx-include-dir=/tools/$LFS_TGT/include/c++/13.2.0
 make -j$(nproc)
 make install
 popd
-rm -rf gcc-11.2.0
+rm -rf gcc-13.2.0
 
 touch $LFS/logs/temptoolchain/status_libstdc++_complete
 
@@ -194,15 +205,18 @@ tar xf binutils-2.41.tar.xz
 pushd binutils-2.41
 mkdir -v build
 cd build
-CC=$LFS_TGT-gcc                  \
-AR=$LFS_TGT-ar                   \
-RANLIB=$LFS_TGT-ranlib           \
+CC=$LFS_TGT-gcc                    \
+AR=$LFS_TGT-ar                     \
+RANLIB=$LFS_TGT-ranlib             \
 ../configure                       \
         --prefix=/tools            \
         --disable-nls              \
         --disable-werror           \
         --with-lib-path=/tools/lib \
         --with-sysroot             \
+        --without-zstd             \
+        --enable-shared            \
+        --enable-64-bit-bfd        \
         --enable-gprofng=no
 make -j$(nproc)
 make install
@@ -214,15 +228,15 @@ rm -rf binutils-2.41
 
 touch $LFS/logs/temptoolchain/status_binutils_pass2_complete
 
-echo GCC-11.2.0 - Pass 2
-tar xf gcc-11.2.0.tar.xz
-pushd gcc-11.2.0
-# fix issue compiling with glibc 2.34
-sed -e '/static.*SIGSTKSZ/d' \
-    -e 's/return kAltStackSize/return SIGSTKSZ * 4/' \
-    -i libsanitizer/sanitizer_common/sanitizer_posix_libcdep.cpp
-cat gcc/limitx.h gcc/glimits.h gcc/limity.h > \
-  `dirname $($LFS_TGT-gcc -print-libgcc-file-name)`/include-fixed/limits.h
+echo GCC-13.2.0 - Pass 2
+tar xf gcc-13.2.0.tar.xz
+pushd gcc-13.2.0
+# # fix issue compiling with glibc 2.34
+# sed -e '/static.*SIGSTKSZ/d' \
+#     -e 's/return kAltStackSize/return SIGSTKSZ * 4/' \
+#     -i libsanitizer/sanitizer_common/sanitizer_posix_libcdep.cpp
+# cat gcc/limitx.h gcc/glimits.h gcc/limity.h > \
+#   `dirname $($LFS_TGT-gcc -print-libgcc-file-name)`/include-fixed/limits.h
 case $(uname -m) in
     x86_64)
       for file in gcc/config/{linux,i386/linux{,64}}.h
@@ -255,20 +269,21 @@ case $(uname -m) in
 esac
 case $(uname -m) in
   x86_64)
-    sed -e '/m64=/s/lib64/lib/' \
-        -i.orig gcc/config/i386/t-linux64
+    sed -e '/m64=/s/lib64/lib/' -i.orig gcc/config/i386/t-linux64
   ;;
   aarch64)
     sed -e '/mabi.lp64=/s/lib64/lib/' -i.orig gcc/config/aarch64/t-aarch64-linux
   ;;
 esac
+sed '/thread_header =/s/@.*@/gthr-posix.h/' \
+    -i libgcc/Makefile.in libstdc++-v3/include/Makefile.in
 tar -xf ../mpfr-4.2.1.tar.xz
 mv -v mpfr-4.2.1 mpfr
 tar -xf ../gmp-6.3.0.tar.xz
 mv -v gmp-6.3.0 gmp
 tar -xf ../mpc-1.3.1.tar.gz
 mv -v mpc-1.3.1 mpc
-patch -Np1 -i /tools/CVE-2023-4039.patch
+#patch -Np1 -i /tools/CVE-2023-4039.patch
 mkdir -v build
 cd       build
 CC=$LFS_TGT-gcc                                    \
@@ -279,21 +294,30 @@ RANLIB=$LFS_TGT-ranlib                             \
     --prefix=/tools                                \
     --with-local-prefix=/tools                     \
     --with-native-system-header-dir=/tools/include \
-    --enable-languages=c,c++                       \
+    --enable-default-pie                           \
+    --enable-default-ssp                           \
     --disable-libstdcxx-pch                        \
+    --without-zstd                                 \
     --disable-multilib                             \
     --disable-bootstrap                            \
-    --disable-libgomp
+    --disable-libatomic                            \
+    --disable-libgomp                              \
+    --disable-libquadmath                          \
+    --disable-libsanitizer                         \
+    --disable-libvtv                               \
+    --disable-libssp                               \
+    --enable-languages=c,c++
 make -j$(nproc)
 make install
 ln -sv gcc /tools/bin/cc
 popd
-rm -rf gcc-11.2.0
+rm -rf gcc-13.2.0
 
 touch $LFS/logs/temptoolchain/status_gcc_pass2_complete
 
 echo "Sanity check 2 (temptoolchain - gcc pass2)"
 set +e
+cc -v
 echo 'int main(){}' > dummy.c
 cc dummy.c
 readelf -l a.out | grep ld-linux
@@ -545,9 +569,9 @@ touch $LFS/logs/temptoolchain/status_tar_complete
 echo Texinfo-7.0.3
 tar xf texinfo-7.0.3.tar.xz
 pushd texinfo-7.0.3
-# fix issue building with glibc 2.34:
-sed -e 's/__attribute_nonnull__/__nonnull/' \
-    -i gnulib/lib/malloc/dynarray-skeleton.c
+# # fix issue building with glibc 2.34:
+# sed -e 's/__attribute_nonnull__/__nonnull/' \
+#     -i gnulib/lib/malloc/dynarray-skeleton.c
 ./configure --prefix=/tools
 make -j$(nproc)
 make install
@@ -579,6 +603,16 @@ popd
 rm -rf flex-2.6.4
 
 touch $LFS/logs/temptoolchain/status_flex_complete
+
+# echo zstd-1.5.5
+# tar xf zstd-1.5.5.tar.gz
+# pushd zstd-1.5.5
+# make -j$(nproc)
+# make install prefix=/tools pkgconfigdir=/tools/lib/pkgconfig
+# popd
+# rm -rf zstd-1.5.5
+
+# touch $LFS/logs/temptoolchain/status_zstd_complete
 
 touch $LFS/logs/temptoolchain/status_temp_toolchain_complete
 

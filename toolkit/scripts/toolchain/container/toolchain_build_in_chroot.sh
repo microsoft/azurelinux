@@ -11,7 +11,6 @@ set -x
 echo Calling script to create files:
 
 sh /tools/toolchain_initial_chroot_setup.sh
-#exec /tools/bin/bash --login +h
 
 echo Now, running the final build steps in chroot inside container
 
@@ -80,39 +79,39 @@ popd
 rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-${KERNEL_VERSION}
 touch /logs/status_kernel_headers_complete
 
-echo glibc-2.35
-tar xf glibc-2.35.tar.xz
-pushd glibc-2.35
-patch -Np1 -i ../glibc-2.35-fhs-1.patch
+echo glibc-2.38
+tar xf glibc-2.38.tar.xz
+pushd glibc-2.38
+patch -Np1 -i ../glibc-2.38-fhs-1.patch
+patch -Np1 -i ../glibc-2.38-memalign_fix-1.patch
+echo "rootsbindir=/usr/sbin" > configparms
 ln -sfv /tools/lib/gcc /usr/lib
 ls -la /usr/lib/gcc/
 case $(uname -m) in
     x86_64)
-        GCC_INCDIR=/usr/lib/gcc/$BUILD_TARGET/11.2.0/include
+        GCC_INCDIR=/usr/lib/gcc/$BUILD_TARGET/13.2.0/include
     ;;
     aarch64)
-        GCC_INCDIR=/usr/lib/gcc/$BUILD_TARGET/11.2.0/include
+        GCC_INCDIR=/usr/lib/gcc/$BUILD_TARGET/13.2.0/include
     ;;
 esac
 rm -f /usr/include/limits.h
 mkdir -v build
 cd       build
+echo "rootsbindir=/usr/sbin" > configparms
 CC="gcc -isystem $GCC_INCDIR -isystem /usr/include" \
 ../configure --prefix=/usr                          \
              --disable-werror                       \
-             --enable-kernel=3.2                    \
+             --enable-kernel=4.14                   \
              --enable-stack-protector=strong        \
-             libc_cv_slibdir=/lib
-
-#             libc_cv_ctors_header=yes
-# ERROR:
-# checking whether to use .ctors/.dtors header and trailer... configure: error: missing __attribute__ ((constructor)) support??
-# adding 'libc_cv_ctors_header=yes'
+             --with-headers=/usr/include            \
+             libc_cv_slibdir=/usr/lib
 unset GCC_INCDIR
 make -j$(nproc)
 touch /etc/ld.so.conf
 sed '/test-installation/s@$(PERL)@echo not running@' -i ../Makefile
 make install
+sed '/RTLDLIST=/s@/usr@@g' -i /usr/bin/ldd
 cp -v ../nscd/nscd.conf /etc/nscd.conf
 mkdir -pv /var/cache/nscd
 cat > /etc/ld.so.conf << "EOF"
@@ -124,11 +123,12 @@ include /etc/ld.so.conf.d/*.conf
 EOF
 mkdir -pv /etc/ld.so.conf.d
 popd
-rm -rf glibc-2.35
+rm -rf glibc-2.38
 
 touch /logs/status_glibc_complete
 
 echo Adjusting the Toolchain
+
 find / -name ld-linux-x86-64.so.2
 # The final C library was just installed above. Ajust the toolchain to link newly compiled programs with it.
 mv -v /tools/bin/{ld,ld-old}
@@ -144,6 +144,7 @@ gcc -dumpspecs | sed -e 's@/tools@@g'                   \
 echo "Sanity check 4 (raw toolchain - adjusting the toolchain)"
 set +e
 echo 'int main(){}' > dummy.c
+cc dummy.c -v
 cc dummy.c -v -Wl,--verbose &> dummy.log
 sleep 3
 sync
@@ -157,7 +158,6 @@ case $(uname -m) in
     echo Expected: '[Requesting program interpreter: /lib/ld-linux-aarch64.so.1]'
   ;;
 esac
-readelf -l a.out
 echo End of readelf output
 grep -o '/usr/lib.*/crt[1in].*succeeded' dummy.log
 echo Expected output: 'Three similar lines:  /usr/lib/../lib/crt1.o succeeded ...'
@@ -241,7 +241,7 @@ touch /logs/status_m4_complete
 echo Binutils-2.41
 tar xf binutils-2.41.tar.xz
 pushd binutils-2.41
-sed -i '/@\tincremental_copy/d' gold/testsuite/Makefile.in
+#sed -i '/@\tincremental_copy/d' gold/testsuite/Makefile.in
 mkdir -v build
 cd build
 ../configure --prefix=/usr       \
@@ -303,26 +303,24 @@ popd
 rm -rf mpc-1.3.1
 touch /logs/status_libmpc_complete
 
-echo GCC-11.2.0
-tar xf gcc-11.2.0.tar.xz
-pushd gcc-11.2.0
-# fix issue compiling with glibc 2.34
-sed -e '/static.*SIGSTKSZ/d' \
-    -e 's/return kAltStackSize/return SIGSTKSZ * 4/' \
-    -i libsanitizer/sanitizer_common/sanitizer_posix_libcdep.cpp
+echo GCC-13.2.0
+tar xf gcc-13.2.0.tar.xz
+pushd gcc-13.2.0
+# # fix issue compiling with glibc 2.34
+# sed -e '/static.*SIGSTKSZ/d' \
+#     -e 's/return kAltStackSize/return SIGSTKSZ * 4/' \
+#     -i libsanitizer/sanitizer_common/sanitizer_posix_libcdep.cpp
 case $(uname -m) in
   x86_64)
-    sed -e '/m64=/s/lib64/lib/' \
-        -i.orig gcc/config/i386/t-linux64
+    sed -e '/m64=/s/lib64/lib/' -i.orig gcc/config/i386/t-linux64
   ;;
   aarch64)
-    sed -e '/mabi.lp64=/s/lib64/lib/' \
-        -i.orig gcc/config/aarch64/t-aarch64-linux
+    sed -e '/mabi.lp64=/s/lib64/lib/' -i.orig gcc/config/aarch64/t-aarch64-linux
   ;;
 esac
 # disable no-pie for gcc binaries
-sed -i '/^NO_PIE_CFLAGS = /s/@NO_PIE_CFLAGS@//' gcc/Makefile.in
-patch -Np1 -i /tools/CVE-2023-4039.patch
+#sed -i '/^NO_PIE_CFLAGS = /s/@NO_PIE_CFLAGS@//' gcc/Makefile.in
+#patch -Np1 -i /tools/CVE-2023-4039.patch
 # LFS 7.4:  Workaround a bug so that GCC doesn't install libiberty.a, which is already provided by Binutils:
 # sed -i 's/install_to_$(INSTALL_DEST) //' libiberty/Makefile.in
 # Need to remove this link to /tools/lib/gcc as the final gcc includes will be installed here.
@@ -333,17 +331,20 @@ mkdir -v build
 cd       build
 SED=sed \
 ../configure    --prefix=/usr \
+                LD=ld \
                 --enable-shared \
                 --enable-threads=posix \
                 --enable-__cxa_atexit \
                 --enable-clocale=gnu \
-                --enable-languages=c,c++\
+                --enable-languages=c,c++ \
                 --disable-multilib \
                 --disable-bootstrap \
+                --disable-fixincludes \
                 --enable-linker-build-id \
-                --enable-plugin \
                 --enable-default-pie \
+                --enable-default-ssp \
                 --with-system-zlib
+# --enable-plugin
 # --enable-install-libiberty
 # --disable-install-libiberty
 make -j$(nproc)
@@ -352,7 +353,7 @@ ln -sv ../usr/bin/cpp /lib
 ln -sv gcc /usr/bin/cc
 
 install -v -dm755 /usr/lib/bfd-plugins
-ln -sfv ../../libexec/gcc/$(gcc -dumpmachine)/11.2.0/liblto_plugin.so /usr/lib/bfd-plugins/
+ln -sfv ../../libexec/gcc/$(gcc -dumpmachine)/13.2.0/liblto_plugin.so /usr/lib/bfd-plugins/
 
 # Sanity check
 set +e
@@ -407,7 +408,7 @@ set -e
 mkdir -pv /usr/share/gdb/auto-load/usr/lib
 mv -v /usr/lib/*gdb.py /usr/share/gdb/auto-load/usr/lib
 popd
-rm -rf gcc-11.2.0
+rm -rf gcc-13.2.0
 
 touch /logs/status_gcc_complete
 
@@ -904,9 +905,9 @@ echo Texinfo-7.0.3
 tar xf texinfo-7.0.3.tar.xz
 pushd texinfo-7.0.3
 ./configure --prefix=/usr --disable-static
-# fix issue building with glibc 2.34:
-sed -e 's/__attribute_nonnull__/__nonnull/' \
-    -i gnulib/lib/malloc/dynarray-skeleton.c
+# # fix issue building with glibc 2.34:
+# sed -e 's/__attribute_nonnull__/__nonnull/' \
+#     -i gnulib/lib/malloc/dynarray-skeleton.c
 make -j$(nproc)
 make install
 popd
