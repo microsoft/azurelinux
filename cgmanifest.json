@@ -26895,8 +26895,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-webrick",
-          "version": "1.7.0",
-          "downloadUrl": "https://github.com/ruby/webrick/archive/refs/tags/v1.7.0.tar.gz"
+          "version": "1.8.1",
+          "downloadUrl": "https://github.com/ruby/webrick/archive/refs/tags/v1.8.1.tar.gz"
         }
       }
     },
