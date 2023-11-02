@@ -26155,8 +26155,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-fluent-plugin-record-modifier",
-          "version": "2.1.0",
-          "downloadUrl": "https://github.com/repeatedly/fluent-plugin-record-modifier/archive/refs/tags/v2.1.0.tar.gz"
+          "version": "2.1.1",
+          "downloadUrl": "https://github.com/repeatedly/fluent-plugin-record-modifier/archive/refs/tags/v2.1.1.tar.gz"
         }
       }
     },
