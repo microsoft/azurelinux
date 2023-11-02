@@ -10741,8 +10741,8 @@
         "type": "other",
         "other": {
           "name": "librelp",
-          "version": "1.10.0",
-          "downloadUrl": "https://download.rsyslog.com/librelp/librelp-1.10.0.tar.gz"
+          "version": "1.11.0",
+          "downloadUrl": "https://download.rsyslog.com/librelp/librelp-1.11.0.tar.gz"
         }
       }
     },
