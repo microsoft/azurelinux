@@ -3860,8 +3860,8 @@
         "type": "other",
         "other": {
           "name": "freetype",
-          "version": "2.13.0",
-          "downloadUrl": "https://download.savannah.gnu.org/releases/freetype/freetype-2.13.0.tar.gz"
+          "version": "2.13.2",
+          "downloadUrl": "https://download.savannah.gnu.org/releases/freetype/freetype-2.13.2.tar.gz"
         }
       }
     },
