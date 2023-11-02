@@ -26045,8 +26045,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-faraday-rack",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/lostisland/faraday-rack/archive/refs/tags/v1.0.0.tar.gz"
+          "version": "2.0.0",
+          "downloadUrl": "https://github.com/lostisland/faraday-rack/archive/refs/tags/v2.0.0.tar.gz"
         }
       }
     },
