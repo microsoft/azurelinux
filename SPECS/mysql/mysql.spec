@@ -76,6 +76,9 @@ make test
 %{_libdir}/private/icudt73l/brkitr/*.brk
 %{_libdir}/private/icudt73l/brkitr/*.dict
 %{_libdir}/private/icudt73l/unames.icu
+%{_libdir}/private/icudt73l/cnvalias.icu
+%{_libdir}/private/icudt73l/uemoji.icu
+%{_libdir}/private/icudt73l/ulayout.icu
 %{_includedir}/*
 %{_libdir}/pkgconfig/mysqlclient.pc
 
