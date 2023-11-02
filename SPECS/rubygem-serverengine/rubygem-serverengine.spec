@@ -2,7 +2,7 @@
 %global gem_name serverengine
 Summary:        a framework to implement robust multiprocess servers like Unicorn
 Name:           rubygem-%{gem_name}
-Version:        2.2.5
+Version:        2.3.2
 Release:        1%{?dist}
 License:        Apache 2.0
 Vendor:         Microsoft Corporation
@@ -34,6 +34,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.3.2-1
+- Auto-upgrade to 2.3.2 - Azure Linux 3.0 - package upgrades
+
 * Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.2.5-1
 - Update to v2.2.5.
 - Build from .tar.gz source.
