@@ -25675,8 +25675,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-asciidoctor",
-          "version": "2.0.17",
-          "downloadUrl": "https://github.com/asciidoctor/asciidoctor/archive/refs/tags/v2.0.17.tar.gz"
+          "version": "2.0.20",
+          "downloadUrl": "https://github.com/asciidoctor/asciidoctor/archive/refs/tags/v2.0.20.tar.gz"
         }
       }
     },
