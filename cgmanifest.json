@@ -26775,8 +26775,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-sigdump",
-          "version": "0.2.4",
-          "downloadUrl": "https://github.com/fluent/sigdump/archive/refs/tags/v0.2.4.tar.gz"
+          "version": "0.2.5",
+          "downloadUrl": "https://github.com/fluent/sigdump/archive/refs/tags/v0.2.5.tar.gz"
         }
       }
     },
