@@ -23984,8 +23984,8 @@
         "type": "other",
         "other": {
           "name": "python-responses",
-          "version": "0.20.0",
-          "downloadUrl": "https://github.com/getsentry/responses/archive/refs/tags/0.20.0.tar.gz"
+          "version": "0.23.3",
+          "downloadUrl": "https://github.com/getsentry/responses/archive/refs/tags/0.23.3.tar.gz"
         }
       }
     },
