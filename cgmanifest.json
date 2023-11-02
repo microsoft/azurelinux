@@ -28137,8 +28137,8 @@
         "type": "other",
         "other": {
           "name": "sympy",
-          "version": "1.11.1",
-          "downloadUrl": "https://github.com/sympy/sympy/archive/sympy-1.11.1.tar.gz"
+          "version": "1.12",
+          "downloadUrl": "https://github.com/sympy/sympy/archive/sympy-1.12.tar.gz"
         }
       }
     },
