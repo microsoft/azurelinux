@@ -25705,8 +25705,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-async-pool",
-          "version": "0.3.9",
-          "downloadUrl": "https://github.com/socketry/async-pool/archive/refs/tags/v0.3.9.tar.gz"
+          "version": "0.4.0",
+          "downloadUrl": "https://github.com/socketry/async-pool/archive/refs/tags/v0.4.0.tar.gz"
         }
       }
     },
