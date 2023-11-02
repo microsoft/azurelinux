@@ -1,5 +1,5 @@
 {
- "Signatures": {
-  "fluent-plugin-kafka-0.17.5.tar.gz": "881d835904f625016f6dec4a73abe4310afa741c1ea9b068964a13232205c6b3"
- }
+  "Signatures": {
+    "fluent-plugin-kafka-0.19.0.tar.gz": "69d3e32cf7cefc7298657a589a8727e6ecb8821c0aca3d09138b4bd932bce7df"
+  }
 }

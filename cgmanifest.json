@@ -26115,8 +26115,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-fluent-plugin-kafka",
-          "version": "0.17.5",
-          "downloadUrl": "https://github.com/fluent/fluent-plugin-kafka/archive/refs/tags/v0.17.5.tar.gz"
+          "version": "0.19.0",
+          "downloadUrl": "https://github.com/fluent/fluent-plugin-kafka/archive/refs/tags/v0.19.0.tar.gz"
         }
       }
     },
