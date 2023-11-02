@@ -26905,8 +26905,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-yajl-ruby",
-          "version": "1.3.1",
-          "downloadUrl": "https://github.com/brianmario/yajl-ruby/archive/refs/tags/1.3.1.tar.gz"
+          "version": "1.4.1",
+          "downloadUrl": "https://github.com/brianmario/yajl-ruby/archive/refs/tags/1.4.1.tar.gz"
         }
       }
     },
