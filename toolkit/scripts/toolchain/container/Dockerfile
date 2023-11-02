@@ -37,6 +37,7 @@ RUN tdnf install -y \
     tar \
     texinfo \
     unzip \
+    util-linux \
     vim \
     wget \
     zip && \
@@ -64,11 +65,22 @@ RUN wget -nv --no-clobber --timeout=30 --continue --input-file=$LFS/tools/toolch
 #RUN wget -nv --no-clobber --timeout=30 --continue --input-file=$LFS/tools/toolchain-remote-wget-list --directory-prefix=$LFS/sources; exit 0
 RUN wget -nv --no-clobber --timeout=30 --continue https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.48.1.tar.gz -O kernel-5.15.48.1.tar.gz --directory-prefix=$LFS/sources; exit 0
 USER root
+
+RUN mkdir -pv $LFS/{etc,var} $LFS/usr/{bin,lib,sbin} && \
+    ln -sv usr/bin $LFS/bin && \
+    ln -sv usr/lib $LFS/lib && \
+    ln -sv usr/sbin $LFS/sbin && \
+    mkdir -pv $LFS/lib64 && \
+    mkdir -pv $LFS/usr/share
+
 RUN sha256sum -c $LFS/tools/toolchain-sha256sums && \
     groupadd lfs && \
     useradd -s /bin/bash -g lfs -m -k /dev/null lfs && \
     usermod -a -G sudo lfs && \
+    chown -Rv lfs $LFS/usr && \
     chown -v lfs $LFS/tools && \
+    chown -Rv lfs $LFS/{usr{,/*},lib,var,etc,bin,sbin,tools} && \
+    chown -v lfs $LFS/lib64 && \
     chown -v lfs $LFS/sources && \
     chown -Rv lfs $LFS/logs && \
     echo "lfs ALL = NOPASSWD : ALL" >> /etc/sudoers && \
@@ -90,6 +102,7 @@ COPY [ "./toolchain_build_temp_tools.sh", \
 
 USER root
 RUN  chown -Rv lfs $LFS/tools && \
+     chown -Rv lfs $LFS/usr && \
      chown -Rv lfs:lfs /home/lfs/
 
 USER lfs

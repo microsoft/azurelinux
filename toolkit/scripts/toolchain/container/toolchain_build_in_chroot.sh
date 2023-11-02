@@ -24,12 +24,6 @@ case $(uname -m) in
     ;;
 esac
 
-echo Configuring files under /var/log
-touch /var/log/{btmp,lastlog,faillog,wtmp}
-chgrp -v utmp /var/log/lastlog
-chmod -v 664  /var/log/lastlog
-chmod -v 600  /var/log/btmp
-
 echo Printing debug info
 echo Path: $PATH
 ls -la /bin/bash
@@ -68,45 +62,133 @@ set -e
 #
 cd /sources
 
-KERNEL_VERSION="5.15.48.1"
-echo Linux-${KERNEL_VERSION} API Headers
-tar xf kernel-${KERNEL_VERSION}.tar.gz
-pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-${KERNEL_VERSION}
-make mrproper
-make headers
-cp -rv usr/include/* /usr/include
+touch /logs/status_building_temp_tools_in_chroot
+
+echo Gettext-0.22
+tar xf gettext-0.22.tar.xz
+pushd gettext-0.22
+./configure --disable-shared
+make -j$(nproc)
+cp -v gettext-tools/src/{msgfmt,msgmerge,xgettext} /usr/bin
 popd
-rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-${KERNEL_VERSION}
-touch /logs/status_kernel_headers_complete
+rm -rf gettext-0.22
+touch /logs/status_gettext_complete
+
+echo Bison-3.8.2
+tar xf bison-3.8.2.tar.xz
+pushd bison-3.8.2
+./configure --prefix=/usr --docdir=/usr/share/doc/bison-3.8.2
+make -j$(nproc)
+make install
+popd
+rm -rf bison-3.8.2
+touch /logs/status_bison_complete
+
+echo Perl-5.38.0
+tar xf perl-5.38.0.tar.xz
+pushd perl-5.38.0
+sh Configure -des                                        \
+             -Dprefix=/usr                               \
+             -Dvendorprefix=/usr                         \
+             -Duseshrplib                                \
+             -Dprivlib=/usr/lib/perl5/5.38/core_perl     \
+             -Darchlib=/usr/lib/perl5/5.38/core_perl     \
+             -Dsitelib=/usr/lib/perl5/5.38/site_perl     \
+             -Dsitearch=/usr/lib/perl5/5.38/site_perl    \
+             -Dvendorlib=/usr/lib/perl5/5.38/vendor_perl \
+             -Dvendorarch=/usr/lib/perl5/5.38/vendor_perl
+make -j$(nproc)
+make install
+popd
+rm -rf perl-5.38.0
+touch /logs/status_perl_complete
+
+echo Python-3.9.13
+tar xf Python-3.9.13.tar.xz
+pushd Python-3.9.13
+./configure --prefix=/usr   \
+            --enable-shared \
+            --without-ensurepip
+make -j$(nproc)
+make install
+popd
+rm -rf Python-3.9.13
+touch /logs/status_python39_complete
+
+# checking for perl... no
+# configure: error: perl not found; Texinfo requires Perl.
+# If you have perl installed somewhere not in PATH,
+# specify where it is using
+#   ./configure PERL=/path/to/perl
+#  /usr/lib/perl5/5.38/core_perl/unicore/lib/Bc/ES.pl  
+#configure: error: perl >= 5.8.1 with Encode and Data::Dumper required by Texinfo.
+
+echo Texinfo-7.0.3
+tar xf texinfo-7.0.3.tar.xz
+pushd texinfo-7.0.3
+./configure --prefix=/usr
+#./configure --prefix=/usr PERL=/usr/bin/perl
+make -j$(nproc)
+make install
+popd
+rm -rf texinfo-7.0.3
+touch /logs/status_texinfo_complete
+
+echo util-linux-2.37.4
+tar xf util-linux-2.37.4.tar.xz
+pushd util-linux-2.37.4
+mkdir -pv /var/lib/hwclock
+./configure ADJTIME_PATH=/var/lib/hwclock/adjtime    \
+            --libdir=/usr/lib    \
+            --runstatedir=/run   \
+            --docdir=/usr/share/doc/util-linux-2.37.4 \
+            --disable-chfn-chsh  \
+            --disable-login      \
+            --disable-nologin    \
+            --disable-su         \
+            --disable-setpriv    \
+            --disable-runuser    \
+            --disable-pylibmount \
+            --disable-static     \
+            --without-python
+make -j$(nproc)
+make install
+popd
+rm -rf util-linux-2.37.4
+touch /logs/status_util-linux_complete
+
+# 7.13. Cleaning up and Saving the Temporary System
+rm -rf /usr/share/{info,man,doc}/*
+find /usr/{lib,libexec} -name \*.la -delete
+#rm -rf /tools
+
+touch /logs/status_build_cross_temp_tools_done
+
+# KERNEL_VERSION="5.15.48.1"
+# echo Linux-${KERNEL_VERSION} API Headers
+# tar xf kernel-${KERNEL_VERSION}.tar.gz
+# pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-${KERNEL_VERSION}
+# make mrproper
+# make headers
+# cp -rv usr/include/* /usr/include
+# popd
+# rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-${KERNEL_VERSION}
+# touch /logs/status_kernel_headers_complete
 
 echo glibc-2.38
 tar xf glibc-2.38.tar.xz
 pushd glibc-2.38
 patch -Np1 -i ../glibc-2.38-fhs-1.patch
 patch -Np1 -i ../glibc-2.38-memalign_fix-1.patch
-echo "rootsbindir=/usr/sbin" > configparms
-ln -sfv /tools/lib/gcc /usr/lib
-ls -la /usr/lib/gcc/
-case $(uname -m) in
-    x86_64)
-        GCC_INCDIR=/usr/lib/gcc/$BUILD_TARGET/13.2.0/include
-    ;;
-    aarch64)
-        GCC_INCDIR=/usr/lib/gcc/$BUILD_TARGET/13.2.0/include
-    ;;
-esac
-rm -f /usr/include/limits.h
 mkdir -v build
 cd       build
 echo "rootsbindir=/usr/sbin" > configparms
-CC="gcc -isystem $GCC_INCDIR -isystem /usr/include" \
 ../configure --prefix=/usr                          \
              --disable-werror                       \
              --enable-kernel=4.14                   \
              --enable-stack-protector=strong        \
              --with-headers=/usr/include            \
              libc_cv_slibdir=/usr/lib
-unset GCC_INCDIR
 make -j$(nproc)
 touch /etc/ld.so.conf
 sed '/test-installation/s@$(PERL)@echo not running@' -i ../Makefile
@@ -120,6 +202,7 @@ cat > /etc/ld.so.conf << "EOF"
 /opt/lib
 # Add an include directory
 include /etc/ld.so.conf.d/*.conf
+
 EOF
 mkdir -pv /etc/ld.so.conf.d
 popd
@@ -127,71 +210,71 @@ rm -rf glibc-2.38
 
 touch /logs/status_glibc_complete
 
-echo Adjusting the Toolchain
+# echo Adjusting the Toolchain
 
-find / -name ld-linux-x86-64.so.2
-# The final C library was just installed above. Ajust the toolchain to link newly compiled programs with it.
-mv -v /tools/bin/{ld,ld-old}
-mv -v /tools/$BUILD_TARGET/bin/{ld,ld-old}
-mv -v /tools/bin/{ld-new,ld}
-ln -sv /tools/bin/ld /tools/$BUILD_TARGET/bin/ld
-gcc -dumpspecs | sed -e 's@/tools@@g'                   \
-    -e '/\*startfile_prefix_spec:/{n;s@.*@/usr/lib/ @}' \
-    -e '/\*cpp:/{n;s@$@ -isystem /usr/include@}' >      \
-    `dirname $(gcc --print-libgcc-file-name)`/specs
+# find / -name ld-linux-x86-64.so.2
+# # The final C library was just installed above. Ajust the toolchain to link newly compiled programs with it.
+# mv -v /tools/bin/{ld,ld-old}
+# mv -v /tools/$BUILD_TARGET/bin/{ld,ld-old}
+# mv -v /tools/bin/{ld-new,ld}
+# ln -sv /tools/bin/ld /tools/$BUILD_TARGET/bin/ld
+# gcc -dumpspecs | sed -e 's@/tools@@g'                   \
+#     -e '/\*startfile_prefix_spec:/{n;s@.*@/usr/lib/ @}' \
+#     -e '/\*cpp:/{n;s@$@ -isystem /usr/include@}' >      \
+#     `dirname $(gcc --print-libgcc-file-name)`/specs
 
-# Sanity check for adjusted toolchain:
-echo "Sanity check 4 (raw toolchain - adjusting the toolchain)"
-set +e
-echo 'int main(){}' > dummy.c
-cc dummy.c -v
-cc dummy.c -v -Wl,--verbose &> dummy.log
-sleep 3
-sync
-# This sets errorlevel..
-readelf -l a.out | grep ld-linux
-case $(uname -m) in
-  x86_64)
-    echo Expected: '[Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]'
-  ;;
-  aarch64)
-    echo Expected: '[Requesting program interpreter: /lib/ld-linux-aarch64.so.1]'
-  ;;
-esac
-echo End of readelf output
-grep -o '/usr/lib.*/crt[1in].*succeeded' dummy.log
-echo Expected output: 'Three similar lines:  /usr/lib/../lib/crt1.o succeeded ...'
-# Expected output:
-# /usr/lib/../lib/crt1.o succeeded
-# /usr/lib/../lib/crti.o succeeded
-# /usr/lib/../lib/crtn.o succeeded
-grep -B1 '^ /usr/include' dummy.log
-# Expected output:
-# #include <...> search starts here:
-#  /usr/include
-grep 'SEARCH.*/usr/lib' dummy.log |sed 's|; |\n|g'
-echo Expected output: 'SEARCH_DIR("/usr/lib") SEARCH_DIR("/lib")'
-# Expected output:
-# SEARCH_DIR("/usr/lib")
-# SEARCH_DIR("/lib")
-grep "/lib.*/libc.so.6 " dummy.log
-echo Expected output: 'attempt to open /lib/libc.so.6 succeeded'
-# Expected output:
-# attempt to open /lib/libc.so.6 succeeded
-grep found dummy.log
-case $(uname -m) in
-  x86_64)
-    echo Expected output 'found ld-linux-x86-64.so.2 at /lib/ld-linux-x86-64.so.2'
-  ;;
-  aarch64)
-    echo Expected output 'found ld-linux-aarch64.so.1 at /lib/ld-linux-aarch64.so.1'
-  ;;
-esac
-# Cleanup
-rm -v dummy.c a.out dummy.log
-set -e
-echo "End sanity check 4"
-touch /logs/status_adjusting_toolchain_complete
+# # Sanity check for adjusted toolchain:
+# echo "Sanity check 4 (raw toolchain - adjusting the toolchain)"
+# set +e
+# echo 'int main(){}' > dummy.c
+# cc dummy.c -v
+# cc dummy.c -v -Wl,--verbose &> dummy.log
+# sleep 3
+# sync
+# # This sets errorlevel..
+# readelf -l a.out | grep ld-linux
+# case $(uname -m) in
+#   x86_64)
+#     echo Expected: '[Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]'
+#   ;;
+#   aarch64)
+#     echo Expected: '[Requesting program interpreter: /lib/ld-linux-aarch64.so.1]'
+#   ;;
+# esac
+# echo End of readelf output
+# grep -o '/usr/lib.*/crt[1in].*succeeded' dummy.log
+# echo Expected output: 'Three similar lines:  /usr/lib/../lib/crt1.o succeeded ...'
+# # Expected output:
+# # /usr/lib/../lib/crt1.o succeeded
+# # /usr/lib/../lib/crti.o succeeded
+# # /usr/lib/../lib/crtn.o succeeded
+# grep -B1 '^ /usr/include' dummy.log
+# # Expected output:
+# # #include <...> search starts here:
+# #  /usr/include
+# grep 'SEARCH.*/usr/lib' dummy.log |sed 's|; |\n|g'
+# echo Expected output: 'SEARCH_DIR("/usr/lib") SEARCH_DIR("/lib")'
+# # Expected output:
+# # SEARCH_DIR("/usr/lib")
+# # SEARCH_DIR("/lib")
+# grep "/lib.*/libc.so.6 " dummy.log
+# echo Expected output: 'attempt to open /lib/libc.so.6 succeeded'
+# # Expected output:
+# # attempt to open /lib/libc.so.6 succeeded
+# grep found dummy.log
+# case $(uname -m) in
+#   x86_64)
+#     echo Expected output 'found ld-linux-x86-64.so.2 at /lib/ld-linux-x86-64.so.2'
+#   ;;
+#   aarch64)
+#     echo Expected output 'found ld-linux-aarch64.so.1 at /lib/ld-linux-aarch64.so.1'
+#   ;;
+# esac
+# # Cleanup
+# rm -v dummy.c a.out dummy.log
+# set -e
+# echo "End sanity check 4"
+# touch /logs/status_adjusting_toolchain_complete
 
 echo Zlib-1.3
 tar xf zlib-1.3.tar.xz
@@ -199,9 +282,53 @@ pushd zlib-1.3
 ./configure --prefix=/usr
 make -j$(nproc)
 make install
+rm -fv /usr/lib/libz.a
 popd
 rm -rf zlib-1.3
 touch /logs/status_zlib_complete
+
+echo Bzip2-1.0.8
+tar xf bzip2-1.0.8.tar.gz
+pushd bzip2-1.0.8
+sed -i 's@\(ln -s -f \)$(PREFIX)/bin/@\1@' Makefile
+sed -i "s@(PREFIX)/man@(PREFIX)/share/man@g" Makefile
+make -f Makefile-libbz2_so
+make clean
+make -j$(nproc)
+make PREFIX=/usr install
+#cp -v bzip2-shared /bin/bzip2
+cp -av libbz2.so.* /usr/lib
+ln -sv libbz2.so.1.0.8 /usr/lib/libbz2.so
+cp -v bzip2-shared /usr/bin/bzip2
+for i in /usr/bin/{bzcat,bunzip2}; do
+  ln -sfv bzip2 $i
+done
+rm -fv /usr/lib/libbz2.a
+popd
+rm -rf bzip2-1.0.8
+touch /logs/status_bzip2_complete
+
+echo Xz-5.4.4
+tar xf xz-5.4.4.tar.xz
+pushd xz-5.4.4
+./configure --prefix=/usr    \
+            --disable-static \
+            --docdir=/usr/share/doc/xz-5.4.4
+make -j$(nproc)
+make install
+popd
+rm -rf xz-5.4.4
+touch /logs/status_xz_complete
+
+echo zstd-1.5.5
+tar xf zstd-1.5.5.tar.gz
+pushd zstd-1.5.5
+make -j$(nproc) prefix=/usr
+make prefix=/usr install
+rm -v /usr/lib/libzstd.a
+popd
+rm -rf zstd-1.5.5
+touch /logs/status_zstd_complete
 
 echo File-5.45
 tar xf file-5.45.tar.gz
@@ -218,12 +345,13 @@ tar xf readline-8.1.tar.gz
 pushd readline-8.1
 sed -i '/MV.*old/d' Makefile.in
 sed -i '/{OLDSUFF}/c:' support/shlib-install
+#patch -Np1 -i ../readline-8.2-upstream_fix-1.patch
 ./configure --prefix=/usr    \
             --disable-static \
             --with-curses    \
             --docdir=/usr/share/doc/readline-8.1
-make SHLIB_LIBS="-L/tools/lib -lncursesw"
-make SHLIB_LIBS="-L/tools/lib -lncursesw" install
+make SHLIB_LIBS="-lncursesw"
+make SHLIB_LIBS="-lncursesw" install
 popd
 rm -rf readline-8.1
 touch /logs/status_readline_complete
@@ -238,6 +366,21 @@ popd
 rm -rf m4-1.4.19
 touch /logs/status_m4_complete
 
+# TODO: build BC?
+
+echo Flex-2.6.4
+tar xf flex-2.6.4.tar.gz
+pushd flex-2.6.4
+#sed -i "/math.h/a #include <malloc.h>" src/flexdef.h
+#HELP2MAN=/tools/bin/true \
+./configure --prefix=/usr --docdir=/usr/share/doc/flex-2.6.4 --disable-static
+make -j$(nproc)
+make install
+ln -sv flex /usr/bin/lex
+popd
+rm -rf flex-2.6.4
+touch /logs/status_flex_complete
+
 echo Binutils-2.41
 tar xf binutils-2.41.tar.xz
 pushd binutils-2.41
@@ -245,18 +388,19 @@ pushd binutils-2.41
 mkdir -v build
 cd build
 ../configure --prefix=/usr       \
+             --sysconfdir=/etc   \
              --enable-gold       \
              --enable-ld=default \
              --enable-plugins    \
              --enable-shared     \
              --disable-werror    \
              --enable-64-bit-bfd \
-             --with-system-zlib  \
-             --enable-gprofng=no
+             --with-system-zlib
 #             --enable-install-libiberty
 # libiberty.a used to be in binutils. Now it is in GCC.
 make -j$(nproc) tooldir=/usr
 make tooldir=/usr install
+rm -fv /usr/lib/lib{bfd,ctf,ctf-nobfd,gprofng,opcodes,sframe}.a
 popd
 rm -rf binutils-2.41
 touch /logs/status_binutils_complete
@@ -270,8 +414,7 @@ cp -v configfsf.sub   config.sub
 ./configure --prefix=/usr    \
             --enable-cxx     \
             --disable-static \
-            --docdir=/usr/share/doc/gmp-6.3.0 \
-            --disable-assembly
+            --docdir=/usr/share/doc/gmp-6.3.0
 make -j$(nproc)
 make install
 popd
@@ -303,13 +446,19 @@ popd
 rm -rf mpc-1.3.1
 touch /logs/status_libmpc_complete
 
+echo libcap-2.60
+tar xf libcap-2.60.tar.xz
+pushd libcap-2.60
+sed -i '/install -m.*STA/d' libcap/Makefile
+make -j$(nproc) prefix=/usr lib=lib
+make prefix=/usr lib=lib install
+popd
+rm -rf libcap-2.60
+touch /logs/status_libcap_complete
+
 echo GCC-13.2.0
 tar xf gcc-13.2.0.tar.xz
 pushd gcc-13.2.0
-# # fix issue compiling with glibc 2.34
-# sed -e '/static.*SIGSTKSZ/d' \
-#     -e 's/return kAltStackSize/return SIGSTKSZ * 4/' \
-#     -i libsanitizer/sanitizer_common/sanitizer_posix_libcdep.cpp
 case $(uname -m) in
   x86_64)
     sed -e '/m64=/s/lib64/lib/' -i.orig gcc/config/i386/t-linux64
@@ -318,42 +467,27 @@ case $(uname -m) in
     sed -e '/mabi.lp64=/s/lib64/lib/' -i.orig gcc/config/aarch64/t-aarch64-linux
   ;;
 esac
-# disable no-pie for gcc binaries
-#sed -i '/^NO_PIE_CFLAGS = /s/@NO_PIE_CFLAGS@//' gcc/Makefile.in
-#patch -Np1 -i /tools/CVE-2023-4039.patch
-# LFS 7.4:  Workaround a bug so that GCC doesn't install libiberty.a, which is already provided by Binutils:
-# sed -i 's/install_to_$(INSTALL_DEST) //' libiberty/Makefile.in
-# Need to remove this link to /tools/lib/gcc as the final gcc includes will be installed here.
-ls -la /usr/lib/gcc
-ls /usr/lib/gcc
-rm -f /usr/lib/gcc
 mkdir -v build
 cd       build
-SED=sed \
-../configure    --prefix=/usr \
-                LD=ld \
-                --enable-shared \
-                --enable-threads=posix \
-                --enable-__cxa_atexit \
-                --enable-clocale=gnu \
-                --enable-languages=c,c++ \
-                --disable-multilib \
-                --disable-bootstrap \
-                --disable-fixincludes \
-                --enable-linker-build-id \
-                --enable-default-pie \
-                --enable-default-ssp \
-                --with-system-zlib
-# --enable-plugin
-# --enable-install-libiberty
-# --disable-install-libiberty
+../configure --prefix=/usr            \
+             LD=ld                    \
+             --enable-languages=c,c++ \
+             --enable-default-pie     \
+             --enable-default-ssp     \
+             --disable-multilib       \
+             --disable-bootstrap      \
+             --disable-fixincludes    \
+             --disable-libsanitizer                         \
+             --with-system-zlib
 make -j$(nproc)
 make install
-ln -sv ../usr/bin/cpp /lib
-ln -sv gcc /usr/bin/cc
+ln -svr /usr/bin/cpp /usr/lib
+ln -sfv ../../libexec/gcc/$(gcc -dumpmachine)/13.2.0/liblto_plugin.so \
+        /usr/lib/bfd-plugins/
 
-install -v -dm755 /usr/lib/bfd-plugins
-ln -sfv ../../libexec/gcc/$(gcc -dumpmachine)/13.2.0/liblto_plugin.so /usr/lib/bfd-plugins/
+#ln -sv gcc /usr/bin/cc
+#install -v -dm755 /usr/lib/bfd-plugins
+#ln -sfv ../../libexec/gcc/$(gcc -dumpmachine)/13.2.0/liblto_plugin.so /usr/lib/bfd-plugins/
 
 # Sanity check
 set +e
@@ -366,7 +500,6 @@ sync
 echo 'int main(){}' > dummy.c
 cc dummy.c -v -Wl,--verbose &> dummy.log
 cat dummy.log
-readelf -l a.out
 readelf -l a.out | grep ld-linux
 echo Expected output: '[Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]'
 # Expected output:
@@ -412,24 +545,26 @@ rm -rf gcc-13.2.0
 
 touch /logs/status_gcc_complete
 
-echo Bzip2-1.0.8
-tar xf bzip2-1.0.8.tar.gz
-pushd bzip2-1.0.8
-sed -i 's@\(ln -s -f \)$(PREFIX)/bin/@\1@' Makefile
-sed -i "s@(PREFIX)/man@(PREFIX)/share/man@g" Makefile
-make -f Makefile-libbz2_so
-make clean
-make -j$(nproc)
-make PREFIX=/usr install
-cp -v bzip2-shared /bin/bzip2
-cp -av libbz2.so* /lib
-ln -sv ../../lib/libbz2.so.1.0 /usr/lib/libbz2.so
-rm -v /usr/bin/{bunzip2,bzcat,bzip2}
-ln -sv bzip2 /bin/bunzip2
-ln -sv bzip2 /bin/bzcat
-popd
-rm -rf bzip2-1.0.8
-touch /logs/status_bzip2_complete
+# andrew  stopped updating for cross tools here
+
+# echo Bzip2-1.0.8
+# tar xf bzip2-1.0.8.tar.gz
+# pushd bzip2-1.0.8
+# sed -i 's@\(ln -s -f \)$(PREFIX)/bin/@\1@' Makefile
+# sed -i "s@(PREFIX)/man@(PREFIX)/share/man@g" Makefile
+# make -f Makefile-libbz2_so
+# make clean
+# make -j$(nproc)
+# make PREFIX=/usr install
+# cp -v bzip2-shared /bin/bzip2
+# cp -av libbz2.so* /lib
+# ln -sv ../../lib/libbz2.so.1.0 /usr/lib/libbz2.so
+# rm -v /usr/bin/{bunzip2,bzcat,bzip2}
+# ln -sv bzip2 /bin/bunzip2
+# ln -sv bzip2 /bin/bzcat
+# popd
+# rm -rf bzip2-1.0.8
+# touch /logs/status_bzip2_complete
 
 echo Pkgconf-2.0.2
 tar xf pkgconf-2.0.2.tar.xz
@@ -441,7 +576,6 @@ make -j$(nproc)
 make install
 # create symlinks for compatability with pkg-config
 ln -sv pkgconf   /usr/bin/pkg-config
-ln -sv pkgconf.1 /usr/share/man/man1/pkg-config.1
 popd
 rm -rf pkgconf-2.0.2
 touch /logs/status_pkgconf_complete
@@ -476,28 +610,65 @@ popd
 rm -rf ncurses-6.4
 touch /logs/status_ncurses_complete
 
-echo libcap-2.60
-tar xf libcap-2.60.tar.xz
-pushd libcap-2.60
-sed -i '/install.*STALIBNAME/d' libcap/Makefile
-make -j$(nproc)
-make RAISE_SETFCAP=no lib=lib prefix=/usr install
-chmod -v 755 /usr/lib/libcap.so.2.60
-#mv -v /usr/lib/libcap.so.* /lib
-#ln -sfv ../../lib/$(readlink /usr/lib/libcap.so) /usr/lib/libcap.so
-popd
-rm -rf libcap-2.60
-touch /logs/status_libcap_complete
+# #/bin/sh: line 1: perl: command not found
+# echo libcap-2.60
+# tar xf libcap-2.60.tar.xz
+# pushd libcap-2.60
+# sed -i '/install.*STALIBNAME/d' libcap/Makefile
+# make -j$(nproc)
+# make RAISE_SETFCAP=no lib=lib prefix=/usr install
+# chmod -v 755 /usr/lib/libcap.so.2.60
+# #mv -v /usr/lib/libcap.so.* /lib
+# #ln -sfv ../../lib/$(readlink /usr/lib/libcap.so) /usr/lib/libcap.so
+# popd
+# rm -rf libcap-2.60
+# touch /logs/status_libcap_complete
 
 echo Sed-4.9
 tar xf sed-4.9.tar.xz
 pushd sed-4.9
-./configure --prefix=/usr --bindir=/bin
+./configure --prefix=/usr
 make -j$(nproc)
 make install
 popd
 rm -rf sed-4.9
 touch /logs/status_sed_complete
+
+# echo Bison-3.8.2
+# tar xf bison-3.8.2.tar.xz
+# pushd bison-3.8.2
+# ./configure --prefix=/usr --docdir=/usr/share/doc/bison-3.8.2
+# make -j$(nproc)
+# make install
+# popd
+# rm -rf bison-3.8.2
+# touch /logs/status_bison_complete
+
+# echo Flex-2.6.4
+# tar xf flex-2.6.4.tar.gz
+# pushd flex-2.6.4
+# sed -i "/math.h/a #include <malloc.h>" src/flexdef.h
+# HELP2MAN=/tools/bin/true \
+# ./configure --prefix=/usr --docdir=/usr/share/doc/flex-2.6.4
+# make -j$(nproc)
+# make install
+# ln -sv flex /usr/bin/lex
+# popd
+# rm -rf flex-2.6.4
+# touch /logs/status_flex_complete
+
+echo Gettext-0.22
+tar xf gettext-0.22.tar.xz
+pushd gettext-0.22
+./configure --prefix=/usr    \
+            --disable-static \
+            --docdir=/usr/share/doc/gettext-0.22
+make -j$(nproc)
+make install
+chmod -v 0755 /usr/lib/preloadable_libintl.so
+popd
+rm -rf gettext-0.22
+touch /logs/status_gettext_complete
 
 echo Bison-3.8.2
 tar xf bison-3.8.2.tar.xz
@@ -509,23 +680,10 @@ popd
 rm -rf bison-3.8.2
 touch /logs/status_bison_complete
 
-echo Flex-2.6.4
-tar xf flex-2.6.4.tar.gz
-pushd flex-2.6.4
-sed -i "/math.h/a #include <malloc.h>" src/flexdef.h
-HELP2MAN=/tools/bin/true \
-./configure --prefix=/usr --docdir=/usr/share/doc/flex-2.6.4
-make -j$(nproc)
-make install
-ln -sv flex /usr/bin/lex
-popd
-rm -rf flex-2.6.4
-touch /logs/status_flex_complete
-
 echo Grep-3.11
 tar xf grep-3.11.tar.xz
 pushd grep-3.11
-./configure --prefix=/usr --bindir=/bin
+./configure --prefix=/usr
 make -j$(nproc)
 make install
 popd
@@ -535,15 +693,21 @@ touch /logs/status_grep_complete
 echo Bash-5.1.8
 tar xf bash-5.1.8.tar.gz
 pushd bash-5.1.8
-./configure --prefix=/usr                      \
-            --docdir=/usr/share/doc/bash-5.1.8 \
-            --without-bash-malloc              \
-            --with-installed-readline
+./configure --prefix=/usr             \
+            --without-bash-malloc     \
+            --with-installed-readline \
+            --docdir=/usr/share/doc/bash-5.2.15
 make -j$(nproc)
 make install
-cd /sources
+popd
 rm -rf bash-5.1.8
 touch /logs/status_bash_complete
+
+#exec /usr/bin/bash --login
+
+# + tar xf libtool-2.4.6.tar.xz
+# tar: libtool-2.4.6.tar.xz: Cannot open: No such file or directory
+# tar: Error is not recoverable: exiting now
 
 echo Libtool-2.4.6
 tar xf libtool-2.4.6.tar.xz
@@ -551,6 +715,7 @@ pushd libtool-2.4.6
 ./configure --prefix=/usr
 make -j$(nproc)
 make install
+rm -fv /usr/lib/libltdl.a
 popd
 rm -rf libtool-2.4.6
 touch /logs/status_libtool_complete
@@ -580,7 +745,6 @@ touch /logs/status_gperf_complete
 echo Expat-2.4.8
 tar xf expat-2.4.8.tar.bz2
 pushd expat-2.4.8
-sed -i 's|usr/bin/env |bin/|' run.sh.in
 ./configure --prefix=/usr    \
             --disable-static \
             --docdir=/usr/share/doc/expat-2.4.8
@@ -590,24 +754,30 @@ popd
 rm -rf expat-2.4.8
 touch /logs/status_expat_complete
 
-echo Perl-5.32.0
-tar xf perl-5.32.0.tar.xz
-pushd perl-5.32.0
-echo "127.0.0.1 localhost $(hostname)" > /etc/hosts
+echo Perl-5.38.0
+tar xf perl-5.38.0.tar.xz
+pushd perl-5.38.0
 export BUILD_ZLIB=False
 export BUILD_BZIP2=0
-sh Configure -des -Dprefix=/usr                 \
-                  -Dvendorprefix=/usr           \
-                  -Dman1dir=/usr/share/man/man1 \
-                  -Dman3dir=/usr/share/man/man3 \
-                  -Dpager="/usr/bin/less -isR"  \
-                  -Duseshrplib                  \
-                  -Dusethreads
+sh Configure -des                                         \
+             -Dprefix=/usr                                \
+             -Dvendorprefix=/usr                          \
+             -Dprivlib=/usr/lib/perl5/5.38/core_perl      \
+             -Darchlib=/usr/lib/perl5/5.38/core_perl      \
+             -Dsitelib=/usr/lib/perl5/5.38/site_perl      \
+             -Dsitearch=/usr/lib/perl5/5.38/site_perl     \
+             -Dvendorlib=/usr/lib/perl5/5.38/vendor_perl  \
+             -Dvendorarch=/usr/lib/perl5/5.38/vendor_perl \
+             -Dman1dir=/usr/share/man/man1                \
+             -Dman3dir=/usr/share/man/man3                \
+             -Dpager="/usr/bin/less -isR"                 \
+             -Duseshrplib                                 \
+             -Dusethreads
 make -j$(nproc)
 make install
 unset BUILD_ZLIB BUILD_BZIP2
 popd
-rm -rf perl-5.32.0
+rm -rf perl-5.38.0
 touch /logs/status_perl_complete
 
 echo Autoconf-2.71
@@ -630,40 +800,66 @@ popd
 rm -rf automake-1.16.5
 touch /logs/status_automake_complete
 
-echo Xz-5.4.4
-tar xf xz-5.4.4.tar.xz
-pushd xz-5.4.4
-./configure --prefix=/usr    \
-            --disable-static \
-            --docdir=/usr/share/doc/xz-5.4.4
-make -j$(nproc)
-make install
-popd
-rm -rf xz-5.4.4
-touch /logs/status_xz_complete
+# echo Xz-5.4.4
+# tar xf xz-5.4.4.tar.xz
+# pushd xz-5.4.4
+# ./configure --prefix=/usr    \
+#             --disable-static \
+#             --docdir=/usr/share/doc/xz-5.4.4
+# make -j$(nproc)
+# make install
+# popd
+# rm -rf xz-5.4.4
+# touch /logs/status_xz_complete
 
-echo zstd-1.5.5
-tar xf zstd-1.5.5.tar.gz
-pushd zstd-1.5.5
-make -j$(nproc)
-make install prefix=/usr pkgconfigdir=/usr/lib/pkgconfig
-rm -v /usr/lib/libzstd.a
-popd
-rm -rf zstd-1.5.5
-touch /logs/status_zstd_complete
+# echo zstd-1.5.5
+# tar xf zstd-1.5.5.tar.gz
+# pushd zstd-1.5.5
+# make -j$(nproc)
+# make install prefix=/usr pkgconfigdir=/usr/lib/pkgconfig
+# rm -v /usr/lib/libzstd.a
+# popd
+# rm -rf zstd-1.5.5
+# touch /logs/status_zstd_complete
 
-echo Gettext-0.22
-tar xf gettext-0.22.tar.xz
-pushd gettext-0.22
-./configure --prefix=/usr    \
-            --disable-static \
-            --docdir=/usr/share/doc/gettext-0.22
-make -j$(nproc)
-make install
-chmod -v 0755 /usr/lib/preloadable_libintl.so
+# echo Gettext-0.22
+# tar xf gettext-0.22.tar.xz
+# pushd gettext-0.22
+# ./configure --prefix=/usr    \
+#             --disable-static \
+#             --docdir=/usr/share/doc/gettext-0.22
+# make -j$(nproc)
+# make install
+# chmod -v 0755 /usr/lib/preloadable_libintl.so
+# popd
+# rm -rf gettext-0.22
+# touch /logs/status_gettext_complete
+
+# Andrew
+# Openssl
+
+echo OpenSSL-1.1.1k
+tar xf openssl-1.1.1k.tar.gz
+pushd openssl-1.1.1k
+sslarch=
+./config --prefix=/usr \
+         --openssldir=/etc/pki/tls \
+         --libdir=lib \
+         enable-ec_nistp_64_gcc_128 \
+         shared \
+         zlib-dynamic \
+         ${sslarch} \
+         no-mdc2 \
+         no-sm2 \
+         no-sm4 \
+         '-DDEVRANDOM="\"/dev/urandom\""'
+perl ./configdata.pm -d
+make all -j$(nproc)
+sed -i '/INSTALL_LIBS/s/libcrypto.a libssl.a//' Makefile
+make MANSUFFIX=ssl install
 popd
-rm -rf gettext-0.22
-touch /logs/status_gettext_complete
+rm -rf openssl-1.1.1k
+touch /logs/status_openssl_complete
 
 echo Elfutils-0.189
 tar xjf elfutils-0.189.tar.bz2
@@ -675,6 +871,7 @@ pushd elfutils-0.189
 make -j$(nproc)
 make -C libelf install
 install -vm644 config/libelf.pc /usr/lib/pkgconfig
+rm /usr/lib/libelf.a
 # Need to also install (libdw.so.1) to satisfy rpmbuild
 make -C libdw install
 # Need to install (eu-strip) as well
@@ -722,60 +919,58 @@ popd
 rm -rf libffi-3.4.2
 touch /logs/status_libffi_complete
 
-echo "Perl Test::Warnings"
-tar xf Test-Warnings-0.028.tar.gz
-pushd Test-Warnings-0.028
-env PERL_MM_USE_DEFAULT=1 perl Makefile.PL INSTALLDIRS=vendor
-make
-make install
-find . -name 'perllocal.pod' -delete
-popd
-rm -rf Test-Warnings-0.028
-touch /logs/status_test_warnings_complete
+# echo "Perl Test::Warnings"
+# tar xf Test-Warnings-0.028.tar.gz
+# pushd Test-Warnings-0.028
+# env PERL_MM_USE_DEFAULT=1 perl Makefile.PL INSTALLDIRS=vendor
+# make
+# make install
+# find . -name 'perllocal.pod' -delete
+# popd
+# rm -rf Test-Warnings-0.028
+# touch /logs/status_test_warnings_complete
 
-echo "Perl Text::Template"
-tar xf Text-Template-1.51.tar.gz
-pushd Text-Template-1.51
-env PERL_MM_USE_DEFAULT=1 perl Makefile.PL INSTALLDIRS=vendor
-make
-make install
-find . -name 'perllocal.pod' -delete
-popd
-rm -rf Text-Template-1.51
-touch /logs/status_text_template_complete
+# echo "Perl Text::Template"
+# tar xf Text-Template-1.51.tar.gz
+# pushd Text-Template-1.51
+# env PERL_MM_USE_DEFAULT=1 perl Makefile.PL INSTALLDIRS=vendor
+# make
+# make install
+# find . -name 'perllocal.pod' -delete
+# popd
+# rm -rf Text-Template-1.51
+# touch /logs/status_text_template_complete
 
-echo OpenSSL-1.1.1k
-tar xf openssl-1.1.1k.tar.gz
-pushd openssl-1.1.1k
-sslarch=
-./config --prefix=/usr \
-         --openssldir=/etc/pki/tls \
-         --libdir=lib \
-         enable-ec_nistp_64_gcc_128 \
-         shared \
-         zlib-dynamic \
-         ${sslarch} \
-         no-mdc2 \
-         no-sm2 \
-         no-sm4 \
-         '-DDEVRANDOM="\"/dev/urandom\""'
-perl ./configdata.pm -d
-make all -j$(nproc)
-sed -i '/INSTALL_LIBS/s/libcrypto.a libssl.a//' Makefile
-make MANSUFFIX=ssl install
-popd
-rm -rf openssl-1.1.1k
-touch /logs/status_openssl_complete
+# echo OpenSSL-1.1.1k
+# tar xf openssl-1.1.1k.tar.gz
+# pushd openssl-1.1.1k
+# sslarch=
+# ./config --prefix=/usr \
+#          --openssldir=/etc/pki/tls \
+#          --libdir=lib \
+#          enable-ec_nistp_64_gcc_128 \
+#          shared \
+#          zlib-dynamic \
+#          ${sslarch} \
+#          no-mdc2 \
+#          no-sm2 \
+#          no-sm4 \
+#          '-DDEVRANDOM="\"/dev/urandom\""'
+# perl ./configdata.pm -d
+# make all -j$(nproc)
+# sed -i '/INSTALL_LIBS/s/libcrypto.a libssl.a//' Makefile
+# make MANSUFFIX=ssl install
+# popd
+# rm -rf openssl-1.1.1k
+# touch /logs/status_openssl_complete
 
 echo Python-3.9.13
 tar xf Python-3.9.13.tar.xz
 pushd Python-3.9.13
 ./configure --prefix=/usr       \
-            --with-platlibdir=lib \
             --enable-shared     \
             --with-system-expat \
-            --with-system-ffi   \
-            --with-ensurepip=yes
+            --with-system-ffi
 make -j$(nproc)
 make install
 chmod -v 755 /usr/lib/libpython3.9.so.1.0
@@ -785,15 +980,26 @@ popd
 rm -rf Python-3.9.13
 touch /logs/status_python39_complete
 
-echo Coreutils-8.32
-tar xf coreutils-8.32.tar.xz
-pushd coreutils-8.32
-patch -Np1 -i ../coreutils-8.32-i18n-1.patch
+# ++ uname -m
+# + autoreconf -fiv
+# autoreconf: export WARNINGS=
+# autoreconf: Entering directory '.'
+# autoreconf: running: autopoint --force
+# Can't exec "autopoint": No such file or directory at /usr/share/autoconf/Autom4te/FileUtils.pm line 293.
+# autoreconf: error: autopoint failed with exit status: 2
+
+echo Coreutils-9.4
+tar xf coreutils-9.4.tar.xz
+pushd coreutils-9.4
+set +e
+patch -Np1 -i ../coreutils-9.4-i18n-1.patch
+#patch -Np1 -i ../coreutils-8.32-i18n-1.patch
 case $(uname -m) in
     aarch64)
         patch -Np1 -i /tools/coreutils-fix-get-sys_getdents-aarch64.patch
     ;;
 esac
+set -e
 autoreconf -fiv
 FORCE_UNSAFE_CONFIGURE=1 ./configure \
             --prefix=/usr            \
@@ -801,10 +1007,8 @@ FORCE_UNSAFE_CONFIGURE=1 ./configure \
 make -j$(nproc)
 make install
 mv -v /usr/bin/chroot /usr/sbin
-mv -v /usr/share/man/man1/chroot.1 /usr/share/man/man8/chroot.8
-sed -i s/\"1\"/\"8\"/1 /usr/share/man/man8/chroot.8
 popd
-rm -rf coreutils-8.32
+rm -rf coreutils-9.4
 touch /logs/status_coreutils_complete
 
 echo Diffutils-3.10
@@ -823,7 +1027,7 @@ pushd gawk-5.2.2
 sed -i 's/extras//' Makefile.in
 ./configure --prefix=/usr
 make -j$(nproc)
-make install
+make LN='ln -f' install
 popd
 rm -rf gawk-5.2.2
 touch /logs/status_gawk_complete
@@ -834,7 +1038,7 @@ pushd findutils-4.9.0
 ./configure --prefix=/usr --localstatedir=/var/lib/locate
 make -j$(nproc)
 make install
-sed -i 's|find:=${BINDIR}|find:=/bin|' /usr/bin/updatedb
+#sed -i 's|find:=${BINDIR}|find:=/bin|' /usr/bin/updatedb
 popd
 rm -rf findutils-4.9.0
 touch /logs/status_findutils_complete
@@ -893,8 +1097,7 @@ echo Tar-1.35
 tar xf tar-1.35.tar.xz
 pushd tar-1.35
 FORCE_UNSAFE_CONFIGURE=1  \
-./configure --prefix=/usr \
-            --bindir=/bin
+./configure --prefix=/usr
 make -j$(nproc)
 make install
 popd
@@ -904,10 +1107,7 @@ touch /logs/status_tar_complete
 echo Texinfo-7.0.3
 tar xf texinfo-7.0.3.tar.xz
 pushd texinfo-7.0.3
-./configure --prefix=/usr --disable-static
-# # fix issue building with glibc 2.34:
-# sed -e 's/__attribute_nonnull__/__nonnull/' \
-#     -i gnulib/lib/malloc/dynarray-skeleton.c
+./configure --prefix=/usr
 make -j$(nproc)
 make install
 popd
@@ -918,15 +1118,11 @@ echo Procps-ng-3.3.17
 tar xf procps-ng-3.3.17.tar.xz
 pushd procps-3.3.17
 ./configure --prefix=/usr                            \
-            --exec-prefix=                           \
-            --libdir=/usr/lib                        \
             --docdir=/usr/share/doc/procps-ng-3.3.17 \
             --disable-static                         \
             --disable-kill
 make -j$(nproc)
 make install
-#mv -v /usr/lib/libprocps.so.* /lib
-#ln -sfv ../../lib/$(readlink /usr/lib/libprocps.so) /usr/lib/libprocps.so
 popd
 rm -rf procps-3.3.17
 touch /logs/status_procpsng_complete
@@ -935,8 +1131,11 @@ echo util-linux-2.37.4
 tar xf util-linux-2.37.4.tar.xz
 pushd util-linux-2.37.4
 mkdir -pv /var/lib/hwclock
-./configure ADJTIME_PATH=/var/lib/hwclock/adjtime   \
-            --docdir=/usr/share/doc/util-linux-2.37.4 \
+./configure ADJTIME_PATH=/var/lib/hwclock/adjtime \
+            --bindir=/usr/bin    \
+            --libdir=/usr/lib    \
+            --runstatedir=/run   \
+            --sbindir=/usr/sbin  \
             --disable-chfn-chsh  \
             --disable-login      \
             --disable-nologin    \
@@ -947,12 +1146,15 @@ mkdir -pv /var/lib/hwclock
             --disable-static     \
             --without-python     \
             --without-systemd    \
+            --without-systemdsystemunitdir \
             --without-systemdsystemunitdir
 make -j$(nproc)
 make install
 popd
 rm -rf util-linux-2.37.4
 touch /logs/status_util-linux_complete
+
+# Andrew
 
 #
 # These next packages include rpm/rpmbuild and dependencies
@@ -1073,7 +1275,9 @@ mv rpm-"$RPM_WITH_VERSION"-release "$RPM_FOLDER"
 pushd "$RPM_FOLDER"
 
 # Still not in the upstream
+set +e
 patch -Np1 -i /tools/rpm-define-RPM-LD-FLAGS.patch
+set -e
 
 # Do not build docs - pandoc dependency is not supplied in the toolchain.
 sed -iE '/SUBDIRS/ s/docs //' Makefile.am
@@ -1105,6 +1309,8 @@ touch /logs/status_rpm_complete
 
 # Cleanup
 rm -rf /tmp/*
+find /usr/lib /usr/libexec -name \*.la -delete
+find /usr -depth -name $(uname -m)-lfs-linux-gnu\* | xargs rm -rf
 
 echo "Sanity check 6 (raw toolchain - after build complete)"
 gcc -v
