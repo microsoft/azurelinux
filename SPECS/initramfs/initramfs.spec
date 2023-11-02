@@ -1,7 +1,7 @@
 Summary:        initramfs
 Name:           initramfs
 Version:        2.0
-Release:        14%{?dist}
+Release:        15%{?dist}
 License:        Apache License
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -110,7 +110,7 @@ echo "initramfs" %{version}-%{release} "posttrans" >&2
 %removal_action
 mkinitrd -q
 # Move initrd generated for kernel-mshv to /boot/efi, where linuxloader expects to find it
-mv /boot/initrd.img-*mshv* /boot/efi/ >/dev/null 2>&1 || :
+cp /boot/initrd.img-*mshv* /boot/efi/ >/dev/null 2>&1 || :
 %grub2_post
 
 %postun
