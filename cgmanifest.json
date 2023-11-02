@@ -26835,8 +26835,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-test-unit",
-          "version": "3.5.3",
-          "downloadUrl": "https://github.com/test-unit/test-unit/archive/refs/tags/3.5.3.tar.gz"
+          "version": "3.6.1",
+          "downloadUrl": "https://github.com/test-unit/test-unit/archive/refs/tags/3.6.1.tar.gz"
         }
       }
     },
