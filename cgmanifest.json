@@ -26665,8 +26665,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-rspec",
-          "version": "3.9.0",
-          "downloadUrl": "https://github.com/rspec/rspec-metagem/archive/refs/tags/v3.9.0.tar.gz"
+          "version": "3.12.0",
+          "downloadUrl": "https://github.com/rspec/rspec-metagem/archive/refs/tags/v3.12.0.tar.gz"
         }
       }
     },
