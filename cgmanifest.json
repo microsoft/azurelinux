@@ -26005,8 +26005,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-faraday-net_http",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/lostisland/faraday-net_http/archive/refs/tags/v1.0.0.tar.gz"
+          "version": "3.0.2",
+          "downloadUrl": "https://github.com/lostisland/faraday-net_http/archive/refs/tags/v3.0.2.tar.gz"
         }
       }
     },
