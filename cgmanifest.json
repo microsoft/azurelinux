@@ -26725,8 +26725,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-ruby-progressbar",
-          "version": "1.11.0",
-          "downloadUrl": "https://github.com/jfelchner/ruby-progressbar/archive/refs/tags/releases/v1.11.0.tar.gz"
+          "version": "1.13.0",
+          "downloadUrl": "https://github.com/jfelchner/ruby-progressbar/archive/refs/tags/releases/v1.13.0.tar.gz"
         }
       }
     },
