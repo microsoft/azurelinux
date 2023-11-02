@@ -89,6 +89,7 @@ OUT_DIR          ?= $(PROJECT_ROOT)/out
 SPECS_DIR        ?= $(PROJECT_ROOT)/SPECS
 CCACHE_DIR       ?= $(PROJECT_ROOT)/ccache
 CCACHE_CONFIG    ?= $(RESOURCES_DIR)/manifests/package/ccache-configuration.json
+MISC_CACHE_DIR   ?= $(PROJECT_ROOT)/cache
 
 # Sub-folder defines
 LOGS_DIR           ?= $(BUILD_DIR)/logs

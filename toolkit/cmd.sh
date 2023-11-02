@@ -1,0 +1,2 @@
+#sudo make build-packages CONFIG_FILE="" PACKAGE_REBUILD_LIST="fontawesome-fonts" PACKAGE_BUILD_LIST="python3-sphinx_rtd_theme" QUICK_REBUILD=y
+sudo make build-packages CONFIG_FILE="" -j50 QUICK_REBUILD=y PACKAGE_BUILD_LIST="nano vim"

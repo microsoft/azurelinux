@@ -145,6 +145,13 @@ func ExecuteLive(squashErrors bool, program string, args ...string) (err error) 
 // If printOutputOnError is true, the full output of the command will be printed after completion if the command returns an error. In the event
 // the buffer becomes full the oldest buffered output is discarded.
 func ExecuteLiveWithCallback(onStdout, onStderr func(...interface{}), printOutputOnError bool, program string, args ...string) (err error) {
+	return ExecuteLiveWithCallbackInDirectory(onStdout, onStderr, printOutputOnError, program, "", args...)
+}
+
+// ExecuteLiveWithCallback runs a command in the shell and invokes the provided callbacks in real-time on each line of stdout and stderr.
+// If printOutputOnError is true, the full output of the command will be printed after completion if the command returns an error. In the event
+// the buffer becomes full the oldest buffered output is discarded.
+func ExecuteLiveWithCallbackInDirectory(onStdout, onStderr func(...interface{}), printOutputOnError bool, program, workingDirectory string, args ...string) (err error) {
 	var outputChan chan string
 	const outputChanBufferSize = 1500
 
@@ -163,6 +170,10 @@ func ExecuteLiveWithCallback(onStdout, onStderr func(...interface{}), printOutpu
 		return
 	}
 	defer stderrPipe.Close()
+
+	if workingDirectory != "" {
+		cmd.Dir = workingDirectory
+	}
 
 	err = trackAndStartProcess(cmd)
 	if err != nil {

@@ -52,6 +52,7 @@ go_tool_list = \
 	specarchchecker \
 	specreader \
 	srpmpacker \
+	toolchain \
 	validatechroot \
 
 # For each utility "util", create a "out/tools/util" target which references code in "tools/util/"

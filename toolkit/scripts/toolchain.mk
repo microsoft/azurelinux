@@ -48,16 +48,54 @@ $(call create_folder,$(toolchain_build_dir))
 $(call create_folder,$(toolchain_downloads_logs_dir))
 $(call create_folder,$(toolchain_from_repos))
 $(call create_folder,$(populated_toolchain_chroot))
+$(call create_folder,$(MISC_CACHE_DIR)/toolchain)
 
 .PHONY: raw-toolchain toolchain clean-toolchain clean-toolchain-containers check-manifests check-aarch64-manifests check-x86_64-manifests
 ##help:target:raw-toolchain=Build the initial toolchain bootstrap stage.
 raw-toolchain: $(raw_toolchain)
 ##help:target:toolchain=Ensure all toolchain RPMs are present.
-toolchain: $(toolchain_rpms)
+toolchain: go-toolchain-builder#$(toolchain_rpms)
 ifeq ($(REBUILD_TOOLCHAIN),y)
 # If we are rebuilding the toolchain, we also expect the built RPMs to end up in out/RPMS
 toolchain: $(toolchain_out_rpms)
 endif
+
+# $(raw_toolchain): $(toolchain_files)
+# 	@echo "Building raw toolchain"
+# 	cd $(SCRIPTS_DIR)/toolchain && \
+# 		./create_toolchain_in_container.sh \
+# 			$(BUILD_DIR) \
+# 			$(SPECS_DIR) \
+# 			$(SOURCE_URL) \
+# 			$(INCREMENTAL_TOOLCHAIN) \
+# 			$(ARCHIVE_TOOL)
+
+bootstrap-hashing-list = \
+	$(SCRIPTS_DIR)/toolchain/create_toolchain_in_container.sh \
+	$(SCRIPTS_DIR)/toolchain/container/toolchain-sha256sums \
+	$(SCRIPTS_DIR)/toolchain/container/Dockerfile \
+	$(call shell_real_build_only, find $(SCRIPTS_DIR)/toolchain/container/ -name *.sh) \
+	$(call shell_real_build_only, find $(SCRIPTS_DIR)/toolchain/container/ -name *.patch) \
+
+go-toolchain-builder: $(go-toolchain)
+	$(go-toolchain) \
+		--toolchain-rpms-dir="$(TOOLCHAIN_RPMS_DIR)" \
+		--toolchain-manifest="$(TOOLCHAIN_MANIFEST)" \
+		--log-level=$(LOG_LEVEL) \
+		--log-file=$(LOGS_DIR)/toolchain/toolchain-builder.log \
+		$(foreach baseUrl, $(PACKAGE_URL_LIST),--package-urls="$(baseUrl)" ) \
+		$(if $(TLS_CERT),--tls-cert="$(TLS_CERT)") \
+		$(if $(TLS_KEY),--tls-key="$(TLS_KEY)") \
+		--bootstrap-output-file="$(raw_toolchain)" \
+		--bootstrap-script="$(SCRIPTS_DIR)/toolchain/create_toolchain_in_container.sh" \
+		--bootstrap-working-dir="$(SCRIPTS_DIR)/toolchain" \
+		--bootstrap-build-dir="$(BUILD_DIR)" \
+		--bootstrap-specs-dir="$(SPECS_DIR)" \
+		--bootstrap-source-url="$(SOURCE_URL)" \
+		$(if $(INCREMENTAL_TOOLCHAIN),--bootstrap-incremental-toolchain) \
+		--bootstrap-archive-tool="$(ARCHIVE_TOOL)" \
+		$(foreach file, $(bootstrap-hashing-list),--bootstrap-input-files="$(file)" ) \
+		--cache-dir="$(MISC_CACHE_DIR)/toolchain"
 
 clean: clean-toolchain
 
