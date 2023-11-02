@@ -43,7 +43,7 @@ if [ "$INCREMENTAL_TOOLCHAIN" != "y" ] || [ -z "$(docker images -q marinertoolch
     cat > ./container/.bashrc << EOF
 set +h
 umask 022
-LFS=/mnt/lfs
+LFS=/temptoolchain/lfs
 LC_ALL=POSIX
 LFS_TGT=$(uname -m)-lfs-linux-gnu
 PATH=/usr/bin
