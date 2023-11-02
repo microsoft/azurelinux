@@ -25955,8 +25955,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-faraday",
-          "version": "2.5.2",
-          "downloadUrl": "https://github.com/lostisland/faraday/archive/refs/tags/v2.5.2.tar.gz"
+          "version": "2.7.10",
+          "downloadUrl": "https://github.com/lostisland/faraday/archive/refs/tags/v2.7.10.tar.gz"
         }
       }
     },
