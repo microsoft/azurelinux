@@ -26875,8 +26875,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-tzinfo",
-          "version": "2.0.4",
-          "downloadUrl": "https://github.com/tzinfo/tzinfo/archive/refs/tags/v2.0.4.tar.gz"
+          "version": "2.0.6",
+          "downloadUrl": "https://github.com/tzinfo/tzinfo/archive/refs/tags/v2.0.6.tar.gz"
         }
       }
     },

@@ -2,7 +2,7 @@
 %global gem_name tzinfo
 Summary:        Ruby Timezone Library
 Name:           rubygem-%{gem_name}
-Version:        2.0.4
+Version:        2.0.6
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -33,6 +33,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.6-1
+- Auto-upgrade to 2.0.6 - Azure Linux 3.0 - package upgrades
+
 * Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.0.4-1
 - Update to v2.0.4.
 - Build from .tar.gz source.
