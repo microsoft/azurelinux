@@ -2,8 +2,8 @@
 
 Summary:        Declarative definition of command line interfaces for OCaml
 Name:           ocaml-cmdliner
-Version:        1.0.4
-Release:        20%{?dist}
+Version:        1.2.0
+Release:        1%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -102,6 +102,9 @@ chmod -x %{buildroot}%{_libdir}/ocaml/%{libname}/opam
 %{_libdir}/ocaml/%{libname}/*.mli
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.2.0-1
+- Auto-upgrade to 1.2.0 - Azure Linux 3.0 - package upgrades
+
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.4-20
 - Cleaning-up spec. License verified.
 
