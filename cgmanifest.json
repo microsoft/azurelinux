@@ -26475,8 +26475,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-oj",
-          "version": "3.13.11",
-          "downloadUrl": "https://github.com/ohler55/oj/archive/refs/tags/v3.13.11.tar.gz"
+          "version": "3.16.0",
+          "downloadUrl": "https://github.com/ohler55/oj/archive/refs/tags/v3.16.0.tar.gz"
         }
       }
     },
