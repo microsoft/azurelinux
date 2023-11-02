@@ -26355,8 +26355,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-mini_portile2",
-          "version": "2.8.0",
-          "downloadUrl": "https://github.com/flavorjones/mini_portile/archive/refs/tags/v2.8.0.tar.gz"
+          "version": "2.8.4",
+          "downloadUrl": "https://github.com/flavorjones/mini_portile/archive/refs/tags/v2.8.4.tar.gz"
         }
       }
     },
