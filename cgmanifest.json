@@ -3218,8 +3218,8 @@
         "type": "other",
         "other": {
           "name": "elixir",
-          "version": "1.14.3",
-          "downloadUrl": "https://github.com/elixir-lang/elixir/archive/v1.14.3/elixir-1.14.3.tar.gz"
+          "version": "1.15.4",
+          "downloadUrl": "https://github.com/elixir-lang/elixir/archive/v1.15.4/elixir-1.15.4.tar.gz"
         }
       }
     },
