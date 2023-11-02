@@ -24804,8 +24804,8 @@
         "type": "other",
         "other": {
           "name": "python-wrapt",
-          "version": "1.11.2",
-          "downloadUrl": "https://github.com/GrahamDumpleton/wrapt/archive/1.11.2.tar.gz"
+          "version": "1.15.0",
+          "downloadUrl": "https://github.com/GrahamDumpleton/wrapt/archive/1.15.0.tar.gz"
         }
       }
     },
