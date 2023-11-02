@@ -22494,8 +22494,8 @@
         "type": "other",
         "other": {
           "name": "python-gast",
-          "version": "0.5.3",
-          "downloadUrl": "https://github.com/serge-sans-paille/gast/archive/0.5.3/gast-0.5.3.tar.gz"
+          "version": "0.5.4",
+          "downloadUrl": "https://github.com/serge-sans-paille/gast/archive/0.5.4/gast-0.5.4.tar.gz"
         }
       }
     },
