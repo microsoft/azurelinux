@@ -25865,8 +25865,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-cool.io",
-          "version": "1.7.1",
-          "downloadUrl": "https://github.com/tarcieri/cool.io/archive/refs/tags/v1.7.1.tar.gz"
+          "version": "1.8.0",
+          "downloadUrl": "https://github.com/tarcieri/cool.io/archive/refs/tags/v1.8.0.tar.gz"
         }
       }
     },
