@@ -14923,8 +14923,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-topkg",
-          "version": "1.0.3",
-          "downloadUrl": "https://github.com/dbuenzli/topkg/archive/v1.0.3/topkg-1.0.3.tar.gz"
+          "version": "1.0.7",
+          "downloadUrl": "https://github.com/dbuenzli/topkg/archive/v1.0.7/topkg-1.0.7.tar.gz"
         }
       }
     },
