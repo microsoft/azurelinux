@@ -26605,8 +26605,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-rake-compiler",
-          "version": "1.1.9",
-          "downloadUrl": "https://github.com/rake-compiler/rake-compiler/archive/refs/tags/v1.1.9.tar.gz"
+          "version": "1.2.5",
+          "downloadUrl": "https://github.com/rake-compiler/rake-compiler/archive/refs/tags/v1.2.5.tar.gz"
         }
       }
     },
