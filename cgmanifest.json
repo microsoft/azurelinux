@@ -7171,8 +7171,8 @@
         "type": "other",
         "other": {
           "name": "im-chooser",
-          "version": "1.7.3",
-          "downloadUrl": "https://releases.pagure.org/im-chooser/im-chooser-1.7.3.tar.bz2"
+          "version": "1.7.4",
+          "downloadUrl": "https://releases.pagure.org/im-chooser/im-chooser-1.7.4.tar.bz2"
         }
       }
     },
