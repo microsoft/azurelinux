@@ -26125,8 +26125,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-fluent-plugin-prometheus",
-          "version": "2.0.2",
-          "downloadUrl": "https://github.com/fluent/fluent-plugin-prometheus/archive/refs/tags/v2.0.2.tar.gz"
+          "version": "2.1.0",
+          "downloadUrl": "https://github.com/fluent/fluent-plugin-prometheus/archive/refs/tags/v2.1.0.tar.gz"
         }
       }
     },
