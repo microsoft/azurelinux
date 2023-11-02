@@ -26165,8 +26165,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-fluent-plugin-s3",
-          "version": "1.6.0",
-          "downloadUrl": "https://github.com/fluent/fluent-plugin-s3/archive/refs/tags/v1.6.0.tar.gz"
+          "version": "1.7.2",
+          "downloadUrl": "https://github.com/fluent/fluent-plugin-s3/archive/refs/tags/v1.7.2.tar.gz"
         }
       }
     },
