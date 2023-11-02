@@ -25695,8 +25695,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-async-io",
-          "version": "1.33.0",
-          "downloadUrl": "https://github.com/socketry/async-io/archive/refs/tags/v1.33.0.tar.gz"
+          "version": "1.35.0",
+          "downloadUrl": "https://github.com/socketry/async-io/archive/refs/tags/v1.35.0.tar.gz"
         }
       }
     },

@@ -2,7 +2,7 @@
 %global gem_name async-io
 Summary:        Concurrent wrappers for native Ruby IO & Sockets
 Name:           rubygem-%{gem_name}
-Version:        1.33.0
+Version:        1.35.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -32,6 +32,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.35.0-1
+- Auto-upgrade to 1.35.0 - Azure Linux 3.0 - package upgrades
+
 * Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.33.0-1
 - Update to v1.33.0.
 - Build from .tar.gz source.
