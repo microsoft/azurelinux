@@ -22544,8 +22544,8 @@
         "type": "other",
         "other": {
           "name": "python-google-auth-oauthlib",
-          "version": "0.5.3",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/g/google-auth-oauthlib/google-auth-oauthlib-0.5.3.tar.gz"
+          "version": "1.0.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/e3/b4/ef2170c5f6aa5bc2461bab959a84e56d2819ce26662b50038d2d0602223e/google-auth-oauthlib-1.0.0.tar.gz"
         }
       }
     },
