@@ -21664,8 +21664,8 @@
         "type": "other",
         "other": {
           "name": "python-absl-py",
-          "version": "1.2.0",
-          "downloadUrl": "https://github.com/abseil/abseil-py/archive/v1.2.0/abseil-py-1.2.0.tar.gz"
+          "version": "1.4.0",
+          "downloadUrl": "https://github.com/abseil/abseil-py/archive/v1.4.0/abseil-py-1.4.0.tar.gz"
         }
       }
     },

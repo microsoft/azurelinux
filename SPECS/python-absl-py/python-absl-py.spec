@@ -12,7 +12,7 @@ Features:
 
 Summary:        Abseil Python Common Libraries
 Name:           python-absl-py
-Version:        1.2.0
+Version:        1.4.0
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -75,6 +75,9 @@ PYTHONPATH='%{buildroot}/%{python3_sitelib}'; export PYTHONPATH
 %license LICENSE
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.4.0-1
+- Auto-upgrade to 1.4.0 - Azure Linux 3.0 - package upgrades
+
 * Wed Oct 05 2022 Riken Maharjan <rmaharjan@microsoft.com> - 1.2.0-1
 - License verified
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
