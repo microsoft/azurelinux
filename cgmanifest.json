@@ -22344,8 +22344,8 @@
         "type": "other",
         "other": {
           "name": "python-ethtool",
-          "version": "0.14",
-          "downloadUrl": "https://github.com/fedora-python/python-ethtool/archive/refs/tags/v0.14.tar.gz"
+          "version": "0.15",
+          "downloadUrl": "https://github.com/fedora-python/python-ethtool/archive/refs/tags/v0.15.tar.gz"
         }
       }
     },
