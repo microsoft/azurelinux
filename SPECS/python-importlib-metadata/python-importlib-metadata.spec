@@ -1,7 +1,7 @@
 Summary:        Library to access the metadata for a Python package
 Name:           python-importlib-metadata
-Version:        4.11.3
-Release:        2%{?dist}
+Version:        6.8.0
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -70,6 +70,9 @@ rm -rf .pyproject-builddir
 %doc README.rst
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.8.0-1
+- Auto-upgrade to 6.8.0 - Azure Linux 3.0 - package upgrades
+
 * Fri Apr 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.11.3-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.
