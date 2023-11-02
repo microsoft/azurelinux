@@ -14933,8 +14933,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-uuidm",
-          "version": "0.9.7",
-          "downloadUrl": "https://github.com/dbuenzli/uuidm/archive/v0.9.7/uuidm-0.9.7.tar.gz"
+          "version": "0.9.8",
+          "downloadUrl": "https://github.com/dbuenzli/uuidm/archive/v0.9.8/uuidm-0.9.8.tar.gz"
         }
       }
     },
