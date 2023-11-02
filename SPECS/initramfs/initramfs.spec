@@ -109,8 +109,8 @@ fi \
 echo "initramfs" %{version}-%{release} "posttrans" >&2
 %removal_action
 mkinitrd -q
-# Move initrd generated for kernel-mshv to /boot/efi, where linuxloader expects to find it
-mv /boot/initrd.img-*mshv* /boot/efi/ >/dev/null 2>&1 || :
+# Copy initrd generated for kernel-mshv to /boot/efi, where linuxloader expects to find it
+cp /boot/initrd.img-*mshv* /boot/efi/ >/dev/null 2>&1 || :
 %grub2_post
 
 %postun
@@ -142,6 +142,7 @@ echo "initramfs" %{version}-%{release} "postun" >&2
 %changelog
 * Fri Oct 06 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.0.14
 - Ensure grub2-mkconfig is called after the initramfs generation
+- Fix bug with 2.0.13 where we were mv'ing the initrd, not cp'ing as expected. 
 
 * Wed Jun 28 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.0.13
 - Copy the initrd image to /boot/efi to maintain backwards compatibility
