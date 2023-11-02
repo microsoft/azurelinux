@@ -26225,8 +26225,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-fluentd",
-          "version": "1.14.6",
-          "downloadUrl": "https://github.com/fluent/fluentd/archive/refs/tags/v1.14.6.tar.gz"
+          "version": "1.16.2",
+          "downloadUrl": "https://github.com/fluent/fluentd/archive/refs/tags/v1.16.2.tar.gz"
         }
       }
     },
