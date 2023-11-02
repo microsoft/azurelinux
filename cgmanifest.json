@@ -25835,8 +25835,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-concurrent-ruby",
-          "version": "1.1.10",
-          "downloadUrl": "https://github.com/ruby-concurrency/concurrent-ruby/archive/refs/tags/v1.1.10.tar.gz"
+          "version": "1.2.2",
+          "downloadUrl": "https://github.com/ruby-concurrency/concurrent-ruby/archive/refs/tags/v1.2.2.tar.gz"
         }
       }
     },
