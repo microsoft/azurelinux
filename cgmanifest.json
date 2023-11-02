@@ -895,8 +895,8 @@
         "type": "other",
         "other": {
           "name": "babel",
-          "version": "2.9.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/17/e6/ec9aa6ac3d00c383a5731cc97ed7c619d3996232c977bb8326bcbb6c687e/Babel-2.9.1.tar.gz"
+          "version": "2.12.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/ba/42/54426ba5d7aeebde9f4aaba9884596eb2fe02b413ad77d62ef0b0422e205/Babel-2.12.1.tar.gz"
         }
       }
     },

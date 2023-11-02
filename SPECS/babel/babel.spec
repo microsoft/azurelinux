@@ -1,6 +1,6 @@
 Summary:        An integrated collection of utilities that assist in internationalizing and localizing Python applications
 Name:           babel
-Version:        2.9.1
+Version:        2.12.1
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -55,6 +55,9 @@ pip3 install pytest freezegun funcsigs pathlib2 pluggy utils
 %{python3_sitelib}/*
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.12.1-1
+- Auto-upgrade to 2.12.1 - Azure Linux 3.0 - package upgrades
+
 * Tue Mar 08 2022 Andrew Phelps <anphel@microsoft.com> - 2.9.1-1
 - Upgrade to version 2.9.1
 
