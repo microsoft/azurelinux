@@ -8,7 +8,7 @@ while getopts "r:f:v:o:e:" opt; do
         r) rpms_folder="$OPTARG";;
         f) repo_file_path="$OPTARG";;
         v) mariner_version="$OPTARG";;
-        o) sodiff_out_bdir="$OPTARG";;
+        o) sodiff_out_dir="$OPTARG";;
         e) sodiff_script_error="$OPTARG";;
     esac
 done
