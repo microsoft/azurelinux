@@ -22674,8 +22674,8 @@
         "type": "other",
         "other": {
           "name": "python-importlib-metadata",
-          "version": "4.11.3",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/i/importlib_metadata/importlib_metadata-4.11.3.tar.gz"
+          "version": "6.8.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/33/44/ae06b446b8d8263d712a211e959212083a5eda2bf36d57ca7415e03f6f36/importlib_metadata-6.8.0.tar.gz"
         }
       }
     },
