@@ -26465,8 +26465,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-nio4r",
-          "version": "2.5.8",
-          "downloadUrl": "https://github.com/socketry/nio4r/archive/refs/tags/v2.5.8.tar.gz"
+          "version": "2.5.9",
+          "downloadUrl": "https://github.com/socketry/nio4r/archive/refs/tags/v2.5.9.tar.gz"
         }
       }
     },
