@@ -1,5 +1,5 @@
 {
- "Signatures": {
-  "ocaml-cmdliner-1.0.4.tar.gz": "aa57385653992f799cc41a73acd6efac0655f8d4a5184288b402cfcec21a858d"
- }
+  "Signatures": {
+    "ocaml-cmdliner-1.2.0.tar.gz": "59c9dc604be40a50f9a32a83001a826db891a7fb16aa9e7e64d484a03d98d569"
+  }
 }
