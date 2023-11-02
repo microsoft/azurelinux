@@ -49,13 +49,31 @@ var (
 	// Bootstrap script inputs
 	bootstrapOutputFile     = app.Flag("bootstrap-output-file", "Path to the output file.").Required().String()
 	bootstrapScript         = app.Flag("bootstrap-script", "Path to the bootstrap script.").Required().String()
-	bootstrapWorkingDir     = app.Flag("bootstrap-working-dir", "Path to the working directory.").Required().String()
-	bootstrapBuildDir       = app.Flag("bootstrap-build-dir", "Path to the build directory.").Required().String()
-	bootstrapSpecsDir       = app.Flag("bootstrap-specs-dir", "Path to the specs directory.").Required().String()
+	bootstrapWorkingDir     = app.Flag("bootstrap-working-dir", "Path to the working directory.").Required().ExistingDir()
+	bootstrapBuildDir       = app.Flag("bootstrap-build-dir", "Path to the build directory.").Required().ExistingDir()
+	bootstrapSpecsDir       = app.Flag("bootstrap-specs-dir", "Path to the specs directory.").Required().ExistingDir()
 	bootstrapSourceURL      = app.Flag("bootstrap-source-url", "URL to the source code.").Required().String()
 	bootstrapUseIncremental = app.Flag("bootstrap-incremental-toolchain", "Use incremental build mode.").Default("false").Bool()
 	bootstrapArchiveTool    = app.Flag("bootstrap-archive-tool", "Path to the archive tool.").Required().String()
-	bootstrapInputFiles     = app.Flag("bootstrap-input-files", "List of input files to hash for validating the cache.").Required().Strings()
+	bootstrapInputFiles     = app.Flag("bootstrap-input-files", "List of input files to hash for validating the cache.").Required().ExistingFiles()
+
+	// Official build inputs
+	officialBuildOutputFile           = app.Flag("official-build-output-file", "Path to the output file.").Required().String()
+	officialBuildScript               = app.Flag("official-build-script", "Path to the official build script.").Required().String()
+	officialBuildWorkingDir           = app.Flag("official-build-working-dir", "Path to the working directory.").Required().ExistingDir()
+	officialBuildDistTag              = app.Flag("dist-tag", "The distribution tag the SPEC will be built with.").Required().String()
+	officialBuildBuildNumber          = app.Flag("build-number", "The build number the SPEC will be built with.").Required().String()
+	officialBuildReleaseVersion       = app.Flag("release-version", "The release version the SPEC will be built with.").Required().String()
+	officialBuildBuildDir             = app.Flag("official-build-build-dir", "Path to the build directory.").Required().ExistingDir()
+	officialBuildRpmsDir              = app.Flag("official-build-rpms-dir", "Path to the directory containing the built RPMs.").Required().ExistingDir()
+	officialBuildSpecsDir             = app.Flag("official-build-specs-dir", "Path to the directory containing the SPEC files.").Required().ExistingDir()
+	officialBuildRunCheck             = app.Flag("official-build-run-check", "Run the check step after building the RPMs.").Default("false").Bool()
+	officialBuildUseIncremental       = app.Flag("official-build-incremental-toolchain", "Use incremental build mode.").Default("false").Bool()
+	officialBuildIntermediateSrpmsDir = app.Flag("official-build-intermediate-srpms-dir", "Path to the directory containing the intermediate SRPMs.").Required().ExistingDir()
+	officialBuildSrpmsDir             = app.Flag("official-build-srpms-dir", "Path to the directory containing the SRPMs.").Required().ExistingDir()
+	officialBuildToolchainFromRepos   = app.Flag("official-build-toolchain-from-repos", "WHAT IS THIS?").Required().ExistingDir()
+	officialBuildBldTracker           = app.Flag("official-build-bld-tracker", "Path to the bld-tracker tool").Required().ExistingFile()
+	officialBuildTimestampFile        = app.Flag("official-build-timestamp-file", "Path to the timestamp file.").Required().String()
 )
 
 func main() {
@@ -81,17 +99,30 @@ func main() {
 		logger.Log.Fatalf("Failed to read toolchain manifest file '%s': %s", *toolchainManifest, err)
 	}
 
-	caCerts, tlsCerts, err := prepCerts(*tlsClientCert, *tlsClientKey, *caCertFile)
-	if err != nil {
-		logger.Log.Fatalf("Failed to load certificates: %s", err)
-	}
+	// Check if we are already good to go (i.e. all toolchain RPMs are present)
 
 	err = toolchain.CleanToolchainRpms(*toolchainRpmDir, toolchainRPMs)
 	if err != nil {
 		logger.Log.Fatalf("Failed to clean toolchain RPMs: %s", err)
 	}
 
+	ready, _, err := validateToolchainRpms(*toolchainRpmDir, toolchainRPMs)
+	if err != nil {
+		logger.Log.Fatalf("Failed to validate toolchain RPMs are ready: %s", err)
+	}
+	if ready {
+		logger.Log.Infof("Toolchain RPMs are ready.")
+		return
+	}
+
+	// Download toolchain RPMs if they are missing
+
 	if !*forceRebuild {
+		caCerts, tlsCerts, err := prepCerts(*tlsClientCert, *tlsClientKey, *caCertFile)
+		if err != nil {
+			logger.Log.Fatalf("Failed to load certificates: %s", err)
+		}
+
 		err = toolchain.DownloadToolchainRpms(*toolchainRpmDir, toolchainRPMs, *packageURLs, caCerts, tlsCerts, *concurrentNetOps)
 		if err != nil {
 			logger.Log.Fatalf("Failed to download toolchain RPMs: %s", err)
@@ -112,6 +143,8 @@ func main() {
 		return
 	}
 
+	// Bootstrap
+
 	bootstrap := toolchain.BootstrapScript{
 		OutputFile:     *bootstrapOutputFile,
 		ScriptPath:     *bootstrapScript,
@@ -124,25 +157,85 @@ func main() {
 	}
 	bootstrap.InputFiles = append(bootstrap.InputFiles, *bootstrapInputFiles...)
 
-	_, cacheOk, err := toolchain.CheckBootstrapCache(bootstrap, *cacheDir)
+	_, cacheOk, err := bootstrap.CheckCache(*cacheDir)
 	if err != nil {
 		logger.Log.Fatalf("Failed to check bootstrap cache: %s", err)
 	}
 
-	if cacheOk {
-		logger.Log.Infof("Bootstrap cache is valid.")
-		toolchain.RestoreFromCache(bootstrap, *cacheDir)
-		return
+	if cacheOk && !*forceRebuild {
+		logger.Log.Infof("Bootstrap cache is valid, restoring.")
+		err = bootstrap.RestoreFromCache(*cacheDir)
+		if err != nil {
+			logger.Log.Fatalf("Failed to restore bootstrap from cache: %s", err)
+		}
 	} else {
-		err = toolchain.Bootstrap(bootstrap)
+		err = bootstrap.Bootstrap()
 		if err != nil {
 			logger.Log.Fatalf("Failed to bootstrap toolchain: %s", err)
 		} else {
-			_, err = toolchain.AddToCache(bootstrap, *cacheDir)
+			_, err = bootstrap.AddToCache(*cacheDir)
 			if err != nil {
 				logger.Log.Fatalf("Failed to add bootstrap to cache: %s", err)
 			}
 		}
+	}
+
+	// Official build
+
+	official := toolchain.OfficialScript{
+		OutputFile:           *officialBuildOutputFile,
+		ScriptPath:           *officialBuildScript,
+		WorkingDir:           *officialBuildWorkingDir,
+		DistTag:              *officialBuildDistTag,
+		BuildNumber:          *officialBuildBuildNumber,
+		ReleaseVersion:       *officialBuildReleaseVersion,
+		BuildDir:             *officialBuildBuildDir,
+		RpmsDir:              *officialBuildRpmsDir,
+		SpecsDir:             *officialBuildSpecsDir,
+		RunCheck:             *officialBuildRunCheck,
+		UseIncremental:       *officialBuildUseIncremental,
+		IntermediateSrpmsDir: *officialBuildIntermediateSrpmsDir,
+		OutputSrpmsDir:       *officialBuildSrpmsDir,
+		ToolchainFromRepos:   *officialBuildToolchainFromRepos,
+		ToolchainManifest:    *toolchainManifest,
+		BldTracker:           *officialBuildBldTracker,
+		TimestampFile:        *officialBuildTimestampFile,
+	}
+	official.InputFiles = append(official.InputFiles, *toolchainManifest)
+	official.InputFiles = append(official.InputFiles, bootstrap.OutputFile)
+
+	_, cacheOk, err = official.CheckCache(*cacheDir)
+	if err != nil {
+		logger.Log.Fatalf("Failed to check official toolchain rpms cache: %s", err)
+	}
+
+	if cacheOk && !*forceRebuild {
+		logger.Log.Infof("Official toolchain rpms cache is valid, restoring.")
+		err = official.RestoreFromCache(*cacheDir)
+		if err != nil {
+			logger.Log.Fatalf("Failed to restore official toolchain rpms from cache: %s", err)
+		}
+	} else {
+		err = official.BuildOfficialToolchainRpms()
+		if err != nil {
+			logger.Log.Fatalf("Failed to build official toolchain rpms: %s", err)
+		} else {
+			_, err = official.AddToCache(*cacheDir)
+			if err != nil {
+				logger.Log.Fatalf("Failed to add official toolchain rpms to cache: %s", err)
+			}
+		}
+	}
+
+	ready, missingRPMs, err = validateToolchainRpms(*toolchainRpmDir, toolchainRPMs)
+	if err != nil {
+		logger.Log.Fatalf("Failed to validate toolchain RPMs are ready: %s", err)
+	}
+	if !ready {
+		logger.Log.Fatalf("Missing toolchain RPMs: %s", missingRPMs)
+	} else {
+		logger.Log.Infof("Toolchain RPMs are ready.")
+		return
 	}
 }
 

@@ -60,16 +60,6 @@ ifeq ($(REBUILD_TOOLCHAIN),y)
 toolchain: $(toolchain_out_rpms)
 endif
 
-# $(raw_toolchain): $(toolchain_files)
-# 	@echo "Building raw toolchain"
-# 	cd $(SCRIPTS_DIR)/toolchain && \
-# 		./create_toolchain_in_container.sh \
-# 			$(BUILD_DIR) \
-# 			$(SPECS_DIR) \
-# 			$(SOURCE_URL) \
-# 			$(INCREMENTAL_TOOLCHAIN) \
-# 			$(ARCHIVE_TOOL)
-
 bootstrap-hashing-list = \
 	$(SCRIPTS_DIR)/toolchain/create_toolchain_in_container.sh \
 	$(SCRIPTS_DIR)/toolchain/container/toolchain-sha256sums \
@@ -96,6 +86,31 @@ go-toolchain-builder: $(go-toolchain)
 		--bootstrap-archive-tool="$(ARCHIVE_TOOL)" \
 		$(foreach file, $(bootstrap-hashing-list),--bootstrap-input-files="$(file)" ) \
 		--cache-dir="$(MISC_CACHE_DIR)/toolchain"
+
+# $(final_toolchain): $(no_repo_acl) $(raw_toolchain) $(toolchain_rpms_rehydrated) $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag | $(go-bldtracker)
+# 	@echo "Building base packages"
+# 	# Clean the existing chroot if not doing an incremental build
+# 	$(if $(filter y,$(INCREMENTAL_TOOLCHAIN)),,$(SCRIPTS_DIR)/safeunmount.sh "$(populated_toolchain_chroot)" || $(call print_error,failed to clean mounts for toolchain build))
+# 	$(if $(filter y,$(INCREMENTAL_TOOLCHAIN)),,rm -rf $(populated_toolchain_chroot))
+# 	cd $(SCRIPTS_DIR)/toolchain && \
+# 		./build_mariner_toolchain.sh \
+# 			$(DIST_TAG) \
+# 			$(BUILD_NUMBER) \
+# 			$(RELEASE_VERSION) \
+# 			$(BUILD_DIR) \
+# 			$(RPMS_DIR) \
+# 			$(SPECS_DIR) \
+# 			$(RUN_CHECK) \
+# 			$(TOOLCHAIN_MANIFESTS_DIR) \
+# 			$(INCREMENTAL_TOOLCHAIN) \
+# 			$(BUILD_SRPMS_DIR) \
+# 			$(SRPMS_DIR) \
+# 			$(toolchain_from_repos) \
+# 			$(TOOLCHAIN_MANIFEST) \
+# 			$(go-bldtracker) \
+# 			$(TIMESTAMP_DIR)/build_mariner_toolchain.jsonl && \
+# 	$(if $(filter y,$(UPDATE_TOOLCHAIN_LIST)), ls -1 $(toolchain_build_dir)/built_rpms_all > $(MANIFESTS_DIR)/package/toolchain_$(build_arch).txt && ) \
+# 	touch $@
 
 clean: clean-toolchain
 
