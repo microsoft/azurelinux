@@ -26515,8 +26515,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-power_assert",
-          "version": "2.0.1",
-          "downloadUrl": "https://github.com/ruby/power_assert/archive/refs/tags/v2.0.1.tar.gz"
+          "version": "2.0.3",
+          "downloadUrl": "https://github.com/ruby/power_assert/archive/refs/tags/v2.0.3.tar.gz"
         }
       }
     },
