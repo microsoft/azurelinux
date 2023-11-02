@@ -10,7 +10,6 @@ echo LFS root is: $LFS
 
 # 7.2. Changing Ownership
 # Change temp tools to root ownership
-chown -R root:root $LFS/tools
 chown -R root:root $LFS/{usr,lib,var,etc,bin,sbin,tools}
 case $(uname -m) in
   x86_64) chown -R root:root $LFS/lib64 ;;

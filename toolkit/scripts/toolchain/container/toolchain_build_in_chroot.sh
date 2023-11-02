@@ -115,19 +115,10 @@ popd
 rm -rf Python-3.9.13
 touch /logs/status_python39_complete
 
-# checking for perl... no
-# configure: error: perl not found; Texinfo requires Perl.
-# If you have perl installed somewhere not in PATH,
-# specify where it is using
-#   ./configure PERL=/path/to/perl
-#  /usr/lib/perl5/5.38/core_perl/unicore/lib/Bc/ES.pl  
-#configure: error: perl >= 5.8.1 with Encode and Data::Dumper required by Texinfo.
-
 echo Texinfo-7.0.3
 tar xf texinfo-7.0.3.tar.xz
 pushd texinfo-7.0.3
 ./configure --prefix=/usr
-#./configure --prefix=/usr PERL=/usr/bin/perl
 make -j$(nproc)
 make install
 popd
@@ -160,6 +151,7 @@ touch /logs/status_util-linux_complete
 # 7.13. Cleaning up and Saving the Temporary System
 rm -rf /usr/share/{info,man,doc}/*
 find /usr/{lib,libexec} -name \*.la -delete
+# do not delete /tools yet, contains rpm patch file
 #rm -rf /tools
 
 touch /logs/status_build_cross_temp_tools_done
@@ -209,72 +201,6 @@ popd
 rm -rf glibc-2.38
 
 touch /logs/status_glibc_complete
-
-# echo Adjusting the Toolchain
-
-# find / -name ld-linux-x86-64.so.2
-# # The final C library was just installed above. Ajust the toolchain to link newly compiled programs with it.
-# mv -v /tools/bin/{ld,ld-old}
-# mv -v /tools/$BUILD_TARGET/bin/{ld,ld-old}
-# mv -v /tools/bin/{ld-new,ld}
-# ln -sv /tools/bin/ld /tools/$BUILD_TARGET/bin/ld
-# gcc -dumpspecs | sed -e 's@/tools@@g'                   \
-#     -e '/\*startfile_prefix_spec:/{n;s@.*@/usr/lib/ @}' \
-#     -e '/\*cpp:/{n;s@$@ -isystem /usr/include@}' >      \
-#     `dirname $(gcc --print-libgcc-file-name)`/specs
-
-# # Sanity check for adjusted toolchain:
-# echo "Sanity check 4 (raw toolchain - adjusting the toolchain)"
-# set +e
-# echo 'int main(){}' > dummy.c
-# cc dummy.c -v
-# cc dummy.c -v -Wl,--verbose &> dummy.log
-# sleep 3
-# sync
-# # This sets errorlevel..
-# readelf -l a.out | grep ld-linux
-# case $(uname -m) in
-#   x86_64)
-#     echo Expected: '[Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]'
-#   ;;
-#   aarch64)
-#     echo Expected: '[Requesting program interpreter: /lib/ld-linux-aarch64.so.1]'
-#   ;;
-# esac
-# echo End of readelf output
-# grep -o '/usr/lib.*/crt[1in].*succeeded' dummy.log
-# echo Expected output: 'Three similar lines:  /usr/lib/../lib/crt1.o succeeded ...'
-# # Expected output:
-# # /usr/lib/../lib/crt1.o succeeded
-# # /usr/lib/../lib/crti.o succeeded
-# # /usr/lib/../lib/crtn.o succeeded
-# grep -B1 '^ /usr/include' dummy.log
-# # Expected output:
-# # #include <...> search starts here:
-# #  /usr/include
-# grep 'SEARCH.*/usr/lib' dummy.log |sed 's|; |\n|g'
-# echo Expected output: 'SEARCH_DIR("/usr/lib") SEARCH_DIR("/lib")'
-# # Expected output:
-# # SEARCH_DIR("/usr/lib")
-# # SEARCH_DIR("/lib")
-# grep "/lib.*/libc.so.6 " dummy.log
-# echo Expected output: 'attempt to open /lib/libc.so.6 succeeded'
-# # Expected output:
-# # attempt to open /lib/libc.so.6 succeeded
-# grep found dummy.log
-# case $(uname -m) in
-#   x86_64)
-#     echo Expected output 'found ld-linux-x86-64.so.2 at /lib/ld-linux-x86-64.so.2'
-#   ;;
-#   aarch64)
-#     echo Expected output 'found ld-linux-aarch64.so.1 at /lib/ld-linux-aarch64.so.1'
-#   ;;
-# esac
-# # Cleanup
-# rm -v dummy.c a.out dummy.log
-# set -e
-# echo "End sanity check 4"
-# touch /logs/status_adjusting_toolchain_complete
 
 echo Zlib-1.3
 tar xf zlib-1.3.tar.xz
@@ -365,8 +291,6 @@ make install
 popd
 rm -rf m4-1.4.19
 touch /logs/status_m4_complete
-
-# TODO: build BC?
 
 echo Flex-2.6.4
 tar xf flex-2.6.4.tar.gz
@@ -485,10 +409,6 @@ ln -svr /usr/bin/cpp /usr/lib
 ln -sfv ../../libexec/gcc/$(gcc -dumpmachine)/13.2.0/liblto_plugin.so \
         /usr/lib/bfd-plugins/
 
-#ln -sv gcc /usr/bin/cc
-#install -v -dm755 /usr/lib/bfd-plugins
-#ln -sfv ../../libexec/gcc/$(gcc -dumpmachine)/13.2.0/liblto_plugin.so /usr/lib/bfd-plugins/
-
 # Sanity check
 set +e
 echo "Sanity check 5 (raw toolchain - gcc)"
@@ -545,27 +465,6 @@ rm -rf gcc-13.2.0
 
 touch /logs/status_gcc_complete
 
-# andrew  stopped updating for cross tools here
-
-# echo Bzip2-1.0.8
-# tar xf bzip2-1.0.8.tar.gz
-# pushd bzip2-1.0.8
-# sed -i 's@\(ln -s -f \)$(PREFIX)/bin/@\1@' Makefile
-# sed -i "s@(PREFIX)/man@(PREFIX)/share/man@g" Makefile
-# make -f Makefile-libbz2_so
-# make clean
-# make -j$(nproc)
-# make PREFIX=/usr install
-# cp -v bzip2-shared /bin/bzip2
-# cp -av libbz2.so* /lib
-# ln -sv ../../lib/libbz2.so.1.0 /usr/lib/libbz2.so
-# rm -v /usr/bin/{bunzip2,bzcat,bzip2}
-# ln -sv bzip2 /bin/bunzip2
-# ln -sv bzip2 /bin/bzcat
-# popd
-# rm -rf bzip2-1.0.8
-# touch /logs/status_bzip2_complete
-
 echo Pkgconf-2.0.2
 tar xf pkgconf-2.0.2.tar.xz
 pushd pkgconf-2.0.2
@@ -610,20 +509,6 @@ popd
 rm -rf ncurses-6.4
 touch /logs/status_ncurses_complete
 
-# #/bin/sh: line 1: perl: command not found
-# echo libcap-2.60
-# tar xf libcap-2.60.tar.xz
-# pushd libcap-2.60
-# sed -i '/install.*STALIBNAME/d' libcap/Makefile
-# make -j$(nproc)
-# make RAISE_SETFCAP=no lib=lib prefix=/usr install
-# chmod -v 755 /usr/lib/libcap.so.2.60
-# #mv -v /usr/lib/libcap.so.* /lib
-# #ln -sfv ../../lib/$(readlink /usr/lib/libcap.so) /usr/lib/libcap.so
-# popd
-# rm -rf libcap-2.60
-# touch /logs/status_libcap_complete
-
 echo Sed-4.9
 tar xf sed-4.9.tar.xz
 pushd sed-4.9
@@ -633,29 +518,6 @@ make install
 popd
 rm -rf sed-4.9
 touch /logs/status_sed_complete
-
-# echo Bison-3.8.2
-# tar xf bison-3.8.2.tar.xz
-# pushd bison-3.8.2
-# ./configure --prefix=/usr --docdir=/usr/share/doc/bison-3.8.2
-# make -j$(nproc)
-# make install
-# popd
-# rm -rf bison-3.8.2
-# touch /logs/status_bison_complete
-
-# echo Flex-2.6.4
-# tar xf flex-2.6.4.tar.gz
-# pushd flex-2.6.4
-# sed -i "/math.h/a #include <malloc.h>" src/flexdef.h
-# HELP2MAN=/tools/bin/true \
-# ./configure --prefix=/usr --docdir=/usr/share/doc/flex-2.6.4
-# make -j$(nproc)
-# make install
-# ln -sv flex /usr/bin/lex
-# popd
-# rm -rf flex-2.6.4
-# touch /logs/status_flex_complete
 
 echo Gettext-0.22
 tar xf gettext-0.22.tar.xz
@@ -703,11 +565,8 @@ popd
 rm -rf bash-5.1.8
 touch /logs/status_bash_complete
 
+# Login again to use new bash?
 #exec /usr/bin/bash --login
-
-# + tar xf libtool-2.4.6.tar.xz
-# tar: libtool-2.4.6.tar.xz: Cannot open: No such file or directory
-# tar: Error is not recoverable: exiting now
 
 echo Libtool-2.4.6
 tar xf libtool-2.4.6.tar.xz
@@ -800,44 +659,6 @@ popd
 rm -rf automake-1.16.5
 touch /logs/status_automake_complete
 
-# echo Xz-5.4.4
-# tar xf xz-5.4.4.tar.xz
-# pushd xz-5.4.4
-# ./configure --prefix=/usr    \
-#             --disable-static \
-#             --docdir=/usr/share/doc/xz-5.4.4
-# make -j$(nproc)
-# make install
-# popd
-# rm -rf xz-5.4.4
-# touch /logs/status_xz_complete
-
-# echo zstd-1.5.5
-# tar xf zstd-1.5.5.tar.gz
-# pushd zstd-1.5.5
-# make -j$(nproc)
-# make install prefix=/usr pkgconfigdir=/usr/lib/pkgconfig
-# rm -v /usr/lib/libzstd.a
-# popd
-# rm -rf zstd-1.5.5
-# touch /logs/status_zstd_complete
-
-# echo Gettext-0.22
-# tar xf gettext-0.22.tar.xz
-# pushd gettext-0.22
-# ./configure --prefix=/usr    \
-#             --disable-static \
-#             --docdir=/usr/share/doc/gettext-0.22
-# make -j$(nproc)
-# make install
-# chmod -v 0755 /usr/lib/preloadable_libintl.so
-# popd
-# rm -rf gettext-0.22
-# touch /logs/status_gettext_complete
-
-# Andrew
-# Openssl
-
 echo OpenSSL-1.1.1k
 tar xf openssl-1.1.1k.tar.gz
 pushd openssl-1.1.1k
@@ -919,51 +740,6 @@ popd
 rm -rf libffi-3.4.2
 touch /logs/status_libffi_complete
 
-# echo "Perl Test::Warnings"
-# tar xf Test-Warnings-0.028.tar.gz
-# pushd Test-Warnings-0.028
-# env PERL_MM_USE_DEFAULT=1 perl Makefile.PL INSTALLDIRS=vendor
-# make
-# make install
-# find . -name 'perllocal.pod' -delete
-# popd
-# rm -rf Test-Warnings-0.028
-# touch /logs/status_test_warnings_complete
-
-# echo "Perl Text::Template"
-# tar xf Text-Template-1.51.tar.gz
-# pushd Text-Template-1.51
-# env PERL_MM_USE_DEFAULT=1 perl Makefile.PL INSTALLDIRS=vendor
-# make
-# make install
-# find . -name 'perllocal.pod' -delete
-# popd
-# rm -rf Text-Template-1.51
-# touch /logs/status_text_template_complete
-
-# echo OpenSSL-1.1.1k
-# tar xf openssl-1.1.1k.tar.gz
-# pushd openssl-1.1.1k
-# sslarch=
-# ./config --prefix=/usr \
-#          --openssldir=/etc/pki/tls \
-#          --libdir=lib \
-#          enable-ec_nistp_64_gcc_128 \
-#          shared \
-#          zlib-dynamic \
-#          ${sslarch} \
-#          no-mdc2 \
-#          no-sm2 \
-#          no-sm4 \
-#          '-DDEVRANDOM="\"/dev/urandom\""'
-# perl ./configdata.pm -d
-# make all -j$(nproc)
-# sed -i '/INSTALL_LIBS/s/libcrypto.a libssl.a//' Makefile
-# make MANSUFFIX=ssl install
-# popd
-# rm -rf openssl-1.1.1k
-# touch /logs/status_openssl_complete
-
 echo Python-3.9.13
 tar xf Python-3.9.13.tar.xz
 pushd Python-3.9.13
@@ -980,26 +756,15 @@ popd
 rm -rf Python-3.9.13
 touch /logs/status_python39_complete
 
-# ++ uname -m
-# + autoreconf -fiv
-# autoreconf: export WARNINGS=
-# autoreconf: Entering directory '.'
-# autoreconf: running: autopoint --force
-# Can't exec "autopoint": No such file or directory at /usr/share/autoconf/Autom4te/FileUtils.pm line 293.
-# autoreconf: error: autopoint failed with exit status: 2
-
 echo Coreutils-9.4
 tar xf coreutils-9.4.tar.xz
 pushd coreutils-9.4
-set +e
 patch -Np1 -i ../coreutils-9.4-i18n-1.patch
-#patch -Np1 -i ../coreutils-8.32-i18n-1.patch
 case $(uname -m) in
     aarch64)
         patch -Np1 -i /tools/coreutils-fix-get-sys_getdents-aarch64.patch
     ;;
 esac
-set -e
 autoreconf -fiv
 FORCE_UNSAFE_CONFIGURE=1 ./configure \
             --prefix=/usr            \
@@ -1154,8 +919,6 @@ popd
 rm -rf util-linux-2.37.4
 touch /logs/status_util-linux_complete
 
-# Andrew
-
 #
 # These next packages include rpm/rpmbuild and dependencies
 #
@@ -1275,9 +1038,7 @@ mv rpm-"$RPM_WITH_VERSION"-release "$RPM_FOLDER"
 pushd "$RPM_FOLDER"
 
 # Still not in the upstream
-set +e
 patch -Np1 -i /tools/rpm-define-RPM-LD-FLAGS.patch
-set -e
 
 # Do not build docs - pandoc dependency is not supplied in the toolchain.
 sed -iE '/SUBDIRS/ s/docs //' Makefile.am
