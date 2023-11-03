@@ -287,7 +287,7 @@ fi
 %files lang -f %{name}.lang
 
 %changelog
-* Thu Nov 2 2023 Rachel Menge <rachelmenge@microsoft.com> - 250.3-19
+* Thu Nov 02 2023 Rachel Menge <rachelmenge@microsoft.com> - 250.3-19
 - Update CIFS magic to build with 6.1 kernel-headers
 
 * Thu Oct 19 2023 Dan Streetman <ddstreet@ieee.org> - 250.3-18
