@@ -2,8 +2,8 @@
 %define six_version 1.14.0
 Summary:        Case-insensitive ordered dictionary library for Python
 Name:           python-%{pkgname}
-Version:        1.0.2
-Release:        2%{?dist}
+Version:        2.0.1
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -50,6 +50,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} tox -e py%{python3_version_nodots}
 %{python3_sitelib}/*.egg-info
 
 %changelog
+* Fri Nov 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.1-1
+- Auto-upgrade to 2.0.1 - Azure Linux 3.0 - package upgrades
+
 * Fri Dec 16 2022 Sam Meluch <sammeluch@microsoft.com> - 1.0.2-2
 - Update version of tox used for package tests
 
