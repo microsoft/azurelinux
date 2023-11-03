@@ -1,7 +1,7 @@
 Summary:        Systemd-250
 Name:           systemd
 Version:        250.3
-Release:        18%{?dist}
+Release:        19%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -60,6 +60,7 @@ Requires:       libgcrypt
 Requires:       lz4
 Requires:       pam
 Requires:       xz
+Requires:       zstd-libs
 Requires(post): audit-libs
 Requires(post): pam
 Requires(post): util-linux-libs
@@ -286,6 +287,9 @@ fi
 %files lang -f %{name}.lang
 
 %changelog
+* Thu Nov 02 2023 Chris Co <chrco@microsoft.com> - 250.3-19
+- Add zstd-libs as a requires to ensure libzstd.so.1 is present
+
 * Thu Oct 19 2023 Dan Streetman <ddstreet@ieee.org> - 250.3-18
 - Enable zstd support for journalctl, but force journald to not use zstd to keep backwards compatibility
 
