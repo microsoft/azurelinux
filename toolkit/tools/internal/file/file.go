@@ -5,6 +5,7 @@ package file
 
 import (
 	"bufio"
+	"bytes"
 	"crypto/sha1"
 	"crypto/sha256"
 	"encoding/hex"
@@ -18,6 +19,8 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 )
+
+const compareBufferSize = 4096
 
 // IsDir check if a given file path is a directory.
 func IsDir(filePath string) (isDir bool, err error) {
@@ -84,6 +87,131 @@ func Copy(src, dst string) (err error) {
 // dst is assumed to be a file and not a directory. Will change the permissions to the given value.
 func CopyAndChangeMode(src, dst string, dirmode os.FileMode, filemode os.FileMode) (err error) {
 	return copyWithPermissions(src, dst, dirmode, true, filemode)
+}
+
+func CalculateHashes(inputFiles []string) (hash []byte, err error) {
+	fileHasher := sha256.New()
+	for _, inputFile := range inputFiles {
+		// Read the file, and pass into the hasher
+		var data []byte
+		data, err = os.ReadFile(inputFile)
+		if err != nil {
+			err = fmt.Errorf("unable to read input file:\n%w", err)
+			return
+		}
+		_, err = fileHasher.Write(data)
+		if err != nil {
+			err = fmt.Errorf("unable to hash file:\n%w", err)
+			return
+		}
+	}
+	hash = fileHasher.Sum(nil)
+	return
+}
+
+func readOneCompareBlock(in io.Reader, buffer *[]byte) (readSize int, err error) {
+	readSize = 0
+	for currentRead := 0; readSize < compareBufferSize; {
+		currentRead, err = in.Read((*buffer)[readSize:])
+		readSize += currentRead
+		if err != nil {
+			break
+		}
+	}
+	return
+}
+
+func compareFileByteStreams(in1, in2 io.Reader) (isSame bool, err error) {
+	buffer1 := make([]byte, compareBufferSize)
+	buffer2 := make([]byte, compareBufferSize)
+	isSame = true
+	for {
+		var readSize1 int
+		readSize1, err = readOneCompareBlock(in1, &buffer1)
+		if err != nil && err != io.EOF {
+			err = fmt.Errorf("unable to read from input 1 while comparing files:\n%w", err)
+			isSame = false
+			return
+		} else {
+			err = nil
+		}
+
+		var readSize2 int
+		readSize2, err = readOneCompareBlock(in2, &buffer2)
+		if err != nil && err != io.EOF {
+			err = fmt.Errorf("unable to read from input 2 while comparing files:\n%w", err)
+			isSame = false
+			return
+		} else {
+			err = nil
+		}
+
+		if readSize1 != readSize2 {
+			isSame = false
+			return
+		}
+		if readSize1 == 0 {
+			break
+		}
+		if !bytes.Equal(buffer1, buffer2) {
+			isSame = false
+			return
+		}
+	}
+	return
+}
+
+func ContentsAreSame(src, dst string) (isSame bool, err error) {
+	logger.Log.Warnf("Comparing files...")
+	isSame = false
+	srcExists, err := PathExists(src)
+	if err != nil {
+		err = fmt.Errorf("unable to check if destination file exists:\n%w", err)
+		return
+	}
+	dstExists, err := PathExists(dst)
+	if err != nil {
+		err = fmt.Errorf("unable to check if destination file exists:\n%w", err)
+		return
+	}
+	if srcExists && dstExists {
+		// var hash1, hash2 []byte
+		// // check if the files are the same
+		// hash1, err = CalculateHashes([]string{src})
+		// if err != nil {
+		// 	err = fmt.Errorf("unable to calculate hash:\n%w", err)
+		// 	return
+		// }
+		// hash2, err = CalculateHashes([]string{dst})
+		// if err != nil {
+		// 	err = fmt.Errorf("unable to calculate hash:\n%w", err)
+		// 	return
+		// }
+		// if bytes.Equal(hash1, hash2) {
+		// 	// The files are the same, so skip the restore
+		// 	isSame = true
+		// }
+		var srcFile, dstFile *os.File
+		srcFile, err = os.Open(src)
+		if err != nil {
+			err = fmt.Errorf("unable to open source file:\n%w", err)
+			return
+		}
+		defer srcFile.Close()
+		dstFile, err = os.Open(dst)
+		if err != nil {
+			err = fmt.Errorf("unable to open destination file:\n%w", err)
+			return
+		}
+		defer dstFile.Close()
+		isSame, err = compareFileByteStreams(srcFile, dstFile)
+		if err != nil {
+			err = fmt.Errorf("unable to compare files:\n%w", err)
+			return
+		}
+	}
+	logger.Log.Warnf("done: %t", isSame)
+	return
 }
 
 // readLines reads file under path and returns lines as strings and any error encountered

@@ -4,11 +4,18 @@
 package toolchain
 
 import (
+	"archive/tar"
+	"bytes"
+	"compress/gzip"
 	"fmt"
+	"io"
+	"os"
 	"path/filepath"
 
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/systemdependency"
 )
 
 const officialName = "official"
@@ -46,7 +53,36 @@ func (o *OfficialScript) AddToCache(cacheDir string) (string, error) {
 	return addToCache(officialName, o.InputFiles, o.OutputFile, cacheDir)
 }
 
-func (o *OfficialScript) BuildOfficialToolchainRpms() error {
+func (o *OfficialScript) PrepIncrementalRpms(downloadDir string, toolchainRPMs []string) (err error) {
+	for _, rpm := range toolchainRPMs {
+		var fileExists bool
+		srcPath := filepath.Join(downloadDir, rpm)
+		dstPath := filepath.Join(o.ToolchainFromRepos, rpm)
+		fileExists, err = file.PathExists(srcPath)
+
+		if err != nil {
+			return fmt.Errorf("unable to check if rpm exists: %w", err)
+		}
+		if !fileExists {
+			// Just touch an empty file in the delta directory
+			dstFile, fileErr := os.Create(dstPath)
+			if fileErr != nil {
+				err = fmt.Errorf("unable to create delta rpm file: %w", fileErr)
+				return
+			}
+			dstFile.Close()
+		} else {
+			err = file.Copy(srcPath, dstPath)
+			if err != nil {
+				err = fmt.Errorf("unable to restore from cache:\n%w", err)
+				return
+			}
+		}
+	}
+	return
+}
+
+func (o *OfficialScript) BuildOfficialToolchainRpms() (err error) {
 	onStdout := func(args ...interface{}) {
 		line := args[0].(string)
 		logger.Log.Infof("Official Toolchain: %s", line)
@@ -60,6 +96,11 @@ func (o *OfficialScript) BuildOfficialToolchainRpms() error {
 	incrementalArg := "n"
 	if o.UseIncremental {
 		incrementalArg = "y"
+	}
+	gzipTool, err := systemdependency.GzipTool()
+	if err != nil {
+		err = fmt.Errorf("failed to get gzip tool. Error:\n%w", err)
+		return
 	}
 	runCheckArg := "n"
 	if o.RunCheck {
@@ -75,6 +116,7 @@ func (o *OfficialScript) BuildOfficialToolchainRpms() error {
 		runCheckArg,
 		filepath.Dir(o.ToolchainManifest),
 		incrementalArg,
+		gzipTool,
 		o.IntermediateSrpmsDir,
 		o.OutputSrpmsDir,
 		o.ToolchainFromRepos,
@@ -83,10 +125,116 @@ func (o *OfficialScript) BuildOfficialToolchainRpms() error {
 		o.TimestampFile,
 	}
 
-	err := shell.ExecuteLiveWithCallbackInDirectory(onStdout, onStdErr, false, script, o.WorkingDir, args...)
+	err = shell.ExecuteLiveWithCallbackInDirectory(onStdout, onStdErr, false, script, o.WorkingDir, args...)
 	if err != nil {
-		return fmt.Errorf("failed to execute bootstrap script. Error:\n%w", err)
+		err = fmt.Errorf("failed to execute bootstrap script. Error:\n%w", err)
+		return
 	}
 
 	return nil
+}
+
+func (o *OfficialScript) ExtractToolchainRpms(rpmsDir string) (err error) {
+	logger.Log.Infof("Extracting rpms from tar.gz file: %s", o.OutputFile)
+	tarGzFileStream, err := os.Open(o.OutputFile)
+	if err != nil {
+		err = fmt.Errorf("failed to open tar.gz file. Error:\n%w", err)
+		return
+	}
+	defer tarGzFileStream.Close()
+
+	tarStream, err := gzip.NewReader(tarGzFileStream)
+	if err != nil {
+		err = fmt.Errorf("failed to create gzip reader. Error:\n%w", err)
+		return
+	}
+	defer tarStream.Close()
+
+	tarReader := tar.NewReader(tarStream)
+
+	logger.Log.Infof("Extracting rpms from'%s'", o.OutputFile)
+	totalRpms := 0
+	extractedRpms := 0
+	for {
+		header, tarErr := tarReader.Next()
+		if tarErr != nil {
+			if tarErr == io.EOF {
+				logger.Log.Infof("Extracted %d/%d rpms from '%s'", extractedRpms, totalRpms, o.OutputFile)
+				break
+			}
+			err = fmt.Errorf("failed to read tar file. Error:\n%w", tarErr)
+			return
+		}
+
+		// get the individual filename and extract to the current directory
+		filename := filepath.Join(rpmsDir, header.Name)
+
+		switch header.Typeflag {
+		case tar.TypeDir:
+			// Converting to a flat directory structure, ignore directories
+			continue
+		case tar.TypeReg:
+			logger.Log.Debugf("Checking toolchain rpm: '%s'", filename)
+			totalRpms++
+			dstFile := filepath.Join(rpmsDir, filepath.Base(filename))
+
+			tarBytes := make([]byte, header.Size)
+			var size int64 = 0
+			for size < header.Size {
+				var readSize int
+				readSize, err = tarReader.Read(tarBytes[size:])
+				if err != nil {
+					if err != io.EOF {
+						err = fmt.Errorf("failed to read file. Error:\n%w", err)
+						return
+					}
+				}
+				size += int64(readSize)
+			}
+
+			var existingFileOk bool
+			existingFileOk, err = file.PathExists(dstFile)
+			if err != nil {
+				return fmt.Errorf("unable to check if rpm exists: %w", err)
+			}
+			if existingFileOk {
+				logger.Log.Debugf("Checking if file contents are the same: %s", filename)
+				existingFileBytes, readErr := os.ReadFile(dstFile)
+				if err != nil {
+					err = fmt.Errorf("unable to read input file:\n%w", readErr)
+					return
+				}
+				existingFileOk = bytes.Equal(existingFileBytes, tarBytes)
+				if !existingFileOk {
+					logger.Log.Infof("File already exists but has different contents: %s", filename)
+				}
+			}
+
+			if !existingFileOk {
+				extractedRpms++
+				var writer *os.File
+				writer, err = os.Create(dstFile)
+				if err != nil {
+					err = fmt.Errorf("failed to create file. Error:\n%w", err)
+					return err
+				}
+
+				logger.Log.Infof("Extracting toolchain rpm: %s", filename)
+				byteReader := bytes.NewReader(tarBytes)
+				_, err = io.Copy(writer, byteReader)
+				writer.Close()
+
+				if err != nil {
+					err = fmt.Errorf("failed to copy file. Error:\n%w", err)
+					return err
+				}
+			} else {
+				logger.Log.Debugf("File already exists and is the same: %s", filename)
+			}
+		default:
+			err = fmt.Errorf("unknown type: %v in tar file", header.Typeflag)
+			return err
+		}
+	}
+	return
 }

@@ -18,10 +18,11 @@ MARINER_INPUT_SRPMS_DIR=$9
 MARINER_OUTPUT_SRPMS_DIR=${10}
 MARINER_REHYDRATED_RPMS_DIR=${11}
 MARINER_TOOLCHAIN_MANIFESTS_FILE=${12}
+ARCHIVE_TOOL=${13}
 #  Time stamp components
 # =====================================================
-BLDTRACKER=${13}
-TIMESTAMP_FILE_PATH=${14}
+BLDTRACKER=${14}
+TIMESTAMP_FILE_PATH=${15}
 source $(dirname  $0)/../timestamp.sh
 # =====================================================
 
@@ -72,7 +73,7 @@ pushd $MARINER_BUILD_DIR/toolchain
 if [[ ! -d "$LFS/usr" ]]
 then
     echo "$LFS not populated with chroot environment yet, unpacking tarball"
-    tar -xzf toolchain_from_container.tar.gz --checkpoint=100000 --checkpoint-action=echo="%T"
+    tar -I "$ARCHIVE_TOOL" -xf toolchain_from_container.tar.gz --checkpoint=100000 --checkpoint-action=echo="%T"
 fi
 popd
 

@@ -274,6 +274,7 @@ $(final_toolchain): $(no_repo_acl) $(raw_toolchain) $(toolchain_rpms_rehydrated)
 			$(RUN_CHECK) \
 			$(TOOLCHAIN_MANIFESTS_DIR) \
 			$(INCREMENTAL_TOOLCHAIN) \
+			$(ARCHIVE_TOOL) \
 			$(BUILD_SRPMS_DIR) \
 			$(SRPMS_DIR) \
 			$(toolchain_from_repos) \

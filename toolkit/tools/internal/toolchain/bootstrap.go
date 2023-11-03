@@ -8,6 +8,7 @@ import (
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/systemdependency"
 )
 
 const bootstrapName = "bootstrap"
@@ -37,7 +38,7 @@ func (b *BootstrapScript) AddToCache(cacheDir string) (string, error) {
 	return addToCache(bootstrapName, b.InputFiles, b.OutputFile, cacheDir)
 }
 
-func (b *BootstrapScript) Bootstrap() error {
+func (b *BootstrapScript) Bootstrap() (err error) {
 	onStdout := func(args ...interface{}) {
 		line := args[0].(string)
 		logger.Log.Infof("Raw Bootstrap: %s", line)
@@ -45,6 +46,11 @@ func (b *BootstrapScript) Bootstrap() error {
 	onStdErr := func(args ...interface{}) {
 		line := args[0].(string)
 		logger.Log.Warnf("Raw Bootstrap: %s", line)
+	}
+	gzipTool, err := systemdependency.GzipTool()
+	if err != nil {
+		err = fmt.Errorf("failed to get gzip tool. Error:\n%w", err)
+		return
 	}
 
 	script := b.ScriptPath
@@ -57,13 +63,14 @@ func (b *BootstrapScript) Bootstrap() error {
 		b.SpecsDir,
 		b.SourceURL,
 		incrementalArg,
-		b.ArchiveTool,
+		gzipTool,
 	}
 
-	err := shell.ExecuteLiveWithCallbackInDirectory(onStdout, onStdErr, false, script, b.WorkingDir, args...)
+	err = shell.ExecuteLiveWithCallbackInDirectory(onStdout, onStdErr, false, script, b.WorkingDir, args...)
 	if err != nil {
-		return fmt.Errorf("failed to execute bootstrap script. Error:\n%w", err)
+		err = fmt.Errorf("failed to execute bootstrap script. Error:\n%w", err)
+		return
 	}
 
-	return nil
+	return
 }

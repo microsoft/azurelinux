@@ -153,7 +153,6 @@ func main() {
 		SpecsDir:       *bootstrapSpecsDir,
 		SourceURL:      *bootstrapSourceURL,
 		UseIncremental: *bootstrapUseIncremental,
-		ArchiveTool:    *bootstrapArchiveTool,
 	}
 	bootstrap.InputFiles = append(bootstrap.InputFiles, *bootstrapInputFiles...)
 
@@ -216,6 +215,13 @@ func main() {
 			logger.Log.Fatalf("Failed to restore official toolchain rpms from cache: %s", err)
 		}
 	} else {
+		if !*forceRebuild {
+			// Toolchain script expects rpms or empty files in a specific directory do do incremental builds
+			err = official.PrepIncrementalRpms(*toolchainRpmDir, toolchainRPMs)
+			if err != nil {
+				logger.Log.Fatalf("Failed to prep delta rpms: %s", err)
+			}
+		}
 		err = official.BuildOfficialToolchainRpms()
 		if err != nil {
 			logger.Log.Fatalf("Failed to build official toolchain rpms: %s", err)
@@ -225,6 +231,11 @@ func main() {
 				logger.Log.Fatalf("Failed to add official toolchain rpms to cache: %s", err)
 			}
 		}
+	}
+
+	err = official.ExtractToolchainRpms(*toolchainRpmDir)
+	if err != nil {
+		logger.Log.Fatalf("Failed to extract official toolchain rpms: %s", err)
 	}
 
 	ready, missingRPMs, err = validateToolchainRpms(*toolchainRpmDir, toolchainRPMs)
