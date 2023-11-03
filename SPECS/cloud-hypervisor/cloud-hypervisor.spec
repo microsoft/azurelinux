@@ -71,9 +71,6 @@ Cloud Hypervisor is an open source Virtual Machine Monitor (VMM) that runs on to
 %setup -q -n %{name}-%{version}
 %if 0%{?using_vendored_crates}
 tar xf %{SOURCE1}
-pushd vendor/libz-sys/src/zlib
-%patch0 -p1
-popd
 mkdir -p .cargo
 cp %{SOURCE2} .cargo/
 %endif
