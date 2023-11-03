@@ -93,7 +93,7 @@ for package in $( cat "$sodiff_out_dir"/sodiff-intermediate-summary.txt ); do
     # Remove version and release
     package_stem=$(echo "$package" | rev | cut -f1,2 -d'-' --complement | rev)
     # Find a highest version of package built during this run and remove .$ARCH.rpm ending
-    highest_build_ver_pkg=$(grPACKAGE_REBUILD_LIST="${{ parameters.srpmPackList }}" \ep -E "$package_stem-[0-9]" "$sodiff_out_dir"/sodiff-built-packages.txt | sort -Vr | head -n 1 | rev | cut -f1,2,3 -d'.' --complement | rev)
+    highest_build_ver_pkg=$(grep -E "$package_stem-[0-9]" "$sodiff_out_dir"/sodiff-built-packages.txt | sort -Vr | head -n 1 | rev | cut -f1,2,3 -d'.' --complement | rev)
 
     # Check if versions differ
     if [[ "$package" == "$highest_build_ver_pkg" ]]; then
@@ -111,7 +111,7 @@ echo "######################"
 if [[ $pkgsFound -gt 0 ]]; then
     echo "The Following Packages Are in Need of an Update:"
     cat "$sodiff_out_dir"/sodiff-summary.txt
-    if [ "$sodiff_script_error" -eq "true" ] then
+    if [[ "$sodiff_script_error" -eq "true" ]]; then
         exit 1
     fi 
 else
