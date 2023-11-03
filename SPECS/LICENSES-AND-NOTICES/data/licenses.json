@@ -1348,6 +1348,7 @@
                 "perl-Net-HTTP",
                 "perl-Net-IMAP-Simple",
                 "perl-Net-IMAP-Simple-SSL",
+                "perl-Net-IP",
                 "perl-Net-LibIDN2",
                 "perl-Net-Patricia",
                 "perl-Net-SMTP-SSL",

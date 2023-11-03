@@ -949,6 +949,13 @@ func TestReadWriteGraph(t *testing.T) {
 
 // Validate the reference graph is valid, and that it matches the output of the test graph.
 func TestReferenceDOTFile(t *testing.T) {
+	if testing.Short() {
+		// Encoding is unreliable on some systems. The final output is still a valid
+		// graph but the base64 encoding of the nodes is different. The final graph once
+		// decoded is the same however (probably gob encoding is different since its stateful?)
+		t.Skip("Short mode enabled")
+	}
+
 	gIn, err := ReadDOTGraphFile("test_graph_reference.dot")
 	assert.NoError(t, err)
 

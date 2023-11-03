@@ -87,11 +87,13 @@ BUILD_DIR        ?= $(PROJECT_ROOT)/build
 OUT_DIR          ?= $(PROJECT_ROOT)/out
 SPECS_DIR        ?= $(PROJECT_ROOT)/SPECS
 CCACHE_DIR       ?= $(PROJECT_ROOT)/ccache
+CCACHE_CONFIG    ?= $(RESOURCES_DIR)/manifests/package/ccache-configuration.json
 
 # Sub-folder defines
 LOGS_DIR           ?= $(BUILD_DIR)/logs
 PKGBUILD_DIR       ?= $(BUILD_DIR)/pkg_artifacts
 CACHED_RPMS_DIR    ?= $(BUILD_DIR)/rpm_cache
+REPO_QUERY_DIR     ?= $(BUILD_DIR)/repo_query
 BUILD_SRPMS_DIR    ?= $(BUILD_DIR)/INTERMEDIATE_SRPMS
 MACRO_DIR          ?= $(BUILD_DIR)/macros
 BUILD_SPECS_DIR    ?= $(BUILD_DIR)/INTERMEDIATE_SPECS
@@ -182,17 +184,19 @@ include $(SCRIPTS_DIR)/profile.mk
 # Set the variables for build number, distro tag, etc
 include $(SCRIPTS_DIR)/build_tag.mk
 
+# go utilities with:
+#   go-tools, clean-go-tools, go-tidy-all (tidy go utilities before committing) go-test-coverage
+include $(SCRIPTS_DIR)/tools.mk
+
 # Bootstrap the toolchain's compilers and other tools with:
 #   toolchain, raw-toolchain, clean-toolchain, check-manifests, check-x86_64-manifests, check-aarch64-manifests
 include $(SCRIPTS_DIR)/toolchain.mk
 
-# go utilities with:
-#   go-tools, clean-go-tools, go-tidy-all (tidy go utilities before committing) go-test-coverage
 # chroot worker with:
 #   chroot-tools clean-chroot-tools
 # macro definitions with:
 #   macro-tools clean-macro-tools
-include $(SCRIPTS_DIR)/tools.mk
+include $(SCRIPTS_DIR)/chroot.mk
 
 # Create SRPMS from local SPECS with:
 #   input-srpms, clean-input-srpms
@@ -214,6 +218,10 @@ include $(SCRIPTS_DIR)/toolkit.mk
 #   pre-cache
 include $(SCRIPTS_DIR)/precache.mk
 
+# Run repo query under chroot with:
+# repo-query
+include $(SCRIPTS_DIR)/repoquerywrapper.mk
+
 # Create a package build workplan with:
 #   workplan, clean-workplan clean-cache
 # Build a package with:
@@ -225,6 +233,10 @@ include $(SCRIPTS_DIR)/pkggen.mk
 # Create images with:
 #   image, iso, clean-imggen
 include $(SCRIPTS_DIR)/imggen.mk
+
+# Add make targets for sodiff to determine if additional packages are required to be recompiled:
+#  sodiff-check, build-summary, build-package-summary, fake-built-packages-list, sodiff-setup
+include $(SCRIPTS_DIR)/analysis.mk
 
 ##help:target:clean=Clean all built files.
 # Each component provides specific clean implementations which clean depends on.

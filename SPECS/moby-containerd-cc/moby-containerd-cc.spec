@@ -77,7 +77,7 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 
 %changelog
-* Fri Oct 13 2023 Saul Paredes <saulparedes@microsoft.com> - 1.7.2-1
+* Fri Nov 3 2023 Saul Paredes <saulparedes@microsoft.com> - 1.7.2-1
 - Always add TargetLayerDigestLabel label to snapshots
 
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7.1-6
