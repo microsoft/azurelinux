@@ -7,7 +7,7 @@
 Summary:        CRI tools
 Name:           cri-tools
 Version:        1.28.0
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -44,6 +44,12 @@ install -p -m 755 -t %{buildroot}%{_bindir} "${BUILD_FOLDER}/critest"
 %{_bindir}/critest
 
 %changelog
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.28.0-3
+- Bump release to rebuild with go 1.20.10
+
+* Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 1.28.0-2
+- Bump release to rebuild with updated version of Go.
+
 * Wed Sep 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.28.0-1
 - Auto-upgrade to 1.28.0 to fix vendored vulns CVE-2021-38561, CVE-2021-44716,
   CVE-2022-32149, CVE-2022-27664, CVE-2022-29526, CVE-2022-28948

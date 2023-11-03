@@ -12,11 +12,20 @@ import (
 
 // SystemConfig defines how each system present on the image is supposed to be configured.
 type SystemConfig struct {
-	Hostname             string                    `yaml:"Hostname"`
-	AdditionalFiles      map[string]FileConfigList `yaml:"AdditionalFiles"`
-	PostInstallScripts   []Script                  `yaml:"PostInstallScripts"`
-	FinalizeImageScripts []Script                  `yaml:"FinalizeImageScripts"`
-	Users                []User                    `yaml:"Users"`
+	Hostname                string                    `yaml:"Hostname"`
+	UpdateBaseImagePackages bool                      `yaml:"UpdateBaseImagePackages"`
+	PackageListsInstall     []string                  `yaml:"PackageListsInstall"`
+	PackagesInstall         []string                  `yaml:"PackagesInstall"`
+	PackageListsRemove      []string                  `yaml:"PackageListsRemove"`
+	PackagesRemove          []string                  `yaml:"PackagesRemove"`
+	PackageListsUpdate      []string                  `yaml:"PackageListsUpdate"`
+	PackagesUpdate          []string                  `yaml:"PackagesUpdate"`
+	AdditionalFiles         map[string]FileConfigList `yaml:"AdditionalFiles"`
+	PostInstallScripts      []Script                  `yaml:"PostInstallScripts"`
+	FinalizeImageScripts    []Script                  `yaml:"FinalizeImageScripts"`
+	Users                   []User                    `yaml:"Users"`
+	Services                Services                  `yaml:"Services"`
+	Modules                 Modules                   `yaml:"Modules"`
 }
 
 func (s *SystemConfig) IsValid() error {
@@ -54,6 +63,14 @@ func (s *SystemConfig) IsValid() error {
 		if err != nil {
 			return fmt.Errorf("invalid Users item at index %d: %w", i, err)
 		}
+	}
+
+	if err := s.Services.IsValid(); err != nil {
+		return err
+	}
+
+	if err := s.Modules.IsValid(); err != nil {
+		return err
 	}
 
 	return nil

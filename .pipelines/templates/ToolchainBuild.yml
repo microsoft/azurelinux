@@ -10,6 +10,14 @@ parameters:
     type: string
     default: "$(Build.ArtifactStagingDirectory)"
 
+  - name: outputArtifactsLogsSubfolder
+    type: string
+    default: "LOGS"
+
+  - name: outputArtifactsPackagesSubfolder
+    type: string
+    default: "ARTIFACTS"
+
   - name: selfRepoName
     type: string
     default: "CBL-Mariner"
@@ -35,13 +43,13 @@ steps:
     displayName: "Print failed RPMs"
 
   - bash: |
-      published_artifacts_dir="${{ parameters.outputArtifactsFolder }}/ARTIFACTS"
+      published_artifacts_dir="${{ parameters.outputArtifactsFolder }}/${{ parameters.outputArtifactsPackagesSubfolder }}"
       mkdir -p "$published_artifacts_dir"
       cp "${{ parameters.buildRepoRoot }}"/build/toolchain/toolchain_built_{,s}rpms_*.tar.gz "$published_artifacts_dir"
     displayName: "Copy artifacts for publishing"
 
   - bash: |
-      published_logs_dir="${{ parameters.outputArtifactsFolder }}/LOGS"
+      published_logs_dir="${{ parameters.outputArtifactsFolder }}/${{ parameters.outputArtifactsLogsSubfolder }}"
       mkdir -p "$published_logs_dir"
       tar -C "${{ parameters.buildRepoRoot }}/build/logs/toolchain" -czf "$published_logs_dir/toolchain.logs.tar.gz" .
     condition: always()
