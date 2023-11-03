@@ -808,6 +808,7 @@ popd
 rm -rf findutils-4.9.0
 touch /logs/status_findutils_complete
 
+# Groff is only needed for perl and we might be able to remove it.
 echo Groff-1.23.0
 tar xf groff-1.23.0.tar.gz
 pushd groff-1.23.0

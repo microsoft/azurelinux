@@ -2,15 +2,15 @@
 %define _use_internal_dependency_generator 0
 Summary:        Contains the GNU compiler collection
 Name:           gcc
-Version:        11.2.0
-Release:        7%{?dist}
+Version:        13.2.0
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://gcc.gnu.org/
 Source0:        https://ftp.gnu.org/gnu/gcc/%{name}-%{version}/%{name}-%{version}.tar.xz
-Patch0:         CVE-2023-4039.patch
+#Patch0:         CVE-2023-4039.patch
 Requires:       gcc-c++ = %{version}-%{release}
 Requires:       gmp
 Requires:       libgcc-atomic = %{version}-%{release}
@@ -48,14 +48,14 @@ Provides:       libquadmath-devel%{?_isa} = %{version}-%{release}
 The GCC package contains the GNU compiler collection,
 which includes the C and C++ compilers.
 
-%package -n     gfortran
-Summary:        GNU Fortran compiler.
-Group:          Development/Tools
-Requires:       gcc = %{version}-%{release}
-Provides:       gcc-gfortran = %{version}-%{release}
+#%%package -n     gfortran
+#Summary:        GNU Fortran compiler.
+#Group:          Development/Tools
+#Requires:       gcc = %{version}-%{release}
+#Provides:       gcc-gfortran = %{version}-%{release}
 
-%description -n gfortran
-The gfortran package contains GNU Fortran compiler.
+#%%description -n gfortran
+#The gfortran package contains GNU Fortran compiler.
 
 %package -n     libgcc
 Summary:        GNU C Library
@@ -149,17 +149,21 @@ export CFLAGS
 export CXXFLAGS
 export FCFLAGS
 
-SED=sed \
 %configure \
     --enable-shared \
+             LD=ld                    \
     --enable-threads=posix \
     --enable-__cxa_atexit \
     --enable-clocale=gnu \
-    --enable-languages=c,c++,fortran \
+    --enable-languages=c,c++ \
     --disable-multilib \
     --disable-bootstrap \
     --enable-linker-build-id \
     --enable-plugin \
+             --enable-default-pie     \
+             --enable-default-ssp     \
+             --disable-fixincludes    \
+             --disable-libsanitizer                         \
     --enable-default-pie \
     --with-system-zlib
 make %{?_smp_mflags}
@@ -167,14 +171,14 @@ make %{?_smp_mflags}
 %install
 make %{?_smp_mflags} DESTDIR=%{buildroot} install
 install -vdm 755 %{buildroot}/%{_libdir}
-ln -sv %{_bindir}/cpp %{buildroot}/%{_libdir}
+#ln -sv %{_bindir}/cpp %{buildroot}/%{_libdir}
 ln -sv gcc %{buildroot}%{_bindir}/cc
 install -vdm 755 %{buildroot}%{_datarootdir}/gdb/auto-load%{_libdir}
 mv -v %{buildroot}%{_lib64dir}/*gdb.py %{buildroot}%{_datarootdir}/gdb/auto-load%{_libdir}
 chmod 755 %{buildroot}/%{_lib64dir}/libgcc_s.so.1
 
 # Install libbacktrace-static components
-mv %{_host}/libbacktrace/.libs/libbacktrace.a %{buildroot}%{_lib64dir}
+mv host-%{_host}/libbacktrace/.libs/libbacktrace.a %{buildroot}%{_lib64dir}
 mv libbacktrace/backtrace.h %{buildroot}%{_includedir}
 
 rm -rf %{buildroot}%{_infodir}
@@ -200,7 +204,7 @@ $tests_ok
 %files -f %{name}.lang
 %defattr(-,root,root)
 %license COPYING
-%{_libdir}/cpp
+#%%{_libdir}/cpp
 # Executables
 %exclude %{_bindir}/*gfortran
 %exclude %{_bindir}/*c++
@@ -230,11 +234,11 @@ $tests_ok
 %exclude %{_lib64dir}/libstdc++*
 %exclude %{_lib64dir}/libsupc++*
 
-%files -n gfortran
-%defattr(-,root,root)
-%{_bindir}/*gfortran
-%{_mandir}/man1/gfortran.1.gz
-%{_libexecdir}/gcc/%{_arch}-%{_host_vendor}-linux-gnu/%{version}/f951
+#%%files -n gfortran
+#%%defattr(-,root,root)
+#%%{_bindir}/*gfortran
+#%%{_mandir}/man1/gfortran.1.gz
+#%%{_libexecdir}/gcc/%{_arch}-%{_host_vendor}-linux-gnu/%{version}/f951
 
 %files -n libbacktrace-static
 %defattr(-,root,root)
@@ -289,6 +293,9 @@ $tests_ok
 %{_lib64dir}/libgomp.spec
 
 %changelog
+* Thu Nov 02 2023 Andrew Phelps <anphel@microsoft.com> - 13.2.0-1
+- Upgrade to version 13.2.0
+
 * Tue Sep 26 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 11.2.0-7
 - Removing 'exit' calls from the '%%check' section.
 

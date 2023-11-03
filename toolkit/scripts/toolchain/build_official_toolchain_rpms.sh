@@ -486,7 +486,12 @@ build_rpm_in_chroot_no_install cracklib
 # pam needs cracklib
 chroot_and_install_rpms cracklib
 build_rpm_in_chroot_no_install cmake
-build_rpm_in_chroot_no_install pam
+# Temporarily disable PAM due to build error:
+#     /bin/ld: .libs/pam_pwhistory_la-opasswd.o: in function `compare_password':
+#     /usr/src/mariner/BUILD/Linux-PAM-1.5.1/modules/pam_pwhistory/opasswd.c:139:(.text+0x25f): undefined reference to `crypt'
+#     collect2: error: ld returned 1 exit status
+# PAM requires the 'crypt' library, previously provided by glibc, but removed in glibc 2.38
+#build_rpm_in_chroot_no_install pam
 build_rpm_in_chroot_no_install docbook-dtd-xml
 
 # libxslt needs libgcrypt
@@ -494,7 +499,7 @@ chroot_and_install_rpms libgcrypt
 build_rpm_in_chroot_no_install libxslt
 
 # docbook-style-xsl needs pam
-chroot_and_install_rpms pam
+#chroot_and_install_rpms pam
 build_rpm_in_chroot_no_install docbook-style-xsl
 
 # libsolv needs cmake
@@ -583,7 +588,8 @@ build_rpm_in_chroot_no_install tdnf
 
 # Build createrepo_c
 # createrepo_c needs cmake, file, glib
-chroot_and_install_rpms file
+# Provide qualified package name for 'file' to avoid conflict installing 'filesystem' package
+chroot_and_install_rpms file file
 chroot_and_install_rpms glib
 build_rpm_in_chroot_no_install createrepo_c
 
@@ -594,7 +600,7 @@ build_rpm_in_chroot_no_install audit
 
 # rebuild pam with selinux and audit support
 chroot_and_install_rpms audit
-build_rpm_in_chroot_no_install pam
+#build_rpm_in_chroot_no_install pam
 
 # libselinux requires libsepol
 chroot_and_install_rpms libsepol
