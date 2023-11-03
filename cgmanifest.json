@@ -7791,7 +7791,7 @@
         "type": "other",
         "other": {
           "name": "jflex-bootstrap",
-          "version": "1.4.3",
+          "version": "1.9.1",
           "downloadUrl": "https://github.com/jflex-de/jflex/archive/refs/tags/release_1_4_3.tar.gz"
         }
       }
