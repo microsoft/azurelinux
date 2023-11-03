@@ -17,8 +17,9 @@ import (
 )
 
 const (
-	AnonymousAccess     = 0
-	AuthenticatedAccess = 1
+	AnonymousAccess        = 0
+	ServicePrincipalAccess = 1
+	ManagedIdentityAccess  = 2
 )
 
 type AzureBlobStorage struct {
@@ -116,11 +117,25 @@ func Create(tenantId string, userName string, password string, storageAccount st
 
 		return abs, nil
 
-	} else if authenticationType == AuthenticatedAccess {
+	} else if authenticationType == ServicePrincipalAccess {
 
 		credential, err := azidentity.NewClientSecretCredential(tenantId, userName, password, nil)
 		if err != nil {
-			return nil, fmt.Errorf("Unable to init azure identity:\n%w", err)
+			return nil, fmt.Errorf("Unable to init azure service principal identity:\n%w", err)
+		}
+
+		abs.theClient, err = azblob.NewClient(url, credential, nil)
+		if err != nil {
+			return nil, fmt.Errorf("Unable to init azure blob storage read-write client:\n%w", err)
+		}
+
+		return abs, nil
+
+	} else if authenticationType == ManagedIdentityAccess {
+
+		credential, err := azidentity.NewDefaultAzureCredential(nil)
+		if err != nil {
+			return nil, fmt.Errorf("Unable to init azure managed identity:\n%w", err)
 		}
 
 		abs.theClient, err = azblob.NewClient(url, credential, nil)
