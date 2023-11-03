@@ -93,10 +93,13 @@ func UpdateUserPassword(installRoot, username, hashedPassword string) error {
 	shadowFilePath := filepath.Join(installRoot, ShadowFile)
 
 	if hashedPassword == "" {
-		// In the /etc/shadow file, `*` means there is no password and password login is disabled, while still
-		// permitting ssh login using public/private keys.
-		// In theory, `!` should also work. But some versions of ssh interpret that as disabling the user, even for ssh
-		// logins.
+		// In the /etc/shadow file, the values `*` and `!` both mean the user's password login is disabled but the user
+		// may login using other means (e.g. ssh, auto-login, etc.). This interpretation is also used by PAM. When sshd
+		// has `UsePAM` set to `yes`, then sshd defers to PAM the decision on whether or not the user is disabled.
+		// However, when `UsePAM` is set to `no`, then sshd must make this interpretation for itself. And the Mariner
+		// build of sshd is configured to interpret the `!` in the shadow file to mean the user is fully disabled, even
+		// for ssh login. But it interprets `*` to mean that only password login is disabled but sshd public/private key
+		// login is fine.
 		hashedPassword = "*"
 	}
 
