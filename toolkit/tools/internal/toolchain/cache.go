@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 )
 
 func checkCache(name string, inputs []string, cacheDir string) (cachedFile string, cacheOk bool, err error) {
@@ -33,12 +34,31 @@ func restoreFromCache(name string, inputFiles []string, outputFile, cacheDir str
 		return
 	}
 	if cacheOk {
+		var hash1, hash2 string
+		// check if the files are the same
+		hash1, err = calculateHash([]string{cachedFile})
+		if err != nil {
+			err = fmt.Errorf("unable to calculate hash:\n%w", err)
+			return
+		}
+		hash2, err = calculateHash([]string{outputFile})
+		if err != nil {
+			err = fmt.Errorf("unable to calculate hash:\n%w", err)
+			return
+		}
+		if hash1 == hash2 {
+			// The files are the same, so skip the restore
+			logger.Log.Infof("Skipping restore from cache, files (%s, %s) are the same", cachedFile, outputFile)
+			return
+		}
+
 		// Move the cached file to the output file
-		err = file.Move(cachedFile, outputFile)
+		err = file.Copy(cachedFile, outputFile)
 		if err != nil {
 			err = fmt.Errorf("unable to restore from cache:\n%w", err)
 			return
 		}
+		logger.Log.Debugf("Cache restored '%s' to '%s'", cachedFile, outputFile)
 	}
 	return
 }
@@ -78,7 +98,7 @@ func addToCache(name string, inputs []string, srcFile, cacheDir string) (cachedF
 		return "", fmt.Errorf("unable to get cache file path:\n%w", err)
 	}
 
-	err = file.Move(srcFile, cachedFile)
+	err = file.Copy(srcFile, cachedFile)
 	if err != nil {
 		return "", fmt.Errorf("unable to move bootstrap file to cache:\n%w", err)
 	}

@@ -67,7 +67,7 @@ bootstrap-hashing-list = \
 	$(call shell_real_build_only, find $(SCRIPTS_DIR)/toolchain/container/ -name *.sh) \
 	$(call shell_real_build_only, find $(SCRIPTS_DIR)/toolchain/container/ -name *.patch) \
 
-go-toolchain-builder: $(go-toolchain)
+go-toolchain-builder: $(no_repo_acl) $(go-toolchain)  $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag $(go-bldtracker)
 	$(go-toolchain) \
 		--toolchain-rpms-dir="$(TOOLCHAIN_RPMS_DIR)" \
 		--toolchain-manifest="$(TOOLCHAIN_MANIFEST)" \
@@ -76,6 +76,8 @@ go-toolchain-builder: $(go-toolchain)
 		$(foreach baseUrl, $(PACKAGE_URL_LIST),--package-urls="$(baseUrl)" ) \
 		$(if $(TLS_CERT),--tls-cert="$(TLS_CERT)") \
 		$(if $(TLS_KEY),--tls-key="$(TLS_KEY)") \
+		--cache-dir="$(MISC_CACHE_DIR)/toolchain" \
+		\
 		--bootstrap-output-file="$(raw_toolchain)" \
 		--bootstrap-script="$(SCRIPTS_DIR)/toolchain/create_toolchain_in_container.sh" \
 		--bootstrap-working-dir="$(SCRIPTS_DIR)/toolchain" \
@@ -85,32 +87,23 @@ go-toolchain-builder: $(go-toolchain)
 		$(if $(INCREMENTAL_TOOLCHAIN),--bootstrap-incremental-toolchain) \
 		--bootstrap-archive-tool="$(ARCHIVE_TOOL)" \
 		$(foreach file, $(bootstrap-hashing-list),--bootstrap-input-files="$(file)" ) \
-		--cache-dir="$(MISC_CACHE_DIR)/toolchain"
-
-# $(final_toolchain): $(no_repo_acl) $(raw_toolchain) $(toolchain_rpms_rehydrated) $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag | $(go-bldtracker)
-# 	@echo "Building base packages"
-# 	# Clean the existing chroot if not doing an incremental build
-# 	$(if $(filter y,$(INCREMENTAL_TOOLCHAIN)),,$(SCRIPTS_DIR)/safeunmount.sh "$(populated_toolchain_chroot)" || $(call print_error,failed to clean mounts for toolchain build))
-# 	$(if $(filter y,$(INCREMENTAL_TOOLCHAIN)),,rm -rf $(populated_toolchain_chroot))
-# 	cd $(SCRIPTS_DIR)/toolchain && \
-# 		./build_mariner_toolchain.sh \
-# 			$(DIST_TAG) \
-# 			$(BUILD_NUMBER) \
-# 			$(RELEASE_VERSION) \
-# 			$(BUILD_DIR) \
-# 			$(RPMS_DIR) \
-# 			$(SPECS_DIR) \
-# 			$(RUN_CHECK) \
-# 			$(TOOLCHAIN_MANIFESTS_DIR) \
-# 			$(INCREMENTAL_TOOLCHAIN) \
-# 			$(BUILD_SRPMS_DIR) \
-# 			$(SRPMS_DIR) \
-# 			$(toolchain_from_repos) \
-# 			$(TOOLCHAIN_MANIFEST) \
-# 			$(go-bldtracker) \
-# 			$(TIMESTAMP_DIR)/build_mariner_toolchain.jsonl && \
-# 	$(if $(filter y,$(UPDATE_TOOLCHAIN_LIST)), ls -1 $(toolchain_build_dir)/built_rpms_all > $(MANIFESTS_DIR)/package/toolchain_$(build_arch).txt && ) \
-# 	touch $@
+		\
+		--official-build-output-file="$(final_toolchain)" \
+		--official-build-script="$(SCRIPTS_DIR)/toolchain/build_mariner_toolchain.sh" \
+		--official-build-working-dir="$(SCRIPTS_DIR)/toolchain" \
+		--official-build-dist-tag="$(DIST_TAG)" \
+		--official-build-build-number="$(BUILD_NUMBER)" \
+		--official-build-release-version="$(RELEASE_VERSION)" \
+		--official-build-build-dir="$(BUILD_DIR)" \
+		--official-build-rpms-dir="$(RPMS_DIR)" \
+		--official-build-specs-dir="$(SPECS_DIR)" \
+		$(if $(RUN_CHECK),--official-build-run-check) \
+		$(if $(INCREMENTAL_TOOLCHAIN),--official-build-incremental-toolchain) \
+		--official-build-intermediate-srpms-dir="$(BUILD_SRPMS_DIR)" \
+		--official-build-srpms-dir="$(SRPMS_DIR)" \
+		--official-build-toolchain-from-repos="$(toolchain_from_repos)" \
+		--official-build-bld-tracker="$(go-bldtracker)" \
+		--official-build-timestamp-file="$(TIMESTAMP_DIR)/build_mariner_toolchain.jsonl"
 
 clean: clean-toolchain
 

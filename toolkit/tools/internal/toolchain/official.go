@@ -53,7 +53,7 @@ func (o *OfficialScript) BuildOfficialToolchainRpms() error {
 	}
 	onStdErr := func(args ...interface{}) {
 		line := args[0].(string)
-		logger.Log.Warnf("Official Toolchain: %s", line)
+		logger.Log.Debugf("Official Toolchain: %s", line)
 	}
 
 	script := o.ScriptPath
