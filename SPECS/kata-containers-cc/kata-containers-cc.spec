@@ -8,7 +8,7 @@
 
 Name:         kata-containers-cc
 Version:      0.6.1
-Release:      3%{?dist}
+Release:      4%{?dist}
 Summary:      Kata Confidential Containers
 License:      ASL 2.0
 Vendor:       Microsoft Corporation
@@ -19,6 +19,7 @@ Source2:      %{name}-%{version}-cargo.tar.gz
 Source3:      mariner-coco-build-uvm.sh
 Patch0:       0001-tardev-snapshotter-enable-feature-impl_trait_in_asso.patch
 Patch1:       drop-mut-for-variables-that-are-not-mutated.patch
+Patch2:       keep-uvm-rootfs-dependencies.patch
 
 ExclusiveArch: x86_64
 
@@ -290,8 +291,11 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %exclude %{osbuilder}/tools/osbuilder/rootfs-builder/ubuntu
 
 %changelog
-* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.6.1-3
-- Bump release to rebuild with go 1.20.10
+*   Fri Nov 3 2023 Dallas Delaney <dadelan@microsoft.com> - 0.6.1-4
+-   Add patch to retain UVM rootfs dependencies
+
+*   Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.6.1-3
+-   Bump release to rebuild with go 1.20.10
 
 *   Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 0.6.1-2
 -   Bump release to rebuild with updated version of Go.

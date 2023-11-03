@@ -1,0 +1,32 @@
+From 6e102a0341a926d8c271bf04472a87d924569910 Mon Sep 17 00:00:00 2001
+From: dallasd1 <dadelan@microsoft.com>
+Date: Fri, 3 Nov 2023 08:35:42 -0700
+Subject: [PATCH] Don't remove UVM packages with dependencies and add back
+ zstd-lib dependency
+
+---
+ tools/osbuilder/rootfs-builder/cbl-mariner/rootfs_lib.sh | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/tools/osbuilder/rootfs-builder/cbl-mariner/rootfs_lib.sh b/tools/osbuilder/rootfs-builder/cbl-mariner/rootfs_lib.sh
+index 0988f08f6..7663c669e 100644
+--- a/tools/osbuilder/rootfs-builder/cbl-mariner/rootfs_lib.sh
++++ b/tools/osbuilder/rootfs-builder/cbl-mariner/rootfs_lib.sh
+@@ -78,13 +78,12 @@ build_rootfs()
+ 		"tar" \
+ 		"tzdata" \
+ 		"xz" \
+-		"zstd-libs" \
+ 	)
+ 
+ 	for MARINER_REMOVED_PACKAGE in ${MARINER_REMOVED_PACKAGES[@]}
+ 	do
+ 		info "removing package ${MARINER_REMOVED_PACKAGE}"
+-		rpm -e "${MARINER_REMOVED_PACKAGE}" --nodeps --root=${ROOTFS_DIR}
++		rpm -e "${MARINER_REMOVED_PACKAGE}" --root=${ROOTFS_DIR}
+ 	done
+ 
+ 	rm -rf ${ROOTFS_DIR}/usr/share/{bash-completion,cracklib,doc,info,locale,man,misc,pixmaps,terminfo,zoneinfo,zsh}
+-- 
+2.17.1
+
