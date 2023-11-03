@@ -93,8 +93,11 @@ func UpdateUserPassword(installRoot, username, hashedPassword string) error {
 	shadowFilePath := filepath.Join(installRoot, ShadowFile)
 
 	if hashedPassword == "" {
-		// In the /etc/shadow file, `!` means there is no password and password login is disabled.
-		hashedPassword = "!"
+		// In the /etc/shadow file, `*` means there is no password and password login is disabled, while still
+		// permitting ssh login using public/private keys.
+		// In theory, `!` should also work. But some versions of ssh interpret that as disabling the user, even for ssh
+		// logins.
+		hashedPassword = "*"
 	}
 
 	// Find the line that starts with "<user>:<password>:..."
