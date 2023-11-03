@@ -26055,8 +26055,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-faraday-retry",
-          "version": "1.0.1",
-          "downloadUrl": "https://github.com/lostisland/faraday-retry/archive/refs/tags/v1.0.1.tar.gz"
+          "version": "2.2.0",
+          "downloadUrl": "https://github.com/lostisland/faraday-retry/archive/refs/tags/v2.2.0.tar.gz"
         }
       }
     },
