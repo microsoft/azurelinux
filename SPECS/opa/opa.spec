@@ -4,7 +4,6 @@
 %global short_commit    e88ad165
 Summary:        Open source, general-purpose policy engine
 Name:           opa
-<<<<<<< HEAD
 Version:        0.55.0
 Release:        1%{?dist}
 # Upstream license specification: MIT and Apache-2.0
