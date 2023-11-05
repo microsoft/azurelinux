@@ -483,7 +483,9 @@ build_rpm_in_chroot_no_install curl
 # cracklib needs python3-setuptools (installed with python3)
 build_rpm_in_chroot_no_install cracklib
 
-# pam needs cracklib
+# pam needs cracklib and libxcrypt
+build_rpm_in_chroot_no_install libxcrypt
+chroot_and_install_rpms libxcrypt
 chroot_and_install_rpms cracklib
 build_rpm_in_chroot_no_install cmake
 # Temporarily disable PAM due to build error:
@@ -491,7 +493,7 @@ build_rpm_in_chroot_no_install cmake
 #     /usr/src/mariner/BUILD/Linux-PAM-1.5.1/modules/pam_pwhistory/opasswd.c:139:(.text+0x25f): undefined reference to `crypt'
 #     collect2: error: ld returned 1 exit status
 # PAM requires the 'crypt' library, previously provided by glibc, but removed in glibc 2.38
-#build_rpm_in_chroot_no_install pam
+build_rpm_in_chroot_no_install pam
 build_rpm_in_chroot_no_install docbook-dtd-xml
 
 # libxslt needs libgcrypt
@@ -499,7 +501,7 @@ chroot_and_install_rpms libgcrypt
 build_rpm_in_chroot_no_install libxslt
 
 # docbook-style-xsl needs pam
-#chroot_and_install_rpms pam
+chroot_and_install_rpms pam
 build_rpm_in_chroot_no_install docbook-style-xsl
 
 # libsolv needs cmake
@@ -600,7 +602,7 @@ build_rpm_in_chroot_no_install audit
 
 # rebuild pam with selinux and audit support
 chroot_and_install_rpms audit
-#build_rpm_in_chroot_no_install pam
+build_rpm_in_chroot_no_install pam
 
 # libselinux requires libsepol
 chroot_and_install_rpms libsepol

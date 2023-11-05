@@ -240,11 +240,6 @@ touch $LFS/logs/temptoolchain/status_bash_complete
 echo Coreutils-9.4
 tar xf coreutils-9.4.tar.xz
 pushd coreutils-9.4
-case $(uname -m) in
-    aarch64)
-        patch -Np1 -i /tools/coreutils-fix-get-sys_getdents-aarch64.patch
-    ;;
-esac
 ./configure --prefix=/usr                     \
             --host=$LFS_TGT                   \
             --build=$(build-aux/config.guess) \

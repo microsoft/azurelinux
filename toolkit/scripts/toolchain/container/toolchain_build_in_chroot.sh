@@ -760,11 +760,6 @@ echo Coreutils-9.4
 tar xf coreutils-9.4.tar.xz
 pushd coreutils-9.4
 patch -Np1 -i ../coreutils-9.4-i18n-1.patch
-case $(uname -m) in
-    aarch64)
-        patch -Np1 -i /tools/coreutils-fix-get-sys_getdents-aarch64.patch
-    ;;
-esac
 autoreconf -fiv
 FORCE_UNSAFE_CONFIGURE=1 ./configure \
             --prefix=/usr            \
