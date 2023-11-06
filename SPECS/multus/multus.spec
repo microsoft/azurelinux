@@ -55,7 +55,8 @@ VERSION=%{version} COMMIT=%{commit} ./hack/build-go.sh
 
 %install
 install -D -m0755 bin/multus %{buildroot}%{_bindir}/multus
-install -D -m0755 cmd/thin_entrypoint %{buildroot}%{_bindir}/thin_entrypoint
+install -D -m0755 bin/thin_entrypoint %{buildroot}%{_bindir}/thin_entrypoint
+install -D -m0755 bin/install_multus %{buildroot}%{_bindir}/install_multus
 install -D -m0644 images/multus-daemonset-crio.yml %{buildroot}%{_datadir}/k8s-yaml/multus/multus.yaml
 
 %files
@@ -63,6 +64,7 @@ install -D -m0644 images/multus-daemonset-crio.yml %{buildroot}%{_datadir}/k8s-y
 %doc README.md
 %{_bindir}/multus
 %{_bindir}/thin_entrypoint
+%{_bindir}/install_multus
 
 %files k8s-yaml
 %dir %{_datarootdir}/k8s-yaml
