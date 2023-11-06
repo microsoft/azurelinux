@@ -145,8 +145,8 @@
         "type": "other",
         "other": {
           "name": "alsa-lib",
-          "version": "1.2.6.1",
-          "downloadUrl": "https://www.alsa-project.org/files/pub/lib/alsa-lib-1.2.6.1.tar.bz2"
+          "version": "1.2.9",
+          "downloadUrl": "https://www.alsa-project.org/files/pub/lib/alsa-lib-1.2.9.tar.bz2"
         }
       }
     },
