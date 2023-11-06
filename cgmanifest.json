@@ -29147,8 +29147,8 @@
         "type": "other",
         "other": {
           "name": "vala",
-          "version": "0.54.6",
-          "downloadUrl": "http://download.gnome.org/sources/vala/0.54/vala-0.54.6.tar.xz"
+          "version": "0.56.9",
+          "downloadUrl": "http://download.gnome.org/sources/vala/0.56/vala-0.56.9.tar.xz"
         }
       }
     },
