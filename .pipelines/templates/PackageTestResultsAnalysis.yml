@@ -43,6 +43,7 @@ steps:
         displayName: "Authenticate to custom pip artifact feeds"
 
   - bash: pip3 install junit_xml
+    retryCountOnTaskFailure: 1
     displayName: "Install Python dependencies"
 
   - task: PythonScript@0
