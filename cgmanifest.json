@@ -8091,8 +8091,8 @@
         "type": "other",
         "other": {
           "name": "keepalived",
-          "version": "2.2.7",
-          "downloadUrl": "https://www.keepalived.org/software/keepalived-2.2.7.tar.gz"
+          "version": "2.2.8",
+          "downloadUrl": "https://www.keepalived.org/software/keepalived-2.2.8.tar.gz"
         }
       }
     },
