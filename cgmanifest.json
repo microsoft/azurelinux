@@ -15194,8 +15194,8 @@
         "type": "other",
         "other": {
           "name": "openmpi",
-          "version": "4.1.4",
-          "downloadUrl": "https://www.open-mpi.org/software/ompi/v4.1/downloads/openmpi-4.1.4.tar.bz2"
+          "version": "4.1.5",
+          "downloadUrl": "https://www.open-mpi.org/software/ompi/v4.1/downloads/openmpi-4.1.5.tar.bz2"
         }
       }
     },
