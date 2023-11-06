@@ -11431,8 +11431,8 @@
         "type": "other",
         "other": {
           "name": "libvirt-java",
-          "version": "0.5.2",
-          "downloadUrl": "https://libvirt.org/sources/java/libvirt-java-0.5.2.tar.gz"
+          "version": "0.5.3",
+          "downloadUrl": "https://libvirt.org/sources/java/libvirt-java-0.5.3.tar.gz"
         }
       }
     },
