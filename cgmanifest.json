@@ -28617,8 +28617,8 @@
         "type": "other",
         "other": {
           "name": "tpm2-abrmd",
-          "version": "2.4.0",
-          "downloadUrl": "https://github.com/tpm2-software/tpm2-abrmd/releases/download/2.4.0/tpm2-abrmd-2.4.0.tar.gz"
+          "version": "3.0.0",
+          "downloadUrl": "https://github.com/tpm2-software/tpm2-abrmd/releases/download/3.0.0/tpm2-abrmd-3.0.0.tar.gz"
         }
       }
     },
