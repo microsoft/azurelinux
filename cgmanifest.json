@@ -8191,8 +8191,8 @@
         "type": "other",
         "other": {
           "name": "kexec-tools",
-          "version": "2.0.23",
-          "downloadUrl": "http://kernel.org/pub/linux/utils/kernel/kexec/kexec-tools-2.0.23.tar.xz"
+          "version": "2.0.27",
+          "downloadUrl": "http://kernel.org/pub/linux/utils/kernel/kexec/kexec-tools-2.0.27.tar.xz"
         }
       }
     },
