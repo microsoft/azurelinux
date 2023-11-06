@@ -1,8 +1,8 @@
 %bcond_without bootstrap
 Summary:        Tools to manage artifacts and deployment
 Name:           maven-wagon
-Version:        3.5.1
-Release:        4%{?dist}
+Version:        3.5.3
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -73,6 +73,9 @@ following providers:
 %doc DEPENDENCIES
 
 %changelog
+* Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.3-1
+- Auto-upgrade to 3.5.3 - Azure Linux 3.0 - package upgrades
+
 * Fri Mar 24 2023 Riken Maharjan <rmaharjan@microsoft.com> - 3.5.1-4
 - Initial CBL-Mariner import from Fedora 38 (license: MIT)
 - License verified
