@@ -26985,8 +26985,8 @@
         "type": "other",
         "other": {
           "name": "sanlock",
-          "version": "3.8.4",
-          "downloadUrl": "https://releases.pagure.org/sanlock/sanlock-3.8.4.tar.gz"
+          "version": "3.8.5",
+          "downloadUrl": "https://releases.pagure.org/sanlock/sanlock-3.8.5.tar.gz"
         }
       }
     },
