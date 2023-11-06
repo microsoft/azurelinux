@@ -1947,8 +1947,8 @@
         "type": "other",
         "other": {
           "name": "colord",
-          "version": "1.4.4",
-          "downloadUrl": "https://www.freedesktop.org/software/colord/releases/colord-1.4.4.tar.xz"
+          "version": "1.4.6",
+          "downloadUrl": "https://www.freedesktop.org/software/colord/releases/colord-1.4.6.tar.xz"
         }
       }
     },
