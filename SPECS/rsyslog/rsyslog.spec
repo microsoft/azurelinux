@@ -2,8 +2,8 @@
 
 Summary:        Rocket-fast system for log processing
 Name:           rsyslog
-Version:        8.2204.1
-Release:        3%{?dist}
+Version:        8.2308.0
+Release:        1%{?dist}
 License:        GPLv3+ AND ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -175,6 +175,9 @@ fi
 %doc %{_docdir}/%{name}/html
 
 %changelog
+* Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.2308.0-1
+- Auto-upgrade to 8.2308.0 - Azure Linux 3.0 - package upgrades
+
 * Wed Oct 12 2022 Nan Liu <liunan@microsoft.com> - 8.2204.1-3
 - Add rsyslog configuration file to /etc/logrotate.d
 
