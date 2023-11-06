@@ -10921,8 +10921,8 @@
         "type": "other",
         "other": {
           "name": "libsigc++30",
-          "version": "3.2.0",
-          "downloadUrl": "https://github.com/libsigcplusplus/libsigcplusplus/releases/download/3.2.0/libsigc++-3.2.0.tar.xz"
+          "version": "3.4.0",
+          "downloadUrl": "https://github.com/libsigcplusplus/libsigcplusplus/releases/download/3.4.0/libsigc++-3.4.0.tar.xz"
         }
       }
     },
