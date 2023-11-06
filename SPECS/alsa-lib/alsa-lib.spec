@@ -1,7 +1,7 @@
 Summary:        ALSA library
 Name:           alsa-lib
-Version:        1.2.6.1
-Release:        2%{?dist}
+Version:        1.2.9
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -46,6 +46,9 @@ make DESTDIR=%{buildroot} install
 %{_includedir}/*
 
 %changelog
+* Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.2.9-1
+- Auto-upgrade to 1.2.9 - test
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.2.6.1-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
