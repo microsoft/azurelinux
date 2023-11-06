@@ -2247,8 +2247,8 @@
         "type": "other",
         "other": {
           "name": "cri-o",
-          "version": "1.21.2",
-          "downloadUrl": "https://github.com/cri-o/cri-o/archive/refs/tags/v1.21.2.tar.gz"
+          "version": "1.28.0",
+          "downloadUrl": "https://github.com/cri-o/cri-o/archive/refs/tags/v1.28.0.tar.gz"
         }
       }
     },
