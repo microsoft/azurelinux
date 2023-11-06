@@ -292,6 +292,9 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 *   Fri Nov 3 2023 Dallas Delaney <dadelan@microsoft.com> 0.6.2-1
 -   Upgrade to version 0.6.2
 
+*   Fri Nov 3 2023 Dallas Delaney <dadelan@microsoft.com> - 0.6.1-4
+-   Add patch to retain UVM rootfs dependencies
+
 *   Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.6.1-3
 -   Bump release to rebuild with go 1.20.10
 
