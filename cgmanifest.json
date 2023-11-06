@@ -9071,8 +9071,8 @@
         "type": "other",
         "other": {
           "name": "libdrm",
-          "version": "2.4.115",
-          "downloadUrl": "https://dri.freedesktop.org/libdrm/libdrm-2.4.115.tar.xz"
+          "version": "2.4.116",
+          "downloadUrl": "https://dri.freedesktop.org/libdrm/libdrm-2.4.116.tar.xz"
         }
       }
     },
