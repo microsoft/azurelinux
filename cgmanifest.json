@@ -14563,8 +14563,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-cmdliner",
-          "version": "1.2.0",
-          "downloadUrl": "https://github.com/dbuenzli/cmdliner/archive/v1.2.0/ocaml-cmdliner-1.2.0.tar.gz"
+          "version": "1.0.4",
+          "downloadUrl": "https://github.com/dbuenzli/cmdliner/archive/v1.0.4/ocaml-cmdliner-1.0.4.tar.gz"
         }
       }
     },
