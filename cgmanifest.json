@@ -25455,8 +25455,8 @@
         "type": "other",
         "other": {
           "name": "rng-tools",
-          "version": "6.14",
-          "downloadUrl": "https://github.com/nhorman/rng-tools/archive/v6.14/rng-tools-6.14.tar.gz"
+          "version": "6.16",
+          "downloadUrl": "https://github.com/nhorman/rng-tools/archive/v6.16/rng-tools-6.16.tar.gz"
         }
       }
     },
