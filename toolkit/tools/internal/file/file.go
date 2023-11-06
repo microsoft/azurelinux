@@ -259,6 +259,25 @@ func copyWithPermissions(src, dst string, dirmode os.FileMode, changeMode bool, 
 		return fmt.Errorf("source (%s) is not a file", src)
 	}
 
+	err = createDestinationDir(dst, dirmode)
+	if err != nil {
+		return
+	}
+
+	err = shell.ExecuteLive(squashErrors, "cp", "--preserve=mode", src, dst)
+	if err != nil {
+		return
+	}
+
+	if changeMode {
+		logger.Log.Debugf("Calling chmod on (%s) with the mode (%v)", dst, filemode)
+		err = os.Chmod(dst, filemode)
+	}
+
+	return
+}
+
+func createDestinationDir(dst string, dirmode os.FileMode) (err error) {
 	isDstExist, err := PathExists(dst)
 	if err != nil {
 		return err
@@ -282,15 +301,38 @@ func copyWithPermissions(src, dst string, dirmode os.FileMode, changeMode bool, 
 		}
 	}
 
-	err = shell.ExecuteLive(squashErrors, "cp", "--preserve=mode", src, dst)
-	if err != nil {
-		return
-	}
-
-	if changeMode {
-		logger.Log.Debugf("Calling chmod on (%s) with the mode (%v)", dst, filemode)
-		err = os.Chmod(dst, filemode)
-	}
-
 	return
+}
+
+func CopyFileFromFS(srcFS fs.FS, srcFile, dst string, dirmode os.FileMode, filemode os.FileMode) error {
+	logger.Log.Debugf("Copying resource (%s) -> (%s)", srcFile, dst)
+
+	err := createDestinationDir(dst, dirmode)
+	if err != nil {
+		return err
+	}
+
+	source, err := srcFS.Open(srcFile)
+	if err != nil {
+		return fmt.Errorf("failed to copy resource (%s) -> (%s):\nfailed to open source:\n%w", srcFile, dst, err)
+	}
+	defer source.Close()
+
+	destination, err := os.OpenFile(dst, os.O_WRONLY|os.O_CREATE, filemode)
+	if err != nil {
+		return fmt.Errorf("failed to copy resource (%s) -> (%s):\nfailed to open destination:\n%w", srcFile, dst, err)
+	}
+	defer destination.Close()
+
+	_, err = io.Copy(destination, source)
+	if err != nil {
+		return fmt.Errorf("failed to copy resource (%s) -> (%s):\nfailed to copy bytes:\n%w", srcFile, dst, err)
+	}
+
+	err = os.Chmod(dst, filemode)
+	if err != nil {
+		return fmt.Errorf("failed to copy resource (%s) -> (%s):\nfailed to set filemode:\n%w", srcFile, dst, err)
+	}
+
+	return nil
 }

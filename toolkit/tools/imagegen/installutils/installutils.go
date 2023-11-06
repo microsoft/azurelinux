@@ -22,6 +22,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repocloner"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/resources"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
@@ -934,14 +935,14 @@ func addEntryToCrypttab(installRoot string, devicePath string, encryptedRoot dis
 }
 
 // InstallGrubEnv installs an empty grubenv f
-func InstallGrubEnv(installRoot, assetsDir string) (err error) {
+func InstallGrubEnv(installRoot string) (err error) {
 	const (
-		assetGrubEnvFile = "grub2/grubenv"
+		assetGrubEnvFile = "assets/grub2/grubenv"
 		grubEnvFile      = "boot/grub2/grubenv"
 	)
-	assetGrubEnvFileFullPath := filepath.Join(assetsDir, assetGrubEnvFile)
 	installGrubEnvFile := filepath.Join(installRoot, grubEnvFile)
-	err = file.CopyAndChangeMode(assetGrubEnvFileFullPath, installGrubEnvFile, bootDirectoryDirMode, bootDirectoryFileMode)
+	err = file.CopyFileFromFS(resources.ResourcesFS, assetGrubEnvFile, installGrubEnvFile, bootDirectoryDirMode,
+		bootDirectoryFileMode)
 	if err != nil {
 		logger.Log.Warnf("Failed to copy and change mode of grubenv: %v", err)
 		return
@@ -961,26 +962,26 @@ func InstallGrubEnv(installRoot, assetsDir string) (err error) {
 // - isBootPartitionSeparate is a boolean value which is true if the /boot partition is separate from the root partition
 // Note: this boot partition could be different than the boot partition specified in the bootloader.
 // This boot partition specifically indicates where to find the kernel, config files, and initrd
-func InstallGrubCfg(installRoot, rootDevice, bootUUID, bootPrefix, assetsDir string, encryptedRoot diskutils.EncryptedRootDevice, kernelCommandLine configuration.KernelCommandLine, readOnlyRoot diskutils.VerityDevice, isBootPartitionSeparate bool) (err error) {
+func InstallGrubCfg(installRoot, rootDevice, bootUUID, bootPrefix string, encryptedRoot diskutils.EncryptedRootDevice, kernelCommandLine configuration.KernelCommandLine, readOnlyRoot diskutils.VerityDevice, isBootPartitionSeparate bool) (err error) {
 	const (
-		assetGrubcfgFile = "grub2/grub.cfg"
+		assetGrubcfgFile = "assets/grub2/grub.cfg"
 		grubCfgFile      = "boot/grub2/grub.cfg"
-		assetGrubDefFile = "grub2/grub"
+		assetGrubDefFile = "assets/grub2/grub"
 		grubDefFile      = "etc/default/grub"
 	)
 
 	// Copy the bootloader's grub.cfg and set the file permission
-	assetGrubcfgFileFullPath := filepath.Join(assetsDir, assetGrubcfgFile)
 	installGrubCfgFile := filepath.Join(installRoot, grubCfgFile)
 
-	assetGrubDefFileFullPath := filepath.Join(assetsDir, assetGrubDefFile)
 	installGrubDefFile := filepath.Join(installRoot, grubDefFile)
 
-	err = file.CopyAndChangeMode(assetGrubcfgFileFullPath, installGrubCfgFile, bootDirectoryDirMode, bootDirectoryFileMode)
+	err = file.CopyFileFromFS(resources.ResourcesFS, assetGrubcfgFile, installGrubCfgFile, bootDirectoryDirMode,
+		bootDirectoryFileMode)
 	if err != nil {
 		return
 	}
-	err = file.CopyAndChangeMode(assetGrubDefFileFullPath, installGrubDefFile, bootDirectoryDirMode, bootDirectoryFileMode)
+	err = file.CopyFileFromFS(resources.ResourcesFS, assetGrubDefFile, installGrubDefFile, bootDirectoryDirMode,
+		bootDirectoryFileMode)
 	if err != nil {
 		return
 	}
@@ -1618,7 +1619,9 @@ func getPackagesFromJSON(file string) (pkgList PackageList, err error) {
 // - bootUUID is the UUID of the boot partition
 // Note: this boot partition could be different than the boot partition specified in the main grub config.
 // This boot partition specifically indicates where to find the main grub cfg
-func InstallBootloader(installChroot *safechroot.Chroot, encryptEnabled bool, bootType, bootUUID, bootPrefix, bootDevPath, assetsDir string) (err error) {
+func InstallBootloader(installChroot *safechroot.Chroot, encryptEnabled bool, bootType, bootUUID, bootPrefix,
+	bootDevPath string,
+) (err error) {
 	const (
 		efiMountPoint  = "/boot/efi"
 		efiBootType    = "efi"
@@ -1636,7 +1639,7 @@ func InstallBootloader(installChroot *safechroot.Chroot, encryptEnabled bool, bo
 		}
 	case efiBootType:
 		efiPath := filepath.Join(installChroot.RootDir(), efiMountPoint)
-		err = installEfiBootloader(encryptEnabled, efiPath, bootUUID, bootPrefix, assetsDir)
+		err = installEfiBootloader(encryptEnabled, efiPath, bootUUID, bootPrefix)
 		if err != nil {
 			return
 		}
@@ -1771,21 +1774,22 @@ func enableCryptoDisk() (err error) {
 // installRoot/boot/efi folder
 // It is expected that shim (bootx64.efi) and grub2 (grub2.efi) are installed
 // into the EFI directory via the package list installation mechanism.
-func installEfiBootloader(encryptEnabled bool, installRoot, bootUUID, bootPrefix, assetsDir string) (err error) {
+func installEfiBootloader(encryptEnabled bool, installRoot, bootUUID, bootPrefix string) (err error) {
 	const (
 		defaultCfgFilename = "grub.cfg"
 		encryptCfgFilename = "grubEncrypt.cfg"
-		grubAssetDir       = "efi/grub"
+		grubAssetDir       = "assets/efi/grub"
 		grubFinalDir       = "boot/grub2"
 	)
 
 	// Copy the bootloader's grub.cfg
-	grubAssetPath := filepath.Join(assetsDir, grubAssetDir, defaultCfgFilename)
+	grubAssetPath := filepath.Join(grubAssetDir, defaultCfgFilename)
 	if encryptEnabled {
-		grubAssetPath = filepath.Join(assetsDir, grubAssetDir, encryptCfgFilename)
+		grubAssetPath = filepath.Join(grubAssetDir, encryptCfgFilename)
 	}
 	grubFinalPath := filepath.Join(installRoot, grubFinalDir, defaultCfgFilename)
-	err = file.CopyAndChangeMode(grubAssetPath, grubFinalPath, bootDirectoryDirMode, bootDirectoryFileMode)
+	err = file.CopyFileFromFS(resources.ResourcesFS, grubAssetPath, grubFinalPath, bootDirectoryDirMode,
+		bootDirectoryFileMode)
 	if err != nil {
 		logger.Log.Warnf("Failed to copy grub.cfg: %v", err)
 		return
