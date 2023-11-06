@@ -26,6 +26,7 @@ type SystemConfig struct {
 	Users                   []User                    `yaml:"Users"`
 	Services                Services                  `yaml:"Services"`
 	Modules                 Modules                   `yaml:"Modules"`
+	Verity                  Verity                    `yaml:"Verity"`
 }
 
 func (s *SystemConfig) IsValid() error {
@@ -70,6 +71,10 @@ func (s *SystemConfig) IsValid() error {
 	}
 
 	if err := s.Modules.IsValid(); err != nil {
+		return err
+	}
+
+	if err := s.Verity.IsValid(); err != nil {
 		return err
 	}
 
