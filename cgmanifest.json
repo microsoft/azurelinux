@@ -25555,8 +25555,8 @@
         "type": "other",
         "other": {
           "name": "rrdtool",
-          "version": "1.7.2",
-          "downloadUrl": "https://github.com/oetiker/rrdtool-1.x/releases/download/v1.7.2/rrdtool-1.7.2.tar.gz"
+          "version": "1.8.0",
+          "downloadUrl": "https://github.com/oetiker/rrdtool-1.x/releases/download/v1.8.0/rrdtool-1.8.0.tar.gz"
         }
       }
     },
