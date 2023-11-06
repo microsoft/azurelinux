@@ -1,0 +1,30 @@
+From f137d551122afef008b3cc5380c6f9744653d69a Mon Sep 17 00:00:00 2001
+From: Noah Watkins <noah@vectorized.io>
+Date: Sat, 23 Oct 2021 13:15:29 -0700
+Subject: [PATCH] Enable rtti for snappy build
+
+Without rtti build fails to link when implementing a custom
+snappy::Source/Sink.
+
+https://github.com/facebook/folly/issues/1606
+
+Signed-off-by: Noah Watkins <noah@vectorized.io>
+---
+ CMakeLists.txt | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 7d9f5429..4a440d2e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -74,10 +74,6 @@ else(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+   # Disable C++ exceptions.
+   string(REGEX REPLACE "-fexceptions" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions")
+-
+-  # Disable RTTI.
+-  string(REGEX REPLACE "-frtti" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti")
+ endif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+ 
+ # BUILD_SHARED_LIBS is a standard CMake variable, but we declare it here to make

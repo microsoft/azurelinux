@@ -25504,8 +25504,8 @@
         "type": "other",
         "other": {
           "name": "redis",
-          "version": "6.2.13",
-          "downloadUrl": "https://download.redis.io/releases/redis-6.2.13.tar.gz"
+          "version": "6.2.14",
+          "downloadUrl": "https://download.redis.io/releases/redis-6.2.14.tar.gz"
         }
       }
     },
@@ -28577,8 +28577,8 @@
         "type": "other",
         "other": {
           "name": "telegraf",
-          "version": "1.27.3",
-          "downloadUrl": "https://github.com/influxdata/telegraf/archive/v1.27.3.tar.gz"
+          "version": "1.28.3",
+          "downloadUrl": "https://github.com/influxdata/telegraf/archive/v1.28.3.tar.gz"
         }
       }
     },
