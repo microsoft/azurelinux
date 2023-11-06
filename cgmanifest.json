@@ -14583,8 +14583,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-compiler-libs-janestreet",
-          "version": "0.12.3",
-          "downloadUrl": "https://github.com/janestreet/ocaml-compiler-libs/archive/v0.12.3/ocaml-compiler-libs-0.12.3.tar.gz"
+          "version": "0.12.4",
+          "downloadUrl": "https://github.com/janestreet/ocaml-compiler-libs/archive/v0.12.4/ocaml-compiler-libs-0.12.4.tar.gz"
         }
       }
     },
