@@ -1,12 +1,12 @@
 %global debug_package %{nil}
 %define upstream_name containerd-cc
 %define upstream_repo confidential-containers-containerd
-%define commit_hash e55e17bb9c75834c863d422bc38b54b0056e467a
+%define commit_hash 4a2809f776500dfb8e4ed33db7f4e05ed68edfbf
 
 Summary: Industry-standard container runtime for confidential containers
 Name: moby-%{upstream_name}
-Version: 1.7.2
-Release: 1%{?dist}
+Version: 1.7.1
+Release: 6%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -77,9 +77,6 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 
 %changelog
-* Fri Nov 3 2023 Saul Paredes <saulparedes@microsoft.com> - 1.7.2-1
-- Always add TargetLayerDigestLabel label to snapshots
-
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7.1-6
 - Bump release to rebuild with go 1.20.10
 
