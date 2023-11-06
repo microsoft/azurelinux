@@ -14763,8 +14763,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-migrate-parsetree",
-          "version": "2.3.0",
-          "downloadUrl": "https://github.com/ocaml-ppx/ocaml-migrate-parsetree/releases/download/v2.3.0/ocaml-migrate-parsetree-2.3.0.tbz"
+          "version": "2.4.0",
+          "downloadUrl": "https://github.com/ocaml-ppx/ocaml-migrate-parsetree/releases/download/2.4.0/ocaml-migrate-parsetree-2.4.0.tbz"
         }
       }
     },
