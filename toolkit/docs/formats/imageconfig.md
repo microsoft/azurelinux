@@ -116,9 +116,9 @@ A PartitionSetting may set a `MountIdentifier` to control how a partition is ide
 `partlabel` may not be used with `mbr` disks, and requires the `Name` key in the corresponding `Partition` be populated. An example with the rootfs mounted via `PARTLABEL=my_rootfs`, but the boot mount using the default `PARTUUID=<PARTUUID>`:
 ``` json
 "Partitions": [
-    
+
     ...
-    
+
     {
         "ID": "rootfs",
         "Name": "my_rootfs",
@@ -174,7 +174,7 @@ A sample `ParitionSettings` entry using `overlay` algorithm:
 `OverlayBaseImage` represents the base image when `overlay` algorithm is used.
 
 ### EnableGrubMkconfig
-EnableGrubMkconfig is a optional boolean that controls whether the image uses grub2-mkconfig to generate the boot configuration (/boot/grub2/grub.cfg) or not. If EnableGrubMkconfig is specified, only valid values are `true` and `false`. Default is `false`. 
+EnableGrubMkconfig is a optional boolean that controls whether the image uses grub2-mkconfig to generate the boot configuration (/boot/grub2/grub.cfg) or not. If EnableGrubMkconfig is specified, only valid values are `true` and `false`. Default is `false`.
 
 ### PackageLists
 
@@ -273,7 +273,7 @@ Fields:
 
 ### Networks
 
-The `Networks` entry is added to enable the users to specify the network configuration parameters to enable users to set IP address, configure the hostname, DNS etc. Currently, the Mariner tooling only supports a subset of the kickstart network command options: `bootproto`, `gateway`, `ip`, `net mask`, `DNS` and `device`. Hostname can be configured using the `Hostname` entry of the image config. 
+The `Networks` entry is added to enable the users to specify the network configuration parameters to enable users to set IP address, configure the hostname, DNS etc. Currently, the Mariner tooling only supports a subset of the kickstart network command options: `bootproto`, `gateway`, `ip`, `net mask`, `DNS` and `device`. Hostname can be configured using the `Hostname` entry of the image config.
 
 A sample Networks entry pointing to one network configuration:
 ``` json
@@ -378,7 +378,7 @@ The GUI installer does not currently support read-only roots.
 - `ValidateOnBoot`: Run a validation of the full disk at boot time, normally blocks are validated only as needed. This can take several minutes if the disk is corrupted.
 - `VerityErrorBehavior`: Indicate additional special system behavior when encountering an unrecoverable verity corruption. One of `"ignore"`, `"restart"`, `"panic"`. Normal behavior is to return an IO error when reading corrupt blocks.
 - `TmpfsOverlays`: Mount these paths as writable overlays backed by a tmpfs in memory.
-- `TmpfsOverlaySize`: Maximum amount of memory the overlays may use. Maybe be one of three forms: `"1234"`, `"1234[k,m,g]"`, `"20%"` (default is `"20%"`) 
+- `TmpfsOverlaySize`: Maximum amount of memory the overlays may use. Maybe be one of three forms: `"1234"`, `"1234[k,m,g]"`, `"20%"` (default is `"20%"`)
 - `TmpfsOverlayDebugEnabled`: Make the tmpfs overlay mounts easily accessible for debugging purposes. They can be found in /mnt/verity_overlay_debug_tmpfs. Include the
     `verity-read-only-root-debug-tools` package to create the required mount points.
 
@@ -403,7 +403,7 @@ ImaPolicy is a list of Integrity Measurement Architecture (IMA) policies to enab
 EnableFIPS is a optional boolean option that controls whether the image tools create the image with FIPS mode enabled or not. If EnableFIPS is specificed, only valid values are `true` and `false`.
 
 #### ExtraCommandLine
-ExtraCommandLine is a string which will be appended to the end of the kernel command line and may contain any additional parameters desired. The `` ` `` character is reserved and may not be used. **Note: Some kernel command line parameters are already configured by default in [grub.cfg](../../resources/assets/grub2/grub.cfg) and [/etc/default/grub](../../resources/assets/grub2/grub) for mkconfig-based images. Many command line options may be overwritten by passing a new value. If a specific argument must be removed from the existing grub template a `FinalizeImageScript` is currently required.
+ExtraCommandLine is a string which will be appended to the end of the kernel command line and may contain any additional parameters desired. The `` ` `` character is reserved and may not be used. **Note: Some kernel command line parameters are already configured by default in [grub.cfg](../../tools/internal/resources/assets/grub2/grub.cfg) and [/etc/default/grub](../../tools/internal/resources/assets/grub2/grub) for mkconfig-based images. Many command line options may be overwritten by passing a new value. If a specific argument must be removed from the existing grub template a `FinalizeImageScript` is currently required.
 
 #### SELinux
 The Security Enhanced Linux (SELinux) feature is enabled by using the `SELinux` key, with value containing the mode to use on boot.  The `enforcing` and `permissive` values will set the mode in /etc/selinux/config.
@@ -411,7 +411,7 @@ This will instruct init (systemd) to set the configured mode on boot.  The `forc
 which is a higher precedent than the config file. This ensures SELinux boots in enforcing even if the /etc/selinux/config was altered.
 
 #### CGroup
-The version for CGroup in Mariner images can be enabled by using the `CGroup` key with value containing which version to use on boot. The value that can be chosen is either `version_one` or `version_two`. 
+The version for CGroup in Mariner images can be enabled by using the `CGroup` key with value containing which version to use on boot. The value that can be chosen is either `version_one` or `version_two`.
 The `version_two` value will set the cgroupv2 to be used in Mariner by setting the config value `systemd.unified_cgroup_hierarchy=1` in the default kernel command line. The value `version_one` or no value set will keep cgroupv1 (current default) to be enabled on boot.
 For more information about cgroups with Kubernetes, see [About cgroupv2](https://kubernetes.io/docs/concepts/architecture/cgroups/).
 
