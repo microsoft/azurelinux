@@ -47,8 +47,8 @@
 # Required for proper ELF symbol versioning support.
 %global _ld_strict_symbol_defs 1
 # override_glibc and glibcversion are temporary to make libxcrypt install on top of glibc
-%define glibcversion 2.35
-%bcond_without override_glibc
+%define glibcversion 2.38
+%bcond_with override_glibc
 # Build the static library?
 %bcond_with new_api
 %bcond_with compat_pkg
@@ -116,6 +116,11 @@ BuildRequires:  automake
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
 BuildRequires:  libtool
+
+BuildRequires:  perl-open
+BuildRequires:  perl-FindBin
+BuildRequires:  perl-lib
+
 BuildRequires:  perl-core
 # We do not need to keep this forever.
 %if !(0%{?fedora} > 31 || 0%{?rhel} > 10)
