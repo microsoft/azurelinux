@@ -56,10 +56,10 @@ procps-ng-lang-4.0.4-1.cm2.x86_64.rpm
 m4-1.4.19-2.cm2.x86_64.rpm
 grep-3.11-1.cm2.x86_64.rpm
 grep-lang-3.11-1.cm2.x86_64.rpm
-diffutils-3.8-2.cm2.x86_64.rpm
+diffutils-3.10-1.cm2.x86_64.rpm
 gawk-5.2.2-1.cm2.x86_64.rpm
-findutils-4.8.0-5.cm2.x86_64.rpm
-findutils-lang-4.8.0-5.cm2.x86_64.rpm
+findutils-4.9.0-1.cm2x86_64.rpm
+findutils-lang-4.9.0-1.cm2x86_64.rpm
 gettext-0.22-1.cm2.x86_64.rpm
 gzip-1.13-1.cm2.x86_64.rpm
 make-4.3-3.cm2.x86_64.rpm
