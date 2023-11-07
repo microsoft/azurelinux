@@ -4,11 +4,7 @@
 package toolchain
 
 import (
-	"archive/tar"
-	"bytes"
-	"compress/gzip"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 
@@ -39,6 +35,9 @@ type OfficialScript struct {
 	BldTracker           string   // Path to the bld tracker
 	TimestampFile        string   // Path to the timestamp file
 	InputFiles           []string // List of input files to hash for validating the cache
+
+	// Internal state
+	buildDone bool
 }
 
 func (o *OfficialScript) CheckCache(cacheDir string) (string, bool, error) {
@@ -131,109 +130,69 @@ func (o *OfficialScript) BuildOfficialToolchainRpms() (err error) {
 		return
 	}
 
-	return nil
+	o.buildDone = true
+	return
 }
 
-func (o *OfficialScript) ExtractToolchainRpms(rpmsDir string) (err error) {
-	logger.Log.Infof("Extracting rpms from tar.gz file: %s", o.OutputFile)
-	tarGzFileStream, err := os.Open(o.OutputFile)
-	if err != nil {
-		err = fmt.Errorf("failed to open tar.gz file. Error:\n%w", err)
+func (o *OfficialScript) getBuiltRpms() (rpms []string, err error) {
+	logsDir := filepath.Join(o.BuildDir, "logs", "toolchain")
+	builtRpmsFile := filepath.Join(logsDir, "built_rpms_list.txt")
+
+	if !o.buildDone {
+		err = fmt.Errorf("can't check built rpms, no build completed")
 		return
 	}
-	defer tarGzFileStream.Close()
 
-	tarStream, err := gzip.NewReader(tarGzFileStream)
+	exists, err := file.PathExists(builtRpmsFile)
 	if err != nil {
-		err = fmt.Errorf("failed to create gzip reader. Error:\n%w", err)
+		err = fmt.Errorf("failed to check if built rpms file exists. Error:\n%w", err)
 		return
 	}
-	defer tarStream.Close()
+	if !exists {
+		logger.Log.Debug("No built rpms file found, built no rpms?")
+	}
 
-	tarReader := tar.NewReader(tarStream)
+	rpms, err = file.ReadLines(builtRpmsFile)
+	if err != nil {
+		err = fmt.Errorf("failed to read built rpms file. Error:\n%w", err)
+		return
+	}
+	return
+}
 
-	logger.Log.Infof("Extracting rpms from'%s'", o.OutputFile)
-	totalRpms := 0
-	extractedRpms := 0
-	for {
-		header, tarErr := tarReader.Next()
-		if tarErr != nil {
-			if tarErr == io.EOF {
-				logger.Log.Infof("Extracted %d/%d rpms from '%s'", extractedRpms, totalRpms, o.OutputFile)
-				break
-			}
-			err = fmt.Errorf("failed to read tar file. Error:\n%w", tarErr)
+func (o *OfficialScript) TransferBuiltRpms() (err error) {
+	builtRpms, err := o.getBuiltRpms()
+	if err != nil {
+		err = fmt.Errorf("can't copy built rpms. Error:\n%w", err)
+		return
+	}
+
+	for _, rpm := range builtRpms {
+		builtRpmsDir := filepath.Join(o.BuildDir, "toolchain", "built_rpms_all")
+		src := filepath.Join(builtRpmsDir, rpm)
+		dst := filepath.Join(o.RpmsDir, rpm)
+
+		srcExists, fErr := file.PathExists(src)
+		if fErr != nil {
+			err = fmt.Errorf("failed to check if rpm exists. Error:\n%w", fErr)
+			return
+		}
+		if !srcExists {
+			err = fmt.Errorf("can't copy output rpm, '%s' doesn't exist", src)
 			return
 		}
 
-		// get the individual filename and extract to the current directory
-		filename := filepath.Join(rpmsDir, header.Name)
-
-		switch header.Typeflag {
-		case tar.TypeDir:
-			// Converting to a flat directory structure, ignore directories
-			continue
-		case tar.TypeReg:
-			logger.Log.Debugf("Checking toolchain rpm: '%s'", filename)
-			totalRpms++
-			dstFile := filepath.Join(rpmsDir, filepath.Base(filename))
-
-			tarBytes := make([]byte, header.Size)
-			var size int64 = 0
-			for size < header.Size {
-				var readSize int
-				readSize, err = tarReader.Read(tarBytes[size:])
-				if err != nil {
-					if err != io.EOF {
-						err = fmt.Errorf("failed to read file. Error:\n%w", err)
-						return
-					}
-				}
-				size += int64(readSize)
-			}
-
-			var existingFileOk bool
-			existingFileOk, err = file.PathExists(dstFile)
+		isSame, fErr := file.ContentsAreSame(src, dst)
+		if fErr != nil {
+			err = fmt.Errorf("failed to compare files. Error:\n%w", fErr)
+			return
+		}
+		if !isSame {
+			err = file.Copy(src, dst)
 			if err != nil {
-				return fmt.Errorf("unable to check if rpm exists: %w", err)
+				err = fmt.Errorf("failed to copy file. Error:\n%w", err)
+				return
 			}
-			if existingFileOk {
-				logger.Log.Debugf("Checking if file contents are the same: %s", filename)
-				existingFileBytes, readErr := os.ReadFile(dstFile)
-				if err != nil {
-					err = fmt.Errorf("unable to read input file:\n%w", readErr)
-					return
-				}
-				existingFileOk = bytes.Equal(existingFileBytes, tarBytes)
-				if !existingFileOk {
-					logger.Log.Infof("File already exists but has different contents: %s", filename)
-				}
-			}
-
-			if !existingFileOk {
-				extractedRpms++
-				var writer *os.File
-				writer, err = os.Create(dstFile)
-				if err != nil {
-					err = fmt.Errorf("failed to create file. Error:\n%w", err)
-					return err
-				}
-
-				logger.Log.Infof("Extracting toolchain rpm: %s", filename)
-				byteReader := bytes.NewReader(tarBytes)
-				_, err = io.Copy(writer, byteReader)
-				writer.Close()
-
-				if err != nil {
-					err = fmt.Errorf("failed to copy file. Error:\n%w", err)
-					return err
-				}
-			} else {
-				logger.Log.Debugf("File already exists and is the same: %s", filename)
-			}
-		default:
-			err = fmt.Errorf("unknown type: %v in tar file", header.Typeflag)
-			return err
 		}
 	}
 	return

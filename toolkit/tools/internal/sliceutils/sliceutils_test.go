@@ -154,3 +154,70 @@ func TestShouldRemoveDuplicates(t *testing.T) {
 	assert.Contains(t, outputSlice, "C")
 	assert.NotContains(t, outputSlice, "X")
 }
+func TestEqual(t *testing.T) {
+	type args struct {
+		slice1 interface{}
+		slice2 interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "Equal slices",
+			args: args{
+				slice1: []int{1, 2, 3},
+				slice2: []int{1, 2, 3},
+			},
+			want: true,
+		},
+		{
+			name: "Different slices",
+			args: args{
+				slice1: []int{1, 2, 3},
+				slice2: []int{1, 2, 4},
+			},
+			want: false,
+		},
+		{
+			name: "Different types",
+			args: args{
+				slice1: []int{1, 2, 3},
+				slice2: []string{"1", "2", "3"},
+			},
+			want: false,
+		},
+		{
+			name: "Nil slices",
+			args: args{
+				slice1: nil,
+				slice2: nil,
+			},
+			want: true,
+		},
+		{
+			name: "One nil slice",
+			args: args{
+				slice1: []int{1, 2, 3},
+				slice2: nil,
+			},
+			want: false,
+		},
+		{
+			name: "Different lengths",
+			args: args{
+				slice1: []int{1, 2, 3},
+				slice2: []int{1, 2},
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Equal(tt.args.slice1, tt.args.slice2); got != tt.want {
+				t.Errorf("Equal() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

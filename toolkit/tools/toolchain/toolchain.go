@@ -45,6 +45,7 @@ var (
 
 	disallowRebuild = app.Flag("disallow-rebuild", "Require all packages to be available from a repo.").Default("false").Bool()
 	forceRebuild    = app.Flag("force-rebuild", "Force rebuilding of all packages.").Default("false").Bool()
+	existingArchive = app.Flag("existing-archive", "Path to an existing archive to use instead of building a new one.").ExistingFile()
 
 	// Bootstrap script inputs
 	bootstrapOutputFile     = app.Flag("bootstrap-output-file", "Path to the output file.").Required().String()
@@ -54,7 +55,6 @@ var (
 	bootstrapSpecsDir       = app.Flag("bootstrap-specs-dir", "Path to the specs directory.").Required().ExistingDir()
 	bootstrapSourceURL      = app.Flag("bootstrap-source-url", "URL to the source code.").Required().String()
 	bootstrapUseIncremental = app.Flag("bootstrap-incremental-toolchain", "Use incremental build mode.").Default("false").Bool()
-	bootstrapArchiveTool    = app.Flag("bootstrap-archive-tool", "Path to the archive tool.").Required().String()
 	bootstrapInputFiles     = app.Flag("bootstrap-input-files", "List of input files to hash for validating the cache.").Required().ExistingFiles()
 
 	// Official build inputs
@@ -90,8 +90,12 @@ func main() {
 	timestamp.BeginTiming("toolchain", *timestampFile)
 	defer timestamp.CompleteTiming()
 
-	if !*disallowRebuild && *forceRebuild {
-		logger.Log.Fatalf("Cannot --force-rebuild rebuild when --allow-rebuild is false.")
+	if *disallowRebuild && *forceRebuild {
+		logger.Log.Fatalf("Cannot --force-rebuild rebuild when --disallow-rebuild is set.")
+	}
+
+	if *existingArchive != "" && *forceRebuild {
+		logger.Log.Fatalf("Cannot --force-rebuild rebuild when --existing-archive is set.")
 	}
 
 	toolchainRPMs, err := schedulerutils.ReadReservedFilesList(*toolchainManifest)
@@ -104,6 +108,41 @@ func main() {
 	err = toolchain.CleanToolchainRpms(*toolchainRpmDir, toolchainRPMs)
 	if err != nil {
 		logger.Log.Fatalf("Failed to clean toolchain RPMs: %s", err)
+	}
+
+	// Use the provided archive if it exists
+
+	if *existingArchive != "" {
+		archive := toolchain.Archive{
+			ArchivePath: *existingArchive,
+		}
+		var missingFromArchive, missingFromManifest []string
+		missingFromArchive, missingFromManifest, err = archive.ValidateArchiveContents(toolchainRPMs)
+		if err != nil {
+			logger.Log.Fatalf("Failed to validate toolchain archive contents: %s", err)
+		}
+		if len(missingFromArchive) > 0 || len(missingFromManifest) > 0 {
+			for _, line := range toolchain.CreateManifestMissmatchReport(missingFromArchive, missingFromManifest, *existingArchive, *toolchainManifest) {
+				logger.Log.Warn(line)
+			}
+			logger.Log.Fatalf("Toolchain archive (%s) and manifest (%s) are missmatched", *existingArchive, *toolchainManifest)
+		}
+
+		logger.Log.Infof("Using existing archive '%s'.", *existingArchive)
+		err = archive.ExtractToolchainRpms(*toolchainRpmDir)
+		if err != nil {
+			logger.Log.Fatalf("Failed to extract toolchain RPMs from archive: %s", err)
+		}
+		ready, _, err := validateToolchainRpms(*toolchainRpmDir, toolchainRPMs)
+		if err != nil {
+			logger.Log.Fatalf("Failed to validate toolchain RPMs are ready: %s", err)
+		}
+		if ready {
+			logger.Log.Infof("Toolchain RPMs are ready.")
+			return
+		} else {
+			logger.Log.Fatal("Toolchain archive is missing RPMs.")
+		}
 	}
 
 	ready, _, err := validateToolchainRpms(*toolchainRpmDir, toolchainRPMs)
@@ -202,6 +241,9 @@ func main() {
 	}
 	official.InputFiles = append(official.InputFiles, *toolchainManifest)
 	official.InputFiles = append(official.InputFiles, bootstrap.OutputFile)
+	builtArchive := toolchain.Archive{
+		ArchivePath: official.OutputFile,
+	}
 
 	_, cacheOk, err = official.CheckCache(*cacheDir)
 	if err != nil {
@@ -231,9 +273,14 @@ func main() {
 				logger.Log.Fatalf("Failed to add official toolchain rpms to cache: %s", err)
 			}
 		}
+
+		err = official.TransferBuiltRpms()
+		if err != nil {
+			logger.Log.Fatalf("Failed to transfer built rpms: %s", err)
+		}
 	}
 
-	err = official.ExtractToolchainRpms(*toolchainRpmDir)
+	err = builtArchive.ExtractToolchainRpms(*toolchainRpmDir)
 	if err != nil {
 		logger.Log.Fatalf("Failed to extract official toolchain rpms: %s", err)
 	}

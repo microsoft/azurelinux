@@ -54,7 +54,7 @@ $(call create_folder,$(MISC_CACHE_DIR)/toolchain)
 ##help:target:raw-toolchain=Build the initial toolchain bootstrap stage.
 raw-toolchain: $(raw_toolchain)
 ##help:target:toolchain=Ensure all toolchain RPMs are present.
-toolchain: go-toolchain-builder#$(toolchain_rpms)
+toolchain: $(toolchain_rpms)
 ifeq ($(REBUILD_TOOLCHAIN),y)
 # If we are rebuilding the toolchain, we also expect the built RPMs to end up in out/RPMS
 toolchain: $(toolchain_out_rpms)
@@ -67,7 +67,10 @@ bootstrap-hashing-list = \
 	$(call shell_real_build_only, find $(SCRIPTS_DIR)/toolchain/container/ -name *.sh) \
 	$(call shell_real_build_only, find $(SCRIPTS_DIR)/toolchain/container/ -name *.patch) \
 
-go-toolchain-builder: $(no_repo_acl) $(go-toolchain)  $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag $(go-bldtracker)
+ifeq ($(TOOLCHAIN_ARCHIVE),)
+go-toolchain-builder: $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag
+endif
+go-toolchain-builder: $(no_repo_acl) $(go-toolchain) $(go-bldtracker)
 	$(go-toolchain) \
 		--toolchain-rpms-dir="$(TOOLCHAIN_RPMS_DIR)" \
 		--toolchain-manifest="$(TOOLCHAIN_MANIFEST)" \
@@ -77,6 +80,8 @@ go-toolchain-builder: $(no_repo_acl) $(go-toolchain)  $(STATUS_FLAGS_DIR)/build_
 		$(if $(TLS_CERT),--tls-cert="$(TLS_CERT)") \
 		$(if $(TLS_KEY),--tls-key="$(TLS_KEY)") \
 		--cache-dir="$(MISC_CACHE_DIR)/toolchain" \
+		$(if $(TOOLCHAIN_ARCHIVE),--existing-archive="$(TOOLCHAIN_ARCHIVE)") \
+		--force-rebuild \
 		\
 		--bootstrap-output-file="$(raw_toolchain)" \
 		--bootstrap-script="$(SCRIPTS_DIR)/toolchain/create_toolchain_in_container.sh" \
@@ -85,7 +90,6 @@ go-toolchain-builder: $(no_repo_acl) $(go-toolchain)  $(STATUS_FLAGS_DIR)/build_
 		--bootstrap-specs-dir="$(SPECS_DIR)" \
 		--bootstrap-source-url="$(SOURCE_URL)" \
 		$(if $(INCREMENTAL_TOOLCHAIN),--bootstrap-incremental-toolchain) \
-		--bootstrap-archive-tool="$(ARCHIVE_TOOL)" \
 		$(foreach file, $(bootstrap-hashing-list),--bootstrap-input-files="$(file)" ) \
 		\
 		--official-build-output-file="$(final_toolchain)" \

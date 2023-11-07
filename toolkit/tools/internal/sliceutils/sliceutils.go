@@ -17,6 +17,10 @@ func Contains(slice interface{}, searched interface{}, cond func(interface{}, in
 	return Find(slice, searched, cond) != NotFound
 }
 
+func Equal(slice1 interface{}, slice2 interface{}) bool {
+	return reflect.DeepEqual(slice1, slice2)
+}
+
 // Find returns an index of the first occurrence of the "searched" argument in slice, or NotFound if it does not appear in the slice.
 func Find(slice interface{}, searched interface{}, cond func(interface{}, interface{}) bool) int {
 	contentValue := reflect.ValueOf(slice)
