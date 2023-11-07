@@ -48,6 +48,7 @@ Werkzeug started as simple collection of various utilities for WSGI applications
 %pyproject_save_files werkzeug
 
 %check
+pip3 install tox tox-current-env
 %tox
 
 %files -n python3-werkzeug -f %{pyproject_files}
