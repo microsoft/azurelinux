@@ -142,7 +142,7 @@ export FCFLAGS
 
 %configure \
     --enable-shared \
-             LD=ld                    \
+    LD=ld \
     --enable-threads=posix \
     --enable-__cxa_atexit \
     --enable-clocale=gnu \
@@ -151,10 +151,10 @@ export FCFLAGS
     --disable-bootstrap \
     --enable-linker-build-id \
     --enable-plugin \
-             --enable-default-pie     \
-             --enable-default-ssp     \
-             --disable-fixincludes    \
-             --disable-libsanitizer                         \
+    --enable-default-pie \
+    --enable-default-ssp \
+    --disable-fixincludes \
+    --disable-libsanitizer \
     --enable-default-pie \
     --with-system-zlib
 make %{?_smp_mflags}
