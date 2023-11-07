@@ -29,7 +29,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.2.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -40,6 +40,8 @@ Source1:        config
 Source2:        config_aarch64
 Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20211013.pem
+Source5:        cpupower
+Source6:        cpupower.service
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -64,6 +66,7 @@ BuildRequires:  pam-devel
 BuildRequires:  procps-ng-devel
 BuildRequires:  python3-devel
 BuildRequires:  sed
+BuildRequires:  systemd-rpm-macros
 %ifarch x86_64
 BuildRequires:  pciutils-devel
 %endif
@@ -219,6 +222,12 @@ install -vdm 700 %{buildroot}/boot
 install -vdm 755 %{buildroot}%{_defaultdocdir}/linux-%{uname_r}
 install -vdm 755 %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}
 install -vdm 755 %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}
+
+install -d -m 755 %{buildroot}%{_sysconfdir}/sysconfig
+install -c -m 644 %{SOURCE5} %{buildroot}/%{_sysconfdir}/sysconfig/cpupower
+install -d -m 755 %{buildroot}%{_unitdir}
+install -c -m 644 %{SOURCE6} %{buildroot}%{_unitdir}/cpupower.service
+
 make INSTALL_MOD_PATH=%{buildroot} modules_install
 
 %ifarch x86_64
@@ -309,6 +318,9 @@ rm -rf %{_localstatedir}/lib/rpm-state/initramfs/pending/%{uname_r}
 rm -rf /boot/initrd.img-%{uname_r}
 echo "initrd of kernel %{uname_r} removed" >&2
 
+%preun -n kernel-tools
+%systemd_preun cpupower.service
+
 %postun
 if [ ! -e /boot/mariner.cfg ]
 then
@@ -320,6 +332,7 @@ then
      fi
 fi
 %grub2_postun
+%systemd_postun cpupower.service
 
 %post
 /sbin/depmod -a %{uname_r}
@@ -334,6 +347,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 
 %post drivers-sound
 /sbin/depmod -a %{uname_r}
+
+%post tools
+%systemd_post cpupower.service
 
 %files
 %defattr(-,root,root)
@@ -400,6 +416,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_datadir}/perf-core/strace/groups/string
 %{_docdir}/*
 %{_includedir}/perf/perf_dlfilter.h
+%{_unitdir}/cpupower.service
+%{_sysconfdir}/sysconfig/cpupower
 
 %files -n python3-perf
 %{python3_sitearch}/*
@@ -409,6 +427,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Thu Dec 14 2023 Rachel Menge <rachelmenge@microsoft.com> - 6.6.2.1-2
+- Add cpupower.service to kernel-tools
+
 * Wed Dec 13 2023 Rachel Menge <rachelmenge@microsoft.com> - 6.6.2.1-1
 - Upgrade to 6.6.2.1
 - Add libtraceevent-devel to BuildRequires

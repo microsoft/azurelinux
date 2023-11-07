@@ -1,0 +1,2 @@
+CPUPOWER_START_OPTS="frequency-set -g performance"
+CPUPOWER_STOP_OPTS="frequency-set -g performance"
