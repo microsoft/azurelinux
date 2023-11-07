@@ -156,17 +156,6 @@ find /usr/{lib,libexec} -name \*.la -delete
 
 touch /logs/status_build_cross_temp_tools_done
 
-# KERNEL_VERSION="5.15.48.1"
-# echo Linux-${KERNEL_VERSION} API Headers
-# tar xf kernel-${KERNEL_VERSION}.tar.gz
-# pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-${KERNEL_VERSION}
-# make mrproper
-# make headers
-# cp -rv usr/include/* /usr/include
-# popd
-# rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-${KERNEL_VERSION}
-# touch /logs/status_kernel_headers_complete
-
 echo glibc-2.38
 tar xf glibc-2.38.tar.xz
 pushd glibc-2.38
@@ -194,7 +183,6 @@ cat > /etc/ld.so.conf << "EOF"
 /opt/lib
 # Add an include directory
 include /etc/ld.so.conf.d/*.conf
-
 EOF
 mkdir -pv /etc/ld.so.conf.d
 popd
@@ -222,7 +210,6 @@ make -f Makefile-libbz2_so
 make clean
 make -j$(nproc)
 make PREFIX=/usr install
-#cp -v bzip2-shared /bin/bzip2
 cp -av libbz2.so.* /usr/lib
 ln -sv libbz2.so.1.0.8 /usr/lib/libbz2.so
 cp -v bzip2-shared /usr/bin/bzip2
@@ -295,8 +282,6 @@ touch /logs/status_m4_complete
 echo Flex-2.6.4
 tar xf flex-2.6.4.tar.gz
 pushd flex-2.6.4
-#sed -i "/math.h/a #include <malloc.h>" src/flexdef.h
-#HELP2MAN=/tools/bin/true \
 ./configure --prefix=/usr --docdir=/usr/share/doc/flex-2.6.4 --disable-static
 make -j$(nproc)
 make install
@@ -308,7 +293,6 @@ touch /logs/status_flex_complete
 echo Binutils-2.41
 tar xf binutils-2.41.tar.xz
 pushd binutils-2.41
-#sed -i '/@\tincremental_copy/d' gold/testsuite/Makefile.in
 mkdir -v build
 cd build
 ../configure --prefix=/usr       \
@@ -798,7 +782,6 @@ pushd findutils-4.9.0
 ./configure --prefix=/usr --localstatedir=/var/lib/locate
 make -j$(nproc)
 make install
-#sed -i 's|find:=${BINDIR}|find:=/bin|' /usr/bin/updatedb
 popd
 rm -rf findutils-4.9.0
 touch /logs/status_findutils_complete
@@ -907,7 +890,6 @@ mkdir -pv /var/lib/hwclock
             --disable-static     \
             --without-python     \
             --without-systemd    \
-            --without-systemdsystemunitdir \
             --without-systemdsystemunitdir
 make -j$(nproc)
 make install

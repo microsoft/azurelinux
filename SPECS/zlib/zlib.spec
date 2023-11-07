@@ -8,7 +8,6 @@ Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://github.com/madler/zlib/releases/download/v%{version}/%{name}-%{version}.tar.xz
-#Patch0:         CVE-2023-45853.patch
 %description
 Compression and decompression routines
 %package    devel

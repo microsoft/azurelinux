@@ -13,10 +13,6 @@ cd $LFS/sources
 
 touch $LFS/logs/temptoolchain/status_temp_toolchain_build_started
 
-ls -la $LFS
-ls -la $LFS/tools
-ls -la /tools
-
 cat /home/lfs/.bashrc
 LFS_TGT=$(uname -m)-lfs-linux-gnu
 
@@ -96,7 +92,6 @@ pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-${KERNEL_VERSION}
 make mrproper
 make headers
 find usr/include -type f ! -name '*.h' -delete
-#cp -rv usr/include/* $LFS/usr
 mkdir -pv $LFS/usr/include
 cp -rv usr/include/* $LFS/usr/include
 popd
@@ -108,8 +103,6 @@ echo glibc-2.38
 tar xf glibc-2.38.tar.xz
 pushd glibc-2.38
 case $(uname -m) in
-    i?86)   ln -sfv ld-linux.so.2 $LFS/lib/ld-lsb.so.3
-    ;;
     x86_64) ln -sfv ../lib/ld-linux-x86-64.so.2 $LFS/lib64
             ln -sfv ../lib/ld-linux-x86-64.so.2 $LFS/lib64/ld-lsb-x86-64.so.3
     ;;

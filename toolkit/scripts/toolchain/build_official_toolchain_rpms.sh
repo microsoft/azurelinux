@@ -483,16 +483,12 @@ build_rpm_in_chroot_no_install curl
 # cracklib needs python3-setuptools (installed with python3)
 build_rpm_in_chroot_no_install cracklib
 
-# pam needs cracklib and libxcrypt
+# pam needs libxcrypt
 build_rpm_in_chroot_no_install libxcrypt
 chroot_and_install_rpms libxcrypt
+# pam needs cracklib
 chroot_and_install_rpms cracklib
 build_rpm_in_chroot_no_install cmake
-# Temporarily disable PAM due to build error:
-#     /bin/ld: .libs/pam_pwhistory_la-opasswd.o: in function `compare_password':
-#     /usr/src/mariner/BUILD/Linux-PAM-1.5.1/modules/pam_pwhistory/opasswd.c:139:(.text+0x25f): undefined reference to `crypt'
-#     collect2: error: ld returned 1 exit status
-# PAM requires the 'crypt' library, previously provided by glibc, but removed in glibc 2.38
 build_rpm_in_chroot_no_install pam
 build_rpm_in_chroot_no_install docbook-dtd-xml
 

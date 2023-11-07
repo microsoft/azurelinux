@@ -31,7 +31,7 @@ tool for building user interfaces
 
 %prep
 %if %{with_check}
-#pip3 install 2to3
+pip3 install 2to3
 %endif
 %autosetup
 

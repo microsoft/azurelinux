@@ -73,8 +73,8 @@ find %{buildroot} -type f -name "*.a" -delete -print
 %{_mandir}/man1/*
 
 %changelog
-* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.5.5-1
-- Auto-upgrade to 1.5.5 - Azure Linux 3.0 - package upgrades
+* Mon Oct 16 2023 Andrew Phelps <anphel@microsoft.com> - 1.5.5-1
+- Upgrade to version 1.5.5
 - License verified
 
 * Tue Oct 12 2021 Thomas Crain <thcrain@microsoft.com> - 1.5.0-1
