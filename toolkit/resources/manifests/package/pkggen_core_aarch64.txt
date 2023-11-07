@@ -1,5 +1,5 @@
 filesystem-1.1-17.cm2.aarch64.rpm
-kernel-headers-5.15.135.1-2.cm2.noarch.rpm
+kernel-headers-6.1.58.1-1.cm2.noarch.rpm
 glibc-2.38-1.cm2.aarch64.rpm
 glibc-devel-2.38-1.cm2.aarch64.rpm
 glibc-i18n-2.38-1.cm2.aarch64.rpm
@@ -7,11 +7,6 @@ glibc-iconv-2.38-1.cm2.aarch64.rpm
 glibc-lang-2.38-1.cm2.aarch64.rpm
 glibc-nscd-2.38-1.cm2.aarch64.rpm
 glibc-tools-2.38-1.cm2.aarch64.rpm
-zlib-1.3-1.cm2.aarch64.rpm
-zlib-devel-1.3-1.cm2.aarch64.rpm
-file-5.45-1.cm2.aarch64.rpm
-file-devel-5.45-1.cm2.aarch64.rpm
-file-libs-5.45-1.cm2.aarch64.rpm
 zlib-1.3-1.cm2.aarch64.rpm
 zlib-devel-1.3-1.cm2.aarch64.rpm
 file-5.45-1.cm2.aarch64.rpm
