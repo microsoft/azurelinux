@@ -81,8 +81,8 @@ file-5.45-1.cm2.aarch64.rpm
 file-debuginfo-5.45-1.cm2.aarch64.rpm
 file-devel-5.45-1.cm2.aarch64.rpm
 file-libs-5.45-1.cm2.aarch64.rpm
-filesystem-1.1-15.cm2.aarch64.rpm
-filesystem-asc-1.1-15.cm2.aarch64.rpm
+filesystem-1.1-17.cm2.aarch64.rpm
+filesystem-asc-1.1-17.cm2.aarch64.rpm
 findutils-4.9.0-1.cm2.aarch64.rpm
 findutils-debuginfo-4.9.0-1.cm2.aarch64.rpm
 findutils-lang-4.9.0-1.cm2.aarch64.rpm
@@ -208,9 +208,12 @@ libtasn1-debuginfo-4.19.0-1.cm2.aarch64.rpm
 libtasn1-devel-4.19.0-1.cm2.aarch64.rpm
 libtool-2.4.7-1.cm2.aarch64.rpm
 libtool-debuginfo-2.4.7-1.cm2.aarch64.rpm
-libxml2-2.10.4-1.cm2.aarch64.rpm
-libxml2-debuginfo-2.10.4-1.cm2.aarch64.rpm
-libxml2-devel-2.10.4-1.cm2.aarch64.rpm
+libxcrypt-4.4.27-1.cm2.aarch64.rpm
+libxcrypt-debuginfo-4.4.27-1.cm2.aarch64.rpm
+libxcrypt-devel-4.4.27-1.cm2.aarch64.rpm
+libxml2-2.10.4-2.cm2.aarch64.rpm
+libxml2-debuginfo-2.10.4-2.cm2.aarch64.rpm
+libxml2-devel-2.10.4-2.cm2.aarch64.rpm
 libxslt-1.1.34-7.cm2.aarch64.rpm
 libxslt-debuginfo-1.1.34-7.cm2.aarch64.rpm
 libxslt-devel-1.1.34-7.cm2.aarch64.rpm
@@ -278,6 +281,10 @@ p11-kit-debuginfo-0.24.1-1.cm2.aarch64.rpm
 p11-kit-devel-0.24.1-1.cm2.aarch64.rpm
 p11-kit-server-0.24.1-1.cm2.aarch64.rpm
 p11-kit-trust-0.24.1-1.cm2.aarch64.rpm
+pam-1.5.1-5.cm2.aarch64.rpm
+pam-debuginfo-1.5.1-5.cm2.aarch64.rpm
+pam-devel-1.5.1-5.cm2.aarch64.rpm
+pam-lang-1.5.1-5.cm2.aarch64.rpm
 patch-2.7.6-8.cm2.aarch64.rpm
 patch-debuginfo-2.7.6-8.cm2.aarch64.rpm
 pcre-8.45-2.cm2.aarch64.rpm
