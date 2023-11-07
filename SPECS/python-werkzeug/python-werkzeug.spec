@@ -21,11 +21,13 @@ BuildRequires:  python3-libs
 BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
+BuildRequires:  python3-flit-core
+BuildRequires:  python3-pip
+BuildRequires:  python3-wheel
 Requires:       python3
 %if %{with_check}
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
-BuildRequires:  python3-pip
 BuildRequires:  python3-requests
 %endif
 
