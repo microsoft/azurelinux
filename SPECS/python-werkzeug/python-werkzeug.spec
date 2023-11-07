@@ -18,6 +18,7 @@ The Swiss Army knife of Python web development
 Summary:        The Swiss Army knife of Python web development
 BuildRequires:  python3-devel
 BuildRequires:  python3-libs
+BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 Requires:       python3
@@ -34,24 +35,28 @@ Werkzeug started as simple collection of various utilities for WSGI applications
 %prep
 %autosetup -n werkzeug-%{version} -p1
 
+%generate_buildrequires
+%pyproject_buildrequires %{?with_tests:-t}
+
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files werkzeug
 
 %check
-pip3 install pytest hypothesis
-LANG=en_US.UTF-8 PYTHONPATH=./  python3 setup.py test
+%tox
 
-%files -n python3-werkzeug
+%files -n python3-werkzeug -f %{pyproject_files}
 %defattr(-,root,root)
-%license LICENSE.rst
-%{python3_sitelib}/*
+%doc README.rst
+%doc CHANGES.rst
 
 %changelog
 * Mon Nov 06 2023 Nick Samson <nisamson@microsoft.com> - 2.3.7-1
 - Upgraded to version 2.3.7
+- Migrated to pyproject build
 - Added patch for CVE-2023-46136
 
 * Tue Mar 14 2023 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 2.2.3-1
