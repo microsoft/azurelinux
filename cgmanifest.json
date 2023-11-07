@@ -25004,8 +25004,8 @@
         "type": "other",
         "other": {
           "name": "python-werkzeug",
-          "version": "2.2.3",
-          "downloadUrl": "https://github.com/pallets/werkzeug/archive/2.2.3.tar.gz"
+          "version": "2.3.7",
+          "downloadUrl": "https://github.com/pallets/werkzeug/archive/2.3.7.tar.gz"
         }
       }
     },
