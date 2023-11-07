@@ -1,6 +1,10 @@
 Summary:        YAML parser and emitter for Python
 Name:           PyYAML
+<<<<<<< HEAD
 Version:        5.2
+=======
+Version:        5.4.1
+>>>>>>> 878c1ec1e (Upgraded PyYAML to 5.4.1 to fix CVE-2020-1747 and CVE-2020-14343.)
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -55,6 +59,9 @@ chmod a-x examples/yaml-highlight/yaml_hl.py
 %{python3_sitelib}/*
 
 %changelog
+* Tue Nov 07 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.4.1-1
+- Upgrade to 5.4 to fix CVE-2020-1747 and CVE-2020-14343.
+
 * Fri Oct 27 2023 Xiaohong Deng <xiaohongdeng@microsoft.com> - 5.2-1
 - Upgrade to 5.2
 
