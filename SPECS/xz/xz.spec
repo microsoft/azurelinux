@@ -1,6 +1,6 @@
 Summary:        Programs for compressing and decompressing files
 Name:           xz
-Version:        5.2.5
+Version:        5.4.4
 Release:        1%{?dist}
 URL:            https://tukaani.org/xz
 License:        GPLv2+ and GPLv3+ and LGPLv2+
@@ -85,6 +85,11 @@ make  %{?_smp_mflags}  check
 %{_bindir}/xzdec
 %{_mandir}/man1/*
 %{_mandir}/de/man1/*
+%{_mandir}/fr/man1/*
+%{_mandir}/ko/man1/*
+%{_mandir}/pt_BR/man1/*
+%{_mandir}/ro/man1/*
+%{_mandir}/uk/man1/*
 
 %files devel
 %{_includedir}/lzma.h
@@ -100,6 +105,9 @@ make  %{?_smp_mflags}  check
 %defattr(-,root,root)
 
 %changelog
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.4.4-1
+- Auto-upgrade to 5.4.4 - Azure Linux 3.0 - package upgrades
+
 *   Fri Nov 05 2021 Andrew Phelps <anphel@microsoft.com> 5.2.5-1
 -   Update to version 5.2.5
 -   License verified

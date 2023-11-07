@@ -1,9 +1,9 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 #
-# Dockerfile to Mariner toolchain from scratch
+# Dockerfile to build Mariner toolchain from scratch
 #
-FROM mcr.microsoft.com/cbl-mariner/base/core:2.0.20230609
+FROM mcr.microsoft.com/cbl-mariner/base/core:2.0.20231004
 
 # Tag the layers so we can clean up all the containers associated with a build directory
 ARG MARINER_BUILD_DIR
@@ -37,6 +37,7 @@ RUN tdnf install -y \
     tar \
     texinfo \
     unzip \
+    util-linux \
     vim \
     wget \
     zip && \
@@ -51,8 +52,6 @@ RUN tdnf install -y \
 COPY [ "./toolchain-sha256sums", \
        "./toolchain-remote-wget-list", \
        "./toolchain-local-wget-list", \
-       "./rpm-define-RPM-LD-FLAGS.patch", \
-       "./linker-script-readonly-keyword-support.patch", \
        "$LFS/tools/" ]
 
 # Download source, then create lfs user and group.
@@ -66,11 +65,22 @@ RUN wget -nv --no-clobber --timeout=30 --continue --input-file=$LFS/tools/toolch
 #RUN wget -nv --no-clobber --timeout=30 --continue --input-file=$LFS/tools/toolchain-remote-wget-list --directory-prefix=$LFS/sources; exit 0
 RUN wget -nv --no-clobber --timeout=30 --continue https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.48.1.tar.gz -O kernel-5.15.48.1.tar.gz --directory-prefix=$LFS/sources; exit 0
 USER root
+
+RUN mkdir -pv $LFS/{etc,var} $LFS/usr/{bin,lib,sbin} && \
+    ln -sv usr/bin $LFS/bin && \
+    ln -sv usr/lib $LFS/lib && \
+    ln -sv usr/sbin $LFS/sbin && \
+    mkdir -pv $LFS/lib64 && \
+    mkdir -pv $LFS/usr/share
+
 RUN sha256sum -c $LFS/tools/toolchain-sha256sums && \
     groupadd lfs && \
     useradd -s /bin/bash -g lfs -m -k /dev/null lfs && \
     usermod -a -G sudo lfs && \
+    chown -Rv lfs $LFS/usr && \
     chown -v lfs $LFS/tools && \
+    chown -Rv lfs $LFS/{usr{,/*},lib,var,etc,bin,sbin,tools} && \
+    chown -v lfs $LFS/lib64 && \
     chown -v lfs $LFS/sources && \
     chown -Rv lfs $LFS/logs && \
     echo "lfs ALL = NOPASSWD : ALL" >> /etc/sudoers && \
@@ -83,11 +93,16 @@ COPY [ "./.bashrc", \
 USER lfs
 COPY [ "./toolchain_build_temp_tools.sh", \
        "./coreutils-fix-get-sys_getdents-aarch64.patch", \
+       "./cpio_extern_nocommon.patch", \
+       "./CVE-2021-38185.patch", \
        "./CVE-2023-4039.patch", \
+       "./linker-script-readonly-keyword-support.patch", \
+       "./rpm-define-RPM-LD-FLAGS.patch", \
        "$LFS/tools/" ]
 
 USER root
 RUN  chown -Rv lfs $LFS/tools && \
+     chown -Rv lfs $LFS/usr && \
      chown -Rv lfs:lfs /home/lfs/
 
 USER lfs
@@ -97,10 +112,6 @@ COPY [ "./toolchain_initial_chroot_setup.sh", \
        "./toolchain_build_in_chroot.sh", \
        "./mount_chroot_start_build.sh", \
        "./unmount_chroot.sh", \
-       "./go14_bootstrap_aarch64.patch", \
-       "./rpm-define-RPM-LD-FLAGS.patch", \
-       "./cpio_extern_nocommon.patch", \
-       "./CVE-2021-38185.patch", \
        "$LFS/tools/" ]
 
 USER root

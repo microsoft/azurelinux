@@ -1,7 +1,7 @@
 Summary:        Programs for monitoring processes
 Name:           procps-ng
-Version:        3.3.17
-Release:        2%{?dist}
+Version:        4.0.4
+Release:        1%{?dist}
 License:        GPLv2 AND LGPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -33,7 +33,7 @@ Requires:       %{name} = %{version}-%{release}
 These are the additional language files of procps-ng
 
 %prep
-%setup -q -n procps-%{version}
+%setup -q -n %{name}-%{version}
 
 %build
 ./configure \
@@ -50,7 +50,6 @@ make %{?_smp_mflags}
 make DESTDIR=%{buildroot} install
 install -vdm 755 %{buildroot}/bin
 install -vdm 755 %{buildroot}/%{_libdir}
-ln -sfv ../..%{_libdir}/$(readlink %{buildroot}/%{_libdir}/libprocps.so) %{buildroot}/%{_libdir}/libprocps.so
 install -vdm 755 %{buildroot}/%{_sbindir}
 ln -s %{_bindir}/pidof %{buildroot}%{_sbindir}/pidof
 find %{buildroot} -type f -name "*.la" -delete -print
@@ -65,8 +64,8 @@ make %{?_smp_mflags} check
 %files
 %defattr(-,root,root)
 %license COPYING
-/bin/pwait
 /bin/ps
+/bin/pidwait
 /bin/pidof
 /bin/free
 /bin/w
@@ -86,31 +85,29 @@ make %{?_smp_mflags} check
 %{_mandir}/man8/*
 %{_mandir}/man1/*
 %{_mandir}/man5/*
-%{_libdir}/libprocps.so.*
+%{_libdir}/libproc2.so.*
 /sbin/sysctl
 
 %files devel
-%{_includedir}/proc/sig.h
-%{_includedir}/proc/wchan.h
-%{_includedir}/proc/version.h
-%{_includedir}/proc/pwcache.h
-%{_includedir}/proc/procps.h
-%{_includedir}/proc/devname.h
-%{_includedir}/proc/sysinfo.h
-%{_includedir}/proc/readproc.h
-%{_includedir}/proc/escape.h
-%{_includedir}/proc/slab.h
-%{_includedir}/proc/alloc.h
-%{_includedir}/proc/whattime.h
-%{_includedir}/proc/numa.h
-%{_libdir}/pkgconfig/libprocps.pc
-%{_libdir}/libprocps.so
+%{_includedir}/libproc2/diskstats.h
+%{_includedir}/libproc2/meminfo.h
+%{_includedir}/libproc2/misc.h
+%{_includedir}/libproc2/pids.h
+%{_includedir}/libproc2/slabinfo.h
+%{_includedir}/libproc2/stat.h
+%{_includedir}/libproc2/vmstat.h
+%{_includedir}/libproc2/xtra-procps-debug.h
+%{_libdir}/pkgconfig/libproc2.pc
+%{_libdir}/libproc2.so
 %{_mandir}/man3/*
 
 %files lang -f %{name}.lang
 %defattr(-,root,root)
 
 %changelog
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.0.4-1
+- Auto-upgrade to 4.0.4 - Azure Linux 3.0 - package upgrades
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.3.17-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
