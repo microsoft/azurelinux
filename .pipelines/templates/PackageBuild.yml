@@ -18,11 +18,11 @@ parameters:
     type: string
     default: "toolchain_built_rpms_all.tar.gz"
 
-  - name: customToolchainBuiltSpecsName
-    type: string
-    default: "built_specs_list.txt"
-
   - name: extraPackageRepos
+    type: string
+    default: ""
+
+  - name: extraPackageRetestList
     type: string
     default: ""
 
@@ -134,9 +134,7 @@ steps:
         displayName: "Download toolchain"
         inputs:
           artifact: "${{ parameters.customToolchainArtifactName }}"
-          patterns: |
-            **/${{ parameters.customToolchainTarballName }}
-            **/${{ parameters.customToolchainBuiltSpecsName }}
+          patterns: "**/${{ parameters.customToolchainTarballName }}"
 
       - script: |
           toolchain_archive="$(find "$(Pipeline.Workspace)" -name "${{ parameters.customToolchainTarballName }}" -print -quit)"
@@ -180,11 +178,6 @@ steps:
 
       if [[ ${{ parameters.isCheckBuild }} == "true" ]]; then
         run_check_arg="RUN_CHECK=y"
-        toolchain_built_list="$(find "$(Pipeline.Workspace)" -name "${{ parameters.customToolchainBuiltSpecsName }}" -print -quit)"
-        if [[ -f "$toolchain_built_list" ]]; then
-          rerun_toolchain_check_pkg_list=$(xargs --arg-file="$toolchain_built_list")
-          skip_check_arg=SKIP_MISSING_TESTS_IN_LISTS=y
-        fi
       elif [[ ${{ parameters.isCheckBuild }} == "false" ]]; then
         run_check_arg="RUN_CHECK=n"
       fi
@@ -205,8 +198,7 @@ steps:
         $delta_fetch_arg \
         $quick_rebuild_packages_arg \
         $run_check_arg \
-        $skip_check_arg \
-        TEST_RERUN_LIST="$rerun_toolchain_check_pkg_list" \
+        TEST_RERUN_LIST="${{ parameters.extraPackageRetestList }}" \
         $rerun_toolchain_checks_arg \
         $use_ccache_arg
     displayName: "Build packages"

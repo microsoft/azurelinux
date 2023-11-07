@@ -88,6 +88,7 @@ extends:
                 variables:
                   ob_artifactBaseName: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}
                   ob_outputDirectory: $(Build.ArtifactStagingDirectory)
+                  testListFromToolchain: $[ stageDependencies.Toolchain_${{ configuration.name }}.CalculatePackageRetestList.outputs['packageTestList'] ]
                 steps:
                   - template: .pipelines/templates/PackageBuild.yml@self
                     parameters:
@@ -98,6 +99,7 @@ extends:
                       pipArtifactFeeds: "mariner/Mariner-Pypi-Feed"
                       selfRepoName: self
                       testSuiteName: "[${{ configuration.name }}] Package test"
+                      extraPackageRetestList: "$(testListFromToolchain)"
 
                   - task: PublishPipelineArtifact@1
                     inputs:

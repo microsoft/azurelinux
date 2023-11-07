@@ -59,3 +59,22 @@ steps:
       tar -C "${{ parameters.buildRepoRoot }}/build/logs/toolchain" -czf "$published_logs_dir/toolchain.logs.tar.gz" .
     condition: always()
     displayName: "Copy logs for publishing"
+
+  - bash: |
+      built_list="${{ parameters.buildRepoRoot }}/build/logs/toolchain/built_specs_list.txt"
+      specs_dir="${{ parameters.buildRepoRoot }}/SPECS/"
+      if [[ -f "$built_list" ]]; then
+        built_specs=$(xargs < "$built_list")
+        retest_list=()
+        if [ ! -f "${specs_dir}/${s}/${s}".spec ]; then
+            echo "ERROR: ${specs_dir}/${s}/${s}.spec does not exist"
+            exit 1
+        fi
+        if grep -q '^%check' "${specs_dir}/${s}/${s}".spec; then
+            test_list+=("${s}")
+        fi
+      fi
+      # Default will be "", which is fine.
+      echo "##vso[task.setvariable variable=packageTestList;isOutput=true]${test_list[*]}"
+
+    displayName: "CalculatePackageRetestList"
