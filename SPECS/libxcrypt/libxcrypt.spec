@@ -102,7 +102,7 @@
 Summary:        Extended crypt library for descrypt, md5crypt, bcrypt, and others
 Name:           libxcrypt
 Version:        4.4.27
-Release:        1%{?dist}
+Release:        3%{?dist}
 # For explicit license breakdown, see the
 # LICENSING file in the source tarball.
 License:        LGPLv2+ AND BSD AND Public Domain
@@ -454,6 +454,9 @@ ln -s %{_libdir}/libcrypt-%{glibcversion}.so %{_libdir}/libcrypt.so.1
 
 
 %changelog
+* Tue Nov 07 2023 Andrew Phelps <anphel@microsoft.com> - 4.4.27-3
+- Build without glibc override
+
 * Thu Apr 14 2022 Andrew Phelps <anphel@microsoft.com> - 4.4.27-2
 - Update glibcversion variable to 2.35
 

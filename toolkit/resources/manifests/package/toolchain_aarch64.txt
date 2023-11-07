@@ -208,9 +208,9 @@ libtasn1-debuginfo-4.19.0-1.cm2.aarch64.rpm
 libtasn1-devel-4.19.0-1.cm2.aarch64.rpm
 libtool-2.4.7-1.cm2.aarch64.rpm
 libtool-debuginfo-2.4.7-1.cm2.aarch64.rpm
-libxcrypt-4.4.27-1.cm2.aarch64.rpm
-libxcrypt-debuginfo-4.4.27-1.cm2.aarch64.rpm
-libxcrypt-devel-4.4.27-1.cm2.aarch64.rpm
+libxcrypt-4.4.27-3.cm2.aarch64.rpm
+libxcrypt-debuginfo-4.4.27-3.cm2.aarch64.rpm
+libxcrypt-devel-4.4.27-3.cm2.aarch64.rpm
 libxml2-2.10.4-2.cm2.aarch64.rpm
 libxml2-debuginfo-2.10.4-2.cm2.aarch64.rpm
 libxml2-devel-2.10.4-2.cm2.aarch64.rpm
