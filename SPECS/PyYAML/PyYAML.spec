@@ -51,7 +51,7 @@ chmod a-x examples/yaml-highlight/yaml_hl.py
 %files
 %defattr(-,root,root,-)
 %license LICENSE
-%doc PKG-INFO README examples
+%doc README examples
 %{python3_sitelib}/*
 
 %changelog
