@@ -203,9 +203,7 @@ popd
             --without-debug              \
             --without-ada                \
             --disable-stripping          \
-            --enable-widec               \
-#            --mandir=/usr/share/man      \
-#            --enable-overwrite
+            --enable-widec
 make -j$(nproc)
 make DESTDIR=$LFS install
 make DESTDIR=$LFS TIC_PATH=$(pwd)/build/progs/tic install

@@ -258,7 +258,6 @@ tar xf readline-8.1.tar.gz
 pushd readline-8.1
 sed -i '/MV.*old/d' Makefile.in
 sed -i '/{OLDSUFF}/c:' support/shlib-install
-#patch -Np1 -i ../readline-8.2-upstream_fix-1.patch
 ./configure --prefix=/usr    \
             --disable-static \
             --with-curses    \
