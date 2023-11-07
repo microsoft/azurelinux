@@ -1,7 +1,7 @@
 Summary:        Systemd-250
 Name:           systemd
 Version:        250.3
-Release:        18%{?dist}
+Release:        19%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -29,6 +29,7 @@ Patch7:         serve-stale-0001-resolved-added-serve-stale-feature-implementati
 Patch8:         serve-stale-0002-resolved-Initialize-until_valid-while-storing-negati.patch
 # Patch9 should be dropped for mariner 3
 Patch9:         mariner-2-do-not-default-zstd-journal-files-for-backwards-compatibility.patch
+Patch10:        update-cifs-for-kernel-headers-6.1.patch
 BuildRequires:  audit-devel
 BuildRequires:  cryptsetup-devel
 BuildRequires:  docbook-dtd-xml
@@ -286,6 +287,9 @@ fi
 %files lang -f %{name}.lang
 
 %changelog
+* Thu Nov 02 2023 Rachel Menge <rachelmenge@microsoft.com> - 250.3-19
+- Update CIFS magic to build with 6.1 kernel-headers
+
 * Thu Oct 19 2023 Dan Streetman <ddstreet@ieee.org> - 250.3-18
 - Enable zstd support for journalctl, but force journald to not use zstd to keep backwards compatibility
 

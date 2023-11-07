@@ -1,18 +1,16 @@
 %global __requires_exclude ^%{_bindir}/perl$
 Summary:        Tracks system calls that are made by a running process
 Name:           strace
-Version:        5.16
-Release:        4%{?dist}
+Version:        6.1
+Release:        1%{?dist}
 License:        GPL-2.0-or-later AND LGPL-2.1-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Debuggers
 URL:            https://strace.io/
 Source0:        https://strace.io/files/%{version}/%{name}-%{version}.tar.xz
-# Released upstream in v5.18
-Patch0:         testfix-landlock-brackets.patch
 # Both patches released upstream in v6.4
-Patch1:         testfix-netlink-list-memberships.patch
+Patch0:         testfix-netlink-list-memberships.patch
 BuildRequires:  libacl-devel
 BuildRequires:  libaio-devel
 
@@ -48,6 +46,9 @@ all the arugments and return values from the system calls. This is useful in deb
 %{_mandir}/man1/*
 
 %changelog
+* Fri Nov 03 2023 Rachel Menge <rachelmenge@microsoft.com> - 6.1-1
+- Upgrade to 6.1
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.16-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
