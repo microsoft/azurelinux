@@ -25144,8 +25144,8 @@
         "type": "other",
         "other": {
           "name": "PyYAML",
-          "version": "5.2",
-          "downloadUrl": "https://pyyaml.org/download/pyyaml/PyYAML-5.2.tar.gz"
+          "version": "5.4.1",
+          "downloadUrl": "https://github.com/yaml/pyyaml/archive/refs/tags/5.4.1.tar.gz"
         }
       }
     },
