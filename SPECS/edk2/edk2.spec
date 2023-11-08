@@ -45,7 +45,7 @@ ExclusiveArch: x86_64
 
 Name:       edk2
 Version:    %{GITDATE}git%{GITCOMMIT}
-Release:    34%{?dist}
+Release:    37%{?dist}
 Summary:    UEFI firmware for 64-bit virtual machines
 License:    BSD-2-Clause-Patent and OpenSSL and MIT
 URL:        http://www.tianocore.org
@@ -110,6 +110,9 @@ Patch0016: 0016-OvmfPkg-Clarify-invariants-for-NestedInterruptTplLib.patch
 Patch0017: 0017-OvmfPkg-Relax-assertion-that-interrupts-do-not-occur.patch
 
 Patch1000: CVE-2023-0464.patch
+Patch1001: CVE-2023-3817.patch
+Patch1002: CVE-2023-0465.patch
+Patch1003: CVE-2023-2650.patch
 
 # python3-devel and libuuid-devel are required for building tools.
 # python3-devel is also needed for varstore template generation and
@@ -294,6 +297,12 @@ cp -a -- %{SOURCE1} .
 tar -C CryptoPkg/Library/OpensslLib -a -f %{SOURCE2} -x
 # Need to patch CVE-2023-0464 in the bundled openssl
 (cd CryptoPkg/Library/OpensslLib/openssl && patch -p1 ) < %{PATCH1000}
+# Need to patch CVE-2023-3817 in the bundled openssl
+(cd CryptoPkg/Library/OpensslLib/openssl && patch -p1 ) < %{PATCH1001}
+# Need to patch CVE-2023-0465 in the bundled openssl
+(cd CryptoPkg/Library/OpensslLib/openssl && patch -p1 ) < %{PATCH1002}
+# Need to patch CVE-2023-2650 in the bundled openssl
+(cd CryptoPkg/Library/OpensslLib/openssl && patch -p1 ) < %{PATCH1003}
 
 # extract softfloat into place
 tar -xf %{SOURCE3} --strip-components=1 --directory ArmPkg/Library/ArmSoftFloatLib/berkeley-softfloat-3/
@@ -515,10 +524,12 @@ done
 %endif
 
 %check
+tests_ok=true
 for file in %{buildroot}%{_datadir}/%{name}/*/*VARS.secboot.fd; do
     test -f "$file" || continue
-    virt-fw-vars --input $file --print | grep "SecureBootEnable.*ON" || exit 1
+    virt-fw-vars --input $file --print | grep "SecureBootEnable.*ON" || tests_ok=false
 done
+$tests_ok
 
 %global common_files \
   %%license License.txt License.OvmfPkg.txt License-History.txt LICENSE.openssl \
@@ -685,6 +696,15 @@ done
 
 
 %changelog
+* Tue Oct 17 2023 Francisco Huelsz Prince <frhuelsz@microsoft.com> - 20230301gitf80f052277c8-37
+- Patch CVE-2023-0465 and CVE-2023-2650 in bundled OpenSSL.
+
+* Tue Oct 13 2023 Sindhu Karri <lakarri@microsoft.com> - 20230301gitf80f052277c8-36
+- Patch CVE-2023-3817 in bundled OpenSSL
+
+* Tue Sep 26 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 20230301gitf80f052277c8-35
+- Removing 'exit' calls from the '%%check' section.
+
 * Wed Jun 21 2023 Vince Perri <viperri@microsoft.com> - 20230301gitf80f052277c8-34
 - Add nvram-template mapping to ovmf x64 config.
 
@@ -1102,4 +1122,3 @@ done
 
 * Thu May 2 2013 Paolo Bonzini <pbonzini@redhat.com> 20130502.g732d199-1
 - Create.
-

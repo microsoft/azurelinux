@@ -1,0 +1,78 @@
+From 3fe02dfed8d8f78d26ef5b975d7886873530ec3e Mon Sep 17 00:00:00 2001
+From: Darren Kenny <darren.kenny@oracle.com>
+Date: Thu, 7 Apr 2022 15:18:12 +0000
+Subject: [PATCH] fs/btrfs: Fix more fuzz issues related to chunks
+
+The corpus was generating issues in grub_btrfs_read_logical() when
+attempting to iterate over stripe entries in the superblock's
+bootmapping.
+
+In most cases the reason for the failure was that the number of stripes
+in chunk->nstripes exceeded the possible space statically allocated in
+superblock bootmapping space. Each stripe entry in the bootmapping block
+consists of a grub_btrfs_key followed by a grub_btrfs_chunk_stripe.
+
+Another issue that came up was that while calculating the chunk size,
+in an earlier piece of code in that function, depending on the data
+provided in the btrfs file system, it would end up calculating a size
+that was too small to contain even 1 grub_btrfs_chunk_item, which is
+obviously invalid too.
+
+Signed-off-by: Darren Kenny <darren.kenny@oracle.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/fs/btrfs.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+
+diff --git a/grub-core/fs/btrfs.c b/grub-core/fs/btrfs.c
+index b3d71cd..54a46b8 100644
+--- a/grub-core/fs/btrfs.c
++++ b/grub-core/fs/btrfs.c
+@@ -918,6 +918,17 @@ grub_btrfs_read_logical (struct grub_btrfs_data *data, grub_disk_addr_t addr,
+ 	  return grub_error (GRUB_ERR_BAD_FS,
+ 			     "got an invalid zero-size chunk");
+ 	}
++
++      /*
++       * The space being allocated for a chunk should at least be able to
++       * contain one chunk item.
++       */
++      if (chsize < sizeof (struct grub_btrfs_chunk_item))
++       {
++         grub_dprintf ("btrfs", "chunk-size too small\n");
++         return grub_error (GRUB_ERR_BAD_FS,
++                            "got an invalid chunk size");
++       }
+       chunk = grub_malloc (chsize);
+       if (!chunk)
+ 	return grub_errno;
+@@ -1165,6 +1176,13 @@ grub_btrfs_read_logical (struct grub_btrfs_data *data, grub_disk_addr_t addr,
+ 	if (csize > (grub_uint64_t) size)
+ 	  csize = size;
+ 
++	/*
++	 * The space for a chunk stripe is limited to the space provide in the super-block's
++	 * bootstrap mapping with an initial btrfs key at the start of each chunk.
++	 */
++	grub_size_t avail_stripes = sizeof (data->sblock.bootstrap_mapping) /
++	  (sizeof (struct grub_btrfs_key) + sizeof (struct grub_btrfs_chunk_stripe));
++
+ 	for (j = 0; j < 2; j++)
+ 	  {
+ 	    grub_size_t est_chunk_alloc = 0;
+@@ -1191,6 +1209,12 @@ grub_btrfs_read_logical (struct grub_btrfs_data *data, grub_disk_addr_t addr,
+ 		break;
+ 	      }
+ 
++	   if (grub_le_to_cpu16 (chunk->nstripes) > avail_stripes)
++             {
++               err = GRUB_ERR_BAD_FS;
++               break;
++             }
++
+ 	    if (is_raid56)
+ 	      {
+ 		err = btrfs_read_from_chunk (data, chunk, stripen,
+-- 
+2.34.1
+

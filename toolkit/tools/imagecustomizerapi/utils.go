@@ -4,6 +4,7 @@
 package imagecustomizerapi
 
 import (
+	"bytes"
 	"os"
 
 	"gopkg.in/yaml.v3"
@@ -32,7 +33,13 @@ func UnmarshalYamlFile[ValueType HasIsValid](yamlFilePath string, value ValueTyp
 func UnmarshalYaml[ValueType HasIsValid](yamlData []byte, value ValueType) error {
 	var err error
 
-	err = yaml.Unmarshal(yamlData, value)
+	reader := bytes.NewReader(yamlData)
+	decoder := yaml.NewDecoder(reader)
+
+	// Ensure unknown fields result in an error.
+	decoder.KnownFields(true)
+
+	err = decoder.Decode(value)
 	if err != nil {
 		return err
 	}

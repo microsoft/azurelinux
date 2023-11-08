@@ -22,12 +22,12 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repocloner"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/randomization"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/tdnf"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/userutils"
 )
 
 const (
@@ -37,7 +37,6 @@ const (
 	NullDevice     = "/dev/null"
 	overlay        = "overlay"
 	rootMountPoint = "/"
-	rootUser       = "root"
 
 	// rpmDependenciesDirectory is the directory which contains RPM database. It is not required for images that do not contain RPM.
 	rpmDependenciesDirectory = "/var/lib/rpm"
@@ -48,7 +47,6 @@ const (
 	// /boot directory should be only accesible by root. The directories need the execute bit as well.
 	bootDirectoryFileMode = 0400
 	bootDirectoryDirMode  = 0700
-	shadowFile            = "/etc/shadow"
 )
 
 // PackageList represents the list of packages to install into an image
@@ -1121,10 +1119,6 @@ func addGroups(installChroot *safechroot.Chroot, groups []configuration.Group) (
 }
 
 func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err error) {
-	const (
-		squashErrors = false
-	)
-
 	rootUserAdded := false
 
 	for _, user := range users {
@@ -1132,11 +1126,10 @@ func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err
 		ReportActionf("Adding user: %s", user.Name)
 
 		var (
-			homeDir string
-			isRoot  bool
+			isRoot bool
 		)
 
-		homeDir, isRoot, err = createUserWithPassword(installChroot, user)
+		isRoot, err = createUserWithPassword(installChroot, user)
 		if err != nil {
 			return
 		}
@@ -1144,17 +1137,17 @@ func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err
 			rootUserAdded = true
 		}
 
-		err = configureUserGroupMembership(installChroot, user)
+		err = ConfigureUserGroupMembership(installChroot, user.Name, user.PrimaryGroup, user.SecondaryGroups)
 		if err != nil {
 			return
 		}
 
-		err = provisionUserSSHCerts(installChroot, user, homeDir)
+		err = ProvisionUserSSHCerts(installChroot, user.Name, user.SSHPubKeyPaths)
 		if err != nil {
 			return
 		}
 
-		err = configureUserStartupCommand(installChroot, user)
+		err = ConfigureUserStartupCommand(installChroot, user.Name, user.StartupCommand)
 		if err != nil {
 			return
 		}
@@ -1165,7 +1158,7 @@ func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err
 		logger.Log.Debugf("No root user entry found in config file. Setting root password to never expire.")
 
 		// Ignore updating if there is no shadow file to update in the target image
-		installChrootShadowFile := filepath.Join(installChroot.RootDir(), shadowFile)
+		installChrootShadowFile := filepath.Join(installChroot.RootDir(), userutils.ShadowFile)
 		if exists, ferr := file.PathExists(installChrootShadowFile); ferr != nil {
 			logger.Log.Error("Error accessing shadow file.")
 			return ferr
@@ -1173,60 +1166,32 @@ func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err
 			logger.Log.Debugf("No shadow file to update. Skipping setting password to never expire.")
 			return
 		}
-		err = installChroot.UnsafeRun(func() error {
-			return chage(-1, "root")
-		})
+		err = Chage(installChroot, -1, "root")
 	}
 	return
 }
 
-func createUserWithPassword(installChroot *safechroot.Chroot, user configuration.User) (homeDir string, isRoot bool, err error) {
-	const (
-		squashErrors      = false
-		rootHomeDir       = "/root"
-		userHomeDirPrefix = "/home"
-		postfixLength     = 12
-	)
-
+func createUserWithPassword(installChroot *safechroot.Chroot, user configuration.User) (isRoot bool, err error) {
 	var (
 		hashedPassword          string
-		stdout                  string
-		stderr                  string
-		salt                    string
-		installChrootShadowFile = filepath.Join(installChroot.RootDir(), shadowFile)
+		installChrootShadowFile = filepath.Join(installChroot.RootDir(), userutils.ShadowFile)
 	)
 
 	// Get the hashed password for the user
 	if user.PasswordHashed {
 		hashedPassword = user.Password
 	} else {
-		salt, err = randomization.RandomString(postfixLength, randomization.LegalCharactersAlphaNum)
+		hashedPassword, err = userutils.HashPassword(user.Password)
 		if err != nil {
 			return
 		}
-		// Generate hashed password based on salt value provided.
-		// -6 option indicates to use the SHA256/SHA512 algorithm
-		stdout, stderr, err = shell.Execute("openssl", "passwd", "-6", "-salt", salt, user.Password)
-		if err != nil {
-			logger.Log.Warnf("Failed to generate hashed password")
-			logger.Log.Warn(stderr)
-			return
-		}
-		hashedPassword = strings.TrimSpace(stdout)
 	}
 	logger.Log.Tracef("hashed password: %v", hashedPassword)
 
-	if strings.TrimSpace(hashedPassword) == "" {
-		err = fmt.Errorf("empty password for user (%s) is not allowed", user.Name)
-		return
-	}
-
 	// Create the user with the given hashed password
-	if user.Name == rootUser {
-		homeDir = rootHomeDir
-
+	if user.Name == userutils.RootUser {
 		if user.UID != "" {
-			logger.Log.Warnf("Ignoring UID for (%s) user, using default", rootUser)
+			logger.Log.Warnf("Ignoring UID for (%s) user, using default", userutils.RootUser)
 		}
 
 		if exists, ferr := file.PathExists(installChrootShadowFile); ferr != nil {
@@ -1237,7 +1202,7 @@ func createUserWithPassword(installChroot *safechroot.Chroot, user configuration
 			logger.Log.Debugf("No shadow file to update. Skipping updating user password..")
 		} else {
 			// Update shadow file
-			err = updateUserPassword(installChroot.RootDir(), user.Name, hashedPassword)
+			err = userutils.UpdateUserPassword(installChroot.RootDir(), user.Name, hashedPassword)
 			if err != nil {
 				logger.Log.Warnf("Encountered a problem when updating root user password: %s", err)
 				return
@@ -1245,20 +1210,10 @@ func createUserWithPassword(installChroot *safechroot.Chroot, user configuration
 		}
 		isRoot = true
 	} else {
-		homeDir = filepath.Join(userHomeDirPrefix, user.Name)
-
-		var args = []string{user.Name, "-m", "-p", hashedPassword}
-		if user.UID != "" {
-			args = append(args, "-u", user.UID)
+		err = userutils.AddUser(user.Name, hashedPassword, user.UID, installChroot)
+		if err != nil {
+			return
 		}
-
-		err = installChroot.UnsafeRun(func() error {
-			return shell.ExecuteLive(squashErrors, "useradd", args...)
-		})
-	}
-
-	if err != nil {
-		return
 	}
 
 	// Update password expiration
@@ -1273,9 +1228,7 @@ func createUserWithPassword(installChroot *safechroot.Chroot, user configuration
 			return
 		}
 
-		err = installChroot.UnsafeRun(func() error {
-			return chage(user.PasswordExpiresDays, user.Name)
-		})
+		err = Chage(installChroot, user.PasswordExpiresDays, user.Name)
 	}
 
 	return
@@ -1283,13 +1236,15 @@ func createUserWithPassword(installChroot *safechroot.Chroot, user configuration
 
 // chage works in the same way as invoking "chage -M passwordExpirationInDays username"
 // i.e. it sets the maximum password expiration date.
-func chage(passwordExpirationInDays int64, username string) (err error) {
+func Chage(installChroot *safechroot.Chroot, passwordExpirationInDays int64, username string) (err error) {
 	var (
 		shadow            []string
 		usernameWithColon = fmt.Sprintf("%s:", username)
 	)
 
-	shadow, err = file.ReadLines(shadowFile)
+	installChrootShadowFile := filepath.Join(installChroot.RootDir(), userutils.ShadowFile)
+
+	shadow, err = file.ReadLines(installChrootShadowFile)
 	if err != nil {
 		return
 	}
@@ -1320,7 +1275,7 @@ func chage(passwordExpirationInDays int64, username string) (err error) {
 			fields := strings.Split(entry, ":")
 			// Any value other than totalFieldsCount indicates error in parsing
 			if len(fields) != totalFieldsCount {
-				return fmt.Errorf(`invalid shadow entry "%v" for user "%s": %d fields expected, but %d found.`, fields, username, totalFieldsCount, len(fields))
+				return fmt.Errorf("invalid shadow entry (%v) for user (%s): %d fields expected, but %d found", fields, username, totalFieldsCount, len(fields))
 			}
 
 			if passwordExpirationInDays == passwordNeverExpiresValue {
@@ -1333,7 +1288,7 @@ func chage(passwordExpirationInDays int64, username string) (err error) {
 				done = true
 			} else if passwordExpirationInDays < passwordNeverExpiresValue {
 				// Values smaller than -1 make no sense
-				return fmt.Errorf(`invalid value for maximum user's "%s" password expiration:(%d); should be greater than %d`, username, passwordExpirationInDays, passwordNeverExpiresValue)
+				return fmt.Errorf("invalid value for maximum user's (%s) password expiration: %d; should be greater than %d", username, passwordExpirationInDays, passwordNeverExpiresValue)
 			} else {
 				// If passwordExpirationInDays has any other value, it's the maximum expiration date: set it accordingly
 				// To do so, we need to ensure that passwordChangedField holds a valid value and then sum it with passwordExpirationInDays.
@@ -1358,7 +1313,7 @@ func chage(passwordExpirationInDays int64, username string) (err error) {
 			if done {
 				// Create and save new shadow file including potential changes from above.
 				shadow[n] = strings.Join(fields, ":")
-				err = file.Write(strings.Join(shadow, "\n"), shadowFile)
+				err = file.Write(strings.Join(shadow, "\n"), installChrootShadowFile)
 				return
 			}
 		}
@@ -1367,13 +1322,15 @@ func chage(passwordExpirationInDays int64, username string) (err error) {
 	return fmt.Errorf(`user "%s" not found when trying to change the password expiration date`, username)
 }
 
-func configureUserGroupMembership(installChroot *safechroot.Chroot, user configuration.User) (err error) {
+func ConfigureUserGroupMembership(installChroot *safechroot.Chroot, username string, primaryGroup string,
+	secondaryGroups []string,
+) (err error) {
 	const squashErrors = false
 
 	// Update primary group
-	if user.PrimaryGroup != "" {
+	if primaryGroup != "" {
 		err = installChroot.UnsafeRun(func() error {
-			return shell.ExecuteLive(squashErrors, "usermod", "-g", user.PrimaryGroup, user.Name)
+			return shell.ExecuteLive(squashErrors, "usermod", "-g", primaryGroup, username)
 		})
 
 		if err != nil {
@@ -1382,10 +1339,10 @@ func configureUserGroupMembership(installChroot *safechroot.Chroot, user configu
 	}
 
 	// Update secondary groups
-	if len(user.SecondaryGroups) != 0 {
-		allGroups := strings.Join(user.SecondaryGroups, ",")
+	if len(secondaryGroups) != 0 {
+		allGroups := strings.Join(secondaryGroups, ",")
 		err = installChroot.UnsafeRun(func() error {
-			return shell.ExecuteLive(squashErrors, "usermod", "-a", "-G", allGroups, user.Name)
+			return shell.ExecuteLive(squashErrors, "usermod", "-a", "-G", allGroups, username)
 		})
 
 		if err != nil {
@@ -1396,30 +1353,31 @@ func configureUserGroupMembership(installChroot *safechroot.Chroot, user configu
 	return
 }
 
-func configureUserStartupCommand(installChroot *safechroot.Chroot, user configuration.User) (err error) {
+func ConfigureUserStartupCommand(installChroot *safechroot.Chroot, username string, startupCommand string) (err error) {
 	const (
 		passwdFilePath = "etc/passwd"
 		sedDelimiter   = "|"
 	)
 
-	if user.StartupCommand == "" {
+	if startupCommand == "" {
 		return
 	}
 
-	logger.Log.Debugf("Updating user '%s' startup command to '%s'.", user.Name, user.StartupCommand)
+	logger.Log.Debugf("Updating user '%s' startup command to '%s'.", username, startupCommand)
 
-	findPattern := fmt.Sprintf(`^\(%s.*\):[^:]*$`, user.Name)
-	replacePattern := fmt.Sprintf(`\1:%s`, user.StartupCommand)
+	findPattern := fmt.Sprintf(`^\(%s.*\):[^:]*$`, username)
+	replacePattern := fmt.Sprintf(`\1:%s`, startupCommand)
 	filePath := filepath.Join(installChroot.RootDir(), passwdFilePath)
 	err = sed(findPattern, replacePattern, sedDelimiter, filePath)
 	if err != nil {
-		logger.Log.Errorf("Failed to update user's startup command.")
+		err = fmt.Errorf("failed to update user's (%s) startup command (%s):\n%w", username, startupCommand, err)
 		return
 	}
+
 	return
 }
 
-func provisionUserSSHCerts(installChroot *safechroot.Chroot, user configuration.User, homeDir string) (err error) {
+func ProvisionUserSSHCerts(installChroot *safechroot.Chroot, username string, sshPubKeyPaths []string) (err error) {
 	var (
 		pubKeyData []string
 		exists     bool
@@ -1431,10 +1389,11 @@ func provisionUserSSHCerts(installChroot *safechroot.Chroot, user configuration.
 
 	// Skip user SSH directory generation when not provided with public keys
 	// Let SSH handle the creation of this folder on its first use
-	if len(user.SSHPubKeyPaths) == 0 {
+	if len(sshPubKeyPaths) == 0 {
 		return
 	}
 
+	homeDir := userutils.UserHomeDirectory(username)
 	userSSHKeyDir := filepath.Join(homeDir, ".ssh")
 	authorizedKeysFile := filepath.Join(userSSHKeyDir, "authorized_keys")
 
@@ -1459,8 +1418,8 @@ func provisionUserSSHCerts(installChroot *safechroot.Chroot, user configuration.
 	}
 	defer os.Remove(authorizedKeysTempFile)
 
-	for _, pubKey := range user.SSHPubKeyPaths {
-		logger.Log.Infof("Adding ssh key (%s) to user (%s)", filepath.Base(pubKey), user.Name)
+	for _, pubKey := range sshPubKeyPaths {
+		logger.Log.Infof("Adding ssh key (%s) to user (%s)", filepath.Base(pubKey), username)
 		relativeDst := filepath.Join(userSSHKeyDir, filepath.Base(pubKey))
 
 		fileToCopy := safechroot.FileToCopy{
@@ -1473,7 +1432,7 @@ func provisionUserSSHCerts(installChroot *safechroot.Chroot, user configuration.
 			return
 		}
 
-		logger.Log.Infof("Adding ssh key (%s) to user (%s) .ssh/authorized_users", filepath.Base(pubKey), user.Name)
+		logger.Log.Infof("Adding ssh key (%s) to user (%s) .ssh/authorized_users", filepath.Base(pubKey), username)
 		pubKeyData, err = file.ReadLines(pubKey)
 		if err != nil {
 			logger.Log.Warnf("Failed to read from SSHPubKey : %v", err)
@@ -1504,16 +1463,16 @@ func provisionUserSSHCerts(installChroot *safechroot.Chroot, user configuration.
 	// Change ownership of the folder to belong to the user and their primary group
 	err = installChroot.UnsafeRun(func() (err error) {
 		// Find the primary group of the user
-		stdout, stderr, err := shell.Execute("id", "-g", user.Name)
+		stdout, stderr, err := shell.Execute("id", "-g", username)
 		if err != nil {
 			logger.Log.Warnf(stderr)
 			return
 		}
 
 		primaryGroup := strings.TrimSpace(stdout)
-		logger.Log.Debugf("Primary group for user (%s) is (%s)", user.Name, primaryGroup)
+		logger.Log.Debugf("Primary group for user (%s) is (%s)", username, primaryGroup)
 
-		ownership := fmt.Sprintf("%s:%s", user.Name, primaryGroup)
+		ownership := fmt.Sprintf("%s:%s", username, primaryGroup)
 		err = shell.ExecuteLive(squashErrors, "chown", "-R", ownership, userSSHKeyDir)
 		if err != nil {
 			return
@@ -1527,20 +1486,6 @@ func provisionUserSSHCerts(installChroot *safechroot.Chroot, user configuration.
 		return
 	}
 
-	return
-}
-
-func updateUserPassword(installRoot, username, password string) (err error) {
-	const sedDelimiter = "|"
-
-	findPattern := fmt.Sprintf("%v:x:", username)
-	replacePattern := fmt.Sprintf("%v:%v:", username, password)
-	filePath := filepath.Join(installRoot, shadowFile)
-	err = sed(findPattern, replacePattern, sedDelimiter, filePath)
-	if err != nil {
-		logger.Log.Warnf("Failed to write hashed password to shadow file")
-		return
-	}
 	return
 }
 

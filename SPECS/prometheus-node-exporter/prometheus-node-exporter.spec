@@ -108,7 +108,7 @@ getent passwd 'prometheus' >/dev/null || useradd -r -g 'prometheus' -d '%{_share
 
 %changelog
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.3.1-21
-- Bump release to rebuild with go 1.20.9
+- Bump release to rebuild with go 1.20.10
 
 * Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 1.3.1-20
 - Bump release to rebuild with updated version of Go.

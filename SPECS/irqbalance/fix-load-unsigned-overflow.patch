@@ -1,0 +1,25 @@
+From 2a66a666d3e202dec5b1a4309447e32d5f292871 Mon Sep 17 00:00:00 2001
+From: liuchao173 <55137861+liuchao173@users.noreply.github.com>
+Date: Tue, 24 Aug 2021 20:50:18 +0800
+Subject: [PATCH] fix unsigned integer subtraction sign overflow
+
+Min_load, adjustment_load  and load are unsigned integers, so it overflows when (lb_info->min_load + info->load) < (lb_info->adjustment_load - info->load). The result will be greater than zero. Therefore the irq cannot be selected to rebalanced.
+
+Signed-off-by: Henry Beberman <henry.beberman@microsoft.com>
+---
+ irqlist.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/irqlist.c b/irqlist.c
+index 9ab321a..4dd4a83 100644
+--- a/irqlist.c
++++ b/irqlist.c
+@@ -97,7 +97,7 @@ static void move_candidate_irqs(struct irq_info *info, void *data)
+ 	}
+ 
+ 	/* If we can migrate an irq without swapping the imbalance do it. */
+-	if ((lb_info->min_load + info->load) - (lb_info->adjustment_load - info->load) < delta_load) {
++	if ((lb_info->min_load + info->load) < delta_load + (lb_info->adjustment_load - info->load)) {
+ 		lb_info->adjustment_load -= info->load;
+ 		lb_info->min_load += info->load;
+ 		if (lb_info->min_load > lb_info->adjustment_load) {
