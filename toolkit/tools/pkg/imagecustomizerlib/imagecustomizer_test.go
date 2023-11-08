@@ -292,18 +292,18 @@ func createFakeEfiImage(buildDir string) (string, error) {
 		return "", fmt.Errorf("failed to format mount identifier:\n%w", err)
 	}
 
-	err = installutils.InstallBootloader(imageChroot, false, "efi", osUuid, bootPrefix, "", assetsDir)
+	err = installutils.InstallBootloader(imageChroot, false, "efi", osUuid, bootPrefix, "")
 	if err != nil {
 		return "", fmt.Errorf("failed to install bootloader:\n%w", err)
 	}
 
-	err = installutils.InstallGrubCfg(imageChroot.RootDir(), rootDevice, osUuid, bootPrefix, assetsDir,
+	err = installutils.InstallGrubCfg(imageChroot.RootDir(), rootDevice, osUuid, bootPrefix,
 		diskutils.EncryptedRootDevice{}, configuration.KernelCommandLine{}, diskutils.VerityDevice{}, false)
 	if err != nil {
 		return "", fmt.Errorf("failed to install main grub config file:\n%w", err)
 	}
 
-	err = installutils.InstallGrubEnv(imageChroot.RootDir(), assetsDir)
+	err = installutils.InstallGrubEnv(imageChroot.RootDir())
 	if err != nil {
 		return "", fmt.Errorf("failed to install grubenv file:\n%w", err)
 	}

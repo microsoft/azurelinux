@@ -69,7 +69,10 @@
             },
             "PostInstallScripts": [
                 {
-                    "Path": "additionalconfigs/configure-image.sh"
+                    "Path": "additionalconfigs/configure-systemd-networkd.sh"
+                },
+                {
+                    "Path": "postinstallscripts/remove-tdnf-cache.sh"
                 }
             ],
             "KernelOptions": {

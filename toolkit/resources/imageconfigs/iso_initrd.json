@@ -28,11 +28,6 @@
             "AdditionalFiles": {
                 "../../out/tools/imager": "/installer/imager",
                 "../../out/tools/liveinstaller": "/installer/liveinstaller",
-                "../assets/efi/grub/grub.cfg": "/installer/efi/grub/grub.cfg",
-                "../assets/efi/grub/grubEncrypt.cfg": "/installer/efi/grub/grubEncrypt.cfg",
-                "../assets/grub2/grub.cfg": "/installer/grub2/grub.cfg",
-                "../assets/grub2/grub": "/installer/grub2/grub",
-                "../assets/grub2/grubenv": "/installer/grub2/grubenv",
                 "additionalfiles/iso_initrd/init": "/init",
                 "additionalfiles/iso_initrd/installer/calamares-EULA.txt": "/etc/calamares/mariner-eula",
                 "additionalfiles/iso_initrd/installer/terminal-EULA.txt": "/installer/EULA.txt",
