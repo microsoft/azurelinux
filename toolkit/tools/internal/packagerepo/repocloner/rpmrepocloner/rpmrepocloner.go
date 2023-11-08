@@ -78,6 +78,7 @@ func ConstructCloner(destinationDir, tmpDir, workerTar, existingRpmsDir, toolcha
 	err = r.initialize(destinationDir, tmpDir, workerTar, existingRpmsDir, toolchainRpmsDir, repoDefinitions)
 	if err != nil {
 		err = fmt.Errorf("failed to prep new rpm cloner:\n%w", err)
+		return
 	}
 
 	tlsKey, tlsCert = strings.TrimSpace(tlsKey), strings.TrimSpace(tlsCert)
