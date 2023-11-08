@@ -99,7 +99,7 @@ extends:
                       pipArtifactFeeds: "mariner/Mariner-Pypi-Feed"
                       selfRepoName: self
                       testSuiteName: "[${{ configuration.name }}] Package test"
-                      extraPackageRetestList: "$(testListFromToolchain)"
+                      testRerunList: "$(testListFromToolchain)"
 
                   - task: PublishPipelineArtifact@1
                     inputs:
