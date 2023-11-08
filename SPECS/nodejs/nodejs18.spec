@@ -6,7 +6,7 @@ Name:           nodejs18
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
 Version:        18.18.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD and MIT and Public Domain and NAIST-2003 and Artistic-2.0
 Group:          Applications/System
 Vendor:         Microsoft Corporation
@@ -116,6 +116,9 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
+* Thu Oct 19 2023 Dan Streetman <ddstreet@ieee.org> - 18.18.2-2
+- Re-enable building debuginfo. We can just ignore the dirs conflict failure in the pipelines! :)
+
 * Wed Oct 18 2023 Dan Streetman <ddstreet@ieee.org> - 18.18.2-1
 - Update to 18.18.2 to fix CVE-2023-44487
 

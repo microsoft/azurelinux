@@ -54,7 +54,7 @@ install -D -p -m 0644 man/*             %{buildroot}%{_mandir}/man1/
 
 %changelog
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.50.2-7
-- Bump release to rebuild with go 1.20.9
+- Bump release to rebuild with go 1.20.10
 
 * Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 0.50.2-6
 - Bump release to rebuild with updated version of Go.

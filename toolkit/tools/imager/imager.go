@@ -397,7 +397,7 @@ func setupLoopDeviceDisk(outputDir, diskName string, diskConfig configuration.Di
 	}()
 
 	// Create Raw Disk File
-	rawDisk, err := diskutils.CreateEmptyDisk(outputDir, diskName, diskConfig)
+	rawDisk, err := diskutils.CreateEmptyDisk(outputDir, diskName, diskConfig.MaxSize)
 	if err != nil {
 		logger.Log.Errorf("Failed to create empty disk file in (%s)", outputDir)
 		return

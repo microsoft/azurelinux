@@ -9,7 +9,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.72.0
-Release:        2%{?dist}
+Release:        5%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -41,6 +41,7 @@ Source4:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{sta
 Source5:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
+Patch0:         CVE-2023-45853.patch
 BuildRequires:  binutils
 BuildRequires:  cmake
 # make sure rust relies on curl from CBL-Mariner (instead of using its vendored flavor)
@@ -56,7 +57,7 @@ BuildRequires:  ninja-build
 BuildRequires:  openssl-devel
 BuildRequires:  python3
 %if %{with_check}
-BuildRequires:  glibc-static >= 2.35-5%{?dist}
+BuildRequires:  glibc-static >= 2.35-6%{?dist}
 %endif
 # rustc uses a C compiler to invoke the linker, and links to glibc in most cases
 Requires:       binutils
@@ -120,7 +121,7 @@ USER=root SUDO_USER=root %make_build
 # We expect to generate dynamic CI contents in this folder, but it will fail since the .github folder is not included
 # with the published sources.
 mkdir -p .github/workflows
-x.py run src/tools/expand-yaml-anchors
+./x.py run src/tools/expand-yaml-anchors
 
 ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage2-tools-bin/rustfmt %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage0/bin/
 ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/vendor/ /root/vendor
@@ -167,6 +168,15 @@ rm %{buildroot}%{_bindir}/*.old
 %{_mandir}/man1/*
 
 %changelog
+* Mon Oct 30 2023 Rohit Rawat <rohitrawat@microsoft.com> - 1.72.0-5
+- Patch CVE-2023-45853 in vendor/libz-sys/src/zlib
+
+* Tue Oct 10 2023 Daniel McIlvaney <damcilva@microsoft.com> - 1.72.2-4
+- Explicitly call './x.py' instead of 'x.py'
+
+* Wed Oct 04 2023 Minghe Ren <mingheren@microsoft.com> - 1.72.2-3
+- Bump release to rebuild against glibc 2.35-6
+
 * Tue Oct 03 2023 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.72.2-2
 - Bump release to rebuild against glibc 2.35-5
 

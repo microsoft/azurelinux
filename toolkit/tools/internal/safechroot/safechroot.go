@@ -403,6 +403,19 @@ func (c *Chroot) Close(leaveOnDisk bool) (err error) {
 	defer activeChrootsMutex.Unlock()
 
 	if buildpipeline.IsRegularBuild() {
+		index := -1
+		for i, chroot := range activeChroots {
+			if chroot == c {
+				index = i
+				break
+			}
+		}
+
+		if index < 0 {
+			// Already closed.
+			return
+		}
+
 		// mount is only supported in regular pipeline
 		err = c.unmountAndRemove(leaveOnDisk, unmountTypeNormal)
 		if err != nil {
@@ -414,13 +427,8 @@ func (c *Chroot) Close(leaveOnDisk bool) (err error) {
 			// Remove this chroot from the list of active ones since it has now been cleaned up.
 			// Create a new slice that is -1 capacity of the current activeChroots.
 			newActiveChroots := make([]*Chroot, emptyLen, len(activeChroots)-1)
-			for _, chroot := range activeChroots {
-				if chroot == c {
-					continue
-				}
-
-				newActiveChroots = append(newActiveChroots, chroot)
-			}
+			newActiveChroots = append(newActiveChroots, activeChroots[:index]...)
+			newActiveChroots = append(newActiveChroots, activeChroots[index+1:]...)
 			activeChroots = newActiveChroots
 		}
 	} else {
@@ -475,7 +483,7 @@ func cleanupAllChroots() {
 	// Acquire and permanently hold the global inChrootMutex lock to ensure this application is not
 	// inside any Chroot.
 	logger.Log.Info("Waiting for outstanding chroot commands to finish")
-	shell.PermanentlyStopAllProcesses(stopSignal)
+	shell.PermanentlyStopAllChildProcesses(stopSignal)
 	inChrootMutex.Lock()
 
 	// mount is only supported in regular pipeline
@@ -524,6 +532,17 @@ func (c *Chroot) unmountAndRemove(leaveOnDisk, lazyUnmount bool) (err error) {
 
 	for _, mountPoint := range c.mountPoints {
 		fullPath := filepath.Join(c.rootDir, mountPoint.target)
+
+		var exists bool
+		exists, err = file.PathExists(fullPath)
+		if err != nil {
+			err = fmt.Errorf("failed to check if mount point (%s) exists. Error: %s", fullPath, err)
+			return
+		}
+		if !exists {
+			logger.Log.Debugf("Skipping unmount of (%s) because path doesn't exist", fullPath)
+			continue
+		}
 
 		var isMounted bool
 		isMounted, err = mountinfo.Mounted(fullPath)

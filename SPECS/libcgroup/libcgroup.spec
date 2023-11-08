@@ -1,7 +1,7 @@
 Summary:        Library to control and monitor control groups
 Name:           libcgroup
 Version:        2.0.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -111,6 +111,7 @@ install tests/gunit/.libs/gtest ${RPM_BUILD_ROOT}/tests/gunit/.libs/lt-gtest
 
 # install config files
 install -d ${RPM_BUILD_ROOT}%{_sysconfdir}
+install -d ${RPM_BUILD_ROOT}%{_sysconfdir}/cgconfig.d
 install -m 644 samples/cgconfig.conf $RPM_BUILD_ROOT/%{_sysconfdir}/cgconfig.conf
 install -m 644 samples/cgsnapshot_blacklist.conf $RPM_BUILD_ROOT/%{_sysconfdir}/cgsnapshot_blacklist.conf
 
@@ -150,6 +151,7 @@ getent group cgred >/dev/null || groupadd -r cgred
 %doc README README_systemd
 %config(noreplace) %{_sysconfdir}/cgconfig.conf
 %config(noreplace) %{_sysconfdir}/cgsnapshot_blacklist.conf
+%dir %{_sysconfdir}/cgconfig.d
 %{_bindir}/cgcreate
 %{_bindir}/cgget
 %{_bindir}/cgset
@@ -186,6 +188,9 @@ getent group cgred >/dev/null || groupadd -r cgred
 /tests/gunit/.libs/lt-gtest
 
 %changelog
+* Tue Aug 29 2023 Andy Zaugg <azaugg@linkedin.com> - 2.0.1-2
+- Create CGCONFIG_CONF_DIR directories on package install
+
 * Tue Mar 15 2022 Nicolas Guibourge <nicolasg@microsoft.com> 2.0.1-23
 - Ugrade to 2.0.1.
 
