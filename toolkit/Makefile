@@ -89,11 +89,13 @@ BUILD_DIR        ?= $(PROJECT_ROOT)/build
 OUT_DIR          ?= $(PROJECT_ROOT)/out
 SPECS_DIR        ?= $(PROJECT_ROOT)/SPECS
 CCACHE_DIR       ?= $(PROJECT_ROOT)/ccache
+CCACHE_CONFIG    ?= $(RESOURCES_DIR)/manifests/package/ccache-configuration.json
 
 # Sub-folder defines
 LOGS_DIR           ?= $(BUILD_DIR)/logs
 PKGBUILD_DIR       ?= $(BUILD_DIR)/pkg_artifacts
 CACHED_RPMS_DIR    ?= $(BUILD_DIR)/rpm_cache
+REPO_QUERY_DIR     ?= $(BUILD_DIR)/repo_query
 BUILD_SRPMS_DIR    ?= $(BUILD_DIR)/INTERMEDIATE_SRPMS
 MACRO_DIR          ?= $(BUILD_DIR)/macros
 BUILD_SPECS_DIR    ?= $(BUILD_DIR)/INTERMEDIATE_SPECS
@@ -122,17 +124,22 @@ IMAGES_DIR      ?= $(OUT_DIR)/images
 # External source server
 SOURCE_URL         ?= https://cblmarinerstorage.blob.core.windows.net/sources/core
 
+# Note on order of precedence: When a variable is passed from the commandline (i.e., make PACKAGE_URL_LIST="my list"), append
+# assignments do not take affect without using 'override'. This means that all of the following PACKAGE_URL_LIST values will
+# be ignored if the user sets any value.
+##help:var:PACKAGE_URL_LIST:<urls_list>=Space-separated list of URLs to download toolchain RPM packages from, used to populate the toolchain packages if `REBUILD_TOOLCHAIN=n'. The URLs will replace the default set of URLs. Print default list with 'make -s printvar-PACKAGE_URL_LIST'.
 PACKAGE_URL_LIST   ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)
 PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/debuginfo/$(build_arch)
 PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/Microsoft/$(build_arch)
 REPO_LIST          ?=
 SRPM_URL_LIST      ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms
 
+# Preview URLs/repos will be appended (via override) even if the user sets custom values for the lists.
 ifeq ($(USE_PREVIEW_REPO),y)
-   PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/$(build_arch)
-   PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/debuginfo/$(build_arch)
-   PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/Microsoft/$(build_arch)
-   SRPM_URL_LIST      += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/srpms
+   override PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/$(build_arch)
+   override PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/debuginfo/$(build_arch)
+   override PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/Microsoft/$(build_arch)
+   override SRPM_URL_LIST      += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/srpms
    ifneq ($(wildcard $(PREVIEW_REPO)),)
       override REPO_LIST += $(PREVIEW_REPO)
    else
@@ -179,17 +186,19 @@ include $(SCRIPTS_DIR)/profile.mk
 # Set the variables for build number, distro tag, etc
 include $(SCRIPTS_DIR)/build_tag.mk
 
+# go utilities with:
+#   go-tools, clean-go-tools, go-tidy-all (tidy go utilities before committing) go-test-coverage
+include $(SCRIPTS_DIR)/tools.mk
+
 # Bootstrap the toolchain's compilers and other tools with:
 #   toolchain, raw-toolchain, clean-toolchain, check-manifests, check-x86_64-manifests, check-aarch64-manifests
 include $(SCRIPTS_DIR)/toolchain.mk
 
-# go utilities with:
-#   go-tools, clean-go-tools, go-tidy-all (tidy go utilities before committing) go-test-coverage
 # chroot worker with:
 #   chroot-tools clean-chroot-tools
 # macro definitions with:
 #   macro-tools clean-macro-tools
-include $(SCRIPTS_DIR)/tools.mk
+include $(SCRIPTS_DIR)/chroot.mk
 
 # Create SRPMS from local SPECS with:
 #   input-srpms, clean-input-srpms
@@ -210,6 +219,10 @@ include $(SCRIPTS_DIR)/toolkit.mk
 # Fill the cache with rpms from the package server without using package manager or chroot with:
 #   pre-cache
 include $(SCRIPTS_DIR)/precache.mk
+
+# Run repo query under chroot with:
+# repo-query
+include $(SCRIPTS_DIR)/repoquerywrapper.mk
 
 # Create a package build workplan with:
 #   workplan, clean-workplan clean-cache

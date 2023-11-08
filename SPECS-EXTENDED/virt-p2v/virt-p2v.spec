@@ -9,7 +9,7 @@ Distribution:   Mariner
 Summary:       Convert a physical machine to run on KVM
 Name:          virt-p2v
 Version:       1.42.0
-Release:       5%{?dist}
+Release:       6%{?dist}
 License:       GPLv2+ and LGPLv2+
 
 # virt-p2v works only on x86_64 at the moment.  It requires porting
@@ -89,7 +89,7 @@ make V=1 %{?_smp_mflags}
 
 if ! make check; then
     cat test-suite.log
-    exit 1
+    false
 fi
 
 
@@ -117,6 +117,9 @@ rm $RPM_BUILD_ROOT%{_mandir}/man1/p2v-release-notes.1*
 
 
 %changelog
+* Tue Sep 26 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.42.0-6
+- Removing 'exit' calls from the '%%check' section.
+
 * Fri Jan 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.42.0-5
 - Removing in-spec verification of source tarballs.
 - License verified.

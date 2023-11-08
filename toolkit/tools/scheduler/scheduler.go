@@ -12,6 +12,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/ccachemanager"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
@@ -33,7 +34,10 @@ const (
 	defaultMaxCascadingRebuilds = "-1"
 )
 
-var defaultFreshness = fmt.Sprintf("%d", schedulerutils.NodeFreshnessAbsoluteMax)
+var (
+	defaultFreshness = fmt.Sprintf("%d", schedulerutils.NodeFreshnessAbsoluteMax)
+	defaultTimeout   = "99h"
+)
 
 // schedulerChannels represents the communication channels used by a build agent.
 // Unlike BuildChannels, schedulerChannels holds bidirectional channels that
@@ -60,7 +64,6 @@ var (
 	toolchainDirPath = app.Flag("toolchain-rpms-dir", "Directory that contains already built toolchain RPMs. Should contain top level directories for architecture.").Required().ExistingDir()
 	srpmDir          = app.Flag("srpm-dir", "The output directory for source RPM packages").Required().String()
 	cacheDir         = app.Flag("cache-dir", "The cache directory containing downloaded dependency RPMS from Mariner Base").Required().ExistingDir()
-	ccacheDir        = app.Flag("ccache-dir", "The directory used to store ccache outputs").Required().ExistingDir()
 	buildLogsDir     = app.Flag("build-logs-dir", "Directory to store package build logs").Required().ExistingDir()
 
 	imageConfig = app.Flag("image-config-file", "Optional image config file to extract a package list from.").String()
@@ -79,8 +82,11 @@ var (
 	toolchainManifest          = app.Flag("toolchain-manifest", "Path to a list of RPMs which are created by the toolchain. RPMs from this list will are considered 'prebuilt' and will not be rebuilt").ExistingFile()
 	optimizeWithCachedImplicit = app.Flag("optimize-with-cached-implicit", "Optimize the build process by allowing cached implicit packages to be used to optimize the initial build graph instead of waiting for a real package build to provide the nodes.").Bool()
 	useCcache                  = app.Flag("use-ccache", "Automatically install and use ccache during package builds").Bool()
+	ccacheDir                  = app.Flag("ccache-dir", "The directory used to store ccache outputs").String()
+	ccacheConfig               = app.Flag("ccache-config", "The ccache configuration file path.").String()
 	allowToolchainRebuilds     = app.Flag("allow-toolchain-rebuilds", "Allow toolchain packages to rebuild without causing an error.").Bool()
 	maxCPU                     = app.Flag("max-cpu", "Max number of CPUs used for package building").Default("").String()
+	timeout                    = app.Flag("timeout", "Max duration for any individual package build/test").Default(defaultTimeout).Duration()
 
 	validBuildAgentFlags = []string{buildagents.TestAgentFlag, buildagents.ChrootAgentFlag}
 	buildAgent           = app.Flag("build-agent", "Type of build agent to build packages with.").PlaceHolder(exe.PlaceHolderize(validBuildAgentFlags)).Required().Enum(validBuildAgentFlags...)
@@ -147,7 +153,6 @@ func main() {
 	buildAgentConfig := &buildagents.BuildAgentConfig{
 		Program:      *buildAgentProgram,
 		CacheDir:     *cacheDir,
-		CCacheDir:    *ccacheDir,
 		RepoFile:     *repoFile,
 		RpmDir:       *rpmDir,
 		ToolchainDir: *toolchainDirPath,
@@ -160,9 +165,12 @@ func main() {
 		DistroBuildNumber:    *distroBuildNumber,
 		RpmmacrosFile:        *rpmmacrosFile,
 
-		NoCleanup: *noCleanup,
-		UseCcache: *useCcache,
-		MaxCpu:    *maxCPU,
+		NoCleanup:    *noCleanup,
+		UseCcache:    *useCcache,
+		CCacheDir:    *ccacheDir,
+		CCacheConfig: *ccacheConfig,
+		MaxCpu:       *maxCPU,
+		Timeout:      *timeout,
 
 		LogDir:   *buildLogsDir,
 		LogLevel: *logLevel,
@@ -190,6 +198,19 @@ func main() {
 	if err != nil {
 		logger.Log.Fatalf("Unable to build package graph.\nFor details see the build summary section above.\nError: %s.", err)
 	}
+
+	if *useCcache {
+		logger.Log.Infof("  ccache is enabled. processing multi-package groups under (%s)...", *ccacheDir)
+		ccacheManager, ccacheErr := ccachemanagerpkg.CreateManager(*ccacheDir, *ccacheConfig)
+		if ccacheErr == nil {
+			ccacheErr = ccacheManager.UploadMultiPkgGroupCCaches()
+			if ccacheErr != nil {
+				logger.Log.Warnf("Failed to archive CCache artifacts:\n%v.", err)
+			}
+		} else {
+			logger.Log.Warnf("Failed to initialize the ccache manager:\n%v", err)
+		}
+	}
 }
 
 // cancelOutstandingBuilds stops any builds that are currently running.
@@ -200,7 +221,7 @@ func cancelOutstandingBuilds(agent buildagents.BuildAgent) {
 	}
 
 	// Issue a SIGINT to all children processes to allow them to gracefully exit.
-	shell.PermanentlyStopAllProcesses(unix.SIGINT)
+	shell.PermanentlyStopAllChildProcesses(unix.SIGINT)
 }
 
 // cancelBuildsOnSignal will stop any builds running on SIGINT/SIGTERM.
@@ -278,23 +299,6 @@ func startWorkerPool(agent buildagents.BuildAgent, workers, buildAttempts, check
 	return
 }
 
-// debugStuckNode is a debugging function that will print out the stuck node and all nodes that are blocking it.
-func debugStuckNode(buildState *schedulerutils.GraphBuildState, pkgGraph *pkggraph.PkgGraph, stuckNode *pkggraph.PkgNode, indent int) {
-	if buildState.IsNodeAvailable(stuckNode) {
-		return
-	}
-
-	nodeName := fmt.Sprintf("(%s)", stuckNode.FriendlyName())
-	logger.Log.Debugf("%*s", indent, nodeName)
-
-	// Iterate over all the nodes that are blocking the stuck node.
-	dependency := pkgGraph.From(stuckNode.ID())
-	for dependency.Next() {
-		dependent := dependency.Node().(*pkggraph.PkgNode)
-		debugStuckNode(buildState, pkgGraph, dependent, indent+1)
-	}
-}
-
 // buildAllNodes will build all nodes in a given dependency graph.
 // This routine only contains control flow logic for build scheduling.
 // It iteratively:
@@ -364,8 +368,6 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 		if len(buildState.ActiveBuilds()) == 0 && len(channels.Results) == 0 {
 			if useCachedImplicit {
 				err = fmt.Errorf("could not build all packages")
-				// Temporarily print debug information about the stuck node.
-				debugStuckNode(buildState, pkgGraph, goalNode, 0)
 				break
 			} else {
 				logger.Log.Warn("Enabling cached packages to satisfy unresolved dynamic dependencies.")
@@ -465,7 +467,6 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 				logger.Log.Infof("%d currently active test(s): %v.", len(activeTests), activeTests)
 			}
 		}
-
 	}
 
 	// Let the workers know they are done

@@ -159,18 +159,37 @@ func (s *SnapshotGenerator) readBuiltRPMs(specPaths []string, defines map[string
 		return
 	}
 
+	type SnapshotResult struct {
+		rpms []string
+		err  error
+	}
+	resultsChannel := make(chan SnapshotResult, len(specPaths))
+
 	for _, specPath := range specPaths {
 		logger.Log.Debugf("Parsing spec (%s).", specPath)
 
 		specDirPath := filepath.Dir(specPath)
 
-		builtRPMs, err = rpm.QuerySPECForBuiltRPMs(specPath, specDirPath, buildArch, defines)
-		if err != nil {
-			logger.Log.Errorf("Failed to query built RPMs from (%s). Error: %v.", specPath, err)
+		go func(pathIter string) {
+			builtRPMs, err = rpm.QuerySPECForBuiltRPMs(pathIter, specDirPath, buildArch, defines)
+			if err != nil {
+				err = fmt.Errorf("failed to query built RPMs from (%s):\n%w", pathIter, err)
+			}
+
+			resultsChannel <- SnapshotResult{
+				rpms: builtRPMs,
+				err:  err,
+			}
+		}(specPath)
+	}
+
+	for i := 0; i < len(specPaths); i++ {
+		result := <-resultsChannel
+		if result.err != nil {
+			err = result.err
 			return
 		}
-
-		allBuiltRPMs = append(allBuiltRPMs, builtRPMs...)
+		allBuiltRPMs = append(allBuiltRPMs, result.rpms...)
 	}
 
 	return

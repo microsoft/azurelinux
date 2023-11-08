@@ -1,7 +1,7 @@
 Summary:        epoxy runtime library
 Name:           libepoxy
 Version:        1.5.10
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -44,7 +44,7 @@ developing applications that use %{name}.
 # This should be %%meson_test but the macro expands with a multiple
 # embedded newlines for no obvious reason
 ninja -C %{_vpath_builddir} test || \
-    (cat %{_vpath_builddir}/meson-logs/testlog.txt ; exit 1)
+    (cat %{_vpath_builddir}/meson-logs/testlog.txt ; false)
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -60,6 +60,9 @@ ninja -C %{_vpath_builddir} test || \
 %{_libdir}/pkgconfig/epoxy.pc
 
 %changelog
+* Tue Sep 26 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.10-2
+- Removing 'exit' calls from the '%%check' section.
+
 * Thu May 19 2022 Sriram Nambakam <snambakam@microsoft.com> - 1.5.10-1
 - Update to version 1.5.10
 
