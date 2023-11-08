@@ -111,7 +111,6 @@ extends:
                       maxCPU: "${{ configuration.maxCPUs }}"
                       pipArtifactFeeds: "mariner/Mariner-Pypi-Feed"
                       selfRepoName: self
-                      srpmPackList: "json-glib jq protobuf"
                       testSuiteName: "[${{ configuration.name }}] Package test"
                       testRerunList: "$(testListFromToolchain)"
 
