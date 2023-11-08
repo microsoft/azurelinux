@@ -8,7 +8,6 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
-	"reflect"
 	"strconv"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
@@ -66,11 +65,6 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 	}
 
 	err = loadOrDisableModules(config.SystemConfig.Modules, imageChroot)
-	if err != nil {
-		return err
-	}
-
-	err = addOSSubrelease(config.SystemConfig.OSSubrelease, imageChroot)
 	if err != nil {
 		return err
 	}
@@ -363,37 +357,6 @@ func loadOrDisableModules(modules imagecustomizerapi.Modules, imageChroot *safec
 		if err != nil {
 			return fmt.Errorf("failed to write module disable configuration: %w", err)
 		}
-	}
-
-	return nil
-}
-
-func addOSSubrelease(ossubrelease imagecustomizerapi.OSSubrelease, imageChroot *safechroot.Chroot) error {
-	var err error
-
-	val := reflect.ValueOf(ossubrelease)
-	typ := reflect.TypeOf(ossubrelease)
-
-	var lines []string
-
-	// Iterate over all fields of the OSSubrelease struct
-	for i := 0; i < val.NumField(); i++ {
-		fieldValue := val.Field(i)
-		fieldType := typ.Field(i)
-
-		fieldName := fieldType.Tag.Get("file")
-
-		// Construct the string and add it to the lines slice
-		line := fmt.Sprintf("%s=\"%s\"", fieldName, fieldValue)
-		lines = append(lines, line)
-	}
-
-	lines = append(lines, "")
-	ossubreleaseFilePath := filepath.Join(imageChroot.RootDir(), "/etc/os-subrelease")
-	logger.Log.Infof("Writing os-subrelease content to '%s'", ossubreleaseFilePath)
-	err = file.WriteLines(lines, ossubreleaseFilePath)
-	if err != nil {
-		return fmt.Errorf("error writing os-subrelease content to '%s': %w", ossubreleaseFilePath, err)
 	}
 
 	return nil
