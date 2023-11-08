@@ -125,14 +125,14 @@ popd
 rm -rf texinfo-7.0.3
 touch /logs/status_texinfo_complete
 
-echo util-linux-2.37.4
-tar xf util-linux-2.37.4.tar.xz
-pushd util-linux-2.37.4
+echo util-linux-2.39.2
+tar xf util-linux-2.39.2.tar.xz
+pushd util-linux-2.39.2
 mkdir -pv /var/lib/hwclock
-./configure ADJTIME_PATH=/var/lib/hwclock/adjtime    \
+./configure ADJTIME_PATH=/var/lib/hwclock/adjtime \
             --libdir=/usr/lib    \
             --runstatedir=/run   \
-            --docdir=/usr/share/doc/util-linux-2.37.4 \
+            --docdir=/usr/share/doc/util-linux-2.39.2 \
             --disable-chfn-chsh  \
             --disable-login      \
             --disable-nologin    \
@@ -145,7 +145,7 @@ mkdir -pv /var/lib/hwclock
 make -j$(nproc)
 make install
 popd
-rm -rf util-linux-2.37.4
+rm -rf util-linux-2.39.2
 touch /logs/status_util-linux_complete
 
 # 7.13. Cleaning up and Saving the Temporary System
@@ -253,19 +253,20 @@ popd
 rm -rf file-5.45
 touch /logs/status_file_complete
 
-echo Readline-8.1
-tar xf readline-8.1.tar.gz
-pushd readline-8.1
+echo Readline-8.2
+tar xf readline-8.2.tar.gz
+pushd readline-8.2
 sed -i '/MV.*old/d' Makefile.in
 sed -i '/{OLDSUFF}/c:' support/shlib-install
+patch -Np1 -i ../readline-8.2-upstream_fix-1.patch
 ./configure --prefix=/usr    \
             --disable-static \
             --with-curses    \
-            --docdir=/usr/share/doc/readline-8.1
+            --docdir=/usr/share/doc/readline-8.2
 make SHLIB_LIBS="-lncursesw"
 make SHLIB_LIBS="-lncursesw" install
 popd
-rm -rf readline-8.1
+rm -rf readline-8.2
 touch /logs/status_readline_complete
 
 echo M4-1.4.19
@@ -353,14 +354,14 @@ popd
 rm -rf mpc-1.3.1
 touch /logs/status_libmpc_complete
 
-echo libcap-2.60
-tar xf libcap-2.60.tar.xz
-pushd libcap-2.60
+echo libcap-2.69
+tar xf libcap-2.69.tar.xz
+pushd libcap-2.69
 sed -i '/install -m.*STA/d' libcap/Makefile
 make -j$(nproc) prefix=/usr lib=lib
 make prefix=/usr lib=lib install
 popd
-rm -rf libcap-2.60
+rm -rf libcap-2.69
 touch /logs/status_libcap_complete
 
 echo GCC-13.2.0
@@ -535,9 +536,9 @@ popd
 rm -rf grep-3.11
 touch /logs/status_grep_complete
 
-echo Bash-5.1.8
-tar xf bash-5.1.8.tar.gz
-pushd bash-5.1.8
+echo Bash-5.2.15
+tar xf bash-5.2.15.tar.gz
+pushd bash-5.2.15
 ./configure --prefix=/usr             \
             --without-bash-malloc     \
             --with-installed-readline \
@@ -545,33 +546,33 @@ pushd bash-5.1.8
 make -j$(nproc)
 make install
 popd
-rm -rf bash-5.1.8
+rm -rf bash-5.2.15
 touch /logs/status_bash_complete
 
 # Login again to use new bash?
 #exec /usr/bin/bash --login
 
-echo Libtool-2.4.6
-tar xf libtool-2.4.6.tar.xz
-pushd libtool-2.4.6
+echo Libtool-2.4.7
+tar xf libtool-2.4.7.tar.xz
+pushd libtool-2.4.7
 ./configure --prefix=/usr
 make -j$(nproc)
 make install
 rm -fv /usr/lib/libltdl.a
 popd
-rm -rf libtool-2.4.6
+rm -rf libtool-2.4.7
 touch /logs/status_libtool_complete
 
-echo GDBM-1.21
-tar xf gdbm-1.21.tar.gz
-pushd gdbm-1.21
+echo GDBM-1.23
+tar xf gdbm-1.23.tar.gz
+pushd gdbm-1.23
 ./configure --prefix=/usr    \
             --disable-static \
             --enable-libgdbm-compat
 make -j$(nproc)
 make install
 popd
-rm -rf gdbm-1.21
+rm -rf gdbm-1.23
 touch /logs/status_gdbm_complete
 
 echo gperf-3.1
@@ -684,9 +685,9 @@ popd
 rm -rf elfutils-0.189
 touch /logs/status_libelf_complete
 
-echo Libffi-3.4.2
-tar xf libffi-3.4.2.tar.gz
-pushd libffi-3.4.2
+echo Libffi-3.4.4
+tar xf libffi-3.4.4.tar.gz
+pushd libffi-3.4.4
 # TODO: set generic build to avoid optimizations causing illegal operation errors on other processors
 # options: https://gcc.gnu.org/onlinedocs/gcc-9.2.0/gcc/x86-Options.html
 #          https://gcc.gnu.org/onlinedocs/gcc-9.2.0/gcc/AArch64-Options.html#AArch64-Options
@@ -720,7 +721,7 @@ unset GCC_ARCH
 make -j$(nproc)
 make install
 popd
-rm -rf libffi-3.4.2
+rm -rf libffi-3.4.4
 touch /logs/status_libffi_complete
 
 echo Python-3.9.13
@@ -816,14 +817,14 @@ popd
 rm -rf libpipeline-1.5.7
 touch /logs/status_libpipeline_complete
 
-echo Make-4.3
-tar xf make-4.3.tar.gz
-pushd make-4.3
+echo Make-4.4.1
+tar xf make-4.4.1.tar.gz
+pushd make-4.4.1
 ./configure --prefix=/usr
 make -j$(nproc)
 make install
 popd
-rm -rf make-4.3
+rm -rf make-4.4.1
 touch /logs/status_make_complete
 
 echo Patch-2.7.6
@@ -857,23 +858,22 @@ popd
 rm -rf texinfo-7.0.3
 touch /logs/status_texinfo_complete
 
-echo Procps-ng-3.3.17
-tar xf procps-ng-3.3.17.tar.xz
-pushd procps-3.3.17
+echo Procps-ng-4.0.4
+tar xf procps-ng-4.0.4.tar.xz
+pushd procps-ng-4.0.4
 ./configure --prefix=/usr                            \
-            --docdir=/usr/share/doc/procps-ng-3.3.17 \
+            --docdir=/usr/share/doc/procps-ng-4.0.4  \
             --disable-static                         \
             --disable-kill
 make -j$(nproc)
 make install
 popd
-rm -rf procps-3.3.17
+rm -rf procps-ng-4.0.4
 touch /logs/status_procpsng_complete
 
-echo util-linux-2.37.4
-tar xf util-linux-2.37.4.tar.xz
-pushd util-linux-2.37.4
-mkdir -pv /var/lib/hwclock
+echo util-linux-2.39.2
+tar xf util-linux-2.39.2.tar.xz
+pushd util-linux-2.39.2
 ./configure ADJTIME_PATH=/var/lib/hwclock/adjtime \
             --bindir=/usr/bin    \
             --libdir=/usr/lib    \
@@ -889,11 +889,12 @@ mkdir -pv /var/lib/hwclock
             --disable-static     \
             --without-python     \
             --without-systemd    \
-            --without-systemdsystemunitdir
+            --without-systemdsystemunitdir \
+            --docdir=/usr/share/doc/util-linux-2.39.2
 make -j$(nproc)
 make install
 popd
-rm -rf util-linux-2.37.4
+rm -rf util-linux-2.39.2
 touch /logs/status_util-linux_complete
 
 #
@@ -958,12 +959,12 @@ popd
 rm -rf libarchive-3.7.1
 touch /logs/status_libarchive_complete
 
-echo lua-5.4.4
-tar xf lua-5.4.4.tar.gz
-pushd lua-5.4.4
+echo lua-5.4.6
+tar xf lua-5.4.6.tar.gz
+pushd lua-5.4.6
 cat > lua.pc << "EOF"
 V=5.4
-R=5.4.4
+R=5.4.6
 prefix=/usr
 INSTALL_BIN=${prefix}/bin
 INSTALL_INC=${prefix}/include
@@ -981,19 +982,16 @@ Requires:
 Libs: -L${libdir} -llua -lm -ldl
 Cflags: -I${includedir}
 EOF
-patch -Np1 -i ../lua-5.4.4-shared_library-2.patch
-sed -i '/#define LUA_ROOT/s:/usr/local/:/usr/:' src/luaconf.h
-make MYCFLAGS="-DLUA_COMPAT_5_2 -DLUA_COMPAT_5_1" linux
+patch -Np1 -i ../lua-5.4.6-shared_library-1.patch
+make linux
 make INSTALL_TOP=/usr                \
      INSTALL_DATA="cp -d"            \
      INSTALL_MAN=/usr/share/man/man1 \
-     TO_LIB="liblua.so liblua.so.5.4 liblua.so.5.4.4" \
+     TO_LIB="liblua.so liblua.so.5.4 liblua.so.5.4.6" \
      install
-mkdir -pv                      /usr/share/doc/lua-5.4.4
-cp -v doc/*.{html,css,gif,png} /usr/share/doc/lua-5.4.4
 install -v -m644 -D lua.pc /usr/lib/pkgconfig/lua.pc
 popd
-rm -rf lua-5.4.4
+rm -rf lua-5.4.6
 touch /logs/status_lua_complete
 
 DEBUGEDIT_WITH_VERSION=debugedit-5.0

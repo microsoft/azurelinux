@@ -49,7 +49,7 @@ make  %{?_smp_mflags} check
 %{_mandir}/man3/zlib.3.gz
 
 %changelog
-* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.3-1
+* Mon Oct 30 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.3-1
 - Auto-upgrade to 1.3 - Azure Linux 3.0 - package upgrades
 
 * Thu Oct 19 2023 Nan Liu <liunan@microsoft.com> - 1.2.13-2

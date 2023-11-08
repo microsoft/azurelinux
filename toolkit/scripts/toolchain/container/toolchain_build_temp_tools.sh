@@ -85,17 +85,17 @@ rm -rf gcc-13.2.0
 
 touch $LFS/logs/temptoolchain/status_gcc_pass1_complete
 
-KERNEL_VERSION="5.15.48.1"
+KERNEL_VERSION="6.1.58.1"
 echo Linux-${KERNEL_VERSION} API Headers
 tar xf kernel-${KERNEL_VERSION}.tar.gz
-pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-${KERNEL_VERSION}
+pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-3-${KERNEL_VERSION}
 make mrproper
 make headers
 find usr/include -type f ! -name '*.h' -delete
 mkdir -pv $LFS/usr/include
 cp -rv usr/include/* $LFS/usr/include
 popd
-rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-${KERNEL_VERSION}
+rm -rf CBL-Mariner-Linux-Kernel-rolling-lts-mariner-3-${KERNEL_VERSION}
 
 touch $LFS/logs/temptoolchain/status_kernel_headers_complete
 

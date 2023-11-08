@@ -586,8 +586,7 @@ build_rpm_in_chroot_no_install tdnf
 
 # Build createrepo_c
 # createrepo_c needs cmake, file, glib
-# Provide qualified package name for 'file' to avoid conflict installing 'filesystem' package
-chroot_and_install_rpms file file
+chroot_and_install_rpms file file # Use full naming since we have a collision with filesystem
 chroot_and_install_rpms glib
 build_rpm_in_chroot_no_install createrepo_c
 

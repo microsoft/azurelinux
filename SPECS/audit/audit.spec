@@ -1,14 +1,14 @@
 Summary:        Kernel Audit Tool
 Name:           audit
-Version:        3.0.6
-Release:        8%{?dist}
+Version:        3.1.2
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://people.redhat.com/sgrubb/audit/
 Source0:        https://people.redhat.com/sgrubb/audit/%{name}-%{version}.tar.gz
-Patch0:         refuse-manual-stop.patch
+#Patch0:         refuse-manual-stop.patch
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  krb5-devel
 BuildRequires:  systemd-bootstrap-rpm-macros
@@ -54,7 +54,7 @@ and libauparse.
 
 %prep
 %setup -q
-%patch0 -p1
+sed -i "s/RefuseManualStop=yes/RefuseManualStop=no/g" init.d/auditd.service
 
 %build
 ./configure \
@@ -136,6 +136,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{python3_sitelib}/*
 
 %changelog
+* Wed Nov 08 2023 Andrew Phelps <anphel@microsoft.com> - 3.1.2-1
+- Upgrade to version 3.1.2
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.0.6-8
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

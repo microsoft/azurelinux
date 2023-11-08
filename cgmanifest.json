@@ -735,8 +735,8 @@
         "type": "other",
         "other": {
           "name": "audit",
-          "version": "3.0.6",
-          "downloadUrl": "https://people.redhat.com/sgrubb/audit/audit-3.0.6.tar.gz"
+          "version": "3.1.2",
+          "downloadUrl": "https://people.redhat.com/sgrubb/audit/audit-3.1.2.tar.gz"
         }
       }
     },
