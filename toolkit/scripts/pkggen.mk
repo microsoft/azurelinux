@@ -185,7 +185,6 @@ graphpkgfetcher_extra_flags += --image-config-file="$(CONFIG_FILE)"
 graphpkgfetcher_extra_flags += --ignored-tests="$(TEST_IGNORE_LIST)"
 graphpkgfetcher_extra_flags += --tests="$(TEST_RUN_LIST)"
 graphpkgfetcher_extra_flags += --rerun-tests="$(TEST_RERUN_LIST)"
-graphpkgfetcher_extra_flags += $(if $(filter y,$(SKIP_MISSING_TESTS_IN_LISTS)),--skip-missing-requested-tests)
 graphpkgfetcher_extra_flags += --try-download-delta-rpms
 graphpkgfetcher_extra_flags += $(if $(CONFIG_FILE),--base-dir="$(CONFIG_BASE_DIR)")
 $(cached_file): $(depend_CONFIG_FILE) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST) $(depend_TEST_RUN_LIST) $(depend_TEST_RERUN_LIST) $(depend_TEST_IGNORE_LIST)

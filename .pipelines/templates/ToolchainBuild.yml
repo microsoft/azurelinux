@@ -46,11 +46,6 @@ steps:
       published_artifacts_dir="${{ parameters.outputArtifactsFolder }}/${{ parameters.outputArtifactsPackagesSubfolder }}"
       mkdir -p "$published_artifacts_dir"
       cp "${{ parameters.buildRepoRoot }}"/build/toolchain/toolchain_built_{,s}rpms_*.tar.gz "$published_artifacts_dir"
-      if [[ -f "${{ parameters.buildRepoRoot }}"/build/logs/toolchain/built_specs_list.txt ]]; then
-        cp "${{ parameters.buildRepoRoot }}"/build/logs/toolchain/built_specs_list.txt "$published_artifacts_dir"
-      else
-        touch "$published_artifacts_dir"/built_specs_list.txt
-      fi
     displayName: "Copy artifacts for publishing"
 
   - bash: |
@@ -61,6 +56,10 @@ steps:
     displayName: "Copy logs for publishing"
 
   - bash: |
+      # Publish the list of packages that should be re-tested during full package build.
+      #   This list will be the contents of 'built_specs_list.txt' in the toolchain build logs directory, but only for
+      #   packages that have a '%check' section in their spec file. The assumption is that all packages will have a 
+      #   '%check' section for all architectures, or none.
       built_list="${{ parameters.buildRepoRoot }}"/build/logs/toolchain/built_specs_list.txt
       specs_dir="${{ parameters.buildRepoRoot }}/SPECS/"
       if [[ -f "$built_list" ]]; then
@@ -79,10 +78,7 @@ steps:
         echo "No file '$built_list' found, so no packages to re-test"
       fi
       # Default will be "", which is fine.
-      echo "Setting packageReestList to '${retest_list[*]}'"
+      echo "Setting 'CalculatePackageRetestList.packageRetestList' to '${retest_list[*]}'"
       echo "##vso[task.setvariable variable=packageRetestList;isOutput=true]${retest_list[*]}"
     name: "CalculatePackageRetestList"
     displayName: "Calculating packages that should be re-tested"
-
-  - bash: |
-      echo "We set packageRetestList to '$(CalculatePackageRetestList.packageRetestList)'"

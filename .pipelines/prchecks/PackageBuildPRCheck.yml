@@ -90,11 +90,6 @@ extends:
                   ob_outputDirectory: $(Build.ArtifactStagingDirectory)
                   testListFromToolchain: $[ stageDependencies.Toolchain_${{ configuration.name }}.Build.outputs['CalculatePackageRetestList.packageRetestList'] ]
                 steps:
-                  - script: |
-                      if [[ -z "$(testListFromToolchain)" ]]; then
-                        echo "ERROR: testListFromToolchain is empty!" >&2
-                        exit 1
-                      fi
                   - template: .pipelines/templates/PackageBuild.yml@self
                     parameters:
                       customToolchainArtifactName: $(toolchainArtifactNameBase)_${{ configuration.name }}

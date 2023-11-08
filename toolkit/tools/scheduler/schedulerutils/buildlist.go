@@ -27,7 +27,6 @@ import (
 // - baseDirPath: the path to the base directory for the image. Used to resolve relative paths in the image config.
 func ParseAndGeneratePackageBuildList(dependencyGraph *pkggraph.PkgGraph, pkgsToBuild, pkgsToRebuild, pkgsToIgnore []string, imageConfig, baseDirPath string) (finalPackagesToBuild, packagesToRebuild, packagesToIgnore []*pkgjson.PackageVer, err error) {
 	logger.Log.Debug("Generating a package list for build nodes.")
-	const doNotSkipMissingPackages = false
 
 	buildNodeGetter := func(node *pkggraph.LookupNode) *pkggraph.PkgNode {
 		if node != nil {
@@ -35,7 +34,7 @@ func ParseAndGeneratePackageBuildList(dependencyGraph *pkggraph.PkgGraph, pkgsTo
 		}
 		return nil
 	}
-	return parseAndGeneratePackageList(dependencyGraph, pkgsToBuild, pkgsToRebuild, pkgsToIgnore, imageConfig, baseDirPath, dependencyGraph.AllBuildNodes(), buildNodeGetter, doNotSkipMissingPackages)
+	return parseAndGeneratePackageList(dependencyGraph, pkgsToBuild, pkgsToRebuild, pkgsToIgnore, imageConfig, baseDirPath, dependencyGraph.AllBuildNodes(), buildNodeGetter)
 }
 
 // ParseAndGeneratePackageTestList parses the common package request arguments and generates a list of packages to test based on the given dependency graph.
@@ -45,8 +44,7 @@ func ParseAndGeneratePackageBuildList(dependencyGraph *pkggraph.PkgGraph, pkgsTo
 // - testsToIgnore: a list of package/spec names to ignore.
 // - imageConfig: the path to the image config file. Used to extract additional packages to test.
 // - baseDirPath: the path to the base directory for the image. Used to resolve relative paths in the image config.
-// - skipMissingTests: if true, missing tests will be skipped instead of failing the build.
-func ParseAndGeneratePackageTestList(dependencyGraph *pkggraph.PkgGraph, testsToRun, testsToRerun, testsToIgnore []string, imageConfig, baseDirPath string, skipMissingTests bool) (finalPackagesToBuild, packagesToRebuild, packagesToIgnore []*pkgjson.PackageVer, err error) {
+func ParseAndGeneratePackageTestList(dependencyGraph *pkggraph.PkgGraph, testsToRun, testsToRerun, testsToIgnore []string, imageConfig, baseDirPath string) (finalPackagesToBuild, packagesToRebuild, packagesToIgnore []*pkgjson.PackageVer, err error) {
 	logger.Log.Debug("Generating a package list for test nodes.")
 
 	testNodeGetter := func(node *pkggraph.LookupNode) *pkggraph.PkgNode {
@@ -55,7 +53,7 @@ func ParseAndGeneratePackageTestList(dependencyGraph *pkggraph.PkgGraph, testsTo
 		}
 		return nil
 	}
-	return parseAndGeneratePackageList(dependencyGraph, testsToRun, testsToRerun, testsToIgnore, imageConfig, baseDirPath, dependencyGraph.AllTestNodes(), testNodeGetter, skipMissingTests)
+	return parseAndGeneratePackageList(dependencyGraph, testsToRun, testsToRerun, testsToIgnore, imageConfig, baseDirPath, dependencyGraph.AllTestNodes(), testNodeGetter)
 }
 
 // ReadReservedFilesList reads the list of reserved files (such as toolchain RPMs) from the manifest file passed in.
@@ -183,7 +181,7 @@ func filterLocalPackagesOnly(packageVersionsInConfig []*pkgjson.PackageVer, depe
 //
 // Note: since "SRPM_PACK_LIST" can work only with spec names, spec names take priority over package names
 // so that passing "X" to "SRPM_PACK_LIST" and "(PACKAGE|TEST)_*_LIST" arguments targets the same set of packages.
-func packageNamesToPackages(packageOrSpecNames []string, analyzedNodes []*pkggraph.PkgNode, nodeGetter func(*pkggraph.LookupNode) *pkggraph.PkgNode, dependencyGraph *pkggraph.PkgGraph, skipMissingPackages bool) (packageVers []*pkgjson.PackageVer, err error) {
+func packageNamesToPackages(packageOrSpecNames []string, analyzedNodes []*pkggraph.PkgNode, nodeGetter func(*pkggraph.LookupNode) *pkggraph.PkgNode, dependencyGraph *pkggraph.PkgGraph) (packageVers []*pkgjson.PackageVer, err error) {
 	logger.Log.Debugf("Converting following package/spec names to PackageVers: %v", packageOrSpecNames)
 
 	specToPackageNodes := make(map[string][]*pkggraph.PkgNode)
@@ -206,20 +204,12 @@ func packageNamesToPackages(packageOrSpecNames []string, analyzedNodes []*pkggra
 				return nil, err
 			}
 			if foundNode == nil {
-				if skipMissingPackages {
-					logger.Log.Warnf("Couldn't find package '%s' in the dependency graph. Skipping it.", packageOrSpecName)
-					continue
-				}
 				err = fmt.Errorf("couldn't find package '%s' in the dependency graph", packageOrSpecName)
 				return nil, err
 			}
 
 			expectedNode := nodeGetter(foundNode)
 			if expectedNode == nil {
-				if skipMissingPackages {
-					logger.Log.Warnf("Found package '%s' but it doesn't have a package of the expected type. Skipping it.", packageOrSpecName)
-					continue
-				}
 				err = fmt.Errorf("found package '%s' but it doesn't have a package of the expected type", packageOrSpecName)
 				return nil, err
 			}
@@ -241,15 +231,14 @@ func packageNamesToPackages(packageOrSpecNames []string, analyzedNodes []*pkggra
 // - ignoreList: a list of package/spec names to ignore.
 // - imageConfig: the path to the image config file. Used to extract additional packages to build.
 // - baseDirPath: the path to the base directory for the image. Used to resolve relative paths in the image config.
-// - skipMissingPackages: if true, missing packages will be skipped instead of failing the build.
-func parseAndGeneratePackageList(dependencyGraph *pkggraph.PkgGraph, buildList, rebuiltList, ignoreList []string, imageConfig, baseDirPath string, analyzedNodes []*pkggraph.PkgNode, nodeGetter func(*pkggraph.LookupNode) *pkggraph.PkgNode, skipMissingPackages bool) (finalPackagesToBuild, packagesToRebuild, packagesToIgnore []*pkgjson.PackageVer, err error) {
-	packagesToBuild, err := packageNamesToPackages(buildList, analyzedNodes, nodeGetter, dependencyGraph, skipMissingPackages)
+func parseAndGeneratePackageList(dependencyGraph *pkggraph.PkgGraph, buildList, rebuiltList, ignoreList []string, imageConfig, baseDirPath string, analyzedNodes []*pkggraph.PkgNode, nodeGetter func(*pkggraph.LookupNode) *pkggraph.PkgNode) (finalPackagesToBuild, packagesToRebuild, packagesToIgnore []*pkgjson.PackageVer, err error) {
+	packagesToBuild, err := packageNamesToPackages(buildList, analyzedNodes, nodeGetter, dependencyGraph)
 	if err != nil {
 		err = fmt.Errorf("unable to find nodes for the packages from the build list, error:\n%s", err)
 		return
 	}
 
-	packagesToRebuild, err = packageNamesToPackages(rebuiltList, analyzedNodes, nodeGetter, dependencyGraph, skipMissingPackages)
+	packagesToRebuild, err = packageNamesToPackages(rebuiltList, analyzedNodes, nodeGetter, dependencyGraph)
 	if err != nil {
 		err = fmt.Errorf("unable to find nodes for the packages from the re-built list, error:\n%s", err)
 		return
@@ -265,7 +254,7 @@ func parseAndGeneratePackageList(dependencyGraph *pkggraph.PkgGraph, buildList, 
 		logger.Log.Warnf("The following ignored items matched neither a spec nor a package name: %v.", unknownNames)
 	}
 
-	packagesToIgnore, err = packageNamesToPackages(prunedIgnoredPackageNames, analyzedNodes, nodeGetter, dependencyGraph, skipMissingPackages)
+	packagesToIgnore, err = packageNamesToPackages(prunedIgnoredPackageNames, analyzedNodes, nodeGetter, dependencyGraph)
 	if err != nil {
 		err = fmt.Errorf("unable to find nodes for the packages from the ignore list, error:\n%s", err)
 		return

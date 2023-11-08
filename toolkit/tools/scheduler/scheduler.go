@@ -98,10 +98,9 @@ var (
 	pkgsToBuild   = app.Flag("packages", "Space separated list of top-level packages that should be built. Omit this argument to build all packages.").String()
 	pkgsToRebuild = app.Flag("rebuild-packages", "Space separated list of base package names packages that should be rebuilt.").String()
 
-	testsToIgnore    = app.Flag("ignored-tests", "Space separated list of package tests that should not be ran.").String()
-	testsToRun       = app.Flag("tests", "Space separated list of tests that should be ran. Omit this argument to run package tests.").String()
-	testsToRerun     = app.Flag("rerun-tests", "Space separated list of package tests that should be re-ran.").String()
-	skipMissingTests = app.Flag("skip-missing-requested-tests", "Skip missing tests in lists").Bool()
+	testsToIgnore = app.Flag("ignored-tests", "Space separated list of package tests that should not be ran.").String()
+	testsToRun    = app.Flag("tests", "Space separated list of tests that should be ran. Omit this argument to run package tests.").String()
+	testsToRerun  = app.Flag("rerun-tests", "Space separated list of package tests that should be re-ran.").String()
 
 	logFile       = exe.LogFileFlag(app)
 	logLevel      = exe.LogLevelFlag(app)
@@ -139,7 +138,7 @@ func main() {
 		logger.Log.Fatalf("Failed to generate package list with error:\n%s", err)
 	}
 
-	finalTestsToRun, testsToRerun, ignoredTests, err := schedulerutils.ParseAndGeneratePackageTestList(dependencyGraph, exe.ParseListArgument(*testsToRun), exe.ParseListArgument(*testsToRerun), exe.ParseListArgument(*testsToIgnore), *imageConfig, *baseDirPath, *skipMissingTests)
+	finalTestsToRun, testsToRerun, ignoredTests, err := schedulerutils.ParseAndGeneratePackageTestList(dependencyGraph, exe.ParseListArgument(*testsToRun), exe.ParseListArgument(*testsToRerun), exe.ParseListArgument(*testsToIgnore), *imageConfig, *baseDirPath)
 	if err != nil {
 		logger.Log.Fatalf("Failed to generate tests list with error:\n%s", err)
 	}
