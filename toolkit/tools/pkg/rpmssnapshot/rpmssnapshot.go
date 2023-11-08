@@ -152,8 +152,6 @@ func (s *SnapshotGenerator) generateSnapshotInChroot(distTag string) (err error)
 }
 
 func (s *SnapshotGenerator) readBuiltRPMs(specPaths []string, defines map[string]string) (allBuiltRPMs []string, err error) {
-	var builtRPMs []string
-
 	buildArch, err := rpm.GetRpmArch(runtime.GOARCH)
 	if err != nil {
 		return
@@ -171,7 +169,7 @@ func (s *SnapshotGenerator) readBuiltRPMs(specPaths []string, defines map[string
 		specDirPath := filepath.Dir(specPath)
 
 		go func(pathIter string) {
-			builtRPMs, err = rpm.QuerySPECForBuiltRPMs(pathIter, specDirPath, buildArch, defines)
+			builtRPMs, err := rpm.QuerySPECForBuiltRPMs(pathIter, specDirPath, buildArch, defines)
 			if err != nil {
 				err = fmt.Errorf("failed to query built RPMs from (%s):\n%w", pathIter, err)
 			}
