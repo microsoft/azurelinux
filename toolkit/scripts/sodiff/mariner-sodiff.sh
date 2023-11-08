@@ -83,7 +83,9 @@ done
 # Obtain a list of unique packages to be updated
 2>/dev/null cat "$sodiff_out_dir"/require* | sort -u > "$sodiff_out_dir"/sodiff-intermediate-summary.txt
 
-rm "$sodiff_out_dir"/require*
+if [ ls "$sodiff_out_dir"/require* 1> /dev/null 2>&1 ]; then
+    rm "$sodiff_out_dir"/require*
+fi
 touch "$sodiff_out_dir"/sodiff-summary.txt
 
 # Remove packages that have been dash-rolled already.
