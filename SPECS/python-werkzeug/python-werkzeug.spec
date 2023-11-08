@@ -29,7 +29,6 @@ Requires:       python3
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
 BuildRequires:  python3-requests
-BuildRequires:  python3-pytest
 %endif
 
 %description -n python3-werkzeug
@@ -49,7 +48,7 @@ Werkzeug started as simple collection of various utilities for WSGI applications
 %pyproject_save_files werkzeug
 
 %check
-pip3 install tox tox-current-env
+pip3 install tox tox-current-env pytest==7.4.0 cryptography==41.0.1 ephemeral-port-reserve==1.1.4 pytest-timeout==2.1.0 pytest-xprocess==0.22.2 watchdog==3.0.0
 %tox
 
 %files -n python3-werkzeug -f %{pyproject_files}
