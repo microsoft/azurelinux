@@ -88,10 +88,10 @@ extends:
                 variables:
                   ob_artifactBaseName: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}
                   ob_outputDirectory: $(Build.ArtifactStagingDirectory)
-                  testListFromToolchain: $[ stageDependencies.Toolchain_${{ configuration.name }}.Build.outputs['CalculatePackageRetestList.packageTestList'] ]
+                  testListFromToolchain: $[ stageDependencies.Toolchain_${{ configuration.name }}.Build.outputs['CalculatePackageRetestList.packageRetestList'] ]
                 steps:
                   - script: |
-                      if [[ -z "${{ variables.testListFromToolchain }}" ]]; then
+                      if [[ -z "$(testListFromToolchain)" ]]; then
                         echo "ERROR: testListFromToolchain is empty!" >&2
                         exit 1
                       fi

@@ -79,10 +79,10 @@ steps:
         echo "No file '$built_list' found, so no packages to re-test"
       fi
       # Default will be "", which is fine.
-      echo "Setting packageTestList to '${retest_list[*]}'"
-      echo "##vso[task.setvariable variable=packageTestList;isOutput=true]${retest_list[*]}"
+      echo "Setting packageReestList to '${retest_list[*]}'"
+      echo "##vso[task.setvariable variable=packageRetestList;isOutput=true]${retest_list[*]}"
     name: "CalculatePackageRetestList"
     displayName: "Calculating packages that should be re-tested"
 
   - bash: |
-      echo "We set packageTestList to '$(CalculatePackageRetestList.packageTestList)'"
+      echo "We set packageRetestList to '$(CalculatePackageRetestList.packageRetestList)'"
