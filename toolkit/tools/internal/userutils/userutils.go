@@ -48,29 +48,56 @@ func HashPassword(password string) (string, error) {
 }
 
 func UserExists(username string, installChroot *safechroot.Chroot) (bool, error) {
+	if installChroot == nil {
+		return userExistsCore(username)
+	}
+
 	var userExists bool
 	err := installChroot.UnsafeRun(func() error {
-		_, stderr, err := shell.Execute("id", "-u", username)
-		if err != nil {
-			if !strings.Contains(stderr, "no such user") {
-				return fmt.Errorf("failed to check if user exists (%s):\n%w", username, err)
-			}
-
-			userExists = false
-		} else {
-			userExists = true
-		}
-
-		return nil
+		exists, err := userExistsCore(username)
+		userExists = exists
+		return err
 	})
+
 	if err != nil {
 		return false, err
 	}
-
 	return userExists, nil
 }
 
+func userExistsCore(username string) (bool, error) {
+	_, stderr, err := shell.Execute("id", "-u", username)
+	if err != nil {
+		if strings.Contains(stderr, "no such user") {
+			return false, nil
+		}
+		return false, fmt.Errorf("failed to check if user exists (%s):\n%w", username, err)
+	}
+	return true, nil
+}
+
 func AddUser(username string, hashedPassword string, uid string, installChroot *safechroot.Chroot) error {
+	var execFunc func() error
+	if installChroot != nil {
+		execFunc = func() error {
+			return installChroot.UnsafeRun(func() error {
+				return addUserCore(username, hashedPassword, uid)
+			})
+		}
+	} else {
+		execFunc = func() error {
+			return addUserCore(username, hashedPassword, uid)
+		}
+	}
+
+	if err := execFunc(); err != nil {
+		return fmt.Errorf("failed to add user (%s):\n%w", username, err)
+	}
+
+	return nil
+}
+
+func addUserCore(username, hashedPassword, uid string) error {
 	var args = []string{username, "-m"}
 	if hashedPassword != "" {
 		args = append(args, "-p", hashedPassword)
@@ -79,14 +106,7 @@ func AddUser(username string, hashedPassword string, uid string, installChroot *
 		args = append(args, "-u", uid)
 	}
 
-	err := installChroot.UnsafeRun(func() error {
-		return shell.ExecuteLive(false /*squashErrors*/, "useradd", args...)
-	})
-	if err != nil {
-		return fmt.Errorf("failed to add user (%s):\n%w", username, err)
-	}
-
-	return nil
+	return shell.ExecuteLive(false, "useradd", args...)
 }
 
 func UpdateUserPassword(installRoot, username, hashedPassword string) error {

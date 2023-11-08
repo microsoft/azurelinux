@@ -1323,35 +1323,37 @@ func Chage(installChroot *safechroot.Chroot, passwordExpirationInDays int64, use
 	return fmt.Errorf(`user "%s" not found when trying to change the password expiration date`, username)
 }
 
-func ConfigureUserGroupMembership(installChroot *safechroot.Chroot, username string, primaryGroup string,
-	secondaryGroups []string,
-) (err error) {
+func ConfigureUserGroupMembership(installChroot *safechroot.Chroot, username string, primaryGroup string, secondaryGroups []string) (err error) {
+	if installChroot == nil {
+		return updateUserGroupMembershipCore(username, primaryGroup, secondaryGroups)
+	}
+
+	err = installChroot.UnsafeRun(func() error {
+		return updateUserGroupMembershipCore(username, primaryGroup, secondaryGroups)
+	})
+
+	return err
+}
+
+func updateUserGroupMembershipCore(username string, primaryGroup string, secondaryGroups []string) error {
 	const squashErrors = false
 
 	// Update primary group
 	if primaryGroup != "" {
-		err = installChroot.UnsafeRun(func() error {
-			return shell.ExecuteLive(squashErrors, "usermod", "-g", primaryGroup, username)
-		})
-
-		if err != nil {
-			return
+		if err := shell.ExecuteLive(squashErrors, "usermod", "-g", primaryGroup, username); err != nil {
+			return err
 		}
 	}
 
 	// Update secondary groups
 	if len(secondaryGroups) != 0 {
 		allGroups := strings.Join(secondaryGroups, ",")
-		err = installChroot.UnsafeRun(func() error {
-			return shell.ExecuteLive(squashErrors, "usermod", "-a", "-G", allGroups, username)
-		})
-
-		if err != nil {
-			return
+		if err := shell.ExecuteLive(squashErrors, "usermod", "-a", "-G", allGroups, username); err != nil {
+			return err
 		}
 	}
 
-	return
+	return nil
 }
 
 func ConfigureUserStartupCommand(installChroot *safechroot.Chroot, username string, startupCommand string) (err error) {
