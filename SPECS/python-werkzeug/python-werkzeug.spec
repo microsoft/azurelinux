@@ -29,6 +29,7 @@ Requires:       python3
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
 BuildRequires:  python3-requests
+BuildRequires:  python3-pytest
 %endif
 
 %description -n python3-werkzeug
