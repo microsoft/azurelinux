@@ -30,6 +30,7 @@ Requires:       python3-markupsafe
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
 BuildRequires:  python3-requests
+BuildRequires:  python3-markupsafe
 %endif
 
 %description -n python3-werkzeug
