@@ -8150,6 +8150,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "kernel-mos",
+          "version": "5.15.136.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2-mos/5.15.136.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "kernel-mshv",
           "version": "5.15.126.mshv9",
           "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.126.mshv9.tar.gz"
