@@ -251,5 +251,5 @@ chkconfig-1.20-4.cm2.x86_64.rpm
 chkconfig-lang-1.20-4.cm2.x86_64.rpm
 msopenjdk-11-11.0.20.1-1.x86_64.rpm
 pyproject-rpm-macros-1.0.0~rc1-4.cm2.noarch.rpm
-audit-3.0.6-8.cm2.x86_64.rpm
-audit-libs-3.0.6-8.cm2.x86_64.rpm
+audit-3.1.2-1.cm2.x86_64.rpm
+audit-libs-3.1.2-1.cm2.x86_64.rpm
