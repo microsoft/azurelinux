@@ -88,7 +88,7 @@ extends:
                 variables:
                   ob_artifactBaseName: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}
                   ob_outputDirectory: $(Build.ArtifactStagingDirectory)
-                  testListFromToolchain: $[ stageDependencies.Toolchain_${{ configuration.name }}.CalculatePackageRetestList.outputs['packageTestList'] ]
+                  testListFromToolchain: $[ stageDependencies.Toolchain_${{ configuration.name }}.Build.outputs['CalculatePackageRetestList.packageTestList'] ]
                 steps:
                   - script: |
                       if [[ -z "${{ variables.testListFromToolchain }}" ]]; then
