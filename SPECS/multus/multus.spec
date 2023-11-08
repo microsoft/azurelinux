@@ -57,7 +57,7 @@ VERSION=%{version} COMMIT=%{commit} ./hack/build-go.sh
 install -D -m0755 bin/multus %{buildroot}%{_bindir}/multus
 install -D -m0755 bin/thin_entrypoint %{buildroot}%{_bindir}/thin_entrypoint
 install -D -m0755 bin/install_multus %{buildroot}%{_bindir}/install_multus
-install -D -m0644 deployments/multus-daemonset-crio.yml %{buildroot}%{_datadir}/k8s-yaml/multus/multus.yaml
+install -D -m0644 deployments/multus-daemonset.yml %{buildroot}%{_datadir}/k8s-yaml/multus/multus.yaml
 
 %files
 %license LICENSE
