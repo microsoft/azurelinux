@@ -25,6 +25,7 @@ BuildRequires:  python3-flit-core
 BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
 Requires:       python3
+Requires:       python3-markupsafe
 %if %{with_check}
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
@@ -60,6 +61,7 @@ pip3 install tox tox-current-env pytest==7.4.0 cryptography==41.0.1 ephemeral-po
 * Mon Nov 06 2023 Nick Samson <nisamson@microsoft.com> - 2.3.7-1
 - Upgraded to version 2.3.7
 - Migrated to pyproject build
+- Added required MarkupSafe dependency
 - Added patch for CVE-2023-46136
 
 * Tue Mar 14 2023 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 2.2.3-1
