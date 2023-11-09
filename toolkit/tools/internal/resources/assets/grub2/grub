@@ -7,7 +7,7 @@ GRUB_CMDLINE_LINUX_DEFAULT="{{.ExtraCommandLine}} $kernelopts"
     
 # =============================notice===============================
 # IMPORTANT: package and feature-specific behaviors are defined in
-#   /etc/default/grub.d/*.cfg. The cfg files are sourced last
+#   /etc/default/grub.d/*.cfg. The executable cfg files are sourced last
 #   before grub2-mkconfig is called and hence have higher precedence
 #   than this file's GRUB_CMDLINE_LINUX. The order as it appears in the
 #   Linux commandline is:
@@ -16,7 +16,7 @@ GRUB_CMDLINE_LINUX_DEFAULT="{{.ExtraCommandLine}} $kernelopts"
 #     - and finally GRUB_CMDLINE_LINUX_DEFAULT 
 # =============================notice===============================
 for x in /etc/default/grub.d/*.cfg ; do
-    if [ -e "${x}" ]; then
+    if [ -x "${x}" ]; then
         . "${x}"
     fi
 done
