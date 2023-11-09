@@ -169,14 +169,14 @@ func (s *SnapshotGenerator) readBuiltRPMs(specPaths []string, defines map[string
 		specDirPath := filepath.Dir(specPath)
 
 		go func(pathIter string) {
-			builtRPMs, err := rpm.QuerySPECForBuiltRPMs(pathIter, specDirPath, buildArch, defines)
-			if err != nil {
-				err = fmt.Errorf("failed to query built RPMs from (%s):\n%w", pathIter, err)
+			builtRPMs, queryErr := rpm.QuerySPECForBuiltRPMs(pathIter, specDirPath, buildArch, defines)
+			if queryErr != nil {
+				queryErr = fmt.Errorf("failed to query built RPMs from (%s):\n%w", pathIter, queryErr)
 			}
 
 			resultsChannel <- SnapshotResult{
 				rpms: builtRPMs,
-				err:  err,
+				err:  queryErr,
 			}
 		}(specPath)
 	}
