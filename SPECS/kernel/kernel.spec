@@ -28,7 +28,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.15.137.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -39,6 +39,7 @@ Source1:        config
 Source2:        config_aarch64
 Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20211013.pem
+Source5:        10_mariner_linux.cfg
 Patch0:         nvme_multipath_default_false.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
@@ -69,6 +70,7 @@ Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
 Requires(postun): coreutils
+%{?grub2_configuration_requires}
 # When updating the config files it is important to sanitize them.
 # Steps for updating a config file:
 #  1. Extract the linux sources into a folder
@@ -304,6 +306,13 @@ make -C tools/bpf/bpftool DESTDIR=%{buildroot} prefix=%{_prefix} bash_compdir=%{
 make -C tools DESTDIR=%{buildroot} prefix=%{_prefix} bash_compdir=%{_sysconfdir}/bash_completion.d/ mandir=%{_mandir} turbostat_install cpupower_install
 %endif
 
+# Add kernel boot configurations to /etc/default/grub.d
+# This configuration preserves the Mariner-2 behavior that 
+# the last-installed kernel is booted by default
+mkdir -p %{buildroot}%{_sysconfdir}/default/grub.d
+install -m 750 %{SOURCE5} %{buildroot}%{_sysconfdir}/default/grub.d/10_mariner_linux.cfg
+sed -i 's/<VERSION_SED_MARKER>/'%{uname_r}'/g' /path/to/file.cfg
+
 # Remove trace (symlink to perf). This file causes duplicate identical debug symbols
 rm -vf %{buildroot}%{_bindir}/trace
 
@@ -352,6 +361,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 /boot/vmlinuz-%{uname_r}
 /boot/.vmlinuz-%{uname_r}.hmac
 %config(noreplace) /boot/linux-%{uname_r}.cfg
+%config(noreplace) %{_sysconfdir}/default/grub.d/10_mariner_linux.cfg
 %config %{_localstatedir}/lib/initramfs/kernel/%{uname_r}
 %defattr(0644,root,root)
 /lib/modules/%{uname_r}/*
@@ -425,6 +435,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Thu Nov 09 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.137.1-2
+- Install mkconfig config 10_mariner_linux.cfg which preserves
+    Mariner 2.0 boot behavior: always boot the last-installed kernel
+
 * Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.137.1-1
 - Auto-upgrade to 5.15.137.1
 
