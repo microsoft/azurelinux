@@ -1,13 +1,25 @@
+From 492288d56314c65316a6d6f50b4b79c2eb0b267e Mon Sep 17 00:00:00 2001
+From: Rachel Menge <rachelmenge@microsoft.com>
+Date: Wed, 8 Nov 2023 10:51:46 -0800
+Subject: [PATCH] kured-imagePullPolicy patch updated for 1.13.2
+
+---
+ kured-ds.yaml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
 diff --git a/kured-ds.yaml b/kured-ds.yaml
-index 15869c4..b226865 100644
+index 7721fa1..78322da 100644
 --- a/kured-ds.yaml
 +++ b/kured-ds.yaml
-@@ -32,7 +32,7 @@ spec:
-           image: docker.io/weaveworks/kured:1.9.1
-                  # If you find yourself here wondering why there is no
-                  # :latest tag on Docker Hub,see the FAQ in the README
+@@ -34,7 +34,7 @@ spec:
+           # If you find yourself here wondering why there is no
+           # :latest tag on Docker Hub,see the FAQ in the README
+           image: ghcr.io/kubereboot/kured:1.13.2
 -          imagePullPolicy: IfNotPresent
 +          imagePullPolicy: Always
            securityContext:
              privileged: true # Give permission to nsenter /proc/1/ns/mnt
-           env:
+           ports:
+-- 
+2.17.1
+
