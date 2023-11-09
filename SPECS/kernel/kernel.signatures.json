@@ -1,6 +1,5 @@
 {
  "Signatures": {
-  "10_mariner_linux.cfg": "3755907a016514913f2765b6d0cc3ef1381b50226e0bca0e6436b4d47426c7b4",
   "cbl-mariner-ca-20211013.pem": "5ef124b0924cb1047c111a0ecff1ae11e6ad7cac8d1d9b40f98f99334121f0b0",
   "config": "29e75717cf6a225402a91fa1005d0e96ebd5f8c0370d34c2987125e29055dde7",
   "config_aarch64": "45e5cba866c119c280b3fb06b5a9e36b0b0c6650e51eb8ed3bb5e690abb75cb8",
