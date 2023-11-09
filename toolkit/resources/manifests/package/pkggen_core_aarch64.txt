@@ -208,6 +208,9 @@ lua-5.4.4-1.cm2.aarch64.rpm
 lua-libs-5.4.4-1.cm2.aarch64.rpm
 mariner-rpm-macros-2.0-23.cm2.noarch.rpm
 mariner-check-macros-2.0-23.cm2.noarch.rpm
+dnf5-5.0.14-2.cm2.aarch64.rpm
+dnf5-devel-5.0.14-2.cm2.aarch64.rpm
+dnf5-plugins-5.0.14-2.cm2.aarch64.rpm
 tdnf-3.5.2-2.cm2.aarch64.rpm
 tdnf-cli-libs-3.5.2-2.cm2.aarch64.rpm
 tdnf-devel-3.5.2-2.cm2.aarch64.rpm
