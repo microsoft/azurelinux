@@ -206,6 +206,8 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 	if isCCacheEnabled(ccacheManager) {
 		ccacheMount := safechroot.NewMountPoint(ccacheManager.CurrentPkgGroup.CCacheDir, chrootCcacheDir, "", safechroot.BindMountPointFlags, "")
 		mountPoints = append(mountPoints, ccacheMount)
+		// need to update extraDirs with ccache specific folders to be created
+		// inside the container.
 		extraDirs = append(extraDirs, chrootCcacheDir)
 	}
 
