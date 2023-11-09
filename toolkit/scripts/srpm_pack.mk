@@ -16,8 +16,11 @@ SRPM_FILE_SIGNATURE_HANDLING ?= enforce
 SRPM_BUILD_CHROOT_DIR = $(BUILD_DIR)/SRPM_packaging
 SRPM_BUILD_LOGS_DIR = $(LOGS_DIR)/pkggen/srpms
 
-toolchain_spec_list = $(toolchain_build_dir)/toolchain_specs.txt
+#toolchain_spec_list = $(toolchain_build_dir)/toolchain_specs.txt
 srpm_pack_list_file = $(BUILD_SRPMS_DIR)/pack_list.txt
+
+srpm_pack_summary_file = $(STATUS_FLAGS_DIR)/srpm_pack_activity.txt
+toolchain_srpm_pack_summary_file = $(STATUS_FLAGS_DIR)/toolchain_srpm_pack_activity.txt
 
 # Configure the list of packages we want to process into SRPMs
 # Strip any whitespace from user input and reasign using override so we can compare it with the empty string
@@ -34,7 +37,9 @@ $(srpm_pack_list_file): $(depend_SRPM_PACK_LIST)
 endif
 local_spec_dirs = $(foreach spec,$(local_specs),$(dir $(spec)))
 local_spec_sources = $(call shell_real_build_only, find $(local_spec_dirs) -type f -name '*')
+built_srpms = $(call shell_real_build_only, find $(BUILD_SRPMS_DIR) -type f -name '*.src.rpm')
 
+$(warning user:$(MARINER_BUILDER_USER))
 $(call create_folder,$(BUILD_DIR))
 $(call create_folder,$(BUILD_SRPMS_DIR))
 $(call create_folder,$(SRPM_BUILD_CHROOT_DIR))
@@ -42,7 +47,7 @@ $(call create_folder,$(SRPM_BUILD_CHROOT_DIR))
 # General targets
 ##help:target:input-srpms=Scan the local `*.spec` files, locate sources, and create `*.src.rpm` files. Limit via SRPM_PACK_LIST.
 .PHONY: toolchain-input-srpms input-srpms clean-input-srpms
-input-srpms: $(BUILD_SRPMS_DIR)
+input-srpms: $(STATUS_FLAGS_DIR)/build_srpms.flag
 toolchain-input-srpms: $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag
 
 clean: clean-input-srpms
@@ -56,9 +61,9 @@ clean-input-srpms:
 
 # The directory freshness is tracked with a status flag. The status flag is only updated when all SRPMs have been
 # updated.
-$(BUILD_SRPMS_DIR): $(STATUS_FLAGS_DIR)/build_srpms.flag
-	@touch $@
-	@echo Finished updating $@
+#$(BUILD_SRPMS_DIR): $(STATUS_FLAGS_DIR)/build_srpms.flag
+#	@touch $@
+#	@echo Finished updating $@
 
 ifeq ($(DOWNLOAD_SRPMS),y)
 $(STATUS_FLAGS_DIR)/build_srpms.flag: $(local_specs) $(local_spec_dirs) $(local_spec_sources) $(SPECS_DIR) $(go-downloader)
@@ -84,7 +89,10 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(local_specs) $(local_spec_dirs) $(local_
 $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(STATUS_FLAGS_DIR)/build_srpms.flag
 	@touch $@
 else
-$(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(local_specs) $(local_spec_dirs) $(SPECS_DIR) $(go-srpmpacker) $(srpm_pack_list_file) $(local_spec_sources)
+
+common_srpm_packer_deps = $(local_specs) $(local_spec_dirs) $(SPECS_DIR) $(local_spec_sources) $(go-srpmpacker) $(built_srpms) $(BUILD_SRPMS_DIR)
+
+$(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(srpm_pack_list_file) $(common_srpm_packer_deps)
 	GODEBUG=netdns=go $(go-srpmpacker) \
 		--dir=$(SPECS_DIR) \
 		--output-dir=$(BUILD_SRPMS_DIR) \
@@ -98,6 +106,7 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(local_specs) $(local_sp
 		--worker-tar=$(chroot_worker) \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		$(if $(SRPM_PACK_LIST),--pack-list=$(srpm_pack_list_file)) \
+		--packed-srpms-summary=$(srpm_pack_summary_file) \
 		--log-file=$(SRPM_BUILD_LOGS_DIR)/srpmpacker.log \
 		--log-level=$(LOG_LEVEL) \
 		--cpu-prof-file=$(PROFILE_DIR)/srpm_packer.cpu.pprof \
@@ -107,9 +116,11 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(local_specs) $(local_sp
 		$(if $(filter y,$(ENABLE_MEM_PROFILE)),--enable-mem-prof) \
 		$(if $(filter y,$(ENABLE_TRACE)),--enable-trace) \
 		--timestamp-file=$(TIMESTAMP_DIR)/srpm_packer.jsonl && \
-	touch $@
+	if [ ! -f $@ ] || [ -s $(srpm_pack_summary_file) ]; then \
+		touch $@; \
+	fi
 
-$(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(toolchain_spec_list) $(go-srpmpacker)
+$(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(toolchain_spec_buildable_list) $(common_srpm_packer_deps)
 	GODEBUG=netdns=go $(go-srpmpacker) \
 		--dir=$(SPECS_DIR) \
 		--output-dir=$(BUILD_SRPMS_DIR) \
@@ -122,6 +133,7 @@ $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(toolchain_spec_list) $(go-srpm
 		--signature-handling=$(SRPM_FILE_SIGNATURE_HANDLING) \
 		--pack-list=$(toolchain_spec_list) \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
+		--packed-srpms-summary=$(toolchain_srpm_pack_summary_file) \
 		--log-file=$(LOGS_DIR)/toolchain/srpms/toolchain_srpmpacker.log \
 		--log-level=$(LOG_LEVEL) \
 		--cpu-prof-file=$(PROFILE_DIR)/srpm_toolchain_packer.cpu.pprof \
@@ -131,5 +143,7 @@ $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(toolchain_spec_list) $(go-srpm
 		$(if $(filter y,$(ENABLE_MEM_PROFILE)),--enable-mem-prof) \
 		$(if $(filter y,$(ENABLE_TRACE)),--enable-trace) \
 		--timestamp-file=$(TIMESTAMP_DIR)/srpm_toolchain_packer.jsonl && \
-	touch $@
+	if [ ! -f $@ ] || [ -s $(toolchain_srpm_pack_summary_file) ]; then \
+		touch $@; \
+	fi
 endif

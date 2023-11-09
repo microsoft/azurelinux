@@ -20,7 +20,8 @@ import (
 )
 
 type Archive struct {
-	ArchivePath string // Path to the generated archive file
+	ArchivePath     string // Path to the generated archive file
+	archiveContents []string
 }
 
 // Print a table of rpms that are missing from the archive or manifest, interleaving the two lists
@@ -70,15 +71,18 @@ func CreateManifestMissmatchReport(missingFromArchive, missingFromManifest []str
 }
 
 func (a *Archive) ValidateArchiveContents(expectedRpms []string) (missingFromArchive, missingFromManifest []string, err error) {
-	archiveRpms, err := a.getArchiveContents()
-	if err != nil {
-		return
+	if len(a.archiveContents) == 0 {
+		logger.Log.Infof("Scanning contents of archive: %s", a.ArchivePath)
+		a.archiveContents, err = a.getArchiveContents()
+		if err != nil {
+			return
+		}
 	}
 
 	missingFromArchive = sliceutils.FindMatches(expectedRpms, func(rpm string) bool {
-		return !sliceutils.Contains(archiveRpms, rpm, sliceutils.StringMatch)
+		return !sliceutils.Contains(a.archiveContents, rpm, sliceutils.StringMatch)
 	})
-	missingFromManifest = sliceutils.FindMatches(archiveRpms, func(rpm string) bool {
+	missingFromManifest = sliceutils.FindMatches(a.archiveContents, func(rpm string) bool {
 		return !sliceutils.Contains(expectedRpms, rpm, sliceutils.StringMatch)
 	})
 	return
@@ -143,8 +147,6 @@ func (a *Archive) ExtractToolchainRpms(rpmsDir string) (err error) {
 	defer tarStream.Close()
 
 	tarReader := tar.NewReader(tarStream)
-
-	logger.Log.Infof("Extracting rpms from'%s'", a.ArchivePath)
 	totalRpms := 0
 	extractedRpms := 0
 	for {
@@ -168,6 +170,8 @@ func (a *Archive) ExtractToolchainRpms(rpmsDir string) (err error) {
 		case tar.TypeReg:
 			logger.Log.Debugf("Checking toolchain rpm: '%s'", filename)
 			totalRpms++
+			a.archiveContents = append(a.archiveContents, filepath.Base(filename))
+
 			dstFile := filepath.Join(rpmsDir, filepath.Base(filename))
 
 			tarBytes := make([]byte, header.Size)
@@ -198,10 +202,10 @@ func (a *Archive) ExtractToolchainRpms(rpmsDir string) (err error) {
 				}
 				existingFileOk = bytes.Equal(existingFileBytes, tarBytes)
 				if !existingFileOk {
-					logger.Log.Infof("File already exists but has different contents: %s", dstFile)
+					logger.Log.Infof("Extracting - different contents: %s", dstFile)
 				}
 			} else {
-				logger.Log.Infof("File does not exist: %s", dstFile)
+				logger.Log.Infof("Extracting - file missing: %s", dstFile)
 			}
 
 			if !existingFileOk {
@@ -213,7 +217,6 @@ func (a *Archive) ExtractToolchainRpms(rpmsDir string) (err error) {
 					return err
 				}
 
-				logger.Log.Infof("Extracting toolchain rpm: %s", dstFile)
 				byteReader := bytes.NewReader(tarBytes)
 				_, err = io.Copy(writer, byteReader)
 				writer.Close()

@@ -162,7 +162,6 @@ func compareFileByteStreams(in1, in2 io.Reader) (isSame bool, err error) {
 }
 
 func ContentsAreSame(src, dst string) (isSame bool, err error) {
-	logger.Log.Warnf("Comparing files...")
 	isSame = false
 	srcExists, err := PathExists(src)
 	if err != nil {
@@ -210,7 +209,6 @@ func ContentsAreSame(src, dst string) (isSame bool, err error) {
 			return
 		}
 	}
-	logger.Log.Warnf("done: %t", isSame)
 	return
 }
 

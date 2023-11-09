@@ -7,10 +7,13 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
+	"time"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/systemdependency"
 )
 
@@ -38,6 +41,7 @@ type OfficialScript struct {
 
 	// Internal state
 	buildDone bool
+	progress  int
 }
 
 func (o *OfficialScript) CheckCache(cacheDir string) (string, bool, error) {
@@ -81,10 +85,42 @@ func (o *OfficialScript) PrepIncrementalRpms(downloadDir string, toolchainRPMs [
 	return
 }
 
+func (o *OfficialScript) updateProgress(done chan bool) {
+	const delay = time.Duration(10) * time.Second
+	var (
+		logFile    = filepath.Join(o.BuildDir, "logs", "toolchain", "build_list.txt")
+		scriptFile = filepath.Join(o.WorkingDir, "./build_official_toolchain_rpms.sh")
+	)
+	script, err := file.ReadLines(scriptFile)
+	if err != nil {
+		logger.Log.Warnf("Failed to read script file '%s'. Error:\n%s", scriptFile, err)
+		return
+	}
+	buildLines := sliceutils.FindMatches(script, func(line string) bool {
+		// Lines that start with 'build_rpm_in_chroot_no_install' are the ones we want
+		return strings.HasPrefix(line, "build_rpm_in_chroot_no_install")
+	})
+	for {
+		select {
+		case <-done:
+			return
+		case <-time.After(delay):
+			numBuilt, err := file.ReadLines(logFile)
+			if err != nil {
+				logger.Log.Warnf("Failed to read log file '%s'. Error:\n%s", logFile, err)
+				return
+			}
+			o.progress = (len(numBuilt) * 100) / len(buildLines)
+		}
+	}
+}
+
+// TOOLCHAIN_BUILD_LIST=$TOOLCHAIN_LOGS/build_list.txt
+
 func (o *OfficialScript) BuildOfficialToolchainRpms() (err error) {
 	onStdout := func(args ...interface{}) {
 		line := args[0].(string)
-		logger.Log.Infof("Official Toolchain: %s", line)
+		logger.Log.Infof("Official Toolchain %3d%%: %s", o.progress, line)
 	}
 	onStdErr := func(args ...interface{}) {
 		line := args[0].(string)
@@ -123,6 +159,10 @@ func (o *OfficialScript) BuildOfficialToolchainRpms() (err error) {
 		o.BldTracker,
 		o.TimestampFile,
 	}
+
+	done := make(chan bool)
+	defer close(done)
+	go o.updateProgress(done)
 
 	err = shell.ExecuteLiveWithCallbackInDirectory(onStdout, onStdErr, false, script, o.WorkingDir, args...)
 	if err != nil {

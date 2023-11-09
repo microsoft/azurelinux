@@ -22,6 +22,7 @@ populated_toolchain_chroot = $(toolchain_build_dir)/populated_toolchain
 toolchain_sources_dir = $(populated_toolchain_chroot)/usr/src/mariner/SOURCES
 populated_toolchain_rpms = $(populated_toolchain_chroot)/usr/src/mariner/RPMS
 toolchain_spec_list = $(toolchain_build_dir)/toolchain_specs.txt
+toolchain_spec_buildable_list = $(toolchain_build_dir)/toolchain_specs_buildable.txt
 toolchain_actual_contents = $(toolchain_build_dir)/actual_archive_contents.txt
 toolchain_expected_contents = $(toolchain_build_dir)/expected_archive_contents.txt
 raw_toolchain = $(toolchain_build_dir)/toolchain_from_container.tar.gz
@@ -81,7 +82,6 @@ go-toolchain-builder: $(no_repo_acl) $(go-toolchain) $(go-bldtracker)
 		$(if $(TLS_KEY),--tls-key="$(TLS_KEY)") \
 		--cache-dir="$(MISC_CACHE_DIR)/toolchain" \
 		$(if $(TOOLCHAIN_ARCHIVE),--existing-archive="$(TOOLCHAIN_ARCHIVE)") \
-		--force-rebuild \
 		\
 		--bootstrap-output-file="$(raw_toolchain)" \
 		--bootstrap-script="$(SCRIPTS_DIR)/toolchain/create_toolchain_in_container.sh" \
@@ -166,11 +166,20 @@ check-x86_64-manifests: $(toolchain_spec_list)
 			x86_64
 
 # Generate a list of a specs built as part of the toolchain.
-$(toolchain_spec_list): $(toolchain_files)
+$(toolchain_spec_list): $(toolchain_files) $(SCRIPTS_DIR)/toolchain/list_toolchain_specs.sh
 	cd $(SCRIPTS_DIR)/toolchain && \
 		./list_toolchain_specs.sh \
 			$(SCRIPTS_DIR)/toolchain/build_official_toolchain_rpms.sh \
+			$(SPECS_DIR) \
 			$(toolchain_spec_list)
+
+$(toolchain_spec_buildable_list): $(toolchain_files) $(SCRIPTS_DIR)/toolchain/list_toolchain_specs.sh
+	cd $(SCRIPTS_DIR)/toolchain && \
+		./list_toolchain_specs.sh \
+			$(SCRIPTS_DIR)/toolchain/build_official_toolchain_rpms.sh \
+			$(SPECS_DIR) \
+			$(toolchain_spec_buildable_list) \
+			--filter-buildable
 
 # To save toolchain artifacts use compress-toolchain and cache the tarballs
 # To restore toolchain artifacts use hydrate-toolchain and give the location of the tarballs on the command-line

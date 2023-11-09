@@ -15,6 +15,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/marineruser"
 	"github.com/sirupsen/logrus"
 )
 
@@ -63,6 +64,11 @@ func initLogFile(filePath string) (err error) {
 	}
 
 	file, err := os.Create(filePath)
+	if err != nil {
+		return
+	}
+
+	err = marineruser.GiveFileToMarinerUser(filePath)
 	if err != nil {
 		return
 	}

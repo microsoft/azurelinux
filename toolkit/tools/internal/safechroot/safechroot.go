@@ -72,6 +72,7 @@ var (
 	inChrootMutex      sync.Mutex
 	activeChrootsMutex sync.Mutex
 	activeChroots      []*Chroot
+	unsafeUnmountDirs  []string
 )
 
 var defaultChrootEnv = []string{
@@ -494,6 +495,18 @@ func cleanupAllChroots() {
 		}
 	}
 
+	if buildpipeline.IsRegularBuild() && len(unsafeUnmountDirs) > 0 {
+		logger.Log.Info("Cleaning up all unsafe unmount dirs")
+		for _, dir := range unsafeUnmountDirs {
+			logger.Log.Infof("Cleaning up unsafe unmount dir (%s)", dir)
+			err := unsafeUnmount(dir)
+			if err != nil {
+				logger.Log.Errorf("Failed to unmount unsafe unmount dir (%s)", dir)
+				failedToUnmount = true
+			}
+		}
+	}
+
 	if failedToUnmount {
 		logger.Log.Fatalf("Failed to unmount a chroot, manual unmount required. See above errors for details on which mounts failed.")
 	} else {
@@ -572,6 +585,68 @@ func (c *Chroot) unmountAndRemove(leaveOnDisk, lazyUnmount bool) (err error) {
 		err = os.RemoveAll(c.rootDir)
 	}
 
+	return
+}
+
+func RegisterUnsafeUnmount(moutnDir string) {
+	activeChrootsMutex.Lock()
+	defer activeChrootsMutex.Unlock()
+	unsafeUnmountDirs = append(unsafeUnmountDirs, moutnDir)
+}
+
+func unsafeUnmount(mountDir string) (err error) {
+	const (
+		// Do a lazy unmount as a fallback. This will allow the unmount to succeed even if the mount point is busy.
+		// This is to avoid leaving folders like /dev mounted if the chroot folder is forcefully deleted by the user. Even
+		// if the mount is busy at least it will be detached from the filesystem and will not damage the host.
+		unmountFlagsLazy = unix.MNT_DETACH
+	)
+
+	// Walk the directory and gather all directories that are mounted, then unmount them in reverse order to ensure nested mounts are unmounted first.
+
+	// walk the dir
+	mountedDirs := []string{}
+	err = filepath.Walk(mountDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			err = fmt.Errorf("failed to walk path (%s). Error:\n%w", path, err)
+			return err
+		}
+		if info.IsDir() {
+			isMounted, err := mountinfo.Mounted(path)
+			if err != nil {
+				logger.Log.Warnf("Failed to check if path (%s) is mounted. Error: %s", path, err)
+				return err
+			}
+			if isMounted {
+				mountedDirs = append(mountedDirs, path)
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		err = fmt.Errorf("failed to walk path (%s). Error:\n%w", mountDir, err)
+	}
+
+	// Sort the path in reverse order to ensure nested mounts are unmounted first.
+	sort.Slice(mountedDirs, func(i, j int) bool {
+		return mountedDirs[i] > mountedDirs[j]
+	})
+
+	// unmount the dirs
+
+	for _, dir := range mountedDirs {
+		logger.Log.Debugf("Calling unmount on path(%s) with flags (%v)", dir, unmountFlagsLazy)
+		umountErr := unix.Unmount(dir, unmountFlagsLazy)
+		if umountErr != nil {
+			logger.Log.Warnf("Failed to unmount (%s). Error: %s", dir, umountErr)
+			err = umountErr
+		}
+
+		if err != nil {
+			err = fmt.Errorf("failed to unmount something. Error: %s", err)
+			return
+		}
+	}
 	return
 }
 

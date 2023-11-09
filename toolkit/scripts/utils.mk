@@ -18,11 +18,13 @@ no_repo_acl = $(STATUS_FLAGS_DIR)/no_repo_acl.flag
 ######## MISC. MAKEFILE Functions ########
 
 # Creates a folder if it doesn't exist. Also sets the timestamp to 0 if it is
-# created.
+# created. It will recursively call for each parent folder.
+# If the folder doesn't exist after the call, it will print an error and exit.
 #
 # $1 - Folder path
 define create_folder
-$(call shell_real_build_only, if [ ! -d $1 ]; then mkdir -p $1 && touch -d @0 $1 ; fi )
+$(call shell_real_build_only, $(SCRIPTS_DIR)/create_folder.sh $1 $(MARINER_BUILDER_USER) $(LOGS_DIR)/create_folder.log)
+$(if $(wildcard $1),,$(error Failed to create folder: $1. Log: $(shell cat $(LOGS_DIR)/create_folder.log)))
 endef
 
 # Runs a shell commannd only if we are actually doing a build rather than parsing the makefile for tab-completion etc

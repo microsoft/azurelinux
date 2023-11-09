@@ -32,7 +32,7 @@ $(BUILD_SPECS_DIR): $(STATUS_FLAGS_DIR)/build_specs.flag
 	@echo "Finished updating $@." | tee -a $(srpm_expand_log)
 
 # For each SRPM, if it is newer than the spec extract a new copy of the .spec file
-$(STATUS_FLAGS_DIR)/build_specs.flag: $(srpms) $(BUILD_SRPMS_DIR)
+$(STATUS_FLAGS_DIR)/build_specs.flag: $(srpms) $(STATUS_FLAGS_DIR)/build_srpms.flag
 	@echo "Extracting new or updated SRPMs from \"$(BUILD_SRPMS_DIR)\"." | tee $(srpm_expand_log) && \
 	for srpm in $(srpms_basename); do \
 		srpm_file=$(BUILD_SRPMS_DIR)/$${srpm} && \
