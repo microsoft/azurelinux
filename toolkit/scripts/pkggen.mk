@@ -294,7 +294,6 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(no_repo_acl) $(preprocessed_file) $(chroo
 		--ignored-tests="$(TEST_IGNORE_LIST)" \
 		--tests="$(TEST_RUN_LIST)" \
 		--rerun-tests="$(TEST_RERUN_LIST)" \
-		$(if $(filter y,$(SKIP_MISSING_TESTS_IN_LISTS)),--skip-missing-requested-tests) \
 		--image-config-file="$(CONFIG_FILE)" \
 		--cpu-prof-file=$(PROFILE_DIR)/scheduler.cpu.pprof \
 		--mem-prof-file=$(PROFILE_DIR)/scheduler.mem.pprof \
