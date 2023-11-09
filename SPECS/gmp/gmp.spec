@@ -1,14 +1,13 @@
 Summary:        Math libraries
 Name:           gmp
-Version:        6.2.1
-Release:        4%{?dist}
+Version:        6.3.0
+Release:        1%{?dist}
 License:        GPLv2+ AND GPLv3+ AND LGPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.gnu.org/software/gmp
 Source0:        http://ftp.gnu.org/gnu/gmp/%{name}-%{version}.tar.xz
-Patch0:         CVE-2021-43618.patch
 
 %description
 The GMP package contains math libraries. These have useful functions
@@ -68,6 +67,9 @@ make %{?_smp_mflags} check
 %{_docdir}/%{name}-%{version}/isa_abi_headache
 
 %changelog
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.3.0-1
+- Auto-upgrade to 6.3.0 - Azure Linux 3.0 - package upgrades
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 6.2.1-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

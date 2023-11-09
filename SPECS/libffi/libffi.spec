@@ -1,7 +1,7 @@
 Summary:        A portable, high level programming interface to various calling conventions
 Name:           libffi
-Version:        3.4.2
-Release:        3%{?dist}
+Version:        3.4.4
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -75,6 +75,9 @@ rm -rf %{buildroot}/%{_infodir}
 %{_mandir}/man3/*
 
 %changelog
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.4.4-1
+- Auto-upgrade to 3.4.4 - Azure Linux 3.0 - package upgrades
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.4.2-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

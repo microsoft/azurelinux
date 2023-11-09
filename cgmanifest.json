@@ -735,8 +735,8 @@
         "type": "other",
         "other": {
           "name": "audit",
-          "version": "3.0.6",
-          "downloadUrl": "https://people.redhat.com/sgrubb/audit/audit-3.0.6.tar.gz"
+          "version": "3.1.2",
+          "downloadUrl": "https://people.redhat.com/sgrubb/audit/audit-3.1.2.tar.gz"
         }
       }
     },
@@ -955,8 +955,8 @@
         "type": "other",
         "other": {
           "name": "bash",
-          "version": "5.1.8",
-          "downloadUrl": "https://ftp.gnu.org/gnu/bash/bash-5.1.8.tar.gz"
+          "version": "5.2",
+          "downloadUrl": "https://ftp.gnu.org/gnu/bash/bash-5.2.tar.gz"
         }
       }
     },
@@ -1097,8 +1097,8 @@
         "type": "other",
         "other": {
           "name": "binutils",
-          "version": "2.37",
-          "downloadUrl": "https://ftp.gnu.org/gnu/binutils/binutils-2.37.tar.xz"
+          "version": "2.41",
+          "downloadUrl": "https://ftp.gnu.org/gnu/binutils/binutils-2.41.tar.xz"
         }
       }
     },
@@ -1117,8 +1117,8 @@
         "type": "other",
         "other": {
           "name": "bison",
-          "version": "3.7.6",
-          "downloadUrl": "https://ftp.gnu.org/gnu/bison/bison-3.7.6.tar.xz"
+          "version": "3.8.2",
+          "downloadUrl": "https://ftp.gnu.org/gnu/bison/bison-3.8.2.tar.xz"
         }
       }
     },
@@ -2087,8 +2087,8 @@
         "type": "other",
         "other": {
           "name": "coreutils",
-          "version": "8.32",
-          "downloadUrl": "https://ftp.gnu.org/gnu/coreutils/coreutils-8.32.tar.xz"
+          "version": "9.4",
+          "downloadUrl": "https://ftp.gnu.org/gnu/coreutils/coreutils-9.4.tar.xz"
         }
       }
     },
@@ -2117,8 +2117,8 @@
         "type": "other",
         "other": {
           "name": "cpio",
-          "version": "2.13",
-          "downloadUrl": "https://ftp.gnu.org/gnu/cpio/cpio-2.13.tar.bz2"
+          "version": "2.14",
+          "downloadUrl": "https://ftp.gnu.org/gnu/cpio/cpio-2.14.tar.bz2"
         }
       }
     },
@@ -2628,8 +2628,8 @@
         "type": "other",
         "other": {
           "name": "diffutils",
-          "version": "3.8",
-          "downloadUrl": "https://ftp.gnu.org/gnu/diffutils/diffutils-3.8.tar.xz"
+          "version": "3.10",
+          "downloadUrl": "https://ftp.gnu.org/gnu/diffutils/diffutils-3.10.tar.xz"
         }
       }
     },
@@ -3198,8 +3198,8 @@
         "type": "other",
         "other": {
           "name": "elfutils",
-          "version": "0.186",
-          "downloadUrl": "https://sourceware.org/elfutils/ftp/0.186/elfutils-0.186.tar.bz2"
+          "version": "0.189",
+          "downloadUrl": "https://sourceware.org/elfutils/ftp/0.189/elfutils-0.189.tar.bz2"
         }
       }
     },
@@ -3528,8 +3528,8 @@
         "type": "other",
         "other": {
           "name": "file",
-          "version": "5.40",
-          "downloadUrl": "http://ftp.astron.com/pub/file/file-5.40.tar.gz"
+          "version": "5.45",
+          "downloadUrl": "http://ftp.astron.com/pub/file/file-5.45.tar.gz"
         }
       }
     },
@@ -3558,8 +3558,8 @@
         "type": "other",
         "other": {
           "name": "findutils",
-          "version": "4.8.0",
-          "downloadUrl": "https://ftp.gnu.org/gnu/findutils/findutils-4.8.0.tar.xz"
+          "version": "4.9.0",
+          "downloadUrl": "https://ftp.gnu.org/gnu/findutils/findutils-4.9.0.tar.xz"
         }
       }
     },
@@ -4010,8 +4010,8 @@
         "type": "other",
         "other": {
           "name": "gawk",
-          "version": "5.1.1",
-          "downloadUrl": "https://ftp.gnu.org/gnu/gawk/gawk-5.1.1.tar.xz"
+          "version": "5.2.2",
+          "downloadUrl": "https://ftp.gnu.org/gnu/gawk/gawk-5.2.2.tar.xz"
         }
       }
     },
@@ -4030,8 +4030,8 @@
         "type": "other",
         "other": {
           "name": "gcc",
-          "version": "11.2.0",
-          "downloadUrl": "https://ftp.gnu.org/gnu/gcc/gcc-11.2.0/gcc-11.2.0.tar.xz"
+          "version": "13.2.0",
+          "downloadUrl": "https://ftp.gnu.org/gnu/gcc/gcc-13.2.0/gcc-13.2.0.tar.xz"
         }
       }
     },
@@ -4110,8 +4110,8 @@
         "type": "other",
         "other": {
           "name": "gdbm",
-          "version": "1.21",
-          "downloadUrl": "https://ftp.gnu.org/gnu/gdbm/gdbm-1.21.tar.gz"
+          "version": "1.23",
+          "downloadUrl": "https://ftp.gnu.org/gnu/gdbm/gdbm-1.23.tar.gz"
         }
       }
     },
@@ -4220,8 +4220,8 @@
         "type": "other",
         "other": {
           "name": "gettext",
-          "version": "0.21",
-          "downloadUrl": "https://ftp.gnu.org/gnu/gettext/gettext-0.21.tar.xz"
+          "version": "0.22",
+          "downloadUrl": "https://ftp.gnu.org/gnu/gettext/gettext-0.22.tar.xz"
         }
       }
     },
@@ -4350,8 +4350,8 @@
         "type": "other",
         "other": {
           "name": "glibc",
-          "version": "2.35",
-          "downloadUrl": "https://ftp.gnu.org/gnu/glibc/glibc-2.35.tar.xz"
+          "version": "2.38",
+          "downloadUrl": "https://ftp.gnu.org/gnu/glibc/glibc-2.38.tar.xz"
         }
       }
     },
@@ -4410,8 +4410,8 @@
         "type": "other",
         "other": {
           "name": "gmp",
-          "version": "6.2.1",
-          "downloadUrl": "http://ftp.gnu.org/gnu/gmp/gmp-6.2.1.tar.xz"
+          "version": "6.3.0",
+          "downloadUrl": "http://ftp.gnu.org/gnu/gmp/gmp-6.3.0.tar.xz"
         }
       }
     },
@@ -4830,8 +4830,8 @@
         "type": "other",
         "other": {
           "name": "grep",
-          "version": "3.7",
-          "downloadUrl": "https://ftp.gnu.org/gnu/grep/grep-3.7.tar.xz"
+          "version": "3.11",
+          "downloadUrl": "https://ftp.gnu.org/gnu/grep/grep-3.11.tar.xz"
         }
       }
     },
@@ -4840,8 +4840,8 @@
         "type": "other",
         "other": {
           "name": "groff",
-          "version": "1.22.4",
-          "downloadUrl": "https://ftp.gnu.org/gnu/groff/groff-1.22.4.tar.gz"
+          "version": "1.23.0",
+          "downloadUrl": "https://ftp.gnu.org/gnu/groff/groff-1.23.0.tar.gz"
         }
       }
     },
@@ -5110,8 +5110,8 @@
         "type": "other",
         "other": {
           "name": "gzip",
-          "version": "1.12",
-          "downloadUrl": "https://ftp.gnu.org/gnu/gzip/gzip-1.12.tar.xz"
+          "version": "1.13",
+          "downloadUrl": "https://ftp.gnu.org/gnu/gzip/gzip-1.13.tar.xz"
         }
       }
     },
@@ -8641,8 +8641,8 @@
         "type": "other",
         "other": {
           "name": "libarchive",
-          "version": "3.6.1",
-          "downloadUrl": "https://github.com/libarchive/libarchive/releases/download/v3.6.1/libarchive-3.6.1.tar.gz"
+          "version": "3.7.1",
+          "downloadUrl": "https://github.com/libarchive/libarchive/releases/download/v3.7.1/libarchive-3.7.1.tar.gz"
         }
       }
     },
@@ -8781,8 +8781,8 @@
         "type": "other",
         "other": {
           "name": "libcap",
-          "version": "2.60",
-          "downloadUrl": "https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/libcap-2.60.tar.xz"
+          "version": "2.69",
+          "downloadUrl": "https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/libcap-2.69.tar.xz"
         }
       }
     },
@@ -9311,8 +9311,8 @@
         "type": "other",
         "other": {
           "name": "libffi",
-          "version": "3.4.2",
-          "downloadUrl": "https://github.com/libffi/libffi/releases/download/v3.4.2/libffi-3.4.2.tar.gz"
+          "version": "3.4.4",
+          "downloadUrl": "https://github.com/libffi/libffi/releases/download/v3.4.4/libffi-3.4.4.tar.gz"
         }
       }
     },
@@ -10551,8 +10551,8 @@
         "type": "other",
         "other": {
           "name": "libpipeline",
-          "version": "1.5.5",
-          "downloadUrl": "http://download.savannah.gnu.org/releases/libpipeline/libpipeline-1.5.5.tar.gz"
+          "version": "1.5.7",
+          "downloadUrl": "http://download.savannah.gnu.org/releases/libpipeline/libpipeline-1.5.7.tar.gz"
         }
       }
     },
@@ -11211,8 +11211,8 @@
         "type": "other",
         "other": {
           "name": "libtool",
-          "version": "2.4.6",
-          "downloadUrl": "http://ftp.gnu.org/gnu/libtool/libtool-2.4.6.tar.xz"
+          "version": "2.4.7",
+          "downloadUrl": "http://ftp.gnu.org/gnu/libtool/libtool-2.4.7.tar.xz"
         }
       }
     },
@@ -12541,8 +12541,8 @@
         "type": "other",
         "other": {
           "name": "make",
-          "version": "4.3",
-          "downloadUrl": "https://ftp.gnu.org/gnu/make/make-4.3.tar.gz"
+          "version": "4.4.1",
+          "downloadUrl": "https://ftp.gnu.org/gnu/make/make-4.4.1.tar.gz"
         }
       }
     },
@@ -12591,8 +12591,8 @@
         "type": "other",
         "other": {
           "name": "man-db",
-          "version": "2.10.1",
-          "downloadUrl": "https://download.savannah.nongnu.org/releases/man-db/man-db-2.10.1.tar.xz"
+          "version": "2.11.2",
+          "downloadUrl": "https://download.savannah.nongnu.org/releases/man-db/man-db-2.11.2.tar.xz"
         }
       }
     },
@@ -13403,8 +13403,8 @@
         "type": "other",
         "other": {
           "name": "mpfr",
-          "version": "4.1.0",
-          "downloadUrl": "http://www.mpfr.org/mpfr-4.1.0/mpfr-4.1.0.tar.xz"
+          "version": "4.2.1",
+          "downloadUrl": "http://www.mpfr.org/mpfr-4.2.1/mpfr-4.2.1.tar.xz"
         }
       }
     },
@@ -21184,8 +21184,8 @@
         "type": "other",
         "other": {
           "name": "popt",
-          "version": "1.18",
-          "downloadUrl": "http://ftp.rpm.org/popt/releases/popt-1.x/popt-1.18.tar.gz"
+          "version": "1.19",
+          "downloadUrl": "http://ftp.rpm.org/popt/releases/popt-1.x/popt-1.19.tar.gz"
         }
       }
     },
@@ -21294,8 +21294,8 @@
         "type": "other",
         "other": {
           "name": "procps-ng",
-          "version": "3.3.17",
-          "downloadUrl": "https://sourceforge.net/projects/procps-ng/files/Production/procps-ng-3.3.17.tar.xz"
+          "version": "4.0.4",
+          "downloadUrl": "https://sourceforge.net/projects/procps-ng/files/Production/procps-ng-4.0.4.tar.xz"
         }
       }
     },
@@ -25264,8 +25264,8 @@
         "type": "other",
         "other": {
           "name": "readline",
-          "version": "8.1",
-          "downloadUrl": "https://ftp.gnu.org/gnu/readline/readline-8.1.tar.gz"
+          "version": "8.2",
+          "downloadUrl": "https://ftp.gnu.org/gnu/readline/readline-8.2.tar.gz"
         }
       }
     },
@@ -25505,8 +25505,8 @@
         "type": "other",
         "other": {
           "name": "rpm",
-          "version": "4.18.0",
-          "downloadUrl": "http://ftp.rpm.org/releases/rpm-4.18.x/rpm-4.18.0.tar.bz2"
+          "version": "4.18.1",
+          "downloadUrl": "http://ftp.rpm.org/releases/rpm-4.18.x/rpm-4.18.1.tar.bz2"
         }
       }
     },
@@ -27315,8 +27315,8 @@
         "type": "other",
         "other": {
           "name": "sed",
-          "version": "4.8",
-          "downloadUrl": "https://ftp.gnu.org/gnu/sed/sed-4.8.tar.xz"
+          "version": "4.9",
+          "downloadUrl": "https://ftp.gnu.org/gnu/sed/sed-4.9.tar.xz"
         }
       }
     },
@@ -28437,8 +28437,8 @@
         "type": "other",
         "other": {
           "name": "texinfo",
-          "version": "6.8",
-          "downloadUrl": "http://ftp.gnu.org/gnu/texinfo/texinfo-6.8.tar.xz"
+          "version": "7.0.3",
+          "downloadUrl": "http://ftp.gnu.org/gnu/texinfo/texinfo-7.0.3.tar.xz"
         }
       }
     },
@@ -29107,8 +29107,8 @@
         "type": "other",
         "other": {
           "name": "util-linux",
-          "version": "2.37.4",
-          "downloadUrl": "https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.37/util-linux-2.37.4.tar.xz"
+          "version": "2.39.2",
+          "downloadUrl": "https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.39/util-linux-2.39.2.tar.xz"
         }
       }
     },
@@ -30450,8 +30450,8 @@
         "type": "other",
         "other": {
           "name": "xz",
-          "version": "5.2.5",
-          "downloadUrl": "https://tukaani.org/xz/xz-5.2.5.tar.xz"
+          "version": "5.4.4",
+          "downloadUrl": "https://tukaani.org/xz/xz-5.4.4.tar.xz"
         }
       }
     },
@@ -30640,8 +30640,8 @@
         "type": "other",
         "other": {
           "name": "zlib",
-          "version": "1.2.13",
-          "downloadUrl": "https://github.com/madler/zlib/releases/download/v1.2.13/zlib-1.2.13.tar.xz"
+          "version": "1.3",
+          "downloadUrl": "https://github.com/madler/zlib/releases/download/v1.3/zlib-1.3.tar.xz"
         }
       }
     },
@@ -30670,8 +30670,8 @@
         "type": "other",
         "other": {
           "name": "zstd",
-          "version": "1.5.0",
-          "downloadUrl": "https://github.com/facebook/zstd/releases/download/v1.5.0/zstd-1.5.0.tar.gz"
+          "version": "1.5.5",
+          "downloadUrl": "https://github.com/facebook/zstd/releases/download/v1.5.5/zstd-1.5.5.tar.gz"
         }
       }
     },

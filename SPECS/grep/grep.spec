@@ -1,7 +1,7 @@
 Summary:        Programs for searching through files
 Name:           grep
-Version:        3.7
-Release:        2%{?dist}
+Version:        3.11
+Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -57,6 +57,9 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.11-1
+- Auto-upgrade to 3.11 - Azure Linux 3.0 - package upgrades
+
 * Wed Feb 23 2022 Muhammad Falak <mwani@microsoft.com> 3.7-2
 - Tweak configure opts `--with-included-regex`
 - Add an explicit BR on `perl(File::Find)` to enable ptest

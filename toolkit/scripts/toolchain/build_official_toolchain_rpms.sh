@@ -436,10 +436,10 @@ chroot_and_install_rpms libxml2
 echo Download JDK rpms
 case $(uname -m) in
     x86_64)
-        wget -nv --no-clobber --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/x86_64/msopenjdk-11-11.0.18-1.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+        wget -nv --no-clobber --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/x86_64/msopenjdk-11-11.0.20.1-1.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
     ;;
     aarch64)
-        wget -nv --no-clobber --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/aarch64/msopenjdk-11-11.0.18-1.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+        wget -nv --no-clobber --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/aarch64/msopenjdk-11-11.0.20.1-1.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
     ;;
 esac
 
@@ -483,6 +483,9 @@ build_rpm_in_chroot_no_install curl
 # cracklib needs python3-setuptools (installed with python3)
 build_rpm_in_chroot_no_install cracklib
 
+# pam needs libxcrypt
+build_rpm_in_chroot_no_install libxcrypt
+chroot_and_install_rpms libxcrypt
 # pam needs cracklib
 chroot_and_install_rpms cracklib
 build_rpm_in_chroot_no_install cmake
@@ -583,7 +586,7 @@ build_rpm_in_chroot_no_install tdnf
 
 # Build createrepo_c
 # createrepo_c needs cmake, file, glib
-chroot_and_install_rpms file
+chroot_and_install_rpms file file # Use full naming since we have a collision with filesystem
 chroot_and_install_rpms glib
 build_rpm_in_chroot_no_install createrepo_c
 

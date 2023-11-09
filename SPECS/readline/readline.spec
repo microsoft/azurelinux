@@ -1,6 +1,6 @@
 Summary:        Command-line editing and history capabilities
 Name:           readline
-Version:        8.1
+Version:        8.2
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
@@ -53,8 +53,8 @@ make %{?_smp_mflags} check
 %license COPYING
 %{_libdir}/libreadline.so.8
 %{_libdir}/libhistory.so.8
-%{_libdir}/libhistory.so.8.1
-%{_libdir}/libreadline.so.8.1
+%{_libdir}/libhistory.so.%{version}
+%{_libdir}/libreadline.so.%{version}
 
 %files devel
 %{_includedir}/%{name}/keymaps.h
@@ -85,6 +85,7 @@ make %{?_smp_mflags} check
 %{_datadir}/%{name}/hist_erasedups.c
 %{_datadir}/%{name}/fileman.c
 %{_datadir}/%{name}/rlkeymaps.c
+%{_datadir}/%{name}/rl-timeout.c
 %{_docdir}/%{name}/INSTALL
 %{_docdir}/%{name}/README
 %{_docdir}/%{name}/CHANGES
@@ -105,8 +106,12 @@ make %{?_smp_mflags} check
 %{_mandir}/man3/history.3.gz
 %{_mandir}/man3/readline.3.gz
 %{_libdir}/pkgconfig/readline.pc
+%{_libdir}/pkgconfig/history.pc
 
 %changelog
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.2-1
+- Auto-upgrade to 8.2 - Azure Linux 3.0 - package upgrades
+
 * Mon Nov 22 2021 Andrew Phelps <anphel@microsoft.com> 8.1-1
 - Update to version 8.1
 - License verified
@@ -126,7 +131,7 @@ make %{?_smp_mflags} check
 * Wed Nov 16 2016 Alexey Makhalov <amakhalov@vmware.com> 6.3-6
 - Move docs and man to the devel package
 
-* Mon Oct 04 2016 ChangLee <changlee@vmware.com> 6.3-5
+* Tue Oct 04 2016 ChangLee <changlee@vmware.com> 6.3-5
 - Modified %check
 
 * Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> 6.3-4

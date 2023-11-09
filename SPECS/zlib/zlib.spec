@@ -1,14 +1,13 @@
 Summary:        Compression and decompression routines
 Name:           zlib
-Version:        1.2.13
-Release:        2%{?dist}
+Version:        1.3
+Release:        1%{?dist}
 URL:            https://www.zlib.net/
 License:        zlib
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://github.com/madler/zlib/releases/download/v%{version}/%{name}-%{version}.tar.xz
-Patch0:         CVE-2023-45853.patch
 %description
 Compression and decompression routines
 %package    devel
@@ -50,6 +49,9 @@ make  %{?_smp_mflags} check
 %{_mandir}/man3/zlib.3.gz
 
 %changelog
+* Mon Oct 30 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.3-1
+- Auto-upgrade to 1.3 - Azure Linux 3.0 - package upgrades
+
 * Thu Oct 19 2023 Nan Liu <liunan@microsoft.com> - 1.2.13-2
 - Add patch to address CVE-2023-45853
 - Fix invalid source URL

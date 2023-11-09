@@ -6,8 +6,8 @@
 
 Summary:        Main C library
 Name:           glibc
-Version:        2.35
-Release:        6%{?dist}
+Version:        2.38
+Release:        1%{?dist}
 License:        BSD AND GPLv2+ AND Inner-Net AND ISC AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,7 +16,7 @@ URL:            https://www.gnu.org/software/libc
 Source0:        https://ftp.gnu.org/gnu/glibc/%{name}-%{version}.tar.xz
 Source1:        locale-gen.sh
 Source2:        locale-gen.conf
-Patch0:         https://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2.35-fhs-1.patch
+Patch0:         https://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2.38-fhs-1.patch
 # Only applicable on ARMv7 targets.
 Patch1:         CVE-2020-6096.nopatch
 # Only applicable on x32 targets.
@@ -26,10 +26,7 @@ Patch3:         CVE-2020-1751.nopatch
 # Marked by upstream/Ubuntu/Red Hat as not a security bug, no fix available
 # Rationale: Exploit requires crafted pattern in regex compiler meant only for trusted content
 Patch4:         CVE-2018-20796.nopatch
-Patch5:         glibc-2.34_pthread_cond_wait.patch
-Patch6:         CVE-2023-4911.patch
-Patch7:         CVE-2023-4806.patch
-Patch8:         CVE-2023-5156.patch
+Patch5:         https://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2.38-memalign_fix-1.patch
 BuildRequires:  bison
 BuildRequires:  gawk
 BuildRequires:  gettext
@@ -145,18 +142,20 @@ export CFLAGS
 export CXXFLAGS
 
 cd %{_builddir}/%{name}-build
+echo "rootsbindir=/usr/sbin" > configparms
 ../%{name}-%{version}/configure \
         --prefix=%{_prefix} \
         --disable-profile \
         --disable-werror \
-        --enable-kernel=3.2 \
+        --enable-kernel=4.14 \
         --enable-bind-now \
+        --disable-build-nscd \
         --enable-static-pie \
-        --disable-experimental-malloc \
 %ifarch x86_64
         --enable-cet \
 %endif
-        --disable-silent-rules
+        --disable-silent-rules \
+        libc_cv_slibdir=/usr/lib
 
 make %{?_smp_mflags}
 
@@ -171,7 +170,7 @@ install -vdm 755 %{buildroot}%{_libdir}/locale
 cp -v ../%{name}-%{version}/nscd/nscd.conf %{buildroot}%{_sysconfdir}/nscd.conf
 #       Install locale generation script and config file
 cp -v %{SOURCE2} %{buildroot}%{_sysconfdir}
-cp -v %{SOURCE1} %{buildroot}/sbin
+cp -v %{SOURCE1} %{buildroot}%{_sbindir}
 #       Remove unwanted cruft
 rm -rf %{buildroot}%{_infodir}
 #       Install configuration files
@@ -211,6 +210,8 @@ mv %{buildroot}%{_libdir}/locale/en_US.utf8 %{buildroot}%{_libdir}/locale/en_US.
 popd
 # to do not depend on /bin/bash
 sed -i 's@#! /bin/bash@#! /bin/sh@' %{buildroot}%{_bindir}/ldd
+# Fix a hard coded path to the executable loader in the ldd script
+sed '/RTLDLIST=/s@/usr@@g' -i %{buildroot}%{_bindir}/ldd
 sed -i 's@#!/bin/bash@#!/bin/sh@' %{buildroot}%{_bindir}/tzselect
 
 # Determine which static libs are needed in `glibc-devel` - the rest will be put
@@ -218,8 +219,8 @@ sed -i 's@#!/bin/bash@#!/bin/sh@' %{buildroot}%{_bindir}/tzselect
 # in `libc.so` (since 2.34 - see https://developers.redhat.com/articles/2021/12/17/why-glibc-234-removed-libpthread)
 # and the "statically linked bit" of `libc.so` (called `libc_nonshared.a`)
 static_libs_in_devel_pattern="lib\(c_nonshared\|pthread\|dl\|rt\|g\|util\|mcheck\).a"
-ls -1 %{buildroot}%{_lib64dir}/*.a | grep -e "$static_libs_in_devel_pattern" | sed "s:^%{buildroot}::g" > devel.filelist
-ls -1 %{buildroot}%{_lib64dir}/*.a | grep -v -e "$static_libs_in_devel_pattern" | sed "s:^%{buildroot}::g" > static.filelist
+ls -1 %{buildroot}%{_libdir}/*.a | grep -e "$static_libs_in_devel_pattern" | sed "s:^%{buildroot}::g" > devel.filelist
+ls -1 %{buildroot}%{_libdir}/*.a | grep -v -e "$static_libs_in_devel_pattern" | sed "s:^%{buildroot}::g" > static.filelist
 
 %check
 cd %{_builddir}/glibc-build
@@ -257,14 +258,14 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %config(noreplace) %{_sysconfdir}/rpc
 %config(missingok,noreplace) %{_sysconfdir}/ld.so.cache
 %config %{_sysconfdir}/locale-gen.conf
-/lib64/*
 %ifarch aarch64
-/lib/ld-linux-aarch64.so.1
+/usr/lib/ld-linux-aarch64.so.1
 %endif
-%exclude /lib64/libpcprofile.so
-%{_lib64dir}/*.so
-/sbin/ldconfig
-/sbin/locale-gen.sh
+#%%exclude /lib64/libpcprofile.so
+%{_libdir}/*.so*
+%{_sbindir}/ldconfig
+%{_sbindir}/locale-gen.sh
+
 #%%{_sbindir}/zdump
 %{_sbindir}/zic
 %{_sbindir}/iconvconfig
@@ -281,21 +282,21 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 
 %files iconv
 %defattr(-,root,root)
-%{_lib64dir}/gconv/*
+%{_libdir}/gconv/*
 
 %files tools
 %defattr(-,root,root)
 %{_bindir}/mtrace
 %{_bindir}/pcprofiledump
 %{_bindir}/xtrace
-/sbin/sln
-%{_lib64dir}/audit/*
-/lib64/libpcprofile.so
+%{_sbindir}/sln
+%{_libdir}/audit/*
+#/lib64/libpcprofile.so
 
 %files nscd
 %defattr(-,root,root)
 %config(noreplace) %{_sysconfdir}/nscd.conf
-%{_sbindir}/nscd
+#%%{_sbindir}/nscd
 %dir %{_localstatedir}/cache/nscd
 
 %files i18n
@@ -308,20 +309,23 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 # TODO: Excluding for now to remove dependency on PERL
 # /usr/bin/mtrace
 # C Runtime files for `-pie`, `-no-pie` and profiled executables as well as for shared libs
-%{_lib64dir}/{,g,M,S}crt1.o
+%{_libdir}/{,g,M,S}crt1.o
 # C Runtime files needed for all targets
-%{_lib64dir}/crt{i,n}.o
+%{_libdir}/crt{i,n}.o
 %{_includedir}/*
 
 %files static -f static.filelist
 %defattr(-,root,root)
 # C Runtime files for `-static-pie` and profiled `-static-pie`
-%{_lib64dir}/{r,gr}crt1.o
+%{_libdir}/{r,gr}crt1.o
 
 %files -f %{name}.lang lang
 %defattr(-,root,root)
 
 %changelog
+* Thu Nov 02 2023 Andrew Phelps <anphel@microsoft.com> - 2.38-1
+- Upgrade to version 2.38
+
 * Wed Oct 04 2023 Minghe Ren <mingheren@microsoft.com> - 2.35-6
 - Add patches for CVE-2023-4806 and CVE-2023-5156
 
