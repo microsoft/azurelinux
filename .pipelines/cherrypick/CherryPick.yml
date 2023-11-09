@@ -5,6 +5,7 @@ name: Cherry Pick fast-track commits from PR
 
 trigger:
 - fasttrack/*
+- tvuong/fasttrack/*
 pr: none
 
 variables:
@@ -15,6 +16,7 @@ resources:
     - repository: CBL-Mariner-Pipelines
       type: git
       name: mariner/CBL-Mariner-Pipelines
+      ref: refs/heads/tvuong/cherry-pick
 
 jobs:
   - job: 'CherryPick'
