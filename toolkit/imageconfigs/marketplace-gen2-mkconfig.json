@@ -60,6 +60,7 @@
                 "grub2"
             ],
             "PackageLists": [
+                "packagelists/grub2-mkconfig.json",
                 "packagelists/core-packages-image.json",
                 "packagelists/marketplace-tools-packages.json",
                 "packagelists/azurevm-packages.json"
