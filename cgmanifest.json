@@ -985,8 +985,8 @@
         "type": "other",
         "other": {
           "name": "bazel",
-          "version": "6.4.0",
-          "downloadUrl": "https://github.com/bazelbuild/bazel/releases/download/6.4.0/bazel-6.4.0-dist.zip"
+          "version": "5.3.2",
+          "downloadUrl": "https://github.com/bazelbuild/bazel/releases/download/5.3.2/bazel-5.3.2-dist.zip"
         }
       }
     },
