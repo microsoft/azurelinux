@@ -1,17 +1,13 @@
 Summary:        Provide tools to manage multipath devices
 Name:           device-mapper-multipath
-Version:        0.8.6
-Release:        5%{?dist}
+Version:        0.9.6
+Release:        1%{?dist}
 License:        GPLv2
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://christophe.varoqui.free.fr/
-#Source0:       https://github.com/opensvc/multipath-tools/archive/refs/tags/%{version}.tar.gz
-Source0:        multipath-tools-%{version}.tar.gz
-# CVE-2022-41973 and CVE-2022-41974 are resolved in 0.9.2
-Patch0:         CVE-2022-41973.patch
-Patch1:         CVE-2022-41974.patch
+Source0:        https://github.com/opensvc/multipath-tools/archive/refs/tags/%{version}.tar.gz#/multipath-tools-%{version}.tar.gz
 BuildRequires:  userspace-rcu-devel
 BuildRequires:  libaio-devel
 BuildRequires:  device-mapper-devel
@@ -101,6 +97,9 @@ install -vd %{buildroot}%{_sysconfdir}/multipath
 %{_mandir}/man8/kpartx.8.gz
 
 %changelog
+* Thu Nov 09 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 0.9.6-1
+- Upgrade to 0.9.6 - Azure Linux 3.0 - package upgrades
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.8.6-5
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
