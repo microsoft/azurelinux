@@ -11281,8 +11281,8 @@
         "type": "other",
         "other": {
           "name": "libunistring",
-          "version": "1.1",
-          "downloadUrl": "http://ftp.gnu.org/gnu/libunistring/libunistring-1.1.tar.xz"
+          "version": "0.9.10",
+          "downloadUrl": "http://ftp.gnu.org/gnu/libunistring/libunistring-0.9.10.tar.xz"
         }
       }
     },
