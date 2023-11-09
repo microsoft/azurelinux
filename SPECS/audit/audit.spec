@@ -8,7 +8,6 @@ Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://people.redhat.com/sgrubb/audit/
 Source0:        https://people.redhat.com/sgrubb/audit/%{name}-%{version}.tar.gz
-#Patch0:         refuse-manual-stop.patch
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  krb5-devel
 BuildRequires:  systemd-bootstrap-rpm-macros
@@ -54,6 +53,8 @@ and libauparse.
 
 %prep
 %setup -q
+# Set "RefuseManualStop=no" in "auditd.service"
+# See this discussion on "RefuseManualStop": https://systemd-devel.freedesktop.narkive.com/9RzEJTWh/auditd-service-and-refusemanualstop
 sed -i "s/RefuseManualStop=yes/RefuseManualStop=no/g" init.d/auditd.service
 
 %build

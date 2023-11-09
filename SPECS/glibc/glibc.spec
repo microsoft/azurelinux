@@ -106,6 +106,7 @@ Name Service Cache Daemon
 
 %prep
 %autosetup -p1
+sed -i 's/\\$$(pwd)/`pwd`/' timezone/Makefile
 install -vdm 755 %{_builddir}/%{name}-build
 # do not try to explicitly provide GLIBC_PRIVATE versioned libraries
 %define __find_provides %{_builddir}/%{name}-%{version}/find_provides.sh
@@ -144,17 +145,17 @@ cd %{_builddir}/%{name}-build
 echo "rootsbindir=/usr/sbin" > configparms
 ../%{name}-%{version}/configure \
         --prefix=%{_prefix} \
+        --disable-profile \
         --disable-werror \
         --enable-kernel=4.14 \
-        --enable-stack-protector=strong        \
-        --with-headers=/usr/include            \
-        libc_cv_slibdir=/usr/lib \
+        --enable-bind-now \
         --disable-build-nscd \
         --enable-static-pie \
 %ifarch x86_64
         --enable-cet \
 %endif
-        --disable-silent-rules
+        --disable-silent-rules \
+        libc_cv_slibdir=/usr/lib
 
 make %{?_smp_mflags}
 
@@ -169,6 +170,7 @@ install -vdm 755 %{buildroot}%{_libdir}/locale
 cp -v ../%{name}-%{version}/nscd/nscd.conf %{buildroot}%{_sysconfdir}/nscd.conf
 #       Install locale generation script and config file
 cp -v %{SOURCE2} %{buildroot}%{_sysconfdir}
+cp -v %{SOURCE1} %{buildroot}%{_sbindir}
 #       Remove unwanted cruft
 rm -rf %{buildroot}%{_infodir}
 #       Install configuration files
@@ -208,6 +210,8 @@ mv %{buildroot}%{_libdir}/locale/en_US.utf8 %{buildroot}%{_libdir}/locale/en_US.
 popd
 # to do not depend on /bin/bash
 sed -i 's@#! /bin/bash@#! /bin/sh@' %{buildroot}%{_bindir}/ldd
+# Fix a hard coded path to the executable loader in the ldd script
+sed '/RTLDLIST=/s@/usr@@g' -i %{buildroot}%{_bindir}/ldd
 sed -i 's@#!/bin/bash@#!/bin/sh@' %{buildroot}%{_bindir}/tzselect
 
 # Determine which static libs are needed in `glibc-devel` - the rest will be put
@@ -260,7 +264,7 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 #%%exclude /lib64/libpcprofile.so
 %{_libdir}/*.so*
 %{_sbindir}/ldconfig
-#/sbin/locale-gen.sh
+%{_sbindir}/locale-gen.sh
 
 #%%{_sbindir}/zdump
 %{_sbindir}/zic

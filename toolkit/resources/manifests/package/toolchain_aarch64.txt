@@ -9,9 +9,9 @@ bash-5.1.8-4.cm2.aarch64.rpm
 bash-debuginfo-5.1.8-4.cm2.aarch64.rpm
 bash-devel-5.1.8-4.cm2.aarch64.rpm
 bash-lang-5.1.8-4.cm2.aarch64.rpm
-binutils-2.37-7.cm2.aarch64.rpm
-binutils-debuginfo-2.37-7.cm2.aarch64.rpm
-binutils-devel-2.37-7.cm2.aarch64.rpm
+binutils-2.41-1.cm2.aarch64.rpm
+binutils-debuginfo-2.41-1.cm2.aarch64.rpm
+binutils-devel-2.41-1.cm2.aarch64.rpm
 bison-3.8.2-1.cm2.aarch64.rpm
 bison-debuginfo-3.8.2-1.cm2.aarch64.rpm
 bzip2-1.0.8-1.cm2.aarch64.rpm

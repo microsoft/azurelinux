@@ -1,7 +1,7 @@
 Summary:        Contains a linker, an assembler, and other tools
 Name:           binutils
-Version:        2.37
-Release:        7%{?dist}
+Version:        2.41
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,12 +10,6 @@ URL:            https://www.gnu.org/software/binutils
 Source0:        https://ftp.gnu.org/gnu/binutils/%{name}-%{version}.tar.xz
 # Patch was derived from source: https://src.fedoraproject.org/rpms/binutils/blob/f34/f/binutils-export-demangle.h.patch
 Patch0:         export-demangle-header.patch
-# Patch1 Source https://sourceware.org/git/?p=binutils-gdb.git;a=commit;h=6b86da53d5ee2022b9065f445d23356190380746
-Patch1:         linker-script-readonly-keyword-support.patch
-Patch2:         thin_archive_descriptor.patch
-Patch3:         CVE-2021-45078.patch
-Patch4:         CVE-2022-38533.patch
-Patch5:         CVE-2022-4285.patch
 Provides:       bundled(libiberty)
 
 %description
@@ -41,6 +35,7 @@ for handling compiled objects.
     --enable-ld=default \
     --enable-plugins    \
     --enable-shared     \
+    --enable-64-bit-bfd \
     --with-system-zlib
 
 %make_build tooldir=%{_prefix}
@@ -81,6 +76,13 @@ sed -i 's/testsuite/ /g' gold/Makefile
 %{_bindir}/ranlib
 %{_bindir}/readelf
 %{_bindir}/strip
+%{_sysconfdir}/gprofng.rc
+%{_bindir}/gp-archive
+%{_bindir}/gp-collect-app
+%{_bindir}/gp-display-html
+%{_bindir}/gp-display-src
+%{_bindir}/gp-display-text
+%{_bindir}/gprofng
 %{_libdir}/ldscripts/*
 %{_mandir}/man1/readelf.1.gz
 %{_mandir}/man1/windmc.1.gz
@@ -100,6 +102,13 @@ sed -i 's/testsuite/ /g' gold/Makefile
 %{_mandir}/man1/windres.1.gz
 %{_mandir}/man1/size.1.gz
 %{_mandir}/man1/objdump.1.gz
+%{_mandir}/man1/gp-archive.1.gz
+%{_mandir}/man1/gp-collect-app.1.gz
+%{_mandir}/man1/gp-display-html.1.gz
+%{_mandir}/man1/gp-display-src.1.gz
+%{_mandir}/man1/gp-display-text.1.gz
+%{_mandir}/man1/gprofng.1.gz
+
 %{_libdir}/libbfd-%{version}.so
 %{_libdir}/libopcodes-%{version}.so
 
@@ -129,8 +138,30 @@ sed -i 's/testsuite/ /g' gold/Makefile
 %{_libdir}/libiberty.a
 %{_libdir}/libopcodes.a
 %{_libdir}/libopcodes.so
+%{_includedir}/collectorAPI.h
+%{_includedir}/libcollector.h
+%{_includedir}/libfcollector.h
+%{_includedir}/sframe-api.h
+%{_includedir}/sframe.h
+%{_libdir}/gprofng/libgp-collector.so
+%{_libdir}/gprofng/libgp-collectorAPI.a
+%{_libdir}/gprofng/libgp-collectorAPI.so
+%{_libdir}/gprofng/libgp-heap.so
+%{_libdir}/gprofng/libgp-iotrace.so
+%{_libdir}/gprofng/libgp-sync.so
+%{_libdir}/libgprofng.a
+%{_libdir}/libgprofng.so
+%{_libdir}/libgprofng.so.0
+%{_libdir}/libgprofng.so.0.0.0
+%{_libdir}/libsframe.a
+%{_libdir}/libsframe.so
+%{_libdir}/libsframe.so.1
+%{_libdir}/libsframe.so.1.0.0
 
 %changelog
+* Wed Nov 08 2023 Andrew Phelps <anphel@microsoft.com> - 2.41-1
+- Upgrade to version 2.41
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.37-7
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
