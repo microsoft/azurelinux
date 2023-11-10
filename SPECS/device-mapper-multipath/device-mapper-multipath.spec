@@ -6,7 +6,7 @@ License:        GPLv2
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            http://christophe.varoqui.free.fr/
+URL:            https://github.com/opensvc/multipath-tools
 Source0:        https://github.com/opensvc/multipath-tools/archive/refs/tags/%{version}.tar.gz#/multipath-tools-%{version}.tar.gz
 BuildRequires:  userspace-rcu-devel
 BuildRequires:  libaio-devel
@@ -55,8 +55,11 @@ make install DESTDIR=%{buildroot} \
    SYSTEMDPATH=%{_libdir} \
    bindir=%{_sbindir} \
    syslibdir=%{_libdir} \
-   libdir=%{_libdir}/multipath \
+   usrlibdir=%{_libdir} \
+   plugindir=%{_libdir}/multipath \
+   includedir=%{_includedir} \
    pkgconfdir=%{_libdir}/pkgconfig \
+   mandir=%{_mandir} \
    tmpfilesdir=%{_tmpfilesdir}
 
 install -vd %{buildroot}%{_sysconfdir}/multipath
@@ -69,20 +72,20 @@ install -vd %{buildroot}%{_sysconfdir}/multipath
 %license COPYING
 %{_sbindir}/mpathpersist
 %{_sbindir}/multipath
+%{_sbindir}/multipathc
 %{_sbindir}/multipathd
 %{_udevrulesdir}/*
-/lib64/*.so
-/lib64/*.so.*
 %{_unitdir}/*
 %{_libdir}/*.so
 %{_libdir}/*.so.*
 %{_libdir}/multipath/*.so
 %{_mandir}/man5/*
-%{_mandir}/man8/mpathpersist.8.gz
-%{_mandir}/man8/multipath.8.gz
-%{_mandir}/man8/multipathd.8.gz
+%{_mandir}/man8/mpathpersist*
+%{_mandir}/man8/multipath*
 %dir %{_sysconfdir}/multipath
 %{_tmpfilesdir}/multipath.conf
+%dir %{_libdir}/modules-load.d
+%{_libdir}/modules-load.d/multipath.conf
 
 %files devel
 %defattr(-,root,root,-)
@@ -94,7 +97,8 @@ install -vd %{buildroot}%{_sysconfdir}/multipath
 %defattr(-,root,root,-)
 %{_sbindir}/kpartx
 %{_libdir}/udev/kpartx_id
-%{_mandir}/man8/kpartx.8.gz
+%{_libdir}/udev/rules.d/*
+%{_mandir}/man8/kpartx.8*
 
 %changelog
 * Thu Nov 09 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 0.9.6-1
