@@ -214,14 +214,22 @@ func findBuildNodesByPath(rpmPath string, pkgGraph *pkggraph.PkgGraph, stripVers
 	buildNodes = make([]*pkggraph.PkgNode, 0)
 	implicitRPMBaseName := filepath.Base(rpmPath)
 
+	var err error
 	if stripVersion {
-		implicitRPMBaseName = rpm.ExtractNameFromRPMPath(implicitRPMBaseName)
+		implicitRPMBaseName, err = rpm.ExtractNameFromRPMPath(implicitRPMBaseName)
+		if err != nil {
+			logger.Log.Warnf("Failed to extract name from RPM path: %s", err)
+			return nil
+		}
 	}
 
 	for _, node := range pkgGraph.AllBuildNodes() {
 		graphNodeRPMBaseName := filepath.Base(node.RpmPath)
 		if stripVersion {
-			graphNodeRPMBaseName = rpm.ExtractNameFromRPMPath(graphNodeRPMBaseName)
+			graphNodeRPMBaseName, err = rpm.ExtractNameFromRPMPath(graphNodeRPMBaseName)
+			if err != nil {
+				continue
+			}
 		}
 		if implicitRPMBaseName == graphNodeRPMBaseName {
 			buildNodes = append(buildNodes, node)

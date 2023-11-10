@@ -11,7 +11,6 @@ import (
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
 	"github.com/sirupsen/logrus"
 	"gonum.org/v1/gonum/graph"
 	"gonum.org/v1/gonum/graph/path"

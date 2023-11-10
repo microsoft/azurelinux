@@ -386,7 +386,7 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 				allowLowPriorityNodes = true
 				nodesToBuild = schedulerutils.LeafNodes(pkgGraph, graphMutex, goalNode, buildState, useCachedImplicit)
 				// Check if any of the low priority nodes are still in the graph. If not, we can skip building them.
-				lowPriorityNodes = filterLowPriorityNodesAgainstGraph(pkgGraph, graphMutex, buildState, lowPriorityNodes)
+				lowPriorityNodes = filterNodesAgainstGraphState(pkgGraph, graphMutex, buildState, lowPriorityNodes)
 				nodesToBuild = append(nodesToBuild, lowPriorityNodes...)
 				// We should generate no more low priority nodes going forward.
 				lowPriorityNodes = nil
@@ -450,7 +450,7 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 
 						// If we are shrinking the graph we need to filter out any low priority nodes that are no longer in the graph.
 						// We may still have some low priority nodes, those will be handled as normal when we switch allowLowPriorityNodes=true
-						lowPriorityNodes = filterLowPriorityNodesAgainstGraph(pkgGraph, graphMutex, buildState, lowPriorityNodes)
+						lowPriorityNodes = filterNodesAgainstGraphState(pkgGraph, graphMutex, buildState, lowPriorityNodes)
 					}
 				}
 
