@@ -54,7 +54,7 @@ install -m 755 ./helm %{buildroot}%{_bindir}
 go test -v ./cmd/helm
 
 %changelog
-* Fri Nov 10 2023 Nicolas Guibourge <cblmargh@microsoft.com> - 3.13.2-1
+* Fri Nov 10 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 3.13.2-1
 - Upgrade to 3.13.2 - Azure Linux 3.0 - package upgrades
 
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.10.3-11
