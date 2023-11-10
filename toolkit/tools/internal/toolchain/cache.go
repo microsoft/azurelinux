@@ -10,7 +10,7 @@ import (
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/marineruser"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/marinerusers"
 )
 
 func checkCache(name string, inputs []string, cacheDir string) (cachedFile string, cacheOk bool, err error) {
@@ -68,14 +68,9 @@ func addToCache(name string, inputs []string, srcFile, cacheDir string) (cachedF
 		return "", fmt.Errorf("unable to get cache file path:\n%w", err)
 	}
 
-	err = file.Copy(srcFile, cachedFile)
+	err = file.CopyWithUser(srcFile, cachedFile, marinerusers.GetMarinerBuildUser())
 	if err != nil {
 		return "", fmt.Errorf("unable to move bootstrap file to cache:\n%w", err)
-	}
-
-	err = marineruser.GiveFileToMarinerUser(cachedFile)
-	if err != nil {
-		return "", fmt.Errorf("unable to give file '%s' to mariner user:\n%w", cachedFile, err)
 	}
 
 	logger.Log.Infof("Cache updated '%s' to '%s'", srcFile, cachedFile)

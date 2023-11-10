@@ -15,6 +15,7 @@ import (
 	ccachemanagerpkg "github.com/microsoft/CBL-Mariner/toolkit/tools/internal/ccachemanager"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/marinerusers"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
@@ -388,6 +389,8 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 			stopBuilding = true
 		}
 
+		err = setOwnershipOfBuildResult(res)
+
 		if !stopBuilding {
 			if res.Err == nil {
 				if res.Node.Type == pkggraph.TypeLocalBuild && res.WasDelta {
@@ -481,6 +484,19 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 	schedulerutils.RecordBuildSummary(builtGraph, graphMutex, buildState, *outputCSVFile)
 	if !allowToolchainRebuilds && (len(buildState.ConflictingRPMs()) > 0 || len(buildState.ConflictingSRPMs()) > 0) {
 		err = fmt.Errorf("toolchain packages rebuilt. See build summary for details. Use 'ALLOW_TOOLCHAIN_REBUILDS=y' to suppress this error if rebuilds were expected")
+	}
+	return
+}
+
+// SetOwnershipOfBuildResult will change ownership of a file or directory to the calling user (MARINER_BUILDER_USER) instead of root, if
+// the user is set. Otherwise will do nothing.
+func setOwnershipOfBuildResult(res *schedulerutils.BuildResult) (err error) {
+	for _, file := range res.BuiltFiles {
+		err = marinerusers.GiveSinglePathToUser(file, marinerusers.GetMarinerBuildUser())
+		if err != nil {
+			err = fmt.Errorf("unable to change ownership of file '%s':\n%w", file, err)
+			return
+		}
 	}
 	return
 }

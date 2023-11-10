@@ -23,12 +23,18 @@ no_repo_acl = $(STATUS_FLAGS_DIR)/no_repo_acl.flag
 # If the folder is not created, it will print an error and exit.
 #
 # $1 - Folder path
+ifeq (n,$(findstring n,$(firstword $(MAKEFLAGS))))
+# Dryrun, noop
+create_folder =
+else # ifeq (n,$(findstring...
 define create_folder
 $(if $(strip $1),,$(error create_folder: $1 is empty)) \
 $(eval create_dir_temp_output = $(call shell_real_build_only, $(SCRIPTS_DIR)/makedirs.sh $1 $(MARINER_BUILDER_USER))) \
 $(if $(create_dir_temp_output),$(warning $(create_dir_temp_output)),) \
 $(if $(wildcard $1),,$(error create_folder: $1 not created))
 endef
+endif # ifeq (n,$(findstring...
+
 
 # Runs a shell commannd only if we are actually doing a build rather than parsing the makefile for tab-completion etc
 # Make will automatically create the MAKEFLAGS variable which contains each of the flags, non-build commmands will include -n
