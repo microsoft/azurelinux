@@ -75,6 +75,10 @@ fi
 %dir %{_sysconfdir}/%{name}/telegraf.d
 
 %changelog
+* Thu Nov 09 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.27.3-5
+- Backporting patch for CVE-2023-46129.
+- Removed invalid, outdated patch.
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.27.3-4
 - Bump release to rebuild with go 1.20.10
 
