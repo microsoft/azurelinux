@@ -14,10 +14,12 @@ parameters:
     default:
       - name: "AMD64"
         agentPool: "$(DEV_AMD64_Managed)" # Pool defined inside the "Agent pools (DEV)" variable group.
+        maxCPUs: "$(($(nproc) / 2))"
         rawToolchainCacheURL: "$(rawToolchainCacheURL_AMD64)"
         rawToolchainExpectedHash: "f56df34b90915c93f772d3961bf5e9eeb8c1233db43dd92070214e4ce6b72894"
       - name: "ARM64"
         agentPool: "$(DEV_ARM64_Managed)" # Pool defined inside the "Agent pools (DEV)" variable group.
+        maxCPUs: "$(($(nproc) / 3))"
         rawToolchainCacheURL: "$(rawToolchainCacheURL_ARM64)"
         rawToolchainExpectedHash: "65de43b3bdcfdaac71df1f11fd1f830a8109b1eb9d7cb6cbc2e2d0e929d0ef76"
 
@@ -97,6 +99,7 @@ extends:
                       isCheckBuild: true
                       isQuickRebuildPackages: true
                       outputArtifactsFolder: $(ob_outputDirectory)
+                      maxCPU: "${{ configuration.maxCPUs }}"
                       pipArtifactFeeds: "mariner/Mariner-Pypi-Feed"
                       selfRepoName: self
                       testSuiteName: "[${{ configuration.name }}] Package test"
