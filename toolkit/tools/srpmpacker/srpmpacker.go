@@ -888,8 +888,7 @@ func hydrateFromLocalSource(fileHydrationState map[string]bool, newSourceDir str
 		if !skipSignatureHandling {
 			err = validateSignature(path, srcConfig, currentSignatures)
 			if err != nil {
-				logger.Log.Warn(err.Error())
-				return nil
+				return err
 			}
 		}
 
