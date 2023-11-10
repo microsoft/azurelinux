@@ -112,7 +112,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 
 	if len(prebuiltSRPMs) != 0 {
 		logger.Log.Info("\033[32mPrebuilt SRPMs:\033[33m")
-		keys := sliceutils.SetToSlice(prebuiltSRPMs)
+		keys := sliceutils.SetToSliceAll(prebuiltSRPMs)
 		sort.Strings(keys)
 		for _, prebuiltSRPM := range keys {
 			logger.Log.Infof("--> %s", filepath.Base(prebuiltSRPM))
@@ -121,7 +121,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 
 	if len(prebuiltDeltaSRPMs) != 0 {
 		logger.Log.Info("\033[34mSkipped SRPMs (i.e., delta mode is on, packages are already available in a repo):\033[33m")
-		keys := sliceutils.SetToSlice(prebuiltDeltaSRPMs)
+		keys := sliceutils.SetToSliceAll(prebuiltDeltaSRPMs)
 		sort.Strings(keys)
 		for _, prebuiltDeltaSRPM := range keys {
 			logger.Log.Infof("--> %s", filepath.Base(prebuiltDeltaSRPM))
@@ -130,7 +130,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 
 	if len(skippedSRPMsTests) != 0 {
 		logger.Log.Info("\033[34mSkipped SRPMs tests:\033[33m")
-		keys := sliceutils.SetToSlice(skippedSRPMsTests)
+		keys := sliceutils.SetToSliceAll(skippedSRPMsTests)
 		sort.Strings(keys)
 		for _, skippedSRPMsTest := range keys {
 			logger.Log.Infof("--> %s", filepath.Base(skippedSRPMsTest))
@@ -139,7 +139,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 
 	if len(builtSRPMs) != 0 {
 		logger.Log.Info("\033[32mBuilt SRPMs:\033[33m")
-		keys := sliceutils.SetToSlice(builtSRPMs)
+		keys := sliceutils.SetToSliceAll(builtSRPMs)
 		sort.Strings(keys)
 		for _, builtSRPM := range keys {
 			logger.Log.Infof("--> %s ", filepath.Base(builtSRPM))
@@ -148,7 +148,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 
 	if len(testedSRPMs) != 0 {
 		logger.Log.Info("\033[32mTested SRPMs:\033[33m")
-		keys := sliceutils.SetToSlice(testedSRPMs)
+		keys := sliceutils.SetToSliceAll(testedSRPMs)
 		sort.Strings(keys)
 		for _, testedSRPM := range keys {
 			logger.Log.Infof("--> %s", filepath.Base(testedSRPM))
@@ -157,7 +157,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 
 	if len(unresolvedDependencies) != 0 {
 		logger.Log.Info("\033[31mUnresolved dependencies:\033[33m")
-		keys := sliceutils.SetToSlice(unresolvedDependencies)
+		keys := sliceutils.SetToSliceAll(unresolvedDependencies)
 		sort.Strings(keys)
 		for _, unresolvedDependency := range keys {
 			logger.Log.Infof("--> %s", filepath.Base(unresolvedDependency))
@@ -166,7 +166,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 
 	if len(blockedSRPMs) != 0 {
 		logger.Log.Info("\033[31mBlocked SRPMs:\033[33m")
-		keys := sliceutils.SetToSlice(blockedSRPMs)
+		keys := sliceutils.SetToSliceAll(blockedSRPMs)
 		sort.Strings(keys)
 		for _, blockedSRPM := range keys {
 			logger.Log.Infof("--> %s", filepath.Base(blockedSRPM))
@@ -175,7 +175,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 
 	if len(blockedSRPMsTests) != 0 {
 		logger.Log.Info("\033[31mBlocked SRPMs tests:\033[33m")
-		keys := sliceutils.SetToSlice(blockedSRPMsTests)
+		keys := sliceutils.SetToSliceAll(blockedSRPMsTests)
 		sort.Strings(keys)
 		for _, blockedSRPMsTest := range keys {
 			logger.Log.Infof("--> %s", filepath.Base(blockedSRPMsTest))
@@ -200,7 +200,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 
 	if len(failedSRPMs) != 0 {
 		logger.Log.Info("\033[31mFailed SRPMs:\033[33m")
-		keys := sliceutils.SetToSlice(failedSRPMs)
+		keys := sliceutils.SetToSliceAll(failedSRPMs)
 		sort.Strings(keys)
 		for _, key := range keys {
 			failure := failedSRPMs[key]
@@ -210,7 +210,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 
 	if len(failedSRPMsTests) != 0 {
 		logger.Log.Info("\033[31mFailed SRPMs tests:\033[33m")
-		keys := sliceutils.SetToSlice(failedSRPMsTests)
+		keys := sliceutils.SetToSliceAll(failedSRPMsTests)
 		sort.Strings(keys)
 		for _, key := range keys {
 			failure := failedSRPMsTests[key]

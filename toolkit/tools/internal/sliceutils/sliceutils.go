@@ -59,18 +59,30 @@ func PackageVerMatch(expected, given interface{}) bool {
 	return reflect.DeepEqual(expected.(*pkgjson.PackageVer), given.(*pkgjson.PackageVer))
 }
 
-// SetToSlice converts a map[T]V to a slice containing the map's keys.
-func SetToSlice[T comparable, V comparable](inputSet map[T]V) []T {
+// SetToSlice converts a map[K]bool to a slice containing the map's keys, iff the key's value is true.
+func SetToSlice[K comparable](inputSet map[K]bool) []K {
 	index := 0
-	outputSlice := make([]T, len(inputSet))
-	for element := range inputSet {
-		outputSlice[index] = element
-		index++
+	outputSlice := make([]K, len(inputSet))
+	for element, elementInSet := range inputSet {
+		// Add key to slice if value is true
+		if elementInSet {
+			outputSlice[index] = element
+			index++
+		}
 	}
 	return outputSlice[:index]
 }
 
-// SliceToSet converts a slice of K to a map[K]bool.
+// SetToSliceAll converts a map[K]V to a slice containing the map's keys.
+func SetToSliceAll[K comparable, V any](inputSet map[K]V) []K {
+	outputSlice := make([]K, len(inputSet))
+	for element := range inputSet {
+		outputSlice = append(outputSlice, element)
+	}
+	return outputSlice
+}
+
+// SliceToSet converts a slice of K to a map[K]bool, with each value set to true.
 func SliceToSet[K comparable](inputSlice []K) (outputSet map[K]bool) {
 	outputSet = make(map[K]bool, len(inputSlice))
 	for _, element := range inputSlice {
