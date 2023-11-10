@@ -53,7 +53,7 @@ install -m 755 -D etc/logrotate.d/%{name} %{buildroot}%{_sysconfdir}/logrotate.d
 install -m 755 -D telegraf.conf %{buildroot}%{_sysconfdir}/%{name}/telegraf.conf
 
 %check
-make test
+make test-integration
 
 %pre
 getent group telegraf >/dev/null || groupadd -r telegraf
