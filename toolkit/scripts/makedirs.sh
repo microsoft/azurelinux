@@ -10,28 +10,36 @@
 
 DIR="${1}"
 USER="${2}"
-LOG_FILE="${3}"
 
 function make_dir_recursive {
-    dir="${1}"
-    user="${2}"
+    local dir="${1}"
+    local user="${2}"
     parent_dir="$(dirname "${dir}")"
 
     # If the parent directory also needs to be created, recurse
     if [[ ! -d "${parent_dir}" ]]; then
-        echo "Creating parent directory ${parent_dir} owned by ${user}" >> "${LOG_FILE}"
-        make_dir_recursive "${parent_dir}"
+        make_dir_recursive "${parent_dir}" "${user}" || { echo "Failed recursively create '${parent_dir}'" ; return 1 ; }
     fi
 
     if [[ -d "${dir}" ]]; then
-        echo "Directory ${dir} already exists, skipping" >> "${LOG_FILE}"
         return 0
     fi
 
-    mkdir -p "${dir}" && chown "${user}" "${dir}" && touch -d @0 "${dir}" >> "${LOG_FILE}" 2>&1 || return 1
+    mkdir -p "${dir}" || { echo "Failed to create '${dir}'" ; return 1 ; }
+    chown "${user}":"${user}" "${dir}" || { echo "Failed to chown '${dir}' to user '${user}'" ; return 1 ; }
+    touch -d @0 "${dir}" || { echo "Failed to reset timestamp on '${dir}'" ; return 1 ; }
 
     return 0
 }
 
-echo "Creating directory ${DIR} owned by ${USER}" >> "${LOG_FILE}"
-make_dir_recursive "${DIR}" "${USER}"
+if [[ -z "${DIR}" ]] || [[ -z "${USER}" ]]; then
+    echo "mkdirs.sh: No directory or user specified (input: ''${DIR}', '${USER}'))"
+    exit 1
+fi
+
+if [[ -d "${DIR}" ]]; then
+    # Directory already exists, no need to do anything
+    exit 0
+else
+    make_dir_recursive "${DIR}" "${USER}" || { echo "Failed to create '${DIR}'" ; exit 1 ; }
+fi

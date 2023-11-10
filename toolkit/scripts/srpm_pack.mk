@@ -39,7 +39,6 @@ local_spec_dirs = $(foreach spec,$(local_specs),$(dir $(spec)))
 local_spec_sources = $(call shell_real_build_only, find $(local_spec_dirs) -type f -name '*')
 built_srpms = $(call shell_real_build_only, find $(BUILD_SRPMS_DIR) -type f -name '*.src.rpm')
 
-$(warning user:$(MARINER_BUILDER_USER))
 $(call create_folder,$(BUILD_DIR))
 $(call create_folder,$(BUILD_SRPMS_DIR))
 $(call create_folder,$(SRPM_BUILD_CHROOT_DIR))
