@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "memcached-1.6.13.tar.gz": "bd1abadd85f678c296628c947cc4b7b462abf0e5b32c68a26718ade51387b5d4",
+  "memcached-1.6.22.tar.gz": "34783a90a4ccf74c4107085fd92b688749d23b276cfdad9f04e4f725a05d1ca7",
   "memcached.sysconfig": "31f7d20fad86bdd2bc5692619928af8785dc0e9f858863aeece67cff0e4edfd2"
  }
 }
