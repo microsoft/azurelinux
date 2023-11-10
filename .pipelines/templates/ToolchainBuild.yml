@@ -65,13 +65,13 @@ steps:
       if [[ -f "$built_list" ]]; then
         built_specs=$(xargs < "$built_list")
         retest_list=()
-        for s in ${built_specs}; do
-          if [ ! -f "${specs_dir}/${s}/${s}".spec ]; then
-              echo "ERROR: '${specs_dir}/${s}/${s}.spec' does not exist"
+        for spec in ${built_specs}; do
+          if [ ! -f "${specs_dir}/${spec}/${spec}".spec ]; then
+              echo "ERROR: '${specs_dir}/${spec}/${spec}.spec' does not exist"
               exit 1
           fi
-          if grep -q '^%check' "${specs_dir}/${s}/${s}.spec"; then
-              retest_list+=("${s}")
+          if grep -q '^%check' "${specs_dir}/${spec}/${spec}.spec"; then
+              retest_list+=("${spec}")
           fi
         done
       else
