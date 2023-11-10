@@ -1,7 +1,7 @@
 Summary:        agent for collecting, processing, aggregating, and writing metrics.
 Name:           telegraf
 Version:        1.27.3
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
