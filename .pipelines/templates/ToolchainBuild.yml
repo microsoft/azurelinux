@@ -55,29 +55,3 @@ steps:
     condition: always()
     displayName: "Copy logs for publishing"
 
-  - bash: |
-      # Publish the list of packages that should be re-tested during full package build.
-      #   This list will be the contents of 'built_specs_list.txt' in the toolchain build logs directory, but only for
-      #   packages that have a '%check' section in their spec file. The assumption is that all packages will have a 
-      #   '%check' section for all architectures, or none.
-      built_list="${{ parameters.buildRepoRoot }}"/build/logs/toolchain/built_specs_list.txt
-      specs_dir="${{ parameters.buildRepoRoot }}/SPECS/"
-      if [[ -f "$built_list" ]]; then
-        retest_list=()
-        while read -r spec; do
-          if [ ! -f "${specs_dir}/${spec}/${spec}".spec ]; then
-              echo "##[error]ERROR: '${specs_dir}/${spec}/${spec}.spec' does not exist"
-              exit 1
-          fi
-          if grep -q '^%check' "${specs_dir}/${spec}/${spec}.spec"; then
-              retest_list+=("${spec}")
-          fi
-        done < "$built_list"
-      else
-        echo "No file '$built_list' found, so no packages to re-test"
-      fi
-      # Default will be "", which is fine.
-      echo "Setting 'CalculatePackageRetestList.packageRetestList' to '${retest_list[*]}'"
-      echo "##vso[task.setvariable variable=packageRetestList;isOutput=true]${retest_list[*]}"
-    name: "CalculatePackageRetestList"
-    displayName: "Calculating packages that should be re-tested"
