@@ -8,6 +8,7 @@ Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://github.com/pallets/werkzeug
 Source0:        https://github.com/pallets/werkzeug/archive/%{version}.tar.gz#/werkzeug-%{version}.tar.gz
+#Source0:               werkzeug-%{version}.tar.gz
 Patch0:         CVE-2023-46136.patch
 BuildArch:      noarch
 
@@ -50,8 +51,13 @@ Werkzeug started as simple collection of various utilities for WSGI applications
 %pyproject_save_files werkzeug
 
 %check
-pip3 install tox tox-current-env pytest==7.4.0 cryptography==41.0.1 ephemeral-port-reserve==1.1.4 pytest-timeout==2.1.0 pytest-xprocess==0.22.2 watchdog==3.0.0
-%tox
+pip3 install tox==4.6.3 tox-current-env
+pip3 install -r requirements/tests.txt
+# The default %%tox macro causes some test failures seemingly due to the way werkzeug invokes additional python processes during the
+# testing process, so tox is invoked manually here.
+# This is a known limitation of tox-current-env. See https://pypi.org/project/tox-current-env/ under "Do not rely on virtualenv details"
+# for more information.
+tox -q --recreate -e %{toxenv}
 
 %files -n python3-werkzeug -f %{pyproject_files}
 %defattr(-,root,root)
