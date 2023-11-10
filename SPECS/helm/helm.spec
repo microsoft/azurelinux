@@ -1,16 +1,15 @@
 %global debug_package %{nil}
 
 Name:          helm
-Version:       3.10.3
-Release:       11%{?dist}
+Version:       3.13.2
+Release:       1%{?dist}
 Summary:       The Kubernetes Package Manager
 Group:         Applications/Networking
 License:       Apache 2.0
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
-Url:           https://github.com/helm/helm
-#Source0:      https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz
-Source0:       %{name}-%{version}.tar.gz
+Url:           https://helm.sh/
+Source0:       https://github.com/helm/helm/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
 # How to re-build this file:
@@ -25,8 +24,7 @@ Source0:       %{name}-%{version}.tar.gz
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
 Source1:       %{name}-%{version}-vendor.tar.gz
-Patch0:        CVE-2023-25165.patch
-BuildRequires: golang <= 1.18.8
+BuildRequires: golang 
 
 %description
 Helm is a tool that streamlines installing and managing Kubernetes applications. Think of it like apt/yum/homebrew for Kubernetes.
@@ -56,6 +54,9 @@ install -m 755 ./helm %{buildroot}%{_bindir}
 go test -v ./cmd/helm
 
 %changelog
+* Fri Nov 10 2023 Nicolas Guibourge <cblmargh@microsoft.com> - 3.13.2-1
+- Upgrade to 3.13.2 - Azure Linux 3.0 - package upgrades
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.10.3-11
 - Bump release to rebuild with go 1.20.10
 
