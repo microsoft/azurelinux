@@ -63,9 +63,8 @@ steps:
       built_list="${{ parameters.buildRepoRoot }}"/build/logs/toolchain/built_specs_list.txt
       specs_dir="${{ parameters.buildRepoRoot }}/SPECS/"
       if [[ -f "$built_list" ]]; then
-        built_specs=$(xargs < "$built_list")
         retest_list=()
-        for s in ${built_specs}; do
+        while read -r s; do
           if [ ! -f "${specs_dir}/${s}/${s}".spec ]; then
               echo "ERROR: '${specs_dir}/${s}/${s}.spec' does not exist"
               exit 1
@@ -73,7 +72,7 @@ steps:
           if grep -q '^%check' "${specs_dir}/${s}/${s}.spec"; then
               retest_list+=("${s}")
           fi
-        done
+        done < "$built_list"
       else
         echo "No file '$built_list' found, so no packages to re-test"
       fi
