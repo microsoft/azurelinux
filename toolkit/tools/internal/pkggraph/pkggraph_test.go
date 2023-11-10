@@ -1336,7 +1336,7 @@ func TestHasNodeCopyGraph(t *testing.T) {
 	assert.NotNil(t, n)
 	assert.NoError(t, err)
 
-	// A deep copy should have different objects, and should returnf alse
+	// A deep copy should have different objects, and should return false
 	gCopy, err := g.DeepCopy()
 	assert.NoError(t, err)
 	assert.False(t, gCopy.HasNode(n))
@@ -1392,132 +1392,6 @@ func TestHasNodeSubgraph(t *testing.T) {
 	for _, n := range outsideSubgraph {
 		assert.False(t, subGraph.HasNode(getRealNodeFromGraphHelper(t, g, n)))
 	}
-}
-
-func TestAllNodes(t *testing.T) {
-	g := NewPkgGraph()
-	assert.NotNil(t, g)
-	n, err := addNodeToGraphHelper(g, pkgARun)
-	assert.NotNil(t, n)
-	assert.NoError(t, err)
-
-	checkEqualComponents(t, []*PkgNode{pkgARun}, g.AllNodes())
-
-	g, err = buildTestGraphHelper()
-	assert.NoError(t, err)
-	assert.NotNil(t, g)
-
-	checkEqualComponents(t, allNodes, g.AllNodes())
-
-}
-
-func TestAllRunNodes(t *testing.T) {
-	g := NewPkgGraph()
-	assert.NotNil(t, g)
-	n, err := addNodeToGraphHelper(g, pkgARun)
-	assert.NotNil(t, n)
-	assert.NoError(t, err)
-
-	checkEqualComponents(t, []*PkgNode{pkgARun}, g.AllRunNodes())
-
-	g, err = buildTestGraphHelper()
-	assert.NoError(t, err)
-	assert.NotNil(t, g)
-
-	checkEqualComponents(t, append(runNodes, unresolvedNodes...), g.AllRunNodes())
-}
-
-func TestAllPreferredRunNodes(t *testing.T) {
-	g := NewPkgGraph()
-	assert.NotNil(t, g)
-	n, err := addNodeToGraphHelper(g, pkgARun)
-	assert.NotNil(t, n)
-	assert.NoError(t, err)
-
-	checkEqualComponents(t, []*PkgNode{pkgARun}, g.AllRunNodes())
-	checkEqualComponents(t, []*PkgNode{pkgARun}, g.AllPreferredRunNodes())
-
-	duplicateRemote, err := addNodeToGraphHelper(g, buildUnresolvedNodeHelper(&pkgA))
-	assert.NotNil(t, duplicateRemote)
-	assert.NoError(t, err)
-
-	// Duplicate node should show here
-	checkEqualComponents(t, []*PkgNode{pkgARun, duplicateRemote}, g.AllRunNodes())
-	// But not here
-	checkEqualComponents(t, []*PkgNode{pkgARun}, g.AllPreferredRunNodes())
-}
-
-func TestAllBuildNodes(t *testing.T) {
-	g := NewPkgGraph()
-	assert.NotNil(t, g)
-	n, err := addNodeToGraphHelper(g, pkgARun)
-	assert.NotNil(t, n)
-	assert.NoError(t, err)
-	n, err = addNodeToGraphHelper(g, pkgABuild)
-	assert.NotNil(t, n)
-	assert.NoError(t, err)
-
-	checkEqualComponents(t, []*PkgNode{pkgABuild}, g.AllBuildNodes())
-
-	g, err = buildTestGraphHelper()
-	assert.NoError(t, err)
-	assert.NotNil(t, g)
-
-	checkEqualComponents(t, buildNodes, g.AllBuildNodes())
-}
-
-func TestAllTestNodes(t *testing.T) {
-	g := NewPkgGraph()
-	assert.NotNil(t, g)
-	n, err := addNodeToGraphHelper(g, pkgARun)
-	assert.NotNil(t, n)
-	assert.NoError(t, err)
-
-	testNode := buildTestNodeHelper(&pkgA)
-
-	n, err = addNodeToGraphHelper(g, testNode)
-	assert.NotNil(t, n)
-	assert.NoError(t, err)
-
-	checkEqualComponents(t, []*PkgNode{testNode}, g.AllTestNodes())
-
-	g, err = buildTestGraphHelper()
-	assert.NoError(t, err)
-	assert.NotNil(t, g)
-
-	n, err = addNodeToGraphHelper(g, testNode)
-	assert.NotNil(t, n)
-	assert.NoError(t, err)
-
-	checkEqualComponents(t, []*PkgNode{testNode}, g.AllTestNodes())
-}
-
-func TestAllImplicitNodes(t *testing.T) {
-	g := NewPkgGraph()
-	assert.NotNil(t, g)
-	n, err := addNodeToGraphHelper(g, pkgARun)
-	assert.NotNil(t, n)
-	assert.NoError(t, err)
-
-	implicitVersion := pkgjson.PackageVer{Name: "/path/to/implicit"}
-	implicitNode := buildUnresolvedNodeHelper(&implicitVersion)
-
-	actualImplicitNode, err := addNodeToGraphHelper(g, implicitNode)
-	assert.NotNil(t, actualImplicitNode)
-	assert.NoError(t, err)
-	assert.True(t, actualImplicitNode.Implicit)
-
-	checkEqualComponents(t, []*PkgNode{actualImplicitNode}, g.AllImplicitNodes())
-
-	g, err = buildTestGraphHelper()
-	assert.NoError(t, err)
-	assert.NotNil(t, g)
-
-	actualImplicitNode, err = addNodeToGraphHelper(g, implicitNode)
-	assert.NotNil(t, actualImplicitNode)
-	assert.NoError(t, err)
-
-	checkEqualComponents(t, []*PkgNode{actualImplicitNode}, g.AllImplicitNodes())
 }
 
 func TestShouldSucceedMakeDAGWithGoalNode(t *testing.T) {
@@ -1583,6 +1457,25 @@ func TestShouldGetSRPMNameFromEmptySRPMPath(t *testing.T) {
 	assert.Equal(t, ".", node.SRPMFileName())
 }
 
+func TestAllBuildNodes(t *testing.T) {
+	g := NewPkgGraph()
+	assert.NotNil(t, g)
+	n, err := addNodeToGraphHelper(g, pkgARun)
+	assert.NotNil(t, n)
+	assert.NoError(t, err)
+	n, err = addNodeToGraphHelper(g, pkgABuild)
+	assert.NotNil(t, n)
+	assert.NoError(t, err)
+
+	checkEqualComponents(t, []*PkgNode{pkgABuild}, g.AllBuildNodes())
+
+	g, err = buildTestGraphHelper()
+	assert.NoError(t, err)
+	assert.NotNil(t, g)
+
+	checkEqualComponents(t, buildNodes, g.AllBuildNodes())
+}
+
 func TestShouldGetAllBuildNodesWithFilter(t *testing.T) {
 	gOut, err := buildTestGraphHelper()
 	assert.NoError(t, err)
@@ -1594,6 +1487,22 @@ func TestShouldGetAllBuildNodesWithFilter(t *testing.T) {
 	checkEqualComponents(t, buildNodes, foundNodes)
 }
 
+func TestAllNodes(t *testing.T) {
+	g := NewPkgGraph()
+	assert.NotNil(t, g)
+	n, err := addNodeToGraphHelper(g, pkgARun)
+	assert.NotNil(t, n)
+	assert.NoError(t, err)
+
+	checkEqualComponents(t, []*PkgNode{pkgARun}, g.AllNodes())
+
+	g, err = buildTestGraphHelper()
+	assert.NoError(t, err)
+	assert.NotNil(t, g)
+
+	checkEqualComponents(t, allNodes, g.AllNodes())
+}
+
 func TestShouldGetAllNodesWithFilter(t *testing.T) {
 	gOut, err := buildTestGraphHelper()
 	assert.NoError(t, err)
@@ -1603,6 +1512,42 @@ func TestShouldGetAllNodesWithFilter(t *testing.T) {
 		return true
 	})
 	checkEqualComponents(t, allNodes, foundNodes)
+}
+
+func TestAllRunNodes(t *testing.T) {
+	g := NewPkgGraph()
+	assert.NotNil(t, g)
+	n, err := addNodeToGraphHelper(g, pkgARun)
+	assert.NotNil(t, n)
+	assert.NoError(t, err)
+
+	checkEqualComponents(t, []*PkgNode{pkgARun}, g.AllRunNodes())
+
+	g, err = buildTestGraphHelper()
+	assert.NoError(t, err)
+	assert.NotNil(t, g)
+
+	checkEqualComponents(t, append(runNodes, unresolvedNodes...), g.AllRunNodes())
+}
+
+func TestAllPreferredRunNodes(t *testing.T) {
+	g := NewPkgGraph()
+	assert.NotNil(t, g)
+	n, err := addNodeToGraphHelper(g, pkgARun)
+	assert.NotNil(t, n)
+	assert.NoError(t, err)
+
+	checkEqualComponents(t, []*PkgNode{pkgARun}, g.AllRunNodes())
+	checkEqualComponents(t, []*PkgNode{pkgARun}, g.AllPreferredRunNodes())
+
+	duplicateRemote, err := addNodeToGraphHelper(g, buildUnresolvedNodeHelper(&pkgA))
+	assert.NotNil(t, duplicateRemote)
+	assert.NoError(t, err)
+
+	// Duplicate node should show here
+	checkEqualComponents(t, []*PkgNode{pkgARun, duplicateRemote}, g.AllRunNodes())
+	// But not here
+	checkEqualComponents(t, []*PkgNode{pkgARun}, g.AllPreferredRunNodes())
 }
 
 func TestShouldGetAllRunNodesWithFilter(t *testing.T) {
@@ -1625,4 +1570,58 @@ func TestShouldGetAllUnresolvedNodesWithFilter(t *testing.T) {
 		return node.State == StateUnresolved
 	})
 	checkEqualComponents(t, unresolvedNodes, foundNodes)
+}
+
+func TestAllTestNodes(t *testing.T) {
+	g := NewPkgGraph()
+	assert.NotNil(t, g)
+	n, err := addNodeToGraphHelper(g, pkgARun)
+	assert.NotNil(t, n)
+	assert.NoError(t, err)
+
+	testNode := buildTestNodeHelper(&pkgA)
+
+	n, err = addNodeToGraphHelper(g, testNode)
+	assert.NotNil(t, n)
+	assert.NoError(t, err)
+
+	checkEqualComponents(t, []*PkgNode{testNode}, g.AllTestNodes())
+
+	g, err = buildTestGraphHelper()
+	assert.NoError(t, err)
+	assert.NotNil(t, g)
+
+	n, err = addNodeToGraphHelper(g, testNode)
+	assert.NotNil(t, n)
+	assert.NoError(t, err)
+
+	checkEqualComponents(t, []*PkgNode{testNode}, g.AllTestNodes())
+}
+
+func TestAllImplicitNodes(t *testing.T) {
+	g := NewPkgGraph()
+	assert.NotNil(t, g)
+	n, err := addNodeToGraphHelper(g, pkgARun)
+	assert.NotNil(t, n)
+	assert.NoError(t, err)
+
+	implicitVersion := pkgjson.PackageVer{Name: "/path/to/implicit"}
+	implicitNode := buildUnresolvedNodeHelper(&implicitVersion)
+
+	actualImplicitNode, err := addNodeToGraphHelper(g, implicitNode)
+	assert.NotNil(t, actualImplicitNode)
+	assert.NoError(t, err)
+	assert.True(t, actualImplicitNode.Implicit)
+
+	checkEqualComponents(t, []*PkgNode{actualImplicitNode}, g.AllImplicitNodes())
+
+	g, err = buildTestGraphHelper()
+	assert.NoError(t, err)
+	assert.NotNil(t, g)
+
+	actualImplicitNode, err = addNodeToGraphHelper(g, implicitNode)
+	assert.NotNil(t, actualImplicitNode)
+	assert.NoError(t, err)
+
+	checkEqualComponents(t, []*PkgNode{actualImplicitNode}, g.AllImplicitNodes())
 }
