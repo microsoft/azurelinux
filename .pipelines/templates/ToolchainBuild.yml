@@ -66,7 +66,7 @@ steps:
         retest_list=()
         while read -r s; do
           if [ ! -f "${specs_dir}/${s}/${s}".spec ]; then
-              echo "ERROR: '${specs_dir}/${s}/${s}.spec' does not exist"
+              echo "##[error]ERROR: '${specs_dir}/${s}/${s}.spec' does not exist"
               exit 1
           fi
           if grep -q '^%check' "${specs_dir}/${s}/${s}.spec"; then
