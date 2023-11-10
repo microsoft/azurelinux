@@ -1,0 +1,57 @@
+From 156728d14591dd2b3131bcff49959e806523c1bb Mon Sep 17 00:00:00 2001
+From: Andre Mauricio Zelak <andre.zelak@windriver.com>
+Date: Mon, 12 Jun 2023 17:32:27 -0300
+Subject: [PATCH 31/47] pmc_agent: Let the update method poll for push events.
+
+Signed-off-by: Richard Cochran <richardcochran@gmail.com>
+
+[commit c4a5eef1f4763805e6e2a2d25eb1d436018d4745 upstream]
+Signed-off-by: Andre Mauricio Zelak <andre.zelak@windriver.com>
+---
+ pmc_agent.c | 3 +++
+ pmc_agent.h | 5 +++--
+ 2 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/pmc_agent.c b/pmc_agent.c
+index aa2347d..6e6627d 100644
+--- a/pmc_agent.c
++++ b/pmc_agent.c
+@@ -390,6 +390,7 @@ int pmc_agent_subscribe(struct pmc_agent *node, int timeout)
+ 
+ int pmc_agent_update(struct pmc_agent *node)
+ {
++	struct ptp_message *msg;
+ 	struct timespec tp;
+ 	uint64_t ts;
+ 
+@@ -411,6 +412,8 @@ int pmc_agent_update(struct pmc_agent *node)
+ 		}
+ 	}
+ 
++	run_pmc(node, 0, -1, &msg);
++
+ 	return 0;
+ }
+ 
+diff --git a/pmc_agent.h b/pmc_agent.h
+index f0e2c7a..dd34d30 100644
+--- a/pmc_agent.h
++++ b/pmc_agent.h
+@@ -141,11 +141,12 @@ void pmc_agent_set_sync_offset(struct pmc_agent *agent, int offset);
+ int pmc_agent_subscribe(struct pmc_agent *agent, int timeout);
+ 
+ /**
+- * Queries the local ptp4l instance to update the TAI-UTC offset and
+- * the current leap second flags.
++ * Polls for push notifications from the local ptp4l service.
+  *
+  * In addition:
+  *
++ * - Queries the local ptp4l instance to update the TAI-UTC offset and
++ *   the current leap second flags.
+  * - Any active port state subscription will be renewed.
+  * - The port state notification callback might be invoked.
+  *
+-- 
+2.25.1
+

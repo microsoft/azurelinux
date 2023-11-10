@@ -1,0 +1,256 @@
+From 7d5061d971a8abc2ba8443edccde38e9a7a6f0ce Mon Sep 17 00:00:00 2001
+From: Andre Mauricio Zelak <andre.zelak@windriver.com>
+Date: Wed, 26 Jul 2023 15:08:15 -0300
+Subject: [PATCH 40/47] Forced lock a clock source in configuration
+
+To help on maintenance and debuging tasks was implemented a configuration
+to forced lock to a single clock. It disables the automatic clock
+selection algorithm and lock to a source interface.
+
+When an interface is configured with maximum ha_priority (254)
+the source selection is locked to it, regardless of its clock
+status.
+
+When more than one source clock is configured with ha_priority 254
+selects the 1st interface in the configuration file.
+
+Test plan: forced lock by configuration
+PASS: Verify the clock source is forced lock to an interface, regardless
+its state.
+PASS: Verify the clock source remains locked event after change the clock
+state.
+PASS: Verify the 1st configured interface with priority 254 is selected
+when multiple interfaces has the same priority.
+
+Reviewed-by: Cole Walker <cole.walker@windriver.com>
+Reviewed-by: Andre Fernando Zanella Kantek <andrefernandozanella.kantek@windriver.com>
+
+[commit 9563a04ef76cda55f9f014150270dbd320ca4bc4 upstream]
+[commit 655fe5e304386b4494d864638ca972c4bd892e52 upstream]
+[commit 3200a16f4cbe2d125bf301827a24d3d01e7f1c70 upstream]
+
+Signed-off-by: Andre Mauricio Zelak <andre.zelak@windriver.com>
+---
+ config.c  |   2 +-
+ phc2sys.c | 105 ++++++++++++++++++++++++++++++++++++++----------------
+ 2 files changed, 75 insertions(+), 32 deletions(-)
+
+diff --git a/config.c b/config.c
+index 1ad5157..dba1eef 100644
+--- a/config.c
++++ b/config.c
+@@ -256,7 +256,7 @@ struct config_item config_tab[] = {
+ 	GLOB_ITEM_INT("ha_min_gm_ClockClass", 135, 6, 255),
+ 	GLOB_ITEM_INT("ha_min_local_clockClass", 135, 6, 255),
+ 	GLOB_ITEM_INT("ha_min_offsetScaledLogVariance", 65535, 0, 65535),
+-	PORT_ITEM_INT("ha_priority", 0, 0, 255),
++	PORT_ITEM_INT("ha_priority", 0, 0, 254),
+ 	PORT_ITEM_INT("ha_stability_timer", 0, 0, INT_MAX),
+ 	GLOB_ITEM_INT("ha_timeTraceable", 0, 0, 1),
+ 	PORT_ITEM_STR("ha_uds_address", "/var/run/ptp4l"),
+diff --git a/phc2sys.c b/phc2sys.c
+index 152e783..0b3f724 100644
+--- a/phc2sys.c
++++ b/phc2sys.c
+@@ -64,6 +64,7 @@
+ 
+ #define PHC_PPS_OFFSET_LIMIT 10000000
+ 
++#define FORCED_SOURCE_CLOCK_PRIORITY 254
+ #define MAX_SRC_CLOCKS 128
+ 
+ #define PORT_INDEX_TO_PORT_ID(port, index) (((((unsigned int) port) & 0xFF) << 8) | (((unsigned int) index) & 0xFF))
+@@ -121,6 +122,7 @@ struct phc2sys_private {
+ 	struct clock *better;
+ 	struct timespec stability_timer;
+ 	int default_sync;
++	int forced_source_clock;
+ };
+ 
+ static struct config *phc2sys_config;
+@@ -998,6 +1000,29 @@ static int update_needed(struct clock *c)
+ 	return 0;
+ }
+ 
++/* check configuration if one of the source clocks is force locked to be active */
++static struct clock* ha_forced_source_clock(struct phc2sys_private *priv, struct config *cfg)
++{
++	int clock_priority;
++	struct clock *clock = NULL, *best = NULL;
++
++	LIST_FOREACH(clock, &priv->clocks, list) {
++		/* ignore the dst clock */
++		if (clock->state == PS_MASTER) {
++			continue;
++		}
++
++		clock_priority = config_get_int(cfg, clock->device, "ha_priority");
++		if (FORCED_SOURCE_CLOCK_PRIORITY == clock_priority) {
++			pr_info("HA automatic source selection is disabled by configuration");
++			priv->forced_source_clock = 1;
++			best = clock;
++		}
++	}
++
++	return best;
++}
++
+ static struct clock* ha_select_clock(struct phc2sys_private *priv, struct config *cfg)
+ {
+ 	int clock_priority, highest_priority;
+@@ -1066,7 +1091,7 @@ static struct clock* ha_select_clock(struct phc2sys_private *priv, struct config
+ 	}
+ 
+ 	if (best)
+-		pr_notice("Best clock selected %s", best->device);
++		pr_notice("best clock available %s", best->device);
+ 
+ 	return best;
+ }
+@@ -1121,7 +1146,7 @@ static struct clock* check_and_select_clock(struct phc2sys_private *priv, struct
+ 			return NULL;
+ 		}
+ 
+-		/* stability timer = 0 - change active */
++		/* stability timer equal 0 - change active */
+ 		stability_timer = config_get_int(cfg, NULL, "ha_stability_timer");
+ 		if (stability_timer == 0) {
+ 			pr_notice("new source clock selected %s", candidate->device);
+@@ -1173,6 +1198,10 @@ static int do_loop(struct phc2sys_private *priv, struct config *cfg, int subscri
+ 			}
+ 
+ 			if (node->new_dds || node->new_tpds || node->new_pds) {
++				pr_debug("pmc agent index %d clock state changed by %s%s%s",
++					node->index, node->new_dds ? "new dds " : "",
++					node->new_tpds ? "new tpds " : "",
++					node->new_pds ? "new pds " : "");
+ 				priv->clock_state_changed = 1;
+ 			}
+ 
+@@ -1194,30 +1223,38 @@ static int do_loop(struct phc2sys_private *priv, struct config *cfg, int subscri
+ 		}
+ 
+ 		if (ha_enabled) {
+-			if (priv->clock_state_changed) {
+-				clock = check_and_select_clock(priv, cfg);
+-				if (clock && clock != priv->master) {
+-					priv->master = clock;
+-					priv->better = NULL;
+-					priv->stability_timer.tv_sec = 0;
+-					priv->stability_timer.tv_nsec = 0;
++			if (priv->forced_source_clock) {
++				/* HA automatic clock selection is disabled */
++				if (priv->clock_state_changed) {
++					priv->clock_state_changed = 0;
++					reset_new_dataset_flags(priv);
+ 				}
++			} else {
++				if (priv->clock_state_changed) {
++					clock = check_and_select_clock(priv, cfg);
++					if (clock && clock != priv->master) {
++						priv->master = clock;
++						priv->better = NULL;
++						priv->stability_timer.tv_sec = 0;
++						priv->stability_timer.tv_nsec = 0;
++					}
+ 
+-				priv->clock_state_changed = 0;
+-				reset_new_dataset_flags(priv);
+-			}
++					priv->clock_state_changed = 0;
++					reset_new_dataset_flags(priv);
++				}
+ 
+-			if (priv->better) {
+-				/* has stability timer expired? */
+-				clock_gettime(CLOCK_REALTIME, &now);
+-				if ((now.tv_sec > priv->stability_timer.tv_sec) ||
+-					(now.tv_sec == priv->stability_timer.tv_sec &&
+-					 now.tv_nsec > priv->stability_timer.tv_nsec)) {
+-					pr_notice("new source clock selected %s", priv->better->device);
+-					priv->master = priv->better;
+-					priv->better = NULL;
+-					priv->stability_timer.tv_sec = 0;
+-					priv->stability_timer.tv_nsec = 0;
++				if (priv->better) {
++					/* has stability timer expired? */
++					clock_gettime(CLOCK_REALTIME, &now);
++					if ((now.tv_sec > priv->stability_timer.tv_sec) ||
++						(now.tv_sec == priv->stability_timer.tv_sec &&
++						now.tv_nsec > priv->stability_timer.tv_nsec)) {
++						pr_notice("new source clock selected %s", priv->better->device);
++						priv->master = priv->better;
++						priv->better = NULL;
++						priv->stability_timer.tv_sec = 0;
++						priv->stability_timer.tv_nsec = 0;
++					}
+ 				}
+ 			}
+ 		}
+@@ -1313,12 +1350,8 @@ static int phc2sys_recv_subscribed(struct pmc_agent *node, void *context, struct
+ 	struct phc2sys_private *priv = (struct phc2sys_private *) context;
+ 	int mgt_id, state;
+ 	struct portDS *pds;
+-	struct defaultDS *dds;
+-	struct parentDS *parentds;
+-	struct timePropertiesDS *tds;
+ 	struct port *port;
+ 	struct clock *clock;
+-	int utc_offset_traceable, freq_traceable;
+ 
+ 	mgt_id = management_tlv_id(msg);
+ 	if (mgt_id == excluded)
+@@ -1563,6 +1596,7 @@ int main(int argc, char *argv[])
+ 		.master = NULL,
+ 		.better = NULL,
+ 		.stability_timer.tv_sec = 0,
++		.forced_source_clock = 0,
+ 	};
+ 	struct pmc_agent *node = NULL;
+ 	unsigned int i, src_cnt = 0;
+@@ -1861,13 +1895,19 @@ int main(int argc, char *argv[])
+ 		goto bad_usage;
+ 	}
+ 
++	if (ha_enabled) {
++		src = ha_forced_source_clock(&priv, cfg);
++		if (src != NULL) {
++			pr_info("Only interface %s will be used as source clock", src->device);
++			priv.master = src;
++		}
++	}
++
+ 	r = -1;
+ 
+ 	if (wait_sync) {
+ 		i = 0;
+-		for (src = LIST_FIRST(&priv.clocks);
+-			 src != NULL;
+-			 src = LIST_NEXT(src, list)) {
++		LIST_FOREACH(src, &priv.clocks, list) {
+ 
+ 			/* skip dst clock */
+ 			if (src == dst) {
+@@ -1890,6 +1930,8 @@ int main(int argc, char *argv[])
+ 
+ 			/* map clock to pmc agent node */
+ 			src->node = node;
++			pr_debug("pmc node index %d source clock %s initialized",
++				node->index, src->device);
+ 
+ 			while (is_running()) {
+ 				r = run_pmc_wait_sync(node, 1000);
+@@ -1918,8 +1960,9 @@ int main(int argc, char *argv[])
+ 			++i;
+ 		}
+ 
+-		if (ha_enabled) {
++		if (ha_enabled && !priv.forced_source_clock) {
+ 			priv.master = ha_select_clock(&priv, cfg);
++			pr_info("interface %s will be used as source clock", priv.master->device);
+ 		}
+ 	}
+ 
+-- 
+2.25.1
+

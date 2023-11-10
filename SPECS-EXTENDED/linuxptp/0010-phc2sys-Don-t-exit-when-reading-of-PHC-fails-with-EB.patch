@@ -1,0 +1,83 @@
+From e4fd6a930213e6f0f009eb070d51b1e14db60d1b Mon Sep 17 00:00:00 2001
+From: Miroslav Lichvar <mlichvar@redhat.com>
+Date: Wed, 18 May 2022 11:33:38 +0200
+Subject: [PATCH 10/47] phc2sys: Don't exit when reading of PHC fails with EBUSY.
+
+Reading of the PHC can occasionally fail with some drivers, e.g. the ice
+driver returns EBUSY when it fails to get a lock. Continue in the loop
+instead of exiting on the error.
+
+Signed-off-by: Miroslav Lichvar <mlichvar@redhat.com>
+
+[ commit e8dc364f9fd5fbdac5d2c5e433f28e9da0028d49 upstream
+  We drop two hunks of it, namely the stuff that applies to
+  clockadj_compare, because they apply to the source code
+  ahead of baseline currently used by StarlingX ]
+
+Signed-off-by: Douglas Henrique Koerich <douglashenrique.koerich@windriver.com>
+---
+ phc2sys.c | 31 +++++++++++++++++++------------
+ 1 file changed, 19 insertions(+), 12 deletions(-)
+
+diff --git a/phc2sys.c b/phc2sys.c
+index 44d6872..7959015 100644
+--- a/phc2sys.c
++++ b/phc2sys.c
+@@ -722,6 +722,7 @@ static int do_loop(struct phc2sys_private *priv, int subscriptions)
+ 	struct clock *clock;
+ 	uint64_t ts;
+ 	int64_t offset, delay;
++	int err;
+ 
+ 	interval.tv_sec = priv->phc_interval;
+ 	interval.tv_nsec = (priv->phc_interval - interval.tv_sec) * 1e9;
+@@ -765,28 +766,34 @@ static int do_loop(struct phc2sys_private *priv, int subscriptions)
+ 			if (clock->clkid == CLOCK_REALTIME &&
+ 			    priv->master->sysoff_method >= 0) {
+ 				/* use sysoff */
+-				if (sysoff_measure(CLOCKID_TO_FD(priv->master->clkid),
+-						   priv->master->sysoff_method,
+-						   priv->phc_readings,
+-						   &offset, &ts, &delay) < 0)
+-					return -1;
++				err = sysoff_measure(CLOCKID_TO_FD(priv->master->clkid),
++						     priv->master->sysoff_method,
++						     priv->phc_readings,
++						     &offset, &ts, &delay);
+ 			} else if (priv->master->clkid == CLOCK_REALTIME &&
+ 				   clock->sysoff_method >= 0) {
+ 				/* use reversed sysoff */
+-				if (sysoff_measure(CLOCKID_TO_FD(clock->clkid),
+-						   clock->sysoff_method,
+-						   priv->phc_readings,
+-						   &offset, &ts, &delay) < 0)
+-					return -1;
+-				offset = -offset;
+-				ts += offset;
++				err = sysoff_measure(CLOCKID_TO_FD(clock->clkid),
++						     clock->sysoff_method,
++						     priv->phc_readings,
++						     &offset, &ts, &delay);
++				if (!err) {
++					offset = -offset;
++					ts += offset;
++				}
+ 			} else {
++				err = 0;
+ 				/* use phc */
+ 				if (!read_phc(priv->master->clkid, clock->clkid,
+ 					      priv->phc_readings,
+ 					      &offset, &ts, &delay))
+ 					continue;
+ 			}
++			if (err == -EBUSY)
++				continue;
++			if (err)
++				return -1;
++
+ 			update_clock(priv, clock, offset, ts, delay);
+ 		}
+ 	}
+-- 
+2.29.2
+

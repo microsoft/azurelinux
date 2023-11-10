@@ -1,0 +1,1036 @@
+From c61a91f5da1c07a783b0922e713c9f1d32adfa80 Mon Sep 17 00:00:00 2001
+From: Andre Mauricio Zelak <andre.zelak@windriver.com>
+Date: Sat, 8 Jul 2023 19:02:50 -0300
+Subject: [PATCH 39/47] Select best source clock after state changes
+
+During operation, the clock states might change and require a new clock
+to be selected. For example, the local clock class of the current active
+clock has changed and it doesn't match requirements any more.
+
+Every 60 seconds the state of every configured clock is updated. The
+clock state includes all the parameters used in the clock selection
+algorithm.
+
+When the active clock degrades, the clock selection algorithm
+is used to immediatialy promote a better source clock.
+
+When a higher priority clock recovers or starts to match the requirements,
+a stability timer is started, and the active candidate clock is selected
+when timer reaches threshold. If the stability timer is not configured
+the switch is done immediatialy.
+
+The stability timer is retriggarable. It is started when a clock with higher
+priority than the active becomes available, becaming the active candidate.
+The timer is restarted when another clock becames the active candidate.
+
+The ha_stability_timer option is a global setting used to configure the
+stability timer. Its value is expressed in seconds, and the value 0
+disables the timer. In other words, when ha_stability_timer is set
+0 the clock change is done immediatialy on clock state change.
+
+When a clock with equal priority than the active becomes available,
+the active clock must not be switched. Only if the active degrades
+the other clock can be selected active.
+
+Test plan: equal priority clocks
+PASS: Verify when the active clock state changes but still matches
+requirements, the active clock doesn't change.
+PASS: Verify when the active clock degrades and secondary clock becomes active.
+PASS: Verify when the primary recovers the active clock doesn't change.
+PASS: Verify when the secondary and active clock degrades, the primary becomes
+active.
+
+Test plan: different priority clock
+PASS: Verify the higher priority clock is selected active at startup.
+PASS: Verify when the active and primary degrades the secondary is selected
+active.
+PASS: Verify when the primary recovers it is selected active.
+
+Test plan: stability timer
+PASS: Verify when primary and active clock degrades the secondary becomes
+active.
+PASS: Verify when primary recovers the secondary is kept active until
+stability timer has elapsed, then the primary becomes active.
+
+Reviewed-by: Cole Walker <cole.walker@windriver.com>
+Reviewed-by: Andre Fernando Zanella Kantek <andrefernandozanella.kantek@windriver.com>
+
+[commit de9976fc57d3e8212f51f4c509da27c88d0a39d8 upstream]
+[commit 44c06ab00d81245d4dfeb159c61f3c0dbf148d81 upstream]
+[commit 44de5cf877cbe18dbec0341931b4bc745e61746e upstream]
+[commit 61cf557b56805a1af9b7cbd0344f22c4acd9400c upstream]
+[commit f7d915c89b949122d9cb9eef82588b73e6171619 upstream]
+[commit 2aec3fc46e82375e9e48da9f5aa227ee3d885308 upstream]
+
+Signed-off-by: Andre Mauricio Zelak <andre.zelak@windriver.com>
+---
+ config.c    |   1 +
+ phc2sys.c   | 672 ++++++++++++++++++++++++++++++++++------------------
+ pmc_agent.c |  39 ++-
+ pmc_agent.h |   6 +-
+ 4 files changed, 481 insertions(+), 237 deletions(-)
+
+diff --git a/config.c b/config.c
+index 8ce5f6c..1ad5157 100644
+--- a/config.c
++++ b/config.c
+@@ -257,6 +257,7 @@ struct config_item config_tab[] = {
+ 	GLOB_ITEM_INT("ha_min_local_clockClass", 135, 6, 255),
+ 	GLOB_ITEM_INT("ha_min_offsetScaledLogVariance", 65535, 0, 65535),
+ 	PORT_ITEM_INT("ha_priority", 0, 0, 255),
++	PORT_ITEM_INT("ha_stability_timer", 0, 0, INT_MAX),
+ 	GLOB_ITEM_INT("ha_timeTraceable", 0, 0, 1),
+ 	PORT_ITEM_STR("ha_uds_address", "/var/run/ptp4l"),
+ 	GLOB_ITEM_ENU("hwts_filter", HWTS_FILTER_NORMAL, hwts_filter_enu),
+diff --git a/phc2sys.c b/phc2sys.c
+index d148d62..152e783 100644
+--- a/phc2sys.c
++++ b/phc2sys.c
+@@ -66,14 +66,14 @@
+ 
+ #define MAX_SRC_CLOCKS 128
+ 
+-#define PORT_INDEX_TO_PORT_ID(port, index) (((((unsigned int) port) & 0xFF) << 8) || (((unsigned int) index) & 0xFF))
++#define PORT_INDEX_TO_PORT_ID(port, index) (((((unsigned int) port) & 0xFF) << 8) | (((unsigned int) index) & 0xFF))
+ #define PORT_ID_TO_PORT(id) ((((unsigned int) id) >> 8) & 0xFF)
+ #define PORT_ID_TO_INDEX(id) (((unsigned int) id) & 0xFF)
+ 
+ struct clock {
+ 	LIST_ENTRY(clock) list;
+ 	LIST_ENTRY(clock) dst_list;
+-	LIST_ENTRY(clock) good_list;
++	LIST_ENTRY(clock) ha_list;
+ 	clockid_t clkid;
+ 	int phc_index;
+ 	int sysoff_method;
+@@ -94,6 +94,7 @@ struct clock {
+ 	struct clockcheck *sanity_check;
+ 	struct pmc_agent *node;
+ };
++typedef LIST_HEAD(head, clock) clock_list_head_t;
+ 
+ struct port {
+ 	LIST_ENTRY(port) list;
+@@ -111,11 +112,14 @@ struct phc2sys_private {
+ 	int forced_sync_offset;
+ 	int kernel_leap;
+ 	int state_changed;
++	int clock_state_changed;
+ 	LIST_HEAD(pmc_agent_head, pmc_agent) pmc_agents;
+ 	LIST_HEAD(port_head, port) ports;
+ 	LIST_HEAD(clock_head, clock) clocks;
+ 	LIST_HEAD(dst_clock_head, clock) dst_clocks;
+ 	struct clock *master;
++	struct clock *better;
++	struct timespec stability_timer;
+ 	int default_sync;
+ };
+ 
+@@ -248,6 +252,235 @@ static void clock_cleanup(struct phc2sys_private *priv)
+ 	}
+ }
+ 
++static struct clock *clock_get(struct phc2sys_private *priv, struct pmc_agent *node)
++{
++	struct clock * clock = NULL;
++	LIST_FOREACH(clock, &priv->clocks, list) {
++		if (clock->node == node) {
++			break;
++		}
++	}
++	return clock;
++}
++
++static bool clock_match_ha_dds_requirements(struct clock *clock, struct config *cfg)
++{
++	/* get requirements */
++	int local_clock_class, min_local_clock_class = config_get_int(cfg, NULL, "ha_min_local_clockClass");
++	unsigned int clock_accuracy, min_clock_accuracy = config_get_int(cfg, NULL, "ha_min_clockAccuracy");
++	unsigned int offset, min_offset_scaled_log_variance = config_get_int(cfg, NULL, "ha_min_offsetScaledLogVariance");
++
++	/* sanity check */
++	if (clock->node == NULL) {
++		pr_debug("clock %s node is (null)", clock->device);
++		return false;
++	}
++
++	if (!clock->node->dds_valid) {
++		pr_debug("clock %s dds is invalid", clock->device);
++		return false;
++	}
++
++	/* min local clock class (lower is better) */
++	local_clock_class = clock->node->dds.clockQuality.clockClass;
++	if (local_clock_class > min_local_clock_class) {
++		pr_debug("clock %s local clock class %d > min local clock class %d",
++			clock->device, local_clock_class, min_local_clock_class);
++		return false;
++	}
++
++	/* min clock accuracy (lower is better) */
++	clock_accuracy = clock->node->dds.clockQuality.clockAccuracy;
++	if (clock_accuracy > min_clock_accuracy) {
++		pr_debug("clock %s clock accuracy %d > min clock accuracy %d",
++			clock->device, clock_accuracy, min_clock_accuracy);
++		return false;
++	}
++
++	/* min offset scaled log variance (lower is better) */
++	offset = clock->node->dds.clockQuality.offsetScaledLogVariance;
++	if (offset > min_offset_scaled_log_variance) {
++		pr_debug("clock %s offset scaled log variance 0x%x > min offset 0x%x",
++			clock->device, offset, min_offset_scaled_log_variance);
++		return false;
++	}
++
++	return true;
++}
++
++static bool clock_match_ha_tpds_requirements(struct clock *clock, struct config *cfg)
++{
++	/* get requirements */
++	bool check_time_traceable = config_get_int(cfg, NULL, "ha_timeTraceable");
++	bool check_freq_traceable = config_get_int(cfg, NULL, "ha_frequencyTraceable");
++
++	/* sanity check */
++	if (clock->node == NULL) {
++		pr_debug("clock %s node is (null)", clock->device);
++		return false;
++	}
++
++	/* is time traceable */
++	if (check_time_traceable && !clock->node->utc_offset_traceable) {
++		pr_debug("clock %s time is not traceable", clock->device);
++		return false;
++	}
++
++	/* is frequency traceable */
++	if (check_freq_traceable && !clock->node->freq_traceable) {
++		pr_debug("clock %s frequency is not traceable", clock->device);
++		return false;
++	}
++
++	return true;
++}
++
++static bool clock_match_ha_pds_requirements(struct clock *clock, struct config *cfg)
++{
++	/* get requirements */
++	int gm_clock_class, min_gm_clock_class = config_get_int(cfg, NULL, "ha_min_gm_ClockClass");
++
++	/* sanity check */
++	if (clock->node == NULL) {
++		pr_debug("clock %s node is (null)", clock->device);
++		return false;
++	}
++
++	if (!clock->node->pds_valid) {
++		pr_debug("clock %s pds is invalid", clock->device);
++		return false;
++	}
++
++	/* min gm clock class (lower is better) */
++	gm_clock_class = clock->node->pds.grandmasterClockQuality.clockClass;
++	if (gm_clock_class > min_gm_clock_class) {
++		pr_debug("clock %s GM clock class %d > min clock class %d",
++			clock->device, gm_clock_class, min_gm_clock_class);
++		return false;
++	}
++
++	return true;
++}
++
++/* save a list of available source clocks that matches ha requirements */
++static int clock_available_ha_src_clocks(struct phc2sys_private *priv, struct config *cfg, clock_list_head_t *available_clocks)
++{
++	int err, retries;
++	struct clock *clock;
++	bool check_time_traceable, check_freq_traceable;
++
++	LIST_INIT(available_clocks);
++
++	check_time_traceable = config_get_int(cfg, NULL, "ha_timeTraceable");
++	check_freq_traceable = config_get_int(cfg, NULL, "ha_frequencyTraceable");
++
++	LIST_FOREACH(clock, &priv->clocks, list) {
++		pr_debug("clock %s state %d", clock->device, clock->state);
++
++		/* ignore the dst clock */
++		if (clock->state == PS_MASTER) {
++			pr_debug("clock %s discarded because state is PS_MASTER", clock->device);
++			continue;
++		}
++
++		/* sanity check */
++		if (clock->node == NULL) {
++			pr_debug("clock %s discarded because node is (null)", clock->device);
++			continue;
++		}
++
++		/* get Default Data Set */
++		if (!clock->node->dds_valid) {
++			retries = 0;
++			while(retries < 10) {
++				if (!is_running()) {
++					return -1;
++				}
++				err = pmc_agent_query_dds(clock->node, 1000);
++				if (!err) {
++					break;
++				}
++				if (err == -ETIMEDOUT) {
++					pr_notice("Waiting for ptp4l...");
++					retries++;
++				} else {
++					return -1;
++				}
++			}
++
++			if (err != 0) {
++				pr_debug("clock %s discarded because tds is invalid", clock->device);
++				continue;
++			}
++		}
++
++		if (!clock_match_ha_dds_requirements(clock, cfg))
++			continue;
++
++		if (check_time_traceable || check_freq_traceable) {
++			/* get Time Properties Data Set */
++			retries = 0;
++			while(retries < 10) {
++				if (!is_running()) {
++					return -1;
++				}
++				err = pmc_agent_query_utc_offset(clock->node, 1000);
++				if (!err) {
++					break;
++				}
++				if (err == -ETIMEDOUT) {
++					pr_notice("Waiting for ptp4l...");
++					retries++;
++				} else {
++					return -1;
++				}
++			}
++
++			if (err != 0) {
++				pr_debug("clock %s discarded because tds is invalid", clock->device);
++				continue;
++			}
++
++			if (!clock_match_ha_tpds_requirements(clock, cfg))
++				continue;
++		}
++
++		/* get Parent Data Set */
++		if (!clock->node->pds_valid) {
++			retries = 0;
++			while (retries < 10) {
++				if (!is_running()) {
++					return -1;
++				}
++				err = pmc_agent_query_pds(clock->node, 1000);
++				if (!err) {
++					break;
++				}
++				if (err == -ETIMEDOUT) {
++					pr_notice("Waiting for ptp4l...");
++					retries++;
++				} else {
++					return -1;
++				}
++			}
++
++			if (err != 0) {
++				pr_debug("clock %s discarded because pds is invalid", clock->device);
++				continue;
++			}
++		}
++
++		if (!clock_match_ha_pds_requirements(clock, cfg))
++			continue;
++
++		clock->ha_list.le_next = NULL;
++		clock->ha_list.le_prev = NULL;
++		LIST_INSERT_HEAD(available_clocks, clock, ha_list);
++	}
++
++	return 0;
++}
++
+ static void port_cleanup(struct phc2sys_private *priv)
+ {
+ 	struct port *p, *tmp;
+@@ -368,6 +601,10 @@ static void clock_reinit(struct phc2sys_private *priv, struct clock *clock,
+ 
+ 		pmc_index = PORT_ID_TO_INDEX(p->number);
+ 		node = pmc_agent_get(priv, pmc_index);
++		if (!node) {
++			pr_warning("pmc node associated to port number %d not found", p->number);
++			continue;
++		}
+ 		err = pmc_agent_query_port_properties(node, 1000,
+ 						      p->number, &state,
+ 						      &timestamping, iface);
+@@ -761,7 +998,159 @@ static int update_needed(struct clock *c)
+ 	return 0;
+ }
+ 
+-static int do_loop(struct phc2sys_private *priv, int subscriptions)
++static struct clock* ha_select_clock(struct phc2sys_private *priv, struct config *cfg)
++{
++	int clock_priority, highest_priority;
++	int clock_class, lowest_clock_class;
++	struct clock *clock = NULL, *best = NULL;
++	clock_list_head_t ha_available_clocks;
++
++	/* save a list of available source clocks that matches requirements */
++	if (clock_available_ha_src_clocks(priv, cfg, &ha_available_clocks) < 0) {
++		pr_err("failed to create ha available clock list");
++		return NULL;
++	}
++
++	/* one or more sources match requirements, select highest priority */
++	highest_priority = 0;
++	LIST_FOREACH(clock, &ha_available_clocks, ha_list) {
++		clock_priority = config_get_int(cfg, clock->device, "ha_priority");
++
++		/* select highest priority clock
++		   more than one clock with same priority, select first
++		   don't select clocks with ha_priority 0 */
++		if (clock_priority > highest_priority) {
++			pr_notice("new highest ha priority clock %s ha_priority %d",
++				clock->device, clock_priority);
++			best = clock;
++			highest_priority = clock_priority;
++		}
++	}
++
++	/* no sources match requirements, choose best available clockClass */
++	if (!best) {
++		lowest_clock_class = 256;
++		LIST_FOREACH(clock, &priv->clocks, list) {
++			/* ignore the dst clock */
++			if (clock->state == PS_MASTER)
++				continue;
++
++			/* sanity check */
++			if (clock->node == NULL)
++				continue;
++
++			/* get clock class */
++			clock_class = clock->node->dds.clockQuality.clockClass;
++			if (clock_class  <= lowest_clock_class) {
++				pr_notice("new better clock class clock %s clock class %d",
++					clock->device, clock_class);
++				best = clock;
++				lowest_clock_class = clock_class;
++			}
++		}
++	}
++
++	/* no clock selected, select first clock configured (last in list) */
++	if (!best) {
++		LIST_FOREACH(clock, &priv->clocks, list) {
++			/* ignore the dst clock */
++			if (clock->state == PS_MASTER)
++				continue;
++
++			/* sanity check */
++			if (clock->node == NULL)
++				continue;
++
++			best = clock;
++		}
++	}
++
++	if (best)
++		pr_notice("Best clock selected %s", best->device);
++
++	return best;
++}
++
++static struct clock* check_and_select_clock(struct phc2sys_private *priv, struct config *cfg)
++{
++	struct clock *active = priv->master, *candidate = NULL;
++	int stability_timer = 0;
++	struct timespec now;
++	int active_priority, candidate_priority;
++	int active_clock_class, candidate_clock_class;
++
++	/* Active source degrades - re-run ha_select_clock algorithm */
++	if ((active->node->new_dds && !clock_match_ha_dds_requirements(active, cfg)) ||
++	    (active->node->new_tpds && !clock_match_ha_tpds_requirements(active, cfg)) ||
++		(active->node->new_pds && !clock_match_ha_pds_requirements(active, cfg))) {
++
++		pr_notice("active clock %s has degraded", active->device);
++
++		active->node->new_dds = false;
++		active->node->new_tpds = false;
++		active->node->new_pds = false;
++
++		candidate = ha_select_clock(priv, cfg);
++		if (active != candidate) {
++			pr_notice("new source clock selected %s", candidate->device);
++			return candidate;
++		}
++	}
++
++	/* Primary clock is active, secondary clock becomes better quality */
++	/* Secondary clock is active, primary clock becomes better quality */
++
++	/* select best clock available */
++	candidate = ha_select_clock(priv, cfg);
++
++	if (active == candidate) {
++		/* active source still is or became the best clock available again */
++		priv->better = NULL;
++		priv->stability_timer.tv_sec = 0;
++		priv->stability_timer.tv_nsec = 0;
++	} else {
++		/* new clock candidate */
++
++		/* candidate has equal priority and clockClass than active - don't change active */
++		active_priority = config_get_int(cfg, active->device, "ha_priority");
++		candidate_priority = config_get_int(cfg, candidate->device, "ha_priority");
++		active_clock_class = active->node->dds.clockQuality.clockClass;
++		candidate_clock_class = candidate->node->dds.clockQuality.clockClass;
++		if ((active_priority == candidate_priority) &&
++			(active_clock_class == candidate_clock_class)) {
++			return NULL;
++		}
++
++		/* stability timer = 0 - change active */
++		stability_timer = config_get_int(cfg, NULL, "ha_stability_timer");
++		if (stability_timer == 0) {
++			pr_notice("new source clock selected %s", candidate->device);
++			return candidate;
++		}
++
++		if (candidate != priv->better) {
++			priv->better = candidate;
++			/* start/restart stability timer */
++			clock_gettime(CLOCK_REALTIME, &now);
++			priv->stability_timer.tv_sec = now.tv_sec + stability_timer;
++			priv->stability_timer.tv_nsec = now.tv_nsec;
++		}
++	}
++
++	return NULL;
++}
++
++static void reset_new_dataset_flags(struct phc2sys_private *priv)
++{
++	struct pmc_agent *node;
++	LIST_FOREACH(node, &priv->pmc_agents, list) {
++		node->new_dds = false;
++		node->new_tpds = false;
++		node->new_pds = false;
++	}
++}
++
++static int do_loop(struct phc2sys_private *priv, struct config *cfg, int subscriptions)
+ {
+ 	struct timespec interval;
+ 	struct clock *clock;
+@@ -769,6 +1158,8 @@ static int do_loop(struct phc2sys_private *priv, int subscriptions)
+ 	int64_t offset, delay;
+ 	int err;
+ 	struct pmc_agent *node = NULL;
++	int ha_enabled = config_get_int(cfg, NULL, "ha_enabled");
++	struct timespec now;
+ 
+ 	interval.tv_sec = priv->phc_interval;
+ 	interval.tv_nsec = (priv->phc_interval - interval.tv_sec) * 1e9;
+@@ -781,6 +1172,10 @@ static int do_loop(struct phc2sys_private *priv, int subscriptions)
+ 				continue;
+ 			}
+ 
++			if (node->new_dds || node->new_tpds || node->new_pds) {
++				priv->clock_state_changed = 1;
++			}
++
+ 			if (subscriptions) {
+ 				run_pmc_events(node);
+ 				if (priv->state_changed) {
+@@ -798,6 +1193,35 @@ static int do_loop(struct phc2sys_private *priv, int subscriptions)
+ 			reconfigure(priv);
+ 		}
+ 
++		if (ha_enabled) {
++			if (priv->clock_state_changed) {
++				clock = check_and_select_clock(priv, cfg);
++				if (clock && clock != priv->master) {
++					priv->master = clock;
++					priv->better = NULL;
++					priv->stability_timer.tv_sec = 0;
++					priv->stability_timer.tv_nsec = 0;
++				}
++
++				priv->clock_state_changed = 0;
++				reset_new_dataset_flags(priv);
++			}
++
++			if (priv->better) {
++				/* has stability timer expired? */
++				clock_gettime(CLOCK_REALTIME, &now);
++				if ((now.tv_sec > priv->stability_timer.tv_sec) ||
++					(now.tv_sec == priv->stability_timer.tv_sec &&
++					 now.tv_nsec > priv->stability_timer.tv_nsec)) {
++					pr_notice("new source clock selected %s", priv->better->device);
++					priv->master = priv->better;
++					priv->better = NULL;
++					priv->stability_timer.tv_sec = 0;
++					priv->stability_timer.tv_nsec = 0;
++				}
++			}
++		}
++
+ 		if (!priv->master)
+ 			continue;
+ 
+@@ -883,21 +1307,25 @@ static int clock_compute_state(struct phc2sys_private *priv,
+ 	return state;
+ }
+ 
+-static int phc2sys_recv_subscribed(void *context, struct ptp_message *msg,
++static int phc2sys_recv_subscribed(struct pmc_agent *node, void *context, struct ptp_message *msg,
+ 				   int excluded)
+ {
+ 	struct phc2sys_private *priv = (struct phc2sys_private *) context;
+ 	int mgt_id, state;
+ 	struct portDS *pds;
++	struct defaultDS *dds;
++	struct parentDS *parentds;
++	struct timePropertiesDS *tds;
+ 	struct port *port;
+ 	struct clock *clock;
++	int utc_offset_traceable, freq_traceable;
+ 
+ 	mgt_id = management_tlv_id(msg);
+ 	if (mgt_id == excluded)
+ 		return 0;
+ 	switch (mgt_id) {
+ 	case MID_PORT_DATA_SET:
+-		pds = management_tlv_data(msg);
++		pds = (struct portDS *)management_tlv_data(msg);
+ 		port = port_get(priv, pds->portIdentity.portNumber);
+ 		if (!port) {
+ 			pr_info("received data for unknown port %s",
+@@ -1074,232 +1502,6 @@ static int clock_handle_leap(struct phc2sys_private *priv, struct clock *clock,
+ 	return 0;
+ }
+ 
+-static struct clock* startup_select_clock(struct phc2sys_private *priv, struct config *cfg)
+-{
+-	struct clock *clock = NULL, *best = NULL;
+-	LIST_HEAD(head, clock) good_clocks;
+-	int clock_priority, highest_priority;
+-	int min_local_clock_class, min_gm_clock_class, clock_class, lowest_clock_class;
+-	int err;
+-	unsigned int min_clock_accuracy, min_offset_scaled_log_variance, retries;
+-	bool check_time_traceable, check_freq_traceable;
+-
+-	LIST_INIT(&good_clocks);
+-
+-	/* get requirements */
+-	min_local_clock_class = config_get_int(cfg, NULL, "ha_min_local_clockClass");
+-	min_clock_accuracy = config_get_int(cfg, NULL, "ha_min_clockAccuracy");
+-	min_offset_scaled_log_variance = config_get_int(cfg, NULL, "ha_min_offsetScaledLogVariance");
+-	check_time_traceable = config_get_int(cfg, NULL, "ha_timeTraceable");
+-	check_freq_traceable = config_get_int(cfg, NULL, "ha_frequencyTraceable");
+-	min_gm_clock_class = config_get_int(cfg, NULL, "ha_min_gm_ClockClass");
+-
+-	/* save a list of available source clocks that matches requirements */
+-	LIST_FOREACH(clock, &priv->clocks, list) {
+-		/* check matching parameters */
+-		pr_debug("clock %s state %d", clock->device, clock->state);
+-
+-		/* ignore the dst clock */
+-		if (clock->state == PS_MASTER) {
+-			pr_debug("clock %s discarded because state is PS_MASTER", clock->device);
+-			continue;
+-		}
+-
+-		/* sanity check */
+-		if (clock->node == NULL) {
+-			pr_debug("clock %s discarded because node is (null)", clock->device);
+-			continue;
+-		}
+-
+-		/* get Default Data Set */
+-		retries = 0;
+-		while(retries < 10) {
+-			if (!is_running()) {
+-				return NULL;
+-			}
+-			err = pmc_agent_query_dds(clock->node, 1000);
+-			if (!err) {
+-				break;
+-			}
+-			if (err == -ETIMEDOUT) {
+-				pr_notice("Waiting for ptp4l...");
+-				retries++;
+-			} else {
+-				return NULL;
+-			}
+-		}
+-
+-		if (!clock->node->dds_valid) {
+-			pr_debug("clock %s discarded because dds is invalid", clock->device);
+-			continue;
+-		}
+-
+-		/* min clockClass
+-		   as lower clock class is better, accept sources which clock class
+-		   is lower then or equal to min local clock class and discard
+-		   the sources which clock class is higher than min local clock class.
+-		*/
+-		clock_class = clock->node->dds.clockQuality.clockClass;
+-		pr_debug("clock %s local clockClass %d", clock->device, clock_class);
+-		if (clock_class > min_local_clock_class) {
+-			pr_debug("clock %s discarded because local clock class %d > min clock class %d",
+-				clock->device, clock_class, min_local_clock_class);
+-			continue;
+-		}
+-
+-		/* min clockAccuracy (lower is better) */
+-		pr_debug("clock %s clockAccuracy 0x%x", clock->device,
+-			clock->node->dds.clockQuality.clockAccuracy);
+-		if (clock->node->dds.clockQuality.clockAccuracy > min_clock_accuracy) {
+-			pr_debug("clock %s discarded because clock accuracy %d > min clock accuracy %d",
+-				clock->device, clock->node->dds.clockQuality.clockAccuracy,
+-				min_clock_accuracy);
+-			continue;
+-		}
+-
+-		/* min offset scaled log variance */
+-		pr_debug("clock %s offsetScaledLogVariance 0x%x", clock->device,
+-			clock->node->dds.clockQuality.offsetScaledLogVariance);
+-		if (clock->node->dds.clockQuality.offsetScaledLogVariance > min_offset_scaled_log_variance) {
+-			pr_debug("clock %s discarded because offset scaled log variance 0x%x > min offset 0x%x",
+-				clock->device, clock->node->dds.clockQuality.offsetScaledLogVariance,
+-				min_offset_scaled_log_variance);
+-			continue;
+-		}
+-
+-		if (check_time_traceable || check_freq_traceable) {
+-			/* get Time Properties Data Set */
+-			retries = 0;
+-			while(retries < 10) {
+-				if (!is_running()) {
+-					return NULL;
+-				}
+-				err = pmc_agent_query_utc_offset(clock->node, 1000);
+-				if (!err) {
+-					break;
+-				}
+-				if (err == -ETIMEDOUT) {
+-					pr_notice("Waiting for ptp4l...");
+-					retries++;
+-				} else {
+-					return NULL;
+-				}
+-			}
+-
+-			if (err != 0) {
+-				pr_debug("clock %s discarded because tds is invalid", clock->device);
+-				continue;
+-			}
+-		}
+-
+-		/* is time traceable */
+-		pr_debug("clock %s is time traceable %s", clock->device,
+-			clock->node->utc_offset_traceable ? "yes" : "no");
+-		if (check_time_traceable && !clock->node->utc_offset_traceable) {
+-			pr_debug("clock %s discarded because time is not traceable", clock->device);
+-			continue;
+-		}
+-
+-		/* is frequency traceable */
+-		pr_debug("clock %s is frequency traceable %s", clock->device,
+-			clock->node->freq_traceable ? "yes" : "no");
+-		if (check_freq_traceable && !clock->node->freq_traceable) {
+-			pr_debug("clock %s discarded because frequency is not traceable", clock->device);
+-			continue;
+-		}
+-
+-		retries = 0;
+-		while (retries < 10) {
+-			if (!is_running()) {
+-				return NULL;
+-			}
+-			err = pmc_agent_query_pds(clock->node, 1000);
+-			if (!err) {
+-				break;
+-			}
+-			if (err == -ETIMEDOUT) {
+-				pr_notice("Waiting for ptp4l...");
+-				retries++;
+-			} else {
+-				return NULL;
+-			}
+-		}
+-
+-		if (!clock->node->pds_valid) {
+-			pr_debug("clock %s discarded because pds is invalid", clock->device);
+-			continue;
+-		}
+-
+-		/* min gm clock class - lower is better */
+-		clock_class = clock->node->pds.grandmasterClockQuality.clockClass;
+-		pr_debug("clock %s GM clockClass %d", clock->device, clock_class);
+-		if (clock_class > min_gm_clock_class) {
+-			pr_debug("clock %s discarded because GM clock class %d > min clock class %d",
+-				clock->device, clock_class, min_gm_clock_class);
+-			continue;
+-		}
+-
+-		pr_notice("clock %s matched requirements", clock->device);
+-
+-		clock->good_list.le_next = NULL;
+-		clock->good_list.le_prev = NULL;
+-		LIST_INSERT_HEAD(&good_clocks, clock, good_list);
+-	}
+-
+-	/* one or more sources match requirements, select highest priority */
+-	highest_priority = 0;
+-	LIST_FOREACH(clock, &good_clocks, good_list) {
+-		clock_priority = config_get_int(cfg, clock->device, "ha_priority");
+-
+-		/* select highest priority clock
+-		   more than one clock with same priority, select first
+-		   don't select clocks with ha_priority 0 */
+-		if (clock_priority > highest_priority) {
+-			pr_notice("new highest ha priority clock %s ha_priority %d",
+-				clock->device, clock_priority);
+-			best = clock;
+-			highest_priority = clock_priority;
+-		}
+-	}
+-
+-	/* no sources match requirements, choose best available clockClass */
+-	if (!best) {
+-		lowest_clock_class = 256;
+-		LIST_FOREACH(clock, &priv->clocks, list) {
+-			/* ignore the dst clock */
+-			if (clock->state == PS_MASTER) {
+-				continue;
+-			}
+-
+-			/* get clock class */
+-			clock_class = clock->node->dds.clockQuality.clockClass;
+-			if (clock_class <= lowest_clock_class) {
+-				pr_notice("new better clock class clock %s clock class %d",
+-					clock->device, clock_class);
+-				best = clock;
+-				lowest_clock_class = clock_class;
+-			}
+-		}
+-	}
+-
+-	/* no clock selected, select first clock configured (last in list) */
+-	if (!best) {
+-		LIST_FOREACH(clock, &priv->clocks, list) {
+-			/* ignore the dst clock */
+-			if (clock->state == PS_MASTER) {
+-				continue;
+-			}
+-
+-			best = clock;
+-		}
+-	}
+-
+-	if (best)
+-		pr_notice("Best clock selected %s", best->device);
+-
+-	return best;
+-};
+-
+ static void usage(char *progname)
+ {
+ 	fprintf(stderr,
+@@ -1359,6 +1561,8 @@ int main(int argc, char *argv[])
+ 		.phc_readings = 5,
+ 		.phc_interval = 1.0,
+ 		.master = NULL,
++		.better = NULL,
++		.stability_timer.tv_sec = 0,
+ 	};
+ 	struct pmc_agent *node = NULL;
+ 	unsigned int i, src_cnt = 0;
+@@ -1616,7 +1820,7 @@ int main(int argc, char *argv[])
+ 			goto end;
+ 		if (auto_init_ports(&priv, rt) < 0)
+ 			goto end;
+-		r = do_loop(&priv, 1);
++		r = do_loop(&priv, cfg, 1);
+ 		goto end;
+ 	}
+ 
+@@ -1715,7 +1919,7 @@ int main(int argc, char *argv[])
+ 		}
+ 
+ 		if (ha_enabled) {
+-			startup_select_clock(&priv, cfg);
++			priv.master = ha_select_clock(&priv, cfg);
+ 		}
+ 	}
+ 
+@@ -1725,7 +1929,7 @@ int main(int argc, char *argv[])
+ 		servo_sync_interval(dst->servo, 1.0);
+ 		r = do_pps_loop(&priv, dst, pps_fd);
+ 	} else {
+-		r = do_loop(&priv, 0);
++		r = do_loop(&priv, cfg, 0);
+ 	}
+ 
+ end:
+diff --git a/pmc_agent.c b/pmc_agent.c
+index 534f483..af15710 100644
+--- a/pmc_agent.c
++++ b/pmc_agent.c
+@@ -162,7 +162,7 @@ static int run_pmc(struct pmc_agent *node, int timeout, int ds_id,
+ 			return RUN_PMC_NODEV;
+ 		}
+ 		if (res <= 0 ||
+-		    node->recv_subscribed(node->recv_context, *msg, ds_id) ||
++		    node->recv_subscribed(node, node->recv_context, *msg, ds_id) ||
+ 		    management_tlv_id(*msg) != ds_id) {
+ 			msg_put(*msg);
+ 			*msg = NULL;
+@@ -280,12 +280,21 @@ int pmc_agent_query_dds(struct pmc_agent *node, int timeout)
+ 	struct ptp_message *msg;
+ 	struct defaultDS *dds;
+ 	int res;
++	struct ClockQuality *current, *new;
+ 
+ 	res = run_pmc(node, timeout, MID_DEFAULT_DATA_SET, &msg);
+ 	if (is_run_pmc_error(res)) {
+ 		return run_pmc_err2errno(res);
+ 	}
+ 	dds = (struct defaultDS *) management_tlv_data(msg);
++	current = &node->dds.clockQuality;
++	new = &dds->clockQuality;
++
++	if ((current->clockClass != new->clockClass) ||
++		(current->clockAccuracy != new->clockAccuracy) ||
++		(current->offsetScaledLogVariance != new->offsetScaledLogVariance)) {
++		node->new_dds = true;
++	}
+ 	memcpy(&node->dds, dds, sizeof(node->dds));
+ 	node->dds_valid = true;
+ 	msg_put(msg);
+@@ -334,12 +343,19 @@ int pmc_agent_query_utc_offset(struct pmc_agent *node, int timeout)
+ 	struct timePropertiesDS *tds;
+ 	struct ptp_message *msg;
+ 	int res;
++	int sync_offset, leap, utc_offset_traceable, freq_traceable;
+ 
+ 	res = run_pmc(node, timeout, MID_TIME_PROPERTIES_DATA_SET, &msg);
+ 	if (is_run_pmc_error(res)) {
+ 		return run_pmc_err2errno(res);
+ 	}
+ 
++	/* save current state */
++	sync_offset = node->sync_offset;
++	leap = node->leap;
++	utc_offset_traceable = node->utc_offset_traceable;
++	freq_traceable = node->freq_traceable;
++
+ 	tds = (struct timePropertiesDS *) management_tlv_data(msg);
+ 	if (tds->flags & PTP_TIMESCALE) {
+ 		node->sync_offset = tds->currentUtcOffset;
+@@ -358,6 +374,15 @@ int pmc_agent_query_utc_offset(struct pmc_agent *node, int timeout)
+ 		node->utc_offset_traceable = 0;
+ 		node->freq_traceable = 0;
+ 	}
++
++	/* compare to new tpds */
++	if ((sync_offset != node->sync_offset) ||
++		(leap != node->leap) ||
++		(utc_offset_traceable != node->utc_offset_traceable) ||
++		(freq_traceable != node->freq_traceable)) {
++		node->new_tpds = true;
++	}
++
+ 	msg_put(msg);
+ 	return 0;
+ }
+@@ -367,6 +392,7 @@ int pmc_agent_query_pds(struct pmc_agent *node, int timeout)
+ 	struct parentDS *pds;
+ 	struct ptp_message *msg;
+ 	int res;
++	struct ClockQuality *current, *new;
+ 
+ 	res = run_pmc(node, timeout, MID_PARENT_DATA_SET, &msg);
+ 	if (is_run_pmc_error(res)) {
+@@ -374,6 +400,11 @@ int pmc_agent_query_pds(struct pmc_agent *node, int timeout)
+ 	}
+ 
+ 	pds = (struct parentDS *) management_tlv_data(msg);
++	current = &node->pds.grandmasterClockQuality;
++	new = &pds->grandmasterClockQuality;
++	if (current->clockClass != new->clockClass) {
++		node->new_pds = true;
++	}
+ 	memcpy(&node->pds, pds, sizeof(node->pds));
+ 	node->pds_valid = true;
+ 	msg_put(msg);
+@@ -396,6 +427,7 @@ int pmc_agent_update(struct pmc_agent *node)
+ 	struct ptp_message *msg;
+ 	struct timespec tp;
+ 	uint64_t ts;
++	int r;
+ 
+ 	if (!node->pmc) {
+ 		return 0;
+@@ -410,7 +442,10 @@ int pmc_agent_update(struct pmc_agent *node)
+ 		if (node->stay_subscribed) {
+ 			renew_subscription(node, 0);
+ 		}
+-		if (!pmc_agent_query_utc_offset(node, 0)) {
++		r = pmc_agent_query_utc_offset(node, 0);
++		r += pmc_agent_query_dds(node, 0);
++		r += pmc_agent_query_pds(node, 0);
++		if (!r) {
+ 			node->pmc_last_update = ts;
+ 		}
+ 	}
+diff --git a/pmc_agent.h b/pmc_agent.h
+index 2bd7f02..8207c46 100644
+--- a/pmc_agent.h
++++ b/pmc_agent.h
+@@ -26,7 +26,8 @@
+ 
+ #include "pmc_common.h"
+ 
+-typedef int pmc_node_recv_subscribed_t(void *context, struct ptp_message *msg,
++struct pmc_agent;
++typedef int pmc_node_recv_subscribed_t(struct pmc_agent* node, void *context, struct ptp_message *msg,
+ 				       int excluded);
+ 
+ struct pmc_agent {
+@@ -36,15 +37,18 @@ struct pmc_agent {
+ 
+ 	struct defaultDS dds;
+ 	bool dds_valid;
++	bool new_dds;
+ 	int leap;
+ 	int pmc_ds_requested;
+ 	bool stay_subscribed;
+ 	int sync_offset;
+ 	int utc_offset_traceable;
+ 	int freq_traceable;
++	bool new_tpds;
+ 	unsigned int index;
+ 	struct parentDS pds;
+ 	bool pds_valid;
++	bool new_pds;
+ 
+ 	/* Callback on message reception */
+ 	pmc_node_recv_subscribed_t *recv_subscribed;
+-- 
+2.25.1
+

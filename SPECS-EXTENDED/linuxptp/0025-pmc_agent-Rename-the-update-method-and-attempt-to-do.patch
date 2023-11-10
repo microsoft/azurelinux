@@ -1,0 +1,155 @@
+From a304d4df86a76c187fc7074755fe9b5ad349efbe Mon Sep 17 00:00:00 2001
+From: Andre Mauricio Zelak <andre.zelak@windriver.com>
+Date: Mon, 12 Jun 2023 15:36:38 -0300
+Subject: [PATCH 25/47] pmc_agent: Rename the update method and attempt to
+ document it.
+
+This patch renames the function to have the module prefix and tries to
+put into words what it does.
+
+Signed-off-by: Richard Cochran <richardcochran@gmail.com>
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+
+[commit 9a2dae984e0d355d751913e3308f9a954da11aa3 upstream]
+Signed-off-by: Andre Mauricio Zelak <andre.zelak@windriver.com>
+---
+ phc2sys.c   |  4 ++--
+ pmc_agent.c | 53 ++++++++++++++++++++++++++---------------------------
+ pmc_agent.h | 21 ++++++++++++++++++++-
+ 3 files changed, 48 insertions(+), 30 deletions(-)
+
+diff --git a/phc2sys.c b/phc2sys.c
+index b155961..cbe80f2 100644
+--- a/phc2sys.c
++++ b/phc2sys.c
+@@ -672,7 +672,7 @@ static int do_pps_loop(struct phc2sys_private *priv, struct clock *clock,
+ 			pps_offset = pps_ts - phc_ts;
+ 		}
+ 
+-		if (update_pmc_node(priv->node) < 0)
++		if (pmc_agent_update(priv->node) < 0)
+ 			continue;
+ 		update_clock(priv, clock, pps_offset, pps_ts, -1);
+ 	}
+@@ -711,7 +711,7 @@ static int do_loop(struct phc2sys_private *priv, int subscriptions)
+ 	while (is_running()) {
+ 		clock_nanosleep(CLOCK_MONOTONIC, 0, &interval, NULL);
+ 
+-		if (update_pmc_node(priv->node) < 0) {
++		if (pmc_agent_update(priv->node) < 0) {
+ 			continue;
+ 		}
+ 
+diff --git a/pmc_agent.c b/pmc_agent.c
+index ea6b3b7..22af306 100644
+--- a/pmc_agent.c
++++ b/pmc_agent.c
+@@ -336,33 +336,6 @@ int run_pmc_clock_identity(struct pmc_agent *node, int timeout)
+ 	return 1;
+ }
+ 
+-/* Returns: -1 in case of error, 0 otherwise */
+-int update_pmc_node(struct pmc_agent *node)
+-{
+-	struct timespec tp;
+-	uint64_t ts;
+-
+-	if (!node->pmc) {
+-		return 0;
+-	}
+-	if (clock_gettime(CLOCK_MONOTONIC, &tp)) {
+-		pr_err("failed to read clock: %m");
+-		return -1;
+-	}
+-	ts = tp.tv_sec * NS_PER_SEC + tp.tv_nsec;
+-
+-	if (ts - node->pmc_last_update >= PMC_UPDATE_INTERVAL) {
+-		if (node->stay_subscribed) {
+-			renew_subscription(node, 0);
+-		}
+-		if (run_pmc_get_utc_offset(node, 0) > 0) {
+-			node->pmc_last_update = ts;
+-		}
+-	}
+-
+-	return 0;
+-}
+-
+ int init_pmc_node(struct config *cfg, struct pmc_agent *node, const char *uds,
+ 		  pmc_node_recv_subscribed_t *recv_subscribed, void *context)
+ {
+@@ -414,6 +387,32 @@ int pmc_agent_subscribe(struct pmc_agent *node, int timeout)
+ 	return renew_subscription(node, timeout);
+ }
+ 
++int pmc_agent_update(struct pmc_agent *node)
++{
++	struct timespec tp;
++	uint64_t ts;
++
++	if (!node->pmc) {
++		return 0;
++	}
++	if (clock_gettime(CLOCK_MONOTONIC, &tp)) {
++		pr_err("failed to read clock: %m");
++		return -errno;
++	}
++	ts = tp.tv_sec * NS_PER_SEC + tp.tv_nsec;
++
++	if (ts - node->pmc_last_update >= PMC_UPDATE_INTERVAL) {
++		if (node->stay_subscribed) {
++			renew_subscription(node, 0);
++		}
++		if (run_pmc_get_utc_offset(node, 0) > 0) {
++			node->pmc_last_update = ts;
++		}
++	}
++
++	return 0;
++}
++
+ bool pmc_agent_utc_offset_traceable(struct pmc_agent *agent)
+ {
+ 	return agent->utc_offset_traceable;
+diff --git a/pmc_agent.h b/pmc_agent.h
+index 743818f..483a21b 100644
+--- a/pmc_agent.h
++++ b/pmc_agent.h
+@@ -33,7 +33,6 @@ typedef int pmc_node_recv_subscribed_t(void *context, struct ptp_message *msg,
+ 
+ int init_pmc_node(struct config *cfg, struct pmc_agent *agent, const char *uds,
+ 		  pmc_node_recv_subscribed_t *recv_subscribed, void *context);
+-int update_pmc_node(struct pmc_agent *agent);
+ int run_pmc_clock_identity(struct pmc_agent *agent, int timeout);
+ int run_pmc_wait_sync(struct pmc_agent *agent, int timeout);
+ int run_pmc_get_number_ports(struct pmc_agent *agent, int timeout);
+@@ -85,6 +84,26 @@ void pmc_agent_set_sync_offset(struct pmc_agent *agent, int offset);
+  */
+ int pmc_agent_subscribe(struct pmc_agent *agent, int timeout);
+ 
++/**
++ * Queries the local ptp4l instance to update the TAI-UTC offset and
++ * the current leap second flags.
++ *
++ * In addition:
++ *
++ * - Any active port state subscription will be renewed.
++ * - The port state notification callback might be invoked.
++ *
++ * This function should be called periodically at least once per
++ * minute to keep both the port state and the leap second flags up to
++ * date.  Note that the PMC agent rate limits the query to once per
++ * minute, and so the caller may safely invoke this method more often
++ * than that.
++ *
++ * @param agent  Pointer to a PMC instance obtained via @ref pmc_agent_create().
++ * @return       Zero on success, negative error code otherwise.
++ */
++int pmc_agent_update(struct pmc_agent *agent);
++
+ /**
+  * Tests whether the current UTC offset is traceable.
+  * @param agent  Pointer to a PMC instance obtained via @ref pmc_agent_create().
+-- 
+2.25.1
+

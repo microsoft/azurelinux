@@ -1,0 +1,201 @@
+From 2d40cc7cf52bbf054856c34902e4bda9f13ebb79 Mon Sep 17 00:00:00 2001
+From: Andre Mauricio Zelak <andre.zelak@windriver.com>
+Date: Mon, 7 Aug 2023 14:55:12 -0300
+Subject: [PATCH 44/47] Stream type phc2sys com socket
+
+The type of the socket was changed from datagram to stream.
+
+Test plan: status/show commands
+PASS: Verify status command response
+PASS: Verify forced lock command response
+PASS: Verify clock source command response
+
+Test plan: enable lock and disable lock commands
+PASS: Verify the enable lock changes the clock source to the given
+interface.
+PASS: Verify that disable lock command makes the better available
+clock to be selected again.
+
+Test plan: disable source and enable source commands
+PASS: Verify a new interface is selected when the active one
+is disabled.
+PASS: Verify the primary interface is re-selected active after
+it is enabled back.
+
+Reviewed-by: Cole Walker <cole.walker@windriver.com>
+Reviewed-by: Andre Fernando Zanella Kantek
+<andrefernandozanella.kantek@windriver.com>
+
+[commit b4f79cb626d6e40cf1d5aa2c5d5fba89e2c2e340 upstream]
+
+Signed-off-by: Andre Mauricio Zelak <andre.zelak@windriver.com>
+---
+ phc2sys.c | 76 +++++++++++++++++++++++++++----------------------------
+ 1 file changed, 38 insertions(+), 38 deletions(-)
+
+diff --git a/phc2sys.c b/phc2sys.c
+index 035ee21..a597014 100644
+--- a/phc2sys.c
++++ b/phc2sys.c
+@@ -1203,14 +1203,12 @@ static int ha_com_socket_close(int fd)
+ 	struct sockaddr_un sa;
+ 	socklen_t len = sizeof(sa);
+ 
+-	// if (fd < 0)
+-	// 	return -1;
+-
+ 	if (!getsockname(fd, (struct sockaddr *) &sa, &len) &&
+ 		sa.sun_family == AF_LOCAL) {
+ 		unlink(sa.sun_path);
+ 	}
+ 
++	shutdown(fd, SHUT_RDWR);
+ 	close(fd);
+ 	return 0;
+ }
+@@ -1219,9 +1217,10 @@ static int ha_com_socket_open(int *fd_out, struct config *cfg)
+ {
+ 	int fd, err;
+ 	struct sockaddr_un sa;
++	const int backlog = 50;
+ 	const char *name = config_get_string(cfg, NULL, "ha_phc2sys_com_socket");
+ 
+-	fd = socket(AF_LOCAL, SOCK_DGRAM, 0);
++	fd = socket(AF_LOCAL, SOCK_STREAM | SOCK_NONBLOCK, 0);
+ 	if (fd < 0) {
+ 		pr_err("ha_com_socket: failed to create socket: %m");
+ 		return -1;
+@@ -1238,22 +1237,27 @@ static int ha_com_socket_open(int *fd_out, struct config *cfg)
+ 		return -1;
+ 	}
+ 
++	err = listen(fd, backlog);
++	if (err < 0) {
++		pr_err("ha_com_socket: listen failed: %m");
++		close(fd);
++		return -1;
++	}
++
+ 	*fd_out = fd;
+ 	chmod(name, HA_SCK_FILEMODE);
+ 
+ 	return 0;
+ }
+ 
+-static int ha_com_socket_recv(int fd, void *buf, size_t buflen,
+-			struct address *addr)
++static int ha_com_socket_recv(int fd, void *buf, size_t buflen)
+ {
+ 	int cnt;
+ 
+-	addr->len = sizeof(addr->sun);
+-	cnt = recvfrom(fd, buf, buflen, 0, &addr->sa, &addr->len);
++	cnt = read(fd, buf, buflen);
+ 	if (cnt <= 0) {
+-		pr_err("ha_com_socket: recvfrom failed: %m");
+-		return cnt;
++		pr_err("ha_com_socket: read failed: %m");
++		return -errno;
+ 	}
+ 
+ 	((char*)buf)[cnt] = '\0';
+@@ -1261,13 +1265,13 @@ static int ha_com_socket_recv(int fd, void *buf, size_t buflen,
+ 	return 0;
+ }
+ 
+-static int ha_com_socket_send(int fd, struct address *addr, void *buf,
+-			size_t buflen)
++static int ha_com_socket_send(int fd, void *buf, size_t buflen)
+ {
+ 	int cnt;
+ 
+-	cnt = sendto(fd, buf, buflen, 0, &addr->sa, addr->len);
+-	if (cnt < 1) {
++	cnt = send(fd, buf, buflen, 0);
++	if (cnt < 0) {
++		pr_err("ha_com_socket: send failed: %m");
+ 		return -errno;
+ 	}
+ 	return cnt;
+@@ -1467,48 +1471,42 @@ static int ha_handle_disable_source_msg(struct phc2sys_private *priv,
+ static int ha_com_socket_handle_msg(struct phc2sys_private *priv,
+ 			struct config *cfg)
+ {
+-	struct pollfd pollfd[HA_SCK_N_FD];
+-	struct address sender;
+-	int cnt, res = 0;
+-	int timeout = 0;
++	int cnt, res = 0, fd;
+ 	void * buffer = NULL;
+ 	void * response = NULL;
+ 
+ 	while(1) {
+-		pollfd[0].fd = priv->ha_socket_fd;
+-		pollfd[0].events = POLLIN|POLLPRI;
+-
+-		cnt = poll(pollfd, HA_SCK_N_FD, timeout);
+-		if (cnt < 0) {
+-			pr_err("ha_com_socket: poll failed: %m");
+-			res = -1;
+-			break;
+-		}
+-		if (!cnt) {
+-			/* timeout and fd wasn't ready */
++		fd = accept(priv->ha_socket_fd, NULL, NULL);
++		if (fd < 0) {
++			if (errno == EAGAIN || errno == EWOULDBLOCK) {
++				/* no msg available */
++			} else {
++				pr_err("ha_com_socket: accept failed: %m");
++				res = -1;
++			}
+ 			break;
+ 		}
+ 
+-		if (!(pollfd[0].revents & (POLLIN|POLLPRI)))
+-			break;
+-
+ 		buffer = malloc(HA_SCK_BUFFER_SIZE);
+ 		if (!buffer) {
+ 			pr_err("ha_com_socket: failed to allocate memory for message");
++			close(fd);
+ 			res = -1;
+ 			break;
+ 		}
+ 
+-		res = ha_com_socket_recv(pollfd[0].fd, buffer, HA_SCK_BUFFER_SIZE, &sender);
+-		if (res < 0)
++		res = ha_com_socket_recv(fd, buffer, HA_SCK_BUFFER_SIZE);
++		if (res < 0) {
++			close(fd);
+ 			break;
++		}
+ 
+-		fprintf(stderr, "ha_com_socket: received: %s\n", (char*)buffer);
+-		fprintf(stderr, "ha_com_socket: recvd from: %s\n", ((struct sockaddr_un*)&sender.sa)->sun_path);
++		pr_debug("ha_com_socket: command received: %s", (char*)buffer);
+ 
+ 		response = malloc(HA_SCK_BUFFER_SIZE);
+ 		if (!response) {
+ 			pr_err("ha_com_socket: failed to allocate memory for response message");
++			close(fd);
+ 			res = -1;
+ 			break;
+ 		}
+@@ -1543,9 +1541,11 @@ static int ha_com_socket_handle_msg(struct phc2sys_private *priv,
+ 					"Error: Invalid command");
+ 		}
+ 
+-		fprintf(stderr, "ha_com_socket: response: \n%s", (char*)response);
++		pr_debug("ha_com_socket: response: %s", (char*)response);
+ 
+-		res = ha_com_socket_send(pollfd[0].fd, &sender, response, cnt);
++		res = ha_com_socket_send(fd, response, cnt);
++
++		close(fd);
+ 	}
+ 
+ 	free(buffer);
+-- 
+2.25.1
+

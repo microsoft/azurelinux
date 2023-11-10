@@ -1,0 +1,448 @@
+From f6d7bb0a62f15fcca0343c42891f7e056f502949 Mon Sep 17 00:00:00 2001
+From: Andre Mauricio Zelak <andre.zelak@windriver.com>
+Date: Mon, 12 Jun 2023 14:55:29 -0300
+Subject: [PATCH 16/47] pmc_agent: Hide the implementation.
+
+The PMC agent's implementation should not be exposed to its users.  This
+patch hides the details and provides a method to create an instance.  In
+addition, the signature of the receive callback is made generic, removing
+the container_of pattern meant for sub-classing modules.
+
+Signed-off-by: Richard Cochran <richardcochran@gmail.com>
+
+[commit 826698791769e0ba4431fe98f02d4d09c109542e upstream]
+Signed-off-by: Andre Mauricio Zelak <andre.zelak@windriver.com>
+---
+ phc2sys.c   | 76 +++++++++++++++++++++++++++++------------------------
+ pmc_agent.c | 58 +++++++++++++++++++++++++++++++++++-----
+ pmc_agent.h | 62 +++++++++++++++++++++++++++++++------------
+ 3 files changed, 138 insertions(+), 58 deletions(-)
+
+diff --git a/phc2sys.c b/phc2sys.c
+index 74ee9d1..037b1b9 100644
+--- a/phc2sys.c
++++ b/phc2sys.c
+@@ -103,7 +103,7 @@ struct phc2sys_private {
+ 	int forced_sync_offset;
+ 	int kernel_leap;
+ 	int state_changed;
+-	struct pmc_agent node;
++	struct pmc_agent *node;
+ 	LIST_HEAD(port_head, port) ports;
+ 	LIST_HEAD(clock_head, clock) clocks;
+ 	LIST_HEAD(dst_clock_head, clock) dst_clocks;
+@@ -306,7 +306,7 @@ static void clock_reinit(struct phc2sys_private *priv, struct clock *clock,
+ 
+ 	LIST_FOREACH(p, &priv->ports, list) {
+ 		if (p->clock == clock) {
+-			ret = run_pmc_port_properties(&priv->node, 1000, p->number,
++			ret = run_pmc_port_properties(priv->node, 1000, p->number,
+ 					              &state, &timestamping,
+ 						      iface);
+ 			if (ret > 0)
+@@ -641,7 +641,7 @@ static int do_pps_loop(struct phc2sys_private *priv, struct clock *clock,
+ 
+ 	if (src == CLOCK_INVALID) {
+ 		/* The sync offset can't be applied with PPS alone. */
+-		priv->node.sync_offset = 0;
++		pmc_agent_set_sync_offset(priv->node, 0);
+ 	} else {
+ 		enable_pps_output(priv->master->clkid);
+ 	}
+@@ -672,7 +672,7 @@ static int do_pps_loop(struct phc2sys_private *priv, struct clock *clock,
+ 			pps_offset = pps_ts - phc_ts;
+ 		}
+ 
+-		if (update_pmc_node(&priv->node, 0) < 0)
++		if (update_pmc_node(priv->node, 0) < 0)
+ 			continue;
+ 		update_clock(priv, clock, pps_offset, pps_ts, -1);
+ 	}
+@@ -710,15 +710,15 @@ static int do_loop(struct phc2sys_private *priv, int subscriptions)
+ 
+ 	while (is_running()) {
+ 		clock_nanosleep(CLOCK_MONOTONIC, 0, &interval, NULL);
+-		if (update_pmc_node(&priv->node, subscriptions) < 0)
++		if (update_pmc_node(priv->node, subscriptions) < 0)
+ 			continue;
+ 
+ 		if (subscriptions) {
+-			run_pmc_events(&priv->node);
++			run_pmc_events(priv->node);
+ 			if (priv->state_changed) {
+ 				/* force getting offset, as it may have
+ 				 * changed after the port state change */
+-				if (run_pmc_get_utc_offset(&priv->node, 1000) <= 0) {
++				if (run_pmc_get_utc_offset(priv->node, 1000) <= 0) {
+ 					pr_err("failed to get UTC offset");
+ 					continue;
+ 				}
+@@ -810,13 +810,10 @@ static int clock_compute_state(struct phc2sys_private *priv,
+ 	return state;
+ }
+ 
+-#define node_to_phc2sys(node) \
+-	container_of(node, struct phc2sys_private, node)
+-
+-static int phc2sys_recv_subscribed(struct pmc_agent *node,
+-				   struct ptp_message *msg, int excluded)
++static int phc2sys_recv_subscribed(void *context, struct ptp_message *msg,
++				   int excluded)
+ {
+-	struct phc2sys_private *priv = node_to_phc2sys(node);
++	struct phc2sys_private *priv = (struct phc2sys_private *) context;
+ 	int mgt_id, state;
+ 	struct portDS *pds;
+ 	struct port *port;
+@@ -863,7 +860,7 @@ static int auto_init_ports(struct phc2sys_private *priv, int add_rt)
+ 	while (1) {
+ 		if (!is_running())
+ 			return -1;
+-		res = run_pmc_clock_identity(&priv->node, 1000);
++		res = run_pmc_clock_identity(priv->node, 1000);
+ 		if (res < 0)
+ 			return -1;
+ 		if (res > 0)
+@@ -872,20 +869,20 @@ static int auto_init_ports(struct phc2sys_private *priv, int add_rt)
+ 		pr_notice("Waiting for ptp4l...");
+ 	}
+ 
+-	number_ports = run_pmc_get_number_ports(&priv->node, 1000);
++	number_ports = run_pmc_get_number_ports(priv->node, 1000);
+ 	if (number_ports <= 0) {
+ 		pr_err("failed to get number of ports");
+ 		return -1;
+ 	}
+ 
+-	res = run_pmc_subscribe(&priv->node, 1000);
++	res = run_pmc_subscribe(priv->node, 1000);
+ 	if (res <= 0) {
+ 		pr_err("failed to subscribe");
+ 		return -1;
+ 	}
+ 
+ 	for (i = 1; i <= number_ports; i++) {
+-		res = run_pmc_port_properties(&priv->node, 1000, i, &state,
++		res = run_pmc_port_properties(priv->node, 1000, i, &state,
+ 					      &timestamping, iface);
+ 		if (res == -1) {
+ 			/* port does not exist, ignore the port */
+@@ -922,7 +919,7 @@ static int auto_init_ports(struct phc2sys_private *priv, int add_rt)
+ 	}
+ 
+ 	/* get initial offset */
+-	if (run_pmc_get_utc_offset(&priv->node, 1000) <= 0) {
++	if (run_pmc_get_utc_offset(priv->node, 1000) <= 0) {
+ 		pr_err("failed to get UTC offset");
+ 		return -1;
+ 	}
+@@ -933,9 +930,9 @@ static int auto_init_ports(struct phc2sys_private *priv, int add_rt)
+ static int clock_handle_leap(struct phc2sys_private *priv, struct clock *clock,
+ 			     int64_t offset, uint64_t ts)
+ {
+-	int clock_leap, node_leap = priv->node.leap;
++	int clock_leap, node_leap = pmc_agent_get_leap(priv->node);
+ 
+-	clock->sync_offset = priv->node.sync_offset;
++	clock->sync_offset = pmc_agent_get_sync_offset(priv->node);
+ 
+ 	if ((node_leap || clock->leap_set) &&
+ 	    clock->is_utc != priv->master->is_utc) {
+@@ -976,7 +973,7 @@ static int clock_handle_leap(struct phc2sys_private *priv, struct clock *clock,
+ 		}
+ 	}
+ 
+-	if (priv->node.utc_offset_traceable &&
++	if (pmc_agent_utc_offset_traceable(priv->node) &&
+ 	    clock->utc_offset_set != clock->sync_offset) {
+ 		if (clock->clkid == CLOCK_REALTIME)
+ 			sysclk_set_tai_offset(clock->sync_offset);
+@@ -1032,11 +1029,13 @@ int main(int argc, char *argv[])
+ {
+ 	char *config = NULL, *dst_name = NULL, *progname, *src_name = NULL;
+ 	char uds_local[MAX_IFNAME_SIZE + 1];
++	int autocfg = 0, c, domain_number = 0, index, ntpshm_segment, offset;
++	int pps_fd = -1, print_level = LOG_INFO, r = -1, rt = 0;
++	int wait_sync = 0;
+ 	struct clock *src, *dst;
+ 	struct config *cfg;
+ 	struct option *opts;
+-	int autocfg = 0, c, domain_number = 0, default_sync = 1, index, ntpshm_segment;
+-	int pps_fd = -1, print_level = LOG_INFO, r = -1, rt = 0, wait_sync = 0;
++	int default_sync = 1;
+ 	double phc_rate, tmp;
+ 	struct phc2sys_private priv = {
+ 		.phc_readings = 5,
+@@ -1049,6 +1048,10 @@ int main(int argc, char *argv[])
+ 	if (!cfg) {
+ 		return -1;
+ 	}
++	priv.node = pmc_agent_create();
++	if (!priv.node) {
++		return -1;
++	}
+ 
+ 	opts = config_long_options(cfg);
+ 
+@@ -1140,9 +1143,10 @@ int main(int argc, char *argv[])
+ 				goto end;
+ 			break;
+ 		case 'O':
+-			if (get_arg_val_i(c, optarg, &priv.node.sync_offset,
+-					  INT_MIN, INT_MAX))
++			if (get_arg_val_i(c, optarg, &offset, INT_MIN, INT_MAX)) {
+ 				goto end;
++			}
++			pmc_agent_set_sync_offset(priv.node, offset);
+ 			priv.forced_sync_offset = -1;
+ 			break;
+ 		case 'L':
+@@ -1271,8 +1275,8 @@ int main(int argc, char *argv[])
+ 		 getpid());
+ 
+ 	if (autocfg) {
+-		if (init_pmc_node(cfg, &priv.node, uds_local,
+-				  phc2sys_recv_subscribed))
++		if (init_pmc_node(cfg, priv.node, uds_local,
++				  phc2sys_recv_subscribed, &priv))
+ 			goto end;
+ 		if (auto_init_ports(&priv, rt) < 0)
+ 			goto end;
+@@ -1309,12 +1313,12 @@ int main(int argc, char *argv[])
+ 	r = -1;
+ 
+ 	if (wait_sync) {
+-		if (init_pmc_node(cfg, &priv.node, uds_local,
+-				  phc2sys_recv_subscribed))
++		if (init_pmc_node(cfg, priv.node, uds_local,
++				  phc2sys_recv_subscribed, &priv))
+ 			goto end;
+ 
+ 		while (is_running()) {
+-			r = run_pmc_wait_sync(&priv.node, 1000);
++			r = run_pmc_wait_sync(priv.node, 1000);
+ 			if (r < 0)
+ 				goto end;
+ 			if (r > 0)
+@@ -1324,7 +1328,7 @@ int main(int argc, char *argv[])
+ 		}
+ 
+ 		if (!priv.forced_sync_offset) {
+-			r = run_pmc_get_utc_offset(&priv.node, 1000);
++			r = run_pmc_get_utc_offset(priv.node, 1000);
+ 			if (r <= 0) {
+ 				pr_err("failed to get UTC offset");
+ 				goto end;
+@@ -1333,8 +1337,10 @@ int main(int argc, char *argv[])
+ 
+ 		if (priv.forced_sync_offset ||
+ 		    (src->clkid != CLOCK_REALTIME && dst->clkid != CLOCK_REALTIME) ||
+-		    src->clkid == CLOCK_INVALID)
+-			close_pmc_node(&priv.node);
++		    src->clkid == CLOCK_INVALID) {
++			pmc_agent_destroy(priv.node);
++			priv.node = NULL;
++		}
+ 	}
+ 
+ 	if (pps_fd >= 0) {
+@@ -1347,7 +1353,9 @@ int main(int argc, char *argv[])
+ 	}
+ 
+ end:
+-	close_pmc_node(&priv.node);
++	if (priv.node) {
++		pmc_agent_destroy(priv.node);
++	}
+ 	clock_cleanup(&priv);
+ 	port_cleanup(&priv);
+ 	config_destroy(cfg);
+diff --git a/pmc_agent.c b/pmc_agent.c
+index e83895c..8ccafe2 100644
+--- a/pmc_agent.c
++++ b/pmc_agent.c
+@@ -19,6 +19,7 @@
+  */
+ #include <net/if.h>
+ #include <poll.h>
++#include <stdlib.h>
+ 
+ #include "notification.h"
+ #include "pmc_agent.h"
+@@ -32,6 +33,22 @@
+  * renewed.
+  */
+ 
++struct pmc_agent {
++	struct pmc *pmc;
++	uint64_t pmc_last_update;
++
++	struct ClockIdentity clock_identity;
++	int clock_identity_set;
++	int leap;
++	int pmc_ds_requested;
++	int sync_offset;
++	int utc_offset_traceable;
++
++	/* Callback on message reception */
++	pmc_node_recv_subscribed_t *recv_subscribed;
++	void *recv_context;
++};
++
+ static void send_subscription(struct pmc_agent *node)
+ {
+ 	struct subscribe_events_np sen;
+@@ -155,7 +172,8 @@ static int run_pmc(struct pmc_agent *node, int timeout, int ds_id,
+ 			node->pmc_ds_requested = 0;
+ 			return -1;
+ 		}
+-		if (res <= 0 || node->recv_subscribed(node, *msg, ds_id) ||
++		if (res <= 0 ||
++		    node->recv_subscribed(node->recv_context, *msg, ds_id) ||
+ 		    get_mgt_id(*msg) != ds_id) {
+ 			msg_put(*msg);
+ 			*msg = NULL;
+@@ -337,7 +355,7 @@ int update_pmc_node(struct pmc_agent *node, int subscribe)
+ }
+ 
+ int init_pmc_node(struct config *cfg, struct pmc_agent *node, const char *uds,
+-		  pmc_node_recv_subscribed_t *recv_subscribed)
++		  pmc_node_recv_subscribed_t *recv_subscribed, void *context)
+ {
+ 	node->pmc = pmc_create(cfg, TRANS_UDS, uds, 0,
+ 			       config_get_int(cfg, NULL, "domainNumber"),
+@@ -347,15 +365,41 @@ int init_pmc_node(struct config *cfg, struct pmc_agent *node, const char *uds,
+ 		return -1;
+ 	}
+ 	node->recv_subscribed = recv_subscribed;
++	node->recv_context = context;
+ 
+ 	return 0;
+ }
+ 
+-void close_pmc_node(struct pmc_agent *node)
++struct pmc_agent *pmc_agent_create(void)
++{
++	struct pmc_agent *agent = calloc(1, sizeof(*agent));
++	return agent;
++}
++
++void pmc_agent_destroy(struct pmc_agent *agent)
++{
++	if (agent->pmc) {
++		pmc_destroy(agent->pmc);
++	}
++	free(agent);
++}
++
++int pmc_agent_get_leap(struct pmc_agent *agent)
+ {
+-	if (!node->pmc)
+-		return;
++	return agent->leap;
++}
++
++int pmc_agent_get_sync_offset(struct pmc_agent *agent)
++{
++	return agent->sync_offset;
++}
+ 
+-	pmc_destroy(node->pmc);
+-	node->pmc = NULL;
++void pmc_agent_set_sync_offset(struct pmc_agent *agent, int offset)
++{
++	agent->sync_offset = offset;
++}
++
++bool pmc_agent_utc_offset_traceable(struct pmc_agent *agent)
++{
++	return agent->utc_offset_traceable;
+ }
+diff --git a/pmc_agent.h b/pmc_agent.h
+index 10ef4b5..c0b4525 100644
+--- a/pmc_agent.h
++++ b/pmc_agent.h
+@@ -22,29 +22,17 @@
+ #ifndef HAVE_PMC_AGENT_H
+ #define HAVE_PMC_AGENT_H
+ 
++#include <stdbool.h>
++
+ #include "pmc_common.h"
+ 
+ struct pmc_agent;
+ 
+-typedef int pmc_node_recv_subscribed_t(struct pmc_agent *agent,
+-				       struct ptp_message *msg,
++typedef int pmc_node_recv_subscribed_t(void *context, struct ptp_message *msg,
+ 				       int excluded);
+ 
+-struct pmc_agent {
+-	struct pmc *pmc;
+-	int pmc_ds_requested;
+-	uint64_t pmc_last_update;
+-	int sync_offset;
+-	int leap;
+-	int utc_offset_traceable;
+-	int clock_identity_set;
+-	struct ClockIdentity clock_identity;
+-	pmc_node_recv_subscribed_t *recv_subscribed;
+-};
+-
+ int init_pmc_node(struct config *cfg, struct pmc_agent *agent, const char *uds,
+-		  pmc_node_recv_subscribed_t *recv_subscribed);
+-void close_pmc_node(struct pmc_agent *agent);
++		  pmc_node_recv_subscribed_t *recv_subscribed, void *context);
+ int update_pmc_node(struct pmc_agent *agent, int subscribe);
+ int run_pmc_subscribe(struct pmc_agent *agent, int timeout);
+ int run_pmc_clock_identity(struct pmc_agent *agent, int timeout);
+@@ -58,5 +46,45 @@ int run_pmc_get_utc_offset(struct pmc_agent *agent, int timeout);
+ int get_mgt_id(struct ptp_message *msg);
+ void *get_mgt_data(struct ptp_message *msg);
+ 
+-#endif
+ 
++/**
++ * Creates an instance of a PMC agent.
++ * @return  Pointer to a PMC instance on success, NULL otherwise.
++ */
++struct pmc_agent *pmc_agent_create(void);
++
++/**
++ * Destroys an instance of a PMC agent.
++ * @param agent  Pointer to a PMC instance obtained via @ref pmc_agent_create().
++ */
++void pmc_agent_destroy(struct pmc_agent *agent);
++
++/**
++ * Gets the current leap adjustment.
++ * @param agent  Pointer to a PMC instance obtained via @ref pmc_agent_create().
++ * @return       The leap adjustment in seconds, either 1, 0, or -1.
++ */
++int pmc_agent_get_leap(struct pmc_agent *agent);
++
++/**
++ * Gets the TAI-UTC offset.
++ * @param agent  Pointer to a PMC instance obtained via @ref pmc_agent_create().
++ * @return       Current offset in seconds.
++ */
++int pmc_agent_get_sync_offset(struct pmc_agent *agent);
++
++/**
++ * Sets the TAI-UTC offset.
++ * @param agent  Pointer to a PMC instance obtained via @ref pmc_agent_create().
++ * @param offset Desired offset in seconds.
++ */
++void pmc_agent_set_sync_offset(struct pmc_agent *agent, int offset);
++
++/**
++ * Tests whether the current UTC offset is traceable.
++ * @param agent  Pointer to a PMC instance obtained via @ref pmc_agent_create().
++ * @return       True is the offset is traceable, false otherwise.
++ */
++bool pmc_agent_utc_offset_traceable(struct pmc_agent *agent);
++
++#endif
+-- 
+2.25.1
+

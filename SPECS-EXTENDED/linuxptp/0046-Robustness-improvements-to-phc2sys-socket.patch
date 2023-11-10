@@ -1,0 +1,78 @@
+From f480fb54182da36baeb35bac90154abafcaf854a Mon Sep 17 00:00:00 2001
+From: Andre Mauricio Zelak <andre.zelak@windriver.com>
+Date: Tue, 8 Aug 2023 14:06:55 -0300
+Subject: [PATCH 46/47] Robustness improvements to phc2sys socket
+
+When phc2sys abnormally exits the socket file might remain created.
+To avoid error when phc2sys is relaunched, the exixting file is
+deleted before recriating the socket.
+
+If the peer application closes the socket before sending the
+response completely, it will cause a broken pipe error. The
+send function generates a SIGPIPE on broken pipe errors,
+killing the phc2sys process unless MSG_NOSIGNAL flag is set.
+
+Test plan: socket file
+PASS: Verify that phc2sys can restart normally after killing it.
+
+Test plan: SIGPIPE
+PASS: Verify the phc2sys application don't exit when client socket
+is closed before the respose is sent.
+
+Reviewed-by: Cole Walker <cole.walker@windriver.com>
+Reviewed-by: Andre Fernando Zanella Kantek
+<andrefernandozanella.kantek@windriver.com>
+
+[commit 8b3765b3f104a90a487fbcb0f61074c7677c215e upstream]
+[commit 50ad1c6f81a706b8be6689bea2ba2db215cf3dc3 upstream]
+
+Signed-off-by: Andre Mauricio Zelak <andre.zelak@windriver.com>
+---
+ phc2sys.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/phc2sys.c b/phc2sys.c
+index 6965162..edc626f 100644
+--- a/phc2sys.c
++++ b/phc2sys.c
+@@ -1218,7 +1218,9 @@ static int ha_com_socket_open(int *fd_out, struct config *cfg)
+ 	int fd, err;
+ 	struct sockaddr_un sa;
+ 	const int backlog = 50;
+-	const char *name = config_get_string(cfg, NULL, "ha_phc2sys_com_socket");
++	const char *path = config_get_string(cfg, NULL, "ha_phc2sys_com_socket");
++
++	unlink(path);
+ 
+ 	fd = socket(AF_LOCAL, SOCK_STREAM | SOCK_NONBLOCK, 0);
+ 	if (fd < 0) {
+@@ -1228,7 +1230,7 @@ static int ha_com_socket_open(int *fd_out, struct config *cfg)
+ 
+ 	memset(&sa, 0, sizeof(sa));
+ 	sa.sun_family = AF_LOCAL;
+-	strncpy(sa.sun_path, name, sizeof(sa.sun_path) - 1);
++	strncpy(sa.sun_path, path, sizeof(sa.sun_path) - 1);
+ 
+ 	err = bind(fd, (struct sockaddr *) &sa, sizeof(sa));
+ 	if (err < 0) {
+@@ -1245,7 +1247,7 @@ static int ha_com_socket_open(int *fd_out, struct config *cfg)
+ 	}
+ 
+ 	*fd_out = fd;
+-	chmod(name, HA_SCK_FILEMODE);
++	chmod(path, HA_SCK_FILEMODE);
+ 
+ 	return 0;
+ }
+@@ -1269,7 +1271,7 @@ static int ha_com_socket_send(int fd, void *buf, size_t buflen)
+ {
+ 	int cnt;
+ 
+-	cnt = send(fd, buf, buflen, 0);
++	cnt = send(fd, buf, buflen, MSG_NOSIGNAL);
+ 	if (cnt < 0) {
+ 		pr_err("ha_com_socket: send failed: %m");
+ 		return -errno;
+-- 
+2.25.1
+
