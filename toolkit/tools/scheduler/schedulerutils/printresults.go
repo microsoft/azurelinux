@@ -23,15 +23,15 @@ const (
 	colorBlue  = "\033[34m"
 )
 
-func printInRed (inputString string) string {
+func printInRed(inputString string) string {
 	return colorRed + inputString + colorReset
 }
 
-func printInGreen (inputString string) string {
+func printInGreen(inputString string) string {
 	return colorGreen + inputString + colorReset
 }
 
-func printInBlue (inputString string) string {
+func printInBlue(inputString string) string {
 	return colorBlue + inputString + colorReset
 }
 
