@@ -13111,8 +13111,8 @@
         "type": "other",
         "other": {
           "name": "memcached",
-          "version": "1.6.13",
-          "downloadUrl": "https://www.memcached.org/files/memcached-1.6.13.tar.gz"
+          "version": "1.6.22",
+          "downloadUrl": "https://www.memcached.org/files/memcached-1.6.22.tar.gz"
         }
       }
     },
