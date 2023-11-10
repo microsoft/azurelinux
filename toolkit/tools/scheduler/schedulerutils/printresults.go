@@ -35,7 +35,6 @@ func printInBlue(inputString string) string {
 	return colorBlue + inputString + colorReset
 }
 
-
 // PrintBuildResult prints a build result to the logger.
 func PrintBuildResult(res *BuildResult) {
 	baseSRPMName := res.Node.SRPMFileName()
