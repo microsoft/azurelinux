@@ -59,15 +59,13 @@ func PackageVerMatch(expected, given interface{}) bool {
 	return reflect.DeepEqual(expected.(*pkgjson.PackageVer), given.(*pkgjson.PackageVer))
 }
 
-// SetToSlice converts a map[T]bool to a slice containing the map's keys.
-func SetToSlice[T comparable](inputSet map[T]bool) []T {
+// SetToSlice converts a map[T]V to a slice containing the map's keys.
+func SetToSlice[T comparable, V comparable](inputSet map[T]V) []T {
 	index := 0
 	outputSlice := make([]T, len(inputSet))
-	for element, elementInSet := range inputSet {
-		if elementInSet {
+	for element := range inputSet {
 			outputSlice[index] = element
 			index++
-		}
 	}
 	return outputSlice[:index]
 }
