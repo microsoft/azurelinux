@@ -918,7 +918,21 @@ func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir st
 		failureBackoffBase    = 2.0
 		downloadRetryDuration = time.Second
 	)
-	var errPackerCancelReceived = fmt.Errorf("packer cancel signal received")
+	errOther := fmt.Errorf("hydrating from remote source failed. See earlier errors for details")
+	errPackerCancelReceived := fmt.Errorf("packer cancel signal received")
+
+	// Making sure we remove the hydrated file in case of signature validation failure.
+	filesToRemove := []string{}
+	defer func() {
+		if err != nil {
+			for _, fileToRemove := range filesToRemove {
+				removeErr := os.Remove(fileToRemove)
+				if removeErr != nil {
+					logger.Log.Errorf("Failed to delete file (%s) after signature validation failure. Error: %s", fileToRemove, removeErr)
+				}
+			}
+		}
+	}()
 
 	for fileName, alreadyHydrated := range fileHydrationState {
 		if alreadyHydrated {
@@ -941,11 +955,10 @@ func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir st
 			}
 		}
 
-		cancelled := false
-		cancelled, err = retry.RunWithExpBackoff(func() error {
+		cancelled, internalErr := retry.RunWithExpBackoff(func() error {
 			err := network.DownloadFile(url, destinationFile, srcConfig.caCerts, srcConfig.tlsCerts)
 			if err != nil {
-				logger.Log.Warnf("Failed to download (%s). Error: %s", url, err)
+				logger.Log.Debugf("Failed an attempt to download (%s). Error: %s", url, err)
 			}
 
 			return err
@@ -956,28 +969,24 @@ func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir st
 			<-netOpsSemaphore
 		}
 
+		// We may intentionally fail early due to a cancellation signal, stop immediately if that is the case.
 		if cancelled {
 			err = errPackerCancelReceived
 			return
 		}
 
-		if err != nil {
-			// We may intentionally fail early due to a cancellation signal, stop immediately if that is the case.
+		if internalErr != nil {
+			logger.Log.Errorf("Failed to download (%s). Error: %s", url, internalErr)
+			err = errOther
 			continue
 		}
 
 		if !skipSignatureHandling {
-			err = validateSignature(destinationFile, srcConfig, currentSignatures)
-			if err != nil {
-				logger.Log.Warn(err.Error())
-
-				// If the delete fails, just warn as there will be another cleanup
-				// attempt when exiting the program.
-				err = os.Remove(destinationFile)
-				if err != nil {
-					logger.Log.Warnf("Failed to delete file (%s). Error: %s", destinationFile, err)
-				}
-
+			internalErr = validateSignature(destinationFile, srcConfig, currentSignatures)
+			if internalErr != nil {
+				logger.Log.Errorf("Signature validation for (%s) failed. Error: %s.", destinationFile, internalErr)
+				filesToRemove = append(filesToRemove, destinationFile)
+				err = errOther
 				continue
 			}
 		}
@@ -986,7 +995,7 @@ func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir st
 		logger.Log.Debugf("Hydrated (%s) from (%s)", fileName, url)
 	}
 
-	return nil
+	return
 }
 
 // validateSignature will compare the SHA256 of the file at path against the signature for it in srcConfig.signatureLookup
