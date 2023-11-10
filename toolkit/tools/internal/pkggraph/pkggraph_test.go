@@ -815,7 +815,7 @@ func TestGoalWithNodes(t *testing.T) {
 		getRealNodeFromGraphHelper(t, g, pkgBRun),
 	}
 
-	goal, err := g.AddGoalNodeFromNodes("test", nodeList, 0)
+	goal, err := g.AddGoalNodeToNodes("test", nodeList, 0)
 	assert.NoError(t, err)
 	assert.NotNil(t, goal)
 	assert.Equal(t, len(allNodes)+1, len(g.AllNodes()))
@@ -830,7 +830,7 @@ func TestDuplicateGoalWithNodes(t *testing.T) {
 	assert.NotNil(t, goal)
 	assert.Equal(t, "test", goal.GoalName)
 
-	_, err = g.AddGoalNodeFromNodes("test", nil, 0)
+	_, err = g.AddGoalNodeToNodes("test", nil, 0)
 	assert.Error(t, err)
 }
 
@@ -842,7 +842,7 @@ func TestGoalWithNodeOutsideGraph(t *testing.T) {
 
 	nodeList := []*PkgNode{pkgARun, pkgBRun}
 
-	goal, err := g.AddGoalNodeFromNodes("test", nodeList, 0)
+	goal, err := g.AddGoalNodeToNodes("test", nodeList, 0)
 	assert.Error(t, err)
 	assert.Nil(t, goal)
 }
@@ -940,7 +940,7 @@ func TestGoalWithNodesWithLevelTwo(t *testing.T) {
 	assert.NotNil(t, g)
 
 	goalNode := getRealNodeFromGraphHelper(t, g, pkgCRun)
-	goal, err := g.AddGoalNodeFromNodes("test_2", []*PkgNode{goalNode}, 2)
+	goal, err := g.AddGoalNodeToNodes("test_2", []*PkgNode{goalNode}, 2)
 	assert.NoError(t, err)
 	assert.NotNil(t, goal)
 	nodesInGoal := []*PkgNode{}

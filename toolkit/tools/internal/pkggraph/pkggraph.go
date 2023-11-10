@@ -1147,8 +1147,8 @@ func (g *PkgGraph) AddGoalNodeWithExtraLayers(goalName string, packages, tests [
 	return
 }
 
-// AddGoalNodeFromNodes adds a goal node to the graph which links to a list of existing nodes.
-func (g *PkgGraph) AddGoalNodeFromNodes(goalName string, existingNodes []*PkgNode, extraLayers int) (goalNode *PkgNode, err error) {
+// AddGoalNodeToNodes adds a goal node to the graph which links to a list of existing nodes.
+func (g *PkgGraph) AddGoalNodeToNodes(goalName string, existingNodes []*PkgNode, extraLayers int) (goalNode *PkgNode, err error) {
 	// Check if we already have a goal node with the requested name
 	if g.FindGoalNode(goalName) != nil {
 		err = fmt.Errorf("can't have two goal nodes named %s", goalName)
