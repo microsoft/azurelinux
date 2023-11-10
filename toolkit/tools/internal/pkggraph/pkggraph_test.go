@@ -310,6 +310,8 @@ func getRealNodeFromGraphHelper(t *testing.T, g *PkgGraph, n *PkgNode) (realN *P
 	case TypeTest:
 		realN = realNode.TestNode
 	case TypeLocalRun:
+		fallthrough
+	case TypeRemoteRun:
 		realN = realNode.RunNode
 	default:
 		assert.Fail(t, "Unknown node type")
