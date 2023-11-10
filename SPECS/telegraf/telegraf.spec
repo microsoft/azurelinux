@@ -10,7 +10,7 @@ URL:            https://github.com/influxdata/telegraf
 Source0:        %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Use the generate_source_tarbbal.sh script to get the vendored sources.
 Source1:        %{name}-%{version}-vendor.tar.gz
-Patch0:         add-extra-metrics.patch
+Patch0:         CVE-2023-46129.patch
 BuildRequires:  golang
 BuildRequires:  systemd-devel
 Requires:       logrotate
