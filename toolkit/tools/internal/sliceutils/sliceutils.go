@@ -64,8 +64,8 @@ func SetToSlice[T comparable, V comparable](inputSet map[T]V) []T {
 	index := 0
 	outputSlice := make([]T, len(inputSet))
 	for element := range inputSet {
-			outputSlice[index] = element
-			index++
+		outputSlice[index] = element
+		index++
 	}
 	return outputSlice[:index]
 }
