@@ -74,6 +74,10 @@ parameters:
     type: string
     default: "TESTS"
 
+  - name: maxCPU
+    type: string
+    default: ""
+
   - name: pipArtifactFeeds
     type: string
     default: ""
@@ -187,6 +191,7 @@ steps:
       sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
         CONCURRENT_PACKAGE_BUILDS=${{ parameters.concurrentPackageBuilds }} \
         CONFIG_FILE="" \
+        MAX_CPU="${{ parameters.maxCPU }}" \
         REBUILD_TOOLS=y \
         REPO_LIST="${{ parameters.extraPackageRepos }}" \
         SPECS_DIR="${{ parameters.buildRepoRoot }}/${{ parameters.specsFolderPath }}" \
