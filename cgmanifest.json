@@ -13713,8 +13713,8 @@
         "type": "other",
         "other": {
           "name": "multus",
-          "version": "3.8",
-          "downloadUrl": "https://github.com/k8snetworkplumbingwg/multus-cni/archive/refs/tags/v3.8.tar.gz"
+          "version": "4.0.2",
+          "downloadUrl": "https://github.com/k8snetworkplumbingwg/multus-cni/archive/refs/tags/v4.0.2.tar.gz"
         }
       }
     },
