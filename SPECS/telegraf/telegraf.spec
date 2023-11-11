@@ -15,10 +15,6 @@ Patch0:         CVE-2023-46129.patch
 BuildRequires:  golang
 BuildRequires:  systemd-devel
 
-%if %{with_check}
-BuildRequires:  git
-%endif
-
 Requires:       logrotate
 Requires:       procps-ng
 Requires:       shadow-utils
