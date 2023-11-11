@@ -925,6 +925,7 @@ func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir st
 	defer func() {
 		if err != nil {
 			for _, fileToRemove := range filesToRemove {
+				logger.Log.Debugf("Removing file (%s) after signature validation failure.", fileToRemove)
 				removeErr := os.Remove(fileToRemove)
 				if removeErr != nil {
 					logger.Log.Errorf("Failed to delete file (%s) after signature validation failure. Error: %s", fileToRemove, removeErr)
