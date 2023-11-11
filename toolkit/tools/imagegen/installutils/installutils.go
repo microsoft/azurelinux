@@ -789,7 +789,23 @@ func updateInitramfsForEncrypt(installChroot *safechroot.Chroot) (err error) {
 	return
 }
 
-func UpdateFstab(installRoot string, partitionSettings []configuration.PartitionSetting, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string, hidepidEnabled bool) (err error) {
+func UpdateFstab(installRoot string, partitionSettings []configuration.PartitionSetting, installMap,
+	mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string,
+	hidepidEnabled bool,
+) (err error) {
+	const fstabPath = "/etc/fstab"
+
+	fullFstabPath := filepath.Join(installRoot, fstabPath)
+
+	return UpdateFstabFile(fullFstabPath, partitionSettings, installMap,
+		mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap,
+		hidepidEnabled)
+}
+
+func UpdateFstabFile(fullFstabPath string, partitionSettings []configuration.PartitionSetting, installMap,
+	mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string,
+	hidepidEnabled bool,
+) (err error) {
 	const (
 		doPseudoFsMount = true
 	)
@@ -802,7 +818,7 @@ func UpdateFstab(installRoot string, partitionSettings []configuration.Partition
 				err = fmt.Errorf("unable to find PartitionSetting for '%s", mountPoint)
 				return
 			}
-			err = addEntryToFstab(installRoot, mountPoint, devicePath, mountPointToFsTypeMap[mountPoint], mountPointToMountArgsMap[mountPoint], partSetting.MountIdentifier, !doPseudoFsMount)
+			err = addEntryToFstab(fullFstabPath, mountPoint, devicePath, mountPointToFsTypeMap[mountPoint], mountPointToMountArgsMap[mountPoint], partSetting.MountIdentifier, !doPseudoFsMount)
 			if err != nil {
 				return
 			}
@@ -810,7 +826,7 @@ func UpdateFstab(installRoot string, partitionSettings []configuration.Partition
 	}
 
 	if hidepidEnabled {
-		err = addEntryToFstab(installRoot, "/proc", "proc", "proc", "rw,nosuid,nodev,noexec,relatime,hidepid=2", configuration.MountIdentifierNone, doPseudoFsMount)
+		err = addEntryToFstab(fullFstabPath, "/proc", "proc", "proc", "rw,nosuid,nodev,noexec,relatime,hidepid=2", configuration.MountIdentifierNone, doPseudoFsMount)
 		if err != nil {
 			return
 		}
@@ -821,7 +837,7 @@ func UpdateFstab(installRoot string, partitionSettings []configuration.Partition
 		if fstype == "linux-swap" {
 			swapPartitionPath, exists := partIDToDevPathMap[partID]
 			if exists {
-				err = addEntryToFstab(installRoot, "none", swapPartitionPath, "swap", "", "", doPseudoFsMount)
+				err = addEntryToFstab(fullFstabPath, "none", swapPartitionPath, "swap", "", "", doPseudoFsMount)
 				if err != nil {
 					return
 				}
@@ -832,9 +848,8 @@ func UpdateFstab(installRoot string, partitionSettings []configuration.Partition
 	return
 }
 
-func addEntryToFstab(installRoot, mountPoint, devicePath, fsType, mountArgs string, identifierType configuration.MountIdentifier, doPseudoFsMount bool) (err error) {
+func addEntryToFstab(fullFstabPath, mountPoint, devicePath, fsType, mountArgs string, identifierType configuration.MountIdentifier, doPseudoFsMount bool) (err error) {
 	const (
-		fstabPath        = "/etc/fstab"
 		rootfsMountPoint = "/"
 		defaultOptions   = "defaults"
 		swapFsType       = "swap"
@@ -860,8 +875,6 @@ func addEntryToFstab(installRoot, mountPoint, devicePath, fsType, mountArgs stri
 	if fsType == swapFsType {
 		options = swapOptions
 	}
-
-	fullFstabPath := filepath.Join(installRoot, fstabPath)
 
 	// Get the block device
 	var device string
