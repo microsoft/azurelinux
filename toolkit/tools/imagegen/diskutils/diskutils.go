@@ -217,17 +217,14 @@ func ApplyRawBinary(diskDevPath string, rawBinary configuration.RawBinary) (err 
 
 // CreateEmptyDisk creates an empty raw disk in the given working directory as described in disk configuration
 func CreateEmptyDisk(workDirPath, diskName string, maxSize uint64) (diskFilePath string, err error) {
-	const (
-		defautBlockSize = MiB
-	)
 	diskFilePath = filepath.Join(workDirPath, diskName)
 
-	err = CreateSparseDisk(diskFilePath, defautBlockSize, maxSize, 0o644)
+	err = CreateSparseDisk(diskFilePath, maxSize, 0o644)
 	return
 }
 
 // CreateSparseDisk creates an empty sparse disk file.
-func CreateSparseDisk(diskPath string, blockSize, size uint64, perm os.FileMode) (err error) {
+func CreateSparseDisk(diskPath string, size uint64, perm os.FileMode) (err error) {
 	// Open and truncate the file.
 	file, err := os.OpenFile(diskPath, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, perm)
 	if err != nil {
