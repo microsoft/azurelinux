@@ -22,6 +22,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repocloner"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/resources"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
@@ -789,7 +790,23 @@ func updateInitramfsForEncrypt(installChroot *safechroot.Chroot) (err error) {
 	return
 }
 
-func UpdateFstab(installRoot string, partitionSettings []configuration.PartitionSetting, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string, hidepidEnabled bool) (err error) {
+func UpdateFstab(installRoot string, partitionSettings []configuration.PartitionSetting, installMap,
+	mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string,
+	hidepidEnabled bool,
+) (err error) {
+	const fstabPath = "/etc/fstab"
+
+	fullFstabPath := filepath.Join(installRoot, fstabPath)
+
+	return UpdateFstabFile(fullFstabPath, partitionSettings, installMap,
+		mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap,
+		hidepidEnabled)
+}
+
+func UpdateFstabFile(fullFstabPath string, partitionSettings []configuration.PartitionSetting, installMap,
+	mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string,
+	hidepidEnabled bool,
+) (err error) {
 	const (
 		doPseudoFsMount = true
 	)
@@ -802,7 +819,7 @@ func UpdateFstab(installRoot string, partitionSettings []configuration.Partition
 				err = fmt.Errorf("unable to find PartitionSetting for '%s", mountPoint)
 				return
 			}
-			err = addEntryToFstab(installRoot, mountPoint, devicePath, mountPointToFsTypeMap[mountPoint], mountPointToMountArgsMap[mountPoint], partSetting.MountIdentifier, !doPseudoFsMount)
+			err = addEntryToFstab(fullFstabPath, mountPoint, devicePath, mountPointToFsTypeMap[mountPoint], mountPointToMountArgsMap[mountPoint], partSetting.MountIdentifier, !doPseudoFsMount)
 			if err != nil {
 				return
 			}
@@ -810,7 +827,7 @@ func UpdateFstab(installRoot string, partitionSettings []configuration.Partition
 	}
 
 	if hidepidEnabled {
-		err = addEntryToFstab(installRoot, "/proc", "proc", "proc", "rw,nosuid,nodev,noexec,relatime,hidepid=2", configuration.MountIdentifierNone, doPseudoFsMount)
+		err = addEntryToFstab(fullFstabPath, "/proc", "proc", "proc", "rw,nosuid,nodev,noexec,relatime,hidepid=2", configuration.MountIdentifierNone, doPseudoFsMount)
 		if err != nil {
 			return
 		}
@@ -821,7 +838,7 @@ func UpdateFstab(installRoot string, partitionSettings []configuration.Partition
 		if fstype == "linux-swap" {
 			swapPartitionPath, exists := partIDToDevPathMap[partID]
 			if exists {
-				err = addEntryToFstab(installRoot, "none", swapPartitionPath, "swap", "", "", doPseudoFsMount)
+				err = addEntryToFstab(fullFstabPath, "none", swapPartitionPath, "swap", "", "", doPseudoFsMount)
 				if err != nil {
 					return
 				}
@@ -832,9 +849,8 @@ func UpdateFstab(installRoot string, partitionSettings []configuration.Partition
 	return
 }
 
-func addEntryToFstab(installRoot, mountPoint, devicePath, fsType, mountArgs string, identifierType configuration.MountIdentifier, doPseudoFsMount bool) (err error) {
+func addEntryToFstab(fullFstabPath, mountPoint, devicePath, fsType, mountArgs string, identifierType configuration.MountIdentifier, doPseudoFsMount bool) (err error) {
 	const (
-		fstabPath        = "/etc/fstab"
 		rootfsMountPoint = "/"
 		defaultOptions   = "defaults"
 		swapFsType       = "swap"
@@ -860,8 +876,6 @@ func addEntryToFstab(installRoot, mountPoint, devicePath, fsType, mountArgs stri
 	if fsType == swapFsType {
 		options = swapOptions
 	}
-
-	fullFstabPath := filepath.Join(installRoot, fstabPath)
 
 	// Get the block device
 	var device string
@@ -934,14 +948,14 @@ func addEntryToCrypttab(installRoot string, devicePath string, encryptedRoot dis
 }
 
 // InstallGrubEnv installs an empty grubenv f
-func InstallGrubEnv(installRoot, assetsDir string) (err error) {
+func InstallGrubEnv(installRoot string) (err error) {
 	const (
-		assetGrubEnvFile = "grub2/grubenv"
+		assetGrubEnvFile = "assets/grub2/grubenv"
 		grubEnvFile      = "boot/grub2/grubenv"
 	)
-	assetGrubEnvFileFullPath := filepath.Join(assetsDir, assetGrubEnvFile)
 	installGrubEnvFile := filepath.Join(installRoot, grubEnvFile)
-	err = file.CopyAndChangeMode(assetGrubEnvFileFullPath, installGrubEnvFile, bootDirectoryDirMode, bootDirectoryFileMode)
+	err = file.CopyResourceFile(resources.ResourcesFS, assetGrubEnvFile, installGrubEnvFile, bootDirectoryDirMode,
+		bootDirectoryFileMode)
 	if err != nil {
 		logger.Log.Warnf("Failed to copy and change mode of grubenv: %v", err)
 		return
@@ -961,26 +975,26 @@ func InstallGrubEnv(installRoot, assetsDir string) (err error) {
 // - isBootPartitionSeparate is a boolean value which is true if the /boot partition is separate from the root partition
 // Note: this boot partition could be different than the boot partition specified in the bootloader.
 // This boot partition specifically indicates where to find the kernel, config files, and initrd
-func InstallGrubCfg(installRoot, rootDevice, bootUUID, bootPrefix, assetsDir string, encryptedRoot diskutils.EncryptedRootDevice, kernelCommandLine configuration.KernelCommandLine, readOnlyRoot diskutils.VerityDevice, isBootPartitionSeparate bool) (err error) {
+func InstallGrubCfg(installRoot, rootDevice, bootUUID, bootPrefix string, encryptedRoot diskutils.EncryptedRootDevice, kernelCommandLine configuration.KernelCommandLine, readOnlyRoot diskutils.VerityDevice, isBootPartitionSeparate bool) (err error) {
 	const (
-		assetGrubcfgFile = "grub2/grub.cfg"
+		assetGrubcfgFile = "assets/grub2/grub.cfg"
 		grubCfgFile      = "boot/grub2/grub.cfg"
-		assetGrubDefFile = "grub2/grub"
+		assetGrubDefFile = "assets/grub2/grub"
 		grubDefFile      = "etc/default/grub"
 	)
 
 	// Copy the bootloader's grub.cfg and set the file permission
-	assetGrubcfgFileFullPath := filepath.Join(assetsDir, assetGrubcfgFile)
 	installGrubCfgFile := filepath.Join(installRoot, grubCfgFile)
 
-	assetGrubDefFileFullPath := filepath.Join(assetsDir, assetGrubDefFile)
 	installGrubDefFile := filepath.Join(installRoot, grubDefFile)
 
-	err = file.CopyAndChangeMode(assetGrubcfgFileFullPath, installGrubCfgFile, bootDirectoryDirMode, bootDirectoryFileMode)
+	err = file.CopyResourceFile(resources.ResourcesFS, assetGrubcfgFile, installGrubCfgFile, bootDirectoryDirMode,
+		bootDirectoryFileMode)
 	if err != nil {
 		return
 	}
-	err = file.CopyAndChangeMode(assetGrubDefFileFullPath, installGrubDefFile, bootDirectoryDirMode, bootDirectoryFileMode)
+	err = file.CopyResourceFile(resources.ResourcesFS, assetGrubDefFile, installGrubDefFile, bootDirectoryDirMode,
+		bootDirectoryFileMode)
 	if err != nil {
 		return
 	}
@@ -1618,7 +1632,9 @@ func getPackagesFromJSON(file string) (pkgList PackageList, err error) {
 // - bootUUID is the UUID of the boot partition
 // Note: this boot partition could be different than the boot partition specified in the main grub config.
 // This boot partition specifically indicates where to find the main grub cfg
-func InstallBootloader(installChroot *safechroot.Chroot, encryptEnabled bool, bootType, bootUUID, bootPrefix, bootDevPath, assetsDir string) (err error) {
+func InstallBootloader(installChroot *safechroot.Chroot, encryptEnabled bool, bootType, bootUUID, bootPrefix,
+	bootDevPath string,
+) (err error) {
 	const (
 		efiMountPoint  = "/boot/efi"
 		efiBootType    = "efi"
@@ -1636,7 +1652,7 @@ func InstallBootloader(installChroot *safechroot.Chroot, encryptEnabled bool, bo
 		}
 	case efiBootType:
 		efiPath := filepath.Join(installChroot.RootDir(), efiMountPoint)
-		err = installEfiBootloader(encryptEnabled, efiPath, bootUUID, bootPrefix, assetsDir)
+		err = installEfiBootloader(encryptEnabled, efiPath, bootUUID, bootPrefix)
 		if err != nil {
 			return
 		}
@@ -1771,21 +1787,22 @@ func enableCryptoDisk() (err error) {
 // installRoot/boot/efi folder
 // It is expected that shim (bootx64.efi) and grub2 (grub2.efi) are installed
 // into the EFI directory via the package list installation mechanism.
-func installEfiBootloader(encryptEnabled bool, installRoot, bootUUID, bootPrefix, assetsDir string) (err error) {
+func installEfiBootloader(encryptEnabled bool, installRoot, bootUUID, bootPrefix string) (err error) {
 	const (
 		defaultCfgFilename = "grub.cfg"
 		encryptCfgFilename = "grubEncrypt.cfg"
-		grubAssetDir       = "efi/grub"
+		grubAssetDir       = "assets/efi/grub"
 		grubFinalDir       = "boot/grub2"
 	)
 
 	// Copy the bootloader's grub.cfg
-	grubAssetPath := filepath.Join(assetsDir, grubAssetDir, defaultCfgFilename)
+	grubAssetPath := filepath.Join(grubAssetDir, defaultCfgFilename)
 	if encryptEnabled {
-		grubAssetPath = filepath.Join(assetsDir, grubAssetDir, encryptCfgFilename)
+		grubAssetPath = filepath.Join(grubAssetDir, encryptCfgFilename)
 	}
 	grubFinalPath := filepath.Join(installRoot, grubFinalDir, defaultCfgFilename)
-	err = file.CopyAndChangeMode(grubAssetPath, grubFinalPath, bootDirectoryDirMode, bootDirectoryFileMode)
+	err = file.CopyResourceFile(resources.ResourcesFS, grubAssetPath, grubFinalPath, bootDirectoryDirMode,
+		bootDirectoryFileMode)
 	if err != nil {
 		logger.Log.Warnf("Failed to copy grub.cfg: %v", err)
 		return

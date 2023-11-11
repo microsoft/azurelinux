@@ -3,7 +3,7 @@
 Summary:        Routing daemon
 Name:           frr
 Version:        8.5.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,6 +16,8 @@ Patch1:         0001-enable-openssl.patch
 Patch2:         0002-disable-eigrp-crypto.patch
 Patch3:         0003-fips-mode.patch
 Patch4:         0004-remove-grpc-test.patch
+Patch5:         CVE-2023-46752.patch
+Patch6:         CVE-2023-46753.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  bison
@@ -197,6 +199,9 @@ rm tests/lib/*grpc*
 %{_sysusersdir}/%{name}.conf
 
 %changelog
+* Mon Nov 06 2023 Rachel Menge <rachelmenge@microsoft.com> - 8.5.3-3
+- Patch CVE-2023-46752 and CVE-2023-46753
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 8.5.3-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

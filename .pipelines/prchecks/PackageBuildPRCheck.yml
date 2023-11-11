@@ -34,6 +34,8 @@ variables:
     value: RPMs
   - name: toolchainArtifactNameBase
     value: Toolchain
+  - name: system.debug
+    value: 'true'
 
 extends:
   template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates
