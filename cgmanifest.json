@@ -1507,8 +1507,8 @@
         "type": "other",
         "other": {
           "name": "ccache",
-          "version": "4.8",
-          "downloadUrl": "https://github.com/ccache/ccache/releases/download/v4.8/ccache-4.8.tar.gz"
+          "version": "4.8.3",
+          "downloadUrl": "https://github.com/ccache/ccache/releases/download/v4.8.3/ccache-4.8.3.tar.gz"
         }
       }
     },
@@ -9481,8 +9481,8 @@
         "type": "other",
         "other": {
           "name": "libgpg-error",
-          "version": "1.46",
-          "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.46.tar.bz2"
+          "version": "1.47",
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.47.tar.bz2"
         }
       }
     },
@@ -27867,8 +27867,8 @@
         "type": "other",
         "other": {
           "name": "sqlite",
-          "version": "3.39.2",
-          "downloadUrl": "https://www.sqlite.org/2022/sqlite-autoconf-3390200.tar.gz"
+          "version": "3.44.0",
+          "downloadUrl": "https://www.sqlite.org/2023/sqlite-autoconf-3440000.tar.gz"
         }
       }
     },
@@ -30600,8 +30600,8 @@
         "type": "other",
         "other": {
           "name": "zeromq",
-          "version": "4.3.4",
-          "downloadUrl": "https://github.com/zeromq/libzmq/releases/download/v4.3.4/zeromq-4.3.4.tar.gz"
+          "version": "4.3.5",
+          "downloadUrl": "https://github.com/zeromq/libzmq/releases/download/v4.3.5/zeromq-4.3.5.tar.gz"
         }
       }
     },
