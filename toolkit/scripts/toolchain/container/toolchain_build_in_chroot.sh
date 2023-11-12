@@ -8,6 +8,7 @@
 
 set -x
 
+touch /logs/status_start_toolchain_build_in_chroot
 echo Calling script to create files:
 
 sh /tools/toolchain_initial_chroot_setup.sh
@@ -377,15 +378,15 @@ case $(uname -m) in
 esac
 mkdir -v build
 cd       build
+LD=ld \
 ../configure --prefix=/usr            \
-             LD=ld                    \
-             --enable-languages=c,c++ \
+             --enable-languages=c,c++,fortran \
              --enable-default-pie     \
              --enable-default-ssp     \
              --disable-multilib       \
              --disable-bootstrap      \
              --disable-fixincludes    \
-             --disable-libsanitizer                         \
+             --disable-libsanitizer   \
              --with-system-zlib
 make -j$(nproc)
 make install
@@ -903,9 +904,9 @@ touch /logs/status_util-linux_complete
 echo Building RPM related packages
 cd /sources
 
-echo sqlite-autoconf-3360000
-tar xf sqlite-autoconf-3360000.tar.gz
-pushd sqlite-autoconf-3360000
+echo sqlite-autoconf-3440000
+tar xf sqlite-autoconf-3440000.tar.gz
+pushd sqlite-autoconf-3440000
 ./configure --prefix=/usr     \
         --disable-static  \
         --enable-fts5     \
@@ -920,7 +921,7 @@ pushd sqlite-autoconf-3360000
 make -j$(nproc)
 make install
 popd
-rm -rf sqlite-autoconf-3360000
+rm -rf sqlite-autoconf-3440000
 touch /logs/status_sqlite-autoconf_complete
 
 echo popt-1.19
@@ -1004,6 +1005,12 @@ make install
 popd
 rm -rf "$DEBUGEDIT_WITH_VERSION"
 touch /logs/status_debugedit_complete
+
+# RPM_WITH_VERSION=rpm-4.19.0
+# RPM_FOLDER="$RPM_WITH_VERSION"
+# echo $RPM_WITH_VERSION
+# tar xf "$RPM_WITH_VERSION".tar.bz2
+# pushd "$RPM_FOLDER"
 
 RPM_WITH_VERSION=rpm-4.17.0
 RPM_FOLDER="$RPM_WITH_VERSION"-release

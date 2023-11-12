@@ -1,7 +1,7 @@
 Summary:        Linux Pluggable Authentication Modules
 Name:           pam
 Version:        1.5.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        BSD and GPLv2+
 URL:            https://github.com/linux-pam/linux-pam
 Source0:        https://github.com/linux-pam/linux-pam/releases/download/v%{version}/Linux-PAM-%{version}.tar.xz
@@ -9,6 +9,7 @@ Group:          System Environment/Security
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildRequires:  cracklib-devel
+BuildRequires:  libxcrypt-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  audit-devel
 Requires:       audit-libs
@@ -98,6 +99,9 @@ EOF
 %{_docdir}/%{name}-%{version}/*
 
 %changelog
+* Fri Nov 10 2023 Andrew Phelps <anphel@microsoft.com> - 1.5.1-6
+- Switch to link with libxcrypt
+
 * Tue Mar 22 2022 Andrew Phelps <anphel@microsoft.com> - 1.5.1-5
 - Require audit-libs
 

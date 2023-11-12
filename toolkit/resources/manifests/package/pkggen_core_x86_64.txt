@@ -84,9 +84,9 @@ bison-3.8.2-1.cm2.x86_64.rpm
 popt-1.19-1.cm2.x86_64.rpm
 popt-devel-1.19-1.cm2.x86_64.rpm
 popt-lang-1.19-1.cm2.x86_64.rpm
-sqlite-3.39.2-2.cm2.x86_64.rpm
-sqlite-devel-3.39.2-2.cm2.x86_64.rpm
-sqlite-libs-3.39.2-2.cm2.x86_64.rpm
+sqlite-3.44.0-1.cm2.x86_64.rpm
+sqlite-devel-3.44.0-1.cm2.x86_64.rpm
+sqlite-libs-3.44.0-1.cm2.x86_64.rpm
 elfutils-0.189-1.cm2.x86_64.rpm
 elfutils-default-yama-scope-0.189-1.cm2.noarch.rpm
 elfutils-devel-0.189-1.cm2.x86_64.rpm

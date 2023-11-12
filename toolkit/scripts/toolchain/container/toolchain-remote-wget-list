@@ -19,6 +19,7 @@ https://ftp.gnu.org/gnu/patch/patch-2.7.6.tar.xz
 https://distfiles.ariadne.space/pkgconf/pkgconf-2.0.2.tar.xz
 https://sourceforge.net/projects/procps-ng/files/Production/procps-ng-4.0.4.tar.xz
 https://www.python.org/ftp/python/3.9.13/Python-3.9.13.tar.xz
+https://www.python.org/ftp/python/3.12.0/Python-3.12.0.tar.xz
 https://tukaani.org/xz/xz-5.4.4.tar.xz
 https://www.zlib.net/zlib-1.3.tar.xz
 https://ftp.gnu.org/gnu/cpio/cpio-2.14.tar.bz2
@@ -27,6 +28,7 @@ https://www.lua.org/ftp/lua-5.4.6.tar.gz
 http://ftp.rpm.org/popt/releases/popt-1.x/popt-1.19.tar.gz
 https://github.com/rpm-software-management/rpm/archive/rpm-4.17.0-release.tar.gz
 http://ftp.rpm.org/releases/rpm-4.18.x/rpm-4.18.1.tar.bz2
+http://ftp.rpm.org/releases/rpm-4.19.x/rpm-4.19.0.tar.bz2
 https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/python.attr
 https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/pythondeps.sh
 https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/pythondistdeps.py
@@ -57,7 +59,6 @@ https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/libcap-2.69.t
 https://download.savannah.gnu.org/releases/libpipeline/libpipeline-1.5.7.tar.gz
 https://www.openssl.org/source/openssl-1.1.1k.tar.gz
 https://ftp.gnu.org/gnu/sed/sed-4.9.tar.xz
-https://www.sqlite.org/2021/sqlite-autoconf-3360000.tar.gz
-https://www.sqlite.org/2023/sqlite-autoconf-3430000.tar.gz
+https://www.sqlite.org/2023/sqlite-autoconf-3440000.tar.gz
 https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.39/util-linux-2.39.2.tar.xz
 https://github.com/facebook/zstd/releases/download/v1.5.5/zstd-1.5.5.tar.gz
