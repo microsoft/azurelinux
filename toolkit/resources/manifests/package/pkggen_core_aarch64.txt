@@ -214,7 +214,7 @@ tdnf-devel-3.5.2-2.cm2.aarch64.rpm
 tdnf-plugin-repogpgcheck-3.5.2-2.cm2.aarch64.rpm
 libassuan-2.5.5-2.cm2.aarch64.rpm
 libassuan-devel-2.5.5-2.cm2.aarch64.rpm
-libgpg-error-1.46-1.cm2.aarch64.rpm
+libgpg-error-1.47-1.cm2.aarch64.rpm
 libgcrypt-1.9.4-2.cm2.aarch64.rpm
 libksba-1.6.3-1.cm2.aarch64.rpm
 libksba-devel-1.6.3-1.cm2.aarch64.rpm
