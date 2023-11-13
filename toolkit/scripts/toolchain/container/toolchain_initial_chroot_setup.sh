@@ -10,7 +10,7 @@ set -x
 
 # Create standard directory tree in chroot
 
-# 7.5. Creating Directories
+# Creating Directories
 mkdir -pv /{boot,home,mnt,opt,srv}
 mkdir -pv /etc/{opt,sysconfig}
 mkdir -pv /lib/firmware
@@ -37,7 +37,7 @@ install -vdm 755 /usr/lib/debug/{lib,bin,sbin,usr}
 ln -sfv /run /var/run
 ln -sfv /run/lock /var/lock
 
-ln -sv bash /bin/sh
+ln -sfv bash /bin/sh
 
 # Create mtab
 ln -sv /proc/self/mounts /etc/mtab
@@ -84,6 +84,19 @@ wheel:x:97:
 users:x:999:
 nogroup:x:65534:
 EOF
+
+cat > /etc/os-release << "EOF"
+NAME="Common Base Linux Mariner Toolchain"
+VERSION="3.0.2023"
+ID=mariner
+VERSION_ID="3.0"
+PRETTY_NAME="CBL-Mariner/Linux"
+ANSI_COLOR="1;34"
+HOME_URL="https://aka.ms/cbl-mariner"
+BUG_REPORT_URL="https://aka.ms/cbl-mariner"
+SUPPORT_URL="https://aka.ms/cbl-mariner"
+EOF
+cat /etc/os-release
 
 touch /var/log/{btmp,lastlog,faillog,wtmp}
 chgrp -v utmp /var/log/lastlog

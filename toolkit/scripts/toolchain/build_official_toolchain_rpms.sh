@@ -318,8 +318,6 @@ mkdir -pv $LFS/usr/lib/rpm/macros.d
 cp -v $MARINER_TOOLCHAIN_MANIFESTS_DIR/macros.override $LFS/usr/lib/rpm/macros.d/macros.override
 cp /etc/resolv.conf $LFS/etc/
 
-chroot_and_print_installed_rpms
-
 stop_record_timestamp "build prep"
 start_record_timestamp "build packages"
 start_record_timestamp "build packages/build"
@@ -425,7 +423,6 @@ chroot_and_install_rpms gperf
 
 # Python3 needs to be installed for RPM to build
 build_rpm_in_chroot_no_install python3
-rm -vf $FINISHED_RPM_DIR/python3*debuginfo*.rpm
 chroot_and_install_rpms python3 python3
 
 # libxml2 is required for at least: libxslt, createrepo_c

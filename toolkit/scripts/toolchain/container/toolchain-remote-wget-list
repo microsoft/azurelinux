@@ -1,6 +1,7 @@
 https://ftp.gnu.org/gnu/autoconf/autoconf-2.71.tar.xz
 https://ftp.gnu.org/gnu/automake/automake-1.16.5.tar.gz
 https://ftp.gnu.org/gnu/binutils/binutils-2.41.tar.xz
+https://cmake.org/files/v3.27/cmake-3.27.2.tar.gz
 https://sourceware.org/ftp/debugedit/5.0/debugedit-5.0.tar.xz
 https://sourceware.org/ftp/elfutils/0.189/elfutils-0.189.tar.bz2
 https://ftp.gnu.org/gnu/findutils/findutils-4.9.0.tar.xz
@@ -58,6 +59,7 @@ https://ftp.gnu.org/gnu/gzip/gzip-1.13.tar.xz
 https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/libcap-2.69.tar.xz
 https://download.savannah.gnu.org/releases/libpipeline/libpipeline-1.5.7.tar.gz
 https://www.openssl.org/source/openssl-1.1.1k.tar.gz
+https://www.openssl.org/source/openssl-3.1.4.tar.gz
 https://ftp.gnu.org/gnu/sed/sed-4.9.tar.xz
 https://www.sqlite.org/2023/sqlite-autoconf-3440000.tar.gz
 https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.39/util-linux-2.39.2.tar.xz
