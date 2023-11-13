@@ -155,37 +155,32 @@ func TestShouldRemoveDuplicates(t *testing.T) {
 	assert.NotContains(t, outputSlice, "X")
 }
 
-// SetToSliceAll() should return empty slice for nil map
-func TestSetToSliceAllShouldCreateEmptySliceFromNil(t *testing.T) {
-	outputSlice := SetToSliceAll[string, any](nil)
+// MapToSlice() should return empty slice for nil map
+func TestMapToSliceShouldCreateEmptySliceFromNil(t *testing.T) {
+	outputSlice := MapToSlice[string, any](nil)
 
 	assert.NotNil(t, outputSlice)
 	assert.Empty(t, outputSlice)
 }
 
-// SetToSliceAll() should return empty slice for empty map
-func TestSetToSliceAllShouldCreateEmptySliceFromEmptySet(t *testing.T) {
-	outputSlice := SetToSliceAll(make(map[string]string))
+// MapToSlice() should return empty slice for empty map
+func TestMapToSliceShouldCreateEmptySliceFromEmptySet(t *testing.T) {
+	outputSlice := MapToSlice(make(map[string]string))
 
 	assert.NotNil(t, outputSlice)
 	assert.Empty(t, outputSlice)
 }
 
-// SetToSliceAll() should return slice with all the keys in the map
-func TestSetToSliceAllReturnKeysInSet(t *testing.T) {
+// MapToSlice() should return slice with all the keys in the map
+func TestMapToSliceReturnKeysInSet(t *testing.T) {
 	inputSet := map[string]bool{
 		"A": true,
 		"B": true,
 		"X": false,
 		"Y": false,
 	}
-	outputSlice := SetToSliceAll(inputSet)
+	expectedOutput := []string{"A", "B", "X", "Y"}
+	outputSlice := MapToSlice(inputSet)
 
-	assert.NotNil(t, outputSlice)
-	assert.Len(t, inputSet, 4)
-	assert.Len(t, outputSlice, 4)
-	assert.Contains(t, outputSlice, "A")
-	assert.Contains(t, outputSlice, "B")
-	assert.Contains(t, outputSlice, "X")
-	assert.Contains(t, outputSlice, "Y")
+	assert.ElementsMatch(t, expectedOutput, outputSlice)
 }
