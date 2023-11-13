@@ -2,7 +2,7 @@
 
 Summary:        XML and HTML with Python
 Name:           python-lxml
-Version:        4.9.1
+Version:        4.9.3
 Release:        1%{?dist}
 # Test suite (and only the test suite) is GPLv2+
 License:        BSD and GPLv2+
@@ -53,6 +53,9 @@ make test
 %{python3_sitelib}/*
 
 %changelog
+* Fri Nov 10 2023 Andrew Phelps <anphel@microsoft.com> - 4.9.3-1
+- Upgrade to version 4.9.3
+
 * Mon Aug 22 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 4.9.1-1
 - Upgrade to to fix CVE-2022-2309
 
