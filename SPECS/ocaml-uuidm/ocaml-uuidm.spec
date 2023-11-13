@@ -6,8 +6,8 @@
 
 Summary:        Universally unique identifiers (UUIDs) for OCaml
 Name:           ocaml-%{srcname}
-Version:        0.9.7
-Release:        15%{?dist}
+Version:        0.9.8
+Release:        1%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -99,6 +99,9 @@ ocaml pkg/pkg.ml test
 %{_libdir}/ocaml/%{srcname}/%{srcname}*.mli
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.9.8-1
+- Auto-upgrade to 0.9.8 - Azure Linux 3.0 - package upgrades
+
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.7-15
 - Cleaning-up spec. License verified.
 

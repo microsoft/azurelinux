@@ -1,8 +1,8 @@
 %global gem_name test-unit
 Summary:        An xUnit family unit testing framework for Ruby
 Name:           rubygem-%{gem_name}
-Version:        3.5.3
-Release:        3%{?dist}
+Version:        3.6.1
+Release:        1%{?dist}
 License:        PSF AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -48,6 +48,9 @@ cp PSFL %{buildroot}%{gem_instdir}/
 %{gemdir}
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.6.1-1
+- Auto-upgrade to 3.6.1 - Azure Linux 3.0 - package upgrades
+
 * Mon Oct 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.5.3-3
 - Adding 'Obsoletes: ruby <= 3.1.2-2'.
 

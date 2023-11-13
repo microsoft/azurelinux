@@ -17,8 +17,8 @@
 
 Summary:        Lexical Analyzer Generator for Java
 Name:           jflex
-Version:        1.4.3
-Release:        31%{?dist}
+Version:        1.9.1
+Release:        1%{?dist}
 License:        GPL-2.0+
 Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
@@ -137,6 +137,9 @@ install -p -m 0755 %{SOURCE1} %{buildroot}%{_bindir}/jflex
 %doc jflex/examples jflex/doc
 
 %changelog
+* Fri Nov 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.9.1-1
+- Auto-upgrade to 1.9.1 - Azure Linux 3.0 - package upgrades
+
 * Thu Mar 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.4.3-31
 - Remove condition macros for with/without, bootstrap; redundant with separate spec
 - Switch source to one that is actively published on github

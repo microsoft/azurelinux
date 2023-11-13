@@ -1,6 +1,6 @@
 Summary:        World timezone definitions, modern and historical
 Name:           pytz
-Version:        2021.3
+Version:        2023.3
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -61,6 +61,9 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2023.3-1
+- Auto-upgrade to 2023.3 - Azure Linux 3.0 - package upgrades
+
 * Sat Feb 12 2022 Muhammad Falak <mwani@microsoft.com> - 2021.3-1
 - Bump version to 2021.3
 - Add an explicit BR on `pip` & remove un-needed deps

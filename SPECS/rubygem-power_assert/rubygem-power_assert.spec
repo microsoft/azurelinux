@@ -1,8 +1,8 @@
 %global gem_name power_assert
 Summary:        Power Assert for Ruby
 Name:           rubygem-%{gem_name}
-Version:        2.0.1
-Release:        4%{?dist}
+Version:        2.0.3
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -41,6 +41,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.3-1
+- Auto-upgrade to 2.0.3 - Azure Linux 3.0 - package upgrades
+
 * Mon Oct 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.1-4
 - Adding 'Obsoletes: ruby <= 3.1.2-2'.
 

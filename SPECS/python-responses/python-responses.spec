@@ -1,8 +1,8 @@
 %global srcname responses
 Summary:        A utility library for mocking out the requests Python library.
 Name:           python-%{srcname}
-Version:        0.20.0
-Release:        4%{?dist}
+Version:        0.23.3
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -54,6 +54,9 @@ tox -e py%{python3_version_nodots} --sitepackages
 %{python3_sitelib}/%{srcname}
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.23.3-1
+- Auto-upgrade to 0.23.3 - Azure Linux 3.0 - package upgrades
+
 * Wed Mar 30 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.20.0-1
 - Upgrade to latest upstream version
 - Use tox to run tests
