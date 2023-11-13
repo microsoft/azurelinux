@@ -602,7 +602,9 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 
 	// Only configure the bootloader or read only partitions for actual disks, a rootfs does not need these
 	if !isRootFS {
-		err = configureDiskBootloader(systemConfig, installChroot, diskDevPath, installMap, encryptedRoot, readOnlyRoot)
+		err = installutils.ConfigureDiskBootloader(systemConfig.BootType, systemConfig.Encryption.Enable,
+			systemConfig.ReadOnlyVerityRoot.Enable, systemConfig.PartitionSettings, systemConfig.KernelCommandLine,
+			installChroot, diskDevPath, installMap, encryptedRoot, readOnlyRoot, systemConfig.EnableGrubMkconfig)
 		if err != nil {
 			err = fmt.Errorf("failed to configure boot loader: %w", err)
 			return
@@ -645,99 +647,6 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 	if err != nil {
 		err = fmt.Errorf("failed to run finalize image script: %s", err)
 		return
-	}
-
-	return
-}
-
-func configureDiskBootloader(systemConfig configuration.SystemConfig, installChroot *safechroot.Chroot, diskDevPath string, installMap map[string]string, encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice) (err error) {
-	timestamp.StartEvent("configuring bootloader", nil)
-	timestamp.StopEvent(nil)
-
-	const rootMountPoint = "/"
-	const bootMountPoint = "/boot"
-
-	var rootDevice string
-
-	// Add bootloader. Prefer a separate boot partition if one exists.
-	bootDevice, isBootPartitionSeparate := installMap[bootMountPoint]
-	bootPrefix := ""
-	if !isBootPartitionSeparate {
-		bootDevice = installMap[rootMountPoint]
-		// If we do not have a separate boot partition we will need to add a prefix to all paths used in the configs.
-		bootPrefix = "/boot"
-	}
-
-	if installMap[rootMountPoint] == installutils.NullDevice {
-		// In case of overlay device being mounted at root, no need to change the bootloader.
-		return
-	}
-
-	// Grub only accepts UUID, not PARTUUID or PARTLABEL
-	bootUUID, err := installutils.GetUUID(bootDevice)
-	if err != nil {
-		err = fmt.Errorf("failed to get UUID: %s", err)
-		return
-	}
-
-	bootType := systemConfig.BootType
-	err = installutils.InstallBootloader(installChroot, systemConfig.Encryption.Enable, bootType, bootUUID, bootPrefix,
-		diskDevPath)
-	if err != nil {
-		err = fmt.Errorf("failed to install bootloader: %s", err)
-		return
-	}
-
-	// Add grub config to image
-	rootPartitionSetting := systemConfig.GetRootPartitionSetting()
-	if rootPartitionSetting == nil {
-		err = fmt.Errorf("failed to find partition setting for root mountpoint")
-		return
-	}
-	rootMountIdentifier := rootPartitionSetting.MountIdentifier
-	if systemConfig.Encryption.Enable {
-		// Encrypted devices don't currently support identifiers
-		rootDevice = installMap[rootMountPoint]
-	} else if systemConfig.ReadOnlyVerityRoot.Enable {
-		var partIdentifier string
-		partIdentifier, err = installutils.FormatMountIdentifier(rootMountIdentifier, readOnlyRoot.BackingDevice)
-		if err != nil {
-			err = fmt.Errorf("failed to get partIdentifier: %s", err)
-			return
-		}
-		rootDevice = fmt.Sprintf("verityroot:%v", partIdentifier)
-	} else {
-		var partIdentifier string
-		partIdentifier, err = installutils.FormatMountIdentifier(rootMountIdentifier, installMap[rootMountPoint])
-		if err != nil {
-			err = fmt.Errorf("failed to get partIdentifier: %s", err)
-			return
-		}
-
-		rootDevice = partIdentifier
-	}
-
-	// Grub will always use filesystem UUID, never PARTUUID or PARTLABEL
-	err = installutils.InstallGrubCfg(installChroot.RootDir(), rootDevice, bootUUID, bootPrefix, encryptedRoot,
-		systemConfig.KernelCommandLine, readOnlyRoot, isBootPartitionSeparate)
-	if err != nil {
-		err = fmt.Errorf("failed to install main grub config file: %s", err)
-		return
-	}
-
-	err = installutils.InstallGrubEnv(installChroot.RootDir())
-	if err != nil {
-		err = fmt.Errorf("failed to install grubenv file: %s", err)
-		return
-	}
-
-	// Use grub mkconfig to replace the static template .cfg with a dynamically generated version if desired.
-	if systemConfig.EnableGrubMkconfig {
-		err = installutils.CallGrubMkconfig(installChroot)
-		if err != nil {
-			err = fmt.Errorf("failed to generate grub.cfg via grub2-mkconfig: %s", err)
-			return
-		}
 	}
 
 	return
