@@ -15,7 +15,7 @@ import (
 	ccachemanagerpkg "github.com/microsoft/CBL-Mariner/toolkit/tools/internal/ccachemanager"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/marinerusers"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/marinertoolusers"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
@@ -390,6 +390,10 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 		}
 
 		err = setOwnershipOfBuildResult(res)
+		if err != nil {
+			err = fmt.Errorf("error setting ownership of build result:\n%w", err)
+			stopBuilding = true
+		}
 
 		if !stopBuilding {
 			if res.Err == nil {
@@ -492,7 +496,7 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 // the user is set. Otherwise will do nothing.
 func setOwnershipOfBuildResult(res *schedulerutils.BuildResult) (err error) {
 	for _, file := range res.BuiltFiles {
-		err = marinerusers.GiveSinglePathToUser(file, marinerusers.GetMarinerBuildUser())
+		err = marinertoolusers.GiveSinglePathToUser(file, marinertoolusers.GetMarinerBuildUser())
 		if err != nil {
 			err = fmt.Errorf("unable to change ownership of file '%s':\n%w", file, err)
 			return

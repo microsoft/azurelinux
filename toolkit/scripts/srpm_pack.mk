@@ -130,7 +130,7 @@ $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(toolchain_spec_buildable_list)
 		--tls-key=$(TLS_KEY) \
 		--build-dir=$(SRPM_BUILD_CHROOT_DIR) \
 		--signature-handling=$(SRPM_FILE_SIGNATURE_HANDLING) \
-		--pack-list=$(toolchain_spec_list) \
+		--pack-list=$(toolchain_spec_buildable_list) \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		--packed-srpms-summary=$(toolchain_srpm_pack_summary_file) \
 		--log-file=$(LOGS_DIR)/toolchain/srpms/toolchain_srpmpacker.log \

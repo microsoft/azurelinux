@@ -4,7 +4,7 @@
 // Defines functions for getting the mariner builder user, and changing ownership of files and directories to the user.
 // The file change functions are defined here since they are used in the logging package and will create circular dependencies
 // in the file package if defined there.
-package marinerusers
+package marinertoolusers
 
 import (
 	"fmt"
@@ -17,30 +17,18 @@ import (
 
 const userEnvName = "MARINER_BUILDER_USER"
 
-var (
-	marinerBuilderUser *user.User
-	gotUser            = false
-)
-
-// Optionally set a user if present in the environment
-func userInit() {
-	if !gotUser {
-		userName := os.Getenv(userEnvName)
-		if userName != "" {
-			builderUser, err := user.Lookup(userName)
-			if err == nil {
-				marinerBuilderUser = builderUser
-			}
-		} else {
-			marinerBuilderUser = nil
+// GetMarinerBuildUser will return the mariner builder user if set, otherwise will return nil
+func GetMarinerBuildUser() (marinerBuilderUser *user.User) {
+	userName := os.Getenv(userEnvName)
+	if userName != "" {
+		builderUser, err := user.Lookup(userName)
+		if err == nil {
+			marinerBuilderUser = builderUser
 		}
-		gotUser = true
+	} else {
+		marinerBuilderUser = nil
 	}
-}
-
-func GetMarinerBuildUser() (user *user.User) {
-	userInit()
-	return marinerBuilderUser
+	return
 }
 
 // GiveSinglePathToMarinerUser will change ownership of a file or directory to the calling user (MARINER_BUILDER_USER) instead of root, if

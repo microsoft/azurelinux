@@ -18,7 +18,7 @@ import (
 	"path/filepath"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/marinerusers"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/marinertoolusers"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 )
 
@@ -449,7 +449,7 @@ func createDestinationDir(dst string, dirmode os.FileMode, user *user.User) (err
 			return
 		}
 		if user != nil {
-			err = marinerusers.GiveSinglePathToUser(destDir, user)
+			err = marinertoolusers.GiveSinglePathToUser(destDir, user)
 			if err != nil {
 				return
 			}
@@ -491,7 +491,7 @@ func CopyResourceFile(srcFS fs.FS, srcFile, dst string, dirmode os.FileMode, fil
 	}
 
 	if user != nil {
-		err = marinerusers.GiveSinglePathToUser(dst, user)
+		err = marinertoolusers.GiveSinglePathToUser(dst, user)
 		if err != nil {
 			return fmt.Errorf("failed to copy resource (%s) -> (%s):\nfailed to set ownership:\n%w", srcFile, dst, err)
 		}
