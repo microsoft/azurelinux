@@ -843,7 +843,7 @@ func hydrateFiles(fileTypeToHydrate fileType, specFile, workingDir string, srcCo
 		err = hydrateFromLocalSource(fileHydrationState, newSourceDir, srcConfig, skipSignatureHandling, currentSignatures)
 		// On error warn and default to hydrating from an external server.
 		if err != nil {
-			logger.Log.Warnf("Error hydrating from local source directory (%s): %v", srcConfig.localSourceDir, err)
+			return
 		}
 	}
 
