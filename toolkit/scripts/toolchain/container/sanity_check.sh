@@ -8,8 +8,6 @@
 # usage: sanity_check.sh "1"
 #    Performs the first sanity check
 
-set -x
-
 echo "sanity check script running"
 LFS_TGT=$(uname -m)-lfs-linux-gnu
 echo "LFS root is: '$LFS', LFS_TGT is '$LFS_TGT'"
