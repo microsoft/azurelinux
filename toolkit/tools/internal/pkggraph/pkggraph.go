@@ -1126,16 +1126,19 @@ func (g *PkgGraph) AddGoalNodeWithExtraLayers(goalName string, packages, tests [
 
 	err = g.safeAddNode(goalNode)
 	if err != nil {
+		err = fmt.Errorf("failed to add goal node '%s': %s", goalName, err.Error())
 		return
 	}
 
 	err = g.connectGoalEdges(goalNode, packagesGoalSet, strict, TypeLocalRun)
 	if err != nil {
+		err = fmt.Errorf("failed to connect goal node '%s' to packages: %s", goalName, err.Error())
 		return
 	}
 
 	err = g.connectGoalEdges(goalNode, testsGoalSet, strict, TypeTest)
 	if err != nil {
+		err = fmt.Errorf("failed to connect goal node '%s' to tests: %s", goalName, err.Error())
 		return
 	}
 
@@ -1171,6 +1174,7 @@ func (g *PkgGraph) AddGoalNodeToNodes(goalName string, existingNodes []*PkgNode,
 
 	err = g.safeAddNode(goalNode)
 	if err != nil {
+		err = fmt.Errorf("failed to add goal node '%s': %s", goalName, err.Error())
 		return
 	}
 
@@ -1181,6 +1185,7 @@ func (g *PkgGraph) AddGoalNodeToNodes(goalName string, existingNodes []*PkgNode,
 		}
 		err = g.AddEdge(goalNode, node)
 		if err != nil {
+			err = fmt.Errorf("failed to add edge from goal node '%s' to node '%s': %s", goalName, node.FriendlyName(), err.Error())
 			return nil, err
 		}
 	}
