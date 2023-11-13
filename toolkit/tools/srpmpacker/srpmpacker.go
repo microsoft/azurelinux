@@ -854,11 +854,16 @@ func hydrateFiles(fileTypeToHydrate fileType, specFile, workingDir string, srcCo
 		}
 	}
 
+	missingFiles := []string{}
 	for fileNeeded, alreadyHydrated := range fileHydrationState {
 		if !alreadyHydrated {
-			err = fmt.Errorf("unable to hydrate file: %s", fileNeeded)
-			logger.Log.Error(err)
+			missingFiles = append(missingFiles, fileNeeded)
+			logger.Log.Errorf("Unable to hydrate file: %s.", fileNeeded)
 		}
+	}
+
+	if len(missingFiles) != 0 {
+		err = fmt.Errorf("unable to hydrate files: %v", missingFiles)
 	}
 
 	return
@@ -919,18 +924,6 @@ func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir st
 	)
 	errPackerCancelReceived := fmt.Errorf("packer cancel signal received")
 
-	// Making sure we remove the hydrated file in case of signature validation failure.
-	filesToRemove := []string{}
-	defer func() {
-		for _, fileToRemove := range filesToRemove {
-			logger.Log.Debugf("Removing file (%s) after signature validation failure.", fileToRemove)
-			removeErr := os.Remove(fileToRemove)
-			if removeErr != nil {
-				logger.Log.Errorf("Failed to delete file (%s) after signature validation failure. Error: %s", fileToRemove, removeErr)
-			}
-		}
-	}()
-
 	for fileName, alreadyHydrated := range fileHydrationState {
 		if alreadyHydrated {
 			continue
@@ -981,7 +974,13 @@ func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir st
 			internalErr = validateSignature(destinationFile, srcConfig, currentSignatures)
 			if internalErr != nil {
 				logger.Log.Errorf("Signature validation for (%s) failed. Error: %s.", destinationFile, internalErr)
-				filesToRemove = append(filesToRemove, destinationFile)
+
+				// If the delete fails, just warn as there will be another cleanup
+				// attempt when exiting the program.
+				internalErr = os.Remove(destinationFile)
+				if internalErr != nil {
+					logger.Log.Warnf("Failed to delete file (%s) after signature validation failure. Error: %s.", destinationFile, internalErr)
+				}
 				continue
 			}
 		}
@@ -990,7 +989,7 @@ func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir st
 		logger.Log.Debugf("Hydrated (%s) from (%s)", fileName, url)
 	}
 
-	return
+	return nil
 }
 
 // validateSignature will compare the SHA256 of the file at path against the signature for it in srcConfig.signatureLookup
