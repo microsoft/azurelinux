@@ -50,7 +50,7 @@ curl-8.3.0-2.cm2.x86_64.rpm
 curl-debuginfo-8.3.0-2.cm2.x86_64.rpm
 curl-devel-8.3.0-2.cm2.x86_64.rpm
 curl-libs-8.3.0-2.cm2.x86_64.rpm
-Cython-debuginfo-0.29.33-1.cm2.x86_64.rpm
+Cython-debuginfo-3.0.5-1.cm2.x86_64.rpm
 debugedit-5.0-2.cm2.x86_64.rpm
 debugedit-debuginfo-5.0-2.cm2.x86_64.rpm
 diffutils-3.10-1.cm2.x86_64.rpm
@@ -515,7 +515,7 @@ python3-3.9.14-8.cm2.x86_64.rpm
 python3-audit-3.1.2-1.cm2.x86_64.rpm
 python3-cracklib-2.9.7-5.cm2.x86_64.rpm
 python3-curses-3.9.14-8.cm2.x86_64.rpm
-python3-Cython-0.29.33-1.cm2.x86_64.rpm
+python3-Cython-3.0.5-1.cm2.x86_64.rpm
 python3-debuginfo-3.9.14-8.cm2.x86_64.rpm
 python3-devel-3.9.14-8.cm2.x86_64.rpm
 python3-gpg-1.16.0-2.cm2.x86_64.rpm
