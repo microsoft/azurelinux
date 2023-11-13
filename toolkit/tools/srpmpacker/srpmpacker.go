@@ -917,19 +917,16 @@ func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir st
 		failureBackoffBase    = 2.0
 		downloadRetryDuration = time.Second
 	)
-	errOther := fmt.Errorf("hydrating from remote source failed. See earlier errors for details")
 	errPackerCancelReceived := fmt.Errorf("packer cancel signal received")
 
 	// Making sure we remove the hydrated file in case of signature validation failure.
 	filesToRemove := []string{}
 	defer func() {
-		if err != nil {
-			for _, fileToRemove := range filesToRemove {
-				logger.Log.Debugf("Removing file (%s) after signature validation failure.", fileToRemove)
-				removeErr := os.Remove(fileToRemove)
-				if removeErr != nil {
-					logger.Log.Errorf("Failed to delete file (%s) after signature validation failure. Error: %s", fileToRemove, removeErr)
-				}
+		for _, fileToRemove := range filesToRemove {
+			logger.Log.Debugf("Removing file (%s) after signature validation failure.", fileToRemove)
+			removeErr := os.Remove(fileToRemove)
+			if removeErr != nil {
+				logger.Log.Errorf("Failed to delete file (%s) after signature validation failure. Error: %s", fileToRemove, removeErr)
 			}
 		}
 	}()
@@ -956,12 +953,12 @@ func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir st
 		}
 
 		cancelled, internalErr := retry.RunWithExpBackoff(func() error {
-			err := network.DownloadFile(url, destinationFile, srcConfig.caCerts, srcConfig.tlsCerts)
-			if err != nil {
-				logger.Log.Debugf("Failed an attempt to download (%s). Error: %s", url, err)
+			downloadErr := network.DownloadFile(url, destinationFile, srcConfig.caCerts, srcConfig.tlsCerts)
+			if downloadErr != nil {
+				logger.Log.Debugf("Failed an attempt to download (%s). Error: %s", url, downloadErr)
 			}
 
-			return err
+			return downloadErr
 		}, downloadRetryAttempts, downloadRetryDuration, failureBackoffBase, cancel)
 
 		if netOpsSemaphore != nil {
@@ -977,7 +974,6 @@ func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir st
 
 		if internalErr != nil {
 			logger.Log.Errorf("Failed to download (%s). Error: %s", url, internalErr)
-			err = errOther
 			continue
 		}
 
@@ -986,7 +982,6 @@ func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir st
 			if internalErr != nil {
 				logger.Log.Errorf("Signature validation for (%s) failed. Error: %s.", destinationFile, internalErr)
 				filesToRemove = append(filesToRemove, destinationFile)
-				err = errOther
 				continue
 			}
 		}
