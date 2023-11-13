@@ -10,6 +10,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://lxml.de
 Source0:        https://github.com/lxml/lxml/releases/download/lxml-%{version}/lxml-%{version}.tar.gz
+Patch0:         noexcept.patch
 BuildRequires:  libxslt-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  python3-Cython
@@ -31,10 +32,8 @@ It is unique in that it combines the speed and XML feature completeness of these
 with the simplicity of a native Python API, mostly compatible but superior to the well-known
 ElementTree API.
 
-
 %prep
-%autosetup -n lxml-%{version}
-find -type f -name "*.c" -delete -print
+%autosetup -p1 -n lxml-%{version}
 
 %build
 %{py3_build "--with-cython"}

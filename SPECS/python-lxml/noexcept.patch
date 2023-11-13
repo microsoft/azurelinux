@@ -1,0 +1,298 @@
+diff --git a/src/lxml/includes/xmlparser.pxd b/src/lxml/includes/xmlparser.pxd
+index 45acfc84..a73713cd 100644
+--- a/src/lxml/includes/xmlparser.pxd
++++ b/src/lxml/includes/xmlparser.pxd
+@@ -229,7 +229,7 @@ cdef extern from "libxml/parser.h":
+ # entity loaders:
+ 
+     ctypedef xmlParserInput* (*xmlExternalEntityLoader)(
+-        const_char * URL, const_char * ID, xmlParserCtxt* context) nogil
++        const_char * URL, const_char * ID, xmlParserCtxt* context) nogil noexcept
+     cdef xmlExternalEntityLoader xmlGetExternalEntityLoader() nogil
+     cdef void xmlSetExternalEntityLoader(xmlExternalEntityLoader f) nogil
+ 
+diff --git a/src/lxml/includes/xslt.pxd b/src/lxml/includes/xslt.pxd
+index 101fb7e7..05e02199 100644
+--- a/src/lxml/includes/xslt.pxd
++++ b/src/lxml/includes/xslt.pxd
+@@ -53,7 +53,7 @@ cdef extern from "libxslt/extensions.h":
+     ctypedef void (*xsltTransformFunction)(xsltTransformContext* ctxt,
+                                            xmlNode* context_node,
+                                            xmlNode* inst,
+-                                           void* precomp_unused) nogil
++                                           void* precomp_unused) nogil noexcept
+ 
+     cdef int xsltRegisterExtFunction(xsltTransformContext* ctxt,
+                                      const_xmlChar* name,
+@@ -79,7 +79,7 @@ cdef extern from "libxslt/documents.h":
+     ctypedef xmlDoc* (*xsltDocLoaderFunc)(const_xmlChar* URI, xmlDict* dict,
+                                           int options,
+                                           void* ctxt,
+-                                          xsltLoadType type) nogil
++                                          xsltLoadType type) nogil noexcept
+     cdef xsltDocLoaderFunc xsltDocDefaultLoader
+     cdef void xsltSetLoaderFunc(xsltDocLoaderFunc f) nogil
+ 
+@@ -139,7 +139,7 @@ cdef extern from "libxslt/security.h":
+ 
+     ctypedef int (*xsltSecurityCheck)(xsltSecurityPrefs* sec,
+                                       xsltTransformContext* ctxt,
+-                                      char* value) nogil
++                                      char* value) nogil noexcept
+ 
+     cdef xsltSecurityPrefs* xsltNewSecurityPrefs() nogil
+     cdef void xsltFreeSecurityPrefs(xsltSecurityPrefs* sec) nogil
+
+
+diff --git a/src/lxml/parser.pxi b/src/lxml/parser.pxi
+index 003407ea..5daacd22 100644
+--- a/src/lxml/parser.pxi
++++ b/src/lxml/parser.pxi
+@@ -413,7 +413,7 @@ cdef int _readFileParser(void* ctxt, char* c_buffer, int c_size) except -1 nogil
+ ############################################################
+ 
+ cdef xmlparser.xmlParserInput* _local_resolver(const_char* c_url, const_char* c_pubid,
+-                                               xmlparser.xmlParserCtxt* c_context) with gil:
++                                               xmlparser.xmlParserCtxt* c_context) noexcept with gil:
+     cdef _ResolverContext context
+     cdef xmlparser.xmlParserInput* c_input
+     cdef _InputDocument doc_ref
+@@ -503,12 +503,12 @@ cdef xmlparser.xmlExternalEntityLoader __DEFAULT_ENTITY_LOADER
+ __DEFAULT_ENTITY_LOADER = xmlparser.xmlGetExternalEntityLoader()
+ 
+ 
+-cdef xmlparser.xmlExternalEntityLoader _register_document_loader() nogil:
++cdef xmlparser.xmlExternalEntityLoader _register_document_loader() noexcept nogil:
+     cdef xmlparser.xmlExternalEntityLoader old = xmlparser.xmlGetExternalEntityLoader()
+     xmlparser.xmlSetExternalEntityLoader(<xmlparser.xmlExternalEntityLoader>_local_resolver)
+     return old
+ 
+-cdef void _reset_document_loader(xmlparser.xmlExternalEntityLoader old) nogil:
++cdef void _reset_document_loader(xmlparser.xmlExternalEntityLoader old) noexcept nogil:
+     xmlparser.xmlSetExternalEntityLoader(old)
+ 
+ 
+diff --git a/src/lxml/proxy.pxi b/src/lxml/proxy.pxi
+index 3c6e3068..849a36bf 100644
+--- a/src/lxml/proxy.pxi
++++ b/src/lxml/proxy.pxi
+@@ -146,7 +146,7 @@ cdef int attemptDeallocation(xmlNode* c_node):
+         return 1
+     return 0
+ 
+-cdef xmlNode* getDeallocationTop(xmlNode* c_node):
++cdef xmlNode* getDeallocationTop(xmlNode* c_node) noexcept:
+     u"""Return the top of the tree that can be deallocated, or NULL.
+     """
+     cdef xmlNode* c_next
+@@ -183,7 +183,7 @@ cdef xmlNode* getDeallocationTop(xmlNode* c_node):
+         c_next = c_next.next
+     return c_node
+ 
+-cdef int canDeallocateChildNodes(xmlNode* c_parent):
++cdef int canDeallocateChildNodes(xmlNode* c_parent) noexcept:
+     cdef xmlNode* c_node
+     c_node = c_parent.children
+     tree.BEGIN_FOR_EACH_ELEMENT_FROM(c_parent, c_node, 1)
+@@ -195,7 +195,7 @@ cdef int canDeallocateChildNodes(xmlNode* c_parent):
+ ################################################################################
+ # fix _Document references and namespaces when a node changes documents
+ 
+-cdef void _copyParentNamespaces(xmlNode* c_from_node, xmlNode* c_to_node) nogil:
++cdef void _copyParentNamespaces(xmlNode* c_from_node, xmlNode* c_to_node) noexcept nogil:
+     u"""Copy the namespaces of all ancestors of c_from_node to c_to_node.
+     """
+     cdef xmlNode* c_parent
+@@ -395,7 +395,7 @@ cdef int moveNodeToDocument(_Document doc, xmlDoc* c_source_doc,
+     return 0
+ 
+ 
+-cdef void _setTreeDoc(xmlNode* c_node, xmlDoc* c_doc):
++cdef void _setTreeDoc(xmlNode* c_node, xmlDoc* c_doc) noexcept:
+     """Adaptation of 'xmlSetTreeDoc()' that deep-fixes the document links iteratively.
+     It avoids https://gitlab.gnome.org/GNOME/libxml2/issues/42
+     """
+@@ -413,7 +413,7 @@ cdef void _setTreeDoc(xmlNode* c_node, xmlDoc* c_doc):
+     tree.END_FOR_EACH_FROM(c_node)
+ 
+ 
+-cdef inline void _fixDocChildren(xmlNode* c_child, xmlDoc* c_doc):
++cdef inline void _fixDocChildren(xmlNode* c_child, xmlDoc* c_doc) noexcept:
+     while c_child:
+         c_child.doc = c_doc
+         if c_child.children:
+@@ -469,7 +469,7 @@ cdef void fixElementDocument(xmlNode* c_element, _Document doc,
+ 
+ cdef void fixThreadDictNames(xmlNode* c_element,
+                              tree.xmlDict* c_src_dict,
+-                             tree.xmlDict* c_dict) nogil:
++                             tree.xmlDict* c_dict) noexcept nogil:
+     # re-assign the names of tags and attributes
+     #
+     # this should only be called when the element is based on a
+@@ -492,7 +492,7 @@ cdef void fixThreadDictNames(xmlNode* c_element,
+ 
+ cdef inline void _fixThreadDictPtr(const_xmlChar** c_ptr,
+                                    tree.xmlDict* c_src_dict,
+-                                   tree.xmlDict* c_dict) nogil:
++                                   tree.xmlDict* c_dict) noexcept nogil:
+     c_str = c_ptr[0]
+     if c_str and c_src_dict and tree.xmlDictOwns(c_src_dict, c_str):
+         # return value can be NULL on memory error, but we don't handle that here
+@@ -503,7 +503,7 @@ cdef inline void _fixThreadDictPtr(const_xmlChar** c_ptr,
+ 
+ cdef void fixThreadDictNamesForNode(xmlNode* c_element,
+                                     tree.xmlDict* c_src_dict,
+-                                    tree.xmlDict* c_dict) nogil:
++                                    tree.xmlDict* c_dict) noexcept nogil:
+     cdef xmlNode* c_node = c_element
+     tree.BEGIN_FOR_EACH_FROM(c_element, c_node, 1)
+     if c_node.type in (tree.XML_ELEMENT_NODE, tree.XML_XINCLUDE_START):
+@@ -523,7 +523,7 @@ cdef void fixThreadDictNamesForNode(xmlNode* c_element,
+ 
+ cdef inline void fixThreadDictNamesForAttributes(tree.xmlAttr* c_attr,
+                                                  tree.xmlDict* c_src_dict,
+-                                                 tree.xmlDict* c_dict) nogil:
++                                                 tree.xmlDict* c_dict) noexcept nogil:
+     cdef xmlNode* c_child
+     cdef xmlNode* c_node = <xmlNode*>c_attr
+     while c_node is not NULL:
+@@ -539,7 +539,7 @@ cdef inline void fixThreadDictNamesForAttributes(tree.xmlAttr* c_attr,
+ 
+ cdef inline void fixThreadDictContentForNode(xmlNode* c_node,
+                                              tree.xmlDict* c_src_dict,
+-                                             tree.xmlDict* c_dict) nogil:
++                                             tree.xmlDict* c_dict) noexcept nogil:
+     if c_node.content is not NULL and \
+            c_node.content is not <xmlChar*>&c_node.properties:
+         if tree.xmlDictOwns(c_src_dict, c_node.content):
+@@ -549,7 +549,7 @@ cdef inline void fixThreadDictContentForNode(xmlNode* c_node,
+ 
+ cdef inline void fixThreadDictNsForNode(xmlNode* c_node,
+                                         tree.xmlDict* c_src_dict,
+-                                        tree.xmlDict* c_dict) nogil:
++                                        tree.xmlDict* c_dict) noexcept nogil:
+     cdef xmlNs* c_ns = c_node.nsDef
+     while c_ns is not NULL:
+         _fixThreadDictPtr(&c_ns.href, c_src_dict, c_dict)
+@@ -559,7 +559,7 @@ cdef inline void fixThreadDictNsForNode(xmlNode* c_node,
+ 
+ cdef void fixThreadDictNamesForDtd(tree.xmlDtd* c_dtd,
+                                    tree.xmlDict* c_src_dict,
+-                                   tree.xmlDict* c_dict) nogil:
++                                   tree.xmlDict* c_dict) noexcept nogil:
+     cdef xmlNode* c_node
+     cdef tree.xmlElement* c_element
+     cdef tree.xmlAttribute* c_attribute
+diff --git a/src/lxml/serializer.pxi b/src/lxml/serializer.pxi
+index e1c76e1b..f0ab1b94 100644
+--- a/src/lxml/serializer.pxi
++++ b/src/lxml/serializer.pxi
+@@ -201,7 +201,7 @@ cdef _raiseSerialisationError(int error_result):
+ # low-level serialisation functions
+ 
+ cdef void _writeDoctype(tree.xmlOutputBuffer* c_buffer,
+-                        const_xmlChar* c_doctype) nogil:
++                        const_xmlChar* c_doctype) noexcept nogil:
+     tree.xmlOutputBufferWrite(c_buffer, tree.xmlStrlen(c_doctype),
+                               <const_char*>c_doctype)
+     tree.xmlOutputBufferWriteString(c_buffer, "\n")
+@@ -211,7 +211,7 @@ cdef void _writeNodeToBuffer(tree.xmlOutputBuffer* c_buffer,
+                              int c_method, bint write_xml_declaration,
+                              bint write_complete_document,
+                              bint pretty_print, bint with_tail,
+-                             int standalone) nogil:
++                             int standalone) noexcept nogil:
+     cdef xmlNode* c_nsdecl_node
+     cdef xmlDoc* c_doc = c_node.doc
+     if write_xml_declaration and c_method == OUTPUT_METHOD_XML:
+@@ -269,7 +269,7 @@ cdef void _writeNodeToBuffer(tree.xmlOutputBuffer* c_buffer,
+ 
+ cdef void _writeDeclarationToBuffer(tree.xmlOutputBuffer* c_buffer,
+                                     const_xmlChar* version, const_char* encoding,
+-                                    int standalone) nogil:
++                                    int standalone) noexcept nogil:
+     if version is NULL:
+         version = <unsigned char*>"1.0"
+     tree.xmlOutputBufferWrite(c_buffer, 15, "<?xml version='")
+@@ -285,7 +285,7 @@ cdef void _writeDeclarationToBuffer(tree.xmlOutputBuffer* c_buffer,
+ 
+ cdef void _writeDtdToBuffer(tree.xmlOutputBuffer* c_buffer,
+                             xmlDoc* c_doc, const_xmlChar* c_root_name,
+-                            int c_method, const_char* encoding) nogil:
++                            int c_method, const_char* encoding) noexcept nogil:
+     cdef tree.xmlDtd* c_dtd
+     cdef xmlNode* c_node
+     cdef char* quotechar
+@@ -355,7 +355,7 @@ cdef void _writeDtdToBuffer(tree.xmlOutputBuffer* c_buffer,
+     tree.xmlOutputBufferWrite(c_buffer, 3, "]>\n")
+ 
+ cdef void _writeTail(tree.xmlOutputBuffer* c_buffer, xmlNode* c_node,
+-                     const_char* encoding, int c_method, bint pretty_print) nogil:
++                     const_char* encoding, int c_method, bint pretty_print) noexcept nogil:
+     u"Write the element tail."
+     c_node = c_node.next
+     while c_node and not c_buffer.error and c_node.type in (
+@@ -369,7 +369,7 @@ cdef void _writeTail(tree.xmlOutputBuffer* c_buffer, xmlNode* c_node,
+         c_node = c_node.next
+ 
+ cdef void _writePrevSiblings(tree.xmlOutputBuffer* c_buffer, xmlNode* c_node,
+-                             const_char* encoding, bint pretty_print) nogil:
++                             const_char* encoding, bint pretty_print) noexcept nogil:
+     cdef xmlNode* c_sibling
+     if c_node.parent and _isElement(c_node.parent):
+         return
+@@ -387,7 +387,7 @@ cdef void _writePrevSiblings(tree.xmlOutputBuffer* c_buffer, xmlNode* c_node,
+         c_sibling = c_sibling.next
+ 
+ cdef void _writeNextSiblings(tree.xmlOutputBuffer* c_buffer, xmlNode* c_node,
+-                             const_char* encoding, bint pretty_print) nogil:
++                             const_char* encoding, bint pretty_print) noexcept nogil:
+     cdef xmlNode* c_sibling
+     if c_node.parent and _isElement(c_node.parent):
+         return
+@@ -404,7 +404,7 @@ cdef void _writeNextSiblings(tree.xmlOutputBuffer* c_buffer, xmlNode* c_node,
+ 
+ 
+ # copied and adapted from libxml2
+-cdef unsigned char *xmlSerializeHexCharRef(unsigned char *out, int val):
++cdef unsigned char *xmlSerializeHexCharRef(unsigned char *out, int val) noexcept:
+     cdef xmlChar *ptr
+     cdef xmlChar c
+ 
+diff --git a/src/lxml/xslt.pxi b/src/lxml/xslt.pxi
+index 78b20ce6..5307b6e5 100644
+--- a/src/lxml/xslt.pxi
++++ b/src/lxml/xslt.pxi
+@@ -112,7 +112,7 @@ cdef xmlDoc* _xslt_resolve_from_python(const_xmlChar* c_uri, void* c_context,
+ 
+ 
+ cdef void _xslt_store_resolver_exception(const_xmlChar* c_uri, void* context,
+-                                         xslt.xsltLoadType c_type) with gil:
++                                         xslt.xsltLoadType c_type) noexcept with gil:
+     try:
+         message = f"Cannot resolve URI {_decodeFilename(c_uri)}"
+         if c_type == xslt.XSLT_LOAD_DOCUMENT:
+@@ -128,7 +128,7 @@ cdef void _xslt_store_resolver_exception(const_xmlChar* c_uri, void* context,
+ 
+ cdef xmlDoc* _xslt_doc_loader(const_xmlChar* c_uri, tree.xmlDict* c_dict,
+                               int parse_options, void* c_ctxt,
+-                              xslt.xsltLoadType c_type) nogil:
++                              xslt.xsltLoadType c_type) noexcept nogil:
+     # nogil => no Python objects here, may be called without thread context !
+     cdef xmlDoc* c_doc
+     cdef xmlDoc* result
+
+diff --git a/src/lxml/xsltext.pxi b/src/lxml/xsltext.pxi
+index c98ae1ff..cfa89f69 100644
+--- a/src/lxml/xsltext.pxi
++++ b/src/lxml/xsltext.pxi
+@@ -162,7 +162,7 @@ cdef _registerXSLTExtensions(xslt.xsltTransformContext* c_ctxt,
+ cdef void _callExtensionElement(xslt.xsltTransformContext* c_ctxt,
+                                 xmlNode* c_context_node,
+                                 xmlNode* c_inst_node,
+-                                void* dummy) with gil:
++                                void* dummy) noexcept with gil:
+     cdef _XSLTContext context
+     cdef XSLTExtension extension
+     cdef python.PyObject* dict_result
