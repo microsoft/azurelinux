@@ -8041,7 +8041,7 @@
         "type": "other",
         "other": {
           "name": "kata-containers-cc",
-          "version": "0.6.2",
+          "version": "0.6.1",
           "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/cc-0.6.2.tar.gz"
         }
       }
