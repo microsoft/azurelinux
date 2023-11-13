@@ -803,7 +803,7 @@ func TestStrictGoalNodes(t *testing.T) {
 	assert.Error(t, err)
 }
 
-// Search for packages to add to the goal node
+// Basic test of adding a goal node using two package node objects.
 func TestGoalWithNodes(t *testing.T) {
 	g := NewPkgGraph()
 	err := addNodesHelper(g, allNodes)
@@ -823,6 +823,7 @@ func TestGoalWithNodes(t *testing.T) {
 	assert.Equal(t, 2, len(goalNodes))
 }
 
+// Make sure we can't add a duplicate goal node with AddGoalNodeToNodes().
 func TestDuplicateGoalWithNodes(t *testing.T) {
 	g := NewPkgGraph()
 	goal, err := g.AddGoalNode("test", nil, nil, false)
@@ -834,6 +835,7 @@ func TestDuplicateGoalWithNodes(t *testing.T) {
 	assert.Error(t, err)
 }
 
+// Ensure nodes that are outside the graph can't be added to a goal
 func TestGoalWithNodeOutsideGraph(t *testing.T) {
 	g := NewPkgGraph()
 	err := addNodesHelper(g, allNodes)
@@ -934,6 +936,7 @@ func TestGoalWithLevelTwo(t *testing.T) {
 	checkEqualComponents(t, expectedGoalPackages, g.AllNodesFrom(goal))
 }
 
+// Check if AddGoalNodeToNodes() works with a levels
 func TestGoalWithNodesWithLevelTwo(t *testing.T) {
 	g, err := buildTestGraphHelper()
 	assert.NoError(t, err)
@@ -1354,6 +1357,8 @@ func TestHasNodeCopyNode(t *testing.T) {
 	assert.False(t, g.HasNode(nCopy))
 }
 
+// Ensure that HasNode functions as expected when we create a subgraph. The subgraph should only "have" the nodes
+// that make up the subgraph.
 func TestHasNodeSubgraph(t *testing.T) {
 	g, err := buildTestGraphHelper()
 	assert.NoError(t, err)
