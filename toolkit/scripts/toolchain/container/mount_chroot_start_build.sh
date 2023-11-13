@@ -20,8 +20,8 @@ mkdir -pv $LFS/{dev,proc,sys,run}
 mknod -m 600 $LFS/dev/console c 5 1
 mknod -m 666 $LFS/dev/null c 1 3
 mount -v --bind /dev $LFS/dev
-#mount -vt devpts devpts $LFS/dev/pts -o gid=5,mode=620
-mount -v --bind /dev/pts $LFS/dev/pts
+mount -vt devpts devpts $LFS/dev/pts -o gid=5,mode=620
+#mount -v --bind /dev/pts $LFS/dev/pts
 mount -vt proc proc $LFS/proc
 mount -vt sysfs sysfs $LFS/sys
 mount -vt tmpfs tmpfs $LFS/run
@@ -39,12 +39,12 @@ ls -la /
 chroot "$LFS" /usr/bin/env -i   \
     HOME=/root                  \
     TERM="$TERM"                \
-    PS1='(lfs chroot) \u:\w\$ ' \
+    PS1='\u:\w\$ '              \
     PATH=/usr/bin:/usr/sbin     \
-    LFS="$LFS" \
-    LC_ALL="$LC_ALL" \
-    LFS_TGT="$LFS_TGT" \
-    /bin/bash --login +h \
+    LFS="$LFS"                  \
+    LC_ALL="$LC_ALL"            \
+    LFS_TGT="$LFS_TGT"          \
+    /bin/bash --login +h        \
     -c "sh /tools/toolchain_build_in_chroot.sh"
 
 sh /tools/unmount_chroot.sh

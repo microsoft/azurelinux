@@ -9,6 +9,7 @@
 set -x
 
 touch /logs/status_start_toolchain_build_in_chroot
+
 echo Calling script to create files:
 
 sh /tools/toolchain_initial_chroot_setup.sh
@@ -25,37 +26,8 @@ case $(uname -m) in
     ;;
 esac
 
-echo Printing debug info
-echo Path: $PATH
-ls -la /bin/bash
-ls -la /bin/sh
-ls -la /bin
-ls -la /tools
-ls -la /tools/bin
-ls -la /tools/lib
-ls -la /lib64
-ls /tools/bin
-ls /tools/sbin
-ls /bin
-ls /
-ls /usr/bin
-ls /usr/sbin
-ls -la /usr/sbin
-ls -la /usr/bin
-ls -la /bin/bash
-ls -la /bin/sh
-
-echo "Sanity check 3 (raw toolchain - before building gcc)"
-find / -name ld-linux-x86-64.so.2
-ls -la /lib64/ld-linux-x86-64.so.2
-ls -la /tools/lib/ld-linux-x86-64.so.2
-ls -la /lib64
-ls -la /lib64/ld-lsb-x86-64.so.3
-ls -la /lib64/ld-linux-x86-64.so.2
-file /tools/bin/gcc
-gcc -v
-echo "End sanity check 3"
-echo Finished printing debug info
+# sanity check 3
+sh /tools/sanity_check.sh "3"
 
 set -e
 #
@@ -376,72 +348,27 @@ case $(uname -m) in
     sed -e '/mabi.lp64=/s/lib64/lib/' -i.orig gcc/config/aarch64/t-aarch64-linux
   ;;
 esac
+# TODO: patch -Np1 -i /tools/CVE-2023-4039.patch
 mkdir -v build
 cd       build
 LD=ld \
 ../configure --prefix=/usr            \
-             --enable-languages=c,c++,fortran \
              --enable-default-pie     \
              --enable-default-ssp     \
              --disable-multilib       \
              --disable-bootstrap      \
              --disable-fixincludes    \
              --disable-libsanitizer   \
-             --with-system-zlib
+             --with-system-zlib       \
+             --enable-languages=c,c++,fortran
 make -j$(nproc)
 make install
 ln -svr /usr/bin/cpp /usr/lib
 ln -sfv ../../libexec/gcc/$(gcc -dumpmachine)/13.2.0/liblto_plugin.so \
         /usr/lib/bfd-plugins/
 
-# Sanity check
-set +e
-echo "Sanity check 5 (raw toolchain - gcc)"
-ldconfig -v
-ldconfig -p
-ldconfig
-gcc -dumpmachine
-sync
-echo 'int main(){}' > dummy.c
-cc dummy.c -v -Wl,--verbose &> dummy.log
-cat dummy.log
-readelf -l a.out | grep ld-linux
-echo Expected output: '[Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]'
-# Expected output:
-# [Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]
-grep -o '/usr/lib.*/crt[1in].*succeeded' dummy.log
-# Expected output:
-# /usr/lib/gcc/x86_64-pc-linux-gnu/11.2.0/../../../../lib/crt1.o succeeded
-# /usr/lib/gcc/x86_64-pc-linux-gnu/11.2.0/../../../../lib/crti.o succeeded
-# /usr/lib/gcc/x86_64-pc-linux-gnu/11.2.0/../../../../lib/crtn.o succeeded
-grep -B4 '^ /usr/include' dummy.log
-# Expected output:
-# #include <...> search starts here:
-#  /usr/lib/gcc/x86_64-pc-linux-gnu/11.2.0/include
-#  /usr/local/include
-#  /usr/lib/gcc/x86_64-pc-linux-gnu/11.2.0/include-fixed
-#  /usr/include
-grep 'SEARCH.*/usr/lib' dummy.log |sed 's|; |\n|g'
-# Expected output:
-# SEARCH_DIR("/usr/x86_64-pc-linux-gnu/lib64")
-# SEARCH_DIR("/usr/local/lib64")
-# SEARCH_DIR("/lib64")
-# SEARCH_DIR("/usr/lib64")
-# SEARCH_DIR("/usr/x86_64-pc-linux-gnu/lib")
-# SEARCH_DIR("/usr/local/lib")
-# SEARCH_DIR("/lib")
-# SEARCH_DIR("/usr/lib");
-grep "/lib.*/libc.so.6 " dummy.log
-echo Expected output: 'attempt to open /lib/libc.so.6 succeeded'
-# Expected output:
-# attempt to open /lib/libc.so.6 succeeded
-grep found dummy.log
-echo Expected output: 'found ld-linux-x86-64.so.2 at /lib/ld-linux-x86-64.so.2'
-# Expected output:
-# found ld-linux-x86-64.so.2 at /lib/ld-linux-x86-64.so.2
-rm -v dummy.c a.out dummy.log
-echo "End sanity check 5"
-set -e
+# sanity check 5
+sh /tools/sanity_check.sh "5"
 
 mkdir -pv /usr/share/gdb/auto-load/usr/lib
 mv -v /usr/lib/*gdb.py /usr/share/gdb/auto-load/usr/lib
@@ -1006,12 +933,6 @@ popd
 rm -rf "$DEBUGEDIT_WITH_VERSION"
 touch /logs/status_debugedit_complete
 
-# RPM_WITH_VERSION=rpm-4.19.0
-# RPM_FOLDER="$RPM_WITH_VERSION"
-# echo $RPM_WITH_VERSION
-# tar xf "$RPM_WITH_VERSION".tar.bz2
-# pushd "$RPM_FOLDER"
-
 RPM_WITH_VERSION=rpm-4.17.0
 RPM_FOLDER="$RPM_WITH_VERSION"-release
 echo $RPM_WITH_VERSION
@@ -1032,7 +953,6 @@ sed -iE '/Always build/,+16 d' Makefile.am
         --without-selinux \
         --with-crypto=openssl \
         --with-vendor=mariner
-
 make -j$(nproc)
 make install
 install -d /var/lib/rpm
@@ -1055,8 +975,7 @@ rm -rf /tmp/*
 find /usr/lib /usr/libexec -name \*.la -delete
 find /usr -depth -name $(uname -m)-lfs-linux-gnu\* | xargs rm -rf
 
-echo "Sanity check 6 (raw toolchain - after build complete)"
-gcc -v
-echo "End sanity check 6"
+# sanity check 6
+sh /tools/sanity_check.sh "6"
 
 touch /logs/status_building_in_chroot_complete
