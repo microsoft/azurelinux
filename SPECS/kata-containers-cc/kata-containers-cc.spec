@@ -7,7 +7,7 @@
 %global debug_package %{nil}
 
 Name:         kata-containers-cc
-Version:      0.6.2
+Version:      0.6.1
 Release:      1%{?dist}
 Summary:      Kata Confidential Containers
 License:      ASL 2.0
