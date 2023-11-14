@@ -1227,8 +1227,8 @@
         "type": "other",
         "other": {
           "name": "boost",
-          "version": "1.76.0",
-          "downloadUrl": "https://downloads.sourceforge.net/boost/boost_1_76_0.tar.bz2"
+          "version": "1.83.0",
+          "downloadUrl": "https://boostorg.jfrog.io/artifactory/main/release/1.83.0/source/boost_1_83_0.tar.bz2"
         }
       }
     },
@@ -4100,8 +4100,8 @@
         "type": "other",
         "other": {
           "name": "gdb",
-          "version": "11.2",
-          "downloadUrl": "https://ftp.gnu.org/gnu/gdb/gdb-11.2.tar.xz"
+          "version": "13.2",
+          "downloadUrl": "https://ftp.gnu.org/gnu/gdb/gdb-13.2.tar.xz"
         }
       }
     },
@@ -24964,8 +24964,8 @@
         "type": "other",
         "other": {
           "name": "PyYAML",
-          "version": "5.2",
-          "downloadUrl": "https://pyyaml.org/download/pyyaml/PyYAML-5.2.tar.gz"
+          "version": "5.3.1",
+          "downloadUrl": "https://pyyaml.org/download/pyyaml/PyYAML-5.3.1.tar.gz"
         }
       }
     },
