@@ -7,8 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://github.com/pallets/werkzeug
-#Source0:        https://github.com/pallets/werkzeug/archive/%{version}.tar.gz#/werkzeug-%{version}.tar.gz
-Source0:               werkzeug-%{version}.tar.gz
+Source0:        https://github.com/pallets/werkzeug/archive/%{version}.tar.gz#/werkzeug-%{version}.tar.gz
 Patch0:         enable-tests-in-rpm-env.patch
 Patch1:         CVE-2023-46136.patch
 BuildArch:      noarch
@@ -54,10 +53,6 @@ Werkzeug started as simple collection of various utilities for WSGI applications
 %check
 pip3 install tox==4.6.3 tox-current-env
 pip3 install -r requirements/tests.txt
-# The default %%tox macro causes some test failures seemingly due to the way werkzeug invokes additional python processes during the
-# testing process, so tox is invoked manually here.
-# This is a known limitation of tox-current-env. See https://pypi.org/project/tox-current-env/ under "Do not rely on virtualenv details"
-# for more information.
 %tox
 
 %files -n python3-werkzeug -f %{pyproject_files}
@@ -72,6 +67,7 @@ pip3 install -r requirements/tests.txt
 - Migrated to pyproject build
 - Added required MarkupSafe dependency
 - Added patch for CVE-2023-46136
+- Added patch to enable %%check tests
 
 * Tue Mar 14 2023 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 2.2.3-1
 - Updated to version 2.2.3 for CVE-2023-23934 adn CVE-2023-25577
