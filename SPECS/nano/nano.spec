@@ -52,8 +52,13 @@ make %{?_smp_mflags} check
 %{_docdir}/%{name}-%{version}/*
 
 %changelog
+<<<<<<< HEAD
 * Mon Nov 13 2023 Thien Trung Vuong <tvuong@microsoft.com> - 6.0-3
 - test bump nano release number
+=======
+* Tue Nov 14 2023 Thien Trung Vuong <tvuong@microsoft.com> - 6.0-3
+- Dummy bump nano version
+>>>>>>> 3243d9d7a ([TEST PR] dummy bump nano version (#6751))
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 6.0-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
