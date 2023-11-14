@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
@@ -15,6 +16,10 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safeloopback"
 	"github.com/moby/sys/mountinfo"
 	"github.com/stretchr/testify/assert"
+)
+
+const (
+	RetryDuration = 3 * time.Second
 )
 
 func TestResourceBusy(t *testing.T) {
@@ -104,9 +109,15 @@ func TestResourceBusy(t *testing.T) {
 	defer fileOnPartition.Close()
 
 	// Try to close the mount.
+	startTime := time.Now()
 	err = mount.CleanClose()
+	endTime := time.Now()
+
 	assert.Error(t, err)
 	assert.ErrorContains(t, err, "busy")
+
+	// Sanity check that the retries were attempted.
+	assert.LessOrEqual(t, RetryDuration, endTime.Sub(startTime))
 
 	// Close the file.
 	fileOnPartition.Close()
