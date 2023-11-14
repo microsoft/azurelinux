@@ -352,18 +352,41 @@ func printSummary(failedSRPMs, failedSRPMsTests map[string]*BuildResult, prebuil
 	logger.Log.Info("--------- Summary ---------")
 	logger.Log.Info("---------------------------")
 
-	color.Cyan("Prints text in cyan.")
-
 	logger.Log.Infof(color.GreenString("Number of prebuilt SRPMs:           " + fmt.Sprint(len(prebuiltSRPMs))))
 	logger.Log.Infof(color.BlueString("Number of prebuilt delta SRPMs:     " + fmt.Sprint(len(prebuiltDeltaSRPMs))))
 	logger.Log.Infof(color.BlueString("Number of skipped SRPMs tests:      " + fmt.Sprint(len(skippedSRPMsTests))))
 	logger.Log.Infof(color.GreenString("Number of built SRPMs:              " + fmt.Sprint(len(builtSRPMs))))
 	logger.Log.Infof(color.GreenString("Number of tested SRPMs:             " + fmt.Sprint(len(testedSRPMs))))
-	logger.Log.Infof(color.RedString("Number of unresolved dependencies:  " + fmt.Sprint(len(unresolvedDependencies))))
-	logger.Log.Infof(color.RedString("Number of blocked SRPMs:            " + fmt.Sprint(len(blockedSRPMs))))
-	logger.Log.Infof(color.RedString("Number of blocked SRPMs tests:      " + fmt.Sprint(len(blockedSRPMsTests))))
-	logger.Log.Infof(color.RedString("Number of failed SRPMs:             " + fmt.Sprint(len(failedSRPMs))))
-	logger.Log.Infof(color.RedString("Number of failed SRPMs tests:       " + fmt.Sprint(len(failedSRPMsTests))))
+
+	if len(unresolvedDependencies) > 0 {
+		logger.Log.Infof(color.RedString("Number of unresolved dependencies:  " + fmt.Sprint(len(unresolvedDependencies))))
+	} else {
+		logger.Log.Infof(color.GreenString("Number of unresolved dependencies:  " + fmt.Sprint(len(unresolvedDependencies))))
+	}
+
+	if len(blockedSRPMs) > 0 {
+		logger.Log.Infof(color.RedString("Number of blocked SRPMs:            " + fmt.Sprint(len(blockedSRPMs))))
+	} else {
+		logger.Log.Infof(color.GreenString("Number of blocked SRPMs:            " + fmt.Sprint(len(blockedSRPMs))))
+	}
+
+	if len(blockedSRPMsTests) > 0 {
+		logger.Log.Infof(color.RedString("Number of blocked SRPMs tests:      " + fmt.Sprint(len(blockedSRPMsTests))))
+	} else {
+		logger.Log.Infof(color.GreenString("Number of blocked SRPMs tests:      " + fmt.Sprint(len(blockedSRPMsTests))))
+	}
+
+	if len(failedSRPMs) > 0 {
+		logger.Log.Infof(color.RedString("Number of failed SRPMs:             " + fmt.Sprint(len(failedSRPMs))))
+	} else {
+		logger.Log.Infof(color.GreenString("Number of failed SRPMs:             " + fmt.Sprint(len(failedSRPMs))))
+	}
+
+	if len(failedSRPMsTests) > 0 {
+		logger.Log.Infof(color.RedString("Number of failed SRPMs tests:       " + fmt.Sprint(len(failedSRPMsTests))))
+	} else {
+		logger.Log.Infof(color.GreenString("Number of failed SRPMs tests:       " + fmt.Sprint(len(failedSRPMsTests))))
+	}
 
 	if allowToolchainRebuilds && (len(rpmConflicts) > 0 || len(srpmConflicts) > 0) {
 		logger.Log.Infof("Toolchain RPMs conflicts are ignored since ALLOW_TOOLCHAIN_REBUILDS=y")
