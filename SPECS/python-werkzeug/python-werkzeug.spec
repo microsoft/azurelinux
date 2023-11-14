@@ -64,6 +64,7 @@ pip3 install -r requirements/tests.txt
 %defattr(-,root,root)
 %doc README.rst
 %doc CHANGES.rst
+%license LICENSE.rst
 
 %changelog
 * Mon Nov 06 2023 Nick Samson <nisamson@microsoft.com> - 2.3.7-1
