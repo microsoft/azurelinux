@@ -28187,8 +28187,8 @@
         "type": "other",
         "other": {
           "name": "systemd",
-          "version": "250.3",
-          "downloadUrl": "https://github.com/systemd/systemd-stable/archive/v250.3.tar.gz"
+          "version": "254.5",
+          "downloadUrl": "https://github.com/systemd/systemd-stable/archive/refs/tags/v254.5.tar.gz"
         }
       }
     },
