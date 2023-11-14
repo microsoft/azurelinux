@@ -4,9 +4,6 @@
 package imagemodifierlib
 
 import (
-	"fmt"
-	"os"
-	"path/filepath"
 	"strconv"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
@@ -15,7 +12,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/userutils"
 )
 
-func doModifications(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config) error {
+func doModifications(baseConfigPath string, config *imagecustomizerapi.Config) error {
 	err := addOrUpdateUsers(config.SystemConfig.Users, baseConfigPath)
 	if err != nil {
 		return err
@@ -40,17 +37,6 @@ func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string) error 
 	logger.Log.Infof("Adding/updating user (%s)", user.Name)
 
 	password := user.Password
-	if user.PasswordPath != "" {
-		// Read password from file.
-		passwordFullPath := filepath.Join(baseConfigPath, user.PasswordPath)
-
-		passwordFileContents, err := os.ReadFile(passwordFullPath)
-		if err != nil {
-			return fmt.Errorf("failed to read password file (%s): %w", passwordFullPath, err)
-		}
-
-		password = string(passwordFileContents)
-	}
 
 	// Hash the password.
 	hashedPassword := password
@@ -100,11 +86,11 @@ func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string) error 
 		return err
 	}
 
-	// TODO: update ProvisionUserSSHCerts to allow empty chroot to set user's SSH keys.
-	// err = installutils.ProvisionUserSSHCerts(nil, user.Name, user.SSHPubKeyPaths)
-	// if err != nil {
-	// 	return err
-	// }
+	// Set user's SSH keys.
+	err = installutils.ProvisionUserSSHCertsWithPubKeys(user.Name, user.SSHPubKeys)
+	if err != nil {
+		return err
+	}
 
 	// TODO: update ConfigureUserStartupCommand to allow empty chroot to set user's startup command.
 	// err = installutils.ConfigureUserStartupCommand(nil, user.Name, user.StartupCommand)

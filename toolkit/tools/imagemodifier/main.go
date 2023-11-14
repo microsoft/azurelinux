@@ -16,10 +16,9 @@ import (
 )
 
 var (
-	app = kingpin.New("imagemodifier", "Modifies a pre-built CBL-Mariner image")
+	app = kingpin.New("imagemodifier", "Used by Trident to modify runtime image")
 
-	buildDir                 = app.Flag("build-dir", "Directory to run build out of.").Required().String()
-	configFile               = app.Flag("config-file", "Path of the image customization config file.").Required().String()
+	configFile               = app.Flag("config-file", "Path of the image modification config file.").Required().String()
 	logFile                  = exe.LogFileFlag(app)
 	logLevel                 = exe.LogLevelFlag(app)
 	profFlags                = exe.SetupProfileFlags(app)
@@ -49,7 +48,7 @@ func main() {
 }
 
 func modifyImage() error {
-	err := imagemodifierlib.ModifyImageWithConfigFile(*buildDir, *configFile)
+	err := imagemodifierlib.ModifyImageWithConfigFile(*configFile)
 	if err != nil {
 		return err
 	}

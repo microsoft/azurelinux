@@ -5,6 +5,7 @@ package installutils
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"path"
 	"path/filepath"
@@ -1380,15 +1381,79 @@ func ConfigureUserStartupCommand(installChroot *safechroot.Chroot, username stri
 	return
 }
 
-func ProvisionUserSSHCerts(installChroot *safechroot.Chroot, username string, sshPubKeyPaths []string) (err error) {
-	var (
-		pubKeyData []string
-		exists     bool
-	)
-	const squashErrors = false
+func setupSSHEnvironment(authorizedKeysTempFilePerms os.FileMode, authorizedKeysTempFile string) (err error) {
+
+	// Check if the temporary authorized_keys file exists
+	exists, err := file.PathExists(authorizedKeysTempFile)
+	if err != nil {
+		return fmt.Errorf("error accessing %s file: %v", authorizedKeysTempFile, err)
+	}
+
+	if !exists {
+		// Create the file if it doesn't exist
+		err = file.Create(authorizedKeysTempFile, authorizedKeysTempFilePerms)
+		if err != nil {
+			return fmt.Errorf("failed to create %s file: %v", authorizedKeysTempFile, err)
+		}
+	} else {
+		// Truncate the file if it exists
+		err = os.Truncate(authorizedKeysTempFile, 0)
+		if err != nil {
+			return fmt.Errorf("failed to truncate %s file: %v", authorizedKeysTempFile, err)
+		}
+	}
+
+	return nil
+}
+
+func ProvisionUserSSHCertsWithPubKeys(username string, sshPubKeys []string) (err error) {
+	// Skip user SSH directory generation when not provided with public keys
+	// Let SSH handle the creation of this folder on its first use
+	if len(sshPubKeys) == 0 {
+		return
+	}
+
 	const authorizedKeysTempFilePerms = 0644
 	const authorizedKeysTempFile = "/tmp/authorized_keys"
-	const sshDirectoryPermission = "0700"
+
+	// Getting user's home directory and SSH directory
+	homeDir := userutils.UserHomeDirectory(username)
+	userSSHKeyDir := filepath.Join(homeDir, ".ssh")
+	authorizedKeysFile := filepath.Join(userSSHKeyDir, "authorized_keys")
+
+	err = setupSSHEnvironment(authorizedKeysTempFilePerms, authorizedKeysTempFile)
+	if err != nil {
+		logger.Log.Warn(err)
+		return err
+	}
+
+	for _, pubKeyData := range sshPubKeys {
+		logger.Log.Infof("Adding ssh key (%s) to user (%s) /tmp/authorized_users", pubKeyData, username)
+		pubKeyData += "\n"
+		err = file.Append(pubKeyData, authorizedKeysTempFile)
+		if err != nil {
+			logger.Log.Warnf("Failed to append to %s : %v", authorizedKeysTempFile, err)
+			return
+		}
+
+		_, err = io.Copy(authorizedKeysTempFile, authorizedKeysFile)
+		if err != nil {
+			return fmt.Errorf("failed to copy resource (%s) -> (%s):\nfailed to copy bytes:\n%w", authorizedKeysTempFile, authorizedKeysFile, err)
+		}
+
+		err := setSSHDirOwnershipAndPermissions(username, userSSHKeyDir)
+
+		if err != nil {
+			return err
+		}
+	}
+	return
+}
+
+func ProvisionUserSSHCerts(installChroot *safechroot.Chroot, username string, sshPubKeyPaths []string) (err error) {
+	var pubKeyData []string
+	const authorizedKeysTempFilePerms = 0644
+	const authorizedKeysTempFile = "/tmp/authorized_keys"
 
 	// Skip user SSH directory generation when not provided with public keys
 	// Let SSH handle the creation of this folder on its first use
@@ -1400,25 +1465,13 @@ func ProvisionUserSSHCerts(installChroot *safechroot.Chroot, username string, ss
 	userSSHKeyDir := filepath.Join(homeDir, ".ssh")
 	authorizedKeysFile := filepath.Join(userSSHKeyDir, "authorized_keys")
 
-	exists, err = file.PathExists(authorizedKeysTempFile)
+	// Setting up SSH environment
+	err = setupSSHEnvironment(authorizedKeysTempFilePerms, authorizedKeysTempFile)
 	if err != nil {
-		logger.Log.Warnf("Error accessing %s file : %v", authorizedKeysTempFile, err)
-		return
+		logger.Log.Warn(err)
+		return err
 	}
-	if !exists {
-		logger.Log.Debugf("File %s does not exist. Creating file...", authorizedKeysTempFile)
-		err = file.Create(authorizedKeysTempFile, authorizedKeysTempFilePerms)
-		if err != nil {
-			logger.Log.Warnf("Failed to create %s file : %v", authorizedKeysTempFile, err)
-			return
-		}
-	} else {
-		err = os.Truncate(authorizedKeysTempFile, 0)
-		if err != nil {
-			logger.Log.Warnf("Failed to truncate %s file : %v", authorizedKeysTempFile, err)
-			return
-		}
-	}
+
 	defer os.Remove(authorizedKeysTempFile)
 
 	for _, pubKey := range sshPubKeyPaths {
@@ -1464,32 +1517,43 @@ func ProvisionUserSSHCerts(installChroot *safechroot.Chroot, username string, ss
 	}
 
 	// Change ownership of the folder to belong to the user and their primary group
-	err = installChroot.UnsafeRun(func() (err error) {
-		// Find the primary group of the user
-		stdout, stderr, err := shell.Execute("id", "-g", username)
+	err = installChroot.UnsafeRun(func() error {
+		err := setSSHDirOwnershipAndPermissions(username, userSSHKeyDir)
+
 		if err != nil {
-			logger.Log.Warnf(stderr)
-			return
+			return err
 		}
 
-		primaryGroup := strings.TrimSpace(stdout)
-		logger.Log.Debugf("Primary group for user (%s) is (%s)", username, primaryGroup)
-
-		ownership := fmt.Sprintf("%s:%s", username, primaryGroup)
-		err = shell.ExecuteLive(squashErrors, "chown", "-R", ownership, userSSHKeyDir)
-		if err != nil {
-			return
-		}
-
-		err = shell.ExecuteLive(squashErrors, "chmod", "-R", sshDirectoryPermission, userSSHKeyDir)
-		return
+		return err
 	})
 
+	return nil
+}
+
+func setSSHDirOwnershipAndPermissions(username, userSSHKeyDir string) error {
+	const squashErrors = false
+	const sshDirectoryPermission = "0700"
+
+	// Find the primary group of the user
+	stdout, stderr, err := shell.Execute("id", "-g", username)
 	if err != nil {
-		return
+		return fmt.Errorf("error getting primary group for %s: %s", username, stderr)
+	}
+	primaryGroup := strings.TrimSpace(stdout)
+	logger.Log.Debugf("Primary group for user (%s) is (%s)", username, primaryGroup)
+
+	// Set ownership of the SSH directory
+	ownership := fmt.Sprintf("%s:%s", username, primaryGroup)
+	if err := shell.ExecuteLive(squashErrors, "chown", "-R", ownership, userSSHKeyDir); err != nil {
+		return err
 	}
 
-	return
+	// Set permissions of the SSH directory
+	if err := shell.ExecuteLive(squashErrors, "chmod", "-R", sshDirectoryPermission, userSSHKeyDir); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // SELinuxConfigure pre-configures SELinux file labels and configuration files
