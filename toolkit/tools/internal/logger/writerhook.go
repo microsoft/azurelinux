@@ -7,8 +7,10 @@ import (
 	"fmt"
 	"io"
 	"runtime"
+	"strings"
 	"sync"
 
+	"github.com/fatih/color"
 	"github.com/sirupsen/logrus"
 )
 
@@ -18,6 +20,7 @@ type writerHook struct {
 	level     logrus.Level
 	writer    io.Writer
 	formatter logrus.Formatter
+	useColors bool
 }
 
 // newWriterHook returns new writerHook
@@ -31,11 +34,9 @@ func newWriterHook(writer io.Writer, level logrus.Level, useColors bool, toolNam
 
 	if toolName != "" {
 		formatter.CallerPrettyfier = func(frame *runtime.Frame) (function string, file string) {
-			const gray = 90
-
 			toolNameField := fmt.Sprintf("[%s]", toolName)
 			if useColors {
-				toolNameField = fmt.Sprintf("[\x1b[%dm%s\x1b[0m]", gray, toolName)
+				toolNameField = fmt.Sprintf(color.BlackString("[%s]"), toolName)
 			}
 
 			return "", toolNameField
@@ -46,6 +47,7 @@ func newWriterHook(writer io.Writer, level logrus.Level, useColors bool, toolNam
 		level:     level,
 		writer:    writer,
 		formatter: formatter,
+		useColors: useColors,
 	}
 }
 
@@ -54,6 +56,13 @@ func (h *writerHook) Fire(entry *logrus.Entry) (err error) {
 	// Filter out entries that are at a higher level (more verbose) than the current filter
 	if entry.Level > h.level {
 		return
+	}
+
+	if h.useColors == false {
+		entry.Message = strings.ReplaceAll(entry.Message, "\x1b[31m", "")
+		entry.Message = strings.ReplaceAll(entry.Message, "\x1b[34m", "")
+		entry.Message = strings.ReplaceAll(entry.Message, "\x1b[0m", "")
+		entry.Message = strings.ReplaceAll(entry.Message, "\x1b[32m", "")
 	}
 
 	h.lock.Lock()

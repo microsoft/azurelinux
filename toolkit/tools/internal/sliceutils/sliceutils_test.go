@@ -164,7 +164,7 @@ func TestMapToSliceShouldCreateEmptySliceFromNil(t *testing.T) {
 }
 
 // MapToSlice() should return empty slice for empty map
-func TestMapToSliceShouldCreateEmptySliceFromEmptySet(t *testing.T) {
+func TestMapToSliceShouldCreateEmptySliceFromEmptyMap(t *testing.T) {
 	outputSlice := MapToSlice(make(map[string]string))
 
 	assert.NotNil(t, outputSlice)
@@ -172,15 +172,15 @@ func TestMapToSliceShouldCreateEmptySliceFromEmptySet(t *testing.T) {
 }
 
 // MapToSlice() should return slice with all the keys in the map
-func TestMapToSliceReturnKeysInSet(t *testing.T) {
-	inputSet := map[string]bool{
+func TestMapToSliceReturnKeysInMap(t *testing.T) {
+	inputMap := map[string]bool{
 		"A": true,
 		"B": true,
 		"X": false,
 		"Y": false,
 	}
 	expectedOutput := []string{"A", "B", "X", "Y"}
-	outputSlice := MapToSlice(inputSet)
+	outputSlice := MapToSlice(inputMap)
 
 	assert.ElementsMatch(t, expectedOutput, outputSlice)
 }

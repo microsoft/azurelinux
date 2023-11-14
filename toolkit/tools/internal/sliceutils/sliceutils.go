@@ -74,9 +74,9 @@ func SetToSlice[K comparable](inputSet map[K]bool) []K {
 }
 
 // MapToSlice converts a map[K]V to a slice containing the map's keys.
-func MapToSlice[K comparable, V any](inputSet map[K]V) []K {
-	outputSlice := make([]K, 0, len(inputSet))
-	for element := range inputSet {
+func MapToSlice[K comparable, V any](inputMap map[K]V) []K {
+	outputSlice := make([]K, 0, len(inputMap))
+	for element := range inputMap {
 		outputSlice = append(outputSlice, element)
 	}
 	return outputSlice
