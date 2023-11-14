@@ -1,7 +1,7 @@
 Summary:        Text editor
 Name:           nano
 Version:        6.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -52,6 +52,9 @@ make %{?_smp_mflags} check
 %{_docdir}/%{name}-%{version}/*
 
 %changelog
+* Tue Nov 14 2023 Thien Trung Vuong <tvuong@microsoft.com> - 6.0-3
+- Dummy bump nano version
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 6.0-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
