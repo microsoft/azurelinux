@@ -138,17 +138,17 @@ func SetMacroDir(newMacroDir string) (origenv []string, err error) {
 }
 
 // ExtractNameFromRPMPath strips the version from an RPM file name. i.e. pkg-name-1.2.3-4.cm2.x86_64.rpm -> pkg-name
-func ExtractNameFromRPMPath(rpmFile string) (strippedFile string, err error) {
-	baseName := filepath.Base(rpmFile)
+func ExtractNameFromRPMPath(rpmFilePath string) (packageName string, err error) {
+	baseName := filepath.Base(rpmFilePath)
 
 	// If the path is invalid, return empty string. We consider any string that has at least 1 '-' characters valid.
 	if !strings.Contains(baseName, "-") {
-		err = fmt.Errorf("invalid RPM file name '%s', can't extract name", rpmFile)
+		err = fmt.Errorf("invalid RPM file path '%s', can't extract name", rpmFilePath)
 		return
 	}
 
 	rpmFileSplit := strings.Split(baseName, "-")
-	strippedFile = strings.Join(rpmFileSplit[:len(rpmFileSplit)-2], "-")
+	packageName = strings.Join(rpmFileSplit[:len(rpmFileSplit)-2], "-")
 	return
 }
 
