@@ -7,9 +7,10 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://github.com/pallets/werkzeug
-Source0:        https://github.com/pallets/werkzeug/archive/%{version}.tar.gz#/werkzeug-%{version}.tar.gz
-#Source0:               werkzeug-%{version}.tar.gz
-Patch0:         CVE-2023-46136.patch
+#Source0:        https://github.com/pallets/werkzeug/archive/%{version}.tar.gz#/werkzeug-%{version}.tar.gz
+Source0:               werkzeug-%{version}.tar.gz
+Patch0:         enable-tests-in-rpm-env.patch
+Patch1:         CVE-2023-46136.patch
 BuildArch:      noarch
 
 %description
@@ -57,7 +58,7 @@ pip3 install -r requirements/tests.txt
 # testing process, so tox is invoked manually here.
 # This is a known limitation of tox-current-env. See https://pypi.org/project/tox-current-env/ under "Do not rely on virtualenv details"
 # for more information.
-tox -q --recreate -e %{toxenv}
+%tox
 
 %files -n python3-werkzeug -f %{pyproject_files}
 %defattr(-,root,root)
