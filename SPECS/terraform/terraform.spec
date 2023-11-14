@@ -58,7 +58,7 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./terraform
 
 %changelog
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.3.2-12
-- Bump release to rebuild with go 1.20.10
+- Bump release to rebuild with go 1.20.9
 
 * Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 1.3.2-11
 - Bump release to rebuild with updated version of Go.
