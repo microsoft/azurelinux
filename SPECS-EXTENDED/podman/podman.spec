@@ -391,7 +391,7 @@ cp -pav test/system %{buildroot}/%{_datadir}/%{name}/test/
 - Bump release to rebuild against glibc 2.35-6
 
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.1.1-17
-- Bump release to rebuild with go 1.20.10
+- Bump release to rebuild with go 1.20.9
 
 * Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 4.1.1-16
 - Bump release to rebuild with updated version of Go.
