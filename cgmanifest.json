@@ -1228,7 +1228,7 @@
         "other": {
           "name": "boost",
           "version": "1.83.0",
-          "downloadUrl": "https://boostorg.jfrog.io/artifactory/main/release/1.83.0/source/boost_1_83_0.tar.bz2"
+          "downloadUrl": "https://downloads.sourceforge.net/boost/boost_1_83_0.tar.bz2"
         }
       }
     },
