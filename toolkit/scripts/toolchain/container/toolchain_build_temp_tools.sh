@@ -53,6 +53,7 @@ case $(uname -m) in
     sed -e '/mabi.lp64=/s/lib64/lib/' -i.orig gcc/config/aarch64/t-aarch64-linux
   ;;
 esac
+# TODO: patch -Np1 -i /tools/CVE-2023-4039.patch
 mkdir -v build
 cd       build
 ../configure                                       \
@@ -128,28 +129,13 @@ rm -rf glibc-2.38
 
 touch $LFS/logs/temptoolchain/status_glibc_complete
 
-echo "Sanity check 1 (temptoolchain - glibc)"
-set +e
-$LFS_TGT-gcc -v
-echo 'int main(){}' | $LFS_TGT-gcc -xc -
-readelf -l a.out | grep ld-linux
-case $(uname -m) in
-  x86_64)
-    echo Expected: '[Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]'
-  ;;
-  aarch64)
-    echo Expected: '[Requesting program interpreter: /tools/lib/ld-linux-aarch64.so.1]'
-  ;;
-esac
-rm -v a.out
-set -e
-echo "End sanity check 1"
-
-touch $LFS/logs/temptoolchain/status_sanity_check_1_complete
+# sanity check 1
+sh /tools/sanity_check.sh "1"
 
 echo Libstdc++ from GCC-13.2.0
 tar xf gcc-13.2.0.tar.xz
 pushd gcc-13.2.0
+# TODO: patch -Np1 -i /tools/CVE-2023-4039.patch
 mkdir -v build
 cd       build
 ../libstdc++-v3/configure           \
@@ -400,7 +386,6 @@ rm -rf xz-5.4.4
 touch $LFS/logs/temptoolchain/status_xz_complete
 
 # Binutils pass 2
-
 echo Binutils-2.41 - Pass 2
 tar xf binutils-2.41.tar.xz
 pushd binutils-2.41
@@ -444,6 +429,7 @@ case $(uname -m) in
 esac
 sed '/thread_header =/s/@.*@/gthr-posix.h/' \
     -i libgcc/Makefile.in libstdc++-v3/include/Makefile.in
+# TODO: patch -Np1 -i /tools/CVE-2023-4039.patch
 mkdir -v build
 cd       build
 ../configure                                       \

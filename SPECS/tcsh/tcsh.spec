@@ -2,7 +2,7 @@
 Summary:        An enhanced version of csh, the C shell
 Name:           tcsh
 Version:        6.22.03
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,7 @@ Group:          System Environment/Shells
 URL:            https://www.tcsh.org/
 Source0:        https://astron.com/pub/%{name}/old/%{name}-%{version}.tar.gz
 BuildRequires:  ncurses-devel
+BuildRequires:  libxcrypt-devel
 %if %{with_check}
 BuildRequires:  shadow-utils
 BuildRequires:  sudo
@@ -116,6 +117,9 @@ fi
 %{_mandir}/man1/*.1*
 
 %changelog
+* Fri Nov 10 2023 Andrew Phelps <anphel@microsoft.com> - 6.22.03-2
+- Link with libxcrypt
+
 * Tue Feb 01 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 6.22.03-1
 - Update version to 6.22.03.
 

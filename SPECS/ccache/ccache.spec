@@ -1,6 +1,6 @@
 Summary:        Compiler Cache
 Name:           ccache
-Version:        4.8
+Version:        4.8.3
 Release:        1%{?dist}
 License:        BeOpen AND BSD AND GPLv3+ AND (Patrick Powell's AND Holger Weiss' license) AND Public Domain AND Python AND zlib
 Vendor:         Microsoft Corporation
@@ -56,6 +56,9 @@ done
 %{_libdir}/*
 
 %changelog
+* Fri Nov 10 2023 Andrew Phelps <anphel@microsoft.com> - 4.8.3-1
+- Upgrade to version 4.8.3
+
 * Thu Mar 23 2023 Andrew Phelps <anphel@microsoft.com> - 4.8-1
 - Update to 4.8
 - Remove missing clang symlinks if detected in post install section

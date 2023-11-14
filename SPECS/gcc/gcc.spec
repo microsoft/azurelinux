@@ -48,6 +48,15 @@ Provides:       libquadmath-devel%{?_isa} = %{version}-%{release}
 The GCC package contains the GNU compiler collection,
 which includes the C and C++ compilers.
 
+%package -n     gfortran
+Summary:        GNU Fortran compiler.
+Group:          Development/Tools
+Requires:       gcc = %{version}-%{release}
+Provides:       gcc-gfortran = %{version}-%{release}
+
+%description -n gfortran
+The gfortran package contains GNU Fortran compiler.
+
 %package -n     libgcc
 Summary:        GNU C Library
 Group:          System Environment/Libraries
@@ -129,24 +138,23 @@ This package contains development headers and static library for libgomp
 
 %prep
 %autosetup -p1
-# disable no-pie for gcc binaries
-sed -i '/^NO_PIE_CFLAGS = /s/@NO_PIE_CFLAGS@//' gcc/Makefile.in
 
 %build
+
 CFLAGS="`echo " %{build_cflags} " | sed 's/-Werror=format-security/-Wno-error=format-security/'`"
 CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/-Werror=format-security/-Wno-error=format-security/'`"
 FCFLAGS="`echo " %{build_fflags} " | sed 's/-Werror=format-security/-Wno-error=format-security/'`"
-export CFLAGS
-export CXXFLAGS
-export FCFLAGS
+export CFLAGS="$CFLAGS -Wno-error=missing-include-dirs"
+export CXXFLAGS="$CXXFLAGS -Wno-error=missing-include-dirs"
+export FCFLAGS="$FCFLAGS -Wno-error=missing-include-dirs"
 
+LD=ld \
 %configure \
     --enable-shared \
-    LD=ld \
     --enable-threads=posix \
     --enable-__cxa_atexit \
     --enable-clocale=gnu \
-    --enable-languages=c,c++ \
+    --enable-languages=c,c++,fortran \
     --disable-multilib \
     --disable-bootstrap \
     --enable-linker-build-id \
@@ -155,13 +163,13 @@ export FCFLAGS
     --enable-default-ssp \
     --disable-fixincludes \
     --disable-libsanitizer \
-    --enable-default-pie \
     --with-system-zlib
 make %{?_smp_mflags}
 
 %install
 make %{?_smp_mflags} DESTDIR=%{buildroot} install
 install -vdm 755 %{buildroot}/%{_libdir}
+ln -sv %{_bindir}/cpp %{buildroot}/%{_libdir}
 ln -sv gcc %{buildroot}%{_bindir}/cc
 install -vdm 755 %{buildroot}%{_datarootdir}/gdb/auto-load%{_libdir}
 mv -v %{buildroot}%{_lib64dir}/*gdb.py %{buildroot}%{_datarootdir}/gdb/auto-load%{_libdir}
@@ -194,6 +202,7 @@ $tests_ok
 %files -f %{name}.lang
 %defattr(-,root,root)
 %license COPYING
+%{_libdir}/cpp
 # Executables
 %exclude %{_bindir}/*gfortran
 %exclude %{_bindir}/*c++
@@ -222,6 +231,12 @@ $tests_ok
 %exclude %{_lib64dir}/libgomp*
 %exclude %{_lib64dir}/libstdc++*
 %exclude %{_lib64dir}/libsupc++*
+
+%files -n gfortran
+%defattr(-,root,root)
+%{_bindir}/*gfortran
+%{_mandir}/man1/gfortran.1.gz
+%{_libexecdir}/gcc/%{_arch}-%{_host_vendor}-linux-gnu/%{version}/f951
 
 %files -n libbacktrace-static
 %defattr(-,root,root)

@@ -1,17 +1,17 @@
-%define sourcever 3390200
+%define sourcever 3440000
 Summary:        A portable, high level programming interface to various calling conventions
 Name:           sqlite
-Version:        3.39.2
-Release:        2%{?dist}
+Version:        3.44.0
+Release:        1%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/GeneralLibraries
 URL:            https://www.sqlite.org
-Source0:        https://www.sqlite.org/2022/%{name}-autoconf-%{sourcever}.tar.gz
+Source0:        https://www.sqlite.org/2023/%{name}-autoconf-%{sourcever}.tar.gz
 # CVE-2015-3717 applies to versions shipped in iOS and OS X
 Patch0:         CVE-2015-3717.nopatch
-Patch1:         CVE-2022-46908.patch
+#Patch1:         CVE-2022-46908.patch
 Requires:       sqlite-libs = %{version}-%{release}
 Provides:       sqlite3
 
@@ -82,6 +82,9 @@ make %{?_smp_mflags} check
 %{_libdir}/libsqlite3.so.0.8.6
 
 %changelog
+* Fri Nov 10 2023 Andrew Phelps <anphel@microsoft.com> - 3.44.0-1
+- Upgrade to version 3.44.0
+
 * Tue Dec 13 2022 Daniel McIlvaney <damcilva@microsoft.com> - 3.39.2-2
 - Address CVE-2022-46908
 
