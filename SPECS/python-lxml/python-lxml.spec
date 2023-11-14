@@ -37,7 +37,7 @@ ElementTree API.
 patch -Np1 --ignore-whitespace < %{PATCH0}
 
 %build
-%{py3_build "--with-cython"}
+%{py3_build "--without-cython"}
 
 %install
 %py3_install

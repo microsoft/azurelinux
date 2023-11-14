@@ -656,9 +656,8 @@ index 35a321b7..6282f0a3 100644
      cdef _BaseContext context
      cdef xpath.xmlXPathContext* rctxt = ctxt.context
      context = <_BaseContext> rctxt.userData
-
 diff --git a/src/lxml/xpath.pxi b/src/lxml/xpath.pxi
-index a7cae4bf..4d0951b2 100644
+index a7cae4bf..ac7177fd 100644
 --- a/src/lxml/xpath.pxi
 +++ b/src/lxml/xpath.pxi
 @@ -26,7 +26,7 @@ cdef object _XPATH_EVAL_ERRORS = (
@@ -679,6 +678,15 @@ index a7cae4bf..4d0951b2 100644
      if ns_utf is None:
          return xpath.xmlXPathRegisterFunc(
              <xpath.xmlXPathContext*>ctxt, _xcstr(name_utf), NULL)
+@@ -78,7 +78,7 @@ cdef class _XPathContext(_BaseContext):
+         xpath.xmlXPathRegisteredVariablesCleanup(self._xpathCtxt)
+         self._cleanup_context()
+ 
+-    cdef void registerExsltFunctions(self):
++    cdef void registerExsltFunctions(self) noexcept:
+         if xslt.LIBXSLT_VERSION < 10125:
+             # we'd only execute dummy functions anyway
+             return
 @@ -99,7 +99,7 @@ cdef class _XPathContext(_BaseContext):
  
  
@@ -705,4 +713,36 @@ index a7cae4bf..4d0951b2 100644
 +    cdef void _unlock(self) noexcept:
          if config.ENABLE_THREADING and self._eval_lock != NULL:
              python.PyThread_release_lock(self._eval_lock)
+ 
 
+diff --git a/src/lxml/xmlschema.pxi b/src/lxml/xmlschema.pxi
+index fe7a2bac..0f7dbb5c 100644
+--- a/src/lxml/xmlschema.pxi
++++ b/src/lxml/xmlschema.pxi
+@@ -175,7 +175,7 @@ cdef class _ParserSchemaValidationContext:
+         return self._schema._newSaxValidator(
+             self._add_default_attributes)
+ 
+-    cdef void inject_default_attributes(self, xmlDoc* c_doc):
++    cdef void inject_default_attributes(self, xmlDoc* c_doc) noexcept:
+         # we currently need to insert default attributes manually
+         # after parsing, as libxml2 does not support this at parse
+         # time
+@@ -198,7 +198,7 @@ cdef class _ParserSchemaValidationContext:
+         self._sax_plug = xmlschema.xmlSchemaSAXPlug(
+             self._valid_ctxt, &c_ctxt.sax, &c_ctxt.userData)
+ 
+-    cdef void disconnect(self):
++    cdef void disconnect(self) noexcept:
+         if self._sax_plug is not NULL:
+             xmlschema.xmlSchemaSAXUnplug(self._sax_plug)
+             self._sax_plug = NULL
+@@ -206,7 +206,7 @@ cdef class _ParserSchemaValidationContext:
+             xmlschema.xmlSchemaSetValidStructuredErrors(
+                 self._valid_ctxt, NULL, NULL)
+ 
+-    cdef bint isvalid(self):
++    cdef bint isvalid(self) noexcept:
+         if self._valid_ctxt is NULL:
+             return 1 # valid
+         return xmlschema.xmlSchemaIsValid(self._valid_ctxt)
