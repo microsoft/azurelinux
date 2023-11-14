@@ -14,26 +14,9 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
+
+	"github.com/fatih/color"
 )
-
-const (
-	colorReset = "\033[33m"
-	colorRed   = "\033[31m"
-	colorGreen = "\033[32m"
-	colorBlue  = "\033[34m"
-)
-
-func printInRed(inputString string) string {
-	return colorRed + inputString + colorReset
-}
-
-func printInGreen(inputString string) string {
-	return colorGreen + inputString + colorReset
-}
-
-func printInBlue(inputString string) string {
-	return colorBlue + inputString + colorReset
-}
 
 // PrintBuildResult prints a build result to the logger.
 func PrintBuildResult(res *BuildResult) {
@@ -131,7 +114,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	printSummary(failedSRPMs, failedSRPMsTests, prebuiltSRPMs, prebuiltDeltaSRPMs, builtSRPMs, testedSRPMs, skippedSRPMsTests, unresolvedDependencies, blockedSRPMs, blockedSRPMsTests, rpmConflicts, srpmConflicts, allowToolchainRebuilds, conflictsLogger)
 
 	if len(prebuiltSRPMs) != 0 {
-		logger.Log.Info(printInGreen("Prebuilt SRPMs:"))
+		logger.Log.Info(color.RedString("Prebuilt SRPMs:"))
 		keys := sliceutils.MapToSlice(prebuiltSRPMs)
 		sort.Strings(keys)
 		for _, prebuiltSRPM := range keys {
@@ -140,7 +123,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	}
 
 	if len(prebuiltDeltaSRPMs) != 0 {
-		logger.Log.Info(printInBlue("Skipped SRPMs (i.e., delta mode is on, packages are already available in a repo):"))
+		logger.Log.Info(color.BlueString("Skipped SRPMs (i.e., delta mode is on, packages are already available in a repo):"))
 		keys := sliceutils.MapToSlice(prebuiltDeltaSRPMs)
 		sort.Strings(keys)
 		for _, prebuiltDeltaSRPM := range keys {
@@ -149,7 +132,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	}
 
 	if len(skippedSRPMsTests) != 0 {
-		logger.Log.Info(printInBlue("Skipped SRPMs tests:"))
+		logger.Log.Info(color.BlueString("Skipped SRPMs tests:"))
 		keys := sliceutils.MapToSlice(skippedSRPMsTests)
 		sort.Strings(keys)
 		for _, skippedSRPMsTest := range keys {
@@ -158,7 +141,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	}
 
 	if len(builtSRPMs) != 0 {
-		logger.Log.Info(printInGreen("Built SRPMs:"))
+		logger.Log.Info(color.GreenString("Built SRPMs:"))
 		keys := sliceutils.MapToSlice(builtSRPMs)
 		sort.Strings(keys)
 		for _, builtSRPM := range keys {
@@ -167,7 +150,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	}
 
 	if len(testedSRPMs) != 0 {
-		logger.Log.Info(printInGreen("Tested SRPMs:"))
+		logger.Log.Info(color.GreenString("Tested SRPMs:"))
 		keys := sliceutils.MapToSlice(testedSRPMs)
 		sort.Strings(keys)
 		for _, testedSRPM := range keys {
@@ -176,7 +159,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	}
 
 	if len(unresolvedDependencies) != 0 {
-		logger.Log.Info(printInRed("Unresolved dependencies:"))
+		logger.Log.Info(color.GreenString("Unresolved dependencies:"))
 		keys := sliceutils.MapToSlice(unresolvedDependencies)
 		sort.Strings(keys)
 		for _, unresolvedDependency := range keys {
@@ -185,7 +168,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	}
 
 	if len(blockedSRPMs) != 0 {
-		logger.Log.Info(printInRed("Blocked SRPMs:"))
+		logger.Log.Info(color.RedString("Blocked SRPMs:"))
 		keys := sliceutils.MapToSlice(blockedSRPMs)
 		sort.Strings(keys)
 		for _, blockedSRPM := range keys {
@@ -194,7 +177,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	}
 
 	if len(blockedSRPMsTests) != 0 {
-		logger.Log.Info(printInRed("Blocked SRPMs tests:"))
+		logger.Log.Info(color.RedString("Blocked SRPMs tests:"))
 		keys := sliceutils.MapToSlice(blockedSRPMsTests)
 		sort.Strings(keys)
 		for _, blockedSRPMsTest := range keys {
@@ -203,7 +186,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	}
 
 	if len(rpmConflicts) != 0 {
-		conflictsLogger(printInRed("RPM conflicts with toolchain:"))
+		conflictsLogger(color.RedString("RPM conflicts with toolchain:"))
 		sort.Strings(rpmConflicts)
 		for _, conflict := range rpmConflicts {
 			conflictsLogger("--> %s", conflict)
@@ -211,7 +194,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	}
 
 	if len(srpmConflicts) != 0 {
-		conflictsLogger(printInRed("SRPM conflicts with toolchain:"))
+		conflictsLogger(color.RedString("SRPM conflicts with toolchain:"))
 		sort.Strings(srpmConflicts)
 		for _, conflict := range srpmConflicts {
 			conflictsLogger("--> %s", conflict)
@@ -219,7 +202,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	}
 
 	if len(failedSRPMs) != 0 {
-		logger.Log.Info(printInRed("Failed SRPMs:"))
+		logger.Log.Info(color.RedString("Failed SRPMs:"))
 		keys := sliceutils.MapToSlice(failedSRPMs)
 		sort.Strings(keys)
 		for _, key := range keys {
@@ -229,7 +212,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	}
 
 	if len(failedSRPMsTests) != 0 {
-		logger.Log.Info(printInRed("Failed SRPMs tests:"))
+		logger.Log.Info(color.RedString("Failed SRPMs tests:"))
 		keys := sliceutils.MapToSlice(failedSRPMsTests)
 		sort.Strings(keys)
 		for _, key := range keys {
@@ -369,23 +352,25 @@ func printSummary(failedSRPMs, failedSRPMsTests map[string]*BuildResult, prebuil
 	logger.Log.Info("--------- Summary ---------")
 	logger.Log.Info("---------------------------")
 
-	logger.Log.Infof(printInGreen("Number of prebuilt SRPMs:           " + fmt.Sprint(len(prebuiltSRPMs))))
-	logger.Log.Infof(printInBlue("Number of prebuilt delta SRPMs:     " + fmt.Sprint(len(prebuiltDeltaSRPMs))))
-	logger.Log.Infof(printInBlue("Number of skipped SRPMs tests:      " + fmt.Sprint(len(skippedSRPMsTests))))
-	logger.Log.Infof(printInGreen("Number of built SRPMs:              " + fmt.Sprint(len(builtSRPMs))))
-	logger.Log.Infof(printInGreen("Number of tested SRPMs:             " + fmt.Sprint(len(testedSRPMs))))
-	logger.Log.Infof(printInRed("Number of unresolved dependencies:  " + fmt.Sprint(len(unresolvedDependencies))))
-	logger.Log.Infof(printInRed("Number of blocked SRPMs:            " + fmt.Sprint(len(blockedSRPMs))))
-	logger.Log.Infof(printInRed("Number of blocked SRPMs tests:      " + fmt.Sprint(len(blockedSRPMsTests))))
-	logger.Log.Infof(printInRed("Number of failed SRPMs:             " + fmt.Sprint(len(failedSRPMs))))
-	logger.Log.Infof(printInRed("Number of failed SRPMs tests:       " + fmt.Sprint(len(failedSRPMsTests))))
+	color.Cyan("Prints text in cyan.")
+
+	logger.Log.Infof(color.GreenString("Number of prebuilt SRPMs:           " + fmt.Sprint(len(prebuiltSRPMs))))
+	logger.Log.Infof(color.BlueString("Number of prebuilt delta SRPMs:     " + fmt.Sprint(len(prebuiltDeltaSRPMs))))
+	logger.Log.Infof(color.BlueString("Number of skipped SRPMs tests:      " + fmt.Sprint(len(skippedSRPMsTests))))
+	logger.Log.Infof(color.GreenString("Number of built SRPMs:              " + fmt.Sprint(len(builtSRPMs))))
+	logger.Log.Infof(color.GreenString("Number of tested SRPMs:             " + fmt.Sprint(len(testedSRPMs))))
+	logger.Log.Infof(color.RedString("Number of unresolved dependencies:  " + fmt.Sprint(len(unresolvedDependencies))))
+	logger.Log.Infof(color.RedString("Number of blocked SRPMs:            " + fmt.Sprint(len(blockedSRPMs))))
+	logger.Log.Infof(color.RedString("Number of blocked SRPMs tests:      " + fmt.Sprint(len(blockedSRPMsTests))))
+	logger.Log.Infof(color.RedString("Number of failed SRPMs:             " + fmt.Sprint(len(failedSRPMs))))
+	logger.Log.Infof(color.RedString("Number of failed SRPMs tests:       " + fmt.Sprint(len(failedSRPMsTests))))
 
 	if allowToolchainRebuilds && (len(rpmConflicts) > 0 || len(srpmConflicts) > 0) {
 		logger.Log.Infof("Toolchain RPMs conflicts are ignored since ALLOW_TOOLCHAIN_REBUILDS=y")
 	}
 
 	if len(rpmConflicts) > 0 || len(srpmConflicts) > 0 {
-		conflictsLogger(printInRed("Number of toolchain RPM conflicts:  " + fmt.Sprint(len(rpmConflicts))))
-		conflictsLogger(printInRed("Number of toolchain SRPM conflicts: " + fmt.Sprint(len(srpmConflicts))))
+		conflictsLogger(color.RedString("Number of toolchain RPM conflicts:  " + fmt.Sprint(len(rpmConflicts))))
+		conflictsLogger(color.RedString("Number of toolchain SRPM conflicts: " + fmt.Sprint(len(srpmConflicts))))
 	}
 }
