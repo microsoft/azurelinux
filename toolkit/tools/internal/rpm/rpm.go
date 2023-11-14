@@ -149,6 +149,10 @@ func ExtractNameFromRPMPath(rpmFilePath string) (packageName string, err error) 
 
 	rpmFileSplit := strings.Split(baseName, "-")
 	packageName = strings.Join(rpmFileSplit[:len(rpmFileSplit)-2], "-")
+	if packageName == "" {
+		err = fmt.Errorf("invalid RPM file path '%s', can't extract name", rpmFilePath)
+		return
+	}
 	return
 }
 
