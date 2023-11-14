@@ -22,6 +22,10 @@ parameters:
     type: string
     default: ""
 
+  - name: testRerunList
+    type: string
+    default: ""
+
   - name: failOnTestFailures
     type: boolean
     default: true
@@ -199,6 +203,7 @@ steps:
         $delta_fetch_arg \
         $quick_rebuild_packages_arg \
         $run_check_arg \
+        TEST_RERUN_LIST="${{ parameters.testRerunList }}" \
         $use_ccache_arg
     displayName: "Build packages"
 
