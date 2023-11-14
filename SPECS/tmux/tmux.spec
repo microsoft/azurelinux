@@ -1,7 +1,7 @@
 Summary:        Terminal multiplexer
 Name:           tmux
 Version:        3.2a
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ISC and BSD
 URL:            https://tmux.github.io/
 Group:          Applications/System
@@ -9,8 +9,9 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://github.com/tmux/tmux/releases/download/%{version}/%{name}-%{version}.tar.gz
 Patch0:         CVE-2022-47016.patch
-Requires:       libevent ncurses
-BuildRequires:  libevent-devel ncurses-devel
+Patch1:         manual-patch-to-fix-crash-due-to-change-to-ncurses.patch
+Requires:       libevent ncurses >= 6.4-2
+BuildRequires:  libevent-devel ncurses-devel >= 6.4-2
 
 %description
 Terminal multiplexer
@@ -38,6 +39,10 @@ make  %{?_smp_mflags} check
 %exclude /usr/src
 
 %changelog
+* Thu Nov 16 2023 Tobias Brick <tobiasb@microsoft.com> - 3.2a-4
+- Add dependency on ncurses >= 6.4-2
+- Patch to fix crash due to kprevious change to ncurses
+
 * Fri Feb 10 2023 Rachel Menge <rachelmenge@microsoft.com> - 3.2a-3
 - Patch CVE-2022-47016
 

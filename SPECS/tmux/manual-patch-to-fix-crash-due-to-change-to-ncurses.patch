@@ -1,0 +1,90 @@
+From 8bec5e2d2e5a6c77ce3c2ec2c38e658efc6fc26f Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Thu, 26 Oct 2023 17:23:48 +0000
+Subject: [PATCH] Manual patch to fix crash due to change to ncurses
+
+ncurses-6.4-20230408 change tparm to require cur_term, which broke tmux usage of it.
+
+ncurses-6.4-20230423 then added tiparm_s that allows usage without cur_term.
+
+tmux change https://github.com/tmux/tmux/commit/39d41d0810d4e8ae6ce8d27776dfbb96722d9319 uses tiparm_s if it exists, but cannot be cleanly applied to tmux tag 3.2a.
+
+That change uses a config setting to created #defines to determine which version of tparm it should use, and only conditionally uses tiparm_s, because it needs to be backwards compatible with previous versions of ncurses.
+
+But to use that, we would need to get the actual source as it appears in github, rather than the released version (they are different downloads: see https://github.com/tmux/tmux/releases).
+
+Fortunately, we have the luxery of forcing tmux to use a version of ncurses that has the function we want (see above).
+
+Given all this, this patch takes the change to use tiparm_s, removes the conditional compilation portion so it always uses tiparm_s and applies it to the code as it exists in 3.2a.
+
+It has both a build-time and run-time dependency on ncurses-6.4-20230423 or later.
+---
+ tty-term.c | 30 +++++++++++++++++++++++++-----
+ 1 file changed, 25 insertions(+), 5 deletions(-)
+
+diff --git a/tty-term.c b/tty-term.c
+index add71d89..a5ed1d77 100644
+--- a/tty-term.c
++++ b/tty-term.c
+@@ -761,33 +761,53 @@ tty_term_string(struct tty_term *term, enum tty_code_code code)
+ const char *
+ tty_term_string1(struct tty_term *term, enum tty_code_code code, int a)
+ {
+-	return (tparm((char *) tty_term_string(term, code), a, 0, 0, 0, 0, 0, 0, 0, 0));
++	const char	*x = tty_term_string(term, code), *s;
++	s = tiparm_s(1, 0, x, a);
++	if (s == NULL)
++		fatalx("could not expand %s", tty_term_codes[code].name);
++	return (s);
+ }
+ 
+ const char *
+ tty_term_string2(struct tty_term *term, enum tty_code_code code, int a, int b)
+ {
+-	return (tparm((char *) tty_term_string(term, code), a, b, 0, 0, 0, 0, 0, 0, 0));
++	const char	*x = tty_term_string(term, code), *s;
++	s = tiparm_s(2, 0, x, a, b);
++	if (s == NULL)
++		fatalx("could not expand %s", tty_term_codes[code].name);
++	return (s);
+ }
+ 
+ const char *
+ tty_term_string3(struct tty_term *term, enum tty_code_code code, int a, int b,
+     int c)
+ {
+-	return (tparm((char *) tty_term_string(term, code), a, b, c, 0, 0, 0, 0, 0, 0));
++	const char	*x = tty_term_string(term, code), *s;
++	s = tiparm_s(3, 0, x, a, b, c);
++	if (s == NULL)
++		fatalx("could not expand %s", tty_term_codes[code].name);
++	return (s);
+ }
+ 
+ const char *
+ tty_term_ptr1(struct tty_term *term, enum tty_code_code code, const void *a)
+ {
+-	return (tparm((char *) tty_term_string(term, code), (long)a, 0, 0, 0, 0, 0, 0, 0, 0));
++	const char	*x = tty_term_string(term, code), *s;
++	s = tiparm_s(1, 1, x, a);
++	if (s == NULL)
++		fatalx("could not expand %s", tty_term_codes[code].name);
++	return (s);
+ }
+ 
+ const char *
+ tty_term_ptr2(struct tty_term *term, enum tty_code_code code, const void *a,
+     const void *b)
+ {
+-	return (tparm((char *) tty_term_string(term, code), (long)a, (long)b, 0, 0, 0, 0, 0, 0, 0));
++	const char	*x = tty_term_string(term, code), *s;
++	s = tiparm_s(2, 3, x, a, b);
++	if (s == NULL)
++		fatalx("could not expand %s", tty_term_codes[code].name);
++	return (s);
+ }
+ 
+ int
+-- 
+2.33.8
+
