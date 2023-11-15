@@ -22,6 +22,10 @@ parameters:
     type: string
     default: ""
 
+  - name: testRerunList
+    type: string
+    default: ""
+
   - name: failOnTestFailures
     type: boolean
     default: true
@@ -61,6 +65,22 @@ parameters:
   - name: outputArtifactsFolder
     type: string
     default: "$(Build.ArtifactStagingDirectory)"
+
+  - name: outputArtifactsLogsSubfolder
+    type: string
+    default: "LOGS"
+
+  - name: outputArtifactsPackagesSubfolder
+    type: string
+    default: "ARTIFACTS"
+
+  - name: outputArtifactsTestsSubfolder
+    type: string
+    default: "TESTS"
+
+  - name: maxCPU
+    type: string
+    default: ""
 
   - name: pipArtifactFeeds
     type: string
@@ -175,6 +195,7 @@ steps:
       sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
         CONCURRENT_PACKAGE_BUILDS=${{ parameters.concurrentPackageBuilds }} \
         CONFIG_FILE="" \
+        MAX_CPU="${{ parameters.maxCPU }}" \
         REBUILD_TOOLS=y \
         REPO_LIST="${{ parameters.extraPackageRepos }}" \
         SPECS_DIR="${{ parameters.buildRepoRoot }}/${{ parameters.specsFolderPath }}" \
@@ -182,6 +203,7 @@ steps:
         $delta_fetch_arg \
         $quick_rebuild_packages_arg \
         $run_check_arg \
+        TEST_RERUN_LIST="${{ parameters.testRerunList }}" \
         $use_ccache_arg
     displayName: "Build packages"
 
@@ -192,7 +214,7 @@ steps:
             displayName: "Compress RPMs"
 
           - bash: |
-              published_artifacts_dir="${{ parameters.outputArtifactsFolder }}/ARTIFACTS"
+              published_artifacts_dir="${{ parameters.outputArtifactsFolder }}/${{ parameters.outputArtifactsPackagesSubfolder }}"
               mkdir -p "$published_artifacts_dir"
               cp "${{ parameters.buildRepoRoot }}"/out/rpms.tar.gz "$published_artifacts_dir/${{ parameters.rpmsTarballName }}"
             displayName: "Copy RPMs for publishing"
@@ -203,14 +225,14 @@ steps:
             displayName: "Compress SRPMs"
 
           - bash: |
-              published_artifacts_dir="${{ parameters.outputArtifactsFolder }}/ARTIFACTS"
+              published_artifacts_dir="${{ parameters.outputArtifactsFolder }}/${{ parameters.outputArtifactsPackagesSubfolder }}"
               mkdir -p "$published_artifacts_dir"
               cp "${{ parameters.buildRepoRoot }}"/out/srpms.tar.gz "$published_artifacts_dir/${{ parameters.srpmsTarballName }}"
             displayName: "Copy SRPMs for publishing"
 
       - ${{ if parameters.publishLogs }}:
           - bash: |
-              published_logs_dir="${{ parameters.outputArtifactsFolder }}/LOGS"
+              published_logs_dir="${{ parameters.outputArtifactsFolder }}/${{ parameters.outputArtifactsLogsSubfolder }}"
               mkdir -p "$published_logs_dir"
               tar -C "${{ parameters.buildRepoRoot }}/build/logs/pkggen" -czf "$published_logs_dir/pkggen.logs.tar.gz" .
               tar -C "${{ parameters.buildRepoRoot }}/build/pkg_artifacts" -czf "$published_logs_dir/pkg_artifacts.tar.gz" .
@@ -224,5 +246,6 @@ steps:
           buildRepoRoot: ${{ parameters.buildRepoRoot }}
           failOnTestFailures: ${{ parameters.failOnTestFailures }}
           outputArtifactsFolder: ${{ parameters.outputArtifactsFolder }}
+          outputArtifactsTestsSubfolder: ${{ parameters.outputArtifactsTestsSubfolder }}
           pipArtifactFeeds: ${{ parameters.pipArtifactFeeds }}
           testSuiteName: ${{ parameters.testSuiteName }}

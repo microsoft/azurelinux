@@ -5,9 +5,12 @@ package userutils
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/randomization"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
@@ -17,10 +20,16 @@ const (
 	RootUser          = "root"
 	RootHomeDir       = "/root"
 	UserHomeDirPrefix = "/home"
+
+	ShadowFile = "/etc/shadow"
 )
 
 func HashPassword(password string) (string, error) {
 	const postfixLength = 12
+
+	if password == "" {
+		return "", nil
+	}
 
 	salt, err := randomization.RandomString(postfixLength, randomization.LegalCharactersAlphaNum)
 	if err != nil {
@@ -29,7 +38,7 @@ func HashPassword(password string) (string, error) {
 
 	// Generate hashed password based on salt value provided.
 	// -6 option indicates to use the SHA256/SHA512 algorithm
-	stdout, _, err := shell.Execute("openssl", "passwd", "-6", "-salt", salt, password)
+	stdout, _, err := shell.ExecuteWithStdin(password, "openssl", "passwd", "-6", "-salt", salt, "-stdin")
 	if err != nil {
 		return "", fmt.Errorf("failed to generate hashed password:\n%w", err)
 	}
@@ -62,7 +71,10 @@ func UserExists(username string, installChroot *safechroot.Chroot) (bool, error)
 }
 
 func AddUser(username string, hashedPassword string, uid string, installChroot *safechroot.Chroot) error {
-	var args = []string{username, "-m", "-p", hashedPassword}
+	var args = []string{username, "-m"}
+	if hashedPassword != "" {
+		args = append(args, "-p", hashedPassword)
+	}
 	if uid != "" {
 		args = append(args, "-u", uid)
 	}
@@ -72,6 +84,51 @@ func AddUser(username string, hashedPassword string, uid string, installChroot *
 	})
 	if err != nil {
 		return fmt.Errorf("failed to add user (%s):\n%w", username, err)
+	}
+
+	return nil
+}
+
+func UpdateUserPassword(installRoot, username, hashedPassword string) error {
+	shadowFilePath := filepath.Join(installRoot, ShadowFile)
+
+	if hashedPassword == "" {
+		// In the /etc/shadow file, the values `*` and `!` both mean the user's password login is disabled but the user
+		// may login using other means (e.g. ssh, auto-login, etc.). This interpretation is also used by PAM. When sshd
+		// has `UsePAM` set to `yes`, then sshd defers to PAM the decision on whether or not the user is disabled.
+		// However, when `UsePAM` is set to `no`, then sshd must make this interpretation for itself. And the Mariner
+		// build of sshd is configured to interpret the `!` in the shadow file to mean the user is fully disabled, even
+		// for ssh login. But it interprets `*` to mean that only password login is disabled but sshd public/private key
+		// login is fine.
+		hashedPassword = "*"
+	}
+
+	// Find the line that starts with "<user>:<password>:..."
+	findUserEntry, err := regexp.Compile(fmt.Sprintf("(?m)^%s:[^:]*:", regexp.QuoteMeta(username)))
+	if err != nil {
+		return fmt.Errorf("failed to compile user (%s) password update regex:\n%w", username, err)
+	}
+
+	// Read in existing /etc/shadow file.
+	shadowFileBytes, err := os.ReadFile(shadowFilePath)
+	if err != nil {
+		return fmt.Errorf("failed to read shadow file (%s) to update user's (%s) password:\n%w", shadowFilePath, username, err)
+	}
+
+	shadowFile := string(shadowFileBytes)
+
+	// Try to find the user's entry.
+	entryIndexes := findUserEntry.FindStringIndex(shadowFile)
+	if entryIndexes == nil {
+		return fmt.Errorf("failed to find user (%s) in shadow file (%s)", username, shadowFilePath)
+	}
+
+	newShadowFile := fmt.Sprintf("%s%s:%s:%s", shadowFile[:entryIndexes[0]], username, hashedPassword, shadowFile[entryIndexes[1]:])
+
+	// Write new /etc/shadow file.
+	err = file.Write(newShadowFile, shadowFilePath)
+	if err != nil {
+		return fmt.Errorf("failed to write new shadow file (%s) to update user's (%s) password:\n%w", shadowFilePath, username, err)
 	}
 
 	return nil

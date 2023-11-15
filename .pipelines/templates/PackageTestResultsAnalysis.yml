@@ -14,6 +14,10 @@ parameters:
     type: string
     default: "$(Build.ArtifactStagingDirectory)"
 
+  - name: outputArtifactsTestsSubfolder
+    type: string
+    default: "TESTS"
+
   - name: pipArtifactFeeds
     type: string
     default: ""
@@ -39,6 +43,7 @@ steps:
         displayName: "Authenticate to custom pip artifact feeds"
 
   - bash: pip3 install junit_xml
+    retryCountOnTaskFailure: 3
     displayName: "Install Python dependencies"
 
   - task: PythonScript@0
@@ -279,7 +284,7 @@ steps:
 
   - ${{ if parameters.outputArtifactsFolder }}:
       - bash: |
-          published_tests_dir="${{ parameters.outputArtifactsFolder }}/TESTS"
+          published_tests_dir="${{ parameters.outputArtifactsFolder }}/${{ parameters.outputArtifactsTestsSubfolder }}"
           mkdir -p "$published_tests_dir"
           cp "${{ parameters.testsWorkspace }}/${{ parameters.reportFileName }}" "$published_tests_dir"
         displayName: "Copy test results to the output directory"

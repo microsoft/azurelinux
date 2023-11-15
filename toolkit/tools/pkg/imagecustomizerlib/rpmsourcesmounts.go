@@ -15,7 +15,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repomanager/rpmrepomanager"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safemount.go"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safemount"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/sys/unix"
 	"gopkg.in/ini.v1"
@@ -246,7 +246,7 @@ func (m *rpmSourcesMounts) close() error {
 
 	// Unmount rpm source directories.
 	for _, mount := range m.mounts {
-		err = mount.Close()
+		err = mount.CleanClose()
 		if err != nil {
 			errs = append(errs, err)
 			continue
