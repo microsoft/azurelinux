@@ -35,7 +35,7 @@ func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 
-	logger.InitBestEffort(*logFile, *logLevel, *logColor)
+	logger.InitBestEffort(*logFilePath, *logLevel, *logColor)
 
 	isoMaker := NewIsoMaker(
 		*unattendedInstall,
