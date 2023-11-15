@@ -7,8 +7,10 @@ package safemount
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
 	"golang.org/x/sys/unix"
 )
 
@@ -92,7 +94,13 @@ func (m *Mount) close(async bool) error {
 	if m.isMounted {
 		if !async {
 			logger.Log.Debugf("Unmounting (%s)", m.target)
-			err = unix.Unmount(m.target, 0)
+			_, err = retry.RunWithExpBackoff(
+				func() error {
+					logger.Log.Debugf("Trying to unmount (%s)", m.target)
+					umountErr := unix.Unmount(m.target, 0)
+					return umountErr
+				},
+				3, time.Second, 2.0, nil)
 			if err != nil {
 				return fmt.Errorf("failed to unmount (%s):\n%w", m.target, err)
 			}
