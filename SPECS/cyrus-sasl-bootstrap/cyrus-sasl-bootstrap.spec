@@ -5,7 +5,7 @@
 Summary:        Cyrus Simple Authentication Service Layer (SASL) library
 Name:           %{_base_name}-bootstrap
 Version:        2.1.28
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD with advertising
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -18,6 +18,7 @@ BuildRequires:  krb5-devel >= 1.12
 BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
 BuildRequires:  systemd
+BuildRequires:  libxcrypt-devel
 
 Requires:       %{name}-lib = %{version}-%{release}
 Requires:       krb5 >= 1.12
@@ -192,6 +193,9 @@ make %{?_smp_mflags} check
 %exclude %{_plugindir2}/libsql.so.%{_soversion}*
 
 %changelog
+* Wed Nov 15 2023 Andrew Phelps <anphel@microsoft.com> - 2.1.28-5
+- Add BR for libxcrypt-devel
+
 * Mon Feb 27 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.1.28-4
 - Remove AutoProv no to address build issues in openldap
 
