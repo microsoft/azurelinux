@@ -8,7 +8,7 @@ The file path of the YAML (or JSON) configuration file that specifies how to cus
 the image.
 
 For documentation on the supported configuration options, see:
-[Mariner Image Customizer configuration](./docs/configuration.md)
+[Mariner Image Customizer configuration](../imagecustomizer/docs/configuration.md)
 
 ## --log-level=LEVEL
 

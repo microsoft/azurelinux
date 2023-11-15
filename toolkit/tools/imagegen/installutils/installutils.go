@@ -5,7 +5,6 @@ package installutils
 
 import (
 	"fmt"
-	"io"
 	"os"
 	"path"
 	"path/filepath"
@@ -1535,7 +1534,7 @@ func ProvisionUserSSHCertsWithPubKeys(username string, sshPubKeys []string) (err
 			return
 		}
 
-		_, err = io.Copy(authorizedKeysTempFile, authorizedKeysFile)
+		err = file.Copy(authorizedKeysTempFile, authorizedKeysFile)
 		if err != nil {
 			return fmt.Errorf("failed to copy resource (%s) -> (%s):\nfailed to copy bytes:\n%w", authorizedKeysTempFile, authorizedKeysFile, err)
 		}

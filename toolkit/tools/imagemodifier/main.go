@@ -16,13 +16,13 @@ import (
 )
 
 var (
-	app = kingpin.New("imagemodifier", "Used by Trident to modify runtime image")
+	app = kingpin.New("imagemodifier", "Used inside chroot to modify runtime image")
 
-	configFile               = app.Flag("config-file", "Path of the image modification config file.").Required().String()
-	logFile                  = exe.LogFileFlag(app)
-	logLevel                 = exe.LogLevelFlag(app)
-	profFlags                = exe.SetupProfileFlags(app)
-	timestampFile            = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
+	configFile    = app.Flag("config-file", "Path of the image modification config file.").Required().String()
+	logFile       = exe.LogFileFlag(app)
+	logLevel      = exe.LogLevelFlag(app)
+	profFlags     = exe.SetupProfileFlags(app)
+	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
 )
 
 func main() {
