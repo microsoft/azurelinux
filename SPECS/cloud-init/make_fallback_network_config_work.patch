@@ -1,0 +1,12 @@
+diff -urpN cloud-init-23.3/cloudinit/distros/photon.py b/cloudinit/distros/photon.py
+--- cloud-init-23.3/cloudinit/distros/photon.py	2023-08-28 12:20:24.000000000 -0400
++++ b/cloudinit/distros/photon.py	2023-11-15 08:28:15.823815993 -0500
+@@ -55,7 +55,7 @@ class Distro(distros.Distro):
+ 
+     def generate_fallback_config(self):
+         key = "disable_fallback_netcfg"
+-        disable_fallback_netcfg = self._cfg.get(key, True)
++        disable_fallback_netcfg = self._cfg.get(key, False)
+         LOG.debug("%s value is: %s", key, disable_fallback_netcfg)
+ 
+         if not disable_fallback_netcfg:
