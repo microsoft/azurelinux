@@ -1,6 +1,67 @@
 #!/bin/bash
 
-sudo apt-get install -y mtools dosfstools grub-pc-bin grub2-pc xorriso glibc-iconv
+set -x
+set -e
+
+sudo apt-get install -y mtools dosfstools grub-pc-bin grub-pc xorriso
+
+function CreateEfibootImage () {
+    SRC_GRUB_CFG=$1
+    INTERMEDIATE_OUTPUT=$2
+    DST_DIR=$3
+
+    mkdir -p $INTERMEDIATE_OUTPUT
+
+    rm -f $INTERMEDIATE_OUTPUT/bootx64.efi
+
+    # create bootx64.efi with the our custom grub
+    grub-mkstandalone \
+        --format=x86_64-efi \
+        --locales="" \
+        --fonts="" \
+        --output=$INTERMEDIATE_OUTPUT/bootx64.efi \
+        boot/grub/grub.cfg=$SRC_GRUB_CFG
+
+    #    --verbose \
+
+    # Generate the fs to hold the bootx64.efi - i.e. out/efiboot.img
+    rm -f $INTERMEDIATE_OUTPUT/efiboot.img
+
+    dd if=/dev/zero of=$DST_DIR/efiboot.img bs=1M count=3
+    mkfs.vfat $DST_DIR/efiboot.img
+
+    LC_CTYPE=C mmd -i $DST_DIR/efiboot.img efi efi/boot
+    LC_CTYPE=C mcopy -i $DST_DIR/efiboot.img ./$INTERMEDIATE_OUTPUT/bootx64.efi ::efi/boot/
+
+    echo "Created ---- " $DST_DIR/efiboot.img
+}
+
+function CreateBiosImage () {
+    SRC_GRUB_CFG=$1
+    INTERMEDIATE_OUTPUT=$2
+    DST_DIR=$3
+
+    mkdir -p $DST_DIR
+    rm -f $INTERMEDIATE_OUTPUT/core.img
+
+    grub-mkstandalone \
+        --format=i386-pc \
+        --install-modules="linux normal iso9660 biosdisk memdisk search tar ls all_video" \
+        --modules="linux normal iso9660 biosdisk search" \
+        --locales="" \
+        --fonts="" \
+        --output=$INTERMEDIATE_OUTPUT/core.img \
+        boot/grub/grub.cfg=$SRC_GRUB_CFG
+
+    # Generate the fs to hold the bios.img - i.e. out/core.img
+    if [[ -f $INTERMEDIATE_OUTPUT/bios.img ]]; then
+        rm $INTERMEDIATE_OUTPUT/bios.img
+    fi
+
+    cat /usr/lib/grub/i386-pc/cdboot.img $INTERMEDIATE_OUTPUT/core.img > $DST_DIR/bios.img
+
+    echo "Created ---- " $DST_DIR/bios.img
+}
 
 # -----------------------------------------------------------------------------
 # prepare iso artifacts
@@ -24,45 +85,51 @@ sudo apt-get install -y mtools dosfstools grub-pc-bin grub2-pc xorriso glibc-ico
 # Originally: ./prepare-iso-artifacts.sh
 #
 
-export INPUT_INTRD=./out/images/iso_initrd/iso-initrd.img
-export INPUT_VMLINUZ=./build/imagegen/iso_initrd/imager_output/rootfs/boot/vmlinuz-*
-export INPUT_GRUB_CFG=./grub.cfg
-export INPUT_ROOT_FS=./test-rootfs.img
+export INPUT_INTRD=$1
+export INPUT_VMLINUZ=$2
+export INPUT_GRUB_CFG=$3
+export INPUT_ROOT_FS=$4
+export INPUT_HOST_CONFIGURATION=$5
+export OUTPUT_ISO_DIR=$6
 
-export INTERMEDIATE_OUTPUT=./iso-intermediate-artifacts
+export INTERMEDIATE_OUTPUT_DIR=./iso-intermediate-artifacts
 
 export STAGED_ISO_ARTIFACTS_DIR=./iso-staged-layout
 
-export OUTPUT_ISO_DIR=./iso-output
 export OUTPUT_ISO_IMAGE_NAME=$OUTPUT_ISO_DIR/baremetal-$(printf "%(%Y%m%d-%H%M%S)T").iso
 export OUTPUT_ISO_LABEL="baremetal-iso"
 
-./steps/0-stage-initrd.sh \
-    $INPUT_INTRD \
-    $STAGED_ISO_ARTIFACTS_DIR/boot
+cd ~/git/CBL-Mariner/toolkit/mic-iso-gen
 
-./steps/1-stage-vm-linuz.sh \
-    $INPUT_VMLINUZ \
-    $STAGED_ISO_ARTIFACTS_DIR/boot
+mkdir -p $STAGED_ISO_ARTIFACTS_DIR/boot
+cp $INPUT_INTRD $STAGED_ISO_ARTIFACTS_DIR/boot/initrd.img
+cp $INPUT_VMLINUZ $STAGED_ISO_ARTIFACTS_DIR/boot/vmlinuz
 
-./steps/2-create-efiboot-img.sh \
+mkdir -p $STAGED_ISO_ARTIFACTS_DIR/artifacts
+cp $INPUT_ROOT_FS $STAGED_ISO_ARTIFACTS_DIR/artifacts/
+cp $INPUT_HOST_CONFIGURATION $STAGED_ISO_ARTIFACTS_DIR/artifacts/
+
+CreateEfibootImage \
     $INPUT_GRUB_CFG \
-    $INTERMEDIATE_OUTPUT \
+    $INTERMEDIATE_OUTPUT_DIR \
     $STAGED_ISO_ARTIFACTS_DIR/boot/grub
 
-./steps/3-create-bios-img.sh \
+CreateBiosImage \
     $INPUT_GRUB_CFG \
-    $INTERMEDIATE_OUTPUT \
+    $INTERMEDIATE_OUTPUT_DIR \
     $STAGED_ISO_ARTIFACTS_DIR/boot/grub
-
-./steps/4-stage-rootfs.sh \
-    $INPUT_ROOT_FS \
-    $STAGED_ISO_ARTIFACTS_DIR/rootfs
 
 # -----------------------------------------------------------------------------
 # Generate the iso
 
-xorriso \
+echo
+pwd
+find $STAGED_ISO_ARTIFACTS_DIR
+echo
+
+mkdir -p $OUTPUT_ISO_DIR
+
+sudo xorriso \
     -as mkisofs \
     -iso-level 3 \
     -full-iso9660-filenames \
@@ -84,6 +151,7 @@ xorriso \
         /EFI/efiboot.img=$STAGED_ISO_ARTIFACTS_DIR/boot/grub/efiboot.img \
     -output $OUTPUT_ISO_IMAGE_NAME
 
+echo $OUTPUT_ISO_IMAGE_NAME
 # -----------------------------------------------------------------------------
 # Test iso
 
