@@ -1947,8 +1947,8 @@
         "type": "other",
         "other": {
           "name": "colord",
-          "version": "1.4.4",
-          "downloadUrl": "https://www.freedesktop.org/software/colord/releases/colord-1.4.4.tar.xz"
+          "version": "1.4.6",
+          "downloadUrl": "https://www.freedesktop.org/software/colord/releases/colord-1.4.6.tar.xz"
         }
       }
     },
@@ -2247,8 +2247,8 @@
         "type": "other",
         "other": {
           "name": "cri-o",
-          "version": "1.21.2",
-          "downloadUrl": "https://github.com/cri-o/cri-o/archive/refs/tags/v1.21.2.tar.gz"
+          "version": "1.28.0",
+          "downloadUrl": "https://github.com/cri-o/cri-o/archive/refs/tags/v1.28.0.tar.gz"
         }
       }
     },
@@ -3228,8 +3228,8 @@
         "type": "other",
         "other": {
           "name": "emacs",
-          "version": "28.2",
-          "downloadUrl": "https://ftp.gnu.org/gnu/emacs/emacs-28.2.tar.xz"
+          "version": "29.1",
+          "downloadUrl": "https://ftp.gnu.org/gnu/emacs/emacs-29.1.tar.xz"
         }
       }
     },
@@ -8031,8 +8031,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers",
-          "version": "3.1.0",
-          "downloadUrl": "https://github.com/kata-containers/kata-containers/archive/refs/tags/3.1.0.tar.gz"
+          "version": "3.1.3",
+          "downloadUrl": "https://github.com/kata-containers/kata-containers/archive/refs/tags/3.1.3.tar.gz"
         }
       }
     },
@@ -8091,8 +8091,8 @@
         "type": "other",
         "other": {
           "name": "keepalived",
-          "version": "2.2.7",
-          "downloadUrl": "https://www.keepalived.org/software/keepalived-2.2.7.tar.gz"
+          "version": "2.2.8",
+          "downloadUrl": "https://www.keepalived.org/software/keepalived-2.2.8.tar.gz"
         }
       }
     },
@@ -8191,8 +8191,8 @@
         "type": "other",
         "other": {
           "name": "kexec-tools",
-          "version": "2.0.23",
-          "downloadUrl": "http://kernel.org/pub/linux/utils/kernel/kexec/kexec-tools-2.0.23.tar.xz"
+          "version": "2.0.27",
+          "downloadUrl": "http://kernel.org/pub/linux/utils/kernel/kexec/kexec-tools-2.0.27.tar.xz"
         }
       }
     },
@@ -9081,8 +9081,8 @@
         "type": "other",
         "other": {
           "name": "libdrm",
-          "version": "2.4.115",
-          "downloadUrl": "https://dri.freedesktop.org/libdrm/libdrm-2.4.115.tar.xz"
+          "version": "2.4.116",
+          "downloadUrl": "https://dri.freedesktop.org/libdrm/libdrm-2.4.116.tar.xz"
         }
       }
     },
@@ -10921,8 +10921,8 @@
         "type": "other",
         "other": {
           "name": "libsigc++30",
-          "version": "3.2.0",
-          "downloadUrl": "https://github.com/libsigcplusplus/libsigcplusplus/releases/download/3.2.0/libsigc++-3.2.0.tar.xz"
+          "version": "3.4.0",
+          "downloadUrl": "https://github.com/libsigcplusplus/libsigcplusplus/releases/download/3.4.0/libsigc++-3.4.0.tar.xz"
         }
       }
     },
@@ -11431,8 +11431,8 @@
         "type": "other",
         "other": {
           "name": "libvirt-java",
-          "version": "0.5.2",
-          "downloadUrl": "https://libvirt.org/sources/java/libvirt-java-0.5.2.tar.gz"
+          "version": "0.5.3",
+          "downloadUrl": "https://libvirt.org/sources/java/libvirt-java-0.5.3.tar.gz"
         }
       }
     },
@@ -12081,8 +12081,8 @@
         "type": "other",
         "other": {
           "name": "lldpd",
-          "version": "1.0.14",
-          "downloadUrl": "https://github.com/lldpd/lldpd/releases/download/1.0.14/lldpd-1.0.14.tar.gz"
+          "version": "1.0.17",
+          "downloadUrl": "https://github.com/lldpd/lldpd/releases/download/1.0.17/lldpd-1.0.17.tar.gz"
         }
       }
     },
@@ -12801,8 +12801,8 @@
         "type": "other",
         "other": {
           "name": "maven-resources-plugin",
-          "version": "3.2.0",
-          "downloadUrl": "https://repo1.maven.org/maven2/org/apache/maven/plugins/maven-resources-plugin/3.2.0/maven-resources-plugin-3.2.0-source-release.zip"
+          "version": "3.3.1",
+          "downloadUrl": "https://repo1.maven.org/maven2/org/apache/maven/plugins/maven-resources-plugin/3.3.1/maven-resources-plugin-3.3.1-source-release.zip"
         }
       }
     },
@@ -12821,8 +12821,8 @@
         "type": "other",
         "other": {
           "name": "maven-wagon",
-          "version": "3.5.1",
-          "downloadUrl": "https://repo1.maven.org/maven2/org/apache/maven/wagon/wagon/3.5.1/wagon-3.5.1-source-release.zip"
+          "version": "3.5.3",
+          "downloadUrl": "https://repo1.maven.org/maven2/org/apache/maven/wagon/wagon/3.5.3/wagon-3.5.3-source-release.zip"
         }
       }
     },
@@ -14513,8 +14513,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-bigarray-compat",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/mirage/bigarray-compat/archive/v1.0.0/bigarray-compat-1.0.0.tar.gz"
+          "version": "1.1.0",
+          "downloadUrl": "https://github.com/mirage/bigarray-compat/archive/v1.1.0/bigarray-compat-1.1.0.tar.gz"
         }
       }
     },
@@ -14583,8 +14583,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-compiler-libs-janestreet",
-          "version": "0.12.3",
-          "downloadUrl": "https://github.com/janestreet/ocaml-compiler-libs/archive/v0.12.3/ocaml-compiler-libs-0.12.3.tar.gz"
+          "version": "0.12.4",
+          "downloadUrl": "https://github.com/janestreet/ocaml-compiler-libs/archive/v0.12.4/ocaml-compiler-libs-0.12.4.tar.gz"
         }
       }
     },
@@ -14763,8 +14763,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-migrate-parsetree",
-          "version": "2.3.0",
-          "downloadUrl": "https://github.com/ocaml-ppx/ocaml-migrate-parsetree/releases/download/v2.3.0/ocaml-migrate-parsetree-2.3.0.tbz"
+          "version": "2.4.0",
+          "downloadUrl": "https://github.com/ocaml-ppx/ocaml-migrate-parsetree/releases/download/2.4.0/ocaml-migrate-parsetree-2.4.0.tbz"
         }
       }
     },
@@ -14903,8 +14903,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-sexplib0",
-          "version": "0.15.0",
-          "downloadUrl": "https://github.com/janestreet/sexplib0/archive/v0.15.0/sexplib0-0.15.0.tar.gz"
+          "version": "0.16.0",
+          "downloadUrl": "https://github.com/janestreet/sexplib0/archive/v0.16.0/sexplib0-0.16.0.tar.gz"
         }
       }
     },
@@ -15194,8 +15194,8 @@
         "type": "other",
         "other": {
           "name": "openmpi",
-          "version": "4.1.4",
-          "downloadUrl": "https://www.open-mpi.org/software/ompi/v4.1/downloads/openmpi-4.1.4.tar.bz2"
+          "version": "4.1.5",
+          "downloadUrl": "https://www.open-mpi.org/software/ompi/v4.1/downloads/openmpi-4.1.5.tar.bz2"
         }
       }
     },
@@ -21544,8 +21544,8 @@
         "type": "other",
         "other": {
           "name": "pycairo",
-          "version": "1.21.0",
-          "downloadUrl": "https://github.com/pygobject/pycairo/releases/download/v1.21.0/pycairo-1.21.0.tar.gz"
+          "version": "1.24.0",
+          "downloadUrl": "https://github.com/pygobject/pycairo/releases/download/v1.24.0/pycairo-1.24.0.tar.gz"
         }
       }
     },
@@ -25455,8 +25455,8 @@
         "type": "other",
         "other": {
           "name": "rng-tools",
-          "version": "6.14",
-          "downloadUrl": "https://github.com/nhorman/rng-tools/archive/v6.14/rng-tools-6.14.tar.gz"
+          "version": "6.16",
+          "downloadUrl": "https://github.com/nhorman/rng-tools/archive/v6.16/rng-tools-6.16.tar.gz"
         }
       }
     },
@@ -25565,8 +25565,8 @@
         "type": "other",
         "other": {
           "name": "rrdtool",
-          "version": "1.7.2",
-          "downloadUrl": "https://github.com/oetiker/rrdtool-1.x/releases/download/v1.7.2/rrdtool-1.7.2.tar.gz"
+          "version": "1.8.0",
+          "downloadUrl": "https://github.com/oetiker/rrdtool-1.x/releases/download/v1.8.0/rrdtool-1.8.0.tar.gz"
         }
       }
     },
@@ -25585,8 +25585,8 @@
         "type": "other",
         "other": {
           "name": "rsyslog",
-          "version": "8.2204.1",
-          "downloadUrl": "https://www.rsyslog.com/files/download/rsyslog/rsyslog-8.2204.1.tar.gz"
+          "version": "8.2308.0",
+          "downloadUrl": "https://www.rsyslog.com/files/download/rsyslog/rsyslog-8.2308.0.tar.gz"
         }
       }
     },
@@ -26995,8 +26995,8 @@
         "type": "other",
         "other": {
           "name": "sanlock",
-          "version": "3.8.4",
-          "downloadUrl": "https://releases.pagure.org/sanlock/sanlock-3.8.4.tar.gz"
+          "version": "3.8.5",
+          "downloadUrl": "https://releases.pagure.org/sanlock/sanlock-3.8.5.tar.gz"
         }
       }
     },
@@ -28227,8 +28227,8 @@
         "type": "other",
         "other": {
           "name": "systemtap",
-          "version": "4.5",
-          "downloadUrl": "https://sourceware.org/systemtap/ftp/releases/systemtap-4.5.tar.gz"
+          "version": "4.9",
+          "downloadUrl": "https://sourceware.org/systemtap/ftp/releases/systemtap-4.9.tar.gz"
         }
       }
     },
@@ -28617,8 +28617,8 @@
         "type": "other",
         "other": {
           "name": "tpm2-abrmd",
-          "version": "2.4.0",
-          "downloadUrl": "https://github.com/tpm2-software/tpm2-abrmd/releases/download/2.4.0/tpm2-abrmd-2.4.0.tar.gz"
+          "version": "3.0.0",
+          "downloadUrl": "https://github.com/tpm2-software/tpm2-abrmd/releases/download/3.0.0/tpm2-abrmd-3.0.0.tar.gz"
         }
       }
     },
@@ -29157,8 +29157,8 @@
         "type": "other",
         "other": {
           "name": "vala",
-          "version": "0.54.6",
-          "downloadUrl": "http://download.gnome.org/sources/vala/0.54/vala-0.54.6.tar.xz"
+          "version": "0.56.9",
+          "downloadUrl": "http://download.gnome.org/sources/vala/0.56/vala-0.56.9.tar.xz"
         }
       }
     },

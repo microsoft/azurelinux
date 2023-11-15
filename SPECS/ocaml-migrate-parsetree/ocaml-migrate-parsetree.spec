@@ -1,7 +1,7 @@
 Summary:        Convert OCaml parsetrees between different major versions
 Name:           ocaml-migrate-parsetree
-Version:        2.3.0
-Release:        2%{?dist}
+Version:        2.4.0
+Release:        1%{?dist}
 License:        LGPLv2+ WITH exceptions
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -71,6 +71,9 @@ dune runtest
 %{_libdir}/ocaml/*/opam
 
 %changelog
+* Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.0-1
+- Auto-upgrade to 2.4.0 - Azure Linux 3.0 - package upgrades
+
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.0-2
 - Cleaning-up spec. License verified.
 
