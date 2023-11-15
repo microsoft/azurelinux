@@ -1,9 +1,9 @@
-%global openssh_ver 8.9p1
+%global openssh_ver 9.5p1
 %global pam_ssh_agent_ver 0.10.3
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        %{openssh_ver}
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -32,7 +32,6 @@ Patch306:       pam_ssh_agent_auth-0.10.2-compat.patch
 # Fix NULL dereference from getpwuid() return value
 # https://sourceforge.net/p/pamsshagentauth/bugs/22/
 Patch307:       pam_ssh_agent_auth-0.10.2-dereference.patch
-Patch308:       CVE-2023-38408.patch
 BuildRequires:  audit-devel
 BuildRequires:  autoconf
 BuildRequires:  e2fsprogs-devel
@@ -105,7 +104,6 @@ pushd pam_ssh_agent_auth-%{pam_ssh_agent_ver}
 rm -f $(cat %{SOURCE4})
 autoreconf
 popd
-%patch308 -p2 -b .cve-2023-38408
 
 %build
 # The -fvisibility=hidden is needed for clean build of the pam_ssh_agent_auth.
@@ -263,6 +261,9 @@ fi
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
+* Tue Nov 14 2023 Andrew Phelps <anphel@microsoft.com> - 9.5p1-1
+- Upgrade to version 9.5p1
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 8.9p1-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

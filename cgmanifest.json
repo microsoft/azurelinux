@@ -15274,8 +15274,8 @@
         "type": "other",
         "other": {
           "name": "openssh",
-          "version": "8.9p1",
-          "downloadUrl": "https://ftp.usa.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-8.9p1.tar.gz"
+          "version": "9.5p1",
+          "downloadUrl": "https://ftp.usa.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-9.5p1.tar.gz"
         }
       }
     },
