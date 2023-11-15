@@ -6,8 +6,8 @@ package logger
 import (
 	"fmt"
 	"io"
+	"regexp"
 	"runtime"
-	"strings"
 	"sync"
 
 	"github.com/fatih/color"
@@ -36,7 +36,7 @@ func newWriterHook(writer io.Writer, level logrus.Level, useColors bool, toolNam
 		formatter.CallerPrettyfier = func(frame *runtime.Frame) (function string, file string) {
 			toolNameField := fmt.Sprintf("[%s]", toolName)
 			if useColors {
-				toolNameField = fmt.Sprintf(color.BlackString("[%s]"), toolName)
+				toolNameField = fmt.Sprintf(color.HiYellowString("[%s]"), toolName)
 			}
 
 			return "", toolNameField
@@ -59,10 +59,8 @@ func (h *writerHook) Fire(entry *logrus.Entry) (err error) {
 	}
 
 	if !h.useColors {
-		entry.Message = strings.ReplaceAll(entry.Message, "\x1b[31m", "")
-		entry.Message = strings.ReplaceAll(entry.Message, "\x1b[34m", "")
-		entry.Message = strings.ReplaceAll(entry.Message, "\x1b[0m", "")
-		entry.Message = strings.ReplaceAll(entry.Message, "\x1b[32m", "")
+		re := regexp.MustCompile(`\x1b\[[0-9]+m`)
+		entry.Message = re.ReplaceAllString(entry.Message, "")
 	}
 
 	h.lock.Lock()

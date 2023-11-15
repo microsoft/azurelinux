@@ -27,6 +27,9 @@ var (
 
 	// Valid log levels
 	levelsArray = []string{"panic", "fatal", "error", "warn", "info", "debug", "trace"}
+
+	// Valid log colors
+	colorsArray = []string{"always", "auto", "never"}
 )
 
 const (
@@ -45,6 +48,9 @@ const (
 	// FileFlagHelp is the suggested help message for the logfile flag
 	FileFlagHelp = "Path to the image's log file."
 
+	// ColorsPlaceholder are all valid log colors separated by '|' character.
+	ColorsPlaceholder = "(always|auto|never)"
+
 	// ColorFlag is the suggested name for logcolor flag
 	ColorFlag = "log-color"
 
@@ -54,6 +60,10 @@ const (
 	defaultLogFileLevel   = logrus.DebugLevel
 	defaultStderrLogLevel = logrus.InfoLevel
 	parentCallerLevel     = 1
+	colourModeAuto        = "auto"
+	colourModeAlways      = "always"
+	colourModeNever       = "never"
+
 )
 
 // initLogFile initializes the common logger with a file
@@ -87,7 +97,7 @@ func InitStderrLog() {
 		log.Panic("Failed to get caller info.")
 	}
 
-	initStderrLogInternal(callerFilePath, "auto")
+	initStderrLogInternal(callerFilePath, colourModeAuto)
 }
 
 // SetFileLogLevel sets the lowest log level for file output
@@ -123,6 +133,11 @@ func InitBestEffort(path string, level string, color string) {
 // Levels returns list of strings representing valid log levels.
 func Levels() []string {
 	return levelsArray
+}
+
+// Colors returns list of strings representing valid log colors.
+func Colors() []string {
+	return colorsArray
 }
 
 // PanicOnError logs the error and any message strings and then panics
@@ -187,9 +202,9 @@ func ReplaceStderrFormatter(newFormatter logrus.Formatter) (oldFormatter logrus.
 
 func initStderrLogInternal(callerFilePath string, color string) {
 	var useColors bool
-	if color == "auto" || color == "always" {
+	if color == colourModeAuto || color == colourModeAlways {
 		useColors = true
-	} else if color == "never" {
+	} else if color == colourModeNever {
 		useColors = false
 	} else {
 		useColors = true

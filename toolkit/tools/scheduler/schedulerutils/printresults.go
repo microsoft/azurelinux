@@ -114,7 +114,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	printSummary(failedSRPMs, failedSRPMsTests, prebuiltSRPMs, prebuiltDeltaSRPMs, builtSRPMs, testedSRPMs, skippedSRPMsTests, unresolvedDependencies, blockedSRPMs, blockedSRPMsTests, rpmConflicts, srpmConflicts, allowToolchainRebuilds, conflictsLogger)
 
 	if len(prebuiltSRPMs) != 0 {
-		logger.Log.Info(color.RedString("Prebuilt SRPMs:"))
+		logger.Log.Info(color.GreenString("Prebuilt SRPMs:"))
 		keys := sliceutils.MapToSlice(prebuiltSRPMs)
 		sort.Strings(keys)
 		for _, prebuiltSRPM := range keys {
@@ -123,7 +123,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	}
 
 	if len(prebuiltDeltaSRPMs) != 0 {
-		logger.Log.Info(color.BlueString("Skipped SRPMs (i.e., delta mode is on, packages are already available in a repo):"))
+		logger.Log.Info(color.GreenString("Skipped SRPMs (i.e., delta mode is on, packages are already available in a repo):"))
 		keys := sliceutils.MapToSlice(prebuiltDeltaSRPMs)
 		sort.Strings(keys)
 		for _, prebuiltDeltaSRPM := range keys {
@@ -132,7 +132,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	}
 
 	if len(skippedSRPMsTests) != 0 {
-		logger.Log.Info(color.BlueString("Skipped SRPMs tests:"))
+		logger.Log.Info(color.RedString("Skipped SRPMs tests:"))
 		keys := sliceutils.MapToSlice(skippedSRPMsTests)
 		sort.Strings(keys)
 		for _, skippedSRPMsTest := range keys {
@@ -159,7 +159,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	}
 
 	if len(unresolvedDependencies) != 0 {
-		logger.Log.Info(color.GreenString("Unresolved dependencies:"))
+		logger.Log.Info(color.RedString("Unresolved dependencies:"))
 		keys := sliceutils.MapToSlice(unresolvedDependencies)
 		sort.Strings(keys)
 		for _, unresolvedDependency := range keys {
@@ -353,15 +353,15 @@ func printSummary(failedSRPMs, failedSRPMsTests map[string]*BuildResult, prebuil
 	logger.Log.Info("---------------------------")
 
 	logger.Log.Infof(color.GreenString("Number of prebuilt SRPMs:           " + fmt.Sprint(len(prebuiltSRPMs))))
-	logger.Log.Infof(color.BlueString("Number of prebuilt delta SRPMs:     " + fmt.Sprint(len(prebuiltDeltaSRPMs))))
-	logger.Log.Infof(color.BlueString("Number of skipped SRPMs tests:      " + fmt.Sprint(len(skippedSRPMsTests))))
+	logger.Log.Infof(color.GreenString("Number of prebuilt delta SRPMs:     " + fmt.Sprint(len(prebuiltDeltaSRPMs))))
+	printSummaryByVal(len(skippedSRPMsTests), "Number of skipped SRPMs tests:      ")
 	logger.Log.Infof(color.GreenString("Number of built SRPMs:              " + fmt.Sprint(len(builtSRPMs))))
 	logger.Log.Infof(color.GreenString("Number of tested SRPMs:             " + fmt.Sprint(len(testedSRPMs))))
-	printSummaryByLen(len(unresolvedDependencies), "Number of unresolved dependencies:  ")
-	printSummaryByLen(len(blockedSRPMs), "Number of blocked SRPMs:            ")
-	printSummaryByLen(len(blockedSRPMsTests), "Number of blocked SRPMs tests:      ")
-	printSummaryByLen(len(failedSRPMs), "Number of failed SRPMs:             ")
-	printSummaryByLen(len(failedSRPMsTests), "Number of failed SRPMs tests:       ")
+	printSummaryByVal(len(unresolvedDependencies), "Number of unresolved dependencies:  ")
+	printSummaryByVal(len(blockedSRPMs), "Number of blocked SRPMs:            ")
+	printSummaryByVal(len(blockedSRPMsTests), "Number of blocked SRPMs tests:      ")
+	printSummaryByVal(len(failedSRPMs), "Number of failed SRPMs:             ")
+	printSummaryByVal(len(failedSRPMsTests), "Number of failed SRPMs tests:       ")
 
 	if allowToolchainRebuilds && (len(rpmConflicts) > 0 || len(srpmConflicts) > 0) {
 		logger.Log.Infof("Toolchain RPMs conflicts are ignored since ALLOW_TOOLCHAIN_REBUILDS=y")
@@ -374,7 +374,7 @@ func printSummary(failedSRPMs, failedSRPMsTests map[string]*BuildResult, prebuil
 }
 
 // Helper function to print summary in specific color.
-func printSummaryByLen(val int, msg string) {
+func printSummaryByVal(val int, msg string) {
 	if val > 0 {
 		logger.Log.Infof(color.RedString(msg + fmt.Sprint(val)))
 	} else {
