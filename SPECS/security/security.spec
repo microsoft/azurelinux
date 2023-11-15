@@ -18,9 +18,6 @@ BuildRequires:  systemd
 %description
 Security package for Mariner to meet all sorts of compliance rules like FedRAMP, STIG, FIPS, etc.
 
-%description STIG
-package to meet STIG Compliance
-
 %prep
 %setup -q 
 
