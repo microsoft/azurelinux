@@ -140,7 +140,7 @@ steps:
           fi
           echo "##vso[task.setvariable variable=toolchainArchive]$toolchain_archive"
 
-          sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" toolchain TOOLCHAIN_ARCHIVE="$(toolchainArchive)"
+          sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" toolchain TOOLCHAIN_ARCHIVE="$toolchain_archive"
         displayName: "Populate toolchain"
 
   - ${{ if parameters.rpmsCacheArtifactName }}:
