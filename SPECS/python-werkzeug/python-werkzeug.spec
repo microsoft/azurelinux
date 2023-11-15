@@ -8,8 +8,9 @@ Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://github.com/pallets/werkzeug
 Source0:        https://github.com/pallets/werkzeug/archive/%{version}.tar.gz#/werkzeug-%{version}.tar.gz
-Patch0:         enable-tests-in-rpm-env.patch
-Patch1:         CVE-2023-46136.patch
+Patch0:         0001-enable-tests-in-rpm-env.patch
+Patch1:         0002-enable-test-exclude-patterns.patch
+Patch2:         CVE-2023-46136.patch
 BuildArch:      noarch
 
 %description

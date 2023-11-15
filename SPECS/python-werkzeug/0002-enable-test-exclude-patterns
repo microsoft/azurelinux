@@ -1,0 +1,44 @@
+From 318b442bf855cde80a26dfaf4c0aafe38340e2c0 Mon Sep 17 00:00:00 2001
+From: Nick Samson <nisamson@microsoft.com>
+Date: Tue, 14 Nov 2023 16:57:59 -0800
+Subject: [PATCH 2/2] Modified 'test_exclude_patterns' to enable run in RPM
+ build
+
+---
+ tests/test_serving.py | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/tests/test_serving.py b/tests/test_serving.py
+index 4abc755d..e7f0839d 100644
+--- a/tests/test_serving.py
++++ b/tests/test_serving.py
+@@ -152,12 +152,24 @@ def test_windows_get_args_for_reloading(monkeypatch, tmp_path):
+ def test_exclude_patterns(find):
+     # Select a path to exclude from the unfiltered list, assert that it is present and
+     # then gets excluded.
+-    paths = find(set(), set())
++
++    # Werkzeug *really* doesn't like running tests in the RPM build environment,
++    # so we have to do some trickery to get it to work by manually adding files to look
++    # at. The %tox macro explicitly sets PYTHONPATH rather than using a virtualenv and,
++    # crucially, also puts Werkzeug in a directory considered to be a system directory.
++    # Normally, Werkzeug is tested using an editable installation, where the source
++    # directory is added to PYTHONPATH but not installed in a system directory.
++    # This means all files this function would normally find are considered system files
++    # and are excluded.  We need to add some extra files here (using the extra_files
++    # parameter) to get around this.
++    test_dir = Path(__file__).parent
++    extra_files = {test_dir}
++    paths = find(extra_files, set())
+     path_to_exclude = next(iter(paths))
+     assert any(p.startswith(path_to_exclude) for p in paths)
+ 
+     # Those paths should be excluded due to the pattern.
+-    paths = find(set(), {f"{path_to_exclude}*"})
++    paths = find(extra_files, {f"{path_to_exclude}*"})
+     assert not any(p.startswith(path_to_exclude) for p in paths)
+ 
+ 
+-- 
+2.34.1
+
