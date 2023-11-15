@@ -49,7 +49,7 @@ cp go-md2man-%{version}/LICENSE.md %{buildroot}%{_docdir}/%{name}-%{version}/LIC
 
 %changelog
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.1-21
-- Bump release to rebuild with go 1.20.10
+- Bump release to rebuild with go 1.20.9
 
 * Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 2.0.1-20
 - Bump release to rebuild with updated version of Go.
