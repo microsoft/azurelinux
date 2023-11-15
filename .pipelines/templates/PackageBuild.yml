@@ -185,7 +185,7 @@ steps:
         use_ccache_arg="USE_CCACHE=n"
       fi
 
-      if [[ -n ${{ if parameters.customToolchainArtifactName }} ]]; then
+      if [[ -n ${{ parameters.customToolchainArtifactName }} ]]; then
         toolchain_archive_arg="TOOLCHAIN_ARCHIVE=$(toolchainArchive)"
       fi
 
