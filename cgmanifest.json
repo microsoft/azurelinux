@@ -8150,6 +8150,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "kernel-mos",
+          "version": "5.15.136.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2-mos/5.15.136.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "kernel-mshv",
           "version": "5.15.126.mshv9",
           "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.126.mshv9.tar.gz"
@@ -13111,8 +13121,8 @@
         "type": "other",
         "other": {
           "name": "memcached",
-          "version": "1.6.13",
-          "downloadUrl": "https://www.memcached.org/files/memcached-1.6.13.tar.gz"
+          "version": "1.6.22",
+          "downloadUrl": "https://www.memcached.org/files/memcached-1.6.22.tar.gz"
         }
       }
     },
@@ -28577,8 +28587,8 @@
         "type": "other",
         "other": {
           "name": "telegraf",
-          "version": "1.27.3",
-          "downloadUrl": "https://github.com/influxdata/telegraf/archive/v1.27.3.tar.gz"
+          "version": "1.27.4",
+          "downloadUrl": "https://github.com/influxdata/telegraf/archive/v1.27.4.tar.gz"
         }
       }
     },

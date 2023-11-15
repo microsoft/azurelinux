@@ -947,6 +947,92 @@ func addEntryToCrypttab(installRoot string, devicePath string, encryptedRoot dis
 	return
 }
 
+func ConfigureDiskBootloader(bootType string, encryptionEnable bool, readOnlyVerityRootEnable bool,
+	partitionSettings []configuration.PartitionSetting, kernelCommandLine configuration.KernelCommandLine,
+	installChroot *safechroot.Chroot, diskDevPath string, installMap map[string]string,
+	encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice,
+) (err error) {
+	timestamp.StartEvent("configuring bootloader", nil)
+	defer timestamp.StopEvent(nil)
+
+	const rootMountPoint = "/"
+	const bootMountPoint = "/boot"
+
+	var rootDevice string
+
+	// Add bootloader. Prefer a separate boot partition if one exists.
+	bootDevice, isBootPartitionSeparate := installMap[bootMountPoint]
+	bootPrefix := ""
+	if !isBootPartitionSeparate {
+		bootDevice = installMap[rootMountPoint]
+		// If we do not have a separate boot partition we will need to add a prefix to all paths used in the configs.
+		bootPrefix = "/boot"
+	}
+
+	if installMap[rootMountPoint] == NullDevice {
+		// In case of overlay device being mounted at root, no need to change the bootloader.
+		return
+	}
+
+	// Grub only accepts UUID, not PARTUUID or PARTLABEL
+	bootUUID, err := GetUUID(bootDevice)
+	if err != nil {
+		err = fmt.Errorf("failed to get UUID: %s", err)
+		return
+	}
+
+	err = InstallBootloader(installChroot, encryptionEnable, bootType, bootUUID, bootPrefix, diskDevPath)
+	if err != nil {
+		err = fmt.Errorf("failed to install bootloader: %s", err)
+		return
+	}
+
+	// Add grub config to image
+	rootPartitionSetting := configuration.FindRootPartitionSetting(partitionSettings)
+	if rootPartitionSetting == nil {
+		err = fmt.Errorf("failed to find partition setting for root mountpoint")
+		return
+	}
+	rootMountIdentifier := rootPartitionSetting.MountIdentifier
+	if encryptionEnable {
+		// Encrypted devices don't currently support identifiers
+		rootDevice = installMap[rootMountPoint]
+	} else if readOnlyVerityRootEnable {
+		var partIdentifier string
+		partIdentifier, err = FormatMountIdentifier(rootMountIdentifier, readOnlyRoot.BackingDevice)
+		if err != nil {
+			err = fmt.Errorf("failed to get partIdentifier: %s", err)
+			return
+		}
+		rootDevice = fmt.Sprintf("verityroot:%v", partIdentifier)
+	} else {
+		var partIdentifier string
+		partIdentifier, err = FormatMountIdentifier(rootMountIdentifier, installMap[rootMountPoint])
+		if err != nil {
+			err = fmt.Errorf("failed to get partIdentifier: %s", err)
+			return
+		}
+
+		rootDevice = partIdentifier
+	}
+
+	// Grub will always use filesystem UUID, never PARTUUID or PARTLABEL
+	err = InstallGrubCfg(installChroot.RootDir(), rootDevice, bootUUID, bootPrefix, encryptedRoot,
+		kernelCommandLine, readOnlyRoot, isBootPartitionSeparate)
+	if err != nil {
+		err = fmt.Errorf("failed to install main grub config file: %s", err)
+		return
+	}
+
+	err = InstallGrubEnv(installChroot.RootDir())
+	if err != nil {
+		err = fmt.Errorf("failed to install grubenv file: %s", err)
+		return
+	}
+
+	return
+}
+
 // InstallGrubEnv installs an empty grubenv f
 func InstallGrubEnv(installRoot string) (err error) {
 	const (
