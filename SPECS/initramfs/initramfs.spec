@@ -110,7 +110,11 @@ echo "initramfs" %{version}-%{release} "posttrans" >&2
 %removal_action
 mkinitrd -q
 # Copy initrd generated for kernel-mshv to /boot/efi, where linuxloader expects to find it
-cp /boot/initrd.img-*mshv* /boot/efi/ >/dev/null 2>&1 || :
+cp /boot/initrd.img-*mshv* /boot/efi/
+if [ $? -ne 0 ]; then
+    echo "WARNING: ESP partition (/boot/efi) is likely full!"
+fi
+
 %grub2_post
 
 %postun
