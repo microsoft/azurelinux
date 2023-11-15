@@ -14,6 +14,10 @@ OUTPUT_DIR=$2
 # -----------------------------------------------------------------------------
 # Build rootfs
 #
+
+sudo rm -rf ./build/imagegen/baremetal
+sudo rm -rf ./out/images/baremetal
+
 pushd toolkit
 sudo make image \
     -j$(nproc) \
