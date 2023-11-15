@@ -41,7 +41,7 @@ func main() {
 		kingpin.Fatalf("Either --output-image-format or --output-split-partitions-format must be specified.")
 	}
 
-	logger.InitBestEffort(*logFile, *logLevel)
+	logger.InitBestEffort(*logFile, *logLevel, *logColor)
 
 	prof, err := profile.StartProfiling(profFlags)
 	if err != nil {

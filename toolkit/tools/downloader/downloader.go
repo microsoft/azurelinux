@@ -28,6 +28,7 @@ var (
 
 	logFile   = exe.LogFileFlag(app)
 	logLevel  = exe.LogLevelFlag(app)
+	logColor  = exe.LogColorFlag(app)
 	noClobber = app.Flag("no-clobber", "Do not overwrite existing files").Bool()
 	noVerbose = app.Flag("no-verbose", "Do not print verbose output").Bool()
 
@@ -43,7 +44,7 @@ var (
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel)
+	logger.InitBestEffort(*logFile, *logLevel, *logColor)
 	if *noVerbose {
 		logger.Log.SetLevel(logrus.WarnLevel)
 	}

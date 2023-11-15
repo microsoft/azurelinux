@@ -42,6 +42,7 @@ var (
 
 	logFile   = exe.LogFileFlag(app)
 	logLevel  = exe.LogLevelFlag(app)
+	logColor  = exe.LogColorFlag(app)
 	profFlags = exe.SetupProfileFlags(app)
 
 	inputDir  = exe.InputDirFlag(app, "A directory containing a .RAW image or a rootfs directory")
@@ -62,7 +63,7 @@ var (
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel)
+	logger.InitBestEffort(*logFile, *logLevel, *logColor)
 
 	prof, err := profile.StartProfiling(profFlags)
 	if err != nil {

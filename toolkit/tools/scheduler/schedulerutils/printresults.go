@@ -357,36 +357,11 @@ func printSummary(failedSRPMs, failedSRPMsTests map[string]*BuildResult, prebuil
 	logger.Log.Infof(color.BlueString("Number of skipped SRPMs tests:      " + fmt.Sprint(len(skippedSRPMsTests))))
 	logger.Log.Infof(color.GreenString("Number of built SRPMs:              " + fmt.Sprint(len(builtSRPMs))))
 	logger.Log.Infof(color.GreenString("Number of tested SRPMs:             " + fmt.Sprint(len(testedSRPMs))))
-
-	if len(unresolvedDependencies) > 0 {
-		logger.Log.Infof(color.RedString("Number of unresolved dependencies:  " + fmt.Sprint(len(unresolvedDependencies))))
-	} else {
-		logger.Log.Infof(color.GreenString("Number of unresolved dependencies:  " + fmt.Sprint(len(unresolvedDependencies))))
-	}
-
-	if len(blockedSRPMs) > 0 {
-		logger.Log.Infof(color.RedString("Number of blocked SRPMs:            " + fmt.Sprint(len(blockedSRPMs))))
-	} else {
-		logger.Log.Infof(color.GreenString("Number of blocked SRPMs:            " + fmt.Sprint(len(blockedSRPMs))))
-	}
-
-	if len(blockedSRPMsTests) > 0 {
-		logger.Log.Infof(color.RedString("Number of blocked SRPMs tests:      " + fmt.Sprint(len(blockedSRPMsTests))))
-	} else {
-		logger.Log.Infof(color.GreenString("Number of blocked SRPMs tests:      " + fmt.Sprint(len(blockedSRPMsTests))))
-	}
-
-	if len(failedSRPMs) > 0 {
-		logger.Log.Infof(color.RedString("Number of failed SRPMs:             " + fmt.Sprint(len(failedSRPMs))))
-	} else {
-		logger.Log.Infof(color.GreenString("Number of failed SRPMs:             " + fmt.Sprint(len(failedSRPMs))))
-	}
-
-	if len(failedSRPMsTests) > 0 {
-		logger.Log.Infof(color.RedString("Number of failed SRPMs tests:       " + fmt.Sprint(len(failedSRPMsTests))))
-	} else {
-		logger.Log.Infof(color.GreenString("Number of failed SRPMs tests:       " + fmt.Sprint(len(failedSRPMsTests))))
-	}
+	printSummaryByLen(len(unresolvedDependencies), "Number of unresolved dependencies:  ")
+	printSummaryByLen(len(blockedSRPMs), "Number of blocked SRPMs:            ")
+	printSummaryByLen(len(blockedSRPMsTests), "Number of blocked SRPMs tests:      ")
+	printSummaryByLen(len(failedSRPMs), "Number of failed SRPMs:             ")
+	printSummaryByLen(len(failedSRPMsTests), "Number of failed SRPMs tests:       ")
 
 	if allowToolchainRebuilds && (len(rpmConflicts) > 0 || len(srpmConflicts) > 0) {
 		logger.Log.Infof("Toolchain RPMs conflicts are ignored since ALLOW_TOOLCHAIN_REBUILDS=y")
@@ -395,5 +370,14 @@ func printSummary(failedSRPMs, failedSRPMsTests map[string]*BuildResult, prebuil
 	if len(rpmConflicts) > 0 || len(srpmConflicts) > 0 {
 		conflictsLogger(color.RedString("Number of toolchain RPM conflicts:  " + fmt.Sprint(len(rpmConflicts))))
 		conflictsLogger(color.RedString("Number of toolchain SRPM conflicts: " + fmt.Sprint(len(srpmConflicts))))
+	}
+}
+
+// Helper function to print summary in specific color.
+func printSummaryByLen(val int, msg string) {
+	if val > 0 {
+		logger.Log.Infof(color.RedString(msg + fmt.Sprint(val)))
+	} else {
+		logger.Log.Infof(color.GreenString(msg + fmt.Sprint(val)))
 	}
 }

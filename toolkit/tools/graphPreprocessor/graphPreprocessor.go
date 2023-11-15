@@ -21,6 +21,7 @@ var (
 
 	logFile  = exe.LogFileFlag(app)
 	logLevel = exe.LogLevelFlag(app)
+	logColor = exe.LogColorFlag(app)
 )
 
 func replaceRunNodesWithPrebuiltNodes(pkgGraph *pkggraph.PkgGraph) (err error) {
@@ -65,7 +66,7 @@ func replaceRunNodesWithPrebuiltNodes(pkgGraph *pkggraph.PkgGraph) (err error) {
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel)
+	logger.InitBestEffort(*logFile, *logLevel, *logColor)
 
 	scrubbedGraph, err := pkggraph.ReadDOTGraphFile(*inputGraphFile)
 	if err != nil {

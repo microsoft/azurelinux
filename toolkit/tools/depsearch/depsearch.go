@@ -45,6 +45,7 @@ var (
 
 	logFile  = exe.LogFileFlag(app)
 	logLevel = exe.LogLevelFlag(app)
+	logColor = exe.LogColorFlag(app)
 )
 
 func main() {
@@ -55,7 +56,7 @@ func main() {
 
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel)
+	logger.InitBestEffort(*logFile, *logLevel, *logColor)
 
 	// only understand verbosity from 1 - 4 (spec, rpm, details, full node)
 	if verbosity == nil || *verbosity > 4 || *verbosity < 1 {

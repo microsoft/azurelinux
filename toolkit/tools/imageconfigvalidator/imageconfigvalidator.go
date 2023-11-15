@@ -26,6 +26,7 @@ var (
 
 	logFile   = exe.LogFileFlag(app)
 	logLevel  = exe.LogLevelFlag(app)
+	logColor  = exe.LogColorFlag(app)
 	profFlags = exe.SetupProfileFlags(app)
 
 	input       = exe.InputStringFlag(app, "Path to the image config file.")
@@ -39,7 +40,7 @@ func main() {
 
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel)
+	logger.InitBestEffort(*logFile, *logLevel, *logColor)
 
 	prof, err := profile.StartProfiling(profFlags)
 	if err != nil {

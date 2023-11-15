@@ -21,6 +21,7 @@ var (
 
 	logFile  = exe.LogFileFlag(app)
 	logLevel = exe.LogLevelFlag(app)
+	logColor = exe.LogColorFlag(app)
 
 	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
 )
@@ -29,7 +30,7 @@ func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 
-	logger.InitBestEffort(*logFile, *logLevel)
+	logger.InitBestEffort(*logFile, *logLevel, *logColor)
 
 	timestamp.BeginTiming("boilerplate", *timestampFile)
 	defer timestamp.CompleteTiming()

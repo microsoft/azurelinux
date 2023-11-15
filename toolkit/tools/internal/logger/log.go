@@ -45,6 +45,12 @@ const (
 	// FileFlagHelp is the suggested help message for the logfile flag
 	FileFlagHelp = "Path to the image's log file."
 
+	// ColorFlag is the suggested name for logcolor flag
+	ColorFlag = "log-color"
+
+	// ColorFlagHelp is the suggested help message for the logcolor flag
+	ColorFlagHelp = "Color setting for log terminal output."
+
 	defaultLogFileLevel   = logrus.DebugLevel
 	defaultStderrLogLevel = logrus.InfoLevel
 	parentCallerLevel     = 1
@@ -81,7 +87,7 @@ func InitStderrLog() {
 		log.Panic("Failed to get caller info.")
 	}
 
-	initStderrLogInternal(callerFilePath)
+	initStderrLogInternal(callerFilePath, "auto")
 }
 
 // SetFileLogLevel sets the lowest log level for file output
@@ -95,7 +101,7 @@ func SetStderrLogLevel(level string) (err error) {
 }
 
 // InitBestEffort runs InitStderrLog always, and InitLogFile if path is not empty
-func InitBestEffort(path string, level string) {
+func InitBestEffort(path string, level string, color string) {
 	if level == "" {
 		level = defaultStderrLogLevel.String()
 	}
@@ -105,7 +111,7 @@ func InitBestEffort(path string, level string) {
 		log.Panic("Failed to get caller info.")
 	}
 
-	initStderrLogInternal(callerFilePath)
+	initStderrLogInternal(callerFilePath, color)
 
 	if path != "" {
 		PanicOnError(initLogFile(path), "Failed while setting log file (%s).", path)
@@ -179,8 +185,15 @@ func ReplaceStderrFormatter(newFormatter logrus.Formatter) (oldFormatter logrus.
 	return stderrHook.ReplaceFormatter(newFormatter)
 }
 
-func initStderrLogInternal(callerFilePath string) {
-	const useColors = true
+func initStderrLogInternal(callerFilePath string, color string) {
+	var useColors bool
+	if color == "auto" || color == "always" {
+		useColors = true
+	} else if color == "never" {
+		useColors = false
+	} else {
+		useColors = true
+	}
 
 	Log = logrus.New()
 	Log.ReportCaller = true

@@ -38,13 +38,14 @@ var (
 	maxResults     = app.Flag("max-results", "The number of results to print per category. Set 0 to print unlimited.").Default(defaultMaxResults).Int()
 	logFile        = exe.LogFileFlag(app)
 	logLevel       = exe.LogLevelFlag(app)
+	logColor       = exe.LogColorFlag(app)
 )
 
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 
-	logger.InitBestEffort(*logFile, *logLevel)
+	logger.InitBestEffort(*logFile, *logLevel, *logColor)
 
 	err := analyzeGraph(*inputGraphFile, *maxResults)
 	if err != nil {

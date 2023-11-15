@@ -40,6 +40,11 @@ func OutputDirFlag(k *kingpin.Application, doc string) *string {
 	return k.Flag("output-dir", doc).Required().String()
 }
 
+// LogColorFlag registers a log color flag for k and returns the passed value
+func LogColorFlag(k *kingpin.Application) *string {
+	return k.Flag(logger.ColorFlag, logger.ColorFlagHelp).String()
+}
+
 // LogFileFlag registers a log file flag for k and returns the passed value
 func LogFileFlag(k *kingpin.Application) *string {
 	return k.Flag(logger.FileFlag, logger.FileFlagHelp).String()

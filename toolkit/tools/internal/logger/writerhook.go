@@ -58,7 +58,7 @@ func (h *writerHook) Fire(entry *logrus.Entry) (err error) {
 		return
 	}
 
-	if h.useColors == false {
+	if !h.useColors {
 		entry.Message = strings.ReplaceAll(entry.Message, "\x1b[31m", "")
 		entry.Message = strings.ReplaceAll(entry.Message, "\x1b[34m", "")
 		entry.Message = strings.ReplaceAll(entry.Message, "\x1b[0m", "")
