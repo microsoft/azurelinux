@@ -199,8 +199,8 @@ steps:
         $delta_fetch_arg \
         $quick_rebuild_packages_arg \
         $run_check_arg \
-        $use_ccache_arg \
-        $toolchain_archive_arg
+        $toolchain_archive_arg \
+        $use_ccache_arg
     displayName: "Build packages"
 
   - ${{ if parameters.outputArtifactsFolder }}:
