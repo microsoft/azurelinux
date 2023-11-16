@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://launchpad.net/cloud-init
-Source0:        https://github.com/canonical/%{name}/archive/refs/tags/%{version}.tar.gz#%{name}-%{version}.tar.gz
+Source0:        https://github.com/canonical/%{name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        10-azure-kvp.cfg
 Patch0:         overrideDatasourceDetection.patch
 Patch1:         make_fallback_network_config_work.patch
