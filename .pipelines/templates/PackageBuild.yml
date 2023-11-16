@@ -205,7 +205,7 @@ steps:
         SPECS_DIR="${{ parameters.buildRepoRoot }}/${{ parameters.specsFolderPath }}" \
         SRPM_PACK_LIST="${{ parameters.srpmPackList }}" \
         $delta_fetch_arg \
-        MAX_CASCADING_REBUILDS=${{ parameters.maxCascadingRebuilds }}" \
+        MAX_CASCADING_REBUILDS="${{ parameters.maxCascadingRebuilds }}" \
         $quick_rebuild_packages_arg \
         $run_check_arg \
         TEST_RERUN_LIST="${{ parameters.testRerunList }}" \
