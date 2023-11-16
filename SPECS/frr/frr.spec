@@ -18,9 +18,8 @@ Patch3:         0003-fips-mode.patch
 Patch4:         0004-remove-grpc-test.patch
 Patch5:         CVE-2023-46752.patch
 Patch6:         CVE-2023-46753.patch
-Patch7:			CVE-2023-4723X-prepatch.patch
+Patch7:			CVE-2023-47235.patch
 Patch8:			CVE-2023-47234.patch
-Patch9:			CVE-2023-47235.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  bison
