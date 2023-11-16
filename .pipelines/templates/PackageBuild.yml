@@ -184,8 +184,8 @@ steps:
         quick_rebuild_packages_arg="QUICK_REBUILD_PACKAGES=n"
       fi
 
-      if [[ ${{ parameters.maxCascadeAmount }} != "" ]]; then
-        max_cascading_rebuilds_arg="MAX_CASCADING_REBUILDS=${{ parameters.maxCascadeAmount }}"
+      if [[ ${{ parameters.maxCascadingRebuilds }} != "" ]]; then
+        max_cascading_rebuilds_arg="MAX_CASCADING_REBUILDS=${{ parameters.maxCascadingRebuilds }}"
       fi
 
       if [[ ${{ parameters.isCheckBuild }} == "true" ]]; then
