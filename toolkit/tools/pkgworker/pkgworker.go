@@ -201,12 +201,15 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 	toolchainRpmsOverlayMount, toolchainRpmsOverlayExtraDirs := safechroot.NewOverlayMountPoint(chroot.RootDir(), overlaySource, chrootLocalToolchainDir, toolchainDirPath, chrootLocalToolchainDir, overlayWorkDirToolchain)
 	rpmCacheMount := safechroot.NewMountPoint(*cacheDir, chrootLocalRpmsCacheDir, "", safechroot.BindMountPointFlags, "")
 	mountPoints := []*safechroot.MountPoint{outRpmsOverlayMount, toolchainRpmsOverlayMount, rpmCacheMount}
+	extraDirs := append(outRpmsOverlayExtraDirs, chrootLocalRpmsCacheDir)
+	extraDirs = append(extraDirs, toolchainRpmsOverlayExtraDirs...)
 	if isCCacheEnabled(ccacheManager) {
 		ccacheMount := safechroot.NewMountPoint(ccacheManager.CurrentPkgGroup.CCacheDir, chrootCcacheDir, "", safechroot.BindMountPointFlags, "")
 		mountPoints = append(mountPoints, ccacheMount)
+		// need to update extraDirs with ccache specific folders to be created
+		// inside the container.
+		extraDirs = append(extraDirs, chrootCcacheDir)
 	}
-	extraDirs := append(outRpmsOverlayExtraDirs, chrootLocalRpmsCacheDir, chrootCcacheDir)
-	extraDirs = append(extraDirs, toolchainRpmsOverlayExtraDirs...)
 
 	err = chroot.Initialize(workerTar, extraDirs, mountPoints)
 	if err != nil {

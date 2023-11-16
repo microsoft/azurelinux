@@ -9,8 +9,8 @@
 
 Summary:        Linux API header files
 Name:           kernel-headers
-Version:        5.15.135.1
-Release:        3%{?dist}
+Version:        5.15.137.1
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -70,9 +70,12 @@ done
 %endif
 
 %changelog
-* Wed Nov 15 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.135.1-3
+* Wed Nov 15 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.137.1-3
 - Add the 'kernel-cross-headers' subpackage for the x86_64 architecture.
 - Used Fedora 38 spec (license: MIT) for guidance.
+
+* Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.137.1-1
+- Auto-upgrade to 5.15.137.1
 
 * Mon Oct 23 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.135.1-2
 - Bump release to match kernel
