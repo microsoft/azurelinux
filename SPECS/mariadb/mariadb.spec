@@ -1,7 +1,7 @@
 Summary:        Database servers made by the original developers of MySQL.
 Name:           mariadb
-Version:        10.6.9
-Release:        5%{?dist}
+Version:        10.11.6
+Release:        1%{?dist}
 License:        GPLv2 WITH exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,10 +11,10 @@ Group:          Applications/Databases
 # To generate run CBL-Mariner/SPECS/mariadb/generate_source_tarball.sh script
 URL:            https://mariadb.org/
 Source0:        https://github.com/MariaDB/server/archive/mariadb-%{version}.tar.gz
-Patch0:         CVE-2022-47015.patch
 BuildRequires:  cmake
 BuildRequires:  curl-devel
 BuildRequires:  e2fsprogs-devel
+BuildRequires:  fmt-devel
 BuildRequires:  krb5-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  openssl-devel
@@ -81,11 +81,11 @@ export CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/ -g//'`"
 mkdir build && cd build
 
 cmake -DCMAKE_BUILD_TYPE=Release                        \
-      -DCMAKE_INSTALL_PREFIX=%{_prefix}                       \
-      -DINSTALL_DOCDIR=share/doc/mariadb-10.2.8         \
-      -DINSTALL_DOCREADMEDIR=share/doc/mariadb-10.2.8   \
+      -DCMAKE_INSTALL_PREFIX=%{_prefix}                 \
+      -DINSTALL_DOCDIR=share/doc/mariadb-%{version}     \
+      -DINSTALL_DOCREADMEDIR=share/doc/mariadb-%{version} \
       -DINSTALL_MANDIR=share/man                        \
-      -DINSTALL_MYSQLSHAREDIR="share/mysql"           \
+      -DINSTALL_MYSQLSHAREDIR="share/mysql"             \
       -DINSTALL_SYSCONFDIR="%{_sysconfdir}"             \
       -DINSTALL_SYSCONF2DIR="%{_sysconfdir}/my.cnf.d"   \
       -DINSTALL_MYSQLTESTDIR=share/mysql/test           \
@@ -94,13 +94,14 @@ cmake -DCMAKE_BUILD_TYPE=Release                        \
       -DINSTALL_SCRIPTDIR=bin                           \
       -DINSTALL_SQLBENCHDIR=share/mysql/bench           \
       -DINSTALL_SUPPORTFILESDIR=share                   \
-      -DMYSQL_DATADIR="%{_sharedstatedir}/mysql"               \
+      -DMYSQL_DATADIR="%{_sharedstatedir}/mysql"        \
       -DMYSQL_UNIX_ADDR="%{_sharedstatedir}/mysql/mysqld.sock" \
       -DWITH_EXTRA_CHARSETS=complex                     \
       -DWITH_EMBEDDED_SERVER=ON                         \
       -DWITH_PCRE=system                                \
       -DWITH_SSL=system                                 \
       -DWITH_ZLIB=system                                \
+      -DWITH_LIBFMT=system                              \
       -DSKIP_TESTS=ON                                   \
       -DTOKUDB_OK=0                                     \
       -DUPDATE_SUBMODULES=OFF                           \
@@ -273,13 +274,16 @@ fi
 
 %exclude %{_datadir}/mysql/bench
 %exclude %{_datadir}/mysql/test
-%exclude %{_docdir}/mariadb-10.2.8/*
+%exclude %{_docdir}/mariadb-%{version}/*
 
 %files server
-%config(noreplace) %{_sysconfdir}/logrotate.d/mysql
+%config(noreplace) %{_sysconfdir}/logrotate.d/mariadb
 %config(noreplace) %{_sysconfdir}/my.cnf.d/enable_encryption.preset
 %config(noreplace) %{_sysconfdir}/my.cnf.d/mysql-clients.cnf
 %config(noreplace) %{_sysconfdir}/my.cnf.d/server.cnf
+%config(noreplace) %{_sysconfdir}/my.cnf.d/hashicorp_key_management.cnf
+%config(noreplace) %{_sysconfdir}/my.cnf.d/provider_bzip2.cnf
+%config(noreplace) %{_sysconfdir}/my.cnf.d/provider_lzma.cnf
 %dir %attr(0750,mysql,mysql) %{_sharedstatedir}/mysql
 %{_libdir}/mysql/plugin*
 %{_bindir}/aria_chk
@@ -318,7 +322,8 @@ fi
 %{_unitdir}/*.socket
 %{_libdir}/systemd/system-preset/50-mariadb.preset
 %{_datadir}/binary-configure
-%{_datadir}/mysql-log-rotate
+%{_datadir}/mariadb.logrotate
+%{_datadir}/mini-benchmark
 %{_datadir}/mysql.server
 %{_datadir}/mysqld_multi.server
 %{_datadir}/policy/apparmor/README
@@ -442,6 +447,7 @@ fi
 %{_datadir}/mysql/errmsg-utf8.txt
 %{_datadir}/mysql/estonian/errmsg.sys
 %{_datadir}/mysql/french/errmsg.sys
+%{_datadir}/mysql/georgian/errmsg.sys
 %{_datadir}/mysql/german/errmsg.sys
 %{_datadir}/mysql/greek/errmsg.sys
 %{_datadir}/mysql/hungarian/errmsg.sys
@@ -462,6 +468,9 @@ fi
 %{_datadir}/mysql/hindi/errmsg.sys
 
 %changelog
+* Thu Nov 16 2023 Andrew Phelps <anphel@microsoft.com> - 10.11.6-1
+- Upgrade to version 10.11.6
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 10.6.9-5
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
