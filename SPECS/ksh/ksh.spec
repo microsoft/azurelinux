@@ -5,7 +5,7 @@
 Summary:        The Original ATT Korn Shell
 Name:           ksh
 Version:        %{verBetaPrefix}~beta.%{verBetaSuffix}
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        EPL-1.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -155,6 +155,9 @@ fi
 %config(noreplace) %{_sysconfdir}/binfmt.d/kshcomp.conf
 
 %changelog
+* Tue Nov 14 2023 Andrew Phelps <anphel@microsoft.com> - 1.0.0~beta.1-5
+- Modify ksh-1.0.0-beta.1-fix-build.patch-fix-build.patch with proper "-lm" location for updated toolchain
+
 * Wed Apr 13 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0~beta.1-4
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.

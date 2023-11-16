@@ -1,16 +1,14 @@
 %define underscore_version %(echo %{version} | cut -d. -f1-3 --output-delimiter="_")
 Summary:        Boost
 Name:           boost
-Version:        1.76.0
-Release:        4%{?dist}
+Version:        1.83.0
+Release:        1%{?dist}
 License:        Boost
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.boost.org/
 Source0:        https://downloads.sourceforge.net/boost/%{name}_%{underscore_version}.tar.bz2
-Patch0:         CVE-2018-25032.patch
-Patch1:         CVE-2023-45853.patch
 BuildRequires:  bzip2-devel
 BuildRequires:  libbacktrace-static
 
@@ -37,11 +35,7 @@ Requires:       %{name} = %{version}-%{release}
 The boost-static package contains boost static libraries.
 
 %prep
-%setup -q -n %{name}_%{underscore_version}
-pushd libs/beast/test/extern/zlib-1.2.11
-%patch0 -p1
-popd
-%patch1 -p1
+%autosetup -n %{name}_%{underscore_version}
 
 %build
 ./bootstrap.sh --prefix=%{buildroot}%{_prefix}
@@ -68,6 +62,9 @@ rm -rf %{buildroot}%{_libdir}/cmake
 %{_libdir}/libboost_*.a
 
 %changelog
+* Tue Nov 14 2023 Andrew Phelps <anphel@microsoft.com> - 1.83.0-1
+- Upgrade to version 1.83.0-1
+
 * Wed Oct 25 2023 Rohit Rawat <rohitrawat@microsoft.com> - 1.76.0-4
 - Patch CVE-2023-45853 for zlib
 
