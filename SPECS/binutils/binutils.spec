@@ -74,7 +74,7 @@ function prep_target () {
     fi
 }
 
-prep_target aarch64-linux-gnu %{build_aarch64}
+prep_target aarch64-%{_vendor}-linux-gnu %{build_aarch64}
 
 %build
 function config_cross_target () {
