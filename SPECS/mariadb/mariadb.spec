@@ -81,11 +81,11 @@ export CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/ -g//'`"
 mkdir build && cd build
 
 cmake -DCMAKE_BUILD_TYPE=Release                        \
-      -DCMAKE_INSTALL_PREFIX=%{_prefix}                       \
-      -DINSTALL_DOCDIR=share/doc/mariadb-%{version}         \
-      -DINSTALL_DOCREADMEDIR=share/doc/mariadb-%{version}   \
+      -DCMAKE_INSTALL_PREFIX=%{_prefix}                 \
+      -DINSTALL_DOCDIR=share/doc/mariadb-%{version}     \
+      -DINSTALL_DOCREADMEDIR=share/doc/mariadb-%{version} \
       -DINSTALL_MANDIR=share/man                        \
-      -DINSTALL_MYSQLSHAREDIR="share/mysql"           \
+      -DINSTALL_MYSQLSHAREDIR="share/mysql"             \
       -DINSTALL_SYSCONFDIR="%{_sysconfdir}"             \
       -DINSTALL_SYSCONF2DIR="%{_sysconfdir}/my.cnf.d"   \
       -DINSTALL_MYSQLTESTDIR=share/mysql/test           \
@@ -94,7 +94,7 @@ cmake -DCMAKE_BUILD_TYPE=Release                        \
       -DINSTALL_SCRIPTDIR=bin                           \
       -DINSTALL_SQLBENCHDIR=share/mysql/bench           \
       -DINSTALL_SUPPORTFILESDIR=share                   \
-      -DMYSQL_DATADIR="%{_sharedstatedir}/mysql"               \
+      -DMYSQL_DATADIR="%{_sharedstatedir}/mysql"        \
       -DMYSQL_UNIX_ADDR="%{_sharedstatedir}/mysql/mysqld.sock" \
       -DWITH_EXTRA_CHARSETS=complex                     \
       -DWITH_EMBEDDED_SERVER=ON                         \
