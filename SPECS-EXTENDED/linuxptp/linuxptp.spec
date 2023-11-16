@@ -215,6 +215,10 @@ fi
 %{_mandir}/man8/*.8*
 
 %changelog
+* Thu Nov 16 2023 Harshit Gupta <guptaharshit@microsoft.com> - 3.1.1-7
+- Initial CBL-Mariner import from Fedora 37 (license: MIT).
+- License Verified.
+
 * Wed Jan 11 2023 Miroslav Lichvar <mlichvar@redhat.com> 3.1.1-6
 - update selinux policy (#2159919)
 
