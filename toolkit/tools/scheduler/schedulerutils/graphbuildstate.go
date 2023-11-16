@@ -44,7 +44,7 @@ type GraphBuildState struct {
 //     '0' where the subsequent nodes will no longer be rebuilt. 'maxFreshness < 0' will cause unbounded cascading rebuilds,
 //     while 'maxFreshness = 0' will cause no cascading rebuilds.
 func NewGraphBuildState(reservedFiles []string, maxFreshness uint) (g *GraphBuildState) {
-	filesMap := sliceutils.SliceToSet[string](reservedFiles)
+	filesMap := sliceutils.SliceToMapBool[string](reservedFiles)
 
 	return &GraphBuildState{
 		activeBuilds:     make(map[int64]*BuildRequest),
@@ -154,7 +154,7 @@ func (g *GraphBuildState) BuildFailures() []*BuildResult {
 // ConflictingRPMs will return a list of *.rpm files which should not have been rebuilt.
 // This list is based on the manifest of pre-built toolchain rpms.
 func (g *GraphBuildState) ConflictingRPMs() (rpms []string) {
-	rpms = sliceutils.SetToSlice(g.conflictingRPMs)
+	rpms = sliceutils.MapToSliceBool(g.conflictingRPMs)
 	sort.Strings(rpms)
 
 	return rpms
@@ -163,7 +163,7 @@ func (g *GraphBuildState) ConflictingRPMs() (rpms []string) {
 // ConflictingSRPMs will return a list of *.src.rpm files which created rpms that should not have been rebuilt.
 // This list is based on the manifest of pre-built toolchain rpms.
 func (g *GraphBuildState) ConflictingSRPMs() (srpms []string) {
-	srpms = sliceutils.SetToSlice(g.conflictingSRPMs)
+	srpms = sliceutils.MapToSliceBool(g.conflictingSRPMs)
 	sort.Strings(srpms)
 
 	return srpms

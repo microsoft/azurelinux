@@ -90,20 +90,20 @@ func main() {
 	nodeListGoal := searchForGoal(graph, goalSearchList)
 
 	nodeLists := append(nodeListPkg, append(nodeListSpec, nodeListGoal...)...)
-	nodeSet := sliceutils.RemoveDuplicatesFromSlice(nodeLists)
+	nodeListUnique := sliceutils.RemoveDuplicatesFromSlice(nodeLists)
 
-	if len(nodeSet) == 0 {
+	if len(nodeListUnique) == 0 {
 		logger.Log.Panicf("Could not find any nodes matching pkgs:[%s] or specs:[%s] or goals[%s]", *pkgsToSearch, *specsToSearch, *goalsToSearch)
 	} else {
-		logger.Log.Infof("Found %d nodes to consider", len(nodeSet))
+		logger.Log.Infof("Found %d nodes to consider", len(nodeListUnique))
 	}
 
 	if *reverseSearch {
 		logger.Log.Infof("Reversed search will list all the dependencies of the provided packages...")
-		outputGraph, root, err = buildRequiresGraph(graph, nodeSet)
+		outputGraph, root, err = buildRequiresGraph(graph, nodeListUnique)
 	} else {
 		logger.Log.Infof("Forward search will list all dependants which rely on any of the provided packages...")
-		outputGraph, root, err = buildDependsOnGraph(graph, nodeSet)
+		outputGraph, root, err = buildDependsOnGraph(graph, nodeListUnique)
 	}
 
 	if err != nil {
@@ -245,7 +245,7 @@ func isFilteredFile(path, filterFile string) bool {
 			if err != nil {
 				logger.Log.Fatalf("Failed to load filter file '%s': %s", filterFile, err)
 			}
-			reservedFiles = sliceutils.SliceToSet[string](reservedFileList)
+			reservedFiles = sliceutils.SliceToMapBool[string](reservedFileList)
 		}
 		base := filepath.Base(path)
 
@@ -435,7 +435,7 @@ func printSpecs(graph *pkggraph.PkgGraph, tree, filter bool, filterFile string, 
 		}
 
 		// Contert to list and sort
-		printLines := sliceutils.SetToSlice[string](results)
+		printLines := sliceutils.MapToSliceBool[string](results)
 		sort.Strings(printLines)
 		for _, l := range printLines {
 			fmt.Println(l)

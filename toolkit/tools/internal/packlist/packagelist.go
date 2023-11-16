@@ -15,8 +15,8 @@ import (
 // ParsePackageListFile will parse a list of packages to pack or parse, if one is specified.
 // Duplicate list entries in the file will be removed.
 // If no path is specified, nil will be returned.
-// A set of [package name] -> [true] will be returned.
-func ParsePackageListFile(packageListFile string) (packageList map[string]bool, err error) {
+// A map of [package name] -> [true] will be returned.
+func ParsePackageListFile(packageListFile string) (packageMap map[string]bool, err error) {
 	timestamp.StartEvent("parse list", nil)
 	defer timestamp.StopEvent(nil)
 
@@ -24,7 +24,7 @@ func ParsePackageListFile(packageListFile string) (packageList map[string]bool, 
 		return
 	}
 
-	packageList = make(map[string]bool)
+	packageMap = make(map[string]bool)
 
 	file, err := os.Open(packageListFile)
 	if err != nil {
@@ -36,11 +36,11 @@ func ParsePackageListFile(packageListFile string) (packageList map[string]bool, 
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
 		if line != "" {
-			packageList[line] = true
+			packageMap[line] = true
 		}
 	}
 
-	if len(packageList) == 0 {
+	if len(packageMap) == 0 {
 		err = fmt.Errorf("cannot have empty pack list (%s)", packageListFile)
 	}
 

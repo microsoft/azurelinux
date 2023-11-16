@@ -391,7 +391,7 @@ func ResolveCompetingPackages(rootDir string, rpmPaths ...string) (resolvedRPMs 
 		}
 	}
 
-	resolvedRPMs = sliceutils.SetToSlice(uniqueResolvedRPMs)
+	resolvedRPMs = sliceutils.MapToSliceBool(uniqueResolvedRPMs)
 	return
 }
 

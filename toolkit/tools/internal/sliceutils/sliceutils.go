@@ -59,12 +59,12 @@ func PackageVerMatch(expected, given interface{}) bool {
 	return reflect.DeepEqual(expected.(*pkgjson.PackageVer), given.(*pkgjson.PackageVer))
 }
 
-// SetToSlice converts a map[T]bool to a slice containing the map's keys.
-func SetToSlice[T comparable](inputSet map[T]bool) []T {
+// MapToSliceBool converts a map[T]bool to a slice containing the map's keys.
+func MapToSliceBool[T comparable](inputMap map[T]bool) []T {
 	index := 0
-	outputSlice := make([]T, len(inputSet))
-	for element, elementInSet := range inputSet {
-		if elementInSet {
+	outputSlice := make([]T, len(inputMap))
+	for element, elementInMap := range inputMap {
+		if elementInMap {
 			outputSlice[index] = element
 			index++
 		}
@@ -72,18 +72,18 @@ func SetToSlice[T comparable](inputSet map[T]bool) []T {
 	return outputSlice[:index]
 }
 
-// SliceToSet converts a slice of K to a map[K]bool.
-func SliceToSet[K comparable](inputSlice []K) (outputSet map[K]bool) {
-	outputSet = make(map[K]bool, len(inputSlice))
+// SliceToMapBool converts a slice of K to a map[K]bool.
+func SliceToMapBool[K comparable](inputSlice []K) (outputMap map[K]bool) {
+	outputMap = make(map[K]bool, len(inputSlice))
 	for _, element := range inputSlice {
-		outputSet[element] = true
+		outputMap[element] = true
 	}
-	return outputSet
+	return outputMap
 }
 
 // RemoveDuplicatesFromSlice removes duplicate elements from a slice.
 func RemoveDuplicatesFromSlice[K comparable](inputSlice []K) (outputSlice []K) {
-	return SetToSlice(SliceToSet(inputSlice))
+	return MapToSliceBool(SliceToMapBool(inputSlice))
 }
 
 func nilCheck(expected interface{}, given interface{}) (checkValid, checkResult bool) {

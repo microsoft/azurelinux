@@ -125,7 +125,7 @@ func FindUnblockedNodesFromResult(res *BuildResult, pkgGraph *pkggraph.PkgGraph,
 		findUnblockedNodesFromNode(pkgGraph, buildState, node, unblockedNodesMap)
 	}
 
-	return sliceutils.SetToSlice(unblockedNodesMap)
+	return sliceutils.MapToSliceBool(unblockedNodesMap)
 }
 
 // findUnblockedNodesFromNode takes a built node and returns a list of nodes that are now unblocked by it.

@@ -657,8 +657,8 @@ func calculateTotalPackages(packages []string, installRoot string) (installedPac
 	}
 
 	// For every package calculate what dependencies would also be installed from it.
-	// checkedPackageSet contains a mapping of all package IDs (name, version, etc) to avoid calculating duplicates
-	checkedPackageSet := make(map[string]bool)
+	// checkedPackageMap contains a mapping of all package IDs (name, version, etc) to avoid calculating duplicates
+	checkedPackageMap := make(map[string]bool)
 	for _, pkg := range packages {
 		var (
 			stdout string
@@ -697,11 +697,11 @@ func calculateTotalPackages(packages []string, installRoot string) (installedPac
 			}
 
 			pkgID := pkg.ID()
-			if checkedPackageSet[pkgID] {
+			if checkedPackageMap[pkgID] {
 				logger.Log.Tracef("Skipping duplicate package: %s", line)
 				continue
 			}
-			checkedPackageSet[pkgID] = true
+			checkedPackageMap[pkgID] = true
 
 			logger.Log.Debugf("Added installedPackages entry for: %v", pkgID)
 

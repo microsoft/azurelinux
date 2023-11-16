@@ -17,28 +17,28 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func TestPackageVersSetToSliceShouldCreateEmptySliceFromNil(t *testing.T) {
-	outputSlice := SetToSlice[*pkgjson.PackageVer](nil)
+func TestPackageVersMapToSliceBoolShouldCreateEmptySliceFromNil(t *testing.T) {
+	outputSlice := MapToSliceBool[*pkgjson.PackageVer](nil)
 
 	assert.NotNil(t, outputSlice)
 	assert.Empty(t, outputSlice)
 }
 
-func TestPackageVersSetToSliceShouldCreateEmptySliceFromEmptySet(t *testing.T) {
-	outputSlice := SetToSlice(map[*pkgjson.PackageVer]bool{})
+func TestPackageVersMapToSliceBoolShouldCreateEmptySliceFromEmptyMap(t *testing.T) {
+	outputSlice := MapToSliceBool(map[*pkgjson.PackageVer]bool{})
 
 	assert.NotNil(t, outputSlice)
 	assert.Empty(t, outputSlice)
 }
 
-func TestPackageVersSetToSliceShouldReturnValuesForAllTrueElementsInSet(t *testing.T) {
+func TestPackageVersMapToSliceBoolShouldReturnValuesForAllTrueElementsInMap(t *testing.T) {
 	existingPackageVer := &pkgjson.PackageVer{Name: "A"}
 	missingPackageVer := &pkgjson.PackageVer{Name: "X"}
-	inputSet := map[*pkgjson.PackageVer]bool{
+	inputMap := map[*pkgjson.PackageVer]bool{
 		existingPackageVer: true,
 		missingPackageVer:  false,
 	}
-	outputSlice := SetToSlice(inputSet)
+	outputSlice := MapToSliceBool(inputMap)
 
 	assert.NotNil(t, outputSlice)
 	assert.Len(t, outputSlice, 1)
@@ -86,28 +86,28 @@ func TestStringShouldMatchForNilInBoth(t *testing.T) {
 	assert.True(t, StringMatch(nil, nil))
 }
 
-func TestStringsSetToSliceShouldCreateEmptySliceFromNil(t *testing.T) {
-	outputSlice := SetToSlice[string](nil)
+func TestStringsMapToSliceBoolShouldCreateEmptySliceFromNil(t *testing.T) {
+	outputSlice := MapToSliceBool[string](nil)
 
 	assert.NotNil(t, outputSlice)
 	assert.Empty(t, outputSlice)
 }
 
-func TestStringsSetToSliceShouldCreateEmptySliceFromEmptySet(t *testing.T) {
-	outputSlice := SetToSlice(map[string]bool{})
+func TestStringsMapToSliceBoolShouldCreateEmptySliceFromEmptyMap(t *testing.T) {
+	outputSlice := MapToSliceBool(map[string]bool{})
 
 	assert.NotNil(t, outputSlice)
 	assert.Empty(t, outputSlice)
 }
 
-func TestSetToSliceShouldReturnValuesForAllTrueElementsInSet(t *testing.T) {
-	inputSet := map[string]bool{
+func TestMapToSliceBoolShouldReturnValuesForAllTrueElementsInMap(t *testing.T) {
+	inputMap := map[string]bool{
 		"A": true,
 		"B": true,
 		"X": false,
 		"Y": false,
 	}
-	outputSlice := SetToSlice(inputSet)
+	outputSlice := MapToSliceBool(inputMap)
 
 	assert.NotNil(t, outputSlice)
 	assert.Len(t, outputSlice, 2)
@@ -117,30 +117,30 @@ func TestSetToSliceShouldReturnValuesForAllTrueElementsInSet(t *testing.T) {
 	assert.NotContains(t, outputSlice, "Y")
 }
 
-func TestSliceToSetShouldCreateEmptySetFromNil(t *testing.T) {
-	outputSet := SliceToSet[string](nil)
+func TestSliceToMapBoolShouldCreateEmptyMapFromNil(t *testing.T) {
+	outputMap := SliceToMapBool[string](nil)
 
-	assert.NotNil(t, outputSet)
-	assert.Empty(t, outputSet)
+	assert.NotNil(t, outputMap)
+	assert.Empty(t, outputMap)
 }
 
-func TestSliceToSetShouldCreateEmptySetFromEmptySlice(t *testing.T) {
-	outputSet := SliceToSet([]string{})
+func TestSliceToMapBoolShouldCreateEmptyMapFromEmptySlice(t *testing.T) {
+	outputMap := SliceToMapBool([]string{})
 
-	assert.NotNil(t, outputSet)
-	assert.Empty(t, outputSet)
+	assert.NotNil(t, outputMap)
+	assert.Empty(t, outputMap)
 }
 
-func TestSliceToSetShouldReturnValuesForAllElementsInSlice(t *testing.T) {
+func TestSliceToMapBoolShouldReturnValuesForAllElementsInSlice(t *testing.T) {
 	inputSlice := []string{"A", "B", "C"}
-	outputSet := SliceToSet(inputSlice)
+	outputMap := SliceToMapBool(inputSlice)
 
-	assert.NotNil(t, outputSet)
-	assert.Len(t, outputSet, 3)
-	assert.Contains(t, outputSet, "A")
-	assert.Contains(t, outputSet, "B")
-	assert.Contains(t, outputSet, "C")
-	assert.NotContains(t, outputSet, "X")
+	assert.NotNil(t, outputMap)
+	assert.Len(t, outputMap, 3)
+	assert.Contains(t, outputMap, "A")
+	assert.Contains(t, outputMap, "B")
+	assert.Contains(t, outputMap, "C")
+	assert.NotContains(t, outputMap, "X")
 }
 
 func TestShouldRemoveDuplicates(t *testing.T) {

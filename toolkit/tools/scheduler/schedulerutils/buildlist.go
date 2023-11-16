@@ -219,7 +219,7 @@ func packageNamesToPackages(packageOrSpecNames []string, analyzedNodes []*pkggra
 		}
 	}
 
-	packageVers = sliceutils.SetToSlice(packageVersMap)
+	packageVers = sliceutils.MapToSliceBool(packageVersMap)
 
 	return
 }
