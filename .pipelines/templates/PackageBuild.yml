@@ -199,16 +199,16 @@ steps:
       sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
         CONCURRENT_PACKAGE_BUILDS=${{ parameters.concurrentPackageBuilds }} \
         CONFIG_FILE="" \
+        MAX_CASCADING_REBUILDS="${{ parameters.maxCascadingRebuilds }}" \
         MAX_CPU="${{ parameters.maxCPU }}" \
         REBUILD_TOOLS=y \
         REPO_LIST="${{ parameters.extraPackageRepos }}" \
         SPECS_DIR="${{ parameters.buildRepoRoot }}/${{ parameters.specsFolderPath }}" \
         SRPM_PACK_LIST="${{ parameters.srpmPackList }}" \
+        TEST_RERUN_LIST="${{ parameters.testRerunList }}" \
         $delta_fetch_arg \
-        MAX_CASCADING_REBUILDS="${{ parameters.maxCascadingRebuilds }}" \
         $quick_rebuild_packages_arg \
         $run_check_arg \
-        TEST_RERUN_LIST="${{ parameters.testRerunList }}" \
         $use_ccache_arg
     displayName: "Build packages"
 
