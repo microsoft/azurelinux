@@ -33,11 +33,11 @@ libpkgconf-1.8.0-3.cm2.aarch64.rpm
 pkgconf-1.8.0-3.cm2.aarch64.rpm
 pkgconf-m4-1.8.0-3.cm2.noarch.rpm
 pkgconf-pkg-config-1.8.0-3.cm2.aarch64.rpm
-ncurses-6.4-1.cm2.aarch64.rpm
-ncurses-compat-6.4-1.cm2.aarch64.rpm
-ncurses-devel-6.4-1.cm2.aarch64.rpm
-ncurses-libs-6.4-1.cm2.aarch64.rpm
-ncurses-term-6.4-1.cm2.aarch64.rpm
+ncurses-6.4-2.cm2.aarch64.rpm
+ncurses-compat-6.4-2.cm2.aarch64.rpm
+ncurses-devel-6.4-2.cm2.aarch64.rpm
+ncurses-libs-6.4-2.cm2.aarch64.rpm
+ncurses-term-6.4-2.cm2.aarch64.rpm
 readline-8.1-1.cm2.aarch64.rpm
 readline-devel-8.1-1.cm2.aarch64.rpm
 coreutils-8.32-7.cm2.aarch64.rpm
