@@ -62,6 +62,10 @@ parameters:
       - "false"
       - "true"
 
+  - name: maxCascadingRebuilds
+    type: string
+    default: ""
+
   - name: outputArtifactsFolder
     type: string
     default: "$(Build.ArtifactStagingDirectory)"
@@ -180,6 +184,10 @@ steps:
         quick_rebuild_packages_arg="QUICK_REBUILD_PACKAGES=n"
       fi
 
+      if [[ ${{ parameters.maxCascadeAmount }} != "" ]]; then
+        max_cascading_rebuilds_arg="MAX_CASCADING_REBUILDS=${{ parameters.maxCascadeAmount }}"
+      fi
+
       if [[ ${{ parameters.isCheckBuild }} == "true" ]]; then
         run_check_arg="RUN_CHECK=y"
       elif [[ ${{ parameters.isCheckBuild }} == "false" ]]; then
@@ -201,6 +209,7 @@ steps:
         SPECS_DIR="${{ parameters.buildRepoRoot }}/${{ parameters.specsFolderPath }}" \
         SRPM_PACK_LIST="${{ parameters.srpmPackList }}" \
         $delta_fetch_arg \
+        $max_cascading_rebuilds_arg \
         $quick_rebuild_packages_arg \
         $run_check_arg \
         TEST_RERUN_LIST="${{ parameters.testRerunList }}" \
