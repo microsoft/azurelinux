@@ -77,6 +77,7 @@ go-toolchain-builder: $(no_repo_acl) $(go-toolchain) $(go-bldtracker)
 		--toolchain-manifest="$(TOOLCHAIN_MANIFEST)" \
 		--log-level=$(LOG_LEVEL) \
 		--log-file=$(LOGS_DIR)/toolchain/toolchain-builder.log \
+		--download-manifest=$(toolchain_downloads_manifest) \
 		$(foreach baseUrl, $(PACKAGE_URL_LIST),--package-urls="$(baseUrl)" ) \
 		$(if $(TLS_CERT),--tls-cert="$(TLS_CERT)") \
 		$(if $(TLS_KEY),--tls-key="$(TLS_KEY)") \

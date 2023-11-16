@@ -38,6 +38,7 @@ var (
 	tlsClientKey     = app.Flag("tls-key", "TLS client key to use when downloading files.").String()
 	packageURLs      = app.Flag("package-urls", "List of URLs to download RPMs from.").Required().Strings()
 	concurrentNetOps = app.Flag("concurrent-net-ops", "Number of concurrent network operations to perform.").Default(defaultNetOpsCount).Uint()
+	downloadManifest = app.Flag("download-manifest", "Path to a list of RPMs that were downloaded.").Required().String()
 
 	toolchainManifest = app.Flag("toolchain-manifest", "Path to a list of RPMs which are created by the toolchain. Will mark RPMs from this list as prebuilt.").Required().ExistingFile()
 	toolchainRpmDir   = app.Flag("toolchain-rpms-dir", "Directory that contains already built toolchain RPMs. Should contain top level directories for architecture.").Required().ExistingDir()
@@ -74,6 +75,7 @@ var (
 	officialBuildToolchainFromRepos   = app.Flag("official-build-toolchain-from-repos", "WHAT IS THIS?").Required().ExistingDir()
 	officialBuildBldTracker           = app.Flag("official-build-bld-tracker", "Path to the bld-tracker tool").Required().ExistingFile()
 	officialBuildTimestampFile        = app.Flag("official-build-timestamp-file", "Path to the timestamp file.").Required().String()
+	officialInputFiles                = app.Flag("official-input-files", "List of input files to hash for validating the cache.").Required().ExistingFiles()
 )
 
 func main() {
@@ -123,7 +125,7 @@ func main() {
 				logger.Log.Fatalf("Failed to load certificates: %s", err)
 			}
 
-			err = toolchain.DownloadToolchainRpms(*toolchainRpmDir, toolchainRPMs, *packageURLs, caCerts, tlsCerts, *concurrentNetOps)
+			err = toolchain.DownloadToolchainRpms(*toolchainRpmDir, toolchainRPMs, *packageURLs, caCerts, tlsCerts, *concurrentNetOps, *downloadManifest)
 			if err != nil {
 				logger.Log.Fatalf("Failed to download toolchain RPMs: %s", err)
 			}
@@ -285,6 +287,7 @@ func buildOfficialToolchainArchive(bootstrap toolchain.BootstrapScript, toolchai
 		BldTracker:           *officialBuildBldTracker,
 		TimestampFile:        *officialBuildTimestampFile,
 	}
+	official.InputFiles = append(official.InputFiles, *officialInputFiles...)
 	official.InputFiles = append(official.InputFiles, *toolchainManifest)
 	official.InputFiles = append(official.InputFiles, bootstrap.OutputFile)
 	builtArchive = toolchain.Archive{

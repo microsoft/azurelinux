@@ -7,10 +7,14 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/buildpipeline"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/moby/sys/mountinfo"
+	"golang.org/x/sys/unix"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -275,4 +279,67 @@ func TestInitializeShouldCreateExtraDirectories(t *testing.T) {
 	fullPath := filepath.Join(chroot.RootDir(), expectedExtraDirectory)
 	_, err = os.Stat(fullPath)
 	assert.True(t, !os.IsNotExist(err))
+}
+
+func TestUnsafeUnmount(t *testing.T) {
+	// create a temporary directory to use as the mount directory
+	rootDir := t.TempDir()
+
+	// create some nested directories and mount them
+	nestedDir1 := filepath.Join(rootDir, "nested1")
+	assert.NoError(t, os.Mkdir(nestedDir1, 0755))
+	assert.NoError(t, unix.Mount("tmpfs", nestedDir1, "tmpfs", 0, ""))
+
+	isMounted, err := mountinfo.Mounted(nestedDir1)
+	assert.NoError(t, err)
+	if !assert.True(t, isMounted) {
+		t.FailNow()
+	}
+
+	nestedDir2 := filepath.Join(nestedDir1, "nested2")
+	assert.NoError(t, os.Mkdir(nestedDir2, 0755))
+	assert.NoError(t, unix.Mount("tmpfs", nestedDir2, "tmpfs", 0, ""))
+
+	isMounted, err = mountinfo.Mounted(nestedDir2)
+	assert.NoError(t, err)
+	if !assert.True(t, isMounted) {
+		t.FailNow()
+	}
+
+	nestedDir3 := filepath.Join(nestedDir2, "nested3")
+	assert.NoError(t, os.Mkdir(nestedDir3, 0755))
+	assert.NoError(t, unix.Mount("tmpfs", nestedDir3, "tmpfs", 0, ""))
+
+	isMounted, err = mountinfo.Mounted(nestedDir3)
+	assert.NoError(t, err)
+	if !assert.True(t, isMounted) {
+		t.FailNow()
+	}
+
+	// call the function being tested
+	err = unsafeUnmount(rootDir)
+	assert.NoError(t, err)
+
+	// check that all directories are unmounted
+	isMounted, err = mountinfo.Mounted(nestedDir1)
+	assert.NoError(t, err)
+	assert.False(t, isMounted)
+
+	// check that all directories are unmounted from the mounts in /proc/mounts
+	mountsList, err := file.ReadLines("/proc/mounts")
+	assert.NoError(t, err)
+
+	foundBadUnmount := false
+	for _, mount := range mountsList {
+		if strings.Contains(mount, rootDir) {
+			path := strings.Fields(mount)[1]
+			t.Logf("**** Consider running 'sudo umount --lazy %s' to clean up ****", path)
+			foundBadUnmount = true
+		}
+	}
+	if foundBadUnmount {
+		// Test is in a bad state, but since we are just using tmpfs mounts in a tempdir it isn't the end of the world.
+		// We will fail out and print instructions to fix the issue but the mounts will get cleaned up on a reboot at worst.
+		t.FailNow()
+	}
 }

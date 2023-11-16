@@ -10,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"golang.org/x/term"
+
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
@@ -118,8 +120,22 @@ func (o *OfficialScript) updateProgress(done chan bool) {
 // TOOLCHAIN_BUILD_LIST=$TOOLCHAIN_LOGS/build_list.txt
 
 func (o *OfficialScript) BuildOfficialToolchainRpms() (err error) {
+	// Calculate the size of the console
+	consoleWidth, _, err := term.GetSize(int(os.Stdout.Fd()))
+	if err != nil {
+		logger.Log.Warnf("Failed to get console size. Error:\n%s", err)
+		consoleWidth = 80
+	}
+
+	headerLen := len("Official Toolchain: ###: ")
+	bufferLen := 3
+	maxLen := consoleWidth - headerLen - bufferLen
+
 	onStdout := func(args ...interface{}) {
 		line := args[0].(string)
+		if len(line) > maxLen {
+			line = line[:maxLen]
+		}
 		logger.Log.Infof("Official Toolchain %3d%%: %s", o.progress, line)
 	}
 	onStdErr := func(args ...interface{}) {

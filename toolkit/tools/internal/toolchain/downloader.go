@@ -10,6 +10,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"sort"
 	"time"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
@@ -63,7 +64,7 @@ func CleanToolchainRpms(toolchainDir string, toolchainRPMs []string) (err error)
 
 // downloadToolchainRpms checks for the existence of toolchain RPMs in the toolchain directory and downloads them if they are not present.
 // It will check each package URL in order and download the first one that exists.
-func DownloadToolchainRpms(toolchainDir string, toolchainRPMs []string, packageURLs []string, caCerts *x509.CertPool, tlsCerts []tls.Certificate, concurrentNetOps uint) (err error) {
+func DownloadToolchainRpms(toolchainDir string, toolchainRPMs []string, packageURLs []string, caCerts *x509.CertPool, tlsCerts []tls.Certificate, concurrentNetOps uint, manifestFile string) (err error) {
 	// We will be downloading packages concurrently, so we need to keep track of when they are all done via a wait group. To
 	// simplify the code just use goroutines with a semaphore channel to limit the number of concurrent network operations. Each
 	// goroutine will handle a single package and will send the result of the download to a results channel. The main thread will
@@ -76,7 +77,7 @@ func DownloadToolchainRpms(toolchainDir string, toolchainRPMs []string, packageU
 		go downloadSingleToolchainRpm(packageURLs, rpm, rpmPath, caCerts, tlsCerts, netOpsSemaphore, results)
 	}
 
-	err = trackDownloadProgress(len(toolchainRPMs), results, len(toolchainRPMs))
+	err = trackDownloadProgress(len(toolchainRPMs), results, len(toolchainRPMs), manifestFile)
 	if err != nil {
 		err = fmt.Errorf("failed to download toolchain RPMs. Error:\n%w", err)
 		return
@@ -172,7 +173,7 @@ func downloadFromMultipleBaseUrls(packageURLs []string, rpmFile, dstFile string,
 }
 
 // trackDownloadProgress will monitor the results channel and update the progress counter accordingly while collecting errors.
-func trackDownloadProgress(numExpectedResults int, results chan downloadResult, totalRPMs int) (err error) {
+func trackDownloadProgress(numExpectedResults int, results chan downloadResult, totalRPMs int, manifestFile string) (err error) {
 	// Collect the failures so we can print them at the end.
 	var successes, failuresOther, failures404, skipped []string
 
@@ -207,6 +208,15 @@ func trackDownloadProgress(numExpectedResults int, results chan downloadResult, 
 	if len(failuresOther) > 0 {
 		logger.Log.Errorf("Failed to download %d/%d toolchain RPMs", len(failuresOther), totalRPMs)
 		err = fmt.Errorf("failed to download %d/%d toolchain RPMs", len(failuresOther), totalRPMs)
+		return
 	}
+
+	sort.Strings(successes)
+	err = file.WriteLines(successes, manifestFile)
+	if err != nil {
+		err = fmt.Errorf("failed to write manifest file:\n%w", err)
+		return
+	}
+
 	return
 }
