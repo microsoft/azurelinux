@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/buildpipeline"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
@@ -33,6 +34,7 @@ var (
 
 func TestMain(m *testing.M) {
 	logger.InitStderrLog()
+	logger.InitBestEffort("", "debug")
 
 	var retVal int
 	if os.Geteuid() != 0 {
@@ -225,6 +227,7 @@ func TestInitializeShouldCreateCustomMountPoints(t *testing.T) {
 
 		extraDirectories := []string{}
 		srcMount := filepath.Join(testDir, "testmount")
+		logger.Log.Warnf("srcMount: %s", srcMount)
 		extraMountPoints := []*MountPoint{
 			NewMountPoint(srcMount, "custom-mount", "", BindMountPointFlags, emptyPath),
 		}
@@ -233,12 +236,18 @@ func TestInitializeShouldCreateCustomMountPoints(t *testing.T) {
 		chroot := NewChroot(dir, isExistingDir)
 
 		err := chroot.Initialize(emptyPath, extraDirectories, extraMountPoints)
+		logger.Log.Infof("Done init")
 		assert.NoError(t, err)
 		defer chroot.Close(defaultLeaveOnDisk)
 
 		fullPath := filepath.Join(dir, expectedFile)
+		logger.Log.Infof("Checking... %s", fullPath)
 		_, err = os.Stat(fullPath)
 		assert.True(t, !os.IsNotExist(err))
+		logger.Log.Infof("Done checking")
+
+		delay := time.After(300 * time.Second)
+		<-delay
 	}
 }
 
@@ -281,7 +290,7 @@ func TestInitializeShouldCreateExtraDirectories(t *testing.T) {
 	assert.True(t, !os.IsNotExist(err))
 }
 
-func TestUnsafeUnmount(t *testing.T) {
+func TestUnsafeUnmounts(t *testing.T) {
 	// create a temporary directory to use as the mount directory
 	rootDir := t.TempDir()
 
@@ -316,16 +325,12 @@ func TestUnsafeUnmount(t *testing.T) {
 		t.FailNow()
 	}
 
-	// call the function being tested
-	err = unsafeUnmount(rootDir)
-	assert.NoError(t, err)
-
-	// check that all directories are unmounted
-	isMounted, err = mountinfo.Mounted(nestedDir1)
-	assert.NoError(t, err)
-	assert.False(t, isMounted)
+	anyFailed := CleanupUnsafeMounts([]string{rootDir, nestedDir1, nestedDir2, nestedDir3})
+	assert.False(t, anyFailed)
 
 	// check that all directories are unmounted from the mounts in /proc/mounts
+	// They will look similar to '/tmp/TestUnsafeUnmount3846658289/001/nested1/nested2/nested3', just search for the
+	// rootDir to find them.
 	mountsList, err := file.ReadLines("/proc/mounts")
 	assert.NoError(t, err)
 

@@ -14,12 +14,15 @@ import (
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/systemdependency"
 )
 
 const officialName = "official"
+
+var toolchainMountPoints = []string{"dev", "dev/pts", "proc", "sys", "run"}
 
 type OfficialScript struct {
 	OutputFile           string   // Path to the generated bootstrap file
@@ -87,6 +90,18 @@ func (o *OfficialScript) PrepIncrementalRpms(downloadDir string, toolchainRPMs [
 	return
 }
 
+func (o *OfficialScript) cleanMountDirs() {
+	// Mounts are taken from 'chroot_mount()' in 'build_official_toolchain_rpms.sh'
+	fullPaths := []string{}
+	for _, mount := range toolchainMountPoints {
+		fullPaths = append(fullPaths, filepath.Join(o.WorkingDir, "populated_toolchain", mount))
+	}
+	safechroot.CleanupUnsafeMounts(fullPaths)
+	for _, mount := range toolchainMountPoints {
+		safechroot.RegisterUnsafeUnmount(mount)
+	}
+}
+
 func (o *OfficialScript) updateProgress(done chan bool) {
 	const delay = time.Duration(10) * time.Second
 	var (
@@ -120,6 +135,8 @@ func (o *OfficialScript) updateProgress(done chan bool) {
 // TOOLCHAIN_BUILD_LIST=$TOOLCHAIN_LOGS/build_list.txt
 
 func (o *OfficialScript) BuildOfficialToolchainRpms() (err error) {
+	o.cleanMountDirs()
+
 	// Calculate the size of the console
 	consoleWidth, _, err := term.GetSize(int(os.Stdout.Fd()))
 	if err != nil {

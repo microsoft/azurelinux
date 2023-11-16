@@ -184,6 +184,9 @@ endif
 # raw_toolchain has no recipe, it is created by the toolchain builder. Just need to track it as a dependency via a no-op.
 $(raw_toolchain): ;
 
+toolchain_mode=auto
+#--use-latest-available
+
 $(toolchain_status_flag): $(no_repo_acl) $(go-toolchain) $(go-bldtracker) $(depend_REBUILD_TOOLCHAIN) $(depend_TOOLCHAIN_ARCHIVE)
 	$(go-toolchain) \
 		--toolchain-rpms-dir="$(TOOLCHAIN_RPMS_DIR)" \
@@ -197,12 +200,14 @@ $(toolchain_status_flag): $(no_repo_acl) $(go-toolchain) $(go-bldtracker) $(depe
 		--cache-dir="$(MISC_CACHE_DIR)/toolchain" \
 		$(if $(filter y, $(REBUILD_TOOLCHAIN)),,--disallow-rebuild) \
 		$(if $(TOOLCHAIN_ARCHIVE),--existing-archive="$(TOOLCHAIN_ARCHIVE)") \
+		--specs-dir="$(SPECS_DIR)" \
+		\
+		--rebuild=$(toolchain_mode) \
 		\
 		--bootstrap-output-file="$(raw_toolchain)" \
 		--bootstrap-script="$(SCRIPTS_DIR)/toolchain/create_toolchain_in_container.sh" \
 		--bootstrap-working-dir="$(SCRIPTS_DIR)/toolchain" \
 		--bootstrap-build-dir="$(BUILD_DIR)" \
-		--bootstrap-specs-dir="$(SPECS_DIR)" \
 		--bootstrap-source-url="$(SOURCE_URL)" \
 		$(if $(filter y,$(INCREMENTAL_TOOLCHAIN)),--bootstrap-incremental-toolchain) \
 		$(foreach file, $(bootstrap-hashing-list),--bootstrap-input-files="$(file)" ) \

@@ -23,6 +23,10 @@ import (
 
 const (
 	defaultNetOpsCount = "40"
+	rebuildAuto        = "auto"
+	rebuildFast        = "fast"
+	rebuildForce       = "force"
+	rebuildNever       = "never"
 )
 
 var (
@@ -39,13 +43,15 @@ var (
 	packageURLs      = app.Flag("package-urls", "List of URLs to download RPMs from.").Required().Strings()
 	concurrentNetOps = app.Flag("concurrent-net-ops", "Number of concurrent network operations to perform.").Default(defaultNetOpsCount).Uint()
 	downloadManifest = app.Flag("download-manifest", "Path to a list of RPMs that were downloaded.").Required().String()
+	specsDir         = app.Flag("specs-dir", "Path to the specs directory.").Required().ExistingDir()
 
-	toolchainManifest = app.Flag("toolchain-manifest", "Path to a list of RPMs which are created by the toolchain. Will mark RPMs from this list as prebuilt.").Required().ExistingFile()
-	toolchainRpmDir   = app.Flag("toolchain-rpms-dir", "Directory that contains already built toolchain RPMs. Should contain top level directories for architecture.").Required().ExistingDir()
-	cacheDir          = app.Flag("cache-dir", "Directory to cache resources in.").Required().ExistingDir()
+	toolchainManifest  = app.Flag("toolchain-manifest", "Path to a list of RPMs which are created by the toolchain. Will mark RPMs from this list as prebuilt.").Required().ExistingFile()
+	useLatestAvailable = app.Flag("use-latest-available", "Use the latest available version of the toolchain RPMs in the repo.").Default("false").Bool()
+	toolchainRpmDir    = app.Flag("toolchain-rpms-dir", "Directory that contains already built toolchain RPMs. Should contain top level directories for architecture.").Required().ExistingDir()
+	cacheDir           = app.Flag("cache-dir", "Directory to cache resources in.").Required().ExistingDir()
+	disableCache       = app.Flag("disable-cache", "Block the use of cached resources.").Default("false").Bool()
 
-	disallowRebuild = app.Flag("disallow-rebuild", "Require all packages to be available from a repo.").Default("false").Bool()
-	forceRebuild    = app.Flag("force-rebuild", "Force rebuilding of all packages.").Default("false").Bool()
+	allowRebuild    = app.Flag("rebuild", "Require all packages to be available from a repo.").Default("auto").Enum(rebuildAuto, rebuildFast, rebuildForce, rebuildNever)
 	existingArchive = app.Flag("existing-archive", "Path to an existing archive to use instead of building a new one.").ExistingFile()
 
 	// Bootstrap script inputs
@@ -53,7 +59,6 @@ var (
 	bootstrapScript         = app.Flag("bootstrap-script", "Path to the bootstrap script.").Required().String()
 	bootstrapWorkingDir     = app.Flag("bootstrap-working-dir", "Path to the working directory.").Required().ExistingDir()
 	bootstrapBuildDir       = app.Flag("bootstrap-build-dir", "Path to the build directory.").Required().ExistingDir()
-	bootstrapSpecsDir       = app.Flag("bootstrap-specs-dir", "Path to the specs directory.").Required().ExistingDir()
 	bootstrapSourceURL      = app.Flag("bootstrap-source-url", "URL to the source code.").Required().String()
 	bootstrapUseIncremental = app.Flag("bootstrap-incremental-toolchain", "Use incremental build mode.").Default("false").Bool()
 	bootstrapInputFiles     = app.Flag("bootstrap-input-files", "List of input files to hash for validating the cache.").Required().ExistingFiles()
@@ -92,17 +97,20 @@ func main() {
 	timestamp.BeginTiming("toolchain", *timestampFile)
 	defer timestamp.CompleteTiming()
 
-	if *disallowRebuild && *forceRebuild {
-		logger.Log.Fatalf("Cannot --force-rebuild rebuild when --disallow-rebuild is set.")
-	}
-
-	if *existingArchive != "" && *forceRebuild {
-		logger.Log.Fatalf("Cannot --force-rebuild rebuild when --existing-archive is set.")
+	if *existingArchive != "" && (*allowRebuild == rebuildForce || *allowRebuild == rebuildFast) {
+		logger.Log.Fatalf("Cannot use --rebuild=force or --rebuild=fast when --existing-archive is set.")
 	}
 
 	toolchainRPMs, err := schedulerutils.ReadReservedFilesList(*toolchainManifest)
 	if err != nil {
 		logger.Log.Fatalf("Failed to read toolchain manifest file '%s': %s", *toolchainManifest, err)
+	}
+
+	if *useLatestAvailable {
+		toolchainRPMs, err = toolchain.UpdateManifestsToLatestAvailable(toolchainRPMs, *existingArchive, *specsDir)
+		if err != nil {
+			logger.Log.Fatalf("Failed to update toolchain manifest file '%s': %s", *toolchainManifest, err)
+		}
 	}
 
 	// All steps that follow are additive, so we need to remove any unwanted packages first
@@ -119,7 +127,7 @@ func main() {
 		}
 	} else {
 		// Download toolchain RPMs if they are missing
-		if !*forceRebuild {
+		if *allowRebuild != rebuildForce {
 			caCerts, tlsCerts, err := prepCerts(*tlsClientCert, *tlsClientKey, *caCertFile)
 			if err != nil {
 				logger.Log.Fatalf("Failed to load certificates: %s", err)
@@ -137,8 +145,8 @@ func main() {
 		}
 		if !ready {
 			logger.Log.Infof("Missing toolchain RPMs: %s", missingRPMs)
-			if *disallowRebuild {
-				logger.Log.Fatalf("Toolchain RPMs are not ready, and --disallow-rebuild is set.")
+			if *allowRebuild == rebuildNever {
+				logger.Log.Fatalf("Toolchain RPMs are not ready, and --rebuild=never was specified.")
 			}
 		} else {
 			logger.Log.Infof("Toolchain RPMs are ready.")
@@ -232,7 +240,7 @@ func buildBootstrapToolchainArchive() (bootstrap toolchain.BootstrapScript, err 
 		ScriptPath:     *bootstrapScript,
 		WorkingDir:     *bootstrapWorkingDir,
 		BuildDir:       *bootstrapBuildDir,
-		SpecsDir:       *bootstrapSpecsDir,
+		SpecsDir:       *specsDir,
 		SourceURL:      *bootstrapSourceURL,
 		UseIncremental: *bootstrapUseIncremental,
 	}
@@ -244,7 +252,7 @@ func buildBootstrapToolchainArchive() (bootstrap toolchain.BootstrapScript, err 
 		return
 	}
 
-	if cacheOk && !*forceRebuild {
+	if cacheOk && !*disableCache {
 		logger.Log.Infof("Bootstrap cache is valid, restoring.")
 		err = bootstrap.RestoreFromCache(*cacheDir)
 		if err != nil {
@@ -300,7 +308,7 @@ func buildOfficialToolchainArchive(bootstrap toolchain.BootstrapScript, toolchai
 		return
 	}
 
-	if cacheOk && !*forceRebuild {
+	if cacheOk && !*disableCache {
 		logger.Log.Infof("Official toolchain rpms cache is valid, restoring.")
 		err = official.RestoreFromCache(*cacheDir)
 		if err != nil {
@@ -308,7 +316,7 @@ func buildOfficialToolchainArchive(bootstrap toolchain.BootstrapScript, toolchai
 			return
 		}
 	} else {
-		if !*forceRebuild {
+		if *allowRebuild != rebuildForce {
 			// Toolchain script expects rpms or empty files in a specific directory do do incremental builds
 			err = official.PrepIncrementalRpms(*toolchainRpmDir, toolchainRPMs)
 			if err != nil {
