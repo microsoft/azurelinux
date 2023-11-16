@@ -1084,8 +1084,8 @@ func (g *PkgGraph) AddGoalNodeWithExtraLayers(goalName string, packages, tests [
 
 	logger.Log.Debugf("Adding a goal node '%s'.", goalName)
 
-	packagesGoalMap := g.buildGoalMap(packages, TypeLocalRun)
-	testsGoalMap := g.buildGoalMap(tests, TypeTest)
+	packagesGoals := g.buildGoals(packages, TypeLocalRun)
+	testsGoals := g.buildGoals(tests, TypeTest)
 
 	// Create goal node and add an edge to all requested packages
 	goalNode = &PkgNode{
@@ -1104,12 +1104,12 @@ func (g *PkgGraph) AddGoalNodeWithExtraLayers(goalName string, packages, tests [
 		return
 	}
 
-	err = g.connectGoalEdges(goalNode, packagesGoalMap, strict, TypeLocalRun)
+	err = g.connectGoalEdges(goalNode, packagesGoals, strict, TypeLocalRun)
 	if err != nil {
 		return
 	}
 
-	err = g.connectGoalEdges(goalNode, testsGoalMap, strict, TypeTest)
+	err = g.connectGoalEdges(goalNode, testsGoals, strict, TypeTest)
 	if err != nil {
 		return
 	}
@@ -1132,7 +1132,7 @@ func (g *PkgGraph) AddGoalNodeWithExtraLayers(goalName string, packages, tests [
 func (g *PkgGraph) addGoalNodeLayers(goalNode *PkgNode, layers int) {
 	logger.Log.Debugf("Expanding goal node '%s' by %d layers", goalNode.GoalName, layers)
 
-	var expandedGoalNodes []*PkgNode
+	var expandedGoalNodesList []*PkgNode
 	// Use a map to keep track of the nodes we already added so we can avoid processing them again
 	expandedGoalNodesMap := make(map[*PkgNode]bool)
 
@@ -1143,13 +1143,13 @@ func (g *PkgGraph) addGoalNodeLayers(goalNode *PkgNode, layers int) {
 	}
 
 	// For each node in the current layer, add all of the nodes that depend on it, then repeat as many times as requested
-	expandedGoalNodes = initialGoalNodes
+	expandedGoalNodesList = initialGoalNodes
 	for i := 0; i < layers; i++ {
-		expandedGoalNodes = append(expandedGoalNodes, g.getNextGoalLayer(expandedGoalNodesMap, expandedGoalNodes)...)
+		expandedGoalNodesList = append(expandedGoalNodesList, g.getNextGoalLayer(expandedGoalNodesMap, expandedGoalNodesList)...)
 	}
 
 	// Add the new edges if they are missing
-	for _, expandedNode := range expandedGoalNodes {
+	for _, expandedNode := range expandedGoalNodesList {
 		// Ensure we don't create a cycle by adding an edge from the goal node to itself
 		if expandedNode == goalNode {
 			continue
@@ -1166,7 +1166,7 @@ func (g *PkgGraph) addGoalNodeLayers(goalNode *PkgNode, layers int) {
 // - currentGoalNodes: The current layer of goal nodes to expand from.
 //
 // Returns a list of additional nodes that connect to currentGoalNodes (but not any nodes that are already in currentGoalNodes)
-func (g *PkgGraph) getNextGoalLayer(expandedGoalNodesMap map[*PkgNode]bool, currentGoalNodes []*PkgNode) (expandedGoalNodes []*PkgNode) {
+func (g *PkgGraph) getNextGoalLayer(expandedGoalNodesMap map[*PkgNode]bool, currentGoalNodes []*PkgNode) (expandedGoalNodesList []*PkgNode) {
 
 	// We will iterate over the current goal nodes and add all the nodes that depend on them to the expanded goal nodes.
 	// The expandedGoalNodesMap will ensure we don't add the same node twice.
@@ -1192,13 +1192,13 @@ func (g *PkgGraph) getNextGoalLayer(expandedGoalNodesMap map[*PkgNode]bool, curr
 				fallthrough
 			case TypeTest:
 				logger.Log.Debugf("Adding '%s' to expanded goal nodes", dependentNode.FriendlyName())
-				expandedGoalNodes = append(expandedGoalNodes, dependentNode)
+				expandedGoalNodesList = append(expandedGoalNodesList, dependentNode)
 			case TypeGoal:
 				logger.Log.Tracef("Skipping '%s' since it is a goal node", dependentNode.FriendlyName())
 			default:
 				// If the node is not a run node we need to keep expanding from the non-run node.
 				logger.Log.Tracef("Continuing to expand past '%s' since it is not a run node", dependentNode.FriendlyName())
-				expandedGoalNodes = append(expandedGoalNodes, g.getNextGoalLayer(expandedGoalNodesMap, []*PkgNode{dependentNode})...)
+				expandedGoalNodesList = append(expandedGoalNodesList, g.getNextGoalLayer(expandedGoalNodesMap, []*PkgNode{dependentNode})...)
 			}
 		}
 	}
@@ -1382,28 +1382,28 @@ func (g *PkgGraph) allNodesOfType(nodeGetter func(node *LookupNode) *PkgNode) []
 	return nodes
 }
 
-// buildGoalMap returns a map of package versions that are the goal of the graph.
-func (g *PkgGraph) buildGoalMap(packageVers []*pkgjson.PackageVer, nodeType NodeType) (goalMap map[*pkgjson.PackageVer]bool) {
+// buildGoals returns a map of package versions that are the goal of the graph.
+func (g *PkgGraph) buildGoals(packageVers []*pkgjson.PackageVer, nodeType NodeType) (goals map[*pkgjson.PackageVer]bool) {
 	if len(packageVers) > 0 {
 		logger.Log.Debugf("Adding a goal for selected nodes of type '%s': %v", nodeType, packageVers)
 
-		goalMap = make(map[*pkgjson.PackageVer]bool)
+		goals = make(map[*pkgjson.PackageVer]bool)
 		for _, pkg := range packageVers {
 			logger.Log.Tracef("\t%s-%s", pkg.Name, pkg.Version)
-			goalMap[pkg] = true
+			goals[pkg] = true
 		}
 	} else {
 		logger.Log.Debugf("Adding a goal for all nodes of type '%s'", nodeType)
 
 		if nodeType == TypeTest {
-			goalMap = pkgNodesListToPackageVerMap(g.AllTestNodes())
+			goals = pkgNodesListToPackageVerMap(g.AllTestNodes())
 		} else {
-			goalMap = pkgNodesListToPackageVerMap(g.AllPreferredRunNodes())
+			goals = pkgNodesListToPackageVerMap(g.AllPreferredRunNodes())
 		}
 	}
 
 	if logger.Log.IsLevelEnabled(logrus.TraceLevel) {
-		for node := range goalMap {
+		for node := range goals {
 			logger.Log.Tracef("\t%s-%s", node.Name, node.Version)
 		}
 	}
@@ -1411,8 +1411,8 @@ func (g *PkgGraph) buildGoalMap(packageVers []*pkgjson.PackageVer, nodeType Node
 	return
 }
 
-func (g *PkgGraph) connectGoalEdges(goalNode *PkgNode, goalMap map[*pkgjson.PackageVer]bool, strict bool, nodeType NodeType) (err error) {
-	for pkg := range goalMap {
+func (g *PkgGraph) connectGoalEdges(goalNode *PkgNode, goals map[*pkgjson.PackageVer]bool, strict bool, nodeType NodeType) (err error) {
+	for pkg := range goals {
 		var existingNode *PkgNode = nil
 		// Try to find an exact match first (to make sure we match revision number exactly, if available)
 		nodeLookup, err := g.FindExactPkgNodeFromPkg(pkg)
@@ -1720,12 +1720,12 @@ func rpmsProvidedBySRPM(srpmPath string, pkgGraph *PkgGraph, graphMutex *sync.RW
 			(node.RpmPath != NoRPMPath)
 	})
 
-	rpmsMap := make(map[string]bool)
+	rpms := make(map[string]bool)
 	for _, node := range filteredNodes {
-		rpmsMap[node.RpmPath] = true
+		rpms[node.RpmPath] = true
 	}
 
-	rpmFiles = sliceutils.MapToSliceBool(rpmsMap)
+	rpmFiles = sliceutils.MapToSliceBool(rpms)
 
 	return
 }
