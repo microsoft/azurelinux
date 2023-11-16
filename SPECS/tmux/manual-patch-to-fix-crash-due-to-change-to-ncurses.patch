@@ -13,7 +13,7 @@ That change uses a config setting to created #defines to determine which version
 
 But to use that, we would need to get the actual source as it appears in github, rather than the released version (they are different downloads: see https://github.com/tmux/tmux/releases).
 
-Fortunately, we have the luxery of forcing tmux to use a version of ncurses that has the function we want (see above).
+Fortunately, we have the luxury of forcing tmux to use a version of ncurses that has the function we want (see above).
 
 Given all this, this patch takes the change to use tiparm_s, removes the conditional compilation portion so it always uses tiparm_s and applies it to the code as it exists in 3.2a.
 
