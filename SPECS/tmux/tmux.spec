@@ -10,8 +10,10 @@ Distribution:   Mariner
 Source0:        https://github.com/tmux/tmux/releases/download/%{version}/%{name}-%{version}.tar.gz
 Patch0:         CVE-2022-47016.patch
 Patch1:         manual-patch-to-fix-crash-due-to-change-to-ncurses.patch
-Requires:       libevent ncurses >= 6.4-2
-BuildRequires:  libevent-devel ncurses-devel >= 6.4-2
+Requires:       libevent
+Requires:       ncurses >= 6.4-2
+BuildRequires:  libevent-devel
+BuildRequires:  ncurses-devel >= 6.4-2
 
 %description
 Terminal multiplexer
