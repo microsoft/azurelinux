@@ -468,6 +468,9 @@ fi
 %{_datadir}/mysql/hindi/errmsg.sys
 
 %changelog
+* Thu Nov 16 2023 Andrew Phelps <anphel@microsoft.com> - 10.11.6-1
+- Upgrade to version 10.11.6
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 10.6.9-5
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
