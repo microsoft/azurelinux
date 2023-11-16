@@ -4,7 +4,7 @@
 Summary:        Cyrus Simple Authentication Service Layer (SASL) library
 Name:           cyrus-sasl
 Version:        2.1.28
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD with advertising
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -22,6 +22,7 @@ BuildRequires:  postgresql-devel
 BuildRequires:  postgresql-libs
 BuildRequires:  systemd
 BuildRequires:  libdb-devel
+BuildRequires:  libxcrypt-devel
 
 Requires:       %{name}-lib = %{version}-%{release}
 Requires:       krb5 >= 1.12
@@ -310,6 +311,9 @@ make %{?_smp_mflags} check
 %{_plugindir2}/libsql.so.%{_soversion}*
 
 %changelog
+* Wed Nov 15 2023 Andrew Phelps <anphel@microsoft.com> - 2.1.28-5
+- Add BR for libxcrypt-devel
+
 * Mon Feb 27 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.1.28-4
 - Fix Obsoletes happening in md5 subpackage when it should be lib.
 - Gate cyrus-sasl obsoletes by pkg version/rel

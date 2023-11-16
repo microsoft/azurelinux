@@ -1,7 +1,7 @@
 Summary:        Systemd-250
 Name:           systemd
 Version:        250.3
-Release:        20%{?dist}
+Release:        19%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -43,7 +43,6 @@ BuildRequires:  kmod-devel
 BuildRequires:  libcap-devel
 BuildRequires:  libgcrypt-devel
 BuildRequires:  libselinux-devel
-BuildRequires:  libxcrypt-devel
 BuildRequires:  libxslt
 BuildRequires:  lz4-devel
 BuildRequires:  meson
@@ -288,9 +287,6 @@ fi
 %files lang -f %{name}.lang
 
 %changelog
-* Tue Nov 14 2023 Andrew Phelps <anphel@microsoft.com> - 250.3-20
-- Link with libxcrypt
-
 * Thu Nov 02 2023 Rachel Menge <rachelmenge@microsoft.com> - 250.3-19
 - Update CIFS magic to build with 6.1 kernel-headers
 
