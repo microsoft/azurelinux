@@ -1,3 +1,23 @@
+%ifarch x86_64
+%global build_all_cross 1
+%else
+%global build_all_cross 0
+%endif
+
+%global build_aarch64 %{build_all_cross}
+
+# Where the binaries aimed at gcc will live (ie. /usr/<target>/bin/)
+%global auxbin_prefix %{_exec_prefix}
+
+%global do_package() \
+%if %2 \
+    %package -n binutils-%1 \
+    Summary: Cross-build binary utilities for %1 \
+    Requires: %{name}-common = %{version}-%{release} \
+    %description -n binutils-%1 \
+    Cross-build binary image generation, manipulation and query tools. \
+%endif
+
 Summary:        Contains a linker, an assembler, and other tools
 Name:           binutils
 Version:        2.37
@@ -18,6 +38,15 @@ Patch4:         CVE-2022-38533.patch
 Patch5:         CVE-2022-4285.patch
 Provides:       bundled(libiberty)
 
+Requires:       %{name}-common = %{version}-%{release}
+
+%package common
+Summary: Binutils documentation
+BuildArch: noarch
+
+%description common
+Documentation for the binutils package.
+
 %description
 The Binutils package contains a linker, an assembler,
 and other tools for handling object files.
@@ -30,10 +59,59 @@ Requires:       %{name} = %{version}
 It contains the libraries and header files to create applications
 for handling compiled objects.
 
+%do_package aarch64-%{_vendor}-linux-gnu %{build_aarch64}
+
 %prep
 %autosetup -p1
 
+function prep_target () {
+    local target=$1
+    local cond=$2
+
+    if [ $cond != 0 ]
+    then
+	    echo $1 >> cross.list
+    fi
+}
+
+prep_target aarch64-linux-gnu %{build_aarch64}
+
 %build
+function config_cross_target () {
+    local target=$1
+
+    local build_dir=${target%%%%-*}
+    local prefix=$target-
+
+    echo "Will cross build for $target."
+
+    mkdir $build_dir
+    pushd $build_dir
+
+    ../configure \
+        --prefix=%{_prefix} \
+        --exec-prefix=%{auxbin_prefix} \
+        --bindir=%{_bindir} \
+        --sbindir=%{_sbindir} \
+        --sysconfdir=%{_sysconfdir} \
+        --datadir=%{_datadir} \
+        --includedir=%{_includedir} \
+        --libdir=%{_libdir} \
+        --libexecdir=%{_libexecdir} \
+        --localstatedir=%{_localstatedir} \
+        --sharedstatedir=%{_sharedstatedir} \
+        --mandir=%{_mandir} \
+        --infodir=%{_infodir} \
+        --build=%{_target_platform} \
+        --host=%{_target_platform} \
+        --program-prefix=$prefix \
+        --target=$target \
+        --disable-multilib \
+        --with-sysroot=%{_prefix}/$target/sys-root
+
+    popd
+}
+
 %configure \
     --disable-silent-rules \
     --disable-werror    \
@@ -42,6 +120,11 @@ for handling compiled objects.
     --enable-plugins    \
     --enable-shared     \
     --with-system-zlib
+
+while read -r target
+do
+    config_cross_target $target
+done < cross.list
 
 %make_build tooldir=%{_prefix}
 
@@ -62,7 +145,6 @@ sed -i 's/testsuite/ /g' gold/Makefile
 
 %files -f %{name}.lang
 %defattr(-,root,root)
-%license COPYING
 %{_bindir}/dwp
 %{_bindir}/gprof
 %{_bindir}/ld.bfd
@@ -82,6 +164,11 @@ sed -i 's/testsuite/ /g' gold/Makefile
 %{_bindir}/readelf
 %{_bindir}/strip
 %{_libdir}/ldscripts/*
+%{_libdir}/libbfd-%{version}.so
+%{_libdir}/libopcodes-%{version}.so
+
+%files common
+%license COPYING
 %{_mandir}/man1/readelf.1.gz
 %{_mandir}/man1/windmc.1.gz
 %{_mandir}/man1/ranlib.1.gz
@@ -100,8 +187,6 @@ sed -i 's/testsuite/ /g' gold/Makefile
 %{_mandir}/man1/windres.1.gz
 %{_mandir}/man1/size.1.gz
 %{_mandir}/man1/objdump.1.gz
-%{_libdir}/libbfd-%{version}.so
-%{_libdir}/libopcodes-%{version}.so
 
 %files devel
 %{_includedir}/ansidecl.h
