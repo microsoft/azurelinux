@@ -1,7 +1,7 @@
 %define majver %(echo %{version} | cut -d. -f 1-2)
 Summary:        Compiler for the Vala programming language
 Name:           vala
-Version:        0.56.9
+Version:        0.54.6
 Release:        1%{?dist}
 License:        LGPL
 Vendor:         Microsoft Corporation
@@ -156,9 +156,6 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/valadoc-%{majver}.pc
 
 %changelog
-* Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.56.9-1
-- Auto-upgrade to 0.56.9 - Azure Linux 3.0 - package upgrades
-
 * Mon Jan 24 2022 Henry Li <lihl@microsoft.com> - 0.54.6-1
 - Upgrade to version 0.54.6
 - Add bison, flex, gobject-introspection-devel, libxslt and graphviz-devel as BR
