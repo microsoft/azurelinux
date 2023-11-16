@@ -11,6 +11,7 @@ function CreateEfibootImage () {
     DST_DIR=$3
 
     mkdir -p $INTERMEDIATE_OUTPUT
+    mkdir -p $DST_DIR
 
     rm -f $INTERMEDIATE_OUTPUT/bootx64.efi
 
@@ -31,7 +32,7 @@ function CreateEfibootImage () {
     mkfs.vfat $DST_DIR/efiboot.img
 
     LC_CTYPE=C mmd -i $DST_DIR/efiboot.img efi efi/boot
-    LC_CTYPE=C mcopy -i $DST_DIR/efiboot.img ./$INTERMEDIATE_OUTPUT/bootx64.efi ::efi/boot/
+    LC_CTYPE=C mcopy -i $DST_DIR/efiboot.img $INTERMEDIATE_OUTPUT/bootx64.efi ::efi/boot/
 
     echo "Created ---- " $DST_DIR/efiboot.img
 }
@@ -41,7 +42,9 @@ function CreateBiosImage () {
     INTERMEDIATE_OUTPUT=$2
     DST_DIR=$3
 
+    mkdir -p $INTERMEDIATE_OUTPUT
     mkdir -p $DST_DIR
+
     rm -f $INTERMEDIATE_OUTPUT/core.img
 
     grub-mkstandalone \
@@ -85,19 +88,24 @@ function CreateBiosImage () {
 # Originally: ./prepare-iso-artifacts.sh
 #
 
-export INPUT_INTRD=$1
-export INPUT_VMLINUZ=$2
-export INPUT_GRUB_CFG=$3
-export INPUT_ROOT_FS=$4
-export INPUT_HOST_CONFIGURATION=$5
-export OUTPUT_ISO_DIR=$6
+INPUT_INTRD=$1
+INPUT_VMLINUZ=$2
+INPUT_GRUB_CFG=$3
+INPUT_ROOT_FS=$4
+INPUT_HOST_CONFIGURATION=$5
+OUTPUT_ISO_DIR=$6
 
-export INTERMEDIATE_OUTPUT_DIR=./iso-intermediate-artifacts
+INTERMEDIATE_OUTPUT_DIR=$OUTPUT_ISO_DIR/iso-intermediate-artifacts
+mkdir -p $INTERMEDIATE_OUTPUT_DIR
 
-export STAGED_ISO_ARTIFACTS_DIR=./iso-staged-layout
+STAGED_ISO_ARTIFACTS_DIR=$OUTPUT_ISO_DIR/iso-staged-layout
+mkdir -p $STAGED_ISO_ARTIFACTS_DIR
 
-export OUTPUT_ISO_IMAGE_NAME=$OUTPUT_ISO_DIR/baremetal-$(printf "%(%Y%m%d-%H%M%S)T").iso
-export OUTPUT_ISO_LABEL="baremetal-iso"
+FINAL_ISO_DIR=$OUTPUT_ISO_DIR/iso
+mkdir -p $FINAL_ISO_DIR
+
+OUTPUT_ISO_IMAGE_NAME=$FINAL_ISO_DIR/baremetal-$(printf "%(%Y%m%d-%H%M%S)T").iso
+OUTPUT_ISO_LABEL="baremetal-iso"
 
 cd ~/git/CBL-Mariner/toolkit/mic-iso-gen
 

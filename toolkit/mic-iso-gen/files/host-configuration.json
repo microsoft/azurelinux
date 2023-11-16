@@ -1,0 +1,47 @@
+{
+  "storage": {
+    "disks": [
+      {
+        "id": "os",
+        "device": "/dev/sda",
+        "partitions": [
+          {
+            "id": "esp",
+            "type": "esp",
+            "size": "10M"
+          },
+          {
+            "id": "root",
+            "type": "root",
+            "size": "4G"
+          }
+        ]
+      }
+    ],
+    "mount-points": [
+      {
+        "path": "/boot/efi",
+        "filesystem": "vfat",
+        "options": ["umask=0077"],
+        "target-id": "esp"
+      },
+      {
+        "path": "/",
+        "filesystem": "ext4",
+        "options": ["defaults"],
+        "target-id": "root"
+      }
+    ]
+  },
+  "imaging": {
+    "images": [
+      {
+        "url": "/mnt/baremetal-iso/artifacts/disk0.raw",
+        "sha256": "1234567890",
+        "format": "raw",
+        "target-type": "disk",
+        "target-id": "os"
+      }
+    ]
+  }
+}
