@@ -25,15 +25,13 @@ var (
 	distTag      = app.Flag("dist-tag", "The distribution tag.").Required().String()
 	workerTar    = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz.").Required().ExistingFile()
 
-	logFile  = exe.LogFileFlag(app)
-	logLevel = exe.LogLevelFlag(app)
-	logColor = exe.LogColorFlag(app)
+	logFlags = exe.SetupLogFlags(app)
 )
 
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel, *logColor)
+	logger.InitBestEffort(logFlags)
 
 	snapshotGenerator, err := rpmssnapshot.New(*buildDirPath, *workerTar, *specsDirPath)
 	if err != nil {

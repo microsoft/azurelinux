@@ -26,16 +26,14 @@ var (
 
 	imageTag = app.Flag("image-tag", "Tag (text) appended to the image name. Empty by default.").String()
 
-	logFilePath = exe.LogFileFlag(app)
-	logLevel    = exe.LogLevelFlag(app)
-	logColor    = exe.LogColorFlag(app)
+	logFlags    = exe.SetupLogFlags(app)
 )
 
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 
-	logger.InitBestEffort(*logFilePath, *logLevel, *logColor)
+	logger.InitBestEffort(logFlags)
 
 	isoMaker := NewIsoMaker(
 		*unattendedInstall,

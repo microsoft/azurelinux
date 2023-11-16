@@ -26,9 +26,7 @@ import (
 var (
 	app = kingpin.New("downloader", "Download files to a location")
 
-	logFile   = exe.LogFileFlag(app)
-	logLevel  = exe.LogLevelFlag(app)
-	logColor  = exe.LogColorFlag(app)
+	logFlags  = exe.SetupLogFlags(app)
 	noClobber = app.Flag("no-clobber", "Do not overwrite existing files").Bool()
 	noVerbose = app.Flag("no-verbose", "Do not print verbose output").Bool()
 
@@ -44,7 +42,7 @@ var (
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel, *logColor)
+	logger.InitBestEffort(logFlags)
 	if *noVerbose {
 		logger.Log.SetLevel(logrus.WarnLevel)
 	}

@@ -23,9 +23,7 @@ var (
 	input  = exe.InputFlag(app, "Input json listing all local SRPMs")
 	output = exe.OutputFlag(app, "Output file to export the graph to")
 
-	logFile               = exe.LogFileFlag(app)
-	logLevel              = exe.LogLevelFlag(app)
-	logColor              = exe.LogColorFlag(app)
+	logFlags              = exe.SetupLogFlags(app)
 	profFlags             = exe.SetupProfileFlags(app)
 	strictGoals           = app.Flag("strict-goals", "Don't allow missing goal packages").Bool()
 	strictUnresolved      = app.Flag("strict-unresolved", "Don't allow missing unresolved packages").Bool()
@@ -53,7 +51,7 @@ func main() {
 
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel, *logColor)
+	logger.InitBestEffort(logFlags)
 
 	prof, err := profile.StartProfiling(profFlags)
 	if err != nil {

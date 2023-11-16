@@ -24,9 +24,7 @@ import (
 var (
 	app = kingpin.New("imageconfigvalidator", "A tool for validating image configuration files")
 
-	logFile   = exe.LogFileFlag(app)
-	logLevel  = exe.LogLevelFlag(app)
-	logColor  = exe.LogColorFlag(app)
+	logFlags  = exe.SetupLogFlags(app)
 	profFlags = exe.SetupProfileFlags(app)
 
 	input       = exe.InputStringFlag(app, "Path to the image config file.")
@@ -40,7 +38,7 @@ func main() {
 
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel, *logColor)
+	logger.InitBestEffort(logFlags)
 
 	prof, err := profile.StartProfiling(profFlags)
 	if err != nil {

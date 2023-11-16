@@ -63,8 +63,13 @@ const (
 	colourModeAuto        = "auto"
 	colourModeAlways      = "always"
 	colourModeNever       = "never"
-
 )
+
+type LogFlags struct {
+	LogColor *string
+	LogFile  *string
+	LogLevel *string
+}
 
 // initLogFile initializes the common logger with a file
 func initLogFile(filePath string) (err error) {
@@ -111,7 +116,11 @@ func SetStderrLogLevel(level string) (err error) {
 }
 
 // InitBestEffort runs InitStderrLog always, and InitLogFile if path is not empty
-func InitBestEffort(path string, level string, color string) {
+func InitBestEffort(lf *LogFlags) {
+	level := *lf.LogLevel
+	color := *lf.LogColor
+	path  := *lf.LogFile
+
 	if level == "" {
 		level = defaultStderrLogLevel.String()
 	}

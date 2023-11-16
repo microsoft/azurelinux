@@ -37,9 +37,7 @@ var (
 	liveInstallFlag = app.Flag("live-install", "Enable to perform a live install to the disk specified in config file.").Bool()
 	emitProgress    = app.Flag("emit-progress", "Write progress updates to stdout, such as percent complete and current action.").Bool()
 	timestampFile   = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
-	logFile         = exe.LogFileFlag(app)
-	logLevel        = exe.LogLevelFlag(app)
-	logColor        = exe.LogColorFlag(app)
+	logFlags        = exe.SetupLogFlags(app)
 	profFlags       = exe.SetupProfileFlags(app)
 )
 
@@ -70,7 +68,7 @@ func main() {
 
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel, *logColor)
+	logger.InitBestEffort(logFlags)
 
 	prof, err := profile.StartProfiling(profFlags)
 	if err != nil {

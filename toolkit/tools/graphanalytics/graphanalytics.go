@@ -36,16 +36,14 @@ var (
 	app            = kingpin.New("graphanalytics", "A tool to print analytics of a given dependency graph.")
 	inputGraphFile = exe.InputFlag(app, "Path to the DOT graph file to analyze.")
 	maxResults     = app.Flag("max-results", "The number of results to print per category. Set 0 to print unlimited.").Default(defaultMaxResults).Int()
-	logFile        = exe.LogFileFlag(app)
-	logLevel       = exe.LogLevelFlag(app)
-	logColor       = exe.LogColorFlag(app)
+	logFlags       = exe.SetupLogFlags(app)
 )
 
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 
-	logger.InitBestEffort(*logFile, *logLevel, *logColor)
+	logger.InitBestEffort(logFlags)
 
 	err := analyzeGraph(*inputGraphFile, *maxResults)
 	if err != nil {
