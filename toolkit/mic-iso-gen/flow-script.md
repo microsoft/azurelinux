@@ -21,8 +21,47 @@ cd ~/git/CBL-Mariner/
 ./toolkit/mic-iso-gen/2-create-iso.sh \
     $INTERMEDIATE_ARTIFACTS_DIR/iso-initrd.img \
     $INTERMEDIATE_ARTIFACTS_DIR/vmlinuz \
-    ~/git/CBL-Mariner/toolkit/mic-iso-gen/files/grub.cfg \
+    ~/git/CBL-Mariner/toolkit/mic-iso-gen/files/stock/grub.cfg \
+    ~/git/CBL-Mariner/toolkit/mic-iso-gen/files/stock/iso-image-installer/iso-image-installer.sh \
+    ~/git/CBL-Mariner/toolkit/mic-iso-gen/files/stock/iso-image-installer/host-configuration.json \
     $INTERMEDIATE_ARTIFACTS_DIR/disk0.raw \
-    ~/git/CBL-Mariner/toolkit/mic-iso-gen/files/host-configuration.json \
     $OUTPUT_DIR
 ```
+
+# mount
+```bash
+sudo mkdir /mnt/isomount
+sudo mount -o loop ~/temp/iso-output/iso/baremetal-20231115-155831.iso /mnt/isomount
+# /mnt/isomount/
+# /mnt/isomount/artifacts
+# /mnt/isomount/artifacts/disk0.raw
+# /mnt/isomount/artifacts/host-configuration.json
+# /mnt/isomount/boot
+# /mnt/isomount/boot/grub
+# /mnt/isomount/boot/grub/bios.img    [grub.cfg embedded]
+# /mnt/isomount/boot/grub/boot.cat
+# /mnt/isomount/boot/grub/efiboot.img [grub.cfg embedded]
+# /mnt/isomount/boot/initrd.img
+# /mnt/isomount/boot/vmlinuz
+# /mnt/isomount/EFI
+# /mnt/isomount/EFI/efiboot.img       [grub.cfg embedded]
+```
+
+## Flow
+
+- build
+  - an iso that does not do anything by default.
+  - it has an agent/start-up script that can look for host-configuration and act on it.
+  - it has an agent/start-up script that looks for a script in the artifacts folder
+    (outside the initrd) and runs it.
+- customize
+  - download iso
+  - read out:
+    - initrd.img
+    - vmlinuz
+    - artifacts/grub.cfg [for re-building the bootloader images]
+  - write
+    - provide your own grub.cfg
+    - add artifact files.
+
+    - add packages to initrd.img [can mic work with initrd.img]
