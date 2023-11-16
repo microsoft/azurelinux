@@ -9,7 +9,9 @@ Group:          Development/Languages/Python
 URL:            https://github.com/pallets/werkzeug
 Source0:        https://github.com/pallets/werkzeug/archive/%{version}.tar.gz#/werkzeug-%{version}.tar.gz
 Patch0:         0001-enable-tests-in-rpm-env.patch
-Patch1:         0002-enable-test-exclude-patterns.patch
+# Necessary because RPM build environment creates specific scenario that violates a core 
+# assumption the testing infrastructure of werkzeug makes
+Patch1:         0002-disable-stat-test.patch
 Patch2:         CVE-2023-46136.patch
 BuildArch:      noarch
 
@@ -68,7 +70,6 @@ pip3 install -r requirements/tests.txt
 - Migrated to pyproject build
 - Added required MarkupSafe dependency
 - Added patch for CVE-2023-46136
-- Added patch to enable %%check tests
 
 * Tue Mar 14 2023 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 2.2.3-1
 - Updated to version 2.2.3 for CVE-2023-23934 adn CVE-2023-25577
