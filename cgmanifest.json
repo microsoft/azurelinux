@@ -8391,8 +8391,8 @@
         "type": "other",
         "other": {
           "name": "kured",
-          "version": "1.9.1",
-          "downloadUrl": "https://github.com/weaveworks/kured/archive/refs/tags/1.9.1.tar.gz"
+          "version": "1.13.2",
+          "downloadUrl": "https://github.com/weaveworks/kured/archive/refs/tags/1.13.2.tar.gz"
         }
       }
     },
@@ -13111,8 +13111,8 @@
         "type": "other",
         "other": {
           "name": "memcached",
-          "version": "1.6.13",
-          "downloadUrl": "https://www.memcached.org/files/memcached-1.6.13.tar.gz"
+          "version": "1.6.22",
+          "downloadUrl": "https://www.memcached.org/files/memcached-1.6.22.tar.gz"
         }
       }
     },
@@ -13713,8 +13713,8 @@
         "type": "other",
         "other": {
           "name": "multus",
-          "version": "3.8",
-          "downloadUrl": "https://github.com/k8snetworkplumbingwg/multus-cni/archive/refs/tags/v3.8.tar.gz"
+          "version": "4.0.2",
+          "downloadUrl": "https://github.com/k8snetworkplumbingwg/multus-cni/archive/refs/tags/v4.0.2.tar.gz"
         }
       }
     },
@@ -28577,8 +28577,8 @@
         "type": "other",
         "other": {
           "name": "telegraf",
-          "version": "1.27.3",
-          "downloadUrl": "https://github.com/influxdata/telegraf/archive/v1.27.3.tar.gz"
+          "version": "1.27.4",
+          "downloadUrl": "https://github.com/influxdata/telegraf/archive/v1.27.4.tar.gz"
         }
       }
     },
