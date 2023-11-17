@@ -40,8 +40,7 @@ Source1:        config
 Source2:        config_aarch64
 Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20211013.pem
-Patch0:         nvme_multipath_default_false.patch
-Patch1:         perf_bpf_test_add_nonnull_argument.patch
+Patch0:         perf_bpf_test_add_nonnull_argument.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -156,7 +155,7 @@ manipulation of eBPF programs and maps.
 
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{mariner_version}-%{version}
-%patch1 -p1
+%patch0 -p1
 make mrproper
 
 cp %{config_source} .config
