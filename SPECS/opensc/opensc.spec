@@ -142,7 +142,7 @@ rm %{buildroot}%{_mandir}/man1/opensc-notify.1*
 
 %changelog
 * Fri Nov 17 2023 Riken Maharjan <rmaharjan@microsoft.com> - 0.23.0-2
-- Fix CVE-2021-34193
+- Fix CVE-2023-4535
 
 * Thu Aug 31 2023 Henry Beberman <henry.beberman@microsoft.com> - 0.23.0-1
 - Upgrade to 0.23.0 to fix CVE-2021-34193
