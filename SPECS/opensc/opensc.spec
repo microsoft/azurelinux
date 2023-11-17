@@ -141,7 +141,7 @@ rm %{buildroot}%{_mandir}/man1/opensc-notify.1*
 %{_mandir}/man5/*
 
 %changelog
-* Fri Aug 31 2023 Riken Maharjan <rmaharjan@microsoft.com> - 0.23.0-2
+* Fri Nov 17 2023 Riken Maharjan <rmaharjan@microsoft.com> - 0.23.0-2
 - Fix CVE-2021-34193
 
 * Thu Aug 31 2023 Henry Beberman <henry.beberman@microsoft.com> - 0.23.0-1
