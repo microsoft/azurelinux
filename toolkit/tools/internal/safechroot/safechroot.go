@@ -55,7 +55,6 @@ type Chroot struct {
 
 	isExistingDir bool
 }
-
 // inChrootMutex guards against multiple Chroots entering their respective Chroots
 // and running commands. Only a single Chroot can be active at a given time.
 //
@@ -661,3 +660,37 @@ func extractWorkerTar(chroot string, workerTar string) (err error) {
 	_, _, err = shell.Execute("tar", "-I", gzipTool, "-xf", workerTar, "-C", chroot)
 	return
 }
+
+type ChrootInterface interface {
+    RootDir() string
+	Initialize(tarPath string, extraDirectories []string, extraMountPoints []*MountPoint) error
+	Run(toRun func() error) error
+	UnsafeRun(toRun func() error) error
+	AddFiles(filesToCopy ...FileToCopy) error
+
+}
+
+// DummyChroot is a placeholder that implements ChrootInterface.
+type DummyChroot struct {}
+
+// No operation for the dummy type
+func (d DummyChroot) RootDir() string {
+    return ""
+}
+
+func (d DummyChroot) Initialize(tarPath string, extraDirectories []string, extraMountPoints []*MountPoint) error {
+    return nil
+}
+
+func (d DummyChroot) Run(toRun func() error) (err error) {
+    return nil
+}
+
+func (d DummyChroot) UnsafeRun(toRun func() error) (err error) {
+    return nil
+}
+
+func (d DummyChroot) AddFiles(filesToCopy ...FileToCopy) (err error) {
+    return nil
+}
+

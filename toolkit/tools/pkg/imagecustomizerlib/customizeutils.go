@@ -54,7 +54,7 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
-	err = addOrUpdateUsers(config.SystemConfig.Users, baseConfigPath, imageChroot)
+	err = AddOrUpdateUsers(config.SystemConfig.Users, baseConfigPath, imageChroot)
 	if err != nil {
 		return err
 	}
@@ -203,7 +203,7 @@ func runScripts(baseConfigPath string, scripts []imagecustomizerapi.Script, imag
 	return nil
 }
 
-func addOrUpdateUsers(users []imagecustomizerapi.User, baseConfigPath string, imageChroot *safechroot.Chroot) error {
+func AddOrUpdateUsers(users []imagecustomizerapi.User, baseConfigPath string, imageChroot safechroot.ChrootInterface) error {
 	for _, user := range users {
 		err := addOrUpdateUser(user, baseConfigPath, imageChroot)
 		if err != nil {
@@ -214,7 +214,7 @@ func addOrUpdateUsers(users []imagecustomizerapi.User, baseConfigPath string, im
 	return nil
 }
 
-func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageChroot *safechroot.Chroot) error {
+func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageChroot safechroot.ChrootInterface) error {
 	var err error
 
 	logger.Log.Infof("Adding/updating user (%s)", user.Name)
