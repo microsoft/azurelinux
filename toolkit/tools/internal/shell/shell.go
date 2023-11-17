@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 
@@ -42,6 +43,8 @@ func CurrentEnvironment() []string {
 // and all of those process's children.
 // Invoking this will also block future process creation, causing the Execute methods to return an error.
 func PermanentlyStopAllChildProcesses(signal unix.Signal) {
+	const maxStopTime = 60 * time.Second
+
 	// Acquire the global activeCommandsMutex to ensure no
 	// new commands are executed during this teardown routine
 	logger.Log.Info("Waiting for outstanding processes to be created")
@@ -54,6 +57,9 @@ func PermanentlyStopAllChildProcesses(signal unix.Signal) {
 
 	// For every running process, issue the provided signal to its process group,
 	// resulting in both the process and all of its children being stopped.
+
+	// Stop channel
+	stopResults := make(chan error, len(activeCommands))
 	for cmd := range activeCommands {
 		logger.Log.Infof("Stopping (%s)", cmd.Path)
 
@@ -62,11 +68,40 @@ func PermanentlyStopAllChildProcesses(signal unix.Signal) {
 		err := unix.Kill(-cmd.Process.Pid, signal)
 		if err != nil {
 			logger.Log.Errorf("Unable to stop (%s): %v", strings.Join(cmd.Args, " "), err)
+			stopResults <- err
 			continue
 		}
 
-		// Wait for the process to fully exit
-		cmd.Wait()
+		// Wait for the process to fully exit, so long as it takes less than maxStopTime
+		go func(cmdToStop *exec.Cmd) {
+			err := cmdToStop.Wait()
+			// Don't care if its killed
+			if err != nil && err.Error() != "signal: killed" {
+				err = fmt.Errorf("process (%s) failed to exit: %v", strings.Join(cmdToStop.Args, " "), err)
+			} else {
+				err = nil
+			}
+			stopResults <- err
+		}(cmd)
+	}
+
+	// Wait for 60 seconds of inactivity before giving up.
+	timeIncrement := 10 * time.Second
+	startTime := time.Now()
+	for commandNum := 0; commandNum < len(activeCommands); commandNum++ {
+		select {
+		case err := <-stopResults:
+			if err != nil {
+				logger.Log.Errorf("Error stopping process:\n%v", err)
+			}
+		case <-time.After(timeIncrement):
+			if time.Since(startTime) > maxStopTime {
+				logger.Log.Errorf("Timed out waiting for processes to stop")
+				return
+			} else {
+				logger.Log.Infof("Still waiting for processes to exit (%s elapsed)", time.Since(startTime))
+			}
+		}
 	}
 }
 

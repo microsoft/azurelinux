@@ -10,8 +10,6 @@ import (
 	"strings"
 	"time"
 
-	"golang.org/x/term"
-
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
@@ -62,6 +60,7 @@ func (o *OfficialScript) AddToCache(cacheDir string) (string, error) {
 }
 
 func (o *OfficialScript) PrepIncrementalRpms(downloadDir string, toolchainRPMs []string) (err error) {
+	logger.Log.Info("Preparing incremental rpms for delta build")
 	for _, rpm := range toolchainRPMs {
 		var fileExists bool
 		srcPath := filepath.Join(downloadDir, rpm)
@@ -94,7 +93,7 @@ func (o *OfficialScript) cleanMountDirs() {
 	// Mounts are taken from 'chroot_mount()' in 'build_official_toolchain_rpms.sh'
 	fullPaths := []string{}
 	for _, mount := range toolchainMountPoints {
-		fullPaths = append(fullPaths, filepath.Join(o.WorkingDir, "populated_toolchain", mount))
+		fullPaths = append(fullPaths, filepath.Join(o.BuildDir, "toolchain", "populated_toolchain", mount))
 	}
 	safechroot.CleanupUnsafeMounts(fullPaths)
 	for _, mount := range toolchainMountPoints {
@@ -103,7 +102,7 @@ func (o *OfficialScript) cleanMountDirs() {
 }
 
 func (o *OfficialScript) updateProgress(done chan bool) {
-	const delay = time.Duration(10) * time.Second
+	const delay = time.Duration(5) * time.Second
 	var (
 		logFile    = filepath.Join(o.BuildDir, "logs", "toolchain", "build_list.txt")
 		scriptFile = filepath.Join(o.WorkingDir, "./build_official_toolchain_rpms.sh")
@@ -117,6 +116,7 @@ func (o *OfficialScript) updateProgress(done chan bool) {
 		// Lines that start with 'build_rpm_in_chroot_no_install' are the ones we want
 		return strings.HasPrefix(line, "build_rpm_in_chroot_no_install")
 	})
+
 	for {
 		select {
 		case <-done:
@@ -132,29 +132,14 @@ func (o *OfficialScript) updateProgress(done chan bool) {
 	}
 }
 
-// TOOLCHAIN_BUILD_LIST=$TOOLCHAIN_LOGS/build_list.txt
-
 func (o *OfficialScript) BuildOfficialToolchainRpms() (err error) {
 	o.cleanMountDirs()
 
-	// Calculate the size of the console
-	consoleWidth, _, err := term.GetSize(int(os.Stdout.Fd()))
-	if err != nil {
-		logger.Log.Warnf("Failed to get console size. Error:\n%s", err)
-		consoleWidth = 80
-	}
-
-	headerLen := len("Official Toolchain: ###: ")
-	bufferLen := 3
-	maxLen := consoleWidth - headerLen - bufferLen
-
 	onStdout := func(args ...interface{}) {
 		line := args[0].(string)
-		if len(line) > maxLen {
-			line = line[:maxLen]
-		}
 		logger.Log.Infof("Official Toolchain %3d%%: %s", o.progress, line)
 	}
+	// Generally stderr is just set -x output, so we don't need to log it to console
 	onStdErr := func(args ...interface{}) {
 		line := args[0].(string)
 		logger.Log.Debugf("Official Toolchain: %s", line)

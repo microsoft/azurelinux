@@ -21,6 +21,17 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
+type buildConfig struct {
+	doBuild                 bool
+	doDeltaBuild            bool
+	doDownload              bool
+	doCache                 bool
+	doUpdateManifestArchive bool
+	doUpdateManifestPMC     bool
+	doUpdateManifestLocal   bool
+	doArchive               bool
+}
+
 const (
 	defaultNetOpsCount = "40"
 	rebuildAuto        = "auto"
@@ -97,16 +108,19 @@ func main() {
 	timestamp.BeginTiming("toolchain", *timestampFile)
 	defer timestamp.CompleteTiming()
 
-	if *existingArchive != "" && (*allowRebuild == rebuildForce || *allowRebuild == rebuildFast) {
-		logger.Log.Fatalf("Cannot use --rebuild=force or --rebuild=fast when --existing-archive is set.")
+	buildConfig, err := validateConfiguOptions(*allowRebuild, *existingArchive, *useLatestAvailable, *disableCache)
+	if err != nil {
+		logger.Log.Fatalf("Failed to validate configuration options:\n%s", err)
 	}
+	printConfigSummary(buildConfig)
 
 	toolchainRPMs, err := schedulerutils.ReadReservedFilesList(*toolchainManifest)
 	if err != nil {
 		logger.Log.Fatalf("Failed to read toolchain manifest file '%s': %s", *toolchainManifest, err)
 	}
 
-	if *useLatestAvailable {
+	// TODO: This does nothing right now...
+	if buildConfig.doUpdateManifestPMC || buildConfig.doUpdateManifestLocal || buildConfig.doUpdateManifestArchive {
 		toolchainRPMs, err = toolchain.UpdateManifestsToLatestAvailable(toolchainRPMs, *existingArchive, *specsDir)
 		if err != nil {
 			logger.Log.Fatalf("Failed to update toolchain manifest file '%s': %s", *toolchainManifest, err)
@@ -119,70 +133,117 @@ func main() {
 		logger.Log.Fatalf("Failed to clean toolchain RPMs: %s", err)
 	}
 
-	// Only build if we don't pass an explicit archive file.
-	var finalToolchainArchive toolchain.Archive
-	if *existingArchive != "" {
-		finalToolchainArchive = toolchain.Archive{
-			ArchivePath: *existingArchive,
-		}
-	} else {
-		// Download toolchain RPMs if they are missing
-		if *allowRebuild != rebuildForce {
-			caCerts, tlsCerts, err := prepCerts(*tlsClientCert, *tlsClientKey, *caCertFile)
-			if err != nil {
-				logger.Log.Fatalf("Failed to load certificates: %s", err)
-			}
-
-			err = toolchain.DownloadToolchainRpms(*toolchainRpmDir, toolchainRPMs, *packageURLs, caCerts, tlsCerts, *concurrentNetOps, *downloadManifest)
-			if err != nil {
-				logger.Log.Fatalf("Failed to download toolchain RPMs: %s", err)
-			}
-		}
-
-		ready, missingRPMs, err := validateToolchainRpms(*toolchainRpmDir, toolchainRPMs)
-		if err != nil {
-			logger.Log.Fatalf("Failed to validate toolchain RPMs are ready: %s", err)
-		}
-		if !ready {
-			logger.Log.Infof("Missing toolchain RPMs: %s", missingRPMs)
-			if *allowRebuild == rebuildNever {
-				logger.Log.Fatalf("Toolchain RPMs are not ready, and --rebuild=never was specified.")
-			}
-		} else {
-			logger.Log.Infof("Toolchain RPMs are ready.")
-			return
-		}
-
-		// Bootstrap
-		bootstrap, err := buildBootstrapToolchainArchive()
-		if err != nil {
-			logger.Log.Fatalf("Failed to build bootstrap toolchain archive: %s", err)
-		}
-
-		// Official build
-		_, finalToolchainArchive, err = buildOfficialToolchainArchive(bootstrap, toolchainRPMs)
-		if err != nil {
-			logger.Log.Fatalf("Failed to build official toolchain archive: %s", err)
-		}
+	finalToolchainArchive, err := produceArchive(buildConfig, toolchainRPMs)
+	if err != nil {
+		logger.Log.Fatalf("Failed to produce toolchain archive:\n%s", err)
 	}
 
 	// Extract and validate the archive
 	err = extractArchive(finalToolchainArchive, toolchainRPMs)
 	if err != nil {
-		logger.Log.Fatalf("Failed to extract toolchain archive: %s", err)
+		logger.Log.Fatalf("Failed to extract toolchain archive:\n%s", err)
 	}
 
 	// Do a final check of the toolchain RPMs
 	ready, missingRPMs, err := validateToolchainRpms(*toolchainRpmDir, toolchainRPMs)
 	if err != nil {
-		logger.Log.Fatalf("Failed to validate toolchain RPMs are ready: %s", err)
+		logger.Log.Fatalf("Failed to validate toolchain RPMs are ready:\n%s", err)
 	}
 	if !ready {
-		logger.Log.Fatalf("Missing toolchain RPMs: %s", missingRPMs)
+		logger.Log.Fatalf("Missing toolchain RPMs:\n%s", missingRPMs)
 	} else {
 		logger.Log.Infof("Toolchain RPMs are ready.")
 		return
 	}
+}
+
+// printConfigSummary will explain what the tools will try to do
+func validateConfiguOptions(allowRebuild, existingArchive string, useLatestAvailable, disableCache bool) (config buildConfig, err error) {
+	config = buildConfig{
+		doBuild:                 false,
+		doDeltaBuild:            false,
+		doDownload:              false,
+		doCache:                 !disableCache,
+		doUpdateManifestArchive: false,
+		doUpdateManifestPMC:     false,
+		doUpdateManifestLocal:   false,
+		doArchive:               false,
+	}
+
+	// ensure allowRebuild is one of the known consts
+	if allowRebuild != rebuildAuto && allowRebuild != rebuildFast && allowRebuild != rebuildForce && allowRebuild != rebuildNever {
+		err = fmt.Errorf("invalid rebuild option %s", allowRebuild)
+		return
+	}
+
+	if existingArchive != "" {
+		// Archive mode. Never build, optionally update manifests, cache doesn't matter
+
+		// Never allow rebuilds when using an existing archive
+		if !((allowRebuild == rebuildAuto) || (allowRebuild == rebuildNever)) {
+			err = fmt.Errorf("must use --rebuild=auto or --rebuild=never when using --existing-archive")
+		}
+		config.doArchive = true
+		if useLatestAvailable {
+			config.doUpdateManifestArchive = true
+		}
+		return
+
+	} else {
+		// No archive
+		if allowRebuild == rebuildNever {
+
+			// Only use PMC
+			config.doDownload = true
+			if useLatestAvailable {
+				config.doUpdateManifestPMC = true
+			}
+			return
+		}
+
+		// Otherwise, we will be doing a build assuming the toolchain RPMs are not available
+		config.doBuild = true
+		// If we are rebuilding and want updated manifests, always update the local manifest
+		if useLatestAvailable {
+			config.doUpdateManifestLocal = true
+		}
+
+		// Local build only
+		if allowRebuild == rebuildForce {
+			config.doDownload = false
+			config.doDeltaBuild = false
+			if useLatestAvailable {
+				config.doUpdateManifestLocal = true
+			}
+			return
+		}
+
+		// Hybrid build
+		if allowRebuild == rebuildFast || allowRebuild == rebuildAuto {
+			config.doDownload = true
+			config.doDeltaBuild = true
+			if useLatestAvailable {
+				config.doUpdateManifestPMC = true
+			}
+			return
+		}
+	}
+
+	err = fmt.Errorf("unhandled build inputs %v %v %v %v", allowRebuild, existingArchive, useLatestAvailable, disableCache)
+	return
+}
+
+func printConfigSummary(config buildConfig) {
+	logger.Log.Infof("Configuration Summary:")
+	logger.Log.Infof("  Use Archive:        %t", config.doArchive)
+	logger.Log.Infof("  Download Toolchain: %t", config.doDownload)
+	logger.Log.Infof("  Build Toolchain:    %t", config.doBuild)
+	logger.Log.Infof("    Delta Build:      %t", config.doDeltaBuild)
+	logger.Log.Infof("  Update Manifest:")
+	logger.Log.Infof("    Archive:          %t", config.doUpdateManifestArchive)
+	logger.Log.Infof("    PMC:              %t", config.doUpdateManifestPMC)
+	logger.Log.Infof("    Local:            %t", config.doUpdateManifestLocal)
+	logger.Log.Infof("  Use Cache:          %t", config.doCache)
 }
 
 // validateToolchainRpms checks that all of the toolchain RPMs exist in the toolchain directory.
@@ -234,7 +295,66 @@ func prepCerts(tlsClientCert, tlsClientKey, caCertFile string) (caCerts *x509.Ce
 	return
 }
 
-func buildBootstrapToolchainArchive() (bootstrap toolchain.BootstrapScript, err error) {
+func produceArchive(config buildConfig, toolchainRPMs []string) (archive toolchain.Archive, err error) {
+	// Only build if we don't pass an explicit archive file.
+	if config.doArchive {
+		archive = toolchain.Archive{
+			ArchivePath: *existingArchive,
+		}
+	} else {
+		// Download toolchain RPMs if they are missing
+		if config.doDownload {
+			caCerts, tlsCerts, err := prepCerts(*tlsClientCert, *tlsClientKey, *caCertFile)
+			if err != nil {
+				err = fmt.Errorf("failed to load certificates:\n%s", err)
+				return archive, err
+			}
+
+			err = toolchain.DownloadToolchainRpms(*toolchainRpmDir, toolchainRPMs, *packageURLs, caCerts, tlsCerts, *concurrentNetOps, *downloadManifest)
+			if err != nil {
+				err = fmt.Errorf("failed to download toolchain RPMs:\n%s", err)
+				return archive, err
+			}
+		}
+
+		ready, missingRPMs, err := validateToolchainRpms(*toolchainRpmDir, toolchainRPMs)
+		if err != nil {
+			err = fmt.Errorf("failed to validate toolchain RPMs are ready:\n%s", err)
+			return archive, err
+		}
+		if !ready {
+			logger.Log.Infof("Missing toolchain RPMs: %s", missingRPMs)
+			if !config.doBuild {
+				err = fmt.Errorf("toolchain RPMs are not ready, and --rebuild=%s was specified", rebuildNever)
+				return archive, err
+			}
+		} else {
+			logger.Log.Infof("Toolchain RPMs are ready.")
+			return archive, err
+		}
+
+		if config.doBuild {
+			// Bootstrap
+			bootstrap, err := buildBootstrapToolchainArchive(config)
+			if err != nil {
+				err = fmt.Errorf("failed to build bootstrap toolchain archive:\n%s", err)
+				logger.Log.Errorf("Toolchain failure, check log file at: %s", *logFile)
+				return archive, err
+			}
+
+			// Official build
+			_, archive, err = buildOfficialToolchainArchive(config, bootstrap, toolchainRPMs)
+			if err != nil {
+				err = fmt.Errorf("failed to build official toolchain archive:\n%s", err)
+				logger.Log.Errorf("Toolchain failure, check log file at: %s", *logFile)
+				return archive, err
+			}
+		}
+	}
+	return archive, err
+}
+
+func buildBootstrapToolchainArchive(config buildConfig) (bootstrap toolchain.BootstrapScript, err error) {
 	bootstrap = toolchain.BootstrapScript{
 		OutputFile:     *bootstrapOutputFile,
 		ScriptPath:     *bootstrapScript,
@@ -246,13 +366,16 @@ func buildBootstrapToolchainArchive() (bootstrap toolchain.BootstrapScript, err 
 	}
 	bootstrap.InputFiles = append(bootstrap.InputFiles, *bootstrapInputFiles...)
 
-	_, cacheOk, err := bootstrap.CheckCache(*cacheDir)
-	if err != nil {
-		err = fmt.Errorf("failed to check bootstrap cache, error:\n%w", err)
-		return
+	cacheOk := false
+	if config.doCache {
+		_, cacheOk, err = bootstrap.CheckCache(*cacheDir)
+		if err != nil {
+			err = fmt.Errorf("failed to check bootstrap cache, error:\n%w", err)
+			return
+		}
 	}
 
-	if cacheOk && !*disableCache {
+	if cacheOk {
 		logger.Log.Infof("Bootstrap cache is valid, restoring.")
 		err = bootstrap.RestoreFromCache(*cacheDir)
 		if err != nil {
@@ -275,7 +398,7 @@ func buildBootstrapToolchainArchive() (bootstrap toolchain.BootstrapScript, err 
 	return
 }
 
-func buildOfficialToolchainArchive(bootstrap toolchain.BootstrapScript, toolchainRPMs []string) (official toolchain.OfficialScript, builtArchive toolchain.Archive, err error) {
+func buildOfficialToolchainArchive(config buildConfig, bootstrap toolchain.BootstrapScript, toolchainRPMs []string) (official toolchain.OfficialScript, builtArchive toolchain.Archive, err error) {
 	official = toolchain.OfficialScript{
 		OutputFile:           *officialBuildOutputFile,
 		ScriptPath:           *officialBuildScript,
@@ -302,13 +425,16 @@ func buildOfficialToolchainArchive(bootstrap toolchain.BootstrapScript, toolchai
 		ArchivePath: official.OutputFile,
 	}
 
-	_, cacheOk, err := official.CheckCache(*cacheDir)
-	if err != nil {
-		err = fmt.Errorf("failed to check official toolchain rpms cache, error:\n%w", err)
-		return
+	cacheOk := false
+	if config.doCache {
+		_, cacheOk, err = official.CheckCache(*cacheDir)
+		if err != nil {
+			err = fmt.Errorf("failed to check official toolchain rpms cache, error:\n%w", err)
+			return
+		}
 	}
 
-	if cacheOk && !*disableCache {
+	if cacheOk {
 		logger.Log.Infof("Official toolchain rpms cache is valid, restoring.")
 		err = official.RestoreFromCache(*cacheDir)
 		if err != nil {
@@ -316,7 +442,8 @@ func buildOfficialToolchainArchive(bootstrap toolchain.BootstrapScript, toolchai
 			return
 		}
 	} else {
-		if *allowRebuild != rebuildForce {
+		if config.doDeltaBuild {
+			//TODO Clean delta folder if not doing delta
 			// Toolchain script expects rpms or empty files in a specific directory do do incremental builds
 			err = official.PrepIncrementalRpms(*toolchainRpmDir, toolchainRPMs)
 			if err != nil {

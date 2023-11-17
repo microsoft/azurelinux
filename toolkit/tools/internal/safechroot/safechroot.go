@@ -619,6 +619,15 @@ func unsafeUnmount(mountDir string) (err error) {
 		unmountFlagsLazy = unix.MNT_DETACH
 	)
 
+	exists, err := file.PathExists(mountDir)
+	if err != nil {
+		logger.Log.Warnf("Failed to check if path (%s) is a directory. Error: %s", mountDir, err)
+		return err
+	}
+	if !exists {
+		return
+	}
+
 	isMounted, err := mountinfo.Mounted(mountDir)
 	if err != nil {
 		logger.Log.Warnf("Failed to check if path (%s) is mounted. Error: %s", mountDir, err)
@@ -631,6 +640,8 @@ func unsafeUnmount(mountDir string) (err error) {
 			logger.Log.Warnf("Failed to unmount (%s). Error: %s", mountDir, umountErr)
 			err = umountErr
 		}
+	} else {
+		logger.Log.Infof("Path (%s) is not mounted", mountDir)
 	}
 	return
 }

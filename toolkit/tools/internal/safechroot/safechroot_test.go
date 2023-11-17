@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/buildpipeline"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
@@ -245,9 +244,6 @@ func TestInitializeShouldCreateCustomMountPoints(t *testing.T) {
 		_, err = os.Stat(fullPath)
 		assert.True(t, !os.IsNotExist(err))
 		logger.Log.Infof("Done checking")
-
-		delay := time.After(300 * time.Second)
-		<-delay
 	}
 }
 
