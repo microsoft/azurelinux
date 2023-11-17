@@ -1,0 +1,35 @@
+From 81807bcba96f3d98824e9fa2c597c22eb619dd7a Mon Sep 17 00:00:00 2001
+From: Rachel Menge <rachelmenge@microsoft.com>
+Date: Fri, 17 Nov 2023 05:21:58 +0000
+Subject: [PATCH] Fix perf bpf tests
+
+Taken from: 
+https://lore.kernel.org/all/ZMj8+bvN86D0ZKiB%40kernel.org/
+
+[PATCH 1/1] perf test bpf: Address error about non-null argument for epoll_pwait 2nd arg
+"Just add that argument to address this compiler warning."
+
+---
+ tools/perf/tests/bpf.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/tools/perf/tests/bpf.c b/tools/perf/tests/bpf.c
+index 6a4235a9c..096378afc 100644
+--- a/tools/perf/tests/bpf.c
++++ b/tools/perf/tests/bpf.c
+@@ -30,10 +30,11 @@
+ static int epoll_pwait_loop(void)
+ {
+ 	int i;
++        struct epoll_event events;
+ 
+ 	/* Should fail NR_ITERS times */
+ 	for (i = 0; i < NR_ITERS; i++)
+-		epoll_pwait(-(i + 1), NULL, 0, 0, NULL);
++		epoll_pwait(-(i + 1), &events, 0, 0, NULL);
+ 	return 0;
+ }
+ 
+-- 
+2.33.8
+

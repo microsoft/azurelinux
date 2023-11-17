@@ -41,6 +41,7 @@ Source2:        config_aarch64
 Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20211013.pem
 Patch0:         nvme_multipath_default_false.patch
+Patch1:         perf_bpf_test_add_nonnull_argument.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -155,7 +156,7 @@ manipulation of eBPF programs and maps.
 
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{mariner_version}-%{version}
-
+%patch1 -p1
 make mrproper
 
 cp %{config_source} .config
@@ -415,6 +416,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 * Fri Oct 27 2023 Rachel Menge <rachelmenge@microsoft.com> - 6.1.58.1-1
 - Upgrade to 6.1.58.1
 - Remove support for imx8 dtb subpackage
+- Add patch for perf_bpf_test_add_nonnull_argument
 
 * Mon Oct 23 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.135.1-2
 - Enable CONFIG_BINFMT_MISC
