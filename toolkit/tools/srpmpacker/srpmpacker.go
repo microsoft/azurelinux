@@ -857,7 +857,7 @@ func hydrateFiles(fileTypeToHydrate fileType, specFile, workingDir string, srcCo
 	for fileNeeded, alreadyHydrated := range fileHydrationState {
 		if !alreadyHydrated {
 			missingFiles = append(missingFiles, fileNeeded)
-			logger.Log.Errorf("Unable to hydrate file: %s.", fileNeeded)
+			logger.Log.Errorf("Unable to hydrate file: %s", fileNeeded)
 		}
 	}
 
@@ -950,7 +950,7 @@ func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir st
 		cancelled, internalErr := retry.RunWithExpBackoff(func() error {
 			downloadErr := network.DownloadFile(url, destinationFile, srcConfig.caCerts, srcConfig.tlsCerts)
 			if downloadErr != nil {
-				logger.Log.Debugf("Failed an attempt to download (%s). Error: %s", url, downloadErr)
+				logger.Log.Debugf("Failed an attempt to download (%s). Error: %s.", url, downloadErr)
 			}
 
 			return downloadErr
@@ -968,7 +968,7 @@ func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir st
 		}
 
 		if internalErr != nil {
-			logger.Log.Errorf("Failed to download (%s). Error: %s", url, internalErr)
+			logger.Log.Errorf("Failed to download (%s). Error: %s.", url, internalErr)
 			continue
 		}
 
