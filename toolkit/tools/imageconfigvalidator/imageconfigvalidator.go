@@ -145,7 +145,7 @@ func validatePackages(config configuration.Config) (err error) {
 			if pkg == dracutFipsPkgName {
 				foundDracutFipsPackage = true
 			}
-			if pkg == selinuxPkgName {
+			if strings.Contains(pkg, selinuxPkgName) {
 				foundSELinuxPackage = true
 			}
 		}

@@ -1662,6 +1662,10 @@ func selinuxRelabelFiles(systemConfig configuration.SystemConfig, installChroot 
 	selinuxType := strings.TrimSpace(stdout)
 	fileContextPath := fmt.Sprintf(fileContextBasePath, selinuxType)
 
+	if len(listOfMountsToLabel) == 0 {
+		listOfMountsToLabel = append(listOfMountsToLabel, "/")
+	}
+
 	logger.Log.Debugf("Running setfiles to apply SELinux labels on mount points: %v", listOfMountsToLabel)
 	err = installChroot.UnsafeRun(func() error {
 		args := []string{"-m", "-v", fileContextPath}
