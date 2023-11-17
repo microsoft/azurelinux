@@ -125,13 +125,8 @@ make INSTALL_MOD_PATH=%{buildroot} modules_install
 mkdir -p %{buildroot}%{_sysconfdir}/default/grub.d
 mkdir -p %{buildroot}%{_sysconfdir}/grub.d
 
-# Initially install this configuration script WITHOUT execution bits.
-# Today, the kernel-mshv menuentry requires a proprietary package and so
-# we cannot enable it for the first boot. 
-# In order to enable (for example, in AgentBaker),
-# run `chmod 750 /etc/default/grub.d/50_mariner_mshv.cfg`
-install -m 640 %{SOURCE3} %{buildroot}%{_sysconfdir}/default/grub.d/50_mariner_mshv.cfg
-install -m 750 %{SOURCE4} %{buildroot}%{_sysconfdir}/grub.d/50_mariner_mshv_menuentry
+install -Dm 755 %{SOURCE3} %{buildroot}%{_sysconfdir}/default/grub.d/50_mariner_mshv.cfg
+install -Dm 755 %{SOURCE4} %{buildroot}%{_sysconfdir}/grub.d/50_mariner_mshv_menuentry
 
 %ifarch x86_64
 install -vm 600 arch/x86/boot/bzImage %{buildroot}/boot/vmlinuz-%{uname_r}
@@ -262,9 +257,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner-mshv.cfg
 * Thu Sep 28 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.126.mshv3-3
 - Introduce 50_mariner_mshv_menuentry, which implements
     the custom boot path when running over MSHV.
-- Avoid enabling menuentry for initial boot because it still depends on a proprietary
-    component that must be added later. The pipeline which injects lxhvloader must
-    also chmod 50_mariner_mshv.cfg
+- Check for required proprietary mshv components in 50_mariner_mshv.cfg before
+    defaulting to kernel-mshv boot. 
 
 * Tue Dec 12 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.126.mshv3-2
 - Add patch for perf_bpf_test_add_nonnull_argument
