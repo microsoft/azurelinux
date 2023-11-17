@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Running iso-image-installer.sh v1435."
+echo "Running iso-image-installer.sh v1137."
 
 if [[ -z $iso_media_mount_dir ]]; then
     echo "iso_media_mount_dir is not configured. Exiting."
