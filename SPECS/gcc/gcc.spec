@@ -3,7 +3,7 @@
 Summary:        Contains the GNU compiler collection
 Name:           gcc
 Version:        13.2.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -254,7 +254,8 @@ $tests_ok
 %files -n libgcc-devel
 %defattr(-,root,root)
 %{_lib64dir}/libgcc_s.so
-%{_libdir}/libcc1.*
+%{_lib64dir}/libcc1.*
+%{_libdir}/gcc/x86_64-pc-linux-gnu/13.2.0/plugin/libcc1plugin*
 
 %files c++
 %defattr(-,root,root)
@@ -291,6 +292,9 @@ $tests_ok
 %{_lib64dir}/libgomp.spec
 
 %changelog
+* Fri Nov 17 2023 Cameron Baird <cameronbaird@microsoft.com> - 13.2.0-2
+- Correct packaging for libgcc-devel
+
 * Thu Nov 02 2023 Andrew Phelps <anphel@microsoft.com> - 13.2.0-1
 - Upgrade to version 13.2.0
 - Remove gfortran
