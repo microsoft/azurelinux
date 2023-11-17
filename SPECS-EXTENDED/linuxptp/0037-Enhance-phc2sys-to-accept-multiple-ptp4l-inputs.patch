@@ -1,0 +1,764 @@
+From 2a6ddfe1b9700ce8e0c62da8a7a4f2edcd4e1cad Mon Sep 17 00:00:00 2001
+From: Andre Mauricio Zelak <andre.zelak@windriver.com>
+Date: Sun, 18 Jun 2023 20:58:34 -0300
+Subject: [PATCH 37/47] Enhance phc2sys to accept multiple ptp4l inputs
+
+A new configuration option called ha_enabled was created. When it is set 1
+multiple ptp4l inputs are accepted and the high availability algorithms
+are enabled.
+
+In addition to ha_enabled 1 a set of interfaces must also be provided.
+Each interface is one-to-one mapped to a clock source, and must be
+associated to an unique ptp4l instance using the ha_uds_address
+configuration option.
+
+For example:
+
+ha_enabled 1
+
+[ens1f1]
+ha_uds_address /var/run/ptp4l-ptp-inst1
+
+[ens1f2]
+ha_uds_address /var/run/ptp4l-ptp-inst2
+
+A maximum of 128 interfaces is supported.
+
+Regression: verify non HA phc2sys configuration
+PASS: Verify auto configuration is still accepted.
+PASS: Verify manual configuration with a single clock is still accepted.
+PASS: Verify mix of manual and auto configuration is denied.
+PASS: Verify manual configuration with zero clock sources is denied.
+
+Test Plan: verify HA configuration
+PASS: Verify HA is disabled by default.
+PASS: Verify HA configuration with 1 or more clock source is accepted.
+PASS: Verify ha_uds_address default value.
+
+Reviewed-by: Cole Walker <cole.walker@windriver.com>
+Reviewed-by: Andre Fernando Zanella Kantek <andrefernandozanella.kantek@windriver.com>
+Signed-off-by: Andre Mauricio Zelak <andre.zelak@windriver.com>
+
+[commit 705fe12b294216c7b5797f48d83ff97fcc076294 upstream]
+[commit e730f006cb56ac55932220c1afff5470de875200 upstream]
+[commit df8fa0492771f6babb75254619337edb6041daea upstream]
+[commit 0201340fa5abc17634bfb4d0b2a386d218d3095b upstream]
+[commit dd7400f4eb548dfb2acfb6ebaf53a6d77b9c5da2 upstream]
+[commit 904fb44ecebd448f9b2952dd287ac2b5db8249db upstream]
+[commit 56dcd671d5241b589dc44b776fec9b2752496477 upstream]
+[commit 7e5617afe8837b77629cc04c9e3abb38ae64678c upstream]
+[commit 5ea8af40b8b5e4680d8a8e1a19482c28f95ce6b3 upstream]
+[commit 3d38367a3151845ec543ab9125e2d0a0aefa2f56 upstream]
+[commit 17a4d6805597fd6ddb911b8246e7b131a42f9191 upstream]
+[commit 1650d972f4fe9bb39807536df2594d1a85aabf9c upstream]
+
+Signed-off-by: Andre Mauricio Zelak <andre.zelak@windriver.com>
+---
+ config.c    |  17 +++
+ config.h    |   2 +
+ phc2sys.c   | 337 +++++++++++++++++++++++++++++++++++++---------------
+ pmc_agent.c |  17 ---
+ pmc_agent.h |  21 +++-
+ uds.c       |  19 ++-
+ 6 files changed, 294 insertions(+), 119 deletions(-)
+
+diff --git a/config.c b/config.c
+index d45e948..b97e5d7 100644
+--- a/config.c
++++ b/config.c
+@@ -250,6 +250,8 @@ struct config_item config_tab[] = {
+ 	GLOB_ITEM_INT("G.8275.defaultDS.localPriority", 128, 1, UINT8_MAX),
+ 	PORT_ITEM_INT("G.8275.portDS.localPriority", 128, 1, UINT8_MAX),
+ 	GLOB_ITEM_INT("gmCapable", 1, 0, 1),
++	GLOB_ITEM_INT("ha_enabled", 0, 0, 1),
++	PORT_ITEM_STR("ha_uds_address", "/var/run/ptp4l"),
+ 	GLOB_ITEM_ENU("hwts_filter", HWTS_FILTER_NORMAL, hwts_filter_enu),
+ 	PORT_ITEM_INT("hybrid_e2e", 0, 0, 1),
+ 	PORT_ITEM_INT("ignore_source_id", 0, 0, 1),
+@@ -996,6 +998,21 @@ char *config_get_string(struct config *cfg, const char *section,
+ 	return ci->val.s;
+ }
+ 
++unsigned int config_get_interfaces(struct config *cfg, char *interfaces[], unsigned int max)
++{
++	struct interface *iface = NULL;
++	unsigned int counter = 0;
++
++	STAILQ_FOREACH(iface, &cfg->interfaces, list) {
++		if (counter == max) {
++			pr_err("bug: too many interfaces!");
++			return (unsigned int)-1;
++		}
++		interfaces[counter++] = interface_name(iface);
++	}
++	return counter;
++}
++
+ int config_harmonize_onestep(struct config *cfg)
+ {
+ 	enum timestamp_type tstype = config_get_int(cfg, NULL, "time_stamping");
+diff --git a/config.h b/config.h
+index 14d2f64..645fb42 100644
+--- a/config.h
++++ b/config.h
+@@ -64,6 +64,8 @@ int config_get_int(struct config *cfg, const char *section,
+ char *config_get_string(struct config *cfg, const char *section,
+ 			const char *option);
+ 
++unsigned int config_get_interfaces(struct config *cfg, char *interfaces[], unsigned int max);
++
+ int config_harmonize_onestep(struct config *cfg);
+ 
+ static inline struct option *config_long_options(struct config *cfg)
+diff --git a/phc2sys.c b/phc2sys.c
+index c9fabd7..a4afe01 100644
+--- a/phc2sys.c
++++ b/phc2sys.c
+@@ -64,6 +64,12 @@
+ 
+ #define PHC_PPS_OFFSET_LIMIT 10000000
+ 
++#define MAX_SRC_CLOCKS 128
++
++#define PORT_INDEX_TO_PORT_ID(port, index) (((((unsigned int) port) & 0xFF) << 8) || (((unsigned int) index) & 0xFF))
++#define PORT_ID_TO_PORT(id) ((((unsigned int) id) >> 8) & 0xFF)
++#define PORT_ID_TO_INDEX(id) (((unsigned int) id) & 0xFF)
++
+ struct clock {
+ 	LIST_ENTRY(clock) list;
+ 	LIST_ENTRY(clock) dst_list;
+@@ -85,6 +91,7 @@ struct clock {
+ 	struct stats *freq_stats;
+ 	struct stats *delay_stats;
+ 	struct clockcheck *sanity_check;
++	struct pmc_agent *node;
+ };
+ 
+ struct port {
+@@ -103,7 +110,7 @@ struct phc2sys_private {
+ 	int forced_sync_offset;
+ 	int kernel_leap;
+ 	int state_changed;
+-	struct pmc_agent *node;
++	LIST_HEAD(pmc_agent_head, pmc_agent) pmc_agents;
+ 	LIST_HEAD(port_head, port) ports;
+ 	LIST_HEAD(clock_head, clock) clocks;
+ 	LIST_HEAD(dst_clock_head, clock) dst_clocks;
+@@ -260,6 +267,18 @@ static struct port *port_get(struct phc2sys_private *priv, unsigned int number)
+ 	return NULL;
+ }
+ 
++static struct port *port_get_by_clock(struct phc2sys_private *priv, struct clock * clock)
++{
++	struct port *p, *port = NULL;
++	LIST_FOREACH(p, &priv->ports, list) {
++		if (p->clock == clock) {
++			port = p;
++			break;
++		}
++	}
++	return port;
++}
++
+ static struct port *port_add(struct phc2sys_private *priv, unsigned int number,
+ 			     char *device)
+ {
+@@ -293,6 +312,42 @@ static struct port *port_add(struct phc2sys_private *priv, unsigned int number,
+ 	return p;
+ }
+ 
++static struct pmc_agent *pmc_agent_get(struct phc2sys_private *priv, unsigned int index)
++{
++	struct pmc_agent *node;
++	LIST_FOREACH(node, &priv->pmc_agents, list) {
++		if (node->index == index) {
++			break;
++		}
++	}
++	return node;
++}
++
++static struct pmc_agent *pmc_agent_add(struct phc2sys_private *priv, unsigned int index)
++{
++	struct pmc_agent *node = pmc_agent_get(priv, index);
++	if (node)
++		return node;
++
++	node = pmc_agent_create();
++	if (!node) {
++		pr_err("failed to allocate memory for a pmc agent");
++		return NULL;
++	}
++
++	node->index = index;
++	LIST_INSERT_HEAD(&priv->pmc_agents, node, list);
++	return node;
++}
++
++static void pmc_agent_cleanup(struct phc2sys_private *priv)
++{
++	struct pmc_agent *node, *tmp;
++	LIST_FOREACH_SAFE(node, &priv->pmc_agents, list, tmp) {
++		pmc_agent_destroy(node);
++	}
++}
++
+ static void clock_reinit(struct phc2sys_private *priv, struct clock *clock,
+ 			 int new_state)
+ {
+@@ -302,12 +357,17 @@ static void clock_reinit(struct phc2sys_private *priv, struct clock *clock,
+ 	struct sk_ts_info ts_info;
+ 	char iface[IFNAMSIZ];
+ 	clockid_t clkid = CLOCK_INVALID;
++	struct pmc_agent *node;
++	unsigned int pmc_index;
+ 
+ 	LIST_FOREACH(p, &priv->ports, list) {
+ 		if (p->clock != clock) {
+ 			continue;
+ 		}
+-		err = pmc_agent_query_port_properties(priv->node, 1000,
++
++		pmc_index = PORT_ID_TO_INDEX(p->number);
++		node = pmc_agent_get(priv, pmc_index);
++		err = pmc_agent_query_port_properties(node, 1000,
+ 						      p->number, &state,
+ 						      &timestamping, iface);
+ 		if (!err) {
+@@ -638,12 +698,13 @@ static int do_pps_loop(struct phc2sys_private *priv, struct clock *clock,
+ 	int64_t pps_offset, phc_offset, phc_delay;
+ 	uint64_t pps_ts, phc_ts;
+ 	clockid_t src = priv->master->clkid;
++	struct pmc_agent *node = LIST_FIRST(&priv->pmc_agents);
+ 
+ 	priv->master->source_label = "pps";
+ 
+ 	if (src == CLOCK_INVALID) {
+ 		/* The sync offset can't be applied with PPS alone. */
+-		pmc_agent_set_sync_offset(priv->node, 0);
++		pmc_agent_set_sync_offset(node, 0);
+ 	} else {
+ 		enable_pps_output(priv->master->clkid);
+ 	}
+@@ -674,7 +735,7 @@ static int do_pps_loop(struct phc2sys_private *priv, struct clock *clock,
+ 			pps_offset = pps_ts - phc_ts;
+ 		}
+ 
+-		if (pmc_agent_update(priv->node) < 0)
++		if (pmc_agent_update(node) < 0)
+ 			continue;
+ 		update_clock(priv, clock, pps_offset, pps_ts, -1);
+ 	}
+@@ -706,6 +767,7 @@ static int do_loop(struct phc2sys_private *priv, int subscriptions)
+ 	uint64_t ts;
+ 	int64_t offset, delay;
+ 	int err;
++	struct pmc_agent *node = NULL;
+ 
+ 	interval.tv_sec = priv->phc_interval;
+ 	interval.tv_nsec = (priv->phc_interval - interval.tv_sec) * 1e9;
+@@ -713,22 +775,28 @@ static int do_loop(struct phc2sys_private *priv, int subscriptions)
+ 	while (is_running()) {
+ 		clock_nanosleep(CLOCK_MONOTONIC, 0, &interval, NULL);
+ 
+-		if (pmc_agent_update(priv->node) < 0) {
+-			continue;
+-		}
++		LIST_FOREACH(node, &priv->pmc_agents, list) {
++			if (pmc_agent_update(node) < 0) {
++				continue;
++			}
+ 
+-		if (subscriptions) {
+-			run_pmc_events(priv->node);
+-			if (priv->state_changed) {
+-				/* force getting offset, as it may have
+-				 * changed after the port state change */
+-				if (pmc_agent_query_utc_offset(priv->node, 1000)) {
+-					pr_err("failed to get UTC offset");
+-					continue;
++			if (subscriptions) {
++				run_pmc_events(node);
++				if (priv->state_changed) {
++					/* force getting offset, as it may have
++					 * changed after the port state change */
++					if (pmc_agent_query_utc_offset(node, 1000)) {
++						pr_err("failed to get UTC offset");
++						continue;
++					}
+ 				}
+-				reconfigure(priv);
+ 			}
+ 		}
++
++		if (subscriptions && priv->state_changed) {
++			reconfigure(priv);
++		}
++
+ 		if (!priv->master)
+ 			continue;
+ 
+@@ -859,55 +927,65 @@ static int auto_init_ports(struct phc2sys_private *priv, int add_rt)
+ 	struct clock *clock;
+ 	struct port *port;
+ 	unsigned int i;
++	struct pmc_agent *node = NULL;
++	unsigned int retries, port_number;
+ 
+-	while (1) {
+-		if (!is_running()) {
+-			return -1;
+-		}
+-		err = pmc_agent_query_dds(priv->node, 1000);
+-		if (!err) {
+-			break;
+-		}
+-		if (err == -ETIMEDOUT) {
+-			pr_notice("Waiting for ptp4l...");
+-		} else {
+-			return -1;
++	LIST_FOREACH(node, &priv->pmc_agents, list) {
++		retries = 0;
++		while(retries < 10) {
++			if (!is_running()) {
++				return -1;
++			}
++			err = pmc_agent_query_dds(node, 1000);
++			if (!err) {
++				break;
++			}
++			if (err == -ETIMEDOUT) {
++				pr_notice("Waiting for ptp4l...");
++				retries++;
++			} else {
++				return -1;
++			}
+ 		}
+-	}
+ 
+-	number_ports = pmc_agent_get_number_ports(priv->node);
+-	if (number_ports <= 0) {
+-		pr_err("failed to get number of ports");
+-		return -1;
+-	}
+-
+-	err = pmc_agent_subscribe(priv->node, 1000);
+-	if (err) {
+-		pr_err("failed to subscribe");
+-		return -1;
+-	}
+-
+-	for (i = 1; i <= number_ports; i++) {
+-		err = pmc_agent_query_port_properties(priv->node, 1000, i,
+-						      &state, &timestamping,
+-						      iface);
+-		if (err == -ENODEV) {
+-			/* port does not exist, ignore the port */
++		number_ports = pmc_agent_get_number_ports(node);
++		if (number_ports <= 0) {
++			pr_err("failed to get number of ports");
+ 			continue;
+ 		}
++
++		err = pmc_agent_subscribe(node, 1000);
+ 		if (err) {
+-			pr_err("failed to get port properties");
+-			return -1;
+-		}
+-		if (timestamping == TS_SOFTWARE) {
+-			/* ignore ports with software time stamping */
++			pr_err("failed to subscribe");
+ 			continue;
+ 		}
+-		port = port_add(priv, i, iface);
+-		if (!port)
+-			return -1;
+-		port->state = normalize_state(state);
++
++		for (i = 1; i <= number_ports; i++) {
++			err = pmc_agent_query_port_properties(node, 1000, i,
++								&state, &timestamping,
++								iface);
++			if (err == -ENODEV) {
++				/* port does not exist, ignore the port */
++				continue;
++			}
++			if (err) {
++				pr_err("failed to get port properties");
++				break;
++			}
++			if (timestamping == TS_SOFTWARE) {
++				/* ignore ports with software time stamping */
++				continue;
++			}
++			port_number = PORT_INDEX_TO_PORT_ID(i, node->index);
++			port = port_add(priv, port_number, iface);
++			if (!port)
++				return -1;
++			port->state = normalize_state(state);
++			/* map clock to pmc agent node */
++			port->clock->node = node;
++		}
+ 	}
++
+ 	if (LIST_EMPTY(&priv->clocks)) {
+ 		pr_err("no suitable ports available");
+ 		return -1;
+@@ -926,9 +1004,11 @@ static int auto_init_ports(struct phc2sys_private *priv, int add_rt)
+ 	}
+ 
+ 	/* get initial offset */
+-	if (pmc_agent_query_utc_offset(priv->node, 1000)) {
+-		pr_err("failed to get UTC offset");
+-		return -1;
++	LIST_FOREACH(node, &priv->pmc_agents, list) {
++		if (pmc_agent_query_utc_offset(node, 1000)) {
++			pr_err("failed to get UTC offset");
++			continue;
++		}
+ 	}
+ 	return 0;
+ }
+@@ -937,9 +1017,12 @@ static int auto_init_ports(struct phc2sys_private *priv, int add_rt)
+ static int clock_handle_leap(struct phc2sys_private *priv, struct clock *clock,
+ 			     int64_t offset, uint64_t ts)
+ {
+-	int clock_leap, node_leap = pmc_agent_get_leap(priv->node);
++	int clock_leap, node_leap;
++	struct pmc_agent *node = priv->master->node;
++
++	node_leap = pmc_agent_get_leap(node);
+ 
+-	clock->sync_offset = pmc_agent_get_sync_offset(priv->node);
++	clock->sync_offset = pmc_agent_get_sync_offset(node);
+ 
+ 	if ((node_leap || clock->leap_set) &&
+ 	    clock->is_utc != priv->master->is_utc) {
+@@ -980,7 +1063,7 @@ static int clock_handle_leap(struct phc2sys_private *priv, struct clock *clock,
+ 		}
+ 	}
+ 
+-	if (pmc_agent_utc_offset_traceable(priv->node) &&
++	if (pmc_agent_utc_offset_traceable(node) &&
+ 	    clock->utc_offset_set != clock->sync_offset) {
+ 		if (clock->clkid == CLOCK_REALTIME)
+ 			sysclk_set_tai_offset(clock->sync_offset);
+@@ -1034,7 +1117,8 @@ static void usage(char *progname)
+ 
+ int main(int argc, char *argv[])
+ {
+-	char *config = NULL, *dst_name = NULL, *progname, *src_name = NULL;
++	char *config = NULL, *dst_name = NULL, *progname;
++	char *src_names[MAX_SRC_CLOCKS];
+ 	char uds_local[MAX_IFNAME_SIZE + 1];
+ 	int autocfg = 0, c, domain_number = 0, index, ntpshm_segment, offset;
+ 	int pps_fd = -1, print_level = LOG_INFO, r = -1, rt = 0;
+@@ -1047,7 +1131,11 @@ int main(int argc, char *argv[])
+ 	struct phc2sys_private priv = {
+ 		.phc_readings = 5,
+ 		.phc_interval = 1.0,
++		.master = NULL,
+ 	};
++	struct pmc_agent *node = NULL;
++	unsigned int i, src_cnt = 0;
++	int ha_enabled = 0;
+ 
+ 	handle_term_signals();
+ 
+@@ -1055,8 +1143,8 @@ int main(int argc, char *argv[])
+ 	if (!cfg) {
+ 		return -1;
+ 	}
+-	priv.node = pmc_agent_create();
+-	if (!priv.node) {
++	node = pmc_agent_add(&priv, 0);
++	if (!node) {
+ 		return -1;
+ 	}
+ 
+@@ -1102,7 +1190,11 @@ int main(int argc, char *argv[])
+ 				"'-i' has been deprecated. please use '-s' instead.\n");
+             /* fallthrough */
+ 		case 's':
+-			src_name = strdup(optarg);
++			if (src_cnt == MAX_SRC_CLOCKS) {
++				fprintf(stderr, "too many source clocks\n");
++				goto bad_usage;
++			}
++			src_names[src_cnt++] = optarg;
+ 			break;
+ 		case 'E':
+ 			if (!strcasecmp(optarg, "pi")) {
+@@ -1153,7 +1245,7 @@ int main(int argc, char *argv[])
+ 			if (get_arg_val_i(c, optarg, &offset, INT_MIN, INT_MAX)) {
+ 				goto end;
+ 			}
+-			pmc_agent_set_sync_offset(priv.node, offset);
++			pmc_agent_set_sync_offset(node, offset);
+ 			priv.forced_sync_offset = -1;
+ 			break;
+ 		case 'L':
+@@ -1241,12 +1333,22 @@ int main(int argc, char *argv[])
+ 		return c;
+ 	}
+ 
+-	if (autocfg && (src_name || dst_name || pps_fd >= 0 || wait_sync || priv.forced_sync_offset)) {
++	if (src_cnt == 0) {
++		/* get the source interface list from configuration file */
++		src_cnt = config_get_interfaces(cfg, src_names, MAX_SRC_CLOCKS);
++		if (src_cnt == (unsigned int)-1) {
++			fprintf(stderr, "too many interfaces in configuration file\n");
++			fprintf(stderr, "maximum number of interfaces is %u\n", MAX_SRC_CLOCKS);
++			goto bad_usage;
++		}
++	}
++
++	if (autocfg && (src_cnt > 0 || dst_name || pps_fd >= 0 || wait_sync || priv.forced_sync_offset)) {
+ 		fprintf(stderr,
+ 			"autoconfiguration cannot be mixed with manual config options.\n");
+ 		goto bad_usage;
+ 	}
+-	if (!autocfg && pps_fd < 0 && !src_name) {
++	if (!autocfg && pps_fd < 0 && src_cnt == 0) {
+ 		fprintf(stderr,
+ 			"autoconfiguration or valid source clock must be selected.\n");
+ 		goto bad_usage;
+@@ -1282,7 +1384,7 @@ int main(int argc, char *argv[])
+ 		 getpid());
+ 
+ 	if (autocfg) {
+-		if (init_pmc_node(cfg, priv.node, uds_local,
++		if (init_pmc_node(cfg, node, uds_local,
+ 				  phc2sys_recv_subscribed, &priv))
+ 			goto end;
+ 		if (auto_init_ports(&priv, rt) < 0)
+@@ -1291,15 +1393,26 @@ int main(int argc, char *argv[])
+ 		goto end;
+ 	}
+ 
+-	src = clock_add(&priv, src_name);
+-	free(src_name);
+-	if (!src) {
+-		fprintf(stderr,
+-			"valid source clock must be selected.\n");
++	ha_enabled = config_get_int(cfg, NULL, "ha_enabled");
++	if (!ha_enabled && src_cnt > 1) {
++		fprintf(stderr, "too many source clocks\n");
++		fprintf(stderr, "Use 'ha_enabled 1' to accept more than one source clocks\n");
+ 		goto bad_usage;
+ 	}
+-	src->state = PS_SLAVE;
+-	priv.master = src;
++
++	for (i = 0; i < src_cnt; ++i) {
++		src = clock_add(&priv, src_names[i]);
++		if (!src) {
++			fprintf(stderr,
++				"invalid source clock '%s'.\n", src_names[i]);
++			goto bad_usage;
++		}
++		src->state = PS_SLAVE;
++		/* select the first clock */
++		if (priv.master == NULL) {
++			priv.master = src;
++		}
++	}
+ 
+ 	dst = clock_add(&priv, dst_name ? dst_name : "CLOCK_REALTIME");
+ 	free(dst_name);
+@@ -1320,32 +1433,58 @@ int main(int argc, char *argv[])
+ 	r = -1;
+ 
+ 	if (wait_sync) {
+-		if (init_pmc_node(cfg, priv.node, uds_local,
+-				  phc2sys_recv_subscribed, &priv))
+-			goto end;
++		i = 0;
++		for (src = LIST_FIRST(&priv.clocks);
++			 src != NULL;
++			 src = LIST_NEXT(src, list)) {
+ 
+-		while (is_running()) {
+-			r = run_pmc_wait_sync(priv.node, 1000);
+-			if (r < 0)
+-				goto end;
+-			if (r > 0)
+-				break;
+-			else
+-				pr_notice("Waiting for ptp4l...");
+-		}
++			/* skip dst clock */
++			if (src == dst) {
++				continue;
++			}
+ 
+-		if (!priv.forced_sync_offset) {
+-			r = pmc_agent_query_utc_offset(priv.node, 1000);
+-			if (r) {
+-				pr_err("failed to get UTC offset");
++			if (i > 0) {
++				node = pmc_agent_add(&priv, i);
++				if (!node)
++					goto end;
++			}
++
++			/* uds local is formated '/var/run/phc2sys.<pid>.<source_interface>' */
++			snprintf(uds_local, sizeof(uds_local), "/var/run/phc2sys.%d.%s",
++				getpid(), src->device);
++
++			if (init_pmc_node(cfg, node, uds_local,
++					phc2sys_recv_subscribed, &priv))
+ 				goto end;
++
++			/* map clock to pmc agent node */
++			src->node = node;
++
++			while (is_running()) {
++				r = run_pmc_wait_sync(node, 1000);
++				if (r < 0)
++					goto end;
++				if (r > 0)
++					break;
++				else
++					pr_notice("Waiting for ptp4l...");
++			}
++
++			if (!priv.forced_sync_offset) {
++				r = pmc_agent_query_utc_offset(node, 1000);
++				if (r) {
++					pr_err("failed to get UTC offset");
++					goto end;
++				}
++			}
++
++			if (priv.forced_sync_offset ||
++				(src->clkid != CLOCK_REALTIME && dst->clkid != CLOCK_REALTIME) ||
++				src->clkid == CLOCK_INVALID) {
++				pmc_agent_disable(node);
+ 			}
+-		}
+ 
+-		if (priv.forced_sync_offset ||
+-		    (src->clkid != CLOCK_REALTIME && dst->clkid != CLOCK_REALTIME) ||
+-		    src->clkid == CLOCK_INVALID) {
+-			pmc_agent_disable(priv.node);
++			++i;
+ 		}
+ 	}
+ 
+@@ -1359,7 +1498,7 @@ int main(int argc, char *argv[])
+ 	}
+ 
+ end:
+-	pmc_agent_destroy(priv.node);
++	pmc_agent_cleanup(&priv);
+ 	clock_cleanup(&priv);
+ 	port_cleanup(&priv);
+ 	config_destroy(cfg);
+diff --git a/pmc_agent.c b/pmc_agent.c
+index 3034f65..d13f569 100644
+--- a/pmc_agent.c
++++ b/pmc_agent.c
+@@ -34,23 +34,6 @@
+  * renewed.
+  */
+ 
+-struct pmc_agent {
+-	struct pmc *pmc;
+-	uint64_t pmc_last_update;
+-
+-	struct defaultDS dds;
+-	bool dds_valid;
+-	int leap;
+-	int pmc_ds_requested;
+-	bool stay_subscribed;
+-	int sync_offset;
+-	int utc_offset_traceable;
+-
+-	/* Callback on message reception */
+-	pmc_node_recv_subscribed_t *recv_subscribed;
+-	void *recv_context;
+-};
+-
+ static void send_subscription(struct pmc_agent *node)
+ {
+ 	struct subscribe_events_np sen;
+diff --git a/pmc_agent.h b/pmc_agent.h
+index dd34d30..5f25984 100644
+--- a/pmc_agent.h
++++ b/pmc_agent.h
+@@ -26,11 +26,28 @@
+ 
+ #include "pmc_common.h"
+ 
+-struct pmc_agent;
+-
+ typedef int pmc_node_recv_subscribed_t(void *context, struct ptp_message *msg,
+ 				       int excluded);
+ 
++struct pmc_agent {
++	LIST_ENTRY(pmc_agent) list;
++	struct pmc *pmc;
++	uint64_t pmc_last_update;
++
++	struct defaultDS dds;
++	bool dds_valid;
++	int leap;
++	int pmc_ds_requested;
++	bool stay_subscribed;
++	int sync_offset;
++	int utc_offset_traceable;
++	unsigned int index;
++
++	/* Callback on message reception */
++	pmc_node_recv_subscribed_t *recv_subscribed;
++	void *recv_context;
++};
++
+ int init_pmc_node(struct config *cfg, struct pmc_agent *agent, const char *uds,
+ 		  pmc_node_recv_subscribed_t *recv_subscribed, void *context);
+ int run_pmc_wait_sync(struct pmc_agent *agent, int timeout);
+diff --git a/uds.c b/uds.c
+index 641a672..57d4796 100644
+--- a/uds.c
++++ b/uds.c
+@@ -55,11 +55,13 @@ static int uds_close(struct transport *t, struct fdarray *fda)
+ static int uds_open(struct transport *t, struct interface *iface, struct fdarray *fda,
+ 		    enum timestamp_type tt)
+ {
+-	char *uds_path = config_get_string(t->cfg, NULL, "uds_address");
++	char *uds_path = NULL;
+ 	struct uds *uds = container_of(t, struct uds, t);
+ 	const char *name = interface_name(iface);
+ 	struct sockaddr_un sa;
+ 	int fd, err;
++	char *point = NULL, *source = NULL;
++	int ha_enabled = config_get_int(t->cfg, NULL, "ha_enabled");
+ 
+ 	fd = socket(AF_LOCAL, SOCK_DGRAM, 0);
+ 	if (fd < 0) {
+@@ -82,6 +84,21 @@ static int uds_open(struct transport *t, struct interface *iface, struct fdarray
+ 	/* For client use, pre load the server path. */
+ 	memset(&sa, 0, sizeof(sa));
+ 	sa.sun_family = AF_LOCAL;
++
++	if (!ha_enabled) {
++		uds_path = config_get_string(t->cfg, NULL, "uds_address");
++	} else {
++		/* The interface name is formated as '/var/run/phc2sys.<pid>.<source>'.
++		   The last item is the source interface. */
++		point = strtok(name, ".");
++		while(point != NULL) {
++			source = point;
++			point = strtok(NULL, ".");
++		}
++
++		uds_path = config_get_string(t->cfg, source, "ha_uds_address");
++	}
++
+ 	strncpy(sa.sun_path, uds_path, sizeof(sa.sun_path) - 1);
+ 	uds->address.sun = sa;
+ 	uds->address.len = sizeof(sa);
+-- 
+2.25.1
+

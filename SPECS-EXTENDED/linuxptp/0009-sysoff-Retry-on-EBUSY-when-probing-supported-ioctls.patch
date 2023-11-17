@@ -1,0 +1,52 @@
+From 11ae077e31d9957df01aacfa17eea5b5d548b249 Mon Sep 17 00:00:00 2001
+From: Miroslav Lichvar <mlichvar@redhat.com>
+Date: Wed, 18 May 2022 11:33:37 +0200
+Subject: [PATCH 9/47] sysoff: Retry on EBUSY when probing supported ioctls.
+
+Handle EBUSY when probing support for a PTP_SYS_OFFSET ioctl. Try each
+ioctl up to three times before giving up on it to make the detection
+more reliable.
+
+Signed-off-by: Miroslav Lichvar <mlichvar@redhat.com>
+[commit dadd2593c7beaee9eba5828a7bd8a0b5849dd8bb upstream]
+Signed-off-by: Douglas Henrique Koerich <douglashenrique.koerich@windriver.com>
+---
+ sysoff.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/sysoff.c b/sysoff.c
+index a425275..fc1f7ca 100644
+--- a/sysoff.c
++++ b/sysoff.c
+@@ -145,8 +145,8 @@ int sysoff_measure(int fd, int method, int n_samples,
+ int sysoff_probe(int fd, int n_samples)
+ {
+ 	int64_t junk, delay;
++	int i, j, err;
+ 	uint64_t ts;
+-	int i;
+ 
+ 	if (n_samples > PTP_MAX_SAMPLES) {
+ 		fprintf(stderr, "warning: %d exceeds kernel max readings %d\n",
+@@ -156,9 +156,15 @@ int sysoff_probe(int fd, int n_samples)
+ 	}
+ 
+ 	for (i = 0; i < SYSOFF_LAST; i++) {
+-		if (sysoff_measure(fd, i, n_samples, &junk, &ts, &delay) < 0)
+-			continue;
+-		return i;
++		for (j = 0; j < 3; j++) {
++			err = sysoff_measure(fd, i, n_samples, &junk, &ts,
++					     &delay);
++			if (err == -EBUSY)
++				continue;
++			if (err)
++				break;
++			return i;
++		}
+ 	}
+ 
+ 	return SYSOFF_RUN_TIME_MISSING;
+-- 
+2.29.2
+

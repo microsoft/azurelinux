@@ -1,0 +1,244 @@
+From acdf74df9fa69b81c1e9332f10d4efcd3e9bae48 Mon Sep 17 00:00:00 2001
+From: Andre Mauricio Zelak <andre.zelak@windriver.com>
+Date: Mon, 12 Jun 2023 17:23:29 -0300
+Subject: [PATCH 28/47] pmc_agent: Convert the method that queries the port
+ properties.
+
+Prefix the function with the module name and correct the return code
+semantics.
+
+The active word in the function's name is "query" rather that "get" in
+order to distinguish methods that send and receive over the network
+from those that merely return a cached value.
+
+Signed-off-by: Richard Cochran <richardcochran@gmail.com>
+
+[commit ac7d69bbc476b94d76e5cee4992b9682f003feaf upstream]
+Signed-off-by: Andre Mauricio Zelak <andre.zelak@windriver.com>
+---
+ phc2sys.c   | 41 +++++++++++++++--------------
+ pmc_agent.c | 74 ++++++++++++++++++++++++++---------------------------
+ pmc_agent.h | 22 +++++++++++++---
+ 3 files changed, 78 insertions(+), 59 deletions(-)
+
+diff --git a/phc2sys.c b/phc2sys.c
+index 78d662b..32e6e13 100644
+--- a/phc2sys.c
++++ b/phc2sys.c
+@@ -296,8 +296,7 @@ static struct port *port_add(struct phc2sys_private *priv, unsigned int number,
+ static void clock_reinit(struct phc2sys_private *priv, struct clock *clock,
+ 			 int new_state)
+ {
+-	int phc_index = -1, phc_switched = 0;
+-	int state, timestamping, ret = -1;
++	int err = -1, phc_index = -1, phc_switched = 0, state, timestamping;
+ 	struct port *p;
+ 	struct servo *servo;
+ 	struct sk_ts_info ts_info;
+@@ -305,16 +304,19 @@ static void clock_reinit(struct phc2sys_private *priv, struct clock *clock,
+ 	clockid_t clkid = CLOCK_INVALID;
+ 
+ 	LIST_FOREACH(p, &priv->ports, list) {
+-		if (p->clock == clock) {
+-			ret = run_pmc_port_properties(priv->node, 1000, p->number,
+-					              &state, &timestamping,
+-						      iface);
+-			if (ret > 0)
+-				p->state = normalize_state(state);
++		if (p->clock != clock) {
++			continue;
++		}
++		err = pmc_agent_query_port_properties(priv->node, 1000,
++						      p->number, &state,
++						      &timestamping, iface);
++		if (!err) {
++			p->state = normalize_state(state);
+ 		}
++		break;
+ 	}
+ 
+-	if (ret > 0 && timestamping != TS_SOFTWARE) {
++	if (!err && timestamping != TS_SOFTWARE) {
+ 		/* Check if device changed */
+ 		if (strcmp(clock->device, iface)) {
+ 			free(clock->device);
+@@ -852,12 +854,12 @@ static int phc2sys_recv_subscribed(void *context, struct ptp_message *msg,
+ 
+ static int auto_init_ports(struct phc2sys_private *priv, int add_rt)
+ {
+-	struct port *port;
+-	struct clock *clock;
+-	int number_ports, res;
+-	unsigned int i;
++	int err, number_ports, res;
+ 	int state, timestamping;
+ 	char iface[IFNAMSIZ];
++	struct clock *clock;
++	struct port *port;
++	unsigned int i;
+ 
+ 	while (1) {
+ 		if (!is_running())
+@@ -877,20 +879,21 @@ static int auto_init_ports(struct phc2sys_private *priv, int add_rt)
+ 		return -1;
+ 	}
+ 
+-	res = pmc_agent_subscribe(priv->node, 1000);
+-	if (res) {
++	err = pmc_agent_subscribe(priv->node, 1000);
++	if (err) {
+ 		pr_err("failed to subscribe");
+ 		return -1;
+ 	}
+ 
+ 	for (i = 1; i <= number_ports; i++) {
+-		res = run_pmc_port_properties(priv->node, 1000, i, &state,
+-					      &timestamping, iface);
+-		if (res == -1) {
++		err = pmc_agent_query_port_properties(priv->node, 1000, i,
++						      &state, &timestamping,
++						      iface);
++		if (err == -ENODEV) {
+ 			/* port does not exist, ignore the port */
+ 			continue;
+ 		}
+-		if (res <= 0) {
++		if (err) {
+ 			pr_err("failed to get port properties");
+ 			return -1;
+ 		}
+diff --git a/pmc_agent.c b/pmc_agent.c
+index 7a57a2f..cc729ab 100644
+--- a/pmc_agent.c
++++ b/pmc_agent.c
+@@ -251,43 +251,6 @@ void run_pmc_events(struct pmc_agent *node)
+ 	run_pmc(node, 0, -1, &msg);
+ }
+ 
+-int run_pmc_port_properties(struct pmc_agent *node, int timeout,
+-			    unsigned int port, int *state,
+-			    int *tstamping, char *iface)
+-{
+-	struct ptp_message *msg;
+-	int res, len;
+-	struct port_properties_np *ppn;
+-
+-	pmc_target_port(node->pmc, port);
+-	while (1) {
+-		res = run_pmc(node, timeout, TLV_PORT_PROPERTIES_NP, &msg);
+-		if (res <= 0)
+-			goto out;
+-
+-		ppn = management_tlv_data(msg);
+-		if (ppn->portIdentity.portNumber != port) {
+-			msg_put(msg);
+-			continue;
+-		}
+-
+-		*state = ppn->port_state;
+-		*tstamping = ppn->timestamping;
+-		len = ppn->interface.length;
+-		if (len > IFNAMSIZ - 1)
+-			len = IFNAMSIZ - 1;
+-		memcpy(iface, ppn->interface.text, len);
+-		iface[len] = '\0';
+-
+-		msg_put(msg);
+-		res = 1;
+-		break;
+-	}
+-out:
+-	pmc_target_all(node->pmc);
+-	return res;
+-}
+-
+ int run_pmc_clock_identity(struct pmc_agent *node, int timeout)
+ {
+ 	struct ptp_message *msg;
+@@ -354,6 +317,43 @@ int pmc_agent_get_sync_offset(struct pmc_agent *agent)
+ 	return agent->sync_offset;
+ }
+ 
++int pmc_agent_query_port_properties(struct pmc_agent *node, int timeout,
++				    unsigned int port, int *state,
++				    int *tstamping, char *iface)
++{
++	struct port_properties_np *ppn;
++	struct ptp_message *msg;
++	int res, len;
++
++	pmc_target_port(node->pmc, port);
++	while (1) {
++		res = run_pmc(node, timeout, TLV_PORT_PROPERTIES_NP, &msg);
++		if (is_run_pmc_error(res)) {
++			goto out;
++		}
++		ppn = management_tlv_data(msg);
++		if (ppn->portIdentity.portNumber != port) {
++			msg_put(msg);
++			continue;
++		}
++		*state = ppn->port_state;
++		*tstamping = ppn->timestamping;
++		len = ppn->interface.length;
++		if (len > IFNAMSIZ - 1) {
++			len = IFNAMSIZ - 1;
++		}
++		memcpy(iface, ppn->interface.text, len);
++		iface[len] = '\0';
++
++		msg_put(msg);
++		res = 0;
++		break;
++	}
++out:
++	pmc_target_all(node->pmc);
++	return run_pmc_err2errno(res);
++}
++
+ int pmc_agent_query_utc_offset(struct pmc_agent *node, int timeout)
+ {
+ 	struct timePropertiesDS *tds;
+diff --git a/pmc_agent.h b/pmc_agent.h
+index 44326d2..ea37bf9 100644
+--- a/pmc_agent.h
++++ b/pmc_agent.h
+@@ -37,9 +37,6 @@ int run_pmc_clock_identity(struct pmc_agent *agent, int timeout);
+ int run_pmc_wait_sync(struct pmc_agent *agent, int timeout);
+ int run_pmc_get_number_ports(struct pmc_agent *agent, int timeout);
+ void run_pmc_events(struct pmc_agent *agent);
+-int run_pmc_port_properties(struct pmc_agent *agent, int timeout,
+-			    unsigned int port, int *state,
+-			    int *tstamping, char *iface);
+ 
+ /**
+  * Creates an instance of a PMC agent.
+@@ -73,6 +70,25 @@ int pmc_agent_get_leap(struct pmc_agent *agent);
+  */
+ int pmc_agent_get_sync_offset(struct pmc_agent *agent);
+ 
++/**
++ * Queries the port properties of a given port from the ptp4l service.
++ *
++ * In addition:
++ *
++ * - The port state notification callback might be invoked.
++ *
++ * @param agent  Pointer to a PMC instance obtained via @ref pmc_agent_create().
++ * @param timeout    Transmit and receive timeout in milliseconds.
++ * @param port       The port index of interest.
++ * @param state      Buffer to hold the returned port state.
++ * @param tstamping  Buffer to hold the returned time stamping flavor.
++ * @param iface      Buffer to hold the returned interface name.
++ * @return           Zero on success, negative error code otherwise.
++ */
++int pmc_agent_query_port_properties(struct pmc_agent *agent, int timeout,
++				    unsigned int port, int *state,
++				    int *tstamping, char *iface);
++
+ /**
+  * Queries the TAI-UTC offset and the current leap adjustment from the
+  * ptp4l service.
+-- 
+2.25.1
+

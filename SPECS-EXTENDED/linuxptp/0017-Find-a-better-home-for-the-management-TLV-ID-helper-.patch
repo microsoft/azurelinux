@@ -1,0 +1,96 @@
+From 4ebb69f5c55e7f1f08d1a73df87d42fe70147ec9 Mon Sep 17 00:00:00 2001
+From: Andre Mauricio Zelak <andre.zelak@windriver.com>
+Date: Mon, 12 Jun 2023 14:58:09 -0300
+Subject: [PATCH 17/47] Find a better home for the management TLV ID helper
+ function.
+
+Signed-off-by: Richard Cochran <richardcochran@gmail.com>
+
+[commit d95bb9f9d62f4f372934905e97e052aa68dcfc58 upstream]
+Signed-off-by: Andre Mauricio Zelak <andre.zelak@windriver.com>
+---
+ msg.h       | 12 ++++++++++++
+ phc2sys.c   |  2 +-
+ pmc_agent.c | 10 +---------
+ pmc_agent.h |  1 -
+ 4 files changed, 14 insertions(+), 11 deletions(-)
+
+diff --git a/msg.h b/msg.h
+index e71d3ce..b600ff0 100644
+--- a/msg.h
++++ b/msg.h
+@@ -247,6 +247,18 @@ static inline uint8_t management_action(struct ptp_message *m)
+ 	return m->management.flags & 0x0f;
+ }
+ 
++/**
++ * Obtain the ID field from the TLV in a management message.
++ * @param m  A management message.
++ * @return   The value of the ID field.
++ */
++static inline int management_tlv_id(struct ptp_message *m)
++{
++	struct management_tlv *mgt;
++	mgt = (struct management_tlv *) m->management.suffix;
++	return mgt->id;
++}
++
+ /**
+  * Test a given bit in a message's flag field.
+  * @param m      Message to test.
+diff --git a/phc2sys.c b/phc2sys.c
+index 037b1b9..1f74f27 100644
+--- a/phc2sys.c
++++ b/phc2sys.c
+@@ -819,7 +819,7 @@ static int phc2sys_recv_subscribed(void *context, struct ptp_message *msg,
+ 	struct port *port;
+ 	struct clock *clock;
+ 
+-	mgt_id = get_mgt_id(msg);
++	mgt_id = management_tlv_id(msg);
+ 	if (mgt_id == excluded)
+ 		return 0;
+ 	switch (mgt_id) {
+diff --git a/pmc_agent.c b/pmc_agent.c
+index 8ccafe2..6dfb3ca 100644
+--- a/pmc_agent.c
++++ b/pmc_agent.c
+@@ -85,14 +85,6 @@ static int is_msg_mgt(struct ptp_message *msg)
+ 	return 0;
+ }
+ 
+-int get_mgt_id(struct ptp_message *msg)
+-{
+-	struct management_tlv *mgt;
+-
+-	mgt = (struct management_tlv *) msg->management.suffix;
+-	return mgt->id;
+-}
+-
+ void *get_mgt_data(struct ptp_message *msg)
+ {
+ 	struct management_tlv *mgt;
+@@ -174,7 +166,7 @@ static int run_pmc(struct pmc_agent *node, int timeout, int ds_id,
+ 		}
+ 		if (res <= 0 ||
+ 		    node->recv_subscribed(node->recv_context, *msg, ds_id) ||
+-		    get_mgt_id(*msg) != ds_id) {
++		    management_tlv_id(*msg) != ds_id) {
+ 			msg_put(*msg);
+ 			*msg = NULL;
+ 			continue;
+diff --git a/pmc_agent.h b/pmc_agent.h
+index c0b4525..09249ff 100644
+--- a/pmc_agent.h
++++ b/pmc_agent.h
+@@ -43,7 +43,6 @@ int run_pmc_port_properties(struct pmc_agent *agent, int timeout,
+ 			    unsigned int port, int *state,
+ 			    int *tstamping, char *iface);
+ int run_pmc_get_utc_offset(struct pmc_agent *agent, int timeout);
+-int get_mgt_id(struct ptp_message *msg);
+ void *get_mgt_data(struct ptp_message *msg);
+ 
+ 
+-- 
+2.25.1
+

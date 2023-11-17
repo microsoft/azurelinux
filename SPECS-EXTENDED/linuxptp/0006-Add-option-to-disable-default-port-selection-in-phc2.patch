@@ -1,0 +1,121 @@
+From 3a6de7b6208ccc64a20474db15abaac08e99d10b Mon Sep 17 00:00:00 2001
+Message-Id: <3a6de7b6208ccc64a20474db15abaac08e99d10b.1630418391.git.Jim.Somerville@windriver.com>
+In-Reply-To: <0389752e3aecf8d2b2743f16ce1408a58088bea9.1630418391.git.Jim.Somerville@windriver.com>
+References: <0389752e3aecf8d2b2743f16ce1408a58088bea9.1630418391.git.Jim.Somerville@windriver.com>
+From: Cole Walker <cole.walker@windriver.com>
+Date: Wed, 23 Jun 2021 11:14:41 -0400
+Subject: [PATCH 6/47] Add option to disable default port selection in phc2sys
+
+This change serves to address an issue in phc2sys
+where the local ptp clocks are not synced together properly if the local
+time is far behind the reference time. This issue occurs when phc2sys
+starts and there is no client port currently synced to a grandmaster. In
+the original behaviour, phc2sys selects the first configured port and
+proceeds to sync all of the other clocks to it by performing the
+first_step operation.
+
+Then ptp4l will evenually lock to the Grandmaster clock, and that
+single port will have its time updated to the correct value, but
+phc2sys has already performed the first_step operation and will not
+step the other clocks again.
+
+This solution provides an option to disable the selection of a
+default port by phc2sys. When no default port is selected, phc2sys waits
+for ptp4l to sync to the Grandmaster before bringing the other clocks
+into sync with the first_step operation.
+
+This option is configured via the default_sync
+parameter or the -D flag. The default_sync parameter is set to on by
+default in order to keep the behaviour the same as upstream linuxptp
+but can be configured by users via
+system service-parameter-add ptp global default_sync=0
+
+Signed-off-by: Jim Somerville <Jim.Somerville@windriver.com>
+---
+ config.c  |  1 +
+ phc2sys.c | 15 ++++++++++++---
+ 2 files changed, 13 insertions(+), 3 deletions(-)
+
+diff --git a/config.c b/config.c
+index ef5e833..cab7e4f 100644
+--- a/config.c
++++ b/config.c
+@@ -333,6 +333,7 @@ struct config_item config_tab[] = {
+ 	GLOB_ITEM_INT("utc_offset", CURRENT_UTC_OFFSET, 0, INT_MAX),
+ 	GLOB_ITEM_INT("verbose", 0, 0, 1),
+ 	GLOB_ITEM_INT("write_phase_mode", 0, 0, 1),
++	GLOB_ITEM_INT("default_sync", 1, 0, 1),
+ };
+ 
+ static struct unicast_master_table *current_uc_mtab;
+diff --git a/phc2sys.c b/phc2sys.c
+index a36cbe0..44d6872 100644
+--- a/phc2sys.c
++++ b/phc2sys.c
+@@ -120,6 +120,7 @@ struct phc2sys_private {
+ 	LIST_HEAD(clock_head, clock) clocks;
+ 	LIST_HEAD(dst_clock_head, clock) dst_clocks;
+ 	struct clock *master;
++	int default_sync;
+ };
+ 
+ static struct config *phc2sys_config;
+@@ -437,7 +438,7 @@ static void reconfigure(struct phc2sys_private *priv)
+ 		}
+ 		last = c;
+ 	}
+-	if (dst_cnt > 1 && !src) {
++	if (dst_cnt > 1 && !src && priv->default_sync) {
+ 		if (!rt || rt->dest_only) {
+ 			priv->master = last;
+ 			/* Reset to original state in next reconfiguration. */
+@@ -1344,6 +1345,7 @@ static void usage(char *progname)
+ 		" -N [num]       number of master clock readings per update (5)\n"
+ 		" -L [limit]     sanity frequency limit in ppb (200000000)\n"
+ 		" -M [num]       NTP SHM segment number (0)\n"
++		" -D [num]       fall back to default clock in automatic mode (1)\n"
+ 		" -u [num]       number of clock updates in summary stats (0)\n"
+ 		" -n [num]       domain number (0)\n"
+ 		" -x             apply leap seconds by servo instead of kernel\n"
+@@ -1364,7 +1366,7 @@ int main(int argc, char *argv[])
+ 	struct clock *src, *dst;
+ 	struct config *cfg;
+ 	struct option *opts;
+-	int autocfg = 0, c, domain_number = 0, index, ntpshm_segment;
++	int autocfg = 0, c, domain_number = 0, default_sync = 1, index, ntpshm_segment;
+ 	int pps_fd = -1, print_level = LOG_INFO, r = -1, rt = 0, wait_sync = 0;
+ 	double phc_rate, tmp;
+ 	struct phc2sys_private priv = {
+@@ -1388,7 +1390,7 @@ int main(int argc, char *argv[])
+ 	progname = strrchr(argv[0], '/');
+ 	progname = progname ? 1+progname : argv[0];
+ 	while (EOF != (c = getopt_long(argc, argv,
+-				"arc:d:f:s:E:P:I:S:F:R:N:O:L:M:i:u:wn:xz:l:t:mqvh",
++				"arc:d:f:s:E:P:I:S:F:R:N:O:L:M:D:i:u:wn:xz:l:t:mqvh",
+ 				opts, &index))) {
+ 		switch (c) {
+ 		case 0:
+@@ -1540,6 +1542,12 @@ int main(int argc, char *argv[])
+ 			version_show(stdout);
+ 			config_destroy(cfg);
+ 			return 0;
++		case 'D':
++			if (get_arg_val_i(c, optarg, &default_sync, 0, 1) ||
++			config_set_int(cfg, "default_sync", default_sync)) {
++				goto end;
++			}
++			break;
+ 		case 'h':
+ 			usage(progname);
+ 			config_destroy(cfg);
+@@ -1588,6 +1596,7 @@ int main(int argc, char *argv[])
+ 	}
+ 	priv.kernel_leap = config_get_int(cfg, NULL, "kernel_leap");
+ 	priv.sanity_freq_limit = config_get_int(cfg, NULL, "sanity_freq_limit");
++	priv.default_sync = config_get_int(cfg, NULL, "default_sync");
+ 
+ 	if (autocfg) {
+ 		if (init_pmc(cfg, &priv))
+-- 
+2.29.2
+

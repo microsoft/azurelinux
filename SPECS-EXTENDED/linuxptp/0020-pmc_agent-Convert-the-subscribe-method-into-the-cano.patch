@@ -1,0 +1,153 @@
+From 8c1dd261683d27acba49e047d9f6da52dada3c98 Mon Sep 17 00:00:00 2001
+From: Andre Mauricio Zelak <andre.zelak@windriver.com>
+Date: Mon, 12 Jun 2023 15:08:01 -0300
+Subject: [PATCH 20/47] pmc_agent: Convert the subscribe method into the
+ canonical form.
+
+This patch renames the function to have the module prefix and corrects the
+return code semantics.
+
+Signed-off-by: Richard Cochran <richardcochran@gmail.com>
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+
+[commit cc98d39f58adc1fd05db0038acfdcc5669f2ba8c upstream]
+Signed-off-by: Andre Mauricio Zelak <andre.zelak@windriver.com>
+---
+ phc2sys.c   |  4 ++--
+ pmc_agent.c | 48 +++++++++++++++++++++++++++++++++++-------------
+ pmc_agent.h |  9 ++++++++-
+ 3 files changed, 45 insertions(+), 16 deletions(-)
+
+diff --git a/phc2sys.c b/phc2sys.c
+index 280e249..f61e699 100644
+--- a/phc2sys.c
++++ b/phc2sys.c
+@@ -875,8 +875,8 @@ static int auto_init_ports(struct phc2sys_private *priv, int add_rt)
+ 		return -1;
+ 	}
+ 
+-	res = run_pmc_subscribe(priv->node, 1000);
+-	if (res <= 0) {
++	res = pmc_agent_subscribe(priv->node, 1000);
++	if (res) {
+ 		pr_err("failed to subscribe");
+ 		return -1;
+ 	}
+diff --git a/pmc_agent.c b/pmc_agent.c
+index 22d9c5b..9c5eb71 100644
+--- a/pmc_agent.c
++++ b/pmc_agent.c
+@@ -17,6 +17,7 @@
+  * with this program; if not, write to the Free Software Foundation, Inc.,
+  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+  */
++#include <errno.h>
+ #include <net/if.h>
+ #include <poll.h>
+ #include <stdlib.h>
+@@ -98,6 +99,26 @@ static int get_mgt_err_id(struct ptp_message *msg)
+ #define RUN_PMC_NODEV	-1
+ #define RUN_PMC_INTR	-2
+ 
++static bool is_run_pmc_error(int code)
++{
++	return code != RUN_PMC_OKAY;
++}
++
++static int run_pmc_err2errno(int code)
++{
++	switch (code) {
++	case RUN_PMC_TMO:
++		return -ETIMEDOUT;
++	case RUN_PMC_NODEV:
++		return -ENODEV;
++	case RUN_PMC_INTR:
++		return -EINTR;
++	case RUN_PMC_OKAY:
++	default:
++		return 0;
++	}
++}
++
+ static int run_pmc(struct pmc_agent *node, int timeout, int ds_id,
+ 		   struct ptp_message **msg)
+ {
+@@ -239,18 +260,6 @@ int run_pmc_get_number_ports(struct pmc_agent *node, int timeout)
+ 	return res;
+ }
+ 
+-int run_pmc_subscribe(struct pmc_agent *node, int timeout)
+-{
+-	struct ptp_message *msg;
+-	int res;
+-
+-	res = run_pmc(node, timeout, TLV_SUBSCRIBE_EVENTS_NP, &msg);
+-	if (res <= 0)
+-		return res;
+-	msg_put(msg);
+-	return 1;
+-}
+-
+ void run_pmc_events(struct pmc_agent *node)
+ {
+ 	struct ptp_message *msg;
+@@ -329,7 +338,7 @@ int update_pmc_node(struct pmc_agent *node, int subscribe)
+ 	    !(ts > node->pmc_last_update &&
+ 	      ts - node->pmc_last_update < PMC_UPDATE_INTERVAL)) {
+ 		if (subscribe)
+-			run_pmc_subscribe(node, 0);
++			pmc_agent_subscribe(node, 0);
+ 		if (run_pmc_get_utc_offset(node, 0) > 0)
+ 			node->pmc_last_update = ts;
+ 	}
+@@ -382,6 +391,19 @@ void pmc_agent_set_sync_offset(struct pmc_agent *agent, int offset)
+ 	agent->sync_offset = offset;
+ }
+ 
++int pmc_agent_subscribe(struct pmc_agent *node, int timeout)
++{
++	struct ptp_message *msg;
++	int res;
++
++	res = run_pmc(node, timeout, TLV_SUBSCRIBE_EVENTS_NP, &msg);
++	if (is_run_pmc_error(res)) {
++		return run_pmc_err2errno(res);
++	}
++	msg_put(msg);
++	return 0;
++}
++
+ bool pmc_agent_utc_offset_traceable(struct pmc_agent *agent)
+ {
+ 	return agent->utc_offset_traceable;
+diff --git a/pmc_agent.h b/pmc_agent.h
+index f3a26fe..9dc684e 100644
+--- a/pmc_agent.h
++++ b/pmc_agent.h
+@@ -34,7 +34,6 @@ typedef int pmc_node_recv_subscribed_t(void *context, struct ptp_message *msg,
+ int init_pmc_node(struct config *cfg, struct pmc_agent *agent, const char *uds,
+ 		  pmc_node_recv_subscribed_t *recv_subscribed, void *context);
+ int update_pmc_node(struct pmc_agent *agent, int subscribe);
+-int run_pmc_subscribe(struct pmc_agent *agent, int timeout);
+ int run_pmc_clock_identity(struct pmc_agent *agent, int timeout);
+ int run_pmc_wait_sync(struct pmc_agent *agent, int timeout);
+ int run_pmc_get_number_ports(struct pmc_agent *agent, int timeout);
+@@ -78,6 +77,14 @@ int pmc_agent_get_sync_offset(struct pmc_agent *agent);
+  */
+ void pmc_agent_set_sync_offset(struct pmc_agent *agent, int offset);
+ 
++/**
++ * Subscribes to push notifications of changes in port state.
++ * @param agent  Pointer to a PMC instance obtained via @ref pmc_agent_create().
++ * @param timeout  Transmit and receive timeout in milliseconds.
++ * @return         Zero on success, negative error code otherwise.
++ */
++int pmc_agent_subscribe(struct pmc_agent *agent, int timeout);
++
+ /**
+  * Tests whether the current UTC offset is traceable.
+  * @param agent  Pointer to a PMC instance obtained via @ref pmc_agent_create().
+-- 
+2.25.1
+

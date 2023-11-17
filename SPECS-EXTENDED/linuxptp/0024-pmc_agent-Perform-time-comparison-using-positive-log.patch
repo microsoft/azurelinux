@@ -1,0 +1,43 @@
+From d5421e4d4d86907648a59810ab9c27e739591971 Mon Sep 17 00:00:00 2001
+From: Andre Mauricio Zelak <andre.zelak@windriver.com>
+Date: Mon, 12 Jun 2023 15:35:23 -0300
+Subject: [PATCH 24/47] pmc_agent: Perform time comparison using positive
+ logic.
+
+In the update_pmc_node() method, reduce the expression
+!(x < y) to (x >= y).
+
+While we're at it, clean the coding style as well.
+
+Signed-off-by: Richard Cochran <richardcochran@gmail.com>
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+
+[commit fb92fec7cef9ee3345950c2633a7781b8bd3ca08 upstream]
+Signed-off-by: Andre Mauricio Zelak <andre.zelak@windriver.com>
+---
+ pmc_agent.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/pmc_agent.c b/pmc_agent.c
+index df3a562..ea6b3b7 100644
+--- a/pmc_agent.c
++++ b/pmc_agent.c
+@@ -351,12 +351,13 @@ int update_pmc_node(struct pmc_agent *node)
+ 	}
+ 	ts = tp.tv_sec * NS_PER_SEC + tp.tv_nsec;
+ 
+-	if (!(ts - node->pmc_last_update < PMC_UPDATE_INTERVAL)) {
++	if (ts - node->pmc_last_update >= PMC_UPDATE_INTERVAL) {
+ 		if (node->stay_subscribed) {
+ 			renew_subscription(node, 0);
+ 		}
+-		if (run_pmc_get_utc_offset(node, 0) > 0)
++		if (run_pmc_get_utc_offset(node, 0) > 0) {
+ 			node->pmc_last_update = ts;
++		}
+ 	}
+ 
+ 	return 0;
+-- 
+2.25.1
+

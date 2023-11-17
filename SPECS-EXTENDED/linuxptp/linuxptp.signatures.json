@@ -1,11 +1,15 @@
 {
  "Signatures": {
-  "clknetsim-79ffe4.tar.gz": "2d60fb5d6a12dd12fafa07b86a0ed8eba2bf552987e960c6d468c4869199dd6a",
-  "linuxptp-e05809.tar.gz": "296bcd84942ad0f9d0dccd703b89ba19a70a2633990598d0460dc7d017d15360",
-  "linuxptp-testsuite-a7f6e1.tar.gz": "ac0fc97a5e4b3ae61665bb07c922fdcf1e0d62ccc097a3de4367d72c2b0ec70a",
+  "clknetsim-9ed48d.tar.gz": "4e464ddb20c6436e8dfbc82305ae5187831a4b6b60b89dcdc92f59a0d3539496",
+  "linuxptp-3.1.1.tgz": "94d6855f9b7f2d8e9b0ca6d384e3fae6226ce6fc012dbad02608bdef3be1c0d9",
+  "linuxptp-testsuite-ff37e2.tar.gz": "038b1bb07ce5f03b3207bbfabe6f85d2cbbb16ef54b121a35749ca7e01d54648",
+  "linuxptp.fc": "3b7a87163f353408b57c059076a2a72689dd6b35b551ddc3042e4192912804d5",
+  "linuxptp.if": "cffc1a6564735f8e5b7ea9ee50b7aa3feee252816e206a7ce1ba545a90f74a20",
+  "linuxptp.te": "240715f4fcc0daa1e2fb44def8b968a69baf029dcdb7b887c33652bbd8f3ace2",
   "phc2sys.service": "4bab3fe8ba6b801d6092d820c4fa4514973f441af5967f4c597ecd60d863c752",
+  "ptp4l.conf": "c3ae7d8d845619f41f3743da9e46ea6f690d218383f127e0bf2b64de2e69c283",
   "ptp4l.service": "2d85b55077bb99091ddf66917b86044f75fe31584b647a7df06994eee5ecf6bd",
-  "timemaster.conf": "c8bbe715944126ac4063199981c4e157228ee52ed7caa71e2a9523d5d0c57943",
+  "timemaster.conf": "068104a097f468aaeb12bcf67eab2705736665a5546cda29be62be3c4593ddd5",
   "timemaster.service": "01af35467d2400f12e7c95df94e069bba89ad06c048b6f346fc26676db2e6b42"
  }
 }

@@ -1,0 +1,214 @@
+From babbe47ab091071e16fcd527bf1aad06e5aec377 Mon Sep 17 00:00:00 2001
+From: Andre Mauricio Zelak <andre.zelak@windriver.com>
+Date: Mon, 12 Jun 2023 18:16:31 -0300
+Subject: [PATCH 34/47] clock: Rename UDS variables to read-write.
+
+In preparation for a new read-only UDS port, rename variables of the
+current UDS port to make it clear it is read-write, as opposed to
+read-only.
+
+Signed-off-by: Miroslav Lichvar <mlichvar@redhat.com>
+
+[commit 1b781a5a086571859b0cfba687706d8fdc764d7f upstream]
+Signed-off-by: Andre Mauricio Zelak <andre.zelak@windriver.com>
+---
+ clock.c | 52 +++++++++++++++++++++++++++++-----------------------
+ 1 file changed, 29 insertions(+), 23 deletions(-)
+
+diff --git a/clock.c b/clock.c
+index f048771..d653c33 100644
+--- a/clock.c
++++ b/clock.c
+@@ -95,7 +95,7 @@ struct clock {
+ 	struct foreign_clock *best;
+ 	struct ClockIdentity best_id;
+ 	LIST_HEAD(ports_head, port) ports;
+-	struct port *uds_port;
++	struct port *uds_rw_port;
+ 	struct pollfd *pollfd;
+ 	int pollfd_valid;
+ 	int nports; /* does not include the UDS port */
+@@ -129,7 +129,7 @@ struct clock {
+ 	struct clock_stats stats;
+ 	int stats_interval;
+ 	struct clockcheck *sanity_check;
+-	struct interface *udsif;
++	struct interface *uds_rw_if;
+ 	LIST_HEAD(clock_subscribers_head, clock_subscriber) subscribers;
+ 	struct monitor *slave_event_monitor;
+ };
+@@ -243,7 +243,7 @@ static void clock_prune_subscriptions(struct clock *c)
+ void clock_send_notification(struct clock *c, struct ptp_message *msg,
+ 			     enum notification event)
+ {
+-	struct port *uds = c->uds_port;
++	struct port *uds = c->uds_rw_port;
+ 	struct clock_subscriber *s;
+ 
+ 	LIST_FOREACH(s, &c->subscribers, list) {
+@@ -265,13 +265,13 @@ void clock_destroy(struct clock *c)
+ {
+ 	struct port *p, *tmp;
+ 
+-	interface_destroy(c->udsif);
++	interface_destroy(c->uds_rw_if);
+ 	clock_flush_subscriptions(c);
+ 	LIST_FOREACH_SAFE(p, &c->ports, list, tmp) {
+ 		clock_remove_port(c, p);
+ 	}
+ 	monitor_destroy(c->slave_event_monitor);
+-	port_close(c->uds_port);
++	port_close(c->uds_rw_port);
+ 	free(c->pollfd);
+ 	if (c->clkid != CLOCK_REALTIME) {
+ 		phc_close(c->clkid);
+@@ -440,7 +440,7 @@ static int clock_management_fill_response(struct clock *c, struct port *p,
+ 		datalen = sizeof(*gsn);
+ 		break;
+ 	case TLV_SUBSCRIBE_EVENTS_NP:
+-		if (p != c->uds_port) {
++		if (p != c->uds_rw_port) {
+ 			/* Only the UDS port allowed. */
+ 			break;
+ 		}
+@@ -782,7 +782,7 @@ static int forwarding(struct clock *c, struct port *p)
+ 	default:
+ 		break;
+ 	}
+-	if (p == c->uds_port && ps != PS_FAULTY) {
++	if (p == c->uds_rw_port && ps != PS_FAULTY) {
+ 		return 1;
+ 	}
+ 	return 0;
+@@ -1042,20 +1042,20 @@ struct clock *clock_create(enum clock_type type, struct config *config,
+ 
+ 	/* Configure the UDS. */
+ 	uds_ifname = config_get_string(config, NULL, "uds_address");
+-	c->udsif = interface_create(uds_ifname);
+-	if (config_set_section_int(config, interface_name(c->udsif),
++	c->uds_rw_if = interface_create(uds_ifname);
++	if (config_set_section_int(config, interface_name(c->uds_rw_if),
+ 				   "announceReceiptTimeout", 0)) {
+ 		return NULL;
+ 	}
+-	if (config_set_section_int(config, interface_name(c->udsif),
++	if (config_set_section_int(config, interface_name(c->uds_rw_if),
+ 				    "delay_mechanism", DM_AUTO)) {
+ 		return NULL;
+ 	}
+-	if (config_set_section_int(config, interface_name(c->udsif),
++	if (config_set_section_int(config, interface_name(c->uds_rw_if),
+ 				    "network_transport", TRANS_UDS)) {
+ 		return NULL;
+ 	}
+-	if (config_set_section_int(config, interface_name(c->udsif),
++	if (config_set_section_int(config, interface_name(c->uds_rw_if),
+ 				   "delay_filter_length", 1)) {
+ 		return NULL;
+ 	}
+@@ -1178,14 +1178,15 @@ struct clock *clock_create(enum clock_type type, struct config *config,
+ 	}
+ 
+ 	/* Create the UDS interface. */
+-	c->uds_port = port_open(phc_device, phc_index, timestamping, 0, c->udsif, c);
+-	if (!c->uds_port) {
++	c->uds_rw_port = port_open(phc_device, phc_index, timestamping, 0,
++				   c->uds_rw_if, c);
++	if (!c->uds_rw_port) {
+ 		pr_err("failed to open the UDS port");
+ 		return NULL;
+ 	}
+ 	clock_fda_changed(c);
+ 
+-	c->slave_event_monitor = monitor_create(config, c->uds_port);
++	c->slave_event_monitor = monitor_create(config, c->uds_rw_port);
+ 	if (!c->slave_event_monitor) {
+ 		pr_err("failed to create slave event monitor");
+ 		return NULL;
+@@ -1204,7 +1205,7 @@ struct clock *clock_create(enum clock_type type, struct config *config,
+ 	LIST_FOREACH(p, &c->ports, list) {
+ 		port_dispatch(p, EV_INITIALIZE, 0);
+ 	}
+-	port_dispatch(c->uds_port, EV_INITIALIZE, 0);
++	port_dispatch(c->uds_rw_port, EV_INITIALIZE, 0);
+ 
+ 	return c;
+ }
+@@ -1312,7 +1313,7 @@ static void clock_check_pollfd(struct clock *c)
+ 		clock_fill_pollfd(dest, p);
+ 		dest += N_CLOCK_PFD;
+ 	}
+-	clock_fill_pollfd(dest, c->uds_port);
++	clock_fill_pollfd(dest, c->uds_rw_port);
+ 	c->pollfd_valid = 1;
+ }
+ 
+@@ -1329,7 +1330,7 @@ static int clock_do_forward_mgmt(struct clock *c,
+ 		return 0;
+ 
+ 	/* Don't forward any requests to the UDS port. */
+-	if (out == c->uds_port) {
++	if (out == c->uds_rw_port) {
+ 		switch (management_action(msg)) {
+ 		case GET:
+ 		case SET:
+@@ -1360,7 +1361,7 @@ static void clock_forward_mgmt_msg(struct clock *c, struct port *p, struct ptp_m
+ 				pr_err("port %d: management forward failed",
+ 				       port_number(piter));
+ 		}
+-		if (clock_do_forward_mgmt(c, p, c->uds_port, msg, &msg_ready))
++		if (clock_do_forward_mgmt(c, p, c->uds_rw_port, msg, &msg_ready))
+ 			pr_err("uds port: management forward failed");
+ 		if (msg_ready) {
+ 			msg_post_recv(msg, pdulen);
+@@ -1412,7 +1413,7 @@ int clock_manage(struct clock *c, struct port *p, struct ptp_message *msg)
+ 			clock_management_send_error(p, msg, TLV_WRONG_LENGTH);
+ 			return changed;
+ 		}
+-		if (p != c->uds_port) {
++		if (p != c->uds_rw_port) {
+ 			/* Sorry, only allowed on the UDS port. */
+ 			clock_management_send_error(p, msg, TLV_NOT_SUPPORTED);
+ 			return changed;
+@@ -1421,6 +1422,11 @@ int clock_manage(struct clock *c, struct port *p, struct ptp_message *msg)
+ 			return changed;
+ 		break;
+ 	case COMMAND:
++		if (p != c->uds_rw_port) {
++			/* Sorry, only allowed on the UDS port. */
++			clock_management_send_error(p, msg, TLV_NOT_SUPPORTED);
++			return changed;
++		}
+ 		break;
+ 	default:
+ 		return changed;
+@@ -1428,7 +1434,7 @@ int clock_manage(struct clock *c, struct port *p, struct ptp_message *msg)
+ 
+ 	switch (mgt->id) {
+ 	case TLV_PORT_PROPERTIES_NP:
+-		if (p != c->uds_port) {
++		if (p != c->uds_rw_port) {
+ 			/* Only the UDS port allowed. */
+ 			clock_management_send_error(p, msg, TLV_NOT_SUPPORTED);
+ 			return 0;
+@@ -1493,7 +1499,7 @@ int clock_manage(struct clock *c, struct port *p, struct ptp_message *msg)
+ 
+ void clock_notify_event(struct clock *c, enum notification event)
+ {
+-	struct port *uds = c->uds_port;
++	struct port *uds = c->uds_rw_port;
+ 	struct PortIdentity pid = port_identity(uds);
+ 	struct ptp_message *msg;
+ 	int id;
+@@ -1599,7 +1605,7 @@ int clock_poll(struct clock *c)
+ 	/* Check the UDS port. */
+ 	for (i = 0; i < N_POLLFD; i++) {
+ 		if (cur[i].revents & (POLLIN|POLLPRI)) {
+-			event = port_event(c->uds_port, i);
++			event = port_event(c->uds_rw_port, i);
+ 			if (EV_STATE_DECISION_EVENT == event) {
+ 				c->sde = 1;
+ 			}
+-- 
+2.25.1
+

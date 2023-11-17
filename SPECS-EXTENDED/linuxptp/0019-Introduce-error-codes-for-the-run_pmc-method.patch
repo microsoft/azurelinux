@@ -1,0 +1,81 @@
+From 95e4983c9ab517b9dda1faf171721f0dd877e076 Mon Sep 17 00:00:00 2001
+From: Andre Mauricio Zelak <andre.zelak@windriver.com>
+Date: Mon, 12 Jun 2023 15:04:11 -0300
+Subject: [PATCH 19/47] Introduce error codes for the run_pmc method.
+
+The run_pmc function is used by several of the PMC agent methods, but it
+breaks the pattern of returning zero on success.  However, the user facing
+PMC agent methods will need to conform to the return code convention used
+throughout the stack.
+
+In order to migrate to proper return codes, this patch replaces the hard
+coded result values with macros so that the interface methods can translate
+them to the required semantics of zero on success.
+
+Signed-off-by: Richard Cochran <richardcochran@gmail.com>
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+
+[commit 802259bbe40faa5f8bdebab36e6fbcbc51c3c2a2 upstream]
+Signed-off-by: Andre Mauricio Zelak <andre.zelak@windriver.com>
+---
+ pmc_agent.c | 19 +++++++++----------
+ 1 file changed, 9 insertions(+), 10 deletions(-)
+
+diff --git a/pmc_agent.c b/pmc_agent.c
+index 6e9c023..22d9c5b 100644
+--- a/pmc_agent.c
++++ b/pmc_agent.c
+@@ -93,12 +93,11 @@ static int get_mgt_err_id(struct ptp_message *msg)
+ 	return mgt->id;
+ }
+ 
+-/* Return values:
+- * 1: success
+- * 0: timeout
+- * -1: error reported by the other side
+- * -2: local error, fatal
+- */
++#define RUN_PMC_OKAY	 1
++#define RUN_PMC_TMO	 0
++#define RUN_PMC_NODEV	-1
++#define RUN_PMC_INTR	-2
++
+ static int run_pmc(struct pmc_agent *node, int timeout, int ds_id,
+ 		   struct ptp_message **msg)
+ {
+@@ -115,12 +114,12 @@ static int run_pmc(struct pmc_agent *node, int timeout, int ds_id,
+ 		cnt = poll(pollfd, N_FD, timeout);
+ 		if (cnt < 0) {
+ 			pr_err("poll failed");
+-			return -2;
++			return RUN_PMC_INTR;
+ 		}
+ 		if (!cnt) {
+ 			/* Request the data set again in the next run. */
+ 			node->pmc_ds_requested = 0;
+-			return 0;
++			return RUN_PMC_TMO;
+ 		}
+ 
+ 		/* Send a new request if there are no pending messages. */
+@@ -154,7 +153,7 @@ static int run_pmc(struct pmc_agent *node, int timeout, int ds_id,
+ 		res = is_msg_mgt(*msg);
+ 		if (res < 0 && get_mgt_err_id(*msg) == ds_id) {
+ 			node->pmc_ds_requested = 0;
+-			return -1;
++			return RUN_PMC_NODEV;
+ 		}
+ 		if (res <= 0 ||
+ 		    node->recv_subscribed(node->recv_context, *msg, ds_id) ||
+@@ -164,7 +163,7 @@ static int run_pmc(struct pmc_agent *node, int timeout, int ds_id,
+ 			continue;
+ 		}
+ 		node->pmc_ds_requested = 0;
+-		return 1;
++		return RUN_PMC_OKAY;
+ 	}
+ }
+ 
+-- 
+2.25.1
+
