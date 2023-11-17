@@ -1,7 +1,7 @@
 Summary:        Man pages
 Name:           man-pages
 Version:        5.13
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+ and GPLv2 and BSD and Latex2e and Verbatim and GPL+ and BSD with advertising and MIT and LDPL and Public Domain
 URL:            https://www.kernel.org/doc/man-pages
 Group:          System Environment/Base
@@ -20,6 +20,8 @@ The Man-pages package contains over 1,900 man pages.
 %install
 make DESTDIR=%{buildroot} prefix=/usr install
 #	The following man pages conflict with other packages
+rm -vf %{buildroot}%{_mandir}/man3/crypt.3
+rm -vf %{buildroot}%{_mandir}/man3/crypt_r.3
 rm -vf %{buildroot}%{_mandir}/man3/getspnam.3
 rm -vf %{buildroot}%{_mandir}/man5/passwd.5
 
@@ -37,6 +39,9 @@ rm -vf %{buildroot}%{_mandir}/man5/passwd.5
 %{_mandir}/man8/*
 
 %changelog
+* Fri Nov 17 2023 Andrew Phelps <anphel@microsoft.com> - 5.13-2
+- Remove conflicts with libxcrypt
+
 * Wed Feb 16 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 5.13-1
 - Upgrading to v5.13
 
