@@ -8,7 +8,7 @@ Distribution:   Mariner
 
 Name:		linuxptp
 Version:	3.1.1
-Release:	7%{?dist}
+Release:	1%{?dist}
 Summary:	PTP implementation for Linux
 
 License:	GPLv2+
@@ -169,9 +169,10 @@ fi
 %{_mandir}/man8/*.8*
 
 %changelog
-* Thu Nov 16 2023 Harshit Gupta <guptaharshit@microsoft.com> - 3.1.1-7
+* Thu Nov 16 2023 Harshit Gupta <guptaharshit@microsoft.com> - 3.1.1-1
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
 - License Verified.
+- Upstream linuxptp v3.1.1-6 has been imported into Azure Linux with package v3.1.1-1
 
 * Wed Jan 11 2023 Miroslav Lichvar <mlichvar@redhat.com> 3.1.1-6
 - update selinux policy (#2159919)
