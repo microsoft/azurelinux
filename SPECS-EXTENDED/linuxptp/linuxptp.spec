@@ -34,55 +34,9 @@ Patch1:		linuxptp-zerolength.patch
 # revert phc2sys options needed by the older version of test suite
 Patch2:		clknetsim-phc2sys.patch
 
-# The following patches are for HA in linuxptp
+# The following patch is a combination of multiple patches to enable HA in linuxptp
 # https://review.opendev.org/c/starlingx/integ/+/891638
-Patch3:         0001-clock-Reset-state-when-switching-port-with-same-best.patch
-Patch4:         0002-clock-Reset-clock-check-on-best-clock-port-change.patch
-Patch5:         0003-port-Don-t-check-timestamps-from-non-slave-ports.patch
-Patch6:         0004-port-Don-t-renew-raw-transport.patch
-Patch7:         0005-clockcheck-Increase-minimum-interval.patch
-Patch8:         0006-Add-option-to-disable-default-port-selection-in-phc2.patch
-Patch9:         0007-sysoff-Change-sysoff_measure-to-return-errno.patch
-Patch10:        0008-sysoff-Change-log-level-of-ioctl-error-messages.patch
-Patch11:        0009-sysoff-Retry-on-EBUSY-when-probing-supported-ioctls.patch
-Patch12:        0010-phc2sys-Don-t-exit-when-reading-of-PHC-fails-with-EB.patch
-Patch13:        0011-phc2sys-extract-PMC-functionality-into-a-smaller-str.patch
-Patch14:        0012-phc2sys-make-PMC-functions-non-static.patch
-Patch15:        0013-phc2sys-break-out-pmc-code-into-pmc_common.c.patch
-Patch16:        0014-Introduce-the-PMC-agent-module.patch
-Patch17:        0015-pmc_agent-Rename-pmc_node-to-something-more-descript.patch
-Patch18:        0016-pmc_agent-Hide-the-implementation.patch
-Patch19:        0017-Find-a-better-home-for-the-management-TLV-ID-helper-.patch
-Patch20:        0018-Find-a-better-home-for-the-management-TLV-data-helpe.patch
-Patch21:        0019-Introduce-error-codes-for-the-run_pmc-method.patch
-Patch22:        0020-pmc_agent-Convert-the-subscribe-method-into-the-cano.patch
-Patch23:        0021-pmc_agent-Simplify-the-update-method.patch
-Patch24:        0022-pmc_agent-Simplify-logic-in-update-method.patch
-Patch25:        0023-pmc_agent-Remove-bogus-comparison-between-last-updat.patch
-Patch26:        0024-pmc_agent-Perform-time-comparison-using-positive-log.patch
-Patch27:        0025-pmc_agent-Rename-the-update-method-and-attempt-to-do.patch
-Patch28:        0026-phc2sys-Fix-null-pointer-de-reference-in-manual-mode.patch
-Patch29:        0027-pmc_agent-Convert-the-method-that-queries-TAI-UTC-of.patch
-Patch30:        0028-pmc_agent-Convert-the-method-that-queries-the-port-p.patch
-Patch31:        0029-pmc_agent-Generalize-the-method-that-queries-the-loc.patch
-Patch32:        0030-pmc_agent-Simplify-the-method-that-gets-of-the-numbe.patch
-Patch33:        0031-pmc_agent-Let-the-update-method-poll-for-push-events.patch
-Patch34:        0032-phc2sys-Fix-regression-in-the-automatic-mode.patch
-Patch35:        0033-Implement-push-notification-for-TIME_STATUS_NP.patch
-Patch36:        0034-clock-Rename-UDS-variables-to-read-write.patch
-Patch37:        0035-clock-Add-read-only-UDS-port-for-monitoring.patch
-Patch38:        0036-Rename-management-ID-macros.patch
-Patch39:        0037-Enhance-phc2sys-to-accept-multiple-ptp4l-inputs.patch
-Patch40:        0038-Best-source-selection-algorithm.patch
-Patch41:        0039-Select-best-source-clock-after-state-changes.patch
-Patch42:        0040-Forced-lock-a-clock-source-in-configuration.patch
-Patch43:        0041-HA-phc2sys-com-socket.patch
-Patch44:        0042-Commands-enable-lock-and-disable-lock.patch
-Patch45:        0043-Commands-enable-source-and-disable-source.patch
-Patch46:        0044-Stream-type-phc2sys-com-socket.patch
-Patch47:        0045-Functions-starts_with-and-str_at_column.patch
-Patch48:        0046-Robustness-improvements-to-phc2sys-socket.patch
-Patch49:        0047-phc2sys-without-w-option.patch
+Patch3:         enable-ha.patch
 
 BuildRequires:	gcc gcc-c++ make systemd
 
