@@ -25,6 +25,12 @@
 %_var               /var
 %_localstatedir     /var
 
+#
+#   Locations for cross-compilation tooling
+#
+%_opt               /opt
+%_cross_prefix      %{_opt}/cross
+
 # https://fedoraproject.org/wiki/Changes/UnversionedDocdirs
 %_pkgdocdir         %{_docdir}/%{name}
 %_docdir_fmt        %%{NAME}

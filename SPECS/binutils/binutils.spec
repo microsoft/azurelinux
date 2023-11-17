@@ -9,6 +9,11 @@
 # Where the binaries aimed at gcc will live (ie. /usr/<target>/bin/)
 %global auxbin_prefix %{_exec_prefix}
 
+%global do_files() \
+%if %2 \
+    %files -n binutils-%1 -f files.%1 \
+%endif
+
 %global do_package() \
 %if %2 \
     %package -n binutils-%1 \
@@ -80,39 +85,43 @@ prep_target aarch64-%{_vendor}-linux-gnu %{build_aarch64}
 function config_cross_target () {
     local target=$1
 
-    local build_dir=${target%%%%-*}
-    local prefix=$target-
+    local program_prefix=$target-
 
-    echo "Will cross build for $target."
+    mkdir $target
+    pushd $target
 
-    mkdir $build_dir
-    pushd $build_dir
+        # --exec-prefix=%{auxbin_prefix} \
+        # --bindir=%{_bindir} \
+        # --sbindir=%{_sbindir} \
+        # --sysconfdir=%{_sysconfdir} \
+        # --datadir=%{_datadir} \
+        # --includedir=%{_includedir} \
+        # --libdir=%{_libdir} \
+        # --libexecdir=%{_libexecdir} \
+        # --localstatedir=%{_localstatedir} \
+        # --sharedstatedir=%{_sharedstatedir} \
+        # --mandir=%{_mandir} \
+        # --infodir=%{_infodir} \
 
     ../configure \
-        --prefix=%{_prefix} \
-        --exec-prefix=%{auxbin_prefix} \
-        --bindir=%{_bindir} \
-        --sbindir=%{_sbindir} \
-        --sysconfdir=%{_sysconfdir} \
-        --datadir=%{_datadir} \
-        --includedir=%{_includedir} \
-        --libdir=%{_libdir} \
-        --libexecdir=%{_libexecdir} \
-        --localstatedir=%{_localstatedir} \
-        --sharedstatedir=%{_sharedstatedir} \
-        --mandir=%{_mandir} \
-        --infodir=%{_infodir} \
+        --prefix=%{_cross_prefix}/$target \
         --build=%{_target_platform} \
         --host=%{_target_platform} \
-        --program-prefix=$prefix \
+        --program-prefix=$program_prefix \
         --target=$target \
         --disable-multilib \
-        --with-sysroot=%{_prefix}/$target/sys-root
+        --disable-nls \
+        --enable-shared \
+        --with-sysroot=%{_cross_prefix}/$target/sys-root
 
     popd
 }
 
-%configure \
+
+mkdir build
+pushd build
+
+../%configure \
     --disable-silent-rules \
     --disable-werror    \
     --enable-gold       \
@@ -121,21 +130,46 @@ function config_cross_target () {
     --enable-shared     \
     --with-system-zlib
 
+popd
+
+%make_build -C build tooldir=%{_prefix}
+
 while read -r target
 do
+    echo "=== BUILD target $target ==="
     config_cross_target $target
+    %make_build -C $target tooldir=%{_cross_prefix}/$target
 done < cross.list
-
-%make_build tooldir=%{_prefix}
 
 %install
 %make_install tooldir=%{_prefix}
-find %{buildroot} -type f -name "*.la" -delete -print
-rm -rf %{buildroot}%{_infodir}
 %find_lang %{name} --all-name
 
 install -m 644 libiberty/pic/libiberty.a %{buildroot}%{_libdir}
 install -m 644 include/libiberty.h %{buildroot}%{_includedir}
+
+while read -r target
+do
+    echo "=== INSTALL target $target ==="
+    %make_install -C $target tooldir=%{_cross_prefix}/$target
+done < cross.list
+
+function build_file_list () {
+    target=$1
+    # cpu=${target%%%%-*}
+
+    (
+        echo "%{_cross_prefix}/*"
+    ) > files.$target
+}
+
+while read -r target
+do
+    build_file_list $target
+done < cross.list
+
+find %{buildroot} -type f -name "*.la" -delete -print
+rm -rf %{buildroot}%{_infodir}
 
 %check
 sed -i 's/testsuite/ /g' gold/Makefile
@@ -214,6 +248,8 @@ sed -i 's/testsuite/ /g' gold/Makefile
 %{_libdir}/libiberty.a
 %{_libdir}/libopcodes.a
 %{_libdir}/libopcodes.so
+
+%do_files aarch64-linux-gnu	%{build_aarch64}
 
 %changelog
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.37-7
