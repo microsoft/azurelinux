@@ -7,8 +7,8 @@
 %global debug_package %{nil}
 
 Name:         kata-containers-cc
-Version:      0.6.1
-Release:      4%{?dist}
+Version:      0.6.2
+Release:      1%{?dist}
 Summary:      Kata Confidential Containers
 License:      ASL 2.0
 Vendor:       Microsoft Corporation
@@ -17,9 +17,7 @@ Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/cc-
 Source1:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{name}-%{version}.tar.gz
 Source2:      %{name}-%{version}-cargo.tar.gz
 Source3:      mariner-coco-build-uvm.sh
-Patch0:       0001-tardev-snapshotter-enable-feature-impl_trait_in_asso.patch
-Patch1:       drop-mut-for-variables-that-are-not-mutated.patch
-Patch2:       keep-uvm-rootfs-dependencies.patch
+Patch0:       keep-uvm-rootfs-dependencies.patch
 
 ExclusiveArch: x86_64
 
@@ -291,6 +289,9 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %exclude %{osbuilder}/tools/osbuilder/rootfs-builder/ubuntu
 
 %changelog
+*   Fri Nov 3 2023 Dallas Delaney <dadelan@microsoft.com> 0.6.2-1
+-   Upgrade to version 0.6.2
+
 *   Fri Nov 3 2023 Dallas Delaney <dadelan@microsoft.com> - 0.6.1-4
 -   Add patch to retain UVM rootfs dependencies
 

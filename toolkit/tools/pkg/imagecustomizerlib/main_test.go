@@ -15,7 +15,6 @@ var (
 	testDir    string
 	tmpDir     string
 	workingDir string
-	assetsDir  string
 )
 
 func TestMain(m *testing.M) {
@@ -30,7 +29,6 @@ func TestMain(m *testing.M) {
 
 	testDir = filepath.Join(workingDir, "testdata")
 	tmpDir = filepath.Join(workingDir, "_tmp")
-	assetsDir = filepath.Join(workingDir, "../../../resources/assets")
 
 	err = os.MkdirAll(tmpDir, os.ModePerm)
 	if err != nil {

@@ -1,13 +1,13 @@
 %global debug_package %{nil}
 
 %define our_gopath %{_topdir}/.gopath
-%define blobfuse2_version 2.1.0
+%define blobfuse2_version 2.1.1
 %define blobfuse2_health_monitor bfusemon
 
 Summary:        FUSE adapter - Azure Storage
 Name:           blobfuse2
 Version:        %{blobfuse2_version}
-Release:        3%{?dist}
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -80,6 +80,9 @@ install -D -m 0644 ./setup/blobfuse2-logrotate %{buildroot}%{_sysconfdir}/logrot
 %{_sysconfdir}/logrotate.d/blobfuse2
 
 %changelog
+* Thu Nov 02 2023 Sourav Gupta <souravgupta@microsoft.com> - 2.1.1-1
+- Bump version to 2.1.1
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.1.0-3
 - Bump release to rebuild with go 1.20.9
 
