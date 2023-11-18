@@ -1,6 +1,6 @@
 Summary:        MySQL.
 Name:           mysql
-Version:        8.0.33
+Version:        8.0.34
 Release:        1%{?dist}
 License:        GPLv2 with exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
@@ -72,14 +72,20 @@ make test
 %files devel
 %{_libdir}/*.so
 %{_libdir}/*.a
-%{_libdir}/private/icudt69l/brkitr/*.res
-%{_libdir}/private/icudt69l/brkitr/*.brk
-%{_libdir}/private/icudt69l/brkitr/*.dict
-%{_libdir}/private/icudt69l/unames.icu
+%{_libdir}/private/icudt73l/brkitr/*.res
+%{_libdir}/private/icudt73l/brkitr/*.brk
+%{_libdir}/private/icudt73l/brkitr/*.dict
+%{_libdir}/private/icudt73l/unames.icu
+%{_libdir}/private/icudt73l/cnvalias.icu
+%{_libdir}/private/icudt73l/uemoji.icu
+%{_libdir}/private/icudt73l/ulayout.icu
 %{_includedir}/*
 %{_libdir}/pkgconfig/mysqlclient.pc
 
 %changelog
+* Wed Nov 1 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.0.34-1
+- Auto-upgrade to 8.0.34 - address CVE-2023-22053, CVE-2023-22054, CVE-2023-22056, CVE-2023-22058, CVE-2023-22065, CVE-2023-22110, CVE-2023-22111, CVE-2023-22113, CVE-2023-22115
+
 * Mon Apr 24 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.0.33-1
 - Auto-upgrade to 8.0.33 - address CVE-2023-21976, CVE-2023-21972, CVE-2023-21982, CVE-2023-21977, CVE-2023-21980
 
