@@ -1,7 +1,7 @@
 Summary:        Development Libraries and headers for EFI
 Name:           gnu-efi
-Version:        3.0.9
-Release:        11%{?dist}
+Version:        3.0.17
+Release:        1%{?dist}
 License:        BSD
 URL:            https://sourceforge.net/projects/gnu-efi
 Vendor:         Microsoft Corporation
