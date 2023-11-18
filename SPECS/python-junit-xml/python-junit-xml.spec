@@ -1,5 +1,4 @@
 %global libname junit-xml
-
 %global common_description %{expand:
 A Python module for creating JUnit XML test result documents that can be read
 by tools such as Jenkins or Bamboo. If you are ever working with test tool or
@@ -7,15 +6,13 @@ test suite written in Python and want to take advantage of Jenkinsâ€™ or Bambooâ
 pretty graphs and test reporting capabilities, this module will let you
 generate the XML test reports.}
 
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-
-Name:           python-%{libname}
 Summary:        Python module for creating JUnit XML test result documents
+Name:           python-%{libname}
 Version:        1.9
 Release:        1%{?dist}
-
 License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://github.com/kyrus/python-junit-xml
 Source0:        https://files.pythonhosted.org/packages/source/j/%{libname}/%{libname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
@@ -164,4 +161,3 @@ Provides:       python3-junit_xml = %{version}-%{release}
 
 * Wed Feb 15 2017 James Hogarth <james.hogarth@gmail.com> - 1.7-1
 - Initial package
-
