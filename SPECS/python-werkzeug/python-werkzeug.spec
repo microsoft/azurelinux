@@ -9,8 +9,14 @@ Group:          Development/Languages/Python
 URL:            https://github.com/pallets/werkzeug
 Source0:        https://github.com/pallets/werkzeug/archive/%{version}.tar.gz#/werkzeug-%{version}.tar.gz
 Patch0:         0001-enable-tests-in-rpm-env.patch
-# Necessary because RPM build environment creates specific scenario that violates a core 
-# assumption the testing infrastructure of werkzeug makes
+# Werkzeug really doesn't like running tests in the RPM build environment,
+# so we have to do some trickery to get it to work by manually adding files to look
+# at. The %%tox macro explicitly sets PYTHONPATH rather than using a virtualenv and,
+# crucially, also puts Werkzeug in a directory considered to be a system directory.
+# Normally, Werkzeug is tested using an editable installation, where the source
+# directory is added to PYTHONPATH but not installed in a system directory.
+# This means all files this function would normally find are considered system files
+# and are excluded.
 Patch1:         0002-disable-stat-test.patch
 Patch2:         CVE-2023-46136.patch
 BuildArch:      noarch
