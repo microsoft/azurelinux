@@ -23,7 +23,7 @@ print_error() {
 help() {
 echo "
 Usage:
-sudo make containerized-rpmbuild [REPO_PATH=/path/to/CBL-Mariner] [MODE=test|build] [VERSION=1.0|2.0] [MOUNTS=/path/in/host:/path/in/container ...] [BUILD_MOUNT=/path/to/build/chroot/mount] [EXTRA_PACKAGES=pkg ...] [ENABLE_REPO=y]
+sudo make containerized-rpmbuild [REPO_PATH=/path/to/CBL-Mariner] [MODE=test|build] [VERSION=1.0|2.0] [MOUNTS=/path/in/host:/path/in/container ...] [BUILD_MOUNT=/path/to/build/chroot/mount] [EXTRA_PACKAGES=pkg ...] [ENABLE_REPO=y] [KEEP_CONTAINER=y]
 
 Starts a docker container with the specified version of mariner.
 
@@ -39,6 +39,7 @@ Optional arguments:
                         Mountpoints will be ${BUILD_MOUNT}/container-build and ${BUILD_MOUNT}/container-buildroot. default: $REPO_PATH/build
     EXTRA_PACKAGES  Space delimited list of packages to tdnf install in the container on startup. e.g. EXTRA_PACKAGES=\"pkg1 pkg2\" default: \"\"
     ENABLE_REPO:    Set to 'y' to use local RPMs to satisfy package dependencies. default: n
+    KEEP_CONTAINER: Set to 'y' to not cleanup container upon exit. default: n
 
     * User can override Mariner make definitions. Some useful overrides could be
                     SPECS_DIR: build specs from another directory like SPECS-EXTENDED by providing SPECS_DIR=path/to/SPECS-EXTENDED. default: $REPO_PATH/SPECS
@@ -79,6 +80,7 @@ fi
 script_dir=$(realpath $(dirname "${BASH_SOURCE[0]}"))
 topdir=/usr/src/mariner
 enable_local_repo=false
+keep_container="--rm"
 
 while (( "$#")); do
   case "$1" in
@@ -89,6 +91,7 @@ while (( "$#")); do
     -b ) build_mount_dir="$(realpath $2)"; shift 2;;
     -ep ) extra_packages="$2"; shift 2;;
     -r ) enable_local_repo=true; shift ;;
+    -k ) keep_container=""; shift ;;
     -h ) help; exit 1 ;;
     ? ) echo -e "ERROR: INVALID OPTION.\n\n"; help; exit 1 ;;
   esac
@@ -242,7 +245,7 @@ docker build -q \
 
 echo "docker_image_tag is ${docker_image_tag}"
 
-bash -c "docker run --rm \
+bash -c "docker run $keep_container\
     ${mount_arg} \
     -it ${docker_image_tag} /bin/bash; \
     if [[ -d $RPMS_DIR/repodata ]]; then { rm -r $RPMS_DIR/repodata; echo 'Clearing repodata' ; }; fi

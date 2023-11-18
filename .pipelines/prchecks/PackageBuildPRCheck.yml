@@ -70,6 +70,10 @@ extends:
                       outputArtifactsFolder: $(ob_outputDirectory)
                       selfRepoName: self
 
+                  # Toolchain package tests should be run through the full package build, calculate the list of packages that should be re-tested
+                  # and make it available to the next stage via an output variable: 'CalculateToolchainPackageRetestList.toolchainPackageRetestList'
+                  - template: .pipelines/templates/ToolchainCalculatePackageRetests.yml@self
+
                   # 1. Automatic publishing won't work if 'isCustom: true' is set on the pool. We cannot do 'isCustom: false' because
                   #    then OneBranch attempts to perform additional actions (adding build tags for instance), which require additional permissions
                   #    that the PR check pipeline does not have.
@@ -92,6 +96,7 @@ extends:
                 variables:
                   ob_artifactBaseName: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}
                   ob_outputDirectory: $(Build.ArtifactStagingDirectory)
+                  testListFromToolchain: $[ stageDependencies.Toolchain_${{ configuration.name }}.Build.outputs['CalculateToolchainPackageRetestList.toolchainPackageRetestList'] ]
                 steps:
                   - template: .pipelines/templates/PackageBuild.yml@self
                     parameters:
@@ -103,6 +108,7 @@ extends:
                       pipArtifactFeeds: "mariner/Mariner-Pypi-Feed"
                       selfRepoName: self
                       testSuiteName: "[${{ configuration.name }}] Package test"
+                      testRerunList: "$(testListFromToolchain)"
 
                   - task: PublishPipelineArtifact@1
                     inputs:
