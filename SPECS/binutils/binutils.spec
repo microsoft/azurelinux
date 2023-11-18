@@ -1,3 +1,6 @@
+# Overriding the default to call 'configure' from subdirectories.
+%global _configure ../configure
+
 %ifarch x86_64
 %global build_all_cross 1
 %else
@@ -7,20 +10,21 @@
 %global build_aarch64 %{build_all_cross}
 
 # Where the binaries aimed at gcc will live (ie. /usr/<target>/bin/)
-%global auxbin_prefix %{_exec_prefix}
+# %global auxbin_prefix %{_exec_prefix}
 
 %global do_files() \
 %if %2 \
-    %files -n binutils-%1 -f files.%1 \
+%files -n binutils-%1 \
+%{_cross_prefix}/%1 \
 %endif
 
 %global do_package() \
 %if %2 \
-    %package -n binutils-%1 \
-    Summary: Cross-build binary utilities for %1 \
-    Requires: %{name}-common = %{version}-%{release} \
-    %description -n binutils-%1 \
-    Cross-build binary image generation, manipulation and query tools. \
+%package -n binutils-%1 \
+Summary: Cross-build binary utilities for %1 \
+Requires: %{name}-common = %{version}-%{release} \
+%description -n binutils-%1 \
+Cross-build binary image generation, manipulation and query tools. \
 %endif
 
 Summary:        Contains a linker, an assembler, and other tools
@@ -64,7 +68,7 @@ Requires:       %{name} = %{version}
 It contains the libraries and header files to create applications
 for handling compiled objects.
 
-%do_package aarch64-%{_vendor}-linux-gnu %{build_aarch64}
+%do_package aarch64-linux-gnu %{build_aarch64}
 
 %prep
 %autosetup -p1
@@ -79,7 +83,7 @@ function prep_target () {
     fi
 }
 
-prep_target aarch64-%{_vendor}-linux-gnu %{build_aarch64}
+prep_target aarch64-linux-gnu %{build_aarch64}
 
 %build
 function config_cross_target () {
@@ -111,17 +115,16 @@ function config_cross_target () {
         --target=$target \
         --disable-multilib \
         --disable-nls \
-        --enable-shared \
         --with-sysroot=%{_cross_prefix}/$target/sys-root
+        # --enable-shared \
 
     popd
 }
 
-
 mkdir build
 pushd build
 
-../%configure \
+%configure \
     --disable-silent-rules \
     --disable-werror    \
     --enable-gold       \
@@ -142,34 +145,36 @@ do
 done < cross.list
 
 %install
-%make_install tooldir=%{_prefix}
+%make_install -C build tooldir=%{_prefix}
 %find_lang %{name} --all-name
 
-install -m 644 libiberty/pic/libiberty.a %{buildroot}%{_libdir}
+install -m 644 build/libiberty/pic/libiberty.a %{buildroot}%{_libdir}
 install -m 644 include/libiberty.h %{buildroot}%{_includedir}
+
+rm -rf %{buildroot}%{_infodir}
 
 while read -r target
 do
     echo "=== INSTALL target $target ==="
     %make_install -C $target tooldir=%{_cross_prefix}/$target
+
+    # Remove cross %%{_infodir} and man files.
+    rm -rf %{_cross_prefix}/$target/share
 done < cross.list
 
-function build_file_list () {
-    target=$1
-    # cpu=${target%%%%-*}
+# function build_file_list () {
+#     target=$1
+#     # cpu=${target%%%%-*}
 
-    (
-        echo "%{_cross_prefix}/*"
-    ) > files.$target
-}
+#     echo "%{_cross_prefix}/$target" > files.$target
+# }
 
-while read -r target
-do
-    build_file_list $target
-done < cross.list
+# while read -r target
+# do
+#     build_file_list $target
+# done < cross.list
 
 find %{buildroot} -type f -name "*.la" -delete -print
-rm -rf %{buildroot}%{_infodir}
 
 %check
 sed -i 's/testsuite/ /g' gold/Makefile
