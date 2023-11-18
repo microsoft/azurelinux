@@ -27,7 +27,7 @@ Cross-build binary image generation, manipulation and query tools. \
 Summary:        Contains a linker, an assembler, and other tools
 Name:           binutils
 Version:        2.37
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -229,6 +229,10 @@ sed -i 's/testsuite/ /g' gold/Makefile
 %do_files aarch64-linux-gnu	%{build_aarch64}
 
 %changelog
+* Fri Nov 17 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.37-8
+- Add the cross-compilation subpackage for aarch64.
+- Used Fedora 38 spec (license: MIT) for guidance.
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.37-7
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

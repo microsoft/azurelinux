@@ -53,7 +53,7 @@ mkdir -p /%{buildroot}%{_includedir}
 cp -rv usr/include/* /%{buildroot}%{_includedir}
 
 for cross_arch in %{cross_archs}; do
-    cross_arch_includedir=/%{buildroot}%{_prefix}/${cross_arch}-linux-gnu/include
+    cross_arch_includedir=/%{buildroot}%{_cross_prefix}/${cross_arch}-linux-gnu/include
     mkdir -p $cross_arch_includedir
     cp -rv usr/include-$cross_arch/usr/include/* $cross_arch_includedir
 done
@@ -66,12 +66,12 @@ done
 %ifarch x86_64
 %files -n kernel-cross-headers
 %defattr(-,root,root)
-%{_prefix}/*-linux-gnu/*
+%{_cross_prefix}/*-linux-gnu/*
 %endif
 
 %changelog
-* Wed Nov 15 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.137.1-3
-- Add the 'kernel-cross-headers' subpackage for the x86_64 architecture.
+* Wed Nov 15 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.137.1-2
+- Add the 'kernel-cross-headers' subpackage for aarch64.
 - Used Fedora 38 spec (license: MIT) for guidance.
 
 * Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.137.1-1

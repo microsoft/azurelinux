@@ -9,7 +9,7 @@
 Summary:        Hyper-V daemons suite
 Name:           hyperv-daemons
 Version:        5.15.137.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -219,6 +219,9 @@ fi
 %{_sbindir}/lsvmbus
 
 %changelog
+* Fri Nov 17 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.137.1-2
+- Bump release to match kernel-headers.
+
 * Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.137.1-1
 - Auto-upgrade to 5.15.137.1
 
