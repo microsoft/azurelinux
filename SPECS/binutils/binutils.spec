@@ -9,9 +9,6 @@
 
 %global build_aarch64 %{build_all_cross}
 
-# Where the binaries aimed at gcc will live (ie. /usr/<target>/bin/)
-# %global auxbin_prefix %{_exec_prefix}
-
 %global do_files() \
 %if %2 \
 %files -n binutils-%1 \
@@ -75,9 +72,9 @@ for handling compiled objects.
 
 function prep_target () {
     local target=$1
-    local cond=$2
+    local condition=$2
 
-    if [ $cond != 0 ]
+    if [ $condition != 0 ]
     then
 	    echo $1 >> cross.list
     fi
@@ -86,6 +83,7 @@ function prep_target () {
 prep_target aarch64-linux-gnu %{build_aarch64}
 
 %build
+
 function config_cross_target () {
     local target=$1
 
@@ -93,19 +91,6 @@ function config_cross_target () {
 
     mkdir $target
     pushd $target
-
-        # --exec-prefix=%{auxbin_prefix} \
-        # --bindir=%{_bindir} \
-        # --sbindir=%{_sbindir} \
-        # --sysconfdir=%{_sysconfdir} \
-        # --datadir=%{_datadir} \
-        # --includedir=%{_includedir} \
-        # --libdir=%{_libdir} \
-        # --libexecdir=%{_libexecdir} \
-        # --localstatedir=%{_localstatedir} \
-        # --sharedstatedir=%{_sharedstatedir} \
-        # --mandir=%{_mandir} \
-        # --infodir=%{_infodir} \
 
     ../configure \
         --prefix=%{_cross_prefix}/$target \
@@ -116,7 +101,6 @@ function config_cross_target () {
         --disable-multilib \
         --disable-nls \
         --with-sysroot=%{_cross_prefix}/$target/sys-root
-        # --enable-shared \
 
     popd
 }
@@ -139,7 +123,7 @@ popd
 
 while read -r target
 do
-    echo "=== BUILD target $target ==="
+    echo "=== BUILD cross-compilation target $target ==="
     config_cross_target $target
     %make_build -C $target tooldir=%{_cross_prefix}/$target
 done < cross.list
@@ -155,24 +139,12 @@ rm -rf %{buildroot}%{_infodir}
 
 while read -r target
 do
-    echo "=== INSTALL target $target ==="
+    echo "=== INSTALL cross-compilation target $target ==="
     %make_install -C $target tooldir=%{_cross_prefix}/$target
 
     # Remove cross %%{_infodir} and man files.
-    rm -rf %{_cross_prefix}/$target/share
+    rm -rf %{buildroot}%{_cross_prefix}/$target/share
 done < cross.list
-
-# function build_file_list () {
-#     target=$1
-#     # cpu=${target%%%%-*}
-
-#     echo "%{_cross_prefix}/$target" > files.$target
-# }
-
-# while read -r target
-# do
-#     build_file_list $target
-# done < cross.list
 
 find %{buildroot} -type f -name "*.la" -delete -print
 
