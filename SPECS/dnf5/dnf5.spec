@@ -17,7 +17,7 @@
 %bcond_without plugin_actions
 %bcond_without python_plugins_loader
 %bcond_without comps
-%bcond_without modulemd
+%bcond_with modulemd
 %bcond_without zchunk
 %bcond_with    html
 %bcond_with    man
@@ -37,7 +37,7 @@
 Summary:        Command-line package manager
 Name:           dnf5
 Version:        %{project_version_major}.%{project_version_minor}.%{project_version_patch}
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -75,9 +75,9 @@ BuildRequires:  pkgconfig(cppunit)
 %if %{with comps}
 BuildRequires:  pkgconfig(libcomps)
 %endif
-%if %{with modulemd}
-BuildRequires:  pkgconfig(modulemd-2.0) >= %{libmodulemd_version}
-%endif
+#%if %{with modulemd}
+#BuildRequires:  pkgconfig(modulemd-2.0) >= %{libmodulemd_version}
+#%endif
 %if %{with zchunk}
 BuildRequires:  pkgconfig(zck) >= %{zchunk_version}
 %endif
@@ -590,6 +590,9 @@ done
 
 
 %changelog
+* Tue Nov 14 2023 Sam Meluch <sammeluch@microsoft.com> - 5.0.14-3
+- compile without modulemd
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.0.14-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

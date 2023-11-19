@@ -55,6 +55,9 @@ debugedit-5.0-2.cm2.aarch64.rpm
 debugedit-debuginfo-5.0-2.cm2.aarch64.rpm
 diffutils-3.10-1.cm2.aarch64.rpm
 diffutils-debuginfo-3.10-1.cm2.aarch64.rpm
+dnf5-5.0.14-3.cm2.aarch64.rpm
+dnf5-devel-5.0.14-3.cm2.aarch64.rpm
+dnf5-plugins-5.0.14-3.cm2.aarch64.rpm
 docbook-dtd-xml-4.5-11.cm2.noarch.rpm
 docbook-style-xsl-1.79.1-13.cm2.noarch.rpm
 dwz-0.14-2.cm2.aarch64.rpm
@@ -89,6 +92,8 @@ findutils-lang-4.9.0-1.cm2.aarch64.rpm
 flex-2.6.4-7.cm2.aarch64.rpm
 flex-debuginfo-2.6.4-7.cm2.aarch64.rpm
 flex-devel-2.6.4-7.cm2.aarch64.rpm
+fmt-8.1.1-1.cm2.aarch64.rpm
+fmt-devel-8.1.1-1.cm2.aarch64.rpm
 gawk-5.2.2-1.cm2.aarch64.rpm
 gawk-debuginfo-5.2.2-1.cm2.aarch64.rpm
 gcc-13.2.0-1.cm2.aarch64.rpm
@@ -134,6 +139,8 @@ gzip-1.13-1.cm2.aarch64.rpm
 gzip-debuginfo-1.13-1.cm2.aarch64.rpm
 intltool-0.51.0-7.cm2.noarch.rpm
 itstool-2.0.6-4.cm2.noarch.rpm
+json-c-0.15-2.cm2.aarch64.rpm
+json-c-devel-0.15-2.cm2.aarch64.rpm
 kbd-2.2.0-1.cm2.aarch64.rpm
 kbd-debuginfo-2.2.0-1.cm2.aarch64.rpm
 kernel-headers-6.1.58.1-1.cm2.noarch.rpm
@@ -157,6 +164,11 @@ libcap-devel-2.69-1.cm2.aarch64.rpm
 libcap-ng-0.8.2-2.cm2.aarch64.rpm
 libcap-ng-debuginfo-0.8.2-2.cm2.aarch64.rpm
 libcap-ng-devel-0.8.2-2.cm2.aarch64.rpm
+libdnf5-5.0.14-3.cm2.aarch64.rpm
+libdnf5-cli-5.0.14-3.cm2.aarch64.rpm
+libdnf5-cli-devel-5.0.14-3.cm2.aarch64.rpm
+libdnf5-devel-5.0.14-3.cm2.aarch64.rpm
+libdnf5-plugin-actions-5.0.14-3.cm2.aarch64.rpm
 libffi-3.4.4-1.cm2.aarch64.rpm
 libffi-debuginfo-3.4.4-1.cm2.aarch64.rpm
 libffi-devel-3.4.4-1.cm2.aarch64.rpm
@@ -180,6 +192,8 @@ libltdl-devel-2.4.7-1.cm2.aarch64.rpm
 libmetalink-0.1.3-1.cm2.aarch64.rpm
 libmetalink-debuginfo-0.1.3-1.cm2.aarch64.rpm
 libmetalink-devel-0.1.3-1.cm2.aarch64.rpm
+libmodulemd-2.13.0-2.cm2.aarch64.rpm
+libmodulemd-devel-2.13.0-2.cm2.aarch64.rpm
 libmpc-1.2.1-1.cm2.aarch64.rpm
 libmpc-debuginfo-1.2.1-1.cm2.aarch64.rpm
 libpipeline-1.5.7-1.cm2.aarch64.rpm
@@ -521,6 +535,9 @@ python3-devel-3.9.14-8.cm2.aarch64.rpm
 python3-gpg-1.16.0-2.cm2.aarch64.rpm
 python3-jinja2-3.0.3-2.cm2.noarch.rpm
 python3-libcap-ng-0.8.2-2.cm2.aarch64.rpm
+python3-libdnf5-5.0.14-3.cm2.aarch64.rpm
+python3-libdnf5-cli-5.0.14-3.cm2.aarch64.rpm
+python3-libdnf5-python-plugins-loader-5.0.14-3.cm2.aarch64.rpm
 python3-libs-3.9.14-8.cm2.aarch64.rpm
 python3-libxml2-2.10.4-2.cm2.aarch64.rpm
 python3-lxml-4.9.3-1.cm2.aarch64.rpm
@@ -561,9 +578,6 @@ systemd-bootstrap-devel-250.3-14.cm2.aarch64.rpm
 systemd-bootstrap-rpm-macros-250.3-14.cm2.noarch.rpm
 tar-1.34-2.cm2.aarch64.rpm
 tar-debuginfo-1.34-2.cm2.aarch64.rpm
-dnf5-5.0.14-2.cm2.aarch64.rpm
-dnf5-devel-5.0.14-2.cm2.aarch64.rpm
-dnf5-plugins-5.0.14-2.cm2.aarch64.rpm
 tdnf-3.5.2-2.cm2.aarch64.rpm
 tdnf-autoupdate-3.5.2-2.cm2.aarch64.rpm
 tdnf-cli-libs-3.5.2-2.cm2.aarch64.rpm
@@ -574,6 +588,7 @@ tdnf-plugin-repogpgcheck-3.5.2-2.cm2.aarch64.rpm
 tdnf-python-3.5.2-2.cm2.aarch64.rpm
 texinfo-7.0.3-1.cm2.aarch64.rpm
 texinfo-debuginfo-7.0.3-1.cm2.aarch64.rpm
+toml11-devel-3.7.0-2.cm2.aarch64.rpm
 unzip-6.0-20.cm2.aarch64.rpm
 unzip-debuginfo-6.0-20.cm2.aarch64.rpm
 util-linux-2.37.4-8.cm2.aarch64.rpm
@@ -588,6 +603,9 @@ xz-debuginfo-5.4.4-1.cm2.aarch64.rpm
 xz-devel-5.4.4-1.cm2.aarch64.rpm
 xz-lang-5.4.4-1.cm2.aarch64.rpm
 xz-libs-5.4.4-1.cm2.aarch64.rpm
+zchunk-1.1.16-3.cm2.aarch64.rpm
+zchunk-devel-1.1.16-3.aarch64.rpm
+zchunk-libs-1.1.16-3.aarch64.rpm
 zip-3.0-5.cm2.aarch64.rpm
 zip-debuginfo-3.0-5.cm2.aarch64.rpm
 zlib-1.3-1.cm2.aarch64.rpm

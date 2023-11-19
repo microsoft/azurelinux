@@ -580,7 +580,18 @@ chroot_and_install_rpms gpgme
 chroot_and_install_rpms libmetalink
 build_rpm_in_chroot_no_install pinentry
 
+# dnf5 needs
+build_rpm_in_chroot_no_install toml11
+chroot_and_install_rpms toml11
+build_rpm_in_chroot_no_install fmt
+chroot_and_install_rpms fmt
+build_rpm_in_chroot_no_install json-c
+chroot_and_install_rpms json-c
+build_rpm_in_chroot_no_install zchunk
+chroot_and_install_rpms zchunk
+
 build_rpm_in_chroot_no_install tdnf
+build_rpm_in_chroot_no_install dnf5
 
 # Build createrepo_c
 # createrepo_c needs cmake, file, glib
