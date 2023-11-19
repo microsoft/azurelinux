@@ -247,7 +247,7 @@ fi
 %{_datadir}/pkgconfig/udev.pc
 
 %changelog
-* Wed Oct 15 2023 Dan Streetman <ddstreet@ieee.org> - 250.3-14
+* Wed Nov 15 2023 Dan Streetman <ddstreet@ieee.org> - 250.3-14
 - Bump release
 
 * Wed Nov 08 2023 Andrew Phelps <anphel@microsoft.com> - 250.3-13
