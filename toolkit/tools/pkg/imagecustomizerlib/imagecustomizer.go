@@ -6,7 +6,9 @@ package imagecustomizerlib
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"regexp"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
@@ -116,6 +118,14 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 		return fmt.Errorf("failed to convert image file to format: %s:\n%w", outputImageFormat, err)
 	}
 
+	if config.SystemConfig.Verity.VerityTab != "" {
+		// Customize image for dm-verity, setting up verity metadata and security features.
+		err = customizeVerityImageHelper(buildDirAbs, baseConfigPath, config, outputImageFile, rpmsSources, useBaseImageRpmRepos)
+		if err != nil {
+			return err
+		}
+	}
+
 	logger.Log.Infof("Success!")
 
 	return nil
@@ -216,6 +226,113 @@ func customizeImageHelper(buildDir string, baseConfigPath string, config *imagec
 	}
 
 	err = imageConnection.CleanClose()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
+	buildImageFile string, rpmsSources []string, useBaseImageRpmRepos bool,
+) error {
+	var err error
+
+	// Connect the disk image to an NBD device using qemu-nbd
+	// Find a free NBD device
+	nbdDevice, err := findFreeNBDDevice()
+	if err != nil {
+		return fmt.Errorf("failed to find a free nbd device: %v", err)
+	}
+
+	_, _, err = shell.Execute("sudo", "qemu-nbd", "-c", nbdDevice, buildImageFile)
+	if err != nil {
+		return fmt.Errorf("failed to connect nbd %s to image %s", nbdDevice, buildImageFile)
+	}
+	defer func() {
+		// Disconnect the NBD device when the function returns
+		_, _, err = shell.Execute("sudo", "qemu-nbd", "-d", nbdDevice)
+		if err != nil {
+			return
+		}
+	}()
+
+	// Resolve VerityDevice and HashDevice if they are specified as PARTUUID or PARTLABEL
+	resolvedVerityDevice, err := findDeviceByUUIDOrLabel(config.SystemConfig.Verity.VerityDevice)
+	if err != nil {
+		return fmt.Errorf("failed to resolve verity device %s: %v", config.SystemConfig.Verity.VerityDevice, err)
+	}
+	resolvedHashDevice, err := findDeviceByUUIDOrLabel(config.SystemConfig.Verity.HashDevice)
+	if err != nil {
+		return fmt.Errorf("failed to resolve hash device %s: %v", config.SystemConfig.Verity.HashDevice, err)
+	}
+
+	// Convert the system config devices to nbd partitions
+	nbdVerityDevice, err := convertToNbdDevicePath(nbdDevice, resolvedVerityDevice)
+	if err != nil {
+		return err
+	}
+	nbdHashDevice, err := convertToNbdDevicePath(nbdDevice, resolvedHashDevice)
+	if err != nil {
+		return err
+	}
+
+	// Extract salt and root hash using regular expressions
+	verityOutput, _, err := shell.Execute("sudo", "veritysetup", "format", nbdVerityDevice, nbdHashDevice)
+	if err != nil {
+		return fmt.Errorf("failed to calculate root hash:\n%w", err)
+	}
+
+	var salt, rootHash string
+	saltRegex := regexp.MustCompile(`Salt:\s+([0-9a-fA-F]+)`)
+	rootHashRegex := regexp.MustCompile(`Root hash:\s+([0-9a-fA-F]+)`)
+
+	saltMatches := saltRegex.FindStringSubmatch(verityOutput)
+	if len(saltMatches) > 1 {
+		salt = saltMatches[1]
+	}
+
+	rootHashMatches := rootHashRegex.FindStringSubmatch(verityOutput)
+	if len(rootHashMatches) > 1 {
+		rootHash = rootHashMatches[1]
+	}
+
+	if salt == "" || rootHash == "" {
+		return fmt.Errorf("failed to parse salt or root hash from veritysetup output")
+	}
+
+	resolvedBootDevice, err := findDeviceByUUIDOrLabel(config.SystemConfig.Verity.BootDevice)
+	if err != nil {
+		return fmt.Errorf("failed to resolve boot device %s: %v", config.SystemConfig.Verity.BootDevice, err)
+	}
+
+	nbdBootDevice, err := convertToNbdDevicePath(nbdDevice, resolvedBootDevice)
+	if err != nil {
+		return err
+	}
+
+	// Create a directory for mounting the boot partition
+	bootMountDir := "/mnt/boot_partition"
+	if err := os.MkdirAll(bootMountDir, 0755); err != nil {
+		return fmt.Errorf("failed to create mount directory %s: %v", bootMountDir, err)
+	}
+	defer func() {
+		// Cleanup: Unmount and remove the directory when the function returns
+		if err := exec.Command("sudo", "umount", bootMountDir).Run(); err != nil {
+			fmt.Printf("Warning: failed to unmount %s: %v\n", bootMountDir, err)
+		}
+		if err := os.Remove(bootMountDir); err != nil {
+			fmt.Printf("Warning: failed to remove %s: %v\n", bootMountDir, err)
+		}
+	}()
+
+	_, _, err = shell.Execute("sudo", "mount", nbdBootDevice, bootMountDir)
+	if err != nil {
+		return err
+	}
+
+	// Update grub configuration
+	err = updateGrubConfig(resolvedVerityDevice, resolvedHashDevice, salt, rootHash, config.SystemConfig.Verity.VerityCorruptionResponse)
 	if err != nil {
 		return err
 	}
