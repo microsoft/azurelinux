@@ -4,9 +4,14 @@
 package imagecustomizerlib
 
 import (
+	"bytes"
 	"fmt"
+	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"regexp"
+	"strings"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
@@ -103,6 +108,12 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 	_, _, err = shell.Execute("qemu-img", "convert", "-O", qemuOutputImageFormat, buildImageFile, outputImageFile)
 	if err != nil {
 		return fmt.Errorf("failed to convert image file to format: %s:\n%w", outputImageFormat, err)
+	}
+
+	// Customize the nbd image file.
+	err = customizeImageHelperNbd(buildDirAbs, baseConfigPath, config, outputImageFile, rpmsSources, useBaseImageRpmRepos)
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -232,4 +243,144 @@ func customizeImageHelper(buildDir string, baseConfigPath string, config *imagec
 	}
 
 	return nil
+}
+
+func customizeImageHelperNbd(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
+	buildImageFile string, rpmsSources []string, useBaseImageRpmRepos bool,
+) error {
+	var err error
+
+	// Connect the disk image to an NBD device using qemu-nbd
+	nbdDevice := "/dev/nbd0" // You may want to dynamically find a free nbd device
+	_, _, err = shell.Execute("sudo", "qemu-nbd", "-c", nbdDevice, buildImageFile)
+	if err != nil {
+		return fmt.Errorf("failed to connect nbd %s to image %s", nbdDevice, buildImageFile)
+	}
+	defer func() {
+		// Disconnect the NBD device when the function returns
+		_, _, err = shell.Execute("sudo", "qemu-nbd", "-d", nbdDevice)
+		if err != nil {
+			return
+		}
+	}()
+
+	// Check if the NBD device is connected using lsblk
+	var out bytes.Buffer
+	lsblkCmd := exec.Command("lsblk")
+	lsblkCmd.Stdout = &out // Redirects output to buffer
+	if err := lsblkCmd.Run(); err != nil {
+		return fmt.Errorf("failed to execute lsblk:\n%w", err)
+	}
+
+	// Print the output of lsblk
+	fmt.Println("Output of lsblk:")
+	fmt.Println(out.String())
+
+	// Extract salt and root hash using regular expressions
+	verityOutput, _, err := shell.Execute("sudo", "veritysetup", "format", "/dev/nbd0p3", "/dev/nbd0p6")
+	if err != nil {
+		return fmt.Errorf("failed to calculate root hash:\n%w", err)
+	}
+
+	var salt, rootHash string
+	saltRegex := regexp.MustCompile(`Salt:\s+([0-9a-fA-F]+)`)
+	rootHashRegex := regexp.MustCompile(`Root hash:\s+([0-9a-fA-F]+)`)
+
+	saltMatches := saltRegex.FindStringSubmatch(verityOutput)
+	if len(saltMatches) > 1 {
+		salt = saltMatches[1]
+	}
+
+	rootHashMatches := rootHashRegex.FindStringSubmatch(verityOutput)
+	if len(rootHashMatches) > 1 {
+		rootHash = rootHashMatches[1]
+	}
+
+	if salt == "" || rootHash == "" {
+		return fmt.Errorf("failed to parse salt or root hash from veritysetup output")
+	}
+
+	// Print salt and root hash
+	fmt.Printf("Salt: %s\n", salt)
+	fmt.Printf("Root hash: %s\n", rootHash)
+
+	// Mount the boot partition
+	mountOutput, _, err := shell.Execute("sudo", "mount", "/dev/nbd0p2", "/mnt/boot_partition")
+	if err != nil {
+		return err
+	}
+
+	// Assuming mountOutput contains relevant information, you might want to log it
+	fmt.Println("Mount output:", mountOutput)
+
+	// Check if the NBD device is connected using lsblk
+	lsblkCmd = exec.Command("lsblk")
+	lsblkCmd.Stdout = &out // Redirects output to buffer
+	if err = lsblkCmd.Run(); err != nil {
+		return fmt.Errorf("failed to execute lsblk:\n%w", err)
+	}
+
+	// Print the output of lsblk
+	fmt.Println("Output of lsblk:")
+	fmt.Println(out.String())
+
+	// Update grub configuration
+    err = updateGrubConfig(salt, rootHash)
+    if err != nil {
+        return err
+    }
+
+    // Unmount the boot partition after the update
+    _, _, err = shell.Execute("sudo", "umount", "/mnt/boot_partition")
+    if err != nil {
+        return fmt.Errorf("failed to unmount boot partition: %v", err)
+    }
+
+	return nil
+}
+
+func updateGrubConfig(salt string, rootHash string) error {
+	const cmdlineTemplate = "rd.systemd.verity=1 roothash=%s systemd.verity_root_data=/dev/sda3 systemd.verity_root_hash=/dev/sda6 systemd.verity_root_options=panic-on-corruption,salt=%s"
+	newArgs := fmt.Sprintf(cmdlineTemplate, rootHash, salt)
+	// Define the relative path to grub.cfg from the mount point
+    grubConfigPath := "/mnt/boot_partition/grub2/grub.cfg"
+
+    // Read the content of the grub configuration file
+    content, err := ioutil.ReadFile(grubConfigPath)
+    if err != nil {
+        return fmt.Errorf("failed to read grub config: %v", err)
+    }
+
+    // Split the content into lines for processing
+    lines := strings.Split(string(content), "\n")
+    var updatedLines []string
+
+    for _, line := range lines {
+        trimmedLine := strings.TrimSpace(line)
+        if strings.HasPrefix(trimmedLine, "linux ") {
+            // Append new arguments to the line that starts with "linux"
+            line += " " + newArgs
+        }
+        if strings.HasPrefix(trimmedLine, "set rootdevice=PARTUUID=") {
+            // Replace the root device line with the new root device
+            line = "set rootdevice=/dev/mapper/root"
+        }
+        updatedLines = append(updatedLines, line)
+    }
+
+    // Write the updated content back to grub.cfg
+    err = ioutil.WriteFile(grubConfigPath, []byte(strings.Join(updatedLines, "\n")), 0644)
+    if err != nil {
+        return fmt.Errorf("failed to write updated grub config: %v", err)
+    }
+
+	// Read and print the updated grub configuration file
+    updatedContent, err := ioutil.ReadFile(grubConfigPath)
+    if err != nil {
+        return err
+    }
+    fmt.Println("Updated grub.cfg content:")
+    fmt.Print(string(updatedContent))
+
+    return nil
 }
