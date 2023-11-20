@@ -17,9 +17,9 @@ Distribution:   Mariner
 Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/%{version}.tar.gz#/kernel-%{version}.tar.gz
-BuildArch:      noarch
 # Historical name shipped by other distros
 Provides:       glibc-kernheaders = %{version}-%{release}
+BuildArch:      noarch
 
 %description
 The Linux API Headers expose the kernel's API for use by Glibc.
