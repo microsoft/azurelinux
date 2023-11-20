@@ -4,7 +4,7 @@ Distribution:   Mariner
 %global testsuite_ver ff37e2
 %global clknetsim_ver 9ed48d
 %global selinuxtype targeted
-%bcond_with selinux
+%bcond_without selinux
 
 Name:		linuxptp
 Version:	3.1.1
