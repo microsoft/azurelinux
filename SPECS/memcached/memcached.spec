@@ -6,8 +6,8 @@
 %bcond_with seccomp
 Summary:        High Performance, Distributed Memory Object Cache
 Name:           memcached
-Version:        1.6.13
-Release:        4%{?dist}
+Version:        1.6.22
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -120,6 +120,9 @@ exit 0
 %{_includedir}/memcached/*
 
 %changelog
+* Thu Nov 09 2023 Harshit Gupta <guptaharshit@microsoft.com> - 1.6.22-1
+- Upgrade to 1.6.22 for CVEs 2023-46852 and 2023-46853
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.6.13-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

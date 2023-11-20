@@ -195,7 +195,7 @@ ifeq ($(PRECACHE),y)
 $(cached_file): $(STATUS_FLAGS_DIR)/precache.flag
 endif
 
-$(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(cached_remote_rpms) $(TOOLCHAIN_MANIFEST) $(toolchain_rpms)
+$(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(cached_remote_rpms) $(TOOLCHAIN_MANIFEST) $(toolchain_rpms) $(depend_EXTRA_BUILD_LAYERS)
 	mkdir -p $(remote_rpms_cache_dir) && \
 	$(go-graphpkgfetcher) \
 		--input=$(graph_file) \
@@ -205,6 +205,7 @@ $(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_lo
 		--tmp-dir=$(cache_working_dir) \
 		--tdnf-worker=$(chroot_worker) \
 		--toolchain-manifest=$(TOOLCHAIN_MANIFEST) \
+		--extra-layers="$(EXTRA_BUILD_LAYERS)" \
 		--tls-cert=$(TLS_CERT) \
 		--tls-key=$(TLS_KEY) \
 		$(foreach repo, $(pkggen_local_repo) $(graphpkgfetcher_cloned_repo) $(REPO_LIST),--repo-file=$(repo) ) \
@@ -265,7 +266,7 @@ $(RPMS_DIR):
 	@touch $@
 endif
 
-$(STATUS_FLAGS_DIR)/build-rpms.flag: $(no_repo_acl) $(preprocessed_file) $(chroot_worker) $(go-scheduler) $(go-pkgworker) $(depend_STOP_ON_PKG_FAIL) $(CONFIG_FILE) $(depend_CONFIG_FILE) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST) $(depend_MAX_CASCADING_REBUILDS) $(depend_TEST_RUN_LIST) $(depend_TEST_RERUN_LIST) $(depend_TEST_IGNORE_LIST) $(pkggen_rpms) $(srpms) $(BUILD_SRPMS_DIR)
+$(STATUS_FLAGS_DIR)/build-rpms.flag: $(no_repo_acl) $(preprocessed_file) $(chroot_worker) $(go-scheduler) $(go-pkgworker) $(depend_STOP_ON_PKG_FAIL) $(CONFIG_FILE) $(depend_CONFIG_FILE) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST) $(depend_MAX_CASCADING_REBUILDS) $(depend_TEST_RUN_LIST) $(depend_TEST_RERUN_LIST) $(depend_TEST_IGNORE_LIST) $(pkggen_rpms) $(srpms) $(BUILD_SRPMS_DIR) $(depend_EXTRA_BUILD_LAYERS)
 	$(go-scheduler) \
 		--input="$(preprocessed_file)" \
 		--output="$(built_file)" \
@@ -278,7 +279,6 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(no_repo_acl) $(preprocessed_file) $(chroo
 		--toolchain-rpms-dir="$(TOOLCHAIN_RPMS_DIR)" \
 		--srpm-dir="$(SRPMS_DIR)" \
 		--cache-dir="$(remote_rpms_cache_dir)" \
-		--ccache-dir="$(CCACHE_DIR)" \
 		--build-logs-dir="$(rpmbuilding_logs_dir)" \
 		--dist-tag="$(DIST_TAG)" \
 		--distro-release-version="$(RELEASE_VERSION)" \
@@ -287,6 +287,7 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(no_repo_acl) $(preprocessed_file) $(chroo
 		--build-attempts="$(PACKAGE_BUILD_RETRIES)" \
 		--check-attempts="$(CHECK_BUILD_RETRIES)" \
 		$(if $(MAX_CASCADING_REBUILDS),--max-cascading-rebuilds="$(MAX_CASCADING_REBUILDS)") \
+		--extra-layers="$(EXTRA_BUILD_LAYERS)" \
 		--build-agent="chroot-agent" \
 		--build-agent-program="$(go-pkgworker)" \
 		--ignored-packages="$(PACKAGE_IGNORE_LIST)" \
@@ -310,8 +311,11 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(no_repo_acl) $(preprocessed_file) $(chroo
 		$(if $(filter-out y,$(CLEANUP_PACKAGE_BUILDS)),--no-cleanup) \
 		$(if $(filter y,$(DELTA_BUILD)),--optimize-with-cached-implicit) \
 		$(if $(filter y,$(USE_CCACHE)),--use-ccache) \
+		$(if $(filter y,$(USE_CCACHE)),--ccache-dir="$(CCACHE_DIR)") \
+		$(if $(filter y,$(USE_CCACHE)),--ccache-config="$(CCACHE_CONFIG)") \
 		$(if $(filter y,$(ALLOW_TOOLCHAIN_REBUILDS)),--allow-toolchain-rebuilds) \
 		--max-cpu="$(MAX_CPU)" \
+		$(if $(PACKAGE_BUILD_TIMEOUT),--timeout="$(PACKAGE_BUILD_TIMEOUT)") \
 		$(logging_command) && \
 	touch $@
 

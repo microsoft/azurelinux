@@ -22,6 +22,10 @@ parameters:
     type: string
     default: ""
 
+  - name: testRerunList
+    type: string
+    default: ""
+
   - name: failOnTestFailures
     type: boolean
     default: true
@@ -58,6 +62,10 @@ parameters:
       - "false"
       - "true"
 
+  - name: maxCascadingRebuilds
+    type: string
+    default: ""
+
   - name: outputArtifactsFolder
     type: string
     default: "$(Build.ArtifactStagingDirectory)"
@@ -73,6 +81,10 @@ parameters:
   - name: outputArtifactsTestsSubfolder
     type: string
     default: "TESTS"
+
+  - name: maxCPU
+    type: string
+    default: ""
 
   - name: pipArtifactFeeds
     type: string
@@ -187,10 +199,13 @@ steps:
       sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
         CONCURRENT_PACKAGE_BUILDS=${{ parameters.concurrentPackageBuilds }} \
         CONFIG_FILE="" \
+        MAX_CASCADING_REBUILDS="${{ parameters.maxCascadingRebuilds }}" \
+        MAX_CPU="${{ parameters.maxCPU }}" \
         REBUILD_TOOLS=y \
         REPO_LIST="${{ parameters.extraPackageRepos }}" \
         SPECS_DIR="${{ parameters.buildRepoRoot }}/${{ parameters.specsFolderPath }}" \
         SRPM_PACK_LIST="${{ parameters.srpmPackList }}" \
+        TEST_RERUN_LIST="${{ parameters.testRerunList }}" \
         $delta_fetch_arg \
         $quick_rebuild_packages_arg \
         $run_check_arg \

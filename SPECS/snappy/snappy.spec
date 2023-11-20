@@ -1,7 +1,7 @@
 Summary:        Fast compression and decompression library
 Name:           snappy
 Version:        1.1.9
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -21,6 +21,7 @@ Source0:        https://github.com/google/snappy/archive/%{version}.tar.gz#/%{na
 
 Patch0:         snappy-inline.patch
 Patch1:         detect_system_gtest.patch
+Patch2:         build-with-rtti.patch
 BuildRequires:  cmake >= 3.3
 BuildRequires:  gmock-devel
 BuildRequires:  gtest-devel
@@ -73,6 +74,9 @@ make test
 %{_libdir}/cmake/Snappy/
 
 %changelog
+* Thu Nov 02 2023 Bala <balakumaran.kannan@microsoft.com> - 1.1.9-3
+- Patch to fix build with RTTI enabled.
+
 * Wed Mar 23 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.1.9-2
 - Do not provide gtest/gmock headers and binaries.
 

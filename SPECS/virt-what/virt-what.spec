@@ -1,6 +1,6 @@
 Name:           virt-what
 Version:        1.20
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Detect if we are running in a virtual machine
 License:        GPLv2+
 
@@ -95,7 +95,7 @@ make install DESTDIR=$RPM_BUILD_ROOT
 %check
 if ! make check ; then
     cat test-suite.log
-    exit 1
+    false
 fi
 
 %files
@@ -106,6 +106,9 @@ fi
 
 
 %changelog
+* Tue Sep 26 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.20-5
+- Removing 'exit' calls from the '%%check' section.
+
 * Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> 1.20-4
 - Move into SPECS
 - License verified

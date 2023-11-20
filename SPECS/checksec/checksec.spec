@@ -3,7 +3,7 @@
 Summary:        Tool to check system for binary-hardening
 Name:           checksec
 Version:        2.5.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -67,8 +67,7 @@ install -pm 0644 extras/man/%{name}.1 %{buildroot}%{_mandir}/man1
 
 %check
 pushd tests
-./xml-checks.sh || exit 2
-popd
+./xml-checks.sh
 
 
 %files
@@ -79,6 +78,9 @@ popd
 
 
 %changelog
+* Tue Sep 26 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.5.0-2
+- Removing 'exit' calls from the '%%check' section.
+
 * Wed Oct 20 2021 Cameron Baird <cameronbaird@microsoft.com> - 2.5.0-1
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - Update to 2.5.0 upstream release

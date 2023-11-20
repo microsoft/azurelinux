@@ -78,6 +78,7 @@ REBUILD_TOOLS                   ?= n
 DELTA_BUILD                     ?= n
 CLEAN_TOOLCHAIN_CONTAINERS      ?= y
 MAX_CPU                         ?=
+PACKAGE_BUILD_TIMEOUT           ?= 8h
 DELTA_FETCH                     ?= n
 PRECACHE                        ?= n
 MAX_CASCADING_REBUILDS          ?=

@@ -1,0 +1,54 @@
+From 218d27f073b1afd18b2232e46e5fdcc0e717d608 Mon Sep 17 00:00:00 2001
+From: Daniel Axtens <dja@axtens.net>
+Date: Mon, 20 Dec 2021 19:41:21 +1100
+Subject: [PATCH] net/ip: Do IP fragment maths safely
+
+We can receive packets with invalid IP fragmentation information. This
+can lead to rsm->total_len underflowing and becoming very large.
+
+Then, in grub_netbuff_alloc(), we add to this very large number, which can
+cause it to overflow and wrap back around to a small positive number.
+The allocation then succeeds, but the resulting buffer is too small and
+subsequent operations can write past the end of the buffer.
+
+Catch the underflow here.
+
+Fixes: CVE-2022-28733
+
+Signed-off-by: Daniel Axtens <dja@axtens.net>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/net/ip.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/net/ip.c b/grub-core/net/ip.c
+index ea5edf8..74e4e8b 100644
+--- a/grub-core/net/ip.c
++++ b/grub-core/net/ip.c
+@@ -25,6 +25,7 @@
+ #include <grub/net/netbuff.h>
+ #include <grub/mm.h>
+ #include <grub/priority_queue.h>
++#include <grub/safemath.h>
+ #include <grub/time.h>
+ 
+ struct iphdr {
+@@ -512,7 +513,14 @@ grub_net_recv_ip4_packets (struct grub_net_buff *nb,
+     {
+       rsm->total_len = (8 * (grub_be_to_cpu16 (iph->frags) & OFFSET_MASK)
+ 			+ (nb->tail - nb->data));
+-      rsm->total_len -= ((iph->verhdrlen & 0xf) * sizeof (grub_uint32_t));
++
++      if (grub_sub (rsm->total_len, (iph->verhdrlen & 0xf) * sizeof (grub_uint32_t),
++		    &rsm->total_len))
++	{
++	  grub_dprintf ("net", "IP reassembly size underflow\n");
++	  return GRUB_ERR_NONE;
++	}
++
+       rsm->asm_netbuff = grub_netbuff_alloc (rsm->total_len);
+       if (!rsm->asm_netbuff)
+ 	{
+-- 
+2.34.1
+

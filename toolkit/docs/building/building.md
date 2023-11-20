@@ -464,7 +464,7 @@ If that is not desired all remote sources can be disabled by clearing the follow
 
 #### `PACKAGE_URL_LIST=...`
 
-> Space separated list of URLs to download toolchain RPM packages from, used to populate the toolchain packages if `$(REBUILD_TOOLCHAIN)` is set to `y`.
+> Space separated list of URLs to download toolchain RPM packages from, used to populate the toolchain packages if `$(REBUILD_TOOLCHAIN)` is set to `n`. Defaults to the standard distro repos. Overriding this will clear all the default values. May be augmented by passing `USE_PREVIEW_REPO=y` which will uncondinally append the distro's preview repos to what ever set of URLs is being used.
 
 #### `SRPM_URL_LIST=...`
 
@@ -560,7 +560,7 @@ If that is not desired all remote sources can be disabled by clearing the follow
 
 ##### `USE_PREVIEW_REPO=`**`y`**
 
-> Pull missing packages from the upstream preview repository in addition to the base repository.
+> Pull missing packages from the upstream preview repository in addition to the base repository. This will uncondinally append the preview repo sources to `PACKAGE_URL_LIST`, `SRPM_URL_LIST`, and `REPO_LIST`.
 
 #### `DISABLE_UPSTREAM_REPOS=...`
 
@@ -796,7 +796,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 |:------------------------------|:---------------------------------------------------------------------------------------------------------|:---
 | SOURCE_URL                    |                                                                                                          | URL to request package sources from
 | SRPM_URL_LIST                 | `https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms`                         | Space separated list of URLs to request packed SRPMs from if `$(DOWNLOAD_SRPMS)` is set to `y`
-| PACKAGE_URL_LIST              | `https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)`                 | Space separated list of URLs to download toolchain RPM packages from, used to populate the toolchain packages if `$(REBUILD_TOOLCHAIN)` is set to `y`.
+| PACKAGE_URL_LIST              | `https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)`...              | Space separated list of URLs to download toolchain RPM packages from, used to populate the toolchain packages if `$(REBUILD_TOOLCHAIN)` is set to `y`.
 | REPO_LIST                     |                                                                                                          | Space separated list of repo files for tdnf to pull packages form
 | CA_CERT                       |                                                                                                          | CA cert to access the above resources, in addition to the system certificate store
 | TLS_CERT                      |                                                                                                          | TLS cert to access the above resources
@@ -819,12 +819,12 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 |  PACKAGE_BUILD_RETRIES        | 1                                                                                                      | Number of build retries for each package
 | CHECK_BUILD_RETRIES           | 1                                                                                                      | Minimum number of check section retries for each package if RUN_CHECK=y and tests fail.
 | MAX_CASCADING_REBUILDS        |                                                                                                        | When a package rebuilds, how many additional layers of dependent packages will be forced to rebuild (leave unset for unbounded, i.e., all downstream packages will rebuild)
+| EXTRA_BUILD_LAYERS            | 0                                                                                                      | How many additional layers of the build graph to build beyond the requested packages (useful for testing changes in dependent packages)
 | IMAGE_TAG                     | (empty)                                                                                                | Text appended to a resulting image name - empty by default. Does not apply to the initrd. The text will be prepended with a hyphen.
 | CONCURRENT_PACKAGE_BUILDS     | 0                                                                                                      | The maximum number of concurrent package builds that are allowed at once. If set to 0 this defaults to the number of logical CPUs.
 | CLEANUP_PACKAGE_BUILDS        | y                                                                                                      | Cleanup a package build's working directory when it finishes. Note that `build` directory will still be removed on a successful package build even when this is turned off.
 | USE_PACKAGE_BUILD_CACHE       | y                                                                                                      | Skip building a package if it and its dependencies are already built.
 | NUM_OF_ANALYTICS_RESULTS      | 10                                                                                                     | The number of entries to print when using the `graphanalytics` tool. If set to 0 this will print all available results.
-| REBUILD_DEP_CHAINS            | y                                                                                                      | Rebuild packages if their dependencies need to be built, even though the package has already been built.
 | TARGET_ARCH                   |                                                                                                        | The architecture of the machine that will run the package binaries.
 | USE_CCACHE                    | n                                                                                                      | Use ccache automatically to speed up repeat package builds.
 | MAX_CPU                       |                                                                                                        | Max number of CPUs used for package building. Use 0 for unlimited. Overrides `%_smp_ncpus_max` macro.
