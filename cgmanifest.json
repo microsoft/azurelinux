@@ -23025,7 +23025,7 @@
         "other": {
           "name": "python-junit-xml",
           "version": "1.9",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/j/junit-xml/junit-xml-1.9.tar.gz"
+          "downloadUrl": "https://github.com/kyrus/python-junit-xml/tarball/856414648cbab3f64e69b856bc25cea8b9aa0377"
         }
       }
     },

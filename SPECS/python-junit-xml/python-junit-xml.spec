@@ -1,4 +1,8 @@
+%global commit 856414648cbab3f64e69b856bc25cea8b9aa0377
+%global shortcommit %(c=%{commit}; echo ${c:0:7})
+
 %global pypi_name junit-xml
+
 %global common_description %{expand:
 A Python module for creating JUnit XML test result documents that can be read
 by tools such as Jenkins or Bamboo. If you are ever working with test tool or
@@ -14,11 +18,14 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/kyrus/python-junit-xml
-Source0:        https://files.pythonhosted.org/packages/source/j/%{pypi_name}/%{pypi_name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# No GitHub release, have to use commit ID.
+# Pypi's tarball is missing the tests.
+Source0:        https://github.com/kyrus/python-junit-xml/tarball/%{commit}#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
 BuildRequires:  python3-devel
 BuildRequires:  python3-pip
+BuildRequires:  python3-six
 BuildRequires:  python3-wheel
 
 %description %{common_description}
@@ -30,7 +37,7 @@ Provides:       python3-junit_xml = %{version}-%{release}
 %description -n python3-%{pypi_name} %{common_description}
 
 %prep
-%autosetup -n %{pypi_name}-%{version} -p1
+%autosetup -n kyrus-%{name}-%{shortcommit} -p1
 
 %generate_buildrequires
 %pyproject_buildrequires -t
@@ -43,7 +50,8 @@ Provides:       python3-junit_xml = %{version}-%{release}
 %pyproject_save_files junit_xml
 
 %check
-pip3 install tox tox-current-env pytest==7.1.3 virtualenv
+# Freezing 'pytest' to a known working version as updates tend to introduce regressions.
+pip3 install tox tox-current-env pytest==7.4.3 virtualenv
 %tox
 
 %files -n python3-%{pypi_name} -f %{pyproject_files}
