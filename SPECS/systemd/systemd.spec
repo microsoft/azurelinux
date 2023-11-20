@@ -1,3 +1,4 @@
+%define majver %(echo %{version} | cut -d. -f 1)
 Summary:        Systemd
 Name:           systemd
 Version:        254.5
@@ -24,6 +25,7 @@ BuildRequires:  libgcrypt-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  libxslt
 BuildRequires:  lz4-devel
+BuildRequires:  mariner-release
 BuildRequires:  meson
 BuildRequires:  pam-devel
 BuildRequires:  perl-XML-Parser
@@ -88,7 +90,7 @@ Language pack for systemd
 %build
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
-CFLAGS="%{build_cflags} -Wno-error=format-overflow="                        \
+CFLAGS="%{build_cflags} -Wno-error=format-overflow="                  \
 meson  --prefix %{_prefix}                                            \
        --sysconfdir %{_sysconfdir}                                    \
        --localstatedir %{_var}                                        \
@@ -207,6 +209,7 @@ fi
 %dir %{_sysconfdir}/udev/rules.d
 %dir %{_sysconfdir}/udev/hwdb.d
 %config(noreplace) %{_sysconfdir}/udev/udev.conf
+%config(noreplace) %{_sysconfdir}/udev/iocost.conf
 %{_libdir}/udev/*
 %{_libdir}/systemd/*
 %{_libdir}/environment.d/99-environment.conf
@@ -241,6 +244,8 @@ fi
 %dir %{_includedir}/systemd
 /lib/libudev.so
 /lib/libsystemd.so
+/lib/systemd/libsystemd-core-%{majver}.so
+/lib/systemd/libsystemd-shared-%{majver}.so
 %{_includedir}/systemd/*.h
 %{_includedir}/libudev.h
 %{_libdir}/pkgconfig/libudev.pc
