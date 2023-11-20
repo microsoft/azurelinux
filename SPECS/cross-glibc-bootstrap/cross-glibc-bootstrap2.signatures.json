@@ -1,7 +1,0 @@
-{
-    "Signatures": {
-        "glibc-2.35.tar.xz": "5123732f6b67ccd319305efd399971d58592122bcc2a6518a1bd2510dd0cf52e",
-        "locale-gen.conf": "94182ce116a42e38ce783d2a867dca1eaf4d6a347d4bff9aac4d6e61cbbfc8f4",
-        "locale-gen.sh": "df7169cb9f126875e0a57a4700261e16e6eba2a98312d739f972377150ba9964"
-    }
-}
