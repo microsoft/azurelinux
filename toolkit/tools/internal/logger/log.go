@@ -60,9 +60,9 @@ const (
 	defaultLogFileLevel   = logrus.DebugLevel
 	defaultStderrLogLevel = logrus.InfoLevel
 	parentCallerLevel     = 1
-	colourModeAuto        = "auto"
-	colourModeAlways      = "always"
-	colourModeNever       = "never"
+	colorModeAuto        = "auto"
+	colorModeAlways      = "always"
+	colorModeNever       = "never"
 )
 
 type LogFlags struct {
@@ -72,10 +72,13 @@ type LogFlags struct {
 }
 
 // initLogFile initializes the common logger with a file
-func initLogFile(filePath string) (err error) {
+func initLogFile(filePath string, color string) (err error) {
+	useColors := true
+	if color == colorModeNever {
+		useColors = false
+	}
 	const (
 		noToolName = ""
-		useColors  = false
 	)
 
 	err = os.MkdirAll(filepath.Dir(filePath), os.ModePerm)
@@ -102,7 +105,7 @@ func InitStderrLog() {
 		log.Panic("Failed to get caller info.")
 	}
 
-	initStderrLogInternal(callerFilePath, colourModeAuto)
+	initStderrLogInternal(callerFilePath, colorModeAuto)
 }
 
 // SetFileLogLevel sets the lowest log level for file output
@@ -133,7 +136,7 @@ func InitBestEffort(lf *LogFlags) {
 	initStderrLogInternal(callerFilePath, color)
 
 	if path != "" {
-		PanicOnError(initLogFile(path), "Failed while setting log file (%s).", path)
+		PanicOnError(initLogFile(path, color), "Failed while setting log file (%s).", path)
 	}
 
 	PanicOnError(SetStderrLogLevel(level), "Failed while setting log level.")
@@ -210,13 +213,9 @@ func ReplaceStderrFormatter(newFormatter logrus.Formatter) (oldFormatter logrus.
 }
 
 func initStderrLogInternal(callerFilePath string, color string) {
-	var useColors bool
-	if color == colourModeAuto || color == colourModeAlways {
-		useColors = true
-	} else if color == colourModeNever {
+	useColors := true
+	if color == colorModeNever {
 		useColors = false
-	} else {
-		useColors = true
 	}
 
 	Log = logrus.New()

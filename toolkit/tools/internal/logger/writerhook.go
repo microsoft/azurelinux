@@ -23,6 +23,12 @@ type writerHook struct {
 	useColors bool
 }
 
+var (
+
+	// colorCodeRegex is of type '\x1b0m' or '\x1b31m', etc.
+	colorCodeRegex = regexp.MustCompile(`\x1b\[[0-9]+m`)
+)
+
 // newWriterHook returns new writerHook
 func newWriterHook(writer io.Writer, level logrus.Level, useColors bool, toolName string) *writerHook {
 	formatter := &logrus.TextFormatter{
@@ -59,8 +65,7 @@ func (h *writerHook) Fire(entry *logrus.Entry) (err error) {
 	}
 
 	if !h.useColors {
-		re := regexp.MustCompile(`\x1b\[[0-9]+m`)
-		entry.Message = re.ReplaceAllString(entry.Message, "")
+		entry.Message = colorCodeRegex.ReplaceAllString(entry.Message, "")
 	}
 
 	h.lock.Lock()

@@ -115,8 +115,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 
 	if len(prebuiltSRPMs) != 0 {
 		logger.Log.Info(color.GreenString("Prebuilt SRPMs:"))
-		keys := sliceutils.MapToSlice(prebuiltSRPMs)
-		sort.Strings(keys)
+		keys := mapToSortedSlice(prebuiltSRPMs)
 		for _, prebuiltSRPM := range keys {
 			logger.Log.Infof("--> %s", filepath.Base(prebuiltSRPM))
 		}
@@ -124,17 +123,15 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 
 	if len(prebuiltDeltaSRPMs) != 0 {
 		logger.Log.Info(color.GreenString("Skipped SRPMs (i.e., delta mode is on, packages are already available in a repo):"))
-		keys := sliceutils.MapToSlice(prebuiltDeltaSRPMs)
-		sort.Strings(keys)
+		keys := mapToSortedSlice(prebuiltDeltaSRPMs)
 		for _, prebuiltDeltaSRPM := range keys {
 			logger.Log.Infof("--> %s", filepath.Base(prebuiltDeltaSRPM))
 		}
 	}
 
 	if len(skippedSRPMsTests) != 0 {
-		logger.Log.Info(color.RedString("Skipped SRPMs tests:"))
-		keys := sliceutils.MapToSlice(skippedSRPMsTests)
-		sort.Strings(keys)
+		logger.Log.Info(color.GreenString("Skipped SRPMs tests:"))
+		keys := mapToSortedSlice(skippedSRPMsTests)
 		for _, skippedSRPMsTest := range keys {
 			logger.Log.Infof("--> %s", filepath.Base(skippedSRPMsTest))
 		}
@@ -142,8 +139,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 
 	if len(builtSRPMs) != 0 {
 		logger.Log.Info(color.GreenString("Built SRPMs:"))
-		keys := sliceutils.MapToSlice(builtSRPMs)
-		sort.Strings(keys)
+		keys := mapToSortedSlice(builtSRPMs)
 		for _, builtSRPM := range keys {
 			logger.Log.Infof("--> %s ", filepath.Base(builtSRPM))
 		}
@@ -151,8 +147,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 
 	if len(testedSRPMs) != 0 {
 		logger.Log.Info(color.GreenString("Tested SRPMs:"))
-		keys := sliceutils.MapToSlice(testedSRPMs)
-		sort.Strings(keys)
+		keys := mapToSortedSlice(testedSRPMs)
 		for _, testedSRPM := range keys {
 			logger.Log.Infof("--> %s", filepath.Base(testedSRPM))
 		}
@@ -160,8 +155,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 
 	if len(unresolvedDependencies) != 0 {
 		logger.Log.Info(color.RedString("Unresolved dependencies:"))
-		keys := sliceutils.MapToSlice(unresolvedDependencies)
-		sort.Strings(keys)
+		keys := mapToSortedSlice(unresolvedDependencies)
 		for _, unresolvedDependency := range keys {
 			logger.Log.Infof("--> %s", filepath.Base(unresolvedDependency))
 		}
@@ -169,8 +163,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 
 	if len(blockedSRPMs) != 0 {
 		logger.Log.Info(color.RedString("Blocked SRPMs:"))
-		keys := sliceutils.MapToSlice(blockedSRPMs)
-		sort.Strings(keys)
+		keys := mapToSortedSlice(blockedSRPMs)
 		for _, blockedSRPM := range keys {
 			logger.Log.Infof("--> %s", filepath.Base(blockedSRPM))
 		}
@@ -178,8 +171,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 
 	if len(blockedSRPMsTests) != 0 {
 		logger.Log.Info(color.RedString("Blocked SRPMs tests:"))
-		keys := sliceutils.MapToSlice(blockedSRPMsTests)
-		sort.Strings(keys)
+		keys := mapToSortedSlice(blockedSRPMsTests)
 		for _, blockedSRPMsTest := range keys {
 			logger.Log.Infof("--> %s", filepath.Base(blockedSRPMsTest))
 		}
@@ -203,8 +195,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 
 	if len(failedSRPMs) != 0 {
 		logger.Log.Info(color.RedString("Failed SRPMs:"))
-		keys := sliceutils.MapToSlice(failedSRPMs)
-		sort.Strings(keys)
+		keys := mapToSortedSlice(failedSRPMs)
 		for _, key := range keys {
 			failure := failedSRPMs[key]
 			logger.Log.Infof("--> %s , error: %s, for details see: %s", failure.Node.SRPMFileName(), failure.Err, failure.LogFile)
@@ -213,8 +204,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 
 	if len(failedSRPMsTests) != 0 {
 		logger.Log.Info(color.RedString("Failed SRPMs tests:"))
-		keys := sliceutils.MapToSlice(failedSRPMsTests)
-		sort.Strings(keys)
+		keys := mapToSortedSlice(failedSRPMsTests)
 		for _, key := range keys {
 			failure := failedSRPMsTests[key]
 			logger.Log.Infof("--> %s , error: %s, for details see: %s", failure.Node.SRPMFileName(), failure.Err, failure.LogFile)
@@ -354,30 +344,35 @@ func printSummary(failedSRPMs, failedSRPMsTests map[string]*BuildResult, prebuil
 
 	logger.Log.Infof(color.GreenString("Number of prebuilt SRPMs:           " + fmt.Sprint(len(prebuiltSRPMs))))
 	logger.Log.Infof(color.GreenString("Number of prebuilt delta SRPMs:     " + fmt.Sprint(len(prebuiltDeltaSRPMs))))
-	printSummaryByVal(len(skippedSRPMsTests), "Number of skipped SRPMs tests:      ")
+	logger.Log.Infof(color.GreenString("Number of skipped SRPMs tests:      " + fmt.Sprint(len(skippedSRPMsTests))))
 	logger.Log.Infof(color.GreenString("Number of built SRPMs:              " + fmt.Sprint(len(builtSRPMs))))
 	logger.Log.Infof(color.GreenString("Number of tested SRPMs:             " + fmt.Sprint(len(testedSRPMs))))
-	printSummaryByVal(len(unresolvedDependencies), "Number of unresolved dependencies:  ")
-	printSummaryByVal(len(blockedSRPMs), "Number of blocked SRPMs:            ")
-	printSummaryByVal(len(blockedSRPMsTests), "Number of blocked SRPMs tests:      ")
-	printSummaryByVal(len(failedSRPMs), "Number of failed SRPMs:             ")
-	printSummaryByVal(len(failedSRPMsTests), "Number of failed SRPMs tests:       ")
+	printSummaryByVal(true, len(unresolvedDependencies), "Number of unresolved dependencies:  ")
+	printSummaryByVal(true, len(blockedSRPMs), "Number of blocked SRPMs:            ")
+	printSummaryByVal(true, len(blockedSRPMsTests), "Number of blocked SRPMs tests:      ")
+	printSummaryByVal(true, len(failedSRPMs), "Number of failed SRPMs:             ")
+	printSummaryByVal(true, len(failedSRPMsTests), "Number of failed SRPMs tests:       ")
 
 	if allowToolchainRebuilds && (len(rpmConflicts) > 0 || len(srpmConflicts) > 0) {
 		logger.Log.Infof("Toolchain RPMs conflicts are ignored since ALLOW_TOOLCHAIN_REBUILDS=y")
 	}
 
-	if len(rpmConflicts) > 0 || len(srpmConflicts) > 0 {
-		conflictsLogger(color.RedString("Number of toolchain RPM conflicts:  " + fmt.Sprint(len(rpmConflicts))))
-		conflictsLogger(color.RedString("Number of toolchain SRPM conflicts: " + fmt.Sprint(len(srpmConflicts))))
-	}
+	printSummaryByVal(!allowToolchainRebuilds, len(rpmConflicts), "Number of toolchain RPM conflicts:  ")
+	printSummaryByVal(!allowToolchainRebuilds, len(rpmConflicts), "Number of toolchain SRPM conflicts: ")
 }
 
-// Helper function to print summary in specific color.
-func printSummaryByVal(val int, msg string) {
-	if val > 0 {
-		logger.Log.Infof(color.RedString(msg + fmt.Sprint(val)))
+// Helper function to print summary in specific color, based on val and cond.
+func printSummaryByVal(cond bool, val int, msg string) {
+	if cond && (val > 0) {
+		logger.Log.Errorf(color.RedString(msg + fmt.Sprint(val)))
 	} else {
 		logger.Log.Infof(color.GreenString(msg + fmt.Sprint(val)))
 	}
+}
+
+// Helper function that converts a map[string]V to a sorted slice containing the map's keys.
+func mapToSortedSlice[V any](inputMap map[string]V) []string {
+	outputSlice := sliceutils.MapToSlice(inputMap)
+	sort.Strings(outputSlice)
+	return outputSlice
 }
