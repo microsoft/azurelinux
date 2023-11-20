@@ -11,7 +11,7 @@
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
 Version:        5.15.126.mshv9
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
@@ -247,6 +247,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner-mshv.cfg
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Mon Nov 20 2023 Archana Choudhary <archana1@microsoft.com> - 5.15.126.mshv9-2
+- Update config
+
 * Mon Nov 6 2023 Dallas Delaney <dadelan@microsoft.com> - 5.15.126.mshv9-1
 - Update to v5.15.126.mshv9
 
