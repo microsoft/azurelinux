@@ -15,15 +15,6 @@
 %{_cross_prefix}/%1 \
 %endif
 
-%global do_package() \
-%if %2 \
-%package -n binutils-%1 \
-Summary: Cross-build binary utilities for %1 \
-Requires: %{name}-common = %{version}-%{release} \
-%description -n binutils-%1 \
-Cross-build binary image generation, manipulation and query tools. \
-%endif
-
 Summary:        Contains a linker, an assembler, and other tools
 Name:           binutils
 Version:        2.37
@@ -45,6 +36,16 @@ Patch5:         CVE-2022-4285.patch
 Provides:       bundled(libiberty)
 
 Requires:       %{name}-common = %{version}-%{release}
+
+# Moving macro before the "SourceX" tags breaks PR checks parsing the specs.
+%global do_package() \
+%if %2 \
+%package -n binutils-%1 \
+Summary: Cross-build binary utilities for %1 \
+Requires: %{name}-common = %{version}-%{release} \
+%description -n binutils-%1 \
+Cross-build binary image generation, manipulation and query tools. \
+%endif
 
 %package common
 Summary: Binutils documentation
