@@ -32,7 +32,7 @@
       "name": "kernel",
       "comment": "",
       "enabled": true,
-      "packageNames": [ "kernel", "kernel-azure", "kernel-hci", "kernel-mshv", "kernel-uvm", "kernel-mos" ]
+      "packageNames": [ "kernel", "kernel-azure", "kernel-hci", "kernel-mshv", "kernel-uvm" ]
     },
     {
       "name": "libdb",
