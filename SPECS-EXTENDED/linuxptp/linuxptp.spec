@@ -77,6 +77,8 @@ pushd testsuite/clknetsim
 %patch2 -p1 -R -b .phc2sys
 popd
 
+%patch3 -p1 -b .pre-ha
+
 mkdir selinux
 cp -p %{SOURCE20} %{SOURCE21} %{SOURCE22} selinux
 
