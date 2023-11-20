@@ -27527,8 +27527,8 @@
         "type": "other",
         "other": {
           "name": "shim-unsigned-aarch64",
-          "version": "15",
-          "downloadUrl": "https://github.com/rhboot/shim/releases/download/15/shim-15.tar.bz2"
+          "version": "15.4",
+          "downloadUrl": "https://github.com/rhboot/shim/releases/download/15.4/shim-15.4.tar.bz2"
         }
       }
     },
