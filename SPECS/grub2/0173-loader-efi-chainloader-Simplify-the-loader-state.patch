@@ -1,0 +1,320 @@
+From 008135319a9ce23aac1742651fa3a3f919b5ea1c Mon Sep 17 00:00:00 2001
+From: Chris Coulson <chris.coulson@canonical.com>
+Date: Tue, 5 Apr 2022 10:02:04 +0100
+Subject: [PATCH] loader/efi/chainloader: Simplify the loader state
+
+The chainloader command retains the source buffer and device path passed
+to LoadImage(), requiring the unload hook passed to grub_loader_set() to
+free them. It isn't required to retain this state though - they aren't
+required by StartImage() or anything else in the boot hook, so clean them
+up before grub_cmd_chainloader() finishes.
+
+Signed-off-by: Chris Coulson <chris.coulson@canonical.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+Modified patch 1469983ebb9674753ad333d37087fb8cb20e1dce to apply to CBL-Mariner: Merged chainloader to remove globals and instead pass context.  Based on https://src.fedoraproject.org/rpms/grub2/blob/f0ad2aaa267a5d99b47f5c5770a55de0a702fdf0/f/0221-loader-efi-chainloader-simplify-the-loader-state.patch
+Modified-by: Gary Swalling <gaswal@microsoft.com>
+---
+ grub-core/loader/efi/chainloader.c | 143 +++++++++++++++++++----------
+ 1 file changed, 97 insertions(+), 46 deletions(-)
+
+diff --git a/grub-core/loader/efi/chainloader.c b/grub-core/loader/efi/chainloader.c
+index 6f5b034..97a6a70 100644
+--- a/grub-core/loader/efi/chainloader.c
++++ b/grub-core/loader/efi/chainloader.c
+@@ -47,38 +47,38 @@ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+ static grub_dl_t my_mod;
+ 
+-static grub_efi_physical_address_t address;
+-static grub_efi_uintn_t pages;
+-static grub_ssize_t fsize;
+-static grub_efi_device_path_t *file_path;
+ static grub_efi_handle_t image_handle;
+-static grub_efi_char16_t *cmdline;
+-static grub_ssize_t cmdline_len;
+-static grub_efi_handle_t dev_handle;
+ 
+-static grub_efi_status_t (*entry_point) (grub_efi_handle_t image_handle, grub_efi_system_table_t *system_table);
++struct grub_secureboot_chainloader_context {
++  grub_efi_physical_address_t address;
++  grub_efi_uintn_t pages;
++  grub_ssize_t fsize;
++  grub_efi_device_path_t *file_path;
++  grub_efi_char16_t *cmdline;
++  grub_ssize_t cmdline_len;
++  grub_efi_handle_t dev_handle;
++};
++static struct grub_secureboot_chainloader_context *sb_context;
+ 
+ static grub_err_t
+ grub_chainloader_unload (void)
+ {
++  grub_efi_loaded_image_t *loaded_image;
+   grub_efi_boot_services_t *b;
+ 
++  loaded_image = grub_efi_get_loaded_image (image_handle);
++  if (loaded_image != NULL)
++    grub_free (loaded_image->load_options);
++
+   b = grub_efi_system_table->boot_services;
+   efi_call_1 (b->unload_image, image_handle);
+-  efi_call_2 (b->free_pages, address, pages);
+-
+-  grub_free (file_path);
+-  grub_free (cmdline);
+-  cmdline = 0;
+-  file_path = 0;
+-  dev_handle = 0;
+ 
+   grub_dl_unref (my_mod);
+   return GRUB_ERR_NONE;
+ }
+ 
+ static grub_err_t
+-grub_chainloader_boot (void)
++grub_start_image (grub_efi_handle_t handle)
+ {
+   grub_efi_boot_services_t *b;
+   grub_efi_status_t status;
+@@ -86,7 +86,7 @@ grub_chainloader_boot (void)
+   grub_efi_char16_t *exit_data = NULL;
+ 
+   b = grub_efi_system_table->boot_services;
+-  status = efi_call_3 (b->start_image, image_handle, &exit_data_size, &exit_data);
++  status = efi_call_3 (b->start_image, handle, &exit_data_size, &exit_data);
+   if (status != GRUB_EFI_SUCCESS)
+     {
+       if (exit_data)
+@@ -110,11 +110,21 @@ grub_chainloader_boot (void)
+   if (exit_data)
+     efi_call_1 (b->free_pool, exit_data);
+ 
+-  grub_loader_unset ();
+-
+   return grub_errno;
+ }
+ 
++static grub_err_t
++grub_chainloader_boot (void)
++{
++  grub_err_t err;
++
++  err = grub_start_image (image_handle);
++
++  grub_loader_unset ();
++  return err;
++}
++
++
+ static grub_err_t
+ copy_file_path (grub_efi_file_path_device_path_t *fp,
+ 		const char *str, grub_efi_uint16_t len)
+@@ -149,7 +159,7 @@ make_file_path (grub_efi_device_path_t *dp, const char *filename)
+   char *dir_start;
+   char *dir_end;
+   grub_size_t size;
+-  grub_efi_device_path_t *d;
++  grub_efi_device_path_t *d, *file_path;
+ 
+   dir_start = grub_strchr (filename, ')');
+   if (! dir_start)
+@@ -521,11 +531,13 @@ grub_efi_get_media_file_path (grub_efi_device_path_t *dp)
+ }
+ 
+ static grub_efi_boolean_t
+-handle_image (void *data, grub_efi_uint32_t datasize)
++handle_image (struct grub_secureboot_chainloader_context *load_context)
+ {
+   grub_efi_boot_services_t *b;
+   grub_efi_loaded_image_t *li, li_bak;
+   grub_efi_status_t efi_status;
++  void *data = (void *)(unsigned long)load_context->address;
++  grub_efi_uint32_t datasize = load_context->fsize;
+   char *buffer = NULL;
+   char *buffer_aligned = NULL;
+   grub_efi_uint32_t i;
+@@ -536,6 +548,7 @@ handle_image (void *data, grub_efi_uint32_t datasize)
+   grub_uint32_t buffer_size;
+   int found_entry_point = 0;
+   int rc;
++  grub_efi_status_t (*entry_point) (grub_efi_handle_t image_handle, grub_efi_system_table_t *system_table);
+ 
+   b = grub_efi_system_table->boot_services;
+ 
+@@ -795,10 +808,10 @@ handle_image (void *data, grub_efi_uint32_t datasize)
+   grub_memcpy (&li_bak, li, sizeof (grub_efi_loaded_image_t));
+   li->image_base = buffer_aligned;
+   li->image_size = context.image_size;
+-  li->load_options = cmdline;
+-  li->load_options_size = cmdline_len;
+-  li->file_path = grub_efi_get_media_file_path (file_path);
+-  li->device_handle = dev_handle;
++  li->load_options = load_context->cmdline;
++  li->load_options_size = load_context->cmdline_len;
++  li->file_path = grub_efi_get_media_file_path (load_context->file_path);
++  li->device_handle = load_context->dev_handle;
+   if (!li->file_path)
+     {
+       grub_error (GRUB_ERR_UNKNOWN_DEVICE, "no matching file path found");
+@@ -826,22 +839,22 @@ error_exit:
+ static grub_err_t
+ grub_secureboot_chainloader_unload (void)
+ {
+-  grub_efi_boot_services_t *b;
++  grub_efi_free_pages (sb_context->address, sb_context->pages);
++  grub_free (sb_context->file_path);
++  grub_free (sb_context->cmdline);
++  grub_free (sb_context);
+ 
+-  b = grub_efi_system_table->boot_services;
+-  efi_call_2 (b->free_pages, address, pages);
+-  grub_free (file_path);
+-  grub_free (cmdline);
+-  cmdline = 0;
+-  file_path = 0;
+-  dev_handle = 0;
++  sb_context = 0;
+ 
+   grub_dl_unref (my_mod);
+   return GRUB_ERR_NONE;
+ }
+ 
+ static grub_err_t
+-grub_load_and_start_image(void *boot_image)
++grub_load_image(grub_efi_device_path_t *file_path, void *boot_image,
++                grub_efi_uintn_t image_size, grub_efi_handle_t dev_handle,
++                grub_efi_char16_t *cmdline, grub_ssize_t cmdline_len,
++                grub_efi_handle_t *image_handle_out)
+ {
+   grub_efi_boot_services_t *b;
+   grub_efi_status_t status;
+@@ -850,7 +863,7 @@ grub_load_and_start_image(void *boot_image)
+   b = grub_efi_system_table->boot_services;
+ 
+   status = efi_call_6 (b->load_image, 0, grub_efi_image_handle, file_path,
+-		       boot_image, fsize, &image_handle);
++                       boot_image, image_size, image_handle_out);
+   if (status != GRUB_EFI_SUCCESS)
+     {
+       if (status == GRUB_EFI_OUT_OF_RESOURCES)
+@@ -863,7 +876,7 @@ grub_load_and_start_image(void *boot_image)
+   /* LoadImage does not set a device handler when the image is
+      loaded from memory, so it is necessary to set it explicitly here.
+      This is a mess.  */
+-  loaded_image = grub_efi_get_loaded_image (image_handle);
++  loaded_image = grub_efi_get_loaded_image (*image_handle_out);
+   if (! loaded_image)
+     {
+       grub_error (GRUB_ERR_BAD_OS, "no loaded image available");
+@@ -883,13 +896,28 @@ grub_load_and_start_image(void *boot_image)
+ static grub_err_t
+ grub_secureboot_chainloader_boot (void)
+ {
++  grub_efi_boot_services_t *b;
+   int rc;
+-  rc = handle_image ((void *)(unsigned long)address, fsize);
++  grub_efi_handle_t handle = 0;
++
++  rc = handle_image (sb_context);
+   if (rc == 0)
+     {
+-      grub_load_and_start_image((void *)(unsigned long)address);
++      /* We weren't able to attempt to execute the image, so fall back
++       * to LoadImage / StartImage.
++       */
++      rc = grub_load_image(sb_context->file_path,
++                          (void *)(unsigned long)sb_context->address,
++                          sb_context->fsize, sb_context->dev_handle,
++                          sb_context->cmdline, sb_context->cmdline_len,
++                          &handle);
++      if (rc == 0)
++        grub_start_image (handle);
+     }
+ 
++  b = grub_efi_system_table->boot_services;
++  efi_call_1 (b->unload_image, handle);
++
+   grub_loader_unset ();
+   return grub_errno;
+ }
+@@ -902,9 +930,15 @@ grub_cmd_chainloader (grub_command_t cmd __attribute__ ((unused)),
+   grub_efi_status_t status;
+   grub_efi_boot_services_t *b;
+   grub_device_t dev = 0;
+-  grub_efi_device_path_t *dp = 0;
++  grub_efi_device_path_t *dp = 0, *file_path = 0;
+   char *filename;
+   void *boot_image = 0;
++  grub_efi_physical_address_t address = 0;
++  grub_ssize_t fsize;
++  grub_efi_uintn_t pages = 0;
++  grub_efi_char16_t *cmdline = 0;
++  grub_ssize_t cmdline_len = 0;
++  grub_efi_handle_t dev_handle = 0;
+   int rc;
+ 
+   if (argc == 0)
+@@ -913,12 +947,6 @@ grub_cmd_chainloader (grub_command_t cmd __attribute__ ((unused)),
+ 
+   grub_dl_ref (my_mod);
+ 
+-  /* Initialize some global variables.  */
+-  address = 0;
+-  image_handle = 0;
+-  file_path = 0;
+-  dev_handle = 0;
+-
+   b = grub_efi_system_table->boot_services;
+ 
+   if (argc > 1)
+@@ -1070,6 +1098,17 @@ grub_cmd_chainloader (grub_command_t cmd __attribute__ ((unused)),
+   grub_dprintf ("chain", "linuxefi_secure_validate: %d\n", rc);
+   if (rc > 0)
+     {
++      sb_context = grub_malloc (sizeof (*sb_context));
++      if (sb_context == NULL)
++        goto fail;
++      sb_context->address = address;
++      sb_context->fsize = fsize;
++      sb_context->pages = pages;
++      sb_context->file_path = file_path;
++      sb_context->cmdline = cmdline;
++      sb_context->cmdline_len = cmdline_len;
++      sb_context->dev_handle = dev_handle;
++
+       grub_file_close (file);
+       grub_device_close (dev);
+       grub_loader_set (grub_secureboot_chainloader_boot,
+@@ -1078,9 +1117,15 @@ grub_cmd_chainloader (grub_command_t cmd __attribute__ ((unused)),
+     }
+   else if (rc == 0)
+     {
+-      grub_load_and_start_image(boot_image);
++      grub_load_image(file_path, boot_image, fsize, dev_handle, cmdline,
++                      cmdline_len, &image_handle);
+       grub_file_close (file);
+       grub_device_close (dev);
++
++      /* We're finished with the source image buffer and file path now */
++      efi_call_2 (b->free_pages, address, pages);
++      grub_free (file_path);
++
+       grub_loader_set (grub_chainloader_boot, grub_chainloader_unload, 0);
+ 
+       return 0;
+@@ -1102,6 +1147,12 @@ fail:
+   if (cmdline)
+     grub_free (cmdline);
+ 
++  if (image_handle != 0)
++    {
++      efi_call_1 (b->unload_image, image_handle);
++      image_handle = 0;
++    }
++
+   grub_dl_unref (my_mod);
+ 
+   return grub_errno;
+-- 
+2.34.1
+

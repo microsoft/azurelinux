@@ -5,11 +5,13 @@ package schedulerutils
 
 import (
 	"fmt"
+	"math"
 	"strings"
 	"sync"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
 	"github.com/sirupsen/logrus"
 	"gonum.org/v1/gonum/graph"
 	"gonum.org/v1/gonum/graph/path"
@@ -49,7 +51,9 @@ func CanSubGraph(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, useCachedI
 
 		// If we are in trace mode, print the path from the root node to the unsolvable node
 		if logger.Log.IsLevelEnabled(logrus.TraceLevel) {
-			paths := path.YenKShortestPaths(pkgGraph, 1, node, pkgNode)
+			// Reference: https://github.com/gonum/gonum/blob/v0.14.0/graph/path/yen_ksp.go#L19
+			infiniteCost := math.Inf(1)
+			paths := path.YenKShortestPaths(pkgGraph, 1, infiniteCost, node, pkgNode)
 			if len(paths) == 0 {
 				logger.Log.Warnf("Could not find path between %v and %v with YenKShortestPaths()", node, pkgNode)
 			} else {

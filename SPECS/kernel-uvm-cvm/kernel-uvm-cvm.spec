@@ -10,7 +10,7 @@
 
 Summary:        Linux Kernel for SEV SNP enabled Kata UVMs
 Name:           kernel-uvm-cvm
-Version:        6.1.0.mshv11
+Version:        6.1.0.mshv14
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -153,6 +153,12 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %{_prefix}/src/linux-headers-%{uname_r}
 
 %changelog
+* Mon Nov 6 2023 Dallas Delaney <dadelan@microsoft.com> - 6.1.0.mshv14-1
+- Update to v6.1.0.mshv14
+
+* Fri Oct 06 2023 Manuel Huber <mahuber@microsoft.com> - 6.1.0.mshv11-2
+- Enable dm-crypt and dm-integrity for encfs sidecar functionality
+
 * Thu Sep 15 2023 Saul Paredes <saulparedes@microsoft.com> - 6.1.0.mshv11-1
 - Update to v6.1.0.mshv11
 

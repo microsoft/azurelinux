@@ -45,6 +45,18 @@ func CreateRepo(repoDir string) (err error) {
 	return
 }
 
+// CreateOrUpdateRepo will create an RPM repository at repoDir or update
+// it if the metadata files already exist.
+func CreateOrUpdateRepo(repoDir string) (err error) {
+	// Create or update repodata
+	_, stderr, err := shell.Execute("createrepo", "--update", repoDir)
+	if err != nil {
+		logger.Log.Warn(stderr)
+	}
+
+	return
+}
+
 // ValidateRpmPaths checks for any rpm filenames in the cache that don't match the expected output according to 'rpm -qp ...'.  It
 // will return an error with all the mismatched pairs if it finds any.
 func ValidateRpmPaths(repoDir string) (err error) {

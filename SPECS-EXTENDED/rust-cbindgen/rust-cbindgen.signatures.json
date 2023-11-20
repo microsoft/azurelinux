@@ -1,0 +1,7 @@
+{
+ "Signatures": {
+  "cargo_config": "77e9219c27274120197571fd165cbe4121963b5ad3bc0b20b383c86ef0ce6c2b",
+  "cbindgen-0.24.3-cargo.tar.gz": "703a54325fd9c366d176835de76843be2d758e3d64ea9cd2e2748709c2360d18",
+  "rust-cbindgen-0.24.3.tar.gz": "5d693ab54acc085b9f2dbafbcf0a1f089737f7e0cb1686fa338c2aaa05dc7705"
+ }
+}
