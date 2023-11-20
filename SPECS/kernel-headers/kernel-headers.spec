@@ -1,7 +1,7 @@
 # This package doesn't contain any binaries, thus no debuginfo package is needed.
 %global debug_package %{nil}
 
-%if %{_arch} == x86_64
+%if "%{_arch}" == "x86_64"
 %define cross_archs arm64
 %else
 %define cross_archs %{nil}
@@ -24,7 +24,7 @@ Provides:       glibc-kernheaders = %{version}-%{release}
 %description
 The Linux API Headers expose the kernel's API for use by Glibc.
 
-%if %{_arch} == x86_64
+%if "%{_arch}" == "x86_64"
 %package -n kernel-cross-headers
 Summary: Header files for the Linux kernel for use by cross-glibc.
 
@@ -64,7 +64,7 @@ done
 %license COPYING
 %{_includedir}/*
 
-%if %{_arch} == x86_64
+%if "%{_arch}" == "x86_64"
 %files -n kernel-cross-headers
 %defattr(-,root,root)
 %{_cross_prefix}/*-linux-gnu/*
