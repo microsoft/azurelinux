@@ -1679,6 +1679,7 @@
                 "python-isodate",
                 "python-isort",
                 "python-itsdangerous",
+                "python-junit-xml",
                 "python-justbases",
                 "python-justbytes",
                 "python-jwcrypto",
