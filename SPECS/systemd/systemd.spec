@@ -1,3 +1,4 @@
+%define majver %(echo %{version} | cut -d. -f 1)
 Summary:        Systemd
 Name:           systemd
 Version:        254.5
@@ -243,8 +244,8 @@ fi
 %dir %{_includedir}/systemd
 /lib/libudev.so
 /lib/libsystemd.so
-/lib/systemd/libsystemd-core-254.so
-/lib/systemd/libsystemd-shared-254.so
+/lib/systemd/libsystemd-core-%{majver}.so
+/lib/systemd/libsystemd-shared-%{majver}.so
 %{_includedir}/systemd/*.h
 %{_includedir}/libudev.h
 %{_libdir}/pkgconfig/libudev.pc
