@@ -30,13 +30,13 @@ Source21:	linuxptp.if
 Source22:	linuxptp.te
 
 # fix handling of zero-length messages
-Patch1:		linuxptp-zerolength.patch
+Patch0:		linuxptp-zerolength.patch
 # revert phc2sys options needed by the older version of test suite
-Patch2:		clknetsim-phc2sys.patch
+Patch1:		clknetsim-phc2sys.patch
 
 # The following patch is a combination of multiple patches to enable HA in linuxptp
 # https://review.opendev.org/c/starlingx/integ/+/891638
-Patch3:         enable-ha.patch
+Patch2:         enable-ha.patch
 
 BuildRequires:	gcc gcc-c++ make systemd
 
@@ -69,15 +69,15 @@ linuxptp SELinux policy module
 
 %prep
 %setup -q -a 10 -a 11 -n %{name}-%{!?gitfullver:%{version}}%{?gitfullver}
-%patch1 -p1 -b .zerolength
+%patch0 -p1 -b .zerolength
 mv linuxptp-testsuite-%{testsuite_ver}* testsuite
 mv clknetsim-%{clknetsim_ver}* testsuite/clknetsim
 
 pushd testsuite/clknetsim
-%patch2 -p1 -R -b .phc2sys
+%patch1 -p1 -R -b .phc2sys
 popd
 
-%patch3 -p1 -b .pre-ha
+%patch2 -p1 -b .pre-ha
 
 mkdir selinux
 cp -p %{SOURCE20} %{SOURCE21} %{SOURCE22} selinux
