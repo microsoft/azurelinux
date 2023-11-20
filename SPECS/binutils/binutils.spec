@@ -151,7 +151,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
 sed -i 's/testsuite/ /g' gold/Makefile
-%make_build check
+%make_build -C build check
 
 %ldconfig_scriptlets
 
