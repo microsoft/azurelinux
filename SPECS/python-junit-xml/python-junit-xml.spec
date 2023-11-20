@@ -1,4 +1,4 @@
-%global libname junit-xml
+%global pypi_name junit-xml
 %global common_description %{expand:
 A Python module for creating JUnit XML test result documents that can be read
 by tools such as Jenkins or Bamboo. If you are ever working with test tool or
@@ -7,28 +7,30 @@ pretty graphs and test reporting capabilities, this module will let you
 generate the XML test reports.}
 
 Summary:        Python module for creating JUnit XML test result documents
-Name:           python-%{libname}
+Name:           python-%{pypi_name}
 Version:        1.9
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/kyrus/python-junit-xml
-Source0:        https://files.pythonhosted.org/packages/source/j/%{libname}/%{libname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/source/j/%{pypi_name}/%{pypi_name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
 BuildRequires:  python3-devel
+BuildRequires:  python3-pip
+BuildRequires:  python3-wheel
 
 %description %{common_description}
 
-%package -n python3-%{libname}
+%package -n python3-%{pypi_name}
 Summary:        %{summary}
 Provides:       python3-junit_xml = %{version}-%{release}
 
-%description -n python3-%{libname} %{common_description}
+%description -n python3-%{pypi_name} %{common_description}
 
 %prep
-%autosetup -n python-%{libname}-%{version} -p1
+%autosetup -n %{pypi_name}-%{version} -p1
 
 %generate_buildrequires
 %pyproject_buildrequires -t
@@ -38,12 +40,13 @@ Provides:       python3-junit_xml = %{version}-%{release}
 
 %install
 %pyproject_install
-%pyproject_save_files %{libname}
+%pyproject_save_files junit_xml
 
 %check
+pip3 install tox tox-current-env pytest==7.1.3 virtualenv
 %tox
 
-%files -n python3-%{libname} -f %{pyproject_files}
+%files -n python3-%{pypi_name} -f %{pyproject_files}
 %license LICENSE.txt
 %doc README.rst
 
