@@ -174,7 +174,7 @@ fi
 * Thu Nov 16 2023 Harshit Gupta <guptaharshit@microsoft.com> - 3.1.1-1
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
 - License Verified.
-- Upstream linuxptp v3.1.1-6 has been imported into Azure Linux with package v3.1.1-1
+- Upstream linuxptp 3.1.1-6 has been imported into Azure Linux with package 3.1.1-1
 
 * Wed Jan 11 2023 Miroslav Lichvar <mlichvar@redhat.com> 3.1.1-6
 - update selinux policy (#2159919)
