@@ -3,8 +3,7 @@
   "Certificate-Creation": "d00fa133b7e7b241c6d973a70a2ae24d38afed6dfc06014aeff117f4cf8e0163",
   "pop3-redirect.xinetd": "d4953253db8cfd8ea1449911ad32723bf7230a8c8edfb394c83b02feeb25f84b",
   "sfinger.xinetd": "e9bb26d7e8fbe978d34168ecbb22205179345cfc1874b00c87de17bcb287d9a9",
-  "stunnel-5.56.tar.gz": "7384bfb356b9a89ddfee70b5ca494d187605bb516b4fff597e167f97e2236b22",
-  "stunnel-5.56.tar.gz.asc": "a7cda5fac7f8fd3f09ced96e03d95b2493d7900649d59ee2e3173f246daf9651",
+  "stunnel-5.70.tar.gz": "7bbc7b9e9a988d76301325db4c110ec360a98ffb8a221c7accbff9c0a8bae2f3",
   "stunnel-pop3s-client.conf": "95379ab5046177833b717c4c832748d31ec314f469c67e9fe4b160876ca93066",
   "stunnel-sfinger.conf": "4d06bccd910b1c8d89ed560fb8375e5e0b220e368a51ce6714e0bc2cd67dc6e4",
   "stunnel@.service": "8e86d44d83d1722371393ff3943e1779111b033da5e89ad1e564d2e5e3be0d89"

@@ -1,7 +1,7 @@
 Summary:        RPC program number mapper
 Name:           rpcbind
 Version:        1.2.5
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        BSD
 URL:            http://nfsv4.bullopensource.org
 Group:          Applications/Daemons
@@ -91,6 +91,9 @@ fi
 %systemd_postun_with_restart rpcbind.service rpcbind.socket
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.2.5-6
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Sep 07 2022 Mateusz Malisz <mamalisz@microsoft.com> - 1.2.5-5
 - Add portmap to provides
 

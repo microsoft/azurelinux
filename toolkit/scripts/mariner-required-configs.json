@@ -94,7 +94,8 @@
                     "y"
                 ],
                 "arch": [
-                    "AMD64"
+                    "AMD64",
+                    "ARM64"
                 ],
                 "comment": "Needed for customer",
                 "PR": [
@@ -1113,6 +1114,104 @@
                 "comment": "Do not enable mctp unless fix for CVE-2023-3439 is present",
                 "PR": [
                     "https://github.com/torvalds/linux/commit/b561275d633bcd8e0e8055ab86f1a13df75a0269"
+                ]
+            },
+            "CONFIG_STX104": {
+                "value": [
+                    "is not set",
+                    "y",
+                    "m",
+                    "<missing>"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "Needed for update to 5.15.131.1",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6196"
+                ]
+            },
+            "CONFIG_NET_CLS_RSVP": {
+                "value": [
+                    "<missing>"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "Needed for update to 5.15.133.1",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6286"
+                ]
+            },
+            "CONFIG_NET_CLS_RSVP6": {
+                "value": [
+                    "<missing>"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "Needed for update to 5.15.133.1",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6286"
+                ]
+            },
+            "CONFIG_FPGA_DFL_AFU": {
+                "value": [
+                    "<missing>",
+                    "is not set"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "Needs to be off for CVE-2023-26242",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6574"
+                ]
+            },
+            "CONFIG_VCC": {
+                "value": [
+                    "<missing>",
+                    "is not set"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "Needs to be off for CVE-2023-23039",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6574"
+                ]
+            },
+            "CONFIG_PHY_TEGRA_XUSB": {
+                "value": [
+                    "<missing>",
+                    "is not set"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "Needs to be off for CVE-2023-23000",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6574"
+                ]
+            },
+            "CONFIG_SMB_SERVER": {
+                "value": [
+                    "<missing>",
+                    "is not set"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "Needs to be off for CVE-2023-38431, CVE-2023-38430, CVE-2023-38427, CVE-2023-32258, CVE-2023-32257, CVE-2023-32254, CVE-2023-32252, CVE-2023-32250, CVE-2023-32247, CVE-2022-47940",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6574"
                 ]
             }
         }

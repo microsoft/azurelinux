@@ -1,12 +1,13 @@
 Summary:        A portable number theoretic multiple-precision integer library
 Name:           libtommath
 Version:        1.1.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.libtom.net/
 Source0:        https://github.com/libtom/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         CVE-2023-36328.patch
 
 BuildRequires:  libtool
 
@@ -25,7 +26,7 @@ The %{name}-devel package contains libraries and header files for developing
 applications that use %{name}.
 
 %prep
-%setup -q
+%autosetup -p1
 # Fix permissions on installed library
 sed -i -e 's/644 $(LIBNAME)/755 $(LIBNAME)/g' makefile.shared
 # Fix pkgconfig path
@@ -56,6 +57,9 @@ find %{buildroot} -name '*.a' -delete
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Thu Sep 07 2023 Brian Fjeldstad <bfjelds@microsoft.com> - 1.1.0-5
+- Fix CVE-2023-36328
+
 * Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.0-4
 - Removing docs to drop dependency on 'ghostscript'.
 - License verified.

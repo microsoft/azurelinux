@@ -72,6 +72,20 @@ func SetToSlice[T comparable](inputSet map[T]bool) []T {
 	return outputSlice[:index]
 }
 
+// SliceToSet converts a slice of K to a map[K]bool.
+func SliceToSet[K comparable](inputSlice []K) (outputSet map[K]bool) {
+	outputSet = make(map[K]bool, len(inputSlice))
+	for _, element := range inputSlice {
+		outputSet[element] = true
+	}
+	return outputSet
+}
+
+// RemoveDuplicatesFromSlice removes duplicate elements from a slice.
+func RemoveDuplicatesFromSlice[K comparable](inputSlice []K) (outputSlice []K) {
+	return SetToSlice(SliceToSet(inputSlice))
+}
+
 func nilCheck(expected interface{}, given interface{}) (checkValid, checkResult bool) {
 	return (expected == nil || given == nil), (expected == nil && given == nil)
 }

@@ -1,7 +1,7 @@
 Summary:        Command line tool for updating bootloader configs
 Name:           grubby
 Version:        8.40
-Release:        45%{?dist}
+Release:        46%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -112,6 +112,9 @@ current boot environment.
 %{_mandir}/man8/*.8*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 8.40-46
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed May 10 2022 Chris Co <chrco@microsoft.com> - 8.40-45
 - Remove default installkernel file and add requires for installkernel package
 

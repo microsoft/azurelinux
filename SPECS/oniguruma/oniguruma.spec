@@ -3,7 +3,7 @@
 Summary:        Regular expressions library
 Name:           oniguruma
 Version:        6.9.7.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -63,6 +63,9 @@ make  check
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 6.9.7.1-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Mon Jan 24 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 6.9.7.1-1
 - Upgraded to 6.9.7.1
 - Added majorversion variable.

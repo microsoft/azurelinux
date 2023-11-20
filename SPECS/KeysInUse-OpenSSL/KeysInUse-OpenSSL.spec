@@ -1,14 +1,13 @@
 Summary:        The KeysInUse Engine for OpenSSL allows the logging of private key usage through OpenSSL
 Name:           KeysInUse-OpenSSL
-Version:        0.3.3
-Release:        4%{?dist}
+Version:        0.3.4
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System/Libraries
 URL:            https://github.com/microsoft/KeysInUse-OpenSSL
-#Source0:       https://github.com/microsoft/KeysInUse-OpenSSL/archive/v%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/microsoft/KeysInUse-OpenSSL/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  golang >= 1.16.6
@@ -18,7 +17,7 @@ Requires:       openssl < 1.1.2
 Requires:       openssl >= 1.1.1
 
 %description
- The KeysInUse Engine for OpenSSL allows the logging of private key usage through OpenSSL
+The KeysInUse Engine for OpenSSL allows the logging of private key usage through OpenSSL
 
 %ifarch x86_64
 %define keysinuse_arch amd64
@@ -75,6 +74,18 @@ if [ -x %{_bindir}/keysinuseutil ]; then
 fi
 
 %changelog
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.3.4-3
+- Bump release to rebuild with go 1.20.9
+
+* Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 0.3.4-2
+- Bump release to rebuild with updated version of Go.
+
+* Fri Sep 22 2023 Maxwell Moyer-McKee <mamckee@microsoft.com> - 0.3.4-1
+- Fix memory leak for high reload public keys
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.3.3-5
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.3.3-4
 - Bump release to rebuild with go 1.19.12
 

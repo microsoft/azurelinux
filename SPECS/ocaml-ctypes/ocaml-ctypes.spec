@@ -1,7 +1,7 @@
 Summary:        Combinators for binding to C libraries without writing any C
 Name:           ocaml-ctypes
 Version:        0.18.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -127,6 +127,9 @@ make test
 %doc *.html *.css
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.18.0-6
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Jun 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.18.0-5
 - Fixing ptests.
 

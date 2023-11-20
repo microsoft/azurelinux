@@ -12,7 +12,7 @@
 Summary:        UCX is a communication library implementing high-performance messaging
 Name:           ucx
 Version:        1.11.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -255,6 +255,9 @@ process to map the memory of another process into its virtual address space.
 
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.11.0-4
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Tue Jul 26 2022 Rachel Menge <rachelmenge@microsoft.com> - 1.11.0-3
 - Move from SPECS-EXTENDED to SPECS
 - License verified

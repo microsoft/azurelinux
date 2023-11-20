@@ -1,7 +1,7 @@
 Summary:        Utilities for internationalization and localization
 Name:           gettext
 Version:        0.21
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3
 URL:            https://www.gnu.org/software/gettext
 Group:          Applications/System
@@ -58,6 +58,10 @@ make %{?_smp_mflags} check
 %{_mandir}/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.21-3
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+- License verified
+
 * Mon Sep 20 2021 Muhammad Falak <mwani@microsoft.com> 0.21-2
 - Add explicit Provides for `gettext-common-devel` & `gettext-libs`
 

@@ -1,7 +1,7 @@
 Summary:        This package contains programs to find files
 Name:           findutils
 Version:        4.8.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -64,6 +64,9 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.8.0-5
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Nov 23 2022 Chris PeBenito <chpebeni@microsoft.com> - 4.8.0-4
 - Force rebuild to address missing SELinux features.
 - Fix spec lint issues.

@@ -1,7 +1,7 @@
 Summary:        cpio-2.13
 Name:           cpio
 Version:        2.13
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -60,6 +60,9 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.13-5
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed May 18 2022 Chris Co <chrco@microsoft.com> - 2.13-4
 - Address CVE-2021-38185
 - Fix lint

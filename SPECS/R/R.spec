@@ -2,7 +2,7 @@
 Summary:        A language for data analysis and graphics
 Name:           R
 Version:        4.1.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -121,6 +121,9 @@ TZ="Europe/Paris" make check -k -i
 %endif
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.1.0-4
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Fri Mar 31 2023 Muhammad Falak <mwani@microsoft.com> - 4.1.0-3
 - Patch to fix build with curl >= 8.0.0
 

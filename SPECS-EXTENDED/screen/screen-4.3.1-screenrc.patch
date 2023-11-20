@@ -1,6 +1,18 @@
-diff -up screen-4.0.3/etc/etcscreenrc.screenrc screen-4.0.3/etc/etcscreenrc
---- screen-4.0.3/etc/etcscreenrc.screenrc	2003-12-05 14:46:13.000000000 +0100
-+++ screen-4.0.3/etc/etcscreenrc	2009-09-25 14:20:31.000000000 +0200
+From 6470f541ed0877c0f82d59da351e636cfdf94c74 Mon Sep 17 00:00:00 2001
+From: Muhammad Falak R Wani <falakreyaz@gmail.com>
+Date: Sat, 2 Sep 2023 10:27:42 +0530
+Subject: [PATCH 2/5] patch2
+
+Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
+---
+ etc/etcscreenrc | 12 ++++-----
+ etc/screenrc    | 65 +++++++++++++------------------------------------
+ 2 files changed, 23 insertions(+), 54 deletions(-)
+
+diff --git a/etc/etcscreenrc b/etc/etcscreenrc
+index a51d64a..9235e27 100644
+--- a/etc/etcscreenrc
++++ b/etc/etcscreenrc
 @@ -36,8 +36,8 @@ vbell_msg "   Wuff  ----  Wuff!!  "
  # IC    insert multiple chars
  # nx    terminal uses xon/xoff
@@ -12,7 +24,7 @@ diff -up screen-4.0.3/etc/etcscreenrc.screenrc screen-4.0.3/etc/etcscreenrc
  
  #the vt100 description does not mention "dl". *sigh*
  termcap  vt100 dl=5\E[M
-@@ -55,15 +55,15 @@ terminfo sun 'up=^K:AL=\E[%p1%dL:DL=\E[%
+@@ -55,15 +55,15 @@ terminfo sun 'up=^K:AL=\E[%p1%dL:DL=\E[%p1%dM:UP=\E[%p1%dA:DO=\E[%p1%dB:LE=\E[%p
  #xterm understands both im/ic and doesn't have a status line.
  #Note: Do not specify im and ic in the real termcap/info file as
  #some programs (e.g. vi) will (no,no, may (jw)) not work anymore.
@@ -32,9 +44,10 @@ diff -up screen-4.0.3/etc/etcscreenrc.screenrc screen-4.0.3/etc/etcscreenrc
  
  #
  # Do not use xterms alternate window buffer. 
-diff -up screen-4.0.3/etc/screenrc.screenrc screen-4.0.3/etc/screenrc
---- screen-4.0.3/etc/screenrc.screenrc	2006-10-23 15:06:32.000000000 +0200
-+++ screen-4.0.3/etc/screenrc	2009-09-25 14:31:30.000000000 +0200
+diff --git a/etc/screenrc b/etc/screenrc
+index ca6561d..2dffb38 100644
+--- a/etc/screenrc
++++ b/etc/screenrc
 @@ -1,21 +1,11 @@
 -#
 -# Example of a user's .screenrc file
@@ -155,3 +168,6 @@ diff -up screen-4.0.3/etc/screenrc.screenrc screen-4.0.3/etc/screenrc
  # bind = resize =
  # bind + resize +1
  # bind - resize -1
+-- 
+2.40.1
+

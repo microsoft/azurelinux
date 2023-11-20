@@ -2,7 +2,7 @@
 Summary:        Utility library for the Xfce4 desktop environment
 Name:           libxfce4util
 Version:        4.14.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -67,6 +67,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %doc %{_datadir}/gtk-doc/
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.14.0-5
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 4.14.0-4
 - License verified
 - Lint spec

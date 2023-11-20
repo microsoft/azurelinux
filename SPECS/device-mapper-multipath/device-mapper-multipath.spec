@@ -1,7 +1,7 @@
 Summary:        Provide tools to manage multipath devices
 Name:           device-mapper-multipath
 Version:        0.8.6
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
@@ -101,6 +101,9 @@ install -vd %{buildroot}%{_sysconfdir}/multipath
 %{_mandir}/man8/kpartx.8.gz
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.8.6-5
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Dec 14 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.8.6-4
 - Get patches to fix CVE-2022-41973, CVE-2022-41974 from Fedora 36
 

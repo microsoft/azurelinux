@@ -3,7 +3,7 @@
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        %{openssh_ver}
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -263,6 +263,9 @@ fi
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 8.9p1-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Thu Jul 27 2023 Riken Maharjan <rmaharjan@microsoft.com> - 8.9p1-1
 - Fix CVE-2023-38408
 - Update to 8.9p1 so that the patch can be applied.

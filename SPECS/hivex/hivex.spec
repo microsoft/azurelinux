@@ -8,7 +8,7 @@
 Summary:        Read and write Windows Registry binary hive files
 Name:           hivex
 Version:        1.3.21
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -186,7 +186,7 @@ if ! make check -k; then
         cat $f
         echo
     done
-    exit 1
+    false
 fi
 
 %files -f %{name}.lang
@@ -244,6 +244,12 @@ fi
 %{ruby_vendorarchdir}/_hivex.so
 
 %changelog
+* Tue Sep 26 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.21-3
+- Removing 'exit' calls from the '%%check' section.
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.3.21-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Tue May 31 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.3.20-1
 - Upgrade to 1.3.21 to fix CVE-2021-3504 and CVE-2021-3622.
 

@@ -10,7 +10,7 @@
 Summary:        iSCSI daemon and utility programs
 Name:           iscsi-initiator-utils
 Version:        6.%{open_iscsi_version}.%{open_iscsi_build}+%{git_short_commit_date}.%{git_short_commit}
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -293,6 +293,9 @@ fi
 %{python3_sitearch}/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 6.2.1.4+20210729.2a8f9d8-3
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Mon Mar 14 2022 Cameron Baird <cameronbaird@microsoft.com> - 6.2.1.4+20210729.2a8f9d8-2
 - Package iscsi-init.service 
 

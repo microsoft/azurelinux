@@ -3,7 +3,7 @@
 Summary:        Open Fabric Interfaces
 Name:           libfabric
 Version:        1.12.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD OR GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -85,6 +85,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man7/*.7*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.12.0-3
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Dec 01 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.12.0-2
 - Removing BR on "infinipath-psm-devel" and "libpsm2-devel".
 - Using the 1.12.0 final release version of the sources instead of the release candidate.

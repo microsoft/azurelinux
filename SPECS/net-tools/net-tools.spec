@@ -1,7 +1,7 @@
 Summary:        Networking Tools
 Name:           net-tools
 Version:        2.10
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -47,6 +47,9 @@ make BASEDIR=%{buildroot} install
 %{_mandir}/man8/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.10-3
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Mon Apr 04 2022 Rachel Menge <rachelmenge@microsoft.com> - 2.10-2
 - Remove ifconfig mv command
 

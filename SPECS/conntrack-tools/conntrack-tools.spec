@@ -1,7 +1,7 @@
 Summary:        Manipulate netfilter connection tracking table and run High Availability
 Name:           conntrack-tools
 Version:        1.4.5
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -96,6 +96,9 @@ echo "disable conntrackd.service" > %{buildroot}%{_libdir}/systemd/system-preset
 %systemd_postun conntrackd.service
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.4.5-8
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Mon Oct 31 2022 Francisco Huelsz Prince <frhuelsz@microsoft.com> - 1.4.5-7
 - Service is disabled by default. Now a minimal working config is provided.
 

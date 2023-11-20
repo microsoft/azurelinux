@@ -1,37 +1,30 @@
 %global with_lua 1
-%global with_maxminddb 1
-%global plugins_version 3.4
+%global plugins_version 4.0
 
 Summary:        Network traffic analyzer
 Name:           wireshark
+Version:        4.0.8
+Release:        1%{?dist}
+License:        BSD-1-Clause AND BSD-2-Clause AND BSD-3-Clause AND MIT AND GPL-2.0-or-later AND LGPL-2.0-or-later AND Zlib AND ISC AND (BSD-3-Clause OR GPL-2.0-only) AND (GPL-2.0-or-later AND Zlib)
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Version:        3.4.16
-Release:        1%{?dist}
-License:        BSD and GPLv2
-Url:            https://www.wireshark.org/
-Source0:        https://2.na.dl.wireshark.org/src/all-versions/%{name}-%{version}.tar.xz 
+URL:            https://www.wireshark.org/
+Source0:        https://wireshark.org/download/src/%{name}-%{version}.tar.xz
 Source1:        90-wireshark-usbmon.rules
-
-# Fedora-specific
 Patch2:         wireshark-0002-Customize-permission-denied-error.patch
-# Will be proposed upstream
 Patch3:         wireshark-0003-fix-string-overrun-in-plugins-profinet.patch
-# Fedora-specific
 Patch4:         wireshark-0004-Restore-Fedora-specific-groups.patch
-# Fedora-specific
 Patch5:         wireshark-0005-Fix-paths-in-a-wireshark.desktop-file.patch
-# Fedora-specific
 Patch6:         wireshark-0006-Move-tmp-to-var-tmp.patch
 Patch7:         wireshark-0007-cmakelists.patch
-
-#install tshark together with wireshark GUI
-
-
-BuildRequires:  bzip2-devel
+Patch8:         wireshark-0008-glib2-g_strdup-build.patch
+Patch9:         wireshark-0009-fix-asn2wrs-cmake.patch
+Patch10:        wireshark-0010-ripemd-fips-core-dump.patch
+Patch11:        wireshark-0011-manage-interfaces-crash.patch
 BuildRequires:  bison
+BuildRequires:  bzip2-devel
 BuildRequires:  c-ares-devel
-Buildrequires:  cmake
+BuildRequires:  cmake
 BuildRequires:  elfutils-devel
 BuildRequires:  flex
 BuildRequires:  gcc-c++
@@ -41,28 +34,30 @@ BuildRequires:  gnutls-devel
 BuildRequires:  krb5-devel
 BuildRequires:  libcap-devel
 BuildRequires:  libgcrypt-devel
-BuildRequires:  libnl3-devel
 BuildRequires:  libnghttp2-devel
+BuildRequires:  libnl3-devel
 BuildRequires:  libpcap-devel >= 0.9
 BuildRequires:  libselinux-devel
 BuildRequires:  libsmi-devel
 BuildRequires:  libssh-devel
 BuildRequires:  openssl-devel
 BuildRequires:  pcre-devel
+BuildRequires:  pcre2-devel
+BuildRequires:  python3
+BuildRequires:  python3-devel
+BuildRequires:  systemd-devel
+BuildRequires:  xdg-utils
+BuildRequires:  zlib-devel
 BuildRequires:  perl(English)
 BuildRequires:  perl(Pod::Html)
 BuildRequires:  perl(Pod::Man)
 BuildRequires:  perl(open)
-BuildRequires:  python3
-Buildrequires:  python3-devel
-BuildRequires:  systemd-devel
-BuildRequires:  xdg-utils
-BuildRequires:  zlib-devel
+#install tshark together with wireshark GUI
+Requires:       %{name}-cli = %{version}-%{release}
 Requires:       c-ares
 Requires:       glib2
 Requires:       systemd-libs
 Requires:       zlib
-Requires:       %{name}-cli = %{version}-%{release}
 
 %description
 Wireshark allows you to examine protocol data stored in files or as it is
@@ -76,23 +71,24 @@ example, view a complete TCP stream, save the contents of a file which was
 transferred over HTTP or CIFS, or play back an RTP audio stream.
 
 %package        cli
-Summary:          Network traffic analyzer
-Requires(pre):    shadow-utils
-Requires(post):   systemd-udev
+Summary:        Network traffic analyzer
+Requires(post): systemd-udev
+Requires(pre):  shadow-utils
 
 %description    cli
 This package contains command-line utilities, plugins, and documentation for
 Wireshark.
 
 %package        devel
-Summary:          Development headers and libraries for wireshark
-Requires:         %{name} = %{version}-%{release} glibc-devel glib2-devel
+Summary:        Development headers and libraries for wireshark
+Requires:       %{name} = %{version}-%{release}
+Requires:       glib2-devel
+Requires:       glibc-devel
 
 %description devel
 The wireshark-devel package contains the header files, developer
 documentation, and libraries required for development of wireshark scripts
 and plugins.
-
 
 %prep
 %autosetup -S git
@@ -101,7 +97,7 @@ and plugins.
 %cmake -G "Unix Makefiles" \
   -DCMAKE_INSTALL_PREFIX="%{_prefix}" \
   -DDISABLE_WERROR=ON \
-  -DENABLE_LUA=OFF \
+  -DENABLE_LUA=ON \
   -DENABLE_LIBXML2=ON \
   -DENABLE_NETLINK=ON \
   -DENABLE_NGHTTP2=ON \
@@ -115,10 +111,10 @@ and plugins.
   -DBUILD_wireshark=OFF \
   .
 
-make %{?_smp_mflags}
+%cmake_build
 
 %install
-make DESTDIR=%{buildroot} install
+%cmake_install
 
 
 #install devel files (inspired by debian/wireshark-dev.header-files)
@@ -135,23 +131,20 @@ mkdir -p "${IDIR}/wsutil"
 mkdir -p %{buildroot}%{_udevrulesdir}
 install -m 644 config.h epan/register.h "${IDIR}/"
 install -m 644 cfile.h file.h "${IDIR}/"
-install -m 644 ws_symbol_export.h "${IDIR}/"
 install -m 644 epan/*.h "${IDIR}/epan/"
 install -m 644 epan/crypt/*.h "${IDIR}/epan/crypt"
 install -m 644 epan/ftypes/*.h "${IDIR}/epan/ftypes"
 install -m 644 epan/dfilter/*.h "${IDIR}/epan/dfilter"
 install -m 644 epan/dissectors/*.h "${IDIR}/epan/dissectors"
-install -m 644 epan/wmem/*.h "${IDIR}/epan/wmem"
 install -m 644 wiretap/*.h "${IDIR}/wiretap"
 install -m 644 wsutil/*.h "${IDIR}/wsutil"
-install -m 644 ws_diag_control.h "${IDIR}/"
 install -m 644 %{SOURCE1} %{buildroot}%{_udevrulesdir}
 
 
 touch %{buildroot}%{_bindir}/%{name}
 
 # Remove libtool archives and static libs
-find %{buildroot} -type f -name "*.la" -delete
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %pre cli
 getent group wireshark >/dev/null || groupadd -r wireshark
@@ -162,14 +155,14 @@ getent group usbmon >/dev/null || groupadd -r usbmon
 # skip triggering if udevd isn't even accessible, e.g. containers or
 # rpm-ostree-based systems
 if [ -S /run/udev/control ]; then
-  /usr/bin/udevadm trigger --subsystem-match=usbmon
+  %{_bindir}/udevadm trigger --subsystem-match=usbmon
 fi
 
 %ldconfig_postun cli
 
 %files
 %{_bindir}/wireshark
-%{_mandir}/man1/wireshark.*
+#%{_mandir}/man1/wireshark.*
 
 %files cli
 %license COPYING
@@ -192,6 +185,7 @@ fi
 %dir %{_libdir}/wireshark/plugins
 %{_libdir}/wireshark/extcap/ciscodump
 %{_libdir}/wireshark/extcap/udpdump
+%{_libdir}/wireshark/extcap/wifidump
 %{_libdir}/wireshark/extcap/sshdump
 %{_libdir}/wireshark/extcap/sdjournal
 %{_libdir}/wireshark/extcap/dpauxmon
@@ -205,29 +199,29 @@ fi
 %{_libdir}/wireshark/plugins/%{plugins_version}/epan/*.so
 %{_libdir}/wireshark/plugins/%{plugins_version}/wiretap/*.so
 %{_libdir}/wireshark/plugins/%{plugins_version}/codecs/*.so
-%{_mandir}/man1/editcap.*
-%{_mandir}/man1/tshark.*
-%{_mandir}/man1/mergecap.*
-%{_mandir}/man1/text2pcap.*
-%{_mandir}/man1/capinfos.*
-%{_mandir}/man1/dumpcap.*
-%{_mandir}/man4/wireshark-filter.*
-%{_mandir}/man1/rawshark.*
-%{_mandir}/man1/dftest.*
-%{_mandir}/man1/randpkt.*
-%{_mandir}/man1/reordercap.*
-%{_mandir}/man1/sshdump.*
-%{_mandir}/man1/udpdump.*
-%{_mandir}/man1/androiddump.*
-%{_mandir}/man1/captype.*
-%{_mandir}/man1/ciscodump.*
-%{_mandir}/man1/randpktdump.*
-%{_mandir}/man1/dpauxmon.*
-%{_mandir}/man1/sdjournal.*
-%{_mandir}/man4/extcap.*
+#%{_mandir}/man1/editcap.*
+#%{_mandir}/man1/tshark.*
+#%{_mandir}/man1/mergecap.*
+#%{_mandir}/man1/text2pcap.*
+#%{_mandir}/man1/capinfos.*
+#%{_mandir}/man1/dumpcap.*
+#%{_mandir}/man4/wireshark-filter.*
+#%{_mandir}/man1/rawshark.*
+#%{_mandir}/man1/dftest.*
+#%{_mandir}/man1/randpkt.*
+#%{_mandir}/man1/reordercap.*
+#%{_mandir}/man1/sshdump.*
+#%{_mandir}/man1/udpdump.*
+#%{_mandir}/man1/androiddump.*
+#%{_mandir}/man1/captype.*
+#%{_mandir}/man1/ciscodump.*
+#%{_mandir}/man1/randpktdump.*
+#%{_mandir}/man1/dpauxmon.*
+#%{_mandir}/man1/sdjournal.*
+#%{_mandir}/man4/extcap.*
 %dir %{_datadir}/wireshark
 %{_datadir}/wireshark/*
-%{_docdir}/wireshark/*.html
+#%{_docdir}/wireshark/*.html
 
 %files devel
 %doc doc/README.* ChangeLog
@@ -236,6 +230,18 @@ fi
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Thu Sep 07 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 4.0.8-1
+- Upgrade version to address 27 CVEs
+- Address CVE-2021-22207, CVE-2021-22222, CVE-2021-22235, CVE-2021-39920, CVE-2021-39921,
+  CVE-2021-39922, CVE-2021-39923, CVE-2021-39924, CVE-2021-39925, CVE-2021-39926,
+  CVE-2021-39928, CVE-2021-39929, CVE-2021-4181, CVE-2021-4182, CVE-2021-4184,
+  CVE-2021-4185, CVE-2021-4186, CVE-2021-4190, CVE-2022-0581, CVE-2022-0582,
+  CVE-2022-0583, CVE-2022-0585, CVE-2022-0586, CVE-2022-3190, CVE-2022-4344,
+  CVE-2023-0667, CVE-2023-2906
+- Swith to SPDX identifiers
+- Fix source URL
+- Lint spec
+
 * Thu Oct 13 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.4.16-1
 - Upgrade to 3.4.16
 
@@ -244,7 +250,6 @@ fi
 - Disabled Android Dump.
 - Removed unused/disabled features.
 - Fixed Formatting.
-
 
 * Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.4.4-5
 - License verified.
@@ -864,7 +869,6 @@ fi
 * Fri Sep  9 2011 Jan Safranek <jsafrane@redhat.com> - 1.6.2-1
 - upgrade to 1.6.2
 - see https://www.wireshark.org/docs/relnotes/wireshark-1.6.2.html
-
 
 * Thu Jul 21 2011 Jan Safranek <jsafrane@redhat.com> - 1.6.1-1
 - upgrade to 1.6.1

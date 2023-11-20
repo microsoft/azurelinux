@@ -5,7 +5,7 @@
 Summary:        The Apache Kafka C library
 Name:           librdkafka
 Version:        1.8.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 # files like src/crc32c.c are under zlib license
 # files like win32/wingetopt.c are under ISC
 # files like src/rdfnv1a.c are under Public Domain
@@ -93,6 +93,9 @@ DESTDIR=%{buildroot} make install
 %{_libdir}/pkgconfig/rdkafka++-static.pc
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.8.2-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Thu Jan 13 2022 Henry Li <lihl@microsoft.com> - 1.8.2-1
 - Upgrade to version 1.8.2
 - Use python3 as BR instead of python2

@@ -12,17 +12,21 @@ toolkit_root := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 SCRIPTS_DIR  ?= $(toolkit_root)/scripts
 
 # Build targets
-ifeq ($(origin CONFIG_FILE), undefined)
-CONFIG_FILE             = $(toolkit_root)/imageconfigs/core-efi.json
-$(warning CONFIG_FILE is undefined, defaulting to toolkit's core-efi.json.)
-endif
+##help:var:CONFIG_FILE:<config_path>=Path to image configuration file to use. Will add package dependencies and define final image generated.
+CONFIG_FILE             ?=
 CONFIG_BASE_DIR         ?= $(dir $(CONFIG_FILE))
 PACKAGE_BUILD_LIST      ?=
+##help:var:PACKAGE_REBUILD_LIST:<spec_list>=List of space-separated spec folders to force rebuild. Must not overlap with "PACKAGE_IGNORE_LIST". Example: PACKAGE_REBUILD_LIST="kernel go which".
 PACKAGE_REBUILD_LIST    ?=
+##help:var:PACKAGE_IGNORE_LIST:<spec_list>=List of space-separated spec folders to ignore during the build. Must not overlap with "PACKAGE_REBUILD_LIST", may overlap with "PACKAGE_BUILD_LIST". Example: PACKAGE_IGNORE_LIST="zlib".
 PACKAGE_IGNORE_LIST     ?=
+##help:var:SRPM_PACK_LIST:<spec_list>=List of space-separated spec folders inside "SPECS_DIR" to analyze for the build. If empty, all items inside the "SPECS_DIR" will be analyzed. Example: SRPM_PACK_LIST="kernel go which".
 SRPM_PACK_LIST          ?=
+##help:var:TEST_RUN_LIST:<spec_list>=List of space-separated spec folders to consider for package tests. Specs from the listed folders MUST contain the "%check" section. If empty, all testable items from "SRPM_PACK_LIST" will be considered. Will not re-test previously built packages. Example: TEST_RUN_LIST="libguestfs zlib".
 TEST_RUN_LIST           ?=
+##help:var:TEST_RERUN_LIST:<spec_list>=List of space-separated spec folders to force running a package test for. Specs from the listed folders MUST contain the "%check" section. Must not overlap with "TEST_IGNORE_LIST". Example: TEST_RERUN_LIST="libguestfs zlib".
 TEST_RERUN_LIST         ?=
+##help:var:TEST_IGNORE_LIST:<spec_list>=List of space-separated spec folders to ignore for package tests. Must not overlap with "TEST_RERUN_LIST", may overlap with "TEST_RUN_LIST". Example: TEST_IGNORE_LIST="acl".
 TEST_IGNORE_LIST        ?=
 
 ######## SET INCREMENTAL BUILD FLAGS ########
@@ -51,6 +55,7 @@ INITRD_CACHE_SUMMARY                 ?=
 PACKAGE_ARCHIVE                      ?=
 PACKAGE_BUILD_RETRIES                ?= 1
 CHECK_BUILD_RETRIES                  ?= 1
+EXTRA_BUILD_LAYERS                   ?= 0
 REFRESH_WORKER_CHROOT                ?= y
 # Set to 0 to use the number of logical CPUs.
 CONCURRENT_PACKAGE_BUILDS            ?= 0
@@ -83,11 +88,13 @@ BUILD_DIR        ?= $(PROJECT_ROOT)/build
 OUT_DIR          ?= $(PROJECT_ROOT)/out
 SPECS_DIR        ?= $(PROJECT_ROOT)/SPECS
 CCACHE_DIR       ?= $(PROJECT_ROOT)/ccache
+CCACHE_CONFIG    ?= $(RESOURCES_DIR)/manifests/package/ccache-configuration.json
 
 # Sub-folder defines
 LOGS_DIR           ?= $(BUILD_DIR)/logs
 PKGBUILD_DIR       ?= $(BUILD_DIR)/pkg_artifacts
 CACHED_RPMS_DIR    ?= $(BUILD_DIR)/rpm_cache
+REPO_QUERY_DIR     ?= $(BUILD_DIR)/repo_query
 BUILD_SRPMS_DIR    ?= $(BUILD_DIR)/INTERMEDIATE_SRPMS
 MACRO_DIR          ?= $(BUILD_DIR)/macros
 BUILD_SPECS_DIR    ?= $(BUILD_DIR)/INTERMEDIATE_SPECS
@@ -116,17 +123,22 @@ IMAGES_DIR      ?= $(OUT_DIR)/images
 # External source server
 SOURCE_URL         ?= https://cblmarinerstorage.blob.core.windows.net/sources/core
 
+# Note on order of precedence: When a variable is passed from the commandline (i.e., make PACKAGE_URL_LIST="my list"), append
+# assignments do not take affect without using 'override'. This means that all of the following PACKAGE_URL_LIST values will
+# be ignored if the user sets any value.
+##help:var:PACKAGE_URL_LIST:<urls_list>=Space-separated list of URLs to download toolchain RPM packages from, used to populate the toolchain packages if `REBUILD_TOOLCHAIN=n'. The URLs will replace the default set of URLs. Print default list with 'make -s printvar-PACKAGE_URL_LIST'.
 PACKAGE_URL_LIST   ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)
 PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/debuginfo/$(build_arch)
 PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/Microsoft/$(build_arch)
 REPO_LIST          ?=
 SRPM_URL_LIST      ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms
 
+# Preview URLs/repos will be appended (via override) even if the user sets custom values for the lists.
 ifeq ($(USE_PREVIEW_REPO),y)
-   PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/$(build_arch)
-   PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/debuginfo/$(build_arch)
-   PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/Microsoft/$(build_arch)
-   SRPM_URL_LIST      += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/srpms
+   override PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/$(build_arch)
+   override PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/debuginfo/$(build_arch)
+   override PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/Microsoft/$(build_arch)
+   override SRPM_URL_LIST      += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/srpms
    ifneq ($(wildcard $(PREVIEW_REPO)),)
       override REPO_LIST += $(PREVIEW_REPO)
    else
@@ -142,6 +154,7 @@ CA_CERT     ?=
 TLS_CERT    ?=
 TLS_KEY     ?=
 
+##help:var:LOG_LEVEL:{panic,fatal,error,warn,info,debug,trace}=Set logging level for toolkit.
 # panic,fatal,error,warn,info,debug,trace
 LOG_LEVEL          ?= info
 STOP_ON_WARNING    ?= n
@@ -154,6 +167,10 @@ STOP_ON_FETCH_FAIL ?= n
 all: toolchain go-tools chroot-tools
 
 ######## SUBMAKE INCLUDES ########
+
+# General help information used by 'help' target; this should be included first so
+# its help will be displayed at the top of the help output.
+include $(SCRIPTS_DIR)/help.mk
 
 # Misc function defines
 # Variable prerequisite tracking
@@ -168,17 +185,19 @@ include $(SCRIPTS_DIR)/profile.mk
 # Set the variables for build number, distro tag, etc
 include $(SCRIPTS_DIR)/build_tag.mk
 
+# go utilities with:
+#   go-tools, clean-go-tools, go-tidy-all (tidy go utilities before committing) go-test-coverage
+include $(SCRIPTS_DIR)/tools.mk
+
 # Bootstrap the toolchain's compilers and other tools with:
 #   toolchain, raw-toolchain, clean-toolchain, check-manifests, check-x86_64-manifests, check-aarch64-manifests
 include $(SCRIPTS_DIR)/toolchain.mk
 
-# go utilities with:
-#   go-tools, clean-go-tools, go-tidy-all (tidy go utilities before committing) go-test-coverage
 # chroot worker with:
 #   chroot-tools clean-chroot-tools
 # macro definitions with:
 #   macro-tools clean-macro-tools
-include $(SCRIPTS_DIR)/tools.mk
+include $(SCRIPTS_DIR)/chroot.mk
 
 # Create SRPMS from local SPECS with:
 #   input-srpms, clean-input-srpms
@@ -200,6 +219,10 @@ include $(SCRIPTS_DIR)/toolkit.mk
 #   pre-cache
 include $(SCRIPTS_DIR)/precache.mk
 
+# Run repo query under chroot with:
+# repo-query
+include $(SCRIPTS_DIR)/repoquerywrapper.mk
+
 # Create a package build workplan with:
 #   workplan, clean-workplan clean-cache
 # Build a package with:
@@ -212,6 +235,11 @@ include $(SCRIPTS_DIR)/pkggen.mk
 #   image, iso, clean-imggen
 include $(SCRIPTS_DIR)/imggen.mk
 
+# Add make targets for sodiff to determine if additional packages are required to be recompiled:
+#  sodiff-check, build-summary, build-package-summary, fake-built-packages-list, sodiff-setup
+include $(SCRIPTS_DIR)/analysis.mk
+
+##help:target:clean=Clean all built files.
 # Each component provides specific clean implementations which clean depends on.
 # They are guaranteed to run first and will verify there are no existing mount points
 # left after a chroot.
@@ -221,6 +249,18 @@ clean:
 	rm -rf $(toolkit_root)/out
 
 ######## VARIABLE PRINTING ########
+
+# Display Makefile usage help; please consult $(SCRIPTS_DIR)/help.mk for documentation
+# on the format of the comment annotations being extracted here.
+.PHONY: help
+help:
+	@sed -ne '/@sed/!s/##help:desc://p' $(MAKEFILE_LIST)
+	@sed -ne '/@sed/!s/##help:target-heading://p' $(MAKEFILE_LIST)
+	@grep -h "^##help:target:" $(MAKEFILE_LIST) | sed -e "s/^##help:target:\([^=]\+\)=\(.*\)/\1|\2/" | sort | awk -F'|' '{ printf("  \033[3m%-26s\033[0m %s\n", $$1, $$2)}'
+	@sed -ne '/@sed/!s/##help:var-heading://p' $(MAKEFILE_LIST)
+	@grep -h "^##help:var:" $(MAKEFILE_LIST) | sed -e "s/^##help:var:\([^:]\+\):\([^=]*\)=\(.*\)/\1|\2|\3/" | sort | awk -F'|' '{ printf("  \033[92;3m%s\033[0m=%s\n      %s\n\n", $$1, $$2, $$3) }'
+	@sed -ne '/@sed/!s/##help:example-heading://p' $(MAKEFILE_LIST)
+	@grep -h "^##help:example:" $(MAKEFILE_LIST) | sed -e "s/^##help:example:\(.*\)/  \1/"
 
 # Some common version information that is useful to gather. Generally should be run with the Make flag --quiet
 get-version: printvar-RELEASE_VERSION

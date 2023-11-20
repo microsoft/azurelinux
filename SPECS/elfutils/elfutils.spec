@@ -4,7 +4,7 @@
 Summary:        A collection of utilities and DSOs to handle compiled objects
 Name:           elfutils
 Version:        0.186
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+ AND (GPLv2+ OR LGPLv3+)
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -268,6 +268,9 @@ fi
 %defattr(-,root,root)
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.186-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Feb 16 2022 Muhammad Falak <mwani@microsoft.com> - 0.186-1
 - Bump version to 0.186
 - Skip a test which can fail 'run-reverse-sections-self'

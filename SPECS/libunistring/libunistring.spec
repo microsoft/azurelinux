@@ -1,7 +1,7 @@
 Summary:        GNU Unicode string library
 Name:           libunistring
 Version:        0.9.10
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        LGPLv3+
 Url:            http://www.gnu.org/software/libunistring/
 Source0:        http://ftp.gnu.org/gnu/libunistring/%{name}-%{version}.tar.xz
@@ -54,6 +54,9 @@ make %{?_smp_mflags} check
 %{_libdir}/*.so
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.9.10-6
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.9.10-5
 - Remove libtool archive files from final packaging
 

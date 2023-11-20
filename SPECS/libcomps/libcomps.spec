@@ -2,7 +2,7 @@
 
 Name:           libcomps
 Version:        0.1.18
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Comps XML file manipulation library
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -77,6 +77,9 @@ popd
 %{python3_sitearch}/%{name}-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.1.18-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Nov 10 2021 Nicolas Guibourge <nicolasg@microsoft.com> 0.1.18-1
 - Upgrade to version 0.1.18.
 

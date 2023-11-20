@@ -1,7 +1,7 @@
 Summary:        Program for compiling packages
 Name:           make
 Version:        4.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -43,6 +43,9 @@ rm -rf %{buildroot}%{_infodir}
 %{_mandir}/*/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.3-3
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Thu Jan 20 2022 Muhammad Falak <mwani@microsoft.com> - 4.3-2
 - Fix ptest with an explicit BR on `perl(lib)`.
 

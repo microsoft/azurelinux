@@ -333,6 +333,7 @@ case $(uname -m) in
 esac
 # disable no-pie for gcc binaries
 sed -i '/^NO_PIE_CFLAGS = /s/@NO_PIE_CFLAGS@//' gcc/Makefile.in
+patch -Np1 -i /tools/CVE-2023-4039.patch
 # LFS 7.4:  Workaround a bug so that GCC doesn't install libiberty.a, which is already provided by Binutils:
 # sed -i 's/install_to_$(INSTALL_DEST) //' libiberty/Makefile.in
 # Need to remove this link to /tools/lib/gcc as the final gcc includes will be installed here.
@@ -827,15 +828,15 @@ popd
 rm -rf diffutils-3.8
 touch /logs/status_diffutils_complete
 
-echo Gawk-5.1.0
-tar xf gawk-5.1.0.tar.xz
-pushd gawk-5.1.0
+echo Gawk-5.1.1
+tar xf gawk-5.1.1.tar.xz
+pushd gawk-5.1.1
 sed -i 's/extras//' Makefile.in
 ./configure --prefix=/usr
 make -j$(nproc)
 make install
 popd
-rm -rf gawk-5.1.0
+rm -rf gawk-5.1.1
 touch /logs/status_gawk_complete
 
 echo Findutils-4.8.0

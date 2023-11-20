@@ -45,6 +45,9 @@ const (
 	repoIDCacheRegular   = "fetcher-cloned-repo"
 	repoIDPreview        = "mariner-preview"
 	repoIDToolchain      = "toolchain-repo"
+
+	useSingleTransaction    = true
+	useMultipleTransactions = !useSingleTransaction
 )
 
 // RpmRepoCloner represents an RPM repository cloner.
@@ -75,6 +78,7 @@ func ConstructCloner(destinationDir, tmpDir, workerTar, existingRpmsDir, toolcha
 	err = r.initialize(destinationDir, tmpDir, workerTar, existingRpmsDir, toolchainRpmsDir, repoDefinitions)
 	if err != nil {
 		err = fmt.Errorf("failed to prep new rpm cloner:\n%w", err)
+		return
 	}
 
 	tlsKey, tlsCert = strings.TrimSpace(tlsKey), strings.TrimSpace(tlsCert)
@@ -330,20 +334,51 @@ func (r *RpmRepoCloner) initializeMountedChrootRepo(repoDir string) (err error) 
 // If cloneDeps is set, package dependencies will also be cloned.
 // It will automatically resolve packages that describe a provide or file from a package.
 // If all packages were pre-built, the cloner will set allPackagesPrebuilt = true.
-func (r *RpmRepoCloner) Clone(cloneDeps bool, packagesToClone ...*pkgjson.PackageVer) (allPackagesPrebuilt bool, err error) {
+func (r *RpmRepoCloner) CloneByPackageVer(cloneDeps bool, packagesToClone ...*pkgjson.PackageVer) (allPackagesPrebuilt bool, err error) {
 	packageNames := []string{}
 	for _, packageToClone := range packagesToClone {
 		logger.Log.Debugf("Cloning (%s).", packageToClone)
 		packageNames = append(packageNames, convertPackageVersionToTdnfArg(packageToClone))
 	}
-	return r.CloneRawPackageNames(cloneDeps, packageNames...)
+	return r.CloneByName(cloneDeps, packageNames...)
 }
 
-// CloneRawPackageNames clones the provided package name exactly as specified.
+// CloneTransaction clones the provided list of packages in a single transaction.
+// If cloneDeps is set, package dependencies will also be cloned.
+// It will automatically resolve packages that describe a provide or file from a package.
+// If all packages were pre-built, the cloner will set allPackagesPrebuilt = true.
+func (r *RpmRepoCloner) CloneByPackageVerSingleTransaction(cloneDeps bool, packagesToClone ...*pkgjson.PackageVer) (allPackagesPrebuilt bool, err error) {
+	packageNames := []string{}
+	for _, packageToClone := range packagesToClone {
+		logger.Log.Debugf("Cloning (%s).", packageToClone)
+		packageNames = append(packageNames, convertPackageVersionToTdnfArg(packageToClone))
+	}
+	return r.CloneByNameSingleTransaction(cloneDeps, packageNames...)
+}
+
+// CloneByName clones the provided package name exactly as specified, with one transaction per package.
+// Any conditional strings will be passed to tdnf verbatim (i.e. "pkg = ver1.2.3-4.cm2")
 // If cloneDeps is set, package dependencies will also be cloned.
 // This version of clone will not resolve provides or files from other packages beyond what tdnf is able to do itself.
 // If all packages were pre-built, the cloner will set allPackagesPrebuilt = true.
-func (r *RpmRepoCloner) CloneRawPackageNames(cloneDeps bool, rawPackageNames ...string) (allPackagesPrebuilt bool, err error) {
+func (r *RpmRepoCloner) CloneByName(cloneDeps bool, rawPackageNames ...string) (allPackagesPrebuilt bool, err error) {
+	return r.cloneRawPackageNames(cloneDeps, useMultipleTransactions, rawPackageNames...)
+}
+
+// CloneRawPackageNames clones the provided package name exactly as specified, using a single transaction.
+// Any conditional strings will be passed to tdnf verbatim (i.e. "pkg = ver1.2.3-4.cm2")
+// If cloneDeps is set, package dependencies will also be cloned.
+// This version of clone will not resolve provides or files from other packages beyond what tdnf is able to do itself.
+// If all packages were pre-built, the cloner will set allPackagesPrebuilt = true.
+func (r *RpmRepoCloner) CloneByNameSingleTransaction(cloneDeps bool, rawPackageNames ...string) (allPackagesPrebuilt bool, err error) {
+	return r.cloneRawPackageNames(cloneDeps, useSingleTransaction, rawPackageNames...)
+}
+
+// cloneRawPackageNames clones the requested packages by name exactly as requested (including any version or condition).
+// If cloneDeps is set, package dependencies will also be cloned.
+// If singleTransaction is set, all packages will be cloned in a single transaction.
+// If all packages come from the toolchain or local builds, the cloner will set allPackagesPrebuilt = true.
+func (r *RpmRepoCloner) cloneRawPackageNames(cloneDeps, singleTransaction bool, rawPackageNames ...string) (allPackagesPrebuilt bool, err error) {
 	timestamp.StartEvent("cloning packages", nil)
 	defer timestamp.StopEvent(nil)
 
@@ -363,11 +398,22 @@ func (r *RpmRepoCloner) CloneRawPackageNames(cloneDeps bool, rawPackageNames ...
 
 	logger.Log.Debugf("Will clone in total %d items.", len(rawPackageNames))
 
-	allPackagesPrebuilt = true
-	for _, packageNameToClone := range rawPackageNames {
-		logger.Log.Debugf("Cloning raw name (%s).", packageNameToClone)
+	// Create a list of lists for each transaction. Each transaction will be cloned separately. Generally either all
+	// packages will be cloned in a single transaction or each package will be cloned in its own transaction.
+	transactions := [][]string{}
+	if singleTransaction {
+		transactions = append(transactions, rawPackageNames)
+	} else {
+		for _, packageName := range rawPackageNames {
+			transactions = append(transactions, []string{packageName})
+		}
+	}
 
-		finalArgs := append(constantArgs, packageNameToClone)
+	allPackagesPrebuilt = true
+	for _, packageNamesToClone := range transactions {
+		logger.Log.Debugf("Cloning raw names (%v).", packageNamesToClone)
+
+		finalArgs := append(constantArgs, packageNamesToClone...)
 		err = r.chroot.Run(func() (chrootErr error) {
 			prebuilt, chrootErr := r.clonePackage(finalArgs)
 			if !prebuilt {

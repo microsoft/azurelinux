@@ -1,0 +1,12 @@
+diff -Naur hping3-20051105-orig/statistics.c hping3-20051105/statistics.c
+--- hping3-20051105-orig/statistics.c	2004-04-09 19:38:56.000000000 -0400
++++ hping3-20051105/statistics.c	2012-07-17 18:47:06.306378289 -0400
+@@ -30,7 +30,7 @@
+ 			lossrate = 100;
+ 
+ 	fprintf(stderr, "\n--- %s hping statistic ---\n", targetname);
+-	fprintf(stderr, "%d packets tramitted, %d packets received, "
++	fprintf(stderr, "%d packets transmitted, %d packets received, "
+ 			"%d%% packet loss\n", sent_pkt, recv_pkt, lossrate);
+ 	if (out_of_sequence_pkt)
+ 		fprintf(stderr, "%d out of sequence packets received\n",

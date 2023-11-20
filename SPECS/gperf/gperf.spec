@@ -1,7 +1,7 @@
 Summary:	Gperf
 Name:		gperf
 Version:	3.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:	GPLv3+
 URL:		http://freedesktop.org/wiki/Software/%{name}l/
 Source0:	http://ftp.gnu.org/gnu/gperf/%{name}-%{version}.tar.gz
@@ -42,6 +42,9 @@ make %{?_smp_mflags} check
 %{_bindir}/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.1-5
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 3.1-4
 - Remove unused `%%define sha1` lines
 - License verified

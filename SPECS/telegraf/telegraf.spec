@@ -1,7 +1,7 @@
 Summary:        agent for collecting, processing, aggregating, and writing metrics.
 Name:           telegraf
-Version:        1.27.3
-Release:        2%{?dist}
+Version:        1.27.4
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,9 +10,11 @@ URL:            https://github.com/influxdata/telegraf
 Source0:        %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Use the generate_source_tarbbal.sh script to get the vendored sources.
 Source1:        %{name}-%{version}-vendor.tar.gz
-Patch0:         add-extra-metrics.patch
+Patch0:         CVE-2023-46129.patch
+
 BuildRequires:  golang
 BuildRequires:  systemd-devel
+
 Requires:       logrotate
 Requires:       procps-ng
 Requires:       shadow-utils
@@ -75,6 +77,17 @@ fi
 %dir %{_sysconfdir}/%{name}/telegraf.d
 
 %changelog
+* Thu Nov 09 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.27.4-1
+- Backporting patch for CVE-2023-46129.
+- Updating to version 1.27.4.
+- Removed invalid, outdated patch.
+
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.27.3-4
+- Bump release to rebuild with go 1.20.9
+
+* Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 1.27.3-3
+- Bump release to rebuild with updated version of Go.
+
 * Mon Aug 28 2023 Cameron Baird <cameronbaird@microsoft.com> - 1.27.3-2
 - Bump release to rebuild with go 1.20.7
 

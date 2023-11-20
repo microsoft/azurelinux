@@ -1,15 +1,35 @@
-check crypt output (rhbz#815605)
+From de1b63fabfb353f24910da2673e348c731c623b5 Mon Sep 17 00:00:00 2001
+From: Muhammad Falak R Wani <falakreyaz@gmail.com>
+Date: Sat, 2 Sep 2023 10:32:36 +0530
+Subject: [PATCH 5/5] check crypt output (rhbz#815605)
+
+Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
+---
+ misc.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
 diff --git a/misc.c b/misc.c
-index 2022a06..235c82f 100644
+index 95093a9..bd5a050 100644
 --- a/misc.c
 +++ b/misc.c
-@@ -57,6 +57,8 @@ register const char *str;
+@@ -68,11 +68,13 @@ SaveStr(register const char *str)
+ char *
+ SaveStrn(register const char *str, int n)
  {
-   register char *cp;
+-	register char *cp;
++  register char *cp;
  
+-	if ((cp = malloc(n + 1)) == NULL)
+-		Panic(0, "%s", strnomem);
+-	else {
 +  if(str == NULL)
 +    Panic(0, "SaveStr() received NULL - possibly failed crypt()");
-   if ((cp = malloc(strlen(str) + 1)) == NULL)
-     Panic(0, "%s", strnomem);
-   else
++  if ((cp = malloc(strlen(str) + 1)) == NULL)
++    Panic(0, "%s", strnomem);
++  else {
+ 		bcopy((char *)str, cp, n);
+ 		cp[n] = 0;
+ 	}
+-- 
+2.40.1
+

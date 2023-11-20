@@ -123,7 +123,7 @@ func calculatePackagesToBuild(packagesNamesToBuild, packagesNamesToRebuild []*pk
 	}
 
 	packageVersToBuild = append(packageVersToBuild, packageVersFromConfig...)
-	packageVersToBuild = removePackageVersDuplicates(packageVersToBuild)
+	packageVersToBuild = sliceutils.RemoveDuplicatesFromSlice(packageVersToBuild)
 
 	return
 }
@@ -171,16 +171,6 @@ func filterLocalPackagesOnly(packageVersionsInConfig []*pkgjson.PackageVer, depe
 	}
 
 	return
-}
-
-func removePackageVersDuplicates(packageVers []*pkgjson.PackageVer) []*pkgjson.PackageVer {
-	uniquePackageVersToBuild := make(map[*pkgjson.PackageVer]bool)
-
-	for _, packageVer := range packageVers {
-		uniquePackageVersToBuild[packageVer] = true
-	}
-
-	return sliceutils.SetToSlice(uniquePackageVersToBuild)
 }
 
 // packageNamesToPackages converts the input strings to PackageVer structures that are understood by the graph.

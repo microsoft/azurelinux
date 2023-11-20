@@ -2,7 +2,7 @@
 Summary:        NIS (or YP) client programs
 Name:           yp-tools
 Version:        4.2.3
-Release:        14%{?dist}
+Release:        15%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -85,6 +85,9 @@ make DESTDIR=%{buildroot} INSTALL_PROGRAM=install install
 %{_var}/yp/nicknames
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.2.3-15
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Aug 24 2022 Zhichun Wan <zhichunwan@microsoft.com> - 4.2.3-14
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
 - License verified

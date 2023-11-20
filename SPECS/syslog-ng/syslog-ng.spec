@@ -1,7 +1,7 @@
 Summary:        Next generation system logger facilty
 Name:           syslog-ng
 Version:        3.33.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD AND GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -147,6 +147,9 @@ fi
 %{_libdir}/pkgconfig/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.33.2-4
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Mon Jan 31 2022 Thomas Crain <thcrain@microsoft.com> - 3.33.2-3
 - Remove python2 subpackage
 

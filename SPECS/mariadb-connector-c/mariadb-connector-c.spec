@@ -3,7 +3,7 @@
 Summary:        The MariaDB Native Client library (C driver)
 Name:           mariadb-connector-c
 Version:        3.1.10
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -194,6 +194,9 @@ popd
 #      NEW:         PR submitted, problem explained, waiting on upstream response
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.1.10-6
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Fri Jun 17 2022 Andrew Phelps <anphel@microsoft.com> - 3.1.10-5
 - Change Requires to -config package to resolve /etc/my.cnf conflict
 

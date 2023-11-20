@@ -1,0 +1,63 @@
+{
+    "Disks": [
+        {
+            "PartitionTableType": "gpt",
+            "MaxSize": 4096,
+            "Artifacts": [
+                {
+                    "Name": "core",
+                    "Type": "vhdx"
+                }
+            ],
+            "Partitions": [
+                {
+                    "ID": "boot",
+                    "Flags": [
+                        "esp",
+                        "boot"
+                    ],
+                    "Start": 1,
+                    "End": 9,
+                    "FsType": "fat32"
+                },
+                {
+                    "ID": "rootfs",
+                    "Start": 9,
+                    "End": 0,
+                    "FsType": "ext4"
+                }
+            ]
+        }
+    ],
+    "SystemConfigs": [
+        {
+            "Name": "Standard",
+            "BootType": "efi",
+            "PartitionSettings": [
+                {
+                    "ID": "boot",
+                    "MountPoint": "/boot/efi",
+                    "MountOptions": "umask=0077"
+                },
+                {
+                    "ID": "rootfs",
+                    "MountPoint": "/"
+                }
+            ],
+            "PackageLists": [
+                "packagelists/baremetal-packages.json",
+                "packagelists/cloud-init-packages.json",
+                "packagelists/core-packages-image.json",
+                "packagelists/selinux-full.json"
+            ],
+            "KernelCommandLine": {
+                "ExtraCommandLine": "console=tty0 console=ttyS0",
+                "SELinux": "enforcing"
+            },
+            "KernelOptions": {
+                "default": "kernel-hci"
+            },
+            "Hostname": "azure-linux"
+        }
+    ]
+}

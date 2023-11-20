@@ -1,7 +1,7 @@
 Summary:        LTTng-UST is an Userspace Tracer library
 Name:           lttng-ust
 Version:        2.13.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+ and LGPLv2+ and MIT
 URL:            https://lttng.org
 Source0:        https://lttng.org/files/%{name}/%{name}-%{version}.tar.bz2
@@ -62,6 +62,9 @@ rm -vf %{buildroot}%{_libdir}/*.la
 %{_libdir}/pkgconfig/lttng-ust*.pc
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.13.1-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 *   Fri Jan 14 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.13.1-1
 -   Upgrading to 2.13.1
 

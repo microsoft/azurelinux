@@ -1,41 +1,38 @@
+Summary:        Implementation of the PKCS#11 (Cryptoki) specification v2.11
+Name:           opencryptoki
+Version:        3.17.0
+Release:        1%{?dist}
+License:        CPL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Name:			opencryptoki
-Summary:		Implementation of the PKCS#11 (Cryptoki) specification v2.11
-Version:		3.13.0
-Release:		2%{?dist}
-License:		CPL
-URL:			https://github.com/opencryptoki/opencryptoki
-Source0:		https://github.com/opencryptoki/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
-Source1:		opencryptoki.module
+URL:            https://github.com/opencryptoki/opencryptoki
+Source0:        https://github.com/opencryptoki/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
+Source1:        opencryptoki.module
 # https://bugzilla.redhat.com/show_bug.cgi?id=732756
-Patch0:			opencryptoki-3.11.0-group.patch
-
+Patch0:         opencryptoki-3.11.0-group.patch
 # bz#1373833, change tmpfiles snippets from /var/lock/* to /run/lock/*
-Patch1:			opencryptoki-3.11.0-lockdir.patch
-
-# Use --no-undefined to debug missing symbols
-#Patch100:			%%{name}-3.2-no-undefined.patch
-
-Requires(pre):		coreutils
-BuildRequires:		gcc
-BuildRequires:		openssl-devel
-BuildRequires:		trousers-devel
-BuildRequires:		openldap-devel
-BuildRequires:		autoconf automake libtool
-BuildRequires:		bison flex
-BuildRequires:		systemd
-BuildRequires:		expect
+Patch1:         opencryptoki-3.11.0-lockdir.patch
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  bison
+BuildRequires:  expect
+BuildRequires:  flex
+BuildRequires:  gcc
+BuildRequires:  libtool
+BuildRequires:  openldap-devel
+BuildRequires:  openssl-devel
+BuildRequires:  systemd
+BuildRequires:  trousers-devel
+Requires:       %{name}(token)
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+Requires(post): systemd
+Requires(postun): systemd
+Requires(pre):  %{name}-libs%{?_isa} = %{version}-%{release}
+Requires(pre):  coreutils
+Requires(preun): systemd
 %ifarch s390 s390x
-BuildRequires:		libica-devel >= 2.3
+BuildRequires:  libica-devel >= 2.3
 %endif
-Requires(pre):		%{name}-libs%{?_isa} = %{version}-%{release}
-Requires:		%{name}-libs%{?_isa} = %{version}-%{release}
-Requires:		%{name}(token)
-Requires(post):		systemd
-Requires(preun):	systemd
-Requires(postun):	systemd
-
 
 %description
 Opencryptoki implements the PKCS#11 specification v2.11 for a set of
@@ -45,10 +42,9 @@ token implementation that can be used without any cryptographic
 hardware.
 This package contains the Slot Daemon (pkcsslotd) and general utilities.
 
-
 %package libs
-Summary:		The run-time libraries for opencryptoki package
-Requires(pre):	shadow-utils
+Summary:        The run-time libraries for opencryptoki package
+Requires(pre):  shadow-utils
 
 %description libs
 Opencryptoki implements the PKCS#11 specification v2.11 for a set of
@@ -60,21 +56,19 @@ This package contains the PKCS#11 library implementation, and requires
 at least one token implementation (packaged separately) to be fully
 functional.
 
-
 %package devel
-Summary:		Development files for openCryptoki
-Requires:		%{name}-libs%{?_isa} = %{version}-%{release}
+Summary:        Development files for openCryptoki
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description devel
 This package contains the development header files for building
 opencryptoki and PKCS#11 based applications
 
-
 %package swtok
-Summary:		The software token implementation for opencryptoki
-Requires(pre):		%{name}-libs%{?_isa} = %{version}-%{release}
-Requires:		%{name}-libs%{?_isa} = %{version}-%{release}
-Provides:		%{name}(token)
+Summary:        The software token implementation for opencryptoki
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+Requires(pre):  %{name}-libs%{?_isa} = %{version}-%{release}
+Provides:       %{name}(token)
 
 %description swtok
 Opencryptoki implements the PKCS#11 specification v2.11 for a set of
@@ -85,12 +79,11 @@ hardware.
 This package brings the software token implementation to use opencryptoki
 without any specific cryptographic hardware.
 
-
 %package tpmtok
-Summary:		Trusted Platform Module (TPM) device support for opencryptoki
-Requires(pre):		%{name}-libs%{?_isa} = %{version}-%{release}
-Requires:		%{name}-libs%{?_isa} = %{version}-%{release}
-Provides:		%{name}(token)
+Summary:        Trusted Platform Module (TPM) device support for opencryptoki
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+Requires(pre):  %{name}-libs%{?_isa} = %{version}-%{release}
+Provides:       %{name}(token)
 
 %description tpmtok
 Opencryptoki implements the PKCS#11 specification v2.11 for a set of
@@ -101,12 +94,11 @@ hardware.
 This package brings the necessary libraries and files to support
 Trusted Platform Module (TPM) devices in the opencryptoki stack.
 
-
 %package icsftok
-Summary:		ICSF token support for opencryptoki
-Requires(pre):		%{name}-libs%{?_isa} = %{version}-%{release}
-Requires:		%{name}-libs%{?_isa} = %{version}-%{release}
-Provides:		%{name}(token)
+Summary:        ICSF token support for opencryptoki
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+Requires(pre):  %{name}-libs%{?_isa} = %{version}-%{release}
+Provides:       %{name}(token)
 
 %description icsftok
 Opencryptoki implements the PKCS#11 specification v2.11 for a set of
@@ -117,13 +109,12 @@ hardware.
 This package brings the necessary libraries and files to support
 ICSF token in the opencryptoki stack.
 
-
 %ifarch s390 s390x
 %package icatok
-Summary:		ICA cryptographic devices (clear-key) support for opencryptoki
-Requires(pre):		%{name}-libs%{?_isa} = %{version}-%{release}
-Requires:		%{name}-libs%{?_isa} = %{version}-%{release}
-Provides:		%{name}(token)
+Summary:        ICA cryptographic devices (clear-key) support for opencryptoki
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+Requires(pre):  %{name}-libs%{?_isa} = %{version}-%{release}
+Provides:       %{name}(token)
 
 %description icatok
 Opencryptoki implements the PKCS#11 specification v2.11 for a set of
@@ -137,10 +128,10 @@ cryptographic hardware such as IBM 4764 or 4765 that uses the
 "accelerator" or "clear-key" path.
 
 %package ccatok
-Summary:		CCA cryptographic devices (secure-key) support for opencryptoki
-Requires(pre):		%{name}-libs%{?_isa} = %{version}-%{release}
-Requires:		%{name}-libs%{?_isa} = %{version}-%{release}
-Provides:		%{name}(token)
+Summary:        CCA cryptographic devices (secure-key) support for opencryptoki
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+Requires(pre):  %{name}-libs%{?_isa} = %{version}-%{release}
+Provides:       %{name}(token)
 
 %description ccatok
 Opencryptoki implements the PKCS#11 specification v2.11 for a set of
@@ -154,10 +145,10 @@ cryptographic hardware such as IBM 4764 or 4765 that uses the
 "co-processor" or "secure-key" path.
 
 %package ep11tok
-Summary:		CCA cryptographic devices (secure-key) support for opencryptoki
-Requires(pre):		%{name}-libs%{?_isa} = %{version}-%{release}
-Requires:		%{name}-libs%{?_isa} = %{version}-%{release}
-Provides:		%{name}(token)
+Summary:        CCA cryptographic devices (secure-key) support for opencryptoki
+Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
+Requires(pre):  %{name}-libs%{?_isa} = %{version}-%{release}
+Provides:       %{name}(token)
 
 %description ep11tok
 Opencryptoki implements the PKCS#11 specification v2.11 for a set of
@@ -190,8 +181,8 @@ make %{?_smp_mflags} CHGRP=/bin/true
 
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT CHGRP=/bin/true
-install -Dpm 644 %{SOURCE1} $RPM_BUILD_ROOT%{_datadir}/p11-kit/modules/opencryptoki.module
+make install DESTDIR=%{buildroot} CHGRP=/bin/true
+install -Dpm 644 %{SOURCE1} %{buildroot}%{_datadir}/p11-kit/modules/opencryptoki.module
 
 
 %pre libs
@@ -210,7 +201,6 @@ fi
 %postun
 %systemd_postun_with_restart pkcsslotd.service
 
-
 %files
 %doc ChangeLog FAQ README.md
 %doc doc/opencryptoki-howto.md
@@ -221,8 +211,13 @@ fi
 %{_unitdir}/pkcsslotd.service
 %{_sbindir}/pkcsconf
 %{_sbindir}/pkcsslotd
+%{_sbindir}/p11sak
+%{_sbindir}/pkcstok_migrate
 %{_mandir}/man1/pkcsconf.1*
+%{_mandir}/man1/p11sak.1*
+%{_mandir}/man1/pkcstok_migrate.1*
 %{_mandir}/man5/%{name}.conf.5*
+%{_mandir}/man5/p11sak_defined_attrs.conf.5*
 %{_mandir}/man7/%{name}.7*
 %{_mandir}/man8/pkcsslotd.8*
 %{_libdir}/opencryptoki/methods
@@ -237,7 +232,7 @@ fi
 %{_sysconfdir}/ld.so.conf.d/*
 # Unversioned .so symlinks usually belong to -devel packages, but opencryptoki
 # needs them in the main package, because:
-#   documentation suggests that programs should dlopen "PKCS11_API.so".
+# documentation suggests that programs should dlopen "PKCS11_API.so".
 %dir %{_libdir}/opencryptoki
 %{_libdir}/opencryptoki/libopencryptoki.*
 %{_libdir}/opencryptoki/PKCS11_API.so
@@ -306,6 +301,11 @@ fi
 
 
 %changelog
+* Mon Sep 04 2023 Muhammad Falak <mwani@microsoft.com> - 3.17.0-1
+- Upgrade version to address CVE-2021-3798
+- Lint spec
+- License verified
+
 * Thu Mar 18 2021 Henry Li <lihl@microsoft.com> - 3.13.0-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove libitm-devel from build requirement because gcc already includes the necessary binaries it covers

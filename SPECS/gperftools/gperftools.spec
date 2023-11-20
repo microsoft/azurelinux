@@ -1,7 +1,7 @@
 Summary:        A fast malloc tool for threads
 Name:           gperftools
 Version:        2.9.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 URL:            https://github.com/gperftools/gperftools
 Source0:        %{url}/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
@@ -66,6 +66,9 @@ TCMALLOC_SAMPLE_PARAMETER=128 && make check
 %{_mandir}/man1/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.9.1-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Feb 16 2022 Cameron Baird <cameronbaird@microsoft.com> 2.9.1-1
 - Update source to v2.9.1
 

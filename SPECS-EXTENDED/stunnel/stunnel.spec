@@ -1,47 +1,55 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
+%bcond_with libwrap
 # Do not generate provides for private libraries
 %global __provides_exclude_from ^%{_libdir}/stunnel/.*$
 
-
-%bcond_with libwrap
-
-
-
-
-Summary: A TLS-encrypting socket wrapper
-Name: stunnel
-Version: 5.56
-Release: 8%{?dist}
-License: GPLv2
-URL: http://www.stunnel.org/
-Source0: https://www.stunnel.org/downloads/stunnel-%{version}.tar.gz
-Source1: https://www.stunnel.org/downloads/stunnel-%{version}.tar.gz.asc
-Source2: Certificate-Creation
-Source3: sfinger.xinetd
-Source4: stunnel-sfinger.conf
-Source5: pop3-redirect.xinetd
-Source6: stunnel-pop3s-client.conf
-Source7: stunnel@.service
-Patch0: stunnel-5.50-authpriv.patch
-Patch1: stunnel-5.50-systemd-service.patch
-Patch3: stunnel-5.56-system-ciphers.patch
-Patch4: stunnel-5.56-coverity.patch
-Patch5: stunnel-5.56-default-tls-version.patch
-Patch6: stunnel-5.56-curves-doc-update.patch
-# util-linux is needed for rename
-BuildRequires: gcc
-BuildRequires: openssl-devel, pkgconfig, util-linux
-BuildRequires: autoconf automake libtool
-%if %{with libwrap}
-Buildrequires: tcp_wrappers-devel
-%endif
-BuildRequires: /usr/bin/pod2man
-BuildRequires: /usr/bin/pod2html
+Summary:        A TLS-encrypting socket wrapper
+Name:           stunnel
+Version:        5.70
+Release:        1%{?dist}
+License:        GPLv2
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            http://www.stunnel.org/
+Source0:        https://www.stunnel.org/downloads/stunnel-%{version}.tar.gz
+Source2:        Certificate-Creation
+Source3:        sfinger.xinetd
+Source4:        stunnel-sfinger.conf
+Source5:        pop3-redirect.xinetd
+Source6:        stunnel-pop3s-client.conf
+Source7:        stunnel@.service
+Patch0:         stunnel-5.50-authpriv.patch
+Patch1:         stunnel-5.61-systemd-service.patch
+# Use cipher configuration from crypto-policies
+#
+# On Fedora, CentOS and RHEL, the system's crypto policies are the best
+# source to determine which cipher suites to accept in TLS. On these
+# platforms, OpenSSL supports the PROFILE=SYSTEM setting to use those
+# policies. Change stunnel to default to this setting.
+Patch3:         stunnel-5.69-system-ciphers.patch
+Patch4:         stunnel-5.56-coverity.patch
+Patch5:         stunnel-5.69-default-tls-version.patch
+Patch6:         stunnel-5.56-curves-doc-update.patch
+# Limit curves defaults in FIPS mode
+Patch8:         stunnel-5.62-disabled-curves.patch
 # build test requirements
-BuildRequires: /usr/bin/nc, /usr/sbin/lsof, /bin/ps
-BuildRequires: systemd
+BuildRequires:  %{_bindir}/nc
+BuildRequires:  %{_bindir}/pod2html
+BuildRequires:  %{_bindir}/pod2man
+BuildRequires:  %{_sbindir}/lsof
+BuildRequires:  /bin/ps
+BuildRequires:  autoconf
+BuildRequires:  automake
+# util-linux is needed for rename
+BuildRequires:  gcc
+BuildRequires:  libtool
+BuildRequires:  openssl-devel
+BuildRequires:  pkgconfig
+BuildRequires:  systemd
+BuildRequires:  util-linux
 %{?systemd_requires}
+%if %{with libwrap}
+BuildRequires:  tcp_wrappers-devel
+%endif
 
 %description
 Stunnel is a socket wrapper which can provide TLS/SSL
@@ -50,23 +58,17 @@ to ordinary applications. For example, it can be used in
 conjunction with imapd to create a TLS secure IMAP server.
 
 %prep
-%setup -q
-%patch0 -p1 -b .authpriv
-%patch1 -p1 -b .systemd-service
-%patch3 -p1 -b .system-ciphers
-%patch4 -p1 -b .coverity
-%patch5 -p1 -b .default-tls-version
-%patch6 -p1 -b .curves-doc-update
+%autosetup -S gendiff -p1
 
 # Fix the configure script output for FIPS mode and stack protector flag
-sed -i '/yes).*result: no/,+1{s/result: no/result: yes/;s/as_echo "no"/as_echo "yes"/};s/-fstack-protector/-fstack-protector-strong/' configure
+# sed -i '/yes).*result: no/,+1{s/result: no/result: yes/;s/as_echo "no"/as_echo "yes"/};s/-fstack-protector/-fstack-protector-strong/' configure
 
 # Fix a testcase with system-ciphers support
-sed -i '/client = yes/a \\  ciphers = PSK' tests/recipes/014_PSK_secrets
+# sed -i '/client = yes/a \\  ciphers = PSK' tests/recipes/014_PSK_secrets
 
 %build
 #autoreconf -v
-CFLAGS="$RPM_OPT_FLAGS -fPIC"; export CFLAGS
+CFLAGS="%{optflags} -fPIC"; export CFLAGS
 if pkg-config openssl ; then
 	CFLAGS="$CFLAGS `pkg-config --cflags openssl`";
 	LDFLAGS="`pkg-config --libs-only-L openssl`"; export LDFLAGS
@@ -94,7 +96,7 @@ mkdir srpm-docs
 cp %{SOURCE2} %{SOURCE3} %{SOURCE4} %{SOURCE5} %{SOURCE6} srpm-docs
 
 mkdir -p %{buildroot}%{_unitdir}
-cp %{buildroot}%{_datadir}/doc/stunnel/examples/%{name}.service %{buildroot}%{_unitdir}/%{name}.service
+cp %{buildroot}%{_docdir}/stunnel/examples/%{name}.service %{buildroot}%{_unitdir}/%{name}.service
 cp %{SOURCE7} %{buildroot}%{_unitdir}/%{name}@.service
 
 
@@ -119,7 +121,7 @@ make test || (for i in tests/logs/*.log ; do echo "$i": ; cat "$i" ; done)
 %lang(pl) %doc doc/pl/*
 %{_bindir}/stunnel
 %exclude %{_bindir}/stunnel3
-%exclude %{_datadir}/doc/stunnel
+%exclude %{_docdir}/stunnel
 %{_libdir}/stunnel
 %exclude %{_libdir}/stunnel/libstunnel.la
 %{_mandir}/man8/stunnel.8*
@@ -128,7 +130,6 @@ make test || (for i in tests/logs/*.log ; do echo "$i": ; cat "$i" ; done)
 %exclude %{_sysconfdir}/stunnel/*
 
 %{_unitdir}/%{name}*.service
-
 
 %post
 /sbin/ldconfig
@@ -142,6 +143,11 @@ make test || (for i in tests/logs/*.log ; do echo "$i": ; cat "$i" ; done)
 %systemd_postun_with_restart %{name}.service
 
 %changelog
+* Mon Sep 04 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 5.70-1
+- Upgrade version to address CVE-2021-20230
+- Lint spec
+- Verified License
+
 * Fri Mar 26 2021 Henry Li <lihl@microsoft.com> - 5.56-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Change /usr/bin/lsof to /usr/sbin/lsof

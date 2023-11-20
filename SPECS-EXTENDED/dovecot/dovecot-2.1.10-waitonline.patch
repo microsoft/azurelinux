@@ -1,11 +1,11 @@
-diff -up dovecot-2.3.0.1/dovecot.service.in.waitonline dovecot-2.3.0.1/dovecot.service.in
---- dovecot-2.3.0.1/dovecot.service.in.waitonline	2018-03-01 10:35:39.888371078 +0100
-+++ dovecot-2.3.0.1/dovecot.service.in	2018-03-01 10:36:29.738784661 +0100
-@@ -12,6 +12,7 @@ After=local-fs.target network-online.tar
+diff -up dovecot-2.3.19.1/dovecot.service.in.waitonline dovecot-2.3.19.1/dovecot.service.in
+--- dovecot-2.3.19.1/dovecot.service.in.waitonline	2022-06-14 08:55:03.000000000 +0200
++++ dovecot-2.3.19.1/dovecot.service.in	2022-11-08 20:28:37.550081709 +0100
+@@ -12,6 +12,7 @@ Description=Dovecot IMAP/POP3 email serv
+ Documentation=man:dovecot(1)
+ Documentation=https://doc.dovecot.org/
+ After=local-fs.target network-online.target
++Wants=network-online.target
  
  [Service]
- Type=simple
-+ExecStartPre=/usr/libexec/dovecot/prestartscript
- ExecStart=@sbindir@/dovecot -F
- PIDFile=@rundir@/master.pid
- ExecReload=@bindir@/doveadm reload
+ Type=@systemdservicetype@

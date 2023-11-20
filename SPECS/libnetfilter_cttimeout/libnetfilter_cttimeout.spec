@@ -1,7 +1,7 @@
 Summary:    User-space infrastructure for connection tracking timeout
 Name:       libnetfilter_cttimeout
 Version:    1.0.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:    GPLv2+
 URL:        http://www.netfilter.org/projects/libnetfilter_cttimeout/index.html
 Group:      System Environment/Libraries
@@ -52,6 +52,9 @@ find %{buildroot} -type f -name '*.la' -exec rm -f {} ';'
 %{_libdir}/*.so
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.0.0-6
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 1.0.0-5
 - Remove unused `%%define sha1` lines
 - License verified

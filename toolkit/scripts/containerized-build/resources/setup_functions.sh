@@ -10,13 +10,18 @@ RPMS_DIR=$TOPDIR/RPMS
 SRPMS_DIR=$TOPDIR/SRPMS
 IS_REPO_ENABLED=false
 
-# Mariner macro files used during spec parsing (as defined in toolkit/scripts/rpmops.sh)
+# General setup
+
+## Mariner macro files used during spec parsing (as defined in toolkit/scripts/rpmops.sh)
 DEFINES=(-D "with_check 1")
 MACROS=()
 for macro_file in "$SPECS_DIR"/mariner-rpm-macros/macros* "$SPECS_DIR"/pyproject-rpm-macros/macros.pyproject "$SPECS_DIR"/perl/macros.perl
 do
   MACROS+=("--load=$macro_file")
 done
+
+## Create SOURCES_DIR
+mkdir -p SOURCES_DIR
 
 # Create symlink from SPECS/ to SOURCES/ when rpm is called
 rpm() {
@@ -30,7 +35,6 @@ rpm() {
                 SPEC=${SPEC%-*} #remove last suffix of type -*
                 SPEC=${SPEC%-*} #remove last suffix of type -*
                 SPEC=${SPEC%\**}
-                mkdir -p $SOURCES_DIR
                 ln -sf $SPECS_DIR/$SPEC/* $SOURCES_DIR/
             fi
         done
@@ -51,9 +55,9 @@ build_pkg() {
 
 # Show help on useful commands
 show_help() {
-    cat /mariner_setup_dir/welcome.txt
+    echo -e "`cat /mariner_setup_dir/welcome.txt`"
     cat /mariner_setup_dir/mounts.txt
-    echo -e "* \n* Local repo information:"
+    echo -e "* \n* \e[31mLocal repo information:\e[0m"
     if [[ "${IS_REPO_ENABLED}" == "true" ]]; then
         echo -e "*\tLocal repo is enabled. Package dependencies will be installed from $RPMS_DIR, /repo and upstream server"
     else
@@ -86,15 +90,20 @@ enable_local_repo() {
     IS_REPO_ENABLED=true
     tdnf install -y createrepo
     mv /etc/yum.repos.d/local_repo.disabled_repo /etc/yum.repos.d/local_repo.repo
-    pushd /repo
-    createrepo .
-    popd
-    mkdir -p $RPMS_DIR
-    pushd $RPMS_DIR
-    createrepo .
-    popd
-    echo "-------- the local repo is enabled ---------"
-    echo "--- Package dependencies will be installed from $RPMS_DIR, /repo and upstream server ---"
+    url_list=""
+    baseurls=$(cat /etc/yum.repos.d/local_repo.repo | grep baseurl | cut -d '=' -f 2)
+    prefixToRemove="file://"
+    for urlWithPrefix in $baseurls
+    do
+        url="${urlWithPrefix#$prefixToRemove}" #remove 'file://' prefix
+        mkdir -p $url || { echo -e "\033[31m WARNING: Could not mkdir at $url, continuing\033[0m"; continue; }
+        pushd $url
+        createrepo .
+        popd
+        url_list+=" $url"
+    done
+    echo "-------- The local repo is enabled ---------"
+    echo "--- Package dependencies will be installed from $url_list and upstream server ---"
     #echo "You can install the following packages from it:"
     #tdnf repoquery --repoid=local_build_repo 2>/dev/null
 }

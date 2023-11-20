@@ -1,8 +1,8 @@
 %define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
-Version:        9.0.1562
-Release:        2%{?dist}
+Version:        9.0.2068
+Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,7 +14,6 @@ BuildRequires:  python3-devel
 Requires(post): sed
 Provides:       vi = %{version}-%{release}
 Provides:       %{name}-minimal = %{version}-%{release}
-Patch0:         CVE-2023-3896.patch
 
 %description
 The Vim package contains a powerful text editor.
@@ -187,7 +186,6 @@ fi
 %{_datarootdir}/vim/vim*/defaults.vim
 %{_datarootdir}/vim/vim*/filetype.vim
 %{_datarootdir}/vim/vim90/syntax/nosyntax.vim
-%{_datarootdir}/vim/vim90/syntax/syntax.vim
 %{_datarootdir}/vim/vim90/autoload/dist/ft.vim
 %{_bindir}/ex
 %{_bindir}/vi
@@ -198,6 +196,27 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Tue Nov 14 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.0.2068-1
+- Auto-upgrade to 9.0.2068 - CVE-2023-46246
+
+* Tue Oct 17 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 9.0.2010-1
+- Update version to 9.0.2010 to fix CVE-2023-5535.
+- Remove patches that no longer apply in the new version.
+- Remove file listed twice.
+
+* Wed Oct 11 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 9.0.1897-3
+- Patch CVE-2023-5441
+
+* Mon Oct 09 2023 Mitch Zhu <mitchzhu@microsoft.com> - 9.0.1897-2
+- Patch CVE-2023-5344
+
+* Tue Sep 12 2023 Henry Li <lihl@microsoft.com> - 9.0.1897-1
+- Upgrade version to resolve CVE-2023-4738, CVE-2023-4750, CVE-2023-4781,
+  CVE-2023-4752 and CVE-2023-4733
+
+* Thu Sep 07 2023 Brian Fjeldstad <bfjelds@microsoft.com> - 9.0.1847-1
+- Bump version to address CVE-2023-4734 CVE-2023-4735 CVE-2023-4736
+
 * Wed Aug 16 2023 Bala <balakumaran.kannan@microsoft.com> - 9.0.1562-2
 - Patch CVE-2023-3896
 

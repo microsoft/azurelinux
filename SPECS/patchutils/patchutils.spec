@@ -1,7 +1,7 @@
 Summary: A collection of programs for manipulating patch files
 Name: patchutils
 Version: 0.4.2
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -42,6 +42,9 @@ make DESTDIR=%{buildroot} install
 %{_mandir}/*/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.4.2-4
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Tue May 02 2023 Cameron Baird <cameronbaird@microsoft.com> - 0.4.2-3
 - Moved to SPECS
 - License verified

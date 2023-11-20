@@ -110,7 +110,7 @@
 Summary:        Distributed File System
 Name:           glusterfs
 Version:        7.9
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2 OR LGPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -1226,6 +1226,9 @@ exit 0
 %endif
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 7.9-5
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Tue Oct 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.9-4
 - Simplifying the 'Release' tag to a single digit and the %%dist macro.
 

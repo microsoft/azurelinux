@@ -1,19 +1,23 @@
+Summary:        A remote mail retrieval and forwarding utility
+Name:           fetchmail
+Version:        6.4.22
+Release:        1%{?dist}
+# For a breakdown of the licensing, see COPYING
+License:        GPL+ AND Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Summary: A remote mail retrieval and forwarding utility
-Name: fetchmail
-Version: 6.4.8
-Release: 2%{?dist}
-Source0: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.xz
-Source1: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.xz.asc
+URL:            https://www.fetchmail.info/
+Source0:        https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.xz
 # systemd service file
-Source2: fetchmail.service
+Source2:        fetchmail.service
 # example configuration file
-Source3: fetchmailrc.example
-URL: http://www.fetchmail.info/
-# For a breakdown of the licensing, see COPYING
-License: GPL+ and Public Domain
-BuildRequires: gcc gettext-devel krb5-devel openssl-devel systemd python3-devel
+Source3:        fetchmailrc.example
+BuildRequires:  gcc
+BuildRequires:  gettext-devel
+BuildRequires:  krb5-devel
+BuildRequires:  openssl-devel
+BuildRequires:  python3-devel
+BuildRequires:  systemd
 
 %description
 Fetchmail is a remote mail retrieval and forwarding utility intended
@@ -27,42 +31,59 @@ Install fetchmail if you need to retrieve mail over SLIP or PPP
 connections.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
-%configure --enable-POP3 --enable-IMAP --with-ssl --without-hesiod \
-	--enable-ETRN --enable-NTLM --enable-SDPS --enable-RPA \
-	--enable-nls --with-kerberos5 --with-gssapi \
-	--enable-fallback=no
-make
+%configure \
+    --enable-ETRN \
+    --enable-IMAP \
+    --enable-NTLM \
+    --enable-POP3 \
+    --enable-RPA \
+    --enable-SDPS \
+    --enable-fallback=no \
+    --enable-nls\
+    --with-gssapi \
+    --with-kerberos5 \
+    --with-ssl \
+    --without-hesiod 
+
+%make_build
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT
+%make_install DESTDIR=%{buildroot}
 
 # install example systemd unit
-mkdir -p $RPM_BUILD_ROOT%{_unitdir}
-install -p -m 644 %{SOURCE2} $RPM_BUILD_ROOT%{_unitdir}/fetchmail.service
+mkdir -p %{buildroot}%{_unitdir}
+install -p -m 644 %{SOURCE2} %{buildroot}%{_unitdir}/fetchmail.service
 
 # install example config file
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}
-install -p -m 600 %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/fetchmailrc.example
+mkdir -p %{buildroot}%{_sysconfdir}
+install -p -m 600 %{SOURCE3} %{buildroot}%{_sysconfdir}/fetchmailrc.example
 
 # remove fetchmailconf stuff
-rm -f $RPM_BUILD_ROOT%{_bindir}/fetchmailconf*
-rm -f $RPM_BUILD_ROOT%{_mandir}/man1/fetchmailconf.1*
-rm -f $RPM_BUILD_ROOT%{python3_sitelib}/fetchmailconf.py*
-rm -f $RPM_BUILD_ROOT%{python3_sitelib}/__pycache__/fetchmailconf*
+rm -f %{buildroot}%{_bindir}/fetchmailconf*
+rm -f %{buildroot}%{_mandir}/man1/fetchmailconf.1*
+rm -f %{buildroot}%{python3_sitelib}/fetchmailconf.py*
+rm -f %{buildroot}%{python3_sitelib}/__pycache__/fetchmailconf*
 
-%find_lang %name
+%find_lang %{name}
 
 %files -f %{name}.lang
-%doc COPYING FAQ FEATURES NEWS NOTES README README.SSL TODO
+%license COPYING
+%doc FAQ FEATURES NEWS NOTES README README.SSL TODO
 %{_bindir}/fetchmail
 %{_mandir}/man1/fetchmail.1*
 %{_unitdir}/fetchmail.service
 %config(noreplace) %attr(0600, mail, mail) %{_sysconfdir}/fetchmailrc.example
 
 %changelog
+* Thu Aug 31 2023 Muhammad Falak <mwani@microsoft.com> - 6.4.22-1
+- Upgrade version to address CVE-2021-39272 & CVE-2021-36386
+- License verified
+- Lint spec
+- Switch to %autosetup, %make_build & %make_install
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.4.8-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
