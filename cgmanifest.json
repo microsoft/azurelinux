@@ -14054,7 +14054,7 @@
         "other": {
           "name": "ncurses",
           "version": "6.4",
-          "downloadUrl": "https://invisible-mirror.net/archives/ncurses/current/ncurses-6.4-20230408.tgz"
+          "downloadUrl": "https://invisible-mirror.net/archives/ncurses/current/ncurses-6.4-20230423.tgz"
         }
       }
     },
@@ -29347,8 +29347,8 @@
         "type": "other",
         "other": {
           "name": "valgrind",
-          "version": "3.18.1",
-          "downloadUrl": "https://sourceware.org/pub/valgrind/valgrind-3.18.1.tar.bz2"
+          "version": "3.22.0",
+          "downloadUrl": "https://sourceware.org/pub/valgrind/valgrind-3.22.0.tar.bz2"
         }
       }
     },

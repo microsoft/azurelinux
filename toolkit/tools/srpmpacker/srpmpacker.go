@@ -838,12 +838,11 @@ func hydrateFiles(fileTypeToHydrate fileType, specFile, workingDir string, srcCo
 		fileHydrationState[fileNeeded] = false
 	}
 
-	// If the user provided an existing source dir, prefer it over remote sources.
+	// If the user provided an existing source dir, try it first before using remote sources.
 	if srcConfig.localSourceDir != "" {
-		err = hydrateFromLocalSource(fileHydrationState, newSourceDir, srcConfig, skipSignatureHandling, currentSignatures)
-		// On error warn and default to hydrating from an external server.
+		err = tryToHydrateFromLocalSource(fileHydrationState, newSourceDir, srcConfig, skipSignatureHandling, currentSignatures)
 		if err != nil {
-			logger.Log.Warnf("Error hydrating from local source directory (%s): %v", srcConfig.localSourceDir, err)
+			return
 		}
 	}
 
@@ -854,20 +853,31 @@ func hydrateFiles(fileTypeToHydrate fileType, specFile, workingDir string, srcCo
 		}
 	}
 
+	missingFiles := []string{}
 	for fileNeeded, alreadyHydrated := range fileHydrationState {
 		if !alreadyHydrated {
-			err = fmt.Errorf("unable to hydrate file: %s", fileNeeded)
-			logger.Log.Error(err)
+			missingFiles = append(missingFiles, fileNeeded)
+			logger.Log.Errorf("Unable to hydrate file: %s", fileNeeded)
 		}
+	}
+
+	if len(missingFiles) != 0 {
+		err = fmt.Errorf("unable to hydrate files: %v", missingFiles)
 	}
 
 	return
 }
 
-// hydrateFromLocalSource will update fileHydrationState.
-// Will alter currentSignatures.
-func hydrateFromLocalSource(fileHydrationState map[string]bool, newSourceDir string, srcConfig sourceRetrievalConfiguration, skipSignatureHandling bool, currentSignatures map[string]string) (err error) {
-	err = filepath.Walk(srcConfig.localSourceDir, func(path string, info os.FileInfo, err error) error {
+// tryToHydrateFromLocalSource tries to find the required sources inside srcConfig.localSourceDir.
+// Will skip files in fileHydrationState that are not present under srcConfig.localSourceDir.
+// Will update fileHydrationState if a source is found.
+// May alter currentSignatures depending on value of srcConfig.signatureHandling.
+func tryToHydrateFromLocalSource(fileHydrationState map[string]bool, newSourceDir string, srcConfig sourceRetrievalConfiguration, skipSignatureHandling bool, currentSignatures map[string]string) (err error) {
+	return filepath.Walk(srcConfig.localSourceDir, func(path string, info os.FileInfo, walkErr error) (internalErr error) {
+		if walkErr != nil {
+			return walkErr
+		}
+
 		isFile, _ := file.IsFile(path)
 		if !isFile {
 			return nil
@@ -875,8 +885,8 @@ func hydrateFromLocalSource(fileHydrationState map[string]bool, newSourceDir str
 
 		fileName := filepath.Base(path)
 
-		isHydrated, found := fileHydrationState[fileName]
-		if !found {
+		isHydrated, fileRequiredBySpec := fileHydrationState[fileName]
+		if !fileRequiredBySpec {
 			return nil
 		}
 
@@ -886,17 +896,15 @@ func hydrateFromLocalSource(fileHydrationState map[string]bool, newSourceDir str
 		}
 
 		if !skipSignatureHandling {
-			err = validateSignature(path, srcConfig, currentSignatures)
-			if err != nil {
-				logger.Log.Warn(err.Error())
-				return nil
+			internalErr = validateSignature(path, srcConfig, currentSignatures)
+			if internalErr != nil {
+				return internalErr
 			}
 		}
 
-		err = file.Copy(path, filepath.Join(newSourceDir, fileName))
-		if err != nil {
-			logger.Log.Warnf("Failed to copy file (%s), skipping. Error: %s", path, err)
-			return nil
+		internalErr = file.Copy(path, filepath.Join(newSourceDir, fileName))
+		if internalErr != nil {
+			return internalErr
 		}
 
 		logger.Log.Debugf("Hydrated (%s) from (%s)", fileName, path)
@@ -904,8 +912,6 @@ func hydrateFromLocalSource(fileHydrationState map[string]bool, newSourceDir str
 		fileHydrationState[fileName] = true
 		return nil
 	})
-
-	return
 }
 
 // hydrateFromRemoteSource will update fileHydrationState.
@@ -918,7 +924,7 @@ func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir st
 		failureBackoffBase    = 2.0
 		downloadRetryDuration = time.Second
 	)
-	var errPackerCancelReceived = fmt.Errorf("packer cancel signal received")
+	errPackerCancelReceived := fmt.Errorf("packer cancel signal received")
 
 	for fileName, alreadyHydrated := range fileHydrationState {
 		if alreadyHydrated {
@@ -941,14 +947,13 @@ func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir st
 			}
 		}
 
-		cancelled := false
-		cancelled, err = retry.RunWithExpBackoff(func() error {
-			err := network.DownloadFile(url, destinationFile, srcConfig.caCerts, srcConfig.tlsCerts)
-			if err != nil {
-				logger.Log.Warnf("Failed to download (%s). Error: %s", url, err)
+		cancelled, internalErr := retry.RunWithExpBackoff(func() error {
+			downloadErr := network.DownloadFile(url, destinationFile, srcConfig.caCerts, srcConfig.tlsCerts)
+			if downloadErr != nil {
+				logger.Log.Debugf("Failed an attempt to download (%s). Error: %s.", url, downloadErr)
 			}
 
-			return err
+			return downloadErr
 		}, downloadRetryAttempts, downloadRetryDuration, failureBackoffBase, cancel)
 
 		if netOpsSemaphore != nil {
@@ -956,28 +961,28 @@ func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir st
 			<-netOpsSemaphore
 		}
 
+		// We may intentionally fail early due to a cancellation signal, stop immediately if that is the case.
 		if cancelled {
 			err = errPackerCancelReceived
 			return
 		}
 
-		if err != nil {
-			// We may intentionally fail early due to a cancellation signal, stop immediately if that is the case.
+		if internalErr != nil {
+			logger.Log.Errorf("Failed to download (%s). Error: %s.", url, internalErr)
 			continue
 		}
 
 		if !skipSignatureHandling {
-			err = validateSignature(destinationFile, srcConfig, currentSignatures)
-			if err != nil {
-				logger.Log.Warn(err.Error())
+			internalErr = validateSignature(destinationFile, srcConfig, currentSignatures)
+			if internalErr != nil {
+				logger.Log.Errorf("Signature validation for (%s) failed. Error: %s.", destinationFile, internalErr)
 
 				// If the delete fails, just warn as there will be another cleanup
 				// attempt when exiting the program.
-				err = os.Remove(destinationFile)
-				if err != nil {
-					logger.Log.Warnf("Failed to delete file (%s). Error: %s", destinationFile, err)
+				internalErr = os.Remove(destinationFile)
+				if internalErr != nil {
+					logger.Log.Warnf("Failed to delete file (%s) after signature validation failure. Error: %s.", destinationFile, internalErr)
 				}
-
 				continue
 			}
 		}
