@@ -47,6 +47,7 @@ make VENDOR_CERT_FILE=cert.der test
 * Tue Mar 30 2021 Chris Co <chrco@microsoft.com> - 15.4-1
 - Update to 15.4
 - Remove extra patches. These are incorporated into latest version
+- License verified
 
 * Tue Aug 25 2020 Chris Co <chrco@microsoft.com> - 15-4
 - Apply patch files (from CentOS: shim-15-8.el7)

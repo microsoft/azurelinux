@@ -41,6 +41,7 @@ install -D -m 0744 %{_datadir}/shim-unsigned-aarch64/shimaa64.efi %{buildroot}/b
 %changelog
 * Tue Mar 30 2021 Chris Co <chrco@microsoft.com> - 15.4-1
 - Update to 15.4
+- License verified
 
 * Tue Aug 25 2020 Chris Co <chrco@microsoft.com> - 15-3
 - Bump release to get patched shims
