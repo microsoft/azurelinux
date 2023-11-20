@@ -23023,6 +23023,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-junit-xml",
+          "version": "1.9",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/j/junit-xml/junit-xml-1.9.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-justbases",
           "version": "0.9",
           "downloadUrl": "https://pypi.io/packages/source/j/justbases/justbases-0.9.tar.gz"
