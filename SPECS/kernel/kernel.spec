@@ -45,6 +45,7 @@ BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
 BuildRequires:  build-essential
+BuildRequires:  cpio
 BuildRequires:  diffutils
 BuildRequires:  dwarves
 BuildRequires:  elfutils-libelf-devel
@@ -416,6 +417,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 - Upgrade to 6.1.58.1
 - Remove support for imx8 dtb subpackage
 - Add patch for perf_bpf_test_add_nonnull_argument
+- Add cpio BuildRequires
 
 * Mon Oct 23 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.135.1-2
 - Enable CONFIG_BINFMT_MISC
