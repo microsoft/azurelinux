@@ -51,7 +51,7 @@ Provides:       python3-junit_xml = %{version}-%{release}
 
 %check
 # Freezing 'pytest' to a known working version as updates tend to introduce regressions.
-pip3 install tox tox-current-env pytest==7.4.3 virtualenv
+pip3 install pytest==7.4.3 tox tox-current-env virtualenv
 %tox
 
 %files -n python3-%{pypi_name} -f %{pyproject_files}
