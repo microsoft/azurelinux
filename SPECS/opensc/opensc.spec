@@ -3,7 +3,7 @@
 Summary:        Smart card library and applications
 Name:           opensc
 Version:        0.23.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,7 @@ URL:            https://github.com/OpenSC/OpenSC
 Source0:        https://github.com/OpenSC/OpenSC/releases/download/%{version}/%{name}-%{version}.tar.gz
 Source1:        opensc.module
 Patch1:         opensc-0.23.0-pinpad.patch
+Patch2:         CVE-2023-4535.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  bash-completion
@@ -140,6 +141,9 @@ rm %{buildroot}%{_mandir}/man1/opensc-notify.1*
 %{_mandir}/man5/*
 
 %changelog
+* Fri Nov 17 2023 Riken Maharjan <rmaharjan@microsoft.com> - 0.23.0-2
+- Fix CVE-2023-4535
+
 * Thu Aug 31 2023 Henry Beberman <henry.beberman@microsoft.com> - 0.23.0-1
 - Upgrade to 0.23.0 to fix CVE-2021-34193
 - Update pinpad.patch to be compatible with 0.23.0
