@@ -417,7 +417,7 @@ func copyWithPermissions(src, dst string, dirmode os.FileMode, changeMode bool, 
 	}
 
 	if user != nil {
-		err = marinerusers.GiveSinglePathToUser(dst, user)
+		err = marinertoolusers.GiveSinglePathToUser(dst, user)
 		if err != nil {
 			return
 		}
