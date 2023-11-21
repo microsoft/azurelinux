@@ -147,9 +147,9 @@ krb5-lang-1.19.4-2.cm2.aarch64.rpm
 libarchive-3.7.1-1.cm2.aarch64.rpm
 libarchive-debuginfo-3.7.1-1.cm2.aarch64.rpm
 libarchive-devel-3.7.1-1.cm2.aarch64.rpm
-libassuan-2.5.5-2.cm2.aarch64.rpm
-libassuan-debuginfo-2.5.5-2.cm2.aarch64.rpm
-libassuan-devel-2.5.5-2.cm2.aarch64.rpm
+libassuan-2.5.6-1.cm2.aarch64.rpm
+libassuan-debuginfo-2.5.6-1.cm2.aarch64.rpm
+libassuan-devel-2.5.6-1.cm2.aarch64.rpm
 libbacktrace-static-13.2.0-1.cm2.aarch64.rpm
 libcap-2.69-1.cm2.aarch64.rpm
 libcap-debuginfo-2.69-1.cm2.aarch64.rpm

@@ -8661,8 +8661,8 @@
         "type": "other",
         "other": {
           "name": "libassuan",
-          "version": "2.5.5",
-          "downloadUrl": "https://gnupg.org/ftp/gcrypt/libassuan/libassuan-2.5.5.tar.bz2"
+          "version": "2.5.6",
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/libassuan/libassuan-2.5.6.tar.bz2"
         }
       }
     },
