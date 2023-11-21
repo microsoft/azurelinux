@@ -14,22 +14,22 @@ while getopts "r:f:v:o:e:" opt; do
 done
 
 if [[ -z "$rpms_folder" ]]; then
-    echo "INVALID ARBUMENT: RPMS_FOLDER is empty"
+    echo "INVALID ARGUMENT: RPMS_FOLDER is empty"
     exit 1
 fi
 
 if [[ -z "$repo_file_path" ]]; then
-    echo "INVALID ARBUMENT: REPO_FILE_PATH is empty"
+    echo "INVALID ARGUMENT: REPO_FILE_PATH is empty"
     exit 1
 fi
 
 if [[ -z "$mariner_version" ]]; then
-    echo "INVALID ARBUMENT: MARINER_VERSION is empty"
+    echo "INVALID ARGUMENT: MARINER_VERSION is empty"
     exit 1
 fi
 
 if [[ -z "$sodiff_out_dir" ]]; then
-    echo "INVALID ARBUMENT: SODIFF_OUT_DIR is empty"
+    echo "INVALID ARGUMENT: SODIFF_OUT_DIR is empty"
     exit 1
 fi
 sodiff_log_file="${sodiff_out_dir}/sodiff.log"
