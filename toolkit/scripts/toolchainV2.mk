@@ -187,6 +187,23 @@ $(raw_toolchain): ;
 toolchain_mode=auto
 #--use-latest-available
 
+# Old varaibles
+ifeq ($(INCREMENTAL_TOOLCHAIN)$(REBUILD_TOOLCHAIN),yy)
+toolchain_mode=auto
+else ifeq ($(REBUILD_TOOLCHAIN),y)
+toolchain_mode=always
+else
+toolchain_mode=never
+endif
+
+# New variables
+ifeq ($(REBUILD_TOOLCHAIN),auto)
+toolchain_mode=auto
+endif
+
+#$(if $(filter y,$(INCREMENTAL_TOOLCHAIN)),--bootstrap-incremental-toolchain)
+#$(if $(filter y,$(INCREMENTAL_TOOLCHAIN)),--official-build-incremental-toolchain)
+
 $(toolchain_status_flag): $(no_repo_acl) $(go-toolchain) $(go-bldtracker) $(depend_REBUILD_TOOLCHAIN) $(depend_TOOLCHAIN_ARCHIVE)
 	$(go-toolchain) \
 		--toolchain-rpms-dir="$(TOOLCHAIN_RPMS_DIR)" \
@@ -198,7 +215,6 @@ $(toolchain_status_flag): $(no_repo_acl) $(go-toolchain) $(go-bldtracker) $(depe
 		$(if $(TLS_CERT),--tls-cert="$(TLS_CERT)") \
 		$(if $(TLS_KEY),--tls-key="$(TLS_KEY)") \
 		--cache-dir="$(MISC_CACHE_DIR)/toolchain" \
-		$(if $(filter y, $(REBUILD_TOOLCHAIN)),,--disallow-rebuild) \
 		$(if $(TOOLCHAIN_ARCHIVE),--existing-archive="$(TOOLCHAIN_ARCHIVE)") \
 		--specs-dir="$(SPECS_DIR)" \
 		\
@@ -209,7 +225,6 @@ $(toolchain_status_flag): $(no_repo_acl) $(go-toolchain) $(go-bldtracker) $(depe
 		--bootstrap-working-dir="$(SCRIPTS_DIR)/toolchain" \
 		--bootstrap-build-dir="$(BUILD_DIR)" \
 		--bootstrap-source-url="$(SOURCE_URL)" \
-		$(if $(filter y,$(INCREMENTAL_TOOLCHAIN)),--bootstrap-incremental-toolchain) \
 		$(foreach file, $(bootstrap-hashing-list),--bootstrap-input-files="$(file)" ) \
 		\
 		--official-build-output-file="$(final_toolchain)" \
@@ -222,7 +237,6 @@ $(toolchain_status_flag): $(no_repo_acl) $(go-toolchain) $(go-bldtracker) $(depe
 		--official-build-rpms-dir="$(RPMS_DIR)" \
 		--official-build-specs-dir="$(SPECS_DIR)" \
 		$(if $(filter y,$(RUN_CHECK)),--official-build-run-check) \
-		$(if $(filter y,$(INCREMENTAL_TOOLCHAIN)),--official-build-incremental-toolchain) \
 		--official-build-intermediate-srpms-dir="$(BUILD_SRPMS_DIR)" \
 		--official-build-srpms-dir="$(SRPMS_DIR)" \
 		--official-build-toolchain-from-repos="$(toolchain_from_repos)" \

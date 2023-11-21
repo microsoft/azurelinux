@@ -197,6 +197,7 @@ include $(SCRIPTS_DIR)/tools.mk
 # Bootstrap the toolchain's compilers and other tools with:
 #   toolchain, raw-toolchain, clean-toolchain, check-manifests, check-x86_64-manifests, check-aarch64-manifests
 ifeq ($(USE_NEW_TOOLCHAIN),y)
+REBUILD_TOOLCHAIN ?= auto
 include $(SCRIPTS_DIR)/toolchainV2.mk
 else
 include $(SCRIPTS_DIR)/toolchain.mk

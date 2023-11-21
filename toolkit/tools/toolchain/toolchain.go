@@ -66,32 +66,32 @@ var (
 	existingArchive = app.Flag("existing-archive", "Path to an existing archive to use instead of building a new one.").ExistingFile()
 
 	// Bootstrap script inputs
-	bootstrapOutputFile     = app.Flag("bootstrap-output-file", "Path to the output file.").Required().String()
-	bootstrapScript         = app.Flag("bootstrap-script", "Path to the bootstrap script.").Required().String()
-	bootstrapWorkingDir     = app.Flag("bootstrap-working-dir", "Path to the working directory.").Required().ExistingDir()
-	bootstrapBuildDir       = app.Flag("bootstrap-build-dir", "Path to the build directory.").Required().ExistingDir()
-	bootstrapSourceURL      = app.Flag("bootstrap-source-url", "URL to the source code.").Required().String()
-	bootstrapUseIncremental = app.Flag("bootstrap-incremental-toolchain", "Use incremental build mode.").Default("false").Bool()
-	bootstrapInputFiles     = app.Flag("bootstrap-input-files", "List of input files to hash for validating the cache.").Required().ExistingFiles()
+	bootstrapOutputFile = app.Flag("bootstrap-output-file", "Path to the output file.").Required().String()
+	bootstrapScript     = app.Flag("bootstrap-script", "Path to the bootstrap script.").Required().String()
+	bootstrapWorkingDir = app.Flag("bootstrap-working-dir", "Path to the working directory.").Required().ExistingDir()
+	bootstrapBuildDir   = app.Flag("bootstrap-build-dir", "Path to the build directory.").Required().ExistingDir()
+	bootstrapSourceURL  = app.Flag("bootstrap-source-url", "URL to the source code.").Required().String()
+	//bootstrapUseIncremental = app.Flag("bootstrap-incremental-toolchain", "Use incremental build mode.").Default("false").Bool()
+	bootstrapInputFiles = app.Flag("bootstrap-input-files", "List of input files to hash for validating the cache.").Required().ExistingFiles()
 
 	// Official build inputs
-	officialBuildOutputFile           = app.Flag("official-build-output-file", "Path to the output file.").Required().String()
-	officialBuildScript               = app.Flag("official-build-script", "Path to the official build script.").Required().String()
-	officialBuildWorkingDir           = app.Flag("official-build-working-dir", "Path to the working directory.").Required().ExistingDir()
-	officialBuildDistTag              = app.Flag("official-build-dist-tag", "The distribution tag the SPEC will be built with.").Required().String()
-	officialBuildBuildNumber          = app.Flag("official-build-build-number", "The build number the SPEC will be built with.").Required().String()
-	officialBuildReleaseVersion       = app.Flag("official-build-release-version", "The release version the SPEC will be built with.").Required().String()
-	officialBuildBuildDir             = app.Flag("official-build-build-dir", "Path to the build directory.").Required().ExistingDir()
-	officialBuildRpmsDir              = app.Flag("official-build-rpms-dir", "Path to the directory containing the built RPMs.").Required().ExistingDir()
-	officialBuildSpecsDir             = app.Flag("official-build-specs-dir", "Path to the directory containing the SPEC files.").Required().ExistingDir()
-	officialBuildRunCheck             = app.Flag("official-build-run-check", "Run the check step after building the RPMs.").Default("false").Bool()
-	officialBuildUseIncremental       = app.Flag("official-build-incremental-toolchain", "Use incremental build mode.").Default("false").Bool()
+	officialBuildOutputFile     = app.Flag("official-build-output-file", "Path to the output file.").Required().String()
+	officialBuildScript         = app.Flag("official-build-script", "Path to the official build script.").Required().String()
+	officialBuildWorkingDir     = app.Flag("official-build-working-dir", "Path to the working directory.").Required().ExistingDir()
+	officialBuildDistTag        = app.Flag("official-build-dist-tag", "The distribution tag the SPEC will be built with.").Required().String()
+	officialBuildBuildNumber    = app.Flag("official-build-build-number", "The build number the SPEC will be built with.").Required().String()
+	officialBuildReleaseVersion = app.Flag("official-build-release-version", "The release version the SPEC will be built with.").Required().String()
+	officialBuildBuildDir       = app.Flag("official-build-build-dir", "Path to the build directory.").Required().ExistingDir()
+	officialBuildRpmsDir        = app.Flag("official-build-rpms-dir", "Path to the directory containing the built RPMs.").Required().ExistingDir()
+	officialBuildSpecsDir       = app.Flag("official-build-specs-dir", "Path to the directory containing the SPEC files.").Required().ExistingDir()
+	officialBuildRunCheck       = app.Flag("official-build-run-check", "Run the check step after building the RPMs.").Default("false").Bool()
+	//officialBuildUseIncremental       = app.Flag("official-build-incremental-toolchain", "Use incremental build mode.").Default("false").Bool()
 	officialBuildIntermediateSrpmsDir = app.Flag("official-build-intermediate-srpms-dir", "Path to the directory containing the intermediate SRPMs.").Required().ExistingDir()
 	officialBuildSrpmsDir             = app.Flag("official-build-srpms-dir", "Path to the directory containing the SRPMs.").Required().ExistingDir()
 	officialBuildToolchainFromRepos   = app.Flag("official-build-toolchain-from-repos", "WHAT IS THIS?").Required().ExistingDir()
 	officialBuildBldTracker           = app.Flag("official-build-bld-tracker", "Path to the bld-tracker tool").Required().ExistingFile()
 	officialBuildTimestampFile        = app.Flag("official-build-timestamp-file", "Path to the timestamp file.").Required().String()
-	officialInputFiles                = app.Flag("official-input-files", "List of input files to hash for validating the cache.").Required().ExistingFiles()
+	officialInputFiles                = app.Flag("official-input-files", "List of input files to hash for validating the cache.").Required().Strings()
 )
 
 func main() {
@@ -362,7 +362,7 @@ func buildBootstrapToolchainArchive(config buildConfig) (bootstrap toolchain.Boo
 		BuildDir:       *bootstrapBuildDir,
 		SpecsDir:       *specsDir,
 		SourceURL:      *bootstrapSourceURL,
-		UseIncremental: *bootstrapUseIncremental,
+		UseIncremental: config.doDeltaBuild,
 	}
 	bootstrap.InputFiles = append(bootstrap.InputFiles, *bootstrapInputFiles...)
 
@@ -410,7 +410,7 @@ func buildOfficialToolchainArchive(config buildConfig, bootstrap toolchain.Boots
 		RpmsDir:              *officialBuildRpmsDir,
 		SpecsDir:             *officialBuildSpecsDir,
 		RunCheck:             *officialBuildRunCheck,
-		UseIncremental:       *officialBuildUseIncremental,
+		UseIncremental:       config.doDeltaBuild,
 		IntermediateSrpmsDir: *officialBuildIntermediateSrpmsDir,
 		OutputSrpmsDir:       *officialBuildSrpmsDir,
 		ToolchainFromRepos:   *officialBuildToolchainFromRepos,
