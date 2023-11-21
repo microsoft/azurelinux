@@ -14013,8 +14013,8 @@
         "type": "other",
         "other": {
           "name": "newt",
-          "version": "0.52.21",
-          "downloadUrl": "https://pagure.io/releases/newt/newt-0.52.21.tar.gz"
+          "version": "0.52.23",
+          "downloadUrl": "https://pagure.io/releases/newt/newt-0.52.23.tar.gz"
         }
       }
     },

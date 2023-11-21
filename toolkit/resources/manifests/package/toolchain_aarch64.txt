@@ -258,10 +258,10 @@ ncurses-debuginfo-6.4-1.cm2.aarch64.rpm
 ncurses-devel-6.4-1.cm2.aarch64.rpm
 ncurses-libs-6.4-1.cm2.aarch64.rpm
 ncurses-term-6.4-1.cm2.aarch64.rpm
-newt-0.52.21-5.cm2.aarch64.rpm
-newt-debuginfo-0.52.21-5.cm2.aarch64.rpm
-newt-devel-0.52.21-5.cm2.aarch64.rpm
-newt-lang-0.52.21-5.cm2.aarch64.rpm
+newt-0.52.23-1.cm2.aarch64.rpm
+newt-debuginfo-0.52.23-1.cm2.aarch64.rpm
+newt-devel-0.52.23-1.cm2.aarch64.rpm
+newt-lang-0.52.23-1.cm2.aarch64.rpm
 nghttp2-1.57.0-1.cm2.aarch64.rpm
 nghttp2-debuginfo-1.57.0-1.cm2.aarch64.rpm
 nghttp2-devel-1.57.0-1.cm2.aarch64.rpm
@@ -526,7 +526,7 @@ python3-libxml2-2.10.4-2.cm2.aarch64.rpm
 python3-lxml-4.9.3-1.cm2.aarch64.rpm
 python3-magic-5.45-1.cm2.noarch.rpm
 python3-markupsafe-2.1.0-1.cm2.aarch64.rpm
-python3-newt-0.52.21-5.cm2.aarch64.rpm
+python3-newt-0.52.23-1.cm2.aarch64.rpm
 python3-pip-3.9.14-8.cm2.noarch.rpm
 python3-pygments-2.4.2-7.cm2.noarch.rpm
 python3-rpm-4.18.0-4.cm2.aarch64.rpm
