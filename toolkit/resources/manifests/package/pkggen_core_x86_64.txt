@@ -64,8 +64,8 @@ gettext-0.22-1.cm2.x86_64.rpm
 gzip-1.13-1.cm2.x86_64.rpm
 make-4.3-3.cm2.x86_64.rpm
 patch-2.7.6-8.cm2.x86_64.rpm
-libcap-ng-0.8.2-2.cm2.x86_64.rpm
-libcap-ng-devel-0.8.2-2.cm2.x86_64.rpm
+libcap-ng-0.8.3-1.cm2.x86_64.rpm
+libcap-ng-devel-0.8.3-1.cm2.x86_64.rpm
 util-linux-2.37.4-8.cm2.x86_64.rpm
 util-linux-devel-2.37.4-8.cm2.x86_64.rpm
 util-linux-libs-2.37.4-8.cm2.x86_64.rpm

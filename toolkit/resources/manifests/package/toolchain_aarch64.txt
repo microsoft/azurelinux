@@ -154,9 +154,9 @@ libbacktrace-static-13.2.0-1.cm2.aarch64.rpm
 libcap-2.69-1.cm2.aarch64.rpm
 libcap-debuginfo-2.69-1.cm2.aarch64.rpm
 libcap-devel-2.69-1.cm2.aarch64.rpm
-libcap-ng-0.8.2-2.cm2.aarch64.rpm
-libcap-ng-debuginfo-0.8.2-2.cm2.aarch64.rpm
-libcap-ng-devel-0.8.2-2.cm2.aarch64.rpm
+libcap-ng-0.8.3-1.cm2.aarch64.rpm
+libcap-ng-debuginfo-0.8.3-1.cm2.aarch64.rpm
+libcap-ng-devel-0.8.3-1.cm2.aarch64.rpm
 libffi-3.4.4-1.cm2.aarch64.rpm
 libffi-debuginfo-3.4.4-1.cm2.aarch64.rpm
 libffi-devel-3.4.4-1.cm2.aarch64.rpm
@@ -520,7 +520,7 @@ python3-debuginfo-3.9.14-8.cm2.aarch64.rpm
 python3-devel-3.9.14-8.cm2.aarch64.rpm
 python3-gpg-1.16.0-2.cm2.aarch64.rpm
 python3-jinja2-3.0.3-2.cm2.noarch.rpm
-python3-libcap-ng-0.8.2-2.cm2.aarch64.rpm
+python3-libcap-ng-0.8.3-1.cm2.aarch64.rpm
 python3-libs-3.9.14-8.cm2.aarch64.rpm
 python3-libxml2-2.10.4-2.cm2.aarch64.rpm
 python3-lxml-4.9.3-1.cm2.aarch64.rpm
