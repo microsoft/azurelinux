@@ -265,8 +265,8 @@ newt-lang-0.52.23-1.cm2.aarch64.rpm
 nghttp2-1.57.0-1.cm2.aarch64.rpm
 nghttp2-debuginfo-1.57.0-1.cm2.aarch64.rpm
 nghttp2-devel-1.57.0-1.cm2.aarch64.rpm
-ninja-build-1.10.2-2.cm2.aarch64.rpm
-ninja-build-debuginfo-1.10.2-2.cm2.aarch64.rpm
+ninja-build-1.11.1-1.cm2.aarch64.rpm
+ninja-build-debuginfo-1.11.1-1.cm2.aarch64.rpm
 npth-1.6-4.cm2.aarch64.rpm
 npth-debuginfo-1.6-4.cm2.aarch64.rpm
 npth-devel-1.6-4.cm2.aarch64.rpm
