@@ -4,7 +4,6 @@
 package formats
 
 import (
-	"fmt"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 )
 
@@ -17,15 +16,8 @@ type SquashFS struct {
 
 // Convert converts the image in the squashfs format
 func (t *SquashFS) Convert(input, output string, isInputFile bool) (err error) {
-	const (
-		squashErrors = false
-	)
-
-	if !isInputFile {
-		return fmt.Errorf("squashfs conversion requires an input")
-	}
-
-	err = shell.ExecuteLive(squashErrors, "mksquashfs", input, output, "-all-root", "-wildcards", "-e", "tmp/*", "-noappend")
+	const squashErrors = false
+	err = shell.ExecuteLive(squashErrors, "mksquashfs", input, output, "-noappend")
 	return
 }
 
