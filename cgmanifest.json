@@ -10111,8 +10111,8 @@
         "type": "other",
         "other": {
           "name": "libmpc",
-          "version": "1.2.1",
-          "downloadUrl": "https://ftp.gnu.org/gnu/mpc/mpc-1.2.1.tar.gz"
+          "version": "1.3.1",
+          "downloadUrl": "https://ftp.gnu.org/gnu/mpc/mpc-1.3.1.tar.gz"
         }
       }
     },
