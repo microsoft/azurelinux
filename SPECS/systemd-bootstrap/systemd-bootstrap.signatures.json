@@ -1,9 +1,9 @@
 {
- "Signatures": {
-  "50-security-hardening.conf": "c9fc6624a3178cc0980ec3495ac2d5f02a8a1f3a4cdadb8770628d7394b92e2c",
-  "99-dhcp-en.network": "158c0003826cef9d780799c6edb2814800d4518f85f884710550f4c46d14be67",
-  "99-mariner.preset": "84326fcef828f893827f3d5acdb7a6fe722a8c8e593b19dcc68b082a1c597c79",
-  "systemd-250.3.tar.gz": "87b0eee7b6e5aaab2ab56d158f9536daa6bfd5de011f2a5fc6ccdd81ee1e7a24",
-  "systemd.cfg": "1fd673c1da90560d9395a18df31f2ce6ef23972a6bf8c910ba6f3fb07818afa9"
- }
+  "Signatures": {
+    "50-security-hardening.conf": "c9fc6624a3178cc0980ec3495ac2d5f02a8a1f3a4cdadb8770628d7394b92e2c",
+    "99-dhcp-en.network": "158c0003826cef9d780799c6edb2814800d4518f85f884710550f4c46d14be67",
+    "99-mariner.preset": "84326fcef828f893827f3d5acdb7a6fe722a8c8e593b19dcc68b082a1c597c79",
+    "systemd.cfg": "1fd673c1da90560d9395a18df31f2ce6ef23972a6bf8c910ba6f3fb07818afa9",
+    "systemd-254.1.tar.gz": "d1e372a6ff817e639cdf58cc3888f72d37a380c0027d42bc875e5ab4b628a580"
+  }
 }

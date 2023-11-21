@@ -28207,8 +28207,8 @@
         "type": "other",
         "other": {
           "name": "systemd-bootstrap",
-          "version": "250.3",
-          "downloadUrl": "https://github.com/systemd/systemd-stable/archive/v250.3.tar.gz"
+          "version": "254.1",
+          "downloadUrl": "https://github.com/systemd/systemd-stable/archive/v254.1.tar.gz"
         }
       }
     },

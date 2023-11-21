@@ -555,10 +555,10 @@ sqlite-devel-3.44.0-1.cm2.x86_64.rpm
 sqlite-libs-3.44.0-1.cm2.x86_64.rpm
 swig-4.0.2-3.cm2.x86_64.rpm
 swig-debuginfo-4.0.2-3.cm2.x86_64.rpm
-systemd-bootstrap-250.3-14.cm2.x86_64.rpm
-systemd-bootstrap-debuginfo-250.3-14.cm2.x86_64.rpm
-systemd-bootstrap-devel-250.3-14.cm2.x86_64.rpm
-systemd-bootstrap-rpm-macros-250.3-14.cm2.noarch.rpm
+systemd-bootstrap-254.1-1.cm2.x86_64.rpm
+systemd-bootstrap-debuginfo-254.1-1.cm2.x86_64.rpm
+systemd-bootstrap-devel-254.1-1.cm2.x86_64.rpm
+systemd-bootstrap-rpm-macros-254.1-1.cm2.noarch.rpm
 tar-1.34-2.cm2.x86_64.rpm
 tar-debuginfo-1.34-2.cm2.x86_64.rpm
 tdnf-3.5.2-2.cm2.x86_64.rpm

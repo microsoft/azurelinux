@@ -1,7 +1,7 @@
 Summary:        Bootstrap version of systemd. Workaround for systemd circular dependency.
 Name:           systemd-bootstrap
-Version:        250.3
-Release:        14%{?dist}
+Version:        254.1
+Release:        1%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,11 +20,8 @@ Patch1:         add-fsync-sysusers-passwd.patch
 # https://github.com/systemd/systemd/commit/d5cb053cd93d516f516e0b748271b55f9dfb3a29
 Patch2:         gpt-auto-devno-not-determined.patch
 # Patch3 can be removed once we update to major version 251 or higher:
-Patch3:         CVE-2022-3821.patch
 # Patch4 can be removed once we update to version 252
-Patch4:         CVE-2022-45873.patch
 Patch5:         backport-helper-util-macros.patch
-Patch6:         CVE-2022-4415.patch
 Patch7:         update-cifs-for-kernel-headers-6.1.patch
 BuildRequires:  docbook-dtd-xml
 BuildRequires:  docbook-style-xsl
@@ -247,6 +244,9 @@ fi
 %{_datadir}/pkgconfig/udev.pc
 
 %changelog
+* Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 254.1-1
+- Auto-upgrade to 254.1 - Azure Linux 3.0 - package upgrades
+
 * Wed Nov 15 2023 Dan Streetman <ddstreet@ieee.org> - 250.3-14
 - Bump release
 
