@@ -585,8 +585,8 @@
         "type": "other",
         "other": {
           "name": "asciidoc",
-          "version": "9.1.0",
-          "downloadUrl": "https://github.com/asciidoc-py/asciidoc-py/releases/download/9.1.0/asciidoc-9.1.0.tar.gz"
+          "version": "10.2.0",
+          "downloadUrl": "https://github.com/asciidoc-py/asciidoc-py/releases/download/10.2.0/asciidoc-10.2.0.tar.gz"
         }
       }
     },

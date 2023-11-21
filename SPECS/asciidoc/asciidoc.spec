@@ -1,6 +1,6 @@
 Summary:        AsciiDoc is a human readable text document format
 Name:           asciidoc
-Version:        9.1.0
+Version:        10.2.0
 Release:        1%{?dist}
 License:        GPLv2
 URL:            https://asciidoc.org/
@@ -52,6 +52,9 @@ python3 tests/testasciidoc.py run
 %{_mandir}/*
 
 %changelog
+* Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 10.2.0-1
+- Auto-upgrade to 10.2.0 - Azure Linux 3.0 - package upgrades
+
 *   Wed May 05 2021 Nick Samson <nisamson@microsoft.com> - 9.1.0-1
 -   Updated to 9.1.0, removed python2 support, verified license
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 8.6.10-4
