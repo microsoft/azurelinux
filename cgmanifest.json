@@ -8331,8 +8331,8 @@
         "type": "other",
         "other": {
           "name": "krb5",
-          "version": "1.19.4",
-          "downloadUrl": "https://kerberos.org/dist/krb5/1.19/krb5-1.19.4.tar.gz"
+          "version": "1.21.2",
+          "downloadUrl": "https://kerberos.org/dist/krb5/1.21/krb5-1.21.2.tar.gz"
         }
       }
     },

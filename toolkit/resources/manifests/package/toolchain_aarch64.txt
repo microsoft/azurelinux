@@ -140,10 +140,10 @@ kernel-headers-6.1.58.1-1.cm2.noarch.rpm
 kmod-30-1.cm2.aarch64.rpm
 kmod-debuginfo-30-1.cm2.aarch64.rpm
 kmod-devel-30-1.cm2.aarch64.rpm
-krb5-1.19.4-2.cm2.aarch64.rpm
-krb5-debuginfo-1.19.4-2.cm2.aarch64.rpm
-krb5-devel-1.19.4-2.cm2.aarch64.rpm
-krb5-lang-1.19.4-2.cm2.aarch64.rpm
+krb5-1.21.2-1.cm2.aarch64.rpm
+krb5-debuginfo-1.21.2-1.cm2.aarch64.rpm
+krb5-devel-1.21.2-1.cm2.aarch64.rpm
+krb5-lang-1.21.2-1.cm2.aarch64.rpm
 libarchive-3.7.1-1.cm2.aarch64.rpm
 libarchive-debuginfo-3.7.1-1.cm2.aarch64.rpm
 libarchive-devel-3.7.1-1.cm2.aarch64.rpm
