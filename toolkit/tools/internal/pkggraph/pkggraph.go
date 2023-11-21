@@ -651,13 +651,9 @@ func (g *PkgGraph) AllNodesFrom(rootNode *PkgNode) []*PkgNode {
 // It traverses the graph and returns all nodes of type TypeLocalRun and
 // TypeRemoteRun.
 func (g *PkgGraph) AllRunNodes() []*PkgNode {
-	nodes := make([]*PkgNode, 0, g.Nodes().Len())
-	for _, n := range g.AllNodes() {
-		if n.Type == TypeLocalRun || n.Type == TypeRemoteRun {
-			nodes = append(nodes, n)
-		}
-	}
-	return nodes
+	return g.NodesMatchingFilter(func(n *PkgNode) bool {
+		return n.Type == TypeLocalRun || n.Type == TypeRemoteRun
+	})
 }
 
 // AllPreferredRunNodes returns all RunNodes in the LookupTable
@@ -668,32 +664,38 @@ func (g *PkgGraph) AllRunNodes() []*PkgNode {
 // 3. LocalRun Node if both LocalRun and RemoteRun nodes are present in the graph
 // This function will return all RunNodes in the LookupTable.
 func (g *PkgGraph) AllPreferredRunNodes() []*PkgNode {
-	return g.allNodesOfType(func(n *LookupNode) *PkgNode {
-		return n.RunNode
-	})
+	// We can estimate there will be ~1 run node per package.
+	foundNodes := 0
+	nodes := make([]*PkgNode, 0, len(g.lookupTable()))
+	for _, versionList := range g.lookupTable() {
+		for _, n := range versionList {
+			if n.RunNode != nil {
+				nodes = append(nodes, n.RunNode)
+				foundNodes++
+			}
+		}
+	}
+	return nodes[:foundNodes]
 }
 
 // AllBuildNodes returns a list of all build nodes in the graph
 func (g *PkgGraph) AllBuildNodes() []*PkgNode {
-	return g.allNodesOfType(func(n *LookupNode) *PkgNode {
-		return n.BuildNode
+	return g.NodesMatchingFilter(func(n *PkgNode) bool {
+		return n.Type == TypeLocalBuild
 	})
 }
 
 // AllTestNodes returns a list of all test nodes in the graph
 func (g *PkgGraph) AllTestNodes() []*PkgNode {
-	return g.allNodesOfType(func(n *LookupNode) *PkgNode {
-		return n.TestNode
+	return g.NodesMatchingFilter(func(n *PkgNode) bool {
+		return n.Type == TypeTest
 	})
 }
 
 // AllImplicitNodes returns a list of all implicit remote nodes in the graph
 func (g *PkgGraph) AllImplicitNodes() []*PkgNode {
-	return g.allNodesOfType(func(n *LookupNode) *PkgNode {
-		if n.RunNode != nil && n.RunNode.Implicit {
-			return n.RunNode
-		}
-		return nil
+	return g.NodesMatchingFilter(func(n *PkgNode) bool {
+		return n.Implicit
 	})
 }
 
@@ -1443,25 +1445,6 @@ func (g *PkgGraph) CloneNode(pkgNode *PkgNode) (newNode *PkgNode) {
 	newNode.This = newNode
 
 	return
-}
-
-// allNodesOfType returns a list of all non-null nodes returned by the getter.
-func (g *PkgGraph) allNodesOfType(nodeGetter func(node *LookupNode) *PkgNode) []*PkgNode {
-	count := 0
-	for _, list := range g.lookupTable() {
-		count += len(list)
-	}
-
-	nodes := make([]*PkgNode, 0, count)
-	for _, list := range g.lookupTable() {
-		for _, n := range list {
-			if node := nodeGetter(n); node != nil {
-				nodes = append(nodes, node)
-			}
-		}
-	}
-
-	return nodes
 }
 
 // buildGoalSet returns a set of package versions that are the goal of the graph.
