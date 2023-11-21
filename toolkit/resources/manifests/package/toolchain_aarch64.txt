@@ -225,9 +225,9 @@ lua-libs-5.4.4-1.cm2.aarch64.rpm
 lua-rpm-macros-1-6.cm2.noarch.rpm
 lua-srpm-macros-1-6.cm2.noarch.rpm
 lua-static-5.4.4-1.cm2.aarch64.rpm
-lz4-1.9.3-1.cm2.aarch64.rpm
-lz4-debuginfo-1.9.3-1.cm2.aarch64.rpm
-lz4-devel-1.9.3-1.cm2.aarch64.rpm
+lz4-1.9.4-1.cm2.aarch64.rpm
+lz4-debuginfo-1.9.4-1.cm2.aarch64.rpm
+lz4-devel-1.9.4-1.cm2.aarch64.rpm
 m4-1.4.19-2.cm2.aarch64.rpm
 m4-debuginfo-1.4.19-2.cm2.aarch64.rpm
 make-4.3-3.cm2.aarch64.rpm
