@@ -9361,8 +9361,8 @@
         "type": "other",
         "other": {
           "name": "libgcrypt",
-          "version": "1.9.4",
-          "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.9.4.tar.bz2"
+          "version": "1.10.2",
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.10.2.tar.bz2"
         }
       }
     },
