@@ -119,6 +119,9 @@
 %build_fflags %{optflags} -I%{_fmoddir}
 %build_ldflags -Wl,-z,relro %{_ld_as_needed_flags} %{_ld_symbols_flags} %{_hardened_ldflags} %{?mariner_module_ldflags:%{mariner_module_ldflags}}
 
+%disable_linking_script \
+  LDFLAGS="$(sed 's|\s*-Wl,-dT,%{_topdir}/BUILD/module_info.ld||' <<<$LDFLAGS)" ; export LDFLAGS
+
 # Deprecated names.  For backwards compatibility only.
 %__global_cflags %{build_cflags}
 %__global_cxxflags %{build_cxxflags}

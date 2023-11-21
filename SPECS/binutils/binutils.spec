@@ -106,6 +106,9 @@ function config_cross_target () {
     popd
 }
 
+echo "(BUILD) module_info.ld contents:"
+cat %{_topdir}/BUILD/module_info.ld
+
 mkdir build
 pushd build
 
@@ -150,7 +153,20 @@ done < cross.list
 find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
-sed -i 's/testsuite/ /g' gold/Makefile
+sed -i '/msg=SECTIONS/{s/.*//;q}' %{_topdir}/BUILD/module_info.ld
+echo "(CHECK) module_info.ld contents:"
+cat %{_topdir}/BUILD/module_info.ld
+# Remove module_info.ld script due to error:
+#   gcctestdir1/collect-ld: error: /usr/src/mariner/BUILD/module_info.ld:67:8: syntax error, unexpected STRING
+#   gcctestdir1/collect-ld: fatal error: unable to parse script file /usr/src/mariner/BUILD/module_info.ld
+echo "BEFORE LDFLAGS: $LDFLAGS"
+LDFLAGS="$(sed 's|\s*-Wl,-dT,%{_topdir}/BUILD/module_info.ld||' <<<"%{build_ldflags}")" ; export LDFLAGS
+echo "AFTER LDFLAGS: $LDFLAGS"
+# LDFLAGS="`echo " %{build_ldflags} " | sed 's#-Wl,-dT,%{_topdir}/BUILD/module_info.ld##'`"; export LDFLAGS
+
+echo > %{_topdir}/BUILD/module_info.ld
+
+sed -i 's/testsuite/ /g' build/gold/Makefile
 %make_build -C build check
 
 %ldconfig_scriptlets
