@@ -209,9 +209,9 @@ libtasn1-debuginfo-4.19.0-1.cm2.x86_64.rpm
 libtasn1-devel-4.19.0-1.cm2.x86_64.rpm
 libtool-2.4.7-1.cm2.x86_64.rpm
 libtool-debuginfo-2.4.7-1.cm2.x86_64.rpm
-libxml2-2.10.4-2.cm2.x86_64.rpm
-libxml2-debuginfo-2.10.4-2.cm2.x86_64.rpm
-libxml2-devel-2.10.4-2.cm2.x86_64.rpm
+libxml2-2.11.5-1.cm2.x86_64.rpm
+libxml2-debuginfo-2.11.5-1.cm2.x86_64.rpm
+libxml2-devel-2.11.5-1.cm2.x86_64.rpm
 libxcrypt-4.4.27-3.cm2.x86_64.rpm
 libxcrypt-debuginfo-4.4.27-3.cm2.x86_64.rpm
 libxcrypt-devel-4.4.27-3.cm2.x86_64.rpm
@@ -522,7 +522,7 @@ python3-gpg-1.16.0-2.cm2.x86_64.rpm
 python3-jinja2-3.0.3-2.cm2.noarch.rpm
 python3-libcap-ng-0.8.3-1.cm2.x86_64.rpm
 python3-libs-3.9.14-8.cm2.x86_64.rpm
-python3-libxml2-2.10.4-2.cm2.x86_64.rpm
+python3-libxml2-2.11.5-1.cm2.x86_64.rpm
 python3-lxml-4.9.3-1.cm2.x86_64.rpm
 python3-magic-5.45-1.cm2.noarch.rpm
 python3-markupsafe-2.1.0-1.cm2.x86_64.rpm
