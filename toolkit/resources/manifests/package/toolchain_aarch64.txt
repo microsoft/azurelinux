@@ -471,7 +471,7 @@ perl-Text-Abbrev-1.02-488.cm2.noarch.rpm
 perl-Text-Balanced-2.04-488.cm2.noarch.rpm
 perl-Text-ParseWords-3.30-488.cm2.noarch.rpm
 perl-Text-Tabs+Wrap-2013.0523-488.cm2.noarch.rpm
-perl-Text-Template-1.60-1.cm2.noarch.rpm
+perl-Text-Template-1.61-1.cm2.noarch.rpm
 perl-Thread-3.05-488.cm2.noarch.rpm
 perl-Thread-Queue-3.14-488.cm2.noarch.rpm
 perl-Thread-Semaphore-2.13-488.cm2.noarch.rpm

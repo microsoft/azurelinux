@@ -20314,8 +20314,8 @@
         "type": "other",
         "other": {
           "name": "perl-Text-Template",
-          "version": "1.60",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/MS/MSCHOUT/Text-Template-1.60.tar.gz"
+          "version": "1.61",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/MS/MSCHOUT/Text-Template-1.61.tar.gz"
         }
       }
     },
