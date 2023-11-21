@@ -88,7 +88,7 @@ echo "disable syslog-ng.service" > %{buildroot}%{_libdir}/systemd/system-preset/
 
 %check
 pip3 install unittest2 nose ply pep8
-make %{?_smp_mflags} check
+make %{?_smp_mflags} ENABLE_TESTING=1 check
 
 %post
 if [ $1 -eq 1 ] ; then
