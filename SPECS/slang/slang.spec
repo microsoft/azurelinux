@@ -1,7 +1,7 @@
 Summary:        An interpreted language that may be embedded into an application to make the application extensible.
 Name:           slang
-Version:        2.3.2
-Release:        4%{?dist}
+Version:        2.3.3
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -62,6 +62,9 @@ make  check
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.3.3-1
+- Auto-upgrade to 2.3.3 - Azure Linux 3.0 - package upgrades
+
 * Fri Jan 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.2-4
 - Removed the "sha1" macro.
 - License verified.
