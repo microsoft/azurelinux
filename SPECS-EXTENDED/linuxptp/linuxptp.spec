@@ -3,8 +3,6 @@ Distribution:   Mariner
 %global _hardened_build 1
 %global testsuite_ver ff37e2
 %global clknetsim_ver 9ed48d
-%global selinuxtype targeted
-%bcond_without selinux
 
 Name:		linuxptp
 Version:	3.1.1
@@ -24,10 +22,6 @@ Source5:	ptp4l.conf
 Source10:	linuxptp-testsuite-%{testsuite_ver}.tar.gz
 # simulator for test suite
 Source11:	clknetsim-%{clknetsim_ver}.tar.gz
-# selinux policy
-Source20:	linuxptp.fc
-Source21:	linuxptp.if
-Source22:	linuxptp.te
 
 # fix handling of zero-length messages
 Patch0:		linuxptp-zerolength.patch
@@ -42,30 +36,12 @@ BuildRequires:	gcc gcc-c++ make systemd
 
 %{?systemd_requires}
 
-%if 0%{?with_selinux}
-Requires:	(%{name}-selinux if selinux-policy-%{selinuxtype})
-%endif
-
 %description
 This software is an implementation of the Precision Time Protocol (PTP)
 according to IEEE standard 1588 for Linux. The dual design goals are to provide
 a robust implementation of the standard and to use the most relevant and modern
 Application Programming Interfaces (API) offered by the Linux kernel.
 Supporting legacy APIs and other platforms is not a goal.
-
-%if 0%{?with_selinux}
-%package selinux
-Summary:	linuxptp SELinux policy
-BuildArch:	noarch
-Requires:	selinux-policy-%{selinuxtype}
-Requires(post):	selinux-policy-%{selinuxtype}
-BuildRequires:	selinux-policy-devel
-%{?selinux_requires}
-
-%description selinux
-linuxptp SELinux policy module
-
-%endif
 
 %prep
 %setup -q -a 10 -a 11 -n %{name}-%{!?gitfullver:%{version}}%{?gitfullver}
@@ -79,18 +55,10 @@ popd
 
 %patch2 -p1 -b .pre-ha
 
-mkdir selinux
-cp -p %{SOURCE20} %{SOURCE21} %{SOURCE22} selinux
-
 %build
 %{make_build} \
 	EXTRA_CFLAGS="$RPM_OPT_FLAGS" \
 	EXTRA_LDFLAGS="$RPM_LD_FLAGS"
-
-%if 0%{?with_selinux}
-make -C selinux -f %{_datadir}/selinux/devel/Makefile linuxptp.pp
-bzip2 -9 selinux/linuxptp.pp
-%endif
 
 %install
 %makeinstall
@@ -105,13 +73,6 @@ echo 'OPTIONS="-a -r"' > $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/phc2sys
 
 echo '.so man8/ptp4l.8' > $RPM_BUILD_ROOT%{_mandir}/man5/ptp4l.conf.5
 echo '.so man8/timemaster.8' > $RPM_BUILD_ROOT%{_mandir}/man5/timemaster.conf.5
-
-%if 0%{?with_selinux}
-install -D -m 0644 selinux/linuxptp.pp.bz2 \
-	$RPM_BUILD_ROOT%{_datadir}/selinux/packages/%{selinuxtype}/linuxptp.pp.bz2
-install -D -p -m 0644 selinux/linuxptp.if \
-	$RPM_BUILD_ROOT%{_datadir}/selinux/devel/include/distributed/linuxptp.if
-%endif
 
 %check
 cd testsuite
@@ -128,27 +89,6 @@ PATH=..:$PATH ./run
 
 %postun
 %systemd_postun_with_restart phc2sys.service ptp4l.service timemaster.service
-
-%if 0%{?with_selinux}
-%pre selinux
-%selinux_relabel_pre -s %{selinuxtype}
-
-%post selinux
-%selinux_modules_install -s %{selinuxtype} %{_datadir}/selinux/packages/%{selinuxtype}/linuxptp.pp.bz2
-%selinux_relabel_post -s %{selinuxtype}
-
-%postun selinux
-if [ $1 -eq 0 ]; then
-	%selinux_modules_uninstall -s %{selinuxtype} linuxptp
-	%selinux_relabel_post -s %{selinuxtype}
-fi
-
-%files selinux
-%{_datadir}/selinux/packages/%{selinuxtype}/linuxptp.pp.*
-%{_datadir}/selinux/devel/include/distributed/linuxptp.if
-%ghost %verify(not md5 size mtime) %{_sharedstatedir}/selinux/%{selinuxtype}/active/modules/200/linuxptp
-
-%endif
 
 %files
 %doc COPYING README.org configs
@@ -175,6 +115,7 @@ fi
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
 - License Verified.
 - Upstream linuxptp 3.1.1-6 has been imported into Azure Linux with package 3.1.1-1
+- Remove SELinux policy
 
 * Wed Jan 11 2023 Miroslav Lichvar <mlichvar@redhat.com> 3.1.1-6
 - update selinux policy (#2159919)
