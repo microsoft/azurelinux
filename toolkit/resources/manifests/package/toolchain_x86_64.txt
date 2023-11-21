@@ -172,9 +172,9 @@ libgpg-error-1.47-1.cm2.x86_64.rpm
 libgpg-error-debuginfo-1.47-1.cm2.x86_64.rpm
 libgpg-error-devel-1.47-1.cm2.x86_64.rpm
 libgpg-error-lang-1.47-1.cm2.x86_64.rpm
-libksba-1.6.3-1.cm2.x86_64.rpm
-libksba-debuginfo-1.6.3-1.cm2.x86_64.rpm
-libksba-devel-1.6.3-1.cm2.x86_64.rpm
+libksba-1.6.4-1.cm2.x86_64.rpm
+libksba-debuginfo-1.6.4-1.cm2.x86_64.rpm
+libksba-devel-1.6.4-1.cm2.x86_64.rpm
 libltdl-2.4.7-1.cm2.x86_64.rpm
 libltdl-devel-2.4.7-1.cm2.x86_64.rpm
 libmetalink-0.1.3-1.cm2.x86_64.rpm

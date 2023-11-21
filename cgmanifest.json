@@ -9871,8 +9871,8 @@
         "type": "other",
         "other": {
           "name": "libksba",
-          "version": "1.6.3",
-          "downloadUrl": "https://www.gnupg.org/ftp/gcrypt/libksba/libksba-1.6.3.tar.bz2"
+          "version": "1.6.4",
+          "downloadUrl": "https://www.gnupg.org/ftp/gcrypt/libksba/libksba-1.6.4.tar.bz2"
         }
       }
     },
