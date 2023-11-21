@@ -528,7 +528,7 @@ python3-magic-5.45-1.cm2.noarch.rpm
 python3-markupsafe-2.1.0-1.cm2.x86_64.rpm
 python3-newt-0.52.23-1.cm2.x86_64.rpm
 python3-pip-3.9.14-8.cm2.noarch.rpm
-python3-pygments-2.4.2-7.cm2.noarch.rpm
+python3-pygments-2.5.2-1.cm2.noarch.rpm
 python3-rpm-4.18.0-4.cm2.x86_64.rpm
 python3-setuptools-3.9.14-8.cm2.noarch.rpm
 python3-test-3.9.14-8.cm2.x86_64.rpm
