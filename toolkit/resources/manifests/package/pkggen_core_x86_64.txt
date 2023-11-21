@@ -247,8 +247,8 @@ libselinux-3.2-1.cm2.x86_64.rpm
 slang-2.3.2-4.cm2.x86_64.rpm
 newt-0.52.21-5.cm2.x86_64.rpm
 newt-lang-0.52.21-5.cm2.x86_64.rpm
-chkconfig-1.20-4.cm2.x86_64.rpm
-chkconfig-lang-1.20-4.cm2.x86_64.rpm
+chkconfig-1.25-1.cm2.x86_64.rpm
+chkconfig-lang-1.25-1.cm2.x86_64.rpm
 msopenjdk-11-11.0.20.1-1.x86_64.rpm
 pyproject-rpm-macros-1.0.0~rc1-4.cm2.noarch.rpm
 audit-3.1.2-1.cm2.x86_64.rpm
