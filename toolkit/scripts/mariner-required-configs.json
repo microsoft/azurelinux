@@ -1286,7 +1286,7 @@
                 "PR": [
                     "https://github.com/microsoft/CBL-Mariner/pull/6823"
                 ]
-            }
+            },
             "CONFIG_ARM_SMMU_V3_SVA": {
                 "value": [
                     "y"
