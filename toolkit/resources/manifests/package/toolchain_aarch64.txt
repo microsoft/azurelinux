@@ -118,9 +118,9 @@ glibc-tools-2.38-1.cm2.aarch64.rpm
 gmp-6.3.0-1.cm2.aarch64.rpm
 gmp-debuginfo-6.3.0-1.cm2.aarch64.rpm
 gmp-devel-6.3.0-1.cm2.aarch64.rpm
-gnupg2-2.4.0-2.cm2.aarch64.rpm
-gnupg2-debuginfo-2.4.0-2.cm2.aarch64.rpm
-gnupg2-lang-2.4.0-2.cm2.aarch64.rpm
+gnupg2-2.4.3-1.cm2.aarch64.rpm
+gnupg2-debuginfo-2.4.3-1.cm2.aarch64.rpm
+gnupg2-lang-2.4.3-1.cm2.aarch64.rpm
 gperf-3.1-5.cm2.aarch64.rpm
 gperf-debuginfo-3.1-5.cm2.aarch64.rpm
 gpgme-1.16.0-2.cm2.aarch64.rpm

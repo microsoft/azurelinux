@@ -4520,8 +4520,8 @@
         "type": "other",
         "other": {
           "name": "gnupg2",
-          "version": "2.4.0",
-          "downloadUrl": "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.4.0.tar.bz2"
+          "version": "2.4.3",
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.4.3.tar.bz2"
         }
       }
     },
