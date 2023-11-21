@@ -553,8 +553,8 @@ sqlite-3.44.0-1.cm2.x86_64.rpm
 sqlite-debuginfo-3.44.0-1.cm2.x86_64.rpm
 sqlite-devel-3.44.0-1.cm2.x86_64.rpm
 sqlite-libs-3.44.0-1.cm2.x86_64.rpm
-swig-4.0.2-3.cm2.x86_64.rpm
-swig-debuginfo-4.0.2-3.cm2.x86_64.rpm
+swig-4.1.1-1.cm2.x86_64.rpm
+swig-debuginfo-4.1.1-1.cm2.x86_64.rpm
 systemd-bootstrap-254.1-1.cm2.x86_64.rpm
 systemd-bootstrap-debuginfo-254.1-1.cm2.x86_64.rpm
 systemd-bootstrap-devel-254.1-1.cm2.x86_64.rpm

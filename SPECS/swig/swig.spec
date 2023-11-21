@@ -1,7 +1,7 @@
 Summary:        Connects C/C++/Objective C to some high-level programming languages
 Name:           swig
-Version:        4.0.2
-Release:        3%{?dist}
+Version:        4.1.1
+Release:        1%{?dist}
 License:        GPLv3+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -63,6 +63,9 @@ ln -fs ../../bin/ccache-swig %{buildroot}%{_libdir}/ccache/swig
 %{_libdir}/ccache
 
 %changelog
+* Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.1.1-1
+- Auto-upgrade to 4.1.1 - Azure Linux 3.0 - package upgrades
+
 * Tue Mar 01 2022 Bala <balakumaran.kannan@microsoft.com> - 4.0.2-3
 - BR python related packages and Boost for check
 - Install 2to3 for converting all test files to python3 compatible

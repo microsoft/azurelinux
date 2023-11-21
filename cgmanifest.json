@@ -28067,8 +28067,8 @@
         "type": "other",
         "other": {
           "name": "swig",
-          "version": "4.0.2",
-          "downloadUrl": "https://github.com/swig/swig/archive/refs/tags/v4.0.2.tar.gz"
+          "version": "4.1.1",
+          "downloadUrl": "https://github.com/swig/swig/archive/refs/tags/v4.1.1.tar.gz"
         }
       }
     },
