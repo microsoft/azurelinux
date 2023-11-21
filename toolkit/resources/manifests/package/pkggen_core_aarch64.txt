@@ -253,5 +253,5 @@ msopenjdk-11-11.0.20.1-1.aarch64.rpm
 pyproject-rpm-macros-1.0.0~rc1-4.cm2.noarch.rpm
 audit-3.1.2-1.cm2.aarch64.rpm
 audit-libs-3.1.2-1.cm2.aarch64.rpm
-libxcrypt-4.4.27-3.cm2.aarch64.rpm
-libxcrypt-devel-4.4.27-3.cm2.aarch64.rpm
+libxcrypt-4.4.36-1.cm2.aarch64.rpm
+libxcrypt-devel-4.4.36-1.cm2.aarch64.rpm
