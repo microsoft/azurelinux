@@ -1,7 +1,7 @@
 Summary:        Bourne-Again SHell
 Name:           bash
-Version:        5.1.8
-Release:        4%{?dist}
+Version:        5.2.15
+Release:        1%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -328,6 +328,9 @@ fi
 %defattr(-,root,root)
 
 %changelog
+* Tue Nov 21 2023 Andrew Phelps <anphel@microsoft.com> - 5.2.15-1
+- Upgrade to version 5.2.15
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.1.8-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
