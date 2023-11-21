@@ -186,8 +186,8 @@ cpio-lang-2.13-5.cm2.aarch64.rpm
 e2fsprogs-libs-1.46.5-3.cm2.aarch64.rpm
 libsolv-0.7.24-1.cm2.aarch64.rpm
 libsolv-devel-0.7.24-1.cm2.aarch64.rpm
-libssh2-1.9.0-3.cm2.aarch64.rpm
-libssh2-devel-1.9.0-3.cm2.aarch64.rpm
+libssh2-1.11.0-1.cm2.aarch64.rpm
+libssh2-devel-1.11.0-1.cm2.aarch64.rpm
 krb5-1.19.4-2.cm2.aarch64.rpm
 nghttp2-1.57.0-1.cm2.aarch64.rpm
 curl-8.3.0-2.cm2.aarch64.rpm

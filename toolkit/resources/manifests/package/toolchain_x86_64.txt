@@ -199,9 +199,9 @@ libsolv-0.7.24-1.cm2.x86_64.rpm
 libsolv-debuginfo-0.7.24-1.cm2.x86_64.rpm
 libsolv-devel-0.7.24-1.cm2.x86_64.rpm
 libsolv-tools-0.7.24-1.cm2.x86_64.rpm
-libssh2-1.9.0-3.cm2.x86_64.rpm
-libssh2-debuginfo-1.9.0-3.cm2.x86_64.rpm
-libssh2-devel-1.9.0-3.cm2.x86_64.rpm
+libssh2-1.11.0-1.cm2.x86_64.rpm
+libssh2-debuginfo-1.11.0-1.cm2.x86_64.rpm
+libssh2-devel-1.11.0-1.cm2.x86_64.rpm
 libstdc++-13.2.0-1.cm2.x86_64.rpm
 libstdc++-devel-13.2.0-1.cm2.x86_64.rpm
 libtasn1-4.19.0-1.cm2.x86_64.rpm
