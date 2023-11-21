@@ -133,7 +133,7 @@ gtk-doc-1.33.2-1.cm2.noarch.rpm
 gzip-1.13-1.cm2.x86_64.rpm
 gzip-debuginfo-1.13-1.cm2.x86_64.rpm
 intltool-0.51.0-7.cm2.noarch.rpm
-itstool-2.0.6-4.cm2.noarch.rpm
+itstool-2.0.7-1.cm2.noarch.rpm
 kbd-2.2.0-1.cm2.x86_64.rpm
 kbd-debuginfo-2.2.0-1.cm2.x86_64.rpm
 kernel-headers-6.1.58.1-1.cm2.noarch.rpm
