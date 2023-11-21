@@ -2,7 +2,7 @@
 name: Questions/Feedback
 about: Ask general questions or provide feedback other than a bug or feature
 title: ''
-labels: ''
+labels: question
 assignees: ''
 
 ---
