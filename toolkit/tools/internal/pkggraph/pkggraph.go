@@ -1150,7 +1150,13 @@ func (g *PkgGraph) AddGoalNodeWithExtraLayers(goalName string, packages, tests [
 	return
 }
 
-// AddGoalNodeToNodes adds a goal node to the graph which links to a list of existing nodes.
+// AddGoalNodeToNodes behaves similarly to AddGoalNodeWithExtraLayers, but instead of using a list of package versions (via
+// graph lookup) to create the goal node, it uses a list of existing nodes in the graph.
+//   - goalName: The name of the goal node to add
+//   - existingNodes: A list of nodes to link the goal node to.
+//   - extraLayers: The number of levels to expand the goal node. Each level will add one more layer of packages beyond
+//     the goal node. For example, if the goal node is "x" and extraLevels is 1, the goal node will link to all nodes
+//     which depend on "x" as well as "x" itself (Specifically run nodes, all other nodes are stepped over)
 func (g *PkgGraph) AddGoalNodeToNodes(goalName string, existingNodes []*PkgNode, extraLayers int) (goalNode *PkgNode, err error) {
 	// Check if we already have a goal node with the requested name
 	if g.FindGoalNode(goalName) != nil {
