@@ -3,8 +3,8 @@
 
 Summary:          A password strength-checking library.
 Name:             cracklib
-Version:          2.9.7
-Release:          5%{?dist}
+Version:          2.9.11
+Release:          1%{?dist}
 Group:            System Environment/Libraries
 URL:              https://github.com/cracklib/cracklib
 License:          LGPLv2+
@@ -184,6 +184,9 @@ rm -f %{_datadir}/cracklib/pw_dict.pwi
 %{_datadir}/locale/*
 
 %changelog
+* Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.9.11-1
+- Auto-upgrade to 2.9.11 - Azure Linux 3.0 - package upgrades
+
 * Tue Jun 07 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.9.7-5
 - Remove packer symlink- not necessary, conflicts with Hashicorp's packer tool
 

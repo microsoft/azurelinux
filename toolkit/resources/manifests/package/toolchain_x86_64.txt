@@ -38,11 +38,11 @@ coreutils-lang-8.32-7.cm2.x86_64.rpm
 cpio-2.13-5.cm2.x86_64.rpm
 cpio-debuginfo-2.13-5.cm2.x86_64.rpm
 cpio-lang-2.13-5.cm2.x86_64.rpm
-cracklib-2.9.7-5.cm2.x86_64.rpm
-cracklib-debuginfo-2.9.7-5.cm2.x86_64.rpm
-cracklib-devel-2.9.7-5.cm2.x86_64.rpm
-cracklib-dicts-2.9.7-5.cm2.x86_64.rpm
-cracklib-lang-2.9.7-5.cm2.x86_64.rpm
+cracklib-2.9.11-1.cm2.x86_64.rpm
+cracklib-debuginfo-2.9.11-1.cm2.x86_64.rpm
+cracklib-devel-2.9.11-1.cm2.x86_64.rpm
+cracklib-dicts-2.9.11-1.cm2.x86_64.rpm
+cracklib-lang-2.9.11-1.cm2.x86_64.rpm
 createrepo_c-1.0.0-1.cm2.x86_64.rpm
 createrepo_c-debuginfo-1.0.0-1.cm2.x86_64.rpm
 createrepo_c-devel-1.0.0-1.cm2.x86_64.rpm
@@ -513,7 +513,7 @@ pyproject-rpm-macros-1.0.0~rc1-4.cm2.noarch.rpm
 python-markupsafe-debuginfo-2.1.0-1.cm2.x86_64.rpm
 python3-3.9.14-8.cm2.x86_64.rpm
 python3-audit-3.1.2-1.cm2.x86_64.rpm
-python3-cracklib-2.9.7-5.cm2.x86_64.rpm
+python3-cracklib-2.9.11-1.cm2.x86_64.rpm
 python3-curses-3.9.14-8.cm2.x86_64.rpm
 python3-Cython-3.0.5-1.cm2.x86_64.rpm
 python3-debuginfo-3.9.14-8.cm2.x86_64.rpm
