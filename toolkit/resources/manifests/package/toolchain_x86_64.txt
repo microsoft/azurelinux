@@ -187,11 +187,11 @@ libpipeline-debuginfo-1.5.7-1.cm2.x86_64.rpm
 libpipeline-devel-1.5.7-1.cm2.x86_64.rpm
 libpkgconf-1.8.0-3.cm2.x86_64.rpm
 libpkgconf-devel-1.8.0-3.cm2.x86_64.rpm
-libselinux-3.2-1.cm2.x86_64.rpm
-libselinux-debuginfo-3.2-1.cm2.x86_64.rpm
-libselinux-devel-3.2-1.cm2.x86_64.rpm
-libselinux-python3-3.2-1.cm2.x86_64.rpm
-libselinux-utils-3.2-1.cm2.x86_64.rpm
+libselinux-3.5-1.cm2.x86_64.rpm
+libselinux-debuginfo-3.5-1.cm2.x86_64.rpm
+libselinux-devel-3.5-1.cm2.x86_64.rpm
+libselinux-python3-3.5-1.cm2.x86_64.rpm
+libselinux-utils-3.5-1.cm2.x86_64.rpm
 libsepol-3.2-2.cm2.x86_64.rpm
 libsepol-debuginfo-3.2-2.cm2.x86_64.rpm
 libsepol-devel-3.2-2.cm2.x86_64.rpm

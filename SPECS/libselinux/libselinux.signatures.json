@@ -1,5 +1,5 @@
 {
- "Signatures": {
-  "libselinux-3.2.tar.gz": "df758ef1d9d4811051dd901ea6b029ae334ffd7c671c128beb16bce1e25ac161"
- }
+  "Signatures": {
+    "libselinux-3.5.tar.gz": "9a3a3705ac13a2ccca2de6d652b6356fead10f36fb33115c185c5ccdf29eec19"
+  }
 }
