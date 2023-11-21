@@ -28,7 +28,7 @@
 Summary:        Linux Kernel
 Name:           kernel-azure
 Version:        5.15.137.1
-Release:        1%{?dist}
+Release:        9999%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
