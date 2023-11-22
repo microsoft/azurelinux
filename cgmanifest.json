@@ -8382,7 +8382,7 @@
         "other": {
           "name": "kubernetes",
           "version": "1.28.4",
-          "downloadUrl": "https://dl.k8s.io/v1.28.4#/kubernetes-src.tar.gz"
+          "downloadUrl": "https://dl.k8s.io/v1.28.4/kubernetes-src.tar.gz#/kubernetes-v1.28.4.tar.gz"
         }
       }
     },
