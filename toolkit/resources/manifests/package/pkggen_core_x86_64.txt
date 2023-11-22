@@ -206,8 +206,8 @@ pcre-8.45-2.cm2.x86_64.rpm
 pcre-libs-8.45-2.cm2.x86_64.rpm
 lua-5.4.4-1.cm2.x86_64.rpm
 lua-libs-5.4.4-1.cm2.x86_64.rpm
-mariner-rpm-macros-2.0-25.cm2.noarch.rpm
-mariner-check-macros-2.0-25.cm2.noarch.rpm
+mariner-rpm-macros-2.0-24.cm2.noarch.rpm
+mariner-check-macros-2.0-24.cm2.noarch.rpm
 tdnf-3.5.2-2.cm2.x86_64.rpm
 tdnf-cli-libs-3.5.2-2.cm2.x86_64.rpm
 tdnf-devel-3.5.2-2.cm2.x86_64.rpm

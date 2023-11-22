@@ -229,7 +229,7 @@ m4-1.4.19-2.cm2.aarch64.rpm
 m4-debuginfo-1.4.19-2.cm2.aarch64.rpm
 make-4.3-3.cm2.aarch64.rpm
 make-debuginfo-4.3-3.cm2.aarch64.rpm
-mariner-check-macros-2.0-25.cm2.noarch.rpm
+mariner-check-macros-2.0-24.cm2.noarch.rpm
 mariner-repos-2.0-8.cm2.noarch.rpm
 mariner-repos-debug-2.0-8.cm2.noarch.rpm
 mariner-repos-debug-preview-2.0-8.cm2.noarch.rpm
@@ -243,7 +243,7 @@ mariner-repos-microsoft-2.0-8.cm2.noarch.rpm
 mariner-repos-microsoft-preview-2.0-8.cm2.noarch.rpm
 mariner-repos-preview-2.0-8.cm2.noarch.rpm
 mariner-repos-shared-2.0-8.cm2.noarch.rpm
-mariner-rpm-macros-2.0-25.cm2.noarch.rpm
+mariner-rpm-macros-2.0-24.cm2.noarch.rpm
 meson-0.60.2-2.cm2.noarch.rpm
 mpfr-4.1.0-2.cm2.aarch64.rpm
 mpfr-debuginfo-4.1.0-2.cm2.aarch64.rpm
