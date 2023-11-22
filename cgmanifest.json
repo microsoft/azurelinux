@@ -2237,8 +2237,8 @@
         "type": "other",
         "other": {
           "name": "createrepo_c",
-          "version": "0.17.5",
-          "downloadUrl": "https://github.com/rpm-software-management/createrepo_c/archive/0.17.5.tar.gz"
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/rpm-software-management/createrepo_c/archive/1.0.0.tar.gz"
         }
       }
     },
