@@ -20,7 +20,7 @@ Testing: Manual testing, creating pods with Limits and without limits, and with 
 
 Adapted by @mfrw from 3.1.0 to apply to 3.2.0
 
-Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
+Signed-off-by: Muhammad Falak R Wani <mwani@microsoft.com>
 ---
  src/runtime/Makefile                          |  7 +++-
  src/runtime/config/configuration-clh.toml.in  | 15 +++++---
