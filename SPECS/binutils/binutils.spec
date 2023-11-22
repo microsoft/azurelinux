@@ -1,6 +1,9 @@
 # Overriding the default to call 'configure' from subdirectories.
 %global _configure ../configure
 
+# Where the binaries aimed at gcc will live (ie. /usr/<target>/bin/)
+%global auxbin_prefix %{_exec_prefix}
+
 %ifarch x86_64
 %global build_all_cross 1
 %else
@@ -13,6 +16,7 @@
 %if %2 \
 %files -n binutils-%1 \
 %{_prefix}/%1 \
+%{_bindir}/%1-* \
 %endif
 
 Summary:        Contains a linker, an assembler, and other tools
@@ -88,19 +92,16 @@ prep_target aarch64-linux-gnu %{build_aarch64}
 function config_cross_target () {
     local target=$1
 
-    local program_prefix=$target-
-
     mkdir $target
     pushd $target
 
-    ../configure \
-        --prefix=%{_prefix}/$target \
-        --build=%{_target_platform} \
-        --host=%{_target_platform} \
-        --program-prefix=$program_prefix \
+    %configure \
+        --exec-prefix=%{auxbin_prefix} \
+        --program-prefix=$target- \
         --target=$target \
         --disable-multilib \
         --disable-nls \
+	    --disable-install_libbfd \
         --with-sysroot=%{_prefix}/$target/sys-root
 
     popd
@@ -129,7 +130,7 @@ while read -r target
 do
     echo "=== BUILD cross-compilation target $target ==="
     config_cross_target $target
-    %make_build -C $target tooldir=%{_prefix}/$target
+    %make_build -C $target tooldir=%{_prefix}
 done < cross.list
 
 %install
@@ -139,17 +140,18 @@ done < cross.list
 install -m 644 build/libiberty/pic/libiberty.a %{buildroot}%{_libdir}
 install -m 644 include/libiberty.h %{buildroot}%{_includedir}
 
-rm -rf %{buildroot}%{_infodir}
-
 while read -r target
 do
     echo "=== INSTALL cross-compilation target $target ==="
-    %make_install -C $target tooldir=%{_prefix}/$target
+    mkdir -p %{buildroot}%{_prefix}/$target/sys-root
+    %make_install -C $target tooldir=%{auxbin_prefix}/$target DESTDIR=%{buildroot}
 
-    # Remove cross %%{_infodir} and man files.
-    rm -rf %{buildroot}%{_prefix}/$target/share
+    # Remove cross man files and ldscripts.
+    rm -rf %{buildroot}%{_mandir}/man1/$target-*
+    rm -rf %{buildroot}%{auxbin_prefix}/*/lib
 done < cross.list
 
+rm -rf %{buildroot}%{_infodir}
 find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
