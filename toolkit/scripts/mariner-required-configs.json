@@ -1223,7 +1223,7 @@
                 ],
                 "comment": "Needed for CONFIG_ARM_SMMU",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/6823"
+                    "https://github.com/microsoft/CBL-Mariner/pull/6829"
                 ]
             },
             "CONFIG_IOMMU_SVA_LIB": {
@@ -1235,7 +1235,7 @@
                 ],
                 "comment": "Needed for CONFIG_ARM_SMMU_V3_SVA",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/6823"
+                    "https://github.com/microsoft/CBL-Mariner/pull/6829"
                 ]
             },
             "CONFIG_ARM_SMMU": {
@@ -1247,7 +1247,7 @@
                 ],
                 "comment": "Needed for VFIO to work",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/6823"
+                    "https://github.com/microsoft/CBL-Mariner/pull/6829"
                 ]
             },
             "CONFIG_ARM_SMMU_LEGACY_DT_BINDINGS": {
@@ -1260,7 +1260,7 @@
                 ],
                 "comment": "No device tree support needed",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/6823"
+                    "https://github.com/microsoft/CBL-Mariner/pull/6829"
                 ]
             },
             "CONFIG_ARM_SMMU_DISABLE_BYPASS_BY_DEFAULT": {
@@ -1272,7 +1272,7 @@
                 ],
                 "comment": "More secure when set",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/6823"
+                    "https://github.com/microsoft/CBL-Mariner/pull/6829"
                 ]
             },
             "CONFIG_ARM_SMMU_QCOM": {
@@ -1284,7 +1284,7 @@
                 ],
                 "comment": "Allow support of QCom SMMU, because why not?",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/6823"
+                    "https://github.com/microsoft/CBL-Mariner/pull/6829"
                 ]
             },
             "CONFIG_ARM_SMMU_V3": {
@@ -1296,7 +1296,7 @@
                 ],
                 "comment": "Needed for VFIO to work",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/6823"
+                    "https://github.com/microsoft/CBL-Mariner/pull/6829"
                 ]
             },
             "CONFIG_ARM_SMMU_V3_SVA": {
@@ -1308,7 +1308,7 @@
                 ],
                 "comment": "Needed for CONFIG_ARM_SMMU_V3",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/6823"
+                    "https://github.com/microsoft/CBL-Mariner/pull/6829"
                 ]
             }
         }
