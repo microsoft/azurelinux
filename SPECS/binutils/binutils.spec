@@ -155,21 +155,21 @@ rm -rf %{buildroot}%{_infodir}
 find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
-sed -i '/msg=SECTIONS/{s/.*//;q}' %{_topdir}/BUILD/module_info.ld
-echo "(CHECK) module_info.ld contents:"
-cat %{_topdir}/BUILD/module_info.ld
+# sed -i '/msg=SECTIONS/{s/.*//;q}' %{_topdir}/BUILD/module_info.ld
+# echo "(CHECK) module_info.ld contents:"
+# cat %{_topdir}/BUILD/module_info.ld
 # Remove module_info.ld script due to error:
 #   gcctestdir1/collect-ld: error: /usr/src/mariner/BUILD/module_info.ld:67:8: syntax error, unexpected STRING
 #   gcctestdir1/collect-ld: fatal error: unable to parse script file /usr/src/mariner/BUILD/module_info.ld
-echo "BEFORE LDFLAGS: $LDFLAGS"
-LDFLAGS="$(sed 's|\s*-Wl,-dT,%{_topdir}/BUILD/module_info.ld||' <<<"%{build_ldflags}")" ; export LDFLAGS
-echo "AFTER LDFLAGS: $LDFLAGS"
+# echo "BEFORE LDFLAGS: $LDFLAGS"
+# LDFLAGS="$(sed 's|\s*-Wl,-dT,%{_topdir}/BUILD/module_info.ld||' <<<"%{build_ldflags}")" ; export LDFLAGS
+# echo "AFTER LDFLAGS: $LDFLAGS"
 # LDFLAGS="`echo " %{build_ldflags} " | sed 's#-Wl,-dT,%{_topdir}/BUILD/module_info.ld##'`"; export LDFLAGS
 
 echo "[BEFORE] Looking for 'module_info.ld' in Makefiles:"
 grep -r 'module_info.ld' build
 
-find build -type f -exec sed -i 's|\s*-Wl,-dT,%{_topdir}/BUILD/module_info.ld||g' {} +
+find build/gold -type f -exec sed -i 's|\s*-Wl\(,-dT\)\?,%{_topdir}/BUILD/module_info.ld||g' {} +
 
 echo "[AFTER] Looking for 'module_info.ld' in Makefiles:"
 grep -r 'module_info.ld' build
@@ -177,7 +177,7 @@ grep -r 'module_info.ld' build
 # echo > %{_topdir}/BUILD/module_info.ld
 
 # sed -i 's/testsuite/ /g' build/gold/Makefile
-%make_build -C build LDFLAGS="$LDFLAGS" check
+%make_build -C build tooldir=%{_prefix} check
 
 %ldconfig_scriptlets
 
