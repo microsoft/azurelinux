@@ -955,8 +955,8 @@
         "type": "other",
         "other": {
           "name": "bash",
-          "version": "5.2",
-          "downloadUrl": "https://ftp.gnu.org/gnu/bash/bash-5.2.tar.gz"
+          "version": "5.2.15",
+          "downloadUrl": "https://ftp.gnu.org/gnu/bash/bash-5.2.15.tar.gz"
         }
       }
     },
@@ -1687,8 +1687,8 @@
         "type": "other",
         "other": {
           "name": "chkconfig",
-          "version": "1.20",
-          "downloadUrl": "https://github.com/fedora-sysv/chkconfig/archive/refs/tags/1.20.tar.gz"
+          "version": "1.25",
+          "downloadUrl": "https://github.com/fedora-sysv/chkconfig/archive/refs/tags/1.25.tar.gz"
         }
       }
     },
