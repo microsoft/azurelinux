@@ -54,7 +54,7 @@ mkdir -p /%{buildroot}%{_includedir}
 cp -rv usr/include/* /%{buildroot}%{_includedir}
 
 for cross_arch in %{cross_archs}; do
-    cross_arch_includedir=/%{buildroot}%{_cross_prefix}/${cross_arch}-linux-gnu/include
+    cross_arch_includedir=/%{buildroot}%{_prefix}/${cross_arch}-linux-gnu/include
     mkdir -p $cross_arch_includedir
     cp -rv usr/include-$cross_arch/usr/include/* $cross_arch_includedir
 done
@@ -67,7 +67,7 @@ done
 %if "%{_arch}" == "x86_64"
 %files -n kernel-cross-headers
 %defattr(-,root,root)
-%{_cross_prefix}/*-linux-gnu/*
+%{_prefix}/*-linux-gnu/*
 %endif
 
 %changelog
