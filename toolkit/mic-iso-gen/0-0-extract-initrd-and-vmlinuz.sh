@@ -93,6 +93,11 @@ function extract_vmlinuz_from_full_disk() {
 
   linuzvm=$(sudo find $rawDiskMountDir/boot/ -name "vmlinuz*")
   sudo cp $linuzvm .
+
+  # change ownership
+  localLinuzvmName=$(basename "$linuzvm")
+  sudo chown george:george $localLinuzvmName
+
   echo "---- extracted vmlinuz ----"
   ls -la $extractedDir
   echo "---- ---- ----"
