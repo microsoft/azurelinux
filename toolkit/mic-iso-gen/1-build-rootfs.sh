@@ -28,7 +28,7 @@ sudo make image \
 
 #   REPO_LIST="$RPM_REPO_LIST"   \
 
-mkdir -p OUTPUT_DIR
+mkdir -p $OUTPUT_DIR
 cp ../build/imagegen/baremetal/imager_output/disk0.raw $OUTPUT_DIR/
 
 popd
