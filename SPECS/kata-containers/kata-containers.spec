@@ -41,7 +41,7 @@
 %global agent_make_vars         LIBC=gnu \\\
                                 DESTDIR=%{buildroot}%{kataagentdir}
 
-Summary:        Kata Containers version 2.x repository
+Summary:        Kata Containers version 3.x repository
 Name:           kata-containers
 Version:        3.2.0
 Release:        1%{?dist}
