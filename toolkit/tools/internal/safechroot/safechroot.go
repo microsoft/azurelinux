@@ -667,27 +667,27 @@ type ChrootInterface interface {
 	Run(toRun func() error) error
 	UnsafeRun(toRun func() error) error
 	AddFiles(filesToCopy ...FileToCopy) error
-
 }
 
 // DummyChroot is a placeholder that implements ChrootInterface.
 type DummyChroot struct {}
 
-// No operation for the dummy type
 func (d DummyChroot) RootDir() string {
-    return ""
+    return "/"
 }
 
 func (d DummyChroot) Initialize(tarPath string, extraDirectories []string, extraMountPoints []*MountPoint) error {
+	// No operation for the dummy type
     return nil
 }
 
 func (d DummyChroot) Run(toRun func() error) (err error) {
-    return nil
+	// Only execute the function, no chroot operations
+    return toRun()
 }
 
 func (d DummyChroot) UnsafeRun(toRun func() error) (err error) {
-    return nil
+    return toRun()
 }
 
 func (d DummyChroot) AddFiles(filesToCopy ...FileToCopy) (err error) {

@@ -1242,7 +1242,7 @@ func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err
 			return
 		}
 
-		err = ProvisionUserSSHCerts(installChroot, user.Name, user.SSHPubKeyPaths)
+		err = ProvisionUserSSHCerts(installChroot, user.Name, user.SSHPubKeyPaths, user.SSHPubKeys)
 		if err != nil {
 			return
 		}
@@ -1477,7 +1477,7 @@ func ConfigureUserStartupCommand(installChroot safechroot.ChrootInterface, usern
 	return
 }
 
-func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username string, sshPubKeyPaths []string) (err error) {
+func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username string, sshPubKeyPaths []string, sshPubKeys []string) (err error) {
 	var (
 		pubKeyData []string
 		exists     bool
@@ -1489,11 +1489,12 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 
 	// Skip user SSH directory generation when not provided with public keys
 	// Let SSH handle the creation of this folder on its first use
-	if len(sshPubKeyPaths) == 0 {
-		return
-	}
+	if len(sshPubKeyPaths) == 0 && len(sshPubKeys) == 0 {
+        return nil
+    }
 
-	homeDir := userutils.UserHomeDirectory(username)
+    // Getting user's home directory and SSH directory
+    homeDir := userutils.UserHomeDirectory(username)
 	userSSHKeyDir := filepath.Join(homeDir, ".ssh")
 	authorizedKeysFile := filepath.Join(userSSHKeyDir, "authorized_keys")
 
@@ -1518,7 +1519,8 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 	}
 	defer os.Remove(authorizedKeysTempFile)
 
-	for _, pubKey := range sshPubKeyPaths {
+    // Process SSH public key paths
+    for _, pubKey := range sshPubKeyPaths {
 		logger.Log.Infof("Adding ssh key (%s) to user (%s)", filepath.Base(pubKey), username)
 		relativeDst := filepath.Join(userSSHKeyDir, filepath.Base(pubKey))
 
@@ -1550,17 +1552,29 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 		}
 	}
 
-	fileToCopy := safechroot.FileToCopy{
-		Src:  authorizedKeysTempFile,
-		Dest: authorizedKeysFile,
-	}
+    // Process SSH public keys
+    for _, pubKeyData := range sshPubKeys {
+        logger.Log.Infof("Adding direct ssh key (%s) to user (%s)", pubKeyData, username)
+        pubKeyData += "\n"
+        err := file.Append(pubKeyData, authorizedKeysTempFile)
+        if err != nil {
+            logger.Log.Warnf("Failed to append to %s : %v", authorizedKeysTempFile, err)
+            return err
+        }
+    }
 
-	err = installChroot.AddFiles(fileToCopy)
-	if err != nil {
-		return
-	}
+    // Copy the combined authorized_keys to the user's SSH directory
+    fileToCopy := safechroot.FileToCopy{
+        Src:  authorizedKeysTempFile,
+        Dest: authorizedKeysFile,
+    }
 
-	// Change ownership of the folder to belong to the user and their primary group
+    err = installChroot.AddFiles(fileToCopy)
+    if err != nil {
+        return err
+    }
+
+    // Set ownership and permissions of the SSH directory
 	err = installChroot.UnsafeRun(func() (err error) {
 		// Find the primary group of the user
 		stdout, stderr, err := shell.Execute("id", "-g", username)
@@ -1582,12 +1596,9 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 		return
 	})
 
-	if err != nil {
-		return
-	}
-
-	return
+    return err
 }
+
 
 // SELinuxConfigure pre-configures SELinux file labels and configuration files
 func SELinuxConfigure(systemConfig configuration.SystemConfig, installChroot *safechroot.Chroot, mountPointToFsTypeMap map[string]string) (err error) {

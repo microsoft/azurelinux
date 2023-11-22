@@ -9,9 +9,9 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/imagecustomizerlib"
 )
 
-func doModifications(baseConfigPath string, config *imagecustomizerapi.Config) error {
+func doModifications(baseConfigPath string, systemConfig *imagecustomizerapi.SystemConfig) error {
 	var dummyChroot safechroot.ChrootInterface = &safechroot.DummyChroot{}
-	err := imagecustomizerlib.AddOrUpdateUsers(config.SystemConfig.Users, baseConfigPath, dummyChroot)
+	err := imagecustomizerlib.AddOrUpdateUsers(systemConfig.Users, baseConfigPath, dummyChroot)
 	if err != nil {
 		return err
 	}

@@ -13,8 +13,8 @@ import (
 func ModifyImageWithConfigFile(configFile string) error {
 	var err error
 
-	var config imagecustomizerapi.Config
-	err = imagecustomizerapi.UnmarshalYamlFile(configFile, &config.SystemConfig)
+	var systemConfig imagecustomizerapi.SystemConfig
+	err = imagecustomizerapi.UnmarshalYamlFile(configFile, &systemConfig)
 	if err != nil {
 		return err
 	}
@@ -26,7 +26,7 @@ func ModifyImageWithConfigFile(configFile string) error {
 		return fmt.Errorf("failed to get absolute path of config file directory:\n%w", err)
 	}
 
-	err = ModifyImage(absBaseConfigPath, &config)
+	err = ModifyImage(absBaseConfigPath, &systemConfig)
 	if err != nil {
 		return err
 	}
@@ -34,8 +34,8 @@ func ModifyImageWithConfigFile(configFile string) error {
 	return nil
 }
 
-func ModifyImage(baseConfigPath string, config *imagecustomizerapi.Config) error {
-	err := doModifications(baseConfigPath, config)
+func ModifyImage(baseConfigPath string, systemConfig *imagecustomizerapi.SystemConfig) error {
+	err := doModifications(baseConfigPath, systemConfig)
 	if err != nil {
 		return err
 	}
