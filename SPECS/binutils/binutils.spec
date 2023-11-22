@@ -12,7 +12,7 @@
 %global do_files() \
 %if %2 \
 %files -n binutils-%1 \
-%{_cross_prefix}/%1 \
+%{_prefix}/%1 \
 %endif
 
 Summary:        Contains a linker, an assembler, and other tools
@@ -94,14 +94,14 @@ function config_cross_target () {
     pushd $target
 
     ../configure \
-        --prefix=%{_cross_prefix}/$target \
+        --prefix=%{_prefix}/$target \
         --build=%{_target_platform} \
         --host=%{_target_platform} \
         --program-prefix=$program_prefix \
         --target=$target \
         --disable-multilib \
         --disable-nls \
-        --with-sysroot=%{_cross_prefix}/$target/sys-root
+        --with-sysroot=%{_prefix}/$target/sys-root
 
     popd
 }
@@ -129,7 +129,7 @@ while read -r target
 do
     echo "=== BUILD cross-compilation target $target ==="
     config_cross_target $target
-    %make_build -C $target tooldir=%{_cross_prefix}/$target
+    %make_build -C $target tooldir=%{_prefix}/$target
 done < cross.list
 
 %install
@@ -144,10 +144,10 @@ rm -rf %{buildroot}%{_infodir}
 while read -r target
 do
     echo "=== INSTALL cross-compilation target $target ==="
-    %make_install -C $target tooldir=%{_cross_prefix}/$target
+    %make_install -C $target tooldir=%{_prefix}/$target
 
     # Remove cross %%{_infodir} and man files.
-    rm -rf %{buildroot}%{_cross_prefix}/$target/share
+    rm -rf %{buildroot}%{_prefix}/$target/share
 done < cross.list
 
 find %{buildroot} -type f -name "*.la" -delete -print
@@ -164,10 +164,18 @@ LDFLAGS="$(sed 's|\s*-Wl,-dT,%{_topdir}/BUILD/module_info.ld||' <<<"%{build_ldfl
 echo "AFTER LDFLAGS: $LDFLAGS"
 # LDFLAGS="`echo " %{build_ldflags} " | sed 's#-Wl,-dT,%{_topdir}/BUILD/module_info.ld##'`"; export LDFLAGS
 
-echo > %{_topdir}/BUILD/module_info.ld
+echo "[BEFORE] Looking for 'module_info.ld' in Makefiles:"
+grep -r 'module_info.ld' build
 
-sed -i 's/testsuite/ /g' build/gold/Makefile
-%make_build -C build check
+find build -type f -exec sed -i 's|\s*-Wl,-dT,%{_topdir}/BUILD/module_info.ld||g' {} +
+
+echo "[AFTER] Looking for 'module_info.ld' in Makefiles:"
+grep -r 'module_info.ld' build
+
+# echo > %{_topdir}/BUILD/module_info.ld
+
+# sed -i 's/testsuite/ /g' build/gold/Makefile
+%make_build -C build LDFLAGS="$LDFLAGS" check
 
 %ldconfig_scriptlets
 
