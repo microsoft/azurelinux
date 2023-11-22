@@ -270,7 +270,7 @@ ninja-build-debuginfo-1.10.2-2.cm2.aarch64.rpm
 npth-1.6-4.cm2.aarch64.rpm
 npth-debuginfo-1.6-4.cm2.aarch64.rpm
 npth-devel-1.6-4.cm2.aarch64.rpm
-ntsysv-1.20-4.cm2.aarch64.rpm
+ntsysv-1.25-1.cm2.aarch64.rpm
 openssl-1.1.1k-27.cm2.aarch64.rpm
 openssl-debuginfo-1.1.1k-27.cm2.aarch64.rpm
 openssl-devel-1.1.1k-27.cm2.aarch64.rpm
