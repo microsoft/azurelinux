@@ -87,6 +87,7 @@ function prep_target () {
     fi
 }
 
+touch cross.list
 prep_target aarch64-linux-gnu %{build_aarch64}
 
 %build
