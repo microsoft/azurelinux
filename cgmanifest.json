@@ -12021,8 +12021,8 @@
         "type": "other",
         "other": {
           "name": "linuxptp",
-          "version": "2.0",
-          "downloadUrl": "https://github.com/richardcochran/linuxptp/archive/e05809/linuxptp-e05809.tar.gz"
+          "version": "3.1.1",
+          "downloadUrl": "https://sourceforge.net/projects/linuxptp/files/v3.1/linuxptp-3.1.1.tgz"
         }
       }
     },
