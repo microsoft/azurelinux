@@ -6,7 +6,7 @@
 Summary: Industry-standard container runtime for confidential containers
 Name: moby-%{upstream_name}
 Version: 1.7.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -16,6 +16,7 @@ Distribution: Mariner
 Source0:  https://github.com/microsoft/confidential-containers-containerd/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1: containerd.service
 Source2: containerd.toml
+Patch0: CVE-2023-47108.patch
 
 %{?systemd_requires}
 
@@ -77,6 +78,9 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 
 %changelog
+* Wed Nov 23 2023 Bala <balakumaran.kannan@gmail.com> - 1.7.2-2
+- Fix CVE-2023-47108 by upgrading otel-grpc version to 0.46.0 in go.mod
+
 * Fri Nov 08 2023 Saul Paredes <saulparedes@microsoft.com> - 1.7.2-1
 - Always add TargetLayerDigestLabel label to snapshots
 
