@@ -27,7 +27,7 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.15.137.1
+Version:        5.15.138.1
 Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -44,6 +44,7 @@ BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
 BuildRequires:  build-essential
+BuildRequires:  cpio
 BuildRequires:  diffutils
 BuildRequires:  dwarves
 BuildRequires:  elfutils-libelf-devel
@@ -425,8 +426,14 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Fri Nov 17 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.137.1-2
+* Wed Nov 22 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.138.1-2
 - Bump release to match kernel-headers.
+
+* Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.138.1-1
+- Auto-upgrade to 5.15.138.1
+
+* Mon Nov 20 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.137.1-2
+- Add missing BuildRequires cpio
 
 * Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.137.1-1
 - Auto-upgrade to 5.15.137.1
