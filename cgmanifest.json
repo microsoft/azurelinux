@@ -4520,8 +4520,8 @@
         "type": "other",
         "other": {
           "name": "gnupg2",
-          "version": "2.4.0",
-          "downloadUrl": "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.4.0.tar.bz2"
+          "version": "2.4.3",
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.4.3.tar.bz2"
         }
       }
     },
@@ -7551,8 +7551,8 @@
         "type": "other",
         "other": {
           "name": "itstool",
-          "version": "2.0.6",
-          "downloadUrl": "http://files.itstool.org/itstool/itstool-2.0.6.tar.bz2"
+          "version": "2.0.7",
+          "downloadUrl": "http://files.itstool.org/itstool/itstool-2.0.7.tar.bz2"
         }
       }
     },
@@ -8281,8 +8281,8 @@
         "type": "other",
         "other": {
           "name": "kmod",
-          "version": "29",
-          "downloadUrl": "http://www.kernel.org/pub/linux/utils/kernel/kmod/kmod-29.tar.xz"
+          "version": "30",
+          "downloadUrl": "http://www.kernel.org/pub/linux/utils/kernel/kmod/kmod-30.tar.xz"
         }
       }
     },
@@ -8331,8 +8331,8 @@
         "type": "other",
         "other": {
           "name": "krb5",
-          "version": "1.19.4",
-          "downloadUrl": "https://kerberos.org/dist/krb5/1.19/krb5-1.19.4.tar.gz"
+          "version": "1.21.2",
+          "downloadUrl": "https://kerberos.org/dist/krb5/1.21/krb5-1.21.2.tar.gz"
         }
       }
     },
@@ -8661,8 +8661,8 @@
         "type": "other",
         "other": {
           "name": "libassuan",
-          "version": "2.5.5",
-          "downloadUrl": "https://gnupg.org/ftp/gcrypt/libassuan/libassuan-2.5.5.tar.bz2"
+          "version": "2.5.6",
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/libassuan/libassuan-2.5.6.tar.bz2"
         }
       }
     },
@@ -8791,8 +8791,8 @@
         "type": "other",
         "other": {
           "name": "libcap-ng",
-          "version": "0.8.2",
-          "downloadUrl": "https://people.redhat.com/sgrubb/libcap-ng/libcap-ng-0.8.2.tar.gz"
+          "version": "0.8.3",
+          "downloadUrl": "https://people.redhat.com/sgrubb/libcap-ng/libcap-ng-0.8.3.tar.gz"
         }
       }
     },
@@ -9361,8 +9361,8 @@
         "type": "other",
         "other": {
           "name": "libgcrypt",
-          "version": "1.9.4",
-          "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.9.4.tar.bz2"
+          "version": "1.10.2",
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.10.2.tar.bz2"
         }
       }
     },
