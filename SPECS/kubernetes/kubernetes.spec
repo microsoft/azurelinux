@@ -10,7 +10,7 @@
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.28.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -263,6 +263,9 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
+* Wed Nov 22 2023 Sean Dougherty <sdougherty@microsoft.com> 1.28.3-3
+- Add CVE-2023-47108.nopatch
+
 * Fri Nov 10 2023 Muhammad Falak <mwani@microsoft.com> - 1.28.3-2
 - Fix version subcommand for components
 

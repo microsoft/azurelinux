@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: moby-%{upstream_name}
 Version: 1.6.22
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -90,6 +90,9 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Wed Nov 22 2023 Sean Dougherty <sdougherty@microsoft.com> 1.6.22-5
+- Add CVE-2023-47108.nopatch
+
 * Tue Oct 18 2023 Chris PeBenito <chpebeni@microsoft.com> - 1.6.22-4
 - Precreate /opt/containerd/{bin,lib} to ensure correct SELinux labeling.
 
