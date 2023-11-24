@@ -1,6 +1,6 @@
 Summary:        Creates a common metadata repository
 Name:           createrepo_c
-Version:        1.0.0
+Version:        0.17.5
 Release:        1%{?dist}
 License:        GPLv2+
 Group:          System Environment/Base
@@ -72,7 +72,7 @@ popd
 %license COPYING
 %{_sysconfdir}/bash_completion.d/createrepo_c.bash
 %{_bindir}/*
-%{_libdir}/*.so.1*
+%{_libdir}/*.so.0*
 %{_mandir}/*
 %exclude %{_libdir}/python*
 
@@ -83,9 +83,6 @@ popd
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
-* Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0.0-1
-- Auto-upgrade to 1.0.0 - Azure Linux 3.0 - package upgrades
-
 * Tue Sep 14 2021 Thomas Crain <thcrain@microsoft.com> - 0.17.5-1
 - Upgrade to latest upstream version
 - Lint spec
