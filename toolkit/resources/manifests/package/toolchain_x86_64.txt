@@ -538,7 +538,7 @@ python3-magic-5.45-1.cm2.noarch.rpm
 python3-markupsafe-2.1.0-1.cm2.x86_64.rpm
 python3-newt-0.52.23-1.cm2.x86_64.rpm
 python3-pip-3.9.14-8.cm2.noarch.rpm
-python3-pygments-2.4.2-7.cm2.noarch.rpm
+python3-pygments-2.5.2-1.cm2.noarch.rpm
 python3-rpm-4.18.0-4.cm2.x86_64.rpm
 python3-setuptools-3.9.14-8.cm2.noarch.rpm
 python3-test-3.9.14-8.cm2.x86_64.rpm
@@ -556,9 +556,9 @@ rpm-libs-4.18.0-4.cm2.x86_64.rpm
 sed-4.9-1.cm2.x86_64.rpm
 sed-debuginfo-4.9-1.cm2.x86_64.rpm
 sed-lang-4.9-1.cm2.x86_64.rpm
-slang-2.3.2-4.cm2.x86_64.rpm
-slang-debuginfo-2.3.2-4.cm2.x86_64.rpm
-slang-devel-2.3.2-4.cm2.x86_64.rpm
+slang-2.3.3-1.cm2.x86_64.rpm
+slang-debuginfo-2.3.3-1.cm2.x86_64.rpm
+slang-devel-2.3.3-1.cm2.x86_64.rpm
 sqlite-3.44.0-1.cm2.x86_64.rpm
 sqlite-debuginfo-3.44.0-1.cm2.x86_64.rpm
 sqlite-devel-3.44.0-1.cm2.x86_64.rpm

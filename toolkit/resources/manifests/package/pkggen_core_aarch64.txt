@@ -241,10 +241,10 @@ python3-3.9.14-8.cm2.aarch64.rpm
 python3-devel-3.9.14-8.cm2.aarch64.rpm
 python3-libs-3.9.14-8.cm2.aarch64.rpm
 python3-setuptools-3.9.14-8.cm2.noarch.rpm
-python3-pygments-2.4.2-7.cm2.noarch.rpm
+python3-pygments-2.5.2-1.cm2.noarch.rpm
 which-2.21-8.cm2.aarch64.rpm
 libselinux-3.5-1.cm2.aarch64.rpm
-slang-2.3.2-4.cm2.aarch64.rpm
+slang-2.3.3-1.cm2.aarch64.rpm
 newt-0.52.23-1.cm2.aarch64.rpm
 newt-lang-0.52.23-1.cm2.aarch64.rpm
 chkconfig-1.20-4.cm2.aarch64.rpm
