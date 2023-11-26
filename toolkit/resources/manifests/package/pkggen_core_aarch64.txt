@@ -229,8 +229,8 @@ mariner-repos-2.0-8.cm2.noarch.rpm
 libffi-3.4.4-1.cm2.aarch64.rpm
 libffi-devel-3.4.4-1.cm2.aarch64.rpm
 libtasn1-4.19.0-1.cm2.aarch64.rpm
-p11-kit-0.24.1-1.cm2.aarch64.rpm
-p11-kit-trust-0.24.1-1.cm2.aarch64.rpm
+p11-kit-0.25.0-1.cm2.aarch64.rpm
+p11-kit-trust-0.25.0-1.cm2.aarch64.rpm
 ca-certificates-shared-2.0.0-13.cm2.noarch.rpm
 ca-certificates-tools-2.0.0-13.cm2.noarch.rpm
 ca-certificates-base-2.0.0-13.cm2.noarch.rpm
