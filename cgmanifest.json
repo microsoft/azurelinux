@@ -10861,8 +10861,8 @@
         "type": "other",
         "other": {
           "name": "libselinux",
-          "version": "3.2",
-          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/3.2/libselinux-3.2.tar.gz"
+          "version": "3.5",
+          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/3.5/libselinux-3.5.tar.gz"
         }
       }
     },
@@ -11041,8 +11041,8 @@
         "type": "other",
         "other": {
           "name": "libssh2",
-          "version": "1.9.0",
-          "downloadUrl": "https://www.libssh2.org/download/libssh2-1.9.0.tar.gz"
+          "version": "1.11.0",
+          "downloadUrl": "https://www.libssh2.org/download/libssh2-1.11.0.tar.gz"
         }
       }
     },
@@ -11781,8 +11781,8 @@
         "type": "other",
         "other": {
           "name": "libxml2",
-          "version": "2.10.4",
-          "downloadUrl": "https://gitlab.gnome.org/GNOME/libxml2/-/archive/v2.10.4/libxml2-v2.10.4.tar.gz"
+          "version": "2.11.5",
+          "downloadUrl": "https://gitlab.gnome.org/GNOME/libxml2/-/archive/v2.11.5/libxml2-v2.11.5.tar.gz"
         }
       }
     },
@@ -12431,8 +12431,8 @@
         "type": "other",
         "other": {
           "name": "lz4",
-          "version": "1.9.3",
-          "downloadUrl": "https://github.com/lz4/lz4/archive/v1.9.3/lz4-1.9.3.tar.gz"
+          "version": "1.9.4",
+          "downloadUrl": "https://github.com/lz4/lz4/archive/v1.9.4/lz4-1.9.4.tar.gz"
         }
       }
     },
@@ -12981,8 +12981,8 @@
         "type": "other",
         "other": {
           "name": "meson",
-          "version": "0.60.2",
-          "downloadUrl": "https://github.com/mesonbuild/meson/releases/download/0.60.2/meson-0.60.2.tar.gz"
+          "version": "1.2.1",
+          "downloadUrl": "https://github.com/mesonbuild/meson/releases/download/1.2.1/meson-1.2.1.tar.gz"
         }
       }
     },
@@ -14014,7 +14014,7 @@
         "other": {
           "name": "newt",
           "version": "0.52.21",
-          "downloadUrl": "https://pagure.io/releases/newt/newt-0.52.21.tar.gz"
+          "downloadUrl": "https://pagure.io/releases/newt/newt-0.52.23.tar.gz"
         }
       }
     },
@@ -14083,8 +14083,8 @@
         "type": "other",
         "other": {
           "name": "ninja-build",
-          "version": "1.10.2",
-          "downloadUrl": "https://github.com/ninja-build/ninja/archive/v1.10.2.tar.gz"
+          "version": "1.11.1",
+          "downloadUrl": "https://github.com/ninja-build/ninja/archive/v1.11.1.tar.gz"
         }
       }
     },
@@ -15514,8 +15514,8 @@
         "type": "other",
         "other": {
           "name": "p11-kit",
-          "version": "0.24.1",
-          "downloadUrl": "https://github.com/p11-glue/p11-kit/releases/download/0.24.1/p11-kit-0.24.1.tar.xz"
+          "version": "0.25.0",
+          "downloadUrl": "https://github.com/p11-glue/p11-kit/releases/download/0.25.0/p11-kit-0.25.0.tar.xz"
         }
       }
     },
@@ -20314,8 +20314,8 @@
         "type": "other",
         "other": {
           "name": "perl-Text-Template",
-          "version": "1.60",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/MS/MSCHOUT/Text-Template-1.60.tar.gz"
+          "version": "1.61",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/MS/MSCHOUT/Text-Template-1.61.tar.gz"
         }
       }
     },
@@ -23594,8 +23594,8 @@
         "type": "other",
         "other": {
           "name": "python-pygments",
-          "version": "2.4.2",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/P/Pygments/Pygments-2.4.2.tar.gz"
+          "version": "2.5.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/P/Pygments/Pygments-2.5.2.tar.gz"
         }
       }
     },
@@ -27587,8 +27587,8 @@
         "type": "other",
         "other": {
           "name": "slang",
-          "version": "2.3.2",
-          "downloadUrl": "https://www.jedsoft.org/releases/slang/slang-2.3.2.tar.bz2"
+          "version": "2.3.3",
+          "downloadUrl": "https://www.jedsoft.org/releases/slang/slang-2.3.3.tar.bz2"
         }
       }
     },
@@ -28067,8 +28067,8 @@
         "type": "other",
         "other": {
           "name": "swig",
-          "version": "4.0.2",
-          "downloadUrl": "https://github.com/swig/swig/archive/refs/tags/v4.0.2.tar.gz"
+          "version": "4.1.1",
+          "downloadUrl": "https://github.com/swig/swig/archive/refs/tags/v4.1.1.tar.gz"
         }
       }
     },
