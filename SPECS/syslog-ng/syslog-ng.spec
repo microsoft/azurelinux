@@ -88,6 +88,7 @@ echo "disable syslog-ng.service" > %{buildroot}%{_libdir}/systemd/system-preset/
 
 %check
 pip3 install unittest2 nose ply pep8
+#make %{?_smp_mflags} check # TODO: fix tests. Look at comments in https://github.com/microsoft/CBL-Mariner/pull/6431
 
 %post
 if [ $1 -eq 1 ] ; then
