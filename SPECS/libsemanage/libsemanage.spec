@@ -1,16 +1,15 @@
-%define libsepolver 3.2-1
-%define libselinuxver 3.2-1
+%define libsepolver 3.5-1
+%define libselinuxver 3.5-1
 Summary:        SELinux binary policy manipulation library
 Name:           libsemanage
-Version:        3.2
-Release:        2%{?dist}
+Version:        3.5
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/SELinuxProject/selinux/wiki
 Source0:        https://github.com/SELinuxProject/selinux/releases/download/%{version}/%{name}-%{version}.tar.gz
 Source1:        semanage.conf
-Patch0:         libsemanage-Fix-RESOURCE_LEAK-and-USE_AFTER_FREE-cov.patch
 BuildRequires:  audit-devel
 BuildRequires:  bison
 BuildRequires:  bzip2
@@ -83,7 +82,7 @@ ln -sf  %{_libdir}/libsemanage.so.2 %{buildroot}/%{_libdir}/libsemanage.so
 %ldconfig_scriptlets
 
 %files
-%license COPYING
+%license LICENSE
 %dir %{_sysconfdir}/selinux
 %config(noreplace) %{_sysconfdir}/selinux/semanage.conf
 %{_libdir}/libsemanage.so.2
@@ -108,6 +107,9 @@ ln -sf  %{_libdir}/libsemanage.so.2 %{buildroot}/%{_libdir}/libsemanage.so
 %{_libexecdir}/selinux/semanage_migrate_store
 
 %changelog
+* Fri Nov 24 2023 Andrew Phelps <anphel@microsoft.com> - 3.5-1
+- Upgrade to version 3.5
+
 * Wed Aug 10 2022 Chris PeBenito <chpebeni@microsoft.com> - 3.2-2
 - Do not ignore /root for genhomedircon, otherwise it will not
 - get correct labeling.
