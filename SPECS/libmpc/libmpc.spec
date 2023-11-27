@@ -1,6 +1,6 @@
 Summary:        Library for the arithmetic of complex numbers
 Name:           libmpc
-Version:        1.2.1
+Version:        1.3.1
 Release:        1%{?dist}
 License:        LGPLv3+
 URL:            http://www.multiprecision.org
@@ -45,6 +45,9 @@ make %{?_smp_mflags} check
 %{_libdir}/*.so.*
 
 %changelog
+* Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.3.1-1
+- Auto-upgrade to 1.3.1 - Azure Linux 3.0 - package upgrades
+
 * Mon Oct 11 2021 Andrew Phelps <anphel@microsoft.com> 1.2.1-1
 - Update to version 1.2.1
 
