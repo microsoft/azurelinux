@@ -587,11 +587,8 @@ build_rpm_in_chroot_no_install fmt
 chroot_and_install_rpms fmt
 build_rpm_in_chroot_no_install json-c
 chroot_and_install_rpms json-c
-build_rpm_in_chroot_no_install zchunk
-chroot_and_install_rpms zchunk
 
 build_rpm_in_chroot_no_install tdnf
-build_rpm_in_chroot_no_install dnf5
 
 # Build createrepo_c
 # createrepo_c needs cmake, file, glib
@@ -642,6 +639,21 @@ chroot_and_install_rpms meson
 chroot_and_install_rpms intltool
 chroot_and_install_rpms python3-jinja2
 build_rpm_in_chroot_no_install systemd-bootstrap
+
+build_rpm_in_chroot_no_install zchunk
+chroot_and_install_rpms zchunk
+chroot_and_install_rpms check
+
+chroot_and_install_rpms flex-devel
+chroot_and_install_rpms libtool
+
+build_rpm_in_chroot_no_install attr
+chroot_and_install_rpms libattr-devel
+build_rpm_in_chroot_no_install librepo
+chroot_and_install_rpms librepo
+
+# dnf5 needs util-linux
+build_rpm_in_chroot_no_install dnf5-bootstrap
 
 # Removed 'lvm2', might not need: ncurses
 chroot_and_install_rpms ncurses

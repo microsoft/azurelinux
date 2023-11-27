@@ -1,7 +1,8 @@
+%define _unpackaged_files_terminate_build 0
 Summary:        Repodata downloading library
 Name:           librepo
 Version:        1.15.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,13 +14,12 @@ BuildRequires:  attr-devel
 BuildRequires:  check
 BuildRequires:  cmake
 BuildRequires:  curl-devel
+BuildRequires:  python3-devel
 BuildRequires:  gcc
 BuildRequires:  glib-devel
 BuildRequires:  gpgme-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  openssl-devel
-BuildRequires:  python3-devel
-BuildRequires:  python3-sphinx
 BuildRequires:  zchunk-devel
 Requires:       curl-libs
 Requires:       gpgme
@@ -37,14 +37,6 @@ Requires:       curl-libs
 
 %description devel
 Development files for librepo.
-
-%package -n python3-%{name}
-%{?python_provide:%python_provide python3-%{name}}
-Summary:        Python 3 bindings for the librepo library
-Requires:       %{name} = %{version}-%{release}
-
-%description -n python3-%{name}
-Python 3 bindings for the librepo library.
 
 %prep
 %autosetup -p1
@@ -77,11 +69,12 @@ popd
 %{_libdir}/%{name}.so
 %{_libdir}/pkgconfig/%{name}.pc
 %{_includedir}/%{name}/
-
-%files -n python3-%{name}
-%{python3_sitearch}/%{name}/
+%{python3_sitearch}/%{name}/*
 
 %changelog
+* Mon Nov 20 2023 Sam Meluch <sammeluch@microsoft.com> - 1.15.1-2
+- Bump release, move python requires
+
 * Wed Jun 21 2023 Sam Meluch <sammeluch@microsoft.com> - 1.15.1-1
 - Upgrade to version 1.15.1 for dnf5
 

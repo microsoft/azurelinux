@@ -1,0 +1,31 @@
+From 249c4d9c9390cea44808939ca86cbd329e2c3b86 Mon Sep 17 00:00:00 2001
+From: Sam Meluch <sammeluch@microsoft.com>
+Date: Mon, 20 Nov 2023 13:06:30 -0800
+Subject: [PATCH] add WITH_MODULEMD patch
+
+---
+ libdnf/CMakeLists.txt | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/libdnf/CMakeLists.txt b/libdnf/CMakeLists.txt
+index 09f0c5f..396901e 100644
+--- a/libdnf/CMakeLists.txt
++++ b/libdnf/CMakeLists.txt
+@@ -51,9 +51,11 @@ pkg_check_modules(JSONC REQUIRED json-c)
+ include_directories(${JSONC_INCLUDE_DIRS})
+ target_link_libraries(libdnf ${JSONC_LIBRARIES})
+ 
+-pkg_check_modules(LIBMODULEMD REQUIRED modulemd-2.0>=2.11.2)
+-list(APPEND LIBDNF5_PC_REQUIRES "${LIBMODULEMD_MODULE_NAME}")
+-target_link_libraries(libdnf ${LIBMODULEMD_LIBRARIES})
++if(WITH_MODULEMD)
++    pkg_check_modules(LIBMODULEMD REQUIRED modulemd-2.0>=2.11.2)
++    list(APPEND LIBDNF5_PC_REQUIRES "${LIBMODULEMD_MODULE_NAME}")
++    target_link_libraries(libdnf ${LIBMODULEMD_LIBRARIES})
++endif()
+ 
+ pkg_check_modules(LIBSOLV REQUIRED libsolv>=0.7.21)
+ list(APPEND LIBDNF5_PC_REQUIRES "${LIBSOLV_MODULE_NAME}")
+-- 
+2.34.1
+
