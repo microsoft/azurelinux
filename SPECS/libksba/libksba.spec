@@ -1,6 +1,6 @@
 Summary:        Library for accessing X.509 and CMS data structure.
 Name:           libksba
-Version:        1.6.3
+Version:        1.6.4
 Release:        1%{?dist}
 # See AUTHORS file for licensing details
 License:        (LGPLv3+ or GPLv2+) and GPLv3+ 
@@ -57,6 +57,9 @@ rm -rf %{buildroot}%{_infodir}
 %{_libdir}/pkgconfig/ksba.pc
 
 %changelog
+* Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.6.4-1
+- Auto-upgrade to 1.6.4 - Azure Linux 3.0 - package upgrades
+
 * Wed Jan 04 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.6.3-1
 - Auto-upgrade to 1.6.3 - to fix CVE-2022-47629
 
