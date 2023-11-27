@@ -22514,8 +22514,8 @@
         "type": "other",
         "other": {
           "name": "python-gevent",
-          "version": "1.3.6",
-          "downloadUrl": "https://github.com/gevent/gevent/archive/1.3.6.tar.gz"
+          "version": "23.9.1",
+          "downloadUrl": "https://github.com/gevent/gevent/archive/23.9.1.tar.gz"
         }
       }
     },
