@@ -221,8 +221,7 @@ chmod 755 $RPM_BUILD_ROOT/etc/kdump-adv-conf/kdump_dracut_modules/99earlykdump/%
 # Add kexec-tools-specific boot configurations to /etc/default/grub.d
 # This configuration sets the crashkernel space allocated at boot
 # to the AzureLinux default value
-mkdir -p %{buildroot}%{_sysconfdir}/default/grub.d
-install -m 750 %{SOURCE30} %{buildroot}%{_sysconfdir}/default/grub.d/51_kexec_tools.cfg
+install -Dm 755 %{SOURCE30} %{buildroot}%{_sysconfdir}/default/grub.d/51_kexec_tools.cfg
 
 %define dracutlibdir %{_prefix}/lib/dracut
 #and move the custom dracut modules to the dracut directory
