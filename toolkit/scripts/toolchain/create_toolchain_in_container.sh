@@ -27,9 +27,6 @@ if [ "$INCREMENTAL_TOOLCHAIN" != "y" ] || [ -z "$(docker images -q marinertoolch
     # docker rmi $(docker images -a -q)
     # docker rmi $(docker history marinertoolchain -q)
 
-    # CPIO patch
-    cp -v $MARINER_SPECS_DIR/cpio/cpio_extern_nocommon.patch ./container
-    cp -v $MARINER_SPECS_DIR/cpio/CVE-2021-38185.patch ./container
     # Coreutils aarch64 patch
     cp -v $MARINER_SPECS_DIR/coreutils/coreutils-fix-get-sys_getdents-aarch64.patch ./container
     # Binutils readonly patch
