@@ -94,8 +94,6 @@ USER lfs
 COPY [ "./toolchain_build_temp_tools.sh", \
        "./sanity_check.sh", \
        "./coreutils-fix-get-sys_getdents-aarch64.patch", \
-       "./cpio_extern_nocommon.patch", \
-       "./CVE-2021-38185.patch", \
        "./CVE-2023-4039.patch", \
        "./linker-script-readonly-keyword-support.patch", \
        "./rpm-define-RPM-LD-FLAGS.patch", \
