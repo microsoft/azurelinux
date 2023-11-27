@@ -1,7 +1,7 @@
 Summary:        Next generation system logger facilty
 Name:           syslog-ng
 Version:        3.33.2
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        BSD AND GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -86,9 +86,10 @@ sed -i 's/eventlog//g'  %{buildroot}%{_libdir}/pkgconfig/syslog-ng.pc
 install -vdm755 %{buildroot}%{_libdir}/systemd/system-preset
 echo "disable syslog-ng.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-syslog-ng.preset
 
-%check
-pip3 install unittest2 nose ply pep8
-#make %{?_smp_mflags} check # TODO: fix tests. Look at comments in https://github.com/microsoft/CBL-Mariner/pull/6431
+# TODO: fix tests. Look at comments in https://github.com/microsoft/CBL-Mariner/pull/6431
+# %check
+# pip3 install unittest2 nose ply pep8
+# make %{?_smp_mflags} check
 
 %post
 if [ $1 -eq 1 ] ; then
@@ -148,6 +149,9 @@ fi
 %{_libdir}/pkgconfig/*
 
 %changelog
+* Mon Nov 27 2023 Saul Paredes <saulparedes@microsoft.com> - 3.33.2-7
+- Comment %check section
+
 * Wed Nov 22 2023 Saul Paredes <saulparedes@microsoft.com> - 3.33.2-6
 - Remove 'make check' from %check section
 
