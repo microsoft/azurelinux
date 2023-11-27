@@ -64,7 +64,7 @@ function find_old_version {
 }
 
 function update_configs {
-    CONFIG_FILE="kernel/config kernel/config_aarch64 kernel-hci/config kernel-azure/config kernel-azure/config_aarch64"
+    CONFIG_FILE="kernel/config kernel/config_aarch64 kernel-hci/config"
     for configfile in $CONFIG_FILE
     do
         FILE=$WORKSPACE/SPECS/$configfile

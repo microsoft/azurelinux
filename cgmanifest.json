@@ -8120,16 +8120,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "kernel-azure",
-          "version": "5.15.135.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.135.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "kernel-hci",
           "version": "5.15.135.1",
           "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.135.1.tar.gz"
