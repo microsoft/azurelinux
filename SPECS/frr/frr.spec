@@ -3,7 +3,7 @@
 Summary:        Routing daemon
 Name:           frr
 Version:        8.5.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -18,6 +18,8 @@ Patch3:         0003-fips-mode.patch
 Patch4:         0004-remove-grpc-test.patch
 Patch5:         CVE-2023-46752.patch
 Patch6:         CVE-2023-46753.patch
+Patch7:         CVE-2023-47235.patch
+Patch8:         CVE-2023-47234.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  bison
@@ -199,6 +201,9 @@ rm tests/lib/*grpc*
 %{_sysusersdir}/%{name}.conf
 
 %changelog
+* Tue Nov 14 2023 Sam Meluch <sammeluch@microsoft.com> - 8.5.3-4
+- Patch CVE-2023-47234 and CVE-2023-47235
+
 * Mon Nov 06 2023 Rachel Menge <rachelmenge@microsoft.com> - 8.5.3-3
 - Patch CVE-2023-46752 and CVE-2023-46753
 

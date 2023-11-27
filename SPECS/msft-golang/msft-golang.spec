@@ -1,3 +1,4 @@
+%global bootstrap_compiler_version 20230802.5
 %global goroot          %{_libdir}/golang
 %global gopath          %{_datadir}/gocode
 %ifarch aarch64
@@ -12,15 +13,16 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           msft-golang
-Version:        1.19.12
+Version:        1.20.11
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://github.com/microsoft/go
-Source0:        https://github.com/microsoft/go/releases/download/v1.19.12-1/go.20230802.5.src.tar.gz
+Source0:        https://github.com/microsoft/go/releases/download/v1.20.11-1/go.20231107.4.src.tar.gz
 Source1:        https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
+Source2:        https://github.com/microsoft/go/releases/download/v1.19.12-1/go.%{bootstrap_compiler_version}.src.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
 Conflicts:      go
 Conflicts:      golang
@@ -37,12 +39,32 @@ mv -v go go-bootstrap
 %setup -q -n go
 
 %build
+# (go >= 1.20 bootstraps with go >= 1.17)
+# This condition makes go compiler >= 1.20 build a 3 step process:
+# - Build the bootstrap compiler 1.4 (bootstrap bits in c)
+# - Use the 1.4 compiler to build %{bootstrap_compiler_version}
+# - Use the %{bootstrap_compiler_version} compiler to build go >= 1.20 compiler
+
 # Build go 1.4 bootstrap
 pushd %{_topdir}/BUILD/go-bootstrap/src
 CGO_ENABLED=0 ./make.bash
 popd
 mv -v %{_topdir}/BUILD/go-bootstrap %{_libdir}/golang
 export GOROOT=%{_libdir}/golang
+
+# Use go1.4 bootstrap to compile go.%{bootstrap_compiler_version} (C bootstrap)
+export GOROOT_BOOTSTRAP=%{_libdir}/golang
+mkdir -p %{_topdir}/BUILD/go.%{bootstrap_compiler_version}
+tar xf %{SOURCE2} -C %{_topdir}/BUILD/go.%{bootstrap_compiler_version} --strip-components=1
+pushd %{_topdir}/BUILD/go.%{bootstrap_compiler_version}/src
+CGO_ENABLED=0 ./make.bash
+popd
+
+# Nuke the older go 1.4 bootstrap
+rm -rf %{_libdir}/golang
+
+# Make go.%{bootstrap_compiler_version} as the new bootstrapper (Go boostrap)
+mv -v %{_topdir}/BUILD/go.%{bootstrap_compiler_version} %{_libdir}/golang
 
 # Build current go version
 export GOHOSTOS=linux
@@ -115,6 +137,10 @@ fi
 %{_bindir}/*
 
 %changelog
+* Wed Nov 22 2023 Andrew Phelps <anphel@microsoft.com> - 1.20.11-1
+- Upgrade to 1.20.11
+- Keep go 1.19.12 source to provide additional go boostrap
+
 * Wed Aug 16 2023 Brian Fjeldstad <bfjelds@microsoft.com> - 1.19.12-1
 - Upgrade to 1.19.12 to fix CVE-2023-39533
 
