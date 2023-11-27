@@ -1,7 +1,7 @@
 Summary:        A system tool for maintaining the %{_sysconfdir}/rc*.d hierarchy
 Name:           chkconfig
-Version:        1.20
-Release:        4%{?dist}
+Version:        1.25
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -108,6 +108,9 @@ mkdir -p %{buildroot}%{_sysconfdir}/chkconfig.d
 %defattr(-,root,root)
 
 %changelog
+* Tue Nov 21 2023 Andrew Phelps <anphel@microsoft.com> - 1.25-1
+- Upgrade to version 1.25
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.20-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
