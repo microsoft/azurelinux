@@ -42,9 +42,9 @@ readline-8.2-1.cm2.x86_64.rpm
 readline-devel-8.2-1.cm2.x86_64.rpm
 coreutils-8.32-7.cm2.x86_64.rpm
 coreutils-lang-8.32-7.cm2.x86_64.rpm
-bash-5.1.8-4.cm2.x86_64.rpm
-bash-devel-5.1.8-4.cm2.x86_64.rpm
-bash-lang-5.1.8-4.cm2.x86_64.rpm
+bash-5.2.15-1.cm2.x86_64.rpm
+bash-devel-5.2.15-1.cm2.x86_64.rpm
+bash-lang-5.2.15-1.cm2.x86_64.rpm
 bzip2-1.0.8-1.cm2.x86_64.rpm
 bzip2-devel-1.0.8-1.cm2.x86_64.rpm
 bzip2-libs-1.0.8-1.cm2.x86_64.rpm
@@ -181,8 +181,8 @@ rpm-build-libs-4.18.0-4.cm2.x86_64.rpm
 rpm-devel-4.18.0-4.cm2.x86_64.rpm
 rpm-lang-4.18.0-4.cm2.x86_64.rpm
 rpm-libs-4.18.0-4.cm2.x86_64.rpm
-cpio-2.13-5.cm2.x86_64.rpm
-cpio-lang-2.13-5.cm2.x86_64.rpm
+cpio-2.14-1.cm2.x86_64.rpm
+cpio-lang-2.14-1.cm2.x86_64.rpm
 e2fsprogs-libs-1.46.5-3.cm2.x86_64.rpm
 libsolv-0.7.24-1.cm2.x86_64.rpm
 libsolv-devel-0.7.24-1.cm2.x86_64.rpm
@@ -247,8 +247,8 @@ libselinux-3.5-1.cm2.x86_64.rpm
 slang-2.3.3-1.cm2.x86_64.rpm
 newt-0.52.23-1.cm2.x86_64.rpm
 newt-lang-0.52.23-1.cm2.x86_64.rpm
-chkconfig-1.20-4.cm2.x86_64.rpm
-chkconfig-lang-1.20-4.cm2.x86_64.rpm
+chkconfig-1.25-1.cm2.x86_64.rpm
+chkconfig-lang-1.25-1.cm2.x86_64.rpm
 msopenjdk-11-11.0.20.1-1.x86_64.rpm
 pyproject-rpm-macros-1.0.0~rc1-4.cm2.noarch.rpm
 audit-3.1.2-1.cm2.x86_64.rpm
