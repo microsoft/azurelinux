@@ -1,7 +1,7 @@
 Summary:        Contains programs for manipulating text files
 Name:           gawk
-Version:        5.1.0
-Release:        2%{?dist}
+Version:        5.2.2
+Release:        1%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -63,6 +63,12 @@ make %{?_smp_mflags} check
 %{_sysconfdir}/profile.d/gawk.sh
 
 %changelog
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.2.2-1
+- Auto-upgrade to 5.2.2 - Azure Linux 3.0 - package upgrades
+
+* Mon Oct 16 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 5.1.1-1
+- Update to v5.1.1 to fix CVE-2023-4156
+
 * Tue Feb 15 2022 Muhammad Falak <mwani@microsoft.com> - 5.1.0-2
 - Generate locale `en_US.iso88591` in `%check` section to enable ptest
 - Lint spec

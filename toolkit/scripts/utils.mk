@@ -13,6 +13,8 @@ ARCHIVE_TOOL ?= $(shell if command -v pigz 1>/dev/null 2>&1 ; then echo pigz ; e
 # Host and target architecture
 build_arch := $(shell uname -m)
 
+no_repo_acl = $(STATUS_FLAGS_DIR)/no_repo_acl.flag
+
 ######## MISC. MAKEFILE Functions ########
 
 # Creates a folder if it doesn't exist. Also sets the timestamp to 0 if it is
@@ -58,7 +60,7 @@ watch_vars=PACKAGE_BUILD_LIST PACKAGE_REBUILD_LIST PACKAGE_IGNORE_LIST REPO_LIST
 #					$(depend_TOOLCHAIN_ARCHIVE) $(depend_REBUILD_TOOLCHAIN) $(depend_SRPM_PACK_LIST) $(depend_SPECS_DIR) $(depend_MAX_CASCADING_REBUILDS) $(depend_RUN_CHECK) $(depend_TEST_RUN_LIST)
 #					$(depend_TEST_RERUN_LIST) $(depend_TEST_IGNORE_LIST)
 
-.PHONY: variable_depends_on_phony clean-variable_depends_on_phony no_repo_acl
+.PHONY: variable_depends_on_phony clean-variable_depends_on_phony setfacl_always_run_phony
 clean: clean-variable_depends_on_phony
 
 $(call create_folder,$(STATUS_FLAGS_DIR))
@@ -93,5 +95,12 @@ $(foreach var,$(watch_vars),$(eval $(call depend_on_var,$(var))))
 
 # Host's ACLs influence the default permissions of the
 # files inside the built RPMs. Disabling them for the repository.
-no_repo_acl:
-	@setfacl -bnR $(PROJECT_ROOT) &>/dev/null
+#
+# NOTE: we depend on a phony target and create the flag only once becase we want
+#       to always run the "setfacl" command but not trigger a re-run of the targets
+#       depending on this target.
+$(no_repo_acl): setfacl_always_run_phony
+	@setfacl -bnR $(PROJECT_ROOT) &>/dev/null && \
+	if [ ! -f $@ ]; then \
+		touch $@; \
+	fi

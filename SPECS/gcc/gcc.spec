@@ -2,15 +2,15 @@
 %define _use_internal_dependency_generator 0
 Summary:        Contains the GNU compiler collection
 Name:           gcc
-Version:        11.2.0
-Release:        6%{?dist}
+Version:        13.2.0
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://gcc.gnu.org/
 Source0:        https://ftp.gnu.org/gnu/gcc/%{name}-%{version}/%{name}-%{version}.tar.xz
-Patch0:         CVE-2023-4039.patch
+#Patch0:         CVE-2023-4039.patch
 Requires:       gcc-c++ = %{version}-%{release}
 Requires:       gmp
 Requires:       libgcc-atomic = %{version}-%{release}
@@ -138,18 +138,17 @@ This package contains development headers and static library for libgomp
 
 %prep
 %autosetup -p1
-# disable no-pie for gcc binaries
-sed -i '/^NO_PIE_CFLAGS = /s/@NO_PIE_CFLAGS@//' gcc/Makefile.in
 
 %build
+
 CFLAGS="`echo " %{build_cflags} " | sed 's/-Werror=format-security/-Wno-error=format-security/'`"
 CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/-Werror=format-security/-Wno-error=format-security/'`"
 FCFLAGS="`echo " %{build_fflags} " | sed 's/-Werror=format-security/-Wno-error=format-security/'`"
-export CFLAGS
-export CXXFLAGS
-export FCFLAGS
+export CFLAGS="$CFLAGS -Wno-error=missing-include-dirs"
+export CXXFLAGS="$CXXFLAGS -Wno-error=missing-include-dirs"
+export FCFLAGS="$FCFLAGS -Wno-error=missing-include-dirs"
 
-SED=sed \
+LD=ld \
 %configure \
     --enable-shared \
     --enable-threads=posix \
@@ -161,6 +160,9 @@ SED=sed \
     --enable-linker-build-id \
     --enable-plugin \
     --enable-default-pie \
+    --enable-default-ssp \
+    --disable-fixincludes \
+    --disable-libsanitizer \
     --with-system-zlib
 make %{?_smp_mflags}
 
@@ -174,7 +176,7 @@ mv -v %{buildroot}%{_lib64dir}/*gdb.py %{buildroot}%{_datarootdir}/gdb/auto-load
 chmod 755 %{buildroot}/%{_lib64dir}/libgcc_s.so.1
 
 # Install libbacktrace-static components
-mv %{_host}/libbacktrace/.libs/libbacktrace.a %{buildroot}%{_lib64dir}
+mv host-%{_host}/libbacktrace/.libs/libbacktrace.a %{buildroot}%{_lib64dir}
 mv libbacktrace/backtrace.h %{buildroot}%{_includedir}
 
 rm -rf %{buildroot}%{_infodir}
@@ -187,10 +189,12 @@ test `cat /proc/sys/kernel/randomize_va_space` -ne 0 && rm gcc/testsuite/gcc.dg/
 # disable security hardening for tests
 rm -f $(dirname $(gcc -print-libgcc-file-name))/../specs
 # run only gcc tests
-make %{?_smp_mflags} check-gcc
+tests_ok=true
+make %{?_smp_mflags} check-gcc || tests_ok=false
 # Only 1 FAIL is OK
-[ `grep ^FAIL testsuite/gcc/gcc.sum | wc -l` -ne 1 -o `grep ^XPASS testsuite/gcc/gcc.sum | wc -l` -ne 0 ] && exit 1 ||:
-[ `grep "^FAIL: gcc.dg/cpp/trad/include.c (test for excess errors)" testsuite/gcc/gcc.sum | wc -l` -ne 1 ] && exit 1 ||:
+[ `grep ^FAIL testsuite/gcc/gcc.sum | wc -l` -ne 1 -o `grep ^XPASS testsuite/gcc/gcc.sum | wc -l` -ne 0 ] && tests_ok=false
+[ `grep "^FAIL: gcc.dg/cpp/trad/include.c (test for excess errors)" testsuite/gcc/gcc.sum | wc -l` -ne 1 ] && tests_ok=false
+$tests_ok
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -287,6 +291,13 @@ make %{?_smp_mflags} check-gcc
 %{_lib64dir}/libgomp.spec
 
 %changelog
+* Thu Nov 02 2023 Andrew Phelps <anphel@microsoft.com> - 13.2.0-1
+- Upgrade to version 13.2.0
+- Remove gfortran
+
+* Tue Sep 26 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 11.2.0-7
+- Removing 'exit' calls from the '%%check' section.
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 11.2.0-6
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

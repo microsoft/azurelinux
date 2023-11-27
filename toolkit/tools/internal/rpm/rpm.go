@@ -4,6 +4,7 @@
 package rpm
 
 import (
+	"errors"
 	"fmt"
 	"path/filepath"
 	"regexp"
@@ -96,6 +97,23 @@ func GetRpmArch(goArch string) (rpmArch string, err error) {
 	if !ok {
 		err = fmt.Errorf("unknown GOARCH detected (%s)", goArch)
 	}
+	return
+}
+
+func GetBasePackageNameFromSpecFile(specPath string) (basePackageName string, err error) {
+
+	baseName := filepath.Base(specPath)
+	if baseName == "" {
+		return "", errors.New(fmt.Sprintf("Cannot extract file name from specPath (%s).", specPath))
+	}
+
+	fileExtension := filepath.Ext(baseName)
+	if fileExtension == "" {
+		return "", errors.New(fmt.Sprintf("Cannot extract file extension from file name (%s).", baseName))
+	}
+
+	basePackageName = baseName[:len(baseName)-len(fileExtension)]
+
 	return
 }
 
@@ -514,17 +532,37 @@ func filterCompatibleSpecs(inputSpecPaths []string, defines map[string]string) (
 		return
 	}
 
+	type specArchResult struct {
+		compatible bool
+		path       string
+		err        error
+	}
+	resultsChannel := make(chan specArchResult, len(inputSpecPaths))
+
 	for _, specFilePath := range inputSpecPaths {
 		specDirPath := filepath.Dir(specFilePath)
 
-		specCompatible, err = SpecArchIsCompatible(specFilePath, specDirPath, buildArch, defines)
-		if err != nil {
-			logger.Log.Errorf("Failed while querrying spec (%s). Error: %v.", specFilePath, err)
+		go func(pathIter string) {
+			specCompatible, err = SpecArchIsCompatible(pathIter, specDirPath, buildArch, defines)
+			if err != nil {
+				err = fmt.Errorf("failed while querrying spec (%s). Error: %v.", pathIter, err)
+			}
+			resultsChannel <- specArchResult{
+				compatible: specCompatible,
+				path:       pathIter,
+				err:        err,
+			}
+		}(specFilePath)
+	}
+
+	for i := 0; i < len(inputSpecPaths); i++ {
+		result := <-resultsChannel
+		if result.err != nil {
+			err = result.err
 			return
 		}
-
-		if specCompatible {
-			filteredSpecPaths = append(filteredSpecPaths, specFilePath)
+		if result.compatible {
+			filteredSpecPaths = append(filteredSpecPaths, result.path)
 		}
 	}
 

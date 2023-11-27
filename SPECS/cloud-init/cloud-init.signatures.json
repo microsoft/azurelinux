@@ -1,6 +1,6 @@
 {
  "Signatures": {
   "10-azure-kvp.cfg": "79e0370c010be5cd4717960e4b414570c9ec6e6d29aede77ccecc43d2b03bb9a",
-  "cloud-init-23.2.tar.gz": "46bd6ed645dfd0168fdd0aadbc78736225528765fa22923f43b6c82bb09c4aec"
+  "cloud-init-23.3.3.tar.gz": "60c6e970ea0a97732478524007b3d4d13425b075d5d1c63c6cb89f2ce8ac7489"
  }
 }

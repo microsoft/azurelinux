@@ -28,7 +28,7 @@
 Summary:        Open Message Passing Interface
 Name:           openmpi%{?_cc_name_suffix}
 Version:        4.1.4
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        BSD AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -303,6 +303,9 @@ make check
 %{python3_sitearch}/openmpi.pth
 
 %changelog
+* Tue Sep 26 2023 Sumedh Sharma <sumsharma@microsoft.com> - 4.1.4-11
+- Bump version to recompile with pmix update for CVE-2023-41915
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.1.4-10
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

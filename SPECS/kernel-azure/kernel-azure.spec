@@ -27,8 +27,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel-azure
-Version:        5.15.131.1
-Release:        2%{?dist}
+Version:        5.15.135.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -46,6 +46,7 @@ BuildRequires:  diffutils
 BuildRequires:  dwarves
 BuildRequires:  elfutils-libelf-devel
 BuildRequires:  glib-devel
+BuildRequires:  grub2-rpm-macros
 BuildRequires:  kbd
 BuildRequires:  kmod-devel
 BuildRequires:  libdnet-devel
@@ -320,10 +321,12 @@ then
           test -n "$list" && ln -sf "$list" /boot/mariner.cfg
      fi
 fi
+%grub2_postun
 
 %post
 /sbin/depmod -a %{uname_r}
 ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
+%grub2_post
 
 %post drivers-accessibility
 /sbin/depmod -a %{uname_r}
@@ -416,6 +419,16 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Oct 17 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.135.1-1
+- Auto-upgrade to 5.15.135.1
+
+* Tue Sep 26 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.133.1-1
+- Auto-upgrade to 5.15.133.1
+
+* Tue Sep 22 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.131.1-3
+- Call grub2-mkconfig to regenerate configs only if the user has 
+    previously used grub2-mkconfig for boot configuration. 
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.15.131.1-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

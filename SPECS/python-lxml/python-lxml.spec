@@ -2,7 +2,7 @@
 
 Summary:        XML and HTML with Python
 Name:           python-lxml
-Version:        4.9.1
+Version:        4.9.3
 Release:        1%{?dist}
 # Test suite (and only the test suite) is GPLv2+
 License:        BSD and GPLv2+
@@ -10,6 +10,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://lxml.de
 Source0:        https://github.com/lxml/lxml/releases/download/lxml-%{version}/lxml-%{version}.tar.gz
+Patch0:         noexcept.patch
 BuildRequires:  libxslt-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  python3-Cython
@@ -31,13 +32,12 @@ It is unique in that it combines the speed and XML feature completeness of these
 with the simplicity of a native Python API, mostly compatible but superior to the well-known
 ElementTree API.
 
-
 %prep
-%autosetup -n lxml-%{version}
-find -type f -name "*.c" -delete -print
+%setup -n lxml-%{version}
+patch -Np1 --ignore-whitespace < %{PATCH0}
 
 %build
-%{py3_build "--with-cython"}
+%{py3_build "--without-cython"}
 
 %install
 %py3_install
@@ -53,6 +53,9 @@ make test
 %{python3_sitelib}/*
 
 %changelog
+* Fri Nov 10 2023 Andrew Phelps <anphel@microsoft.com> - 4.9.3-1
+- Upgrade to version 4.9.3
+
 * Mon Aug 22 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 4.9.1-1
 - Upgrade to to fix CVE-2022-2309
 

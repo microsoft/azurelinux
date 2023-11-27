@@ -3,13 +3,13 @@
 
 # Release date and version of stage 0 compiler can be found in "src/stage0.json" inside the extracted "Source0".
 # Look for "date:" and "rustc:".
-%define release_date 2023-02-09
-%define stage0_version 1.67.1
+%define release_date 2023-07-13
+%define stage0_version 1.71.0
 
 Summary:        Rust Programming Language
 Name:           rust
-Version:        1.68.2
-Release:        5%{?dist}
+Version:        1.72.0
+Release:        6%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -28,18 +28,20 @@ Source0:        https://static.rust-lang.org/dist/rustc-%{version}-src.tar.xz
 #   wget https://static.rust-lang.org/dist/rustc-1.68.2-src.tar.xz
 # - Create a directory to store the output from the script:
 #   mkdir rustOutputDir
+# - Get prereqs for the script (for a mariner container):
+#   tdnf -y install rust wget jq tar ca-certificates
 # - Run the script:
 #   ./generate_source_tarball --srcTarball path/to/rustc-1.68.2-src.tar.xz --outFolder path/to/rustOutputDir --pkgVersion 1.68.2
 #
 
 Source1:        rustc-%{version}-src-cargo.tar.gz
-Source2:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-x86_64-unknown-linux-gnu.tar.gz
-Source3:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-x86_64-unknown-linux-gnu.tar.gz
-Source4:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-x86_64-unknown-linux-gnu.tar.gz
-Source5:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-aarch64-unknown-linux-gnu.tar.gz
-Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-aarch64-unknown-linux-gnu.tar.gz
-Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.gz
-Patch0:         CVE-2023-27477.patch
+Source2:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-x86_64-unknown-linux-gnu.tar.xz
+Source3:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-x86_64-unknown-linux-gnu.tar.xz
+Source4:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-x86_64-unknown-linux-gnu.tar.xz
+Source5:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
+Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
+Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
+Patch0:         CVE-2023-45853.patch
 BuildRequires:  binutils
 BuildRequires:  cmake
 # make sure rust relies on curl from CBL-Mariner (instead of using its vendored flavor)
@@ -55,7 +57,7 @@ BuildRequires:  ninja-build
 BuildRequires:  openssl-devel
 BuildRequires:  python3
 %if %{with_check}
-BuildRequires:  glibc-static >= 2.35-4%{?dist}
+BuildRequires:  glibc-static >= 2.38-1%{?dist}
 %endif
 # rustc uses a C compiler to invoke the linker, and links to glibc in most cases
 Requires:       binutils
@@ -85,23 +87,18 @@ tar -xf %{SOURCE1} --no-same-owner
 popd
 %autosetup -p1 -n rustc-%{version}-src
 
-# Rust doesn't recognize our .tar.gz bootstrap files when XZ support is enabled
-# This causes stage 0 bootstrap to look online for sources
-# So, we remove XZ support detection in the bootstrap program
-sed -i "s/tarball_suffix = '.tar.xz' if support_xz() else '.tar.gz'/tarball_suffix = '.tar.gz'/g" src/bootstrap/bootstrap.py
-
 # Setup build/cache directory
 BUILD_CACHE_DIR="build/cache/%{release_date}"
 mkdir -pv "$BUILD_CACHE_DIR"
 %ifarch x86_64
-mv %{SOURCE2} "$BUILD_CACHE_DIR"
-mv %{SOURCE3} "$BUILD_CACHE_DIR"
-mv %{SOURCE4} "$BUILD_CACHE_DIR"
+cp %{SOURCE2} "$BUILD_CACHE_DIR"
+cp %{SOURCE3} "$BUILD_CACHE_DIR"
+cp %{SOURCE4} "$BUILD_CACHE_DIR"
 %endif
 %ifarch aarch64
-mv %{SOURCE5} "$BUILD_CACHE_DIR"
-mv %{SOURCE6} "$BUILD_CACHE_DIR"
-mv %{SOURCE7} "$BUILD_CACHE_DIR"
+cp %{SOURCE5} "$BUILD_CACHE_DIR"
+cp %{SOURCE6} "$BUILD_CACHE_DIR"
+cp %{SOURCE7} "$BUILD_CACHE_DIR"
 %endif
 
 %build
@@ -112,7 +109,7 @@ export CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/ -g//'`"
 sh ./configure \
     --prefix=%{_prefix} \
     --enable-extended \
-    --tools="cargo,clippy,rustfmt" \
+    --tools="cargo,clippy,rustfmt,rust-analyzer-proc-macro-srv" \
     --release-channel="stable" \
     --release-description="CBL-Mariner %{version}-%{release}"
 
@@ -121,6 +118,11 @@ sh ./configure \
 USER=root SUDO_USER=root %make_build
 
 %check
+# We expect to generate dynamic CI contents in this folder, but it will fail since the .github folder is not included
+# with the published sources.
+mkdir -p .github/workflows
+./x.py run src/tools/expand-yaml-anchors
+
 ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage2-tools-bin/rustfmt %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage0/bin/
 ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/vendor/ /root/vendor
 # remove rustdoc ui flaky test issue-98690.rs (which is tagged with 'unstable-options')
@@ -133,6 +135,7 @@ mv %{buildroot}%{_docdir}/%{name}/LICENSE-THIRD-PARTY .
 rm %{buildroot}%{_docdir}/%{name}/{COPYRIGHT,LICENSE-APACHE,LICENSE-MIT}
 rm %{buildroot}%{_docdir}/%{name}/html/.lock
 rm %{buildroot}%{_docdir}/%{name}/*.old
+rm %{buildroot}%{_bindir}/*.old
 
 %ldconfig_scriptlets
 
@@ -165,6 +168,24 @@ rm %{buildroot}%{_docdir}/%{name}/*.old
 %{_mandir}/man1/*
 
 %changelog
+* Tue Nov 07 2023 Andrew Phelps <anphel@microsoft.com> - 1.72.0-6
+- Bump release to rebuild against glibc 2.38-1
+
+* Mon Oct 30 2023 Rohit Rawat <rohitrawat@microsoft.com> - 1.72.0-5
+- Patch CVE-2023-45853 in vendor/libz-sys/src/zlib
+
+* Tue Oct 10 2023 Daniel McIlvaney <damcilva@microsoft.com> - 1.72.2-4
+- Explicitly call './x.py' instead of 'x.py'
+
+* Wed Oct 04 2023 Minghe Ren <mingheren@microsoft.com> - 1.72.2-3
+- Bump release to rebuild against glibc 2.35-6
+
+* Tue Oct 03 2023 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.72.2-2
+- Bump release to rebuild against glibc 2.35-5
+
+* Wed Sep 06 2023 Daniel McIlvaney <damcilva@microsoft.com> - 1.72.2-1
+- Bump to version 1.72.2 to address CVE-2023-38497, CVE-2023-40030
+
 * Tue Aug 22 2023 Rachel Menge <rachelmenge@microsoft.com> - 1.68.2-5
 - Bump release to rebuild against openssl 1.1.1k-26
 

@@ -1,7 +1,7 @@
 Summary:        Programs for handling passwords in a secure way
 Name:           shadow-utils
 Version:        4.9
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -31,6 +31,7 @@ BuildRequires:  cracklib-devel
 BuildRequires:  docbook-dtd-xml
 BuildRequires:  docbook-style-xsl
 BuildRequires:  itstool
+BuildRequires:  libxcrypt-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  libsemanage-devel
 BuildRequires:  libtool
@@ -178,6 +179,9 @@ chmod 000 %{_sysconfdir}/shadow
 %{_libdir}/libsubid.so
 
 %changelog
+* Fri Nov 10 2023 Andrew Phelps <anphel@microsoft.com> - 4.9-14
+- Switch to link with libxcrypt
+
 * Wed Sep 20 2023 Kanika Nema <kanikanema@microsoft.com> - 4.9-13
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 - Address CVE-2023-29383

@@ -1,0 +1,24 @@
+From 5fcf237c5dacff5e688b81e67d33823feb880140 Mon Sep 17 00:00:00 2001
+From: Muhammad Falak R Wani <falakreyaz@gmail.com>
+Date: Thu, 14 Sep 2023 15:03:27 +0530
+Subject: [PATCH] tardev-snapshotter: enable feature(impl_trait_in_assoc_type)
+ to unblock build
+
+Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
+---
+ src/tardev-snapshotter/src/main.rs | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/tardev-snapshotter/src/main.rs b/src/tardev-snapshotter/src/main.rs
+index 5ca175b..10018a3 100644
+--- a/src/tardev-snapshotter/src/main.rs
++++ b/src/tardev-snapshotter/src/main.rs
+@@ -1,4 +1,5 @@
+ #![feature(type_alias_impl_trait)]
++#![feature(impl_trait_in_assoc_type)]
+ 
+ use containerd_snapshots::server;
+ use log::{error, info, warn};
+-- 
+2.40.1
+

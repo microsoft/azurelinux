@@ -47,8 +47,8 @@
 # Required for proper ELF symbol versioning support.
 %global _ld_strict_symbol_defs 1
 # override_glibc and glibcversion are temporary to make libxcrypt install on top of glibc
-%define glibcversion 2.35
-%bcond_without override_glibc
+%define glibcversion 2.38
+%bcond_with override_glibc
 # Build the static library?
 %bcond_with new_api
 %bcond_with compat_pkg
@@ -102,7 +102,7 @@
 Summary:        Extended crypt library for descrypt, md5crypt, bcrypt, and others
 Name:           libxcrypt
 Version:        4.4.27
-Release:        1%{?dist}
+Release:        3%{?dist}
 # For explicit license breakdown, see the
 # LICENSING file in the source tarball.
 License:        LGPLv2+ AND BSD AND Public Domain
@@ -116,6 +116,11 @@ BuildRequires:  automake
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
 BuildRequires:  libtool
+
+BuildRequires:  perl-open
+BuildRequires:  perl-FindBin
+BuildRequires:  perl-lib
+
 BuildRequires:  perl-core
 # We do not need to keep this forever.
 %if !(0%{?fedora} > 31 || 0%{?rhel} > 10)
@@ -449,6 +454,9 @@ ln -s %{_libdir}/libcrypt-%{glibcversion}.so %{_libdir}/libcrypt.so.1
 
 
 %changelog
+* Tue Nov 07 2023 Andrew Phelps <anphel@microsoft.com> - 4.4.27-3
+- Build without glibc override
+
 * Thu Apr 14 2022 Andrew Phelps <anphel@microsoft.com> - 4.4.27-2
 - Update glibcversion variable to 2.35
 

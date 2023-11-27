@@ -1,6 +1,0 @@
-{
- "Signatures": {
-  "livepatching.service": "7c1a827df2dfdefb795fab2c1417bc6145604c151b32d9d5987e458427ac1b0b",
-  "livepatching.systemd": "b248eeb126ce212843d75b01a16bd63157bee8e1ca1ac4f86de6573561a5e069"
- }
-}

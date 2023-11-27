@@ -7,9 +7,9 @@ name: Spec License Map Check
 
 on:
   push:
-    branches: [main, dev, 1.0*, 2.0*, fasttrack/*]
+    branches: [main, dev, 1.0*, 2.0*, 3.0*, fasttrack/*]
   pull_request:
-    branches: [main, dev, 1.0*, 2.0*, fasttrack/*]
+    branches: [main, dev, 1.0*, 2.0*, 3.0*, fasttrack/*]
 
 jobs:
   check:

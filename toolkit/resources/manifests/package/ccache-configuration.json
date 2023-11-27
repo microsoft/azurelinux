@@ -1,0 +1,74 @@
+{
+  "remoteStore": {
+    "type": "azure-blob-storage",
+    "tenantId": "",
+    "userName": "",
+    "password": "",
+    "storageAccount": "marinerccache",
+    "containerName": "30-stable",
+    "tagsFolder": "tags",
+    "downloadEnabled": true,
+    "downloadLatest": true,
+    "downloadFolder": "",
+    "uploadEnabled": false,
+    "uploadFolder": "",
+    "updateLatest": false,
+    "keepLatestOnly": false
+  },
+  "groups": [
+    {
+      "name": "jflex",
+      "comment": "",
+      "enabled": true,
+      "packageNames": [ "jflex", "jflex-bootstrap" ]
+    },
+    {
+      "name": "java-cup",
+      "comment": "",
+      "enabled": true,
+      "packageNames": [ "java-cup", "java-cup-bootstrap" ]
+    },
+    {
+      "name": "kernel",
+      "comment": "",
+      "enabled": true,
+      "packageNames": [ "kernel", "kernel-azure", "kernel-hci", "kernel-mshv", "kernel-uvm" ]
+    },
+    {
+      "name": "libdb",
+      "comment": "Disabling ccache for pkg because it breaks the build when enabled.",
+      "enabled": false,
+      "packageNames": [ "libdb" ]
+    },
+    {
+      "name": "m2crypto",
+      "comment": "Disabling ccache for pkg because it breaks the build when enabled.",
+      "enabled": false,
+      "packageNames": [ "m2crypto" ]
+    },
+    {
+      "name": "openssh",
+      "comment": "Disabling ccache for pkg because it breaks the build when enabled.",
+      "enabled": false,
+      "packageNames": [ "openssh" ]
+    },
+    {
+      "name": "php",
+      "comment": "Disabling ccache for pkg because it breaks the build when enabled.",
+      "enabled": false,
+      "packageNames": [ "php" ]
+    },
+    {
+      "name": "php-pecl-zip",
+      "comment": "Disabling ccache for pkg because it breaks the build when enabled.",
+      "enabled": false,
+      "packageNames": [ "php-pecl-zip" ]
+    },
+    {
+      "name": "systemd",
+      "comment": "",
+      "enabled": true,
+      "packageNames": [ "systemd", "systemd-bootstrap" ]
+    }
+  ]
+}

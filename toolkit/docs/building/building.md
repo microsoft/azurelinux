@@ -464,7 +464,7 @@ If that is not desired all remote sources can be disabled by clearing the follow
 
 #### `PACKAGE_URL_LIST=...`
 
-> Space separated list of URLs to download toolchain RPM packages from, used to populate the toolchain packages if `$(REBUILD_TOOLCHAIN)` is set to `y`.
+> Space separated list of URLs to download toolchain RPM packages from, used to populate the toolchain packages if `$(REBUILD_TOOLCHAIN)` is set to `n`. Defaults to the standard distro repos. Overriding this will clear all the default values. May be augmented by passing `USE_PREVIEW_REPO=y` which will uncondinally append the distro's preview repos to what ever set of URLs is being used.
 
 #### `SRPM_URL_LIST=...`
 
@@ -560,7 +560,7 @@ If that is not desired all remote sources can be disabled by clearing the follow
 
 ##### `USE_PREVIEW_REPO=`**`y`**
 
-> Pull missing packages from the upstream preview repository in addition to the base repository.
+> Pull missing packages from the upstream preview repository in addition to the base repository. This will uncondinally append the preview repo sources to `PACKAGE_URL_LIST`, `SRPM_URL_LIST`, and `REPO_LIST`.
 
 #### `DISABLE_UPSTREAM_REPOS=...`
 
@@ -796,7 +796,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 |:------------------------------|:---------------------------------------------------------------------------------------------------------|:---
 | SOURCE_URL                    |                                                                                                          | URL to request package sources from
 | SRPM_URL_LIST                 | `https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms`                         | Space separated list of URLs to request packed SRPMs from if `$(DOWNLOAD_SRPMS)` is set to `y`
-| PACKAGE_URL_LIST              | `https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)`                 | Space separated list of URLs to download toolchain RPM packages from, used to populate the toolchain packages if `$(REBUILD_TOOLCHAIN)` is set to `y`.
+| PACKAGE_URL_LIST              | `https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)`...              | Space separated list of URLs to download toolchain RPM packages from, used to populate the toolchain packages if `$(REBUILD_TOOLCHAIN)` is set to `y`.
 | REPO_LIST                     |                                                                                                          | Space separated list of repo files for tdnf to pull packages form
 | CA_CERT                       |                                                                                                          | CA cert to access the above resources, in addition to the system certificate store
 | TLS_CERT                      |                                                                                                          | TLS cert to access the above resources

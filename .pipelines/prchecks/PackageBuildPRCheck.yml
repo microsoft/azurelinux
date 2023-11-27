@@ -97,6 +97,7 @@ extends:
                       outputArtifactsFolder: $(ob_outputDirectory)
                       pipArtifactFeeds: "mariner/Mariner-Pypi-Feed"
                       selfRepoName: self
+                      testSuiteName: "[${{ configuration.name }}] Package test"
 
                   - task: PublishPipelineArtifact@1
                     inputs:
@@ -104,3 +105,16 @@ extends:
                       targetPath: $(ob_outputDirectory)
                     condition: always()
                     displayName: "Publish packages build artifacts"
+
+          - stage: sodiff_${{ configuration.name }}
+            dependsOn: RPMs_${{ configuration.name }}
+            jobs:
+              - job: Sodiff_Check
+                pool:
+                  type: linux
+                  isCustom: true
+                  name: ${{ configuration.agentPool }}
+                steps:
+                  - template: .pipelines/templatesWithCheckout/SodiffCheck.yml@self
+                    parameters:
+                      inputArtifactName: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}

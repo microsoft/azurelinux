@@ -38,10 +38,10 @@ func CurrentEnvironment() []string {
 	return currentEnv
 }
 
-// PermanentlyStopAllProcesses will send the provided signal to all processes spawned by this package,
+// PermanentlyStopAllChildProcesses will send the provided signal to all processes spawned by this package,
 // and all of those process's children.
 // Invoking this will also block future process creation, causing the Execute methods to return an error.
-func PermanentlyStopAllProcesses(signal unix.Signal) {
+func PermanentlyStopAllChildProcesses(signal unix.Signal) {
 	// Acquire the global activeCommandsMutex to ensure no
 	// new commands are executed during this teardown routine
 	logger.Log.Info("Waiting for outstanding processes to be created")
@@ -72,6 +72,11 @@ func PermanentlyStopAllProcesses(signal unix.Signal) {
 
 // Execute runs the provided command.
 func Execute(program string, args ...string) (stdout, stderr string, err error) {
+	return ExecuteInDirectory("", program, args...)
+}
+
+// Execute runs the provided command in a specific working directory.
+func ExecuteInDirectory(workingDirectory, program string, args ...string) (stdout, stderr string, err error) {
 	var (
 		outBuf bytes.Buffer
 		errBuf bytes.Buffer
@@ -80,6 +85,10 @@ func Execute(program string, args ...string) (stdout, stderr string, err error) 
 	cmd := exec.Command(program, args...)
 	cmd.Stdout = &outBuf
 	cmd.Stderr = &errBuf
+
+	if workingDirectory != "" {
+		cmd.Dir = workingDirectory
+	}
 
 	err = trackAndStartProcess(cmd)
 	if err != nil {

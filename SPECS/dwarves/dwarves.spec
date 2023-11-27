@@ -2,14 +2,13 @@
 %define libver 1
 Summary:        Debugging Information Manipulation Tools (pahole & friends)
 Name:           dwarves
-Version:        1.21
-Release:        4%{?dist}
+Version:        1.25
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://acmel.wordpress.com
-Source:         http://fedorapeople.org/~acme/dwarves/%{name}-%{version}.tar.xz
-Patch1:         0001-btf-Remove-ftrace-filter.patch
+Source:         https://fedorapeople.org/~acme/dwarves/%{name}-%{version}.tar.xz
 BuildRequires:  cmake >= 2.8.12
 BuildRequires:  elfutils-devel >= 0.130
 BuildRequires:  gcc
@@ -66,8 +65,7 @@ Requires:       %{libname}%{libver} = %{version}-%{release}
 Debugging information processing library development files.
 
 %prep
-%setup -q
-%patch1 -p1
+%autosetup -p1
 
 %build
 %cmake -DCMAKE_BUILD_TYPE=Release .
@@ -117,7 +115,6 @@ rm -Rf %{buildroot}
 %doc MANIFEST README
 %{_includedir}/dwarves/btf_encoder.h
 %{_includedir}/dwarves/config.h
-%{_includedir}/dwarves/ctf_encoder.h
 %{_includedir}/dwarves/ctf.h
 %{_includedir}/dwarves/dutil.h
 %{_includedir}/dwarves/dwarves.h
@@ -127,16 +124,18 @@ rm -Rf %{buildroot}
 %{_includedir}/dwarves/elf_symtab.h
 %{_includedir}/dwarves/gobuffer.h
 %{_includedir}/dwarves/hash.h
-%{_includedir}/dwarves/libbtf.h
 %{_includedir}/dwarves/libctf.h
 %{_includedir}/dwarves/list.h
 %{_includedir}/dwarves/rbtree.h
-%{_includedir}/dwarves/pahole_strings.h
 %{_libdir}/%{libname}.so
 %{_libdir}/%{libname}_emit.so
 %{_libdir}/%{libname}_reorganize.so
 
 %changelog
+* Thu Nov 16 2023 Rachel Menge <rachelmenge@microsoft.com> - 1.25-1
+- Update to version 1.25
+- License verified
+
 * Fri Aug 20 2021 Chris Co <chrco@microsoft.com> - 1.21-4
 - Initial CBL-Mariner import from Fedora 35 (license: MIT).
 

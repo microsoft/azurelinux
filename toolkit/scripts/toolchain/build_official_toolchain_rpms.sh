@@ -52,6 +52,14 @@ PARAM_DIST_TAG=$MARINER_DIST_TAG
 PARAM_BUILD_NUM=$MARINER_BUILD_NUMBER
 PARAM_RELEASE_VER=$MARINER_RELEASE_VERSION
 
+if [ "$RUN_CHECK" = "y" ]; then
+    export CHECK_SETTING=" "
+    export CHECK_DEFINE_NUM="1"
+else
+    export CHECK_SETTING="--nocheck"
+    export CHECK_DEFINE_NUM="0"
+fi
+
 # Assumption: pipeline has copied file: build/toolchain/toolchain_from_container.tar.gz
 # Or, if toolchain-build-all was called, both of the following will exist:
 #       build/toolchain/populated_toolchain
@@ -192,8 +200,8 @@ chroot_and_install_rpms () {
         # This is a heuristic to find the associated RPMs. In theory we should instead use a more selective filtering like
         # we use for build_rpm_in_chroot_no_install by querying for exact RPMs that match $2 found in $1.spec however to
         # preserve the existing behavior we'll just copy all RPMs that match the name-version-release string.
-        #     e.g. matching_rpms=$(rpmspec -q $specPath --srpm --define="with_check 1" --define="_sourcedir $specDir" --define="dist $PARAM_DIST_TAG" --builtrpms --queryformat '%{nvra}.rpm\n' | grep $2)
-        verrel=$(rpmspec -q $specPath --srpm --define="with_check 1" --define="_sourcedir $specDir" --define="dist $PARAM_DIST_TAG" --queryformat %{VERSION}-%{RELEASE})
+        #     e.g. matching_rpms=$(rpmspec -q $specPath --srpm --define="with_check $CHECK_DEFINE_NUM" --define="_sourcedir $specDir" --define="dist $PARAM_DIST_TAG" --builtrpms --queryformat '%{nvra}.rpm\n' | grep $2)
+        verrel=$(rpmspec -q $specPath --srpm --define="with_check $CHECK_DEFINE_NUM" --define="_sourcedir $specDir" --define="dist $PARAM_DIST_TAG" --queryformat %{VERSION}-%{RELEASE})
         # Do not include any files with "debuginfo" in the name
         find $CHROOT_RPMS_DIR -name "$2*$verrel*" ! -name "*debuginfo*" -exec cp {} $CHROOT_INSTALL_RPM_DIR ';'
     else
@@ -221,12 +229,6 @@ chroot_and_run_rpmbuild () {
     echo "Will build spec for $1 in chroot"
     chroot_mount
 
-    if [ "$RUN_CHECK" = "y" ]; then
-        export CHECK_SETTING=" "
-    else
-        export CHECK_SETTING="--nocheck"
-    fi
-
     chroot "$LFS" /usr/bin/env -i          \
         HOME=/root                         \
         TERM="$TERM"                       \
@@ -235,7 +237,7 @@ chroot_and_run_rpmbuild () {
         SHELL=/bin/bash                    \
         rpmbuild --nodeps --rebuild --clean     \
             $CHECK_SETTING                 \
-            --define "with_check 1" --define "dist $PARAM_DIST_TAG" --define "mariner_build_number $PARAM_BUILD_NUM" \
+            --define "with_check $CHECK_DEFINE_NUM" --define "dist $PARAM_DIST_TAG" --define "mariner_build_number $PARAM_BUILD_NUM" \
             --define "mariner_release_version $PARAM_RELEASE_VER" $TOPDIR/SRPMS/$1 \
             --define "mariner_module_ldflags -Wl,-dT,%{_topdir}/BUILD/module_info.ld" \
             || echo "$1" >> "$TOOLCHAIN_FAILURES"
@@ -252,7 +254,7 @@ build_rpm_in_chroot_no_install () {
 
     specPath=$(find $SPECROOT -name "$1.spec" -print -quit)
     specDir=$(dirname $specPath)
-    rpmMacros=(-D "with_check 1" -D "_sourcedir $specDir" -D "dist $PARAM_DIST_TAG")
+    rpmMacros=(-D "with_check $CHECK_DEFINE_NUM" -D "_sourcedir $specDir" -D "dist $PARAM_DIST_TAG")
     builtRpms="$(rpmspec -q $specPath --builtrpms "${rpmMacros[@]}" --queryformat="%{nvra}.rpm\n")"
 
     # Find all the associated RPMs for the SRPM and check if they are in the chroot RPM directory
@@ -315,8 +317,6 @@ cp -v $SPECROOT/mariner-rpm-macros/verify-package-notes.sh $LFS/usr/lib/rpm/mari
 mkdir -pv $LFS/usr/lib/rpm/macros.d
 cp -v $MARINER_TOOLCHAIN_MANIFESTS_DIR/macros.override $LFS/usr/lib/rpm/macros.d/macros.override
 cp /etc/resolv.conf $LFS/etc/
-
-chroot_and_print_installed_rpms
 
 stop_record_timestamp "build prep"
 start_record_timestamp "build packages"
@@ -423,7 +423,6 @@ chroot_and_install_rpms gperf
 
 # Python3 needs to be installed for RPM to build
 build_rpm_in_chroot_no_install python3
-rm -vf $FINISHED_RPM_DIR/python3*debuginfo*.rpm
 chroot_and_install_rpms python3 python3
 
 # libxml2 is required for at least: libxslt, createrepo_c
@@ -434,10 +433,10 @@ chroot_and_install_rpms libxml2
 echo Download JDK rpms
 case $(uname -m) in
     x86_64)
-        wget -nv --no-clobber --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/x86_64/msopenjdk-11-11.0.18-1.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+        wget -nv --no-clobber --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/x86_64/msopenjdk-11-11.0.20.1-1.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
     ;;
     aarch64)
-        wget -nv --no-clobber --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/aarch64/msopenjdk-11-11.0.18-1.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+        wget -nv --no-clobber --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/aarch64/msopenjdk-11-11.0.20.1-1.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
     ;;
 esac
 
@@ -481,6 +480,9 @@ build_rpm_in_chroot_no_install curl
 # cracklib needs python3-setuptools (installed with python3)
 build_rpm_in_chroot_no_install cracklib
 
+# pam needs libxcrypt
+build_rpm_in_chroot_no_install libxcrypt
+chroot_and_install_rpms libxcrypt
 # pam needs cracklib
 chroot_and_install_rpms cracklib
 build_rpm_in_chroot_no_install cmake
@@ -531,6 +533,7 @@ build_rpm_in_chroot_no_install gtk-doc
 # python3-lxml requires python3-Cython and libxslt
 build_rpm_in_chroot_no_install Cython
 chroot_and_install_rpms python3-Cython
+chroot_and_install_rpms patch # python-lxml needs patch
 build_rpm_in_chroot_no_install python-lxml
 chroot_and_install_rpms python3-lxml
 
@@ -581,7 +584,7 @@ build_rpm_in_chroot_no_install tdnf
 
 # Build createrepo_c
 # createrepo_c needs cmake, file, glib
-chroot_and_install_rpms file
+chroot_and_install_rpms file file # Use full naming since we have a collision with filesystem
 chroot_and_install_rpms glib
 build_rpm_in_chroot_no_install createrepo_c
 

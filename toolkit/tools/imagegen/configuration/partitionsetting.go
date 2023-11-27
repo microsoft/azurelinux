@@ -56,3 +56,21 @@ func (p *PartitionSetting) UnmarshalJSON(b []byte) (err error) {
 	}
 	return
 }
+
+// FindRootPartitionSetting returns a pointer to the partition setting describing the disk which
+// will be mounted at "/", or nil if no partition is found
+func FindRootPartitionSetting(partitionSettings []PartitionSetting) (rootPartitionSetting *PartitionSetting) {
+	return FindMountpointPartitionSetting(partitionSettings, "/")
+}
+
+// FindMountpointPartitionSetting will search a list of partition settings for the partition setting
+// corresponding to a mount point.
+func FindMountpointPartitionSetting(partitionSettings []PartitionSetting, mountPoint string) (partitionSetting *PartitionSetting) {
+	for _, p := range partitionSettings {
+		if p.MountPoint == mountPoint {
+			// We want to reference the actual object in the slice
+			return &p
+		}
+	}
+	return nil
+}

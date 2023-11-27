@@ -14,8 +14,38 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestUpdateHostname(t *testing.T) {
+	if os.Geteuid() != 0 {
+		t.Skip("Test must be run as root because it uses a chroot")
+	}
+
+	// Setup environment.
+	proposedDir := filepath.Join(tmpDir, "TestUpdateHostname")
+	chroot := safechroot.NewChroot(proposedDir, false)
+	err := chroot.Initialize("", []string{}, []*safechroot.MountPoint{})
+	assert.NoError(t, err)
+	defer chroot.Close(false)
+
+	err = os.MkdirAll(filepath.Join(chroot.RootDir(), "etc"), os.ModePerm)
+	assert.NoError(t, err)
+
+	// Set hostname.
+	expectedHostname := "testhostname"
+	err = updateHostname(expectedHostname, chroot)
+	assert.NoError(t, err)
+
+	// Ensure hostname was correctly set.
+	actualHostname, err := os.ReadFile(filepath.Join(chroot.RootDir(), "etc/hostname"))
+	assert.NoError(t, err)
+	assert.Equal(t, expectedHostname, string(actualHostname))
+}
+
 func TestCopyAdditionalFiles(t *testing.T) {
-	proposedDir := filepath.Join(tmpDir, "chroot", "TestCopyAdditionalFiles")
+	if os.Geteuid() != 0 {
+		t.Skip("Test must be run as root because it uses a chroot")
+	}
+
+	proposedDir := filepath.Join(tmpDir, "TestCopyAdditionalFiles")
 	chroot := safechroot.NewChroot(proposedDir, false)
 	baseConfigPath := testDir
 
