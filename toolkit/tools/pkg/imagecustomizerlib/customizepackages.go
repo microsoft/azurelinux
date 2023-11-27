@@ -66,7 +66,7 @@ func addRemoveAndUpdatePackages(buildDir string, baseConfigPath string, config *
 		return err
 	}
 
-	logger.Log.Infof("Updating packages: %v", allPackagesInstall)
+	logger.Log.Infof("Updating packages: %v", allPackagesUpdate)
 	err = installOrUpdatePackages("update", allPackagesUpdate, imageChroot)
 	if err != nil {
 		return err
