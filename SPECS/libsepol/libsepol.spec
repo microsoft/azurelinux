@@ -1,7 +1,7 @@
 Summary:        SELinux binary policy manipulation library
 Name:           libsepol
-Version:        3.2
-Release:        2%{?dist}
+Version:        3.5
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -84,11 +84,16 @@ exit 0
 
 %files
 %defattr(-,root,root)
+%license LICENSE
 %{_libdir}/libsepol.so.2
+%{_bindir}/sepol_check_access
+%{_bindir}/sepol_compute_av
+%{_bindir}/sepol_compute_member
+%{_bindir}/sepol_compute_relabel
+%{_bindir}/sepol_validate_transition
 
 %files devel
 %defattr(-,root,root)
-%license COPYING
 %{_libdir}/libsepol.so
 %{_libdir}/libsepol.a
 %{_libdir}/pkgconfig/libsepol.pc
@@ -100,6 +105,9 @@ exit 0
 %{_mandir}/man3/*.3.gz
 
 %changelog
+* Fri Nov 24 2023 Andrew Phelps <anphel@microsoft.com> - 3.5-1
+- Upgrade to version 3.5
+
 * Thu Nov 04 2021 Pawel Winogrodzki <pawel.winogrodzki@microsoft.com> - 3.2-2
 - Fixing BR on "CUnit-devel".
 - Switching to source tarball for full SELinux project to include test dependencies.

@@ -2,16 +2,14 @@
 
 Summary:        libssh2 is a library implementing the SSH2 protocol.
 Name:           libssh2
-Version:        1.9.0
-Release:        3%{?dist}
+Version:        1.11.0
+Release:        1%{?dist}
 License:        BSD
 URL:            https://www.libssh2.org/
 Group:          System Environment/NetworkingLibraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://www.libssh2.org/download/libssh2-%{version}.tar.gz
-Patch0:         CVE-2019-17498.patch
-Patch1:         CVE-2020-22218.patch
 BuildRequires:  openssl-devel
 BuildRequires:  zlib-devel
 
@@ -59,6 +57,9 @@ find %{buildroot} -name '*.la' -exec rm -f {} ';'
 %{_mandir}/man3/*
 
 %changelog
+* Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.11.0-1
+- Auto-upgrade to 1.11.0 - Azure Linux 3.0 - package upgrades
+
 * Wed Sep 13 2023 Suresh Thelkar <sthelkar@microsoft.com> - 1.9.0-3
 - Add patch for CVE-2020-22218
 
