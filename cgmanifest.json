@@ -10881,8 +10881,8 @@
         "type": "other",
         "other": {
           "name": "libsepol",
-          "version": "3.2",
-          "downloadUrl": "https://github.com/SELinuxProject/selinux/archive/refs/tags/3.2.tar.gz"
+          "version": "3.5",
+          "downloadUrl": "https://github.com/SELinuxProject/selinux/archive/refs/tags/3.5.tar.gz"
         }
       }
     },
@@ -15584,8 +15584,8 @@
         "type": "other",
         "other": {
           "name": "pam",
-          "version": "1.5.1",
-          "downloadUrl": "https://github.com/linux-pam/linux-pam/releases/download/v1.5.1/Linux-PAM-1.5.1.tar.xz"
+          "version": "1.5.3",
+          "downloadUrl": "https://github.com/linux-pam/linux-pam/releases/download/v1.5.3/Linux-PAM-1.5.3.tar.xz"
         }
       }
     },

@@ -198,7 +198,7 @@ libxml2-2.11.5-1.cm2.aarch64.rpm
 libxml2-devel-2.11.5-1.cm2.aarch64.rpm
 docbook-dtd-xml-4.5-11.cm2.noarch.rpm
 docbook-style-xsl-1.79.1-13.cm2.noarch.rpm
-libsepol-3.2-2.cm2.aarch64.rpm
+libsepol-3.5-1.cm2.aarch64.rpm
 glib-2.71.0-2.cm2.aarch64.rpm
 libltdl-2.4.7-1.cm2.aarch64.rpm
 libltdl-devel-2.4.7-1.cm2.aarch64.rpm

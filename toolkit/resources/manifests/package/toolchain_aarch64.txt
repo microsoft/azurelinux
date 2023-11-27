@@ -196,9 +196,9 @@ libselinux-debuginfo-3.5-1.cm2.aarch64.rpm
 libselinux-devel-3.5-1.cm2.aarch64.rpm
 libselinux-python3-3.5-1.cm2.aarch64.rpm
 libselinux-utils-3.5-1.cm2.aarch64.rpm
-libsepol-3.2-2.cm2.aarch64.rpm
-libsepol-debuginfo-3.2-2.cm2.aarch64.rpm
-libsepol-devel-3.2-2.cm2.aarch64.rpm
+libsepol-3.5-1.cm2.aarch64.rpm
+libsepol-debuginfo-3.5-1.cm2.aarch64.rpm
+libsepol-devel-3.5-1.cm2.aarch64.rpm
 libsolv-0.7.24-1.cm2.aarch64.rpm
 libsolv-debuginfo-0.7.24-1.cm2.aarch64.rpm
 libsolv-devel-0.7.24-1.cm2.aarch64.rpm
@@ -286,10 +286,10 @@ p11-kit-debuginfo-0.25.0-1.cm2.aarch64.rpm
 p11-kit-devel-0.25.0-1.cm2.aarch64.rpm
 p11-kit-server-0.25.0-1.cm2.aarch64.rpm
 p11-kit-trust-0.25.0-1.cm2.aarch64.rpm
-pam-1.5.1-6.cm2.aarch64.rpm
-pam-debuginfo-1.5.1-6.cm2.aarch64.rpm
-pam-devel-1.5.1-6.cm2.aarch64.rpm
-pam-lang-1.5.1-6.cm2.aarch64.rpm
+pam-1.5.3-1.cm2.aarch64.rpm
+pam-debuginfo-1.5.3-1.cm2.aarch64.rpm
+pam-devel-1.5.3-1.cm2.aarch64.rpm
+pam-lang-1.5.3-1.cm2.aarch64.rpm
 patch-2.7.6-8.cm2.aarch64.rpm
 patch-debuginfo-2.7.6-8.cm2.aarch64.rpm
 pcre2-10.42-1.cm2.aarch64.rpm
