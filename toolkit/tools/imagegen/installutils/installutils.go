@@ -1070,7 +1070,7 @@ func CallGrubMkconfig(installChroot *safechroot.Chroot) (err error) {
 
 	ReportActionf("Running grub2-mkconfig...")
 	err = installChroot.UnsafeRun(func() error {
-		return shell.ExecuteLive(squashErrors, "grub2-mkconfig", "-o", "/boot/grub2/grub.cfg") 
+		return shell.ExecuteLive(squashErrors, "grub2-mkconfig", "-o", "/boot/grub2/grub.cfg")
 	})
 
 	return

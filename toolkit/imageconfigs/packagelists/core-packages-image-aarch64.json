@@ -1,7 +1,7 @@
 {
     "packages": [
-        "grub2-configuration",
         "shim-unsigned",
+        "grub2-configuration",
         "grub2-efi-binary",
         "ca-certificates",
         "cronie-anacron",
