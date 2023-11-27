@@ -69,7 +69,7 @@ libcap-ng-devel-0.8.3-1.cm2.aarch64.rpm
 util-linux-2.37.4-8.cm2.aarch64.rpm
 util-linux-devel-2.37.4-8.cm2.aarch64.rpm
 util-linux-libs-2.37.4-8.cm2.aarch64.rpm
-tar-1.34-2.cm2.aarch64.rpm
+tar-1.35-1.cm2.aarch64.rpm
 xz-5.4.4-1.cm2.aarch64.rpm
 xz-devel-5.4.4-1.cm2.aarch64.rpm
 xz-lang-5.4.4-1.cm2.aarch64.rpm
