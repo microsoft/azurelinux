@@ -16864,8 +16864,8 @@
         "type": "other",
         "other": {
           "name": "perl-DBD-SQLite",
-          "version": "1.70",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/I/IS/ISHIGAKI/DBD-SQLite-1.70.tar.gz"
+          "version": "1.74",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/I/IS/ISHIGAKI/DBD-SQLite-1.74.tar.gz"
         }
       }
     },
@@ -20914,8 +20914,8 @@
         "type": "other",
         "other": {
           "name": "pinentry",
-          "version": "1.2.0",
-          "downloadUrl": "https://gnupg.org/ftp/gcrypt/pinentry/pinentry-1.2.0.tar.bz2"
+          "version": "1.2.1",
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/pinentry/pinentry-1.2.1.tar.bz2"
         }
       }
     },
@@ -20964,8 +20964,8 @@
         "type": "other",
         "other": {
           "name": "pkgconf",
-          "version": "1.8.0",
-          "downloadUrl": "https://distfiles.dereferenced.org/pkgconf/pkgconf-1.8.0.tar.xz"
+          "version": "2.0.2",
+          "downloadUrl": "https://distfiles.dereferenced.org/pkgconf/pkgconf-2.0.2.tar.xz"
         }
       }
     },

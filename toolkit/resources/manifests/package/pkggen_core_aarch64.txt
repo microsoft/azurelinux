@@ -29,10 +29,10 @@ libgomp-13.2.0-1.cm2.aarch64.rpm
 libgomp-devel-13.2.0-1.cm2.aarch64.rpm
 gcc-13.2.0-1.cm2.aarch64.rpm
 gcc-c++-13.2.0-1.cm2.aarch64.rpm
-libpkgconf-1.8.0-3.cm2.aarch64.rpm
-pkgconf-1.8.0-3.cm2.aarch64.rpm
-pkgconf-m4-1.8.0-3.cm2.noarch.rpm
-pkgconf-pkg-config-1.8.0-3.cm2.aarch64.rpm
+libpkgconf-2.0.2-1.cm2.aarch64.rpm
+pkgconf-2.0.2-1.cm2.aarch64.rpm
+pkgconf-m4-2.0.2-1.cm2.noarch.rpm
+pkgconf-pkg-config-2.0.2-1.cm2.aarch64.rpm
 ncurses-6.4-1.cm2.aarch64.rpm
 ncurses-compat-6.4-1.cm2.aarch64.rpm
 ncurses-devel-6.4-1.cm2.aarch64.rpm
@@ -220,7 +220,7 @@ libksba-1.6.4-1.cm2.aarch64.rpm
 libksba-devel-1.6.4-1.cm2.aarch64.rpm
 libxslt-1.1.34-7.cm2.aarch64.rpm
 npth-1.6-4.cm2.aarch64.rpm
-pinentry-1.2.0-1.cm2.aarch64.rpm
+pinentry-1.2.1-1.cm2.aarch64.rpm
 gnupg2-2.4.3-1.cm2.aarch64.rpm
 gnupg2-lang-2.4.3-1.cm2.aarch64.rpm
 gpgme-1.16.0-2.cm2.aarch64.rpm
