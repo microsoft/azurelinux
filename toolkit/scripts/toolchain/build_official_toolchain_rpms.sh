@@ -651,6 +651,11 @@ build_rpm_in_chroot_no_install attr
 chroot_and_install_rpms libattr-devel
 build_rpm_in_chroot_no_install librepo
 chroot_and_install_rpms librepo
+build_rpm_in_chroot_no_install libyaml
+chroot_and_install_rpms libyaml
+
+build_rpm_in_chroot_no_install libmodulemd
+chroot_and_install_rpms libmodulemd
 
 # dnf5 needs util-linux
 build_rpm_in_chroot_no_install dnf5-bootstrap

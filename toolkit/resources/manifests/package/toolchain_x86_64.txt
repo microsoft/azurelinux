@@ -192,6 +192,8 @@ libltdl-devel-2.4.7-1.cm2.x86_64.rpm
 libmetalink-0.1.3-1.cm2.x86_64.rpm
 libmetalink-debuginfo-0.1.3-1.cm2.x86_64.rpm
 libmetalink-devel-0.1.3-1.cm2.x86_64.rpm
+libmodulemd-2.13.0-3.cm2.x86_64.rpm
+libmodulemd-devel-2.13.0-3.cm2.x86_64.rpm
 libmpc-1.2.1-1.cm2.x86_64.rpm
 libmpc-debuginfo-1.2.1-1.cm2.x86_64.rpm
 libpipeline-1.5.7-1.cm2.x86_64.rpm
@@ -232,6 +234,8 @@ libxcrypt-devel-4.4.27-3.cm2.x86_64.rpm
 libxslt-1.1.34-7.cm2.x86_64.rpm
 libxslt-debuginfo-1.1.34-7.cm2.x86_64.rpm
 libxslt-devel-1.1.34-7.cm2.x86_64.rpm
+libyaml-0.2.5-3.cm2.x86_64.rpm
+libyaml-devel-0.2.5-3.cm2.x86_64.rpm
 lua-5.4.4-1.cm2.x86_64.rpm
 lua-debuginfo-5.4.4-1.cm2.x86_64.rpm
 lua-devel-5.4.4-1.cm2.x86_64.rpm
