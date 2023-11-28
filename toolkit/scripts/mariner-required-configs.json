@@ -1216,10 +1216,10 @@
             },
             "CONFIG_CUSE": {
                 "value": [
-                    "m",
+                    "m"
                 ],
                 "arch": [
-                    "AMD64",
+                    "AMD64"
                 ],
                 "comment": "Enable CUSE to support Nvidia rshim interface for Mariner hosts",
                 "PR": [
