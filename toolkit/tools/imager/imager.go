@@ -735,6 +735,7 @@ func configureDiskBootloader(systemConfig configuration.SystemConfig, installChr
 		return
 	}
 
+	// Use grub mkconfig to replace the static template .cfg with a dynamically generated version if desired.
 	if systemConfig.EnableGrubMkconfig {
 		err = installutils.CallGrubMkconfig(installChroot)
 		if err != nil {
