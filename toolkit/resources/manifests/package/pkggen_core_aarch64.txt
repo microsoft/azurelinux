@@ -199,7 +199,7 @@ libxml2-devel-2.11.5-1.cm2.aarch64.rpm
 docbook-dtd-xml-4.5-11.cm2.noarch.rpm
 docbook-style-xsl-1.79.1-13.cm2.noarch.rpm
 libsepol-3.5-1.cm2.aarch64.rpm
-glib-2.71.0-2.cm2.aarch64.rpm
+glib-2.78.1-1.cm2.aarch64.rpm
 libltdl-2.4.7-1.cm2.aarch64.rpm
 libltdl-devel-2.4.7-1.cm2.aarch64.rpm
 pcre-8.45-2.cm2.aarch64.rpm
@@ -253,5 +253,5 @@ msopenjdk-11-11.0.20.1-1.aarch64.rpm
 pyproject-rpm-macros-1.0.0~rc1-4.cm2.noarch.rpm
 audit-3.1.2-1.cm2.aarch64.rpm
 audit-libs-3.1.2-1.cm2.aarch64.rpm
-libxcrypt-4.4.27-3.cm2.aarch64.rpm
-libxcrypt-devel-4.4.27-3.cm2.aarch64.rpm
+libxcrypt-4.4.36-1.cm2.aarch64.rpm
+libxcrypt-devel-4.4.36-1.cm2.aarch64.rpm

@@ -101,11 +101,11 @@ gdbm-lang-1.23-1.cm2.aarch64.rpm
 gettext-0.22-1.cm2.aarch64.rpm
 gettext-debuginfo-0.22-1.cm2.aarch64.rpm
 gfortran-13.2.0-1.cm2.aarch64.rpm
-glib-2.71.0-2.cm2.aarch64.rpm
-glib-debuginfo-2.71.0-2.cm2.aarch64.rpm
-glib-devel-2.71.0-2.cm2.aarch64.rpm
-glib-doc-2.71.0-2.cm2.noarch.rpm
-glib-schemas-2.71.0-2.cm2.aarch64.rpm
+glib-2.78.1-1.cm2.aarch64.rpm
+glib-debuginfo-2.78.1-1.cm2.aarch64.rpm
+glib-devel-2.78.1-1.cm2.aarch64.rpm
+glib-doc-2.78.1-1.cm2.noarch.rpm
+glib-schemas-2.78.1-1.cm2.aarch64.rpm
 glibc-2.38-1.cm2.aarch64.rpm
 glibc-debuginfo-2.38-1.cm2.aarch64.rpm
 glibc-devel-2.38-1.cm2.aarch64.rpm
@@ -213,9 +213,9 @@ libtasn1-debuginfo-4.19.0-1.cm2.aarch64.rpm
 libtasn1-devel-4.19.0-1.cm2.aarch64.rpm
 libtool-2.4.7-1.cm2.aarch64.rpm
 libtool-debuginfo-2.4.7-1.cm2.aarch64.rpm
-libxcrypt-4.4.27-3.cm2.aarch64.rpm
-libxcrypt-debuginfo-4.4.27-3.cm2.aarch64.rpm
-libxcrypt-devel-4.4.27-3.cm2.aarch64.rpm
+libxcrypt-4.4.36-1.cm2.aarch64.rpm
+libxcrypt-debuginfo-4.4.36-1.cm2.aarch64.rpm
+libxcrypt-devel-4.4.36-1.cm2.aarch64.rpm
 libxml2-2.11.5-1.cm2.aarch64.rpm
 libxml2-debuginfo-2.11.5-1.cm2.aarch64.rpm
 libxml2-devel-2.11.5-1.cm2.aarch64.rpm
@@ -385,7 +385,7 @@ perl-Filter-1.59-488.cm2.aarch64.rpm
 perl-Filter-Simple-0.96-488.cm2.noarch.rpm
 perl-FindBin-1.52-488.cm2.noarch.rpm
 perl-GDBM_File-1.19-488.cm2.aarch64.rpm
-perl-generators-1.11-9.cm2.noarch.rpm
+perl-generators-1.15-1.cm2.noarch.rpm
 perl-Getopt-Long-2.52-488.cm2.noarch.rpm
 perl-Getopt-Std-1.13-488.cm2.noarch.rpm
 perl-Hash-Util-0.25-488.cm2.aarch64.rpm
@@ -529,7 +529,7 @@ python3-Cython-3.0.5-1.cm2.aarch64.rpm
 python3-debuginfo-3.9.14-8.cm2.aarch64.rpm
 python3-devel-3.9.14-8.cm2.aarch64.rpm
 python3-gpg-1.16.0-2.cm2.aarch64.rpm
-python3-jinja2-3.0.3-2.cm2.noarch.rpm
+python3-jinja2-3.1.2-1.cm2.noarch.rpm
 python3-libcap-ng-0.8.3-1.cm2.aarch64.rpm
 python3-libs-3.9.14-8.cm2.aarch64.rpm
 python3-libxml2-2.11.5-1.cm2.aarch64.rpm

@@ -4330,8 +4330,8 @@
         "type": "other",
         "other": {
           "name": "glib",
-          "version": "2.71.0",
-          "downloadUrl": "https://ftp.gnome.org/pub/gnome/sources/glib/2.71/glib-2.71.0.tar.xz"
+          "version": "2.78.1",
+          "downloadUrl": "https://ftp.gnome.org/pub/gnome/sources/glib/2.78/glib-2.78.1.tar.xz"
         }
       }
     },
@@ -11631,8 +11631,8 @@
         "type": "other",
         "other": {
           "name": "libxcrypt",
-          "version": "4.4.27",
-          "downloadUrl": "https://github.com/besser82/libxcrypt/archive/v4.4.27/libxcrypt-4.4.27.tar.gz"
+          "version": "4.4.36",
+          "downloadUrl": "https://github.com/besser82/libxcrypt/archive/v4.4.36/libxcrypt-4.4.36.tar.gz"
         }
       }
     },
@@ -17594,8 +17594,8 @@
         "type": "other",
         "other": {
           "name": "perl-generators",
-          "version": "1.11",
-          "downloadUrl": "https://jplesnik.fedorapeople.org/generators/generators-1.11.tar.gz"
+          "version": "1.15",
+          "downloadUrl": "https://jplesnik.fedorapeople.org/generators/generators-1.15.tar.gz"
         }
       }
     },
@@ -22784,8 +22784,8 @@
         "type": "other",
         "other": {
           "name": "python-jinja2",
-          "version": "3.0.3",
-          "downloadUrl": "https://files.pythonhosted.org/packages/91/a5/429efc6246119e1e3fbf562c00187d04e83e54619249eb732bb423efa6c6/Jinja2-3.0.3.tar.gz"
+          "version": "3.1.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/j/jinja2/Jinja2-3.1.2.tar.gz"
         }
       }
     },
