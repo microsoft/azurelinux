@@ -123,9 +123,9 @@ gnupg2-debuginfo-2.4.3-1.cm2.x86_64.rpm
 gnupg2-lang-2.4.3-1.cm2.x86_64.rpm
 gperf-3.1-5.cm2.x86_64.rpm
 gperf-debuginfo-3.1-5.cm2.x86_64.rpm
-gpgme-1.16.0-2.cm2.x86_64.rpm
-gpgme-debuginfo-1.16.0-2.cm2.x86_64.rpm
-gpgme-devel-1.16.0-2.cm2.x86_64.rpm
+gpgme-1.23.2-1.cm2.x86_64.rpm
+gpgme-debuginfo-1.23.2-1.cm2.x86_64.rpm
+gpgme-devel-1.23.2-1.cm2.x86_64.rpm
 grep-3.11-1.cm2.x86_64.rpm
 grep-debuginfo-3.11-1.cm2.x86_64.rpm
 grep-lang-3.11-1.cm2.x86_64.rpm
@@ -219,9 +219,9 @@ libxml2-devel-2.11.5-1.cm2.x86_64.rpm
 libxcrypt-4.4.36-1.cm2.x86_64.rpm
 libxcrypt-debuginfo-4.4.36-1.cm2.x86_64.rpm
 libxcrypt-devel-4.4.36-1.cm2.x86_64.rpm
-libxslt-1.1.34-7.cm2.x86_64.rpm
-libxslt-debuginfo-1.1.34-7.cm2.x86_64.rpm
-libxslt-devel-1.1.34-7.cm2.x86_64.rpm
+libxslt-1.1.39-1.cm2.x86_64.rpm
+libxslt-debuginfo-1.1.39-1.cm2.x86_64.rpm
+libxslt-devel-1.1.39-1.cm2.x86_64.rpm
 lua-5.4.4-1.cm2.x86_64.rpm
 lua-debuginfo-5.4.4-1.cm2.x86_64.rpm
 lua-devel-5.4.4-1.cm2.x86_64.rpm
@@ -528,7 +528,7 @@ python3-curses-3.9.14-8.cm2.x86_64.rpm
 python3-Cython-3.0.5-1.cm2.x86_64.rpm
 python3-debuginfo-3.9.14-8.cm2.x86_64.rpm
 python3-devel-3.9.14-8.cm2.x86_64.rpm
-python3-gpg-1.16.0-2.cm2.x86_64.rpm
+python3-gpg-1.23.2-1.cm2.x86_64.rpm
 python3-jinja2-3.1.2-1.cm2.noarch.rpm
 python3-libcap-ng-0.8.3-1.cm2.x86_64.rpm
 python3-libs-3.9.14-8.cm2.x86_64.rpm

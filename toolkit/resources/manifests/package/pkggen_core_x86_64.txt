@@ -218,12 +218,12 @@ libgpg-error-1.47-1.cm2.x86_64.rpm
 libgcrypt-1.10.2-1.cm2.x86_64.rpm
 libksba-1.6.4-1.cm2.x86_64.rpm
 libksba-devel-1.6.4-1.cm2.x86_64.rpm
-libxslt-1.1.34-7.cm2.x86_64.rpm
+libxslt-1.1.39-1.cm2.x86_64.rpm
 npth-1.6-4.cm2.x86_64.rpm
 pinentry-1.2.1-1.cm2.x86_64.rpm
 gnupg2-2.4.3-1.cm2.x86_64.rpm
 gnupg2-lang-2.4.3-1.cm2.x86_64.rpm
-gpgme-1.16.0-2.cm2.x86_64.rpm
+gpgme-1.23.2-1.cm2.x86_64.rpm
 mariner-repos-shared-2.0-8.cm2.noarch.rpm
 mariner-repos-2.0-8.cm2.noarch.rpm
 libffi-3.4.4-1.cm2.x86_64.rpm
