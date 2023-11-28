@@ -28,7 +28,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.15.138.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -426,8 +426,11 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Wed Nov 22 2023 Thien Trung Vuong <tvuong@microsoft.com> - 5.15.138.1-2
+* Tue Nov 28 2023 Thien Trung Vuong <tvuong@microsoft.com> - 5.15.138.1-3
 - Enable CONFIG_BPF_LSM
+
+* Wed Nov 22 2023 David Daney <daviddaney@microsoft.com> - 5.15.138.1-2
+- Add IOMMU configs for aarch64
 
 * Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.138.1-1
 - Auto-upgrade to 5.15.138.1

@@ -2917,6 +2917,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "double-conversion",
+          "version": "3.1.5",
+          "downloadUrl": "https://github.com/google/double-conversion/archive/v3.1.5/double-conversion-3.1.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "dovecot",
           "version": "2.3.20",
           "downloadUrl": "https://www.dovecot.org/releases/2.3/dovecot-2.3.20.tar.gz"
@@ -12021,8 +12031,8 @@
         "type": "other",
         "other": {
           "name": "linuxptp",
-          "version": "2.0",
-          "downloadUrl": "https://github.com/richardcochran/linuxptp/archive/e05809/linuxptp-e05809.tar.gz"
+          "version": "3.1.1",
+          "downloadUrl": "https://sourceforge.net/projects/linuxptp/files/v3.1/linuxptp-3.1.1.tgz"
         }
       }
     },
@@ -13615,6 +13625,16 @@
           "name": "msft-golang",
           "version": "1.19.12",
           "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.19.12-1/go.20230802.5.src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "msft-golang",
+          "version": "1.20.11",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.20.11-1/go.20231107.4.src.tar.gz"
         }
       }
     },
@@ -29387,8 +29407,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.0.2068",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.2068.tar.gz"
+          "version": "9.0.2112",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.2112.tar.gz"
         }
       }
     },

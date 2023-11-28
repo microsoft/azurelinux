@@ -1,32 +1,38 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-%global gitfullver e0580929f451e685d92cd10d80b76f39e9b09a97
-%global gitver %(c=%{gitfullver}; echo ${c:0:6})
 %global _hardened_build 1
-%global testsuite_ver a7f6e1
-%global clknetsim_ver 79ffe4
+%global testsuite_ver ff37e2
+%global clknetsim_ver 9ed48d
 
 Name:		linuxptp
-Version:	2.0
-Release:	8%{?dist}
+Version:	3.1.1
+Release:	1%{?dist}
 Summary:	PTP implementation for Linux
 
 License:	GPLv2+
 URL:		http://linuxptp.sourceforge.net/
 
-#Source0:	https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tgz
-Source0:	https://github.com/richardcochran/%{name}/archive/%{gitver}/%{name}-%{gitver}.tar.gz
+Source0:	https://sourceforge.net/projects/%{name}/files/v3.1/%{name}-%{version}.tgz
 Source1:	phc2sys.service
 Source2:	ptp4l.service
 Source3:	timemaster.service
 Source4:	timemaster.conf
+Source5:	ptp4l.conf
 # external test suite
-Source10:	https://github.com/mlichvar/linuxptp-testsuite/archive/%{testsuite_ver}/linuxptp-testsuite-%{testsuite_ver}.tar.gz
+Source10:	linuxptp-testsuite-%{testsuite_ver}.tar.gz
 # simulator for test suite
-Source11:	https://github.com/mlichvar/clknetsim/archive/%{clknetsim_ver}/clknetsim-%{clknetsim_ver}.tar.gz
+Source11:	clknetsim-%{clknetsim_ver}.tar.gz
 
-BuildRequires:	gcc gcc-c++ systemd
-BuildRequires:	net-snmp-devel
+# fix handling of zero-length messages
+Patch0:		linuxptp-zerolength.patch
+# revert phc2sys options needed by the older version of test suite
+Patch1:		clknetsim-phc2sys.patch
+
+# The following patch is a combination of multiple patches to enable HA in linuxptp
+# https://review.opendev.org/c/starlingx/integ/+/891638
+Patch2:         enable-ha.patch
+
+BuildRequires:	gcc gcc-c++ make systemd
 
 %{?systemd_requires}
 
@@ -39,11 +45,18 @@ Supporting legacy APIs and other platforms is not a goal.
 
 %prep
 %setup -q -a 10 -a 11 -n %{name}-%{!?gitfullver:%{version}}%{?gitfullver}
+%patch0 -p1 -b .zerolength
 mv linuxptp-testsuite-%{testsuite_ver}* testsuite
 mv clknetsim-%{clknetsim_ver}* testsuite/clknetsim
 
+pushd testsuite/clknetsim
+%patch1 -p1 -R -b .phc2sys
+popd
+
+%patch2 -p1 -b .pre-ha
+
 %build
-make %{?_smp_mflags} \
+%{make_build} \
 	EXTRA_CFLAGS="$RPM_OPT_FLAGS" \
 	EXTRA_LDFLAGS="$RPM_LD_FLAGS"
 
@@ -51,11 +64,10 @@ make %{?_smp_mflags} \
 %makeinstall
 
 mkdir -p $RPM_BUILD_ROOT{%{_sysconfdir}/sysconfig,%{_unitdir},%{_mandir}/man5}
-install -m 644 -p configs/default.cfg $RPM_BUILD_ROOT%{_sysconfdir}/ptp4l.conf
 install -m 644 -p %{SOURCE1} %{SOURCE2} %{SOURCE3} $RPM_BUILD_ROOT%{_unitdir}
-install -m 644 -p %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}
+install -m 644 -p %{SOURCE4} %{SOURCE5} $RPM_BUILD_ROOT%{_sysconfdir}
 
-echo 'OPTIONS="-f /etc/ptp4l.conf -i eth0"' > \
+echo 'OPTIONS="-f /etc/ptp4l.conf"' > \
 	$RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/ptp4l
 echo 'OPTIONS="-a -r"' > $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/phc2sys
 
@@ -66,7 +78,7 @@ echo '.so man8/timemaster.8' > $RPM_BUILD_ROOT%{_mandir}/man5/timemaster.conf.5
 cd testsuite
 # set random seed to get deterministic results
 export CLKNETSIM_RANDOM_SEED=26743
-make %{?_smp_mflags} -C clknetsim
+%{make_build} -C clknetsim
 PATH=..:$PATH ./run
 
 %post
@@ -93,15 +105,53 @@ PATH=..:$PATH ./run
 %{_sbindir}/phc_ctl
 %{_sbindir}/pmc
 %{_sbindir}/ptp4l
-%{_sbindir}/snmp4lptp
 %{_sbindir}/timemaster
+%{_sbindir}/ts2phc
 %{_mandir}/man5/*.5*
 %{_mandir}/man8/*.8*
 
 %changelog
-* Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-8
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Converting the 'Release' tag to the '[number].[distribution]' format.
+* Thu Nov 16 2023 Harshit Gupta <guptaharshit@microsoft.com> - 3.1.1-1
+- Initial CBL-Mariner import from Fedora 37 (license: MIT).
+- License Verified.
+- Upstream linuxptp 3.1.1-6 has been imported into Azure Linux with package 3.1.1-1
+- Remove SELinux policy
+
+* Wed Jan 11 2023 Miroslav Lichvar <mlichvar@redhat.com> 3.1.1-6
+- update selinux policy (#2159919)
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.1.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue Apr 26 2022 Miroslav Lichvar <mlichvar@redhat.com> 3.1.1-4
+- fix tests on ppc64le (#2046706)
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.1.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Miroslav Lichvar <mlichvar@redhat.com> 3.1.1-2
+- package selinux policy
+
+* Wed Jul 07 2021 Miroslav Lichvar <mlichvar@redhat.com> 3.1.1-1
+- update to 3.1.1 (CVE-2021-3570, CVE-2021-3571)
+
+* Tue Mar 02 2021 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 3.1-4
+- Rebuilt for updated systemd-rpm-macros
+  See https://pagure.io/fesco/issue/2583.
+
+* Thu Feb 25 2021 Miroslav Lichvar <mlichvar@redhat.com> 3.1-3
+- fix handling of zero-length messages
+- minimize default configuration
+- remove obsolete build requirement
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 3.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Sep 29 2020 Miroslav Lichvar <mlichvar@redhat.com> 3.1-1
+- update to 3.1
+
+* Mon Jul 27 2020 Miroslav Lichvar <mlichvar@redhat.com> 3.0-1
+- update to 3.0
 
 * Mon Feb 03 2020 Miroslav Lichvar <mlichvar@redhat.com> 2.0-7.20191225gite05809
 - update to 20191225gite05809
