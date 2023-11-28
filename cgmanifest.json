@@ -13864,7 +13864,7 @@
         "other": {
           "name": "ncurses",
           "version": "6.4",
-          "downloadUrl": "https://invisible-mirror.net/archives/ncurses/current/ncurses-6.4-20230408.tgz"
+          "downloadUrl": "https://invisible-mirror.net/archives/ncurses/current/ncurses-6.4-20231125.tgz"
         }
       }
     },
