@@ -1103,6 +1103,19 @@
                     "https://github.com/microsoft/CBL-Mariner/pull/5972"
                 ]
             },
+            "CONFIG_BPF_LSM": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "Allow customers to use BPF LSM programs",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6846"
+                ]
+            },
             "CONFIG_MCTP": {
                 "value": [
                     "is not set"
