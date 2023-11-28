@@ -62,6 +62,10 @@ parameters:
       - "false"
       - "true"
 
+  - name: maxCascadingRebuilds
+    type: string
+    default: ""
+
   - name: outputArtifactsFolder
     type: string
     default: "$(Build.ArtifactStagingDirectory)"
@@ -146,6 +150,7 @@ steps:
             echo "ERROR: toolchain archive not found!" >&2
             exit 1
           fi
+          echo "##vso[task.setvariable variable=toolchainArchive]$toolchain_archive"
 
           sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" toolchain TOOLCHAIN_ARCHIVE="$toolchain_archive"
         displayName: "Populate toolchain"
@@ -192,18 +197,24 @@ steps:
         use_ccache_arg="USE_CCACHE=n"
       fi
 
+      if [[ -n "${{ parameters.customToolchainArtifactName }}" ]]; then
+        toolchain_archive_arg="TOOLCHAIN_ARCHIVE=$(toolchainArchive)"
+      fi
+
       sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
         CONCURRENT_PACKAGE_BUILDS=${{ parameters.concurrentPackageBuilds }} \
         CONFIG_FILE="" \
+        MAX_CASCADING_REBUILDS="${{ parameters.maxCascadingRebuilds }}" \
         MAX_CPU="${{ parameters.maxCPU }}" \
         REBUILD_TOOLS=y \
         REPO_LIST="${{ parameters.extraPackageRepos }}" \
         SPECS_DIR="${{ parameters.buildRepoRoot }}/${{ parameters.specsFolderPath }}" \
         SRPM_PACK_LIST="${{ parameters.srpmPackList }}" \
+        TEST_RERUN_LIST="${{ parameters.testRerunList }}" \
         $delta_fetch_arg \
         $quick_rebuild_packages_arg \
         $run_check_arg \
-        TEST_RERUN_LIST="${{ parameters.testRerunList }}" \
+        $toolchain_archive_arg \
         $use_ccache_arg
     displayName: "Build packages"
 
