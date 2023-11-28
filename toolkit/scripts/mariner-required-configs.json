@@ -1213,6 +1213,103 @@
                 "PR": [
                     "https://github.com/microsoft/CBL-Mariner/pull/6574"
                 ]
+            },
+            "CONFIG_IOASID": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for CONFIG_ARM_SMMU",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6829"
+                ]
+            },
+            "CONFIG_IOMMU_SVA_LIB": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for CONFIG_ARM_SMMU_V3_SVA",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6829"
+                ]
+            },
+            "CONFIG_ARM_SMMU": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for VFIO to work",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6829"
+                ]
+            },
+            "CONFIG_ARM_SMMU_LEGACY_DT_BINDINGS": {
+                "value": [
+                    "<missing>",
+                    "is not set"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "No device tree support needed",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6829"
+                ]
+            },
+            "CONFIG_ARM_SMMU_DISABLE_BYPASS_BY_DEFAULT": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "More secure when set",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6829"
+                ]
+            },
+            "CONFIG_ARM_SMMU_QCOM": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Allow support of QCom SMMU, because why not?",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6829"
+                ]
+            },
+            "CONFIG_ARM_SMMU_V3": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for VFIO to work",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6829"
+                ]
+            },
+            "CONFIG_ARM_SMMU_V3_SVA": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for CONFIG_ARM_SMMU_V3",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6829"
+                ]
             }
         }
     }
