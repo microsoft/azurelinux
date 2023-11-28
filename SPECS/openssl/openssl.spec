@@ -36,7 +36,6 @@ Epoch: 1
 Source: https://www.openssl.org/source/openssl-%{version}.tar.gz
 Source2: Makefile.certificate
 Source3: genpatches
-# Source4: openssl.rpmlintrc
 Source6: make-dummy-cert
 Source7: renew-dummy-cert
 Source9: configuration-switch.h
@@ -50,12 +49,14 @@ Patch2:   0002-Use-more-general-default-values-in-openssl.cnf.patch
 # # Do not install html docs
 Patch3:   0003-Do-not-install-html-docs.patch
 # # Override default paths for the CA directory tree
+# AZL: NOTE: We do not use crypto-policies, so this patch does not apply.
 # Patch4:   0004-Override-default-paths-for-the-CA-directory-tree.patch
 # # apps/ca: fix md option help text
 Patch5:   0005-apps-ca-fix-md-option-help-text.patch
 # # Disable signature verification with totally unsafe hash algorithms
 Patch6:   0006-Disable-signature-verification-with-totally-unsafe-h.patch
 # # Add support for PROFILE=SYSTEM system default cipherlist
+# AZL: NOTE: We do not use crypto-policies, so this patch does not apply.
 # Patch7:   0007-Add-support-for-PROFILE-SYSTEM-system-default-cipher.patch
 # # Add FIPS_mode() compatibility macro
 Patch8:   0008-Add-FIPS_mode-compatibility-macro.patch
@@ -72,6 +73,7 @@ Patch12:  0012-Disable-explicit-ec.patch
 # # Skipped tests from former 0011-Remove-EC-curves.patch
 Patch13:  0013-skipped-tests-EC-curves.patch
 # # Instructions to load legacy provider in openssl.cnf
+# AZL: NOTE: Had to change this patch because of cascading changes from previous AZL note(s)
 Patch24:  0024-load-legacy-prov.patch
 # # We load FIPS provider and set FIPS properties implicitly
 Patch32:  0032-Force-fips.patch
@@ -88,12 +90,14 @@ Patch45:  0045-FIPS-services-minimize.patch
 # # Execute KATS before HMAC verification
 Patch47:  0047-FIPS-early-KATS.patch
 # # Selectively disallow SHA1 signatures rhbz#2070977
+# AZL: NOTE: Had to change this patch because of cascading changes from previous AZL note(s)
 Patch49:  0049-Allow-disabling-of-SHA1-signatures.patch
 # # Support SHA1 in TLS in LEGACY crypto-policy (which is SECLEVEL=1)
 Patch52:  0052-Allow-SHA1-in-seclevel-1-if-rh-allow-sha1-signatures.patch
 # # https://github.com/openssl/openssl/pull/18103
 # # The patch is incorporated in 3.0.3 but we provide this function since 3.0.1
 # # so the patch should persist
+# AZL: NOTE: Had to change this patch because of cascading changes from previous AZL note(s)
 Patch56:  0056-strcasecmp.patch
 # # https://bugzilla.redhat.com/show_bug.cgi?id=2053289
 Patch58:  0058-FIPS-limit-rsa-encrypt.patch
@@ -400,11 +404,6 @@ for lib in $RPM_BUILD_ROOT%{_libdir}/*.so.%{version} ; do
 	ln -s -f `basename ${lib}` $RPM_BUILD_ROOT%{_libdir}/`basename ${lib} .%{version}`
 	ln -s -f `basename ${lib}` $RPM_BUILD_ROOT%{_libdir}/`basename ${lib} .%{version}`.%{soversion}
 done
-
-# # Remove static libraries
-# for lib in $RPM_BUILD_ROOT%%{_libdir}/*.a ; do
-# 	rm -f ${lib}
-# done
 
 # Install a makefile for generating keys and self-signed certs, and a script
 # for generating them on the fly.
