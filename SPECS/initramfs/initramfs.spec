@@ -109,12 +109,6 @@ fi \
 echo "initramfs" %{version}-%{release} "posttrans" >&2
 %removal_action
 mkinitrd -q
-# Copy initrd generated for kernel-mshv to /boot/efi, where linuxloader expects to find it
-cp /boot/initrd.img-*mshv* /boot/efi/
-if [ $? -ne 0 ]; then
-    echo "WARNING: ESP partition (/boot/efi) is likely full!"
-fi
-
 %grub2_post
 
 %postun
@@ -146,7 +140,7 @@ echo "initramfs" %{version}-%{release} "postun" >&2
 %changelog
 * Fri Oct 06 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.0.14
 - Ensure grub2-mkconfig is called after the initramfs generation
-- Fix bug with 2.0.13 where we were mv'ing the initrd, not cp'ing as expected. 
+- Deprecate old linuxloader; no longer copy initrd image to efi partition 
 
 * Wed Jun 28 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.0.13
 - Copy the initrd image to /boot/efi to maintain backwards compatibility
