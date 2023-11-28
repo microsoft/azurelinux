@@ -60,6 +60,7 @@ nosetests
 
 %changelog
 * Mon Nov 27 2023 Tobias Brick <tobiasb@microsoft.com> - 23.9.1-1
+- Update to 23.9.1
 
 * Wed Oct 04 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.3.6-9
 - Add patch for CVE-2023-41419
