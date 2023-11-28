@@ -51,11 +51,18 @@ func (s *SystemConfig) IsValid() error {
 		}
 	}
 
+	partitionIDSet := make(map[string]bool)
 	for i, partition := range s.PartitionSettings {
 		err = partition.IsValid()
 		if err != nil {
 			return fmt.Errorf("invalid PartitionSettings item at index %d: %w", i, err)
 		}
+
+		if _, existingName := partitionIDSet[partition.ID]; existingName {
+			return fmt.Errorf("duplicate PartitionSettings ID used (%s) at index %d", partition.ID, i)
+		}
+
+		partitionIDSet[partition.ID] = false // dummy value
 	}
 
 	for i, script := range s.PostInstallScripts {

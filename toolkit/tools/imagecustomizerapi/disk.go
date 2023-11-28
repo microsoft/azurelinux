@@ -32,11 +32,18 @@ func (d *Disk) IsValid() error {
 		return fmt.Errorf("a disk's MaxSize value (%d) must be a positive non-zero number", d.MaxSize)
 	}
 
+	partitionIDSet := make(map[string]bool)
 	for i, partition := range d.Partitions {
 		err := partition.IsValid()
 		if err != nil {
 			return fmt.Errorf("invalid partition at index %d:\n%w", i, err)
 		}
+
+		if _, existingName := partitionIDSet[partition.ID]; existingName {
+			return fmt.Errorf("duplicate partition ID used (%s) at index %d", partition.ID, i)
+		}
+
+		partitionIDSet[partition.ID] = false // dummy value
 
 		if d.PartitionTableType == PartitionTableTypeGpt {
 			isESP := sliceutils.ContainsValue(partition.Flags, PartitionFlagESP)

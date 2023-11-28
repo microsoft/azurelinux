@@ -94,7 +94,7 @@ func TestDiskIsValidTwoExpanding(t *testing.T) {
 				Start:  1,
 			},
 			{
-				ID:     "a",
+				ID:     "b",
 				FsType: "ext4",
 				Start:  2,
 			},
@@ -118,7 +118,7 @@ func TestDiskIsValidOverlaps(t *testing.T) {
 				End:    ptrutils.PtrTo(uint64(3)),
 			},
 			{
-				ID:     "a",
+				ID:     "b",
 				FsType: "ext4",
 				Start:  2,
 				End:    ptrutils.PtrTo(uint64(4)),
@@ -143,7 +143,7 @@ func TestDiskIsValidOverlapsExpanding(t *testing.T) {
 				End:    ptrutils.PtrTo(uint64(3)),
 			},
 			{
-				ID:     "a",
+				ID:     "b",
 				FsType: "ext4",
 				Start:  2,
 			},
@@ -167,7 +167,7 @@ func TestDiskIsValidTooSmall(t *testing.T) {
 				End:    ptrutils.PtrTo(uint64(2)),
 			},
 			{
-				ID:     "a",
+				ID:     "b",
 				FsType: "ext4",
 				Start:  3,
 				End:    ptrutils.PtrTo(uint64(4)),
@@ -192,7 +192,7 @@ func TestDiskIsValidTooSmallExpanding(t *testing.T) {
 				End:    ptrutils.PtrTo(uint64(3)),
 			},
 			{
-				ID:     "a",
+				ID:     "b",
 				FsType: "ext4",
 				Start:  3,
 			},
@@ -260,4 +260,28 @@ func TestDiskIsValidMissingBootFlag(t *testing.T) {
 	assert.ErrorContains(t, err, "esp")
 	assert.ErrorContains(t, err, "boot")
 	assert.ErrorContains(t, err, "flag")
+}
+
+func TestDiskIsValidDuplicatePartitionId(t *testing.T) {
+	disk := &Disk{
+		PartitionTableType: PartitionTableTypeGpt,
+		MaxSize:            2,
+		Partitions: []Partition{
+			{
+				ID:     "a",
+				FsType: "ext4",
+				Start:  1,
+				End:    ptrutils.PtrTo(uint64(2)),
+			},
+			{
+				ID:     "a",
+				FsType: "ext4",
+				Start:  2,
+			},
+		},
+	}
+
+	err := disk.IsValid()
+	assert.Error(t, err)
+	assert.ErrorContains(t, err, "duplicate partition ID")
 }
