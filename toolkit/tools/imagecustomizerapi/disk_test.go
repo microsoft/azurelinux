@@ -27,6 +27,42 @@ func TestDiskIsValid(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func TestDiskIsValidWithEnd(t *testing.T) {
+	disk := &Disk{
+		PartitionTableType: PartitionTableTypeGpt,
+		MaxSize:            2,
+		Partitions: []Partition{
+			{
+				ID:     "a",
+				FsType: "ext4",
+				Start:  1,
+				End:    ptrutils.PtrTo(uint64(2)),
+			},
+		},
+	}
+
+	err := disk.IsValid()
+	assert.NoError(t, err)
+}
+
+func TestDiskIsValidWithSize(t *testing.T) {
+	disk := &Disk{
+		PartitionTableType: PartitionTableTypeGpt,
+		MaxSize:            2,
+		Partitions: []Partition{
+			{
+				ID:     "a",
+				FsType: "ext4",
+				Start:  1,
+				Size:   ptrutils.PtrTo(uint64(1)),
+			},
+		},
+	}
+
+	err := disk.IsValid()
+	assert.NoError(t, err)
+}
+
 func TestDiskIsValidStartAt0(t *testing.T) {
 	disk := &Disk{
 		PartitionTableType: PartitionTableTypeGpt,

@@ -15,7 +15,6 @@ func TestPartitionIsValidExpanding(t *testing.T) {
 		ID:     "a",
 		FsType: "ext4",
 		Start:  0,
-		End:    nil,
 	}
 
 	err := partition.IsValid()
@@ -48,6 +47,20 @@ func TestPartitionIsValidZeroSize(t *testing.T) {
 	assert.ErrorContains(t, err, "size")
 }
 
+func TestPartitionIsValidZeroSizeV2(t *testing.T) {
+	partition := Partition{
+		ID:     "a",
+		FsType: "ext4",
+		Start:  0,
+		Size:   ptrutils.PtrTo(uint64(0)),
+	}
+
+	err := partition.IsValid()
+	assert.Error(t, err)
+	assert.ErrorContains(t, err, "partition")
+	assert.ErrorContains(t, err, "size")
+}
+
 func TestPartitionIsValidNegativeSize(t *testing.T) {
 	partition := Partition{
 		ID:     "a",
@@ -60,6 +73,21 @@ func TestPartitionIsValidNegativeSize(t *testing.T) {
 	assert.Error(t, err)
 	assert.ErrorContains(t, err, "partition")
 	assert.ErrorContains(t, err, "size")
+}
+
+func TestPartitionIsValidBothEndAndSize(t *testing.T) {
+	partition := Partition{
+		ID:     "a",
+		FsType: "ext4",
+		Start:  2,
+		End:    ptrutils.PtrTo(uint64(3)),
+		Size:   ptrutils.PtrTo(uint64(1)),
+	}
+
+	err := partition.IsValid()
+	assert.Error(t, err)
+	assert.ErrorContains(t, err, "End")
+	assert.ErrorContains(t, err, "Size")
 }
 
 func TestPartitionIsValidGoodName(t *testing.T) {

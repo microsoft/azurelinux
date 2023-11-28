@@ -6,12 +6,11 @@ Disks:
     Flags:
     - bios_grub
     Start: 1
-    End: 9
+    Size: 8
     FsType: fat32
 
   - ID: rootfs
     Start: 9
-    End: 2048
     FsType: ext4
 
 SystemConfig:

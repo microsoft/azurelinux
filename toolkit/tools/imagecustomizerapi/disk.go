@@ -67,16 +67,19 @@ func (d *Disk) IsValid() error {
 	for i := 0; i < len(sortedPartitions)-1; i++ {
 		a := &sortedPartitions[i]
 		b := &sortedPartitions[i+1]
-		if a.End == nil {
+
+		aEnd, aHasEnd := a.GetEnd()
+		if !aHasEnd {
 			return fmt.Errorf("partition (%s) is not last partition but ommitted End value", a.ID)
 		}
-		if *a.End > b.Start {
-			bEnd := ""
-			if b.End != nil {
-				bEnd = strconv.FormatUint(*b.End, 10)
+		if aEnd > b.Start {
+			bEnd, bHasEnd := b.GetEnd()
+			bEndStr := ""
+			if bHasEnd {
+				bEndStr = strconv.FormatUint(bEnd, 10)
 			}
 			return fmt.Errorf("partition's (%s) range [%d, %d) overlaps partition's (%s) range [%d, %s)",
-				a.ID, a.Start, *a.End, b.ID, b.Start, bEnd)
+				a.ID, a.Start, aEnd, b.ID, b.Start, bEndStr)
 		}
 	}
 
@@ -89,11 +92,14 @@ func (d *Disk) IsValid() error {
 
 		// Check that the disk is big enough for the partition layout.
 		lastPartition := sortedPartitions[len(sortedPartitions)-1]
+
+		lastPartitionEnd, lastPartitionHasEnd := lastPartition.GetEnd()
+
 		var requiredSize uint64
-		if lastPartition.End == nil {
+		if !lastPartitionHasEnd {
 			requiredSize = lastPartition.Start + 1
 		} else {
-			requiredSize = *lastPartition.End
+			requiredSize = lastPartitionEnd
 		}
 
 		if requiredSize > d.MaxSize {

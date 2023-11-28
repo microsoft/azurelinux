@@ -21,6 +21,8 @@ type Partition struct {
 	Start uint64 `yaml:"Start"`
 	// End is the offset where the partition ends (exclusive), in MiBs.
 	End *uint64 `yaml:"End"`
+	// Size is the size of the partition in MiBs.
+	Size *uint64 `yaml:"Size"`
 	// Flags assigns features to the partition.
 	Flags []PartitionFlag `yaml:"Flags"`
 }
@@ -31,12 +33,16 @@ func (p *Partition) IsValid() error {
 		return fmt.Errorf("invalid partition (%s) FsType value:\n%w", p.ID, err)
 	}
 
-	err = IsGPTNameValid(p.Name)
+	err = isGPTNameValid(p.Name)
 	if err != nil {
 		return err
 	}
 
-	if p.End != nil && p.Start >= *p.End {
+	if p.End != nil && p.Size != nil {
+		return fmt.Errorf("cannot specify both End and Size on partition (%s)", p.ID)
+	}
+
+	if (p.End != nil && p.Start >= *p.End) || (p.Size != nil && *p.Size <= 0) {
 		return fmt.Errorf("partition's (%s) size can't be 0 or negative", p.ID)
 	}
 
@@ -68,8 +74,20 @@ func (p *Partition) IsValid() error {
 	return nil
 }
 
-// IsGPTNameValid checks if a GPT partition name is valid.
-func IsGPTNameValid(name string) error {
+func (p *Partition) GetEnd() (uint64, bool) {
+	if p.End != nil {
+		return *p.End, true
+	}
+
+	if p.Size != nil {
+		return p.Start + *p.Size, true
+	}
+
+	return 0, false
+}
+
+// isGPTNameValid checks if a GPT partition name is valid.
+func isGPTNameValid(name string) error {
 	// The max partition name length is 36 UTF-16 code units, including a null terminator.
 	// Since we are also restricting the name to ASCII, this means 35 ASCII characters.
 	const maxLength = 35

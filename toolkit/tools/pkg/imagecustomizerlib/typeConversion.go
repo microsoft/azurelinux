@@ -68,10 +68,7 @@ func partitionsToImager(partitions []imagecustomizerapi.Partition) ([]configurat
 }
 
 func partitionToImager(partition imagecustomizerapi.Partition) (configuration.Partition, error) {
-	imagerEnd := uint64(0)
-	if partition.End != nil {
-		imagerEnd = *partition.End
-	}
+	imagerEnd, _ := partition.GetEnd()
 
 	imagerFlags, err := partitionFlagsToImager(partition.Flags)
 	if err != nil {
