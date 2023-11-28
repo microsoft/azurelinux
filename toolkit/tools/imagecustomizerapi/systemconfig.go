@@ -25,6 +25,7 @@ type SystemConfig struct {
 	FinalizeImageScripts    []Script                  `yaml:"FinalizeImageScripts"`
 	Users                   []User                    `yaml:"Users"`
 	Services                Services                  `yaml:"Services"`
+	Modules                 Modules                   `yaml:"Modules"`
 }
 
 func (s *SystemConfig) IsValid() error {
@@ -65,6 +66,10 @@ func (s *SystemConfig) IsValid() error {
 	}
 
 	if err := s.Services.IsValid(); err != nil {
+		return err
+	}
+
+	if err := s.Modules.IsValid(); err != nil {
 		return err
 	}
 

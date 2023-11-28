@@ -37,8 +37,6 @@ func main() {
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	setupLogger(*logLevel)
 
-	//logger.Log.Warnf("Printing log to '%s'", *outPath)
-
 	// Perform different actions based on the input "mode".
 	switch *mode {
 	case initializeMode:

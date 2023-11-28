@@ -1,0 +1,79 @@
+From 1126af7c04aced132923b76a5f26cfb665d1c88f Mon Sep 17 00:00:00 2001
+From: Darren Kenny <darren.kenny@oracle.com>
+Date: Tue, 29 Mar 2022 10:49:56 +0000
+Subject: [PATCH] fs/btrfs: Fix several fuzz issues with invalid dir item
+ sizing
+
+According to the btrfs code in Linux, the structure of a directory item
+leaf should be of the form:
+
+  |struct btrfs_dir_item|name|data|
+
+in GRUB the name len and data len are in the grub_btrfs_dir_item
+structure's n and m fields respectively.
+
+The combined size of the structure, name and data should be less than
+the allocated memory, a difference to the Linux kernel's struct
+btrfs_dir_item is that the grub_btrfs_dir_item has an extra field for
+where the name is stored, so we adjust for that too.
+
+Signed-off-by: Darren Kenny <darren.kenny@oracle.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/fs/btrfs.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+
+diff --git a/grub-core/fs/btrfs.c b/grub-core/fs/btrfs.c
+index 6320303..eb9857d 100644
+--- a/grub-core/fs/btrfs.c
++++ b/grub-core/fs/btrfs.c
+@@ -1961,6 +1961,7 @@ grub_btrfs_dir (grub_device_t device, const char *path,
+   int r = 0;
+   grub_uint64_t tree;
+   grub_uint8_t type;
++  grub_size_t est_size = 0;
+ 
+   if (!data)
+     return grub_errno;
+@@ -2019,6 +2020,18 @@ grub_btrfs_dir (grub_device_t device, const char *path,
+ 	  break;
+ 	}
+ 
++      if (direl == NULL ||
++	  grub_add (grub_le_to_cpu16 (direl->n),
++		    grub_le_to_cpu16 (direl->m), &est_size) ||
++	  grub_add (est_size, sizeof (*direl), &est_size) ||
++	  grub_sub (est_size, sizeof (direl->name), &est_size) ||
++	  est_size > allocated)
++       {
++         grub_errno = GRUB_ERR_OUT_OF_RANGE;
++         r = -grub_errno;
++         goto out;
++       }
++
+       for (cdirel = direl;
+ 	   (grub_uint8_t *) cdirel - (grub_uint8_t *) direl
+ 	   < (grub_ssize_t) elemsize;
+@@ -2029,6 +2042,19 @@ grub_btrfs_dir (grub_device_t device, const char *path,
+ 	  char c;
+ 	  struct grub_btrfs_inode inode;
+ 	  struct grub_dirhook_info info;
++
++	  if (cdirel == NULL ||
++	      grub_add (grub_le_to_cpu16 (cdirel->n),
++			grub_le_to_cpu16 (cdirel->m), &est_size) ||
++	      grub_add (est_size, sizeof (*cdirel), &est_size) ||
++	      grub_sub (est_size, sizeof (cdirel->name), &est_size) ||
++	      est_size > allocated)
++	   {
++	     grub_errno = GRUB_ERR_OUT_OF_RANGE;
++	     r = -grub_errno;
++	     goto out;
++	   }
++
+ 	  err = grub_btrfs_read_inode (data, &inode, cdirel->key.object_id,
+ 				       tree);
+ 	  grub_memset (&info, 0, sizeof (info));
+-- 
+2.34.1
+

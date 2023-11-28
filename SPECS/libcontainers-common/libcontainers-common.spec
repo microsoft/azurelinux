@@ -26,7 +26,7 @@
 Summary:        Configuration files common to github.com/containers
 Name:           libcontainers-common
 Version:        20210626
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0 AND GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -158,6 +158,9 @@ fi
 %license LICENSE
 
 %changelog
+* Thu Oct 19 2023 Dan Streetman <ddstreet@ieee.org> - 20210626-2
+- Bump release to rebuild with updated version of Go.
+
 * Fri Jul 22 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 20210626-1
 - Upgrade version to 20210626 and License information.
 - Remove oci-hook man5 tar conflicting with podman package.

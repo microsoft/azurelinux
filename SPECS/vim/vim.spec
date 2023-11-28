@@ -1,15 +1,14 @@
 %define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
-Version:        9.0.1897
-Release:        2%{?dist}
+Version:        9.0.2068
+Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Editors
 URL:            https://www.vim.org
 Source0:        https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:         CVE-2023-5344.patch
 BuildRequires:  ncurses-devel
 BuildRequires:  python3-devel
 Requires(post): sed
@@ -187,7 +186,6 @@ fi
 %{_datarootdir}/vim/vim*/defaults.vim
 %{_datarootdir}/vim/vim*/filetype.vim
 %{_datarootdir}/vim/vim90/syntax/nosyntax.vim
-%{_datarootdir}/vim/vim90/syntax/syntax.vim
 %{_datarootdir}/vim/vim90/autoload/dist/ft.vim
 %{_bindir}/ex
 %{_bindir}/vi
@@ -198,6 +196,17 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Tue Nov 14 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.0.2068-1
+- Auto-upgrade to 9.0.2068 - CVE-2023-46246
+
+* Tue Oct 17 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 9.0.2010-1
+- Update version to 9.0.2010 to fix CVE-2023-5535.
+- Remove patches that no longer apply in the new version.
+- Remove file listed twice.
+
+* Wed Oct 11 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 9.0.1897-3
+- Patch CVE-2023-5441
+
 * Mon Oct 09 2023 Mitch Zhu <mitchzhu@microsoft.com> - 9.0.1897-2
 - Patch CVE-2023-5344
 

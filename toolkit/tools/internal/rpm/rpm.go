@@ -4,6 +4,7 @@
 package rpm
 
 import (
+	"errors"
 	"fmt"
 	"path/filepath"
 	"regexp"
@@ -96,6 +97,23 @@ func GetRpmArch(goArch string) (rpmArch string, err error) {
 	if !ok {
 		err = fmt.Errorf("unknown GOARCH detected (%s)", goArch)
 	}
+	return
+}
+
+func GetBasePackageNameFromSpecFile(specPath string) (basePackageName string, err error) {
+
+	baseName := filepath.Base(specPath)
+	if baseName == "" {
+		return "", errors.New(fmt.Sprintf("Cannot extract file name from specPath (%s).", specPath))
+	}
+
+	fileExtension := filepath.Ext(baseName)
+	if fileExtension == "" {
+		return "", errors.New(fmt.Sprintf("Cannot extract file extension from file name (%s).", baseName))
+	}
+
+	basePackageName = baseName[:len(baseName)-len(fileExtension)]
+
 	return
 }
 

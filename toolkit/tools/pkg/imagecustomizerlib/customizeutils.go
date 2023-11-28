@@ -15,7 +15,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safemount.go"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safemount"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/userutils"
 	"golang.org/x/sys/unix"
@@ -59,7 +59,12 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
-	err = enableOrDisableServices(config.SystemConfig.Services, baseConfigPath, imageChroot)
+	err = enableOrDisableServices(config.SystemConfig.Services, imageChroot)
+	if err != nil {
+		return err
+	}
+
+	err = loadOrDisableModules(config.SystemConfig.Modules, imageChroot)
 	if err != nil {
 		return err
 	}
@@ -159,6 +164,10 @@ func copyAdditionalFiles(baseConfigPath string, additionalFiles map[string]image
 }
 
 func runScripts(baseConfigPath string, scripts []imagecustomizerapi.Script, imageChroot *safechroot.Chroot) error {
+	if len(scripts) <= 0 {
+		return nil
+	}
+
 	configDirMountPath := filepath.Join(imageChroot.RootDir(), configDirMountPathInChroot)
 
 	// Bind mount the config directory so that the scripts can access any required resources.
@@ -186,7 +195,7 @@ func runScripts(baseConfigPath string, scripts []imagecustomizerapi.Script, imag
 		}
 	}
 
-	err = mount.Close()
+	err = mount.CleanClose()
 	if err != nil {
 		return err
 	}
@@ -226,7 +235,7 @@ func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageC
 	// Hash the password.
 	hashedPassword := password
 	if !user.PasswordHashed {
-		hashedPassword, err = userutils.HashPassword(user.Password)
+		hashedPassword, err = userutils.HashPassword(password)
 		if err != nil {
 			return err
 		}
@@ -240,7 +249,7 @@ func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageC
 
 	if userExists {
 		// Update the user's password.
-		err = installutils.UpdateUserPassword(imageChroot.RootDir(), user.Name, hashedPassword)
+		err = userutils.UpdateUserPassword(imageChroot.RootDir(), user.Name, hashedPassword)
 		if err != nil {
 			return err
 		}
@@ -286,7 +295,7 @@ func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageC
 	return nil
 }
 
-func enableOrDisableServices(services imagecustomizerapi.Services, baseConfigPath string, imageChroot *safechroot.Chroot) error {
+func enableOrDisableServices(services imagecustomizerapi.Services, imageChroot *safechroot.Chroot) error {
 	var err error
 
 	// Handle enabling services
@@ -320,6 +329,33 @@ func enableOrDisableServices(services imagecustomizerapi.Services, baseConfigPat
 		})
 		if err != nil {
 			return err
+		}
+	}
+
+	return nil
+}
+
+func loadOrDisableModules(modules imagecustomizerapi.Modules, imageChroot *safechroot.Chroot) error {
+	var err error
+
+	for _, module := range modules.Load {
+		logger.Log.Infof("Loading kernel module (%s)", module.Name)
+		moduleFileName := module.Name + ".conf"
+		moduleFilePath := filepath.Join(imageChroot.RootDir(), "/etc/modules-load.d/", moduleFileName)
+		err = file.Write(module.Name, moduleFilePath)
+		if err != nil {
+			return fmt.Errorf("failed to write module load configuration: %w", err)
+		}
+	}
+
+	for _, module := range modules.Disable {
+		logger.Log.Infof("Disabling kernel module (%s)", module.Name)
+		moduleFileName := module.Name + ".conf"
+		moduleFilePath := filepath.Join(imageChroot.RootDir(), "/etc/modprobe.d/", moduleFileName)
+		data := fmt.Sprintf("blacklist %s\n", module.Name)
+		err = file.Write(data, moduleFilePath)
+		if err != nil {
+			return fmt.Errorf("failed to write module disable configuration: %w", err)
 		}
 	}
 
