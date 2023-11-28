@@ -138,7 +138,7 @@ func ensureManagerExists() error {
 func BeginTiming(toolName, outputFile string) (*TimeStamp, error) {
 	if outputFile == "" {
 		err := fmt.Errorf("timestamp output file is not specified, the feature will be turned off for %s", toolName)
-		logger.Log.Info(err.Error())
+		logger.Log.Debug(err.Error())
 		return &TimeStamp{}, err
 	}
 
@@ -171,7 +171,7 @@ func BeginTiming(toolName, outputFile string) (*TimeStamp, error) {
 func ResumeTiming(toolName, outputFile string) error {
 	if outputFile == "" {
 		err := fmt.Errorf("timestamp output file is not specified, the feature will be turned off for %s", toolName)
-		logger.Log.Info(err.Error())
+		logger.Log.Debug(err.Error())
 		return err
 	}
 

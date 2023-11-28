@@ -241,6 +241,7 @@ func CreateSparseDisk(diskPath string, size uint64, perm os.FileMode) (err error
 
 // SetupLoopbackDevice creates a /dev/loop device for the given disk file
 func SetupLoopbackDevice(diskFilePath string) (devicePath string, err error) {
+	logger.Log.Debugf("Attaching Loopback: %v", diskFilePath)
 	stdout, stderr, err := shell.Execute("losetup", "--show", "-f", "-P", diskFilePath)
 	if err != nil {
 		logger.Log.Warnf("Failed to create loopback device using losetup: %v", stderr)
@@ -301,7 +302,7 @@ func BlockOnDiskIOByIds(debugName string, maj string, min string) (err error) {
 		outstandingOpsIdx = 11
 	)
 
-	logger.Log.Infof("Flushing all IO to disk")
+	logger.Log.Debugf("Flushing all IO to disk")
 	_, _, err = shell.Execute("sync")
 	if err != nil {
 		return
@@ -351,7 +352,7 @@ func BlockOnDiskIOByIds(debugName string, maj string, min string) (err error) {
 
 // DetachLoopbackDevice detaches the specified disk
 func DetachLoopbackDevice(diskDevPath string) (err error) {
-	logger.Log.Infof("Detaching Loopback Device Path: %v", diskDevPath)
+	logger.Log.Debugf("Detaching Loopback Device Path: %v", diskDevPath)
 	_, stderr, err := shell.Execute("losetup", "-d", diskDevPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to detach loopback device using losetup: %v", stderr)

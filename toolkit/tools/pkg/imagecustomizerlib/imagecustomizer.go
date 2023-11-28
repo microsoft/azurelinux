@@ -10,6 +10,7 @@ import (
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safeloopback"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
@@ -85,7 +86,8 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 	// Convert image file to raw format, so that a kernel loop device can be used to make changes to the image.
 	buildImageFile := filepath.Join(buildDirAbs, "image.raw")
 
-	_, _, err = shell.Execute("qemu-img", "convert", "-O", "raw", imageFile, buildImageFile)
+	logger.Log.Infof("Mounting base image: %s", buildImageFile)
+	err = shell.ExecuteLiveWithErr(1, "qemu-img", "convert", "-O", "raw", imageFile, buildImageFile)
 	if err != nil {
 		return fmt.Errorf("failed to convert image file to raw format:\n%w", err)
 	}
@@ -97,13 +99,17 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 	}
 
 	// Create final output image file.
+	logger.Log.Infof("Writing: %s", outputImageFile)
+
 	outDir := filepath.Dir(outputImageFile)
 	os.MkdirAll(outDir, os.ModePerm)
 
-	_, _, err = shell.Execute("qemu-img", "convert", "-O", qemuOutputImageFormat, buildImageFile, outputImageFile)
+	err = shell.ExecuteLiveWithErr(1, "qemu-img", "convert", "-O", qemuOutputImageFormat, buildImageFile, outputImageFile)
 	if err != nil {
 		return fmt.Errorf("failed to convert image file to format: %s:\n%w", outputImageFormat, err)
 	}
+
+	logger.Log.Infof("Success!")
 
 	return nil
 }
