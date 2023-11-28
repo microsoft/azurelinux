@@ -156,48 +156,23 @@ Patch114: 0114-FIPS-enforce-EMS-support.patch
 
 License: Apache-2.0
 URL: http://www.openssl.org/
-# BuildRequires: gcc g++
-# BuildRequires: coreutils, perl-interpreter, sed, zlib-devel, /usr/bin/cmp
-# BuildRequires: lksctp-tools-devel
-# BuildRequires: /usr/bin/rename
-# BuildRequires: /usr/bin/pod2man
-# BuildRequires: /usr/sbin/sysctl
-# BuildRequires: perl(Test::Harness), perl(Test::More), perl(Math::BigInt)
-# BuildRequires: perl(Module::Load::Conditional), perl(File::Temp)
-# BuildRequires: perl(Time::HiRes), perl(IPC::Cmd), perl(Pod::Html), perl(Digest::SHA)
-# BuildRequires: perl(FindBin), perl(lib), perl(File::Compare), perl(File::Copy), perl(bigint)
-# BuildRequires: git-core
-# BuildRequires: systemtap-sdt-devel
-# Requires: coreutils
-# Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
 
-# BuildRequires:  lksctp-tools-devel
+# AZL: NOTE: Removed dependencies we don't have in AZL and that create circular dependencies.
+#            Will go through these as I go through patches and config options.
+BuildRequires: gcc g++
+BuildRequires: coreutils, perl-interpreter, sed, zlib-devel, /usr/bin/cmp
+BuildRequires: /usr/bin/rename
+BuildRequires: /usr/bin/pod2man
+BuildRequires: perl(Test::Harness), perl(Test::More), perl(Math::BigInt)
+BuildRequires: perl(Module::Load::Conditional), perl(File::Temp)
+BuildRequires: perl(Time::HiRes), perl(IPC::Cmd), perl(Pod::Html), perl(Digest::SHA)
+BuildRequires: perl(FindBin), perl(lib), perl(File::Compare), perl(File::Copy), perl(bigint)
+BuildRequires: git-core
+BuildRequires: systemtap-sdt-devel
+
 Requires:       perl >= 5.13.4
-BuildRequires:  perl-Text-Template
-BuildRequires:  perl-FindBin
-BuildRequires:  perl-lib
-BuildRequires:  perl-IPC-Cmd
-# BuildRequires:  perl-Pod-Html
-BuildRequires:  perl(Pod::Html)
-BuildRequires:  perl(Digest::SHA)
-BuildRequires:  perl(Math::BigInt)
-# BuildRequires:  git
-# BuildRequires: git-core
-
-# BuildRequires:  perl-Test-Warnings
-# BuildRequires:  perl-Text-Template
-# BuildRequires:  perl(FindBin)
-# BuildRequires:  perl(lib)
-# Requires:       %{name}-libs = %{version}-%{release}
-# Requires:       glibc
-# Requires:       libgcc
-# Conflicts:      httpd <= 2.4.37
-# %if %{with_check}
-# BuildRequires:  perl
-# BuildRequires:  perl(Math::BigInt)
-# BuildRequires:  perl(Test::Harness)
-# %endif
-
+Requires: coreutils
+Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
 
 %description
 The OpenSSL toolkit provides support for secure communications between
@@ -347,15 +322,6 @@ done
 %check
 # Verify that what was compiled actually works.
 
-# Hack - either enable SCTP AUTH chunks in kernel or disable sctp for check
-(sysctl net.sctp.addip_enable=1 && sysctl net.sctp.auth_enable=1) || \
-(echo 'Failed to enable SCTP AUTH chunks, disabling SCTP for tests...' &&
- sed '/"msan" => "default",/a\ \ "sctp" => "default",' configdata.pm > configdata.pm.new && \
- touch -r configdata.pm configdata.pm.new && \
- mv -f configdata.pm.new configdata.pm)
-
-# We must revert patch4 before tests otherwise they will fail
-patch -p1 -R < %{PATCH4}
 #We must disable default provider before tests otherwise they will fail
 patch -p1 < %{SOURCE14}
 
