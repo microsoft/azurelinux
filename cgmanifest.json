@@ -20194,8 +20194,8 @@
         "type": "other",
         "other": {
           "name": "perl-Test-Warnings",
-          "version": "0.031",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/E/ET/ETHER/Test-Warnings-0.031.tar.gz"
+          "version": "0.032",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/E/ET/ETHER/Test-Warnings-0.032.tar.gz"
         }
       }
     },
