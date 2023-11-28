@@ -183,7 +183,7 @@ rpm-lang-4.18.0-4.cm2.aarch64.rpm
 rpm-libs-4.18.0-4.cm2.aarch64.rpm
 cpio-2.14-1.cm2.aarch64.rpm
 cpio-lang-2.14-1.cm2.aarch64.rpm
-e2fsprogs-libs-1.46.5-3.cm2.aarch64.rpm
+e2fsprogs-libs-1.47.0-1.cm2.aarch64.rpm
 libsolv-0.7.24-1.cm2.aarch64.rpm
 libsolv-devel-0.7.24-1.cm2.aarch64.rpm
 libssh2-1.11.0-1.cm2.aarch64.rpm

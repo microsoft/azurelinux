@@ -3078,8 +3078,8 @@
         "type": "other",
         "other": {
           "name": "e2fsprogs",
-          "version": "1.46.5",
-          "downloadUrl": "https://prdownloads.sourceforge.net/e2fsprogs/e2fsprogs-1.46.5.tar.gz"
+          "version": "1.47.0",
+          "downloadUrl": "https://prdownloads.sourceforge.net/e2fsprogs/e2fsprogs-1.47.0.tar.gz"
         }
       }
     },
