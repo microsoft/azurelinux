@@ -282,9 +282,16 @@ The start location (inclusive) of the partition, specified in MiBs.
 
 The end location (exclusive) of the partition, specified in MiBs.
 
-This field is required for all partitions except for the last partition.
-When the End field is omitted, the last partition will fill the remainder of the disk
-(based on the [MaxSize](#maxsize-uint64) field).
+The End and Size fields cannot be specified at the same time.
+
+Either the Size or End field is required for all partitions except for the last
+partition.
+When both the Size and End fields are omitted, the last partition will fill the
+remainder of the disk (based on the disk's [MaxSize](#maxsize-uint64) field).
+
+### Size [uint64]
+
+The size of the partition, specified in MiBs.
 
 ### Flags [string[]]
 
