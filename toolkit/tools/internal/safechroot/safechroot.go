@@ -55,6 +55,7 @@ type Chroot struct {
 
 	isExistingDir bool
 }
+
 // inChrootMutex guards against multiple Chroots entering their respective Chroots
 // and running commands. Only a single Chroot can be active at a given time.
 //
@@ -662,35 +663,49 @@ func extractWorkerTar(chroot string, workerTar string) (err error) {
 }
 
 type ChrootInterface interface {
-    RootDir() string
-	Initialize(tarPath string, extraDirectories []string, extraMountPoints []*MountPoint) error
+	RootDir() string
 	Run(toRun func() error) error
 	UnsafeRun(toRun func() error) error
 	AddFiles(filesToCopy ...FileToCopy) error
 }
 
 // DummyChroot is a placeholder that implements ChrootInterface.
-type DummyChroot struct {}
+type DummyChroot struct {
+}
 
 func (d DummyChroot) RootDir() string {
-    return "/"
+	return "/"
 }
 
 func (d DummyChroot) Initialize(tarPath string, extraDirectories []string, extraMountPoints []*MountPoint) error {
 	// No operation for the dummy type
-    return nil
+	return nil
 }
 
 func (d DummyChroot) Run(toRun func() error) (err error) {
 	// Only execute the function, no chroot operations
-    return toRun()
+	return toRun()
 }
 
 func (d DummyChroot) UnsafeRun(toRun func() error) (err error) {
-    return toRun()
+	return toRun()
 }
 
 func (d DummyChroot) AddFiles(filesToCopy ...FileToCopy) (err error) {
-    return nil
-}
+	for _, f := range filesToCopy {
+		dest := filepath.Join(d.RootDir(), f.Dest)
+		logger.Log.Debugf("Copying '%s' to worker '%s'", f.Src, dest)
 
+		if f.Permissions != nil {
+			err = file.CopyAndChangeMode(f.Src, dest, os.ModePerm, *f.Permissions)
+		} else {
+			err = file.Copy(f.Src, dest)
+		}
+
+		if err != nil {
+			logger.Log.Errorf("Error provisioning worker with '%s'", f.Src)
+			return
+		}
+	}
+	return
+}
