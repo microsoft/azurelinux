@@ -1113,7 +1113,7 @@
                 ],
                 "comment": "Allow customers to use BPF LSM programs",
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/XXX"
+                    "https://github.com/microsoft/CBL-Mariner/pull/6846"
                 ]
             },
             "CONFIG_MCTP": {
