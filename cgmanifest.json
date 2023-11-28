@@ -18044,8 +18044,8 @@
         "type": "other",
         "other": {
           "name": "perl-libintl-perl",
-          "version": "1.32",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/G/GU/GUIDO/libintl-perl-1.32.tar.gz"
+          "version": "1.33",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/G/GU/GUIDO/libintl-perl-1.33.tar.gz"
         }
       }
     },

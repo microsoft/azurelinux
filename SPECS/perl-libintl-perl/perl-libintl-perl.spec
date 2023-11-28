@@ -1,8 +1,8 @@
 # Got the intial spec from Fedora and modified it
 Summary:        Internationalization library for Perl, compatible with gettext
 Name:           perl-libintl-perl
-Version:        1.32
-Release:        2%{?dist}
+Version:        1.33
+Release:        1%{?dist}
 License:        GPLv3+
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/libintl-perl/
@@ -203,6 +203,9 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+* Mon Nov 27 2023 Andrew Phelps <anphel@microsoft.com> - 1.33-1
+- Upgrade to 1.33
+
 * Fri Jul 29 2022 Muhammad Falak <mwani@microsoft.com> - 1.32-2
 - Add BR on `perl(ExtUtils::MakeMaker)` & `perl(Test)` to enable ptest
 

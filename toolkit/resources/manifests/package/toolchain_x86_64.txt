@@ -406,8 +406,8 @@ perl-IPC-SysV-2.09-488.cm2.x86_64.rpm
 perl-JSON-PP-4.06-488.cm2.noarch.rpm
 perl-less-0.03-488.cm2.noarch.rpm
 perl-lib-0.65-488.cm2.x86_64.rpm
-perl-libintl-perl-1.32-2.cm2.x86_64.rpm
-perl-libintl-perl-debuginfo-1.32-2.cm2.x86_64.rpm
+perl-libintl-perl-1.33-1.cm2.x86_64.rpm
+perl-libintl-perl-debuginfo-1.33-1.cm2.x86_64.rpm
 perl-libnet-3.13-488.cm2.noarch.rpm
 perl-libnetcfg-5.34.1-488.cm2.noarch.rpm
 perl-libs-5.34.1-488.cm2.x86_64.rpm
