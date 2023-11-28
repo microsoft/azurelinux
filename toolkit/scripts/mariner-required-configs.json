@@ -1232,7 +1232,8 @@
                     "m"
                 ],
                 "arch": [
-                    "AMD64"
+                    "AMD64",
+                    "ARM64"
                 ],
                 "comment": "Enable CUSE to support Nvidia rshim interface for Mariner hosts",
                 "PR": [
