@@ -247,13 +247,9 @@ package provides Perl scripts for converting certificates and keys
 from other formats to the formats used by the OpenSSL toolkit.
 
 %prep
-echo "TOBIASB: entering prep"
-# %%autosetup -S git -n %{name}-%{version}
 %autosetup -p1 -n %{name}-%{version}
-echo "TOBIASB: leaving prep"
 
 %build
-echo "TOBIASB: starting build"
 # Figure out which flags we want to use.
 # default
 sslarch=%{_os}-%{_target_cpu}
