@@ -30,6 +30,16 @@ After downloading the ISO, use [the quickstart instructions](toolkit/docs/quick_
 
 Note: Support for the ISO is community based. Before filing a new bug or feature request, please search the list of Github Issues. If you are unable to find a matching issue, please report new bugs by clicking [here](https://github.com/microsoft/CBL-Mariner/issues) or create a new feature request by clicking [here](https://github.com/microsoft/CBL-Mariner/issues/new). For additional information refer to the [support.md](https://github.com/microsoft/CBL-Mariner/blob/2.0/SUPPORT.md) file.
 
+
+## Getting Help
+- Bugs, feature requests and questions can be filed as GitHub issues.
+- We are starting a public community call for Mariner users to get together and discuss new features, provide feedback, and learn more about how others are using Mariner. In each session, we will feature a new demo. The schedule for the upcoming community calls are:
+- 1/25/24 from 8-9am (PST) [Click to join](https://teams.microsoft.com/l/meetup-join/19%3ameeting_NGM1YWZiMDMtYWZkZi00NzBmLWExNjgtM2RkMjFmYTNiYmU2%40thread.v2/0?context=%7b%22Tid%22%3a%2272f988bf-86f1-41af-91ab-2d7cd011db47%22%2c%22Oid%22%3a%2230697089-15b8-4c68-b67e-7db9cd4f02ea%22%7d) 
+- 3/28/24 from 8-9am (PST) [Click to join](https://teams.microsoft.com/l/meetup-join/19%3ameeting_NGM1YWZiMDMtYWZkZi00NzBmLWExNjgtM2RkMjFmYTNiYmU2%40thread.v2/0?context=%7b%22Tid%22%3a%2272f988bf-86f1-41af-91ab-2d7cd011db47%22%2c%22Oid%22%3a%2230697089-15b8-4c68-b67e-7db9cd4f02ea%22%7d) 
+- 5/23/24 from 8-9am (PST) [Click to join](https://teams.microsoft.com/l/meetup-join/19%3ameeting_NGM1YWZiMDMtYWZkZi00NzBmLWExNjgtM2RkMjFmYTNiYmU2%40thread.v2/0?context=%7b%22Tid%22%3a%2272f988bf-86f1-41af-91ab-2d7cd011db47%22%2c%22Oid%22%3a%2230697089-15b8-4c68-b67e-7db9cd4f02ea%22%7d) 
+- 7/25/24 from 8-9am (PST) [Click to join](https://teams.microsoft.com/l/meetup-join/19%3ameeting_NGM1YWZiMDMtYWZkZi00NzBmLWExNjgtM2RkMjFmYTNiYmU2%40thread.v2/0?context=%7b%22Tid%22%3a%2272f988bf-86f1-41af-91ab-2d7cd011db47%22%2c%22Oid%22%3a%2230697089-15b8-4c68-b67e-7db9cd4f02ea%22%7d) 
+- 9/26/24 from 8-9am (PST) [Click to join](https://teams.microsoft.com/l/meetup-join/19%3ameeting_NGM1YWZiMDMtYWZkZi00NzBmLWExNjgtM2RkMjFmYTNiYmU2%40thread.v2/0?context=%7b%22Tid%22%3a%2272f988bf-86f1-41af-91ab-2d7cd011db47%22%2c%22Oid%22%3a%2230697089-15b8-4c68-b67e-7db9cd4f02ea%22%7d)
+
 ## Trademarks
 
 This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft trademarks or logos is subject to and must follow [Microsoft's Trademark & Brand Guidelines](https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general). Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or imply Microsoft sponsorship. Any use of third-party trademarks or logos are subject to those third-party's policies.
