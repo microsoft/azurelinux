@@ -33,7 +33,12 @@ Note: Support for the ISO is community based. Before filing a new bug or feature
 
 ## Getting Help
 - Bugs, feature requests and questions can be filed as GitHub issues.
-- We will begin a public community call on 1/25/2024 that will occur every 2 months from 8-9am (PST). This is a time for Mariner users to get together and discuss new features, provide feedback, and learn more about how others are using Mariner. In each session, we will feature a new demo. All are welcome to join, and the invite link is [here.](https://teams.microsoft.com/l/meetup-join/19%3ameeting_NGM1YWZiMDMtYWZkZi00NzBmLWExNjgtM2RkMjFmYTNiYmU2%40thread.v2/0?context=%7b%22Tid%22%3a%2272f988bf-86f1-41af-91ab-2d7cd011db47%22%2c%22Oid%22%3a%2230697089-15b8-4c68-b67e-7db9cd4f02ea%22%7d)
+- We are starting a public community call for Mariner users to get together and discuss new features, provide feedback, and learn more about how others are using Mariner. In each session, we will feature a new demo. The schedule for the upcoming community calls are:
+- 1/25/24 from 8-9am (PST) [Click to join](https://teams.microsoft.com/l/meetup-join/19%3ameeting_NGM1YWZiMDMtYWZkZi00NzBmLWExNjgtM2RkMjFmYTNiYmU2%40thread.v2/0?context=%7b%22Tid%22%3a%2272f988bf-86f1-41af-91ab-2d7cd011db47%22%2c%22Oid%22%3a%2230697089-15b8-4c68-b67e-7db9cd4f02ea%22%7d) 
+- 3/28/24 from 8-9am (PST) [Click to join](https://teams.microsoft.com/l/meetup-join/19%3ameeting_NGM1YWZiMDMtYWZkZi00NzBmLWExNjgtM2RkMjFmYTNiYmU2%40thread.v2/0?context=%7b%22Tid%22%3a%2272f988bf-86f1-41af-91ab-2d7cd011db47%22%2c%22Oid%22%3a%2230697089-15b8-4c68-b67e-7db9cd4f02ea%22%7d) 
+- 5/23/24 from 8-9am (PST) [Click to join](https://teams.microsoft.com/l/meetup-join/19%3ameeting_NGM1YWZiMDMtYWZkZi00NzBmLWExNjgtM2RkMjFmYTNiYmU2%40thread.v2/0?context=%7b%22Tid%22%3a%2272f988bf-86f1-41af-91ab-2d7cd011db47%22%2c%22Oid%22%3a%2230697089-15b8-4c68-b67e-7db9cd4f02ea%22%7d) 
+- 7/25/24 from 8-9am (PST) [Click to join](https://teams.microsoft.com/l/meetup-join/19%3ameeting_NGM1YWZiMDMtYWZkZi00NzBmLWExNjgtM2RkMjFmYTNiYmU2%40thread.v2/0?context=%7b%22Tid%22%3a%2272f988bf-86f1-41af-91ab-2d7cd011db47%22%2c%22Oid%22%3a%2230697089-15b8-4c68-b67e-7db9cd4f02ea%22%7d) 
+- 9/26/24 from 8-9am (PST) [Click to join](https://teams.microsoft.com/l/meetup-join/19%3ameeting_NGM1YWZiMDMtYWZkZi00NzBmLWExNjgtM2RkMjFmYTNiYmU2%40thread.v2/0?context=%7b%22Tid%22%3a%2272f988bf-86f1-41af-91ab-2d7cd011db47%22%2c%22Oid%22%3a%2230697089-15b8-4c68-b67e-7db9cd4f02ea%22%7d)
 
 ## Trademarks
 
