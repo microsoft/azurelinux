@@ -156,7 +156,7 @@ func createOverlayPartition(partitionSetting configuration.PartitionSetting, mou
 	//Mount the base image
 	//Create a temp upper dir
 	//Add to the mount args
-	devicePath, err := diskutils.SetupLoopbackDevice(partitionSetting.OverlayBaseImage)
+	devicePath, err := diskutils.SetupLoopbackDevice(partitionSetting.OverlayBaseImage, nil)
 
 	if err != nil {
 		logger.Log.Errorf("Could not setup loop back device for mount (%s)", partitionSetting.OverlayBaseImage)

@@ -239,10 +239,56 @@ func CreateSparseDisk(diskPath string, size uint64, perm os.FileMode) (err error
 	return
 }
 
+// devineBlockSize tries to determine the block size used by the file system image
+func devineBlockSize(diskFilePath string) uint32 {
+	var blockSize uint32 = 512 // Default to 512
+	diskFile, err := os.Open(diskFilePath)
+	if err != nil {
+		logger.Log.Warnf("Failed to open %v to devine block size, assuming %d.", diskFilePath, blockSize)
+		return blockSize
+	}
+	defer diskFile.Close()
+
+	var probePoint int64 = 4096
+	signature := make([]byte, 8)
+	_, err = diskFile.ReadAt(signature, probePoint)
+	if err != nil {
+		logger.Log.Warnf("Failed to read from %v to devine block size, assuming %d.", diskFilePath, blockSize)
+		return blockSize
+	}
+	// GPT header starts with 8 bytes of ascii "EFI PART"
+	if signature[0] == 0x45 &&
+		signature[1] == 0x46 &&
+		signature[2] == 0x49 &&
+		signature[3] == 0x20 &&
+		signature[4] == 0x50 &&
+		signature[5] == 0x41 &&
+		signature[6] == 0x52 &&
+		signature[7] == 0x54 {
+		logger.Log.Debugf("Found GPT signature at %d in: %v, assuming that block size", probePoint, diskFilePath)
+		blockSize = uint32(probePoint)
+	}
+	return blockSize
+}
+
 // SetupLoopbackDevice creates a /dev/loop device for the given disk file
-func SetupLoopbackDevice(diskFilePath string) (devicePath string, err error) {
-	logger.Log.Debugf("Attaching Loopback: %v", diskFilePath)
-	stdout, stderr, err := shell.Execute("losetup", "--show", "-f", "-P", diskFilePath)
+func SetupLoopbackDevice(diskFilePath string, disk *configuration.Disk) (devicePath string, err error) {
+	var blockSize uint32 = 0
+	if disk != nil {
+		blockSize = disk.BlockSize
+	}
+	if blockSize == 0 {
+		blockSize = devineBlockSize(diskFilePath)
+	}
+	logger.Log.Debugf("Attaching Loopback: %v, block size: %d", diskFilePath, blockSize)
+	losetupArgs := []string{
+		"--show",
+		"-f",
+		"-P",
+		"-b", fmt.Sprintf("%d", blockSize),
+		diskFilePath,
+	}
+	stdout, stderr, err := shell.Execute("losetup", losetupArgs...)
 	if err != nil {
 		logger.Log.Warnf("Failed to create loopback device using losetup: %v", stderr)
 		return

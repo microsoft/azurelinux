@@ -33,7 +33,7 @@ func NewLoopback(diskFilePath string) (*Loopback, error) {
 
 func (l *Loopback) newLoopbackHelper() error {
 	// Try to create the mount.
-	devicePath, err := diskutils.SetupLoopbackDevice(l.diskFilePath)
+	devicePath, err := diskutils.SetupLoopbackDevice(l.diskFilePath, nil)
 	if err != nil {
 		return err
 	}
