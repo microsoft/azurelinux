@@ -11,10 +11,8 @@ import (
 	"testing"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/buildpipeline"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/ptrutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safeloopback"
 	"github.com/stretchr/testify/assert"
@@ -206,130 +204,55 @@ func createFakeEfiImage(buildDir string) (string, error) {
 	}
 
 	// Use a prototypical Mariner image partition config.
-	diskConfig := configuration.Disk{
-		PartitionTableType: configuration.PartitionTableTypeGpt,
+	diskConfig := imagecustomizerapi.Disk{
+		PartitionTableType: imagecustomizerapi.PartitionTableTypeGpt,
 		MaxSize:            4096,
-		Partitions: []configuration.Partition{
+		Partitions: []imagecustomizerapi.Partition{
 			{
 				ID:     "boot",
-				Flags:  []configuration.PartitionFlag{"esp", "boot"},
+				Flags:  []imagecustomizerapi.PartitionFlag{"esp", "boot"},
 				Start:  1,
-				End:    9,
+				End:    ptrutils.PtrTo(uint64(9)),
 				FsType: "fat32",
 			},
 			{
 				ID:     "rootfs",
 				Start:  9,
-				End:    0,
+				End:    nil,
 				FsType: "ext4",
 			},
 		},
 	}
 
-	partitionSettings := []configuration.PartitionSetting{
+	partitionSettings := []imagecustomizerapi.PartitionSetting{
 		{
 			ID:              "boot",
 			MountPoint:      "/boot/efi",
 			MountOptions:    "umask=0077",
-			MountIdentifier: configuration.MountIdentifierDefault,
+			MountIdentifier: imagecustomizerapi.MountIdentifierTypeDefault,
 		},
 		{
 			ID:              "rootfs",
 			MountPoint:      "/",
-			MountIdentifier: configuration.MountIdentifierDefault,
+			MountIdentifier: imagecustomizerapi.MountIdentifierTypeDefault,
 		},
 	}
 
-	// Create raw disk image file.
-	rawDisk, err := diskutils.CreateEmptyDisk(buildDir, "disk.raw", diskConfig.MaxSize)
-	if err != nil {
-		return "", fmt.Errorf("failed to create empty disk file in (%s):\n%w", buildDir, err)
+	rawDisk := filepath.Join(buildDir, "disk.raw")
+
+	installOS := func(imageChroot *safechroot.Chroot) error {
+		// Don't write anything for the OS.
+		// The createNewImage function will still write the bootloader and fstab file, which will allow the partition
+		// discovery logic to work. This allows for a limited set of tests to run without needing any of the RPM files.
+		return nil
 	}
 
-	// Connect raw disk image file.
-	loopback, err := safeloopback.NewLoopback(rawDisk)
-	if err != nil {
-		return "", fmt.Errorf("failed to mount raw disk (%s) as a loopback device:\n%w", rawDisk, err)
-	}
-	defer loopback.Close()
-
-	// Set up partitions.
-	partIDToDevPathMap, partIDToFsTypeMap, _, _, err := diskutils.CreatePartitions(loopback.DevicePath(), diskConfig,
-		configuration.RootEncryption{}, configuration.ReadOnlyVerityRoot{})
-	if err != nil {
-		return "", fmt.Errorf("failed to create partitions on disk (%s):\n%w", loopback.DevicePath(), err)
-	}
-
-	// Create partition mount config.
-	bootPartitionDevPath := fmt.Sprintf("%sp1", loopback.DevicePath())
-	osPartitionDevPath := fmt.Sprintf("%sp2", loopback.DevicePath())
-
-	newMountDirectories := []string{}
-	mountPoints := []*safechroot.MountPoint{
-		safechroot.NewPreDefaultsMountPoint(osPartitionDevPath, "/", "ext4", 0, ""),
-		safechroot.NewMountPoint(bootPartitionDevPath, "/boot/efi", "vfat", 0, ""),
-	}
-
-	// Mount the partitions.
-	chrootLeaveOnDisk := false
-	imageChroot := safechroot.NewChroot(filepath.Join(buildDir, "imageroot"), chrootLeaveOnDisk)
-	err = imageChroot.Initialize("", newMountDirectories, mountPoints)
+	imageConnection, err := createNewImage(rawDisk, diskConfig, partitionSettings, "efi", buildDir, "imageroot",
+		installOS)
 	if err != nil {
 		return "", err
 	}
-	defer imageChroot.Close(chrootLeaveOnDisk)
-
-	// Write a fake grub.cfg file so that the partition discovery logic works.
-	bootPrefix := "/boot"
-
-	osUuid, err := installutils.GetUUID(osPartitionDevPath)
-	if err != nil {
-		return "", fmt.Errorf("failed get OS partition UUID:\n%w", err)
-	}
-
-	rootDevice, err := installutils.FormatMountIdentifier(configuration.MountIdentifierUuid, osPartitionDevPath)
-	if err != nil {
-		return "", fmt.Errorf("failed to format mount identifier:\n%w", err)
-	}
-
-	err = installutils.InstallBootloader(imageChroot, false, "efi", osUuid, bootPrefix, "")
-	if err != nil {
-		return "", fmt.Errorf("failed to install bootloader:\n%w", err)
-	}
-
-	err = installutils.InstallGrubCfg(imageChroot.RootDir(), rootDevice, osUuid, bootPrefix,
-		diskutils.EncryptedRootDevice{}, configuration.KernelCommandLine{}, diskutils.VerityDevice{}, false)
-	if err != nil {
-		return "", fmt.Errorf("failed to install main grub config file:\n%w", err)
-	}
-
-	err = installutils.InstallGrubEnv(imageChroot.RootDir())
-	if err != nil {
-		return "", fmt.Errorf("failed to install grubenv file:\n%w", err)
-	}
-
-	// Write a fake fstab file so that the partition discovery logic works.
-	mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, _ := installutils.CreateMountPointPartitionMap(
-		partIDToDevPathMap, partIDToFsTypeMap, partitionSettings,
-	)
-
-	err = installutils.UpdateFstab(imageChroot.RootDir(), partitionSettings, mountPointMap, mountPointToFsTypeMap,
-		mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, false, /*hidepidEnabled*/
-	)
-	if err != nil {
-		return "", fmt.Errorf("failed to install fstab file:\n%w", err)
-	}
-
-	// Close.
-	err = imageChroot.Close(chrootLeaveOnDisk)
-	if err != nil {
-		return "", err
-	}
-
-	err = loopback.CleanClose()
-	if err != nil {
-		return "", err
-	}
+	defer imageConnection.Close()
 
 	return rawDisk, nil
 }

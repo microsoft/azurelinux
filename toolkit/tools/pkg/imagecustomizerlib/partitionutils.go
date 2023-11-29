@@ -273,7 +273,8 @@ func findMountsFromRootfs(rootfsPartition *diskutils.PartitionInfo, diskPartitio
 	tmpDir := filepath.Join(buildDir, tmpParitionDirName)
 
 	// Temporarily mount the rootfs partition so that the fstab file can be read.
-	rootfsPartitionMount, err := safemount.NewMount(rootfsPartition.Path, tmpDir, rootfsPartition.FileSystemType, 0, "", true)
+	rootfsPartitionMount, err := safemount.NewMount(rootfsPartition.Path, tmpDir, rootfsPartition.FileSystemType, 0, "",
+		true)
 	if err != nil {
 		return nil, fmt.Errorf("failed to mount rootfs partition (%s):\n%w", rootfsPartition.Path, err)
 	}
@@ -281,7 +282,8 @@ func findMountsFromRootfs(rootfsPartition *diskutils.PartitionInfo, diskPartitio
 
 	// Read the fstab file.
 	fstabPath := filepath.Join(tmpDir, "/etc/fstab")
-	fstabEntries, err := diskutils.ReadFstabFile(fstabPath)
+
+	mountPoints, err := findMountsFromFstabFile(fstabPath, diskPartitions)
 	if err != nil {
 		return nil, err
 	}
@@ -292,6 +294,17 @@ func findMountsFromRootfs(rootfsPartition *diskutils.PartitionInfo, diskPartitio
 		return nil, fmt.Errorf("failed to close rootfs partition mount (%s):\n%w", rootfsPartition.Path, err)
 	}
 
+	return mountPoints, nil
+}
+
+func findMountsFromFstabFile(fstabPath string, diskPartitions []diskutils.PartitionInfo,
+) ([]*safechroot.MountPoint, error) {
+	// Read the fstab file.
+	fstabEntries, err := diskutils.ReadFstabFile(fstabPath)
+	if err != nil {
+		return nil, err
+	}
+
 	mountPoints, err := fstabEntriesToMountPoints(fstabEntries, diskPartitions)
 	if err != nil {
 		return nil, err
@@ -300,7 +313,8 @@ func findMountsFromRootfs(rootfsPartition *diskutils.PartitionInfo, diskPartitio
 	return mountPoints, nil
 }
 
-func fstabEntriesToMountPoints(fstabEntries []diskutils.FstabEntry, diskPartitions []diskutils.PartitionInfo) ([]*safechroot.MountPoint, error) {
+func fstabEntriesToMountPoints(fstabEntries []diskutils.FstabEntry, diskPartitions []diskutils.PartitionInfo,
+) ([]*safechroot.MountPoint, error) {
 	// Convert fstab entries into mount points.
 	var mountPoints []*safechroot.MountPoint
 	var foundRoot bool
