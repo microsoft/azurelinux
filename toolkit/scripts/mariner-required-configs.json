@@ -1252,6 +1252,19 @@
                 "PR": [
                     "https://github.com/microsoft/CBL-Mariner/pull/7044"
                 ]
+            },
+            "CONFIG_CUSE": {
+                "value": [
+                    "m"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "Enable CUSE to support Nvidia rshim interface for Mariner hosts",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6853"
+                ]
             }
         }
     }
