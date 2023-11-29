@@ -478,6 +478,7 @@ install -m644 %{SOURCE9} \
 %changelog
 * Tue Nov 28 2023 Tobias Brick <tobiasb@microsoft.com> - 3.1.4-1
 - Upgrade to 3.1.4
+- Initial CBL-Mariner import from Fedora 39 (license: MIT).
 - License verified
 
 * Thu Oct 26 2023 Sahana Prasad <sahana@redhat.com> - 1:3.1.4-1
