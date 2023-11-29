@@ -1,9 +1,3 @@
-# For the curious:
-# 0.9.8jk + EAP-FAST soversion = 8
-# 1.0.0 soversion = 10
-# 1.1.0 soversion = 1.1 (same as upstream although presence of some symbols
-#                        depends on build configuration options)
-# 3.0.0 soversion = 3 (same as upstream)
 %define soversion 3
 
 # Arches on which we need to prevent arch conflicts on opensslconf.h, must
@@ -32,7 +26,6 @@ Version: 3.1.4
 Release: 1%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Epoch: 1
 Source: https://www.openssl.org/source/openssl-%{version}.tar.gz
 Source2: Makefile.certificate
 Source3: genpatches
@@ -167,12 +160,10 @@ BuildRequires: perl(Test::Harness), perl(Test::More), perl(Math::BigInt)
 BuildRequires: perl(Module::Load::Conditional), perl(File::Temp)
 BuildRequires: perl(Time::HiRes), perl(IPC::Cmd), perl(Pod::Html), perl(Digest::SHA)
 BuildRequires: perl(FindBin), perl(lib), perl(File::Compare), perl(File::Copy), perl(bigint)
-BuildRequires: git-core
-BuildRequires: systemtap-sdt-devel
 
-Requires:       perl >= 5.13.4
+Requires: perl
 Requires: coreutils
-Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
+Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description
 The OpenSSL toolkit provides support for secure communications between
@@ -192,7 +183,7 @@ support cryptographic algorithms and protocols.
 
 %package devel
 Summary: Files for development of applications which will use OpenSSL
-Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
+Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 Requires: pkgconfig
 
 %description devel
@@ -203,7 +194,7 @@ support various cryptographic algorithms and protocols.
 %package static
 Summary:        Libraries for static linking of applications which will use OpenSSL
 # Group:          Development/Libraries
-Requires:       %{name}-devel%{?_isa} = %{epoch}:%{version}-%{release}
+Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
 
 %description static
 OpenSSL is a toolkit for supporting cryptography. The openssl-static
@@ -214,7 +205,7 @@ protocols.
 %package perl
 Summary: Perl scripts provided with OpenSSL
 Requires: perl-interpreter
-Requires: %{name}%{?_isa} = %{epoch}:%{version}-%{release}
+Requires: %{name}%{?_isa} = %{version}-%{release}
 
 %description perl
 OpenSSL is a toolkit for supporting cryptography. The openssl-perl
@@ -485,6 +476,10 @@ install -m644 %{SOURCE9} \
 %ldconfig_scriptlets libs
 
 %changelog
+* Tue Nov 28 2023 Tobias Brick <tobiasb@microsoft.com> - 3.1.4-1
+- Upgrade to 3.1.4
+- License verified
+
 * Thu Oct 26 2023 Sahana Prasad <sahana@redhat.com> - 1:3.1.4-1
 - Rebase to upstream version 3.1.4
 
