@@ -4750,8 +4750,8 @@
         "type": "other",
         "other": {
           "name": "gpgme",
-          "version": "1.16.0",
-          "downloadUrl": "https://www.gnupg.org/ftp/gcrypt/gpgme/gpgme-1.16.0.tar.bz2"
+          "version": "1.23.2",
+          "downloadUrl": "https://www.gnupg.org/ftp/gcrypt/gpgme/gpgme-1.23.2.tar.bz2"
         }
       }
     },

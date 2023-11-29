@@ -583,11 +583,11 @@ texinfo-7.0.3-1.cm2.x86_64.rpm
 texinfo-debuginfo-7.0.3-1.cm2.x86_64.rpm
 unzip-6.0-20.cm2.x86_64.rpm
 unzip-debuginfo-6.0-20.cm2.x86_64.rpm
-util-linux-2.37.4-8.cm2.x86_64.rpm
-util-linux-debuginfo-2.37.4-8.cm2.x86_64.rpm
-util-linux-devel-2.37.4-8.cm2.x86_64.rpm
-util-linux-lang-2.37.4-8.cm2.x86_64.rpm
-util-linux-libs-2.37.4-8.cm2.x86_64.rpm
+util-linux-2.39.2-1.cm2.x86_64.rpm
+util-linux-debuginfo-2.39.2-1.cm2.x86_64.rpm
+util-linux-devel-2.39.2-1.cm2.x86_64.rpm
+util-linux-lang-2.39.2-1.cm2.x86_64.rpm
+util-linux-libs-2.39.2-1.cm2.x86_64.rpm
 which-2.21-8.cm2.x86_64.rpm
 which-debuginfo-2.21-8.cm2.x86_64.rpm
 xz-5.4.4-1.cm2.x86_64.rpm
