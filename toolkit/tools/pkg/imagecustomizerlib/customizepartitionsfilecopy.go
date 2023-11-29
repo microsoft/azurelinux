@@ -58,6 +58,9 @@ func copyFilesIntoNewDisk(existingImageChroot *safechroot.Chroot, newImageChroot
 }
 
 func copyFilesIntoNewDiskHelper(existingImageChroot *safechroot.Chroot, newImageChroot *safechroot.Chroot) error {
+	// Notes:
+	// `-a` ensures unix permissions, extended attributes (including SELinux), and sub-directories (-r) are copied.
+	// `--no-dereference` ensures that symlinks are copied as symlinks.
 	copyArgs := []string{"--verbose", "--no-clobber", "-a", "--no-dereference", "--sparse", "always", "-t", newImageChroot.RootDir()}
 
 	files, err := os.ReadDir(existingImageChroot.RootDir())
@@ -69,6 +72,9 @@ func copyFilesIntoNewDiskHelper(existingImageChroot *safechroot.Chroot, newImage
 		switch file.Name() {
 		case "dev", "proc", "sys", "run", "tmp":
 			// Exclude special directories.
+			//
+			// Note: Under /var, there are symlinks to a couple of these special directories.
+			// However, the `cp` command is called with `--no-dereference`. So, the symlinks will be copied as symlinks.
 			continue
 		}
 
