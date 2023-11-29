@@ -2,7 +2,7 @@
 Cython is an optimising static compiler for both the Python programming language and the extended Cython programming language (baded on Pyrex). It makes writing C extensions for Python as easy as Python itself.}
 Summary:        Language for writing Python extension modules
 Name:           Cython
-Version:        0.29.33
+Version:        0.29.36
 Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
@@ -55,6 +55,9 @@ pip3 install -r test-requirements.txt
 %{python3_sitearch}/__pycache__/cython.*
 
 %changelog
+* Wed Nov 29 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.29.36-1
+- Auto-upgrade to 0.29.36 - Update to most recent usptream patch version
+
 * Mon Feb 13 2023 Olivia Crain <oliviacrain@microsoft.com> - 0.29.33-1
 - Update to latest upstream patch version to fix failing package tests
 - Use release tarball instead of git snapshot of release commit
