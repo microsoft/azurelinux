@@ -2,6 +2,8 @@
  "Signatures": {
   "MICROSOFT-METADATA-GPG-KEY": "1824ecffeda90cfe4178a99bddde450f09fd40e8faf4f0124fba16ea79998c4c",
   "MICROSOFT-RPM-GPG-KEY": "1092f37ec429e58bf9c7f898df17c3c32eb2ce3c4c037afb8ffe2d2b42e16e89",
+  "mariner-cloud-native.repo": "7f3dd689050ed5085b66b7d92417369cde8fe5f608476c4901f335a3bd57f005",
+  "mariner-cloud-native-preview.repo": "68fccfcba6c8a7be6d56e6ec29519a314615a60de673bac5fd5249d60e9485e2",
   "mariner-debuginfo-preview.repo": "1fea397ab17fc801351174626639c4a5e38df7393053bc419f192d49530d9f92",
   "mariner-debuginfo.repo": "5502de8668a12802c46f45b51e47e54472e371b02984c641d757a3905322bc7d",
   "mariner-extended-debuginfo-preview.repo": "2897ae5134cddb357a17348308a02f3f3ef7032109687fa9dbbfa017abc87933",

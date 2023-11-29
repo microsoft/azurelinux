@@ -1,7 +1,7 @@
 Summary:        Metapackage with core sets of packages
 Name:           core-packages
 Version:        2.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -61,6 +61,7 @@ Requires:       grep
 Requires:       gzip
 Requires:       mariner-release
 Requires:       mariner-repos
+Requires:       mariner-repos-cloud-native
 Requires:       mariner-repos-extras
 Requires:       mariner-repos-microsoft
 Requires:       ncurses-libs
@@ -87,6 +88,9 @@ Requires:       zlib
 %files container
 
 %changelog
+* Wed Nov 29 2023 Andrew Phelps <anphel@microsoft.com> - 2.0-9
+- Add mariner-repos-cloud-native
+
 * Wed Jun 28 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-8
 - Moving 'curl' and 'grep' to the 'core-packages-container' package.
 
