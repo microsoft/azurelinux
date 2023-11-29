@@ -130,7 +130,7 @@ install -p plugins/ipam/dhcp/systemd/cni-dhcp.socket %{buildroot}%{_unitdir}
 
 %changelog
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.1-13
-- Bump release to rebuild with go 1.20.10
+- Bump release to rebuild with go 1.20.9
 
 * Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 1.1.1-12
 - Bump release to rebuild with updated version of Go.

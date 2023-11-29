@@ -127,14 +127,14 @@ func deleteResolvConf(imageChroot *safechroot.Chroot) error {
 }
 
 func updateHostname(hostname string, imageChroot *safechroot.Chroot) error {
-	var err error
-
 	if hostname == "" {
 		return nil
 	}
 
+	logger.Log.Infof("Setting hostname (%s)", hostname)
+
 	hostnameFilePath := filepath.Join(imageChroot.RootDir(), "etc/hostname")
-	err = file.Write(hostname, hostnameFilePath)
+	err := file.Write(hostname, hostnameFilePath)
 	if err != nil {
 		return fmt.Errorf("failed to write hostname file: %w", err)
 	}
@@ -143,17 +143,17 @@ func updateHostname(hostname string, imageChroot *safechroot.Chroot) error {
 }
 
 func copyAdditionalFiles(baseConfigPath string, additionalFiles map[string]imagecustomizerapi.FileConfigList, imageChroot *safechroot.Chroot) error {
-	var err error
-
 	for sourceFile, fileConfigs := range additionalFiles {
 		for _, fileConfig := range fileConfigs {
+			logger.Log.Infof("Copying: %s", fileConfig.Path)
+
 			fileToCopy := safechroot.FileToCopy{
 				Src:         filepath.Join(baseConfigPath, sourceFile),
 				Dest:        fileConfig.Path,
 				Permissions: (*fs.FileMode)(fileConfig.Permissions),
 			}
 
-			err = imageChroot.AddFiles(fileToCopy)
+			err := imageChroot.AddFiles(fileToCopy)
 			if err != nil {
 				return err
 			}
@@ -180,18 +180,14 @@ func runScripts(baseConfigPath string, scripts []imagecustomizerapi.Script, imag
 	for _, script := range scripts {
 		scriptPathInChroot := filepath.Join(configDirMountPathInChroot, script.Path)
 		command := fmt.Sprintf("%s %s", scriptPathInChroot, script.Args)
+		logger.Log.Infof("Running script (%s)", script.Path)
 
 		// Run the script.
 		err = imageChroot.UnsafeRun(func() error {
-			err := shell.ExecuteLive(false, shell.ShellProgram, "-c", command)
-			if err != nil {
-				return err
-			}
-
-			return nil
+			return shell.ExecuteLiveWithErr(1, shell.ShellProgram, "-c", command)
 		})
 		if err != nil {
-			return err
+			return fmt.Errorf("script (%s) failed:\n%w", script.Path, err)
 		}
 	}
 
@@ -303,15 +299,10 @@ func enableOrDisableServices(services imagecustomizerapi.Services, imageChroot *
 		logger.Log.Infof("Enabling service (%s)", service.Name)
 
 		err = imageChroot.UnsafeRun(func() error {
-			err := shell.ExecuteLive(false, "systemctl", "enable", service.Name)
-			if err != nil {
-				return fmt.Errorf("failed to enable service (%s): \n%w", service.Name, err)
-			}
-
-			return nil
+			return shell.ExecuteLiveWithErr(1, "systemctl", "enable", service.Name)
 		})
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to enable service (%s):\n%w", service.Name, err)
 		}
 	}
 
@@ -320,15 +311,10 @@ func enableOrDisableServices(services imagecustomizerapi.Services, imageChroot *
 		logger.Log.Infof("Disabling service (%s)", service.Name)
 
 		err = imageChroot.UnsafeRun(func() error {
-			err := shell.ExecuteLive(false, "systemctl", "disable", service.Name)
-			if err != nil {
-				return fmt.Errorf("failed to disable service (%s): %w", service.Name, err)
-			}
-
-			return nil
+			return shell.ExecuteLiveWithErr(1, "systemctl", "disable", service.Name)
 		})
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to disable service (%s):\n%w", service.Name, err)
 		}
 	}
 

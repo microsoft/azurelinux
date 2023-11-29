@@ -1,5 +1,5 @@
 filesystem-1.1-17.cm2.x86_64.rpm
-kernel-headers-5.15.137.1-1.cm2.noarch.rpm
+kernel-headers-5.15.138.1-3.cm2.noarch.rpm
 glibc-2.35-6.cm2.x86_64.rpm
 glibc-devel-2.35-6.cm2.x86_64.rpm
 glibc-i18n-2.35-6.cm2.x86_64.rpm
@@ -33,11 +33,11 @@ libpkgconf-1.8.0-3.cm2.x86_64.rpm
 pkgconf-1.8.0-3.cm2.x86_64.rpm
 pkgconf-m4-1.8.0-3.cm2.noarch.rpm
 pkgconf-pkg-config-1.8.0-3.cm2.x86_64.rpm
-ncurses-6.4-1.cm2.x86_64.rpm
-ncurses-compat-6.4-1.cm2.x86_64.rpm
-ncurses-devel-6.4-1.cm2.x86_64.rpm
-ncurses-libs-6.4-1.cm2.x86_64.rpm
-ncurses-term-6.4-1.cm2.x86_64.rpm
+ncurses-6.4-2.cm2.x86_64.rpm
+ncurses-compat-6.4-2.cm2.x86_64.rpm
+ncurses-devel-6.4-2.cm2.x86_64.rpm
+ncurses-libs-6.4-2.cm2.x86_64.rpm
+ncurses-term-6.4-2.cm2.x86_64.rpm
 readline-8.1-1.cm2.x86_64.rpm
 readline-devel-8.1-1.cm2.x86_64.rpm
 coreutils-8.32-7.cm2.x86_64.rpm
@@ -206,8 +206,8 @@ pcre-8.45-2.cm2.x86_64.rpm
 pcre-libs-8.45-2.cm2.x86_64.rpm
 lua-5.4.4-1.cm2.x86_64.rpm
 lua-libs-5.4.4-1.cm2.x86_64.rpm
-mariner-rpm-macros-2.0-23.cm2.noarch.rpm
-mariner-check-macros-2.0-23.cm2.noarch.rpm
+mariner-rpm-macros-2.0-24.cm2.noarch.rpm
+mariner-check-macros-2.0-24.cm2.noarch.rpm
 tdnf-3.5.2-2.cm2.x86_64.rpm
 tdnf-cli-libs-3.5.2-2.cm2.x86_64.rpm
 tdnf-devel-3.5.2-2.cm2.x86_64.rpm

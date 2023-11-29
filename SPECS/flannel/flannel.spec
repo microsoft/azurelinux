@@ -52,7 +52,7 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./dist/flanneld
 - Bump release to rebuild against glibc 2.35-6
 
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.14.0-19
-- Bump release to rebuild with go 1.20.10
+- Bump release to rebuild with go 1.20.9
 
 * Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 0.14.0-18
 - Bump release to rebuild with updated version of Go.

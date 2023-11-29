@@ -1103,6 +1103,19 @@
                     "https://github.com/microsoft/CBL-Mariner/pull/5972"
                 ]
             },
+            "CONFIG_BPF_LSM": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "Allow customers to use BPF LSM programs",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6846"
+                ]
+            },
             "CONFIG_MCTP": {
                 "value": [
                     "is not set"
@@ -1212,6 +1225,103 @@
                 "comment": "Needs to be off for CVE-2023-38431, CVE-2023-38430, CVE-2023-38427, CVE-2023-32258, CVE-2023-32257, CVE-2023-32254, CVE-2023-32252, CVE-2023-32250, CVE-2023-32247, CVE-2022-47940",
                 "PR": [
                     "https://github.com/microsoft/CBL-Mariner/pull/6574"
+                ]
+            },
+            "CONFIG_IOASID": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for CONFIG_ARM_SMMU",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6829"
+                ]
+            },
+            "CONFIG_IOMMU_SVA_LIB": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for CONFIG_ARM_SMMU_V3_SVA",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6829"
+                ]
+            },
+            "CONFIG_ARM_SMMU": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for VFIO to work",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6829"
+                ]
+            },
+            "CONFIG_ARM_SMMU_LEGACY_DT_BINDINGS": {
+                "value": [
+                    "<missing>",
+                    "is not set"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "No device tree support needed",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6829"
+                ]
+            },
+            "CONFIG_ARM_SMMU_DISABLE_BYPASS_BY_DEFAULT": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "More secure when set",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6829"
+                ]
+            },
+            "CONFIG_ARM_SMMU_QCOM": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Allow support of QCom SMMU, because why not?",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6829"
+                ]
+            },
+            "CONFIG_ARM_SMMU_V3": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for VFIO to work",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6829"
+                ]
+            },
+            "CONFIG_ARM_SMMU_V3_SVA": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for CONFIG_ARM_SMMU_V3",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/6829"
                 ]
             }
         }
