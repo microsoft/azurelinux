@@ -39,9 +39,14 @@ func (c *Config) IsValid() error {
 
 	hasDisks := c.Disks != nil
 	hasBootType := c.SystemConfig.BootType != BootTypeUnset
+	hasKernelCommandLineArgs := c.SystemConfig.KernelCommandLine.ExtraCommandLine != ""
 
 	if hasDisks != hasBootType {
 		return fmt.Errorf("SystemConfig.BootType and Disks must be specified together")
+	}
+
+	if hasKernelCommandLineArgs && !hasDisks {
+		return fmt.Errorf("the Disks and SystemConfig.BootType values must also be specified if SystemConfig.KernelCommandLine.ExtraCommandLine is specified")
 	}
 
 	// Ensure the correct partitions exist to support the specified the boot type.

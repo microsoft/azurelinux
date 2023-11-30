@@ -58,13 +58,14 @@ func connectToExistingImageHelper(imageConnection *ImageConnection, imageFilePat
 }
 
 func createNewImage(filename string, diskConfig imagecustomizerapi.Disk,
-	partitionSettings []imagecustomizerapi.PartitionSetting, bootType imagecustomizerapi.BootType, buildDir string,
-	chrootDirName string, installOS installOSFunc,
+	partitionSettings []imagecustomizerapi.PartitionSetting, bootType imagecustomizerapi.BootType,
+	kernelCommandLine imagecustomizerapi.KernelCommandLine, buildDir string, chrootDirName string,
+	installOS installOSFunc,
 ) (*ImageConnection, error) {
 	imageConnection := &ImageConnection{}
 
-	err := createNewImageHelper(imageConnection, filename, diskConfig, partitionSettings, bootType, buildDir,
-		chrootDirName, installOS,
+	err := createNewImageHelper(imageConnection, filename, diskConfig, partitionSettings, bootType, kernelCommandLine,
+		buildDir, chrootDirName, installOS,
 	)
 	if err != nil {
 		imageConnection.Close()
@@ -75,8 +76,9 @@ func createNewImage(filename string, diskConfig imagecustomizerapi.Disk,
 }
 
 func createNewImageHelper(imageConnection *ImageConnection, filename string, diskConfig imagecustomizerapi.Disk,
-	partitionSettings []imagecustomizerapi.PartitionSetting, bootType imagecustomizerapi.BootType, buildDir string,
-	chrootDirName string, installOS installOSFunc,
+	partitionSettings []imagecustomizerapi.PartitionSetting, bootType imagecustomizerapi.BootType,
+	kernelCommandLine imagecustomizerapi.KernelCommandLine, buildDir string, chrootDirName string,
+	installOS installOSFunc,
 ) error {
 	// Convert config to image config types, so that the imager's utils can be used.
 	imagerBootType, err := bootTypeToImager(bootType)
@@ -90,6 +92,11 @@ func createNewImageHelper(imageConnection *ImageConnection, filename string, dis
 	}
 
 	imagerPartitionSettings, err := partitionSettingsToImager(partitionSettings)
+	if err != nil {
+		return err
+	}
+
+	imagerKernelCommandLine, err := kernelCommandLineToImager(kernelCommandLine)
 	if err != nil {
 		return err
 	}
@@ -114,7 +121,7 @@ func createNewImageHelper(imageConnection *ImageConnection, filename string, dis
 
 	// Configure the boot loader.
 	err = installutils.ConfigureDiskBootloader(imagerBootType, false, false, imagerPartitionSettings,
-		configuration.KernelCommandLine{}, imageConnection.Chroot(), imageConnection.Loopback().DevicePath(),
+		imagerKernelCommandLine, imageConnection.Chroot(), imageConnection.Loopback().DevicePath(),
 		mountPointMap, diskutils.EncryptedRootDevice{}, diskutils.VerityDevice{})
 	if err != nil {
 		return fmt.Errorf("failed to install bootloader:\n%w", err)

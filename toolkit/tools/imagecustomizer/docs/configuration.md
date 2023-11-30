@@ -179,6 +179,22 @@ SystemConfig:
       Permissions: "664"
 ```
 
+## KernelCommandLine type
+
+Options for configuring the kernel.
+
+### ExtraCommandLine
+
+Additional Linux kernel command line options to add during partition customization.
+
+This value may only be used when when the [Disks](#disks-disk) and
+[SystemConfig.PartitionSettings](#partitionsettings-partitionsetting) fields are
+specified.
+
+### CommandLineAdd
+
+Additional Linux kernel command line options to add during image customization.
+
 ## Module type
 
 Options for configuring a kernel module.
@@ -460,6 +476,11 @@ Example:
 SystemConfig:
   Hostname: example-image
 ```
+
+### KernelCommandLine [[KernelCommandLine](#kernelcommandline-type)]
+
+Specifies extra kernel command line options, as well as other configuration values
+relating to the kernel.
 
 ### UpdateBaseImagePackages [bool]
 

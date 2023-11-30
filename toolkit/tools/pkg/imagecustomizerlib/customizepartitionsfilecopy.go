@@ -30,7 +30,7 @@ func customizePartitionsUsingFileCopy(buildDir string, baseConfigPath string, co
 	}
 
 	newImageConnection, err := createNewImage(newBuildImageFile, diskConfig, config.SystemConfig.PartitionSettings,
-		config.SystemConfig.BootType, buildDir, "newimageroot", installOSFunc)
+		config.SystemConfig.BootType, config.SystemConfig.KernelCommandLine, buildDir, "newimageroot", installOSFunc)
 	if err != nil {
 		return err
 	}
