@@ -24,8 +24,9 @@ resources:
       name: mariner/CBL-Mariner-Pipelines
       ref: 'refs/heads/nicolasg/codeQL-toolkit'
 
-stage: CodeQL-Analysis
-  - template: SDL/pipelines/CodeQL-template.yml@CBL-Mariner-Pipelines
-    parameters:
-      marinerBranch: ${{ parameters.marinerBranch }}
-      analyzeInPipeline: ${{ parameters.analyzeInPipeline }}
+stages:
+  - stage: CodeQL-Analysis
+    - template: SDL/pipelines/CodeQL-template.yml@CBL-Mariner-Pipelines
+      parameters:
+        marinerBranch: ${{ parameters.marinerBranch }}
+        analyzeInPipeline: ${{ parameters.analyzeInPipeline }}
