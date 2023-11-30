@@ -20,6 +20,7 @@ type User struct {
 	PrimaryGroup        string   `yaml:"PrimaryGroup"`
 	SecondaryGroups     []string `yaml:"SecondaryGroups"`
 	StartupCommand      string   `yaml:"StartupCommand"`
+	HomeDirectory       string   `yaml:"HomeDirectory"`
 }
 
 func (u *User) IsValid() error {

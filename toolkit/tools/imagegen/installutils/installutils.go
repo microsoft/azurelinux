@@ -433,11 +433,20 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 	// Keep a running total of how many packages have been installed through all the `TdnfInstallWithProgress` invocations
 	packagesInstalled := 0
 
+	var (
+		corePkgs = []string{"filesystem"}
+	)
+	if len(config.Users) > 0 || len(config.Groups) > 0 {
+		corePkgs = append(corePkgs, "shadow-utils")
+	}
+
 	timestamp.StartEvent("installing packages", nil)
 	// Install filesystem package first
-	packagesInstalled, err = TdnfInstallWithProgress(filesystemPkg, installRoot, packagesInstalled, totalPackages, true)
-	if err != nil {
-		return
+	for _, pkg := range corePkgs {
+		packagesInstalled, err = TdnfInstallWithProgress(pkg, installRoot, packagesInstalled, totalPackages, true)
+		if err != nil {
+			return
+		}
 	}
 
 	hostname := config.Hostname
@@ -447,6 +456,18 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 		if err != nil {
 			return
 		}
+	}
+
+	// Add groups
+	err = addGroups(installChroot, config.Groups)
+	if err != nil {
+		return
+	}
+
+	// Add users
+	err = addUsers(installChroot, config.Users)
+	if err != nil {
+		return
 	}
 
 	// Install packages one-by-one to avoid exhausting memory
@@ -473,18 +494,6 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 		if err != nil {
 			return
 		}
-
-		// Add groups
-		err = addGroups(installChroot, config.Groups)
-		if err != nil {
-			return
-		}
-	}
-
-	// Add users
-	err = addUsers(installChroot, config.Users)
-	if err != nil {
-		return
 	}
 
 	// Add machine-id
@@ -1310,7 +1319,7 @@ func createUserWithPassword(installChroot *safechroot.Chroot, user configuration
 		}
 		isRoot = true
 	} else {
-		err = userutils.AddUser(user.Name, hashedPassword, user.UID, installChroot)
+		err = userutils.AddUser(user.Name, user.HomeDirectory, user.PrimaryGroup, hashedPassword, user.UID, installChroot)
 		if err != nil {
 			return
 		}

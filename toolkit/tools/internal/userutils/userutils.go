@@ -70,13 +70,20 @@ func UserExists(username string, installChroot safechroot.ChrootInterface) (bool
 	return userExists, nil
 }
 
-func AddUser(username string, hashedPassword string, uid string, installChroot safechroot.ChrootInterface) error {
+func AddUser(username string, homeDir string, primaryGroup string, hashedPassword string, uid string, installChroot *safechroot.Chroot) error {
 	var args = []string{username, "-m"}
 	if hashedPassword != "" {
 		args = append(args, "-p", hashedPassword)
 	}
 	if uid != "" {
 		args = append(args, "-u", uid)
+	}
+	if len(homeDir) == 0 {
+		homeDir = filepath.Join(UserHomeDirPrefix, username)
+	}
+	args = append(args, "-d", homeDir)
+	if primaryGroup != "" {
+		args = append(args, "-g", primaryGroup)
 	}
 
 	err := installChroot.UnsafeRun(func() error {

@@ -24,6 +24,7 @@ type User struct {
 	PrimaryGroup        string   `json:"PrimaryGroup"`
 	SecondaryGroups     []string `json:"SecondaryGroups"`
 	StartupCommand      string   `json:"StartupCommand"`
+	HomeDirectory       string   `json:"HomeDirectory"`
 }
 
 // UnmarshalJSON Unmarshals a User entry
