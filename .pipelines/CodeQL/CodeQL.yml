@@ -22,6 +22,7 @@ resources:
     - repository: CBL-Mariner-Pipelines
       type: git
       name: mariner/CBL-Mariner-Pipelines
+      ref: 'refs/heads/nicolasg/codeQL-toolkit'
 
 stage: CodeQL-Analysis
   - template: SDL/pipelines/CodeQL-template.yml@CBL-Mariner-Pipelines
