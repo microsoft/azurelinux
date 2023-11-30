@@ -79,7 +79,7 @@ fi
 
 %changelog
 * Wed Nov 23 2023 Bala <balakumaran.kannan@gmail.com> - 1.7.2-2
-- Fix CVE-2023-47108 by upgrading otel-grpc version to 0.46.0 in go.mod
+- Fix CVE-2023-47108 by backporting the fix made for otel-grpc-0.40.0
 
 * Fri Nov 08 2023 Saul Paredes <saulparedes@microsoft.com> - 1.7.2-1
 - Always add TargetLayerDigestLabel label to snapshots
