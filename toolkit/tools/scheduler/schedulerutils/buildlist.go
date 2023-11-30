@@ -88,8 +88,8 @@ func ReadReservedFilesList(path string) (reservedFiles []string, err error) {
 }
 
 // IsReservedFile determines if a given file path or filename is found in a list of reserved RPMs.
-// reservedRPMs may be a list of filenames or paths to reserved files. (e.g. 'foo-1.0.0-1.cm1.x86_64.rpm' or
-// '/path/to/foo-1.0.0-1.cm1.x86_64.rpm').
+// reservedRPMs may be a list of filenames or paths to reserved files. (e.g. 'foo-1.0.0-1.azl3.x86_64.rpm' or
+// '/path/to/foo-1.0.0-1.azl3.x86_64.rpm').
 func IsReservedFile(rpmPath string, reservedRPMs []string) bool {
 	base := filepath.Base(rpmPath)
 	for _, reservedRPM := range reservedRPMs {
