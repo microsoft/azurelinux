@@ -609,37 +609,37 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 			err = fmt.Errorf("failed to configure boot loader: %w", err)
 			return
 		}
+	}
 
-		// Preconfigure SELinux labels now since all the changes to the filesystem should be done
-		if systemConfig.KernelCommandLine.SELinux != configuration.SELinuxOff {
-			err = installutils.SELinuxConfigure(systemConfig, installChroot, mountPointToFsTypeMap)
-			if err != nil {
-				err = fmt.Errorf("failed to configure selinux: %w", err)
-				return
-			}
+	// Preconfigure SELinux labels now since all the changes to the filesystem should be done
+	if systemConfig.KernelCommandLine.SELinux != configuration.SELinuxOff {
+		err = installutils.SELinuxConfigure(systemConfig, installChroot, mountPointToFsTypeMap, isRootFS)
+		if err != nil {
+			err = fmt.Errorf("failed to configure selinux: %w", err)
+			return
 		}
+	}
 
-		// Snapshot the root filesystem as a read-only verity disk and update the initramfs.
-		if systemConfig.ReadOnlyVerityRoot.Enable {
-			timestamp.StartEvent("configure DM Verity", nil)
-			var initramfsPathList []string
-			err = readOnlyRoot.SwitchDeviceToReadOnly(mountPointMap["/"], mountPointToMountArgsMap["/"])
-			if err != nil {
-				err = fmt.Errorf("failed to switch root to read-only: %w", err)
-				return
-			}
-			installutils.ReportAction("Hashing root for read-only with dm-verity, this may take a long time if error correction is enabled")
-			initramfsPathList, err = filepath.Glob(filepath.Join(installRoot, "/boot/initrd.img*"))
-			if err != nil || len(initramfsPathList) != 1 {
-				return fmt.Errorf("could not find single initramfs (%v): %w", initramfsPathList, err)
-			}
-			err = readOnlyRoot.AddRootVerityFilesToInitramfs(verityWorkingDir, initramfsPathList[0])
-			if err != nil {
-				err = fmt.Errorf("failed to include read-only root files in initramfs: %w", err)
-				return
-			}
-			timestamp.StopEvent(nil) // configure DM Verity
+	// Snapshot the root filesystem as a read-only verity disk and update the initramfs.
+	if !isRootFS && systemConfig.ReadOnlyVerityRoot.Enable {
+		timestamp.StartEvent("configure DM Verity", nil)
+		var initramfsPathList []string
+		err = readOnlyRoot.SwitchDeviceToReadOnly(mountPointMap["/"], mountPointToMountArgsMap["/"])
+		if err != nil {
+			err = fmt.Errorf("failed to switch root to read-only: %w", err)
+			return
 		}
+		installutils.ReportAction("Hashing root for read-only with dm-verity, this may take a long time if error correction is enabled")
+		initramfsPathList, err = filepath.Glob(filepath.Join(installRoot, "/boot/initrd.img*"))
+		if err != nil || len(initramfsPathList) != 1 {
+			return fmt.Errorf("could not find single initramfs (%v): %w", initramfsPathList, err)
+		}
+		err = readOnlyRoot.AddRootVerityFilesToInitramfs(verityWorkingDir, initramfsPathList[0])
+		if err != nil {
+			err = fmt.Errorf("failed to include read-only root files in initramfs: %w", err)
+			return
+		}
+		timestamp.StopEvent(nil) // configure DM Verity
 	}
 
 	// Run finalize image scripts from within the installroot chroot

@@ -1610,7 +1610,7 @@ func ProvisionUserSSHCerts(installChroot *safechroot.Chroot, username string, ss
 }
 
 // SELinuxConfigure pre-configures SELinux file labels and configuration files
-func SELinuxConfigure(systemConfig configuration.SystemConfig, installChroot *safechroot.Chroot, mountPointToFsTypeMap map[string]string) (err error) {
+func SELinuxConfigure(systemConfig configuration.SystemConfig, installChroot *safechroot.Chroot, mountPointToFsTypeMap map[string]string, isRootFS bool) (err error) {
 	timestamp.StartEvent("SELinux", nil)
 	defer timestamp.StopEvent(nil)
 	logger.Log.Infof("Preconfiguring SELinux policy in %s mode", systemConfig.KernelCommandLine.SELinux)
@@ -1620,7 +1620,7 @@ func SELinuxConfigure(systemConfig configuration.SystemConfig, installChroot *sa
 		logger.Log.Errorf("Failed to update SELinux config")
 		return
 	}
-	err = selinuxRelabelFiles(systemConfig, installChroot, mountPointToFsTypeMap)
+	err = selinuxRelabelFiles(systemConfig, installChroot, mountPointToFsTypeMap, isRootFS)
 	if err != nil {
 		logger.Log.Errorf("Failed to label SELinux files")
 		return
@@ -1648,7 +1648,7 @@ func selinuxUpdateConfig(systemConfig configuration.SystemConfig, installChroot 
 	return
 }
 
-func selinuxRelabelFiles(systemConfig configuration.SystemConfig, installChroot *safechroot.Chroot, mountPointToFsTypeMap map[string]string) (err error) {
+func selinuxRelabelFiles(systemConfig configuration.SystemConfig, installChroot *safechroot.Chroot, mountPointToFsTypeMap map[string]string, isRootFS bool) (err error) {
 	const (
 		squashErrors        = false
 		configFile          = "etc/selinux/config"
@@ -1656,18 +1656,22 @@ func selinuxRelabelFiles(systemConfig configuration.SystemConfig, installChroot 
 	)
 	var listOfMountsToLabel []string
 
-	// Search through all our mount points for supported filesystem types
-	// Note for the future: SELinux can support any of {btrfs, encfs, ext2-4, f2fs, jffs2, jfs, ubifs, xfs, zfs}, but the build system currently
-	//     only supports the below cases:
-	for mount, fsType := range mountPointToFsTypeMap {
-		switch fsType {
-		case "ext2", "ext3", "ext4", "xfs":
-			listOfMountsToLabel = append(listOfMountsToLabel, mount)
-		case "fat32", "fat16", "vfat":
-			logger.Log.Debugf("SELinux will not label mount at (%s) of type (%s), skipping", mount, fsType)
-		default:
-			err = fmt.Errorf("unknown fsType (%s) for mount (%s), cannot configure SELinux", fsType, mount)
-			return
+	if isRootFS {
+		listOfMountsToLabel = append(listOfMountsToLabel, "/")
+	} else {
+		// Search through all our mount points for supported filesystem types
+		// Note for the future: SELinux can support any of {btrfs, encfs, ext2-4, f2fs, jffs2, jfs, ubifs, xfs, zfs}, but the build system currently
+		//     only supports the below cases:
+		for mount, fsType := range mountPointToFsTypeMap {
+			switch fsType {
+			case "ext2", "ext3", "ext4", "xfs":
+				listOfMountsToLabel = append(listOfMountsToLabel, mount)
+			case "fat32", "fat16", "vfat":
+				logger.Log.Debugf("SELinux will not label mount at (%s) of type (%s), skipping", mount, fsType)
+			default:
+				err = fmt.Errorf("unknown fsType (%s) for mount (%s), cannot configure SELinux", fsType, mount)
+				return
+			}
 		}
 	}
 
