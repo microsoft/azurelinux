@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-package imagemodifierlib
+package osmodifierlib
 
 import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"

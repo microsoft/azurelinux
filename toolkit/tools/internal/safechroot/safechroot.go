@@ -284,10 +284,15 @@ func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMoun
 
 // AddFiles copies each file 'Src' to the relative path chrootRootDir/'Dest' in the chroot.
 func (c *Chroot) AddFiles(filesToCopy ...FileToCopy) (err error) {
+	return addFilesToDestination(c.rootDir, filesToCopy...)
+}
+
+func addFilesToDestination(destDir string, filesToCopy ...FileToCopy) error {
 	for _, f := range filesToCopy {
-		dest := filepath.Join(c.rootDir, f.Dest)
+		dest := filepath.Join(destDir, f.Dest)
 		logger.Log.Debugf("Copying '%s' to worker '%s'", f.Src, dest)
 
+		var err error
 		if f.Permissions != nil {
 			err = file.CopyAndChangeMode(f.Src, dest, os.ModePerm, *f.Permissions)
 		} else {
@@ -296,10 +301,10 @@ func (c *Chroot) AddFiles(filesToCopy ...FileToCopy) (err error) {
 
 		if err != nil {
 			logger.Log.Errorf("Error provisioning worker with '%s'", f.Src)
-			return
+			return err
 		}
 	}
-	return
+	return nil
 }
 
 // CopyOutFile copies file 'srcPath' in the chroot to the host at 'destPath'
@@ -659,53 +664,5 @@ func extractWorkerTar(chroot string, workerTar string) (err error) {
 
 	logger.Log.Debugf("Using (%s) to extract tar", gzipTool)
 	_, _, err = shell.Execute("tar", "-I", gzipTool, "-xf", workerTar, "-C", chroot)
-	return
-}
-
-type ChrootInterface interface {
-	RootDir() string
-	Run(toRun func() error) error
-	UnsafeRun(toRun func() error) error
-	AddFiles(filesToCopy ...FileToCopy) error
-}
-
-// DummyChroot is a placeholder that implements ChrootInterface.
-type DummyChroot struct {
-}
-
-func (d DummyChroot) RootDir() string {
-	return "/"
-}
-
-func (d DummyChroot) Initialize(tarPath string, extraDirectories []string, extraMountPoints []*MountPoint) error {
-	// No operation for the dummy type
-	return nil
-}
-
-func (d DummyChroot) Run(toRun func() error) (err error) {
-	// Only execute the function, no chroot operations
-	return toRun()
-}
-
-func (d DummyChroot) UnsafeRun(toRun func() error) (err error) {
-	return toRun()
-}
-
-func (d DummyChroot) AddFiles(filesToCopy ...FileToCopy) (err error) {
-	for _, f := range filesToCopy {
-		dest := filepath.Join(d.RootDir(), f.Dest)
-		logger.Log.Debugf("Copying '%s' to worker '%s'", f.Src, dest)
-
-		if f.Permissions != nil {
-			err = file.CopyAndChangeMode(f.Src, dest, os.ModePerm, *f.Permissions)
-		} else {
-			err = file.Copy(f.Src, dest)
-		}
-
-		if err != nil {
-			logger.Log.Errorf("Error provisioning worker with '%s'", f.Src)
-			return
-		}
-	}
 	return
 }

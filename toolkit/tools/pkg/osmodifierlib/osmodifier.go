@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-package imagemodifierlib
+package osmodifierlib
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
 )
 
-func ModifyImageWithConfigFile(configFile string) error {
+func ModifyOSWithConfigFile(configFile string) error {
 	var err error
 
 	var systemConfig imagecustomizerapi.SystemConfig
@@ -26,7 +26,7 @@ func ModifyImageWithConfigFile(configFile string) error {
 		return fmt.Errorf("failed to get absolute path of config file directory:\n%w", err)
 	}
 
-	err = ModifyImage(absBaseConfigPath, &systemConfig)
+	err = ModifyOS(absBaseConfigPath, &systemConfig)
 	if err != nil {
 		return err
 	}
@@ -34,7 +34,7 @@ func ModifyImageWithConfigFile(configFile string) error {
 	return nil
 }
 
-func ModifyImage(baseConfigPath string, systemConfig *imagecustomizerapi.SystemConfig) error {
+func ModifyOS(baseConfigPath string, systemConfig *imagecustomizerapi.SystemConfig) error {
 	err := doModifications(baseConfigPath, systemConfig)
 	if err != nil {
 		return err

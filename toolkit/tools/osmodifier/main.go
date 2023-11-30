@@ -10,15 +10,15 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/imagemodifierlib"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/osmodifierlib"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/profile"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
 var (
-	app = kingpin.New("imagemodifier", "Used inside chroot to modify runtime image")
+	app = kingpin.New("osmodifier", "Used to modify os")
 
-	configFile    = app.Flag("config-file", "Path of the image modification config file.").Required().String()
+	configFile    = app.Flag("config-file", "Path of the os modification config file.").Required().String()
 	logFile       = exe.LogFileFlag(app)
 	logLevel      = exe.LogLevelFlag(app)
 	profFlags     = exe.SetupProfileFlags(app)
@@ -38,17 +38,17 @@ func main() {
 	}
 	defer prof.StopProfiler()
 
-	timestamp.BeginTiming("imagemodifier", *timestampFile)
+	timestamp.BeginTiming("osmodifier", *timestampFile)
 	defer timestamp.CompleteTiming()
 
 	err = modifyImage()
 	if err != nil {
-		log.Fatalf("image modification failed: %v", err)
+		log.Fatalf("os modification failed: %v", err)
 	}
 }
 
 func modifyImage() error {
-	err := imagemodifierlib.ModifyImageWithConfigFile(*configFile)
+	err := osmodifierlib.ModifyOSWithConfigFile(*configFile)
 	if err != nil {
 		return err
 	}
