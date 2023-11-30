@@ -47,7 +47,6 @@ var (
 	inputDir  = exe.InputDirFlag(app, "A directory containing a .RAW image or a rootfs directory")
 	outputDir = exe.OutputDirFlag(app, "A destination directory for the output image")
 
-	// george - comment this out.
 	configFile = app.Flag("config", "Path to the image config file.").Required().ExistingFile()
 	tmpDir     = app.Flag("tmp-dir", "Directory to store temporary files while converting.").Required().String()
 
@@ -98,18 +97,6 @@ func main() {
 		logger.Log.Panicf("Error when creating output directory. Error: %s", err)
 	}
 
-	logger.Log.Infof("inputDir = %s", inDirPath)
-	logger.Log.Infof("outputDir = %s", outDirPath)
-	logger.Log.Infof("tmpDir = %s", tmpDirPath)
-/*
-	newInitrdFile, err := 
-	  convertArtifact("initrd", outDirPath, "initrd", "", inDirPath , false, true)
-	if err != nil {
-		logger.Log.Panicf("Error when creating target image. Error: %s", err)
-	}
-
-	logger.Log.Infof("newInitrdFile = %s", newInitrdFile)
-*/	
 	config, err := configuration.Load(*configFile)
 	if err != nil {
 		logger.Log.Panicf("Failed loading image configuration. Error: %s", err)
