@@ -81,12 +81,9 @@ cd ~/git/CBL-Mariner/
 
 ```
 
+# Derive the initrd Image from The Full Rootfs
+
 ```bash
-#------------------------------------------------------------------------------
-#------------------------------------------------------------------------------
-#------------------------------------------------------------------------------
-
-
 OUTPUT_DIR=~/temp/iso-output
 # sudo rm -rf $OUTPUT_DIR
 mkdir -p $OUTPUT_DIR
@@ -100,90 +97,39 @@ cd ~/git/CBL-Mariner/
 # ~/temp/iso-output/iso-intermediates/disk0.raw
 ./toolkit/mic-iso-gen/1-build-rootfs.sh ~/git/CBL-Mariner/imageconfigs/baremetal.json $INTERMEDIATE_ARTIFACTS_DIR
 
-#------------------------------------------------------------------------------
-# Extract vmlinuz...
+# /home/george/temp/extracted-artifacts-dir/
+# outputs:
+#   extracted-initrd
+#   extracted-initrd-file
+#   extracted-rootfs
+#   extracted-vmlinuz-file
 #
-# Output:
-# ls -la /home/george/temp/extracted-artifacts-dir/original-vmlinuz-extracted/vmlinuz-5.15.137.1-1.cm2
-#
-./toolkit/mic-iso-gen/0-0-extract-vmlinuz-from-full-image.sh \
-  ~/temp/iso-output/iso-intermediates/disk0.raw \
-  /mnt/full-disk-rootfs-mount \
-  /home/george/temp/extracted-artifacts-dir
-
-#------------------------------------------------------------------------------
-# extract rootfs to be the seed for initrd...
-#
-# Output:
-# ls -la /home/george/temp/extracted-artifacts-dir/new-initrd-root
-#
-./toolkit/mic-iso-gen/0-0-b-extract-rootfs.sh \
+./toolkit/mic-iso-gen/1-extract-artifacts-from-rootfs.sh \
     ~/temp/iso-output/iso-intermediates/disk0.raw \
     /mnt/full-disk-rootfs-mount \
-    /home/george/temp/tmp-extract-rootfs \
+    /home/george/temp/tmp-extract-artifacts-from-rootfs \
     /home/george/temp/extracted-artifacts-dir
 
-#------------------------------------------------------------------------------
-## modify rootfs into initrd...
+./toolkit/mic-iso-gen/2-1-1-convert-rootfs-to-initrd.sh \
+    /home/george/temp/extracted-artifacts-dir/extracted-rootfs
+
+# outputs:
+#   /home/george/temp/generated-initrd-dir/initrd.img
 #
-# Output:
-# ls -la ~/temp/extracted-artifacts-dir/new-initrd-root/
+./toolkit/mic-iso-gen/2-1-2-create-initrd-from-folder.sh \
+    /home/george/temp/extracted-artifacts-dir/extracted-rootfs \
+    /home/george/temp/tmp-create-initrd-from-folder \
+    /home/george/temp/generated-initrd-dir
+
+# outputs:
+#   /home/george/temp/iso-output/iso/baremetal-20231129-200226.iso
 #
-# Compare with: ls -la ~/temp/iso-minimal-initrd/extracted/
-#
-sudo cp ~/temp/iso-minimal-initrd/extracted/root/mariner-iso-start-up.sh \
-    /home/george/temp/extracted-artifacts-dir/new-initrd-root/root/
-
-sudo cp ~/git/CBL-Mariner/toolkit/mic-iso-gen/0-0-c-rpm-uninstall-packages.sh \
-    /home/george/temp/extracted-artifacts-dir/new-initrd-root
-
-sudo rm /home/george/temp/extracted-artifacts-dir/new-initrd-root/etc/fstab
-sudo touch /home/george/temp/extracted-artifacts-dir/new-initrd-root/etc/fstab
-
-pushd /home/george/temp/extracted-artifacts-dir/new-initrd-root/
-sudo patch -p1 -i /home/george/git/CBL-Mariner/toolkit/mic-iso-gen/passwd.patch
-
-popd
-
-sudo chroot /home/george/temp/extracted-artifacts-dir/new-initrd-root/
-sudo chown -R root:root .
-/0-0-c-rpm-uninstall-packages.sh
-exit
-
-sudo chmod 744 /home/george/temp/extracted-artifacts-dir/new-initrd-root/boot
-
-#------------------------------------------------------------------------------
-# Re-package
-#
-# Output:
-# ls -la /home/george/temp/experiment-roast-out/initrd.img
-#
-/home/george/git/CBL-Mariner/toolkit/mic-iso-gen/0-0-d-create-initrd-using-roast.sh \
-  /home/george/temp/extracted-artifacts-dir/new-initrd-root/
-
-# create an initrd...
-
-# ~/temp/iso-output
-
-# INITRD_FILE=/home/george/temp/derived-initrd-working-dir/initrd.img-5.15.137.1-1.cm2
-# INITRD_FILE=/home/george/temp/reduced-rootfs-to-initrd/initrd.img
-# INITRD_FILE=/mnt/full-initrd-iso/isolinux/initrd.img
-# INITRD_FILE=~/temp/experiment/new/compressed/initrd.img
-# INITRD_FILE=/home/george/temp/experiment-roast-out/initrd.img
-INITRD_FILE=/home/george/temp/experiment-roast-out/initrd.img
-OUTPUT_DIR=~/temp/iso-output
-mkdir -p $OUTPUT_DIR
-
-INTERMEDIATE_ARTIFACTS_DIR=$OUTPUT_DIR/iso-intermediates
-mkdir -p $INTERMEDIATE_ARTIFACTS_DIR
-
-./toolkit/mic-iso-gen/2-create-iso.sh \
-    $INITRD_FILE \
-    /home/george/temp/extracted-artifacts-dir/original-vmlinuz-extracted/vmlinuz-5.15.137.1-1.cm2 \
+./toolkit/mic-iso-gen/2-1-3-create-iso-from-initrd-vmlinuz.sh \
+    /home/george/temp/generated-initrd-dir/initrd.img \
+    /home/george/temp/extracted-artifacts-dir/extracted-vmlinuz-file/vmlinuz-5.15.137.1-1.cm2 \
     ~/git/CBL-Mariner/toolkit/mic-iso-gen/files/stock/grub.cfg \
     ~/git/CBL-Mariner/toolkit/mic-iso-gen/files/stock/iso-image-installer/iso-image-installer.sh \
     ~/git/CBL-Mariner/toolkit/mic-iso-gen/files/stock/iso-image-installer/host-configuration.json \
     ~/temp/iso-output/iso-intermediates/disk0.raw \
     $OUTPUT_DIR
-
 ```
