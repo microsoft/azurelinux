@@ -49,7 +49,6 @@ $(call create_folder,$(toolchain_build_dir))
 $(call create_folder,$(toolchain_downloads_logs_dir))
 $(call create_folder,$(toolchain_from_repos))
 $(call create_folder,$(populated_toolchain_chroot))
-$(call create_folder,$(MISC_CACHE_DIR)/toolchain)
 
 .PHONY: raw-toolchain toolchain clean-toolchain clean-toolchain-containers check-manifests check-aarch64-manifests check-x86_64-manifests
 ##help:target:raw-toolchain=Build the initial toolchain bootstrap stage.
@@ -60,55 +59,6 @@ ifeq ($(REBUILD_TOOLCHAIN),y)
 # If we are rebuilding the toolchain, we also expect the built RPMs to end up in out/RPMS
 toolchain: $(toolchain_out_rpms)
 endif
-
-bootstrap-hashing-list = \
-	$(SCRIPTS_DIR)/toolchain/create_toolchain_in_container.sh \
-	$(SCRIPTS_DIR)/toolchain/container/toolchain-sha256sums \
-	$(SCRIPTS_DIR)/toolchain/container/Dockerfile \
-	$(call shell_real_build_only, find $(SCRIPTS_DIR)/toolchain/container/ -name *.sh) \
-	$(call shell_real_build_only, find $(SCRIPTS_DIR)/toolchain/container/ -name *.patch) \
-
-ifeq ($(TOOLCHAIN_ARCHIVE),)
-go-toolchain-builder: $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag
-endif
-go-toolchain-builder: $(no_repo_acl) $(go-toolchain) $(go-bldtracker)
-	$(go-toolchain) \
-		--toolchain-rpms-dir="$(TOOLCHAIN_RPMS_DIR)" \
-		--toolchain-manifest="$(TOOLCHAIN_MANIFEST)" \
-		--log-level=$(LOG_LEVEL) \
-		--log-file=$(LOGS_DIR)/toolchain/toolchain-builder.log \
-		--download-manifest=$(toolchain_downloads_manifest) \
-		$(foreach baseUrl, $(PACKAGE_URL_LIST),--package-urls="$(baseUrl)" ) \
-		$(if $(TLS_CERT),--tls-cert="$(TLS_CERT)") \
-		$(if $(TLS_KEY),--tls-key="$(TLS_KEY)") \
-		--cache-dir="$(MISC_CACHE_DIR)/toolchain" \
-		$(if $(TOOLCHAIN_ARCHIVE),--existing-archive="$(TOOLCHAIN_ARCHIVE)") \
-		\
-		--bootstrap-output-file="$(raw_toolchain)" \
-		--bootstrap-script="$(SCRIPTS_DIR)/toolchain/create_toolchain_in_container.sh" \
-		--bootstrap-working-dir="$(SCRIPTS_DIR)/toolchain" \
-		--bootstrap-build-dir="$(BUILD_DIR)" \
-		--bootstrap-specs-dir="$(SPECS_DIR)" \
-		--bootstrap-source-url="$(SOURCE_URL)" \
-		$(if $(INCREMENTAL_TOOLCHAIN),--bootstrap-incremental-toolchain) \
-		$(foreach file, $(bootstrap-hashing-list),--bootstrap-input-files="$(file)" ) \
-		\
-		--official-build-output-file="$(final_toolchain)" \
-		--official-build-script="$(SCRIPTS_DIR)/toolchain/build_mariner_toolchain.sh" \
-		--official-build-working-dir="$(SCRIPTS_DIR)/toolchain" \
-		--official-build-dist-tag="$(DIST_TAG)" \
-		--official-build-build-number="$(BUILD_NUMBER)" \
-		--official-build-release-version="$(RELEASE_VERSION)" \
-		--official-build-build-dir="$(BUILD_DIR)" \
-		--official-build-rpms-dir="$(RPMS_DIR)" \
-		--official-build-specs-dir="$(SPECS_DIR)" \
-		$(if $(RUN_CHECK),--official-build-run-check) \
-		$(if $(INCREMENTAL_TOOLCHAIN),--official-build-incremental-toolchain) \
-		--official-build-intermediate-srpms-dir="$(BUILD_SRPMS_DIR)" \
-		--official-build-srpms-dir="$(SRPMS_DIR)" \
-		--official-build-toolchain-from-repos="$(toolchain_from_repos)" \
-		--official-build-bld-tracker="$(go-bldtracker)" \
-		--official-build-timestamp-file="$(TIMESTAMP_DIR)/build_mariner_toolchain.jsonl"
 
 clean: clean-toolchain
 

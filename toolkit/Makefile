@@ -195,13 +195,18 @@ include $(SCRIPTS_DIR)/build_tag.mk
 include $(SCRIPTS_DIR)/tools.mk
 
 # Bootstrap the toolchain's compilers and other tools with:
-#   toolchain, raw-toolchain, clean-toolchain, check-manifests, check-x86_64-manifests, check-aarch64-manifests
+#     (common to both) toolchain clean-toolchain clean-toolchain-containers clean-toolchain-rpms
 ifeq ($(USE_NEW_TOOLCHAIN),y)
 REBUILD_TOOLCHAIN ?= auto
 include $(SCRIPTS_DIR)/toolchainV2.mk
 else
+#   (unique to old flow) raw-toolchain copy-toolchain-rpms
 include $(SCRIPTS_DIR)/toolchain.mk
 endif
+
+# Common toolchain utilities with that are used for both new and old flows.
+#   check-manifests check-x86_64-manifests check-aarch64-manifests compress-toolchain hydrate-toolchain
+include $(SCRIPTS_DIR)/toolchain_utils.mk
 
 # chroot worker with:
 #   chroot-tools clean-chroot-tools
