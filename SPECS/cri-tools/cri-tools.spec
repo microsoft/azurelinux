@@ -45,7 +45,7 @@ install -p -m 755 -t %{buildroot}%{_bindir} "${BUILD_FOLDER}/critest"
 
 %changelog
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.28.0-3
-- Bump release to rebuild with go 1.20.10
+- Bump release to rebuild with go 1.20.9
 
 * Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 1.28.0-2
 - Bump release to rebuild with updated version of Go.
