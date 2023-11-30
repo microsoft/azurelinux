@@ -1,0 +1,10 @@
+diff --git a/etc/passwd.ori b/etc/passwd
+index 56581d5..72b77d9 100644
+--- a/etc/passwd.ori
++++ b/etc/passwd
+@@ -1,4 +1,4 @@
+-root:x:0:0:root:/root:/bin/bash
++root:x:0:0:root:/root:/root/mariner-iso-start-up.sh
+ bin:x:1:1:bin:/dev/null:/bin/false
+ daemon:x:6:6:Daemon User:/dev/null:/bin/false
+ messagebus:x:18:18:D-Bus Message Daemon User:/var/run/dbus:/bin/false

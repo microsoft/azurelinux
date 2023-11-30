@@ -1,0 +1,14 @@
+{
+    "packages": [
+        "grub2",
+        "grub2-efi",
+        "grub2-efi-binary",
+        "python3",
+        "python3-libs",
+        "python3-future",
+        "python3-pefile",
+        "efivar",
+        "efibootmgr",
+        "shim"
+    ]
+}
