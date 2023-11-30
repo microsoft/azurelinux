@@ -26,7 +26,8 @@ resources:
 
 stages:
   - stage: CodeQL-Analysis
-    template: SDL/pipelines/CodeQL-template.yml@CBL-Mariner-Pipelines
+    jobs:
+    - template: SDL/pipelines/CodeQL-template.yml@CBL-Mariner-Pipelines
       parameters:
         marinerBranch: ${{ parameters.marinerBranch }}
         analyzeInPipeline: ${{ parameters.analyzeInPipeline }}
