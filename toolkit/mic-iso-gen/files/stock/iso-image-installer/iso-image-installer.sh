@@ -2,9 +2,8 @@
 
 echo "Running iso-image-installer.sh v1137."
 
-if [[ -z $iso_media_mount_dir ]]; then
-    echo "iso_media_mount_dir is not configured. Exiting."
-    /bin/bash
+echo "iso_media_mount_dir is not configured. Exiting."
+/bin/bash
 fi
 
 image_file_path=$(cat $iso_media_mount_dir/artifacts/host-configuration.json | jq -r '.imaging.images[0].url')
