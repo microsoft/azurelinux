@@ -25,7 +25,7 @@ resources:
       ref: 'refs/heads/nicolasg/codeQL-toolkit'
 
 stages:
-  - stage: CodeQL-Analysis
+  - stage: CodeQlAnalysis
     jobs:
     - template: SDL/pipelines/CodeQL-template.yml@CBL-Mariner-Pipelines
       parameters:
