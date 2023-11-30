@@ -3,33 +3,28 @@
 set -e
 set -x
 
-IMAGE_DEFINITION={$1:./imageconfigs/baremetal.json}
-OUTPUT_DIR=$2
+CONFIG_FILE=$1
+OUTPUT_FILE=$2
 
-# -----------------------------------------------------------------------------
-# [placeholder] build/customize rootfs
-#
+function build_full_image () {
+    local configFile=$1
+    local outputFile=$2
 
+    sudo rm -rf ./build/imagegen/baremetal
+    sudo rm -rf ./out/images/baremetal
 
-# -----------------------------------------------------------------------------
-# Build rootfs
-#
+    pushd toolkit
+    sudo make image \
+        -j$(nproc) \
+        REBUILD_TOOLS=y \
+        REBUILD_TOOLCHAIN=n \
+        REBUILD_PACKAGES=n \
+        CONFIG_FILE=$configFile
 
-sudo rm -rf ./build/imagegen/baremetal
-sudo rm -rf ./out/images/baremetal
+    mkdir -p $(dirname "$outputFile")
+    cp ../build/imagegen/baremetal/imager_output/disk0.raw $outputFile
 
-pushd toolkit
-sudo make image \
-    -j$(nproc) \
-    REBUILD_TOOLS=y \
-    REBUILD_TOOLCHAIN=n \
-    REBUILD_PACKAGES=n \
-    CONFIG_FILE=./imageconfigs/baremetal.json
+    popd
+}
 
-#   REPO_LIST="$RPM_REPO_LIST"   \
-
-mkdir -p $OUTPUT_DIR
-cp ../build/imagegen/baremetal/imager_output/disk0.raw $OUTPUT_DIR/
-
-popd
-
+build_full_image $CONFIG_FILE $OUTPUT_FILE

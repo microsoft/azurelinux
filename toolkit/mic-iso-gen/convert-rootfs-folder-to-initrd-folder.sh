@@ -3,7 +3,8 @@
 set -x
 set -e
 
-initrdRootDir=$1
+inputRootDir=$1
+outputRootDir=$2
 
 function create_init_script() {
     local initScriptPath=$1
@@ -16,19 +17,23 @@ EOF
 }
 
 # ---- main ----
+sudo rm -rf $outputRootDir
+mkdir -p $outputRootDir
+sudo cp -r -a $inputRootDir/* $outputRootDir
 
-sudo cp /home/george/git/argus-toolkit/prov-builder/files/mariner-iso-start-up.sh $initrdRootDir/root/
-sudo cp /home/george/git/CBL-Mariner/toolkit/mic-iso-gen/2-1-1-chroot-1-remove-packages.sh $initrdRootDir/
-sudo rm -f $initrdRootDir/etc/fstab
-sudo touch $initrdRootDir/etc/fstab
+sudo cp /home/george/git/argus-toolkit/prov-builder/files/mariner-iso-start-up.sh $outputRootDir/root/
+sudo cp /home/george/git/CBL-Mariner/toolkit/mic-iso-gen/chroot-remove-packages.sh $outputRootDir/
+sudo rm -f $outputRootDir/etc/fstab
+sudo touch $outputRootDir/etc/fstab
 
-# pushd $initrdRootDir
-# sudo patch -p1 -i /home/george/git/CBL-Mariner/toolkit/mic-iso-gen/passwd.patch
-# popd
+pushd $outputRootDir
+sudo patch -p1 -i /home/george/git/CBL-Mariner/toolkit/mic-iso-gen/passwd.patch
+popd
 
-create_init_script $initrdRootDir/init
+create_init_script $outputRootDir/init
 
-sudo chroot $initrdRootDir /bin/bash -c "sudo /2-1-1-chroot-1-remove-packages.sh"
-sudo chroot $initrdRootDir /bin/bash -c "chown -R root:root ."
+sudo chroot $outputRootDir /bin/bash -c "sudo /chroot-remove-packages.sh"
+sudo chroot $outputRootDir /bin/bash -c "chown -R root:root ."
 
-sudo chmod 744 $initrdRootDir/boot
+sudo chmod 744 $outputRootDir/boot
+sudo chmod 755 $outputRootDir/etc/shadow
