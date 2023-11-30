@@ -6,7 +6,7 @@
 
 ######## BUILD DEFINES ########
 
-DIST_TAG           ?= .cm2
+DIST_TAG           ?= .azl3
 # Running 'git' as the owner of the repo, so it doesn't complain about the repo not belonging to root.
 GIT_COMMIT_ID := $(call shell_real_build_only, if [ -n "$$UID" ] && [ "$$UID" -eq 0 ]; then runuser -u $$(stat -c "%U" $(PROJECT_ROOT)) -- git rev-parse --short HEAD; else git rev-parse --short HEAD; fi)
 BUILD_NUMBER ?= $(GIT_COMMIT_ID)
