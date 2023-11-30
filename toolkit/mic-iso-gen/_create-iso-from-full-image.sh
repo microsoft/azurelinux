@@ -8,7 +8,7 @@ FULL_IMAGE_CONFIG_FILE=~/git/CBL-Mariner/toolkit/imageconfigs/baremetal.json
 #------------------------------------------------------------------------------
 
 BUILD_DIR=~/temp/iso-build
-# sudo rm -rf $BUILD_DIR
+sudo rm -rf $BUILD_DIR
 mkdir -p $BUILD_DIR
 
 BUILD_WORKING_DIR=$BUILD_DIR/intermediates
@@ -25,7 +25,7 @@ FULL_IMAGE_RAW_DISK=$BUILD_WORKING_DIR/raw-disk-output/disk0.raw
 # outputs:
 #   disk0.raw
 #
-./toolkit/mic-iso-gen/0-build-rootfs.sh \
+./toolkit/mic-iso-gen/build-rootfs.sh \
     $FULL_IMAGE_CONFIG_FILE \
     $FULL_IMAGE_RAW_DISK
 
@@ -52,7 +52,7 @@ EXTRACT_ARTIFACTS_OUT_DIR=$BUILD_WORKING_DIR/extract-rootfs-artifacts-from-rootf
 INITRD_DIR=$BUILD_WORKING_DIR/initrd-dir
 
 ./toolkit/mic-iso-gen/convert-rootfs-folder-to-initrd-folder.sh \
-    $EXTRACT_ARTIFACTS_OUT_DIR/extracted-rootfs
+    $EXTRACT_ARTIFACTS_OUT_DIR/extracted-rootfs \
     $INITRD_DIR
 
 # outputs:
