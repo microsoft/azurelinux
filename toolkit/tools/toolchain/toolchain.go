@@ -64,6 +64,7 @@ var (
 
 	allowRebuild    = app.Flag("rebuild", "Require all packages to be available from a repo.").Default("auto").Enum(rebuildAuto, rebuildFast, rebuildForce, rebuildNever)
 	existingArchive = app.Flag("existing-archive", "Path to an existing archive to use instead of building a new one.").ExistingFile()
+	summaryFile     = app.Flag("summary-file", "Path to the summary file which records any changes made.").String()
 
 	// Bootstrap script inputs
 	bootstrapOutputFile = app.Flag("bootstrap-output-file", "Path to the output file.").Required().String()
@@ -127,21 +128,24 @@ func main() {
 		}
 	}
 
+	// Track any chages we make to the environment
+	var changesMade []string
+
 	// All steps that follow are additive, so we need to remove any unwanted packages first
-	err = toolchain.CleanToolchainRpms(*toolchainRpmDir, toolchainRPMs)
+	removedRpms, err := toolchain.CleanToolchainRpms(*toolchainRpmDir, toolchainRPMs)
 	if err != nil {
 		logger.Log.Fatalf("Failed to clean toolchain RPMs: %s", err)
 	}
-
-	finalToolchainArchive, err := produceArchive(buildConfig, toolchainRPMs)
-	if err != nil {
-		logger.Log.Fatalf("Failed to produce toolchain archive:\n%s", err)
+	for _, rpm := range removedRpms {
+		changesMade = append(changesMade, fmt.Sprintf("Removed %s from toolchain dir", rpm))
 	}
 
-	// Extract and validate the archive
-	err = extractArchive(finalToolchainArchive, toolchainRPMs)
+	modifications, err := produceToolchain(buildConfig, toolchainRPMs)
 	if err != nil {
-		logger.Log.Fatalf("Failed to extract toolchain archive:\n%s", err)
+		logger.Log.Fatalf("Failed to produce toolchain rpms:\n%s", err)
+	}
+	for _, modification := range modifications {
+		changesMade = append(changesMade, fmt.Sprintf("Updated: %s", modification))
 	}
 
 	// Do a final check of the toolchain RPMs
@@ -153,7 +157,15 @@ func main() {
 		logger.Log.Fatalf("Missing toolchain RPMs:\n%s", missingRPMs)
 	} else {
 		logger.Log.Infof("Toolchain RPMs are ready.")
-		return
+	}
+
+	if len(*summaryFile) > 0 {
+		logger.Log.Warnf("Writing summary file to %s", *summaryFile)
+		logger.Log.Warnf("Changes made:\n%s", changesMade)
+		err = file.WriteLines(changesMade, *summaryFile)
+		if err != nil {
+			return
+		}
 	}
 }
 
@@ -295,8 +307,9 @@ func prepCerts(tlsClientCert, tlsClientKey, caCertFile string) (caCerts *x509.Ce
 	return
 }
 
-func produceArchive(config buildConfig, toolchainRPMs []string) (archive toolchain.Archive, err error) {
+func produceToolchain(config buildConfig, toolchainRPMs []string) (newRpms []string, err error) {
 	// Only build if we don't pass an explicit archive file.
+	var archive toolchain.Archive
 	if config.doArchive {
 		archive = toolchain.Archive{
 			ArchivePath: *existingArchive,
@@ -307,30 +320,29 @@ func produceArchive(config buildConfig, toolchainRPMs []string) (archive toolcha
 			caCerts, tlsCerts, err := prepCerts(*tlsClientCert, *tlsClientKey, *caCertFile)
 			if err != nil {
 				err = fmt.Errorf("failed to load certificates:\n%s", err)
-				return archive, err
+				return newRpms, err
 			}
 
-			err = toolchain.DownloadToolchainRpms(*toolchainRpmDir, toolchainRPMs, *packageURLs, caCerts, tlsCerts, *concurrentNetOps, *downloadManifest)
+			downloads, err := toolchain.DownloadToolchainRpms(*toolchainRpmDir, toolchainRPMs, *packageURLs, caCerts, tlsCerts, *concurrentNetOps, *downloadManifest)
+			newRpms = append(newRpms, downloads...)
 			if err != nil {
 				err = fmt.Errorf("failed to download toolchain RPMs:\n%s", err)
-				return archive, err
+				return newRpms, err
 			}
 		}
 
 		ready, missingRPMs, err := validateToolchainRpms(*toolchainRpmDir, toolchainRPMs)
 		if err != nil {
 			err = fmt.Errorf("failed to validate toolchain RPMs are ready:\n%s", err)
-			return archive, err
+			return newRpms, err
 		}
-		if !ready {
-			logger.Log.Infof("Missing toolchain RPMs: %s", missingRPMs)
-			if !config.doBuild {
-				err = fmt.Errorf("toolchain RPMs are not ready, and --rebuild=%s was specified", rebuildNever)
-				return archive, err
-			}
+
+		// Might be able to if all the RPMs are there already.
+		if ready {
+			logger.Log.Infof("Toolchain build not required, all RPMs are present.")
+			return newRpms, err
 		} else {
-			logger.Log.Infof("Toolchain RPMs are ready.")
-			return archive, err
+			logger.Log.Infof("Missing toolchain RPMs: %s", missingRPMs)
 		}
 
 		if config.doBuild {
@@ -339,19 +351,32 @@ func produceArchive(config buildConfig, toolchainRPMs []string) (archive toolcha
 			if err != nil {
 				err = fmt.Errorf("failed to build bootstrap toolchain archive:\n%s", err)
 				logger.Log.Errorf("Toolchain failure, check log file at: %s", *logFile)
-				return archive, err
+				return newRpms, err
 			}
 
 			// Official build
-			_, archive, err = buildOfficialToolchainArchive(config, bootstrap, toolchainRPMs)
+			_, _, archive, err = buildOfficialToolchainArchive(config, bootstrap, toolchainRPMs)
 			if err != nil {
 				err = fmt.Errorf("failed to build official toolchain archive:\n%s", err)
 				logger.Log.Errorf("Toolchain failure, check log file at: %s", *logFile)
-				return archive, err
+				return newRpms, err
 			}
+
+		} else {
+			err = fmt.Errorf("toolchain RPMs are not ready, and but toolchain rebuild is disabled")
+			return newRpms, err
 		}
 	}
-	return archive, err
+
+	// Extract and validate the archive
+	missingFiles, err := extractArchive(archive, toolchainRPMs)
+	if err != nil {
+		err = fmt.Errorf("failed to extract toolchain archive:\n%s", err)
+		return
+	}
+	newRpms = append(newRpms, missingFiles...)
+
+	return
 }
 
 func buildBootstrapToolchainArchive(config buildConfig) (bootstrap toolchain.BootstrapScript, err error) {
@@ -398,7 +423,7 @@ func buildBootstrapToolchainArchive(config buildConfig) (bootstrap toolchain.Boo
 	return
 }
 
-func buildOfficialToolchainArchive(config buildConfig, bootstrap toolchain.BootstrapScript, toolchainRPMs []string) (official toolchain.OfficialScript, builtArchive toolchain.Archive, err error) {
+func buildOfficialToolchainArchive(config buildConfig, bootstrap toolchain.BootstrapScript, toolchainRPMs []string) (builtRpms []string, official toolchain.OfficialScript, builtArchive toolchain.Archive, err error) {
 	official = toolchain.OfficialScript{
 		OutputFile:           *officialBuildOutputFile,
 		ScriptPath:           *officialBuildScript,
@@ -450,8 +475,15 @@ func buildOfficialToolchainArchive(config buildConfig, bootstrap toolchain.Boots
 				err = fmt.Errorf("failed to prep delta rpms, error:\n%w", err)
 				return
 			}
+		} else {
+			// Remove any delta rpms from previous builds
+			err = official.CleanIncrementalRpms()
+			if err != nil {
+				err = fmt.Errorf("failed to clean old delta rpms, error:\n%w", err)
+				return
+			}
 		}
-		err = official.BuildOfficialToolchainRpms()
+		builtRpms, err = official.BuildOfficialToolchainRpms()
 		if err != nil {
 			err = fmt.Errorf("failed to build official toolchain rpms, error:\n%w", err)
 			return
@@ -463,24 +495,29 @@ func buildOfficialToolchainArchive(config buildConfig, bootstrap toolchain.Boots
 			}
 		}
 
-		err = official.TransferBuiltRpms()
+		var movedRpms []string
+		movedRpms, err = official.TransferBuiltRpms()
 		if err != nil {
 			err = fmt.Errorf("failed to transfer built rpms, error:\n%w", err)
 			return
 		}
+		builtRpms = append(builtRpms, movedRpms...)
 	}
 	return
 }
 
-func extractArchive(archive toolchain.Archive, toolchainRPMs []string) (err error) {
+func extractArchive(archive toolchain.Archive, toolchainRPMs []string) (extractedRpms []string, err error) {
 	// Finalize the RPMs from the archive
 	var missingFromArchive, missingFromManifest []string
 
 	// Extract rpms
-	err = archive.ExtractToolchainRpms(*toolchainRpmDir)
+	extracated, err := archive.ExtractToolchainRpms(*toolchainRpmDir)
 	if err != nil {
 		err = fmt.Errorf("failed to extract official toolchain rpms, error:\n%w", err)
 		return
+	}
+	for _, rpm := range extracated {
+		extractedRpms = append(extractedRpms, fmt.Sprintf("Extracted: %s", rpm))
 	}
 
 	missingFromArchive, missingFromManifest, err = archive.ValidateArchiveContents(toolchainRPMs)

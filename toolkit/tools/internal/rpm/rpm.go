@@ -156,6 +156,34 @@ func ExtractNameFromRPMPath(rpmFilePath string) (packageName string, err error) 
 	return
 }
 
+// ExtractArchFromRPMPath returns just the arch from a RPM file name. i.e. pkg-name-1.2.3-4.cm2.x86_64.rpm -> x86_64
+func ExtractArchFromRPMPath(rpmFilePath string) (arch string, err error) {
+	baseName := filepath.Base(rpmFilePath)
+
+	// If the path is invalid, return empty string. We consider any string that has at least 1 '-' characters valid.
+	if !strings.Contains(baseName, "-") {
+		err = fmt.Errorf("invalid RPM file path '%s', can't extract arch", rpmFilePath)
+		return
+	}
+
+	// Grab the last part of the file name, which should be the arch. Arch will be after the distro tag, and before the .rpm.
+	splitName := strings.Split(baseName, ".")
+
+	if len(splitName) < 2 {
+		err = fmt.Errorf("invalid RPM file path '%s', can't extract arch", rpmFilePath)
+		return
+	}
+
+	arch = splitName[len(splitName)-2]
+
+	if arch == "" {
+		err = fmt.Errorf("invalid RPM file path '%s', can't extract arch", rpmFilePath)
+		return
+	}
+
+	return
+}
+
 // getCommonBuildArgs will generate arguments to pass to 'rpmbuild'.
 func getCommonBuildArgs(outArch, srpmFile string, defines map[string]string) (buildArgs []string, err error) {
 	const (

@@ -199,3 +199,67 @@ func TestExtractNameFromRPMPath(t *testing.T) {
 		})
 	}
 }
+func TestExtractArchFromRPMPath(t *testing.T) {
+	tests := []struct {
+		name          string
+		rpmFilePath   string
+		expectedArch  string
+		expectedError error
+	}{
+		{
+			name:          "valid RPM file path",
+			rpmFilePath:   "/path/to/pkg-1.0.0-1.x86_64.rpm",
+			expectedArch:  "x86_64",
+			expectedError: nil,
+		},
+		{
+			name:          "valid RPM file path with complex name",
+			rpmFilePath:   "/path/to/pkg-name-1.0.0-1.aarch64.rpm",
+			expectedArch:  "aarch64",
+			expectedError: nil,
+		},
+		{
+			name:          "invalid RPM file path",
+			rpmFilePath:   "/path/to/garbage.rpm",
+			expectedArch:  "",
+			expectedError: fmt.Errorf("invalid RPM file path '/path/to/garbage.rpm', can't extract arch"),
+		},
+		{
+			name:          "empty RPM file path",
+			rpmFilePath:   "",
+			expectedArch:  "",
+			expectedError: fmt.Errorf("invalid RPM file path '', can't extract arch"),
+		},
+		{
+			name:          "RPM file path without arch",
+			rpmFilePath:   "/path/to/pkg-foo-bar..rpm",
+			expectedArch:  "",
+			expectedError: fmt.Errorf("invalid RPM file path '/path/to/pkg-foo-bar..rpm', can't extract arch"),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			actualArch, actualError := ExtractArchFromRPMPath(tt.rpmFilePath)
+			assert.Equal(t, tt.expectedArch, actualArch)
+			assert.Equal(t, tt.expectedError, actualError)
+		})
+	}
+}
+
+// func TestExistingSpecsJsonInput(t *testing.T) {
+// 	specsJsonPath := filepath.Join(specsDir, "specs.json")
+
+// 	localPackages := pkgjson.PackageRepo{}
+// 	err := localPackages.ParsePackageJSON(specsJsonPath)
+// 	assert.NoError(t, err)
+
+// 	for _, pkg := range localPackages.Repo {
+// 		rpmPath := pkg.RpmPath
+// 		arch := pkg.Architecture
+
+// 		actualArch, actualError := ExtractArchFromRPMPath(rpmPath)
+// 		assert.Equal(t, arch, actualArch)
+// 		assert.Equal(t, nil, actualError)
+// 	}
+// }

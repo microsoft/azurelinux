@@ -43,8 +43,13 @@ type OfficialScript struct {
 	InputFiles           []string // List of input files to hash for validating the cache
 
 	// Internal state
-	buildDone bool
-	progress  int
+	buildDone      bool
+	unmountsQueued bool
+	progress       int
+}
+
+func (o *OfficialScript) populatedToolchainDir() string {
+	return filepath.Join(o.BuildDir, "toolchain", "populated_toolchain")
 }
 
 func (o *OfficialScript) CheckCache(cacheDir string) (string, bool, error) {
@@ -61,6 +66,14 @@ func (o *OfficialScript) AddToCache(cacheDir string) (string, error) {
 
 func (o *OfficialScript) PrepIncrementalRpms(downloadDir string, toolchainRPMs []string) (err error) {
 	logger.Log.Info("Preparing incremental rpms for delta build")
+
+	incrementalRpmsPath := filepath.Join(o.populatedToolchainDir(), "usr", "src", "mariner", "RPMS")
+	_, err = CleanToolchainRpms(incrementalRpmsPath, toolchainRPMs)
+	if err != nil {
+		err = fmt.Errorf("unable to clean toolchain rpms:\n%w", err)
+		return
+	}
+
 	for _, rpm := range toolchainRPMs {
 		var fileExists bool
 		srcPath := filepath.Join(downloadDir, rpm)
@@ -89,16 +102,48 @@ func (o *OfficialScript) PrepIncrementalRpms(downloadDir string, toolchainRPMs [
 	return
 }
 
-func (o *OfficialScript) cleanMountDirs() {
+func (o *OfficialScript) CleanIncrementalRpms() (err error) {
+	logger.Log.Info("Cleaning incremental rpms")
+	err = os.RemoveAll(o.ToolchainFromRepos)
+	if err != nil {
+		err = fmt.Errorf("unable to clean incremental rpms:\n%w", err)
+		return
+	}
+
+	err = o.cleanMountDirs()
+	if err != nil {
+		err = fmt.Errorf("unable to clean mount dirs:\n%w", err)
+		return
+	}
+	err = os.RemoveAll(o.populatedToolchainDir())
+	if err != nil {
+		err = fmt.Errorf("unable to clean populated toolchain dir:\n%w", err)
+		return
+	}
+
+	return
+}
+
+func (o *OfficialScript) cleanMountDirs() (err error) {
 	// Mounts are taken from 'chroot_mount()' in 'build_official_toolchain_rpms.sh'
 	fullPaths := []string{}
 	for _, mount := range toolchainMountPoints {
-		fullPaths = append(fullPaths, filepath.Join(o.BuildDir, "toolchain", "populated_toolchain", mount))
+		fullPaths = append(fullPaths, filepath.Join(o.populatedToolchainDir(), mount))
 	}
-	safechroot.CleanupUnsafeMounts(fullPaths)
-	for _, mount := range toolchainMountPoints {
-		safechroot.RegisterUnsafeUnmount(mount)
+	failed := safechroot.CleanupUnsafeMounts(fullPaths)
+	if failed {
+		err = fmt.Errorf("failed to unmount some mount points")
+		return
 	}
+
+	// Register the unmounts so they can be cleaned up if the process is killed
+	if !o.unmountsQueued {
+		for _, mountPath := range fullPaths {
+			safechroot.RegisterUnsafeUnmount(mountPath)
+		}
+		o.unmountsQueued = true
+	}
+	return
 }
 
 func (o *OfficialScript) updateProgress(done chan bool) {
@@ -122,6 +167,15 @@ func (o *OfficialScript) updateProgress(done chan bool) {
 		case <-done:
 			return
 		case <-time.After(delay):
+			exists, err := file.PathExists(logFile)
+			if err != nil {
+				logger.Log.Warnf("Failed to check if log file '%s' exists. Error:\n%s", logFile, err)
+				return
+			}
+			if !exists {
+				// Log not created yet, keep waiting
+				continue
+			}
 			numBuilt, err := file.ReadLines(logFile)
 			if err != nil {
 				logger.Log.Warnf("Failed to read log file '%s'. Error:\n%s", logFile, err)
@@ -132,8 +186,12 @@ func (o *OfficialScript) updateProgress(done chan bool) {
 	}
 }
 
-func (o *OfficialScript) BuildOfficialToolchainRpms() (err error) {
-	o.cleanMountDirs()
+func (o *OfficialScript) BuildOfficialToolchainRpms() (builtRpms []string, err error) {
+	err = o.cleanMountDirs()
+	if err != nil {
+		err = fmt.Errorf("failed to clean mount dirs. Error:\n%w", err)
+		return
+	}
 
 	onStdout := func(args ...interface{}) {
 		line := args[0].(string)
@@ -189,6 +247,15 @@ func (o *OfficialScript) BuildOfficialToolchainRpms() (err error) {
 	}
 
 	o.buildDone = true
+	builtRpmPaths, err := o.getBuiltRpms()
+	if err != nil {
+		err = fmt.Errorf("failed to get built rpms. Error:\n%w", err)
+		return
+	}
+	for _, rpm := range builtRpmPaths {
+		rpm = filepath.Join(o.RpmsDir, rpm)
+		builtRpms = append(builtRpms, fmt.Sprintf("Built: %s", rpm))
+	}
 	return
 }
 
@@ -218,7 +285,7 @@ func (o *OfficialScript) getBuiltRpms() (rpms []string, err error) {
 	return
 }
 
-func (o *OfficialScript) TransferBuiltRpms() (err error) {
+func (o *OfficialScript) TransferBuiltRpms() (rpmsMoved []string, err error) {
 	builtRpms, err := o.getBuiltRpms()
 	if err != nil {
 		err = fmt.Errorf("can't copy built rpms. Error:\n%w", err)
@@ -251,6 +318,7 @@ func (o *OfficialScript) TransferBuiltRpms() (err error) {
 				err = fmt.Errorf("failed to copy file. Error:\n%w", err)
 				return
 			}
+			rpmsMoved = append(rpmsMoved, fmt.Sprintf("Copied: %s", dst))
 		}
 	}
 	return

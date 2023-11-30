@@ -16,21 +16,22 @@ toolchain_from_repos = $(toolchain_build_dir)/repo_rpms
 toolchain_logs_dir = $(LOGS_DIR)/toolchain
 toolchain_downloads_logs_dir = $(toolchain_logs_dir)/downloads
 toolchain_downloads_manifest = $(toolchain_downloads_logs_dir)/download_manifest.txt
+# populated_toolchain_chroot is the chroot where the toolchain is built, it is configured by the toolchain script
 populated_toolchain_chroot = $(toolchain_build_dir)/populated_toolchain
-toolchain_sources_dir = $(populated_toolchain_chroot)/usr/src/mariner/SOURCES
 populated_toolchain_rpms = $(populated_toolchain_chroot)/usr/src/mariner/RPMS
 toolchain_spec_list = $(toolchain_build_dir)/toolchain_specs.txt
 toolchain_spec_buildable_list = $(toolchain_build_dir)/toolchain_specs_buildable.txt
 raw_toolchain = $(toolchain_build_dir)/toolchain_from_container.tar.gz
 final_toolchain = $(toolchain_build_dir)/toolchain_built_rpms_all.tar.gz
 toolchain_status_flag = $(STATUS_FLAGS_DIR)/build_toolchain.flag
+toolchain_summary_file = $(STATUS_FLAGS_DIR)/build_toolchain_summary.txt
 
 TOOLCHAIN_MANIFEST ?= $(TOOLCHAIN_MANIFESTS_DIR)/toolchain_$(build_arch).txt
 # Find the *.rpm corresponding to each of the entries in the manifest
 # regex operation: (.*\.([^\.]+)\.rpm) extracts *.(<arch>).rpm" to determine
 # the exact path of the required rpm
 # Outputs: $(TOOLCHAIN_RPMS_DIR)/<arch>/<name>.<arch>.rpm
-sed_regex_full_path = 's`(.*\.([^\.]+)\.rpm)`$(TOOLCHAIN_RPMS_DIR)/\2/\1`p'
+sed_regex_full_path = 's`(.*\.([^\.]+)\.rpm)`$(TOOLCHAIN_RPMS_DIR)/\1`p'
 sed_regex_full_path_out_rpms = 's`(.*\.([^\.]+)\.rpm)`$(RPMS_DIR)/\2/\1`p'
 toolchain_rpms := $(shell sed -nr $(sed_regex_full_path) < $(TOOLCHAIN_MANIFEST))
 toolchain_rpms_buildarch := $(shell grep $(build_arch) $(TOOLCHAIN_MANIFEST))
@@ -50,7 +51,9 @@ raw-toolchain: $(raw_toolchain)
 toolchain: $(toolchain_rpms)
 ifeq ($(REBUILD_TOOLCHAIN),y)
 # If we are rebuilding the toolchain, we also expect the built RPMs to end up in out/RPMS
-toolchain: $(toolchain_out_rpms)
+
+# TODO Do we want to do this still?
+# toolchain: $(toolchain_out_rpms)
 endif
 
 clean: clean-toolchain
@@ -151,11 +154,14 @@ hydrate-toolchain:
 	sudo rm $(final_toolchain)
 	sudo touch $(raw_toolchain)
 
-.SILENT: $(toolchain_rpms)
+.SILENT: $(toolchain_rpms) $(toolchain_out_rpms)
 $(toolchain_rpms): $(toolchain_status_flag)
 ifeq ($(REBUILD_TOOLCHAIN),y)
 $(toolchain_out_rpms): $(toolchain_status_flag)
 endif
+
+$(toolchain_rpms) $(toolchain_out_rpms):
+	touch $@
 
 # Files to track when building the raw bootstrapped toolchain
 bootstrap-hashing-list = \
@@ -191,7 +197,7 @@ toolchain_mode=auto
 ifeq ($(INCREMENTAL_TOOLCHAIN)$(REBUILD_TOOLCHAIN),yy)
 toolchain_mode=auto
 else ifeq ($(REBUILD_TOOLCHAIN),y)
-toolchain_mode=always
+toolchain_mode=force
 else
 toolchain_mode=never
 endif
@@ -203,8 +209,8 @@ endif
 
 #$(if $(filter y,$(INCREMENTAL_TOOLCHAIN)),--bootstrap-incremental-toolchain)
 #$(if $(filter y,$(INCREMENTAL_TOOLCHAIN)),--official-build-incremental-toolchain)
-
-$(toolchain_status_flag): $(no_repo_acl) $(go-toolchain) $(go-bldtracker) $(depend_REBUILD_TOOLCHAIN) $(depend_TOOLCHAIN_ARCHIVE)
+.PHONY: always-run-toolchain-builder
+$(toolchain_status_flag): $(no_repo_acl) $(go-toolchain) $(go-bldtracker) $(depend_REBUILD_TOOLCHAIN) $(depend_TOOLCHAIN_ARCHIVE) always-run-toolchain-builder
 	$(go-toolchain) \
 		--toolchain-rpms-dir="$(TOOLCHAIN_RPMS_DIR)" \
 		--toolchain-manifest="$(TOOLCHAIN_MANIFEST)" \
@@ -219,6 +225,7 @@ $(toolchain_status_flag): $(no_repo_acl) $(go-toolchain) $(go-bldtracker) $(depe
 		--specs-dir="$(SPECS_DIR)" \
 		\
 		--rebuild=$(toolchain_mode) \
+		--summary-file="$(toolchain_summary_file)" \
 		\
 		--bootstrap-output-file="$(raw_toolchain)" \
 		--bootstrap-script="$(SCRIPTS_DIR)/toolchain/create_toolchain_in_container.sh" \
@@ -242,4 +249,10 @@ $(toolchain_status_flag): $(no_repo_acl) $(go-toolchain) $(go-bldtracker) $(depe
 		--official-build-toolchain-from-repos="$(toolchain_from_repos)" \
 		--official-build-bld-tracker="$(go-bldtracker)" \
 		--official-build-timestamp-file="$(TIMESTAMP_DIR)/build_mariner_toolchain.jsonl" \
-		$(foreach file, $(official-hashing-list),--official-input-files="$(file)" ) \
+		$(foreach file, $(official-hashing-list),--official-input-files="$(file)" ) && \
+	touch $@
+
+
+	if [ ! -f $@ ] || [ -s $(toolchain_summary_file) ]; then \
+		touch $@; \
+	fi

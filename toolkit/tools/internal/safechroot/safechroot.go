@@ -597,8 +597,8 @@ func CleanupUnsafeMounts(mounts []string) (failedToUnmount bool) {
 	sort.Slice(mounts, func(i, j int) bool {
 		return mounts[i] > mounts[j]
 	})
+	logger.Log.Errorf("Unmounting %v", mounts)
 	for _, dir := range mounts {
-		logger.Log.Infof("Cleaning up unsafe unmount dir (%s)", dir)
 		err := unsafeUnmount(dir)
 		if err != nil {
 			logger.Log.Errorf("Failed to unmount unsafe unmount dir (%s)", dir)
@@ -626,6 +626,8 @@ func unsafeUnmount(mountDir string) (err error) {
 	}
 	if !exists {
 		return
+	} else {
+		logger.Log.Infof("Checking '%s' for possible unsafe unmount", mountDir)
 	}
 
 	isMounted, err := mountinfo.Mounted(mountDir)

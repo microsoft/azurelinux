@@ -119,7 +119,7 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(srpm_pack_list_file) $(
 		touch $@; \
 	fi
 
-$(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(toolchain_spec_buildable_list) $(common_srpm_packer_deps)
+$(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(toolchain_spec_buildable_list) $(common_srpm_packer_deps) $(TOOLCHAIN_MANIFEST)
 	GODEBUG=netdns=go $(go-srpmpacker) \
 		--dir=$(SPECS_DIR) \
 		--output-dir=$(BUILD_SRPMS_DIR) \

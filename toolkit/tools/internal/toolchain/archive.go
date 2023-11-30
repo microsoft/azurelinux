@@ -130,7 +130,7 @@ func (a *Archive) getArchiveContents() (rpms []string, err error) {
 	return
 }
 
-func (a *Archive) ExtractToolchainRpms(rpmsDir string) (err error) {
+func (a *Archive) ExtractToolchainRpms(rpmsDir string) (extractedRpms []string, err error) {
 	logger.Log.Infof("Extracting rpms from tar.gz file: %s", a.ArchivePath)
 	tarGzFileStream, err := os.Open(a.ArchivePath)
 	if err != nil {
@@ -148,12 +148,11 @@ func (a *Archive) ExtractToolchainRpms(rpmsDir string) (err error) {
 
 	tarReader := tar.NewReader(tarStream)
 	totalRpms := 0
-	extractedRpms := 0
 	for {
 		header, tarErr := tarReader.Next()
 		if tarErr != nil {
 			if tarErr == io.EOF {
-				logger.Log.Infof("Extracted %d/%d rpms from '%s'", extractedRpms, totalRpms, a.ArchivePath)
+				logger.Log.Infof("Extracted %d/%d rpms from '%s'", len(extractedRpms), totalRpms, a.ArchivePath)
 				break
 			}
 			err = fmt.Errorf("failed to read tar file. Error:\n%w", tarErr)
@@ -191,7 +190,8 @@ func (a *Archive) ExtractToolchainRpms(rpmsDir string) (err error) {
 			var existingFileOk bool
 			existingFileOk, err = file.PathExists(dstFile)
 			if err != nil {
-				return fmt.Errorf("unable to check if rpm exists: %w", err)
+				err = fmt.Errorf("unable to check if rpm exists: %w", err)
+				return
 			}
 			if existingFileOk {
 				logger.Log.Debugf("Checking if file contents are the same: %s", dstFile)
@@ -209,12 +209,12 @@ func (a *Archive) ExtractToolchainRpms(rpmsDir string) (err error) {
 			}
 
 			if !existingFileOk {
-				extractedRpms++
+				extractedRpms = append(extractedRpms, dstFile)
 				var writer *os.File
 				writer, err = os.Create(dstFile)
 				if err != nil {
 					err = fmt.Errorf("failed to create file. Error:\n%w", err)
-					return err
+					return
 				}
 
 				byteReader := bytes.NewReader(tarBytes)
@@ -223,15 +223,16 @@ func (a *Archive) ExtractToolchainRpms(rpmsDir string) (err error) {
 
 				if err != nil {
 					err = fmt.Errorf("failed to copy file. Error:\n%w", err)
-					return err
+					return
 				}
 			} else {
 				logger.Log.Debugf("File already exists and is the same: %s", dstFile)
 			}
 		default:
 			err = fmt.Errorf("unknown type: %v in tar file '%s'", header.Typeflag, a.ArchivePath)
-			return err
+			return
 		}
 	}
+
 	return
 }

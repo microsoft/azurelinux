@@ -36,7 +36,17 @@ type downloadResult struct {
 }
 
 // Remove any unepxected RPMs from the toolchain directory.
-func CleanToolchainRpms(toolchainDir string, toolchainRPMs []string) (err error) {
+func CleanToolchainRpms(toolchainDir string, toolchainRPMs []string) (filesRemoved []string, err error) {
+	exists, err := file.PathExists(toolchainDir)
+	if err != nil {
+		err = fmt.Errorf("failed to check if toolchain directory exists. Error:\n%w", err)
+		return
+	}
+	if !exists {
+		logger.Log.Debugf("Toolchain directory '%s' does not exist, skipping clean.", toolchainDir)
+		return
+	}
+
 	expectedRpms := sliceutils.SliceToSet(toolchainRPMs)
 	err = filepath.WalkDir(toolchainDir, func(path string, info fs.DirEntry, err error) error {
 		if err != nil {
@@ -49,6 +59,7 @@ func CleanToolchainRpms(toolchainDir string, toolchainRPMs []string) (err error)
 
 		if !expectedRpms[info.Name()] {
 			logger.Log.Debugf("Removing unexpected file in toolchain directory: %s", path)
+			filesRemoved = append(filesRemoved, path)
 			return os.Remove(path)
 		}
 
@@ -56,7 +67,7 @@ func CleanToolchainRpms(toolchainDir string, toolchainRPMs []string) (err error)
 	})
 
 	if err != nil {
-		logger.Log.Warnf("Unable to remove lib archive file: %s", err)
+		logger.Log.Warnf("Unable to remove unexpected toolchain files: %s", err)
 	}
 
 	return
@@ -64,7 +75,7 @@ func CleanToolchainRpms(toolchainDir string, toolchainRPMs []string) (err error)
 
 // downloadToolchainRpms checks for the existence of toolchain RPMs in the toolchain directory and downloads them if they are not present.
 // It will check each package URL in order and download the first one that exists.
-func DownloadToolchainRpms(toolchainDir string, toolchainRPMs []string, packageURLs []string, caCerts *x509.CertPool, tlsCerts []tls.Certificate, concurrentNetOps uint, manifestFile string) (err error) {
+func DownloadToolchainRpms(toolchainDir string, toolchainRPMs []string, packageURLs []string, caCerts *x509.CertPool, tlsCerts []tls.Certificate, concurrentNetOps uint, manifestFile string) (downloadedRpms []string, err error) {
 	// We will be downloading packages concurrently, so we need to keep track of when they are all done via a wait group. To
 	// simplify the code just use goroutines with a semaphore channel to limit the number of concurrent network operations. Each
 	// goroutine will handle a single package and will send the result of the download to a results channel. The main thread will
@@ -77,10 +88,15 @@ func DownloadToolchainRpms(toolchainDir string, toolchainRPMs []string, packageU
 		go downloadSingleToolchainRpm(packageURLs, rpm, rpmPath, caCerts, tlsCerts, netOpsSemaphore, results)
 	}
 
-	err = trackDownloadProgress(len(toolchainRPMs), results, len(toolchainRPMs), manifestFile)
+	downloads, err := trackDownloadProgress(len(toolchainRPMs), results, len(toolchainRPMs), manifestFile)
 	if err != nil {
 		err = fmt.Errorf("failed to download toolchain RPMs. Error:\n%w", err)
 		return
+	}
+
+	for _, rpm := range downloads {
+		rpmPath := filepath.Join(toolchainDir, rpm)
+		downloadedRpms = append(downloadedRpms, fmt.Sprintf("Downloaded: %s", rpmPath))
 	}
 
 	return
@@ -173,9 +189,9 @@ func downloadFromMultipleBaseUrls(packageURLs []string, rpmFile, dstFile string,
 }
 
 // trackDownloadProgress will monitor the results channel and update the progress counter accordingly while collecting errors.
-func trackDownloadProgress(numExpectedResults int, results chan downloadResult, totalRPMs int, manifestFile string) (err error) {
+func trackDownloadProgress(numExpectedResults int, results chan downloadResult, totalRPMs int, manifestFile string) (downloaded []string, err error) {
 	// Collect the failures so we can print them at the end.
-	var successes, failuresOther, failures404, skipped []string
+	var failuresOther, failures404, skipped []string
 
 	for i := 0; i < numExpectedResults; i++ {
 		progressString := fmt.Sprintf("%3d%%", ((i+1)*100)/totalRPMs)
@@ -183,7 +199,7 @@ func trackDownloadProgress(numExpectedResults int, results chan downloadResult, 
 		switch result.result {
 		case downloadResultTypeSuccess:
 			logger.Log.Infof("%s: Successfully downloaded: '%s'", progressString, result.toolchainRpm)
-			successes = append(successes, result.toolchainRpm)
+			downloaded = append(downloaded, result.toolchainRpm)
 		case downloadResultTypeFailure404:
 			logger.Log.Infof("%s: Unavailable upstream: '%s'", progressString, result.toolchainRpm)
 			failures404 = append(failures404, result.toolchainRpm)
@@ -196,8 +212,8 @@ func trackDownloadProgress(numExpectedResults int, results chan downloadResult, 
 		}
 	}
 
-	if len(successes) > 0 {
-		logger.Log.Infof("Downloaded %d/%d toolchain RPMs", len(successes), totalRPMs)
+	if len(downloaded) > 0 {
+		logger.Log.Infof("Downloaded %d/%d toolchain RPMs", len(downloaded), totalRPMs)
 	}
 	if len(skipped) > 0 {
 		logger.Log.Infof("Skipped %d/%d pre-downloaded toolchain RPMs", len(skipped), totalRPMs)
@@ -211,8 +227,8 @@ func trackDownloadProgress(numExpectedResults int, results chan downloadResult, 
 		return
 	}
 
-	sort.Strings(successes)
-	err = file.WriteLines(successes, manifestFile)
+	sort.Strings(downloaded)
+	err = file.WriteLines(downloaded, manifestFile)
 	if err != nil {
 		err = fmt.Errorf("failed to write manifest file:\n%w", err)
 		return
