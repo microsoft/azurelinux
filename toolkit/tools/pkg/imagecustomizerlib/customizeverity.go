@@ -5,7 +5,7 @@ package imagecustomizerlib
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -116,7 +116,7 @@ func updateMarinerCfgWithInitramfs(imageChroot *safechroot.Chroot) error {
 
 	// Update mariner.cfg to reference the new initramfs
 	err = imageChroot.Run(func() error {
-		input, innerErr := ioutil.ReadFile(cfgPath)
+		input, innerErr := os.ReadFile(cfgPath)
 		if innerErr != nil {
 			return fmt.Errorf("failed to read mariner.cfg: %w", innerErr)
 		}
@@ -128,7 +128,7 @@ func updateMarinerCfgWithInitramfs(imageChroot *safechroot.Chroot) error {
 			}
 		}
 		output := strings.Join(lines, "\n")
-		return ioutil.WriteFile(cfgPath, []byte(output), 0644)
+		return os.WriteFile(cfgPath, []byte(output), 0644)
 	})
 
 	return nil
@@ -139,7 +139,7 @@ func updateGrubConfig(resolvedVerityDevice string, resolvedHashDevice string, sa
 	newArgs := fmt.Sprintf(cmdlineTemplate, rootHash, resolvedVerityDevice, resolvedHashDevice, verityCorruptionResponse, salt)
 	grubConfigPath := "/mnt/boot_partition/grub2/grub.cfg"
 
-	content, err := ioutil.ReadFile(grubConfigPath)
+	content, err := os.ReadFile(grubConfigPath)
 	if err != nil {
 		return fmt.Errorf("failed to read grub config: %v", err)
 	}
@@ -162,7 +162,7 @@ func updateGrubConfig(resolvedVerityDevice string, resolvedHashDevice string, sa
 	}
 
 	// Write the updated content back to grub.cfg
-	err = ioutil.WriteFile(grubConfigPath, []byte(strings.Join(updatedLines, "\n")), 0644)
+	err = os.WriteFile(grubConfigPath, []byte(strings.Join(updatedLines, "\n")), 0644)
 	if err != nil {
 		return fmt.Errorf("failed to write updated grub config: %v", err)
 	}
@@ -178,7 +178,7 @@ func findFreeNBDDevice() (string, error) {
 	}
 
 	for _, file := range files {
-		size, err := ioutil.ReadFile(filepath.Join(file, "size"))
+		size, err := os.ReadFile(filepath.Join(file, "size"))
 		if err != nil {
 			continue
 		}
@@ -206,10 +206,10 @@ func convertToNbdDevicePath(nbdDevice, systemDevice string) (string, error) {
 
 // findDeviceByUUIDOrLabel attempts to resolve a PARTUUID, PARTLABEL, UUID, or LABEL to a device file.
 func findDeviceByUUIDOrLabel(uuidOrLabel string) (string, error) {
-	// Check if the input is already a device path
+	// Error if the input is already a device path
 	if strings.HasPrefix(uuidOrLabel, "/dev/") {
-		return uuidOrLabel, nil
-	}
+        return "", fmt.Errorf("logical error: function called with resolved device path '%s'", uuidOrLabel)
+    }
 
 	// Resolve UUIDs and LABELs
 	for _, dir := range []string{"by-partuuid", "by-partlabel", "by-uuid", "by-label"} {

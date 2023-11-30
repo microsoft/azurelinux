@@ -290,15 +290,15 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 	saltMatches := saltRegex.FindStringSubmatch(verityOutput)
 	if len(saltMatches) > 1 {
 		salt = saltMatches[1]
+	} else {
+		return fmt.Errorf("failed to parse salt from veritysetup output")
 	}
 
 	rootHashMatches := rootHashRegex.FindStringSubmatch(verityOutput)
 	if len(rootHashMatches) > 1 {
 		rootHash = rootHashMatches[1]
-	}
-
-	if salt == "" || rootHash == "" {
-		return fmt.Errorf("failed to parse salt or root hash from veritysetup output")
+	} else {
+		return fmt.Errorf("failed to parse root hash from veritysetup output")
 	}
 
 	resolvedBootDevice, err := findDeviceByUUIDOrLabel(config.SystemConfig.Verity.BootDevice)
@@ -312,7 +312,7 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 	}
 
 	// Create a directory for mounting the boot partition
-	bootMountDir := "/mnt/boot_partition"
+	bootMountDir := filepath.Join(buildDir, "/mnt/boot_partition")
 	if err := os.MkdirAll(bootMountDir, 0755); err != nil {
 		return fmt.Errorf("failed to create mount directory %s: %v", bootMountDir, err)
 	}
