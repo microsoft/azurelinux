@@ -60,7 +60,7 @@ build_worker_chroot() {
 build_tools() {
     pushd $toolkit_root
     echo "Building required tools..."
-    make go-srpmpacker go-depsearch go-grapher go-specreader REBUILD_TOOLS=y > /dev/null
+    make go-depsearch go-downloader go-grapher go-specreader go-srpmpacker REBUILD_TOOLS=y > /dev/null
     popd
 }
 
@@ -146,7 +146,7 @@ fi
 if [[ "${mode}" == "build" ]]; then
     pushd $toolkit_root
     echo "Populating Intermediate SRPMs..."
-    if [[ ( ! -f "$TOOL_BINS_DIR/srpmpacker" ) ]]; then build_tools; fi
+    if [[ ( ! -f "$TOOL_BINS_DIR/srpmpacker" )  || ( ! -f "$TOOL_BINS_DIR/downloader" ) ]]; then build_tools; fi
     make input-srpms SRPM_FILE_SIGNATURE_HANDLING="update" > /dev/null
     popd
 fi

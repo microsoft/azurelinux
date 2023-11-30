@@ -1,6 +1,6 @@
 Summary:        The Swiss Army knife of Python web development
 Name:           python-werkzeug
-Version:        2.2.3
+Version:        2.3.7
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -8,6 +8,16 @@ Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://github.com/pallets/werkzeug
 Source0:        https://github.com/pallets/werkzeug/archive/%{version}.tar.gz#/werkzeug-%{version}.tar.gz
+Patch0:         0001-enable-tests-in-rpm-env.patch
+# Werkzeug really doesn't like running tests in the RPM build environment.
+# The %%tox macro explicitly sets PYTHONPATH rather than using a virtualenv and,
+# crucially, also puts Werkzeug in a directory considered to be a system directory.
+# Normally, Werkzeug is tested using an editable installation, where the source
+# directory is added to PYTHONPATH but not installed in a system directory.
+# This means all files this function would normally find are considered system files
+# and are excluded.
+Patch1:         0002-disable-stat-test.patch
+Patch2:         CVE-2023-46136.patch
 BuildArch:      noarch
 
 %description
@@ -17,14 +27,19 @@ The Swiss Army knife of Python web development
 Summary:        The Swiss Army knife of Python web development
 BuildRequires:  python3-devel
 BuildRequires:  python3-libs
+BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
+BuildRequires:  python3-flit-core
+BuildRequires:  python3-pip
+BuildRequires:  python3-wheel
 Requires:       python3
+Requires:       python3-markupsafe
 %if %{with_check}
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
-BuildRequires:  python3-pip
 BuildRequires:  python3-requests
+BuildRequires:  python3-markupsafe
 %endif
 
 %description -n python3-werkzeug
@@ -33,22 +48,34 @@ Werkzeug started as simple collection of various utilities for WSGI applications
 %prep
 %autosetup -n werkzeug-%{version} -p1
 
+%generate_buildrequires
+%pyproject_buildrequires %{?with_tests:-t}
+
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files werkzeug
 
 %check
-pip3 install pytest hypothesis
-LANG=en_US.UTF-8 PYTHONPATH=./  python3 setup.py test
+pip3 install tox==4.6.3 tox-current-env
+pip3 install -r requirements/tests.txt
+%tox
 
-%files -n python3-werkzeug
+%files -n python3-werkzeug -f %{pyproject_files}
 %defattr(-,root,root)
+%doc README.rst
+%doc CHANGES.rst
 %license LICENSE.rst
-%{python3_sitelib}/*
 
 %changelog
+* Mon Nov 06 2023 Nick Samson <nisamson@microsoft.com> - 2.3.7-1
+- Upgraded to version 2.3.7
+- Migrated to pyproject build
+- Added required MarkupSafe dependency
+- Added patch for CVE-2023-46136
+
 * Tue Mar 14 2023 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 2.2.3-1
 - Updated to version 2.2.3 for CVE-2023-23934 adn CVE-2023-25577
 - Remove patch for CVE-2023-25577

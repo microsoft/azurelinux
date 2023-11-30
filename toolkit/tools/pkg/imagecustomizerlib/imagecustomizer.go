@@ -10,13 +10,15 @@ import (
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safeloopback"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 )
 
 const (
 	tmpParitionDirName = "tmppartition"
+
+	BaseImageName                = "image.raw"
+	PartitionCustomizedImageName = "image2.raw"
 )
 
 var (
@@ -83,11 +85,18 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 	}
 
 	// Convert image file to raw format, so that a kernel loop device can be used to make changes to the image.
-	buildImageFile := filepath.Join(buildDirAbs, "image.raw")
+	buildImageFile := filepath.Join(buildDirAbs, BaseImageName)
 
-	_, _, err = shell.Execute("qemu-img", "convert", "-O", "raw", imageFile, buildImageFile)
+	logger.Log.Infof("Mounting base image: %s", buildImageFile)
+	err = shell.ExecuteLiveWithErr(1, "qemu-img", "convert", "-O", "raw", imageFile, buildImageFile)
 	if err != nil {
 		return fmt.Errorf("failed to convert image file to raw format:\n%w", err)
+	}
+
+	// Customize the partitions.
+	buildImageFile, err = customizePartitions(buildDirAbs, baseConfigPath, config, buildImageFile)
+	if err != nil {
+		return err
 	}
 
 	// Customize the raw image file.
@@ -97,13 +106,17 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 	}
 
 	// Create final output image file.
+	logger.Log.Infof("Writing: %s", outputImageFile)
+
 	outDir := filepath.Dir(outputImageFile)
 	os.MkdirAll(outDir, os.ModePerm)
 
-	_, _, err = shell.Execute("qemu-img", "convert", "-O", qemuOutputImageFormat, buildImageFile, outputImageFile)
+	err = shell.ExecuteLiveWithErr(1, "qemu-img", "convert", "-O", qemuOutputImageFormat, buildImageFile, outputImageFile)
 	if err != nil {
 		return fmt.Errorf("failed to convert image file to format: %s:\n%w", outputImageFormat, err)
 	}
+
+	logger.Log.Infof("Success!")
 
 	return nil
 }
@@ -190,43 +203,19 @@ func validateScript(baseConfigPath string, script *imagecustomizerapi.Script) er
 func customizeImageHelper(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
 	buildImageFile string, rpmsSources []string, useBaseImageRpmRepos bool,
 ) error {
-	// Mount the raw disk image file.
-	loopback, err := safeloopback.NewLoopback(buildImageFile)
-	if err != nil {
-		return fmt.Errorf("failed to mount raw disk (%s) as a loopback device:\n%w", buildImageFile, err)
-	}
-	defer loopback.Close()
-
-	// Look for all the partitions on the image.
-	newMountDirectories, mountPoints, err := findPartitions(buildDir, loopback.DevicePath())
-	if err != nil {
-		return fmt.Errorf("failed to find disk partitions:\n%w", err)
-	}
-
-	// Create chroot environment.
-	imageChrootDir := filepath.Join(buildDir, "imageroot")
-
-	chrootLeaveOnDisk := false
-	imageChroot := safechroot.NewChroot(imageChrootDir, chrootLeaveOnDisk)
-	err = imageChroot.Initialize("", newMountDirectories, mountPoints)
+	imageConnection, err := connectToExistingImage(buildImageFile, buildDir, "imageroot")
 	if err != nil {
 		return err
 	}
-	defer imageChroot.Close(chrootLeaveOnDisk)
+	defer imageConnection.Close()
 
 	// Do the actual customizations.
-	err = doCustomizations(buildDir, baseConfigPath, config, imageChroot, rpmsSources, useBaseImageRpmRepos)
+	err = doCustomizations(buildDir, baseConfigPath, config, imageConnection.Chroot(), rpmsSources, useBaseImageRpmRepos)
 	if err != nil {
 		return err
 	}
 
-	// Close.
-	err = imageChroot.Close(chrootLeaveOnDisk)
-	if err != nil {
-		return err
-	}
-
-	err = loopback.CleanClose()
+	err = imageConnection.CleanClose()
 	if err != nil {
 		return err
 	}
