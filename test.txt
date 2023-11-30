@@ -1,4 +1,0 @@
-hi
-ho
-fizz
-buzz
