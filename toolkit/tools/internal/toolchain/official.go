@@ -15,7 +15,6 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/systemdependency"
 )
 
 const officialName = "official"
@@ -208,11 +207,6 @@ func (o *OfficialScript) BuildOfficialToolchainRpms() (builtRpms []string, err e
 	if o.UseIncremental {
 		incrementalArg = "y"
 	}
-	gzipTool, err := systemdependency.GzipTool()
-	if err != nil {
-		err = fmt.Errorf("failed to get gzip tool. Error:\n%w", err)
-		return
-	}
 	runCheckArg := "n"
 	if o.RunCheck {
 		runCheckArg = "y"
@@ -227,7 +221,6 @@ func (o *OfficialScript) BuildOfficialToolchainRpms() (builtRpms []string, err e
 		runCheckArg,
 		filepath.Dir(o.ToolchainManifest),
 		incrementalArg,
-		gzipTool,
 		o.IntermediateSrpmsDir,
 		o.OutputSrpmsDir,
 		o.ToolchainFromRepos,

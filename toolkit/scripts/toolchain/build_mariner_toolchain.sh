@@ -17,15 +17,14 @@ MARINER_SPECS_DIR=$6
 RUN_CHECK=$7
 MARINER_TOOLCHAIN_MANIFESTS_DIR=$8
 INCREMENTAL_TOOLCHAIN=${9:-n}
-ARCHIVE_TOOL=${10}
-MARINER_INPUT_SRPMS_DIR=${11}
-MARINER_OUTPUT_SRPMS_DIR=${12}
-MARINER_REHYDRATED_RPMS_DIR=${13}
-MARINER_TOOLCHAIN_MANIFESTS_FILE=${14}
+MARINER_INPUT_SRPMS_DIR=${10}
+MARINER_OUTPUT_SRPMS_DIR=${11}
+MARINER_REHYDRATED_RPMS_DIR=${12}
+MARINER_TOOLCHAIN_MANIFESTS_FILE=${13}
 #  Time stamp components
 # =====================================================
-BLDTRACKER=${15}
-TIMESTAMP_FILE_PATH=${16}
+BLDTRACKER=${14}
+TIMESTAMP_FILE_PATH=${15}
 # =====================================================
 
 # Create toolchain subdirectory in out folder
@@ -46,7 +45,6 @@ mkdir -pv $MARINER_RPM_DIR/$(uname -m)
     "$MARINER_OUTPUT_SRPMS_DIR" \
     "$MARINER_REHYDRATED_RPMS_DIR" \
     "$MARINER_TOOLCHAIN_MANIFESTS_FILE" \
-    "$ARCHIVE_TOOL" \
     "$BLDTRACKER" \
     "$TIMESTAMP_FILE_PATH"
 
@@ -58,7 +56,7 @@ echo Full CBL-Mariner toolchain build complete
 rm -rvf $MARINER_BUILD_DIR/toolchain/built_rpms_all
 mv -v $MARINER_BUILD_DIR/toolchain/built_rpms/ $MARINER_BUILD_DIR/toolchain/built_rpms_all
 pushd $MARINER_BUILD_DIR/toolchain
-tar -I "$ARCHIVE_TOOL" -cvf toolchain_built_rpms_all.tar.gz built_rpms_all
+tar cvf toolchain_built_rpms_all.tar.gz built_rpms_all
 popd
 # Output:
 # out/toolchain/built_rpms_all
@@ -66,15 +64,15 @@ popd
 
 echo Creating toolchain source RPM archive
 pushd $MARINER_BUILD_DIR/toolchain
-tar -I "$ARCHIVE_TOOL" -C ./populated_toolchain/usr/src/mariner -cvf toolchain_built_srpms_all.tar.gz SRPMS
+tar -C ./populated_toolchain/usr/src/mariner -cvf toolchain_built_srpms_all.tar.gz SRPMS
 popd
 
 if [ "$INCREMENTAL_TOOLCHAIN" = "y" ]; then
     echo "Creating delta toolchain RPMs tarball."
 
-    tar -I "$ARCHIVE_TOOL" -C "$MARINER_BUILD_DIR"/toolchain/built_rpms_all \
+    tar -C "$MARINER_BUILD_DIR"/toolchain/built_rpms_all \
         -T "$MARINER_BUILD_DIR"/logs/toolchain/built_rpms_list.txt \
-        -cvf "$MARINER_BUILD_DIR"/toolchain/toolchain_built_rpms_delta.tar.gz
+        -czvf "$MARINER_BUILD_DIR"/toolchain/toolchain_built_rpms_delta.tar.gz
 fi
 
 echo Printing list of built toolchain RPMS:
