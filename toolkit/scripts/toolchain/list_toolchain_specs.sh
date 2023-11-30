@@ -25,8 +25,6 @@ sed -nE 's/^\s*build_rpm_in_chroot_no_install\s+([A-Za-z0-9_-]+).*$/\1/pgm' $TOO
 # Special case to add msopenjdk-11 RPM which is downloaded instead of built
 echo "msopenjdk-11" >> "${OUTPUT_FILE}.tmp"
 
-echo "foobar" >> "${OUTPUT_FILE}.tmp"
-
 # Only filter if the --filter-buildable flag is passed in
 if [[ "$DO_FILTER" == "true" ]]; then
     # Only write to the list if the .spec file is available locally
@@ -42,4 +40,3 @@ else
 fi
 
 rm -f "${OUTPUT_FILE}.tmp"
-
