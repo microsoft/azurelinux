@@ -16,9 +16,9 @@ SRPM_FILE_SIGNATURE_HANDLING ?= enforce
 SRPM_BUILD_CHROOT_DIR = $(BUILD_DIR)/SRPM_packaging
 SRPM_BUILD_LOGS_DIR = $(LOGS_DIR)/pkggen/srpms
 
-#toolchain_spec_list = $(toolchain_build_dir)/toolchain_specs.txt
+# Input to the packing process
 srpm_pack_list_file = $(BUILD_SRPMS_DIR)/pack_list.txt
-
+# The output of the packing process (may be empty is everything is already up-to-date)
 srpm_pack_summary_file = $(STATUS_FLAGS_DIR)/srpm_pack_activity.txt
 toolchain_srpm_pack_summary_file = $(STATUS_FLAGS_DIR)/toolchain_srpm_pack_activity.txt
 
@@ -58,14 +58,8 @@ clean-input-srpms:
 	$(SCRIPTS_DIR)/safeunmount.sh "$(SRPM_BUILD_CHROOT_DIR)" && \
 	rm -rf $(SRPM_BUILD_CHROOT_DIR)
 
-# The directory freshness is tracked with a status flag. The status flag is only updated when all SRPMs have been
-# updated.
-#$(BUILD_SRPMS_DIR): $(STATUS_FLAGS_DIR)/build_srpms.flag
-#	@touch $@
-#	@echo Finished updating $@
-
 ifeq ($(DOWNLOAD_SRPMS),y)
-$(STATUS_FLAGS_DIR)/build_srpms.flag: $(local_specs) $(local_spec_dirs) $(local_spec_sources) $(SPECS_DIR) $(go-downloader)
+$(STATUS_FLAGS_DIR)/build_srpms.flag: $(local_specs) $(local_spec_dirs) $(local_spec_sources) $(SPECS_DIR) $(BUILD_SRPMS_DIR) $(go-downloader)
 	for spec in $(local_specs); do \
 		spec_file=$${spec} && \
 		srpm_file=$$(rpmspec -q $${spec_file} --srpm --define='with_check 1' --define='dist $(DIST_TAG)' --queryformat %{NAME}-%{VERSION}-%{RELEASE}.src.rpm) && \
@@ -89,6 +83,7 @@ $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(STATUS_FLAGS_DIR)/build_srpms.
 	@touch $@
 else
 
+# Dependencies common to both the full packer and the toolchain-only packer targets
 common_srpm_packer_deps = $(local_specs) $(local_spec_dirs) $(SPECS_DIR) $(local_spec_sources) $(go-srpmpacker) $(built_srpms) $(BUILD_SRPMS_DIR)
 
 $(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(srpm_pack_list_file) $(common_srpm_packer_deps)
