@@ -3,9 +3,9 @@
 set -x
 set -e
 
-EXTRACTED_DIR=$1
-OUTPUT_DIR=/home/george/temp/experiment-roast-out
-WORKING_DIR=/home/george/temp/experiment-roast-tmp
+SOURCE_DIR=$1
+WORKING_DIR=$2
+OUTPUT_DIR=$3
 
 chmod 755 /home/george/temp/experiment/in/extracted/etc/shadow
 
@@ -20,7 +20,7 @@ pushd ~/git/CBL-Mariner/toolkit
 sudo make go-tools REBUILD_TOOLS=y
 
 sudo ./out/tools/roast \
- --dir $EXTRACTED_DIR \
+ --dir $SOURCE_DIR \
  --output-dir $OUTPUT_DIR \
  --tmp-dir $WORKING_DIR
 

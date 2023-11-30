@@ -37,49 +37,7 @@ function unmount_raw_disk() {
   sudo umount $rawDiskMountDir
 }
 
-function extract_and_expand_initrd_from_full_disk() {
-  local rawDiskMountDir=$1
-  local workingDir=$2
 
-  pushd $workingDir
-
-  #
-  # 22 MB compressed, 42MB decompressed
-  # Copy original to working directory
-  originalInitrdImg=$(sudo find $rawDiskMountDir/boot -name "initrd.img*")
-  sudo cp $originalInitrdImg $workingDir/
-
-  # Rename
-  tempInitrdImg=$(find $workingDir -name "initrd.img*")
-  mv $tempInitrdImg ${tempInitrdImg}.gz
-  tempInitrdImgGz=${tempInitrdImg}.gz
-  
-  # change ownership
-  sudo chown george:george $tempInitrdImgGz
-
-  # decompress
-  pigz -k -d $tempInitrdImgGz
-
-  # extrac from archive
-  extractedDir=$workingDir/original-initrd-extracted
-  mkdir -p $extractedDir
-  pushd $extractedDir
-  set +e
-  cpio -i --make-directories < $tempInitrdImg
-  # cpio: dev/console: Cannot mknod: Operation not permitted
-  # cpio: dev/kmsg: Cannot mknod: Operation not permitted
-  # cpio: dev/null: Cannot mknod: Operation not permitted
-  # cpio: dev/random: Cannot mknod: Operation not permitted
-  # cpio: dev/urandom: Cannot mknod: Operation not permitted
-  # 85524 blocks
-  set -e
-  echo "---- extracted initrd contents ----"
-  ls -la $extractedDir
-  echo "---- ---- ----"
-  popd
-
-  popd
-}
 
 sudo rm -rf $workingDir
 mkdir -p $workingDir
