@@ -13,4 +13,4 @@ resources:
 stages:
   - stage: CodeQlAnalysis
     jobs:
-    - template: SDL/CodeQL-template.yml@CBL-Mariner-Pipelines
+    - template: SDL/CodeQL-CBL-Mariner-template.yml@CBL-Mariner-Pipelines
