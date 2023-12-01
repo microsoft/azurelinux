@@ -121,8 +121,9 @@ mkdir -p $STAGED_ISO_ARTIFACTS_DIR
 
 pushd ~/git/CBL-Mariner/toolkit/mic-iso-gen
 
-cp $INPUT_INITRD $STAGED_ISO_ARTIFACTS_DIR/boot
-cp $INPUT_VMLINUZ $STAGED_ISO_ARTIFACTS_DIR/boot
+mkdir -p $STAGED_ISO_ARTIFACTS_DIR/boot
+cp $INPUT_INITRD $STAGED_ISO_ARTIFACTS_DIR/boot/
+cp $INPUT_VMLINUZ $STAGED_ISO_ARTIFACTS_DIR/boot/
 
 create_bootload_images \
     $INPUT_GRUB_CFG \

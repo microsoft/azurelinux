@@ -7,6 +7,7 @@
         "grub2-efi-binary",
         "mariner-release",
         "rpm",
+        "jq",
         "shadow-utils",
         "shim",
         "systemd"

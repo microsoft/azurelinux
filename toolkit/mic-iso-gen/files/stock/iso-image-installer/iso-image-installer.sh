@@ -1,10 +1,6 @@
 #!/bin/bash
 
-echo "Running iso-image-installer.sh v1137."
-
-echo "iso_media_mount_dir is not configured. Exiting."
-/bin/bash
-fi
+echo "Running iso-image-installer.sh v231130-2001."
 
 image_file_path=$(cat $iso_media_mount_dir/artifacts/host-configuration.json | jq -r '.imaging.images[0].url')
 image_target_device=$(cat $iso_media_mount_dir/artifacts/host-configuration.json | jq -r '.storage.disks[0].device')
@@ -26,5 +22,6 @@ echo "Ejecting the CD-ROM..."
 umount /dev/cdrom
 eject /dev/cdrom
 
-echo "Rebooting..."
+# echo "Rebooting..."
 reboot
+# /bin/bash
