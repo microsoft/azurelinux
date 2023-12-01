@@ -8,7 +8,7 @@ resources:
     - repository: CBL-Mariner-Pipelines
       type: git
       name: mariner/CBL-Mariner-Pipelines
-      ref: 'refs/heads/nicolasg/codeQL-toolkit'
+      ref: 'refs/heads/master'
 
 stages:
   - stage: CodeQlAnalysis
