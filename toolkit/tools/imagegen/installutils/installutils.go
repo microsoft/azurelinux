@@ -1356,7 +1356,7 @@ func createUserWithPassword(installChroot *safechroot.Chroot, user configuration
 
 // chage works in the same way as invoking "chage -M passwordExpirationInDays username"
 // i.e. it sets the maximum password expiration date.
-func Chage(installChroot *safechroot.Chroot, passwordExpirationInDays int64, username string) (err error) {
+func Chage(installChroot safechroot.ChrootInterface, passwordExpirationInDays int64, username string) (err error) {
 	var (
 		shadow            []string
 		usernameWithColon = fmt.Sprintf("%s:", username)
@@ -1442,7 +1442,7 @@ func Chage(installChroot *safechroot.Chroot, passwordExpirationInDays int64, use
 	return fmt.Errorf(`user "%s" not found when trying to change the password expiration date`, username)
 }
 
-func ConfigureUserGroupMembership(installChroot *safechroot.Chroot, username string, primaryGroup string,
+func ConfigureUserGroupMembership(installChroot safechroot.ChrootInterface, username string, primaryGroup string,
 	secondaryGroups []string,
 ) (err error) {
 	const squashErrors = false
@@ -1473,7 +1473,7 @@ func ConfigureUserGroupMembership(installChroot *safechroot.Chroot, username str
 	return
 }
 
-func ConfigureUserStartupCommand(installChroot *safechroot.Chroot, username string, startupCommand string) (err error) {
+func ConfigureUserStartupCommand(installChroot safechroot.ChrootInterface, username string, startupCommand string) (err error) {
 	const (
 		passwdFilePath = "etc/passwd"
 		sedDelimiter   = "|"
@@ -1497,7 +1497,7 @@ func ConfigureUserStartupCommand(installChroot *safechroot.Chroot, username stri
 	return
 }
 
-func ProvisionUserSSHCerts(installChroot *safechroot.Chroot, username string, sshPubKeyPaths []string) (err error) {
+func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username string, sshPubKeyPaths []string) (err error) {
 	var (
 		pubKeyData []string
 		exists     bool
