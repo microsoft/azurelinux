@@ -28,7 +28,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.15.138.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -426,6 +426,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Nov 28 2023 Juan Camposeco <juanarturoc@microsoft.com> - 5.15.138.1-4
+- Enable CUSE module
+
 * Tue Nov 28 2023 Thien Trung Vuong <tvuong@microsoft.com> - 5.15.138.1-3
 - Enable CONFIG_BPF_LSM
 

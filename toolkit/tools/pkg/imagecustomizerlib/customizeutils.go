@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"time"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
@@ -34,6 +35,8 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 	// Note: The ordering of the customization steps here should try to mirror the order of the equivalent steps in imager
 	// tool as closely as possible.
 
+	buildTime := time.Now().Format("2006-01-02T15:04:05Z")
+
 	err = overrideResolvConf(imageChroot)
 	if err != nil {
 		return err
@@ -54,7 +57,7 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
-	err = addOrUpdateUsers(config.SystemConfig.Users, baseConfigPath, imageChroot)
+	err = AddOrUpdateUsers(config.SystemConfig.Users, baseConfigPath, imageChroot)
 	if err != nil {
 		return err
 	}
@@ -65,6 +68,11 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 	}
 
 	err = loadOrDisableModules(config.SystemConfig.Modules, imageChroot)
+	if err != nil {
+		return err
+	}
+
+	err = addCustomizerRelease(imageChroot, ToolVersion, buildTime)
 	if err != nil {
 		return err
 	}
@@ -199,7 +207,7 @@ func runScripts(baseConfigPath string, scripts []imagecustomizerapi.Script, imag
 	return nil
 }
 
-func addOrUpdateUsers(users []imagecustomizerapi.User, baseConfigPath string, imageChroot *safechroot.Chroot) error {
+func AddOrUpdateUsers(users []imagecustomizerapi.User, baseConfigPath string, imageChroot safechroot.ChrootInterface) error {
 	for _, user := range users {
 		err := addOrUpdateUser(user, baseConfigPath, imageChroot)
 		if err != nil {
@@ -210,7 +218,7 @@ func addOrUpdateUsers(users []imagecustomizerapi.User, baseConfigPath string, im
 	return nil
 }
 
-func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageChroot *safechroot.Chroot) error {
+func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageChroot safechroot.ChrootInterface) error {
 	var err error
 
 	logger.Log.Infof("Adding/updating user (%s)", user.Name)
@@ -343,6 +351,26 @@ func loadOrDisableModules(modules imagecustomizerapi.Modules, imageChroot *safec
 		if err != nil {
 			return fmt.Errorf("failed to write module disable configuration: %w", err)
 		}
+	}
+
+	return nil
+}
+
+func addCustomizerRelease(imageChroot *safechroot.Chroot, toolVersion string, buildTime string) error {
+	var err error
+
+	logger.Log.Infof("Creating image customizer release file")
+
+	customizerReleaseFilePath := filepath.Join(imageChroot.RootDir(), "/etc/mariner-customizer-release")
+	lines := []string{
+		fmt.Sprintf("%s=\"%s\"", "TOOL_VERSION", toolVersion),
+		fmt.Sprintf("%s=\"%s\"", "BUILD_DATE", buildTime),
+		"",
+	}
+
+	err = file.WriteLines(lines, customizerReleaseFilePath)
+	if err != nil {
+		return fmt.Errorf("error writing customizer release file (%s): %w", customizerReleaseFilePath, err)
 	}
 
 	return nil
