@@ -28,8 +28,7 @@
                 "../mic-iso-gen/files/prov/udev/vf-rep-link-name.sh": "/lib/udev/vf-rep-link-name.sh",
                 "../mic-iso-gen/files/prov/udev/vf-net-link-name.sh": "/lib/udev/vf-net-link-name.sh",
                 "../mic-iso-gen/files/prov/root.profile": "/root/.profile",
-                "../mic-iso-gen/files/stock/mariner-iso-start-up.sh": "/root/mariner-iso-start-up.sh"
-
+                "../mic-iso-gen/files/prov/mariner-iso-start-up.sh": "/root/mariner-iso-start-up.sh"
             },
             "Users": [
                 {
