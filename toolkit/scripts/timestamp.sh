@@ -39,7 +39,7 @@ begin_timestamp()  {
             --script-name=$_timestamp_script_name \
             --out-path="$TIMESTAMP_FILE_PATH" \
             --log-level=$_loglevel \
-            --mode="init"
+            --mode="init" || true
     fi
 }
 
@@ -53,7 +53,7 @@ start_record_timestamp () {
             --out-path="$TIMESTAMP_FILE_PATH" \
             --step-path="$_timestamp_path" \
             --log-level=$_loglevel \
-            --mode="record"
+            --mode="record" || true
     fi
 }
 
@@ -67,7 +67,7 @@ stop_record_timestamp () {
             --out-path="$TIMESTAMP_FILE_PATH" \
             --step-path="$_timestamp_path" \
             --log-level=$_loglevel \
-            --mode="stop"
+            --mode="stop" || true
     fi
 }
 
@@ -79,6 +79,6 @@ finish_timestamp() {
             --script-name=$_timestamp_script_name \
             --out-path="$TIMESTAMP_FILE_PATH" \
             --log-level=$_loglevel \
-            --mode="finish"
+            --mode="finish" || true
     fi
 }
