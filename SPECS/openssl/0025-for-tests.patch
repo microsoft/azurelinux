@@ -1,3 +1,7 @@
+Modified for AZL to take into account other patches and config settings.
+Specifically, removed the second '#' from the blank comment on line 15 of this file.
+
+
 diff -up openssl-3.0.0/apps/openssl.cnf.xxx openssl-3.0.0/apps/openssl.cnf
 --- openssl-3.0.0/apps/openssl.cnf.xxx	2021-11-23 16:29:50.618691603 +0100
 +++ openssl-3.0.0/apps/openssl.cnf	2021-11-23 16:28:16.872882099 +0100
