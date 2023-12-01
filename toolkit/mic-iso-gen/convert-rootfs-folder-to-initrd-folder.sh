@@ -21,7 +21,7 @@ sudo rm -rf $outputRootDir
 mkdir -p $outputRootDir
 sudo cp -r -a $inputRootDir/* $outputRootDir
 
-sudo cp /home/george/git/argus-toolkit/prov-builder/files/mariner-iso-start-up.sh $outputRootDir/root/
+sudo cp /home/george/git/CBL-Mariner/toolkit/mic-iso-gen/files/prov/mariner-iso-start-up-minimal.sh $outputRootDir/root/mariner-iso-start-up.sh
 sudo cp /home/george/git/CBL-Mariner/toolkit/mic-iso-gen/chroot-remove-packages.sh $outputRootDir/
 sudo rm -f $outputRootDir/etc/fstab
 sudo touch $outputRootDir/etc/fstab

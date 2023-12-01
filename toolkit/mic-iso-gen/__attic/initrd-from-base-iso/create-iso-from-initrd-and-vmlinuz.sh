@@ -77,7 +77,7 @@ function create_bootload_images() {
     local INTERMEDIATE_OUTPUT_DIR=$2
     local OUT_DIR=$3
 
-    mkdir -p INTERMEDIATE_OUTPUT_DIR
+    mkdir -p $INTERMEDIATE_OUTPUT_DIR
 
     create_efi_boot_image \
         $INPUT_GRUB_CFG \
