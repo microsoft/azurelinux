@@ -14,7 +14,7 @@
         {
             "Name": "initrd",
             "PackageLists": [
-                "../imageconfigs/packagelists/baremetal-initrd-packages.json"
+                "../imageconfigs/packagelists/baremetal-initrd-minimal-packages.json"
             ],
             "PostInstallScripts": [],
             "KernelOptions": {

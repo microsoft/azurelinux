@@ -5,7 +5,7 @@
 export TERMINFO=/usr/lib/mariner/terminfo
 export TERM=mariner-installer
 
-echo "Running mariner-iso-start-up script v231130-1811."
+echo "Running mariner-iso-start-up script v231201-1145."
 
 function wait_for_mount {
     local mount_point="$1"
@@ -28,6 +28,8 @@ function run_user_script {
     if [[ -f $iso_custom_installer_script ]]; then
         echo "Found."
         echo "-------------------------------------------------------------------------------"
+        echo "Sleeping for 5 seconds before calling user script..."
+        sleep 5s
         source $iso_custom_installer_script
         return
     fi
@@ -37,6 +39,8 @@ function run_user_script {
     if [[ -f $iso_image_installer ]]; then
         echo "Found."
         echo "-------------------------------------------------------------------------------"
+        echo "Sleeping for 5 seconds before calling user script..."
+        sleep 5s
         source $iso_image_installer
         return
     fi

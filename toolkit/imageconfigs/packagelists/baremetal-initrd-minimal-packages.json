@@ -5,9 +5,9 @@
         "efibootmgr",
         "grub2-efi",
         "grub2-efi-binary",
+        "jq",
         "mariner-release",
         "rpm",
-        "jq",
         "shadow-utils",
         "shim",
         "systemd"
