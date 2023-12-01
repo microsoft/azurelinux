@@ -107,7 +107,7 @@ func createNewImageHelper(imageConnection *ImageConnection, filename string, dis
 	})
 
 	// Create imager boilerplate.
-	mountPointMap, err := createImageBoilerplate(imageConnection, filename, buildDir, chrootDirName, imagerDiskConfig,
+	mountPointMap, tmpFstabFile, err := createImageBoilerplate(imageConnection, filename, buildDir, chrootDirName, imagerDiskConfig,
 		imagerPartitionSettings)
 	if err != nil {
 		return err
@@ -117,6 +117,14 @@ func createNewImageHelper(imageConnection *ImageConnection, filename string, dis
 	err = installOS(imageConnection.Chroot())
 	if err != nil {
 		return err
+	}
+
+	// Move the fstab file into the image.
+	imageFstabFilePath := filepath.Join(imageConnection.Chroot().RootDir(), "etc/fstab")
+
+	err = file.Move(tmpFstabFile, imageFstabFilePath)
+	if err != nil {
+		return fmt.Errorf("failed to move fstab into new image:\n%w", err)
 	}
 
 	// Configure the boot loader.
@@ -132,17 +140,17 @@ func createNewImageHelper(imageConnection *ImageConnection, filename string, dis
 
 func createImageBoilerplate(imageConnection *ImageConnection, filename string, buildDir string, chrootDirName string,
 	imagerDiskConfig configuration.Disk, imagerPartitionSettings []configuration.PartitionSetting,
-) (map[string]string, error) {
+) (map[string]string, string, error) {
 	// Create raw disk image file.
 	err := diskutils.CreateSparseDisk(filename, imagerDiskConfig.MaxSize, 0o644)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create empty disk file (%s):\n%w", filename, err)
+		return nil, "", fmt.Errorf("failed to create empty disk file (%s):\n%w", filename, err)
 	}
 
 	// Connect raw disk image file.
 	err = imageConnection.ConnectLoopback(filename)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	// Set up partitions.
@@ -150,13 +158,13 @@ func createImageBoilerplate(imageConnection *ImageConnection, filename string, b
 		imageConnection.Loopback().DevicePath(), imagerDiskConfig, configuration.RootEncryption{},
 		configuration.ReadOnlyVerityRoot{})
 	if err != nil {
-		return nil, fmt.Errorf("failed to create partitions on disk (%s):\n%w", imageConnection.Loopback().DevicePath(), err)
+		return nil, "", fmt.Errorf("failed to create partitions on disk (%s):\n%w", imageConnection.Loopback().DevicePath(), err)
 	}
 
 	// Read the disk partitions.
 	diskPartitions, err := diskutils.GetDiskPartitions(imageConnection.Loopback().DevicePath())
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	// Create the fstab file.
@@ -173,13 +181,13 @@ func createImageBoilerplate(imageConnection *ImageConnection, filename string, b
 		mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, false, /*hidepidEnabled*/
 	)
 	if err != nil {
-		return nil, fmt.Errorf("failed to write temp fstab file:\n%w", err)
+		return nil, "", fmt.Errorf("failed to write temp fstab file:\n%w", err)
 	}
 
 	// Read back the fstab file.
 	mountPoints, err := findMountsFromFstabFile(tmpFstabFile, diskPartitions)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	// Create chroot environment.
@@ -187,16 +195,8 @@ func createImageBoilerplate(imageConnection *ImageConnection, filename string, b
 
 	err = imageConnection.ConnectChroot(imageChrootDir, false, nil, mountPoints)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
-	// Move the fstab file into the image.
-	imageFstabFilePath := filepath.Join(imageConnection.Chroot().RootDir(), "etc/fstab")
-
-	err = file.Move(tmpFstabFile, imageFstabFilePath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to move fstab into new image:\n%w", err)
-	}
-
-	return mountPointMap, nil
+	return mountPointMap, tmpFstabFile, nil
 }

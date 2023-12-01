@@ -330,7 +330,7 @@ func TestCustomizePartitionCustomize(t *testing.T) {
 					MountPoint: "/",
 				},
 				{
-					ID:         "rootfs",
+					ID:         "var",
 					MountPoint: "/var",
 				},
 			},
@@ -381,7 +381,7 @@ func TestCustomizePartitionCustomize(t *testing.T) {
 
 	t.Logf("%s", grub2ConfigFile)
 
-	linuxCommandLineRegex, err := regexp.Compile(`linux .* console=tty0 console=ttyS0 `)
+	linuxCommandLineRegex, err := regexp.Compile(`linux .* \$systemd_cmdline *console=tty0 console=ttyS0 *\$kernelopts`)
 	if !assert.NoError(t, err) {
 		return
 	}
