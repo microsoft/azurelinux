@@ -5,7 +5,7 @@ Release:        1%{?dist}
 License:        GPLv2+
 Group:          Applications/Internet
 Url:            http://traceroute.sourceforge.net
-Source0:        http://downloads.sourceforge.net/project/traceroute/traceroute/traceroute-%{version}/traceroute-%{version}.tar.gz
+Source0:        https://sourceforge.net/projects/traceroute/files/traceroute/traceroute-%{version}/traceroute-%{version}.tar.gz
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
