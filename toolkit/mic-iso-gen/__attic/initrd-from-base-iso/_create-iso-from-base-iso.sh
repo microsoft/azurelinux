@@ -5,8 +5,8 @@ set -e
 
 FULL_IMAGE_CONFIG_FILE=~/git/CBL-Mariner/toolkit/imageconfigs/baremetal.json
 ISO_INITRD_CONFIG_FILE=~/git/CBL-Mariner/toolkit/imageconfigs/baremetal-initrd.json
+# ISO_INITRD_CONFIG_FILE=~/git/CBL-Mariner/toolkit/imageconfigs/baremetal-initrd-minimal.json
 ISO_IMAGE_CONFIG_FILE=~/git/CBL-Mariner/toolkit/imageconfigs/baremetal-iso.json
-
 
 #------------------------------------------------------------------------------
 
