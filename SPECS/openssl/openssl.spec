@@ -277,20 +277,20 @@ ktlsopt=disable-ktls
 # marked as not requiring an executable stack.
 # Also add -DPURIFY to make using valgrind with openssl easier as we do not
 # want to depend on the uninitialized memory as a source of entropy anyway.
-RPM_OPT_FLAGS="$RPM_OPT_FLAGS -Wa,--noexecstack -Wa,--generate-missing-build-notes=yes -DPURIFY $RPM_LD_FLAGS"
+NEW_RPM_OPT_FLAGS="%{optflags} -Wa,--noexecstack -Wa,--generate-missing-build-notes=yes -DPURIFY $RPM_LD_FLAGS"
 
 export HASHBANGPERL=/usr/bin/perl
 
 # ia64, x86_64, ppc are OK by default
 # Configure the build tree.  Override OpenSSL defaults with known-good defaults
 # usable on all platforms.  The Configure script already knows to use -fPIC and
-# RPM_OPT_FLAGS, so we can skip specifiying them here.
+# NEW_RPM_OPT_FLAGS, so we can skip specifiying them here.
 ./Configure \
 	--prefix=%{_prefix} --openssldir=%{_sysconfdir}/pki/tls ${sslflags} --libdir=lib \
 	zlib enable-camellia enable-seed enable-rfc3779 no-sctp \
 	enable-cms enable-md2 enable-rc5 ${ktlsopt} enable-fips\
 	no-mdc2 no-ec2m no-sm2 no-sm4 enable-buildtest-c++\
-	shared  ${sslarch} $RPM_OPT_FLAGS '-DDEVRANDOM="\"/dev/urandom\""'\
+	shared  ${sslarch} $NEW_RPM_OPT_FLAGS '-DDEVRANDOM="\"/dev/urandom\""'\
 	-Wl,--allow-multiple-definition
 
 # Do not run this in a production package the FIPS symbols must be patched-in
