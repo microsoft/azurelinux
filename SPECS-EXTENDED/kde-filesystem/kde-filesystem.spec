@@ -193,7 +193,7 @@ mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/xdg/plasma-workspace/{env,shutdown}
 
 
 %changelog
-* Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 4-65
+* Fri Dec 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 4-65
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4-64

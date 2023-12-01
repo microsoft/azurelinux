@@ -706,7 +706,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 - Address CVE-2021-43267, CVE-2021-42739, CVE-2021-42327, CVE-2021-43389
 - Add patch to fix SPDX-License-Identifier in headers
 
-* Mon Nov 15 2021 Thomas Crain <thcrain@microsoft.com> - 5.10.74.1-4
+* Mon Nov 15 2021 Olivia Crain <oliviacrain@microsoft.com> - 5.10.74.1-4
 - Add python3-perf subpackage and add python3-devel to build-time requirements
 - Exclude accessibility modules from main package to avoid subpackage conflict
 - Remove redundant License tag from bpftool subpackage
@@ -844,7 +844,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 * Thu Mar 04 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.10.13.1-3
 - Add configs for CONFIG_BNXT bnxt_en and MSR drivers
 
-* Mon Feb 22 2021 Thomas Crain <thcrain@microsoft.com> - 5.10.13.1-2
+* Mon Feb 22 2021 Olivia Crain <oliviacrain@microsoft.com> - 5.10.13.1-2
 - Add configs for speakup and uinput drivers
 - Add kernel-drivers-accessibility subpackage
 

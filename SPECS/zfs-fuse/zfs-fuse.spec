@@ -139,7 +139,7 @@ rm -rf %{_var}/lock/zfs
 * Fri Apr 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7.2.2-17
 - Cleaning-up spec.
 
-* Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 0.7.2.2-16
+* Tue Jan 18 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.7.2.2-16
 - Remove copying of RPM's config.guess/config.sub into build dir (not shipped by RPM anymore)
 - Update Source0 URL
 - License verified

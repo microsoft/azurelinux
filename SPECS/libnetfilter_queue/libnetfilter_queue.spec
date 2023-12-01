@@ -57,7 +57,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 - Verified License
 - Remove sha1 macro
 
-* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.0.3-5
+* Fri Sep 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.0.3-5
 - Remove libtool archive files from final packaging
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.0.3-4

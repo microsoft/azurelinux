@@ -58,7 +58,7 @@ make test
 %{_mandir}/man3/Crypt::PasswdMD5.3*
 
 %changelog
-* Wed Apr 28 2021 Thomas Crain <thcrain@microsoft.com> - 1.4.0-19
+* Wed Apr 28 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.4.0-19
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove colons from patchnames
 

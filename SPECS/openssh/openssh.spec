@@ -309,7 +309,7 @@ fi
 - Removing nopatch for CVE-2020-14145 and CVE-2020-15778, since the fixes are included in this version.
 - Removing regressions test fixes - already part of this version.
 
-* Mon Dec 28 2020 Thomas Crain <thcrain@microsoft.com> - 8.0p1-13
+* Mon Dec 28 2020 Olivia Crain <oliviacrain@microsoft.com> - 8.0p1-13
 - Add BRs for check section
 - Add patch fixing cert-hostkey and cert-userkey regression tests
 

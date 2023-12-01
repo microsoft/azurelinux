@@ -78,7 +78,7 @@ rm -f %{buildroot}%{_datadir}/bash-completion/completions/\
 * Wed Oct 27 2021 Muhammad Falak <mwani@microsft.com> - 2.7-4
 - Remove epoch
 
-* Mon Mar 08 2021 Thomas Crain <thcrain@microsoft.com> - 2.7-3
+* Mon Mar 08 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.7-3
 - Require devel subpackage from base package for compatibility with other distros
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.7-2

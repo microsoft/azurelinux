@@ -69,7 +69,7 @@ make install DESTDIR=${RPM_BUILD_ROOT}
 %{_mandir}/man*/*
 
 %changelog
-* Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 2.17-52
+* Fri Dec 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.17-52
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.17-51

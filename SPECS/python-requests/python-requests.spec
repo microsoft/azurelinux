@@ -91,7 +91,7 @@ LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
 - Bump version to 2.27.1
 - Use 'py39' as tox env to enable ptest
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.22.0-3
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.22.0-3
 - Remove python2 package
 - Lint spec
 - License verified
@@ -99,7 +99,7 @@ LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
 * Mon Mar 01 2021 Andrew Phelps <anphel@microsoft.com> - 2.22.0-2
 - Add patches for test issues and run tests with tox
 
-* Thu Dec 31 2020 Thomas Crain <thcrain@microsoft.com> - 2.22.0-1
+* Thu Dec 31 2020 Olivia Crain <oliviacrain@microsoft.com> - 2.22.0-1
 - Upgrade to version 2.22.0
 - Fix Source0 URL
 

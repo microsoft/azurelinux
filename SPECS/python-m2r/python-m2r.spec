@@ -55,13 +55,13 @@ pip3 install mock
 %{python3_sitelib}/*
 
 %changelog
-* Mon Feb 07 2022 Thomas Crain <thcrain@microsoft.com> - 0.2.1-1
+* Mon Feb 07 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.2.1-1
 - Upgrade to latest upstream version
 
-* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 0.2.0-7
+* Fri Dec 03 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.2.0-7
 - Replace easy_install usage with pip in %%check sections
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.2.0-6
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.2.0-6
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

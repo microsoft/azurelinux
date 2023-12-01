@@ -47,7 +47,7 @@ make voikko-install DESTDIR=%{buildroot}%{_libdir}/voikko
 - Moved from SPECS-EXTENDED to SPECS
 - License verified
 
-* Fri May 28 2021 Thomas Crain <thcrain@microsoft.com> - 1.19-12
+* Fri May 28 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.19-12
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Build with python3 instead of python2
 

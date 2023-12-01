@@ -697,7 +697,7 @@ fi
 - Introduce macro '%{mariner_failing_tests}' to gate `--run-check` failures
 - Remove non 0 exit from check to avoid build break
 
-* Wed Aug 11 2021 Thomas Crain <thcrain@microsoft.com> - 2.13.1-7
+* Wed Aug 11 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.13.1-7
 - Only require testing requirements during check builds
 - Only build Fedora subpackage on Fedora
 

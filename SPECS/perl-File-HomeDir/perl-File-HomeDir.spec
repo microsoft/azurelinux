@@ -86,7 +86,7 @@ find %{buildroot} -name 'perllocal.pod' -delete
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.004-7
 - Adding 'BuildRequires: perl-generators'.
 
-* Mon Aug 23 2021 Thomas Crain <thcrain@microsoft.com> - 1.004-6
+* Mon Aug 23 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.004-6
 - Bump release to represent package's move to toolchain
 - Lint spec
 - License verified

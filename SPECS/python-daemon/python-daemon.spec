@@ -53,10 +53,10 @@ pip3 install mock testscenarios testtools
 %{python3_sitelib}/*
 
 %changelog
-* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 2.2.0-6
+* Fri Dec 03 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.2.0-6
 - Replace easy_install usage with pip in %%check sections
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.2.0-5
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.2.0-5
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

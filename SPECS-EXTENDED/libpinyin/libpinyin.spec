@@ -109,7 +109,7 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 %{_libdir}/libzhuyin*.so.*
 
 %changelog
-* Mon Jun 28 2021 Thomas Crain <thcrain@microsoft.com> - 2.3.0-4
+* Mon Jun 28 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.3.0-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Require libzhuyin subpackage from libpinyin-devel
 

@@ -117,10 +117,10 @@ LANG=en_US.UTF-8 sudo -u test /home/test/.local/bin/tox -e nocov-posix-alldeps
 - Add an explicit BR on 'pip' & 'sudo'
 - Use `py39` as tox environment to enable ptest
 
-* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 19.2.1-8
+* Fri Dec 03 2021 Olivia Crain <oliviacrain@microsoft.com> - 19.2.1-8
 - Replace easy_install usage with pip in %%check sections
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 19.2.1-7
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 19.2.1-7
 - Remove python2 package, move default bindaries to python3 package
 - Lint spec
 

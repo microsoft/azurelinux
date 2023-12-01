@@ -61,7 +61,7 @@ rm -rf %{buildroot}%{_infodir}/dir
 - Adding 0001-freelocale-bug-fix.patch.
 - License verified.
 
-* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 3.2-12
+* Fri Sep 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.2-12
 - Remove libtool archive files from final packaging
 
 * Tue Nov 03 2020 Joe Schmitt <joschmit@microsoft.com> - 3.2-11

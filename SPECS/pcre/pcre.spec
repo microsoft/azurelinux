@@ -102,12 +102,12 @@ find %{buildroot} -type f -name "*.la" -delete -print
 - Upgrading to v8.45
 - Correcting source URL.
 
-* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 8.44-3
+* Fri Jul 23 2021 Olivia Crain <oliviacrain@microsoft.com> - 8.44-3
 - Remove *.la files from devel subpackage
 - Build static libraries, add compatibility provides for static subpackage
 - Remove manual pkgconfig provides
 
-* Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 8.44-2
+* Mon Apr 26 2021 Olivia Crain <oliviacrain@microsoft.com> - 8.44-2
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 
 * Thu Oct 29 2020 Joe Schmitt <joschmit@microsoft.com> - 8.44-1

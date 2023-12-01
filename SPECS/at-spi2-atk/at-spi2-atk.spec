@@ -71,7 +71,7 @@ The %{name}-devel package includes the header files for the %{name} library.
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.34.2-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
-* Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 2.34.2-3
+* Wed Dec 08 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.34.2-3
 - License verified
 - Lint spec
 

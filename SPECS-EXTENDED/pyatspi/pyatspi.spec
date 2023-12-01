@@ -78,7 +78,7 @@ sed -i '1s|^#!/usr/bin/python|#!%{__python3}|' examples/magFocusTracker.py
 
 
 %changelog
-* Thu Jun 17 2021 Thomas Crain <thcrain@microsoft.com> - 2.36.0-2
+* Thu Jun 17 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.36.0-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Explicitly require dbus-glib-devel instead of pkgconfig(dbus-glib-1)
 

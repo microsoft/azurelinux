@@ -320,7 +320,7 @@ gtk-query-immodules-2.0-%{__isa_bits} --update-cache
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.24.32-11
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
-* Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 2.24.32-10
+* Wed Dec 08 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.24.32-10
 - License verified
 - Lint spec
 

@@ -78,11 +78,11 @@ export LC_CTYPE=C.utf8
 * Sun Dec 12 2021 Chris Co <chrco@microsoft.com> - 2.13.0-2
 - Fix build options with new meson
 
-* Tue Sep 14 2021 Thomas Crain <thcrain@microsoft.com> - 2.13.0-1
+* Tue Sep 14 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.13.0-1
 - Upgrade to latest version
 - Use updated source URL
 
-* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 2.5.0-6
+* Fri Apr 02 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.5.0-6
 - Merge the following releases from dev to 1.0 spec
 - joschmit@microsoft.com, 2.5.0-4: Replace python3-pygobject requires with python3-gobject.
 

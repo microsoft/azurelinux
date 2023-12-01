@@ -56,7 +56,7 @@ find %{buildroot} -type f -name "*.a" -delete -print
 * Fri Sep 09 2022 Muhammad Falak <mwani@microsoft.com> - 1.0.0-1
 - Bump version to 1.0.0
 
-* Wed Sep 22 2021 Thomas Crain <thcrain@microsoft.com> - 0.4.0-3
+* Wed Sep 22 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.4.0-3
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - Lint spec and remove epoch
 - Remove static subpackage

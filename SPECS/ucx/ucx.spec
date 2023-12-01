@@ -262,7 +262,7 @@ process to map the memory of another process into its virtual address space.
 - Move from SPECS-EXTENDED to SPECS
 - License verified
 
-* Thu Aug 26 2021 Thomas Crain <thcrain@microsoft.com> - 1.11.0-2
+* Thu Aug 26 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.11.0-2
 - Initial CBL-Mariner import from Fedora 35 (license: MIT).
 - Remove option to build with libibcm
 

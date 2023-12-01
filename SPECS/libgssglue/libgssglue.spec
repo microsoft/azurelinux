@@ -43,7 +43,7 @@ find %{buildroot}/%{_libdir} -name '*.la' -delete
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 0.4-6
+* Tue Feb 08 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.4-6
 - Remove unused `%%define sha1` lines
 - License verified
 

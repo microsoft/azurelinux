@@ -141,7 +141,7 @@ find %{buildroot} -type f -name *.la -exec rm -f {} \;
 * Tue Feb 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.14.4-3
 - Adding missing BRs on Perl modules.
 
-* Thu May 27 2021 Thomas Crain <thcrain@microsoft.com> - 4.14.4-2
+* Thu May 27 2021 Olivia Crain <oliviacrain@microsoft.com> - 4.14.4-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - Unconditionally use "%%bcond_with perl"
 

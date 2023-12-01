@@ -59,7 +59,7 @@ popd
 %{python3_sitelib}/*
 
 %changelog
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.7.11-6
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.7.11-6
 - Remove python2 package
 - Lint spec
 - License verified

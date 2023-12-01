@@ -101,7 +101,7 @@ ninja check-all
 * Wed Feb 09 2022 Chris Co <chrco@microsoft.com> - 12.0.1-4
 - Allow tools to link to libLLVM shared library
 
-* Mon Jan 31 2022 Thomas Crain <thcrain@microsoft.com> - 12.0.1-3
+* Mon Jan 31 2022 Olivia Crain <oliviacrain@microsoft.com> - 12.0.1-3
 - Use python3 during build
 
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 12.0.1-2
@@ -110,7 +110,7 @@ ninja check-all
 * Fri Sep 17 2021 Chris Co <chrco@microsoft.com> - 12.0.1-1
 - Update to 12.0.1
 
-* Tue Apr 27 2021 Thomas Crain <thcrain@microsoft.com> - 8.0.1-5
+* Tue Apr 27 2021 Olivia Crain <oliviacrain@microsoft.com> - 8.0.1-5
 - Merge the following releases from 1.0 to dev branch
 - anphel@microsoft.com, 8.0.1-4: Enable tests in build and run test with ninja.
 

@@ -361,7 +361,7 @@ fi
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.1-9
 - Removing the explicit %%clean stage.
 
-* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 4.1-8
+* Fri Dec 03 2021 Olivia Crain <oliviacrain@microsoft.com> - 4.1-8
 - Don't hardcode python site-packages directory (enables Python 3.9 build)
 
 * Wed Oct 27 2021 Muhammad Falak <mwani@microsft.com> - 4.1-7

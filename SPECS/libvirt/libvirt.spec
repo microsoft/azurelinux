@@ -1065,7 +1065,7 @@ exit 0
 - Re-enabling '*-glusterfs' subpackage.
 - Bringing back dependency on 'lzop' and 'radvd'.
 
-* Thu Feb 17 2022 Thomas Crain <thcrain@microsoft.com> - 7.10.0-2
+* Thu Feb 17 2022 Olivia Crain <oliviacrain@microsoft.com> - 7.10.0-2
 - Remove requirement on python2 (python in general is not needed at runtime)
 
 * Tue Jan 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.10.0-1
@@ -1073,7 +1073,7 @@ exit 0
 - Switched to building with "meson".
 - Removed obsolete 'libvirt-bash-completion' subpackage.
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 6.1.0-4
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 6.1.0-4
 - Use python3-docutils dependency instead of python-docutils
 - License verified (specify as LGPLv2+ rather than just LGPL)
 

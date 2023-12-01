@@ -60,10 +60,10 @@ rm -rf %{buildroot}/%{_infodir}
 * Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.5.6-1
 - Auto-upgrade to 2.5.6 - Azure Linux 3.0 - package upgrades
 
-* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 2.5.5-2
+* Tue Feb 08 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.5.5-2
 - Remove manual pkgconfig(*) provides in toolchain specs
 
-* Mon Nov 22 2021 Thomas Crain <thcrain@microsoft.com> - 2.5.5-1
+* Mon Nov 22 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.5.5-1
 - Upgrade to latest upstream version
 - Split out development files into devel subpackage
 - Lint spec

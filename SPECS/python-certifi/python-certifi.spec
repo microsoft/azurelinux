@@ -75,7 +75,7 @@ rm -rf certifi/*.pem
 * Wed Feb 09 2022 Nick Samson <nisamson@microsoft.com> - 2021.10.08-1
 - Updated URL, updated to 2021.10.08
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2018.10.15-6
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 2018.10.15-6
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

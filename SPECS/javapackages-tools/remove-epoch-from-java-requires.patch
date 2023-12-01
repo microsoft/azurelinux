@@ -1,5 +1,5 @@
 From e07e0151799de936535c48fbc65770160a64dfdd Mon Sep 17 00:00:00 2001
-From: Thomas Crain <thcrain@microsoft.com>
+From: Olivia Crain <oliviacrain@microsoft.com>
 Date: Wed, 5 Jan 2022 10:59:13 -0800
 Subject: [PATCH 1/2] Remove epoch from java requires generation
 

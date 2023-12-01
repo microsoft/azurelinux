@@ -346,10 +346,10 @@ fi
 - Update to version 5.1.8
 - License verified
 
-* Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 4.4.18-7
+* Mon Apr 26 2021 Olivia Crain <oliviacrain@microsoft.com> - 4.4.18-7
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 
-* Thu Oct 22 2020 Thomas Crain <thcrain@microsoft.com> - 4.4.18-6
+* Thu Oct 22 2020 Olivia Crain <oliviacrain@microsoft.com> - 4.4.18-6
 - Nopatch CVE-2019-18276
 
 * Fri Jul 31 2020 Leandro Pereira <leperei@microsoft.com> - 4.4.18-5

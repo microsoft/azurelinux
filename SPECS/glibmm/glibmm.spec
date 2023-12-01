@@ -104,7 +104,7 @@ export GIO_EXTRA_MODULES=/usr/lib/gio/modules
 - Renaming glibmm24 to glibmm
 - Add doc package
 
-* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 2.56.0-8
+* Fri Sep 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.56.0-8
 - Remove libtool archive files from final packaging
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 2.56.0-7

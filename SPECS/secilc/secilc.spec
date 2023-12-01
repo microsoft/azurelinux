@@ -40,14 +40,14 @@ for more information about the goals and features on the CIL language.
 %{_mandir}/man8/secil2conf.8.gz
 
 %changelog
-* Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 3.2-1
+* Fri Aug 13 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.2-1
 - Upgrade to latest upstream version and rebase patch
 - Add -fno-semantic-interposition to CFLAGS as recommended by upstream
 - Update source URL to new format
 - Lint spec
 - License verified
 
-* Fri Oct 09 2020 Thomas Crain <thcrain@microsoft.com> - 2.9-4
+* Fri Oct 09 2020 Olivia Crain <oliviacrain@microsoft.com> - 2.9-4
 - Add missing %libsepolver definition
 
 * Thu Aug 27 2020 Daniel Burgener <daburgen@microsoft.com> - 2.9-3

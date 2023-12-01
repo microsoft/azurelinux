@@ -147,10 +147,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 - Update source to v1.71.0
 - Switch to meson build
 
-* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 1.58.0-12
+* Fri Dec 03 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.58.0-12
 - Fix Python 3.9 compatibility issue
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.58.0-11
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.58.0-11
 - Remove python2 package
 - Lint spec
 

@@ -227,7 +227,7 @@ cp -ar README.md CHANGES.md MIGRATION.md doc/_build/* %{buildroot}%{_pkgdocdir}/
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.8.5-3
 - Cleaning-up spec. License verified.
 
-* Mon Aug 09 2021 Thomas Crain <thcrain@microsoft.com> - 2.8.5-2
+* Mon Aug 09 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.8.5-2
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 - Remove emacs, menhir support.
 

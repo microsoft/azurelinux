@@ -106,13 +106,13 @@ python3 setup.py check && python3 setup.py test
 * Thu Sep 16 2021 Henry Beberman <henry.beberman@microsoft.com> - 2.2.54.2-3
 - Include the 99-azure-product-uuid udev rule.
 
-* Tue Aug 17 2021 Thomas Crain <thcrain@microsoft.com> - 2.2.54.2-2
+* Tue Aug 17 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.2.54.2-2
 - Fix incorrect %%{_lib} macro usage
 
 * Mon May 24 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.2.54.2-1
 - Upgrade to version 2.2.54.2 which has Mariner distro support.
 
-* Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 2.2.52-3
+* Mon Apr 26 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.2.52-3
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 - %{_lib}/python3.7/site-packages/*
 

@@ -112,7 +112,7 @@ fi
 - Remove check section since testsuite depends on kernel module
   which we do not build
 
-* Thu Sep 30 2021 Thomas Crain <thcrain@microsoft.com> - 7.1-3
+* Thu Sep 30 2021 Olivia Crain <oliviacrain@microsoft.com> - 7.1-3
 - Add service subpackage from Fedora 35 (license: MIT)
 - Add provides for libs subpackage from main package
 - Lint spec

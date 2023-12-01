@@ -68,7 +68,7 @@ install -m 644 dist/lib/%{name}.jar %{buildroot}%{_javadir}/%{name}-%{version}.j
 * Tue Apr 12 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.6-285
 - Adding missing BR on 'javapackages-tools'.
 
-* Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.2.6-284
+* Fri Dec 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.2.6-284
 - License verified
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.6-283

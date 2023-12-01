@@ -280,7 +280,7 @@ dconf update || :
 %{_datadir}/gtk-doc/html/*
 
 %changelog
-* Tue Aug 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.5.22-9
+* Tue Aug 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.5.22-9
 - Remove python2 support
 - Remove build-time dependency version checking
 

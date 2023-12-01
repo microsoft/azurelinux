@@ -42,7 +42,7 @@ It is pure Python code with no dependencies, but includes an optional C extensio
 * Tue Mar 29 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.17.6-1
 - Upgrade to latest upstream version
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 3.17.0-3
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.17.0-3
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

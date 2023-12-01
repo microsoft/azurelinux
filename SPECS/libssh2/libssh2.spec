@@ -63,7 +63,7 @@ find %{buildroot} -name '*.la' -exec rm -f {} ';'
 * Wed Sep 13 2023 Suresh Thelkar <sthelkar@microsoft.com> - 1.9.0-3
 - Add patch for CVE-2020-22218
 
-* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 1.9.0-2
+* Tue Feb 08 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.9.0-2
 - Remove unused `%%define sha1` lines
 - License verified
 

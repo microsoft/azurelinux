@@ -53,7 +53,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} tox -e py%{python3_version_nodots}
 * Fri Dec 16 2022 Sam Meluch <sammeluch@microsoft.com> - 1.0.2-2
 - Update version of tox used for package tests
 
-* Tue Mar 15 2022 Thomas Crain <thcrain@microsoft.com> - 1.0.2-1
+* Tue Mar 15 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.0.2-1
 - Upgrade to latest upstream release
 - Use tox as a test runner
 - Lint spec
@@ -62,6 +62,6 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} tox -e py%{python3_version_nodots}
 - Disable auto dependency generator.
 - Add explicit dist provides.
 
-* Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 0.5.0-1
+* Fri Aug 21 2020 Olivia Crain <oliviacrain@microsoft.com> - 0.5.0-1
 - Original version for CBL-Mariner.
 - License verified.

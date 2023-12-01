@@ -95,7 +95,7 @@ Python 3 version.
 %{python3_sitearch}/__pycache__/%{name}.*
 
 %changelog
-* Tue Jun 01 2021 Thomas Crain <thcrain@microsoft.com> - 3.6.2-7
+* Tue Jun 01 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.6.2-7
 - Remove unneeded deletion of Python 2 sitelib in buildroot
 
 * Fri Mar 05 2021 Henry Li <lihl@microsoft.com> - 3.6.2-6

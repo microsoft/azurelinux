@@ -100,7 +100,7 @@ chmod ogu-x scripts/conf.mingw.sh scripts/config.djgpp.sh
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.9.0~dev.9-5
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
-* Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 2.9.0~dev.9-4
+* Wed Dec 08 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.9.0~dev.9-4
 - Reformat patches, use autosetup
 - License verified
 - Lint spec

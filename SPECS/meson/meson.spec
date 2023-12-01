@@ -69,7 +69,7 @@ python3 ./run_tests.py
 - Updating to 0.60.2.
 - License Verified
 
-* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 0.57.1-2
+* Fri Apr 02 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.57.1-2
 - Merge the following releases from 1.0 to dev branch
 - pawelwi@microsoft.com, 0.56.0-1: Removing 'python3-xml' from '*Requires'.
 

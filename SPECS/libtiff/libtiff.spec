@@ -119,7 +119,7 @@ make %{?_smp_mflags} -k check
 - Use autosetup and modify build steps
 - License Verified
 
-* Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 4.1.0-3
+* Fri Mar 26 2021 Olivia Crain <oliviacrain@microsoft.com> - 4.1.0-3
 - Merge the following releases from 1.0 to dev branch
 - joslobo@microsoft.com, 4.1.0-2: Add patches for CVE-2020-35521, CVE-2020-35522, CVE-2020-35523, CVE-2020-35524
 

@@ -117,7 +117,7 @@ cp -pr %{archive_folder}/doc/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}
 * Thu Feb 17 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.2.5-16
 - Updating used version of Java.
 
-* Wed Jan 05 2022 Thomas Crain <thcrain@microsoft.com> - 2.2.5-15
+* Wed Jan 05 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.2.5-15
 - Rename java-headless dependency to java
 - License verified
 

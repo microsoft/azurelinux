@@ -247,10 +247,10 @@ fi
 - Clean up the spec.
 - Add libmetalink as a dependency
 
-* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 2.1.0-8
+* Fri Dec 03 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.1.0-8
 - Replace easy_install usage with pip in %%check sections
 
-* Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 2.1.0-7
+* Mon Apr 26 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.1.0-7
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 
 * Mon Dec 28 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.0-6

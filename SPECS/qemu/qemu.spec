@@ -2372,7 +2372,7 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 * Mon Jan 03 2022 Bala <balakumaran.kannan@microsoft.com> - 6.1.0-13
 - Skip qos test from ptest as it hungs indefinitely
 
-* Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 6.1.0-12
+* Fri Dec 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 6.1.0-12
 - Lint spec
 - Remove user-static subpackage references- no plans to support at this time
 
@@ -2393,7 +2393,7 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2:6.1.0-7
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
-* Thu Sep 30 2021 Thomas Crain <thcrain@microsoft.com> - 2:6.1.0-6
+* Thu Sep 30 2021 Olivia Crain <oliviacrain@microsoft.com> - 2:6.1.0-6
 - Initial CBL-Mariner import from Fedora 35 (license: MIT).
 - Remove parts specific to unsupported build host architectures
 - Remove default support for PPC and SPARC architectures

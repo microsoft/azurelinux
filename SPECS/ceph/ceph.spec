@@ -1815,7 +1815,7 @@ exit 0
 * Wed Mar 09 2022 Mateusz Malisz <mamalisz@microsoft.com> - 16.2.5-4
 - Add libevent as a build requires to fix build error/warning for some hostnames
 
-* Fri Feb 18 2022 Thomas Crain <thcrain@microsoft.com> - 16.2.5-3
+* Fri Feb 18 2022 Olivia Crain <oliviacrain@microsoft.com> - 16.2.5-3
 - Add patch to fix build with snappy >= 1.1.9
 
 * Thu Feb 17 2022 Andrew Phelps <anphel@microsoft.com> - 16.2.5-2
@@ -1833,7 +1833,7 @@ exit 0
 * Tue Aug 31 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 16.2.0-4
 - Enabling the "libradosstriper" subpackages.
 
-* Wed Aug 18 2021 Thomas Crain <thcrain@microsoft.com> - 16.2.0-3
+* Wed Aug 18 2021 Olivia Crain <oliviacrain@microsoft.com> - 16.2.0-3
 - Enable python byte compilation for directories outside of %%python3_site{lib,arch}
 
 * Thu Jun 17 2021 Neha Agarwal <nehaagarwal@microsoft.com> 16.2.0-2
@@ -1845,6 +1845,6 @@ exit 0
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 15.2.4-2
 - Include python bytecompiled files in the resulting package.
 
-* Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> 15.2.4-1
+* Fri Aug 21 2020 Olivia Crain <oliviacrain@microsoft.com> 15.2.4-1
 - Initial CBL-Mariner import from Ceph source (license: LGPLv2.1)
 - License verified

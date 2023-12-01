@@ -53,10 +53,10 @@ pip3 install pytest pathlib2 pluggy
 - Add an explict BR on 'pip' to enable ptest
 - Remove stray `popd` in the `%check` section
 
-* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.0-8
+* Fri Dec 03 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.1.0-8
 - Replace easy_install usage with pip in %%check sections
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.0-7
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.1.0-7
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

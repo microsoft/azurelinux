@@ -92,7 +92,7 @@ rm -f %{buildroot}%{_libdir}/libmcpp.la
 * Mon Jun 27 2022 Daniel McIlvaney <damcilva@microsoft.com> - 2.7.2-28
 - Add inline comments to patch.mcpp.2.7.2 patch file to indicate it fixes CVE-2019-14274.
 
-* Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 2.7.2-27
+* Wed Dec 08 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.7.2-27
 - License verified
 - Lint spec
 - Fixed libmcpp-devel requires

@@ -74,7 +74,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Fri Oct 22 2021 Andrew Phelps <anphel@microsoft.com> - 1.3.2-1
 - Update to version 1.3.2
 
-* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.4-5
+* Fri Sep 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.1.4-5
 - Remove libtool archive files from final packaging
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.1.4-4

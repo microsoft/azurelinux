@@ -45,13 +45,13 @@ tox -e py%{python3_version_nodots}
 %{_bindir}/pycodestyle
 
 %changelog
-* Tue Mar 15 2022 Thomas Crain <thcrain@microsoft.com> - 2.8.0-1
+* Tue Mar 15 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.8.0-1
 - Upgrade to latest upstream release
 - Switch source from PyPI to GitHub
 - Switch package test to use tox as a test runner
 - License verified
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.5.0-5
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.5.0-5
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

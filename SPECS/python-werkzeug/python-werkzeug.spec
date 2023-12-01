@@ -63,7 +63,7 @@ LANG=en_US.UTF-8 PYTHONPATH=./  python3 setup.py test
 * Mon Dec 27 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.0.1-1
 - Updated to version 1.0.1
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.14.1-7
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.14.1-7
 - Add license to python3 package
 - Remove python2 package, switch check section to python3
 - Lint spec

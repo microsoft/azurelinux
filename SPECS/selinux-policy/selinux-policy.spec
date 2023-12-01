@@ -435,7 +435,7 @@ exit 0
   fork Reference Policy, so the changes are not related and the version numbers
   are incomparable.
 
-* Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 2.20200818-2
+* Fri Aug 13 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.20200818-2
 - Update versions on checkpolicy, policycoreutils dependencies
 
 * Mon Aug 31 2020 Daniel Burgener <daburgen@microsoft.com> - 2.20200818-1

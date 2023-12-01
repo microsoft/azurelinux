@@ -57,7 +57,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_includedir}/X11/extensions/panoramiXext.h
 
 %changelog
-* Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.4-7
+* Wed Dec 08 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.1.4-7
 - License verified
 - Lint spec
 

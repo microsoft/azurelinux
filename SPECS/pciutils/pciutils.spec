@@ -66,7 +66,7 @@ make DESTDIR=%{buildroot} \
 * Thu Apr 14 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 3.7.0-3
 - Do not change libpci.so rights during install
 
-* Mon Feb 07 2022 Thomas Crain <thcrain@microsoft.com> - 3.7.0-2
+* Mon Feb 07 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.7.0-2
 - Require libs subpackage from main package
 - Remove libraries from main package
 

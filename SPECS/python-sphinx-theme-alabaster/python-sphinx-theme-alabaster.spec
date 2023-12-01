@@ -43,7 +43,7 @@ Alabaster is a visually (c)lean, responsive, configurable theme for the Sphinx d
 - Updating to version 0.7.12.
 - Removed invalid '%%check' section.
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.7.11-6
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.7.11-6
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

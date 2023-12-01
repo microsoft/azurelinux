@@ -1,5 +1,5 @@
 From 2a24bb358bb20f86dbb0cc892a5cb5d853258ef5 Mon Sep 17 00:00:00 2001
-From: Thomas Crain <thcrain@microsoft.com>
+From: Olivia Crain <oliviacrain@microsoft.com>
 Date: Tue, 25 Jan 2022 11:44:00 -0800
 Subject: [PATCH] Disable unreliable tests in Mariner chroot
 

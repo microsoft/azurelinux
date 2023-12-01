@@ -367,16 +367,16 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 * Tue Apr 26 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.9.12-1
 - Upgrade to latest maintenance release for the 3.9 series
 
-* Tue Jan 25 2022 Thomas Crain <thcrain@microsoft.com> - 3.9.10-1
+* Tue Jan 25 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.9.10-1
 - Upgrade to latest bugfix release for the 3.9 series
 
 * Mon Jan 10 2022 Muhammad Falak <mwani@microsoft.com> - 3.9.9-3
 - Fix pip3 bootstrap which causes a build break in ptest
 
-* Wed Dec 22 2021 Thomas Crain <thcrain@microsoft.com> - 3.9.9-2
+* Wed Dec 22 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.9.9-2
 - Use filtered flags when compiling extensions
 
-* Mon Nov 29 2021 Thomas Crain <thcrain@microsoft.com> - 3.9.9-1
+* Mon Nov 29 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.9.9-1
 - Upgrade to latest release in 3.9 series
 - Add profile guided optimization to configuration
 - Fold xml subpackage into libs subpackage and add compatibility provides
@@ -391,13 +391,13 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 * Wed Apr 28 2021 Andrew Phelps <anphel@microsoft.com> - 3.7.10-2
 - Add patch to fix test_ssl tests.
 
-* Tue Apr 27 2021 Thomas Crain <thcrain@microsoft.com> - 3.7.10-1
+* Tue Apr 27 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.7.10-1
 - Merge the following releases from 1.0 to dev branch
-- thcrain@microsoft.com, 3.7.9-1: Update to 3.7.9, the latest security release for 3.7
-- thcrain@microsoft.com, 3.7.9-2: Patch CVE-2020-27619
+- oliviacrain@microsoft.com, 3.7.9-1: Update to 3.7.9, the latest security release for 3.7
+- oliviacrain@microsoft.com, 3.7.9-2: Patch CVE-2020-27619
 - pawelw@microsoft.com, 3.7.9-3: Adding explicit runtime dependency on 'python3-xml' for the 'python3-setuptool' subpackage.
 - nisamson@microsoft.com, 3.7.9-4: Patched CVE-2021-3177 with backported patch. Moved to autosetup.
-- thcrain@microsoft.com, 3.7.10-1: Update to 3.7.10, the latest security release for 3.7, to fix CVE-2021-23336
+- oliviacrain@microsoft.com, 3.7.10-1: Update to 3.7.10, the latest security release for 3.7, to fix CVE-2021-23336
 -   Remove backported patches for CVE-2020-27619, CVE-2021-3177
 - anphel@microsoft.com, 3.7.10-2: Add patch to fix test_ssl tests
 

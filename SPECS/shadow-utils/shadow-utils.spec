@@ -222,11 +222,11 @@ chmod 000 %{_sysconfdir}/shadow
 - Change loginuid to be set only on logins.
 - Add missing BuildRequires for xsltproc.
 
-* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 4.9-2
+* Fri Sep 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 4.9-2
 - Update system-password PAM config to use pam_pwquality.so instead of removed pam_cracklib.so
 - Add license to subid subpackage
 
-* Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 4.9-1
+* Fri Aug 13 2021 Olivia Crain <oliviacrain@microsoft.com> - 4.9-1
 - Upgrade to latest upstream version and rebase chkname patch
 - Add upstream patch to deal with libsubid build failure when linking to pam
 - Add %%{_sysconfdir}/login.defs and %{_syconfdir}/default/useradd to sources
@@ -242,10 +242,10 @@ chmod 000 %{_sysconfdir}/shadow
 * Wed May 26 2021 Daniel Burgener <daburgen@microsoft.com> - 4.6-13
 - Add SELinux support
 
-* Thu May 20 2021 Thomas Crain <thcrain@microsoft.com> - 4.6-12
+* Thu May 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 4.6-12
 - Enable usergroups for useradd
 
-* Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> 4.6-11
+* Fri Mar 26 2021 Olivia Crain <oliviacrain@microsoft.com> 4.6-11
 - Merge the following releases from 1.0 to dev branch
 - schalam@microsoft.com, 4.6-9: Remove PASS_MAX_DAYS customized value 90 to set default value
 - lihl@microsoft.com, 4.6-10: Add sym link to adduser from useradd and create the file for adduser

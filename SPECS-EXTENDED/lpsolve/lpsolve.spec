@@ -59,7 +59,7 @@ install -p -m 644 \
 %{_includedir}/lpsolve
 
 %changelog
-* Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 5.5.2.0-26
+* Fri Dec 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 5.5.2.0-26
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.5.2.0-25

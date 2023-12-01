@@ -71,7 +71,7 @@ ln -s ncat %{buildroot}%{_bindir}/nc
 * Mon May 17 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> 7.90-2 (merge from 1.0 branch)
 - nmap-unix_crash.patch fix for crash with unix sockets.
 
-* Mon May 03 2021 Thomas Crain <thcrain@microsoft.com> - 7.90-2
+* Mon May 03 2021 Olivia Crain <oliviacrain@microsoft.com> - 7.90-2
 - Remove zenmap/ndiff from configuration 
 
 * Tue Feb 02 2021 Henry Beberman <henry.beberman@microsoft.com> - 7.90-1

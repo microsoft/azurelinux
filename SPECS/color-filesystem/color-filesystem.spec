@@ -44,7 +44,7 @@ EOF
 %{_rpmconfigdir}/macros.d/macros.color
 
 %changelog
-* Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 1-26
+* Wed Dec 08 2021 Olivia Crain <oliviacrain@microsoft.com> - 1-26
 - License verified
 - Lint spec
 

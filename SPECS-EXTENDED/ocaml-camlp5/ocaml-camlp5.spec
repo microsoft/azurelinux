@@ -86,7 +86,7 @@ mv %{buildroot}%{_libdir}/ocaml/{ocaml/topfind.camlp5,}
 %{_mandir}/man1/*.1*
 
 %changelog
-* Fri Jan 21 2022 Thomas Crain <thcrain@microsoft.com> - 8.00.02-1
+* Fri Jan 21 2022 Olivia Crain <oliviacrain@microsoft.com> - 8.00.02-1
 - Upgrade to latest upstream version
 - Lint spec
 - License verified

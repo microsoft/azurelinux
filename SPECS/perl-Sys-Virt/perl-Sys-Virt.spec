@@ -75,7 +75,7 @@ perl Build.PL installdirs=vendor
 * Fri Apr 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.1.0-4
 - Cleaning-up spec. License verified.
 
-* Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 6.1.0-3
+* Tue Jan 18 2022 Olivia Crain <oliviacrain@microsoft.com> - 6.1.0-3
 - Only pull in test dependencies during check builds
 - License verified
 

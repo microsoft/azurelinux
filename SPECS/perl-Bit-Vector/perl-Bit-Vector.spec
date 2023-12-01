@@ -70,7 +70,7 @@ make test
 %{_mandir}/man3/*.3*
 
 %changelog
-* Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 7.4-21
+* Wed Dec 08 2021 Olivia Crain <oliviacrain@microsoft.com> - 7.4-21
 - License verified
 - Lint spec
 

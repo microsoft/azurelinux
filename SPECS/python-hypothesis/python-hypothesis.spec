@@ -51,7 +51,7 @@ and then generates simple and comprehensible examples that make your tests fail.
 - Updated source URL, updated to 6.36.2
 - Added hypothesis binary
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 3.71.0-5
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.71.0-5
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

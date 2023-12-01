@@ -52,14 +52,14 @@ PYTHONPATH=./ pytest
 %{python3_sitelib}/*
 
 %changelog
-* Tue Feb 01 2022 Thomas Crain <thcrain@microsoft.com> - 21.3-1
+* Tue Feb 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 21.3-1
 - Upgrade to latest upstream version
 - Use github release source instead of pypi source
 
-* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 17.1-8
+* Fri Dec 03 2021 Olivia Crain <oliviacrain@microsoft.com> - 17.1-8
 - Replace easy_install usage with pip in %%check sections
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 17.1-7
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 17.1-7
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

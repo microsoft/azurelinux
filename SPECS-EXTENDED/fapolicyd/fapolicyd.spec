@@ -239,7 +239,7 @@ fi
 - Upgrade to 1.3.2 - CVE-2022-1117
 - License verified
 
-* Thu Aug 12 2021 Thomas Crain <thcrain@microsoft.com> - 1.0.2-3
+* Thu Aug 12 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.0.2-3
 - Disable selinux subpackage build
 
 * Fri Apr 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.2-2

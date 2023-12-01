@@ -53,10 +53,10 @@ pytest
 - Updated to 21.0.0
 - Updated URL and Source0 to reflect github change.
 
-* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 19.0.0-4
+* Fri Dec 03 2021 Olivia Crain <oliviacrain@microsoft.com> - 19.0.0-4
 - Replace easy_install usage with pip in %%check sections
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 19.0.0-3
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 19.0.0-3
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

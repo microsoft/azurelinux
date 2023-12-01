@@ -170,7 +170,7 @@ fi
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.5.4-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
-* Tue Nov 30 2021 Thomas Crain <thcrain@microsoft.com> - 2.5.4-2
+* Tue Nov 30 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.5.4-2
 - Remove python shebang line fixes (fixed upstream)
 
 * Wed Nov 10 2021 Andrew Phelps <anphel@microsoft.com> - 2.5.4-1

@@ -650,7 +650,7 @@ rm -f %{cups_serverbin}/backend/smb
 %{_mandir}/man7/ippeveps.7.gz
 
 %changelog
-* Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 2.3.3op2-5
+* Wed Dec 08 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.3.3op2-5
 - License verified
 - Lint spec
 

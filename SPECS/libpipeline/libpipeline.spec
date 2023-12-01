@@ -60,14 +60,14 @@ make -C tests check
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.5.5-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
-* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 1.5.5-2
+* Tue Feb 08 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.5.5-2
 - Remove manual pkgconfig(*) provides in toolchain specs
 
 * Wed Jan 12 2022 Henry Li <lihl@microsoft.com> - 1.5.5-1
 - Upgrade to version 1.5.5
 - Verified License
 
-* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.5.0-5
+* Fri Sep 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.5.0-5
 - Remove libtool archive files from final packaging
 
 *   Tue Dec 08 2020 Andrew Phelps <anphel@microsoft.com> 1.5.0-4

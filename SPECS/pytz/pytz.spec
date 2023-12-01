@@ -66,7 +66,7 @@ popd
 - Add an explicit BR on `pip` & remove un-needed deps
 - Use correct test files to enable ptest
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2018.5-6
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 2018.5-6
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

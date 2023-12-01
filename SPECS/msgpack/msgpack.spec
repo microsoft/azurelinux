@@ -53,7 +53,7 @@ make install DESTDIR=%{buildroot}
 * Thu Mar 03 2022 Minghe Ren <mingheren@microsoft.com> - 3.3.0-1
 - Upgrade to version 3.3.0
 
-* Mon Oct 12 2020 Thomas Crain <thcrain@microsoft.com> - 3.2.1-2
+* Mon Oct 12 2020 Olivia Crain <oliviacrain@microsoft.com> - 3.2.1-2
 - License verified and %%license added
 - Update Source0
 

@@ -105,12 +105,12 @@ make %{?_smp_mflags} check
 * Thu Sep 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.13.6-9
 - Breaking circular dependency on 'systemd' by using 'Recommends' instead of 'Requires'.
 
-* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.13.6-8
+* Fri Sep 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.13.6-8
 - Remove libtool archive files from final packaging
 
-* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 1.13.6-7
+* Fri Apr 02 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.13.6-7
 - Merge the following releases from 1.0 to dev branch
-- thcrain@microsoft.com, 1.13.6-4: Patch CVE-2019-12749
+- oliviacrain@microsoft.com, 1.13.6-4: Patch CVE-2019-12749
 
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.13.6-6
 - Replace incorrect %%{_lib} usage with %%{_libdir}
@@ -121,7 +121,7 @@ make %{?_smp_mflags} check
 * Mon Nov 02 2020 Joe Schmitt <joschmit@microsoft.com> - 1.13.6-4 (from dev branch)
 - Provide dbus-libs.
 
-* Thu Oct 22 2020 Thomas Crain <thcrain@microsoft.com> - 1.13.6-4 (from 1.0 branch)
+* Thu Oct 22 2020 Olivia Crain <oliviacrain@microsoft.com> - 1.13.6-4 (from 1.0 branch)
 - Patch CVE-2019-12749
 
 * Sat May 09 00:21:00 PST 2020 Nick Samson <nisamson@microsoft.com> - 1.13.6-3

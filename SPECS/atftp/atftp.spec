@@ -126,7 +126,7 @@ fi
 
 
 %changelog
-* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 0.7.5-4
+* Tue Feb 08 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.7.5-4
 - Remove unused `%%define sha1` lines
 
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7.5-3

@@ -471,7 +471,7 @@ ln -s %{_libdir}/libcrypt-%{glibcversion}.so %{_libdir}/libcrypt.so.1
 * Mon Nov 22 2021 Andrew Phelps <anphel@microsoft.com> - 4.4.17-4
 - Update required glibc version to 2.34
 
-* Sat Nov 21 2020 Thomas Crain <thcrain@microsoft.com> - 4.4.17-3
+* Sat Nov 21 2020 Olivia Crain <oliviacrain@microsoft.com> - 4.4.17-3
 - Replace %%ldconfig_scriptlets with actual post/postun sections
 
 * Wed Oct 21 2020 Henry Beberman <henry.beberman@microsoft.com> - 4.4.17-2

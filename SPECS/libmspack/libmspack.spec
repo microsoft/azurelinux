@@ -61,7 +61,7 @@ make -k check
 - Remove the sha1 macro
 - Fix URL field
 
-* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.7.1alpha-4
+* Fri Sep 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.7.1alpha-4
 - Remove libtool archive files from final packaging
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.7.1alpha-3

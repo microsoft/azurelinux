@@ -46,11 +46,11 @@ rm -f tests/performance_test.py
 %{python3_sitelib}/*
 
 %changelog
-* Mon Feb 07 2022 Thomas Crain <thcrain@microsoft.com> - 1.8.7-1
+* Mon Feb 07 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.8.7-1
 - Upgrade to latest upstream version
 - Use github source tarball
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.8.5-4
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.8.5-4
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

@@ -120,7 +120,7 @@ EOF
 * Tue Oct 19 2021 Jon Slobodzian <joslobo@microsoft.com> - 1.5.1-2
 - Remove libdb dependency
 
-* Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 1.5.1-1
+* Fri Aug 13 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.5.1-1
 - Upgrade to latest upstream version
 
 * Tue Feb 16 2021 Daniel Burgener <daburgen@microsoft.com> 1.3.1-6

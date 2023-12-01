@@ -92,10 +92,10 @@ make test
 * Thu Jun 23 2022 Henry Beberman <henry.beberman@microsoft.com> - 8.0.29-1
 - Upgrade to 8.0.29 to fix 17 CVEs
 
-* Wed Jan 26 2022 Neha Agarwal <thcrain@microsoft.com> - 8.0.28-1
+* Wed Jan 26 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 8.0.28-1
 - Upgrade to 8.0.28 to fix 16 CVEs
 
-* Sat Apr 24 2021 Thomas Crain <thcrain@microsoft.com> - 8.0.24-1
+* Sat Apr 24 2021 Olivia Crain <oliviacrain@microsoft.com> - 8.0.24-1
 - Upgrade to 8.0.24 to fix 30 CVEs
 - Update source URL
 

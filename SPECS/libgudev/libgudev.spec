@@ -72,10 +72,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Mon Mar 14 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 237-1
 - Upgrade to version 237
 
-* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 232-6
+* Fri Sep 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 232-6
 - Remove libtool archive files from final packaging
 
-* Tue May 25 2021 Thomas Crain <thcrain@microsoft.com> - 232-5
+* Tue May 25 2021 Olivia Crain <oliviacrain@microsoft.com> - 232-5
 - Add provides for libgudev1, libgudev1-devel
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 232-4

@@ -45,11 +45,11 @@ tox -e py%{python3_version_nodots}
 %{python3_sitelib}/*
 
 %changelog
-* Fri Feb 04 2022 Thomas Crain <thcrain@microsoft.com> - 3.0.7-1
+* Fri Feb 04 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.0.7-1
 - Upgrade to latest upstream version
 - Add tests
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.2.0-8
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.2.0-8
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

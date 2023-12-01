@@ -96,7 +96,7 @@ cd Release/build.release/Binaries
 * Tue Dec 08 2020 Andrew Phelps <anphel@microsoft.com> - 2.10.14-6
 - Remove -DBUILD_TESTS=OFF to allow running tests
 
-* Sat Nov 21 2020 Thomas Crain <thcrain@microsoft.com> - 2.10.14-5
+* Sat Nov 21 2020 Olivia Crain <oliviacrain@microsoft.com> - 2.10.14-5
 - Replace %%ldconfig_scriptlets with actual post/postun sections
 
 * Tue Mar 31 2020 Paul Monson <paulmon@microsoft.com> 2.10.14-4

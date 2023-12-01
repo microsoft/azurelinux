@@ -94,13 +94,13 @@ python3 setup.py test
 - Upgrade to latest upstream version
 - Lint spec
 
-* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 3.36.1-5
+* Fri Dec 03 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.36.1-5
 - Replace easy_install usage with pip in %%check sections
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 3.36.1-4
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.36.1-4
 - Remove unused python-setuptools dependency
 
-* Fri May 14 2021 Thomas Crain <thcrain@microsoft.com> - 3.36.1-3
+* Fri May 14 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.36.1-3
 - Move python setuptools and glib schemas to non-check BuildRequires
 
 * Thu Feb 04 2021 Joe Schmitt <joschmit@microsoft.com> - 3.36.1-2

@@ -166,10 +166,10 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 * Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.0-11
 - add sed step to os_install_post to remove references to module_info.ld in pkgconfigs
 
-* Wed Dec 23 2021 Thomas Crain <thcrain@microsoft.com> - 2.0-10
+* Wed Dec 23 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.0-10
 - Add Fedora's macros for passing flags to extension builders (license: MIT)
 
-* Wed Dec 01 2021 Thomas Crain <thcrain@microsoft.com> - 2.0-9
+* Wed Dec 01 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.0-9
 - Update unversioned python and python3 macros to reflect removal of easy_install binary
 
 * Tue Nov 02 2021 Mateusz Malisz <mamalisz@microsoft.com> - 2.0-8
@@ -204,7 +204,7 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 * Tue Jun 01 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0-17
 - Adding font macros from the "fontpackages-devel" package.
 
-* Mon May 17 2021 Thomas Crain <thcrain@microsoft.com> - 1.0-16
+* Mon May 17 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.0-16
 - Add Rust SRPM macros from rust2rpm (license: MIT)
 - Add rust-srpm-macros Provides
 

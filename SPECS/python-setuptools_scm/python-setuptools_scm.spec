@@ -67,7 +67,7 @@ python3 setup.py test
 - Adding a dependency on 'python3-tomli'.
 - Removing Python 2 version.
 
-* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 3.1.0-4
+* Tue Feb 08 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.1.0-4
 - Remove unused `%%define sha1` lines
 - License verified
 

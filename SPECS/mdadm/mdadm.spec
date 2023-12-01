@@ -105,7 +105,7 @@ install -m644 %{SOURCE6} %{buildroot}%{_sysconfdir}/libreport/events.d
 * Fri Apr 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.1-8
 - Cleaning-up spec. License verified.
 
-* Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 4.1-7
+* Tue Jan 18 2022 Olivia Crain <oliviacrain@microsoft.com> - 4.1-7
 - Disable usage of libreport by default
 - License verified
 - Lint spec

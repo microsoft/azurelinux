@@ -66,7 +66,7 @@ make %{?_smp_mflags} V=1 CC="gcc %{optflags} $LDFLAGS -Wno-error=missing-prototy
 - Update to version 1.6.1
 - Remove dtc-disable-warning.patch
 
-* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 1.5.1-4
+* Fri Jul 23 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.5.1-4
 - Add compatibility provides for libfdt, libfdt-static, libfdt-devel, python3-libfdt packages
 - Use make macros throughout, lint spec
 

@@ -68,7 +68,7 @@ git config --local --add efi.arches "x86_64 aarch64 %{arm} %{ix86}"
 - Fixing package build by adding an explicit BR on '/etc/os-release'.
 - License verified.
 
-* Mon Jun 07 2021 Thomas Crain <thcrain@microsoft.com> - 4-5
+* Mon Jun 07 2021 Olivia Crain <oliviacrain@microsoft.com> - 4-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Set shell to bash during make invocations, since the Makefile uses bash built-in commands 
 

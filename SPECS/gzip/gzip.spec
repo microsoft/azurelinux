@@ -54,7 +54,7 @@ make %{?_smp_mflags} check
 * Fri Oct 22 2021 Andrew Phelps <anphel@microsoft.com> - 1.11-1
 - Update to version 1.11
 
-* Mon May 17 2021 Thomas Crain <thcrain@microsoft.com> - 1.9-6
+* Mon May 17 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.9-6
 - Stop packaging 'uncompress' binary alias
 - Lint spec
 - Update URLs to secure variants

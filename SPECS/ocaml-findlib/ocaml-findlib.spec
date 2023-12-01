@@ -100,7 +100,7 @@ make install \
 * Wed Mar 30 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.8.1-16
 - Updating dependencies.
 
-* Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 1.8.1-15
+* Tue Jan 18 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.8.1-15
 - Patch stdlib bytes library detection for ocaml 4.13
 - License verified
 

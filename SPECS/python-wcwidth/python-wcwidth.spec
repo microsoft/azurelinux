@@ -61,7 +61,7 @@ pytest3 -vv tests -k "not test_package_version"
 * Fri Mar 25 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 0.2.5-1
 - Upgrade to  0.2.5
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.1.7-5
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.1.7-5
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

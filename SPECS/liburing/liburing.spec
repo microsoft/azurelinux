@@ -53,7 +53,7 @@ for the Linux-native io_uring.
 %{_mandir}/man7/*
 
 %changelog
-* Wed Sep 22 2021 Thomas Crain <thcrain@microsoft.com> - 2.0-3
+* Wed Sep 22 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.0-3
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - Lint spec
 - License verified

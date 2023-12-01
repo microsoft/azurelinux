@@ -61,7 +61,7 @@ It contains the libraries and header files for libqmi
 * Wed Jan 12 2022 Henry Li <lihl@microsoft.com> - 1.30.2-1
 - Upgrade to version 1.30.2
 
-* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 1.22.4-3
+* Fri Jul 23 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.22.4-3
 - Add compatibility provides for utils subpackage
 - Lint spec
 

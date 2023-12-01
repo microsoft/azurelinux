@@ -70,7 +70,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.14.0-5
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
-* Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 4.14.0-4
+* Wed Dec 08 2021 Olivia Crain <oliviacrain@microsoft.com> - 4.14.0-4
 - License verified
 - Lint spec
 

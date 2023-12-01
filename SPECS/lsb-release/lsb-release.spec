@@ -38,6 +38,6 @@ install -D -m 755 lsb_release %{buildroot}%{_bindir}/lsb_release
 - Upgrade to 3.1
 - Fix Source0
 
-*   Wed Aug 26 2020 Thomas Crain <thcrain@microsoft.com> - 1.4-1
+*   Wed Aug 26 2020 Olivia Crain <oliviacrain@microsoft.com> - 1.4-1
 -   Original version for CBL-Mariner.
 -   License verified.

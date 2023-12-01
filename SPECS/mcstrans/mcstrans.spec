@@ -87,7 +87,7 @@ install -m644 %{SOURCE1} %{buildroot}%{_mandir}/man8/
 %{_datadir}/mcstrans/util/*
 
 %changelog
-* Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 3.2-1
+* Fri Aug 13 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.2-1
 - Upgrade to latest upstream version
 - Add -fno-semantic-interposition to CFLAGS as recommended by upstream
 - Update source URL to new format

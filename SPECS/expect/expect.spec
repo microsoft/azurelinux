@@ -55,7 +55,7 @@ make %{?_smp_mflags} test
 
 
 %changelog
-* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 5.45.4-5
+* Tue Feb 08 2022 Olivia Crain <oliviacrain@microsoft.com> - 5.45.4-5
 - Remove unused `%%define sha1` lines
 - License verified (corrected from GPLv2+ to Public Domain)
 

@@ -102,7 +102,7 @@ EOF
 * Fri Apr 09 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.9-4
 - Add patch for CVE-2021-30004
 
-* Mon Mar 08 2021 Thomas Crain <thcrain@microsoft.com> - 2.9-3
+* Mon Mar 08 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.9-3
 - Add patch for CVE-2021-0326 and CVE-2021-27803
 
 * Mon Nov 16 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 2.9-2

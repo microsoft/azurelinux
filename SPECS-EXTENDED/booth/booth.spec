@@ -247,7 +247,7 @@ VERBOSE=1 make check
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0-6
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
-* Wed Aug 11 2021 Thomas Crain <thcrain@microsoft.com> - 1.0-5.5d837d2.git
+* Wed Aug 11 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.0-5.5d837d2.git
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Substitute asciidoc for asciidoctor build requirement
 

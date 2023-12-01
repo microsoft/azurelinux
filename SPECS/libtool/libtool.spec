@@ -84,7 +84,7 @@ make %{?_smp_mflags} check
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.7-1
 - Auto-upgrade to 2.4.7 - Azure Linux 3.0 - package upgrades
 
-* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 2.4.6-8
+* Tue Feb 08 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.4.6-8
 - Remove unused `%%define sha1` lines
 - License verified
 

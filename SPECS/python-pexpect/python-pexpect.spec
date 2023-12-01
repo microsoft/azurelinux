@@ -92,14 +92,14 @@ TRAVIS=true python3 -m pytest -v -k "not spawn_uses_env"
 * Tue Aug 09 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.8.0-11
 - Disabling flaky "spawn_uses_env" test.
 
-* Wed Jun 23 2021 Thomas Crain <thcrain@microsoft.com> - 4.8.0-10
+* Wed Jun 23 2021 Olivia Crain <oliviacrain@microsoft.com> - 4.8.0-10
 - Fix package tests by using pip to install testing requirements
 - Fix package tests by taking sys_executable patch from upstream
 
-* Tue May 11 2021 Thomas Crain <thcrain@microsoft.com> - 4.8.0-9
+* Tue May 11 2021 Olivia Crain <oliviacrain@microsoft.com> - 4.8.0-9
 - Remove /usr/bin/man dependency, replace with check-time man-db dependency
 
-* Mon May 10 2021 Thomas Crain <thcrain@microsoft.com> - 4.8.0-8
+* Mon May 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 4.8.0-8
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - License verified
 

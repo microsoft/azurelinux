@@ -46,7 +46,7 @@ make DESTDIR=%{buildroot} install
 - Upgrade to B.02.19
 - Fix Source0
 
-* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - B.02.18-4
+* Tue Feb 08 2022 Olivia Crain <oliviacrain@microsoft.com> - B.02.18-4
 - Remove unused `%%define sha1` lines
 - License verified
 

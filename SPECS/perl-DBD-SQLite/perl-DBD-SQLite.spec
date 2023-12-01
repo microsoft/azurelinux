@@ -72,7 +72,7 @@ make test
 * Tue Apr 26 2022 Mateusz Malisz <mamalisz@microsoft.com> - 1.70-1
 - Update to 1.70
 
-* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 1.62-6
+* Tue Feb 08 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.62-6
 - Remove unused `%%define sha1` lines
 
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.62-5

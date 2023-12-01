@@ -165,14 +165,14 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Fri Dec 10 2021 Chris Co <chrco@microsoft.com> - 3.0.6-1
 - Update to 3.0.6
 
-* Thu Nov 11 2021 Thomas Crain <thcrain@microsoft.com> - 3.0-8
+* Thu Nov 11 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.0-8
 - Remove tcp_wrappers dependency due to package removal
 - License verified
 
-* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 3.0-7
+* Fri Sep 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.0-7
 - Remove libtool archive files from final packaging
 
-* Wed Aug 18 2021 Thomas Crain <thcrain@microsoft.com> - 3.0-6
+* Wed Aug 18 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.0-6
 - Remove python2 subpackage
 
 * Mon Nov 02 2020 Joe Schmitt <joschmit@microsoft.com> - 3.0-5 (from dev branch)

@@ -575,7 +575,7 @@ rm -fr %{buildroot}%{_docdir}/*
 %verify(not size md5 mtime) %{ibus_tables_dir}/cantonyale.db
 
 %changelog
-* Thu Jun 17 2021 Thomas Crain <thcrain@microsoft.com> - 1.8.3-3
+* Thu Jun 17 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.8.3-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Supplement CMake module search path with the location of cmake-fedora's modules
 

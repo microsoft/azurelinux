@@ -87,7 +87,7 @@ make -k check
 - Drop parallel `%{?_smp_mflags}` make flags to enable ptest
 - Switch Source urls to `https`
 
-* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 5.18.16-7
+* Fri Sep 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 5.18.16-7
 - Remove libtool archive files from final packaging
 
 * Mon Oct 12 2020 Joe Schmitt <joschmit@microsoft.com> 5.18.16-6

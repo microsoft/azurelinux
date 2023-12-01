@@ -198,7 +198,7 @@ fi
 - Fixing invalid source URL.
 - License verified.
 
-* Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 0.6.3-56
+* Fri Aug 21 2020 Olivia Crain <oliviacrain@microsoft.com> - 0.6.3-56
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 
 * Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.3-55

@@ -295,7 +295,7 @@ gtk-query-immodules-3.0-%{__isa_bits} --update-cache &>/dev/null || :
 * Thu Feb 03 2022 Henry Li <lihl@microsoft.com> - 3.24.28-8
 - Use pkgconfig(rest-1.0) as BR 
 
-* Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 3.24.28-7
+* Wed Dec 08 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.24.28-7
 - License verified
 - Lint spec
 
@@ -306,7 +306,7 @@ gtk-query-immodules-3.0-%{__isa_bits} --update-cache &>/dev/null || :
 * Wed Oct 06 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.24.28-5
 - Bringing back the dependency on 'cairo'.
 
-* Fri May 21 2021 Thomas Crain <thcrain@microsoft.com> - 3.24.28-4
+* Fri May 21 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.24.28-4
 - Remove gtk-update-icon-cache subpackage
 - Turn off sysprof integration to break build cycle
 

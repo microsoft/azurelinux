@@ -200,7 +200,7 @@ popd
 * Fri Jun 17 2022 Andrew Phelps <anphel@microsoft.com> - 3.1.10-5
 - Change Requires to -config package to resolve /etc/my.cnf conflict
 
-* Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 3.1.10-4
+* Wed Dec 08 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.1.10-4
 - Remove testsuite conditionals
 - License verified
 - Lint spec

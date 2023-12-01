@@ -39,7 +39,7 @@ cp -p *.1 %{buildroot}%{_mandir}/man1
 %doc README
 
 %changelog
-* Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 0.4-23
+* Wed Dec 08 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.4-23
 - License verified
 - Lint spec
 - Specify prefix dir

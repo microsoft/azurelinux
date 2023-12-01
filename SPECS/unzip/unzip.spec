@@ -64,7 +64,7 @@ ln -sf unzip %{buildroot}%{_bindir}/zipinfo
 - Remove nopatch files from spec
 - License verified
 
-* Tue Apr 27 2021 Thomas Crain <thcrain@microsoft.com> - 6.0-19
+* Tue Apr 27 2021 Olivia Crain <oliviacrain@microsoft.com> - 6.0-19
 - Remove contents of nopatch files
 
 * Fri Oct 23 2020 Nick Samson <nisamson@microsoft.com> 6.0-18

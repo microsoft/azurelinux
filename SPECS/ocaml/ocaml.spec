@@ -261,7 +261,7 @@ make -j1 all
 * Mon Feb 28 2022 Muhammad Falak <mwani@microsoft.com> - 4.13.1-2
 - Introduce a patch to remove unused vars in test to enable ptest
 
-* Mon Jan 10 2022 Thomas Crain <thcrain@microsoft.com> - 4.13.1-1
+* Mon Jan 10 2022 Olivia Crain <oliviacrain@microsoft.com> - 4.13.1-1
 - Upgrade to latest upstream release and rebase relevant patches
 - Remove arch-specific gating- only applies to arches Mariner does not support
 - License verified

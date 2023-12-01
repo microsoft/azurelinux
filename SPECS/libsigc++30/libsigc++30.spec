@@ -62,7 +62,7 @@ This package contains the full API documentation for %{name}.
 - Update to v3.2.0
 - Add doc package
 
-* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 2.10.0-7
+* Fri Sep 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.10.0-7
 - Remove libtool archive files from final packaging
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.10.0-6

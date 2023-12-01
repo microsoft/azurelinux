@@ -93,7 +93,7 @@ make test
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.88-5
 - Adding 'BuildRequires: perl-generators'.
 
-* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 1.88-4
+* Fri Apr 02 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.88-4
 - Merge the following releases from 1.0 to dev branch
 - pawelwi@microsoft.com, 1.88-3: Adding 'local::lib' perl5 library to fix test dependencies.
 

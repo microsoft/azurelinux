@@ -99,7 +99,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Thu Mar 10 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.9.13-1
 - Updating to version 2.9.13 to fix CVE-2022-23308.
 
-* Tue Aug 17 2021 Thomas Crain <thcrain@microsoft.com> - 2.9.12-2
+* Tue Aug 17 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.9.12-2
 - Revert re-addition of python2 dependency from bad merge
 - Remove recompilation with python support during install step
 - Lint spec
@@ -112,7 +112,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 - Remove requirement on python2
 - Remove libxml2-python subpackage
 
-* Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 2.9.10-7
+* Fri Mar 26 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.9.10-7
 - Merge the following releases from 1.0 to dev branch
 - v-ruyche@microsoft.com, 2.9.10-3: Patch CVE-2020-24977.
 - anphel@microsoft.com, 2.9.10-4: Skip python tests which are known to be broken.
@@ -132,7 +132,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Tue Nov 03 2020 Joe Schmitt <joschmit@microsoft.com> - 2.9.10-3
 - Version pkgconfig(libxml-2.0) provide.
 
-* Wed Sep 09 2020 Thomas Crain <thcrain@microsoft.com> - 2.9.10-2
+* Wed Sep 09 2020 Olivia Crain <oliviacrain@microsoft.com> - 2.9.10-2
 - Patch CVE-2019-20388 and CVE-2020-7595.
 
 * Wed Jun 03 2020 Joe Schmitt <joschmit@microsoft.com> - 2.9.10-1

@@ -60,7 +60,7 @@ make %{?_smp_mflags} check
 * Tue Oct 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.19.0-1
 - Updating to version 4.19.0 to fix CVE-2021-46848.
 
-* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 4.18.0-2
+* Tue Feb 08 2022 Olivia Crain <oliviacrain@microsoft.com> - 4.18.0-2
 - Remove manual pkgconfig(*) provides in toolchain specs
 
 * Tue Jan 25 2022 Henry Li <lihl@microsoft.com> - 4.18.0-1

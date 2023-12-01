@@ -64,7 +64,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Wed Sep 06 2023 Osama Esmail <osamaesmail@microsoft.com> - 1.10.0-2
 - Adding `glibc-debuginfo` to fix the tests
 
-* Mon Nov 29 2021 Thomas Crain <thcrain@microsoft.com> - 1.10.0-1
+* Mon Nov 29 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.10.0-1
 - Upgrade to latest version
 - Remove upstreamed flaky test disabling
 - Change to upstream-hosted source URL
@@ -72,10 +72,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 - Lint spec
 - License verified
 
-* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.2.17-9
+* Fri Sep 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.2.17-9
 - Remove libtool archive files from final packaging
 
-* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 1.2.17-8
+* Fri Apr 02 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.2.17-8
 - Merge the following releases from 1.0 to dev branch
 - anphel@microsoft.com, 1.2.17-7: Fix check tests.
 

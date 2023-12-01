@@ -503,12 +503,12 @@ fi
 * Tue Mar 08 2022 Andrew Phelps <anphel@microsoft.com> - 7.7.0-8
 - Add patch to compile with newer autoconf
 
-* Thu Feb 17 2022 Thomas Crain <thcrain@microsoft.com> - 7.7.0-7
+* Thu Feb 17 2022 Olivia Crain <oliviacrain@microsoft.com> - 7.7.0-7
 - Remove python2 patch and build requirement
 - Add patch to fix python detection during configuration
 - Fix python script shebang lines
 
-* Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 7.7.0-6
+* Mon Apr 26 2021 Olivia Crain <oliviacrain@microsoft.com> - 7.7.0-6
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 
 * Wed Oct 21 2020 Henry Beberman <henry.beberman@microsoft.com> - 7.7.0-5

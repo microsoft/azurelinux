@@ -70,10 +70,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Thu Jan 20 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 0.112-1
 - Upgrade to 0.112
 
-* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.110-5
+* Fri Sep 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.110-5
 - Remove libtool archive files from final packaging
 
-* Thu Jun 17 2021 Thomas Crain <thcrain@microsoft.com> - 0.110-4
+* Thu Jun 17 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.110-4
 - Move pkgconfig(dbus-glib-1) provides to the devel package from the base package
 - License verified- corrected to "AFL OR GPLv2+" from "AFL AND GPLv2+"
 - Fix test suite by compiling unit tests, assertions during %%with_check builds

@@ -54,7 +54,7 @@ make DESTDIR=%{buildroot} PREFIX=%{_prefix} install
 - Update source to v4.3
 - Include man3 directory
 
-* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 4.1-4
+* Tue Feb 08 2022 Olivia Crain <oliviacrain@microsoft.com> - 4.1-4
 - Remove unused `%%define sha1` lines
 - License verified
 

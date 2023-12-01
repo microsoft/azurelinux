@@ -43,7 +43,7 @@ cp %{SOURCE1} ./
 %{python3_sitelib}/*
 
 %changelog
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 5.0.6-7
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 5.0.6-7
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

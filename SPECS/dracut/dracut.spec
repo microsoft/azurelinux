@@ -209,7 +209,7 @@ ln -sr %{buildroot}%{_bindir}/dracut %{buildroot}%{_sbindir}/dracut
 * Thu Sep 23 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 049-7
 - Adding 'Provides' for 'dracut-caps'.
 
-* Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 049-6
+* Mon Apr 26 2021 Olivia Crain <oliviacrain@microsoft.com> - 049-6
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 
 * Fri Feb 12 2021 Nicolas Ontiveros <niontive@microsoft.com> - 049-5

@@ -650,7 +650,7 @@ fi;
 - Remove unprovided soname version of libraries
 - Include versioned library names in libs subpackage
 
-* Fri May 14 2021 Thomas Crain <thcrain@microsoft.com> - 9.16.3-5
+* Fri May 14 2021 Olivia Crain <oliviacrain@microsoft.com> - 9.16.3-5
 - Merge the following releases from 1.0 to dev branch
 - nicolasg@microsoft.com, 9.16.3-3: Fixes CVE-2020-8625
 

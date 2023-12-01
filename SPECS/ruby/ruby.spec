@@ -447,12 +447,12 @@ sudo -u test make test TESTS="-v"
 * Wed Mar 09 2022 Andrew Phelps <anphel@microsoft.com> - 2.7.4-1
 - Update to version 2.7.4 to build with new autoconf
 
-* Mon Jul 12 2021 Thomas Crain <thcrain@microsoft.com> - 2.7.2-4
+* Mon Jul 12 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.7.2-4
 - Add attribution for parts of the install script taken from Fedora 34 (license: MIT)
 - Add provides for rubygem(json), and install json gem into the gemdir
 - Modernize spec with macros
 
-* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 2.7.2-3
+* Fri Apr 02 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.7.2-3
 - Merge the following releases from 1.0 to dev branch
 - pawelwi@microsoft.com, 2.6.6-3: Adding 'BuildRequires' on 'shadow-utils' and 'sudo' to run the package tests.
 - anphel@microsoft.com, 2.6.6-4: Run "make test" instead of "make check" to avoid unstable tests.

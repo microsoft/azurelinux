@@ -125,14 +125,14 @@ find %{buildroot}%{_libdir}/ocaml -name \*.cmxs -exec chmod 0755 {} \+
 %endif
 
 %changelog
-* Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 0.15.0-1
+* Tue Jan 18 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.15.0-1
 - Upgrade to latest version
 - License verified
 
 * Thu Dec  2 2021 Muhammad Falak <mwani@microsoft.com> - 0.14.0-7
 - Remove epoch.
 
-* Mon Aug 09 2021 Thomas Crain <thcrain@microsoft.com> - 1:0.14.0-6
+* Mon Aug 09 2021 Olivia Crain <oliviacrain@microsoft.com> - 1:0.14.0-6
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 - Diable vim subpackage by default
 

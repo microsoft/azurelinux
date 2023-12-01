@@ -56,7 +56,7 @@ make test
 - Fixing invalid source URL.
 - License verified.
 
-* Mon Oct 12 2020 Thomas Crain <thcrain@microsoft.com> - 1.1.0-6
+* Mon Oct 12 2020 Olivia Crain <oliviacrain@microsoft.com> - 1.1.0-6
 - Update Source0
 - Licenses verified, added %%license macro
 

@@ -144,7 +144,7 @@ fi
 - Replacing 'systemd-devel' BR with 'systemd-bootstrap-devel'
   to remove cyclic dependencies in other packages.
 
-* Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 0.23.22-2
+* Mon Apr 26 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.23.22-2
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 
 * Mon Dec 28 2020 Nicolas Ontiveros <niontive@microsoft.com> - 0.23.22-1

@@ -107,7 +107,7 @@ make test
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.02-7
 - Adding 'BuildRequires: perl-generators'.
 
-* Wed Apr 28 2021 Thomas Crain <thcrain@microsoft.com> - 4.02-6
+* Wed Apr 28 2021 Olivia Crain <oliviacrain@microsoft.com> - 4.02-6
 - Manually define tests subpackage, taken from Fedora 34 (license: MIT)
 
 * Wed Oct 21 2020 Henry Beberman <henry.beberman@microsoft.com> - 4.02-5

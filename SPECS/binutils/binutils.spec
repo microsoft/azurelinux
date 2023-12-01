@@ -191,7 +191,7 @@ sed -i 's/testsuite/ /g' gold/Makefile
 * Tue Sep 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.36.1-3
 - Adding 'libiberty' lib and header.
 
-* Tue Aug 24 2021 Thomas Crain <thcrain@microsoft.com> - 2.36.1-2
+* Tue Aug 24 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.36.1-2
 - Add patch from Fedora 34 (license: MIT) to export demangle.h from libiberty sources
 - Lint spec
 

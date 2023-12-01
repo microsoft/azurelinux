@@ -53,7 +53,7 @@ tox -e py%{python3_version_nodots}
 * Fri Dec 16 2022 Sam Meluch <sammeluch@microsoft.com> - 1.5.0-2
 - Update version of tox used for package tests
 
-* Mon Mar 14 2022 Thomas Crain <thcrain@microsoft.com> - 1.5.0-1
+* Mon Mar 14 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.5.0-1
 - Upgrade to latest upstream version
 - Use system libsodium instead of bundled version
 - Switch source from PyPI to GitHub
@@ -64,12 +64,12 @@ tox -e py%{python3_version_nodots}
 - BR necessary packages for PTest
 - Patch test cases written with older verion libraries
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.3.0-7
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.3.0-7
 - Add license to python3 package
 - Remove python2 package
 - Lint spec
 
-* Sun Dec 05 2020 Thomas Crain <thcrain@microsoft.com> - 1.3.0-6
+* Sun Dec 05 2020 Olivia Crain <oliviacrain@microsoft.com> - 1.3.0-6
 - Enable package tests
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.3.0-5

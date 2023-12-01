@@ -44,7 +44,7 @@ PATH=%{buildroot}%{_bindir}:${PATH} \
 %{python3_sitelib}/*
 
 %changelog
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.5.0-9
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.5.0-9
 - Remove python2 package, have main package contain python3 version
 - Add license to python3 package
 - Align python3 support patch file prefix level with other patches

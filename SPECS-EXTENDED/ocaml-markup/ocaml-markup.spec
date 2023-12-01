@@ -184,7 +184,7 @@ dune runtest
 %{_libdir}/ocaml/%{srcname}-lwt/unix/%{srcname}_lwt_unix.mli
 
 %changelog
-* Mon Aug 09 2021 Thomas Crain <thcrain@microsoft.com> - 1.0.0-5
+* Mon Aug 09 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.0.0-5
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 - Remove test, docs circular dependencies
 

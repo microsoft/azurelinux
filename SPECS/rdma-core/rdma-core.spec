@@ -610,10 +610,10 @@ fi
 - Update to version 39.0.
 - Modified patch to apply to new version.
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 31.0-3
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 31.0-3
 - Use python3-docutils dependency instead of python-docutils
 
-* Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 31.0-2
+* Fri Aug 21 2020 Olivia Crain <oliviacrain@microsoft.com> - 31.0-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT). License verified.
 
 * Wed Aug 19 2020 Honggang Li <honli@redhat.com> - 31.0-1

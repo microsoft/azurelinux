@@ -69,6 +69,6 @@ LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
 * Tue Jun 08 2021 Andrew Phelps <anphel@microsoft.com> - 1.7.1-2
 - Fix check tests
 
-* Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 1.7.1-1
+* Fri Aug 21 2020 Olivia Crain <oliviacrain@microsoft.com> - 1.7.1-1
 - Original version for CBL-Mariner
 - License verified

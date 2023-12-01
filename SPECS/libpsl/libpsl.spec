@@ -100,7 +100,7 @@ make check
 - Use python3 as BR instead of python2
 - Modify the Source0 field
 
-* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.20.2-6
+* Fri Sep 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.20.2-6
 - Remove libtool archive files from final packaging
 
 * Fri Apr 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20.2-5

@@ -30,7 +30,7 @@ make install BINDIR=%{buildroot}%{_bindir} \
 %{_mandir}/man1/*
 
 %changelog
-* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 1.8.0-2
+* Tue Feb 08 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.8.0-2
 - Remove unused `%%define sha1` lines
 
 * Wed Jan 05 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.8.0-1

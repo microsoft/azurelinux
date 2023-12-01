@@ -42,11 +42,11 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} %python3 test.py
 %{python3_sitelib}/*
 
 %changelog
-* Mon Mar 14 2022 Thomas Crain <thcrain@microsoft.com> - 0.11.0-1
+* Mon Mar 14 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.11.0-1
 - Upgrade to latest upstream version
 - Add package test
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.10.9-4
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.10.9-4
 - Add build instructions
 - Add license to python3 package
 - Remove python2 package

@@ -75,7 +75,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 - Disable gtk-doc which will involve unresolved dependencies in Mariner
 - Modify the file names due to version change
 
-* Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 0.8.1-9
+* Wed Dec 08 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.8.1-9
 - License verified
 - Lint spec
 

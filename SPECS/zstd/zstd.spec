@@ -77,7 +77,7 @@ find %{buildroot} -type f -name "*.a" -delete -print
 - Upgrade to version 1.5.5
 - License verified
 
-* Tue Oct 12 2021 Thomas Crain <thcrain@microsoft.com> - 1.5.0-1
+* Tue Oct 12 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.5.0-1
 - Upgrade to latest upstream version
 - Change license tag to properly reflect dual licensing situation
 - Remove licenses from main package (pulled in through libs subpackage)

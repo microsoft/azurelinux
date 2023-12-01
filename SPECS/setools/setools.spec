@@ -105,7 +105,7 @@ rm -rf %{buildroot}%{_mandir}/{,ru/}man1/apol*
   by them.
 - Fix lint issues.
 
-* Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 4.4.0-1
+* Fri Aug 13 2021 Olivia Crain <oliviacrain@microsoft.com> - 4.4.0-1
 - Upgrade to latest upstream
 - Update version of libselinux/libsepol dependencies
 - Add python3-setools provides to python3 subpackage

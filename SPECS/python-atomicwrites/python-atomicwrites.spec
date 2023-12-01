@@ -49,10 +49,10 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} %python3 tests/test_atomicwrites.py
 - Upgrade to latest upstream version
 - Simplify dependencies and self-test invocations
 
-* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 1.2.1-7
+* Fri Dec 03 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.2.1-7
 - Replace easy_install usage with pip in %%check sections
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.2.1-6
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.2.1-6
 - Remove python2 package
 - Lint spec
 

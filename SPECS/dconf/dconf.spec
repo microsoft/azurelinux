@@ -93,7 +93,7 @@ dconf update
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.36.0-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
-* Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 0.36.0-3
+* Wed Dec 08 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.36.0-3
 - License verified (corrected to just LGPLv2+)
 - Lint spec
 

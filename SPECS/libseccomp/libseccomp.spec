@@ -67,12 +67,12 @@ find %{buildroot} -type f -name "*.la" -delete -print
 - Add gperf as BR
 - Add /usr/include/seccomp-syscalls.h to libseccomp-devel package
 
-* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 2.4.1-4
+* Fri Jul 23 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.4.1-4
 - Remove pkgconfig provides (no longer necessary)
 - Require base package from devel subpackage
 - Include libseccomp soname version in %%file section
 
-* Tue Jun 29 2021 Thomas Crain <thcrain@microsoft.com> - 2.4.1-3
+* Tue Jun 29 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.4.1-3
 - Provide libseccomp-static from devel subpackage
 - Version the pkgconfig provides
 - Modernize spec with macros

@@ -65,7 +65,7 @@ tox -e py
 * Tue Feb 08 2022 Muhammad Falak <mwani@microsoft.com> - 16.0.0-8
 - Add an explicit BR on `python3-pip` to enable ptest
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 16.0.0-7
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 16.0.0-7
 - Add license, virtualenv binary to python3 package
 - Remove python2 package
 - Lint spec

@@ -106,7 +106,7 @@ test `$capable --arch ppc64p7` = true
 %{macrosdir}/*
 
 %changelog
-* Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 1-17
+* Wed Dec 08 2021 Olivia Crain <oliviacrain@microsoft.com> - 1-17
 - License verified
 - Lint spec
 

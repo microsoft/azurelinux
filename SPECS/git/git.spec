@@ -193,7 +193,7 @@ fi
 * Tue Mar 1 2022 Mateusz Malisz <mamalisz@microsoft.com> - 2.33.0-5
 - Add openssh dependency for git
 
-* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 2.33.0-4
+* Tue Feb 08 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.33.0-4
 - Replace python2 depdendency with python3
 - Lint spec
 

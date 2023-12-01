@@ -66,7 +66,7 @@ make install -j1
 %{_libdir}/ocaml/extlib/*.mli
 
 %changelog
-* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 1.7.8-1
+* Tue Feb 08 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.7.8-1
 - Upgrade to latest upstream version
 - Lint spec
 - License verified

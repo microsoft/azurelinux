@@ -39,7 +39,7 @@ pycparser is a complete parser of the C language, written in pure Python using t
 %{python3_sitelib}/*
 
 %changelog
-* Tue Mar 15 2022 Thomas Crain <thcrain@microsoft.com> - 2.21-1
+* Tue Mar 15 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.21-1
 - Upgrade to latest upstream version
 - Switch tests to be automatically discovered by the unittest module
 
@@ -47,7 +47,7 @@ pycparser is a complete parser of the C language, written in pure Python using t
 - Fix test path `tests/all_tests.py` instead of `all_tests.py` to enable ptest
 - Drop unnecessary `pushd/popd`
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.18-4
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.18-4
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

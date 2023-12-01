@@ -79,7 +79,7 @@ export LDFLAGS="-Wl,-z,relro,-z,now"
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.4-8
 - Removing the explicit %%clean stage.
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.4.4-7
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.4.4-7
 - Replace python2 with python3
 - Remove pkgconf provides
 

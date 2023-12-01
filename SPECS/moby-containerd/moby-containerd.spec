@@ -170,7 +170,7 @@ fi
 * Wed Jan 19 2022 Henry Li <lihl@microsoft.com> - 1.4.4+azure-6
 - Increment release for force republishing using golang 1.16.12
 
-* Tue Nov 02 2021 Thomas Crain <thcrain@microsoft.com> - 1.4.4+azure-5
+* Tue Nov 02 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.4.4+azure-5
 - Increment release for force republishing using golang 1.16.9
 
 * Mon Oct 04 2021 Henry Beberman <henry.beberman@microsoft.com> 1.4.4+azure-4

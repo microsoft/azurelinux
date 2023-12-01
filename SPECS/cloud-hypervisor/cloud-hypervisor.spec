@@ -205,10 +205,10 @@ cargo build --release --target=%{rust_musl_target} --package vhost_user_block %{
 * Wed Dec 01 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 19.0-1
 - Updating to version 19.0 to use existing dependencies and build with the 1.56.1 version of 'rust'.
 
-* Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 0.6.0-7
+* Mon Apr 26 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.6.0-7
 - Bump release to rebuild with rust 1.47.0-3 (security update)
 
-* Tue Apr 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.6.0-6
+* Tue Apr 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.6.0-6
 - Bump release to rebuild with rust 1.47.0-2 (security update)
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 0.6.0-5

@@ -85,7 +85,7 @@ documents using the %{name} library.
 - Disabled gtk doc generation to remove network dependency during build-time.
 - License verified.
 
-* Thu Jun 17 2021 Thomas Crain <thcrain@microsoft.com> - 0.3.1-6
+* Thu Jun 17 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.3.1-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Use pkgconfig(cairo) build requirement instead of cairo-devel
 

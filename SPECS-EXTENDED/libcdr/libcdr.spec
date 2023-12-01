@@ -114,7 +114,7 @@ make %{?_smp_mflags} check
 %{_mandir}/man1/cmx2xhtml.1*
 
 %changelog
-* Wed May 19 2021 Thomas Crain <thcrain@microsoft.com> - 0.1.6-2
+* Wed May 19 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.1.6-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Apply build fix for break caused by icu package upgrade
 

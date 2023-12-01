@@ -130,7 +130,7 @@ exit 0
 - Add explict BR on perl-{FindBin,lib,fields} to fix ptest
 - Drop dependency on 'sudo' & 'shadow-utils'
 
-* Mon Jan 24 2022 Thomas Crain <thcrain@microsoft.com> - 1.6.13-1
+* Mon Jan 24 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.6.13-1
 - Upgrade to latest upstream version
 - Remove Fedora's selinux policy and associated subpackage
 - Run check section as a non-root user

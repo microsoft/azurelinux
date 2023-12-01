@@ -335,10 +335,10 @@ fi
 * Wed Nov 10 2021 Nick Samson <nisamson@microsoft.com> - 8.2.3582-1
 - Upgrade to 8.2.3582 to fix CVE-2021-3927 and CVE-2021-3928
 
-* Fri Nov 05 2021 Thomas Crain <thcrain@microsoft.com> - 8.2.3564-2
+* Fri Nov 05 2021 Olivia Crain <oliviacrain@microsoft.com> - 8.2.3564-2
 - Package default color list in main package for use by default theme
 
-* Wed Nov 03 2021 Thomas Crain <thcrain@microsoft.com> - 8.2.3564-1
+* Wed Nov 03 2021 Olivia Crain <oliviacrain@microsoft.com> - 8.2.3564-1
 - Upgrade to 8.2.3564 to fix CVE-2021-3903
 - Package actual license text
 - License verified

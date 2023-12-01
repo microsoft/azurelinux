@@ -64,7 +64,7 @@ development of programs using %{name}.
 %{_datadir}/gir-1.0/Notify-%{majmin}.gir
 
 %changelog
-* Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 0.7.9-4
+* Wed Dec 08 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.7.9-4
 - License verified
 - Lint spec
 

@@ -65,7 +65,7 @@ sed -i '/use_2to3/d' setup.py
 - Fixing build for updated version of "python3-setuptools".
 - Updating to version 0.5.2 and applying a build patch from Fedora 36 (license: MIT).
 
-* Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.5.1-28
+* Fri Dec 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.5.1-28
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.5.1-27

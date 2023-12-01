@@ -66,18 +66,18 @@ pip3 install -r test-requirements.txt
 * Fri Nov 04 2022 Osama Esmail <osamaesmail@microsoft.com> - 0.29.32-1
 - Update version to 0.29.32
 
-* Mon Jan 24 2022 Thomas Crain <thcrain@microsoft.com> - 0.29.26-1
+* Mon Jan 24 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.29.26-1
 - Update version to 0.29.26
 - Add check section
 
 * Thu Jan 06 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.29.24-1
 - Update version to 0.29.24
 
-* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 0.29.13-7
+* Fri Dec 03 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.29.13-7
 - Add upstream patch to enable generating code for Python >= 3.8
 - License verified
 
-* Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 0.29.13-6
+* Fri Aug 21 2020 Olivia Crain <oliviacrain@microsoft.com> - 0.29.13-6
 - Initial CBL-Mariner import from Fedora 31 (license: MIT).
 
 * Thu Oct 03 2019 Miro Hrončok <mhroncok@redhat.com> - 0.29.13-5

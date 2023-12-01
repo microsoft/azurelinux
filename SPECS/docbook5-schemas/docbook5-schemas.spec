@@ -336,7 +336,7 @@ fi
 %{_bindir}/db4-entities.pl
 
 %changelog
-* Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 5.1-3
+* Fri Aug 21 2020 Olivia Crain <oliviacrain@microsoft.com> - 5.1-3
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 - License verified
 

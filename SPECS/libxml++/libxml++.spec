@@ -75,7 +75,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 - Add doxygen, graphviz, libxslt and docbook-style-xsl as BR
 - Use macro to represent major version
 
-* Mon Oct 12 2020 Thomas Crain <thcrain@microsoft.com> - 3.2.0-3
+* Mon Oct 12 2020 Olivia Crain <oliviacrain@microsoft.com> - 3.2.0-3
 - Remove .la files
 - License verified
 

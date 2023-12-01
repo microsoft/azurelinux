@@ -222,7 +222,7 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 *   Tue Dec 28 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 3.5.0-1
 -   Upgrade to version 3.5.0
 
-*   Tue Nov 02 2021 Thomas Crain <thcrain@microsoft.com> - 3.4.13-6
+*   Tue Nov 02 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.4.13-6
 -   Increment release for force republishing using golang 1.16.9
 
 *   Fri Aug 06 2021 Nicolas Guibourge <nicolasg@microsoft.com> 3.4.13-5

@@ -314,7 +314,7 @@ popd
 * Wed Apr 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 4.17.0-4
 - Update required dependecies for rpm-libs and rpm-build sub-packages.
 
-* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 4.17.0-3
+* Tue Feb 08 2022 Olivia Crain <oliviacrain@microsoft.com> - 4.17.0-3
 - Remove manual pkgconfig(*) provides in toolchain specs
 
 * Sat Jan 29 2022 Muhammad Falak <mwani@microsoft.com> - 4.17.0-2
@@ -323,7 +323,7 @@ popd
 * Wed Sep 15 2021 Mateusz Malisz <mamalisz@microsoft.com> - 4.17.0-1
 - Upgrade to version 4.17.0.  Remove libdb dependency.
 
-* Mon Jun 07 2021 Thomas Crain <thcrain@microsoft.com> - 4.14.2.1-4
+* Mon Jun 07 2021 Olivia Crain <oliviacrain@microsoft.com> - 4.14.2.1-4
 - Add patch to define "$RPM_LD_FLAGS" during spec %%build phases
 - Remove %%python3_sitelib redefinition
 - Remove %%clean section
@@ -332,7 +332,7 @@ popd
 * Wed May 19 2021 Nick Samson <nisamson@microsoft.com> - 4.14.2.1-3
 - Removed python-rpm python2 module support
 
-* Fri Apr 30 2021 Thomas Crain <thcrain@microsoft.com> - 4.14.2.1-2
+* Fri Apr 30 2021 Olivia Crain <oliviacrain@microsoft.com> - 4.14.2.1-2
 - Merge the following releases from 1.0 to dev branch
 - niontive@microsoft.com, 4.14.2-11: Patch CVE-2021-20271 and CVE-2021-3421
 

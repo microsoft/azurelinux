@@ -105,7 +105,7 @@ make install DESTDIR=$RPM_BUILD_ROOT
 %ldconfig_scriptlets
 
 %changelog
-* Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.4.3-4
+* Fri Dec 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.4.3-4
 - License verified
 
 * Tue Mar 02 2021 Henry Li <lihl@microsoft.com> - 1.4.3-3

@@ -76,7 +76,7 @@ rm -f %{emacs_lisp_path}/xcscope.el
 rm -f %{vim_plugin_path}/cctree.vim
 
 %changelog
-* Wed Nov 03 2021 Thomas Crain <thcrain@microsoft.com> - 15.9-8
+* Wed Nov 03 2021 Olivia Crain <oliviacrain@microsoft.com> - 15.9-8
 - Remove xemacs support
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 15.9-7

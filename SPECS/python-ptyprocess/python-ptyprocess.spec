@@ -47,10 +47,10 @@ python3 -m pytest -v
 %{python3_sitelib}/ptyprocess-*.egg-info
 
 %changelog
-* Wed Jun 23 2021 Thomas Crain <thcrain@microsoft.com> - 0.7.0-2
+* Wed Jun 23 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.7.0-2
 - Fix package test by using pip to install test requirements
 
-* Mon May 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.7.0-1
+* Mon May 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.7.0-1
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - Updated to latest package version
 - License verified

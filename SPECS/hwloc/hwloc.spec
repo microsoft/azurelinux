@@ -176,7 +176,7 @@ LD_LIBRARY_PATH=$PWD/hwloc/.libs make check
 - Update to 2.5.0
 - License verified
 
-* Tue Jun 22 2021 Thomas Crain <thcrain@microsoft.com> - 2.0.4-5
+* Tue Jun 22 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.0.4-5
 - Use pkgconfig(cairo) instead of cairo-devel build requirement
 
 * Fri Dec 11 2020 Joe Schmitt <joschmit@microsoft.com> - 2.0.4-4

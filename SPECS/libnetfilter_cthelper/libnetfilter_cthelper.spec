@@ -52,7 +52,7 @@ find %{buildroot} -type f -name '*.la' -exec rm -f {} ';'
 %{_libdir}/*.so
 
 %changelog
-* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 1.0.0-5
+* Tue Feb 08 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.0.0-5
 - Remove unused `%%define sha1` lines
 - License verified
 

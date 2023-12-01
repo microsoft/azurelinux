@@ -57,7 +57,7 @@ make %{?_smp_mflags} check
 - Removing the explicit %%clean stage.
 - License verified.
 
-* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.2.5-2
+* Fri Sep 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.2.5-2
 - Remove libtool archive files from final packaging
 
 * Fri Jan 29 2021  Joe Schmitt <joschmit@microsoft.com> - 0.2.5-1

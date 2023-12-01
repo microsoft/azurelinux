@@ -35,7 +35,7 @@ make install DESTDIR=%{buildroot} libdir=%{_libdir}
 * Fri Feb 18 2022 Cameron Baird <cameronbaird@microsoft.com> - 0.356-1
 - Update source to v0.356
 
-* Fri May 28 2021 Thomas Crain <thcrain@microsoft.com> - 0.341-4
+* Fri May 28 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.341-4
 - Replace improper %%{_lib} macro usage with %%{_libdir}
 
 * Mon Mar 29 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.341-3

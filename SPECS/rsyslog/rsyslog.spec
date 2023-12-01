@@ -201,7 +201,7 @@ fi
 * Thu Sep 16 2021 Henry Beberman <henry.beberman@microsoft.com> - 8.37.0-7
 - Add /etc/rsyslog.d directory.
 
-* Mon Jul 19 2021 Thomas Crain <thcrain@microsoft.com> - 8.37.0-6
+* Mon Jul 19 2021 Olivia Crain <oliviacrain@microsoft.com> - 8.37.0-6
 - Add html documentation subpackage from upstream-provided tarball
 - Enable various features and add the corresponding provides for subpackages from other distros:
 -   crypto, elasticsearch, kafka, mmaudit, mmjson, mmkubernetes, 

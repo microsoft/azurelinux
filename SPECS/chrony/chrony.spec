@@ -221,7 +221,7 @@ systemctl start chronyd.service
 * Fri Jan 15 2021 Andrew Phelps <anphel@microsoft.com> - 3.5.1-3
 - Add build requirements needed for check tests
 
-* Thu Oct 01 2020 Thomas Crain <thcrain@microsoft.com> - 3.5.1-2
+* Thu Oct 01 2020 Olivia Crain <oliviacrain@microsoft.com> - 3.5.1-2
 - Remove chrony-wait service as a boot dependency
 
 * Tue Sep 01 2020 Mateusz Malisz <mamalisz@microsoft.com> - 3.5.1-1

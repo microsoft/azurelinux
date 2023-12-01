@@ -95,7 +95,7 @@ dune runtest
 %{_libdir}/ocaml/%{srcname}/*.mli
 
 %changelog
-* Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 0.15.0-1
+* Tue Jan 18 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.15.0-1
 - Upgrade to latest version
 - License verified
 

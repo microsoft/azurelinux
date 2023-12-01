@@ -72,7 +72,7 @@ ln -fs ../../bin/ccache-swig %{buildroot}%{_libdir}/ccache/swig
 - Install 2to3 for converting all test files to python3 compatible
 - Pass PY3=y for make check to use Python3
 
-* Thu Aug 05 2021 Thomas Crain <thcrain@microsoft.com> - 4.0.2-2
+* Thu Aug 05 2021 Olivia Crain <oliviacrain@microsoft.com> - 4.0.2-2
 - Switch source URL to GitHub version
 - Lint spec
 

@@ -78,7 +78,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Thu Jul 21 2022 Henry Li <lihl@microsoft.com> - 1.4.0-2
 - Add patch to resolve CVE-2022-33070
 
-* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 1.4.0-1
+* Fri Jul 23 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.4.0-1
 - Upgrade to latest upstream version
 - Add check section
 - Remove libtool archives from devel subpackage

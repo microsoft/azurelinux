@@ -125,7 +125,7 @@ make %{?_smp_mflags} test
 - Adding 'BuildRequires: perl-generators'.
 - License verified.
 
-* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 1.26-5
+* Fri Apr 02 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.26-5
 - Merge the following releases from 1.0 to dev branch
 - pawelwi@microsoft.com, 1.26-4: Adding 'local::lib' perl5 library to fix test dependencies.
 

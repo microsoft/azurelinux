@@ -160,7 +160,7 @@ rm %{buildroot}%{_mandir}/man1/opensc-notify.1*
 * Thu Feb 10 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.20.0-9
 - License verified.
 
-* Tue Jun 08 2021 Thomas Crain <thcrain@microsoft.com> - 0.20.0-8
+* Tue Jun 08 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.20.0-8
 - Explicitly specify bash-completion when configuring
 
 * Tue Jan 12 2021 Joe Schmitt <joschmit@microsoft.com> - 0.20.0-7

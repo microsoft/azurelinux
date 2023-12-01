@@ -238,7 +238,7 @@ exit 0
 %endif
 
 %changelog
-* Tue Jun 22 2021 Thomas Crain <thcrain@microsoft.com@microsoft.com> - 0.79.13-2
+* Tue Jun 22 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.79.13-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Add build-time requirement on systemd-devel for systemd pkgconfig files
 

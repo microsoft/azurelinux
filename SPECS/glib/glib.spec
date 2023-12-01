@@ -135,21 +135,21 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 - Don't remove pcre sources which no longer apply for the new version
 - Fix Source0 URL to use macro to represent major version
 
-* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 2.60.1-6
+* Tue Feb 08 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.60.1-6
 - Remove manual pkgconfig(*) provides in toolchain specs
 
 * Wed May 19 2021 Nick Samson <nisamson@microsoft.com> - 2.60.1-5
 - Removed python2 support
 
-* Wed May 19 2021 Thomas Crain <thcrain@microsoft.com> - 2.60.1-4
+* Wed May 19 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.60.1-4
 - Require schemas subpackage from devel subpackage
 
-* Fri Apr 27 2021 Thomas Crain <thcrain@microsoft.com> - 2.60.1-3
+* Fri Apr 27 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.60.1-3
 - Remove CVE-2019-13012 patch (already in the this version)
 - Exclude doubly-packaged files from devel subpackage
 - Merge the following releases from 1.0 to dev branch
 - nisamson@microsoft.com, 2.58.0-7: Added patch for CVE-2020-35457, removed %%sha, license verified.
-- thcrain@microsoft.com, 2.58.0-8: Added patch for CVE-2021-27218, CVE-2021-27219
+- oliviacrain@microsoft.com, 2.58.0-8: Added patch for CVE-2021-27218, CVE-2021-27219
 - niontive@microsoft.com, 2.58.0-9: Added patch for CVE-2021-28153
 
 * Fri Apr 16 2021 Henry Li <lihl@microsoft.com> - 2.60.1-2

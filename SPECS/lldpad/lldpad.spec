@@ -71,10 +71,10 @@ mv %{buildroot}/%{_libdir}/systemd/system/lldpad.socket  \
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.1.0-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
-* Thu Nov 11 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.0-1
+* Thu Nov 11 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.1.0-1
 - Upgrade to latest upstream version
 
-* Tue Jun 29 2021 Thomas Crain <thcrain@microsoft.com> - 1.0.1-18
+* Tue Jun 29 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.0.1-18
 - Use libconfig-devel at build-time, rather than libconfig
 - Lint spec, modernize with macros
 

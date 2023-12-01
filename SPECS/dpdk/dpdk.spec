@@ -194,7 +194,7 @@ CFLAGS="$(echo %{optflags} -fcommon)" \
 * Sat Sep 25 2021 Muhammad Falak <mwani@microsoft.com> - 2:18.11.2-6
 - Enable `tools` subpackage by default
 
-* Thu Aug 05 2021 Thomas Crain <thcrain@microsoft.com> - 2:18.11.2-5
+* Thu Aug 05 2021 Olivia Crain <oliviacrain@microsoft.com> - 2:18.11.2-5
 - Disable examples subpackage by default
 
 * Thu Nov 05 2020 Joe Schmit <joschmit@microsoft.com> - 2:18.11.2-4

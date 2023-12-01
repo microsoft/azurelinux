@@ -79,7 +79,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Fri Nov 12 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 2.9.7-10
 - Fix gcc 11 build issue
 
-* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 2.9.7-8
+* Fri Jul 23 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.9.7-8
 - Add provides for libs subpackages from base package
 - Minor linting (make macros, replace source URL)
 - License verified

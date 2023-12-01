@@ -76,7 +76,7 @@ make test
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.72-8
 - Adding 'BuildRequires: perl-generators'.
 
-* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 0.72-8
+* Fri Apr 02 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.72-8
 - Merge the following releases from 1.0 to dev branch
 - anphel@microsoft.com, 0.72-7: Add patch to fix test issue
 

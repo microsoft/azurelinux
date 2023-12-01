@@ -52,7 +52,7 @@ install -vm 644 services %{buildroot}%{_sysconfdir}/services
 * Mon Sep 12 2022 Olivia Crain <oliviacrain@microsoft.com> - 20211115-2
 - Separate documents into separate package to reduce base package size
 
-* Mon Nov 22 2021 Thomas Crain <thcrain@microsoft.com> - 20211115-1
+* Mon Nov 22 2021 Olivia Crain <oliviacrain@microsoft.com> - 20211115-1
 - Switch to new upstream source used by LFS and upgrade to latest
 - Use new release version corresponding to IANA source update dates
 - Include original IANA XML sources in packaging

@@ -59,7 +59,7 @@ install test/dispol %{buildroot}%{_bindir}/sedispol
 %{_mandir}/ru/man8/checkmodule.8.gz
 
 %changelog
-* Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 3.2-1
+* Fri Aug 13 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.2-1
 - Upgrade to latest upstream version
 - Add -fno-semantic-interposition to CFLAGS as recommended by upstream
 - Update source URL to new format

@@ -237,7 +237,7 @@ exit 0
 * Thu Sep 01 2022 Henry Beberman <henry.beberman@microsoft.com> - 1.4.4-9
 - Patch CVE-2021-42523 to remove unused error_msg pointers.
 
-* Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 1.4.4-8
+* Wed Dec 08 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.4.4-8
 - License verified, added LGPLv2 license text
 - Lint spec
 

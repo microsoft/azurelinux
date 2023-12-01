@@ -79,7 +79,7 @@ FCFLAGS="$FCFLAGS   -O0 -g"; export FCFLAGS
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.1.11-3
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
-* Mon Jun 28 2021 Thomas Crain <thcrain@microsoft.com> - 3.1.11-2
+* Mon Jun 28 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.1.11-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - Turn in-source builds back on to fix build break regarding cmake macro compatibility
 

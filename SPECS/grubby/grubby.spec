@@ -124,7 +124,7 @@ current boot environment.
 * Wed Apr 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.40-43
 - Removing redundant "#Source0" comment.
 
-* Fri Jan 28 2022 Thomas Crain <thcrain@microsoft.com> - 8.40-42
+* Fri Jan 28 2022 Olivia Crain <oliviacrain@microsoft.com> - 8.40-42
 - Add Fedora patch file (license: MIT) to fix linking with RPM >= 4.16.0
 - Remove git setup steps, apply patches using %%autosetup
 - Remove s390x-specific instructions

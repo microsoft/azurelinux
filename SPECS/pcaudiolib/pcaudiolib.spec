@@ -67,6 +67,6 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Mon Feb 14 2022 Minghe Ren <mingheren@microsoft.com> - 1.2-1
 - Update to version 1.2
 
-* Fri Feb 05 2021 Thomas Crain <thcrain@microsoft.com> - 1.1-1
+* Fri Feb 05 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.1-1
 - Original version for CBL-Mariner (license: MIT)
 - License verified

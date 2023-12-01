@@ -44,7 +44,7 @@ They utilize the Assuan protocol as specified in the Libassuan manual.
 * Mon Nov 27 2023 Andrew Phelps <anphel@microsoft.com> - 1.2.1-1
 - Upgrade to 1.2.1
 
-* Mon Nov 22 2021 Thomas Crain <thcrain@microsoft.com> - 1.2.0-1
+* Mon Nov 22 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.2.0-1
 - Upgrade to latest upstream
 - Better specify build/runtime requirements
 - Lint spec

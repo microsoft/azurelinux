@@ -64,7 +64,7 @@ make check -C build
 * Thu Feb 03 2022 Minghe Ren <mingheren@microsoft.com> - 1.11.4-1
 - Update to Version 1.11.4
 
-* Mon Oct 12 2020 Thomas Crain <thcrain@microsoft.com> - 1.10-2
+* Mon Oct 12 2020 Olivia Crain <oliviacrain@microsoft.com> - 1.10-2
 - License verified
 - Update Source0
 

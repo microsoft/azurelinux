@@ -88,7 +88,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Tue Oct 19 2021 Jon Slobodzian <joslobo@microsoft.com> - 0.7.19-2
 - RPM no longer requires libdb, so remove dependency from libsolv
 
-* Tue Aug 14 2021 Thomas Crain <thcrain@microsoft.com> - 0.7.19-1
+* Tue Aug 14 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.7.19-1
 - Upgrade to latest upstream
 - Install files to %%{_libdir} instead of %%{_lib64dir}
 - Lint spec

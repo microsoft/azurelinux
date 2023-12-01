@@ -57,7 +57,7 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/lib*.la
 %{_libdir}/*.so
 
 %changelog
-* Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.4-23
+* Fri Dec 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.4-23
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4-22

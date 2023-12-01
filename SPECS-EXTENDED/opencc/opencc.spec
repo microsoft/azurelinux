@@ -80,7 +80,7 @@ developing applications that use %{name}.
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.1-3
+* Fri Jul 23 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.1.1-3
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 - Add patch to fix parallel build issue
 

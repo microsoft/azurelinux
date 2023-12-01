@@ -77,7 +77,7 @@ sed -i 's/\"libnetlink.h\"/"..\/include\/libnetlink.h\"/g' ../lib/libnetlink.c
 * Wed Feb 02 2022 Muhammad Falak <mwani@microsoft.com> - 5.15.0-2
 - Add an explict BR on 'sudo' & 'libmnl-devel' to enable check section
 
-* Mon Nov 29 2021 Thomas Crain <thcrain@microsoft.com> - 5.15.0-1
+* Mon Nov 29 2021 Olivia Crain <oliviacrain@microsoft.com> - 5.15.0-1
 - Upgrade to latest upstream version
 - Add relevant build/runtime requirements
 - Fix check section instructions for new version

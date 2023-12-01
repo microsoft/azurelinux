@@ -59,7 +59,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Wed Mar 16 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.15.1-1
 - Update to v1.15.1.
 
-* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 1.12.1-7
+* Tue Feb 08 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.12.1-7
 - Remove unused `%%define sha1` lines
 - License verified
 

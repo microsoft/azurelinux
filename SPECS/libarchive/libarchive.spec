@@ -75,7 +75,7 @@ make %{?_smp_mflags} check
 * Thu Feb 03 2022 Muhammad Falak <mwani@microsoft.com> - 3.4.2-5
 - Backport patch from upstream to fix 'test_write_disk_secure'
 
-* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 3.4.2-4
+* Fri Apr 02 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.4.2-4
 - Merge the following releases from 1.0 to dev branch
 - henry.beberman@microsoft.com, 3.4.2-3: Update Source URL to GitHub instead of libarchive.org
 

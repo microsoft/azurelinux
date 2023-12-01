@@ -94,7 +94,7 @@ cp -rv README INSTALL doc/* \
 * Tue Feb 08 2022 Henry Li <lihl@microsoft.com> - 3.6.0-1
 - Upgrade to 3.6.0
 
-* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 3.5.0-9
+* Fri Jul 23 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.5.0-9
 - Add provides for libs subpackages from base package
 
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 3.5.0-8

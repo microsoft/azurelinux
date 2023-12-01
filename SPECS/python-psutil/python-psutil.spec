@@ -56,16 +56,16 @@ LANG=en_US.UTF-8 PYTHONPATH=%{buildroot}%{python3_sitelib} make test PYTHON=pyth
 %{python3_sitelib}/*
 
 %changelog
-* Tue Jan 25 2022 Thomas Crain <thcrain@microsoft.com> - 5.9.0-1
+* Tue Jan 25 2022 Olivia Crain <oliviacrain@microsoft.com> - 5.9.0-1
 - Upgrade to latest upstream version
 - Update skipped tests patch
 - Lint spec
 - License verified
 
-* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 5.6.3-6
+* Fri Dec 03 2021 Olivia Crain <oliviacrain@microsoft.com> - 5.6.3-6
 - Replace easy_install usage with pip in %%check sections
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 5.6.3-5
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 5.6.3-5
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

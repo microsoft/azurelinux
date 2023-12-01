@@ -111,7 +111,7 @@ popd
 * Mon Mar 20 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.17.3-2
 - Added check section for running tests
 
-* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 3.17.3-1
+* Fri Jul 23 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.17.3-1
 - Upgrade to latest upstream version, using upstream release tarball
 - Add soname version to %%file packaging
 - Remove protobuf-m2-%{version}.tar.gz source tarball (no longer needed with java removal)

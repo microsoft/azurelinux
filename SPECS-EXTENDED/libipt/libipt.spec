@@ -75,7 +75,7 @@ ctest -V %{?_smp_mflags}
 - Updating to version 2.0.5 using Fedora 36 spec (license: MIT) for guidance.
 - License verified.
 
-* Thu Jun 17 2021 Thomas Crain <thcrain@microsoft.com> - 2.0.1-3
+* Thu Jun 17 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.0.1-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Conditionalize building of documentation
 

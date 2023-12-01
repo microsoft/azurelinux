@@ -81,13 +81,13 @@ make %{?_smp_mflags} check
 * Fri Mar 03 2023 Bala <balakumaran.kannan@microsoft.com> - 1.46-1
 - Upgrade to version 1.46 to support gnupg2
 
-* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 1.43-2
+* Tue Feb 08 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.43-2
 - Remove manual pkgconfig(*) provides in toolchain specs
 
 * Fri Nov 05 2021 Andrew Phelps <anphel@microsoft.com> 1.43-1
 - Update to version 1.43
 
-* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> 1.32-6
+* Fri Sep 10 2021 Olivia Crain <oliviacrain@microsoft.com> 1.32-6
 - Remove libtool archive files from final packaging
 
 * Mon Sep 28 2020 Joe Schmitt <joschmit@microsoft.com> 1.32-5

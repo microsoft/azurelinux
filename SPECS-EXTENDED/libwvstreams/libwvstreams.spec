@@ -118,7 +118,7 @@ popd
 %ldconfig_scriptlets
 
 %changelog
-* Tue Aug 10 2021 Thomas Crain <thcrain@microsoft.com> - 4.6.1-34
+* Tue Aug 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 4.6.1-34
 - Add patch to enable compatibility with recent versions of openssl
 
 * Tue Jul 06 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.6.1-33

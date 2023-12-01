@@ -47,5 +47,5 @@ make PREFIX=%{_prefix} DESTDIR=%{buildroot} install_core
 %{_mandir}/man1/*
 
 %changelog
-* Mon May 17 2021 Thomas Crain <thcrain@microsoft.com> - 5.0-1
+* Mon May 17 2021 Olivia Crain <oliviacrain@microsoft.com> - 5.0-1
 - Original version for CBL-Mariner

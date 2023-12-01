@@ -119,7 +119,7 @@ gdk-pixbuf-query-loaders-%{__isa_bits} --update-cache
 * Fri Mar 31 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.40.0-5
 - Bumping release to re-build with newer 'libtiff' libraries.
 
-* Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 2.40.0-4
+* Wed Dec 08 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.40.0-4
 - License verified
 - Lint spec
 

@@ -58,7 +58,7 @@ LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
 * Sat Feb 12 2022 Muhammad Falak <mwani@microsoft.com> - 18.2.0-9
 - Use `py39` as tox env to enable ptest
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 18.2.0-8
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 18.2.0-8
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

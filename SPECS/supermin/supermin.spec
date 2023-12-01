@@ -156,7 +156,7 @@ make check || {
 * Wed Mar 30 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.2.1-2
 - Updating dependencies.
 
-* Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 5.2.1-1
+* Tue Jan 18 2022 Olivia Crain <oliviacrain@microsoft.com> - 5.2.1-1
 - Upgrade to latest upstream stable release
 - Enable full mariner support via patch
 - License verified

@@ -68,7 +68,7 @@ mkdir build && cd build
 * Wed Feb 09 2022 Francisco Huelsz Prince <frhuelsz@microsoft.com> - 0.3.1-1
 - Upgrade to 0.3.1 for lttng-ust 2.13 compatibility & fixes.
 
-* Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 0.3-1
+* Tue Jan 18 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.3-1
 - Upgrade to latest upstream version for lttng-ust 2.13 compatibility
 - Use CMake options to avoid pulling in catch-devel in non-test builds
 - Add version constraints to requirements

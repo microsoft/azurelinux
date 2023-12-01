@@ -42,11 +42,11 @@ PATH=%{buildroot}%{_bindir}:${PATH} \
 %{python3_sitelib}/*
 
 %changelog
-* Fri Feb 04 2022 Thomas Crain <thcrain@microsoft.com> - 1.4.4-1
+* Fri Feb 04 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.4.4-1
 - Upgrade to latest upstream release version
 - Use github release tarball
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.4.3-5
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.4.3-5
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

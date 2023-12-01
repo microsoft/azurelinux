@@ -247,7 +247,7 @@ rm -fr %{buildroot}%{_defaultdocdir}/%{name}
 - Disabling Java subpackage as it's no needed.
 - Adding a missing BR on 'libsxlt-devel'.
 
-* Wed Jan 05 2022 Thomas Crain <thcrain@microsoft.com> - 2.6.0-24
+* Wed Jan 05 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.6.0-24
 - Rename java-headless dependency to java
 - License verified
 

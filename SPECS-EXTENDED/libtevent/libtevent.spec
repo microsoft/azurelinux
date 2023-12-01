@@ -107,7 +107,7 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 %ldconfig_scriptlets
 
 %changelog
-* Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.10.2-4
+* Fri Dec 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.10.2-4
 - License verified
 
 * Tue Mar 02 2021 Henry Li <lihl@microsoft.com> - 0.10.2-3

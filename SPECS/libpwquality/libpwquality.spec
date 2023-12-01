@@ -110,7 +110,7 @@ mkdir %{buildroot}%{_secconfdir}/pwquality.conf.d
 * Wed Jan 12 2022 Henry Li <lihl@microsoft.com> - 1.4.4-1
 - Upgrade to version 1.4.4
 
-* Sat Nov 21 2020 Thomas Crain <thcrain@microsoft.com> - 1.4.2-6
+* Sat Nov 21 2020 Olivia Crain <oliviacrain@microsoft.com> - 1.4.2-6
 - Replace %%ldconfig_scriptlets with actual post/postun sections
 
 * Thu Nov 19 2020 Andrew Phelps <anphel@microsoft.com> 1.4.2-5

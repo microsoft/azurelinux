@@ -111,7 +111,7 @@ ctest -V %{?_smp_mflags}
 * Mon Mar 21 2022 Nicolas Guibourge <nicolasg@microsoft.com> 1.23-1
 - Upgrade to 1.23
 
-* Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> 1.22-3
+* Fri Aug 21 2020 Olivia Crain <oliviacrain@microsoft.com> 1.22-3
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 - License verified
 

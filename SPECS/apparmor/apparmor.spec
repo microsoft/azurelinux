@@ -362,7 +362,7 @@ make DESTDIR=%{buildroot} install
 * Wed Jan 19 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.13-17
 - Add perl Pod-Checker Pod-Html and ExtUtils-MakeMaker to build requires.
 
-* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 2.13-16
+* Fri Dec 03 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.13-16
 - Remove hardcoded python3 variables in favor of macros to enable build with Python 3.9
 - Add upstream patch to fix autoconf macro for python3 >= 3.8
 - License verified
@@ -370,7 +370,7 @@ make DESTDIR=%{buildroot} install
 * Wed Sep 29 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.13-15
 - Added missing BR on "systemd-rpm-macros".
 
-* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 2.13-14
+* Fri Apr 02 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.13-14
 - Merge the following releases from 1.0 to dev branch
 - anphel@microsoft.com, 2.13-12: Add patch to severity.db to fix tests.
 

@@ -55,7 +55,7 @@ needed for development of applications or toolkits which use ATK.
 %{_datadir}/gir-1.0
 
 %changelog
-* Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 2.36.0-3
+* Wed Dec 08 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.36.0-3
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.36.0-2

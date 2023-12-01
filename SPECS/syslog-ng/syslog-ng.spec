@@ -150,7 +150,7 @@ fi
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.33.2-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
-* Mon Jan 31 2022 Thomas Crain <thcrain@microsoft.com> - 3.33.2-3
+* Mon Jan 31 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.33.2-3
 - Remove python2 subpackage
 
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.33.2-2
@@ -162,7 +162,7 @@ fi
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.23.1-4
 - Removing the explicit %%clean stage.
 
-* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 3.23.1-3
+* Fri Dec 03 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.23.1-3
 - Replace easy_install usage with pip in %%check sections
 
 * Tue Oct 13 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 3.23.1-2

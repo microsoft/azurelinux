@@ -70,7 +70,7 @@ make %{?_smp_mflags} check
 %{_includedir}/*
 
 %changelog
-* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 2.6.4-7
+* Fri Apr 02 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.6.4-7
 - Merge the following releases from 1.0 to dev branch
 - niontive@microsoft.com, 2.6.4-6: No patch CVE-2019-6293, Move "lex" script to separate file
 

@@ -64,7 +64,7 @@ find %{buildroot} -name '*.a' -delete
 - Removing docs to drop dependency on 'ghostscript'.
 - License verified.
 
-* Mon Jun 14 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.0-3
+* Mon Jun 14 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.1.0-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Conditionally build documentation, and turn off documentation building by default
 

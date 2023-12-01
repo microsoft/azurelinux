@@ -67,7 +67,7 @@ make %{?_smp_mflags} check
 * Thu Sep 23 2021 Pawel Winogrodzki <pawelwi@microsoft.com> 3.1-5
 - Adding 'Provides' for 'bison-runtime'.
 
-* Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> 3.1-4
+* Fri Aug 21 2020 Olivia Crain <oliviacrain@microsoft.com> 3.1-4
 - Remove yacc command for compatibility with byacc package
 - Remove sha hash
 - License verified

@@ -48,11 +48,11 @@ ln -s jsonpatch %{buildroot}%{_bindir}/jsonpatch3
 %{_bindir}/jsonpatch3
 
 %changelog
-* Thu Feb 10 2022 Thomas Crain <thcrain@microsoft.com> - 1.32-1
+* Thu Feb 10 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.32-1
 - Upgrade to latest upstream version
 - Use github source tarball
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.23-5
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.23-5
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

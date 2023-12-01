@@ -94,10 +94,10 @@ install -p -m 755 build/blobfuse %{buildroot}%{_bindir}/
 * Tue Jun 14 2022 Muhammad Falak <mwani@microsoft.com> - 1.4.2-3
 - Bump release to rebuild with golang 1.18.3
 
-* Wed Dec 01 2021 Thomas Crain <thcrain@microsoft.com> - 1.4.2-2
+* Wed Dec 01 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.4.2-2
 - Add back in gcc11 compilation error mitigation
 
-* Mon Nov 29 2021 Thomas Crain <thcrain@microsoft.com> - 1.4.2-1
+* Mon Nov 29 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.4.2-1
 - Upgrade to latest upstream version
 - Remove %%clean section
 

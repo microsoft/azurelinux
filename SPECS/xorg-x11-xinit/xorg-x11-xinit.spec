@@ -111,7 +111,7 @@ install -p -m 755 %{SOURCE19} %{buildroot}%{_libexecdir}
 %{_datadir}/xsessions/xinit-compat.desktop
 
 %changelog
-* Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 1.4.0-8
+* Wed Dec 08 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.4.0-8
 - License verified
 - Lint spec
 

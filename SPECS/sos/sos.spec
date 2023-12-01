@@ -78,10 +78,10 @@ rm -rf %{buildroot}%{_prefix}/config/
 * Thu Dec 30 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 4.2-1
 - Update to version 4.2
 
-* Wed May 12 2021 Thomas Crain <thcrain@microsoft.com> - 4.1-3
+* Wed May 12 2021 Olivia Crain <oliviacrain@microsoft.com> - 4.1-3
 - Fix build break due to doubly-packaged license/doc files
 
-* Mon May 10 2021 Thomas Crain <thcrain@microsoft.com> - 4.1-2
+* Mon May 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 4.1-2
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - Linted spec to Mariner style
 - License verified

@@ -61,7 +61,7 @@ make -k check %{?_smp_mflags}
 - License verified
 - Remove unneeded autoconf-make-check.patch
 
-* Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 2.69-11
+* Fri Mar 26 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.69-11
 - Merge the following releases from 1.0 to dev branch
 - anphel@microsoft.com, 2.69-10: Fix check tests
 

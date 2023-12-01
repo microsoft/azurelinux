@@ -78,7 +78,7 @@ export PYTHONPATH=%{buildroot}%{python3_sitearch}
 %{python3_sitearch}/%{pypi_name}-%{version}-py%{python3_version}.egg-info/
 
 %changelog
-* Fri Jan 28 2022 Thomas Crain <thcrain@microsoft.com> - 0.14-9
+* Fri Jan 28 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.14-9
 - Fix source name collision with ethtool package
 - Use github source tarball instead of pypi
 * Thu Jan 27 2022 Cameron Baird <cameronbaird@microsoft.com> - 0.14-8

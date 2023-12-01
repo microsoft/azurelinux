@@ -74,7 +74,7 @@ dune runtest
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.0-2
 - Cleaning-up spec. License verified.
 
-* Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 2.3.0-1
+* Tue Jan 18 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.3.0-1
 - Upgrade to latest upstream version
 - License verified
 

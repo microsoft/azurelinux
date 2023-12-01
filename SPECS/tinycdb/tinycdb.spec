@@ -64,7 +64,7 @@ cp -p debian/libcdb.pc %{buildroot}%{_libdir}/pkgconfig/libcdb.pc
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 0.78-15
+* Wed Dec 08 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.78-15
 - License verified
 - Lint spec
 

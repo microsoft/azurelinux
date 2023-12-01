@@ -147,7 +147,7 @@ popd
 - Remove gpg signature verification
 - License verified
  
-* Tue Jun 08 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.3-3
+* Tue Jun 08 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.1.3-3
 - Remove python2 macros
 
 * Mon Jan 04 2021 Joe Schmitt <joschmit@microsoft.com> - 1.1.3-2

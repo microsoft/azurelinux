@@ -473,14 +473,14 @@ fi
 * Mon Nov 29 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.8.4-9
 - Fix build issue due to gcc 11.2 and CFLAGS
 
-* Tue Jun 29 2021 Thomas Crain <thcrain@microsoft.com> - 1.8.4-8
+* Tue Jun 29 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.8.4-8
 - Use libconfig-devel at build-time instead of libconfig
 - Remove %%bcond_with test line
 
-* Wed Mar 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.8.4-7
+* Wed Mar 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.8.4-7
 - Remove manual placement of bash-completion file, now that this package has bash-completion.pc available to it
 
-* Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> 1.8.4-6
+* Fri Aug 21 2020 Olivia Crain <oliviacrain@microsoft.com> 1.8.4-6
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 - License verified
 

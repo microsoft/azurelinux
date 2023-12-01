@@ -36,7 +36,7 @@ make DESTDIR=%{buildroot} install
 %_mandir/man1/qperf.1*
 
 %changelog
-* Fri May 28 2021 Thomas Crain <thcrain@microsoft.com> - 0.4.9-18
+* Fri May 28 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.4.9-18
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Add BR: perl-diagnostics, perl-POSIX
 

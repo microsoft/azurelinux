@@ -169,7 +169,7 @@ install -Dm 0644 -p %{SOURCE11} \
         %{buildroot}%{_metainfodir}/%{fontname}.metainfo.xml
 
 %changelog
-* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 2.2-52
+* Fri Jul 23 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.2-52
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Add %%_metainfodir definition at top of spec, if not already defined
 

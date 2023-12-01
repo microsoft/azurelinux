@@ -88,10 +88,10 @@ find . -type f -name "*.py" -exec sed -i'' -e '1 s|^#!\s*/usr/bin/env\s\+python3
 - Make check section sed for /usr/bin/env/python3, rather than .../python
 - License verified
 
-* Thu Jun 24 2021 Thomas Crain <thcrain@microsoft.com> - 2.6.4-3
+* Thu Jun 24 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.6.4-3
 - Fix pkgconfig(freetype2) dependency (incorrect pkgconfig name)
 
-* Mon Jun 21 2021 Thomas Crain <thcrain@microsoft.com> - 2.6.4-2
+* Mon Jun 21 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.6.4-2
 - Build harfbuzz with icu libraries, fontconfig libraries
 - Use pkgconfig(*)-style dependencies
 - Provide harbuzz-icu from devel subpackage

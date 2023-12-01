@@ -56,7 +56,7 @@ make check
 * Wed Oct 19 2022 Muhammad Falak <mwani@microsoft.com> - 0.6.13-6
 - Drop fedora specific patch
 
-* Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 0.6.13-5
+* Wed Dec 08 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.6.13-5
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.6.13-4

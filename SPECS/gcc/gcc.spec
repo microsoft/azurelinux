@@ -310,7 +310,7 @@ $tests_ok
 * Thu Dec 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 11.2.0-3
 - Adding static components for "libbacktrace".
 
-* Tue Jan 25 2022 Thomas Crain <thcrain@microsoft.com> - 11.2.0-2
+* Tue Jan 25 2022 Olivia Crain <oliviacrain@microsoft.com> - 11.2.0-2
 - Add provides for libasan, liblsan, libtsan, and libubsan (and their static counterparts) to the main package
 - Remove CVE-2019-15847 nopatch file (not relevant to our version of GCC)
 
@@ -330,7 +330,7 @@ $tests_ok
 - Split gcc-c++ subpackage.
 - Provide cpp, gcc-gfortran, libatomic, and listdc++-static.
 
-* Thu Sep 10 2020 Thomas Crain <thcrain@microsoft.com> - 9.1.0-7
+* Thu Sep 10 2020 Olivia Crain <oliviacrain@microsoft.com> - 9.1.0-7
 - Ignore CVE-2019-15847, as it applies to an unsupported ISA
 
 * Mon Jul 06 2020 Henry Beberman <henry.beberman@microsoft.com> - 9.1.0-6

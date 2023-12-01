@@ -8,7 +8,7 @@ not declare it supported.
 
 Close #854
 
-Ported to 2.7.5 by Thomas Crain <thcrain@microsoft.com>
+Ported to 2.7.5 by Olivia Crain <oliviacrain@microsoft.com>
 ---
  psycopg/psycopgmodule.c | 5 +++++
  1 file changed, 5 insertions(+)

@@ -56,7 +56,7 @@ make test -C build
 * Wed Nov 10 2021 Pawel Winogrodzki <pawel.winogrodzki@microsoft.com> - 3.10.4-1
 - Updating to version 3.10.4 to get code fixes for GCC 10 and 11.
 
-* Mon Oct 12 2020 Thomas Crain <thcrain@microsoft.com> - 3.6.1-2
+* Mon Oct 12 2020 Olivia Crain <oliviacrain@microsoft.com> - 3.6.1-2
 - Update Source0
 - License verified
 

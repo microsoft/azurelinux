@@ -351,7 +351,7 @@ The policycoreutils-restorecond package contains the restorecond service.
 %systemd_postun_with_restart restorecond.service
 
 %changelog
-* Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 3.2-1
+* Fri Aug 13 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.2-1
 - Upgrade to latest upstream version
 - Switch source to use upstream's combined tarball
 - Add -fno-semantic-interposition to CFLAGS as recommended by upstream

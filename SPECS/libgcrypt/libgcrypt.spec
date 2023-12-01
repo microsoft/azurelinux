@@ -65,17 +65,17 @@ rm -rf %{buildroot}%{_infodir}
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.9.4-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
-* Mon Nov 22 2021 Thomas Crain <thcrain@microsoft.com> - 1.9.4-1
+* Mon Nov 22 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.9.4-1
 - Upgrade to latest upstream version
 - License verified
 
-* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.8.7-3
+* Fri Sep 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.8.7-3
 - Remove libtool archive files from final packaging
 
 * Tue Jun 22 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.8.7-2
 - libgcrypt CVE-2021-33560 fix
 
-* Mon Feb 01 2021 Thomas Crain <thcrain@microsoft.com> - 1.8.7-1
+* Mon Feb 01 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.8.7-1
 - Update to 1.8.7 to fix CVE-2019-13627
 - Remove cross-compile patch
 - Add pkgconfig file to devel subpackage

@@ -344,9 +344,9 @@ make %{?_smp_mflags} check
 - Moving MD5 plug-in libs into the "*-md5" subpackage.
 - Removed SRP libs as they were unused.
 
-* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 2.1.27-8
+* Fri Apr 02 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.1.27-8
 - Merge the following releases from 1.0 to dev branch
-- thcrain@microsoft.com, 2.1.27-5: Add nopatch for CVE-2020-8032, Lint spec
+- oliviacrain@microsoft.com, 2.1.27-5: Add nopatch for CVE-2020-8032, Lint spec
 
 * Tue Jan 12 2021 Ruying Chen <v-ruyche@microsoft.com> - 2.1.27-7
 - Provide cyrus-sasl-plain.

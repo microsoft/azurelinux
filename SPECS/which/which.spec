@@ -26,7 +26,7 @@ rm -rf %{buildroot}%{_infodir}
 %{_mandir}/man1/*
 
 %changelog
-* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 2.21-8
+* Tue Feb 08 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.21-8
 - Remove unused `%%define sha1` lines
 - License verified
 

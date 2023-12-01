@@ -59,10 +59,10 @@ LANG=en_US.UTF-8  PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{python3_sitelib}/*
 
 %changelog
-* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 18.0.0-8
+* Fri Dec 03 2021 Olivia Crain <oliviacrain@microsoft.com> - 18.0.0-8
 - Replace easy_install usage with pip in %%check sections
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 18.0.0-7
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 18.0.0-7
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

@@ -164,7 +164,7 @@ rm -rf %{buildroot}%{_libdir}/python2.7
 * Thu Feb 03 2022 Chris Co <chrco@microsoft.com> - 1.7.2-1
 - Update to 1.7.2.
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.7.0-7
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.7.0-7
 - Remove unused python-setuptools dependency
 
 * Mon Jan 11 2021 Ruying Chen <v-ruyche@microsoft.com> - 1.7.0-6

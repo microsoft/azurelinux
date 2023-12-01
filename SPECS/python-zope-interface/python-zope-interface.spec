@@ -54,11 +54,11 @@ For detailed documentation, please see http://docs.zope.org/zope.interface
 * Sat Feb 12 2022 Muhammad Falak <mwani@microsoft.com> - 4.7.2-3
 - Add an explicit BR on `pip` to enable ptest
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 4.7.2-2
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 4.7.2-2
 - Add license to python3 package
 - Remove python2 package
 
-* Wed Nov 11 2020 Thomas Crain <thcrain@microsoft.com> - 4.7.2-1
+* Wed Nov 11 2020 Olivia Crain <oliviacrain@microsoft.com> - 4.7.2-1
 - Update to 4.7.2 to fix setuptools compatibility issues
 - Update Source0
 - Lint to Mariner style

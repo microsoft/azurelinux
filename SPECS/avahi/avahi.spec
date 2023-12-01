@@ -413,7 +413,7 @@ exit 0
 - Remove mono patch- we don't build with mono.
 - Remove local services patch- upstreamed
 
-* Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 0.7-26
+* Wed Dec 08 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.7-26
 - License verified
 - Lint spec
 

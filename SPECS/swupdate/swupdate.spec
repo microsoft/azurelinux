@@ -137,7 +137,7 @@ fi
 * Tue Jan 18 2022 Daniel McIlvaney <damcilva@microsoft.com> - 2021.04-1
 - Update to version 2021.04.
 
-* Tue Jun 29 2021 Thomas Crain <thcrain@microsoft.com> - 2019.11-7
+* Tue Jun 29 2021 Olivia Crain <oliviacrain@microsoft.com> - 2019.11-7
 - Use libconfig-devel at build-time, instead of libconfig
 
 * Fri Sep 25 2020 Emre Girgin <mrgirgin@microsoft.com> - 2019.11-6

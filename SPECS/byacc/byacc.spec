@@ -56,7 +56,7 @@ echo ====================TESTING END=====================
 * Tue Jan 11 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.9.20220109-1
 - Upgrade to 1.9.20220109
 
-* Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 1.9.20200330-4
+* Fri Aug 21 2020 Olivia Crain <oliviacrain@microsoft.com> - 1.9.20200330-4
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 - License verified
 

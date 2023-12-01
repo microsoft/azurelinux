@@ -41,7 +41,7 @@ make  %{?_smp_mflags} check
 * Fri Feb 10 2023 Rachel Menge <rachelmenge@microsoft.com> - 3.2a-3
 - Patch CVE-2022-47016
 
-* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 3.2a-2
+* Tue Feb 08 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.2a-2
 - Remove unused `%%define sha1` lines
 
 * Mon Jan 10 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.2a-1

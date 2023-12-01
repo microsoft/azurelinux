@@ -54,7 +54,7 @@ pip3 install pytest
 - Add an explicit BR on `pip`
 - Use `%pytest` to enable ptest
 
-* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 1.11.0-6
+* Fri Dec 03 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.11.0-6
 - Replace easy_install usage with pip in %%check sections
 
 * Tue Jul 06 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.11.0-5

@@ -1,5 +1,5 @@
 From bea39e1e86709d7413cfd2ef5858ae5335453360 Mon Sep 17 00:00:00 2001
-From: Thomas Crain <thcrain@microsoft.com>
+From: Olivia Crain <oliviacrain@microsoft.com>
 Date: Mon, 20 Sep 2021 08:31:39 -0500
 Subject: [PATCH] Fix logic typo in CMake bashcomp detection
 

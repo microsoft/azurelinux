@@ -55,7 +55,7 @@ gtk-update-icon-cache --force %{_datadir}/icons/hicolor &>/dev/null || :
 %ghost %{_datadir}/icons/hicolor/icon-theme.cache
 
 %changelog
-* Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 0.17-10
+* Wed Dec 08 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.17-10
 - License verified
 - Lint spec
 

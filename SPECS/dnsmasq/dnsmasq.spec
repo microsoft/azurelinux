@@ -79,7 +79,7 @@ EOF
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.85-2
 - Removing the explicit %%clean stage.
 
-* Fri Apr 23 2021 Thomas Crain <thcrain@microsoft.com> - 2.85-1
+* Fri Apr 23 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.85-1
 - Upgrade to version 2.85 to fix  CVE-2021-3348
 
 * Thu Jan 28 2021 Henry Li <lihl@microsoft.com> - 2.84-1

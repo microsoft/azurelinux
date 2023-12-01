@@ -249,7 +249,7 @@ make check -j1
 - Fixing source URL. 
 - License verified.
 
-* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 10.34-2
+* Fri Jul 23 2021 Olivia Crain <oliviacrain@microsoft.com> - 10.34-2
 - Unconditionally build with readline support
 - Add compatibility provides for pcre2-utf{16,32}
 - Require libpcre2-8-0, libpcre2-posix2 from base package

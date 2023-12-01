@@ -43,11 +43,11 @@ ln -s jsonpointer %{buildroot}%{_bindir}/jsonpointer3
 %{_bindir}/jsonpointer3
 
 %changelog
-* Tue Mar 08 2022 Thomas Crain <thcrain@microsoft.com> - 2.2-1
+* Tue Mar 08 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.2-1
 - Upgrade to latest upstream
 - Switch source from PyPI to GitHub
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.0-4
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.0-4
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

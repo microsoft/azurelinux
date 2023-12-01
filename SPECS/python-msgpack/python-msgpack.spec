@@ -51,7 +51,7 @@ tox -e py%{python3_version_nodots}-c,py%{python3_version_nodots}-pure
 - Upgrade to latest upstream version
 - Use tox as test runner
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.6.2-3
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.6.2-3
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

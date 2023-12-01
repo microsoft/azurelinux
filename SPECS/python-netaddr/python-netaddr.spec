@@ -50,13 +50,13 @@ LANG=en_US.UTF-8 PYTHONPATH=./ %{python3} setup.py test
 %{python3_sitelib}/*
 
 %changelog
-* Mon Jan 24 2022 Thomas Crain <thcrain@microsoft.com> - 0.8.0-1
+* Mon Jan 24 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.8.0-1
 - Upgrade to latest upstream version
 
-* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 0.7.19-10
+* Fri Dec 03 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.7.19-10
 - Replace easy_install usage with pip in %%check sections
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.7.19-9
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.7.19-9
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

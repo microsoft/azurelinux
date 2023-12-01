@@ -189,7 +189,7 @@ end
 * Fri Oct 08 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200619-3.git781bbd4
 - Changing the conflicting version of 'nss' to fit the versioning for CBL-Mariner.
 
-* Thu Aug 12 2021 Thomas Crain <thcrain@microsoft.com> - 20200619-2.git781bbd4
+* Thu Aug 12 2021 Olivia Crain <oliviacrain@microsoft.com> - 20200619-2.git781bbd4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Fix path to asciidoc xsl files in Makefile
 

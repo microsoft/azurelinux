@@ -42,7 +42,7 @@ A library that provides symbolic constant support. It includes collections and c
 %{python3_sitelib}/*
 
 %changelog
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 15.1.0-6
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 15.1.0-6
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

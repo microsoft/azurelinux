@@ -193,7 +193,7 @@ find %{buildroot}%{_libdir}/ocaml -name \*.cmxs -exec chmod a+x {} \+
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.2.2-6
 - Cleaning-up spec. License verified.
 
-* Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 2.2.2-5
+* Tue Jan 18 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.2.2-5
 - Take Fedora patch (license: MIT) to fix building with OCaml 4.13.0
 - License verified
 

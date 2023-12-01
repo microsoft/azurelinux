@@ -76,7 +76,7 @@ API documentation for libatspi.
 %{_libdir}/pkgconfig/atspi-2.pc
 
 %changelog
-* Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 2.36.1-3
+* Wed Dec 08 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.36.1-3
 - License verified
 - Lint spec
 

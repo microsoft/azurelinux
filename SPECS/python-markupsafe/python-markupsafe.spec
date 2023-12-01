@@ -50,19 +50,19 @@ pip3 install py
 * Tue Mar 08 2022 Nick Samson <nisamson@microsoft.com> - 2.1.0-1
 * Upgrade to 2.1.0.
 
-* Mon Dec 06 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.1-4
+* Mon Dec 06 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.1.1-4
 - Replace easy_install usage with pip in %%check sections
 
 * Sat Dec 04 2021 Henry Beberman <henry.beberman@microsoft.com> - 1.1.1-3
 - Explicitly provide python3dist(markupsafe) because built in toolchain.
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.1-2
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.1.1-2
 - Add license to python3 package
 - Remove python2 package
 - Lint spec
 - License verified
 
-* Wed Nov 11 2020 Thomas Crain <thcrain@microsoft.com> - 1.1.1-1
+* Wed Nov 11 2020 Olivia Crain <oliviacrain@microsoft.com> - 1.1.1-1
 - Upgrade to 1.1.1 to fix setuptools compatibility issues
 - Change Source0
 - Correct license location

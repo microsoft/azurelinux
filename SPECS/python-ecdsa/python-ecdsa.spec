@@ -51,13 +51,13 @@ tox -e py%{python3_version_nodots}
 %{python3_sitelib}/*
 
 %changelog
-* Tue Mar 08 2022 Thomas Crain <thcrain@microsoft.com> - 0.17.0-1
+* Tue Mar 08 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.17.0-1
 - Update to latest upstream version
 - Use tox to run tests
 - Remove test patch- test suite now detects cipher availability properly
 - Switch from PyPI to GitHub source
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.13.3-5
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.13.3-5
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

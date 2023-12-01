@@ -51,7 +51,7 @@ PYTHONPATH=.:%{buildroot}%{python3_sitelib} %python3 tests/__main__.py
 - Switch source from PyPI to GitHub source
 - Clean up test invocation
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.2.2-6
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.2.2-6
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

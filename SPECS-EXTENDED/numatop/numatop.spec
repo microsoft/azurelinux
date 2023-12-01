@@ -63,7 +63,7 @@ autoreconf -ivf
 - Add patch to fix format-security wanings with ncurses 6.3
 - License verified
 
-* Wed Aug 11 2021 Thomas Crain <thcrain@microsoft.com> - 2.1-4
+* Wed Aug 11 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.1-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Add patch to fix linking error
 

@@ -78,7 +78,7 @@ cp -pr kubernetes/e2e_test %{buildroot}%{python3_sitelib}/%{library}/
 * Mon Feb 07 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 21.7.0-1
 - Upgrade to 21.7.0
 
-* Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 11.0.0-5
+* Fri Aug 21 2020 Olivia Crain <oliviacrain@microsoft.com> - 11.0.0-5
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 - License verified
 

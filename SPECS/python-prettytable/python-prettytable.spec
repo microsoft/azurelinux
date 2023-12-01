@@ -63,7 +63,7 @@ tox -e py%{python3_version_nodots} --sitepackages
 - Switch tests to tox runner
 - Switch URL/Source0 links to new upstream location
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.7.2-9
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.7.2-9
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

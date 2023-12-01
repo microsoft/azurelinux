@@ -122,11 +122,11 @@ make clean
 * Mon Jan 10 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.0.9-1
 - Upgrade to 1.0.9
 
-* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 1.0.7-10
+* Fri Dec 03 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.0.7-10
 - Remove hardcoded %%python_version macros to enable building with Python 3.9
 - License verified
 
-* Fri Oct 30 2020 Thomas Crain <thcrain@microsoft.com> - 1.0.7-9
+* Fri Oct 30 2020 Olivia Crain <oliviacrain@microsoft.com> - 1.0.7-9
 - Patch CVE-2020-8927
 - Remove sha1 hash
 - Lint to Mariner style

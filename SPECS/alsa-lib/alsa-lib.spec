@@ -52,7 +52,7 @@ make DESTDIR=%{buildroot} install
 * Tue Jan 4 2022 Nicolas Guibourge <nicolasg@microsoft.com> 1.2.6.1-1
 - Update to version 1.2.6.1
 
-* Wed May 26 2021 Thomas Crain <thcrain@microsoft.com> - 1.2.2-2
+* Wed May 26 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.2.2-2
 - Replace python2 dependencies with python3
 - License verified
 

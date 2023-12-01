@@ -69,6 +69,6 @@ tox -e py%{python3_version_nodots}
 * Wed Jun 23 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 2.4.1-2
 - Pass check section
 
-* Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 2.4.1-1
+* Fri Aug 21 2020 Olivia Crain <oliviacrain@microsoft.com> - 2.4.1-1
 - Original version for CBL-Mariner
 - License verified

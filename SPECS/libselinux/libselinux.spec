@@ -109,7 +109,7 @@ echo "d %{_localstatedir}/run/setrans 0755 root root" > %{buildroot}/%{_libdir}/
 * Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5-1
 - Auto-upgrade to 3.5 - Azure Linux 3.0 - package upgrades
 
-* Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 3.2-1
+* Fri Aug 13 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.2-1
 - Upgrade to latest upstream version
 - Add -fno-semantic-interposition to CFLAGS as recommended by upstream 
 - License verified

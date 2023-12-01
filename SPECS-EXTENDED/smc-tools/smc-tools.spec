@@ -49,7 +49,7 @@ sockets in Linux.
 
 
 %changelog
-* Mon Jun 07 2021 Thomas Crain <thcrain@microsoft.com> - 1.2.0-4
+* Mon Jun 07 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.2.0-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Set LIBDIR during installation
 

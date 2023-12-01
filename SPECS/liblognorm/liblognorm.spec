@@ -94,7 +94,7 @@ rm %{buildroot}%{htmldir}/{objects.inv,.buildinfo}
 * Mon Jan 10 2022 Henry Li <lihl@microsoft.com> - 2.0.6-1
 - Upgrade to version 2.0.6
 
-* Tue Jul 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.0.3-11
+* Tue Jul 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.0.3-11
 - License verified
 - Spec linted
 

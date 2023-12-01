@@ -150,11 +150,11 @@ ctest -VV
 - Emit dnf-automatic messages through motd
 - Start dnf-automatic-notifyonly timer
 
-* Tue Sep 14 2021 Thomas Crain <thcrain@microsoft.com> - 4.8.0-1
+* Tue Sep 14 2021 Olivia Crain <oliviacrain@microsoft.com> - 4.8.0-1
 - Upgrade to latest upstream version
 - Lint spec
 
-* Wed Mar 10 2021 Thomas Crain <thcrain@microsoft.com> - 4.2.18-4
+* Wed Mar 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 4.2.18-4
 - Use modern bash-completion directory, now that dnf can auto-detect it based on bash-completion.pc
 
 * Tue Nov 03 2020 Ruying Chen <v-ruyche@microsoft.com> - 4.2.18-3

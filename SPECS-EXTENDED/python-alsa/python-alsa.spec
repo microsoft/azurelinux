@@ -43,7 +43,7 @@ mv %{SOURCE1} ./LICENSE.txt
 %{python3_sitearch}/*
 
 %changelog
-* Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.6-12
+* Fri Dec 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.1.6-12
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.6-11

@@ -92,7 +92,7 @@ cp -pr target/javadoc/* %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
-* Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 20101219-4
+* Fri Dec 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 20101219-4
 - License verified
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20101219-3

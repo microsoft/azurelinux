@@ -74,7 +74,7 @@ popd
 * Fri Jul 26 2021 Henry Beberman <henry.beberman@microsoft.com> - 2.0.0-9
 - Patch CVE-2020-17541 (JOSLOBO: Dash rolled for merge)
 
-* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 2.0.0-8
+* Fri Jul 23 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.0.0-8
 - Add provides for turbojpeg, turbojpeg-devel packages, utils subpackage
 
 * Thu Dec 10 2020 Joe Schmitt <joschmit@microsoft.com> - 2.0.0-7

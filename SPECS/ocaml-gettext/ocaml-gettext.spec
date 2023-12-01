@@ -157,7 +157,7 @@ rm -rf %{buildroot}%{_prefix}/doc
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4.2-2
 - Cleaning-up spec. License verified.
 
-* Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 0.4.2-1
+* Tue Jan 18 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.4.2-1
 - Upgrade to latest upstream version
 - Remove RHEL distro check macros
 - Lint spec

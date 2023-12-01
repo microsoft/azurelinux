@@ -61,7 +61,7 @@ rm %{buildroot}/%{_docdir}/libdaemon/style.css
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 0.14-21
+* Wed Dec 08 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.14-21
 - License verified
 - Lint spec
 

@@ -70,10 +70,10 @@ tox -e py%{python3_version_nodots}
 - Bump version to 5.8.1
 - Use `tox` instead of `setup.py test` to enable ptest
 
-* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 5.1.2-4
+* Fri Dec 03 2021 Olivia Crain <oliviacrain@microsoft.com> - 5.1.2-4
 - Replace easy_install usage with pip in %%check sections
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 5.1.2-3
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 5.1.2-3
 - Remove python2 package
 - Lint spec
 

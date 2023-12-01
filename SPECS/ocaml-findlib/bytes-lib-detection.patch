@@ -1,5 +1,5 @@
 From 5f1b253a84215d7f83e43bb8a5e247cf44fff569 Mon Sep 17 00:00:00 2001
-From: Thomas Crain <thcrain@microsoft.com>
+From: Olivia Crain <oliviacrain@microsoft.com>
 Date: Tue, 18 Jan 2022 15:12:19 -0800
 Subject: [PATCH] Make bytes lib detection work for ocaml 4.13
 

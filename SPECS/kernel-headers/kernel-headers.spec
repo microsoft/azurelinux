@@ -358,7 +358,7 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 - Update source to 5.10.78.1
 - Add patch to fix SPDX-License-Identifier in headers
 
-* Mon Nov 15 2021 Thomas Crian <thcrain@microsoft.com> - 5.10.74.1-4
+* Mon Nov 15 2021 Olivia Crain <oliviacrain@microsoft.com> - 5.10.74.1-4
 - Bump release number to match kernel release
 - Lint spec and version the glibc-kernheaders provides
 
@@ -466,7 +466,7 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 * Thu Mar 04 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.10.13.1-3
 - Update to kernel release 5.10.13.1-3
 
-* Mon Feb 22 2021 Thomas Crain <thcrain@microsoft.com> - 5.10.13.1-2
+* Mon Feb 22 2021 Olivia Crain <oliviacrain@microsoft.com> - 5.10.13.1-2
 - Update to kernel release 5.10.13.1-2
 
 * Thu Feb 18 2021 Chris Co <chrco@microsoft.com> - 5.10.13.1-1

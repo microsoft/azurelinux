@@ -146,7 +146,7 @@ make check
 * Mon Feb 28 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.18-4
 - Removing dependcy on Bash.
 
-* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 1.18-3
+* Tue Feb 08 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.18-3
 - Remove manual pkgconfig(*) provides in toolchain specs
 
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.18-2
@@ -155,7 +155,7 @@ make check
 * Mon Aug 16 2021 Muhammad Falak <mwani@microsoft.com> - 1.18-1
 - Bump version to 1.18
 
-* Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 1.17-7
+* Fri Mar 26 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.17-7
 - Merge the following releases from 1.0 to dev branch
 - anphel@microsoft.com, 1.17-4: Fix check tests by adding iana-etc which supplies required /etc/services file
 

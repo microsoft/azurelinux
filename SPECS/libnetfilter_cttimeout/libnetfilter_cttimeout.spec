@@ -55,7 +55,7 @@ find %{buildroot} -type f -name '*.la' -exec rm -f {} ';'
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.0.0-6
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
-* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 1.0.0-5
+* Tue Feb 08 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.0.0-5
 - Remove unused `%%define sha1` lines
 - License verified
 

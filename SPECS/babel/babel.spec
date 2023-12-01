@@ -58,10 +58,10 @@ pip3 install pytest freezegun funcsigs pathlib2 pluggy utils
 * Tue Mar 08 2022 Andrew Phelps <anphel@microsoft.com> - 2.9.1-1
 - Upgrade to version 2.9.1
 
-* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 2.6.0-10
+* Fri Dec 03 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.6.0-10
 - Replace easy_install usage with pip in %%check sections
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.6.0-9
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.6.0-9
 - Remove python2 package, have main package contain python3 version
 - Add license to python3 package
 - Lint spec

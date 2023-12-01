@@ -83,7 +83,7 @@ gtk-update-icon-cache --force %{_datadir}/icons/Adwaita &>/dev/null || :
 %{_datadir}/pkgconfig/adwaita-icon-theme.pc
 
 %changelog
-* Wed May 26 2021 Thomas Crain <thcrain@microsoft.com> - 3.36.1-2
+* Wed May 26 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.36.1-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Turn on bootstrapping to avoid build cycle with gtk3
 - License verified

@@ -62,7 +62,7 @@ fi
 - Removing gtk-docs since they require a network connection.
 - License verified.
 
-* Tue Jun 08 2021 Thomas Crain <thcrain@microsoft.com> - 2.4-2
+* Tue Jun 08 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.4-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Add BR:systemd-devel for pkgconfig files
 

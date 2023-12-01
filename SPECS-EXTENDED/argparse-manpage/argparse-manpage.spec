@@ -71,7 +71,7 @@ pip3 install pytest==7.1.2 six==1.16.0
 - Drop BR on pytest, six & pip install deps to enable ptest
 - License verified
 
-* Tue Aug 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.5-2
+* Tue Aug 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.5-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - Remove python2 support, distro specific macros
 

@@ -112,7 +112,7 @@ exit 0
 - Fixing BR on "CUnit-devel".
 - Switching to source tarball for full SELinux project to include test dependencies.
 
-* Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 3.2-1
+* Fri Aug 13 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.2-1
 - Upgrade to latest upstream and update source URL format
 - Add -fno-semantic-interposition to CFLAGS as recommended by upstream
 - Remove cunit source, switch to check-time build requirement on cunit

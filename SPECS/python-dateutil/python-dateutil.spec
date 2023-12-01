@@ -43,7 +43,7 @@ The dateutil module provides powerful extensions to the datetime module availabl
 %{python3_sitelib}/*
 
 %changelog
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.7.3-5
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.7.3-5
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

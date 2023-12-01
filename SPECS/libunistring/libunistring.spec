@@ -57,7 +57,7 @@ make %{?_smp_mflags} check
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.9.10-6
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
-* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.9.10-5
+* Fri Sep 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.9.10-5
 - Remove libtool archive files from final packaging
 
 * Thu Jan 07 2021 Andrew Phelps <anphel@microsoft.com> 0.9.10-4

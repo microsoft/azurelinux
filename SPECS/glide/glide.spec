@@ -98,13 +98,13 @@ popd
 *   Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 0.13.3-10
 -   Bump release to force rebuild with golang 1.16.15
 
-*   Fri Feb 18 2022 Thomas Crain <thcrain@microsoft.com> - 0.13.3-9
+*   Fri Feb 18 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.13.3-9
 -   Bump release to force rebuild with golang 1.16.14
 
 *   Wed Jan 19 2022 Henry Li <lihl@microsoft.com> - 0.13.3-8
 -   Increment release for force republishing using golang 1.16.12
 
-*   Tue Nov 02 2021 Thomas Crain <thcrain@microsoft.com> - 0.13.3-7
+*   Tue Nov 02 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.13.3-7
 -   Increment release for force republishing using golang 1.16.9
 
 *   Fri Sep 17 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.13.3-6

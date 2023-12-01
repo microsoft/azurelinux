@@ -73,7 +73,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man1/nfs-*.1*
 
 %changelog
-* Wed Sep 22 2021 Thomas Crain <thcrain@microsoft.com> - 4.0.0-6
+* Wed Sep 22 2021 Olivia Crain <oliviacrain@microsoft.com> - 4.0.0-6
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - License verified
 

@@ -56,7 +56,7 @@ mv %{buildroot}%{_docdir}/iniparse-%{version} %{buildroot}%{_docdir}/%{name}-%{v
 - Removed unnecessary compatibility patch
 - Updated URL
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.4-10
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.4-10
 - Add license, docs to python3 package
 - Remove python2 package
 - Lint spec

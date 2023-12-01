@@ -88,7 +88,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Wed Oct 06 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.12.0-14
 - Bringing back the dependency on 'cairo'.
 
-* Thu Jun 17 2021 Thomas Crain <thcrain@microsoft.com> - 1.12.0-13
+* Thu Jun 17 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.12.0-13
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Use UI-cairo instead of cairo to avoid runtime conflicts
 

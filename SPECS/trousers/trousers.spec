@@ -95,7 +95,7 @@ fi
 %exclude %{_libdir}/libtddl.a
 
 %changelog
-* Tue Oct 27 2020 Thomas Crain <thcrain@microsoft.com> - 0.3.14-7
+* Tue Oct 27 2020 Olivia Crain <oliviacrain@microsoft.com> - 0.3.14-7
 - Added nopatch file for CVE-2020-24332.
 
 * Thu Aug 20 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.3.14-6

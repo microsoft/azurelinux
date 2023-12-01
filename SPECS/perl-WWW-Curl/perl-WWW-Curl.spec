@@ -96,7 +96,7 @@ make test
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.17-12
 - Adding 'BuildRequires: perl-generators'.
 
-* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 4.17-11
+* Fri Apr 02 2021 Olivia Crain <oliviacrain@microsoft.com> - 4.17-11
 - Merge the following releases from 1.0 to dev branch
 - pawelwi@microsoft.com, 4.17-10: Adapting Fedora 32 patch (license: MIT) for "curl" versions >= 7.69.0.
 - JOSLOBO 7/26/21: Bump dash version due to merge.

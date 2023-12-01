@@ -61,7 +61,7 @@ mv %{SOURCE1} ./LICENSE.txt
 %{python3_sitelib}/jabber*
 
 %changelog
-* Fri Dec 11 2021 Thomas Crain <thcrain@microsoft.com> - 0.5-2
+* Fri Dec 11 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.5-2
 - License verified
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.5-1

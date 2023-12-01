@@ -77,7 +77,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 - Upgrade to 0.8.2
 - License verified
 
-* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 0.7.9-4
+* Fri Jul 23 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.7.9-4
 - Add compatibility provides for utils subpackage
 - Remove python2 subpackage
 - Lint spec, modernize with macros

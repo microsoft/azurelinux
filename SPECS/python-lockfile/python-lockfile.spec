@@ -46,7 +46,7 @@ as a demonstration of the possibilities it provides than as production-quality c
 %{python3_sitelib}/lockfile
 
 %changelog
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.12.2-6
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.12.2-6
 - Add license to python3 package, fix summary
 - Remove python2 package
 - Lint spec

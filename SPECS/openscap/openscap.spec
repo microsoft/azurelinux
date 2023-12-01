@@ -130,7 +130,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 - Update to version 1.3.5
 - License verified
 
-* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 1.3.1-7
+* Fri Jul 23 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.3.1-7
 - Add provides for scanner subpackage from base package
 - Remove openscap-python python2 subpackage
 - Add python3-openscap subpackage

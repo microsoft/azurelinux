@@ -58,7 +58,7 @@ make test
 - Adding 'BuildRequires: perl-generators'.
 - License verified.
 
-* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 1.39-8
+* Fri Apr 02 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.39-8
 - Merge the following releases from 1.0 to dev branch
 - pawelwi@microsoft.com, 1.39-7: Adding 'local::lib' perl5 library to fix test dependencies.
 

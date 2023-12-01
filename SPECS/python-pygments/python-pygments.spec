@@ -60,7 +60,7 @@ it is usable as a command-line tool and as a library.
 * Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.5.2-1
 - Auto-upgrade to 2.5.2 - Azure Linux 3.0 - package upgrades
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.4.2-7
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.4.2-7
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

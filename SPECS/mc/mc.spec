@@ -48,7 +48,7 @@ MC (Midnight Commander) is a text-mode full-screen file manager and visual shell
 * Tue Jul 12 2022 Olivia Crain <oliviacrain@microsoft.com> - 4.8.27-2
 - Fix unversioned python shebangs in extfs helpers
 
-* Mon Nov 01 2021 Thomas Crain <thcrain@microsoft.com> - 4.8.27-1
+* Mon Nov 01 2021 Olivia Crain <oliviacrain@microsoft.com> - 4.8.27-1
 - Upgrade to latest version to fix CVE-2021-36370
 - License verified
 

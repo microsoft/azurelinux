@@ -85,11 +85,11 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Tue Sep 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.57-5
 - Removing dependency on "cyrus-sasl".
 
-* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 2.4.57-4
+* Fri Jul 23 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.4.57-4
 - Add clients, compat subpackage provides from base package
 - Minor macro linting
 
-* Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 2.4.57-3
+* Fri Mar 26 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.4.57-3
 - Merge the following releases from dev to 1.0 spec
 - v-ruyche@microsoft.com, 2.4.50-2: Explicit provide -devel subpackage
 

@@ -80,13 +80,13 @@ make check
 %{_libdir}/*.so
 
 %changelog
-* Mon May 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.50-3
+* Mon May 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.50-3
 - Rename "Mr serious" voice to "Mr_serious"
 
-* Fri Mar 05 2021 Thomas Crain <thcrain@microsoft.com> - 1.50-2
+* Fri Mar 05 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.50-2
 - Add tests-fix-greek-letter-variants.patch to address failing test
 - Adjust tests-newline-fixes.patch to account for new patch
 
-* Fri Feb 05 2021 Thomas Crain <thcrain@microsoft.com> - 1.50-1
+* Fri Feb 05 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.50-1
 - Original version for CBL-Mariner (license: MIT)
 - License verified

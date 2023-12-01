@@ -83,7 +83,7 @@ popd
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
-* Tue Sep 14 2021 Thomas Crain <thcrain@microsoft.com> - 0.17.5-1
+* Tue Sep 14 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.17.5-1
 - Upgrade to latest upstream version
 - Lint spec
 - Ensure libraries are placed in %%{_libdir} instead of %%{_lib64dir}

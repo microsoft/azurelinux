@@ -92,7 +92,7 @@ make  %{?_smp_mflags} check
 - Upgrading to v1.18.6
 - License verified.
 
-* Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 1.10.4-4
+* Fri Mar 26 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.10.4-4
 - Merge the following releases from 1.0 to dev branch
 - anphel@microsoft.com, 1.10.4-3: Add dbus BuildRequires to fix check tests.
 

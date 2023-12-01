@@ -452,7 +452,7 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
   - 'grub2-tools-extra',
   - 'grub2-tools-minimal'.
 
-* Tue May 25 2021 Thomas Crain <thcrain@microsoft.com> - 2.06~rc1-5
+* Tue May 25 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.06~rc1-5
 - Explicitly specify python 3 as the python interpreter for bootstrapping
 
 * Fri Apr 16 2021 Chris Co <chrco@microsoft.com> - 2.06~rc1-4

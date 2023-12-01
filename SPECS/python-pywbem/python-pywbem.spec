@@ -85,7 +85,7 @@ rm -rf %{buildroot}%{_bindir}/*.bat
 * Tue Jan 05 2021 Ruying Chen <v-ruyche@microsoft.com> - 1.0.1-3
 - Disable auto dependency generator.
 
-* Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 1.0.1-2
+* Fri Aug 21 2020 Olivia Crain <oliviacrain@microsoft.com> - 1.0.1-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 
 * Mon Aug 10 2020 Gris Ge <fge@redhat.com> - 1.0.1-1

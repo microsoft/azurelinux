@@ -70,7 +70,7 @@ exit 0
 %{_datadir}/man/man8/usbmuxd.8.gz
 
 %changelog
-* Mon Jun 14 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.0-20
+* Mon Jun 14 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.1.0-20
 - Add build-time dependency on systemd-devel for systemd pkgconfig files
 
 * Fri Apr 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.0-19

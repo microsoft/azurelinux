@@ -452,7 +452,7 @@ cp -pav test/system %{buildroot}/%{_datadir}/%{name}/test/
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 2.2.1-4
 - Remove epoch
 
-* Tue Jun 01 2021 Thomas Crain <thcrain@microsoft.com> - 2:2.2.1-3
+* Tue Jun 01 2021 Olivia Crain <oliviacrain@microsoft.com> - 2:2.2.1-3
 - Rename runc dependency to moby-runc
 
 * Fri Apr 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2:2.2.1-2

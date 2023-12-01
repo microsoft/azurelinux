@@ -63,7 +63,7 @@ make check
 * Wed Oct 13 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.49-4
 - Changing BR to be more accurate: "nginx" -> "nginx-filesystem".
 
-* Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 2.1.49-3
+* Fri Aug 21 2020 Olivia Crain <oliviacrain@microsoft.com> - 2.1.49-3
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 - License verified
 

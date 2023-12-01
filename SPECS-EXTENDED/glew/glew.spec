@@ -74,7 +74,7 @@ chmod 0755 $RPM_BUILD_ROOT%{_libdir}/*.so*
 %doc doc/*
 
 %changelog
-* Thu Jun 17 2021 Thomas Crain <thcrain@microsoft.com> - 2.1.0-7
+* Thu Jun 17 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.1.0-7
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove redhat-specific config.guess seeding
 

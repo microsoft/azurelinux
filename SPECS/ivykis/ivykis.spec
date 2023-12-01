@@ -44,7 +44,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.42.4-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
-* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.42.4-3
+* Fri Sep 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.42.4-3
 - Remove libtool archive files from final packaging
 
 *   Mon Oct 19 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 0.42.4-2

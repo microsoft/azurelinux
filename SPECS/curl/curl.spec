@@ -148,7 +148,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Wed May 26 2021 Jon Slobodzian <joslobo@microsoft.com> - 7.76.0-2 (from 1.0 branch)
 - Patch 7.76.0 to fix CVE-2021-22898 and CVE-2021-22901.
 
-* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 7.76.0-2 (from dev branch)
+* Fri Apr 02 2021 Olivia Crain <oliviacrain@microsoft.com> - 7.76.0-2 (from dev branch)
 - Merge the following releases from dev to 1.0 spec
 - v-ruyche@microsoft.com, 7.68.0-2: Add explicit provides for libcurl and libcurl-devel
 

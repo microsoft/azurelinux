@@ -168,7 +168,7 @@ install -m0644 -D %{SOURCE2} $RPM_BUILD_ROOT%{_rpmconfigdir}/fileattrs/gstreamer
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.16.2-4
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
-* Mon Jun 14 2021 Thomas Crain <thcrain@microsoft.com> - 1.16.2-3
+* Mon Jun 14 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.16.2-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Conditionally build tex-based documentation, and turn off documentation building by default
 

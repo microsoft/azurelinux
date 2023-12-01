@@ -33,7 +33,7 @@ make DESTDIR=%{buildroot} binprefix=%{_prefix} install
 * Thu Feb 17 2022 Cameron Baird <cameronbaird@microsoft.com> - 9.63-1
 - Update source to v9.63
 
-* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 9.56-5
+* Tue Feb 08 2022 Olivia Crain <oliviacrain@microsoft.com> - 9.56-5
 - Remove unused `%%define sha1` lines
 - License verified
 

@@ -47,7 +47,7 @@ The original bubblewrap code existed before user namespaces - it inherits code f
 - Upgrade to version 0.6.1
 - Disable documentation explicitly
 
-* Mon Jul 19 2021 Thomas Crain <thcrain@microsoft.com> - 0.4.1-1
+* Mon Jul 19 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.4.1-1
 - Update to latest upstream version
 - Lint spec, modernize with macros
 - Remove CVE-2019-12439, CVE-2020-5291 patches. Both are patched in this version.

@@ -62,7 +62,7 @@ make %{?_smp_mflags} check
 * Wed Oct 28 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 1.0.6-4
 - Address source RPM publishing issue on packages.microsoft.com
 
-* Mon Oct 12 2020 Thomas Crain <thcrain@microsoft.com> - 1.0.6-3
+* Mon Oct 12 2020 Olivia Crain <oliviacrain@microsoft.com> - 1.0.6-3
 - Remove .la files
 - Lint to Mariner style
 - License verified, %%license added

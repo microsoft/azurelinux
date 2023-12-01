@@ -90,7 +90,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Fri Apr 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 20140608-22
 - Cleaning-up spec. License verified.
 
-* Mon Aug 09 2021 Thomas Crain <thcrain@microsoft.com> - 20140608-21
+* Mon Aug 09 2021 Olivia Crain <oliviacrain@microsoft.com> - 20140608-21
 - Initial CBL-Mariner import from Fedora 35 (license: MIT).
 - Remove Python 2 support
 

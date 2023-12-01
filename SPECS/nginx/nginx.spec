@@ -196,7 +196,7 @@ exit 0
 * Fri Jun 11 2021 Henry Beberman <henry.beberman@microsoft.com> - 1.20.1-1
 - Update to version 1.20.1 to resolve CVE-2021-23017
 
-* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 1.16.1-4
+* Fri Apr 02 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.16.1-4
 - Merge the following releases from 1.0 to dev branch
 - lihl@microsoft.com, 1.16.1-3: Used autosetup, Added patch to resolve CVE-2019-20372
 - nicolasg@microsoft.com, 1.16.1-4: nopatch for CVE-2009-4487

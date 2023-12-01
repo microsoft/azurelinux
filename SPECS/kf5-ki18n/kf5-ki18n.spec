@@ -93,7 +93,7 @@ make install/fast DESTDIR=%{buildroot} -C %{_target_platform}
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.61.0-5
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
-* Thu Feb 17 2022 Thomas Crain <thcrain@microsoft.com> - 5.61.0-4
+* Thu Feb 17 2022 Olivia Crain <oliviacrain@microsoft.com> - 5.61.0-4
 - Remove python2, replace with python3
 
 * Thu Apr 23 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.61.0-3

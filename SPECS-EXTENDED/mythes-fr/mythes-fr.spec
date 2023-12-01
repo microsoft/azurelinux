@@ -43,7 +43,7 @@ cp -p thes_fr.idx $RPM_BUILD_ROOT/%{_datadir}/mythes/th_fr_FR_v2.idx
 %{_datadir}/mythes/*
 
 %changelog
-* Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 2.3-17
+* Fri Dec 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.3-17
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3-16

@@ -192,7 +192,7 @@ mkdir -p -m 0600 %{buildroot}%{_sysconfdir}/liboath
 * Fri Feb 18 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.6.7-1
 - Upgrading to v2.6.7
 
-* Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 2.6.2-7
+* Fri Aug 21 2020 Olivia Crain <oliviacrain@microsoft.com> - 2.6.2-7
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 - License verified
 

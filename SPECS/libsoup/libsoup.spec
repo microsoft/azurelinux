@@ -130,7 +130,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Wed Jan 19 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.64.0-8
 - Add perl find bin and file find to build requires.
 
-* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 2.64.0-7
+* Fri Sep 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.64.0-7
 - Remove libtool archive files from final packaging
 
 * Tue Jan 05 2021 Ruying Chen <v-ruyche@microsoft.com> - 2.64.0-6

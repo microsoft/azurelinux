@@ -89,7 +89,7 @@ make check
 * Tue Jan 25 2022 Henry Li <lihl@microsoft.com> - 2.3.3-1
 - Upgrade to version 2.3.3
 
-* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 2.3.1-2
+* Fri Dec 03 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.3.1-2
 - Use %%{python3_sitelib} macro to enable building with Python 3.9
 
 * Mon Jan 11 2021 Joe Schmitt <joschmit@microsoft.com> - 2.3.1-1

@@ -165,11 +165,11 @@ install -vdm 755 %{buildroot}%{_sysconfdir}/ostree/remotes.d
 - Upgrade to version 2022.1
 - Fix Source0 field to use macro to represent package version
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2021.4-2
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 2021.4-2
 - Remove unused gobject-introspection-python requirement
 - Explicity specify python3-gobject-introspection requirement
 
-* Thu Sep 30 2021 Thomas Crain <thcrain@microsoft.com> - 2021.4-1
+* Thu Sep 30 2021 Olivia Crain <oliviacrain@microsoft.com> - 2021.4-1
 - Upgrade to latest upstream and rebase patches
 
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 2019.2-11

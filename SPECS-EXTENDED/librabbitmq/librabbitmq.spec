@@ -116,7 +116,7 @@ make test
 
 
 %changelog
-* Mon Jan 24 2022 Thomas Crain <thcrain@microsoft.com> - 0.10.0-4
+* Mon Jan 24 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.10.0-4
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.10.0-3

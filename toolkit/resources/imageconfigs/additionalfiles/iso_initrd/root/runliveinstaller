@@ -119,7 +119,7 @@ fi
 
 if [[ ! -f "$UNATTENDED_CONFIG_FILE" ]]; then
     # Restrict speakup use to attended installs
-    # FIXME(thcrain-msft)
+    # FIXME(oliviacrain)
     # This is a loop of silence to keep the default audio device alive
     # This is a temporary workaround that is needed for VirtualBox,
     # which is currently the most convenient platform to test on which

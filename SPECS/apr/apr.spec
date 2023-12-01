@@ -78,7 +78,7 @@ make -j1 check
 - Removed `%%sha1` macro.
 - License verified.
 
-* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.6.5-5
+* Fri Sep 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.6.5-5
 - Remove libtool archive files from final packaging
 
 * Mon Dec 07 2020 Andrew Phelps <anphel@microsoft.com> - 1.6.5-4

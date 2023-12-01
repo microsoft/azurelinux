@@ -129,14 +129,14 @@ popd
 - Upgrade to version 5.9.1
 - Removing the lines that enables snmpd and snmptrapd services by default
 
-* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 5.9-6
+* Fri Sep 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 5.9-6
 - Remove libtool archive files from final packaging
 
-* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 5.9-5
+* Fri Jul 23 2021 Olivia Crain <oliviacrain@microsoft.com> - 5.9-5
 - Add provides for libs, agent-libs subpackages from base package
 - Minor linting (https source, updated URL, make macros)
 
-* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 5.9-4
+* Fri Apr 02 2021 Olivia Crain <oliviacrain@microsoft.com> - 5.9-4
 - Fix man pages being doubly-listed in devel subpackage
 - Merge the following releases from dev to 1.0 spec
 - joschmit@microsoft.com, 5.8-5: Use new perl package names.

@@ -43,7 +43,7 @@ Python 3 version.
 * Wed Feb 09 2022 Jon Slobodzian <joslobo@microsoft.com> - 0.4.0-1
 - Upgrade to 0.4.0 for Mariner 2.0
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.3.3-6
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.3.3-6
 - Remove python2 package
 - Lint spec
 

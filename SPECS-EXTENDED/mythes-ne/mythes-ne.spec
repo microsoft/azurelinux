@@ -33,7 +33,7 @@ cp -p th_ne_NP_v2.* $RPM_BUILD_ROOT/%{_datadir}/mythes/
 %{_datadir}/mythes/*
 
 %changelog
-* Fri Dec 1 2021 Thomas Crain <thcrain@microsoft.com> - 1.1-20
+* Fri Dec 1 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.1-20
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1-19

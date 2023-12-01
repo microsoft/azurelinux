@@ -55,6 +55,6 @@ install -m755 %{SOURCE2} %{buildroot}%{_libdir}/systemd/system/%{name}.service
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.80-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
-* Thu Jan 07 2021 Thomas Crain <thcrain@microsoft.com> - 0.80-1
+* Thu Jan 07 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.80-1
 - Original version for CBL-Mariner (license: MIT)
 - License verified

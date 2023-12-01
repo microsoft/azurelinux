@@ -78,7 +78,7 @@ rm -rf %{buildroot}%{_libdir}/cmake
 * Mon Jan 03 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.76.0-1
 - Update version to 1.76.0
 
-* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 1.66.0-4
+* Fri Jul 23 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.66.0-4
 - Add signals subpackage provide from the devel subpackage
 - License verified, changed to use short name
 - Lint spec

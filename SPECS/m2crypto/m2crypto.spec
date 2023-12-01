@@ -67,7 +67,7 @@ pip3 install parameterized
 - Update to version v0.38.0
 - Added parameterized as BR and pip install in check section.
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.35.2-9
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.35.2-9
 - Add license to python3 package
 - Remove python3-typing requirement
 - Remove python2 package

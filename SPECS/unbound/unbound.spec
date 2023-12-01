@@ -108,7 +108,7 @@ useradd -r -g unbound -d %{_sysconfdir}/unbound -s /sbin/nologin \
 * Fri Jan 14 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.13.2-1
 - Update to version 1.13.2.
 
-* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 1.10.0-5
+* Fri Jul 23 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.10.0-5
 - Add provides for libs subpackage from base package
 - Add python3 modules subpackage
 

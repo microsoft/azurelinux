@@ -151,7 +151,7 @@ fi
 * Mon Nov 23 2020 Henry Beberman <henry.beberman@microsoft.com> - 1.15.5-1
 - Updated to version 1.15.5
 
-* Fri Oct 30 2020 Thomas Crain <thcrain@microsoft.com> - 1.13.15-2
+* Fri Oct 30 2020 Olivia Crain <oliviacrain@microsoft.com> - 1.13.15-2
 - Patch CVE-2020-24553
 
 * Tue Sep 08 2020 Nicolas Ontiveros <niontive@microsoft.com> - 1.13.15-1

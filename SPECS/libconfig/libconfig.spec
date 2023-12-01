@@ -59,7 +59,7 @@ cd ..
 * Tue Jul 06 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.7.3-2
 - Removing minor version number from the %%files section.
 
-* Tue Jun 29 2021 Thomas Crain <thcrain@microsoft.com> - 1.7.3-1
+* Tue Jun 29 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.7.3-1
 - Upgrade to latest release and update license location
 - Use release version of the source tarball
 - Add a devel subpackage

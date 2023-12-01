@@ -116,7 +116,7 @@ find %{buildroot}%{_libdir}/ocaml -name \*.cmxs -exec chmod a+x {} \+
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.15.0-2
 - Cleaning-up spec. License verified.
 
-* Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 0.15.0-1
+* Tue Jan 18 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.15.0-1
 - Upgrade to latest upstream version
 - Add patch for OCaml 4.13.0 compatibility
 - License verified

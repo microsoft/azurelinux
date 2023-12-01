@@ -73,7 +73,7 @@ nosetests
 * Mon Feb 07 2022 Muhammad Falak <mwani@microsoft.com> 0.11.1-5
 - Test with `nosetests` instead of `nosetests-3.9`
 
-* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 0.11.1-4
+* Fri Dec 03 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.11.1-4
 - Replace easy_install usage with pip in %%check sections
 
 * Wed Jun 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 0.11.1-3

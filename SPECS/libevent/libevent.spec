@@ -61,7 +61,7 @@ make %{?_smp_mflags} -k check
 * Fri Mar 11 2022 Jon Slobodzian <joslobo@microsoft.com> - 2.1.12-1
 - Upgrade to 2.1.12
 
-* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 2.1.8-4
+* Tue Feb 08 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.1.8-4
 - Remove unused `%%define sha1` lines
 - License verified
 

@@ -58,7 +58,7 @@ ctest -V %{?_smp_mflags}
 * Tue Jan 11 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 2.13.8-1
 - Upgrade to 2.13.8
 
-* Thu Nov 11 2021 Thomas Crain <thcrain@microsoft.com> - 2.13.7-1
+* Thu Nov 11 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.13.7-1
 - Upgrade to latest upstream version for glibc > 2.33 compatibility
 
 * Wed Mar 18 2020 Emre Girgin <mrgirgin@microsoft.com> - 2.10.2-1

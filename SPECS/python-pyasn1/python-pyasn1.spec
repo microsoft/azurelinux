@@ -41,12 +41,12 @@ to be suitable for a wide range of protocols based on ASN.1 specification.
 %{python3_sitelib}/*
 
 %changelog
-* Mon Jan 03 2022 Thomas Crain <thcrain@microsoft.com> - 0.4.8-1
+* Mon Jan 03 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.4.8-1
 - Upgrade to latest upstream version
 - Use nicer Source0
 - License verified
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.4.4-4
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.4.4-4
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

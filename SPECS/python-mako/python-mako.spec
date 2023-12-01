@@ -74,7 +74,7 @@ tox -e py%{python3_version_nodots}
 - Drop BR on `python3-pytest`
 - Use `tox` instead of `pytest` to enable ptest
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.0.7-5
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.0.7-5
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

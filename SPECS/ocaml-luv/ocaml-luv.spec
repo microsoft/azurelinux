@@ -138,7 +138,7 @@ dune runtest
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.5.10-3
 - Cleaning-up spec. License verified.
 
-* Mon Aug 09 2021 Thomas Crain <thcrain@microsoft.com> - 0.5.10-2
+* Mon Aug 09 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.5.10-2
 - Initial CBL-Mariner import from Fedora 35 (license: MIT).
 - Remove docs circular dependency by building docs conditionally
 

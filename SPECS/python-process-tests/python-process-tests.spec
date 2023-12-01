@@ -38,7 +38,7 @@ Tools for testing processes for Python 3.
 %{python3_sitelib}/process_tests*
 
 %changelog
-* Mon Feb 07 2022 Thomas Crain <thcrain@microsoft.com> - 2.1.2-1
+* Mon Feb 07 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.1.2-1
 - Upgrade to latest upstream version
 - Remove %%python3_pkgversion boilerplating
 - Use upstream github source

@@ -54,7 +54,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_datadir}/aclocal/%{name}.m4
 
 %changelog
-* Mon Nov 22 2021 Thomas Crain <thcrain@microsoft.com> - 1.6-4
+* Mon Nov 22 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.6-4
 - Use official URL/Source0 from gnupg.org
 - Lint spec
 - License verified

@@ -50,7 +50,7 @@ This acts as a suitable replacement for the “encodings.idna” module that com
 - Updated Source0 and license file.
 - Updated to 3.3.
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.7-5
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.7-5
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

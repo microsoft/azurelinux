@@ -96,7 +96,7 @@ python3 setup.py install -O1 --skip-build --root %{buildroot}
 * Tue Mar 15 2022 Bala <balakumaran.kannan@microsoft.com> - 5.40-2
 - Add patch to fix xz mime type reporting
 
-* Tue Sep 14 2021 Thomas Crain <thcrain@microsoft.com> - 5.40-1
+* Tue Sep 14 2021 Olivia Crain <oliviacrain@microsoft.com> - 5.40-1
 - Update to latest upstream version
 - Move license to libs subpackage
 - Change source URL to http version

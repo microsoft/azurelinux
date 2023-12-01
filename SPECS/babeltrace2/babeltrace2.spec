@@ -90,7 +90,7 @@ rm -fv %{buildroot}%{_docdir}/babeltrace2/*
 * Mon Jan 10 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 2.0.4-1
 - Upgrate to 2.0.4
 
-* Wed Oct 14 2020 Thomas Crain <thcrain@microsoft.com> - 2.0.1-3
+* Wed Oct 14 2020 Olivia Crain <oliviacrain@microsoft.com> - 2.0.1-3
 - Update Source0
 - License verified
 

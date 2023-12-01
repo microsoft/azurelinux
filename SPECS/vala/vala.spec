@@ -164,7 +164,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 - Remove duplicate %license COPYING from main package  
 - License Verified
 
-* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.34.6-4
+* Fri Sep 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.34.6-4
 - Remove libtool archive files from final packaging
 
 * Tue Mar 16 2021 Henry Li <lihl@microsoft.com> - 0.34.6-3

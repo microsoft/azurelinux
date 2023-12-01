@@ -61,7 +61,7 @@ make %{?_smp_mflags} check
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 8.0.0-4
+* Fri Sep 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 8.0.0-4
 - Remove libtool archive files from final packaging
 
 *   Wed May 27 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 8.0.0-3

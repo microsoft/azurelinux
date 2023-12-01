@@ -62,10 +62,10 @@ chmod a-x examples/yaml-highlight/yaml_hl.py
 * Fri Oct 27 2023 Xiaohong Deng <xiaohongdeng@microsoft.com> - 5.2-1
 - Upgrade to 5.2
 
-* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 3.13-8
+* Fri Dec 03 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.13-8
 - Rebuild C source files using Cython for Python 3.9 compatibility
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 3.13-7
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.13-7
 - Remove python2 package, have main package contain python3 version
 - Add license to python3 package
 - Lint spec

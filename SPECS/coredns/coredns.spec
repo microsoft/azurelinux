@@ -114,7 +114,7 @@ install -p -m 755 -t %{buildroot}%{_bindir} %{name}
 * Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 1.8.4-4
 - Bump release to force rebuild with golang 1.16.15
 
-* Fri Feb 18 2022 Thomas Crain <thcrain@microsoft.com> - 1.8.4-3
+* Fri Feb 18 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.8.4-3
 - Bump release to force rebuild with golang 1.16.14
 
 * Wed Jan 19 2022 Henry Li <lihl@microsoft.com> - 1.8.4-2
@@ -123,7 +123,7 @@ install -p -m 755 -t %{buildroot}%{_bindir} %{name}
 * Tue Dec 28 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 1.8.4-1
 - Update to version  "1.8.4".
 
-* Tue Nov 02 2021 Thomas Crain <thcrain@microsoft.com> - 1.8.0-2
+* Tue Nov 02 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.8.0-2
 - Increment release for force republishing using golang 1.16.9
 
 * Fri Aug 20 2021 CBL-Mariner Service Account <cblmargh@microsoft.com> - 1.8.0-1

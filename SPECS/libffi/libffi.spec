@@ -81,7 +81,7 @@ rm -rf %{buildroot}/%{_infodir}
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.4.2-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
-* Tue Jan 25 2022 Thomas Crain <thcrain@microsoft.com> - 3.4.2-2
+* Tue Jan 25 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.4.2-2
 - Remove incorrect pkgconfig provides in main package
 
 * Tue Dec 07 2021 Chris Co <chrco@microsoft.com> - 3.4.2-1

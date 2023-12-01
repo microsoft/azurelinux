@@ -34,6 +34,6 @@ rm -rf %{buildroot}%{_datadir}/doc/%{name}
 %{_datadir}/cmake/Templates/*
 
 %changelog
-* Thu Jun 17 2021 Thomas Crain <thcrain@microsoft.com> - 2.9.3-1
+* Thu Jun 17 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.9.3-1
 - Original version for CBL-Mariner (license: MIT)
 - License verified

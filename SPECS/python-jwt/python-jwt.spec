@@ -84,7 +84,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 - Updated build and install sequence to use CBL-Mariner macros.
 - Removed removal of setup.cfg as it no longer installs additional dependencies.
 
-* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 1.7.1-10
+* Fri Dec 03 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.7.1-10
 - Remove hardcoded %%python3_version macro to enable use of Python 3.9
 
 * Wed Jun 23 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 1.7.1-9

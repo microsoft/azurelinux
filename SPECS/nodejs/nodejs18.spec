@@ -169,7 +169,7 @@ make cctest
 * Thu Feb 24 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 16.14.0-1
 - Upgrade to 16.14.0.
 
-* Thu Nov 18 2021 Thomas Crain <thcrain@microsoft.com> - 14.18.1-1
+* Thu Nov 18 2021 Olivia Crain <oliviacrain@microsoft.com> - 14.18.1-1
 - Update to version 14.18.1 to fix CVE-2021-22959, CVE-2021-22960, CVE-2021-37701,
     CVE-2021-37712, CVE-2021-37713, CVE-2021-39134, CVE-2021-39135
 - Add patch to remove problematic cipher from default list

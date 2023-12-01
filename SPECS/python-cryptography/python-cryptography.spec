@@ -75,7 +75,7 @@ pip3 install pretend pytest hypothesis iso8601 cryptography_vectors pytz
 - Add and explict BR on 'pip'
 - Install ptest dependecies
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 3.3.2-2
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.3.2-2
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

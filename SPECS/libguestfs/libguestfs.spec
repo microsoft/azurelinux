@@ -1281,12 +1281,12 @@ rm ocaml/html/.gitignore
 - Making BR on "po4a" conditional.
 - Spec clean-up.
 
-* Sat Feb 05 2022 Thomas Crain <thcrain@microsoft.com> - 1.44.0-5
+* Sat Feb 05 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.44.0-5
 - Add patch to fix UUID parsing with file >= 5.40
 - Downgrade selinux-policy requirement to a recommendation without a version constraint
 - Bump release number to 5
 
-* Thu Jan 20 2022 Thomas Crain <thcrain@microsoft.com> - 1.44.0-3
+* Thu Jan 20 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.44.0-3
 - Remove Fedora-specific comments/macros
 - Use TDNF to get build-cached RPMs
 - Remove link to highjacked upstream bug tracker
@@ -1297,7 +1297,7 @@ rm ocaml/html/.gitignore
 - Replace perl(Locale::TextDomain) BR with actual provider perl-libintl-perl
 - License verified
 
-* Thu Sep 30 2021 Thomas Crain <thcrain@microsoft.com> - 1.44.0-2
+* Thu Sep 30 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.44.0-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - Remove epoch
 - Temporarily disable appliance building

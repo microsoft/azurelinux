@@ -188,7 +188,7 @@ install -p %{SOURCE11} %{buildroot}%{_sysconfdir}/sysconfig/network-scripts/ifdo
 %doc PLUGINS
 
 %changelog
-* Thu Mar 25 2021 Thomas Crain <thcrain@microsoft.com> - 2.4.7-36
+* Thu Mar 25 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.4.7-36
 - Remove epoch from minimum supported libpcap version
 
 * Tue Mar 23 2021 Henry Li <lihl@microsoft.com> - 2.4.7-36

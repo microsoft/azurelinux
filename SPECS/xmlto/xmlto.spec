@@ -49,7 +49,7 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 * Wed Mar 16 2022 Andrew Phelps <anphel@microsoft.com> - 0.0.28-7
 - Remove unneeded systemd requires
 
-* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 0.0.28-6
+* Tue Feb 08 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.0.28-6
 - Remove unused `%%define sha1` lines
 - License verified
 

@@ -58,7 +58,7 @@ cp -p %{SOURCE10} %{buildroot}%{_mandir}/man1/
 * Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 3.0.9-61
 - Update Source0
 
-* Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 3.0.9-60
+* Fri Dec 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.0.9-60
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.9-59

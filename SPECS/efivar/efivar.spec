@@ -59,7 +59,7 @@ It contains the libraries and header files to create applications
 - Modify CFLAGS to build with gcc11
 - License verified
 
-* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 37-4
+* Fri Jul 23 2021 Olivia Crain <oliviacrain@microsoft.com> - 37-4
 - Lint spec, using make macros throughout
 - Package libraries in %%{_libdir}, not %%{_lib64dir}
 

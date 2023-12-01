@@ -75,10 +75,10 @@ LANG=en_US.UTF-8  make test PYTHON=python%{python3_version} NOSETESTS="nosetests
 %doc RELEASE-NOTES.rst ChangeLog README.rst examples doc tests
 
 %changelog
-* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 7.43.0.2-10
+* Fri Dec 03 2021 Olivia Crain <oliviacrain@microsoft.com> - 7.43.0.2-10
 - Replace easy_install usage with pip in %%check sections
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 7.43.0.2-9
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 7.43.0.2-9
 - Add licenses to python3 package, remove from docs package
 - Remove python2 package
 - Lint spec
@@ -87,7 +87,7 @@ LANG=en_US.UTF-8  make test PYTHON=python%{python3_version} NOSETESTS="nosetests
 - Add patch to fix libcurl package test issue 
 - (JOSLOBO: 7/26/21 Bumped dash verison due to merge conflict)
 
-* Mon May 17 2021 Thomas Crain <thcrain@microsoft.com> - 7.43.0.2-7
+* Mon May 17 2021 Olivia Crain <oliviacrain@microsoft.com> - 7.43.0.2-7
 - Update source URL
 
 * Wed Mar 03 2021 Andrew Phelps <anphel@microsoft.com> 7.43.0.2-6

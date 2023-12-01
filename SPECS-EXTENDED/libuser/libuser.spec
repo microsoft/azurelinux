@@ -156,7 +156,7 @@ export PYTHONPATH
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 0.63-9
 - Remove epoch
 
-* Thu Aug 26 2021 Thomas Crain <thcrain@microsoft.com> - 0.63-8
+* Thu Aug 26 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.63-8
 - Initial CBL-Mariner import from Fedora 35 (license: MIT).
 - Conditionally build tex-based documentation, and turn off documentation building by default
 - Conditionally depend on check requirements at build-time

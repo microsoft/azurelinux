@@ -109,13 +109,13 @@ sudo -u test make check && userdel test -r -f
 * Mon Apr 25 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.14.1-3
 - Fix duplicate packaging of libsvn_swig_perl so
 
-* Mon Jan 31 2022 Thomas Crain <thcrain@microsoft.com> - 1.14.1-2
+* Mon Jan 31 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.14.1-2
 - Use python3 during %%check section instead of python2
 
 * Fri Jan 14 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.14.1-1
 - Update to version 1.14.1.
 
-* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 1.14.0-4
+* Fri Apr 02 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.14.0-4
 - Merge the following releases from 1.0 to dev branch
 - pawelwi@microsoft.com, 1.14.0-3: Adding 'BuildRequires' on 'python', 'shadow-utils' and 'sudo' to fix the package tests.
 - henry.beberman@microsoft.com, 1.14.0-4: Patch CVE-2020-17525.

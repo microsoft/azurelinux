@@ -116,7 +116,7 @@ install -m 644 -p ecj.1 %{buildroot}%{_mandir}/man1/ecj.1
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1:4.12-3
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 
-* Thu Mar 25 2021 Thomas Crain <thcrain@microsoft.com> - 1:4.12-2.5
+* Thu Mar 25 2021 Olivia Crain <oliviacrain@microsoft.com> - 1:4.12-2.5
 - Set epoch to 1 to match Fedora's ecj epoch
 
 * Thu Nov 12 2020 Joe Schmitt <joschmit@microsoft.com> - 4.12-1.5

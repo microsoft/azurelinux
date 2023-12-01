@@ -78,10 +78,10 @@ make %{?_smp_mflags} check
 * Wed Jan 12 2022 Henry Li <lihl@microsoft.com> - 3.5.0-1
 - Upgrade to version 3.5.0
 
-* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 3.4.0-7
+* Fri Sep 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.4.0-7
 - Remove libtool archive files from final packaging
 
-* Fri Aug 28 2020 Thomas Crain <thcrain@microsoft.com> - 3.4.0-6
+* Fri Aug 28 2020 Olivia Crain <oliviacrain@microsoft.com> - 3.4.0-6
 - Add pkg-config provides to devel package
 - License verified
 

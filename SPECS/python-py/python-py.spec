@@ -49,10 +49,10 @@ py.code: dynamic code generation and introspection
 %{python3_sitelib}/*
 
 %changelog
-* Wed Feb 16 2022 Thomas Crain <thcrian@microsoft.com> - 1.10.0-3
+* Wed Feb 16 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.10.0-3
 - Fix accidental double-packaging of python3 subpackage in main package
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.10.0-2
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.10.0-2
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

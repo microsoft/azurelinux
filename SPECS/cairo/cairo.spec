@@ -145,7 +145,7 @@ rm -rf %{buildroot}%{_datadir}/gtk-doc
 * Thu Sep 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.17.4-2
 - Disabling "symbol-lookup" feature due to compilation errors.
 
-* Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 1.17.4-1
+* Fri Mar 26 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.17.4-1
 - Merge the following releases from 1.0 to dev branch
 - niontive@microsoft.com, 1.16.0-5: Fix CVE-2018-19876
 - niontive@microsoft.com, 1.17.4-1: Upgrade to version 1.17.4, which resolves CVE-2020-35492. Fix Source URL

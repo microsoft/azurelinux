@@ -63,7 +63,7 @@ rm -rf %{buildroot}%{_infodir}
 * Wed Jan 04 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.6.3-1
 - Auto-upgrade to 1.6.3 - to fix CVE-2022-47629
 
-* Mon Nov 22 2021 Thomas Crain <thcrain@microsoft.com> - 1.6.0-1
+* Mon Nov 22 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.6.0-1
 - Upgrade to latest upstream version
 - Split out development files into a devel subpackage
 - Lint spec

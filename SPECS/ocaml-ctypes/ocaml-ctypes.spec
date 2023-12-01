@@ -136,7 +136,7 @@ make test
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.18.0-4
 - Cleaning-up spec. License verified.
 
-* Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 0.18.0-3
+* Tue Jan 18 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.18.0-3
 - Use direct libffi-devel BR instead of pkgconfig(libffi) due to improper provides
 - License verified
 

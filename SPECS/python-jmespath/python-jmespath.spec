@@ -47,14 +47,14 @@ pip3 install nose mock
 %{_bindir}/jp.py-%{python3_version}
 
 %changelog
-* Mon Mar 14 2022 Thomas Crain <thcrain@microsoft.com> - 0.10.0-1
+* Mon Mar 14 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.10.0-1
 - Upgrade to latest upstream version
 - Switch source from PyPI to GitHub
 
-* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 0.9.3-6
+* Fri Dec 03 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.9.3-6
 - Replace easy_install usage with pip in %%check sections
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.9.3-5
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.9.3-5
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

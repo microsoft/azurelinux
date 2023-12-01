@@ -66,16 +66,16 @@ make test
 * Thu Apr 14 2022 Daniel McIlvaney <damcilva@microsoft.com> - 4.2.4-11
 - Disable the debuginfo package here since it is not being built in the toolchain
 
-* Wed Feb 16 2022 Thomas Crain <thcrain@microsoft.com> - 4.2.4-10
+* Wed Feb 16 2022 Olivia Crain <oliviacrain@microsoft.com> - 4.2.4-10
 - Remove %%files section for main package to avoid outputting an empty RPM
 
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.2.4-9
 - Removing the explicit %%clean stage.
 
-* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 4.2.4-8
+* Fri Dec 03 2021 Olivia Crain <oliviacrain@microsoft.com> - 4.2.4-8
 - Regenerate C sources at build-time to fix build break with Python 3.9
 
-* Wed Aug 26 2020 Thomas Crain <thcrain@microsoft.com> - 4.2.4-7
+* Wed Aug 26 2020 Olivia Crain <oliviacrain@microsoft.com> - 4.2.4-7
 - Remove python2 support.
 - License verified.
 

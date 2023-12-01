@@ -92,7 +92,7 @@ make install INSTALLBINDIR=%{buildroot}%{_bindir} INSTALLLIBDIR=%{buildroot}%{_l
 
 
 %changelog
-* Mon Jun 14 2021 Thomas Crain <thcrain@microsoft.com> - 1.3-36
+* Mon Jun 14 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.3-36
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Conditionally build documentation, and turn off documentation building by default
 

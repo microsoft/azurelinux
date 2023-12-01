@@ -71,7 +71,7 @@ mv %{SOURCE1} ./LICENSE.txt
 
 
 %changelog
-* Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.6.0-7
+* Fri Dec 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.6.0-7
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.6.0-6

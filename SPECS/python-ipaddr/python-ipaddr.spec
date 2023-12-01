@@ -40,7 +40,7 @@ ipaddr.py is a library for working with IP addresses, both IPv4 and IPv6. It was
 %{python3_sitelib}/*
 
 %changelog
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.2.0-3
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.2.0-3
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

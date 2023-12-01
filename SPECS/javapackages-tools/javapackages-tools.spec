@@ -163,7 +163,7 @@ pip3 install -r test-requirements.txt
     while we wait for maven to be fixed (so that the new macros can be used)
 - Add javapackages-generators 
 
-* Wed Jan 05 2022 Thomas Crain <thcrain@microsoft.com> - 5.3.0-14
+* Wed Jan 05 2022 Olivia Crain <oliviacrain@microsoft.com> - 5.3.0-14
 - Add patch to replace generated dependency on "java-headless" with "java"
 - Amend epoch patch to fix expected test results
 - Remove obsoletes statements that don't apply to Mariner

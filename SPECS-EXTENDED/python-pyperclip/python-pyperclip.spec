@@ -77,7 +77,7 @@ rm -rf html/.{doctrees,buildinfo}
 %doc html
 
 %changelog
-* Fri Dec 01 2021 Thomas Crain <thcrain@microsoft.com> - 1.6.4-9
+* Fri Dec 01 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.6.4-9
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.4-8

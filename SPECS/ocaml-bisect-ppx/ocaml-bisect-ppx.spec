@@ -115,7 +115,7 @@ find %{buildroot}%{_libdir}/ocaml -name \*.ml -delete
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.6.3-3
 - Cleaning-up spec. License verified.
 
-* Mon Aug 09 2021 Thomas Crain <thcrain@microsoft.com> - 2.6.3-2
+* Mon Aug 09 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.6.3-2
 - Initial CBL-Mariner import from Fedora 35 (license: MIT).
 - Remove test, docs circular dependencies
 

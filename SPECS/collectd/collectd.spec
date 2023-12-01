@@ -872,7 +872,7 @@ make check
 * Wed Sep 29 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.12.0-8
 - Added missing BR on "systemd-rpm-macros".
 
-* Tue Aug 24 2021 Thomas Crain <thcrain@microsoft.com> - 5.12.0-7
+* Tue Aug 24 2021 Olivia Crain <oliviacrain@microsoft.com> - 5.12.0-7
 - Disable virt subpackage to mitigate build break regarding systemd %%post sections
 - Remove spec conditionals regarding unsupported architectures
 

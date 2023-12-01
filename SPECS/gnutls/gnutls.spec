@@ -111,11 +111,11 @@ sed -i 's/TESTS += test-ciphers-openssl.sh//'  tests/slow/Makefile.am
 - Upgrade to 3.7.3
 - License verified
 
-* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 3.6.14-6
+* Fri Jul 23 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.6.14-6
 - Provide compatibility provides for c++ subpackage from base package
 - Lint spec
 
-* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 3.6.14-5
+* Fri Apr 02 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.6.14-5
 - Merge the following releases from 1.0 to dev branch
 - anphel@microsoft.com, 3.6.14-4: Fix check tests.
 - mmalisz@microsoft.com, 3.6.14-5: Apply patch for CVE-2021-20231 and CVE-2021-20232 from upstream.

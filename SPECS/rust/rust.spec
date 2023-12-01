@@ -233,23 +233,23 @@ rm %{buildroot}%{_bindir}/*.old
 - Updating to version 1.56.1.
 - Switching to building with Python 3.
 
-* Mon May 17 2021 Thomas Crain <thcrain@microsoft.com> - 1.47.0-5
+* Mon May 17 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.47.0-5
 - Add provides for 'cargo' from the base package
 
-* Tue May 04 2021 Thomas Crain <thcrain@microsoft.com> - 1.47.0-4
+* Tue May 04 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.47.0-4
 - Remove XZ support detection in bootstrap
 
-* Mon Apr 26 2021 Thomas Crain <thcrain@microsoft.com> - 1.47.0-3
+* Mon Apr 26 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.47.0-3
 - Patch CVE-2020-36317, CVE-2021-28875, CVE-2021-28876, CVE-2021-28877, CVE-2021-28878
 - Redo patch for CVE-2021-28879 with regards to patches listed above
 
-* Mon Apr 19 2021 Thomas Crain <thcrain@microsoft.com> - 1.47.0-2
+* Mon Apr 19 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.47.0-2
 - Patch CVE-2021-28879
 
 * Wed Feb 24 2021 Andrew Phelps <anphel@microsoft.com> - 1.47.0-1
 - Update version to 1.47.0
 
-* Wed Jan 06 2021 Thomas Crain <thcrain@microsoft.com> - 1.39.0-8
+* Wed Jan 06 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.39.0-8
 - Add python-xml BR for package test
 - Add ignore-linker-output-non-utf8-test patch to skip faulty test
 

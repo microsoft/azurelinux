@@ -90,7 +90,7 @@ make %{?_smp_mflags} check
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2015.2-7
 - Removing the explicit %%clean stage.
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2015.2-6
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 2015.2-6
 - Remove unused gobject-introspection-python requirement
 - Explicity specify python3-gobject-introspection requirement
 

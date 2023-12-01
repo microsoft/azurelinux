@@ -78,14 +78,14 @@ mv %{buildroot}%{_mandir}/man2/move_pages.2 %{buildroot}%{_mandir}/man2/numa-mov
 * Tue Feb 1 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.0.14-1
 - Upgrading to 2.0.14
 
-* Thu Sep 30 2021 Thomas Crain <thcrain@microsoft.com> - 2.0.13-6
+* Thu Sep 30 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.0.13-6
 - Rename conflicting move_pages.2 man pages
 - Require libnuma from libnuma-devel
 - Fix license packaging
 - Lint spec
 - License verified
 
-* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 2.0.13-5
+* Fri Sep 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.0.13-5
 - Remove libtool archive files from final packaging
 
 * Thu Dec 10 2020 Joe Schmitt <joschmit@microsoft.com> - 2.0.13-4

@@ -38,7 +38,7 @@ make DESTDIR=%{buildroot} install
 * Tue Feb 15 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.4.3-1
 - Update source to 5.4.3
 
-* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 5.2.4-5
+* Tue Feb 08 2022 Olivia Crain <oliviacrain@microsoft.com> - 5.2.4-5
 - Remove unused `%%define sha1` lines
 - License verified (corrected from Freeware to Gnuplot)
 

@@ -109,7 +109,7 @@ rm -f %{buildroot}%{_libdir}/udev/rules.d/99-fuse3.rules
 %config(noreplace) %{_sysconfdir}/fuse.conf
 
 %changelog
-* Wed Sep 22 2021 Thomas Crain <thcrain@microsoft.com> - 3.10.5-2
+* Wed Sep 22 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.10.5-2
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - Spec linted
 - License verified

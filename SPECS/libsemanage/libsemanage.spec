@@ -114,7 +114,7 @@ ln -sf  %{_libdir}/libsemanage.so.2 %{buildroot}/%{_libdir}/libsemanage.so
 - Do not ignore /root for genhomedircon, otherwise it will not
 - get correct labeling.
 
-* Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 3.2-1
+* Fri Aug 13 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.2-1
 - Upgrade to latest upstream version and rebase patch
 - Add -fno-semantic-interposition to CFLAGS as recommended by upstream
 - Add static subpackage provides to devel subpackage

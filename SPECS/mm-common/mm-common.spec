@@ -43,7 +43,7 @@ make install DESTDIR=%{buildroot}
 * Thu Feb 17 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 1.0.4-1
 - Upgrading to v1.0.4
 
-* Mon Oct 12 2020 Thomas Crain <thcrain@microsoft.com> - 1.0.0-3
+* Mon Oct 12 2020 Olivia Crain <oliviacrain@microsoft.com> - 1.0.0-3
 - Update Source0 (removes need for libstdc++.tag file)
 - Lint for Mariner style
 - License verified

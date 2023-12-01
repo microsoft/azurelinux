@@ -36,7 +36,7 @@ In short, SCons is an easier, more reliable and faster way to build software.
 %{_datadir}/*
 
 %changelog
-* Thu Feb 17 2022 Thomas Crain <thcrain@microsoft.com> - 3.0.1-6
+* Thu Feb 17 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.0.1-6
 - Build with python3 instead of python2
 
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.1-5

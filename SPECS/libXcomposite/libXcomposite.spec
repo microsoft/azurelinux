@@ -53,7 +53,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man3/X?omposite*.3*
 
 %changelog
-* Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 0.4.5-4
+* Wed Dec 08 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.4.5-4
 - License verified
 - Lint spec
 

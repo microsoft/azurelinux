@@ -59,10 +59,10 @@ tox
 * Fri Mar 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.4-1
 - Updating to version 1.2.4.
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.5.0-2
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.5.0-2
 - Remove python2 package
 - Lint spec
 
-* Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 0.5.0-1
+* Fri Aug 21 2020 Olivia Crain <oliviacrain@microsoft.com> - 0.5.0-1
 - Original version for CBL-Mariner.
 - License verified.

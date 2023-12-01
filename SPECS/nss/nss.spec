@@ -250,7 +250,7 @@ popd
 - Set NSS_DISABLE_GTESTS=1 to speed up build
 - Run tests much faster by limiting to NSS_CYCLES=standard
 
-* Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 3.44-4
+* Fri Mar 26 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.44-4
 - Merge the following releases from 1.0 to dev branch
 - anphel@microsoft.com, 3.44-3: Fix check tests
 - niontive@microsoft.com, 3.44-4: Enable FIPS mode

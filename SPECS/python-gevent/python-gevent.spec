@@ -65,10 +65,10 @@ nosetests
 * Wed Oct 04 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.3.6-9
 - Add patch for CVE-2023-41419
 
-* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 1.3.6-8
+* Fri Dec 03 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.3.6-8
 - Regenerate C sources at build-time to fix build break with Python 3.9
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.3.6-7
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.3.6-7
 - Add license to python3 package
 - Remove python2 package
 - Make python byte compilation errors fatal again

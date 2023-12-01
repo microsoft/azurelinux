@@ -81,7 +81,7 @@ A simple USB host TCP server, using libusbredirhost.
 * Tue Jun 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.12.0-1
 - Updating to 0.12.0 to fix CVE-2021-3700.
 
-* Wed Sep 22 2021 Thomas Crain <thcrain@microsoft.com> - 0.10.0-3
+* Wed Sep 22 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.10.0-3
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - Lint spec
 - License verified

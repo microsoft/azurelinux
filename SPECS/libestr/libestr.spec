@@ -52,7 +52,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Fri Mar 11 2022 Jon Slobodzian <joslobo@microsoft.com> - 0.1.11-1
 - Upgrade to 0.1.11
 
-* Mon Oct 12 2020 Thomas Crain <thcrain@microsoft.com> - 0.1.10-5
+* Mon Oct 12 2020 Olivia Crain <oliviacrain@microsoft.com> - 0.1.10-5
 - Remove %%sha1 line
 - Lint to Mariner style
 - Remove *.la files

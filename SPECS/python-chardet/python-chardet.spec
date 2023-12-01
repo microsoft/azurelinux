@@ -51,7 +51,7 @@ chardet is a universal character encoding detector in Python.
 * Thu Feb 10 2022 Nick Samson <nisamson@microsoft.com> - 4.0.0-1
 - Updated to 4.0.0, updated source URL.
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 3.0.4-6
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.0.4-6
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

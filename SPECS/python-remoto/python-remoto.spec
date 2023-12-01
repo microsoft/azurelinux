@@ -61,6 +61,6 @@ python3 -m pytest -v remoto/tests
 * Wed Jun 23 2021 Neha Agarwal <nehaagarwal@microsoft.com> 1.2.0-2
 - Pass check section
 
-* Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> 1.2.0-1
+* Fri Aug 21 2020 Olivia Crain <oliviacrain@microsoft.com> 1.2.0-1
 - Original version for CBL-Mariner
 - License verified

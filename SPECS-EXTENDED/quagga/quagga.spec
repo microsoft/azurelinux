@@ -225,7 +225,7 @@ fi
 %{_includedir}/quagga/ospfd/*.h
 
 %changelog
-* Thu Jun 17 2021 Thomas Crain <thcrain@microsoft.com> - 1.2.4-15
+* Thu Jun 17 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.2.4-15
 - Conditionalize building of tex-based documentation
 
 * Fri Apr 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.4-14

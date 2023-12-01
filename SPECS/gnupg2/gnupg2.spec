@@ -108,7 +108,7 @@ ln -s $(pwd)/bin/gpg $(pwd)/bin/gpg2
 * Wed Feb 23 2022 Muhammad Falak <mwani@microsoft.com> - 2.3.3-2
 - Add an explict softlink `gpg2 -> gpg` in check section to enable ptest
 
-* Mon Nov 22 2021 Thomas Crain <thcrain@microsoft.com> - 2.3.3-1
+* Mon Nov 22 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.3.3-1
 - Upgrade to latest upstream version
 
 * Mon Sep 28 2020 Ruying Chen <v-ruyche@microsoft.com> - 2.2.20-4

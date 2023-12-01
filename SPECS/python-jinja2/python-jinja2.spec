@@ -68,7 +68,7 @@ tox -e py%{python3_version_nodots}
 * Sat Dec 04 2021 Henry Beberman <henry.beberman@microsoft.com> - 2.10.1-4
 - Explicitly provide python3dist(jinja2) because built in toolchain.
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.10.1-3
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.10.1-3
 - Remove python2 package and re-enable fatal python byte compilation errors
 - Fix build instruction ordering
 - Lint spec

@@ -71,7 +71,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_datadir}/gtk-doc/html/libgxim
 
 %changelog
-* Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 0.5.0-20
+* Wed Dec 08 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.5.0-20
 - License verified
 - Lint spec
 

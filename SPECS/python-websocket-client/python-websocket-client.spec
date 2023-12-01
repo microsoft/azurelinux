@@ -61,7 +61,7 @@ pytest3 -vv websocket/tests -k "not echo-server"
 * Fri Mar 25 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.3.1-1
 - Upgrade to 1.3.1
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.56.0-3
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.56.0-3
 - Add license, wsdump.py binary to python3 package
 - Remove python2 package
 - Lint spec

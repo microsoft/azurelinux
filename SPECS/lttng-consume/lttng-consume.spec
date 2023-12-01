@@ -65,7 +65,7 @@ mkdir build && cd build
 * Fri Nov 12 2021 Andrew Phelps <anphel@microsoft.com> - 0.2.1-1
 - Update to version 0.2.1 to fix gcc11 compilation error
 
-* Wed Oct 07 2020 Thomas Crain <thcrain@microsoft.com> - 0.2-3
+* Wed Oct 07 2020 Olivia Crain <oliviacrain@microsoft.com> - 0.2-3
 - Add #Source0 URL
 - Verified License field and %%license macro
 

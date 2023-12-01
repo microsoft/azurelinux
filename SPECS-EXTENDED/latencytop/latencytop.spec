@@ -82,7 +82,7 @@ ln -s latencytop.8 %{buildroot}%{_mandir}/man8/latencytop-tui.8
 %{_mandir}/man8/*
 
 %changelog
-* Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.5-27
+* Fri Dec 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.5-27
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.5-26

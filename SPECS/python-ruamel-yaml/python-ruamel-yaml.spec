@@ -54,7 +54,7 @@ python3 setup.py install --single-version-externally-managed --skip-build --root
 %{python3_sitelib}/%{pypi_name}-%{version}-py%{python3_version}.egg-info
 
 %changelog
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.16.6-7
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.16.6-7
 - Remove requirement on python3-typing (not needed for python >= 3.5)
 
 * Mon Jun 21 2021 Rachel Menge <rachelmenge@microsoft.com> - 0.16.6-6

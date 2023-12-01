@@ -98,17 +98,17 @@ rm -f $(dirname $(gcc -print-libgcc-file-name))/../specs
 * Wed May 11 2022 Fanzhe Lyu <falyu@microsoft.com> - 11.2
 - Upgrade to gdb 11.2
 
-* Thu Nov 11 2021 Thomas Crain <thcrain@microsoft.com> - 11.1
+* Thu Nov 11 2021 Olivia Crain <oliviacrain@microsoft.com> - 11.1
 - Upgrade to latest upstream version and remove upstreamed patches
 - Use system zlib during build
 
-* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 8.3-5
+* Fri Jul 23 2021 Olivia Crain <oliviacrain@microsoft.com> - 8.3-5
 - Add compatibility provides for gdbserver subpackage
 - Use make macros throughout
 
-* Fri Mar 26 2021 Thomas Crain <thcrain@microsoft.com> - 8.3-4
+* Fri Mar 26 2021 Olivia Crain <oliviacrain@microsoft.com> - 8.3-4
 - Merge the following releases from 1.0 to dev branch
-- thcrain@microsoft.com, 8.3-3: Patch CVE-2019-1010180
+- oliviacrain@microsoft.com, 8.3-3: Patch CVE-2019-1010180
 - anphel@microsoft.com, 8.3-4: Only run gdb.base/default.exp tests
 
 * Wed Mar 03 2021 Henry Li <lihl@microsoft.com> - 8.3-3

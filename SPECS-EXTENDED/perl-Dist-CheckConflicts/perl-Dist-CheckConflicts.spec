@@ -94,7 +94,7 @@ make test TEST_FILES="$(echo $(find xt/ -name '*.t'))"
 %{_mandir}/man3/Dist::CheckConflicts.3pm*
 
 %changelog
-* Wed Apr 28 2021 Thomas Crain <thcrain@microsoft.com> - 0.11-18
+* Wed Apr 28 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.11-18
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove colons from patchnames
 

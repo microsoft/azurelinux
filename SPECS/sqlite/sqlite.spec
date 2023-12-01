@@ -94,7 +94,7 @@ make %{?_smp_mflags} check
 * Wed Apr 20 2022 Chris Co <chrco@microsoft.com> - 3.36.0-3
 - Address CVE-2021-36690
 
-* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 3.36.0-2
+* Tue Feb 08 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.36.0-2
 - Remove manual pkgconfig(*) provides in toolchain specs
 
 * Wed Jan 26 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.36.0-1
@@ -104,7 +104,7 @@ make %{?_smp_mflags} check
 - Removing the explicit %%clean stage.
 - License verified.
 
-* Tue Apr 20 2021 Thomas Crain <thcrain@microsoft.com> - 3.34.1-1
+* Tue Apr 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.34.1-1
 - Update to 3.34.1 to fix CVE-2021-20227
 - Remove Obsoletes tags
 

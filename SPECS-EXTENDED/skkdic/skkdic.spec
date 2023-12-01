@@ -79,7 +79,7 @@ popd
 %{_datadir}/skk/
 
 %changelog
-* Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 20210217-1
+* Fri Dec 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 20210217-1
 - Upgrade using Fedora 35 version of spec (license: MIT) 
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200128-2

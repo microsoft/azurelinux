@@ -79,7 +79,7 @@ make test
 * Fri Aug 27 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.63-449
 - Removing unnecessary BR on `Perl(IO::String)'.
 
-* Wed Aug 18 2021 Thomas Crain <thcrain@microsoft.com> - 1.63-448
+* Wed Aug 18 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.63-448
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 
 * Tue Jul 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.63-447

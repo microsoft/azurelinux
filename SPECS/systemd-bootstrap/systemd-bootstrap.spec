@@ -314,7 +314,7 @@ fi
 - Enable building systemd-sysusers
 - Ship systemd-sysusers and related conf files from systemd package
 
-* Fri May 14 2021 Thomas Crain <thcrain@microsoft.com> - 239-39
+* Fri May 14 2021 Olivia Crain <oliviacrain@microsoft.com> - 239-39
 - Merge the following releases from 1.0 to dev branch
 - niontive@microsoft.com, 2.39-33: Use autosetup
 -   Fix CVE-2019-3842

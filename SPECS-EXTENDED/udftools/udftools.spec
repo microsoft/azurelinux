@@ -48,7 +48,7 @@ rm -rf %{buildroot}%{_bindir}/udffsck
 
 
 %changelog
-* Mon Jun 14 2021 Thomas Crain <thcrain@microsoft.com> - 2.1-6
+* Mon Jun 14 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.1-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Add dependency on systemd-devel for udev pkgconfig files
 

@@ -52,10 +52,10 @@ export LANG=C.UTF-8
 * Wed Feb 09 2022 Muhammad Falak <mwani@microsoft.com> - 1.6.0-2
 - Use `%pytest` instead of `tox` to enable ptest
 
-* Mon Jan 24 2022 Thomas Crain <thcrain@microsoft.com> - 1.6.0-1
+* Mon Jan 24 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.6.0-1
 - Upgrade to latest upstream version
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.4.0-5
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.4.0-5
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

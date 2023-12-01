@@ -143,7 +143,7 @@ rm -f %{buildroot}%{_docdir}/libftdipp1/example.conf
 - Updating to 1.5 using Fedora 36 (license: MIT) for guidance.
 - License verified.
 
-* Wed Jun 02 2021 Thomas Crain <thcrain@microsoft.com> - 1.4-3
+* Wed Jun 02 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.4-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Explicitly set an empty libdir suffix for CMake
 

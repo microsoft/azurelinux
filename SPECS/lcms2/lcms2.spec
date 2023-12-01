@@ -78,7 +78,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 - Updating to 2.13.1.
 - Fixing source URL.
 
-* Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 2.9-9
+* Wed Dec 08 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.9-9
 - License verified
 - Lint spec
 

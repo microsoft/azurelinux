@@ -48,7 +48,7 @@ The fastest markdown parser in pure Python with renderer features, inspired by m
 * Wed Feb 09 2022 Muhammad Falak <mwani@microsoft.com> - 0.8.3-5
 - Add an explict BR on 'pip' to enable ptest
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.8.3-4
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.8.3-4
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

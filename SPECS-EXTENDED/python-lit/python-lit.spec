@@ -52,7 +52,7 @@ sed -i -e '1{\@^#!/usr/bin/env python@d}' %{buildroot}%{python3_sitelib}/%{srcna
 %{_bindir}/lit
 
 %changelog
-* Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.9.0-6
+* Fri Dec 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.9.0-6
 - License verified
 - Remove python2 support
 

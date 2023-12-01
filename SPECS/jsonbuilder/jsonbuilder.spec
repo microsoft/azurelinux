@@ -57,7 +57,7 @@ make test -C build
 %{_includedir}/jsonbuilder
 
 %changelog
-* Wed Oct 07 2020 Thomas Crain <thcrain@microsoft.com> - 0.2.1-2
+* Wed Oct 07 2020 Olivia Crain <oliviacrain@microsoft.com> - 0.2.1-2
 - Updated #Source0 URL
 - Verified License field and %%license macro
 

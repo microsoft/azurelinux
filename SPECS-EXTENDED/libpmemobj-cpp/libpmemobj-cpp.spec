@@ -126,7 +126,7 @@ ctest -V %{?_smp_mflags} -E concurrent_hash_map_rehash_0_helgrind -E concurrent_
 - Disabling missing test dependency.
 - License verified.
 
-* Wed Jun 23 2021 Thomas Crain <thcrain@microsoft.com> - 1.9-2
+* Wed Jun 23 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.9-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Conditionally require check dependencies at build time
 

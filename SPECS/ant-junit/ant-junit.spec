@@ -739,7 +739,7 @@ popd
 - Updated version to 1.10.11.
 - License verified.
 
-* Thu Dec 09 2021 Thomas Crain <thcrain@microsoft.com> - 1.10.9-3
+* Thu Dec 09 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.10.9-3
 - Replace usage of removed %%requires_eq macro
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.10.9-2

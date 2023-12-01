@@ -75,10 +75,10 @@ rm -r /home/postgres/data &>/dev/null ||:
 %doc doc
 
 %changelog
-* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 2.7.5-8
+* Fri Dec 03 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.7.5-8
 - Fix build with Python 3.9 using upstream patch
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.7.5-7
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.7.5-7
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

@@ -71,7 +71,7 @@ find %{buildroot} -type f -name "*.a" -delete -print
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.0.18-6
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
-* Mon Mar 14 2022 Thomas Crain <thcrain@microsoft.com> - 1.0.18-5
+* Mon Mar 14 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.0.18-5
 - Move package from Mariner Extended to Mariner Core repo
 - Use HTTPS source URL instead of HTTP
 - Remove static subpackage and static library

@@ -22,7 +22,7 @@ mkdir -p %{buildroot}/%{_sysconfdir}/OpenCL/vendors/
 %{_sysconfdir}/OpenCL/
 
 %changelog
-* Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.0-13
+* Fri Dec 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.0-13
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0-12

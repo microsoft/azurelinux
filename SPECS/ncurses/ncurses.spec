@@ -252,7 +252,7 @@ xz NEWS
 - Change FTP source url to HTTPS mirror
 - Lint spec
 
-* Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 6.2-5
+* Tue Feb 08 2022 Olivia Crain <oliviacrain@microsoft.com> - 6.2-5
 - Remove manual pkgconfig(*) provides in toolchain specs
 
 * Thu Aug 06 2020 Mateusz Malisz <mamalisz@microsoft.com> - 6.2-4

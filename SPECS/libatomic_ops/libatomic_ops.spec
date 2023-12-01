@@ -57,7 +57,7 @@ rm -rf %{buildroot}%{_docdir}/%{name}/{COPYING,LICENSING.txt}
 %{_libdir}/pkgconfig/atomic_ops.pc
 
 %changelog
-* Wed Jan 12 2022 Thomas Crain <thcrain@microsoft.com> - 7.6.12-1
+* Wed Jan 12 2022 Olivia Crain <oliviacrain@microsoft.com> - 7.6.12-1
 - Upgrade to latest upstream version
 - Remove static libraries
 - Install licenses using just the %%license macro

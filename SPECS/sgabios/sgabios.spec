@@ -62,7 +62,7 @@ install -m 0644 sgabios.bin %{buildroot}%{_datadir}/sgabios
 * Wed Apr 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20180715git-8
 - Updating source URL.
 
-* Tue Dec 14 2021 Thomas Crain <thcrain@microsoft.com> - 0.20180715git-7
+* Tue Dec 14 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.20180715git-7
 - Lint spec
 - License verified
 - Remove cross-compilation pieces
@@ -70,7 +70,7 @@ install -m 0644 sgabios.bin %{buildroot}%{_datadir}/sgabios
 * Fri Oct 29 2021 Muhammad Falak <mwani@microsft.com> - 0.20180715git-6
 - Remove epoch
 
-* Tue Jun 22 2021 Thomas Crain <thcrain@microsoft.com@microsoft.com> - 1:0.20180715git-5
+* Tue Jun 22 2021 Olivia Crain <oliviacrain@microsoft.com> - 1:0.20180715git-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Turn off cross-compilation
 

@@ -314,11 +314,11 @@ fi
 
 
 %changelog
-* Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 1.8.2-3
+* Wed Dec 08 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.8.2-3
 - License verified
 - Lint spec
 
-* Tue Jun 01 2021 Thomas Crain <thcrain@microsoft.com> - 1.8.2-3
+* Tue Jun 01 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.8.2-3
 - Initial CBL-Mariner import from Fedora 31 (license: MIT).
 - Disable desktop environment-based subpackages
 

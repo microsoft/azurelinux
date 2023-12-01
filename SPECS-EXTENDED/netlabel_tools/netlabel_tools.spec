@@ -69,7 +69,7 @@ make V=1 DESTDIR="%{buildroot}" install
 %attr(0644,root,root) %config(noreplace) /etc/netlabel.rules
 
 %changelog
-* Mon Jun 07 2021 Thomas Crain <thcrain@microsoft.com> - 0.30.0-10
+* Mon Jun 07 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.30.0-10
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Add BR:systemd-devel for the systemd *.pc files
 

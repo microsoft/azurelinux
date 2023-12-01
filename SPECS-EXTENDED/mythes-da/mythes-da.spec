@@ -39,7 +39,7 @@ cp -p th_da_DK.idx $RPM_BUILD_ROOT/%{_datadir}/mythes/th_da_DK_v2.idx
 %{_datadir}/mythes/*
 
 %changelog
-* Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.20100629.15.16-20
+* Fri Dec 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.20100629.15.16-20
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20100629.15.16-19

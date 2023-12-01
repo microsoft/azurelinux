@@ -55,6 +55,6 @@ python3 setup.py install --skip-build --root=%{buildroot}
 * Fri Mar 25 2022 Andrew Phelps <anphel@microsoft.com> - 1.1.0-1
 - Updated to version 1.1.0
 
-* Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 0.5.4-1
+* Fri Aug 21 2020 Olivia Crain <oliviacrain@microsoft.com> - 0.5.4-1
 - Original version for CBL-Mariner
 - License verified

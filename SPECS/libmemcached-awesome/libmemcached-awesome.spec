@@ -145,7 +145,7 @@ rm -r %{buildroot}%{_docdir}/%{name}/
 * Sun Feb 13 2022 Jon Slobodzian <joslobo@microsoft.com> - 1.1.1-4
 - Adding python-devel to fix python-sphinx build issue
 
-* Mon Jan 24 2022 Thomas Crain <thcrain@microsoft.com> - 1.1.1-3
+* Mon Jan 24 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.1.1-3
 - Initial CBL-Mariner import from Fedora 36 (license: CC-BY-SA)
 - Lint spec
 - License verified

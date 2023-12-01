@@ -85,17 +85,17 @@ popd
 * Wed Jun 21 2023 Sam Meluch <sammeluch@microsoft.com> - 1.15.1-1
 - Upgrade to version 1.15.1 for dnf5
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.14.2-2
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.14.2-2
 - Remove unused python2 build requirements
 
-* Tue Sep 14 2021 Thomas Crain <thcrain@microsoft.com> - 1.14.2-1
+* Tue Sep 14 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.14.2-1
 - Update to latest upstream version
 - Lint spec
 
-* Mon Jan 04 2021 Thomas Crain <thcrain@microsoft.com> - 1.11.0-4
+* Mon Jan 04 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.11.0-4
 - Enable package tests for both major python versions
 
-* Tue Nov 10 2020 Thomas Crain <thcrain@microsoft.com> - 1.11.0-3
+* Tue Nov 10 2020 Olivia Crain <oliviacrain@microsoft.com> - 1.11.0-3
 - Patch CVE-2020-14352
 - Lint to Mariner style
 

@@ -49,7 +49,7 @@ cp %{SOURCE1} .
 * Tue Feb 08 2022 Muhammad Falak <mwani@microsoft.com> - 2.16.0.0-6
 - Fix typo `s/setup/setup.py/` in `%check` section to enable ptest
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.16.0.0-5
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.16.0.0-5
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

@@ -206,7 +206,7 @@ rm -f %{buildroot}%{_bindir}/xkeystone
 %endif
 
 %changelog
-* Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 7.7-37
+* Wed Dec 08 2021 Olivia Crain <oliviacrain@microsoft.com> - 7.7-37
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.7-36

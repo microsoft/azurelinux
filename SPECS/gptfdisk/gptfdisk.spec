@@ -48,7 +48,7 @@ install -m644 *.8 %{buildroot}%{_mandir}/man8
 * Fri Jun 17 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.0.8-2
 - Add upstream patch to fix -Werror=format-security errors after ncurses 6.3 upgrade
 
-* Wed Feb 16 2022 Thomas Crain <thcrain@microsoft.com> - 1.0.8-1
+* Wed Feb 16 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.0.8-1
 - Upgrade to latest upstream version
 - Translate Makefile patch to %%install section instructions for easier maintenance
 - Add provides for gdisk package for Fedora compatibility

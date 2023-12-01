@@ -191,7 +191,7 @@ echo "disable ipmi.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-ip
 * Tue Feb 22 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.0.32-1
 - Upgrading to version 2.0.32.
 
-* Mon Jan 31 2022 Thomas Crain <thcrain@microsoft.com> - 2.0.25-7
+* Mon Jan 31 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.0.25-7
 - Use python3 instead of python2 in python subpackage
 - Add Fedora patch to enable build with python >= 3.9
 - License verified

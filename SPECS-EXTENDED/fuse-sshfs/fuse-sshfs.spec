@@ -67,7 +67,7 @@ python3 -m pytest test/
 
 
 %changelog
-* Thu Jun 17 2021 Thomas Crain <thcrain@microsoft.com> - 3.7.1-2
+* Thu Jun 17 2021 Olivia Crain <oliviacrain@microsoft.com> - 3.7.1-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - Update meson.build to look for the rst2man3 program shipping by python3-docutils
 

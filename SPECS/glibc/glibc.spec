@@ -364,13 +364,13 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 * Thu Jul 29 2021 Jon Slobodzian <joslobo@microsoft.com> 2.28-18
 - Dash Rolled for Merge from 1.0 branch
 
-* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 2.28-17
+* Fri Apr 02 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.28-17
 - Merge the following releases from 1.0 to dev branch
 - lihl@microsoft.com, 2.28-13: Added patch to resolve CVE-2019-7309, Used autosteup
-- thcrain@microsoft.com, 2.28-14: Patch CVE-2019-19126
+- oliviacrain@microsoft.com, 2.28-14: Patch CVE-2019-19126
 - mamalisz@microsoft.com, 2.28-15: Exclude binaries(such as bash) from requires list.
 - nicolasg@microsoft.com, 2.28-16: Patch CVE-2019-25013
-- thcrain@microsoft.com, 2.28-17: Patch CVE-2021-3326
+- oliviacrain@microsoft.com, 2.28-17: Patch CVE-2021-3326
 - nisamson@microsoft.com, 2.28-18: Patch CVE-2021-27618
 
 * Thu Mar 25 2021 Henry Li <lihl@microsoft.com> - 2.28-16
@@ -387,7 +387,7 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 - Move some tools from glibc-tools and glibc-iconv to glibc and provide glibc-common
 - Provide glibc-static and glibc-headers under glibc-devel
 
-* Wed Jul 29 2020 Thomas Crain <thcrain@microsoft.com> - 2.28-12
+* Wed Jul 29 2020 Olivia Crain <oliviacrain@microsoft.com> - 2.28-12
 - Ignore CVE-2018-20796, as it is not a security issue
 
 * Wed Jul 29 2020 Emre Girgin <mrgirgin@microsoft.com> - 2.28-11

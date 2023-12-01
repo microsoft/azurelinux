@@ -211,7 +211,7 @@ fi
 %{_libdir}/pkgconfig/netcf.pc
 
 %changelog
-* Wed Jun 16 2021 Thomas Crain <thcrain@microsoft.com> - 0.2.8-16
+* Wed Jun 16 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.2.8-16
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Specify "redhat" network driver to enable build
 

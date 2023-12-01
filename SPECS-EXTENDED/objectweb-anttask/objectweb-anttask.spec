@@ -72,7 +72,7 @@ popd
 * Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.2-266
 - Updated source URL.
 
-* Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.2-265
+* Fri Dec 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.2-265
 - License verified
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2-264

@@ -106,7 +106,7 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 - Disabled gtk doc generation to remove network dependency during build-time.
 - License verified.
 
-* Tue Jun 01 2021 Thomas Crain <thcrain@microsoft.com> - 0.99.11-4
+* Tue Jun 01 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.99.11-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Specify udev rules directory and systemd system unit dir
 

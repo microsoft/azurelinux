@@ -156,17 +156,17 @@ fi
 * Fri Jan 14 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 0.104.2-1
 - Upgrade to 0.104.2
 
-* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.103.2-3
+* Fri Sep 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.103.2-3
 - Remove libtool archive files from final packaging
 
-* Fri Jul 23 2021 Thomas Crain <thcrain@microsoft.com> - 0.103.2-2
+* Fri Jul 23 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.103.2-2
 - Add provides for devel, lib subpackages
 - Use make macros throughout
 
-* Tue Apr 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.103.2-1
+* Tue Apr 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.103.2-1
 - Updating to 0.103.2 to fix CVE-2021-1252, CVE-2021-1404, CVE-2021-1405
 
-* Fri Apr 02 2021 Thomas Crain <thcrain@microsoft.com> - 0.103.0-2
+* Fri Apr 02 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.103.0-2
 - Merge the following releases from dev to 1.0 spec
 - v-ruyche@microsoft.com, 0.101.2-4: Systemd supports merged /usr. Update units file location and macro.
 

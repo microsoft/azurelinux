@@ -48,7 +48,7 @@ developing applications that use %{name}.
 %{_libdir}/pkgconfig/slirp.pc
 
 %changelog
-* Wed Sep 22 2021 Thomas Crain <thcrain@microsoft.com> - 4.6.1-3
+* Wed Sep 22 2021 Olivia Crain <oliviacrain@microsoft.com> - 4.6.1-3
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - Lint spec
 - License verified

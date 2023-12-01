@@ -157,7 +157,7 @@ fi
 %attr(0644,-,arpwatch) %verify(not md5 size mtime) %config(noreplace) %{_vararpwatch}/ethercodes.dat
 
 %changelog
-* Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 2.1a15-51
+* Fri Dec 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.1a15-51
 - License verified
 
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 2.1a15-50

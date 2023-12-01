@@ -73,7 +73,7 @@ scons check
 * Tue Nov 28 2023 Tobias Brick <tobiasb@microsoft.com> - 1.3.10-1
 - Update to 1.3.10
 
-* Thu Feb 17 2022 Thomas Crain <thcrain@microsoft.com> - 1.3.9-8
+* Thu Feb 17 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.3.9-8
 - Add Fedora patch to enable build with python3
 
 * Tue Nov 30 2021 Mateusz Malisz <mamalisz@microsoft.com> - 1.3.9-7

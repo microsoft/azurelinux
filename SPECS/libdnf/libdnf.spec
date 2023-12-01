@@ -124,7 +124,7 @@ popd
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.63.1-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
-* Tue Sep 14 2021 Thomas Crain <thcrain@microsoft.com> - 0.63.1-1
+* Tue Sep 14 2021 Olivia Crain <oliviacrain@microsoft.com> - 0.63.1-1
 - Upgrade to latest upstream version
 - Lint spec
 

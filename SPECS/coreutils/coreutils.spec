@@ -138,7 +138,7 @@ LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8 make -k check
 * Fri Jan 22 2021 Andrew Phelps <anphel@microsoft.com> 8.30-8
 - Fix check test
 
-* Tue Nov 10 2020 Thomas Crain <thcrain@microsoft.com> 8.30-7
+* Tue Nov 10 2020 Olivia Crain <oliviacrain@microsoft.com> 8.30-7
 - Nopatch CVE-2013-0222, CVE-2013-0223
 - Remove references to Linux From Scratch
 - Change Source0 to HTTPS url

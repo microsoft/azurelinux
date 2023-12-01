@@ -182,20 +182,20 @@ make check
 * Mon Nov 29 2021 Nicolas Guibourge <nicolasg@microsoft.com> - 2020.4-3
 - Fix build issue due to gcc 11.2
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2020.4-2
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 2020.4-2
 - Remove unused gobject-introspection-python requirement
 - Explicity specify python3-gobject-introspection requirement
 
-* Mon Sep 27 2021 Thomas Crain <thcrain@microsoft.com> - 2020.4-1
+* Mon Sep 27 2021 Olivia Crain <oliviacrain@microsoft.com> - 2020.4-1
 - Upgrade version and rebase patches
 - Move all dbus files to reside under %%{_datadir}
 - License verified
 
-* Tue Apr 27 2021 Thomas Crain <thcrain@microsoft.com> - 2019.3-9
+* Tue Apr 27 2021 Olivia Crain <oliviacrain@microsoft.com> - 2019.3-9
 - Merge the following releases from dev to 1.0 spec
 - v-ruyche@microsoft.com, 2019.3-7: Systemd supports merged /usr. Update unit file directory macro.
 
-* Tue Apr 20 2021 Thomas Crain <thcrain@microsoft.com> - 2019.3-8
+* Tue Apr 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 2019.3-8
 - Bump release to rebuild with rust 1.47.0-2 (security update)
 
 * Tue Dec 08 2020 Pawel Wingrodzki <pawelwi@microsoft.com> - 2019.3-7

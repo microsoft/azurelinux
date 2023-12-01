@@ -54,7 +54,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 - Upgrade to 1.16.3
 - License verified
 
-* Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.16.0-2
+* Fri Sep 10 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.16.0-2
 - Remove libtool archive files from final packaging
 
 *  Fri Dec 11 2020 Jonathan Chiu <jochi@microsoft.com> 1.16.0-1

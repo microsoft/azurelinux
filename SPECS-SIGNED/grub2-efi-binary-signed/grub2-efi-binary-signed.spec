@@ -125,7 +125,7 @@ cp %{SOURCE3} %{buildroot}/boot/efi/EFI/BOOT/%{grubpxeefiname}
 - Update release to be aligned with unsigned version.
 - Adding 'Provides' for 'grub2-efi-x64'.
 
-* Tue May 25 2021 Thomas Crain <thcrain@microsoft.com> - 2.06~rc1-5
+* Tue May 25 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.06~rc1-5
 - Update release to be aligned with unsigned version
 
 * Fri Apr 16 2021 Chris Co <chrco@microsoft.com> - 2.06~rc1-4

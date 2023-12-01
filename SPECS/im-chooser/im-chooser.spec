@@ -103,7 +103,7 @@ rm -rf %{buildroot}%{_datadir}/applications/im-chooser-panel.desktop
 %endif
 
 %changelog
-* Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 1.7.3-5
+* Wed Dec 08 2021 Olivia Crain <oliviacrain@microsoft.com> - 1.7.3-5
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.7.3-4

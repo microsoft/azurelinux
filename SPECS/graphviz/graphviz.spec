@@ -532,7 +532,7 @@ php --no-php-ini \
 * Thu Apr 21 2022 Minghe Ren <mingheren@microsoft.com> - 2.42.4-6
 - Add patch for CVE-2020-18032
 
-* Mon Jan 31 2022 Thomas Crain <thcrain@microsoft.com> - 2.42.4-5
+* Mon Jan 31 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.42.4-5
 - Remove option to build with python2
 
 * Wed Jan 26 2022 Henry Li <lihl@microsoft.com> - 2.42.4-4
@@ -541,7 +541,7 @@ php --no-php-ini \
 - Fix linting
 - Remove usage of {?ext_man}, which is not supported in CBL-Mariner
 
-* Tue Jun 22 2021 Thomas Crain <thcrain@microsoft.com> - 2.42.4-3
+* Tue Jun 22 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.42.4-3
 - Use pkgconfig(cairo) instead of cairo-devel build requirement
 
 * Thu Dec 17 2020 Joe Schmitt <joschmit@microsoft.com> - 2.42.4-2

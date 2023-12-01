@@ -77,7 +77,7 @@ chmod a+x %{buildroot}%{_libdir}/ocaml/%{srcname}/%{srcname}.cmxs
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.15.0-2
 - Cleaning-up spec. License verified.
 
-* Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 0.15.0-1
+* Tue Jan 18 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.15.0-1
 - Upgrade to latest version
 - License verified
 

@@ -51,7 +51,7 @@ make %{?_smp_mflags} check
 * Tue Feb 08 2022 Rachel Menge <rachelmenge@microsoft.com> - 4.99.1-1
 - Update to 4.99.1
 
-* Fri Nov 13 2020 Thomas Crain <thcrain@microsoft.com> - 4.9.3-3
+* Fri Nov 13 2020 Olivia Crain <oliviacrain@microsoft.com> - 4.9.3-3
 - Patch CVE-2020-8037
 - Lint to Mariner style
 
