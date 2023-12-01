@@ -1,0 +1,13 @@
+{
+    "SystemConfigs": [
+        {
+            "Name": "CDROM",
+            "PackageLists": [
+                "packagelists/baremetal-iso-empty.json"
+            ],
+            "KernelOptions": {
+                "default": "kernel"
+            }
+        }
+    ]
+}

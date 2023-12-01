@@ -1,0 +1,43 @@
+{
+    "Disks": [
+        {
+            "Artifacts": [
+                {
+                    "Name": "iso-initrd",
+                    "Type": "initrd",
+                    "Compression": "tar.gz"
+                }
+            ]
+        }
+    ],
+    "SystemConfigs": [
+        {
+            "Name": "initrd",
+            "PackageLists": [
+                "../imageconfigs/packagelists/baremetal-initrd.json"
+            ],
+            "PostInstallScripts": [],
+            "KernelOptions": {
+                "default": "kernel"
+            },
+            "AdditionalFiles": {
+                "../mic-iso-gen/files/prov/init": "/init",
+                "../mic-iso-gen/files/prov/getty@.service": "/usr/lib/systemd/system/getty@.service",
+                "../mic-iso-gen/files/prov/serial-getty@.service": "/usr/lib/systemd/system/serial-getty@.service",
+                "../mic-iso-gen/files/prov/udev/82-net-pnic.rules": "/etc/udev/rules.d/82-net-pnic.rules",
+                "../mic-iso-gen/files/prov/udev/vf-rep-link-name.sh": "/lib/udev/vf-rep-link-name.sh",
+                "../mic-iso-gen/files/prov/udev/vf-net-link-name.sh": "/lib/udev/vf-net-link-name.sh",
+                "../mic-iso-gen/files/prov/root.profile": "/root/.profile",
+                "../mic-iso-gen/files/stock/mariner-iso-start-up.sh": "/root/mariner-iso-start-up.sh"
+
+            },
+            "Users": [
+                {
+                    "Name": "root",
+                    "PasswordExpiresDays": 99999,
+                    "StartupCommand": "/root/mariner-iso-start-up.sh"
+                }
+            ]
+        }
+    ]
+}
