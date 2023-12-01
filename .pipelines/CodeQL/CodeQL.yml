@@ -8,9 +8,11 @@ resources:
     - repository: CBL-Mariner-Pipelines
       type: git
       name: mariner/CBL-Mariner-Pipelines
-      ref: 'refs/heads/master'
+      ref: 'refs/heads/nicolasg/codeQL-toolkit'
 
-stages:
-  - stage: CodeQlAnalysis
-    jobs:
-    - template: SDL/CodeQL-CBL-Mariner.yml@CBL-Mariner-Pipelines
+extends:
+  template: .pipelines/OneBranch-VM-Common-Template.yml@CBL-Mariner-Pipelines
+  parameters:
+    isOfficialTemplate: false
+    stages:
+      - template: SDL/CodeQL-CBL-Mariner.yml@CBL-Mariner-Pipelines
