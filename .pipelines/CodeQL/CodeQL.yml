@@ -4,14 +4,6 @@
 name: CodeQL CBL-Mariner repository
 
 parameters:
-  - name: marinerBranch
-    displayName: "CBL-Mariner branch to 'CodeQL'"
-    type: string
-    default: '2.0'
-    values:
-    - '2.0'
-    - '3.0'
-
   - name: analyzeInPipeline
     displayName: "local analysis (for debugging)"
     type: boolean
@@ -29,5 +21,4 @@ stages:
     jobs:
     - template: SDL/pipelines/CodeQL-template.yml@CBL-Mariner-Pipelines
       parameters:
-        marinerBranch: ${{ parameters.marinerBranch }}
         analyzeInPipeline: ${{ parameters.analyzeInPipeline }}
