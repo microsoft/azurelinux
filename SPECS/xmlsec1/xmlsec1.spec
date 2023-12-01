@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.aleksey.com/xmlsec
-Source0:        %{url}/download/%{name}-%{version}.tar.gz
+Source0:        https://www.aleksey.com/xmlsec/download/%{name}-%{version}.tar.gz
 BuildRequires:  gnutls-devel
 BuildRequires:  libgcrypt-devel
 BuildRequires:  libltdl-devel

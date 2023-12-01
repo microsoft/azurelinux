@@ -8,7 +8,7 @@ Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://github.com/shibukawa/imagesize_py
 #Source0:       https://github.com/shibukawa/imagesize_py/archive/%{version}.tar.gz
-Source0:        https://files.pythonhosted.org/packages/41/f5/3cf63735d54aa9974e544aa25858d8f9670ac5b4da51020bbfc6aaade741/imagesize-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/a7/84/62473fb57d61e31fef6e36d64a179c8781605429fd927b5dd608c997be31/imagesize-%{version}.tar.gz
 BuildArch:      noarch
 %if %{with_check}
 BuildRequires:  python3-pip

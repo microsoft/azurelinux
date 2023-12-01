@@ -6,7 +6,7 @@ License:        LGPLv2+ WITH exceptions
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/ocaml-ppx/ocaml-migrate-parsetree
-Source0:        https://github.com/ocaml-ppx/ocaml-migrate-parsetree/releases/download/v%{version}/%{name}-%{version}.tbz
+Source0:        https://github.com/ocaml-ppx/ocaml-migrate-parsetree/releases/download/%{version}/%{name}-%{version}.tbz
 
 BuildRequires:  ocaml
 BuildRequires:  ocaml-cinaps-devel

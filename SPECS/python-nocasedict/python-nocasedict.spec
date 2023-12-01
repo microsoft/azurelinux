@@ -8,7 +8,7 @@ License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/pywbem/nocasedict
-Source0:        https://github.com/pywbem/nocasedict/archive/refs/tags/1.0.2.tar.gz#/%{pkgname}-%{version}.tar.gz
+Source0:        https://github.com/pywbem/nocasedict/archive/refs/tags/%{version}.tar.gz#/%{pkgname}-%{version}.tar.gz
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-six >= %{six_version}

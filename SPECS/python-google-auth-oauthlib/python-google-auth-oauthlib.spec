@@ -8,7 +8,7 @@ License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/googleapis/google-auth-library-python-oauthlib
-Source0:        %{pypi_source}
+Source0:        https://files.pythonhosted.org/packages/e3/b4/ef2170c5f6aa5bc2461bab959a84e56d2819ce26662b50038d2d0602223e/%{pypi_name}-%{version}.tar.gz
 BuildRequires:  python3-click
 BuildRequires:  python3-devel
 BuildRequires:  python3-google-auth

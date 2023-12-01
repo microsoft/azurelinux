@@ -9,7 +9,7 @@ Group:          System Environment/Libraries
 URL:            https://www.infradead.org/~tgr/libnl/
 # It seems like the website no longer has the latest version of the source; this seems to be the correct source.
 # Note that a branch tag made it into the name using underscores in the semver. This will have to be updated with versions.
-Source0:        https://github.com/thom311/libnl/releases/download/%{name}_5_0/libnl-%{version}.tar.gz
+Source0:        https://github.com/thom311/libnl/releases/download/%{name}_7_0/libnl-%{version}.tar.gz
 BuildRequires:  dbus-devel
 BuildRequires:  glib-devel
 Requires:       dbus
