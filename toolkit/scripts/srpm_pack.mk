@@ -17,7 +17,6 @@ SRPM_BUILD_CHROOT_DIR = $(BUILD_DIR)/SRPM_packaging
 SRPM_BUILD_LOGS_DIR = $(LOGS_DIR)/pkggen/srpms
 
 # Input to the packing process
-toolchain_spec_list = $(toolchain_build_dir)/toolchain_specs.txt
 srpm_pack_list_file = $(BUILD_SRPMS_DIR)/pack_list.txt
 # The output of the packing process (may be empty is everything is already up-to-date)
 srpm_pack_summary_file = $(STATUS_FLAGS_DIR)/srpm_pack_activity.txt
@@ -115,7 +114,7 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(srpm_pack_list_file) $(
 		touch $@; \
 	fi
 
-$(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(toolchain_spec_list) $(common_srpm_packer_deps) $(TOOLCHAIN_MANIFEST)
+$(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(toolchain_spec_buildable_list) $(common_srpm_packer_deps) $(TOOLCHAIN_MANIFEST)
 	GODEBUG=netdns=go $(go-srpmpacker) \
 		--dir=$(SPECS_DIR) \
 		--output-dir=$(BUILD_SRPMS_DIR) \
@@ -126,7 +125,7 @@ $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(toolchain_spec_list) $(common_
 		--tls-key=$(TLS_KEY) \
 		--build-dir=$(SRPM_BUILD_CHROOT_DIR) \
 		--signature-handling=$(SRPM_FILE_SIGNATURE_HANDLING) \
-		--pack-list=$(toolchain_spec_list) \
+		--pack-list=$(toolchain_spec_buildable_list) \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		--packed-srpms-summary=$(toolchain_srpm_pack_summary_file) \
 		--log-file=$(LOGS_DIR)/toolchain/srpms/toolchain_srpmpacker.log \
