@@ -3078,8 +3078,8 @@
         "type": "other",
         "other": {
           "name": "e2fsprogs",
-          "version": "1.46.5",
-          "downloadUrl": "https://prdownloads.sourceforge.net/e2fsprogs/e2fsprogs-1.46.5.tar.gz"
+          "version": "1.47.0",
+          "downloadUrl": "https://prdownloads.sourceforge.net/e2fsprogs/e2fsprogs-1.47.0.tar.gz"
         }
       }
     },
@@ -4330,8 +4330,8 @@
         "type": "other",
         "other": {
           "name": "glib",
-          "version": "2.71.0",
-          "downloadUrl": "https://ftp.gnome.org/pub/gnome/sources/glib/2.71/glib-2.71.0.tar.xz"
+          "version": "2.78.1",
+          "downloadUrl": "https://ftp.gnome.org/pub/gnome/sources/glib/2.78/glib-2.78.1.tar.xz"
         }
       }
     },
@@ -4750,8 +4750,8 @@
         "type": "other",
         "other": {
           "name": "gpgme",
-          "version": "1.16.0",
-          "downloadUrl": "https://www.gnupg.org/ftp/gcrypt/gpgme/gpgme-1.16.0.tar.bz2"
+          "version": "1.23.2",
+          "downloadUrl": "https://www.gnupg.org/ftp/gcrypt/gpgme/gpgme-1.23.2.tar.bz2"
         }
       }
     },
@@ -11631,8 +11631,8 @@
         "type": "other",
         "other": {
           "name": "libxcrypt",
-          "version": "4.4.27",
-          "downloadUrl": "https://github.com/besser82/libxcrypt/archive/v4.4.27/libxcrypt-4.4.27.tar.gz"
+          "version": "4.4.36",
+          "downloadUrl": "https://github.com/besser82/libxcrypt/archive/v4.4.36/libxcrypt-4.4.36.tar.gz"
         }
       }
     },
@@ -11871,8 +11871,8 @@
         "type": "other",
         "other": {
           "name": "libxslt",
-          "version": "1.1.34",
-          "downloadUrl": "http://xmlsoft.org/sources/libxslt-1.1.34.tar.gz"
+          "version": "1.1.39",
+          "downloadUrl": "https://download.gnome.org/sources/libxslt/1.1/libxslt-1.1.39.tar.xz"
         }
       }
     },
@@ -13864,7 +13864,7 @@
         "other": {
           "name": "ncurses",
           "version": "6.4",
-          "downloadUrl": "https://invisible-mirror.net/archives/ncurses/current/ncurses-6.4-20230408.tgz"
+          "downloadUrl": "https://invisible-mirror.net/archives/ncurses/current/ncurses-6.4-20231125.tgz"
         }
       }
     },
@@ -16864,8 +16864,8 @@
         "type": "other",
         "other": {
           "name": "perl-DBD-SQLite",
-          "version": "1.70",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/I/IS/ISHIGAKI/DBD-SQLite-1.70.tar.gz"
+          "version": "1.74",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/I/IS/ISHIGAKI/DBD-SQLite-1.74.tar.gz"
         }
       }
     },
@@ -17594,8 +17594,8 @@
         "type": "other",
         "other": {
           "name": "perl-generators",
-          "version": "1.11",
-          "downloadUrl": "https://jplesnik.fedorapeople.org/generators/generators-1.11.tar.gz"
+          "version": "1.15",
+          "downloadUrl": "https://jplesnik.fedorapeople.org/generators/generators-1.15.tar.gz"
         }
       }
     },
@@ -18044,8 +18044,8 @@
         "type": "other",
         "other": {
           "name": "perl-libintl-perl",
-          "version": "1.32",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/G/GU/GUIDO/libintl-perl-1.32.tar.gz"
+          "version": "1.33",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/G/GU/GUIDO/libintl-perl-1.33.tar.gz"
         }
       }
     },
@@ -20194,8 +20194,8 @@
         "type": "other",
         "other": {
           "name": "perl-Test-Warnings",
-          "version": "0.031",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/E/ET/ETHER/Test-Warnings-0.031.tar.gz"
+          "version": "0.032",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/E/ET/ETHER/Test-Warnings-0.032.tar.gz"
         }
       }
     },
@@ -20914,8 +20914,8 @@
         "type": "other",
         "other": {
           "name": "pinentry",
-          "version": "1.2.0",
-          "downloadUrl": "https://gnupg.org/ftp/gcrypt/pinentry/pinentry-1.2.0.tar.bz2"
+          "version": "1.2.1",
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/pinentry/pinentry-1.2.1.tar.bz2"
         }
       }
     },
@@ -20964,8 +20964,8 @@
         "type": "other",
         "other": {
           "name": "pkgconf",
-          "version": "1.8.0",
-          "downloadUrl": "https://distfiles.dereferenced.org/pkgconf/pkgconf-1.8.0.tar.xz"
+          "version": "2.0.2",
+          "downloadUrl": "https://distfiles.dereferenced.org/pkgconf/pkgconf-2.0.2.tar.xz"
         }
       }
     },
@@ -22784,8 +22784,8 @@
         "type": "other",
         "other": {
           "name": "python-jinja2",
-          "version": "3.0.3",
-          "downloadUrl": "https://files.pythonhosted.org/packages/91/a5/429efc6246119e1e3fbf562c00187d04e83e54619249eb732bb423efa6c6/Jinja2-3.0.3.tar.gz"
+          "version": "3.1.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/j/jinja2/Jinja2-3.1.2.tar.gz"
         }
       }
     },
@@ -23044,8 +23044,8 @@
         "type": "other",
         "other": {
           "name": "python-markupsafe",
-          "version": "2.1.0",
-          "downloadUrl": "https://pypi.python.org/packages/source/M/MarkupSafe/MarkupSafe-2.1.0.tar.gz"
+          "version": "2.1.3",
+          "downloadUrl": "https://pypi.python.org/packages/source/M/MarkupSafe/MarkupSafe-2.1.3.tar.gz"
         }
       }
     },
@@ -28267,8 +28267,8 @@
         "type": "other",
         "other": {
           "name": "tar",
-          "version": "1.34",
-          "downloadUrl": "https://ftp.gnu.org/gnu/tar/tar-1.34.tar.xz"
+          "version": "1.35",
+          "downloadUrl": "https://ftp.gnu.org/gnu/tar/tar-1.35.tar.xz"
         }
       }
     },

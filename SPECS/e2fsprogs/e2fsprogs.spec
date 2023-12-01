@@ -1,14 +1,13 @@
 Summary:        Contains the utilities for the ext2 file system
 Name:           e2fsprogs
-Version:        1.46.5
-Release:        3%{?dist}
+Version:        1.47.0
+Release:        1%{?dist}
 License:        GPLv2 AND LGPLv2 AND BSD AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            http://e2fsprogs.sourceforge.net
 Source0:        https://prdownloads.sourceforge.net/e2fsprogs/%{name}-%{version}.tar.gz
-Patch0:         CVE-2022-1304.patch
 Requires:       %{name}-libs = %{version}-%{release}
 Conflicts:      toybox
 
@@ -144,6 +143,9 @@ done
 %defattr(-,root,root)
 
 %changelog
+* Tue Nov 28 2023 Andrew Phelps <anphel@microsoft.com> - 1.47.0-1
+- Upgrade to 1.47.0
+
 * Thu Aug 11 2022 Muhammad Falak <mwani@microsoft.com> - 1.46.5-3
 - Switch to `%autosetup` instead of `%setup`
 - Patch CVE-2022-1304
