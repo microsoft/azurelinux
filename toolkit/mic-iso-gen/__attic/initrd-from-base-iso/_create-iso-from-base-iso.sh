@@ -4,7 +4,9 @@ set -x
 set -e
 
 FULL_IMAGE_CONFIG_FILE=~/git/CBL-Mariner/toolkit/imageconfigs/baremetal.json
+ISO_INITRD_CONFIG_FILE=~/git/CBL-Mariner/toolkit/imageconfigs/baremetal-initrd.json
 ISO_IMAGE_CONFIG_FILE=~/git/CBL-Mariner/toolkit/imageconfigs/baremetal-iso.json
+
 
 #------------------------------------------------------------------------------
 
@@ -31,40 +33,33 @@ FULL_IMAGE_RAW_DISK=$BUILD_WORKING_DIR/raw-disk-output/disk0.raw
     $FULL_IMAGE_RAW_DISK
 
 # outputs:
-#   baremetal.iso
+#   $BUILD_WORKING_DIR/iso-image-output/baremetal.iso
 #
-ISO_IMAGE_RAW_DISK=$BUILD_WORKING_DIR/iso-image-output/baremetal.iso
+ISO_IMAGE=$BUILD_WORKING_DIR/iso-image-output/baremetal.iso
 
 ./toolkit/mic-iso-gen/__attic/initrd-from-base-iso/build-base-iso.sh \
     $ISO_IMAGE_CONFIG_FILE \
-    $ISO_IMAGE_RAW_DISK
+    $ISO_INITRD_CONFIG_FILE \
+    $ISO_IMAGE
 
+# outputs:
+#    $EXTRACT_ARTIFACTS_OUT_DIR
+#
+EXTRACT_ARTIFACTS_OUT_DIR=$BUILD_WORKING_DIR/extract-artifacts-from-iso-out-dir
 
+./toolkit/mic-iso-gen/__attic/initrd-from-base-iso/extract-artifacts-from-iso.sh \
+    $ISO_IMAGE \
+    /mnt/iso-mount \
+    $EXTRACT_ARTIFACTS_OUT_DIR
 
-
-#----
-OUTPUT_DIR=~/temp/iso-output
-sudo rm -rf $OUTPUT_DIR
-mkdir -p $OUTPUT_DIR
-
-INTERMEDIATE_ARTIFACTS_DIR=$OUTPUT_DIR/iso-intermediates
-mkdir -p $INTERMEDIATE_ARTIFACTS_DIR
-
-cd ~/git/CBL-Mariner/
-
-# ~/temp/iso-intermediates/iso-initrd.img
-# ~/temp/iso-intermediates/vmlinuz
-# ~/temp/iso-intermediates/baremetal.iso
-./toolkit/mic-iso-gen/0-build-baremetal-iso.sh gmileka/assemble-iso $INTERMEDIATE_ARTIFACTS_DIR
-
-# ~/temp/iso-intermediates/disk0.raw
-./toolkit/mic-iso-gen/1-build-rootfs.sh ~/git/CBL-Mariner/imageconfigs/baremetal.json $INTERMEDIATE_ARTIFACTS_DIR
-
-# ~/temp/iso-output
-./toolkit/mic-iso-gen/2-create-iso-2.sh \
-    $INTERMEDIATE_ARTIFACTS_DIR/baremetal.iso \
+# outputs:
+# $OUTPUT_DIR
+#
+./toolkit/mic-iso-gen/__attic/initrd-from-base-iso/create-iso-from-initrd-and-vmlinuz.sh \
+    $EXTRACT_ARTIFACTS_OUT_DIR/initrd.img \
+    $EXTRACT_ARTIFACTS_OUT_DIR/vmlinuz \
     ~/git/CBL-Mariner/toolkit/mic-iso-gen/files/stock/grub.cfg \
     ~/git/CBL-Mariner/toolkit/mic-iso-gen/files/stock/iso-image-installer/iso-image-installer.sh \
     ~/git/CBL-Mariner/toolkit/mic-iso-gen/files/stock/iso-image-installer/host-configuration.json \
-    $INTERMEDIATE_ARTIFACTS_DIR/disk0.raw \
-    $OUTPUT_DIR
+    $FULL_IMAGE_RAW_DISK \
+    $BUILD_OUT_DIR

@@ -3,14 +3,15 @@
 set -x
 set -e
 
-INPUT_BASE_ISO=$1
-INPUT_GRUB_CFG=$2
-INPUT_STARTUP_SCRIPT=$3
-INPUT_STARTUP_SCRIPT_CONFIGURATION=$4
-INPUT_ROOT_FS=$5
-OUTPUT_ISO_DIR=$6
+INPUT_INITRD=$1
+INPUT_VMLINUZ=$2
+INPUT_GRUB_CFG=$3
+INPUT_STARTUP_SCRIPT=$4
+INPUT_STARTUP_SCRIPT_CONFIGURATION=$5
+INPUT_ROOT_FS=$6
+OUTPUT_ISO_DIR=$7
 
-function CreateEfibootImage () {
+function create_efi_boot_image () {
     SRC_GRUB_CFG=$1
     INTERMEDIATE_OUTPUT=$2
     DST_DIR=$3
@@ -42,7 +43,7 @@ function CreateEfibootImage () {
     echo "Created ---- " $DST_DIR/efiboot.img
 }
 
-function CreateBiosImage () {
+function create_bios_image () {
     SRC_GRUB_CFG=$1
     INTERMEDIATE_OUTPUT=$2
     DST_DIR=$3
@@ -71,39 +72,19 @@ function CreateBiosImage () {
     echo "Created ---- " $DST_DIR/bios.img
 }
 
-function ExtractInitrdAndVmlinuz () {
-    local INPUT_ISO=$1
-    local OUTPUT_DIR=$2
-
-    BASE_ISO_MOUNT_DIR=/mnt/isomount
-    INPUT_INTRD=$BASE_ISO_MOUNT_DIR/isolinux/initrd.img
-    INPUT_VMLINUZ=$BASE_ISO_MOUNT_DIR/isolinux/vmlinuz
-
-    sudo mkdir -p $BASE_ISO_MOUNT_DIR
-    # sudo umount $BASE_ISO_MOUNT_DIR
-    sudo mount -o loop $INPUT_BASE_ISO $BASE_ISO_MOUNT_DIR
-
-    mkdir -p $OUTPUT_DIR
-    sudo cp $INPUT_INTRD $OUTPUT_DIR/initrd.img
-    sudo cp $INPUT_VMLINUZ $OUTPUT_DIR/vmlinuz
-
-    sudo umount $BASE_ISO_MOUNT_DIR
-    sudo rm -r $BASE_ISO_MOUNT_DIR
-}
-
-function CreateBootloadImages() {
+function create_bootload_images() {
     local INPUT_GRUB_CFG=$1
     local INTERMEDIATE_OUTPUT_DIR=$2
     local OUT_DIR=$3
 
     mkdir -p INTERMEDIATE_OUTPUT_DIR
 
-    CreateEfibootImage \
+    create_efi_boot_image \
         $INPUT_GRUB_CFG \
         $INTERMEDIATE_OUTPUT_DIR \
         $OUT_DIR
 
-    CreateBiosImage \
+    create_bios_image \
         $INPUT_GRUB_CFG \
         $INTERMEDIATE_OUTPUT_DIR \
         $OUT_DIR
@@ -140,11 +121,10 @@ mkdir -p $STAGED_ISO_ARTIFACTS_DIR
 
 pushd ~/git/CBL-Mariner/toolkit/mic-iso-gen
 
-ExtractInitrdAndVmlinuz \
-    $INPUT_BASE_ISO \
-    $STAGED_ISO_ARTIFACTS_DIR/boot
+cp $INPUT_INITRD $STAGED_ISO_ARTIFACTS_DIR/boot
+cp $INPUT_VMLINUZ $STAGED_ISO_ARTIFACTS_DIR/boot
 
-CreateBootloadImages \
+create_bootload_images \
     $INPUT_GRUB_CFG \
     $OUTPUT_ISO_DIR/iso-intermediate-artifacts \
     $STAGED_ISO_ARTIFACTS_DIR/boot/grub
@@ -195,21 +175,3 @@ sudo xorriso \
 echo $OUTPUT_ISO_IMAGE_NAME
 
 popd
-
-# -----------------------------------------------------------------------------
-# Test iso
-
-# sudo ./images/live-cd/test-create-vm.sh mariner13 /home/george/git/AfO-Packages/afo-host-live-cd-20211229-150826.iso
-
-# virt-install \
-#   --name $1 \
-#   --memory 4096 \
-#   --vcpus 2 \
-#   --cdrom $2 \
-#   --livecd \
-#   --nodisks \
-#   --cpu host \
-#   --machine pc-i440fx-hirsute \
-#   --os-variant linux2020 \
-#   --network default \
-#   --boot uefi,loader=/usr/share/OVMF/OVMF_CODE_4M.fd,loader_secure=no

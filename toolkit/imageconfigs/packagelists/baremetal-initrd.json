@@ -1,0 +1,14 @@
+{
+    "packages": [
+        "bash",
+        "dracut",
+        "efibootmgr",
+        "grub2-efi",
+        "grub2-efi-binary",
+        "mariner-release",
+        "rpm",
+        "shadow-utils",
+        "shim",
+        "systemd"
+    ]
+}

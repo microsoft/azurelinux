@@ -1,0 +1,46 @@
+# ConnectX-5
+SUBSYSTEM=="net", ACTION=="add", ATTRS{device}=="0x1017", ATTR{phys_port_name}!="", \
+        IMPORT{program}="/lib/udev/vf-rep-link-name.sh $attr{phys_port_name}" \
+        NAME="$env{NAME}", GOTO="net_setup_skip_link_name"
+
+SUBSYSTEM=="net", ACTION=="add", ATTRS{device}=="0x1018", DRIVERS=="mlx5_core", \
+        IMPORT{program}="/lib/udev/vf-net-link-name.sh" \
+        NAME="$env{NAME}", GOTO="net_setup_skip_link_name"
+
+# ConnectX-5 Ex
+SUBSYSTEM=="net", ACTION=="add", ATTRS{device}=="0x1019", ATTR{phys_port_name}!="", \
+        IMPORT{program}="/lib/udev/vf-rep-link-name.sh $attr{phys_port_name}" \
+        NAME="$env{NAME}", GOTO="net_setup_skip_link_name"
+
+SUBSYSTEM=="net", ACTION=="add", ATTRS{device}=="0x101a", DRIVERS=="mlx5_core", \
+        IMPORT{program}="/lib/udev/vf-net-link-name.sh" \
+        NAME="$env{NAME}", GOTO="net_setup_skip_link_name"
+
+# ConnectX-6
+SUBSYSTEM=="net", ACTION=="add", ATTRS{device}=="0x101b", ATTR{phys_port_name}!="", \
+        IMPORT{program}="/lib/udev/vf-rep-link-name.sh $attr{phys_port_name}" \
+        NAME="$env{NAME}", GOTO="net_setup_skip_link_name"
+
+SUBSYSTEM=="net", ACTION=="add", ATTRS{device}=="0x101c", DRIVERS=="mlx5_core", \
+        IMPORT{program}="/lib/udev/vf-net-link-name.sh" \
+        NAME="$env{NAME}", GOTO="net_setup_skip_link_name"
+
+# ConnectX-6 Dx
+SUBSYSTEM=="net", ACTION=="add", ATTRS{device}=="0x101d", ATTR{phys_port_name}!="", \
+        IMPORT{program}="/lib/udev/vf-rep-link-name.sh $attr{phys_port_name}" \
+        NAME="$env{NAME}", GOTO="net_setup_skip_link_name"
+
+SUBSYSTEM=="net", ACTION=="add", ATTRS{device}=="0x101e", DRIVERS=="mlx5_core", \
+        IMPORT{program}="/lib/udev/vf-net-link-name.sh" \
+        NAME="$env{NAME}", GOTO="net_setup_skip_link_name"
+
+# ConnectX-6 LX
+SUBSYSTEM=="net", ACTION=="add", ATTRS{device}=="0x101f", ATTR{phys_port_name}!="", \
+        IMPORT{program}="/lib/udev/vf-rep-link-name.sh $attr{phys_port_name}" \
+        NAME="$env{NAME}", GOTO="net_setup_skip_link_name"
+
+SUBSYSTEM=="net", ACTION=="add", ATTRS{device}=="0x101e", DRIVERS=="mlx5_core", \
+        IMPORT{program}="/lib/udev/vf-net-link-name.sh" \
+        NAME="$env{NAME}", GOTO="net_setup_skip_link_name"
+
+LABEL="net_setup_skip_link_name"

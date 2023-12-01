@@ -35,8 +35,8 @@ FULL_IMAGE_RAW_DISK=$BUILD_WORKING_DIR/raw-disk-output/disk0.raw
 #   $EXTRACT_ARTIFACTS_OUT_DIR/extracted-rootfs
 #   $EXTRACT_ARTIFACTS_OUT_DIR/extracted-vmlinuz-file
 #
-EXTRACT_ARTIFACTS_TMP_DIR=$BUILD_WORKING_DIR/extract-rootfs-artifacts-from-rootfs-tmp-dir
-EXTRACT_ARTIFACTS_OUT_DIR=$BUILD_WORKING_DIR/extract-rootfs-artifacts-from-rootfs-out-dir
+EXTRACT_ARTIFACTS_TMP_DIR=$BUILD_WORKING_DIR/extract-artifacts-from-rootfs-tmp-dir
+EXTRACT_ARTIFACTS_OUT_DIR=$BUILD_WORKING_DIR/extract-artifacts-from-rootfs-out-dir
 
 ./toolkit/mic-iso-gen/extract-artifacts-from-rootfs.sh \
     $FULL_IMAGE_RAW_DISK \
