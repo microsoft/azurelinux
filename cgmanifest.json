@@ -30099,7 +30099,7 @@
         "other": {
           "name": "xmlsec1",
           "version": "1.3.1",
-          "downloadUrl": "https://www.aleksey.com/xmlsec/download/xmlsec1-1.3.1.tar.gz"
+          "downloadUrl": "https://www.aleksey.com/xmlsec/download/older-releases/xmlsec1-1.3.1.tar.gz"
         }
       }
     },
