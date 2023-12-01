@@ -3,12 +3,6 @@
 
 name: CodeQL CBL-Mariner repository
 
-parameters:
-  - name: analyzeInPipeline
-    displayName: "local analysis (for debugging)"
-    type: boolean
-    default: true
-
 resources:
   repositories:
     - repository: CBL-Mariner-Pipelines
@@ -20,5 +14,3 @@ stages:
   - stage: CodeQlAnalysis
     jobs:
     - template: SDL/CodeQL-template.yml@CBL-Mariner-Pipelines
-      parameters:
-        analyzeInPipeline: ${{ parameters.analyzeInPipeline }}
