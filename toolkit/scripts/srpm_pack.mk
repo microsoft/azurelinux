@@ -16,7 +16,6 @@ SRPM_FILE_SIGNATURE_HANDLING ?= enforce
 SRPM_BUILD_CHROOT_DIR = $(BUILD_DIR)/SRPM_packaging
 SRPM_BUILD_LOGS_DIR = $(LOGS_DIR)/pkggen/srpms
 
-toolchain_spec_list = $(toolchain_build_dir)/toolchain_specs.txt
 srpm_pack_list_file = $(BUILD_SRPMS_DIR)/pack_list.txt
 
 # Configure the list of packages we want to process into SRPMs
@@ -109,7 +108,7 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(local_specs) $(local_sp
 		--timestamp-file=$(TIMESTAMP_DIR)/srpm_packer.jsonl && \
 	touch $@
 
-$(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(toolchain_spec_list) $(go-srpmpacker)
+$(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(toolchain_spec_buildable_list) $(go-srpmpacker)
 	GODEBUG=netdns=go $(go-srpmpacker) \
 		--dir=$(SPECS_DIR) \
 		--output-dir=$(BUILD_SRPMS_DIR) \
@@ -120,7 +119,7 @@ $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(toolchain_spec_list) $(go-srpm
 		--tls-key=$(TLS_KEY) \
 		--build-dir=$(SRPM_BUILD_CHROOT_DIR) \
 		--signature-handling=$(SRPM_FILE_SIGNATURE_HANDLING) \
-		--pack-list=$(toolchain_spec_list) \
+		--pack-list=$(toolchain_spec_buildable_list) \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		--log-file=$(LOGS_DIR)/toolchain/srpms/toolchain_srpmpacker.log \
 		--log-level=$(LOG_LEVEL) \
