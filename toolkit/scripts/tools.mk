@@ -127,12 +127,12 @@ $(BUILD_DIR)/tools/internal.test_coverage: $(go_internal_files) $(go_imagegen_fi
 # downloaded the dependencies as root. The go build command will download the dependencies if they are missing (but as root).
 $(STATUS_FLAGS_DIR)/got_go_deps.flag:
 	@cd $(TOOLS_DIR)/ && \
-		if [ -z "$$SUDO_USER" ]; then \
-			echo "SUDO_USER is not set, running 'go get' as user '$$USER'"; \
+		if [ -z "$(MARINER_BUILDER_USER)" ]; then \
+			echo "MARINER_BUILDER_USER is not set, running 'go get' as user '$$USER'"; \
 			go get -d ./... || echo "Failed to run 'go get', falling back to 'go build' to pull modules" ; \
 		else \
-			echo "SUDO_USER is set, running 'go get' as user '$$SUDO_USER'"; \
-			sudo -u $$SUDO_USER go get -d ./... || echo "Failed to run 'go get', falling back to 'go build' to pull modules" ; \
+			echo "MARINER_BUILDER_USER is set, running 'go get' as user '$(MARINER_BUILDER_USER)'"; \
+			sudo -u $(MARINER_BUILDER_USER) go get -d ./... || echo "Failed to run 'go get', falling back to 'go build' to pull modules" ; \
 		fi && \
 		touch $@
 

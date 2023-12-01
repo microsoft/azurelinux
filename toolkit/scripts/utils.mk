@@ -17,13 +17,25 @@ no_repo_acl = $(STATUS_FLAGS_DIR)/no_repo_acl.flag
 
 ######## MISC. MAKEFILE Functions ########
 
+ifeq (n,$(findstring n,$(firstword $(MAKEFLAGS))))
+# Dryrun, noop
+create_folder =
+else # ifeq (n,$(findstring...
 # Creates a folder if it doesn't exist. Also sets the timestamp to 0 if it is
-# created.
+# created. It will recursively call for each parent folder.
+# If the folder already exists, it will do nothing.
+# If the folder is not created, it will print an error and exit.
+#
+# Need to do some extra steps here so the user will get meaningful debug output from the shell script, generally a
+# call to $(shell ...) will not generate any output to the console.
 #
 # $1 - Folder path
 define create_folder
-$(call shell_real_build_only, if [ ! -d $1 ]; then mkdir -p $1 && touch -d @0 $1 ; fi )
+$(eval create_dir_temp_output = $(shell $(SCRIPTS_DIR)/makedirs.sh $1 $(MARINER_BUILDER_USER))) \
+$(if $(create_dir_temp_output),$(warning $(create_dir_temp_output)),) \
+$(if $(wildcard $1),,$(error create_folder: $1 not created))
 endef
+endif # ifeq (n,$(findstring...
 
 # Runs a shell commannd only if we are actually doing a build rather than parsing the makefile for tab-completion etc
 # Make will automatically create the MAKEFLAGS variable which contains each of the flags, non-build commmands will include -n
@@ -73,9 +85,9 @@ clean-variable_depends_on_phony:
 # they will alway run. Each rule will check the currently stored value in the file and only
 # update it if needed.
 
-# Generate a target which watches a variable for changes so rebuilds can be 
-# triggered if needed. Uses one file per variable. If the value of the variable 
-# is not the same as recorded in the file, update the file to match. This will 
+# Generate a target which watches a variable for changes so rebuilds can be
+# triggered if needed. Uses one file per variable. If the value of the variable
+# is not the same as recorded in the file, update the file to match. This will
 # force a rebuild of any dependent targets.
 #
 # $1 - name of the variable to watch for changes
