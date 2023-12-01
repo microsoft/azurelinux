@@ -14,8 +14,13 @@ function build_iso_image () {
 
     sudo rm -rf ./build/imagegen/baremetal-initrd
     sudo rm -rf ./build/imagegen/baremetal-iso
+    sudo rm -rf ./build/imagegen/iso-initrd
+    sudo rm -rf ./build/imagegen/iso_initrd
+
     sudo rm -rf ./out/images/baremetal-initrd
     sudo rm -rf ./out/images/baremetal-iso
+    sudo rm -rf ./out/images/iso-initrd
+    sudo rm -rf ./out/images/iso_initrd
 
     pushd toolkit
 

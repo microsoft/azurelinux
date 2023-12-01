@@ -5,6 +5,6 @@
 export TERMINFO=/usr/lib/mariner/terminfo
 export TERM=mariner-installer
 
-echo "Running mariner-iso-start-up script v1129-1110."
+echo "Running mariner-iso-start-up-minimal script v231130-1811."
 
 /bin/bash
