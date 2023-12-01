@@ -207,10 +207,6 @@ include $(SCRIPTS_DIR)/srpm_pack.mk
 #   containerized-rpmbuild containerized-rpmbuild-help
 include $(SCRIPTS_DIR)/containerized-build.mk
 
-# Expand local SRPMS into sources and SPECS with:
-#   expand-specs clean-expand-specs
-include $(SCRIPTS_DIR)/srpm_expand.mk
-
 # Create self contained toolkit archive contianing all the required tools with:
 #   package-toolkit, clean-package-toolkit
 include $(SCRIPTS_DIR)/toolkit.mk
