@@ -42,8 +42,8 @@ toolkit_rpms_snapshot_file_relative_path = $(toolkit_rpms_snapshot_file:$(toolki
 toolkit_repos_dir = $(toolkit_prep_dir)/repos
 toolkit_tools_dir = $(toolkit_prep_dir)/tools/toolkit_bins
 
-$(call create_folder,"$(rpms_snapshot_build_dir)")
-$(call create_folder,"$(toolkit_prep_dir)")
+$(call create_folder,$(rpms_snapshot_build_dir))
+$(call create_folder,$(toolkit_prep_dir))
 
 # Outputs
 toolkit_archive_versioned_compressed   = $(OUT_DIR)/toolkit-$(toolkit_version).tar.gz
