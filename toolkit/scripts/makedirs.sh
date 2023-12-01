@@ -33,7 +33,7 @@ function make_dir_recursive {
 }
 
 if [[ -z "${DIR}" ]] || [[ -z "${USER}" ]]; then
-    echo "mkdirs.sh: No directory or user specified (input: ''${DIR}', '${USER}'))"
+    echo "mkdirs.sh: No directory or user specified (input: '${DIR}', '${USER}'))"
     exit 1
 fi
 
