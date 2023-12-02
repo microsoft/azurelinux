@@ -144,7 +144,7 @@ func BeginTiming(toolName, outputFile string) (*TimeStamp, error) {
 
 	initTimeStampManager()
 
-	outputFileDescriptor, err := os.OpenFile(outputFile, os.O_CREATE|os.O_WRONLY, 0664)
+	outputFileDescriptor, err := os.OpenFile(outputFile, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0664)
 	if err != nil {
 		err = fmt.Errorf("unable to create file %s: %v", outputFile, err)
 		logger.Log.Warn(err.Error())
