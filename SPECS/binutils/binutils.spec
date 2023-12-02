@@ -41,23 +41,21 @@ Patch5:         CVE-2022-4285.patch
 Patch6:         disable_gold_test.patch
 Provides:       bundled(libiberty)
 
-Requires:       %{name}-common = %{version}-%{release}
-
 # Moving macro before the "SourceX" tags breaks PR checks parsing the specs.
 %global do_package() \
 %if %2 \
 %package -n binutils-%1 \
 Summary: Cross-build binary utilities for %1 \
-Requires: %{name}-common = %{version}-%{release} \
+Requires: cross-%{name}-common = %{version}-%{release} \
 %description -n binutils-%1 \
 Cross-build binary image generation, manipulation and query tools. \
 %endif
 
-%package common
+%package -n cross-%{name}-common
 Summary: Binutils documentation
 BuildArch: noarch
 
-%description common
+%description -n cross-%{name}-common
 Documentation for the binutils package.
 
 %description
@@ -86,6 +84,9 @@ function prep_target () {
 	    echo $1 >> cross.list
     fi
 }
+
+# $PACKAGE is used for the gettext catalog name when building 'cross-binutils-common'.
+sed -i -e 's/^ PACKAGE=/ PACKAGE=cross-/' */configure
 
 touch cross.list
 prep_target aarch64-linux-gnu %{build_aarch64}
@@ -133,6 +134,22 @@ do
     %make_build -C $target tooldir=%{_prefix}
 done < cross.list
 
+# for documentation purposes only
+mkdir cross-binutils
+pushd cross-binutils
+
+%configure \
+    --exec-prefix=%{auxbin_prefix} \
+    --program-prefix=cross- \
+    --disable-dependency-tracking \
+    --disable-silent-rules \
+    --disable-shared
+
+popd
+
+%make_build -C cross-binutils tooldir=%{_prefix}
+
+
 %install
 %make_install -C build tooldir=%{_prefix}
 %find_lang %{name} --all-name
@@ -153,6 +170,21 @@ done < cross.list
 
 rm -rf %{buildroot}%{_infodir}
 find %{buildroot} -type f -name "*.la" -delete -print
+
+echo "=== INSTALL po targets ==="
+for binary_name in binutils opcodes bfd gas ld gprof
+do
+    %make_install -C cross-binutils/$binary_name/po DESTDIR=%{buildroot}
+done
+
+# Find the language files which only exist in the common package
+(
+    for binary_name in binutils opcodes bfd gas ld gprof
+    do
+        %find_lang cross-$binary_name
+        cat cross-${binary_name}.lang
+    done
+) >files.cross || cat files.cross
 
 %check
 %make_build -C build tooldir=%{_prefix} check
@@ -182,9 +214,6 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/ldscripts/*
 %{_libdir}/libbfd-%{version}.so
 %{_libdir}/libopcodes-%{version}.so
-
-%files common
-%license COPYING
 %{_mandir}/man1/readelf.1.gz
 %{_mandir}/man1/windmc.1.gz
 %{_mandir}/man1/ranlib.1.gz
@@ -203,6 +232,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man1/windres.1.gz
 %{_mandir}/man1/size.1.gz
 %{_mandir}/man1/objdump.1.gz
+
+%files -n cross-%{name}-common -f files.cross
+%license COPYING
 
 %files devel
 %{_includedir}/ansidecl.h
