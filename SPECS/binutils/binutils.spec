@@ -201,6 +201,7 @@ done
 
 %files -f %{name}.lang
 %defattr(-,root,root)
+%license COPYING
 %{_bindir}/dwp
 %{_bindir}/gprof
 %{_bindir}/ld.bfd
