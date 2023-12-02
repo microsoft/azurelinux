@@ -5,11 +5,13 @@ package shell
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 
@@ -26,6 +28,8 @@ var (
 	allowProcessCreation = true
 
 	currentEnv = os.Environ()
+
+	ErrProcessTerminateTimeout = errors.New("process failed to exit after timeout")
 )
 
 // SetEnvironment sets the default environment variables to be used for all processes launched from this package.
@@ -41,7 +45,13 @@ func CurrentEnvironment() []string {
 // PermanentlyStopAllChildProcesses will send the provided signal to all processes spawned by this package,
 // and all of those process's children.
 // Invoking this will also block future process creation, causing the Execute methods to return an error.
-func PermanentlyStopAllChildProcesses(signal unix.Signal) {
+func PermanentlyStopAllChildProcesses(signal unix.Signal, customWaitDuration *time.Duration) (errorStates map[*exec.Cmd]error) {
+	waitDuration := 60 * time.Second
+	if customWaitDuration != nil {
+		waitDuration = *customWaitDuration
+	}
+	errorStates = make(map[*exec.Cmd]error)
+
 	// Acquire the global activeCommandsMutex to ensure no
 	// new commands are executed during this teardown routine
 	logger.Log.Info("Waiting for outstanding processes to be created")
@@ -54,6 +64,13 @@ func PermanentlyStopAllChildProcesses(signal unix.Signal) {
 
 	// For every running process, issue the provided signal to its process group,
 	// resulting in both the process and all of its children being stopped.
+
+	// Stop channel
+	type commandResult struct {
+		cmd *exec.Cmd
+		err error
+	}
+	stopResults := make(chan commandResult, len(activeCommands))
 	for cmd := range activeCommands {
 		logger.Log.Infof("Stopping (%s)", cmd.Path)
 
@@ -62,12 +79,52 @@ func PermanentlyStopAllChildProcesses(signal unix.Signal) {
 		err := unix.Kill(-cmd.Process.Pid, signal)
 		if err != nil {
 			logger.Log.Errorf("Unable to stop (%s): %v", strings.Join(cmd.Args, " "), err)
+			stopResults <- commandResult{cmd, err}
 			continue
 		}
 
-		// Wait for the process to fully exit
-		cmd.Wait()
+		// Wait for the process to fully exit, so long as it takes less than maxStopTime
+		go func(cmdToStop *exec.Cmd) {
+			err := cmdToStop.Wait()
+			stopResults <- commandResult{cmdToStop, err}
+		}(cmd)
 	}
+
+	// Wait for 60 seconds of inactivity before giving up.
+	timeIncrement := 10 * time.Second
+	startTime := time.Now()
+	for commandNum := 0; commandNum < len(activeCommands); commandNum++ {
+		// If increment is less than the remaining time, adjust it to match
+		if time.Since(startTime)+timeIncrement > waitDuration {
+			timeIncrement = waitDuration - time.Since(startTime)
+		}
+
+		select {
+		case result := <-stopResults:
+			errorStates[result.cmd] = result.err
+			resultCmd := result.cmd
+			resultErr := result.err
+			// Only write error if it matters (kill and term are expected)
+			if resultErr != nil && resultErr.Error() != "signal: killed" && resultErr.Error() != "signal: terminated" {
+				resultErr = fmt.Errorf("failed to stop process  (%s): %v", strings.Join(resultCmd.Args, " "), resultErr)
+				logger.Log.Errorf("Error stopping process:\n%v", resultErr)
+			} else {
+				delete(activeCommands, resultCmd)
+			}
+		case <-time.After(timeIncrement):
+			if time.Since(startTime) > waitDuration {
+				for stuckCmd := range activeCommands {
+					cmdErr := fmt.Errorf("%w: (%s), %s elapsed", ErrProcessTerminateTimeout, strings.Join(stuckCmd.Args, " "), time.Since(startTime))
+					logger.Log.Errorf("Error stopping process: %v", cmdErr)
+					errorStates[stuckCmd] = cmdErr
+				}
+				return
+			} else {
+				logger.Log.Infof("Still waiting for processes to exit (%s elapsed)", time.Since(startTime))
+			}
+		}
+	}
+	return
 }
 
 // Execute runs the provided command.
@@ -169,6 +226,13 @@ func ExecuteLiveWithErr(stderrLines int, program string, args ...string) (err er
 // If printOutputOnError is true, the full output of the command will be printed after completion if the command returns an error. In the event
 // the buffer becomes full the oldest buffered output is discarded.
 func ExecuteLiveWithCallback(onStdout, onStderr func(...interface{}), printOutputOnError bool, program string, args ...string) (err error) {
+	return ExecuteLiveWithCallbackInDirectory(onStdout, onStderr, printOutputOnError, program, "", args...)
+}
+
+// ExecuteLiveWithCallback runs a command in the shell and invokes the provided callbacks in real-time on each line of stdout and stderr.
+// If printOutputOnError is true, the full output of the command will be printed after completion if the command returns an error. In the event
+// the buffer becomes full the oldest buffered output is discarded.
+func ExecuteLiveWithCallbackInDirectory(onStdout, onStderr func(...interface{}), printOutputOnError bool, program, workingDirectory string, args ...string) (err error) {
 	var outputChan chan string
 	const outputChanBufferSize = 1500
 
@@ -214,6 +278,10 @@ func ExecuteLiveWithCallbackAndChannels(onStdout, onStderr func(...interface{}),
 		return
 	}
 	defer stderrPipe.Close()
+
+	if workingDirectory != "" {
+		cmd.Dir = workingDirectory
+	}
 
 	err = trackAndStartProcess(cmd)
 	if err != nil {
