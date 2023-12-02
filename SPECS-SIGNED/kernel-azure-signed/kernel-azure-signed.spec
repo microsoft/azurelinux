@@ -10,7 +10,7 @@
 Summary:        Signed Linux Kernel for Azure
 Name:           kernel-azure-signed-%{buildarch}
 Version:        5.15.138.1
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -153,9 +153,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %exclude /module_info.ld
 
 %changelog
-* Wed Nov 22 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.138.1-2
-- Bump release to match kernel-headers.
-
 * Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.138.1-1
 - Auto-upgrade to 5.15.138.1
 
