@@ -90,8 +90,10 @@ function prep_target () {
 touch cross.list
 prep_target aarch64-linux-gnu %{build_aarch64}
 
+%if %{build_cross}
 # $PACKAGE is used for the gettext catalog name when building 'cross-binutils-common'.
 sed -i -e 's/^ PACKAGE=/ PACKAGE=cross-/' */configure
+%endif
 
 %build
 
@@ -136,6 +138,7 @@ do
     %make_build -C $target tooldir=%{_prefix}
 done < cross.list
 
+%if %{build_cross}
 # for documentation purposes only
 mkdir cross-binutils
 pushd cross-binutils
@@ -150,6 +153,7 @@ pushd cross-binutils
 popd
 
 %make_build -C cross-binutils tooldir=%{_prefix}
+%endif
 
 
 %install
@@ -173,6 +177,7 @@ done < cross.list
 rm -rf %{buildroot}%{_infodir}
 find %{buildroot} -type f -name "*.la" -delete -print
 
+%if %{build_cross}
 echo "=== INSTALL po targets ==="
 for binary_name in binutils opcodes bfd gas ld gprof
 do
@@ -187,6 +192,7 @@ done
         cat cross-${binary_name}.lang
     done
 ) >files.cross || cat files.cross
+%endif
 
 %check
 %make_build -C build tooldir=%{_prefix} check
