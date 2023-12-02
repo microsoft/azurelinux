@@ -1,7 +1,7 @@
 Summary:        Utility to send ICMP echo probes to network hosts
 Name:           fping
-Version:        5.0
-Release:        2%{?dist}
+Version:        5.1
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -37,6 +37,9 @@ rm -rf %{buildroot}%{_infodir}
 %{_mandir}/man8/fping.8*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.1-1
+- Auto-upgrade to 5.1 - Azure Linux 3.0 - package upgrades
+
 * Thu May 12 2022 Eric Desrochers <edesrochers@microsoft.com> - 5.0-2
 - Add iana-etc as runtime depends
 

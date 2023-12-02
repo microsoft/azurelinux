@@ -1,6 +1,6 @@
 Summary:        C library for reading, creating, and modifying zip archives
 Name:           libzip
-Version:        1.8.0
+Version:        1.10.1
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -106,6 +106,9 @@ make check
 %{_libdir}/pkgconfig/libzip.pc
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.10.1-1
+- Auto-upgrade to 1.10.1 - Azure Linux 3.0 - package upgrades
+
 * Mon Feb 07 2022 Henry Li <lihl@microsoft.com> - 1.8.0-1
 - Upgrade to version 1.8.0
 

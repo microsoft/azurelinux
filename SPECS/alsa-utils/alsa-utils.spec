@@ -1,7 +1,7 @@
 Summary:        ALSA Utilities.
 Name:           alsa-utils
-Version:        1.2.6
-Release:        2%{?dist}
+Version:        1.2.9
+Release:        1%{?dist}
 License:        GPLv2+
 URL:            https://alsa-project.org
 Group:          Applications/Internet
@@ -45,6 +45,9 @@ alsactl -L store
 %{_localstatedir}/*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.2.9-1
+- Auto-upgrade to 1.2.9 - Azure Linux 3.0 - package upgrades
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.2.6-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

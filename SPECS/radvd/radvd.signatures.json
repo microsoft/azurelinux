@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "radvd-2.18.tar.xz": "e1bffefe6537e4b205d33afda35fec6014e5f860cc364850068a6ed9c6a65cdc",
-  "radvd-tmpfs.conf": "da69653b29db8af0f757d9f968882db566c4284a4cc9d7d29516d4c82dd463bb"
- }
+  "Signatures": {
+    "radvd-tmpfs.conf": "da69653b29db8af0f757d9f968882db566c4284a4cc9d7d29516d4c82dd463bb",
+    "radvd-2.19.tar.xz": "564e04597f71a9057d02290da0dd21b592d277ceb0e7277550991d788213e240"
+  }
 }

@@ -11,8 +11,8 @@
 %{!?_pkgdocdir: %global _pkgdocdir %{_docdir}/%{name}-%{version}}
 Summary:        A Kerberos 5 implementation without export restrictions
 Name:           heimdal
-Version:        7.7.1
-Release:        3%{?dist}
+Version:        7.8.0
+Release:        1%{?dist}
 License:        BSD AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -40,8 +40,6 @@ Source31:       %{name}-ipropd-slave-wrapper
 # to know how to interpret the "heimdal-" prefixes.
 Patch1:         heimdal-1.6.0-c25f45a-rename-commands.patch
 Patch2:         heimdal-configure.patch
-Patch3:         CVE-2022-45142.patch
-Patch4:         CVE-2022-42898.patch
 Patch5:         0001-lib-krb5-krb5_pac_parse-mem-leak-if-pac_header_size-.patch
 Patch6:         0002-kdc-Check-generate_pac-return-code.patch
 Patch7:         0003-kdc-avoid-re-encoding-KDC-REQ-BODY.patch
@@ -487,6 +485,9 @@ fi
 %{_sysconfdir}/profile.d/%{name}.csh
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 7.8.0-1
+- Auto-upgrade to 7.8.0 - Azure Linux 3.0 - package upgrades
+
 * Thu Aug 24 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 7.7.1-3
 - Address CVE-2022-42898
 - Introduce 3 more patches that fix bugs: https://github.com/heimdal/heimdal/issues/1011

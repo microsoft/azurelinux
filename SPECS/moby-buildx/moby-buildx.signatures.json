@@ -1,5 +1,5 @@
 {
- "Signatures": {
-  "moby-buildx-0.7.1.tar.gz": "5df4224eeac5a00d1bef2344660e93415264a64ea4742133f2c2a794c563ef50"
- }
+  "Signatures": {
+    "moby-buildx-0.11.2.tar.gz": "371eb742213ed580179fc4fdfd9a197f0e3115e91979b7907828427d578d49e5"
+  }
 }

@@ -7,8 +7,8 @@ comes with good defaults out of the box.
 
 Summary:        Simple wrapper around optparse for powerful command line utilities
 Name:           python-%{pypi_name}
-Version:        7.1.2
-Release:        7%{?dist}
+Version:        8.1.7
+Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -50,6 +50,9 @@ pytest -v tests
 %{python3_sitelib}/%{pypi_name}-*.egg-info/
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.1.7-1
+- Auto-upgrade to 8.1.7 - Azure Linux 3.0 - package upgrades
+
 * Tue May 30 2023 Olivia Crain <oliviacrain@microsoft.com> - 7.1.2-7
 - Change %%check to install known-good version of pytest
 - Use SPDX license expression in license tag

@@ -1,6 +1,6 @@
 Summary:        setuid implementation of a subset of user namespaces.
 Name:           bubblewrap
-Version:        0.6.1
+Version:        0.8.0
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
@@ -43,6 +43,9 @@ The original bubblewrap code existed before user namespaces - it inherits code f
 %{_datadir}/zsh/site-functions/_bwrap
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.8.0-1
+- Auto-upgrade to 0.8.0 - Azure Linux 3.0 - package upgrades
+
 * Tue Mar 08 2022 Andrew Phelps <anphel@microsoft.com> - 0.6.1-1
 - Upgrade to version 0.6.1
 - Disable documentation explicitly

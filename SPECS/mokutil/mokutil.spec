@@ -1,6 +1,6 @@
 Summary:        Tool to manage UEFI Secure Boot MoK Keys
 Name:           mokutil
-Version:        0.5.0
+Version:        0.6.0
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
@@ -43,6 +43,9 @@ make PREFIX=%{_prefix} LIBDIR=%{_libdir} DESTDIR=%{buildroot} install
 %{_datadir}/bash-completion/completions/mokutil
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.6.0-1
+- Auto-upgrade to 0.6.0 - Azure Linux 3.0 - package upgrades
+
 * Fri Feb 11 2022 Chris Co <chrco@microsoft.com> - 0.5.0-1
 - Update to 0.5.0 version
 - License verified

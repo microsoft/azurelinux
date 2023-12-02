@@ -1,7 +1,7 @@
 %define double_profiling_build 1
 Summary:        A spell checker and morphological analyzer library
 Name:           hunspell
-Version:        1.7.1
+Version:        1.7.2
 Release:        1%{?dist}
 License:        LGPLv2+ OR GPLv2+ OR MPLv1.1
 Vendor:         Microsoft Corporation
@@ -119,6 +119,9 @@ mkdir %{buildroot}/%{_datadir}/myspell
 %{_mandir}/man5/hunspell.5.gz
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7.2-1
+- Auto-upgrade to 1.7.2 - Azure Linux 3.0 - package upgrades
+
 * Mon Oct 10 2022 Osama Esmail <osamaesmail@microsoft.com> - 1.7.1-1
 - Moved from SPECS-EXTENDED to SPECS
 - Upgraded from 1.7.0 to 1.7.1 to address CVE-2019-16707

@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "im-chooser-1.7.3.tar.bz2": "de97071f0680913d95d2aa7d77a01f26c5f9c1f0fd1aa171986d1134fbddc174",
-  "im-chooser-LGPLv2.txt": "20c17d8b8c48a600800dfd14f95d5cb9ff47066a9641ddeab48dc54aec96e331"
- }
+  "Signatures": {
+    "im-chooser-LGPLv2.txt": "20c17d8b8c48a600800dfd14f95d5cb9ff47066a9641ddeab48dc54aec96e331",
+    "im-chooser-1.7.4.tar.bz2": "b1343773cfea5a340f75be3d051ce6e261940f8f4e7307c58bb46710853a0aa7"
+  }
 }

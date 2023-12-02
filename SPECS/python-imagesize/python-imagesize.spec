@@ -1,14 +1,14 @@
 Summary:        python module to analyze jpeg/jpeg2000/png/gif image header and return image size.
 Name:           python-imagesize
-Version:        1.1.0
-Release:        9%{?dist}
+Version:        1.4.1
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://github.com/shibukawa/imagesize_py
 #Source0:       https://github.com/shibukawa/imagesize_py/archive/%{version}.tar.gz
-Source0:        https://files.pythonhosted.org/packages/41/f5/3cf63735d54aa9974e544aa25858d8f9670ac5b4da51020bbfc6aaade741/imagesize-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/a7/84/62473fb57d61e31fef6e36d64a179c8781605429fd927b5dd608c997be31/imagesize-%{version}.tar.gz
 BuildArch:      noarch
 %if %{with_check}
 BuildRequires:  python3-pip
@@ -49,6 +49,9 @@ pip3 install pytest pathlib2 pluggy
 %{python3_sitelib}/*
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.4.1-1
+- Auto-upgrade to 1.4.1 - Azure Linux 3.0 - package upgrades
+
 * Wed Feb 09 2022 Muhammad Falak <mwani@microsoft.com> - 1.1.0-9
 - Add an explict BR on 'pip' to enable ptest
 - Remove stray `popd` in the `%check` section

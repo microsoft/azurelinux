@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "rng-tools-6.14.tar.gz": "4dd86f6ae37d917a8489f44070d39d7feddcc622429b95efd7aa85a1f3cfdf81",
-  "rngd.service": "f00fe60ff19fe22347103ff0ae60ab6c9f5e5713b598ec9921c7c185c548cf95"
- }
+  "Signatures": {
+    "rngd.service": "f00fe60ff19fe22347103ff0ae60ab6c9f5e5713b598ec9921c7c185c548cf95",
+    "rng-tools-6.16.tar.gz": "17666c4745fb635d91df293be188daf94b9e465d51d8503c0195fa3beb390894"
+  }
 }

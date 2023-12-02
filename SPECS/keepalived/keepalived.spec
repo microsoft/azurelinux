@@ -1,6 +1,6 @@
 Summary:        HA monitor built upon LVS, VRRP and services poller
 Name:           keepalived
-Version:        2.2.7
+Version:        2.2.8
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -109,6 +109,9 @@ fi
 %{_mandir}/man8/keepalived.8*
 
 %changelog
+* Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.2.8-1
+- Auto-upgrade to 2.2.8 - Azure Linux 3.0 - package upgrades
+
 * Tue Feb 08 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.2.7-1
 - Update source to v2.2.7
 - Using Fedora 36 spec (license: MIT) for guidance.

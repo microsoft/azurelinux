@@ -1,7 +1,7 @@
 Summary:        Parallel Implementation of GZIP
 Name:           pigz
-Version:        2.6
-Release:        2%{?dist}
+Version:        2.8
+Release:        1%{?dist}
 License:        zlib
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -37,6 +37,9 @@ install -p -m 755 unpigz %{buildroot}%{_bindir}/
 %{_bindir}/unpigz
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.8-1
+- Auto-upgrade to 2.8 - Azure Linux 3.0 - package upgrades
+
 * Mon Apr 11 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.6-2
 - Fixing invalid source URL.
 * Tue Feb 09 2021 Henry Beberman <henry.beberman@microsoft.com> - 2.6-1

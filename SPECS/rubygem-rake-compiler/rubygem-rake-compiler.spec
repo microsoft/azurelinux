@@ -2,7 +2,7 @@
 %undefine        _changelog_trimtime
 Summary:        Rake-based Ruby C Extension task generator
 Name:           rubygem-%{gem_name}
-Version:        1.1.9
+Version:        1.2.5
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -101,6 +101,9 @@ popd
 %{gem_docdir}
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.2.5-1
+- Auto-upgrade to 1.2.5 - Azure Linux 3.0 - package upgrades
+
 * Tue Mar 01 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.1.9-1
 - Update to v1.1.9.
 - Build from .tar.gz source.

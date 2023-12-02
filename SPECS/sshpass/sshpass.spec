@@ -1,6 +1,6 @@
 Summary:        Noninteractive ssh password provider
 Name:           sshpass
-Version:        1.09
+Version:        1.10
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
@@ -31,6 +31,9 @@ make prefix=%{_prefix}	DESTDIR=%{buildroot} install
 %{_mandir}/man1
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.10-1
+- Auto-upgrade to 1.10 - Azure Linux 3.0 - package upgrades
+
 * Mon Jan 03 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.09-1
 - Updated to version 1.09.
 
