@@ -1,0 +1,22 @@
+commit 2c62b9a3d8aa61bbb45a522c47be1ff2261e9b0e
+Author: Miroslav Lichvar <mlichvar@redhat.com>
+Date:   Mon Mar 14 11:40:50 2022 +0100
+
+    bash: remove default options for phc2sys
+    
+    Don't set any options by default for phc2sys to avoid conflict between
+    -O and -a.
+
+diff --git a/clknetsim.bash b/clknetsim.bash
+index becc94d..eed622c 100644
+--- a/clknetsim.bash
++++ b/clknetsim.bash
+@@ -82,7 +82,7 @@ start_client() {
+ 	    args+=($opts)
+ 	    ;;
+ 	phc2sys)
+-	    args=(-s /dev/ptp0 -O 0 $opts $config)
++	    args=($opts $config)
+ 	    ;;
+ 	nsm)
+ 	    args=($opts)
