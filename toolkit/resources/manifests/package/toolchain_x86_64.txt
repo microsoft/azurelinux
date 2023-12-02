@@ -11,7 +11,6 @@ bash-devel-5.1.8-4.cm2.x86_64.rpm
 bash-lang-5.1.8-4.cm2.x86_64.rpm
 binutils-2.37-8.cm2.x86_64.rpm
 binutils-aarch64-linux-gnu-2.37-8.cm2.x86_64.rpm
-binutils-common-2.37-8.cm2.noarch.rpm
 binutils-debuginfo-2.37-8.cm2.x86_64.rpm
 binutils-devel-2.37-8.cm2.x86_64.rpm
 bison-3.7.6-2.cm2.x86_64.rpm
@@ -48,6 +47,7 @@ cracklib-lang-2.9.7-5.cm2.x86_64.rpm
 createrepo_c-0.17.5-1.cm2.x86_64.rpm
 createrepo_c-debuginfo-0.17.5-1.cm2.x86_64.rpm
 createrepo_c-devel-0.17.5-1.cm2.x86_64.rpm
+cross-binutils-common-2.37-8.cm2.noarch.rpm
 curl-8.3.0-2.cm2.x86_64.rpm
 curl-debuginfo-8.3.0-2.cm2.x86_64.rpm
 curl-devel-8.3.0-2.cm2.x86_64.rpm
