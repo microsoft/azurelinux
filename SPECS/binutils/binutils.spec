@@ -5,12 +5,12 @@
 %global auxbin_prefix %{_exec_prefix}
 
 %ifarch x86_64
-%global build_all_cross 1
+%global build_cross 1
 %else
-%global build_all_cross 0
+%global build_cross 0
 %endif
 
-%global build_aarch64 %{build_all_cross}
+%global build_aarch64 %{build_cross}
 
 %global do_files() \
 %if %2 \
@@ -51,13 +51,6 @@ Requires: cross-%{name}-common = %{version}-%{release} \
 Cross-build binary image generation, manipulation and query tools. \
 %endif
 
-%package -n cross-%{name}-common
-Summary: Binutils documentation
-BuildArch: noarch
-
-%description -n cross-%{name}-common
-Documentation for the binutils package.
-
 %description
 The Binutils package contains a linker, an assembler,
 and other tools for handling object files.
@@ -69,6 +62,15 @@ Requires:       %{name} = %{version}
 %description    devel
 It contains the libraries and header files to create applications
 for handling compiled objects.
+
+%if %{build_cross}
+%package -n cross-%{name}-common
+Summary: Binutils documentation
+BuildArch: noarch
+
+%description -n cross-%{name}-common
+Documentation for the binutils package.
+%endif
 
 %do_package aarch64-linux-gnu %{build_aarch64}
 
@@ -85,11 +87,11 @@ function prep_target () {
     fi
 }
 
-# $PACKAGE is used for the gettext catalog name when building 'cross-binutils-common'.
-sed -i -e 's/^ PACKAGE=/ PACKAGE=cross-/' */configure
-
 touch cross.list
 prep_target aarch64-linux-gnu %{build_aarch64}
+
+# $PACKAGE is used for the gettext catalog name when building 'cross-binutils-common'.
+sed -i -e 's/^ PACKAGE=/ PACKAGE=cross-/' */configure
 
 %build
 
@@ -233,9 +235,6 @@ done
 %{_mandir}/man1/size.1.gz
 %{_mandir}/man1/objdump.1.gz
 
-%files -n cross-%{name}-common -f files.cross
-%license COPYING
-
 %files devel
 %{_includedir}/ansidecl.h
 %{_includedir}/bfd.h
@@ -262,6 +261,11 @@ done
 %{_libdir}/libiberty.a
 %{_libdir}/libopcodes.a
 %{_libdir}/libopcodes.so
+
+%if %{build_cross}
+%files -n cross-%{name}-common -f files.cross
+%license COPYING
+%endif
 
 %do_files aarch64-linux-gnu	%{build_aarch64}
 
