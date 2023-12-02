@@ -236,7 +236,7 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 	case err = <-results:
 	case <-time.After(timeout):
 		logger.Log.Errorf("Timeout after %v: killing all processes in chroot...", timeout)
-		shell.PermanentlyStopAllChildProcesses(unix.SIGKILL)
+		shell.PermanentlyStopAllChildProcesses(unix.SIGKILL, nil)
 		err = fmt.Errorf("build timed out after %s", timeout)
 	}
 
