@@ -2,9 +2,11 @@
 %global debug_package %{nil}
 
 %if "%{_arch}" == "x86_64"
-%define cross_archs arm64
+    %global build_cross 1
+    %define cross_archs arm64
 %else
-%define cross_archs %{nil}
+    %global build_cross 0
+    %define cross_archs %{nil}
 %endif
 
 Summary:        Linux API header files
@@ -24,7 +26,7 @@ BuildArch:      noarch
 %description
 The Linux API Headers expose the kernel's API for use by Glibc.
 
-%if "%{_arch}" == "x86_64"
+%if %{build_cross}
 %package -n kernel-cross-headers
 Summary: Header files for the Linux kernel for use by cross-glibc.
 
@@ -64,7 +66,7 @@ done
 %license COPYING
 %{_includedir}/*
 
-%if "%{_arch}" == "x86_64"
+%if %{build_cross}
 %files -n kernel-cross-headers
 %defattr(-,root,root)
 %{_prefix}/*-linux-gnu/*

@@ -1,13 +1,13 @@
 # Overriding the default to call 'configure' from subdirectories.
 %global _configure ../configure
 
-# Where the binaries aimed at gcc will live (ie. /usr/<target>/bin/)
+# Where the binaries aimed at gcc will live (ie. /usr/<target>/bin/).
 %global auxbin_prefix %{_exec_prefix}
 
 %ifarch x86_64
-%global build_cross 1
+    %global build_cross 1
 %else
-%global build_cross 0
+    %global build_cross 0
 %endif
 
 %global build_aarch64 %{build_cross}
@@ -48,7 +48,7 @@ Provides:       bundled(libiberty)
 Summary: Cross-build binary utilities for %1 \
 Requires: cross-%{name}-common = %{version}-%{release} \
 %description -n binutils-%1 \
-Cross-build binary image generation, manipulation and query tools. \
+Cross-build binary image generation, manipulation and query tools for the %1 architecture. \
 %endif
 
 %description
@@ -65,11 +65,11 @@ for handling compiled objects.
 
 %if %{build_cross}
 %package -n cross-%{name}-common
-Summary: Binutils documentation
+Summary: Cross-compilation binutils documentation
 BuildArch: noarch
 
 %description -n cross-%{name}-common
-Documentation for the binutils package.
+Documentation for the cross-compilation binutils package.
 %endif
 
 %do_package aarch64-linux-gnu %{build_aarch64}
@@ -91,8 +91,8 @@ touch cross.list
 prep_target aarch64-linux-gnu %{build_aarch64}
 
 %if %{build_cross}
-# $PACKAGE is used for the gettext catalog name when building 'cross-binutils-common'.
-sed -i -e 's/^ PACKAGE=/ PACKAGE=cross-/' */configure
+    # $PACKAGE is used for the gettext catalog name when building 'cross-binutils-common'.
+    sed -i -e 's/^ PACKAGE=/ PACKAGE=cross-/' */configure
 %endif
 
 %build
@@ -139,20 +139,20 @@ do
 done < cross.list
 
 %if %{build_cross}
-# for documentation purposes only
-mkdir cross-binutils
-pushd cross-binutils
+    # For documentation purposes only.
+    mkdir cross-binutils
+    pushd cross-binutils
 
-%configure \
-    --exec-prefix=%{auxbin_prefix} \
-    --program-prefix=cross- \
-    --disable-dependency-tracking \
-    --disable-silent-rules \
-    --disable-shared
+    %configure \
+        --exec-prefix=%{auxbin_prefix} \
+        --program-prefix=cross- \
+        --disable-dependency-tracking \
+        --disable-silent-rules \
+        --disable-shared
 
-popd
+    popd
 
-%make_build -C cross-binutils tooldir=%{_prefix}
+    %make_build -C cross-binutils tooldir=%{_prefix}
 %endif
 
 
@@ -178,20 +178,20 @@ rm -rf %{buildroot}%{_infodir}
 find %{buildroot} -type f -name "*.la" -delete -print
 
 %if %{build_cross}
-echo "=== INSTALL po targets ==="
-for binary_name in binutils opcodes bfd gas ld gprof
-do
-    %make_install -C cross-binutils/$binary_name/po DESTDIR=%{buildroot}
-done
-
-# Find the language files which only exist in the common package
-(
+    echo "=== INSTALL po targets ==="
     for binary_name in binutils opcodes bfd gas ld gprof
     do
-        %find_lang cross-$binary_name
-        cat cross-${binary_name}.lang
+        %make_install -C cross-binutils/$binary_name/po DESTDIR=%{buildroot}
     done
-) >files.cross || cat files.cross
+
+    # Find the language files which only exist in the common package.
+    (
+        for binary_name in binutils opcodes bfd gas ld gprof
+        do
+            %find_lang cross-$binary_name
+            cat cross-${binary_name}.lang
+        done
+    ) >files.cross
 %endif
 
 %check
