@@ -70,8 +70,11 @@ MAX_CASCADING_REBUILDS ?= 1
 endif
 
 ######## SET REMAINING FLAG DEFAULTS ########
-
+ifeq ($(USE_NEW_TOOLCHAIN),y)
+REBUILD_TOOLCHAIN               ?= auto
+else
 REBUILD_TOOLCHAIN               ?= n
+endif
 ALLOW_TOOLCHAIN_DOWNLOAD_FAIL   ?= n
 ##help:var:REBUILD_TOOLS:{y,n}=Build the go tools locally instead of taking them from the SDK.
 REBUILD_TOOLS                   ?= n

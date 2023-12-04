@@ -89,6 +89,7 @@ OUT_DIR          ?= $(PROJECT_ROOT)/out
 SPECS_DIR        ?= $(PROJECT_ROOT)/SPECS
 CCACHE_DIR       ?= $(PROJECT_ROOT)/ccache
 CCACHE_CONFIG    ?= $(RESOURCES_DIR)/manifests/package/ccache-configuration.json
+MISC_CACHE_DIR   ?= $(PROJECT_ROOT)/cache
 
 # Sub-folder defines
 LOGS_DIR           ?= $(BUILD_DIR)/logs
@@ -190,8 +191,17 @@ include $(SCRIPTS_DIR)/build_tag.mk
 include $(SCRIPTS_DIR)/tools.mk
 
 # Bootstrap the toolchain's compilers and other tools with:
-#   toolchain, raw-toolchain, clean-toolchain, check-manifests, check-x86_64-manifests, check-aarch64-manifests
+#     (common to both) toolchain clean-toolchain clean-toolchain-containers clean-toolchain-rpms
+ifeq ($(USE_NEW_TOOLCHAIN),y)
+include $(SCRIPTS_DIR)/toolchainV2.mk
+else
+#   (unique to old flow) raw-toolchain
 include $(SCRIPTS_DIR)/toolchain.mk
+endif
+
+# Common toolchain utilities with that are used for both new and old flows.
+#   copy-toolchain-rpms check-manifests check-x86_64-manifests check-aarch64-manifests compress-toolchain hydrate-toolchain
+include $(SCRIPTS_DIR)/toolchain_utils.mk
 
 # chroot worker with:
 #   chroot-tools clean-chroot-tools
