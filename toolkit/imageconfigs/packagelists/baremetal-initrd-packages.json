@@ -67,6 +67,7 @@
         "veritysetup",
         "words",
         "xz",
-        "zlib"
+        "zlib",
+        "zstd"
     ]
 }

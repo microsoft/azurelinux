@@ -23,14 +23,16 @@ mkdir -p $BUILD_OUT_DIR
 #------------------------------------------------------------------------------
 cd ~/git/CBL-Mariner/
 
-FULL_IMAGE_RAW_DISK=$BUILD_WORKING_DIR/raw-disk-output/disk0.raw
+# FULL_IMAGE_RAW_DISK=$BUILD_WORKING_DIR/raw-disk-output/disk0.raw
+# FULL_IMAGE_RAW_DISK=~/temp/control-plane.zst
+FULL_IMAGE_RAW_DISK=~/temp/control-plane-20231201.9.zst
 
 # outputs:
 #   disk0.raw
 #
-./toolkit/mic-iso-gen/build-rootfs.sh \
-    $FULL_IMAGE_CONFIG_FILE \
-    $FULL_IMAGE_RAW_DISK
+# ./toolkit/mic-iso-gen/build-rootfs.sh \
+#     $FULL_IMAGE_CONFIG_FILE \
+#     $FULL_IMAGE_RAW_DISK
 
 # outputs:
 #   $BUILD_WORKING_DIR/iso-image-output/baremetal.iso

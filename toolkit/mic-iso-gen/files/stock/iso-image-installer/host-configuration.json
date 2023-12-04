@@ -36,9 +36,9 @@
   "imaging": {
     "images": [
       {
-        "url": "/mnt/baremetal-iso/artifacts/disk0.raw",
+        "url": "/mnt/baremetal-iso/artifacts/full-image.zst",
         "sha256": "1234567890",
-        "format": "raw",
+        "format": "zst",
         "target-type": "disk",
         "target-id": "os"
       }
