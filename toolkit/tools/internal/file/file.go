@@ -15,9 +15,11 @@ import (
 	"io"
 	"io/fs"
 	"os"
+	"os/user"
 	"path/filepath"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/marinertoolusers"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 )
 
@@ -81,13 +83,27 @@ func Move(src, dst string) (err error) {
 // Copy copies a file from src to dst, creating directories for the destination if needed.
 // dst is assumed to be a file and not a directory. Will preserve permissions.
 func Copy(src, dst string) (err error) {
-	return copyWithPermissions(src, dst, os.ModePerm, false, os.ModePerm)
+	return copyWithPermissions(src, dst, os.ModePerm, false, os.ModePerm, nil)
+}
+
+// Copy copies a file from src to dst, creating directories for the destination if needed.
+// dst is assumed to be a file and not a directory. Will preserve permissions. Ownership will
+// be assigned to the given user.
+func CopyWithUser(src, dst string, user *user.User) (err error) {
+	return copyWithPermissions(src, dst, os.ModePerm, false, os.ModePerm, user)
 }
 
 // CopyAndChangeMode copies a file from src to dst, creating directories with the given access rights for the destination if needed.
 // dst is assumed to be a file and not a directory. Will change the permissions to the given value.
 func CopyAndChangeMode(src, dst string, dirmode os.FileMode, filemode os.FileMode) (err error) {
-	return copyWithPermissions(src, dst, dirmode, true, filemode)
+	return copyWithPermissions(src, dst, dirmode, true, filemode, nil)
+}
+
+// CopyAndChangeModeWithUser copies a file from src to dst, creating directories with the given access rights for the destination if needed.
+// dst is assumed to be a file and not a directory. Will change the permissions to the given value. Ownership will be
+// assigned to the given user.
+func CopyAndChangeModeWithUser(src, dst string, dirmode os.FileMode, filemode os.FileMode, user *user.User) (err error) {
+	return copyWithPermissions(src, dst, dirmode, true, filemode, user)
 }
 
 func readOneCompareBlock(in io.Reader, buffer *[]byte) (readSize int, err error) {
@@ -349,7 +365,7 @@ func GetAbsPathWithBase(baseDirPath, inputPath string) string {
 
 // copyWithPermissions copies a file from src to dst, creating directories with the requested mode for the destination if needed.
 // Depending on the changeMode parameter, it may also change the file mode.
-func copyWithPermissions(src, dst string, dirmode os.FileMode, changeMode bool, filemode os.FileMode) (err error) {
+func copyWithPermissions(src, dst string, dirmode os.FileMode, changeMode bool, filemode os.FileMode, user *user.User) (err error) {
 	const squashErrors = false
 
 	logger.Log.Debugf("Copying (%s) -> (%s)", src, dst)
@@ -362,7 +378,7 @@ func copyWithPermissions(src, dst string, dirmode os.FileMode, changeMode bool, 
 		return fmt.Errorf("source (%s) is not a file", src)
 	}
 
-	err = createDestinationDir(dst, dirmode)
+	err = createDestinationDir(dst, dirmode, user)
 	if err != nil {
 		return
 	}
@@ -377,10 +393,17 @@ func copyWithPermissions(src, dst string, dirmode os.FileMode, changeMode bool, 
 		err = os.Chmod(dst, filemode)
 	}
 
+	if user != nil {
+		err = marinertoolusers.GiveSinglePathToUser(dst, user)
+		if err != nil {
+			return
+		}
+	}
+
 	return
 }
 
-func createDestinationDir(dst string, dirmode os.FileMode) (err error) {
+func createDestinationDir(dst string, dirmode os.FileMode, user *user.User) (err error) {
 	isDstExist, err := PathExists(dst)
 	if err != nil {
 		return err
@@ -402,16 +425,22 @@ func createDestinationDir(dst string, dirmode os.FileMode) (err error) {
 		if err != nil {
 			return
 		}
+		if user != nil {
+			err = marinertoolusers.GiveSinglePathToUser(destDir, user)
+			if err != nil {
+				return
+			}
+		}
 	}
 
 	return
 }
 
 // CopyResourceFile copies a file from an embedded binary resource file.
-func CopyResourceFile(srcFS fs.FS, srcFile, dst string, dirmode os.FileMode, filemode os.FileMode) error {
+func CopyResourceFile(srcFS fs.FS, srcFile, dst string, dirmode os.FileMode, filemode os.FileMode, user *user.User) error {
 	logger.Log.Debugf("Copying resource (%s) -> (%s)", srcFile, dst)
 
-	err := createDestinationDir(dst, dirmode)
+	err := createDestinationDir(dst, dirmode, user)
 	if err != nil {
 		return err
 	}
@@ -436,6 +465,13 @@ func CopyResourceFile(srcFS fs.FS, srcFile, dst string, dirmode os.FileMode, fil
 	err = os.Chmod(dst, filemode)
 	if err != nil {
 		return fmt.Errorf("failed to copy resource (%s) -> (%s):\nfailed to set filemode:\n%w", srcFile, dst, err)
+	}
+
+	if user != nil {
+		err = marinertoolusers.GiveSinglePathToUser(dst, user)
+		if err != nil {
+			return fmt.Errorf("failed to copy resource (%s) -> (%s):\nfailed to set ownership:\n%w", srcFile, dst, err)
+		}
 	}
 
 	return nil

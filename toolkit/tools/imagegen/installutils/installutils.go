@@ -1041,7 +1041,7 @@ func InstallGrubEnv(installRoot string) (err error) {
 	)
 	installGrubEnvFile := filepath.Join(installRoot, grubEnvFile)
 	err = file.CopyResourceFile(resources.ResourcesFS, assetGrubEnvFile, installGrubEnvFile, bootDirectoryDirMode,
-		bootDirectoryFileMode)
+		bootDirectoryFileMode, nil)
 	if err != nil {
 		logger.Log.Warnf("Failed to copy and change mode of grubenv: %v", err)
 		return
@@ -1075,12 +1075,12 @@ func InstallGrubCfg(installRoot, rootDevice, bootUUID, bootPrefix string, encryp
 	installGrubDefFile := filepath.Join(installRoot, grubDefFile)
 
 	err = file.CopyResourceFile(resources.ResourcesFS, assetGrubcfgFile, installGrubCfgFile, bootDirectoryDirMode,
-		bootDirectoryFileMode)
+		bootDirectoryFileMode, nil)
 	if err != nil {
 		return
 	}
 	err = file.CopyResourceFile(resources.ResourcesFS, assetGrubDefFile, installGrubDefFile, bootDirectoryDirMode,
-		bootDirectoryFileMode)
+		bootDirectoryFileMode, nil)
 	if err != nil {
 		return
 	}
@@ -1892,7 +1892,7 @@ func installEfiBootloader(encryptEnabled bool, installRoot, bootUUID, bootPrefix
 	}
 	grubFinalPath := filepath.Join(installRoot, grubFinalDir, defaultCfgFilename)
 	err = file.CopyResourceFile(resources.ResourcesFS, grubAssetPath, grubFinalPath, bootDirectoryDirMode,
-		bootDirectoryFileMode)
+		bootDirectoryFileMode, nil)
 	if err != nil {
 		logger.Log.Warnf("Failed to copy grub.cfg: %v", err)
 		return
