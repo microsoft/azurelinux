@@ -4,20 +4,6 @@
 # also be handled in opensslconf-new.h.
 %define multilib_arches %{ix86} ia64 %{mips} ppc ppc64 s390 s390x sparcv9 sparc64 x86_64
 
-%define srpmhash() %{lua:
-local files = rpm.expand("%_specdir/openssl.spec")
-for i, p in ipairs(patches) do
-   files = files.." "..p
-end
-for i, p in ipairs(sources) do
-   files = files.." "..p
-end
-local sha256sum = assert(io.popen("cat "..files.." 2>/dev/null | sha256sum"))
-local hash = sha256sum:read("*a")
-sha256sum:close()
-print(string.sub(hash, 0, 16))
-}
-
 %global _performance_build 1
 
 Summary: Utilities from the general purpose cryptography library with TLS implementation
@@ -79,7 +65,9 @@ Patch35:  0035-speed-skip-unavailable-dgst.patch
 # # Extra public/private key checks required by FIPS-140-3
 Patch44:  0044-FIPS-140-3-keychecks.patch
 # # Minimize fips services
-Patch45:  0045-FIPS-services-minimize.patch
+# AZL: NOTE: Removed this because it is RHEL-specific, but want a record of it until I do the final
+#            review of patches.
+#Patch45:  0045-FIPS-services-minimize.patch
 # # Execute KATS before HMAC verification
 Patch47:  0047-FIPS-early-KATS.patch
 # # Selectively disallow SHA1 signatures rhbz#2070977
@@ -146,6 +134,12 @@ Patch113: 0113-asymciphers-kem-Add-explicit-FIPS-indicator.patch
 # # We believe that some changes present in CentOS are not necessary
 # # because ustream has a check for FIPS version
 Patch114: 0114-FIPS-enforce-EMS-support.patch
+
+# Fips disallows SHA1, but some of the tests still use it.
+# AZL: NOTE: Look at this when we fully review patches; it's possible it will be
+#            unnecessary.
+Patch115: 0001-Disable-most-DSA-tests-that-use-SHA1-which-is-disall.patch
+
 
 License: Apache-2.0
 URL: http://www.openssl.org/
@@ -287,7 +281,6 @@ RPM_OPT_FLAGS="$RPM_OPT_FLAGS -Wa,--noexecstack -Wa,--generate-missing-build-not
 
 export HASHBANGPERL=/usr/bin/perl
 
-%define fips %{version}-%{srpmhash}
 # ia64, x86_64, ppc are OK by default
 # Configure the build tree.  Override OpenSSL defaults with known-good defaults
 # usable on all platforms.  The Configure script already knows to use -fPIC and
@@ -297,7 +290,7 @@ export HASHBANGPERL=/usr/bin/perl
 	zlib enable-camellia enable-seed enable-rfc3779 no-sctp \
 	enable-cms enable-md2 enable-rc5 ${ktlsopt} enable-fips\
 	no-mdc2 no-ec2m no-sm2 no-sm4 enable-buildtest-c++\
-	shared  ${sslarch} $RPM_OPT_FLAGS '-DDEVRANDOM="\"/dev/urandom\"" -DREDHAT_FIPS_VERSION="\"%{fips}\""'\
+	shared  ${sslarch} $RPM_OPT_FLAGS '-DDEVRANDOM="\"/dev/urandom\""'\
 	-Wl,--allow-multiple-definition
 
 # Do not run this in a production package the FIPS symbols must be patched-in
@@ -480,6 +473,7 @@ install -m644 %{SOURCE9} \
 - Upgrade to 3.1.4
 - Initial CBL-Mariner import from Fedora 39 (license: MIT).
 - License verified
+- Removed redhat-specific REDHAT_FIPS_VERSION and added/updated relevant patches
 
 * Thu Oct 26 2023 Sahana Prasad <sahana@redhat.com> - 1:3.1.4-1
 - Rebase to upstream version 3.1.4
