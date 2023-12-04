@@ -11,7 +11,7 @@
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
 Version:        5.15.126.mshv9
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
@@ -139,7 +139,7 @@ ln -s vmlinux-%{uname_r} %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vml
 
 cat > %{buildroot}/boot/linux-%{uname_r}.cfg << "EOF"
 # GRUB Environment Block
-mariner_cmdline_mshv=rd.auto=1 lockdown=integrity sysctl.kernel.unprivileged_bpf_disabled=1 init=/lib/systemd/systemd ro no-vmw-sta crashkernel=128M audit=0 console=ttyS0,115200n8 earlyprintk
+mariner_cmdline_mshv=rd.auto=1 lockdown=integrity sysctl.kernel.unprivileged_bpf_disabled=1 init=/lib/systemd/systemd ro no-vmw-sta audit=0 console=ttyS0,115200n8 earlyprintk
 mariner_linux_mshv=vmlinuz-%{uname_r}
 mariner_initrd_mshv=initrd.img-%{uname_r}
 EOF
@@ -208,6 +208,9 @@ fi
 ln -sf linux-%{uname_r}.cfg /boot/mariner-mshv.cfg
 %grub2_post
 
+%posttrans
+systemctl mask kdump.service >/dev/null 2>&1 || :
+
 %files
 %defattr(-,root,root)
 %license COPYING
@@ -248,6 +251,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner-mshv.cfg
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Mon Dec 04 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.126.mshv9-3
+- Disable kdump.service, crashkernel allocation
+
 * Mon Nov 20 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.126.mshv9-2
 - Add cpio as BuildRequires
 
