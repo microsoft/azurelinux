@@ -83,7 +83,7 @@ function prep_target () {
 
     if [ $condition != 0 ]
     then
-	    echo $1 >> cross.list
+        echo $1 >> cross.list
     fi
 }
 
@@ -109,7 +109,7 @@ function config_cross_target () {
         --target=$target \
         --disable-multilib \
         --disable-nls \
-	    --disable-install_libbfd \
+        --disable-install_libbfd \
         --with-sysroot=%{_prefix}/$target/sys-root
 
     popd
@@ -274,7 +274,7 @@ done
 %license COPYING
 %endif
 
-%do_files aarch64-linux-gnu	%{build_aarch64}
+%do_files aarch64-linux-gnu %{build_aarch64}
 
 %changelog
 * Fri Nov 17 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.37-8
