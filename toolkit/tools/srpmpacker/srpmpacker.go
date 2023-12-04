@@ -1021,7 +1021,7 @@ func validateSignature(path string, srcConfig sourceRetrievalConfiguration, curr
 		return
 	}
 
-	newSignature, err := file.GenerateSHA256(path)
+	newSignature, err := file.GenerateSHA256String(path)
 	if err != nil {
 		return
 	}
