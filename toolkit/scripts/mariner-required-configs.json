@@ -644,7 +644,7 @@
                     "https://github.com/microsoft/CBL-Mariner/pull/3210"
                 ]
             },
-            "CONSOLE_LOGLEVEL_DEFAULT": {
+            "CONFIG_CONSOLE_LOGLEVEL_DEFAULT": {
                 "value": [
                     "7"
                 ],
