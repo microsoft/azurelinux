@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"sort"
 	"sync"
 	"time"
 
@@ -72,6 +73,7 @@ var (
 	inChrootMutex      sync.Mutex
 	activeChrootsMutex sync.Mutex
 	activeChroots      []*Chroot
+	unsafeUnmountDirs  []string
 )
 
 var defaultChrootEnv = []string{
@@ -499,7 +501,12 @@ func cleanupAllChroots() {
 		}
 	}
 
-	if failedToUnmount {
+	failedToUnmountUnsafe := false
+	if buildpipeline.IsRegularBuild() && len(unsafeUnmountDirs) > 0 {
+		failedToUnmountUnsafe = CleanupUnsafeMounts(unsafeUnmountDirs)
+	}
+
+	if failedToUnmount || failedToUnmountUnsafe {
 		logger.Log.Fatalf("Failed to unmount a chroot, manual unmount required. See above errors for details on which mounts failed.")
 	} else {
 		logger.Log.Info("Cleanup finished")
@@ -577,6 +584,72 @@ func (c *Chroot) unmountAndRemove(leaveOnDisk, lazyUnmount bool) (err error) {
 		err = os.RemoveAll(c.rootDir)
 	}
 
+	return
+}
+
+// RegisterUnsafeUnmount registers a directory to be unmounted on SIGTERM. These unmounts will be hanlded lazily with
+// best effort. This is intended to be used to unmount as a last resort. The mounts will be sorted by path and unmounted
+// in reverse order to ensure nested mounts are unmounted first.
+func RegisterUnsafeUnmount(moutnDir string) {
+	activeChrootsMutex.Lock()
+	defer activeChrootsMutex.Unlock()
+	unsafeUnmountDirs = append(unsafeUnmountDirs, moutnDir)
+}
+
+// CleanupUnsafeMounts unmounts a given list of directories. These unmounts will be hanlded lazily with best effort, reverse sorted
+// order to ensure nested mounts are unmounted first. This is intended to be used to unmount as a last resort.
+func CleanupUnsafeMounts(mounts []string) (failedToUnmount bool) {
+	sort.Slice(mounts, func(i, j int) bool {
+		return mounts[i] > mounts[j]
+	})
+	logger.Log.Errorf("Unmounting %v", mounts)
+	for _, dir := range mounts {
+		err := unsafeUnmount(dir)
+		if err != nil {
+			logger.Log.Errorf("Failed to unmount unsafe unmount dir (%s)", dir)
+			failedToUnmount = true
+		}
+	}
+	return
+}
+
+// UnsafeUnmount unmounts a given directory. This function is unsafe because it does not coordinate with other Chroots.
+// This is NOT a recursive unmount, it just unmounts the given directory lazily. This is intended to be used to unmount
+// as a last resort.
+func unsafeUnmount(mountDir string) (err error) {
+	const (
+		// Do a lazy unmount as a fallback. This will allow the unmount to succeed even if the mount point is busy.
+		// This is to avoid leaving folders like /dev mounted if the chroot folder is forcefully deleted by the user. Even
+		// if the mount is busy at least it will be detached from the filesystem and will not damage the host.
+		unmountFlagsLazy = unix.MNT_DETACH
+	)
+
+	exists, err := file.PathExists(mountDir)
+	if err != nil {
+		logger.Log.Warnf("Failed to check if path (%s) is a directory. Error: %s", mountDir, err)
+		return err
+	}
+	if !exists {
+		return
+	} else {
+		logger.Log.Infof("Checking '%s' for possible unsafe unmount", mountDir)
+	}
+
+	isMounted, err := mountinfo.Mounted(mountDir)
+	if err != nil {
+		logger.Log.Warnf("Failed to check if path (%s) is mounted. Error: %s", mountDir, err)
+		return err
+	}
+	if isMounted {
+		logger.Log.Warnf("Path (%s) is still mounted. Attempting to unmount it.", mountDir)
+		umountErr := unix.Unmount(mountDir, unmountFlagsLazy)
+		if umountErr != nil {
+			logger.Log.Warnf("Failed to unmount (%s). Error: %s", mountDir, umountErr)
+			err = umountErr
+		}
+	} else {
+		logger.Log.Infof("Path (%s) is not mounted", mountDir)
+	}
 	return
 }
 
