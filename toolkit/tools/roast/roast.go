@@ -15,6 +15,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/marinertoolusers"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/profile"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/roast/formats"
@@ -257,7 +258,12 @@ func artifactConverterWorker(convertRequests chan *convertRequest, convertedResu
 			if err != nil {
 				logger.Log.Errorf("Failed to move (%s) to (%s). Error: %s", workingArtifactPath, finalFile, err)
 			} else {
-				result.convertedFile = finalFile
+				err = marinertoolusers.GiveSinglePathToUser(finalFile, marinertoolusers.GetMarinerBuildUser())
+				if err != nil {
+					logger.Log.Errorf("Failed to change ownership of (%s) to mariner builder user. Error: %s", finalFile, err)
+				} else {
+					result.convertedFile = finalFile
+				}
 			}
 		}
 
