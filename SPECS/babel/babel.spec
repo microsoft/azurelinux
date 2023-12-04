@@ -1,13 +1,13 @@
 Summary:        An integrated collection of utilities that assist in internationalizing and localizing Python applications
 Name:           babel
-Version:        2.9.1
+Version:        2.12.1
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://babel.pocoo.org
-Source0:        https://files.pythonhosted.org/packages/17/e6/ec9aa6ac3d00c383a5731cc97ed7c619d3996232c977bb8326bcbb6c687e/Babel-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/ba/42/54426ba5d7aeebde9f4aaba9884596eb2fe02b413ad77d62ef0b0422e205/Babel-%{version}.tar.gz
 BuildRequires:  python3-devel
 BuildRequires:  python3-pytest
 BuildRequires:  python3-pytz
@@ -55,6 +55,9 @@ pip3 install pytest freezegun funcsigs pathlib2 pluggy utils
 %{python3_sitelib}/*
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.12.1-1
+- Auto-upgrade to 2.12.1 - Azure Linux 3.0 - package upgrades
+
 * Tue Mar 08 2022 Andrew Phelps <anphel@microsoft.com> - 2.9.1-1
 - Upgrade to version 2.9.1
 

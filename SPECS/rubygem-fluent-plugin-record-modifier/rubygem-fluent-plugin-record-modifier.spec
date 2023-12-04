@@ -2,8 +2,8 @@
 %global gem_name fluent-plugin-record-modifier
 Summary:        Filter plugin for modifying event record
 Name:           rubygem-%{gem_name}
-Version:        2.1.0
-Release:        2%{?dist}
+Version:        2.1.1
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -33,6 +33,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.1.1-1
+- Auto-upgrade to 2.1.1 - Azure Linux 3.0 - package upgrades
+
 * Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.1.0-2
 - Build from .tar.gz source.
 

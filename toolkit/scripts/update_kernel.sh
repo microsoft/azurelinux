@@ -64,7 +64,7 @@ function find_old_version {
 }
 
 function update_configs {
-    CONFIG_FILE="kernel/config kernel/config_aarch64 kernel-hci/config kernel-azure/config kernel-azure/config_aarch64"
+    CONFIG_FILE="kernel/config kernel/config_aarch64 kernel-hci/config"
     for configfile in $CONFIG_FILE
     do
         FILE=$WORKSPACE/SPECS/$configfile
@@ -141,7 +141,7 @@ function update_toolchain_pkglist {
     do
         file=$PKGLIST_FOLDER/$pkg
         PATTERN="kernel-headers-.*"
-        REPLACE="kernel-headers-$VERSION-1.cm2.noarch.rpm"
+        REPLACE="kernel-headers-$VERSION-1.azl3.noarch.rpm"
         sed -i "s/$PATTERN/$REPLACE/" $file
     done
 }

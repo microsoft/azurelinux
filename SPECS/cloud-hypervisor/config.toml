@@ -1,47 +1,47 @@
 [source.crates-io]
 replace-with = "vendored-sources"
 
-[source."https://github.com/cloud-hypervisor/kvm-bindings"]
+[source."git+https://github.com/cloud-hypervisor/kvm-bindings?branch=ch-v0.6.0-tdx"]
 git = "https://github.com/cloud-hypervisor/kvm-bindings"
 branch = "ch-v0.6.0-tdx"
 replace-with = "vendored-sources"
 
-[source."https://github.com/cloud-hypervisor/versionize_derive"]
+[source."git+https://github.com/cloud-hypervisor/versionize_derive?branch=ch"]
 git = "https://github.com/cloud-hypervisor/versionize_derive"
 branch = "ch"
 replace-with = "vendored-sources"
 
-[source."https://github.com/firecracker-microvm/micro-http"]
+[source."git+https://github.com/firecracker-microvm/micro-http?branch=main"]
 git = "https://github.com/firecracker-microvm/micro-http"
 branch = "main"
 replace-with = "vendored-sources"
 
-[source."https://github.com/rust-vmm/acpi_tables"]
+[source."git+https://github.com/rust-vmm/acpi_tables?branch=main"]
 git = "https://github.com/rust-vmm/acpi_tables"
 branch = "main"
 replace-with = "vendored-sources"
 
-[source."https://github.com/rust-vmm/kvm-ioctls"]
+[source."git+https://github.com/rust-vmm/kvm-ioctls?branch=main"]
 git = "https://github.com/rust-vmm/kvm-ioctls"
 branch = "main"
 replace-with = "vendored-sources"
 
-[source."https://github.com/rust-vmm/mshv"]
+[source."git+https://github.com/rust-vmm/mshv?branch=main"]
 git = "https://github.com/rust-vmm/mshv"
 branch = "main"
 replace-with = "vendored-sources"
 
-[source."https://github.com/rust-vmm/vfio"]
-git = "https://github.com/rust-vmm/vfio"
-branch = "main"
-replace-with = "vendored-sources"
-
-[source."https://github.com/rust-vmm/vfio-user"]
+[source."git+https://github.com/rust-vmm/vfio-user?branch=main"]
 git = "https://github.com/rust-vmm/vfio-user"
 branch = "main"
 replace-with = "vendored-sources"
 
-[source."https://github.com/rust-vmm/vm-fdt"]
+[source."git+https://github.com/rust-vmm/vfio?branch=main"]
+git = "https://github.com/rust-vmm/vfio"
+branch = "main"
+replace-with = "vendored-sources"
+
+[source."git+https://github.com/rust-vmm/vm-fdt?branch=main"]
 git = "https://github.com/rust-vmm/vm-fdt"
 branch = "main"
 replace-with = "vendored-sources"

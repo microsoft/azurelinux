@@ -1,7 +1,7 @@
 Summary:        High-Level Crypto API
 Name:           gpgme
-Version:        1.16.0
-Release:        2%{?dist}
+Version:        1.23.2
+Release:        1%{?dist}
 License:        GPLv3+ and LGPLv2+ and MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -84,6 +84,9 @@ cd tests
 %{python3_sitearch}/gpg/
 
 %changelog
+* Tue Nov 28 2023 Andrew Phelps <anphel@microsoft.com> - 1.23.2-1
+- Upgrade to version 1.23.2
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.16.0-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

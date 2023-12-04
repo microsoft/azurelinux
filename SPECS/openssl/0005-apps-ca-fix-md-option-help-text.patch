@@ -1,0 +1,28 @@
+From 3d8fa9859501b07e02b76b5577e2915d5851e927 Mon Sep 17 00:00:00 2001
+From: Tomas Mraz <tmraz@fedoraproject.org>
+Date: Thu, 24 Sep 2020 09:27:18 +0200
+Subject: apps/ca: fix md option help text
+
+upstreamable
+
+(was openssl-1.1.1-apps-dgst.patch)
+---
+ apps/ca.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/apps/ca.c b/apps/ca.c
+index 0f21b4fa1c..3d4b2c1673 100755
+--- a/apps/ca.c
++++ b/apps/ca.c
+@@ -209,7 +209,7 @@ const OPTIONS ca_options[] = {
+     {"noemailDN", OPT_NOEMAILDN, '-', "Don't add the EMAIL field to the DN"},
+ 
+     OPT_SECTION("Signing"),
+-    {"md", OPT_MD, 's', "Digest to use, such as sha256"},
++    {"md", OPT_MD, 's', "Digest to use, such as sha256; see openssl help for list"},
+     {"keyfile", OPT_KEYFILE, 's', "The CA private key"},
+     {"keyform", OPT_KEYFORM, 'f',
+      "Private key file format (ENGINE, other values ignored)"},
+-- 
+2.26.2
+

@@ -1,6 +1,6 @@
 {
- "Signatures": {
+  "Signatures": {
     "classifiers.lst": "c1ba7f56d9886590f20f25078d8ccd6b50333cdc6c9a7125243df72767f79da5",
-    "flit-3.7.1.tar.gz": "59d8a4dea4c9d6678853f2643abac028f5efeb9db42e14dd846524b061cb9446"
- }
+    "flit-3.9.0.tar.gz": "55e28d0953726c4c744f02779b85f733f65da5bffb6a5d2fe11072d19ca2d148"
+  }
 }

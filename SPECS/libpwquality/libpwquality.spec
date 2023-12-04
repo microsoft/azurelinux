@@ -2,7 +2,7 @@
 
 Summary:        A library for password generation and password quality checking
 Name:           libpwquality
-Version:        1.4.4
+Version:        1.4.5
 Release:        1%{?dist}
 License:        BSD OR GPLv2+
 Vendor:         Microsoft Corporation
@@ -107,6 +107,9 @@ mkdir %{buildroot}%{_secconfdir}/pwquality.conf.d
 %{python3_sitearch}/*.egg-info
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.4.5-1
+- Auto-upgrade to 1.4.5 - Azure Linux 3.0 - package upgrades
+
 * Wed Jan 12 2022 Henry Li <lihl@microsoft.com> - 1.4.4-1
 - Upgrade to version 1.4.4
 

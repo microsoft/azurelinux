@@ -87,7 +87,7 @@ var (
 	//
 	// Example:
 	//
-	//	D: ========== +++ systemd-devel-239-42.cm2 x86_64-linux 0x0
+	//	D: ========== +++ systemd-devel-239-42.azl3 x86_64-linux 0x0
 	installedRPMRegex = regexp.MustCompile(`^D: =+ \+{3} (\S+) (\S+)-linux.*$`)
 )
 
@@ -247,7 +247,7 @@ func DefaultDefines(runCheck bool) map[string]string {
 
 // GetInstalledPackages returns a string list of all packages installed on the system
 // in the "[name]-[version]-[release].[distribution].[architecture]" format.
-// Example: tdnf-2.1.0-4.cm1.x86_64
+// Example: tdnf-2.1.0-4.azl3.x86_64
 func GetInstalledPackages() (result []string, err error) {
 	const queryArg = "-qa"
 

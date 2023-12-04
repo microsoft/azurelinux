@@ -1,11 +1,11 @@
 {
- "Signatures": {
-  "cri-o-1.21.2-vendor.tar.gz": "a189bb12672719142a509813daf5203ae08b105c704e25816e37a32535030dc0",
-  "cri-o-1.21.2.tar.gz": "a8e745822b50d1581cb3d12edeede05eca316f1f57a3a865f7f7d600fe627828",
-  "cri-o-rpmlintrc": "851a8f7e0b91e011d19a123c2ec703590f3261bfc3fedc41f058dc7556de86cc",
-  "crio.conf": "0b4d11a34542656ad1077fefefdbd0782c15ea521da914bfed0fc7bf84215f0e",
-  "crio.service": "aa19713bbb91d0871de67a4a36a75e9558a31b5b4952b8cf81a667c41f0a7c0c",
-  "kubelet.env": "1569e237d627aa54c2bd391fb879956886ac335ce72211db9dff2e25799d0bf0",
-  "sysconfig.crio": "72330a238a86278545ede539a855fbbca55a74635939e5b26fefdae911577da1"
- }
+  "Signatures": {
+    "cri-o-1.28.0-vendor.tar.gz": "d13582cfe043c902eb37e58b51e9b9dc908665b9012a94ed57fc9650fb103e68",
+    "cri-o-rpmlintrc": "851a8f7e0b91e011d19a123c2ec703590f3261bfc3fedc41f058dc7556de86cc",
+    "crio.conf": "0b4d11a34542656ad1077fefefdbd0782c15ea521da914bfed0fc7bf84215f0e",
+    "crio.service": "aa19713bbb91d0871de67a4a36a75e9558a31b5b4952b8cf81a667c41f0a7c0c",
+    "kubelet.env": "1569e237d627aa54c2bd391fb879956886ac335ce72211db9dff2e25799d0bf0",
+    "sysconfig.crio": "72330a238a86278545ede539a855fbbca55a74635939e5b26fefdae911577da1",
+    "cri-o-1.28.0.tar.gz": "d3be43f4ad8ebc005327a6545e8300a37177d994cea1a23c8d48cba06c1e9472"
+  }
 }

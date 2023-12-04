@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 Summary:        MessagePack (de)serializer.
 Name:           python-msgpack
-Version:        1.0.3
+Version:        1.0.5
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -47,6 +47,9 @@ tox -e py%{python3_version_nodots}-c,py%{python3_version_nodots}-pure
 %{python3_sitelib}/*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0.5-1
+- Auto-upgrade to 1.0.5 - Azure Linux 3.0 - package upgrades
+
 * Thu Apr 07 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.0.3-1
 - Upgrade to latest upstream version
 - Use tox as test runner

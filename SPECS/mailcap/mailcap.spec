@@ -1,6 +1,6 @@
 Summary:        Helper application and MIME type associations for file types
 Name:           mailcap
-Version:        2.1.53
+Version:        2.1.54
 Release:        1%{?dist}
 License:        Public Domain AND MIT
 Vendor:         Microsoft Corporation
@@ -57,6 +57,9 @@ make check
 %config(noreplace) %{_sysconfdir}/nginx/mime.types
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.1.54-1
+- Auto-upgrade to 2.1.54 - Azure Linux 3.0 - package upgrades
+
 * Wed Feb 02 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.1.53-1
 - Upgrading to v2.1.53
 

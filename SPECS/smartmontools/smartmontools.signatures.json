@@ -1,8 +1,8 @@
 {
- "Signatures": {
-  "drivedb.h": "7554f4e5d38256e4d5bc5dacf73d36c15f308c5dcd307bcf30c4c01234e8f329",
-  "smartdnotify": "fc52edf35938249fe4af31637eb8e62e291c0888610c5826907eef76cd154edc",
-  "smartmontools-7.3.tar.gz": "a544f8808d0c58cfb0e7424ca1841cb858a974922b035d505d4e4c248be3a22b",
-  "smartmontools.sysconf": "f64f561dc2948f58d5121d7df6fce361116f2c7b1e9ed4bd036ec928a179790a"
- }
+  "Signatures": {
+    "drivedb.h": "7554f4e5d38256e4d5bc5dacf73d36c15f308c5dcd307bcf30c4c01234e8f329",
+    "smartdnotify": "fc52edf35938249fe4af31637eb8e62e291c0888610c5826907eef76cd154edc",
+    "smartmontools.sysconf": "f64f561dc2948f58d5121d7df6fce361116f2c7b1e9ed4bd036ec928a179790a",
+    "smartmontools-7.4.tar.gz": "e9a61f641ff96ca95319edfb17948cd297d0cd3342736b2c49c99d4716fb993d"
+  }
 }

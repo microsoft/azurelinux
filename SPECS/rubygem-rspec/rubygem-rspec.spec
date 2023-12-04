@@ -2,8 +2,8 @@
 %global gem_name rspec
 Summary:        Behaviour driven development (BDD) framework for Ruby
 Name:           rubygem-%{gem_name}
-Version:        3.9.0
-Release:        6%{?dist}
+Version:        3.12.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -50,6 +50,9 @@ cp -r lib/ %{buildroot}%{gem_instdir}/
 %doc %{gem_docdir}
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.12.0-1
+- Auto-upgrade to 3.12.0 - Azure Linux 3.0 - package upgrades
+
 * Mon Apr 18 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.9.0-6
 - Add lib from source.
 

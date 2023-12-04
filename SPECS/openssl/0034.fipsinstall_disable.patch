@@ -1,0 +1,473 @@
+From a9825123e7ab3474d2794a5706d9bed047959c9c Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Mon, 31 Jul 2023 09:41:28 +0200
+Subject: [PATCH 18/35] 0034.fipsinstall_disable.patch
+
+Patch-name: 0034.fipsinstall_disable.patch
+Patch-id: 34
+Patch-status: |
+    # Comment out fipsinstall command-line utility
+From-dist-git-commit: 9409bc7044cf4b5773639cce20f51399888c45fd
+---
+ apps/fipsinstall.c                  |   3 +
+ doc/man1/openssl-fipsinstall.pod.in | 272 +---------------------------
+ doc/man1/openssl.pod                |   4 -
+ doc/man5/config.pod                 |   1 -
+ doc/man5/fips_config.pod            | 104 +----------
+ doc/man7/OSSL_PROVIDER-FIPS.pod     |   1 -
+ 6 files changed, 10 insertions(+), 375 deletions(-)
+
+diff --git a/apps/fipsinstall.c b/apps/fipsinstall.c
+index e1ef645b60..db92cb5fb2 100644
+--- a/apps/fipsinstall.c
++++ b/apps/fipsinstall.c
+@@ -375,6 +375,9 @@ int fipsinstall_main(int argc, char **argv)
+     EVP_MAC *mac = NULL;
+     CONF *conf = NULL;
+ 
++    BIO_printf(bio_err, "This command is not enabled in the Red Hat Enterprise Linux OpenSSL build, please consult Red Hat documentation to learn how to enable FIPS mode\n");
++    return 1;
++
+     if ((opts = sk_OPENSSL_STRING_new_null()) == NULL)
+         goto end;
+ 
+diff --git a/doc/man1/openssl-fipsinstall.pod.in b/doc/man1/openssl-fipsinstall.pod.in
+index b1768b7f91..b6b00e27d8 100644
+--- a/doc/man1/openssl-fipsinstall.pod.in
++++ b/doc/man1/openssl-fipsinstall.pod.in
+@@ -8,275 +8,9 @@ openssl-fipsinstall - perform FIPS configuration installation
+ =head1 SYNOPSIS
+ 
+ B<openssl fipsinstall>
+-[B<-help>]
+-[B<-in> I<configfilename>]
+-[B<-out> I<configfilename>]
+-[B<-module> I<modulefilename>]
+-[B<-provider_name> I<providername>]
+-[B<-section_name> I<sectionname>]
+-[B<-verify>]
+-[B<-mac_name> I<macname>]
+-[B<-macopt> I<nm>:I<v>]
+-[B<-noout>]
+-[B<-quiet>]
+-[B<-pedantic>]
+-[B<-no_conditional_errors>]
+-[B<-no_security_checks>]
+-[B<-ems_check>]
+-[B<-no_drbg_truncated_digests>]
+-[B<-self_test_onload>]
+-[B<-self_test_oninstall>]
+-[B<-corrupt_desc> I<selftest_description>]
+-[B<-corrupt_type> I<selftest_type>]
+-[B<-config> I<parent_config>]
+-
+-=head1 DESCRIPTION
+-
+-This command is used to generate a FIPS module configuration file.
+-This configuration file can be used each time a FIPS module is loaded
+-in order to pass data to the FIPS module self tests. The FIPS module always
+-verifies its MAC, but optionally only needs to run the KAT's once,
+-at installation.
+-
+-The generated configuration file consists of:
+-
+-=over 4
+-
+-=item - A MAC of the FIPS module file.
+-
+-=item - A test status indicator.
+-
+-This indicates if the Known Answer Self Tests (KAT's) have successfully run.
+-
+-=item - A MAC of the status indicator.
+-
+-=item - A control for conditional self tests errors.
+-
+-By default if a continuous test (e.g a key pair test) fails then the FIPS module
+-will enter an error state, and no services or cryptographic algorithms will be
+-able to be accessed after this point.
+-The default value of '1' will cause the fips module error state to be entered.
+-If the value is '0' then the module error state will not be entered.
+-Regardless of whether the error state is entered or not, the current operation
+-(e.g. key generation) will return an error. The user is responsible for retrying
+-the operation if the module error state is not entered.
+-
+-=item - A control to indicate whether run-time security checks are done.
+-
+-This indicates if run-time checks related to enforcement of security parameters
+-such as minimum security strength of keys and approved curve names are used.
+-The default value of '1' will perform the checks.
+-If the value is '0' the checks are not performed and FIPS compliance must
+-be done by procedures documented in the relevant Security Policy.
+-
+-=back
+-
+-This file is described in L<fips_config(5)>.
+-
+-=head1 OPTIONS
+-
+-=over 4
+-
+-=item B<-help>
+-
+-Print a usage message.
+-
+-=item B<-module> I<filename>
+-
+-Filename of the FIPS module to perform an integrity check on.
+-The path provided in the filename is used to load the module when it is
+-activated, and this overrides the environment variable B<OPENSSL_MODULES>.
+-
+-=item B<-out> I<configfilename>
+-
+-Filename to output the configuration data to; the default is standard output.
+-
+-=item B<-in> I<configfilename>
+-
+-Input filename to load configuration data from.
+-Must be used if the B<-verify> option is specified.
+-
+-=item B<-verify>
+-
+-Verify that the input configuration file contains the correct information.
+-
+-=item B<-provider_name> I<providername>
+-
+-Name of the provider inside the configuration file.
+-The default value is C<fips>.
+-
+-=item B<-section_name> I<sectionname>
+-
+-Name of the section inside the configuration file.
+-The default value is C<fips_sect>.
+-
+-=item B<-mac_name> I<name>
+-
+-Specifies the name of a supported MAC algorithm which will be used.
+-The MAC mechanisms that are available will depend on the options
+-used when building OpenSSL.
+-To see the list of supported MAC's use the command
+-C<openssl list -mac-algorithms>.  The default is B<HMAC>.
+-
+-=item B<-macopt> I<nm>:I<v>
+-
+-Passes options to the MAC algorithm.
+-A comprehensive list of controls can be found in the EVP_MAC implementation
+-documentation.
+-Common control strings used for this command are:
+-
+-=over 4
+-
+-=item B<key>:I<string>
+-
+-Specifies the MAC key as an alphanumeric string (use if the key contains
+-printable characters only).
+-The string length must conform to any restrictions of the MAC algorithm.
+-A key must be specified for every MAC algorithm.
+-If no key is provided, the default that was specified when OpenSSL was
+-configured is used.
+-
+-=item B<hexkey>:I<string>
+-
+-Specifies the MAC key in hexadecimal form (two hex digits per byte).
+-The key length must conform to any restrictions of the MAC algorithm.
+-A key must be specified for every MAC algorithm.
+-If no key is provided, the default that was specified when OpenSSL was
+-configured is used.
+-
+-=item B<digest>:I<string>
+-
+-Used by HMAC as an alphanumeric string (use if the key contains printable
+-characters only).
+-The string length must conform to any restrictions of the MAC algorithm.
+-To see the list of supported digests, use the command
+-C<openssl list -digest-commands>.
+-The default digest is SHA-256.
+-
+-=back
+-
+-=item B<-noout>
+-
+-Disable logging of the self tests.
+-
+-=item B<-pedantic>
+-
+-Configure the module so that it is strictly FIPS compliant rather
+-than being backwards compatible.  This enables conditional errors,
+-security checks etc.  Note that any previous configuration options will
+-be overwritten and any subsequent configuration options that violate
+-FIPS compliance will result in an error.
+-
+-=item B<-no_conditional_errors>
+-
+-Configure the module to not enter an error state if a conditional self test
+-fails as described above.
+-
+-=item B<-no_security_checks>
+-
+-Configure the module to not perform run-time security checks as described above.
+-
+-Enabling the configuration option "no-fips-securitychecks" provides another way to
+-turn off the check at compile time.
+-
+-=item B<-ems_check>
+-
+-Configure the module to enable a run-time Extended Master Secret (EMS) check
+-when using the TLS1_PRF KDF algorithm. This check is disabled by default.
+-See RFC 7627 for information related to EMS.
+-
+-=item B<-no_drbg_truncated_digests>
+-
+-Configure the module to not allow truncated digests to be used with Hash and
+-HMAC DRBGs.  See FIPS 140-3 IG D.R for details.
+-
+-=item B<-self_test_onload>
+-
+-Do not write the two fields related to the "test status indicator" and
+-"MAC status indicator" to the output configuration file. Without these fields
+-the self tests KATS will run each time the module is loaded. This option could be
+-used for cross compiling, since the self tests need to run at least once on each
+-target machine. Once the self tests have run on the target machine the user
+-could possibly then add the 2 fields into the configuration using some other
+-mechanism.
+-
+-This is the default.
+-
+-=item B<-self_test_oninstall>
+-
+-The converse of B<-self_test_oninstall>.  The two fields related to the
+-"test status indicator" and "MAC status indicator" are written to the
+-output configuration file.
+-
+-=item B<-quiet>
+-
+-Do not output pass/fail messages. Implies B<-noout>.
+-
+-=item B<-corrupt_desc> I<selftest_description>,
+-B<-corrupt_type> I<selftest_type>
+-
+-The corrupt options can be used to test failure of one or more self tests by
+-name.
+-Either option or both may be used to select the tests to corrupt.
+-Refer to the entries for B<st-desc> and B<st-type> in L<OSSL_PROVIDER-FIPS(7)> for
+-values that can be used.
+-
+-=item B<-config> I<parent_config>
+-
+-Test that a FIPS provider can be loaded from the specified configuration file.
+-A previous call to this application needs to generate the extra configuration
+-data that is included by the base C<parent_config> configuration file.
+-See L<config(5)> for further information on how to set up a provider section.
+-All other options are ignored if '-config' is used.
+-
+-=back
+-
+-=head1 NOTES
+-
+-Self tests results are logged by default if the options B<-quiet> and B<-noout>
+-are not specified, or if either of the options B<-corrupt_desc> or
+-B<-corrupt_type> are used.
+-If the base configuration file is set up to autoload the fips module, then the
+-fips module will be loaded and self tested BEFORE the fipsinstall application
+-has a chance to set up its own self test callback. As a result of this the self
+-test output and the options B<-corrupt_desc> and B<-corrupt_type> will be ignored.
+-For normal usage the base configuration file should use the default provider
+-when generating the fips configuration file.
+-
+-The B<-self_test_oninstall> option was added and the
+-B<-self_test_onload> option was made the default in OpenSSL 3.1.
+-
+-The command and all remaining options were added in OpenSSL 3.0.
+-
+-=head1 EXAMPLES
+-
+-Calculate the mac of a FIPS module F<fips.so> and run a FIPS self test
+-for the module, and save the F<fips.cnf> configuration file:
+-
+- openssl fipsinstall -module ./fips.so -out fips.cnf -provider_name fips
+-
+-Verify that the configuration file F<fips.cnf> contains the correct info:
+-
+- openssl fipsinstall -module ./fips.so -in fips.cnf  -provider_name fips -verify
+-
+-Corrupt any self tests which have the description C<SHA1>:
+-
+- openssl fipsinstall -module ./fips.so -out fips.cnf -provider_name fips \
+-         -corrupt_desc 'SHA1'
+-
+-Validate that the fips module can be loaded from a base configuration file:
+-
+- export OPENSSL_CONF_INCLUDE=<path of configuration files>
+- export OPENSSL_MODULES=<provider-path>
+- openssl fipsinstall -config' 'default.cnf'
+-
+-
+-=head1 SEE ALSO
+-
+-L<config(5)>,
+-L<fips_config(5)>,
+-L<OSSL_PROVIDER-FIPS(7)>,
+-L<EVP_MAC(3)>
++This command is disabled.
++Please consult Red Hat Enterprise Linux documentation to learn how to correctly
++enable FIPS mode on Red Hat Enterprise
+ 
+ =head1 COPYRIGHT
+ 
+diff --git a/doc/man1/openssl.pod b/doc/man1/openssl.pod
+index d9c22a580f..d5ec3b9a6a 100644
+--- a/doc/man1/openssl.pod
++++ b/doc/man1/openssl.pod
+@@ -135,10 +135,6 @@ Engine (loadable module) information and manipulation.
+ 
+ Error Number to Error String Conversion.
+ 
+-=item B<fipsinstall>
+-
+-FIPS configuration installation.
+-
+ =item B<gendsa>
+ 
+ Generation of DSA Private Key from Parameters. Superseded by
+diff --git a/doc/man5/config.pod b/doc/man5/config.pod
+index 714a10437b..bd05736220 100644
+--- a/doc/man5/config.pod
++++ b/doc/man5/config.pod
+@@ -573,7 +573,6 @@ configuration files using that syntax will have to be modified.
+ =head1 SEE ALSO
+ 
+ L<openssl-x509(1)>, L<openssl-req(1)>, L<openssl-ca(1)>,
+-L<openssl-fipsinstall(1)>,
+ L<ASN1_generate_nconf(3)>,
+ L<EVP_set_default_properties(3)>,
+ L<CONF_modules_load(3)>,
+diff --git a/doc/man5/fips_config.pod b/doc/man5/fips_config.pod
+index 2255464304..1c15e32a5c 100644
+--- a/doc/man5/fips_config.pod
++++ b/doc/man5/fips_config.pod
+@@ -6,106 +6,10 @@ fips_config - OpenSSL FIPS configuration
+ 
+ =head1 DESCRIPTION
+ 
+-A separate configuration file, using the OpenSSL L<config(5)> syntax,
+-is used to hold information about the FIPS module. This includes a digest
+-of the shared library file, and status about the self-testing.
+-This data is used automatically by the module itself for two
+-purposes:
+-
+-=over 4
+-
+-=item - Run the startup FIPS self-test known answer tests (KATS).
+-
+-This is normally done once, at installation time, but may also be set up to
+-run each time the module is used.
+-
+-=item - Verify the module's checksum.
+-
+-This is done each time the module is used.
+-
+-=back
+-
+-This file is generated by the L<openssl-fipsinstall(1)> program, and
+-used internally by the FIPS module during its initialization.
+-
+-The following options are supported. They should all appear in a section
+-whose name is identified by the B<fips> option in the B<providers>
+-section, as described in L<config(5)/Provider Configuration Module>.
+-
+-=over 4
+-
+-=item B<activate>
+-
+-If present, the module is activated. The value assigned to this name is not
+-significant.
+-
+-=item B<install-version>
+-
+-A version number for the fips install process. Should be 1.
+-
+-=item B<conditional-errors>
+-
+-The FIPS module normally enters an internal error mode if any self test fails.
+-Once this error mode is active, no services or cryptographic algorithms are
+-accessible from this point on.
+-Continuous tests are a subset of the self tests (e.g., a key pair test during key
+-generation, or the CRNG output test).
+-Setting this value to C<0> allows the error mode to not be triggered if any
+-continuous test fails. The default value of C<1> will trigger the error mode.
+-Regardless of the value, the operation (e.g., key generation) that called the
+-continuous test will return an error code if its continuous test fails. The
+-operation may then be retried if the error mode has not been triggered.
+-
+-=item B<security-checks>
+-
+-This indicates if run-time checks related to enforcement of security parameters
+-such as minimum security strength of keys and approved curve names are used.
+-A value of '1' will perform the checks, otherwise if the value is '0' the checks
+-are not performed and FIPS compliance must be done by procedures documented in
+-the relevant Security Policy.
+-
+-=item B<module-mac>
+-
+-The calculated MAC of the FIPS provider file.
+-
+-=item B<install-status>
+-
+-An indicator that the self-tests were successfully run.
+-This should only be written after the module has
+-successfully passed its self tests during installation.
+-If this field is not present, then the self tests will run when the module
+-loads.
+-
+-=item B<install-mac>
+-
+-A MAC of the value of the B<install-status> option, to prevent accidental
+-changes to that value.
+-It is written-to at the same time as B<install-status> is updated.
+-
+-=back
+-
+-For example:
+-
+- [fips_sect]
+- activate = 1
+- install-version = 1
+- conditional-errors = 1
+- security-checks = 1
+- module-mac = 41:D0:FA:C2:5D:41:75:CD:7D:C3:90:55:6F:A4:DC
+- install-mac = FE:10:13:5A:D3:B4:C7:82:1B:1E:17:4C:AC:84:0C
+- install-status = INSTALL_SELF_TEST_KATS_RUN
+-
+-=head1 NOTES
+-
+-When using the FIPS provider, it is recommended that the
+-B<config_diagnostics> option is enabled to prevent accidental use of
+-non-FIPS validated algorithms via broken or mistaken configuration.
+-See L<config(5)>.
+-
+-=head1 SEE ALSO
+-
+-L<config(5)>
+-L<openssl-fipsinstall(1)>
++This command is disabled in Red Hat Enterprise Linux. The FIPS provider is
++automatically loaded when the system is booted in FIPS mode, or when the
++environment variable B<OPENSSL_FORCE_FIPS_MODE> is set. See the documentation
++for more information.
+ 
+ =head1 HISTORY
+ 
+diff --git a/doc/man7/OSSL_PROVIDER-FIPS.pod b/doc/man7/OSSL_PROVIDER-FIPS.pod
+index 4f908888ba..ef00247770 100644
+--- a/doc/man7/OSSL_PROVIDER-FIPS.pod
++++ b/doc/man7/OSSL_PROVIDER-FIPS.pod
+@@ -444,7 +444,6 @@ want to operate in a FIPS approved manner.  The algorithms are:
+ 
+ =head1 SEE ALSO
+ 
+-L<openssl-fipsinstall(1)>,
+ L<fips_config(5)>,
+ L<OSSL_SELF_TEST_set_callback(3)>,
+ L<OSSL_SELF_TEST_new(3)>,
+-- 
+2.41.0
+

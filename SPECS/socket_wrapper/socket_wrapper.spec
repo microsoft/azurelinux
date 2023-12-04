@@ -1,6 +1,6 @@
 Name:           socket_wrapper
-Version:        1.3.3
-Release:        2%{?dist}
+Version:        1.4.2
+Release:        1%{?dist}
 License:        BSD
 Summary:        A library passing all socket communications through Unix sockets
 Vendor:         Microsoft Corporation
@@ -100,6 +100,9 @@ popd
 %{_libdir}/pkgconfig/%{name}_noop.pc
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.4.2-1
+- Auto-upgrade to 1.4.2 - Azure Linux 3.0 - package upgrades
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.3.3-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

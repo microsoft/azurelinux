@@ -27,8 +27,8 @@
 %global __requires_exclude lib(mca|ompi|open-(pal|rte|trace)|vt).*
 Summary:        Open Message Passing Interface
 Name:           openmpi%{?_cc_name_suffix}
-Version:        4.1.4
-Release:        11%{?dist}
+Version:        4.1.5
+Release:        1%{?dist}
 License:        BSD AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -303,6 +303,9 @@ make check
 %{python3_sitearch}/openmpi.pth
 
 %changelog
+* Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.1.5-1
+- Auto-upgrade to 4.1.5 - Azure Linux 3.0 - package upgrades
+
 * Tue Sep 26 2023 Sumedh Sharma <sumsharma@microsoft.com> - 4.1.4-11
 - Bump version to recompile with pmix update for CVE-2023-41915
 

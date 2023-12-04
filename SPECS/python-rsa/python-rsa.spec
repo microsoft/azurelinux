@@ -3,14 +3,13 @@
 
 Summary:        Purely Python RSA implementation
 Name:           python-%{pkgname}
-Version:        4.7.2
+Version:        4.9
 Release:        1%{?dist}
 License:        ASL 2.0
 URL:            https://stuvel.eu/software/rsa/
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Source0:        https://pypi.python.org/packages/source/r/%{pkgname}/%{pkgname}-%{version}.tar.gz
-
+Source0:        https://files.pythonhosted.org/packages/aa/65/7d973b89c4d2351d7fb232c2e452547ddfa243e93131e7cfa766da627b52/%{pkgname}-%{version}.tar.gz
 BuildArch:  noarch
 
 %description
@@ -45,6 +44,9 @@ python3 setup.py install --skip-build --root=%{buildroot}
 %{_bindir}/*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.9-1
+- Auto-upgrade to 4.9 - Azure Linux 3.0 - package upgrades
+
 * Fri May 21 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 4.7.2-1
 - Update package version to fix CVE-2020-25658
 

@@ -1,7 +1,7 @@
 Summary:        RELP Library
 Name:           librelp
-Version:        1.10.0
-Release:        2%{?dist}
+Version:        1.11.0
+Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -61,6 +61,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/relp.pc
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.11.0-1
+- Auto-upgrade to 1.11.0 - Azure Linux 3.0 - package upgrades
+
 * Wed Sep 06 2023 Osama Esmail <osamaesmail@microsoft.com> - 1.10.0-2
 - Adding `glibc-debuginfo` to fix the tests
 

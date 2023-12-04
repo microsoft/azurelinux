@@ -2,8 +2,8 @@
 %global gem_name oj
 Summary:        Optimized JSON
 Name:           rubygem-%{gem_name}
-Version:        3.13.11
-Release:        2%{?dist}
+Version:        3.16.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -31,6 +31,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.16.0-1
+- Auto-upgrade to 3.16.0 - Azure Linux 3.0 - package upgrades
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.13.11-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

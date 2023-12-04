@@ -8,8 +8,8 @@ for Python, which can be used as the basis for the construction of\
 function wrappers and decorator functions.
 Summary:        A Python module for decorators, wrappers and monkey patching
 Name:           python-%{sname}
-Version:        1.11.2
-Release:        7%{?dist}
+Version:        1.15.0
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -70,6 +70,9 @@ popd
 %{python3_sitearch}/%{sname}-%{version}-py?.?.egg-info
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.15.0-1
+- Auto-upgrade to 1.15.0 - Azure Linux 3.0 - package upgrades
+
 * Wed Nov 30 2022 Riken Maharjan <rmaharjan@microsoft.com> - 1.11.2-7
 - Move to Core.
 - License verified.

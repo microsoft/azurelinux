@@ -1,6 +1,6 @@
 Summary:        Measures number of Terminal column cells of wide-character codes.
 Name:           python-wcwidth
-Version:        0.2.5
+Version:        0.2.6
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -58,6 +58,9 @@ pytest3 -vv tests -k "not test_package_version"
 %{python3_sitelib}/*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.2.6-1
+- Auto-upgrade to 0.2.6 - Azure Linux 3.0 - package upgrades
+
 * Fri Mar 25 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 0.2.5-1
 - Upgrade to  0.2.5
 

@@ -1,7 +1,7 @@
 %define LICENSE_PATH LICENSE.PTR
 Summary:        Talloc is a hierarchical, reference counted memory pool system
 Name:           libtalloc
-Version:        2.3.3
+Version:        2.4.1
 Release:        1%{?dist}
 # Some files are GPL, others LGPL. Info in source.
 License:        GPLv3+ AND LGPLv3+
@@ -86,6 +86,9 @@ make check
 %{_libdir}/libpytalloc-util.cpython*.so
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.1-1
+- Auto-upgrade to 2.4.1 - Azure Linux 3.0 - package upgrades
+
 * Tue Jan 25 2022 Henry Li <lihl@microsoft.com> - 2.3.3-1
 - Upgrade to version 2.3.3
 

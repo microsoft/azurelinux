@@ -1,6 +1,6 @@
 Summary:        TPM2 Access Broker & Resource Management Daemon implementing the TCG spec
 Name:           tpm2-abrmd
-Version:        2.4.0
+Version:        3.0.0
 Release:        1%{?dist}
 License:        BSD 2-Clause
 Vendor:         Microsoft Corporation
@@ -65,6 +65,9 @@ make DESTDIR=%{buildroot} install
 %{_mandir}/man7
 
 %changelog
+* Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0.0-1
+- Auto-upgrade to 3.0.0 - Azure Linux 3.0 - package upgrades
+
 * Tue Jan 18 2022 Daniel McIlvaney <damcilva@microsoft.com> - 2.4.0-1
 - Update to version 2.4.0
 
