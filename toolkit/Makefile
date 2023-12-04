@@ -132,10 +132,10 @@ PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR
 REPO_LIST          ?=
 SRPM_URL_LIST      ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms
 
-ifneq ($(DAILYBUILDID),)
-   $(warning "hello")
-   override PACKAGE_URL_LIST   := https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILYBUILDID)-amd64/built_rpms_all
-   override SRPM_URL_LIST      := https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILYBUILDID)-amd64/SRPMS
+ifneq ($(DAILY_BUILD_ID),)
+   $(warning Using Daily Build $(DAILY_BUILD_ID))
+   override PACKAGE_URL_LIST   := https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-amd64/built_rpms_all
+   override SRPM_URL_LIST      := https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-amd64/SRPMS
 else
    ifeq ($(USE_PREVIEW_REPO),y)
       override PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/$(build_arch)
