@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "cli-8.4.0.tar.gz": "208187b9c1b8091c64b271a2f625d69cf9f56b9e6dc186e9a687de8e13ea0747",
-  "cli-8.4.0-vendor.tar.gz": "da49fa01ea58dd92036107663963d93f195970790e7d1501b4741fc3ad2e9ec0"
- }
+  "Signatures": {
+    "cli-8.7.3-vendor.tar.gz": "93edcc674e1a11888afbd0e84918ada9c2bcb4f47ac90a23ecddcc4bf98ac4cf",
+    "cli-8.7.3.tar.gz": "9af5a13d217d122d575a4c77afd04d5d8cb61f07f13ae1befa87bc5fde6a7c3d"
+  }
 }

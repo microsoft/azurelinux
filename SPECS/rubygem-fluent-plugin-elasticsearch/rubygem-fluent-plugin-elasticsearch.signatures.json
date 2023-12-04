@@ -1,5 +1,5 @@
 {
- "Signatures": {
-  "fluent-plugin-elasticsearch-5.2.2.tar.gz": "38d94866a896c1f16a3e7cb8dc03c8decd57cb780e2f4ecf2ea44b54aa8e0392"
- }
+  "Signatures": {
+    "fluent-plugin-elasticsearch-5.3.0.tar.gz": "061e4d681eb2006cb96c791d25e3ba4ecaaed8815ad6c256dbada6eb22ba214f"
+  }
 }

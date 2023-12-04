@@ -1,6 +1,6 @@
 Summary:        lsb_release script
 Name:           lsb-release
-Version:        3.1
+Version:        3.2
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
@@ -34,6 +34,9 @@ install -D -m 755 lsb_release %{buildroot}%{_bindir}/lsb_release
 %{_mandir}/man1/lsb_release.1.gz
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2-1
+- Auto-upgrade to 3.2 - Azure Linux 3.0 - package upgrades
+
 * Tue Feb 08 2022 Henry Li <lihl@microsoft.com> - 3.1-1
 - Upgrade to 3.1
 - Fix Source0

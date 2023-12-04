@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "net-http-persistent-3.1.0.tar.gz": "533ae3238132b314a2964a33667bb8cb4d22c84b25a9a567f864645be9b6b5f0",
-  "net-http-persistent.gemspec": "2a17fd7907a902a1595964a3a45c6180e456cf5e3a70dc66f00a502e9e1a8b46"
- }
+  "Signatures": {
+    "net-http-persistent.gemspec": "2a17fd7907a902a1595964a3a45c6180e456cf5e3a70dc66f00a502e9e1a8b46",
+    "net-http-persistent-4.0.2.tar.gz": "10aab67179e80159f4e080dea3b47d86742331d693a8712803fe3906b5b1f6db"
+  }
 }

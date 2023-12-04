@@ -2,7 +2,7 @@
 %global gem_name webrick
 Summary:        HTTP server toolkit
 Name:           rubygem-%{gem_name}
-Version:        1.7.0
+Version:        1.8.1
 Release:        1%{?dist}
 License:        BSD
 Vendor:	        Microsoft Corporation
@@ -35,6 +35,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.1-1
+- Auto-upgrade to 1.8.1 - Azure Linux 3.0 - package upgrades
+
 * Mon Jun 13 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.7.0-1
 - License verified
 - Original version for CBL-Mariner

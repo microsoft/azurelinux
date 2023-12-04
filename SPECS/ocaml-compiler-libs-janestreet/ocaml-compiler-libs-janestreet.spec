@@ -8,8 +8,8 @@
 
 Summary:        OCaml compiler libraries repackaged
 Name:           %{srcname}-janestreet
-Version:        0.12.3
-Release:        4%{?dist}
+Version:        0.12.4
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -108,6 +108,9 @@ find %{buildroot}%{_libdir}/ocaml -name \*.cmxs -exec chmod a+x {} \+
 %endif
 
 %changelog
+* Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.12.4-1
+- Auto-upgrade to 0.12.4 - Azure Linux 3.0 - package upgrades
+
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.12.3-4
 - Cleaning-up spec. License verified.
 

@@ -6,15 +6,14 @@
 %define enable_sane 0
 Summary:        Color daemon
 Name:           colord
-Version:        1.4.4
-Release:        9%{?dist}
+Version:        1.4.6
+Release:        1%{?dist}
 License:        GPLv2+ and LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.freedesktop.org/software/colord/
 Source0:        https://www.freedesktop.org/software/colord/releases/%{name}-%{version}.tar.xz
 Source1:        %{name}-LGPLv2.txt
-Patch0:         CVE-2021-42523.patch
 BuildRequires:  bash-completion
 BuildRequires:  color-filesystem
 BuildRequires:  dbus-devel
@@ -234,6 +233,9 @@ exit 0
 %{_datadir}/installed-tests/colord/*
 
 %changelog
+* Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.4.6-1
+- Auto-upgrade to 1.4.6 - Azure Linux 3.0 - package upgrades
+
 * Thu Sep 01 2022 Henry Beberman <henry.beberman@microsoft.com> - 1.4.4-9
 - Patch CVE-2021-42523 to remove unused error_msg pointers.
 

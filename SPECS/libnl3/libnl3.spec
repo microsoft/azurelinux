@@ -1,7 +1,7 @@
 Summary:        Netlink Protocol Library Suite
 Name:           libnl3
-Version:        3.5.0
-Release:        4%{?dist}
+Version:        3.7.0
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,7 +9,7 @@ Group:          System Environment/Libraries
 URL:            https://www.infradead.org/~tgr/libnl/
 # It seems like the website no longer has the latest version of the source; this seems to be the correct source.
 # Note that a branch tag made it into the name using underscores in the semver. This will have to be updated with versions.
-Source0:        https://github.com/thom311/libnl/releases/download/%{name}_5_0/libnl-%{version}.tar.gz
+Source0:        https://github.com/thom311/libnl/releases/download/%{name}_7_0/libnl-%{version}.tar.gz
 BuildRequires:  dbus-devel
 BuildRequires:  glib-devel
 Requires:       dbus
@@ -66,6 +66,9 @@ make %{?_smp_mflags} check
 %{_libdir}/pkgconfig/libnl-xfrm-3.0.pc
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.7.0-1
+- Auto-upgrade to 3.7.0 - Azure Linux 3.0 - package upgrades
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.5.0-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

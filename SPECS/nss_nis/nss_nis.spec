@@ -1,7 +1,7 @@
 Summary:        Name Service Switch (NSS) module using NIS
 Name:           nss_nis
-Version:        3.1
-Release:        14%{?dist}
+Version:        3.2
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -59,6 +59,9 @@ make check
 %{_unitdir}/systemd-userdbd.service.d/*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2-1
+- Auto-upgrade to 3.2 - Azure Linux 3.0 - package upgrades
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.1-14
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

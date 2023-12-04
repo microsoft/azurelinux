@@ -17,8 +17,8 @@
 
 
 Name:           golang-packaging
-Version:        15.0.15
-Release:        2%{?dist}
+Version:        15.0.17
+Release:        1%{?dist}
 Summary:        A toolchain to help packaging golang
 License:        GPLv3
 Vendor:         Microsoft Corporation
@@ -59,6 +59,9 @@ install -m0644 macros.go %{buildroot}%{_sysconfdir}/rpm/
 %config %{_sysconfdir}/rpm/macros.go
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 15.0.17-1
+- Auto-upgrade to 15.0.17 - Azure Linux 3.0 - package upgrades
+
 * Tue Oct 12 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 15.0.15-2
 - Switching to using a single digit for the 'Release' tag.
 

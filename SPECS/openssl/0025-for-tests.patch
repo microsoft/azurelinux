@@ -8,7 +8,7 @@ diff -up openssl-3.0.0/apps/openssl.cnf.xxx openssl-3.0.0/apps/openssl.cnf
 -default = default_sect
 +##default = default_sect
  ##legacy = legacy_sect
- ##
+ #
 -[default_sect]
 -activate = 1
 +##[default_sect]

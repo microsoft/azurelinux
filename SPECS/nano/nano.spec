@@ -1,7 +1,7 @@
 Summary:        Text editor
 Name:           nano
-Version:        6.0
-Release:        2%{?dist}
+Version:        6.4
+Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -52,6 +52,9 @@ make %{?_smp_mflags} check
 %{_docdir}/%{name}-%{version}/*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.4-1
+- Auto-upgrade to 6.4 - Azure Linux 3.0 - package upgrades
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 6.0-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

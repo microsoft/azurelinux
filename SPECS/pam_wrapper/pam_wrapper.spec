@@ -1,6 +1,6 @@
 Name:           pam_wrapper
-Version:        1.1.4
-Release:        2%{?dist}
+Version:        1.1.5
+Release:        1%{?dist}
 Summary:        A tool to test PAM applications and PAM modules
 License:        GPLv3+
 URL:            https://cwrap.org/
@@ -139,6 +139,9 @@ popd
 %{python3_sitearch}/pypamtest.so
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.5-1
+- Auto-upgrade to 1.1.5 - Azure Linux 3.0 - package upgrades
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.1.4-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

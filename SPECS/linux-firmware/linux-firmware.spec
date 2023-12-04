@@ -4,8 +4,8 @@
 %define _binaries_in_noarch_packages_terminate_build   0
 Summary:        Linux Firmware
 Name:           linux-firmware
-Version:        20211216
-Release:        2%{?dist}
+Version:        20230804
+Release:        1%{?dist}
 License:        GPL+ AND GPLv2+ AND MIT AND Redistributable, no modification permitted
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -96,6 +96,9 @@ cp iwlwifi-8000C-*.ucode %{buildroot}%{_firmwarepath}
 %{_firmwarepath}/intel
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 20230804-1
+- Auto-upgrade to 20230804 - Azure Linux 3.0 - package upgrades
+
 * Mon Nov 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 20211216-2
 - Split linux-firmware to sub packages.
 

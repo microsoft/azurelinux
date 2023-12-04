@@ -1,6 +1,6 @@
 Name:           perl-File-Listing
-Version:        6.07
-Release:        3%{?dist}
+Version:        6.15
+Release:        1%{?dist}
 Summary:        Parse directory listing
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -62,6 +62,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.15-1
+- Auto-upgrade to 6.15 - Azure Linux 3.0 - package upgrades
+
 * Tue Jul 26 2022 Henry Li <lihl@microsoft.com> - 6.07-3
 - License Verified
 
