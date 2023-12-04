@@ -1,8 +1,8 @@
 %define         aprver  1
 Summary:        The Apache Portable Runtime
 Name:           apr
-Version:        1.7.2
-Release:        2%{?dist}
+Version:        1.7.4
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -64,6 +64,9 @@ make -j1 check
 %{_libdir}/pkgconfig
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7.4-1
+- Auto-upgrade to 1.7.4 - Azure Linux 3.0 - package upgrades
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.7.2-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

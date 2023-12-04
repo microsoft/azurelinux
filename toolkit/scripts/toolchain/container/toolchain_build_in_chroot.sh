@@ -571,9 +571,9 @@ popd
 rm -rf automake-1.16.5
 touch /logs/status_automake_complete
 
-echo OpenSSL-1.1.1k
-tar xf openssl-1.1.1k.tar.gz
-pushd openssl-1.1.1k
+echo OpenSSL-3.1.4
+tar xf openssl-3.1.4.tar.gz
+pushd openssl-3.1.4
 sslarch=
 ./config --prefix=/usr \
          --openssldir=/etc/pki/tls \
@@ -591,7 +591,7 @@ make all -j$(nproc)
 sed -i '/INSTALL_LIBS/s/libcrypto.a libssl.a//' Makefile
 make MANSUFFIX=ssl install
 popd
-rm -rf openssl-1.1.1k
+rm -rf openssl-3.1.4
 touch /logs/status_openssl_complete
 
 echo Elfutils-0.189
@@ -645,7 +645,7 @@ esac
 unset GCC_ARCH
 #	CFLAGS="-O2 -g" \
 #	CXXFLAGS="-O2 -g" \
-# Libffi is causing error building: find: '/usr/src/mariner/BUILDROOT/libffi-3.4.2-1.cm1.x86_64//usr/lib64': No such file or directory
+# Libffi is causing error building: find: '/usr/src/mariner/BUILDROOT/libffi-3.4.2-1.azl3.x86_64//usr/lib64': No such file or directory
 make -j$(nproc)
 make install
 popd

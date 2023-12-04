@@ -1,0 +1,31 @@
+From 213f38dc580d39f2cb46592b5e6db585fc6a650f Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Mon, 31 Jul 2023 09:41:28 +0200
+Subject: [PATCH 19/35] 0035-speed-skip-unavailable-dgst.patch
+
+Patch-name: 0035-speed-skip-unavailable-dgst.patch
+Patch-id: 35
+Patch-status: |
+    # Skip unavailable algorithms running `openssl speed`
+From-dist-git-commit: 9409bc7044cf4b5773639cce20f51399888c45fd
+---
+ apps/speed.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/apps/speed.c b/apps/speed.c
+index d527f12f18..2ff3eb53bd 100644
+--- a/apps/speed.c
++++ b/apps/speed.c
+@@ -610,6 +610,9 @@ static int EVP_MAC_loop(int algindex, void *args)
+     for (count = 0; COND(c[algindex][testnum]); count++) {
+         size_t outl;
+ 
++        if (mctx == NULL)
++            return -1;
++
+         if (!EVP_MAC_init(mctx, NULL, 0, NULL)
+             || !EVP_MAC_update(mctx, buf, lengths[testnum])
+             || !EVP_MAC_final(mctx, mac, &outl, sizeof(mac)))
+-- 
+2.41.0
+

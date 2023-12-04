@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "LMDB_0.9.29.tar.gz": "22054926b426c66d8f2bc22071365df6e35f3aacf19ad943bc6167d4cae3bebb",
-  "lmdb.pc": "84f7f4e67a8bcba5033800badf76e2e03f8e5d55efef9f34f454e1fb9b62c2e4"
- }
+  "Signatures": {
+    "lmdb.pc": "84f7f4e67a8bcba5033800badf76e2e03f8e5d55efef9f34f454e1fb9b62c2e4",
+    "LMDB_0.9.31.tar.gz": "dd70a8c67807b3b8532b3e987b0a4e998962ecc28643e1af5ec77696b081c9b0"
+  }
 }

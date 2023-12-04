@@ -6,8 +6,8 @@
 %{bcond_without perl_Net_HTTP_enables_ssl}
 
 Name:           perl-Net-HTTP
-Version:        6.19
-Release:        6%{?dist}
+Version:        6.23
+Release:        1%{?dist}
 Summary:        Low-level HTTP connection (client)
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -90,6 +90,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.23-1
+- Auto-upgrade to 6.23 - Azure Linux 3.0 - package upgrades
+
 * Tue Jul 26 2022 Henry Li <lihl@microsoft.com> - 6.19-6
 - License Verified
 

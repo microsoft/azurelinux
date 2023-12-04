@@ -1,14 +1,13 @@
 Summary:        Compressed file format
 Name:           zchunk
-Version:        1.1.16
-Release:        3%{?dist}
+Version:        1.3.2
+Release:        1%{?dist}
 License:        BSD 2-Clause AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://github.com/zchunk/zchunk
 Source0:        https://github.com/zchunk/zchunk/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:         CVE-2023-46228.patch
 BuildRequires:  curl-devel
 BuildRequires:  meson
 BuildRequires:  openssl-devel
@@ -88,6 +87,9 @@ DESTDIR=%{buildroot}/ ninja install
 %{_includedir}/zck.h
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.3.2-1
+- Auto-upgrade to 1.3.2 - Azure Linux 3.0 - package upgrades
+
 * Mon Oct 23 2023 Jonathan Behrens <jbehrens@microsoft.com> - 1.1.16-3
 - Patch CVE-2023-46228
 

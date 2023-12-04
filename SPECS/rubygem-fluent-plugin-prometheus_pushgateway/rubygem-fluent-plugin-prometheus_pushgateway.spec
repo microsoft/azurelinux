@@ -2,7 +2,7 @@
 %global gem_name fluent-plugin-prometheus_pushgateway
 Summary:        A fluent plugin for prometheus pushgateway
 Name:           rubygem-%{gem_name}
-Version:        0.1.0
+Version:        0.1.1
 Release:        1%{?dist}
 License:        Apache 2.0
 Vendor:         Microsoft Corporation
@@ -34,6 +34,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.1.1-1
+- Auto-upgrade to 0.1.1 - Azure Linux 3.0 - package upgrades
+
 * Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.1.0-1
 - Update to v0.1.0.
 - Build from .tar.gz source.

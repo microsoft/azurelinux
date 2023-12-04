@@ -1,6 +1,6 @@
 Summary:        Libbpf library
 Name:           libbpf
-Version:        1.0.1
+Version:        1.2.2
 Release:        1%{?dist}
 License:        LGPLv2 OR BSD
 Vendor:         Microsoft Corporation
@@ -50,6 +50,9 @@ find %{buildroot} -type f -name "*.a" -delete -print
 %{_libdir}/pkgconfig/libbpf.pc
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.2.2-1
+- Auto-upgrade to 1.2.2 - Azure Linux 3.0 - package upgrades
+
 * Mon Oct 03 2022 Muhammad Falak <mwani@microsoft.com> - 1.0.1-1
 - Bump version to 1.0.1
 

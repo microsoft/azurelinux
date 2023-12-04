@@ -1,7 +1,7 @@
 Summary:        Archiving program
 Name:           tar
-Version:        1.34
-Release:        2%{?dist}
+Version:        1.35
+Release:        1%{?dist}
 License:        GPLv3+
 URL:            https://www.gnu.org/software/tar
 Group:          Applications/System
@@ -43,9 +43,10 @@ make  %{?_smp_mflags} check
 %{_mandir}/*/*
 
 %changelog
+* Mon Nov 27 2023 Andrew Phelps <anphel@microsoft.com> - 1.35-1
+- Upgrade to version 1.35
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.34-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
-
 *   Fri Nov 05 2021 Andrew Phelps <anphel@microsoft.com> 1.34-1
 -   Update to version 1.34
 -   License verified

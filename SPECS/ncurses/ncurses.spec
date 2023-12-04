@@ -1,16 +1,16 @@
-%global patchlevel     20230408
+%global patchlevel     20231125
 
 Summary:        Libraries for terminal handling of character screens
 Name:           ncurses
 Version:        6.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://invisible-island.net/ncurses/
 #
-# Please note that it is very important to select the ncurses package 
+# Please note that it is very important to select the ncurses package
 # with the highest available patch level in the name when fixing CVE's
 #
 # For example, the original 6.3 ncurses release is available here:
@@ -20,7 +20,7 @@ URL:            https://invisible-island.net/ncurses/
 # https://invisible-mirror.net/archives/ncurses/current/
 #
 # So, when upgrading choose the appropriate patch version
-# Also note that at least one CVE on NIST had unusual matching rules 
+# Also note that at least one CVE on NIST had unusual matching rules
 # where the patch number is not specified in the version,
 # but was described in the textual description.
 #
@@ -30,7 +30,7 @@ URL:            https://invisible-island.net/ncurses/
 # Matching rules showed:
 #   cpe:2.3:a:gnu:ncurses:*:*:*:*:*:*:*:*  	    Up to (excluding)  6.3
 #   cpe:2.3:a:gnu:ncurses:6.3:-:*:*:*:*:*:*     [and this line says including 6.3?!]
-# 
+#
 # Use a nopatch file to clear the CVE after choosing the correct patch level
 #
 Source0:        https://invisible-mirror.net/archives/%{name}/current/%{name}-%{version}-%{patchlevel}.tgz
@@ -227,12 +227,16 @@ xz NEWS
 %{_includedir}/ncursesw/*.h
 %{_includedir}/*.h
 %{_mandir}/man1/ncurses*-config*
+%{_mandir}/man1/description.1m.gz
 %{_mandir}/man3/*
 %{_libdir}/lib*.a
 
 %files term -f terms.term
 
 %changelog
+* Tue Nov 28 2023 Andrew Phelps <anphel@microsoft.com> - 6.4-2
+- Update to version 6.4-20231125
+
 * Wed Apr 26 2023 Sindhu Karri <lakarri@microsoft.com> - 6.4-1
 - Update to version 6.4-20230408 to fix CVE-2023-29491
 

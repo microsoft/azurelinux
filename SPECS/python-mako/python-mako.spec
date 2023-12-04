@@ -1,8 +1,8 @@
 %define version_tag %(echo %{version} | cut -d. -f1-3 --output-delimiter="_")
 Summary:        Python templating language
 Name:           python-mako
-Version:        1.2.2
-Release:        2%{?dist}
+Version:        1.2.4
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -58,6 +58,9 @@ tox -e py%{python3_version_nodots}
 %{_bindir}/mako-render3
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.2.4-1
+- Auto-upgrade to 1.2.4 - Azure Linux 3.0 - package upgrades
+
 * Wed Sep 28 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.2.2-2
 - Add missing run time dependencies (python3-pygments and python3-markupsafe)
 

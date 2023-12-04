@@ -7,8 +7,8 @@
 
 Summary:        Trace memory leaks
 Name:           perl-Test-LeakTrace
-Version:        0.16
-Release:        18%{?dist}
+Version:        0.17
+Release:        1%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -119,6 +119,9 @@ make test
 %{_mandir}/man3/Test::LeakTrace::Script.3*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.17-1
+- Auto-upgrade to 0.17 - Azure Linux 3.0 - package upgrades
+
 * Tue May 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.16-18
 - Linted spec.
 

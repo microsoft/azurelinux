@@ -1,6 +1,6 @@
 {
-    "Signatures": {
-     "kube-vip-cloud-provider-0.0.2-vendor.tar.gz": "6dda8a2eb13a1c29f5f5c70deaa7f399e6961c221d9c8ee3b0323c9d99ee5a12",
-     "kube-vip-cloud-provider-0.0.2.tar.gz": "f8cfdff062f55c5e167503e1fc1ca0e99f9d53858660a3be07858a3db680a7e5"
-    }
+  "Signatures": {
+    "kube-vip-cloud-provider-0.0.7-vendor.tar.gz": "25cc170d2662416ecaf305873e4a567fa13affcce02f25be6ae055906689a089",
+    "kube-vip-cloud-provider-0.0.7.tar.gz": "2f0ba9c9809fd44e52ffdf064ce1e4596f7c470ba3aa65dc5bfdb574c2bbce52"
+  }
 }

@@ -2,7 +2,7 @@
 %global gem_name mini_portile2
 Summary:        Simplistic port-like solution for developers
 Name:           rubygem-mini_portile2
-Version:        2.8.0
+Version:        2.8.4
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -32,6 +32,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.8.4-1
+- Auto-upgrade to 2.8.4 - Azure Linux 3.0 - package upgrades
+
 * Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.8.0-1
 - Update to v2.8.0.
 - Build from .tar.gz source.

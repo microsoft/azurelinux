@@ -1,7 +1,7 @@
 Summary:        LTTng is an open source tracing framework for Linux.
 Name:           lttng-tools
-Version:        2.13.2
-Release:        2%{?dist}
+Version:        2.13.11
+Release:        1%{?dist}
 License:        GPLv2 and LGPLv2+
 URL:            https://lttng.org/
 Source0:        https://lttng.org/files/%{name}/%{name}-%{version}.tar.bz2
@@ -45,6 +45,9 @@ find %{buildroot} -name '*.la' -delete
 %exclude %{_libdir}/debug
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.13.11-1
+- Auto-upgrade to 2.13.11 - Azure Linux 3.0 - package upgrades
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.13.2-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

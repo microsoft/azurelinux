@@ -1,9 +1,12 @@
 {
  "Signatures": {
-  "ec_curve.c": "138a74284d4193a8eb7c55d3420b9addff81b29687435d6cd1cf8583130e19af",
-  "ectest.c": "a03d49c8de47405912932f946c1f28f2374194cbc053df58dbb228f7ed4b09b3",
-  "hobble-openssl": "7140fcaa43acf82bd40228e0157d42ee8ad52effbffadf84252adab73337d5bd",
-  "ideatest.c": "0ee7bbb2c4a5984015d041135ea645af971cb1a0c7198fc59c7871366fd582f6",
-  "openssl-1.1.1k-hobbled.tar.xz": "ba25a2f2ddaa047d3e07b9b81b9ce7d0af66fce352e7f1608d51c774f2b93f36"
+  "0025-for-tests.patch": "cd03c0551d1df8ad0881f45020836cb682a6ffda4f423e15d2eb7f8e9b99a47e",
+  "Makefile.certificate": "fba3d7313fd8bdf2a585cd76795503584d6f3e1205dcd16a74c817842fda372b",
+  "configuration-prefix.h": "11aba0dcfab381269e7e6ba1fdde1e4e8dfe51e39d8c7a2918f3b28a32cb98fd",
+  "configuration-switch.h": "400439d7e8c551e7d5de8bfc648dcc0ddf6f4a7552750af4813449f68941b928",
+  "genpatches": "9da7f988d4378adf499b1322e79f29e94c889c4bf10cd6e79e6991b673de2463",
+  "make-dummy-cert": "bc9d96d7bcb2c82dc9674e80e6a4146f9eea3cce96c2feae305dafb0561f4365",
+  "openssl-3.1.4.tar.gz": "840af5366ab9b522bde525826be3ef0fb0af81c6a9ebd84caa600fea1731eee3",
+  "renew-dummy-cert": "58e1c7c2b15bfcb323e4223b8b1280ff12f17fbd88e5f8b817df7bbd0fb97637"
  }
 }

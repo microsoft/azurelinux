@@ -1,8 +1,8 @@
 # Got the intial spec from Fedora and modified it
 Summary:        SQLite DBI Driver
 Name:           perl-DBD-SQLite
-Version:        1.70
-Release:        2%{?dist}
+Version:        1.74
+Release:        1%{?dist}
 Group:          Development/Libraries
 License:        (GPL+ or Artistic) and Public Domain
 URL:            http://search.cpan.org/dist/DBD-SQLite/
@@ -63,6 +63,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Mon Nov 27 2023 Andrew Phelps <anphel@microsoft.com> - 1.74-1
+- Upgrade to version 1.74
+
 * Mon Aug 01 2022 Muhammad Falak <mwani@microsoft.com> - 1.70-2
 - Add BR on `perl(Test::More)` & `perl(Digest::MD5)` to fix ptest
 

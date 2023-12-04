@@ -2,7 +2,7 @@
 %global gem_name ruby-kafka
 Summary:        A Ruby client library for Apache Kafka
 Name:           rubygem-%{gem_name}
-Version:        1.4.0
+Version:        1.5.1
 Release:        1%{?dist}
 License:        Apache 2.0
 Vendor:         Microsoft Corporation
@@ -36,6 +36,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.5.1-1
+- Auto-upgrade to 1.5.1 - Azure Linux 3.0 - package upgrades
+
 * Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.4.0-1
 - Update to v1.4.0.
 - Build from .tar.gz source.
