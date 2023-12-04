@@ -415,7 +415,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %changelog
 * Fri Dec 01 2023 Cameron Baird <cameronbaird@microsoft.com> - 6.1.58.1-2
 - Remove loglevel=3, causing kernel to boot with the config-defined value,
-    https://cateee.net/lkddb/web-lkddb/CONSOLE_LOGLEVEL_DEFAULT.html
+    CONSOLE_LOGLEVEL_DEFAULT.
 
 * Fri Oct 27 2023 Rachel Menge <rachelmenge@microsoft.com> - 6.1.58.1-1
 - Upgrade to 6.1.58.1
