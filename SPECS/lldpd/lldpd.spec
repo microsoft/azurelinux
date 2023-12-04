@@ -4,8 +4,8 @@ Distribution:   Mariner
 %global rundir /run/
 
 Name:     lldpd
-Version:  1.0.14
-Release:  3%{?dist}
+Version:  1.0.17
+Release:  1%{?dist}
 Summary:  ISC-licensed implementation of LLDP
 
 License:  ISC
@@ -16,7 +16,6 @@ Source2:  %{name}-tmpfiles
 Source3:  %{name}-fedora.sysconfig
 Source4:  %{name}-el6.init
 Source5:  %{name}-el7.service
-Patch0:   CVE-2023-41910.patch
 
 BuildRequires: gcc
 BuildRequires: readline-devel
@@ -163,6 +162,9 @@ fi
 
 
 %changelog
+* Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0.17-1
+- Auto-upgrade to 1.0.17 - Azure Linux 3.0 - package upgrades
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.0.14-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

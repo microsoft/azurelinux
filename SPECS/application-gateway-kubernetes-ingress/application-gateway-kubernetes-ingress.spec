@@ -1,15 +1,14 @@
 %global debug_package %{nil}
 Summary:        Application Gateway Ingress Controller
 Name:           application-gateway-kubernetes-ingress
-Version:        1.4.0
-Release:        16%{?dist}
+Version:        1.7.2
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Networking
 URL:            https://github.com/Azure/application-gateway-kubernetes-ingress
-#Source0:       https://github.com/Azure/application-gateway-kubernetes-ingress/archive/refs/tags/1.4.0.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/Azure/application-gateway-kubernetes-ingress/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
 # We're using vendored Go modules from this tarball, since network is disabled during build time.
 # How to re-build this file:
@@ -54,6 +53,9 @@ cp appgw-ingress %{buildroot}%{_bindir}/
 %{_bindir}/appgw-ingress
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7.2-1
+- Auto-upgrade to 1.7.2 - Azure Linux 3.0 - package upgrades
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.4.0-16
 - Bump release to rebuild with go 1.20.10
 

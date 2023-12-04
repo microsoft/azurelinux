@@ -1,7 +1,6 @@
-diff --git a/liboath/global.c b/liboath/global.c
-index 6fb51fd..251ad15 100644
---- a/liboath/global.c
-+++ b/liboath/global.c
+diff -ru oath-toolkit-2.6.9-orig/liboath/global.c oath-toolkit-2.6.9/liboath/global.c
+--- oath-toolkit-2.6.9-orig/liboath/global.c	2023-11-06 08:52:01.544401132 -0800
++++ oath-toolkit-2.6.9/liboath/global.c	2023-11-06 08:57:08.612406143 -0800
 @@ -25,9 +25,12 @@
  
  #include <stdio.h>		/* For snprintf, getline. */
@@ -15,7 +14,7 @@ index 6fb51fd..251ad15 100644
  /**
   * oath_init:
   *
-@@ -52,6 +55,8 @@ oath_init (void)
+@@ -52,6 +55,8 @@
    if (gc_init () != GC_OK)
      return OATH_CRYPTO_ERROR;
  
@@ -24,7 +23,7 @@ index 6fb51fd..251ad15 100644
    return OATH_OK;
  }
  
-@@ -71,6 +76,11 @@ oath_done (void)
+@@ -71,6 +76,11 @@
  {
    gc_done ();
  
@@ -36,7 +35,7 @@ index 6fb51fd..251ad15 100644
    return OATH_OK;
  }
  
-@@ -99,3 +109,23 @@ oath_check_version (const char *req_version)
+@@ -99,3 +109,23 @@
  
    return NULL;
  }
@@ -60,11 +59,11 @@ index 6fb51fd..251ad15 100644
 +  }
 +  return OATH_OK;
 +}
-diff --git a/liboath/liboath.map b/liboath/liboath.map
-index 010c512..fd32e07 100644
---- a/liboath/liboath.map
-+++ b/liboath/liboath.map
-@@ -75,6 +75,7 @@ LIBOATH_2.2.0
+\ No newline at end of file
+diff -ru oath-toolkit-2.6.9-orig/liboath/liboath.map oath-toolkit-2.6.9/liboath/liboath.map
+--- oath-toolkit-2.6.9-orig/liboath/liboath.map	2023-11-06 08:52:01.544401132 -0800
++++ oath-toolkit-2.6.9/liboath/liboath.map	2023-11-06 08:58:25.864410203 -0800
+@@ -75,6 +75,7 @@
    global:
      oath_totp_validate3;
      oath_totp_validate3_callback;
@@ -72,51 +71,23 @@ index 010c512..fd32e07 100644
  } LIBOATH_1.12.0;
  
  LIBOATH_2.6.0
-diff --git a/liboath/oath.h b/liboath/oath.h
-index 7819c02..8bb5fc6 100644
---- a/liboath/oath.h
-+++ b/liboath/oath.h
-@@ -136,11 +136,15 @@ typedef enum
+diff -ru oath-toolkit-2.6.9-orig/liboath/oath.h oath-toolkit-2.6.9/liboath/oath.h
+--- oath-toolkit-2.6.9-orig/liboath/oath.h	2023-11-06 08:52:01.544401132 -0800
++++ oath-toolkit-2.6.9/liboath/oath.h	2023-11-06 09:46:10.416744428 -0800
+@@ -164,6 +164,9 @@
  
- /* Global */
+   extern OATHAPI const char *oath_check_version (const char *req_version);
  
-+extern char *oath_lockfile_path;
-+
- extern OATHAPI int oath_init (void);
- extern OATHAPI int oath_done (void);
- 
- extern OATHAPI const char *oath_check_version (const char *req_version);
- 
-+extern OATHAPI int oath_set_lockfile_path(const char *lockfile);
++  extern char *oath_lockfile_path;
++  extern OATHAPI int oath_set_lockfile_path(const char *lockfile);
 +
  /* Error handling */
  
- extern OATHAPI const char *oath_strerror (int err);
-diff --git a/liboath/oath.h.in b/liboath/oath.h.in
-index 524e9ac..4d5cddc 100644
---- a/liboath/oath.h.in
-+++ b/liboath/oath.h.in
-@@ -136,11 +136,15 @@ typedef enum
- 
- /* Global */
- 
-+extern char *oath_lockfile_path;
-+
- extern OATHAPI int oath_init (void);
- extern OATHAPI int oath_done (void);
- 
- extern OATHAPI const char *oath_check_version (const char *req_version);
- 
-+extern OATHAPI int oath_set_lockfile_path(const char *lockfile);
-+
- /* Error handling */
- 
- extern OATHAPI const char *oath_strerror (int err);
-diff --git a/liboath/usersfile.c b/liboath/usersfile.c
-index 3442fd2..066f936 100644
---- a/liboath/usersfile.c
-+++ b/liboath/usersfile.c
-@@ -323,9 +323,18 @@ update_usersfile (const char *usersfile,
+   extern OATHAPI const char *oath_strerror (int err);
+diff -ru oath-toolkit-2.6.9-orig/liboath/usersfile.c oath-toolkit-2.6.9/liboath/usersfile.c
+--- oath-toolkit-2.6.9-orig/liboath/usersfile.c	2023-11-06 08:52:01.548401132 -0800
++++ oath-toolkit-2.6.9/liboath/usersfile.c	2023-11-06 09:08:36.692294389 -0800
+@@ -325,9 +325,18 @@
    {
      int l;
  
@@ -138,11 +109,10 @@ index 3442fd2..066f936 100644
  
      lockfh = fopen (lockfile, "w");
      if (!lockfh)
-diff --git a/pam_oath/pam_oath.c b/pam_oath/pam_oath.c
-index 57fd33c..aa041e3 100644
---- a/pam_oath/pam_oath.c
-+++ b/pam_oath/pam_oath.c
-@@ -70,6 +70,7 @@ struct cfg
+diff -ru oath-toolkit-2.6.9-orig/pam_oath/pam_oath.c oath-toolkit-2.6.9/pam_oath/pam_oath.c
+--- oath-toolkit-2.6.9-orig/pam_oath/pam_oath.c	2023-11-06 08:52:01.576401132 -0800
++++ oath-toolkit-2.6.9/pam_oath/pam_oath.c	2023-11-06 09:14:42.848153201 -0800
+@@ -73,6 +73,7 @@
    int try_first_pass;
    int use_first_pass;
    char *usersfile;
@@ -150,7 +120,7 @@ index 57fd33c..aa041e3 100644
    unsigned digits;
    unsigned window;
  };
-@@ -84,6 +85,7 @@ parse_cfg (int flags, int argc, const char **argv, struct cfg *cfg)
+@@ -87,6 +88,7 @@
    cfg->try_first_pass = 0;
    cfg->use_first_pass = 0;
    cfg->usersfile = NULL;
@@ -158,7 +128,7 @@ index 57fd33c..aa041e3 100644
    cfg->digits = -1;
    cfg->window = 5;
  
-@@ -99,6 +101,8 @@ parse_cfg (int flags, int argc, const char **argv, struct cfg *cfg)
+@@ -102,6 +104,8 @@
  	cfg->use_first_pass = 1;
        if (strncmp (argv[i], "usersfile=", 10) == 0)
  	cfg->usersfile = (char *) argv[i] + 10;
@@ -167,7 +137,7 @@ index 57fd33c..aa041e3 100644
        if (strncmp (argv[i], "digits=", 7) == 0)
  	cfg->digits = atoi (argv[i] + 7);
        if (strncmp (argv[i], "window=", 7) == 0)
-@@ -124,6 +128,7 @@ parse_cfg (int flags, int argc, const char **argv, struct cfg *cfg)
+@@ -127,6 +131,7 @@
        D (("try_first_pass=%d", cfg->try_first_pass));
        D (("use_first_pass=%d", cfg->use_first_pass));
        D (("usersfile=%s", cfg->usersfile ? cfg->usersfile : "(null)"));
@@ -175,10 +145,11 @@ index 57fd33c..aa041e3 100644
        D (("digits=%d", cfg->digits));
        D (("window=%d", cfg->window));
      }
-@@ -189,6 +194,17 @@ pam_sm_authenticate (pam_handle_t * pamh,
+@@ -336,6 +341,17 @@
+       retval = PAM_AUTHINFO_UNAVAIL;
        goto done;
      }
- 
++
 +  if (cfg.lockfile)
 +    rc = oath_set_lockfile_path(cfg.lockfile);
 +  else
@@ -189,7 +160,6 @@ index 57fd33c..aa041e3 100644
 +      retval = PAM_AUTHINFO_UNAVAIL;
 +      goto done;
 +    }
-+
+ 
    if (password == NULL)
      {
-       retval = pam_get_item (pamh, PAM_CONV, (const void **) &conv);

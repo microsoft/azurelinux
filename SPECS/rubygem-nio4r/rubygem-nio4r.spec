@@ -2,7 +2,7 @@
 %global gem_name nio4r
 Summary:        Cross-platform asynchronous I/O primitives for scalable network clients and servers
 Name:           rubygem-%{gem_name}
-Version:        2.5.8
+Version:        2.5.9
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -33,6 +33,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.5.9-1
+- Auto-upgrade to 2.5.9 - Azure Linux 3.0 - package upgrades
+
 * Fri Apr 01 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.5.8-1
 - Update to v2.5.8.
 - Build from .tar.gz source.

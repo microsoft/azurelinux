@@ -7,8 +7,8 @@ Distribution:   Mariner
 %global pypi_name ethtool
 
 Name:           python-%{pypi_name}
-Version:        0.14
-Release:        9%{?dist}
+Version:        0.15
+Release:        1%{?dist}
 Summary:        Python module to interface with %{pypi_name}
 
 License:        GPLv2
@@ -78,6 +78,9 @@ export PYTHONPATH=%{buildroot}%{python3_sitearch}
 %{python3_sitearch}/%{pypi_name}-%{version}-py%{python3_version}.egg-info/
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.15-1
+- Auto-upgrade to 0.15 - Azure Linux 3.0 - package upgrades
+
 * Fri Jan 28 2022 Thomas Crain <thcrain@microsoft.com> - 0.14-9
 - Fix source name collision with ethtool package
 - Use github source tarball instead of pypi

@@ -3,8 +3,8 @@
 
 Summary:        Tox plugin to run tests in current Python environment
 Name:           python-%{pypi_name}
-Version:        0.0.7
-Release:        4%{?dist}
+Version:        0.0.11
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -57,6 +57,9 @@ tox -e py%{python3_version_nodots}
 %doc README.rst
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.0.11-1
+- Auto-upgrade to 0.0.11 - Azure Linux 3.0 - package upgrades
+
 * Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 0.0.7-4
 - Use `py%{python3_version_nodots}` instead of harcoding `py39`
 

@@ -1,6 +1,6 @@
 Summary:        Logrotate
 Name:           logrotate
-Version:        3.20.1
+Version:        3.21.0
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -61,6 +61,9 @@ install -p -m 644 examples/{b,w}tmp %{buildroot}%{_sysconfdir}/logrotate.d/
 %ghost %verify(not size md5 mtime) %attr(0644, root, root) %{_localstatedir}/lib/logrotate/logrotate.status
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.21.0-1
+- Auto-upgrade to 3.21.0 - Azure Linux 3.0 - package upgrades
+
 * Mon Jun 13 2022 Muhammad Falak <mwani@microsoft.com> - 3.20.1-1
 - Bump version to 3.20.1 to address CVE-2022-1348
 

@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "0025-for-tests.patch": "0824fb88488a4e38b5abc6231f0b18b06193444340fa534afc05294f7a13cfcd",
+  "0025-for-tests.patch": "cd03c0551d1df8ad0881f45020836cb682a6ffda4f423e15d2eb7f8e9b99a47e",
   "Makefile.certificate": "fba3d7313fd8bdf2a585cd76795503584d6f3e1205dcd16a74c817842fda372b",
   "configuration-prefix.h": "11aba0dcfab381269e7e6ba1fdde1e4e8dfe51e39d8c7a2918f3b28a32cb98fd",
   "configuration-switch.h": "400439d7e8c551e7d5de8bfc648dcc0ddf6f4a7552750af4813449f68941b928",

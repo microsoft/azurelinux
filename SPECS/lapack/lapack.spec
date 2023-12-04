@@ -30,8 +30,8 @@ provides a number of basic algorithms for numerical algebra.
 
 Summary:        Numerical linear algebra package libraries
 Name:           lapack
-Version:        3.10.0
-Release:        6%{?dist}
+Version:        3.11.0
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -40,7 +40,6 @@ Source0:        https://github.com/Reference-LAPACK/lapack/archive/v%{version}.t
 Source4:        http://www.netlib.org/lapack/lapackqref.ps
 Source5:        http://www.netlib.org/blas/blasqr.ps
 # Fix from https://github.com/Reference-LAPACK/lapack/pull/625/
-Patch0:         CVE-2021-4048.patch
 
 BuildRequires:  cmake
 BuildRequires:  gawk
@@ -102,7 +101,6 @@ This build has 64bit INTEGER support and a symbol name suffix.
 
 %prep
 %setup -q
-%patch0 -p1 -b .CVE-2021-4048
 
 %build
 %global optflags %{optflags} -frecursive --no-optimize-sibling-calls
@@ -251,6 +249,9 @@ rm -rf %{buildroot}%{_libdir}/*.def*
 %endif
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.11.0-1
+- Auto-upgrade to 3.11.0 - Azure Linux 3.0 - package upgrades
+
 * Thu Mar 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.10.0-6
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - Removing manpages to fix build hangs.

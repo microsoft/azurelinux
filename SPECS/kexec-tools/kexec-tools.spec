@@ -5,8 +5,8 @@
 
 Summary:        The kexec/kdump userspace component
 Name:           kexec-tools
-Version:        2.0.23
-Release:        3%{?dist}
+Version:        2.0.27
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -324,6 +324,9 @@ done
 /usr/share/makedumpfile/
 
 %changelog
+* Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.27-1
+- Auto-upgrade to 2.0.27 - Azure Linux 3.0 - package upgrades
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.0.23-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

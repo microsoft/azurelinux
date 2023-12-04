@@ -1,7 +1,7 @@
 Summary:        File manager
 Name:           mc
-Version:        4.8.27
-Release:        2%{?dist}
+Version:        4.8.30
+Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -45,6 +45,9 @@ MC (Midnight Commander) is a text-mode full-screen file manager and visual shell
 %exclude %{_prefix}/src
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.8.30-1
+- Auto-upgrade to 4.8.30 - Azure Linux 3.0 - package upgrades
+
 * Tue Jul 12 2022 Olivia Crain <oliviacrain@microsoft.com> - 4.8.27-2
 - Fix unversioned python shebangs in extfs helpers
 

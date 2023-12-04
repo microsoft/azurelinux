@@ -1,7 +1,7 @@
 {
- "Signatures": {
-  "ant-bootstrap.pom.in": "85d35aedfb5ccc60ba1642b4c7624d092f34b253662d3c6c8f2bc1982dcad580",
-  "apache-ant-1.10.11-src.tar.gz": "c44d71e07e240eaab638d1da96f2038f84dcc1f245656f03e040a69603ca5b39",
-  "apache-ant-1.8.ant.conf": "8a0bace4a527bd0ff35ad0b0a31c1f7bf30fa186e98cd9dc5142a97098f36ddf"
- }
+  "Signatures": {
+    "ant-bootstrap.pom.in": "85d35aedfb5ccc60ba1642b4c7624d092f34b253662d3c6c8f2bc1982dcad580",
+    "apache-ant-1.8.ant.conf": "8a0bace4a527bd0ff35ad0b0a31c1f7bf30fa186e98cd9dc5142a97098f36ddf",
+    "apache-ant-1.10.14-src.tar.gz": "9a5fe31f44d1eb62590cbe38e4fab25b25e2f68643b38a54b66498e0bf621b54"
+  }
 }

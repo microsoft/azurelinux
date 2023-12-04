@@ -1,7 +1,7 @@
 Summary:        Cron Daemon
 Name:           cronie
-Version:        1.5.7
-Release:        3%{?dist}
+Version:        1.6.1
+Release:        1%{?dist}
 License:        GPLv2+ AND MIT AND BSD AND ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -165,6 +165,9 @@ make %{?_smp_mflags} check
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/cron.d/dailyjobs
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.6.1-1
+- Auto-upgrade to 1.6.1 - Azure Linux 3.0 - package upgrades
+
 * Fri Oct 27 2023 Andrew Phelps <anphel@microsoft.com> - 1.5.7-3
 - Fix pam/crond file contents
 

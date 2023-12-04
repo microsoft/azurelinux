@@ -1,6 +1,6 @@
 Summary:        C/C++ library for network traffic capture
 Name:           libpcap
-Version:        1.10.1
+Version:        1.10.4
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -68,6 +68,9 @@ make DESTDIR=%{buildroot} install
 %{_mandir}/man7/*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.10.4-1
+- Auto-upgrade to 1.10.4 - Azure Linux 3.0 - package upgrades
+
 * Wed Jan 12 2022 Henry Li <lihl@microsoft.com> - 1.10.1-1
 - Upgrade to version 1.10.1
 

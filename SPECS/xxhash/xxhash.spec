@@ -1,7 +1,7 @@
 Summary:        Extremely fast hash algorithm
 Name:           xxhash
-Version:        0.8.1
-Release:        3%{?dist}
+Version:        0.8.2
+Release:        1%{?dist}
 License:        BSD AND GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -94,6 +94,9 @@ rm %{buildroot}/%{_libdir}/libxxhash.a
 %doc doxygen/html
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.8.2-1
+- Auto-upgrade to 0.8.2 - Azure Linux 3.0 - package upgrades
+
 * Wed Jul 06 2022 Sumedh Sharma <sumsharma@microsoft.com> - 0.8.1-3
 - Initial CBL-Mariner import from Fedora 36 (license: MIT)
 - Adding as run dependency for cassandra medusa package

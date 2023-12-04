@@ -81,8 +81,8 @@ file-5.45-1.azl3.aarch64.rpm
 file-debuginfo-5.45-1.azl3.aarch64.rpm
 file-devel-5.45-1.azl3.aarch64.rpm
 file-libs-5.45-1.azl3.aarch64.rpm
-filesystem-1.1-17.azl3.aarch64.rpm
-filesystem-asc-1.1-17.azl3.aarch64.rpm
+filesystem-1.1-18.azl3.aarch64.rpm
+filesystem-asc-1.1-18.azl3.aarch64.rpm
 findutils-4.9.0-1.azl3.aarch64.rpm
 findutils-debuginfo-4.9.0-1.azl3.aarch64.rpm
 findutils-lang-4.9.0-1.azl3.aarch64.rpm

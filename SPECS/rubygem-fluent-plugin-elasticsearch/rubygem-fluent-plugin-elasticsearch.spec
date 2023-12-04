@@ -2,7 +2,7 @@
 %global gem_name fluent-plugin-elasticsearch
 Summary:        Elasticsearch output plugin for Fluent event collector
 Name:           rubygem-fluent-plugin-elasticsearch
-Version:        5.2.2
+Version:        5.3.0
 Release:        1%{?dist}
 License:        Apache 2.0
 Vendor:         Microsoft Corporation
@@ -36,6 +36,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.3.0-1
+- Auto-upgrade to 5.3.0 - Azure Linux 3.0 - package upgrades
+
 * Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.2.2-1
 - Update to v5.2.2.
 - Build from .tar.gz source.

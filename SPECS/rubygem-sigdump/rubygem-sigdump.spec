@@ -2,8 +2,8 @@
 %global gem_name sigdump
 Summary:        SIGQUIT of Java VM for Ruby
 Name:           rubygem-%{gem_name}
-Version:        0.2.4
-Release:        2%{?dist}
+Version:        0.2.5
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -34,6 +34,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.2.5-1
+- Auto-upgrade to 0.2.5 - Azure Linux 3.0 - package upgrades
+
 * Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.2.4-2
 - Build from .tar.gz source.
 

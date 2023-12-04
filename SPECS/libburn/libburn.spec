@@ -4,7 +4,7 @@
 
 Summary:         Library for reading, mastering and writing optical discs
 Name:            libburn
-Version:         1.5.4
+Version:         1.5.6
 Release:         1%{?dist}
 License:         GPLv2+
 Group:           System Environment/Libraries
@@ -89,6 +89,9 @@ rm -rf $RPM_BUILD_ROOT%{_defaultdocdir}
 %{_mandir}/man1/%{cdrskin}.1*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.5.6-1
+- Auto-upgrade to 1.5.6 - Azure Linux 3.0 - package upgrades
+
 * Mon Mar 14 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.5.4-1
 - Upgrade to 1.5.4.
 

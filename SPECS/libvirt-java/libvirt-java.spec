@@ -3,7 +3,7 @@
 
 Summary:        Java bindings for the libvirt virtualization API
 Name:           libvirt-java
-Version:        0.5.2
+Version:        0.5.3
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -53,6 +53,9 @@ ant test
 %{_javadir}/libvirt.jar
 
 %changelog
+* Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.5.3-1
+- Auto-upgrade to 0.5.3 - Azure Linux 3.0 - package upgrades
+
 * Wed Jan 05 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.5.2-1
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.

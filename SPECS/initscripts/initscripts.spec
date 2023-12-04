@@ -1,6 +1,6 @@
 Summary:        Scripts to bring up network interfaces and legacy utilities
 Name:           initscripts
-Version:        10.15
+Version:        10.19
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -107,6 +107,9 @@ touch %{buildroot}%{_sbindir}/ifdown
 %{_prefix}/lib/systemd/system/readonly-root.service
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 10.19-1
+- Auto-upgrade to 10.19 - Azure Linux 3.0 - package upgrades
+
 * Tue Feb 22 2022 Cameron Baird <cameronbaird@microsoft.com> - 10.15-1
 - Update source to v10.15
 - Use python3 to build

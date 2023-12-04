@@ -1,6 +1,6 @@
 Summary:        Simple Python style checker in one Python file
 Name:           python-pycodestyle
-Version:        2.8.0
+Version:        2.11.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -45,6 +45,9 @@ tox -e py%{python3_version_nodots}
 %{_bindir}/pycodestyle
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.11.0-1
+- Auto-upgrade to 2.11.0 - Azure Linux 3.0 - package upgrades
+
 * Tue Mar 15 2022 Thomas Crain <thcrain@microsoft.com> - 2.8.0-1
 - Upgrade to latest upstream release
 - Switch source from PyPI to GitHub

@@ -1,6 +1,6 @@
 Summary:        YANG data modeling language library
 Name:           libyang
-Version:        2.1.55
+Version:        2.1.111
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -91,6 +91,9 @@ cp -a doc/html %{buildroot}/%{_docdir}/libyang/html
 %{_docdir}/libyang
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.1.111-1
+- Auto-upgrade to 2.1.111 - Azure Linux 3.0 - package upgrades
+
 * Mon Apr 10 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.1.55-1
 - Auto-upgrade to 2.1.55 - to fix CVE-2023-26916
 

@@ -2,8 +2,8 @@
 %global gem_name rubyzip
 Summary:        a ruby module for reading and writing zip files
 Name:           rubygem-%{gem_name}
-Version:        1.3.0
-Release:        2%{?dist}
+Version:        2.3.2
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -31,6 +31,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.3.2-1
+- Auto-upgrade to 2.3.2 - Azure Linux 3.0 - package upgrades
+
 * Fri Apr 01 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.3.0-2
 - Build from .tar.gz source.
 
