@@ -288,18 +288,16 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 	rootHashRegex := regexp.MustCompile(`Root hash:\s+([0-9a-fA-F]+)`)
 
 	saltMatches := saltRegex.FindStringSubmatch(verityOutput)
-	if len(saltMatches) > 1 {
-		salt = saltMatches[1]
-	} else {
+	if len(saltMatches) <= 1 {
 		return fmt.Errorf("failed to parse salt from veritysetup output")
 	}
+	salt = saltMatches[1]
 
 	rootHashMatches := rootHashRegex.FindStringSubmatch(verityOutput)
-	if len(rootHashMatches) > 1 {
-		rootHash = rootHashMatches[1]
-	} else {
+	if len(rootHashMatches) <= 1 {
 		return fmt.Errorf("failed to parse root hash from veritysetup output")
 	}
+	rootHash = rootHashMatches[1]
 
 	resolvedBootDevice, err := findDeviceByUUIDOrLabel(config.SystemConfig.Verity.BootDevice)
 	if err != nil {
@@ -332,7 +330,7 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 	}
 
 	// Update grub configuration
-	err = updateGrubConfig(resolvedVerityDevice, resolvedHashDevice, salt, rootHash, config.SystemConfig.Verity.VerityCorruptionResponse)
+	err = updateGrubConfig(resolvedVerityDevice, resolvedHashDevice, salt, rootHash, config.SystemConfig.Verity.VerityErrorBehavior)
 	if err != nil {
 		return err
 	}

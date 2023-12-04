@@ -8,20 +8,20 @@ import (
 )
 
 type Verity struct {
-	VerityTab                string                   `yaml:"VerityTab"`
-	VerityDevice             string                   `yaml:"VerityDevice"`
-	HashDevice               string                   `yaml:"HashDevice"`
-	BootDevice               string                   `yaml:"BootDevice"`
-	VerityCorruptionResponse VerityCorruptionResponse `yaml:"VerityCorruptionResponse"`
+	VerityTab           string              `yaml:"VerityTab"`
+	VerityDevice        string              `yaml:"VerityDevice"`
+	HashDevice          string              `yaml:"HashDevice"`
+	BootDevice          string              `yaml:"BootDevice"`
+	VerityErrorBehavior VerityErrorBehavior `yaml:"VerityErrorBehavior"`
 }
 
 var (
 	DefaultVerity = Verity{
-		VerityTab:                "",
-		VerityDevice:             "",
-		HashDevice:               "",
-		BootDevice:               "",
-		VerityCorruptionResponse: "",
+		VerityTab:           "",
+		VerityDevice:        "",
+		HashDevice:          "",
+		BootDevice:          "",
+		VerityErrorBehavior: "",
 	}
 )
 
@@ -44,12 +44,10 @@ func (v *Verity) IsValid() error {
 		return fmt.Errorf("invalid BootDevice value: empty string")
 	}
 
-	err = v.VerityCorruptionResponse.IsValid()
+	err = v.VerityErrorBehavior.IsValid()
 	if err != nil {
 		return err
 	}
 
 	return nil
 }
-
-// TODO: Implement a new dedicated UnmarshalYAML function.

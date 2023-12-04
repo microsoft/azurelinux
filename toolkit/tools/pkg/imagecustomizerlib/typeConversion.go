@@ -161,3 +161,24 @@ func mountIdentifierTypeToImager(mountIdentifierType imagecustomizerapi.MountIde
 		return "", fmt.Errorf("unknwon MountIdentifierType value (%s)", mountIdentifierType)
 	}
 }
+
+func VerityErrorBehaviorToImager(verityErrorBehavior imagecustomizerapi.VerityErrorBehavior,
+) (configuration.VerityErrorBehavior, error) {
+	switch verityErrorBehavior {
+	case imagecustomizerapi.VerityErrorBehaviorIgnore:
+		return configuration.VerityErrorBehaviorIgnore, nil
+
+	case imagecustomizerapi.VerityErrorBehaviorPanic:
+		return configuration.VerityErrorBehaviorPanic, nil
+
+	case imagecustomizerapi.VerityErrorBehaviorRestart:
+		return configuration.VerityErrorBehaviorRestart, nil
+
+	case imagecustomizerapi.VerityErrorBehaviorDefault:
+		return configuration.VerityErrorBehaviorDefault, nil
+
+	default:
+		return "", fmt.Errorf("unknwon VerityErrorBehavior value (%s)", verityErrorBehavior)
+
+	}
+}

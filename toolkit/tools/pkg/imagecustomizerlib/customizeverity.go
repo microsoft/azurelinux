@@ -134,9 +134,15 @@ func updateMarinerCfgWithInitramfs(imageChroot *safechroot.Chroot) error {
 	return nil
 }
 
-func updateGrubConfig(resolvedVerityDevice string, resolvedHashDevice string, salt string, rootHash string, verityCorruptionResponse string) error {
+func updateGrubConfig(resolvedVerityDevice string, resolvedHashDevice string, salt string, rootHash string, verityErrorBehavior imagecustomizerapi.VerityErrorBehavior) error {
+	var err error
+
 	const cmdlineTemplate = "rd.systemd.verity=1 roothash=%s systemd.verity_root_data=%s systemd.verity_root_hash=%s systemd.verity_root_options=%s,salt=%s"
-	newArgs := fmt.Sprintf(cmdlineTemplate, rootHash, resolvedVerityDevice, resolvedHashDevice, verityCorruptionResponse, salt)
+	verityErrorBehaviorString, err := VerityErrorBehaviorToImager(verityErrorBehavior)
+	if err != nil {
+		return err
+	}
+	newArgs := fmt.Sprintf(cmdlineTemplate, rootHash, resolvedVerityDevice, resolvedHashDevice, verityErrorBehaviorString, salt)
 	grubConfigPath := "/mnt/boot_partition/grub2/grub.cfg"
 
 	content, err := os.ReadFile(grubConfigPath)
