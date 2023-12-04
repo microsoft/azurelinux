@@ -8,7 +8,7 @@ INPUT_VMLINUZ=$2
 INPUT_GRUB_CFG=$3
 INPUT_STARTUP_SCRIPT=$4
 INPUT_STARTUP_SCRIPT_CONFIGURATION=$5
-INPUT_ROOT_FS=$6
+INPUT_FULL_IMAGE_ZST=$6
 OUTPUT_ISO_DIR=$7
 
 function create_efi_boot_image () {
@@ -133,7 +133,7 @@ create_bootload_images \
 mkdir -p $STAGED_ISO_ARTIFACTS_DIR/artifacts
 cp $INPUT_STARTUP_SCRIPT $STAGED_ISO_ARTIFACTS_DIR/artifacts/
 cp $INPUT_STARTUP_SCRIPT_CONFIGURATION $STAGED_ISO_ARTIFACTS_DIR/artifacts/
-cp $INPUT_ROOT_FS $STAGED_ISO_ARTIFACTS_DIR/artifacts/
+cp $INPUT_FULL_IMAGE_ZST $STAGED_ISO_ARTIFACTS_DIR/artifacts/full-image.zst
 
 # -----------------------------------------------------------------------------
 # Generate the iso
