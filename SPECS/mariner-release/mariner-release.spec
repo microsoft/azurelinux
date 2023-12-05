@@ -1,41 +1,41 @@
-Summary:        CBL-Mariner release files
+Summary:        Azure Linux release files
 Name:           mariner-release
-Version:        2.0
-Release:        53%{?dist}
+Version:        3.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Microsoft Azure Linux
 Group:          System Environment/Base
-URL:            https://aka.ms/cbl-mariner
+URL:            https://aka.ms/azurelinux
 # Allows package management tools to find and set the default value
 # for the "releasever" variable from the RPM database.
 Provides:       system-release(releasever)
 BuildArch:      noarch
 
 %description
-Azure CBL-Mariner release files such as yum configs and other %{_sysconfdir}/ release related files
+Azure Linux release files such as yum configs and other %{_sysconfdir}/ release related files
 
 %install
 install -d %{buildroot}%{_sysconfdir}
 install -d %{buildroot}/%{_libdir}
 
-echo "CBL-Mariner %{mariner_release_version}" > %{buildroot}%{_sysconfdir}/mariner-release
+echo "Azure Linux %{mariner_release_version}" > %{buildroot}%{_sysconfdir}/mariner-release
 echo "MARINER_BUILD_NUMBER=%{mariner_build_number}" >> %{buildroot}%{_sysconfdir}/mariner-release
 
 cat > %{buildroot}%{_sysconfdir}/lsb-release <<- "EOF"
-DISTRIB_ID="Mariner"
+DISTRIB_ID="azurelinux"
 DISTRIB_RELEASE="%{mariner_release_version}"
-DISTRIB_CODENAME=Mariner
-DISTRIB_DESCRIPTION="CBL-Mariner %{mariner_release_version}"
+DISTRIB_CODENAME=AzureLinux
+DISTRIB_DESCRIPTION="Microsoft Azure Linux %{mariner_release_version}"
 EOF
 
 version_id=`echo %{mariner_release_version} | grep -o -E '[0-9]+.[0-9]+' | head -1`
 cat > %{buildroot}/%{_libdir}/os-release << EOF
-NAME="Common Base Linux Mariner"
+NAME="Microsoft Azure Linux"
 VERSION="%{mariner_release_version}"
-ID=mariner
+ID=azurelinux
 VERSION_ID="$version_id"
-PRETTY_NAME="CBL-Mariner/Linux"
+PRETTY_NAME="Microsoft Azure Linux $version_id"
 ANSI_COLOR="1;34"
 HOME_URL="%{url}"
 BUG_REPORT_URL="%{url}"
@@ -45,11 +45,11 @@ EOF
 ln -sv ../usr/lib/os-release %{buildroot}%{_sysconfdir}/os-release
 
 cat > %{buildroot}%{_sysconfdir}/issue <<- EOF
-Welcome to CBL-Mariner %{mariner_release_version} (%{_arch}) - Kernel \r (\l)
+Welcome to Azure Linux %{mariner_release_version} (%{_arch}) - Kernel \r (\l)
 EOF
 
 cat > %{buildroot}%{_sysconfdir}/issue.net <<- EOF
-Welcome to CBL-Mariner %{mariner_release_version} (%{_arch})
+Welcome to Azure Linux %{mariner_release_version} (%{_arch})
 EOF
 
 %files
@@ -62,6 +62,9 @@ EOF
 %config(noreplace) %{_sysconfdir}/issue.net
 
 %changelog
+* Wed Nov 29 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.0-1
+- First version of Azure Linux 3.0.  Includes minimal rebranding changes.
+
 * Fri Oct 20 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0-53
 - Bump release for October 2023 Release 2
 

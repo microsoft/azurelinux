@@ -1,5 +1,5 @@
 Name:           doxygen
-Version:        1.9.3
+Version:        1.9.8
 Release:        1%{?dist}
 Summary:        Automated C, C++, and Java Documentation Generator
 License:        GPLv2
@@ -51,6 +51,9 @@ install -vm 644 doc/doxygen.1 %{buildroot}%{_mandir}/man1/
 %license LICENSE
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.9.8-1
+- Auto-upgrade to 1.9.8 - Azure Linux 3.0 - package upgrades
+
 * Wed Jan 12 2022 Rachel Menge <rachelmenge@microsoft.com> - 1.9.3-1
 - Update to version 1.9.3
 

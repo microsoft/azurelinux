@@ -3,7 +3,7 @@
 Summary:        Z shell
 Name:           zsh
 Version:        5.9
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT AND GPLv2.0 AND GPLv3.0 AND GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -129,6 +129,9 @@ fi
 %doc Doc/*.html
 
 %changelog
+* Thu Nov 30 2023 Dan Streetman <ddstreet@ieee.org> - 5.9-3
+- Remove umask 027
+
 * Thu Jun 16 2022 Olivia Crain <oliviacrain@microsoft.com> - 5.9-2
 - Fix package install by patching out bad shebangs in included scripts
 

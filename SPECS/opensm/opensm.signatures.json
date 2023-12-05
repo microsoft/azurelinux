@@ -1,11 +1,11 @@
 {
- "Signatures": {
-  "opensm-3.3.23.tar.gz": "c3f223864df0e007678263466144957765c20726f0c7c502f5691502fc6aa61c",
-  "opensm.launch": "c5d3c84147f1cbcbdb242f9b4baacb65a98bd75919fb0cb0928b394a57467fed",
-  "opensm.logrotate": "555b11cd81a0ee54e0d8260cfbb4e5e89c3f570f81f54ccf46a68a23fd02d9bb",
-  "opensm.partitions": "0d3f04f3be0d8e83e4c66caffaf3df104ec35c1e256875cc9fd0ad271b8391a8",
-  "opensm.rwtab": "09319e99403695c29520e2d5c6a4b8feae02cd4eaa06448fa3dec1ae34ee6bda",
-  "opensm.service": "dab30eb53c1284c45ca1ac1cc90c623a1012f40d222ba2f6074f46e4aaf5dc9d",
-  "opensm.sysconfig": "0716ad114bac8bc47d1a836f98f87416184aa1f0ffc1e979977221c751cf4ede"
- }
+  "Signatures": {
+    "opensm.launch": "c5d3c84147f1cbcbdb242f9b4baacb65a98bd75919fb0cb0928b394a57467fed",
+    "opensm.logrotate": "555b11cd81a0ee54e0d8260cfbb4e5e89c3f570f81f54ccf46a68a23fd02d9bb",
+    "opensm.partitions": "0d3f04f3be0d8e83e4c66caffaf3df104ec35c1e256875cc9fd0ad271b8391a8",
+    "opensm.rwtab": "09319e99403695c29520e2d5c6a4b8feae02cd4eaa06448fa3dec1ae34ee6bda",
+    "opensm.service": "dab30eb53c1284c45ca1ac1cc90c623a1012f40d222ba2f6074f46e4aaf5dc9d",
+    "opensm.sysconfig": "0716ad114bac8bc47d1a836f98f87416184aa1f0ffc1e979977221c751cf4ede",
+    "opensm-3.3.24.tar.gz": "a3335e371a4b044427574dff9d324c6c334e502e8facdf58bc070ee151d7e460"
+  }
 }

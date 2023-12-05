@@ -1,6 +1,5 @@
 {
-    "Signatures": {
-     "python-absl-py-1.2.0.tar.gz": "b9130d6f49a21dc44f56da89d5e8409807e93d28c194c23e27777f3c8cceef81"
-    }
-   }
-   
+  "Signatures": {
+    "python-absl-py-1.4.0.tar.gz": "0fb3a4916a157eb48124ef309231cecdfdd96ff54adf1660b39c0d4a9790a2c0"
+  }
+}

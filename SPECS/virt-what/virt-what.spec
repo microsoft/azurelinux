@@ -1,6 +1,6 @@
 Name:           virt-what
-Version:        1.20
-Release:        5%{?dist}
+Version:        1.25
+Release:        1%{?dist}
 Summary:        Detect if we are running in a virtual machine
 License:        GPLv2+
 
@@ -106,6 +106,9 @@ fi
 
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.25-1
+- Auto-upgrade to 1.25 - Azure Linux 3.0 - package upgrades
+
 * Tue Sep 26 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.20-5
 - Removing 'exit' calls from the '%%check' section.
 

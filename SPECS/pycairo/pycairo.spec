@@ -1,6 +1,6 @@
 Summary:        Python bindings for the cairo library
 Name:           pycairo
-Version:        1.21.0
+Version:        1.24.0
 Release:        1%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -61,6 +61,9 @@ pip3 install pytest
 %{_libdir}/pkgconfig/py3cairo.pc
 
 %changelog
+* Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.24.0-1
+- Auto-upgrade to 1.24.0 - Azure Linux 3.0 - package upgrades
+
 * Wed Apr 20 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.21.0-1
 - Upgrade to latest upstream version
 - Switch python3-pytest BR to check-time 

@@ -1,6 +1,6 @@
 Summary:        C library for reading MaxMind DB files
 Name:           libmaxminddb
-Version:        1.6.0
+Version:        1.7.1
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -54,6 +54,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/libmaxminddb.pc
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7.1-1
+- Auto-upgrade to 1.7.1 - Azure Linux 3.0 - package upgrades
+
 * Mon Jan 10 2022 Henry Li <lihl@microsoft.com> 1.6.0-1
 - Upgrade to version 1.6.0
 

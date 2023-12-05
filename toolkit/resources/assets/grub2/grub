@@ -2,7 +2,7 @@ GRUB_TIMEOUT=0
 GRUB_DISTRIBUTOR="AzureLinux"
 GRUB_DISABLE_SUBMENU=y
 GRUB_TERMINAL_OUTPUT="console"
-GRUB_CMDLINE_LINUX="{{.LuksUUID}} {{.LVM}} {{.IMAPolicy}} {{.ReadOnlyVerityRoot}} {{.SELinux}} {{.FIPS}} rd.auto=1 init=/lib/systemd/systemd net.ifnames=0 plymouth.enable=0 systemd.legacy_systemd_cgroup_controller=yes systemd.unified_cgroup_hierarchy=0 lockdown=integrity sysctl.kernel.unprivileged_bpf_disabled=1 loglevel=3 {{.CGroup}}"
+GRUB_CMDLINE_LINUX="{{.LuksUUID}} {{.LVM}} {{.IMAPolicy}} {{.ReadOnlyVerityRoot}} {{.SELinux}} {{.FIPS}} rd.auto=1 init=/lib/systemd/systemd net.ifnames=0 plymouth.enable=0 systemd.legacy_systemd_cgroup_controller=yes systemd.unified_cgroup_hierarchy=0 lockdown=integrity sysctl.kernel.unprivileged_bpf_disabled=1 {{.CGroup}}"
 GRUB_CMDLINE_LINUX_DEFAULT="{{.ExtraCommandLine}} $kernelopts"
     
 # =============================notice===============================

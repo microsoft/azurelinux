@@ -1,7 +1,7 @@
 Summary:        RPC program number mapper
 Name:           rpcbind
-Version:        1.2.5
-Release:        6%{?dist}
+Version:        1.2.6
+Release:        1%{?dist}
 License:        BSD
 URL:            http://nfsv4.bullopensource.org
 Group:          Applications/Daemons
@@ -91,6 +91,9 @@ fi
 %systemd_postun_with_restart rpcbind.service rpcbind.socket
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.2.6-1
+- Auto-upgrade to 1.2.6 - Azure Linux 3.0 - package upgrades
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.2.5-6
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

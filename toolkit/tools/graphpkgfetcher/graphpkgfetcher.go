@@ -402,7 +402,7 @@ func downloadSingleDeltaRPM(realDependencyGraph *pkggraph.PkgGraph, buildNode *p
 	}
 	// We have the expected rpm path, take the base name and strip .rpm off to get a name we can pass to tdnf
 	// to download the delta RPM
-	// e.g. "/home/user/repo/out/RPMS/x86_64/pkg-1.0-1.cm2.x86_64.rpm" -> "pkg-1.0-1.cm2.x86_64"
+	// e.g. "/home/user/repo/out/RPMS/x86_64/pkg-1.0-1.azl3.x86_64.rpm" -> "pkg-1.0-1.azl3.x86_64"
 	fullyQualifiedRpmName := filepath.Base(originalRpmPath)
 	fullyQualifiedRpmName = strings.TrimSuffix(fullyQualifiedRpmName, ".rpm")
 

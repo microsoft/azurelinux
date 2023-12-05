@@ -1,8 +1,8 @@
 {
- "Signatures": {
-  "85-regulatory.rules": "82f3aec0dcb441ce9057f07d1779b9f4f9947eaad662f1822d017f0fee436b42",
-  "setregdomain": "d75acfd89e1a635b5edaef5548fe9675c96610ddf1a8b9b6f750149449e9cd14",
-  "setregdomain.1": "1275b1bfaea90ccbe49662cc1bf72923f619a35a64f8ef1fffaecb9386cdd2e8",
-  "wireless-regdb-2022.08.12.tar.xz": "59c8f7d17966db71b27f90e735ee8f5b42ca3527694a8c5e6e9b56bd379c3b84"
- }
+  "Signatures": {
+    "85-regulatory.rules": "82f3aec0dcb441ce9057f07d1779b9f4f9947eaad662f1822d017f0fee436b42",
+    "setregdomain": "d75acfd89e1a635b5edaef5548fe9675c96610ddf1a8b9b6f750149449e9cd14",
+    "setregdomain.1": "1275b1bfaea90ccbe49662cc1bf72923f619a35a64f8ef1fffaecb9386cdd2e8",
+    "wireless-regdb-2023.05.03.tar.xz": "f254d08ab3765aeae2b856222e11a95d44aef519a6663877c71ef68fae4c8c12"
+  }
 }

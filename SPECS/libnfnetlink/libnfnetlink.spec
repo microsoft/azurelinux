@@ -1,7 +1,7 @@
 Summary:    Library for netfilter related kernel/userspace communication
 Name:       libnfnetlink
-Version:    1.0.1
-Release:        6%{?dist}
+Version:    1.0.2
+Release:        1%{?dist}
 License:    GPLv2+
 URL:        http://www.netfilter.org/projects/libnfnetlink/index.html
 Group:      System Environment/Libraries
@@ -50,6 +50,9 @@ find %{buildroot} -type f -name '*.la' -exec rm -f {} ';'
 %{_libdir}/*.so
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0.2-1
+- Auto-upgrade to 1.0.2 - Azure Linux 3.0 - package upgrades
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.0.1-6
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

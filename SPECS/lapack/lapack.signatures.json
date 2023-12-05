@@ -1,7 +1,7 @@
 {
- "Signatures": {
-  "blasqr.ps": "4fdeb1e649b0dc244ae1331efdc7a2b32a3f0011205d05e64129c304638fba8c",
-  "lapack-3.10.0.tar.gz": "328c1bea493a32cac5257d84157dc686cc3ab0b004e2bea22044e0a59f6f8a19",
-  "lapackqref.ps": "fafadde0c1804cc0ab6d9435d41239745d8e265299773ede827c82596bbcef4b"
- }
+  "Signatures": {
+    "blasqr.ps": "4fdeb1e649b0dc244ae1331efdc7a2b32a3f0011205d05e64129c304638fba8c",
+    "lapackqref.ps": "fafadde0c1804cc0ab6d9435d41239745d8e265299773ede827c82596bbcef4b",
+    "lapack-3.11.0.tar.gz": "4b9ba79bfd4921ca820e83979db76ab3363155709444a787979e81c22285ffa9"
+  }
 }

@@ -1,6 +1,6 @@
 Summary:        A shared storage lock manager
 Name:           sanlock
-Version:        3.8.4
+Version:        3.8.5
 Release:        1%{?dist}
 License:        GPLv2 AND GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
@@ -183,6 +183,9 @@ common sanlock lockspace.
 %{_mandir}/man8/sanlk-reset*
 
 %changelog
+* Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.8.5-1
+- Auto-upgrade to 3.8.5 - Azure Linux 3.0 - package upgrades
+
 * Tue Dec 28 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 3.8.4-1
 - Update to version 3.8.4.
 

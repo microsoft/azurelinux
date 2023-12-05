@@ -1,6 +1,6 @@
 Summary:	    command line utility to set and view hardware parameters
 Name:		    hdparm
-Version:	    9.63
+Version:	    9.65
 Release:        1%{?dist}
 License:	    BSD
 URL:		    http://sourceforge.net/projects/%{name}/
@@ -30,6 +30,9 @@ make DESTDIR=%{buildroot} binprefix=%{_prefix} install
 %{_mandir}/man8/hdparm.8*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.65-1
+- Auto-upgrade to 9.65 - Azure Linux 3.0 - package upgrades
+
 * Thu Feb 17 2022 Cameron Baird <cameronbaird@microsoft.com> - 9.63-1
 - Update source to v9.63
 

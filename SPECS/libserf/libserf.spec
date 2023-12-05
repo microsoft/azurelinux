@@ -1,15 +1,13 @@
 Summary:        A high performance C-based HTTP client library built upon the Apache Portable Runtime (APR) library
 Name:           libserf
-Version:        1.3.9
-Release:        8%{?dist}
+Version:        1.3.10
+Release:        1%{?dist}
 License:        ASL 2.0
 URL:            https://serf.apache.org/
 Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://www.apache.org/dist/serf/serf-%{version}.tar.bz2
-# Enable building with python3 version of scons (patch courtesy of Fedora 35, license: MIT)
-Patch0:         %{name}-python3.patch
 Requires:       openldap
 BuildRequires:  apr-devel
 BuildRequires:  apr-util-devel
@@ -57,8 +55,6 @@ sed -i '/SUITE_ADD_TEST(suite, test_ssltunnel_basic_auth_proxy_has_keepalive_off
 sed -i '/SUITE_ADD_TEST(suite, test_ssltunnel_basic_auth_proxy_close_conn_on_200resp);/d' ./test/test_context.c
 sed -i '/SUITE_ADD_TEST(suite, test_ssltunnel_digest_auth);/d' ./test/test_context.c
 
-# OpenSSL 1.1.1i+ breaks test_ssl_handshake, so disable test_ssl_handshake
-sed -i '/SUITE_ADD_TEST(suite, test_ssl_handshake);/d' ./test/test_context.c
 scons check
 
 %files
@@ -74,6 +70,9 @@ scons check
 
 
 %changelog
+* Tue Nov 28 2023 Tobias Brick <tobiasb@microsoft.com> - 1.3.10-1
+- Update to 1.3.10
+
 * Thu Feb 17 2022 Thomas Crain <thcrain@microsoft.com> - 1.3.9-8
 - Add Fedora patch to enable build with python3
 

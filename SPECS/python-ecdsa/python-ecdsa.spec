@@ -1,6 +1,6 @@
 Summary:        ECDSA cryptographic signature library (pure python)
 Name:           python-ecdsa
-Version:        0.17.0
+Version:        0.18.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -51,6 +51,9 @@ tox -e py%{python3_version_nodots}
 %{python3_sitelib}/*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.18.0-1
+- Auto-upgrade to 0.18.0 - Azure Linux 3.0 - package upgrades
+
 * Tue Mar 08 2022 Thomas Crain <thcrain@microsoft.com> - 0.17.0-1
 - Update to latest upstream version
 - Use tox to run tests

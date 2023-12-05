@@ -1,7 +1,7 @@
 {
- "Signatures": {
-  "ipset-7.15.tar.bz2": "0a5545aaadb640142c1f888d366a78ddf8724799967fa20686a70053bd621751",
-  "ipset.service": "f422eeea514a914deceff1591abfdbd066d0ddec9f9d053c22efb2a66bda117d",
-  "ipset.start-stop": "4596d809de30478e92fa840d905703a183aa99e1d1f55a991bf3190b932e3717"
- }
+  "Signatures": {
+    "ipset.service": "f422eeea514a914deceff1591abfdbd066d0ddec9f9d053c22efb2a66bda117d",
+    "ipset.start-stop": "4596d809de30478e92fa840d905703a183aa99e1d1f55a991bf3190b932e3717",
+    "ipset-7.17.tar.bz2": "be49c9ff489dd6610cad6541e743c3384eac96e9f24707da7b3929d8f2ac64d8"
+  }
 }

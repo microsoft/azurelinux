@@ -1,6 +1,6 @@
 Summary:        Python Atomic file writes
 Name:           python-atomicwrites
-Version:        1.4.0
+Version:        1.4.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -45,6 +45,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} %python3 tests/test_atomicwrites.py
 %{python3_sitelib}/*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.4.1-1
+- Auto-upgrade to 1.4.1 - Azure Linux 3.0 - package upgrades
+
 * Wed Mar 30 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.4.0-1
 - Upgrade to latest upstream version
 - Simplify dependencies and self-test invocations

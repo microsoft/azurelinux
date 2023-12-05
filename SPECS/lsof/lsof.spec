@@ -1,6 +1,6 @@
 Summary:        List Open Files
 Name:           lsof
-Version:        4.94.0
+Version:        4.98.0
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -35,6 +35,9 @@ install -v -m 0644 Lsof.8 %{buildroot}%{_mandir}/man8/lsof.8
 %{_mandir}/man8/*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.98.0-1
+- Auto-upgrade to 4.98.0 - Azure Linux 3.0 - package upgrades
+
 * Mon Feb 07 2022 Henry Li <lihl@microsoft.com> - 4.94.0-1
 - Upgrade to version 4.94.0
 
