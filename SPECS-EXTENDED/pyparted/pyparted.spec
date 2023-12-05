@@ -126,6 +126,7 @@ popd
 %changelog
 * Mon Dec 04 2023 Andrew Phelps <anphel@microsoft.com> - 3.11.4-4
 - Fix build issue with gpg keyboxd
+- License verified.
 
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsoft.com> - 3.11.4-3
 - Remove epoch
