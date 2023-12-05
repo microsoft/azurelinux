@@ -1,0 +1,7 @@
+--- etc/passwd.ori	2023-12-04 16:06:31.119052119 -0800
++++ etc/passwd	2023-12-04 16:07:21.303063085 -0800
+@@ -1,3 +1,3 @@
+ systemd-network:x:76:76:systemd Network Management:/:/bin/false
+-root::0:0::/root:/bin/sh
++root::0:0::/root:/mariner-iso-start-up-minimal.sh
+ nobody:x:65534:65533:Unprivileged User:/dev/null:/bin/false
