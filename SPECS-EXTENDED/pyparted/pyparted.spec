@@ -8,7 +8,7 @@ Distribution:   Mariner
 Summary: Python module for GNU parted
 Name:    pyparted
 Version: 3.11.4
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv2+
 URL:     https://github.com/dcantrell/pyparted
 
@@ -62,6 +62,8 @@ partition tables. This package provides Python 3 bindings for parted.
 
 %prep
 # Verify source archive signature
+# Remove "use-keyboxd" from gnupg configuration; if present, since it will wait forever if the service is not running
+sed -i '/use-keyboxd/d' ~/.gnupg/common.conf
 gpg --no-default-keyring --keyring %{SOURCE2} --trustdb-name %{SOURCE3} --verify %{SOURCE1} %{SOURCE0} || exit 1
 
 %setup -q
@@ -122,7 +124,10 @@ popd
 %endif
 
 %changelog
-* Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 3.11.4-3
+* Mon Dec 04 2023 Andrew Phelps <anphel@microsoft.com> - 3.11.4-4
+- Fix build issue with gpg keyboxd
+
+* Mon Nov 01 2021 Muhammad Falak <mwani@microsoft.com> - 3.11.4-3
 - Remove epoch
 
 * Mon Mar 01 2021 Henry Li <lihl@microsoft.com> - 1:3.11.4-2
