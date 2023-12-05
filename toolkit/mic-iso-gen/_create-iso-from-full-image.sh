@@ -3,7 +3,13 @@
 set -x
 set -e
 
-BUILD_DIR=${1:-~/temp/iso-build}
+BUILD_DIR=$1
+BUILD_CLEAN=$2
+
+if [[ -z $BUILD_DIR ]]; then
+    echo "Specify output build directory."
+    exit 1
+fi
 
 #------------------------------------------------------------------------------
 function create_and_expand_full_image() {
@@ -66,7 +72,7 @@ function create_iso_with_reduced_rootfs_initrd () {
     #
     ./toolkit/mic-iso-gen/create-iso-from-initrd-vmlinuz.sh \
         $initrdOutDir/initrd.img \
-        $extractedRootFS/extracted-vmlinuz-file/vmlinuz-5.15.137.1-1.cm2 \
+        $extractedRootFS/extracted-vmlinuz-file/vmlinuz-5.15.138.1-1.cm2 \
         ~/git/CBL-Mariner/toolkit/mic-iso-gen/files/stock/grub.cfg \
         ~/git/CBL-Mariner/toolkit/mic-iso-gen/files/stock/iso-image-installer/iso-image-installer.sh \
         ~/git/CBL-Mariner/toolkit/mic-iso-gen/files/stock/iso-image-installer/host-configuration.json \
@@ -125,7 +131,9 @@ create_iso_with_rootfs_initrd_dir () {
 #-- main ----------------------------------------------------------------------
 FULL_IMAGE_CONFIG_FILE=~/git/CBL-Mariner/toolkit/imageconfigs/baremetal.json
 
-# sudo rm -rf $BUILD_DIR
+if [[ ! -z $BUILD_CLEAN ]]; then
+  sudo rm -rf $BUILD_DIR
+fi
 mkdir -p $BUILD_DIR
 
 BUILD_WORKING_DIR=$BUILD_DIR/intermediates
@@ -141,11 +149,13 @@ FULL_IMAGE_RAW_DISK=$BUILD_WORKING_DIR/raw-disk-output/disk0.raw
 EXTRACT_ARTIFACTS_TMP_DIR=$BUILD_WORKING_DIR/extract-artifacts-from-rootfs-tmp-dir
 EXTRACT_ARTIFACTS_OUT_DIR=$BUILD_WORKING_DIR/extract-artifacts-from-rootfs-out-dir
 
-# create_and_expand_full_image \
-#     $FULL_IMAGE_CONFIG_FILE \
-#     $FULL_IMAGE_RAW_DISK \
-#     $EXTRACT_ARTIFACTS_TMP_DIR \
-#     $EXTRACT_ARTIFACTS_OUT_DIR
+if [[ ! -z $BUILD_CLEAN ]]; then
+    create_and_expand_full_image \
+        $FULL_IMAGE_CONFIG_FILE \
+        $FULL_IMAGE_RAW_DISK \
+        $EXTRACT_ARTIFACTS_TMP_DIR \
+        $EXTRACT_ARTIFACTS_OUT_DIR
+fi
 
 INITRD_DIR=$BUILD_WORKING_DIR/initrd-dir
 CREATE_INITRD_TMP_DIR=$BUILD_WORKING_DIR/create-initrd-from-folder-tmp-dir
@@ -166,8 +176,8 @@ CREATE_INITRD_OUT_DIR=$BUILD_WORKING_DIR/create-initrd-from-folder-out-dir
 # Option 2.a. rootfs initrd + no modifications
 #
 # create_iso_with_rootfs_initrd \
-#     $EXTRACT_ARTIFACTS_OUT_DIR/extracted-initrd-file/initrd.img-5.15.137.1-1.cm2 \
-#     $EXTRACT_ARTIFACTS_OUT_DIR/extracted-vmlinuz-file/vmlinuz-5.15.137.1-1.cm2 \
+#     $EXTRACT_ARTIFACTS_OUT_DIR/extracted-initrd-file/initrd.img-5.15.138.1-1.cm2 \
+#     $EXTRACT_ARTIFACTS_OUT_DIR/extracted-vmlinuz-file/vmlinuz-5.15.138.1-1.cm2 \
 #     $CREATE_INITRD_OUT_DIR \
 #     $FULL_IMAGE_RAW_DISK\
 #     $BUILD_OUT_DIR
@@ -180,6 +190,6 @@ create_iso_with_rootfs_initrd_dir \
     $BUILD_WORKING_DIR/modified-initrd-dir \
     $BUILD_WORKING_DIR/tmp-initrd-dir \
     $BUILD_WORKING_DIR/out-initrd-dir \
-    $EXTRACT_ARTIFACTS_OUT_DIR/extracted-vmlinuz-file/vmlinuz-5.15.137.1-1.cm2 \
+    $EXTRACT_ARTIFACTS_OUT_DIR/extracted-vmlinuz-file/vmlinuz-5.15.138.1-1.cm2 \
     $FULL_IMAGE_RAW_DISK\
     $BUILD_OUT_DIR
