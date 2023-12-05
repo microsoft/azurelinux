@@ -258,5 +258,4 @@ steps:
           failOnTestFailures: ${{ parameters.failOnTestFailures }}
           outputArtifactsFolder: ${{ parameters.outputArtifactsFolder }}
           outputArtifactsTestsSubfolder: ${{ parameters.outputArtifactsTestsSubfolder }}
-          pipArtifactFeeds: ${{ parameters.pipArtifactFeeds }}
           testSuiteName: ${{ parameters.testSuiteName }}
