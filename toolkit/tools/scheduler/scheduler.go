@@ -364,7 +364,7 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 			//    resolve implicit provides if the scheduler is unable to find a provider for them.
 			switch buildState.GetNodePriority(req.Node) {
 			case schedulerutils.HighNodePriority:
-				logger.Log.Tracef("Priority priority request (%d) for node '%s'", buildState.GetNodePriority(req.Node), req.Node.FriendlyName())
+				logger.Log.Tracef("High priority request (%d) for node '%s'", buildState.GetNodePriority(req.Node), req.Node.FriendlyName())
 				channels.HighPriorityRequests <- req
 			case schedulerutils.MediumNodePriority:
 				logger.Log.Tracef("Medium priority request (%d) for node '%s'", buildState.GetNodePriority(req.Node), req.Node.FriendlyName())
