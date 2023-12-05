@@ -1,0 +1,87 @@
+From c316d45e6326f127b6d1d4cba143fc31507cca1f Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Fri, 1 Dec 2023 01:19:25 +0000
+Subject: [PATCH] Disable most DSA tests that use SHA1, which is disallowed
+ with fips.
+
+---
+ test/recipes/30-test_evp_data/evppkey_dsa.txt | 49 -------------------
+ 1 file changed, 49 deletions(-)
+
+diff --git a/test/recipes/30-test_evp_data/evppkey_dsa.txt b/test/recipes/30-test_evp_data/evppkey_dsa.txt
+index debd62b..5f9cab0 100644
+--- a/test/recipes/30-test_evp_data/evppkey_dsa.txt
++++ b/test/recipes/30-test_evp_data/evppkey_dsa.txt
+@@ -44,36 +44,6 @@ PrivPubKeyPair = DSA-1024:DSA-1024-PUBLIC
+ 
+ Title = DSA tests
+ 
+-Verify = DSA-1024
+-Ctrl = digest:SHA1
+-Input = "0123456789ABCDEF1234"
+-Output = 302d021500942b8c5850e05b59e24495116b1e8559e51b610e0214237aedf272d91f2397f63c9fc8790e1a6cde5d87
+-
+-Verify = DSA-1024-PUBLIC
+-Ctrl = digest:SHA1
+-Input = "0123456789ABCDEF1234"
+-Output = 302d021500942b8c5850e05b59e24495116b1e8559e51b610e0214237aedf272d91f2397f63c9fc8790e1a6cde5d87
+-
+-# Modified signature
+-Verify = DSA-1024-PUBLIC
+-Ctrl = digest:SHA1
+-Input = "0123456789ABCDEF1234"
+-Output = 302d021500942b8c5850e05b59e24495116b1e8559e51b610e0214237aedf272d91f2397f63c9fc8790e1a6cde5d88
+-Result = VERIFY_ERROR
+-
+-# Digest too short
+-Verify = DSA-1024-PUBLIC
+-Ctrl = digest:SHA1
+-Input = "0123456789ABCDEF123"
+-Output = 302d021500942b8c5850e05b59e24495116b1e8559e51b610e0214237aedf272d91f2397f63c9fc8790e1a6cde5d87
+-Result = VERIFY_ERROR
+-
+-# Digest too long
+-Verify = DSA-1024-PUBLIC
+-Ctrl = digest:SHA1
+-Input = "0123456789ABCDEF12345"
+-Output = 302d021500942b8c5850e05b59e24495116b1e8559e51b610e0214237aedf272d91f2397f63c9fc8790e1a6cde5d87
+-Result = VERIFY_ERROR
+ 
+ # Garbage after signature
+ Verify = DSA-1024-PUBLIC
+@@ -81,19 +51,6 @@ Input = "0123456789ABCDEF1234"
+ Output = 302d021500942b8c5850e05b59e24495116b1e8559e51b610e0214237aedf272d91f2397f63c9fc8790e1a6cde5d8700
+ Result = VERIFY_ERROR
+ 
+-# Invalid tag
+-Verify = DSA-1024-PUBLIC
+-Ctrl = digest:SHA1
+-Input = "0123456789ABCDEF1234"
+-Output = 312d021500942b8c5850e05b59e24495116b1e8559e51b610e0214237aedf272d91f2397f63c9fc8790e1a6cde5d87
+-Result = VERIFY_ERROR
+-
+-# BER signature
+-Verify = DSA-1024-PUBLIC
+-Ctrl = digest:SHA1
+-Input = "0123456789ABCDEF1234"
+-Output = 3080021500942b8c5850e05b59e24495116b1e8559e51b610e0214237aedf272d91f2397f63c9fc8790e1a6cde5d870000
+-Result = VERIFY_ERROR
+ 
+ Title = Test keypair mismatches
+ 
+@@ -307,12 +264,6 @@ Key = DSA-1024
+ Input = "Hello "
+ Output = 302c02142e32c8a5b0bd19b2ba33fd9c78aad3729dcb1b9e02142c006f7726a9d6833d414865b95167ea5f4f7713
+ 
+-# Test verify with SHA1 is allowed in fips mode
+-DigestVerify = SHA1
+-Key = DSA-1024
+-Input = "Hello "
+-Output = 302c0214602d21ed37e46051bb3d06cc002adddeb4cdb3bd02144f39f75587b286588862d06366b2f29bddaf8cf6
+-
+ # Test verify with a 2048/160 bit key is allowed in fips mode
+ FIPSversion = >3.1.1
+ DigestVerify = SHA256
+-- 
+2.33.8
+
