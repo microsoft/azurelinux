@@ -29417,8 +29417,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.0.2112",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.2112.tar.gz"
+          "version": "9.0.2121",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.2121.tar.gz"
         }
       }
     },
