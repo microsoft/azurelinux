@@ -362,19 +362,24 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 			// - Medium priority nodes are our desired build goal.
 			// - Low priority nodes are packages that are not needed to build the desired goal, but may be needed to
 			//    resolve implicit provides if the scheduler is unable to find a provider for them.
-			switch buildState.GetNodePriority(req.Node) {
+			nodePriority := buildState.GetNodePriority(req.Node)
+			switch nodePriority {
 			case schedulerutils.HighNodePriority:
-				logger.Log.Tracef("High priority request (%d) for node '%s'", buildState.GetNodePriority(req.Node), req.Node.FriendlyName())
+				logger.Log.Tracef("High priority request (%d) for node '%s'", nodePriority, req.Node.FriendlyName())
 				channels.HighPriorityRequests <- req
 			case schedulerutils.MediumNodePriority:
-				logger.Log.Tracef("Medium priority request (%d) for node '%s'", buildState.GetNodePriority(req.Node), req.Node.FriendlyName())
+				logger.Log.Tracef("Medium priority request (%d) for node '%s'", nodePriority, req.Node.FriendlyName())
 				channels.MediumPriorityRequests <- req
 			case schedulerutils.LowNodePriority:
-				fallthrough
-			default:
-				logger.Log.Tracef("Low priority request (%d) for node '%s'", buildState.GetNodePriority(req.Node), req.Node.FriendlyName())
+				logger.Log.Tracef("Low priority request (%d) for node '%s'", nodePriority, req.Node.FriendlyName())
 				channels.LowPriorityRequests <- req
+			default:
+				err = fmt.Errorf("unknown node priority (%d) for node '%s'", nodePriority, req.Node.FriendlyName())
 			}
+		}
+		if err != nil {
+			err = fmt.Errorf("error converting nodes to requests:\n%w", err)
+			break
 		}
 		nodesToBuild = nil
 
