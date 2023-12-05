@@ -134,14 +134,13 @@ func (s NodePriorityMap) GetPriority(node *pkggraph.PkgNode) (priority int) {
 // SetSubgraphPriority will increase the priority of the given node and all of its dependencies to the given priority.
 func (s NodePriorityMap) SetSubgraphPriority(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, priority int) {
 	search := traverse.BreadthFirst{}
-
 	// Walk the graph from the node and prioritize all its dependencies
-	search.Walk(pkgGraph, node, func(n graph.Node, d int) (stopSearch bool) {
+	search.Visit = func(n graph.Node) {
 		pkgNode := n.(*pkggraph.PkgNode)
 		logger.Log.Warnf("Setting %s to priority %d", pkgNode.FriendlyName(), priority)
 		s.IncreaseNodePriority(pkgNode, priority)
-		return
-	})
+	}
+	search.Walk(pkgGraph, node, nil)
 }
 
 // findMatchesForImplicit will try and find real packages that satisfies the implicit node. This is done through four methods:
