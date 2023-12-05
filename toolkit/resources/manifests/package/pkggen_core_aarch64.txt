@@ -1,5 +1,5 @@
 filesystem-1.1-17.cm2.aarch64.rpm
-kernel-headers-5.15.137.1-1.cm2.noarch.rpm
+kernel-headers-5.15.138.1-4.cm2.noarch.rpm
 glibc-2.35-6.cm2.aarch64.rpm
 glibc-devel-2.35-6.cm2.aarch64.rpm
 glibc-i18n-2.35-6.cm2.aarch64.rpm
@@ -33,11 +33,11 @@ libpkgconf-1.8.0-3.cm2.aarch64.rpm
 pkgconf-1.8.0-3.cm2.aarch64.rpm
 pkgconf-m4-1.8.0-3.cm2.noarch.rpm
 pkgconf-pkg-config-1.8.0-3.cm2.aarch64.rpm
-ncurses-6.4-1.cm2.aarch64.rpm
-ncurses-compat-6.4-1.cm2.aarch64.rpm
-ncurses-devel-6.4-1.cm2.aarch64.rpm
-ncurses-libs-6.4-1.cm2.aarch64.rpm
-ncurses-term-6.4-1.cm2.aarch64.rpm
+ncurses-6.4-2.cm2.aarch64.rpm
+ncurses-compat-6.4-2.cm2.aarch64.rpm
+ncurses-devel-6.4-2.cm2.aarch64.rpm
+ncurses-libs-6.4-2.cm2.aarch64.rpm
+ncurses-term-6.4-2.cm2.aarch64.rpm
 readline-8.1-1.cm2.aarch64.rpm
 readline-devel-8.1-1.cm2.aarch64.rpm
 coreutils-8.32-7.cm2.aarch64.rpm
@@ -224,8 +224,8 @@ pinentry-1.2.0-1.cm2.aarch64.rpm
 gnupg2-2.4.0-2.cm2.aarch64.rpm
 gnupg2-lang-2.4.0-2.cm2.aarch64.rpm
 gpgme-1.16.0-2.cm2.aarch64.rpm
-mariner-repos-shared-2.0-8.cm2.noarch.rpm
-mariner-repos-2.0-8.cm2.noarch.rpm
+mariner-repos-shared-2.0-9.cm2.noarch.rpm
+mariner-repos-2.0-9.cm2.noarch.rpm
 libffi-3.4.2-3.cm2.aarch64.rpm
 libffi-devel-3.4.2-3.cm2.aarch64.rpm
 libtasn1-4.19.0-1.cm2.aarch64.rpm

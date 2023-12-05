@@ -1147,8 +1147,8 @@
         "type": "other",
         "other": {
           "name": "blobfuse2",
-          "version": "2.1.1",
-          "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse2-2.1.1.tar.gz"
+          "version": "2.1.2",
+          "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse2-2.1.2.tar.gz"
         }
       }
     },
@@ -2910,6 +2910,16 @@
           "name": "dotnet-sdk-3.1",
           "version": "3.1.115",
           "downloadUrl": "https://download.visualstudio.microsoft.com/download/pr/cc86b0c8-9e72-4410-b3b0-2c5a8f90d8a4/426913359d4c524560e42c4f2ee18fa1/dotnet-sdk-3.1.115-linux-x64.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "double-conversion",
+          "version": "3.1.5",
+          "downloadUrl": "https://github.com/google/double-conversion/archive/v3.1.5/double-conversion-3.1.5.tar.gz"
         }
       }
     },
@@ -6530,8 +6540,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.137.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.137.1.tar.gz"
+          "version": "5.15.138.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.138.1.tar.gz"
         }
       }
     },
@@ -8111,8 +8121,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.137.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.137.1.tar.gz"
+          "version": "5.15.138.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.138.1.tar.gz"
         }
       }
     },
@@ -8121,8 +8131,8 @@
         "type": "other",
         "other": {
           "name": "kernel-azure",
-          "version": "5.15.137.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.137.1.tar.gz"
+          "version": "5.15.138.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.138.1.tar.gz"
         }
       }
     },
@@ -8131,8 +8141,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hci",
-          "version": "5.15.137.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.137.1.tar.gz"
+          "version": "5.15.138.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.138.1.tar.gz"
         }
       }
     },
@@ -8141,8 +8151,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.137.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.137.1.tar.gz"
+          "version": "5.15.138.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.138.1.tar.gz"
         }
       }
     },
@@ -12021,8 +12031,8 @@
         "type": "other",
         "other": {
           "name": "linuxptp",
-          "version": "2.0",
-          "downloadUrl": "https://github.com/richardcochran/linuxptp/archive/e05809/linuxptp-e05809.tar.gz"
+          "version": "3.1.1",
+          "downloadUrl": "https://sourceforge.net/projects/linuxptp/files/v3.1/linuxptp-3.1.1.tgz"
         }
       }
     },
@@ -13622,6 +13632,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "msft-golang",
+          "version": "1.20.11",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.20.11-1/go.20231107.4.src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "msgpack",
           "version": "3.3.0",
           "downloadUrl": "https://github.com/msgpack/msgpack-c/archive/cpp-3.3.0.tar.gz"
@@ -14054,7 +14074,7 @@
         "other": {
           "name": "ncurses",
           "version": "6.4",
-          "downloadUrl": "https://invisible-mirror.net/archives/ncurses/current/ncurses-6.4-20230408.tgz"
+          "downloadUrl": "https://invisible-mirror.net/archives/ncurses/current/ncurses-6.4-20230423.tgz"
         }
       }
     },
@@ -23023,6 +23043,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-junit-xml",
+          "version": "1.9",
+          "downloadUrl": "https://github.com/kyrus/python-junit-xml/tarball/856414648cbab3f64e69b856bc25cea8b9aa0377"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-justbases",
           "version": "0.9",
           "downloadUrl": "https://pypi.io/packages/source/j/justbases/justbases-0.9.tar.gz"
@@ -29347,8 +29377,8 @@
         "type": "other",
         "other": {
           "name": "valgrind",
-          "version": "3.18.1",
-          "downloadUrl": "https://sourceware.org/pub/valgrind/valgrind-3.18.1.tar.bz2"
+          "version": "3.22.0",
+          "downloadUrl": "https://sourceware.org/pub/valgrind/valgrind-3.22.0.tar.bz2"
         }
       }
     },
@@ -29387,8 +29417,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.0.2010",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.2010.tar.gz"
+          "version": "9.0.2112",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.2112.tar.gz"
         }
       }
     },
