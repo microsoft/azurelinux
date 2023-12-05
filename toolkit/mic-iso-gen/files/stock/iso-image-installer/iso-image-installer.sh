@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Running iso-image-installer.sh v231201-2015."
+echo "Running iso-image-installer.sh v231204-1315."
 
 image_file_path=$(cat $iso_media_mount_dir/artifacts/host-configuration.json | jq -r '.imaging.images[0].url')
 image_target_device=$(cat $iso_media_mount_dir/artifacts/host-configuration.json | jq -r '.storage.disks[0].device')
@@ -26,5 +26,5 @@ eject /dev/cdrom
 # echo "Rebooting..."
 echo "Sleeping for 5 seconds before rebooting..."
 sleep 5s
-# reboot
-/bin/bash
+reboot
+# /bin/bash
