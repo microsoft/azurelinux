@@ -121,10 +121,6 @@ make INSTALL_MOD_PATH=%{buildroot} modules_install
 # Add kernel-mshv-specific boot configurations to /etc/default/grub.d
 # This configuration contains additional boot parameters required in our
 # Linux-Dom0-based images. 
-
-mkdir -p %{buildroot}%{_sysconfdir}/default/grub.d
-mkdir -p %{buildroot}%{_sysconfdir}/grub.d
-
 install -Dm 755 %{SOURCE3} %{buildroot}%{_sysconfdir}/default/grub.d/50_mariner_mshv.cfg
 install -Dm 755 %{SOURCE4} %{buildroot}%{_sysconfdir}/grub.d/50_mariner_mshv_menuentry
 
