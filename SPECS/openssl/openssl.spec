@@ -210,11 +210,6 @@ from other formats to the formats used by the OpenSSL toolkit.
 %autosetup -p1 -n %{name}-%{version}
 
 %build
-ktlsopt=enable-ktls
-%ifarch armv7hl
-ktlsopt=disable-ktls
-%endif
-
 # Add -Wa,--noexecstack here so that libcrypto's assembler modules will be
 # marked as not requiring an executable stack.
 # Also add -DPURIFY to make using valgrind with openssl easier as we do not
@@ -230,7 +225,7 @@ export HASHBANGPERL=/usr/bin/perl
 ./Configure \
 	--prefix=%{_prefix} --openssldir=%{_sysconfdir}/pki/tls --libdir=lib \
 	zlib enable-camellia enable-seed enable-rfc3779 no-sctp \
-	enable-cms enable-md2 enable-rc5 enable-ec_nistp_64_gcc_128 ${ktlsopt} enable-fips\
+	enable-cms enable-md2 enable-rc5 enable-ec_nistp_64_gcc_128 enable-ktls enable-fips\
 	no-mdc2 no-ec2m no-sm2 no-sm4 enable-buildtest-c++\
 	shared $NEW_RPM_OPT_FLAGS '-DDEVRANDOM="\"/dev/urandom\""'\
 	-Wl,--allow-multiple-definition
