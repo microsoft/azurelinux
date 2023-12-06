@@ -1,7 +1,7 @@
 Summary:        CBL-Mariner repo files, gpg keys
 Name:           mariner-repos
 Version:        2.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -21,6 +21,8 @@ Source10:       mariner-official-base.repo
 Source11:       mariner-official-preview.repo
 Source12:       mariner-extended-debuginfo.repo
 Source13:       mariner-extended-debuginfo-preview.repo
+Source14:       mariner-cloud-native.repo
+Source15:       mariner-cloud-native-preview.repo
 
 Requires:       %{name}-shared = %{version}-%{release}
 
@@ -28,6 +30,22 @@ BuildArch:      noarch
 
 %description
 CBL-Mariner repo files and gpg keys
+
+%package cloud-native
+Summary:        CBL-Mariner cloud-native repo file.
+Group:          System Environment/Base
+Requires:       %{name}-shared = %{version}-%{release}
+
+%description cloud-native
+%{summary}
+
+%package cloud-native-preview
+Summary:        CBL-Mariner cloud-native preview repo file.
+Group:          System Environment/Base
+Requires:       %{name}-shared = %{version}-%{release}
+
+%description cloud-native-preview
+%{summary}
 
 %package debug
 Summary:        CBL-Mariner Debuginfo repo file.
@@ -143,6 +161,8 @@ install -m 644 %{SOURCE10} $REPO_DIRECTORY
 install -m 644 %{SOURCE11} $REPO_DIRECTORY
 install -m 644 %{SOURCE12} $REPO_DIRECTORY
 install -m 644 %{SOURCE13} $REPO_DIRECTORY
+install -m 644 %{SOURCE14} $REPO_DIRECTORY
+install -m 644 %{SOURCE15} $REPO_DIRECTORY
 
 export RPM_GPG_DIRECTORY="%{buildroot}%{_sysconfdir}/pki/rpm-gpg"
 
@@ -163,6 +183,14 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %files
 %defattr(-,root,root,-)
 %config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-official-base.repo
+
+%files cloud-native
+%defattr(-,root,root,-)
+%config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-cloud-native.repo
+
+%files cloud-native-preview
+%defattr(-,root,root,-)
+%config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-cloud-native-preview.repo
 
 %files debug
 %defattr(-,root,root,-)
@@ -214,6 +242,9 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %{_sysconfdir}/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
 
 %changelog
+* Wed Nov 29 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.0-9
+- Add cloud native repos.
+
 * Thu Jul 14 2022 Andrew Phelps <anphel@microsoft.com> - 2.0-8
 - Add SRPM and Debuginfo repos to existing base, extended, and preview subpackages
 

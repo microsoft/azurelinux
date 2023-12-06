@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 5.15.138.1 Kernel Configuration
+# Linux/arm64 5.15.139.1 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="gcc (GCC) 11.2.0"
 CONFIG_CC_IS_GCC=y
@@ -8693,7 +8693,7 @@ CONFIG_QUOTACTL=y
 CONFIG_AUTOFS4_FS=y
 CONFIG_AUTOFS_FS=y
 CONFIG_FUSE_FS=m
-# CONFIG_CUSE is not set
+CONFIG_CUSE=m
 CONFIG_VIRTIO_FS=m
 CONFIG_FUSE_DAX=y
 CONFIG_OVERLAY_FS=m
