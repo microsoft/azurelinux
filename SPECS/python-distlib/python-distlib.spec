@@ -2,7 +2,7 @@
 Summary:        Low-level components of distutils2/packaging, augmented with higher-level APIs
 Name:           python-distlib
 Version:        0.3.6
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        Python
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -53,16 +53,24 @@ rm distlib/*.exe
 
 %check
 export PYTHONHASHSEED=0
+
 # test_sequencer_basic test fails due to relying
 # on the ordering of the input, hence disabling it.
 # https://github.com/pypa/distlib/issues/161
-%pytest -k "not test_sequencer_basic"
+
+# test_is_writable assumes we're not the root user
+# and does not like that we have write access to /etc
+
+%pytest -k "not (test_sequencer_basic or test_is_writable)"
 
 %files -n python%{python3_pkgversion}-%{srcname} -f %pyproject_files
 %license LICENSE.txt
 %doc README.rst
 
 %changelog
+* Fri Dec 01 2023 Olivia Crain <oliviacrain@microsoft.com> - 0.3.6-3
+- Skip test_is_writable during check builds
+
 * Tue Dec 21 2021 Riken Maharjan <rmaharjan@microsoft.com> - 0.3.6-2
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
 - License verified.
