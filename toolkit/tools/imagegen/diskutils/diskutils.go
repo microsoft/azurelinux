@@ -6,6 +6,7 @@
 package diskutils
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -240,45 +241,46 @@ func CreateSparseDisk(diskPath string, size uint64, perm os.FileMode) (err error
 }
 
 // devineBlockSize tries to determine the block size used by the file system image
-func devineBlockSize(diskFilePath string) uint32 {
-	var blockSize uint32 = 512 // Default to 512
+func devineBlockSize(diskFilePath string) (blockSize uint32, err error) {
+	blockSize = 512 // Default to 512
 	diskFile, err := os.Open(diskFilePath)
 	if err != nil {
-		logger.Log.Warnf("Failed to open %v to devine block size, assuming %d.", diskFilePath, blockSize)
-		return blockSize
+		logger.Log.Errorf("Failed to open %v to determine block size.", diskFilePath)
+		return
 	}
 	defer diskFile.Close()
 
 	var probePoint int64 = 4096
 	signature := make([]byte, 8)
-	_, err = diskFile.ReadAt(signature, probePoint)
-	if err != nil {
-		logger.Log.Warnf("Failed to read from %v to devine block size, assuming %d.", diskFilePath, blockSize)
-		return blockSize
+	_, local_err := diskFile.ReadAt(signature, probePoint)
+	if local_err != nil {
+		// Failure to read is not fatal, assume default blockSize as no signature is present.
+		logger.Log.Warnf("Failed to read from %v to determine block size, assuming %d.", diskFilePath, blockSize)
+		return
 	}
 	// GPT header starts with 8 bytes of ascii "EFI PART"
-	if signature[0] == 0x45 &&
-		signature[1] == 0x46 &&
-		signature[2] == 0x49 &&
-		signature[3] == 0x20 &&
-		signature[4] == 0x50 &&
-		signature[5] == 0x41 &&
-		signature[6] == 0x52 &&
-		signature[7] == 0x54 {
+	if bytes.Equal(signature, []byte{0x45, 0x46, 0x49, 0x20, 0x50, 0x41, 0x52, 0x54}) {
 		logger.Log.Debugf("Found GPT signature at %d in: %v, assuming that block size", probePoint, diskFilePath)
 		blockSize = uint32(probePoint)
 	}
-	return blockSize
+	return
 }
 
 // SetupLoopbackDevice creates a /dev/loop device for the given disk file
-func SetupLoopbackDevice(diskFilePath string, disk *configuration.Disk) (devicePath string, err error) {
-	var blockSize uint32 = 0
-	if disk != nil {
-		blockSize = disk.BlockSize
+func SetupLoopbackDevice(diskFilePath string, blockSize uint32) (devicePath string, err error) {
+	switch blockSize {
+	case 0, 512, 4096:
+		break
+	default:
+		err = fmt.Errorf("invalid blockSize: %d. Must be 0, 512, or 4096", blockSize)
+		return
 	}
+
 	if blockSize == 0 {
-		blockSize = devineBlockSize(diskFilePath)
+		blockSize, err = devineBlockSize(diskFilePath)
+		if err != nil {
+			return
+		}
 	}
 	logger.Log.Debugf("Attaching Loopback: %v, block size: %d", diskFilePath, blockSize)
 	losetupArgs := []string{

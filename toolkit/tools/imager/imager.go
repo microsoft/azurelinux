@@ -400,7 +400,7 @@ func setupLoopDeviceDisk(outputDir, diskName string, diskConfig configuration.Di
 		return
 	}
 
-	diskDevPath, err = diskutils.SetupLoopbackDevice(rawDisk, &diskConfig)
+	diskDevPath, err = diskutils.SetupLoopbackDevice(rawDisk, diskConfig.BlockSize)
 	if err != nil {
 		logger.Log.Errorf("Failed to mount raw disk (%s) as a loopback device", rawDisk)
 		return
