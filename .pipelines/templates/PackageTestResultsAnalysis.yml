@@ -32,11 +32,7 @@ parameters:
     default: "$(Agent.TempDirectory)"
 
 steps:
-<<<<<<< HEAD
-  - bash: tdnf install -y python3-junit-xml
-=======
   - bash: sudo tdnf install -y python3-junit-xml
->>>>>>> ae6c6211d (Switching to using Mariner's version of Python's `junit_xml` module for test verification. (#6917))
     retryCountOnTaskFailure: 3
     displayName: "Install Python dependencies"
 
