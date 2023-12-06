@@ -5,7 +5,7 @@
 set -e
 
 if [[ $# -lt 2 ]]; then
-    echo "Usage: $0 <CA certificate in DER/PEM format> <trust flags in the format accepted by the '-t' argument for 'nss-addbuiltin'>" >&2
+    echo "Usage: $0 <CA certificate in DER/PEM format or directory with such certificates> <trust flags in the format accepted by the '-t' argument for 'nss-addbuiltin'>" >&2
     echo "See here for more details: https://access.redhat.com/documentation/en-us/red_hat_directory_server/12/html/securing_red_hat_directory_server/assembly_changing-the-ca-trust-flagssecuring-rhds" >&2
     exit 1
 fi
