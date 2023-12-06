@@ -6,12 +6,7 @@ $(call create_folder,$(IMAGEGEN_DIR))
 # Resources
 config_name              = $(notdir $(CONFIG_FILE:%.json=%))
 CONFIG_BASE_DIR          = $(dir $(CONFIG_FILE:%.json=%))
-config_other_files      := $(shell grep -E '.json|.sh' $(CONFIG_FILE)| sed 's/\"Path\"\://' | tr ", \n" " " | tr "\"" " " | xargs)
-define fix_filenames
-$(call shell, if [ "$1" = "/" ]; then echo $2; else echo $(CONFIG_BASE_DIR)$2 | tr -d '[:blank:]'; fi)
-endef
-config_other_files_fixed := $(foreach filename,$(config_other_files),$(call fix_filenames,$(shell echo $(filename) | head -c 1), $(filename)))
-
+config_other_files       = $(if $(CONFIG_FILE),$(shell $(SCRIPTS_DIR)/get_config_deps.sh $(CONFIG_FILE) $(CONFIG_BASE_DIR)))
 assets_dir               = $(RESOURCES_DIR)/assets/
 assets_files             = $(call shell_real_build_only, find $(assets_dir))
 imggen_local_repo        = $(MANIFESTS_DIR)/image/local.repo
@@ -90,7 +85,7 @@ fetch-external-image-packages: $(image_external_package_cache_summary)
 # Validate the selected config file if any changes occur in the image config base directory.
 # Changes to files located outside the base directory will not be detected.
 validate-image-config: $(validate-config)
-$(STATUS_FLAGS_DIR)/validate-image-config%.flag: $(go-imageconfigvalidator) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(config_other_files_fixed)
+$(STATUS_FLAGS_DIR)/validate-image-config%.flag: $(go-imageconfigvalidator) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(config_other_files)
 	$(if $(CONFIG_FILE),,$(error Must set CONFIG_FILE=))
 	$(go-imageconfigvalidator) \
 		--input=$(CONFIG_FILE) \
