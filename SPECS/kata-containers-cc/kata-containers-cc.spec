@@ -1,8 +1,9 @@
-%global runtime_make_vars       DEFSTATICRESOURCEMGMT=true \\\
+%global runtime_make_vars       DEFSTATICRESOURCEMGMT_CLH=true \\\
+                                DEFSHAREDFS_CLH_SNP_VIRTIOFS=none \\\
                                 SKIP_GO_VERSION_CHECK=1
 
 %global agent_make_vars         LIBC=gnu \\\
-                                SECURITY_POLICY=yes
+                                AGENT_POLICY=yes
 
 %global debug_package %{nil}
 
