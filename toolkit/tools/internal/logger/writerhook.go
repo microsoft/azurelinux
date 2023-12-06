@@ -25,7 +25,7 @@ type writerHook struct {
 
 var (
 
-	// colorCodeRegex is of type '\x1b0m' or '\x1b31m', etc.
+	// colorCodeRegex is of type '\x1b[0m' or '\x1b[31m', etc.
 	colorCodeRegex = regexp.MustCompile(`\x1b\[[0-9]+m`)
 )
 
