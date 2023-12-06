@@ -80,7 +80,7 @@ BuildRequires:  rust
 Requires:       busybox
 Requires:       kernel
 Requires:       libseccomp
-Requires:       %{_libexecdir}/virtiofsd
+Requires:       qemu-virtiofsd
 
 Conflicts:      kata-agent
 Conflicts:      kata-ksm-throttler
@@ -231,6 +231,7 @@ ln -sf %{_bindir}/kata-runtime %{buildroot}%{_prefix}/local/bin/kata-runtime
 %changelog
 * Tue Dec 05 2023 Archana Choudhary <archana1@microsoft.com> - 3.1.0-10
 - Drop qemu-kvm-core dependency
+- Define explicit dependency on qemu-virtiofsd
 
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.1.0-9
 - Bump release to rebuild with go 1.20.9
