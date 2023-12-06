@@ -1,7 +1,7 @@
 Summary:        Metapackage with core sets of packages
 Name:           core-packages
 Version:        2.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -39,6 +39,9 @@ Requires:       pkg-config
 Requires:       procps-ng
 Requires:       sudo
 Requires:       systemd
+Requires:       systemd-networkd
+Requires:       systemd-resolved
+Requires:       systemd-udev
 Requires:       tar
 Requires:       tzdata
 Requires:       util-linux
@@ -87,6 +90,9 @@ Requires:       zlib
 %files container
 
 %changelog
+* Wed Jan 24 12:12:42 EST 2024 Dan Streetman <ddstreet@ieee.org> - 2.0-9
+- require broken-out systemd packages
+
 * Wed Jun 28 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-8
 - Moving 'curl' and 'grep' to the 'core-packages-container' package.
 
