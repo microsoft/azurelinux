@@ -11,6 +11,6 @@ resources:
       ref: 'refs/heads/master'
 
 stages:
-  - stage: CodeQlAnalysis
+  - stage: CodeQlAnalysis_test
     jobs:
     - template: SDL/CodeQL-CBL-Mariner.yml@CBL-Mariner-Pipelines
