@@ -82,7 +82,10 @@ func checkMaxSizeCorrectness(disk *Disk) (err error) {
 
 // IsValid returns an error if the PartitionTableType is not valid
 func (d *Disk) IsValid() (err error) {
-	if d.BlockSize != 0 && d.BlockSize != 512 && d.BlockSize != 4096 {
+	switch d.BlockSize {
+	case 0, 512, 4096:
+		break
+	default:
 		return fmt.Errorf("invalid [BlockSize]: %d. Must be 0, 512, or 4096", d.BlockSize)
 	}
 	if err = d.PartitionTableType.IsValid(); err != nil {
