@@ -74,8 +74,8 @@ Patch5:         glibc-2.34_pthread_cond_wait.patch
 Provides:       %{name}-common = %{version}-%{release}
 Provides:       %{_cross_name}-rtld(GNU_HASH)
 Provides:       %{_crossdir}%{_tuple}/sbin/ldconfig
-BuildRequires:  %{_cross_name}-binutils
-BuildRequires:  %{_cross_name}-kernel-headers
+BuildRequires:  binutils-aarch64-linux-gnu
+BuildRequires:  kernel-cross-headers
 BuildRequires:  %{_cross_name}-gcc-bootstrap
 BuildRequires:  %{_cross_name}-gcc-bootstrap2
 BuildRequires:  perl(File::Find)

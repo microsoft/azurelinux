@@ -1,3 +1,6 @@
+# Overriding the default to call 'configure' from subdirectories.
+%global _configure ../configure
+
 %global security_hardening nofortify
 %global debug_package %{nil}
 %global set_build_flags %{nil}
@@ -66,8 +69,8 @@ Source1:        https://ftp.gnu.org/gnu/mpfr/mpfr-4.1.0.tar.xz
 Source2:        http://ftp.gnu.org/gnu/gmp/gmp-6.2.1.tar.xz
 Source3:        https://ftp.gnu.org/gnu/mpc/mpc-1.2.1.tar.gz
 # Only applies to the Power9 ISA
-BuildRequires:  %{_cross_name}-binutils
-BuildRequires:  %{_cross_name}-kernel-headers
+BuildRequires:  binutils-aarch64-linux-gnu
+BuildRequires:  kernel-cross-headers
 AutoReqProv:    no
 ExclusiveArch:  x86_64
 Conflicts:      %{_cross_name}-cross-gcc
@@ -169,18 +172,18 @@ which includes the C and C++ compilers.
 # disable no-pie for gcc binaries
 sed -i '/^NO_PIE_CFLAGS = /s/@NO_PIE_CFLAGS@//' gcc/Makefile.in
 
-install -vdm 755 %{_builddir}/%{name}-build
-cd %{_builddir}
+mkdir build
+cd build
 tar -xf %{SOURCE1}
-ln -s mpfr-4.1.0 gcc-%{version}/mpfr
+ln -s mpfr-4.1.0 ../mpfr
 tar -xf %{SOURCE2}
-ln -s gmp-6.2.1 gcc-%{version}/gmp
+ln -s gmp-6.2.1 ../gmp
 tar -xf %{SOURCE3}
-ln -s mpc-1.2.1 gcc-%{version}/mpc
+ln -s mpc-1.2.1 ../mpc
 
-cp mpfr-4.1.0/COPYING gcc-%{version}/COPYING-mpfr
-cp gmp-6.2.1/COPYING gcc-%{version}/COPYING-gmp
-cp mpc-1.2.1/COPYING.LESSER gcc-%{version}/COPYING.LESSER-mpc
+cp mpfr-4.1.0/COPYING ../COPYING-mpfr
+cp gmp-6.2.1/COPYING ../COPYING-gmp
+cp mpc-1.2.1/COPYING.LESSER ../COPYING.LESSER-mpc
 
 %build
 # What flags do we want here? Clearing with '%%global set_build_flags %%{nil}' at start of file.
@@ -191,26 +194,27 @@ cp mpc-1.2.1/COPYING.LESSER gcc-%{version}/COPYING.LESSER-mpc
 # SED=sed \
 
 # Ideally we would like to model this after the %%configure macro in the future.
-cd %{_builddir}/%{name}-build
-../gcc-%{version}/configure \
-            --prefix=%{_cross_prefix} \
-            --target=%{_tuple} \
-            --disable-multilib \
-            --enable-shared \
-            --enable-threads=posix \
-            --enable-__cxa_atexit \
-            --enable-clocale=gnu \
-            --enable-languages=c,c++,fortran \
-            --disable-bootstrap \
-            --enable-linker-build-id \
-            --enable-plugin \
-            --enable-default-pie \
-            --with-sysroot=%{_cross_sysroot} \
-            --with-native-system-header-dir=%{_includedir}
+cd build
+target="aarch64-linux-gnu"
+%configure \
+    --prefix=%{_cross_prefix} \
+    --target=$target \
+    --disable-multilib \
+    --enable-shared \
+    --enable-threads=posix \
+    --enable-__cxa_atexit \
+    --enable-clocale=gnu \
+    --enable-languages=c,c++,fortran \
+    --disable-bootstrap \
+    --enable-linker-build-id \
+    --enable-plugin \
+    --enable-default-pie \
+    --with-sysroot=%{_prefix}/$target/sys-root \
+    --with-native-system-header-dir=%{_includedir}
 make %{?_smp_mflags} all-gcc
 
 %install
-cd %{_builddir}/%{name}-build
+cd build
 make %{?_smp_mflags} DESTDIR=%{buildroot} install-gcc
 
 find %{buildroot} -name '*.la' -delete

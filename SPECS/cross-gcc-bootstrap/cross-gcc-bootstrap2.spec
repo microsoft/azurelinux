@@ -66,8 +66,8 @@ Source1:        https://ftp.gnu.org/gnu/mpfr/mpfr-4.1.0.tar.xz
 Source2:        http://ftp.gnu.org/gnu/gmp/gmp-6.2.1.tar.xz
 Source3:        https://ftp.gnu.org/gnu/mpc/mpc-1.2.1.tar.gz
 
-BuildRequires:  %{_cross_name}-binutils
-BuildRequires:  %{_cross_name}-kernel-headers
+BuildRequires:  binutils-aarch64-linux-gnu
+BuildRequires:  kernel-cross-headers
 BuildRequires:  %{_cross_name}-glibc-bootstrap
 AutoReqProv:    no
 ExclusiveArch:  x86_64

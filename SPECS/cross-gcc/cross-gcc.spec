@@ -59,8 +59,8 @@ License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
-BuildRequires:  %{_cross_name}-binutils
-BuildRequires:  %{_cross_name}-kernel-headers
+BuildRequires:  binutils-aarch64-linux-gnu
+BuildRequires:  kernel-cross-headers
 BuildRequires:  %{_cross_name}-glibc-bootstrap2
 BuildRequires:  %{_cross_name}-gcc-bootstrap3
 BuildRequires:  grep
@@ -71,7 +71,7 @@ Conflicts:      %{_cross_name}-gcc-bootstrap2
 Conflicts:      %{_cross_name}-gcc-bootstrap3
 Conflicts:      %{_cross_name}-glibc-bootstrap
 Conflicts:      %{_cross_name}-glibc-bootstrap2
-Conflicts:      %{_cross_name}-kernel-headers
+Conflicts:      kernel-cross-headers
 Requires:       libmpc
 
 %description
@@ -79,7 +79,7 @@ Bundle of all files needed to cross compile with gcc including: gcc, glibc, binu
 
 %build
 # Find all non-license files and place in a manifest.
-rpm -ql %{_cross_name}-binutils %{_cross_name}-kernel-headers %{_cross_name}-glibc-bootstrap2 %{_cross_name}-gcc-bootstrap3 | \
+rpm -ql binutils-aarch64-linux-gnu kernel-cross-headers %{_cross_name}-glibc-bootstrap2 %{_cross_name}-gcc-bootstrap3 | \
     grep --invert-match "%{_datadir}/licenses/" | \
     sort --unique > %{_cross_name}-file_manifest_with_dirs.txt
 
@@ -91,12 +91,12 @@ rpm -ql %{_cross_name}-binutils %{_cross_name}-kernel-headers %{_cross_name}-gli
 
 install -vdm 755 %{_builddir}/licenses
 #binutils
-for license in $(rpm -qL %{_cross_name}-binutils); do
+for license in $(rpm -qL binutils-aarch64-linux-gnu); do
     new_name=binutils-$(basename ${license})
     cp ${license} ./licenses/${new_name}
 done
 #kernel-headers
-for license in $(rpm -qL %{_cross_name}-kernel-headers); do
+for license in $(rpm -qL kernel-cross-headers); do
     new_name=kernel-headers-$(basename ${license})
     cp ${license} ./licenses/${new_name}
 done
