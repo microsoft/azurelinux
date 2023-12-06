@@ -22724,8 +22724,8 @@
         "type": "other",
         "other": {
           "name": "python-gevent",
-          "version": "1.3.6",
-          "downloadUrl": "https://github.com/gevent/gevent/archive/1.3.6.tar.gz"
+          "version": "21.1.2",
+          "downloadUrl": "https://github.com/gevent/gevent/archive/21.1.2.tar.gz"
         }
       }
     },
@@ -29417,8 +29417,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.0.2112",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.2112.tar.gz"
+          "version": "9.0.2121",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.0.2121.tar.gz"
         }
       }
     },
