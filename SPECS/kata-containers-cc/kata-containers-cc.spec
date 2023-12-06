@@ -47,7 +47,7 @@ BuildRequires:  kernel-uvm-cvm-devel
 Requires:  kernel-uvm
 Requires:  kernel-uvm-cvm
 Requires:  moby-containerd-cc
-Requires:  %{_libexecdir}/virtiofsd
+Requires:  qemu-virtiofsd
 
 %description
 Kata Confidential Containers.
@@ -291,7 +291,7 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 
 %changelog
 *   Tue Dec 05 2023 Archana Choudhary <archana1@microsoft.com> - 0.6.2-2
--   Add virtiofsd as a requirement
+-   Add qemu-virtiofsd as a requirement
 
 *   Fri Nov 3 2023 Dallas Delaney <dadelan@microsoft.com> 0.6.2-1
 -   Upgrade to version 0.6.2
