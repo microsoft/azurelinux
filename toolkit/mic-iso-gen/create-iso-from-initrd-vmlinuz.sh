@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "-------- create-iso-from-initrd-vmlinuz.sh [enter] --------"
+
 set -x
 set -e
 
@@ -34,7 +36,7 @@ function CreateEfibootImage () {
     LC_CTYPE=C mmd -i $DST_DIR/efiboot.img efi efi/boot
     LC_CTYPE=C mcopy -i $DST_DIR/efiboot.img $INTERMEDIATE_OUTPUT/bootx64.efi ::efi/boot/
 
-    echo "Created ---- " $DST_DIR/efiboot.img
+    echo "Created -------- " $DST_DIR/efiboot.img
 }
 
 function CreateBiosImage () {
@@ -63,7 +65,7 @@ function CreateBiosImage () {
 
     cat /usr/lib/grub/i386-pc/cdboot.img $INTERMEDIATE_OUTPUT/core.img > $DST_DIR/bios.img
 
-    echo "Created ---- " $DST_DIR/bios.img
+    echo "Created -------- " $DST_DIR/bios.img
 }
 
 # -----------------------------------------------------------------------------
@@ -93,8 +95,9 @@ INPUT_VMLINUZ=$2
 INPUT_GRUB_CFG=$3
 INPUT_STARTUP_SCRIPT=$4
 INPUT_STARTUP_SCRIPT_CONFIGURATION=$5
-INPUT_ROOT_FS=$6
-OUTPUT_ISO_DIR=$7
+INPUT_FULL_IMAGE=$6
+INPUT_ROOTFS_RAW_FILE=$7
+OUTPUT_ISO_DIR=$8
 
 INTERMEDIATE_OUTPUT_DIR=$OUTPUT_ISO_DIR/iso-intermediate-artifacts
 mkdir -p $INTERMEDIATE_OUTPUT_DIR
@@ -113,11 +116,16 @@ cd ~/git/CBL-Mariner/toolkit/mic-iso-gen
 mkdir -p $STAGED_ISO_ARTIFACTS_DIR/boot
 cp $INPUT_INTRD $STAGED_ISO_ARTIFACTS_DIR/boot/initrd.img
 cp $INPUT_VMLINUZ $STAGED_ISO_ARTIFACTS_DIR/boot/vmlinuz
+if [[ ! -z $INPUT_ROOTFS_RAW_FILE ]] && [[ $INPUT_ROOTFS_RAW_FILE != "none" ]]; then
+    cp $INPUT_ROOTFS_RAW_FILE $STAGED_ISO_ARTIFACTS_DIR/boot/
+fi
 
 mkdir -p $STAGED_ISO_ARTIFACTS_DIR/artifacts
 cp $INPUT_STARTUP_SCRIPT $STAGED_ISO_ARTIFACTS_DIR/artifacts/
 cp $INPUT_STARTUP_SCRIPT_CONFIGURATION $STAGED_ISO_ARTIFACTS_DIR/artifacts/
-#george temp: cp $INPUT_ROOT_FS $STAGED_ISO_ARTIFACTS_DIR/artifacts/
+if [[ ! -z $INPUT_FULL_IMAGE ]] && [[ ! $INPUT_FULL_IMAGE == "none" ]]; then
+    cp $INPUT_FULL_IMAGE $STAGED_ISO_ARTIFACTS_DIR/artifacts/
+fi
 
 CreateEfibootImage \
     $INPUT_GRUB_CFG \
@@ -180,3 +188,6 @@ echo $OUTPUT_ISO_IMAGE_NAME
 #   --os-variant linux2020 \
 #   --network default \
 #   --boot uefi,loader=/usr/share/OVMF/OVMF_CODE_4M.fd,loader_secure=no
+
+set +x
+echo "-------- create-iso-from-initrd-vmlinuz.sh [exit] --------"
