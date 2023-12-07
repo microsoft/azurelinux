@@ -9061,8 +9061,8 @@
         "type": "other",
         "other": {
           "name": "libdnf",
-          "version": "0.63.1",
-          "downloadUrl": "https://github.com/rpm-software-management/libdnf/archive/0.63.1.tar.gz"
+          "version": "0.72.0",
+          "downloadUrl": "https://github.com/rpm-software-management/libdnf/archive/0.72.0.tar.gz"
         }
       }
     },
