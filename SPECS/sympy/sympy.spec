@@ -11,8 +11,8 @@ comprehensible and easily extensible. SymPy is written entirely in\
 Python and does not require any external libraries.
 Summary:        A Python library for symbolic mathematics
 Name:           sympy
-Version:        1.11.1
-Release:        5%{?dist}
+Version:        1.12
+Release:        1%{?dist}
 # The project as a whole is BSD-3-Clause.
 # The files in sympy/parsing/latex are MIT.
 License:        BSD-3-Clause AND MIT
@@ -156,6 +156,9 @@ fi
 %doc examples/*
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.12-1
+- Auto-upgrade to 1.12 - Azure Linux 3.0 - package upgrades
+
 * Thu Apr 06 2023 Riken Maharjan <rmaharjan@microsoft.com> - 1.11.1-5
 - Initial CBL-Mariner import from Fedora 38 (license: MIT)
 - License Verified

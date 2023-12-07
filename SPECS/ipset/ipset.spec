@@ -1,7 +1,7 @@
 Summary:        administration tool for IP sets
 Name:           ipset
-Version:        7.15
-Release:        2%{?dist}
+Version:        7.17
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -104,6 +104,9 @@ fi
 %dir %{_sysconfdir}/%{name}
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 7.17-1
+- Auto-upgrade to 7.17 - Azure Linux 3.0 - package upgrades
+
 * Thu Jun 15 2023 Andy Zaugg <azaugg@linkedin.com> - 7.15-2
 - Fix ipset systemd unit file
 

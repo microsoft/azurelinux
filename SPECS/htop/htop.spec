@@ -1,7 +1,7 @@
 Summary:        Interactive process viewer
 Name:           htop
-Version:        3.0.5
-Release:        5%{?dist}
+Version:        3.2.2
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -47,6 +47,9 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/%{name}.desktop
 %{_mandir}/man1/htop.1*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.2-1
+- Auto-upgrade to 3.2.2 - Azure Linux 3.0 - package upgrades
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.0.5-5
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

@@ -16,14 +16,12 @@
 # Modification to specific packages go to specific teams
 /SPECS/installkernel/* @microsoft/cbl-mariner-kernel
 /SPECS/kernel/* @microsoft/cbl-mariner-kernel
-/SPECS/kernel-azure/* @microsoft/cbl-mariner-kernel
 /SPECS/kernel-hci/* @microsoft/cbl-mariner-kernel
 /SPECS/kernel-headers/* @microsoft/cbl-mariner-kernel
 /SPECS/kernel-mshv/* @microsoft/cbl-mariner-kernel
 /SPECS/kernel-uvm/* @microsoft/cbl-mariner-kernel
 /SPECS-SIGNED/kernel-signed/* @microsoft/cbl-mariner-kernel
 /SPECS-SIGNED/kernel-hci-signed/* @microsoft/cbl-mariner-kernel
-/SPECS-SIGNED/kernel-azure-signed/* @microsoft/cbl-mariner-kernel
 /SPECS-SIGNED/kernel-mstflint-signed/* @microsoft/cbl-mariner-kernel
 
 /SPECS/grub2/* @microsoft/cbl-mariner-bootloader

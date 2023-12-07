@@ -1,7 +1,7 @@
 Summary:        Console-based network traffic monitor
 Name:           vnstat
-Version:        2.7
-Release:        2%{?dist}
+Version:        2.11
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -46,6 +46,9 @@ mkdir -p %{buildroot}%{_unitdir}/
 %{_mandir}/*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.11-1
+- Auto-upgrade to 2.11 - Azure Linux 3.0 - package upgrades
+
 * Mon Apr 11 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7-2
 - Fixing invalid source URL.
 

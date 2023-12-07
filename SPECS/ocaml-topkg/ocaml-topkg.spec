@@ -9,8 +9,8 @@
 
 Summary:        The transitory OCaml software packager
 Name:           ocaml-%{srcname}
-Version:        1.0.3
-Release:        4%{?dist}
+Version:        1.0.7
+Release:        1%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -129,6 +129,9 @@ ocaml pkg/pkg.ml test
 %doc html/*
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0.7-1
+- Auto-upgrade to 1.0.7 - Azure Linux 3.0 - package upgrades
+
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.3-4
 - Cleaning-up spec. License verified.
 

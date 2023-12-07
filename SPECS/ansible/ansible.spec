@@ -1,7 +1,7 @@
 Summary:        Configuration-management, application deployment, cloud provisioning system
 Name:           ansible
-Version:        2.12.1
-Release:        3%{?dist}
+Version:        2.15.3
+Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -47,6 +47,9 @@ python3 setup.py test
 %{python3_sitelib}/*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.15.3-1
+- Auto-upgrade to 2.15.3 - Azure Linux 3.0 - package upgrades
+
 * Mon Jun 26 2023 Sam Meluch <sammeluch@microsoft.com> - 2.12.1-3
 - add python-resolvelib dependency to fix ansible-galaxy
 

@@ -1,13 +1,13 @@
 Summary:        Python wrapper module around the OpenSSL library
 Name:           pyOpenSSL
-Version:        18.0.0
-Release:        8%{?dist}
+Version:        23.2.0
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://github.com/pyca/pyopenssl
-Source0:        https://files.pythonhosted.org/packages/source/p/pyOpenSSL/%{name}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/be/df/75a6525d8988a89aed2393347e9db27a56cb38a3e864314fac223e905aef/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
@@ -59,6 +59,9 @@ LANG=en_US.UTF-8  PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{python3_sitelib}/*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 23.2.0-1
+- Auto-upgrade to 23.2.0 - Azure Linux 3.0 - package upgrades
+
 * Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 18.0.0-8
 - Replace easy_install usage with pip in %%check sections
 

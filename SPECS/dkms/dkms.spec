@@ -2,7 +2,7 @@
 
 Summary:        Dynamic Kernel Module Support
 Name:           dkms
-Version:        3.0.3
+Version:        3.0.11
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -56,6 +56,9 @@ echo "disable dkms.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-dk
 %{_mandir}/*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0.11-1
+- Auto-upgrade to 3.0.11 - Azure Linux 3.0 - package upgrades
+
 * Thu Jan 20 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 3.0.3-1
 - Upgrade to 3.0.3
 
