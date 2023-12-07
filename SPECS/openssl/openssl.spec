@@ -144,20 +144,29 @@ Patch115: 0001-Disable-most-DSA-tests-that-use-SHA1-which-is-disall.patch
 License: Apache-2.0
 URL: http://www.openssl.org/
 
-# AZL: NOTE: Removed dependencies we don't have in AZL and that create circular dependencies.
-#            Will go through these as I go through patches and config options.
-BuildRequires: gcc g++
-BuildRequires: coreutils, perl-interpreter, sed, zlib-devel, /usr/bin/cmp
-BuildRequires: /usr/bin/rename
-BuildRequires: /usr/bin/pod2man
-BuildRequires: perl(Test::Harness), perl(Test::More), perl(Math::BigInt)
-BuildRequires: perl(Module::Load::Conditional), perl(File::Temp)
-BuildRequires: perl(Time::HiRes), perl(IPC::Cmd), perl(Pod::Html), perl(Digest::SHA)
-BuildRequires: perl(FindBin), perl(lib), perl(File::Compare), perl(File::Copy), perl(bigint)
+BuildRequires: %{_bindir}/cmp
+BuildRequires: %{_bindir}/pod2man
+BuildRequires: %{_bindir}/rename
+BuildRequires: coreutils
+BuildRequires: g++
+BuildRequires: gcc
+BuildRequires: make
+BuildRequires: perl-core
+BuildRequires: perl(Digest::SHA)
+BuildRequires: perl(FindBin)
+BuildRequires: perl(IPC::Cmd)
+BuildRequires: perl(lib)
+BuildRequires: perl(Pod::Html)
+BuildRequires: perl(Text::Template)
+BuildRequires: sed
 
-Requires: perl
-Requires: coreutils
+%if 0%{?with_check}
+BuildRequires: perl(Test::More)
+%endif
+
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
+Requires: coreutils
+Requires: perl
 
 %description
 The OpenSSL toolkit provides support for secure communications between
