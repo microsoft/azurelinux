@@ -1,7 +1,7 @@
 Summary:        A collection of modular and reusable compiler and toolchain technologies.
 Name:           llvm
 Version:        12.0.1
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -30,6 +30,9 @@ for developing applications that use llvm.
 %prep
 %setup -q -n %{name}-%{version}.src
 %autopatch -p2
+# fix build break with gcc 13 by including cstdint header
+sed -i 's/#include <string>/#include <cstdint>\n#include <string>/g' ./include/llvm/Support/Base64.h
+sed -i 's/#include <string>/#include <cstdint>\n#include <string>/g' ./include/llvm/Support/Signals.h
 
 %build
 # Disable symbol generation
@@ -89,6 +92,9 @@ ninja check-all
 %{_includedir}/*
 
 %changelog
+* Tue Dec 06 2023 Andrew Phelps <anphel@microsoft.com> - 12.0.1-8
+- Fix build break with gcc 13
+
 * Thu Jun 29 2023 Andrew Phelps <anphel@microsoft.com> - 12.0.1-7
 - Modify parallel compile jobs limit to _smp_ncpus_max if set, or _smp_build_ncpus
 

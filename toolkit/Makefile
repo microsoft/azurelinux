@@ -132,20 +132,25 @@ PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR
 REPO_LIST          ?=
 SRPM_URL_LIST      ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms
 
-# Preview URLs/repos will be appended (via override) even if the user sets custom values for the lists.
-ifeq ($(USE_PREVIEW_REPO),y)
-   override PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/$(build_arch)
-   override PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/debuginfo/$(build_arch)
-   override PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/Microsoft/$(build_arch)
-   override SRPM_URL_LIST      += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/srpms
-   ifneq ($(wildcard $(PREVIEW_REPO)),)
-      override REPO_LIST += $(PREVIEW_REPO)
-   else
-      $(warning )
-      $(warning ######################### WARNING #########################)
-      $(warning 'USE_PREVIEW_REPO=y' set but '$(PREVIEW_REPO)' is missing. Regenerate toolkit's 'repos' directory. Remove 'USE_PREVIEW_REPO' for core builds.)
-      $(warning ######################### WARNING #########################)
-      $(warning )
+ifneq ($(DAILY_BUILD_ID),)
+   $(warning Using Daily Build $(DAILY_BUILD_ID))
+   override PACKAGE_URL_LIST   := https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-amd64/built_rpms_all
+   override SRPM_URL_LIST      := https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-amd64/SRPMS
+else
+   ifeq ($(USE_PREVIEW_REPO),y)
+      override PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/$(build_arch)
+      override PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/debuginfo/$(build_arch)
+      override PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/Microsoft/$(build_arch)
+      override SRPM_URL_LIST      += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/srpms
+      ifneq ($(wildcard $(PREVIEW_REPO)),)
+         override REPO_LIST += $(PREVIEW_REPO)
+      else
+         $(warning )
+         $(warning ######################### WARNING #########################)
+         $(warning 'USE_PREVIEW_REPO=y' set but '$(PREVIEW_REPO)' is missing. Regenerate toolkit's 'repos' directory. Remove 'USE_PREVIEW_REPO' for core builds.)
+         $(warning ######################### WARNING #########################)
+         $(warning )
+      endif
    endif
 endif
 

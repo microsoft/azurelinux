@@ -3880,8 +3880,8 @@
         "type": "other",
         "other": {
           "name": "fribidi",
-          "version": "1.0.12",
-          "downloadUrl": "https://github.com/fribidi/fribidi/releases/download/v1.0.12/fribidi-1.0.12.tar.xz"
+          "version": "1.0.13",
+          "downloadUrl": "https://github.com/fribidi/fribidi/releases/download/v1.0.13/fribidi-1.0.13.tar.xz"
         }
       }
     },
@@ -8360,9 +8360,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "kubernetes",
-          "version": "1.28.3",
-          "downloadUrl": "https://dl.k8s.io/v1.28.3/kubernetes-src.tar.gz"
+          "name": "kube-vip-cloud-provider",
+          "version": "0.0.7",
+          "downloadUrl": "https://github.com/kube-vip/kube-vip-cloud-provider/archive/refs/tags/v0.0.7.tar.gz"
         }
       }
     },
@@ -8370,9 +8370,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "kube-vip-cloud-provider",
-          "version": "0.0.7",
-          "downloadUrl": "https://github.com/kube-vip/kube-vip-cloud-provider/archive/refs/tags/v0.0.7.tar.gz"
+          "name": "kubernetes",
+          "version": "1.28.3",
+          "downloadUrl": "https://dl.k8s.io/v1.28.3/kubernetes-src.tar.gz"
         }
       }
     },
@@ -9061,8 +9061,8 @@
         "type": "other",
         "other": {
           "name": "libdnf",
-          "version": "0.63.1",
-          "downloadUrl": "https://github.com/rpm-software-management/libdnf/archive/0.63.1.tar.gz"
+          "version": "0.72.0",
+          "downloadUrl": "https://github.com/rpm-software-management/libdnf/archive/0.72.0.tar.gz"
         }
       }
     },
