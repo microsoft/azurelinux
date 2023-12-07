@@ -8,16 +8,18 @@ Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://github.com/influxdata/telegraf
 Source0:        %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-# Use the generate_source_tarbbal.sh script to get the vendored sources.
+# Use the generate_source_tarball.sh script to get the vendored sources.
 Source1:        %{name}-%{version}-vendor.tar.gz
 
 BuildRequires:  golang
 BuildRequires:  systemd-devel
+BuildRequires:  tzdata
 
 Requires:       logrotate
 Requires:       procps-ng
 Requires:       shadow-utils
 Requires:       systemd
+Requires:       tzdata
 Requires(pre):  %{_sbindir}/useradd
 Requires(pre):  %{_sbindir}/groupadd
 Requires(postun): %{_sbindir}/userdel
@@ -48,6 +50,7 @@ install -m 755 -D etc/logrotate.d/%{name} %{buildroot}%{_sysconfdir}/logrotate.d
 install -m 755 -D telegraf.conf %{buildroot}%{_sysconfdir}/%{name}/telegraf.conf
 
 %check
+echo $ZONEINFO
 make test
 
 %pre
