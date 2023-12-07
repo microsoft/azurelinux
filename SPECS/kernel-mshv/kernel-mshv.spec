@@ -253,7 +253,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner-mshv.cfg
 * Thu Sep 28 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.126.mshv3-3
 - Introduce 50_mariner_mshv_menuentry, which implements
     the custom boot path when running over MSHV.
-- Check for required proprietary mshv components in 50_mariner_mshv.cfg before
+- Check for required mshv components in 50_mariner_mshv.cfg before
     defaulting to kernel-mshv boot. 
 
 * Tue Dec 12 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.126.mshv3-2

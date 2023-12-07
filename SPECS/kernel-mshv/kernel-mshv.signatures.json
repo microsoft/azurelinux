@@ -1,9 +1,9 @@
 {
  "Signatures": {
-  "50_mariner_mshv.cfg": "b2642e592cc9dde5ccf8a2c06f40d5520325d4bfe64152277967ba16681f9fc7",
+  "50_mariner_mshv.cfg": "12bf23f8857f893549933a20062ad2a69c3c654b87893e8dd3ce42f9329801c7",
   "50_mariner_mshv_menuentry": "aebb8a39f7f34563c52403e2666ceab4d487b34a39b2fbd4d7affb48b4f90d0d",
   "cbl-mariner-ca-20211013.pem": "5ef124b0924cb1047c111a0ecff1ae11e6ad7cac8d1d9b40f98f99334121f0b0",
-  "config": "bbdc5e2c5506e2a272a15b82541ea258c4dcc6c25db4a2120d09675a43e96528",
+  "config": "2227744a0089cceae344dec57d6ff0540e265056f3831e24805d9cad4571e825",
   "kernel-mshv-5.15.126.mshv3.tar.gz": "a4a19caadbcb6c367bbc8d92338bbf6843f5e0fbd411f0ff0ba7650d44505e87"
  }
 }

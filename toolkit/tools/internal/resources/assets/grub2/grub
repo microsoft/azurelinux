@@ -17,6 +17,6 @@ GRUB_CMDLINE_LINUX_DEFAULT="{{.ExtraCommandLine}} $kernelopts"
 # =============================notice===============================
 for x in /etc/default/grub.d/*.cfg ; do
     if [ -e "${x}" ]; then
-        . "${x}"
+        . "${x}" || grub_warn "Received non-zero exit code from ${x}."
     fi
 done
