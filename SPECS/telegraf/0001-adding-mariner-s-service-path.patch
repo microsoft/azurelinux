@@ -1,0 +1,26 @@
+From 544bbca001e29bb2cfee802d19467fc0487a7e66 Mon Sep 17 00:00:00 2001
+From: Osama Esmail <osamaesmail@microsoft.com>
+Date: Thu, 7 Dec 2023 11:17:06 -0800
+Subject: [PATCH] adding mariner's service path
+
+---
+ plugins/processors/port_name/services_path_notwindows.go | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/plugins/processors/port_name/services_path_notwindows.go b/plugins/processors/port_name/services_path_notwindows.go
+index 6bc71c4d8..0ae955b39 100644
+--- a/plugins/processors/port_name/services_path_notwindows.go
++++ b/plugins/processors/port_name/services_path_notwindows.go
+@@ -13,7 +13,8 @@ func servicesPath() string {
+ 	var files = []string{
+ 		"/etc/services",
+ 		"/usr/etc/services", // fallback on OpenSuSE
+-	}
++    "/usr/share/dbus-1/services", //fallback on CBL-Mariner
++}
+ 
+ 	for i := range files {
+ 		if _, err := os.Stat(files[i]); err == nil {
+-- 
+2.25.1
+

@@ -10,6 +10,7 @@ URL:            https://github.com/influxdata/telegraf
 Source0:        %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Use the generate_source_tarball.sh script to get the vendored sources.
 Source1:        %{name}-%{version}-vendor.tar.gz
+Patch0:         0001-adding-mariner-s-service-path.patch
 
 BuildRequires:  golang
 BuildRequires:  systemd-devel
