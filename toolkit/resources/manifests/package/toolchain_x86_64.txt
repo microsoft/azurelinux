@@ -136,7 +136,7 @@ intltool-0.51.0-7.cm2.noarch.rpm
 itstool-2.0.6-4.cm2.noarch.rpm
 kbd-2.2.0-1.cm2.x86_64.rpm
 kbd-debuginfo-2.2.0-1.cm2.x86_64.rpm
-kernel-headers-5.15.138.1-4.cm2.noarch.rpm
+kernel-headers-5.15.138.1-91.cm2.noarch.rpm
 kmod-29-2.cm2.x86_64.rpm
 kmod-debuginfo-29-2.cm2.x86_64.rpm
 kmod-devel-29-2.cm2.x86_64.rpm
@@ -270,12 +270,12 @@ npth-1.6-4.cm2.x86_64.rpm
 npth-debuginfo-1.6-4.cm2.x86_64.rpm
 npth-devel-1.6-4.cm2.x86_64.rpm
 ntsysv-1.20-4.cm2.x86_64.rpm
-openssl-1.1.1k-27.cm2.x86_64.rpm
-openssl-debuginfo-1.1.1k-27.cm2.x86_64.rpm
-openssl-devel-1.1.1k-27.cm2.x86_64.rpm
-openssl-libs-1.1.1k-27.cm2.x86_64.rpm
-openssl-perl-1.1.1k-27.cm2.x86_64.rpm
-openssl-static-1.1.1k-27.cm2.x86_64.rpm
+openssl-1.1.1k-91.cm2.x86_64.rpm
+openssl-debuginfo-1.1.1k-91.cm2.x86_64.rpm
+openssl-devel-1.1.1k-91.cm2.x86_64.rpm
+openssl-libs-1.1.1k-91.cm2.x86_64.rpm
+openssl-perl-1.1.1k-91.cm2.x86_64.rpm
+openssl-static-1.1.1k-91.cm2.x86_64.rpm
 p11-kit-0.24.1-1.cm2.x86_64.rpm
 p11-kit-debuginfo-0.24.1-1.cm2.x86_64.rpm
 p11-kit-devel-0.24.1-1.cm2.x86_64.rpm
