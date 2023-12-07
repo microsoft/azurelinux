@@ -165,11 +165,11 @@ texinfo-6.8-1.cm2.x86_64.rpm
 gtk-doc-1.33.2-1.cm2.noarch.rpm
 autoconf-2.71-3.cm2.noarch.rpm
 automake-1.16.5-1.cm2.noarch.rpm
-openssl-1.1.1k-27.cm2.x86_64.rpm
-openssl-devel-1.1.1k-27.cm2.x86_64.rpm
-openssl-libs-1.1.1k-27.cm2.x86_64.rpm
-openssl-perl-1.1.1k-27.cm2.x86_64.rpm
-openssl-static-1.1.1k-27.cm2.x86_64.rpm
+openssl-1.1.1k-28.cm2.x86_64.rpm
+openssl-devel-1.1.1k-28.cm2.x86_64.rpm
+openssl-libs-1.1.1k-28.cm2.x86_64.rpm
+openssl-perl-1.1.1k-28.cm2.x86_64.rpm
+openssl-static-1.1.1k-28.cm2.x86_64.rpm
 libcap-2.60-2.cm2.x86_64.rpm
 libcap-devel-2.60-2.cm2.x86_64.rpm
 debugedit-5.0-2.cm2.x86_64.rpm
