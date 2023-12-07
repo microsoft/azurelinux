@@ -90,11 +90,6 @@ function prep_target () {
 touch cross.list
 prep_target aarch64-linux-gnu %{build_aarch64}
 
-%if %{build_cross}
-    # $PACKAGE is used for the gettext catalog name when building 'cross-binutils-common'.
-    sed -i -e 's/^ PACKAGE=/ PACKAGE=cross-/' */configure
-%endif
-
 %build
 
 function config_cross_target () {
@@ -140,6 +135,9 @@ done < cross.list
 
 %if %{build_cross}
     # For documentation purposes only.
+    # $PACKAGE is used for the gettext catalog name when building 'cross-binutils-common'.
+    sed -i -e 's/^ PACKAGE=/ PACKAGE=cross-/' */configure
+
     mkdir cross-binutils
     pushd cross-binutils
 
