@@ -1,6 +1,6 @@
 Summary:        Library implementing the Unicode Bidirectional Algorithm
 Name:           fribidi
-Version:        1.0.12
+Version:        1.0.13
 Release:        1%{?dist}
 License:        LGPLv2+ AND UCD
 Vendor:         Microsoft Corporation
@@ -52,6 +52,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Thu Dec 07 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.13-1
+- Upgrade to 1.0.13.
+
 * Mon Sep 19 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0.12-1
 - Upgrade to 1.0.12
 
@@ -241,7 +244,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 - put devel .so symlink in the right subpackage
 
 * Tue May 23 2006 Caolan McNamara <caolanm@redhat.com> 0.10.7-3
-- rh#192669# clearly I didn't actually get around to basing fribidi-config 
+- rh#192669# clearly I didn't actually get around to basing fribidi-config
   of pkg-config output
 
 * Tue May 02 2006 Caolan McNamara <caolanm@redhat.com> 0.10.7-2
