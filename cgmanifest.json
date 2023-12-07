@@ -2207,8 +2207,8 @@
         "type": "other",
         "other": {
           "name": "crash",
-          "version": "8.0.3",
-          "downloadUrl": "https://github.com/crash-utility/crash/archive/8.0.3.tar.gz"
+          "version": "8.0.4",
+          "downloadUrl": "https://github.com/crash-utility/crash/archive/8.0.4.tar.gz"
         }
       }
     },
