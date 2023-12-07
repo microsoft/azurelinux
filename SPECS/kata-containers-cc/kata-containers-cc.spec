@@ -18,7 +18,6 @@ Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/cc-
 Source1:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{name}-%{version}.tar.gz
 Source2:      %{name}-%{version}-cargo.tar.gz
 Source3:      mariner-coco-build-uvm.sh
-Patch0:       keep-uvm-rootfs-dependencies.patch
 
 ExclusiveArch: x86_64
 
