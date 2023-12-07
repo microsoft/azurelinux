@@ -134,7 +134,7 @@ func updateMarinerCfgWithInitramfs(imageChroot *safechroot.Chroot) error {
 	return nil
 }
 
-func updateGrubConfig(resolvedVerityDevice string, resolvedHashDevice string, salt string, rootHash string, verityErrorBehavior imagecustomizerapi.VerityErrorBehavior) error {
+func updateGrubConfig(resolvedVerityDevice string, resolvedHashDevice string, salt string, rootHash string, verityErrorBehavior imagecustomizerapi.VerityErrorBehavior, bootMountDir string) error {
 	var err error
 
 	const cmdlineTemplate = "rd.systemd.verity=1 roothash=%s systemd.verity_root_data=%s systemd.verity_root_hash=%s systemd.verity_root_options=%s,salt=%s"
@@ -143,7 +143,7 @@ func updateGrubConfig(resolvedVerityDevice string, resolvedHashDevice string, sa
 		return err
 	}
 	newArgs := fmt.Sprintf(cmdlineTemplate, rootHash, resolvedVerityDevice, resolvedHashDevice, verityErrorBehaviorString, salt)
-	grubConfigPath := "/mnt/boot_partition/grub2/grub.cfg"
+	grubConfigPath := filepath.Join(bootMountDir, "grub2/grub.cfg")
 
 	content, err := os.ReadFile(grubConfigPath)
 	if err != nil {
@@ -214,7 +214,7 @@ func convertToNbdDevicePath(nbdDevice, systemDevice string) (string, error) {
 func findDeviceByUUIDOrLabel(uuidOrLabel string) (string, error) {
 	// Error if the input is already a device path
 	if strings.HasPrefix(uuidOrLabel, "/dev/") {
-        return "", fmt.Errorf("logical error: function called with resolved device path '%s'", uuidOrLabel)
+        return uuidOrLabel, nil
     }
 
 	// Resolve UUIDs and LABELs

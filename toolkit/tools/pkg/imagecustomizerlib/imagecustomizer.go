@@ -330,7 +330,7 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 	}
 
 	// Update grub configuration
-	err = updateGrubConfig(resolvedVerityDevice, resolvedHashDevice, salt, rootHash, config.SystemConfig.Verity.VerityErrorBehavior)
+	err = updateGrubConfig(resolvedVerityDevice, resolvedHashDevice, salt, rootHash, config.SystemConfig.Verity.VerityErrorBehavior, bootMountDir)
 	if err != nil {
 		return err
 	}
