@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "-------- create-initrd-image-from-folder.sh [enter] --------"
+
 set -x
 set -e
 
@@ -27,7 +29,7 @@ build_and_run_roast() {
     popd
 }
 
-# ---- main ----
+# -------- main --------
 
 pushd ~/git/CBL-Mariner
 
@@ -39,3 +41,5 @@ git checkout -- toolkit/tools/roast/roast.go
 
 popd
 
+set +x
+echo "-------- create-initrd-image-from-folder.sh [exit] --------"

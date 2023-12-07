@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "-------- convert-rootfs-folder-to-initrd-folder.sh [enter] --------"
+
 set -x
 set -e
 
@@ -16,7 +18,7 @@ EOF
     sudo chmod 775 $initScriptPath
 }
 
-# ---- main ----
+# -------- main --------
 sudo rm -rf $outputRootDir
 mkdir -p $outputRootDir
 sudo cp -r -a $inputRootDir/* $outputRootDir
@@ -37,3 +39,6 @@ sudo chroot $outputRootDir /bin/bash -c "chown -R root:root ."
 
 sudo chmod 744 $outputRootDir/boot
 sudo chmod 755 $outputRootDir/etc/shadow
+
+set +x
+echo "-------- convert-rootfs-folder-to-initrd-folder.sh [exit] --------"
