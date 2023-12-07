@@ -28,7 +28,7 @@ function remove_systemd() {
     sudo rm -r $outputRootDir/etc/conf.d/systemd.conf
 }
 
-function copy_devics() {
+function copy_devices() {
     local outputRootDir=$1
 
     # pkggen/worker/create_worker_chroot.sh
@@ -78,6 +78,27 @@ modprobe virtiofs
 modprobe fuse
 modprobe configfs
 modprobe autofs4
+
+modprobe xen-scsifront
+modprobe xen-blkfront
+modprobe xen-acpi-processor
+modprobe xen-evtchn
+modprobe xen-gntalloc
+modprobe xen-gntdev
+modprobe xen-privcmd
+modprobe xen-pciback
+modprobe xenfs
+modprobe hv_sock
+modprobe virtio_blk
+modprobe virtio-rng
+modprobe virtio_console
+modprobe virtio_crypto
+modprobe virtio_mem
+modprobe vmw_vsock_virtio_transport
+modprobe vmw_vsock_virtio_transport_common
+modprobe 9pnet_virtio
+modprobe vrf
+
 echo "------------ 8 ------------"
 lsmod
 echo "------------ 2 ------------"
@@ -121,7 +142,24 @@ mkdir -p $outputRootDir
 sudo cp -r -a $inputRootDir/* $outputRootDir
 
 add_start_up_script $outputRootDir
-create_init_script $outputRootDir
-remove_systemd $outputRootDir
-copy_devics $outputRootDir
+#
+# patch dracut script file to have delays and echo check points for debugging.
+# this does not seem to help much.
+#
+# cp ~/git/CBL-Mariner/toolkit/mic-iso-gen/files/dracut-patch/dracut-lib.sh $outputRootDir/usr/lib/
+# cp ~/git/CBL-Mariner/toolkit/mic-iso-gen/files/dracut-patch/dracut-cmdline  $outputRootDir/usr/bin/
+# cp ~/git/CBL-Mariner/toolkit/mic-iso-gen/files/dracut-patch/initqueue $outputRootDir/usr/sbin/
+#
+# copying dracut files does not seem to have any effect.
+# cp -r ~/temp/baremetal-minimal-iso/extracted/usr/lib64/dracut $outputRootDir/usr/lib64/
+#
+# uncommenting the following line causes the boot process to abort very early with
+# an error about a missing system call. Most likely systemd binaries got copied without
+# their dependencies.
+#
+# cp -r ~/temp/baremetal-minimal-iso/extracted/usr/lib64/systemd $outputRootDir/usr/lib64/
+#
+# create_init_script $outputRootDir
+# remove_systemd $outputRootDir
+copy_devices $outputRootDir
 copy_binaries $outputRootDir

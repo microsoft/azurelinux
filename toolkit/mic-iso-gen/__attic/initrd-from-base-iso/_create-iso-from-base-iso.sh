@@ -25,7 +25,8 @@ cd ~/git/CBL-Mariner/
 
 # FULL_IMAGE_RAW_DISK=$BUILD_WORKING_DIR/raw-disk-output/disk0.raw
 # FULL_IMAGE_RAW_DISK=~/temp/control-plane.zst
-FULL_IMAGE_RAW_DISK=~/temp/control-plane-20231201.9.zst
+# FULL_IMAGE_RAW_DISK=~/temp/control-plane-20231201.9.zst
+FULL_IMAGE_RAW_DISK=~/temp/worker-20231201.9.zst
 
 # outputs:
 #   disk0.raw

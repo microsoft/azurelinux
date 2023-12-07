@@ -1,0 +1,87 @@
+#!/bin/sh
+#
+# Licensed under the GPLv2+
+#
+# Copyright 2008-2010, Red Hat, Inc.
+# Harald Hoyer <harald@redhat.com>
+
+echo "george - sleeping for 3 seconds - dracut-initqueue - 1."
+sleep 3s
+
+PATH=/usr/sbin:/usr/bin:/sbin:/bin
+
+type getarg > /dev/null 2>&1 || . /lib/dracut-lib.sh
+
+echo "george - sleeping for 3 seconds - dracut-initqueue - 2."
+sleep 3s
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --onetime)
+            onetime="yes"
+            ;;
+        --online)
+            qname="/online"
+            ;;
+        --settled)
+            qname="/settled"
+            ;;
+        --finished)
+            qname="/finished"
+            ;;
+        --timeout)
+            qname="/timeout"
+            ;;
+        --unique)
+            unique="yes"
+            ;;
+        --name)
+            name="$2"
+            shift
+            ;;
+        --env)
+            env="$2"
+            shift
+            ;;
+        *)
+            break
+            ;;
+    esac
+    shift
+done
+
+if [ -z "$unique" ]; then
+    job="${name}$$"
+else
+    job="${name:-$1}"
+    job=${job##*/}
+fi
+
+echo "george - sleeping for 3 seconds - dracut-initqueue - 3."
+sleep 3s
+
+exe=$1
+shift
+
+echo "george - sleeping for 3 seconds - dracut-initqueue - 4."
+sleep 3s
+
+[ -x "$exe" ] || exe=$(command -v "$exe")
+if [ -z "$exe" ]; then
+    echo "Invalid command"
+    exit 1
+fi
+
+{
+    # shellcheck disable=SC2016
+    [ -n "$onetime" ] && echo '[ -e "$job" ] && rm -f -- "$job"'
+    [ -n "$env" ] && echo "$env"
+    echo "$exe" "$@"
+} > "/tmp/$$-${job}.sh"
+
+echo "george - sleeping for 3 seconds - dracut-initqueue - 5."
+sleep 3s
+
+mv -f "/tmp/$$-${job}.sh" "$hookdir/initqueue${qname}/${job}.sh"
+[ -z "$qname" ] && : >> "$hookdir"/initqueue/work
+exit 0
