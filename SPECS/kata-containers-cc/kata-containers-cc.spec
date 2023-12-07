@@ -191,7 +191,6 @@ mkdir -p %{buildroot}%{osbuilder}/src/agent/samples/policy
 cp -aR samples/policy/all-allowed         %{buildroot}%{osbuilder}/src/agent/samples/policy
 install -D -m 0755 kata-containers.target %{buildroot}%{osbuilder}/kata-containers.target
 install -D -m 0755 kata-agent.service.in  %{buildroot}%{osbuilder}/kata-agent.service.in
-install -D -m 0755 coco-opa.service       %{buildroot}%{osbuilder}/coco-opa.service
 install -D -m 0755 target/x86_64-unknown-linux-gnu/release/kata-agent %{buildroot}%{osbuilder}/kata-agent
 popd
 
