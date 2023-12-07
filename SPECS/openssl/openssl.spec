@@ -144,20 +144,29 @@ Patch115: 0001-Disable-most-DSA-tests-that-use-SHA1-which-is-disall.patch
 License: Apache-2.0
 URL: http://www.openssl.org/
 
-# AZL: NOTE: Removed dependencies we don't have in AZL and that create circular dependencies.
-#            Will go through these as I go through patches and config options.
-BuildRequires: gcc g++
-BuildRequires: coreutils, perl-interpreter, sed, zlib-devel, /usr/bin/cmp
-BuildRequires: /usr/bin/rename
-BuildRequires: /usr/bin/pod2man
-BuildRequires: perl(Test::Harness), perl(Test::More), perl(Math::BigInt)
-BuildRequires: perl(Module::Load::Conditional), perl(File::Temp)
-BuildRequires: perl(Time::HiRes), perl(IPC::Cmd), perl(Pod::Html), perl(Digest::SHA)
-BuildRequires: perl(FindBin), perl(lib), perl(File::Compare), perl(File::Copy), perl(bigint)
+BuildRequires: %{_bindir}/cmp
+BuildRequires: %{_bindir}/pod2man
+BuildRequires: %{_bindir}/rename
+BuildRequires: coreutils
+BuildRequires: g++
+BuildRequires: gcc
+BuildRequires: make
+BuildRequires: perl-core
+BuildRequires: perl(Digest::SHA)
+BuildRequires: perl(FindBin)
+BuildRequires: perl(IPC::Cmd)
+BuildRequires: perl(lib)
+BuildRequires: perl(Pod::Html)
+BuildRequires: perl(Text::Template)
+BuildRequires: sed
 
-Requires: perl
-Requires: coreutils
+%if 0%{?with_check}
+BuildRequires: perl(Test::More)
+%endif
+
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
+Requires: coreutils
+Requires: perl
 
 %description
 The OpenSSL toolkit provides support for secure communications between
@@ -210,69 +219,6 @@ from other formats to the formats used by the OpenSSL toolkit.
 %autosetup -p1 -n %{name}-%{version}
 
 %build
-# Figure out which flags we want to use.
-# default
-sslarch=%{_os}-%{_target_cpu}
-%ifarch %ix86
-sslarch=linux-elf
-if ! echo %{_target} | grep -q i686 ; then
-	sslflags="no-asm 386"
-fi
-%endif
-%ifarch x86_64
-sslflags=enable-ec_nistp_64_gcc_128
-%endif
-%ifarch sparcv9
-sslarch=linux-sparcv9
-sslflags=no-asm
-%endif
-%ifarch sparc64
-sslarch=linux64-sparcv9
-sslflags=no-asm
-%endif
-%ifarch alpha alphaev56 alphaev6 alphaev67
-sslarch=linux-alpha-gcc
-%endif
-%ifarch s390 sh3eb sh4eb
-sslarch="linux-generic32 -DB_ENDIAN"
-%endif
-%ifarch s390x
-sslarch="linux64-s390x"
-%endif
-%ifarch %{arm}
-sslarch=linux-armv4
-%endif
-%ifarch aarch64
-sslarch=linux-aarch64
-sslflags=enable-ec_nistp_64_gcc_128
-%endif
-%ifarch sh3 sh4
-sslarch=linux-generic32
-%endif
-%ifarch ppc64 ppc64p7
-sslarch=linux-ppc64
-%endif
-%ifarch ppc64le
-sslarch="linux-ppc64le"
-sslflags=enable-ec_nistp_64_gcc_128
-%endif
-%ifarch mips mipsel
-sslarch="linux-mips32 -mips32r2"
-%endif
-%ifarch mips64 mips64el
-sslarch="linux64-mips64 -mips64r2"
-%endif
-%ifarch mips64el
-sslflags=enable-ec_nistp_64_gcc_128
-%endif
-%ifarch riscv64
-sslarch=linux-generic64
-%endif
-ktlsopt=enable-ktls
-%ifarch armv7hl
-ktlsopt=disable-ktls
-%endif
-
 # Add -Wa,--noexecstack here so that libcrypto's assembler modules will be
 # marked as not requiring an executable stack.
 # Also add -DPURIFY to make using valgrind with openssl easier as we do not
@@ -286,11 +232,11 @@ export HASHBANGPERL=/usr/bin/perl
 # usable on all platforms.  The Configure script already knows to use -fPIC and
 # NEW_RPM_OPT_FLAGS, so we can skip specifiying them here.
 ./Configure \
-	--prefix=%{_prefix} --openssldir=%{_sysconfdir}/pki/tls ${sslflags} --libdir=lib \
+	--prefix=%{_prefix} --openssldir=%{_sysconfdir}/pki/tls --libdir=lib \
 	zlib enable-camellia enable-seed enable-rfc3779 no-sctp \
-	enable-cms enable-md2 enable-rc5 ${ktlsopt} enable-fips\
+	enable-cms enable-md2 enable-rc5 enable-ec_nistp_64_gcc_128 enable-ktls enable-fips\
 	no-mdc2 no-ec2m no-sm2 no-sm4 enable-buildtest-c++\
-	shared  ${sslarch} $NEW_RPM_OPT_FLAGS '-DDEVRANDOM="\"/dev/urandom\""'\
+	shared $NEW_RPM_OPT_FLAGS '-DDEVRANDOM="\"/dev/urandom\""'\
 	-Wl,--allow-multiple-definition
 
 # Do not run this in a production package the FIPS symbols must be patched-in
@@ -474,6 +420,7 @@ install -m644 %{SOURCE9} \
 - Initial CBL-Mariner import from Fedora 39 (license: MIT).
 - License verified
 - Removed redhat-specific REDHAT_FIPS_VERSION and added/updated relevant patches
+- Remove handling of different architectures -- we always build on the target architecture
 
 * Thu Oct 26 2023 Sahana Prasad <sahana@redhat.com> - 1:3.1.4-1
 - Rebase to upstream version 3.1.4
