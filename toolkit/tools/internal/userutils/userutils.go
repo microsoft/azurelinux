@@ -78,7 +78,7 @@ func AddUser(username string, homeDir string, primaryGroup string, hashedPasswor
 	if uid != "" {
 		args = append(args, "-u", uid)
 	}
-	if homeDir =! "" {
+	if homeDir != "" {
 		args = append(args, "-d", homeDir)
 	}
 	if primaryGroup != "" {
