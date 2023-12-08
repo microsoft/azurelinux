@@ -151,6 +151,9 @@ done < cross.list
     popd
 
     %make_build -C cross-binutils tooldir=%{_prefix}
+
+    # Restore the original $PACKAGE value to not influence the native install steps.
+    sed -i -e 's/^ PACKAGE=cross-/ PACKAGE=/' */configure
 %endif
 
 
@@ -165,7 +168,7 @@ while read -r target
 do
     echo "=== INSTALL cross-compilation target $target ==="
     mkdir -p %{buildroot}%{_prefix}/$target/sys-root
-    %make_install -C $target tooldir=%{auxbin_prefix}/$target DESTDIR=%{buildroot}
+    %make_install -C $target tooldir=%{auxbin_prefix}/$target
 
     # Remove cross man files and ldscripts.
     rm -rf %{buildroot}%{_mandir}/man1/$target-*
@@ -179,7 +182,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
     echo "=== INSTALL po targets ==="
     for binary_name in binutils opcodes bfd gas ld gprof
     do
-        %make_install -C cross-binutils/$binary_name/po DESTDIR=%{buildroot}
+        %make_install -C cross-binutils/$binary_name/po
     done
 
     # Find the language files which only exist in the common package.
