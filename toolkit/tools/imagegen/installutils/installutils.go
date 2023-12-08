@@ -388,6 +388,7 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 
 	const (
 		filesystemPkg = "filesystem"
+		shadowUtilsPkg = "shadow-utils"
 	)
 
 	defer stopGPGAgent(installChroot)
@@ -440,6 +441,26 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 		return
 	}
 
+	if isRootFS && (len(config.Users) > 0 || len(config.Groups) > 0)  {
+		// Install shadow-utils package
+		packagesInstalled, err = TdnfInstallWithProgress(shadowUtilsPkg, installRoot, packagesInstalled, totalPackages, true)
+		if err != nil {
+			return
+		}
+
+		// Add groups
+		err = addGroups(installChroot, config.Groups)
+		if err != nil {
+			return
+		}
+
+		// Add users
+		err = addUsers(installChroot, config.Users)
+		if err != nil {
+			return
+		}
+	}
+
 	hostname := config.Hostname
 	if !isRootFS && mountPointToFsTypeMap[rootMountPoint] != overlay {
 		// Add /etc/hostname
@@ -479,12 +500,12 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 		if err != nil {
 			return
 		}
-	}
 
-	// Add users
-	err = addUsers(installChroot, config.Users)
-	if err != nil {
-		return
+		// Add users
+		err = addUsers(installChroot, config.Users)
+		if err != nil {
+			return
+		}
 	}
 
 	// Add machine-id
