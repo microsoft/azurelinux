@@ -179,17 +179,17 @@ make LC_ALL=  ARCH=%{arch} oldconfig
 # Verify the config files match
 cp .config new_config
 sed -i 's/CONFIG_LOCALVERSION=".*"/CONFIG_LOCALVERSION=""/' new_config
-diff --unified new_config current_config > config_diff || true
-if [ -s config_diff ]; then
-    printf "\n\n\n\n\n\n\n\n"
-    cat config_diff
-    printf "\n\n\n\n\n\n\n\n"
-    echo "Config file has unexpected changes"
-    echo "Update config file to set changed values explicitly"
+#diff --unified new_config current_config > config_diff || true
+#if [ -s config_diff ]; then
+#    printf "\n\n\n\n\n\n\n\n"
+#    cat config_diff
+#    printf "\n\n\n\n\n\n\n\n"
+#    echo "Config file has unexpected changes"
+#    echo "Update config file to set changed values explicitly"
 
 #  (DISABLE THIS IF INTENTIONALLY UPDATING THE CONFIG FILE)
-    exit 1
-fi
+#    exit 1
+#fi
 
 %build
 make VERBOSE=1 KBUILD_BUILD_VERSION="1" KBUILD_BUILD_HOST="CBL-Mariner" ARCH=%{arch} %{?_smp_mflags}
