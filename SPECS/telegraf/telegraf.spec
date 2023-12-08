@@ -10,22 +10,20 @@ URL:            https://github.com/influxdata/telegraf
 Source0:        %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Use the generate_source_tarball.sh script to get the vendored sources.
 Source1:        %{name}-%{version}-vendor.tar.gz
-
 BuildRequires:  golang
 BuildRequires:  iana-etc
 BuildRequires:  systemd-devel
 BuildRequires:  tzdata
-
 Requires:       iana-etc
 Requires:       logrotate
 Requires:       procps-ng
 Requires:       shadow-utils
 Requires:       systemd
 Requires:       tzdata
-Requires(pre):  %{_sbindir}/useradd
-Requires(pre):  %{_sbindir}/groupadd
-Requires(postun): %{_sbindir}/userdel
 Requires(postun): %{_sbindir}/groupdel
+Requires(postun): %{_sbindir}/userdel
+Requires(pre):  %{_sbindir}/groupadd
+Requires(pre):  %{_sbindir}/useradd
 
 %description
 Telegraf is an agent written in Go for collecting, processing, aggregating, and writing metrics.
@@ -84,7 +82,7 @@ fi
 %dir %{_sysconfdir}/%{name}/telegraf.d
 
 %changelog
-* Tue Dec 05 2023 Osama Esmail <osamaesmail@microsoft.com> 1.28.5-1
+* Tue Dec 05 2023 Osama Esmail <osamaesmail@microsoft.com> - 1.28.5-1
 - Updating to version 1.28.5 to address critical CVEs
 - Fix testing
 
