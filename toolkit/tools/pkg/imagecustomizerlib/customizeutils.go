@@ -28,7 +28,7 @@ const (
 )
 
 func doCustomizations(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
-	imageChroot *safechroot.Chroot, rpmsSources []string, useBaseImageRpmRepos bool,
+	imageChroot *safechroot.Chroot, rpmsSources []string, useBaseImageRpmRepos bool, partitionsCustomized bool,
 ) error {
 	var err error
 
@@ -42,7 +42,13 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
-	err = addRemoveAndUpdatePackages(buildDir, baseConfigPath, &config.SystemConfig, imageChroot, rpmsSources, useBaseImageRpmRepos)
+	err = refreshInitrd(partitionsCustomized, imageChroot)
+	if err != nil {
+		return err
+	}
+
+	err = addRemoveAndUpdatePackages(buildDir, baseConfigPath, &config.SystemConfig, imageChroot, rpmsSources,
+		useBaseImageRpmRepos)
 	if err != nil {
 		return err
 	}
@@ -132,6 +138,26 @@ func deleteResolvConf(imageChroot *safechroot.Chroot) error {
 	}
 
 	return err
+}
+
+func refreshInitrd(partitionsCustomized bool, imageChroot *safechroot.Chroot) error {
+	if !partitionsCustomized {
+		// The partitions weren't customized.
+		// So, the original initrd file should still be valid.
+		return nil
+	}
+
+	logger.Log.Infof("Refresh initrd")
+
+	// Run the script.
+	err := imageChroot.UnsafeRun(func() error {
+		return shell.ExecuteLiveWithErrAndCallbacks(logger.Log.Debug, func(...interface{}) {}, 1, "mkinitrd")
+	})
+	if err != nil {
+		return fmt.Errorf("mkinitrd failed:\n%w", err)
+	}
+
+	return nil
 }
 
 func updateHostname(hostname string, imageChroot *safechroot.Chroot) error {
