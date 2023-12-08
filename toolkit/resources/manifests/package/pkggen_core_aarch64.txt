@@ -1,5 +1,5 @@
 filesystem-1.1-18.cm2.aarch64.rpm
-kernel-headers-5.15.139.1-1.cm2.noarch.rpm
+kernel-headers-5.15.139.1-2.cm2.noarch.rpm
 glibc-2.35-6.cm2.aarch64.rpm
 glibc-devel-2.35-6.cm2.aarch64.rpm
 glibc-i18n-2.35-6.cm2.aarch64.rpm
@@ -12,8 +12,8 @@ zlib-devel-1.2.13-2.cm2.aarch64.rpm
 file-5.40-2.cm2.aarch64.rpm
 file-devel-5.40-2.cm2.aarch64.rpm
 file-libs-5.40-2.cm2.aarch64.rpm
-binutils-2.37-7.cm2.aarch64.rpm
-binutils-devel-2.37-7.cm2.aarch64.rpm
+binutils-2.37-8.cm2.aarch64.rpm
+binutils-devel-2.37-8.cm2.aarch64.rpm
 gmp-6.2.1-4.cm2.aarch64.rpm
 gmp-devel-6.2.1-4.cm2.aarch64.rpm
 mpfr-4.1.0-2.cm2.aarch64.rpm
