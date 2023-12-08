@@ -8,7 +8,7 @@
 
 Name:         kata-containers-cc
 Version:      0.6.2
-Release:      1%{?dist}
+Release:      2%{?dist}
 Summary:      Kata Confidential Containers
 License:      ASL 2.0
 Vendor:       Microsoft Corporation
@@ -187,6 +187,7 @@ find %{buildroot}/etc
 pushd %{_builddir}/%{name}-%{version}/src/agent
 mkdir -p %{buildroot}%{osbuilder}/src/agent/samples/policy
 cp -aR samples/policy/all-allowed         %{buildroot}%{osbuilder}/src/agent/samples/policy
+cp -aR samples/policy/set-policy-allowed  %{buildroot}%{osbuilder}/src/agent/samples/policy
 install -D -m 0755 kata-containers.target %{buildroot}%{osbuilder}/kata-containers.target
 install -D -m 0755 kata-agent.service.in  %{buildroot}%{osbuilder}/kata-agent.service.in
 install -D -m 0755 coco-opa.service       %{buildroot}%{osbuilder}/coco-opa.service
@@ -263,7 +264,9 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 
 %files tools
 %dir %{osbuilder}/src/agent/samples/policy/all-allowed
+%dir %{osbuilder}/src/agent/samples/policy/set-policy-allowed
 %{osbuilder}/src/agent/samples/policy/all-allowed/all-allowed.rego
+%{osbuilder}/src/agent/samples/policy/set-policy-allowed/set-policy-allowed.rego
 
 %{osbuilder}/mariner-coco-build-uvm.sh
 %{osbuilder}/kata-containers.target
@@ -289,6 +292,9 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %exclude %{osbuilder}/tools/osbuilder/rootfs-builder/ubuntu
 
 %changelog
+*   Fri Dec 7 2023 Manuel Huber <mahuber@microsoft.com> 0.6.2-2
+-   Default to enforcement of restrictive policy
+
 *   Fri Nov 3 2023 Dallas Delaney <dadelan@microsoft.com> 0.6.2-1
 -   Upgrade to version 0.6.2
 
