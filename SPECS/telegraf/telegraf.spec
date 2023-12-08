@@ -12,6 +12,7 @@ Source0:        %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-vendor.tar.gz
 
 BuildRequires:  golang
+BuildRequires:  iana-etc
 BuildRequires:  systemd-devel
 BuildRequires:  tzdata
 
