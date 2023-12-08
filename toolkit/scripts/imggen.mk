@@ -5,7 +5,7 @@ $(call create_folder,$(IMAGEGEN_DIR))
 
 # Resources
 config_name              = $(notdir $(CONFIG_FILE:%.json=%))
-config_other_files       = $(if $(CONFIG_FILE),$(shell $(SCRIPTS_DIR)/get_config_deps.sh $(CONFIG_FILE)),)
+config_other_files       = $(if $(CONFIG_FILE),$(call shell_real_build_only, $(SCRIPTS_DIR)/get_config_deps.sh $(CONFIG_FILE)),)
 assets_dir               = $(RESOURCES_DIR)/assets/
 assets_files             = $(call shell_real_build_only, find $(assets_dir))
 imggen_local_repo        = $(MANIFESTS_DIR)/image/local.repo
