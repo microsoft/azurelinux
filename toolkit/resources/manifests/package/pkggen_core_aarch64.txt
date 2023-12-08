@@ -1,5 +1,5 @@
 filesystem-1.1-18.azl3.aarch64.rpm
-kernel-headers-6.1.58.1-2.azl3.noarch.rpm
+kernel-headers-6.1.58.1-3.azl3.noarch.rpm
 glibc-2.38-1.azl3.aarch64.rpm
 glibc-devel-2.38-1.azl3.aarch64.rpm
 glibc-i18n-2.38-1.azl3.aarch64.rpm
