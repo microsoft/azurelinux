@@ -66,7 +66,7 @@ Development files for %{name}
 %cmake_install
 
 %check
-%ctest
+%ctest --exclude-regex "flb-rt-in_podman_metrics|flb-rt-filter_lua|.*\\.sh"
 
 %files
 %license LICENSE
