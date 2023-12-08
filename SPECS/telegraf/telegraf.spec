@@ -50,7 +50,6 @@ install -m 755 -D etc/logrotate.d/%{name} %{buildroot}%{_sysconfdir}/logrotate.d
 install -m 755 -D telegraf.conf %{buildroot}%{_sysconfdir}/%{name}/telegraf.conf
 
 %check
-echo $ZONEINFO
 make test
 
 %pre
