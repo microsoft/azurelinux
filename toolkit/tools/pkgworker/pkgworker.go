@@ -121,12 +121,14 @@ func main() {
 	builtRPMs, err := buildSRPMInChroot(chrootDir, rpmsDirAbsPath, toolchainDirAbsPath, *workerTar, *srpmFile, *repoFile, *rpmmacrosFile, *outArch, defines, *noCleanup, *runCheck, *packagesToInstall, ccacheManager, *timeout)
 	logger.PanicOnError(err, "Failed to build SRPM '%s'. For details see log file: %s .", *srpmFile, *logFile)
 
-	err = copySRPMToOutput(*srpmFile, srpmsDirAbsPath)
-	logger.PanicOnError(err, "Failed to copy SRPM '%s' to output directory '%s'.", *srpmFile, rpmsDirAbsPath)
-
-	// On success write a comma-seperated list of RPMs built to stdout that can be parsed by the invoker.
-	// Any output from logger will be on stderr so stdout will only contain this output.
+	// For regular (non-test) package builds:
+	// - Copy the SRPM which produced the package to the output directory.
+	// - Write a comma-separated list of RPMs built to stdout that can be parsed by the invoker.
+	//   Any output from logger will be on stderr so stdout will only contain this output.
 	if !*runCheck {
+		err = copySRPMToOutput(*srpmFile, srpmsDirAbsPath)
+		logger.PanicOnError(err, "Failed to copy SRPM '%s' to output directory '%s'.", *srpmFile, rpmsDirAbsPath)
+
 		fmt.Print(strings.Join(builtRPMs, ","))
 	}
 }
