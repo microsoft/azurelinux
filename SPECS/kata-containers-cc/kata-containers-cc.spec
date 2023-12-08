@@ -7,8 +7,8 @@
 %global debug_package %{nil}
 
 Name:         kata-containers-cc
-Version:      0.6.2
-Release:      2%{?dist}
+Version:      0.6.5
+Release:      1%{?dist}
 Summary:      Kata Confidential Containers
 License:      ASL 2.0
 Vendor:       Microsoft Corporation
@@ -17,7 +17,6 @@ Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/cc-
 Source1:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{name}-%{version}.tar.gz
 Source2:      %{name}-%{version}-cargo.tar.gz
 Source3:      mariner-coco-build-uvm.sh
-Patch0:       keep-uvm-rootfs-dependencies.patch
 
 ExclusiveArch: x86_64
 
@@ -293,6 +292,9 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %exclude %{osbuilder}/tools/osbuilder/rootfs-builder/ubuntu
 
 %changelog
+* Fri Dec 08 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.6.5-1
+- Auto-upgrade to 0.6.5
+
 *   Fri Dec 7 2023 Manuel Huber <mahuber@microsoft.com> 0.6.2-2
 -   Default to enforcement of restrictive policy
 
@@ -322,7 +324,6 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 *   Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.6.0-2
 -   Bump release to rebuild with go 1.19.12
 
-*   Tue Jul 11 2023 Dallas Delaney <dadelan@microsoft.com> 0.6.0-1
 -   Upgrade to version 0.6.0
 
 *   Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.4.2-2
