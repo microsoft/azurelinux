@@ -78,10 +78,9 @@ func AddUser(username string, homeDir string, primaryGroup string, hashedPasswor
 	if uid != "" {
 		args = append(args, "-u", uid)
 	}
-	if len(homeDir) == 0 {
-		homeDir = filepath.Join(UserHomeDirPrefix, username)
+	if homeDir =! "" {
+		args = append(args, "-d", homeDir)
 	}
-	args = append(args, "-d", homeDir)
 	if primaryGroup != "" {
 		args = append(args, "-g", primaryGroup)
 	}
