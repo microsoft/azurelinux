@@ -53,7 +53,7 @@
 Summary:        Intel PSM Libraries
 Name:           libpsm2
 Version:        11.2.206
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD-3-Clause OR GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -112,7 +112,7 @@ rm -f %{buildroot}%{_lib64dir}/*.a
 %license COPYING
 %{_lib64dir}/libpsm2.so.2.*
 %{_lib64dir}/libpsm2.so.2
-/lib/udev/rules.d/40-psm.rules
+%{_libdir}/udev/rules.d/40-psm.rules
 
 %files devel
 %{_lib64dir}/libpsm2.so
@@ -123,11 +123,14 @@ rm -f %{buildroot}%{_lib64dir}/*.a
 
 %files compat
 %{_lib64dir}/psm2-compat
-/lib/udev/rules.d/40-psm-compat.rules
+%{_libdir}/udev/rules.d/40-psm-compat.rules
 %{_libdir}/libpsm2
 %{_sysconfdir}/modprobe.d/libpsm2-compat.conf
 
 %changelog
+* Thu Dec 07 2023 Andrew Phelps <anphel@microsoft.com> - 11.2.206-3
+- Fix build issue by using _libdir macro
+
 * Mon Feb 06 2023 Riken Maharjan <rmaharjan@microsoft.com> - 11.2.206-2
 - Move from Extended to Core.
 
