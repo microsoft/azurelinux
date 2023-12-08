@@ -1,28 +1,7 @@
-# Overriding the default to call 'configure' from subdirectories.
-%global _configure ../configure
-
-# Where the binaries aimed at gcc will live (ie. /usr/<target>/bin/).
-%global auxbin_prefix %{_exec_prefix}
-
-%ifarch x86_64
-    %global build_cross 1
-%else
-    %global build_cross 0
-%endif
-
-%global build_aarch64 %{build_cross}
-
-%global do_files() \
-%if %2 \
-%files -n binutils-%1 \
-%{_prefix}/%1 \
-%{_bindir}/%1-* \
-%endif
-
 Summary:        Contains a linker, an assembler, and other tools
 Name:           binutils
 Version:        2.37
-Release:        8%{?dist}
+Release:        7%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -37,19 +16,7 @@ Patch2:         thin_archive_descriptor.patch
 Patch3:         CVE-2021-45078.patch
 Patch4:         CVE-2022-38533.patch
 Patch5:         CVE-2022-4285.patch
-# The gold linker doesn't understand the 'module_info.ld' script passed to all linkers and the tests fail to correctly link.
-Patch6:         disable_gold_test.patch
 Provides:       bundled(libiberty)
-
-# Moving macro before the "SourceX" tags breaks PR checks parsing the specs.
-%global do_package() \
-%if %2 \
-%package -n binutils-%1 \
-Summary: Cross-build binary utilities for %1 \
-Requires: cross-%{name}-common = %{version}-%{release} \
-%description -n binutils-%1 \
-Cross-build binary image generation, manipulation and query tools for the %1 architecture. \
-%endif
 
 %description
 The Binutils package contains a linker, an assembler,
@@ -63,61 +30,10 @@ Requires:       %{name} = %{version}
 It contains the libraries and header files to create applications
 for handling compiled objects.
 
-%if %{build_cross}
-%package -n cross-%{name}-common
-Summary: Cross-compilation binutils documentation
-BuildArch: noarch
-
-%description -n cross-%{name}-common
-Documentation for the cross-compilation binutils package.
-%endif
-
-%do_package aarch64-linux-gnu %{build_aarch64}
-
 %prep
 %autosetup -p1
 
-function prep_target () {
-    local target=$1
-    local condition=$2
-
-    if [ $condition != 0 ]
-    then
-        echo $1 >> cross.list
-    fi
-}
-
-touch cross.list
-prep_target aarch64-linux-gnu %{build_aarch64}
-
-%if %{build_cross}
-    # $PACKAGE is used for the gettext catalog name when building 'cross-binutils-common'.
-    sed -i -e 's/^ PACKAGE=/ PACKAGE=cross-/' */configure
-%endif
-
 %build
-
-function config_cross_target () {
-    local target=$1
-
-    mkdir $target
-    pushd $target
-
-    %configure \
-        --exec-prefix=%{auxbin_prefix} \
-        --program-prefix=$target- \
-        --target=$target \
-        --disable-multilib \
-        --disable-nls \
-        --disable-install_libbfd \
-        --with-sysroot=%{_prefix}/$target/sys-root
-
-    popd
-}
-
-mkdir build
-pushd build
-
 %configure \
     --disable-silent-rules \
     --disable-werror    \
@@ -127,75 +43,20 @@ pushd build
     --enable-shared     \
     --with-system-zlib
 
-popd
-
-%make_build -C build tooldir=%{_prefix}
-
-while read -r target
-do
-    echo "=== BUILD cross-compilation target $target ==="
-    config_cross_target $target
-    %make_build -C $target tooldir=%{_prefix}
-done < cross.list
-
-%if %{build_cross}
-    # For documentation purposes only.
-    mkdir cross-binutils
-    pushd cross-binutils
-
-    %configure \
-        --exec-prefix=%{auxbin_prefix} \
-        --program-prefix=cross- \
-        --disable-dependency-tracking \
-        --disable-silent-rules \
-        --disable-shared
-
-    popd
-
-    %make_build -C cross-binutils tooldir=%{_prefix}
-%endif
-
+%make_build tooldir=%{_prefix}
 
 %install
-%make_install -C build tooldir=%{_prefix}
+%make_install tooldir=%{_prefix}
+find %{buildroot} -type f -name "*.la" -delete -print
+rm -rf %{buildroot}%{_infodir}
 %find_lang %{name} --all-name
 
-install -m 644 build/libiberty/pic/libiberty.a %{buildroot}%{_libdir}
+install -m 644 libiberty/pic/libiberty.a %{buildroot}%{_libdir}
 install -m 644 include/libiberty.h %{buildroot}%{_includedir}
 
-while read -r target
-do
-    echo "=== INSTALL cross-compilation target $target ==="
-    mkdir -p %{buildroot}%{_prefix}/$target/sys-root
-    %make_install -C $target tooldir=%{auxbin_prefix}/$target DESTDIR=%{buildroot}
-
-    # Remove cross man files and ldscripts.
-    rm -rf %{buildroot}%{_mandir}/man1/$target-*
-    rm -rf %{buildroot}%{auxbin_prefix}/*/lib
-done < cross.list
-
-rm -rf %{buildroot}%{_infodir}
-find %{buildroot} -type f -name "*.la" -delete -print
-
-%if %{build_cross}
-    echo "=== INSTALL po targets ==="
-    for binary_name in binutils opcodes bfd gas ld gprof
-    do
-        %make_install -C cross-binutils/$binary_name/po DESTDIR=%{buildroot}
-    done
-
-    # Find the language files which only exist in the common package.
-    (
-        for binary_name in binutils opcodes bfd gas ld gprof
-        do
-            %find_lang cross-$binary_name
-            cat cross-${binary_name}.lang
-        done
-    ) >files.cross
-%endif
-
 %check
-%make_build -C build tooldir=%{_prefix} check
+sed -i 's/testsuite/ /g' gold/Makefile
+%make_build check
 
 %ldconfig_scriptlets
 
@@ -221,8 +82,6 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_bindir}/readelf
 %{_bindir}/strip
 %{_libdir}/ldscripts/*
-%{_libdir}/libbfd-%{version}.so
-%{_libdir}/libopcodes-%{version}.so
 %{_mandir}/man1/readelf.1.gz
 %{_mandir}/man1/windmc.1.gz
 %{_mandir}/man1/ranlib.1.gz
@@ -241,6 +100,8 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man1/windres.1.gz
 %{_mandir}/man1/size.1.gz
 %{_mandir}/man1/objdump.1.gz
+%{_libdir}/libbfd-%{version}.so
+%{_libdir}/libopcodes-%{version}.so
 
 %files devel
 %{_includedir}/ansidecl.h
@@ -269,18 +130,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libopcodes.a
 %{_libdir}/libopcodes.so
 
-%if %{build_cross}
-%files -n cross-%{name}-common -f files.cross
-%license COPYING
-%endif
-
-%do_files aarch64-linux-gnu %{build_aarch64}
-
 %changelog
-* Fri Nov 17 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.37-8
-- Add the cross-compilation subpackage for aarch64.
-- Used Fedora 38 spec (license: MIT) for guidance.
-
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.37-7
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
