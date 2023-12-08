@@ -387,7 +387,7 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 	defer timestamp.StopEvent(nil)
 
 	const (
-		filesystemPkg = "filesystem"
+		filesystemPkg  = "filesystem"
 		shadowUtilsPkg = "shadow-utils"
 	)
 
@@ -441,7 +441,7 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 		return
 	}
 
-	if isRootFS && (len(config.Users) > 0 || len(config.Groups) > 0)  {
+	if isRootFS && (len(config.Users) > 0 || len(config.Groups) > 0) {
 		// Install shadow-utils package
 		packagesInstalled, err = TdnfInstallWithProgress(shadowUtilsPkg, installRoot, packagesInstalled, totalPackages, true)
 		if err != nil {
