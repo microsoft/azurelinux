@@ -29,7 +29,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.1.58.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -413,6 +413,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Thu Dec 07 2023 Rachel Menge <rachelmenge@microsoft.com> - 6.1.58.1-3
+- Update 6.1 to have parity with ARM configs for 5.15
+
 * Fri Dec 01 2023 Cameron Baird <cameronbaird@microsoft.com> - 6.1.58.1-2
 - Remove loglevel=3, causing kernel to boot with the config-defined value,
     CONSOLE_LOGLEVEL_DEFAULT.
@@ -422,6 +425,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 - Remove support for imx8 dtb subpackage
 - Add patch for perf_bpf_test_add_nonnull_argument
 - Add cpio BuildRequires
+- Ensure parity with 2.0 kernel configs
 
 * Mon Oct 23 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.135.1-2
 - Enable CONFIG_BINFMT_MISC
