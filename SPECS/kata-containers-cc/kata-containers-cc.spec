@@ -187,7 +187,8 @@ find %{buildroot}/etc
 pushd %{_builddir}/%{name}-%{version}/src/agent
 mkdir -p %{buildroot}%{osbuilder}/src/agent/samples/policy
 cp -aR samples/policy/all-allowed         %{buildroot}%{osbuilder}/src/agent/samples/policy
-cp -aR samples/policy/set-policy-allowed  %{buildroot}%{osbuilder}/src/agent/samples/policy
+kdir -p %{buildroot}%{osbuilder}/src/agent/samples/policy/set-policy-allowed
+cp samples/policy/set-policy-allowed/set-policy-allowed.rego %{buildroot}%{osbuilder}/src/agent/samples/policy/set-policy-allowed
 install -D -m 0755 kata-containers.target %{buildroot}%{osbuilder}/kata-containers.target
 install -D -m 0755 kata-agent.service.in  %{buildroot}%{osbuilder}/kata-agent.service.in
 install -D -m 0755 coco-opa.service       %{buildroot}%{osbuilder}/coco-opa.service
