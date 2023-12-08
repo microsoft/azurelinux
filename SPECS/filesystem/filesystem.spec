@@ -561,18 +561,18 @@ posix.mkdir("/sys")
 posix.chmod("/proc", 0555)
 posix.chmod("/sys", 0555)
 
-# Prior to filesystem-1.1-16, /media used to be a symlink to /run/media but this was
-# replaced with a directory. The RPM upgrade operation generally worked when the /media
-# symlink is a dangling link, which is commonly the case, however not always the case.
-#
-# And when the /media symlink is indeed properly pointing to a real /run/media, RPM has a
-# known limitation where it is not possible to replace an active symlink with a directory,
-# and thus the RPM transation fails.
-#
-# To workaround this, a %pretrans scriptlet must run to test and remove the symlink
-# before RPM attempts to install the new directory.
-#
-# https://docs.fedoraproject.org/en-US/packaging-guidelines/Directory_Replacement
+-- Prior to filesystem-1.1-16, /media used to be a symlink to /run/media but this was
+-- replaced with a directory. The RPM upgrade operation generally worked when the /media
+-- symlink is a dangling link, which is commonly the case, however not always the case.
+--
+-- And when the /media symlink is indeed properly pointing to a real /run/media, RPM has a
+-- known limitation where it is not possible to replace an active symlink with a directory,
+-- and thus the RPM transation fails.
+--
+-- To workaround this, a %pretrans scriptlet must run to test and remove the symlink
+-- before RPM attempts to install the new directory.
+--
+-- https://docs.fedoraproject.org/en-US/packaging-guidelines/Directory_Replacement
 path = "/media"
 st = posix.stat(path)
 if st and st.type == "link" then
