@@ -1,8 +1,8 @@
 # Got the intial spec from Fedora and modified it
 Summary:        An enhanced version of csh, the C shell
 Name:           tcsh
-Version:        6.22.03
-Release:        2%{?dist}
+Version:        6.24.10
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -117,6 +117,9 @@ fi
 %{_mandir}/man1/*.1*
 
 %changelog
+* Fri Dec 08 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.24.10-1
+- Auto-upgrade to 6.24.10 - 3.0 upgrades
+
 * Fri Nov 10 2023 Andrew Phelps <anphel@microsoft.com> - 6.22.03-2
 - Link with libxcrypt
 
