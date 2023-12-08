@@ -126,9 +126,9 @@ gperf-debuginfo-3.1-5.azl3.x86_64.rpm
 gpgme-1.23.2-1.azl3.x86_64.rpm
 gpgme-debuginfo-1.23.2-1.azl3.x86_64.rpm
 gpgme-devel-1.23.2-1.azl3.x86_64.rpm
-grep-3.11-1.azl3.x86_64.rpm
-grep-debuginfo-3.11-1.azl3.x86_64.rpm
-grep-lang-3.11-1.azl3.x86_64.rpm
+grep-3.11-2.azl3.x86_64.rpm
+grep-debuginfo-3.11-2.azl3.x86_64.rpm
+grep-lang-3.11-2.azl3.x86_64.rpm
 gtk-doc-1.33.2-1.azl3.noarch.rpm
 gzip-1.13-1.azl3.x86_64.rpm
 gzip-debuginfo-1.13-1.azl3.x86_64.rpm
