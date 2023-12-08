@@ -268,7 +268,6 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %{osbuilder}/mariner-coco-build-uvm.sh
 %{osbuilder}/kata-containers.target
 %{osbuilder}/kata-agent.service.in
-%{osbuilder}/coco-opa.service
 %{osbuilder}/kata-agent
 %{osbuilder}/ci/install_yq.sh
 
