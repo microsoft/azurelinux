@@ -12,7 +12,6 @@ BuildRequires:  pcre2-devel
 %if %{with_check}
 BuildRequires:  perl(File::Find)
 %endif
-Requires:       pcre2
 Conflicts:      toybox
 
 %description
