@@ -185,6 +185,14 @@ Group:          System Environment/Base
 Directory for package-specific boot configurations
 to be persistently stored on AzureLinux
 
+%package extra-modules
+Summary:        Additional optional modules to improve the grub console.
+Group:          System Environment/Base
+
+%description extra-modules
+Additional optional modules to improve the grub console
+dev experience. 
+
 %prep
 # Remove module_info.ld script due to error "grub2-install: error: Decompressor is too big"
 LDFLAGS="`echo " %{build_ldflags} " | sed 's#-Wl,-dT,%{_topdir}/BUILD/module_info.ld##'`"
@@ -302,6 +310,7 @@ GRUB_MODULE_NAME=
 GRUB_MODULE_SOURCE=
 
 install -d $EFI_BOOT_DIR
+install -d $EFI_BOOT_DIR/x86_64-efi/
 
 # Install grub2 macros
 mkdir -p %{buildroot}%{_rpmconfigdir}/macros.d
@@ -312,6 +321,8 @@ GRUB_MODULE_NAME=grubx64.efi
 GRUB_PXE_MODULE_NAME=grubx64-noprefix.efi
 GRUB_MODULE_SOURCE=%{buildroot}%{_datadir}/grub2-efi/grubx64.efi
 GRUB_PXE_MODULE_SOURCE=%{buildroot}%{_datadir}/grub2-efi/grubx64-noprefix.efi
+
+cp ./install-for-efi/usr/lib/grub/x86_64-efi/* $EFI_BOOT_DIR/x86_64-efi/
 %endif
 
 %ifarch aarch64
@@ -319,6 +330,7 @@ GRUB_MODULE_NAME=grubaa64.efi
 GRUB_PXE_MODULE_NAME=grubaa64-noprefix.efi
 GRUB_MODULE_SOURCE=%{buildroot}%{_datadir}/grub2-efi/grubaa64.efi
 GRUB_PXE_MODULE_SOURCE=%{buildroot}%{_datadir}/grub2-efi/grubaa64-noprefix.efi
+GRUB_EXTRA_MODULES_SUBDIR=x86_64-efi
 %endif
 
 cp $GRUB_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_MODULE_NAME
@@ -385,6 +397,11 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 
 %files configuration
 %{_sysconfdir}/default/grub.d
+
+%files extra-modules
+%ifarch x86_64
+/boot/efi/EFI/BOOT/x86_64-efi/*
+%endif
 
 %changelog
 * Wed Oct 18 2023 Gary Swalling <gaswal@microsoft.com> - 2.06-12
