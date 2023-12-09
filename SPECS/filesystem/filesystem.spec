@@ -567,7 +567,7 @@ posix.chmod("/sys", 0555)
 --
 -- And when the /media symlink is indeed properly pointing to a real /run/media, RPM has a
 -- known limitation where it is not possible to replace an active symlink with a directory,
--- and thus the RPM transation fails.
+-- and thus the RPM transaction fails.
 --
 -- To workaround this, a %pretrans scriptlet must run to test and remove the symlink
 -- before RPM attempts to install the new directory.
