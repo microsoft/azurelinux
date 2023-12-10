@@ -556,8 +556,8 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 		setupChrootPackages = append(setupChrootPackages, toolingPackage.Name)
 	}
 
-	logger.Log.Infof("HidepidDisabled is %v.", systemConfig.HidepidDisabled)
-	hidepidEnabled := !systemConfig.HidepidDisabled
+	logger.Log.Infof("EnableHidepid is %v.", systemConfig.EnableHidepid)
+	hidepidEnabled := systemConfig.EnableHidepid
 
 	if systemConfig.ReadOnlyVerityRoot.Enable {
 		// We will need the veritysetup package (and its dependencies) to manage the verity disk, add them to our
