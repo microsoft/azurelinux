@@ -166,14 +166,6 @@ if [[ ! -f %{_tdnf_history_db_dir}/history.db ]]; then
     %{_libdir}/tdnf/tdnf-history-util init
 fi
 
-# Make the decision to update yum sym link during post script
-# not package build. Some workloads want to disable tdnf, so
-# decision should not be made during build but during install
-# of package.
-if [ ! -h $(rpm --eval %{_bindir})/yum ]; then
-ln -sf $(rpm --eval %{_bindir})/tdnf $(rpm --eval %{_bindir})/yum
-fi
-
 %preun
 if  [[ $(readlink $(rpm --eval %{_bindir})/yum) == $(rpm --eval %{_bindir})/tdnf ]]; then
   rm $(rpm --eval %{_bindir})/yum
@@ -181,6 +173,15 @@ fi
 
 %postun
 /sbin/ldconfig
+
+%posttrans
+# Make the decision to update yum sym link during post script
+# not package build. Some workloads want to disable tdnf, so
+# decision should not be made during build but during install
+# of package.
+if [ ! -h $(rpm --eval %{_bindir})/yum ]; then
+ln -sf $(rpm --eval %{_bindir})/tdnf $(rpm --eval %{_bindir})/yum
+fi
 
 %files
 %license COPYING
