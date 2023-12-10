@@ -208,10 +208,10 @@ lua-5.4.4-1.cm2.aarch64.rpm
 lua-libs-5.4.4-1.cm2.aarch64.rpm
 mariner-rpm-macros-2.0-24.cm2.noarch.rpm
 mariner-check-macros-2.0-24.cm2.noarch.rpm
-tdnf-3.5.2-2.cm2.aarch64.rpm
-tdnf-cli-libs-3.5.2-2.cm2.aarch64.rpm
-tdnf-devel-3.5.2-2.cm2.aarch64.rpm
-tdnf-plugin-repogpgcheck-3.5.2-2.cm2.aarch64.rpm
+tdnf-3.5.2-3.cm2.aarch64.rpm
+tdnf-cli-libs-3.5.2-3.cm2.aarch64.rpm
+tdnf-devel-3.5.2-3.cm2.aarch64.rpm
+tdnf-plugin-repogpgcheck-3.5.2-3.cm2.aarch64.rpm
 libassuan-2.5.5-2.cm2.aarch64.rpm
 libassuan-devel-2.5.5-2.cm2.aarch64.rpm
 libgpg-error-1.46-1.cm2.aarch64.rpm
