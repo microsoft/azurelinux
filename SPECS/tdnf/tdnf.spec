@@ -174,16 +174,13 @@ if [ ! -h $(rpm --eval %{_bindir})/yum ]; then
 ln -sf $(rpm --eval %{_bindir})/tdnf $(rpm --eval %{_bindir})/yum
 fi
 
-
 %preun
 if  [[ $(readlink $(rpm --eval %{_bindir})/yum) == $(rpm --eval %{_bindir})/tdnf ]]; then
   rm $(rpm --eval %{_bindir})/yum
 fi
 
-
 %postun
 /sbin/ldconfig
-
 
 %files
 %license COPYING
