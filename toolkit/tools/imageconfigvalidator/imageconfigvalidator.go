@@ -120,6 +120,7 @@ func validatePackages(config configuration.Config) (err error) {
 		verityDebugPkgName = "verity-read-only-root-debug-tools"
 		dracutFipsPkgName  = "dracut-fips"
 		fipsKernelCmdLine  = "fips=1"
+		grub2PkgName       = "grub2"
 	)
 
 	for _, systemConfig := range config.SystemConfigs {
@@ -131,6 +132,7 @@ func validatePackages(config configuration.Config) (err error) {
 		foundVerityInitramfsPackage := false
 		foundVerityInitramfsDebugPackage := false
 		foundDracutFipsPackage := false
+		foundGrub2Package := false
 		kernelCmdLineString := systemConfig.KernelCommandLine.ExtraCommandLine
 		for _, pkg := range packageList {
 			if pkg == "kernel" {
@@ -147,6 +149,9 @@ func validatePackages(config configuration.Config) (err error) {
 			}
 			if pkg == selinuxPkgName {
 				foundSELinuxPackage = true
+			}
+			if pkg == grub2PkgName {
+				foundGrub2Package = true
 			}
 		}
 		if systemConfig.ReadOnlyVerityRoot.Enable {
@@ -165,6 +170,11 @@ func validatePackages(config configuration.Config) (err error) {
 		if systemConfig.KernelCommandLine.SELinux != configuration.SELinuxOff {
 			if !foundSELinuxPackage {
 				return fmt.Errorf("%s: [SELinux] selected, but '%s' package is not included in the package lists", validateError, selinuxPkgName)
+			}
+		}
+		if systemConfig.EnableGrubMkconfig {
+			if !foundGrub2Package {
+				return fmt.Errorf("%s: [EnableGrubMkconfig] selected, but '%s' package is not included in the package lists", validateError, grub2PkgName)
 			}
 		}
 	}
