@@ -20,6 +20,7 @@ type SystemConfig struct {
 	IsKickStartBoot      bool                      `json:"IsKickStartBoot"`
 	IsIsoInstall         bool                      `json:"IsIsoInstall"`
 	BootType             string                    `json:"BootType"`
+	EnableGrubMkconfig   bool                      `json:"EnableGrubMkconfig"`
 	Hostname             string                    `json:"Hostname"`
 	Name                 string                    `json:"Name"`
 	PackageLists         []string                  `json:"PackageLists"`
