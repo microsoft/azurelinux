@@ -1126,6 +1126,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "blobfuse",
+          "version": "1.4.5",
+          "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse-1.4.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "blobfuse2",
           "version": "2.1.0",
           "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse2-2.1.0.tar.gz"

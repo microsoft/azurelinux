@@ -2144,6 +2144,7 @@
                 "azure-iot-sdk-c",
                 "azure-storage-cpp",
                 "bazel",
+                "blobfuse",
                 "blobfuse2",
                 "bmon",
                 "bpftrace",
