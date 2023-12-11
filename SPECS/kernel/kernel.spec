@@ -318,7 +318,7 @@ rm -rf %{_localstatedir}/lib/rpm-state/initramfs/pending/%{uname_r}
 rm -rf /boot/initrd.img-%{uname_r}
 echo "initrd of kernel %{uname_r} removed" >&2
 
-%preun -n kernel-tools
+%preun tools
 %systemd_preun cpupower.service
 
 %postun
@@ -332,6 +332,8 @@ then
      fi
 fi
 %grub2_postun
+
+%postun tools
 %systemd_postun cpupower.service
 
 %post
@@ -417,7 +419,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_docdir}/*
 %{_includedir}/perf/perf_dlfilter.h
 %{_unitdir}/cpupower.service
-%{_sysconfdir}/sysconfig/cpupower
+%config(noreplace) %{_sysconfdir}/sysconfig/cpupower
 
 %files -n python3-perf
 %{python3_sitearch}/*
