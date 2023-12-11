@@ -1,6 +1,6 @@
 Summary:        agent for collecting, processing, aggregating, and writing metrics.
 Name:           telegraf
-Version:        1.27.4
+Version:        1.28.5
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -8,21 +8,22 @@ Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://github.com/influxdata/telegraf
 Source0:        %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-# Use the generate_source_tarbbal.sh script to get the vendored sources.
+# Use the generate_source_tarball.sh script to get the vendored sources.
 Source1:        %{name}-%{version}-vendor.tar.gz
-Patch0:         CVE-2023-46129.patch
-
 BuildRequires:  golang
+BuildRequires:  iana-etc
 BuildRequires:  systemd-devel
-
+BuildRequires:  tzdata
+Requires:       iana-etc
 Requires:       logrotate
 Requires:       procps-ng
 Requires:       shadow-utils
 Requires:       systemd
-Requires(pre):  %{_sbindir}/useradd
-Requires(pre):  %{_sbindir}/groupadd
-Requires(postun): %{_sbindir}/userdel
+Requires:       tzdata
 Requires(postun): %{_sbindir}/groupdel
+Requires(postun): %{_sbindir}/userdel
+Requires(pre):  %{_sbindir}/groupadd
+Requires(pre):  %{_sbindir}/useradd
 
 %description
 Telegraf is an agent written in Go for collecting, processing, aggregating, and writing metrics.
@@ -36,7 +37,7 @@ Postgres, or Redis) and third party APIs (like Mailchimp, AWS CloudWatch, or Goo
 tar -xf %{SOURCE1}
 
 %build
-go build -mod=vendor ./cmd/telegraf
+go build -buildvcs=false -mod=vendor ./cmd/telegraf
 
 %install
 mkdir -pv %{buildroot}%{_sysconfdir}/%{name}/%{name}.d
@@ -47,6 +48,9 @@ install -m 755 -D etc/logrotate.d/%{name} %{buildroot}%{_sysconfdir}/logrotate.d
 # Provide empty config file.
 ./%{name} config > telegraf.conf
 install -m 755 -D telegraf.conf %{buildroot}%{_sysconfdir}/%{name}/telegraf.conf
+
+%check
+make test
 
 %pre
 getent group telegraf >/dev/null || groupadd -r telegraf
@@ -77,6 +81,10 @@ fi
 %dir %{_sysconfdir}/%{name}/telegraf.d
 
 %changelog
+* Tue Dec 05 2023 Osama Esmail <osamaesmail@microsoft.com> - 1.28.5-1
+- Updating to version 1.28.5 to address critical CVEs
+- Fix testing
+
 * Thu Nov 09 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.27.4-1
 - Backporting patch for CVE-2023-46129.
 - Updating to version 1.27.4.
