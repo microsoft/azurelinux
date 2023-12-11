@@ -484,16 +484,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "apparmor",
-          "version": "3.0.4",
-          "downloadUrl": "https://launchpad.net/apparmor/3.0/3.0.4/+download/apparmor-3.0.4.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "application-gateway-kubernetes-ingress",
           "version": "1.7.2",
           "downloadUrl": "https://github.com/Azure/application-gateway-kubernetes-ingress/archive/refs/tags/1.7.2.tar.gz"
@@ -1129,16 +1119,6 @@
           "name": "blktrace",
           "version": "1.3.0",
           "downloadUrl": "https://git.kernel.org/pub/scm/linux/kernel/git/axboe/blktrace.git/snapshot/blktrace-1.3.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "blobfuse",
-          "version": "1.4.5",
-          "downloadUrl": "https://github.com/Azure/azure-storage-fuse/archive/blobfuse-1.4.5.tar.gz"
         }
       }
     },
@@ -2207,8 +2187,8 @@
         "type": "other",
         "other": {
           "name": "crash",
-          "version": "8.0.3",
-          "downloadUrl": "https://github.com/crash-utility/crash/archive/8.0.3.tar.gz"
+          "version": "8.0.4",
+          "downloadUrl": "https://github.com/crash-utility/crash/archive/8.0.4.tar.gz"
         }
       }
     },
