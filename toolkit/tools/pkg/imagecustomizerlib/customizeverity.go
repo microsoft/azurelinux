@@ -15,17 +15,12 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 )
 
-func enableVerityPartition(Verity imagecustomizerapi.Verity, imageChroot *safechroot.Chroot) error {
+func enableVerityPartition(imageChroot *safechroot.Chroot) error {
 	var err error
-
-	// Ensure the VerityPartition value is the supported type: 'root'. TODO: add another supported type 'user'
-	if Verity.VerityTab != "root" {
-		return fmt.Errorf("invalid VerityPartition: %s. It should be 'root' only at this time.", Verity.VerityTab)
-	}
 
 	// Integrate systemd veritysetup dracut module into initramfs img.
 	systemdVerityDracutModule := "systemd-veritysetup"
-	err = buildDracutModule(systemdVerityDracutModule, imageChroot) 
+	err = buildDracutModule(systemdVerityDracutModule, imageChroot)
 	if err != nil {
 		return err
 	}
@@ -134,15 +129,15 @@ func updateMarinerCfgWithInitramfs(imageChroot *safechroot.Chroot) error {
 	return nil
 }
 
-func updateGrubConfig(resolvedVerityDevice string, resolvedHashDevice string, salt string, rootHash string, verityErrorBehavior imagecustomizerapi.VerityErrorBehavior, bootMountDir string) error {
+func updateGrubConfig(resolvedDataPartition string, resolvedHashPartition string, rootHash string, verityErrorBehavior imagecustomizerapi.VerityErrorBehavior, bootMountDir string) error {
 	var err error
 
-	const cmdlineTemplate = "rd.systemd.verity=1 roothash=%s systemd.verity_root_data=%s systemd.verity_root_hash=%s systemd.verity_root_options=%s,salt=%s"
+	const cmdlineTemplate = "rd.systemd.verity=1 roothash=%s systemd.verity_root_data=%s systemd.verity_root_hash=%s systemd.verity_root_options=%s"
 	verityErrorBehaviorString, err := VerityErrorBehaviorToImager(verityErrorBehavior)
 	if err != nil {
 		return err
 	}
-	newArgs := fmt.Sprintf(cmdlineTemplate, rootHash, resolvedVerityDevice, resolvedHashDevice, verityErrorBehaviorString, salt)
+	newArgs := fmt.Sprintf(cmdlineTemplate, rootHash, resolvedDataPartition, resolvedHashPartition, verityErrorBehaviorString)
 	grubConfigPath := filepath.Join(bootMountDir, "grub2/grub.cfg")
 
 	content, err := os.ReadFile(grubConfigPath)
@@ -184,12 +179,9 @@ func findFreeNBDDevice() (string, error) {
 	}
 
 	for _, file := range files {
-		size, err := os.ReadFile(filepath.Join(file, "size"))
-		if err != nil {
-			continue
-		}
-
-		if strings.TrimSpace(string(size)) == "0" {
+		// Check if the pid file exists. If it does not exist, the device is likely free.
+		pidFile := filepath.Join(file, "pid")
+		if _, err := os.Stat(pidFile); os.IsNotExist(err) {
 			return "/dev/" + filepath.Base(file), nil
 		}
 	}
@@ -214,8 +206,8 @@ func convertToNbdDevicePath(nbdDevice, systemDevice string) (string, error) {
 func findDeviceByUUIDOrLabel(uuidOrLabel string) (string, error) {
 	// Error if the input is already a device path
 	if strings.HasPrefix(uuidOrLabel, "/dev/") {
-        return uuidOrLabel, nil
-    }
+		return uuidOrLabel, nil
+	}
 
 	// Resolve UUIDs and LABELs
 	for _, dir := range []string{"by-partuuid", "by-partlabel", "by-uuid", "by-label"} {
