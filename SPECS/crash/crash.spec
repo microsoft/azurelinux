@@ -1,5 +1,5 @@
 Name:          crash
-Version:       8.0.3
+Version:       8.0.4
 Release:       1%{?dist}
 Summary:       kernel crash analysis utility for live systems, netdump, diskdump, kdump, LKCD or mcore dumpfiles
 Group:         Development/Tools
@@ -63,6 +63,9 @@ cp -p defs.h %{buildroot}%{_includedir}/crash
 %{_includedir}/crash/*.h
 
 %changelog
+* Thu Dec 07 2023 Andrew Phelps <anphel@microsoft.com> - 8.0.4-1
+- Upgrade to 8.0.4
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.0.3-1
 - Auto-upgrade to 8.0.3 - Azure Linux 3.0 - package upgrades
 

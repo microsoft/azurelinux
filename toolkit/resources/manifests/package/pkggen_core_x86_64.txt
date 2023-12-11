@@ -1,5 +1,5 @@
 filesystem-1.1-18.azl3.x86_64.rpm
-kernel-headers-6.1.58.1-2.azl3.noarch.rpm
+kernel-headers-6.1.58.1-3.azl3.noarch.rpm
 glibc-2.38-1.azl3.x86_64.rpm
 glibc-devel-2.38-1.azl3.x86_64.rpm
 glibc-i18n-2.38-1.azl3.x86_64.rpm
@@ -54,8 +54,8 @@ procps-ng-4.0.4-1.azl3.x86_64.rpm
 procps-ng-devel-4.0.4-1.azl3.x86_64.rpm
 procps-ng-lang-4.0.4-1.azl3.x86_64.rpm
 m4-1.4.19-2.azl3.x86_64.rpm
-grep-3.11-1.azl3.x86_64.rpm
-grep-lang-3.11-1.azl3.x86_64.rpm
+grep-3.11-2.azl3.x86_64.rpm
+grep-lang-3.11-2.azl3.x86_64.rpm
 diffutils-3.10-1.azl3.x86_64.rpm
 gawk-5.2.2-1.azl3.x86_64.rpm
 findutils-4.9.0-1.azl3.x86_64.rpm
