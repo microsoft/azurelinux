@@ -65,7 +65,7 @@ pip3 install pretend pytest hypothesis iso8601 cryptography_vectors pytz
 %{python3_sitelib}/*
 
 %changelog
-* Wed Dec 08 2023 Aadhar Agarwal <aadagarwal@microsoft.com> - 3.3.2-6
+* Fri Dec 08 2023 Aadhar Agarwal <aadagarwal@microsoft.com> - 3.3.2-6
 - Patch CVE-2023-49083
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.3.2-5
