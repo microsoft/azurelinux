@@ -1,10 +1,11 @@
 # Where the binaries aimed at gcc will live (ie. /usr/<target>/bin/).
 %global auxbin_prefix %{_exec_prefix}
 
-%global srcdir .# %%{name}-%%{version}
+%global srcdir %{name}-%{version}
 
 # Overriding the default to call 'configure' from subdirectories.
 # %%global _configure ../%%{srcdir}/configure
+# %%global _configure ../configure
 
 %ifarch x86_64
     %global build_cross 1
@@ -77,10 +78,8 @@ Documentation for the cross-compilation binutils package.
 %do_package aarch64-linux-gnu %{build_aarch64}
 
 %prep
-%autosetup -p1
-# %%setup -q -c
-# cd %%{srcdir}
-# %%autopatch -p1
+# %%autosetup -p1
+%setup -q -c
 
 function prep_target () {
     local target=$1
@@ -92,7 +91,10 @@ function prep_target () {
     fi
 }
 
-# cd ..
+cd %{srcdir}
+%autopatch -p1
+cd ..
+
 touch cross.list
 prep_target aarch64-linux-gnu %{build_aarch64}
 
@@ -117,7 +119,8 @@ function config_cross_target () {
 }
 
 # mkdir build
-# pushd build
+cp -r %{srcdir} build
+pushd build
 
 %configure \
     --disable-silent-rules \
@@ -128,10 +131,10 @@ function config_cross_target () {
     --enable-shared     \
     --with-system-zlib
 
-# popd
-
 %make_build tooldir=%{_prefix}
-# %%make_build -C build tooldir=%%{_prefix}
+popd
+
+# %%make_build tooldir=%{_prefix}
 
 # while read -r target
 # do
@@ -165,14 +168,17 @@ function config_cross_target () {
 
 
 %install
+pushd build
 %make_install tooldir=%{_prefix}
-# %%make_install -C build tooldir=%%{_prefix}
+# %%make_install -C build tooldir=%{_prefix}
 %find_lang %{name} --all-name
 
 # install -m 644 build/libiberty/pic/libiberty.a %{buildroot}%{_libdir}
 # install -m 644 %{srcdir}/include/libiberty.h %{buildroot}%{_includedir}
+
 install -m 644 libiberty/pic/libiberty.a %{buildroot}%{_libdir}
 install -m 644 include/libiberty.h %{buildroot}%{_includedir}
+popd
 
 # while read -r target
 # do
@@ -210,10 +216,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %ldconfig_scriptlets
 
-%files -f %{name}.lang
+%files -f build/%{name}.lang
 %defattr(-,root,root)
-# %%license %{srcdir}/COPYING
-%license COPYING
+%license %{srcdir}/COPYING
+# %%license COPYING
 %{_bindir}/dwp
 %{_bindir}/gprof
 %{_bindir}/ld.bfd
