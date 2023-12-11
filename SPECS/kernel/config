@@ -1980,7 +1980,7 @@ CONFIG_EFI_EARLYCON=y
 # end of Tegra firmware driver
 # end of Firmware Drivers
 
-CONFIG_GNSS=y
+CONFIG_GNSS=m
 # CONFIG_MTD is not set
 # CONFIG_OF is not set
 CONFIG_ARCH_MIGHT_HAVE_PC_PARPORT=y
