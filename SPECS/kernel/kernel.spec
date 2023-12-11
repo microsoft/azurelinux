@@ -28,8 +28,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        6.1.58.1
-Release:        3%{?dist}
+Version:        6.6.2.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -40,7 +40,6 @@ Source1:        config
 Source2:        config_aarch64
 Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20211013.pem
-Patch0:         perf_bpf_test_add_nonnull_argument.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -58,6 +57,7 @@ BuildRequires:  kmod-devel
 BuildRequires:  libcap-devel
 BuildRequires:  libdnet-devel
 BuildRequires:  libmspack-devel
+BuildRequires:  libtraceevent-devel
 BuildRequires:  openssl
 BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
@@ -156,7 +156,6 @@ manipulation of eBPF programs and maps.
 
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{mariner_version}-%{version}
-%patch0 -p1
 make mrproper
 
 cp %{config_source} .config
@@ -381,12 +380,12 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %exclude %dir %{_libdir}/debug
 %ifarch x86_64
 %{_sbindir}/cpufreq-bench
-%{_lib64dir}/traceevent
 %{_lib64dir}/libperf-jvmti.so
 %{_lib64dir}/libcpupower.so*
 %{_sysconfdir}/cpufreq-bench.conf
 %{_includedir}/cpuidle.h
 %{_includedir}/cpufreq.h
+%{_includedir}/powercap.h
 %{_mandir}/man1/cpupower*.gz
 %{_mandir}/man8/turbostat*.gz
 %{_datadir}/locale/*/LC_MESSAGES/cpupower.mo
@@ -401,8 +400,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_datadir}/perf-core/strace/groups/file
 %{_datadir}/perf-core/strace/groups/string
 %{_docdir}/*
-%{_libdir}/perf/examples/bpf/*
-%{_libdir}/perf/include/bpf/*
 %{_includedir}/perf/perf_dlfilter.h
 
 %files -n python3-perf
@@ -413,6 +410,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Wed Dec 13 2023 Rachel Menge <rachelmenge@microsoft.com> - 6.6.2.1-1
+- Upgrade to 6.6.2.1
+- Add libtraceevent-devel to BuildRequires
+
 * Thu Dec 07 2023 Rachel Menge <rachelmenge@microsoft.com> - 6.1.58.1-3
 - Update 6.1 to have parity with ARM configs for 5.15
 
