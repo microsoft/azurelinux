@@ -1,13 +1,15 @@
 Summary:        Python cryptography library
 Name:           python-cryptography
 Version:        3.3.2
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/cryptography
 Source0:        https://pypi.io/packages/source/c/cryptography/cryptography-%{version}.tar.gz
+Patch0:    CVE-2023-49083-1.patch
+Patch0:    CVE-2023-49083.patch
 Patch0:         CVE-2023-23931.patch
 %if %{with_check}
 BuildRequires:  python3-pip
@@ -64,6 +66,9 @@ pip3 install pretend pytest hypothesis iso8601 cryptography_vectors pytz
 %{python3_sitelib}/*
 
 %changelog
+* Mon Dec 11 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.3.2-6
+- Add patch for CVE-2023-49083
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.3.2-5
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
