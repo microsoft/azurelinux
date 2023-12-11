@@ -239,7 +239,7 @@
             "ReadOnlyVerityRoot": {
                 "Enable": false
             },
-            "HidepidDisabled": true
+            "EnableHidepid": true
         },
         {
             "Name": "BiggerDiskA",

@@ -440,9 +440,9 @@ A sample KernelCommandLine enabling CGroup and booting with cgroupv2 enabled:
 },
 ```
 
-### HidepidDisabled
+### EnableHidepid
 
-An optional flag that removes the `hidepid` option from `/proc`. `Hidepid` prevents proc IDs from being visible to all users. Set this flag if mounting `/proc` in postinstall scripts to ensure the mount options are set correctly.
+An optional flag that enables the stricter `hidepid` option in `/proc` (`hidepid=2`). `hidepid` prevents proc IDs from being visible to all users.
 
 ### Users
 
