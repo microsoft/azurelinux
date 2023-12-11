@@ -3,10 +3,6 @@
 
 %global srcdir %{name}-%{version}
 
-# Overriding the default to call 'configure' from subdirectories.
-# %%global _configure ../%%{srcdir}/configure
-# %%global _configure ../configure
-
 %ifarch x86_64
     %global build_cross 1
 %else
@@ -18,8 +14,8 @@
 %global do_files() \
 %if %2 \
 %files -n binutils-%1 \
-# %%{_prefix}/%%1 \
-# %%{_bindir}/%%1-* \
+%{_prefix}/%1 \
+%{_bindir}/%1-* \
 %endif
 
 Summary:        Contains a linker, an assembler, and other tools
@@ -78,7 +74,6 @@ Documentation for the cross-compilation binutils package.
 %do_package aarch64-linux-gnu %{build_aarch64}
 
 %prep
-# %%autosetup -p1
 %setup -q -c
 
 function prep_target () {
@@ -103,7 +98,7 @@ prep_target aarch64-linux-gnu %{build_aarch64}
 function config_cross_target () {
     local target=$1
 
-    mkdir $target
+    cp -r %{srcdir} $target
     pushd $target
 
     %configure \
@@ -118,7 +113,12 @@ function config_cross_target () {
     popd
 }
 
-# mkdir build
+# Native components build steps.
+
+# Copying extracted sources for each run of "configure" and "make".
+# Building in separate subdirectories but with a single source causes
+# other packages to fail with a "configure: error: C compiler cannot create executables" error.
+# Proper fix needed and moved to a separate bug at the time of writing this comment.
 cp -r %{srcdir} build
 pushd build
 
@@ -131,85 +131,85 @@ pushd build
     --enable-shared     \
     --with-system-zlib
 
-%make_build tooldir=%{_prefix}
 popd
+%make_build -C build tooldir=%{_prefix}
 
-# %%make_build tooldir=%{_prefix}
 
-# while read -r target
-# do
-#     echo "=== BUILD cross-compilation target $target ==="
-#     config_cross_target $target
-#     %%make_build -C $target tooldir=%%{_prefix}
-# done < cross.list
+# Cross-compilation components build steps.
 
-# %%if %%{build_cross}
-#     # For documentation purposes only.
-#     # $PACKAGE is used for the gettext catalog name when building 'cross-binutils-common'.
-#     sed -i -e 's/^ PACKAGE=/ PACKAGE=cross-/' %%{srcdir}/*/configure
+while read -r target
+do
+    echo "=== BUILD cross-compilation target $target ==="
+    config_cross_target $target
+    %make_build -C $target tooldir=%{_prefix}
+done < cross.list
 
-#     mkdir cross-binutils
-#     pushd cross-binutils
+%if %{build_cross}
+    # For documentation purposes only.
 
-#     %%configure \
-#         --exec-prefix=%%{auxbin_prefix} \
-#         --program-prefix=cross- \
-#         --disable-dependency-tracking \
-#         --disable-silent-rules \
-#         --disable-shared
+    cp -r %{srcdir} cross-binutils
+    pushd cross-binutils
 
-#     popd
+    # $PACKAGE is used for the gettext catalog name when building 'cross-binutils-common'.
+    sed -i -e 's/^ PACKAGE=/ PACKAGE=cross-/' */configure
 
-#     %%make_build -C cross-binutils tooldir=%%{_prefix}
+    %configure \
+        --exec-prefix=%{auxbin_prefix} \
+        --program-prefix=cross- \
+        --disable-dependency-tracking \
+        --disable-silent-rules \
+        --disable-shared
 
-#     # Restore the original $PACKAGE value to not influence the native install steps.
-#     sed -i -e 's/^ PACKAGE=cross-/ PACKAGE=/' %%{srcdir}/*/configure
-# %%endif
+    popd
+    %make_build -C cross-binutils tooldir=%{_prefix}
+%endif
 
 
 %install
-pushd build
-%make_install tooldir=%{_prefix}
-# %%make_install -C build tooldir=%{_prefix}
-%find_lang %{name} --all-name
+# Native components installation steps.
 
-# install -m 644 build/libiberty/pic/libiberty.a %{buildroot}%{_libdir}
-# install -m 644 %{srcdir}/include/libiberty.h %{buildroot}%{_includedir}
+pushd build
+
+%make_install tooldir=%{_prefix}
+%find_lang %{name} --all-name
 
 install -m 644 libiberty/pic/libiberty.a %{buildroot}%{_libdir}
 install -m 644 include/libiberty.h %{buildroot}%{_includedir}
+
 popd
 
-# while read -r target
-# do
-#     echo "=== INSTALL cross-compilation target $target ==="
-#     mkdir -p %%{buildroot}%%{_prefix}/$target/sys-root
-#     %%make_install -C $target tooldir=%%{auxbin_prefix}/$target
+# Cross-compilation components installation steps.
 
-#     # Remove cross man files and ldscripts.
-#     rm -rf %%{buildroot}%%{_mandir}/man1/$target-*
-#     rm -rf %%{buildroot}%%{auxbin_prefix}/*/lib
-# done < cross.list
+while read -r target
+do
+    echo "=== INSTALL cross-compilation target $target ==="
+    mkdir -p %{buildroot}%{_prefix}/$target/sys-root
+    %make_install -C $target tooldir=%{auxbin_prefix}/$target
+
+    # Remove cross man files and ldscripts.
+    rm -rf %{buildroot}%{_mandir}/man1/$target-*
+    rm -rf %{buildroot}%{auxbin_prefix}/*/lib
+done < cross.list
 
 rm -rf %{buildroot}%{_infodir}
 find %{buildroot} -type f -name "*.la" -delete -print
 
-# %%if %%{build_cross}
-#     echo "=== INSTALL po targets ==="
-#     for binary_name in binutils opcodes bfd gas ld gprof
-#     do
-#         %%make_install -C cross-binutils/$binary_name/po
-#     done
+%if %{build_cross}
+    echo "=== INSTALL po targets ==="
+    for binary_name in binutils opcodes bfd gas ld gprof
+    do
+        %make_install -C cross-binutils/$binary_name/po
+    done
 
-#     # Find the language files which only exist in the common package.
-#     (
-#         for binary_name in binutils opcodes bfd gas ld gprof
-#         do
-#             %%find_lang cross-$binary_name
-#             cat cross-${binary_name}.lang
-#         done
-#     ) >files.cross
-# %%endif
+    # Find the language files which only exist in the common package.
+    (
+        for binary_name in binutils opcodes bfd gas ld gprof
+        do
+            %find_lang cross-$binary_name
+            cat cross-${binary_name}.lang
+        done
+    ) >files.cross
+%endif
 
 %check
 %make_build -C build tooldir=%{_prefix} check
@@ -219,7 +219,6 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %files -f build/%{name}.lang
 %defattr(-,root,root)
 %license %{srcdir}/COPYING
-# %%license COPYING
 %{_bindir}/dwp
 %{_bindir}/gprof
 %{_bindir}/ld.bfd
@@ -288,9 +287,8 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libopcodes.so
 
 %if %{build_cross}
-%files -n cross-%{name}-common
-#-f files.cross
-# %%license %%{srcdir}/COPYING
+%files -n cross-%{name}-common -f files.cross
+%license %{srcdir}/COPYING
 %endif
 
 %do_files aarch64-linux-gnu %{build_aarch64}
