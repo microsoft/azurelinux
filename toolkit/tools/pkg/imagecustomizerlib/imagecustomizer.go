@@ -67,7 +67,7 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 	}
 
 	// Validate config.
-	err = validateConfig(baseConfigPath, config)
+	err = validateConfig(baseConfigPath, config, rpmsSources, useBaseImageRpmRepos)
 	if err != nil {
 		return fmt.Errorf("invalid image config:\n%w", err)
 	}
@@ -94,13 +94,14 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 	}
 
 	// Customize the partitions.
-	buildImageFile, err = customizePartitions(buildDirAbs, baseConfigPath, config, buildImageFile)
+	partitionsCustomized, buildImageFile, err := customizePartitions(buildDirAbs, baseConfigPath, config, buildImageFile)
 	if err != nil {
 		return err
 	}
 
 	// Customize the raw image file.
-	err = customizeImageHelper(buildDirAbs, baseConfigPath, config, buildImageFile, rpmsSources, useBaseImageRpmRepos)
+	err = customizeImageHelper(buildDirAbs, baseConfigPath, config, buildImageFile, rpmsSources, useBaseImageRpmRepos,
+		partitionsCustomized)
 	if err != nil {
 		return err
 	}
@@ -134,10 +135,13 @@ func toQemuImageFormat(imageFormat string) (string, error) {
 	}
 }
 
-func validateConfig(baseConfigPath string, config *imagecustomizerapi.Config) error {
-	var err error
+func validateConfig(baseConfigPath string, config *imagecustomizerapi.Config, rpmsSources []string,
+	useBaseImageRpmRepos bool,
+) error {
+	partitionsCustomized := hasPartitionCustomizations(config)
 
-	err = validateSystemConfig(baseConfigPath, &config.SystemConfig)
+	err := validateSystemConfig(baseConfigPath, &config.SystemConfig, rpmsSources, useBaseImageRpmRepos,
+		partitionsCustomized)
 	if err != nil {
 		return err
 	}
@@ -145,8 +149,19 @@ func validateConfig(baseConfigPath string, config *imagecustomizerapi.Config) er
 	return nil
 }
 
-func validateSystemConfig(baseConfigPath string, config *imagecustomizerapi.SystemConfig) error {
+func hasPartitionCustomizations(config *imagecustomizerapi.Config) bool {
+	return config.Disks != nil
+}
+
+func validateSystemConfig(baseConfigPath string, config *imagecustomizerapi.SystemConfig,
+	rpmsSources []string, useBaseImageRpmRepos bool, partitionsCustomized bool,
+) error {
 	var err error
+
+	err = validatePackageLists(baseConfigPath, config, rpmsSources, useBaseImageRpmRepos, partitionsCustomized)
+	if err != nil {
+		return err
+	}
 
 	for sourceFile := range config.AdditionalFiles {
 		sourceFileFullPath := filepath.Join(baseConfigPath, sourceFile)
@@ -200,8 +215,49 @@ func validateScript(baseConfigPath string, script *imagecustomizerapi.Script) er
 	return nil
 }
 
+func validatePackageLists(baseConfigPath string, config *imagecustomizerapi.SystemConfig, rpmsSources []string,
+	useBaseImageRpmRepos bool, partitionsCustomized bool,
+) error {
+	allPackagesRemove, err := collectPackagesList(baseConfigPath, config.PackageListsRemove, config.PackagesRemove)
+	if err != nil {
+		return err
+	}
+
+	allPackagesInstall, err := collectPackagesList(baseConfigPath, config.PackageListsInstall, config.PackagesInstall)
+	if err != nil {
+		return err
+	}
+
+	allPackagesUpdate, err := collectPackagesList(baseConfigPath, config.PackageListsUpdate, config.PackagesUpdate)
+	if err != nil {
+		return err
+	}
+
+	hasRpmSources := len(rpmsSources) > 0 || useBaseImageRpmRepos
+
+	if !hasRpmSources {
+		needRpmsSources := len(allPackagesInstall) > 0 || len(allPackagesUpdate) > 0 || config.UpdateBaseImagePackages
+
+		if needRpmsSources {
+			return fmt.Errorf("have packages to install or update but no RPM sources were specified")
+		} else if partitionsCustomized {
+			return fmt.Errorf("partitions were customized so the initramfs package needs to be reinstalled but no RPM sources were specified")
+		}
+	}
+
+	config.PackagesRemove = allPackagesRemove
+	config.PackagesInstall = allPackagesInstall
+	config.PackagesUpdate = allPackagesUpdate
+
+	config.PackageListsRemove = nil
+	config.PackageListsInstall = nil
+	config.PackageListsUpdate = nil
+
+	return nil
+}
+
 func customizeImageHelper(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
-	buildImageFile string, rpmsSources []string, useBaseImageRpmRepos bool,
+	buildImageFile string, rpmsSources []string, useBaseImageRpmRepos bool, partitionsCustomized bool,
 ) error {
 	imageConnection, err := connectToExistingImage(buildImageFile, buildDir, "imageroot")
 	if err != nil {
@@ -210,7 +266,8 @@ func customizeImageHelper(buildDir string, baseConfigPath string, config *imagec
 	defer imageConnection.Close()
 
 	// Do the actual customizations.
-	err = doCustomizations(buildDir, baseConfigPath, config, imageConnection.Chroot(), rpmsSources, useBaseImageRpmRepos)
+	err = doCustomizations(buildDir, baseConfigPath, config, imageConnection.Chroot(), rpmsSources,
+		useBaseImageRpmRepos, partitionsCustomized)
 	if err != nil {
 		return err
 	}
