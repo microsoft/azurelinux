@@ -119,38 +119,32 @@ func TestCustomizeImageCopyFiles(t *testing.T) {
 }
 
 func TestValidateConfigValidAdditionalFiles(t *testing.T) {
-	var err error
-
-	err = validateConfig(testDir, &imagecustomizerapi.Config{
+	err := validateConfig(testDir, &imagecustomizerapi.Config{
 		SystemConfig: imagecustomizerapi.SystemConfig{
 			AdditionalFiles: map[string]imagecustomizerapi.FileConfigList{
 				"files/a.txt": {{Path: "/a.txt"}},
 			},
-		}})
+		}}, nil, true)
 	assert.NoError(t, err)
 }
 
 func TestValidateConfigMissingAdditionalFiles(t *testing.T) {
-	var err error
-
-	err = validateConfig(testDir, &imagecustomizerapi.Config{
+	err := validateConfig(testDir, &imagecustomizerapi.Config{
 		SystemConfig: imagecustomizerapi.SystemConfig{
 			AdditionalFiles: map[string]imagecustomizerapi.FileConfigList{
 				"files/missing_a.txt": {{Path: "/a.txt"}},
 			},
-		}})
+		}}, nil, true)
 	assert.Error(t, err)
 }
 
 func TestValidateConfigdditionalFilesIsDir(t *testing.T) {
-	var err error
-
-	err = validateConfig(testDir, &imagecustomizerapi.Config{
+	err := validateConfig(testDir, &imagecustomizerapi.Config{
 		SystemConfig: imagecustomizerapi.SystemConfig{
 			AdditionalFiles: map[string]imagecustomizerapi.FileConfigList{
 				"files": {{Path: "/a.txt"}},
 			},
-		}})
+		}}, nil, true)
 	assert.Error(t, err)
 }
 
@@ -167,7 +161,7 @@ func TestValidateConfigScript(t *testing.T) {
 					Path: "scripts/finalizeimagescript.sh",
 				},
 			},
-		}})
+		}}, nil, true)
 	assert.NoError(t, err)
 }
 
@@ -179,7 +173,7 @@ func TestValidateConfigScriptNonLocalFile(t *testing.T) {
 					Path: "../a.sh",
 				},
 			},
-		}})
+		}}, nil, true)
 	assert.Error(t, err)
 }
 
@@ -191,7 +185,7 @@ func TestValidateConfigScriptNonExecutable(t *testing.T) {
 					Path: "files/a.txt",
 				},
 			},
-		}})
+		}}, nil, true)
 	assert.Error(t, err)
 }
 
