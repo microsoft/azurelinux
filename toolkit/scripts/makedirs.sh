@@ -9,10 +9,10 @@
 # New directories will be created with timestamp 0.
 
 DIR="${1}"
-USER="${2}"
+MARINER_USER="${2}"
 
-if [[ -z "${DIR}" ]] || [[ -z "${USER}" ]]; then
-    echo "mkdirs.sh: No directory or user specified (input: DIR: '${DIR}', USER: '${USER}')"
+if [[ -z "${DIR}" ]] || [[ -z "${MARINER_USER}" ]]; then
+    echo "mkdirs.sh: No directory or user specified (input: DIR: '${DIR}', USER: '${MARINER_USER}')"
     exit 1
 fi
 
@@ -20,5 +20,15 @@ if [[ -d "${DIR}" ]]; then
     # Directory already exists, no need to do anything
     exit 0
 else
-    runuser -u "${USER}" -- mkdir -p "${DIR}" || { echo "Failed to create '${DIR}'" ; exit 1 ; }
+    if [[ "${USER}" == "root" ]]; then
+        # If the current user is root, use runuser to create the directory as the specified user
+        runuser -u "${MARINER_USER}" -- mkdir -p "${DIR}" || { echo "Failed to create '${DIR}'" ; exit 1 ; }
+    elif [[ "${MARINER_USER}" == "${USER}" ]]; then
+        # Otherwise check if the user is the same as the current user, and create the directory as the current user
+        mkdir -p "${DIR}" || { echo "Failed to create '${DIR}'" ; exit 1 ; }
+    else
+        # Otherwise, the user is not the current user, and not root, so we cannot create the directory
+        echo "mkdirs.sh: Mariner build user '${MARINER_USER}' is not the current user '${USER}', and not running with sudo, cannot create '${DIR}'"
+        exit 1
+    fi
 fi
