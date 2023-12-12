@@ -179,7 +179,7 @@ fi
 # not package build. Some workloads want to disable tdnf, so
 # decision should not be made during build but during install
 # of package.
-if [ ! -h $(rpm --eval %{_bindir})/yum ]; then
+if [ ! -e $(rpm --eval %{_bindir})/yum ]; then
 ln -sf $(rpm --eval %{_bindir})/tdnf $(rpm --eval %{_bindir})/yum
 fi
 
