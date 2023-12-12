@@ -204,9 +204,8 @@ ln -s "../include" "$TEMP_SYSROOT/usr/include"
 # Ideally we would like to model this after the %%configure macro in the future.
 cd %{_builddir}/%{name}-build
 ../gcc-%{version}/configure \
-            --cache-file=/dev/null \
-            --prefix=%{_cross_prefix} \
-            --target=%{_tuple} \
+            --program-prefix=$target- \
+            --target=$target \
             --disable-multilib \
             --enable-shared \
             --enable-threads=posix \
@@ -217,8 +216,9 @@ cd %{_builddir}/%{name}-build
             --enable-linker-build-id \
             --enable-plugin \
             --enable-default-pie \
-            --with-sysroot=%{_cross_sysroot} \
-            --with-build-sysroot="$TEMP_SYSROOT"
+            --with-sysroot=%{_prefix}/$target/sys-root \
+            --with-build-sysroot="$TEMP_SYSROOT" \
+            --with-system-zlib
 
 make %{?_smp_mflags}
 
