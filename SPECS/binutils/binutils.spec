@@ -86,9 +86,9 @@ function prep_target () {
     fi
 }
 
-cd %{srcdir}
+pushd %{srcdir}
 %autopatch -p1
-cd ..
+popd
 
 touch cross.list
 prep_target aarch64-linux-gnu %{build_aarch64}
