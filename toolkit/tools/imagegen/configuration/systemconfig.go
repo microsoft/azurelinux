@@ -20,6 +20,7 @@ type SystemConfig struct {
 	IsKickStartBoot      bool                      `json:"IsKickStartBoot"`
 	IsIsoInstall         bool                      `json:"IsIsoInstall"`
 	BootType             string                    `json:"BootType"`
+	EnableGrubMkconfig   bool                      `json:"EnableGrubMkconfig"`
 	Hostname             string                    `json:"Hostname"`
 	Name                 string                    `json:"Name"`
 	PackageLists         []string                  `json:"PackageLists"`
@@ -38,7 +39,7 @@ type SystemConfig struct {
 	Encryption           RootEncryption            `json:"Encryption"`
 	RemoveRpmDb          bool                      `json:"RemoveRpmDb"`
 	ReadOnlyVerityRoot   ReadOnlyVerityRoot        `json:"ReadOnlyVerityRoot"`
-	HidepidDisabled      bool                      `json:"HidepidDisabled"`
+	EnableHidepid        bool                      `json:"EnableHidepid"`
 }
 
 // GetRootPartitionSetting returns a pointer to the partition setting describing the disk which
@@ -175,8 +176,6 @@ func (s *SystemConfig) IsValid() (err error) {
 	}
 
 	//Validate Encryption
-
-	//Validate HidepidDisabled
 
 	return
 }

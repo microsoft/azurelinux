@@ -440,9 +440,6 @@ case $(uname -m) in
     ;;
 esac
 
-# PCRE needs to be installed (above) for grep to build with perl regexp support
-build_rpm_in_chroot_no_install grep
-
 # Lua needs to be installed for RPM to build
 build_rpm_in_chroot_no_install lua
 chroot_and_install_rpms lua lua
@@ -553,6 +550,9 @@ chroot_and_install_rpms swig
 build_rpm_in_chroot_no_install libselinux
 
 chroot_and_install_rpms libselinux
+
+# PCRE2 needs to be installed (above) for grep to build with perl regexp support
+build_rpm_in_chroot_no_install grep
 
 # coreutils and findutils require libselinux
 # for SELinux support.

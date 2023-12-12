@@ -1,7 +1,7 @@
 Summary:        A shared library implementation of IPMI and the basic tools
 Name:           OpenIPMI
 Version:        2.0.32
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+ AND GPLv2+ OR BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -121,6 +121,7 @@ echo "disable ipmi.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-ip
 %defattr(-,root,root)
 %license COPYING
 %{_libdir}/libOpenIPMIcmdlang.so.*
+%{_libdir}/libOpenIPMIglib.so*
 %{_libdir}/libOpenIPMIposix.so.*
 %{_libdir}/libOpenIPMIpthread.so.*
 %{_libdir}/libOpenIPMI.so.*
@@ -188,6 +189,9 @@ echo "disable ipmi.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-ip
 %{_mandir}/man5/ipmi_sim_cmd.5.gz
 
 %changelog
+* Fri Dec 08 2023 Andrew Phelps <anphel@microsoft.com> - 2.0.32-2
+- Add missing file
+
 * Tue Feb 22 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.0.32-1
 - Upgrading to version 2.0.32.
 

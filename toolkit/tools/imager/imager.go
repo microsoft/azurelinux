@@ -556,9 +556,6 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 		setupChrootPackages = append(setupChrootPackages, toolingPackage.Name)
 	}
 
-	logger.Log.Infof("HidepidDisabled is %v.", systemConfig.HidepidDisabled)
-	hidepidEnabled := !systemConfig.HidepidDisabled
-
 	if systemConfig.ReadOnlyVerityRoot.Enable {
 		// We will need the veritysetup package (and its dependencies) to manage the verity disk, add them to our
 		// image setup environment (setuproot chroot or live installer).
@@ -600,7 +597,7 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 	timestamp.StopEvent(nil) // install chroot packages
 
 	// Populate image contents
-	err = installutils.PopulateInstallRoot(installChroot, packagesToInstall, systemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, isRootFS, encryptedRoot, diffDiskBuild, hidepidEnabled)
+	err = installutils.PopulateInstallRoot(installChroot, packagesToInstall, systemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, isRootFS, encryptedRoot, diffDiskBuild)
 	if err != nil {
 		err = fmt.Errorf("failed to populate image contents: %s", err)
 		return
@@ -733,6 +730,15 @@ func configureDiskBootloader(systemConfig configuration.SystemConfig, installChr
 	if err != nil {
 		err = fmt.Errorf("failed to install grubenv file: %s", err)
 		return
+	}
+
+	// Use grub mkconfig to replace the static template .cfg with a dynamically generated version if desired.
+	if systemConfig.EnableGrubMkconfig {
+		err = installutils.CallGrubMkconfig(installChroot)
+		if err != nil {
+			err = fmt.Errorf("failed to generate grub.cfg via grub2-mkconfig: %s", err)
+			return
+		}
 	}
 
 	return

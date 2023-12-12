@@ -173,6 +173,9 @@ A sample `ParitionSettings` entry using `overlay` algorithm:
 `RdiffBaseImage` represents the base image when `rdiff` algorithm is used.
 `OverlayBaseImage` represents the base image when `overlay` algorithm is used.
 
+### EnableGrubMkconfig
+EnableGrubMkconfig is a optional boolean that controls whether the image uses grub2-mkconfig to generate the boot configuration (/boot/grub2/grub.cfg) or not. If EnableGrubMkconfig is specified, only valid values are `true` and `false`. Default is `false`. 
+
 ### PackageLists
 
 PackageLists key consists of an array of relative paths to the package lists (JSON files).
@@ -400,7 +403,7 @@ ImaPolicy is a list of Integrity Measurement Architecture (IMA) policies to enab
 EnableFIPS is a optional boolean option that controls whether the image tools create the image with FIPS mode enabled or not. If EnableFIPS is specificed, only valid values are `true` and `false`.
 
 #### ExtraCommandLine
-ExtraCommandLine is a string which will be appended to the end of the kernel command line and may contain any additional parameters desired. The `` ` `` character is reserved and may not be used. **Note: Some kernel command line parameters are already configured by default in [grub.cfg](../../resources/assets/grub2/grub.cfg). Many command line options may be overwritten by passing a new value. If a specific argument must be removed from the existing grub template a `FinalizeImageScript` is currently required.
+ExtraCommandLine is a string which will be appended to the end of the kernel command line and may contain any additional parameters desired. The `` ` `` character is reserved and may not be used. **Note: Some kernel command line parameters are already configured by default in [grub.cfg](../../resources/assets/grub2/grub.cfg) and [/etc/default/grub](../../resources/assets/grub2/grub) for mkconfig-based images. Many command line options may be overwritten by passing a new value. If a specific argument must be removed from the existing grub template a `FinalizeImageScript` is currently required.
 
 #### SELinux
 The Security Enhanced Linux (SELinux) feature is enabled by using the `SELinux` key, with value containing the mode to use on boot.  The `enforcing` and `permissive` values will set the mode in /etc/selinux/config.
@@ -437,9 +440,9 @@ A sample KernelCommandLine enabling CGroup and booting with cgroupv2 enabled:
 },
 ```
 
-### HidepidDisabled
+### EnableHidepid
 
-An optional flag that removes the `hidepid` option from `/proc`. `Hidepid` prevents proc IDs from being visible to all users. Set this flag if mounting `/proc` in postinstall scripts to ensure the mount options are set correctly.
+An optional flag that enables the stricter `hidepid` option in `/proc` (`hidepid=2`). `hidepid` prevents proc IDs from being visible to all users.
 
 ### Users
 

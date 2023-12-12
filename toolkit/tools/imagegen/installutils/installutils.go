@@ -380,8 +380,7 @@ func PackageNamesFromConfig(config configuration.Config) (packageList []*pkgjson
 // - isRootFS specifies if the installroot is either backed by a directory (rootfs) or a raw disk
 // - encryptedRoot stores information about the encrypted root device if root encryption is enabled
 // - diffDiskBuild is a flag that denotes whether this is a diffdisk build or not
-// - hidepidEnabled is a flag that denotes whether /proc will be mounted with the hidepid option
-func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []string, config configuration.SystemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string, isRootFS bool, encryptedRoot diskutils.EncryptedRootDevice, diffDiskBuild, hidepidEnabled bool) (err error) {
+func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []string, config configuration.SystemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string, isRootFS bool, encryptedRoot diskutils.EncryptedRootDevice, diffDiskBuild bool) (err error) {
 	timestamp.StartEvent("populating install root", nil)
 	defer timestamp.StopEvent(nil)
 
@@ -468,7 +467,7 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 
 	if !isRootFS {
 		// Configure system files
-		err = configureSystemFiles(installChroot, hostname, config, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, hidepidEnabled)
+		err = configureSystemFiles(installChroot, hostname, config, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot)
 		if err != nil {
 			return
 		}
@@ -618,7 +617,7 @@ func TdnfInstallWithProgress(packageName, installRoot string, currentPackagesIns
 	return
 }
 
-func configureSystemFiles(installChroot *safechroot.Chroot, hostname string, config configuration.SystemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string, encryptedRoot diskutils.EncryptedRootDevice, hidepidEnabled bool) (err error) {
+func configureSystemFiles(installChroot *safechroot.Chroot, hostname string, config configuration.SystemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string, encryptedRoot diskutils.EncryptedRootDevice) (err error) {
 	// Update hosts file
 	err = updateHosts(installChroot.RootDir(), hostname)
 	if err != nil {
@@ -626,7 +625,7 @@ func configureSystemFiles(installChroot *safechroot.Chroot, hostname string, con
 	}
 
 	// Update fstab
-	err = UpdateFstab(installChroot.RootDir(), config.PartitionSettings, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, hidepidEnabled)
+	err = UpdateFstab(installChroot.RootDir(), config.PartitionSettings, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, config.EnableHidepid)
 	if err != nil {
 		return
 	}
@@ -986,80 +985,92 @@ func InstallGrubCfg(installRoot, rootDevice, bootUUID, bootPrefix, assetsDir str
 	}
 
 	for _, installedFile := range []string{installGrubCfgFile, installGrubDefFile} {
+
 		// Add in bootUUID
 		err = setGrubCfgBootUUID(bootUUID, installedFile)
 		if err != nil {
-			logger.Log.Warnf("Failed to set bootUUID in grub.cfg: %v", err)
+			logger.Log.Warnf("Failed to set bootUUID in %s: %v", installedFile, err)
 			return
 		}
 
 		// Add in bootPrefix
 		err = setGrubCfgBootPrefix(bootPrefix, installedFile)
 		if err != nil {
-			logger.Log.Warnf("Failed to set bootPrefix in grub.cfg: %v", err)
+			logger.Log.Warnf("Failed to set bootPrefix in %s: %v", installedFile, err)
 			return
 		}
 
 		// Add in rootDevice
 		err = setGrubCfgRootDevice(rootDevice, installedFile, encryptedRoot.LuksUUID)
 		if err != nil {
-			logger.Log.Warnf("Failed to set rootDevice in grub.cfg: %v", err)
+			logger.Log.Warnf("Failed to set rootDevice in %s: %v", installedFile, err)
 			return
 		}
 
 		// Add in rootLuksUUID
 		err = setGrubCfgLuksUUID(installedFile, encryptedRoot.LuksUUID)
 		if err != nil {
-			logger.Log.Warnf("Failed to set luksUUID in grub.cfg: %v", err)
+			logger.Log.Warnf("Failed to set luksUUID in %s: %v", installedFile, err)
 			return
 		}
 
 		// Add in logical volumes to active
 		err = setGrubCfgLVM(installedFile, encryptedRoot.LuksUUID)
 		if err != nil {
-			logger.Log.Warnf("Failed to set lvm.lv in grub.cfg: %v", err)
+			logger.Log.Warnf("Failed to set lvm.lv in %s: %v", installedFile, err)
 			return
 		}
 
 		// Configure IMA policy
 		err = setGrubCfgIMA(installedFile, kernelCommandLine)
 		if err != nil {
-			logger.Log.Warnf("Failed to set ima_policy in grub.cfg: %v", err)
+			logger.Log.Warnf("Failed to set ima_policy in in %s: %v", installedFile, err)
 			return
 		}
 
 		err = setGrubCfgReadOnlyVerityRoot(installedFile, readOnlyRoot)
 		if err != nil {
-			logger.Log.Warnf("Failed to set verity root in grub.cfg: %v", err)
+			logger.Log.Warnf("Failed to set verity root in in %s: %v", installedFile, err)
 			return
 		}
 
 		err = setGrubCfgSELinux(installedFile, kernelCommandLine)
 		if err != nil {
-			logger.Log.Warnf("Failed to set SELinux in grub.cfg: %v", err)
+			logger.Log.Warnf("Failed to set SELinux in %s: %v", installedFile, err)
 			return
 		}
 
 		// Configure FIPS
 		err = setGrubCfgFIPS(isBootPartitionSeparate, bootUUID, installedFile, kernelCommandLine)
 		if err != nil {
-			logger.Log.Warnf("Failed to set FIPS in grub.cfg: %v", err)
+			logger.Log.Warnf("Failed to set FIPS in %s: %v", installedFile, err)
 			return
 		}
 
 		err = setGrubCfgCGroup(installedFile, kernelCommandLine)
 		if err != nil {
-			logger.Log.Warnf("Failed to set CGroup configuration in grub.cfg: %v", err)
+			logger.Log.Warnf("Failed to set CGroup configuration in %s: %v", installedFile, err)
 			return
 		}
 
 		// Append any additional command line parameters
 		err = setGrubCfgAdditionalCmdLine(installedFile, kernelCommandLine)
 		if err != nil {
-			logger.Log.Warnf("Failed to append extra command line parameters in grub.cfg: %v", err)
+			logger.Log.Warnf("Failed to append extra command line parameters in %s: %v", installedFile, err)
 			return
 		}
 	}
+
+	return
+}
+
+func CallGrubMkconfig(installChroot *safechroot.Chroot) (err error) {
+	squashErrors := false
+
+	ReportActionf("Running grub2-mkconfig...")
+	err = installChroot.UnsafeRun(func() error {
+		return shell.ExecuteLive(squashErrors, "grub2-mkconfig", "-o", "/boot/grub2/grub.cfg")
+	})
 
 	return
 }
