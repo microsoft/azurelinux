@@ -215,7 +215,7 @@ tdnf-plugin-repogpgcheck-3.5.2-2.cm2.x86_64.rpm
 libassuan-2.5.5-2.cm2.x86_64.rpm
 libassuan-devel-2.5.5-2.cm2.x86_64.rpm
 libgpg-error-1.46-1.cm2.x86_64.rpm
-libgcrypt-1.9.4-2.cm2.x86_64.rpm
+libgcrypt-1.10.3-1.cm2.x86_64.rpm
 libksba-1.6.3-1.cm2.x86_64.rpm
 libksba-devel-1.6.3-1.cm2.x86_64.rpm
 libxslt-1.1.34-7.cm2.x86_64.rpm
