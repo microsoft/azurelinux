@@ -5,7 +5,7 @@
 Summary:        dnf/yum equivalent using C libs
 Name:           tdnf
 Version:        3.5.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2.1 AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -144,7 +144,6 @@ find %{buildroot} -name '*.a' -delete -print
 mkdir -p %{buildroot}%{_var}/cache/tdnf
 mkdir -p %{buildroot}%{_tdnf_history_db_dir}
 ln -sf %{_bindir}/tdnf %{buildroot}%{_bindir}/tyum
-ln -sf %{_bindir}/tdnf %{buildroot}%{_bindir}/yum
 ln -sf %{_bindir}/tdnf %{buildroot}%{_bindir}/tdnfj
 install -v -D -m 0755 %{SOURCE1} %{buildroot}%{_bindir}/tdnf-cache-updateinfo
 install -v -D -m 0644 %{SOURCE2} %{buildroot}%{_libdir}/systemd/system/tdnf-cache-updateinfo.service
@@ -167,8 +166,22 @@ if [[ ! -f %{_tdnf_history_db_dir}/history.db ]]; then
     %{_libdir}/tdnf/tdnf-history-util init
 fi
 
+%preun
+if [ "$1" = 0 ] && [[ $(readlink $(rpm --eval %{_bindir})/yum) == tdnf ]]; then
+    rm $(rpm --eval %{_bindir})/yum
+fi
+
 %postun
 /sbin/ldconfig
+
+%posttrans
+# For backwards compat, create yum symlink to tdnf if one 
+# does not exist. If yum file is already present, this means
+# the symlink already exists or the user has opted to have
+# their own, in which case it should not be touched. 
+if [ ! -e $(rpm --eval %{_bindir})/yum ]; then
+    ln -sf tdnf $(rpm --eval %{_bindir})/yum
+fi
 
 %files
 %license COPYING
@@ -181,7 +194,6 @@ fi
 %{_bindir}/tdnf-config
 %{_bindir}/tdnfj
 %{_bindir}/tyum
-%{_bindir}/yum
 %{_datadir}/bash-completion/completions/tdnf
 %{_libdir}/libtdnf.so.3
 %{_libdir}/libtdnf.so.3.*
@@ -225,6 +237,9 @@ fi
 /%{_lib}/systemd/system/tdnf*
 
 %changelog
+* Fri Oct 06 2023 Andy Zaugg <azaugg@linkedin.com> - 3.5.2-3
+- tdnf should only become default if a backend package manager has not previously been defined
+
 * Thu Jun 15 2023 Sam Meluch <sammeluch@microsoft.com> - 3.5.2-2
 - add patch for SELECTION_DOTARCH in solv/tdnfquery.c
 
