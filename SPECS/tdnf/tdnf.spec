@@ -168,7 +168,7 @@ fi
 
 %preun
 if [ "$1" = 0 ] && [[ $(readlink $(rpm --eval %{_bindir})/yum) == tdnf ]]; then
-  rm $(rpm --eval %{_bindir})/yum
+    rm $(rpm --eval %{_bindir})/yum
 fi
 
 %postun
@@ -180,7 +180,7 @@ fi
 # decision should not be made during build but during install
 # of package.
 if [ ! -e $(rpm --eval %{_bindir})/yum ]; then
-ln -sf tdnf $(rpm --eval %{_bindir})/yum
+    ln -sf tdnf $(rpm --eval %{_bindir})/yum
 fi
 
 %files
