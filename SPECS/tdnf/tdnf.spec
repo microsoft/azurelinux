@@ -167,7 +167,7 @@ if [[ ! -f %{_tdnf_history_db_dir}/history.db ]]; then
 fi
 
 %preun
-if  [[ $(readlink $(rpm --eval %{_bindir})/yum) == $(rpm --eval %{_bindir})/tdnf ]]; then
+if [ "$1" = 0 ] && [[ $(readlink $(rpm --eval %{_bindir})/yum) == $(rpm --eval %{_bindir})/tdnf ]]; then
   rm $(rpm --eval %{_bindir})/yum
 fi
 
