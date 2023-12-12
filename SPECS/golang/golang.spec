@@ -14,7 +14,7 @@
 Summary:        Go
 Name:           golang
 Version:        1.20.10
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -23,6 +23,7 @@ URL:            https://golang.org
 Source0:        https://golang.org/dl/go%{version}.src.tar.gz
 Source1:        https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
 Source2:        https://dl.google.com/go/go%{bootstrap_compiler_version}.src.tar.gz
+Patch0:    CVE-2023-49292.patch
 Patch0:         go14_bootstrap_aarch64.patch
 Obsoletes:      %{name} < %{version}
 Provides:       %{name} = %{version}
@@ -39,7 +40,7 @@ patch -Np1 --ignore-whitespace < %{PATCH0}
 mv -v go go-bootstrap
 
 %setup -q -n go
-
+%patch0 -p1\n
 %build
 # (go >= 1.20 bootstraps with go >= 1.17)
 # This condition makes go compiler >= 1.20 build a 3 step process:
@@ -141,6 +142,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Tue Dec 12 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.20.10-2
+- Add patch for CVE-2023-49292
+
 * Mon Oct 16 2023 Nan Liu <liunan@microsoft.com> - 1.20.10-1
 - Bump version to 1.20.10 to address CVE-2023-29409, CVE-2023-39318, CVE-2023-39319, CVE-2023-39323, CVE-2023-39533, CVE-2023-29406, CVE-2023-39325, CVE-2023-44487
 - Remove patches that no longer apply
