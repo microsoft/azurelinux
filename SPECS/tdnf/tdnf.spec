@@ -175,10 +175,10 @@ fi
 /sbin/ldconfig
 
 %posttrans
-# Make the decision to update yum sym link during post script
-# not package build. Some workloads want to disable tdnf, so
-# decision should not be made during build but during install
-# of package.
+# For backwards compat, create yum symlink to tdnf if one 
+# does not exist. If yum file is already present, this means
+# the symlink already exists or the user has opted to have
+# their own, in which case it should not be touched. 
 if [ ! -e $(rpm --eval %{_bindir})/yum ]; then
     ln -sf tdnf $(rpm --eval %{_bindir})/yum
 fi
