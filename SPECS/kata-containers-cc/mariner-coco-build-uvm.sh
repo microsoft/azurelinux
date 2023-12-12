@@ -18,21 +18,6 @@ rm -rf ${ROOTFS_DIR}
 sudo -E PATH=$PATH SECURITY_POLICY=yes make -B DISTRO=cbl-mariner rootfs
 popd
 
-# include both kernel-uvm and kernel-uvm-cvm modules in rootfs
-# TODO once kernel-uvm and kernel-uvm-cvm are re-aligned:
-# - remove this code
-# - define and export a KERNEL_MODULE_DIR variable above make rootfs
-# - this will cause the make rootfs command to copy the modules and call dempod
-# - the current version of rootfs.sh does not support adding multiple module folder for different kernel versions
-MODULE_ROOTFS_DEST_DIR="${ROOTFS_DIR}/lib/modules"
-mkdir -p ${MODULE_ROOTFS_DEST_DIR}
-for d in modules/*;
-do
-    MODULE_DIR_NAME=$(basename $d)
-    cp -a "modules/${MODULE_DIR_NAME}" "${MODULE_ROOTFS_DEST_DIR}/"
-    depmod -a -b "${ROOTFS_DIR}" ${MODULE_DIR_NAME}
-done
-
 # install other services
 cp ${SCRIPT_DIR}/coco-opa.service        ${ROOTFS_DIR}/usr/lib/systemd/system/coco-opa.service
 cp ${SCRIPT_DIR}/kata-containers.target  ${ROOTFS_DIR}/usr/lib/systemd/system/kata-containers.target

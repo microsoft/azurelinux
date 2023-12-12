@@ -102,7 +102,7 @@ cargo build --release
 popd
 
 # kernel modules
-pushd /usr/src/$(ls /usr/src | grep linux-header | grep -v cvm)
+pushd /usr/src/$(ls /usr/src | grep linux-header)
 header_dir=$(basename $PWD)
 KERNEL_VER=${header_dir#"linux-headers-"}
 KERNEL_MODULE_VER=${KERNEL_VER%%-*}
