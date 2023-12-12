@@ -23,8 +23,8 @@ URL:            https://golang.org
 Source0:        https://golang.org/dl/go%{version}.src.tar.gz
 Source1:        https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
 Source2:        https://dl.google.com/go/go%{bootstrap_compiler_version}.src.tar.gz
-Patch0:    CVE-2023-49292.patch
 Patch0:         go14_bootstrap_aarch64.patch
+Patch1:         CVE-2023-49292.patch
 Obsoletes:      %{name} < %{version}
 Provides:       %{name} = %{version}
 Provides:       go = %{version}-%{release}
@@ -34,13 +34,14 @@ Go is an open source programming language that makes it easy to build simple, re
 
 %prep
 # Setup go 1.4 bootstrap source
+%autosetup -p1
 tar xf %{SOURCE1} --no-same-owner
 patch -Np1 --ignore-whitespace < %{PATCH0}
+patch -Np1 < %{PATCH1}
 
 mv -v go go-bootstrap
 
 %setup -q -n go
-%patch0 -p1\n
 %build
 # (go >= 1.20 bootstraps with go >= 1.17)
 # This condition makes go compiler >= 1.20 build a 3 step process:
