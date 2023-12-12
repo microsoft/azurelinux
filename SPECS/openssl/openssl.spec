@@ -467,6 +467,7 @@ install -m644 %{SOURCE9} \
 - License verified
 - Removed redhat-specific REDHAT_FIPS_VERSION and added/updated relevant patches
 - Remove handling of different architectures -- we always build on the target architecture
+- Align config options with Marinver version 2.0
 
 * Thu Oct 26 2023 Sahana Prasad <sahana@redhat.com> - 1:3.1.4-1
 - Rebase to upstream version 3.1.4
