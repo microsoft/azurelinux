@@ -33,10 +33,14 @@ do
     depmod -a -b "${ROOTFS_DIR}" ${MODULE_DIR_NAME}
 done
 
-# # install other services
-# cp ${SCRIPT_DIR}/kata-containers.target  ${ROOTFS_DIR}/usr/lib/systemd/system/kata-containers.target
-# cp ${SCRIPT_DIR}/kata-agent.service.in   ${ROOTFS_DIR}/usr/lib/systemd/system/kata-agent.service
-# sed -i 's/@BINDIR@\/@AGENT_NAME@/\/usr\/bin\/kata-agent/g'  ${ROOTFS_DIR}/usr/lib/systemd/system/kata-agent.service
+# Install other services.
+#
+# This is needed because we don't use `make install-services` (which installs
+# the service files on the host by default), therefore the rootfs builder can't
+# symlink the services from the host into the rootfs.
+cp ${SCRIPT_DIR}/kata-containers.target  ${ROOTFS_DIR}/usr/lib/systemd/system/kata-containers.target
+cp ${SCRIPT_DIR}/kata-agent.service.in   ${ROOTFS_DIR}/usr/lib/systemd/system/kata-agent.service
+sed -i 's/@BINDIR@\/@AGENT_NAME@/\/usr\/bin\/kata-agent/g'  ${ROOTFS_DIR}/usr/lib/systemd/system/kata-agent.service
 
 # build image
 pushd ${OSBUILDER_DIR}
