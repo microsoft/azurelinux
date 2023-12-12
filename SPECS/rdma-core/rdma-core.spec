@@ -1,7 +1,7 @@
 Summary:        RDMA core userspace libraries and daemons
 Name:           rdma-core
 Version:        39.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 URL:            https://github.com/linux-rdma/rdma-core
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -603,6 +603,9 @@ fi
 %{_docdir}/%{name}/tests/*.py
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 39.0-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Mon Feb 14 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 39.0-1
 - Update to version 39.0.
 - Modified patch to apply to new version.

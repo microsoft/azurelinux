@@ -5,9 +5,9 @@ name: Check Manifests
 
 on:
   push:
-    branches: [main, dev, 1.0*, 2.0*]
+    branches: [main, dev, 1.0*, 2.0*, fasttrack/*]
   pull_request:
-    branches: [main, dev, 1.0*, 2.0*]
+    branches: [main, dev, 1.0*, 2.0*, fasttrack/*]
 
 jobs:
   build:
@@ -16,7 +16,7 @@ jobs:
     steps:
 
     - name: Check out code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Check x86_64 manifests
       run: |

@@ -4,7 +4,7 @@
 Summary:        A GTK+ module that bridges ATK to D-Bus at-spi
 Name:           at-spi2-atk
 Version:        2.34.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -68,6 +68,9 @@ The %{name}-devel package includes the header files for the %{name} library.
 %{_libdir}/pkgconfig/atk-bridge-2.0.pc
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.34.2-4
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 2.34.2-3
 - License verified
 - Lint spec
@@ -263,7 +266,8 @@ The %{name}-devel package includes the header files for the %{name} library.
 
 * Sat Dec 21 2013 Ville Skyttä <ville.skytta@iki.fi> - 2.11.3-2
 - Add ldconfig %%post* scriptlets.
-- Fix bogus dates in %%changelog.
+- Fix bogus dates in changelog.
+
 
 * Tue Dec 17 2013 Richard Hughes <rhughes@redhat.com> - 2.11.3-1
 - Update to 2.11.3

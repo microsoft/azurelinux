@@ -1,6 +1,6 @@
 Summary:        Linux API header files
 Name:           kernel-headers
-Version:        5.15.126.1
+Version:        5.15.139.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -36,6 +36,45 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 %{_includedir}/*
 
 %changelog
+* Tue Dec 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.139.1-1
+- Auto-upgrade to 5.15.139.1
+
+* Tue Nov 28 2023 Juan Camposeco <juanarturoc@microsoft.com> - 5.15.138.1-4
+- Bump release to match kernel
+
+* Tue Nov 28 2023 Thien Trung Vuong <tvuong@microsoft.com> - 5.15.138.1-3
+- Bump release to match kernel
+
+* Wed Nov 22 2023 David Daney <daviddaney@microsoft.com> - 5.15.138.1-2
+- Bump release to match kernel
+
+* Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.138.1-1
+- Auto-upgrade to 5.15.138.1
+
+* Mon Nov 20 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.137.1-2
+- Bump release to match kernel
+
+* Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.137.1-1
+- Auto-upgrade to 5.15.137.1
+
+* Mon Oct 23 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.135.1-2
+- Bump release to match kernel
+
+* Tue Oct 17 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.135.1-1
+- Auto-upgrade to 5.15.135.1
+
+* Tue Sep 26 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.133.1-1
+- Auto-upgrade to 5.15.133.1
+
+* Tue Sep 22 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.131.1-3
+- Bump release to match kernel
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.15.131.1-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
+* Fri Sep 08 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.131.1-1
+- Auto-upgrade to 5.15.131.1
+
 * Mon Aug 14 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.126.1-1
 - Auto-upgrade to 5.15.126.1
 

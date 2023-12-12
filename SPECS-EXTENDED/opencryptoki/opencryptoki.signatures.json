@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "opencryptoki-3.13.0.tar.gz": "af2983bb9d8059bbad604c562cb7d78e59f999f597cff0a02ab7763064301f39",
-  "opencryptoki.module": "d335359abeb5d4d1e684841f055ac99b98e8fcc77578e480ef86ef2621ab363d"
- }
+  "Signatures": {
+    "opencryptoki.module": "d335359abeb5d4d1e684841f055ac99b98e8fcc77578e480ef86ef2621ab363d",
+    "opencryptoki-3.17.0.tar.gz": "785596925738855b33b29bdff2399f613b892e7c6000d9ffbf79fe32c2aeaeee"
+  }
 }

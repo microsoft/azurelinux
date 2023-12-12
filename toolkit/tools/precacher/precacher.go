@@ -12,17 +12,14 @@ import (
 	"sync"
 	"time"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/network"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repocloner"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/randomization"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repoutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/profile"
 	"github.com/sirupsen/logrus"
@@ -40,7 +37,7 @@ const (
 	downloadResultTypeSuccess downloadResultType = iota
 	downloadResultTypeFailure
 	downloadResultTypeSkipped
-	donwloadResultTypeUnavailable
+	downloadResultTypeUnavailable
 )
 
 type downloadResult struct {
@@ -61,8 +58,9 @@ var (
 	outputSummaryFile = app.Flag("output-summary-file", "Path to save the summary of packages downloaded").String()
 	repoUrlsFile      = app.Flag("repo-urls-file", "Path to save the list of package URLs available in the repos").String()
 	repoUrls          = app.Flag("repo-url", "URLs of the repos to download from.").Strings()
+	repoFiles         = app.Flag("repo-file", "Files containing URLs of the repos to download from.").ExistingFiles()
 	workerTar         = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz").Required().ExistingFile()
-	buildDir          = app.Flag("worker-dir", "Directory to store chroot while running repo query.").Required().ExistingDir()
+	buildDir          = app.Flag("worker-dir", "Directory to store chroot while running repo query.").Required().String()
 
 	concurrentNetOps = app.Flag("concurrent-net-ops", "Number of concurrent network operations to perform.").Default(defaultNetOpsCount).Uint()
 )
@@ -85,8 +83,7 @@ func main() {
 	if err != nil {
 		logger.PanicOnError(err)
 	}
-
-	packagesAvailableFromRepos, err := getAllRepoData(*repoUrls, *workerTar, *buildDir, *repoUrlsFile)
+	packagesAvailableFromRepos, err := repoutils.GetAllRepoData(*repoUrls, *repoFiles, *workerTar, *buildDir, *repoUrlsFile)
 	if err != nil {
 		logger.PanicOnError(err)
 	}
@@ -124,141 +121,7 @@ func rpmSnapshotFromFile(snapshotFile string) (rpmSnapshot *repocloner.RepoConte
 	return
 }
 
-// getAllRepoData returns a map of package names to URLs for all packages available in the given repos. It uses
-// a chroot to run repoquery.
-func getAllRepoData(repoURLs []string, workerTar, buildDir, repoUrlsFile string) (namesToURLs map[string]string, err error) {
-	const (
-		leaveChrootOnDisk = false
-	)
-	timestamp.StartEvent("pull available package data from repos", nil)
-	defer timestamp.StopEvent(nil)
-
-	queryChroot, err := createChroot(workerTar, buildDir, leaveChrootOnDisk)
-	if err != nil {
-		err = fmt.Errorf("failed to create chroot:\n%w", err)
-		return nil, err
-	}
-	defer queryChroot.Close(leaveChrootOnDisk)
-
-	namesToURLs = make(map[string]string)
-	URLList := []string{}
-	for _, repoURL := range repoURLs {
-		// Use the chroot to query each repo for the packages it contains
-		var packageRepoPaths []string
-		err = queryChroot.Run(func() (chrootErr error) {
-			packageRepoPaths, chrootErr = getPackageRepoPaths(repoURL)
-			return chrootErr
-		})
-		if err != nil {
-			return nil, err
-		}
-
-		// We will be searching by the name: "<name>-<version>.<distro>.<arch>", the results from the repoquery will be
-		// in the form of "<PARTIAL_URL>/<name>-<version>.<distro>.<arch>.rpm"
-		for _, packageRepoPath := range packageRepoPaths {
-			packageName := path.Base(packageRepoPath)
-			packageName = strings.TrimSuffix(packageName, ".rpm")
-
-			// We need to prepend the repoURL to the partial URL to get the full URL
-			packageRepoPath = fmt.Sprintf("%s/%s", repoURL, packageRepoPath)
-			namesToURLs[packageName] = packageRepoPath
-			URLList = append(URLList, packageRepoPath)
-		}
-	}
-	err = file.WriteLines(URLList, repoUrlsFile)
-
-	return
-}
-
-// createChroot creates a network-enabled chroot to run repoquery in. The caller is expected to call Close() on the
-// returned chroot unless an error is returned, in which case the chroot will be closed by this function.
-func createChroot(workerTar, chrootDir string, leaveChrootOnDisk bool) (queryChroot *safechroot.Chroot, err error) {
-	const (
-		dnfUtilsPackageName = "dnf-utils"
-		rootDir             = "/"
-	)
-	timestamp.StartEvent("creating repoquery chroot", nil)
-	defer timestamp.StopEvent(nil)
-	logger.Log.Info("Creating chroot for repoquery")
-
-	queryChroot = safechroot.NewChroot(chrootDir, true)
-	err = queryChroot.Initialize(workerTar, nil, nil)
-	if err != nil {
-		err = fmt.Errorf("failed to initialize chroot:\n%w", err)
-		return
-	}
-
-	defer func() {
-		if err != nil {
-			closeErr := queryChroot.Close(leaveChrootOnDisk)
-			if closeErr != nil {
-				logger.Log.Errorf("Failed to close chroot, err: %s", closeErr)
-			}
-		}
-	}()
-
-	// We will need network to install the repoquery package
-	files := []safechroot.FileToCopy{
-		{Src: "/etc/resolv.conf", Dest: "/etc/resolv.conf"},
-	}
-	err = queryChroot.AddFiles(files...)
-	if err != nil {
-		err = fmt.Errorf("failed to add files to chroot:\n%w", err)
-		return
-	}
-
-	// Install the repoquery package from upstream
-	logger.Log.Infof("Installing '%s' package to get 'repoquery' command", dnfUtilsPackageName)
-	queryChroot.Run(func() error {
-		_, err = installutils.TdnfInstall(dnfUtilsPackageName, rootDir)
-		if err != nil {
-			err = fmt.Errorf("failed to install '%s':\n%w", dnfUtilsPackageName, err)
-		}
-		return err
-	})
-	if err != nil {
-		err = fmt.Errorf("failed to install '%s' in chroot:\n%w", dnfUtilsPackageName, err)
-		return
-	}
-	return
-}
-
-// getPackageRepoPaths returns a list of packages available in the given repoUrl by running repoquery
-func getPackageRepoPaths(repoUrl string) (packages []string, err error) {
-	const (
-		reqoqueryTool    = "repoquery"
-		randomNameLength = 10
-		printErrorOutput = true
-	)
-	var queryCommonArgList = []string{"-y", "-q", "--disablerepo=*", "-a", "--qf", "%{location}"}
-
-	logger.Log.Infof("Getting package data from %s", repoUrl)
-
-	// We want to avoid using the same repo name for each repoUrl, so we generate a random name
-	randomName, err := randomization.RandomString(randomNameLength, randomization.LegalCharactersAlphaNum)
-	if err != nil {
-		err = fmt.Errorf("failed to generate random string:\n%w", err)
-		return
-	}
-	repoPathArg := fmt.Sprintf("--repofrompath=mariner-precache-%s,%s", randomName, repoUrl)
-	finalArgList := append(queryCommonArgList, repoPathArg)
-
-	onStdout := func(args ...interface{}) {
-		line := args[0].(string)
-		packages = append(packages, line)
-	}
-
-	// Run the repoquery command
-	err = shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, printErrorOutput, reqoqueryTool, finalArgList...)
-	if err != nil {
-		err = fmt.Errorf("failed to run repoquery command:\n%w", err)
-		return
-	}
-
-	return
-}
-
-// downloadMissingPackages will attemp to download each package listed in rpmSnapshot that is not already present in the
+// downloadMissingPackages will attempt to download each package listed in rpmSnapshot that is not already present in the
 // outDir. It will return a list of the packages that were downloaded. It will use concurrentNetOps to limit the number of
 // concurrent network operations used to download the missing packages. It will also monitor the results and print periodic
 // progress updates to the console.
@@ -320,7 +183,7 @@ func monitorProgress(total int, results chan downloadResult, doneChannel chan st
 			case downloadResultTypeFailure:
 				logger.Log.Warnf("Failed to download: %s", result.pkgName)
 				failed++
-			case donwloadResultTypeUnavailable:
+			case downloadResultTypeUnavailable:
 				logger.Log.Warnf("Could not find '%s' in any repos", result.pkgName)
 				unavailable++
 			}
@@ -344,9 +207,9 @@ func monitorProgress(total int, results chan downloadResult, doneChannel chan st
 // This function runs with best effort, so it will return all errors via the results channel. rather than returning an error.
 // The results may be one of:
 //   - downloadResultTypeSuccess: The package was downloaded successfully
-//   - downloadResultTypeFailure: The package failed to download (ie error occured)
+//   - downloadResultTypeFailure: The package failed to download (ie error occurred)
 //   - downloadResultTypeSkipped: The package was not downloaded because it already exists
-//   - donwloadResultTypeUnavailable: The package was not downloaded because it was not found in any of the repos
+//   - downloadResultTypeUnavailable: The package was not downloaded because it was not found in any of the repos
 //
 // The caller is expected to have added to the provided wait group, while this function is
 // responsible for removing itself from the wait group. As much processing as possible is done before acquiring the
@@ -388,7 +251,7 @@ func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map
 	// Get the URL for the package, or bail out if it is not available.
 	url, ok := packagesAvailableFromRepos[pkgName]
 	if !ok {
-		result.resultType = donwloadResultTypeUnavailable
+		result.resultType = downloadResultTypeUnavailable
 		return
 	}
 

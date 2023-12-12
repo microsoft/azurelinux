@@ -5,7 +5,7 @@ Summary:        IB Performance tests
 Name:           perftest
 # Update extended_release with version updates
 Version:        4.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD or GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -38,6 +38,9 @@ chmod -x runme
 %_bindir/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.5-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Thu Jun 23 2022 Rachel Menge <rachelmenge@microsoft.com> - 4.5-1
 - Initial CBL-Mariner import from NVIDIA (license: GPLv2)
 - License verified

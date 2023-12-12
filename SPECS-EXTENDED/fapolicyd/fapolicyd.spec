@@ -1,35 +1,44 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %global selinuxtype targeted
 %global moduletype contrib
-%define semodule_version 0.3
+%define semodule_version 0.6
 
 %bcond_with selinux
 
-Summary: Application Whitelisting Daemon
-Name: fapolicyd
-Version: 1.0.2
-Release: 3%{?dist}
-License: GPLv3+
-URL: http://people.redhat.com/sgrubb/fapolicyd
-Source0: https://people.redhat.com/sgrubb/fapolicyd/%{name}-%{version}.tar.gz
-Source1: https://github.com/linux-application-whitelisting/%{name}-selinux/releases/download/v%{semodule_version}/%{name}-selinux-%{semodule_version}.tar.gz
-BuildRequires: gcc
-BuildRequires: kernel-headers
-BuildRequires: autoconf automake make gcc libtool
-BuildRequires: systemd-devel libgcrypt-devel rpm-devel file-devel file
-BuildRequires: libcap-ng-devel libseccomp-devel lmdb-devel
-BuildRequires: python3-devel
-BuildRequires: uthash-devel
-Requires: %{name}-plugin
-Recommends: %{name}-selinux
-Requires(pre): shadow-utils
+Summary:        Application Whitelisting Daemon
+Name:           fapolicyd
+Version:        1.3.2
+Release:        1%{?dist}
+License:        GPLv3+
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://people.redhat.com/sgrubb/fapolicyd
+Source0:        https://people.redhat.com/sgrubb/fapolicyd/%{name}-%{version}.tar.gz
+
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  file
+BuildRequires:  file-devel
+# Source1: https://github.com/linux-application-whitelisting/%{name}-selinux/releases/download/v%{semodule_version}/%{name}-selinux-%{semodule_version}.tar.gz
+BuildRequires:  gcc
+BuildRequires:  kernel-headers
+BuildRequires:  libcap-ng-devel
+BuildRequires:  libseccomp-devel
+BuildRequires:  libtool
+BuildRequires:  lmdb-devel
+BuildRequires:  make
+BuildRequires:  openssl-devel
+BuildRequires:  python3-devel
+BuildRequires:  rpm-devel
+BuildRequires:  systemd
+BuildRequires:  systemd-devel
+BuildRequires:  uthash-devel
+Requires:       %{name}-plugin
+Requires(pre):  shadow-utils
 Requires(post): systemd-units
 Requires(preun): systemd-units
 Requires(postun): systemd-units
 
-Patch1: fapolicyd-magic-override.patch
-Patch2: selinux.patch
+# Patch1: selinux.patch
 
 %description
 Fapolicyd (File Access Policy Daemon) implements application whitelisting
@@ -41,10 +50,11 @@ makes use of the kernel's fanotify interface to determine file access rights.
 %package        selinux
 Summary:        Fapolicyd selinux
 Group:          Applications/System
-Requires:       %{name} = %{version}-%{release}
-BuildRequires:  selinux-policy
 BuildRequires:  selinux-policy-devel
-BuildArch: noarch
+Requires:       %{name} = %{version}-%{release}
+Requires:       selinux-policy-%{selinuxtype}
+Requires(post): selinux-policy-%{selinuxtype}
+BuildArch:      noarch
 %{?selinux_requires}
 
 %description    selinux
@@ -55,8 +65,8 @@ The %{name}-selinux package contains selinux policy for the %{name} daemon.
 Summary:        Fapolicyd dnf plugin
 Group:          Applications/System
 Requires:       %{name} = %{version}-%{release}
-BuildArch: noarch
-Provides: %{name}-plugin
+Provides:       %{name}-plugin
+BuildArch:      noarch
 
 %description    dnf-plugin
 The %{name}-dnf-plugin notifies %{name} daemon about dnf update.
@@ -69,25 +79,31 @@ Don't use dnf and rpm plugin together.
 %setup -q
 
 # selinux
-%setup -q -D -T -a 1
+# %setup -q -D -T -a 1
+# %patch 1 -b .selinux
 
-%patch1 -p1 -b .magic-override
-%patch2 -p1 -b .selinux
+# generate rules for python
+sed -i "s/%python2_path%/`readlink -f %{__python2} | sed 's/\//\\\\\//g'`/g" rules.d/*.rules
+sed -i "s/%python3_path%/`readlink -f %{__python3} | sed 's/\//\\\\\//g'`/g" rules.d/*.rules
 
-sed -i "s/%python2_path%/`readlink -f %{__python2} | sed 's/\//\\\\\//g'`/g" init/%{name}.rules.*
-sed -i "s/%python3_path%/`readlink -f %{__python3} | sed 's/\//\\\\\//g'`/g" init/%{name}.rules.*
-sed -i "s/%ld_so_path%/`find /usr/lib64/ -type f -name 'ld-2\.*.so' | sed 's/\//\\\\\//g'`/g" init/%{name}.rules.*
+# Detect run time linker directly from bash
+interpret=`readelf -e /usr/bin/bash \
+    | grep Requesting \
+    | sed 's/.$//' \
+    | rev | cut -d" " -f1 \
+    | rev`
+
+sed -i "s|%ld_so_path%|`realpath $interpret`|g" rules.d/*.rules
 
 %build
-
+cp INSTALL INSTALL.tmp
 ./autogen.sh
-
 %configure \
     --with-audit \
     --with-rpm \
     --disable-shared
 
-make CFLAGS="%{optflags}" %{?_smp_mflags}
+make
 
 %if %{with selinux}
 # selinux
@@ -106,13 +122,14 @@ make check
 %endif
 
 %install
-make DESTDIR="%{buildroot}" INSTALL='install -p' install
+%make_install
 mkdir -p %{buildroot}/%{python3_sitelib}/dnf-plugins/
 install -p -m 644 dnf/%{name}-dnf-plugin.py %{buildroot}/%{python3_sitelib}/dnf-plugins/
 install -p -m 644 -D init/%{name}-tmpfiles.conf %{buildroot}/%{_tmpfilesdir}/%{name}.conf
-install -p -m 644 init/%{name}.rules.known-libs %{buildroot}/%{_sysconfdir}/%{name}/%{name}.rules
 mkdir -p %{buildroot}/%{_localstatedir}/lib/%{name}
 mkdir -p %{buildroot}/run/%{name}
+mkdir -p %{buildroot}%{_sysconfdir}/%{name}/trust.d
+mkdir -p %{buildroot}%{_sysconfdir}/%{name}/rules.d
 
 %if %{with selinux}
 # selinux
@@ -123,12 +140,37 @@ install -p -m 644 %{name}-selinux-%{semodule_version}/%{name}.if %{buildroot}%{_
 %endif
 
 #cleanup
-find %{buildroot} \( -name '*.la' -o -name '*.a' \) -exec rm -f {} ';'
+find %{buildroot} \( -name '*.la' -o -name '*.a' \) -delete
 
 %pre
-getent passwd %{name} >/dev/null || useradd -r -M -d %{_localstatedir}/lib/%{name} -s /usr/sbin/nologin -c "Application Whitelisting Daemon" %{name}
+getent passwd %{name} >/dev/null || useradd -r -M -d %{_localstatedir}/lib/%{name} -s /sbin/nologin -c "Application Whitelisting Daemon" %{name}
 
 %post
+# if no pre-existing rule file
+if [ ! -e %{_sysconfdir}/%{name}/%{name}.rules ] ; then
+ files=`ls %{_sysconfdir}/%{name}/rules.d/ 2>/dev/null | wc -w`
+ # Only if no pre-existing component rules
+ if [ "$files" -eq 0 ] ; then
+  ## Install the known libs policy
+  cp %{_datadir}/%{name}/sample-rules/10-languages.rules  %{_sysconfdir}/%{name}/rules.d/
+  cp %{_datadir}/%{name}/sample-rules/20-dracut.rules %{_sysconfdir}/%{name}/rules.d/
+  cp %{_datadir}/%{name}/sample-rules/21-updaters.rules  %{_sysconfdir}/%{name}/rules.d/
+  cp %{_datadir}/%{name}/sample-rules/30-patterns.rules %{_sysconfdir}/%{name}/rules.d/
+  cp %{_datadir}/%{name}/sample-rules/40-bad-elf.rules  %{_sysconfdir}/%{name}/rules.d/
+  cp %{_datadir}/%{name}/sample-rules/41-shared-obj.rules  %{_sysconfdir}/%{name}/rules.d/
+  cp %{_datadir}/%{name}/sample-rules/42-trusted-elf.rules  %{_sysconfdir}/%{name}/rules.d/
+  cp %{_datadir}/%{name}/sample-rules/70-trusted-lang.rules  %{_sysconfdir}/%{name}/rules.d/
+  cp %{_datadir}/%{name}/sample-rules/72-shell.rules  %{_sysconfdir}/%{name}/rules.d/
+  cp %{_datadir}/%{name}/sample-rules/90-deny-execute.rules %{_sysconfdir}/%{name}/rules.d/
+  cp %{_datadir}/%{name}/sample-rules/95-allow-open.rules  %{_sysconfdir}/%{name}/rules.d/
+  chgrp %{name} %{_sysconfdir}/%{name}/rules.d/*
+  if [ -x /usr/sbin/restorecon ] ; then
+   # restore correct label
+   /usr/sbin/restorecon -F %{_sysconfdir}/%{name}/rules.d/*
+  fi
+  fagenrules --load
+ fi
+fi
 %systemd_post %{name}.service
 
 %preun
@@ -142,34 +184,42 @@ getent passwd %{name} >/dev/null || useradd -r -M -d %{_localstatedir}/lib/%{nam
 %{!?_licensedir:%global license %%doc}
 %license COPYING
 %attr(755,root,%{name}) %dir %{_datadir}/%{name}
-%attr(644,root,%{name}) %{_datadir}/%{name}/%{name}.rules.*
+%attr(755,root,%{name}) %dir %{_datadir}/%{name}/sample-rules
+%attr(644,root,%{name}) %{_datadir}/%{name}/sample-rules/*
+%attr(644,root,%{name}) %{_datadir}/%{name}/fapolicyd-magic.mgc
 %attr(750,root,%{name}) %dir %{_sysconfdir}/%{name}
+%attr(750,root,%{name}) %dir %{_sysconfdir}/%{name}/trust.d
+%attr(750,root,%{name}) %dir %{_sysconfdir}/%{name}/rules.d
+%attr(644,root,root) %{_sysconfdir}/bash_completion.d/*
+%ghost %{_sysconfdir}/%{name}/rules.d/*
+%ghost %{_sysconfdir}/%{name}/%{name}.rules
 %config(noreplace) %attr(644,root,%{name}) %{_sysconfdir}/%{name}/%{name}.conf
+%config(noreplace) %attr(644,root,%{name}) %{_sysconfdir}/%{name}/%{name}-filter.conf
 %config(noreplace) %attr(644,root,%{name}) %{_sysconfdir}/%{name}/%{name}.trust
-%config(noreplace) %attr(644,root,%{name}) %{_sysconfdir}/%{name}/%{name}.rules
+%ghost %attr(644,root,%{name}) %{_sysconfdir}/%{name}/compiled.rules
 %attr(644,root,root) %{_unitdir}/%{name}.service
 %attr(644,root,root) %{_tmpfilesdir}/%{name}.conf
 %attr(755,root,root) %{_sbindir}/%{name}
 %attr(755,root,root) %{_sbindir}/%{name}-cli
+%attr(755,root,root) %{_sbindir}/fagenrules
 %attr(644,root,root) %{_mandir}/man8/*
 %attr(644,root,root) %{_mandir}/man5/*
-%attr(644,root,root) %{_mandir}/man1/*
-%attr(644,root,root) %{_datadir}/%{name}/*
-%ghost %{_localstatedir}/log/%{name}-access.log
+%ghost %attr(440,%{name},%{name}) %verify(not md5 size mtime) %{_localstatedir}/log/%{name}-access.log
 %attr(770,root,%{name}) %dir %{_localstatedir}/lib/%{name}
 %attr(770,root,%{name}) %dir /run/%{name}
-%ghost /run/%{name}/%{name}.fifo
-%ghost %{_localstatedir}/lib/%{name}/data.mdb
-%ghost %{_localstatedir}/lib/%{name}/lock.mdb
+%ghost %attr(660,root,%{name}) /run/%{name}/%{name}.fifo
+%ghost %attr(660,%{name},%{name}) %verify(not md5 size mtime) %{_localstatedir}/lib/%{name}/data.mdb
+%ghost %attr(660,%{name},%{name}) %verify(not md5 size mtime) %{_localstatedir}/lib/%{name}/lock.mdb
 
 %if %{with selinux}
 %files selinux
 %{_datadir}/selinux/packages/%{selinuxtype}/%{name}.pp.bz2
-%ghost %{_sharedstatedir}/selinux/%{selinuxtype}/active/modules/200/%{name}
+%ghost %verify(not md5 size mode mtime) %{_sharedstatedir}/selinux/%{selinuxtype}/active/modules/200/%{name}
 %{_datadir}/selinux/devel/include/%{moduletype}/ipp-%{name}.if
 
 %post selinux
 %selinux_modules_install -s %{selinuxtype} %{_datadir}/selinux/packages/%{selinuxtype}/%{name}.pp.bz2
+%selinux_relabel_post -s %{selinuxtype}
 
 %postun selinux
 if [ $1 -eq 0 ]; then
@@ -184,8 +234,11 @@ fi
 %{python3_sitelib}/dnf-plugins/%{name}-dnf-plugin.py
 %{python3_sitelib}/dnf-plugins/__pycache__/%{name}-dnf-plugin.*.pyc
 
-
 %changelog
+* Wed Sep 06 2023 Archana Choudhary <archana1@microsoft.com> - 1.3.2-1
+- Upgrade to 1.3.2 - CVE-2022-1117
+- License verified
+
 * Thu Aug 12 2021 Thomas Crain <thcrain@microsoft.com> - 1.0.2-3
 - Disable selinux subpackage build
 
@@ -293,7 +346,6 @@ Resolves: rhbz#1834674
 
 * Thu Jan 31 2019 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.7-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
-
 
 * Wed Oct 03 2018 Steve Grubb <sgrubb@redhat.com> 0.8.7-1
 - New upstream bugfix release

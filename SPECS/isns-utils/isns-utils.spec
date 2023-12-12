@@ -1,7 +1,7 @@
 Summary:        The iSNS daemon and utility programs
 Name:           isns-utils
 Version:        0.101
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -100,6 +100,9 @@ install -p -m 644 %{SOURCE1} %{buildroot}%{_unitdir}/isnsd.service
 %{_libdir}/libisns.so
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.101-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Feb 23 2022 Cameron Baird <cameronbaird@microsoft.com> - 0.101-1
 - Update source to v0.101
 

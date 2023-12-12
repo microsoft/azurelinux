@@ -3,7 +3,7 @@
 Summary:        Utilities related to RGB colors
 Name:           perl-Color-RGB-Util
 Version:        0.606
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -31,8 +31,10 @@ BuildRequires:  perl(IO::Handle)
 BuildRequires:  perl(IPC::Open3)
 BuildRequires:  perl(Test::Exception)
 BuildRequires:  perl(Test::More) >= 0.98
-BuildRequires:  perl(Test::RandomResult)
 BuildRequires:  perl(blib)
+
+# Missing test dependencies:
+# BuildRequires:  perl(Test::RandomResult)
 %endif
 
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
@@ -93,6 +95,9 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Thu Aug 31 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.606-3
+- Disabling missing test dependency.
+
 * Wed Jan 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.606-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.

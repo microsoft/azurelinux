@@ -2,7 +2,7 @@
 Summary:        The Apache Portable Runtime
 Name:           apr
 Version:        1.7.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -64,6 +64,9 @@ make -j1 check
 %{_libdir}/pkgconfig
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.7.2-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Tue Feb 14 2023 Suresh Thelkar <sthelkar@microsoft.com> - 1.7.2-1
 - Upgrade to version 1.7.2 to fix CVE-2022-24963
 

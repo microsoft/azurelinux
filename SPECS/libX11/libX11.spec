@@ -1,17 +1,13 @@
 Summary:        Core X11 protocol client library
 Name:           libX11
-Version:        1.6.12
-Release:        6%{?dist}
+Version:        1.8.7
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.x.org
-Source0:        https://xorg.freedesktop.org/archive/individual/lib/%{name}-%{version}.tar.bz2
-
+Source0:        https://xorg.freedesktop.org/archive/individual/lib/%{name}-%{version}.tar.gz
 Patch2:         dont-forward-keycode-0.patch
-# diff from https://gitlab.freedesktop.org/xorg/lib/libx11/-/merge_requests/53
-Patch3:         libX11-race-condition.patch
-Patch4:         CVE-2023-3138.patch
 
 BuildRequires:  libxcb-devel >= 1.2
 BuildRequires:  make
@@ -52,10 +48,7 @@ Conflicts:      %{name} < %{version}-%{release}
 libX11/libxcb interoperability library
 
 %prep
-%setup -q
-%patch2 -p1 -b .dont-forward-keycode-0
-%patch3 -p1 -b .race-condition
-%patch4 -p1
+%autosetup -p1
 
 %build
 autoreconf -v --install --force
@@ -86,7 +79,7 @@ make %{?_smp_mflags} check
 
 %files
 %{_libdir}/libX11.so.6
-%{_libdir}/libX11.so.6.3.0
+%{_libdir}/libX11.so.6.4.0
 
 %files xcb
 %{_libdir}/libX11-xcb.so.1
@@ -94,7 +87,7 @@ make %{?_smp_mflags} check
 
 %files common
 %license COPYING
-%doc AUTHORS README.md NEWS
+%doc AUTHORS README.md
 %{_datadir}/X11/locale/
 %{_datadir}/X11/XErrorDB
 %dir %{_var}/cache/libX11
@@ -122,6 +115,13 @@ make %{?_smp_mflags} check
 %{_mandir}/man5/*.5*
 
 %changelog
+* Wed Oct 18 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 1.8.7-1
+- Update to v1.8.7 to fix CVEs 2023-43785, 2023-43786 and 2023-43787
+- Remove patches that don't apply to the new version
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.6.12-7
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Sun Jul 09 2023 Muhammad Falak <mwani@microsoft.com> - 1.6.12-6
 - Address CVE-2023-3138
 

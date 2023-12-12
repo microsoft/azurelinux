@@ -1,7 +1,7 @@
 Summary:        The GNU shar utilities for packaging and unpackaging shell archives
 Name:           sharutils
 Version:        4.15.2
-Release:        20%{?dist}
+Release:        21%{?dist}
 # The main code:                GPLv3+
 # intl/dngettext.c:             LGPLv2+
 # lib (gnulib):                 GPLv3+
@@ -101,6 +101,9 @@ chmod 644 AUTHORS ChangeLog COPYING NEWS README THANKS TODO
 %{_mandir}/man5/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.15.2-21
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Mon Oct 30 2022 Olivia Crain <oliviacrain@microsoft.com> - 4.15.2-20
 - Fix typo in CVE-2018-1000097 patch filename to ensure detection by CVE tooling
 

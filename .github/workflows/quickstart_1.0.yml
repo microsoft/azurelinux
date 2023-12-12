@@ -16,7 +16,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         ref: '1.0-stable'
 
@@ -44,7 +44,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         ref: '1.0-stable'
 
@@ -63,7 +63,7 @@ jobs:
     - name: ISO Quick Start
       run: |
         pushd toolkit
-        sudo make iso REBUILD_TOOLS=y REBUILD_PACKAGES=n
+        sudo make iso REBUILD_TOOLS=y REBUILD_PACKAGES=n CONFIG_FILE=./imageconfigs/full.json
         popd
 
   vhdx_quickstart:
@@ -71,7 +71,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         ref: '1.0-stable'
 
@@ -90,5 +90,5 @@ jobs:
     - name: VHDX Quick Start
       run: |
         pushd toolkit
-        sudo make image REBUILD_TOOLS=y REBUILD_PACKAGES=n
+        sudo make image REBUILD_TOOLS=y REBUILD_PACKAGES=n CONFIG_FILE=./imageconfigs/core-efi.json
         popd

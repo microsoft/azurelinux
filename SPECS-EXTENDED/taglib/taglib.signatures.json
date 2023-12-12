@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "taglib-1.11.1.tar.gz": "b6d1a5a610aae6ff39d93de5efd0fdc787aa9e9dc1e7026fa4c961b26563526b",
-  "taglib-snapshot.sh": "eb3ae797bd716f0209628f0245f7ab03a9d5b78fbeffd74d8f9b50aae151a3d8"
- }
+  "Signatures": {
+    "taglib-snapshot.sh": "eb3ae797bd716f0209628f0245f7ab03a9d5b78fbeffd74d8f9b50aae151a3d8",
+    "taglib-1.13.1.tar.gz": "c8da2b10f1bfec2cd7dbfcd33f4a2338db0765d851a50583d410bacf055cfd0b"
+  }
 }

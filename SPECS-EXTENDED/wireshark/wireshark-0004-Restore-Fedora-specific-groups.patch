@@ -3,10 +3,10 @@ Date: Fri, 13 Sep 2013 14:36:55 +0400
 Subject: [PATCH] Restore Fedora-specific groups
 
 Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
-diff --git a/wireshark.desktop b/wireshark.desktop
-index 334db48..669c6f1 100644
---- a/wireshark.desktop
-+++ b/wireshark.desktop
+diff --git a/resources/freedesktop/org.wireshark.Wireshark.desktop b/resources/freedesktop/org.wireshark.Wireshark.desktop
+index a880a50a33..a25d67d99b 100644
+--- a/resources/freedesktop/org.wireshark.Wireshark.desktop
++++ b/resources/freedesktop/org.wireshark.Wireshark.desktop
 @@ -108,4 +108,4 @@ Terminal=false
  MimeType=application/vnd.tcpdump.pcap;application/x-pcapng;application/x-snoop;application/x-iptrace;application/x-lanalyzer;application/x-nettl;application/x-radcom;application/x-etherpeek;application/x-visualnetworks;application/x-netinstobserver;application/x-5view;application/x-tektronix-rf5;application/x-micropross-mplog;application/x-apple-packetlogger;application/x-endace-erf;application/ipfix;application/x-ixia-vwr;
  # Category entry according to:

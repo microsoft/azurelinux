@@ -7,10 +7,13 @@
 ######## QUICK_REBUILD AUTO CONFIGURE ########
 
 # The QUICK_REBUILD* flags are special flags that will try to build the toolchain and packages as quickly as possible. They will
-# automatically set REBUILD_TOOLS, USE_CCACHE, REBUILD_TOOLCHAIN, DELTA_BUILD, INCREMENTAL_TOOLCHAIN, and ALLOW_TOOLCHAIN_DOWNLOAD_FAIL to 'y'.
+# automatically set REBUILD_TOOLS, REBUILD_TOOLCHAIN, DELTA_BUILD, INCREMENTAL_TOOLCHAIN, and ALLOW_TOOLCHAIN_DOWNLOAD_FAIL to 'y'.
 # It will also set CLEAN_TOOLCHAIN_CONTAINERS to 'n'
+##help:var:QUICK_REBUILD:{y,n}=Optimize the build for speed by using existing published components and optimizing unimpactful package rebuilds (Implies QUICK_REBUILD_PACKAGES=y, QUICK_REBUILD_TOOLCHAIN=y).
 QUICK_REBUILD           ?= n
+##help:var:QUICK_REBUILD_TOOLCHAIN:{y,n}=Rebuild the toolchain, but attempt to download components where possible.
 QUICK_REBUILD_TOOLCHAIN ?= n
+##help:var:QUICK_REBUILD_PACKAGES:{y,n}=Use as many packages as possible from upstream repos, limit cascading rebuilds when a dependency is rebuilt.
 QUICK_REBUILD_PACKAGES  ?= n
 
 ifeq ($(QUICK_REBUILD),y)
@@ -57,9 +60,8 @@ endif
 
 DELTA_BUILD    = y
 
-# Don't care if USE_CCACHE or REBUILD_TOOLS are set or not, doesn't matter to the quickbuild. Just turn them
+# Don't care if REBUILD_TOOLS is set or not, doesn't matter to the quickbuild. Just turn it
 # on to be friendly to the user unless they have explicitly set it to off.
-USE_CCACHE             ?= y
 REBUILD_TOOLS          ?= y
 DELTA_FETCH            ?= y
 PRECACHE               ?= y
@@ -71,11 +73,12 @@ endif
 
 REBUILD_TOOLCHAIN               ?= n
 ALLOW_TOOLCHAIN_DOWNLOAD_FAIL   ?= n
+##help:var:REBUILD_TOOLS:{y,n}=Build the go tools locally instead of taking them from the SDK.
 REBUILD_TOOLS                   ?= n
-USE_CCACHE                      ?= n
 DELTA_BUILD                     ?= n
 CLEAN_TOOLCHAIN_CONTAINERS      ?= y
 MAX_CPU                         ?=
+PACKAGE_BUILD_TIMEOUT           ?= 8h
 DELTA_FETCH                     ?= n
 PRECACHE                        ?= n
 MAX_CASCADING_REBUILDS          ?=

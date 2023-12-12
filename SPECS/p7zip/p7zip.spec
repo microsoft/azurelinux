@@ -1,7 +1,7 @@
 Summary:        Very high compression ratio file archiver
 Name:           p7zip
 Version:        16.02
-Release:        22%{?dist}
+Release:        23%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 # Files under C/Compress/Lzma/ are dual LGPL or CPL
@@ -131,6 +131,9 @@ make test
 %doc contrib/
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 16.02-23
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Mon May 24 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 16.02-22
 - Add nopatch for CVE-2018-5996
 

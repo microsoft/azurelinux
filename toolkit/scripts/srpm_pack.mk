@@ -40,6 +40,7 @@ $(call create_folder,$(BUILD_SRPMS_DIR))
 $(call create_folder,$(SRPM_BUILD_CHROOT_DIR))
 
 # General targets
+##help:target:input-srpms=Scan the local `*.spec` files, locate sources, and create `*.src.rpm` files. Limit via SRPM_PACK_LIST.
 .PHONY: toolchain-input-srpms input-srpms clean-input-srpms
 input-srpms: $(BUILD_SRPMS_DIR)
 toolchain-input-srpms: $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag
@@ -48,6 +49,7 @@ clean: clean-input-srpms
 clean-input-srpms:
 	rm -rf $(BUILD_SRPMS_DIR)
 	rm -rf $(STATUS_FLAGS_DIR)/build_srpms.flag
+	rm -rf $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag
 	@echo Verifying no mountpoints present in $(SRPM_BUILD_CHROOT_DIR)
 	$(SCRIPTS_DIR)/safeunmount.sh "$(SRPM_BUILD_CHROOT_DIR)" && \
 	rm -rf $(SRPM_BUILD_CHROOT_DIR)
@@ -59,12 +61,12 @@ $(BUILD_SRPMS_DIR): $(STATUS_FLAGS_DIR)/build_srpms.flag
 	@echo Finished updating $@
 
 ifeq ($(DOWNLOAD_SRPMS),y)
-$(STATUS_FLAGS_DIR)/build_srpms.flag: $(local_specs) $(local_spec_dirs) $(local_spec_sources) $(SPECS_DIR)
+$(STATUS_FLAGS_DIR)/build_srpms.flag: $(local_specs) $(local_spec_dirs) $(local_spec_sources) $(SPECS_DIR) $(go-downloader)
 	for spec in $(local_specs); do \
 		spec_file=$${spec} && \
 		srpm_file=$$(rpmspec -q $${spec_file} --srpm --define='with_check 1' --define='dist $(DIST_TAG)' --queryformat %{NAME}-%{VERSION}-%{RELEASE}.src.rpm) && \
 		for url in $(SRPM_URL_LIST); do \
-			wget $${url}/$${srpm_file} \
+			$(go-downloader) $${url}/$${srpm_file} \
 				-O $(BUILD_SRPMS_DIR)/$${srpm_file} \
 				--no-verbose \
 				$(if $(TLS_CERT),--certificate=$(TLS_CERT)) \

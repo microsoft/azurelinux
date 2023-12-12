@@ -1,7 +1,21 @@
-diff -up stunnel-5.48/src/str.c.coverity stunnel-5.48/src/str.c
---- stunnel-5.48/src/str.c.coverity	2018-07-02 23:30:10.000000000 +0200
-+++ stunnel-5.48/src/str.c	2018-09-04 17:24:08.949928906 +0200
-@@ -165,6 +165,7 @@ char *str_vprintf(const char *format, va
+From c705c47f486cff5b6d79ca3183a6faec015f3ac1 Mon Sep 17 00:00:00 2001
+From: Sahana Prasad <sahana@redhat.com>
+Date: Mon, 12 Sep 2022 11:07:38 +0200
+Subject: [PATCH 4/8] Apply patch stunnel-5.56-coverity.patch
+
+Patch-name: stunnel-5.56-coverity.patch
+Patch-id: 4
+From-dist-git-commit: 70b3076eb09912b3a11f371b8c523303114fffa3
+---
+ src/str.c     | 1 +
+ src/stunnel.c | 1 -
+ 2 files changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/str.c b/src/str.c
+index b9eca81..fd62db8 100644
+--- a/src/str.c
++++ b/src/str.c
+@@ -165,6 +165,7 @@ char *str_vprintf(const char *format, va_list start_ap) {
      for(;;) {
          va_copy(ap, start_ap);
          n=vsnprintf(p, size, format, ap);
@@ -9,10 +23,11 @@ diff -up stunnel-5.48/src/str.c.coverity stunnel-5.48/src/str.c
          if(n>-1 && n<(int)size)
              return p;
          if(n>-1)                /* glibc 2.1 */
-diff -up stunnel-5.48/src/stunnel.c.coverity stunnel-5.48/src/stunnel.c
---- stunnel-5.48/src/stunnel.c.coverity	2018-07-02 23:30:10.000000000 +0200
-+++ stunnel-5.48/src/stunnel.c	2018-09-04 17:24:08.949928906 +0200
-@@ -364,7 +364,6 @@ NOEXPORT int accept_connection(SERVICE_O
+diff --git a/src/stunnel.c b/src/stunnel.c
+index 4ce906b..31115ea 100644
+--- a/src/stunnel.c
++++ b/src/stunnel.c
+@@ -445,7 +445,6 @@ NOEXPORT int accept_connection(SERVICE_OPTIONS *opt, unsigned i) {
  #endif
      if(create_client(fd, s, alloc_client_session(opt, s, s))) {
          s_log(LOG_ERR, "Connection rejected: create_client failed");
@@ -20,3 +35,6 @@ diff -up stunnel-5.48/src/stunnel.c.coverity stunnel-5.48/src/stunnel.c
  #ifndef USE_FORK
          service_free(opt);
  #endif
+-- 
+2.37.3
+

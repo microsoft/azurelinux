@@ -3,7 +3,7 @@
 Summary:        Modern Kafka client library for Ruby based on librdkafka
 Name:           rubygem-%{gem_name}
 Version:        0.12.0.beta.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -43,6 +43,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.12.0.beta.4-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.12.0.beta.4-1
 - Update to v0.12.0.beta.4.
 - Build from .tar.gz source.

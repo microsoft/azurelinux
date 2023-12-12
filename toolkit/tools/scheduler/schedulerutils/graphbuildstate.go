@@ -44,10 +44,7 @@ type GraphBuildState struct {
 //     '0' where the subsequent nodes will no longer be rebuilt. 'maxFreshness < 0' will cause unbounded cascading rebuilds,
 //     while 'maxFreshness = 0' will cause no cascading rebuilds.
 func NewGraphBuildState(reservedFiles []string, maxFreshness uint) (g *GraphBuildState) {
-	filesMap := make(map[string]bool)
-	for _, file := range reservedFiles {
-		filesMap[file] = true
-	}
+	filesMap := sliceutils.SliceToSet[string](reservedFiles)
 
 	return &GraphBuildState{
 		activeBuilds:     make(map[int64]*BuildRequest),

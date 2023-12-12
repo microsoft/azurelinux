@@ -8,7 +8,7 @@ Distribution:   Mariner
 
 Name:    pybind11
 Version: 2.6.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: Seamless operability between C++11 and Python
 License: BSD
 URL:	 https://github.com/pybind/pybind11
@@ -26,7 +26,9 @@ BuildRequires: python3-setuptools
 %if %{with_check}
 BuildRequires: python3-pytest
 BuildRequires: python3-numpy
-BuildRequires: python3-scipy
+
+# Missing test dependencies:
+# BuildRequires: python3-scipy
 %endif
 
 BuildRequires: gcc-c++
@@ -98,6 +100,10 @@ PYBIND11_USE_CMAKE=true %py3_install "--install-purelib" "%{python3_sitearch}"
 %{python3_sitearch}/%{name}-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Thu Aug 31 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.6.2-3
+- Disabling missing test dependency.
+- License verified.
+
 * Thu Sep 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.6.2-2
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 - Removing Python 2 build steps. Focusing on Python 3.

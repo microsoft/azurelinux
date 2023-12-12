@@ -1,7 +1,7 @@
 Summary:        Program for modifying or creating files
 Name:           patch
 Version:        2.7.6
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv3+
 URL:            https://www.gnu.org/software/patch/
 Source0:        https://ftp.gnu.org/gnu/patch/%{name}-%{version}.tar.gz
@@ -48,6 +48,9 @@ make  %{?_smp_mflags} check
 %{_mandir}/*/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.7.6-8
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 *   Tue Jun 02 2020 Nick Samson <nisamson@microsoft.com> - 2.7.6-7
 -   Fixed CVE-2019-13636
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2.7.6-6

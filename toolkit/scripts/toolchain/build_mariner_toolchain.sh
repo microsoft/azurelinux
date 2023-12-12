@@ -72,7 +72,7 @@ if [ "$INCREMENTAL_TOOLCHAIN" = "y" ]; then
 
     tar -C "$MARINER_BUILD_DIR"/toolchain/built_rpms_all \
         -T "$MARINER_BUILD_DIR"/logs/toolchain/built_rpms_list.txt \
-        -cvf "$MARINER_BUILD_DIR"/toolchain/toolchain_built_rpms_delta.tar.gz
+        -czvf "$MARINER_BUILD_DIR"/toolchain/toolchain_built_rpms_delta.tar.gz
 fi
 
 echo Printing list of built toolchain RPMS:

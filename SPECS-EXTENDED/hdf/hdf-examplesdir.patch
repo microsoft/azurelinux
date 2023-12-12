@@ -1,0 +1,50 @@
+diff -up a/hdf/examples/Makefile.am b/hdf/examples/Makefile.am
+--- a/hdf/examples/Makefile.am	2017-01-31 14:41:51.947802481 -0700
++++ b/hdf/examples/Makefile.am	2017-01-31 14:42:34.883572782 -0700
+@@ -46,8 +46,8 @@
+ INSTALL_TOP_FILES = README
+ 
+ # Where to install example files
+-EXAMPLEDIR=${DESTDIR}$(exec_prefix)/share/hdf4_examples/c
+-EXAMPLETOPDIR=${DESTDIR}$(exec_prefix)/share/hdf4_examples
++EXAMPLEDIR=$(docdir)/examples/c
++EXAMPLETOPDIR=$(docdir)/examples
+ 
+ # How to build C programs using h4cc
+ $(EXTRA_PROG): $(H4CC)
+diff -up a/hdf/fortran/examples/Makefile.am b/hdf/fortran/examples/Makefile.am
+--- a/hdf/fortran/examples/Makefile.am	2017-01-31 14:41:51.949802471 -0700
++++ b/hdf/fortran/examples/Makefile.am	2017-01-31 14:43:07.968395906 -0700
+@@ -41,7 +41,7 @@
+ INSTALL_SCRIPT_FILES = run-fortran-ex.sh
+ 
+ # Where to install Fortran example files
+-EXAMPLEDIR=${DESTDIR}$(exec_prefix)/share/hdf4_examples/fortran
++EXAMPLEDIR=$(docdir)/examples/fortran
+ 
+ # How to build Fortran programs using h4fc
+ $(EXTRA_PROG): $(H4FC)
+diff -up a/mfhdf/examples/Makefile.am b/mfhdf/examples/Makefile.am
+--- a/mfhdf/examples/Makefile.am	2017-01-31 14:41:51.950802465 -0700
++++ b/mfhdf/examples/Makefile.am	2017-01-31 14:43:23.376314066 -0700
+@@ -23,7 +23,7 @@
+ 	SD_get_info.c SD_find_sds_by_name.c SD_set_get_dim_info.c        \
+ 	SD_dimscale_vs_sds.c SD_set_attr.c SD_get_attr.c SD_chunking_example.c
+ 
+-EXAMPLEDIR=${DESTDIR}$(exec_prefix)/share/hdf4_examples/c
++EXAMPLEDIR=$(docdir)/examples/c
+ 
+ # How to build programs using h4cc
+ $(EXTRA_PROG): $(H4CC)
+diff -up a/mfhdf/fortran/examples/Makefile.am b/mfhdf/fortran/examples/Makefile.am
+--- a/mfhdf/fortran/examples/Makefile.am	2017-01-31 14:41:51.952802455 -0700
++++ b/mfhdf/fortran/examples/Makefile.am	2017-01-31 14:43:40.206224672 -0700
+@@ -24,7 +24,7 @@
+ 	SD_set_attr.f SD_get_attr.f SD_compress_sds.f SD_chunking_example.f
+ 
+ # Where to install example files
+-EXAMPLEDIR=${DESTDIR}$(exec_prefix)/share/hdf4_examples/fortran
++EXAMPLEDIR=$(docdir)/examples/fortran
+ 
+ # How to build Fortran programs using h4fc
+ $(EXTRA_PROG): $(H4FC)

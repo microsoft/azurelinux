@@ -1,29 +1,31 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 %bcond_with multiuser
 %global _hardened_build 1
 
 Summary:        A screen manager that supports multiple logins on one terminal
 Name:           screen
-Version:        4.9.0
+Version:        4.9.1
 Release:        1%{?dist}
 License:        GPLv3+
-URL:            http://www.gnu.org/software/screen
-Requires(pre):  /usr/sbin/groupadd
-BuildRequires:  ncurses-devel pam-devel libutempter-devel autoconf texinfo
-BuildRequires:  automake gcc
-# for %%_tmpfilesdir macro
-BuildRequires:  systemd
-
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://www.gnu.org/software/screen
 Source0:        https://ftp.gnu.org/gnu/screen/screen-%{version}.tar.gz
 Source1:        screen.pam
-
 Patch1:         screen-4.3.1-libs.patch
 Patch2:         screen-4.3.1-screenrc.patch
 Patch3:         screen-E3.patch
 Patch4:         screen-4.3.1-suppress_remap.patch
 Patch5:         screen-4.3.1-crypt.patch
-Patch6:         screen-4.9.0-braille.patch
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  gcc
+BuildRequires:  libutempter-devel
+BuildRequires:  ncurses-devel
+BuildRequires:  pam-devel
+# for %%_tmpfilesdir macro
+BuildRequires:  systemd
+BuildRequires:  texinfo
+Requires(pre):  %{_sbindir}/groupadd
 
 %description
 The screen utility allows you to have multiple logins on just one
@@ -33,7 +35,6 @@ login.
 
 Install the screen package if you need a screen manager that can
 support multiple logins on one terminal.
-
 
 %prep
 %autosetup -p1
@@ -55,7 +56,7 @@ autoreconf -i
 # We would like to have braille support.
 sed -i -e 's/.*#.*undef.*HAVE_BRAILLE.*/#define HAVE_BRAILLE 1/;' config.h
 
-sed -i -e 's/\(\/usr\)\?\/local\/etc/\/etc/g;' doc/screen.{1,texinfo}
+sed -i -e 's/\(\/usr\)\?\/local\%{_sysconfdir}/\%{_sysconfdir}/g;' doc/screen.{1,texinfo}
 
 for i in doc/screen.texinfo; do
     iconv -f iso8859-1 -t utf-8 < $i > $i.utf8 && mv -f ${i}{.utf8,}
@@ -67,23 +68,23 @@ rm -f doc/screen.info*
 make
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT
-mv -f $RPM_BUILD_ROOT%{_bindir}/screen{-%{version},}
+make install DESTDIR=%{buildroot}
+mv -f %{buildroot}%{_bindir}/screen{-%{version},}
 
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}
-install -m 0644 etc/etcscreenrc $RPM_BUILD_ROOT%{_sysconfdir}/screenrc
-cat etc/screenrc >> $RPM_BUILD_ROOT%{_sysconfdir}/screenrc
+mkdir -p %{buildroot}%{_sysconfdir}
+install -m 0644 etc/etcscreenrc %{buildroot}%{_sysconfdir}/screenrc
+cat etc/screenrc >> %{buildroot}%{_sysconfdir}/screenrc
 
 # Better not forget to copy the pam file around
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/pam.d
-install -p -m 0644 %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/pam.d/screen
+mkdir -p %{buildroot}%{_sysconfdir}/pam.d
+install -p -m 0644 %{SOURCE1} %{buildroot}%{_sysconfdir}/pam.d/screen
 
 # Create the socket dir
-mkdir -p $RPM_BUILD_ROOT%{_rundir}/screen
+mkdir -p %{buildroot}%{_rundir}/screen
 
 # And tell systemd to recreate it on start with tmpfs
-mkdir -p $RPM_BUILD_ROOT%{_tmpfilesdir}
-cat <<EOF > $RPM_BUILD_ROOT%{_tmpfilesdir}/screen.conf
+mkdir -p %{buildroot}%{_tmpfilesdir}
+cat <<EOF > %{buildroot}%{_tmpfilesdir}/screen.conf
 # screen needs directory in /run
 %if %{with multiuser}
 d %{_rundir}/screen 0755 root root
@@ -93,10 +94,10 @@ d %{_rundir}/screen 0775 root screen
 EOF
 
 # Remove files from the buildroot which we don't want packaged
-rm -f $RPM_BUILD_ROOT%{_infodir}/dir
+rm -f %{buildroot}%{_infodir}/dir
 
 %pre
-/usr/sbin/groupadd -g 84 -r -f screen
+%{_sbindir}/groupadd -g 84 -r -f screen
 :
 
 %files
@@ -117,6 +118,10 @@ rm -f $RPM_BUILD_ROOT%{_infodir}/dir
 %endif
 
 %changelog
+* Thu Aug 31 2023 Muhammad Falak <mwani@microsoft.com> - 4.9.1-1
+- Upgrade version to adress CVE-2021-20230
+- Lint spec
+
 * Wed Nov 09 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.9.0-1
 - Auto-upgrade to 4.9.0 - CVE-2021-26937
 

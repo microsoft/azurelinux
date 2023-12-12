@@ -15,7 +15,7 @@
 Summary:        GTK+ graphical user interface library
 Name:           gtk3
 Version:        3.24.28
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -289,6 +289,9 @@ gtk-query-immodules-3.0-%{__isa_bits} --update-cache &>/dev/null || :
 %{_datadir}/installed-tests/
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.24.28-9
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Thu Feb 03 2022 Henry Li <lihl@microsoft.com> - 3.24.28-8
 - Use pkgconfig(rest-1.0) as BR 
 

@@ -1,4 +1,4 @@
-From bd87b44049dd383d6139b2b756dbfc3167ad4937 Mon Sep 17 00:00:00 2001
+From 43040291be2f48d6b2aae015592266c0b1dbd59e Mon Sep 17 00:00:00 2001
 From: Muhammad Falak R Wani <falakreyaz@gmail.com>
 Date: Fri, 12 Aug 2022 07:34:42 +0530
 Subject: [PATCH 3/3] xterm man paths
@@ -10,7 +10,7 @@ Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
  2 files changed, 11 insertions(+), 4 deletions(-)
 
 diff --git a/minstall.in b/minstall.in
-index cd15775..0228db7 100644
+index fe2c610..03b00b3 100644
 --- a/minstall.in
 +++ b/minstall.in
 @@ -141,6 +141,11 @@ USE_chr1=`echo "$USE_name" | sed -e 's/^.//'`
@@ -36,10 +36,10 @@ index cd15775..0228db7 100644
  	"$OLD_FILE" >$NEW_FILE
  # diff -u $OLD_FILE $NEW_FILE
 diff --git a/xterm.man b/xterm.man
-index f5f510f..fdc4990 100644
+index f8270fd..51867fa 100644
 --- a/xterm.man
 +++ b/xterm.man
-@@ -2551,19 +2551,18 @@ Since X11R6, bitmap fonts have been scaled.
+@@ -2572,19 +2572,18 @@ Since X11R6, bitmap fonts have been scaled.
  The font server claims to provide the bold font that \fI\*n\fP requests,
  but the result is not always readable.
  XFree86 introduced a feature which can be used to suppress the scaling.
@@ -63,5 +63,5 @@ index f5f510f..fdc4990 100644
  .IP
  Depending on your configuration, the font server may have its own configuration
 -- 
-2.37.1
+2.40.1
 

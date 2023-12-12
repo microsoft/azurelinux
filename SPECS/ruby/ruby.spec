@@ -83,7 +83,7 @@ Name:           ruby
 # provides should be versioned according to the ruby version.
 # More info: https://stdgems.org/
 Version:        3.1.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -401,6 +401,9 @@ sudo -u test make test TESTS="-v"
 %{_rpmconfigdir}/rubygems.con
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.1.4-3
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Mon Aug 14 2023 Saul Paredes <saulparedes@microsoft.com> - 3.1.4-2
 - Patch CVE-2023-36617
 

@@ -72,6 +72,40 @@ func SetToSlice[T comparable](inputSet map[T]bool) []T {
 	return outputSlice[:index]
 }
 
+// SliceToSet converts a slice of K to a map[K]bool.
+func SliceToSet[K comparable](inputSlice []K) (outputSet map[K]bool) {
+	outputSet = make(map[K]bool, len(inputSlice))
+	for _, element := range inputSlice {
+		outputSet[element] = true
+	}
+	return outputSet
+}
+
+// RemoveDuplicatesFromSlice removes duplicate elements from a slice.
+func RemoveDuplicatesFromSlice[K comparable](inputSlice []K) (outputSlice []K) {
+	return SetToSlice(SliceToSet(inputSlice))
+}
+
 func nilCheck(expected interface{}, given interface{}) (checkValid, checkResult bool) {
 	return (expected == nil || given == nil), (expected == nil && given == nil)
+}
+
+// Can be replaced by slices.Contains in Go 1.21.
+func ContainsValue[K comparable](inputSlice []K, value K) bool {
+	for _, item := range inputSlice {
+		if item == value {
+			return true
+		}
+	}
+	return false
+}
+
+// Can be replaced by slices.ContainsFunc in Go 1.21.
+func ContainsFunc[K any](inputSlice []K, fn func(K) bool) bool {
+	for _, item := range inputSlice {
+		if fn(item) {
+			return true
+		}
+	}
+	return false
 }

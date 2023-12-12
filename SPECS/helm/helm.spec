@@ -1,8 +1,8 @@
 %global debug_package %{nil}
 
 Name:          helm
-Version:       3.10.3
-Release:       9%{?dist}
+Version:       3.13.2
+Release:       1%{?dist}
 Summary:       The Kubernetes Package Manager
 Group:         Applications/Networking
 License:       Apache 2.0
@@ -25,8 +25,7 @@ Source0:       %{name}-%{version}.tar.gz
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
 Source1:       %{name}-%{version}-vendor.tar.gz
-Patch0:        CVE-2023-25165.patch
-BuildRequires: golang <= 1.18.8
+BuildRequires: golang
 
 %description
 Helm is a tool that streamlines installing and managing Kubernetes applications. Think of it like apt/yum/homebrew for Kubernetes.
@@ -56,6 +55,16 @@ install -m 755 ./helm %{buildroot}%{_bindir}
 go test -v ./cmd/helm
 
 %changelog
+* Thu Nov 30 2023 Sindhu Karri <lakarri@microsoft.com> - 3.13.2-1
+- Upgrade to 3.13.2 to fix CVE-2023-2253, CVE-2023-28840, CVE-2022-27664, CVE-2022-41721, CVE-2022-41723, CVE-2023-39325, CVE-2022-32149, GHSA-m425-mq94-257g, CVE-2022-23471, CVE-2023-25153, CVE-2023-25173, GHSA-6xv5-86q9-7xr8, CVE-2023-28841, CVE-2023-28842, GHSA-jq35-85cj-fj4p, CVE-2023-3978, CVE-2023-44487, CVE-2023-44487, CVE-2023-25165
+- Remove dependency on golang version <= 1.18.8. Builds with latest golang version 1.20.10
+
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.10.3-11
+- Bump release to rebuild with go 1.20.9
+
+* Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 3.10.3-10
+- Bump release to rebuild with updated version of Go.
+
 * Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.10.3-9
 - Bump release to rebuild with go 1.19.12
 

@@ -4,7 +4,7 @@
 Name:          ipmitool
 Summary:       Utility for IPMI control
 Version:       1.8.18
-Release:       21%{?dist}
+Release:       22%{?dist}
 License:       BSD
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
@@ -187,6 +187,9 @@ install -Dm 755 contrib/bmc-snmp-proxy         %{buildroot}%{_libexecdir}/bmc-sn
 %{_libexecdir}/bmc-snmp-proxy
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.8.18-22
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Fri Jun 19 2020 Andrew Phelps <anphel@microsoft.com> - 1.8.18-21
 - Require net-tools instead of hostname
 

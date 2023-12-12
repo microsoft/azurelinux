@@ -53,7 +53,7 @@
 Summary:        Postfix Mail Transport Agent
 Name:           postfix
 Version:        3.7.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        (IBM AND GPLv2+) OR (EPL-2.0 AND GPLv2+)
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -762,6 +762,9 @@ exit 0
 %endif
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.7.0-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Mon Feb 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.7.0-1
 - Updating to version 3.7.0.
 - License verified.

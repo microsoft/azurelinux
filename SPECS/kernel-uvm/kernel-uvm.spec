@@ -10,18 +10,18 @@
 
 Summary:        Linux Kernel for Kata UVM
 Name:           kernel-uvm
-Version:        5.15.110.mshv2
-Release:        2%{?dist}
+Version:        6.1.0.mshv14
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Kernel
-# uses same source as kernel-mshv
-Source0:       %{_mariner_sources_url}/kernel-mshv-%{version}.tar.gz
+Source0:        %{_mariner_sources_url}/kernel-uvm-%{version}.tar.gz
 Source1:        config
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
+BuildRequires:  cpio
 BuildRequires:  diffutils
 BuildRequires:  dwarves
 BuildRequires:  elfutils-libelf-devel
@@ -154,6 +154,31 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %{_prefix}/src/linux-headers-%{uname_r}
 
 %changelog
+* Wed Nov 29 2023 Manuel Huber <mahuber@microsoft.com> - 6.1.0.mshv14-3
+- Enable tmpfs xattr for supporting use of extended attributes when container
+    rootfs is an overlayfs with tmps as upper dir as with tardev-snapshotter
+
+* Mon Nov 20 2023 Rachel Menge <rachelmenge@microsoft.com> - 6.1.0.mshv14-2
+- Add cpio as BuildRequires
+
+* Mon Nov 6 2023 Dallas Delaney <dadelan@microsoft.com> - 6.1.0.mshv14-1
+- Update to v6.1.0.mshv14
+
+* Fri Oct 06 2023 Manuel Huber <mahuber@microsoft.com> - 6.1.0.mshv11-2
+- Enable dm-crypt and dm-integrity for encfs sidecar functionality
+
+* Thu Sep 15 2023 Saul Paredes <saulparedes@microsoft.com> - 6.1.0.mshv11-1
+- Update to v6.1.0.mshv11
+
+* Fri Sep 15 2023 Saul Paredes <saulparedes@microsoft.com> - 6.1.0.mshv10-1
+- Update to v6.1.0.mshv10
+
+* Mon Aug 28 2023 Saul Paredes <saulparedes@microsoft.com> - 5.15.123.mshv4-1
+- Update to v5.15.123.mshv4
+
+* Thu Jun 22 2023 Saul Paredes <saulparedes@microsoft.com> - 5.15.118.mshv4-1
+- Update to v5.15.118.mshv4
+
 * Wed May 31 2023 Dallas Delaney <dadelan@microsoft.com> - 5.15.110.mshv2-2
 - Enable dm-verity
 
@@ -196,7 +221,7 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 - Symlink /lib/modules/uname/vmlinuz to /boot/vmlinuz-uname to improve compat with scripts seeking the kernel.
 
 * Wed Jun 22 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 5.15.48.1-2
-- Enabling Vgem driver in config. 
+- Enabling Vgem driver in config.
 
 * Fri Jun 17 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.48.1-1
 - Update source to 5.15.48.1
@@ -209,7 +234,7 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 - Address CVE-2022-32250 with a nopatch
 
 * Mon Jun 06 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 5.15.41.1-4
-- Compiling ptp_kvm driver as a module 
+- Compiling ptp_kvm driver as a module
 
 * Wed Jun 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.41.1-3
 - Enabling "LIVEPATCH" config option.
@@ -229,7 +254,7 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 
 * Mon May 09 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.37.1-1
 - Update source to 5.15.37.1
-- Nopatch CVE-2021-4095, CVE-2022-0500, CVE-2022-0998, CVE-2022-28796, CVE-2022-29582, 
+- Nopatch CVE-2021-4095, CVE-2022-0500, CVE-2022-0998, CVE-2022-28796, CVE-2022-29582,
     CVE-2022-1048, CVE-2022-1195, CVE-2022-1353, CVE-2022-29968, CVE-2022-1015
 - Enable IFB config
 
@@ -237,7 +262,7 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 - Update source to 5.15.34.1
 - Clean up nopatches in Patch list, no longer needed for CVE automation
 - Nopatch CVE-2022-28390, CVE-2022-28389, CVE-2022-28388, CVE-2022-28356, CVE-2022-0435,
-    CVE-2021-4202, CVE-2022-27950, CVE-2022-0433, CVE-2022-0494, CVE-2022-0330, CVE-2022-0854, 
+    CVE-2021-4202, CVE-2022-27950, CVE-2022-0433, CVE-2022-0494, CVE-2022-0330, CVE-2022-0854,
     CVE-2021-4197, CVE-2022-29156
 
 * Tue Apr 19 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 5.15.32.1-3
@@ -268,7 +293,7 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 * Tue Mar 08 2022 cameronbaird <cameronbaird@microsoft.com> - 5.15.26.1-1
 - Update source to 5.15.26.1
 - Address CVES: 2022-0617, 2022-25375, 2022-25258, 2021-4090, 2022-25265,
-  2021-45402, 2022-0382, 2022-0185, 2021-44879, 2022-24959, 2022-0264, 
+  2021-45402, 2022-0382, 2022-0185, 2021-44879, 2022-24959, 2022-0264,
   2022-24448, 2022-24122, 2021-20194, 2022-0847, 1999-0524, 2008-4609,
   2010-0298, 2010-4563, 2011-0640, 2022-0492, 2021-3743, 2022-26966
 
@@ -287,7 +312,7 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 * Mon Feb 07 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.18.1-1
 - Update source to 5.15.18.1
 - Address CVE-2010-0309, CVE-2018-1000026, CVE-2018-16880, CVE-2019-3016,
-  CVE-2019-3819, CVE-2019-3887, CVE-2020-25672, CVE-2021-3564, CVE-2021-45095, 
+  CVE-2019-3819, CVE-2019-3887, CVE-2020-25672, CVE-2021-3564, CVE-2021-45095,
   CVE-2021-45469, CVE-2021-45480
 
 * Thu Feb 03 2022 Henry Li <lihl@microsoft.com> - 5.15.2.1-5

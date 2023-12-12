@@ -1,0 +1,146 @@
+From 4a1a2c0f05839e80229fcb2516fee5067804491e Mon Sep 17 00:00:00 2001
+From: Chris Coulson <chris.coulson@canonical.com>
+Date: Tue, 5 Apr 2022 11:48:58 +0100
+Subject: [PATCH] loader/efi/chainloader: Use grub_loader_set_ex()
+
+This ports the EFI chainloader to use grub_loader_set_ex() in order to fix
+a use-after-free bug that occurs when grub_cmd_chainloader() is executed
+more than once before a boot attempt is performed.
+
+Fixes: CVE-2022-28736
+
+Signed-off-by: Chris Coulson <chris.coulson@canonical.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+Modified patch 04c86e0bb7b58fc2f913f798cdb18934933e532d to apply to CBL-Mariner: Merged chainloader to remove remaining globals and use grub_loader_set_ex().  Based on https://src.fedoraproject.org/rpms/grub2/blob/f0ad2aaa267a5d99b47f5c5770a55de0a702fdf0/f/0223-loader-efi-chainloader-Use-grub_loader_set_ex.patch
+Modified-by: Gary Swalling <gaswal@microsoft.com>
+---
+ grub-core/loader/efi/chainloader.c | 35 +++++++++++++++---------------
+ 1 file changed, 18 insertions(+), 17 deletions(-)
+
+diff --git a/grub-core/loader/efi/chainloader.c b/grub-core/loader/efi/chainloader.c
+index 97a6a70..996787f 100644
+--- a/grub-core/loader/efi/chainloader.c
++++ b/grub-core/loader/efi/chainloader.c
+@@ -47,8 +47,6 @@ GRUB_MOD_LICENSE ("GPLv3+");
+ 
+ static grub_dl_t my_mod;
+ 
+-static grub_efi_handle_t image_handle;
+-
+ struct grub_secureboot_chainloader_context {
+   grub_efi_physical_address_t address;
+   grub_efi_uintn_t pages;
+@@ -58,11 +56,11 @@ struct grub_secureboot_chainloader_context {
+   grub_ssize_t cmdline_len;
+   grub_efi_handle_t dev_handle;
+ };
+-static struct grub_secureboot_chainloader_context *sb_context;
+ 
+ static grub_err_t
+-grub_chainloader_unload (void)
++grub_chainloader_unload (void *context)
+ {
++  grub_efi_handle_t image_handle = (grub_efi_handle_t) context;
+   grub_efi_loaded_image_t *loaded_image;
+   grub_efi_boot_services_t *b;
+ 
+@@ -114,8 +112,9 @@ grub_start_image (grub_efi_handle_t handle)
+ }
+ 
+ static grub_err_t
+-grub_chainloader_boot (void)
++grub_chainloader_boot (void *context)
+ {
++  grub_efi_handle_t image_handle = (grub_efi_handle_t) context;
+   grub_err_t err;
+ 
+   err = grub_start_image (image_handle);
+@@ -124,7 +123,6 @@ grub_chainloader_boot (void)
+   return err;
+ }
+ 
+-
+ static grub_err_t
+ copy_file_path (grub_efi_file_path_device_path_t *fp,
+ 		const char *str, grub_efi_uint16_t len)
+@@ -837,15 +835,16 @@ error_exit:
+ }
+ 
+ static grub_err_t
+-grub_secureboot_chainloader_unload (void)
++grub_secureboot_chainloader_unload (void *context)
+ {
++  struct grub_secureboot_chainloader_context *sb_context;
++  sb_context = (struct grub_secureboot_chainloader_context *) context;
++
+   grub_efi_free_pages (sb_context->address, sb_context->pages);
+   grub_free (sb_context->file_path);
+   grub_free (sb_context->cmdline);
+   grub_free (sb_context);
+ 
+-  sb_context = 0;
+-
+   grub_dl_unref (my_mod);
+   return GRUB_ERR_NONE;
+ }
+@@ -894,12 +893,15 @@ grub_load_image(grub_efi_device_path_t *file_path, void *boot_image,
+ }
+ 
+ static grub_err_t
+-grub_secureboot_chainloader_boot (void)
++grub_secureboot_chainloader_boot (void *context)
+ {
++  struct grub_secureboot_chainloader_context *sb_context;
+   grub_efi_boot_services_t *b;
+   int rc;
+   grub_efi_handle_t handle = 0;
+ 
++  sb_context = (struct grub_secureboot_chainloader_context *) context;
++
+   rc = handle_image (sb_context);
+   if (rc == 0)
+     {
+@@ -939,6 +941,8 @@ grub_cmd_chainloader (grub_command_t cmd __attribute__ ((unused)),
+   grub_efi_char16_t *cmdline = 0;
+   grub_ssize_t cmdline_len = 0;
+   grub_efi_handle_t dev_handle = 0;
++  grub_efi_handle_t image_handle = 0;
++  struct grub_secureboot_chainloader_context *sb_context = 0;
+   int rc;
+ 
+   if (argc == 0)
+@@ -1111,8 +1115,8 @@ grub_cmd_chainloader (grub_command_t cmd __attribute__ ((unused)),
+ 
+       grub_file_close (file);
+       grub_device_close (dev);
+-      grub_loader_set (grub_secureboot_chainloader_boot,
+-		       grub_secureboot_chainloader_unload, 0);
++      grub_loader_set_ex (grub_secureboot_chainloader_boot,
++		       grub_secureboot_chainloader_unload, sb_context, 0);
+       return 0;
+     }
+   else if (rc == 0)
+@@ -1126,7 +1130,7 @@ grub_cmd_chainloader (grub_command_t cmd __attribute__ ((unused)),
+       efi_call_2 (b->free_pages, address, pages);
+       grub_free (file_path);
+ 
+-      grub_loader_set (grub_chainloader_boot, grub_chainloader_unload, 0);
++      grub_loader_set_ex (grub_chainloader_boot, grub_chainloader_unload, image_handle, 0);
+ 
+       return 0;
+     }
+@@ -1148,10 +1152,7 @@ fail:
+     grub_free (cmdline);
+ 
+   if (image_handle != 0)
+-    {
+-      efi_call_1 (b->unload_image, image_handle);
+-      image_handle = 0;
+-    }
++    efi_call_1 (b->unload_image, image_handle);
+ 
+   grub_dl_unref (my_mod);
+ 
+-- 
+2.34.1
+

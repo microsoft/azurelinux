@@ -5,9 +5,9 @@ name: Check Package CGManifests
 
 on:
   push:
-    branches: [main, dev, 1.0*, 2.0*]
+    branches: [main, dev, 1.0*, 2.0*, fasttrack/*]
   pull_request:
-    branches: [main, dev, 1.0*, 2.0*]
+    branches: [main, dev, 1.0*, 2.0*, fasttrack/*]
 
 jobs:
 
@@ -17,7 +17,7 @@ jobs:
     steps:
 
     - name: Check out code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Get base commit for PRs
       if: ${{ github.event_name == 'pull_request' }}

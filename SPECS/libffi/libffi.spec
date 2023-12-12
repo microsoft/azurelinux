@@ -1,7 +1,7 @@
 Summary:        A portable, high level programming interface to various calling conventions
 Name:           libffi
 Version:        3.4.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -75,6 +75,9 @@ rm -rf %{buildroot}/%{_infodir}
 %{_mandir}/man3/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.4.2-3
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Tue Jan 25 2022 Thomas Crain <thcrain@microsoft.com> - 3.4.2-2
 - Remove incorrect pkgconfig provides in main package
 

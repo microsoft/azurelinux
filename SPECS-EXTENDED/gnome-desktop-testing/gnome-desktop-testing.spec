@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           gnome-desktop-testing
 Version:        2018.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        GNOME test runner for installed tests
 
 License:        LGPLv2+
@@ -10,7 +10,7 @@ URL:            https://live.gnome.org/Initiatives/GnomeGoals/InstalledTests
 Source0:        https://gitlab.gnome.org/GNOME/%{name}/-/archive/v%{version}/%{name}-v%{version}.tar.gz
 
 BuildRequires:  pkgconfig(gio-unix-2.0)
-BuildRequires:  pkgconfig(libsystemd)
+BuildRequires:  systemd-devel
 BuildRequires:  pkgconfig(libgsystem)
 BuildRequires:  git automake autoconf libtool
 
@@ -39,6 +39,10 @@ make install DESTDIR=$RPM_BUILD_ROOT
 %{_bindir}/ginsttest-runner
 
 %changelog
+* Tue Sep 19 2023 Jon Slobodzian <joslobo@microsoft.com> - 2018.1-4
+- Fix build issue for systemd/systemd-bootstrap confusion
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2018.1-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

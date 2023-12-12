@@ -1,0 +1,3 @@
+SystemConfig:
+  AdditionalFiles:
+    files/a.txt: /a.txt

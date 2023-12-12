@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           iio-sensor-proxy
 Version:        3.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        IIO accelerometer sensor to input device proxy
 
 License:        GPLv3+
@@ -12,8 +12,6 @@ Source0:        https://gitlab.freedesktop.org/hadess/%{name}/uploads/de965bcb44
 BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:  make
 BuildRequires:  gcc
-BuildRequires:  pkgconfig(udev)
-BuildRequires:  pkgconfig(systemd)
 BuildRequires:  pkgconfig(gio-2.0)
 BuildRequires:  pkgconfig(gudev-1.0)
 BuildRequires:  systemd
@@ -66,6 +64,9 @@ This package contains the documentation for %{name}.
 %{_datadir}/gtk-doc/html/%{name}/
 
 %changelog
+* Tue Sep 19 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.0-5
+- Fix build issue for systemd/systemd-bootstrap confusion
+
 * Tue Mar 22 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0-4
 - Fixing configuration step in %%build.
 

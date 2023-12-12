@@ -32,12 +32,13 @@
 Summary:        Ticket Manager for Multi-site Clusters
 Name:           booth
 Version:        1.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/ClusterLabs/%{name}
 Source0:        https://github.com/ClusterLabs/%{name}/archive/%{commit}/%{name}-%{shortcommit}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:    CVE-2022-2553.patch
 # direct build process dependencies
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -237,6 +238,9 @@ VERBOSE=1 make check
 %{_libdir}/ocf/resource.d/booth/sharedrsc
 
 %changelog
+* Wed Aug 30 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0-8
+- Add patch for CVE-2022-2553
+
 * Wed Mar 08 2023 Sumedh Sharma <sumsharma@microsoft.com> - 1.0-7
 - license verified
 

@@ -1,7 +1,7 @@
 Summary:        Bourne-Again SHell
 Name:           bash
 Version:        5.1.8
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -328,6 +328,9 @@ fi
 %defattr(-,root,root)
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.1.8-4
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Thu Jun 29 2023 Tobias Brick <tobiasb@microsoft.com> - 5.1.8-3
 - Revert: Add dependency on filesystem
 - Revert: Remove umask.sh, which will be provided by filesystem

@@ -12,11 +12,14 @@
 %undefine _strict_symbol_defs_build
 
 %global katacache               %{_localstatedir}/cache
-%global katalibexecdir          %{_libexecdir}/kata-containers
+%global katauvmdir              /opt/kata-containers/uvm
 %global katalocalstatecachedir  %{katacache}/kata-containers
 
-%global kataagentdir            %{katalibexecdir}/agent
-%global kataosbuilderdir        %{katalibexecdir}/osbuilder
+%global kataagentdir            %{katauvmdir}/agent
+%global kataosbuilderdir        %{katauvmdir}/tools/osbuilder
+%global kataconfigdir           /usr/share/defaults/kata-containers
+%global kataclhdir              /usr/share/cloud-hypervisor
+%global katainitrddir           /var/cache/kata-containers/osbuilder-images/kernel-uvm
 
 %global runtime_make_vars       QEMUPATH=%{qemupath} \\\
                                 KERNELTYPE="compressed" \\\
@@ -25,8 +28,8 @@
                                 DEFVIRTIOFSDAEMON=%{_libexecdir}/"virtiofsd" \\\
                                 DEFVIRTIOFSCACHESIZE=0 \\\
                                 DEFSANDBOXCGROUPONLY=false \\\
-                                DEFSTATICSANDBOXWORKLOADMEM=1984 \\\
-                                DEFMEMSZ=64 \\\
+                                DEFSTATICSANDBOXWORKLOADMEM=1792 \\\
+                                DEFMEMSZ=256 \\\
                                 SKIP_GO_VERSION_CHECK=y \\\
                                 MACHINETYPE=%{machinetype} \\\
                                 DESTDIR=%{buildroot} \\\
@@ -41,22 +44,23 @@
 Summary:        Kata Containers version 2.x repository
 Name:           kata-containers
 Version:        3.1.0
-Release:        4%{?dist}
+Release:        10%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 URL:            https://github.com/%{name}/%{name}
 Source0:        https://github.com/%{name}/%{name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        https://github.com/%{name}/%{name}/releases/download/%{version}/%{name}-%{version}-vendor.tar.gz
-Source2:        kata-osbuilder.sh
-Source3:        kata-osbuilder-generate.service
-Source4:        15-dracut.conf
-Source5:        50-kata
+Source2:        50-kata
+Source3:        mariner-build-uvm.sh
 Patch0:         0001-Merged-PR-9607-Allow-10-seconds-for-VM-creation-star.patch
 Patch1:         0002-Merged-PR-9671-Wait-for-a-possibly-slow-Guest.patch
 Patch2:         0003-Merged-PR-9805-Add-support-for-MSHV.patch
 Patch3:         0004-Merged-PR-9806-Fix-enable_debug-for-hypervisor.clh.patch
 Patch4:         0005-Merged-PR-9956-shim-avoid-memory-hotplug-timeout.patch
-Patch9:         runtime-reduce-uvm-high-mem-footprint.patch
+Patch5:         runtime-reduce-uvm-high-mem-footprint.patch
+Patch6:         drop-mut-for-variables-that-are-not-mutated.patch
+Patch7:         0001-osbuilder-Add-support-for-CBL-Mariner.patch
+Patch8:         0001-Append-systemd-kernel-cmdline-params-for-initrd.patch
 
 BuildRequires:  golang
 BuildRequires:  git-core
@@ -74,15 +78,12 @@ BuildRequires:  cargo
 BuildRequires:  rust
 
 Requires:       busybox
-Requires:       dracut
 Requires:       kernel
 Requires:       libseccomp
-Requires:       qemu-kvm-core >= 4.2.0-4
-Requires:       %{_libexecdir}/virtiofsd
+Requires:       qemu-virtiofsd
 
 Conflicts:      kata-agent
 Conflicts:      kata-ksm-throttler
-Conflicts:      kata-osbuilder
 Conflicts:      kata-proxy
 Conflicts:      kata-runtime
 Conflicts:      kata-shim
@@ -92,6 +93,14 @@ Kata Containers version 2.x repository. Kata Containers is an open source
 project and community working to build a standard implementation of lightweight
 Virtual Machines (VMs) that feel and perform like containers, but provide the
 workload isolation and security advantages of VMs. https://katacontainers.io/.}
+
+%package tools
+Summary:        Kata Tools package
+Requires:       cargo
+Requires:       curl
+
+%description tools
+This package contains the UVM osbuilder files
 
 %prep
 %autosetup -p1 -n %{name}-%{version}
@@ -130,10 +139,16 @@ export PATH=$PATH:$GOPATH/bin
 
 cd go/src/github.com/%{name}/%{name}
 
-install -m 0644 -D -t %{buildroot}%{katalibexecdir} VERSION
+install -m 0755 -D -t %{buildroot}%{katauvmdir} %{SOURCE3}
+install -m 0644 -D -t %{buildroot}%{katauvmdir} VERSION
+install -m 0644 -D -t %{buildroot}%{katauvmdir} versions.yaml
+install -D -m 0644 ci/install_yq.sh %{buildroot}%{katauvmdir}/ci/install_yq.sh
+sed -i 's#distro_config_dir="${script_dir}/${distro}#distro_config_dir="${script_dir}/cbl-mariner#g' tools/osbuilder/rootfs-builder/rootfs.sh
 
 pushd src/runtime
 %make_install %{runtime_make_vars}
+sed -i -e "s|image = .*$|initrd = \"%{katainitrddir}/kata-containers-initrd.img\"|" %{buildroot}%{kataconfigdir}/configuration.toml
+sed -i -e "s|kernel = .*$|kernel = \"%{kataclhdir}/vmlinux.bin\"|" %{buildroot}%{kataconfigdir}/configuration.toml
 popd
 
 pushd src/agent
@@ -145,24 +160,21 @@ rm .gitignore
 rm rootfs-builder/.gitignore
 mkdir -p %{buildroot}%{katalocalstatecachedir}
 
-install -m 0644 -D -t %{buildroot}%{_unitdir} %{SOURCE3}
 install -m 0755 -D -t %{buildroot}%{kataosbuilderdir} nsdax
-install -m 0644 -D -t %{buildroot}%{kataosbuilderdir} %{SOURCE2}
 
 cp -aR rootfs-builder %{buildroot}%{kataosbuilderdir}
 cp -aR image-builder  %{buildroot}%{kataosbuilderdir}
 cp -aR initrd-builder %{buildroot}%{kataosbuilderdir}
 cp -aR scripts        %{buildroot}%{kataosbuilderdir}
 cp -aR dracut         %{buildroot}%{kataosbuilderdir}
+cp -aR Makefile       %{buildroot}%{kataosbuilderdir}
 
 rm -f %{buildroot}%{kataosbuilderdir}/image-builder/nsdax.gpl.c
-install -m 0644 -D -t %{buildroot}%{kataosbuilderdir}/dracut/dracut.conf.d/ %{SOURCE4}
 chmod +x %{buildroot}%{kataosbuilderdir}/scripts/lib.sh
-chmod +x %{buildroot}%{kataosbuilderdir}/kata-osbuilder.sh
 popd
 
 # Install the CRI-O config drop-in file
-install -m 0644 -D -t %{buildroot}%{_sysconfdir}/crio/crio.conf.d %{SOURCE5}
+install -m 0644 -D -t %{buildroot}%{_sysconfdir}/crio/crio.conf.d %{SOURCE2}
 
 # Disable the image= option, so we use initrd= by default
 # The kernels kata-osbuilder creates are in /var/cache now, see rhbz#1792216
@@ -172,15 +184,6 @@ mkdir -p %{buildroot}%{_prefix}/local/bin
 ln -sf %{_bindir}/containerd-shim-kata-v2 %{buildroot}%{_prefix}/local/bin/containerd-shim-kata-v2
 ln -sf %{_bindir}/kata-monitor %{buildroot}%{_prefix}/local/bin/kata-monitor
 ln -sf %{_bindir}/kata-runtime %{buildroot}%{_prefix}/local/bin/kata-runtime
-
-%preun
-%systemd_preun kata-osbuilder-generate.service
-
-%postun
-%systemd_postun kata-osbuilder-generate.service
-
-%post
-%systemd_post kata-osbuilder-generate.service
 
 %files
 # runtime
@@ -193,26 +196,29 @@ ln -sf %{_bindir}/kata-runtime %{buildroot}%{_prefix}/local/bin/kata-runtime
 %{_prefix}/local/bin/kata-runtime
 %dir %{_datadir}/defaults/kata-containers/
 %{_datadir}/defaults/kata-containers/configuration*.toml
-%dir %{katalibexecdir}
-%{katalibexecdir}/VERSION
 %{_datadir}/bash-completion/completions/kata-runtime
 %license LICENSE
 %doc CONTRIBUTING.md
 %doc README.md
 
-#agent
+# CRI-O drop-in file
+%{_sysconfdir}/crio/crio.conf.d/50-kata
+
+%files tools
+# osbuilddir
+%dir %{kataosbuilderdir}
+%dir %{katalocalstatecachedir}
+%{kataosbuilderdir}/*
+
+# agent
 %dir %{kataagentdir}
 %{kataagentdir}/*
 
-#osbuilder
-%dir %{kataosbuilderdir}
-%dir %{katalocalstatecachedir}
-
-%{kataosbuilderdir}/*
-%{_unitdir}/kata-osbuilder-generate.service
-
-# CRI-O drop-in file
-%{_sysconfdir}/crio/crio.conf.d/50-kata
+%dir %{katauvmdir}
+%{katauvmdir}/VERSION
+%{katauvmdir}/versions.yaml
+%{katauvmdir}/mariner-build-uvm.sh
+%{katauvmdir}/ci/install_yq.sh
 
 # Remove some scripts we don't use
 %exclude %{kataosbuilderdir}/rootfs-builder/alpine
@@ -223,6 +229,25 @@ ln -sf %{_bindir}/kata-runtime %{buildroot}%{_prefix}/local/bin/kata-runtime
 %exclude %{kataosbuilderdir}/rootfs-builder/ubuntu
 
 %changelog
+* Tue Dec 05 2023 Archana Choudhary <archana1@microsoft.com> - 3.1.0-10
+- Drop qemu-kvm-core dependency
+- Define explicit dependency on qemu-virtiofsd
+
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.1.0-9
+- Bump release to rebuild with go 1.20.9
+
+* Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 3.1.0-8
+- Bump release to rebuild with updated version of Go.
+
+* Wed Sep 27 2023 Dallas Delaney <dadelan@microsoft.com> 3.1.0-7
+- Refactor UVM build script and add -tools subpackage
+
+* Thu Sep 14 2023 Muhammad Falak <mwani@microsoft.com> - 3.1.0-6
+- Introduce patch to drop mut for variables to unblock build
+
+* Thu Sep 07 2023 Daniel McIlvaney <damcilva@microsoft.com> - 3.1.0-5
+- Bump package to rebuild with rust 1.72.0
+
 * Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.1.0-4
 - Bump release to rebuild with go 1.19.12
 

@@ -1,12 +1,12 @@
 %global debug_package %{nil}
 %define upstream_name containerd-cc
 %define upstream_repo confidential-containers-containerd
-%define commit_hash 4a2809f776500dfb8e4ed33db7f4e05ed68edfbf
+%define commit_hash e55e17bb9c75834c863d422bc38b54b0056e467a
 
 Summary: Industry-standard container runtime for confidential containers
 Name: moby-%{upstream_name}
-Version: 1.7.1
-Release: 4%{?dist}
+Version: 1.7.2
+Release: 2%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -16,6 +16,7 @@ Distribution: Mariner
 Source0:  https://github.com/microsoft/confidential-containers-containerd/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1: containerd.service
 Source2: containerd.toml
+Patch0: CVE-2023-47108.patch
 
 %{?systemd_requires}
 
@@ -77,6 +78,18 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 
 %changelog
+* Wed Nov 23 2023 Bala <balakumaran.kannan@gmail.com> - 1.7.2-2
+- Fix CVE-2023-47108 by backporting the fix made for otel-grpc-0.40.0
+
+* Fri Nov 08 2023 Saul Paredes <saulparedes@microsoft.com> - 1.7.2-1
+- Always add TargetLayerDigestLabel label to snapshots
+
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7.1-6
+- Bump release to rebuild with go 1.20.9
+
+* Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 1.7.1-5
+- Bump release to rebuild with updated version of Go.
+
 * Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7.1-4
 - Bump release to rebuild with go 1.19.12
 
@@ -86,13 +99,13 @@ fi
 * Thu Jun 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7.1-2
 - Bump release to rebuild with go 1.19.10
 
-*   Mon May 22 2023 Dallas Delaney <dadelan@microsoft.com> - 1.7.1-1
--   Fix unit test arguments for TestSnapshotterFromPodSandboxConfig
+* Mon May 22 2023 Dallas Delaney <dadelan@microsoft.com> - 1.7.1-1
+- Fix unit test arguments for TestSnapshotterFromPodSandboxConfig
 
-*   Wed May 17 2023 Dallas Delaney <dadelan@microsoft.com> - 1.7.0-2
--   Add build version dependency on golang
+* Wed May 17 2023 Dallas Delaney <dadelan@microsoft.com> - 1.7.0-2
+- Add build version dependency on golang
 
-*   Tue Apr 25 2023 Dallas Delaney <dadelan@microsoft.com> - 1.7.0-1
--   Add initial spec
--   License verified.
--   Original version for CBL-Mariner
+* Tue Apr 25 2023 Dallas Delaney <dadelan@microsoft.com> - 1.7.0-1
+- Add initial spec
+- License verified.
+- Original version for CBL-Mariner

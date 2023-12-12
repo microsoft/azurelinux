@@ -1,6 +1,6 @@
 Name:          crash
 Version:       8.0.1
-Release:       1%{?dist}
+Release:       3%{?dist}
 Summary:       kernel crash analysis utility for live systems, netdump, diskdump, kdump, LKCD or mcore dumpfiles
 Group:         Development/Tools
 Vendor:        Microsoft Corporation
@@ -9,11 +9,16 @@ URL:           https://github.com/crash-utility/crash
 Source0:       https://github.com/crash-utility/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # crash requires gdb tarball for the build. There is no option to use the host gdb. For crash 8.0.1 the newest supported gdb version is 10.2.
 Source1:       https://ftp.gnu.org/gnu/gdb/gdb-10.2.tar.gz
+# lzo patch sourced from https://src.fedoraproject.org/rpms/crash/blob/rawhide/f/lzo_snappy_zstd.patch
+Patch0:        lzo_snappy_zstd.patch
 License:       GPLv3+
 BuildRequires: binutils
 BuildRequires: glibc-devel
+BuildRequires: lzo-devel
 BuildRequires: ncurses-devel
+BuildRequires: snappy-devel
 BuildRequires: zlib-devel
+BuildRequires: zstd-devel
 Requires:      binutils
 
 %description
@@ -30,7 +35,7 @@ The core analysis suite is a self-contained tool that can be used to investigate
 This package contains libraries and header files need for development.
 
 %prep
-%setup -q -n %{name}-%{version}
+%autosetup -n %{name}-%{version}
 cp %{SOURCE1} .
 
 %build
@@ -58,6 +63,13 @@ cp -p defs.h %{buildroot}%{_includedir}/crash
 %{_includedir}/crash/*.h
 
 %changelog
+* Mon Oct 09 2023 Chris Co <chrco@microsoft.com> - 8.0.1-3
+- Add patch from Fedora to enable lzo, snappy, zstd compression support
+- Remove unused crash printk fix patch
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 8.0.1-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Apr 27 2022 Mateusz Malisz <mamalisz@microsoft.com> - 8.0.1-1
 - Update to 8.0.1
 

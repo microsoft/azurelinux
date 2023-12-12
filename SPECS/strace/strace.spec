@@ -2,7 +2,7 @@
 Summary:        Tracks system calls that are made by a running process
 Name:           strace
 Version:        5.16
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPL-2.0-or-later AND LGPL-2.1-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -48,6 +48,9 @@ all the arugments and return values from the system calls. This is useful in deb
 %{_mandir}/man1/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.16-4
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Mon Jun 10 2023 Olivia Crain <oliviacrain@microsoft.com> - 5.16-3
 - Add upstream patch to fix sockopt-sol_netlink test with kernel >= 5.15.116.1
 - Modify landlock test patch to properly apply with `git am`

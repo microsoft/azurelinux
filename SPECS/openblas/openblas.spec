@@ -21,7 +21,7 @@ Summary:        An optimized BLAS library based on GotoBLAS2
 # "obsoleted" features are still kept in the spec.
 Name:           openblas
 Version:        0.3.21
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -561,6 +561,9 @@ rm -rf %{buildroot}%{_libdir}/pkgconfig
 %{_libdir}/lib%{name}p64_.a
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.3.21-3
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Tue Nov 15 2022 Osama Esmail <osamaesmail@microsoft.com> - 0.3.21-2
 - Moved from SPECS-EXTENDED to SPECS
 - Linted spec file

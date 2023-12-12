@@ -1,0 +1,28 @@
+From 874056b5bb1e7510a13f6c640f01d240a0ff35ce Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ralf=20Cors=C3=A9pius?= <corsepiu@fedoraproject.org>
+Date: Tue, 15 Apr 2014 05:21:09 +0200
+Subject: [PATCH 2/6] No solicitation
+
+	No automatic phone home by default (RHBZ 668865).
+---
+ gui/babeldata.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/gui/babeldata.h b/gui/babeldata.h
+index 198f8889..4d73a4e4 100644
+--- a/gui/babeldata.h
++++ b/gui/babeldata.h
+@@ -64,8 +64,8 @@ public:
+     upgradeErrors_(0),
+     upgradeOffers_(0),
+     runCount_(0),
+-    startupVersionCheck_(true),
+-    reportStatistics_(true),
++    startupVersionCheck_(false),
++    reportStatistics_(false),
+     allowBetaUpgrades_(false),
+     ignoreVersionMismatch_(false),
+     disableDonateDialog_(false),
+-- 
+2.26.2
+

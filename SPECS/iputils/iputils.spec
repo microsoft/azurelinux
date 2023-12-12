@@ -1,7 +1,7 @@
 Summary:        Programs for basic networking
 Name:           iputils
 Version:        20211215
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD-3 AND GPLv2+ AND Rdisc
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -67,6 +67,9 @@ mv -f RELNOTES.tmp RELNOTES.old
 %exclude %{_sysconfdir}/init.d/ninfod.sh
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 20211215-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Tue Feb 15 2022 Rachel Menge <rachelmenge@microsoft.com> - 20211215-1
 - Update source to 20211215
 - Enable meson builds and tests

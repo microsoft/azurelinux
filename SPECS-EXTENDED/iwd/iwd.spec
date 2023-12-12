@@ -1,7 +1,7 @@
 Summary:        Wireless daemon for Linux
 Name:           iwd
 Version:        1.22
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,7 +15,7 @@ BuildRequires:  python3-docutils
 BuildRequires:  readline-devel
 BuildRequires:  pkgconfig(dbus-1)
 BuildRequires:  pkgconfig(ell) >= 0.27
-BuildRequires:  pkgconfig(libsystemd)
+BuildRequires:  systemd-devel
 Requires:       dbus
 Requires:       systemd
 
@@ -71,6 +71,9 @@ mkdir -p %{buildroot}%{_sharedstatedir}/ead
 
 
 %changelog
+* Tue Sep 19 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.22-2
+- Fix build issue for systemd/systemd-bootstrap confusion
+
 * Thu Dec 15 2022 Muhammad Falak <mwani@microsoft.com> - 1.22-1
 - License verified
 

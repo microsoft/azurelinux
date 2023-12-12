@@ -1,0 +1,61 @@
+{
+    "Disks": [
+        {
+            "PartitionTableType": "gpt",
+            "MaxSize": 4096,
+            "Artifacts": [
+                {
+                    "Name": "core",
+                    "Type": "vhdx"
+                }
+            ],
+            "Partitions": [
+                {
+                    "ID": "boot",
+                    "Flags": [
+                        "esp",
+                        "boot"
+                    ],
+                    "Start": 1,
+                    "End": 9,
+                    "FsType": "fat32"
+                },
+                {
+                    "ID": "rootfs",
+                    "Start": 9,
+                    "End": 0,
+                    "FsType": "ext4"
+                }
+            ]
+        }
+    ],
+    "SystemConfigs": [
+        {
+            "Name": "Standard",
+            "BootType": "efi",
+            "PartitionSettings": [
+                {
+                    "ID": "boot",
+                    "MountPoint": "/boot/efi",
+                    "MountOptions": "umask=0077"
+                },
+                {
+                    "ID": "rootfs",
+                    "MountPoint": "/"
+                }
+            ],
+            "PackageLists": [
+                "packagelists/core-packages-image.json",
+                "packagelists/cloud-init-packages.json",
+                "packagelists/qemu-guest-packages.json"
+            ],
+            "KernelCommandLine": {
+                "ExtraCommandLine": "console=tty0 console=ttyS0"
+            },
+            "KernelOptions": {
+                "default": "kernel-hci"
+            },
+            "Hostname": "azure-linux"
+        }
+    ]
+}

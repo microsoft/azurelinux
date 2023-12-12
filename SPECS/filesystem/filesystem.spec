@@ -1,7 +1,7 @@
 Summary:      Default file system
 Name:         filesystem
 Version:      1.1
-Release:      15%{?dist}
+Release:      19%{?dist}
 License:      GPLv3
 Group:        System Environment/Base
 Vendor:       Microsoft Corporation
@@ -31,6 +31,8 @@ install -vdm 755 %{buildroot}/{dev,run/{media/{floppy,cdrom},lock}}
 install -vdm 755 %{buildroot}/{etc/{opt,sysconfig},home,mnt}
 install -vdm 700 %{buildroot}/boot
 install -vdm 755 %{buildroot}/{var}
+install -vdm 755 %{buildroot}/opt
+install -vdm 755 %{buildroot}/media
 install -dv -m 0750 %{buildroot}/root
 install -dv -m 1777 %{buildroot}/tmp %{buildroot}/var/tmp
 install -vdm 755 %{buildroot}/usr/{,local/}{bin,include,lib,sbin,src}
@@ -44,7 +46,6 @@ install -vdm 755 %{buildroot}/usr/lib/debug/{lib,bin,sbin,usr,.dwz}
 ln -svfn usr/lib %{buildroot}/lib
 ln -svfn usr/bin %{buildroot}/bin
 ln -svfn usr/sbin %{buildroot}/sbin
-ln -svfn run/media %{buildroot}/media
 
 ln -svfn ../bin %{buildroot}/usr/lib/debug/usr/bin
 ln -svfn ../sbin %{buildroot}/usr/lib/debug/usr/sbin
@@ -177,6 +178,8 @@ cat > %{buildroot}/etc/hosts <<- "EOF"
 
 # End /etc/hosts (network card version)
 EOF
+# and /etc/host.conf file
+echo "multi on" > %{buildroot}/etc/host.conf
 #
 #	7.9. Configuring the setclock Script"
 #
@@ -557,6 +560,24 @@ posix.mkdir("/proc")
 posix.mkdir("/sys")
 posix.chmod("/proc", 0555)
 posix.chmod("/sys", 0555)
+
+-- Prior to filesystem-1.1-16, /media used to be a symlink to /run/media but this was
+-- replaced with a directory. The RPM upgrade operation generally worked when the /media
+-- symlink is a dangling link, which is commonly the case, however not always the case.
+--
+-- And when the /media symlink is indeed properly pointing to a real /run/media, RPM has a
+-- known limitation where it is not possible to replace an active symlink with a directory,
+-- and thus the RPM transaction fails.
+--
+-- To workaround this, a %pretrans scriptlet must run to test and remove the symlink
+-- before RPM attempts to install the new directory.
+--
+-- https://docs.fedoraproject.org/en-US/packaging-guidelines/Directory_Replacement
+path = "/media"
+st = posix.stat(path)
+if st and st.type == "link" then
+  os.remove(path)
+end
 return 0
 
 %files
@@ -568,6 +589,7 @@ return 0
 %dir /etc
 %dir /home
 /lib
+%dir /opt
 
 /media
 %dir /mnt
@@ -585,6 +607,7 @@ return 0
 %config(noreplace) /etc/fstab
 %config(noreplace) /etc/group
 %config(noreplace) /etc/hosts
+%config(noreplace) /etc/host.conf
 %config(noreplace) /etc/inputrc
 %config(noreplace) /etc/mtab
 %config(noreplace) /etc/passwd
@@ -709,6 +732,18 @@ return 0
 %config(noreplace) /etc/modprobe.d/tipc.conf
 
 %changelog
+* Fri Dec 08 2023 Chris Co <chrco@microsoft.com> - 1.1-19
+- Add scriptlet to handle /media symlink failed upgrade issue
+
+* Thu Dec 07 2023 Dan Streetman <ddstreet@ieee.org> - 1.1-18
+- Add /etc/host.conf with multi enabled
+
+* Thu Oct 12 2023 Chris PeBenito <chpebeni@microsoft.com> - 1.1-17
+- Restore the /opt directory.
+
+* Mon Oct 09 2023 Chris Co <chrco@microsoft.com> - 1.1-16
+- Make /media a proper directory
+
 * Thu Jun 29 2023 Tobias Brick <tobiasb@microsoft.com> - 1.1-15
 - Revert: Remove setting umask from /etc/profile and add it to a separate file in /etc/profile.d
 

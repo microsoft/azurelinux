@@ -49,7 +49,7 @@ end}
 %endif
 Summary:        Direct Rendering Manager runtime library
 Name:           libdrm
-Version:        2.4.114
+Version:        2.4.115
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -290,6 +290,12 @@ cp %{SOURCE1} %{buildroot}%{_docdir}/libdrm
 %endif
 
 %changelog
+* Fri Oct 27 2023 Xiaohong Deng <xiaohongdeng@microsoft.com> - 2.4.115-1
+- Upgrade to 2.4.115
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.4.114-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Mon May 15 2023 Hideyuki Nagase <hideyukn@microsoft.com> - 2.4.114-1
 - Updating to version 2.4.114 using Fedora 39 spec (license: MIT) for guidance.
 

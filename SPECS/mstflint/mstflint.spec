@@ -1,7 +1,7 @@
 Summary:        Mellanox firmware burning tool
 Name:           mstflint
 Version:        4.21.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2 OR BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -58,6 +58,9 @@ find %{buildroot} -type f -name '*.a' -delete
 %{_mandir}/man1/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.21.0-4
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Thu Feb 23 2023 Elaheh Dehghani <edehghani@microsoft.com> - 4.21.0-3
 - Enabled 'adb-generic-tools' in build config.
 

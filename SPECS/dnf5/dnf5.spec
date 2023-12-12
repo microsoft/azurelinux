@@ -37,7 +37,7 @@
 Summary:        Command-line package manager
 Name:           dnf5
 Version:        %{project_version_major}.%{project_version_minor}.%{project_version_patch}
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -590,6 +590,9 @@ done
 
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.0.14-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Jun 21 2023 Sam Meluch <sammeluch@microsoft.com> - 5.0.14-1
 - Add "if with man" sections for files section
 - turn off man, ruby, perl for mariner

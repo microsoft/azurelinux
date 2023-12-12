@@ -1,0 +1,213 @@
+From 601bf39e6b2eaff9e77588ff1b1a8a987dad404d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jo=C3=A3o=20Valverde?= <j@v6e.pt>
+Date: Fri, 26 May 2023 14:16:06 +0100
+Subject: [PATCH] CMake: Remove module LocatePythonModule.cmake
+
+This module is unnecessary and frequently causes hard-to-debug
+issues during CMake's configure run. Nuke it.
+---
+ cmake/modules/LocatePythonModule.cmake | 53 --------------------------
+ cmake/modules/UseAsn2Wrs.cmake         | 13 ++-----
+ cmake/modules/UseMakePluginReg.cmake   |  7 +---
+ 3 files changed, 6 insertions(+), 67 deletions(-)
+ delete mode 100644 cmake/modules/LocatePythonModule.cmake
+
+diff --git a/cmake/modules/LocatePythonModule.cmake b/cmake/modules/LocatePythonModule.cmake
+deleted file mode 100644
+index 3fbe0c7..0000000
+--- a/cmake/modules/LocatePythonModule.cmake
++++ /dev/null
+@@ -1,53 +0,0 @@
+-#LOCATE_PYTHON_MODULE(<module> [PATHS <path1> ... <pathN>] [REQUIRED])
+-#
+-# This function tries to find the given python module.
+-# If found the path is provided in <PY_<module> and <<module>_FOUND> is set to TRUE.
+-#
+-# After PATHS additional paths for python to search can be provided.
+-# When REQUIRED is set, the function will abort the cmake execution is the module is not found
+-function(LOCATE_PYTHON_MODULE module)
+-	if(NOT PYTHON_EXECUTABLE)
+-		find_package(PythonInterp)
+-	endif()
+-
+-	# Parse (additional) arguments
+-	set(options REQUIRED)
+-	set(multiValueArgs PATHS)
+-	cmake_parse_arguments(LPM "${options}" "" "${multiValueArgs}" ${ARGN})
+-
+-	string(TOUPPER ${module} module_upper)
+-	if(NOT PY_${module_upper})
+-
+-		if(LPM_PATHS)
+-			# Append LPM_PATHS to PYTHONPATH to search at provided location (first)
+-			file(TO_CMAKE_PATH "$ENV{PYTHONPATH}" CMAKE_PATH)
+-			list(INSERT CMAKE_PATH 0 ${LPM_PATHS})
+-			file(TO_NATIVE_PATH "${CMAKE_PATH}" NATIVE_PATH)
+-			if(UNIX)
+-				string(REPLACE ";" ":" NATIVE_PATH "${NATIVE_PATH}")
+-			endif(UNIX)
+-			set(ENV{PYTHONPATH} "${NATIVE_PATH}")
+-		endif(LPM_PATHS)
+-
+-		# Use the (native) python impl module to find the location of the requested module
+-		execute_process(COMMAND "${PYTHON_EXECUTABLE}" "-c"
+-			"import imp; print(imp.find_module('${module}')[1])"
+-			RESULT_VARIABLE _${module}_status
+-			OUTPUT_VARIABLE _${module}_location
+-			ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+-
+-		if(NOT _${module}_status)
+-			set(PY_${module_upper} ${_${module}_location} CACHE STRING
+-				"Location of Python module ${module}")
+-			set(${module_upper}_FOUND TRUE)
+-			message(STATUS "Found python module ${module}: ${PY_${module_upper}}")
+-		else(NOT _${module}_status)
+-			set(${module_upper}_FOUND FALSE)
+-			if(LPM_REQUIRED)
+-				message(FATAL_ERROR "Could NOT find python module ${module}")
+-			else(LPM_REQUIRED)
+-				message(STATUS "Could NOT find python module ${module}")
+-			endif(LPM_REQUIRED)
+-		endif(NOT _${module}_status)
+-	endif(NOT PY_${module_upper})
+-endfunction(LOCATE_PYTHON_MODULE)
+diff --git a/cmake/modules/UseMakePluginReg.cmake b/cmake/modules/UseMakePluginReg.cmake
+index e6e6a91..fe57381 100644
+--- a/cmake/modules/UseMakePluginReg.cmake
++++ b/cmake/modules/UseMakePluginReg.cmake
+@@ -1,20 +1,17 @@
+ #
+ function(register_plugin_files _outputfile _registertype)
+-	include(LocatePythonModule)
+-	locate_python_module(make-plugin-reg REQUIRED PATHS ${CMAKE_SOURCE_DIR}/tools)
+-
+ 	file(RELATIVE_PATH output "${CMAKE_BINARY_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/${_outputfile}")
+ 	add_custom_command(
+ 	    OUTPUT
+ 	      ${_outputfile}
+ 	    COMMAND ${PYTHON_EXECUTABLE}
+-	      ${PY_MAKE-PLUGIN-REG}
++	      ${CMAKE_SOURCE_DIR}/tools/make-plugin-reg.py
+ 	      ${CMAKE_CURRENT_SOURCE_DIR}
+ 	      ${_registertype}
+ 	      ${ARGN}
+ 	    COMMENT "Generating ${output}"
+ 	    DEPENDS
+ 	      ${ARGN}
+-	      ${PY_MAKE-PLUGIN-REG}
++	      ${CMAKE_SOURCE_DIR}/tools/make-plugin-reg.py
+ 	)
+ endfunction()
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 6db2e46..21e71e8 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -3825,7 +3825,6 @@ install(
+ 		${WS_CMAKE_MODULE_PATH}/FindWSLibrary.cmake
+ 		${WS_CMAKE_MODULE_PATH}/FindWSWinLibs.cmake
+ 		${WS_CMAKE_MODULE_PATH}/UseAsn2Wrs.cmake
+-		${WS_CMAKE_MODULE_PATH}/LocatePythonModule.cmake
+ 		${WS_CMAKE_MODULE_PATH}/UseMakePluginReg.cmake
+ 	DESTINATION
+ 		${WIRESHARK_INSTALL_CMAKEDIR}
+diff --git a/cmake/modules/FindAsciidoctor.cmake b/cmake/modules/FindAsciidoctor.cmake
+index 67cbc8d..929a4eb 100644
+--- a/cmake/modules/FindAsciidoctor.cmake
++++ b/cmake/modules/FindAsciidoctor.cmake
+@@ -124,7 +124,7 @@ if(ASCIIDOCTOR_EXECUTABLE)
+         ADD_CUSTOM_COMMAND(
+             OUTPUT
+                 ${_output_txt}
+-            COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/html2text.py
++            COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/html2text.py
+                 ${_output_html}
+                 > ${_output_txt}
+             DEPENDS
+diff --git a/cmake/modules/UseMakePluginReg.cmake b/cmake/modules/UseMakePluginReg.cmake
+index fe57381..0c7198d 100644
+--- a/cmake/modules/UseMakePluginReg.cmake
++++ b/cmake/modules/UseMakePluginReg.cmake
+@@ -4,7 +4,7 @@ function(register_plugin_files _outputfile _registertype)
+ 	add_custom_command(
+ 	    OUTPUT
+ 	      ${_outputfile}
+-	    COMMAND ${PYTHON_EXECUTABLE}
++	    COMMAND ${Python3_EXECUTABLE}
+ 	      ${CMAKE_SOURCE_DIR}/tools/make-plugin-reg.py
+ 	      ${CMAKE_CURRENT_SOURCE_DIR}
+ 	      ${_registertype}
+diff --git a/cmake/modules/UseMakeTaps.cmake b/cmake/modules/UseMakeTaps.cmake
+index aed9318..56fd628 100644
+--- a/cmake/modules/UseMakeTaps.cmake
++++ b/cmake/modules/UseMakeTaps.cmake
+@@ -5,7 +5,7 @@ MACRO(REGISTER_TAP_FILES _outputfile)
+         OUTPUT
+           ${_outputfile}
+         COMMAND
+-          ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/make-regs.py taps ${_outputfile} ${_sources}
++          ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/make-regs.py taps ${_outputfile} ${_sources}
+         DEPENDS
+           ${CMAKE_SOURCE_DIR}/tools/make-regs.py
+           ${_sources}
+diff --git a/cmake/modules/UseAsn2Wrs.cmake b/cmake/modules/UseAsn2Wrs.cmake
+index 9d7cdfe..6b0c46c 100644
+--- a/cmake/modules/UseAsn2Wrs.cmake
++++ b/cmake/modules/UseAsn2Wrs.cmake
+@@ -6,11 +6,6 @@
+ #                     absolute path (e.g. "${CMAKE_CURRENT_SOURCE_DIR}").
+ 
+ function(ASN2WRS)
+-	if(NOT PY_ASN2WRS)
+-		include(LocatePythonModule)
+-		locate_python_module(asn2wrs REQUIRED PATHS "${CMAKE_SOURCE_DIR}/tools")
+-	endif()
+-
+ 	if(NOT PROTO_OPT)
+ 		set(PROTO_OPT -p ${PROTOCOL_NAME})
+ 	elseif(PROTO_OPT STREQUAL "_EMPTY_")
+@@ -38,8 +33,8 @@ function(ASN2WRS)
+ 	# Creates a dissector in the source directory and store the timestamp.
+ 	add_custom_command(
+ 		OUTPUT packet-${PROTOCOL_NAME}-stamp
+-		COMMAND "${PYTHON_EXECUTABLE}"
+-			${PY_ASN2WRS}
++		COMMAND "${Python3_EXECUTABLE}"
++			${CMAKE_SOURCE_DIR}/tools/asn2wrs.py
+ 			${A2W_FLAGS}
+ 			${PROTO_OPT}
+ 			-c "${CMAKE_CURRENT_SOURCE_DIR}/${PROTOCOL_NAME}.cnf"
+@@ -48,12 +43,12 @@ function(ASN2WRS)
+ 			-O "${A2W_OUTPUT_DIR}"
+ 			${EXT_ASN_FILE_LIST} ${ASN_FILE_LIST} ${EXT_ASN_FILE_LIST_LATE}
+ 		COMMAND
+-			"${PYTHON_EXECUTABLE}" -c
++			"${Python3_EXECUTABLE}" -c
+ 				"import shutil, sys; x,s,d=sys.argv; open(d, 'w'); shutil.copystat(s, d)"
+ 				"${A2W_OUTPUT_DIR}/packet-${PROTOCOL_NAME}.c"
+ 				packet-${PROTOCOL_NAME}-stamp
+ 		DEPENDS
+-			"${PY_ASN2WRS}"
++			${CMAKE_SOURCE_DIR}/tools/asn2wrs.py
+ 			${SRC_FILES}
+ 			${EXTRA_CNF_targets}
+ 			${EXTRA_CNF}
+@@ -67,8 +62,8 @@ function(ASN2WRS)
+ 	foreach(_asn2wrs_export_file IN LISTS EXPORT_FILES)
+ 		add_custom_command(
+ 			OUTPUT ${_asn2wrs_export_file}
+-			COMMAND "${PYTHON_EXECUTABLE}"
+-				"${PY_ASN2WRS}"
++			COMMAND "${Python3_EXECUTABLE}"
++				${CMAKE_SOURCE_DIR}/tools/asn2wrs.py
+ 				-E
+ 				${A2W_FLAGS}
+ 				${PROTO_OPT}
+@@ -76,7 +71,7 @@ function(ASN2WRS)
+ 				-D "${CMAKE_CURRENT_SOURCE_DIR}"
+ 				${EXT_ASN_FILE_LIST} ${ASN_FILE_LIST} ${EXT_ASN_FILE_LIST_LATE}
+ 			DEPENDS
+-				"${PY_ASN2WRS}"
++				${CMAKE_SOURCE_DIR}/tools/asn2wrs.py
+ 				${SRC_FILES}
+ 				${EXPORT_DEPENDS_targets}
+ 				${EXPORT_DEPENDS}

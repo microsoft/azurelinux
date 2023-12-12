@@ -1,10 +1,17 @@
-Author: Loic Minier <lool@dooz.org>
-Description: Unbreak several useful keybindings.
+From 729f1df0fcf8165dfc557b00c06fd47e57955149 Mon Sep 17 00:00:00 2001
+From: Loic Minier <lool@dooz.org>
+Date: Sat, 2 Sep 2023 10:29:02 +0530
+Subject: [PATCH 4/5] Unbreak several useful keybindings.
 
 fix for nonworking ^a backspace (rhbz#708698)
 
+Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
+---
+ termcap.c | 2 --
+ 1 file changed, 2 deletions(-)
+
 diff --git a/termcap.c b/termcap.c
-index 26cba62..ed9e838 100644
+index 26c8f5a..29684cf 100644
 --- a/termcap.c
 +++ b/termcap.c
 @@ -553,8 +553,6 @@ int map;
@@ -16,3 +23,6 @@ index 26cba62..ed9e838 100644
    if (map == 0 && domap)
      return 0;
    if (map && !domap)
+-- 
+2.40.1
+

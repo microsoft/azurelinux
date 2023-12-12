@@ -1,7 +1,7 @@
 Summary:        Tools and libraries to manipulate EFI variables
 Name:           efibootmgr
 Version:        16
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 URL:            https://github.com/rhboot/efibootmgr/
 Group:          System Environment/System Utilities
@@ -32,7 +32,11 @@ gzip -9 %{buildroot}%{_mandir}/man8/efibootdump.8
 %license COPYING
 %{_sbindir}/*
 %{_mandir}/man8/*
+
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 16-4
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 16-3
 - Removing the explicit %%clean stage.
 

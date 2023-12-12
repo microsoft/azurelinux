@@ -1,7 +1,7 @@
 Summary:        Stream editor
 Name:           sed
 Version:        4.8
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3
 URL:            https://www.gnu.org/software/sed
 Group:          Applications/Editors
@@ -54,6 +54,9 @@ make check
 %defattr(-,root,root)
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.8-3
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Sat Feb 12 2022 Muhammad Falak <mwani@microsoft.com> - 4.8-2
 - Add an explicit BR on `perl(File::Find)` to enable ptest
 

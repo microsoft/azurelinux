@@ -1,7 +1,7 @@
 Summary:        Dynamic host configuration protocol
 Name:           dhcp
 Version:        4.4.2
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MPLv2.0
 Url:            https://www.isc.org/dhcp/
 Source0:        ftp://ftp.isc.org/isc/dhcp/%{version}/%{name}-%{version}.tar.gz
@@ -170,6 +170,9 @@ mkdir -p %{buildroot}%{_localstatedir}/lib/dhclient/
 %{_mandir}/man8/dhclient.8.gz
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.4.2-6
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Fri Jul 28 2023 Suresh Thelkar <sthelkar@microsoft.com> - 4.4.2-5
 - Fix a bug in applying earlier patches.
 

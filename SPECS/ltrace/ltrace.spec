@@ -1,7 +1,7 @@
 Summary:	ltrace intercepts and records dynamic library calls.
 Name:		ltrace
 Version:	0.7.3
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:	GPLv2+
 URL:		http://www.ltrace.org/
 Group:		Development/Debuggers
@@ -50,6 +50,9 @@ make %{?_smp_mflags} check
 %{_datadir}
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.7.3-8
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7.3-7
 - Removing the explicit %%clean stage.
 - License verified.

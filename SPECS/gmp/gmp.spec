@@ -1,7 +1,7 @@
 Summary:        Math libraries
 Name:           gmp
 Version:        6.2.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+ AND GPLv3+ AND LGPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -68,6 +68,9 @@ make %{?_smp_mflags} check
 %{_docdir}/%{name}-%{version}/isa_abi_headache
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 6.2.1-4
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Jul 26 2023 Archana Choudhary <archana1@microsoft.com> - 6.2.1-3
 - Added c++ support in gmp-devel package
 

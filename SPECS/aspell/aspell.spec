@@ -1,7 +1,7 @@
 Summary:        Spell checker
 Name:           aspell
 Version:        0.60.8
-Release:        7%{?dist}
+Release:        8%{?dist}
 # LGPLv2+ .. common/gettext.h
 # LGPLv2  .. modules/speller/default/phonet.hpp,
 #            modules/speller/default/phonet.cpp,
@@ -116,6 +116,9 @@ rm -f %{buildroot}%{_infodir}/dir
 %{_mandir}/man1/pspell-config.1*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.60.8-8
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Fri Oct 14 2022 Henry Li <lihl@microsoft.com> - 0.60.8-7
 - Rename aspell-0.60.8-objstack.patch to CVE-2019-25051.patch to make the CVE
   scanner tool recognize the fix patch

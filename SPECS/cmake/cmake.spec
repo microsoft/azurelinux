@@ -2,7 +2,7 @@
 Summary:        Cmake
 Name:           cmake
 Version:        3.21.4
-Release:        7%{?dist}
+Release:        10%{?dist}
 License:        BSD AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,6 +16,10 @@ Patch1:         CVE-2022-43551.patch
 Patch2:         CVE-2023-23914-0001-share-add-sharing-of-HSTS-cache-among-handles.patch
 Patch3:         CVE-2023-23914-0002-hsts-handle-adding-the-same-host-name-again.patch
 Patch4:         CVE-2023-28322-lib-unify-the-upload-method-handling.patch
+Patch5:         CVE-2023-35945.patch
+Patch6:         CVE-2023-38545.patch
+Patch7:         CVE-2023-38546.patch
+Patch8:         cve-2023-44487.patch
 BuildRequires:  bzip2
 BuildRequires:  bzip2-devel
 BuildRequires:  curl
@@ -81,6 +85,15 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %{_prefix}/doc/%{name}-*/*
 
 %changelog
+* Thu Oct 19 2023 Dan Streetman <ddstreet@ieee.org> - 3.21.4-10
+- Patch vendored nghttp2 for CVE-2023-44487
+
+* Tue Oct 10 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.21.4-9
+- Patch vendored curl for CVE-2023-38545, CVE-2023-38546
+
+* Wed Sep 06 2023 Brian Fjeldstad <bfjelds@microsoft.com> - 3.21.4-8
+- Patch vendored nghttp2 for CVE-2023-35945
+
 * Thu Jun 08 2023 Sam Meluch <sammeluch@microsoft.com> - 3.21.4-7
 - Add source directory for when not building in source
 

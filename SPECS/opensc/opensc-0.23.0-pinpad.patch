@@ -1,0 +1,13 @@
+diff -up opensc-0.19.0/etc/opensc.conf.pinpad opensc-0.19.0/etc/opensc.conf
+--- opensc-0.19.0/etc/opensc.conf.pinpad	2018-10-22 14:31:12.082963540 +0200
++++ opensc-0.19.0/etc/opensc.conf	2018-10-22 14:33:59.939410701 +0200
+@@ -4,4 +4,9 @@ app default {
+ 	framework pkcs15 {
+ 		# use_file_caching = public;
+ 	}
++	reader_driver pcsc {
++		# The pinpad is disabled by default,
++		# because of many broken readers out there
++		enable_pinpad = false;
++	}
+ }

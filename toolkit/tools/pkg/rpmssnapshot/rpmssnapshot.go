@@ -39,12 +39,12 @@ const (
 //
 //	^(.*)			<-- [index 1] package name
 //	-				<-- second-to-last hyphen separating the package name from its version
-//	([^-]+-\d+)		<-- [index 2] package version and package release number connected by the last hyphen
+//	([^-]+-[^-]+)		<-- [index 2] package version and package release number connected by the last hyphen
 //	\.				<-- second-to-last period separating the package release number from the distribution tag
 //	([^.]+)			<-- [index 3] the distribution tag
 //	\.				<-- last period separating the distribution tag from the architecture string
 //	([^.]+)$		<-- [index 4] the architecture string
-var rpmSpecBuiltRPMRegex = regexp.MustCompile(`^(.*)-([^-]+-\d+)\.([^.]+)\.([^.]+)$`)
+var rpmSpecBuiltRPMRegex = regexp.MustCompile(`^(.*)-([^-]+-[^-]+)\.([^.]+)\.([^.]+)$`)
 
 const (
 	rpmSpecBuiltRPMRegexNameIndex = iota + 1
@@ -152,25 +152,42 @@ func (s *SnapshotGenerator) generateSnapshotInChroot(distTag string) (err error)
 }
 
 func (s *SnapshotGenerator) readBuiltRPMs(specPaths []string, defines map[string]string) (allBuiltRPMs []string, err error) {
-	var builtRPMs []string
-
 	buildArch, err := rpm.GetRpmArch(runtime.GOARCH)
 	if err != nil {
 		return
 	}
+
+	type SnapshotResult struct {
+		rpms []string
+		err  error
+	}
+	resultsChannel := make(chan SnapshotResult, len(specPaths))
 
 	for _, specPath := range specPaths {
 		logger.Log.Debugf("Parsing spec (%s).", specPath)
 
 		specDirPath := filepath.Dir(specPath)
 
-		builtRPMs, err = rpm.QuerySPECForBuiltRPMs(specPath, specDirPath, buildArch, defines)
-		if err != nil {
-			logger.Log.Errorf("Failed to query built RPMs from (%s). Error: %v.", specPath, err)
+		go func(pathIter string) {
+			builtRPMs, queryErr := rpm.QuerySPECForBuiltRPMs(pathIter, specDirPath, buildArch, defines)
+			if queryErr != nil {
+				queryErr = fmt.Errorf("failed to query built RPMs from (%s):\n%w", pathIter, queryErr)
+			}
+
+			resultsChannel <- SnapshotResult{
+				rpms: builtRPMs,
+				err:  queryErr,
+			}
+		}(specPath)
+	}
+
+	for i := 0; i < len(specPaths); i++ {
+		result := <-resultsChannel
+		if result.err != nil {
+			err = result.err
 			return
 		}
-
-		allBuiltRPMs = append(allBuiltRPMs, builtRPMs...)
+		allBuiltRPMs = append(allBuiltRPMs, result.rpms...)
 	}
 
 	return

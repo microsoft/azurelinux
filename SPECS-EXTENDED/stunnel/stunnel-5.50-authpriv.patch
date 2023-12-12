@@ -1,43 +1,62 @@
-diff -up stunnel-5.50/doc/stunnel.8.in.authpriv stunnel-5.50/doc/stunnel.8.in
---- stunnel-5.50/doc/stunnel.8.in.authpriv	2018-12-02 23:47:20.000000000 +0100
-+++ stunnel-5.50/doc/stunnel.8.in	2019-01-14 12:15:05.135100163 +0100
-@@ -200,7 +200,7 @@ info (6), or debug (7).  All logs for th
- all levels numerically less than it will be shown.  Use \fIdebug = debug\fR or
- \&\fIdebug = 7\fR for greatest debugging output.  The default is notice (5).
+From cfbf803dd3338a915f41bdfded69b34e7f21403d Mon Sep 17 00:00:00 2001
+From: Tomas Mraz <tmraz@fedoraproject.org>
+Date: Mon, 12 Sep 2022 11:07:38 +0200
+Subject: [PATCH 1/7] Apply patch stunnel-5.50-authpriv.patch
+
+Patch-name: stunnel-5.50-authpriv.patch
+Patch-id: 0
+From-dist-git-commit: 70b3076eb09912b3a11f371b8c523303114fffa3
+---
+ doc/stunnel.8.in    | 2 +-
+ doc/stunnel.html.in | 2 +-
+ doc/stunnel.pod.in  | 2 +-
+ src/options.c       | 4 ++++
+ 4 files changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/doc/stunnel.8.in b/doc/stunnel.8.in
+index 8cd8bc0..b5d7d75 100644
+--- a/doc/stunnel.8.in
++++ b/doc/stunnel.8.in
+@@ -209,7 +209,7 @@ requested to do so by an stunnel developer, or when you intend to get confused.
  .Sp
--The syslog facility 'daemon' will be used unless a facility name is supplied.
-+The syslog facility 'authpriv' will be used unless a facility name is supplied.
+ The default logging level is notice (5).
+ .Sp
+-The syslog 'daemon' facility will be used unless a facility name is supplied.
++The syslog 'authpriv' facility will be used unless a facility name is supplied.
  (Facilities are not supported on Win32.)
  .Sp
  Case is ignored for both facilities and levels.
-diff -up stunnel-5.50/doc/stunnel.html.in.authpriv stunnel-5.50/doc/stunnel.html.in
---- stunnel-5.50/doc/stunnel.html.in.authpriv	2018-12-02 23:47:21.000000000 +0100
-+++ stunnel-5.50/doc/stunnel.html.in	2019-01-14 12:15:05.136100146 +0100
-@@ -244,7 +244,7 @@
+diff --git a/doc/stunnel.html.in b/doc/stunnel.html.in
+index a7931aa..cda5993 100644
+--- a/doc/stunnel.html.in
++++ b/doc/stunnel.html.in
+@@ -248,7 +248,7 @@
  
- <p>Level is one of the syslog level names or numbers emerg (0), alert (1), crit (2), err (3), warning (4), notice (5), info (6), or debug (7). All logs for the specified level and all levels numerically less than it will be shown. Use <i>debug = debug</i> or <i>debug = 7</i> for greatest debugging output. The default is notice (5).</p>
+ <p>The default logging level is notice (5).</p>
  
--<p>The syslog facility &#39;daemon&#39; will be used unless a facility name is supplied. (Facilities are not supported on Win32.)</p>
-+<p>The syslog facility &#39;authpriv&#39; will be used unless a facility name is supplied. (Facilities are not supported on Win32.)</p>
+-<p>The syslog &#39;daemon&#39; facility will be used unless a facility name is supplied. (Facilities are not supported on Win32.)</p>
++<p>The syslog &#39;authpriv&#39; facility will be used unless a facility name is supplied. (Facilities are not supported on Win32.)</p>
  
  <p>Case is ignored for both facilities and levels.</p>
  
-diff -up stunnel-5.50/doc/stunnel.pod.in.authpriv stunnel-5.50/doc/stunnel.pod.in
---- stunnel-5.50/doc/stunnel.pod.in.authpriv	2018-12-02 23:47:18.000000000 +0100
-+++ stunnel-5.50/doc/stunnel.pod.in	2019-01-14 12:15:05.136100146 +0100
-@@ -192,7 +192,7 @@ info (6), or debug (7).  All logs for th
- all levels numerically less than it will be shown.  Use I<debug = debug> or
- I<debug = 7> for greatest debugging output.  The default is notice (5).
+diff --git a/doc/stunnel.pod.in b/doc/stunnel.pod.in
+index a54b25d..f830cf3 100644
+--- a/doc/stunnel.pod.in
++++ b/doc/stunnel.pod.in
+@@ -197,7 +197,7 @@ requested to do so by an stunnel developer, or when you intend to get confused.
  
--The syslog facility 'daemon' will be used unless a facility name is supplied.
-+The syslog facility 'authpriv' will be used unless a facility name is supplied.
+ The default logging level is notice (5).
+ 
+-The syslog 'daemon' facility will be used unless a facility name is supplied.
++The syslog 'authpriv' facility will be used unless a facility name is supplied.
  (Facilities are not supported on Win32.)
  
  Case is ignored for both facilities and levels.
-diff -up stunnel-5.50/src/options.c.authpriv stunnel-5.50/src/options.c
---- stunnel-5.50/src/options.c.authpriv	2019-01-14 12:15:05.136100146 +0100
-+++ stunnel-5.50/src/options.c	2019-01-14 12:16:25.537727511 +0100
-@@ -1745,8 +1745,12 @@ NOEXPORT char *parse_service_option(CMD
+diff --git a/src/options.c b/src/options.c
+index 5f8ad8b..6e4a18b 100644
+--- a/src/options.c
++++ b/src/options.c
+@@ -1960,7 +1960,11 @@ NOEXPORT const char *parse_service_option(CMD cmd, SERVICE_OPTIONS **section_ptr
      case CMD_SET_DEFAULTS:
          section->log_level=LOG_NOTICE;
  #if !defined (USE_WIN32) && !defined (__vms)
@@ -45,8 +64,10 @@ diff -up stunnel-5.50/src/options.c.authpriv stunnel-5.50/src/options.c
 +        new_global_options.log_facility=LOG_AUTHPRIV;
 +#else
          new_global_options.log_facility=LOG_DAEMON;
- #endif
 +#endif
+ #endif
          break;
      case CMD_SET_COPY:
-         section->log_level=new_service_options.log_level;
+-- 
+2.39.2
+

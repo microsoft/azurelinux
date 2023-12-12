@@ -1,0 +1,50 @@
+From 23b2d8b498939723413a60adc6b29e37ec46b91e Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <chpebeni@linux.microsoft.com>
+Date: Wed, 25 Mar 2020 16:43:17 -0400
+Subject: copy_file(): Revise completion of SELinux security context
+ preserve/set.
+
+The existing setfscreatecon() at the beginning of copy_file() is the secure
+method for setting the context of new files, but it doesn't apply to
+existing files. Change the setfilecon() to only run on preexisting files.
+
+Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
+
+diff -ur busybox-1.35.0.orig/libbb/copy_file.c busybox-1.35.0/libbb/copy_file.c
+--- busybox-1.35.0.orig/libbb/copy_file.c	2021-12-26 16:53:20.000000000 +0000
++++ busybox-1.35.0/libbb/copy_file.c	2023-08-16 22:04:45.557799523 +0000
+@@ -327,19 +327,22 @@
+ 		if ((flags & (FILEUTILS_PRESERVE_SECURITY_CONTEXT|FILEUTILS_SET_SECURITY_CONTEXT))
+ 		 && is_selinux_enabled() > 0
+ 		) {
+-			security_context_t con;
+-			if (getfscreatecon(&con) == -1) {
++			/* Failure to preserve the security context isn't fatal here since
++			 * the copy has been done at this point. */
++			security_context_t con = NULL;
++			if (getfscreatecon(&con) < 0)
+ 				bb_simple_perror_msg("getfscreatecon");
+-				return -1;
+-			}
+-			if (con) {
+-				if (setfilecon(dest, con) == -1) {
+-					bb_perror_msg("setfilecon:%s,%s", dest, con);
+-					freecon(con);
+-					return -1;
+-				}
+-				freecon(con);
+-			}
++
++			if (setfscreatecon(NULL) < 0)
++				bb_perror_msg("can't reset fscreate");
++
++			/* setfscreatecon() only works when a file is created. If dest
++			 * preexisted, use setfilecon instead */
++			if (con && dest_exists)
++				if (fsetfilecon(dst_fd, con) < 0)
++					bb_perror_msg("fsetfilecon:%s,%s", dest, con);
++
++			freecon(con);
+ 		}
+ #endif
+ #if ENABLE_FEATURE_CP_REFLINK

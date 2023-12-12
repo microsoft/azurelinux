@@ -1,0 +1,88 @@
+{
+    "Disks": [
+        {
+            "PartitionTableType": "gpt",
+            "MaxSize": 5000,
+            "Artifacts": [
+                {
+                    "Name": "cblmariner-gen2-fips",
+                    "Type": "vhd"
+                }
+            ],
+            "Partitions": [
+                {
+                    "ID": "efi",
+                    "Flags": [
+                        "esp",
+                        "boot"
+                    ],
+                    "Start": 1,
+                    "End": 65,
+                    "FsType": "fat32"
+                },
+                {
+                    "ID": "boot",
+                    "Start": 65,
+                    "End": 565,
+                    "FsType": "ext4"
+                },
+                {
+                    "ID": "rootfs",
+                    "Name": "rootfs",
+                    "Start": 565,
+                    "End": 0,
+                    "FsType": "ext4"
+                }
+            ]
+        }
+    ],
+    "SystemConfigs": [
+        {
+            "Name": "Standard",
+            "BootType": "efi",
+            "PartitionSettings": [
+                {
+                    "ID": "efi",
+                    "MountPoint": "/boot/efi",
+                    "MountOptions" : "umask=0077"
+                },
+                {
+                    "ID": "boot",
+                    "MountPoint": "/boot"
+                },
+                {
+                    "ID": "rootfs",
+                    "MountPoint": "/"
+                }
+            ],
+            "PackageLists": [
+                "packagelists/fips-packages.json",
+                "packagelists/core-packages-image.json",
+                "packagelists/marketplace-tools-packages.json",
+                "packagelists/azurevm-packages.json"
+            ],
+            "AdditionalFiles": {
+                "additionalconfigs/cloud-init.cfg": "/etc/cloud/cloud.cfg",
+                "additionalconfigs/chrony.cfg": "/etc/chrony.conf",
+                "additionalconfigs/wait-for-ptp-hyperv.conf": "/etc/systemd/system/chronyd.service.d/wait-for-ptp-hyperv.conf",
+                "additionalconfigs/51-ptp-hyperv.rules": "/etc/udev/rules.d/51-ptp-hyperv.rules"
+            },
+            "PostInstallScripts": [
+                {
+                    "Path": "additionalconfigs/configure-systemd-networkd.sh"
+                },
+                {
+                    "Path": "postinstallscripts/remove-tdnf-cache.sh"
+                }
+            ],
+            "KernelOptions": {
+                "default": "kernel"
+            },
+            "KernelCommandLine": {
+                "EnableFIPS": true,
+                "ExtraCommandLine": "console=ttyS0"
+            },
+            "Hostname": "cbl-mariner"
+        }
+    ]
+}

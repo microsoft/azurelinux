@@ -1,7 +1,7 @@
 Summary:        Multithreaded IO generation tool
 Name:           fio
 Version:        3.30
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -191,6 +191,9 @@ EXTFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_LD_FLAGS" %make_build
 %{_libdir}/fio/fio-rdma.so
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.30-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Fri July 15 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.30-1
 - Promote to Mariner base repo
 - Update to latest upstream version and remove upstreamed patches

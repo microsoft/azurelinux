@@ -8,7 +8,7 @@
 Summary:           Open vSwitch daemon/database/utilities
 Name:              openvswitch
 Version:           2.17.5
-Release:           2%{?dist}
+Release:           3%{?dist}
 License:           ASL 2.0 AND LGPLv2+ AND SISSL
 Vendor:            Microsoft Corporation
 Distribution:      Mariner
@@ -374,6 +374,9 @@ fi
 %{_unitdir}/openvswitch-ipsec.service
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.17.5-3
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Tue May 02 2023 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 2.17.5-2
 - Add patch to fix CVE-2023-1668
 

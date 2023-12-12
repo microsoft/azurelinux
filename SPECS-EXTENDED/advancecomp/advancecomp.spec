@@ -1,7 +1,7 @@
 Summary:        Recompression utilities for .png, .mng, .zip and .gz files
 Name:           advancecomp
-Version:        2.4
-Release:        2%{?dist}
+Version:        2.5
+Release:        1%{?dist}
 # Source file headers all specify GPL-2.0-or-later (see source file headers),
 # except:
 #
@@ -132,6 +132,9 @@ export LDFLAGS="-lzopfli ${LDFLAGS-}"
 %{_mandir}/man1/adv{def,mng,png,zip}.1*
 
 %changelog
+* Tue Sep 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.5-1
+- Auto-upgrade to 2.5 - CVE-2023-2961
+
 * Wed Jan 18 2023 Suresh Thelkar <sthelkar@microsoft.com> - 2.4-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT)
 - License verified

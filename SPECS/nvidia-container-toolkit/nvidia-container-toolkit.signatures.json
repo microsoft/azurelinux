@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "nvidia-container-toolkit-1.11.0-vendor.tar.gz": "e4a81c97d3f306326c30065096d4535ba09d1f4d4de6d3bc7b28f6267ca3eb66",
-  "nvidia-container-toolkit-1.11.0.tar.gz": "016e20b3a1a59409da131817d84b9fc56eab72d3f69a9797bbf960f73c9e5262"
+  "nvidia-container-toolkit-1.13.5-vendor.tar.gz": "e2a72626fedaf53ad5e8a167509451eadd567e417fab4dec07cd9c19a84baae9",
+  "nvidia-container-toolkit-1.13.5.tar.gz": "2e95a89ca3ab95528df4bf32c5e0c8333e283e0465b9636458282c3d49a1b1da"
  }
 }

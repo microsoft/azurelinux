@@ -3,7 +3,7 @@
 Summary:        A configuration system
 Name:           dconf
 Version:        0.36.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -90,6 +90,9 @@ dconf update
 %{_datadir}/vala
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.36.0-4
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 0.36.0-3
 - License verified (corrected to just LGPLv2+)
 - Lint spec
@@ -253,7 +256,8 @@ dconf update
 - Update to 0.17.1
 
 * Mon Aug 05 2013 Parag Nemade <paragn AT fedoraproject DOT org> - 0.17.0-3
-- Fix bogus date in %%changelog
+- Fix bogus date in changelog
+
 - Compilation should be more verbose, add V=1
 - Upstream does not install dconf-editor ui files
 

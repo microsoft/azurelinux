@@ -28,7 +28,7 @@
 Summary:        Open Message Passing Interface
 Name:           openmpi%{?_cc_name_suffix}
 Version:        4.1.4
-Release:        9%{?dist}
+Release:        11%{?dist}
 License:        BSD AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -303,6 +303,12 @@ make check
 %{python3_sitearch}/openmpi.pth
 
 %changelog
+* Tue Sep 26 2023 Sumedh Sharma <sumsharma@microsoft.com> - 4.1.4-11
+- Bump version to recompile with pmix update for CVE-2023-41915
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.1.4-10
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Mon Feb 06 2023 Riken Maharjan <rmaharjan@microsoft.com> - 4.1.4-9
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
 - License Verified.
@@ -529,7 +535,7 @@ make check
 - Rebuild with new flags from redhat-rpm-config
 
 * Fri Feb 09 2018 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 2.1.1-9
-- Escape macros in %%changelog
+- Escape macros in changelog
 
 * Mon Feb 05 2018 Orion Poplawski <orion@cora.nwra.com> - 2.1.1-8
 - Rebuild for rdma-core 16.2

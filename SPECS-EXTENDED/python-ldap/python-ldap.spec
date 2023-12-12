@@ -1,55 +1,50 @@
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 ### Abstract ###
 # global prerelease b4
-
 %global openldap_version 2.4.45-4
-
-Name: python-ldap
-Version: 3.3.1
-Release: 2%{?dist}
-License: Python
-Summary: An object-oriented API to access LDAP directory servers
-URL: http://python-ldap.org/
-Source0: https://files.pythonhosted.org/packages/source/p/%{name}/%{name}-%{version}%{?prerelease}.tar.gz
-
-### Build Dependencies ###
-BuildRequires: gcc
-BuildRequires: openldap-devel >= %{openldap_version}
-BuildRequires: openssl-devel
-BuildRequires: cyrus-sasl-devel
-BuildRequires: python3-devel
-BuildRequires: python3-setuptools
-# Test dependencies
-BuildRequires: /usr/bin/tox
-BuildRequires: openldap >= %{openldap_version}
-BuildRequires: python3-coverage
-BuildRequires: python3-pyasn1 >= 0.3.7
-BuildRequires: python3-pyasn1-modules >= 0.1.5
-
 %global _description\
 python-ldap provides an object-oriented API for working with LDAP within\
 Python programs.  It allows access to LDAP directory servers by wrapping the\
 OpenLDAP 2.x libraries, and contains modules for other LDAP-related tasks\
 (including processing LDIF, LDAPURLs, LDAPv3 schema, etc.).
 
-%description %_description
+Summary:        An object-oriented API to access LDAP directory servers
+Name:           python-ldap
+Version:        3.4.0
+Release:        1%{?dist}
+License:        Python
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            http://python-ldap.org/
+Source0:        https://files.pythonhosted.org/packages/source/p/%{name}/%{name}-%{version}%{?prerelease}.tar.gz
 
+# Test dependencies
+BuildRequires:  %{_bindir}/tox
+BuildRequires:  cyrus-sasl-devel
+### Build Dependencies ###
+BuildRequires:  gcc
+BuildRequires:  openldap >= %{openldap_version}
+BuildRequires:  openldap-devel >= %{openldap_version}
+BuildRequires:  openssl-devel
+BuildRequires:  python3-coverage
+BuildRequires:  python3-devel
+BuildRequires:  python3-pyasn1 >= 0.3.7
+BuildRequires:  python3-pyasn1-modules >= 0.1.5
+BuildRequires:  python3-setuptools
+
+%description %{_description}
 
 %package -n     python3-ldap
 Summary:        %{summary}
-
-Requires:  openldap >= %{openldap_version}
-Requires:  python3-pyasn1 >= 0.3.7
-Requires:  python3-pyasn1-modules >= 0.1.5
-Requires:  python3-setuptools
 %{?python_provide:%python_provide python3-ldap}
-Obsoletes: python3-pyldap < 3
-Provides:  python3-pyldap = %{version}-%{release}
-Provides:  python3-pyldap%{?_isa} = %{version}-%{release}
+Requires:       openldap >= %{openldap_version}
+Requires:       python3-pyasn1 >= 0.3.7
+Requires:       python3-pyasn1-modules >= 0.1.5
+Requires:       python3-setuptools
+Obsoletes:      python3-pyldap < 3
+Provides:       python3-pyldap = %{version}-%{release}
+Provides:       python3-pyldap%{?_isa} = %{version}-%{release}
 
-%description -n python3-ldap %_description
-
+%description -n python3-ldap %{_description}
 
 %prep
 %setup -q -n %{name}-%{version}%{?prerelease}
@@ -88,6 +83,10 @@ TOXENV=py%{python3_version_nodots} LOGLEVEL=10 tox --sitepackages
 %{python3_sitearch}/python_ldap-%{version}%{?prerelease}-py%{python3_version}.egg-info/
 
 %changelog
+* Tue Sep 19 2023 Archana Choudhary <archana1@microsoft.com> - 3.4.0-1
+- Upgrade to 3.4.0 - CVE-2021-46823
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.3.1-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

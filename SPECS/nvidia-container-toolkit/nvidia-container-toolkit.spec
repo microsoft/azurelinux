@@ -1,8 +1,8 @@
 %global debug_package %{nil}
 Summary:        NVIDIA container runtime hook
 Name:           nvidia-container-toolkit
-Version:        1.11.0
-Release:        11%{?dist}
+Version:        1.13.5
+Release:        3%{?dist}
 License:        ALS2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -28,11 +28,11 @@ Source0:        %{name}-%{version}.tar.gz
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
-BuildRequires:  golang
+BuildRequires:  golang >= 1.20.7
 Obsoletes: nvidia-container-runtime <= 3.5.0-1, nvidia-container-runtime-hook <= 1.4.0-2
 Provides: nvidia-container-runtime
 Provides: nvidia-container-runtime-hook
-Requires: libnvidia-container-tools >= 1.11.0, libnvidia-container-tools < 2.0.0
+Requires: libnvidia-container-tools >= 1.13.5, libnvidia-container-tools < 2.0.0
 
 %description
 Provides a OCI hook to enable GPU support in containers.
@@ -94,6 +94,16 @@ rm -f %{_bindir}/nvidia-container-toolkit
 %{_bindir}/nvidia-ctk
 
 %changelog
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.13.5-3
+- Bump release to rebuild with go 1.20.9
+
+* Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 1.13.5-2
+- Bump release to rebuild with updated version of Go.
+
+* Thu Aug 24 2023 Henry Li <lihl@microsoft.com> - 1.13.5-1
+- Upgrade to version 1.13.5
+- Enforce golang to be equal to or greater than v1.20.7
+
 * Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.11.0-11
 - Bump release to rebuild with go 1.19.12
 

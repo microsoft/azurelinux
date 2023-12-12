@@ -1,34 +1,34 @@
 ******************************************************************************************
-* To see this menu again, run show_help
+* To see this menu again, run \e[32m show_help\e[0m
 *
-* Some tips:
-*     Use local RPMs to satify dependencies:        run 'enable_local_repo'
-*     Install an SRPM:                              run 'rpm -ihv /mnt/INTERMEDIATE_SRPMS/my-pkg.src.rpm'
+* \e[31mSome tips:\e[0m
+*     Use local RPMs to satify dependencies:        run\e[32m enable_local_repo\e[0m
+*     Install an SRPM:                              run\e[32m rpm -ihv /mnt/INTERMEDIATE_SRPMS/my-pkg.src.rpm\e[0m
                                                         This will provide src tarball at /usr/src/mariner/SOURCES
-*     Build an SRPM:                                run 'rpmbuild -ba /usr/src/mariner/SPECS/my-pkg/my-pkg.spec'
+*     Build an SRPM:                                run\e[32m rpmbuild -ba /usr/src/mariner/SPECS/my-pkg/my-pkg.spec\e[0m
 *     For more build options, see https://linux.die.net/man/8/rpmbuild
 *     Auto install dependencies:                    there are 3 ways to auto install a package's build dependencies
-                                                        1) run 'install_dependencies pkg' to install
-                                                            dependencies listed as 'BuildRequires' from spec
-                                                        2) run 'install_dependencies_depsearch pkg' to install
-                                                            dependencies using mariner depsearch tool
-                                                        3) use dnf repoquery:
-                                                            run 'tdnf install -y dnf dnf-plugins-core'
-                                                            followed by 'dnf builddep -y my-pkg.spec'
-*     Show package dependencies:                    run 'tdnf install -y dnf', 'dnf repoquery --deplist my-pkg'
-*     Build a package:                              run 'build_pkg my-pkg' This will install my-pkg.src.rpm,
+                                                        1) run\e[32m install_dependencies pkg\e[0m to install
+                                                            'BuildRequires' dependencies from spec
+                                                        2) run\e[32m install_dependencies_depsearch pkg\e[0m to install
+                                                            dependencies using Mariner depsearch tool
+                                                        3) use dnf repoquery: run\e[32m tdnf install -y dnf dnf-plugins-core\e[0m,
+                                                            \e[32m dnf builddep -y my-pkg.spec\e[0m
+*     Show package dependencies:                    run\e[32m tdnf install -y dnf\e[0m,\e[32m dnf repoquery --deplist my-pkg\e[0m
+*     Build a package:                              run\e[32m build_pkg my-pkg\e[0m. This will install my-pkg.src.rpm,
                                                         install package dependencies and build it
-*     Create a new package:                         Create spec folder under /usr/src/mariner/SPECS
-                                                        with spec, source tarball and any other files
+*     Create a new package:                         Add source tarball to /usr/src/mariner/SOURCES and
+                                                        create new folder under /usr/src/mariner/SPECS
+                                                        with .spec (and other files)
 
 *     Changes to /usr/src/mariner/SPECS will be available on host machine at <CBL-Mariner>/SPECS
 *     Changes to /usr/src/mariner/SOURCES will not be available on host machine
 *     RPMs built in the container are stored at /usr/src/mariner/RPMS, and will not be available on host machine
-*     RPMs from host's out/RPMs will be available in /repo
-*     Individual packages may be installed directly via 'tdnf install /repo/x86_64/pkg.rpm'
+*     RPMs from host's <CBL-Mariner>/out/RPMs will be available in /repo
+*     Individual packages may be installed directly via\e[32m tdnf install /repo/<AARCH>/pkg.rpm and /repo/noarch/pkg.rpm\e[0m
 *
-* Directory information:
+* \e[31mDirectory information:\e[0m
 *     Mariner repo path:          <REPO_PATH>
 *     Mariner repo branch:        <REPO_BRANCH>
 *
-* Mount points:
+* \e[31mMount points:\e[0m

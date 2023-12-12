@@ -1,6 +1,6 @@
 Name:          archivemount
 Version:       0.9.1
-Release:       4%{?dist}
+Release:       5%{?dist}
 Summary:       FUSE based filesystem for mounting compressed archives
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
@@ -39,6 +39,9 @@ rm -f archivemount.1
 %{_bindir}/archivemount
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.9.1-5
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Mon May 17 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.9.1-4
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - License verified

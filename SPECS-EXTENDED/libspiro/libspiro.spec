@@ -1,21 +1,19 @@
+Summary:        Library to simplify the drawing of beautiful curves
+Name:           libspiro
+Version:        20221101
+Release:        1%{?dist}
+License:        GPL-3.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Name:           libspiro
-Version:        20190731
-Release:        3%{?dist}
-Summary:        Library to simplify the drawing of beautiful curves
-
-# The files that are used to compile this library are all in GPLv3+
-# https://github.com/fontforge/libspiro/issues/8
-License:        GPLv3+
 URL:            https://github.com/fontforge/libspiro/
-Source0:        https://github.com/fontforge/libspiro/releases/download/%{version}/libspiro-%{version}.tar.gz
-BuildRequires: automake autoconf libtool
+Source0:        https://github.com/fontforge/libspiro/releases/download/%{version}/libspiro-dist-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+BuildRequires:  gcc
+BuildRequires:  make
 
 %description
-This library will take an array of spiro control points and 
-convert them into a series of bézier splines which can then 
-be used in the myriad of ways the world has come to use béziers. 
+This library will take an array of spiro control points and
+convert them into a series of bézier splines which can then
+be used in the myriad of ways the world has come to use béziers.
 
 %package        devel
 Summary:        Development files for %{name}
@@ -29,14 +27,12 @@ developing applications that use %{name}.
 %autosetup -n libspiro-%{version}
 
 %build
-autoreconf -i
-automake --foreign -Wall
 %configure --disable-static
-make %{?_smp_mflags}
+%make_build
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p"
-find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
+%make_install
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %files
 %doc README* ChangeLog AUTHORS
@@ -47,8 +43,14 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 %{_includedir}/*
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/libspiro.pc
+%{_mandir}/man3/libspiro.3.gz
 
 %changelog
+* Fri Oct 15 2021 Muhammad Falak <mwani@microsoft.com> - 20221101-1
+- Bump version to address CVE-2019-19847
+- Lint spec
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20190731-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

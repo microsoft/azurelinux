@@ -1,7 +1,7 @@
 Summary:        Utilities for managing the XFS filesystem
 Name:           xfsprogs
 Version:        5.15.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL+ and LGPLv2+
 URL:            http://oss.sgi.com/projects/xfs/
 Group:          System Environment/Base
@@ -88,6 +88,9 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %defattr(-,root,root)
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.15.0-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Fri Jul 28 2023 Andy Zaugg <azaugg@linkedin.com> - 5.15-1
 - Updated to version 5.15
 

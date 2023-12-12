@@ -1,7 +1,7 @@
 Summary:        Kernel Audit Tool
 Name:           audit
 Version:        3.0.6
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -136,6 +136,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{python3_sitelib}/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.0.6-8
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Fri Jun 17 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.0.6-7
 - Remove requirement on base package from libs subpackage
 - Move %%{_sysconfdir}/libaudit.conf to libs subpackage
