@@ -17,15 +17,7 @@
 
 %global do_exclude() \
 %if %2 \
-%exclude %{_bindir}/%{1}*-c++ \
-%exclude %{_bindir}/%{1}*-cpp \
-%exclude %{_bindir}/%{1}*-g++ \
-%exclude %{_bindir}/%{1}*-gcc \
-%exclude %{_bindir}/%{1}*-gcc-ar \
-%exclude %{_bindir}/%{1}*-gcc-nm \
-%exclude %{_bindir}/%{1}*-gcc-ranlib \
-%exclude %{_bindir}/%{1}*-gcov* \
-%exclude %{_bindir}/%{1}*-lto-dump \
+%exclude %{_bindir}/%{1}* \
 %exclude %{_libdir}/gcc/%{1} \
 %exclude %{_libexecdir}/gcc/%{1} \
 %exclude %{_prefix}/%{1}/sys-root/ \
