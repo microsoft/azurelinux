@@ -233,15 +233,6 @@ prep_target aarch64-linux-gnu %{build_aarch64}
 # disable no-pie for gcc binaries
 sed -i '/^NO_PIE_CFLAGS = /s/@NO_PIE_CFLAGS@//' gcc/Makefile.in
 
-# Fedora stuff:
-# echo 'Mariner Cross %{version}-%{release}' > gcc/DEV-PHASE
-
-# ./contrib/gcc_update --touch
-
-# LC_ALL=C sed -i -e 's/\xa0/ /' gcc/doc/options.texi
-
-# sed -i -e 's/Common Driver Var(flag_report_bug)/& Init(1)/' gcc/common.opt
-
 %build
 function config_cross_target () {
     local target=$1
@@ -249,11 +240,6 @@ function config_cross_target () {
     mkdir $target
     pushd $target
 
-    # --disable-bootstrap \
-    # --with-build-sysroot="$TEMP_SYSROOT" \
-    # --with-sysroot=%{_prefix}/$target/sys-root \
-    # --with-native-system-header-dir=%{_includedir} \
-    # --enable-shared \
     CFLAGS_FOR_TARGET="-g -O2 -Wall -fexceptions" \
     AR_FOR_TARGET=%{_bindir}/$target-ar \
     AS_FOR_TARGET=%{_bindir}/$target-as \
@@ -264,7 +250,7 @@ function config_cross_target () {
     READELF_FOR_TARGET=%{_bindir}/$target-readelf \
     STRIP_FOR_TARGET=%{_bindir}/$target-strip \
     SED=sed %configure \
-        --disable-multilib \
+        --disable-bootstrap \
         --disable-decimal-float \
         --disable-dependency-tracking \
         --disable-gold \
@@ -274,7 +260,7 @@ function config_cross_target () {
         --disable-libquadmath \
         --disable-libssp \
         --disable-libunwind-exceptions \
-        --disable-shared \
+        --disable-multilib \
         --disable-silent-rules \
         --disable-sjlj-exceptions \
         --disable-threads \
@@ -284,6 +270,7 @@ function config_cross_target () {
         --enable-default-pie \
         --enable-languages=c,c++ \
         --enable-linker-build-id \
+        --enable-shared \
         --enable-targets=all \
         --program-prefix=$target- \
         --target=$target \
@@ -303,26 +290,26 @@ export CFLAGS
 export CXXFLAGS
 export FCFLAGS
 
-# mkdir build
-# pushd build
+mkdir build
+pushd build
 
-# SED=sed \
-# %%configure \
-#     --disable-bootstrap \
-#     --disable-multilib \
-#     --enable-__cxa_atexit \
-#     --enable-clocale=gnu \
-#     --enable-default-pie \
-#     --enable-languages=c,c++,fortran \
-#     --enable-linker-build-id \
-#     --enable-plugin \
-#     --enable-shared \
-#     --enable-threads=posix \
-#     --with-system-zlib
+SED=sed \
+%configure \
+    --disable-bootstrap \
+    --disable-multilib \
+    --enable-__cxa_atexit \
+    --enable-clocale=gnu \
+    --enable-default-pie \
+    --enable-languages=c,c++,fortran \
+    --enable-linker-build-id \
+    --enable-plugin \
+    --enable-shared \
+    --enable-threads=posix \
+    --with-system-zlib
 
-# popd
+popd
 
-# make -C build %%{?_smp_mflags}
+make -C build %{?_smp_mflags}
 
 while read -r target
 do
@@ -332,35 +319,38 @@ do
 done < cross.list
 
 %install
-# make -C build %{?_smp_mflags} DESTDIR=%{buildroot} install
-# install -vdm 755 %{buildroot}/%{_libdir}
-# ln -sv %{_bindir}/cpp %{buildroot}/%{_libdir}
-# ln -sv gcc %{buildroot}%{_bindir}/cc
-# install -vdm 755 %{buildroot}%{_datarootdir}/gdb/auto-load%%{_libdir}
-# mv -v %{buildroot}%{_lib64dir}/*gdb.py %{buildroot}%{_datarootdir}/gdb/auto-load%%{_libdir}
-# chmod 755 %{buildroot}/%{_lib64dir}/libgcc_s.so.1
+pushd build
 
-# # Install libbacktrace-static components
-# mv %{_host}/libbacktrace/.libs/libbacktrace.a %{buildroot}%{_lib64dir}
-# mv libbacktrace/backtrace.h %{buildroot}%{_includedir}
+make %{?_smp_mflags} DESTDIR=%{buildroot} install
+install -vdm 755 %{buildroot}/%{_libdir}
+ln -sv %{_bindir}/cpp %{buildroot}/%{_libdir}
+ln -sv gcc %{buildroot}%{_bindir}/cc
+install -vdm 755 %{buildroot}%{_datarootdir}/gdb/auto-load%{_libdir}
+mv -v %{buildroot}%{_lib64dir}/*gdb.py %{buildroot}%{_datarootdir}/gdb/auto-load%{_libdir}
+chmod 755 %{buildroot}/%{_lib64dir}/libgcc_s.so.1
 
-# rm -rf %{buildroot}%{_infodir}
-# %%find_lang %{name} --all-name
+# Install libbacktrace-static components
+cp %{_host}/libbacktrace/.libs/libbacktrace.a %{buildroot}%{_lib64dir}
+cp ../libbacktrace/backtrace.h %{buildroot}%{_includedir}
+
+rm -rf %{buildroot}%{_infodir}
+%find_lang %{name} --all-name
+
+popd
 
 while read -r target
 do
     echo "=== INSTALL cross-compilation target $target ==="
-    # make -C $target %{?_smp_mflags} DESTDIR=%{buildroot} install-gcc
 
-    echo "TEST LOCAL INSTALL DIR %{_builddir}/$target"
-    mkdir -p "%{_builddir}/$target"
-
-    make -C $target %{?_smp_mflags} DESTDIR=%{_builddir}/$target install-gcc
-    # tree "%%{_builddir}/$target"
+    mkdir -p %{buildroot}%{_prefix}/$target/sys-root
+    make -C $target %{?_smp_mflags} DESTDIR=%{buildroot} install-gcc
 done < cross.list
 
 %check
 ulimit -s 32768
+
+pushd build
+
 # disable PCH tests is ASLR is on (due to bug in pch)
 test `cat /proc/sys/kernel/randomize_va_space` -ne 0 && rm gcc/testsuite/gcc.dg/pch/pch.exp
 # disable security hardening for tests
@@ -376,7 +366,7 @@ $tests_ok
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
-%files -f %{name}.lang
+%files -f build/%{name}.lang
 %defattr(-,root,root)
 %license COPYING
 %{_libdir}/cpp
@@ -431,7 +421,7 @@ $tests_ok
 %files -n libgcc-devel
 %defattr(-,root,root)
 %{_lib64dir}/libgcc_s.so
-%{_libdir}/libcc1.*
+%{_lib64dir}/libcc1.*
 
 %files c++
 %defattr(-,root,root)
@@ -467,9 +457,12 @@ $tests_ok
 %{_lib64dir}/libgomp.so
 %{_lib64dir}/libgomp.spec
 
+%do_files aarch64-linux-gnu %{build_aarch64}
+
 %changelog
 * Mon Dec 11 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 11.2.0-8
 - Added cross-compilation support for aarch64.
+- Used Fedora 36 spec (license: MIT) for guidance.
 
 * Tue Sep 26 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 11.2.0-7
 - Removing 'exit' calls from the '%%check' section.
