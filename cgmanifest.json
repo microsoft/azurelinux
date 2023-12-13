@@ -25343,6 +25343,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "quotatool",
+          "version": "1.6.2",
+          "downloadUrl": "http://quotatool.ekenberg.se/quotatool-1.6.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "R",
           "version": "4.1.0",
           "downloadUrl": "https://cran.r-project.org/src/base/R-4/R-4.1.0.tar.gz"
