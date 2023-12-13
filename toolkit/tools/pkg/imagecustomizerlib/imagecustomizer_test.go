@@ -230,7 +230,7 @@ func TestCustomizeImageKernelCommandLineAdd(t *testing.T) {
 	config := &imagecustomizerapi.Config{
 		SystemConfig: imagecustomizerapi.SystemConfig{
 			KernelCommandLine: imagecustomizerapi.KernelCommandLine{
-				CommandLineAdd: "console=tty0 console=ttyS0",
+				ExtraCommandLineAdd: "console=tty0 console=ttyS0",
 			},
 		},
 	}
