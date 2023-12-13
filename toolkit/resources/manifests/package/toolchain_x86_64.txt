@@ -93,8 +93,8 @@ gawk-5.1.1-1.cm2.x86_64.rpm
 gawk-debuginfo-5.1.1-1.cm2.x86_64.rpm
 gcc-11.2.0-8.cm2.x86_64.rpm
 gcc-aarch64-linux-gnu-11.2.0-8.cm2.x86_64.rpm
-gcc-aarch64-linux-gnu-c++-11.2.0-8.cm2.x86_64.rpm
 gcc-c++-11.2.0-8.cm2.x86_64.rpm
+gcc-c++-aarch64-linux-gnu-11.2.0-8.cm2.x86_64.rpm
 gcc-debuginfo-11.2.0-8.cm2.x86_64.rpm
 gdbm-1.21-1.cm2.x86_64.rpm
 gdbm-debuginfo-1.21-1.cm2.x86_64.rpm
