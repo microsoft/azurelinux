@@ -6,7 +6,6 @@ package imagecustomizerlib
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 
@@ -244,14 +243,6 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 	}
 	defer imageConnection.Close()
 
-	// Execute and print lsblk
-	cmd := exec.Command("lsblk")
-	lsblkOutput, err := cmd.Output()
-	if err != nil {
-		return fmt.Errorf("failed to execute lsblk: %w", err)
-	}
-	fmt.Printf("lsblk output:\n%s\n", lsblkOutput)
-
 	// Regular expression to extract the partition number
 	partitionRegex := regexp.MustCompile(`\d+$`)
 	// Get the base loop device path
@@ -262,9 +253,6 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 	// Construct the full device paths
 	dataPartition := fmt.Sprintf("%sp%s", baseLoopDevice, dataPartitionId) // e.g., "/dev/loop2p3"
 	hashPartition := fmt.Sprintf("%sp%s", baseLoopDevice, hashPartitionId) // e.g., "/dev/loop2p5"
-	// TODO: delete
-	fmt.Printf("dataPartition:\n%s\n", dataPartition)
-	fmt.Printf("hashPartition:\n%s\n", hashPartition)
 
 	// Extract root hash using regular expressions
 	verityOutput, _, err := shell.Execute("veritysetup", "format", dataPartition, hashPartition)
@@ -280,9 +268,6 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 		return fmt.Errorf("failed to parse root hash from veritysetup output")
 	}
 	rootHash = rootHashMatches[1]
-
-	// Print the extracted root hash
-	fmt.Printf("Extracted root hash: %s\n", rootHash)
 
 	// Update grub configuration
 	err = updateGrubConfig(config.SystemConfig.Verity.DataPartition.Id, config.SystemConfig.Verity.HashPartition.Id, rootHash, imageConnection.Chroot())
