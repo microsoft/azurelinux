@@ -1,7 +1,7 @@
 Summary:        C/C++ library for network traffic capture
 Name:           libpcap
 Version:        1.10.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -29,6 +29,13 @@ Requires:       %{name} = %{version}-%{release}
 %description    devel
 This package contains libraries and header files for
 developing applications that use %{name}.
+
+%package        static
+Summary:        Static lib for %{name}
+Requires:       %{name} = %{version}-%{release}
+
+%description    static
+This package contains static lib for %{name}.
 
 %prep
 %setup -q -n %{name}-%{name}-%{version}
@@ -59,7 +66,6 @@ make DESTDIR=%{buildroot} install
 %{_bindir}/*-config
 %{_includedir}/*.h
 %{_includedir}/pcap
-%exclude %{_libdir}/*.a
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
 %{_mandir}/man1/*
@@ -67,7 +73,13 @@ make DESTDIR=%{buildroot} install
 %{_mandir}/man5/*
 %{_mandir}/man7/*
 
+%files static
+%{_libdir}/*.a
+
 %changelog
+* Wed Dec 13 2023 Zhichun Wan <zhichunwan@microsoft.com> - 1.10.1-2
+- Add static library as sub package
+
 * Wed Jan 12 2022 Henry Li <lihl@microsoft.com> - 1.10.1-1
 - Upgrade to version 1.10.1
 
