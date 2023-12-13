@@ -22,6 +22,9 @@ function create_full_image() {
     local fullImageConfigFile=$1
     local outFullImageRawDisk=$2
     local outRootfsRawFile=$3
+    local outRootfsRawGzFile=$4
+    local outRootfsSquashFile=$5
+    local outRootfsSquashGzFile=$6
 
     # outputs:
     #
@@ -45,7 +48,11 @@ function create_full_image() {
     ./toolkit/mic-iso-gen/build-rootfs.sh \
         $fullImageConfigFile \
         $outFullImageRawDisk \
-        $outRootfsRawFile
+        $outRootfsRawFile \
+        $outRootfsRawGzFile \
+        $outRootfsSquashFile \
+        $outRootfsSquashGzFile
+
     mic_poc_log "---------------- create_full_image [exit] --------"
 }
 
@@ -53,12 +60,8 @@ function create_full_image() {
 function extract_artifacts_from_full_image() {
     mic_poc_log "---------------- extract_artifacts_from_full_image [enter] --------"
     local outFullImageRawDisk=$1
-    local outRootfsRawFile=$2
-    local outRootfsRawTgzFile=$3
-    local tmpDir=$4
-    local outDir=$5
-
-    tar -czvf $outRootfsRawTgzFile $outRootfsRawFile
+    local tmpDir=$2
+    local outDir=$3
 
     # outputs:
     #   $EXTRACT_ARTIFACTS_OUT_DIR/extracted-initrd
@@ -127,9 +130,10 @@ create_iso_with_rootfs_initrd () {
     local vmlinuzFile=$2
     local grubCfg=$3
     local initrdDir=$4
-    local fullImageRawDisk=$5
-    local rootfsRawFile=$6
-    local outDir=$7
+    local sourceFullImageRawDisk=$5
+    local sourceRootfsFile=$6
+    local targetRootfsFile=$7
+    local outDir=$8
 
     # outputs:
     #   /home/george/temp/iso-output/iso/baremetal-20231129-200226.iso
@@ -140,8 +144,9 @@ create_iso_with_rootfs_initrd () {
         $grubCfg \
         ~/git/CBL-Mariner/toolkit/mic-iso-gen/files/stock/iso-image-installer/iso-image-installer.sh \
         ~/git/CBL-Mariner/toolkit/mic-iso-gen/files/stock/iso-image-installer/host-configuration.json \
-        $fullImageRawDisk \
-        $rootfsRawFile \
+        $sourceFullImageRawDisk \
+        $sourceRootfsFile \
+        $targetRootfsFile \
         $outDir
 
     mic_poc_log "---------------- create_iso_with_rootfs_initrd [exit] --------"
@@ -181,12 +186,24 @@ create_iso_with_rootfs_initrd_dir () {
     mic_poc_log "---------------- create_iso_with_rootfs_initrd_dir [exit] --------"
 }
 
+function create_wrapper_iso() {
+    local isoLabel=$1
+    local sourceDir=$2
+    local outputFile=$3
+
+    sudo xorriso \
+        -as mkisofs \
+        -iso-level 3 \
+        -full-iso9660-filenames \
+        -volid $isoLabel \
+        -graft-points $sourceDir \
+        -output $outputFile
+}
+
 #-- main ----------------------------------------------------------------------
 FULL_IMAGE_CONFIG_FILE=~/git/CBL-Mariner/toolkit/imageconfigs/baremetal.json
 
-if [[ ! -z $BUILD_CLEAN ]]; then
-  sudo rm -rf $BUILD_DIR
-fi
+# s
 mkdir -p $BUILD_DIR
 
 BUILD_WORKING_DIR=$BUILD_DIR/intermediates
@@ -199,23 +216,108 @@ mkdir -p $BUILD_OUT_DIR
 cd ~/git/CBL-Mariner/
 
 FULL_IMAGE_RAW_DISK=$BUILD_WORKING_DIR/raw-disk-output/disk0.raw
+
 ROOTFS_RAW_FILE=$BUILD_WORKING_DIR/raw-disk-output/rootfs.img
-ROOTFS_RAW_TGZ_FILE=$BUILD_WORKING_DIR/raw-disk-output/rootfs.tgz
+ROOTFS_RAW_GZ_FILE=$BUILD_WORKING_DIR/raw-disk-output/rootfs.img.tgz
+
+UNWRAPPED_ROOTFS_SQUASH_FILE=$BUILD_WORKING_DIR/raw-disk-output/squashfs.img
+ROOTFS_SQUASH_GZ_FILE=$BUILD_WORKING_DIR/raw-disk-output/squashfs.img.tgz
+
 EXTRACT_ARTIFACTS_TMP_DIR=$BUILD_WORKING_DIR/extract-artifacts-from-rootfs-tmp-dir
 EXTRACT_ARTIFACTS_OUT_DIR=$BUILD_WORKING_DIR/extract-artifacts-from-rootfs-out-dir
 
-if [[ ! -z $BUILD_CLEAN ]]; then
-    create_full_image  \
-        $FULL_IMAGE_CONFIG_FILE \
-        $FULL_IMAGE_RAW_DISK \
-        $ROOTFS_RAW_FILE
+FEDORA_LIVE_ISO_DIR_0=$BUILD_WORKING_DIR/fedora-working-dir-0
+# FEDORA_LIVE_ISO_STAGING_DIR_0=$FEDORA_LIVE_ISO_DIR_0/input
+# FEDORA_LIVE_ISO_STAGING_LIVEOS_DIR_0=$FEDORA_LIVE_ISO_STAGING_DIR_0/LiveOS
+FEDORA_LIVE_ISO_WRAPPER_RAW_FILE_0=$FEDORA_LIVE_ISO_DIR_0/wrapper.img
 
-    extract_artifacts_from_full_image \
-        $FULL_IMAGE_RAW_DISK \
-        $ROOTFS_RAW_FILE \
-        $ROOTFS_RAW_TGZ_FILE \
-        $EXTRACT_ARTIFACTS_TMP_DIR \
-        $EXTRACT_ARTIFACTS_OUT_DIR
+FEDORA_LIVE_ISO_DIR_1=$BUILD_WORKING_DIR/fedora-working-dir-1
+FEDORA_LIVE_ISO_STAGING_DIR_1=$FEDORA_LIVE_ISO_DIR_1/input
+FEDORA_LIVE_ISO_STAGING_LIVEOS_DIR_1=$FEDORA_LIVE_ISO_STAGING_DIR_1/LiveOS
+FEDORA_LIVE_ISO_SQUASHFS_FILE_1=$FEDORA_LIVE_ISO_DIR_1/squashfs.img
+
+FEDORA_LIVE_ISO_DIR_2=$BUILD_WORKING_DIR/fedora-working-dir-2
+FEDORA_LIVE_ISO_STAGING_DIR_2=$FEDORA_LIVE_ISO_DIR_2/input
+FEDORA_LIVE_ISO_STAGING_LIVEOS_DIR_2=$FEDORA_LIVE_ISO_STAGING_DIR_2/LiveOS
+FEDORA_LIVE_ISO_WRAPPER_ISO_FILE=$FEDORA_LIVE_ISO_DIR_2/squashfs.iso
+
+if [[ ! -z $BUILD_CLEAN ]]; then
+    # create_full_image  \
+    #     $FULL_IMAGE_CONFIG_FILE \
+    #     $FULL_IMAGE_RAW_DISK \
+    #     $ROOTFS_RAW_FILE \
+    #     $ROOTFS_RAW_GZ_FILE \
+    #     $UNWRAPPED_ROOTFS_SQUASH_FILE \
+    #     $ROOTFS_SQUASH_GZ_FILE
+
+    # extract_artifacts_from_full_image \
+    #     $FULL_IMAGE_RAW_DISK \
+    #     $EXTRACT_ARTIFACTS_TMP_DIR \
+    #     $EXTRACT_ARTIFACTS_OUT_DIR
+
+    #
+    # Create the following:
+    # wrapper.img [raw file system]
+    #  |- LiveOS
+    #      |- rootfs.img [raw file system]
+    #
+    mkdir -p $FEDORA_LIVE_ISO_DIR_0
+    # mkdir -p $FEDORA_LIVE_ISO_STAGING_LIVEOS_DIR_0
+    # cp $ROOTFS_RAW_FILE \
+    #    $FEDORA_LIVE_ISO_STAGING_LIVEOS_DIR_0
+    sudo rm -f $FEDORA_LIVE_ISO_WRAPPER_RAW_FILE_0
+
+    dd if=/dev/zero \
+       of=$FEDORA_LIVE_ISO_WRAPPER_RAW_FILE_0 \
+       bs=1M \
+       count=2176
+
+    mkfs.ext4 $FEDORA_LIVE_ISO_WRAPPER_RAW_FILE_0
+
+    newDevice=$(sudo losetup -f -P --show $FEDORA_LIVE_ISO_WRAPPER_RAW_FILE_0)
+    sudo mkdir -p /mnt/wrapper
+    sudo mount $newDevice /mnt/wrapper
+    sudo mkdir -p /mnt/wrapper/LiveOS
+    sudo cp $ROOTFS_RAW_FILE /mnt/wrapper/LiveOS
+    echo "---------------------------------------------------------------------"
+    echo "New Device: $newDevice"
+    set +e
+    lsblk -o NAME,FSTYPE,SIZE,MOUNTPOINT,LABEL,UUID,PARTLABEL,PARTUUID
+    set -e
+    echo "---------------------------------------------------------------------"
+    sudo umount /mnt/wrapper
+    sleep 10s
+    # sudo rm -r /mnt/wrapper
+    sudo losetup -d $newDevice
+
+    #
+    # Create the following:
+    # squashfs.img [squash file system]
+    #  |- LiveOS
+    #      |- rootfs.img [raw file system]
+    #
+    mkdir -p $FEDORA_LIVE_ISO_STAGING_LIVEOS_DIR_1
+    cp $ROOTFS_RAW_FILE \
+        $FEDORA_LIVE_ISO_STAGING_LIVEOS_DIR_1
+    sudo rm -f $FEDORA_LIVE_ISO_SQUASHFS_FILE_1
+    mksquashfs \
+        $FEDORA_LIVE_ISO_STAGING_DIR_1 \
+        $FEDORA_LIVE_ISO_SQUASHFS_FILE_1
+
+    #
+    # Create the following
+    # squashfs.iso [iso file system - label=WRAPISO]
+    #  |- LiveOS
+    #      |- squashfs.img
+    #
+    mkdir -p $FEDORA_LIVE_ISO_STAGING_LIVEOS_DIR_2
+    cp $FEDORA_LIVE_ISO_SQUASHFS_FILE_1 \
+        $FEDORA_LIVE_ISO_STAGING_LIVEOS_DIR_2
+    sudo rm -f $FEDORA_LIVE_ISO_WRAPPER_ISO_FILE
+    create_wrapper_iso \
+        "WRAPISO" \
+        $FEDORA_LIVE_ISO_STAGING_DIR_2 \
+        $FEDORA_LIVE_ISO_WRAPPER_ISO_FILE
 fi
 
 INITRD_DIR=$BUILD_WORKING_DIR/initrd-dir
@@ -244,18 +346,40 @@ CREATE_INITRD_OUT_DIR=$BUILD_WORKING_DIR/create-initrd-from-folder-out-dir
 #     $CREATE_INITRD_OUT_DIR \
 #     $FULL_IMAGE_RAW_DISK\
 #     $NONE_VALUE \
+#     $NONE_VALUE \
 #     $BUILD_OUT_DIR
 
 #
 # Option 2.b. rootfs initrd + NO modifications + grub configured for dracut live scenario
 #
+# $EXTRACT_ARTIFACTS_OUT_DIR/extracted-initrd-file/initrd.img-5.15.138.1-1.cm2
+#
+
+# SOURCE_ROOTFS_FILE=$UNWRAPPED_ROOTFS_SQUASH_FILE
+# SOURCE_ROOTFS_FILE=$FEDORA_LIVE_ISO_SQUASHFS_FILE
+# TARGET_ROOTFS_FILE="/LiveOS/squashfs.img"
+
+# SOURCE_ROOTFS_FILE=$FEDORA_LIVE_ISO_WRAPPER_ISO_FILE
+# TARGET_ROOTFS_FILE="/LiveOS/squashfs.iso"
+
+# This configuration fails because dracut expects this raw images to contain
+# a subfolder named LiveOS/ and in that LiveOS/ folder, there should be
+# a raw file name `rootfs.img`.
+#
+# SOURCE_ROOTFS_FILE=$ROOTFS_RAW_FILE
+# TARGET_ROOTFS_FILE="/artifacts/rootfs.img"
+
+SOURCE_ROOTFS_FILE=$FEDORA_LIVE_ISO_WRAPPER_RAW_FILE_0
+TARGET_ROOTFS_FILE="/artifacts/wrapper.img"
+
 create_iso_with_rootfs_initrd \
-    $EXTRACT_ARTIFACTS_OUT_DIR/extracted-initrd-file/initrd.img-5.15.138.1-1.cm2 \
+    ~/temp/initrd.img \
     $EXTRACT_ARTIFACTS_OUT_DIR/extracted-vmlinuz-file/vmlinuz-5.15.138.1-1.cm2 \
     "/home/george/git/CBL-Mariner/toolkit/mic-iso-gen/files/stock/grub-dracut-live-cd.cfg" \
     $CREATE_INITRD_OUT_DIR \
     $NONE_VALUE \
-    $ROOTFS_RAW_FILE \
+    $SOURCE_ROOTFS_FILE \
+    $TARGET_ROOTFS_FILE \
     $BUILD_OUT_DIR
 
 #

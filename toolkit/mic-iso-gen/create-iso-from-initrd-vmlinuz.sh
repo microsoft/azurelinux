@@ -5,7 +5,15 @@ echo "-------- create-iso-from-initrd-vmlinuz.sh [enter] --------"
 set -x
 set -e
 
-sudo apt-get install -y mtools dosfstools grub-pc-bin grub-pc xorriso
+INPUT_INTRD=$1
+INPUT_VMLINUZ=$2
+INPUT_GRUB_CFG=$3
+INPUT_STARTUP_SCRIPT=$4
+INPUT_STARTUP_SCRIPT_CONFIGURATION=$5
+INPUT_FULL_IMAGE=$6
+INPUT_ROOTFS_FILE=$7
+OUTPUT_ROOTFS_FILE=$8
+OUTPUT_ISO_DIR=$9
 
 function CreateEfibootImage () {
     SRC_GRUB_CFG=$1
@@ -89,15 +97,7 @@ function CreateBiosImage () {
 #
 # Originally: ./prepare-iso-artifacts.sh
 #
-
-INPUT_INTRD=$1
-INPUT_VMLINUZ=$2
-INPUT_GRUB_CFG=$3
-INPUT_STARTUP_SCRIPT=$4
-INPUT_STARTUP_SCRIPT_CONFIGURATION=$5
-INPUT_FULL_IMAGE=$6
-INPUT_ROOTFS_RAW_FILE=$7
-OUTPUT_ISO_DIR=$8
+sudo apt-get install -y mtools dosfstools grub-pc-bin grub-pc xorriso
 
 INTERMEDIATE_OUTPUT_DIR=$OUTPUT_ISO_DIR/iso-intermediate-artifacts
 mkdir -p $INTERMEDIATE_OUTPUT_DIR
@@ -116,8 +116,10 @@ cd ~/git/CBL-Mariner/toolkit/mic-iso-gen
 mkdir -p $STAGED_ISO_ARTIFACTS_DIR/boot
 cp $INPUT_INTRD $STAGED_ISO_ARTIFACTS_DIR/boot/initrd.img
 cp $INPUT_VMLINUZ $STAGED_ISO_ARTIFACTS_DIR/boot/vmlinuz
-if [[ ! -z $INPUT_ROOTFS_RAW_FILE ]] && [[ $INPUT_ROOTFS_RAW_FILE != "none" ]]; then
-    cp $INPUT_ROOTFS_RAW_FILE $STAGED_ISO_ARTIFACTS_DIR/boot/
+if [[ ! -z $INPUT_ROOTFS_FILE ]] && [[ $INPUT_ROOTFS_FILE != "none" ]]; then
+    TARGET_ROOTFS_FILE=${STAGED_ISO_ARTIFACTS_DIR}${OUTPUT_ROOTFS_FILE}
+    mkdir -p $(dirname $TARGET_ROOTFS_FILE)
+    cp $INPUT_ROOTFS_FILE $TARGET_ROOTFS_FILE
 fi
 
 mkdir -p $STAGED_ISO_ARTIFACTS_DIR/artifacts
@@ -170,24 +172,6 @@ sudo xorriso \
     -output $OUTPUT_ISO_IMAGE_NAME
 
 echo $OUTPUT_ISO_IMAGE_NAME
-# -----------------------------------------------------------------------------
-# Test iso
-
-
-# sudo ./images/live-cd/test-create-vm.sh mariner13 /home/george/git/AfO-Packages/afo-host-live-cd-20211229-150826.iso
-
-# virt-install \
-#   --name $1 \
-#   --memory 4096 \
-#   --vcpus 2 \
-#   --cdrom $2 \
-#   --livecd \
-#   --nodisks \
-#   --cpu host \
-#   --machine pc-i440fx-hirsute \
-#   --os-variant linux2020 \
-#   --network default \
-#   --boot uefi,loader=/usr/share/OVMF/OVMF_CODE_4M.fd,loader_secure=no
 
 set +x
 echo "-------- create-iso-from-initrd-vmlinuz.sh [exit] --------"
