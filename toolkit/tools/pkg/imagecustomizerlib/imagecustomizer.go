@@ -238,47 +238,36 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 ) error {
 	var err error
 
-	// Connect the disk image to an NBD device using qemu-nbd
-	// Find a free NBD device
-	nbdDevice, err := findFreeNBDDevice()
-	if err != nil {
-		return fmt.Errorf("failed to find a free nbd device: %v", err)
-	}
-
-	_, _, err = shell.Execute("sudo", "qemu-nbd", "-c", nbdDevice, "-f", "raw", buildImageFile)
-	if err != nil {
-		return fmt.Errorf("failed to connect nbd %s to image %s: %s", nbdDevice, buildImageFile, err)
-	}
-	defer func() {
-		// Disconnect the NBD device when the function returns
-		_, _, err = shell.Execute("sudo", "qemu-nbd", "-d", nbdDevice)
-		if err != nil {
-			return
-		}
-	}()
-
-	// Resolve DataPartition and HashPartition if they are specified as PARTUUID or PARTLABEL
-	resolvedDataPartition, err := findDeviceByUUIDOrLabel(config.SystemConfig.Verity.DataPartition.Id)
-	if err != nil {
-		return fmt.Errorf("failed to resolve verity device %s: %v", config.SystemConfig.Verity.DataPartition.Id, err)
-	}
-	resolvedHashPartition, err := findDeviceByUUIDOrLabel(config.SystemConfig.Verity.HashPartition.Id)
-	if err != nil {
-		return fmt.Errorf("failed to resolve hash device %s: %v", config.SystemConfig.Verity.HashPartition.Id, err)
-	}
-
-	// Convert the system config devices to nbd partitions
-	nbdDataPartition, err := convertToNbdDevicePath(nbdDevice, resolvedDataPartition)
+	imageConnection, err := connectToExistingImage(buildImageFile, buildDir, "imageroot")
 	if err != nil {
 		return err
 	}
-	nbdHashPartition, err := convertToNbdDevicePath(nbdDevice, resolvedHashPartition)
+	defer imageConnection.Close()
+
+	// Execute and print lsblk
+	cmd := exec.Command("lsblk")
+	lsblkOutput, err := cmd.Output()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to execute lsblk: %w", err)
 	}
+	fmt.Printf("lsblk output:\n%s\n", lsblkOutput)
+
+	// Regular expression to extract the partition number
+	partitionRegex := regexp.MustCompile(`\d+$`)
+	// Get the base loop device path
+	baseLoopDevice := imageConnection.Loopback().DevicePath() // e.g., "/dev/loop2"
+	// Extract the partition numbers
+	dataPartitionId := partitionRegex.FindString(config.SystemConfig.Verity.DataPartition.Id) // e.g., "3"
+	hashPartitionId := partitionRegex.FindString(config.SystemConfig.Verity.HashPartition.Id) // e.g., "5"
+	// Construct the full device paths
+	dataPartition := fmt.Sprintf("%sp%s", baseLoopDevice, dataPartitionId) // e.g., "/dev/loop2p3"
+	hashPartition := fmt.Sprintf("%sp%s", baseLoopDevice, hashPartitionId) // e.g., "/dev/loop2p5"
+	// TODO: delete
+	fmt.Printf("dataPartition:\n%s\n", dataPartition)
+	fmt.Printf("hashPartition:\n%s\n", hashPartition)
 
 	// Extract root hash using regular expressions
-	verityOutput, _, err := shell.Execute("sudo", "veritysetup", "format", nbdDataPartition, nbdHashPartition)
+	verityOutput, _, err := shell.Execute("veritysetup", "format", dataPartition, hashPartition)
 	if err != nil {
 		return fmt.Errorf("failed to calculate root hash:\n%w", err)
 	}
@@ -292,38 +281,16 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 	}
 	rootHash = rootHashMatches[1]
 
-	resolvedBootPartition, err := findDeviceByUUIDOrLabel(config.SystemConfig.Verity.BootPartition.Id)
-	if err != nil {
-		return fmt.Errorf("failed to resolve boot device %s: %v", config.SystemConfig.Verity.BootPartition.Id, err)
-	}
+	// Print the extracted root hash
+	fmt.Printf("Extracted root hash: %s\n", rootHash)
 
-	nbdBootPartition, err := convertToNbdDevicePath(nbdDevice, resolvedBootPartition)
+	// Update grub configuration
+	err = updateGrubConfig(config.SystemConfig.Verity.DataPartition.Id, config.SystemConfig.Verity.HashPartition.Id, rootHash, imageConnection.Chroot())
 	if err != nil {
 		return err
 	}
 
-	// Create a directory for mounting the boot partition
-	bootMountDir := filepath.Join(buildDir, "/mnt/boot_partition")
-		if err := os.MkdirAll(bootMountDir, 0755); err != nil {
-			return fmt.Errorf("failed to create mount directory %s: %v", bootMountDir, err)
-		}
-		defer func() {
-			// Cleanup: Unmount and remove the directory when the function returns
-			if err := exec.Command("sudo", "umount", bootMountDir).Run(); err != nil {
-				fmt.Printf("Warning: failed to unmount %s: %v\n", bootMountDir, err)
-			}
-			if err := os.Remove(bootMountDir); err != nil {
-				fmt.Printf("Warning: failed to remove %s: %v\n", bootMountDir, err)
-			}
-		}()
-
-		_, _, err = shell.Execute("sudo", "mount", nbdBootPartition, bootMountDir)
-		if err != nil {
-			return err
-		}
-
-	// Update grub configuration
-	err = updateGrubConfig(resolvedDataPartition, resolvedHashPartition, rootHash, config.SystemConfig.Verity.VerityErrorBehavior, bootMountDir)
+	err = imageConnection.CleanClose()
 	if err != nil {
 		return err
 	}

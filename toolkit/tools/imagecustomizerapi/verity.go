@@ -8,59 +8,27 @@ import (
 )
 
 type VerityPartition struct {
-	IdType string `yaml:"IdType"`
+	IdType IdType `yaml:"IdType"`
 	Id     string `yaml:"Id"`
 }
 
 type Verity struct {
-	DataPartition       VerityPartition     `yaml:"DataPartition"`
-	HashPartition       VerityPartition     `yaml:"HashPartition"`
-	BootPartition       VerityPartition     `yaml:"BootPartition"`
-	VerityErrorBehavior VerityErrorBehavior `yaml:"VerityErrorBehavior"`
+	DataPartition VerityPartition `yaml:"DataPartition"`
+	HashPartition VerityPartition `yaml:"HashPartition"`
 }
-
-var (
-	DefaultVerity = Verity{
-		DataPartition:       VerityPartition{IdType: "PARTITION", Id: ""},
-		HashPartition:       VerityPartition{IdType: "PARTITION", Id: ""},
-		BootPartition:       VerityPartition{IdType: "PARTITION", Id: ""},
-		VerityErrorBehavior: "",
-	}
-)
 
 func (v *Verity) IsSet() bool {
 	return v.DataPartition != VerityPartition{} ||
-		v.HashPartition != VerityPartition{} ||
-		v.BootPartition != VerityPartition{}
+		v.HashPartition != VerityPartition{}
 }
 
 func (v *Verity) IsValid() error {
-	var err error
-
-	validIdTypes := map[string]bool{
-		"PARTITION": true,
-		"ID":        true,
-		"LABEL":     true,
-		"PARTLABEL": true,
-		"UUID":      true,
-		"PARTUUID":  true,
+	if err := v.DataPartition.IdType.IsValid(); err != nil || v.DataPartition.Id == "" {
+		return fmt.Errorf("invalid DataPartition: %v", err)
 	}
 
-	if _, ok := validIdTypes[v.DataPartition.IdType]; !ok || v.DataPartition.Id == "" {
-		return fmt.Errorf("invalid DataPartition: IdType must be one of %v and Id must not be empty", validIdTypes)
-	}
-
-	if _, ok := validIdTypes[v.HashPartition.IdType]; !ok || v.HashPartition.Id == "" {
-		return fmt.Errorf("invalid HashPartition: IdType must be one of %v and Id must not be empty", validIdTypes)
-	}
-
-	if _, ok := validIdTypes[v.BootPartition.IdType]; !ok || v.BootPartition.Id == "" {
-		return fmt.Errorf("invalid BootPartition: IdType must be one of %v and Id must not be empty", validIdTypes)
-	}
-
-	err = v.VerityErrorBehavior.IsValid()
-	if err != nil {
-		return err
+	if err := v.HashPartition.IdType.IsValid(); err != nil || v.HashPartition.Id == "" {
+		return fmt.Errorf("invalid HashPartition: %v", err)
 	}
 
 	return nil

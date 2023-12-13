@@ -7,10 +7,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strings"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 )
@@ -67,16 +65,8 @@ func buildDracutModule(dracutModuleName string, imageChroot *safechroot.Chroot) 
 	// Extract the version from the kernel filename (e.g., vmlinuz-5.15.131.1-2.cm2 -> 5.15.131.1-2.cm2)
 	kernelVersion := strings.TrimPrefix(kernelFiles[0], "vmlinuz-")
 
-	buildDracutModuleArgs := []string{
-		"dracut", "-f", "--kver", kernelVersion, "-a",
-		// Placeholder for dracut module name.
-		"",
-	}
-
-	buildDracutModuleArgs[len(buildDracutModuleArgs)-1] = dracutModuleName
-
 	err = imageChroot.Run(func() error {
-		_, _, err = shell.Execute("sudo", buildDracutModuleArgs...)
+		err = shell.ExecuteLiveWithErr(1, "dracut", "-f", "--kver", kernelVersion, "-a", dracutModuleName)
 		return err
 	})
 	if err != nil {
@@ -87,15 +77,12 @@ func buildDracutModule(dracutModuleName string, imageChroot *safechroot.Chroot) 
 }
 
 func updateMarinerCfgWithInitramfs(imageChroot *safechroot.Chroot) error {
-	initramfsPath := filepath.Join("boot", "initramfs-*")
+	var err error
 
+	initramfsPath := filepath.Join(imageChroot.RootDir(), "boot/initramfs-*")
 	// Fetch the initramfs file name.
 	var initramfsFiles []string
-	err := imageChroot.Run(func() error {
-		var innerErr error
-		initramfsFiles, innerErr = filepath.Glob(initramfsPath)
-		return innerErr
-	})
+	initramfsFiles, err = filepath.Glob(initramfsPath)
 	if err != nil {
 		return fmt.Errorf("failed to list initramfs file: %w", err)
 	}
@@ -107,38 +94,31 @@ func updateMarinerCfgWithInitramfs(imageChroot *safechroot.Chroot) error {
 
 	newInitramfs := filepath.Base(initramfsFiles[0])
 
-	cfgPath := filepath.Join("boot", "mariner.cfg")
-
+	cfgPath := filepath.Join(imageChroot.RootDir(), "boot/mariner.cfg")
 	// Update mariner.cfg to reference the new initramfs
-	err = imageChroot.Run(func() error {
-		input, innerErr := os.ReadFile(cfgPath)
-		if innerErr != nil {
-			return fmt.Errorf("failed to read mariner.cfg: %w", innerErr)
-		}
+	input, err := os.ReadFile(cfgPath)
+	if err != nil {
+		return fmt.Errorf("failed to read mariner.cfg: %w", err)
+	}
 
-		lines := strings.Split(string(input), "\n")
-		for i, line := range lines {
-			if strings.HasPrefix(line, "mariner_initrd=") {
-				lines[i] = "mariner_initrd=" + newInitramfs
-			}
+	lines := strings.Split(string(input), "\n")
+	for i, line := range lines {
+		if strings.HasPrefix(line, "mariner_initrd=") {
+			lines[i] = "mariner_initrd=" + newInitramfs
 		}
-		output := strings.Join(lines, "\n")
-		return os.WriteFile(cfgPath, []byte(output), 0644)
-	})
+	}
+	output := strings.Join(lines, "\n")
+	os.WriteFile(cfgPath, []byte(output), 0644)
 
 	return nil
 }
 
-func updateGrubConfig(resolvedDataPartition string, resolvedHashPartition string, rootHash string, verityErrorBehavior imagecustomizerapi.VerityErrorBehavior, bootMountDir string) error {
+func updateGrubConfig(resolvedDataPartition string, resolvedHashPartition string, rootHash string, imageChroot *safechroot.Chroot) error {
 	var err error
 
-	const cmdlineTemplate = "rd.systemd.verity=1 roothash=%s systemd.verity_root_data=%s systemd.verity_root_hash=%s systemd.verity_root_options=%s"
-	verityErrorBehaviorString, err := VerityErrorBehaviorToImager(verityErrorBehavior)
-	if err != nil {
-		return err
-	}
-	newArgs := fmt.Sprintf(cmdlineTemplate, rootHash, resolvedDataPartition, resolvedHashPartition, verityErrorBehaviorString)
-	grubConfigPath := filepath.Join(bootMountDir, "grub2/grub.cfg")
+	const cmdlineTemplate = "rd.systemd.verity=1 roothash=%s systemd.verity_root_data=%s systemd.verity_root_hash=%s systemd.verity_root_options=ignore-corruption"
+	newArgs := fmt.Sprintf(cmdlineTemplate, rootHash, resolvedDataPartition, resolvedHashPartition)
+	grubConfigPath := filepath.Join(imageChroot.RootDir(), "boot/grub2/grub.cfg")
 
 	content, err := os.ReadFile(grubConfigPath)
 	if err != nil {
@@ -169,37 +149,6 @@ func updateGrubConfig(resolvedDataPartition string, resolvedHashPartition string
 	}
 
 	return nil
-}
-
-// findFreeNBDDevice finds the first available NBD device.
-func findFreeNBDDevice() (string, error) {
-	files, err := filepath.Glob("/sys/class/block/nbd*")
-	if err != nil {
-		return "", err
-	}
-
-	for _, file := range files {
-		// Check if the pid file exists. If it does not exist, the device is likely free.
-		pidFile := filepath.Join(file, "pid")
-		if _, err := os.Stat(pidFile); os.IsNotExist(err) {
-			return "/dev/" + filepath.Base(file), nil
-		}
-	}
-
-	return "", fmt.Errorf("no free nbd devices available")
-}
-
-// convertToDevicePath takes an NBD device path and a system config device path,
-// and converts it to the corresponding NBD partition path.
-func convertToNbdDevicePath(nbdDevice, systemDevice string) (string, error) {
-	partitionRegex := regexp.MustCompile(`[0-9]+$`)
-	partitionNumber := partitionRegex.FindString(systemDevice)
-
-	if partitionNumber == "" {
-		return "", fmt.Errorf("failed to extract partition number from %s", systemDevice)
-	}
-
-	return fmt.Sprintf("%sp%s", nbdDevice, partitionNumber), nil
 }
 
 // findDeviceByUUIDOrLabel attempts to resolve a PARTUUID, PARTLABEL, UUID, or LABEL to a device file.
