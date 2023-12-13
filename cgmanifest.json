@@ -5240,8 +5240,8 @@
         "type": "other",
         "other": {
           "name": "helm",
-          "version": "3.10.3",
-          "downloadUrl": "https://github.com/helm/helm/archive/v3.10.3.tar.gz"
+          "version": "3.13.2",
+          "downloadUrl": "https://github.com/helm/helm/archive/v3.13.2.tar.gz"
         }
       }
     },
@@ -8161,8 +8161,8 @@
         "type": "other",
         "other": {
           "name": "kernel-mos",
-          "version": "5.15.136.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2-mos/5.15.136.1.tar.gz"
+          "version": "5.15.139.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2-mos/5.15.139.1.tar.gz"
         }
       }
     },
@@ -8391,8 +8391,8 @@
         "type": "other",
         "other": {
           "name": "kubernetes",
-          "version": "1.28.3",
-          "downloadUrl": "https://dl.k8s.io/v1.28.3/kubernetes-src.tar.gz"
+          "version": "1.28.4",
+          "downloadUrl": "https://dl.k8s.io/v1.28.4/kubernetes-src.tar.gz"
         }
       }
     },
@@ -9381,8 +9381,8 @@
         "type": "other",
         "other": {
           "name": "libgcrypt",
-          "version": "1.9.4",
-          "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.9.4.tar.bz2"
+          "version": "1.10.3",
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.10.3.tar.bz2"
         }
       }
     },
@@ -28617,8 +28617,8 @@
         "type": "other",
         "other": {
           "name": "telegraf",
-          "version": "1.27.4",
-          "downloadUrl": "https://github.com/influxdata/telegraf/archive/v1.27.4.tar.gz"
+          "version": "1.28.5",
+          "downloadUrl": "https://github.com/influxdata/telegraf/archive/v1.28.5.tar.gz"
         }
       }
     },

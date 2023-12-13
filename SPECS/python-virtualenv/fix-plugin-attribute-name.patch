@@ -1,0 +1,25 @@
+From 1fd2fe77069305080fde3b3265bfbe6ec526e683 Mon Sep 17 00:00:00 2001
+From: Olivia Crain <olivia@olivia.dev>
+Date: Fri, 29 Sep 2023 13:02:31 -0500
+Subject: [PATCH] Fix plugin attribute name
+
+---
+ tests/conftest.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/conftest.py b/tests/conftest.py
+index ad8643b..1bb96ee 100644
+--- a/tests/conftest.py
++++ b/tests/conftest.py
+@@ -28,7 +28,7 @@ def pytest_configure(config):
+     """Ensure randomly is called before we re-order"""
+     manager = config.pluginmanager
+     # noinspection PyProtectedMember
+-    order = manager.hook.pytest_collection_modifyitems._nonwrappers
++    order = manager.hook.pytest_collection_modifyitems._hookimpls
+     dest = next((i for i, p in enumerate(order) if p.plugin is manager.getplugin("randomly")), None)
+     if dest is not None:
+         from_pos = next(i for i, p in enumerate(order) if p.plugin is manager.getplugin(__file__))
+-- 
+2.41.0
+
