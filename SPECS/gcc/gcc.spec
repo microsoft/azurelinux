@@ -17,18 +17,18 @@
 
 %global do_files() \
 %if %2 \
-%files -n gcc-%1 -f files.%1 \
-%{_bindir}/%1*-cpp \
-%{_bindir}/%1*-gcc \
-%{_bindir}/%1*-gcc-ar \
-%{_bindir}/%1*-gcc-nm \
-%{_bindir}/%1*-gcc-ranlib \
-%{_bindir}/%1*-gcov* \
-%{_bindir}/%1*-lto-dump \
+%files -n gcc-%1 \
+%{_bindir}/%{1}*-cpp \
+%{_bindir}/%{1}*-gcc \
+%{_bindir}/%{1}*-gcc-ar \
+%{_bindir}/%{1}*-gcc-nm \
+%{_bindir}/%{1}*-gcc-ranlib \
+%{_bindir}/%{1}*-gcov* \
+%{_bindir}/%{1}*-lto-dump \
 \
 %files -n gcc-c++-%1 \
-%{_bindir}/%1*-c++ \
-%{_bindir}/%1*-g++ \
+%{_bindir}/%{1}*-c++ \
+%{_bindir}/%{1}*-g++ \
 %endif
 
 Summary:        Contains the GNU compiler collection
@@ -86,7 +86,7 @@ BuildRequires: binutils-%1 \
 Requires: binutils-%1 \
 Requires: gmp-devel \
 Requires: mpfr-devel \
-Requires: libmpc-deve \
+Requires: libmpc-devel \
 %description -n gcc-%1 \
 Cross-build GNU C compiler. \
 \
@@ -456,6 +456,11 @@ $tests_ok
 %{_lib64dir}/libgomp.la
 %{_lib64dir}/libgomp.so
 %{_lib64dir}/libgomp.spec
+
+%if %{build_cross}
+%files -n cross-gcc-common
+%license COPYING
+%endif
 
 %do_files aarch64-linux-gnu %{build_aarch64}
 
