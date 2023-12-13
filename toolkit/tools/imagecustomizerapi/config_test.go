@@ -263,6 +263,40 @@ func TestConfigIsValidInvalidPartitionId(t *testing.T) {
 	assert.ErrorContains(t, err, "ID")
 }
 
+func TestConfigIsValidPartitionSettingsMissingDisks(t *testing.T) {
+	config := &Config{
+		SystemConfig: SystemConfig{
+			Hostname: "test",
+			PartitionSettings: []PartitionSetting{
+				{
+					ID:         "esp",
+					MountPoint: "/boot/efi",
+				},
+			},
+		},
+	}
+	err := config.IsValid()
+	assert.Error(t, err)
+	assert.ErrorContains(t, err, "Disks")
+	assert.ErrorContains(t, err, "BootType")
+	assert.ErrorContains(t, err, "PartitionSettings")
+}
+
+func TestConfigIsValidBootTypeMissingDisks(t *testing.T) {
+	config := &Config{
+		SystemConfig: SystemConfig{
+			Hostname: "test",
+			BootType: BootTypeEfi,
+			KernelCommandLine: KernelCommandLine{
+				ExtraCommandLine: "console=ttyS0",
+			},
+		},
+	}
+	err := config.IsValid()
+	assert.Error(t, err)
+	assert.ErrorContains(t, err, "SystemConfig.BootType and Disks must be specified together")
+}
+
 func TestConfigIsValidKernelCLI(t *testing.T) {
 	config := &Config{
 		Disks: &[]Disk{{
@@ -296,25 +330,4 @@ func TestConfigIsValidKernelCLI(t *testing.T) {
 	}
 	err := config.IsValid()
 	assert.NoError(t, err)
-}
-
-func TestConfigIsValidKernelCLIMissingDisks(t *testing.T) {
-	config := &Config{
-		SystemConfig: SystemConfig{
-			Hostname: "test",
-			PartitionSettings: []PartitionSetting{
-				{
-					ID:         "esp",
-					MountPoint: "/boot/efi",
-				},
-			},
-			KernelCommandLine: KernelCommandLine{
-				ExtraCommandLine: "console=ttyS0",
-			},
-		},
-	}
-	err := config.IsValid()
-	assert.Error(t, err)
-	assert.ErrorContains(t, err, "Disks")
-	assert.ErrorContains(t, err, "BootType")
 }

@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"regexp"
 
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 )
 
@@ -16,13 +17,21 @@ var (
 	linuxCommandLineRegex = regexp.MustCompile(`\tlinux .* (\$kernelopts)`)
 )
 
-func handleKernelCommandLine(commandLineAdd string, imageChroot *safechroot.Chroot) error {
+func handleKernelCommandLine(extraCommandLine string, imageChroot *safechroot.Chroot, partitionsCustomized bool) error {
 	var err error
 
-	if commandLineAdd == "" {
+	if partitionsCustomized {
+		// ExtraCommandLine was handled when the new image was created and the grub.cfg file was regenerated from
+		// scatch.
+		return nil
+	}
+
+	if extraCommandLine == "" {
 		// Nothing to do.
 		return nil
 	}
+
+	logger.Log.Infof("Setting KernelCommandLine.ExtraCommandLine")
 
 	grub2ConfigFilePath := filepath.Join(imageChroot.RootDir(), "/boot/grub2/grub.cfg")
 
@@ -45,7 +54,7 @@ func handleKernelCommandLine(commandLineAdd string, imageChroot *safechroot.Chro
 	insertIndex := match[2]
 
 	// Insert new command line arguments.
-	newGrub2ConfigFile := grub2ConfigFile[:insertIndex] + commandLineAdd + " " + grub2ConfigFile[insertIndex:]
+	newGrub2ConfigFile := grub2ConfigFile[:insertIndex] + extraCommandLine + " " + grub2ConfigFile[insertIndex:]
 
 	// Update grub.cfg file.
 	err = os.WriteFile(grub2ConfigFilePath, []byte(newGrub2ConfigFile), 0)

@@ -9,20 +9,12 @@ import (
 )
 
 type KernelCommandLine struct {
-	// Extra command line args that are set during partition customiztion when a new grub.cfg file is created.
+	// Extra kernel command line args.
 	ExtraCommandLine string `yaml:"ExtraCommandLine"`
-
-	// Extra command line args that are added to the existing grub.cfg file.
-	ExtraCommandLineAdd string `yaml:"ExtraCommandLineAdd"`
 }
 
 func (s *KernelCommandLine) IsValid() error {
 	err := commandLineIsValid(s.ExtraCommandLine, "ExtraCommandLine")
-	if err != nil {
-		return err
-	}
-
-	err = commandLineIsValid(s.ExtraCommandLineAdd, "ExtraCommandLineAdd")
 	if err != nil {
 		return err
 	}

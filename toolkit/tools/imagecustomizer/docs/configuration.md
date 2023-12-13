@@ -185,19 +185,14 @@ Options for configuring the kernel.
 
 ### ExtraCommandLine
 
+Additional Linux kernel command line options to add to the image.
+
 If the partitions are customized, then the `grub.cfg` file will be reset to handle the
 new partition layout.
-When the new `grub.cfg` file is created, the `ExtraCommandLine` value will be added to
-the Linux kernel command line options.
+So, any existing ExtraCommandLine value in the base image will be replaced.
 
-This field may only be used when when the [Disks](#disks-disk) and
-[SystemConfig.PartitionSettings](#partitionsettings-partitionsetting) fields are
-specified.
-
-### ExtraCommandLineAdd
-
-Additional Linux kernel command line options that are added to the existing `grub.cfg`
-file.
+If the partitions are not customized, then the `ExtraCommandLine` value will be appended
+to the existing `grub.cfg` file.
 
 ## Module type
 
