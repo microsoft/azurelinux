@@ -392,7 +392,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_datadir}/bash-completion/completions/cpupower
 %endif
 %ifarch aarch64
-%{_libdir}/traceevent
 %{_libdir}/libperf-jvmti.so
 %endif
 %{_bindir}
