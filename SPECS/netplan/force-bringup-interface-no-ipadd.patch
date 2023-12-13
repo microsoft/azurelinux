@@ -1,0 +1,587 @@
+From d96a6a0f50c98301a36042f5065e7e834737122f Mon Sep 17 00:00:00 2001
+From: Mathieu Trudel-Lapierre <mathieu.trudel-lapierre@canonical.com>
+Date: Tue, 29 May 2018 11:03:45 -0400
+Subject: [PATCH] networkd: force bringing up devices with no IP addresses
+
+Signed-off-by: Mathieu Trudel-Lapierre <mathieu.trudel-lapierre@canonical.com>
+---
+ src/networkd.c                    | 130 ++++++++++++-----------
+ tests/generator/test_common.py    |   6 ++
+ tests/generator/test_ethernets.py |  34 ++++++-
+ tests/generator/test_tunnels.py   | 164 ++----------------------------
+ 4 files changed, 116 insertions(+), 218 deletions(-)
+
+diff --git a/src/networkd.c b/src/networkd.c
+index 843ba2115..7c7ccef92 100644
+--- a/src/networkd.c
++++ b/src/networkd.c
+@@ -421,101 +421,97 @@ combine_dhcp_overrides(net_definition* def, dhcp_overrides* combined_dhcp_overri
+ static void
+ write_network_file(net_definition* def, const char* rootdir, const char* path)
+ {
++    GString* network = NULL;
++    GString* link = NULL;
+     GString* s = NULL;
+     mode_t orig_umask;
+ 
+-    /* do we need to write a .network file? */
+-    if (!def->dhcp4 && !def->dhcp6 && !def->bridge && !def->bond &&
+-        !def->ip4_addresses && !def->ip6_addresses && !def->gateway4 && !def->gateway6 &&
+-        !def->ip4_nameservers && !def->ip6_nameservers && !def->has_vlans &&
+-        def->type < ND_VIRTUAL)
+-        return;
++    /* Prepare the [Link] section of the .network file. */
++    link = g_string_sized_new(200);
+ 
+-    /* build file contents */
+-    s = g_string_sized_new(200);
+-    append_match_section(def, s, TRUE);
++    /* Prepare the [Network] section */
++    network = g_string_sized_new(200);
+ 
+     if (def->optional || def->optional_addresses) {
+-        g_string_append(s, "\n[Link]\n");
+         if (def->optional) {
+-            g_string_append(s, "RequiredForOnline=no\n");
++            g_string_append(link, "RequiredForOnline=no\n");
+         }
+         for (unsigned i = 0; optional_address_options[i].name != NULL; ++i) {
+             if (def->optional_addresses & optional_address_options[i].flag) {
+-            g_string_append_printf(s, "OptionalAddresses=%s\n", optional_address_options[i].name);
++            g_string_append_printf(link, "OptionalAddresses=%s\n", optional_address_options[i].name);
+             }
+         }
+     }
+ 
+-    g_string_append(s, "\n[Network]\n");
++
+     if (def->dhcp4 && def->dhcp6)
+-        g_string_append(s, "DHCP=yes\n");
++        g_string_append(network, "DHCP=yes\n");
+     else if (def->dhcp4)
+-        g_string_append(s, "DHCP=ipv4\n");
++        g_string_append(network, "DHCP=ipv4\n");
+     else if (def->dhcp6)
+-        g_string_append(s, "DHCP=ipv6\n");
++        g_string_append(network, "DHCP=ipv6\n");
+ 
+     /* Set link local addressing -- this does not apply to bond and bridge
+      * member interfaces, which always get it disabled.
+      */
+     if (!def->bond && !def->bridge && (def->linklocal.ipv4 || def->linklocal.ipv6)) {
+         if (def->linklocal.ipv4 && def->linklocal.ipv6)
+-            g_string_append(s, "LinkLocalAddressing=yes\n");
++            g_string_append(network, "LinkLocalAddressing=yes\n");
+         else if (def->linklocal.ipv4)
+-            g_string_append(s, "LinkLocalAddressing=ipv4\n");
++            g_string_append(network, "LinkLocalAddressing=ipv4\n");
+         else if (def->linklocal.ipv6)
+-            g_string_append(s, "LinkLocalAddressing=ipv6\n");
++            g_string_append(network, "LinkLocalAddressing=ipv6\n");
+     } else {
+-        g_string_append(s, "LinkLocalAddressing=no\n");
++        g_string_append(network, "LinkLocalAddressing=no\n");
+     }
+ 
+     if (def->ip4_addresses)
+         for (unsigned i = 0; i < def->ip4_addresses->len; ++i)
+-            g_string_append_printf(s, "Address=%s\n", g_array_index(def->ip4_addresses, char*, i));
++            g_string_append_printf(network, "Address=%s\n", g_array_index(def->ip4_addresses, char*, i));
+     if (def->ip6_addresses)
+         for (unsigned i = 0; i < def->ip6_addresses->len; ++i)
+-            g_string_append_printf(s, "Address=%s\n", g_array_index(def->ip6_addresses, char*, i));
++            g_string_append_printf(network, "Address=%s\n", g_array_index(def->ip6_addresses, char*, i));
+     if (def->accept_ra == ACCEPT_RA_ENABLED)
+-        g_string_append_printf(s, "IPv6AcceptRA=yes\n");
++        g_string_append_printf(network, "IPv6AcceptRA=yes\n");
+     else if (def->accept_ra == ACCEPT_RA_DISABLED)
+-        g_string_append_printf(s, "IPv6AcceptRA=no\n");
++        g_string_append_printf(network, "IPv6AcceptRA=no\n");
+     if (def->ip6_privacy)
+-        g_string_append(s, "IPv6PrivacyExtensions=yes\n");
++        g_string_append(network, "IPv6PrivacyExtensions=yes\n");
+     if (def->gateway4)
+-        g_string_append_printf(s, "Gateway=%s\n", def->gateway4);
++        g_string_append_printf(network, "Gateway=%s\n", def->gateway4);
+     if (def->gateway6)
+-        g_string_append_printf(s, "Gateway=%s\n", def->gateway6);
++        g_string_append_printf(network, "Gateway=%s\n", def->gateway6);
+     if (def->ip4_nameservers)
+         for (unsigned i = 0; i < def->ip4_nameservers->len; ++i)
+-            g_string_append_printf(s, "DNS=%s\n", g_array_index(def->ip4_nameservers, char*, i));
++            g_string_append_printf(network, "DNS=%s\n", g_array_index(def->ip4_nameservers, char*, i));
+     if (def->ip6_nameservers)
+         for (unsigned i = 0; i < def->ip6_nameservers->len; ++i)
+-            g_string_append_printf(s, "DNS=%s\n", g_array_index(def->ip6_nameservers, char*, i));
++            g_string_append_printf(network, "DNS=%s\n", g_array_index(def->ip6_nameservers, char*, i));
+     if (def->search_domains) {
+-        g_string_append_printf(s, "Domains=%s", g_array_index(def->search_domains, char*, 0));
++        g_string_append_printf(network, "Domains=%s", g_array_index(def->search_domains, char*, 0));
+         for (unsigned i = 1; i < def->search_domains->len; ++i)
+-            g_string_append_printf(s, " %s", g_array_index(def->search_domains, char*, i));
+-        g_string_append(s, "\n");
++            g_string_append_printf(network, " %s", g_array_index(def->search_domains, char*, i));
++        g_string_append(network, "\n");
+     }
+ 
+     if (def->type >= ND_VIRTUAL)
+-        g_string_append(s, "ConfigureWithoutCarrier=yes\n");
++        g_string_append(network, "ConfigureWithoutCarrier=yes\n");
+ 
+     if (def->bridge) {
+-        g_string_append_printf(s, "Bridge=%s\n", def->bridge);
++        g_string_append_printf(network, "Bridge=%s\n", def->bridge);
+ 
+         if (def->bridge_params.path_cost || def->bridge_params.port_priority)
+-            g_string_append_printf(s, "\n[Bridge]\n");
++            g_string_append_printf(network, "\n[Bridge]\n");
+         if (def->bridge_params.path_cost)
+-            g_string_append_printf(s, "Cost=%u\n", def->bridge_params.path_cost);
++            g_string_append_printf(network, "Cost=%u\n", def->bridge_params.path_cost);
+         if (def->bridge_params.port_priority)
+-            g_string_append_printf(s, "Priority=%u\n", def->bridge_params.port_priority);
++            g_string_append_printf(network, "Priority=%u\n", def->bridge_params.port_priority);
+     }
+     if (def->bond) {
+-        g_string_append_printf(s, "Bond=%s\n", def->bond);
++        g_string_append_printf(network, "Bond=%s\n", def->bond);
+ 
+         if (def->bond_params.primary_slave)
+-            g_string_append_printf(s, "PrimarySlave=true\n");
++            g_string_append_printf(network, "PrimarySlave=true\n");
+     }
+ 
+     if (def->has_vlans) {
+@@ -525,37 +521,38 @@ write_network_file(net_definition* def, const char* rootdir, const char* path)
+         g_hash_table_iter_init(&i, netdefs);
+         while (g_hash_table_iter_next (&i, NULL, (gpointer*) &nd))
+             if (nd->vlan_link == def)
+-                g_string_append_printf(s, "VLAN=%s\n", nd->id);
++                g_string_append_printf(network, "VLAN=%s\n", nd->id);
+     }
+ 
+     if (def->routes != NULL) {
+         for (unsigned i = 0; i < def->routes->len; ++i) {
+             ip_route* cur_route = g_array_index (def->routes, ip_route*, i);
+-            write_route(cur_route, s);
++            write_route(cur_route, network);
+         }
+     }
+     if (def->ip_rules != NULL) {
+         for (unsigned i = 0; i < def->ip_rules->len; ++i) {
+             ip_rule* cur_rule = g_array_index (def->ip_rules, ip_rule*, i);
+-            write_ip_rule(cur_rule, s);
++            write_ip_rule(cur_rule, network);
+         }
+     }
+ 
+     if (def->dhcp4 || def->dhcp6) {
+         /* NetworkManager compatible route metrics */
+-        g_string_append(s, "\n[DHCP]\n");
++        g_string_append(network, "\n[DHCP]\n");
++
+         if (g_strcmp0(def->dhcp_identifier, "duid") != 0)
+-            g_string_append_printf(s, "ClientIdentifier=%s\n", def->dhcp_identifier);
++            g_string_append_printf(network, "ClientIdentifier=%s\n", def->dhcp_identifier);
+         if (def->critical)
+-            g_string_append_printf(s, "CriticalConnection=true\n");
++            g_string_append_printf(network, "CriticalConnection=true\n");
+ 
+         dhcp_overrides combined_dhcp_overrides;
+         combine_dhcp_overrides(def, &combined_dhcp_overrides);
+ 
+         if (combined_dhcp_overrides.metric == METRIC_UNSPEC) {
+-            g_string_append_printf(s, "RouteMetric=%i\n", (def->type == ND_WIFI ? 600 : 100));
++            g_string_append_printf(network, "RouteMetric=%i\n", (def->type == ND_WIFI ? 600 : 100));
+         } else {
+-            g_string_append_printf(s, "RouteMetric=%u\n",
++            g_string_append_printf(network, "RouteMetric=%u\n",
+                                    combined_dhcp_overrides.metric);
+         }
+ 
+@@ -563,31 +560,44 @@ write_network_file(net_definition* def, const char* rootdir, const char* path)
+         if (!combined_dhcp_overrides.use_mtu) {
+             /* isc-dhcp dhclient compatible UseMTU, networkd default is to
+              * not accept MTU, which breaks clouds */
+-            g_string_append_printf(s, "UseMTU=false\n");
++            g_string_append_printf(network, "UseMTU=false\n");
+         } else {
+-            g_string_append_printf(s, "UseMTU=true\n");
++            g_string_append_printf(network, "UseMTU=true\n");
+         }
+ 
+         /* Only write DHCP options that differ from the networkd default. */
+         if (!combined_dhcp_overrides.use_routes)
+-            g_string_append_printf(s, "UseRoutes=false\n");
++            g_string_append_printf(network, "UseRoutes=false\n");
+         if (!combined_dhcp_overrides.use_dns)
+-            g_string_append_printf(s, "UseDNS=false\n");
++            g_string_append_printf(network, "UseDNS=false\n");
+         if (!combined_dhcp_overrides.use_ntp)
+-            g_string_append_printf(s, "UseNTP=false\n");
++            g_string_append_printf(network, "UseNTP=false\n");
+         if (!combined_dhcp_overrides.send_hostname)
+-            g_string_append_printf(s, "SendHostname=false\n");
++            g_string_append_printf(network, "SendHostname=false\n");
+         if (!combined_dhcp_overrides.use_hostname)
+-            g_string_append_printf(s, "UseHostname=false\n");
++            g_string_append_printf(network, "UseHostname=false\n");
+         if (combined_dhcp_overrides.hostname)
+-            g_string_append_printf(s, "Hostname=%s\n", combined_dhcp_overrides.hostname);
++            g_string_append_printf(network, "Hostname=%s\n", combined_dhcp_overrides.hostname);
+     }
+ 
+-    /* these do not contain secrets and need to be readable by
+-     * systemd-networkd - LP: #1736965 */
+-    orig_umask = umask(022);
+-    g_string_free_to_file(s, rootdir, path, ".network");
+-    umask(orig_umask);
++    if (network->len > 0 || link->len > 0) {
++        s = g_string_sized_new(200);
++        append_match_section(def, s, TRUE);
++
++        if (link->len > 0)
++            g_string_append_printf(s, "\n[Link]\n%s", link->str);
++        if (network->len > 0)
++            g_string_append_printf(s, "\n[Network]\n%s", network->str);
++
++        g_string_free(link, TRUE);
++        g_string_free(network, TRUE);
++
++        /* these do not contain secrets and need to be readable by
++         * systemd-networkd - LP: #1736965 */
++        orig_umask = umask(022);
++        g_string_free_to_file(s, rootdir, path, ".network");
++        umask(orig_umask);
++    }
+ }
+ 
+ static void
+diff --git a/tests/generator/test_common.py b/tests/generator/test_common.py
+index c8f2ff7ca..39c524c78 100644
+--- a/tests/generator/test_common.py
++++ b/tests/generator/test_common.py
+@@ -1243,6 +1243,12 @@ def test_def_in_lib(self):
+ 
+         self.assert_networkd({'engreen.network': ND_DHCP4 % 'engreen',
+                               'enred.link': '[Match]\nOriginalName=enred\n\n[Link]\nWakeOnLan=magic\n',
++                              'enred.network': '''[Match]
++Name=enred
++
++[Network]
++LinkLocalAddressing=ipv6
++''',
+                               'enyellow.network': ND_DHCP4 % 'enyellow',
+                               'enblue.network': ND_DHCP4 % 'enblue'})
+ 
+diff --git a/tests/generator/test_ethernets.py b/tests/generator/test_ethernets.py
+index 3cf456d26..42be708e0 100644
+--- a/tests/generator/test_ethernets.py
++++ b/tests/generator/test_ethernets.py
+@@ -32,7 +32,13 @@ def test_eth_wol(self):
+       wakeonlan: true
+       dhcp4: n''')
+ 
+-        self.assert_networkd({'eth0.link': '[Match]\nOriginalName=eth0\n\n[Link]\nWakeOnLan=magic\n'})
++        self.assert_networkd({'eth0.link': '[Match]\nOriginalName=eth0\n\n[Link]\nWakeOnLan=magic\n',
++                              'eth0.network': '''[Match]
++Name=eth0
++
++[Network]
++LinkLocalAddressing=ipv6
++'''})
+         self.assert_networkd_udev(None)
+         self.assert_nm(None, '''[keyfile]
+ # devices managed by networkd
+@@ -49,7 +55,13 @@ def test_eth_mtu(self):
+       mtu: 1280
+       dhcp4: n''')
+ 
+-        self.assert_networkd({'eth1.link': '[Match]\nOriginalName=eth1\n\n[Link]\nWakeOnLan=off\nMTUBytes=1280\n'})
++        self.assert_networkd({'eth1.link': '[Match]\nOriginalName=eth1\n\n[Link]\nWakeOnLan=off\nMTUBytes=1280\n',
++                              'eth1.network': '''[Match]
++Name=eth1
++
++[Network]
++LinkLocalAddressing=ipv6
++'''})
+         self.assert_networkd_udev(None)
+ 
+     def test_eth_match_by_driver_rename(self):
+@@ -61,7 +73,14 @@ def test_eth_match_by_driver_rename(self):
+         driver: ixgbe
+       set-name: lom1''')
+ 
+-        self.assert_networkd({'def1.link': '[Match]\nDriver=ixgbe\n\n[Link]\nName=lom1\nWakeOnLan=off\n'})
++        self.assert_networkd({'def1.link': '[Match]\nDriver=ixgbe\n\n[Link]\nName=lom1\nWakeOnLan=off\n',
++                              'def1.network': '''[Match]
++Driver=ixgbe
++Name=lom1
++
++[Network]
++LinkLocalAddressing=ipv6
++'''})
+         self.assert_networkd_udev({'def1.rules': (UDEV_NO_MAC_RULE % ('ixgbe', 'lom1'))})
+         # NM cannot match by driver, so blacklisting needs to happen via udev
+         self.assert_nm(None, None)
+@@ -76,7 +95,14 @@ def test_eth_match_by_mac_rename(self):
+         macaddress: 11:22:33:44:55:66
+       set-name: lom1''')
+ 
+-        self.assert_networkd({'def1.link': '[Match]\nMACAddress=11:22:33:44:55:66\n\n[Link]\nName=lom1\nWakeOnLan=off\n'})
++        self.assert_networkd({'def1.link': '[Match]\nMACAddress=11:22:33:44:55:66\n\n[Link]\nName=lom1\nWakeOnLan=off\n',
++                              'def1.network': '''[Match]
++MACAddress=11:22:33:44:55:66
++Name=lom1
++
++[Network]
++LinkLocalAddressing=ipv6
++'''})
+         self.assert_networkd_udev({'def1.rules': (UDEV_MAC_RULE % ('?*', '11:22:33:44:55:66', 'lom1'))})
+         self.assert_nm(None, '''[keyfile]
+ # devices managed by networkd
+diff --git a/tests/generator/test_tunnels.py b/tests/generator/test_tunnels.py
+index 8399f8432..0768f3466 100644
+--- a/tests/generator/test_tunnels.py
++++ b/tests/generator/test_tunnels.py
+@@ -26,10 +26,6 @@ def prepare_config_for_mode(renderer, mode, key=None):
+   version: 2
+   renderer: {}
+ """.format(renderer)
+-    config += '''
+-  ethernets:
+-    en1: {}
+-'''
+ 
+     if mode == "ip6gre" \
+             or mode == "ip6ip6" \
+@@ -428,21 +424,7 @@ def test_isatap(self):
+         """[NetworkManager] Validate ISATAP tunnel generation"""
+         config = prepare_config_for_mode('NetworkManager', 'isatap')
+         self.generate(config)
+-        self.assert_nm({'en1': '''[connection]
+-id=netplan-en1
+-type=ethernet
+-interface-name=en1
+-
+-[ethernet]
+-wake-on-lan=0
+-
+-[ipv4]
+-method=link-local
+-
+-[ipv6]
+-method=ignore
+-''',
+-                        'tun0': '''[connection]
++        self.assert_nm({'tun0': '''[connection]
+ id=netplan-tun0
+ type=ip-tunnel
+ interface-name=tun0
+@@ -465,21 +447,7 @@ def test_sit(self):
+         """[NetworkManager] Validate generation of SIT tunnels"""
+         config = prepare_config_for_mode('NetworkManager', 'sit')
+         self.generate(config)
+-        self.assert_nm({'en1': '''[connection]
+-id=netplan-en1
+-type=ethernet
+-interface-name=en1
+-
+-[ethernet]
+-wake-on-lan=0
+-
+-[ipv4]
+-method=link-local
+-
+-[ipv6]
+-method=ignore
+-''',
+-                        'tun0': '''[connection]
++        self.assert_nm({'tun0': '''[connection]
+ id=netplan-tun0
+ type=ip-tunnel
+ interface-name=tun0
+@@ -561,21 +529,7 @@ def test_vti(self):
+         """[NetworkManager] Validate generation of VTI tunnels"""
+         config = prepare_config_for_mode('NetworkManager', 'vti')
+         self.generate(config)
+-        self.assert_nm({'en1': '''[connection]
+-id=netplan-en1
+-type=ethernet
+-interface-name=en1
+-
+-[ethernet]
+-wake-on-lan=0
+-
+-[ipv4]
+-method=link-local
+-
+-[ipv6]
+-method=ignore
+-''',
+-                        'tun0': '''[connection]
++        self.assert_nm({'tun0': '''[connection]
+ id=netplan-tun0
+ type=ip-tunnel
+ interface-name=tun0
+@@ -598,21 +552,7 @@ def test_vti6(self):
+         """[NetworkManager] Validate generation of VTI6 tunnels"""
+         config = prepare_config_for_mode('NetworkManager', 'vti6')
+         self.generate(config)
+-        self.assert_nm({'en1': '''[connection]
+-id=netplan-en1
+-type=ethernet
+-interface-name=en1
+-
+-[ethernet]
+-wake-on-lan=0
+-
+-[ipv4]
+-method=link-local
+-
+-[ipv6]
+-method=ignore
+-''',
+-                        'tun0': '''[connection]
++        self.assert_nm({'tun0': '''[connection]
+ id=netplan-tun0
+ type=ip-tunnel
+ interface-name=tun0
+@@ -635,21 +575,7 @@ def test_ip6ip6(self):
+         """[NetworkManager] Validate generation of IP6IP6 tunnels"""
+         config = prepare_config_for_mode('NetworkManager', 'ip6ip6')
+         self.generate(config)
+-        self.assert_nm({'en1': '''[connection]
+-id=netplan-en1
+-type=ethernet
+-interface-name=en1
+-
+-[ethernet]
+-wake-on-lan=0
+-
+-[ipv4]
+-method=link-local
+-
+-[ipv6]
+-method=ignore
+-''',
+-                        'tun0': '''[connection]
++        self.assert_nm({'tun0': '''[connection]
+ id=netplan-tun0
+ type=ip-tunnel
+ interface-name=tun0
+@@ -672,21 +598,7 @@ def test_ipip(self):
+         """[NetworkManager] Validate generation of IPIP tunnels"""
+         config = prepare_config_for_mode('NetworkManager', 'ipip')
+         self.generate(config)
+-        self.assert_nm({'en1': '''[connection]
+-id=netplan-en1
+-type=ethernet
+-interface-name=en1
+-
+-[ethernet]
+-wake-on-lan=0
+-
+-[ipv4]
+-method=link-local
+-
+-[ipv6]
+-method=ignore
+-''',
+-                        'tun0': '''[connection]
++        self.assert_nm({'tun0': '''[connection]
+ id=netplan-tun0
+ type=ip-tunnel
+ interface-name=tun0
+@@ -709,21 +621,7 @@ def test_gre(self):
+         """[NetworkManager] Validate generation of GRE tunnels"""
+         config = prepare_config_for_mode('NetworkManager', 'gre')
+         self.generate(config)
+-        self.assert_nm({'en1': '''[connection]
+-id=netplan-en1
+-type=ethernet
+-interface-name=en1
+-
+-[ethernet]
+-wake-on-lan=0
+-
+-[ipv4]
+-method=link-local
+-
+-[ipv6]
+-method=ignore
+-''',
+-                        'tun0': '''[connection]
++        self.assert_nm({'tun0': '''[connection]
+ id=netplan-tun0
+ type=ip-tunnel
+ interface-name=tun0
+@@ -746,21 +644,7 @@ def test_gre_with_keys(self):
+         """[NetworkManager] Validate generation of GRE tunnels with keys"""
+         config = prepare_config_for_mode('NetworkManager', 'gre', key={'input': 1111, 'output': 5555})
+         self.generate(config)
+-        self.assert_nm({'en1': '''[connection]
+-id=netplan-en1
+-type=ethernet
+-interface-name=en1
+-
+-[ethernet]
+-wake-on-lan=0
+-
+-[ipv4]
+-method=link-local
+-
+-[ipv6]
+-method=ignore
+-''',
+-                        'tun0': '''[connection]
++        self.assert_nm({'tun0': '''[connection]
+ id=netplan-tun0
+ type=ip-tunnel
+ interface-name=tun0
+@@ -785,21 +669,7 @@ def test_ip6gre(self):
+         """[NetworkManager] Validate generation of IP6GRE tunnels"""
+         config = prepare_config_for_mode('NetworkManager', 'ip6gre')
+         self.generate(config)
+-        self.assert_nm({'en1': '''[connection]
+-id=netplan-en1
+-type=ethernet
+-interface-name=en1
+-
+-[ethernet]
+-wake-on-lan=0
+-
+-[ipv4]
+-method=link-local
+-
+-[ipv6]
+-method=ignore
+-''',
+-                        'tun0': '''[connection]
++        self.assert_nm({'tun0': '''[connection]
+ id=netplan-tun0
+ type=ip-tunnel
+ interface-name=tun0
+@@ -822,21 +692,7 @@ def test_ip6gre_with_key(self):
+         """[NetworkManager] Validate generation of IP6GRE tunnels with key"""
+         config = prepare_config_for_mode('NetworkManager', 'ip6gre', key='9999')
+         self.generate(config)
+-        self.assert_nm({'en1': '''[connection]
+-id=netplan-en1
+-type=ethernet
+-interface-name=en1
+-
+-[ethernet]
+-wake-on-lan=0
+-
+-[ipv4]
+-method=link-local
+-
+-[ipv6]
+-method=ignore
+-''',
+-                        'tun0': '''[connection]
++        self.assert_nm({'tun0': '''[connection]
+ id=netplan-tun0
+ type=ip-tunnel
+ interface-name=tun0
