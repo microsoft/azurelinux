@@ -28197,8 +28197,8 @@
         "type": "other",
         "other": {
           "name": "systemtap",
-          "version": "4.9",
-          "downloadUrl": "https://sourceware.org/systemtap/ftp/releases/systemtap-4.9.tar.gz"
+          "version": "5.0",
+          "downloadUrl": "https://sourceware.org/systemtap/ftp/releases/systemtap-5.0.tar.gz"
         }
       }
     },
