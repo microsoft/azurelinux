@@ -15,6 +15,22 @@
 
 %global build_aarch64 %{build_cross}
 
+%global do_exclude() \
+%if %2 \
+%exclude %{_bindir}/%{1}*-c++ \
+%exclude %{_bindir}/%{1}*-cpp \
+%exclude %{_bindir}/%{1}*-g++ \
+%exclude %{_bindir}/%{1}*-gcc \
+%exclude %{_bindir}/%{1}*-gcc-ar \
+%exclude %{_bindir}/%{1}*-gcc-nm \
+%exclude %{_bindir}/%{1}*-gcc-ranlib \
+%exclude %{_bindir}/%{1}*-gcov* \
+%exclude %{_bindir}/%{1}*-lto-dump \
+%exclude %{_libdir}/gcc/%{1} \
+%exclude %{_libexecdir}/gcc/%{1} \
+%exclude %{_prefix}/%{1}/sys-root/ \
+%endif
+
 %global do_files() \
 %if %2 \
 %files -n gcc-%1 \
@@ -25,6 +41,9 @@
 %{_bindir}/%{1}*-gcc-ranlib \
 %{_bindir}/%{1}*-gcov* \
 %{_bindir}/%{1}*-lto-dump \
+%{_libdir}/gcc/%{1} \
+%{_libexecdir}/gcc/%{1} \
+%{_prefix}/%{1}/sys-root/ \
 \
 %files -n gcc-c++-%1 \
 %{_bindir}/%{1}*-c++ \
@@ -400,6 +419,8 @@ $tests_ok
 %exclude %{_lib64dir}/libgomp*
 %exclude %{_lib64dir}/libstdc++*
 %exclude %{_lib64dir}/libsupc++*
+
+%do_exclude aarch64-linux-gnu %{build_aarch64}
 
 %files -n gfortran
 %defattr(-,root,root)
