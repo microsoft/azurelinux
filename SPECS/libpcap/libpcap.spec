@@ -32,7 +32,7 @@ developing applications that use %{name}.
 
 %package        static
 Summary:        Static lib for %{name}
-Requires:       %{name} = %{version}-%{release}-devel
+Requires:       %{name}-devel = %{version}-%{release}
 
 %description    static
 This package contains static lib for %{name}.
