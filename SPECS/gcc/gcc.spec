@@ -333,7 +333,6 @@ chmod 755 %{buildroot}/%{_lib64dir}/libgcc_s.so.1
 cp %{_host}/libbacktrace/.libs/libbacktrace.a %{buildroot}%{_lib64dir}
 cp ../libbacktrace/backtrace.h %{buildroot}%{_includedir}
 
-rm -rf %{buildroot}%{_infodir}
 %find_lang %{name} --all-name
 
 popd
@@ -344,7 +343,10 @@ do
 
     mkdir -p %{buildroot}%{_prefix}/$target/sys-root
     make -C $target %{?_smp_mflags} DESTDIR=%{buildroot} install-gcc
+    rm -rf %{buildroot}%{_mandir}/man1/$target-*
 done < cross.list
+
+rm -rf %{buildroot}%{_infodir}
 
 %check
 ulimit -s 32768
@@ -421,7 +423,7 @@ $tests_ok
 %files -n libgcc-devel
 %defattr(-,root,root)
 %{_lib64dir}/libgcc_s.so
-%{_lib64dir}/libcc1.*
+%{_libdir}/libcc1.*
 
 %files c++
 %defattr(-,root,root)
