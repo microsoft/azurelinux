@@ -1,0 +1,21 @@
+From 09695c944947d804cbe3b5c7e2c854953984413e Mon Sep 17 00:00:00 2001
+From: Bas Zoetekouw <bas.zoetekouw@surfnet.nl>
+Date: Thu, 9 Aug 2018 22:17:22 +0200
+Subject: [PATCH] fix implicit fallthrough
+
+---
+ src/parse.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/parse.c b/src/parse.c
+index c22654a..b59c931 100644
+--- a/src/parse.c
++++ b/src/parse.c
+@@ -268,6 +268,7 @@ argdata_t *parse_commandline (int argc, char **argv)
+ 
+     case '?':
+       output_error ("Unrecognized option: '%c'", optopt);
++      __attribute__ ((fallthrough));
+ 
+     default:
+       output_help();
