@@ -127,7 +127,7 @@ License:        GPL+ or Artistic
 Epoch:          %{perl_epoch}
 Version:        %{perl_version}
 # release number must be even higher, because dual-lived modules will be broken otherwise
-Release:        488%{?dist}
+Release:        489%{?dist}
 Summary:        Practical Extraction and Report Language
 Url:            https://www.perl.org/
 Vendor:         Microsoft Corporation
@@ -6813,6 +6813,9 @@ popd
 
 # Old changelog entries are preserved in CVS.
 %changelog
+* Thu Dec 14 2023 Nicolas Guibourge <micolasg@microsoft.com> - 4:5.34.1-489
+- Bump release for testing
+
 * Fri May 20 2022 Andrew Phelps <anphel@microsoft.com> - 4:5.34.1-488
 - Undefine "mariner_module_ldflags" to remove references to module_info.ld in embedded ldflags
 
