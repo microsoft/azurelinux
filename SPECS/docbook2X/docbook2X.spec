@@ -73,6 +73,7 @@ rm -f $RPM_BUILD_ROOT%{_infodir}/dir
 %changelog
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.8.8-36
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
+- Verified license
 
 * Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.8-35
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
