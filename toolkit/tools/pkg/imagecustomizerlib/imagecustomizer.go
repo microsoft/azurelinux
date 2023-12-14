@@ -64,10 +64,12 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 ) error {
 	var err error
 
-	// Validate 'outputImageFormat' value.
-	qemuOutputImageFormat, err := toQemuImageFormat(outputImageFormat)
-	if err != nil {
-		return err
+	// Validate 'outputImageFormat' value if specified.
+	if outputImageFormat != "" {
+		qemuOutputImageFormat, err := toQemuImageFormat(outputImageFormat)
+		if err != nil {
+			return err
+		}
 	}
 
 	// Validate config.
