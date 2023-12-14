@@ -24,8 +24,6 @@ func extractPartitions(imageConnection *ImageConnection, outputImageFile string,
 	// Get output directory path.
 	outDir := filepath.Dir(outputImageFile)
 
-	var err error
-
 	// Get partition info.
 	diskPartitions, err := diskutils.GetDiskPartitions(imageLoopDevice)
 	if err != nil {
