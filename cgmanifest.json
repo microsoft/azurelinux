@@ -10981,8 +10981,8 @@
         "type": "other",
         "other": {
           "name": "libsoup",
-          "version": "3.0.4",
-          "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/libsoup/3.0/libsoup-3.0.4.tar.xz"
+          "version": "3.4.4",
+          "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/libsoup/3.4/libsoup-3.4.4.tar.xz"
         }
       }
     },
