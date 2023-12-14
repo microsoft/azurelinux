@@ -105,7 +105,7 @@ make check
 
 
 %changelog
-* Wed Dec 12 2023 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 0.95-2
+* Wed Dec 13 2023 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 0.95-2
 - Add patch for force bringing up devices with no IP addresses
 
 * Fri Sep 17 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.95-1
