@@ -1,0 +1,7 @@
+{
+ "Signatures": {
+  "cbl-mariner-ca-20211013.pem": "5ef124b0924cb1047c111a0ecff1ae11e6ad7cac8d1d9b40f98f99334121f0b0",
+  "config": "3ae34ad2d9db1f31d40b6441f6e4b177de46b16f352f64aef9c058a2efbf3d6b",
+  "linux-snp-host-5.19.0.tar.gz": "86bebfcdb07013e0fc4f7ca689f005775de0753b583ee7e8f148fa5fa93dc3e8"
+ }
+}
