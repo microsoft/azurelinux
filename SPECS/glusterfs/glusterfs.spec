@@ -109,13 +109,13 @@
 ##
 Summary:        Distributed File System
 Name:           glusterfs
-Version:        7.9
-Release:        5%{?dist}
+Version:        11.1
+Release:        1%{?dist}
 License:        GPLv2 OR LGPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://docs.gluster.org/
-Source0:        https://download.gluster.org/pub/gluster/%{name}/7/%{version}/%{name}-%{version}.tar.gz
+Source0:        https://download.gluster.org/pub/gluster/%{name}/11/%{version}/%{name}-%{version}.tar.gz
 Source1:        glusterd.sysconfig
 Source2:        glusterfsd.sysconfig
 Source7:        glusterfsd.service
@@ -1226,6 +1226,9 @@ exit 0
 %endif
 
 %changelog
+* Thu Dec 14 2023  Brian Fjeldstad <bfjelds@microsoft.com> - 11.1-1
+- Upgrade to 11.1
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 7.9-5
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
