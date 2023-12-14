@@ -133,10 +133,8 @@ enforced by the kernel when running with SELinux enabled.
 %{_sharedstatedir}/selinux/%{policy_name}/active/homedir_template
 %{_sharedstatedir}/selinux/%{policy_name}/active/seusers
 %{_sharedstatedir}/selinux/%{policy_name}/active/file_contexts
+%{_sharedstatedir}/selinux/%{policy_name}/active/modules_checksum
 %exclude %{_sharedstatedir}/selinux/%{policy_name}/active/policy.kern
-%exclude %{_sharedstatedir}/selinux/%{policy_name}/active/policy.linked
-%exclude %{_sharedstatedir}/selinux/%{policy_name}/active/seusers.linked
-%exclude %{_sharedstatedir}/selinux/%{policy_name}/active/users_extra.linked
 %verify(not md5 size mtime) %{_sharedstatedir}/selinux/%{policy_name}/active/file_contexts.homedirs
 %{_sharedstatedir}/selinux/%{policy_name}/active/modules/100/base
 
