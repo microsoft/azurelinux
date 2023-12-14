@@ -29,7 +29,7 @@ var (
 
 func CustomizeImageWithConfigFile(buildDir string, configFile string, imageFile string,
 	rpmsSources []string, outputImageFile string, outputImageFormat string,
-	useBaseImageRpmRepos bool,
+	outputSplitPartitionsFormat string, useBaseImageRpmRepos bool,
 ) error {
 	var err error
 
@@ -47,7 +47,7 @@ func CustomizeImageWithConfigFile(buildDir string, configFile string, imageFile 
 	}
 
 	err = CustomizeImage(buildDir, absBaseConfigPath, &config, imageFile, rpmsSources, outputImageFile, outputImageFormat,
-		useBaseImageRpmRepos)
+		outputSplitPartitionsFormat, useBaseImageRpmRepos)
 	if err != nil {
 		return err
 	}
@@ -56,7 +56,7 @@ func CustomizeImageWithConfigFile(buildDir string, configFile string, imageFile 
 }
 
 func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config, imageFile string,
-	rpmsSources []string, outputImageFile string, outputImageFormat string, useBaseImageRpmRepos bool,
+	rpmsSources []string, outputImageFile string, outputImageFormat string, outputSplitPartitionsFormat string, useBaseImageRpmRepos bool,
 ) error {
 	var err error
 
@@ -115,6 +115,15 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 	err = shell.ExecuteLiveWithErr(1, "qemu-img", "convert", "-O", qemuOutputImageFormat, buildImageFile, outputImageFile)
 	if err != nil {
 		return fmt.Errorf("failed to convert image file to format: %s:\n%w", outputImageFormat, err)
+	}
+
+	// If outputSplitPartitionsFormat is specified, extract the partition files.
+	if outputSplitPartitionsFormat != "" {
+		logger.Log.Infof("Extracting partition files")
+		err = extractPartitionsHelper(buildDirAbs, buildImageFile, outputImageFile, outputSplitPartitionsFormat)
+		if err != nil {
+			return err
+		}
 	}
 
 	logger.Log.Infof("Success!")
@@ -278,6 +287,24 @@ func customizeImageHelper(buildDir string, baseConfigPath string, config *imagec
 	if err != nil {
 		return err
 	}
+
+	err = imageConnection.CleanClose()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func extractPartitionsHelper(buildDir string, buildImageFile string, outputImageFile string, outputSplitPartitionsFormat string) error {
+	imageConnection, err := connectToExistingImage(buildImageFile, buildDir, "imageroot")
+	if err != nil {
+		return err
+	}
+	defer imageConnection.Close()
+
+	// Extract the partitions as files.
+	extractPartitions(imageConnection, outputImageFile, outputSplitPartitionsFormat)
 
 	err = imageConnection.CleanClose()
 	if err != nil {
