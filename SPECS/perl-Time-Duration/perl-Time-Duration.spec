@@ -27,9 +27,6 @@ terms.
 %prep
 %setup -q -n Time-Duration-%{version} 
 
-%check
-make test
-
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
 %{make_build}
@@ -43,6 +40,9 @@ perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
 %doc README Changes
 %{_mandir}/man3/*
 %{perl_vendorlib}/Time
+
+%check
+make test
 
 %changelog
 * Thu Dec 14 2023 Sindhu Karri <lakarri@microsoft.com> - 1.21-15
