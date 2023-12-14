@@ -1157,8 +1157,8 @@
         "type": "other",
         "other": {
           "name": "bmake",
-          "version": "20211221",
-          "downloadUrl": "https://ftp.netbsd.org/pub/NetBSD/misc/sjg//bmake-20211221.tar.gz"
+          "version": "20230723",
+          "downloadUrl": "https://ftp.netbsd.org/pub/NetBSD/misc/sjg//bmake-20230723.tar.gz"
         }
       }
     },
