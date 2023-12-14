@@ -69,6 +69,7 @@ func buildDracutModule(dracutModuleName string, imageChroot *safechroot.Chroot) 
 	kernelVersion := strings.TrimPrefix(kernelFiles[0], "vmlinuz-")
 
 	err = imageChroot.Run(func() error {
+		// TODO: Config Dracut module systemd-veritysetup.
 		err = shell.ExecuteLiveWithErr(1, "dracut", "-f", "--kver", kernelVersion, "-a", dracutModuleName)
 		return err
 	})
@@ -190,8 +191,6 @@ func idToPartitionBlockDevicePath(idType imagecustomizerapi.IdType, id string, n
 			if partition.Path == expectedPartitionName {
 				return partition.Path, nil
 			}
-		case "ID":
-			// TODO
 		case "PartLabel":
 			if partition.PartLabel == id {
 				return partition.Path, nil

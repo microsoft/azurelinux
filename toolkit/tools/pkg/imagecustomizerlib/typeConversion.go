@@ -167,9 +167,6 @@ func IdTypeToImager(idType imagecustomizerapi.IdType) (string, error) {
 	case imagecustomizerapi.IdTypePartition:
 		return "Partition", nil
 
-	case imagecustomizerapi.IdTypeId:
-		return "ID", nil
-
 	case imagecustomizerapi.IdTypePartlabel:
 		return "PartLabel", nil
 
