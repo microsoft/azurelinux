@@ -10,8 +10,10 @@ import (
 	"regexp"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safemount"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 )
 
@@ -237,24 +239,41 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 ) error {
 	var err error
 
-	imageConnection, err := connectToExistingImage(buildImageFile, buildDir, "imageroot")
+	// Connect the disk image to an NBD device using qemu-nbd
+	// Find a free NBD device
+	nbdDevice, err := findFreeNBDDevice()
+	if err != nil {
+		return fmt.Errorf("failed to find a free nbd device: %v", err)
+	}
+
+	err = shell.ExecuteLiveWithErr(1, "qemu-nbd", "-c", nbdDevice, "-f", "raw", buildImageFile)
+	if err != nil {
+		return fmt.Errorf("failed to connect nbd %s to image %s: %s", nbdDevice, buildImageFile, err)
+	}
+	defer func() {
+		// Disconnect the NBD device when the function returns
+		err = shell.ExecuteLiveWithErr(1, "qemu-nbd", "-d", nbdDevice)
+		if err != nil {
+			return
+		}
+	}()
+
+	diskPartitions, err := diskutils.GetDiskPartitions(nbdDevice)
 	if err != nil {
 		return err
 	}
-	defer imageConnection.Close()
 
-	// Regular expression to extract the partition number
-	partitionRegex := regexp.MustCompile(`\d+$`)
-	// Get the base loop device path
-	baseLoopDevice := imageConnection.Loopback().DevicePath() // e.g., "/dev/loop2"
-	// Extract the partition numbers
-	dataPartitionId := partitionRegex.FindString(config.SystemConfig.Verity.DataPartition.Id) // e.g., "3"
-	hashPartitionId := partitionRegex.FindString(config.SystemConfig.Verity.HashPartition.Id) // e.g., "5"
-	// Construct the full device paths
-	dataPartition := fmt.Sprintf("%sp%s", baseLoopDevice, dataPartitionId) // e.g., "/dev/loop2p3"
-	hashPartition := fmt.Sprintf("%sp%s", baseLoopDevice, hashPartitionId) // e.g., "/dev/loop2p5"
+	// Extract the partition block device path.
+	dataPartition, err := idToPartitionBlockDevicePath(config.SystemConfig.Verity.DataPartition.IdType, config.SystemConfig.Verity.DataPartition.Id, nbdDevice, diskPartitions)
+	if err != nil {
+		return err
+	}
+	hashPartition, err := idToPartitionBlockDevicePath(config.SystemConfig.Verity.HashPartition.IdType, config.SystemConfig.Verity.HashPartition.Id, nbdDevice, diskPartitions)
+	if err != nil {
+		return err
+	}
 
-	// Extract root hash using regular expressions
+	// Extract root hash using regular expressions.
 	verityOutput, _, err := shell.Execute("veritysetup", "format", dataPartition, hashPartition)
 	if err != nil {
 		return fmt.Errorf("failed to calculate root hash:\n%w", err)
@@ -269,15 +288,37 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 	}
 	rootHash = rootHashMatches[1]
 
-	// Update grub configuration
-	err = updateGrubConfig(config.SystemConfig.Verity.DataPartition.Id, config.SystemConfig.Verity.HashPartition.Id, rootHash, imageConnection.Chroot())
-	if err != nil {
-		return err
-	}
+	bootPartitionTmpDir := filepath.Join(buildDir, tmpParitionDirName)
+	for _, diskPartition := range diskPartitions {
+		switch diskPartition.FileSystemType {
+		case "ext4", "vfat", "xfs":
 
-	err = imageConnection.CleanClose()
-	if err != nil {
-		return err
+		default:
+			// Skips file system types that aren't known to support the boot loader partition.
+			continue
+		}
+
+		// Temporarily mount the partition.
+		partitionMount, err := safemount.NewMount(diskPartition.Path, bootPartitionTmpDir, diskPartition.FileSystemType, 0, "", true)
+		if err != nil {
+			return fmt.Errorf("failed to mount partition (%s):\n%w", diskPartition.Path, err)
+		}
+		defer partitionMount.Close()
+
+		grubCfgFullPath := filepath.Join(bootPartitionTmpDir, "grub2/grub.cfg")
+		grubCfgExists, err := file.PathExists(grubCfgFullPath)
+		if err != nil {
+			return fmt.Errorf("failed to stat file (%s):\n%w", grubCfgFullPath, err)
+		}
+
+		if grubCfgExists {
+			// Update grub configuration
+			err = updateGrubConfig(config.SystemConfig.Verity.DataPartition.IdType, config.SystemConfig.Verity.DataPartition.Id, config.SystemConfig.Verity.HashPartition.IdType, config.SystemConfig.Verity.HashPartition.Id, rootHash, grubCfgFullPath)
+			if err != nil {
+				return err
+			}
+			break
+		}
 	}
 
 	return nil

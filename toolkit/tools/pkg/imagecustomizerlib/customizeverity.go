@@ -7,8 +7,11 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 )
@@ -113,14 +116,23 @@ func updateMarinerCfgWithInitramfs(imageChroot *safechroot.Chroot) error {
 	return nil
 }
 
-func updateGrubConfig(resolvedDataPartition string, resolvedHashPartition string, rootHash string, imageChroot *safechroot.Chroot) error {
+func updateGrubConfig(dataPartitionIdType imagecustomizerapi.IdType, dataPartitionId string, hashPartitionIdType imagecustomizerapi.IdType, hashPartitionId string, rootHash string, grubCfgFullPath string) error {
 	var err error
 
-	const cmdlineTemplate = "rd.systemd.verity=1 roothash=%s systemd.verity_root_data=%s systemd.verity_root_hash=%s systemd.verity_root_options=ignore-corruption"
-	newArgs := fmt.Sprintf(cmdlineTemplate, rootHash, resolvedDataPartition, resolvedHashPartition)
-	grubConfigPath := filepath.Join(imageChroot.RootDir(), "boot/grub2/grub.cfg")
+	const cmdlineTemplate = "rd.systemd.verity=1 roothash=%s systemd.verity_root_data=%s systemd.verity_root_hash=%s systemd.verity_root_options=panic-on-corruption"
+	// Format the dataPartitionId and hashPartitionId using the helper function.
+	formattedDataPartitionPlaceHolder, err := systemdFormatPartitionId(dataPartitionIdType, dataPartitionId)
+	if err != nil {
+		return err
+	}
+	formattedHashPartitionPlaceHolder, err := systemdFormatPartitionId(hashPartitionIdType, hashPartitionId)
+	if err != nil {
+		return err
+	}
 
-	content, err := os.ReadFile(grubConfigPath)
+	newArgs := fmt.Sprintf(cmdlineTemplate, rootHash, formattedDataPartitionPlaceHolder, formattedHashPartitionPlaceHolder)
+
+	content, err := os.ReadFile(grubCfgFullPath)
 	if err != nil {
 		return fmt.Errorf("failed to read grub config: %v", err)
 	}
@@ -143,7 +155,7 @@ func updateGrubConfig(resolvedDataPartition string, resolvedHashPartition string
 	}
 
 	// Write the updated content back to grub.cfg
-	err = os.WriteFile(grubConfigPath, []byte(strings.Join(updatedLines, "\n")), 0644)
+	err = os.WriteFile(grubCfgFullPath, []byte(strings.Join(updatedLines, "\n")), 0644)
 	if err != nil {
 		return fmt.Errorf("failed to write updated grub config: %v", err)
 	}
@@ -151,19 +163,88 @@ func updateGrubConfig(resolvedDataPartition string, resolvedHashPartition string
 	return nil
 }
 
-// findDeviceByUUIDOrLabel attempts to resolve a PARTUUID, PARTLABEL, UUID, or LABEL to a device file.
-func findDeviceByUUIDOrLabel(uuidOrLabel string) (string, error) {
-	// Error if the input is already a device path
-	if strings.HasPrefix(uuidOrLabel, "/dev/") {
-		return uuidOrLabel, nil
+// idToPartitionBlockDevicePath returns the block device path for a given idType and id.
+func idToPartitionBlockDevicePath(idType imagecustomizerapi.IdType, id string, nbdDevice string, diskPartitions []diskutils.PartitionInfo) (string, error) {
+	imagerIdType, err := IdTypeToImager(idType)
+	if err != nil {
+		return "", err
 	}
 
-	// Resolve UUIDs and LABELs
-	for _, dir := range []string{"by-partuuid", "by-partlabel", "by-uuid", "by-label"} {
-		devicePath, err := filepath.EvalSymlinks(filepath.Join("/dev/disk", dir, uuidOrLabel))
-		if err == nil {
-			return devicePath, nil
+	// Create a regular expression to find the last number in the id string.
+	partitionRegex := regexp.MustCompile(`\d+$`)
+
+	// Iterate over each partition to find the matching id.
+	for _, partition := range diskPartitions {
+		switch imagerIdType {
+		case "Partition":
+			// Find the partition number in the provided id.
+			partNum := partitionRegex.FindString(id)
+			if partNum == "" {
+				return "", fmt.Errorf("no partition number found in id: %s", id)
+			}
+
+			// Construct the expected partition name.
+			expectedPartitionName := fmt.Sprintf("%sp%s", nbdDevice, partNum)
+
+			// Check if the constructed name matches the partition name.
+			if partition.Path == expectedPartitionName {
+				return partition.Path, nil
+			}
+		case "ID":
+			// TODO
+		case "PartLabel":
+			if partition.PartLabel == id {
+				return partition.Path, nil
+			}
+		case "Uuid":
+			if partition.Uuid == id {
+				return partition.Path, nil
+			}
+		case "PartUuid":
+			if partition.PartUuid == id {
+				return partition.Path, nil
+			}
+		default:
+			return "", fmt.Errorf("invalid idType provided (%s)", imagerIdType)
 		}
 	}
-	return "", fmt.Errorf("device with UUID, LABEL, PARTUUID, or PARTLABEL '%s' not found", uuidOrLabel)
+
+	// If no partition is found with the given id.
+	return "", fmt.Errorf("no partition found for %s: %s", idType, id)
+}
+
+// systemdFormatPartitionId formats the partition ID based on the ID type following systemd dm-verity style.
+func systemdFormatPartitionId(idType imagecustomizerapi.IdType, id string) (string, error) {
+	imagerIdType, err := IdTypeToImager(idType)
+	if err != nil {
+		return "", err
+	}
+
+	switch imagerIdType {
+	case "Partition":
+		return id, nil
+	// case imagecustomizerapi.ID: // Ignored for now.
+	case "PartLabel", "Uuid", "PartUuid":
+		return fmt.Sprintf("%s=%s", strings.ToUpper(imagerIdType), id), nil
+	default:
+		return "", fmt.Errorf("invalid idType provided (%s)", imagerIdType)
+	}
+}
+
+// findFreeNBDDevice finds the first available NBD device.
+func findFreeNBDDevice() (string, error) {
+	files, err := filepath.Glob("/sys/class/block/nbd*")
+	if err != nil {
+		return "", err
+	}
+
+	for _, file := range files {
+		// Check if the pid file exists. If it does not exist, the device is likely free.
+		pidFile := filepath.Join(file, "pid")
+		if _, err := os.Stat(pidFile); os.IsNotExist(err) {
+			return "/dev/" + filepath.Base(file), nil
+		}
+	}
+
+	return "", fmt.Errorf("no free nbd devices available")
 }
