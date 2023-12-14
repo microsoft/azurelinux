@@ -16,15 +16,15 @@ _emergency_action=$(getarg rd.emergency)
 if getargbool 1 rd.shell -d -y rdshell || getarg rd.break -d rdbreak; then
     FSTXT="/run/dracut/fsck/fsck_help_$fstype.txt"
     echo "---- dracut-emergency.sh ---- 0 ----"
-    sleep 1s
+    # sleep 1s
 
     RDSOSREPORT="$(rdsosreport)"
     echo "---- dracut-emergency.sh ---- 1 -----"
-    sleep 1s
+    # sleep 1s
 
     source_hook "$hook"
     echo "---- dracut-emergency.sh ---- 2 -----"
-    sleep 1s
+    # sleep 1s
 
     while read -r _tty rest; do
         (
@@ -43,18 +43,18 @@ if getargbool 1 rd.shell -d -y rdshell || getarg rd.break -d rdbreak; then
     done < /proc/consoles
 
     echo "---- dracut-emergency.sh ---- 3 ----"
-    sleep 1s
+    # sleep 1s
 
     [ -f /etc/profile ] && . /etc/profile
     [ -z "$PS1" ] && export PS1="$_name:\${PWD}# "
 
     echo "---- dracut-emergency.sh ---- 4 ----"
-    sleep 1s
+    # sleep 1s
 
     exec sulogin -e
 
     echo "---- dracut-emergency.sh ---- 5 ----"
-    sleep 1s
+    # sleep 1s
 
 else
     export hook="shutdown-emergency"
@@ -64,27 +64,27 @@ else
 fi
 
 echo "---- dracut-emergency.sh ---- 6 ----"
-sleep 1s
+# sleep 1s
 
 /bin/rm -f -- /.console_lock
 
 echo "---- dracut-emergency.sh ---- 7 ----"
-sleep 1s
+# sleep 1s
 
 case "$_emergency_action" in
     reboot)
         echo "---- dracut-emergency.sh ---- 8 -----"
-        sleep 1s
+        # sleep 1s
         reboot || exit 1
         ;;
     poweroff)
         echo "---- dracut-emergency.sh ----- 9 -----"
-        sleep 1s
+        # sleep 1s
         poweroff || exit 1
         ;;
     halt)
         echo "---- dracut-emergency.sh ----- 10 -----"
-        sleep 1s
+        # sleep 1s
         halt || exit 1
         ;;
 esac

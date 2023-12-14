@@ -24,6 +24,12 @@ cp 20-gmileka.conf       /etc/dracut.conf.d/20-gmileka.conf
 chown root:root /etc/dracut.conf.d/20-gmileka.conf
 
 rm -f /home/afo123/initrd.img 
-dracut /home/afo123/initrd.img --filesystems "squashfs"
+dracut /home/afo123/initrd.img \
+    --filesystems "squashfs" \
+    --include /usr/bin/more /usr/sbin/more \
+    --include /usr/bin/vim /usr/sbin/vim \
+    --include /usr/bin/lsblk /usr/sbin/lsblk \
+    --include /usr/bin/grep /usr/bin/grep
+
 chown afo123:afo123 /home/afo123/initrd.img 
 ls -la /home/afo123

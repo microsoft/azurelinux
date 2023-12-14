@@ -79,6 +79,6 @@ sleep 3s
 mkdir -p "$GENERATOR_DIR/$_dev.device.d"
 {
     echo "[Unit]"
-    echo "JobTimeoutSec=120"
-    echo "JobRunningTimeoutSec=120"
+    echo "JobTimeoutSec=50"
+    echo "JobRunningTimeoutSec=50"
 } > "$GENERATOR_DIR/$_dev.device.d/timeout.conf"

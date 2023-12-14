@@ -3,11 +3,17 @@
 set -x
 set -e
 
-scp ~/git/CBL-Mariner/toolkit/mic-iso-gen/dracut-patches/dmsquash-generator.sh afo123@10.137.194.51:~/
-scp ~/git/CBL-Mariner/toolkit/mic-iso-gen/dracut-patches/dmsquash-live-root.sh afo123@10.137.194.51:~/
-scp ~/git/CBL-Mariner/toolkit/mic-iso-gen/dracut-patches/dracut-emergency.sh afo123@10.137.194.51:~/
-scp ~/git/CBL-Mariner/toolkit/mic-iso-gen/dracut-patches/dracut-mount.sh afo123@10.137.194.51:~/
-scp ~/git/CBL-Mariner/toolkit/mic-iso-gen/dracut-patches/iso-scan.sh afo123@10.137.194.51:~/
-scp ~/git/CBL-Mariner/toolkit/mic-iso-gen/dracut-patches/20-gmileka.conf afo123@10.137.194.51:~/
+dracutSourceDir=~/git/CBL-Mariner/toolkit/mic-iso-gen/dracut-patches
+dracutBuildMachineIP=10.137.194.51
+dracutBuildMachineUser=afo123
 
-scp ~/git/CBL-Mariner/toolkit/mic-iso-gen/dracut-patches/rebuild-initrd.sh afo123@10.137.194.51:~/
+# dracut artifacts
+scp $dracutSourceDir/artifacts/dmsquash-generator.sh $dracutBuildMachineUser@$dracutBuildMachineIP:~/
+scp $dracutSourceDir/artifacts/dmsquash-live-root.sh $dracutBuildMachineUser@$dracutBuildMachineIP:~/
+scp $dracutSourceDir/artifacts/dracut-emergency.sh $dracutBuildMachineUser@$dracutBuildMachineIP:~/
+scp $dracutSourceDir/artifacts/dracut-mount.sh $dracutBuildMachineUser@$dracutBuildMachineIP:~/
+scp $dracutSourceDir/artifacts/iso-scan.sh $dracutBuildMachineUser@$dracutBuildMachineIP:~/
+scp $dracutSourceDir/artifacts/20-gmileka.conf $dracutBuildMachineUser@$dracutBuildMachineIP:~/
+
+# re-building script
+scp $dracutSourceDir/rebuild-initrd.sh $dracutBuildMachineUser@$dracutBuildMachineIP:~/
