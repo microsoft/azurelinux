@@ -762,6 +762,7 @@ Epoch:          0
 # Real version 1.54
 Version:        1.54
 License:        GPL+ or Artistic
+Provides:       perl(Carp::Heavy) = %{version}
 %if %{defined perl_bootstrap}
 Requires:       %perl_compat
 %gendep_perl_Carp
@@ -1868,7 +1869,7 @@ File::Fetch is a generic file fetching mechanism.
 
 %package File-Find
 Summary:        Traverse a directory tree
-License:        GPL-1.0-or-later OR Artistic-1.0-Perl
+License:        GPL+ or Artistic
 Epoch:          0
 Version:        1.43
 Recommends:     perl(Scalar::Util)
@@ -2168,7 +2169,6 @@ Version:        1.52
 Requires:       %perl_compat
 %gendep_perl_IO
 %endif
-Conflicts:      perl < 4:5.22.0-351
 
 %description IO
 This is a collection of Perl input/output modules.
@@ -2281,7 +2281,7 @@ error output for handling the errors.
 %if %{dual_life} || %{rebuild_from_scratch}
 %package IPC-SysV
 Summary:        Object interface to System V IPC
-License:        GPL-1.0-or-later OR Artistic-1.0-Perl
+License:        GPL+ or Artistic
 Epoch:          0
 Version:        2.09
 Requires:       perl(DynaLoader)
@@ -2332,7 +2332,7 @@ locale".
 
 %package I18N-LangTags
 Summary:        Functions for dealing with RFC 3066 language tags
-License:        GPL-1.0-or-later OR Artistic-1.0-Perl
+License:        GPL+ or Artistic
 Epoch:          0
 Version:        0.45
 Requires:       perl(integer)
@@ -2342,7 +2342,7 @@ Requires:       %perl_compat
 %gendep_perl_I18N_LangTags
 %endif
 BuildArch:      noarch
-Conflicts:      perl-interpreter < 4:5.30.1-451
+
 
 %description I18N-LangTags
 Language tags are a formalism, described in RFC 3066, for declaring what
@@ -2892,7 +2892,7 @@ will not be executed.
 
 %package open
 Summary:        Perl pragma to set default PerlIO layers for input and output
-License:        GPL-1.0-or-later OR Artistic-1.0-Perl
+License:        GPL+ or Artistic
 Epoch:          0
 Version:        1.13
 Requires:       perl(Carp)
@@ -3575,7 +3575,7 @@ on CPAN (under the "Term::ReadLine::*" name space).
 
 %package Test
 Summary:        Simple framework for writing test scripts
-License:        GPL-1.0-or-later OR Artistic-1.0-Perl
+License:        GPL+ or Artistic
 Epoch:          0
 Version:        1.31
 # Algorithm::Diff 1.15 is optional
@@ -3585,7 +3585,6 @@ Requires:       %perl_compat
 %gendep_perl_Test
 %endif
 BuildArch:      noarch
-Conflicts:      perl < 4:5.22.0-351
 
 %description Test
 The Test Perl module simplifies the task of writing test files for Perl modules,
@@ -3611,7 +3610,7 @@ Use TAP::Parser, Test::Harness package was whole rewritten.
 %if %{dual_life} || %{rebuild_from_scratch}
 %package Test-Simple
 Summary:        Basic utilities for writing tests
-License:        (GPL-1.0-or-later OR Artistic-1.0-Perl) AND CC0-1.0 AND LicenseRef-Fedora-Public-Domain
+License:        (GPL+ or Artistic) and CC0 and Public Domain
 Epoch:          3
 Version:        1.302194
 Requires:       perl(Data::Dumper)
@@ -3775,7 +3774,7 @@ the array are reflected in the file immediately.
 
 %package Tie-Memoize
 Summary:        Add data to a hash when needed
-License:        GPL-2.0-or-later OR Artistic-1.0-Perl
+License:        GPLv2+ or Artistic
 Epoch:          0
 Version:        1.1
 Requires:       perl(Carp)
@@ -4085,10 +4084,8 @@ you're not running VMS, this module does nothing.
 %patch11 -p1
 %patch12 -p1
 %patch13 -p1
-%patch14 -p1
 %patch200 -p1
 %patch201 -p1
-%patch202 -p1
 
 #copy Pod-Html license clarification
 cp %{SOURCE6} .
@@ -6850,6 +6847,9 @@ popd
 
 # Old changelog entries are preserved in CVS.
 %changelog
+* Thu Dec 14 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 4:5.38.2-503
+- Upgrade to version 5.38.2 referencing Fedora 39 (license: MIT)
+
 * Fri May 20 2022 Andrew Phelps <anphel@microsoft.com> - 4:5.34.1-488
 - Undefine "mariner_module_ldflags" to remove references to module_info.ld in embedded ldflags
 
