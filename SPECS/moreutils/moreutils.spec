@@ -134,6 +134,7 @@ make check
 %changelog
 * Thu Dec 14 2023 Sindhu Karri <lakarri@microsoft.com> - 0.67-7
 - Initial CBL-Mariner import from Fedora 39 (license: MIT)
+- Source license verified to be GPLv2
 
 * Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.67-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
