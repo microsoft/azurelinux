@@ -60,6 +60,7 @@ You can reuse your favorite Python packages such as NumPy, SciPy and Cython to e
 %build
 export USE_CUDA=0
 export BUILD_CAFFE2=0
+export MAX_JOBS=1
 %py3_build
 
 %install
@@ -80,6 +81,9 @@ cp -arf docs %{buildroot}/%{_pkgdocdir}
 %{_docdir}/*
 
 %changelog
+* Thu Dec 14 2023 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.0.0-3
+- Set MAX_JOBS=1 to test
+
 * Thu Apr 06 2023 Riken Maharjan <rmaharjan@microsoft.com> - 2.0.0-2
 - Add missing runtine for 2.0.0
 
