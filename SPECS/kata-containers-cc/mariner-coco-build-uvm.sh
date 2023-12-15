@@ -18,6 +18,19 @@ rm -rf ${ROOTFS_DIR}
 sudo -E PATH=$PATH SECURITY_POLICY=yes make -B DISTRO=cbl-mariner rootfs
 popd
 
+MODULE_ROOTFS_DEST_DIR="${ROOTFS_DIR}/lib/modules"
+mkdir -p ${MODULE_ROOTFS_DEST_DIR}
+
+pushd modules/*
+# get kernel modules version
+export KERNEL_MODULES_VER=$(basename $PWD)
+export KERNEL_MODULES_DIR=${SCRIPT_DIR}/modules/${KERNEL_MODULES_VER}
+# copy kernel modules to rootfs
+cp -a ${KERNEL_MODULES_DIR} "${MODULE_ROOTFS_DEST_DIR}/"
+# run depmod
+depmod -a -b ${ROOTFS_DIR} ${KERNEL_MODULES_VER}
+popd
+
 # install other services
 cp ${SCRIPT_DIR}/coco-opa.service        ${ROOTFS_DIR}/usr/lib/systemd/system/coco-opa.service
 cp ${SCRIPT_DIR}/kata-containers.target  ${ROOTFS_DIR}/usr/lib/systemd/system/kata-containers.target
