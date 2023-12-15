@@ -1,0 +1,24 @@
+diff -Naur a/lsinitrd.sh b/lsinitrd.sh
+--- a/lsinitrd.sh       2021-05-27 12:34:19.000000000 +0000
++++ b/lsinitrd.sh       2021-12-04 22:52:58.491629173 +0000
+@@ -109,19 +109,7 @@
+         exit 1
+     fi
+ else
+-    [[ -f /etc/machine-id ]] && read -r MACHINE_ID < /etc/machine-id
+-
+-    if [[ -d /efi/loader/entries || -L /efi/loader/entries ]] \
+-        && [[ $MACHINE_ID ]] \
+-        && [[ -d /efi/${MACHINE_ID} || -L /efi/${MACHINE_ID} ]]; then
+-        image="/efi/${MACHINE_ID}/${KERNEL_VERSION}/initrd"
+-    elif [[ -d /boot/loader/entries || -L /boot/loader/entries ]] \
+-        && [[ $MACHINE_ID ]] \
+-        && [[ -d /boot/${MACHINE_ID} || -L /boot/${MACHINE_ID} ]]; then
+-        image="/boot/${MACHINE_ID}/${KERNEL_VERSION}/initrd"
+-    else
+-        image="/boot/initramfs-${KERNEL_VERSION}.img"
+-    fi
++    image="/boot/initrd.img-${KERNEL_VERSION}"
+ fi
+
+ shift

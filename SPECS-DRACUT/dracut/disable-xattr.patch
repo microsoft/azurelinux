@@ -1,0 +1,39 @@
+--- a/dracut-init.sh    2021-05-27 12:34:19.000000000 +0000
++++ b/dracut-init.sh    2021-12-02 00:23:25.472246275 +0000
+@@ -19,11 +19,7 @@
+ #
+ export LC_MESSAGES=C
+
+-if [[ $EUID == "0" ]] && ! [[ $DRACUT_NO_XATTR ]]; then
+-    export DRACUT_CP="cp --reflink=auto --sparse=auto --preserve=mode,timestamps,xattr,links -dfr"
+-else
+     export DRACUT_CP="cp --reflink=auto --sparse=auto --preserve=mode,timestamps,links -dfr"
+-fi
+
+ # is_func <command>
+ # Check whether $1 is a function.
+diff -Naur a/src/install/dracut-install.c b/src/install/dracut-install.c
+--- a/src/install/dracut-install.c      2021-05-27 12:34:19.000000000 +0000
++++ b/src/install/dracut-install.c      2021-12-02 00:22:47.368277730 +0000
+@@ -323,10 +323,6 @@
+ normal_copy:
+         pid = fork();
+         if (pid == 0) {
+-                if (geteuid() == 0 && no_xattr == false)
+-                        execlp("cp", "cp", "--reflink=auto", "--sparse=auto", "--preserve=mode,xattr,timestamps", "-fL",
+-                               src, dst, NULL);
+-                else
+                         execlp("cp", "cp", "--reflink=auto", "--sparse=auto", "--preserve=mode,timestamps", "-fL", src,
+                                dst, NULL);
+                 _exit(EXIT_FAILURE);
+@@ -335,10 +331,6 @@
+         while (waitpid(pid, &ret, 0) < 0) {
+                 if (errno != EINTR) {
+                         ret = -1;
+-                        if (geteuid() == 0 && no_xattr == false)
+-                                log_error("Failed: cp --reflink=auto --sparse=auto --preserve=mode,xattr,timestamps -fL %s %s",
+-                                          src, dst);
+-                        else
+                                 log_error("Failed: cp --reflink=auto --sparse=auto --preserve=mode,timestamps -fL %s %s",
+                                           src, dst);
+                         break;

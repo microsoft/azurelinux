@@ -2,10 +2,10 @@
     "Disks": [
         {
             "PartitionTableType": "gpt",
-            "MaxSize": 4096,
+            "MaxSize": 2048,
             "Artifacts": [
                 {
-                    "Name": "core",
+                    "Name": "baremetal",
                     "Type": "vhdx"
                 }
             ],
@@ -24,7 +24,24 @@
                     "ID": "rootfs",
                     "Start": 9,
                     "End": 0,
-                    "FsType": "ext4"
+                    "FsType": "ext4",
+                    "Artifacts": [
+                        {
+                            "Name": "mariner-rootfs-ext4",
+                            "Type": "ext4",
+                            "Compression": "gz"
+                        },
+                        {
+                            "Name": "mariner-rootfs-raw",
+                            "Type": "raw",
+                            "Compression": "gz"
+                        },
+                        {
+                            "Name": "mariner-rootfs-squashfs",
+                            "Type": "squashfs",
+                            "Compression": "gz"
+                        }
+                    ]
                 }
             ]
         }
@@ -48,7 +65,8 @@
                 "packagelists/baremetal-packages.json",
                 "packagelists/cloud-init-packages.json",
                 "packagelists/core-packages-image.json",
-                "packagelists/selinux-full.json"
+                "packagelists/selinux-full.json",
+                "packagelists/match-minimal-initrd-packages.json"
             ],
             "KernelCommandLine": {
                 "ExtraCommandLine": "console=tty0 console=ttyS0",

@@ -186,24 +186,115 @@ create_iso_with_rootfs_initrd_dir () {
     mic_poc_log "---------------- create_iso_with_rootfs_initrd_dir [exit] --------"
 }
 
-function create_wrapper_iso() {
-    local isoLabel=$1
-    local sourceDir=$2
-    local outputFile=$3
+#
+# Create the following:
+# wrapper.img [raw file system]
+#  |- LiveOS
+#      |- rootfs.img [raw file system]
+#
+function create_uncompressed_wrapper_un_compressed_rootfs() {
+    local rootfsRawFile=$1
+    local fedoraLiveIsoDir=$2
+    local fedoraLiveIsoWrapperRawFile=$3
+    local wrapperSizeInMBs=$4
 
+    mkdir -p $fedoraLiveIsoDir
+    sudo rm -f $fedoraLiveIsoWrapperRawFile
+
+    dd if=/dev/zero \
+       of=$fedoraLiveIsoWrapperRawFile \
+       bs=1M \
+       count=$wrapperSizeInMBs
+
+    mkfs.ext4 $fedoraLiveIsoWrapperRawFile
+
+    newDevice=$(sudo losetup -f -P --show $fedoraLiveIsoWrapperRawFile)
+    sudo mkdir -p /mnt/wrapper
+    sudo mount $newDevice /mnt/wrapper
+    sudo mkdir -p /mnt/wrapper/LiveOS
+    sudo cp $rootfsRawFile /mnt/wrapper/LiveOS/rootfs.img
+    echo "---------------------------------------------------------------------"
+    echo "New Device: $newDevice"
+    set +e
+    lsblk -o NAME,FSTYPE,SIZE,MOUNTPOINT,LABEL,UUID,PARTLABEL,PARTUUID
+    set -e
+    echo "---------------------------------------------------------------------"
+    sudo umount /mnt/wrapper
+    sleep 5s
+    # The following command fails with a device still in use error.
+    # sudo rm -r /mnt/wrapper
+    sudo losetup -d $newDevice
+}
+
+#
+# Create the following:
+# squashfs.img [squash file system]
+#  |- LiveOS
+#      |- rootfs.img [raw file system]
+#
+function create_squashfs_wrapper_uncompressed_rootfs () {
+    local rootfsRawFile=$1
+    local fedoraLiveIsoStagingDir=$2
+    local fedoraLiveIsoWrapperSquashfsFile=$3
+    local liveOSDir=$fedoraLiveIsoStagingDir/LiveOS
+
+    mkdir -p $liveOSDir
+    cp $rootfsRawFile \
+        $liveOSDir
+    sudo rm -f $fedoraLiveIsoWrapperSquashfsFile
+    mksquashfs \
+        $fedoraLiveIsoStagingDir \
+        $fedoraLiveIsoWrapperSquashfsFile
+}
+
+#
+# Create the following
+# squashfs.iso [iso file system - label=WRAPISO]
+#  |- LiveOS
+#      |- squashfs.img
+#
+function create_iso_wrapper_squashfs_rootfs() {
+    local rootfsSquashfsFile=$1
+    local fedoraLiveIsoStagingDir=$2
+    local isoLabel=$3
+    local fedoraLiveIsoWrapperIsofsFile=$5
+
+    local liveOSDir=$fedoraLiveIsoStagingDir/LiveOS
+
+    mkdir -p $liveOSDir
+    cp $rootfsSquashfsFile \
+        $liveOSDir
+    sudo rm -f $fedoraLiveIsoWrapperIsofsFile
     sudo xorriso \
         -as mkisofs \
         -iso-level 3 \
         -full-iso9660-filenames \
         -volid $isoLabel \
-        -graft-points $sourceDir \
-        -output $outputFile
+        -graft-points $liveOSDir \
+        -output $fedoraLiveIsoWrapperIsofsFile
+}
+
+
+function prepare_root_partition() {
+    rootfsRawFile=$1
+    modifiedRootfsRawFile=$2
+
+    cp $rootfsRawFile \
+        $modifiedRootfsRawFile
+
+    sudo mkdir -p /mnt/hack
+    loDevice=$(sudo losetup -f -P --show $modifiedRootfsRawFile)
+    sudo mount $loDevice /mnt/hack
+    sudo ls -la /mnt/hack/etc/fstab
+    sudo rm /mnt/hack/etc/fstab
+    sudo umount /mnt/hack
+    sudo rm -f /mnt/hack
+    sudo losetup -d loDevice
 }
 
 #-- main ----------------------------------------------------------------------
 FULL_IMAGE_CONFIG_FILE=~/git/CBL-Mariner/toolkit/imageconfigs/baremetal.json
 
-# s
 mkdir -p $BUILD_DIR
 
 BUILD_WORKING_DIR=$BUILD_DIR/intermediates
@@ -220,6 +311,10 @@ FULL_IMAGE_RAW_DISK=$BUILD_WORKING_DIR/raw-disk-output/disk0.raw
 ROOTFS_RAW_FILE=$BUILD_WORKING_DIR/raw-disk-output/rootfs.img
 ROOTFS_RAW_GZ_FILE=$BUILD_WORKING_DIR/raw-disk-output/rootfs.img.tgz
 
+MODIFIED_ROOTFS_DIR=$BUILD_WORKING_DIR/raw-disk-output-modified
+MODIFIED_ROOTFS_RAW_FILE=$MODIFIED_ROOTFS_DIR/rootfs.img
+MODIFIED_ROOTFS_RAW_FILE_COMPRESSED=${MODIFIED_ROOTFS_RAW_FILE}.tar.gz
+
 UNWRAPPED_ROOTFS_SQUASH_FILE=$BUILD_WORKING_DIR/raw-disk-output/squashfs.img
 ROOTFS_SQUASH_GZ_FILE=$BUILD_WORKING_DIR/raw-disk-output/squashfs.img.tgz
 
@@ -227,18 +322,16 @@ EXTRACT_ARTIFACTS_TMP_DIR=$BUILD_WORKING_DIR/extract-artifacts-from-rootfs-tmp-d
 EXTRACT_ARTIFACTS_OUT_DIR=$BUILD_WORKING_DIR/extract-artifacts-from-rootfs-out-dir
 
 FEDORA_LIVE_ISO_DIR_0=$BUILD_WORKING_DIR/fedora-working-dir-0
-# FEDORA_LIVE_ISO_STAGING_DIR_0=$FEDORA_LIVE_ISO_DIR_0/input
-# FEDORA_LIVE_ISO_STAGING_LIVEOS_DIR_0=$FEDORA_LIVE_ISO_STAGING_DIR_0/LiveOS
 FEDORA_LIVE_ISO_WRAPPER_RAW_FILE_0=$FEDORA_LIVE_ISO_DIR_0/wrapper.img
+FEDORA_LIVE_ISO_WRAPPER_SIZE_IN_MBS_0=2176
+FEDORA_LIVE_ISO_WRAPPER_SIZE_IN_MBS_0_COMPRESSED=256
 
 FEDORA_LIVE_ISO_DIR_1=$BUILD_WORKING_DIR/fedora-working-dir-1
 FEDORA_LIVE_ISO_STAGING_DIR_1=$FEDORA_LIVE_ISO_DIR_1/input
-FEDORA_LIVE_ISO_STAGING_LIVEOS_DIR_1=$FEDORA_LIVE_ISO_STAGING_DIR_1/LiveOS
 FEDORA_LIVE_ISO_SQUASHFS_FILE_1=$FEDORA_LIVE_ISO_DIR_1/squashfs.img
 
 FEDORA_LIVE_ISO_DIR_2=$BUILD_WORKING_DIR/fedora-working-dir-2
 FEDORA_LIVE_ISO_STAGING_DIR_2=$FEDORA_LIVE_ISO_DIR_2/input
-FEDORA_LIVE_ISO_STAGING_LIVEOS_DIR_2=$FEDORA_LIVE_ISO_STAGING_DIR_2/LiveOS
 FEDORA_LIVE_ISO_WRAPPER_ISO_FILE=$FEDORA_LIVE_ISO_DIR_2/squashfs.iso
 
 if [[ ! -z $BUILD_CLEAN ]]; then
@@ -255,69 +348,79 @@ if [[ ! -z $BUILD_CLEAN ]]; then
     #     $EXTRACT_ARTIFACTS_TMP_DIR \
     #     $EXTRACT_ARTIFACTS_OUT_DIR
 
+    # remove fstab...
+    #
+    # mkdir -p $MODIFIED_ROOTFS_DIR
+    # prepare_root_partition \
+    #     $ROOTFS_RAW_FILE \
+    #     $MODIFIED_ROOTFS_RAW_FILE
+
+    # -------------------------------------------
+    # Cfg1
     #
     # Create the following:
-    # wrapper.img [raw file system]
+    #
+    # wrapper.img [raw file system - uncompressed]
     #  |- LiveOS
-    #      |- rootfs.img [raw file system]
+    #      |- rootfs.img [raw file system - uncompressed]
     #
-    mkdir -p $FEDORA_LIVE_ISO_DIR_0
-    # mkdir -p $FEDORA_LIVE_ISO_STAGING_LIVEOS_DIR_0
-    # cp $ROOTFS_RAW_FILE \
-    #    $FEDORA_LIVE_ISO_STAGING_LIVEOS_DIR_0
-    sudo rm -f $FEDORA_LIVE_ISO_WRAPPER_RAW_FILE_0
-
-    dd if=/dev/zero \
-       of=$FEDORA_LIVE_ISO_WRAPPER_RAW_FILE_0 \
-       bs=1M \
-       count=2176
-
-    mkfs.ext4 $FEDORA_LIVE_ISO_WRAPPER_RAW_FILE_0
-
-    newDevice=$(sudo losetup -f -P --show $FEDORA_LIVE_ISO_WRAPPER_RAW_FILE_0)
-    sudo mkdir -p /mnt/wrapper
-    sudo mount $newDevice /mnt/wrapper
-    sudo mkdir -p /mnt/wrapper/LiveOS
-    sudo cp $ROOTFS_RAW_FILE /mnt/wrapper/LiveOS
-    echo "---------------------------------------------------------------------"
-    echo "New Device: $newDevice"
-    set +e
-    lsblk -o NAME,FSTYPE,SIZE,MOUNTPOINT,LABEL,UUID,PARTLABEL,PARTUUID
-    set -e
-    echo "---------------------------------------------------------------------"
-    sudo umount /mnt/wrapper
-    sleep 10s
-    # sudo rm -r /mnt/wrapper
-    sudo losetup -d $newDevice
-
+    # create_uncompressed_wrapper_un_compressed_rootfs \
+    #     $MODIFIED_ROOTFS_RAW_FILE \
+    #     $FEDORA_LIVE_ISO_DIR_0 \
+    #     $FEDORA_LIVE_ISO_WRAPPER_RAW_FILE_0 \
+    #     $FEDORA_LIVE_ISO_WRAPPER_SIZE_IN_MBS_0
+ 
+    # -------------------------------------------
+    # Cfg2
     #
     # Create the following:
+    #
     # squashfs.img [squash file system]
     #  |- LiveOS
     #      |- rootfs.img [raw file system]
     #
-    mkdir -p $FEDORA_LIVE_ISO_STAGING_LIVEOS_DIR_1
-    cp $ROOTFS_RAW_FILE \
-        $FEDORA_LIVE_ISO_STAGING_LIVEOS_DIR_1
-    sudo rm -f $FEDORA_LIVE_ISO_SQUASHFS_FILE_1
-    mksquashfs \
-        $FEDORA_LIVE_ISO_STAGING_DIR_1 \
-        $FEDORA_LIVE_ISO_SQUASHFS_FILE_1
+    # create_squashfs_wrapper_uncompressed_rootfs \
+    #     $MODIFIED_ROOTFS_RAW_FILE \
+    #     $FEDORA_LIVE_ISO_STAGING_DIR_1 \
+    #     $FEDORA_LIVE_ISO_SQUASHFS_FILE_1
 
+    # -------------------------------------------
+    # Cfg3
+    #
+    # Create the following:
+    #
+    # wrapper.img [squash file system]
+    #  |- LiveOS
+    #      |- rootfs.img [raw file system - compressed]
+    #
+    sudo rm -f $MODIFIED_ROOTFS_RAW_FILE_COMPRESSED
+
+    # compress
+    rawFilePath=$(dirname $MODIFIED_ROOTFS_RAW_FILE)
+    rawFileName=$(basename $MODIFIED_ROOTFS_RAW_FILE)
+    pushd $rawFilePath
+    tar -czvf $MODIFIED_ROOTFS_RAW_FILE_COMPRESSED $rawFileName
+    popd
+
+    create_uncompressed_wrapper_un_compressed_rootfs \
+        $MODIFIED_ROOTFS_RAW_FILE_COMPRESSED \
+        $FEDORA_LIVE_ISO_DIR_0 \
+        $FEDORA_LIVE_ISO_WRAPPER_RAW_FILE_0 \
+        $FEDORA_LIVE_ISO_WRAPPER_SIZE_IN_MBS_0_COMPRESSED
+
+    # -------------------------------------------
+    # CfgX
     #
     # Create the following
     # squashfs.iso [iso file system - label=WRAPISO]
     #  |- LiveOS
     #      |- squashfs.img
     #
-    mkdir -p $FEDORA_LIVE_ISO_STAGING_LIVEOS_DIR_2
-    cp $FEDORA_LIVE_ISO_SQUASHFS_FILE_1 \
-        $FEDORA_LIVE_ISO_STAGING_LIVEOS_DIR_2
-    sudo rm -f $FEDORA_LIVE_ISO_WRAPPER_ISO_FILE
-    create_wrapper_iso \
-        "WRAPISO" \
-        $FEDORA_LIVE_ISO_STAGING_DIR_2 \
-        $FEDORA_LIVE_ISO_WRAPPER_ISO_FILE
+    # create_iso_wrapper_squashfs_rootfs \
+    #     $FEDORA_LIVE_ISO_SQUASHFS_FILE_1 \
+    #     $FEDORA_LIVE_ISO_STAGING_DIR_2 \
+    #     "WRAPISO" \
+    #     $FEDORA_LIVE_ISO_WRAPPER_ISO_FILE
 fi
 
 INITRD_DIR=$BUILD_WORKING_DIR/initrd-dir
@@ -355,20 +458,30 @@ CREATE_INITRD_OUT_DIR=$BUILD_WORKING_DIR/create-initrd-from-folder-out-dir
 # $EXTRACT_ARTIFACTS_OUT_DIR/extracted-initrd-file/initrd.img-5.15.138.1-1.cm2
 #
 
-# SOURCE_ROOTFS_FILE=$UNWRAPPED_ROOTFS_SQUASH_FILE
-# SOURCE_ROOTFS_FILE=$FEDORA_LIVE_ISO_SQUASHFS_FILE
-# TARGET_ROOTFS_FILE="/LiveOS/squashfs.img"
-
 # SOURCE_ROOTFS_FILE=$FEDORA_LIVE_ISO_WRAPPER_ISO_FILE
 # TARGET_ROOTFS_FILE="/LiveOS/squashfs.iso"
 
 # This configuration fails because dracut expects this raw images to contain
 # a subfolder named LiveOS/ and in that LiveOS/ folder, there should be
 # a raw file name `rootfs.img`.
-#
 # SOURCE_ROOTFS_FILE=$ROOTFS_RAW_FILE
 # TARGET_ROOTFS_FILE="/artifacts/rootfs.img"
 
+# -----------------------------------------------
+# Cfg 1
+#
+# SOURCE_ROOTFS_FILE=$FEDORA_LIVE_ISO_WRAPPER_RAW_FILE_0
+# TARGET_ROOTFS_FILE="/artifacts/wrapper.img"
+
+# -----------------------------------------------
+# Cfg 2
+#
+# SOURCE_ROOTFS_FILE=$FEDORA_LIVE_ISO_SQUASHFS_FILE_1
+# TARGET_ROOTFS_FILE="/artifacts/squashfs.img"
+
+# -----------------------------------------------
+# Cfg 3
+#
 SOURCE_ROOTFS_FILE=$FEDORA_LIVE_ISO_WRAPPER_RAW_FILE_0
 TARGET_ROOTFS_FILE="/artifacts/wrapper.img"
 

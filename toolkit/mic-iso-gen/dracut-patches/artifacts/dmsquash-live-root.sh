@@ -1,6 +1,8 @@
 #!/bin/bash
 
 set -x
+echo "---- dmsquash-live-root.sh ---- 0 ----" > /dev/kmsg
+sleep 2s
 
 type getarg > /dev/null 2>&1 || . /lib/dracut-lib.sh
 
@@ -16,6 +18,9 @@ fi
 
 [ -z "$1" ] && exit 1
 livedev="$1"
+
+echo "---- dmsquash-live-root.sh ---- 1 ---- livedev=$livedev" > /dev/kmsg
+sleep 3s
 
 # parse various live image specific options that make sense to be
 # specified as their own things
@@ -106,6 +111,11 @@ else
         fi
     fi
 fi
+
+echo "---- dmsquash-live-root.sh ---- 2 ---- fstype=$fstype" > /dev/kmsg
+echo "---- dmsquash-live-root.sh ---- 3 ---- SQUASHED=$SQUASHED" > /dev/kmsg
+echo "---- dmsquash-live-root.sh ---- 4 ---- FSIMG=$FSIMG" > /dev/kmsg
+sleep 3s
 
 # overlay setup helper function
 do_live_overlay() {
@@ -277,13 +287,25 @@ do_live_overlay() {
 # end do_live_overlay()
 
 set -x
+echo "---- dmsquash-live-root.sh ---- 5 ---- FSIMG=$FSIMG" > /dev/kmsg
 
 # we might have an embedded fs image on squashfs (compressed live)
 if [ -e /run/initramfs/live/${live_dir}/${squash_image} ]; then
+    echo "---- dmsquash-live-root.sh ---- 5.1 ----" > /dev/kmsg
+    sleep 3s
     SQUASHED="/run/initramfs/live/${live_dir}/${squash_image}"
 fi
+
+echo "---- dmsquash-live-root.sh ---- 6 ----" > /dev/kmsg
+
 if [ -e "$SQUASHED" ]; then
+
+    echo "---- dmsquash-live-root.sh ---- 6.1 ----" > /dev/kmsg
+
     if [ -n "$live_ram" ]; then
+
+        echo "---- dmsquash-live-root.sh ---- 6.1.1 ---- dd if=$SQUASHED of=/run/initramfs/squashed.img" > /dev/kmsg
+
         echo 'Copying live image to RAM...' > /dev/kmsg
         echo ' (this may take a minute)' > /dev/kmsg
         dd if=$SQUASHED of=/run/initramfs/squashed.img bs=512 2> /dev/null
@@ -291,10 +313,14 @@ if [ -e "$SQUASHED" ]; then
         SQUASHED="/run/initramfs/squashed.img"
     fi
 
+    echo "---- dmsquash-live-root.sh ---- 6.2 ---- losetup and mounting /run/initramfs/squashfs" > /dev/kmsg
+
     SQUASHED_LOOPDEV=$(losetup -f)
     losetup -r "$SQUASHED_LOOPDEV" $SQUASHED
     mkdir -m 0755 -p /run/initramfs/squashfs
     mount -n -t squashfs -o ro "$SQUASHED_LOOPDEV" /run/initramfs/squashfs
+
+    echo "---- dmsquash-live-root.sh ---- 6.3 ----" > /dev/kmsg
 
     if [ -d /run/initramfs/squashfs/LiveOS ]; then
         if [ -f /run/initramfs/squashfs/LiveOS/rootfs.img ]; then
@@ -312,6 +338,9 @@ if [ -e "$SQUASHED" ]; then
         die "Failed to find a root filesystem in $SQUASHED."
         exit 1
     fi
+
+    echo "---- dmsquash-live-root.sh ---- 6.4 ----FSIMG=$FSIMG" > /dev/kmsg
+
 else
     # we might have an embedded fs image to use as rootfs (uncompressed live)
     if [ -e /run/initramfs/live/${live_dir}/rootfs.img ]; then
@@ -350,9 +379,15 @@ if [ -n "$FSIMG" ]; then
             cp -v $FSIMG /run/initramfs/fsimg/rootfs.img
         else
             echo "---- dmsquash-live-root.sh ---- 13.1.1.2 ---- not squashed." > /dev/kmsg
-            echo "---- dmsquash-live-root.sh ---- 13.1.1.2.1 ---- cp $FSIMG /run/initramfs/fsimg/." > /dev/kmsg
-            sleep 2s
-            cp $FSIMG /run/initramfs/fsimg/
+            # uncompressed (added by gmileka)
+            # echo "---- dmsquash-live-root.sh ---- 13.1.1.2.1 ---- cp $FSIMG /run/initramfs/fsimg/" > /dev/kmsg
+            # cp $FSIMG /run/initramfs/fsimg/
+            # compressed
+            echo "---- dmsquash-live-root.sh ---- 13.1.1.2.2 ---- tar -x $FSIMG /run/initramfs/fsimg/" > /dev/kmsg
+            unpack_archive $FSIMG /run/initramfs/fsimg/
+            echo "---- dmsquash-live-root.sh ---- 13.1.1.2.3 ---- ls -la /run/initramfs/fsimg/" > /dev/kmsg
+            ls -la /run/initramfs/fsimg/ > /dev/kmsg
+            sleep 5s
         fi
         FSIMG=/run/initramfs/fsimg/rootfs.img
     fi
@@ -387,7 +422,8 @@ if [ -n "$FSIMG" ]; then
         # losetup -a > /dev/kmsg
         # losetup -f --show /run/initramfs/fsimg/rootfs.img
         # losetup -f --verbose --show "$opt" $FSIMG > /dev/kmsg 2>&1
-        losetup -f --verbose --show $FSIMG > /dev/kmsg 2>&1
+        # good
+        # losetup -f --verbose --show $FSIMG > /dev/kmsg 2>&1
         # udevadm trigger --action=add > /dev/null 2>&1
         if [ -n "$opt" ]; then
             BASE_LOOPDEV=$(losetup -f --show "$opt" $FSIMG)
@@ -406,12 +442,12 @@ if [ -n "$FSIMG" ]; then
         sz=$(blockdev --getsz "$BASE_LOOPDEV")
         echo "---- dmsquash-live-root.sh ---- 13.3.2.4 ---- sz=$sz" > /dev/kmsg
         # hack
-        mkdir -p /mnt/hack
-        mount $BASE_LOOPDEV /mnt/hack
-        ls -la /mnt/hack > /dev/kmsg
-        rm /mnt/hack/etc/fstab
-        umount /mnt/hack
-        rm /mnt/hack
+        # mkdir -p /mnt/hack
+        # mount $BASE_LOOPDEV /mnt/hack
+        # ls -la /mnt/hack > /dev/kmsg
+        # rm /mnt/hack/etc/fstab
+        # umount /mnt/hack
+        # rm /mnt/hack
     fi
 
     echo "---- dmsquash-live-root.sh ---- 13.4 ----" > /dev/kmsg
