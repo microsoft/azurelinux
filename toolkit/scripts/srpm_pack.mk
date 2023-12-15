@@ -19,7 +19,7 @@ SRPM_BUILD_LOGS_DIR = $(LOGS_DIR)/pkggen/srpms
 # Input to the packing process
 toolchain_spec_list = $(toolchain_build_dir)/toolchain_specs.txt
 srpm_pack_list_file = $(BUILD_SRPMS_DIR)/pack_list.txt
-# The output of the packing process (may be empty is everything is already up-to-date)
+# The output of the packing process (may be empty if everything is already up-to-date)
 srpm_pack_summary_file = $(STATUS_FLAGS_DIR)/srpm_pack_activity.txt
 toolchain_srpm_pack_summary_file = $(STATUS_FLAGS_DIR)/toolchain_srpm_pack_activity.txt
 
