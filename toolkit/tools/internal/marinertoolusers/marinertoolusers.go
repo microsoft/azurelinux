@@ -70,7 +70,7 @@ func GiveDirToUserRecursive(path string, user *user.User) (err error) {
 	return
 }
 
-// Get the mariner builder UID
+// convertUserUIDInt will convert a user.User UID to an int
 func convertUserUIDInt(user *user.User) (uid int, err error) {
 	if user == nil {
 		err = fmt.Errorf("user is nil")
@@ -83,7 +83,7 @@ func convertUserUIDInt(user *user.User) (uid int, err error) {
 	return
 }
 
-// Get the mariner builder GID
+// convertUserGIDInt will convert a user.User GID to an int
 func convertUserGIDInt(user *user.User) (gid int, err error) {
 	if user == nil {
 		err = fmt.Errorf("user is nil")

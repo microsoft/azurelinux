@@ -56,6 +56,7 @@ func prepEnv(t *testing.T, envName string) {
 	os.Setenv(envName, currentEnvName)
 }
 
+// Get the current user we should test against. If we are root, try to get the user from SUDO_USER
 func getCurrentUserHelper(t *testing.T) (currentUser *user.User, err error) {
 	t.Helper()
 	currentUser, err = user.Current()
@@ -85,6 +86,7 @@ func getCurrentUserHelper(t *testing.T) (currentUser *user.User, err error) {
 	return
 }
 
+// Get the nobody user
 func getNobodyUserHelper(t *testing.T) (nobodyUser *user.User, err error) {
 	t.Helper()
 	nobodyUser, err = user.Lookup("nobody")
@@ -99,6 +101,7 @@ func getNobodyUserHelper(t *testing.T) (nobodyUser *user.User, err error) {
 	return
 }
 
+// Get the UID and GID from a user.User and convert them to ints
 func getIDsHelper(t *testing.T, user *user.User) (uid int, gid int) {
 	t.Helper()
 	if user == nil {
@@ -115,6 +118,7 @@ func getIDsHelper(t *testing.T, user *user.User) (uid int, gid int) {
 	return
 }
 
+// Find the owner of a file or directory and return the UID and GID
 func getOwnerHelper(t *testing.T, file *os.File, info *fs.FileInfo) (uid int, gid int) {
 	// Sanity check that we set the ownership correctly
 	var err error
