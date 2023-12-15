@@ -633,6 +633,22 @@ Much of the code in GlusterFS is in user space and easily manageable.
 This package contains the python modules of GlusterFS and own gluster
 namespace.
 
+%package regression-tests
+Summary:          Development Tools
+Requires:         %{name}%{?_isa} = %{version}-%{release}
+Requires:         %{name}-fuse%{?_isa} = %{version}-%{release}
+Requires:         %{name}-server%{?_isa} = %{version}-%{release}
+## thin provisioning support
+Requires:         lvm2 >= 2.02.89
+Requires:         perl(App::Prove) perl(Test::Harness) gcc util-linux-ng
+Requires:         python%{_pythonver}
+Requires:         attr dbench file git libacl-devel net-tools
+Requires:         nfs-utils xfsprogs yajl psmisc bc
+
+%description regression-tests
+The Gluster Test Framework, is a suite of scripts used for
+regression testing of Gluster.
+
 %if ( 0%{!?_without_ocf:1} )
 %package resource-agents
 Summary:        OCF Resource Agents for GlusterFS
