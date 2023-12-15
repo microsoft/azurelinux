@@ -11,9 +11,6 @@
 toolkit_root := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 SCRIPTS_DIR  ?= $(toolkit_root)/scripts
 
-# Host and target architecture
-build_arch := $(shell uname -m)
-
 # Build targets
 ##help:var:CONFIG_FILE:<config_path>=Path to image configuration file to use. Will add package dependencies and define final image generated.
 CONFIG_FILE             ?=
