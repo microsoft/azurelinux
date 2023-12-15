@@ -1,5 +1,4 @@
-%global runtime_make_vars       DEFSTATICRESOURCEMGMT_CLH=true \\\
-                                DEFSHAREDFS_CLH_SNP_VIRTIOFS=none \\\
+%global runtime_make_vars       DEFSHAREDFS_CLH_SNP_VIRTIOFS=none \\\
                                 SKIP_GO_VERSION_CHECK=1
 
 %global agent_make_vars         LIBC=gnu \\\
@@ -9,7 +8,7 @@
 
 Name:         kata-containers-cc
 Version:      0.6.2
-Release:      2%{?dist}
+Release:      3%{?dist}
 Summary:      Kata Confidential Containers
 License:      ASL 2.0
 Vendor:       Microsoft Corporation
