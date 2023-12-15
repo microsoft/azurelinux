@@ -39,30 +39,48 @@
 # if you wish to compile an rpm with IPv6 default...
 # rpmbuild -ta @PACKAGE_NAME@-@PACKAGE_VERSION@.tar.gz --with ipv6default
 %{?_with_ipv6default:%global _with_ipv6default --with-ipv6-default}
+# linux-io_uring
+# If you wish to compile an rpm without linux-io_uring support...
+# rpmbuild -ta  @PACKAGE_NAME@-@PACKAGE_VERSION@.tar.gz --without linux-io_uring
+%{?_without_linux_io_uring:%global _without_linux_io_uring --disable-linux-io_uring}
+# Disable linux-io_uring on unsupported distros.
+%if ( 0%{?fedora} && 0%{?fedora} <= 32 ) || ( 0%{?rhel} && 0%{?rhel} <= 7 )
+%global _without_linux_io_uring --disable-linux-io_uring
+%endif
 # libtirpc
 # if you wish to compile an rpm without TIRPC (i.e. use legacy glibc rpc)
 # rpmbuild -ta @PACKAGE_NAME@-@PACKAGE_VERSION@.tar.gz --without libtirpc
 %{?_without_libtirpc:%global _without_libtirpc --without-libtirpc}
+# libtcmalloc
+# if you wish to compile an rpm without tcmalloc (i.e. use gluster mempool)
+# rpmbuild -ta @PACKAGE_NAME@-@PACKAGE_VERSION@.tar.gz --without tcmalloc
+%{?_without_tcmalloc:%global _without_tcmalloc --without-tcmalloc}
+%ifnarch x86_64
+%global _without_tcmalloc --without-tcmalloc
+%endif
 # ocf
 # if you wish to compile an rpm without the OCF resource agents...
 # rpmbuild -ta @PACKAGE_NAME@-@PACKAGE_VERSION@.tar.gz --without ocf
 %{?_without_ocf:%global _without_ocf --without-ocf}
-# rdma
-# if you wish to compile an rpm without rdma support, compile like this...
-# rpmbuild -ta @PACKAGE_NAME@-@PACKAGE_VERSION@.tar.gz --without rdma
-%{?_without_rdma:%global _without_rdma --disable-ibverbs}
-# No RDMA Support on armv7hl
-%ifarch armv7hl
-%global _without_rdma --disable-ibverbs
-%endif
 # server
-# Disabling 'server' subpackage for CBL-Mariner as it's currently unnecessary.
+# if you wish to build rpms without server components, compile like this
+# rpmbuild -ta @PACKAGE_NAME@-@PACKAGE_VERSION@.tar.gz --without server
+%{?_without_server:%global _without_server --without-server}
+# disable server components forcefully as rhel <= 6
+%if ( 0%{?rhel} && 0%{?rhel} <= 6 )
 %global _without_server --without-server
+%endif
+# syslog
+# if you wish to build rpms without syslog logging, compile like this
+# rpmbuild -ta @PACKAGE_NAME@-@PACKAGE_VERSION@.tar.gz --without syslog
+%{?_without_syslog:%global _without_syslog --disable-syslog}
 # disable syslog forcefully as rhel <= 6 doesn't have rsyslog or rsyslog-mmcount
 # Fedora deprecated syslog, see
 #  https://fedoraproject.org/wiki/Changes/NoDefaultSyslog
 # (And what about RHEL7?)
+%if ( 0%{?fedora} && 0%{?fedora} >= 20 ) || ( 0%{?rhel} && 0%{?rhel} <= 6 )
 %global _without_syslog --disable-syslog
+%endif
 # tsan
 # if you wish to compile an rpm with thread sanitizer...
 # rpmbuild -ta @PACKAGE_NAME@-@PACKAGE_VERSION@.tar.gz --with tsan
@@ -74,6 +92,11 @@
 ##-----------------------------------------------------------------------------
 ## All %%global definitions should be placed here and keep them sorted
 ##
+# selinux booleans whose defalut value needs modification
+# these booleans will be consumed by "%%selinux_set_booleans" macro.
+%if ( 0%{?rhel} && 0%{?rhel} >= 8 )
+%global selinuxbooleans rsync_full_access=1 rsync_client=1
+%endif
 %global _with_firewalld --enable-firewalld
 %if ( 0%{?_tmpfilesdir:1} )
 %global _with_tmpfilesdir --with-tmpfilesdir=%{_tmpfilesdir}
@@ -84,6 +107,7 @@
 %if ( 0%{?_without_server:1} )
 %global _without_events --disable-events
 %global _without_georeplication --disable-georeplication
+%global _without_linux_io_uring --disable-linux-io_uring
 %global _with_gnfs %{nil}
 %global _without_ocf --without-ocf
 %endif
@@ -104,6 +128,10 @@
 # modern rpm and current Fedora do not generate requires when the
 # provides are filtered
 %global __provides_exclude_from ^%{_libdir}/glusterfs/%{version}/.*$
+%global bashcompdir %(pkg-config --variable=completionsdir bash-completion 2>/dev/null)
+%if "%{bashcompdir}" == ""
+%global bashcompdir ${sysconfdir}/bash_completion.d
+%endif
 ##-----------------------------------------------------------------------------
 ## All package definitions should be placed here and keep them sorted
 ##
@@ -629,6 +657,19 @@ replicate volume. It includes translators required to provide the
 functionality, and also few other scripts required for setup.
 
 This package provides the glusterfs thin-arbiter translator.
+
+%package client-xlators
+Summary:          GlusterFS client-side translators
+
+%description client-xlators
+GlusterFS is a distributed file-system capable of scaling to several
+petabytes. It aggregates various storage bricks over TCP/IP interconnect
+into one large parallel network filesystem. GlusterFS is one of the
+most sophisticated file systems in terms of features and extensibility.
+It borrows a powerful concept called Translators from GNU Hurd kernel.
+Much of the code in GlusterFS is in user space and easily manageable.
+
+This package provides the translators needed on any GlusterFS client.
 
 %prep
 %setup -q -n %{name}-%{version}%{?dev}
