@@ -2,8 +2,8 @@
 # This package depends on automagic byte compilation
 # https://fedoraproject.org/wiki/Changes/No_more_automagic_Python_bytecompilation_phase_2
 %global _python_bytecompile_extra 1
-# uncomment and add '%' to use the %%dev for pre-releases
-#%%global dev rc3
+# uncomment and add '%' to use the prereltag for pre-releases
+# %%global prereltag qa3
 ##-----------------------------------------------------------------------------
 ## All argument definitions should be placed here and keep them sorted
 ##
@@ -78,6 +78,8 @@
 %if ( 0%{?rhel} && 0%{?rhel} <= 6 )
 %global _without_server --without-server
 %endif
+# Disabling 'server' subpackage for CBL-Mariner as it's currently unnecessary.
+%global _without_server --without-server
 # syslog
 # if you wish to build rpms without syslog logging, compile like this
 # rpmbuild -ta @PACKAGE_NAME@-@PACKAGE_VERSION@.tar.gz --without syslog
@@ -770,8 +772,13 @@ GlusterFS Events
 %endif
 
 %prep
-%setup -q -n %{name}-%{version}%{?dev}
-%patch0001 -p1
+%setup -q -n %{name}-%{version}%{?prereltag}
+%if ( ! %{_usepython3} )
+echo "fixing python shebangs..."
+for f in api events extras geo-replication libglusterfs tools xlators; do
+find $f -type f -exec sed -i 's|/usr/bin/python3|/usr/bin/python2|' {} \;
+done
+%endif
 
 %build
 
@@ -839,7 +846,7 @@ head -50 ChangeLog > ChangeLog.head && mv ChangeLog.head ChangeLog
 cat << EOM >> ChangeLog
 
 More commit messages for this ChangeLog can be found at
-https://forge.gluster.org/glusterfs-core/glusterfs/commits/v%{version}%{?dev}
+https://forge.gluster.org/glusterfs-core/glusterfs/commits/v%{version}%{?prereltag}
 EOM
 
 # Remove benchmarking and other unpackaged files
@@ -1161,48 +1168,47 @@ exit 0
 %endif
 # xlators that are needed on the client- and on the server-side
 %dir %{_libdir}/glusterfs
-%dir %{_libdir}/glusterfs/%{version}%{?dev}
-%dir %{_libdir}/glusterfs/%{version}%{?dev}/auth
-%{_libdir}/glusterfs/%{version}%{?dev}/auth/addr.so
-%{_libdir}/glusterfs/%{version}%{?dev}/auth/login.so
-%dir %{_libdir}/glusterfs/%{version}%{?dev}/rpc-transport
-%{_libdir}/glusterfs/%{version}%{?dev}/rpc-transport/socket.so
-%dir %{_libdir}/glusterfs/%{version}%{?dev}/xlator
-%dir %{_libdir}/glusterfs/%{version}%{?dev}/xlator/debug
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/debug/error-gen.so
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/debug/delay-gen.so
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/debug/io-stats.so
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/debug/sink.so
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/debug/trace.so
-%dir %{_libdir}/glusterfs/%{version}%{?dev}/xlator/features
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/features/access-control.so
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/features/barrier.so
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/features/cdc.so
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/features/changelog.so
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/features/utime.so
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/features/gfid-access.so
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/features/namespace.so
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/features/read-only.so
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/features/shard.so
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/features/snapview-client.so
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/features/worm.so
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/features/cloudsync.so
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/meta.so
-%dir %{_libdir}/glusterfs/%{version}%{?dev}/xlator/performance
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/performance/io-cache.so
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/performance/io-threads.so
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/performance/md-cache.so
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/performance/open-behind.so
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/performance/quick-read.so
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/performance/read-ahead.so
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/performance/readdir-ahead.so
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/performance/stat-prefetch.so
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/performance/write-behind.so
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/performance/nl-cache.so
-%dir %{_libdir}/glusterfs/%{version}%{?dev}/xlator/system
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/system/posix-acl.so
+%dir %{_libdir}/glusterfs/%{version}%{?prereltag}
+%dir %{_libdir}/glusterfs/%{version}%{?prereltag}/auth
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/auth/addr.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/auth/login.so
+%dir %{_libdir}/glusterfs/%{version}%{?prereltag}/rpc-transport
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/rpc-transport/socket.so
+%dir %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator
+%dir %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/debug
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/debug/error-gen.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/debug/delay-gen.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/debug/io-stats.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/debug/sink.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/debug/trace.so
+%dir %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/features
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/features/access-control.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/features/barrier.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/features/cdc.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/features/changelog.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/features/utime.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/features/gfid-access.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/features/namespace.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/features/read-only.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/features/shard.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/features/snapview-client.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/features/worm.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/features/cloudsync.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/meta.so
+%dir %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/performance
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/performance/io-cache.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/performance/io-threads.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/performance/md-cache.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/performance/open-behind.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/performance/quick-read.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/performance/read-ahead.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/performance/readdir-ahead.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/performance/stat-prefetch.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/performance/write-behind.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/performance/nl-cache.so
+%dir %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/system
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/system/posix-acl.so
 %dir %attr(0775,gluster,gluster) %{_rundir}/gluster
-%dir %attr(0775,gluster,gluster) %{_rundir}/gluster/metrics
 %if 0%{?_tmpfilesdir:1}
 %{_tmpfilesdir}/gluster.conf
 %endif
@@ -1220,9 +1226,9 @@ exit 0
 %{bashcompdir}/gluster.bash
 
 %files cloudsync-plugins
-%dir %{_libdir}/glusterfs/%{version}%{?dev}/cloudsync-plugins
-     %{_libdir}/glusterfs/%{version}%{?dev}/cloudsync-plugins/cloudsyncs3.so
-     %{_libdir}/glusterfs/%{version}%{?dev}/cloudsync-plugins/cloudsynccvlt.so
+%dir %{_libdir}/glusterfs/%{version}%{?prereltag}/cloudsync-plugins
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/cloudsync-plugins/cloudsyncs3.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/cloudsync-plugins/cloudsynccvlt.so
 
 %files -n libglusterfs-devel
 %dir %{_includedir}/glusterfs
@@ -1269,8 +1275,9 @@ exit 0
 %{_sbindir}/glusterfs
 %{_sbindir}/glusterfsd
 %config(noreplace) %{_sysconfdir}/logrotate.d/glusterfs
-%dir %{_libdir}/glusterfs/%{version}%{?dev}/xlator/mount
-     %{_libdir}/glusterfs/%{version}%{?dev}/xlator/mount/fuse.so
+%dir %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator
+%dir %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/mount
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/mount/fuse.so
 /sbin/mount.glusterfs
 %if ( 0%{!?_without_fusermount:1} )
 %{_bindir}/fusermount-glusterfs
@@ -1288,9 +1295,9 @@ exit 0
 %endif
 
 %files thin-arbiter
-%dir %{_libdir}/glusterfs/%{version}%{?dev}/xlator
-%dir %{_libdir}/glusterfs/%{version}%{?dev}/xlator/features
-     %{_libdir}/glusterfs/%{version}%{?dev}/xlator/features/thin-arbiter.so
+%dir %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator
+%dir %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/features
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/features/thin-arbiter.so
 %dir %{_datadir}/glusterfs/scripts
      %{_datadir}/glusterfs/scripts/setup-thin-arbiter.sh
 %config %{_sysconfdir}/glusterfs/thin-arbiter.vol
@@ -1395,10 +1402,12 @@ exit 0
 %exclude %{_sharedstatedir}/glusterd/nfs/nfs-server.vol
 %exclude %{_sharedstatedir}/glusterd/nfs/run/nfs.pid
 %if ( 0%{?_with_gnfs:1} )
-%exclude %{_libdir}/glusterfs/%{version}%{?dev}/xlator/nfs/*
+%exclude %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/nfs/*
 %endif
 %config(noreplace) %{_sysconfdir}/sysconfig/glusterd
+%if ( 0%{_for_fedora_koji_builds} )
 %config(noreplace) %{_sysconfdir}/sysconfig/glusterfsd
+%endif
 
 # init files
 %{glusterd_svcfile}
