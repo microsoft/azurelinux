@@ -179,6 +179,21 @@ SystemConfig:
       Permissions: "664"
 ```
 
+## KernelCommandLine type
+
+Options for configuring the kernel.
+
+### ExtraCommandLine
+
+Additional Linux kernel command line options to add to the image.
+
+If the partitions are customized, then the `grub.cfg` file will be reset to handle the
+new partition layout.
+So, any existing ExtraCommandLine value in the base image will be replaced.
+
+If the partitions are not customized, then the `ExtraCommandLine` value will be appended
+to the existing `grub.cfg` file.
+
 ## Module type
 
 Options for configuring a kernel module.
@@ -460,6 +475,11 @@ Example:
 SystemConfig:
   Hostname: example-image
 ```
+
+### KernelCommandLine [[KernelCommandLine](#kernelcommandline-type)]
+
+Specifies extra kernel command line options, as well as other configuration values
+relating to the kernel.
 
 ### UpdateBaseImagePackages [bool]
 
