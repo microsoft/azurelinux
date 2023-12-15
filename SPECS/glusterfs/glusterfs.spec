@@ -11,6 +11,9 @@
 # if you wish to compile an rpm with address sanitizer...
 # rpmbuild -ta @PACKAGE_NAME@-@PACKAGE_VERSION@.tar.gz --with asan
 %{?_with_asan:%global _with_asan --enable-asan}
+%if ( 0%{?rhel} && 0%{?rhel} < 7 )
+%global _with_asan %{nil}
+%endif
 # cmocka
 # if you wish to compile an rpm with cmocka unit testing...
 # rpmbuild -ta @PACKAGE_NAME@-@PACKAGE_VERSION@.tar.gz --with cmocka
@@ -34,7 +37,7 @@
 # gnfs
 # if you wish to compile an rpm with the legacy gNFS server xlator
 # rpmbuild -ta @PACKAGE_NAME@-@PACKAGE_VERSION@.tar.gz --with gnfs
-%{?_without_gnfs:%global _with_gnfs --disable-gnfs}
+%{?_with_gnfs:%global _with_gnfs --enable-gnfs}
 # ipv6default
 # if you wish to compile an rpm with IPv6 default...
 # rpmbuild -ta @PACKAGE_NAME@-@PACKAGE_VERSION@.tar.gz --with ipv6default
@@ -57,6 +60,11 @@
 %{?_without_tcmalloc:%global _without_tcmalloc --without-tcmalloc}
 %ifnarch x86_64
 %global _without_tcmalloc --without-tcmalloc
+%endif
+# Do not use libtirpc on EL6, it does not have xdr_uint64_t() and xdr_uint32_t
+# Do not use libtirpc on EL7, it does not have xdr_sizeof()
+%if ( 0%{?rhel} && 0%{?rhel} <= 7 )
+%global _without_libtirpc --without-libtirpc
 %endif
 # ocf
 # if you wish to compile an rpm without the OCF resource agents...
@@ -85,6 +93,9 @@
 # if you wish to compile an rpm with thread sanitizer...
 # rpmbuild -ta @PACKAGE_NAME@-@PACKAGE_VERSION@.tar.gz --with tsan
 %{?_with_tsan:%global _with_tsan --enable-tsan}
+%if ( 0%{?rhel} && 0%{?rhel} < 7 )
+%global _with_tsan %{nil}
+%endif
 # valgrind
 # if you wish to compile an rpm to run all processes under valgrind...
 # rpmbuild -ta @PACKAGE_NAME@-@PACKAGE_VERSION@.tar.gz --with valgrind
@@ -97,26 +108,44 @@
 %if ( 0%{?rhel} && 0%{?rhel} >= 8 )
 %global selinuxbooleans rsync_full_access=1 rsync_client=1
 %endif
+%if ( 0%{?fedora} ) || ( 0%{?rhel} && 0%{?rhel} > 6 )
+%global _with_systemd true
+%endif
+%if ( 0%{?fedora} ) || ( 0%{?rhel} && 0%{?rhel} >= 7 )
 %global _with_firewalld --enable-firewalld
-%if ( 0%{?_tmpfilesdir:1} )
+%endif
+%if 0%{?_tmpfilesdir:1}
 %global _with_tmpfilesdir --with-tmpfilesdir=%{_tmpfilesdir}
 %else
 %global _with_tmpfilesdir --without-tmpfilesdir
 %endif
 # without server should also disable some server-only components
-%if ( 0%{?_without_server:1} )
+%if 0%{?_without_server:1}
 %global _without_events --disable-events
 %global _without_georeplication --disable-georeplication
 %global _without_linux_io_uring --disable-linux-io_uring
 %global _with_gnfs %{nil}
 %global _without_ocf --without-ocf
 %endif
+%if ( 0%{?fedora} ) || ( 0%{?rhel} && 0%{?rhel} > 7 )
+%global _usepython3 1
 %global _pythonver 3
-%global service_start()   /bin/systemctl --quiet start %{1}.service || : \
+%else
+%global _usepython3 0
+%global _pythonver 2
+%endif
+# From https://fedoraproject.org/wiki/Packaging:Python#Macros
+%if ( 0%{?rhel} && 0%{?rhel} <= 6 )
+%{!?python2_sitelib: %global python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
+%{!?python2_sitearch: %global python2_sitearch %(python2 -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(1))")}
+%global _rundir %{_localstatedir}/run
+%endif
+%if ( 0%{?_with_systemd:1} )
+%global service_start()   /bin/systemctl --quiet start %1.service || : \
 %{nil}
-%global service_stop()    /bin/systemctl --quiet stop %{1}.service || :\
+%global service_stop()    /bin/systemctl --quiet stop %1.service || :\
 %{nil}
-%global service_install() install -D -p -m 0644 %{_sourcedir}/%{1}.service %{buildroot}%{2} \
+%global service_install() install -D -p -m 0644 %1.service %{buildroot}%2 \
 %{nil}
 # can't seem to make a generic macro that works
 %global glusterd_svcfile   %{_unitdir}/glusterd.service
@@ -124,10 +153,40 @@
 %global glusterta_svcfile %{_unitdir}/gluster-ta-volume.service
 %global glustereventsd_svcfile %{_unitdir}/glustereventsd.service
 %global glusterfssharedstorage_svcfile %{_unitdir}/glusterfssharedstorage.service
+%else
+%global systemd_post()  /sbin/chkconfig --add %1 >/dev/null 2>&1 || : \
+%{nil}
+%global systemd_preun() /sbin/chkconfig --del %1 >/dev/null 2>&1 || : \
+%{nil}
+%global systemd_postun_with_restart() /sbin/service %1 condrestart >/dev/null 2>&1 || : \
+%{nil}
+%global service_start()   /sbin/service %1 start >/dev/null 2>&1 || : \
+%{nil}
+%global service_stop()    /sbin/service %1 stop >/dev/null 2>&1 || : \
+%{nil}
+%global service_install() install -D -p -m 0755 %1.init %{buildroot}%2 \
+%{nil}
+# can't seem to make a generic macro that works
+%global glusterd_svcfile   %{_sysconfdir}/init.d/glusterd
+%global glusterfsd_svcfile %{_sysconfdir}/init.d/glusterfsd
+%global glustereventsd_svcfile %{_sysconfdir}/init.d/glustereventsd
+%endif
 %{!?_pkgdocdir: %global _pkgdocdir %{_docdir}/%{name}-%{version}}
+# We do not want to generate useless provides and requires for xlator
+# .so files to be set for glusterfs packages.
+# Filter all generated:
+#
+# TODO: RHEL5 does not have a convenient solution
+%if ( 0%{?rhel} == 6 )
+# filter_setup exists in RHEL6 only
+%filter_provides_in %{_libdir}/glusterfs/%{version}/
+%global __filter_from_req %{?__filter_from_req} | grep -v -P '^(?!lib).*\.so.*$'
+%filter_setup
+%else
 # modern rpm and current Fedora do not generate requires when the
 # provides are filtered
 %global __provides_exclude_from ^%{_libdir}/glusterfs/%{version}/.*$
+%endif
 %global bashcompdir %(pkg-config --variable=completionsdir bash-completion 2>/dev/null)
 %if "%{bashcompdir}" == ""
 %global bashcompdir ${sysconfdir}/bash_completion.d
