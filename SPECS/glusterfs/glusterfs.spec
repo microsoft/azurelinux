@@ -730,6 +730,29 @@ Much of the code in GlusterFS is in user space and easily manageable.
 
 This package provides the translators needed on any GlusterFS client.
 
+%if ( 0%{!?_without_events:1} )
+%package events
+Summary:          GlusterFS Events
+Requires:         %{name}-server%{?_isa} = %{version}-%{release}
+Requires:         python%{_pythonver} python%{_pythonver}-prettytable
+Requires:         python%{_pythonver}-gluster = %{version}-%{release}
+%if ( 0%{?rhel} && 0%{?rhel} < 8 )
+Requires:         python-requests
+%else
+Requires:         python%{_pythonver}-requests
+%endif
+%if ( 0%{?rhel} && 0%{?rhel} < 7 )
+Requires:         python-argparse
+%endif
+%if ( 0%{?_with_systemd:1} )
+%{?systemd_requires}
+%endif
+
+%description events
+GlusterFS Events
+
+%endif
+
 %prep
 %setup -q -n %{name}-%{version}%{?dev}
 %patch0001 -p1
