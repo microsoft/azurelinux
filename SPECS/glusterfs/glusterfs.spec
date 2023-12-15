@@ -1080,16 +1080,10 @@ exit 0
 %{_mandir}/man8/gluster.8*
 %{bashcompdir}/gluster.bash
 
-%files client-xlators
-%dir %{_libdir}/glusterfs/%{version}%{?dev}/xlator/cluster
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/cluster/*.so
-%dir %{_libdir}/glusterfs/%{version}%{?dev}/xlator/protocol
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/protocol/client.so
-
 %files cloudsync-plugins
 %dir %{_libdir}/glusterfs/%{version}%{?dev}/cloudsync-plugins
-%{_libdir}/glusterfs/%{version}%{?dev}/cloudsync-plugins/cloudsyncs3.so
-%{_libdir}/glusterfs/%{version}%{?dev}/cloudsync-plugins/cloudsynccvlt.so
+     %{_libdir}/glusterfs/%{version}%{?dev}/cloudsync-plugins/cloudsyncs3.so
+     %{_libdir}/glusterfs/%{version}%{?dev}/cloudsync-plugins/cloudsynccvlt.so
 
 %files -n libglusterfs-devel
 %dir %{_includedir}/glusterfs
@@ -1102,7 +1096,6 @@ exit 0
      %{_includedir}/glusterfs/api/*.h
 %{_libdir}/libgfapi.so
 %{_libdir}/pkgconfig/glusterfs-api.pc
-
 
 %files -n libgfchangelog-devel
 %dir %{_includedir}/glusterfs/gfchangelog
@@ -1118,11 +1111,19 @@ exit 0
 %files -n libgfxdr-devel
 %{_libdir}/libgfxdr.so
 
+%files client-xlators
+%dir %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator
+%dir %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/cluster
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/cluster/*.so
+%dir %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/protocol
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/protocol/client.so
+
 %files extra-xlators
-%dir %{_libdir}/glusterfs/%{version}%{?dev}/xlator/features
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/features/quiesce.so
-%dir %{_libdir}/glusterfs/%{version}%{?dev}/xlator/playground
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/playground/template.so
+%dir %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator
+%dir %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/features
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/features/quiesce.so
+%dir %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/playground
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/playground/template.so
 
 %files fuse
 # glusterfs is a symlink to glusterfsd, -server depends on -fuse.
@@ -1130,7 +1131,7 @@ exit 0
 %{_sbindir}/glusterfsd
 %config(noreplace) %{_sysconfdir}/logrotate.d/glusterfs
 %dir %{_libdir}/glusterfs/%{version}%{?dev}/xlator/mount
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/mount/fuse.so
+     %{_libdir}/glusterfs/%{version}%{?dev}/xlator/mount/fuse.so
 /sbin/mount.glusterfs
 %if ( 0%{!?_without_fusermount:1} )
 %{_bindir}/fusermount-glusterfs
@@ -1138,23 +1139,26 @@ exit 0
 
 %if ( 0%{?_with_gnfs:1} && 0%{!?_without_server:1} )
 %files gnfs
-%dir %{_libdir}/glusterfs/%{version}%{?dev}/xlator/nfs
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/nfs/*
+%dir %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator
+%dir %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/nfs
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/nfs/server.so
 %ghost %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/nfs
-%ghost %attr(0600,-,-) %{_sharedstatedir}/glusterd/nfs/nfs-server.vol
+%ghost      %attr(0600,-,-) %{_sharedstatedir}/glusterd/nfs/nfs-server.vol
 %ghost %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/nfs/run
-%ghost %attr(0600,-,-) %{_sharedstatedir}/glusterd/nfs/run/nfs.pid
+%ghost      %attr(0600,-,-) %{_sharedstatedir}/glusterd/nfs/run/nfs.pid
 %endif
 
 %files thin-arbiter
 %dir %{_libdir}/glusterfs/%{version}%{?dev}/xlator
 %dir %{_libdir}/glusterfs/%{version}%{?dev}/xlator/features
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/features/thin-arbiter.so
+     %{_libdir}/glusterfs/%{version}%{?dev}/xlator/features/thin-arbiter.so
 %dir %{_datadir}/glusterfs/scripts
-%{_datadir}/glusterfs/scripts/setup-thin-arbiter.sh
+     %{_datadir}/glusterfs/scripts/setup-thin-arbiter.sh
 %config %{_sysconfdir}/glusterfs/thin-arbiter.vol
 
+%if ( 0%{?_with_systemd:1} )
 %{_unitdir}/gluster-ta-volume.service
+%endif
 
 %if ( 0%{!?_without_georeplication:1} )
 %files geo-replication
@@ -1183,12 +1187,14 @@ exit 0
      %{_libexecdir}/glusterfs/peer_georep-sshkey.py*
 %{_sbindir}/gluster-georep-sshkey
 
-%dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/geo-replication
-%ghost %attr(0644,-,-) %{_sharedstatedir}/glusterd/geo-replication/gsyncd_template.conf
-%dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/gsync-create
-%dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/gsync-create/post
-%attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/gsync-create/post/S56glusterd-geo-rep-create-post.sh
+       %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/geo-replication
+%ghost      %attr(0644,-,-) %{_sharedstatedir}/glusterd/geo-replication/gsyncd_template.conf
+       %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/gsync-create
+       %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/gsync-create/post
+            %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/gsync-create/post/S56glusterd-geo-rep-create-post.sh
 %ghost %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/gsync-create/pre
+
+%endif
 
 %files -n libglusterfs0
 %{_libdir}/libglusterfs.so.*
@@ -1211,15 +1217,9 @@ exit 0
 # introducing glusterfs module in site packages.
 # so that all other gluster submodules can reside in the same namespace.
 %dir %{python3_sitelib}/gluster
-%{python3_sitelib}/gluster/__init__.*
-%{python3_sitelib}/gluster/__pycache__
-%{python3_sitelib}/gluster/cliutils
-
-%if ( 0%{!?_without_rdma:1} )
-%files rdma
-%dir %{_libdir}/glusterfs/%{version}%{?dev}/rpc-transport
-%{_libdir}/glusterfs/%{version}%{?dev}/rpc-transport/rdma*
-%endif
+     %{python3_sitelib}/gluster/__init__.*
+     %{python3_sitelib}/gluster/__pycache__
+     %{python3_sitelib}/gluster/cliutils
 
 %files regression-tests
 %dir %{_datadir}/glusterfs
@@ -1278,28 +1278,30 @@ exit 0
 # Manpages
 %{_mandir}/man8/gluster-setgfid2path.8*
 
-%dir %{_libdir}/glusterfs/%{version}%{?dev}/xlator/features
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/features/arbiter.so
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/features/bit-rot.so
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/features/bitrot-stub.so
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/features/sdfs.so
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/features/index.so
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/features/locks.so
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/features/posix*
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/features/snapview-server.so
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/features/marker.so
-%{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/features/simple-quota.so
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/features/quota*
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/features/selinux.so
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/features/trash.so
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/features/upcall.so
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/features/leases.so
-%dir %{_libdir}/glusterfs/%{version}%{?dev}/xlator/mgmt
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/mgmt/glusterd.so
-%dir %{_libdir}/glusterfs/%{version}%{?dev}/xlator/protocol
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/protocol/server.so
-%dir %{_libdir}/glusterfs/%{version}%{?dev}/xlator/storage
-%{_libdir}/glusterfs/%{version}%{?dev}/xlator/storage/posix.so
+# xlators
+%dir %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator
+%dir %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/features
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/features/arbiter.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/features/bit-rot.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/features/bitrot-stub.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/features/sdfs.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/features/index.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/features/locks.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/features/posix*
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/features/snapview-server.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/features/marker.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/features/simple-quota.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/features/quota*
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/features/selinux.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/features/trash.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/features/upcall.so
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/features/leases.so
+%dir %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/mgmt
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/mgmt/glusterd.so
+%dir %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/protocol
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/protocol/server.so
+%dir %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/storage
+     %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/storage/posix.so
 
 # snap_scheduler
 %{_sbindir}/snap_scheduler.py
@@ -1307,63 +1309,63 @@ exit 0
 %{_sbindir}/conf.py
 
 # /var/lib/glusterd, e.g. hookscripts, etc.
-%ghost %attr(0644,-,-) %config(noreplace) %{_sharedstatedir}/glusterd/glusterd.info
-%dir %attr(0755,-,-) %{_sharedstatedir}/glusterd
+%ghost      %attr(0644,-,-) %config(noreplace) %{_sharedstatedir}/glusterd/glusterd.info
+       %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd
 %ghost %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/bitd
-%dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/groups
-%attr(0644,-,-) %{_sharedstatedir}/glusterd/groups/virt
-%attr(0644,-,-) %{_sharedstatedir}/glusterd/groups/metadata-cache
-%attr(0644,-,-) %{_sharedstatedir}/glusterd/groups/gluster-block
-%attr(0644,-,-) %{_sharedstatedir}/glusterd/groups/nl-cache
-%attr(0644,-,-) %{_sharedstatedir}/glusterd/groups/db-workload
-%attr(0644,-,-) %{_sharedstatedir}/glusterd/groups/distributed-virt
-%attr(0644,-,-) %{_sharedstatedir}/glusterd/groups/samba
-%dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/glusterfind
-%dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/glusterfind/.keys
+       %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/groups
+            %attr(0644,-,-) %{_sharedstatedir}/glusterd/groups/virt
+            %attr(0644,-,-) %{_sharedstatedir}/glusterd/groups/metadata-cache
+            %attr(0644,-,-) %{_sharedstatedir}/glusterd/groups/gluster-block
+            %attr(0644,-,-) %{_sharedstatedir}/glusterd/groups/nl-cache
+            %attr(0644,-,-) %{_sharedstatedir}/glusterd/groups/db-workload
+            %attr(0644,-,-) %{_sharedstatedir}/glusterd/groups/distributed-virt
+            %attr(0644,-,-) %{_sharedstatedir}/glusterd/groups/samba
+       %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/glusterfind
+       %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/glusterfind/.keys
 %ghost %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/glustershd
-%dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks
-%dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1
-%dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/add-brick
-%dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/add-brick/post
-%attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/add-brick/post/disabled-quota-root-xattr-heal.sh
-%attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/add-brick/post/S10selinux-label-brick.sh
-%attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/add-brick/post/S13create-subdir-mounts.sh
-%dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/add-brick/pre
-%attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/add-brick/pre/S28Quota-enable-root-xattr-heal.sh
-%dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/create
-%dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/create/post
-%attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/create/post/S10selinux-label-brick.sh
+       %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks
+       %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1
+       %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/add-brick
+       %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/add-brick/post
+            %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/add-brick/post/disabled-quota-root-xattr-heal.sh
+            %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/add-brick/post/S10selinux-label-brick.sh
+            %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/add-brick/post/S13create-subdir-mounts.sh
+       %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/add-brick/pre
+            %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/add-brick/pre/S28Quota-enable-root-xattr-heal.sh
+       %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/create
+       %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/create/post
+            %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/create/post/S10selinux-label-brick.sh
 %ghost %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/create/pre
 %ghost %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/copy-file
 %ghost %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/copy-file/post
 %ghost %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/copy-file/pre
-%dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/delete
-%dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/delete/post
-%{_sharedstatedir}/glusterd/hooks/1/delete/post/S57glusterfind-delete-post
-%dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/delete/pre
-%attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/delete/pre/S10selinux-del-fcontext.sh
+       %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/delete
+       %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/delete/post
+                            %{_sharedstatedir}/glusterd/hooks/1/delete/post/S57glusterfind-delete-post
+       %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/delete/pre
+            %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/delete/pre/S10selinux-del-fcontext.sh
 %ghost %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/remove-brick
 %ghost %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/remove-brick/post
 %ghost %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/remove-brick/pre
-%dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/reset
-%dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/reset/post
+       %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/reset
+       %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/reset/post
 %ghost %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/reset/pre
-%dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/set
-%dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/set/post
-%attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/set/post/S30samba-set.sh
-%attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/set/post/S32gluster_enable_shared_storage.sh
+       %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/set
+       %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/set/post
+            %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/set/post/S30samba-set.sh
+            %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/set/post/S32gluster_enable_shared_storage.sh
 %ghost %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/set/pre
-%dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/start
-%dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/start/post
-%attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/start/post/S29CTDBsetup.sh
-%attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/start/post/S30samba-start.sh
+       %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/start
+       %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/start/post
+            %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/start/post/S29CTDBsetup.sh
+            %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/start/post/S30samba-start.sh
 %ghost %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/start/pre
-%dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/stop
+       %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/stop
 %ghost %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/stop/post
-%dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/stop/pre
-%attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/stop/pre/S30samba-stop.sh
-%attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/stop/pre/S29CTDB-teardown.sh
-%config(noreplace) %ghost %attr(0600,-,-) %{_sharedstatedir}/glusterd/options
+       %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/stop/pre
+            %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/stop/pre/S30samba-stop.sh
+            %attr(0755,-,-) %{_sharedstatedir}/glusterd/hooks/1/stop/pre/S29CTDB-teardown.sh
+%config(noreplace) %ghost      %attr(0600,-,-) %{_sharedstatedir}/glusterd/options
 %ghost %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/peers
 %ghost %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/quotad
 %ghost %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/scrub
@@ -1372,23 +1374,21 @@ exit 0
 %ghost %dir %attr(0755,-,-) %{_sharedstatedir}/glusterd/vols
 
 # Extra utility script
-%dir %{_datadir}/glusterfs
+%dir %{_libexecdir}/glusterfs
 %dir %{_datadir}/glusterfs/scripts
-%{_datadir}/glusterfs/scripts/stop-all-gluster-processes.sh
-%{_libexecdir}/glusterfs/mount-shared-storage.sh
-%{_datadir}/glusterfs/scripts/control-cpu-load.sh
-%{_datadir}/glusterfs/scripts/control-mem.sh
+     %{_datadir}/glusterfs/scripts/stop-all-gluster-processes.sh
+     %{_libexecdir}/glusterfs/mount-shared-storage.sh
+     %{_datadir}/glusterfs/scripts/control-cpu-load.sh
+     %{_datadir}/glusterfs/scripts/control-mem.sh
 
 # Incrementalapi
-%dir %{_libexecdir}/glusterfs
-%{_libexecdir}/glusterfs/glusterfind
-%{_libexecdir}/glusterfs/peer_add_secret_pub
+     %{_libexecdir}/glusterfs/glusterfind
 %{_bindir}/glusterfind
+     %{_libexecdir}/glusterfs/peer_add_secret_pub
 
 %if ( 0%{?_with_firewalld:1} )
-%{_libdir}/firewalld/services/glusterfs.xml
+%{_prefix}/lib/firewalld/services/glusterfs.xml
 %endif
-
 # end of server files
 %endif
 
@@ -1399,13 +1399,16 @@ exit 0
 %dir %{_sharedstatedir}/glusterd
 %dir %{_sharedstatedir}/glusterd/events
 %dir %{_libexecdir}/glusterfs
-%dir %{_libexecdir}/glusterfs/gfevents
-%{_libexecdir}/glusterfs/gfevents/*
-%{_libexecdir}/glusterfs/peer_eventsapi.py*
+     %{_libexecdir}/glusterfs/gfevents
+     %{_libexecdir}/glusterfs/peer_eventsapi.py*
 %{_sbindir}/glustereventsd
 %{_sbindir}/gluster-eventsapi
 %{_datadir}/glusterfs/scripts/eventsdash.py*
+%if ( 0%{?_with_systemd:1} )
 %{_unitdir}/glustereventsd.service
+%else
+%{_sysconfdir}/init.d/glustereventsd
+%endif
 %endif
 
 %changelog
