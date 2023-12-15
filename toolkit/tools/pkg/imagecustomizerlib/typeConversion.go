@@ -161,3 +161,11 @@ func mountIdentifierTypeToImager(mountIdentifierType imagecustomizerapi.MountIde
 		return "", fmt.Errorf("unknwon MountIdentifierType value (%s)", mountIdentifierType)
 	}
 }
+
+func kernelCommandLineToImager(kernelCommandLine imagecustomizerapi.KernelCommandLine,
+) (configuration.KernelCommandLine, error) {
+	imagerKernelCommandLine := configuration.KernelCommandLine{
+		ExtraCommandLine: kernelCommandLine.ExtraCommandLine,
+	}
+	return imagerKernelCommandLine, nil
+}

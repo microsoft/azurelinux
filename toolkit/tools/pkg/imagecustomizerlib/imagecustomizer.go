@@ -138,9 +138,16 @@ func toQemuImageFormat(imageFormat string) (string, error) {
 func validateConfig(baseConfigPath string, config *imagecustomizerapi.Config, rpmsSources []string,
 	useBaseImageRpmRepos bool,
 ) error {
+	// Note: This IsValid() check does duplicate the one in UnmarshalYamlFile().
+	// But it is useful for functions that call CustomizeImage() directly. For example, test code.
+	err := config.IsValid()
+	if err != nil {
+		return err
+	}
+
 	partitionsCustomized := hasPartitionCustomizations(config)
 
-	err := validateSystemConfig(baseConfigPath, &config.SystemConfig, rpmsSources, useBaseImageRpmRepos,
+	err = validateSystemConfig(baseConfigPath, &config.SystemConfig, rpmsSources, useBaseImageRpmRepos,
 		partitionsCustomized)
 	if err != nil {
 		return err
