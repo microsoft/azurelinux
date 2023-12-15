@@ -83,6 +83,12 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
+	err = handleKernelCommandLine(config.SystemConfig.KernelCommandLine.ExtraCommandLine, imageChroot,
+		partitionsCustomized)
+	if err != nil {
+		return fmt.Errorf("failed to add extra kernel command line: %w", err)
+	}
+
 	err = runScripts(baseConfigPath, config.SystemConfig.FinalizeImageScripts, imageChroot)
 	if err != nil {
 		return err
