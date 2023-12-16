@@ -1,7 +1,7 @@
 Summary:        Lossless compression algorithm
 Name:           brotli
-Version:        1.0.9
-Release:        2%{?dist}
+Version:        1.1.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -66,9 +66,6 @@ python3 setup.py build
 cd build
 %make_install
 
-# I couldn't find the option to not build the static libraries
-rm "%{buildroot}%{_libdir}/"*.a
-
 cd ..
 python3 setup.py install --skip-build --prefix=%{_prefix} --root=%{buildroot}
 install -dm755 "%{buildroot}%{_mandir}/man3"
@@ -116,6 +113,9 @@ make clean
 %{_mandir}/man3/constants.h.3brotli*
 
 %changelog
+* Wed Dec 13 2023 Andrew Phelps <anphel@microsoft.com> - 1.1.0-1
+- Upgrade to version 1.1.0
+
 * Fri Feb 02 2022 Muhammad Falak <mwani@microsoft.com> - 1.0.9-2
 - Use `make test` instead of `ctest` to fix ptests
 

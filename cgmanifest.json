@@ -1157,8 +1157,8 @@
         "type": "other",
         "other": {
           "name": "bmake",
-          "version": "20211221",
-          "downloadUrl": "https://ftp.netbsd.org/pub/NetBSD/misc/sjg//bmake-20211221.tar.gz"
+          "version": "20230723",
+          "downloadUrl": "https://ftp.netbsd.org/pub/NetBSD/misc/sjg//bmake-20230723.tar.gz"
         }
       }
     },
@@ -1267,8 +1267,8 @@
         "type": "other",
         "other": {
           "name": "brotli",
-          "version": "1.0.9",
-          "downloadUrl": "https://github.com/google/brotli/archive/refs/tags/v1.0.9.tar.gz"
+          "version": "1.1.0",
+          "downloadUrl": "https://github.com/google/brotli/archive/refs/tags/v1.1.0.tar.gz"
         }
       }
     },
@@ -10981,8 +10981,8 @@
         "type": "other",
         "other": {
           "name": "libsoup",
-          "version": "3.0.4",
-          "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/libsoup/3.0/libsoup-3.0.4.tar.xz"
+          "version": "3.4.4",
+          "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/libsoup/3.4/libsoup-3.4.4.tar.xz"
         }
       }
     },
@@ -25435,8 +25435,8 @@
         "type": "other",
         "other": {
           "name": "rocksdb",
-          "version": "6.26.0",
-          "downloadUrl": "https://github.com/facebook/rocksdb/archive/v6.26.0.tar.gz"
+          "version": "8.9.1",
+          "downloadUrl": "https://github.com/facebook/rocksdb/archive/v8.9.1.tar.gz"
         }
       }
     },
@@ -28197,8 +28197,8 @@
         "type": "other",
         "other": {
           "name": "systemtap",
-          "version": "4.9",
-          "downloadUrl": "https://sourceware.org/systemtap/ftp/releases/systemtap-4.9.tar.gz"
+          "version": "5.0",
+          "downloadUrl": "https://sourceware.org/systemtap/ftp/releases/systemtap-5.0.tar.gz"
         }
       }
     },
