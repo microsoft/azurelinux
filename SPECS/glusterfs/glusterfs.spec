@@ -136,6 +136,7 @@
 %global _usepython3 0
 %global _pythonver 2
 %endif
+%global _pythonver 3
 # From https://fedoraproject.org/wiki/Packaging:Python#Macros
 %if ( 0%{?rhel} && 0%{?rhel} <= 6 )
 %{!?python2_sitelib: %global python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
