@@ -27366,8 +27366,8 @@
         "type": "other",
         "other": {
           "name": "setools",
-          "version": "4.4.0",
-          "downloadUrl": "https://github.com/SELinuxProject/setools/releases/download/4.4.0/setools-4.4.0.tar.bz2"
+          "version": "4.4.4",
+          "downloadUrl": "https://github.com/SELinuxProject/setools/releases/download/4.4.4/setools-4.4.4.tar.bz2"
         }
       }
     },
