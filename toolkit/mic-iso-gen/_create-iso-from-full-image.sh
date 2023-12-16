@@ -385,7 +385,7 @@ if [[ ! -z $BUILD_CLEAN ]]; then
     #     $FEDORA_LIVE_ISO_SQUASHFS_FILE_1
 
     # -------------------------------------------
-    # Cfg3
+    # Cfg3, Cfg4
     #
     # Create the following:
     #
@@ -468,19 +468,19 @@ CREATE_INITRD_OUT_DIR=$BUILD_WORKING_DIR/create-initrd-from-folder-out-dir
 # TARGET_ROOTFS_FILE="/artifacts/rootfs.img"
 
 # -----------------------------------------------
-# Cfg 1
+# Cfg1
 #
 # SOURCE_ROOTFS_FILE=$FEDORA_LIVE_ISO_WRAPPER_RAW_FILE_0
 # TARGET_ROOTFS_FILE="/artifacts/wrapper.img"
 
 # -----------------------------------------------
-# Cfg 2
+# Cfg2
 #
 # SOURCE_ROOTFS_FILE=$FEDORA_LIVE_ISO_SQUASHFS_FILE_1
 # TARGET_ROOTFS_FILE="/artifacts/squashfs.img"
 
 # -----------------------------------------------
-# Cfg 3
+# Cfg3, Cfg4
 #
 SOURCE_ROOTFS_FILE=$FEDORA_LIVE_ISO_WRAPPER_RAW_FILE_0
 TARGET_ROOTFS_FILE="/artifacts/wrapper.img"

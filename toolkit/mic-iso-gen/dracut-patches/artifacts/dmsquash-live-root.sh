@@ -123,6 +123,8 @@ do_live_overlay() {
     # overlay: if non-ram overlay searching is desired, do it,
     #              otherwise, create traditional overlay in ram
 
+    echo "---- do_live_overlay() ---- 0 ----" > /dev/kmsg
+
     l=$(blkid -s LABEL -o value "$livedev") || l=""
     u=$(blkid -s UUID -o value "$livedev") || u=""
 
@@ -133,6 +135,8 @@ do_live_overlay() {
         pathspec=${overlay##*:}
     fi
 
+    echo "---- do_live_overlay() ---- 1 ----pathspec=$pathspec" > /dev/kmsg
+
     if [ -z "$pathspec" -o "$pathspec" = "auto" ]; then
         pathspec="/${live_dir}/overlay-$l-$u"
     fi
@@ -140,11 +144,17 @@ do_live_overlay() {
 
     # need to know where to look for the overlay
     if [ -z "$setup" -a -n "$devspec" -a -n "$pathspec" -a -n "$overlay" ]; then
+
+        echo "---- do_live_overlay() ---- 1.1 ---- mkdir -m 0755 -p /run/initramfs/overlayfs" > /dev/kmsg
+
         mkdir -m 0755 -p /run/initramfs/overlayfs
         opt=''
         [ -n "$readonly_overlay" ] && opt=-r
         mount -n -t auto "$devspec" /run/initramfs/overlayfs || :
         if [ -f /run/initramfs/overlayfs$pathspec -a -w /run/initramfs/overlayfs$pathspec ]; then
+
+            echo "---- do_live_overlay() ---- 1.1.1 ---- losetup -f --show $opt /run/initramfs/overlayfs$pathspec" > /dev/kmsg
+
             OVERLAY_LOOPDEV=$(losetup -f --show $opt /run/initramfs/overlayfs$pathspec)
             over=$OVERLAY_LOOPDEV
             umount -l /run/initramfs/overlayfs || :
@@ -174,6 +184,9 @@ do_live_overlay() {
             fi
         elif [ -d /run/initramfs/overlayfs$pathspec ] \
             && [ -d /run/initramfs/overlayfs$pathspec/../ovlwork ]; then
+
+            echo "---- do_live_overlay() ---- 1.1.2 ----" > /dev/kmsg
+
             ln -s /run/initramfs/overlayfs$pathspec /run/overlayfs$opt
             ln -s /run/initramfs/overlayfs$pathspec/../ovlwork /run/ovlwork$opt
             if [ -z "$overlayfs" ] && [ -n "$DRACUT_SYSTEMD" ]; then
@@ -182,7 +195,11 @@ do_live_overlay() {
             overlayfs="required"
             setup="yes"
         fi
+        echo "---- do_live_overlay() ---- 1.2 ----" > /dev/kmsg
     fi
+
+    echo "---- do_live_overlay() ---- 2 ----" > /dev/kmsg
+
     if [ -n "$overlayfs" ]; then
         if ! modprobe overlay; then
             if [ "$overlayfs" = required ]; then
@@ -196,7 +213,11 @@ do_live_overlay() {
         fi
     fi
 
+    echo "---- do_live_overlay() ---- 3 ----" > /dev/kmsg
+
     if [ -z "$setup" -o -n "$readonly_overlay" ]; then
+        echo "---- do_live_overlay() ---- 3.1 ----" > /dev/kmsg
+
         if [ -n "$setup" ]; then
             warn "Using temporary overlay."
         elif [ -n "$devspec" -a -n "$pathspec" ]; then
@@ -223,25 +244,39 @@ do_live_overlay() {
                 read -s -r -p $'\n\n'"${m}" -n 1 _
             fi
         fi
+
+        echo "---- do_live_overlay() ---- 3.2 ----" > /dev/kmsg
+
         if [ -n "$overlayfs" ]; then
+            echo "---- do_live_overlay() ---- 3.2.1.0 ----" > /dev/kmsg
             mkdir -m 0755 -p /run/overlayfs
             mkdir -m 0755 -p /run/ovlwork
             if [ -n "$readonly_overlay" ] && ! [ -h /run/overlayfs-r ]; then
+                echo "---- do_live_overlay() ---- 3.2.1.0.1 ----" > /dev/kmsg
                 info "No persistent overlay found."
                 unset -v readonly_overlay
                 [ -n "$DRACUT_SYSTEMD" ] && reloadsysrootmountunit="${reloadsysrootmountunit}:>/xor_readonly;"
             fi
+            echo "---- do_live_overlay() ---- 3.2.1.1 ----" > /dev/kmsg
         else
+            echo "---- do_live_overlay() ---- 3.2.2.0 ----" > /dev/kmsg
             dd if=/dev/null of=/overlay bs=1024 count=1 seek=$((overlay_size * 1024)) 2> /dev/null
             if [ -n "$setup" -a -n "$readonly_overlay" ]; then
+                echo "---- do_live_overlay() ---- 3.2.2.1 ----" > /dev/kmsg
                 RO_OVERLAY_LOOPDEV=$(losetup -f --show /overlay)
                 over=$RO_OVERLAY_LOOPDEV
             else
+                echo "---- do_live_overlay() ---- 3.2.2.2 ----" > /dev/kmsg
                 OVERLAY_LOOPDEV=$(losetup -f --show /overlay)
                 over=$OVERLAY_LOOPDEV
             fi
         fi
+
+        echo "---- do_live_overlay() ---- 3.3 ----" > /dev/kmsg
+
     fi
+
+    echo "---- do_live_overlay() ---- 4 ----" > /dev/kmsg
 
     # set up the snapshot
     if [ -z "$overlayfs" ]; then
@@ -253,7 +288,10 @@ do_live_overlay() {
         fi
     fi
 
+    echo "---- do_live_overlay() ---- 5 ---- creating a snapshot" > /dev/kmsg
+
     if [ -n "$thin_snapshot" ]; then
+        echo "---- do_live_overlay() ---- 5.1 ---- thin snapshot overlay" > /dev/kmsg
         modprobe dm_thin_pool
         mkdir -m 0755 -p /run/initramfs/thin-overlay
 
@@ -275,14 +313,25 @@ do_live_overlay() {
         # Create a snapshot of the base image
         echo 0 "$sz" thin /dev/mapper/live-overlay-pool 0 "$base" | dmsetup create live-rw
     elif [ -z "$overlayfs" ]; then
+        echo "---- do_live_overlay() ---- 5.2 ---- dmsetup create live-rw with overlay" > /dev/kmsg
+        echo "sz=$sz" > /dev/kmsg
+        echo "base=$base" > /dev/kmsg
+        echo "over=$over" > /dev/kmsg
         echo 0 "$sz" snapshot "$base" "$over" PO 8 | dmsetup create live-rw
+
     fi
+
+    echo "---- do_live_overlay() ---- 6 ----" > /dev/kmsg
 
     # Create a device for the ro base of overlayed file systems.
     if [ -z "$overlayfs" ]; then
+        echo "---- do_live_overlay() ---- 6.1 ----" > /dev/kmsg
         echo 0 "$sz" linear "$BASE_LOOPDEV" 0 | dmsetup create --readonly live-base
     fi
     ln -s "$BASE_LOOPDEV" /dev/live-base
+
+    echo "---- do_live_overlay() ---- 7 ----" > /dev/kmsg
+    sleep 10s
 }
 # end do_live_overlay()
 
@@ -441,13 +490,6 @@ if [ -n "$FSIMG" ]; then
         sleep 1s
         sz=$(blockdev --getsz "$BASE_LOOPDEV")
         echo "---- dmsquash-live-root.sh ---- 13.3.2.4 ---- sz=$sz" > /dev/kmsg
-        # hack
-        # mkdir -p /mnt/hack
-        # mount $BASE_LOOPDEV /mnt/hack
-        # ls -la /mnt/hack > /dev/kmsg
-        # rm /mnt/hack/etc/fstab
-        # umount /mnt/hack
-        # rm /mnt/hack
     fi
 
     echo "---- dmsquash-live-root.sh ---- 13.4 ----" > /dev/kmsg
@@ -476,28 +518,38 @@ sleep 1s
 ROOTFLAGS="$(getarg rootflags)"
 
 if [ -n "$overlayfs" ]; then
+    echo "---- dmsquash-live-root.sh ---- 15.1.0 ----" > /dev/kmsg
+
     mkdir -m 0755 -p /run/rootfsbase
     if [ -n "$reset_overlay" ] && [ -h /run/overlayfs ]; then
         ovlfs=$(readlink /run/overlayfs)
         info "Resetting the OverlayFS overlay directory."
         rm -r -- "${ovlfs:?}"/* "${ovlfs:?}"/.* > /dev/null 2>&1
     fi
+
+    echo "---- dmsquash-live-root.sh ---- 15.1.1 ----" > /dev/kmsg
+
     if [ -n "$readonly_overlay" ] && [ -h /run/overlayfs-r ]; then
         ovlfs=lowerdir=/run/overlayfs-r:/run/rootfsbase
     else
         ovlfs=lowerdir=/run/rootfsbase
     fi
+
+    echo "---- dmsquash-live-root.sh ---- 15.1.2 ----" > /dev/kmsg
+
     mount -r $FSIMG /run/rootfsbase
     if [ -z "$DRACUT_SYSTEMD" ]; then
         printf 'mount -t overlay LiveOS_rootfs -o%s,%s %s\n' "$ROOTFLAGS" \
             "$ovlfs",upperdir=/run/overlayfs,workdir=/run/ovlwork \
             "$NEWROOT" > "$hookdir"/mount/01-$$-live.sh
     fi
+    echo "---- dmsquash-live-root.sh ---- 15.1.3 ----" > /dev/kmsg
 else
-    # if [ -z "$DRACUT_SYSTEMD" ]; then
+    echo "---- dmsquash-live-root.sh ---- 15.2.0 ----" > /dev/kmsg
+    if [ -z "$DRACUT_SYSTEMD" ]; then
         [ -n "$ROOTFLAGS" ] && ROOTFLAGS="-o $ROOTFLAGS"
         printf 'mount %s /dev/mapper/live-rw %s\n' "$ROOTFLAGS" "$NEWROOT" > "$hookdir"/mount/01-$$-live.sh
-    # fi
+    fi
 fi
 
 echo "---- dmsquash-live-root.sh ---- 16 ----" > /dev/kmsg
@@ -506,12 +558,12 @@ sleep 1s
 [ -e "$SQUASHED" ] && umount -l /run/initramfs/squashfs
 
 echo "---- dmsquash-live-root.sh ---- 17 ----" > /dev/kmsg
-sleep 20s
+sleep 3s
 
 ln -s null /dev/root
 
 echo "---- dmsquash-live-root.sh ---- 18 ----" > /dev/kmsg
-sleep 20s
+sleep 3s
 
 need_shutdown
 
