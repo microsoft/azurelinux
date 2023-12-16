@@ -10,7 +10,7 @@
 Summary:        Domain Name System software
 Name:           bind
 Version:        9.16.44
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -384,22 +384,26 @@ popd
 rm -f %{buildroot}%{_prefix}%{_sysconfdir}/bind.keys
 
 %pre
-if ! getent group named >/dev/null; then
-    groupadd -r named
-fi
-if ! getent passwd named >/dev/null; then
-    useradd -g named -d %{_sharedstatedir}/bind\
-        -s /bin/false -M -r named
+if [ $1 -eq 1 ]; then
+  if ! getent group named >/dev/null; then
+      groupadd -r named
+  fi
+  if ! getent passwd named >/dev/null; then
+      useradd -g named -d %{_sharedstatedir}/bind\
+          -s /bin/false -M -r named
+  fi
 fi
 
 %post -p /sbin/ldconfig
 %postun
 /sbin/ldconfig
-if getent passwd named >/dev/null; then
-    userdel named
-fi
-if getent group named >/dev/null; then
-    groupdel named
+if [ $1 -eq 0 ]; then
+  if getent passwd named >/dev/null; then
+      userdel named
+  fi
+  if getent group named >/dev/null; then
+      groupdel named
+  fi
 fi
 
 # Fix permissions on existing device files on upgrade
@@ -613,6 +617,9 @@ fi;
 %{_mandir}/man8/named-nzd2nzf.8*
 
 %changelog
+* Thu Dec 14 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 9.16.44-2
+- Fix resetting of passwd and group on package update
+
 * Wed Sep 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.16.44-1
 - Auto-upgrade to 9.16.44 - Fix CVE-2023-3341
 
