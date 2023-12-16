@@ -9,7 +9,7 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -133,10 +133,8 @@ enforced by the kernel when running with SELinux enabled.
 %{_sharedstatedir}/selinux/%{policy_name}/active/homedir_template
 %{_sharedstatedir}/selinux/%{policy_name}/active/seusers
 %{_sharedstatedir}/selinux/%{policy_name}/active/file_contexts
+%{_sharedstatedir}/selinux/%{policy_name}/active/modules_checksum
 %exclude %{_sharedstatedir}/selinux/%{policy_name}/active/policy.kern
-%exclude %{_sharedstatedir}/selinux/%{policy_name}/active/policy.linked
-%exclude %{_sharedstatedir}/selinux/%{policy_name}/active/seusers.linked
-%exclude %{_sharedstatedir}/selinux/%{policy_name}/active/users_extra.linked
 %verify(not md5 size mtime) %{_sharedstatedir}/selinux/%{policy_name}/active/file_contexts.homedirs
 %{_sharedstatedir}/selinux/%{policy_name}/active/modules/100/base
 
@@ -345,6 +343,10 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
+* Fri Dec 15 2023 Aditya Dubey <adityadubey@microsoft.com> - 2.20221101-6
+- Adding modules_checksum file
+- removed exclude for policy.linked, seusers.linked, and users_extra.linked files
+
 * Tue Oct 17 2023 Chris PeBenito <chpebeni@microsoft.com> - 2.20221101-5
 - Silence noise in containerd io.containerd.internal.v1.opt plugin.
 
