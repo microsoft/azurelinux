@@ -197,6 +197,10 @@
 %if "%{bashcompdir}" == ""
 %global bashcompdir ${sysconfdir}/bash_completion.d
 %endif
+# Skip regression-tests because they previously were excluded in
+# CBL-Mariner glusterfs and the new version introduces a dependency
+# (dbench)
+%global _without_regression_tests true
 ##-----------------------------------------------------------------------------
 ## All package definitions should be placed here and keep them sorted
 ##
@@ -640,24 +644,23 @@ Much of the code in GlusterFS is in user space and easily manageable.
 This package contains the python modules of GlusterFS and own gluster
 namespace.
 
-# Comment regression-tests out because they previously were excluded in
-# CBL-Mariner glusterfs and the new version introduces a dependency
-# (dbench)
-#%package regression-tests
-#Summary:          Development Tools
-#Requires:         %{name}%{?_isa} = %{version}-%{release}
-#Requires:         %{name}-fuse%{?_isa} = %{version}-%{release}
-#Requires:         %{name}-server%{?_isa} = %{version}-%{release}
-### thin provisioning support
-#Requires:         lvm2 >= 2.02.89
-#Requires:         perl(App::Prove) perl(Test::Harness) gcc util-linux-ng
-#Requires:         python%{_pythonver}
-#Requires:         attr dbench file git libacl-devel net-tools
-#Requires:         nfs-utils xfsprogs yajl psmisc bc
-#
-#%description regression-tests
-#The Gluster Test Framework, is a suite of scripts used for
-#regression testing of Gluster.
+%if ( 0%{!?_without_regression_tests:1} )
+%package regression-tests
+Summary:          Development Tools
+Requires:         %{name}%{?_isa} = %{version}-%{release}
+Requires:         %{name}-fuse%{?_isa} = %{version}-%{release}
+Requires:         %{name}-server%{?_isa} = %{version}-%{release}
+## thin provisioning support
+Requires:         lvm2 >= 2.02.89
+Requires:         perl(App::Prove) perl(Test::Harness) gcc util-linux-ng
+Requires:         python%{_pythonver}
+Requires:         attr dbench file git libacl-devel net-tools
+Requires:         nfs-utils xfsprogs yajl psmisc bc
+
+%description regression-tests
+The Gluster Test Framework, is a suite of scripts used for
+regression testing of Gluster.
+%endif
 
 %if ( 0%{!?_without_ocf:1} )
 %package resource-agents
@@ -1375,14 +1378,16 @@ exit 0
      %{python3_sitelib}/gluster/__pycache__
      %{python3_sitelib}/gluster/cliutils
 
-# Comment regression-tests out because they previously were excluded in
-# CBL-Mariner glusterfs and the new version introduces a dependency
-# (dbench)
-#%files regression-tests
-#%dir %{_datadir}/glusterfs
-#     %{_datadir}/glusterfs/run-tests.sh
-#     %{_datadir}/glusterfs/tests
-#%exclude %{_datadir}/glusterfs/tests/vagrant
+%if ( 0%{!?_without_regression_tests:1} )
+%files regression-tests
+%dir %{_datadir}/glusterfs
+     %{_datadir}/glusterfs/run-tests.sh
+     %{_datadir}/glusterfs/tests
+%exclude %{_datadir}/glusterfs/tests/vagrant
+%else
+%exclude %{_datadir}/glusterfs/run-tests.sh
+%exclude %{_datadir}/glusterfs/tests
+%endif
 
 %if ( 0%{!?_without_server:1} )
 %files ganesha
