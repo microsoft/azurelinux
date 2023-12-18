@@ -1,6 +1,6 @@
 Name:           perl-Test-Needs
-Version:        0.002006
-Release:        6%{?dist}
+Version:        0.002010
+Release:        1%{?dist}
 Summary:        Skip tests when modules not available
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -54,6 +54,9 @@ make test
 %{_mandir}/man3/Test*
 
 %changelog
+* Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.002010-1
+- Auto-upgrade to 0.002010 - Azure Linux 3.0 - package upgrades
+
 * Tue Jul 26 2022 Henry Li <lihl@microsoft.com> - 0.002006-6
 - License Verified
 

@@ -19984,8 +19984,8 @@
         "type": "other",
         "other": {
           "name": "perl-Test-Needs",
-          "version": "0.002006",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/H/HA/HAARG/Test-Needs-0.002006.tar.gz"
+          "version": "0.002010",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/H/HA/HAARG/Test-Needs-0.002010.tar.gz"
         }
       }
     },
