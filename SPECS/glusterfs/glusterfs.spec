@@ -113,6 +113,7 @@
 %if ( 0%{?fedora} ) || ( 0%{?rhel} && 0%{?rhel} > 6 )
 %global _with_systemd true
 %endif
+%global _with_systemd true
 %if ( 0%{?fedora} ) || ( 0%{?rhel} && 0%{?rhel} >= 7 )
 %global _with_firewalld --enable-firewalld
 %endif
