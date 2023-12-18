@@ -1,4 +1,6 @@
-%global runtime_make_vars       DEFSHAREDFS_CLH_SNP_VIRTIOFS=none \\\
+%global runtime_make_vars       DEFMEMSZ=256 \\\
+                                DEFSHAREDFS_CLH_SNP_VIRTIOFS=none \\\
+                                DEFSTATICSANDBOXWORKLOADMEM=1792 \\\
                                 SKIP_GO_VERSION_CHECK=1
 
 %global agent_make_vars         LIBC=gnu \\\
