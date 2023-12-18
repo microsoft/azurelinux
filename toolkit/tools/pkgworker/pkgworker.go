@@ -213,7 +213,7 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 		extraDirs = append(extraDirs, chrootCcacheDir)
 	}
 
-	err = chroot.Initialize(workerTar, extraDirs, mountPoints)
+	err = chroot.Initialize(workerTar, extraDirs, mountPoints, true)
 	if err != nil {
 		return
 	}
