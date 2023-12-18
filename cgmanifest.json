@@ -16904,8 +16904,8 @@
         "type": "other",
         "other": {
           "name": "perl-Devel-CheckLib",
-          "version": "1.14",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Devel/Devel-CheckLib-1.14.tar.gz"
+          "version": "1.16",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Devel/Devel-CheckLib-1.16.tar.gz"
         }
       }
     },
