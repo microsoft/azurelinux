@@ -1,7 +1,7 @@
 Summary:        Perl interface to pseudo tty's
 Name:           perl-IO-Tty
-Version:        1.14
-Release:        4%{?dist}
+Version:        1.18
+Release:        1%{?dist}
 # Mostly licensed same as Perl. IO-Tty-1.14/Tty.xs is licensed under BSD.
 License:        (GPL+ OR Artistic) AND BSD
 Vendor:         Microsoft Corporation
@@ -70,6 +70,9 @@ make test
 %{_mandir}/man3/IO::Tty::Constant.3*
 
 %changelog
+* Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.18-1
+- Auto-upgrade to 1.18 - Azure Linux 3.0 - package upgrades
+
 * Fri Apr 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.14-4
 - Cleaning-up spec. License verified.
 
