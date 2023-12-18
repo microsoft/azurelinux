@@ -20334,8 +20334,8 @@
         "type": "other",
         "other": {
           "name": "perl-TimeDate",
-          "version": "2.32",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/A/AT/ATOOMIC/TimeDate-2.32.tar.gz"
+          "version": "2.33",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/A/AT/ATOOMIC/TimeDate-2.33.tar.gz"
         }
       }
     },
