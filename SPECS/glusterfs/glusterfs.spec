@@ -238,14 +238,10 @@
 # CBL-Mariner glusterfs and the new version introduces a dependency
 # (dbench)
 %global _without_regression_tests true
-#
-#
-#
-#
-# Hard-coded settings unique to CBL-Mariner
-#
 # Explicitly require rpcgen
 %global _require_rpcgen true
+# Use for mariner-specific configs
+%global _mariner true
 #
 #
 #
@@ -888,16 +884,19 @@ done
         %{?_without_tcmalloc}
 
 # fix hardening and remove rpath in shlibs
-%if ( 0%{?fedora} && 0%{?fedora} > 17 ) || ( 0%{?rhel} && 0%{?rhel} > 6 )
+echo "bfjelds: 0%{?_mariner:1}"
+%if ( 0%{?fedora} && 0%{?fedora} > 17 ) || ( 0%{?rhel} && 0%{?rhel} > 6 ) || ( 0%{?_mariner:1} )
 sed -i 's| \\\$compiler_flags |&\\\$LDFLAGS |' libtool
 %endif
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|' libtool
-
+echo "bfjelds: before make"
 make %{?_smp_mflags}
-
+echo "bfjelds: after make"
 %check
+echo "bfjelds: before make check"
 make check
+echo "bfjelds: after make check"
 
 %install
 rm -rf %{buildroot}
