@@ -949,8 +949,8 @@ Requires:       perl(ExtUtils::CBuilder)
 # local::lib recommended by CPAN::FirstTime default choice, bug #1122498
 Requires:       perl(local::lib)
 %endif
-Requires:       perl(Module::Build)
 %if ! %{defined perl_bootstrap}
+Requires:       perl(Module::Build)
 Requires:       perl(Text::Glob)
 %endif
 Provides:       cpan = %{version}
