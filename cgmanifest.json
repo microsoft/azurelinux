@@ -17674,8 +17674,8 @@
         "type": "other",
         "other": {
           "name": "perl-HTTP-Cookies",
-          "version": "6.08",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/O/OA/OALDERS/HTTP-Cookies-6.08.tar.gz"
+          "version": "6.11",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/O/OA/OALDERS/HTTP-Cookies-6.11.tar.gz"
         }
       }
     },
