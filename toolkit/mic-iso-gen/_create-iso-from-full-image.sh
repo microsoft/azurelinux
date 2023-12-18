@@ -192,7 +192,9 @@ create_iso_with_rootfs_initrd_dir () {
 #  |- LiveOS
 #      |- rootfs.img [raw file system]
 #
-function create_uncompressed_wrapper_un_compressed_rootfs() {
+function create_wrapper_fs() {
+    mic_poc_log "---------------- create_wrapper_fs [enter] --------"
+
     local rootfsRawFile=$1
     local fedoraLiveIsoDir=$2
     local fedoraLiveIsoWrapperRawFile=$3
@@ -224,6 +226,8 @@ function create_uncompressed_wrapper_un_compressed_rootfs() {
     # The following command fails with a device still in use error.
     # sudo rm -r /mnt/wrapper
     sudo losetup -d $newDevice
+
+    mic_poc_log "---------------- create_wrapper_fs [exit] --------"
 }
 
 #
@@ -274,22 +278,36 @@ function create_iso_wrapper_squashfs_rootfs() {
         -output $fedoraLiveIsoWrapperIsofsFile
 }
 
-
 function prepare_root_partition() {
+    mic_poc_log "---------------- prepare_root_partition [enter] --------"
+
     rootfsRawFile=$1
     modifiedRootfsRawFile=$2
+    modifiedRootfsSquashFile=$3
 
     cp $rootfsRawFile \
         $modifiedRootfsRawFile
 
+    # mount
     sudo mkdir -p /mnt/hack
     loDevice=$(sudo losetup -f -P --show $modifiedRootfsRawFile)
     sudo mount $loDevice /mnt/hack
-    sudo ls -la /mnt/hack/etc/fstab
-    sudo rm /mnt/hack/etc/fstab
+
+    # modify
+    # sudo ls -la /mnt/hack/etc/fstab
+    sudo rm -f /mnt/hack/etc/fstab
+
+    # create the squashfs (must be run under sudo or else some files/folder
+    # will not be copied correctly)
+    sudo mksquashfs /mnt/hack \
+        $modifiedRootfsSquashFile
+
+    # umount
     sudo umount /mnt/hack
-    sudo rm -f /mnt/hack
-    sudo losetup -d loDevice
+    # sudo rm -f /mnt/hack
+    sudo losetup -d $loDevice
+
+    mic_poc_log "---------------- prepare_root_partition [exit] --------"
 }
 
 #-- main ----------------------------------------------------------------------
@@ -313,6 +331,7 @@ ROOTFS_RAW_GZ_FILE=$BUILD_WORKING_DIR/raw-disk-output/rootfs.img.tgz
 
 MODIFIED_ROOTFS_DIR=$BUILD_WORKING_DIR/raw-disk-output-modified
 MODIFIED_ROOTFS_RAW_FILE=$MODIFIED_ROOTFS_DIR/rootfs.img
+MODIFIED_ROOTFS_SQUASH_FILE=$MODIFIED_ROOTFS_DIR/rootfs.squashfs
 MODIFIED_ROOTFS_RAW_FILE_COMPRESSED=${MODIFIED_ROOTFS_RAW_FILE}.tar.gz
 
 UNWRAPPED_ROOTFS_SQUASH_FILE=$BUILD_WORKING_DIR/raw-disk-output/squashfs.img
@@ -335,25 +354,24 @@ FEDORA_LIVE_ISO_STAGING_DIR_2=$FEDORA_LIVE_ISO_DIR_2/input
 FEDORA_LIVE_ISO_WRAPPER_ISO_FILE=$FEDORA_LIVE_ISO_DIR_2/squashfs.iso
 
 if [[ ! -z $BUILD_CLEAN ]]; then
-    # create_full_image  \
-    #     $FULL_IMAGE_CONFIG_FILE \
-    #     $FULL_IMAGE_RAW_DISK \
-    #     $ROOTFS_RAW_FILE \
-    #     $ROOTFS_RAW_GZ_FILE \
-    #     $UNWRAPPED_ROOTFS_SQUASH_FILE \
-    #     $ROOTFS_SQUASH_GZ_FILE
+    create_full_image  \
+        $FULL_IMAGE_CONFIG_FILE \
+        $FULL_IMAGE_RAW_DISK \
+        $ROOTFS_RAW_FILE \
+        $ROOTFS_RAW_GZ_FILE \
+        $UNWRAPPED_ROOTFS_SQUASH_FILE \
+        $ROOTFS_SQUASH_GZ_FILE
 
-    # extract_artifacts_from_full_image \
-    #     $FULL_IMAGE_RAW_DISK \
-    #     $EXTRACT_ARTIFACTS_TMP_DIR \
-    #     $EXTRACT_ARTIFACTS_OUT_DIR
+    extract_artifacts_from_full_image \
+        $FULL_IMAGE_RAW_DISK \
+        $EXTRACT_ARTIFACTS_TMP_DIR \
+        $EXTRACT_ARTIFACTS_OUT_DIR
 
-    # remove fstab...
-    #
-    # mkdir -p $MODIFIED_ROOTFS_DIR
-    # prepare_root_partition \
-    #     $ROOTFS_RAW_FILE \
-    #     $MODIFIED_ROOTFS_RAW_FILE
+    mkdir -p $MODIFIED_ROOTFS_DIR
+    prepare_root_partition \
+        $ROOTFS_RAW_FILE \
+        $MODIFIED_ROOTFS_RAW_FILE \
+        $MODIFIED_ROOTFS_SQUASH_FILE
 
     # -------------------------------------------
     # Cfg1
@@ -364,7 +382,7 @@ if [[ ! -z $BUILD_CLEAN ]]; then
     #  |- LiveOS
     #      |- rootfs.img [raw file system - uncompressed]
     #
-    # create_uncompressed_wrapper_un_compressed_rootfs \
+    # create_wrapper_fs \
     #     $MODIFIED_ROOTFS_RAW_FILE \
     #     $FEDORA_LIVE_ISO_DIR_0 \
     #     $FEDORA_LIVE_ISO_WRAPPER_RAW_FILE_0 \
@@ -375,9 +393,9 @@ if [[ ! -z $BUILD_CLEAN ]]; then
     #
     # Create the following:
     #
-    # squashfs.img [squash file system]
+    # squashfs.img [squash file system - compressed]
     #  |- LiveOS
-    #      |- rootfs.img [raw file system]
+    #      |- rootfs.img [raw file system - uncompressed]
     #
     # create_squashfs_wrapper_uncompressed_rootfs \
     #     $MODIFIED_ROOTFS_RAW_FILE \
@@ -389,21 +407,38 @@ if [[ ! -z $BUILD_CLEAN ]]; then
     #
     # Create the following:
     #
-    # wrapper.img [squash file system]
+    # wrapper.img [raw file system - uncompressed]
     #  |- LiveOS
     #      |- rootfs.img [raw file system - compressed]
     #
-    sudo rm -f $MODIFIED_ROOTFS_RAW_FILE_COMPRESSED
+    # sudo rm -f $MODIFIED_ROOTFS_RAW_FILE_COMPRESSED
 
-    # compress
-    rawFilePath=$(dirname $MODIFIED_ROOTFS_RAW_FILE)
-    rawFileName=$(basename $MODIFIED_ROOTFS_RAW_FILE)
-    pushd $rawFilePath
-    tar -czvf $MODIFIED_ROOTFS_RAW_FILE_COMPRESSED $rawFileName
-    popd
+    # # compress
+    # rawFilePath=$(dirname $MODIFIED_ROOTFS_RAW_FILE)
+    # rawFileName=$(basename $MODIFIED_ROOTFS_RAW_FILE)
+    # pushd $rawFilePath
+    # tar -czvf $MODIFIED_ROOTFS_RAW_FILE_COMPRESSED $rawFileName
+    # popd
 
-    create_uncompressed_wrapper_un_compressed_rootfs \
-        $MODIFIED_ROOTFS_RAW_FILE_COMPRESSED \
+    # create_wrapper_fs \
+    #     $MODIFIED_ROOTFS_RAW_FILE_COMPRESSED \
+    #     $FEDORA_LIVE_ISO_DIR_0 \
+    #     $FEDORA_LIVE_ISO_WRAPPER_RAW_FILE_0 \
+    #     $FEDORA_LIVE_ISO_WRAPPER_SIZE_IN_MBS_0_COMPRESSED
+
+    # -------------------------------------------
+    # Cfg5
+    #
+    # Create the following:
+    #
+    # wrapper.img [raw file system - uncompressed]
+    #  |- LiveOS
+    #      |- rootfs.img [raw file system - squashfs]
+    #
+    # sudo rm -f $MODIFIED_ROOTFS_RAW_FILE_COMPRESSED
+        
+    create_wrapper_fs \
+        $MODIFIED_ROOTFS_SQUASH_FILE \
         $FEDORA_LIVE_ISO_DIR_0 \
         $FEDORA_LIVE_ISO_WRAPPER_RAW_FILE_0 \
         $FEDORA_LIVE_ISO_WRAPPER_SIZE_IN_MBS_0_COMPRESSED
@@ -468,19 +503,13 @@ CREATE_INITRD_OUT_DIR=$BUILD_WORKING_DIR/create-initrd-from-folder-out-dir
 # TARGET_ROOTFS_FILE="/artifacts/rootfs.img"
 
 # -----------------------------------------------
-# Cfg1
-#
-# SOURCE_ROOTFS_FILE=$FEDORA_LIVE_ISO_WRAPPER_RAW_FILE_0
-# TARGET_ROOTFS_FILE="/artifacts/wrapper.img"
-
-# -----------------------------------------------
 # Cfg2
 #
 # SOURCE_ROOTFS_FILE=$FEDORA_LIVE_ISO_SQUASHFS_FILE_1
 # TARGET_ROOTFS_FILE="/artifacts/squashfs.img"
 
 # -----------------------------------------------
-# Cfg3, Cfg4
+# Cfg1, Cfg3, Cfg4, Cfg5
 #
 SOURCE_ROOTFS_FILE=$FEDORA_LIVE_ISO_WRAPPER_RAW_FILE_0
 TARGET_ROOTFS_FILE="/artifacts/wrapper.img"

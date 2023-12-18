@@ -41,12 +41,15 @@ function build_full_image () {
     cp $sourceRootfsRawGzFile $outputRootfsRawGzFile
 
     # ./out/images/baremetal/mariner-rootfs-squashfs-2.0.20231208.1322.squashfs
-    sourceRootfsSquashFile=$(find ../out/images/baremetal -name "mariner-rootfs-squash*.squashfs")
-    cp $sourceRootfsSquashFile $outputRootfsSquashFile
+    # The squashfs in this case has a single file and that is the rootfs image.
+    # This cannot be used for mounting.
+    #
+    # sourceRootfsSquashFile=$(find ../out/images/baremetal -name "mariner-rootfs-squash*.squashfs")
+    # cp $sourceRootfsSquashFile $outputRootfsSquashFile
 
     # ./out/images/baremetal/mariner-rootfs-squashfs-2.0.20231208.1322.squashfs.gz
-    sourceRootfsSquashGzFile=$(find ../out/images/baremetal -name "mariner-rootfs-squash*.squashfs.gz")
-    cp $sourceRootfsSquashGzFile $outputRootfsSquashGzFile
+    # sourceRootfsSquashGzFile=$(find ../out/images/baremetal -name "mariner-rootfs-squash*.squashfs.gz")
+    # cp $sourceRootfsSquashGzFile $outputRootfsSquashGzFile
 
     popd
 }

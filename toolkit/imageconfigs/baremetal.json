@@ -35,11 +35,6 @@
                             "Name": "mariner-rootfs-raw",
                             "Type": "raw",
                             "Compression": "gz"
-                        },
-                        {
-                            "Name": "mariner-rootfs-squashfs",
-                            "Type": "squashfs",
-                            "Compression": "gz"
                         }
                     ]
                 }
