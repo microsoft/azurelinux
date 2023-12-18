@@ -15874,8 +15874,8 @@
         "type": "other",
         "other": {
           "name": "perl-App-cpanminus",
-          "version": "1.7045",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/MI/MIYAGAWA/App-cpanminus-1.7045.tar.gz"
+          "version": "1.7047",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/MI/MIYAGAWA/App-cpanminus-1.7047.tar.gz"
         }
       }
     },
