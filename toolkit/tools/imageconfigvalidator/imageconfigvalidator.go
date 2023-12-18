@@ -114,6 +114,7 @@ func validatePackages(config configuration.Config) (err error) {
 	defer timestamp.StopEvent(nil)
 
 	const (
+		selinuxPkgName     = "selinux-policy"
 		validateError      = "failed to validate package lists in config"
 		verityPkgName      = "verity-read-only-root"
 		verityDebugPkgName = "verity-read-only-root-debug-tools"
@@ -133,11 +134,6 @@ func validatePackages(config configuration.Config) (err error) {
 		foundDracutFipsPackage := false
 		foundGrub2Package := false
 		kernelCmdLineString := systemConfig.KernelCommandLine.ExtraCommandLine
-		selinuxPkgName := systemConfig.KernelCommandLine.SELinuxPolicy
-		if selinuxPkgName == "" {
-			selinuxPkgName = "selinux-policy"
-		}
-
 		for _, pkg := range packageList {
 			if pkg == "kernel" {
 				return fmt.Errorf("%s: kernel should not be included in a package list, add via config file's [KernelOptions] entry", validateError)

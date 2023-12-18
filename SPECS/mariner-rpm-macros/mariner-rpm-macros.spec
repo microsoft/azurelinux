@@ -6,7 +6,7 @@
 Summary:        Mariner specific rpm macro files
 Name:           mariner-rpm-macros
 Version:        2.0
-Release:        24%{?dist}
+Release:        23%{?dist}
 License:        GPL+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -125,9 +125,6 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
-* Thu Nov 09 2023 George Mileka <gmileka@microsoft.com> - 2.0-24
-- Update ccache to use the compiler content for comparison.
-
 * Thu Jul 06 2023 Andrew Phelps <anphel@microsoft.com> - 2.0-23
 - Compress rpm binaries with zstd
 

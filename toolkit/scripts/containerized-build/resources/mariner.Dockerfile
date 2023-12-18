@@ -4,7 +4,6 @@ ARG version
 ARG enable_local_repo
 ARG mariner_repo
 ARG mode
-ARG extra_packages
 LABEL containerized-rpmbuild=$mariner_repo/build
 
 COPY resources/local_repo /etc/yum.repos.d/local_repo.disabled_repo
@@ -23,4 +22,4 @@ RUN if [[ "${mode}" == "build" ]]; then echo "cd /usr/src/mariner || { echo \"ER
 RUN if [[ "${mode}" == "test" ]]; then echo "cd /mnt || { echo \"ERROR: Could not change directory to /mnt \"; exit 1; }"  >> /root/.bashrc; fi
 
 # Install vim & git in the build env
-RUN tdnf --releasever=$version install -y vim git $extra_packages
+RUN tdnf --releasever=$version install -y vim git

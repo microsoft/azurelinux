@@ -4,9 +4,6 @@
 package schedulerutils
 
 import (
-	"fmt"
-	"math"
-	"strings"
 	"sync"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
@@ -24,7 +21,6 @@ func CanSubGraph(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, useCachedI
 	search := traverse.BreadthFirst{}
 
 	foundUnsolvableNode := false
-	unsolvedNodes := make([]*pkggraph.PkgNode, 0)
 
 	// Walk entire graph and print list of any/all unsolvable nodes
 	search.Walk(pkgGraph, node, func(n graph.Node, d int) (stopSearch bool) {
@@ -46,14 +42,11 @@ func CanSubGraph(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, useCachedI
 		}
 
 		// This node is not yet solvable
-		logger.Log.Debugf("Could not subgraph due to node: %v", pkgNode)
-		unsolvedNodes = append(unsolvedNodes, pkgNode)
+		logger.Log.Warnf("Could not subgraph due to node: %v", pkgNode)
 
 		// If we are in trace mode, print the path from the root node to the unsolvable node
 		if logger.Log.IsLevelEnabled(logrus.TraceLevel) {
-			// Reference: https://github.com/gonum/gonum/blob/v0.14.0/graph/path/yen_ksp.go#L19
-			infiniteCost := math.Inf(1)
-			paths := path.YenKShortestPaths(pkgGraph, 1, infiniteCost, node, pkgNode)
+			paths := path.YenKShortestPaths(pkgGraph, 1, node, pkgNode)
 			if len(paths) == 0 {
 				logger.Log.Warnf("Could not find path between %v and %v with YenKShortestPaths()", node, pkgNode)
 			} else {
@@ -68,24 +61,7 @@ func CanSubGraph(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, useCachedI
 		return
 	})
 
-	// Print a summary of the nodes causing the subgraph to be unsolvable
-	if len(unsolvedNodes) > 0 {
-		var warningString strings.Builder
-		warningString.WriteString(fmt.Sprintf("Found %d unsolved implicit nodes, cannot optimize subgraph yet...\n", len(unsolvedNodes)))
-		printCount := 5
-		if len(unsolvedNodes) <= 5 {
-			printCount = len(unsolvedNodes)
-		}
-		for _, node := range unsolvedNodes[:printCount] {
-			warningString.WriteString(fmt.Sprintf("\tUnsolvable node: %v\n", node))
-		}
-		if len(unsolvedNodes) > 5 {
-			warningString.WriteString(fmt.Sprintf("\t...and %d more\n", len(unsolvedNodes)-printCount))
-		}
-		logger.Log.Warn(warningString.String())
-	}
-
-	return !foundUnsolvableNode
+	return foundUnsolvableNode == false
 }
 
 // LeafNodes returns a slice of all leaf nodes in the graph.

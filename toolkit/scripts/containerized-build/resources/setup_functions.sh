@@ -20,8 +20,8 @@ do
   MACROS+=("--load=$macro_file")
 done
 
-## Create $SOURCES_DIR
-mkdir -p $SOURCES_DIR
+## Create SOURCES_DIR
+mkdir -p SOURCES_DIR
 
 # Create symlink from SPECS/ to SOURCES/ when rpm is called
 rpm() {

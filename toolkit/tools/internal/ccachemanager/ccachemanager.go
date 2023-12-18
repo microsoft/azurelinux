@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-package ccachemanager
+package ccachemanagerpkg
 
 import (
 	"context"
@@ -227,7 +227,7 @@ type CCacheManager struct {
 
 	// A utility helper for downloading/uploading archives from/to Azure blob
 	// storage.
-	AzureBlobStorage *azureblobstorage.AzureBlobStorage
+	AzureBlobStorage *azureblobstoragepkg.AzureBlobStorage
 }
 
 func buildRemotePath(arch, folder, name, suffix string) string {
@@ -276,7 +276,7 @@ func (g *CCachePkgGroup) UpdateTarPaths(remoteStoreConfig *RemoteStoreConfig, lo
 	g.TarFile = tarFile
 }
 
-func (g *CCachePkgGroup) getLatestTag(azureBlobStorage *azureblobstorage.AzureBlobStorage, containerName string) (string, error) {
+func (g *CCachePkgGroup) getLatestTag(azureBlobStorage *azureblobstoragepkg.AzureBlobStorage, containerName string) (string, error) {
 
 	logger.Log.Infof("  checking if (%s) already exists...", g.TagFile.LocalSourcePath)
 	_, err := os.Stat(g.TagFile.LocalSourcePath)
@@ -454,12 +454,12 @@ func CreateManager(rootDir string, configFileName string) (m *CCacheManager, err
 	}
 
 	logger.Log.Infof("  creating blob storage client...")
-	accessType := azureblobstorage.AnonymousAccess
+	accessType := azureblobstoragepkg.AnonymousAccess
 	if configuration.RemoteStoreConfig.UploadEnabled {
-		accessType = azureblobstorage.ManagedIdentityAccess
+		accessType = azureblobstoragepkg.AuthenticatedAccess
 	}
 
-	azureBlobStorage, err := azureblobstorage.Create(configuration.RemoteStoreConfig.TenantId, configuration.RemoteStoreConfig.UserName, configuration.RemoteStoreConfig.Password, configuration.RemoteStoreConfig.StorageAccount, accessType)
+	azureBlobStorage, err := azureblobstoragepkg.Create(configuration.RemoteStoreConfig.TenantId, configuration.RemoteStoreConfig.UserName, configuration.RemoteStoreConfig.Password, configuration.RemoteStoreConfig.StorageAccount, accessType)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to init azure blob storage client:\n%w", err)
 	}

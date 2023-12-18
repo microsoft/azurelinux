@@ -89,23 +89,3 @@ func RemoveDuplicatesFromSlice[K comparable](inputSlice []K) (outputSlice []K) {
 func nilCheck(expected interface{}, given interface{}) (checkValid, checkResult bool) {
 	return (expected == nil || given == nil), (expected == nil && given == nil)
 }
-
-// Can be replaced by slices.Contains in Go 1.21.
-func ContainsValue[K comparable](inputSlice []K, value K) bool {
-	for _, item := range inputSlice {
-		if item == value {
-			return true
-		}
-	}
-	return false
-}
-
-// Can be replaced by slices.ContainsFunc in Go 1.21.
-func ContainsFunc[K any](inputSlice []K, fn func(K) bool) bool {
-	for _, item := range inputSlice {
-		if fn(item) {
-			return true
-		}
-	}
-	return false
-}

@@ -14,12 +14,10 @@ parameters:
     default:
       - name: "AMD64"
         agentPool: "$(DEV_AMD64_Managed)" # Pool defined inside the "Agent pools (DEV)" variable group.
-        maxCPUs: "$(($(nproc) / 2))"
         rawToolchainCacheURL: "$(rawToolchainCacheURL_AMD64)"
         rawToolchainExpectedHash: "f56df34b90915c93f772d3961bf5e9eeb8c1233db43dd92070214e4ce6b72894"
       - name: "ARM64"
         agentPool: "$(DEV_ARM64_Managed)" # Pool defined inside the "Agent pools (DEV)" variable group.
-        maxCPUs: "$(($(nproc) / 3))"
         rawToolchainCacheURL: "$(rawToolchainCacheURL_ARM64)"
         rawToolchainExpectedHash: "65de43b3bdcfdaac71df1f11fd1f830a8109b1eb9d7cb6cbc2e2d0e929d0ef76"
 
@@ -36,8 +34,6 @@ variables:
     value: RPMs
   - name: toolchainArtifactNameBase
     value: Toolchain
-  - name: system.debug
-    value: 'true'
 
 extends:
   template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates
@@ -70,10 +66,6 @@ extends:
                       outputArtifactsFolder: $(ob_outputDirectory)
                       selfRepoName: self
 
-                  # Toolchain package tests should be run through the full package build, calculate the list of packages that should be re-tested
-                  # and make it available to the next stage via an output variable: 'CalculateToolchainPackageRetestList.toolchainPackageRetestList'
-                  - template: .pipelines/templates/ToolchainCalculatePackageRetests.yml@self
-
                   # 1. Automatic publishing won't work if 'isCustom: true' is set on the pool. We cannot do 'isCustom: false' because
                   #    then OneBranch attempts to perform additional actions (adding build tags for instance), which require additional permissions
                   #    that the PR check pipeline does not have.
@@ -96,7 +88,6 @@ extends:
                 variables:
                   ob_artifactBaseName: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}
                   ob_outputDirectory: $(Build.ArtifactStagingDirectory)
-                  testListFromToolchain: $[ stageDependencies.Toolchain_${{ configuration.name }}.Build.outputs['CalculateToolchainPackageRetestList.toolchainPackageRetestList'] ]
                 steps:
                   - template: .pipelines/templates/PackageBuild.yml@self
                     parameters:
@@ -104,11 +95,9 @@ extends:
                       isCheckBuild: true
                       isQuickRebuildPackages: true
                       outputArtifactsFolder: $(ob_outputDirectory)
-                      maxCPU: "${{ configuration.maxCPUs }}"
                       pipArtifactFeeds: "mariner/Mariner-Pypi-Feed"
                       selfRepoName: self
                       testSuiteName: "[${{ configuration.name }}] Package test"
-                      testRerunList: "$(testListFromToolchain)"
 
                   - task: PublishPipelineArtifact@1
                     inputs:

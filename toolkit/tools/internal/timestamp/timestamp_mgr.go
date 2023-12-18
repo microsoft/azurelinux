@@ -138,13 +138,13 @@ func ensureManagerExists() error {
 func BeginTiming(toolName, outputFile string) (*TimeStamp, error) {
 	if outputFile == "" {
 		err := fmt.Errorf("timestamp output file is not specified, the feature will be turned off for %s", toolName)
-		logger.Log.Debug(err.Error())
+		logger.Log.Info(err.Error())
 		return &TimeStamp{}, err
 	}
 
 	initTimeStampManager()
 
-	outputFileDescriptor, err := os.OpenFile(outputFile, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0664)
+	outputFileDescriptor, err := os.OpenFile(outputFile, os.O_CREATE|os.O_WRONLY, 0664)
 	if err != nil {
 		err = fmt.Errorf("unable to create file %s: %v", outputFile, err)
 		logger.Log.Warn(err.Error())
@@ -171,7 +171,7 @@ func BeginTiming(toolName, outputFile string) (*TimeStamp, error) {
 func ResumeTiming(toolName, outputFile string) error {
 	if outputFile == "" {
 		err := fmt.Errorf("timestamp output file is not specified, the feature will be turned off for %s", toolName)
-		logger.Log.Debug(err.Error())
+		logger.Log.Info(err.Error())
 		return err
 	}
 

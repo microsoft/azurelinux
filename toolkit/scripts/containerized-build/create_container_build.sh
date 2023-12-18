@@ -23,7 +23,7 @@ print_error() {
 help() {
 echo "
 Usage:
-sudo make containerized-rpmbuild [REPO_PATH=/path/to/CBL-Mariner] [MODE=test|build] [VERSION=1.0|2.0] [MOUNTS=/path/in/host:/path/in/container ...] [BUILD_MOUNT=/path/to/build/chroot/mount] [EXTRA_PACKAGES=pkg ...] [ENABLE_REPO=y] [KEEP_CONTAINER=y]
+sudo make containerized-rpmbuild [REPO_PATH=/path/to/CBL-Mariner] [MODE=test|build] [VERSION=1.0|2.0] [MOUNTS=/path/in/host:/path/in/container ...] [ENABLE_REPO=y] [BUILD_MOUNT=/path/to/build/chroot/mount]
 
 Starts a docker container with the specified version of mariner.
 
@@ -37,9 +37,7 @@ Optional arguments:
                         e.g. MOUNTS=\"/host/dir1:/container/dir1 /host/dir2:/container/dir2\"
     BUILD_MOUNT     path to folder to create mountpoints for container's BUILD and BUILDROOT directories.
                         Mountpoints will be ${BUILD_MOUNT}/container-build and ${BUILD_MOUNT}/container-buildroot. default: $REPO_PATH/build
-    EXTRA_PACKAGES  Space delimited list of packages to tdnf install in the container on startup. e.g. EXTRA_PACKAGES=\"pkg1 pkg2\" default: \"\"
     ENABLE_REPO:    Set to 'y' to use local RPMs to satisfy package dependencies. default: n
-    KEEP_CONTAINER: Set to 'y' to not cleanup container upon exit. default: n
 
     * User can override Mariner make definitions. Some useful overrides could be
                     SPECS_DIR: build specs from another directory like SPECS-EXTENDED by providing SPECS_DIR=path/to/SPECS-EXTENDED. default: $REPO_PATH/SPECS
@@ -60,7 +58,7 @@ build_worker_chroot() {
 build_tools() {
     pushd $toolkit_root
     echo "Building required tools..."
-    make go-depsearch go-downloader go-grapher go-specreader go-srpmpacker REBUILD_TOOLS=y > /dev/null
+    make go-srpmpacker go-depsearch go-grapher go-specreader REBUILD_TOOLS=y > /dev/null
     popd
 }
 
@@ -80,7 +78,6 @@ fi
 script_dir=$(realpath $(dirname "${BASH_SOURCE[0]}"))
 topdir=/usr/src/mariner
 enable_local_repo=false
-keep_container="--rm"
 
 while (( "$#")); do
   case "$1" in
@@ -89,9 +86,7 @@ while (( "$#")); do
     -p ) repo_path="$(realpath $2)"; shift 2 ;;
     -mo ) extra_mounts="$2"; shift 2 ;;
     -b ) build_mount_dir="$(realpath $2)"; shift 2;;
-    -ep ) extra_packages="$2"; shift 2;;
     -r ) enable_local_repo=true; shift ;;
-    -k ) keep_container=""; shift ;;
     -h ) help; exit 1 ;;
     ? ) echo -e "ERROR: INVALID OPTION.\n\n"; help; exit 1 ;;
   esac
@@ -146,7 +141,7 @@ fi
 if [[ "${mode}" == "build" ]]; then
     pushd $toolkit_root
     echo "Populating Intermediate SRPMs..."
-    if [[ ( ! -f "$TOOL_BINS_DIR/srpmpacker" )  || ( ! -f "$TOOL_BINS_DIR/downloader" ) ]]; then build_tools; fi
+    if [[ ( ! -f "$TOOL_BINS_DIR/srpmpacker" ) ]]; then build_tools; fi
     make input-srpms SRPM_FILE_SIGNATURE_HANDLING="update" > /dev/null
     popd
 fi
@@ -240,12 +235,11 @@ docker build -q \
                 --build-arg enable_local_repo="$enable_local_repo" \
                 --build-arg mariner_repo="$repo_path" \
                 --build-arg mode="$mode" \
-                --build-arg extra_packages="$extra_packages" \
                 .
 
 echo "docker_image_tag is ${docker_image_tag}"
 
-bash -c "docker run $keep_container\
+bash -c "docker run --rm \
     ${mount_arg} \
     -it ${docker_image_tag} /bin/bash; \
     if [[ -d $RPMS_DIR/repodata ]]; then { rm -r $RPMS_DIR/repodata; echo 'Clearing repodata' ; }; fi

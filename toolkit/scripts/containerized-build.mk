@@ -30,16 +30,8 @@ ifneq ($(BUILD_MOUNT),)
 containerized_build_args += -b ${BUILD_MOUNT}
 endif
 
-ifneq ($(EXTRA_PACKAGES),)
-containerized_build_args += -ep "$(EXTRA_PACKAGES)"
-endif
-
 ifeq ($(ENABLE_REPO),y)
 containerized_build_args += -r
-endif
-
-ifeq ($(KEEP_CONTAINER),y)
-containerized_build_args += -k
 endif
 
 ##help:target:containerized-rpmbuild=Launch containerized shell for inner-loop RPM building/testing.

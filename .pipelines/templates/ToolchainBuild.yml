@@ -54,4 +54,3 @@ steps:
       tar -C "${{ parameters.buildRepoRoot }}/build/logs/toolchain" -czf "$published_logs_dir/toolchain.logs.tar.gz" .
     condition: always()
     displayName: "Copy logs for publishing"
-

@@ -18,6 +18,10 @@ parameters:
     type: string
     default: "TESTS"
 
+  - name: pipArtifactFeeds
+    type: string
+    default: ""
+
   - name: testSuiteName
     type: string
     default: "Package test"
@@ -32,8 +36,13 @@ parameters:
     default: "$(Agent.TempDirectory)"
 
 steps:
-  - bash: sudo tdnf install -y python3-junit-xml
-    retryCountOnTaskFailure: 3
+  - ${{ if parameters.pipArtifactFeeds }}:
+      - task: PipAuthenticate@1
+        inputs:
+          artifactFeeds: "${{ parameters.pipArtifactFeeds }}"
+        displayName: "Authenticate to custom pip artifact feeds"
+
+  - bash: pip3 install junit_xml
     displayName: "Install Python dependencies"
 
   - task: PythonScript@0
