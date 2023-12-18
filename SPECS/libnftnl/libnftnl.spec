@@ -1,13 +1,13 @@
 Summary:        Library for low-level netlink programming interface to the in-kernel nf_tables subsystem
 Name:           libnftnl
-Version:        1.2.1
-Release:        2%{?dist}
+Version:        1.2.6
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://netfilter.org/projects/libnftnl/
-Source0:        https://netfilter.org/projects/libnftnl/files/%{name}-%{version}.tar.bz2
+Source0:        https://netfilter.org/projects/libnftnl/files/%{name}-%{version}.tar.xz
 BuildRequires:  jansson-devel
 BuildRequires:  libmnl-devel
 
@@ -23,7 +23,7 @@ Requires:       %{name} = %{version}-%{release}
 Development files for %{name}
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 ./configure \
@@ -46,7 +46,6 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %files
 %defattr(-,root,root)
 %license COPYING
-%license COPYING
 %{_libdir}/*.so.*
 
 %files devel
@@ -56,6 +55,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_includedir}/%{name}
 
 %changelog
+* Fri Dec 15 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 1.2.6-1
+- Update to v1.2.6
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.2.1-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
