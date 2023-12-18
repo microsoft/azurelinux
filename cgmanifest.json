@@ -18354,8 +18354,8 @@
         "type": "other",
         "other": {
           "name": "perl-Module-Install",
-          "version": "1.19",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/E/ET/ETHER/Module-Install-1.19.tar.gz"
+          "version": "1.21",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/E/ET/ETHER/Module-Install-1.21.tar.gz"
         }
       }
     },
