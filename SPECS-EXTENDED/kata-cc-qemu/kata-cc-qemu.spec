@@ -13,8 +13,8 @@ Summary:      Kata Confidential Containers for KVM-QEMU SEV-SNP Setup
 License:      ASL 2.0
 Vendor:       Microsoft Corporation
 URL:          https://github.com/microsoft/kata-containers
-Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/cc-%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{name}-%{version}.tar.gz
+Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/cc-%{version}.tar.gz#/kata-containers-cc-%{version}.tar.gz
+Source1:      https://github.com/microsoft/kata-containers/archive/refs/tags/kata-containers-cc-%{version}.tar.gz
 Source2:      %{name}-%{version}-cargo.tar.gz
 Source3:      mariner-coco-build-uvm.sh
 Patch0:       keep-uvm-rootfs-dependencies.patch
@@ -38,7 +38,7 @@ BuildRequires:  device-mapper-devel
 BuildRequires:  cmake
 BuildRequires:  fuse-devel
 BuildRequires:  kernel-kvm-snp-devel
-Requires:  kernel-kvm
+Requires:  kernel-kvm-snp
 Requires:  moby-containerd-cc
 Requires:  qemu-virtiofsd
 
@@ -276,87 +276,5 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %exclude %{osbuilder}/tools/osbuilder/rootfs-builder/ubuntu
 
 %changelog
-*   Tue Dec 05 2023 Archana Choudhary <archana1@microsoft.com> - 0.6.2-2
--   Add qemu-virtiofsd as a requirement
-
-*   Fri Nov 3 2023 Dallas Delaney <dadelan@microsoft.com> 0.6.2-1
--   Upgrade to version 0.6.2
-
-*   Fri Nov 3 2023 Dallas Delaney <dadelan@microsoft.com> - 0.6.1-4
--   Add patch to retain UVM rootfs dependencies
-
-*   Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.6.1-3
--   Bump release to rebuild with go 1.20.9
-
-*   Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 0.6.1-2
--   Bump release to rebuild with updated version of Go.
-
-*   Mon Sep 18 2023 Dallas Delaney <dadelan@microsoft.com> 0.6.1-1
--   Update to use cloud-hypervisor-cvm and kernel-uvm-cm
--   Pull in latest source for genpolicy, utarfs, and overlay changes
-
-*   Thu Sep 14 2023 Muhammad Falak <mwani@microsoft.com> - 0.6.0-4
--   Introduce patch to drop mut for immutable vars
--   Introduce patch enabling feature(impl_trait_in_assoc_type) to unblock build
-
-*   Thu Sep 07 2023 Daniel McIlvaney <damcilva@microsoft.com> - 0.6.0-3
--   Bump package to rebuild with rust 1.72.0
-
-*   Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.6.0-2
--   Bump release to rebuild with go 1.19.12
-
-*   Tue Jul 11 2023 Dallas Delaney <dadelan@microsoft.com> 0.6.0-1
--   Upgrade to version 0.6.0
-
-*   Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.4.2-2
--   Bump release to rebuild with go 1.19.11
-
-*   Thu Jun 29 2023 Dallas Delaney <dadelan@microsoft.com> 0.4.2-1
--   Upgrade to version 0.4.2 for new snapshotter and policy features
-
-*   Thu Jun 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.4.1-3
--   Bump release to rebuild with go 1.19.10
-
-*   Wed May 24 2023 Dallas Delaney <dadelan@microsoft.com> 0.4.1-2
--   Enable static resource management and build with host's openssl
-
-*   Wed May 10 2023 Dallas Delaney <dadelan@microsoft.com> 0.4.1-1
--   Add version 0.4.1 and fix CVEs
-
-*   Wed Apr 26 2023 Dallas Delaney <dadelan@microsoft.com> 0.4.0-1
--   Remove containerd override and add dependency on moby-containerd-cc
-
-*   Mon Apr 24 2023 Dallas Delaney <dadelan@microsoft.com> 0.4.0-1
--   Add vendored code and move UVM building out of base package
-
-*   Wed Apr 5 2023 Dallas Delaney <dadelan@microsoft.com> 0.1.0-10
--   Rebase against 0.4.0 upstream tag
--   License verified.
--   Original version for CBL-Mariner
-
-*   Thu Mar 2 2023 Dallas Delaney <dadelan@microsoft.com> 0.1.0-9
--   Fix configuration paths
-
-*   Wed Mar 1 2023 Dallas Delaney <dadelan@microsoft.com> 0.1.0-8
--   Build from source code
-
-*   Fri Feb 17 2023 Mitch Zhu <mitchzhu@microsoft.com> 0.1.0-7
--   Port over kata-cc spec update
-
-*   Wed Jan 18 2023 Dan Mihai <dmihai@microsoft.com> 0.1.0-6
--   Build kata UVM image
-
-*   Mon Jan 16 2023 Dan Mihai <dmihai@microsoft.com> 0.1.0-5
--   Build kata runtime from source code
-
-*   Mon Jan 16 2023 Dan Mihai <dmihai@microsoft.com> 0.1.0-4
--   Build kata-agent from source code
-
-*   Thu Jan 12 2023 Dan Mihai <dmihai@microsoft.com> 0.1.0-3
--   Install /usr/local/bin/containerd-shim-kata-clh-v2
-
-*   Thu Jan 12 2023 Dan Mihai <dmihai@microsoft.com> 0.1.0-2
--   Mariner-based host configuration
-
-*   Tue Oct 25 2022 Dallas Delaney <dadelan@microsoft.com> 0.1.0-1
--   Initial rpm data and spec added
+* Mon Dec 18 2023 Archana Choudhary <archana1@microsoft.com> - 0.6.2-1
+- Initial spec
