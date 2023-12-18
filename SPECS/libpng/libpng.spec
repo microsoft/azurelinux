@@ -21,7 +21,7 @@ Requires:       %{name} = %{version}-%{release}
 It contains the libraries and header files to create applications
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 %configure
