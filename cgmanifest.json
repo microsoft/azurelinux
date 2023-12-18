@@ -17204,8 +17204,8 @@
         "type": "other",
         "other": {
           "name": "perl-Exporter-Tiny",
-          "version": "1.002002",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/T/TO/TOBYINK/Exporter-Tiny-1.002002.tar.gz"
+          "version": "1.006002",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/T/TO/TOBYINK/Exporter-Tiny-1.006002.tar.gz"
         }
       }
     },
