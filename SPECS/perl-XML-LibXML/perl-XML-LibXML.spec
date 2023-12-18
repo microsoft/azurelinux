@@ -7,8 +7,8 @@ Name:           perl-XML-LibXML
 # https://bugzilla.redhat.com/show_bug.cgi?id=469480
 # it might not be needed anymore
 # this module is maintained, the other is not
-Version:        2.0207
-Release:        7%{?dist}
+Version:        2.0209
+Release:        1%{?dist}
 Summary:        Perl interface to the libxml2 library
 License:        (GPL+ or Artistic) and MIT
 URL:            https://metacpan.org/release/XML-LibXML
@@ -183,6 +183,9 @@ fi
 %{_libexecdir}/%{name}
 
 %changelog
+* Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0209-1
+- Auto-upgrade to 2.0209 - Azure Linux 3.0 - package upgrades
+
 * Tue Jul 26 2022 Henry Li <lihl@microsoft.com> - 2.0207-7
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
 - License Verified

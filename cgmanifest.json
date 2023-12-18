@@ -20574,8 +20574,8 @@
         "type": "other",
         "other": {
           "name": "perl-XML-LibXML",
-          "version": "2.0207",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/S/SH/SHLOMIF/XML-LibXML-2.0207.tar.gz"
+          "version": "2.0209",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/S/SH/SHLOMIF/XML-LibXML-2.0209.tar.gz"
         }
       }
     },
