@@ -116,6 +116,7 @@
 %if ( 0%{?fedora} ) || ( 0%{?rhel} && 0%{?rhel} >= 7 )
 %global _with_firewalld --enable-firewalld
 %endif
+%global _with_firewalld --enable-firewalld
 %if 0%{?_tmpfilesdir:1}
 %global _with_tmpfilesdir --with-tmpfilesdir=%{_tmpfilesdir}
 %else
@@ -210,6 +211,7 @@ Source1:        glusterd.sysconfig
 Source2:        glusterfsd.sysconfig
 Source7:        glusterfsd.service
 Source8:        glusterfsd.init
+Patch001:       include-eventtypes-always.patch
 
 BuildRequires:  bison
 BuildRequires:  flex
@@ -773,7 +775,7 @@ GlusterFS Events
 %endif
 
 %prep
-%setup -q -n %{name}-%{version}%{?prereltag}
+%autosetup -p1 -n %{name}-%{version}%{?prereltag}
 %if ( ! %{_usepython3} )
 echo "fixing python shebangs..."
 for f in api events extras geo-replication libglusterfs tools xlators; do
@@ -1563,6 +1565,7 @@ exit 0
 %changelog
 * Thu Dec 14 2023  Brian Fjeldstad <bfjelds@microsoft.com> - 11.1-1
 - Upgrade to 11.1
+- add include-eventtypes-always.patch to fix 11.1 build error
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 7.9-5
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
