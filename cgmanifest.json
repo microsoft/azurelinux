@@ -17974,8 +17974,8 @@
         "type": "other",
         "other": {
           "name": "perl-JSON-Any",
-          "version": "1.39",
-          "downloadUrl": "http://search.cpan.org/CPAN/authors/id/E/ET/ETHER/JSON-Any-1.39.tar.gz"
+          "version": "1.40",
+          "downloadUrl": "http://search.cpan.org/CPAN/authors/id/E/ET/ETHER/JSON-Any-1.40.tar.gz"
         }
       }
     },
