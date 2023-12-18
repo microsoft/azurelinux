@@ -61,6 +61,7 @@
 %ifnarch x86_64
 %global _without_tcmalloc --without-tcmalloc
 %endif
+%global _without_tcmalloc --without-tcmalloc
 # Do not use libtirpc on EL6, it does not have xdr_uint64_t() and xdr_uint32_t
 # Do not use libtirpc on EL7, it does not have xdr_sizeof()
 %if ( 0%{?rhel} && 0%{?rhel} <= 7 )
