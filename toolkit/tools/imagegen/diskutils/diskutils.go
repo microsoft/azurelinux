@@ -410,7 +410,9 @@ func WaitForDevicesToSettle() error {
 }
 
 // CreatePartitions creates partitions on the specified disk according to the disk config
-func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryption configuration.RootEncryption, readOnlyRootConfig configuration.ReadOnlyVerityRoot) (partDevPathMap map[string]string, partIDToFsTypeMap map[string]string, encryptedRoot EncryptedRootDevice, readOnlyRoot VerityDevice, err error) {
+func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryption configuration.RootEncryption,
+	readOnlyRootConfig configuration.ReadOnlyVerityRoot, mkfsOptions map[string][]string,
+) (partDevPathMap map[string]string, partIDToFsTypeMap map[string]string, encryptedRoot EncryptedRootDevice, readOnlyRoot VerityDevice, err error) {
 	const timeoutInSeconds = "5"
 	partDevPathMap = make(map[string]string)
 	partIDToFsTypeMap = make(map[string]string)
@@ -458,7 +460,7 @@ func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryptio
 			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
 		}
 
-		partFsType, err := FormatSinglePartition(partDevPath, partition)
+		partFsType, err := FormatSinglePartition(partDevPath, partition, mkfsOptions)
 		if err != nil {
 			logger.Log.Warnf("Failed to format partition")
 			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
@@ -651,7 +653,8 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int, partitio
 }
 
 // FormatSinglePartition formats the given partition to the type specified in the partition configuration
-func FormatSinglePartition(partDevPath string, partition configuration.Partition) (fsType string, err error) {
+func FormatSinglePartition(partDevPath string, partition configuration.Partition, mkfsOptions map[string][]string,
+) (fsType string, err error) {
 	const (
 		totalAttempts = 5
 		retryDuration = time.Second
@@ -664,11 +667,18 @@ func FormatSinglePartition(partDevPath string, partition configuration.Partition
 	// To handle such cases, we can retry the command.
 	switch fsType {
 	case "fat32", "fat16", "vfat", "ext2", "ext3", "ext4", "xfs":
+		mkfsOptions := mkfsOptions[fsType]
+
 		if fsType == "fat32" || fsType == "fat16" {
 			fsType = "vfat"
 		}
+
+		mkfsArgs := []string{"-t", fsType}
+		mkfsArgs = append(mkfsArgs, mkfsOptions...)
+		mkfsArgs = append(mkfsArgs, partDevPath)
+
 		err = retry.Run(func() error {
-			_, stderr, err := shell.Execute("mkfs", "-t", fsType, partDevPath)
+			_, stderr, err := shell.Execute("mkfs", mkfsArgs...)
 			if err != nil {
 				logger.Log.Warnf("Failed to format partition using mkfs: %v", stderr)
 				return err
