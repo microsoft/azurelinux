@@ -1,3 +1,24 @@
+#
+# Hard-coded settings unique to CBL-Mariner
+#
+# For CBL-Mariner, hardcode python3
+%global _pythonver 3
+# Use same malloc that previous CBL-Mariner used
+%global _without_tcmalloc --without-tcmalloc
+# Disabling 'server' subpackage for CBL-Mariner as it's currently unnecessary.
+%global _without_server --without-server
+# Use systemd like previously done
+%global _with_systemd true
+# Enable firewalld as previously done
+%global _with_firewalld --enable-firewalld
+# Skip regression-tests because they previously were excluded in
+# CBL-Mariner glusterfs and the new version introduces a dependency
+# (dbench)
+%global _without_regression_tests true
+#
+#
+#
+
 %global __brp_python_bytecompile %{nil}
 # This package depends on automagic byte compilation
 # https://fedoraproject.org/wiki/Changes/No_more_automagic_Python_bytecompilation_phase_2
@@ -191,24 +212,6 @@
 %if "%{bashcompdir}" == ""
 %global bashcompdir ${sysconfdir}/bash_completion.d
 %endif
-
-#
-# Hard-coded settings unique to CBL-Mariner
-#
-# For CBL-Mariner, hardcode python3
-%global _pythonver 3
-# Use same malloc that previous CBL-Mariner used
-%global _without_tcmalloc --without-tcmalloc
-# Disabling 'server' subpackage for CBL-Mariner as it's currently unnecessary.
-%global _without_server --without-server
-# Use systemd like previously done
-%global _with_systemd true
-# Enable firewalld as previously done
-%global _with_firewalld --enable-firewalld
-# Skip regression-tests because they previously were excluded in
-# CBL-Mariner glusterfs and the new version introduces a dependency
-# (dbench)
-%global _without_regression_tests true
 ##-----------------------------------------------------------------------------
 ## All package definitions should be placed here and keep them sorted
 ##
@@ -226,6 +229,8 @@ Source2:        glusterfsd.sysconfig
 Source7:        glusterfsd.service
 Source8:        glusterfsd.init
 Patch001:       include-eventtypes-always.patch
+
+BuildRoot:        %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
 Requires(pre):    shadow-utils
 %if ( 0%{?_with_systemd:1} )
