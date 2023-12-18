@@ -416,13 +416,8 @@ func setupLoopDeviceDisk(outputDir, diskName string, diskConfig configuration.Di
 }
 
 func setupRealDisk(diskDevPath string, diskConfig configuration.Disk, rootEncryption configuration.RootEncryption, readOnlyRootConfig configuration.ReadOnlyVerityRoot) (partIDToDevPathMap, partIDToFsTypeMap map[string]string, encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice, err error) {
-	const (
-		defaultBlockSize = diskutils.MiB
-		noMaxSize        = 0
-	)
-
 	// Set up partitions
-	partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err = diskutils.CreatePartitions(diskDevPath, diskConfig, rootEncryption, readOnlyRootConfig)
+	partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err = diskutils.CreatePartitions(diskDevPath, diskConfig, rootEncryption, readOnlyRootConfig, nil)
 	if err != nil {
 		logger.Log.Errorf("Failed to create partitions on disk (%s)", diskDevPath)
 		return
