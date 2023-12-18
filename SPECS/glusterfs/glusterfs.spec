@@ -61,7 +61,6 @@
 %ifnarch x86_64
 %global _without_tcmalloc --without-tcmalloc
 %endif
-%global _without_tcmalloc --without-tcmalloc
 # Do not use libtirpc on EL6, it does not have xdr_uint64_t() and xdr_uint32_t
 # Do not use libtirpc on EL7, it does not have xdr_sizeof()
 %if ( 0%{?rhel} && 0%{?rhel} <= 7 )
@@ -79,8 +78,6 @@
 %if ( 0%{?rhel} && 0%{?rhel} <= 6 )
 %global _without_server --without-server
 %endif
-# Disabling 'server' subpackage for CBL-Mariner as it's currently unnecessary.
-%global _without_server --without-server
 # syslog
 # if you wish to build rpms without syslog logging, compile like this
 # rpmbuild -ta @PACKAGE_NAME@-@PACKAGE_VERSION@.tar.gz --without syslog
@@ -114,11 +111,9 @@
 %if ( 0%{?fedora} ) || ( 0%{?rhel} && 0%{?rhel} > 6 )
 %global _with_systemd true
 %endif
-%global _with_systemd true
 %if ( 0%{?fedora} ) || ( 0%{?rhel} && 0%{?rhel} >= 7 )
 %global _with_firewalld --enable-firewalld
 %endif
-%global _with_firewalld --enable-firewalld
 %if 0%{?_tmpfilesdir:1}
 %global _with_tmpfilesdir --with-tmpfilesdir=%{_tmpfilesdir}
 %else
@@ -139,7 +134,6 @@
 %global _usepython3 0
 %global _pythonver 2
 %endif
-%global _pythonver 3
 # From https://fedoraproject.org/wiki/Packaging:Python#Macros
 %if ( 0%{?rhel} && 0%{?rhel} <= 6 )
 %{!?python2_sitelib: %global python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
@@ -197,6 +191,20 @@
 %if "%{bashcompdir}" == ""
 %global bashcompdir ${sysconfdir}/bash_completion.d
 %endif
+
+#
+# Hard-coded settings unique to CBL-Mariner
+#
+# For CBL-Mariner, hardcode python3
+%global _pythonver 3
+# Use same malloc that previous CBL-Mariner used
+%global _without_tcmalloc --without-tcmalloc
+# Disabling 'server' subpackage for CBL-Mariner as it's currently unnecessary.
+%global _without_server --without-server
+# Use systemd like previously done
+%global _with_systemd true
+# Enable firewalld as previously done
+%global _with_firewalld --enable-firewalld
 # Skip regression-tests because they previously were excluded in
 # CBL-Mariner glusterfs and the new version introduces a dependency
 # (dbench)
