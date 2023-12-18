@@ -16494,8 +16494,8 @@
         "type": "other",
         "other": {
           "name": "perl-CPAN-Meta-Check",
-          "version": "0.014",
-          "downloadUrl": "http://cpan.metacpan.org/authors/id/L/LE/LEONT/CPAN-Meta-Check-0.014.tar.gz"
+          "version": "0.018",
+          "downloadUrl": "http://cpan.metacpan.org/authors/id/L/LE/LEONT/CPAN-Meta-Check-0.018.tar.gz"
         }
       }
     },
