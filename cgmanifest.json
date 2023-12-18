@@ -18044,8 +18044,8 @@
         "type": "other",
         "other": {
           "name": "perl-libwww-perl",
-          "version": "6.49",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/O/OA/OALDERS/libwww-perl-6.49.tar.gz"
+          "version": "6.72",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/O/OA/OALDERS/libwww-perl-6.72.tar.gz"
         }
       }
     },

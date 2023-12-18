@@ -4,8 +4,8 @@
 %bcond_with perl_libwww_perl_enables_internet_test
 
 Name:           perl-libwww-perl
-Version:        6.49
-Release:        3%{?dist}
+Version:        6.72
+Release:        1%{?dist}
 Summary:        A Perl interface to the World-Wide Web
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -174,6 +174,9 @@ make test
 %{_mandir}/man3/*.3*
 
 %changelog
+* Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.72-1
+- Auto-upgrade to 6.72 - Azure Linux 3.0 - package upgrades
+
 * Tue Jul 26 2022 Henry Li <lihl@microsoft.com> - 6.49-3
 - License Verified
 
