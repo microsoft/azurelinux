@@ -19844,8 +19844,8 @@
         "type": "other",
         "other": {
           "name": "perl-Test-Fatal",
-          "version": "0.014",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RJ/RJBS/Test-Fatal-0.014.tar.gz"
+          "version": "0.017",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RJ/RJBS/Test-Fatal-0.017.tar.gz"
         }
       }
     },
