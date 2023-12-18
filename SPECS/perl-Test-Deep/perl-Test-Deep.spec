@@ -1,6 +1,6 @@
 Name:           perl-Test-Deep
-Version:        1.130
-Release:        3%{?dist}
+Version:        1.204
+Release:        1%{?dist}
 Summary:        Extremely flexible deep comparison
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -67,6 +67,9 @@ make test
 %{_mandir}/man3/Test::Deep::NoTest.3*
 
 %changelog
+* Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.204-1
+- Auto-upgrade to 1.204 - Azure Linux 3.0 - package upgrades
+
 * Thu Aug 04 2022 Muhammad Falak <mwani@microsoft.com> - 1.130-3
 - Add `%license`
 - License verified

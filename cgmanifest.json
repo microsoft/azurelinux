@@ -19764,8 +19764,8 @@
         "type": "other",
         "other": {
           "name": "perl-Test-Deep",
-          "version": "1.130",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Test/Test-Deep-1.130.tar.gz"
+          "version": "1.204",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Test/Test-Deep-1.204.tar.gz"
         }
       }
     },
