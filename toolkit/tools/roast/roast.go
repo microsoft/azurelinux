@@ -308,6 +308,8 @@ func converterFactory(formatType string) (converter formats.Converter, err error
 		converter = formats.NewGzip()
 	case formats.TarGzipType:
 		converter = formats.NewTarGzip()
+	case formats.SquashFSType:
+		converter = formats.NewSquashFS()
 	case formats.XzType:
 		converter = formats.NewXz()
 	case formats.TarXzType:

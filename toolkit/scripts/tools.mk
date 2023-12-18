@@ -43,6 +43,7 @@ go_tool_list = \
 	imager \
 	isomaker \
 	liveinstaller \
+	osmodifier \
 	pkgworker \
 	precacher \
 	repoquerywrapper \
