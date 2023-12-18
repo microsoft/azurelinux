@@ -17964,8 +17964,8 @@
         "type": "other",
         "other": {
           "name": "perl-JSON",
-          "version": "4.05",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/JSON/JSON-4.05.tar.gz"
+          "version": "4.10",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/JSON/JSON-4.10.tar.gz"
         }
       }
     },
