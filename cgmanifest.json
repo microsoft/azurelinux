@@ -20454,8 +20454,8 @@
         "type": "other",
         "other": {
           "name": "perl-URI",
-          "version": "1.76",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/O/OA/OALDERS/URI-1.76.tar.gz"
+          "version": "5.21",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/O/OA/OALDERS/URI-5.21.tar.gz"
         }
       }
     },

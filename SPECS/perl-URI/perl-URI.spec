@@ -2,8 +2,8 @@
 %bcond_without perl_URI_enables_Business_ISBN
 
 Name:           perl-URI
-Version:        1.76
-Release:        8%{?dist}
+Version:        5.21
+Release:        1%{?dist}
 Summary:        A Perl module implementing URI parsing and manipulation
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -99,6 +99,9 @@ make test
 %{_mandir}/man3/URI::ldap.3*
 
 %changelog
+* Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.21-1
+- Auto-upgrade to 5.21 - Azure Linux 3.0 - package upgrades
+
 * Tue Jul 26 2022 Henry Li <lihl@microsoft.com> - 1.76-8
 - License Verified
 
