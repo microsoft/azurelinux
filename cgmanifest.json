@@ -17854,8 +17854,8 @@
         "type": "other",
         "other": {
           "name": "perl-IO-HTML",
-          "version": "1.001",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/C/CJ/CJM/IO-HTML-1.001.tar.gz"
+          "version": "1.004",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/C/CJ/CJM/IO-HTML-1.004.tar.gz"
         }
       }
     },
