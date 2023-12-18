@@ -20714,8 +20714,8 @@
         "type": "other",
         "other": {
           "name": "perl-XML-XPath",
-          "version": "1.44",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/MA/MANWAR/XML-XPath-1.44.tar.gz"
+          "version": "1.48",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/MA/MANWAR/XML-XPath-1.48.tar.gz"
         }
       }
     },
