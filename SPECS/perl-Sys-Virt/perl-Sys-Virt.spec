@@ -1,7 +1,7 @@
 Summary:        Represent and manage a libvirt hypervisor connection
 Name:           perl-Sys-Virt
-Version:        6.1.0
-Release:        4%{?dist}
+Version:        9.8.0
+Release:        1%{?dist}
 License:        GPLv2+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -72,6 +72,9 @@ perl Build.PL installdirs=vendor
 %{_mandir}/man3/*
 
 %changelog
+* Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.8.0-1
+- Auto-upgrade to 9.8.0 - Azure Linux 3.0 - package upgrades
+
 * Fri Apr 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.1.0-4
 - Cleaning-up spec. License verified.
 

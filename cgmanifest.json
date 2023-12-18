@@ -19644,8 +19644,8 @@
         "type": "other",
         "other": {
           "name": "perl-Sys-Virt",
-          "version": "6.1.0",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/D/DA/DANBERR/Sys-Virt-v6.1.0.tar.gz"
+          "version": "9.8.0",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/D/DA/DANBERR/Sys-Virt-v9.8.0.tar.gz"
         }
       }
     },
