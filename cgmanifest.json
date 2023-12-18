@@ -18094,8 +18094,8 @@
         "type": "other",
         "other": {
           "name": "perl-local-lib",
-          "version": "2.000024",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/H/HA/HAARG/local-lib-2.000024.tar.gz"
+          "version": "2.000029",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/H/HA/HAARG/local-lib-2.000029.tar.gz"
         }
       }
     },
