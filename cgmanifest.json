@@ -17684,8 +17684,8 @@
         "type": "other",
         "other": {
           "name": "perl-HTTP-Daemon",
-          "version": "6.06",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/O/OA/OALDERS/HTTP-Daemon-6.06.tar.gz"
+          "version": "6.16",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/O/OA/OALDERS/HTTP-Daemon-6.16.tar.gz"
         }
       }
     },
