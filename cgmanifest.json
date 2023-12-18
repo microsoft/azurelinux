@@ -16474,8 +16474,8 @@
         "type": "other",
         "other": {
           "name": "perl-CPAN-Changes",
-          "version": "0.400002",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/CPAN/CPAN-Changes-0.400002.tar.gz"
+          "version": "0.500002",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/CPAN/CPAN-Changes-0.500002.tar.gz"
         }
       }
     },

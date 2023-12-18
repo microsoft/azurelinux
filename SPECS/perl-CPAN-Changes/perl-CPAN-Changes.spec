@@ -1,7 +1,7 @@
 Summary:        Read and write Changes files
 Name:           perl-CPAN-Changes
-Version:        0.400002
-Release:        16%{?dist}
+Version:        0.500002
+Release:        1%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -89,6 +89,9 @@ make test TEST_FILES="$(echo $(find xt/ -name '*.t'))"
 %{_mandir}/man3/Test::CPAN::Changes.3*
 
 %changelog
+* Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.500002-1
+- Auto-upgrade to 0.500002 - Azure Linux 3.0 - package upgrades
+
 * Wed Jul 20 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.400002-16
 - License verified.
 - Spec clean-up.
