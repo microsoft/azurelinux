@@ -18524,8 +18524,8 @@
         "type": "other",
         "other": {
           "name": "perl-Module-ScanDeps",
-          "version": "1.31",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RS/RSCHUPP/Module-ScanDeps-1.31.tar.gz"
+          "version": "1.35",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RS/RSCHUPP/Module-ScanDeps-1.35.tar.gz"
         }
       }
     },
