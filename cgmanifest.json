@@ -17694,8 +17694,8 @@
         "type": "other",
         "other": {
           "name": "perl-HTTP-Date",
-          "version": "6.05",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/O/OA/OALDERS/HTTP-Date-6.05.tar.gz"
+          "version": "6.06",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/O/OA/OALDERS/HTTP-Date-6.06.tar.gz"
         }
       }
     },
