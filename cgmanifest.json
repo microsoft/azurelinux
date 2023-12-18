@@ -16114,8 +16114,8 @@
         "type": "other",
         "other": {
           "name": "perl-CGI",
-          "version": "4.54",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/L/LE/LEEJO/CGI-4.54.tar.gz"
+          "version": "4.60",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/L/LE/LEEJO/CGI-4.60.tar.gz"
         }
       }
     },
