@@ -20354,8 +20354,8 @@
         "type": "other",
         "other": {
           "name": "perl-Try-Tiny",
-          "version": "0.30",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/E/ET/ETHER/Try-Tiny-0.30.tar.gz"
+          "version": "0.31",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/E/ET/ETHER/Try-Tiny-0.31.tar.gz"
         }
       }
     },
