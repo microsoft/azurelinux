@@ -305,7 +305,7 @@ BuildRequires:    python-ctypes
 %if ( 0%{?_with_ipv6default:1} ) || ( 0%{!?_without_libtirpc:1} )
 BuildRequires:    libtirpc-devel
 %endif
-%if ( 0%{?fedora} && 0%{?fedora} > 27 ) || ( 0%{?rhel} && 0%{?rhel} > 7 ) || ( 0%{!?_require_rpcgen:1} )
+%if ( 0%{?fedora} && 0%{?fedora} > 27 ) || ( 0%{?rhel} && 0%{?rhel} > 7 ) || ( 0%{?_require_rpcgen:1} )
 BuildRequires:    rpcgen
 %endif
 BuildRequires:    userspace-rcu-devel >= 0.7
