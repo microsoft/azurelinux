@@ -17894,8 +17894,8 @@
         "type": "other",
         "other": {
           "name": "perl-IO-Socket-SSL",
-          "version": "2.074",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/IO/IO-Socket-SSL-2.074.tar.gz"
+          "version": "2.084",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/IO/IO-Socket-SSL-2.084.tar.gz"
         }
       }
     },
