@@ -511,8 +511,14 @@ CREATE_INITRD_OUT_DIR=$BUILD_WORKING_DIR/create-initrd-from-folder-out-dir
 # -----------------------------------------------
 # Cfg1, Cfg3, Cfg4, Cfg5
 #
-SOURCE_ROOTFS_FILE=$FEDORA_LIVE_ISO_WRAPPER_RAW_FILE_0
-TARGET_ROOTFS_FILE="/artifacts/wrapper.img"
+# SOURCE_ROOTFS_FILE=$FEDORA_LIVE_ISO_WRAPPER_RAW_FILE_0
+# TARGET_ROOTFS_FILE="/artifacts/wrapper.img"
+
+#-------------------------------------------------
+# Cfg6
+#
+SOURCE_ROOTFS_FILE=$MODIFIED_ROOTFS_SQUASH_FILE
+TARGET_ROOTFS_FILE="/LiveOS/rootfs.img"
 
 create_iso_with_rootfs_initrd \
     ~/temp/initrd.img \
