@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: moby-%{upstream_name}
 Version: 1.6.22
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
