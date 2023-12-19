@@ -70,7 +70,6 @@ find %{buildroot} -type f -name .packlist -delete
 # Install tests
 mkdir -p %{buildroot}%{_libexecdir}/%{name}
 cp -a t %{buildroot}%{_libexecdir}/%{name}
-rm %{buildroot}%{_libexecdir}/%{name}/t/00_pod.t
 cat > %{buildroot}%{_libexecdir}/%{name}/test << 'EOF'
 #!/bin/bash
 # t/20_unknown.t writes to CWD
