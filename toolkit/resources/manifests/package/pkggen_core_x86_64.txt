@@ -190,9 +190,9 @@ libssh2-1.11.0-1.azl3.x86_64.rpm
 libssh2-devel-1.11.0-1.azl3.x86_64.rpm
 krb5-1.21.2-1.azl3.x86_64.rpm
 nghttp2-1.57.0-1.azl3.x86_64.rpm
-curl-8.3.0-2.azl3.x86_64.rpm
-curl-devel-8.3.0-2.azl3.x86_64.rpm
-curl-libs-8.3.0-2.azl3.x86_64.rpm
+curl-8.5.0-1.azl3.x86_64.rpm
+curl-devel-8.5.0-1.azl3.x86_64.rpm
+curl-libs-8.5.0-1.azl3.x86_64.rpm
 createrepo_c-0.17.5-1.azl3.x86_64.rpm
 libxml2-2.11.5-1.azl3.x86_64.rpm
 libxml2-devel-2.11.5-1.azl3.x86_64.rpm
