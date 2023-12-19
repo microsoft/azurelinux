@@ -37,6 +37,7 @@ ignore_no_source_tarball=" \
   initramfs \
   installkernel \
   javapackages-tools-meta \
+  kata-packages \
   kde-filesystem \
   kf5 \
   livepatching \

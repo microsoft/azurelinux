@@ -12,6 +12,7 @@
                 "crash-ptdump-command",
                 "delve",
                 "fstrm",
+                "kata-packages",
                 "nodejs-nodemon",
                 "rhnlib",
                 "rt-setup",
