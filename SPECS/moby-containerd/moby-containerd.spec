@@ -90,6 +90,9 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Tue Dec 19 2023 Ravi Prakash Pandey <rapandey@microsoft.com> - 1.6.22-5
+- Set oom_score_adj of containerd to -999 and bump the release version to 5
+
 * Tue Oct 18 2023 Chris PeBenito <chpebeni@microsoft.com> - 1.6.22-4
 - Precreate /opt/containerd/{bin,lib} to ensure correct SELinux labeling.
 
