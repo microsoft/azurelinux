@@ -46,7 +46,7 @@ cpan Test::Fatal Test::Requires Test::Warnings Test::Without::Module
 make test
 
 %files
-%license LICENSE
+%license LICENCE
 %{perl_vendorlib}/*
 %{_mandir}/man?/*
 
