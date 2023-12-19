@@ -1226,6 +1226,19 @@
                 "PR": [
                     "https://github.com/microsoft/CBL-Mariner/pull/6574"
                 ]
+            },
+            "CONFIG_USER_EVENTS": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "Enable user-based event tracing",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/7044"
+                ]
             }
         }
     }
