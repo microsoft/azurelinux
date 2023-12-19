@@ -150,7 +150,7 @@ Specifies the configuration for dm-verity root integrity verification.
 
 - DataPartition: A partition configured with dm-verity, which verifies integrity at each system boot. 
 
-  - IdType: Specifies the type of id for the partition. The options are `Partition` (partition block device path, for example, `/dev/sda1`), `PartLabel` (partition label), `Uuid` (FS UUID), and `PartUuid` (partition UUID). 
+  - IdType: Specifies the type of id for the partition. The options are `PartLabel` (partition label), `Uuid` (filesystem UUID), and `PartUuid` (partition UUID). 
 
   - Id: The unique identifier value of the partition, corresponding to the specified IdType. 
 
@@ -162,8 +162,8 @@ Example:
 SystemConfig:
   Verity:
     DataPartition:
-      IdType: Partition
-      Id: /dev/sda3
+      IdType: PartUuid
+      Id: 00000000-0000-0000-0000-000000000000
     HashPartition:
       IdType: PartLabel
       Id: hash_partition
