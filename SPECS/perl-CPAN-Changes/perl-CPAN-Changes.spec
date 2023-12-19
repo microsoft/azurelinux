@@ -83,9 +83,7 @@ make test TEST_FILES="$(echo $(find xt/ -name '*.t'))"
 %{perl_vendorlib}/Test/
 %{_mandir}/man1/tidy_changelog.1*
 %{_mandir}/man3/CPAN::Changes.3*
-%{_mandir}/man3/CPAN::Changes::Group.3*
-%{_mandir}/man3/CPAN::Changes::Release.3*
-%{_mandir}/man3/CPAN::Changes::Spec.3*
+%{_mandir}/man3/CPAN::Changes::*.3*
 %{_mandir}/man3/Test::CPAN::Changes.3*
 
 %changelog
