@@ -161,22 +161,3 @@ func mountIdentifierTypeToImager(mountIdentifierType imagecustomizerapi.MountIde
 		return "", fmt.Errorf("unknwon MountIdentifierType value (%s)", mountIdentifierType)
 	}
 }
-
-func IdTypeToImager(idType imagecustomizerapi.IdType) (string, error) {
-	switch idType {
-	case imagecustomizerapi.IdTypePartition:
-		return "Partition", nil
-
-	case imagecustomizerapi.IdTypePartlabel:
-		return "PartLabel", nil
-
-	case imagecustomizerapi.IdTypeUuid:
-		return "Uuid", nil
-
-	case imagecustomizerapi.IdTypePartuuid:
-		return "PartUuid", nil
-
-	default:
-		return "", fmt.Errorf("invalid IdType value (%s)", idType)
-	}
-}

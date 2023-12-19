@@ -10,7 +10,6 @@ import (
 type IdType string
 
 const (
-	IdTypePartition IdType = "Partition"
 	IdTypePartlabel IdType = "PartLabel"
 	IdTypeUuid      IdType = "Uuid"
 	IdTypePartuuid  IdType = "PartUuid"
@@ -18,7 +17,7 @@ const (
 
 func (i IdType) IsValid() error {
 	switch i {
-	case IdTypePartition, IdTypePartlabel, IdTypeUuid, IdTypePartuuid:
+	case IdTypePartlabel, IdTypeUuid, IdTypePartuuid:
 		// All good.
 		return nil
 

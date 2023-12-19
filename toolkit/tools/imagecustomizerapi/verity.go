@@ -7,11 +7,6 @@ import (
 	"fmt"
 )
 
-type VerityPartition struct {
-	IdType IdType `yaml:"IdType"`
-	Id     string `yaml:"Id"`
-}
-
 type Verity struct {
 	DataPartition VerityPartition `yaml:"DataPartition"`
 	HashPartition VerityPartition `yaml:"HashPartition"`

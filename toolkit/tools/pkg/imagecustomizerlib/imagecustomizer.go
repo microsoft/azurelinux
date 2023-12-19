@@ -280,7 +280,11 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 	}
 
 	var rootHash string
-	rootHashRegex := regexp.MustCompile(`Root hash:\s+([0-9a-fA-F]+)`)
+	rootHashRegex, err := regexp.Compile(`Root hash:\s+([0-9a-fA-F]+)`)
+	if err != nil {
+		// handle the error appropriately, for example:
+		return fmt.Errorf("failed to compile root hash regex: %w", err)
+	}
 
 	rootHashMatches := rootHashRegex.FindStringSubmatch(verityOutput)
 	if len(rootHashMatches) <= 1 {
@@ -288,37 +292,37 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 	}
 	rootHash = rootHashMatches[1]
 
+	systemBootPartition, err := findSystemBootPartition(diskPartitions)
+	if err != nil {
+		return err
+	}
+	bootPartition, err := findBootPartitionFromEsp(systemBootPartition, diskPartitions, buildDir)
+	if err != nil {
+		return err
+	}
+
 	bootPartitionTmpDir := filepath.Join(buildDir, tmpParitionDirName)
-	for _, diskPartition := range diskPartitions {
-		switch diskPartition.FileSystemType {
-		case "ext4", "vfat", "xfs":
+	// Temporarily mount the partition.
+	bootPartitionMount, err := safemount.NewMount(bootPartition.Path, bootPartitionTmpDir, bootPartition.FileSystemType, 0, "", true)
+	if err != nil {
+		return fmt.Errorf("failed to mount partition (%s):\n%w", bootPartition.Path, err)
+	}
+	defer bootPartitionMount.Close()
 
-		default:
-			// Skips file system types that aren't known to support the boot loader partition.
-			continue
-		}
+	grubCfgFullPath := filepath.Join(bootPartitionTmpDir, "grub2/grub.cfg")
+	if err != nil {
+		return fmt.Errorf("failed to stat file (%s):\n%w", grubCfgFullPath, err)
+	}
 
-		// Temporarily mount the partition.
-		partitionMount, err := safemount.NewMount(diskPartition.Path, bootPartitionTmpDir, diskPartition.FileSystemType, 0, "", true)
-		if err != nil {
-			return fmt.Errorf("failed to mount partition (%s):\n%w", diskPartition.Path, err)
-		}
-		defer partitionMount.Close()
+	err = updateGrubConfig(config.SystemConfig.Verity.DataPartition.IdType, config.SystemConfig.Verity.DataPartition.Id,
+		config.SystemConfig.Verity.HashPartition.IdType, config.SystemConfig.Verity.HashPartition.Id, rootHash, grubCfgFullPath)
+	if err != nil {
+		return err
+	}
 
-		grubCfgFullPath := filepath.Join(bootPartitionTmpDir, "grub2/grub.cfg")
-		grubCfgExists, err := file.PathExists(grubCfgFullPath)
-		if err != nil {
-			return fmt.Errorf("failed to stat file (%s):\n%w", grubCfgFullPath, err)
-		}
-
-		if grubCfgExists {
-			// Update grub configuration
-			err = updateGrubConfig(config.SystemConfig.Verity.DataPartition.IdType, config.SystemConfig.Verity.DataPartition.Id, config.SystemConfig.Verity.HashPartition.IdType, config.SystemConfig.Verity.HashPartition.Id, rootHash, grubCfgFullPath)
-			if err != nil {
-				return err
-			}
-			break
-		}
+	err = bootPartitionMount.CleanClose()
+	if err != nil {
+		return err
 	}
 
 	return nil

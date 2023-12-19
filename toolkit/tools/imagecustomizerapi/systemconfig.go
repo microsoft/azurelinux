@@ -28,7 +28,7 @@ type SystemConfig struct {
 	Users                   []User                    `yaml:"Users"`
 	Services                Services                  `yaml:"Services"`
 	Modules                 Modules                   `yaml:"Modules"`
-	Verity                  Verity                    `yaml:"Verity"`
+	Verity                  *Verity                   `yaml:"Verity"`
 }
 
 func (s *SystemConfig) IsValid() error {

@@ -7,11 +7,11 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strings"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 )
@@ -38,11 +38,11 @@ func enableVerityPartition(imageChroot *safechroot.Chroot) error {
 func buildDracutModule(dracutModuleName string, imageChroot *safechroot.Chroot) error {
 	var err error
 
-	// This function will be run inside the chroot to list kernel files in /boot
 	listKernels := func() ([]string, error) {
 		var kernels []string
-		// Assuming the vmlinuz files are located in /boot
-		files, err := filepath.Glob("/boot/vmlinuz-*")
+		// Use RootDir to get the path on the host OS
+		bootDir := filepath.Join(imageChroot.RootDir(), "boot")
+		files, err := filepath.Glob(filepath.Join(bootDir, "vmlinuz-*"))
 		if err != nil {
 			return nil, err
 		}
@@ -52,24 +52,25 @@ func buildDracutModule(dracutModuleName string, imageChroot *safechroot.Chroot) 
 		return kernels, nil
 	}
 
-	var kernelFiles []string
-	err = imageChroot.Run(func() error {
-		kernelFiles, err = listKernels()
-		return err
-	})
+	kernelFiles, err := listKernels()
 	if err != nil {
-		return fmt.Errorf("failed to list kernels in chroot: %w", err)
+		return fmt.Errorf("failed to list kernels: %w", err)
 	}
 
 	if len(kernelFiles) == 0 {
 		return fmt.Errorf("no kernels found in chroot environment")
 	}
 
+	// Check if more than one kernel is found
+	if len(kernelFiles) > 1 {
+		return fmt.Errorf("multiple kernels found in chroot environment, expected only one")
+	}
+
 	// Extract the version from the kernel filename (e.g., vmlinuz-5.15.131.1-2.cm2 -> 5.15.131.1-2.cm2)
 	kernelVersion := strings.TrimPrefix(kernelFiles[0], "vmlinuz-")
 
 	err = imageChroot.Run(func() error {
-		// TODO: Config Dracut module systemd-veritysetup.
+		// TODO: Config Dracut module systemd-veritysetup - task 6421.
 		err = shell.ExecuteLiveWithErr(1, "dracut", "-f", "--kver", kernelVersion, "-a", dracutModuleName)
 		return err
 	})
@@ -99,49 +100,54 @@ func updateMarinerCfgWithInitramfs(imageChroot *safechroot.Chroot) error {
 	newInitramfs := filepath.Base(initramfsFiles[0])
 
 	cfgPath := filepath.Join(imageChroot.RootDir(), "boot/mariner.cfg")
-	// Update mariner.cfg to reference the new initramfs
-	input, err := os.ReadFile(cfgPath)
+
+	lines, err := file.ReadLines(cfgPath)
 	if err != nil {
 		return fmt.Errorf("failed to read mariner.cfg: %w", err)
 	}
 
-	lines := strings.Split(string(input), "\n")
+	// Update lines to reference the new initramfs
 	for i, line := range lines {
 		if strings.HasPrefix(line, "mariner_initrd=") {
 			lines[i] = "mariner_initrd=" + newInitramfs
 		}
 	}
-	output := strings.Join(lines, "\n")
-	os.WriteFile(cfgPath, []byte(output), 0644)
+	// Write the updated lines back to mariner.cfg using the internal method
+	err = file.WriteLines(lines, cfgPath)
+	if err != nil {
+		return fmt.Errorf("failed to write to mariner.cfg: %w", err)
+	}
 
 	return nil
 }
 
-func updateGrubConfig(dataPartitionIdType imagecustomizerapi.IdType, dataPartitionId string, hashPartitionIdType imagecustomizerapi.IdType, hashPartitionId string, rootHash string, grubCfgFullPath string) error {
+func updateGrubConfig(dataPartitionIdType imagecustomizerapi.IdType, dataPartitionId string,
+	hashPartitionIdType imagecustomizerapi.IdType, hashPartitionId string, rootHash string, grubCfgFullPath string,
+) error {
 	var err error
 
-	const cmdlineTemplate = "rd.systemd.verity=1 roothash=%s systemd.verity_root_data=%s systemd.verity_root_hash=%s systemd.verity_root_options=panic-on-corruption"
 	// Format the dataPartitionId and hashPartitionId using the helper function.
-	formattedDataPartitionPlaceHolder, err := systemdFormatPartitionId(dataPartitionIdType, dataPartitionId)
+	formattedDataPartition, err := systemdFormatPartitionId(dataPartitionIdType, dataPartitionId)
 	if err != nil {
 		return err
 	}
-	formattedHashPartitionPlaceHolder, err := systemdFormatPartitionId(hashPartitionIdType, hashPartitionId)
+	formattedHashPartition, err := systemdFormatPartitionId(hashPartitionIdType, hashPartitionId)
 	if err != nil {
 		return err
 	}
 
-	newArgs := fmt.Sprintf(cmdlineTemplate, rootHash, formattedDataPartitionPlaceHolder, formattedHashPartitionPlaceHolder)
+	newArgs := fmt.Sprintf(
+		"rd.systemd.verity=1 roothash=%s systemd.verity_root_data=%s systemd.verity_root_hash=%s systemd.verity_root_options=panic-on-corruption",
+		rootHash, formattedDataPartition, formattedHashPartition,
+	)
 
-	content, err := os.ReadFile(grubCfgFullPath)
+	// Read grub.cfg using the internal method
+	lines, err := file.ReadLines(grubCfgFullPath)
 	if err != nil {
 		return fmt.Errorf("failed to read grub config: %v", err)
 	}
 
-	// Split the content into lines for processing
-	lines := strings.Split(string(content), "\n")
 	var updatedLines []string
-
 	for _, line := range lines {
 		trimmedLine := strings.TrimSpace(line)
 		if strings.HasPrefix(trimmedLine, "linux ") {
@@ -155,8 +161,7 @@ func updateGrubConfig(dataPartitionIdType imagecustomizerapi.IdType, dataPartiti
 		updatedLines = append(updatedLines, line)
 	}
 
-	// Write the updated content back to grub.cfg
-	err = os.WriteFile(grubCfgFullPath, []byte(strings.Join(updatedLines, "\n")), 0644)
+	err = file.WriteLines(updatedLines, grubCfgFullPath)
 	if err != nil {
 		return fmt.Errorf("failed to write updated grub config: %v", err)
 	}
@@ -166,45 +171,23 @@ func updateGrubConfig(dataPartitionIdType imagecustomizerapi.IdType, dataPartiti
 
 // idToPartitionBlockDevicePath returns the block device path for a given idType and id.
 func idToPartitionBlockDevicePath(idType imagecustomizerapi.IdType, id string, nbdDevice string, diskPartitions []diskutils.PartitionInfo) (string, error) {
-	imagerIdType, err := IdTypeToImager(idType)
-	if err != nil {
-		return "", err
-	}
-
-	// Create a regular expression to find the last number in the id string.
-	partitionRegex := regexp.MustCompile(`\d+$`)
-
 	// Iterate over each partition to find the matching id.
 	for _, partition := range diskPartitions {
-		switch imagerIdType {
-		case "Partition":
-			// Find the partition number in the provided id.
-			partNum := partitionRegex.FindString(id)
-			if partNum == "" {
-				return "", fmt.Errorf("no partition number found in id: %s", id)
-			}
-
-			// Construct the expected partition name.
-			expectedPartitionName := fmt.Sprintf("%sp%s", nbdDevice, partNum)
-
-			// Check if the constructed name matches the partition name.
-			if partition.Path == expectedPartitionName {
-				return partition.Path, nil
-			}
-		case "PartLabel":
+		switch idType {
+		case imagecustomizerapi.IdTypePartlabel:
 			if partition.PartLabel == id {
 				return partition.Path, nil
 			}
-		case "Uuid":
+		case imagecustomizerapi.IdTypeUuid:
 			if partition.Uuid == id {
 				return partition.Path, nil
 			}
-		case "PartUuid":
+		case imagecustomizerapi.IdTypePartuuid:
 			if partition.PartUuid == id {
 				return partition.Path, nil
 			}
 		default:
-			return "", fmt.Errorf("invalid idType provided (%s)", imagerIdType)
+			return "", fmt.Errorf("invalid idType provided (%s)", string(idType))
 		}
 	}
 
@@ -214,19 +197,11 @@ func idToPartitionBlockDevicePath(idType imagecustomizerapi.IdType, id string, n
 
 // systemdFormatPartitionId formats the partition ID based on the ID type following systemd dm-verity style.
 func systemdFormatPartitionId(idType imagecustomizerapi.IdType, id string) (string, error) {
-	imagerIdType, err := IdTypeToImager(idType)
-	if err != nil {
-		return "", err
-	}
-
-	switch imagerIdType {
-	case "Partition":
-		return id, nil
-	// case imagecustomizerapi.ID: // Ignored for now.
-	case "PartLabel", "Uuid", "PartUuid":
-		return fmt.Sprintf("%s=%s", strings.ToUpper(imagerIdType), id), nil
+	switch idType {
+	case imagecustomizerapi.IdTypePartlabel, imagecustomizerapi.IdTypeUuid, imagecustomizerapi.IdTypePartuuid:
+		return fmt.Sprintf("%s=%s", strings.ToUpper(string(idType)), id), nil
 	default:
-		return "", fmt.Errorf("invalid idType provided (%s)", imagerIdType)
+		return "", fmt.Errorf("invalid idType provided (%s)", string(idType))
 	}
 }
 
