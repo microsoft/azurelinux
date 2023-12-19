@@ -2,7 +2,7 @@
 
 set -x
 echo "---- dmsquash-live-root.sh ---- 0 ----" > /dev/kmsg
-sleep 2s
+sleep 1s
 
 type getarg > /dev/null 2>&1 || . /lib/dracut-lib.sh
 
@@ -20,7 +20,6 @@ fi
 livedev="$1"
 
 echo "---- dmsquash-live-root.sh ---- 1 ---- livedev=$livedev" > /dev/kmsg
-sleep 3s
 
 # parse various live image specific options that make sense to be
 # specified as their own things
@@ -92,17 +91,17 @@ if [ -f "$livedev" ]; then
     esac
     [ -e /sys/fs/"$fstype" ] || modprobe "$fstype"
 else
-    echo "---- dmsquash-live-root.sh ---- 1.2.0 ---- livedev=$livedev" > /dev/kmsg
+    echo "---- dmsquash-live-root.sh ---- 1.2.0   ---- livedev=$livedev is not a file" > /dev/kmsg
 
     livedev_fstype=$(blkid -o value -s TYPE "$livedev")
-    echo "---- dmsquash-live-root.sh ---- 1.2.1 ---- livedev_fstype=$livedev_fstype" > /dev/kmsg
+    echo "---- dmsquash-live-root.sh ---- 1.2.1   ---- livedev_fstype=$livedev_fstype" > /dev/kmsg
 
     if [ "$livedev_fstype" = "squashfs" ]; then
         echo "---- dmsquash-live-root.sh ---- 1.2.1.1 ----" > /dev/kmsg
         # no mount needed - we've already got the LiveOS image in $livedev
         SQUASHED=$livedev
     elif [ "$livedev_fstype" != "ntfs" ]; then
-        echo "---- dmsquash-live-root.sh ---- 1.2.1.2 ----" > /dev/kmsg
+        echo "---- dmsquash-live-root.sh ---- 1.2.1.2 ---- mounting "$livedev" /run/initramfs/live" > /dev/kmsg
         if ! mount -n -t "$fstype" -o "${liverw:-ro}" "$livedev" /run/initramfs/live; then
             die "Failed to mount block device of live image"
             exit 1
@@ -120,10 +119,7 @@ else
     fi
 fi
 
-echo "---- dmsquash-live-root.sh ---- 2 ---- fstype=$fstype" > /dev/kmsg
-echo "---- dmsquash-live-root.sh ---- 3 ---- SQUASHED=$SQUASHED" > /dev/kmsg
-echo "---- dmsquash-live-root.sh ---- 4 ---- FSIMG=$FSIMG" > /dev/kmsg
-sleep 3s
+echo "---- dmsquash-live-root.sh ---- 2 ---- fstype=$fstype, SQUASHED=$SQUASHED, FSIMG=$FSIMG" > /dev/kmsg
 
 # overlay setup helper function
 do_live_overlay() {
@@ -143,12 +139,14 @@ do_live_overlay() {
         pathspec=${overlay##*:}
     fi
 
-    echo "---- do_live_overlay() ---- 1 ----pathspec=$pathspec" > /dev/kmsg
+    echo "---- do_live_overlay() ---- 1 ---- pathspec=$pathspec" > /dev/kmsg
 
     if [ -z "$pathspec" -o "$pathspec" = "auto" ]; then
         pathspec="/${live_dir}/overlay-$l-$u"
     fi
     devspec=${overlay%%:*}
+    echo "---- do_live_overlay() ---- 1.0.1 ---- pathspec=$pathspec" > /dev/kmsg
+    echo "---- do_live_overlay() ---- 1.0.2 ---- devspec=$devspec" > /dev/kmsg
 
     # need to know where to look for the overlay
     if [ -z "$setup" -a -n "$devspec" -a -n "$pathspec" -a -n "$overlay" ]; then
@@ -158,6 +156,8 @@ do_live_overlay() {
         mkdir -m 0755 -p /run/initramfs/overlayfs
         opt=''
         [ -n "$readonly_overlay" ] && opt=-r
+
+        echo "---- do_live_overlay() ---- 1.1.0 ---- mount $devspec /run/initramfs/overlayfs" > /dev/kmsg
         mount -n -t auto "$devspec" /run/initramfs/overlayfs || :
         if [ -f /run/initramfs/overlayfs$pathspec -a -w /run/initramfs/overlayfs$pathspec ]; then
 
@@ -202,11 +202,13 @@ do_live_overlay() {
             fi
             overlayfs="required"
             setup="yes"
+        else
+            echo "---- do_live_overlay() ---- 1.3 ---- nothing is matching..." > /dev/kmsg        
         fi
-        echo "---- do_live_overlay() ---- 1.2 ----" > /dev/kmsg
+        echo "---- do_live_overlay() ---- 1.4 ----" > /dev/kmsg
     fi
 
-    echo "---- do_live_overlay() ---- 2 ----" > /dev/kmsg
+    echo "---- do_live_overlay() ---- 2 ---- loading overlay driver." > /dev/kmsg
 
     if [ -n "$overlayfs" ]; then
         if ! modprobe overlay; then
@@ -224,7 +226,7 @@ do_live_overlay() {
     echo "---- do_live_overlay() ---- 3 ----" > /dev/kmsg
 
     if [ -z "$setup" -o -n "$readonly_overlay" ]; then
-        echo "---- do_live_overlay() ---- 3.1 ----" > /dev/kmsg
+        echo "---- do_live_overlay() ---- 3.1 ---- we'll be using a temporary overlay" > /dev/kmsg
 
         if [ -n "$setup" ]; then
             warn "Using temporary overlay."
@@ -339,21 +341,20 @@ do_live_overlay() {
     ln -s "$BASE_LOOPDEV" /dev/live-base
 
     echo "---- do_live_overlay() ---- 7 ----" > /dev/kmsg
-    sleep 10s
+    sleep 1s
 }
 # end do_live_overlay()
 
 set -x
-echo "---- dmsquash-live-root.sh ---- 5 ---- FSIMG=$FSIMG" > /dev/kmsg
+echo "---- dmsquash-live-root.sh ---- 5   ---- -e /run/initramfs/live/${live_dir}/${squash_image}" > /dev/kmsg
 
 # we might have an embedded fs image on squashfs (compressed live)
 if [ -e /run/initramfs/live/${live_dir}/${squash_image} ]; then
-    echo "---- dmsquash-live-root.sh ---- 5.1 ----" > /dev/kmsg
-    sleep 3s
+    echo "---- dmsquash-live-root.sh ---- 5.1 ---- setting SQUASHED="/run/initramfs/live/${live_dir}/${squash_image}"" > /dev/kmsg
     SQUASHED="/run/initramfs/live/${live_dir}/${squash_image}"
 fi
 
-echo "---- dmsquash-live-root.sh ---- 6 ----" > /dev/kmsg
+echo "---- dmsquash-live-root.sh ---- 6 ---- -e $SQUASHED" > /dev/kmsg
 
 if [ -e "$SQUASHED" ]; then
 
@@ -370,17 +371,17 @@ if [ -e "$SQUASHED" ]; then
         SQUASHED="/run/initramfs/squashed.img"
     fi
 
-    echo "---- dmsquash-live-root.sh ---- 6.2.0 ---- SQUASHED=$SQUASHED" > /dev/kmsg
+    echo "---- dmsquash-live-root.sh ---- 6.2.0 ---- creating a loop device off $SQUASHED" > /dev/kmsg
     SQUASHED_LOOPDEV=$(losetup -f)
-    echo "---- dmsquash-live-root.sh ---- 6.2.1 ---- SQUASHED_LOOPDEV=$SQUASHED_LOOPDEV" > /dev/kmsg
     losetup -r "$SQUASHED_LOOPDEV" $SQUASHED
+    echo "---- dmsquash-live-root.sh ---- 6.2.1 ---- created SQUASHED_LOOPDEV=$SQUASHED_LOOPDEV" > /dev/kmsg
 
-    echo "---- dmsquash-live-root.sh ---- 6.2.2 ---- losetup and mounting /run/initramfs/squashfs" > /dev/kmsg
+    echo "---- dmsquash-live-root.sh ---- 6.2.2 ---- mounting $SQUASHED_LOOPDEV to /run/initramfs/squashfs" > /dev/kmsg
     mkdir -m 0755 -p /run/initramfs/squashfs
     mount -n -t squashfs -o ro "$SQUASHED_LOOPDEV" /run/initramfs/squashfs
 
-    echo "---- dmsquash-live-root.sh ---- 6.3 ---- ls -la /run/initramfs/squashfs" > /dev/kmsg
-    /run/initramfs/squashfs > /dev/kmsg
+    echo "---- dmsquash-live-root.sh ---- 6.3 ---- mounted. ls -la /run/initramfs/squashfs" > /dev/kmsg
+    ls -la /run/initramfs/squashfs > /dev/kmsg
 
     if [ -d /run/initramfs/squashfs/LiveOS ]; then
         if [ -f /run/initramfs/squashfs/LiveOS/rootfs.img ]; then
@@ -401,8 +402,7 @@ if [ -e "$SQUASHED" ]; then
         exit 1
     fi
 
-    echo "---- dmsquash-live-root.sh ---- 6.4 ----FSIMG=$FSIMG" > /dev/kmsg
-
+    echo "---- dmsquash-live-root.sh ---- 6.4 ---- FSIMG=$FSIMG" > /dev/kmsg
 else
     # we might have an embedded fs image to use as rootfs (uncompressed live)
     if [ -e /run/initramfs/live/${live_dir}/rootfs.img ]; then
@@ -419,18 +419,20 @@ else
     fi
 fi
 
+echo "---- dmsquash-live-root.sh ---- 12 ---- losetup -a" > /dev/kmsg
+losetup -a >  /dev/kmsg
 echo "---- dmsquash-live-root.sh ---- 13 ---- checking FSIMG=$FSIMG" > /dev/kmsg
-sleep 3s
+sleep 1s
 
 if [ -n "$FSIMG" ]; then
 
     echo "---- dmsquash-live-root.sh ---- 13.1 ---- FSIMG not empty." > /dev/kmsg
-    sleep 3s
+    sleep 1s
 
     if [ -n "$writable_fsimg" ]; then
 
         echo "---- dmsquash-live-root.sh ---- 13.1.1 ---- writable_fsimg." > /dev/kmsg
-        sleep 2s
+        sleep 1s
 
         # mount the provided filesystem read/write
         echo "Unpacking live filesystem (may take some time)" > /dev/kmsg
@@ -449,12 +451,12 @@ if [ -n "$FSIMG" ]; then
         fi
         echo "---- dmsquash-live-root.sh ---- 13.1.1.2.3 ---- ls -la /run/initramfs/fsimg/" > /dev/kmsg
         ls -la /run/initramfs/fsimg/ > /dev/kmsg
-        sleep 5s
+        sleep 1s
         FSIMG=/run/initramfs/fsimg/rootfs.img
     fi
 
     echo "---- dmsquash-live-root.sh ---- 13.2 ----." > /dev/kmsg
-    sleep 3s
+    sleep 1s
 
     opt=-r
     # For writable DM images...
@@ -480,27 +482,16 @@ if [ -n "$FSIMG" ]; then
         BASE_LOOPDEV=$SQUASHED_LOOPDEV
     else
         echo "---- dmsquash-live-root.sh ---- 13.3.2 ---- losetup -f --show $FSIMG" > /dev/kmsg
-        # ls -la $FSIMG > /dev/kmsg
-        # losetup -a > /dev/kmsg
-        # losetup -f --show /run/initramfs/fsimg/rootfs.img
-        # losetup -f --verbose --show "$opt" $FSIMG > /dev/kmsg 2>&1
-        # good
-        # losetup -f --verbose --show $FSIMG > /dev/kmsg 2>&1
-        # udevadm trigger --action=add > /dev/null 2>&1
         if [ -n "$opt" ]; then
             BASE_LOOPDEV=$(losetup -f --show "$opt" $FSIMG)
         else
             BASE_LOOPDEV=$(losetup -f --show $FSIMG)
         fi
         echo "---- dmsquash-live-root.sh ---- 13.3.2.1 ---- BASE_LOOPDEV=$BASE_LOOPDEV" > /dev/kmsg
-        BASE_LOOPDEV
-        sleep 1s
         echo "---- dmsquash-live-root.sh ---- 13.3.2.2 ---- losetup -a" > /dev/kmsg
         losetup -a > /dev/kmsg
-        sleep 1s
         echo "---- dmsquash-live-root.sh ---- 13.3.2.3 ---- losetup -a" > /dev/kmsg
         lsblk -o NAME,FSTYPE,SIZE,MOUNTPOINT,LABEL,UUID,PARTLABEL,PARTUUID
-        sleep 1s
         sz=$(blockdev --getsz "$BASE_LOOPDEV")
         echo "---- dmsquash-live-root.sh ---- 13.3.2.4 ---- sz=$sz" > /dev/kmsg
     fi
@@ -525,7 +516,7 @@ if [ -n "$reloadsysrootmountunit" ]; then
     systemctl daemon-reload
 fi
 
-echo "---- dmsquash-live-root.sh ---- 15 ----" > /dev/kmsg
+echo "---- dmsquash-live-root.sh ---- 15 ---- creating the overlay..." > /dev/kmsg
 sleep 1s
 
 ROOTFLAGS="$(getarg rootflags)"
@@ -548,7 +539,10 @@ if [ -n "$overlayfs" ]; then
         ovlfs=lowerdir=/run/rootfsbase
     fi
 
-    echo "---- dmsquash-live-root.sh ---- 15.1.2 ----" > /dev/kmsg
+    echo "---- dmsquash-live-root.sh ---- 15.1.2 ---- scheduling overlayfs mount" > /dev/kmsg
+    echo "---- dmsquash-live-root.sh ---- 15.1.3 ---- lower: $ovlfs" > /dev/kmsg
+    echo "---- dmsquash-live-root.sh ---- 15.1.4 ---- upper: /run/overlayfs" > /dev/kmsg
+    echo "---- dmsquash-live-root.sh ---- 15.1.4 ---- newroot: $NEWROO" > /dev/kmsg
 
     mount -r $FSIMG /run/rootfsbase
     if [ -z "$DRACUT_SYSTEMD" ]; then
@@ -571,12 +565,12 @@ sleep 1s
 [ -e "$SQUASHED" ] && umount -l /run/initramfs/squashfs
 
 echo "---- dmsquash-live-root.sh ---- 17 ----" > /dev/kmsg
-sleep 3s
+sleep 1s
 
 ln -s null /dev/root
 
 echo "---- dmsquash-live-root.sh ---- 18 ----" > /dev/kmsg
-sleep 3s
+sleep 1s
 
 need_shutdown
 
