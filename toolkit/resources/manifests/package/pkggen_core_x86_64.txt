@@ -190,9 +190,9 @@ libssh2-1.9.0-3.cm2.x86_64.rpm
 libssh2-devel-1.9.0-3.cm2.x86_64.rpm
 krb5-1.19.4-2.cm2.x86_64.rpm
 nghttp2-1.57.0-1.cm2.x86_64.rpm
-curl-8.3.0-2.cm2.x86_64.rpm
-curl-devel-8.3.0-2.cm2.x86_64.rpm
-curl-libs-8.3.0-2.cm2.x86_64.rpm
+curl-8.5.0-1.cm2.x86_64.rpm
+curl-devel-8.5.0-1.cm2.x86_64.rpm
+curl-libs-8.5.0-1.cm2.x86_64.rpm
 createrepo_c-0.17.5-1.cm2.x86_64.rpm
 libxml2-2.10.4-2.cm2.x86_64.rpm
 libxml2-devel-2.10.4-2.cm2.x86_64.rpm
