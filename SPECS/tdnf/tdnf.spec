@@ -31,6 +31,7 @@ Patch4:         tdnf-sqlite-library.patch
 Patch5:         tdnf-GetRepoMD-fix.patch
 Patch6:	        tdnf-dotarch.patch
 Patch7:         tdnf-installonlypkgs.patch
+Patch8:         tdnf-add-installonlypkgs-config.patch
 #Cmake requires binutils
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -240,6 +241,7 @@ fi
 %changelog
 * Tue Dec 12 2023 Sam Meluch <sammeluch@microsoft.com> - 3.5.2-4
 - backport patch for installonlypkg functionality
+- add config for installonlypkgs
 
 * Fri Oct 06 2023 Andy Zaugg <azaugg@linkedin.com> - 3.5.2-3
 - tdnf should only become default if a backend package manager has not previously been defined
