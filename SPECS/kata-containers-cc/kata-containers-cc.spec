@@ -11,7 +11,7 @@
 Name:         kata-containers-cc
 Version:      0.6.2
 Release:      3%{?dist}
-Summary:      Kata Confidential Containers package for Confidential Containers on AKS
+Summary:      Kata Confidential Containers package developed for Confidential Containers on AKS
 License:      ASL 2.0
 Vendor:       Microsoft Corporation
 URL:          https://github.com/microsoft/kata-containers
@@ -52,7 +52,8 @@ Requires:  qemu-virtiofsd
 
 %description
 The Kata Confidential Containers package ships the Kata components for Confidential Containers on AKS.
-The package sources are based on a Microsoft fork of the kata-containers project.
+The package sources are based on a Microsoft fork of the kata-containers project and tailored to the use
+for Mariner-based AKS node images.
 
 # This subpackage is used to build the UVM and therefore has dependencies on the kernel-uvm(-cvm) binaries
 %package tools
