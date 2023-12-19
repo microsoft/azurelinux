@@ -87,16 +87,7 @@ make test
 %{perl_privlib}/URI.pm
 %{perl_privlib}/URI/
 %{_mandir}/man3/URI.3*
-%{_mandir}/man3/URI::Escape.3*
-%{_mandir}/man3/URI::Heuristic.3*
-%{_mandir}/man3/URI::QueryParam.3*
-%{_mandir}/man3/URI::Split.3*
-%{_mandir}/man3/URI::URL.3*
-%{_mandir}/man3/URI::WithBase.3*
-%{_mandir}/man3/URI::_punycode.3*
-%{_mandir}/man3/URI::data.3*
-%{_mandir}/man3/URI::file.3*
-%{_mandir}/man3/URI::ldap.3*
+%{_mandir}/man3/URI::*.3*
 
 %changelog
 * Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.21-1
