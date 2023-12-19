@@ -58,7 +58,7 @@ You can reuse your favorite Python packages such as NumPy, SciPy and Cython to e
 %autosetup -a 1 -n %{name}-v%{version}
 
 %build
-export MAX_JOBS=8
+export MAX_JOBS=12
 export USE_CUDA=0
 export BUILD_CAFFE2=0
 %py3_build
