@@ -310,6 +310,54 @@ function prepare_root_partition() {
     mic_poc_log "---------------- prepare_root_partition [exit] --------"
 }
 
+function stage_initrd_build_file () {
+    local sourceFile=$1
+    local targetFile=$2
+
+    sudo cp $sourceFile $targetFile
+    sudo chown root:root $targetFile
+}
+
+function build_inird() {
+    local rawImage=$1
+    local workingFolder=$2
+    local initrdImage=$3
+
+    rawImageFolder=$(dirname $rawImage)
+    rawImageName=$(basename $rawImage)
+
+    rawImageCopy=$workingFolder/$rawImageName
+
+    mkdir -p $workingFolder
+    cp $rawImage $rawImageCopy
+    loopDev=$(sudo losetup -f --show $rawImageCopy)
+    echo "loopDev=$loopDev"
+
+    mountFolder=/mnt/chroot-raw-image-$$
+    sudo mkdir -p $mountFolder
+    sudo mount $loopDev $mountFolder
+
+    artifactsDir=/home/george/git/CBL-Mariner/toolkit/mic-iso-gen/dracut-patches/artifacts
+
+    stage_initrd_build_file $artifactsDir/dmsquash-generator.sh $mountFolder/usr/lib/dracut/modules.d/90dmsquash-live/dmsquash-generator.sh
+    stage_initrd_build_file $artifactsDir/dmsquash-live-root.sh $mountFolder/usr/lib/dracut/modules.d/90dmsquash-live/dmsquash-live-root.sh
+    stage_initrd_build_file $artifactsDir/dracut-emergency.sh   $mountFolder/usr/lib/dracut/modules.d/98dracut-systemd/dracut-emergency.sh
+    stage_initrd_build_file $artifactsDir/dracut-mount.sh       $mountFolder/usr/lib/dracut/modules.d/98dracut-systemd/dracut-mount.sh
+    stage_initrd_build_file $artifactsDir/iso-scan.sh           $mountFolder/usr/lib/dracut/modules.d/90dmsquash-live/iso-scan.sh
+    stage_initrd_build_file $artifactsDir/20-gmileka.conf       $mountFolder/etc/dracut.conf.d/20-gmileka.conf
+    stage_initrd_build_file $artifactsDir/build-initrd.sh       $mountFolder/build-initrd.sh
+
+    sudo chroot $mountFolder /bin/bash -c "sudo /build-initrd.sh"
+
+    mkdir -p $(dirname $initrdImage)
+    sudo cp $mountFolder/initrd.img $initrdImage
+    sudo chown $USER:$USER $initrdImage
+
+    sudo umount $mountFolder
+    sudo losetup -d $loopDev
+    rm $rawImageCopy
+}
+
 #-- main ----------------------------------------------------------------------
 FULL_IMAGE_CONFIG_FILE=~/git/CBL-Mariner/toolkit/imageconfigs/baremetal.json
 
@@ -333,6 +381,9 @@ MODIFIED_ROOTFS_DIR=$BUILD_WORKING_DIR/raw-disk-output-modified
 MODIFIED_ROOTFS_RAW_FILE=$MODIFIED_ROOTFS_DIR/rootfs.img
 MODIFIED_ROOTFS_SQUASH_FILE=$MODIFIED_ROOTFS_DIR/rootfs.squashfs
 MODIFIED_ROOTFS_RAW_FILE_COMPRESSED=${MODIFIED_ROOTFS_RAW_FILE}.tar.gz
+
+INITRD_BUILD_WORKING_DIR=$BUILD_WORKING_DIR/initrd-build
+INITRD_BUILD_OUTPUT_FILE=$INITRD_BUILD_WORKING_DIR/output/initrd.img
 
 UNWRAPPED_ROOTFS_SQUASH_FILE=$BUILD_WORKING_DIR/raw-disk-output/squashfs.img
 ROOTFS_SQUASH_GZ_FILE=$BUILD_WORKING_DIR/raw-disk-output/squashfs.img.tgz
@@ -520,8 +571,15 @@ CREATE_INITRD_OUT_DIR=$BUILD_WORKING_DIR/create-initrd-from-folder-out-dir
 SOURCE_ROOTFS_FILE=$MODIFIED_ROOTFS_SQUASH_FILE
 TARGET_ROOTFS_FILE="/LiveOS/rootfs.img"
 
+build_inird \
+    $MODIFIED_ROOTFS_RAW_FILE \
+    $INITRD_BUILD_WORKING_DIR \
+    $INITRD_BUILD_OUTPUT_FILE
+
+# working initrd:    ~/temp/initrd.img \
+
 create_iso_with_rootfs_initrd \
-    ~/temp/initrd.img \
+    $INITRD_BUILD_OUTPUT_FILE \
     $EXTRACT_ARTIFACTS_OUT_DIR/extracted-vmlinuz-file/vmlinuz-5.15.138.1-1.cm2 \
     "/home/george/git/CBL-Mariner/toolkit/mic-iso-gen/files/stock/grub-dracut-live-cd.cfg" \
     $CREATE_INITRD_OUT_DIR \

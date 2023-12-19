@@ -2,7 +2,7 @@
 
 set -x
 echo "---- dmsquash-live-root.sh ---- 0 ----" > /dev/kmsg
-sleep 1s
+# sleep 1s
 
 type getarg > /dev/null 2>&1 || . /lib/dracut-lib.sh
 
@@ -341,7 +341,7 @@ do_live_overlay() {
     ln -s "$BASE_LOOPDEV" /dev/live-base
 
     echo "---- do_live_overlay() ---- 7 ----" > /dev/kmsg
-    sleep 1s
+    # sleep 1s
 }
 # end do_live_overlay()
 
@@ -422,17 +422,17 @@ fi
 echo "---- dmsquash-live-root.sh ---- 12 ---- losetup -a" > /dev/kmsg
 losetup -a >  /dev/kmsg
 echo "---- dmsquash-live-root.sh ---- 13 ---- checking FSIMG=$FSIMG" > /dev/kmsg
-sleep 1s
+# sleep 1s
 
 if [ -n "$FSIMG" ]; then
 
     echo "---- dmsquash-live-root.sh ---- 13.1 ---- FSIMG not empty." > /dev/kmsg
-    sleep 1s
+    # sleep 1s
 
     if [ -n "$writable_fsimg" ]; then
 
         echo "---- dmsquash-live-root.sh ---- 13.1.1 ---- writable_fsimg." > /dev/kmsg
-        sleep 1s
+        # sleep 1s
 
         # mount the provided filesystem read/write
         echo "Unpacking live filesystem (may take some time)" > /dev/kmsg
@@ -451,12 +451,12 @@ if [ -n "$FSIMG" ]; then
         fi
         echo "---- dmsquash-live-root.sh ---- 13.1.1.2.3 ---- ls -la /run/initramfs/fsimg/" > /dev/kmsg
         ls -la /run/initramfs/fsimg/ > /dev/kmsg
-        sleep 1s
+        # sleep 1s
         FSIMG=/run/initramfs/fsimg/rootfs.img
     fi
 
     echo "---- dmsquash-live-root.sh ---- 13.2 ----." > /dev/kmsg
-    sleep 1s
+    # sleep 1s
 
     opt=-r
     # For writable DM images...
@@ -509,7 +509,7 @@ if [ -n "$FSIMG" ]; then
 fi
 
 echo "---- dmsquash-live-root.sh ---- 14 ----" > /dev/kmsg
-sleep 1s
+# sleep 1s
 
 if [ -n "$reloadsysrootmountunit" ]; then
     eval "$reloadsysrootmountunit"
@@ -517,7 +517,7 @@ if [ -n "$reloadsysrootmountunit" ]; then
 fi
 
 echo "---- dmsquash-live-root.sh ---- 15 ---- creating the overlay..." > /dev/kmsg
-sleep 1s
+# sleep 1s
 
 ROOTFLAGS="$(getarg rootflags)"
 
@@ -560,17 +560,17 @@ else
 fi
 
 echo "---- dmsquash-live-root.sh ---- 16 ----" > /dev/kmsg
-sleep 1s
+# sleep 1s
 
 [ -e "$SQUASHED" ] && umount -l /run/initramfs/squashfs
 
 echo "---- dmsquash-live-root.sh ---- 17 ----" > /dev/kmsg
-sleep 1s
+# sleep 1s
 
 ln -s null /dev/root
 
 echo "---- dmsquash-live-root.sh ---- 18 ----" > /dev/kmsg
-sleep 1s
+# sleep 1s
 
 need_shutdown
 

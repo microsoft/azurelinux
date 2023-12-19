@@ -9,6 +9,7 @@
         "python3-pefile",
         "efivar",
         "efibootmgr",
+        "squashfs-tools",
         "shim"
     ]
 }

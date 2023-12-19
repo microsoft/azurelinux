@@ -31,7 +31,7 @@ while :; do
     fi
 
     echo "---- dracut-mount.sh ---- 3 ----"
-    sleep 1
+    # sleep 1
 
     for f in "$hookdir"/mount/*.sh; do
 

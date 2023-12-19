@@ -73,7 +73,7 @@ ROOTFLAGS="$(getarg rootflags)"
 } > "$GENERATOR_DIR"/sysroot.mount
 
 echo "---- dmsquash-generator.sh ----" > /dev/kmsg
-sleep 3s
+# sleep 3s
 
 
 mkdir -p "$GENERATOR_DIR/$_dev.device.d"
