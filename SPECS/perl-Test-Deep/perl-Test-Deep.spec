@@ -64,7 +64,7 @@ make test
 %doc Changes README TODO
 %{perl_vendorlib}/Test/
 %{_mandir}/man3/Test::Deep.3*
-%{_mandir}/man3/Test::Deep::NoTest.3*
+%{_mandir}/man3/Test::Deep::*.3*
 
 %changelog
 * Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.204-1
