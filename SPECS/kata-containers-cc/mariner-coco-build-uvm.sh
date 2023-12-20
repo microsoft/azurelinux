@@ -15,7 +15,7 @@ export AGENT_SOURCE_BIN=${SCRIPT_DIR}/kata-agent
 pushd ${OSBUILDER_DIR}
 sudo make clean
 rm -rf ${ROOTFS_DIR}
-sudo -E PATH=$PATH AGENT_POLICY=yes make -B DISTRO=cbl-mariner rootfs
+sudo -E PATH=$PATH AGENT_POLICY=yes CONF_GUEST=yes make -B DISTRO=cbl-mariner rootfs
 popd
 
 # include both kernel-uvm and kernel-uvm-cvm modules in rootfs
