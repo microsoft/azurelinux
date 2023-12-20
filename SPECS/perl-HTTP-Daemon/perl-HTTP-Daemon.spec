@@ -1,6 +1,6 @@
 Name:           perl-HTTP-Daemon
-Version:        6.16
-Release:        1%{?dist}
+Version:        6.06
+Release:        4%{?dist}
 Summary:        Simple HTTP server class
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -83,9 +83,6 @@ make test
 %{_mandir}/man3/*
 
 %changelog
-* Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.16-1
-- Auto-upgrade to 6.16 - Azure Linux 3.0 - package upgrades
-
 * Tue Jul 26 2022 Henry Li <lihl@microsoft.com> - 6.06-4
 - License Verified
 
