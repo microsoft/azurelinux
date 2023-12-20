@@ -1,6 +1,6 @@
 Name:           perl-IPC-Run
 Version:        20180523.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        Perl module for interacting with child processes
 # the rest:                     GPL+ or Artistic
 # The Win32* modules are not part of the binary RPM package
@@ -101,6 +101,10 @@ make test
 %{_mandir}/man3/IPC::Run::Timer.3*
 
 %changelog
+* Wed Dec 20 2023 Sindhu Karri <lakarri@microsoft.com> - 20180523.0-9
+- Promote package to Mariner Base repo
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20180523.0-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
