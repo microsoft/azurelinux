@@ -1,6 +1,6 @@
 Summary:        A library for access to RESTful web services
 Name:           rest
-Version:        0.9.0
+Version:        0.9.1
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
@@ -66,6 +66,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_datadir}/gir-1.0/RestExtras-1.0.gir
 
 %changelog
+* Wed Dec 20 2023 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 0.9.1-1
+- Upgrade to version 0.9.1
+
 * Fri Jan 28 2022 Henry Li <lihl@microsoft.com> - 0.9.0-1
 - Upgrade to version 0.9.0
 - Remove patch that no longer applies
