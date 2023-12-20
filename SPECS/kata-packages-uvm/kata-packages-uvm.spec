@@ -1,6 +1,6 @@
-Summary:        Metapackage for Kata
+Summary:        Metapackage for Kata UVM components
 Name:           kata-packages-uvm
-Version:        1.1.0
+Version:        1.0.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -8,11 +8,6 @@ Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://aka.ms/mariner
 
-%description
-Metapackage for Kata.
-
-%package        uvm
-Summary:        Metapackage to install the set of packages inside a Kata containers UVM.
 Requires:       bash
 Requires:       ca-certificates
 Requires:       chrony
@@ -38,19 +33,18 @@ Requires:       tzdata
 Requires:       util-linux
 Requires:       zlib
 
-%description    uvm
-%{summary}
+%description
+Metapackage to install the set of packages inside a Kata containers UVM
 
-%package        coco-uvm
+%package        coco
 Summary:        Metapackage to install the set of packages inside a Kata confidential containers UVM.
-Requires:       %{name}-uvm = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 Requires:       device-mapper
 Requires:       opa
 
-%description    coco-uvm
-%{summary}
+%description    coco
 
-%package        uvm-build
+%package        build
 Summary:        Metapackage to install the set of packages for building a Kata UVM.
 Requires:       acpica-tools
 Requires:       clang
@@ -76,31 +70,31 @@ Requires:       python3-libclang
 Requires:       python3-tomli    
 Requires:       veritysetup 
 
-%description    uvm-build
-%{summary}
+%description    build
 
-%package        coco-uvm-sign
+%package        coco-sign
 Summary:        Metapackage to install the set of packages for building the signing tool for Kata confidential containers UVM.
 Requires:       build-essential
 # Uncomment and remove duplicates once cosesign1go is available
 #Requires:       cosesign1go
 Requires:       golang
 
-%description    coco-uvm-sign
-%{summary}
+%description    coco-sign
 
 %prep
 
 %build
 
-%files uvm
+%files
 
-%files coco-uvm
+%files coco
 
-%files uvm-build
+%files build
 
-%files coco-uvm-sign
+%files coco-sign
 
 %changelog
-* Tue Dec 19 2023 Mitch Zhu <mitchzhu@microsoft.com> - 1.1.0-1
-- Introduce kata meta-package to CBL-Mariner.
+* Tue Dec 19 2023 Mitch Zhu <mitchzhu@microsoft.com> - 1.0.0-1
+- Introduce kata meta-package for the UVM components.
+- License verified
+- Original version for CBL-Mariner
