@@ -1,18 +1,18 @@
 %define _hardened_build 1
 Summary:        An advanced interactive monitor to view the load on system and process level
 Name:           atop
-Version:        2.6.0
-Release:        9%{?dist}
+Version:        2.9.0
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.atoptool.nl
 Source0:        http://www.atoptool.nl/download/%{name}-%{version}.tar.gz
 Source1:        atop.d
-Patch0:         nvme_support.patch
-Patch1:         atop-sysconfig.patch
-Patch2:         atop-2.3.0-newer-gcc.patch
-Patch3:         9cb119713b5e6be43671fe1856fb4bd49ff91fa7.patch
+
+Patch0:         atop-sysconfig.patch
+Patch1:         format.patch
+
 BuildRequires:  gcc
 BuildRequires:  make
 BuildRequires:  ncurses-devel
@@ -41,10 +41,8 @@ http://www.atcomputing.nl/Tools/atop/kernpatch.html
 
 %prep
 %setup -q
-%patch0  -b .nvme
-%patch1  -b .sysconfig
-%patch2 -p1 -b .newer-gcc
-%patch3 -p1 -b .service
+%patch0  -b .sysconfig
+%patch1  -b .format
 
 # Correct unit file path
 sed -i "s|%{_sysconfdir}/default/atop|%{_sysconfdir}/sysconfig/atop|g" atop.service
@@ -78,7 +76,7 @@ install -Dp -m 0644 atop-rotate.* %{buildroot}%{_unitdir}/
 
 %files
 %license COPYING
-%doc AUTHOR README*
+%doc AUTHORS README*
 %config(noreplace) %{_sysconfdir}/sysconfig/atop
 %{_bindir}/atopsar
 %{_bindir}/atop
@@ -93,6 +91,10 @@ install -Dp -m 0644 atop-rotate.* %{buildroot}%{_unitdir}/
 %{_sbindir}/atopacctd
 
 %changelog
+* Fri Jan 05 2024 Muhammad Falak <mwani@microsoft.com> -- 2.9.0-1
+- Bump version to 2.9.0
+- Drop un-needed patches
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.6.0-9
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
