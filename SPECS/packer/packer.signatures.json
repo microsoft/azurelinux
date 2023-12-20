@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "packer-1.8.1.tar.gz": "2a264119f7bdeeb82e79e0c9a02e4fa3d9bdf3e984c47e0c89ca2856eecb3b88",
-  "packer-1.8.1-vendor.tar.gz": "e9c56ee2307590ab771cc943eb9948c4aee3de95189eae7a1e153e999d88d704"
- }
+  "Signatures": {
+    "packer-1.8.1-vendor.tar.gz": "e9c56ee2307590ab771cc943eb9948c4aee3de95189eae7a1e153e999d88d704",
+    "packer-1.8.7.tar.gz": "0b3a45a3ecb0b5e993a0a39ee4599d69b58c1419cebddbfc45c61eb15389ba98"
+  }
 }

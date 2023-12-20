@@ -15754,8 +15754,8 @@
         "type": "other",
         "other": {
           "name": "packer",
-          "version": "1.8.1",
-          "downloadUrl": "https://github.com/hashicorp/packer/archive/v1.8.1.tar.gz"
+          "version": "1.8.7",
+          "downloadUrl": "https://github.com/hashicorp/packer/archive/v1.8.7.tar.gz"
         }
       }
     },
