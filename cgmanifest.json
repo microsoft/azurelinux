@@ -665,8 +665,8 @@
         "type": "other",
         "other": {
           "name": "atftp",
-          "version": "0.7.5",
-          "downloadUrl": "http://sourceforge.net/projects/atftp/files/latest/download/atftp-0.7.5.tar.gz"
+          "version": "0.8.0",
+          "downloadUrl": "http://sourceforge.net/projects/atftp/files/latest/download/atftp-0.8.0.tar.gz"
         }
       }
     },
