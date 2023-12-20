@@ -79,7 +79,7 @@ python3 setup.py build
 %install
 %{py3_install "--init-system=systemd"}
 
-python3 tools/render-cloudcfg --variant mariner > %{buildroot}/%{_sysconfdir}/cloud/cloud.cfg
+python3 tools/render-template --variant mariner > %{buildroot}/%{_sysconfdir}/cloud/cloud.cfg
 sed -i "s,@@PACKAGED_VERSION@@,%{version}-%{release}," %{buildroot}/%{python3_sitelib}/cloudinit/version.py
 
 %if "%{_arch}" == "aarch64"
