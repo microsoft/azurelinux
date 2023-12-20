@@ -1,13 +1,14 @@
 Summary:        Sudo
 Name:           sudo
 Version:        1.9.14p3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ISC
 URL:            https://www.sudo.ws/
 Group:          System Environment/Security
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://www.sudo.ws/sudo/dist/%{name}-%{version}.tar.gz
+Patch0:         sudo-ldap-netgroup-query.patch
 BuildRequires:  audit-devel
 BuildRequires:  man-db
 BuildRequires:  openssl-devel
@@ -99,6 +100,9 @@ fi
 %exclude  /etc/sudoers.dist
 
 %changelog
+* Tue Dec 19  2023 Andy Zaugg <azaugg@linkedin.com> - 1.9.14p3-2
+- Add patch to bug fix support for NETGROUP_QUERY
+
 * Fri Aug 25 2023 Andy Zaugg <azaugg@linkedin.com> - 1.9.14p3-1
 - Bump version to 1.9.14p3
 
