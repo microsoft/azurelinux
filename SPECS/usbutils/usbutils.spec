@@ -1,6 +1,6 @@
 Summary:        USB Utils
 Name:           usbutils
-Version:        014
+Version:        017
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
@@ -20,7 +20,7 @@ The USB Utils package contains an utility used to display information
 about USB buses in the system and the devices connected to them.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 ./configure --prefix=%{_prefix} \
@@ -32,6 +32,8 @@ make %{?_smp_mflags}
 make DESTDIR=%{buildroot} install
 mkdir -p %{buildroot}%{_datadir}/misc/
 install -p -m 0644 %{SOURCE1} %{buildroot}%{_datadir}/misc/
+# Remove the pkgconfig file
+rm -rf %{buildroot}/%{_libdir}/pkgconfig/usbutils.pc
 
 %files
 %defattr(-,root,root,-)
@@ -44,6 +46,9 @@ install -p -m 0644 %{SOURCE1} %{buildroot}%{_datadir}/misc/
 %{_datadir}/misc/usb.ids
 
 %changelog
+* Mon Dec 18 2023 Rachel Menge <rachelmenge@microsoft.com> - 017-1
+- Update to 017 release
+
 * Wed Feb 02 2022 Chris Co <chrco@microsoft.com> - 014-1
 - Update to 014 release
 - License shipped upstream now.
