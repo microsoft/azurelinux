@@ -4,7 +4,7 @@
 
 Name:		perl-Sub-Name
 Version:	0.26
-Release:	3%{?dist}
+Release:	4%{?dist}
 Summary:	Name - or rename - a sub
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -79,6 +79,10 @@ make test
 %{_mandir}/man3/Sub::Name.3*
 
 %changelog
+* Wed Dec 20 2023 Sindhu Karri <lakarri@microsoft.com> - 0.26-4
+- Promote package to Mariner Base repo
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.26-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

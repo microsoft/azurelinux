@@ -1844,6 +1844,7 @@
                 "qt5-rpm-macros",
                 "quagga",
                 "quota",
+                "quotatool",
                 "radvd",
                 "ragel",
                 "raptor2",

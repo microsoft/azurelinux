@@ -1,6 +1,6 @@
 Name:           perl-Class-Accessor
 Version:        0.51
-Release:        9%{?dist}
+Release:        10%{?dist}
 Summary:        Automated accessor generation
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -53,6 +53,10 @@ make test
 %{_mandir}/man3/Class::Accessor::Faster.3*
 
 %changelog
+* Wed Dec 20 2023 Sindhu Karri <lakarri@microsoft.com> - 0.51-10
+- Promote package to Mariner Base repo
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.51-9
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

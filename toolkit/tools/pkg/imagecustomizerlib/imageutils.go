@@ -16,6 +16,18 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 )
 
+var (
+	// When calling mkfs, the default options change depending on the host OS you are running on and typically match
+	// what the distro has decided is best for their OS. For example, for ext2/3/4, the defaults are stored in
+	// /etc/mke2fs.conf.
+	// However, for the image customizer tool, the defaults should be as consistent as possible.
+	DefaultMkfsOptions = map[string][]string{
+		"ext2": {"-b", "4096", "-O", "none,sparse_super,large_file,filetype,resize_inode,dir_index,ext_attr"},
+		"ext3": {"-b", "4096", "-O", "none,sparse_super,large_file,filetype,resize_inode,dir_index,ext_attr,has_journal"},
+		"ext4": {"-b", "4096", "-O", "none,sparse_super,large_file,filetype,resize_inode,dir_index,ext_attr,has_journal,extent,huge_file,flex_bg,metadata_csum,64bit,dir_nlink,extra_isize"},
+	}
+)
+
 type installOSFunc func(imageChroot *safechroot.Chroot) error
 
 func connectToExistingImage(imageFilePath string, buildDir string, chrootDirName string) (*ImageConnection, error) {
@@ -58,13 +70,14 @@ func connectToExistingImageHelper(imageConnection *ImageConnection, imageFilePat
 }
 
 func createNewImage(filename string, diskConfig imagecustomizerapi.Disk,
-	partitionSettings []imagecustomizerapi.PartitionSetting, bootType imagecustomizerapi.BootType, buildDir string,
-	chrootDirName string, installOS installOSFunc,
+	partitionSettings []imagecustomizerapi.PartitionSetting, bootType imagecustomizerapi.BootType,
+	kernelCommandLine imagecustomizerapi.KernelCommandLine, buildDir string, chrootDirName string,
+	installOS installOSFunc,
 ) (*ImageConnection, error) {
 	imageConnection := &ImageConnection{}
 
-	err := createNewImageHelper(imageConnection, filename, diskConfig, partitionSettings, bootType, buildDir,
-		chrootDirName, installOS,
+	err := createNewImageHelper(imageConnection, filename, diskConfig, partitionSettings, bootType, kernelCommandLine,
+		buildDir, chrootDirName, installOS,
 	)
 	if err != nil {
 		imageConnection.Close()
@@ -75,8 +88,9 @@ func createNewImage(filename string, diskConfig imagecustomizerapi.Disk,
 }
 
 func createNewImageHelper(imageConnection *ImageConnection, filename string, diskConfig imagecustomizerapi.Disk,
-	partitionSettings []imagecustomizerapi.PartitionSetting, bootType imagecustomizerapi.BootType, buildDir string,
-	chrootDirName string, installOS installOSFunc,
+	partitionSettings []imagecustomizerapi.PartitionSetting, bootType imagecustomizerapi.BootType,
+	kernelCommandLine imagecustomizerapi.KernelCommandLine, buildDir string, chrootDirName string,
+	installOS installOSFunc,
 ) error {
 	// Convert config to image config types, so that the imager's utils can be used.
 	imagerBootType, err := bootTypeToImager(bootType)
@@ -94,13 +108,18 @@ func createNewImageHelper(imageConnection *ImageConnection, filename string, dis
 		return err
 	}
 
+	imagerKernelCommandLine, err := kernelCommandLineToImager(kernelCommandLine)
+	if err != nil {
+		return err
+	}
+
 	// Sort the partitions so that they are mounted in the correct oder.
 	sort.Slice(imagerPartitionSettings, func(i, j int) bool {
 		return imagerPartitionSettings[i].MountPoint < imagerPartitionSettings[j].MountPoint
 	})
 
 	// Create imager boilerplate.
-	mountPointMap, err := createImageBoilerplate(imageConnection, filename, buildDir, chrootDirName, imagerDiskConfig,
+	mountPointMap, tmpFstabFile, err := createImageBoilerplate(imageConnection, filename, buildDir, chrootDirName, imagerDiskConfig,
 		imagerPartitionSettings)
 	if err != nil {
 		return err
@@ -112,9 +131,17 @@ func createNewImageHelper(imageConnection *ImageConnection, filename string, dis
 		return err
 	}
 
+	// Move the fstab file into the image.
+	imageFstabFilePath := filepath.Join(imageConnection.Chroot().RootDir(), "etc/fstab")
+
+	err = file.Move(tmpFstabFile, imageFstabFilePath)
+	if err != nil {
+		return fmt.Errorf("failed to move fstab into new image:\n%w", err)
+	}
+
 	// Configure the boot loader.
 	err = installutils.ConfigureDiskBootloader(imagerBootType, false, false, imagerPartitionSettings,
-		configuration.KernelCommandLine{}, imageConnection.Chroot(), imageConnection.Loopback().DevicePath(),
+		imagerKernelCommandLine, imageConnection.Chroot(), imageConnection.Loopback().DevicePath(),
 		mountPointMap, diskutils.EncryptedRootDevice{}, diskutils.VerityDevice{})
 	if err != nil {
 		return fmt.Errorf("failed to install bootloader:\n%w", err)
@@ -125,31 +152,31 @@ func createNewImageHelper(imageConnection *ImageConnection, filename string, dis
 
 func createImageBoilerplate(imageConnection *ImageConnection, filename string, buildDir string, chrootDirName string,
 	imagerDiskConfig configuration.Disk, imagerPartitionSettings []configuration.PartitionSetting,
-) (map[string]string, error) {
+) (map[string]string, string, error) {
 	// Create raw disk image file.
 	err := diskutils.CreateSparseDisk(filename, imagerDiskConfig.MaxSize, 0o644)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create empty disk file (%s):\n%w", filename, err)
+		return nil, "", fmt.Errorf("failed to create empty disk file (%s):\n%w", filename, err)
 	}
 
 	// Connect raw disk image file.
 	err = imageConnection.ConnectLoopback(filename)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	// Set up partitions.
 	partIDToDevPathMap, partIDToFsTypeMap, _, _, err := diskutils.CreatePartitions(
 		imageConnection.Loopback().DevicePath(), imagerDiskConfig, configuration.RootEncryption{},
-		configuration.ReadOnlyVerityRoot{})
+		configuration.ReadOnlyVerityRoot{}, DefaultMkfsOptions)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create partitions on disk (%s):\n%w", imageConnection.Loopback().DevicePath(), err)
+		return nil, "", fmt.Errorf("failed to create partitions on disk (%s):\n%w", imageConnection.Loopback().DevicePath(), err)
 	}
 
 	// Read the disk partitions.
 	diskPartitions, err := diskutils.GetDiskPartitions(imageConnection.Loopback().DevicePath())
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	// Create the fstab file.
@@ -166,13 +193,13 @@ func createImageBoilerplate(imageConnection *ImageConnection, filename string, b
 		mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, false, /*hidepidEnabled*/
 	)
 	if err != nil {
-		return nil, fmt.Errorf("failed to write temp fstab file:\n%w", err)
+		return nil, "", fmt.Errorf("failed to write temp fstab file:\n%w", err)
 	}
 
 	// Read back the fstab file.
 	mountPoints, err := findMountsFromFstabFile(tmpFstabFile, diskPartitions)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	// Create chroot environment.
@@ -180,16 +207,8 @@ func createImageBoilerplate(imageConnection *ImageConnection, filename string, b
 
 	err = imageConnection.ConnectChroot(imageChrootDir, false, nil, mountPoints)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
-	// Move the fstab file into the image.
-	imageFstabFilePath := filepath.Join(imageConnection.Chroot().RootDir(), "etc/fstab")
-
-	err = file.Move(tmpFstabFile, imageFstabFilePath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to move fstab into new image:\n%w", err)
-	}
-
-	return mountPointMap, nil
+	return mountPointMap, tmpFstabFile, nil
 }

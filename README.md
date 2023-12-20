@@ -22,7 +22,6 @@ Instructions for building CBL-Mariner may be found here: [Toolkit Documentation]
 You can try CBL-Mariner with the following ISO images:
 
 - [Mariner 2.0 x86_64 ISO](https://aka.ms/mariner-2.0-x86_64-iso).
-- [Mariner 1.0 x86_64 ISO](https://aka.ms/mariner-1.0-x86_64-iso).
 
 Before using a downloaded ISO, [verify the checksum and signature of the image](toolkit/docs/security/iso-image-verification.md).
 

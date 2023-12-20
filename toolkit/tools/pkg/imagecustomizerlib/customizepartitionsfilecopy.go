@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 )
@@ -30,7 +29,7 @@ func customizePartitionsUsingFileCopy(buildDir string, baseConfigPath string, co
 	}
 
 	newImageConnection, err := createNewImage(newBuildImageFile, diskConfig, config.SystemConfig.PartitionSettings,
-		config.SystemConfig.BootType, buildDir, "newimageroot", installOSFunc)
+		config.SystemConfig.BootType, config.SystemConfig.KernelCommandLine, buildDir, "newimageroot", installOSFunc)
 	if err != nil {
 		return err
 	}
@@ -82,8 +81,7 @@ func copyFilesIntoNewDiskHelper(existingImageChroot *safechroot.Chroot, newImage
 		copyArgs = append(copyArgs, fullFileName)
 	}
 
-	err = shell.ExecuteLiveWithCallback(func(...interface{}) {}, logger.Log.Warn, false,
-		"cp", copyArgs...)
+	err = shell.ExecuteLiveWithErr(1, "cp", copyArgs...)
 	if err != nil {
 		return fmt.Errorf("failed to copy files:\n%w", err)
 	}
