@@ -25,8 +25,6 @@ function create_full_image() {
     mic_poc_log "---------------- create_full_image [enter] --------"
     local configFile=$1
     local outputDiskRawFile=$2
-    local outputRootfsRawFile=$3
-    local outputRootfsRawGzFile=$4
 
     # outputs:
     #
@@ -59,14 +57,6 @@ function create_full_image() {
 
     mkdir -p $(dirname "$outputDiskRawFile")
     cp ../build/imagegen/baremetal/imager_output/disk0.raw $outputDiskRawFile
-
-    # ./out/images/baremetal/mariner-rootfs-raw-2.0.20231206.1707.raw
-    sourceRootfsRawFile=$(find ../out/images/baremetal -name "mariner-rootfs-raw*.raw")
-    cp $sourceRootfsRawFile $outputRootfsRawFile
-
-    # ./out/images/baremetal/mariner-rootfs-raw-2.0.20231208.1322.raw.gz
-    sourceRootfsRawGzFile=$(find ../out/images/baremetal -name "mariner-rootfs-raw*.raw.gz")
-    cp $sourceRootfsRawGzFile $outputRootfsRawGzFile
 
     popd
 
@@ -110,6 +100,7 @@ function mount_raw_disk() {
     local originalRawDisk=$1
     local rawDiskMountDir=$2
     local workingDir=$3
+    local loDeviceLogFile=$4
 
     set +e
     mounted=$(mount | grep $rawDiskMountDir)
@@ -129,6 +120,8 @@ function mount_raw_disk() {
     sudo rm -rf $rawDiskMountDir
     sudo mkdir -p $rawDiskMountDir
     sudo mount ${loDevice}p2 $rawDiskMountDir
+
+    echo $loDevice > $loDeviceLogFile
 }
 
 #------------------------------------------------------------------------------
@@ -159,19 +152,45 @@ function copy_vmlinuz_from_full_disk() {
 }
 
 #------------------------------------------------------------------------------
+function copy_rootfs_from_full_disk() {
+    local rawDiskDevice=$1
+    local rootfsImageFile=$2
+
+    sudo dd if=${rawDiskDevice}p2 of=$rootfsImageFile
+}
+
+#------------------------------------------------------------------------------
+function copy_boot_efi_from_full_disk() {
+    local rawDiskDevice=$1
+    local bootefiImageFile=$2
+
+    sudo dd if=${rawDiskDevice}p2 of=$rootfsImageFile
+}
+
+#------------------------------------------------------------------------------
 function extract_artifacts_from_full_image() {
     mic_poc_log "---------------- extract_artifacts_from_full_image [enter] --------"
     local outFullImageRawDisk=$1
     local tmpMount=$2
     local tmpDir=$3
     local extractedVmLinuzFile=$4
+    local extractedRootfsImgFile=$5
 
     sudo rm -rf $tmpDir
     mkdir -p $tmpDir
     pushd $tmpDir
 
-    mount_raw_disk $outFullImageRawDisk $tmpMount $tmpDir
+    loDeviceLogFile=$tmpDir/lo-device.txt
+
+    mount_raw_disk $outFullImageRawDisk $tmpMount $tmpDir $loDeviceLogFile
+
+    mkdir -p $(dirname $extractedVmLinuzFile)
     copy_vmlinuz_from_full_disk $tmpMount $extractedVmLinuzFile
+
+    loDevice=$(cat $loDeviceLogFile)
+    mkdir -p $(dirname $extractedRootfsImgFile)
+    copy_rootfs_from_full_disk ${loDevice} $extractedRootfsImgFile
+
     unmount_raw_disk $tmpMount
 
     popd
@@ -233,7 +252,7 @@ function build_inird() {
 }
 
 #------------------------------------------------------------------------------
-function CreateEfibootImage () {
+function create_efi_boot_image () {
     grubCfg=$1
     workingDir=$2
     efitbootImage=$3
@@ -253,11 +272,10 @@ function CreateEfibootImage () {
         boot/grub/grub.cfg=$grubCfg
 
     # Generate the fs to hold the bootx64.efi - i.e. out/efiboot.img
-    rm -f $workingDir/efiboot.img
+    rm -f $efitbootImage
 
     dd if=/dev/zero of=$efitbootImage bs=1M count=3
     mkfs.vfat $efitbootImage
-
     LC_CTYPE=C mmd -i $efitbootImage efi efi/boot
     LC_CTYPE=C mcopy -i $efitbootImage $workingDir/bootx64.efi ::efi/boot/
 
@@ -265,7 +283,7 @@ function CreateEfibootImage () {
 }
 
 #------------------------------------------------------------------------------
-function CreateBiosImage () {
+function create_bios_boot_image () {
     grubCfg=$1
     workingDir=$2
     biosbootImage=$3
@@ -286,10 +304,7 @@ function CreateBiosImage () {
         boot/grub/grub.cfg=$grubCfg
 
     # Generate the fs to hold the bios.img - i.e. out/core.img
-    if [[ -f $workingDir/bios.img ]]; then
-        rm $workingDir/bios.img
-    fi
-
+    rm -f $biosbootImage
     cat /usr/lib/grub/i386-pc/cdboot.img $workingDir/core.img > $biosbootImage
 
     echo "Created -------- " $biosbootImage
@@ -311,7 +326,7 @@ function create_iso_image () {
     mkdir -p $intermediateOutputDir
 
     stagedIsoArtifactsDir=$outputIsoDir/iso-staged-layout
-    sudo rm -r $stagedIsoArtifactsDir
+    sudo rm -rf $stagedIsoArtifactsDir
     mkdir -p $stagedIsoArtifactsDir
 
     finalIsoDir=$outputIsoDir/iso
@@ -329,12 +344,12 @@ function create_iso_image () {
         cp $inputSquashFS $stagedSquashFSFile
     fi
 
-    CreateEfibootImage \
+    create_efi_boot_image \
         $inputGrubCfg \
         $intermediateOutputDir \
         $stagedIsoArtifactsDir/boot/grub/efiboot.img
 
-    CreateBiosImage \
+    create_bios_boot_image \
         $inputGrubCfg \
         $intermediateOutputDir \
         $stagedIsoArtifactsDir/boot/grub/bios.img
@@ -395,9 +410,6 @@ pushd $scriptDir/../../
 
 fullImageRawDisk=$buildWorkingDir/raw-disk-output/disk0.raw
 
-rootfsRawFile=$buildWorkingDir/raw-disk-output/rootfs.img
-rootfsRawGzFile=$buildWorkingDir/raw-disk-output/rootfs.img.tgz
-
 modifiedRootfsDir=$buildWorkingDir/raw-disk-output-modified
 modifiedRootfsRawFile=$modifiedRootfsDir/rootfs.img
 modifiedRootfsSquashFile=$modifiedRootfsDir/rootfs.squashfs
@@ -408,25 +420,25 @@ initrdBuildOutputFile=$initrdBuildWorkingDir/output/initrd.img
 extractArtifactsTmpDir=$buildWorkingDir/extract-artifacts-from-rootfs-tmp-dir
 extractArtifactsOutDir=$buildWorkingDir/extract-artifacts-from-rootfs-out-dir
 extractedVmlinuz=$extractArtifactsOutDir/extracted-vmlinuz-file/vmlinuz
+extractedRootfs=$extractArtifactsOutDir/extracted-rootfs-file/rootfs.img
 
 mediaRootfsSquashfsFile="/LiveOS/rootfs.img"
 
-if [[ ! -z $buildRootfs ]]; then
+if [[ -n "$buildRootfs" ]]; then
     create_full_image  \
         $fullImageConfigFile \
-        $fullImageRawDisk \
-        $rootfsRawFile \
-        $rootfsRawGzFile
+        $fullImageRawDisk
 
     extract_artifacts_from_full_image \
         $fullImageRawDisk \
         "/mnt/full-disk-rootfs-mount" \
         $extractArtifactsTmpDir \
-        $extractArtifactsOutDir/extracted-vmlinuz-file/vmlinuz
+        $extractedVmlinuz \
+        $extractedRootfs
 
     mkdir -p $modifiedRootfsDir
     prepare_root_partition \
-        $rootfsRawFile \
+        $extractedRootfs \
         $modifiedRootfsRawFile \
         $modifiedRootfsSquashFile
 fi
