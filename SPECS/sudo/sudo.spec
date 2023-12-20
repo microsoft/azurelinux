@@ -100,7 +100,7 @@ fi
 %exclude  /etc/sudoers.dist
 
 %changelog
-* Tue Dec 19  2023 Andy Zaugg <azaugg@linkedin.com> - 1.9.14p3-2
+* Tue Dec 19 2023 Andy Zaugg <azaugg@linkedin.com> - 1.9.14p3-2
 - Add patch to bug fix support for NETGROUP_QUERY
 
 * Fri Aug 25 2023 Andy Zaugg <azaugg@linkedin.com> - 1.9.14p3-1
