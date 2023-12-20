@@ -5,6 +5,8 @@ package imagecustomizerapi
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestSystemConfigValidEmpty(t *testing.T) {
@@ -21,4 +23,33 @@ func TestSystemConfigInvalidHostname(t *testing.T) {
 
 func TestSystemConfigInvalidAdditionalFiles(t *testing.T) {
 	testInvalidYamlValue[*SystemConfig](t, "{ \"AdditionalFiles\": { \"a.txt\": [] } }")
+}
+
+func TestSystemConfigIsValidDuplicatePartitionID(t *testing.T) {
+	value := SystemConfig{
+		PartitionSettings: []PartitionSetting{
+			{
+				ID: "a",
+			},
+			{
+				ID: "a",
+			},
+		},
+	}
+
+	err := value.IsValid()
+	assert.Error(t, err)
+	assert.ErrorContains(t, err, "duplicate PartitionSettings ID")
+}
+
+func TestSystemConfigIsValidKernelCommandLineInvalidChars(t *testing.T) {
+	value := SystemConfig{
+		KernelCommandLine: KernelCommandLine{
+			ExtraCommandLine: "example=\"example\"",
+		},
+	}
+
+	err := value.IsValid()
+	assert.Error(t, err)
+	assert.ErrorContains(t, err, "ExtraCommandLine")
 }

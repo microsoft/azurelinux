@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"time"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
@@ -27,19 +28,22 @@ const (
 )
 
 func doCustomizations(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
-	imageChroot *safechroot.Chroot, rpmsSources []string, useBaseImageRpmRepos bool,
+	imageChroot *safechroot.Chroot, rpmsSources []string, useBaseImageRpmRepos bool, partitionsCustomized bool,
 ) error {
 	var err error
 
 	// Note: The ordering of the customization steps here should try to mirror the order of the equivalent steps in imager
 	// tool as closely as possible.
 
+	buildTime := time.Now().Format("2006-01-02T15:04:05Z")
+
 	err = overrideResolvConf(imageChroot)
 	if err != nil {
 		return err
 	}
 
-	err = addRemoveAndUpdatePackages(buildDir, baseConfigPath, &config.SystemConfig, imageChroot, rpmsSources, useBaseImageRpmRepos)
+	err = addRemoveAndUpdatePackages(buildDir, baseConfigPath, &config.SystemConfig, imageChroot, rpmsSources,
+		useBaseImageRpmRepos, partitionsCustomized)
 	if err != nil {
 		return err
 	}
@@ -54,7 +58,7 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
-	err = addOrUpdateUsers(config.SystemConfig.Users, baseConfigPath, imageChroot)
+	err = AddOrUpdateUsers(config.SystemConfig.Users, baseConfigPath, imageChroot)
 	if err != nil {
 		return err
 	}
@@ -69,9 +73,20 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
+	err = addCustomizerRelease(imageChroot, ToolVersion, buildTime)
+	if err != nil {
+		return err
+	}
+
 	err = runScripts(baseConfigPath, config.SystemConfig.PostInstallScripts, imageChroot)
 	if err != nil {
 		return err
+	}
+
+	err = handleKernelCommandLine(config.SystemConfig.KernelCommandLine.ExtraCommandLine, imageChroot,
+		partitionsCustomized)
+	if err != nil {
+		return fmt.Errorf("failed to add extra kernel command line: %w", err)
 	}
 
 	err = runScripts(baseConfigPath, config.SystemConfig.FinalizeImageScripts, imageChroot)
@@ -127,14 +142,14 @@ func deleteResolvConf(imageChroot *safechroot.Chroot) error {
 }
 
 func updateHostname(hostname string, imageChroot *safechroot.Chroot) error {
-	var err error
-
 	if hostname == "" {
 		return nil
 	}
 
+	logger.Log.Infof("Setting hostname (%s)", hostname)
+
 	hostnameFilePath := filepath.Join(imageChroot.RootDir(), "etc/hostname")
-	err = file.Write(hostname, hostnameFilePath)
+	err := file.Write(hostname, hostnameFilePath)
 	if err != nil {
 		return fmt.Errorf("failed to write hostname file: %w", err)
 	}
@@ -143,17 +158,17 @@ func updateHostname(hostname string, imageChroot *safechroot.Chroot) error {
 }
 
 func copyAdditionalFiles(baseConfigPath string, additionalFiles map[string]imagecustomizerapi.FileConfigList, imageChroot *safechroot.Chroot) error {
-	var err error
-
 	for sourceFile, fileConfigs := range additionalFiles {
 		for _, fileConfig := range fileConfigs {
+			logger.Log.Infof("Copying: %s", fileConfig.Path)
+
 			fileToCopy := safechroot.FileToCopy{
 				Src:         filepath.Join(baseConfigPath, sourceFile),
 				Dest:        fileConfig.Path,
 				Permissions: (*fs.FileMode)(fileConfig.Permissions),
 			}
 
-			err = imageChroot.AddFiles(fileToCopy)
+			err := imageChroot.AddFiles(fileToCopy)
 			if err != nil {
 				return err
 			}
@@ -180,18 +195,14 @@ func runScripts(baseConfigPath string, scripts []imagecustomizerapi.Script, imag
 	for _, script := range scripts {
 		scriptPathInChroot := filepath.Join(configDirMountPathInChroot, script.Path)
 		command := fmt.Sprintf("%s %s", scriptPathInChroot, script.Args)
+		logger.Log.Infof("Running script (%s)", script.Path)
 
 		// Run the script.
 		err = imageChroot.UnsafeRun(func() error {
-			err := shell.ExecuteLive(false, shell.ShellProgram, "-c", command)
-			if err != nil {
-				return err
-			}
-
-			return nil
+			return shell.ExecuteLiveWithErr(1, shell.ShellProgram, "-c", command)
 		})
 		if err != nil {
-			return err
+			return fmt.Errorf("script (%s) failed:\n%w", script.Path, err)
 		}
 	}
 
@@ -203,7 +214,7 @@ func runScripts(baseConfigPath string, scripts []imagecustomizerapi.Script, imag
 	return nil
 }
 
-func addOrUpdateUsers(users []imagecustomizerapi.User, baseConfigPath string, imageChroot *safechroot.Chroot) error {
+func AddOrUpdateUsers(users []imagecustomizerapi.User, baseConfigPath string, imageChroot safechroot.ChrootInterface) error {
 	for _, user := range users {
 		err := addOrUpdateUser(user, baseConfigPath, imageChroot)
 		if err != nil {
@@ -214,7 +225,7 @@ func addOrUpdateUsers(users []imagecustomizerapi.User, baseConfigPath string, im
 	return nil
 }
 
-func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageChroot *safechroot.Chroot) error {
+func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageChroot safechroot.ChrootInterface) error {
 	var err error
 
 	logger.Log.Infof("Adding/updating user (%s)", user.Name)
@@ -303,15 +314,10 @@ func enableOrDisableServices(services imagecustomizerapi.Services, imageChroot *
 		logger.Log.Infof("Enabling service (%s)", service.Name)
 
 		err = imageChroot.UnsafeRun(func() error {
-			err := shell.ExecuteLive(false, "systemctl", "enable", service.Name)
-			if err != nil {
-				return fmt.Errorf("failed to enable service (%s): \n%w", service.Name, err)
-			}
-
-			return nil
+			return shell.ExecuteLiveWithErr(1, "systemctl", "enable", service.Name)
 		})
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to enable service (%s):\n%w", service.Name, err)
 		}
 	}
 
@@ -320,15 +326,10 @@ func enableOrDisableServices(services imagecustomizerapi.Services, imageChroot *
 		logger.Log.Infof("Disabling service (%s)", service.Name)
 
 		err = imageChroot.UnsafeRun(func() error {
-			err := shell.ExecuteLive(false, "systemctl", "disable", service.Name)
-			if err != nil {
-				return fmt.Errorf("failed to disable service (%s): %w", service.Name, err)
-			}
-
-			return nil
+			return shell.ExecuteLiveWithErr(1, "systemctl", "disable", service.Name)
 		})
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to disable service (%s):\n%w", service.Name, err)
 		}
 	}
 
@@ -357,6 +358,26 @@ func loadOrDisableModules(modules imagecustomizerapi.Modules, imageChroot *safec
 		if err != nil {
 			return fmt.Errorf("failed to write module disable configuration: %w", err)
 		}
+	}
+
+	return nil
+}
+
+func addCustomizerRelease(imageChroot *safechroot.Chroot, toolVersion string, buildTime string) error {
+	var err error
+
+	logger.Log.Infof("Creating image customizer release file")
+
+	customizerReleaseFilePath := filepath.Join(imageChroot.RootDir(), "/etc/mariner-customizer-release")
+	lines := []string{
+		fmt.Sprintf("%s=\"%s\"", "TOOL_VERSION", toolVersion),
+		fmt.Sprintf("%s=\"%s\"", "BUILD_DATE", buildTime),
+		"",
+	}
+
+	err = file.WriteLines(lines, customizerReleaseFilePath)
+	if err != nil {
+		return fmt.Errorf("error writing customizer release file (%s): %w", customizerReleaseFilePath, err)
 	}
 
 	return nil

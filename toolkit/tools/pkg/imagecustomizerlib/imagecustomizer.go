@@ -10,13 +10,15 @@ import (
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safeloopback"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 )
 
 const (
 	tmpParitionDirName = "tmppartition"
+
+	BaseImageName                = "image.raw"
+	PartitionCustomizedImageName = "image2.raw"
 )
 
 var (
@@ -65,7 +67,7 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 	}
 
 	// Validate config.
-	err = validateConfig(baseConfigPath, config)
+	err = validateConfig(baseConfigPath, config, rpmsSources, useBaseImageRpmRepos)
 	if err != nil {
 		return fmt.Errorf("invalid image config:\n%w", err)
 	}
@@ -83,27 +85,39 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 	}
 
 	// Convert image file to raw format, so that a kernel loop device can be used to make changes to the image.
-	buildImageFile := filepath.Join(buildDirAbs, "image.raw")
+	buildImageFile := filepath.Join(buildDirAbs, BaseImageName)
 
-	_, _, err = shell.Execute("qemu-img", "convert", "-O", "raw", imageFile, buildImageFile)
+	logger.Log.Infof("Mounting base image: %s", buildImageFile)
+	err = shell.ExecuteLiveWithErr(1, "qemu-img", "convert", "-O", "raw", imageFile, buildImageFile)
 	if err != nil {
 		return fmt.Errorf("failed to convert image file to raw format:\n%w", err)
 	}
 
+	// Customize the partitions.
+	partitionsCustomized, buildImageFile, err := customizePartitions(buildDirAbs, baseConfigPath, config, buildImageFile)
+	if err != nil {
+		return err
+	}
+
 	// Customize the raw image file.
-	err = customizeImageHelper(buildDirAbs, baseConfigPath, config, buildImageFile, rpmsSources, useBaseImageRpmRepos)
+	err = customizeImageHelper(buildDirAbs, baseConfigPath, config, buildImageFile, rpmsSources, useBaseImageRpmRepos,
+		partitionsCustomized)
 	if err != nil {
 		return err
 	}
 
 	// Create final output image file.
+	logger.Log.Infof("Writing: %s", outputImageFile)
+
 	outDir := filepath.Dir(outputImageFile)
 	os.MkdirAll(outDir, os.ModePerm)
 
-	_, _, err = shell.Execute("qemu-img", "convert", "-O", qemuOutputImageFormat, buildImageFile, outputImageFile)
+	err = shell.ExecuteLiveWithErr(1, "qemu-img", "convert", "-O", qemuOutputImageFormat, buildImageFile, outputImageFile)
 	if err != nil {
 		return fmt.Errorf("failed to convert image file to format: %s:\n%w", outputImageFormat, err)
 	}
+
+	logger.Log.Infof("Success!")
 
 	return nil
 }
@@ -121,10 +135,20 @@ func toQemuImageFormat(imageFormat string) (string, error) {
 	}
 }
 
-func validateConfig(baseConfigPath string, config *imagecustomizerapi.Config) error {
-	var err error
+func validateConfig(baseConfigPath string, config *imagecustomizerapi.Config, rpmsSources []string,
+	useBaseImageRpmRepos bool,
+) error {
+	// Note: This IsValid() check does duplicate the one in UnmarshalYamlFile().
+	// But it is useful for functions that call CustomizeImage() directly. For example, test code.
+	err := config.IsValid()
+	if err != nil {
+		return err
+	}
 
-	err = validateSystemConfig(baseConfigPath, &config.SystemConfig)
+	partitionsCustomized := hasPartitionCustomizations(config)
+
+	err = validateSystemConfig(baseConfigPath, &config.SystemConfig, rpmsSources, useBaseImageRpmRepos,
+		partitionsCustomized)
 	if err != nil {
 		return err
 	}
@@ -132,8 +156,19 @@ func validateConfig(baseConfigPath string, config *imagecustomizerapi.Config) er
 	return nil
 }
 
-func validateSystemConfig(baseConfigPath string, config *imagecustomizerapi.SystemConfig) error {
+func hasPartitionCustomizations(config *imagecustomizerapi.Config) bool {
+	return config.Disks != nil
+}
+
+func validateSystemConfig(baseConfigPath string, config *imagecustomizerapi.SystemConfig,
+	rpmsSources []string, useBaseImageRpmRepos bool, partitionsCustomized bool,
+) error {
 	var err error
+
+	err = validatePackageLists(baseConfigPath, config, rpmsSources, useBaseImageRpmRepos, partitionsCustomized)
+	if err != nil {
+		return err
+	}
 
 	for sourceFile := range config.AdditionalFiles {
 		sourceFileFullPath := filepath.Join(baseConfigPath, sourceFile)
@@ -187,46 +222,64 @@ func validateScript(baseConfigPath string, script *imagecustomizerapi.Script) er
 	return nil
 }
 
-func customizeImageHelper(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
-	buildImageFile string, rpmsSources []string, useBaseImageRpmRepos bool,
+func validatePackageLists(baseConfigPath string, config *imagecustomizerapi.SystemConfig, rpmsSources []string,
+	useBaseImageRpmRepos bool, partitionsCustomized bool,
 ) error {
-	// Mount the raw disk image file.
-	loopback, err := safeloopback.NewLoopback(buildImageFile)
-	if err != nil {
-		return fmt.Errorf("failed to mount raw disk (%s) as a loopback device:\n%w", buildImageFile, err)
-	}
-	defer loopback.Close()
-
-	// Look for all the partitions on the image.
-	newMountDirectories, mountPoints, err := findPartitions(buildDir, loopback.DevicePath())
-	if err != nil {
-		return fmt.Errorf("failed to find disk partitions:\n%w", err)
-	}
-
-	// Create chroot environment.
-	imageChrootDir := filepath.Join(buildDir, "imageroot")
-
-	chrootLeaveOnDisk := false
-	imageChroot := safechroot.NewChroot(imageChrootDir, chrootLeaveOnDisk)
-	err = imageChroot.Initialize("", newMountDirectories, mountPoints)
+	allPackagesRemove, err := collectPackagesList(baseConfigPath, config.PackageListsRemove, config.PackagesRemove)
 	if err != nil {
 		return err
 	}
-	defer imageChroot.Close(chrootLeaveOnDisk)
+
+	allPackagesInstall, err := collectPackagesList(baseConfigPath, config.PackageListsInstall, config.PackagesInstall)
+	if err != nil {
+		return err
+	}
+
+	allPackagesUpdate, err := collectPackagesList(baseConfigPath, config.PackageListsUpdate, config.PackagesUpdate)
+	if err != nil {
+		return err
+	}
+
+	hasRpmSources := len(rpmsSources) > 0 || useBaseImageRpmRepos
+
+	if !hasRpmSources {
+		needRpmsSources := len(allPackagesInstall) > 0 || len(allPackagesUpdate) > 0 || config.UpdateBaseImagePackages
+
+		if needRpmsSources {
+			return fmt.Errorf("have packages to install or update but no RPM sources were specified")
+		} else if partitionsCustomized {
+			return fmt.Errorf("partitions were customized so the initramfs package needs to be reinstalled but no RPM sources were specified")
+		}
+	}
+
+	config.PackagesRemove = allPackagesRemove
+	config.PackagesInstall = allPackagesInstall
+	config.PackagesUpdate = allPackagesUpdate
+
+	config.PackageListsRemove = nil
+	config.PackageListsInstall = nil
+	config.PackageListsUpdate = nil
+
+	return nil
+}
+
+func customizeImageHelper(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
+	buildImageFile string, rpmsSources []string, useBaseImageRpmRepos bool, partitionsCustomized bool,
+) error {
+	imageConnection, err := connectToExistingImage(buildImageFile, buildDir, "imageroot")
+	if err != nil {
+		return err
+	}
+	defer imageConnection.Close()
 
 	// Do the actual customizations.
-	err = doCustomizations(buildDir, baseConfigPath, config, imageChroot, rpmsSources, useBaseImageRpmRepos)
+	err = doCustomizations(buildDir, baseConfigPath, config, imageConnection.Chroot(), rpmsSources,
+		useBaseImageRpmRepos, partitionsCustomized)
 	if err != nil {
 		return err
 	}
 
-	// Close.
-	err = imageChroot.Close(chrootLeaveOnDisk)
-	if err != nil {
-		return err
-	}
-
-	err = loopback.CleanClose()
+	err = imageConnection.CleanClose()
 	if err != nil {
 		return err
 	}
