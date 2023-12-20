@@ -174,7 +174,7 @@ func idToPartitionBlockDevicePath(idType imagecustomizerapi.IdType, id string, n
 	// Iterate over each partition to find the matching id.
 	for _, partition := range diskPartitions {
 		switch idType {
-		case imagecustomizerapi.IdTypePartlabel:
+		case imagecustomizerapi.IdTypePartLabel:
 			if partition.PartLabel == id {
 				return partition.Path, nil
 			}
@@ -182,7 +182,7 @@ func idToPartitionBlockDevicePath(idType imagecustomizerapi.IdType, id string, n
 			if partition.Uuid == id {
 				return partition.Path, nil
 			}
-		case imagecustomizerapi.IdTypePartuuid:
+		case imagecustomizerapi.IdTypePartUuid:
 			if partition.PartUuid == id {
 				return partition.Path, nil
 			}
@@ -198,7 +198,7 @@ func idToPartitionBlockDevicePath(idType imagecustomizerapi.IdType, id string, n
 // systemdFormatPartitionId formats the partition ID based on the ID type following systemd dm-verity style.
 func systemdFormatPartitionId(idType imagecustomizerapi.IdType, id string) (string, error) {
 	switch idType {
-	case imagecustomizerapi.IdTypePartlabel, imagecustomizerapi.IdTypeUuid, imagecustomizerapi.IdTypePartuuid:
+	case imagecustomizerapi.IdTypePartLabel, imagecustomizerapi.IdTypeUuid, imagecustomizerapi.IdTypePartUuid:
 		return fmt.Sprintf("%s=%s", strings.ToUpper(string(idType)), id), nil
 	default:
 		return "", fmt.Errorf("invalid idType provided (%s)", string(idType))

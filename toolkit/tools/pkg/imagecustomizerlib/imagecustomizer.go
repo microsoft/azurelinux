@@ -108,7 +108,7 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 		return err
 	}
 
-	if config.SystemConfig.Verity.IsSet() {
+	if config.SystemConfig.Verity != nil {
 		// Customize image for dm-verity, setting up verity metadata and security features.
 		err = customizeVerityImageHelper(buildDirAbs, baseConfigPath, config, buildImageFile, rpmsSources, useBaseImageRpmRepos)
 		if err != nil {

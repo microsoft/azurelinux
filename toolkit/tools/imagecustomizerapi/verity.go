@@ -12,11 +12,6 @@ type Verity struct {
 	HashPartition VerityPartition `yaml:"HashPartition"`
 }
 
-func (v *Verity) IsSet() bool {
-	return v.DataPartition != VerityPartition{} ||
-		v.HashPartition != VerityPartition{}
-}
-
 func (v *Verity) IsValid() error {
 	if err := v.DataPartition.IdType.IsValid(); err != nil || v.DataPartition.Id == "" {
 		return fmt.Errorf("invalid DataPartition: %v", err)

@@ -148,13 +148,18 @@ The partitions to provision on the disk.
 
 Specifies the configuration for dm-verity root integrity verification.
 
-- DataPartition: A partition configured with dm-verity, which verifies integrity at each system boot. 
+- DataPartition: A partition configured with dm-verity, which verifies integrity
+  at each system boot.
 
-  - IdType: Specifies the type of id for the partition. The options are `PartLabel` (partition label), `Uuid` (filesystem UUID), and `PartUuid` (partition UUID). 
+  - IdType: Specifies the type of id for the partition. The options are
+    `PartLabel` (partition label), `Uuid` (filesystem UUID), and `PartUuid`
+    (partition UUID).
 
-  - Id: The unique identifier value of the partition, corresponding to the specified IdType. 
+  - Id: The unique identifier value of the partition, corresponding to the
+    specified IdType.
 
-- HashPartition: A partition used exclusively for storing a calculated hash tree.
+- HashPartition: A partition used exclusively for storing a calculated hash
+  tree.
 
 Example:
 

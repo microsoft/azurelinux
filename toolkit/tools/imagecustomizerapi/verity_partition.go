@@ -12,6 +12,8 @@ type VerityPartition struct {
 	Id     string `yaml:"Id"`
 }
 
+var uuidRegex = regexp.MustCompile(`^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[4][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$`)
+
 func (v *VerityPartition) IsValid() error {
 	// Check if IdType is valid
 	if err := v.IdType.IsValid(); err != nil {
@@ -25,15 +27,14 @@ func (v *VerityPartition) IsValid() error {
 
 	// Check Id format based on IdType
 	switch v.IdType {
-	case IdTypePartlabel:
-		// Validate using isGPTNameValid function for IdTypePartlabel
+	case IdTypePartLabel:
+		// Validate using isGPTNameValid function for IdTypePartLabel
 		if err := isGPTNameValid(v.Id); err != nil {
-			return fmt.Errorf("invalid Id for IdTypePartlabel: %v", err)
+			return fmt.Errorf("invalid Id for IdTypePartLabel: %v", err)
 		}
-	case IdTypeUuid, IdTypePartuuid:
+	case IdTypeUuid, IdTypePartUuid:
 		// UUID validation (standard format)
-		matched, _ := regexp.MatchString(`^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[4][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$`, v.Id)
-		if !matched {
+		if !uuidRegex.MatchString(v.Id) {
 			return fmt.Errorf("invalid Id format for %s: %s", v.IdType, v.Id)
 		}
 	}
