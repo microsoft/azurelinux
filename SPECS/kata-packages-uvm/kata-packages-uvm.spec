@@ -8,6 +8,8 @@ Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://aka.ms/mariner
 
+ExclusiveArch:  x86_64
+
 Requires:       bash
 Requires:       ca-certificates
 Requires:       chrony
