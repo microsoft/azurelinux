@@ -1,0 +1,72 @@
+parameters:
+  - name: architecture
+    type: string
+  - name: lkgFilePath
+    type: string
+  - name: nightlyRepoBaseURL
+    type: string
+  - name: nightlyRepoMetadataDir
+    type: string
+  - name: nightlyRepoLastKnownGoodFile
+    type: string
+  - name: repoFileLocation
+    type: string
+
+steps:
+  - bash: |
+      architecture=$(echo "${{ parameters.architecture }}" | tr '[:upper:]' '[:lower:]')
+      LAST_KNOWN_GOOD_ENDPOINT="${{ parameters.nightlyRepoBaseURL }}${{ parameters.nightlyRepoMetadataDir }}${{ parameters.nightlyRepoLastKnownGoodFile }}"
+      if ! wget --quiet --timeout=30 --continue "$LAST_KNOWN_GOOD_ENDPOINT" -O "$lkgFilePath"; then
+          echo "-- ERROR: failed to download last known good metadata from the provided nightly package repository." >&2
+          exit 1
+      fi
+
+      # Construct Nightly Repo URL expects the lkgFilePath to be a json file with the following format:
+      #
+      # lkg.json:
+      # {
+      #   "amd64": "amd-container-name",
+      #   "arm64": "arm-container-name"
+      # }
+      
+      if [[ "${architecture}" == "arm64" ]]; then
+          lkg_container_name=$(jq -r '.arm64' "$lkgFilePath")
+      else
+          lkg_container_name=$(jq -r '.amd64' "$lkgFilePath")
+      fi
+
+      nightlyRepoURL="${{ parameters.nightlyRepoBaseURL }}${container_name}/"
+      
+
+      # Construct Nightly Repo URL expects the commit id to be in a json file with the following format:
+      #
+      # commit.json:
+      # {
+      #   "id": "commit-id"
+      # }
+      
+      if ! wget --quiet --timeout=30 --continue "${nightlyRepoURL}/repodata/commit.json" -O "$(Build.SourcesDirectory)/commit.json"; then
+          echo "-- ERROR: failed to download repo's commit id from the provided nightly package repository." >&2
+          exit 1
+      fi
+
+      commit_id=$(jq -r '.id' "$(Build.SourcesDirectory)/commit.json")
+
+      # Ensure the last known good commit is an ancestor of the current commit.
+      if ! git merge-base --is-ancestor $commit_id HEAD; then
+          echo "The last known good commit is not an ancestor of the current commit. Failing out... Confirm the following: this branch is a child of the nightly repo's source branch, the correct LKG file name parameter is set, and the correct nightly repo base url is set."
+          exit 1
+      fi
+
+      # Note: Repos secured by SAS tokens are not supported yet.
+      cat << EOF > "${{ parameters.repoFileLocation }}"
+      [nightly]
+      name=nightly
+      baseurl=${nightlyRepoURL}
+      enabled=1
+      gpgcheck=0
+      EOF
+
+      echo "##vso[task.setvariable isOutput=true,variable=nightlyRepoURL]${nightlyRepoURL}"
+    displayName: Construct Nightly Repo URL
+    name: construct-nightly-repo-url

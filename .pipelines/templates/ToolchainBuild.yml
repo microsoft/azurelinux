@@ -22,13 +22,21 @@ parameters:
     type: string
     default: "CBL-Mariner"
 
+  - name: packageUrlList
+    type: string
+    default: ""
+
 steps:
   - template: ToolkitCheck.yml@${{ parameters.selfRepoName }}
     parameters:
       buildRepoRoot: ${{ parameters.buildRepoRoot }}
 
-  - bash: sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" "-j$(nproc)" toolchain QUICK_REBUILD=y
-    displayName: "Build toolchain"
+  ${{ if eq(parameters.packageUrlList, "") }}:
+    - bash: sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" "-j$(nproc)" toolchain QUICK_REBUILD=y
+      displayName: "Build toolchain (quick rebuild)"
+  ${{ else }}:
+    - bash: sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" "-j$(nproc)" toolchain PACKAGE_URL_LIST="${{ parameters.packageUrlList }}" INCREMENTAL_TOOLCHAIN=y ALLOW_TOOLCHAIN_DOWNLOAD_FAIL=y
+      displayName: "Build toolchain (nightly repo)"
 
   - bash: |
       failed_rpms_log="${{ parameters.buildRepoRoot }}/build/logs/toolchain/failures.txt"

@@ -1,0 +1,28 @@
+
+variables:
+  - name: lkgFilePath
+    value: "$(Build.SourcesDirectory)/lkg.json"
+  - name: repoFileLocation
+    value: "$(Build.SourcesDirectory)/nightly.repo"
+
+
+  # NightlyRepo_{{targetbranch}} is a group variable that contains the following variables (with example values):
+  #   - name: nightlyRepoBaseURL
+  #     value: "https://testreposdou.blob.core.windows.net/20231220174055-preview-repo-local-test/"
+  #   - name: nightlyRepoMetadataDir
+  #     value: "lkg/"
+  #   - name: nightlyRepoLastKnownGoodFile
+  #     value: "lkg.json"
+  #
+  # NOTE: we expect the path values to have trailing '/' characters. This is because we use the values in the following way:
+  #   # The container_name variable in this example is set in the NightlyRepoDefineRepoURL.yml template and does not contain the trailing '/' because it is used outside of pathing.
+  #   "${{ parameters.nightlyRepoBaseURL }}${{ parameters.nightlyRepoMetadataDir }}${{ parameters.nightlyRepoLastKnownGoodFile }}"
+  #   "${{ parameters.nightlyRepoBaseURL }}${container_name}/"
+  #   "${{ parameters.nightlyRepoBaseURL }}${container_name}/repodata/commit.json"
+
+  ${{ if eq(variables.System.PullRequest.TargetBranch, "main")}}:
+    - group: NightlyRepo_main
+  ${{ elseif eq(variables.System.PullRequest.TargetBranch, "3.0") }}:
+    - group: NightlyRepo_3.0
+  ${{ else }}:
+    - group: NightlyRepo_main # For now, default to main... (Maybe we shouldn't default to something and instead fail the build?)

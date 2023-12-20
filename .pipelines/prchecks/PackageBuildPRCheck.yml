@@ -22,6 +22,7 @@ parameters:
         maxCPUs: "$(($(nproc) / 3))"
         rawToolchainCacheURL: "$(rawToolchainCacheURL_ARM64)"
         rawToolchainExpectedHash: "65de43b3bdcfdaac71df1f11fd1f830a8109b1eb9d7cb6cbc2e2d0e929d0ef76"
+        
 
 resources:
   repositories:
@@ -59,7 +60,17 @@ extends:
                 variables:
                   ob_artifactBaseName: $(toolchainArtifactNameBase)_${{ configuration.name }}
                   ob_outputDirectory: $(Build.ArtifactStagingDirectory)
+                  - template: .pipelines/templates/NightlyRepoVariables.yml@templates
                 steps:
+                  - template: .pipelines/templates/NightlyRepoDefineRepoURL.yml@self
+                    parameters:
+                      architecture: ${{ configuration.name }}
+                      lkgFilePath: "$(lkgFilePath)"
+                      nightlyRepoBaseURL: "$(nightlyRepoBaseURL)"
+                      nightlyRepoMetadataDir: "$(nightlyRepoMetadataDir)"
+                      nightlyRepoLastKnownGoodFile: "$(nightlyRepoLastKnownGoodFile)"
+                      repoFileLocation: "$(repoFileLocation)"
+
                   - template: .pipelines/templates/RawToolchainDownload.yml@self
                     parameters:
                       rawToolchainCacheURL: ${{ configuration.rawToolchainCacheURL }}
@@ -67,6 +78,7 @@ extends:
 
                   - template: .pipelines/templates/ToolchainBuild.yml@self
                     parameters:
+                      nightlyRepoURL: $[ stageDependencies.Toolchain_${{ configuration.name }}.Build.outputs['construct-nightly-repo-url.nightlyRepoURL'] ] 
                       outputArtifactsFolder: $(ob_outputDirectory)
                       selfRepoName: self
 
@@ -97,10 +109,21 @@ extends:
                   ob_artifactBaseName: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}
                   ob_outputDirectory: $(Build.ArtifactStagingDirectory)
                   testListFromToolchain: $[ stageDependencies.Toolchain_${{ configuration.name }}.Build.outputs['CalculateToolchainPackageRetestList.toolchainPackageRetestList'] ]
+                  - template: .pipelines/templates/NightlyRepoVariables.yml@templates
                 steps:
+                  - template: .pipelines/templates/NightlyRepoDefineRepoURL.yml@self
+                    parameters:
+                      architecture: ${{ configuration.name }}
+                      lkgFilePath: "$(lkgFilePath)"
+                      nightlyRepoBaseURL: "$(nightlyRepoBaseURL)"
+                      nightlyRepoMetadataDir: "$(nightlyRepoMetadataDir)"
+                      nightlyRepoLastKnownGoodFile: "$(nightlyRepoLastKnownGoodFile)"
+                      repoFileLocation: "$(repoFileLocation)"
+                  
                   - template: .pipelines/templates/PackageBuild.yml@self
                     parameters:
                       customToolchainArtifactName: $(toolchainArtifactNameBase)_${{ configuration.name }}
+                      extraPackageRepos: "$(repoFileLocation)"
                       isCheckBuild: true
                       isQuickRebuildPackages: true
                       outputArtifactsFolder: $(ob_outputDirectory)
@@ -129,3 +152,5 @@ extends:
                   - template: .pipelines/templatesWithCheckout/SodiffCheck.yml@self
                     parameters:
                       inputArtifactName: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}
+
+          # If we expanded this to also build an image, we could begin to run all of our tests with these artifacts. (We'd want to enable the setting that only runs this pipeline when a teammate comments on the PR, so as to limit who and when these tests can run for.)
