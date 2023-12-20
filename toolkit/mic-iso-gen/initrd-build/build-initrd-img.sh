@@ -25,8 +25,4 @@ echo "kernelVersion=$kernelVersion"
 
 sudo dracut /initrd.img \
     --kver $kernelVersion \
-    --filesystems "squashfs" \
-    --include /usr/bin/more /usr/sbin/more \
-    --include /usr/bin/vim /usr/sbin/vim \
-    --include /usr/bin/lsblk /usr/sbin/lsblk \
-    --include /usr/bin/grep /usr/bin/grep
+    --filesystems "squashfs"

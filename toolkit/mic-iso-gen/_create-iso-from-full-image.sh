@@ -337,17 +337,19 @@ function build_inird() {
     sudo mkdir -p $mountFolder
     sudo mount $loopDev $mountFolder
 
-    artifactsDir=/home/george/git/CBL-Mariner/toolkit/mic-iso-gen/dracut-patches/artifacts
+    artifactsDir=/home/george/git/CBL-Mariner/toolkit/mic-iso-gen/initrd-build
 
-    stage_initrd_build_file $artifactsDir/dmsquash-generator.sh $mountFolder/usr/lib/dracut/modules.d/90dmsquash-live/dmsquash-generator.sh
-    stage_initrd_build_file $artifactsDir/dmsquash-live-root.sh $mountFolder/usr/lib/dracut/modules.d/90dmsquash-live/dmsquash-live-root.sh
-    stage_initrd_build_file $artifactsDir/dracut-emergency.sh   $mountFolder/usr/lib/dracut/modules.d/98dracut-systemd/dracut-emergency.sh
-    stage_initrd_build_file $artifactsDir/dracut-mount.sh       $mountFolder/usr/lib/dracut/modules.d/98dracut-systemd/dracut-mount.sh
-    stage_initrd_build_file $artifactsDir/iso-scan.sh           $mountFolder/usr/lib/dracut/modules.d/90dmsquash-live/iso-scan.sh
-    stage_initrd_build_file $artifactsDir/20-gmileka.conf       $mountFolder/etc/dracut.conf.d/20-gmileka.conf
-    stage_initrd_build_file $artifactsDir/build-initrd.sh       $mountFolder/build-initrd.sh
+    stage_initrd_build_file $artifactsDir/20-live-cd.conf     $mountFolder/etc/dracut.conf.d/20-live-cd.conf
+    stage_initrd_build_file $artifactsDir/build-initrd-img.sh $mountFolder/build-initrd-img.sh
 
-    sudo chroot $mountFolder /bin/bash -c "sudo /build-initrd.sh"
+    # patch dmsquash-live-root to supress user prompt during boot when the overlay is temporary.
+    sudo chmod +w $mountFolder/usr/lib/dracut/modules.d/90dmsquash-live/dmsquash-live-root.sh
+    sudo patch -p1 -i $artifactsDir/no_user_prompt.patch $mountFolder/usr/lib/dracut/modules.d/90dmsquash-live/dmsquash-live-root.sh
+    sudo chmod 755 $mountFolder/usr/lib/dracut/modules.d/90dmsquash-live/dmsquash-live-root.sh
+
+    cp $mountFolder/usr/lib/dracut/modules.d/90dmsquash-live/dmsquash-live-root.sh ~/temp/blah.sh
+
+    sudo chroot $mountFolder /bin/bash -c "sudo /build-initrd-img.sh"
 
     mkdir -p $(dirname $initrdImage)
     sudo cp $mountFolder/initrd.img $initrdImage
