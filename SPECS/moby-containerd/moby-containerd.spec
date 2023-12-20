@@ -90,7 +90,7 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
-* Tue Dec 20 2023 Ravi Prakash Pandey <rapandey@microsoft.com> - 1.6.22-2
+* Tue Dec 20 2023 Ravi Prakash Pandey <rapandey@microsoft.com> - 1.6.26-2
 - Set oom_score_adj of containerd to -999 and bump the release version to 2
 
 * Fri Dec 15 2023 Rohit Rawat <rohitrawat@microsoft.com> - 1.6.26-1
