@@ -35,13 +35,13 @@ func extractPartitions(imageConnection *ImageConnection, outputImageFile string,
 			rawFilename := basename + "_" + strconv.Itoa(partitionNum) + ".raw"
 			partitionLoopDevice := diskPartitions[partitionNum].Path
 
-			err, partitionFilepath := createRawFile(outDir, partitionLoopDevice, rawFilename)
+			partitionFilepath, err := copyBlockDeviceToFile(outDir, partitionLoopDevice, rawFilename)
 			if err != nil {
 				return err
 			}
 
 			if partitionFormat == "raw-zstd" {
-				err, partitionFilepath = compressWithZstd(partitionFilepath)
+				partitionFilepath, err = compressWithZstd(partitionFilepath)
 				if err != nil {
 					return err
 				}
@@ -54,7 +54,7 @@ func extractPartitions(imageConnection *ImageConnection, outputImageFile string,
 }
 
 // Creates .raw file for the mentioned partition path.
-func createRawFile(outDir, devicePath, name string) (err error, filename string) {
+func copyBlockDeviceToFile(outDir, devicePath, name string) (filename string, err error) {
 	const (
 		defaultBlockSize = 1024 * 1024 // 1MB
 		squashErrors     = true
@@ -67,23 +67,28 @@ func createRawFile(outDir, devicePath, name string) (err error, filename string)
 		fmt.Sprintf("bs=%d", defaultBlockSize), // Size of one copied block.
 	}
 
-	return shell.ExecuteLive(squashErrors, "dd", ddArgs...), fullPath
+	err = shell.ExecuteLive(squashErrors, "dd", ddArgs...)
+	if err != nil {
+		return "", fmt.Errorf("failed to copy block device into file:\n%w", err)
+	}
+
+	return fullPath, nil
 }
 
 // Compress file from raw to raw-zstd format using zstd.
-func compressWithZstd(partitionRawFilepath string) (err error, partitionFilepath string) {
+func compressWithZstd(partitionRawFilepath string) (partitionFilepath string, err error) {
 	// Using -f to overwrite a file with same name if it exists.
 	cmd := exec.Command("zstd", "-f", "-9", "-T0", partitionRawFilepath)
 	_, err = cmd.Output()
 	if err != nil {
-		return err, ""
+		return "", fmt.Errorf("failed to compress %s with zstd:\n%w", partitionRawFilepath, err)
 	}
 
 	// Remove raw file since output partition format is raw-zstd.
 	err = os.Remove(partitionRawFilepath)
 	if err != nil {
-		return err, ""
+		return "", fmt.Errorf("failed to remove raw file %s:\n%w", partitionRawFilepath, err)
 	}
 
-	return nil, partitionRawFilepath + ".zst"
+	return partitionRawFilepath + ".zst", nil
 }

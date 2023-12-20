@@ -304,7 +304,10 @@ func extractPartitionsHelper(buildDir string, buildImageFile string, outputImage
 	defer imageConnection.Close()
 
 	// Extract the partitions as files.
-	extractPartitions(imageConnection, outputImageFile, outputSplitPartitionsFormat)
+	err = extractPartitions(imageConnection, outputImageFile, outputSplitPartitionsFormat)
+	if err != nil {
+		return err
+	}
 
 	err = imageConnection.CleanClose()
 	if err != nil {
