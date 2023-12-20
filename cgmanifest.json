@@ -13363,8 +13363,8 @@
         "type": "other",
         "other": {
           "name": "moby-cli",
-          "version": "20.10.25",
-          "downloadUrl": "https://github.com/docker/cli/archive/v20.10.25.tar.gz"
+          "version": "20.10.27",
+          "downloadUrl": "https://github.com/docker/cli/archive/v20.10.27.tar.gz"
         }
       }
     },
@@ -13383,8 +13383,8 @@
         "type": "other",
         "other": {
           "name": "moby-containerd",
-          "version": "1.6.22",
-          "downloadUrl": "https://github.com/containerd/containerd/archive/v1.6.22.tar.gz"
+          "version": "1.6.26",
+          "downloadUrl": "https://github.com/containerd/containerd/archive/v1.6.26.tar.gz"
         }
       }
     },
@@ -13403,8 +13403,8 @@
         "type": "other",
         "other": {
           "name": "moby-engine",
-          "version": "20.10.25",
-          "downloadUrl": "https://github.com/moby/moby/archive/v20.10.25.tar.gz"
+          "version": "20.10.27",
+          "downloadUrl": "https://github.com/moby/moby/archive/v20.10.27.tar.gz"
         }
       }
     },
