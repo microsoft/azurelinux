@@ -2367,8 +2367,8 @@
         "type": "other",
         "other": {
           "name": "curl",
-          "version": "8.3.0",
-          "downloadUrl": "https://curl.haxx.se/download/curl-8.3.0.tar.gz"
+          "version": "8.5.0",
+          "downloadUrl": "https://curl.haxx.se/download/curl-8.5.0.tar.gz"
         }
       }
     },
@@ -20573,6 +20573,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Time-Duration",
+          "version": "1.21",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/N/NE/NEILB/Time-Duration-1.21.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-TimeDate",
           "version": "2.32",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/A/AT/ATOOMIC/TimeDate-2.32.tar.gz"
@@ -25346,6 +25356,16 @@
           "name": "quota",
           "version": "4.06",
           "downloadUrl": "http://downloads.sourceforge.net/linuxquota/quota-4.06.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "quotatool",
+          "version": "1.6.2",
+          "downloadUrl": "http://quotatool.ekenberg.se/quotatool-1.6.2.tar.gz"
         }
       }
     },
