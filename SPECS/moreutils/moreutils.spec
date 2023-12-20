@@ -12,7 +12,7 @@ Distribution:   Mariner
 
 Name:           moreutils
 Version:        0.67
-Release:        7
+Release:        7%{?dist}
 Summary:        Additional unix utilities
 License:        GPLv2
 URL:            https://joeyh.name/code/moreutils/
