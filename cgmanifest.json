@@ -20563,6 +20563,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-Time-Duration",
+          "version": "1.21",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/N/NE/NEILB/Time-Duration-1.21.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-TimeDate",
           "version": "2.32",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/A/AT/ATOOMIC/TimeDate-2.32.tar.gz"
