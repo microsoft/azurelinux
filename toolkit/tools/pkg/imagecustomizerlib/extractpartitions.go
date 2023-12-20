@@ -40,11 +40,16 @@ func extractPartitions(imageConnection *ImageConnection, outputImageFile string,
 				return err
 			}
 
-			if partitionFormat == "raw-zstd" {
+			switch partitionFormat {
+			case "raw":
+				// Do nothing for "raw" case.
+			case "raw-zstd":
 				partitionFilepath, err = compressWithZstd(partitionFilepath)
 				if err != nil {
 					return err
 				}
+			default:
+				return fmt.Errorf("unsupported partition format (supported: raw, raw-zstd): %s", partitionFormat)
 			}
 
 			logger.Log.Infof("Partition file created: %s", partitionFilepath)
