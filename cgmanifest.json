@@ -15,8 +15,8 @@
         "type": "other",
         "other": {
           "name": "abseil-cpp",
-          "version": "20220623.0",
-          "downloadUrl": "https://github.com/abseil/abseil-cpp/archive/20220623.0/abseil-cpp-20220623.0.tar.gz"
+          "version": "20230802.1",
+          "downloadUrl": "https://github.com/abseil/abseil-cpp/archive/refs/tags/20230802.1.tar.gz"
         }
       }
     },
