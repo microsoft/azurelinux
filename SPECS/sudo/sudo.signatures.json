@@ -1,6 +1,5 @@
 {
    "Signatures": {
-      "sudo-1.9.14p3.tar.gz": "a08318b1c4bc8582c004d4cd9ae2903abc549e7e46ba815e41fe81d1c0782b62",
-      "sudo-ldap-netgroup-query.patch": "a830889178e984859b13a07b5ef458107794ca8683248bd4051403eae714dad6"
+      "sudo-1.9.14p3.tar.gz": "a08318b1c4bc8582c004d4cd9ae2903abc549e7e46ba815e41fe81d1c0782b62"
    }
 }
