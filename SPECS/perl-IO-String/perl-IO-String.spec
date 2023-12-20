@@ -1,6 +1,6 @@
 Name:           perl-IO-String
 Version:        1.08
-Release:        38%{?dist}
+Release:        39%{?dist}
 Summary:        Emulate file interface for in-core strings
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -56,9 +56,12 @@ make test
 
 
 %changelog
+* Wed Dec 20 2023 Sindhu Karri <lakarri@microsoft.com> - 1.08-39
+- Promote package to Mariner Base repo
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.08-38
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- License verified
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.08-37
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
