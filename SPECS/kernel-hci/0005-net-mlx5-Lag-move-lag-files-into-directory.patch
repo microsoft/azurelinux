@@ -61,7 +61,7 @@ index 303e6e7..fd4d9fb 100644
  struct mlx5e_tc_tun_route_attr {
  	struct net_device *out_dev;
 diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
-index 78538a1..1d9045c 100644
+index 78538a1..89a98ed 100644
 --- a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
 +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
 @@ -67,8 +67,8 @@
@@ -71,7 +71,7 @@ index 78538a1..1d9045c 100644
 -#include "lag.h"
 -#include "lag_mp.h"
 +#include "lag/lag.h"
-+#include "lag/lag_mp.h"
++#include "lag/mp.h"
  
  #define nic_chains(priv) ((priv)->fs.tc.chains)
  
