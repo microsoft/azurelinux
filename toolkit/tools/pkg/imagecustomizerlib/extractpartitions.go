@@ -3,9 +3,9 @@ package imagecustomizerlib
 import (
 	"fmt"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"strconv"
@@ -80,7 +80,10 @@ func compressWithZstd(partitionRawFilepath string) (err error, partitionFilepath
 	}
 
 	// Remove raw file since output partition format is raw-zstd.
-	file.RemoveFileIfExists(partitionRawFilepath)
+	err = os.Remove(partitionRawFilepath)
+	if err != nil {
+		return err, ""
+	}
 
 	return nil, partitionRawFilepath + ".zst"
 }
