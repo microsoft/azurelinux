@@ -30,24 +30,25 @@ func extractPartitions(imageConnection *ImageConnection, outputImageFile string,
 		return err
 	}
 
-	// Start extracting from 1 because the diskPartitions[0] refers to the image itself.
-	for partitionNum := 1; partitionNum < len(diskPartitions); partitionNum++ {
-		rawFilename := basename + "_" + strconv.Itoa(partitionNum) + ".raw"
-		partitionLoopDevice := diskPartitions[partitionNum].Path
+	for partitionNum := 0; partitionNum < len(diskPartitions); partitionNum++ {
+		if diskPartitions[partitionNum].Type == "part" {
+			rawFilename := basename + "_" + strconv.Itoa(partitionNum) + ".raw"
+			partitionLoopDevice := diskPartitions[partitionNum].Path
 
-		err, partitionFilepath := createRawFile(outDir, partitionLoopDevice, rawFilename)
-		if err != nil {
-			return err
-		}
-
-		if partitionFormat == "raw-zstd" {
-			err, partitionFilepath = compressWithZstd(partitionFilepath)
+			err, partitionFilepath := createRawFile(outDir, partitionLoopDevice, rawFilename)
 			if err != nil {
 				return err
 			}
-		}
 
-		logger.Log.Infof("Partition file created: %s", partitionFilepath)
+			if partitionFormat == "raw-zstd" {
+				err, partitionFilepath = compressWithZstd(partitionFilepath)
+				if err != nil {
+					return err
+				}
+			}
+
+			logger.Log.Infof("Partition file created: %s", partitionFilepath)
+		}
 	}
 	return nil
 }
