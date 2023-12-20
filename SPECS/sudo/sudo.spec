@@ -8,7 +8,7 @@ Group:          System Environment/Security
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://www.sudo.ws/sudo/dist/%{name}-%{version}.tar.gz
-Patch0:         sudo-ldap-netgroup-query.patch
+Patch0:         disable-newgroup-query-when-netgroup-base-is-not-set.patch
 BuildRequires:  audit-devel
 BuildRequires:  man-db
 BuildRequires:  openssl-devel
