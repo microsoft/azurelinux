@@ -29836,7 +29836,7 @@
         "other": {
           "name": "xfsprogs",
           "version": "6.5.0",
-          "downloadUrl": "https://mirrors.edge.kernel.org/pub/linux/utils/fs/xfs/xfsprogs/xfsprogs-6.5.0.tar.xz"
+          "downloadUrl": "https://kernel.org/pub/linux/utils/fs/xfs/xfsprogs/xfsprogs-6.5.0.tar.xz"
         }
       }
     },
