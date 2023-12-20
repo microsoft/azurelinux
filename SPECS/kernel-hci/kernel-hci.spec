@@ -437,6 +437,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %changelog
 * Tue Dec 19 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.143.1-1
 - Auto-upgrade to 5.15.143.1
+- Fix 0005-net-mlx5-Lag-move-lag-files-into-directory.patch so patch applies after update
 
 * Tue Dec 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.139.1-1
 - Auto-upgrade to 5.15.139.1
