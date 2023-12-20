@@ -3,24 +3,33 @@
 # Ensure that the 'dracut-lib' is present and loaded.
 type getarg >/dev/null 2>&1 || . /lib/dracut-lib.sh
 
-VERITY_MOUNT="/verity_mnt"
-OVERLAY_MNT_OPTS="rw,nodev,nosuid,nouser,noexec"
+VERITY_MOUNT="systemd_verity/verity_mnt"
+OVERLAYS_TMPFS="systemd_verity/overlays"
+OVERLAYS_MNT_OPTS="rw,nodev,nosuid,nouser,noexec"
 
-# Retrieve Overlays parameters.
+# Retrieve the verity root. It is expected to be predefined by the dracut cmdline module.
+[ -z "$root" ] && root=$(getarg root=)
+# Retrieve the Overlays parameters.
 [ -z "${overlays}" ] && overlays=$(getarg rd.overlays=)
+[ -z "${overlaysize}" ] && overlaysize=$(getarg rd.overlaysize=)
+
+# Verify that an overlay size is specified when using overlay file systems.
+if [ -n "${overlays}" ]; then
+    [ -z "${overlaysize}" ] && die "rd.overlaysize= must be set if using rd.overlays="
+fi
 
 create_overlay() {
     local _dir=$1
-    local _upper=$2
-    local _work=$3
     local _mounted_dir="${VERITY_MOUNT}/${_dir}"
+    local _upper_dir=$2
+    local _work_dir=$3
+    local _upper="${OVERLAYS_TMPFS}/${_upper_dir}"
+    local _work="${OVERLAYS_TMPFS}/${_work_dir}"
 
-    info "Creating a R/W overlay for $_dir"
-    [ -d "$_mounted_dir" ] || die "$_dir does not exist, cannot create overlay"
+    [ -d "$_mounted_dir" ] || die "Unable to create overlay as $_dir does not exist"
 
-    # Assume upper and work layer will be prepared here.
-    [ ! -d "${_upper}" ] || die "Name collision with ${_upper}"
-    [ ! -d "${_work}" ] || die "Name collision with ${_work}"
+    [ ! -d "${_upper}" ] || die "Conflict in naming with ${_upper}"
+    [ ! -d "${_work}" ] || die "Conflict in naming with ${_work}"
 
     mkdir -p "${_upper}" && \
     mkdir -p "${_work}" && \
@@ -29,11 +38,14 @@ create_overlay() {
 }
 
 mount_root() {
-    info "Mounting dm-verity root"
     mkdir -p "${VERITY_MOUNT}"
     mount -o ro,defaults "/dev/mapper/root" "${VERITY_MOUNT}" || \
-        die "Failed to mount dm-verity root"
+        die "Failed to mount dm-verity root target"
     
+    mkdir -p "${OVERLAYS_TMPFS}"
+    mount -t tmpfs tmpfs -o ${OVERLAYS_MNT_OPTS},size=${overlaysize} "${OVERLAYS_TMPFS}" || \
+            die "Failed to create overlay tmpfs at ${OVERLAYS_TMPFS}"
+
     for _group in ${overlays}; do
         IFS=',' read -r overlay upper work <<< "$_group"
         create_overlay "$overlay" "$upper" "$work"
