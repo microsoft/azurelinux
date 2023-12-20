@@ -1,6 +1,6 @@
 Name:		perl-Devel-CheckBin
 Version:	0.04
-Release:	14%{?dist}
+Release:	15%{?dist}
 Summary:	Check that a command is available
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -54,9 +54,12 @@ make test
 %{_mandir}/man3/Devel::CheckBin.3*
 
 %changelog
+* Wed Dec 20 2023 Sindhu Karri <lakarri@microsoft.com> - 0.04-15
+- Promote package to Mariner Base repo
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.04-14
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- License verified
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.04-13
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
