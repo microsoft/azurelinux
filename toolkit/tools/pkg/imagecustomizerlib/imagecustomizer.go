@@ -7,10 +7,13 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safemount"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 )
 
@@ -104,6 +107,14 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 		partitionsCustomized)
 	if err != nil {
 		return err
+	}
+
+	if config.SystemConfig.Verity != nil {
+		// Customize image for dm-verity, setting up verity metadata and security features.
+		err = customizeVerityImageHelper(buildDirAbs, baseConfigPath, config, buildImageFile, rpmsSources, useBaseImageRpmRepos)
+		if err != nil {
+			return err
+		}
 	}
 
 	// Create final output image file.
@@ -310,6 +321,100 @@ func extractPartitionsHelper(buildDir string, buildImageFile string, outputImage
 	}
 
 	err = imageConnection.CleanClose()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
+	buildImageFile string, rpmsSources []string, useBaseImageRpmRepos bool,
+) error {
+	var err error
+
+	// Connect the disk image to an NBD device using qemu-nbd
+	// Find a free NBD device
+	nbdDevice, err := findFreeNBDDevice()
+	if err != nil {
+		return fmt.Errorf("failed to find a free nbd device: %v", err)
+	}
+
+	err = shell.ExecuteLiveWithErr(1, "qemu-nbd", "-c", nbdDevice, "-f", "raw", buildImageFile)
+	if err != nil {
+		return fmt.Errorf("failed to connect nbd %s to image %s: %s", nbdDevice, buildImageFile, err)
+	}
+	defer func() {
+		// Disconnect the NBD device when the function returns
+		err = shell.ExecuteLiveWithErr(1, "qemu-nbd", "-d", nbdDevice)
+		if err != nil {
+			return
+		}
+	}()
+
+	diskPartitions, err := diskutils.GetDiskPartitions(nbdDevice)
+	if err != nil {
+		return err
+	}
+
+	// Extract the partition block device path.
+	dataPartition, err := idToPartitionBlockDevicePath(config.SystemConfig.Verity.DataPartition.IdType, config.SystemConfig.Verity.DataPartition.Id, nbdDevice, diskPartitions)
+	if err != nil {
+		return err
+	}
+	hashPartition, err := idToPartitionBlockDevicePath(config.SystemConfig.Verity.HashPartition.IdType, config.SystemConfig.Verity.HashPartition.Id, nbdDevice, diskPartitions)
+	if err != nil {
+		return err
+	}
+
+	// Extract root hash using regular expressions.
+	verityOutput, _, err := shell.Execute("veritysetup", "format", dataPartition, hashPartition)
+	if err != nil {
+		return fmt.Errorf("failed to calculate root hash:\n%w", err)
+	}
+
+	var rootHash string
+	rootHashRegex, err := regexp.Compile(`Root hash:\s+([0-9a-fA-F]+)`)
+	if err != nil {
+		// handle the error appropriately, for example:
+		return fmt.Errorf("failed to compile root hash regex: %w", err)
+	}
+
+	rootHashMatches := rootHashRegex.FindStringSubmatch(verityOutput)
+	if len(rootHashMatches) <= 1 {
+		return fmt.Errorf("failed to parse root hash from veritysetup output")
+	}
+	rootHash = rootHashMatches[1]
+
+	systemBootPartition, err := findSystemBootPartition(diskPartitions)
+	if err != nil {
+		return err
+	}
+	bootPartition, err := findBootPartitionFromEsp(systemBootPartition, diskPartitions, buildDir)
+	if err != nil {
+		return err
+	}
+
+	bootPartitionTmpDir := filepath.Join(buildDir, tmpParitionDirName)
+	// Temporarily mount the partition.
+	bootPartitionMount, err := safemount.NewMount(bootPartition.Path, bootPartitionTmpDir, bootPartition.FileSystemType, 0, "", true)
+	if err != nil {
+		return fmt.Errorf("failed to mount partition (%s):\n%w", bootPartition.Path, err)
+	}
+	defer bootPartitionMount.Close()
+
+	grubCfgFullPath := filepath.Join(bootPartitionTmpDir, "grub2/grub.cfg")
+	if err != nil {
+		return fmt.Errorf("failed to stat file (%s):\n%w", grubCfgFullPath, err)
+	}
+
+	err = updateGrubConfig(config.SystemConfig.Verity.DataPartition.IdType, config.SystemConfig.Verity.DataPartition.Id,
+		config.SystemConfig.Verity.HashPartition.IdType, config.SystemConfig.Verity.HashPartition.Id, rootHash, grubCfgFullPath)
+	if err != nil {
+		return err
+	}
+
+	err = bootPartitionMount.CleanClose()
 	if err != nil {
 		return err
 	}
