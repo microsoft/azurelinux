@@ -11661,8 +11661,8 @@
         "type": "other",
         "other": {
           "name": "libxfce4util",
-          "version": "4.14.0",
-          "downloadUrl": "https://archive.xfce.org/src/xfce/libxfce4util/4.14/libxfce4util-4.14.0.tar.bz2"
+          "version": "4.19.2",
+          "downloadUrl": "https://archive.xfce.org/src/xfce/libxfce4util/4.19/libxfce4util-4.19.2.tar.bz2"
         }
       }
     },
