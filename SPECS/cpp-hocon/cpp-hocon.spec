@@ -17,7 +17,7 @@
 
 Name:           cpp-hocon
 Version:        0.3.0
-Release:        16%{?dist}
+Release:        17%{?dist}
 Summary:        C++ support for the HOCON configuration file format
 Vendor:		Microsoft Corporation
 Distribution:	Mariner
@@ -120,6 +120,9 @@ ninja test
 
 
 %changelog
+* Thu Dec 21 2023 Sindhu Karri <lakarri@microsoft.com> - 0.3.0-17
+- Promote package to Mariner Base repo
+
 * Tue Oct 19 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> 0.3.0-16
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - License verified
@@ -231,5 +234,3 @@ ninja test
 
 * Wed Oct 04 2017 James Hogarth <james.hogarth@gmail.com> - 0.1.6-1
 - Initial packaging
-
-
