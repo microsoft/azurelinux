@@ -3,6 +3,6 @@
     "cbl-mariner-ca-20211013.pem": "5ef124b0924cb1047c111a0ecff1ae11e6ad7cac8d1d9b40f98f99334121f0b0",
     "config": "31d715c94442a6919cfb4e953ed018c74ab2decb98e756803d719d1a9bafd1e4",
     "sha512hmac-openssl.sh": "02ab91329c4be09ee66d759e4d23ac875037c3b56e5a598e32fd1206da06a27f",
-    "kernel-mos-5.15.143.1.tar.gz": "3f0bcbee6b6c5411790e822562ac46448001559aa55950dc2f8ca7a9547a1d1f"
+    "kernel-mos-5.15.143.1.tar.gz": "db64de6cf1d81ba0b7c42abace102b0514ea8a2bf1a32040733bf4ce89d2a124"
   }
 }
