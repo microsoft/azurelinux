@@ -19,32 +19,31 @@ import (
 type installOSFunc func(imageChroot *safechroot.Chroot) error
 
 func connectToExistingImage(imageFilePath string, buildDir string, chrootDirName string, includeDefaultMounts bool,
-) (*ImageConnection, error) {
+) (*ImageConnection, []*safechroot.MountPoint, error) {
 	imageConnection := NewImageConnection()
 
-	err := connectToExistingImageHelper(imageConnection, imageFilePath, buildDir, chrootDirName, includeDefaultMounts)
+	mountPoints, err := connectToExistingImageHelper(imageConnection, imageFilePath, buildDir, chrootDirName, includeDefaultMounts)
 	if err != nil {
 		imageConnection.Close()
-		return nil, err
+		return nil, nil, err
 	}
 
-	return imageConnection, nil
-
+	return imageConnection, mountPoints, nil
 }
 
 func connectToExistingImageHelper(imageConnection *ImageConnection, imageFilePath string,
 	buildDir string, chrootDirName string, includeDefaultMounts bool,
-) error {
+) ([]*safechroot.MountPoint, error) {
 	// Connect to image file using loopback device.
 	err := imageConnection.ConnectLoopback(imageFilePath)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Look for all the partitions on the image.
 	newMountDirectories, mountPoints, err := findPartitions(buildDir, imageConnection.Loopback().DevicePath())
 	if err != nil {
-		return fmt.Errorf("failed to find disk partitions:\n%w", err)
+		return nil, fmt.Errorf("failed to find disk partitions:\n%w", err)
 	}
 
 	// Create chroot environment.
@@ -52,10 +51,10 @@ func connectToExistingImageHelper(imageConnection *ImageConnection, imageFilePat
 
 	err = imageConnection.ConnectChroot(imageChrootDir, false, newMountDirectories, mountPoints, includeDefaultMounts)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return mountPoints, nil
 }
 
 func createNewImage(filename string, diskConfig imagecustomizerapi.Disk,

@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
@@ -37,6 +38,8 @@ func CustomizeImageWithConfigFile(buildDir string, configFile string, imageFile 
 ) error {
 	var err error
 
+	logger.Log.Infof("--imagecustomizer.go - starting...")
+
 	var config imagecustomizerapi.Config
 	err = imagecustomizerapi.UnmarshalYamlFile(configFile, &config)
 	if err != nil {
@@ -65,6 +68,29 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 	var err error
 	var qemuOutputImageFormat string
 
+	logger.Log.Infof("--imagecustomizer.go - validating config...")
+
+	outputImageBase := strings.TrimSuffix(filepath.Base(outputImageFile), filepath.Ext(outputImageFile))
+	outputImageDir := filepath.Dir(outputImageFile)
+
+	enableIsoCreation := false
+	outputIsoImageFile := ""
+	if outputImageFormat == "iso" {
+		enableIsoCreation = true
+		inputImageExt := filepath.Ext(imageFile)
+
+		outputIsoImageFile = outputImageFile
+		outputImageFile = filepath.Join(outputImageDir, outputImageBase + inputImageExt)
+
+		outputImageFormat = inputImageExt[1:]
+	}
+
+	logger.Log.Infof("--imagecustomizer.go - outputImageFormat  = %s", outputImageFormat)
+	logger.Log.Infof("--imagecustomizer.go - outputImageBase    = %s", outputImageBase)
+	logger.Log.Infof("--imagecustomizer.go - outputImageDir     = %s", outputImageDir)
+	logger.Log.Infof("--imagecustomizer.go - outputImageFile    = %s", outputImageFile)
+	logger.Log.Infof("--imagecustomizer.go - outputIsoImageFile = %s", outputIsoImageFile)
+	
 	// Validate 'outputImageFormat' value if specified.
 	if outputImageFormat != "" {
 		qemuOutputImageFormat, err = toQemuImageFormat(outputImageFormat)
@@ -91,23 +117,25 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 		return err
 	}
 
+	logger.Log.Infof("--imagecustomizer.go - converting input image to raw format...")
 	// Convert image file to raw format, so that a kernel loop device can be used to make changes to the image.
-	buildImageFile := filepath.Join(buildDirAbs, BaseImageName)
+	rawImageFile := filepath.Join(buildDirAbs, BaseImageName)
 
-	logger.Log.Infof("Mounting base image: %s", buildImageFile)
-	err = shell.ExecuteLiveWithErr(1, "qemu-img", "convert", "-O", "raw", imageFile, buildImageFile)
+	err = shell.ExecuteLiveWithErr(1, "qemu-img", "convert", "-O", "raw", imageFile, rawImageFile)
 	if err != nil {
 		return fmt.Errorf("failed to convert image file to raw format:\n%w", err)
 	}
 
 	// Customize the partitions.
-	partitionsCustomized, buildImageFile, err := customizePartitions(buildDirAbs, baseConfigPath, config, buildImageFile)
+	logger.Log.Infof("--imagecustomizer.go - customizing partitions...")
+	partitionsCustomized, rawImageFile, err := customizePartitions(buildDirAbs, baseConfigPath, config, rawImageFile)
 	if err != nil {
 		return err
 	}
 
 	// Customize the raw image file.
-	err = customizeImageHelper(buildDirAbs, baseConfigPath, config, buildImageFile, rpmsSources, useBaseImageRpmRepos,
+	logger.Log.Infof("--imagecustomizer.go - customizing raw image...")
+	err = customizeImageHelper(buildDirAbs, baseConfigPath, config, rawImageFile, rpmsSources, useBaseImageRpmRepos,
 		partitionsCustomized)
 	if err != nil {
 		return err
@@ -115,7 +143,7 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 
 	if config.SystemConfig.Verity != nil {
 		// Customize image for dm-verity, setting up verity metadata and security features.
-		err = customizeVerityImageHelper(buildDirAbs, baseConfigPath, config, buildImageFile, rpmsSources, useBaseImageRpmRepos)
+		err = customizeVerityImageHelper(buildDirAbs, baseConfigPath, config, rawImageFile, rpmsSources, useBaseImageRpmRepos)
 		if err != nil {
 			return err
 		}
@@ -128,16 +156,24 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 		outDir := filepath.Dir(outputImageFile)
 		os.MkdirAll(outDir, os.ModePerm)
 
-		err = shell.ExecuteLiveWithErr(1, "qemu-img", "convert", "-O", qemuOutputImageFormat, buildImageFile, outputImageFile)
+		err = shell.ExecuteLiveWithErr(1, "qemu-img", "convert", "-O", qemuOutputImageFormat, rawImageFile, outputImageFile)
 		if err != nil {
 			return fmt.Errorf("failed to convert image file to format: %s:\n%w", outputImageFormat, err)
+		}
+	}
+
+	if enableIsoCreation {
+		logger.Log.Infof("--imagecustomizer.go - creating a live os iso from the customized image...")
+		err = createIsoImage(buildDir, rawImageFile, outputImageDir, outputImageBase)
+		if err != nil {
+			return err
 		}
 	}
 
 	// If outputSplitPartitionsFormat is specified, extract the partition files.
 	if outputSplitPartitionsFormat != "" {
 		logger.Log.Infof("Extracting partition files")
-		err = extractPartitionsHelper(buildImageFile, outputImageFile, outputSplitPartitionsFormat)
+		err = extractPartitionsHelper(rawImageFile, outputImageFile, outputSplitPartitionsFormat)
 		if err != nil {
 			return err
 		}
@@ -290,9 +326,9 @@ func validatePackageLists(baseConfigPath string, config *imagecustomizerapi.Syst
 }
 
 func customizeImageHelper(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
-	buildImageFile string, rpmsSources []string, useBaseImageRpmRepos bool, partitionsCustomized bool,
+	rawImageFile string, rpmsSources []string, useBaseImageRpmRepos bool, partitionsCustomized bool,
 ) error {
-	imageConnection, err := connectToExistingImage(buildImageFile, buildDir, "imageroot", true)
+	imageConnection, _, err := connectToExistingImage(rawImageFile, buildDir, "imageroot", true)
 	if err != nil {
 		return err
 	}
@@ -313,8 +349,8 @@ func customizeImageHelper(buildDir string, baseConfigPath string, config *imagec
 	return nil
 }
 
-func extractPartitionsHelper(buildImageFile string, outputImageFile string, outputSplitPartitionsFormat string) error {
-	imageLoopback, err := safeloopback.NewLoopback(buildImageFile)
+func extractPartitionsHelper(rawImageFile string, outputImageFile string, outputSplitPartitionsFormat string) error {
+	imageLoopback, err := safeloopback.NewLoopback(rawImageFile)
 	if err != nil {
 		return err
 	}
@@ -421,6 +457,74 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 	}
 
 	err = bootPartitionMount.CleanClose()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func createIsoImage(buildDir, sourceImageFile, outputImageDir, outputImageBase string) error {
+
+	logger.Log.Infof("--imagecustomizer.go - connecting to customized raw image (%s)", sourceImageFile)
+
+	imageConnection, mountPoints, err := connectToExistingImage(sourceImageFile, buildDir, "imageroot", true)
+	if err != nil {
+		return err
+	}
+	defer imageConnection.Close()
+
+	iae := &IsoArtifactExtractor{
+		buildDir      : buildDir,
+		tmpDir        : filepath.Join(buildDir, "tmp"),
+		// IsoMaker needs its own folder to work in (it starts by deleting and re-creating it).
+		isomakerTmpDir: filepath.Join(buildDir, "isomaker-tmp"),
+		outDir        : filepath.Join(buildDir, "out"),	
+	}
+
+	// extract boot artifacts (before rootfs artifacts)...
+	for _, mountPoint := range mountPoints {
+		if mountPoint.GetTarget() == "/boot/efi" {
+			err := iae.extractIsoArtifactsFromBoot(mountPoint.GetSource(), mountPoint.GetFSType())
+			if err != nil {
+				return err
+			}
+			break
+		}
+	}
+
+	// extract rootfs artifacts...
+	for _, mountPoint := range mountPoints {
+		if mountPoint.GetTarget() == "/" {
+
+			writeableRootfsImage := filepath.Join(iae.tmpDir, "writeable-rootfs.img")
+
+			err := iae.createWriteableRootfs(mountPoint.GetSource(), mountPoint.GetFSType(), writeableRootfsImage)
+			if err != nil {
+				return err
+			}
+
+			isoMakerArtifactsStagingDirWithinRWImage := "/boot-staging"
+			err = iae.convertToLiveOSImage(writeableRootfsImage, isoMakerArtifactsStagingDirWithinRWImage)
+			if err != nil {
+				return err
+			}
+
+			err = iae.generateInitrd(writeableRootfsImage, isoMakerArtifactsStagingDirWithinRWImage)
+			if err != nil {
+				return err
+			}
+		
+			break
+		}
+	}
+
+	err = createIso(iae.isomakerTmpDir, iae.grubCfgPath, iae.initrdPath, iae.squashfsPath, outputImageDir, outputImageBase)
+	if err != nil {
+		return err
+	}
+
+	err = imageConnection.CleanClose()
 	if err != nil {
 		return err
 	}
