@@ -13,11 +13,11 @@ type Verity struct {
 }
 
 func (v *Verity) IsValid() error {
-	if err := v.DataPartition.IdType.IsValid(); err != nil || v.DataPartition.Id == "" {
+	if err := v.DataPartition.IdType.IsValid(); err != nil {
 		return fmt.Errorf("invalid DataPartition: %v", err)
 	}
 
-	if err := v.HashPartition.IdType.IsValid(); err != nil || v.HashPartition.Id == "" {
+	if err := v.HashPartition.IdType.IsValid(); err != nil {
 		return fmt.Errorf("invalid HashPartition: %v", err)
 	}
 

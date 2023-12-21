@@ -95,13 +95,11 @@ func (s *SystemConfig) IsValid() error {
 		return err
 	}
 
-	if s.Verity == nil {
-		return fmt.Errorf("Verity is nil")
-	}
-
-	err = s.Verity.IsValid()
-	if err != nil {
-		return fmt.Errorf("invalid Verity: %w", err)
+	if s.Verity != nil {
+		err = s.Verity.IsValid()
+		if err != nil {
+			return fmt.Errorf("invalid Verity: %w", err)
+		}
 	}
 
 	return nil
