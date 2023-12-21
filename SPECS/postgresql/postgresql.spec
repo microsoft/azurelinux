@@ -18,6 +18,8 @@ BuildRequires:  perl
 BuildRequires:  readline-devel
 BuildRequires:  tzdata
 BuildRequires:  zlib-devel
+BuildRequires:  pkgconfig(icu-i18n)
+BuildRequires:  pkgconfig(icu-uc)
 
 %if %{with_check}
 BuildRequires:  sudo
@@ -125,7 +127,6 @@ sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
 %{_bindir}/pg_xlogdump
 %{_bindir}/pgbench
 %{_bindir}/postgres
-%{_bindir}/postmaster
 %{_bindir}/vacuumlo
 %{_datadir}/postgresql/*
 %{_libdir}/postgresql/*
