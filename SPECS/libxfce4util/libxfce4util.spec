@@ -1,8 +1,8 @@
-%global xfceversion 4.14
+%define xfceversion %(echo %{version} | cut -d. -f1-2)
 Summary:        Utility library for the Xfce4 desktop environment
 Name:           libxfce4util
-Version:        4.14.0
-Release:        5%{?dist}
+Version:        4.19.2
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -53,11 +53,11 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %files -f %{name}.lang
 %license COPYING
-%doc AUTHORS ChangeLog NEWS README README.Kiosk THANKS
+%doc AUTHORS ChangeLog NEWS
 %{_libdir}/lib*.so.*
 %{_sbindir}/xfce4-kiosk-query
-%{_libdir}/girepository-1.0/%{name}-1.0.typelib
-%{_datadir}/gir-1.0/%{name}-1.0.gir
+%{_libdir}/girepository-1.0/Libxfce4util-1.0.typelib
+%{_datadir}/gir-1.0/Libxfce4util-1.0.gir
 %{_datadir}/vala/vapi/%{name}-1.0.vapi
 
 %files devel
@@ -67,6 +67,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %doc %{_datadir}/gtk-doc/
 
 %changelog
+* Wed Dec 20 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 4.19.2-1
+- Update to v4.19.2
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.14.0-5
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

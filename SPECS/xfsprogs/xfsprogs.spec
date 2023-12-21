@@ -1,9 +1,9 @@
 Summary:        Utilities for managing the XFS filesystem
 Name:           xfsprogs
-Version:        5.15.0
-Release:        2%{?dist}
+Version:        6.5.0
+Release:        1%{?dist}
 License:        GPL+ and LGPLv2+
-URL:            http://oss.sgi.com/projects/xfs/
+URL:            https://xfs.wiki.kernel.org/
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -37,8 +37,8 @@ These are the additional language files of xfsprogs.
 
 %build
 %configure \
-        --enable-readline=yes	\
-	--enable-blkid=yes
+    --enable-readline=yes \
+    --enable-blkid=yes
 
 make DEBUG=-DNDEBUG     \
      INSTALL_USER=root  \
@@ -48,7 +48,6 @@ make DEBUG=-DNDEBUG     \
 make DESTDIR=%{buildroot} PKG_DOC_DIR=%{_usr}/share/doc/%{name}-%{version} install
 make DESTDIR=%{buildroot} PKG_DOC_DIR=%{_usr}/share/doc/%{name}-%{version} install-dev
 
-#find %{buildroot}/lib64/ -name '*.so' -delete
 find %{buildroot}/%{_lib64dir} -name '*.la' -delete
 find %{buildroot}/%{_lib64dir} -name '*.a' -delete
 
@@ -67,14 +66,13 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %doc %{_docdir}/%{name}-%{version}/*
 /sbin/*
 /lib64/*.so.*.*
-/usr/lib64/*/*.cron
+%{_libdir}/xfsprogs/xfs_scrub_all.cron
 %{_mandir}/man2/*
 %{_mandir}/man8/*
 %{_mandir}/man5/*
 %{_sbindir}/*
-%{_datadir}/%{name}/mkfs/lts_5.15.conf
+%{_datadir}/%{name}/mkfs/*.conf
 %exclude %{_docdir}/%{name}-%{version}/CHANGES.gz
-%exclude %{_datadir}/%{name}/mkfs/*.conf
 
 %files devel
 %defattr(-,root,root)
@@ -88,6 +86,9 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %defattr(-,root,root)
 
 %changelog
+* Tue Dec 19 2023 Andrew Phelps <anphel@microsoft.com> - 6.5.0-1
+- Upgrade to version 6.5.0
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.15.0-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

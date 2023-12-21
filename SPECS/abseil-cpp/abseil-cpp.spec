@@ -1,12 +1,12 @@
 Summary:        C++ Common Libraries
 Name:           abseil-cpp
-Version:        20220623.0
+Version:        20230802.1
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://abseil.io
-Source0:        https://github.com/abseil/abseil-cpp/archive/%{version}/%{name}-%{version}.tar.gz
+Source0:        https://github.com/abseil/abseil-cpp/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires:  cmake >= 3.20.0
 BuildRequires:  gcc
@@ -72,7 +72,7 @@ ctest --output-on-failure
 %files
 %license LICENSE
 %doc FAQ.md README.md UPGRADES.md
-%{_libdir}/libabsl_*.so.2206.*
+%{_libdir}/libabsl_*.so.2308.*
 
 %files devel
 %{_includedir}/absl
@@ -81,6 +81,9 @@ ctest --output-on-failure
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Sun Dec 17 2023 Muhammad Falak <mwani@microsoft.com> - 20230802.1-1
+- Bump version to 20230802.1
+
 * Thu Jun 30 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 20220623.0-1
 - Updating to 20220623.0 to remove workaround patches for GTest.
 
