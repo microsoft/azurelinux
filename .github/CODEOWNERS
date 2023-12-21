@@ -72,6 +72,21 @@
 /SPECS/cloud-init/* @microsoft/cbl-mariner-provisioning
 /SPECS/walinuxagent/* @microsoft/cbl-mariner-provisioning
 
+# Modifications to the toolkit requires reviews from the toolkit team
+/toolkit/ @microsoft/cbl-mariner-tooling
+
+# Docs to be reviewed by general CBL-Mariner devs
+/toolkit/docs/ @microsoft/cbl-mariner-devs
+
+# Default image configurations to be reviewed by general CBL-Mariner devs
+/toolkit/imageconfigs/ @microsoft/cbl-mariner-devs
+
+# Package and toolchain manifests to be reviewed by general CBL-Mariner devs
+/toolkit/resources/manifests/package/pkggen_core_aarch64.txt @microsoft/cbl-mariner-devs
+/toolkit/resources/manifests/package/pkggen_core_x86_64.txt @microsoft/cbl-mariner-devs
+/toolkit/resources/manifests/package/toolchain_aarch64.txt @microsoft/cbl-mariner-devs
+/toolkit/resources/manifests/package/toolchain_x86_64.txt @microsoft/cbl-mariner-devs
+
 # Modifications to the raw toolchain require admin approval.
 /toolkit/scripts/toolchain/container/* @microsoft/cbl-mariner-admins
 /toolkit/scripts/toolchain/cgmanifest.json @microsoft/cbl-mariner-admins
