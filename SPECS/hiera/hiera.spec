@@ -1,7 +1,7 @@
 Summary:        A simple hierarchical database supporting plugin data sources
 Name:           hiera
 Version:        3.7.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -51,6 +51,9 @@ rspec -Ilib spec
 %config(noreplace) %{_sysconfdir}/puppet/hiera.yaml
 
 %changelog
+* Thu Dec 21 2023 Sindhu Karri <lakarri@microsoft.com> - 3.7.0-5
+- Promote package to Mariner Base repo
+
 * Thu Apr 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.7.0-4
 - Spec clean-up.
 
