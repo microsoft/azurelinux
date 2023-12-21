@@ -1,4 +1,4 @@
-%global xfceversion 4.19
+%define xfceversion %(echo %{version} | cut -d. -f1-2)
 Summary:        Utility library for the Xfce4 desktop environment
 Name:           libxfce4util
 Version:        4.19.2
