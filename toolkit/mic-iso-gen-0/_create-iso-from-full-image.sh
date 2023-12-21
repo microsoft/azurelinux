@@ -5,62 +5,40 @@ set -e
 
 scriptDir=$(dirname "$BASH_SOURCE")
 
-buildDir=$1
-buildRootfs=$2
+while getopts ":i:b:" OPTIONS; do
+  case "${OPTIONS}" in
+    i ) inputImageFile=$OPTARG ;;
+    b ) buildDir=$OPTARG ;;
 
-if [[ -z $buildDir ]]; then
-    echo "Specify output build directory."
+    \? )
+        echo "-- Error - Invalid Option: -$OPTARG" 1>&2
+        exit 1
+        ;;
+    : )
+        echo "-- Error - Invalid Option: -$OPTARG requires an argument" 1>&2
+        exit 1
+        ;;
+  esac
+done
+
+if [[ -z $inputImageFile ]]; then
+    echo "Specify input image (-i image-file-name)."
     exit 1
 fi
+
+if [[ -z $buildDir ]]; then
+    echo "Specify a build directory (-b dir-name)."
+    exit 1
+fi
+
+echo "inputImageFile = $inputImageFile"
+echo "buildDir       = $buildDir"
 
 #------------------------------------------------------------------------------
 function mic_poc_log() {
     set +x
     echo $1
     set -x
-}
-
-#------------------------------------------------------------------------------
-function create_full_image() {
-    mic_poc_log "---------------- create_full_image [enter] --------"
-    local configFile=$1
-    local outputDiskRawFile=$2
-
-    # outputs:
-    #
-    #  full disk:
-    #   ./out/images/disk0.raw
-    #   ./build/imagegen/disk0.raw
-    #   ./build/imagegen/baremetal/imager_output/disk0.raw
-    #   ./out/images/baremetal/core-2.0.20231206.1707.vhdx
-    #
-    #  rootfs partition:
-    #
-    #   ./out/images/baremetal/mariner-rootfs-ext4-2.0.20231206.1707.ext4.gz
-    #   ./out/images/baremetal/mariner-rootfs-ext4-2.0.20231206.1707.ext4
-    #
-    #   ./out/images/baremetal/mariner-rootfs-raw-2.0.20231206.1707.raw
-    #   ./out/images/baremetal/mariner-rootfs-raw-2.0.20231206.1707.raw.gz
-    #
-    #
-
-    sudo rm -rf ./build/imagegen/baremetal
-    sudo rm -rf ./out/images/baremetal
-
-    pushd toolkit
-    sudo make image \
-        -j$(nproc) \
-        REBUILD_TOOLS=y \
-        REBUILD_TOOLCHAIN=n \
-        REBUILD_PACKAGES=n \
-        CONFIG_FILE=$configFile
-
-    mkdir -p $(dirname "$outputDiskRawFile")
-    cp ../build/imagegen/baremetal/imager_output/disk0.raw $outputDiskRawFile
-
-    popd
-
-    mic_poc_log "---------------- create_full_image [exit] --------"
 }
 
 #------------------------------------------------------------------------------
@@ -97,7 +75,7 @@ function prepare_root_partition() {
 
 #------------------------------------------------------------------------------
 function mount_raw_disk() {
-    local originalRawDisk=$1
+    local originalRawDiskFile=$1
     local rawDiskMountDir=$2
     local workingDir=$3
     local loDeviceLogFile=$4
@@ -111,8 +89,10 @@ function mount_raw_disk() {
         sudo rm -r $rawDiskMountDir
     fi
 
-    cp $originalRawDisk $workingDir/
-    rawDisk=$workingDir/$(basename "$originalRawDisk")
+    # create a copy because we have seen examples where the mounted file gets
+    # corrupted.
+    rawDisk=$workingDir/$(basename "$originalRawDiskFile")
+    cp $originalRawDiskFile $rawDisk
 
     loDevice=$(sudo losetup --show -f -P $rawDisk)
     echo "Found lo device: $loDevice"
@@ -131,7 +111,35 @@ function unmount_raw_disk() {
 }
 
 #------------------------------------------------------------------------------
-function copy_vmlinuz_from_full_disk() {
+function guestmount_disk_partition() {
+    local originalDiskFile=$1
+    local originalDevicePartition=$2
+    local diskPartitionMountDir=$3
+    local workingDir=$4
+
+    sudo apt-get install -y libguestfs-tools   
+
+    # create a copy because we have seen examples where the mounted file gets
+    # corrupted.
+    diskFile=$workingDir/$(basename "$originalDiskFile")
+    cp $originalDiskFile $diskFile
+
+    sudo rm -rf $diskPartitionMountDir
+    sudo mkdir -p $diskPartitionMountDir
+    sudo guestmount \
+        -a $diskFile \
+        -m $originalDevicePartition \
+        $diskPartitionMountDir
+}
+
+#------------------------------------------------------------------------------
+function guestunmount_disk_partition() {
+    local diskPartitionMountDir=$1
+    sudo guestunmount $diskPartitionMountDir
+}
+
+#------------------------------------------------------------------------------
+function copy_vmlinuz_from_rootfs() {
 
     local rawDiskMountDir=$1
     local extractedVmLinuzFile=$2
@@ -152,25 +160,63 @@ function copy_vmlinuz_from_full_disk() {
 }
 
 #------------------------------------------------------------------------------
-function copy_rootfs_from_full_disk() {
+function copy_rootfs_from_device() {
+    mic_poc_log "---------------- copy_rootfs_from_device [enter] --------"
     local rawDiskDevice=$1
     local rootfsImageFile=$2
 
+    mkdir -p $(dirname $rootfsImageFile)
     sudo dd if=${rawDiskDevice}p2 of=$rootfsImageFile
+    mic_poc_log "---------------- copy_rootfs_from_device [exit] --------"
 }
 
 #------------------------------------------------------------------------------
-function copy_boot_efi_from_full_disk() {
-    local rawDiskDevice=$1
-    local bootefiImageFile=$2
+function copy_rootfs_from_dir() {
+    mic_poc_log "---------------- copy_rootfs_from_dir [enter] --------"
+    local rootfsDir=$1
+    local rootfsImageFile=$2
 
-    sudo dd if=${rawDiskDevice}p2 of=$rootfsImageFile
+    # 76G
+    # 8.8M
+    # 124K
+    contentSize=$(sudo du -sh $rootfsDir | awk '{print $1}')
+    unit=${contentSize: -1}
+    unitCount=${contentSize%?}
+    toMBFactor=1
+    case $unit in
+      'K')
+        echo "error: rootfs is too small. not supported."
+        exit 1
+        ;;
+      'M')
+        toMBFactor=1
+        ;;
+      'G')
+        toMBFactor=1024
+        ;;
+    esac
+    safetyFactor=2
+    contentSizeInM=$(( unitCount * toMBFactor * 2 ))
+    # wasteFactor=1.5
+    # imageSizeInK=$(( contentSizeInK * wasteFactor ))
+    mkdir -p $(dirname $rootfsImageFile)
+    dd if=/dev/zero of=$rootfsImageFile bs=1M count=$contentSizeInM
+    mkfs.ext4 -b 4096 $rootfsImageFile
+
+    rootfsImageDevice=$(sudo losetup -f --show $rootfsImageFile)
+    rootfsImageMount=/mnt/rootfs-image-mount-$$
+    sudo mkdir -p $rootfsImageMount
+    sudo mount $rootfsImageDevice $rootfsImageMount
+    sudo cp -aT $rootfsDir $rootfsImageMount
+    sudo umount $rootfsImageMount
+    sudo losetup -d $rootfsImageDevice
+    mic_poc_log "---------------- copy_rootfs_from_dir [exit] --------"
 }
 
 #------------------------------------------------------------------------------
 function extract_artifacts_from_full_image() {
     mic_poc_log "---------------- extract_artifacts_from_full_image [enter] --------"
-    local outFullImageRawDisk=$1
+    local imageFile=$1
     local tmpMount=$2
     local tmpDir=$3
     local extractedVmLinuzFile=$4
@@ -180,18 +226,40 @@ function extract_artifacts_from_full_image() {
     mkdir -p $tmpDir
     pushd $tmpDir
 
-    loDeviceLogFile=$tmpDir/lo-device.txt
+    imageExtension=${imageFile##*.}
 
-    mount_raw_disk $outFullImageRawDisk $tmpMount $tmpDir $loDeviceLogFile
+    if [[ "$imageExtension" == "raw" ]]; then
+        loDeviceLogFile=$tmpDir/lo-device.txt
 
-    mkdir -p $(dirname $extractedVmLinuzFile)
-    copy_vmlinuz_from_full_disk $tmpMount $extractedVmLinuzFile
+        mount_raw_disk $imageFile $tmpMount $tmpDir $loDeviceLogFile
 
-    loDevice=$(cat $loDeviceLogFile)
-    mkdir -p $(dirname $extractedRootfsImgFile)
-    copy_rootfs_from_full_disk ${loDevice} $extractedRootfsImgFile
+        mkdir -p $(dirname $extractedVmLinuzFile)
+        copy_vmlinuz_from_rootfs $tmpMount $extractedVmLinuzFile
 
-    unmount_raw_disk $tmpMount
+        loDevice=$(cat $loDeviceLogFile)
+
+        mkdir -p $(dirname $extractedRootfsImgFile)
+        copy_rootfs_from_device ${loDevice} $extractedRootfsImgFile
+
+        unmount_raw_disk $tmpMount
+        rm loDeviceLogFile
+    else
+        partitionDevice="/dev/sda2"
+
+        guestmount_disk_partition  \
+            $imageFile \
+            $partitionDevice \
+            $tmpMount \
+            $tmpDir
+
+        mkdir -p $(dirname $extractedVmLinuzFile)
+        copy_vmlinuz_from_rootfs $tmpMount $extractedVmLinuzFile
+
+        mkdir -p $(dirname $extractedRootfsImgFile)
+        copy_rootfs_from_dir $tmpMount $extractedRootfsImgFile
+        
+        guestunmount_disk_partition $tmpMount
+    fi
 
     popd
 
@@ -261,14 +329,15 @@ function create_efi_boot_image () {
     mkdir -p $workingDir
     mkdir -p $outDir
 
-    rm -f $workingDir/bootx64.efi
+    local bootx64EfiFile=$workingDir/bootx64.efi
+    rm -f $bootx64EfiFile
 
     # create bootx64.efi with the our custom grub
     grub-mkstandalone \
         --format=x86_64-efi \
         --locales="" \
         --fonts="" \
-        --output=$workingDir/bootx64.efi \
+        --output=$bootx64EfiFile \
         boot/grub/grub.cfg=$grubCfg
 
     # Generate the fs to hold the bootx64.efi - i.e. out/efiboot.img
@@ -277,7 +346,7 @@ function create_efi_boot_image () {
     dd if=/dev/zero of=$efitbootImage bs=1M count=3
     mkfs.vfat $efitbootImage
     LC_CTYPE=C mmd -i $efitbootImage efi efi/boot
-    LC_CTYPE=C mcopy -i $efitbootImage $workingDir/bootx64.efi ::efi/boot/
+    LC_CTYPE=C mcopy -i $efitbootImage $bootx64EfiFile ::efi/boot/
 
     echo "Created -------- " $efitbootImage
 }
@@ -292,7 +361,9 @@ function create_bios_boot_image () {
     mkdir -p $workingDir
     mkdir -p $outDir
 
-    rm -f $workingDir/core.img
+
+    coreImage=$workingDir/core.img
+    rm -f $coreImage
 
     grub-mkstandalone \
         --format=i386-pc \
@@ -300,18 +371,19 @@ function create_bios_boot_image () {
         --modules="linux normal iso9660 biosdisk search" \
         --locales="" \
         --fonts="" \
-        --output=$workingDir/core.img \
+        --output=$coreImage \
         boot/grub/grub.cfg=$grubCfg
 
     # Generate the fs to hold the bios.img - i.e. out/core.img
     rm -f $biosbootImage
-    cat /usr/lib/grub/i386-pc/cdboot.img $workingDir/core.img > $biosbootImage
+    cat /usr/lib/grub/i386-pc/cdboot.img $coreImage > $biosbootImage
 
     echo "Created -------- " $biosbootImage
 }
 
-
+#------------------------------------------------------------------------------
 function create_iso_image () {
+    mic_poc_log "---------------- create_iso_image [enter] --------"
     inputInitrdFile=$1
     inputVmlinuz=$2
     inputGrubCfg=$3
@@ -389,26 +461,21 @@ function create_iso_image () {
 
     echo $outputIsoImageName
 
-    set +x
-    echo "-------- create-iso-from-initrd-vmlinuz.sh [exit] --------"
+    mic_poc_log "---------------- create_iso_image [exit] --------"
 }
 
 #------------------------------------------------------------------------------
 #-- main ----------------------------------------------------------------------
-
-fullImageConfigFile=~/git/CBL-Mariner/toolkit/imageconfigs/baremetal.json
 
 mkdir -p $buildDir
 
 buildWorkingDir=$buildDir/intermediates
 mkdir -p $buildWorkingDir
 
-BUILD_OUT_DIR=$buildDir/out
-mkdir -p $BUILD_OUT_DIR
+isoOutDir=$buildDir/out
+mkdir -p $isoOutDir
 
 pushd $scriptDir/../../
-
-fullImageRawDisk=$buildWorkingDir/raw-disk-output/disk0.raw
 
 modifiedRootfsDir=$buildWorkingDir/raw-disk-output-modified
 modifiedRootfsRawFile=$modifiedRootfsDir/rootfs.img
@@ -424,24 +491,18 @@ extractedRootfs=$extractArtifactsOutDir/extracted-rootfs-file/rootfs.img
 
 mediaRootfsSquashfsFile="/LiveOS/rootfs.img"
 
-if [[ -n "$buildRootfs" ]]; then
-    create_full_image  \
-        $fullImageConfigFile \
-        $fullImageRawDisk
+extract_artifacts_from_full_image \
+    $inputImageFile \
+    "/mnt/full-disk-rootfs-mount" \
+    $extractArtifactsTmpDir \
+    $extractedVmlinuz \
+    $extractedRootfs
 
-    extract_artifacts_from_full_image \
-        $fullImageRawDisk \
-        "/mnt/full-disk-rootfs-mount" \
-        $extractArtifactsTmpDir \
-        $extractedVmlinuz \
-        $extractedRootfs
-
-    mkdir -p $modifiedRootfsDir
-    prepare_root_partition \
-        $extractedRootfs \
-        $modifiedRootfsRawFile \
-        $modifiedRootfsSquashFile
-fi
+mkdir -p $modifiedRootfsDir
+prepare_root_partition \
+    $extractedRootfs \
+    $modifiedRootfsRawFile \
+    $modifiedRootfsSquashFile
 
 build_inird \
     $modifiedRootfsRawFile \
@@ -456,6 +517,6 @@ create_iso_image \
     $modifiedRootfsSquashFile \
     $mediaRootfsSquashfsFile \
     "baremetal-iso" \
-    $BUILD_OUT_DIR
+    $isoOutDir
 
 popd

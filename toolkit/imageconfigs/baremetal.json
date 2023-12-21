@@ -24,19 +24,7 @@
                     "ID": "rootfs",
                     "Start": 9,
                     "End": 0,
-                    "FsType": "ext4",
-                    "Artifacts": [
-                        {
-                            "Name": "mariner-rootfs-ext4",
-                            "Type": "ext4",
-                            "Compression": "gz"
-                        },
-                        {
-                            "Name": "mariner-rootfs-raw",
-                            "Type": "raw",
-                            "Compression": "gz"
-                        }
-                    ]
+                    "FsType": "ext4"
                 }
             ]
         }
