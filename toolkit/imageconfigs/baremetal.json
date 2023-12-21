@@ -49,7 +49,7 @@
                 "packagelists/cloud-init-packages.json",
                 "packagelists/core-packages-image.json",
                 "packagelists/selinux-full.json",
-                "packagelists/match-minimal-initrd-packages.json"
+                "packagelists/mic-iso-gen-packages.json"
             ],
             "KernelCommandLine": {
                 "ExtraCommandLine": "console=tty0 console=ttyS0",
