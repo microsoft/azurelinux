@@ -53,6 +53,7 @@ type PartitionInfo struct {
 	PartUuid          string `json:"partuuid"`   // Example: 7b1367a6-5845-43f2-99b1-a742d873f590
 	Mountpoint        string `json:"mountpoint"` // Example: /mnt/os/boot
 	PartLabel         string `json:"partlabel"`  // Example: boot
+	Type              string `json:"type"`       // Example: part
 }
 
 type loopbackListOutput struct {
@@ -769,7 +770,7 @@ func GetDiskPartitions(diskDevPath string) ([]PartitionInfo, error) {
 	}
 
 	// Read the disk's partitions.
-	jsonString, _, err := shell.Execute("lsblk", diskDevPath, "--output", "NAME,PATH,PARTTYPE,FSTYPE,UUID,MOUNTPOINT,PARTUUID,PARTLABEL", "--json", "--list")
+	jsonString, _, err := shell.Execute("lsblk", diskDevPath, "--output", "NAME,PATH,PARTTYPE,FSTYPE,UUID,MOUNTPOINT,PARTUUID,PARTLABEL,TYPE", "--json", "--list")
 	if err != nil {
 		return nil, fmt.Errorf("failed to list disk (%s) partitions:\n%w", diskDevPath, err)
 	}
