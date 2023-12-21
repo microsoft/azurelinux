@@ -28,7 +28,7 @@ The Sudo package allows a system administrator to give certain users (or groups 
 the ability to run some (or all) commands as root or another user while logging the commands and arguments.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 ./configure \
