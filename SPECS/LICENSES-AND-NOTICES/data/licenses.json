@@ -907,6 +907,7 @@
                 "mod_security_crs",
                 "mod_wsgi",
                 "mokutil",
+                "moreutils",
                 "mpage",
                 "mrtg",
                 "mstflint",
