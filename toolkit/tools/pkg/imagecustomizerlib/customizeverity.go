@@ -137,7 +137,7 @@ func updateGrubConfig(dataPartitionIdType imagecustomizerapi.IdType, dataPartiti
 	}
 
 	newArgs := fmt.Sprintf(
-		"rd.systemd.verity=1 roothash=%s systemd.verity_root_data=%s systemd.verity_root_hash=%s systemd.verity_root_options=panic-on-corruption",
+		"rd.systemd.verity=1 roothash=%s systemd.verity_root_data=%s systemd.verity_root_hash=%s systemd.verity_root_options=panic-on-corruption rd.overlays=/etc,/upper,/work rd.overlaysize=10M",
 		rootHash, formattedDataPartition, formattedHashPartition,
 	)
 
