@@ -10,7 +10,7 @@ import (
 )
 
 func TestIdTypeIsValid(t *testing.T) {
-	err := IdTypePartlabel.IsValid()
+	err := IdTypePartLabel.IsValid()
 	assert.NoError(t, err)
 }
 
