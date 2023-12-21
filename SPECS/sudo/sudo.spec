@@ -29,6 +29,7 @@ the ability to run some (or all) commands as root or another user while logging 
 
 %prep
 %setup -q
+%patch0 -p1
 
 %build
 ./configure \
