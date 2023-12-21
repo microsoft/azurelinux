@@ -81,6 +81,22 @@ func findSystemBootPartition(diskPartitions []diskutils.PartitionInfo) (*diskuti
 }
 
 func findRootfsPartitionFromEsp(efiSystemPartition *diskutils.PartitionInfo, diskPartitions []diskutils.PartitionInfo, buildDir string) (*diskutils.PartitionInfo, error) {
+	var bootPartition *diskutils.PartitionInfo
+	bootPartition, err := findBootPartitionFromEsp(efiSystemPartition, diskPartitions, buildDir)
+
+	rootfsPartition, err := tryFindRootfsPartitionFromBootPartition(bootPartition, diskPartitions, buildDir)
+	if err != nil {
+		return nil, err
+	}
+
+	if rootfsPartition == nil {
+		return nil, fmt.Errorf("failed to find rootfs partition using boot partition (%s)", bootPartition.Name)
+	}
+
+	return rootfsPartition, nil
+}
+
+func findBootPartitionFromEsp(efiSystemPartition *diskutils.PartitionInfo, diskPartitions []diskutils.PartitionInfo, buildDir string) (*diskutils.PartitionInfo, error) {
 	tmpDir := filepath.Join(buildDir, tmpParitionDirName)
 
 	// Mount the EFI System Partition.
@@ -125,16 +141,7 @@ func findRootfsPartitionFromEsp(efiSystemPartition *diskutils.PartitionInfo, dis
 		return nil, fmt.Errorf("failed to find boot partition with UUID (%s)", bootPartitionUuid)
 	}
 
-	rootfsPartition, err := tryFindRootfsPartitionFromBootPartition(bootPartition, diskPartitions, buildDir)
-	if err != nil {
-		return nil, err
-	}
-
-	if rootfsPartition == nil {
-		return nil, fmt.Errorf("failed to find rootfs partition using boot partition (%s)", bootPartition.Name)
-	}
-
-	return rootfsPartition, nil
+	return bootPartition, nil
 }
 
 func findRootfsPartitionFromBiosBootPartition(biosBootLoaderPartition *diskutils.PartitionInfo,
