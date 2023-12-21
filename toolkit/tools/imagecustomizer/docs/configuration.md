@@ -268,7 +268,7 @@ Packages:
 Required.
 
 The ID of the partition.
-This is used correlate Partition objects with [PartitionSetting](#partitionsetting-type)
+This is used to correlate Partition objects with [PartitionSetting](#partitionsetting-type)
 objects.
 
 ### FsType [string]
