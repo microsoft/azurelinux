@@ -1,7 +1,7 @@
 Summary:        File System in Userspace (FUSE) v3 utilities
 Name:           fuse3
-Version:        3.10.5
-Release:        2%{?dist}
+Version:        3.16.2
+Release:        1%{?dist}
 License:        GPL+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -50,8 +50,7 @@ License:        GPL+
 Common files for FUSE v2 and FUSE v3.
 
 %prep
-%setup -q -n libfuse-fuse-%{version}
-%patch0 -p1
+%autosetup -p1 -n fuse-%{version}
 
 %build
 export LC_ALL=en_US.UTF-8
@@ -109,6 +108,9 @@ rm -f %{buildroot}%{_libdir}/udev/rules.d/99-fuse3.rules
 %config(noreplace) %{_sysconfdir}/fuse.conf
 
 %changelog
+* Thu Dec 21 2023 Muhammad Falak <mwani@microsoft.com> - 3.16.2-1
+- Upgrade version to 3.16.2
+
 * Wed Sep 22 2021 Thomas Crain <thcrain@microsoft.com> - 3.10.5-2
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - Spec linted
