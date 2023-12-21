@@ -11871,8 +11871,8 @@
         "type": "other",
         "other": {
           "name": "libXtst",
-          "version": "1.2.3",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXtst-1.2.3.tar.bz2"
+          "version": "1.2.4",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXtst-1.2.4.tar.gz"
         }
       }
     },
