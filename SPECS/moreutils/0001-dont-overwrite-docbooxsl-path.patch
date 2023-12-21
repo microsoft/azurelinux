@@ -1,0 +1,14 @@
+--- Makefile	2019-01-09 10:14:34.000000000 -0500
++++ Makefile	2019-08-27 09:36:49.465727725 -0400
+@@ -5,11 +5,7 @@
+ INSTALL_BIN?=install -s
+ PREFIX?=/usr
+
+-ifneq (,$(findstring CYGWIN,$(shell uname)))
+	DOCBOOKXSL?=/usr/share/sgml/docbook/xsl-stylesheets
+-else
+-	DOCBOOKXSL?=/usr/share/xml/docbook/stylesheet/docbook-xsl
+-endif
+
+ DOCBOOK2XMAN=xsltproc --param man.authors.section.enabled 0 $(DOCBOOKXSL)/manpages/docbook.xsl
+
