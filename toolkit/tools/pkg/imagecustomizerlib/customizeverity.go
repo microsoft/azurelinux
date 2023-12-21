@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
@@ -57,21 +58,26 @@ func buildDracutModule(dracutModuleName string, imageChroot *safechroot.Chroot) 
 		return fmt.Errorf("failed to list kernels: %w", err)
 	}
 
-	if len(kernelFiles) == 0 {
-		return fmt.Errorf("no kernels found in chroot environment")
-	}
-
-	// Check if more than one kernel is found
-	if len(kernelFiles) > 1 {
-		return fmt.Errorf("multiple kernels found in chroot environment, expected only one")
+	if len(kernelFiles) != 1 {
+		return fmt.Errorf("expected one kernel file, but found %d", len(kernelFiles))
 	}
 
 	// Extract the version from the kernel filename (e.g., vmlinuz-5.15.131.1-2.cm2 -> 5.15.131.1-2.cm2)
 	kernelVersion := strings.TrimPrefix(kernelFiles[0], "vmlinuz-")
 
+	dracutConfigFile := filepath.Join(imageChroot.RootDir(), "etc", "dracut.conf.d", dracutModuleName+".conf")
+
+	// Check if the dracut module configuration file already exists.
+	if _, err := os.Stat(dracutConfigFile); os.IsNotExist(err) {
+		lines := []string{"add_dracutmodules+=\"" + dracutModuleName + "\""}
+		err = file.WriteLines(lines, dracutConfigFile)
+		if err != nil {
+			return fmt.Errorf("failed to write to dracut module config file (%s): %w", dracutConfigFile, err)
+		}
+	}
+
 	err = imageChroot.Run(func() error {
-		// TODO: Config Dracut module systemd-veritysetup - task 6421.
-		err = shell.ExecuteLiveWithErr(1, "dracut", "-f", "--kver", kernelVersion, "-a", dracutModuleName)
+		err = shell.ExecuteLiveWithErr(1, "dracut", "-f", "--kver", kernelVersion)
 		return err
 	})
 	if err != nil {
@@ -84,10 +90,10 @@ func buildDracutModule(dracutModuleName string, imageChroot *safechroot.Chroot) 
 func updateMarinerCfgWithInitramfs(imageChroot *safechroot.Chroot) error {
 	var err error
 
-	initramfsPath := filepath.Join(imageChroot.RootDir(), "boot/initramfs-*")
+	initramfsPattern := filepath.Join(imageChroot.RootDir(), "boot", "initramfs-*")
 	// Fetch the initramfs file name.
 	var initramfsFiles []string
-	initramfsFiles, err = filepath.Glob(initramfsPath)
+	initramfsFiles, err = filepath.Glob(initramfsPattern)
 	if err != nil {
 		return fmt.Errorf("failed to list initramfs file: %w", err)
 	}
@@ -99,7 +105,7 @@ func updateMarinerCfgWithInitramfs(imageChroot *safechroot.Chroot) error {
 
 	newInitramfs := filepath.Base(initramfsFiles[0])
 
-	cfgPath := filepath.Join(imageChroot.RootDir(), "boot/mariner.cfg")
+	cfgPath := filepath.Join(imageChroot.RootDir(), "boot", "mariner.cfg")
 
 	lines, err := file.ReadLines(cfgPath)
 	if err != nil {
@@ -148,17 +154,29 @@ func updateGrubConfig(dataPartitionIdType imagecustomizerapi.IdType, dataPartiti
 	}
 
 	var updatedLines []string
+	linuxLineRegex := regexp.MustCompile(`^linux .*rd.systemd.verity=(1|0).*`)
 	for _, line := range lines {
 		trimmedLine := strings.TrimSpace(line)
-		if strings.HasPrefix(trimmedLine, "linux ") {
-			// Append new arguments to the line that starts with "linux"
-			line += " " + newArgs
-		}
-		if strings.HasPrefix(trimmedLine, "set rootdevice=PARTUUID=") {
-			// Replace the root device line with the new root device. TODO: add supported type 'user'
+		if linuxLineRegex.MatchString(trimmedLine) {
+			// Replace existing arguments
+			verityRegexPattern := `rd.systemd.verity=(1|0)` +
+				`( roothash=[^ ]*)?` +
+				`( systemd.verity_root_data=[^ ]*)?` +
+				`( systemd.verity_root_hash=[^ ]*)?` +
+				`( systemd.verity_root_options=[^ ]*)?`
+			verityRegex := regexp.MustCompile(verityRegexPattern)
+			newLinuxLine := verityRegex.ReplaceAllString(trimmedLine, newArgs)
+			updatedLines = append(updatedLines, newLinuxLine)
+		} else if strings.HasPrefix(trimmedLine, "linux ") {
+			// Append new arguments
+			updatedLines = append(updatedLines, line+" "+newArgs)
+		} else if strings.HasPrefix(trimmedLine, "set rootdevice=PARTUUID=") {
 			line = "set rootdevice=/dev/mapper/root"
+			updatedLines = append(updatedLines, line)
+		} else {
+			// Add other lines unchanged
+			updatedLines = append(updatedLines, line)
 		}
-		updatedLines = append(updatedLines, line)
 	}
 
 	err = file.WriteLines(updatedLines, grubCfgFullPath)
