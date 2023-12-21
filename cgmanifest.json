@@ -11571,8 +11571,8 @@
         "type": "other",
         "other": {
           "name": "libXau",
-          "version": "1.0.9",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXau-1.0.9.tar.bz2"
+          "version": "1.0.11",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXau-1.0.11.tar.gz"
         }
       }
     },
