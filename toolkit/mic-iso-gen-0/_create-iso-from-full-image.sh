@@ -5,10 +5,10 @@ set -e
 
 scriptDir=$(dirname "$BASH_SOURCE")
 
-while getopts ":i:b:" OPTIONS; do
+while getopts ":i:o:" OPTIONS; do
   case "${OPTIONS}" in
     i ) inputImageFile=$OPTARG ;;
-    b ) buildDir=$OPTARG ;;
+    o ) outDir=$OPTARG ;;
 
     \? )
         echo "-- Error - Invalid Option: -$OPTARG" 1>&2
@@ -26,13 +26,13 @@ if [[ -z $inputImageFile ]]; then
     exit 1
 fi
 
-if [[ -z $buildDir ]]; then
-    echo "Specify a build directory (-b dir-name)."
+if [[ -z $outDir ]]; then
+    echo "Specify a output directory (-o dir-name)."
     exit 1
 fi
 
 echo "inputImageFile = $inputImageFile"
-echo "buildDir       = $buildDir"
+echo "outDir         = $outDir"
 
 #------------------------------------------------------------------------------
 function mic_poc_log() {
@@ -53,22 +53,24 @@ function prepare_root_partition() {
         $modifiedRootfsRawFile
 
     # mount
-    sudo mkdir -p /mnt/hack
+    tmpMount=/mnt/$$-rw-rootfs-prepare
+    sudo mkdir -p $tmpMount
     loDevice=$(sudo losetup -f -P --show $modifiedRootfsRawFile)
-    sudo mount $loDevice /mnt/hack
+    sudo mount $loDevice $tmpMount
 
     # modify
-    sudo rm -f /mnt/hack/etc/fstab
+    sudo rm -f $tmpMount/etc/fstab
 
     # create the squashfs (must be run under sudo or else some files/folder
     # will not be copied correctly)
-    sudo mksquashfs /mnt/hack \
+    sudo rm -rf $modifiedRootfsSquashFile
+    sudo mksquashfs $tmpMount \
         $modifiedRootfsSquashFile
 
     # umount
-    sudo umount /mnt/hack
-    # sudo rm -f /mnt/hack
+    sudo umount $tmpMount
     sudo losetup -d $loDevice
+    sudo rm -r $tmpMount
 
     mic_poc_log "---------------- prepare_root_partition [exit] --------"
 }
@@ -108,6 +110,7 @@ function mount_raw_disk() {
 function unmount_raw_disk() {
     local rawDiskMountDir=$1
     sudo umount $rawDiskMountDir
+    sudo rm -r $rawDiskMountDir
 }
 
 #------------------------------------------------------------------------------
@@ -136,6 +139,7 @@ function guestmount_disk_partition() {
 function guestunmount_disk_partition() {
     local diskPartitionMountDir=$1
     sudo guestunmount $diskPartitionMountDir
+    sudo rm -r $diskPartitionMountDir
 }
 
 #------------------------------------------------------------------------------
@@ -204,12 +208,13 @@ function copy_rootfs_from_dir() {
     mkfs.ext4 -b 4096 $rootfsImageFile
 
     rootfsImageDevice=$(sudo losetup -f --show $rootfsImageFile)
-    rootfsImageMount=/mnt/rootfs-image-mount-$$
+    rootfsImageMount=/mnt/$$-rw-rootfs-copy
     sudo mkdir -p $rootfsImageMount
     sudo mount $rootfsImageDevice $rootfsImageMount
     sudo cp -aT $rootfsDir $rootfsImageMount
     sudo umount $rootfsImageMount
     sudo losetup -d $rootfsImageDevice
+    sudo rm -r $rootfsImageMount
     mic_poc_log "---------------- copy_rootfs_from_dir [exit] --------"
 }
 
@@ -217,14 +222,15 @@ function copy_rootfs_from_dir() {
 function extract_artifacts_from_full_image() {
     mic_poc_log "---------------- extract_artifacts_from_full_image [enter] --------"
     local imageFile=$1
-    local tmpMount=$2
-    local tmpDir=$3
-    local extractedVmLinuzFile=$4
-    local extractedRootfsImgFile=$5
+    local tmpDir=$2
+    local extractedVmLinuzFile=$3
+    local extractedRootfsImgFile=$4
 
     sudo rm -rf $tmpDir
     mkdir -p $tmpDir
     pushd $tmpDir
+
+    tmpMount="/mnt/$$-ro-rootfs-extract"
 
     imageExtension=${imageFile##*.}
 
@@ -294,28 +300,29 @@ function build_inird() {
     loopDev=$(sudo losetup -f --show $rawImageCopy)
     echo "loopDev=$loopDev"
 
-    mountFolder=/mnt/chroot-raw-image-$$
-    sudo mkdir -p $mountFolder
-    sudo mount $loopDev $mountFolder
+    tmpMount=/mnt/$$-rw-rootfs-chroot
+    sudo mkdir -p $tmpMount
+    sudo mount $loopDev $tmpMount
 
-    stage_initrd_build_file $initrdArtifactsDir/20-live-cd.conf     $mountFolder/etc/dracut.conf.d/20-live-cd.conf
-    stage_initrd_build_file $initrdArtifactsDir/build-initrd-img.sh $mountFolder/build-initrd-img.sh
+    stage_initrd_build_file $initrdArtifactsDir/20-live-cd.conf     $tmpMount/etc/dracut.conf.d/20-live-cd.conf
+    stage_initrd_build_file $initrdArtifactsDir/build-initrd-img.sh $tmpMount/build-initrd-img.sh
 
     # patch dmsquash-live-root to supress user prompt during boot when the overlay is temporary.
-    sudo chmod +w $mountFolder/usr/lib/dracut/modules.d/90dmsquash-live/dmsquash-live-root.sh
-    sudo patch -p1 -i $initrdArtifactsDir/no_user_prompt.patch $mountFolder/usr/lib/dracut/modules.d/90dmsquash-live/dmsquash-live-root.sh
-    sudo chmod 755 $mountFolder/usr/lib/dracut/modules.d/90dmsquash-live/dmsquash-live-root.sh
+    sudo chmod +w $tmpMount/usr/lib/dracut/modules.d/90dmsquash-live/dmsquash-live-root.sh
+    sudo patch -p1 -i $initrdArtifactsDir/no_user_prompt.patch $tmpMount/usr/lib/dracut/modules.d/90dmsquash-live/dmsquash-live-root.sh
+    sudo chmod 755 $tmpMount/usr/lib/dracut/modules.d/90dmsquash-live/dmsquash-live-root.sh
 
-    cp $mountFolder/usr/lib/dracut/modules.d/90dmsquash-live/dmsquash-live-root.sh ~/temp/blah.sh
+    cp $tmpMount/usr/lib/dracut/modules.d/90dmsquash-live/dmsquash-live-root.sh ~/temp/blah.sh
 
-    sudo chroot $mountFolder /bin/bash -c "sudo /build-initrd-img.sh"
+    sudo chroot $tmpMount /bin/bash -c "sudo /build-initrd-img.sh"
 
     mkdir -p $(dirname $initrdImage)
-    sudo cp $mountFolder/initrd.img $initrdImage
+    sudo cp $tmpMount/initrd.img $initrdImage
     sudo chown $USER:$USER $initrdImage
 
-    sudo umount $mountFolder
+    sudo umount $tmpMount
     sudo losetup -d $loopDev
+    sudo rm -r $tmpMount
     rm $rawImageCopy
 }
 
@@ -467,12 +474,13 @@ function create_iso_image () {
 #------------------------------------------------------------------------------
 #-- main ----------------------------------------------------------------------
 
-mkdir -p $buildDir
+sudo rm -rf $outDir
+mkdir -p $outDir
 
-buildWorkingDir=$buildDir/intermediates
+buildWorkingDir=$outDir/intermediates
 mkdir -p $buildWorkingDir
 
-isoOutDir=$buildDir/out
+isoOutDir=$outDir/iso-out
 mkdir -p $isoOutDir
 
 pushd $scriptDir/../../
@@ -493,7 +501,6 @@ mediaRootfsSquashfsFile="/LiveOS/rootfs.img"
 
 extract_artifacts_from_full_image \
     $inputImageFile \
-    "/mnt/full-disk-rootfs-mount" \
     $extractArtifactsTmpDir \
     $extractedVmlinuz \
     $extractedRootfs
