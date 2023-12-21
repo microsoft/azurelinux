@@ -3950,8 +3950,8 @@
         "type": "other",
         "other": {
           "name": "fuse3",
-          "version": "3.10.5",
-          "downloadUrl": "https://github.com/libfuse/libfuse/archive/fuse-3.10.5.tar.gz"
+          "version": "3.16.2",
+          "downloadUrl": "https://github.com/libfuse/libfuse/archive/fuse-3.16.2.tar.gz"
         }
       }
     },
