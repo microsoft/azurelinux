@@ -9,7 +9,7 @@ import (
 	"strconv"
 )
 
-func shrinkFilesystems(imageLoopDevice string, outputImageFile string) error {
+func shrinkFilesystems(imageLoopDevice string) error {
 	logger.Log.Infof("Shrinking filesystems")
 
 	// Get partition info
