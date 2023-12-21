@@ -9,6 +9,7 @@ OVERLAYS_MNT_OPTS="rw,nodev,nosuid,nouser,noexec"
 
 # Retrieve the verity root. It is expected to be predefined by the dracut cmdline module.
 [ -z "$root" ] && root=$(getarg root=)
+[ "$root" = "/dev/mapper/root" ] || exit 0
 # Retrieve the Overlays parameters.
 [ -z "${overlays}" ] && overlays=$(getarg rd.overlays=)
 [ -z "${overlaysize}" ] && overlaysize=$(getarg rd.overlaysize=)
@@ -38,10 +39,12 @@ create_overlay() {
 }
 
 mount_root() {
+    info "Mounting DM-Verity Target"
     mkdir -p "${VERITY_MOUNT}"
     mount -o ro,defaults "/dev/mapper/root" "${VERITY_MOUNT}" || \
         die "Failed to mount dm-verity root target"
     
+    info "Creating Overlays"
     mkdir -p "${OVERLAYS_TMPFS}"
     mount -t tmpfs tmpfs -o ${OVERLAYS_MNT_OPTS},size=${overlaysize} "${OVERLAYS_TMPFS}" || \
             die "Failed to create overlay tmpfs at ${OVERLAYS_TMPFS}"
@@ -51,6 +54,9 @@ mount_root() {
         create_overlay "$overlay" "$upper" "$work"
     done
 
+    info "Done Verity Root Mounting and Overlays Mounting"
     # Re-mount the verity mount along with all overlays to the sysroot.
     mount --rbind "${VERITY_MOUNT}" "${NEWROOT}"
 }
+
+mount_root
