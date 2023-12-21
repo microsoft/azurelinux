@@ -1,7 +1,7 @@
 Summary:        Advanced Trivial File Transfer Protocol (ATFTP) - TFTP server
 Name:           atftp
-Version:        0.7.5
-Release:        4%{?dist}
+Version:        0.8.0
+Release:        1%{?dist}
 URL:            http://sourceforge.net/projects/atftp
 License:        GPLv2+
 Group:          System Environment/Daemons
@@ -40,6 +40,7 @@ files using the TFTP protocol.
 sed -i "s/-g -Wall -D_REENTRANT/-g -Wall -D_REENTRANT -std=gnu89/" configure.ac
 
 %build
+./autogen.sh
 %configure
 make
 
@@ -126,6 +127,9 @@ fi
 
 
 %changelog
+* Wed Dec 20 2023 Muhammad Falak <mwani@microsoft.com> - 0.8.0-1
+- Bump version to 0.8.0
+
 * Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 0.7.5-4
 - Remove unused `%%define sha1` lines
 

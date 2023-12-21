@@ -8,6 +8,7 @@ package diskutils
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -216,34 +217,31 @@ func ApplyRawBinary(diskDevPath string, rawBinary configuration.RawBinary) (err 
 
 // CreateEmptyDisk creates an empty raw disk in the given working directory as described in disk configuration
 func CreateEmptyDisk(workDirPath, diskName string, maxSize uint64) (diskFilePath string, err error) {
-	const (
-		defautBlockSize = MiB
-	)
 	diskFilePath = filepath.Join(workDirPath, diskName)
 
-	err = sparseDisk(diskFilePath, defautBlockSize, maxSize)
+	err = CreateSparseDisk(diskFilePath, maxSize, 0o644)
 	return
 }
 
-// sparseDisk creates an empty sparse disk file.
-func sparseDisk(diskPath string, blockSize, size uint64) (err error) {
-	ddArgs := []string{
-		"if=/dev/zero",                  // Input file.
-		fmt.Sprintf("of=%s", diskPath),  // Output file.
-		fmt.Sprintf("bs=%d", blockSize), // Size of one copied block.
-		fmt.Sprintf("seek=%d", size),    // Size of the image.
-		"count=0",                       // Number of blocks to copy to the output file.
+// CreateSparseDisk creates an empty sparse disk file.
+func CreateSparseDisk(diskPath string, size uint64, perm os.FileMode) (err error) {
+	// Open and truncate the file.
+	file, err := os.OpenFile(diskPath, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, perm)
+	if err != nil {
+		return fmt.Errorf("failed to create empty disk file:\n%w", err)
 	}
 
-	_, stderr, err := shell.Execute("dd", ddArgs...)
+	// Resize the file to the desired size.
+	err = file.Truncate(int64(size * MiB))
 	if err != nil {
-		logger.Log.Warnf("Failed to create empty disk with dd: %v", stderr)
+		return fmt.Errorf("failed to set empty disk file's size:\n%w", err)
 	}
 	return
 }
 
 // SetupLoopbackDevice creates a /dev/loop device for the given disk file
 func SetupLoopbackDevice(diskFilePath string) (devicePath string, err error) {
+	logger.Log.Debugf("Attaching Loopback: %v", diskFilePath)
 	stdout, stderr, err := shell.Execute("losetup", "--show", "-f", "-P", diskFilePath)
 	if err != nil {
 		logger.Log.Warnf("Failed to create loopback device using losetup: %v", stderr)
@@ -304,7 +302,7 @@ func BlockOnDiskIOByIds(debugName string, maj string, min string) (err error) {
 		outstandingOpsIdx = 11
 	)
 
-	logger.Log.Infof("Flushing all IO to disk")
+	logger.Log.Debugf("Flushing all IO to disk")
 	_, _, err = shell.Execute("sync")
 	if err != nil {
 		return
@@ -354,7 +352,7 @@ func BlockOnDiskIOByIds(debugName string, maj string, min string) (err error) {
 
 // DetachLoopbackDevice detaches the specified disk
 func DetachLoopbackDevice(diskDevPath string) (err error) {
-	logger.Log.Infof("Detaching Loopback Device Path: %v", diskDevPath)
+	logger.Log.Debugf("Detaching Loopback Device Path: %v", diskDevPath)
 	_, stderr, err := shell.Execute("losetup", "-d", diskDevPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to detach loopback device using losetup: %v", stderr)

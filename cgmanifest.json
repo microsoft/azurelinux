@@ -15,8 +15,8 @@
         "type": "other",
         "other": {
           "name": "abseil-cpp",
-          "version": "20220623.0",
-          "downloadUrl": "https://github.com/abseil/abseil-cpp/archive/20220623.0/abseil-cpp-20220623.0.tar.gz"
+          "version": "20230802.1",
+          "downloadUrl": "https://github.com/abseil/abseil-cpp/archive/refs/tags/20230802.1.tar.gz"
         }
       }
     },
@@ -665,8 +665,8 @@
         "type": "other",
         "other": {
           "name": "atftp",
-          "version": "0.7.5",
-          "downloadUrl": "http://sourceforge.net/projects/atftp/files/latest/download/atftp-0.7.5.tar.gz"
+          "version": "0.8.0",
+          "downloadUrl": "http://sourceforge.net/projects/atftp/files/latest/download/atftp-0.8.0.tar.gz"
         }
       }
     },
@@ -1015,8 +1015,8 @@
         "type": "other",
         "other": {
           "name": "bcc",
-          "version": "0.28.0",
-          "downloadUrl": "https://github.com/iovisor/bcc/releases/download/v0.28.0/bcc-src-with-submodule.tar.gz"
+          "version": "0.29.1",
+          "downloadUrl": "https://github.com/iovisor/bcc/releases/download/v0.29.1/bcc-src-with-submodule.tar.gz"
         }
       }
     },
@@ -10261,8 +10261,8 @@
         "type": "other",
         "other": {
           "name": "libnftnl",
-          "version": "1.2.1",
-          "downloadUrl": "https://netfilter.org/projects/libnftnl/files/libnftnl-1.2.1.tar.bz2"
+          "version": "1.2.6",
+          "downloadUrl": "https://netfilter.org/projects/libnftnl/files/libnftnl-1.2.6.tar.xz"
         }
       }
     },
@@ -10561,8 +10561,8 @@
         "type": "other",
         "other": {
           "name": "libpng",
-          "version": "1.6.37",
-          "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.37.tar.xz"
+          "version": "1.6.40",
+          "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.40.tar.xz"
         }
       }
     },
@@ -11801,8 +11801,8 @@
         "type": "other",
         "other": {
           "name": "libXrandr",
-          "version": "1.5.2",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXrandr-1.5.2.tar.bz2"
+          "version": "1.5.3",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXrandr-1.5.3.tar.gz"
         }
       }
     },
@@ -11811,8 +11811,8 @@
         "type": "other",
         "other": {
           "name": "libXrender",
-          "version": "0.9.10",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXrender-0.9.10.tar.bz2"
+          "version": "0.9.11",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXrender-0.9.11.tar.gz"
         }
       }
     },
@@ -11861,8 +11861,8 @@
         "type": "other",
         "other": {
           "name": "libXt",
-          "version": "1.2.0",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXt-1.2.0.tar.bz2"
+          "version": "1.3.0",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXt-1.3.0.tar.gz"
         }
       }
     },
@@ -11871,8 +11871,8 @@
         "type": "other",
         "other": {
           "name": "libXtst",
-          "version": "1.2.3",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXtst-1.2.3.tar.bz2"
+          "version": "1.2.4",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXtst-1.2.4.tar.gz"
         }
       }
     },
@@ -29017,8 +29017,8 @@
         "type": "other",
         "other": {
           "name": "usbutils",
-          "version": "014",
-          "downloadUrl": "https://www.kernel.org/pub/linux/utils/usb/usbutils/usbutils-014.tar.xz"
+          "version": "017",
+          "downloadUrl": "https://www.kernel.org/pub/linux/utils/usb/usbutils/usbutils-017.tar.xz"
         }
       }
     },

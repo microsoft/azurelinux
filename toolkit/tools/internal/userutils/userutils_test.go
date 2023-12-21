@@ -80,20 +80,20 @@ func TestHashPasswordNotEmpty(t *testing.T) {
 }
 
 func TestUpdateUserPasswordEmptyToEmpty(t *testing.T) {
-	testUpdateUserPassword(t, "root:!:19634:7:99999:7:::", "root:!:19634:7:99999:7:::", "root", "")
+	testUpdateUserPassword(t, "root:*:19634:7:99999:7:::", "root:*:19634:7:99999:7:::", "root", "")
 }
 
 func TestUpdateUserPasswordSomethingToEmpty(t *testing.T) {
 	testUpdateUserPassword(t,
 		"root:$6$E0M9VkDvOLvO$nr9FjmIiSSP5C5V3Lhuqv4VzWmscABoiQ0mF.ZTbwKEN4nS60nsiU17qA/RGMbXHtJfci/DeLT1Zu2nhNFbwQ.:19634:7:99999:7:::",
-		"root:!:19634:7:99999:7:::",
+		"root:*:19634:7:99999:7:::",
 		"root",
 		"")
 }
 
 func TestUpdateUserPassword(t *testing.T) {
 	testUpdateUserPassword(t,
-		"root:!:19634:7:99999:7:::",
+		"root:*:19634:7:99999:7:::",
 		"root:$6$E0M9VkDvOLvO$nr9FjmIiSSP5C5V3Lhuqv4VzWmscABoiQ0mF.ZTbwKEN4nS60nsiU17qA/RGMbXHtJfci/DeLT1Zu2nhNFbwQ.:19634:7:99999:7:::",
 		"root",
 		"$6$E0M9VkDvOLvO$nr9FjmIiSSP5C5V3Lhuqv4VzWmscABoiQ0mF.ZTbwKEN4nS60nsiU17qA/RGMbXHtJfci/DeLT1Zu2nhNFbwQ.")

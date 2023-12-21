@@ -4,9 +4,9 @@
 %define mariner_version 3
 
 # find_debuginfo.sh arguments are set by default in rpm's macros.
-# The default arguments regenerate the build-id for vmlinux in the 
+# The default arguments regenerate the build-id for vmlinux in the
 # debuginfo package causing a mismatch with the build-id for vmlinuz in
-# the kernel package. Therefore, explicilty set the relevant default 
+# the kernel package. Therefore, explicilty set the relevant default
 # settings to prevent this behavior.
 %undefine _unique_build_ids
 %undefine _unique_debug_names
@@ -431,6 +431,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %changelog
 * Thu Dec 14 2023 Rachel Menge <rachelmenge@microsoft.com> - 6.6.2.1-2
 - Add cpupower.service to kernel-tools
+- Enable user-based event tracing
+- Enable CONFIG_BPF_LSM (Thien Trung Vuong <tvuong@microsoft.com>)
+- Enable CUSE module (Juan Camposeco <juanarturoc@microsoft.com>)
+- Add IOMMU configs for aarch64 (David Daney <daviddaney@microsoft.com>)
 
 * Wed Dec 13 2023 Rachel Menge <rachelmenge@microsoft.com> - 6.6.2.1-1
 - Upgrade to 6.6.2.1
@@ -461,8 +465,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 - Remove CONFIG_NET_CLS_RSVP and CONFIG_NET_CLS_RSVP6 that don't apply to the new version
 
 * Thu Sep 21 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.131.1-3
-- Call grub2-mkconfig to regenerate configs only if the user has 
-    previously used grub2-mkconfig for boot configuration. 
+- Call grub2-mkconfig to regenerate configs only if the user has
+    previously used grub2-mkconfig for boot configuration.
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.15.131.1-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)

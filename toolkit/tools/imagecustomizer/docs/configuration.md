@@ -1,7 +1,6 @@
 # Mariner Image Customizer configuration
 
 The Mariner Image Customizer is configured using a YAML (or JSON) file.
-The top level type for this YAML file is the [Config](#config-type) type.
 
 ### Operation ordering
 
@@ -63,18 +62,85 @@ SystemConfig:
   - kernel-hci
 ```
 
+## Top-level
+
+The top level type for the YAML file is the [Config](#config-type) type.
+
 ## Config type
 
 The top-level type of the configuration.
+
+### Disks [[Disk](#disk-type)[]]
+
+Contains the options for provisioning disks and their partitions.
+
+If the Disks field isn't specified, then the partitions of the base image aren't
+changed.
+
+If Disks is specified, then [SystemConfig.BootType](#boottype-boottype) must also be
+specified.
+
+While Disks is a list, only 1 disk is supported at the moment.
+Support for multiple disks may (or may not) be added in the future.
+
+```yaml
+Disks:
+- PartitionTableType: gpt
+  MaxSize: 4096
+  Partitions:
+  - ID: esp
+    Flags:
+    - esp
+    - boot
+    Start: 1
+    End: 9
+    FsType: fat32
+
+  - ID: rootfs
+    Start: 9
+    FsType: ext4
+
+SystemConfig:
+  BootType: efi
+  PartitionSettings:
+  - ID: esp
+    MountPoint: /boot/efi
+    MountOptions: umask=0077
+
+  - ID: rootfs
+    MountPoint: /
+```
 
 ### SystemConfig [[SystemConfig](#systemconfig-type)]
 
 Contains the configuration options for the OS.
 
+Example:
+
 ```yaml
 SystemConfig:
   Hostname: example-image
 ```
+
+## Disk type
+
+Specifies the properties of a disk, including its partitions.
+
+### PartitionTableType [string]
+
+Specifies how the partition tables are laid out.
+
+Supported options:
+
+- `gpt`: Use the GUID Partition Table (GPT) format.
+
+### MaxSize [uint64]
+
+The size of the disk, specified in mebibytes (MiB).
+
+### Partitions [[Partition](#partition-type)]
+
+The partitions to provision on the disk.
 
 ## FileConfig type
 
@@ -180,6 +246,124 @@ Packages:
 - openssh-server
 ```
 
+## Partition type
+
+### ID [string]
+
+Required.
+
+The ID of the partition.
+This is used correlate Partition objects with [PartitionSetting](#partitionsetting-type)
+objects.
+
+### FsType [string]
+
+Required.
+
+The filesystem type of the partition.
+
+Supported options:
+
+- `ext4`
+- `fat32`
+- `xfs`
+
+### Name [string]
+
+The label to assign to the partition.
+
+### Start [uint64]
+
+Required.
+
+The start location (inclusive) of the partition, specified in MiBs.
+
+### End [uint64]
+
+The end location (exclusive) of the partition, specified in MiBs.
+
+The End and Size fields cannot be specified at the same time.
+
+Either the Size or End field is required for all partitions except for the last
+partition.
+When both the Size and End fields are omitted, the last partition will fill the
+remainder of the disk (based on the disk's [MaxSize](#maxsize-uint64) field).
+
+### Size [uint64]
+
+The size of the partition, specified in MiBs.
+
+### Flags [string[]]
+
+Specifies options for the partition.
+
+Supported options:
+
+- `esp`: The UEFI System Partition (ESP).
+  The partition must have a `FsType` of `fat32`.
+
+  When specified on a GPT formatted disk, the `boot` flag must also be added.
+
+- `bios_grub`: Specifies this partition is the BIOS boot partition.
+  This is required for GPT disks that wish to be bootable using legacy BIOS mode.
+
+  This partition must start at block 1.
+
+  This flag is only supported on GPT formatted disks.
+
+  For further details, see: https://en.wikipedia.org/wiki/BIOS_boot_partition
+
+- `boot`: Specifies that this partition contains the boot loader.
+
+  When specified on a GPT formatted disk, the `esp` flag must also be added.
+
+These options mirror those in
+[parted](https://www.gnu.org/software/parted/manual/html_node/set.html).
+
+## PartitionSetting type
+
+Specifies the mount options for a partition.
+
+### ID [string]
+
+Required.
+
+The ID of the partition.
+This is used correlate [Partition](#partition-type) objects with PartitionSetting
+objects.
+
+### MountIdentifier [string]
+
+Default: `partuuid`
+
+The partition ID type that should be used to recognize the partition on the disk.
+
+Supported options:
+
+- `uuid`: The filesystem's partition UUID.
+
+- `partuuid`: The partition UUID specified in the partition table.
+
+- `partlabel`: The partition label specified in the partition table.
+
+### MountOptions [string]
+
+The additional options used when mounting the file system.
+
+These options are in the same format as [mount](https://linux.die.net/man/8/mount)'s
+`-o` option (or the `fs_mntops` field of the
+[fstab](https://man7.org/linux/man-pages/man5/fstab.5.html) file).
+
+### MountPoint [string]
+
+Required.
+
+The absolute path of where the partition should be mounted.
+
+The mounts will be sorted to ensure that parent directories are mounted before child
+directories.
+For example, `/boot` will be mounted before `/boot/efi`.
+
 ## Script type
 
 Points to a script file (typically a Bash script) to be run during customization.
@@ -247,6 +431,22 @@ SystemConfig:
 ## SystemConfig type
 
 Contains the configuration options for the OS.
+
+### BootType [string]
+
+Specifies the boot system that the image supports.
+
+Supported options:
+
+- `legacy`: Support booting from BIOS firmware.
+
+  When this option is specified, the partition layout must contain a partition with the
+  `bios_grub` flag.
+
+- `efi`: Support booting from UEFI firmware.
+
+  When this option is specified, the partition layout must contain a partition with the
+  `esp` flag.
 
 ### Hostname [string]
 
@@ -392,6 +592,10 @@ SystemConfig:
     - Path: /c2.txt
       Permissions: "664"
 ```
+
+### PartitionSettings [[PartitionSetting](#partitionsetting-type)[]]
+
+Specifies the mount options of the partitions.
 
 ### PostInstallScripts [[Script](#script-type)[]]
 
