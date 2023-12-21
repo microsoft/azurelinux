@@ -11841,8 +11841,8 @@
         "type": "other",
         "other": {
           "name": "libxshmfence",
-          "version": "1.3",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libxshmfence-1.3.tar.bz2"
+          "version": "1.3.2",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libxshmfence-1.3.2.tar.gz"
         }
       }
     },
