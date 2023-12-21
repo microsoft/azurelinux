@@ -35,6 +35,8 @@ The Mariner Image Customizer is configured using a YAML (or JSON) file.
 
 10. Delete `/etc/resolv.conf` file.
 
+11. Enable dm-verity root protection.
+
 ### /etc/resolv.conf
 
 The `/etc/resolv.conf` file is overridden so that the package installation and
@@ -141,6 +143,36 @@ The size of the disk, specified in mebibytes (MiB).
 ### Partitions [[Partition](#partition-type)]
 
 The partitions to provision on the disk.
+
+## Verity type
+
+Specifies the configuration for dm-verity root integrity verification.
+
+- DataPartition: A partition configured with dm-verity, which verifies integrity
+  at each system boot.
+
+  - IdType: Specifies the type of id for the partition. The options are
+    `PartLabel` (partition label), `Uuid` (filesystem UUID), and `PartUuid`
+    (partition UUID).
+
+  - Id: The unique identifier value of the partition, corresponding to the
+    specified IdType.
+
+- HashPartition: A partition used exclusively for storing a calculated hash
+  tree.
+
+Example:
+
+```yaml
+SystemConfig:
+  Verity:
+    DataPartition:
+      IdType: PartUuid
+      Id: 00000000-0000-0000-0000-000000000000
+    HashPartition:
+      IdType: PartLabel
+      Id: hash_partition
+```
 
 ## FileConfig type
 

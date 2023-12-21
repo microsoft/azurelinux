@@ -99,6 +99,11 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
+	err = enableVerityPartition(imageChroot)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
