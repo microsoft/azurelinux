@@ -5,7 +5,7 @@
 Summary:        Thor is a toolkit for building powerful command-line interfaces
 Name:           rubygem-%{gem_name}
 Version:        1.2.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Group:          Development/Languages
 License:        MIT
 Vendor:		    Microsoft Corporation
@@ -32,6 +32,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Thu Dec 21 2023 Sindhu Karri <lakarri@microsoft.com> - 1.2.1-2
+- Promote package to Mariner Base repo
+
 * Mon Feb 28 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.2.1-1
 - Update to v1.2.1.
 - Build from .tar.gz source.
