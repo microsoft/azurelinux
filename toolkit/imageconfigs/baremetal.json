@@ -2,10 +2,10 @@
     "Disks": [
         {
             "PartitionTableType": "gpt",
-            "MaxSize": 4096,
+            "MaxSize": 2048,
             "Artifacts": [
                 {
-                    "Name": "core",
+                    "Name": "baremetal",
                     "Type": "vhdx"
                 }
             ],
@@ -48,7 +48,8 @@
                 "packagelists/baremetal-packages.json",
                 "packagelists/cloud-init-packages.json",
                 "packagelists/core-packages-image.json",
-                "packagelists/selinux-full.json"
+                "packagelists/selinux-full.json",
+                "packagelists/mic-iso-gen-packages.json"
             ],
             "KernelCommandLine": {
                 "ExtraCommandLine": "console=tty0 console=ttyS0",
