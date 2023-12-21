@@ -27937,8 +27937,8 @@
         "type": "other",
         "other": {
           "name": "strace",
-          "version": "6.1",
-          "downloadUrl": "https://strace.io/files/6.1/strace-6.1.tar.xz"
+          "version": "6.6",
+          "downloadUrl": "https://strace.io/files/6.6/strace-6.6.tar.xz"
         }
       }
     },
@@ -29835,8 +29835,8 @@
         "type": "other",
         "other": {
           "name": "xfsprogs",
-          "version": "5.15.0",
-          "downloadUrl": "https://kernel.org/pub/linux/utils/fs/xfs/xfsprogs/xfsprogs-5.15.0.tar.xz"
+          "version": "6.5.0",
+          "downloadUrl": "https://kernel.org/pub/linux/utils/fs/xfs/xfsprogs/xfsprogs-6.5.0.tar.xz"
         }
       }
     },
