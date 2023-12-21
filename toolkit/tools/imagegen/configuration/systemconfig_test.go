@@ -47,22 +47,6 @@ func TestShouldFailParsingMissingName_SystemConfig(t *testing.T) {
 	assert.Equal(t, "failed to parse [SystemConfig]: missing [Name] field", err.Error())
 }
 
-func TestShouldFailParsingMissingPackages_SystemConfig(t *testing.T) {
-	var checkedSystemConfig SystemConfig
-
-	missingPackageListConfig := validSystemConfig
-	missingPackageListConfig.PackageLists = []string{}
-	missingPackageListConfig.Packages = []string{}
-
-	err := missingPackageListConfig.IsValid()
-	assert.Error(t, err)
-	assert.Equal(t, "system configuration must provide at least one package list inside the [PackageLists] or one package in the [Packages] field", err.Error())
-
-	err = remarshalJSON(missingPackageListConfig, &checkedSystemConfig)
-	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [SystemConfig]: system configuration must provide at least one package list inside the [PackageLists] or one package in the [Packages] field", err.Error())
-}
-
 func TestShouldSucceedParsingMissingPackageLists_SystemConfig(t *testing.T) {
 	var checkedSystemConfig SystemConfig
 

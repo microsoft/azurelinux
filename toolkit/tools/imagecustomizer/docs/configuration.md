@@ -85,6 +85,8 @@ specified.
 While Disks is a list, only 1 disk is supported at the moment.
 Support for multiple disks may (or may not) be added in the future.
 
+Disks cannot be specified if the output format is `iso`.
+
 ```yaml
 Disks:
 - PartitionTableType: gpt
@@ -648,6 +650,8 @@ SystemConfig:
 ### PartitionSettings [[PartitionSetting](#partitionsetting-type)[]]
 
 Specifies the mount options of the partitions.
+
+If the output format is iso, PartitionsSettings cannot be specified.
 
 ### PostInstallScripts [[Script](#script-type)[]]
 
