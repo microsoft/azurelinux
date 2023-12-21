@@ -1,15 +1,5 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-## START: Set by rpmautospec
-## (rpmautospec version 0.3.5)
-## RPMAUTOSPEC: autorelease, autochangelog
-%define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 6;
-    base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
-    print(release_number + base_release_number - 1);
-}%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
-## END: Set by rpmautospec
-
 Name:           moreutils
 Version:        0.67
 Release:        7%{?dist}
