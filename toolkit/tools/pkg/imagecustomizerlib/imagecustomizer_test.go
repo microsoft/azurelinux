@@ -235,7 +235,7 @@ func TestCustomizeImageKernelCommandLineAdd(t *testing.T) {
 		},
 	}
 
-	err = CustomizeImage(buildDir, buildDir, config, diskFilePath, nil, outImageFilePath, "raw", false)
+	err = CustomizeImage(buildDir, buildDir, config, diskFilePath, nil, outImageFilePath, "raw", "", false)
 	if !assert.NoError(t, err) {
 		return
 	}
