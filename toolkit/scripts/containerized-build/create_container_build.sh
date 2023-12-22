@@ -159,14 +159,16 @@ if [[ "${mode}" == "build" ]]; then
 fi
 
 # ============ Setup tools ============
+if [[ "${mode}" == "build" ]]; then
 # Copy relavant build tool executables from $TOOL_BINS_DIR
-echo "Setting up tools..."
-if [[ ( ! -f "$TOOL_BINS_DIR/depsearch" ) || ( ! -f "$TOOL_BINS_DIR/grapher" ) || ( ! -f "$TOOL_BINS_DIR/specreader" ) ]]; then build_tools; fi
-if [[ ! -f "$PKGBUILD_DIR/graph.dot" ]]; then build_graph; fi
-cp $TOOL_BINS_DIR/depsearch ${tmp_dir}/
-cp $TOOL_BINS_DIR/grapher ${tmp_dir}/
-cp $TOOL_BINS_DIR/specreader ${tmp_dir}/
-cp $PKGBUILD_DIR/graph.dot ${tmp_dir}/
+    echo "Setting up tools..."
+    if [[ ( ! -f "$TOOL_BINS_DIR/depsearch" ) || ( ! -f "$TOOL_BINS_DIR/grapher" ) || ( ! -f "$TOOL_BINS_DIR/specreader" ) ]]; then build_tools; fi
+    if [[ ! -f "$PKGBUILD_DIR/graph.dot" ]]; then build_graph; fi
+    cp $TOOL_BINS_DIR/depsearch ${tmp_dir}/
+    cp $TOOL_BINS_DIR/grapher ${tmp_dir}/
+    cp $TOOL_BINS_DIR/specreader ${tmp_dir}/
+    cp $PKGBUILD_DIR/graph.dot ${tmp_dir}/
+fi
 
 # ========= Setup mounts =========
 echo "Setting up mounts..."
