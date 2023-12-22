@@ -5,7 +5,7 @@
 Summary:        dnf/yum equivalent using C libs
 Name:           tdnf
 Version:        3.5.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2.1 AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -29,7 +29,9 @@ Patch4:         tdnf-sqlite-library.patch
 # Patch to be removed once we upgrade to a version of tdnf which contains the upstream fix
 # https://github.com/vmware/tdnf/pull/432
 Patch5:         tdnf-GetRepoMD-fix.patch
-Patch6:		tdnf-dotarch.patch
+Patch6:	        tdnf-dotarch.patch
+Patch7:         tdnf-installonlypkgs.patch
+Patch8:         tdnf-add-installonlypkgs-config.patch
 #Cmake requires binutils
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -237,6 +239,10 @@ fi
 /%{_lib}/systemd/system/tdnf*
 
 %changelog
+* Tue Dec 12 2023 Sam Meluch <sammeluch@microsoft.com> - 3.5.2-4
+- backport patch for installonlypkg functionality
+- add config for installonlypkgs
+
 * Fri Oct 06 2023 Andy Zaugg <azaugg@linkedin.com> - 3.5.2-3
 - tdnf should only become default if a backend package manager has not previously been defined
 
