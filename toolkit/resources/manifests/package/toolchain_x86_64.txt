@@ -30,8 +30,8 @@ check-debuginfo-0.15.2-1.cm2.x86_64.rpm
 chkconfig-1.20-4.cm2.x86_64.rpm
 chkconfig-debuginfo-1.20-4.cm2.x86_64.rpm
 chkconfig-lang-1.20-4.cm2.x86_64.rpm
-cmake-3.21.4-10.cm2.x86_64.rpm
-cmake-debuginfo-3.21.4-10.cm2.x86_64.rpm
+cmake-3.21.4-11.cm2.x86_64.rpm
+cmake-debuginfo-3.21.4-11.cm2.x86_64.rpm
 coreutils-8.32-7.cm2.x86_64.rpm
 coreutils-debuginfo-8.32-7.cm2.x86_64.rpm
 coreutils-lang-8.32-7.cm2.x86_64.rpm
