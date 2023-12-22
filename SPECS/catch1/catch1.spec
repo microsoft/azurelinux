@@ -4,7 +4,7 @@ Distribution:   Mariner
 
 Name:           catch1
 Version:        1.12.2
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        A modern, C++-native, header-only, framework for unit-tests, TDD and BDD
 
 License:        Boost
@@ -59,6 +59,9 @@ ctest -V %{?_smp_mflags}
 
 
 %changelog
+* Thu Dec 21 2023 Sindhu Karri <lakarri@microsoft.com> - 1.12.2-8
+- Promote package to Mariner Base repo
+
 * Tue Oct 19 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.12.2-7
 - Add catch1-sigstksz patch.
 - License verified.
