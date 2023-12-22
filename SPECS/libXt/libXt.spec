@@ -1,14 +1,12 @@
 Summary:        X.Org X11 libXt runtime library
 Name:           libXt
-Version:        1.2.0
-Release:        5%{?dist}
+Version:        1.3.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.x.org
-Source0:        https://xorg.freedesktop.org/archive/individual/lib/%{name}-%{version}.tar.bz2
-
-Patch0:         0001-xt-Work-around-a-compiler-issue-with-gcc-10.patch
+Source0:        https://xorg.freedesktop.org/archive/individual/lib/%{name}-%{version}.tar.gz
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -102,6 +100,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man3/*.3*
 
 %changelog
+* Wed Dec 20 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 1.3.0-1
+- Update to v1.3.0
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.2.0-5
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
