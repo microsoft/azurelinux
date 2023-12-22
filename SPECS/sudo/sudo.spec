@@ -1,13 +1,14 @@
 Summary:        Sudo
 Name:           sudo
 Version:        1.9.14p3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ISC
 URL:            https://www.sudo.ws/
 Group:          System Environment/Security
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://www.sudo.ws/sudo/dist/%{name}-%{version}.tar.gz
+Patch0:         disable-newgroup-query-when-netgroup-base-is-not-set.patch
 BuildRequires:  audit-devel
 BuildRequires:  man-db
 BuildRequires:  openssl-devel
@@ -27,7 +28,7 @@ The Sudo package allows a system administrator to give certain users (or groups 
 the ability to run some (or all) commands as root or another user while logging the commands and arguments.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 ./configure \
@@ -99,6 +100,9 @@ fi
 %exclude  /etc/sudoers.dist
 
 %changelog
+* Tue Dec 19 2023 Andy Zaugg <azaugg@linkedin.com> - 1.9.14p3-2
+- Add patch to bug fix support for NETGROUP_QUERY
+
 * Fri Aug 25 2023 Andy Zaugg <azaugg@linkedin.com> - 1.9.14p3-1
 - Bump version to 1.9.14p3
 

@@ -1,8 +1,8 @@
 %define majver %(echo %{version} | cut -d. -f 1-2)
 Summary:        libxml++
 Name:           libxml++
-Version:        5.0.1
-Release:        2%{?dist}
+Version:        5.0.3
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -53,7 +53,6 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %files
 %license COPYING
-%doc README
 %{_libdir}/*.so.*
 
 %files devel
@@ -67,6 +66,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_datadir}/devhelp/*
 
 %changelog
+* Wed Dec 20 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 5.0.3-1
+- Update to v5.0.3
+
 * Tue Feb 15 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.0.1-2
 - Update Requires: to point at glibmm, rather than glibmm24 (removed)
 
