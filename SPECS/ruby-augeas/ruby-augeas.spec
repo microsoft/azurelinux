@@ -1,7 +1,7 @@
 Summary:        Ruby bindings for Augeas
 Name:           ruby-augeas
 Version:        0.5.0
-Release:        30%{?dist}
+Release:        31%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -47,6 +47,9 @@ ruby tests/tc_augeas.rb
 %{ruby_vendorarchdir}/_augeas.so
 
 %changelog
+* Thu Dec 21 2023 Sindhu Karri <lakarri@microsoft.com> - 0.5.0-31
+- Promote package to Mariner Base repo
+
 * Wed Jun 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.5.0-30
 - Adding missed BR on 'rubygem(rake)'.
 - Fixed source URL.
