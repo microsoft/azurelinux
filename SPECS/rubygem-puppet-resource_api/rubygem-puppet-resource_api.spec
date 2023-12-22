@@ -5,7 +5,7 @@
 Summary:        Provides a simple way to write new native resources for puppet
 Name:           rubygem-%{gem_name}
 Version:        1.8.14
-Release:        2%{?dist}
+Release:        3%{?dist}
 Group:          Development/Languages
 License:        MIT
 Vendor:		Microsoft Corporation
@@ -32,6 +32,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Thu Dec 21 2023 Sindhu Karri <lakarri@microsoft.com> - 1.8.14-3
+- Promote package to Mariner Base repo
+
 * Tue Mar 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.8.14-2
 - Build from .tar.gz source.
 
