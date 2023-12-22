@@ -1,7 +1,7 @@
 Summary:        Linux-native asynchronous I/O access library
 Name:           libaio
-Version:        0.3.112
-Release:        4%{?dist}
+Version:        0.3.113
+Release:        1%{?dist}
 License:        LGPLv2+
 Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
@@ -9,7 +9,6 @@ Distribution:   Mariner
 URL:            https://pagure.io/libaio
 Source0:        https://releases.pagure.org/%{name}/%{name}-%{version}.tar.gz
 Patch0:         libaio-install-to-destdir-slash-usr.patch
-Patch1:         fix-gcc11-bug-and-parity-with-upstream.patch
 
 %if %{with_check}
 BuildRequires:  e2fsprogs-devel
@@ -71,6 +70,10 @@ make -k check
 %attr(0755,root,root) %{_libdir}/libaio.a
 
 %changelog
+* Tue Dec 19 2023 Brian Fjeldstad <bfjelds@microsoft.com> 0.3-113-1
+- Upgrade to 0.3.113
+- Remove gcc-11 patch that was added to libaio 0.3.113
+
 * Mon Feb 21 2022 Muhammad Falak <mwani@microsoft.com> 0.3-112-4
 - Switch to `%autosetup` instead of `%setup`
 - Introduce patch to fix gcc-11 ptest bug & parity with upstream
