@@ -1,0 +1,25 @@
+From de620a8166329c2f7b6eaecb5b4e24af1db95e4d Mon Sep 17 00:00:00 2001
+From: Sam Meluch <sam.meluch@microsoft.com>
+Date: Tue, 19 Dec 2023 12:04:36 -0800
+Subject: [PATCH] Add installonlypkgs to tdnf.conf for mariner kernel packages
+
+---
+ etc/tdnf/tdnf.conf | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/etc/tdnf/tdnf.conf b/etc/tdnf/tdnf.conf
+index 67c4d51..8ec4003 100644
+--- a/etc/tdnf/tdnf.conf
++++ b/etc/tdnf/tdnf.conf
+@@ -1,7 +1,8 @@
+ [main]
+ gpgcheck=1
+ installonly_limit=3
++installonlypkgs=kernel kernel-hci kernel-mos kernel-mshv kernel-uvm kernel-uvm-cvm kernel-azure
+ clean_requirements_on_remove=0
+ repodir=/etc/yum.repos.d
+ cachedir=/var/cache/tdnf
+ plugins=1
+-- 
+2.34.1
+
