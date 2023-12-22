@@ -10701,8 +10701,8 @@
         "type": "other",
         "other": {
           "name": "librdkafka",
-          "version": "1.8.2",
-          "downloadUrl": "https://github.com/edenhill/librdkafka/archive/v1.8.2.tar.gz"
+          "version": "2.2.0",
+          "downloadUrl": "https://github.com/edenhill/librdkafka/archive/v2.2.0.tar.gz"
         }
       }
     },
