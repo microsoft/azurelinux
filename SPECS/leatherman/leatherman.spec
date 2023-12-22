@@ -1,6 +1,6 @@
 Name:           leatherman
 Version:        1.12.6
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Collection of C++ and CMake utility libraries
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -81,6 +81,9 @@ sed -i -e "s/\s*-Werror\s*//g" cmake/cflags.cmake
 %{_libdir}/cmake/%{name}/
 
 %changelog
+* Thu Dec 21 2023 Sindhu Karri <lakarri@microsoft.com> - 1.12.6-5
+- Promote package to Mariner Base repo
+
 * Tue Oct 19 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.12.6-4
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - License verified
@@ -171,4 +174,3 @@ sed -i -e "s/\s*-Werror\s*//g" cmake/cflags.cmake
 
 * Thu Oct 27 2016 Haïkel Guémar <hguemar@fedoraproject.org> - 0.9.2-1
 - Initial package on EL7
-
