@@ -51,13 +51,11 @@ Patch5:         0001-autobind-GPUs-to-the-screen.patch
 Patch6:         0001-Fedora-hack-Make-the-suid-root-wrapper-always-start-.patch
 # Backports from current stable "server-1.20-branch":
 # <empty> 
-# Backports from upstream "main":
-Patch7:         0001-avoid-integer-truncation-in-length-check.patch
-Patch8:         0001-allocate-enough-XkbActions-for-buttons.patch
-
 
 # Backports from "master" upstream:
-Patch7: CVE-2023-1594.patch
+Patch7:         CVE-2023-1594.patch
+Patch8:         0001-avoid-integer-truncation-in-length-check.patch
+Patch9:         0001-allocate-enough-XkbActions-for-buttons.patch
 
 # Backported Xwayland randr resolution change emulation support
 Patch501:       0001-dix-Add-GetCurrentClient-helper.patch
