@@ -21,7 +21,7 @@
 Summary:        X.Org X11 X server
 Name:           xorg-x11-server
 Version:        1.20.10
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -50,7 +50,11 @@ Patch5:         0001-autobind-GPUs-to-the-screen.patch
 # Because the display-managers are not ready yet, do not upstream
 Patch6:         0001-Fedora-hack-Make-the-suid-root-wrapper-always-start-.patch
 # Backports from current stable "server-1.20-branch":
-# <empty>
+# <empty> 
+# Backports from upstream "main":
+Patch7:         0001-avoid-integer-truncation-in-length-check.patch
+Patch8:         0001-allocate-enough-XkbActions-for-buttons.patch
+
 
 # Backports from "master" upstream:
 Patch7: CVE-2023-1594.patch
@@ -384,6 +388,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_datadir}/aclocal/xorg-server.m4
 
 %changelog
+* Fri Dec 22 2023 Cameron Baird <cameronbaird@microsoft.com> - 1.20.10-5
+- Add patches for CVE-2023-6478, CVE-2023-6377
+
 * Fri Aug 11 2023 Sean Dougherty <sdougherty@microsoft.com> - 1.20.10-4
 - Add patch for CVE-2023-1594
 
