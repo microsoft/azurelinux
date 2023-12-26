@@ -11251,8 +11251,8 @@
         "type": "other",
         "other": {
           "name": "libunistring",
-          "version": "0.9.10",
-          "downloadUrl": "http://ftp.gnu.org/gnu/libunistring/libunistring-0.9.10.tar.xz"
+          "version": "1.1",
+          "downloadUrl": "http://ftp.gnu.org/gnu/libunistring/libunistring-1.1.tar.xz"
         }
       }
     },
@@ -11271,8 +11271,8 @@
         "type": "other",
         "other": {
           "name": "liburing",
-          "version": "2.0",
-          "downloadUrl": "https://brick.kernel.dk/snaps/liburing-2.0.tar.gz"
+          "version": "2.5",
+          "downloadUrl": "https://brick.kernel.dk/snaps/liburing-2.5.tar.gz"
         }
       }
     },

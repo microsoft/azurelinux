@@ -18,8 +18,9 @@
 /SPECS/kernel/* @microsoft/cbl-mariner-kernel
 /SPECS/kernel-hci/* @microsoft/cbl-mariner-kernel
 /SPECS/kernel-headers/* @microsoft/cbl-mariner-kernel
-/SPECS/kernel-mshv/* @microsoft/cbl-mariner-kernel
-/SPECS/kernel-uvm/* @microsoft/cbl-mariner-kernel
+/SPECS/kernel-mshv/* @microsoft/cbl-mariner-kata-containers
+/SPECS/kernel-uvm/* @microsoft/cbl-mariner-kata-containers
+/SPECS/kernel-uvm-cvm/* @microsoft/cbl-mariner-kata-containers
 /SPECS-SIGNED/kernel-signed/* @microsoft/cbl-mariner-kernel
 /SPECS-SIGNED/kernel-hci-signed/* @microsoft/cbl-mariner-kernel
 /SPECS-SIGNED/kernel-mstflint-signed/* @microsoft/cbl-mariner-kernel
@@ -57,16 +58,32 @@
 /SPECS/moby-buildx/* @microsoft/cbl-mariner-container-runtime
 /SPECS/moby-cli/* @microsoft/cbl-mariner-container-runtime
 /SPECS/moby-containerd/* @microsoft/cbl-mariner-container-runtime
-/SPECS/moby-containerd-cc/* @microsoft/cbl-mariner-container-runtime
+/SPECS/moby-containerd-cc/* @microsoft/cbl-mariner-kata-containers
 /SPECS/moby-engine/* @microsoft/cbl-mariner-container-runtime
 /SPECS/moby-runc/* @microsoft/cbl-mariner-container-runtime
-/SPECS/kata-containers/* @microsoft/cbl-mariner-container-runtime
-/SPECS/kata-containers-cc/* @microsoft/cbl-mariner-container-runtime
+/SPECS/kata-containers/* @microsoft/cbl-mariner-kata-containers
+/SPECS/kata-containers-cc/* @microsoft/cbl-mariner-kata-containers
 
 /SPECS/cloud-hypervisor/* @microsoft/cbl-mariner-virtualization
+/SPECS/hvloader/* @microsoft/cbl-mariner-kata-containers
 
 /SPECS/cloud-init/* @microsoft/cbl-mariner-provisioning
 /SPECS/walinuxagent/* @microsoft/cbl-mariner-provisioning
+
+# Modifications to the toolkit requires reviews from the toolkit team
+/toolkit/ @microsoft/cbl-mariner-tooling
+
+# Docs to be reviewed by general CBL-Mariner devs
+/toolkit/docs/ @microsoft/cbl-mariner-devs
+
+# Default image configurations to be reviewed by general CBL-Mariner devs
+/toolkit/imageconfigs/ @microsoft/cbl-mariner-devs
+
+# Package and toolchain manifests to be reviewed by general CBL-Mariner devs
+/toolkit/resources/manifests/package/pkggen_core_aarch64.txt @microsoft/cbl-mariner-devs
+/toolkit/resources/manifests/package/pkggen_core_x86_64.txt @microsoft/cbl-mariner-devs
+/toolkit/resources/manifests/package/toolchain_aarch64.txt @microsoft/cbl-mariner-devs
+/toolkit/resources/manifests/package/toolchain_x86_64.txt @microsoft/cbl-mariner-devs
 
 # Modifications to the raw toolchain require admin approval.
 /toolkit/scripts/toolchain/container/* @microsoft/cbl-mariner-admins
