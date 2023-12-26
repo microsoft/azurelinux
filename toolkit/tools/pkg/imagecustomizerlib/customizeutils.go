@@ -28,7 +28,7 @@ const (
 )
 
 func doCustomizations(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
-	imageChroot *safechroot.Chroot, rpmsSources []string, useBaseImageRpmRepos bool,
+	imageChroot *safechroot.Chroot, rpmsSources []string, useBaseImageRpmRepos bool, partitionsCustomized bool,
 ) error {
 	var err error
 
@@ -42,7 +42,8 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
-	err = addRemoveAndUpdatePackages(buildDir, baseConfigPath, &config.SystemConfig, imageChroot, rpmsSources, useBaseImageRpmRepos)
+	err = addRemoveAndUpdatePackages(buildDir, baseConfigPath, &config.SystemConfig, imageChroot, rpmsSources,
+		useBaseImageRpmRepos, partitionsCustomized)
 	if err != nil {
 		return err
 	}
@@ -82,12 +83,23 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
+	err = handleKernelCommandLine(config.SystemConfig.KernelCommandLine.ExtraCommandLine, imageChroot,
+		partitionsCustomized)
+	if err != nil {
+		return fmt.Errorf("failed to add extra kernel command line: %w", err)
+	}
+
 	err = runScripts(baseConfigPath, config.SystemConfig.FinalizeImageScripts, imageChroot)
 	if err != nil {
 		return err
 	}
 
 	err = deleteResolvConf(imageChroot)
+	if err != nil {
+		return err
+	}
+
+	err = enableVerityPartition(imageChroot)
 	if err != nil {
 		return err
 	}

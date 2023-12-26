@@ -1,7 +1,7 @@
 Summary:      Default file system
 Name:         filesystem
 Version:      1.1
-Release:      17%{?dist}
+Release:      19%{?dist}
 License:      GPLv3
 Group:        System Environment/Base
 Vendor:       Microsoft Corporation
@@ -178,6 +178,8 @@ cat > %{buildroot}/etc/hosts <<- "EOF"
 
 # End /etc/hosts (network card version)
 EOF
+# and /etc/host.conf file
+echo "multi on" > %{buildroot}/etc/host.conf
 #
 #	7.9. Configuring the setclock Script"
 #
@@ -558,6 +560,24 @@ posix.mkdir("/proc")
 posix.mkdir("/sys")
 posix.chmod("/proc", 0555)
 posix.chmod("/sys", 0555)
+
+-- Prior to filesystem-1.1-16, /media used to be a symlink to /run/media but this was
+-- replaced with a directory. The RPM upgrade operation generally worked when the /media
+-- symlink is a dangling link, which is commonly the case, however not always the case.
+--
+-- And when the /media symlink is indeed properly pointing to a real /run/media, RPM has a
+-- known limitation where it is not possible to replace an active symlink with a directory,
+-- and thus the RPM transaction fails.
+--
+-- To workaround this, a %pretrans scriptlet must run to test and remove the symlink
+-- before RPM attempts to install the new directory.
+--
+-- https://docs.fedoraproject.org/en-US/packaging-guidelines/Directory_Replacement
+path = "/media"
+st = posix.stat(path)
+if st and st.type == "link" then
+  os.remove(path)
+end
 return 0
 
 %files
@@ -587,6 +607,7 @@ return 0
 %config(noreplace) /etc/fstab
 %config(noreplace) /etc/group
 %config(noreplace) /etc/hosts
+%config(noreplace) /etc/host.conf
 %config(noreplace) /etc/inputrc
 %config(noreplace) /etc/mtab
 %config(noreplace) /etc/passwd
@@ -711,6 +732,12 @@ return 0
 %config(noreplace) /etc/modprobe.d/tipc.conf
 
 %changelog
+* Fri Dec 08 2023 Chris Co <chrco@microsoft.com> - 1.1-19
+- Add scriptlet to handle /media symlink failed upgrade issue
+
+* Thu Dec 07 2023 Dan Streetman <ddstreet@ieee.org> - 1.1-18
+- Add /etc/host.conf with multi enabled
+
 * Thu Oct 12 2023 Chris PeBenito <chpebeni@microsoft.com> - 1.1-17
 - Restore the /opt directory.
 

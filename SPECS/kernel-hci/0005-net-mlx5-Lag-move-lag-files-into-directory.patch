@@ -24,7 +24,7 @@ Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
  rename drivers/net/ethernet/mellanox/mlx5/core/{lag_mp.h => lag/mp.h} (100%)
 
 diff --git a/drivers/net/ethernet/mellanox/mlx5/core/Makefile b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
-index 63032cd6efb1..bf2581b43b1f 100644
+index 63032cd..bf2581b 100644
 --- a/drivers/net/ethernet/mellanox/mlx5/core/Makefile
 +++ b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
 @@ -14,7 +14,7 @@ obj-$(CONFIG_MLX5_CORE) += mlx5_core.o
@@ -46,7 +46,7 @@ index 63032cd6efb1..bf2581b43b1f 100644
  					en/mapping.o
  mlx5_core-$(CONFIG_MLX5_CLS_ACT)     += en_tc.o en/rep/tc.o en/rep/neigh.o \
 diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun.c b/drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun.c
-index cf03297c8471..26be4ed9564b 100644
+index 303e6e7..fd4d9fb 100644
 --- a/drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun.c
 +++ b/drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun.c
 @@ -11,8 +11,8 @@
@@ -61,7 +61,7 @@ index cf03297c8471..26be4ed9564b 100644
  struct mlx5e_tc_tun_route_attr {
  	struct net_device *out_dev;
 diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
-index 3aa8d0b83d10..8ca1db84ca21 100644
+index 78538a1..89a98ed 100644
 --- a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
 +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
 @@ -67,8 +67,8 @@
@@ -74,12 +74,12 @@ index 3aa8d0b83d10..8ca1db84ca21 100644
 +#include "lag/mp.h"
  
  #define nic_chains(priv) ((priv)->fs.tc.chains)
- #define MLX5_MH_ACT_SZ MLX5_UN_SZ_BYTES(set_add_copy_action_in_auto)
+ 
 diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lag.c b/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
 similarity index 99%
 rename from drivers/net/ethernet/mellanox/mlx5/core/lag.c
 rename to drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
-index 57d86d47ec2a..ce41d766e417 100644
+index 5f8b7f3..fa8b7c7 100644
 --- a/drivers/net/ethernet/mellanox/mlx5/core/lag.c
 +++ b/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
 @@ -38,7 +38,7 @@
@@ -95,7 +95,7 @@ diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lag.h b/drivers/net/etherne
 similarity index 98%
 rename from drivers/net/ethernet/mellanox/mlx5/core/lag.h
 rename to drivers/net/ethernet/mellanox/mlx5/core/lag/lag.h
-index d4bae528954e..c268663c89b4 100644
+index d4bae52..c268663 100644
 --- a/drivers/net/ethernet/mellanox/mlx5/core/lag.h
 +++ b/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.h
 @@ -5,7 +5,7 @@
@@ -111,7 +111,7 @@ diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lag_mp.c b/drivers/net/ethe
 similarity index 99%
 rename from drivers/net/ethernet/mellanox/mlx5/core/lag_mp.c
 rename to drivers/net/ethernet/mellanox/mlx5/core/lag/mp.c
-index 81786a9a424c..17967ed405d8 100644
+index 81786a9..17967ed 100644
 --- a/drivers/net/ethernet/mellanox/mlx5/core/lag_mp.c
 +++ b/drivers/net/ethernet/mellanox/mlx5/core/lag/mp.c
 @@ -4,7 +4,7 @@
@@ -128,5 +128,5 @@ similarity index 100%
 rename from drivers/net/ethernet/mellanox/mlx5/core/lag_mp.h
 rename to drivers/net/ethernet/mellanox/mlx5/core/lag/mp.h
 -- 
-2.25.1
+2.34.1
 
