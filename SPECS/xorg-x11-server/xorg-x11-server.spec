@@ -21,7 +21,7 @@
 Summary:        X.Org X11 X server
 Name:           xorg-x11-server
 Version:        1.20.10
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -386,6 +386,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_datadir}/aclocal/xorg-server.m4
 
 %changelog
+* Tue Dec 26 2023 Dallas Delaney <dadelan@microsoft.com> - 1.20.10-5
+- Add patches for CVE-2023-6377 and CVE-2023-6478
+
 * Fri Aug 11 2023 Sean Dougherty <sdougherty@microsoft.com> - 1.20.10-4
 - Add patch for CVE-2023-1594
 
