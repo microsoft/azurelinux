@@ -15,7 +15,7 @@ Vendor:       Microsoft Corporation
 URL:          https://github.com/microsoft/kata-containers
 Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/cc-%{version}.tar.gz#/kata-containers-cc-%{version}.tar.gz
 Source1:      https://github.com/microsoft/kata-containers/archive/refs/tags/kata-containers-cc-%{version}.tar.gz
-Source2:      %{name}-%{version}-cargo.tar.gz
+Source2:      kata-containers-cc-%{version}-cargo.tar.gz
 Source3:      mariner-coco-build-uvm.sh
 Patch0:       keep-uvm-rootfs-dependencies.patch
 
@@ -38,7 +38,7 @@ BuildRequires:  device-mapper-devel
 BuildRequires:  cmake
 BuildRequires:  fuse-devel
 BuildRequires:  kernel-kvm-snp-devel
-Requires:  kernel-kvm-snp
+BuildRequires:  kernel-kvm-snp
 Requires:  moby-containerd-cc
 Requires:  qemu-virtiofsd
 
@@ -60,8 +60,8 @@ Requires:       kernel-kvm-snp
 This package contains the UVM osbuilder files
 
 %prep
-%autosetup -p1 -n %{name}-%{version}
-pushd %{_builddir}/%{name}-%{version}
+%autosetup -p1 -n kata-containers-cc-%{version}
+pushd %{_builddir}/kata-containers-cc-%{version}
 tar -xf %{SOURCE2}
 popd
 
@@ -71,54 +71,44 @@ export GOPATH="$(pwd)/go"
 export OPENSSL_NO_VENDOR=1
 
 # kata shim/runtime
-pushd %{_builddir}/%{name}-%{version}/src/runtime
+pushd %{_builddir}/kata-containers-cc-%{version}/src/runtime
 %make_build %{runtime_make_vars}
 popd
 
 # agent
-pushd %{_builddir}/%{name}-%{version}/src/agent
+pushd %{_builddir}/kata-containers-cc-%{version}/src/agent
 %make_build %{agent_make_vars}
 popd
 
 # tardev snapshotter
-pushd %{_builddir}/%{name}-%{version}/src/tardev-snapshotter
+pushd %{_builddir}/kata-containers-cc-%{version}/src/tardev-snapshotter
 make
 chmod +x target/release/tardev-snapshotter
 popd
 
 # overlay
-pushd %{_builddir}/%{name}-%{version}/src/overlay
+pushd %{_builddir}/kata-containers-cc-%{version}/src/overlay
 cargo build --release
 popd
 
 # utarfs
-pushd %{_builddir}/%{name}-%{version}/src/utarfs
+pushd %{_builddir}/kata-containers-cc-%{version}/src/utarfs
 cargo build --release
 popd
 
-# Build the guest kernel from kata-containers/tools/packaging/kernel utility
-echo "Building guest kernel"
-export PATH="$PATH:$GOPATH/bin"
-pushd %{_builddir}/%{name}-%{version}/tools/packaging/kernel
-echo "CONFIG_MODULES=y" >> configs/fragments/x86_64/snp/snp.conf
-echo "CONFIG_MODULE_UNLOAD=y" >> configs/fragments/x86_64/snp/snp.conf
-sed -i '/CONFIG_CRYPTO_FIPS/d' configs/fragments/common/crypto.conf
-KATA_BUILD_CC=yes ./build-kernel.sh -a x86_64 -x snp setup
-KATA_BUILD_CC=yes ./build-kernel.sh -a x86_64 -x snp build
-sudo -E PATH="${PATH}" ./build-kernel.sh -x snp install
-pushd $(ls | grep kata-linux)
-GUESTKERNELDIR=$PWD
-GUESTKERNELVERSION=$(cat include/config/kernel.release)
-sudo -E PATH=$PATH make modules_install
-popd
+# kernel modules
+pushd /usr/src/linux-headers*
+header_dir=$(basename $PWD)
+KERNEL_VER=${header_dir#"linux-headers-"}
+KERNEL_MODULE_VER=${KERNEL_VER%%-*}
 popd
 
 # Build tarfs kernel modules
-pushd %{_builddir}/%{name}-%{version}/src/tarfs
-make KDIR=$GUESTKERNELDIR
-make KDIR=$GUESTKERNELDIR install
+pushd %{_builddir}/kata-containers-cc-%{version}/src/tarfs
+make KDIR=/usr/src/linux-headers-${KERNEL_VER}
+make KDIR=/usr/src/linux-headers-${KERNEL_VER} install
 popd
-%global KERNEL_MODULES_DIR %{_builddir}/%{name}-%{version}/src/tarfs/_install/lib/modules/${GUESTKERNELVERSION}
+%global KERNEL_MODULES_DIR %{_builddir}/kata-containers-cc-%{version}/src/tarfs/_install/lib/modules/${KERNEL_MODULE_VER}
 
 %install
 %define coco_path     /opt/confidential-containers
@@ -137,7 +127,7 @@ mkdir -p %{buildroot}%{osbuilder}/ci
 cp -aR %{KERNEL_MODULES_DIR} %{buildroot}%{osbuilder}
 
 # osbuilder
-pushd %{_builddir}/%{name}-%{version}
+pushd %{_builddir}/kata-containers-cc-%{version}
 rm tools/osbuilder/.gitignore
 rm tools/osbuilder/rootfs-builder/.gitignore
 
@@ -160,10 +150,12 @@ mkdir -p %{buildroot}/etc/systemd/system/containerd.service.d/
 
 ln -sf /usr/libexec/virtiofsd %{buildroot}/%{coco_path}/libexec/virtiofsd
 
+ln -sf /lib/modules/%{KERNEL_MODULE_VER}/vmlinuz %{buildroot}%{share_kata}/vmlinuz-snp.container
+
 find %{buildroot}/etc
 
 # agent
-pushd %{_builddir}/%{name}-%{version}/src/agent
+pushd %{_builddir}/kata-containers-cc-%{version}/src/agent
 mkdir -p %{buildroot}%{osbuilder}/src/agent/samples/policy
 cp -aR samples/policy/all-allowed         %{buildroot}%{osbuilder}/src/agent/samples/policy
 install -D -m 0755 kata-containers.target %{buildroot}%{osbuilder}/kata-containers.target
@@ -173,7 +165,7 @@ install -D -m 0755 target/x86_64-unknown-linux-gnu/release/kata-agent %{buildroo
 popd
 
 # runtime/shim
-pushd %{_builddir}/%{name}-%{version}/src/runtime
+pushd %{_builddir}/kata-containers-cc-%{version}/src/runtime
 install -D -m 0755 containerd-shim-kata-v2 %{buildroot}/usr/local/bin/containerd-shim-kata-cc-v2
 install -D -m 0755 kata-monitor %{buildroot}%{coco_bin}/kata-monitor
 install -D -m 0755 kata-runtime %{buildroot}%{coco_bin}/kata-runtime
@@ -197,28 +189,28 @@ sed -i 's/shared_fs = "virtio-fs"/shared_fs = "virtio-9p"/' %{buildroot}/%{defau
 sed -i 's/^virtio_fs_daemon =/# virtio_fs_daemon =/' %{buildroot}/%{defaults_kata}/configuration-clh-snp.toml
 sed -i 's/^#disable_image_nvdimm = /disable_image_nvdimm = /' %{buildroot}/%{defaults_kata}/configuration-clh-snp.toml
 sed -i 's/^#file_mem_backend = ""/file_mem_backend = ""/' %{buildroot}/%{defaults_kata}/configuration-clh-snp.toml
-sed -i 's/^#disable_nesting_checks = true/disable_nesting_checks = true/'%{buildroot}/%{defaults_kata}/configuration-clh-snp.toml
+sed -i 's/^#disable_nesting_checks = true/disable_nesting_checks = true/' %{buildroot}/%{defaults_kata}/configuration-clh-snp.toml
 popd
 
 # tardev-snapshotter
-pushd %{_builddir}/%{name}-%{version}/src/tardev-snapshotter/
+pushd %{_builddir}/kata-containers-cc-%{version}/src/tardev-snapshotter/
 sed -i -e 's/containerd.service/kubelet.service/g' tardev-snapshotter.service
 install -m 0644 -D -t %{buildroot}%{_unitdir} tardev-snapshotter.service
 install -D -m 0755 target/release/tardev-snapshotter  %{buildroot}/usr/bin/tardev-snapshotter
 popd
 
 # overlay
-pushd %{_builddir}/%{name}-%{version}/src/overlay/
+pushd %{_builddir}/kata-containers-cc-%{version}/src/overlay/
 install -D -m 0755 target/release/kata-overlay  %{buildroot}/usr/bin/kata-overlay
 popd
 
 # utarfs
-pushd %{_builddir}/%{name}-%{version}/src/utarfs/
+pushd %{_builddir}/kata-containers-cc-%{version}/src/utarfs/
 install -D -m 0755 target/release/utarfs  %{buildroot}/usr/sbin/mount.tar
 popd
 
-install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder/image_builder.sh   %{buildroot}%{osbuilder}/tools/osbuilder/image-builder/image_builder.sh
-install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder/nsdax.gpl.c        %{buildroot}%{osbuilder}/tools/osbuilder/image-builder/nsdax.gpl.c
+install -D -m 0755 %{_builddir}/kata-containers-cc-%{version}/tools/osbuilder/image-builder/image_builder.sh   %{buildroot}%{osbuilder}/tools/osbuilder/image-builder/image_builder.sh
+install -D -m 0755 %{_builddir}/kata-containers-cc-%{version}/tools/osbuilder/image-builder/nsdax.gpl.c        %{buildroot}%{osbuilder}/tools/osbuilder/image-builder/nsdax.gpl.c
 
 %preun
 %systemd_preun tardev-snapshotter.service
@@ -230,7 +222,7 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %systemd_post tardev-snapshotter.service
 
 %files
-%{share_kata}/vmlinux.container
+%{share_kata}/vmlinuz-snp.container
 %{coco_bin}/kata-collect-data.sh
 %{coco_bin}/kata-monitor
 %{coco_bin}/kata-runtime
