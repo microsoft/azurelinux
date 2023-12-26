@@ -4,7 +4,7 @@
 %define _binary_payload w9.gzdio
 Summary:        The Apache Kafka C library
 Name:           librdkafka
-Version:        2.2.0
+Version:        2.3.0
 Release:        1%{?dist}
 # files like src/crc32c.c are under zlib license
 # files like win32/wingetopt.c are under ISC
@@ -97,8 +97,8 @@ DESTDIR=%{buildroot} make install
 %{_libdir}/pkgconfig/rdkafka++-static.pc
 
 %changelog
-* Thu Dec 21 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 2.2.0-1
-- Update to v2.2.0
+* Thu Dec 21 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 2.3.0-1
+- Update to v2.3.0
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.8.2-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
