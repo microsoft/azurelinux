@@ -54,6 +54,8 @@ Patch6:         0001-Fedora-hack-Make-the-suid-root-wrapper-always-start-.patch
 
 # Backports from "master" upstream:
 Patch7: CVE-2023-1594.patch
+Patch8: CVE-2023-6377.patch
+Patch9: CVE-2023-6478.patch
 
 # Backported Xwayland randr resolution change emulation support
 Patch501:       0001-dix-Add-GetCurrentClient-helper.patch
