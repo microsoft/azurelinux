@@ -1,6 +1,6 @@
 Summary:        Trusted pre-kernel module and tools.
 Name:           tboot
-Version:        1.10.2
+Version:        1.11.2
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -58,6 +58,9 @@ install -m 755 %{SOURCE2} %{buildroot}%{_docdir}/README.md
 
 
 %changelog
+* Wed Dec 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.11.2-1
+- Auto-upgrade to 1.11.2 - none
+
 * Fri Feb 25 2022 Henry Li <lihl@microsoft.com> 1.10.2-1
 - Upgrade to version 1.10.2
 - Add mandatory grub configuration files/tooling that are missing
