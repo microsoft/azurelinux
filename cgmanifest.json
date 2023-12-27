@@ -16254,8 +16254,8 @@
         "type": "other",
         "other": {
           "name": "perl-Clone",
-          "version": "0.43",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Clone/Clone-0.43.tar.gz"
+          "version": "0.46",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/G/GA/GARU/Clone-0.46.tar.gz"
         }
       }
     },
@@ -16466,6 +16466,16 @@
           "name": "perl-Coro-Multicore",
           "version": "1.07",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/Coro-Multicore-1.07.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "perl-B-COW",
+          "version": "0.007",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/A/AT/ATOOMIC/B-COW-0.007.tar.gz"
         }
       }
     },

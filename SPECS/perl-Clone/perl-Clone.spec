@@ -1,12 +1,12 @@
 Name:           perl-Clone
-Version:        0.43
-Release:        3%{?dist}
+Version:        0.46
+Release:        1%{?dist}
 Summary:        Recursively copy perl data types
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            https://metacpan.org/release/Clone
-Source0:        https://cpan.metacpan.org/modules/by-module/Clone/Clone-%{version}.tar.gz#/perl-Clone-%{version}.tar.gz
+URL:            https://metacpan.org/dist/Clone
+Source0:        https://cpan.metacpan.org/authors/id/G/GA/GARU/Clone-%{version}.tar.gz#/perl-Clone-%{version}.tar.gz
 # Build
 BuildRequires:  coreutils
 BuildRequires:  findutils
@@ -16,24 +16,19 @@ BuildRequires:  perl-devel
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 BuildRequires:  perl(ExtUtils::MakeMaker)
+BuildRequires:  perl(warnings)
 # Run-time:
 BuildRequires:  perl(AutoLoader)
-BuildRequires:  perl(DynaLoader)
 BuildRequires:  perl(Exporter)
 BuildRequires:  perl(strict)
-BuildRequires:  perl(vars)
+BuildRequires:  perl(XSLoader)
 # Tests:
-BuildRequires:  perl(Test::More)
-BuildRequires:  perl(utf8)
-BuildRequires:  perl(warnings)
-# Optional tests:
 BuildRequires:  perl(B)
-BuildRequires:  perl(Data::Dumper)
-BuildRequires:  perl(Devel::Peek)
-BuildRequires:  perl(Hash::Util::FieldHash)
-BuildRequires:  perl(Scalar::Util)
-BuildRequires:  perl(Storable)
-BuildRequires:  perl(Taint::Runtime)
+BuildRequires:  perl(B::COW) >= 0.004
+BuildRequires:  perl(Test::More) >= 0.88
+BuildRequires:  perl(utf8)
+BuildRequires:  perl(vars)
+
 # Dependencies
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
@@ -71,6 +66,9 @@ make test
 %{_mandir}/man3/Clone.3*
 
 %changelog
+* Wed Dec 27 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 0.46-1
+- Azure Linux 3.0 - upgrade to 0.46
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.43-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
