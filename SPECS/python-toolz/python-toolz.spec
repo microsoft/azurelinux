@@ -33,7 +33,7 @@ License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/pytoolz/toolz/
-Source0:        https://files.pythonhosted.org/packages/d6/0d/fdad31347bf3d058002993a094da1ca95f0f3ef9beec08856d0fe4ad9766/%{srcname}-%{version}.tar.gz
+Source0:	https://github.com/pytoolz/toolz/archive/refs/tags/%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
