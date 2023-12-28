@@ -8,7 +8,7 @@ License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/pytoolz/cytoolz/
-Source0:        https://files.pythonhosted.org/packages/source/c/cytoolz/cytoolz-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/source/c/cytoolz/%{srcname}-%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
 BuildRequires:  gcc
 
 %description
