@@ -167,9 +167,7 @@ make test
 %license LICENSE
 %doc Changes examples README.SSL
 %{_bindir}/*
-%{perl_vendorlib}/libwww/
-%{perl_vendorlib}/LWP.pm
-%{perl_vendorlib}/LWP/
+%{perl_vendorlib}/*
 %{_mandir}/man1/*.1*
 %{_mandir}/man3/*.3*
 
