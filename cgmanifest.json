@@ -11251,8 +11251,8 @@
         "type": "other",
         "other": {
           "name": "libunistring",
-          "version": "0.9.10",
-          "downloadUrl": "http://ftp.gnu.org/gnu/libunistring/libunistring-0.9.10.tar.xz"
+          "version": "1.1",
+          "downloadUrl": "http://ftp.gnu.org/gnu/libunistring/libunistring-1.1.tar.xz"
         }
       }
     },
@@ -22084,8 +22084,8 @@
         "type": "other",
         "other": {
           "name": "python-cytoolz",
-          "version": "0.11.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/c/cytoolz/cytoolz-0.11.0.tar.gz"
+          "version": "0.12.2",
+          "downloadUrl": "https://github.com/pytoolz/cytoolz/archive/refs/tags/0.12.2.tar.gz"
         }
       }
     },
@@ -24504,8 +24504,8 @@
         "type": "other",
         "other": {
           "name": "python-toolz",
-          "version": "0.11.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/d6/0d/fdad31347bf3d058002993a094da1ca95f0f3ef9beec08856d0fe4ad9766/toolz-0.11.1.tar.gz"
+          "version": "0.12.0",
+          "downloadUrl": "https://github.com/pytoolz/toolz/archive/refs/tags/0.12.0.tar.gz"
         }
       }
     },
