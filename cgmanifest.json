@@ -22084,8 +22084,8 @@
         "type": "other",
         "other": {
           "name": "python-cytoolz",
-          "version": "0.11.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/c/cytoolz/cytoolz-0.11.0.tar.gz"
+          "version": "0.12.2",
+          "downloadUrl": "https://github.com/pytoolz/cytoolz/archive/refs/tags/0.12.2.tar.gz"
         }
       }
     },
