@@ -11051,8 +11051,8 @@
         "type": "other",
         "other": {
           "name": "libssh",
-          "version": "0.10.5",
-          "downloadUrl": "https://www.libssh.org/files/0.10/libssh-0.10.5.tar.xz"
+          "version": "0.10.6",
+          "downloadUrl": "https://www.libssh.org/files/0.10/libssh-0.10.6.tar.xz"
         }
       }
     },
