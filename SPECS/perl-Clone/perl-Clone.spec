@@ -68,6 +68,7 @@ make test
 %changelog
 * Wed Dec 27 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 0.46-1
 - Azure Linux 3.0 - upgrade to 0.46
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.43-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
