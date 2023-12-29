@@ -17,7 +17,7 @@ Source0:        https://cpan.metacpan.org/authors/id/S/SH/SHLOMIF/XML-LibXML-%{v
 # posted to the upstream.
 Patch0:         XML-LibXML-2.0202-Parse-an-ampersand-entity-in-SAX-interface.patch
 # To reduce dependencies replace Alien::Libxml2 with pkg-config
-Patch1:         XML-LibXML-2.0206-Use-pkgconfig-instead-of-Alien-Libxml2.patch
+Patch1:         XML-LibXML-2.0208-Use-pkgconfig-instead-of-Alien-Libxml2.patch
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  glibc-common
