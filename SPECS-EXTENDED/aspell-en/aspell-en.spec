@@ -1,21 +1,20 @@
+Summary:        English dictionaries for Aspell
+Name:           aspell-%{lang}
+Version:        2019.10.06
+Release:        5%{?dist}
+License:        MIT AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
+URL:            http://aspell.net/
+Source:         https://ftp.gnu.org/gnu/aspell/dict/%{lang}/aspell%{aspellversion}-%{lang}-%{version}-%{langrelease}.tar.bz2
 %define lang en
 %define langrelease 0
 %define aspellversion 6
-Summary: English dictionaries for Aspell
-Name: aspell-%{lang}
-Version: 2019.10.06
-Release: 4%{?dist}
-License: MIT and BSD
-URL: http://aspell.net/
-Source: ftp://ftp.gnu.org/gnu/aspell/dict/%{lang}/aspell%{aspellversion}-%{lang}-%{version}-%{langrelease}.tar.bz2
-Buildrequires: aspell >= 0.60
-Requires: aspell >= 0.60
-Obsoletes: aspell-en-gb <= 0.33.7.1
-Obsoletes: aspell-en-ca <= 0.33.7.1
-
 %define debug_package %{nil}
+BuildRequires:  aspell >= 0.60
+Requires:       aspell >= 0.60
+Obsoletes:      aspell-en-gb <= 0.33.7.1
+Obsoletes:      aspell-en-ca <= 0.33.7.1
 
 %description
 Provides the word list/dictionaries for the following: English, Canadian
@@ -29,14 +28,16 @@ English, British English
 make
 
 %install
-rm -rf $RPM_BUILD_ROOT
-make install DESTDIR=$RPM_BUILD_ROOT
+make install DESTDIR=%{buildroot}
 
 %files
 %doc Copyright
 %{_libdir}/aspell-0.60/*
 
 %changelog
+* Mon Jun 13 2022 Jamie Magee <jamagee@microsoft.com> - 2019.10.06-5
+- Switch from FTP to HTTPS source
+
 * Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 2019.10.06-4
 - Remove epoch
 
