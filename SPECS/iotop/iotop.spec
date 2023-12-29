@@ -1,7 +1,7 @@
 Summary:        Iotop is a Python program with a top like UI used to show the processes and their corresponding IO activity.
 Name:           iotop
-Version:        0.6
-Release:        10%{?dist}
+Version:        1.23
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -44,6 +44,9 @@ Iotop is a Python program with a top like UI used to show the processes and thei
 %{_mandir}/man8/%{name}*
 
 %changelog
+* Fri Dec 29 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.23-1
+- Auto-upgrade to 1.23 - none
+
 * Wed May 25 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 0.6-10
 - Add dependency on python3-curses
 
