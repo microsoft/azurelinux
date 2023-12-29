@@ -15784,8 +15784,8 @@
         "type": "other",
         "other": {
           "name": "perl",
-          "version": "5.34.1",
-          "downloadUrl": "https://www.cpan.org/src/5.0/perl-5.34.1.tar.xz"
+          "version": "5.38.2",
+          "downloadUrl": "https://www.cpan.org/src/5.0/perl-5.38.2.tar.xz"
         }
       }
     },
