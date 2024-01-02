@@ -55,6 +55,7 @@ INITRD_CACHE_SUMMARY                 ?=
 PACKAGE_ARCHIVE                      ?=
 PACKAGE_BUILD_RETRIES                ?= 1
 CHECK_BUILD_RETRIES                  ?= 1
+EXTRA_BUILD_LAYERS                   ?= 0
 REFRESH_WORKER_CHROOT                ?= y
 # Set to 0 to use the number of logical CPUs.
 CONCURRENT_PACKAGE_BUILDS            ?= 0
@@ -132,20 +133,47 @@ PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR
 REPO_LIST          ?=
 SRPM_URL_LIST      ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms
 
-# Preview URLs/repos will be appended (via override) even if the user sets custom values for the lists.
-ifeq ($(USE_PREVIEW_REPO),y)
-   override PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/$(build_arch)
-   override PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/debuginfo/$(build_arch)
-   override PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/Microsoft/$(build_arch)
-   override SRPM_URL_LIST      += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/srpms
-   ifneq ($(wildcard $(PREVIEW_REPO)),)
-      override REPO_LIST += $(PREVIEW_REPO)
+######## COMMON MAKEFILE UTILITIES ########
+
+# Misc function defines
+# Variable prerequisite tracking
+include $(SCRIPTS_DIR)/utils.mk
+
+######## REMAINING BUILD FLAGS ########
+
+ifneq ($(DAILY_BUILD_ID),)
+   $(warning Using Daily Build $(DAILY_BUILD_ID))
+   # Ensure build_arch is set
+   ifeq ($(build_arch),)
+      $(error build_arch must be set when using DAILY_BUILD_ID)
+   endif
+   # build_arch cannot be directly used because Azure storage do not support container names with '_' char
+   ifeq ($(build_arch),x86_64)
+      # The actual repo is found at <URL>/, while a duplicate copy of all the rpms can be found at <URL>/built_rpms_all/
+      # Include both so that the tools that expect a valid repo work, while the tools that expect a basic URL also work.
+      override PACKAGE_URL_LIST   := https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-amd64/built_rpms_all \
+                                       https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-amd64
+      override SRPM_URL_LIST      := https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-amd64/SRPMS
    else
-      $(warning )
-      $(warning ######################### WARNING #########################)
-      $(warning 'USE_PREVIEW_REPO=y' set but '$(PREVIEW_REPO)' is missing. Regenerate toolkit's 'repos' directory. Remove 'USE_PREVIEW_REPO' for core builds.)
-      $(warning ######################### WARNING #########################)
-      $(warning )
+      override PACKAGE_URL_LIST   := https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-arm64/built_rpms_all \
+                                       https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-arm64
+      override SRPM_URL_LIST      := https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-arm64/SRPMS
+   endif
+else
+   ifeq ($(USE_PREVIEW_REPO),y)
+      override PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/$(build_arch)
+      override PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/debuginfo/$(build_arch)
+      override PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/Microsoft/$(build_arch)
+      override SRPM_URL_LIST      += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/srpms
+      ifneq ($(wildcard $(PREVIEW_REPO)),)
+         override REPO_LIST += $(PREVIEW_REPO)
+      else
+         $(warning )
+         $(warning ######################### WARNING #########################)
+         $(warning 'USE_PREVIEW_REPO=y' set but '$(PREVIEW_REPO)' is missing. Regenerate toolkit's 'repos' directory. Remove 'USE_PREVIEW_REPO' for core builds.)
+         $(warning ######################### WARNING #########################)
+         $(warning )
+      endif
    endif
 endif
 
@@ -170,10 +198,6 @@ all: toolchain go-tools chroot-tools
 # General help information used by 'help' target; this should be included first so
 # its help will be displayed at the top of the help output.
 include $(SCRIPTS_DIR)/help.mk
-
-# Misc function defines
-# Variable prerequisite tracking
-include $(SCRIPTS_DIR)/utils.mk
 
 # Set up for the timestamp feature
 include $(SCRIPTS_DIR)/timestamp.mk

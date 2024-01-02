@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "crash-8.0.1.tar.gz": "233208b1433a49e1d5a063fa88e6fc9772b99fbb7b30ae79a2115d1b8f0dfc52",
-  "gdb-10.2.tar.gz": "b33ad58d687487a821ec8d878daab0f716be60d0936f2e3ac5cf08419ce70350"
- }
+  "Signatures": {
+    "gdb-10.2.tar.gz": "b33ad58d687487a821ec8d878daab0f716be60d0936f2e3ac5cf08419ce70350",
+    "crash-8.0.4.tar.gz": "94df600c183301013787cd47112044e358fb37bb8e2b5544f40377dda98ee78f"
+  }
 }

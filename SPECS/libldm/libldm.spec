@@ -1,7 +1,7 @@
 Summary:        A tool to manage Windows dynamic disks
 Name:           libldm
-Version:        0.2.4
-Release:        9%{?dist}
+Version:        0.2.5
+Release:        1%{?dist}
 License:        LGPLv3+ AND GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -65,6 +65,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/ldm-1.0.pc
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.2.5-1
+- Auto-upgrade to 0.2.5 - Azure Linux 3.0 - package upgrades
+
 * Fri Apr 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.2.4-9
 - Cleaning-up spec. License verified.
 

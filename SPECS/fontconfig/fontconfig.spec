@@ -1,6 +1,6 @@
 Summary:        library for configuring and customizing font access.
 Name:           fontconfig
-Version:        2.13.95
+Version:        2.14.2
 Release:        1%{?dist}
 License:        MIT or Unicode or Public Domain
 URL:            https://www.freedesktop.org/wiki/Software/fontconfig/
@@ -67,6 +67,9 @@ make -k check
 %{_mandir}/man3/*
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.14.2-1
+- Auto-upgrade to 2.14.2 - Azure Linux 3.0 - package upgrades
+
 * Wed Feb 02 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.13.95-1
 - Update to 2.13.91
 - License verified

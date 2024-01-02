@@ -1,41 +1,42 @@
 %define BaseVersion 3.0
+%define majmin %(echo %{version} | cut -d. -f1-2)
+
 Summary:        libsoup HTTP client/server library
 Name:           libsoup
-Version:        %{BaseVersion}.4
+Version:        3.4.4
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Development
 URL:            https://wiki.gnome.org/LibSoup
-Source0:        https://ftp.gnome.org/pub/GNOME/sources/libsoup/%{BaseVersion}/%{name}-%{version}.tar.xz
-BuildRequires:  meson
+Source0:        https://ftp.gnome.org/pub/GNOME/sources/libsoup/%{majmin}/%{name}-%{version}.tar.xz
 BuildRequires:  autogen
+BuildRequires:  brotli-devel
+BuildRequires:  cmake
 BuildRequires:  glib-devel
 BuildRequires:  glib-networking
+BuildRequires:  gnutls-devel
 BuildRequires:  gobject-introspection-devel
 BuildRequires:  httpd
 BuildRequires:  icu-devel
 BuildRequires:  intltool
 BuildRequires:  krb5-devel
+BuildRequires:  libnghttp2-devel
 BuildRequires:  libpsl-devel
 BuildRequires:  libxml2-devel
+BuildRequires:  meson
+BuildRequires:  perl(File::Find)
+BuildRequires:  perl(FindBin)
+BuildRequires:  perl-generators
+BuildRequires:  perl-interpreter
 BuildRequires:  python3
 BuildRequires:  python3-devel
 BuildRequires:  python3-libs
+BuildRequires:  python3-pygments
 BuildRequires:  python3-tools
 BuildRequires:  sqlite-devel
-BuildRequires:  cmake
-BuildRequires:  libnghttp2-devel
-BuildRequires:  brotli-devel
-BuildRequires:  gnutls-devel
 BuildRequires:  vala
-BuildRequires:  gtk-doc
-BuildRequires:  python3-pygments
-BuildRequires:  perl-generators
-BuildRequires:  perl-interpreter
-BuildRequires:  perl(FindBin)
-BuildRequires:  perl(File::Find)
 Requires:       glib-networking
 Requires:       libpsl
 Requires:       libxml2
@@ -52,14 +53,6 @@ Requires:       libxml2-devel
 %description     devel
 Header files for libsoup.
 
-%package         doc
-Summary:        gtk-doc files for libsoup
-Group:          System Environment/Development
-Requires:       %{name} = %{version}-%{release}
-
-%description     doc
-gtk-doc files for libsoup.
-
 %package         lang
 Summary:        Additional language files for libsoup
 Group:          System Environment/Development
@@ -73,11 +66,11 @@ These are the additional language files of libsoup.
 
 %build
 %meson \
-    -Dgtk_doc=true \
     -Dsysprof=disabled \
     -Dautobahn=disabled \
-    -Dhttp2_tests=disabled \
     -Dntlm=disabled \
+    -Ddoc_tests=false \
+    -Ddocs=disabled \
     -Dtests=false
 %meson_build
 
@@ -103,7 +96,6 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %defattr(-,root,root)
 %{_includedir}/*
 %{_libdir}/*.so
-%exclude %{_libdir}/*.a
 %{_libdir}/pkgconfig/*
 %{_datadir}/gir-1.0/*
 %dir %{_datadir}/vala
@@ -111,20 +103,20 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_datadir}/vala/vapi/%{name}-%{BaseVersion}.deps
 %{_datadir}/vala/vapi/%{name}-%{BaseVersion}.vapi
 
-%files doc
-%defattr(-,root,root)
-%{_datadir}/gtk-doc/html/*
-
 %files lang -f %{name}-%{BaseVersion}.lang
 %defattr(-,root,root)
 
 %changelog
+* Wed Dec 13 2023 Andrew Phelps <anphel@microsoft.com> - 3.4.4-1
+- Upgrade to version 3.4.4
+- Remove doc subpackage
+
 * Mon Jan 24 2022 Henry Li <lihl@microsoft.com> - 3.0.4-1
 - Upgrade to version 3.0.4
-- Add cmake, libnghttp2-devel, brotli-devel, gnutls-devel, 
+- Add cmake, libnghttp2-devel, brotli-devel, gnutls-devel,
   gtk-doc, vala and python3-pygments as BR
 - Use meson to build and install
-- Add additional files to libsoup-devel 
+- Add additional files to libsoup-devel
 - License Verified
 
 * Wed Jan 19 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.64.0-8

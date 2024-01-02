@@ -26,8 +26,8 @@ const (
 // Regular expression to extract package name, version, distribution, and architecture from values returned by 'rpmspec --builtrpms'.
 // Examples:
 //
-//	kernel-5.15.63.1-1.cm2.x86_64		->	Name: kernel, Version: 5.15.63.1-1, Distribution: cm2, Architecture: x86_64
-//	python3-perf-5.15.63.1-1.cm2.x86_64	->	Name: python3-perf, Version: 5.15.63.1-1, Distribution: cm2, Architecture: x86_64
+//	kernel-5.15.63.1-1.azl3.x86_64		->	Name: kernel, Version: 5.15.63.1-1, Distribution: azl3, Architecture: x86_64
+//	python3-perf-5.15.63.1-1.azl3.x86_64	->	Name: python3-perf, Version: 5.15.63.1-1, Distribution: azl3, Architecture: x86_64
 //
 // NOTE: regular expression based on following assumptions:
 //   - Package version and release values are not allowed to contain a hyphen character.
@@ -152,8 +152,6 @@ func (s *SnapshotGenerator) generateSnapshotInChroot(distTag string) (err error)
 }
 
 func (s *SnapshotGenerator) readBuiltRPMs(specPaths []string, defines map[string]string) (allBuiltRPMs []string, err error) {
-	var builtRPMs []string
-
 	buildArch, err := rpm.GetRpmArch(runtime.GOARCH)
 	if err != nil {
 		return
@@ -171,14 +169,14 @@ func (s *SnapshotGenerator) readBuiltRPMs(specPaths []string, defines map[string
 		specDirPath := filepath.Dir(specPath)
 
 		go func(pathIter string) {
-			builtRPMs, err = rpm.QuerySPECForBuiltRPMs(pathIter, specDirPath, buildArch, defines)
-			if err != nil {
-				err = fmt.Errorf("failed to query built RPMs from (%s):\n%w", pathIter, err)
+			builtRPMs, queryErr := rpm.QuerySPECForBuiltRPMs(pathIter, specDirPath, buildArch, defines)
+			if queryErr != nil {
+				queryErr = fmt.Errorf("failed to query built RPMs from (%s):\n%w", pathIter, queryErr)
 			}
 
 			resultsChannel <- SnapshotResult{
 				rpms: builtRPMs,
-				err:  err,
+				err:  queryErr,
 			}
 		}(specPath)
 	}

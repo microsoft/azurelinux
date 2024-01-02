@@ -1,6 +1,6 @@
 Summary:        user space RCU (read-copy-update)
 Name:           userspace-rcu
-Version:        0.13.0
+Version:        0.14.0
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
@@ -56,6 +56,9 @@ make %{?_smp_mflags} check
 %{_includedir}/*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.14.0-1
+- Auto-upgrade to 0.14.0 - Azure Linux 3.0 - package upgrades
+
 * Wed Jan 12 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.13.0-1
 - Update to version 0.13.0.
 

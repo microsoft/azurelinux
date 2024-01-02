@@ -1,6 +1,6 @@
 Summary:        A light-weight C++ XML processing library
 Name:           pugixml
-Version:        1.11.4
+Version:        1.13
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -61,6 +61,9 @@ make check -C build
 %{_libdir}/pkgconfig/pugixml.pc
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.13-1
+- Auto-upgrade to 1.13 - Azure Linux 3.0 - package upgrades
+
 * Thu Feb 03 2022 Minghe Ren <mingheren@microsoft.com> - 1.11.4-1
 - Update to Version 1.11.4
 

@@ -17,18 +17,18 @@
 # https://bugzilla.redhat.com/show_bug.cgi?id=1780584
 
 # enable rdma as we will only build for ARM64 and AMD64
-%bcond_without rdma 
+%bcond_without rdma
 
 # enable java openmpi subpackage by default
-%bcond_without java 
+%bcond_without java
 
 # Private openmpi libraries
 %global __provides_exclude_from %{_libdir}/openmpi/lib/(lib(mca|ompi|open-(pal|rte|trace))|openmpi/).*.so
 %global __requires_exclude lib(mca|ompi|open-(pal|rte|trace)|vt).*
 Summary:        Open Message Passing Interface
 Name:           openmpi%{?_cc_name_suffix}
-Version:        4.1.4
-Release:        11%{?dist}
+Version:        4.1.5
+Release:        2%{?dist}
 License:        BSD AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -229,6 +229,7 @@ make check
 %{_libdir}/%{name}/bin/oshrun
 %{_libdir}/%{name}/bin/shmemrun
 %endif
+%{_libdir}/libOpenIPMIglib.so*
 %{_libdir}/%{name}/lib/*.so.40*
 %{_libdir}/%{name}/lib/libmca_common_ofi.so.10*
 %{_libdir}/%{name}/lib/libmca*.so.41*
@@ -303,6 +304,12 @@ make check
 %{python3_sitearch}/openmpi.pth
 
 %changelog
+* Thu Dec 07 2023 Andrew Phelps <anphel@microsoft.com> - 4.1.5-2
+- Update file list
+
+* Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.1.5-1
+- Auto-upgrade to 4.1.5 - Azure Linux 3.0 - package upgrades
+
 * Tue Sep 26 2023 Sumedh Sharma <sumsharma@microsoft.com> - 4.1.4-11
 - Bump version to recompile with pmix update for CVE-2023-41915
 

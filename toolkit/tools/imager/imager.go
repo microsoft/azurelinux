@@ -62,8 +62,6 @@ const (
 	// kickstartPartitionFile is the file that includes the partitioning schema used by
 	// kickstart installation
 	kickstartPartitionFile = "/tmp/part-include"
-
-	assetsMountPoint = "/installer"
 )
 
 func main() {
@@ -240,7 +238,6 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 		timestamp.StartEvent("create offline install env", nil)
 		// Create setup chroot
 		additionalExtraMountPoints := []*safechroot.MountPoint{
-			safechroot.NewMountPoint(*assets, assetsMountPoint, "", safechroot.BindMountPointFlags, ""),
 			safechroot.NewMountPoint(*localRepo, localRepoMountPoint, "", safechroot.BindMountPointFlags, ""),
 			safechroot.NewMountPoint(filepath.Dir(*repoFile), repoFileMountPoint, "", safechroot.BindMountPointFlags, ""),
 		}
@@ -556,9 +553,6 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 		setupChrootPackages = append(setupChrootPackages, toolingPackage.Name)
 	}
 
-	logger.Log.Infof("HidepidDisabled is %v.", systemConfig.HidepidDisabled)
-	hidepidEnabled := !systemConfig.HidepidDisabled
-
 	if systemConfig.ReadOnlyVerityRoot.Enable {
 		// We will need the veritysetup package (and its dependencies) to manage the verity disk, add them to our
 		// image setup environment (setuproot chroot or live installer).
@@ -600,7 +594,7 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 	timestamp.StopEvent(nil) // install chroot packages
 
 	// Populate image contents
-	err = installutils.PopulateInstallRoot(installChroot, packagesToInstall, systemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, isRootFS, encryptedRoot, diffDiskBuild, hidepidEnabled)
+	err = installutils.PopulateInstallRoot(installChroot, packagesToInstall, systemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, isRootFS, encryptedRoot, diffDiskBuild)
 	if err != nil {
 		err = fmt.Errorf("failed to populate image contents: %s", err)
 		return
@@ -608,130 +602,50 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 
 	// Only configure the bootloader or read only partitions for actual disks, a rootfs does not need these
 	if !isRootFS {
-		err = configureDiskBootloader(systemConfig, installChroot, diskDevPath, installMap, encryptedRoot, readOnlyRoot)
+		err = installutils.ConfigureDiskBootloader(systemConfig.BootType, systemConfig.Encryption.Enable,
+			systemConfig.ReadOnlyVerityRoot.Enable, systemConfig.PartitionSettings, systemConfig.KernelCommandLine,
+			installChroot, diskDevPath, installMap, encryptedRoot, readOnlyRoot, systemConfig.EnableGrubMkconfig)
 		if err != nil {
 			err = fmt.Errorf("failed to configure boot loader: %w", err)
 			return
 		}
+	}
 
-		// Preconfigure SELinux labels now since all the changes to the filesystem should be done
-		if systemConfig.KernelCommandLine.SELinux != configuration.SELinuxOff {
-			err = installutils.SELinuxConfigure(systemConfig, installChroot, mountPointToFsTypeMap)
-			if err != nil {
-				err = fmt.Errorf("failed to configure selinux: %w", err)
-				return
-			}
+	// Preconfigure SELinux labels now since all the changes to the filesystem should be done
+	if systemConfig.KernelCommandLine.SELinux != configuration.SELinuxOff {
+		err = installutils.SELinuxConfigure(systemConfig, installChroot, mountPointToFsTypeMap, isRootFS)
+		if err != nil {
+			err = fmt.Errorf("failed to configure selinux: %w", err)
+			return
 		}
+	}
 
-		// Snapshot the root filesystem as a read-only verity disk and update the initramfs.
-		if systemConfig.ReadOnlyVerityRoot.Enable {
-			timestamp.StartEvent("configure DM Verity", nil)
-			var initramfsPathList []string
-			err = readOnlyRoot.SwitchDeviceToReadOnly(mountPointMap["/"], mountPointToMountArgsMap["/"])
-			if err != nil {
-				err = fmt.Errorf("failed to switch root to read-only: %w", err)
-				return
-			}
-			installutils.ReportAction("Hashing root for read-only with dm-verity, this may take a long time if error correction is enabled")
-			initramfsPathList, err = filepath.Glob(filepath.Join(installRoot, "/boot/initrd.img*"))
-			if err != nil || len(initramfsPathList) != 1 {
-				return fmt.Errorf("could not find single initramfs (%v): %w", initramfsPathList, err)
-			}
-			err = readOnlyRoot.AddRootVerityFilesToInitramfs(verityWorkingDir, initramfsPathList[0])
-			if err != nil {
-				err = fmt.Errorf("failed to include read-only root files in initramfs: %w", err)
-				return
-			}
-			timestamp.StopEvent(nil) // configure DM Verity
+	// Snapshot the root filesystem as a read-only verity disk and update the initramfs.
+	if !isRootFS && systemConfig.ReadOnlyVerityRoot.Enable {
+		timestamp.StartEvent("configure DM Verity", nil)
+		var initramfsPathList []string
+		err = readOnlyRoot.SwitchDeviceToReadOnly(mountPointMap["/"], mountPointToMountArgsMap["/"])
+		if err != nil {
+			err = fmt.Errorf("failed to switch root to read-only: %w", err)
+			return
 		}
+		installutils.ReportAction("Hashing root for read-only with dm-verity, this may take a long time if error correction is enabled")
+		initramfsPathList, err = filepath.Glob(filepath.Join(installRoot, "/boot/initrd.img*"))
+		if err != nil || len(initramfsPathList) != 1 {
+			return fmt.Errorf("could not find single initramfs (%v): %w", initramfsPathList, err)
+		}
+		err = readOnlyRoot.AddRootVerityFilesToInitramfs(verityWorkingDir, initramfsPathList[0])
+		if err != nil {
+			err = fmt.Errorf("failed to include read-only root files in initramfs: %w", err)
+			return
+		}
+		timestamp.StopEvent(nil) // configure DM Verity
 	}
 
 	// Run finalize image scripts from within the installroot chroot
 	err = installutils.RunFinalizeImageScripts(installChroot, systemConfig)
 	if err != nil {
 		err = fmt.Errorf("failed to run finalize image script: %s", err)
-		return
-	}
-
-	return
-}
-
-func configureDiskBootloader(systemConfig configuration.SystemConfig, installChroot *safechroot.Chroot, diskDevPath string, installMap map[string]string, encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice) (err error) {
-	timestamp.StartEvent("configuring bootloader", nil)
-	timestamp.StopEvent(nil)
-
-	const rootMountPoint = "/"
-	const bootMountPoint = "/boot"
-
-	var rootDevice string
-
-	// Add bootloader. Prefer a separate boot partition if one exists.
-	bootDevice, isBootPartitionSeparate := installMap[bootMountPoint]
-	bootPrefix := ""
-	if !isBootPartitionSeparate {
-		bootDevice = installMap[rootMountPoint]
-		// If we do not have a separate boot partition we will need to add a prefix to all paths used in the configs.
-		bootPrefix = "/boot"
-	}
-
-	if installMap[rootMountPoint] == installutils.NullDevice {
-		// In case of overlay device being mounted at root, no need to change the bootloader.
-		return
-	}
-
-	// Grub only accepts UUID, not PARTUUID or PARTLABEL
-	bootUUID, err := installutils.GetUUID(bootDevice)
-	if err != nil {
-		err = fmt.Errorf("failed to get UUID: %s", err)
-		return
-	}
-
-	bootType := systemConfig.BootType
-	err = installutils.InstallBootloader(installChroot, systemConfig.Encryption.Enable, bootType, bootUUID, bootPrefix, diskDevPath, assetsMountPoint)
-	if err != nil {
-		err = fmt.Errorf("failed to install bootloader: %s", err)
-		return
-	}
-
-	// Add grub config to image
-	rootPartitionSetting := systemConfig.GetRootPartitionSetting()
-	if rootPartitionSetting == nil {
-		err = fmt.Errorf("failed to find partition setting for root mountpoint")
-		return
-	}
-	rootMountIdentifier := rootPartitionSetting.MountIdentifier
-	if systemConfig.Encryption.Enable {
-		// Encrypted devices don't currently support identifiers
-		rootDevice = installMap[rootMountPoint]
-	} else if systemConfig.ReadOnlyVerityRoot.Enable {
-		var partIdentifier string
-		partIdentifier, err = installutils.FormatMountIdentifier(rootMountIdentifier, readOnlyRoot.BackingDevice)
-		if err != nil {
-			err = fmt.Errorf("failed to get partIdentifier: %s", err)
-			return
-		}
-		rootDevice = fmt.Sprintf("verityroot:%v", partIdentifier)
-	} else {
-		var partIdentifier string
-		partIdentifier, err = installutils.FormatMountIdentifier(rootMountIdentifier, installMap[rootMountPoint])
-		if err != nil {
-			err = fmt.Errorf("failed to get partIdentifier: %s", err)
-			return
-		}
-
-		rootDevice = partIdentifier
-	}
-
-	// Grub will always use filesystem UUID, never PARTUUID or PARTLABEL
-	err = installutils.InstallGrubCfg(installChroot.RootDir(), rootDevice, bootUUID, bootPrefix, assetsMountPoint, encryptedRoot, systemConfig.KernelCommandLine, readOnlyRoot, isBootPartitionSeparate)
-	if err != nil {
-		err = fmt.Errorf("failed to install main grub config file: %s", err)
-		return
-	}
-
-	err = installutils.InstallGrubEnv(installChroot.RootDir(), assetsMountPoint)
-	if err != nil {
-		err = fmt.Errorf("failed to install grubenv file: %s", err)
 		return
 	}
 

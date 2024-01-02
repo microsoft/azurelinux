@@ -1,5 +1,6 @@
 {
  "Signatures": {
+  "51_kexec_tools.cfg": "58c706bde0d87e96c4a53b921994c1dbf0d5a57fa1c8ae1b7f7b20da9befcc4d",
   "98-kexec.rules": "c4e3768d55cf3c6e617670f22d4e6f0e0bbc13c278a6c6fba88533f6a25106b8",
   "dracut-early-kdump-module-setup.sh": "f819b213de84fda98b2859af7c7beaa8e6aa92400106751dc5e73a878699bae4",
   "dracut-early-kdump.sh": "615a5497d1c586796ad2163d174f74b151b1dbaa87597a64e5e24727dc4ae2e0",
@@ -29,7 +30,7 @@
   "kdumpctl": "d511b5db0ea2de014fb06ec9fa0a6a4fdf508a3ba6c0d73344870f245ebd4c23",
   "kdumpctl.8": "025a39d212eed0584da7c23c1bb50d6ab797a0fa3c686ac6b80391af875dbaec",
   "kexec-kdump-howto.txt": "e783390a9aa582a2b5e7981cd3277081385340b5873a3f0633c789811876eccb",
-  "kexec-tools-2.0.23.tar.xz": "aa63cd6c7dd95b06ceba6240a7fdc6792789cada75a655e6714987175224241b",
+  "kexec-tools-2.0.27.tar.xz": "38d78bcfa33a88928324b57dc81f50c1dfc279eede45e80957ca18f4e84b8187",
   "live-image-kdump-howto.txt": "465a7ce28ecd9ff8f8c22ebfb17bbbafd01a52d81134be1203ee753856e4c37c",
   "makedumpfile-1.6.8.tar.gz": "85d79b7090e9a8ce0d426795d3bc1de2858def7e12954d9bc6ae03de160b694c",
   "mkdumprd": "ebe0cbd1152d9db3333357e898685854c7667d4c6d9df4c79196ab1e7294dad2",

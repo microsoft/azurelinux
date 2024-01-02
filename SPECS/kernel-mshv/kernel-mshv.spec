@@ -11,7 +11,7 @@
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
 Version:        5.15.126.mshv3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
@@ -20,6 +20,7 @@ Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
 Source1:        config
 Source2:        cbl-mariner-ca-20211013.pem
 Source3:        50_mariner_mshv.cfg
+Patch0:         perf_bpf_test_add_nonnull_argument.patch
 ExclusiveArch:  x86_64
 BuildRequires:  audit-devel
 BuildRequires:  bash
@@ -247,6 +248,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner-mshv.cfg
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Tue Dec 12 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.126.mshv3-2
+- Add patch for perf_bpf_test_add_nonnull_argument
+- Update config to reflect gcc 13 toolchain
+
 * Thu Sep 21 2023 Saul Paredes <saulparedes@microsoft.com> - 5.15.126.mshv3-1
 - Update to v5.15.126.mshv3
 

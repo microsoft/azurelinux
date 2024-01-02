@@ -1,7 +1,7 @@
 %define _userunitdir %{_libdir}/systemd/user
 Summary:        Library for loading and sharing PKCS#11 modules
 Name:           p11-kit
-Version:        0.24.1
+Version:        0.25.0
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -134,6 +134,9 @@ fi
 %{_userunitdir}/p11-kit-server.socket
 
 %changelog
+* Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.25.0-1
+- Auto-upgrade to 0.25.0 - Azure Linux 3.0 - package upgrades
+
 * Thu Feb 24 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 0.24.1-1
 - Upgrading to v0.24.1
 

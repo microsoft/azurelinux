@@ -5,8 +5,8 @@ as produced by ast.parse from the standard ast module.}
 
 Summary:        Python AST that abstracts the underlying Python version
 Name:           python-gast
-Version:        0.5.3
-Release:        5%{?dist}
+Version:        0.5.4
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -52,6 +52,9 @@ pip3 install tox tox-current-env pytest==7.1.3
 %doc README.rst
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.5.4-1
+- Auto-upgrade to 0.5.4 - Azure Linux 3.0 - package upgrades
+
 * Thu Oct 20 2022 Riken Maharjan <rmaharjan@microsoft.com> - 0.5.3-5
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
 - License verified.

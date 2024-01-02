@@ -2,8 +2,8 @@
 
 Summary:        Tool to check system for binary-hardening
 Name:           checksec
-Version:        2.5.0
-Release:        2%{?dist}
+Version:        2.6.0
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -78,6 +78,9 @@ pushd tests
 
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.6.0-1
+- Auto-upgrade to 2.6.0 - Azure Linux 3.0 - package upgrades
+
 * Tue Sep 26 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.5.0-2
 - Removing 'exit' calls from the '%%check' section.
 

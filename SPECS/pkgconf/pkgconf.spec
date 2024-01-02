@@ -10,8 +10,8 @@
 %global pkgconf_libdirs %{_libdir}/pkgconfig:%{_datadir}/pkgconfig
 Summary:        Package compiler and linker metadata toolkit
 Name:           pkgconf
-Version:        1.8.0
-Release:        3%{?dist}
+Version:        2.0.2
+Release:        1%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,8 +20,6 @@ URL:            http://pkgconf.org/
 Source0:        https://distfiles.dereferenced.org/%{name}/%{name}-%{version}.tar.xz
 # Simple wrapper script to offer platform versions of pkgconfig
 Source1:        platform-pkg-config.in
-# CVE-2023-24056 is resloved in version 1.9.4
-Patch0:         CVE-2023-24056.patch
 # For regenerating autotools scripts
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -149,6 +147,7 @@ rm -rf %{buildroot}%{_datadir}/aclocal
 %license COPYING
 %doc README.md AUTHORS NEWS
 %{_bindir}/%{name}
+%{_bindir}/bomtool
 %{_mandir}/man1/%{name}.1*
 %{_mandir}/man5/pc.5*
 %{_mandir}/man5/%{name}-personality.5*
@@ -180,6 +179,9 @@ rm -rf %{buildroot}%{_datadir}/aclocal
 %endif
 
 %changelog
+* Mon Nov 27 2023 Andrew Phelps <anphel@microsoft.com> - 2.0.2-1
+- Upgrade to version 2.0.2
+
 * Wed Feb 01 2023 Daniel McIlvaney <damcilva@microsoft.com> - 1.8.0-3
 - Add patch for CVE-2023-24056
 

@@ -2,13 +2,13 @@
 %define py_setup_args --with-cython
 Summary:        Cython implementation of the toolz package
 Name:           python-%{srcname}
-Version:        0.11.0
-Release:        3%{?dist}
+Version:        0.12.2
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/pytoolz/cytoolz/
-Source0:        https://files.pythonhosted.org/packages/source/c/cytoolz/cytoolz-%{version}.tar.gz
+Source0:	https://github.com/pytoolz/cytoolz/archive/refs/tags/%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
 BuildRequires:  gcc
 
 %description
@@ -102,6 +102,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %exclude %{python3_sitearch}/.pytest_cache/
 
 %changelog
+* Wed Dec 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.12.2-1
+- Auto-upgrade to 0.12.2 - none
+
 * Wed Jun 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 0.11.0-3
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - Remove python2

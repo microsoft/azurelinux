@@ -1,14 +1,13 @@
 Summary:        Text file viewer
 Name:           less
-Version:        590
-Release:        2%{?dist}
+Version:        643
+Release:        1%{?dist}
 License:        GPLv3+ OR BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/File
 URL:            https://www.greenwoodsoftware.com/less
 Source0:        https://www.greenwoodsoftware.com/less/%{name}-%{version}.tar.gz
-Patch0:         CVE-2022-46663.patch
 BuildRequires:  ncurses-devel
 Requires:       ncurses
 
@@ -32,6 +31,9 @@ The Less package contains a text file viewer
 %{_mandir}/*/*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 643-1
+- Auto-upgrade to 643 - Azure Linux 3.0 - package upgrades
+
 * Fri Feb 17 2023 Suresh Thelkar <sthelkar@microsoft.com> - 590-2
 - Patch CVE-2022-46663
 

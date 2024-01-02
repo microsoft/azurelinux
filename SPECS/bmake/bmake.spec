@@ -1,21 +1,16 @@
 Summary:       The NetBSD make(1) tool
 Name:          bmake
-Version:       20211221
-Release:       2%{?dist}
+Version:       20230723
+Release:       1%{?dist}
 License:       BSD
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
 URL:           https://ftp.netbsd.org/pub/NetBSD/misc/sjg/
 Source0:       %{url}/bmake-%{version}.tar.gz
-# Certain tests in varmod-localtime.mk will inconsistently fail
-# on pipeline machines. Disabling with this patch for now, and
-# tracking this bug in workitem 38644519
-Patch0:        remove-inconsistent-time-tests.patch
-Requires:      mk-files
-
 BuildRequires: gcc
 BuildRequires: sed
 BuildRequires: util-linux
+Requires:      mk-files
 
 %description
 bmake, the NetBSD make tool, is a program designed to simplify the
@@ -39,7 +34,6 @@ shared libraries.
 
 %prep
 %autosetup -p1 -n %{name}
-sed -i.timestamp -e 's|cp_f=-f|cp_f=-pf|' mk/install-mk
 sed -i.python -e '1 s|^#!/usr/bin/env python|#!/usr/bin/python3|' mk/meta2deps.py
 
 %build
@@ -47,9 +41,7 @@ sed -i.python -e '1 s|^#!/usr/bin/env python|#!/usr/bin/python3|' mk/meta2deps.p
 sh ./make-bootstrap.sh
 
 %install
-export STRIP=/bin/true # Make sure binary is not stripped
-./bmake -m mk install DESTDIR=%{buildroot}
-mv %{buildroot}%{_mandir}/{cat,man}1
+./bmake -m mk install DESTDIR=%{buildroot} INSTALL='install -p' STRIP_FLAG=''
 chmod a-x %{buildroot}%{_datadir}/mk/mkopt.sh
 
 %files
@@ -64,6 +56,9 @@ chmod a-x %{buildroot}%{_datadir}/mk/mkopt.sh
 %{_datadir}/mk
 
 %changelog
+* Fri Dec 08 2023 Andrew Phelps <anphel@microsoft.com> - 20230723-1
+- Upgrade to version 20230723
+
 * Tue Mar 22 2022 Cameron Baird <cameronbaird@microsoft.com> - 20211221-2
 - Add patch remove-inconsistent-time-tests.patch, which disables unreliably failing
 - tests in varmod-localtime.mk

@@ -87,7 +87,7 @@ var (
 	//
 	// Example:
 	//
-	//	D: ========== +++ systemd-devel-239-42.cm2 x86_64-linux 0x0
+	//	D: ========== +++ systemd-devel-239-42.azl3 x86_64-linux 0x0
 	installedRPMRegex = regexp.MustCompile(`^D: =+ \+{3} (\S+) (\S+)-linux.*$`)
 )
 
@@ -134,6 +134,25 @@ func SetMacroDir(newMacroDir string) (origenv []string, err error) {
 	env := append(shell.CurrentEnvironment(), fmt.Sprintf("RPM_CONFIGDIR=%s", newMacroDir))
 	shell.SetEnvironment(env)
 
+	return
+}
+
+// ExtractNameFromRPMPath strips the version from an RPM file name. i.e. pkg-name-1.2.3-4.cm2.x86_64.rpm -> pkg-name
+func ExtractNameFromRPMPath(rpmFilePath string) (packageName string, err error) {
+	baseName := filepath.Base(rpmFilePath)
+
+	// If the path is invalid, return empty string. We consider any string that has at least 1 '-' characters valid.
+	if !strings.Contains(baseName, "-") {
+		err = fmt.Errorf("invalid RPM file path '%s', can't extract name", rpmFilePath)
+		return
+	}
+
+	rpmFileSplit := strings.Split(baseName, "-")
+	packageName = strings.Join(rpmFileSplit[:len(rpmFileSplit)-2], "-")
+	if packageName == "" {
+		err = fmt.Errorf("invalid RPM file path '%s', can't extract name", rpmFilePath)
+		return
+	}
 	return
 }
 
@@ -247,7 +266,7 @@ func DefaultDefines(runCheck bool) map[string]string {
 
 // GetInstalledPackages returns a string list of all packages installed on the system
 // in the "[name]-[version]-[release].[distribution].[architecture]" format.
-// Example: tdnf-2.1.0-4.cm1.x86_64
+// Example: tdnf-2.1.0-4.azl3.x86_64
 func GetInstalledPackages() (result []string, err error) {
 	const queryArg = "-qa"
 

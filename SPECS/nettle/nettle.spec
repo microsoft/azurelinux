@@ -1,7 +1,7 @@
 Summary:	Low level cryptographic libraries
 Name:		nettle
-Version:    3.7.3
-Release:    3%{?dist}
+Version:    3.9.1
+Release:    1%{?dist}
 License:	LGPLv3+ or GPLv2+
 URL:        https://www.lysator.liu.se/~nisse/nettle/
 Source0: 	https://ftp.gnu.org/gnu/nettle/%{name}-%{version}.tar.gz
@@ -61,6 +61,9 @@ make %{?_smp_mflags} check
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.9.1-1
+- Auto-upgrade to 3.9.1 - Azure Linux 3.0 - package upgrades
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.7.3-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

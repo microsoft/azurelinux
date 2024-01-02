@@ -2,8 +2,8 @@
 
 Summary:        Rocket-fast system for log processing
 Name:           rsyslog
-Version:        8.2204.1
-Release:        3%{?dist}
+Version:        8.2308.0
+Release:        2%{?dist}
 License:        GPLv3+ AND ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -133,11 +133,13 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %make_build check
 
 %pre
-if ! (getent passwd syslog >/dev/null); then
-    groupadd --system syslog
-fi
-if ! (getent passwd syslog >/dev/null); then
-useradd --system --comment 'System Logging'  --gid syslog --shell /bin/false syslog
+if [ $1 -eq 1 ]; then
+    if ! (getent passwd syslog >/dev/null); then
+        groupadd --system syslog
+    fi
+    if ! (getent passwd syslog >/dev/null); then
+        useradd --system --comment 'System Logging'  --gid syslog --shell /bin/false syslog
+    fi
 fi
 
 %post
@@ -150,11 +152,13 @@ fi
 %postun
 /sbin/ldconfig
 %systemd_postun_with_restart rsyslog.service
-if getent passwd syslog >/dev/null; then
-    userdel syslog
-fi
-if getent group syslog >/dev/null; then
-    groupdel syslog
+if [ $1 -eq 0 ]; then
+    if getent passwd syslog >/dev/null; then
+        userdel syslog
+    fi
+    if getent group syslog >/dev/null; then
+        groupdel syslog
+    fi
 fi
 
 %files
@@ -175,6 +179,12 @@ fi
 %doc %{_docdir}/%{name}/html
 
 %changelog
+* Thu Dec 14 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 8.2308.0-2
+- Fix resetting of passwd and group on package update
+
+* Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.2308.0-1
+- Auto-upgrade to 8.2308.0 - Azure Linux 3.0 - package upgrades
+
 * Wed Oct 12 2022 Nan Liu <liunan@microsoft.com> - 8.2204.1-3
 - Add rsyslog configuration file to /etc/logrotate.d
 

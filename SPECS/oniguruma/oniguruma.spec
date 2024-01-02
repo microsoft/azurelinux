@@ -2,8 +2,8 @@
 
 Summary:        Regular expressions library
 Name:           oniguruma
-Version:        6.9.7.1
-Release:        2%{?dist}
+Version:        6.9.8
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -63,6 +63,9 @@ make  check
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.9.8-1
+- Auto-upgrade to 6.9.8 - Azure Linux 3.0 - package upgrades
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 6.9.7.1-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

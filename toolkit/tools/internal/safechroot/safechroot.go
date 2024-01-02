@@ -8,7 +8,6 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
-	"sort"
 	"sync"
 	"time"
 
@@ -265,19 +264,11 @@ func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMoun
 			}
 		}
 
-		// Mount with the original unsorted order. Assumes the order of mounts is important.
-		err = c.createMountPoints(allMountPoints)
-
-		// Sort the mount points by target directory
-		// This way nested mounts will be correctly unraveled:
-		// e.g.: /dev/pts is unmounted and then /dev is.
-		//
-		// Sort now before checking err so that `unmountAndRemove` can be called from Initialize.
+		// Assign to `c.mountPoints` now since `Initialize` will call `unmountAndRemove` if an error occurs.
 		c.mountPoints = allMountPoints
-		sort.Slice(c.mountPoints, func(i, j int) bool {
-			return c.mountPoints[i].target > c.mountPoints[j].target
-		})
 
+		// Mount with the original unsorted order. Assumes the order of mounts is important.
+		err = c.createMountPoints()
 		if err != nil {
 			logger.Log.Warn("Error creating mountpoints for chroot")
 			return
@@ -293,10 +284,15 @@ func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMoun
 
 // AddFiles copies each file 'Src' to the relative path chrootRootDir/'Dest' in the chroot.
 func (c *Chroot) AddFiles(filesToCopy ...FileToCopy) (err error) {
+	return addFilesToDestination(c.rootDir, filesToCopy...)
+}
+
+func addFilesToDestination(destDir string, filesToCopy ...FileToCopy) error {
 	for _, f := range filesToCopy {
-		dest := filepath.Join(c.rootDir, f.Dest)
+		dest := filepath.Join(destDir, f.Dest)
 		logger.Log.Debugf("Copying '%s' to worker '%s'", f.Src, dest)
 
+		var err error
 		if f.Permissions != nil {
 			err = file.CopyAndChangeMode(f.Src, dest, os.ModePerm, *f.Permissions)
 		} else {
@@ -305,10 +301,10 @@ func (c *Chroot) AddFiles(filesToCopy ...FileToCopy) (err error) {
 
 		if err != nil {
 			logger.Log.Errorf("Error provisioning worker with '%s'", f.Src)
-			return
+			return err
 		}
 	}
-	return
+	return nil
 }
 
 // CopyOutFile copies file 'srcPath' in the chroot to the host at 'destPath'
@@ -530,7 +526,10 @@ func (c *Chroot) unmountAndRemove(leaveOnDisk, lazyUnmount bool) (err error) {
 		unmountFlags = unmountFlagsLazy
 	}
 
-	for _, mountPoint := range c.mountPoints {
+	// Unmount in the reverse order of mounting to ensure that any nested mounts are unraveled in the correct order.
+	for i := len(c.mountPoints) - 1; i >= 0; i-- {
+		mountPoint := c.mountPoints[i]
+
 		fullPath := filepath.Join(c.rootDir, mountPoint.target)
 
 		var exists bool
@@ -632,8 +631,8 @@ func (c *Chroot) restoreRoot(originalRoot, originalWd *os.File) {
 }
 
 // createMountPoints will create a provided list of mount points
-func (c *Chroot) createMountPoints(allMountPoints []*MountPoint) (err error) {
-	for _, mountPoint := range allMountPoints {
+func (c *Chroot) createMountPoints() (err error) {
+	for _, mountPoint := range c.mountPoints {
 		fullPath := filepath.Join(c.rootDir, mountPoint.target)
 		logger.Log.Debugf("Mounting: source: (%s), target: (%s), fstype: (%s), flags: (%#x), data: (%s)",
 			mountPoint.source, fullPath, mountPoint.fstype, mountPoint.flags, mountPoint.data)

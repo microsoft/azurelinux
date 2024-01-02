@@ -1,8 +1,8 @@
 %global _with_xfce 0
 Summary:        Desktop Input Method configuration tool
 Name:           im-chooser
-Version:        1.7.3
-Release:        5%{?dist}
+Version:        1.7.4
+Release:        1%{?dist}
 License:        GPLv2+ and LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -103,6 +103,9 @@ rm -rf %{buildroot}%{_datadir}/applications/im-chooser-panel.desktop
 %endif
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7.4-1
+- Auto-upgrade to 1.7.4 - Azure Linux 3.0 - package upgrades
+
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 1.7.3-5
 - License verified
 

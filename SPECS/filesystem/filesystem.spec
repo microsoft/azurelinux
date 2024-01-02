@@ -1,7 +1,7 @@
 Summary:      Default file system
 Name:         filesystem
 Version:      1.1
-Release:      17%{?dist}
+Release:      18%{?dist}
 License:      GPLv3
 Group:        System Environment/Base
 Vendor:       Microsoft Corporation
@@ -285,7 +285,6 @@ for script in /etc/profile.d/*.sh ; do
 done
 
 unset script RED GREEN NORMAL
-umask 027
 # End /etc/profile
 EOF
 #
@@ -711,6 +710,9 @@ return 0
 %config(noreplace) /etc/modprobe.d/tipc.conf
 
 %changelog
+* Thu Nov 30 2023 Dan Streetman <ddstreet@ieee.org> - 1.1-18
+- Remove umask 027
+
 * Thu Oct 12 2023 Chris PeBenito <chpebeni@microsoft.com> - 1.1-17
 - Restore the /opt directory.
 

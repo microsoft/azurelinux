@@ -1,6 +1,6 @@
 Summary:        software font engine.
 Name:           freetype
-Version:        2.13.0
+Version:        2.13.2
 Release:        1%{?dist}
 License:        BSD/GPLv2
 Vendor:         Microsoft Corporation
@@ -80,6 +80,9 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_bindir}/freetype-config
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.13.2-1
+- Auto-upgrade to 2.13.2 - Azure Linux 3.0 - package upgrades
+
 * Mon May 08 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.13.0-1
 - Auto-upgrade to 2.13.0 - to fix CVE-2023-2004
 
