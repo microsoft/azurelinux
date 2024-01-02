@@ -46,9 +46,7 @@
 # Fail linking if there are undefined symbols.
 # Required for proper ELF symbol versioning support.
 %global _ld_strict_symbol_defs 1
-# override_glibc and glibcversion are temporary to make libxcrypt install on top of glibc
 %define glibcversion 2.35
-%bcond_without override_glibc
 # Build the static library?
 %bcond_with new_api
 %bcond_with compat_pkg
@@ -102,7 +100,7 @@
 Summary:        Extended crypt library for descrypt, md5crypt, bcrypt, and others
 Name:           libxcrypt
 Version:        4.4.27
-Release:        1%{?dist}
+Release:        3%{?dist}
 # For explicit license breakdown, see the
 # LICENSING file in the source tarball.
 License:        LGPLv2+ AND BSD AND Public Domain
@@ -138,14 +136,10 @@ Obsoletes:      %{name}-compat < %{version}-%{release}
 %endif
 # We need a version of glibc, that doesn't build libcrypt anymore.
 #Requires:       glibc%{?_isa}         >= %{glibc_minver}
-%if %{with override_glibc}
-# Require a specific glibc version so the post macro is compatible.
-BuildRequires:  glibc-devel = %{glibcversion}
-Requires:       glibc = %{glibcversion}
-%endif
 %if 0%{?fedora} >= 30
 Recommends:     mkpasswd
 %endif
+Conflicts:      glibc-libcrypt
 
 %description
 libxcrypt is a modern library for one-way hashing of passwords.  It
@@ -320,11 +314,6 @@ install -Dpm 0644 -t %{buildroot}%{_pkgdocdir} \
 # Drop README.md as it is identical to README.
 rm -f %{buildroot}%{_pkgdocdir}/README.md
 
-%if %{with override_glibc}
-mv %{buildroot}/%{_libdir}/libcrypt.so.%{sov} %{buildroot}/%{_libdir}/libxcrypt.so.%{sov}
-%endif
-
-
 %check
 build_dirs="%{_vpath_builddir}"
 %if %{with compat_pkg}
@@ -341,24 +330,9 @@ for dir in ${build_dirs}; do
     }
 done
 
-%if %{with override_glibc}
-# This posttrans section is a stopgap to allow installing
-# libxcrypt on a system that already has libcrypt from glibc.
-# In a future release these will be removed and libxcrypt will be default.
-%posttrans
-rm %{_libdir}/libcrypt.so.1
-ln -s %{_libdir}/libxcrypt.so.%{sov} %{_libdir}/libcrypt.so.1
-%endif
-
 %post -p /sbin/ldconfig
 
-%postun
-# See above comments about the %%posttrans section
-%if %{with override_glibc}
-rm %{_libdir}/libcrypt.so.1
-ln -s %{_libdir}/libcrypt-%{glibcversion}.so %{_libdir}/libcrypt.so.1
-%endif
-/sbin/ldconfig
+%postun -p /sbin/ldconfig
 
 %if %{with compat_pkg}
 %post -n compat -p /sbin/ldconfig
@@ -382,13 +356,8 @@ ln -s %{_libdir}/libcrypt-%{glibcversion}.so %{_libdir}/libcrypt.so.1
 #%{_fipsdir}/libcrypt.so.%{soc}.hmac
 #%{_fipsdir}/libcrypt.so.%{sov}.hmac
 
-%if %{with override_glibc}
-%exclude %{_libdir}/libcrypt.so.%{soc}
-%{_libdir}/libxcrypt.so.%{sov}
-%else
 %{_libdir}/libcrypt.so.%{soc}
 %{_libdir}/libcrypt.so.%{sov}
-%endif
 
 %{_mandir}/man5/crypt.5*
 
@@ -408,13 +377,8 @@ ln -s %{_libdir}/libcrypt-%{glibcversion}.so %{_libdir}/libcrypt.so.1
 %files devel
 %doc %{_pkgdocdir}/ChangeLog
 %doc %{_pkgdocdir}/TODO
-%if %{with override_glibc}
-%exclude %{_libdir}/libcrypt.so
-%exclude %{_includedir}/crypt.h
-%else
 %{_libdir}/libcrypt.so
 %{_includedir}/crypt.h
-%endif
 %if %{without new_api}
 %{_libdir}/libxcrypt.so
 %endif
@@ -449,6 +413,10 @@ ln -s %{_libdir}/libcrypt-%{glibcversion}.so %{_libdir}/libcrypt.so.1
 
 
 %changelog
+* Mon Oct 09 2023 Chris Co <chrco@microsoft.com> - 4.4.27-3
+- Remove override_glibc
+- Add conflicts with glibc-libcrypt
+
 * Thu Apr 14 2022 Andrew Phelps <anphel@microsoft.com> - 4.4.27-2
 - Update glibcversion variable to 2.35
 
