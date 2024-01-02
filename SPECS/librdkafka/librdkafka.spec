@@ -90,7 +90,7 @@ DESTDIR=%{buildroot} make install
 %{_libdir}/librdkafka.so
 %{_libdir}/librdkafka++.a
 %{_libdir}/librdkafka++.so
-%{_libdir}/librdkafka-static.a
+%exclude %{_libdir}/librdkafka-static.a
 %{_libdir}/pkgconfig/rdkafka++.pc
 %{_libdir}/pkgconfig/rdkafka.pc
 %{_libdir}/pkgconfig/rdkafka-static.pc
