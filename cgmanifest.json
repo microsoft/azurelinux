@@ -2997,6 +2997,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "duktape",
+          "version": "2.7.0",
+          "downloadUrl": "https://duktape.org/duktape-2.7.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "dump",
           "version": "0.4",
           "downloadUrl": "http://downloads.sourceforge.net/dump/dump-0.4b46.tar.gz"
@@ -21154,8 +21164,8 @@
         "type": "other",
         "other": {
           "name": "polkit",
-          "version": "0.119",
-          "downloadUrl": "https://www.freedesktop.org/software/polkit/releases/polkit-0.119.tar.gz"
+          "version": "123",
+          "downloadUrl": "https://gitlab.freedesktop.org/polkit/polkit/-/archive/123/polkit-123.tar.gz"
         }
       }
     },
