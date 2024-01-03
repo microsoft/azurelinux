@@ -1,15 +1,13 @@
 Summary:        Irqbalance daemon
 Name:           irqbalance
-Version:        1.8.0
-Release:        4%{?dist}
+Version:        1.9.3
+Release:        1%{?dist}
 License:        GPLv2
 URL:            https://github.com/Irqbalance/irqbalance
 Group:          System Environment/Services
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://github.com/Irqbalance/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:         fix-format-security.patch
-Patch1:         fix-load-unsigned-overflow.patch
 BuildRequires:  systemd-devel
 BuildRequires:  glib-devel
 Requires:       systemd
@@ -58,6 +56,10 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_datadir}/*
 
 %changelog
+* Wed Jan 03 2024 Muhammad Falak <mwani@microsoft.com> - 1.9.3-1
+- Drop un-needed patches
+- Bump version to 1.9.3
+
 * Fri Oct 06 2023 Henry Beberman <henry.beberman@microsoft.com> - 1.8.0-4
 - Apply upstream fix for unsigned subtraction overflow in load calculation
 
