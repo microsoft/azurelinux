@@ -1,0 +1,43 @@
+From 40881e1cedb564b643b2b0cd0c5d21fe3327082d Mon Sep 17 00:00:00 2001
+From: Mikel Olasagasti Uranga <mikel@olasagasti.info>
+Date: Tue, 17 May 2022 12:52:08 +0200
+Subject: [PATCH] Use pclose() instead of fclose()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The return value from popen() is a normal standard I/O stream in all
+respects save that it must be closed with pclose() rather than
+fclose(3).
+
+Solves the following warning when compiled with -Wmismatched-dealloc:
+
+errno.c: In function ‘search_all’:
+errno.c:126:5: warning: ‘fclose’ called on pointer returned from a
+                         mismatched allocation function
+                         [-Wmismatched-dealloc]
+  126 |     fclose(f);
+      |     ^~~~~~~~~
+errno.c:113:9: note: returned from ‘popen’
+  113 |     f = popen("locale -a", "r");
+      |         ^~~~~~~~~~~~~~~~~~~~~~~
+---
+ errno.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/errno.c b/errno.c
+index d2f68a1..fcf3dee 100644
+--- a/errno.c
++++ b/errno.c
+@@ -123,7 +123,7 @@ search_all(int num_words, char **words)
+         search(num_words, words);
+     }
+ 
+-    fclose(f);
++    pclose(f);
+ }
+ 
+ 
+-- 
+2.36.1
+

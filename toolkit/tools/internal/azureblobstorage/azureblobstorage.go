@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-package azureblobstoragepkg
+package azureblobstorage
 
 import (
 	"context"

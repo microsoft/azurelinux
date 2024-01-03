@@ -1,13 +1,15 @@
 Summary:        Virtual Python Environment builder
 Name:           python-virtualenv
 Version:        20.14.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/virtualenv
 Source0:        https://files.pythonhosted.org/packages/4a/c3/04f361a90ed4e6b3f3f696d61db5c786eaa741d2a6c125bc905b8a1c0200/virtualenv-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# Derived from upstream patch https://github.com/pypa/virtualenv/commit/9f9dc6250fc88e92b1ca6206429966788846d696
+Patch0:         fix-plugin-attribute-name.patch
 BuildArch:      noarch
 
 %description
@@ -34,7 +36,7 @@ Provides:       %{name}-doc = %{version}-%{release}
 virtualenv is a tool to create isolated Python environment.
 
 %prep
-%autosetup -n virtualenv-%{version}
+%autosetup -p1 -n virtualenv-%{version}
 
 %build
 %py3_build
@@ -53,6 +55,9 @@ tox -e py
 %{_bindir}/virtualenv
 
 %changelog
+* Mon Dec 04 2023 Olivia Crain <oliviacrain@microsoft.com> - 20.14.0-4
+- Add upstream patch to fix package tests with newer versions of pluggy
+
 * Wed Dec 21 2022 Riken Maharjan <rmaharjan@microsoft.com> - 20.14.0-3
 - Add missing runtime dependencies
 
@@ -65,7 +70,7 @@ tox -e py
 * Tue Feb 08 2022 Muhammad Falak <mwani@microsoft.com> - 16.0.0-8
 - Add an explicit BR on `python3-pip` to enable ptest
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 16.0.0-7
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 16.0.0-7
 - Add license, virtualenv binary to python3 package
 - Remove python2 package
 - Lint spec
