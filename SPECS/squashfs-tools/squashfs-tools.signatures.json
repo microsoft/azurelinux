@@ -1,7 +1,7 @@
 {
- "Signatures": {
-  "mksquashfs.1": "9beac1f14a27e6b1fc09eb8843e0eac93edce787293411bfa0221467281da294",
-  "squashfs-tools-4.5.1.tar.gz": "277b6e7f75a4a57f72191295ae62766a10d627a4f5e5f19eadfbc861378deea7",
-  "unsquashfs.1": "781e745ca67b124e243d4cf839674c55561e107d165ffb84ed6101937cafea86"
- }
+  "Signatures": {
+    "mksquashfs.1": "9beac1f14a27e6b1fc09eb8843e0eac93edce787293411bfa0221467281da294",
+    "unsquashfs.1": "781e745ca67b124e243d4cf839674c55561e107d165ffb84ed6101937cafea86",
+    "squashfs-tools-4.6.1.tar.gz": "94201754b36121a9f022a190c75f718441df15402df32c2b520ca331a107511c"
+  }
 }
