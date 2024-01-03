@@ -44,7 +44,6 @@ checker and intrusion detection program.
 cp -a %{S:2} .
 
 %build
-# autoreconf -ivf
 %configure  \
   --disable-static \
   --with-config_file=%{_sysconfdir}/aide.conf \
