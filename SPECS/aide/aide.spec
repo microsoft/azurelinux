@@ -2,8 +2,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Summary:        Intrusion detection environment
 Name:           aide
-Version:        0.16
-Release:        16%{?dist}
+Version:        0.18.6
+Release:        1%{?dist}
 URL:            https://github.com/aide/aide
 License:        GPLv2+
 
@@ -81,6 +81,9 @@ mkdir -p -m0700 %{buildroot}%{_localstatedir}/lib/aide
 %dir %attr(0700,root,root) %{_localstatedir}/log/aide
 
 %changelog
+* Wed Jan 03 2024 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 0.18.6-1
+- Bump version to 0.18.6
+
 * Thu Jan 05 2023 Thien Trung Vuong <tvuong@microsoft.com> - 0.16-16
 - Updated project URL to Github
 - Verified license
