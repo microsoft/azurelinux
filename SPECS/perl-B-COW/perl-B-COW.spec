@@ -34,7 +34,7 @@ Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 %{?perl_default_filter}
 
 %description
-B::COW provides some naÃ¯ve additional B helpers to check the Copy On Write
+B::COW provides some naive additional B helpers to check the Copy On Write
 (COW) status of one SvPV (a Perl string variable).
 
 A COWed SvPV is sharing its string (the PV) with other SvPVs. It's a (kind of)
