@@ -1,6 +1,6 @@
 Summary:        Libraries for Transport Independent RPC
 Name:           libtirpc
-Version:        1.3.3
+Version:        1.3.4
 Release:        1%{?dist}
 License:        BSD
 Group:          System Environment/Libraries
@@ -35,7 +35,7 @@ Requires:   krb5-devel
 This package includes header files and libraries necessary for developing programs which use the tirpc library.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 ./configure --prefix=%{_prefix} --sysconfdir=%{_sysconfdir}
@@ -68,6 +68,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/*.a
 
 %changelog
+* Tue Jan 02 2024 Rachel Menge <rachelmenge@microsoft.com> - 1.3.4-1
+- Update to version 1.3.4
+
 * Wed Aug 10 2022 Muhammad Falak <mwani@microsoft.com> - 1.3.3-1
 - Bump verison to address CVE-2021-46828
 
