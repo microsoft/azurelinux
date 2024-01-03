@@ -26,11 +26,8 @@ BuildRequires:  e2fsprogs-devel
 BuildRequires:  audit-libs-devel
 BuildRequires:  autoconf automake libtool
 
-# # Customize the database file location in the man page.
 # Patch1: aide-0.16rc1-man.patch
-# # fix aide in FIPS mode
 # Patch2: aide-0.16b1-fipsfix.patch
-# # Bug 1674637 - aide: FTBFS in Fedora rawhide/f30
 # Patch3: aide-0.16-Use-LDADD-for-adding-curl-library-to-the-linker-comm.patch
 #
 # Patch4: aide-0.15-syslog-format.patch
