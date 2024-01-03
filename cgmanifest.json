@@ -11151,8 +11151,8 @@
         "type": "other",
         "other": {
           "name": "libtirpc",
-          "version": "1.3.3",
-          "downloadUrl": "https://downloads.sourceforge.net/libtirpc/libtirpc-1.3.3.tar.bz2"
+          "version": "1.3.4",
+          "downloadUrl": "https://downloads.sourceforge.net/libtirpc/libtirpc-1.3.4.tar.bz2"
         }
       }
     },
@@ -14003,8 +14003,8 @@
         "type": "other",
         "other": {
           "name": "nfs-utils",
-          "version": "2.5.4",
-          "downloadUrl": "https://www.kernel.org/pub/linux/utils/nfs-utils/2.5.4/nfs-utils-2.5.4.tar.xz"
+          "version": "2.6.4",
+          "downloadUrl": "https://www.kernel.org/pub/linux/utils/nfs-utils/2.6.4/nfs-utils-2.6.4.tar.xz"
         }
       }
     },
