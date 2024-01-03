@@ -108,13 +108,13 @@ done
 PROJECT_ROOT=$repo_path
 toolkit_root="$PROJECT_ROOT/toolkit"
 pushd $toolkit_root
-BUILD_DIR=$(make -s printvar-BUILD_DIR  2> /dev/null)              # default: $repo_path/build
-OUT_DIR=$(make -s printvar-OUT_DIR 2> /dev/null)                   # default: $repo_path/out
-SPECS_DIR=$(make -s printvar-SPECS_DIR 2> /dev/null)               # default: $repo_path/SPECS
-BUILD_SRPMS_DIR=$(make -s printvar-BUILD_SRPMS_DIR 2> /dev/null)   # default: $repo_path/build/INTERMEDIATE_SRPMS
-RPMS_DIR=$(make -s printvar-RPMS_DIR 2> /dev/null)                 # default: $repo_path/out/RPMS
-TOOL_BINS_DIR=$(make -s printvar-TOOL_BINS_DIR 2> /dev/null)       # default: $repo_path/toolkit/out/tools
-PKGBUILD_DIR=$(make -s printvar-PKGBUILD_DIR 2> /dev/null)         # default: $repo_path/build/pkg_artifacts
+BUILD_DIR=$(make --no-print-directory -s printvar-BUILD_DIR  2> /dev/null)              # default: $repo_path/build
+OUT_DIR=$(make --no-print-directory -s printvar-OUT_DIR 2> /dev/null)                   # default: $repo_path/out
+SPECS_DIR=$(make --no-print-directory -s printvar-SPECS_DIR 2> /dev/null)               # default: $repo_path/SPECS
+BUILD_SRPMS_DIR=$(make --no-print-directory -s printvar-BUILD_SRPMS_DIR 2> /dev/null)   # default: $repo_path/build/INTERMEDIATE_SRPMS
+RPMS_DIR=$(make --no-print-directory -s printvar-RPMS_DIR 2> /dev/null)                 # default: $repo_path/out/RPMS
+TOOL_BINS_DIR=$(make --no-print-directory -s printvar-TOOL_BINS_DIR 2> /dev/null)       # default: $repo_path/toolkit/out/tools
+PKGBUILD_DIR=$(make --no-print-directory -s printvar-PKGBUILD_DIR 2> /dev/null)         # default: $repo_path/build/pkg_artifacts
 popd
 
 # Assign remaining default values based on folder definitions
