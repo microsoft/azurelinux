@@ -51,7 +51,7 @@ application that use %{name}.
 
 %changelog
 * Tue Jan 02 2024 Reuben Olinsky <reubeno@microsoft.com> 2.7.0-1
-- Imported to Azure Linux.
+- Initial CBL-Mariner import from Fedora 39 (license: MIT).
 
 * Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> 2.6.0-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
