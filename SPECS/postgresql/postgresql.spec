@@ -1,6 +1,6 @@
 Summary:        PostgreSQL database engine
 Name:           postgresql
-Version:        14.8
+Version:        14.10
 Release:        1%{?dist}
 License:        PostgreSQL
 Vendor:         Microsoft Corporation
@@ -172,6 +172,9 @@ sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
 %{_libdir}/libpgtypes.a
 
 %changelog
+* Fri Dec 29 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 14.10-1
+- Upgrade to 14.10 to fix CVE-2023-5868, CVE-2023-5869 and CVE-2023-5870
+
 * Tue Jun 20 2023 Bala <balakumaran.kannan@microsoft.com> - 14.8-1
 - Upgrade to 14.8 to fix CVE-2023-2454, CVE-2023-2455 and CVE-2022-41862
 
