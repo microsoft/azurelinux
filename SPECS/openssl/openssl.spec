@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1k
-Release:        27%{?dist}
+Release:        28%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -58,6 +58,7 @@ Patch34:        CVE-2023-0465.patch
 Patch35:        CVE-2023-0466.patch
 Patch36:        CVE-2023-2650.patch
 Patch37:        CVE-2023-3817.patch
+Patch38:        openssl-1.1.1-improve-safety-of-DH.patch
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
 BuildRequires:  perl(FindBin)
@@ -168,6 +169,7 @@ cp %{SOURCE4} test/
 %patch35 -p1
 %patch36 -p1
 %patch37 -p1
+%patch38 -p1
 
 %build
 # Add -Wa,--noexecstack here so that libcrypto's assembler modules will be
@@ -357,6 +359,9 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 %postun libs -p /sbin/ldconfig
 
 %changelog
+* Wed Dec 06 2023 Muhammad Falak <mwani@microsoft.com> - 1.1.1k-28
+- Introduce patch to correctly address exessively long DH keys
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.1.1k-27
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
