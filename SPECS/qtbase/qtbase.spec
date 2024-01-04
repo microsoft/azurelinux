@@ -30,9 +30,9 @@
 ## skip for now, until we're better at it --rex
 #global tests 1
 
-Name:         qt5-qtbase
-Summary:      Qt5 - QtBase components
-Version:      5.12.11
+Name:         qtbase
+Summary:      Qt6 - QtBase components
+Version:      6.6.1
 Release:      9%{?dist}
 # See LICENSE.GPL3-EXCEPT.txt, for exception details
 License:      GFDL AND LGPLv3 AND GPLv2 AND GPLv3 with exceptions AND QT License Agreement 4.0
@@ -71,18 +71,11 @@ Source1: qtlogging.ini
 # https://bugzilla.redhat.com/show_bug.cgi?id=1036956
 Source5: qconfig-multilib.h
 
-# xinitrc script to check for OpenGL 1 only drivers and automatically set
-# QT_XCB_FORCE_SOFTWARE_OPENGL for them
-#Source6: 10-qt5-check-opengl2.sh
-
 # macros
-Source10: macros.qt5-qtbase
+Source10: macros.qtbase
 
 # support multilib optflags
 Patch2: qtbase-multilib_optflags.patch
-
-# fix QTBUG-35459 (too low entityCharacterLimit=1024 for CVE-2013-4549)
-Patch4: qtbase-opensource-src-5.3.2-QTBUG-35459.patch
 
 # borrowed from opensuse
 # track private api via properly versioned symbols
@@ -92,67 +85,35 @@ Patch8: tell-the-truth-about-private-api.patch
 
 # upstreamable patches
 # namespace QT_VERSION_CHECK to workaround major/minor being pre-defined (#1396755)
-Patch50: qtbase-opensource-src-5.8.0-QT_VERSION_CHECK.patch
-
-# 1381828 - Broken window scaling for some QT5 applications (#1381828)
-# This patch moves the threshold for 2x scaling from the DPI of 144 to 192,
-# the same value GNOME uses. It's not a complete solution...
-Patch51: qtbase-hidpi_scale_at_192.patch
+Patch50: qtbase-QT_VERSION_CHECK.patch
 
 # 1. Workaround moc/multilib issues
 # https://bugzilla.redhat.com/show_bug.cgi?id=1290020
 # https://bugreports.qt.io/browse/QTBUG-49972
 # 2. Workaround sysmacros.h (pre)defining major/minor a breaking stuff
-Patch52: qtbase-opensource-src-5.7.1-moc_macros.patch
-
-# CMake generates wrong -isystem /usr/include compilations flags with Qt5::Gui
-# https://bugzilla.redhat.com/1704474
-Patch53: qtbase-everywhere-src-5.12.1-qt5gui_cmake_isystem_includes.patch
+Patch52: qtbase-moc-macros.patch
 
 # respect QMAKE_LFLAGS_RELEASE when building qmake
 Patch54: qtbase-qmake_LFLAGS.patch
 
 # drop -O3 and make -O2 by default
-Patch61: qt5-qtbase-cxxflag.patch
-
-# support firebird version 3.x
-Patch64: qt5-qtbase-5.12.1-firebird.patch
+Patch61: qtbase-cxxflag.patch
 
 # fix for new mariadb
-Patch65: qtbase-opensource-src-5.9.0-mysql.patch
-
-# python3
-Patch68: qtbase-everywhere-src-5.11.1-python3.patch
+Patch65: qtbase-mysql.patch
 
 # https://fedoraproject.org/wiki/Changes/Qt_Wayland_By_Default_On_Gnome
 # https://bugzilla.redhat.com/show_bug.cgi?id=1732129
 Patch80: qtbase-use-wayland-on-gnome.patch
 
-## upstream patches
-# Fix CVE-2023-24607
-Patch81: CVE-2023-24607.patch
-
-# Fix CVE-2023-32762
-Patch82: CVE-2023-32762.patch
-
-# Fix CVE-2023-32763
-Patch83: CVE-2023-32763.patch
-
-# Fix CVE-2023-33285
-Patch84: CVE-2023-33285.patch
-
-# Fix CVE-2023-37369, CVE-2023-38197
-Patch86: CVE-2023-37369.patch
-Patch87: CVE-2023-38197.patch
-
-# Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
+# Do not check any files in %%{_qt_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
 # not there, the platform to integrate with isn't either. Then Qt will just
 # silently ignore the plugin that fails to load. Thus, there is no need to let
 # RPM drag in gtk3 as a dependency for the GTK+3 dialog support.
-%global __requires_exclude_from ^%{_qt5_plugindir}/platformthemes/.*$
+%global __requires_exclude_from ^%{_qt_plugindir}/platformthemes/.*$
 # filter plugin provides
-%global __provides_exclude_from ^%{_qt5_plugindir}/.*\\.so$
+%global __provides_exclude_from ^%{_qt_plugindir}/.*\\.so$
 
 # http://bugzilla.redhat.com/1196359
 %global dbus -dbus-linked
@@ -179,7 +140,7 @@ This package contains base tools, like string, xml, and network
 handling.
 
 %package common
-Summary: Common files for Qt5
+Summary: Common files for Qt
 BuildArch: noarch
 %description common
 %{summary}.
@@ -188,14 +149,13 @@ BuildArch: noarch
 Summary: Development files for %{name}
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires: %{name}-gui%{?_isa}
-Requires: qt5-rpm-macros
+Requires: qt-rpm-macros
 %description devel
 %{summary}.
 
 %package private-devel
 Summary: Development files for %{name} private APIs
 # upgrade path, when private-devel was introduced
-Obsoletes: %{name}-devel < 5.12.1-3
 Requires: %{name}-devel%{?_isa} = %{version}-%{release}
 # QtPrintSupport/private requires cups/ppd.h
 %description private-devel
@@ -217,14 +177,10 @@ Requires: %{name}-devel%{?_isa} = %{version}-%{release}
 
 # debating whether to do 1 subpkg per library or not -- rex
 %package gui
-Summary: Qt5 GUI-related libraries
-Obsoletes: qt5-qtbase-x11 < 5.2.0
-Provides:  qt5-qtbase-x11 = %{version}-%{release}
-# for Source6: 10-qt5-check-opengl2.sh:
-# glxinfo
-#Requires: glx-utils
+Summary: Qt GUI-related libraries
+Provides:  qtbase-x11 = %{version}-%{release}
 %description gui
-Qt5 libraries used for drawing widgets and OpenGL items.
+Qt libraries used for drawing widgets and OpenGL items.
 
 
 %prep
@@ -236,15 +192,12 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 # omit '-b .tell-the-truth-about-private-api' so it doesn't end up in installed files -- rdieter
 %patch 8 -p1
 
-%patch 50 -p1 -b .QT_VERSION_CHECK
-%patch 51 -p1 -b .hidpi_scale_at_192
-%patch 52 -p1 -b .moc_macros
-%patch 53 -p1 -b .qt5gui_cmake_isystem_includes
-%patch 54 -p1 -b .qmake_LFLAGS
-%patch 61 -p1 -b .qt5-qtbase-cxxflag
-%patch 64 -p1 -b .firebird
-%patch 65 -p1 -b .mysql
-%patch 68 -p1
+%patch50 -p1 -b .QT_VERSION_CHECK
+%patch52 -p1 -b .moc_macros
+%patch54 -p1 -b .qmake_LFLAGS
+%patch61 -p1 -b .qtbase-cxxflag
+%patch65 -p1 -b .mysql
+%patch68 -p1
 
 %patch 80 -p1 -b .use-wayland-on-gnome.patch
 %patch 81 -p1
@@ -289,7 +242,7 @@ sed -i 's/#  include <utility>/#  include <utility>\n#  include <limits>/g' src/
 ## adjust $RPM_OPT_FLAGS
 # remove -fexceptions
 RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed 's|-fexceptions||g'`
-RPM_OPT_FLAGS="$RPM_OPT_FLAGS %{?qt5_arm_flag} %{?qt5_deprecated_flag} %{?qt5_null_flag}"
+RPM_OPT_FLAGS="$RPM_OPT_FLAGS %{?qt_arm_flag} %{?qt_deprecated_flag} %{?qt_null_flag}"
 
 export CFLAGS="$CFLAGS $RPM_OPT_FLAGS"
 export CXXFLAGS="$CXXFLAGS $RPM_OPT_FLAGS"
@@ -314,19 +267,19 @@ ls /usr/bin/
   -confirm-license \
   -platform linuxfb \
   -no-opengl \
-  -prefix %{_qt5_prefix} \
-  -archdatadir %{_qt5_archdatadir} \
-  -bindir %{_qt5_bindir} \
-  -libdir %{_qt5_libdir} \
-  -libexecdir %{_qt5_libexecdir} \
-  -datadir %{_qt5_datadir} \
-  -docdir %{_qt5_docdir} \
-  -examplesdir %{_qt5_examplesdir} \
-  -headerdir %{_qt5_headerdir} \
-  -importdir %{_qt5_importdir} \
-  -plugindir %{_qt5_plugindir} \
-  -sysconfdir %{_qt5_sysconfdir} \
-  -translationdir %{_qt5_translationdir} \
+  -prefix %{_qt_prefix} \
+  -archdatadir %{_qt_archdatadir} \
+  -bindir %{_qt_bindir} \
+  -libdir %{_qt_libdir} \
+  -libexecdir %{_qt_libexecdir} \
+  -datadir %{_qt_datadir} \
+  -docdir %{_qt_docdir} \
+  -examplesdir %{_qt_examplesdir} \
+  -headerdir %{_qt_headerdir} \
+  -importdir %{_qt_importdir} \
+  -plugindir %{_qt_plugindir} \
+  -sysconfdir %{_qt_sysconfdir} \
+  -translationdir %{_qt_translationdir} \
   -platform %{platform} \
   -release \
   -shared \
@@ -374,55 +327,55 @@ make clean -C qmake
 %install
 make install INSTALL_ROOT=%{buildroot}
 
-install -m644 -p -D %{SOURCE1} %{buildroot}%{_qt5_datadir}/qtlogging.ini
+install -m644 -p -D %{SOURCE1} %{buildroot}%{_qt_datadir}/qtlogging.ini
 
 # Qt5.pc
-cat >%{buildroot}%{_libdir}/pkgconfig/Qt5.pc<<EOF
-prefix=%{_qt5_prefix}
-archdatadir=%{_qt5_archdatadir}
-bindir=%{_qt5_bindir}
-datadir=%{_qt5_datadir}
+cat >%{buildroot}%{_libdir}/pkgconfig/Qt6.pc<<EOF
+prefix=%{_qt_prefix}
+archdatadir=%{_qt_archdatadir}
+bindir=%{_qt_bindir}
+datadir=%{_qt_datadir}
 
-docdir=%{_qt5_docdir}
-examplesdir=%{_qt5_examplesdir}
-headerdir=%{_qt5_headerdir}
-importdir=%{_qt5_importdir}
-libdir=%{_qt5_libdir}
-libexecdir=%{_qt5_libexecdir}
-moc=%{_qt5_bindir}/moc
-plugindir=%{_qt5_plugindir}
-qmake=%{_qt5_bindir}/qmake
-settingsdir=%{_qt5_settingsdir}
-sysconfdir=%{_qt5_sysconfdir}
-translationdir=%{_qt5_translationdir}
+docdir=%{_qt_docdir}
+examplesdir=%{_qt_examplesdir}
+headerdir=%{_qt_headerdir}
+importdir=%{_qt_importdir}
+libdir=%{_qt_libdir}
+libexecdir=%{_qt_libexecdir}
+moc=%{_qt_bindir}/moc
+plugindir=%{_qt_plugindir}
+qmake=%{_qt_bindir}/qmake
+settingsdir=%{_qt_settingsdir}
+sysconfdir=%{_qt_sysconfdir}
+translationdir=%{_qt_translationdir}
 
-Name: Qt5
-Description: Qt5 Configuration
+Name: Qt6
+Description: Qt6 Configuration
 Version: %{version}
 EOF
 
 # rpm macros
 install -p -m644 -D %{SOURCE10} \
-  %{buildroot}%{rpm_macros_dir}/macros.qt5-qtbase
+  %{buildroot}%{rpm_macros_dir}/macros.qtbase
 sed -i \
   -e "s|@@NAME@@|%{name}|g" \
   -e "s|@@EPOCH@@|%{?epoch}%{!?epoch:0}|g" \
   -e "s|@@VERSION@@|%{version}|g" \
   -e "s|@@EVR@@|%{?epoch:%{epoch:}}%{version}-%{release}|g" \
-  %{buildroot}%{rpm_macros_dir}/macros.qt5-qtbase
+  %{buildroot}%{rpm_macros_dir}/macros.qtbase
 
 # create/own dirs
-mkdir -p %{buildroot}{%{_qt5_archdatadir}/mkspecs/modules,%{_qt5_importdir},%{_qt5_libexecdir},%{_qt5_plugindir}/{designer,iconengines,script,styles},%{_qt5_translationdir}}
+mkdir -p %{buildroot}{%{_qt_archdatadir}/mkspecs/modules,%{_qt_importdir},%{_qt_libexecdir},%{_qt_plugindir}/{designer,iconengines,script,styles},%{_qt_translationdir}}
 mkdir -p %{buildroot}%{_sysconfdir}/xdg/QtProject
 
-# hardlink binaries from %{_qt5_bindir} to {_bindir}, add -qt5 postfix to not conflict
+# hardlink binaries from %{_qt_bindir} to {_bindir}, add -qt6 postfix to not conflict
 mkdir %{buildroot}%{_bindir}
-pushd %{buildroot}%{_qt5_bindir}
+pushd %{buildroot}%{_qt_bindir}
 
 for i in * ; do
   case "${i}" in
     moc|qdbuscpp2xml|qdbusxml2cpp|qmake|rcc|syncqt|uic)
-      ln -v  ${i} %{buildroot}%{_bindir}/${i}-qt5
+      ln -v  ${i} %{buildroot}%{_bindir}/${i}-qt6
       ln -sv ${i} ${i}-qt5
       ;;
     *)
@@ -436,18 +389,18 @@ popd
 %if 0%{?qtchooser}
   mkdir -p %{buildroot}%{_sysconfdir}/xdg/qtchooser
   pushd    %{buildroot}%{_sysconfdir}/xdg/qtchooser
-  echo "%{_qt5_bindir}" >  5-%{__isa_bits}.conf
-## FIXME/TODO: verify qtchooser (still) happy if _qt5_prefix uses %%_prefix instead of %%_libdir/qt5
-  echo "%{_qt5_prefix}" >> 5-%{__isa_bits}.conf
+  echo "%{_qt_bindir}" >  6-%{__isa_bits}.conf
+## FIXME/TODO: verify qtchooser (still) happy if _qt5_prefix uses %%_prefix instead of %%_libdir/qt6
+  echo "%{_qt_prefix}" >> 6-%{__isa_bits}.conf
   # alternatives targets
-  touch default.conf 5.conf
+  touch default.conf 6.conf
   popd
 %endif
 
 ## .prl/.la file love
 # nuke .prl reference(s) to %%buildroot, excessive (.la-like) libs
-pushd %{buildroot}%{_qt5_libdir}
-for prl_file in libQt5*.prl ; do
+pushd %{buildroot}%{_qt_libdir}
+for prl_file in libQt6*.prl ; do
   sed -i -e "/^QMAKE_PRL_BUILD_DIR/d" ${prl_file}
   if [ -f "$(basename ${prl_file} .prl).so" ]; then
     rm -fv "$(basename ${prl_file} .prl).la"
@@ -457,8 +410,8 @@ done
 popd
 
 # install privat headers for qtxcb
-mkdir -p %{buildroot}%{_qt5_headerdir}/QtXcb
-install -m 644 src/plugins/platforms/xcb/*.h %{buildroot}%{_qt5_headerdir}/QtXcb/
+mkdir -p %{buildroot}%{_qt_headerdir}/QtXcb
+install -m 644 src/plugins/platforms/xcb/*.h %{buildroot}%{_qt_headerdir}/QtXcb/
 
 
 %check
@@ -469,8 +422,8 @@ test "$(pkg-config --modversion Qt5)" = "%{version}"
 ## see tests/README for expected environment (running a plasma session essentially)
 ## we are not quite there yet
 export CTEST_OUTPUT_ON_FAILURE=1
-export PATH=%{buildroot}%{_qt5_bindir}:$PATH
-export LD_LIBRARY_PATH=%{buildroot}%{_qt5_libdir}
+export PATH=%{buildroot}%{_qt_bindir}:$PATH
+export LD_LIBRARY_PATH=%{buildroot}%{_qt_libdir}
 # dbus tests error out when building if session bus is not available
 dbus-launch --exit-with-session \
 %make_build sub-tests  -k ||:
@@ -484,14 +437,14 @@ make check -k ||:
 %if 0%{?qtchooser}
 %pre
 if [ $1 -gt 1 ] ; then
-# remove short-lived qt5.conf alternatives
+# remove short-lived qt6.conf alternatives
 %{_sbindir}/update-alternatives  \
-  --remove qtchooser-qt5 \
-  %{_sysconfdir}/xdg/qtchooser/qt5-%{__isa_bits}.conf >& /dev/null ||:
+  --remove qtchooser-qt6 \
+  %{_sysconfdir}/xdg/qtchooser/qt6-%{__isa_bits}.conf >& /dev/null ||:
 
 %{_sbindir}/update-alternatives  \
   --remove qtchooser-default \
-  %{_sysconfdir}/xdg/qtchooser/qt5.conf >& /dev/null ||:
+  %{_sysconfdir}/xdg/qtchooser/qt6.conf >& /dev/null ||:
 fi
 %endif
 
@@ -499,15 +452,15 @@ fi
 %{?ldconfig}
 %if 0%{?qtchooser}
 %{_sbindir}/update-alternatives \
-  --install %{_sysconfdir}/xdg/qtchooser/5.conf \
-  qtchooser-5 \
+  --install %{_sysconfdir}/xdg/qtchooser/6.conf \
+  qtchooser-6 \
   %{_sysconfdir}/xdg/qtchooser/5-%{__isa_bits}.conf \
   %{priority}
 
 %{_sbindir}/update-alternatives \
   --install %{_sysconfdir}/xdg/qtchooser/default.conf \
   qtchooser-default \
-  %{_sysconfdir}/xdg/qtchooser/5.conf \
+  %{_sysconfdir}/xdg/qtchooser/6.conf \
   %{priority}
 %endif
 
@@ -516,12 +469,12 @@ fi
 %if 0%{?qtchooser}
 if [ $1 -eq 0 ]; then
 %{_sbindir}/update-alternatives  \
-  --remove qtchooser-5 \
-  %{_sysconfdir}/xdg/qtchooser/5-%{__isa_bits}.conf
+  --remove qtchooser-6 \
+  %{_sysconfdir}/xdg/qtchooser/6-%{__isa_bits}.conf
 
 %{_sbindir}/update-alternatives  \
   --remove qtchooser-default \
-  %{_sysconfdir}/xdg/qtchooser/5.conf
+  %{_sysconfdir}/xdg/qtchooser/6.conf
 fi
 %endif
 
@@ -530,234 +483,237 @@ fi
 %license LICENSE.GPL*
 %license LICENSE.LGPL*
 %license LICENSE.QT-LICENSE-AGREEMENT-4.2
+%dir %{_qt_archdatadir}/
+%dir %{_qt_datadir}/
+%dir %{_qt_docdir}/
+%dir %{_qt_libdir}/cmake/
+%dir %{_qt_libdir}/cmake/Qt6/
+%dir %{_qt_libdir}/cmake/Qt6Concurrent/
+%dir %{_qt_libdir}/cmake/Qt6Core/
+%dir %{_qt_libdir}/cmake/Qt6DBus/
+%dir %{_qt_libdir}/cmake/Qt6Gui/
+%dir %{_qt_libdir}/cmake/Qt6Network/
+%dir %{_qt_libdir}/cmake/Qt6PrintSupport/
+%dir %{_qt_libdir}/cmake/Qt6Sql/
+%dir %{_qt_libdir}/cmake/Qt6Test/
+%dir %{_qt_libdir}/cmake/Qt6Widgets/
+%dir %{_qt_libdir}/cmake/Qt6Xml/
+%dir %{_qt_libexecdir}/
+%dir %{_qt_plugindir}/
+%dir %{_qt_plugindir}/bearer/
+%dir %{_qt_plugindir}/designer/
+%dir %{_qt_plugindir}/generic/
+%dir %{_qt_plugindir}/iconengines/
+%dir %{_qt_plugindir}/imageformats/
+%dir %{_qt_plugindir}/platforminputcontexts/
+%dir %{_qt_plugindir}/platforms/
+%dir %{_qt_plugindir}/platformthemes/
+%dir %{_qt_plugindir}/script/
+%dir %{_qt_plugindir}/sqldrivers/
+%dir %{_qt_plugindir}/styles/
+%if "%{_qt_prefix}" != "%{_prefix}"
+%dir %{_qt_prefix}/
+%endif
+%dir %{_sysconfdir}/xdg/QtProject/
+%{_qt_datadir}/qtlogging.ini
+%{_qt_docdir}/global/
+%{_qt_importdir}/
+%{_qt_libdir}/cmake/Qt6Sql/Qt6Sql_QSQLiteDriverPlugin.cmake
+%{_qt_libdir}/cmake/Qt6Network/Qt6Network_QConnmanEnginePlugin.cmake
+%{_qt_libdir}/cmake/Qt6Network/Qt6Network_QGenericEnginePlugin.cmake
+%{_qt_libdir}/cmake/Qt6Network/Qt6Network_QNetworkManagerEnginePlugin.cmake
+%{_qt_libdir}/libQt6Concurrent.so.6*
+%{_qt_libdir}/libQt6Core.so.6*
+%{_qt_libdir}/libQt6DBus.so.6*
+%{_qt_libdir}/libQt6Network.so.6*
+%{_qt_libdir}/libQt6PrintSupport.so.6*
+%{_qt_libdir}/libQt6Sql.so.6*
+%{_qt_libdir}/libQt6Test.so.6*
+%{_qt_libdir}/libQt6Xml.so.6*
+%{_qt_plugindir}/bearer/libqconnmanbearer.so
+%{_qt_plugindir}/bearer/libqgenericbearer.so
+%{_qt_plugindir}/bearer/libqnmbearer.so
+%{_qt_plugindir}/sqldrivers/libqsqlite.so
+%{_qt_translationdir}/
 %if 0%{?qtchooser}
 %dir %{_sysconfdir}/xdg/qtchooser
 # not editable config files, so not using %%config here
 %ghost %{_sysconfdir}/xdg/qtchooser/default.conf
 %ghost %{_sysconfdir}/xdg/qtchooser/5.conf
-%{_sysconfdir}/xdg/qtchooser/5-%{__isa_bits}.conf
+%{_sysconfdir}/xdg/qtchooser/6-%{__isa_bits}.conf
 %endif
-%dir %{_sysconfdir}/xdg/QtProject/
-%{_qt5_libdir}/libQt5Concurrent.so.5*
-%{_qt5_libdir}/libQt5Core.so.5*
-%{_qt5_libdir}/libQt5DBus.so.5*
-%{_qt5_libdir}/libQt5Network.so.5*
-%{_qt5_libdir}/libQt5PrintSupport.so.5*
-%{_qt5_libdir}/libQt5Sql.so.5*
-%{_qt5_libdir}/libQt5Test.so.5*
-%{_qt5_libdir}/libQt5Xml.so.5*
-%dir %{_qt5_libdir}/cmake/
-%dir %{_qt5_libdir}/cmake/Qt5/
-%dir %{_qt5_libdir}/cmake/Qt5Concurrent/
-%dir %{_qt5_libdir}/cmake/Qt5Core/
-%dir %{_qt5_libdir}/cmake/Qt5DBus/
-%dir %{_qt5_libdir}/cmake/Qt5Gui/
-%dir %{_qt5_libdir}/cmake/Qt5Network/
-%dir %{_qt5_libdir}/cmake/Qt5PrintSupport/
-%dir %{_qt5_libdir}/cmake/Qt5Sql/
-%dir %{_qt5_libdir}/cmake/Qt5Test/
-%dir %{_qt5_libdir}/cmake/Qt5Widgets/
-%dir %{_qt5_libdir}/cmake/Qt5Xml/
-%dir %{_qt5_docdir}/
-%{_qt5_docdir}/global/
-%{_qt5_importdir}/
-%{_qt5_translationdir}/
-%if "%{_qt5_prefix}" != "%{_prefix}"
-%dir %{_qt5_prefix}/
-%endif
-%dir %{_qt5_archdatadir}/
-%dir %{_qt5_datadir}/
-%{_qt5_datadir}/qtlogging.ini
-%dir %{_qt5_libexecdir}/
-%dir %{_qt5_plugindir}/
-%dir %{_qt5_plugindir}/bearer/
-%{_qt5_plugindir}/bearer/libqconnmanbearer.so
-%{_qt5_plugindir}/bearer/libqgenericbearer.so
-%{_qt5_plugindir}/bearer/libqnmbearer.so
-%{_qt5_libdir}/cmake/Qt5Network/Qt5Network_QConnmanEnginePlugin.cmake
-%{_qt5_libdir}/cmake/Qt5Network/Qt5Network_QGenericEnginePlugin.cmake
-%{_qt5_libdir}/cmake/Qt5Network/Qt5Network_QNetworkManagerEnginePlugin.cmake
-%dir %{_qt5_plugindir}/designer/
-%dir %{_qt5_plugindir}/generic/
-%dir %{_qt5_plugindir}/iconengines/
-%dir %{_qt5_plugindir}/imageformats/
-%dir %{_qt5_plugindir}/platforminputcontexts/
-%dir %{_qt5_plugindir}/platforms/
-%dir %{_qt5_plugindir}/platformthemes/
-%dir %{_qt5_plugindir}/script/
-%dir %{_qt5_plugindir}/sqldrivers/
-%dir %{_qt5_plugindir}/styles/
-%{_qt5_plugindir}/sqldrivers/libqsqlite.so
-%{_qt5_libdir}/cmake/Qt5Sql/Qt5Sql_QSQLiteDriverPlugin.cmake
 
 %files common
 # mostly empty for now, consider: filesystem/dir ownership, licenses
-%{rpm_macros_dir}/macros.qt5-qtbase
+%{rpm_macros_dir}/macros.qtbase
 
 %files devel
-%if "%{_qt5_bindir}" != "%{_bindir}"
-%dir %{_qt5_bindir}
+%if "%{_qt_bindir}" != "%{_bindir}"
+%dir %{_qt_bindir}
 %endif
+%if "%{_qt_headerdir}" != "%{_includedir}"
+%dir %{_qt_headerdir}
+%endif
+%{_bindir}/fixqt4headers.pl
 %{_bindir}/moc*
 %{_bindir}/qdbuscpp2xml*
 %{_bindir}/qdbusxml2cpp*
+%{_bindir}/qlalr
 %{_bindir}/qmake*
+%{_bindir}/qvkgen
 %{_bindir}/rcc*
 %{_bindir}/syncqt*
 %{_bindir}/uic*
-%{_bindir}/qlalr
-%{_bindir}/fixqt4headers.pl
-%{_bindir}/qvkgen
-%{_qt5_bindir}/moc*
-%{_qt5_bindir}/qdbuscpp2xml*
-%{_qt5_bindir}/qdbusxml2cpp*
-%{_qt5_bindir}/qmake*
-%{_qt5_bindir}/rcc*
-%{_qt5_bindir}/syncqt*
-%{_qt5_bindir}/uic*
-%{_qt5_bindir}/qlalr
-%{_qt5_bindir}/fixqt4headers.pl
-%{_qt5_bindir}/qvkgen
-%if "%{_qt5_headerdir}" != "%{_includedir}"
-%dir %{_qt5_headerdir}
-%endif
-%{_qt5_headerdir}/QtConcurrent/
-%{_qt5_headerdir}/QtCore/
-%{_qt5_headerdir}/QtDBus/
-%{_qt5_headerdir}/QtGui/
-%{_qt5_headerdir}/QtNetwork/
-%{_qt5_headerdir}/QtPlatformHeaders/
-%{_qt5_headerdir}/QtPrintSupport/
-%{_qt5_headerdir}/QtSql/
-%{_qt5_headerdir}/QtTest/
-%{_qt5_headerdir}/QtWidgets/
-%{_qt5_headerdir}/QtXcb/
-%{_qt5_headerdir}/QtXml/
-%{_qt5_headerdir}/QtInputSupport
-%{_qt5_headerdir}/QtEdidSupport
-%{_qt5_archdatadir}/mkspecs/
-%{_qt5_libdir}/libQt5Concurrent.prl
-%{_qt5_libdir}/libQt5Concurrent.so
-%{_qt5_libdir}/libQt5Core.prl
-%{_qt5_libdir}/libQt5Core.so
-%{_qt5_libdir}/libQt5DBus.prl
-%{_qt5_libdir}/libQt5DBus.so
-%{_qt5_libdir}/libQt5Gui.prl
-%{_qt5_libdir}/libQt5Gui.so
-%{_qt5_libdir}/libQt5Network.prl
-%{_qt5_libdir}/libQt5Network.so
-%{_qt5_libdir}/libQt5PrintSupport.prl
-%{_qt5_libdir}/libQt5PrintSupport.so
-%{_qt5_libdir}/libQt5Sql.prl
-%{_qt5_libdir}/libQt5Sql.so
-%{_qt5_libdir}/libQt5Test.prl
-%{_qt5_libdir}/libQt5Test.so
-%{_qt5_libdir}/libQt5Widgets.prl
-%{_qt5_libdir}/libQt5Widgets.so
-%{_qt5_libdir}/libQt5Xml.prl
-%{_qt5_libdir}/libQt5Xml.so
-%{_qt5_libdir}/cmake/Qt5/Qt5Config*.cmake
-%{_qt5_libdir}/cmake/Qt5Concurrent/Qt5ConcurrentConfig*.cmake
-%{_qt5_libdir}/cmake/Qt5Core/Qt5CoreConfig*.cmake
-%{_qt5_libdir}/cmake/Qt5Core/Qt5CoreMacros.cmake
-%{_qt5_libdir}/cmake/Qt5Core/Qt5CTestMacros.cmake
-%{_qt5_libdir}/cmake/Qt5DBus/Qt5DBusConfig*.cmake
-%{_qt5_libdir}/cmake/Qt5DBus/Qt5DBusMacros.cmake
-%{_qt5_libdir}/cmake/Qt5Gui/Qt5GuiConfig*.cmake
-%{_qt5_libdir}/cmake/Qt5Network/Qt5NetworkConfig*.cmake
-%{_qt5_libdir}/cmake/Qt5PrintSupport/Qt5PrintSupportConfig*.cmake
-%{_qt5_libdir}/cmake/Qt5Sql/Qt5SqlConfig*.cmake
-%{_qt5_libdir}/cmake/Qt5Test/Qt5TestConfig*.cmake
-%{_qt5_libdir}/cmake/Qt5Widgets/Qt5WidgetsConfig*.cmake
-%{_qt5_libdir}/cmake/Qt5Widgets/Qt5WidgetsMacros.cmake
-%{_qt5_libdir}/cmake/Qt5Xml/Qt5XmlConfig*.cmake
-%{_qt5_libdir}/cmake/Qt5/Qt5ModuleLocation.cmake
-%{_qt5_libdir}/pkgconfig/Qt5.pc
-%{_qt5_libdir}/pkgconfig/Qt5Concurrent.pc
-%{_qt5_libdir}/pkgconfig/Qt5Core.pc
-%{_qt5_libdir}/pkgconfig/Qt5DBus.pc
-%{_qt5_libdir}/pkgconfig/Qt5Gui.pc
-%{_qt5_libdir}/pkgconfig/Qt5Network.pc
-%{_qt5_libdir}/pkgconfig/Qt5PrintSupport.pc
-%{_qt5_libdir}/pkgconfig/Qt5Sql.pc
-%{_qt5_libdir}/pkgconfig/Qt5Test.pc
-%{_qt5_libdir}/pkgconfig/Qt5Widgets.pc
-%{_qt5_libdir}/pkgconfig/Qt5Xml.pc
+%{_qt_archdatadir}/mkspecs/
+%{_qt_bindir}/fixqt4headers.pl
+%{_qt_bindir}/moc*
+%{_qt_bindir}/qdbuscpp2xml*
+%{_qt_bindir}/qdbusxml2cpp*
+%{_qt_bindir}/qlalr
+%{_qt_bindir}/qmake*
+%{_qt_bindir}/qvkgen
+%{_qt_bindir}/rcc*
+%{_qt_bindir}/syncqt*
+%{_qt_bindir}/uic*
+%{_qt_headerdir}/QtConcurrent/
+%{_qt_headerdir}/QtCore/
+%{_qt_headerdir}/QtDBus/
+%{_qt_headerdir}/QtEdidSupport
+%{_qt_headerdir}/QtGui/
+%{_qt_headerdir}/QtInputSupport
+%{_qt_headerdir}/QtNetwork/
+%{_qt_headerdir}/QtPlatformHeaders/
+%{_qt_headerdir}/QtPrintSupport/
+%{_qt_headerdir}/QtSql/
+%{_qt_headerdir}/QtTest/
+%{_qt_headerdir}/QtWidgets/
+%{_qt_headerdir}/QtXcb/
+%{_qt_headerdir}/QtXml/
+%{_qt_libdir}/cmake/Qt6/Qt6Config*.cmake
+%{_qt_libdir}/cmake/Qt6/Qt6ModuleLocation.cmake
+%{_qt_libdir}/cmake/Qt6Concurrent/Qt6ConcurrentConfig*.cmake
+%{_qt_libdir}/cmake/Qt6Core/Qt6CTestMacros.cmake
+%{_qt_libdir}/cmake/Qt6Core/Qt6CoreConfig*.cmake
+%{_qt_libdir}/cmake/Qt6Core/Qt6CoreMacros.cmake
+%{_qt_libdir}/cmake/Qt6DBus/Qt6DBusConfig*.cmake
+%{_qt_libdir}/cmake/Qt6DBus/Qt6DBusMacros.cmake
+%{_qt_libdir}/cmake/Qt6Gui/Qt6GuiConfig*.cmake
+%{_qt_libdir}/cmake/Qt6Network/Qt6NetworkConfig*.cmake
+%{_qt_libdir}/cmake/Qt6PrintSupport/Qt6PrintSupportConfig*.cmake
+%{_qt_libdir}/cmake/Qt6Sql/Qt6SqlConfig*.cmake
+%{_qt_libdir}/cmake/Qt6Test/Qt6TestConfig*.cmake
+%{_qt_libdir}/cmake/Qt6Widgets/Qt6WidgetsConfig*.cmake
+%{_qt_libdir}/cmake/Qt6Widgets/Qt6WidgetsMacros.cmake
+%{_qt_libdir}/cmake/Qt6Xml/Qt6XmlConfig*.cmake
+%{_qt_libdir}/libQt6Concurrent.prl
+%{_qt_libdir}/libQt6Concurrent.so
+%{_qt_libdir}/libQt6Core.prl
+%{_qt_libdir}/libQt6Core.so
+%{_qt_libdir}/libQt6DBus.prl
+%{_qt_libdir}/libQt6DBus.so
+%{_qt_libdir}/libQt6Gui.prl
+%{_qt_libdir}/libQt6Gui.so
+%{_qt_libdir}/libQt6Network.prl
+%{_qt_libdir}/libQt6Network.so
+%{_qt_libdir}/libQt6PrintSupport.prl
+%{_qt_libdir}/libQt6PrintSupport.so
+%{_qt_libdir}/libQt6Sql.prl
+%{_qt_libdir}/libQt6Sql.so
+%{_qt_libdir}/libQt6Test.prl
+%{_qt_libdir}/libQt6Test.so
+%{_qt_libdir}/libQt6Widgets.prl
+%{_qt_libdir}/libQt6Widgets.so
+%{_qt_libdir}/libQt6Xml.prl
+%{_qt_libdir}/libQt6Xml.so
+%{_qt_libdir}/pkgconfig/Qt6.pc
+%{_qt_libdir}/pkgconfig/Qt6Concurrent.pc
+%{_qt_libdir}/pkgconfig/Qt6Core.pc
+%{_qt_libdir}/pkgconfig/Qt6DBus.pc
+%{_qt_libdir}/pkgconfig/Qt6Gui.pc
+%{_qt_libdir}/pkgconfig/Qt6Network.pc
+%{_qt_libdir}/pkgconfig/Qt6PrintSupport.pc
+%{_qt_libdir}/pkgconfig/Qt6Sql.pc
+%{_qt_libdir}/pkgconfig/Qt6Test.pc
+%{_qt_libdir}/pkgconfig/Qt6Widgets.pc
+%{_qt_libdir}/pkgconfig/Qt6Xml.pc
 ## private-devel globs
 # keep mkspecs/modules stuff  in -devel for now, https://bugzilla.redhat.com/show_bug.cgi?id=1705280
-# PERCENT_SIGN exclude PERCENT_SIGN {_qt5_archdatadir}/mkspecs/modules/qt_lib_*_private.pri
-%exclude %{_qt5_headerdir}/*/%{version}/*/private/
+# PERCENT_SIGN exclude PERCENT_SIGN {_qt_archdatadir}/mkspecs/modules/qt_lib_*_private.pri
+%exclude %{_qt_headerdir}/*/%{version}/*/private/
 
 %files private-devel
-%{_qt5_headerdir}/*/%{version}/*/private/
+%{_qt_headerdir}/*/%{version}/*/private/
 
 %files static
-%{_qt5_libdir}/libQt5Bootstrap.*a
-%{_qt5_libdir}/libQt5Bootstrap.prl
-%{_qt5_libdir}/libQt5AccessibilitySupport.*a
-%{_qt5_libdir}/libQt5AccessibilitySupport.prl
-%{_qt5_headerdir}/QtAccessibilitySupport
-%{_qt5_libdir}/libQt5DeviceDiscoverySupport.*a
-%{_qt5_libdir}/libQt5DeviceDiscoverySupport.prl
-%{_qt5_headerdir}/QtDeviceDiscoverySupport
-%{_qt5_libdir}/libQt5EventDispatcherSupport.*a
-%{_qt5_libdir}/libQt5EventDispatcherSupport.prl
-%{_qt5_headerdir}/QtEventDispatcherSupport
-%{_qt5_libdir}/libQt5FbSupport.*a
-%{_qt5_libdir}/libQt5FbSupport.prl
-%{_qt5_headerdir}/QtFbSupport
-%{_qt5_libdir}/libQt5FontDatabaseSupport.*a
-%{_qt5_libdir}/libQt5FontDatabaseSupport.prl
-%{_qt5_headerdir}/QtFontDatabaseSupport
-%{_qt5_libdir}/libQt5InputSupport.*a
-%{_qt5_libdir}/libQt5InputSupport.prl
-%{_qt5_libdir}/libQt5ServiceSupport.*a
-%{_qt5_libdir}/libQt5ServiceSupport.prl
-%{_qt5_headerdir}/QtServiceSupport
-%{_qt5_libdir}/libQt5ThemeSupport.*a
-%{_qt5_libdir}/libQt5ThemeSupport.prl
-%{_qt5_headerdir}/QtThemeSupport
-%{_qt5_libdir}/libQt5EdidSupport.*a
-%{_qt5_libdir}/libQt5EdidSupport.prl
+%{_qt_headerdir}/QtAccessibilitySupport
+%{_qt_headerdir}/QtDeviceDiscoverySupport
+%{_qt_headerdir}/QtEventDispatcherSupport
+%{_qt_headerdir}/QtFbSupport
+%{_qt_headerdir}/QtFontDatabaseSupport
+%{_qt_headerdir}/QtServiceSupport
+%{_qt_headerdir}/QtThemeSupport
+%{_qt_libdir}/libQt6AccessibilitySupport.*a
+%{_qt_libdir}/libQt6AccessibilitySupport.prl
+%{_qt_libdir}/libQt6Bootstrap.*a
+%{_qt_libdir}/libQt6Bootstrap.prl
+%{_qt_libdir}/libQt6DeviceDiscoverySupport.*a
+%{_qt_libdir}/libQt6DeviceDiscoverySupport.prl
+%{_qt_libdir}/libQt6EdidSupport.*a
+%{_qt_libdir}/libQt6EdidSupport.prl
+%{_qt_libdir}/libQt6EventDispatcherSupport.*a
+%{_qt_libdir}/libQt6EventDispatcherSupport.prl
+%{_qt_libdir}/libQt6FbSupport.*a
+%{_qt_libdir}/libQt6FbSupport.prl
+%{_qt_libdir}/libQt6FontDatabaseSupport.*a
+%{_qt_libdir}/libQt6FontDatabaseSupport.prl
+%{_qt_libdir}/libQt6InputSupport.*a
+%{_qt_libdir}/libQt6InputSupport.prl
+%{_qt_libdir}/libQt6ServiceSupport.*a
+%{_qt_libdir}/libQt6ServiceSupport.prl
+%{_qt_libdir}/libQt6ThemeSupport.*a
+%{_qt_libdir}/libQt6ThemeSupport.prl
 
 %if 0%{?examples}
 %files examples
-%{_qt5_examplesdir}/
+%{_qt_examplesdir}/
 %endif
 
 %files gui
-%{_qt5_libdir}/libQt5Gui.so.5*
-%{_qt5_libdir}/libQt5Widgets.so.5*
-%{_qt5_plugindir}/generic/libqevdevkeyboardplugin.so
-%{_qt5_plugindir}/generic/libqevdevmouseplugin.so
-%{_qt5_plugindir}/generic/libqevdevtabletplugin.so
-%{_qt5_plugindir}/generic/libqevdevtouchplugin.so
-%{_qt5_plugindir}/generic/libqtuiotouchplugin.so
-%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEvdevKeyboardPlugin.cmake
-%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEvdevMousePlugin.cmake
-%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEvdevTabletPlugin.cmake
-%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEvdevTouchScreenPlugin.cmake
-%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QTuioTouchPlugin.cmake
-%{_qt5_plugindir}/imageformats/libqgif.so
-%{_qt5_plugindir}/imageformats/libqico.so
-%{_qt5_plugindir}/imageformats/libqjpeg.so
-%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QGifPlugin.cmake
-%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QICOPlugin.cmake
-%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QJpegPlugin.cmake
-%{_qt5_plugindir}/platforminputcontexts/libibusplatforminputcontextplugin.so
-%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QIbusPlatformInputContextPlugin.cmake
-%{_qt5_plugindir}/platforms/libqlinuxfb.so
-%{_qt5_plugindir}/platforms/libqminimal.so
-%{_qt5_plugindir}/platforms/libqoffscreen.so
-%{_qt5_plugindir}/platforms/libqvnc.so
-%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QLinuxFbIntegrationPlugin.cmake
-%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QMinimalIntegrationPlugin.cmake
-%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QOffscreenIntegrationPlugin.cmake
-%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QVncIntegrationPlugin.cmake
-%{_qt5_plugindir}/platformthemes/libqxdgdesktopportal.so
-%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXdgDesktopPortalThemePlugin.cmake
+%{_qt_libdir}/cmake/Qt6Gui/Qt6Gui_QEvdevKeyboardPlugin.cmake
+%{_qt_libdir}/cmake/Qt6Gui/Qt6Gui_QEvdevMousePlugin.cmake
+%{_qt_libdir}/cmake/Qt6Gui/Qt6Gui_QEvdevTabletPlugin.cmake
+%{_qt_libdir}/cmake/Qt6Gui/Qt6Gui_QEvdevTouchScreenPlugin.cmake
+%{_qt_libdir}/cmake/Qt6Gui/Qt6Gui_QGifPlugin.cmake
+%{_qt_libdir}/cmake/Qt6Gui/Qt6Gui_QICOPlugin.cmake
+%{_qt_libdir}/cmake/Qt6Gui/Qt6Gui_QIbusPlatformInputContextPlugin.cmake
+%{_qt_libdir}/cmake/Qt6Gui/Qt6Gui_QJpegPlugin.cmake
+%{_qt_libdir}/cmake/Qt6Gui/Qt6Gui_QLinuxFbIntegrationPlugin.cmake
+%{_qt_libdir}/cmake/Qt6Gui/Qt6Gui_QMinimalIntegrationPlugin.cmake
+%{_qt_libdir}/cmake/Qt6Gui/Qt6Gui_QOffscreenIntegrationPlugin.cmake
+%{_qt_libdir}/cmake/Qt6Gui/Qt6Gui_QTuioTouchPlugin.cmake
+%{_qt_libdir}/cmake/Qt6Gui/Qt6Gui_QVncIntegrationPlugin.cmake
+%{_qt_libdir}/cmake/Qt6Gui/Qt6Gui_QXdgDesktopPortalThemePlugin.cmake
+%{_qt_libdir}/libQt6Gui.so.6*
+%{_qt_libdir}/libQt6Widgets.so.6*
+%{_qt_plugindir}/generic/libqevdevkeyboardplugin.so
+%{_qt_plugindir}/generic/libqevdevmouseplugin.so
+%{_qt_plugindir}/generic/libqevdevtabletplugin.so
+%{_qt_plugindir}/generic/libqevdevtouchplugin.so
+%{_qt_plugindir}/generic/libqtuiotouchplugin.so
+%{_qt_plugindir}/imageformats/libqgif.so
+%{_qt_plugindir}/imageformats/libqico.so
+%{_qt_plugindir}/imageformats/libqjpeg.so
+%{_qt_plugindir}/platforminputcontexts/libibusplatforminputcontextplugin.so
+%{_qt_plugindir}/platforms/libqlinuxfb.so
+%{_qt_plugindir}/platforms/libqminimal.so
+%{_qt_plugindir}/platforms/libqoffscreen.so
+%{_qt_plugindir}/platforms/libqvnc.so
+%{_qt_plugindir}/platformthemes/libqxdgdesktopportal.so
 
 %changelog
+* Tue Jan 02 2023 Sam Meluch <sammeluch@micrsoft.com> - 6.6.1
+- Upgrade to version 6.6.1 for Azure Linux 3.0
+
 * Tue Aug 01 2023 Thien Trung Vuong <tvuong@microsoft.com> - 5.12.11-9
 - Add patch to resolve CVE-2023-33285, CVE-2023-37369, CVE-2023-38197
 
