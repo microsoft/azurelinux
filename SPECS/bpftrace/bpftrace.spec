@@ -81,7 +81,7 @@ install -p -m 644 tools/*.txt %{buildroot}%{_datadir}/bpftrace/tools/doc
 %changelog
 * Thu Jan 04 2024 muhammad Falak <mwani@microsoft.com> - 0.19.1-1
 - Upgrade version to 0.19.1
-- Use sytem libbpf
+- Use system libbpf
 - Switch build type to RelWithDebInfo
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.16.0-2
