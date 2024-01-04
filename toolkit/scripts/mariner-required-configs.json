@@ -1348,6 +1348,18 @@
                 "PR": [
                     "https://github.com/microsoft/CBL-Mariner/pull/7280"
                 ]
+            },
+            "CONFIG_X86_IOPL_IOPERM": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/"
+                ]
             }
         }
     }
