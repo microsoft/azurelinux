@@ -93,7 +93,7 @@ TZ=:America/Los_Angeles %__make check
 - Upgraded to 0.9.0
 - License verified
 - Promoted package to CBL-Mariner Core repository
-- Added patch libdwarf_skip_test.patch to skip two tests test_dwarfdumpPE.sh and test_dwarfdumpMacos.sh that require the packages to be installed in system repositories. Patch avoid ptest failure due to issue https://github.com/davea42/libdwarf-code/issues/212
+- Added patch libdwarf_skip_test.patch to skip two tests test_dwarfdumpPE.sh and test_dwarfdumpMacos.sh that require the packages to be installed in system repositories. Patch is added to avoid ptest failure due to issue https://github.com/davea42/libdwarf-code/issues/212
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200114-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
