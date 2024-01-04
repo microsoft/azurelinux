@@ -29,8 +29,8 @@
 %bcond_without tools
 Summary:        Set of libraries and drivers for fast packet processing
 Name:           dpdk
-Version:        21.11.2
-Release:        2%{?dist}
+Version:        23.07
+Release:        1%{?dist}
 License:        BSD AND LGPLv2 AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -179,6 +179,9 @@ CFLAGS="$(echo %{optflags} -fcommon)" \
 %endif
 
 %changelog
+* Thu Jan 04 2024 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 23.07-1
+- Update to version 23.07 for 3.0 upgrades
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 21.11.2-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

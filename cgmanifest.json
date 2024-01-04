@@ -2918,8 +2918,8 @@
         "type": "other",
         "other": {
           "name": "dpdk",
-          "version": "21.11.2",
-          "downloadUrl": "https://fast.dpdk.org/rel/dpdk-21.11.2.tar.xz"
+          "version": "23.07",
+          "downloadUrl": "https://fast.dpdk.org/rel/dpdk-23.07.tar.xz"
         }
       }
     },
