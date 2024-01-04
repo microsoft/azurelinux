@@ -26,15 +26,6 @@ BuildRequires:  e2fsprogs-devel
 BuildRequires:  audit-libs-devel
 BuildRequires:  autoconf automake libtool
 
-# Patch1: aide-0.16rc1-man.patch
-# Patch2: aide-0.16b1-fipsfix.patch
-# Patch3: aide-0.16-Use-LDADD-for-adding-curl-library-to-the-linker-comm.patch
-#
-# Patch4: aide-0.15-syslog-format.patch
-# Patch5: aide-0.16-crypto-disable-haval-and-others.patch
-# Patch6: coverity.patch
-# Patch7: aide-0.16-crash-elf.patch
-
 %description
 AIDE (Advanced Intrusion Detection Environment) is a file integrity
 checker and intrusion detection program.
