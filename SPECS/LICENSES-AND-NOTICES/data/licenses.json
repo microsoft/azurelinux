@@ -2196,6 +2196,7 @@
                 "kernel-azure-signed",
                 "kernel-hci-signed",
                 "kernel-mos-signed",
+                "kernel-mshv-signed",
                 "kernel-signed",
                 "KeysInUse-OpenSSL",
                 "kpatch",
