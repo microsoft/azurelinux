@@ -30,8 +30,8 @@ check-debuginfo-0.15.2-1.azl3.x86_64.rpm
 chkconfig-1.25-1.azl3.x86_64.rpm
 chkconfig-debuginfo-1.25-1.azl3.x86_64.rpm
 chkconfig-lang-1.25-1.azl3.x86_64.rpm
-cmake-3.21.4-10.azl3.x86_64.rpm
-cmake-debuginfo-3.21.4-10.azl3.x86_64.rpm
+cmake-3.27.4-1.azl3.x86_64.rpm
+cmake-debuginfo-3.27.4-1.azl3.x86_64.rpm
 coreutils-8.32-7.azl3.x86_64.rpm
 coreutils-debuginfo-8.32-7.azl3.x86_64.rpm
 coreutils-lang-8.32-7.azl3.x86_64.rpm
