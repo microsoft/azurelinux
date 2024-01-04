@@ -77,6 +77,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man1/*
 
 %changelog
+* Thu Jan 04 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.7.24-1
+- Auto-upgrade to 0.7.24 - 3.0 upgrades
+
 * Tue Jun 20 2023 Sam Meluch <sammeluch@microsoft.com> - 0.7.24-1
 - add ENABLE_COMPS option to support dnf5
 - Upgrade to version 0.7.24
