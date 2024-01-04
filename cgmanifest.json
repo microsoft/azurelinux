@@ -2397,8 +2397,8 @@
         "type": "other",
         "other": {
           "name": "dbus",
-          "version": "1.15.2",
-          "downloadUrl": "https://dbus.freedesktop.org/releases/dbus/dbus-1.15.2.tar.xz"
+          "version": "1.15.8",
+          "downloadUrl": "https://dbus.freedesktop.org/releases/dbus/dbus-1.15.8.tar.xz"
         }
       }
     },
