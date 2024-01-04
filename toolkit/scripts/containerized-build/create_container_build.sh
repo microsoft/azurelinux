@@ -23,7 +23,7 @@ print_error() {
 help() {
 echo "
 Usage:
-sudo make containerized-rpmbuild [REPO_PATH=/path/to/CBL-Mariner] [MODE=test|build] [VERSION=1.0|2.0] [MOUNTS=/path/in/host:/path/in/container ...] [BUILD_MOUNT=/path/to/build/chroot/mount] [EXTRA_PACKAGES=pkg ...] [ENABLE_REPO=y] [KEEP_CONTAINER=y] [IMAGE="image"]
+sudo make containerized-rpmbuild [REPO_PATH=/path/to/CBL-Mariner] [MODE=test|build] [VERSION=1.0|2.0] [MOUNTS=/path/in/host:/path/in/container ...] [BUILD_MOUNT=/path/to/build/chroot/mount] [EXTRA_PACKAGES=pkg ...] [ENABLE_REPO=y] [KEEP_CONTAINER=y] [IMAGE=default|latest|image-id]
 
 Starts a docker container with the specified version of mariner.
 
@@ -40,8 +40,10 @@ Optional arguments:
     EXTRA_PACKAGES  Space delimited list of packages to tdnf install in the container on startup. e.g. EXTRA_PACKAGES=\"pkg1 pkg2\" default: \"\"
     ENABLE_REPO:    Set to 'y' to use local RPMs to satisfy package dependencies. default: n
     KEEP_CONTAINER: Set to 'y' to not cleanup container upon exit. default: n
-    IMAGE:          Container image to use. For example, IMAGE=\"mcr.microsoft.com/cbl-mariner/root-containerized-rpmbuild:2.0\". default: tool constructs an image
-
+    IMAGE:          Container image to use. default, latest or image-id. default: default.
+                        If 'default', construct a new image using base Mariner image.
+                        If 'latest', run last container for containerized-rpmbuild image.
+                        If user provides image-id, run last container for user-provided image-id.
     * User can override Mariner make definitions. Some useful overrides could be
                     SPECS_DIR: build specs from another directory like SPECS-EXTENDED by providing SPECS_DIR=path/to/SPECS-EXTENDED. default: $REPO_PATH/SPECS
                     SRPM_PACK_LIST: provide a list of SRPMS to build by providing SRPM_PACK_LIST=\"srpm1 srpm2 ...\". default: builds all SRPMS from $SPECS_DIR
@@ -82,7 +84,7 @@ script_dir=$(realpath $(dirname "${BASH_SOURCE[0]}"))
 topdir=/usr/src/mariner
 enable_local_repo=false
 keep_container="--rm"
-container_img=""
+container_img_type="default"
 
 while (( "$#")); do
   case "$1" in
@@ -94,14 +96,11 @@ while (( "$#")); do
     -ep ) extra_packages="$2"; shift 2;;
     -r ) enable_local_repo=true; shift ;;
     -k ) keep_container=""; shift ;;
-    -i) container_img="$2"; shift 2 ;;
-    -h ) help; exit 1 ;;
+    -i) container_img_type="$2"; shift 2 ;;
+    -h ) help; exit 0 ;;
     ? ) echo -e "ERROR: INVALID OPTION.\n\n"; help; exit 1 ;;
   esac
 done
-    -i) container_img="$2"; shift 2 ;;
-
-echo "container image is $container_img"
 
 # Assign default values
 [[ -z "${repo_path}" ]] && repo_path=${script_dir} && repo_path=${repo_path%'/toolkit'*}
@@ -213,8 +212,7 @@ sed -i "s~<TOPDIR>~${topdir}~" $tmp_dir/setup_functions.sh
 
 # ============ Build the image ============
 dockerfile="${script_dir}/resources/mariner.Dockerfile"
-
-if [[ "${container_img}" == "" ]]; then # Configure base image
+if [[ "${container_img_type}" == "default" ]]; then # Configure base image
     if [[ "${mode}" == "build" ]]; then
         echo "Importing chroot into docker..."
         chroot_file="$BUILD_DIR/worker/worker_chroot.tar.gz"
@@ -237,28 +235,36 @@ if [[ "${container_img}" == "" ]]; then # Configure base image
     else
         container_img="mcr.microsoft.com/cbl-mariner/base/core:${version}"
     fi
-else
-    echo "NEHAAAAAAAA we have an image alreadyy $container_img"
 fi
 
 # ================== Launch Container ==================
-echo "Checking if build env is up-to-date..."
 docker_image_tag="mcr.microsoft.com/cbl-mariner/${USER}-containerized-rpmbuild:${version}"
-docker build -q \
-                -f "${dockerfile}" \
-                -t "${docker_image_tag}" \
-                --build-arg container_img="$container_img" \
-                --build-arg version="$version" \
-                --build-arg enable_local_repo="$enable_local_repo" \
-                --build-arg mariner_repo="$repo_path" \
-                --build-arg mode="$mode" \
-                --build-arg extra_packages="$extra_packages" \
-                .
-
-echo "docker_image_tag is ${docker_image_tag}"
-
-bash -c "docker run $keep_container\
-    ${mount_arg} \
-    -it ${docker_image_tag} /bin/bash; \
-    if [[ -d $RPMS_DIR/repodata ]]; then { rm -r $RPMS_DIR/repodata; echo 'Clearing repodata' ; }; fi
-    "
+if [[ "${container_img_type}" == "default" ]]; then # Start a new container
+    echo "Building image..."
+    docker build -q \
+                    -f "${dockerfile}" \
+                    -t "${docker_image_tag}" \
+                    --build-arg container_img="$container_img" \
+                    --build-arg version="$version" \
+                    --build-arg enable_local_repo="$enable_local_repo" \
+                    --build-arg mariner_repo="$repo_path" \
+                    --build-arg mode="$mode" \
+                    --build-arg extra_packages="$extra_packages" \
+                    .
+    bash -c "docker run $keep_container\
+        ${mount_arg} \
+        -it ${docker_image_tag} /bin/bash; \
+        if [[ -d $RPMS_DIR/repodata ]]; then { rm -r $RPMS_DIR/repodata; echo 'Clearing repodata' ; }; fi
+        "
+else # Restart container for user provided image-id
+    if [[ ! "${container_img_type}" == "latest" ]]; then
+        bash -c "docker tag $container_img_type $docker_image_tag"
+    fi
+    last_container=$(docker ps --all --filter "ancestor=$docker_image_tag" --format "{{.ID}}" | head -n1)
+    [[ -z "${last_container}" ]] && { print_error "No container found for this image, try constructing a new image using IMAGE=default"; exit 1; }
+    bash -c "docker start ${last_container}"
+    bash -c "docker exec \
+        -it ${last_container} /bin/bash; \
+        if [[ -d $RPMS_DIR/repodata ]]; then { rm -r $RPMS_DIR/repodata; echo 'Clearing repodata' ; }; fi
+        "
+fi
