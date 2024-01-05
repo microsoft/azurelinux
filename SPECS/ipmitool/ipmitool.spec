@@ -1,10 +1,10 @@
 %global        gitname     IPMITOOL
-%global        gitversion  1_8_18
+%global        gitversion  1_8_19
 
 Name:          ipmitool
 Summary:       Utility for IPMI control
-Version:       1.8.18
-Release:       22%{?dist}
+Version:       1.8.19
+Release:       1%{?dist}
 License:       BSD
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
@@ -17,19 +17,14 @@ Source3:       exchange-bmc-os-info.service
 Source4:       exchange-bmc-os-info.sysconf
 Source5:       set-bmc-url.sh
 Source6:       exchange-bmc-os-info
+# https://www.iana.org/assignments/enterprise-numbers.txt
+Source7:       enterprise-numbers
  
-Patch1:        0001-CVE-2011-4339-OpenIPMI.patch
-Patch2:        0002-openssl.patch
-Patch3:        0003-ipmitool-1.8.11-set-kg-key.patch
-Patch4:        0004-slowswid.patch
-Patch5:        0005-sensor-id-length.patch
-Patch6:        0006-enable-usb.patch
-Patch7:        0007-check-input.patch
-Patch8:        0008-add-extern.patch
-Patch9:        0009-best-cipher.patch
-Patch10:       0010-pef-missing-newline.patch
-Patch11:       0011-expand-sensor-name-column.patch
-Patch12:       0012-CVE-2020-5208.patch
+# https://github.com/ipmitool/ipmitool/issues/170
+Patch1:       ipmitool-1.8.19-set-kg-key.patch
+Patch2:       0004-slowswid.patch
+Patch3:       0005-sensor-id-length.patch
+Patch4:       0007-check-input.patch
 
 BuildRequires: openssl-devel readline-devel ncurses-devel
 %{?systemd_requires}
@@ -92,7 +87,7 @@ for the host OS to use.
 
 
 %prep
-%autosetup -n %{name}-%{version} -p1
+%autosetup -n %{name}-%{gitname}_%{gitversion} -p1
 
 for f in AUTHORS ChangeLog; do
     iconv -f iso-8859-1 -t utf8 < ${f} > ${f}.utf8
@@ -116,6 +111,7 @@ autoconf
 automake --foreign
 # end: release auto-tools
 
+install -Dm 644 %{SOURCE7} .
 %configure --disable-dependency-tracking --enable-file-security --disable-intf-free
 make %{?_smp_mflags}
 
@@ -168,6 +164,7 @@ install -Dm 755 contrib/bmc-snmp-proxy         %{buildroot}%{_libexecdir}/bmc-sn
 %{_mandir}/man1/ipmitool.1*
 %doc %{_datadir}/doc/ipmitool
 %{_datadir}/ipmitool
+%{_datadir}/misc/enterprise-numbers
 
 %files -n ipmievd
 %config(noreplace) %{_sysconfdir}/sysconfig/ipmievd
@@ -187,6 +184,10 @@ install -Dm 755 contrib/bmc-snmp-proxy         %{buildroot}%{_libexecdir}/bmc-sn
 %{_libexecdir}/bmc-snmp-proxy
 
 %changelog
+* Fri Jan 05 2024 Muhammad Falak <mwani@microsoft.com> - 1.8.19-1
+- Upgrade version to 1.8.19
+- Drop un-needed patches
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.8.18-22
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

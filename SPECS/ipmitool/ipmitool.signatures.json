@@ -1,10 +1,11 @@
 {
  "Signatures": {
+  "enterprise-numbers": "40e2880e506a3a385f2242ee7a9bfe2c5eb61c2350cb71e03312691ae5429bbe",
   "exchange-bmc-os-info": "8b021af5d548cde4c4f38ee69ef6a9528f0b2dad8cdf9cf96a1de737b0b9fd32",
   "exchange-bmc-os-info.service": "e58ab59ce79a8e1244ad6b8c57c565591ab201563cdfdf0936416430f1e04ca0",
   "exchange-bmc-os-info.sysconf": "1c6415513c81ebe1af71f2f0c9749d6a9792edc2749584f91e2a6cb1daaa1635",
   "ipmievd.service": "fc451958b17ecb50d5b4b8c9719b4c207f82f6aa5e3791b3608dcf4687831d79",
-  "ipmitool-1.8.18.tar.gz": "e93fe5966d59e16bb4317c9c588cdf35d6100753a0ba957c493b064bcad52493",
+  "ipmitool-1.8.19.tar.gz": "48b010e7bcdf93e4e4b6e43c53c7f60aa6873d574cbd45a8d86fa7aaeebaff9c",
   "openipmi-ipmievd.sysconf": "bf2bf1064f0d2ffe171dfea59041e215bd1cef13d47f8175b058820817eeb80a",
   "set-bmc-url.sh": "4e6930bcdd4ba60464855250bf7d89e17e73abfb8454e1e53e31d0888e3a1743"
  }
