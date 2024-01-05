@@ -56,6 +56,7 @@ Patch25:        0026-net-mlx5-Bridge-implement-QinQ-support.patch
 Patch26:        0027-mstflint-This-driver-enables-under-the-secure-boot.patch
 Patch27:        0028-net-mlx5-Bridge-use-debug-not-warn-if-entry-not-found.patch
 Patch28:        support-intel-e800.patch
+Patch29:        intel-e800-vf-lag-switchdev.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -202,6 +203,7 @@ manipulation of eBPF programs and maps.
 %patch26 -p1
 %patch27 -p1
 %patch28 -p1
+%patch29 -p1
 
 make mrproper
 
@@ -437,7 +439,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Thurs Jan 18 2024 Carolyn Wyborny <carolyn.wyborny@intel.com> - 5.15.145.2-2
+* Thu Jan 18 2024 Carolyn Wyborny <carolyn.wyborny@intel.com> - 5.15.145.2-2
  - Add support for Intel E810 devices including SRIOV+LAG feature support
 
 * Tue Jan 16 2024 Gary Swalling <gaswal@microsoft.com> - 5.15.145.2-1
