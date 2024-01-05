@@ -2184,6 +2184,7 @@
                 "gtk-update-icon-cache",
                 "helm",
                 "hvloader",
+                "hvloader-signed",
                 "installkernel",
                 "intel-pf-bb-config",
                 "ivykis",
