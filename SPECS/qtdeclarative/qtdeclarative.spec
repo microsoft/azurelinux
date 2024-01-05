@@ -1,7 +1,7 @@
-Summary:      Qt5 - QtDeclarative component
-Name:         qt5-qtdeclarative
-Version:      5.12.5
-Release:      5%{?dist}
+Summary:      Qt6 - QtDeclarative component
+Name:         qtdeclarative
+Version:      6.6.1
+Release:      1%{?dist}
 Vendor:       Microsoft Corporation
 Distribution:   Azure Linux
 
@@ -16,12 +16,12 @@ Source0: https://download.qt.io/archive/qt/%{majmin}/%{version}/submodules/qtdec
 ## upstreamable patches
 
 # filter qml provides
-%global __provides_exclude_from ^%{_qt5_archdatadir}/qml/.*\\.so$
+%global __provides_exclude_from ^%{_qt_archdatadir}/qml/.*\\.so$
 
 BuildRequires: gcc
 # qt macros
-BuildRequires: qt5-qtbase-devel >= %{version}
-BuildRequires: qt5-qtbase-private-devel
+BuildRequires: qtbase-devel >= %{version}
+BuildRequires: qtbase-private-devel
 BuildRequires: python3
 
 %description
@@ -31,7 +31,7 @@ BuildRequires: python3
 Summary: Development files for %{name}
 Provides: %{name}-private-devel = %{version}-%{release}
 Requires: %{name} = %{version}-%{release}
-Requires: qt5-qtbase-devel
+Requires: qtbase-devel
 %description devel
 %{summary}.
 
@@ -56,28 +56,28 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 ln -s /usr/bin/python3 python
 export PATH=`pwd`:$PATH
 
-qmake-qt5 .
+qmake-qt6 .
 make %{?_smp_mflags}
 
 %install
 %make_install INSTALL_ROOT=%{buildroot}
 
 
-# hardlink files to %{_bindir}, add -qt5 postfix to not conflict
+# hardlink files to %{_bindir}, add -qt6 postfix to not conflict
 mkdir %{buildroot}%{_bindir}
-pushd %{buildroot}%{_qt5_bindir}
+pushd %{buildroot}%{_qt_bindir}
 for i in * ; do
   case "${i}" in
     # qt4 conflicts
     qmlplugindump|qmlprofiler)
-      ln -v  ${i} %{buildroot}%{_bindir}/${i}-qt5
-      ln -sv ${i} ${i}-qt5
+      ln -v  ${i} %{buildroot}%{_bindir}/${i}-qt6
+      ln -sv ${i} ${i}-qt6
       ;;
     # qtchooser stuff
     qml|qmlbundle|qmlmin|qmlscene)
       ln -v  ${i} %{buildroot}%{_bindir}/${i}
-      ln -v  ${i} %{buildroot}%{_bindir}/${i}-qt5
-      ln -sv ${i} ${i}-qt5
+      ln -v  ${i} %{buildroot}%{_bindir}/${i}-qt6
+      ln -sv ${i} ${i}-qt6
       ;;
     *)
       ln -v  ${i} %{buildroot}%{_bindir}/${i}
@@ -88,8 +88,8 @@ popd
 
 ## .prl/.la file love
 # nuke .prl reference(s) to %%buildroot, excessive (.la-like) libs
-pushd %{buildroot}%{_qt5_libdir}
-for prl_file in libQt5*.prl ; do
+pushd %{buildroot}%{_qt_libdir}
+for prl_file in libQt6*.prl ; do
   sed -i -e "/^QMAKE_PRL_BUILD_DIR/d" ${prl_file}
   rm -fv "$(basename ${prl_file} .prl).la"
   sed -i -e "/^QMAKE_PRL_LIBS/d" ${prl_file}
@@ -101,46 +101,47 @@ popd
 
 %files
 %license LICENSE.LGPL*
-%{_qt5_libdir}/libQt5Qml.so.5*
-%{_qt5_libdir}/libQt5Quick.so.5*
-%{_qt5_libdir}/libQt5QuickWidgets.so.5*
+%{_qt_archdatadir}/qml/
+%{_qt_libdir}/libQt6Qml.so.6*
+%{_qt_libdir}/libQt6Quick.so.6*
 # Not needed for calamares
-#%{_qt5_libdir}/libQt5QuickParticles.so.5*
-%{_qt5_libdir}/libQt5QuickShapes.so.5*
-%{_qt5_libdir}/libQt5QuickTest.so.5*
-%{_qt5_plugindir}/qmltooling/
-%{_qt5_archdatadir}/qml/
+#%{_qt_libdir}/libQt6QuickParticles.so.6*
+%{_qt_libdir}/libQt6QuickShapes.so.6*
+%{_qt_libdir}/libQt6QuickTest.so.6*
+%{_qt_libdir}/libQt6QuickWidgets.so.6*
+%{_qt_plugindir}/qmltooling/
 
 %files devel
 %{_bindir}/qml*
-%{_qt5_bindir}/qml*
-%{_qt5_headerdir}/Qt*/
-%{_qt5_libdir}/libQt5Qml.so
-%{_qt5_libdir}/libQt5Qml.prl
-%{_qt5_libdir}/libQt5Quick*.so
-%{_qt5_libdir}/libQt5Quick*.prl
-%dir %{_qt5_libdir}/cmake/Qt5Quick*/
-%{_qt5_libdir}/cmake/Qt5*/Qt5*Config*.cmake
-%{_qt5_libdir}/pkgconfig/Qt5*.pc
-%{_qt5_archdatadir}/mkspecs/modules/*.pri
-%{_qt5_archdatadir}/mkspecs/features/*.prf
-%dir %{_qt5_libdir}/cmake/Qt5Qml/
-%{_qt5_libdir}/cmake/Qt5Qml/Qt5Qml_*Factory.cmake
+%{_qt_bindir}/qml*
+%{_qt_headerdir}/Qt*/
+%{_qt_libdir}/libQt6Qml.so
+%{_qt_libdir}/libQt6Qml.prl
+%{_qt_libdir}/libQt6Quick*.so
+%{_qt_libdir}/libQt6Quick*.prl
+%dir %{_qt_libdir}/cmake/Qt6Quick*/
+%{_qt_libdir}/cmake/Qt6*/Qt6*Config*.cmake
+%{_qt_libdir}/pkgconfig/Qt6*.pc
+%{_qt_archdatadir}/mkspecs/modules/*.pri
+%{_qt_archdatadir}/mkspecs/features/*.prf
+%dir %{_qt_libdir}/cmake/Qt6Qml/
+%{_qt_libdir}/cmake/Qt5Qml/Qt6Qml_*Factory.cmake
 
 %files static
-%{_qt5_libdir}/libQt5QmlDevTools.a
-%{_qt5_libdir}/libQt5QmlDevTools.prl
-%{_qt5_libdir}/libQt5PacketProtocol.a
-%{_qt5_libdir}/libQt5PacketProtocol.prl
-%{_qt5_libdir}/libQt5QmlDebug.a
-%{_qt5_libdir}/libQt5QmlDebug.prl
+%{_qt_libdir}/libQt6QmlDevTools.a
+%{_qt_libdir}/libQt6QmlDevTools.prl
+%{_qt_libdir}/libQt6PacketProtocol.a
+%{_qt_libdir}/libQt6PacketProtocol.prl
+%{_qt_libdir}/libQt6QmlDebug.a
+%{_qt_libdir}/libQt6QmlDebug.prl
 
 %files examples
-%{_qt5_examplesdir}/
-
-
+%{_qt_examplesdir}/
 
 %changelog
+* Tue Jan 02 2024 Sam Meluch <sammeluch@microsoft.com> - 6.6.1-1
+- Upgrade to version 6.6.1
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.12.5-5
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
