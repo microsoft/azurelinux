@@ -1,6 +1,6 @@
-Summary:      Qt5 - QtTool components
-Name:         qt5-qttools
-Version:      5.12.5
+Summary:      Qt6 - QtTool components
+Name:         qttools
+Version:      6.6.1
 Release:      6%{?dist}
 Vendor:       Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,17 +10,13 @@ Url:     http://www.qt.io
 %global majmin %(echo %{version} | cut -d. -f1-2)
 Source0: https://download.qt.io/archive/qt/%{majmin}/%{version}/submodules/qttools-everywhere-src-%{version}.tar.xz
 
-# help lrelease/lupdate use/prefer qmake-qt5
-# https://bugzilla.redhat.com/show_bug.cgi?id=1009893
-Patch0: qttools-opensource-src-5.5.0-qmake-qt5.patch
-
 BuildRequires: coreutils
 
-BuildRequires: qt5-qtbase-private-devel
+BuildRequires: qtbase-private-devel
 # Qt macros
-BuildRequires: qt5-rpm-macros >= %{version}
-BuildRequires: qt5-qtbase-static >= %{version}
-BuildRequires: qt5-qtdeclarative-static >= %{version}
+BuildRequires: qt-rpm-macros >= %{version}
+BuildRequires: qtbase-static >= %{version}
+BuildRequires: qtdeclarative-static >= %{version}
 
 Requires: %{name}-common = %{version}-%{release}
 
@@ -39,10 +35,10 @@ Requires: %{name} = %{version}-%{release}
 Requires: %{name}-libs-designer%{?_isa} = %{version}-%{release}
 Requires: %{name}-libs-designercomponents%{?_isa} = %{version}-%{release}
 Requires: %{name}-libs-help%{?_isa} = %{version}-%{release}
-Requires: qt5-doctools = %{version}-%{release}
-Requires: qt5-designer = %{version}-%{release}
-Requires: qt5-linguist = %{version}-%{release}
-Requires: qt5-qtbase-devel%{?_isa}
+Requires: qt-doctools = %{version}-%{release}
+Requires: qt-designer = %{version}-%{release}
+Requires: qt-linguist = %{version}-%{release}
+Requires: qtbase-devel%{?_isa}
 %description devel
 %{summary}.
 
@@ -53,60 +49,60 @@ Requires: %{name}-devel%{?_isa} = %{version}-%{release}
 %{summary}.
 
 %package libs-designer
-Summary: Qt5 Designer runtime library
+Summary: Qt6 Designer runtime library
 Requires: %{name}-common = %{version}-%{release}
 %description libs-designer
 %{summary}.
 
 %package libs-designercomponents
-Summary: Qt5 Designer Components runtime library
+Summary: Qt6 Designer Components runtime library
 Requires: %{name}-common = %{version}-%{release}
 %description libs-designercomponents
 %{summary}.
 
 %package libs-help
-Summary: Qt5 Help runtime library
+Summary: Qt6 Help runtime library
 Requires: %{name}-common = %{version}-%{release}
 # when split happened
-Conflicts: qt5-tools < 5.4.0-0.2
+Conflicts: qttools < 5.4.0-0.2
 %description libs-help
 %{summary}.
 
-%package -n qt5-assistant
-Summary: Documentation browser for Qt5
+%package -n qt-assistant
+Summary: Documentation browser for Qt6
 Requires: %{name}-common = %{version}-%{release}
-%description -n qt5-assistant
+%description -n qt-assistant
 %{summary}.
 
-%package -n qt5-designer
-Summary: Design GUIs for Qt5 applications
+%package -n qt-designer
+Summary: Design GUIs for Qt6 applications
 Requires: %{name}-libs-designer%{?_isa} = %{version}-%{release}
 Requires: %{name}-libs-designercomponents%{?_isa} = %{version}-%{release}
-%description -n qt5-designer
+%description -n qt-designer
 %{summary}.
 
-%package -n qt5-linguist
-Summary: Qt5 Linguist Tools
+%package -n qt-linguist
+Summary: Qt6 Linguist Tools
 Requires: %{name}-common = %{version}-%{release}
-%description -n qt5-linguist
-Tools to add translations to Qt5 applications.
+%description -n qt-linguist
+Tools to add translations to Qt6 applications.
 
-%package -n qt5-qdbusviewer
+%package -n qt-qdbusviewer
 Summary: D-Bus debugger and viewer
 Requires: %{name}-common = %{version}-%{release}
-%{?_qt5:Requires: %{_qt5}%{?_isa} >= %{_qt5_version}}
-%description -n qt5-qdbusviewer
+%{?_qt:Requires: %{_qt}%{?_isa} >= %{_qt_version}}
+%description -n qt-qdbusviewer
 QDbusviewer can be used to inspect D-Bus objects of running programs
 and invoke methods on those objects.
 
-%package -n qt5-doctools
-Summary: Qt5 doc tools package
-Provides: qt5-qdoc = %{version}
+%package -n qt-doctools
+Summary: Qt6 doc tools package
+Provides: qt-qdoc = %{version}
 BuildRequires: clang-devel
 BuildRequires: llvm-devel
-Provides: qt5-qhelpgenerator = %{version}
+Provides: qt-qhelpgenerator = %{version}
 
-%description -n qt5-doctools
+%description -n qt-doctools
 %{summary}.
 
 %package examples
@@ -118,35 +114,34 @@ Requires: %{name}-common = %{version}-%{release}
 
 %prep
 %setup -q -n qttools-everywhere-src-%{version}
-%patch 0 -p1 -b .qmake-qt5
 
 %build
 
-qmake-qt5 .
+qmake-qt6 .
 make %{?_smp_mflags}
 
 %install
 make install INSTALL_ROOT=%{buildroot}
 
 # icons
-install -m644 -p -D src/assistant/assistant/images/assistant.png %{buildroot}%{_datadir}/icons/hicolor/32x32/apps/assistant-qt5.png
-install -m644 -p -D src/assistant/assistant/images/assistant-128.png %{buildroot}%{_datadir}/icons/hicolor/128x128/apps/assistant-qt5.png
-install -m644 -p -D src/designer/src/designer/images/designer.png %{buildroot}%{_datadir}/icons/hicolor/128x128/apps/designer-qt5.png
-install -m644 -p -D src/qdbus/qdbusviewer/images/qdbusviewer.png %{buildroot}%{_datadir}/icons/hicolor/32x32/apps/qdbusviewer-qt5.png
-install -m644 -p -D src/qdbus/qdbusviewer/images/qdbusviewer-128.png %{buildroot}%{_datadir}/icons/hicolor/128x128/apps/qdbusviewer-qt5.png
+install -m644 -p -D src/assistant/assistant/images/assistant.png %{buildroot}%{_datadir}/icons/hicolor/32x32/apps/assistant-qt6.png
+install -m644 -p -D src/assistant/assistant/images/assistant-128.png %{buildroot}%{_datadir}/icons/hicolor/128x128/apps/assistant-qt6.png
+install -m644 -p -D src/designer/src/designer/images/designer.png %{buildroot}%{_datadir}/icons/hicolor/128x128/apps/designer-qt6.png
+install -m644 -p -D src/qdbus/qdbusviewer/images/qdbusviewer.png %{buildroot}%{_datadir}/icons/hicolor/32x32/apps/qdbusviewer-qt6.png
+install -m644 -p -D src/qdbus/qdbusviewer/images/qdbusviewer-128.png %{buildroot}%{_datadir}/icons/hicolor/128x128/apps/qdbusviewer-qt6.png
 # linguist icons
 for icon in src/linguist/linguist/images/icons/linguist-*-32.png ; do
   size=$(echo $(basename ${icon}) | cut -d- -f2)
-  install -p -m644 -D ${icon} %{buildroot}%{_datadir}/icons/hicolor/${size}x${size}/apps/linguist-qt5.png
+  install -p -m644 -D ${icon} %{buildroot}%{_datadir}/icons/hicolor/${size}x${size}/apps/linguist-qt6.png
 done
 
 # hardlink files to {_bindir}, add -qt5 postfix to not conflict
 mkdir %{buildroot}%{_bindir}
-pushd %{buildroot}%{_qt5_bindir}
+pushd %{buildroot}%{_qt_bindir}
 for i in * ; do
   case "${i}" in
    assistant|designer|lconvert|linguist|lrelease|lupdate|pixeltool|qcollectiongenerator|qdbus|qdbusviewer|qhelpconverter|qhelpgenerator|qtplugininfo|qtattributionsscanner)
-      ln -v  ${i} %{buildroot}%{_bindir}/${i}-qt5
+      ln -v  ${i} %{buildroot}%{_bindir}/${i}-qt6
       ln -sv ${i} ${i}-qt5
       ;;
     *)
@@ -158,8 +153,8 @@ popd
 
 ## .prl/.la file love
 # nuke .prl reference(s) to %%buildroot, excessive (.la-like) libs
-pushd %{buildroot}%{_qt5_libdir}
-for prl_file in libQt5*.prl ; do
+pushd %{buildroot}%{_qt_libdir}
+for prl_file in libQt6*.prl ; do
   sed -i -e "/^QMAKE_PRL_BUILD_DIR/d" ${prl_file}
   if [ -f "$(basename ${prl_file} .prl).so" ]; then
     rm -fv "$(basename ${prl_file} .prl).la"
@@ -169,7 +164,7 @@ done
 popd
 
 ## Qt5Designer.pc references non-existent Qt5UiPlugin.pc, remove the reference for now
-sed -i -e 's| Qt5UiPlugin||g' %{buildroot}%{_qt5_libdir}/pkgconfig/Qt5Designer.pc
+sed -i -e 's| Qt6UiPlugin||g' %{buildroot}%{_qt_libdir}/pkgconfig/Qt6Designer.pc
 
 
 ## work-in-progress... -- rex
@@ -177,10 +172,10 @@ sed -i -e 's| Qt5UiPlugin||g' %{buildroot}%{_qt5_libdir}/pkgconfig/Qt5Designer.p
 %check
 # verify validity of Qt5Designer.pc
 export PKG_CONFIG_PATH=%{buildroot}%{_libdir}/pkgconfig
-pkg-config --print-requires --print-requires-private Qt5Designer
-export CMAKE_PREFIX_PATH=%{buildroot}%{_qt5_prefix}:%{buildroot}%{_prefix}
-export PATH=%{buildroot}%{_qt5_bindir}:%{_qt5_bindir}:$PATH
-export LD_LIBRARY_PATH=%{buildroot}%{_qt5_libdir}
+pkg-config --print-requires --print-requires-private Qt6Designer
+export CMAKE_PREFIX_PATH=%{buildroot}%{_qt_prefix}:%{buildroot}%{_prefix}
+export PATH=%{buildroot}%{_qt_bindir}:%{_qt_bindir}:$PATH
+export LD_LIBRARY_PATH=%{buildroot}%{_qt_libdir}
 mkdir tests/auto/cmake/%{_target_platform}
 pushd tests/auto/cmake/%{_target_platform}
 cmake ..
@@ -203,194 +198,197 @@ popd
 
 
 %files
-%{_bindir}/qdbus-qt5
+%{_bindir}/qdbus-qt6
 %{_bindir}/qtpaths
-%{_qt5_bindir}/qdbus
-%{_qt5_bindir}/qdbus-qt5
-%{_qt5_bindir}/qtpaths
+%{_qt_bindir}/qdbus
+%{_qt_bindir}/qdbus-qt6
+%{_qt_bindir}/qtpaths
 
 %files common
 %license LICENSE.LGPL*
 
 %files  libs-designer
-%{_qt5_libdir}/libQt5Designer.so.5*
-%dir %{_qt5_libdir}/cmake/Qt5Designer/
+%dir %{_qt_libdir}/cmake/Qt6Designer/
+%{_qt_libdir}/libQt6Designer.so.6*
 
 %files  libs-designercomponents
-%{_qt5_libdir}/libQt5DesignerComponents.so.5*
+%{_qt_libdir}/libQt6DesignerComponents.so.6*
 
 %files  libs-help
-%{_qt5_libdir}/libQt5Help.so.5*
+%{_qt_libdir}/libQt6Help.so.6*
 
 %if 0%{?rhel} && 0%{?rhel} <= 7
-%post -n qt5-assistant
+%post -n qt-assistant
 touch --no-create %{_datadir}/icons/hicolor ||:
 
-%posttrans -n qt5-assistant
+%posttrans -n qt-assistant
 gtk-update-icon-cache -q %{_datadir}/icons/hicolor 2> /dev/null ||:
 
-%postun -n qt5-assistant
+%postun -n qt-assistant
 if [ $1 -eq 0 ] ; then
 touch --no-create %{_datadir}/icons/hicolor ||:
 gtk-update-icon-cache -q %{_datadir}/icons/hicolor 2> /dev/null ||:
 fi
 %endif
 
-%files -n qt5-assistant
-%{_bindir}/assistant-qt5
-%{_qt5_bindir}/assistant*
+%files -n qt-assistant
+%{_bindir}/assistant-qt6
 %{_datadir}/icons/hicolor/*/apps/assistant*.*
+%{_qt5_bindir}/assistant*
 
 %if 0%{?rhel} && 0%{?rhel} <= 7
-%post -n qt5-doctools
+%post -n qt-doctools
 touch --no-create %{_datadir}/icons/hicolor ||:
 
-%posttrans -n qt5-doctools
+%posttrans -n qt-doctools
 gtk-update-icon-cache -q %{_datadir}/icons/hicolor 2> /dev/null ||:
 
-%postun -n qt5-doctools
+%postun -n qt-doctools
 if [ $1 -eq 0 ] ; then
 touch --no-create %{_datadir}/icons/hicolor ||:
 gtk-update-icon-cache -q %{_datadir}/icons/hicolor 2> /dev/null ||:
 fi
 %endif
 
-%files -n qt5-doctools
-%{_bindir}/qdoc*
-%{_qt5_bindir}/qdoc*
+%files -n qt-doctools
 %{_bindir}/qdistancefieldgenerator*
+%{_bindir}/qdoc*
 %{_bindir}/qhelpgenerator*
-%{_qt5_bindir}/qdistancefieldgenerator*
-%{_qt5_bindir}/qhelpgenerator*
-%{_bindir}/qtattributionsscanner-qt5
-%{_qt5_bindir}/qtattributionsscanner*
+%{_bindir}/qtattributionsscanner-qt6
+%{_qt_bindir}/qdistancefieldgenerator*
+%{_qt_bindir}/qdoc*
+%{_qt_bindir}/qhelpgenerator*
+%{_qt_bindir}/qtattributionsscanner*
 
 %if 0%{?rhel} && 0%{?rhel} <= 7
-%post -n qt5-designer
+%post -n qt-designer
 touch --no-create %{_datadir}/icons/hicolor ||:
 
-%posttrans -n qt5-designer
+%posttrans -n qt-designer
 gtk-update-icon-cache -q %{_datadir}/icons/hicolor 2> /dev/null ||:
 update-desktop-database -q &> /dev/null ||:
 
-%postun -n qt5-designer
+%postun -n qt-designer
 if [ $1 -eq 0 ] ; then
 touch --no-create %{_datadir}/icons/hicolor ||:
 gtk-update-icon-cache -q %{_datadir}/icons/hicolor 2> /dev/null ||:
 fi
 %endif
 
-%files -n qt5-designer
+%files -n qt-designer
 %{_bindir}/designer*
-%{_qt5_bindir}/designer*
 %{_datadir}/icons/hicolor/*/apps/designer*.*
+%{_qt_bindir}/designer*
 
 %if 0%{?rhel} && 0%{?rhel} <= 7
-%post -n qt5-linguist
+%post -n qt-linguist
 touch --no-create %{_datadir}/icons/hicolor ||:
 
-%posttrans -n qt5-linguist
+%posttrans -n qt-linguist
 gtk-update-icon-cache -q %{_datadir}/icons/hicolor 2> /dev/null ||:
 update-desktop-database -q &> /dev/null ||:
 
-%postun -n qt5-linguist
+%postun -n qt-linguist
 if [ $1 -eq 0 ] ; then
 touch --no-create %{_datadir}/icons/hicolor ||:
 gtk-update-icon-cache -q %{_datadir}/icons/hicolor 2> /dev/null ||:
 fi
 %endif
 
-%files -n qt5-linguist
+%files -n qt-linguist
 %{_bindir}/linguist*
-%{_qt5_bindir}/linguist*
-# phrasebooks used by linguist
-%{_qt5_datadir}/phrasebooks/
-%{_datadir}/icons/hicolor/*/apps/linguist*.*
+%{_qt_bindir}/linguist*
+# cmake config
+%dir %{_qt_libdir}/cmake/Qt6LinguistTools/
+%{_qt_libdir}/cmake/Qt6LinguistTools/Qt6LinguistToolsConfig*.cmake
+%{_qt_libdir}/cmake/Qt6LinguistTools/Qt6LinguistToolsMacros.cmake
 # linguist friends
 %{_bindir}/lconvert*
 %{_bindir}/lrelease*
 %{_bindir}/lupdate*
-%{_qt5_bindir}/lconvert*
-%{_qt5_bindir}/lrelease*
-%{_qt5_bindir}/lupdate*
-# cmake config
-%dir %{_qt5_libdir}/cmake/Qt5LinguistTools/
-%{_qt5_libdir}/cmake/Qt5LinguistTools/Qt5LinguistToolsConfig*.cmake
-%{_qt5_libdir}/cmake/Qt5LinguistTools/Qt5LinguistToolsMacros.cmake
+%{_qt_bindir}/lconvert*
+%{_qt_bindir}/lrelease*
+%{_qt_bindir}/lupdate*
+# phrasebooks used by linguist
+%{_datadir}/icons/hicolor/*/apps/linguist*.*
+%{_qt_datadir}/phrasebooks/
 
 %if 0%{?rhel} && 0%{?rhel} <= 7
-%post -n qt5-qdbusviewer
+%post -n qt-qdbusviewer
 touch --no-create %{_datadir}/icons/hicolor ||:
 
-%posttrans -n qt5-qdbusviewer
+%posttrans -n qt-qdbusviewer
 gtk-update-icon-cache -q %{_datadir}/icons/hicolor 2> /dev/null ||:
 
-%postun -n qt5-qdbusviewer
+%postun -n qt-qdbusviewer
 if [ $1 -eq 0 ] ; then
 touch --no-create %{_datadir}/icons/hicolor ||:
 gtk-update-icon-cache -q %{_datadir}/icons/hicolor 2> /dev/null ||:
 fi
 %endif
 
-%files -n qt5-qdbusviewer
+%files -n qt-qdbusviewer
 %{_bindir}/qdbusviewer*
-%{_qt5_bindir}/qdbusviewer*
 %{_datadir}/icons/hicolor/*/apps/qdbusviewer*.*
+%{_qt_bindir}/qdbusviewer*
 
 %files devel
+#{_bindir}/qhelpconverter*
+#{_qt5_bindir}/qhelpconverter*
+%dir %{_qt_libdir}/cmake/Qt6Help/
 %{_bindir}/pixeltool*
 %{_bindir}/qcollectiongenerator*
-#{_bindir}/qhelpconverter*
 %{_bindir}/qtdiag*
 %{_bindir}/qtplugininfo*
-%{_qt5_bindir}/pixeltool*
-%{_qt5_bindir}/qtdiag*
-%{_qt5_bindir}/qcollectiongenerator*
-#{_qt5_bindir}/qhelpconverter*
-%{_qt5_bindir}/qtplugininfo*
-%{_qt5_headerdir}/QtDesigner/
-%{_qt5_headerdir}/QtDesignerComponents/
-%{_qt5_headerdir}/QtHelp/
-%{_qt5_headerdir}/QtUiPlugin
-%{_qt5_libdir}/libQt5Designer*.prl
-%{_qt5_libdir}/libQt5Designer*.so
-%{_qt5_libdir}/libQt5Help.prl
-%{_qt5_libdir}/libQt5Help.so
-%{_qt5_libdir}/Qt5UiPlugin.la
-%{_qt5_libdir}/libQt5UiPlugin.prl
-%{_qt5_libdir}/cmake/Qt5Designer/Qt5DesignerConfig*.cmake
-%dir %{_qt5_libdir}/cmake/Qt5Help/
-%{_qt5_libdir}/cmake/Qt5Help/Qt5HelpConfig*.cmake
-%{_qt5_libdir}/cmake/Qt5UiPlugin/
-%{_qt5_libdir}/pkgconfig/Qt5Designer.pc
-%{_qt5_libdir}/pkgconfig/Qt5Help.pc
-%{_qt5_libdir}/pkgconfig/Qt5UiPlugin.pc
-%{_qt5_archdatadir}/mkspecs/modules/qt_lib_designer.pri
-%{_qt5_archdatadir}/mkspecs/modules/qt_lib_designer_private.pri
-%{_qt5_archdatadir}/mkspecs/modules/qt_lib_designercomponents_private.pri
-%{_qt5_archdatadir}/mkspecs/modules/qt_lib_help.pri
-%{_qt5_archdatadir}/mkspecs/modules/qt_lib_help_private.pri
-%{_qt5_archdatadir}/mkspecs/modules/qt_lib_uiplugin.pri
+%{_qt_archdatadir}/mkspecs/modules/qt_lib_designer.pri
+%{_qt_archdatadir}/mkspecs/modules/qt_lib_designer_private.pri
+%{_qt_archdatadir}/mkspecs/modules/qt_lib_designercomponents_private.pri
+%{_qt_archdatadir}/mkspecs/modules/qt_lib_help.pri
+%{_qt_archdatadir}/mkspecs/modules/qt_lib_help_private.pri
+%{_qt_archdatadir}/mkspecs/modules/qt_lib_uiplugin.pri
+%{_qt_bindir}/pixeltool*
+%{_qt_bindir}/qcollectiongenerator*
+%{_qt_bindir}/qtdiag*
+%{_qt_bindir}/qtplugininfo*
+%{_qt_headerdir}/QtDesigner/
+%{_qt_headerdir}/QtDesignerComponents/
+%{_qt_headerdir}/QtHelp/
+%{_qt_headerdir}/QtUiPlugin
+%{_qt_libdir}/Qt6UiPlugin.la
+%{_qt_libdir}/cmake/Qt6Designer/Qt6DesignerConfig*.cmake
+%{_qt_libdir}/cmake/Qt6Help/Qt6HelpConfig*.cmake
+%{_qt_libdir}/cmake/Qt5UiPlugin/
+%{_qt_libdir}/libQt6Designer*.prl
+%{_qt_libdir}/libQt6Designer*.so
+%{_qt_libdir}/libQt6Help.prl
+%{_qt_libdir}/libQt6Help.so
+%{_qt_libdir}/libQt6UiPlugin.prl
+%{_qt_libdir}/pkgconfig/Qt6Designer.pc
+%{_qt_libdir}/pkgconfig/Qt6Help.pc
+%{_qt_libdir}/pkgconfig/Qt6UiPlugin.pc
 
 %files static
-%{_qt5_headerdir}/QtUiTools/
-%{_qt5_libdir}/libQt5UiTools.*a
-%{_qt5_libdir}/libQt5UiTools.prl
-%{_qt5_libdir}/cmake/Qt5UiTools/
-%{_qt5_libdir}/pkgconfig/Qt5UiTools.pc
-%{_qt5_archdatadir}/mkspecs/modules/qt_lib_uitools.pri
-%{_qt5_archdatadir}/mkspecs/modules/qt_lib_uitools_private.pri
+%{_qt_archdatadir}/mkspecs/modules/qt_lib_uitools.pri
+%{_qt_archdatadir}/mkspecs/modules/qt_lib_uitools_private.pri
+%{_qt_headerdir}/QtUiTools/
+%{_qt_libdir}/cmake/Qt5UiTools/
+%{_qt_libdir}/libQt6UiTools.*a
+%{_qt_libdir}/libQt6UiTools.prl
+%{_qt_libdir}/pkgconfig/Qt6UiTools.pc
 
 %if ! 0%{?no_examples:1}
 %files examples
-%{_qt5_examplesdir}/
-%{_qt5_plugindir}/designer/*
-%dir %{_qt5_libdir}/cmake/Qt5Designer
-%{_qt5_libdir}/cmake/Qt5Designer/Qt5Designer_*
+%{_qt_examplesdir}/
+%{_qt_plugindir}/designer/*
+%dir %{_qt_libdir}/cmake/Qt6Designer
+%{_qt_libdir}/cmake/Qt6Designer/Qt6Designer_*
 %endif
 
 
 %changelog
+* Tue Jan 02 2023 Sam Meluch <sammeluch@microsoft.com> - 6.6.1-1
+- Update qttools to version 6.6.1
+
 * Mon Nov 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.12.5-6
 - Update source download path
 - License verified.
