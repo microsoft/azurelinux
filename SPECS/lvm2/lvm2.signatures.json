@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "LVM2.2.03.15.tgz": "935283a51ee17abd752a545a0ed1cf4edc993359265bc9e562edf81500edc99e",
-  "lvm2-activate.service": "06dc09a2784f2263ae7c16fdfa4739faebfa91a33bb0017e1af41bba0a392aa6"
- }
+  "Signatures": {
+    "lvm2-activate.service": "06dc09a2784f2263ae7c16fdfa4739faebfa91a33bb0017e1af41bba0a392aa6",
+    "LVM2.2.03.23.tgz": "74e794a9e9dee1bcf8a2065f65b9196c44fdf321e22d63b98ed7de8c9aa17a5d"
+  }
 }
