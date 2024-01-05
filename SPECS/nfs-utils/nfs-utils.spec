@@ -1,7 +1,7 @@
 Summary:        NFS client utils
 Name:           nfs-utils
-Version:        2.5.4
-Release:        3%{?dist}
+Version:        2.6.4
+Release:        1%{?dist}
 License:        MIT and GPLv2 and GPLv2+ and BSD
 URL:            https://linux-nfs.org/
 Group:          Applications/Nfs-utils-client
@@ -16,24 +16,24 @@ Source7:        nfs-mountd.service
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
-BuildRequires:  libtool
+BuildRequires:  e2fsprogs-devel
+BuildRequires:  device-mapper-devel
+BuildRequires:  keyutils-devel
 BuildRequires:  krb5-devel
 BuildRequires:  libcap-devel
-BuildRequires:  libtirpc-devel
-BuildRequires:  python3-devel
 BuildRequires:  libevent-devel
-BuildRequires:  device-mapper-devel
-BuildRequires:  systemd-devel
-BuildRequires:  keyutils-devel
+BuildRequires:  libgssglue-devel
+BuildRequires:  libtirpc-devel >= 1.3.4
+BuildRequires:  libtool
+BuildRequires:  python3-devel
 BuildRequires:  sqlite
 BuildRequires:  sqlite-devel
-BuildRequires:  libgssglue-devel
-BuildRequires:  e2fsprogs-devel
+BuildRequires:  systemd-devel
 Requires:       libnfsidmap
 Requires:       libtirpc
+Requires:       python3-libs
 Requires:       rpcbind
 Requires:       shadow-utils
-Requires:       python3-libs
 Requires(pre):  /usr/sbin/useradd /usr/sbin/groupadd
 Requires(postun):/usr/sbin/userdel /usr/sbin/groupdel
 
@@ -90,6 +90,7 @@ sed -i 's/RPCGEN_PATH" =/rpcgen_path" =/' configure
 sed -i 's/-Werror=strict-prototypes/-Wno-error=strict-prototypes/' support/nsm/Makefile
 sed -i 's/CFLAGS = -g/CFLAGS = -Wno-error=strict-prototypes/' support/nsm/Makefile
 make %{?_smp_mflags}
+
 %install
 make DESTDIR=%{buildroot} install
 install -v -m644 utils/mount/nfsmount.conf /etc/nfsmount.conf
@@ -154,6 +155,8 @@ fi
 %config(noreplace) /etc/exports
 /lib/systemd/system/*
 %{_libdir}/systemd/system-preset/50-nfs-server.preset
+%{_libexecdir}/nfsrahead
+%{_udevrulesdir}/99-nfs.rules
 
 %files -n libnfsidmap
 %{_libdir}/libnfsidmap.so.*
@@ -167,6 +170,9 @@ fi
 %{_libdir}/libnfsidmap.so
 
 %changelog
+* Tue Jan 02 2024 Rachel Menge <rachelmenge@microsoft.com> - 2.6.4-1
+- Update to version 2.6.4
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.5.4-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

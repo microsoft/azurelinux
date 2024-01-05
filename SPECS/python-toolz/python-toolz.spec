@@ -27,13 +27,13 @@ associated with functional programming, within a natural Pythonic style\
 suitable for most developers.
 Summary:        A functional standard library for Python
 Name:           python-%{srcname}
-Version:        0.11.1
-Release:        5%{?dist}
+Version:        0.12.0
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/pytoolz/toolz/
-Source0:        https://files.pythonhosted.org/packages/d6/0d/fdad31347bf3d058002993a094da1ca95f0f3ef9beec08856d0fe4ad9766/%{srcname}-%{version}.tar.gz
+Source0:	https://github.com/pytoolz/toolz/archive/refs/tags/%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
@@ -70,6 +70,9 @@ nosetests
 %{python3_sitelib}/tlz/
 
 %changelog
+* Wed Dec 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.12.0-1
+- Auto-upgrade to 0.12.0 - none
+
 * Mon Feb 07 2022 Muhammad Falak <mwani@microsoft.com> 0.11.1-5
 - Test with `nosetests` instead of `nosetests-3.9`
 

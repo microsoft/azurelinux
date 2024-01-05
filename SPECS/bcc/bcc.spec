@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 Summary:        BPF Compiler Collection (BCC)
 Name:           bcc
-Version:        0.28.0
+Version:        0.29.1
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -122,6 +122,9 @@ find %{buildroot}%{_lib64dir} -name '*.a' -delete
 %{_datadir}/%{name}/man/*
 
 %changelog
+* Wed Dec 20 2023 Muhammad Falak <mwani@microsoft.com> - 0.29.1-1
+- Bump version to 0.29.1
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.28.0-1
 - Auto-upgrade to 0.28.0 - Azure Linux 3.0 - package upgrades
 
