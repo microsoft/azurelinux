@@ -9,6 +9,8 @@ Distribution:   Mariner
 Group:          Applications/File
 URL:            https://www.freedesktop.org/wiki/Software/dbus
 Source0:        https://%{name}.freedesktop.org/releases/%{name}/%{name}-%{version}.tar.xz
+BuildRequires:  autoconf-archive
+BuildRequires:  autoconf
 BuildRequires:  audit-devel
 BuildRequires:  expat-devel
 BuildRequires:  libselinux-devel
@@ -40,6 +42,9 @@ It contains the libraries and header files to create applications
 %autosetup -p1
 
 %build
+libtoolize && aclocal
+autoupdate
+autoreconf -i
 %configure \
     --docdir=%{_versioneddocdir}  \
     --enable-libaudit=yes \
