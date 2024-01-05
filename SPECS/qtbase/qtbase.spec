@@ -33,7 +33,7 @@
 Name:         qtbase
 Summary:      Qt6 - QtBase components
 Version:      6.6.1
-Release:      9%{?dist}
+Release:      1%{?dist}
 # See LICENSE.GPL3-EXCEPT.txt, for exception details
 License:      GFDL AND LGPLv3 AND GPLv2 AND GPLv3 with exceptions AND QT License Agreement 4.0
 Vendor:       Microsoft Corporation
