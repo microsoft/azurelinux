@@ -12611,8 +12611,8 @@
         "type": "other",
         "other": {
           "name": "lvm2",
-          "version": "2.03.15",
-          "downloadUrl": "https://sourceware.org/pub/lvm2/LVM2.2.03.15.tgz"
+          "version": "2.03.23",
+          "downloadUrl": "https://sourceware.org/pub/lvm2/LVM2.2.03.23.tgz"
         }
       }
     },
