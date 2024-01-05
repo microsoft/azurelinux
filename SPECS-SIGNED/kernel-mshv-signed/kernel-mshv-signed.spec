@@ -149,5 +149,5 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner-mshv.cfg
 
 %changelog
 * Thu Jan 04 2024 Cameron Baird <cameronbaird@microsoft.com> - 5.15.126.mshv9-2
-- Introduced
+- Original version for CBL-Mariner.
 - License verified

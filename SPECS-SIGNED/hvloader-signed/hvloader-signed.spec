@@ -70,5 +70,5 @@ popd
 
 %changelog
 * Thu Jan 04 2024 Cameron Baird <cameronbaird@microsoft.com> - 1.0.1-1
-- Introduced
+- Original version for CBL-Mariner.
 - License verified
