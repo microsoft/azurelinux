@@ -200,7 +200,7 @@ fi
 
 %files -f %{name}.lang
 %license COPYING
-%doc README
+%doc README.md
 %{_sbindir}/firewalld
 %{_bindir}/firewall-cmd
 %{_bindir}/firewall-offline-cmd
@@ -209,7 +209,7 @@ fi
 %dir %{_datadir}/zsh/site-functions
 %{_datadir}/zsh/site-functions/_firewalld
 %{_libdir}/firewalld/icmptypes/*.xml
-%{_libdir}/firewalld/ipsets/README
+%{_libdir}/firewalld/ipsets/README.md
 %{_libdir}/firewalld/policies/*.xml
 %{_libdir}/firewalld/services/*.xml
 %{_libdir}/firewalld/zones/*.xml
@@ -271,7 +271,7 @@ fi
 
 %files -n firewalld-test
 %dir %{_datadir}/firewalld/testsuite
-%{_datadir}/firewalld/testsuite/README
+%{_datadir}/firewalld/testsuite/README.md
 %{_datadir}/firewalld/testsuite/testsuite
 %dir %{_datadir}/firewalld/testsuite/integration
 %{_datadir}/firewalld/testsuite/integration/testsuite
