@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "lld-12.0.1.src.tar.xz": "690b3f6a76310e13a783a142f87500ade9cafe003e088b678364487ed873e361",
-  "libunwind-12.0.1.src.tar.xz": "0bea6089518395ca65cf58b0a450716c5c99ce1f041079d3aa42d280ace15ca4"
+  "libunwind-17.0.6.src.tar.xz": "9e7535a353aa862730b4ba38df42e06f6856b40c4cc51b57f27b5046dc21d70d",
+  "lld-17.0.6.src.tar.xz": "4ac13125616dc44905b85820aa403d27ec1226329b7f674daeb5f5584c6f0b22"
  }
 }

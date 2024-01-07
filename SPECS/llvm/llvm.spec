@@ -1,14 +1,13 @@
 Summary:        A collection of modular and reusable compiler and toolchain technologies.
 Name:           llvm
-Version:        12.0.1
-Release:        8%{?dist}
+Version:        17.0.6
+Release:        1%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://llvm.org/
 Source0:        https://github.com/llvm/llvm-project/releases/download/llvmorg-%{version}/%{name}-%{version}.src.tar.xz
-Patch1:         llvm-12.0.1-issue-49955-workaround.patch
 BuildRequires:  cmake
 BuildRequires:  libffi-devel
 BuildRequires:  libxml2-devel
@@ -29,7 +28,6 @@ for developing applications that use llvm.
 
 %prep
 %setup -q -n %{name}-%{version}.src
-%autopatch -p2
 # fix build break with gcc 13 by including cstdint header
 sed -i 's/#include <string>/#include <cstdint>\n#include <string>/g' ./include/llvm/Support/Base64.h
 sed -i 's/#include <string>/#include <cstdint>\n#include <string>/g' ./include/llvm/Support/Signals.h
@@ -92,6 +90,9 @@ ninja check-all
 %{_includedir}/*
 
 %changelog
+* Thu Jan 04 2024 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 17.0.6-1
+- Upgrade to 17.0.6 for 3.0
+
 * Tue Dec 06 2023 Andrew Phelps <anphel@microsoft.com> - 12.0.1-8
 - Fix build break with gcc 13
 

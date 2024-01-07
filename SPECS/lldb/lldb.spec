@@ -1,14 +1,13 @@
 Summary:        A next generation, high-performance debugger.
 Name:           lldb
-Version:        12.0.1
-Release:        2%{?dist}
+Version:        17.0.6
+Release:        1%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://lldb.llvm.org
 Source0:        https://github.com/llvm/llvm-project/releases/download/llvmorg-%{version}/%{name}-%{version}.src.tar.xz
-Patch1:         0001-Silence-GCC-warnings-about-format-not-being-a-string.patch
 BuildRequires:  clang-devel = %{version}
 BuildRequires:  cmake
 BuildRequires:  libxml2-devel
@@ -44,7 +43,6 @@ The package contains the LLDB Python module.
 
 %prep
 %setup -q -n %{name}-%{version}.src
-%patch1 -p1
 
 %build
 # Disable symbol generation
@@ -98,6 +96,9 @@ rm -f %{buildroot}%{python3_sitelib}/six.*
 %{python3_sitelib}/*
 
 %changelog
+* Thu Jan 04 2024 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 17.0.6-1
+- Upgrade to 17.0.6 for 3.0
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 12.0.1-2
 - Removing the explicit %%clean stage.
 
