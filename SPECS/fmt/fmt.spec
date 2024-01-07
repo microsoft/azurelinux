@@ -1,6 +1,6 @@
 Summary:        Small, safe and fast formatting library for C++
 Name:           fmt
-Version:        8.1.1
+Version:        10.2.1
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -69,9 +69,9 @@ sed -i "s/'--clean-css',//" doc/build.py
 %ctest
 
 %files
-%license LICENSE.rst
-%doc ChangeLog.rst README.rst
-%{_libdir}/lib%{name}.so.8*
+%license LICENSE
+%doc ChangeLog.md README.md
+%{_libdir}/lib%{name}.so.10*
 
 %files devel
 %{_includedir}/%{name}
@@ -80,6 +80,12 @@ sed -i "s/'--clean-css',//" doc/build.py
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Fri Jan 05 2024 Muhammad Falak <mwani@microsoft.com> - 10.2.1-1
+- Bump version to 10.2.1
+
+* Thu Dec 21 2023 Muhammad Falak <mwani@microsoft.com> - 10.1.0-1
+- Bump version to 10.1.0
+
 * Tue Feb 01 2022 Cameron Baird <cameronbaird@microsoft.com> - 8.1.1-1
 - Update to 8.1.1
 - Clean up docs 
