@@ -1,13 +1,13 @@
 Summary:        A fast, reliable HA, load balancing, and proxy solution.
 Name:           haproxy
-Version:        2.4.24
+Version:        2.9.1
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.haproxy.org
-Source0:        http://www.haproxy.org/download/2.4/src/%{name}-%{version}.tar.gz
+Source0:        https://www.haproxy.org/download/2.9/src/%{name}-%{version}.tar.gz
 BuildRequires:  lua-devel
 BuildRequires:  openssl-devel
 BuildRequires:  pcre-devel
@@ -59,6 +59,9 @@ install -vDm644 examples/transparent_proxy.cfg  %{buildroot}/%{_sysconfdir}/hapr
 %{_mandir}/*
 
 %changelog
+* Tue Jan 02 2024 Muhammad Falak <mwani@microsoft.com> - 2.9.1-1
+- Update version to 2.9.1
+
 * Mon Aug 21 2023 Bala <balakumaran.kannan@microsoft.com> - 2.4.24-1
 - Update to 2.4.24 to fix CVE-2023-40225
 

@@ -5,8 +5,8 @@
 
 Summary:	Incredibly simple helpers for testing code with exceptions 
 Name:		perl-Test-Fatal
-Version:	0.014
-Release:	17%{?dist}
+Version:	0.017
+Release:	1%{?dist}
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -74,6 +74,9 @@ make test TEST_FILES="$(echo $(find xt/ -name '*.t'))"
 %{_mandir}/man3/Test::Fatal.3*
 
 %changelog
+* Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.017-1
+- Auto-upgrade to 0.017 - Azure Linux 3.0 - package upgrades
+
 * Tue Jul 26 2022 Henry Li <lihl@microsoft.com> - 0.014-17
 - License Verified
 - Remove usage of macros not applied for CBL-Mariner
