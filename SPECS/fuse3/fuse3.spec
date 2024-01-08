@@ -16,7 +16,7 @@ BuildRequires:  meson
 BuildRequires:  ninja-build
 BuildRequires:  libudev-devel
 BuildRequires:  which
-Requires:       %{_sysconfdir}/fuse.conf
+Requires:       fuse-common = %{version}-%{release}
 
 %description
 With FUSE it is possible to implement a fully functional filesystem in a
@@ -110,6 +110,7 @@ rm -f %{buildroot}%{_libdir}/udev/rules.d/99-fuse3.rules
 %changelog
 * Thu Dec 21 2023 Muhammad Falak <mwani@microsoft.com> - 3.16.2-1
 - Upgrade version to 3.16.2
+- Add a requires on fuse-common instead of a config-file
 
 * Wed Sep 22 2021 Thomas Crain <thcrain@microsoft.com> - 3.10.5-2
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
