@@ -1,5 +1,5 @@
 Name:           perl-Parse-PMFile
-Version:        0.43
+Version:        0.44
 Release:        1%{?dist}
 Summary:        Parses .pm file as PAUSE does
 License:        GPL+ OR Artistic
@@ -66,6 +66,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.44-1
+- Auto-upgrade to 0.44 - Azure Linux 3.0 - package upgrades
+
 * Thu Apr 14 2022 Mateusz Malisz <mateusz.malisz@microsoft.com> - 0.43-1
 - Updating to 0.43
 

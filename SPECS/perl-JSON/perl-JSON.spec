@@ -2,7 +2,7 @@
 %global __requires_exclude %{?__requires_exclude:%__requires_exclude|}perl\\(JSON::(backportPP|backportPP::Boolean)\\)
 Summary:        Parse and convert to JSON (JavaScript Object Notation)
 Name:           perl-JSON
-Version:        4.05
+Version:        4.10
 Release:        1%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
@@ -70,7 +70,6 @@ find %{buildroot} -type f -name .packlist -delete
 # Install tests
 mkdir -p %{buildroot}%{_libexecdir}/%{name}
 cp -a t %{buildroot}%{_libexecdir}/%{name}
-rm %{buildroot}%{_libexecdir}/%{name}/t/00_pod.t
 cat > %{buildroot}%{_libexecdir}/%{name}/test << 'EOF'
 #!/bin/bash
 # t/20_unknown.t writes to CWD
@@ -97,6 +96,9 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.10-1
+- Auto-upgrade to 4.10 - Azure Linux 3.0 - package upgrades
+
 * Tue Apr 26 2022 Mateusz Malisz <mamalisz@microsoft.com> - 4.05-1
 - Update to 4.05
 - Update Source0

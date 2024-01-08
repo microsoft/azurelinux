@@ -3950,8 +3950,8 @@
         "type": "other",
         "other": {
           "name": "fuse3",
-          "version": "3.10.5",
-          "downloadUrl": "https://github.com/libfuse/libfuse/archive/fuse-3.10.5.tar.gz"
+          "version": "3.16.2",
+          "downloadUrl": "https://github.com/libfuse/libfuse/archive/fuse-3.16.2.tar.gz"
         }
       }
     },
@@ -5120,8 +5120,8 @@
         "type": "other",
         "other": {
           "name": "haproxy",
-          "version": "2.4.24",
-          "downloadUrl": "http://www.haproxy.org/download/2.4/src/haproxy-2.4.24.tar.gz"
+          "version": "2.9.1",
+          "downloadUrl": "https://www.haproxy.org/download/2.9/src/haproxy-2.9.1.tar.gz"
         }
       }
     },
@@ -7461,8 +7461,8 @@
         "type": "other",
         "other": {
           "name": "irqbalance",
-          "version": "1.8.0",
-          "downloadUrl": "https://github.com/Irqbalance/irqbalance/archive/v1.8.0.tar.gz"
+          "version": "1.9.3",
+          "downloadUrl": "https://github.com/Irqbalance/irqbalance/archive/v1.9.3.tar.gz"
         }
       }
     },
@@ -15784,8 +15784,8 @@
         "type": "other",
         "other": {
           "name": "perl",
-          "version": "5.34.1",
-          "downloadUrl": "https://www.cpan.org/src/5.0/perl-5.34.1.tar.xz"
+          "version": "5.38.2",
+          "downloadUrl": "https://www.cpan.org/src/5.0/perl-5.38.2.tar.xz"
         }
       }
     },
@@ -15874,8 +15874,8 @@
         "type": "other",
         "other": {
           "name": "perl-App-cpanminus",
-          "version": "1.7045",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/MI/MIYAGAWA/App-cpanminus-1.7045.tar.gz"
+          "version": "1.7047",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/MI/MIYAGAWA/App-cpanminus-1.7047.tar.gz"
         }
       }
     },
@@ -16114,8 +16114,8 @@
         "type": "other",
         "other": {
           "name": "perl-CGI",
-          "version": "4.54",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/L/LE/LEEJO/CGI-4.54.tar.gz"
+          "version": "4.60",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/L/LE/LEEJO/CGI-4.60.tar.gz"
         }
       }
     },
@@ -16254,8 +16254,8 @@
         "type": "other",
         "other": {
           "name": "perl-Clone",
-          "version": "0.43",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Clone/Clone-0.43.tar.gz"
+          "version": "0.46",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/G/GA/GARU/Clone-0.46.tar.gz"
         }
       }
     },
@@ -16473,9 +16473,19 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-B-COW",
+          "version": "0.007",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/A/AT/ATOOMIC/B-COW-0.007.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-CPAN-Changes",
-          "version": "0.400002",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/CPAN/CPAN-Changes-0.400002.tar.gz"
+          "version": "0.500002",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/CPAN/CPAN-Changes-0.500002.tar.gz"
         }
       }
     },
@@ -16494,8 +16504,8 @@
         "type": "other",
         "other": {
           "name": "perl-CPAN-Meta-Check",
-          "version": "0.014",
-          "downloadUrl": "http://cpan.metacpan.org/authors/id/L/LE/LEONT/CPAN-Meta-Check-0.014.tar.gz"
+          "version": "0.018",
+          "downloadUrl": "http://cpan.metacpan.org/authors/id/L/LE/LEONT/CPAN-Meta-Check-0.018.tar.gz"
         }
       }
     },
@@ -16904,8 +16914,8 @@
         "type": "other",
         "other": {
           "name": "perl-Devel-CheckLib",
-          "version": "1.14",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Devel/Devel-CheckLib-1.14.tar.gz"
+          "version": "1.16",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Devel/Devel-CheckLib-1.16.tar.gz"
         }
       }
     },
@@ -17204,8 +17214,8 @@
         "type": "other",
         "other": {
           "name": "perl-Exporter-Tiny",
-          "version": "1.002002",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/T/TO/TOBYINK/Exporter-Tiny-1.002002.tar.gz"
+          "version": "1.006002",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/T/TO/TOBYINK/Exporter-Tiny-1.006002.tar.gz"
         }
       }
     },
@@ -17674,8 +17684,8 @@
         "type": "other",
         "other": {
           "name": "perl-HTTP-Cookies",
-          "version": "6.08",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/O/OA/OALDERS/HTTP-Cookies-6.08.tar.gz"
+          "version": "6.11",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/O/OA/OALDERS/HTTP-Cookies-6.11.tar.gz"
         }
       }
     },
@@ -17684,8 +17694,8 @@
         "type": "other",
         "other": {
           "name": "perl-HTTP-Daemon",
-          "version": "6.06",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/O/OA/OALDERS/HTTP-Daemon-6.06.tar.gz"
+          "version": "6.16",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/O/OA/OALDERS/HTTP-Daemon-6.16.tar.gz"
         }
       }
     },
@@ -17694,8 +17704,8 @@
         "type": "other",
         "other": {
           "name": "perl-HTTP-Date",
-          "version": "6.05",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/O/OA/OALDERS/HTTP-Date-6.05.tar.gz"
+          "version": "6.06",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/O/OA/OALDERS/HTTP-Date-6.06.tar.gz"
         }
       }
     },
@@ -17704,8 +17714,8 @@
         "type": "other",
         "other": {
           "name": "perl-HTTP-Message",
-          "version": "6.22",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/O/OA/OALDERS/HTTP-Message-6.22.tar.gz"
+          "version": "6.45",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/O/OA/OALDERS/HTTP-Message-6.45.tar.gz"
         }
       }
     },
@@ -17854,8 +17864,8 @@
         "type": "other",
         "other": {
           "name": "perl-IO-HTML",
-          "version": "1.001",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/C/CJ/CJM/IO-HTML-1.001.tar.gz"
+          "version": "1.004",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/C/CJ/CJM/IO-HTML-1.004.tar.gz"
         }
       }
     },
@@ -17894,8 +17904,8 @@
         "type": "other",
         "other": {
           "name": "perl-IO-Socket-SSL",
-          "version": "2.074",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/IO/IO-Socket-SSL-2.074.tar.gz"
+          "version": "2.084",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/IO/IO-Socket-SSL-2.084.tar.gz"
         }
       }
     },
@@ -17924,8 +17934,8 @@
         "type": "other",
         "other": {
           "name": "perl-IO-Tty",
-          "version": "1.14",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/IO/IO-Tty-1.14.tar.gz"
+          "version": "1.18",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/IO/IO-Tty-1.18.tar.gz"
         }
       }
     },
@@ -17964,8 +17974,8 @@
         "type": "other",
         "other": {
           "name": "perl-JSON",
-          "version": "4.05",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/JSON/JSON-4.05.tar.gz"
+          "version": "4.10",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/JSON/JSON-4.10.tar.gz"
         }
       }
     },
@@ -17974,8 +17984,8 @@
         "type": "other",
         "other": {
           "name": "perl-JSON-Any",
-          "version": "1.39",
-          "downloadUrl": "http://search.cpan.org/CPAN/authors/id/E/ET/ETHER/JSON-Any-1.39.tar.gz"
+          "version": "1.40",
+          "downloadUrl": "http://search.cpan.org/CPAN/authors/id/E/ET/ETHER/JSON-Any-1.40.tar.gz"
         }
       }
     },
@@ -18044,8 +18054,8 @@
         "type": "other",
         "other": {
           "name": "perl-libwww-perl",
-          "version": "6.49",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/O/OA/OALDERS/libwww-perl-6.49.tar.gz"
+          "version": "6.72",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/O/OA/OALDERS/libwww-perl-6.72.tar.gz"
         }
       }
     },
@@ -18094,8 +18104,8 @@
         "type": "other",
         "other": {
           "name": "perl-local-lib",
-          "version": "2.000024",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/H/HA/HAARG/local-lib-2.000024.tar.gz"
+          "version": "2.000029",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/H/HA/HAARG/local-lib-2.000029.tar.gz"
         }
       }
     },
@@ -18354,8 +18364,8 @@
         "type": "other",
         "other": {
           "name": "perl-Module-Install",
-          "version": "1.19",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/E/ET/ETHER/Module-Install-1.19.tar.gz"
+          "version": "1.21",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/E/ET/ETHER/Module-Install-1.21.tar.gz"
         }
       }
     },
@@ -18524,8 +18534,8 @@
         "type": "other",
         "other": {
           "name": "perl-Module-ScanDeps",
-          "version": "1.31",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RS/RSCHUPP/Module-ScanDeps-1.31.tar.gz"
+          "version": "1.35",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RS/RSCHUPP/Module-ScanDeps-1.35.tar.gz"
         }
       }
     },
@@ -18994,8 +19004,8 @@
         "type": "other",
         "other": {
           "name": "perl-Parse-PMFile",
-          "version": "0.43",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/I/IS/ISHIGAKI/Parse-PMFile-0.43.tar.gz"
+          "version": "0.44",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/I/IS/ISHIGAKI/Parse-PMFile-0.44.tar.gz"
         }
       }
     },
@@ -19184,8 +19194,8 @@
         "type": "other",
         "other": {
           "name": "perl-Pod-Parser",
-          "version": "1.63",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/MA/MAREKR/Pod-Parser-1.63.tar.gz"
+          "version": "1.66",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/MA/MAREKR/Pod-Parser-1.66.tar.gz"
         }
       }
     },
@@ -19644,8 +19654,8 @@
         "type": "other",
         "other": {
           "name": "perl-Sys-Virt",
-          "version": "6.1.0",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/D/DA/DANBERR/Sys-Virt-v6.1.0.tar.gz"
+          "version": "9.8.0",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/D/DA/DANBERR/Sys-Virt-v9.8.0.tar.gz"
         }
       }
     },
@@ -19764,8 +19774,8 @@
         "type": "other",
         "other": {
           "name": "perl-Test-Deep",
-          "version": "1.130",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Test/Test-Deep-1.130.tar.gz"
+          "version": "1.204",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/Test/Test-Deep-1.204.tar.gz"
         }
       }
     },
@@ -19844,8 +19854,8 @@
         "type": "other",
         "other": {
           "name": "perl-Test-Fatal",
-          "version": "0.014",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RJ/RJBS/Test-Fatal-0.014.tar.gz"
+          "version": "0.017",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RJ/RJBS/Test-Fatal-0.017.tar.gz"
         }
       }
     },
@@ -19984,8 +19994,8 @@
         "type": "other",
         "other": {
           "name": "perl-Test-Needs",
-          "version": "0.002006",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/H/HA/HAARG/Test-Needs-0.002006.tar.gz"
+          "version": "0.002010",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/H/HA/HAARG/Test-Needs-0.002010.tar.gz"
         }
       }
     },
@@ -20334,8 +20344,8 @@
         "type": "other",
         "other": {
           "name": "perl-TimeDate",
-          "version": "2.32",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/A/AT/ATOOMIC/TimeDate-2.32.tar.gz"
+          "version": "2.33",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/A/AT/ATOOMIC/TimeDate-2.33.tar.gz"
         }
       }
     },
@@ -20354,8 +20364,8 @@
         "type": "other",
         "other": {
           "name": "perl-Try-Tiny",
-          "version": "0.30",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/E/ET/ETHER/Try-Tiny-0.30.tar.gz"
+          "version": "0.31",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/E/ET/ETHER/Try-Tiny-0.31.tar.gz"
         }
       }
     },
@@ -20454,8 +20464,8 @@
         "type": "other",
         "other": {
           "name": "perl-URI",
-          "version": "1.76",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/O/OA/OALDERS/URI-1.76.tar.gz"
+          "version": "5.21",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/O/OA/OALDERS/URI-5.21.tar.gz"
         }
       }
     },
@@ -20574,8 +20584,8 @@
         "type": "other",
         "other": {
           "name": "perl-XML-LibXML",
-          "version": "2.0207",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/S/SH/SHLOMIF/XML-LibXML-2.0207.tar.gz"
+          "version": "2.0209",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/S/SH/SHLOMIF/XML-LibXML-2.0209.tar.gz"
         }
       }
     },
@@ -20714,8 +20724,8 @@
         "type": "other",
         "other": {
           "name": "perl-XML-XPath",
-          "version": "1.44",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/MA/MANWAR/XML-XPath-1.44.tar.gz"
+          "version": "1.48",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/MA/MANWAR/XML-XPath-1.48.tar.gz"
         }
       }
     },
