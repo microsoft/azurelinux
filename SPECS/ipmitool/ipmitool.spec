@@ -187,6 +187,7 @@ install -Dm 755 contrib/bmc-snmp-proxy         %{buildroot}%{_libexecdir}/bmc-sn
 * Fri Jan 05 2024 Muhammad Falak <mwani@microsoft.com> - 1.8.19-1
 - Upgrade version to 1.8.19
 - Drop un-needed patches
+- Add OEM enterprise-numbers dictionary file (https://github.com/ipmitool/ipmitool/commit/bd0475ce)
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.8.18-22
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
