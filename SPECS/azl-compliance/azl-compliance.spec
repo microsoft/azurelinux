@@ -9,7 +9,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://aka.ms/mariner
-Source0:        azl-compliance-1.0.tar.xz
+Source0:        azl-compliance-1.0.tar.gz
 Requires:       rust
 Requires:       systemd
 BuildRequires:  rust
@@ -26,20 +26,31 @@ Requires:       grubby
 %description fips
 package to meet FIPS Compliance
 
+%package fedramp
+Summary:        FedRAMP compliance
+
+%description fedramp
+package to meet FedRAMP Compliance
+
+
 %prep
-%setup -q 
+%setup -c
 
 %build
 cd azl-compliance
-cargo build --release
+cargo build 
 
 %install
 mkdir -p %{buildroot}%{_sysconfdir}/azl-compliance/
 mkdir -p %{buildroot}%{_unitdir}
 install -D -m 644 azl-compliance.service %{buildroot}%{_unitdir}/azl-compliance.service
-install -m 0755 ./azl-compliance/target/release/azl-compliance %{buildroot}%{_sysconfdir}/azl-compliance/
+install -m 0755 ./azl-compliance/target/debug/azl-compliance %{buildroot}%{_sysconfdir}/azl-compliance/
 mkdir -p %{buildroot}%{_sysconfdir}/azl-compliance/FIPS
 install -m 0755 FIPS/* %{buildroot}%{_sysconfdir}/azl-compliance/FIPS/
+mkdir -p %{buildroot}%{_sysconfdir}/azl-compliance/FedRAMP
+install -m 0755 FedRAMP/* %{buildroot}%{_sysconfdir}/azl-compliance/FedRAMP/
+install -m 0755 azl-compliance-fips.json %{buildroot}%{_sysconfdir}/azl-compliance/
+install -m 0755 azl-compliance-fedramp.json %{buildroot}%{_sysconfdir}/azl-compliance/
 
 %post
 %systemd_post azl-compliance.service
@@ -50,6 +61,11 @@ install -m 0755 FIPS/* %{buildroot}%{_sysconfdir}/azl-compliance/FIPS/
 
 %files fips
 %{_sysconfdir}/azl-compliance/FIPS
+%{_sysconfdir}/azl-compliance/azl-compliance-fips.json
+
+%files fedramp
+%{_sysconfdir}/azl-compliance/FedRAMP
+%{_sysconfdir}/azl-compliance/azl-compliance-fedramp.json
 
 %changelog
 * Wed Oct 18 2023 Minghe Ren <mingheren@microsoft.com> 1.0-1
@@ -57,3 +73,4 @@ install -m 0755 FIPS/* %{buildroot}%{_sysconfdir}/azl-compliance/FIPS/
 - License verified
 - Add azl-compliance.service
 - Add FIPS sub-package
+- Add FedRAMP sub-package
