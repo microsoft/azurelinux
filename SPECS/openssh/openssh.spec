@@ -3,7 +3,7 @@
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        %{openssh_ver}
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -35,6 +35,15 @@ Patch307:       pam_ssh_agent_auth-0.10.2-dereference.patch
 Patch308:       CVE-2023-38408.patch
 Patch309:       CVE-2023-51384.patch
 Patch310:       CVE-2023-51385.patch
+Patch311:       CVE-2023-48795-0001-upstream-Always-return-allocated-strings-from-the-ke.patch
+Patch312:       CVE-2023-48795-0002-upstream-fix-double-free-caused-by-compat_kex_propos.patch
+Patch313:       CVE-2023-48795-0003-upstream-Remove-now-unused-compat-bit-SSH_BUG_BIGEND.patch
+Patch314:       CVE-2023-48795-0004-upstream-Remove-now-unused-compat-bit-SSH_BUG_RSASIG.patch
+Patch315:       CVE-2023-48795-0005-upstream-Don-t-leak-the-strings-allocated-by-order_h.patch
+Patch316:       CVE-2023-48795-0006-upstream-Remove-leftover-line.patch
+Patch317:       CVE-2023-48795-0007-upstream-Refactor-creation-of-KEX-proposal.patch
+Patch318:       CVE-2023-48795-0008-upstream-Limit-number-of-entries-in-SSH2_MSG_EXT_INF.patch
+Patch319:       CVE-2023-48795-0009-upstream-implement-strict-key-exchange-in-ssh-and-ss.patch
 BuildRequires:  audit-devel
 BuildRequires:  autoconf
 BuildRequires:  e2fsprogs-devel
@@ -110,6 +119,15 @@ popd
 %patch308 -p2 -b .cve-2023-38408
 %patch309 -p1 -b .cve-2023-51384
 %patch310 -p1 -b .cve-2023-51385
+%patch311 -p1 -b .cve-2023-48795-0001
+%patch312 -p1 -b .cve-2023-48795-0002
+%patch313 -p1 -b .cve-2023-48795-0003
+%patch314 -p1 -b .cve-2023-48795-0004
+%patch315 -p1 -b .cve-2023-48795-0005
+%patch316 -p1 -b .cve-2023-48795-0006
+%patch317 -p1 -b .cve-2023-48795-0007
+%patch318 -p1 -b .cve-2023-48795-0008
+%patch319 -p1 -b .cve-2023-48795-0009
 
 %build
 # The -fvisibility=hidden is needed for clean build of the pam_ssh_agent_auth.
@@ -267,6 +285,9 @@ fi
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
+* Mon Jan  8 15:23:58 EST 2024 Dan Streetman <ddstreet@ieee.org> - 8.9p1-4
+- Add patches for CVE-2023-48795
+
 * Tue Dec 26 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 8.9p1-3
 - Patch CVEs 2023-51384 and 2023-51385
 
