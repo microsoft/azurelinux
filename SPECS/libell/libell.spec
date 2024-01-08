@@ -1,6 +1,6 @@
 Summary:        Embedded Linux library
 Name:           libell
-Version:        0.58
+Version:        0.61
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
@@ -51,6 +51,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/ell.pc
 
 %changelog
+* Wed Jan 03 2024 Rachel Menge <rachelmenge@microsoft.com> - 0.61-1
+- Upgrade to 0.61
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.58-1
 - Auto-upgrade to 0.58 - Azure Linux 3.0 - package upgrades
 
