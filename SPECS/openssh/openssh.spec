@@ -3,7 +3,7 @@
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        %{openssh_ver}
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -35,6 +35,7 @@ Patch307:       pam_ssh_agent_auth-0.10.2-dereference.patch
 Patch308:       CVE-2023-38408.patch
 Patch309:       CVE-2023-51384.patch
 Patch310:       CVE-2023-51385.patch
+Patch311:       CVE-2023-48795.patch
 BuildRequires:  audit-devel
 BuildRequires:  autoconf
 BuildRequires:  e2fsprogs-devel
@@ -110,6 +111,7 @@ popd
 %patch308 -p2 -b .cve-2023-38408
 %patch309 -p1 -b .cve-2023-51384
 %patch310 -p1 -b .cve-2023-51385
+%patch311 -p1 -b .cve-2023-48795
 
 %build
 # The -fvisibility=hidden is needed for clean build of the pam_ssh_agent_auth.
@@ -267,6 +269,9 @@ fi
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
+* Mon Jan  8 15:23:58 EST 2024 Dan Streetman <ddstreet@ieee.org> - 8.9p1-4
+- Add patch for CVE-2023-48795
+
 * Tue Dec 26 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 8.9p1-3
 - Patch CVEs 2023-51384 and 2023-51385
 
