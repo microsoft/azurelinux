@@ -1,6 +1,6 @@
-diff -up XML-LibXML-2.0206/Makefile.PL.orig XML-LibXML-2.0206/Makefile.PL
---- XML-LibXML-2.0206/Makefile.PL.orig	2020-09-15 10:00:42.000000000 +0200
-+++ XML-LibXML-2.0206/Makefile.PL	2020-11-30 15:54:20.965335954 +0100
+diff -up XML-LibXML-2.0208/Makefile.PL.orig XML-LibXML-2.0208/Makefile.PL
+--- XML-LibXML-2.0208/Makefile.PL.orig	2022-09-30 09:47:44.807934522 +0200
++++ XML-LibXML-2.0208/Makefile.PL	2022-09-30 09:49:19.192599793 +0200
 @@ -17,15 +17,31 @@ use warnings;
  
  require 5.008001;
@@ -36,13 +36,22 @@ diff -up XML-LibXML-2.0206/Makefile.PL.orig XML-LibXML-2.0206/Makefile.PL
    "Config" => 0,
    "ExtUtils::MakeMaker" => 0,
  );
-@@ -71,7 +87,8 @@ my %prereqs = (
- my %xsbuild = (
+@@ -68,15 +84,12 @@ my %prereqs = (
+   "warnings" => 0,
+ );
+ 
+-my %xsbuild_concat = (
++my %xsbuild = (
    DEFINE  => '-DHAVE_UTF8',
    OBJECT  => '$(O_FILES)',
--  Alien::Base::Wrapper->mm_args,
 +  LIBS    => $libs,
 +  INC     => $inc,
  );
+-my %xsbuild = Alien::Base::Wrapper->mm_args;  # Might contain a definition of DEFINE, must thus concatenate.
+-while (my ($k, $v) = each %xsbuild_concat) {
+-  my $base_val = $xsbuild{$k};
+-  $xsbuild{$k} = (defined($base_val) ? ($base_val . ' ' . $v) : $v);
+-}
  
  my %WriteMakefileArgs = (
+   "NAME" => "XML::LibXML",

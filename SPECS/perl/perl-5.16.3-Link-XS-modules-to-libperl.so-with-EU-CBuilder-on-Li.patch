@@ -20,14 +20,14 @@ diff --git a/MANIFEST b/MANIFEST
 index 397252a..d7c519b 100644
 --- a/MANIFEST
 +++ b/MANIFEST
-@@ -3424,6 +3424,7 @@ dist/ExtUtils-CBuilder/lib/ExtUtils/CBuilder/Platform/aix.pm	CBuilder methods fo
- dist/ExtUtils-CBuilder/lib/ExtUtils/CBuilder/Platform/cygwin.pm	CBuilder methods for cygwin
- dist/ExtUtils-CBuilder/lib/ExtUtils/CBuilder/Platform/darwin.pm	CBuilder methods for darwin
+@@ -3886,6 +3886,7 @@ dist/ExtUtils-CBuilder/lib/ExtUtils/CBuilder/Platform/aix.pm	CBuilder methods fo
+ dist/ExtUtils-CBuilder/lib/ExtUtils/CBuilder/Platform/cygwin.pm		CBuilder methods for cygwin
+ dist/ExtUtils-CBuilder/lib/ExtUtils/CBuilder/Platform/darwin.pm		CBuilder methods for darwin
  dist/ExtUtils-CBuilder/lib/ExtUtils/CBuilder/Platform/dec_osf.pm	CBuilder methods for OSF
-+dist/ExtUtils-CBuilder/lib/ExtUtils/CBuilder/Platform/linux.pm	CBuilder methods for Linux
- dist/ExtUtils-CBuilder/lib/ExtUtils/CBuilder/Platform/os2.pm	CBuilder methods for OS/2
- dist/ExtUtils-CBuilder/lib/ExtUtils/CBuilder/Platform/Unix.pm	CBuilder methods for Unix
- dist/ExtUtils-CBuilder/lib/ExtUtils/CBuilder/Platform/VMS.pm	CBuilder methods for VMS
++dist/ExtUtils-CBuilder/lib/ExtUtils/CBuilder/Platform/linux.pm		CBuilder methods for Linux
+ dist/ExtUtils-CBuilder/lib/ExtUtils/CBuilder/Platform/os2.pm		CBuilder methods for OS/2
+ dist/ExtUtils-CBuilder/lib/ExtUtils/CBuilder/Platform/Unix.pm		CBuilder methods for Unix
+ dist/ExtUtils-CBuilder/lib/ExtUtils/CBuilder/Platform/VMS.pm		CBuilder methods for VMS
 diff --git a/dist/ExtUtils-CBuilder/lib/ExtUtils/CBuilder/Platform/linux.pm b/dist/ExtUtils-CBuilder/lib/ExtUtils/CBuilder/Platform/linux.pm
 new file mode 100644
 index 0000000..e3251c4

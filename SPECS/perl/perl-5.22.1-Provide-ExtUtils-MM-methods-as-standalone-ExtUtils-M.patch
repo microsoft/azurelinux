@@ -23,14 +23,14 @@ diff --git a/MANIFEST b/MANIFEST
 index 6af238c..d4f0c56 100644
 --- a/MANIFEST
 +++ b/MANIFEST
-@@ -784,6 +784,7 @@ cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM_OS390.pm
- cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM_OS390.pm
- cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM_QNX.pm			MakeMaker methods for QNX
- cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM_Unix.pm			MakeMaker methods for Unix
-+cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM/Utils.pm		Independed MM methods
- cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM_UWIN.pm			MakeMaker methods for U/WIN
- cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM_VMS.pm			MakeMaker methods for VMS
- cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM_VOS.pm			MakeMaker methods for VOS
+@@ -1037,6 +1037,7 @@ cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM_OS390.pm
+ cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM_OS390.pm				MakeMaker methods for OS 390
+ cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM_QNX.pm					MakeMaker methods for QNX
+ cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM_Unix.pm					MakeMaker methods for Unix
++cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM/Utils.pm				Independed MM methods
+ cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM_UWIN.pm					MakeMaker methods for U/WIN
+ cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM_VMS.pm					MakeMaker methods for VMS
+ cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM_VOS.pm					MakeMaker methods for VOS
 diff --git a/cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM/Utils.pm b/cpan/ExtUtils-MakeMaker/lib/ExtUtils/MM/Utils.pm
 new file mode 100644
 index 0000000..6bbc0d8

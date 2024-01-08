@@ -5,8 +5,8 @@
 
 Summary:        XPath parser and evaluator for Perl
 Name:           perl-XML-XPath
-Version:        1.44
-Release:        13%{?dist}
+Version:        1.48
+Release:        1%{?dist}
 # XML/XPath.pm, XML/XPath/PerlSAX.pm, REAME: GPL+ or Artistic
 # Others: Artistic 2.0
 License:        Artistic 2.0 AND (GPL+ OR Artistic)
@@ -88,6 +88,9 @@ make test
 %{_mandir}/man3/*.3*
 
 %changelog
+* Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.48-1
+- Auto-upgrade to 1.48 - Azure Linux 3.0 - package upgrades
+
 * Wed Jul 20 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.44-13
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.

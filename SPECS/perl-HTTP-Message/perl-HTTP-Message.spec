@@ -1,6 +1,6 @@
 Name:           perl-HTTP-Message
-Version:        6.22
-Release:        3%{?dist}
+Version:        6.45
+Release:        1%{?dist}
 Summary:        HTTP style message
 # CONTRIBUTING.md:  CC0
 # other files:      GPL+ or Artistic
@@ -94,6 +94,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.45-1
+- Auto-upgrade to 6.45 - Azure Linux 3.0 - package upgrades
+
 * Tue Jul 26 2022 Henry Li <lihl@microsoft.com> - 6.22-3
 - License Verified
 

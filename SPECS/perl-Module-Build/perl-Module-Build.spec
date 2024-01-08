@@ -6,10 +6,10 @@
 Summary:        Build and install Perl modules
 Name:           perl-Module-Build
 Version:        0.4234
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
-URL:            http://search.cpan.org/dist/Module-Build/
+URL:            https://metacpan.org/dist/Module-Build
 Source0:        https://cpan.metacpan.org/authors/id/L/LE/LEONT/Module-Build-%{version}.tar.gz
 Source1:        LICENSE.PTR
 Vendor:         Microsoft Corporation
@@ -95,6 +95,9 @@ LANG=C TEST_SIGNATURE=1 MB_TEST_EXPERIMENTAL=1 ./Build test
 %{_mandir}/man3/*
 
 %changelog
+* Thu Dec 14 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 0.4234-2
+- Fix URL
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.4234-1
 - Auto-upgrade to 0.4234 - Azure Linux 3.0 - package upgrades
 
