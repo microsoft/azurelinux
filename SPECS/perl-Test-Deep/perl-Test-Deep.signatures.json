@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "LICENSE.PTR": "f622ec0f2dca6313056e7e52dc90c2592e58a7c41f05ecc49ab10f512fb1fdb4",
-  "perl-Test-Deep-1.130.tar.gz": "4064f494f5f62587d0ae501ca439105821ee5846c687dc6503233f55300a7c56"
- }
+  "Signatures": {
+    "LICENSE.PTR": "f622ec0f2dca6313056e7e52dc90c2592e58a7c41f05ecc49ab10f512fb1fdb4",
+    "perl-Test-Deep-1.204.tar.gz": "b6591f6ccdd853c7efc9ff3c5756370403211cffe46047f082b1cd1611a84e5f"
+  }
 }

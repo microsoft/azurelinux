@@ -1,6 +1,6 @@
 Name:           perl-local-lib
-Version:        2.000024
-Release:        10%{?dist}
+Version:        2.000029
+Release:        1%{?dist}
 Summary:        Create and use a local lib/ for perl modules
 License:        GPL+ OR Artistic
 Group:          Development/Libraries
@@ -105,6 +105,9 @@ make test
 %{_sysconfdir}/profile.d/*
 
 %changelog
+* Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.000029-1
+- Auto-upgrade to 2.000029 - Azure Linux 3.0 - package upgrades
+
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.000024-10
 - Adding 'BuildRequires: perl-generators'.
 

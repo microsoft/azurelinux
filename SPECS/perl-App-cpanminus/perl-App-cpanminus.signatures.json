@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "App-cpanminus-1.7045.tar.gz": "ac4e4adc23fec0ab54f088aca511f5a57d95e6c97a12a1cb98eed1fe0fe0e99c",
-  "fatunpack": "07b2d934de6d30dcac0843a095ab1207b406526e6fb151c51eb39d8b8591b6e3"
- }
+  "Signatures": {
+    "fatunpack": "07b2d934de6d30dcac0843a095ab1207b406526e6fb151c51eb39d8b8591b6e3",
+    "App-cpanminus-1.7047.tar.gz": "963e63c6e1a8725ff2f624e9086396ae150db51dd0a337c3781d09a994af05a5"
+  }
 }
