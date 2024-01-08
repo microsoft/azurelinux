@@ -1,7 +1,6 @@
 {
  "Signatures": {
-  "freetds-1.3.20.tar.bz2": "20ae11f3b806e4fbc0fa0b5931fb473bb5748bee9d487f6aa12885083578a5ed",
+  "freetds-1.4.10.tar.bz2": "c7eaf226bdcb1cdc1b221696532ccd25f4e4e7754265a29777a3400084bde698",
   "freetds-tds_sysdep_public.h": "8478bd6bd98ba4bfaf5920aae639b155d7fe2eec676bdbbd9d01e1358f295a59"
  }
 }
-
