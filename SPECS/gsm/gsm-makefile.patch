@@ -1,6 +1,7 @@
-diff -up gsm-1.0-pl17/Makefile.mk gsm-1.0-pl17/Makefile
---- gsm-1.0-pl17/Makefile.mk	2017-06-28 02:24:24.000000000 +0200
-+++ gsm-1.0-pl17/Makefile	2017-06-29 13:18:44.138719902 +0200
+diff --git a/Makefile b/Makefile
+index 2ad5e5d..a1aa787 100644
+--- a/Makefile
++++ b/Makefile
 @@ -44,13 +44,17 @@ WAV49	= -DWAV49
  # CCFLAGS 	= -c -O
  
@@ -15,7 +16,7 @@ diff -up gsm-1.0-pl17/Makefile.mk gsm-1.0-pl17/Makefile
  
 +SO_MAJOR = 1
 +SO_MINOR = 0
-+SO_PATCH = 18
++SO_PATCH = 19
 +SO_VER = $(SO_MAJOR).$(SO_MINOR).$(SO_PATCH)
  
  # If your compiler needs additional flags/libraries, regardless of
@@ -29,7 +30,7 @@ diff -up gsm-1.0-pl17/Makefile.mk gsm-1.0-pl17/Makefile
  
  
  # Where do you want to install the toast binaries and their manpage?
-@@ -91,16 +95,16 @@ GSM_INSTALL_MAN = $(GSM_INSTALL_ROOT)/ma
+@@ -91,12 +95,12 @@ GSM_INSTALL_MAN = $(GSM_INSTALL_ROOT)/man/man3
  
  TOAST_INSTALL_ROOT	  = $(INSTALL_ROOT)
  TOAST_INSTALL_BIN = $(TOAST_INSTALL_ROOT)/bin
@@ -44,11 +45,6 @@ diff -up gsm-1.0-pl17/Makefile.mk gsm-1.0-pl17/Makefile
  BASENAME 	= basename
  AR		= ar
  ARFLAGS		= cr
--RMFLAGS		=
-+RMFLAGS		= -f
- FIND		= find
- COMPRESS 	= gzip
- COMPRESSFLAGS 	= 
 @@ -140,6 +144,7 @@ LFLAGS	= $(LDFLAGS) $(LDINC)
  # Targets
  
@@ -115,70 +111,76 @@ diff -up gsm-1.0-pl17/Makefile.mk gsm-1.0-pl17/Makefile
  
  
  # The local bin and lib directories
-@@ -352,8 +367,7 @@ toastuninstall:
+@@ -352,52 +367,55 @@ toastuninstall:
  
  $(TOAST_INSTALL_BIN)/toast:	$(TOAST)
- 		-rm $@
+ 		-rm $(RMFLAGS) $@
 -		cp $(TOAST) $@
 -		chmod 755 $@
 +		install -pm755 $(TOAST) $@
  
  $(TOAST_INSTALL_BIN)/untoast:	$(TOAST_INSTALL_BIN)/toast
- 		-rm $@
-@@ -365,39 +379,43 @@ $(TOAST_INSTALL_BIN)/tcat:	$(TOAST_INSTA
+ 		-rm $(RMFLAGS) $@
+-		$(LN) $? $@
++		$(LN) -rs $? $@
+ 
+ $(TOAST_INSTALL_BIN)/tcat:	$(TOAST_INSTALL_BIN)/toast
+ 		-rm $(RMFLAGS) $@
+-		$(LN) $? $@
++		$(LN) -rs $? $@
  
  $(TOAST_INSTALL_MAN)/toast.1:	$(MAN)/toast.1
- 		-rm $@
+ 		-rm $(RMFLAGS) $@
 -		cp $? $@
 -		chmod 444 $@
 +		install -pm644 $? $@
  
  $(GSM_INSTALL_MAN)/gsm.3:	$(MAN)/gsm.3
- 		-rm $@
+ 		-rm $(RMFLAGS) $@
 -		cp $? $@
 -		chmod 444 $@
 +		install -pm644 $? $@
  
  $(GSM_INSTALL_MAN)/gsm_option.3:	$(MAN)/gsm_option.3
- 		-rm $@
+ 		-rm $(RMFLAGS) $@
 -		cp $? $@
 -		chmod 444 $@
 +		install -pm644 $? $@
  
  $(GSM_INSTALL_MAN)/gsm_explode.3:	$(MAN)/gsm_explode.3
- 		-rm $@
+ 		-rm $(RMFLAGS) $@
 -		cp $? $@
 -		chmod 444 $@
 +		install -pm644 $? $@
  
  $(GSM_INSTALL_MAN)/gsm_print.3:	$(MAN)/gsm_print.3
- 		-rm $@
+ 		-rm $(RMFLAGS) $@
 -		cp $? $@
 -		chmod 444 $@
 +		install -pm644 $? $@
  
  $(GSM_INSTALL_INC)/gsm.h:	$(INC)/gsm.h
- 		-rm $@
+ 		-rm $(RMFLAGS) $@
 -		cp $? $@
 -		chmod 444 $@
 +		install -pm644 $? $@
  
  $(GSM_INSTALL_LIB)/libgsm.a:	$(LIBGSM)
- 		-rm $@
+ 		-rm $(RMFLAGS) $@
 -		cp $? $@
 -		chmod 444 $@
 +		install -pm644 $? $@
  
 +$(GSM_INSTALL_LIB)/libgsm.so.$(SO_VER):	$(LIBGSMSO).$(SO_VER)
-+		-rm $@
++		-rm $(RMFLAGS) $@
 +		install -pm755 $? $@
 +
 +$(GSM_INSTALL_LIB)/libgsm.so.$(SO_MAJOR):	$(LIBGSMSO).$(SO_MAJOR)
-+		-rm $@
++		-rm $(RMFLAGS) $@
 +		ln -s libgsm.so.$(SO_VER) $@
 +
 +$(GSM_INSTALL_LIB)/libgsm.so:	$(LIBGSMSO)
-+		-rm $@
++		-rm $(RMFLAGS) $@
 +		ln -s libgsm.so.$(SO_VER) $@
  
  # Distribution
