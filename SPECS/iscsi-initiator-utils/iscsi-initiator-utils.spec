@@ -41,7 +41,9 @@ BuildRequires: autoconf automake libtool libmount-devel openssl-devel
 BuildRequires: isns-utils-devel
 BuildRequires: systemd-devel
 Requires: %{name}-iscsiuio >= %{version}-%{release}
-#Requires: (fedora-release-common >= 38-0.23 if fedora-release-common)
+%if 0%{?fedora}
+Requires: (fedora-release-common >= 38-0.23 if fedora-release-common)
+%endif
 Requires(post): systemd
 Requires(preun): systemd
 Requires(postun): systemd
