@@ -1,8 +1,8 @@
 # Got the intial spec from Fedora and modified it
 Summary:        Recursively scan Perl code for dependencies
 Name:           perl-Module-ScanDeps
-Version:        1.31
-Release:        2%{?dist}
+Version:        1.35
+Release:        1%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 Source0:        https://cpan.metacpan.org/authors/id/R/RS/RSCHUPP/Module-ScanDeps-%{version}.tar.gz
@@ -64,6 +64,9 @@ make %{?_smp_mflags} test
 %{_mandir}/man3/*
 
 %changelog
+* Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.35-1
+- Auto-upgrade to 1.35 - Azure Linux 3.0 - package upgrades
+
 * Tue Aug 23 2020 Muhammad Falak <mwani@microsoft.com> - 1.31-2
 - Add BR on `perl-{(CPAN::*),(FindBin),(Test::More)}` to enable ptest
 
