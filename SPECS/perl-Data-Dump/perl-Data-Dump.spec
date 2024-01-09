@@ -6,7 +6,7 @@ License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://metacpan.org/release/Data-Dump
-Source0:        https://cpan.metacpan.org/authors/id/G/GA/GAAS/Data-Dump-%{version}.tar.gz#/perl-Data-Dump-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/G/GA/GARU/Data-Dump-%{version}.tar.gz#/perl-Data-Dump-%{version}.tar.gz
 BuildArch:      noarch
 # Build
 BuildRequires:  make
