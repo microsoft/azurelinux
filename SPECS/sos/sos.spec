@@ -1,8 +1,8 @@
 %{!?python3_sitelib: %global python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Summary:        A set of tools to gather troubleshooting information from a system
 Name:           sos
-Version:        4.4
-Release:        2%{?dist}
+Version:        4.6.0
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -69,6 +69,9 @@ rm -rf %{buildroot}%{_prefix}/config/
 %config(noreplace) %{_sysconfdir}/sos/sos.conf
 
 %changelog
+* Tue Jan 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.6.0-1
+- Auto-upgrade to 4.6.0 - Azure Linux 3.0 Upgrades
+
 * Mon Apr 03 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 4.4-2
 - Fixing missing runtime dep of python3-magic
 
