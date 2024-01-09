@@ -17,10 +17,10 @@ index 1af8d1b..9a814c6 100644
 +++ b/iscsiuio/src/unix/libs/qedi.c
 @@ -1034,7 +1034,7 @@ static int qedi_read(nic_t *nic, packet_t *pkt)
  
- 	ILOG_DEBUG(PFX "%s:hw_prod %d bd_prod %d, rx_pkt_idx %d, rxlen %d",
+ 	LOG_DEBUG(PFX "%s:hw_prod %d bd_prod %d, rx_pkt_idx %d, rxlen %d",
  		  nic->log_name, hw_prod, bd_prod, rx_bd->rx_pkt_index, len);
--	ILOG_DEBUG(PFX "%s: sw_con %d bd_cons %d num BD %d",
-+	ILOG_DEBUG(PFX "%s: sw_con %d bd_cons %d num BD %lu",
+-	LOG_DEBUG(PFX "%s: sw_con %d bd_cons %d num BD %d",
++	LOG_DEBUG(PFX "%s: sw_con %d bd_cons %d num BD %lu",
  		  nic->log_name, sw_cons, bd_cons, QEDI_NUM_RX_BD);
  
  	if (bd_cons != bd_prod) {
@@ -33,7 +33,7 @@ index 0c9ad49..f83f305 100644
  	sigaddset(&set, SIGUSR1);
  	rc = pthread_sigmask(SIG_SETMASK, &set, NULL);
 +	if (rc != 0) {
-+		ILOG_ERR("Failed to set thread signal mask");
++		LOG_ERR("Failed to set thread signal mask");
 +	}
  
  	/*  Spin off the signal handling thread */
