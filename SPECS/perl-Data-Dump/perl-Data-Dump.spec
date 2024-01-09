@@ -1,6 +1,6 @@
 Name:           perl-Data-Dump
-Version:        1.23
-Release:        15%{?dist}
+Version:        1.25
+Release:        1%{?dist}
 Summary:        Pretty printing of data structures
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -54,11 +54,14 @@ make pure_install DESTDIR=%{buildroot}
 make test
 
 %files
-%doc Changes README
+%doc Changes README.md
 %{perl_vendorlib}/*
 %{_mandir}/man3/*
 
 %changelog
+* Tue Jan 09 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 1.25-1
+- Azure Linux 3.0 - upgrade to 1.25 
+
 * Tue Jul 26 2022 Henry Li <lihl@microsoft.com> - 1.23-15
 - License Verified
 
