@@ -72,8 +72,8 @@ make  %{?_smp_mflags} check
 
 %files devel
 %defattr(-,root,root)
-%{_includedir}/guile/2.0/*.h
-%{_includedir}/guile/2.0/libguile/*.h
+%{_includedir}/guile/3.0/*.h
+%{_includedir}/guile/3.0/libguile/*.h
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
 
