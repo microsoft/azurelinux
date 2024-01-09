@@ -285,8 +285,8 @@
         "type": "other",
         "other": {
           "name": "apache-commons-cli",
-          "version": "1.4",
-          "downloadUrl": "http://archive.apache.org/dist/commons/cli/source/commons-cli-1.4-src.tar.gz"
+          "version": "1.6.0",
+          "downloadUrl": "http://archive.apache.org/dist/commons/cli/source/commons-cli-1.6.0-src.tar.gz"
         }
       }
     },
