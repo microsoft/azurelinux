@@ -4,8 +4,8 @@ Distribution:   Mariner
 # Copyright (c) 2003 FreeIPMI Core Team
 
 Name:             freeipmi
-Version:          1.6.6
-Release:          3%{?dist}
+Version:          1.6.11
+Release:          1%{?dist}
 Summary:          IPMI remote console and system management software
 License:          GPLv3+
 URL:              http://www.gnu.org/software/freeipmi/
