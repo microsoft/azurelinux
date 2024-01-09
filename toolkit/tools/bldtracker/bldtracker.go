@@ -7,12 +7,15 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
+	"github.com/alecthomas/kong"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 	"gopkg.in/alecthomas/kingpin.v2"
+	// "github.com/alecthomas/kong"
 )
 
 const (
@@ -32,10 +35,43 @@ var (
 	mode       = app.Flag("mode", "The mode of this tool. Could be 'initialize' ('i') or 'record' ('r').").Required().Enum(validModes...)
 )
 
+type InitializeCmd struct{}
+
+type RecordCmd struct{}
+
+type StopCmd struct{}
+
+type FinishCmd struct{}
+
+type VersionFlag string
+
+func (v VersionFlag) Decode(ctx *kong.DecodeContext) error { return nil }
+func (v VersionFlag) IsBool() bool                         { return true }
+func (v VersionFlag) BeforeApply(app *kong.Kong, vars kong.Vars) error {
+	fmt.Println(vars["version"])
+	app.Exit(0)
+	return nil
+}
+
+var CLI struct {
+	Initialize InitializeCmd `cmd:""`
+	Record     RecordCmd     `cmd:""`
+	Stop       StopCmd       `cmd:""`
+	Finish     FinishCmd     `cmd:""`
+
+	ScriptName string
+	StepPath   string
+	OutPath    string
+	LogLevel   string
+}
+
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	setupLogger(*logLevel)
+
+	// test stuff
+	// ctx := kong.Parse(&CLI)
 
 	// Perform different actions based on the input "mode".
 	switch *mode {

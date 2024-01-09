@@ -31,7 +31,7 @@ endif
 go_tool_list = \
 	bldtracker \
 	boilerplate \
-	depsearch \
+	cli \
 	downloader \
 	grapher \
 	graphpkgfetcher \

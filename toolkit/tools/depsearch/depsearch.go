@@ -1,104 +1,80 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-package main
+package depsearch
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 	"sort"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/globals"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/scheduler/schedulerutils"
 
 	"gonum.org/v1/gonum/graph"
-	"gopkg.in/alecthomas/kingpin.v2"
 )
+
+type DepsearchCmd struct {
+	InputGraphFile  string   `help:"Path to the DOT graph file to search" type:"existingfile"`
+	OutputGraphFile string   `help:"Path to save the graph"`
+	Packages        []string `help:"Comma separated list of packages to search from."`
+	Specs           []string `help:"Comma separated list of specfiles to search from"`
+	Goals           []string `help:"Comma separated list of goal names to search (Try 'ALL' or 'PackagesToBuild')"`
+	Reverse         bool     `help:"Reverse the search to give a traditional dependency list for the packages instead of dependants."`
+	Tree            bool     `help:"Print output as a simple tree instead of a list"`
+	Verbosity       int      `enum:"1,2,3,4" default:"1" help:"Print the full node details (4), limited details (3), RPM (2), or SPEC name (1) for each result"`
+	MaxDepth        int      `default:"-1" help:"Maximum depth into the tree to scan, -1 for unlimited"`
+	PrintDuplicates bool     `help:"In tree mode, if there is a duplicate node in the tree don't replace it with '...'"`
+	RpmFilterFile   string   `help:"Filter the returned packages based on this list of *.rpm filenames (defaults to the x86_64 toolchain manifest './resources/manifests/package/toolchain_x86_64.txt' if it exists)" type:"existingfile"`
+	RpmFilter       bool     `help:"Only print any packages that are missing from the rpm-filter-file (useful for debugging toolchain package issues for example)"`
+}
 
 const (
 	defaultFilterPath = "./resources/manifests/package/toolchain_x86_64.txt"
 )
 
-var (
-	app = kingpin.New("depsearch", "Returns a list of everything that depends on a given package or spec")
-
-	inputGraphFile  = exe.InputFlag(app, "Path to the DOT graph file to search.")
-	outputGraphFile = app.Flag("output", "Path to save the graph.").String()
-
-	pkgsToSearch  = app.Flag("packages", "Space seperated list of packages to search from.").String()
-	specsToSearch = app.Flag("specs", "Space seperated list of specfiles to search from.").String()
-	goalsToSearch = app.Flag("goals", "Space seperated list of goal names to search (Try 'ALL' or 'PackagesToBuild').").String()
-
-	reverseSearch = app.Flag("reverse", "Reverse the search to give a traditional dependency list for the packages instead of dependants.").Bool()
-
-	printTree       = app.Flag("tree", "Print output as a simple tree instead of a list").Bool()
-	verbosity       = app.Flag("verbosity", "Print the full node details (4), limited details (3), RPM (2), or SPEC name (1) for each result").Default("1").Int()
-	maxDepth        = app.Flag("max-depth", "Maximum depth into the tree to scan, -1 for unlimited").Default("-1").Int()
-	printDuplicates = app.Flag("print-duplicates", "In tree mode, if there is a duplicate node in the tree don't replace it with '...'").Bool()
-	filterFile      = app.Flag("rpm-filter-file", "Filter the returned packages based on this list of *.rpm filenames (defaults to the x86_64 toolchain manifest './resources/manifests/package/toolchain_x86_64.txt' if it exists)").ExistingFile()
-	filter          = app.Flag("rpm-filter", "Only print any packages that are missing from the rpm-filter-file (useful for debugging toolchain package issues for example)").Bool()
-
-	logFile  = exe.LogFileFlag(app)
-	logLevel = exe.LogLevelFlag(app)
-)
-
-func main() {
+func (cmd *DepsearchCmd) Run(globals *globals.Globals) error {
 	var (
 		outputGraph *pkggraph.PkgGraph
 		root        *pkggraph.PkgNode
 	)
 
-	app.Version(exe.ToolkitVersion)
-	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel)
-
-	// only understand verbosity from 1 - 4 (spec, rpm, details, full node)
-	if verbosity == nil || *verbosity > 4 || *verbosity < 1 {
-		verbosity = new(int)
-		*verbosity = 1
-	}
-
-	if !(*maxDepth == -1 || *maxDepth >= 1) {
-		logger.Log.Fatalf("Invalid max depth '%d', valid ranges are -1, >=1", *maxDepth)
+	if !(cmd.MaxDepth == -1 || cmd.MaxDepth >= 1) {
+		logger.Log.Fatalf("Invalid max depth '%d', valid ranges are -1, >=1", cmd.MaxDepth)
 	}
 
 	// We can color the entries when using --tree, or limit the output in all modes with --rpm-filter
-	configureFilterFiles(filterFile, filter)
-	if len(*filterFile) > 0 && (*filter || *printTree) {
-		logger.Log.Infof("Applying package filter from '%s'", *filterFile)
+	configureFilterFiles(cmd.RpmFilterFile, cmd.RpmFilter)
+	if len(cmd.RpmFilterFile) > 0 && (cmd.RpmFilter || cmd.Tree) {
+		logger.Log.Infof("Applying package filter from '%s'", cmd.RpmFilterFile)
 	} else {
-		logger.Log.Infof("Filter file '%s' not applicable here", *filterFile)
+		logger.Log.Infof("Filter file '%s' not applicable here", cmd.RpmFilterFile)
 	}
 
-	pkgSearchList := exe.ParseListArgument(*pkgsToSearch)
-	specSearchList := exe.ParseListArgument(*specsToSearch)
-	goalSearchList := exe.ParseListArgument(*goalsToSearch)
-
-	graph, err := pkggraph.ReadDOTGraphFile(*inputGraphFile)
+	graph, err := pkggraph.ReadDOTGraphFile(cmd.InputGraphFile)
 	if err != nil {
 		logger.Log.Panicf("Failed to read DOT graph with error: %s", err)
 	}
 
 	// Generate a list of nodes to search from
-	nodeListPkg := searchForPkg(graph, pkgSearchList)
-	nodeListSpec := searchForSpec(graph, specSearchList)
-	nodeListGoal := searchForGoal(graph, goalSearchList)
+	nodeListPkg := searchForPkg(graph, cmd.Packages)
+	nodeListSpec := searchForSpec(graph, cmd.Specs)
+	nodeListGoal := searchForGoal(graph, cmd.Goals)
 
 	nodeLists := append(nodeListPkg, append(nodeListSpec, nodeListGoal...)...)
 	nodeSet := sliceutils.RemoveDuplicatesFromSlice(nodeLists)
 
 	if len(nodeSet) == 0 {
-		logger.Log.Panicf("Could not find any nodes matching pkgs:[%s] or specs:[%s] or goals[%s]", *pkgsToSearch, *specsToSearch, *goalsToSearch)
+		logger.Log.Panicf("Could not find any nodes matching pkgs:[%s] or specs:[%s] or goals[%s]", cmd.Packages, cmd.Specs, cmd.Goals)
 	} else {
 		logger.Log.Infof("Found %d nodes to consider", len(nodeSet))
 	}
 
-	if *reverseSearch {
+	if cmd.Reverse {
 		logger.Log.Infof("Reversed search will list all the dependencies of the provided packages...")
 		outputGraph, root, err = buildRequiresGraph(graph, nodeSet)
 	} else {
@@ -110,31 +86,31 @@ func main() {
 		logger.Log.Panicf("Failed to generate graph to run depsearch on: %s", err)
 	}
 
-	printSpecs(outputGraph, *printTree, *filter, *filterFile, *printDuplicates, *verbosity, *maxDepth, root)
-
-	if len(*outputGraphFile) > 0 {
-		pkggraph.WriteDOTGraphFile(outputGraph, *outputGraphFile)
+	printSpecs(outputGraph, cmd.Tree, cmd.RpmFilter, cmd.RpmFilterFile, cmd.PrintDuplicates, cmd.Verbosity, cmd.MaxDepth, root)
+	if len(cmd.OutputGraphFile) > 0 {
+		pkggraph.WriteDOTGraphFile(outputGraph, cmd.OutputGraphFile)
 	}
+	return nil
 }
 
-func configureFilterFiles(filterFile *string, filter *bool) {
+func configureFilterFiles(filterFile string, filter bool) {
 	setDefault := false
-	if len(*filterFile) == 0 {
-		*filterFile = defaultFilterPath
+	if len(filterFile) == 0 {
+		filterFile = defaultFilterPath
 		setDefault = true
 	}
-	isFile, err := file.PathExists(*filterFile)
+	isFile, err := file.PathExists(filterFile)
 	if err != nil {
-		logger.Log.Panicf("Failed to query if filter file ('%s') exists: %s", *filterFile, err)
+		logger.Log.Panicf("Failed to query if filter file ('%s') exists: %s", filterFile, err)
 	}
 
 	// If we are just trying to use the default, its fine if its missing.
 	if !isFile && setDefault {
-		logger.Log.Warnf("Default toolchain filter file ('%s') not found, setting to ''", *filterFile)
-		*filterFile = ""
+		logger.Log.Warnf("Default toolchain filter file ('%s') not found, setting to ''", filterFile)
+		filterFile = ""
 	}
 
-	if len(*filterFile) == 0 && *filter {
+	if len(filterFile) == 0 && filter {
 		logger.Log.Panic("Must pass a --rpm-filter-file to use the filter function, consider './resources/manifests/package/toolchain_x86_64.txt'")
 	}
 }
