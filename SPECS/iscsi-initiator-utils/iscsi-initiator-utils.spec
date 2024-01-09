@@ -1,16 +1,9 @@
 %global __provides_exclude_from ^(%{python2_sitearch}/.*\\.so|%{python3_sitearch}/.*\\.so)$
 
-# Use only 7-10 first characters of the git commit hash!
-%global git_commit            2a8f9d81d0d6b5094c3fe9c686e2afb2ec27058a
-%global git_short_commit      2a8f9d8
-%global git_short_commit_date 20210729
-%global open_iscsi_build      4
-%global open_iscsi_version    2.1
-
 Summary:        iSCSI daemon and utility programs
 Name:           iscsi-initiator-utils
-Version:        6.%{open_iscsi_version}.%{open_iscsi_build}+%{git_short_commit_date}.%{git_short_commit}
-Release:        3%{?dist}
+Version:        2.1.9
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner

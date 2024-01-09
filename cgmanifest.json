@@ -7491,8 +7491,8 @@
         "type": "other",
         "other": {
           "name": "iscsi-initiator-utils",
-          "version": "6.2.1.4+20210729.2a8f9d8",
-          "downloadUrl": "https://github.com/open-iscsi/open-iscsi/archive/2a8f9d81d0d6b5094c3fe9c686e2afb2ec27058a.tar.gz"
+          "version": "2.1.9",
+          "downloadUrl": "https://github.com/open-iscsi/open-iscsi/archive/refs/tags/2.1.9.tar.gz"
         }
       }
     },
