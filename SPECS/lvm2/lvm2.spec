@@ -329,6 +329,7 @@ echo "disable lvm2-monitor.service" >> %{buildroot}%{_libdir}/systemd/system-pre
 %{_libdir}/tmpfiles.d/lvm2.conf
 %dir %{_sysconfdir}/lvm
 %attr(644, -, -) %config(noreplace) %{_sysconfdir}/lvm/lvm.conf
+%attr(755, -, -) %{_libexecdir}/lvresize_fs_helper
 %config(noreplace) %{_sysconfdir}/lvm/lvmlocal.conf
 %dir %{_sysconfdir}/lvm/profile
 %{_sysconfdir}/lvm/profile/*
