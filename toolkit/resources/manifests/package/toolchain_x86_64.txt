@@ -480,7 +480,7 @@ perl-tests-5.38.2-504.azl3.x86_64.rpm
 perl-Text-Abbrev-1.02-504.azl3.noarch.rpm
 perl-Text-Balanced-2.06-504.azl3.noarch.rpm
 perl-Text-ParseWords-3.31-504.azl3.noarch.rpm
-perl-Text-Tabs+Wrap-2021.0814-503.azl3.noarch.rpm
+perl-Text-Tabs+Wrap-2021.0814-504.azl3.noarch.rpm
 perl-Text-Template-1.61-1.azl3.noarch.rpm
 perl-Thread-3.05-504.azl3.noarch.rpm
 perl-Thread-Queue-3.14-504.azl3.noarch.rpm

@@ -140,7 +140,7 @@ perl-Symbol-1.09-504.azl3.noarch.rpm
 perl-Term-ANSIColor-5.01-504.azl3.noarch.rpm
 perl-Term-Cap-1.18-504.azl3.noarch.rpm
 perl-Text-ParseWords-3.31-504.azl3.noarch.rpm
-perl-Text-Tabs+Wrap-2021.0814-503.azl3.noarch.rpm
+perl-Text-Tabs+Wrap-2021.0814-504.azl3.noarch.rpm
 perl-Thread-Queue-3.14-504.azl3.noarch.rpm
 perl-Time-Local-1.300-504.azl3.noarch.rpm
 perl-Unicode-Normalize-1.32-504.azl3.aarch64.rpm
