@@ -7361,8 +7361,8 @@
         "type": "other",
         "other": {
           "name": "ipmitool",
-          "version": "1.8.18",
-          "downloadUrl": "https://github.com/ipmitool/ipmitool/archive/IPMITOOL_1_8_18/ipmitool-1.8.18.tar.gz"
+          "version": "1.8.19",
+          "downloadUrl": "https://github.com/ipmitool/ipmitool/archive/IPMITOOL_1_8_19/ipmitool-1.8.19.tar.gz"
         }
       }
     },
