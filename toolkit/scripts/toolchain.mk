@@ -212,7 +212,7 @@ endif
 # Output:
 # out/toolchain/built_rpms
 # out/toolchain/toolchain_built_rpms.tar.gz
-$(final_toolchain): $(no_repo_acl) $(raw_toolchain) $(toolchain_rpms_rehydrated) $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag | $(go-bldtracker)
+$(final_toolchain): $(no_repo_acl) $(raw_toolchain) $(toolchain_rpms_rehydrated) $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag | $(go-cli)
 	@echo "Building base packages"
 	# Clean the existing chroot if not doing an incremental build
 	$(if $(filter y,$(INCREMENTAL_TOOLCHAIN)),,$(SCRIPTS_DIR)/safeunmount.sh "$(populated_toolchain_chroot)" || $(call print_error,failed to clean mounts for toolchain build))
@@ -232,7 +232,7 @@ $(final_toolchain): $(no_repo_acl) $(raw_toolchain) $(toolchain_rpms_rehydrated)
 			$(SRPMS_DIR) \
 			$(toolchain_from_repos) \
 			$(TOOLCHAIN_MANIFEST) \
-			$(go-bldtracker) \
+			$(go-cli) \
 			$(TIMESTAMP_DIR)/build_mariner_toolchain.jsonl && \
 	$(if $(filter y,$(UPDATE_TOOLCHAIN_LIST)), ls -1 $(toolchain_build_dir)/built_rpms_all > $(MANIFESTS_DIR)/package/toolchain_$(build_arch).txt && ) \
 	touch $@

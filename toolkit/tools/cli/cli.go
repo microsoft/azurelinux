@@ -6,6 +6,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/bldtracker"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/depsearch"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/globals"
@@ -17,7 +18,8 @@ import (
 type CLI struct {
 	globals.Globals
 
-	Depsearch depsearch.DepsearchCmd `cmd:"Returns a list of everything that depends on a given package or spec"`
+	Depsearch  depsearch.DepSearchCmd   `cmd:"" help:"Returns a list of everything that depends on a given package or spec"`
+	Bldtracker bldtracker.BldTrackerCmd `cmd:"" help:"Track build time of different steps in a makefile"`
 }
 
 func main() {

@@ -29,7 +29,6 @@ endif
 
 # List of go utilities in tools/ directory
 go_tool_list = \
-	bldtracker \
 	boilerplate \
 	cli \
 	downloader \

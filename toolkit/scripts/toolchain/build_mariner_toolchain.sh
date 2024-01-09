@@ -23,7 +23,7 @@ MARINER_REHYDRATED_RPMS_DIR=${12}
 MARINER_TOOLCHAIN_MANIFESTS_FILE=${13}
 #  Time stamp components
 # =====================================================
-BLDTRACKER=${14}
+CLI=${14}
 TIMESTAMP_FILE_PATH=${15}
 # =====================================================
 
@@ -45,7 +45,7 @@ mkdir -pv $MARINER_RPM_DIR/$(uname -m)
     "$MARINER_OUTPUT_SRPMS_DIR" \
     "$MARINER_REHYDRATED_RPMS_DIR" \
     "$MARINER_TOOLCHAIN_MANIFESTS_FILE" \
-    "$BLDTRACKER" \
+    "$CLI" \
     "$TIMESTAMP_FILE_PATH"
 
 # Output:

@@ -4,18 +4,12 @@
 // Tool to initialize a CSV file or record a new timestamp
 // for shell scripts during the image-building process.
 
-package main
+package bldtracker
 
 import (
-	"fmt"
-	"os"
-
-	"github.com/alecthomas/kong"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/globals"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
-	"gopkg.in/alecthomas/kingpin.v2"
-	// "github.com/alecthomas/kong"
 )
 
 const (
@@ -25,76 +19,28 @@ const (
 	finishMode     = "finish"
 )
 
-var (
-	app        = kingpin.New("bldtracker", "A tool that helps track build time of different steps in the makefile.")
-	scriptName = app.Flag("script-name", "The name of the current tool.").Required().String()
-	stepPath   = app.Flag("step-path", "A '/' separated path of steps").Default("").String()
-	outPath    = app.Flag("out-path", "The file that stores timestamp CSVs.").Required().String() // currently must be absolute
-	logLevel   = exe.LogLevelFlag(app)
-	validModes = []string{initializeMode, recordMode, stopMode, finishMode}
-	mode       = app.Flag("mode", "The mode of this tool. Could be 'initialize' ('i') or 'record' ('r').").Required().Enum(validModes...)
-)
-
-type InitializeCmd struct{}
-
-type RecordCmd struct{}
-
-type StopCmd struct{}
-
-type FinishCmd struct{}
-
-type VersionFlag string
-
-func (v VersionFlag) Decode(ctx *kong.DecodeContext) error { return nil }
-func (v VersionFlag) IsBool() bool                         { return true }
-func (v VersionFlag) BeforeApply(app *kong.Kong, vars kong.Vars) error {
-	fmt.Println(vars["version"])
-	app.Exit(0)
-	return nil
+type BldTrackerCmd struct {
+	Mode       string `enum:"init,record,stop,finish" required:"" help:"The mode of this tool. Can be any of (${enum})"`
+	ScriptName string `required:"" help:"The name of the current tool"`
+	StepPath   string `help:"A '/' separated path of steps" default:""`
+	OutPath    string `required:"" help:"The file to write timestamp data to"`
 }
 
-var CLI struct {
-	Initialize InitializeCmd `cmd:""`
-	Record     RecordCmd     `cmd:""`
-	Stop       StopCmd       `cmd:""`
-	Finish     FinishCmd     `cmd:""`
-
-	ScriptName string
-	StepPath   string
-	OutPath    string
-	LogLevel   string
-}
-
-func main() {
-	app.Version(exe.ToolkitVersion)
-	kingpin.MustParse(app.Parse(os.Args[1:]))
-	setupLogger(*logLevel)
-
-	// test stuff
-	// ctx := kong.Parse(&CLI)
-
-	// Perform different actions based on the input "mode".
-	switch *mode {
+func (cmd *BldTrackerCmd) Run(globals *globals.Globals) error {
+	// Perform different actions based on the input "mode"
+	switch cmd.Mode {
 	case initializeMode:
-		initialize(*outPath, *scriptName)
+		initialize(cmd.OutPath, cmd.ScriptName)
 	case recordMode:
-		record(*outPath, *scriptName, *stepPath)
+		record(cmd.OutPath, cmd.ScriptName, cmd.StepPath)
 	case stopMode:
-		stop(*outPath, *scriptName, *stepPath)
+		stop(cmd.OutPath, cmd.ScriptName, cmd.StepPath)
 	case finishMode:
-		finish(*outPath, *scriptName)
-
+		finish(cmd.OutPath, cmd.ScriptName)
 	default:
-		logger.Log.Warnf("Invalid call. Mode must be 'n' for initialize or 'r' for record. ")
+		logger.Log.Panicf("Invalid mode")
 	}
-}
-
-func setupLogger(logLevelStr string) {
-	if logLevelStr == "" {
-		logLevelStr = "info"
-	}
-	logger.InitStderrLog()
-	logger.SetStderrLogLevel(logLevelStr)
+	return nil
 }
 
 // Creates a JSON specifically for the shell script mentioned in "scriptName".

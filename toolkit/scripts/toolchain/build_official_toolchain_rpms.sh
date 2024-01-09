@@ -20,7 +20,7 @@ MARINER_REHYDRATED_RPMS_DIR=${11}
 MARINER_TOOLCHAIN_MANIFESTS_FILE=${12}
 #  Time stamp components
 # =====================================================
-BLDTRACKER=${13}
+CLI=${13}
 TIMESTAMP_FILE_PATH=${14}
 source $(dirname  $0)/../timestamp.sh
 # =====================================================

@@ -5,7 +5,7 @@
 # Set of functions to generate timing data for shell-script based parts of the build
 
 # Set
-#   BLDTRACKER=/path/to/bldtracker
+#   CLI=/path/to/CLI
 # Set
 #   TIMESTAMP_FILE_PATH=/path/to/output.jsonl
 # Include via
@@ -24,18 +24,19 @@
 # Finish the measurements
 #   finish_timestamp
 
-if [[ -z "$BLDTRACKER" ]] || [[ -z "$TIMESTAMP_FILE_PATH" ]]; then
-    echo 'Must set $BLDTRACKER and $TIMESTAMP_FILE_PATH before calling any timestamp.sh functions'
+if [[ -z "$CLI" ]] || [[ -z "$TIMESTAMP_FILE_PATH" ]]; then
+    echo 'Must set $CLI and $TIMESTAMP_FILE_PATH before calling any timestamp.sh functions'
 fi
 
 _timestamp_script_name="$(basename $0)"
 [[ -z "$_loglevel" ]] && _loglevel="info"
 
 begin_timestamp()  {
-    if [[ -z "$BLDTRACKER" ]] || [[ -z "$TIMESTAMP_FILE_PATH" ]]; then
-        echo 'Must set $BLDTRACKER and $TIMESTAMP_FILE_PATH before calling begin_timestamp'
+    if [[ -z "$CLI" ]] || [[ -z "$TIMESTAMP_FILE_PATH" ]]; then
+        echo 'Must set $CLI and $TIMESTAMP_FILE_PATH before calling begin_timestamp'
     else
-        $BLDTRACKER \
+        $CLI \
+            bldtracker \
             --script-name=$_timestamp_script_name \
             --out-path="$TIMESTAMP_FILE_PATH" \
             --log-level=$_loglevel \
@@ -44,11 +45,12 @@ begin_timestamp()  {
 }
 
 start_record_timestamp () {
-    if [[ -z "$BLDTRACKER" ]] || [[ -z "$TIMESTAMP_FILE_PATH" ]]; then
-        echo 'Must set $BLDTRACKER and $TIMESTAMP_FILE_PATH before calling begin_timestamp'
+    if [[ -z "$CLI" ]] || [[ -z "$TIMESTAMP_FILE_PATH" ]]; then
+        echo 'Must set $CLI and $TIMESTAMP_FILE_PATH before calling begin_timestamp'
     else
         _timestamp_path="$1"
-        $BLDTRACKER \
+        $CLI \
+            bldtracker \
             --script-name=$_timestamp_script_name \
             --out-path="$TIMESTAMP_FILE_PATH" \
             --step-path="$_timestamp_path" \
@@ -58,11 +60,12 @@ start_record_timestamp () {
 }
 
 stop_record_timestamp () {
-    if [[ -z "$BLDTRACKER" ]] || [[ -z "$TIMESTAMP_FILE_PATH" ]]; then
-        echo 'Must set $BLDTRACKER and $TIMESTAMP_FILE_PATH before calling begin_timestamp'
+    if [[ -z "$CLI" ]] || [[ -z "$TIMESTAMP_FILE_PATH" ]]; then
+        echo 'Must set $CLI and $TIMESTAMP_FILE_PATH before calling begin_timestamp'
     else
         _timestamp_path="$1"
-        $BLDTRACKER \
+        $CLI \
+            bldtracker \
             --script-name=$_timestamp_script_name \
             --out-path="$TIMESTAMP_FILE_PATH" \
             --step-path="$_timestamp_path" \
@@ -72,10 +75,11 @@ stop_record_timestamp () {
 }
 
 finish_timestamp() {
-    if [[ -z "$BLDTRACKER" ]] || [[ -z "$TIMESTAMP_FILE_PATH" ]]; then
-        echo 'Must set $BLDTRACKER and $TIMESTAMP_FILE_PATH before calling begin_timestamp'
+    if [[ -z "$CLI" ]] || [[ -z "$TIMESTAMP_FILE_PATH" ]]; then
+        echo 'Must set $CLI and $TIMESTAMP_FILE_PATH before calling begin_timestamp'
     else
-        $BLDTRACKER \
+        $CLI \
+            bldtracker \
             --script-name=$_timestamp_script_name \
             --out-path="$TIMESTAMP_FILE_PATH" \
             --log-level=$_loglevel \

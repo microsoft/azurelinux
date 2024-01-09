@@ -18,7 +18,7 @@ import (
 	"gonum.org/v1/gonum/graph"
 )
 
-type DepsearchCmd struct {
+type DepSearchCmd struct {
 	InputGraphFile  string   `help:"Path to the DOT graph file to search" type:"existingfile"`
 	OutputGraphFile string   `help:"Path to save the graph"`
 	Packages        []string `help:"Comma separated list of packages to search from."`
@@ -37,7 +37,7 @@ const (
 	defaultFilterPath = "./resources/manifests/package/toolchain_x86_64.txt"
 )
 
-func (cmd *DepsearchCmd) Run(globals *globals.Globals) error {
+func (cmd *DepSearchCmd) Run(globals *globals.Globals) error {
 	var (
 		outputGraph *pkggraph.PkgGraph
 		root        *pkggraph.PkgNode
