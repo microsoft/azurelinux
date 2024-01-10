@@ -300,7 +300,7 @@ func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageC
 	for i, _ := range user.SSHPubKeyPaths {
 		user.SSHPubKeyPaths[i] = filepath.Join(baseConfigPath, user.SSHPubKeyPaths[i])
 	}
-	
+
 	err = installutils.ProvisionUserSSHCerts(imageChroot, user.Name, user.SSHPubKeyPaths)
 	if err != nil {
 		return err
