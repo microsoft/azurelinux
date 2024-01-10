@@ -15,7 +15,11 @@ Distribution:   Mariner
 %global libusbx_version 1.0.23
 %global meson_version 0.61.3
 %global usbredir_version 0.7.1
+%if 0%{?azl}
+%global ipxe_version 1.21.1
+%else
 %global ipxe_version 20200823-5.git4bd064de
+%endif
 %if 0%{?azl}
 %global excluded_targets moxie-softmmu
 %endif
@@ -489,8 +493,8 @@ Source31: kvm-x86.conf
 Source36: README.tests
 
 BuildRequires: meson >= %{meson_version}
-#BuildRequires: bison
-#BuildRequires: flex
+BuildRequires: bison
+BuildRequires: flex
 BuildRequires: zlib-devel
 BuildRequires: libselinux-devel
 BuildRequires: cyrus-sasl-devel
@@ -721,7 +725,15 @@ Requires(post): systemd-units
 Requires(preun): systemd-units
 Requires(postun): systemd-units
 %{obsoletes_some_modules}
+%if %{?azl}
+# AzLinux specific
+%ifarch x86_64
+Requires: ipxe >= %{ipxe_version}
+%endif
+%else
 Requires: ipxe-roms-qemu >= %{ipxe_version}
+%endif
+
 %description common
 %{name} is an open source virtualizer that provides hardware emulation for
 the KVM hypervisor.
@@ -977,11 +989,13 @@ Requires: %{name}-common%{?_isa} = %{epoch}:%{version}-%{release}
 This package provides the Baum chardev driver for QEMU.
 %endif
 
+%if %{have_ui}
 %package device-display-virtio-gpu
 Summary: QEMU virtio-gpu display device
 Requires: %{name}-common%{?_isa} = %{epoch}:%{version}-%{release}
 %description device-display-virtio-gpu
 This package provides the virtio-gpu display device for QEMU.
+%endif
 
 %if %{have_virgl}
 %package device-display-virtio-gpu-gl
@@ -999,11 +1013,13 @@ Requires: %{name}-common%{?_isa} = %{epoch}:%{version}-%{release}
 This package provides the virtio-gpu-rutabaga display device for QEMU.
 %endif
 
+%if %{have_ui}
 %package device-display-virtio-gpu-pci
 Summary: QEMU virtio-gpu-pci display device
 Requires: %{name}-common%{?_isa} = %{epoch}:%{version}-%{release}
 %description device-display-virtio-gpu-pci
 This package provides the virtio-gpu-pci display device for QEMU.
+%endif
 
 %if %{have_virgl}
 %package device-display-virtio-gpu-pci-gl
@@ -1021,6 +1037,7 @@ Requires: %{name}-common%{?_isa} = %{epoch}:%{version}-%{release}
 This package provides the virtio-gpu-pci-rutabaga display device for QEMU.
 %endif
 
+%if %{have_ui}
 %package device-display-virtio-gpu-ccw
 Summary: QEMU virtio-gpu-ccw display device
 Requires: %{name}-common%{?_isa} = %{epoch}:%{version}-%{release}
@@ -1038,6 +1055,7 @@ Summary: QEMU virtio-vga-gl display device
 Requires: %{name}-common%{?_isa} = %{epoch}:%{version}-%{release}
 %description device-display-virtio-vga-gl
 This package provides the virtio-vga-gl display device for QEMU.
+%endif
 
 %if %{have_rutabaga_gfx}
 %package device-display-virtio-vga-rutabaga
@@ -1154,6 +1172,14 @@ Requires(postun): systemd-units
 #Conflicts: qemu-user-static
 %description user-binfmt
 This package provides the user mode emulation of qemu targets
+
+#AzLinux specific
+%package        ipxe
+Summary:        PXE and EFI ROM images for qemu
+Requires:       %{name}-common = %{version}-%{release}
+
+%description ipxe
+This package provides PXE and EFI ROM images for qemu
 
 %if %{user_static}
 %package user-static
@@ -1319,6 +1345,8 @@ Requires: %{name}-common = %{epoch}:%{version}-%{release}
 %if %{have_edk2}
 Requires: edk2-aarch64
 %endif
+Requires:       %{name}-ipxe = %{version}-%{release}
+
 %description system-aarch64-core
 This package provides the QEMU system emulator for AArch64.
 
@@ -1581,7 +1609,8 @@ Requires: %{name}-common = %{epoch}:%{version}-%{release}
 %description system-tricore-core
 This package provides the QEMU system emulator for Tricore.
 
-
+# Needed until CBL-Mariner starts cross-compiling 'ipxe', 'seabios' and 'sgabios' for other architectures.
+%ifarch x86_64
 %package system-x86
 Summary: QEMU system emulator for x86
 Requires: %{name}-system-x86-core = %{epoch}:%{version}-%{release}
@@ -1599,11 +1628,13 @@ Requires: seavgabios-bin
 %if %{have_edk2}
 Requires: edk2-ovmf
 %endif
+Requires:       %{name}-ipxe = %{version}-%{release}
+
 %description system-x86-core
 This package provides the QEMU system emulator for x86. When being run in a x86
 machine that supports it, this package also provides the KVM virtualization
 platform.
-
+%endif
 
 %package system-xtensa
 Summary: QEMU system emulator for Xtensa
@@ -2156,9 +2187,10 @@ rm -rf %{buildroot}%{_datadir}/%{name}/openbios-sparc32
 rm -rf %{buildroot}%{_datadir}/%{name}/openbios-sparc64
 # Provided by package SLOF
 rm -rf %{buildroot}%{_datadir}/%{name}/slof.bin
+# AzLinux specific
 # Provided by package ipxe
-rm -rf %{buildroot}%{_datadir}/%{name}/pxe*rom
-rm -rf %{buildroot}%{_datadir}/%{name}/efi*rom
+#rm -rf %{buildroot}%{_datadir}/%{name}/pxe*rom
+#rm -rf %{buildroot}%{_datadir}/%{name}/efi*rom
 # Provided by package seavgabios
 rm -rf %{buildroot}%{_datadir}/%{name}/vgabios*bin
 # Provided by package seabios
@@ -2167,7 +2199,21 @@ rm -rf %{buildroot}%{_datadir}/%{name}/bios*.bin
 rm -rf %{buildroot}%{_datadir}/%{name}/edk2*
 rm -rf %{buildroot}%{_datadir}/%{name}/firmware
 
+# Remove datadir files packaged with excluded targets for AzLinux
+%if %{without ppc_support}
+rm -rf %{buildroot}%{_datadir}/%{name}/bamboo.dtb
+rm -rf %{buildroot}%{_datadir}/%{name}/canyonlands.dtb
+rm -rf %{buildroot}%{_datadir}/%{name}/qemu_vga.ndrv
+rm -rf %{buildroot}%{_datadir}/%{name}/skiboot.lid
+rm -rf %{buildroot}%{_datadir}/%{name}/u-boot.e500
+rm -rf %{buildroot}%{_datadir}/%{name}/u-boot-sam460-20100605.bin
+%endif
 
+%if %{without sparc_support}
+rm -rf %{buildroot}%{_datadir}/%{name}/QEMU,tcx.bin
+rm -rf %{buildroot}%{_datadir}/%{name}/QEMU,cgthree.bin
+%endif
+%
 # Fedora specific stuff below
 %find_lang %{name}
 
@@ -2178,11 +2224,29 @@ for emu in %{buildroot}%{_bindir}/qemu-system-*; do
  done
 
 # Install kvm specific source bits, and qemu-kvm manpage
+%ifarch x86_64
+# Install kvm specific source bits, and qemu-kvm manpage
 %if %{need_qemu_kvm}
 ln -sf qemu.1.gz %{buildroot}%{_mandir}/man1/qemu-kvm.1.gz
 ln -sf qemu-system-x86_64 %{buildroot}%{_bindir}/qemu-kvm
-   %endif
-
+%endif
+%else
+# Needed until CBL-Mariner starts cross-compiling 'ipxe', 'seabios' and 'sgabios' for other architectures.
+rm -rf %{buildroot}%{_bindir}/qemu-system-i386
+rm -rf %{buildroot}%{_bindir}/qemu-system-x86_64
+rm -rf %{buildroot}%{_libdir}/%{name}/accel-tcg-i386.so
+rm -rf %{buildroot}%{_libdir}/%{name}/accel-tcg-x86_64.so
+rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-system-i386*.stp
+rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-system-x86_64*.stp
+rm -rf %{buildroot}%{_mandir}/man1/qemu-system-i386.1*
+rm -rf %{buildroot}%{_mandir}/man1/qemu-system-x86_64.1*
+rm -rf %{buildroot}%{_datadir}/%{name}/kvmvapic.bin
+rm -rf %{buildroot}%{_datadir}/%{name}/linuxboot.bin
+rm -rf %{buildroot}%{_datadir}/%{name}/multiboot.bin
+rm -rf %{buildroot}%{_datadir}/%{name}/multiboot_dma.bin
+rm -rf %{buildroot}%{_datadir}/%{name}/pvh.bin
+rm -rf %{buildroot}%{_datadir}/%{name}/qboot.rom
+%endif
 
 # Install binfmt
 %global binfmt_dir %{buildroot}%{_exec_prefix}/lib/binfmt.d
@@ -3225,6 +3289,9 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_datadir}/systemtap/tapset/qemu-system-tricore-simpletrace.stp
 %{_mandir}/man1/qemu-system-tricore.1*
 
+%files ipxe
+%{_datadir}/%{name}/pxe*rom
+%{_datadir}/%{name}/efi*rom
 
 %files system-x86
 %files system-x86-core
