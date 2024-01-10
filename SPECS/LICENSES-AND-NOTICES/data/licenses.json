@@ -1088,6 +1088,7 @@
                 "perl-Archive-Extract",
                 "perl-Archive-Zip",
                 "perl-Authen-SASL",
+                "perl-B-COW",
                 "perl-B-Debug",
                 "perl-B-Hooks-EndOfScope",
                 "perl-B-Hooks-OP-Check",
