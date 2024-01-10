@@ -1,0 +1,42 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+ARG BASE_IMAGE
+
+FROM $BASE_IMAGE
+
+@INCLUDE_MAIN_RUN_INSTRUCTION@
+
+RUN set -eux; \
+    mkdir -p /home/influxdb && \
+    chown -R influxdb:influxdb /home/influxdb && \
+    mkdir -p /var/lib/influxdb && \
+    chown -R influxdb:influxdb /var/lib/influxdb
+
+# Smoke test for influxdb server and CLI.
+RUN set -eux && \
+    influxd version &&\
+    influx version
+
+# Create standard directories expected by the entry-point.
+RUN mkdir /docker-entrypoint-initdb.d && \
+    mkdir -p /var/lib/influxdb && \
+    chown -R influxdb:influxdb /var/lib/influxdb && \
+    mkdir -p /etc/influxdb && \
+    chown -R influxdb:influxdb /etc/influxdb
+
+VOLUME /var/lib/influxdb /etc/influxdb
+
+COPY config.yml /etc/defaults/influxdb/config.yml
+COPY influxdb-docker-entrypoint.sh /usr/local/bin/
+
+RUN chmod +x /usr/local/bin/influxdb-docker-entrypoint.sh
+
+ENTRYPOINT ["/usr/local/bin/influxdb-docker-entrypoint.sh"]
+CMD ["influxd"]
+
+EXPOSE 8086
+ENV INFLUX_CONFIGS_PATH /etc/influxdb/influx-configs
+ENV INFLUXD_INIT_PORT 9999
+ENV INFLUXD_INIT_PING_ATTEMPTS 600
+ENV DOCKER_INFLUXDB_INIT_CLI_CONFIG_NAME default
