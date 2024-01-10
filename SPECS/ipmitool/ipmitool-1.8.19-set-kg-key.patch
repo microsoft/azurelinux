@@ -1,0 +1,239 @@
+diff --color -Nur ipmitool-IPMITOOL_1_8_19.orig/doc/ipmitool.1.in ipmitool-IPMITOOL_1_8_19/doc/ipmitool.1.in
+--- ipmitool-IPMITOOL_1_8_19.orig/doc/ipmitool.1.in	2023-01-02 11:41:51.179962218 -0800
++++ ipmitool-IPMITOOL_1_8_19/doc/ipmitool.1.in	2023-01-02 11:43:56.396850762 -0800
+@@ -384,6 +384,20 @@
+ 
+ Displays the list of cipher suites supported for the given
+ application (ipmi or sol) on the given channel.
++.TP
++\fIsetkg\fP <\fIhex\fP|\fIplain\fP> <\fBkey\fP> [<\fBchannel\fR>]
++.br
++
++Sets K_g key to given value. Use \fIplain\fP to specify \fBkey\fR as simple ASCII string.
++Use \fIhex\fP to specify \fBkey\fR as sequence of hexadecimal codes of ASCII charactes.
++I.e. following two examples are equivalent:
++
++.RS
++ipmitool channel setkg plain PASSWORD
++
++ipmitool channel setkg hex 50415353574F5244
++.RE
++
+ .RE
+ .RE
+ .TP 
+diff --color -Nur ipmitool-IPMITOOL_1_8_19.orig/include/ipmitool/helper.h ipmitool-IPMITOOL_1_8_19/include/ipmitool/helper.h
+--- ipmitool-IPMITOOL_1_8_19.orig/include/ipmitool/helper.h	2022-09-01 11:42:31.000000000 -0700
++++ ipmitool-IPMITOOL_1_8_19/include/ipmitool/helper.h	2023-01-02 11:44:40.775811260 -0800
+@@ -67,6 +67,8 @@
+ # define IPMI_UID_MAX 63
+ #endif
+ 
++#define IPMI_KG_BUFFER_SIZE       21 /* key plus null byte */
++
+ struct ipmi_intf;
+ 
+ struct valstr {
+diff --color -Nur ipmitool-IPMITOOL_1_8_19.orig/include/ipmitool/ipmi_channel.h ipmitool-IPMITOOL_1_8_19/include/ipmitool/ipmi_channel.h
+--- ipmitool-IPMITOOL_1_8_19.orig/include/ipmitool/ipmi_channel.h	2022-09-01 11:42:31.000000000 -0700
++++ ipmitool-IPMITOOL_1_8_19/include/ipmitool/ipmi_channel.h	2023-01-02 11:46:39.321705721 -0800
+@@ -49,6 +49,10 @@
+ #define IPMI_GET_USER_NAME             0x46
+ #define IPMI_SET_USER_PASSWORD         0x47
+ #define IPMI_GET_CHANNEL_CIPHER_SUITES 0x54
++#define IPMI_SET_CHANNEL_SECURITY_KEYS 0x56
++
++#define IPMI_KG_KEY_ID  1
++#define IPMI_SET_CHANNEL_SECURITY_KEYS_OP_SET 1
+ 
+ /* These are for channel_info_t.session_support */
+ #define IPMI_CHANNEL_SESSION_LESS 0x00
+@@ -208,6 +212,39 @@
+                              struct channel_access_t channel_access,
+                              uint8_t access_option,
+                              uint8_t privilege_option);
++struct set_channel_security_keys_req {
++#if WORDS_BIGENDIAN
++       uint8_t __reserved1                     :4;
++       uint8_t channel                         :4;
++       
++       uint8_t __reserved2                     :6;
++       uint8_t operation                       :2;
++       
++       uint8_t key_id;
++       unsigned char key_value[IPMI_KG_BUFFER_SIZE-1]; /* we don't want space for '\0' at the end */
++#else
++       uint8_t channel                         :4;
++       uint8_t __reserved1                     :4;
++       
++       uint8_t operation                       :2;
++       uint8_t __reserved2                     :6;
++       
++       uint8_t key_id;
++       unsigned char key_value[IPMI_KG_BUFFER_SIZE-1]; /* we don't want space for '\0' at the end */
++#endif
++} __attribute__ ((packed));
++
++struct set_channel_security_keys_rsp {
++#if WORDS_BIGENDIAN
++       uint8_t __reserved1                     :6;
++       uint8_t lock_status                     :2;
++       unsigned char key_value; /* just the first character, use &key_value to explore the rest */
++#else
++       uint8_t lock_status                     :2;
++       uint8_t __reserved1                     :6;
++       unsigned char key_value; /* just the first character, use &key_value to explore the rest */
++#endif
++} __attribute__ ((packed));
+ 
+ uint8_t ipmi_get_channel_medium(struct ipmi_intf * intf, uint8_t channel);
+ void ipmi_current_channel_info(struct ipmi_intf *intf,
+diff --color -Nur ipmitool-IPMITOOL_1_8_19.orig/include/ipmitool/ipmi_intf.h ipmitool-IPMITOOL_1_8_19/include/ipmitool/ipmi_intf.h
+--- ipmitool-IPMITOOL_1_8_19.orig/include/ipmitool/ipmi_intf.h	2022-09-01 11:42:31.000000000 -0700
++++ ipmitool-IPMITOOL_1_8_19/include/ipmitool/ipmi_intf.h	2023-01-02 11:47:15.995673068 -0800
+@@ -59,7 +59,6 @@
+ 
+ #define IPMI_AUTHCODE_BUFFER_SIZE 20
+ #define IPMI_SIK_BUFFER_SIZE      IPMI_MAX_MD_SIZE
+-#define IPMI_KG_BUFFER_SIZE       21 /* key plus null byte */
+ 
+ enum cipher_suite_ids {
+ 	IPMI_LANPLUS_CIPHER_SUITE_0 = 0,
+diff --color -Nur ipmitool-IPMITOOL_1_8_19.orig/lib/ipmi_channel.c ipmitool-IPMITOOL_1_8_19/lib/ipmi_channel.c
+--- ipmitool-IPMITOOL_1_8_19.orig/lib/ipmi_channel.c	2022-09-01 11:42:31.000000000 -0700
++++ ipmitool-IPMITOOL_1_8_19/lib/ipmi_channel.c	2023-01-02 11:51:08.420466223 -0800
+@@ -901,6 +901,92 @@
+ 	return 0;
+ }
+ 
++int 
++ipmi_set_channel_security_keys (struct ipmi_intf *intf, uint8_t channel, const char *method, const char *key)
++{
++       uint8_t kgkey[IPMI_KG_BUFFER_SIZE];
++       struct ipmi_rs *rsp;
++       struct ipmi_rq req;
++       struct set_channel_security_keys_req req_data;
++       int rc = -1;
++       
++       /* convert provided key to array of bytes */
++       if (strcmp(method, "hex") == 0) {
++               if (strlen(key) > (IPMI_KG_BUFFER_SIZE-1)*2) {
++                       lprintf(LOG_ERR, "Provided key is too long, max. length is %d bytes", (IPMI_KG_BUFFER_SIZE-1));
++                       printf_channel_usage();
++                       return -1;
++               }
++
++               rc = ipmi_parse_hex(key, kgkey, sizeof(kgkey)-1);
++               if (rc == -1) {
++                       lprintf(LOG_ERR, "Number of Kg key characters is not even");
++                       return rc;
++               } else if (rc == -3) {
++                       lprintf(LOG_ERR, "Kg key is not hexadecimal number");
++                       return rc;
++               } else if (rc > (IPMI_KG_BUFFER_SIZE-1)) {
++                       lprintf(LOG_ERR, "Kg key is too long");
++                       return rc;
++               }
++               
++       } else if (strcmp(method, "plain") == 0) {
++               if (strlen(key) > IPMI_KG_BUFFER_SIZE-1) {
++                       lprintf(LOG_ERR, "Provided key is too long, max. length is %d bytes", (IPMI_KG_BUFFER_SIZE -1));
++                       printf_channel_usage();
++                       return rc;
++               }
++               
++               strncpy(kgkey, key, IPMI_KG_BUFFER_SIZE-1);
++       } else {
++               printf_channel_usage();
++               return rc;
++       }
++       
++       /* assemble and send request to set kg key */
++       memset(&req_data, 0, sizeof(req_data));
++       req_data.channel = channel;
++       req_data.operation = IPMI_SET_CHANNEL_SECURITY_KEYS_OP_SET;
++       req_data.key_id = IPMI_KG_KEY_ID;
++       memcpy(req_data.key_value, kgkey, IPMI_KG_BUFFER_SIZE-1);
++       
++       memset(&req, 0, sizeof(req));
++       req.msg.netfn = IPMI_NETFN_APP;
++       req.msg.cmd = IPMI_SET_CHANNEL_SECURITY_KEYS;
++       req.msg.data = (uint8_t*) &req_data;
++       req.msg.data_len = sizeof(req_data);
++
++       rsp = intf->sendrecv(intf, &req);
++       if (rsp == NULL) {
++               lprintf(LOG_ERR, "Set Channel Security Keys command failed");
++               return rc;
++       }
++       if (rsp->ccode > 0) {
++               const char *error = NULL;
++               switch (rsp->ccode) {
++               case 0x80:
++                       error = "Key is locked";
++                       break;
++               case 0x81:
++                       error = "Insufficient key bytes";
++                       break;
++               case 0x82:
++                       error = "Too many key bytes";
++                       break;
++               case 0x83:
++                       error = "Key value does not meet criteria for K_g key";
++                       break;
++               default:
++                       error = val2str(rsp->ccode, completion_code_vals);
++               }
++               lprintf(LOG_ERR, "Error setting security key: %X (%s)", rsp->ccode, error);
++               return rc;
++       }
++       
++       lprintf(LOG_NOTICE, "Set Channel Security Keys command succeeded");
++       return 0;
++}
++
+ int
+ ipmi_channel_main(struct ipmi_intf *intf, int argc, char **argv)
+ {
+@@ -970,6 +1056,19 @@
+ 		retval = ipmi_print_channel_cipher_suites(intf,
+ 		                                          argv[1], /* ipmi | sol */
+ 		                                          channel);
++        } else if (strncmp(argv[0], "setkg", 5) == 0) {
++               if (argc < 3 || argc > 4)
++                       printf_channel_usage();
++               else {
++                       uint8_t ch = 0xe;
++                       char *method = argv[1];
++                       char *key = argv[2];
++                       if (argc == 4) {
++                               ch = (uint8_t)strtol(argv[3], NULL, 0);
++                       }
++                               
++                       retval = ipmi_set_channel_security_keys(intf, ch, method, key);
++               }
+ 	} else {
+ 		lprintf(LOG_ERR, "Invalid CHANNEL command: %s\n", argv[0]);
+ 		printf_channel_usage();
+@@ -996,6 +1095,10 @@
+ 	lprintf(LOG_NOTICE,
+ "");
+ 	lprintf(LOG_NOTICE,
++"                  setkg hex|plain <key> [channel]");
++	lprintf(LOG_NOTICE,
++"");
++	lprintf(LOG_NOTICE,
+ "Possible privilege levels are:");
+ 	lprintf(LOG_NOTICE,
+ "   1   Callback level");
+diff --color -Nur ipmitool-IPMITOOL_1_8_19.orig/src/plugins/ipmi_intf.c ipmitool-IPMITOOL_1_8_19/src/plugins/ipmi_intf.c
+--- ipmitool-IPMITOOL_1_8_19.orig/src/plugins/ipmi_intf.c	2022-09-01 11:42:31.000000000 -0700
++++ ipmitool-IPMITOOL_1_8_19/src/plugins/ipmi_intf.c	2023-01-02 11:51:45.295433433 -0800
+@@ -52,6 +52,7 @@
+ #include <ipmitool/ipmi.h>
+ #include <ipmitool/ipmi_sdr.h>
+ #include <ipmitool/log.h>
++#include <ipmitool/helper.h>
+ 
+ #define IPMI_DEFAULT_PAYLOAD_SIZE   25
+ 

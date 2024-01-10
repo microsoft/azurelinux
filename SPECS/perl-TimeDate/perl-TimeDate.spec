@@ -1,6 +1,6 @@
 Name:           perl-TimeDate
-Version:        2.32
-Release:        4%{?dist}
+Version:        2.33
+Release:        1%{?dist}
 Summary:        A Perl module for time and date manipulation
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -63,6 +63,9 @@ make test
 %{_mandir}/man3/*.3*
 
 %changelog
+* Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.33-1
+- Auto-upgrade to 2.33 - Azure Linux 3.0 - package upgrades
+
 * Tue Jul 26 2022 Henry Li <lihl@microsoft.com> - 2.32-4
 - License Verified
 
