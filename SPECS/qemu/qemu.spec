@@ -5,13 +5,19 @@ Distribution:   Mariner
 # the qemu test suite is historically flakey
 %bcond_without check
 
+# This spec is for AzLinux
+%global azl 3
+
+%global __strip /bin/true
 %global libfdt_version 1.6.0
 %global libseccomp_version 2.4.0
 %global libusbx_version 1.0.23
 %global meson_version 0.61.3
 %global usbredir_version 0.7.1
 %global ipxe_version 20200823-5.git4bd064de
-
+%if 0%{?azl}
+%global excluded_targets moxie-softmmu
+%endif
 %global have_memlock_limits 0
 %global need_qemu_kvm 0
 %ifarch %{ix86}
@@ -54,7 +60,11 @@ Distribution:   Mariner
 
 %global tools_only 0
 
+
 %global user_static 1
+%if 0%{?azl}
+%global user_static 0
+%endif
 %if 0%{?rhel}
 # EPEL/RHEL do not have required -static builddeps
 %global user_static 0
@@ -71,8 +81,11 @@ Distribution:   Mariner
 %global have_numactl 0
 %endif
 
-# Matches spice ExclusiveArch
 %global have_spice 1
+%if 0%{?azl}
+%global have_spice 0
+%endif
+# Matches spice ExclusiveArch
 %ifnarch %{ix86} x86_64 %{arm} aarch64
 %global have_spice 0
 %endif
@@ -89,6 +102,9 @@ Distribution:   Mariner
 %endif
 
 %global have_liburing 0
+%if 0%{?azl}
+%global have_liburing 1
+%endif
 %if 0%{?fedora}
 %ifnarch %{arm}
 %global have_liburing 1
@@ -96,6 +112,9 @@ Distribution:   Mariner
 %endif
 
 %global have_virgl 0
+%if 0%{?azl}
+%global have_virgl 1
+%endif
 %if 0%{?fedora}
 %global have_virgl 1
 %endif
@@ -106,6 +125,9 @@ Distribution:   Mariner
 %endif
 
 %global have_jack 1
+%if 0%{?azl}
+%global have_jack 0
+%endif
 %if 0%{?rhel}
 %global have_jack 0
 %endif
@@ -123,6 +145,9 @@ Distribution:   Mariner
 
 %global have_gvnc_devel %{defined fedora}
 %global have_sdl_image %{defined fedora}
+%if 0%{?azl}
+%global have_sdl_image 0
+%endif
 %global have_fdt 1
 %global have_opengl 1
 %global have_usbredir 1
