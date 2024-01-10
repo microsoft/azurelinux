@@ -7,6 +7,7 @@ Distribution:   Mariner
 
 # This spec is for AzLinux
 %global azl 3
+%global azl_no_ui 1
 
 %global __strip /bin/true
 %global libfdt_version 1.6.0
@@ -112,9 +113,9 @@ Distribution:   Mariner
 %endif
 
 %global have_virgl 0
-%if 0%{?azl}
-%global have_virgl 1
-%endif
+#%if 0%{?azl}
+#%global have_virgl 1
+#%endif
 %if 0%{?fedora}
 %global have_virgl 1
 %endif
@@ -156,6 +157,9 @@ Distribution:   Mariner
 %endif
 %global have_fdt 1
 %global have_opengl 1
+%if 0%{?azl_no_ui}
+%global have_opengl 0
+%endif
 %global have_usbredir 1
 %global enable_werror 0
 
@@ -207,6 +211,11 @@ Distribution:   Mariner
 %ifarch x86_64 aarch64
 %define have_rutabaga_gfx 1
 %endif
+%endif
+
+%global have_ui 1
+%if 0%{?azl_no_ui}
+%global have_ui 0
 %endif
 
 # LTO still has issues with qemu on armv7hl and aarch64
@@ -261,17 +270,39 @@ Distribution:   Mariner
 %define requires_block_ssh Requires: %{name}-block-ssh = %{evr}
 %define requires_audio_alsa Requires: %{name}-audio-alsa = %{evr}
 %define requires_audio_oss Requires: %{name}-audio-oss = %{evr}
+%if %{with pulseaudio}
+%define pa_drv pa,
 %define requires_audio_pa Requires: %{name}-audio-pa = %{evr}
+%else
+%define requires_audio_pa %{nil}
+%endif
 %define requires_audio_pipewire Requires: %{name}-audio-pipewire = %{evr}
+%if %{with sdl}
+%define sdl_drv sdl,
 %define requires_audio_sdl Requires: %{name}-audio-sdl = %{evr}
+%else
+%define requires_audio_sdl %{nil}
+%endif
+%if %{with brltty}
 %define requires_char_baum Requires: %{name}-char-baum = %{evr}
+%else
+%define requires_char_baum %{nil}
+%endif
 %define requires_device_usb_host Requires: %{name}-device-usb-host = %{evr}
 %define requires_device_usb_redirect Requires: %{name}-device-usb-redirect = %{evr}
+%if %{have_ui}
 %define requires_ui_curses Requires: %{name}-ui-curses = %{evr}
 %define requires_ui_gtk Requires: %{name}-ui-gtk = %{evr}
 %define requires_ui_sdl Requires: %{name}-ui-sdl = %{evr}
 %define requires_ui_egl_headless Requires: %{name}-ui-egl-headless = %{evr}
 %define requires_ui_opengl Requires: %{name}-ui-opengl = %{evr}
+%else
+%define requires_ui_curses %{nil}
+%define requires_ui_gtk %{nil}
+%define requires_ui_sdl %{nil}
+%define requires_ui_egl_headless %{nil}
+%define requires_ui_opengl %{nil}
+%endif
 %define requires_device_display_virtio_gpu Requires: %{name}-device-display-virtio-gpu = %{evr}
 %define requires_device_display_virtio_gpu_pci Requires: %{name}-device-display-virtio-gpu-pci = %{evr}
 %define requires_device_display_virtio_gpu_ccw Requires: %{name}-device-display-virtio-gpu-ccw = %{evr}
@@ -402,19 +433,38 @@ Obsoletes: %{name}-system-unicore32 <= %{epoch}:%{version}-%{release} \
 Obsoletes: %{name}-system-unicore32-core <= %{epoch}:%{version}-%{release} \
 Obsoletes: sgabios-bin <= 1:0.20180715git-10.fc38
 
-%if 0%{?rcver:1}
+%if 0%{?rcver}
 %global rcrel .%{rcver}
 %global rcstr -%{rcver}
 %endif
 
+# Mariner builds all default targets except for Moxie, PPC, SPARC targets
+# The Moxie exclusion is inherited from Fedora
+# Both PPC and SPARC targets require packages that only build natively on the target platforms
+# and Mariner cannot support that at the moment.
+%bcond_with ppc_support
+%bcond_with sparc_support
+# Temporarily disabled features waiting for missing BRs:
+%bcond_with brltty
+%bcond_with capstone
+%bcond_with libssh
+%bcond_with pulseaudio
+%bcond_with sdl
+%if %{without ppc_support}
+%global excluded_targets %{excluded_targets},ppc-softmmu,ppc64-softmmu,ppc-linux-user,ppc64-linux-user,ppc64le-linux-user
+%endif
+%if %{without sparc_support}
+%global excluded_targets %{excluded_targets},sparc-softmmu,sparc64-softmmu,sparc-linux-user,sparc32plus-linux-user,sparc64-linux-user
+%endif
+
 # To prevent rpmdev-bumpspec breakage
-%global baserelease 0.2
+#%global baserelease 0.2
 
 Summary: QEMU is a FAST! processor emulator
 Name: qemu
 Version: 8.2.0
 Release: 1%{?dist}
-Epoch: 2
+#Epoch: 2
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND FSFAP AND GPL-1.0-or-later AND GPL-2.0-only AND GPL-2.0-or-later AND GPL-2.0-or-later WITH GCC-exception-2.0 AND LGPL-2.0-only AND LGPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND MIT AND LicenseRef-Fedora-Public-Domain AND CC-BY-3.0
 URL: http://www.qemu.org/
 
@@ -439,11 +489,9 @@ Source31: kvm-x86.conf
 Source36: README.tests
 
 BuildRequires: meson >= %{meson_version}
-BuildRequires: bison
-BuildRequires: flex
+#BuildRequires: bison
+#BuildRequires: flex
 BuildRequires: zlib-devel
-BuildRequires: glib2-devel
-BuildRequires: gnutls-devel
 BuildRequires: libselinux-devel
 BuildRequires: cyrus-sasl-devel
 BuildRequires: libaio-devel
@@ -459,15 +507,19 @@ BuildRequires: python3-sphinx_rtd_theme
 BuildRequires: libseccomp-devel >= %{libseccomp_version}
 # For network block driver
 BuildRequires: libcurl-devel
+%if %{with libssh}
 BuildRequires: libssh-devel
+%endif
 %if %{have_block_rbd}
 BuildRequires: librbd-devel
 %endif
 # We need both because the 'stap' binary is probed for by configure
 BuildRequires: systemtap
 BuildRequires: systemtap-sdt-devel
+%if %{have_ui}
 # For VNC PNG support
 BuildRequires: libpng-devel
+%endif
 # For virtiofs
 BuildRequires: libcap-ng-devel
 # Hard requirement for version >= 1.3
@@ -516,9 +568,13 @@ BuildRequires: make
 # For autosetup git_am
 BuildRequires: git
 # -display sdl support
+%if %{with sdl}
 BuildRequires: SDL2-devel
+%endif
+%if %{with pulseaudio}
 # pulseaudio audio output
 BuildRequires: pulseaudio-libs-devel
+%endif
 # alsa audio output
 BuildRequires: alsa-lib-devel
 %if %{have_block_nfs}
@@ -532,19 +588,28 @@ BuildRequires: ncurses-devel
 BuildRequires: spice-protocol
 BuildRequires: spice-server-devel
 %endif
+%if %{have_ui}
 # VNC JPEG support
 BuildRequires: libjpeg-devel
+%endif
+%if %{with brltty}
 # Braille device support
 BuildRequires: brlapi-devel
+%endif
 %if %{have_block_gluster}
 # gluster block driver
 BuildRequires: glusterfs-api-devel
 %endif
+%if %{have_ui}
+# gtk related?
+BuildRequires: glib2-devel
+BuildRequires: gnutls-devel
 # GTK frontend
 BuildRequires: gtk3-devel
 BuildRequires: vte291-devel
 # GTK translations
 BuildRequires: gettext
+%endif
 %if %{have_xen}
 # Xen support
 BuildRequires: xen-devel
@@ -561,8 +626,10 @@ BuildRequires: libcacard-devel
 # virgl 3d support
 BuildRequires: virglrenderer-devel
 %endif
+%if %{with capstone}
 # preferred disassembler for TCG
 BuildRequires: capstone-devel
+%endif
 # qemu-ga
 BuildRequires: libudev-devel
 # qauth infrastructure
@@ -574,7 +641,8 @@ BuildRequires: liburing-devel
 # zstd compression support
 BuildRequires: libzstd-devel
 # `hostname` used by test suite
-BuildRequires: hostname
+# XXX: Fix me once hostname rpm is available
+#BuildRequires: hostname
 # nvdimm dax
 BuildRequires: daxctl-devel
 # fuse block device
@@ -758,7 +826,7 @@ Install this package if you want to access remote Ceph volumes
 using the rbd protocol.
 %endif
 
-
+%if %{with libssh}
 %package  block-ssh
 Summary: QEMU SSH block driver
 Requires: %{name}-common%{?_isa} = %{epoch}:%{version}-%{release}
@@ -767,7 +835,7 @@ This package provides the additional SSH block driver for QEMU.
 
 Install this package if you want to access remote disks using
 the Secure Shell (SSH) protocol.
-
+%endif
 
 %if %{have_opengl}
 %package  ui-opengl
@@ -834,11 +902,13 @@ Requires: %{name}-common%{?_isa} = %{epoch}:%{version}-%{release}
 %description audio-oss
 This package provides the additional OSS audio driver for QEMU.
 
+%if %{with pulseaudio}
 %package  audio-pa
 Summary: QEMU PulseAudio audio driver
 Requires: %{name}-common%{?_isa} = %{epoch}:%{version}-%{release}
 %description audio-pa
 This package provides the additional PulseAudio audio driver for QEMU.
+%endif
 
 %package  audio-pipewire
 Summary: QEMU Pipewire audio driver
@@ -846,11 +916,13 @@ Requires: %{name}-common%{?_isa} = %{epoch}:%{version}-%{release}
 %description audio-pipewire
 This package provides the additional Pipewire audio driver for QEMU.
 
+%if %{with sdl}
 %package  audio-sdl
 Summary: QEMU SDL audio driver
 Requires: %{name}-common%{?_isa} = %{epoch}:%{version}-%{release}
 %description audio-sdl
 This package provides the additional SDL audio driver for QEMU.
+%endif
 
 %if %{have_jack}
 %package  audio-jack
@@ -860,13 +932,6 @@ Requires: %{name}-common%{?_isa} = %{epoch}:%{version}-%{release}
 This package provides the additional Jack audio driver for QEMU.
 %endif
 
-
-%package  ui-curses
-Summary: QEMU curses UI driver
-Requires: %{name}-common%{?_isa} = %{epoch}:%{version}-%{release}
-%description ui-curses
-This package provides the additional curses UI for QEMU.
-
 %if %{have_dbus_display}
 %package  ui-dbus
 Summary: QEMU D-Bus UI driver
@@ -874,6 +939,13 @@ Requires: %{name}-common%{?_isa} = %{epoch}:%{version}-%{release}
 %description ui-dbus
 This package provides the additional D-Bus UI for QEMU.
 %endif
+
+%if %{have_ui}
+%package  ui-curses
+Summary: QEMU curses UI driver
+Requires: %{name}-common%{?_isa} = %{epoch}:%{version}-%{release}
+%description ui-curses
+This package provides the additional curses UI for QEMU.
 
 %package  ui-gtk
 Summary: QEMU GTK UI driver
@@ -895,14 +967,15 @@ Requires: %{name}-common%{?_isa} = %{epoch}:%{version}-%{release}
 Requires: %{name}-ui-opengl%{?_isa} = %{epoch}:%{version}-%{release}
 %description ui-egl-headless
 This package provides the additional egl-headless UI for QEMU.
+%endif
 
-
+%if %{with brltty}
 %package  char-baum
 Summary: QEMU Baum chardev driver
 Requires: %{name}-common%{?_isa} = %{epoch}:%{version}-%{release}
 %description char-baum
 This package provides the Baum chardev driver for QEMU.
-
+%endif
 
 %package device-display-virtio-gpu
 Summary: QEMU virtio-gpu display device
@@ -1766,7 +1839,9 @@ run_configure \
 %endif
   --enable-bpf \
   --enable-cap-ng \
+  %if %{with capstone}
   --enable-capstone \
+  %endif
   --enable-coroutine-pool \
   --enable-curl \
 %if %{have_dbus_display}
@@ -1790,7 +1865,9 @@ run_configure \
 %if %{have_pmem}
   --enable-libpmem \
 %endif
+%if %{with libssh}
   --enable-libssh \
+%endif
   --enable-libusb \
   --enable-libudev \
   --enable-linux-aio \
@@ -1850,7 +1927,9 @@ run_configure \
   --with-default-devices \
   --enable-auth-pam \
   --enable-bochs \
+  %if %{with brltty}
   --enable-brlapi \
+  %endif
   --enable-bzip2 \
   --enable-cloop \
   --enable-curses \
@@ -1860,7 +1939,9 @@ run_configure \
 %if %{have_block_gluster}
   --enable-glusterfs \
 %endif
+%if %{have_ui}
   --enable-gtk \
+%endif
   --enable-hv-balloon \
   --enable-libdaxctl \
   --enable-libdw \
@@ -1885,9 +1966,11 @@ run_configure \
 %if %{have_rutabaga_gfx}
   --enable-rutabaga-gfx \
 %endif
+%if %{with sdl}
   --enable-sdl \
 %if %{have_sdl_image}
   --enable-sdl-image \
+%endif
 %endif
 %if %{have_libcacard}
   --enable-smartcard \
@@ -2400,9 +2483,10 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %files block-rbd
 %{_libdir}/%{name}/block-rbd.so
 %endif
+%if %{with libssh}
 %files block-ssh
 %{_libdir}/%{name}/block-ssh.so
-
+%endif
 %if %{have_opengl}
 %files ui-opengl
 %{_libdir}/%{name}/ui-opengl.so
@@ -2428,34 +2512,43 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %endif
 %files audio-oss
 %{_libdir}/%{name}/audio-oss.so
+%if %{with pulseaudio}
 %files audio-pa
 %{_libdir}/%{name}/audio-pa.so
+%endif
 %files audio-pipewire
 %{_libdir}/%{name}/audio-pipewire.so
+%if %{with sdl}
 %files audio-sdl
 %{_libdir}/%{name}/audio-sdl.so
+%endif
 %if %{have_jack}
 %files audio-jack
 %{_libdir}/%{name}/audio-jack.so
 %endif
 
 
-%files ui-curses
-%{_libdir}/%{name}/ui-curses.so
 %if %{have_dbus_display}
 %files ui-dbus
 %{_libdir}/%{name}/ui-dbus.so
 %endif
+%if %{have_ui}
+%files ui-curses
+%{_libdir}/%{name}/ui-curses.so
 %files ui-gtk
 %{_libdir}/%{name}/ui-gtk.so
+%if %{with sdl}
 %files ui-sdl
 %{_libdir}/%{name}/ui-sdl.so
+%endif
 %files ui-egl-headless
 %{_libdir}/%{name}/ui-egl-headless.so
+%endif
 
+%if %{with brltty}
 %files char-baum
 %{_libdir}/%{name}/chardev-baum.so
-
+%endif
 
 %files device-display-virtio-gpu
 %{_libdir}/%{name}/hw-display-virtio-gpu.so
