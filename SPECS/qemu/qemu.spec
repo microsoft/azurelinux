@@ -216,8 +216,8 @@ Obsoletes: %{name}-system-unicore32-core <= %{version}-%{release}
 %endif
 Summary:        QEMU is a FAST! processor emulator
 Name:           qemu
-Version:        6.2.0
-Release:        18%{?dist}
+Version:        8.2.0
+Release:        1%{?dist}
 License:        BSD AND CC-BY AND GPLv2+ AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -246,34 +246,19 @@ Patch6:         0001-acpi-fix-QEMU-crash-when-started-with-SLIC-table.patch
 Patch7:         0001-ebpf-replace-deprecated-bpf_program__set_socket_filt.patch
 # CVE-2022-0358 is fixed in 7.0.0 by https://gitlab.com/qemu-project/qemu/-/commit/48302d4eb628ff0bea4d7e92cbf6b726410eb4c3
 # From https://bugzilla.redhat.com/show_bug.cgi?id=2046202
-Patch1000:      CVE-2022-0358.patch
 # CVE-2021-20255 does not seem to have been fixed in a release yet
 # From https://lists.gnu.org/archive/html/qemu-devel/2021-02/msg06098.html
-Patch1001:      CVE-2021-20255.patch
 # CVE-2022-1050 does not seem to have been fixed in a release yet
 # From https://lists.nongnu.org/archive/html/qemu-devel/2022-03/msg05197.html
-Patch1002:      CVE-2022-1050.patch
 # CVE-2022-26354 is fixed in 7.0.0 by https://gitlab.com/qemu-project/qemu/-/commit/8d1b247f3748ac4078524130c6d7ae42b6140aaf
-Patch1003:      CVE-2022-26354.patch
-Patch1004:      CVE-2022-26353.patch
-Patch1005:      CVE-2021-4206.patch
-Patch1006:      CVE-2022-35414.patch
 # CVE-2021-4158 is fixed in 7.0.0 by https://gitlab.com/qemu-project/qemu/-/commit/9bd6565ccee68f72d5012e24646e12a1c662827e
-Patch1007:      CVE-2021-4158.patch
 # CVE-2022-2962 will be fixed in 7.2.0 by https://gitlab.com/qemu-project/qemu/-/commit/36a894aeb64a2e02871016da1c37d4a4ca109182
 Patch1008:      0001-removed-tulip.c-from-build-process-due-to-CVE-2022-2962.patch
 # CVE-2022-4144 will be fixed in 7.2.0 by https://gitlab.com/qemu-project/qemu/-/commit/6dbbf055148c6f1b7d8a3251a65bd6f3d1e1f622
-Patch1009:      CVE-2022-4144.patch
-Patch1010:      CVE-2022-3872.patch
 # CVE-2021-3929 is fixed in 7.0.0 by https://gitlab.com/qemu-project/qemu/-/commit/736b01642d85be832385
-Patch1011:      CVE-2021-3929.patch
 # CVE-2021-4207 is fixed in 7.0.0 by https://gitlab.com/qemu-project/qemu/-/commit/9569f5cb
-Patch1012:      CVE-2021-4207.patch
-Patch1013:      CVE-2022-3165.patch
 # CVE-2021-3750 fix is not in a release yet
 # https://gitlab.com/qemu-project/qemu/-/issues/541
-Patch1014:      CVE-2021-3750.patch
-Patch1015:      CVE-2022-36648.patch
 
 # alsa audio output
 BuildRequires:  alsa-lib-devel
@@ -2308,6 +2293,9 @@ useradd -r -u 107 -g qemu -G kvm -d / -s %{_sbindir}/nologin \
 
 
 %changelog
+* Wed Jan 10 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.2.0-1
+- Auto-upgrade to 8.2.0 - none
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 6.2.0-18
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
