@@ -1,8 +1,8 @@
 {
  "Signatures": {
   "Pod-Html-license-clarification": "8667642d6d3a4ca8d8281b33b5e83a264e7681eb5080256331ae34b09d63b0cc",
-  "gendep.macros": "111f808eaf6ec1fc793399c5b0fc543bba7efbd2c877e3bbc117566fdeaa2e7b",
+  "gendep.macros": "acde93c38249583f6e24fa21cc4066ffbca617d36f8cba5d4676408ae0bbefb2",
   "macros.perl": "0597172591cea26c81e92b580b63cb1c5e812cc354c34ac21b8ebc1854713183",
-  "perl-5.34.1.tar.xz": "6d52cf833ff1af27bb5e986870a2c30cec73c044b41e3458cd991f94374039f7"
+  "perl-5.38.2.tar.xz": "d91115e90b896520e83d4de6b52f8254ef2b70a8d545ffab33200ea9f1cf29e8"
  }
 }
