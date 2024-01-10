@@ -1,7 +1,7 @@
 Summary:        MySQL.
 Name:           mysql
 Version:        8.0.35
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2 with exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -51,6 +51,12 @@ make DESTDIR=%{buildroot} install
 %check
 make test
 
+%pre
+if [ $1 -eq 1 ] ; then
+    getent group  mysql  >/dev/null || groupadd -r mysql
+    getent passwd mysql  >/dev/null || useradd  -c "mysql" -s /bin/false -g mysql -M -r mysql
+fi
+
 %files
 %defattr(-,root,root)
 %license LICENSE router/LICENSE.router
@@ -84,6 +90,9 @@ make test
 %{_libdir}/pkgconfig/mysqlclient.pc
 
 %changelog
+* Wed Jan 10 2024 Andy Zaugg <azaugg@linkedin.com> - 8.0.35-3
+- Add mysql user as part of post scripts
+
 * Wed Dec 20 2023 Suresh Thelkar <sthelkar@microsoft.com> - 8.0.35-2
 - Patch CVE-2023-46218 
 
