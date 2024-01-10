@@ -1,0 +1,19 @@
+ARG RPMS_TO_INSTALL \
+\
+RUN --mount=type=bind,source=./Stage/,target=/dockerStage/ \\\
+    RPMS_PATH="/dockerStage/RPMS"; \\\
+    LOCAL_REPO_PATH="/localrepo"; \\\
+    mkdir -p $LOCAL_REPO_PATH; \\\
+    tdnf install -y createrepo; \\\
+    cp -r ${RPMS_PATH} ${LOCAL_REPO_PATH}; \\\
+    cat /dockerStage/marinerLocalRepo.repo >> /etc/yum.repos.d/local.repo; \\\
+    createrepo --database ${LOCAL_REPO_PATH} --workers 10; tdnf makecache \&\& tdnf makecache; \\\
+    tdnf autoremove -y createrepo; \\\
+    for rpm in "${RPMS_TO_INSTALL[@]}"; do \\\
+       echo "RPM: $rpm"; \\\
+       tdnf install -y $rpm; \\\
+    done; \\\
+    tdnf clean all; \\\
+    rm -f /etc/yum.repos.d/local.repo; \\\
+    rm -rf /var/cache/tdnf; \\\
+    rm -rf ${LOCAL_REPO_PATH};
