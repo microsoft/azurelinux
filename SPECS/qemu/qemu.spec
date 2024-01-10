@@ -133,6 +133,9 @@ Distribution:   Mariner
 %endif
 
 %global have_dbus_display 1
+%if 0%{?azl}
+%global have_dbus_display 0
+%endif
 %if %{defined rhel} && 0%{?rhel} < 9
 # RHEL/Centos 8 glib is not new enough
 %global have_dbus_display 0
@@ -144,6 +147,9 @@ Distribution:   Mariner
 %endif
 
 %global have_gvnc_devel %{defined fedora}
+%if 0%{?azl}
+%global have_gvnc_devel 0
+%endif
 %global have_sdl_image %{defined fedora}
 %if 0%{?azl}
 %global have_sdl_image 0
@@ -159,6 +165,9 @@ Distribution:   Mariner
 %ifarch %{ix86} x86_64 %{arm} aarch64
 %global have_edk2 1
 %endif
+%if 0%{?azl}
+%global have_edk2 0
+%endif
 
 # All modules should be listed here.
 %define have_block_rbd 1
@@ -168,11 +177,17 @@ Distribution:   Mariner
 
 
 %global have_block_gluster 1
+%if 0%{?azl}
+%global have_block_gluster 0
+%endif
 %if 0%{?rhel} >= 9
 %global have_block_gluster 0
 %endif
 
 %define have_block_nfs 0
+%if 0%{?azl}
+%define have_block_nfs 1
+%endif
 %if 0%{?fedora}
 %define have_block_nfs 1
 %endif
@@ -199,9 +214,20 @@ Distribution:   Mariner
 %global _lto_cflags %{nil}
 
 %global firmwaredirs "%{_datadir}/qemu-firmware:%{_datadir}/ipxe/qemu:%{_datadir}/seavgabios:%{_datadir}/seabios"
+%if 0%{?azl}
+%ifarch x86_64
+%global firmwaredirs "%{_datadir}/qemu-firmware:%{_datadir}/ipxe/qemu:%{_datadir}/seavgabios:%{_datadir}/seabios:%{_datadir}/sgabios"
+%else
+%global firmwaredirs "%{_datadir}/qemu-firmware
+%endif
+%endif
 
 %global qemudocdir %{_docdir}/%{name}
+%if 0%{?azl}
+%define evr %{version}-%{release}
+%else
 %define evr %{epoch}:%{version}-%{release}
+%endif
 
 %if %{have_libblkio}
 %define requires_block_blkio Requires: %{name}-block-blkio = %{evr}
