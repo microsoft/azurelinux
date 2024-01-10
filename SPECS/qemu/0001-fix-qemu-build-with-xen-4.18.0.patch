@@ -1,0 +1,26 @@
+From 3a2e5ecdde13bc4eb7f173f6cb36b1a6c752aa1f Mon Sep 17 00:00:00 2001
+Message-ID: <3a2e5ecdde13bc4eb7f173f6cb36b1a6c752aa1f.1701978796.git.m.a.young@durham.ac.uk>
+From: Michael Young <m.a.young@durham.ac.uk>
+Date: Thu, 7 Dec 2023 19:49:20 +0000
+Subject: [PATCH] fix qemu build with xen-4.18.0
+
+---
+ include/hw/xen/xen_native.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/hw/xen/xen_native.h b/include/hw/xen/xen_native.h
+index 6f09c48823..04b1ef4d34 100644
+--- a/include/hw/xen/xen_native.h
++++ b/include/hw/xen/xen_native.h
+@@ -532,7 +532,7 @@ static inline int xendevicemodel_set_irq_level(xendevicemodel_handle *dmod,
+ }
+ #endif
+ 
+-#if CONFIG_XEN_CTRL_INTERFACE_VERSION <= 41700
++#if CONFIG_XEN_CTRL_INTERFACE_VERSION >= 41700
+ #define GUEST_VIRTIO_MMIO_BASE   xen_mk_ullong(0x02000000)
+ #define GUEST_VIRTIO_MMIO_SIZE   xen_mk_ullong(0x00100000)
+ #define GUEST_VIRTIO_MMIO_SPI_FIRST   33
+-- 
+2.43.0
+
