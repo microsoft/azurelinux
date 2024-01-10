@@ -299,7 +299,7 @@ func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageC
 	// Set user's SSH keys.
 	for i, _ := range user.SSHPubKeyPaths {
 		// If absolute path is not provided, then append baseConfigPath.
-		if filepath.IsAbs(user.SSHPubKeyPaths[i]) == false {
+		if !filepath.IsAbs(user.SSHPubKeyPaths[i]) {
 			user.SSHPubKeyPaths[i] = filepath.Join(baseConfigPath, user.SSHPubKeyPaths[i])
 		}
 	}
