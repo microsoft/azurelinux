@@ -1,7 +1,7 @@
 Summary:        Cloud instance init scripts
 Name:           cloud-init
 Version:        23.4.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,6 +9,7 @@ Group:          System Environment/Base
 URL:            https://launchpad.net/cloud-init
 Source0:        https://launchpad.net/cloud-init/trunk/%{version}/+download/%{name}-%{version}.tar.gz
 Source1:        10-azure-kvp.cfg
+Patch0:         Retain-exit-code-in-cloud-init-status-for-recoverabl.patch
 %define cl_services cloud-config.service cloud-config.target cloud-final.service cloud-init.service cloud-init.target cloud-init-local.service
 BuildRequires:  automake
 BuildRequires:  dbus
@@ -144,6 +145,9 @@ make check %{?_smp_mflags}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
+* Fri Jan 19 2024 Chris Co <chrco@microsoft.com> - 23.4.1-2
+- Add patch to retain exit code for recoverable errors
+
 * Fri Jan 19 2024 Chris Co <chrco@microsoft.com> - 23.4.1-1
 - Upgrade cloud-init to 23.4.1
 - Remove overrideDatasourceDetection patch since it is now in 23.4 source
