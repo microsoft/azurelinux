@@ -17,7 +17,7 @@
 %define config_source %{SOURCE1}
 Summary:        Linux Kernel for HCI
 Name:           kernel-hci
-Version:        5.15.143.1
+Version:        5.15.139.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -435,10 +435,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Tue Dec 19 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.143.1-1
-- Auto-upgrade to 5.15.143.1
-- Fix 0005-net-mlx5-Lag-move-lag-files-into-directory.patch so patch applies after update
-
 * Tue Dec 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.139.1-1
 - Auto-upgrade to 5.15.139.1
 
