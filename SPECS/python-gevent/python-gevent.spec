@@ -57,7 +57,7 @@ Features include:
 %check
 cp %{SOURCE1} src/gevent/tests/tests_to_ignore.txt
 %python3 setup.py develop
-%python3 -m gevent.tests --ignore="tests_to_ignore.txt"
+%python3 -m gevent.tests --ignore="tests_to_ignore.txt" -u-network
 
 %files -n python3-gevent
 %defattr(-,root,root,-)
@@ -66,7 +66,8 @@ cp %{SOURCE1} src/gevent/tests/tests_to_ignore.txt
 
 %changelog
 * Wed Jan 10 2024 Thien Trung Vuong <tvuong@microsoft.com> - 21.1.2-2
-- Add list of tests to ignore, add python-requests dependency
+- Disable unreliable tests
+- Add python-requests dependency
 
 * Wed Nov 29 2023 Thien Trung Vuong <tvuong@microsoft.com> - 21.1.2-1
 - Update to version 21.1.2
