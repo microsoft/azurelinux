@@ -1,7 +1,7 @@
 Summary:        Minimal try/catch with proper preservation of $@
 Name:           perl-Try-Tiny
-Version:        0.30
-Release:        8%{?dist}
+Version:        0.31
+Release:        1%{?dist}
 URL:            https://metacpan.org/release/Try-Tiny
 License:        MIT
 Group:          Development/Libraries
@@ -46,6 +46,9 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+* Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.31-1
+- Auto-upgrade to 0.31 - Azure Linux 3.0 - package upgrades
+
 * Mon Aug 01 2022 Muhammad Falak <mwani@microsoft.com> - 0.30-8
 - Add BR on `perl(Test::More)` to fix ptest build
 

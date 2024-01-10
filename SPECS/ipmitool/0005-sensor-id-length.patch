@@ -1,9 +1,8 @@
-diff --git a/include/ipmitool/ipmi_sdr.h b/include/ipmitool/ipmi_sdr.h
-index ccf0cf0..47d3949 100644
---- a/include/ipmitool/ipmi_sdr.h
-+++ b/include/ipmitool/ipmi_sdr.h
-@@ -819,7 +819,7 @@ static const char *sensor_type_desc[] __attribute__ ((unused)) = {
- 	    "Version Change", "FRU State" };
+diff --color -Nur ipmitool-IPMITOOL_1_8_19.orig/include/ipmitool/ipmi_sdr.h ipmitool-IPMITOOL_1_8_19/include/ipmitool/ipmi_sdr.h
+--- ipmitool-IPMITOOL_1_8_19.orig/include/ipmitool/ipmi_sdr.h	2022-09-01 11:42:31.000000000 -0700
++++ ipmitool-IPMITOOL_1_8_19/include/ipmitool/ipmi_sdr.h	2022-12-20 14:12:47.675994549 -0800
+@@ -799,7 +799,7 @@
+ #define SENSOR_TYPE_MAX 0x2C
  
  struct sensor_reading {
 -	char		s_id[17];		/* name of the sensor */
@@ -11,6 +10,3 @@ index ccf0cf0..47d3949 100644
  	struct sdr_record_full_sensor    *full;
  	struct sdr_record_compact_sensor *compact;
  	uint8_t		s_reading_valid;	/* read value valididity */
--- 
-2.1.0
-
