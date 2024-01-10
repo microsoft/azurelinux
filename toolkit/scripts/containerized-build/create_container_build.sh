@@ -228,7 +228,8 @@ if [[ "${mode}" == "build" ]]; then # Configure base image
         docker import "${chroot_file}" $container_img
     fi
 else
-    container_img="mcr.microsoft.com/cbl-mariner/base/core:${version}"
+    # Till we publish 3.0 image, use the image created by the build phase
+    container_img="mcr.microsoft.com/cbl-mariner/${USER}-containerized-rpmbuild:${version}"
 fi
 
 # ================== Launch Container ==================
