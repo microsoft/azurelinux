@@ -83,7 +83,7 @@ make %{?_smp_mflags} check
 %{_libdir}/libsqlite3.so.0.8.6
 
 %changelog
-* Tue Jan 09 2023 Henry Li <lihl@microsoft.com> - 3.39.2-3
+* Tue Jan 09 2024 Henry Li <lihl@microsoft.com> - 3.39.2-3
 - Address CVE-2023-7104
 
 * Tue Dec 13 2022 Daniel McIlvaney <damcilva@microsoft.com> - 3.39.2-2
