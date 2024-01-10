@@ -32,7 +32,6 @@ BuildRequires:  openssl-devel
 BuildRequires:  python3-test
 BuildRequires:  python3-pip
 BuildRequires:  python3-greenlet
-BuildRequires:  python3-requests
 %endif
 
 %description -n python3-gevent
@@ -67,7 +66,6 @@ cp %{SOURCE1} src/gevent/tests/tests_to_ignore.txt
 %changelog
 * Wed Jan 10 2024 Thien Trung Vuong <tvuong@microsoft.com> - 21.1.2-2
 - Disable unreliable tests
-- Add python-requests dependency
 
 * Wed Nov 29 2023 Thien Trung Vuong <tvuong@microsoft.com> - 21.1.2-1
 - Update to version 21.1.2
