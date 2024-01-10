@@ -17,20 +17,23 @@
 %define short_name commons-%{base_name}
 Summary:        Apache Commons Lang Package
 Name:           apache-%{short_name}
-Version:        3.8.1
-Release:        5%{?dist}
+Version:        3.14.0
+Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            https://commons.apache.org/proper/commons-lang
-Source0:        https://archive.apache.org/dist/commons/lang/source/%{short_name}-%{version}-src.tar.gz
+Source0:        https://dlcdn.apache.org/commons/lang/source/%{short_name}-%{version}-src.tar.gz
+# maven is not being used here due to a circular dependency with this package.
+# Instead, ant is being used. ant relies on build.xml and default.properties.
+# Both files are used in other distributions like OpenSuse.
 Source1:        build.xml
 Source2:        default.properties
 BuildRequires:  ant
 BuildRequires:  ant-junit
 BuildRequires:  fdupes
-BuildRequires:  java-devel >= 1.7
+BuildRequires:  java-devel >= 1.8
 BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  junit
 Provides:       %{short_name} = %{version}-%{release}
@@ -69,7 +72,7 @@ sed -i 's/\r//' *.txt
 export OPT_JAR_LIST=`cat %{_sysconfdir}/ant.d/junit`
 export CLASSPATH=
 ant \
-    -Dcompile.source=1.7 -Dcompile.target=1.7 \
+    -Dcompile.source=1.8 -Dcompile.target=1.8 \
     -Dfinal.name=%{short_name} \
      jar javadoc
 
@@ -98,6 +101,9 @@ cp -pr target/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %{_javadocdir}/%{name}
 
 %changelog
+* Mon Feb 26 2024 George Mileka <gmileka@microsoft.com> - 3.14.0-1
+- Updated to 3.14.0-1.
+
 * Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.8.1-5
 - Moved from extended to core
 - License verified
