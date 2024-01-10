@@ -53,7 +53,7 @@
 Summary:        Postfix Mail Transport Agent
 Name:           postfix
 Version:        3.7.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        (IBM AND GPLv2+) OR (EPL-2.0 AND GPLv2+)
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -74,6 +74,7 @@ Patch1:         postfix-3.5.0-config.patch
 Patch2:         postfix-3.4.0-files.patch
 Patch3:         postfix-3.3.3-alternatives.patch
 Patch4:         postfix-3.4.0-large-fs.patch
+Patch5:         CVE-2023-51764.patch
 Patch9:         pflogsumm-1.1.5-datecalc.patch
 # rhbz#1384871, sent upstream
 Patch10:        pflogsumm-1.1.5-ipv6-warnings-fix.patch
@@ -232,6 +233,7 @@ maps with Postfix, you need this.
 %patch2 -p1 -b .files
 %patch3 -p1 -b .alternatives
 %patch4 -p1 -b .large-fs
+%patch5 -p1
 
 # Change DEF_SHLIB_DIR according to build host
 sed -i \
@@ -762,6 +764,9 @@ exit 0
 %endif
 
 %changelog
+* Wed Jan 10 2024 Henry Li <lihl@microsoft.com> - 3.7.0-3
+- Fix CVE-2023-51764
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.7.0-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
