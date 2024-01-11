@@ -28,7 +28,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.15.139.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -40,6 +40,8 @@ Source2:        config_aarch64
 Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20211013.pem
 Patch0:         nvme_multipath_default_false.patch
+# Remove once we upgrade past 5.15.143
+Patch1:         CVE-2023-6817.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -163,6 +165,7 @@ manipulation of eBPF programs and maps.
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{version}
 %patch0 -p1
+%patch1 -p1 
 
 make mrproper
 
@@ -426,6 +429,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Thu Jan 11 2024 Cameron Baird <cameronbaird@microsoft.com> - 5.15.139.1-2
+- Cherry-pick fix for CVE-2023-6817
+
 * Tue Dec 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.139.1-1
 - Auto-upgrade to 5.15.139.1
 
