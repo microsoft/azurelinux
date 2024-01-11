@@ -15,6 +15,7 @@ BuildRequires:  libxml2-devel
 BuildRequires:  meson
 BuildRequires:  cmake
 BuildRequires:  json-glib-devel
+BuildRequires:  libadwaita-1
 
 %description
 This library was designed to make it easier to access web services that
@@ -68,6 +69,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %changelog
 * Wed Dec 20 2023 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 0.9.1-1
 - Upgrade to version 0.9.1
+- Adding libadwaita-1 to BuildRequires
 
 * Fri Jan 28 2022 Henry Li <lihl@microsoft.com> - 0.9.0-1
 - Upgrade to version 0.9.0
