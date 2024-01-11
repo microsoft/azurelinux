@@ -33,8 +33,6 @@ Source4:        %{name}.conf
 Source5:        %{name}.logrotate
 # Replace defaults paths for config files
 Patch0:         defaults-paths.patch
-# https://github.com/prometheus/node_exporter/pull/2190
-Patch1:         0001-Refactor-perf-collector.patch
 
 BuildRequires:  golang
 BuildRequires:  systemd-rpm-macros
