@@ -108,7 +108,7 @@ getent passwd 'prometheus' >/dev/null || useradd -r -g 'prometheus' -d '%{_share
 
 %changelog
 * Wed Jan 10 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7.0-1
-- Auto-upgrade to 1.7.0 - none
+- Auto-upgrade to 1.7.0
 
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.3.1-21
 - Bump release to rebuild with go 1.20.10

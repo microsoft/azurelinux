@@ -1,6 +1,6 @@
 {
   "Signatures": {
-    "prometheus-node-exporter-1.3.1-vendor.tar.gz": "e4236b8506ba36c182b6ffba09fde5056969e5407b9fdf4e9a15f8bfad3ae5e8",
+    "prometheus-node-exporter-1.7.0-vendor.tar.gz": "2179316a78a2f9fd1801fbc6a6f2fb19bf38674f3d793bf15f8ea836b31ec6ca",
     "prometheus-node-exporter.conf": "af398945dffd2cf49225accf3d6ec0a0161d61906328b82a2f473deda073667a",
     "prometheus-node-exporter.logrotate": "ee082283a512e75bbfa365e7e60eba0903ac8082962c96108e53ccfe8afc7b2b",
     "prometheus-node-exporter.service": "351a6bf987a56993deca6e57493fcc235c3abef56ed2749153fdba4d2fa0faf6",
