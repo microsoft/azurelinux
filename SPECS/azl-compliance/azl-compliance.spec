@@ -38,17 +38,16 @@ package to meet FedRAMP Compliance
 
 %build
 cd azl-compliance
-cargo build 
 
 %install
 mkdir -p %{buildroot}%{_sysconfdir}/azl-compliance/
 mkdir -p %{buildroot}%{_unitdir}
 install -D -m 644 azl-compliance.service %{buildroot}%{_unitdir}/azl-compliance.service
 install -m 0755 ./azl-compliance/target/debug/azl-compliance %{buildroot}%{_sysconfdir}/azl-compliance/
-mkdir -p %{buildroot}%{_sysconfdir}/azl-compliance/FIPS
-install -m 0755 FIPS/* %{buildroot}%{_sysconfdir}/azl-compliance/FIPS/
-mkdir -p %{buildroot}%{_sysconfdir}/azl-compliance/FedRAMP
-install -m 0755 FedRAMP/* %{buildroot}%{_sysconfdir}/azl-compliance/FedRAMP/
+mkdir -p %{buildroot}%{_sysconfdir}/azl-compliance/fips
+mkdir -p %{buildroot}%{_sysconfdir}/azl-compliance/fedramp
+install -m 0755 fips/* %{buildroot}%{_sysconfdir}/azl-compliance/fips/
+cp -r fedramp/* %{buildroot}%{_sysconfdir}/azl-compliance/fedramp
 install -m 0755 azl-compliance-fips.json %{buildroot}%{_sysconfdir}/azl-compliance/
 install -m 0755 azl-compliance-fedramp.json %{buildroot}%{_sysconfdir}/azl-compliance/
 
@@ -60,11 +59,11 @@ install -m 0755 azl-compliance-fedramp.json %{buildroot}%{_sysconfdir}/azl-compl
 %{_unitdir}/azl-compliance.service
 
 %files fips
-%{_sysconfdir}/azl-compliance/FIPS
+%{_sysconfdir}/azl-compliance/fips
 %{_sysconfdir}/azl-compliance/azl-compliance-fips.json
 
 %files fedramp
-%{_sysconfdir}/azl-compliance/FedRAMP
+%{_sysconfdir}/azl-compliance/fedramp
 %{_sysconfdir}/azl-compliance/azl-compliance-fedramp.json
 
 %changelog
