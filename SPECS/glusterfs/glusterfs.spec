@@ -1,3 +1,11 @@
+#
+# Use mariner=<version> for Mariner-specific settings
+#
+%global mariner 3
+#
+#
+#
+
 %global __brp_python_bytecompile %{nil}
 # This package depends on automagic byte compilation
 # https://fedoraproject.org/wiki/Changes/No_more_automagic_Python_bytecompilation_phase_2
@@ -61,14 +69,10 @@
 %ifnarch x86_64
 %global _without_tcmalloc --without-tcmalloc
 %endif
-#
-# Hard-coded settings unique to CBL-Mariner
-#
+%if ( 0%{?mariner} && 0%{?mariner} >= 3 )
 # Use same malloc that previous CBL-Mariner used
 %global _without_tcmalloc --without-tcmalloc
-#
-#
-#
+%endif
 # Do not use libtirpc on EL6, it does not have xdr_uint64_t() and xdr_uint32_t
 # Do not use libtirpc on EL7, it does not have xdr_sizeof()
 %if ( 0%{?rhel} && 0%{?rhel} <= 7 )
@@ -83,17 +87,9 @@
 # rpmbuild -ta @PACKAGE_NAME@-@PACKAGE_VERSION@.tar.gz --without server
 %{?_without_server:%global _without_server --without-server}
 # disable server components forcefully as rhel <= 6
-%if ( 0%{?rhel} && 0%{?rhel} <= 6 )
+%if ( 0%{?rhel} && 0%{?rhel} <= 6 ) || ( 0%{?mariner} && 0%{?mariner} >= 3 )
 %global _without_server --without-server
 %endif
-#
-# Hard-coded settings unique to CBL-Mariner
-#
-# Disabling 'server' subpackage for CBL-Mariner as it's currently unnecessary.
-%global _without_server --without-server
-#
-#
-#
 # syslog
 # if you wish to build rpms without syslog logging, compile like this
 # rpmbuild -ta @PACKAGE_NAME@-@PACKAGE_VERSION@.tar.gz --without syslog
@@ -124,28 +120,12 @@
 %if ( 0%{?rhel} && 0%{?rhel} >= 8 )
 %global selinuxbooleans rsync_full_access=1 rsync_client=1
 %endif
-%if ( 0%{?fedora} ) || ( 0%{?rhel} && 0%{?rhel} > 6 )
+%if ( 0%{?fedora} ) || ( 0%{?rhel} && 0%{?rhel} > 6 ) || ( 0%{?mariner} && 0%{?mariner} >= 3 )
 %global _with_systemd true
 %endif
-#
-# Hard-coded settings unique to CBL-Mariner
-#
-# Use systemd like previously done
-%global _with_systemd true
-#
-#
-#
-%if ( 0%{?fedora} ) || ( 0%{?rhel} && 0%{?rhel} >= 7 )
+%if ( 0%{?fedora} ) || ( 0%{?rhel} && 0%{?rhel} >= 7 ) || ( 0%{?mariner} && 0%{?mariner} >= 3 )
 %global _with_firewalld --enable-firewalld
 %endif
-#
-# Hard-coded settings unique to CBL-Mariner
-#
-# Enable firewalld as previously done
-%global _with_firewalld --enable-firewalld
-#
-#
-#
 %if 0%{?_tmpfilesdir:1}
 %global _with_tmpfilesdir --with-tmpfilesdir=%{_tmpfilesdir}
 %else
@@ -159,23 +139,15 @@
 %global _with_gnfs %{nil}
 %global _without_ocf --without-ocf
 %endif
-%if ( 0%{?fedora} ) || ( 0%{?rhel} && 0%{?rhel} > 7 )
+%if ( 0%{?fedora} ) || ( 0%{?rhel} && 0%{?rhel} > 7 ) || ( 0%{?mariner} && 0%{?mariner} >= 3 )
 %global _usepython3 1
 %global _pythonver 3
 %else
 %global _usepython3 0
 %global _pythonver 2
 %endif
-#
-# Hard-coded settings unique to CBL-Mariner
-#
-# For CBL-Mariner, hardcode python3
-%global _pythonver 3
-#
-#
-#
 # From https://fedoraproject.org/wiki/Packaging:Python#Macros
-%if ( 0%{?rhel} && 0%{?rhel} <= 6 )
+%if ( 0%{?rhel} && 0%{?rhel} <= 6 ) && ( 0%{!?mariner} )
 %{!?python2_sitelib: %global python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
 %{!?python2_sitearch: %global python2_sitearch %(python2 -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(1))")}
 %global _rundir %{_localstatedir}/run
@@ -231,20 +203,14 @@
 %if "%{bashcompdir}" == ""
 %global bashcompdir ${sysconfdir}/bash_completion.d
 %endif
-#
-# Hard-coded settings unique to CBL-Mariner
-#
+%if ( 0%{?mariner} && 0%{?mariner} >= 3 )
 # Skip regression-tests because they previously were excluded in
 # CBL-Mariner glusterfs and the new version introduces a dependency
 # (dbench)
 %global _without_regression_tests true
 # Explicitly require rpcgen
 %global _require_rpcgen true
-# Use for mariner-specific configs
-%global _mariner true
-#
-#
-#
+%endif
 ##-----------------------------------------------------------------------------
 ## All package definitions should be placed here and keep them sorted
 ##
@@ -261,7 +227,11 @@ Source1:        glusterd.sysconfig
 Source2:        glusterfsd.sysconfig
 Source7:        glusterfsd.service
 Source8:        glusterfsd.init
+%if ( 0%{?mariner} && 0%{?mariner} >= 3 )
+# Patch created for Mariner to fix build break related to
+# including eventtypes.h
 Patch001:       include-eventtypes-always.patch
+%endif
 
 BuildRoot:        %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
@@ -347,12 +317,16 @@ and client framework.
 
 %package cli
 Summary:          GlusterFS CLI
+%if ( 0%{?mariner} && 0%{?mariner} >= 3 )
+BuildRequires:    bash-completion
+%else
 %if ( ! (0%{?rhel} && 0%{?rhel} < 7) )
 BuildRequires:    pkgconfig(bash-completion)
 # bash-completion >= 1.90 satisfies this requirement.
 # If it is not available, the condition can be adapted
 # and the completion script will be installed in the backwards compatible
 # %{sysconfdir}/bash_completion.d
+%endif
 %endif
 Requires:         libglusterfs0%{?_isa} = %{version}-%{release}
 
@@ -796,7 +770,6 @@ It borrows a powerful concept called Translators from GNU Hurd kernel.
 Much of the code in GlusterFS is in user space and easily manageable.
 
 This package provides the glusterfs server daemon.
-%endif
 
 %package thin-arbiter
 Summary:          GlusterFS thin-arbiter module
@@ -809,6 +782,7 @@ replicate volume. It includes translators required to provide the
 functionality, and also few other scripts required for getting the setup done.
 
 This package provides the glusterfs thin-arbiter translator.
+%endif
 
 %package client-xlators
 Summary:          GlusterFS client-side translators
@@ -847,7 +821,7 @@ GlusterFS Events
 %endif
 
 %prep
-%setup -q -n %{name}-%{version}%{?prereltag}
+%autosetup -p1 -n %{name}-%{version}%{?prereltag}
 %if ( ! %{_usepython3} )
 echo "fixing python shebangs..."
 for f in api events extras geo-replication libglusterfs tools xlators; do
@@ -858,7 +832,7 @@ done
 %build
 
 # RHEL6 and earlier need to manually replace config.guess and config.sub
-%if ( 0%{?rhel} && 0%{?rhel} <= 6 )
+%if ( 0%{?rhel} && 0%{?rhel} <= 6 ) || ( 0%{?mariner} && 0%{?mariner} >= 3 )
 ./autogen.sh
 %endif
 
@@ -883,20 +857,17 @@ done
         %{?_without_libtirpc} \
         %{?_without_tcmalloc}
 
-# fix hardening and remove rpath in shlibs
-echo "bfjelds: 0%{?_mariner:1}"
-%if ( 0%{?fedora} && 0%{?fedora} > 17 ) || ( 0%{?rhel} && 0%{?rhel} > 6 ) || ( 0%{?_mariner:1} )
+## fix hardening and remove rpath in shlibs
+%if ( 0%{?fedora} && 0%{?fedora} > 17 ) || ( 0%{?rhel} && 0%{?rhel} > 6 ) || ( 0%{?mariner} && 0%{?mariner} >= 3 )
 sed -i 's| \\\$compiler_flags |&\\\$LDFLAGS |' libtool
 %endif
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|' libtool
-echo "bfjelds: before make"
+
 make %{?_smp_mflags}
-echo "bfjelds: after make"
+
 %check
-echo "bfjelds: before make check"
 make check
-echo "bfjelds: after make check"
 
 %install
 rm -rf %{buildroot}
@@ -1178,7 +1149,6 @@ if [ $1 -ge 1 ]; then
     %systemd_postun_with_restart glusterd
 fi
 exit 0
-%endif
 
 %preun thin-arbiter
 if [ $1 -eq 0 ]; then
@@ -1187,6 +1157,7 @@ if [ $1 -eq 0 ]; then
         %systemd_preun gluster-ta-volume
     fi
 fi
+%endif
 
 ##-----------------------------------------------------------------------------
 ## All %%postun should be placed here and keep them sorted
@@ -1384,6 +1355,7 @@ exit 0
 %ghost      %attr(0600,-,-) %{_sharedstatedir}/glusterd/nfs/run/nfs.pid
 %endif
 
+%if ( 0%{?_with_gnfs:1} && 0%{!?_without_server:1} )
 %files thin-arbiter
 %dir %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator
 %dir %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/features
@@ -1391,6 +1363,11 @@ exit 0
 %dir %{_datadir}/glusterfs/scripts
      %{_datadir}/glusterfs/scripts/setup-thin-arbiter.sh
 %config %{_sysconfdir}/glusterfs/thin-arbiter.vol
+%else
+%exclude %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/features/thin-arbiter.so
+%exclude %{_datadir}/glusterfs/scripts/setup-thin-arbiter.sh
+%exclude %{_sysconfdir}/glusterfs/thin-arbiter.vol
+%endif
 
 %if ( 0%{?_with_systemd:1} )
 %{_unitdir}/gluster-ta-volume.service
