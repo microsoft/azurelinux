@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://www.gnu.org/software/guile/
-Source0:        ftp://ftp.gnu.org/pub/gnu/guile/%{name}-%{version}.tar.gz
+Source0:        https://ftp.gnu.org/gnu/guile/%{name}-%{version}.tar.gz
 BuildRequires:  gc-devel
 BuildRequires:  libffi-devel
 BuildRequires:  libltdl-devel

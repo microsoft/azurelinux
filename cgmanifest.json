@@ -5041,7 +5041,7 @@
         "other": {
           "name": "guile",
           "version": "3.0.9",
-          "downloadUrl": "ftp://ftp.gnu.org/pub/gnu/guile/guile-3.0.9.tar.gz"
+          "downloadUrl": "https://ftp.gnu.org/gnu/guile/guile-3.0.9.tar.gz"
         }
       }
     },
