@@ -127,7 +127,6 @@ sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
 %{_bindir}/pg_xlogdump
 %{_bindir}/pgbench
 %{_bindir}/postgres
-%{_bindir}/postmaster
 %{_bindir}/vacuumlo
 %{_datadir}/postgresql/*
 %{_libdir}/postgresql/*
@@ -176,6 +175,8 @@ sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
 %changelog
 * Wed Dec 20 2023 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 16.1-1
 - Upgrade to 16.1
+- Removing postmaster since it is deprecated in v15 (https://www.postgresql.org/docs/15/app-postmaster.html)
+- Adding pkgconfig(icu-i18n) and pkgconfig(icu-uc) to BuildRequires for building the new version
 
 * Tue Jun 20 2023 Bala <balakumaran.kannan@microsoft.com> - 14.8-1
 - Upgrade to 14.8 to fix CVE-2023-2454, CVE-2023-2455 and CVE-2022-41862
