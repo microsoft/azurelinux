@@ -233,7 +233,7 @@ maps with Postfix, you need this.
 %patch2 -p1 -b .files
 %patch3 -p1 -b .alternatives
 %patch4 -p1 -b .large-fs
-%patch5 -p1
+%patch5 -p1 -b .config
 
 # Change DEF_SHLIB_DIR according to build host
 sed -i \
