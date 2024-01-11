@@ -1,0 +1,17 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+ARG BASE_IMAGE
+
+FROM $BASE_IMAGE
+
+@INCLUDE_MAIN_RUN_INSTRUCTION@
+
+RUN ln -s /usr/bin/python3 /usr/bin/python
+
+RUN mkdir -p /usr/src/multus-cni/bin \ 
+  && cp /usr/bin/multus /usr/src/multus-cni/bin/ \ 
+  && cp /usr/bin/install_multus /install_multus \ 
+  && cp /usr/bin/thin_entrypoint /thin_entrypoint 
+
+ENTRYPOINT [ "/thin_entrypoint" ]
