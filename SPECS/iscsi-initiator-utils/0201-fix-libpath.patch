@@ -1,9 +1,9 @@
 diff --git a/libopeniscsiusr/Makefile b/libopeniscsiusr/Makefile
-index a045a45..5e51f20 100644
+index 0d215fc..8cc0214 100644
 --- a/libopeniscsiusr/Makefile
 +++ b/libopeniscsiusr/Makefile
-@@ -13,11 +13,7 @@ prefix ?= /usr
- INSTALL ?= install
+@@ -17,11 +17,7 @@ SBINDIR ?= $(exec_prefix)/sbin
+ DBROOT ?= $(etcdir)/iscsi
  
  ifndef LIB_DIR
 -	ifeq ($(shell test -d /lib64 && echo 1),1)
