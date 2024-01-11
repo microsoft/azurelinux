@@ -130,8 +130,7 @@ popd
 %patch319 -p1 -b .cve-2023-48795-0009
 
 %build
-# The -fvisibility=hidden is needed for clean build of the pam_ssh_agent_auth.
-export CFLAGS="$CFLAGS -fvisibility=hidden -fpic"
+export CFLAGS="$CFLAGS -fpic"
 SAVE_LDFLAGS="$LDFLAGS"
 export LDFLAGS="$LDFLAGS -pie -z relro -z now"
 %configure \
