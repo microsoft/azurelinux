@@ -1,18 +1,14 @@
-%define upstream_version_group 23.3.3
-%define package_version %(echo %{upstream_version_group} | cut -d. -f1-2)
-
 Summary:        Cloud instance init scripts
 Name:           cloud-init
-Version:        %{package_version}
-Release:        2%{?dist}
+Version:        23.4.1
+Release:        1%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://launchpad.net/cloud-init
-Source0:        https://launchpad.net/cloud-init/trunk/%{upstream_version_group}/+download/%{name}-%{version}.tar.gz
+Source0:        https://launchpad.net/cloud-init/trunk/%{version}/+download/%{name}-%{version}.tar.gz
 Source1:        10-azure-kvp.cfg
-Patch0:         overrideDatasourceDetection.patch
 %define cl_services cloud-config.service cloud-config.target cloud-final.service cloud-init.service cloud-init.target cloud-init-local.service
 BuildRequires:  automake
 BuildRequires:  dbus
@@ -85,7 +81,7 @@ python3 setup.py build
 %install
 %{py3_install "--init-system=systemd"}
 
-python3 tools/render-cloudcfg --variant mariner > %{buildroot}/%{_sysconfdir}/cloud/cloud.cfg
+python3 tools/render-template --variant mariner > %{buildroot}/%{_sysconfdir}/cloud/cloud.cfg
 sed -i "s,@@PACKAGED_VERSION@@,%{version}-%{release}," %{buildroot}/%{python3_sitelib}/cloudinit/version.py
 
 %if "%{_arch}" == "aarch64"
@@ -148,6 +144,10 @@ make check %{?_smp_mflags}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
+* Fri Jan 19 2024 Chris Co <chrco@microsoft.com> - 23.4.1-1
+- Upgrade cloud-init to 23.4.1
+- Remove overrideDatasourceDetection patch since it is now in 23.4 source
+
 * Thu Jan 18 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 23.3-2
 - Switching to our version of 'jsonschema' to keep the tests more stable.
 - Fixing source URL.
