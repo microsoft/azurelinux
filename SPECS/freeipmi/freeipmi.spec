@@ -345,6 +345,9 @@ rm -frv %{buildroot}%{_initrddir} %{buildroot}%{_sysconfdir}/init.d
 %dir %{_localstatedir}/cache/ipmiseld
 
 %changelog
+* Thu Jan 11 2024 Xiaohong Deng <xiaohongdeng@microsoft.com> 1.6.11-1
+- Upgrade for Mariner 3.0
+
 * Thu Jul 28 2022 Henry Li <lihl@microsoft.com> - 1.6.6-3
 - Fix spec formatting
 - License Verified
