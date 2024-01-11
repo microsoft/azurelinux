@@ -35,8 +35,8 @@ function create_multus_container_image_base {
 
     # Copy files into docker context directory
     tar -xf "$MARINER_RPMS_TARBALL" -C "$hostMountedDir"/
-    cp "$containerSrcDir/marinerLocalRepo.repo" "$hostMountedDir"/
-    cp "$containerSrcDir/Dockerfile-Initial" "$containerBuildDir/Dockerfile-Initial"
+    cp "$CONTAINER_SRC_DIR/marinerLocalRepo.repo" "$hostMountedDir"/
+    cp "$CONTAINER_SRC_DIR/Dockerfile-Initial" "$containerBuildDir/Dockerfile-Initial"
     cp $initialDockerfile $containerBuildDir/Dockerfile
 
     pushd $containerBuildDir > /dev/null
@@ -129,7 +129,7 @@ function create_multus_container {
         "$base_container_name" \
         "$base_container_tag" \
         "$packages" \
-        "$containerSrcDir/$MULTUS/Dockerfile-Multus"
+        "$CONTAINER_SRC_DIR/$MULTUS/Dockerfile-Multus"
 
     # Save text files generated in TEMPDIR
     echo "+++ publish container list into pipeline artifacts"

@@ -60,13 +60,13 @@ function create_cdi_container_image_base {
 
     # Copy files into docker context directory
     tar -xf "$MARINER_RPMS_TARBALL" -C "$hostMountedDir"/
-    cp "$containerSrcDir/marinerLocalRepo.repo" "$hostMountedDir"/
-    cp "$containerSrcDir/Dockerfile-Initial" "$containerBuildDir/Dockerfile-Initial"
+    cp "$CONTAINER_SRC_DIR/marinerLocalRepo.repo" "$hostMountedDir"/
+    cp "$CONTAINER_SRC_DIR/Dockerfile-Initial" "$containerBuildDir/Dockerfile-Initial"
     cp $initialDockerfile $containerBuildDir/Dockerfile
 
     # Workaround till proper binaries are built as part of the cdi rpm & renames are removed
     # https://github.com/microsoft/CBL-Mariner/pull/5708/files#
-    cp "$containerSrcDir/$CDI_BASE_COMPONENT/configuration-files"/* "$containerBuildDir"
+    cp "$CONTAINER_SRC_DIR/$CDI_BASE_COMPONENT/configuration-files"/* "$containerBuildDir"
     pushd $containerBuildDir > /dev/null
 
     # set Dockerfile
@@ -193,7 +193,7 @@ function create_cdi_subcomp_containers {
       "$base_container_name"\
       "$base_container_tag" \
       "$packages" \
-      "$containerSrcDir/$CDI_BASE_COMPONENT/Dockerfile-$cdi_comp" \
+      "$CONTAINER_SRC_DIR/$CDI_BASE_COMPONENT/Dockerfile-$cdi_comp" \
       ${cdi_binary_path[$comp]} \
       ${cdi_container_user[$comp]}
 

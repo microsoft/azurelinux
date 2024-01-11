@@ -36,13 +36,13 @@ function create_kubevirt_container_image_base {
 
     # Copy files into docker context directory
     tar -xf "$MARINER_RPMS_TARBALL" -C "$hostMountedDir"/
-    cp "$containerSrcDir/marinerLocalRepo.repo" "$hostMountedDir"/
-    cp "$containerSrcDir/Dockerfile-Initial" "$containerBuildDir/Dockerfile-Initial"
-    cp "$containerSrcDir/$KUBEVIRT_BASE_COMPONENT/$goldenImageDockerfile" "$containerBuildDir/Dockerfile"
+    cp "$CONTAINER_SRC_DIR/marinerLocalRepo.repo" "$hostMountedDir"/
+    cp "$CONTAINER_SRC_DIR/Dockerfile-Initial" "$containerBuildDir/Dockerfile-Initial"
+    cp "$CONTAINER_SRC_DIR/$KUBEVIRT_BASE_COMPONENT/$goldenImageDockerfile" "$containerBuildDir/Dockerfile"
 
     # Ensure that the path exists before copying files.
-    if [ -d "$containerSrcDir/$KUBEVIRT_BASE_COMPONENT/configuration-files" ]; then
-        cp "$containerSrcDir/$KUBEVIRT_BASE_COMPONENT/configuration-files"/* "$containerBuildDir"
+    if [ -d "$CONTAINER_SRC_DIR/$KUBEVIRT_BASE_COMPONENT/configuration-files" ]; then
+        cp "$CONTAINER_SRC_DIR/$KUBEVIRT_BASE_COMPONENT/configuration-files"/* "$containerBuildDir"
     fi
 
     pushd "$containerBuildDir"
