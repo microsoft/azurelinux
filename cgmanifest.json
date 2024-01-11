@@ -3608,8 +3608,8 @@
         "type": "other",
         "other": {
           "name": "flannel",
-          "version": "0.14.0",
-          "downloadUrl": "https://github.com/flannel-io/flannel/archive/refs/tags/v0.14.0.tar.gz"
+          "version": "0.24.0",
+          "downloadUrl": "https://github.com/flannel-io/flannel/archive/refs/tags/v0.24.0.tar.gz"
         }
       }
     },
