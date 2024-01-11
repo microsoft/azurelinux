@@ -117,9 +117,9 @@ Distribution:   Mariner
 %endif
 
 %global have_virgl 0
-#%if 0%{?azl}
-#%global have_virgl 1
-#%endif
+# %if 0%{?azl}
+# %global have_virgl 1
+# %endif
 %if 0%{?fedora}
 %global have_virgl 1
 %endif
@@ -462,13 +462,12 @@ Obsoletes: sgabios-bin <= 1:0.20180715git-10.fc38
 %endif
 
 # To prevent rpmdev-bumpspec breakage
-#%global baserelease 0.2
+# %global baserelease 0.2
 
 Summary: QEMU is a FAST! processor emulator
 Name: qemu
 Version: 8.2.0
 Release: 1%{?dist}
-#Epoch: 2
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND FSFAP AND GPL-1.0-or-later AND GPL-2.0-only AND GPL-2.0-or-later AND GPL-2.0-or-later WITH GCC-exception-2.0 AND LGPL-2.0-only AND LGPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND MIT AND LicenseRef-Fedora-Public-Domain AND CC-BY-3.0
 URL: http://www.qemu.org/
 
@@ -2614,8 +2613,6 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_libdir}/%{name}/chardev-baum.so
 %endif
 
-%files device-display-virtio-gpu
-%{_libdir}/%{name}/hw-display-virtio-gpu.so
 %if %{have_virgl}
 %files device-display-virtio-gpu-gl
 %{_libdir}/%{name}/hw-display-virtio-gpu-gl.so
@@ -2624,8 +2621,6 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %files device-display-virtio-gpu-rutabaga
 %{_libdir}/%{name}/hw-display-virtio-gpu-rutabaga.so
 %endif
-%files device-display-virtio-gpu-pci
-%{_libdir}/%{name}/hw-display-virtio-gpu-pci.so
 %if %{have_virgl}
 %files device-display-virtio-gpu-pci-gl
 %{_libdir}/%{name}/hw-display-virtio-gpu-pci-gl.so
@@ -2634,12 +2629,20 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %files device-display-virtio-gpu-pci-rutabaga
 %{_libdir}/%{name}/hw-display-virtio-gpu-pci-rutabaga.so
 %endif
+
+%if %{have_ui}
+%files device-display-virtio-gpu
+%{_libdir}/%{name}/hw-display-virtio-gpu.so
+%files device-display-virtio-gpu-pci
+%{_libdir}/%{name}/hw-display-virtio-gpu-pci.so
 %files device-display-virtio-gpu-ccw
 %{_libdir}/%{name}/hw-s390x-virtio-gpu-ccw.so
 %files device-display-virtio-vga
 %{_libdir}/%{name}/hw-display-virtio-vga.so
 %files device-display-virtio-vga-gl
 %{_libdir}/%{name}/hw-display-virtio-vga-gl.so
+%endif
+
 %if %{have_rutabaga_gfx}
 %files device-display-virtio-vga-rutabaga
 %{_libdir}/%{name}/hw-display-virtio-vga-rutabaga.so
