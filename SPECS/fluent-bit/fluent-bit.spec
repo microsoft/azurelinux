@@ -1,6 +1,6 @@
 Summary:        Fast and Lightweight Log processor and forwarder for Linux, BSD and OSX
 Name:           fluent-bit
-Version:        2.1.10
+Version:        2.2.1
 Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
@@ -75,6 +75,9 @@ Development files for %{name}
 %{_libdir}/fluent-bit/*.so
 
 %changelog
+* Thu Jan 11 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.2.1-1
+- Auto-upgrade to 2.2.1 - For 3.0 release
+
 * Tue Oct 31 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.1.10-1
 - Auto-upgrade to 2.1.10 - upgrade to latest
 

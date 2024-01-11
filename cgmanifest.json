@@ -3658,8 +3658,8 @@
         "type": "other",
         "other": {
           "name": "fluent-bit",
-          "version": "2.1.10",
-          "downloadUrl": "https://github.com/fluent/fluent-bit/archive/refs/tags/v2.1.10.tar.gz"
+          "version": "2.2.1",
+          "downloadUrl": "https://github.com/fluent/fluent-bit/archive/refs/tags/v2.2.1.tar.gz"
         }
       }
     },
