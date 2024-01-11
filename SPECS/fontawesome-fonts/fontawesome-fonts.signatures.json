@@ -1,7 +1,7 @@
 {
- "Signatures": {
-  "README-Trademarks.txt": "8773f8666357f0302351db5b41e6fb34fcc65b435fe367411731aa3c47edf63c",
-  "fontawesome-fonts-4.7.0.tar.gz": "de512ba0e1dead382bbfce372cde74b3f18971d876fffb635ee9333f0db05d43",
-  "fontawesome-fonts-fontconfig.conf": "d3bb1226f75c9449df040a5bf1cc4114430c797a502b0513dcbf7f7f52365da5"
- }
+  "Signatures": {
+    "README-Trademarks.txt": "8773f8666357f0302351db5b41e6fb34fcc65b435fe367411731aa3c47edf63c",
+    "fontawesome-fonts-fontconfig.conf": "d3bb1226f75c9449df040a5bf1cc4114430c797a502b0513dcbf7f7f52365da5",
+    "fontawesome-fonts-6.5.1.tar.gz": "4cc4c537892e9b774ecdf070e0592ce0971b8f8a1b0649448133967977409d46"
+  }
 }
