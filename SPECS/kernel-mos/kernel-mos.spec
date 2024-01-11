@@ -18,7 +18,7 @@
 %define config_source %{SOURCE1}
 Summary:        Linux Kernel for MOS
 Name:           kernel-mos
-Version:        5.15.143.1
+Version:        5.15.145.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -377,6 +377,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Wed Jan 10 2023 Gary Swalling <gaswal@microsoft.com> - 5.15.145.1-1
+- Update to 5.15.145.1
+
 * Wed Dec 20 2023 Gary Swalling <gaswal@microsoft.com> - 5.15.143.1-1
 - Update to 5.15.143.1
 
