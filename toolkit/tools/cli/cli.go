@@ -4,7 +4,7 @@
 package main
 
 import (
-	"fmt"
+	"path"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/bldtracker"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/depsearch"
@@ -23,6 +23,7 @@ type CLI struct {
 }
 
 func main() {
+	var defaultBuildConfigsFile = path.Join(exe.ToolkitRootDir, "default_build_configs.json")
 	var cli CLI
 
 	ctx := kong.Parse(&cli,
@@ -30,11 +31,8 @@ func main() {
 		kong.Description("A sample golang tool for Mariner."),
 		kong.UsageOnError(),
 		kong.ConfigureHelp(kong.HelpOptions{Compact: true}),
-		kong.Configuration(kong.JSON, "/datadrive/projects/CBL-Mariner/toolkit/default_build_configs.json"),
+		kong.Configuration(kong.JSON, defaultBuildConfigsFile),
 		kong.Vars{"version": exe.ToolkitVersion})
-
-	fmt.Println(cli.LogFile)
-	fmt.Println(cli.LogLevel)
 
 	logger.InitBestEffort(cli.LogFile, cli.LogLevel)
 

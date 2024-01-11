@@ -109,9 +109,10 @@ $(TOOL_BINS_DIR)/%: $(go_common_files)
 	cd $(TOOLS_DIR)/$* && \
 		go test -test.short -covermode=atomic -coverprofile=$(BUILD_DIR)/tools/$*.test_coverage ./... && \
 		TOOLKIT_VER="-X github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe.ToolkitVersion=$(RELEASE_VERSION)" && \
+		TOOLKIT_ROOT="-X github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe.ToolkitRootDir=$(toolkit_root)" && \
 		IMGCUST_VER="-X github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/imagecustomizerlib.ToolVersion=$(IMAGE_CUSTOMIZER_FULL_VERSION)" && \
 		CGO_ENABLED=0 go build \
-			-ldflags="$$TOOLKIT_VER $$IMGCUST_VER" \
+			-ldflags="$$TOOLKIT_VER $$TOOLKIT_ROOT $$IMGCUST_VER" \
 			-o $(TOOL_BINS_DIR)
 endif
 
