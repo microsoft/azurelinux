@@ -54,6 +54,7 @@ LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8 make check
 %license LICENSE.md
 %doc lump.md NEWS.md README.md
 %{_libdir}/libutf8proc.so.*
+%{_libdir}/pkgconfig/libutf8proc.pc
 
 %files devel
 %defattr(-,root,root,-)
