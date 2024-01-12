@@ -34,7 +34,7 @@ index 9f7b034..5d29792 100644
  CFLAGS += -DISCSI_VERSION_STR=\"$(ISCSI_VERSION_STR)\"
 
 -CFLAGS += -L../redhat-linux-build
-+CFLAGS += -L../$(RPM_ARCH)-$(TARGET_OS)-$(RPM_OS)
++CFLAGS += -L../$(RPM_ARCH)-mariner-linux
  LDLIBS += -lopeniscsiusr -lkmod -lcrypto
 
  LIB = libiscsi.so.0
