@@ -22,7 +22,7 @@ if [[ $# -lt 1 ]];then
 	exit 1
 fi
 
-while getopts "a:v:h" options; do
+while getopts "v:h" options; do
 	case "${options}" in
 		h)
 			usage
@@ -30,10 +30,6 @@ while getopts "a:v:h" options; do
 		v|version)
 			VERSION="$OPTARG"
 			echo $VERSION
-			;;
-		a|abi)
-			BUILDARCH="$OPTARG"
-			echo $BUILDARCH
 			;;
 		\?)
 			echo "Empty Value provide."
@@ -43,11 +39,7 @@ while getopts "a:v:h" options; do
 	esac
 done
 
-if [ -e $VERSION ] || [ -e $BUILDARCH ]; then
-	echo "Either VERSION or BUILDARCH is empty"
-	usage
-	exit 1
-fi
+BUILDARCH=$(rpm --eval '%{_arch}')
 
 # Source URL to extract the sources.
 SOURCEURL="https://archive.apache.org/dist/maven/maven-3/${VERSION}/source/apache-maven-${VERSION}-src.tar.gz"
@@ -73,14 +65,14 @@ function dieIfError {
 
 function installUtils {
 	echo "Installing wget."
-	sudo tdnf install -y wget | dieIfError
+	tdnf install -y wget | dieIfError
 	pushd "/tmp"
 	wget $MAVENBINARY -O maven.rpm
 	echo "Installing pre-built PMC 1.0 maven rpm to provide maven binary needed to build maven itself."
-	sudo rpm -i --nodeps maven.rpm
+	rpm -i --nodeps maven.rpm
 	mvn -v
 	echo "Installing msopenjdk-11."
-	sudo tdnf install -y msopenjdk-11 | dieIfError
+	tdnf install -y msopenjdk-11 | dieIfError
 }
 
 function buildMaven {
