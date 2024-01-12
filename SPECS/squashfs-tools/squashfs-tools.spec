@@ -1,7 +1,7 @@
 Summary:        Utility for the creation of squashfs filesystems
 Name:           squashfs-tools
-Version:        4.5.1
-Release:        2%{?dist}
+Version:        4.6.1
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,6 +16,8 @@ BuildRequires:  lzo-devel
 BuildRequires:  xz-devel
 BuildRequires:  zlib-devel
 BuildRequires:  zstd-devel
+
+%global major_ver 4.6
 
 %description
 Squashfs is a highly compressed read-only filesystem for Linux.  This package
@@ -38,7 +40,7 @@ install -m 644 %{SOURCE2} %{buildroot}%{_mandir}/man1/unsquashfs.1
 
 %files
 %license COPYING
-%doc ACTIONS-README ACKNOWLEDGEMENTS README-%{version} CHANGES USAGE INSTALL
+%doc ACTIONS-README ACKNOWLEDGEMENTS README-%{version} CHANGES USAGE-%{major_ver} USAGE-MKSQUASHFS-%{major_ver} USAGE-SQFSCAT-%{major_ver} USAGE-SQFSTAR-%{major_ver} USAGE-UNSQUASHFS-%{major_ver} INSTALL
 
 %{_mandir}/man1/*
 
@@ -46,6 +48,9 @@ install -m 644 %{SOURCE2} %{buildroot}%{_mandir}/man1/unsquashfs.1
 %{_sbindir}/unsquashfs
 
 %changelog
+* Fri Jan 12 2024 Xiaohong Deng <xiaohongdeng@microsoft.com> - 4.6.1-1
+- Upgrade to 4.6.1
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.5.1-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
