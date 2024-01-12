@@ -185,7 +185,7 @@ fi
 %{_unitdir}/cassandra-%{name}.service
 
 %changelog
-* Thu Jan 11 2024 Henry Li <lihl@microsoft.com> - 3.1.1-9
+* Thu Jan 11 2024 Henry Li <lihl@microsoft.com> - 3.1.1-8
 - Apply patch to resolve CVE-2023-26159
 
 * Thu Aug 17 2023 Bala <balakumaran.kannan@microsoft.com> - 3.1.1-7
