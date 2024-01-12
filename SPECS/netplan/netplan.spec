@@ -12,7 +12,7 @@
 
 
 Name:           netplan
-Version:        0.95
+Version:        0.107.1
 Release:        1%{?dist}
 Summary:        Network configuration tool using YAML
 Group:          System Environment/Base
@@ -104,6 +104,9 @@ make check
 
 
 %changelog
+* Fri Jan 12 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.107.1-1
+- Auto-upgrade to 0.107.1 - none
+
 * Fri Sep 17 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.95-1
 - Initial CBL-Mariner import from Netplan source (license: GPLv3)
 - License verified
