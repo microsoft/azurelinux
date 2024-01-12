@@ -23464,8 +23464,8 @@
         "type": "other",
         "other": {
           "name": "python-psutil",
-          "version": "5.9.0",
-          "downloadUrl": "https://github.com/giampaolo/psutil/archive/release-5.9.0.tar.gz"
+          "version": "5.9.7",
+          "downloadUrl": "https://github.com/giampaolo/psutil/archive/release-5.9.7.tar.gz"
         }
       }
     },
