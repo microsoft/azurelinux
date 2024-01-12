@@ -12,7 +12,7 @@ License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.open-iscsi.com/
-Source0:        https://github.com/open-iscsi/open-iscsi/archive/%{commit0}.tar.gz#/open-iscsi-test-%{version}.tar.gz
+Source0:        https://github.com/open-iscsi/open-iscsi/archive/%{commit0}.tar.gz#/open-iscsi-%{version}-%{commit0}.tar.gz
 Source4:        04-iscsi
 Source5:        iscsi-tmpfiles.conf
 
