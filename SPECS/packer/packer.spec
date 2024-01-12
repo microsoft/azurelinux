@@ -43,7 +43,7 @@ Packer is a tool for building identical machine images for multiple platforms fr
 %build
 tar --no-same-owner -xf %{SOURCE1}
 export GOPATH=%{our_gopath}
-LD_FLAGS="-X github.com/hashicorp/packer/version.Version=1.8.7 -X github.com/hashicorp/packer/version.VersionPrerelease="
+LD_FLAGS="-X github.com/hashicorp/packer/version.Version=%{version} -X github.com/hashicorp/packer/version.VersionPrerelease="
 go build -mod=vendor -v -a -o packer --ldflags="$LD_FLAGS"
 
 %install
