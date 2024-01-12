@@ -1,3 +1,12 @@
+From b9c0329fb653d416b0d47f327ab3ee2480a1a009 Mon Sep 17 00:00:00 2001
+From: Brian Fjeldstad <bfjelds@microsoft.com>
+Date: Fri, 12 Jan 2024 00:11:22 +0000
+Subject: [PATCH] fix libpath error
+
+---
+ libopeniscsiusr/Makefile | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
 diff --git a/libopeniscsiusr/Makefile b/libopeniscsiusr/Makefile
 index 0d215fc..8cc0214 100644
 --- a/libopeniscsiusr/Makefile
@@ -15,3 +24,6 @@ index 0d215fc..8cc0214 100644
  endif
  
  INCLUDE_DIR ?= $(prefix)/include
+-- 
+2.34.1
+
