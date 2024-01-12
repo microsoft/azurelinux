@@ -38,7 +38,7 @@ Patch103: 0103-fix-libiscsi-firmware-discovery-issue-with-NULL-drec.patch
 Patch104: 0104-libiscsi-build-fixes.patch
 
 # Mariner: add patch to fix build refrences to lib*
-Patch201: 0201-fix-libpath.patch
+Patch201: 0201-mariner-fixes.patch
  
 BuildRequires: meson git
 BuildRequires: flex bison doxygen kmod-devel systemd-units

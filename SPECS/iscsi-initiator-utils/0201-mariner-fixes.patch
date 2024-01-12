@@ -5,7 +5,8 @@ Subject: [PATCH] fix libpath error
 
 ---
  libopeniscsiusr/Makefile | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+ libiscsi/Makefile | 2 +-----
+ 2 file changed, 2 insertion(+), 6 deletions(-)
 
 diff --git a/libopeniscsiusr/Makefile b/libopeniscsiusr/Makefile
 index 0d215fc..8cc0214 100644
@@ -24,6 +25,19 @@ index 0d215fc..8cc0214 100644
  endif
  
  INCLUDE_DIR ?= $(prefix)/include
+diff --git a/libiscsi/Makefile b/libiscsi/Makefile
+index 9f7b034..5d29792 100644
+--- a/libiscsi/Makefile
++++ b/libiscsi/Makefile
+@@ -19,7 +19,7 @@ CFLAGS += -DSBINDIR=\"$(SBINDIR)\"
+ CFLAGS += -DISCSI_DB_ROOT=\"$(DBROOT)\"
+ CFLAGS += -DISCSI_VERSION_STR=\"$(ISCSI_VERSION_STR)\"
+
+-CFLAGS += -L../redhat-linux-build
++CFLAGS += -L../$(RPM_ARCH)-$(TARGET_OS)-$(RPM_OS)
+ LDLIBS += -lopeniscsiusr -lkmod -lcrypto
+
+ LIB = libiscsi.so.0
 -- 
 2.34.1
 
