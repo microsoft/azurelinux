@@ -24904,8 +24904,8 @@
         "type": "other",
         "other": {
           "name": "pytorch",
-          "version": "2.0.0",
-          "downloadUrl": "https://github.com/pytorch/pytorch/releases/download/v2.0.0/pytorch-v2.0.0.tar.gz"
+          "version": "2.1.2",
+          "downloadUrl": "https://github.com/pytorch/pytorch/releases/download/v2.1.2/pytorch-v2.1.2.tar.gz"
         }
       }
     },

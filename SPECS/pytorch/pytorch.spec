@@ -1,8 +1,8 @@
 %global _empty_manifest_terminate_build 0
 Summary:        Tensors and Dynamic neural networks in Python with strong GPU acceleration.
 Name:           pytorch
-Version:        2.0.0
-Release:        2%{?dist}
+Version:        2.1.2
+Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -80,6 +80,9 @@ cp -arf docs %{buildroot}/%{_pkgdocdir}
 %{_docdir}/*
 
 %changelog
+* Fri Jan 12 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.1.2-1
+- Auto-upgrade to 2.1.2 - none
+
 * Thu Apr 06 2023 Riken Maharjan <rmaharjan@microsoft.com> - 2.0.0-2
 - Add missing runtine for 2.0.0
 

@@ -1,6 +1,6 @@
 {
-    "Signatures": {
-        "pytorch-2.0.0-submodules.tar.gz": "81fa75ec16c2228fc75ae8e0c7e5e841665c50581995f48994a490c9a2a87af4",
-        "pytorch-2.0.0.tar.gz": "cecc38b6d4256b810336edfc6119d7a57b701fdf1ba43c50001f31e2724fd8e2"
-    }
+  "Signatures": {
+    "pytorch-2.1.2.tar.gz": "85effbcce037bffa290aea775c9a4bad5f769cb229583450c40055501ee1acd7",
+    "pytorch-2.1.2-submodules.tar.gz": "fa217de5dab6f722a8c287f38a4a33afd9da4c790127c5a82c0031afe427add9"
+  }
 }
