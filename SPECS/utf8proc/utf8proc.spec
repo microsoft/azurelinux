@@ -34,6 +34,7 @@ mkdir -p build
 cd build
 cmake -DCMAKE_INSTALL_PREFIX=%{_prefix} \
       -DCMAKE_BUILD_TYPE=Release        \
+      -DCMAKE_INSTALL_LIBDIR=%{_libdir} \
       -DBUILD_SHARED_LIBS=ON            \
       ..
 make %{?_smp_mflags}
