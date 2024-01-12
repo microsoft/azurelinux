@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "clang-12.0.1.src.tar.xz": "6e912133bcf56e9cfe6a346fa7e5c52c2cde3e4e48b7a6cc6fcc7c75047da45f",
-  "clang-tools-extra-12.0.1.src.tar.xz": "65659efdf97dbed70ae0caee989936b731f249dddc46f1cb4225b2f49b232ae5"
+  "clang-17.0.6.src.tar.xz": "a78f668a726ae1d3d9a7179996d97b12b90fb76ab9442a43110b972ff7ad9029",
+  "clang-tools-extra-17.0.6.src.tar.xz": "aa774642415d338d7b77a66fcbad6fd1f77f382dabcb67422a6230614eff1ab9"
  }
 }

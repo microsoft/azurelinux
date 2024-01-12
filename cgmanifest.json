@@ -1747,18 +1747,8 @@
         "type": "other",
         "other": {
           "name": "clang",
-          "version": "12.0.1",
-          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.1/clang-12.0.1.src.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "clang16",
-          "version": "16.0.0",
-          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-16.0.0.tar.gz"
+          "version": "17.0.6",
+          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-17.0.6/clang-17.0.6.src.tar.xz"
         }
       }
     },
@@ -12061,18 +12051,8 @@
         "type": "other",
         "other": {
           "name": "llvm",
-          "version": "12.0.1",
-          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.1/llvm-12.0.1.src.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "llvm16",
-          "version": "16.0.0",
-          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-16.0.0.tar.gz"
+          "version": "17.0.6",
+          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-17.0.6/llvm-17.0.6.src.tar.xz"
         }
       }
     },

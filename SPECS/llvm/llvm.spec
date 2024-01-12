@@ -1,20 +1,21 @@
 Summary:        A collection of modular and reusable compiler and toolchain technologies.
 Name:           llvm
-Version:        12.0.1
-Release:        8%{?dist}
+Version:        17.0.6
+Release:        1%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://llvm.org/
 Source0:        https://github.com/llvm/llvm-project/releases/download/llvmorg-%{version}/%{name}-%{version}.src.tar.xz
-Patch1:         llvm-12.0.1-issue-49955-workaround.patch
 BuildRequires:  cmake
 BuildRequires:  libffi-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  ninja-build
 BuildRequires:  python3-devel
 Requires:       libxml2
+Provides:       %{name} = %{version}
+Provides:       %{name} = %{version}-%{release}
 
 %description
 The LLVM Project is a collection of modular and reusable compiler and toolchain technologies. Despite its name, LLVM has little to do with traditional virtual machines, though it does provide helpful libraries that can be used to build them. The name "LLVM" itself is not an acronym; it is the full name of the project.
@@ -29,10 +30,6 @@ for developing applications that use llvm.
 
 %prep
 %setup -q -n %{name}-%{version}.src
-%autopatch -p2
-# fix build break with gcc 13 by including cstdint header
-sed -i 's/#include <string>/#include <cstdint>\n#include <string>/g' ./include/llvm/Support/Base64.h
-sed -i 's/#include <string>/#include <cstdint>\n#include <string>/g' ./include/llvm/Support/Signals.h
 
 %build
 # Disable symbol generation
@@ -55,7 +52,7 @@ cmake -G Ninja                              \
       -DLLVM_TARGETS_TO_BUILD="host;AMDGPU;BPF" \
       -DLLVM_INCLUDE_GO_TESTS=No            \
       -DLLVM_ENABLE_RTTI=ON                 \
-      -Wno-dev ..
+      -Wno-dev ../llvm
 
 %ninja_build LLVM
 %ninja_build
@@ -92,14 +89,17 @@ ninja check-all
 %{_includedir}/*
 
 %changelog
-* Tue Dec 06 2023 Andrew Phelps <anphel@microsoft.com> - 12.0.1-8
-- Fix build break with gcc 13
+* Fri Jan 12 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 17.0.6-1
+- Upgrade to 17.0.6
 
-* Thu Jun 29 2023 Andrew Phelps <anphel@microsoft.com> - 12.0.1-7
+* Thu Jun 29 2023 Andrew Phelps <anphel@microsoft.com> - 16.0.0-3
 - Modify parallel compile jobs limit to _smp_ncpus_max if set, or _smp_build_ncpus
 
-* Thu Jun 01 2023 Andrew Phelps <anphel@microsoft.com> - 12.0.1-6
+* Thu Jun 01 2023 Andrew Phelps <anphel@microsoft.com> - 16.0.0-2
 - Limit to 2 parallel compile jobs to avoid running out of memory in build
+
+* Wed Apr 05 2023 Andrew Phelps <anphel@microsoft.com> - 16.0.0-1
+- Add spec for llvm16
 
 * Tue Dec 06 2022 Adam Schwab <adschwab@microsoft.com> - 12.0.1-5
 - Workaround for llvm issue #49955 with patch
