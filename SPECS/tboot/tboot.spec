@@ -10,7 +10,7 @@ URL:            https://sourceforge.net/projects/tboot/
 Source0:        http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 Source1:        create-drtm-policy.sh
 Source2:        README.md
-Patch0:         remove-sm3.patch
+Patch0:         remove-s3-algo.patch
 BuildRequires:  make
 BuildRequires:  gcc
 BuildRequires:  openssl-devel
@@ -59,7 +59,8 @@ install -m 755 %{SOURCE2} %{buildroot}%{_docdir}/README.md
 
 %changelog
 * Wed Dec 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.11.2-1
-- Auto-upgrade to 1.11.2 - none
+- Auto-upgrade to 1.11.2
+- Update remove-s3 patch file for 1.11.2
 
 * Fri Feb 25 2022 Henry Li <lihl@microsoft.com> 1.10.2-1
 - Upgrade to version 1.10.2
