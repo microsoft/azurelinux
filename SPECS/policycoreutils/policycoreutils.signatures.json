@@ -1,10 +1,10 @@
 {
- "Signatures": {
-  "selinux-3.2.tar.gz": "cda0b315ea88f93b1e7b6aa9f48d3b568a5506af1f8f401f5d05fa2ce8c7008f",
-  "selinux-autorelabel": "817911a36413e8cb13fd5107ed94314d3f49962befd00acd9e86038acfa31e73",
-  "selinux-autorelabel-generator.sh": "ec37c4ed3d2168d367d2bb07c44ea16df052e123908e83010d84aaa1bda1cede",
-  "selinux-autorelabel-mark.service": "c7707e97067ae344b99a9b59845a4c7335c9ff4e470723bf2a213a6757877707",
-  "selinux-autorelabel.service": "106ff381e311119d389fd6f9421330a408d3406fab0b990690c73739b02377ac",
-  "selinux-autorelabel.target": "c340133060c163caf9e22f0624306bd528768e89b3d5faf7285f23d2bada9485"
- }
+  "Signatures": {
+    "selinux-autorelabel": "817911a36413e8cb13fd5107ed94314d3f49962befd00acd9e86038acfa31e73",
+    "selinux-autorelabel-generator.sh": "ec37c4ed3d2168d367d2bb07c44ea16df052e123908e83010d84aaa1bda1cede",
+    "selinux-autorelabel-mark.service": "c7707e97067ae344b99a9b59845a4c7335c9ff4e470723bf2a213a6757877707",
+    "selinux-autorelabel.service": "106ff381e311119d389fd6f9421330a408d3406fab0b990690c73739b02377ac",
+    "selinux-autorelabel.target": "c340133060c163caf9e22f0624306bd528768e89b3d5faf7285f23d2bada9485",
+    "selinux-3.6.tar.gz": "97a5f11a3b05e0a2f26166168b1d7cbab83d0841d4189c88a0c8864f2eafae2e"
+  }
 }

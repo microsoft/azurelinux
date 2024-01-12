@@ -8,7 +8,7 @@
 %global _python_bytecompile_extra 0
 Summary:        SELinux policy core utilities
 Name:           policycoreutils
-Version:        3.2
+Version:        3.6
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -351,6 +351,9 @@ The policycoreutils-restorecond package contains the restorecond service.
 %systemd_postun_with_restart restorecond.service
 
 %changelog
+* Fri Jan 12 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.6-1
+- Auto-upgrade to 3.6 - Mariner 3.0 upgrade
+
 * Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 3.2-1
 - Upgrade to latest upstream version
 - Switch source to use upstream's combined tarball

@@ -21144,8 +21144,8 @@
         "type": "other",
         "other": {
           "name": "policycoreutils",
-          "version": "3.2",
-          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/3.2/selinux-3.2.tar.gz"
+          "version": "3.6",
+          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/3.6/selinux-3.6.tar.gz"
         }
       }
     },
