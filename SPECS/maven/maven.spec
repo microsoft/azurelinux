@@ -13,7 +13,7 @@
 Summary:        Apache Maven
 Name:           maven
 Version:        3.9.4
-Release:        3%{?dist}
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -156,7 +156,7 @@ echo JAVA_HOME=%{_lib}/jvm/msopenjdk-11 >%{buildroot}%{_sysconfdir}/java/maven.c
 %config /etc/java/maven.conf-openjdk11
 
 %changelog
-* Fri Jan 12 2024 Riken Maharjan <rmaharjan@microsoft.com>
+* Fri Jan 12 2024 Riken Maharjan <rmaharjan@microsoft.com> - 3.9.4-1
 - Upgrade to 3.9.4
 
 * Tue Apr 04 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.8.7-2
