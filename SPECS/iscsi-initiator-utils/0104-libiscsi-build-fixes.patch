@@ -52,7 +52,7 @@ index 7f5d371..9f7b034 100644
  CFLAGS += -DISCSI_VERSION_STR=\"$(ISCSI_VERSION_STR)\"
  
 -LDFLAGS = -L../libopeniscsiusr -lopeniscsiusr -lkmod -lcrypto
-+CFLAGS += -L../libopeniscsiusr
++CFLAGS += -L../$(RPM_ARCH)-$(TARGET_OS)-$(RPM_OS)
 +LDLIBS += -lopeniscsiusr -lkmod -lcrypto
  
  LIB = libiscsi.so.0
