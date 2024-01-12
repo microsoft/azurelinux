@@ -52,9 +52,15 @@ make DESTDIR=%{buildroot} install
 make test
 
 %pre
-if [ $1 -eq 1 ] ; then
-    getent group  mysql  >/dev/null || groupadd -r mysql
-    getent passwd mysql  >/dev/null || useradd  -c "mysql" -s /bin/false -g mysql -M -r mysql
+getent group  mysql  >/dev/null || groupadd -r mysql
+getent passwd mysql  >/dev/null || useradd  -c "mysql" -s /bin/false -g mysql -M -r mysql
+
+%postun
+if getent passwd mysql >/dev/null; then
+   userdel mysql
+fi
+if getent group mysql >/dev/null; then
+    groupdel mysql
 fi
 
 %files
