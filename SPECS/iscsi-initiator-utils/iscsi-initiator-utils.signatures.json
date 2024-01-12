@@ -2,6 +2,6 @@
  "Signatures": {
   "04-iscsi": "7973dbc4f86506289fcf64255475598a9c6e153465c73633589961d96d2621af",
   "iscsi-tmpfiles.conf": "fd7766bfba489e4de4cc57713014c2a92c06164b49b135b97c8da679832e7146",
-  "open-iscsi-2.1.9.tar.gz": "60e2a1e3058a8af7f702e86a5a0511b05b8754d29d3d2df4e0e301399b5cf70a"
+  "open-iscsi-test-2.1.9.tar.gz": "fd93e4e1a36236f7ec8b54859b386f3be940e899988a257ec87663b187c6ba63"
  }
 }

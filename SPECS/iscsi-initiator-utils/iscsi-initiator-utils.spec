@@ -1,3 +1,5 @@
+%global commit0			c26218d9f8afdca44a492a4c3811648bd2880b26
+
 # Disable python2 build by default
 %bcond python2 0
 %bcond python3 1
@@ -10,7 +12,7 @@ License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.open-iscsi.com/
-Source0:        https://github.com/open-iscsi/open-iscsi/archive/%{version}.tar.gz#/open-iscsi-%{version}.tar.gz
+Source0:        https://github.com/open-iscsi/open-iscsi/archive/%{commit0}.tar.gz#/open-iscsi-test-%{version}.tar.gz
 Source4:        04-iscsi
 Source5:        iscsi-tmpfiles.conf
 
@@ -110,7 +112,7 @@ libiscsi interface for interacting with %{name}
 # ended with python3
  
 %prep
-%autosetup -p1 -n open-iscsi-%{version} -Sgit_am
+%autosetup -p1 -n open-iscsi-%{commit0} -Sgit_am
  
 %build
 # avoid undefined references linking failures
