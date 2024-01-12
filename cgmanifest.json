@@ -25364,8 +25364,8 @@
         "type": "other",
         "other": {
           "name": "rest",
-          "version": "0.9.1",
-          "downloadUrl": "https://download.gnome.org/sources/rest/0.9/rest-0.9.1.tar.xz"
+          "version": "0.9.0",
+          "downloadUrl": "https://download.gnome.org/sources/rest/0.9/rest-0.9.0.tar.xz"
         }
       }
     },
