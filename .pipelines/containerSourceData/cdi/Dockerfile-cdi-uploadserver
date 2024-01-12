@@ -1,6 +1,6 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
-#
+
 ARG BASE_IMAGE
 
 FROM $BASE_IMAGE
