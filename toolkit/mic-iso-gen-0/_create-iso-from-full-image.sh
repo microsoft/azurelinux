@@ -200,7 +200,7 @@ function copy_rootfs_from_dir() {
         ;;
     esac
     safetyFactor=2
-    contentSizeInM=$(( unitCount * toMBFactor * 2 ))
+    contentSizeInM=$(( unitCount * toMBFactor * safetyFactor ))
     # wasteFactor=1.5
     # imageSizeInK=$(( contentSizeInK * wasteFactor ))
     mkdir -p $(dirname $rootfsImageFile)
@@ -305,14 +305,14 @@ function build_inird() {
     sudo mount $loopDev $tmpMount
 
     stage_initrd_build_file $initrdArtifactsDir/20-live-cd.conf     $tmpMount/etc/dracut.conf.d/20-live-cd.conf
+    # get kernel version
+    # run dracut with kernel version
     stage_initrd_build_file $initrdArtifactsDir/build-initrd-img.sh $tmpMount/build-initrd-img.sh
 
     # patch dmsquash-live-root to supress user prompt during boot when the overlay is temporary.
     sudo chmod +w $tmpMount/usr/lib/dracut/modules.d/90dmsquash-live/dmsquash-live-root.sh
     sudo patch -p1 -i $initrdArtifactsDir/no_user_prompt.patch $tmpMount/usr/lib/dracut/modules.d/90dmsquash-live/dmsquash-live-root.sh
     sudo chmod 755 $tmpMount/usr/lib/dracut/modules.d/90dmsquash-live/dmsquash-live-root.sh
-
-    cp $tmpMount/usr/lib/dracut/modules.d/90dmsquash-live/dmsquash-live-root.sh ~/temp/blah.sh
 
     sudo chroot $tmpMount /bin/bash -c "sudo /build-initrd-img.sh"
 
