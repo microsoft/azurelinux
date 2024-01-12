@@ -12711,8 +12711,8 @@
         "type": "other",
         "other": {
           "name": "maven",
-          "version": "3.8.7",
-          "downloadUrl": "https://archive.apache.org/dist/maven/maven-3/3.8.7/source/apache-maven-3.8.7-src.tar.gz"
+          "version": "3.9.4",
+          "downloadUrl": "https://archive.apache.org/dist/maven/maven-3/3.9.4/source/apache-maven-3.9.4-src.tar.gz"
         }
       }
     },
