@@ -548,10 +548,10 @@ sed-lang-4.8-3.cm2.aarch64.rpm
 slang-2.3.2-4.cm2.aarch64.rpm
 slang-debuginfo-2.3.2-4.cm2.aarch64.rpm
 slang-devel-2.3.2-4.cm2.aarch64.rpm
-sqlite-3.39.2-2.cm2.aarch64.rpm
-sqlite-debuginfo-3.39.2-2.cm2.aarch64.rpm
-sqlite-devel-3.39.2-2.cm2.aarch64.rpm
-sqlite-libs-3.39.2-2.cm2.aarch64.rpm
+sqlite-3.39.2-3.cm2.aarch64.rpm
+sqlite-debuginfo-3.39.2-3.cm2.aarch64.rpm
+sqlite-devel-3.39.2-3.cm2.aarch64.rpm
+sqlite-libs-3.39.2-3.cm2.aarch64.rpm
 swig-4.0.2-3.cm2.aarch64.rpm
 swig-debuginfo-4.0.2-3.cm2.aarch64.rpm
 systemd-bootstrap-250.3-12.cm2.aarch64.rpm
