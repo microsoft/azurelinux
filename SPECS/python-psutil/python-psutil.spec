@@ -9,7 +9,6 @@ Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/psutil
 Source0:        https://github.com/giampaolo/psutil/archive/release-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # A small number of tests do not reliably run in Mariner chroots- we can skip these tests
-Patch0:         disable-tests-python-psutil.patch
 BuildRequires:  gcc
 BuildRequires:  python3-devel
 %if %{with_check}
