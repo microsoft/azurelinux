@@ -58,6 +58,7 @@ LANG=en_US.UTF-8 PYTHONPATH=%{buildroot}%{python3_sitelib} make test PYTHON=pyth
 %changelog
 * Fri Jan 12 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 5.9.7-1
 - Upgrade to latest upstream version (v5.9.7)
+- Remove the disable-tests-python-psutil.patch
 
 * Tue Jan 25 2022 Thomas Crain <thcrain@microsoft.com> - 5.9.0-1
 - Upgrade to latest upstream version
