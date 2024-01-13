@@ -94,7 +94,7 @@ LANG=en_US.UTF-8 PYTHONPATH=%{buildroot}%{python3_sitelib} make test PYTHON=pyth
 * Wed Sep 12 2018 Tapas Kundu <tkundu@vmware.com> - 5.4.7-1
 - Updated to version 5.4.7
 
-* Fri Aug 10 2017 Xiaolin Li <xiaolinl@vmware.com> - 5.2.2-2
+* Thu Aug 10 2017 Xiaolin Li <xiaolinl@vmware.com> - 5.2.2-2
 - Fixed make check error.
 
 * Wed Apr 26 2017 Xialin Li <xiaolinl@vmware.com> - 5.2.2-1
