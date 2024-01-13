@@ -11,7 +11,7 @@ diff --git a/collector/textfile.go b/collector/textfile.go
 index 469235dc..12353ffd 100644
 --- a/collector/textfile.go
 +++ b/collector/textfile.go
-@@ -34,7 +34,7 @@ import (
+@@ -33,7 +33,7 @@ import (
  )
  
  var (

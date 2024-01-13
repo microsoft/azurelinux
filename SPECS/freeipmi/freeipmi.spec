@@ -4,8 +4,8 @@ Distribution:   Mariner
 # Copyright (c) 2003 FreeIPMI Core Team
 
 Name:             freeipmi
-Version:          1.6.6
-Release:          3%{?dist}
+Version:          1.6.11
+Release:          1%{?dist}
 Summary:          IPMI remote console and system management software
 License:          GPLv3+
 URL:              http://www.gnu.org/software/freeipmi/
@@ -345,6 +345,9 @@ rm -frv %{buildroot}%{_initrddir} %{buildroot}%{_sysconfdir}/init.d
 %dir %{_localstatedir}/cache/ipmiseld
 
 %changelog
+* Thu Jan 11 2024 Xiaohong Deng <xiaohongdeng@microsoft.com> 1.6.11-1
+- Upgrade for Mariner 3.0
+
 * Thu Jul 28 2022 Henry Li <lihl@microsoft.com> - 1.6.6-3
 - Fix spec formatting
 - License Verified
