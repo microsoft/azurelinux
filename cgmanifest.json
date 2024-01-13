@@ -25485,8 +25485,8 @@
         "type": "other",
         "other": {
           "name": "rt-tests",
-          "version": "1.8",
-          "downloadUrl": "https://www.kernel.org/pub/linux/utils/rt-tests/older/rt-tests-1.8.tar.xz"
+          "version": "2.6",
+          "downloadUrl": "https://mirrors.edge.kernel.org/pub/linux/utils/rt-tests/rt-tests-2.6.tar.xz"
         }
       }
     },
