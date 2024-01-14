@@ -150,11 +150,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %exclude /module_info.ld
 
 %changelog
-* Wed Jan 10 2023 Gary Swalling <gaswal@microsoft.com> - 5.15.145.1-1
+* Sat Jan 13 2024 Gary Swalling <gaswal@microsoft.com> - 5.15.145.1-1
 - Update to 5.15.145.1
-
-* Wed Dec 20 2023 Gary Swalling <gaswal@microsoft.com> - 5.15.143.1-1
-- Update to 5.15.143.1
 
 * Mon Dec 11 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.139.1-1
 - Update to 5.15.139.1

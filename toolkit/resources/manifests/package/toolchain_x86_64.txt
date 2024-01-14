@@ -136,7 +136,7 @@ intltool-0.51.0-7.cm2.noarch.rpm
 itstool-2.0.6-4.cm2.noarch.rpm
 kbd-2.2.0-1.cm2.x86_64.rpm
 kbd-debuginfo-2.2.0-1.cm2.x86_64.rpm
-kernel-headers-5.15.145.1-1.cm2.noarch.rpm
+kernel-headers-5.15.139.1-1.cm2.noarch.rpm
 kmod-29-2.cm2.x86_64.rpm
 kmod-debuginfo-29-2.cm2.x86_64.rpm
 kmod-devel-29-2.cm2.x86_64.rpm
@@ -548,10 +548,10 @@ sed-lang-4.8-3.cm2.x86_64.rpm
 slang-2.3.2-4.cm2.x86_64.rpm
 slang-debuginfo-2.3.2-4.cm2.x86_64.rpm
 slang-devel-2.3.2-4.cm2.x86_64.rpm
-sqlite-3.39.2-2.cm2.x86_64.rpm
-sqlite-debuginfo-3.39.2-2.cm2.x86_64.rpm
-sqlite-devel-3.39.2-2.cm2.x86_64.rpm
-sqlite-libs-3.39.2-2.cm2.x86_64.rpm
+sqlite-3.39.2-3.cm2.x86_64.rpm
+sqlite-debuginfo-3.39.2-3.cm2.x86_64.rpm
+sqlite-devel-3.39.2-3.cm2.x86_64.rpm
+sqlite-libs-3.39.2-3.cm2.x86_64.rpm
 swig-4.0.2-3.cm2.x86_64.rpm
 swig-debuginfo-4.0.2-3.cm2.x86_64.rpm
 systemd-bootstrap-250.3-12.cm2.x86_64.rpm
