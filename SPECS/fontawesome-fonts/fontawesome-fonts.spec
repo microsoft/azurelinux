@@ -51,8 +51,8 @@ ttembed webfonts/*.ttf otfs/*.otf
 
 %install
 install -m 0755 -d %{buildroot}%{_fontdir}
-install -m 0644 -p webfonts/*.{ttf,otf,woff,svg,woff2,eot} %{buildroot}%{_fontdir}
-install -m 0644 -p otfs/*.{ttf,otf,woff,svg,woff2,eot} %{buildroot}%{_fontdir}
+install -m 0644 -p webfonts/*.{ttf,woff2} %{buildroot}%{_fontdir}
+install -m 0644 -p otfs/*.otf %{buildroot}%{_fontdir}
 
 install -m 0755 -d %{buildroot}%{_fontconfig_templatedir} \
 		%{buildroot}%{_fontconfig_confdir}
@@ -69,7 +69,7 @@ cp -a css js less metadata scss sprites svgs webfonts \
     %{buildroot}%{_datadir}/fontawesome
 
 # files:
-%_font_pkg -f %{fontconf} *.ttf *.otf
+%_font_pkg -f %{fontconf} *.ttf *.otf *.woff2
 
 %doc README-Trademarks.txt
 
