@@ -2177,8 +2177,8 @@
         "type": "other",
         "other": {
           "name": "cracklib",
-          "version": "2.9.7",
-          "downloadUrl": "https://github.com/cracklib/cracklib/releases/download/v2.9.7/cracklib-2.9.7.tar.gz"
+          "version": "2.9.11",
+          "downloadUrl": "https://github.com/cracklib/cracklib/releases/download/v2.9.11/cracklib-2.9.11.tar.gz"
         }
       }
     },
