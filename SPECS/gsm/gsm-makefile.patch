@@ -16,7 +16,7 @@ index 2ad5e5d..a1aa787 100644
  
 +SO_MAJOR = 1
 +SO_MINOR = 0
-+SO_PATCH = 19
++SO_PATCH = 22
 +SO_VER = $(SO_MAJOR).$(SO_MINOR).$(SO_PATCH)
  
  # If your compiler needs additional flags/libraries, regardless of
