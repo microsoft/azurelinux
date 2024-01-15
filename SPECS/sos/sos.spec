@@ -1,25 +1,27 @@
 %{!?python3_sitelib: %global python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 Summary:        A set of tools to gather troubleshooting information from a system
 Name:           sos
-Version:        4.6.0
+Version:        4.6.1
 Release:        1%{?dist}
-License:        GPLv2+
+License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/sosreport/sos
 #Source0:       https://github.com/sosreport/sos/archive/%%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
-BuildRequires:  gettext
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
+# For the _tmpfilesdir macro.
+BuildRequires:  systemd
 Requires:       bzip2
 Requires:       python3
 Requires:       python3-libxml2
-Requires:       python3-magic
 Requires:       python3-pexpect
 Requires:       python3-rpm
-Requires:       tar
-Requires:       xz
+Requires:       python3-setuptools
+Recommends:     python3-magic
+# Mandatory just for uploading to a SFTP server:
+Recommends: python3-requests
 BuildArch:      noarch
 
 %description
@@ -46,13 +48,17 @@ install -d -m 700 %{buildroot}%{_sysconfdir}/%{name}/cleaner
 install -d -m 755 %{buildroot}%{_sysconfdir}/%{name}/presets.d
 install -d -m 755 %{buildroot}%{_sysconfdir}/%{name}/groups.d
 install -d -m 755 %{buildroot}%{_sysconfdir}/%{name}/extras.d
+install -d -m 755 %{buildroot}%{_tmpfilesdir}
 install -m 644 %{name}.conf %{buildroot}%{_sysconfdir}/%{name}/%{name}.conf
+install -m 644 tmpfiles/tmpfilesd-sos-rh.conf %{buildroot}%{_tmpfilesdir}/%{name}.conf
 
 rm -rf %{buildroot}%{_prefix}/config/
 
 %find_lang %{name} || echo 0
 
-%files -f %{name}.lang
+# internationalization is currently broken. Uncomment this line once fixed.
+# %%files -f %%{name}.lang
+%files
 %license LICENSE
 %doc AUTHORS README.md
 %{_sbindir}/sos
@@ -62,6 +68,7 @@ rm -rf %{buildroot}%{_prefix}/config/
 %dir %{_sysconfdir}/sos/presets.d
 %dir %{_sysconfdir}/sos/extras.d
 %dir %{_sysconfdir}/sos/groups.d
+%{_tmpfilesdir}/%{name}.conf
 %{python3_sitelib}/*
 %{_mandir}/man1/*
 %{_mandir}/man5/*
@@ -69,8 +76,9 @@ rm -rf %{buildroot}%{_prefix}/config/
 %config(noreplace) %{_sysconfdir}/sos/sos.conf
 
 %changelog
-* Tue Jan 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.6.0-1
-- Auto-upgrade to 4.6.0 - Azure Linux 3.0 Upgrades
+* Tue Jan 15 2024 Aadhar Agarwal <aadagarwal@microsoft.com> - 4.6.1-1
+- Upgrade to 4.6.1
+- Migrated to SPDX license
 
 * Mon Apr 03 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 4.4-2
 - Fixing missing runtime dep of python3-magic
