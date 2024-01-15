@@ -44,7 +44,7 @@
 Summary:        Kata Containers version 2.x repository
 Name:           kata-containers
 Version:        3.1.0
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 URL:            https://github.com/%{name}/%{name}
@@ -61,6 +61,7 @@ Patch5:         runtime-reduce-uvm-high-mem-footprint.patch
 Patch6:         drop-mut-for-variables-that-are-not-mutated.patch
 Patch7:         0001-osbuilder-Add-support-for-CBL-Mariner.patch
 Patch8:         0001-Append-systemd-kernel-cmdline-params-for-initrd.patch
+Patch9:    CVE-2023-50711.patch
 
 BuildRequires:  golang
 BuildRequires:  git-core
@@ -229,6 +230,9 @@ ln -sf %{_bindir}/kata-runtime %{buildroot}%{_prefix}/local/bin/kata-runtime
 %exclude %{kataosbuilderdir}/rootfs-builder/ubuntu
 
 %changelog
+* Mon Jan 15 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.1.0-11
+- Add patch for CVE-2023-50711
+
 * Tue Dec 05 2023 Archana Choudhary <archana1@microsoft.com> - 3.1.0-10
 - Drop qemu-kvm-core dependency
 - Define explicit dependency on qemu-virtiofsd
