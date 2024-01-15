@@ -27527,8 +27527,8 @@
         "type": "other",
         "other": {
           "name": "sos",
-          "version": "4.6.0",
-          "downloadUrl": "https://github.com/sosreport/sos/archive/refs/tags/4.6.0.tar.gz"
+          "version": "4.6.1",
+          "downloadUrl": "https://github.com/sosreport/sos/archive/4.6.1.tar.gz"
         }
       }
     },
