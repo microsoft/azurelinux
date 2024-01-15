@@ -28297,8 +28297,8 @@
         "type": "other",
         "other": {
           "name": "tboot",
-          "version": "1.10.2",
-          "downloadUrl": "http://downloads.sourceforge.net/tboot/tboot-1.10.2.tar.gz"
+          "version": "1.11.2",
+          "downloadUrl": "http://downloads.sourceforge.net/tboot/tboot-1.11.2.tar.gz"
         }
       }
     },
