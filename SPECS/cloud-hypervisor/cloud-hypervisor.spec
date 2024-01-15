@@ -5,7 +5,7 @@
 Summary:        Cloud Hypervisor is an open source Virtual Machine Monitor (VMM) that runs on top of KVM.
 Name:           cloud-hypervisor
 Version:        32.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0 OR BSD-3-clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,7 +19,8 @@ Source0:        https://github.com/cloud-hypervisor/cloud-hypervisor/archive/ref
 #   cd %{name}-%{version}
 #   cargo vendor > config.toml
 #   tar -czf %{name}-%{version}-cargo.tar.gz vendor/
-Source1:        %{name}-%{version}-cargo.tar.gz
+# rename the tarball to %{name}-%{version}-cargo.tar.gz when updating version
+Source1:        %{name}-%{version}-cargo-v1.tar.gz
 Source2:        config.toml
 Patch0:         CVE-2023-45853.patch
 %endif
@@ -155,6 +156,9 @@ cargo build --release --target=%{rust_musl_target} --package vhost_user_block %{
 %license LICENSE-BSD-3-Clause
 
 %changelog
+* Mon Jan 15 2024 Sindhu Karri <lakarri@microsoft.com> - 32.0-3
+- Bump version of vmm-sys-util in packages built with serde in vendor to 0.12.1 to fix CVE-2023-50711. Update and rename vendor cargo tarball
+
 * Mon Oct 23 2023 Rohit Rawat <rohitrawat@microsoft.com> - 32.0-2
 - Patch CVE-2023-45853 in vendor/libz-sys/src/zlib
 
