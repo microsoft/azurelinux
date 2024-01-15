@@ -1,6 +1,6 @@
 Name:          libdwarf
 Version:       0.9.0
-Release:       1%{?dist}
+Release:       2%{?dist}
 Summary:       Library to access the DWARF Debugging file format 
 
 License:       LGPL-2.1-only AND BSD-2-Clause-FreeBSD
@@ -8,6 +8,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:           https://www.prevanders.net/dwarf.html
 Source0:       https://www.prevanders.net/%{name}-%{version}.tar.xz
+Patch0:    CVE-2020-28163.patch
+Patch0:    CVE-2020-27545.patch
 Patch0:        libdwarf_skip_test.patch
 
 BuildRequires: gcc make python3
@@ -89,6 +91,9 @@ TZ=:America/Los_Angeles %__make check
 
 
 %changelog
+* Mon Jan 15 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.9.0-2
+- Add patch for CVE-2020-27545, CVE-2020-28163
+
 * Tue Jan 02 2024 Sindhu Karri <lakarri@microsoft.com> - 0.9.0-1
 - Upgraded to 0.9.0
 - License verified
