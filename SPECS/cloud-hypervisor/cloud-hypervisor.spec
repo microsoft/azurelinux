@@ -20,10 +20,14 @@ Source0:        https://github.com/cloud-hypervisor/cloud-hypervisor/archive/ref
 #   cargo vendor > config.toml
 #   tar -czf %{name}-%{version}-cargo.tar.gz vendor/
 # rename the tarball to %{name}-%{version}-cargo.tar.gz when updating version
-Source1:        %{name}-%{version}-cargo-v1.tar.gz
+Source1:        %{name}-%{version}-cargo.tar.gz
 Source2:        config.toml
 Patch0:         CVE-2023-45853.patch
-Patch1:         CVE-2023-50711.patch
+Patch1:         CVE-2023-50711-vmm-sys-util-fix1.patch 
+Patch2:         CVE-2023-50711-vmm-sys-util-fix2.patch
+Patch3:         CVE-2023-50711-vmm-sys-util-cargo-fix3.patch
+Patch4:         CVE-2023-50711-vhost.patch
+Patch5:         CVE-2023-50711-versionize.patch
 %endif
 
 BuildRequires:  binutils
@@ -73,11 +77,17 @@ Cloud Hypervisor is an open source Virtual Machine Monitor (VMM) that runs on to
 
 %setup -q -n %{name}-%{version}
 %if 0%{?using_vendored_crates}
-%patch1 -p1
 tar xf %{SOURCE1}
 pushd vendor/libz-sys/src/zlib
 %patch0 -p1
 popd
+pushd vendor/vmm-sys-util
+%patch1 -p1
+%patch2 -p1
+popd
+%patch3 -p1	
+%patch4 -p1
+%patch5 -p1
 mkdir -p .cargo
 cp %{SOURCE2} .cargo/
 %endif
@@ -159,8 +169,7 @@ cargo build --release --target=%{rust_musl_target} --package vhost_user_block %{
 
 %changelog
 * Mon Jan 15 2024 Sindhu Karri <lakarri@microsoft.com> - 32.0-3
-- Bump version of vmm-sys-util in vendor to 0.12.1 to fix CVE-2023-50711. Update and rename vendor cargo tarball
-- Patch CVE-2023-50711 to use updated vmm-sys-util
+- Patch CVE-2023-50711 in vendor/vmm-sys-util, vendor/vhost, vendor/versionize
 
 * Mon Oct 23 2023 Rohit Rawat <rohitrawat@microsoft.com> - 32.0-2
 - Patch CVE-2023-45853 in vendor/libz-sys/src/zlib
