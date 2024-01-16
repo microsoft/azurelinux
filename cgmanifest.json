@@ -11781,8 +11781,8 @@
         "type": "other",
         "other": {
           "name": "libXmu",
-          "version": "1.1.3",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXmu-1.1.3.tar.bz2"
+          "version": "1.1.4",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXmu-1.1.4.tar.gz"
         }
       }
     },
