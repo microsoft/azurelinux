@@ -10,8 +10,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://fontawesome.com
 Source0:        https://github.com/FortAwesome/Font-Awesome/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source2:        README-Trademarks.txt
-Source3:	60-fontawesome-6-free-fonts.conf
+Source1:        README-Trademarks.txt
+Source2:        60-fontawesome-6-free-fonts.conf
 
 BuildArch:      noarch
 
@@ -44,7 +44,7 @@ used on web pages.
 
 %prep
 %setup -q -n Font-Awesome-%{version}
-cp -p %{SOURCE2} .
+cp -p %{SOURCE1} .
 
 %build
 ttembed webfonts/*.ttf otfs/*.otf
@@ -57,7 +57,7 @@ install -m 0644 -p otfs/*.otf %{buildroot}%{_fontdir}
 install -m 0755 -d %{buildroot}%{_fontconfig_templatedir} \
 		%{buildroot}%{_fontconfig_confdir}
 
-install -m 0644 -p %{SOURCE3} \
+install -m 0644 -p %{SOURCE2} \
 		%{buildroot}%{_fontconfig_templatedir}/%{fontconf}
 
 ln -s %{_fontconfig_templatedir}/%{fontconf} \
