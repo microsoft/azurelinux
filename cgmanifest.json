@@ -625,8 +625,8 @@
         "type": "other",
         "other": {
           "name": "at",
-          "version": "3.2.2",
-          "downloadUrl": "https://salsa.debian.org/debian/at/-/archive/release/3.2.2/at-release-3.2.2.tar.gz"
+          "version": "3.2.5",
+          "downloadUrl": "https://salsa.debian.org/debian/at/-/archive/release/3.2.5/at-release-3.2.5.tar.gz"
         }
       }
     },
