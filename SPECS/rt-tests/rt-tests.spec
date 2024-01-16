@@ -14,20 +14,6 @@ Requires:      bc
 Requires:      python3
 BuildRequires: libnuma-devel
 BuildRequires: python3-devel
-Patch1:        cyclictest-Fix-setaffinity-error-on-large-NUMA-machines.patch
-Patch2:        rt-tests-queuelat-Fix-storing-unsigned-long-long-int.patch
-Patch3:        rt-tests-cyclictest-remove-the-debug-log-pid-xxx-in-.patch
-Patch4:        rt-tests-improvements-to-the-python-style-in-get_cyc.patch
-Patch5:        rt-tests-pi_stress.8-Remove-unused-t-n-from-the-manp.patch
-Patch6:        rt-tests-ptsematest.8-Update-the-ptsematest-man-page.patch
-Patch7:        rt-tests-Add-a-man-page-for-get_cyclictest_snapshot.patch
-Patch8:        rt-tests-Tweak-the-cyclictest-man-page.patch
-Patch9:        rt-tests-get_cyclictest_snapshot-Warn-if-no-cyclicte.patch
-Patch10:       rt-tests-Install-new-man-page-get_cyclictest_snapshot.patch
-Patch11:       pi_stress-limit-the-number-of-inversion-groups-to-th.patch
-Patch12:       rt-tests-cyclictest-Move-ftrace-helpers-into-rt-util.patch
-Patch13:       rt-tests-oslat-Init-commit.patch
-Patch14:       rt-tests-oslat-Proper-reformat-of-code.patch
 
 %description
 rt-tests is a set of programs that test and measure various components of
@@ -36,20 +22,6 @@ latency. It also tests the functioning of priority-inheritance mutexes.
 
 %prep
 %setup -q
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%patch8 -p1
-%patch9 -p1
-%patch10 -p1
-%patch11 -p1
-%patch12 -p1
-%patch13 -p1
-%patch14 -p1
 
 %build
 make %{?_smp_mflags} NUMA=1 HAVE_PARSE_CPUSTRING_ALL=1
@@ -80,7 +52,6 @@ make %{?_smp_mflags} DESTDIR=%{buildroot} prefix=%{_prefix} install
 /usr/bin/ssdd
 /usr/bin/oslat
 /usr/bin/determine_maximum_mpps.sh
-/usr/bin/get_cpuinfo_mhz.sh
 /usr/bin/get_cyclictest_snapshot
 %{python3_sitelib}/__pycache__/*
 %{python3_sitelib}/*
@@ -102,6 +73,7 @@ make %{?_smp_mflags} DESTDIR=%{buildroot} prefix=%{_prefix} install
 /usr/share/man/man8/ssdd.8.gz
 /usr/share/man/man8/oslat.8.gz
 /usr/share/man/man8/get_cyclictest_snapshot.8.gz
+/usr/share/man/man8/determine_maximum_mpps.8.gz
 
 %changelog
 * Sat Jan 13 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.6-1
