@@ -9,7 +9,7 @@ License:        OFL AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://fontawesome.com
-Source0:        https://github.com/FortAwesome/Font-Awesome/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/FortAwesome/Font-Awesome/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        README-Trademarks.txt
 Source2:        60-fontawesome-6-free-fonts.conf
 
