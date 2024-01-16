@@ -3699,8 +3699,8 @@
         "type": "other",
         "other": {
           "name": "fontawesome-fonts",
-          "version": "4.7.0",
-          "downloadUrl": "https://github.com/FortAwesome/Font-Awesome/archive/refs/tags/v4.7.0.tar.gz"
+          "version": "6.5.1",
+          "downloadUrl": "https://github.com/FortAwesome/Font-Awesome/archive/refs/tags/6.5.1.tar.gz"
         }
       }
     },
