@@ -3700,7 +3700,7 @@
         "other": {
           "name": "fontawesome-fonts",
           "version": "6.5.1",
-          "downloadUrl": "https://github.com/fortawesome/font-awesome/archive/refs/tags/6.5.1.tar.gz"
+          "downloadUrl": "https://github.com/Fortawesome/Font-Awesome/archive/refs/tags/6.5.1.tar.gz"
         }
       }
     },
