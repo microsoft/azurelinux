@@ -17,8 +17,12 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 )
 
-func enableVerityPartition(imageChroot *safechroot.Chroot) error {
+func enableVerityPartition(verity *imagecustomizerapi.Verity, imageChroot *safechroot.Chroot) error {
 	var err error
+
+	if verity == nil {
+		return nil
+	}
 
 	// Integrate systemd veritysetup dracut module into initramfs img.
 	systemdVerityDracutModule := "systemd-veritysetup"
