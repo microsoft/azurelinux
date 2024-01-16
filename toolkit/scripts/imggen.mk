@@ -83,6 +83,8 @@ fetch-external-image-packages: $(image_external_package_cache_summary)
 ##help:target:validate-image-config=Validate the selected image config.
 # Validate the selected config file if any changes occur in the image config base directory.
 # Changes to files located outside the base directory will not be detected.
+$(info $(STATUS_FLAGS_DIR)/validate-image-config%.flag: $(go-imageconfigvalidator) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(config_other_files))
+
 validate-image-config: $(validate-config)
 $(STATUS_FLAGS_DIR)/validate-image-config%.flag: $(go-imageconfigvalidator) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(config_other_files)
 	$(if $(CONFIG_FILE),,$(error Must set CONFIG_FILE=))

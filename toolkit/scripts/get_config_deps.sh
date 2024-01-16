@@ -20,7 +20,11 @@ fi
 
 config_base_dir=$(dirname "$config_file")
 
-config_other_files=$(grep -E '.json|.sh' $config_file| sed 's/\"Path\"\://' | tr ", \n" " " | tr "\"" " " | xargs)
+pkg_lists=$(jq -r '.SystemConfigs[]?.PackageLists[]?' $config_file)
+postinstall_scripts=$(jq -r '.SystemConfigs[]?.PostInstallScripts[]?.Path' $config_file)
+preinstall_scripts=$(jq -r '.SystemConfigs[]?.PreInstallScripts[]?.Path' $config_file)
+finalizeimg_scripts=$(jq -r '.SystemConfigs[]?.FinalizeImageScripts[]?.Path' $config_file)
+config_other_files="$pkg_lists $postinstall_scripts $preinstall_scripts $finalizeimg_scripts"
 for filename in $config_other_files
 do
     # fix path if it's relative to config_file
