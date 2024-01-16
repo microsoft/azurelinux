@@ -99,7 +99,7 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
-	err = enableVerityPartition(imageChroot)
+	err = enableVerityPartition(config.SystemConfig.Verity, imageChroot)
 	if err != nil {
 		return err
 	}
