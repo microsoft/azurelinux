@@ -1,6 +1,6 @@
 Name:           scons
-Version:        3.0.1
-Release:        6%{?dist}
+Version:        4.6.0
+Release:        1%{?dist}
 Summary:        An Open Source software construction tool
 Group:          Development/Tools
 License:        MIT
@@ -36,6 +36,9 @@ In short, SCons is an easier, more reliable and faster way to build software.
 %{_datadir}/*
 
 %changelog
+* Tue Jan 16 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.6.0-1
+- Auto-upgrade to 4.6.0 - none
+
 * Thu Feb 17 2022 Thomas Crain <thcrain@microsoft.com> - 3.0.1-6
 - Build with python3 instead of python2
 
