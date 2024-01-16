@@ -1,8 +1,10 @@
 %global commit0			c26218d9f8afdca44a492a4c3811648bd2880b26
 
 # Disable python2 build by default
-%bcond python2 0
-%bcond python3 1
+# %bcond python2 0
+%bcond_with python2
+# %bcond python3 1
+%bcond_without python3
 
 Summary:        iSCSI daemon and utility programs
 Name:           iscsi-initiator-utils
