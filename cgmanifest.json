@@ -4890,8 +4890,8 @@
         "type": "other",
         "other": {
           "name": "gsm",
-          "version": "1.0.19",
-          "downloadUrl": "http://www.quut.com/gsm/gsm-1.0.19.tar.gz"
+          "version": "1.0.22",
+          "downloadUrl": "https://www.quut.com/gsm/gsm-1.0.22.tar.gz"
         }
       }
     },

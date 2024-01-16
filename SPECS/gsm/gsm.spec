@@ -1,16 +1,16 @@
 %global ver_major 1
 %global ver_minor 0
-%global ver_patch 19
+%global ver_patch 22
 
 Summary:        Shared libraries for GSM speech compressor
 Name:           gsm
 Version:        %{ver_major}.%{ver_minor}.%{ver_patch}
-Release:        4%{?dist}
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            http://www.quut.com/gsm/
-Source0:        http://www.quut.com/gsm/%{name}-%{version}.tar.gz
+URL:            https://www.quut.com/gsm/
+Source0:        https://www.quut.com/gsm/%{name}-%{version}.tar.gz
 
 Patch0:         %{name}-makefile.patch
 Patch1:         %{name}-warnings.patch
@@ -107,6 +107,10 @@ make addtst
 %{_libdir}/libgsm.so
 
 %changelog
+* Mon Jan 08 2024 Muhammad Falak <mwani@microsoft.com> 1.0.22-1
+- Upgrade version to 1.0.22
+- Switch to https URL instead of http
+
 * Tue Jan 19 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.19-4
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - License verified.
