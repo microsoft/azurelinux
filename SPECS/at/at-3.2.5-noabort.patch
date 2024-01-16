@@ -1,7 +1,7 @@
-diff -up at-3.1.18/atd.c.noabort at-3.1.18/atd.c
---- at-3.1.18/atd.c.noabort	2016-03-23 12:49:15.147520116 +0100
-+++ at-3.1.18/atd.c	2016-03-23 12:49:15.148520138 +0100
-@@ -349,9 +349,12 @@ run_file(const char *filename, uid_t uid
+diff -ur b/atd.c a/atd.c
+--- b/atd.c	2022-02-22 16:09:15.683717386 +0100
++++ a/atd.c	2022-02-22 16:12:48.992989327 +0100
+@@ -344,9 +344,12 @@
       */
  
      pid = fork();
@@ -17,7 +17,7 @@ diff -up at-3.1.18/atd.c.noabort at-3.1.18/atd.c
      else if (pid != 0) {
  	free(mailname);
  	free(newname);
-@@ -669,15 +672,19 @@ run_loop()
+@@ -659,16 +662,20 @@
       * up.
       */
  
@@ -28,10 +28,11 @@ diff -up at-3.1.18/atd.c.noabort at-3.1.18/atd.c
 +        return next_job;
 +    }
  
-     if (nothing_to_do && buf.st_mtime <= last_chg)
+     if (nothing_to_do && buf.st_mtime == last_chg)
  	return next_job;
      last_chg = buf.st_mtime;
  
+     hupped = 0;
 -    if ((spool = opendir(".")) == NULL)
 -	perr("Cannot read " ATJOB_DIR);
 +    if ((spool = opendir(".")) == NULL) {

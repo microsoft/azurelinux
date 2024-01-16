@@ -1,13 +1,13 @@
 Summary:        GNU Ubiquitous Intelligent Language for Extensions
 Name:           guile
-Version:        2.0.14
-Release:        5%{?dist}
+Version:        3.0.9
+Release:        1%{?dist}
 License:        LGPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://www.gnu.org/software/guile/
-Source0:        ftp://ftp.gnu.org/pub/gnu/guile/%{name}-%{version}.tar.gz
+Source0:        https://ftp.gnu.org/gnu/guile/%{name}-%{version}.tar.gz
 BuildRequires:  gc-devel
 BuildRequires:  libffi-devel
 BuildRequires:  libltdl-devel
@@ -72,12 +72,15 @@ make  %{?_smp_mflags} check
 
 %files devel
 %defattr(-,root,root)
-%{_includedir}/guile/2.0/*.h
-%{_includedir}/guile/2.0/libguile/*.h
+%{_includedir}/guile/3.0/*.h
+%{_includedir}/guile/3.0/libguile/*.h
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Tue Jan 09 2024 Brian Fjeldstad <bfjelds@microsoft.com> 3.0.9-1
+- Update to 3.0.9.
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.0.14-5
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

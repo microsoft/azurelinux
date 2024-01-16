@@ -1,6 +1,6 @@
 Summary:        A library for retrieving information onrunning processes and system utilization
 Name:           python-psutil
-Version:        5.9.0
+Version:        5.9.7
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -9,7 +9,6 @@ Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/psutil
 Source0:        https://github.com/giampaolo/psutil/archive/release-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # A small number of tests do not reliably run in Mariner chroots- we can skip these tests
-Patch0:         disable-tests-python-psutil.patch
 BuildRequires:  gcc
 BuildRequires:  python3-devel
 %if %{with_check}
@@ -56,6 +55,10 @@ LANG=en_US.UTF-8 PYTHONPATH=%{buildroot}%{python3_sitelib} make test PYTHON=pyth
 %{python3_sitelib}/*
 
 %changelog
+* Fri Jan 12 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 5.9.7-1
+- Upgrade to latest upstream version (v5.9.7)
+- Remove the disable-tests-python-psutil.patch
+
 * Tue Jan 25 2022 Thomas Crain <thcrain@microsoft.com> - 5.9.0-1
 - Upgrade to latest upstream version
 - Update skipped tests patch
@@ -91,7 +94,7 @@ LANG=en_US.UTF-8 PYTHONPATH=%{buildroot}%{python3_sitelib} make test PYTHON=pyth
 * Wed Sep 12 2018 Tapas Kundu <tkundu@vmware.com> - 5.4.7-1
 - Updated to version 5.4.7
 
-* Fri Aug 10 2017 Xiaolin Li <xiaolinl@vmware.com> - 5.2.2-2
+* Thu Aug 10 2017 Xiaolin Li <xiaolinl@vmware.com> - 5.2.2-2
 - Fixed make check error.
 
 * Wed Apr 26 2017 Xialin Li <xiaolinl@vmware.com> - 5.2.2-1
