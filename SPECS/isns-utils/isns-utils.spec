@@ -98,6 +98,7 @@ install -p -m 644 %{SOURCE1} %{buildroot}%{_unitdir}/isnsd.service
 %dir %{_includedir}/libisns
 %{_includedir}/libisns/*.h
 %{_libdir}/libisns.so
+%{_libdir}/pkgconfig/libisns.pc
 
 %changelog
 * Tue Jan 16 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 0.102-1
