@@ -11581,8 +11581,8 @@
         "type": "other",
         "other": {
           "name": "libXaw",
-          "version": "1.0.13",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXaw-1.0.13.tar.bz2"
+          "version": "1.0.15",
+          "downloadUrl": "https://www.x.org/archive/individual/lib/libXaw-1.0.15.tar.gz"
         }
       }
     },
