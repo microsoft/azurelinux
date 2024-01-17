@@ -17,7 +17,6 @@ func shrinkFilesystems(imageLoopDevice string, outputImageFile string) error {
 
 	for partitionNum := 0; partitionNum < len(diskPartitions); partitionNum++ {
 		if diskPartitions[partitionNum].Type == "part" {
-			partitionLoopDevice := diskPartitions[partitionNum].Path
 			fstype := diskPartitions[partitionNum].FileSystemType
 
 			if fstype != "ext2" && fstype != "ext3" && fstype != "ext4" {
