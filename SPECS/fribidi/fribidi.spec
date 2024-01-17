@@ -6,7 +6,7 @@ License:        LGPLv2+ AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/fribidi/fribidi/
-Source:         https://github.com/%{name}/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.xz
+Source:         https://github.com/%{name}/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.xzss
 Patch0:         %{name}-drop-bundled-gnulib.patch
 BuildRequires:  gcc
 BuildRequires:  meson
@@ -40,6 +40,8 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %ldconfig_scriptlets
 
+%clean
+
 %files
 %doc README AUTHORS ChangeLog THANKS NEWS TODO
 %license COPYING
@@ -59,9 +61,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 - Update to Version 1.0.10
 
 * Thu Apr 15 2021 Henry Li <lihl@microsoft.com> - 1.0.9-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove distro check that does not apply to CBL-Mariner.
-- License verified.
 
 * Thu Mar 05 2020 Akira TAGOH <tagoh@redhat.com> - 1.0.9-1
 - New upstream release.
@@ -241,7 +241,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 - put devel .so symlink in the right subpackage
 
 * Tue May 23 2006 Caolan McNamara <caolanm@redhat.com> 0.10.7-3
-- rh#192669# clearly I didn't actually get around to basing fribidi-config 
+- rh#192669# clearly I didn't actually get around to basing fribidi-config
   of pkg-config output
 
 * Tue May 02 2006 Caolan McNamara <caolanm@redhat.com> 0.10.7-2
