@@ -2,6 +2,9 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
+# Quit on failure
+set -e
+
 # $1 - config_file
 
 if [[ $# -ne 1 ]]
@@ -31,7 +34,7 @@ do
     # fix path if it's relative to config_file
 	if [ "${filename:0:1}" == "/" ]
 	then
-		echo $(realpath "$filename")
+		echo "$filename"
 	else
 		echo $(realpath "$config_base_dir/$filename")
 	fi
