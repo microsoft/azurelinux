@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "at-release-3.2.2.tar.gz": "176b20253dbec91042d9cdeac4792026086d39d625bf2135ae63227cd3394f03",
+  "at-release-3.2.5.tar.gz": "bd72b2e0666323f4a9d25613880b7a4d5761c8c2fefbf2fac7d5e9564a9d0da4",
   "atd.sysconf": "6d93ffd140d05b26f86f3c24ca0a8ad3e674f5e5dea5b2b31540128eeba3b287",
   "atd.systemd": "da0da49ca99a8e86b7b24ea7b7a61bb852b04e875009162662e98f6714a41c06",
   "pam_atd": "33e3d5ae213ba007258f08cb72554efd2457d6d696803b3eece1dbe9582a5017"
