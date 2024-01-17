@@ -1190,7 +1190,7 @@ MinGW Windows libvirt virtualization library.
 %autosetup -S git_am
 
 %build
-%if 0%{?fedora} >= %{min_fedora} || 0%{?rhel} >= %{min_rhel}
+%if 0%{?fedora} >= %{min_fedora} || 0%{?rhel} >= %{min_rhel} || 0%{?mariner}
     %define supported_platform 1
 %else
     %define supported_platform 0
