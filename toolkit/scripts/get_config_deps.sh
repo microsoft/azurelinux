@@ -24,7 +24,8 @@ pkg_lists=$(jq -r '.SystemConfigs[]?.PackageLists[]?' $config_file)
 postinstall_scripts=$(jq -r '.SystemConfigs[]?.PostInstallScripts[]?.Path' $config_file)
 preinstall_scripts=$(jq -r '.SystemConfigs[]?.PreInstallScripts[]?.Path' $config_file)
 finalizeimg_scripts=$(jq -r '.SystemConfigs[]?.FinalizeImageScripts[]?.Path' $config_file)
-config_other_files="$pkg_lists $postinstall_scripts $preinstall_scripts $finalizeimg_scripts"
+additional_files=$(jq -r '.SystemConfigs[]?.AdditionalFiles?|keys[]' $config_file)
+config_other_files="$pkg_lists $postinstall_scripts $preinstall_scripts $finalizeimg_scripts $additional_files"
 for filename in $config_other_files
 do
     # fix path if it's relative to config_file
