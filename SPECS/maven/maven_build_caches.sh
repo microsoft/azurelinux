@@ -45,7 +45,7 @@ BUILDARCH=$(rpm --eval '%{_arch}')
 SOURCEURL="https://archive.apache.org/dist/maven/maven-3/${VERSION}/source/apache-maven-${VERSION}-src.tar.gz"
 # Maven binary dependency to download from pmc.
 # NOTE: Version IN THIS IS HARDCODED.
-MAVENBINARY="https://packages.microsoft.com/cbl-mariner/2.0/prod/base/x86_64/Packages/m/maven-3.8.7-3.cm2.${BUILDARCH}.rpm"
+MAVENBINARY="https://packages.microsoft.com/cbl-mariner/2.0/prod/base/${BUILDARCH}/Packages/m/maven-3.8.7-3.cm2.${BUILDARCH}.rpm"
 
 maven_m2_cache_tarball_name="apache-maven-${VERSION}-m2.tar.gz"
 maven_licenses_tarball_name="apache-maven-${VERSION}-licenses.tar.gz"
