@@ -60,9 +60,9 @@ python3 tests/testasciidoc.py run
 %{_mandir}/*
 %{python3_sitelib}/asciidoc/
 %{_pkgdocdir}/doc
+%{python3_sitelib}/asciidoc-*.egg-info
 %dir %{python3_sitelib}/asciidoc/resources/filters/latex
-%exclude %{python3_sitelib}/asciidoc/resources/filters/music
-%exclude %{python3_sitelib}/asciidoc-10.2.0-py3.9.egg-info
+%dir %{python3_sitelib}/asciidoc/resources/filters/music
 
 
 %changelog
