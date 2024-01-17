@@ -1336,6 +1336,18 @@
                 "PR": [
                     "https://github.com/microsoft/CBL-Mariner/pull/6829"
                 ]
+            },
+            "CONFIG_DWMAC_LOONGSON": {
+                "value": [
+                    "<missing>"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Needed for update to 5.15.145.2",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/7280"
+                ]
             }
         }
     }
