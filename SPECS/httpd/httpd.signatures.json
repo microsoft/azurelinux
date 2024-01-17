@@ -1,15 +1,15 @@
 {
- "Signatures": {
-  "00-proxyhtml.conf": "a2211995b7e55b781f68666664f0bcd84550ed9a16edee07121f63477dfaaffa",
-  "00-ssl.conf": "88f04c415dbd1bf0d074965d37261e056d073b675a047a02e55222818640c6e8",
-  "01-ldap.conf": "cbbbdd396fe056e8ab167abd7b2cb5145b42210bfea38452968ff02a03493fc8",
-  "01-session.conf": "51df0ceeb7dae9922817f4af0554f83fe01d6268025ee08260aeed69be3953d1",
-  "10-listen443.conf": "fc7484790ec6328b9082e04083137551a5ae2e8f4d4696d9846b052915b6a0cb",
-  "httpd-2.4.58.tar.bz2": "fa16d72a078210a54c47dd5bef2f8b9b8a01d94909a51453956b3ec6442ea4c5",
-  "httpd-init.service": "2501b44bdb02f583d98cc5296accbf0af36957b93ed5b871358aeb10a0512a7c",
-  "httpd-ssl-gencerts": "ae96a94eeb0be8731c0bb976e5b878e0e5a196442a001c9e809bed3873f4755d",
-  "httpd-ssl-pass-dialog": "b9bd4816dda673ad9294a0fbd2904fac9b96eabddb4d72080ae58b498bcd1db9",
-  "macros.httpd": "6dbf9313a5d085cb705fa5ef393372ec940008f08bf1c9350f8f49d58df75dff",
-  "ssl.conf": "6690cb873d2312d0ecffcda3822562cd1b1b11ac44b1fcb7bd1b720a9e53c333"
- }
+  "Signatures": {
+    "00-proxyhtml.conf": "a2211995b7e55b781f68666664f0bcd84550ed9a16edee07121f63477dfaaffa",
+    "00-ssl.conf": "88f04c415dbd1bf0d074965d37261e056d073b675a047a02e55222818640c6e8",
+    "01-ldap.conf": "cbbbdd396fe056e8ab167abd7b2cb5145b42210bfea38452968ff02a03493fc8",
+    "01-session.conf": "51df0ceeb7dae9922817f4af0554f83fe01d6268025ee08260aeed69be3953d1",
+    "10-listen443.conf": "fc7484790ec6328b9082e04083137551a5ae2e8f4d4696d9846b052915b6a0cb",
+    "httpd-init.service": "2501b44bdb02f583d98cc5296accbf0af36957b93ed5b871358aeb10a0512a7c",
+    "httpd-ssl-gencerts": "ae96a94eeb0be8731c0bb976e5b878e0e5a196442a001c9e809bed3873f4755d",
+    "httpd-ssl-pass-dialog": "b9bd4816dda673ad9294a0fbd2904fac9b96eabddb4d72080ae58b498bcd1db9",
+    "macros.httpd": "6dbf9313a5d085cb705fa5ef393372ec940008f08bf1c9350f8f49d58df75dff",
+    "ssl.conf": "6690cb873d2312d0ecffcda3822562cd1b1b11ac44b1fcb7bd1b720a9e53c333",
+    "httpd-2.4.58.tar.bz2": "fa16d72a078210a54c47dd5bef2f8b9b8a01d94909a51453956b3ec6442ea4c5"
+  }
 }

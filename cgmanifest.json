@@ -5351,7 +5351,7 @@
         "other": {
           "name": "httpd",
           "version": "2.4.58",
-          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.58.tar.bz2"
+          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.58.tar.gz"
         }
       }
     },

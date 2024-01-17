@@ -345,6 +345,9 @@ fi
 %{_libexecdir}/httpd-ssl-pass-dialog
 
 %changelog
+* Wed Jan 17 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.58-1
+- Auto-upgrade to 2.4.58 - For 3.0 release
+
 * Fri Oct 20 2023 Muhammad Falak <mwani@microsoft.com> - 2.4.58-1
 - Upgrade version to address CVE-2023-45802, CVE-2023-43622 & CVE-2023-31122
 
