@@ -45,7 +45,7 @@ operating systems, tools sets, protocols and communications patterns widely in u
 %global debug_package %{nil}
 
 %prep
-%setup -qn %{name}
+%autosetup -p1 -n %{name}
 
 %build
 mkdir cmake
