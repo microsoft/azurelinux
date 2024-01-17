@@ -99,7 +99,7 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
-	err = enableVerityPartition(imageChroot)
+	err = enableVerityPartition(config.SystemConfig.Verity, imageChroot)
 	if err != nil {
 		return err
 	}
@@ -297,6 +297,13 @@ func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageC
 	}
 
 	// Set user's SSH keys.
+	for i, _ := range user.SSHPubKeyPaths {
+		// If absolute path is not provided, then append baseConfigPath.
+		if !filepath.IsAbs(user.SSHPubKeyPaths[i]) {
+			user.SSHPubKeyPaths[i] = filepath.Join(baseConfigPath, user.SSHPubKeyPaths[i])
+		}
+	}
+
 	err = installutils.ProvisionUserSSHCerts(imageChroot, user.Name, user.SSHPubKeyPaths)
 	if err != nil {
 		return err
