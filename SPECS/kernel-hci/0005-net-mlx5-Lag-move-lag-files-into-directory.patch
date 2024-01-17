@@ -74,7 +74,7 @@ index 3aa8d0b83d10..8ca1db84ca21 100644
 +#include "lag/mp.h"
  
  #define nic_chains(priv) ((priv)->fs.tc.chains)
- #define MLX5_MH_ACT_SZ MLX5_UN_SZ_BYTES(set_add_copy_action_in_auto)
+ 
 diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lag.c b/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
 similarity index 99%
 rename from drivers/net/ethernet/mellanox/mlx5/core/lag.c
