@@ -153,7 +153,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %exclude /module_info.ld
 
 %changelog
-* Tue Dec 05 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.145.2-2
+* Wed Jan 17 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.145.2-2
 - Bump release to match kernel-headers.
 
 * Tue Jan 16 2024 Gary Swalling <gaswal@microsoft.com> - 5.15.145.2-1

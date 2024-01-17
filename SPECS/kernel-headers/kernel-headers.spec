@@ -73,7 +73,7 @@ done
 %endif
 
 %changelog
-* Tue Dec 05 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.145.2-2
+* Wed Jan 17 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.145.2-2
 - Add the 'kernel-cross-headers' subpackage for aarch64.
 - Used Fedora 38 spec (license: MIT) for guidance.
 
