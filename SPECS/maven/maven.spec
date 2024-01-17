@@ -10,7 +10,6 @@
 %define _libdirmvn %{_prefixmvn}/lib
 # maven 2.0 package version being used. This needs to be updated in case of updates in 1.0.
 %define mvn_2_0_pmc_ver 3.8.7-3
-%define pmc_url https://packages.microsoft.com/cbl-mariner/2.0/prod/base
 Summary:        Apache Maven
 Name:           maven
 Version:        3.9.4
@@ -23,8 +22,9 @@ URL:            https://maven.apache.org/
 Source0:        https://archive.apache.org/dist/%{name}/%{name}-3/%{version}/source/apache-%{name}-%{version}-src.tar.gz
 # Since bootstrap has been removed for maven, it requires a pre-built maven binary to build itself.
 # Relying on 2.0 maven rpm to provide the mvn binary for the build.
-Source1:        %{pmc_url}/x86_64/Packages/m/%{name}-%{mvn_2_0_pmc_ver}.cm2.x86_64.rpm
-Source2:        %{pmc_url}/aarch64/Packages/m/%{name}-%{mvn_2_0_pmc_ver}.cm2.aarch64.rpm
+
+Source1:        %{_mariner_sources_url}/%{name}-%{mvn_2_0_pmc_ver}.cm2.x86_64.rpm
+Source2:        %{_mariner_sources_url}/%{name}-%{mvn_2_0_pmc_ver}.cm2.aarch64.rpm
 # CBL-Mariner build are without network connection. Hence, we need to generate build caches
 # as tarballs to build rpms in offline mode.
 # In order to generate tarballs, use "maven_build_caches.sh".
