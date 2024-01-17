@@ -46,8 +46,7 @@ install -D -p -m 0755 target/release/virtiofsd %{buildroot}%{_libexecdir}/virtio
 %files
 %license LICENSE-APACHE LICENSE-BSD-3-Clause
 %doc README.md
-%{_libexecdir}/virtiofsd
-%{_datadir}/qemu/vhost-user/50-qemu-virtiofsd.json
+%{_libexecdir}/virtiofsd-rs
 
 %changelog
 * Tue Jan 9 2024 Aurélien Bombo <abombo@microsoft.com> - 1.8.0-1
