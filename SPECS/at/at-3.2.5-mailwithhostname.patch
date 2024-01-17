@@ -1,7 +1,7 @@
-diff -up at-3.1.14/atd.c.mail at-3.1.14/atd.c
---- at-3.1.14/atd.c.mail	2013-12-04 11:39:44.556239282 +0100
-+++ at-3.1.14/atd.c	2013-12-04 11:40:50.544234246 +0100
-@@ -100,6 +100,10 @@ int selinux_enabled=0;
+diff -ur b/atd.c a/atd.c
+--- b/atd.c	2022-02-22 15:21:06.649147600 +0100
++++ a/atd.c	2022-02-22 15:49:13.640184845 +0100
+@@ -98,6 +98,10 @@
  #define BATCH_INTERVAL_DEFAULT 60
  #define CHECK_INTERVAL 3600
  
@@ -12,15 +12,15 @@ diff -up at-3.1.14/atd.c.mail at-3.1.14/atd.c
  /* Global variables */
  
  uid_t real_uid, effective_uid;
-@@ -117,6 +121,7 @@ static time_t last_chg;
- static int nothing_to_do;
+@@ -115,6 +119,7 @@
+ static int nothing_to_do = 0;
  unsigned int batch_interval;
  static int run_as_daemon = 0;
 +static int mail_with_hostname = 0;
+ static int hupped = 0;
  
  static volatile sig_atomic_t term_signal = 0;
- 
-@@ -298,6 +303,7 @@ run_file(const char *filename, uid_t uid
+@@ -301,6 +306,7 @@
      char fmt[64];
      unsigned long jobno;
      int rc;
@@ -28,19 +28,19 @@ diff -up at-3.1.14/atd.c.mail at-3.1.14/atd.c
  #ifdef WITH_PAM
      int retcode;
  #endif
-@@ -452,6 +458,11 @@ run_file(const char *filename, uid_t uid
+@@ -455,6 +461,11 @@
  
      write_string(fd_out, "Subject: Output from your job ");
      write_string(fd_out, jobbuf);
 +    if (mail_with_hostname > 0) {
-+               gethostname(hostbuf, MAXHOSTNAMELEN-1);
++        gethostname(hostbuf, MAXHOSTNAMELEN-1);
 +        write_string(fd_out, " ");
 +        write_string(fd_out, hostbuf);
 +    }
      write_string(fd_out, "\nTo: ");
      write_string(fd_out, mailname);    
      write_string(fd_out, "\n\n");
-@@ -843,7 +854,7 @@ main(int argc, char *argv[])
+@@ -905,7 +916,7 @@
      run_as_daemon = 1;
      batch_interval = BATCH_INTERVAL_DEFAULT;
  
@@ -49,7 +49,7 @@ diff -up at-3.1.14/atd.c.mail at-3.1.14/atd.c
  	switch (c) {
  	case 'l':
  	    if (sscanf(optarg, "%lf", &load_avg) != 1)
-@@ -865,6 +876,10 @@ main(int argc, char *argv[])
+@@ -927,6 +938,10 @@
  	    daemon_foreground++;
  	    break;
  
