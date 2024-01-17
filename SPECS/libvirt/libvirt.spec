@@ -659,8 +659,11 @@ Requires: libvirt-daemon-common = %{version}-%{release}
 Requires: libvirt-libs = %{version}-%{release}
 # needed for device enumeration
 Requires: systemd >= 185
+%if %{!?mariner}
+# bfjelds: FOR NOW ... to see if things build
 # For managing persistent mediated devices
 Requires: mdevctl
+%endif
 # for modprobe of pci devices
 Requires: module-init-tools
 
