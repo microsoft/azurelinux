@@ -38,7 +38,7 @@ func TestExclusiveArchCheckShouldSucceedForSupportedArchitectures(t *testing.T) 
 
 	matches, err := SpecExclusiveArchIsCompatible(specFilePath, specsDir, buildArch, defines)
 	assert.NoError(t, err)
-	assert.False(t, matches)
+	assert.True(t, matches)
 }
 
 func TestExclusiveArchCheckShouldSucceedForNoExclusiveArch(t *testing.T) {
