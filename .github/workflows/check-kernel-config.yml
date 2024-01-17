@@ -16,6 +16,8 @@ on:
     paths:
       - 'SPECS/kernel*/config*'
 
+permissions: read-all
+
 jobs:
   check:
     name: Kernel configs check
@@ -25,7 +27,7 @@ jobs:
       # Checkout the branch of our repo that triggered this action
       - name: Workflow trigger checkout
         uses: actions/checkout@v4
-        
+
       - name: Get base commit for PRs
         if: ${{ github.event_name == 'pull_request' }}
         run: |
