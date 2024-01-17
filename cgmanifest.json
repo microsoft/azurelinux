@@ -815,8 +815,8 @@
         "type": "other",
         "other": {
           "name": "autogen",
-          "version": "5.18.16",
-          "downloadUrl": "https://ftp.gnu.org/gnu/autogen/rel5.18.16/autogen-5.18.16.tar.xz"
+          "version": "5.18.98",
+          "downloadUrl": "https://git.savannah.gnu.org/cgit/autogen.git/snapshot/autogen-5.19.98.tar.gz"
         }
       }
     },

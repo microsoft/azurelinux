@@ -1,7 +1,7 @@
 Summary:        The Automated Text and Program Generation Tool
 Name:           autogen
-Version:        5.18.16
-Release:        8%{?dist}
+Version:        5.18.98
+Release:        1%{?dist}
 License:        GPLv3+
 URL:            https://www.gnu.org/software/autogen/
 Source0:        https://ftp.gnu.org/gnu/autogen/rel%{version}/%{name}-%{version}.tar.xz
@@ -82,6 +82,9 @@ make -k check
 %exclude /usr/share/info/
 
 %changelog
+* Wed Jan 17 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.18.98-1
+- Auto-upgrade to 5.18.98 - 3.0 release
+
 * Mon Feb 21 2022 Muhammad Falak <mwani@microsoft.com> - 5.18.16-8
 - Add an explicit BR on `perl(lib)` to enable build
 - Drop parallel `%{?_smp_mflags}` make flags to enable ptest
