@@ -1,7 +1,7 @@
 Summary:        Metapackage for Kata UVM components
 Name:           kata-packages-uvm
 Version:        1.0.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -50,6 +50,7 @@ Requires:       opa
 Summary:        Metapackage to install the set of packages for building a Kata UVM.
 Requires:       acpica-tools
 Requires:       clang
+Requires:       golang
 Requires:       kata-containers-tools
 Requires:       kata-containers-cc-tools
 Requires:       kernel-uvm
@@ -96,6 +97,9 @@ Requires:       golang
 %files coco-sign
 
 %changelog
+* Tue Jan 16 2023 Mitch Zhu <mitchzhu@microsoft.com> - 1.0.0-2
+- Add golang to kata-packages-uvm-build
+
 * Tue Dec 19 2023 Mitch Zhu <mitchzhu@microsoft.com> - 1.0.0-1
 - Introduce kata meta-package for the UVM components.
 - License verified
