@@ -543,7 +543,7 @@ Requires: libvirt-libs = %{version}-%{release}
 Recommends: libvirt-client = %{version}-%{release}
 # for /sbin/ip
 Requires: iproute
-%if %{!?mariner}
+%if 0%{!?mariner}
 # bfjelds: FOR NOW ... to see if things build
 # for /sbin/tc
 Requires: iproute-tc
@@ -659,7 +659,7 @@ Requires: libvirt-daemon-common = %{version}-%{release}
 Requires: libvirt-libs = %{version}-%{release}
 # needed for device enumeration
 Requires: systemd >= 185
-%if %{!?mariner}
+%if 0%{!?mariner}
 # bfjelds: FOR NOW ... to see if things build
 # For managing persistent mediated devices
 Requires: mdevctl
@@ -870,7 +870,7 @@ Requires: xz
 %if 0%{!?mariner}
 Requires: systemd-container
 %endif
-%if %{!?mariner}
+%if 0%{!?mariner}
 # bfjelds: FOR NOW ... to see if things build
 # bfjelds: NEW
 Requires: swtpm-tools
