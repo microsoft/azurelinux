@@ -9,7 +9,7 @@ Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://erlang.org
 Source0:        https://github.com/erlang/otp/archive/OTP-%{version}/otp-OTP-%{version}.tar.gz
-Patch1:         CVE-2023-48795.patch
+Patch0:         CVE-2023-48795.patch
 BuildRequires:  ncurses-devel
 BuildRequires:  openssl-devel
 BuildRequires:  unixODBC-devel
@@ -20,7 +20,7 @@ erlang programming language
 
 %prep
 %setup -q -n otp-OTP-%{version}
-%patch1 -p1
+%patch0 -p1
 
 %build
 export ERL_TOP=`pwd`
