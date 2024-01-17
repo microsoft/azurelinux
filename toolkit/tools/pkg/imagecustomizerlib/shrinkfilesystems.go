@@ -1,16 +1,16 @@
 package imagecustomizerlib
 
 import (
-	// "fmt"
-	// "github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
+	"fmt"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
 	// "github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	// "github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	// "os"
-	// "os/exec"
+	"os/exec"
 	// "path/filepath"
 	// "strconv"
 	// "strings"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
+	// "github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 )
 
 func shrinkFilesystems(imageConnection *ImageConnection, outputImageFile string) error {
@@ -24,9 +24,8 @@ func shrinkFilesystems(imageConnection *ImageConnection, outputImageFile string)
 
 	for partitionNum := 0; partitionNum < len(diskPartitions); partitionNum++ {
 		if diskPartitions[partitionNum].Type == "part" {
-			partitionLoopDevice := diskPartitions[partitionNum].Path
 			fstype := diskPartitions[partitionNum].FileSystemType
-			err = resizeFilesystem(partitionFilepath, fstype)
+			err = resizeFilesystem(fstype)
 			if err != nil {
 				return err
 			}
@@ -36,7 +35,7 @@ func shrinkFilesystems(imageConnection *ImageConnection, outputImageFile string)
 }
 
 // Resize filesystem that has fstype ext2/ext3/ext4
-func resizeFilesystem(partitionRawFilepath string, fstype string) (err error) {
+func resizeFilesystem(fstype string) (err error) {
 	if fstype != "ext2" && fstype != "ext3" && fstype != "ext4" {
 		return nil
 	}
