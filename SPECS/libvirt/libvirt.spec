@@ -543,8 +543,11 @@ Requires: libvirt-libs = %{version}-%{release}
 Recommends: libvirt-client = %{version}-%{release}
 # for /sbin/ip
 Requires: iproute
+%if %{!?mariner}
+# bfjelds: FOR NOW ... to see if things build
 # for /sbin/tc
 Requires: iproute-tc
+%endif
 Requires: polkit >= 0.112
     %if %{with_dmidecode}
 # For virConnectGetSysinfo
@@ -864,8 +867,11 @@ Requires: xz
 %if 0%{!?mariner}
 Requires: systemd-container
 %endif
+%if %{!?mariner}
+# bfjelds: FOR NOW ... to see if things build
 # bfjelds: NEW
 Requires: swtpm-tools
+%endif
         %if %{with_numad}
 Requires: numad
         %endif
