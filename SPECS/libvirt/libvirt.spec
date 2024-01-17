@@ -1,5 +1,10 @@
 # -*- rpm-spec -*-
 
+# Define mariner version to define mariner-specific settings/changes from
+# fedora spec
+%define mariner 3
+
+
 # This spec file assumes you are building on a Fedora or RHEL version
 # that's still supported by the vendor. It may work on other distros
 # or versions, but no effort will be made to ensure that going forward.
