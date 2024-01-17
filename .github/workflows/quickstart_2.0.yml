@@ -30,7 +30,7 @@ jobs:
       run: |
         # Golang and docker are already installed on the agent
         sudo apt-get update
-        sudo apt -y install make tar wget curl rpm qemu-utils genisoimage python-minimal bison gawk parted
+        sudo apt -y install make tar wget curl rpm qemu-utils genisoimage python-is-python3 bison gawk parted
         sudo apt -y install pigz
 
     - name: Download SRPMS
@@ -59,7 +59,7 @@ jobs:
       run: |
         # Golang and docker are already installed on the agent
         sudo apt-get update
-        sudo apt -y install make tar wget curl rpm qemu-utils genisoimage python-minimal bison gawk parted
+        sudo apt -y install make tar wget curl rpm qemu-utils genisoimage python-is-python3 bison gawk parted
         sudo apt -y install pigz
 
     - name: ISO Quick Start
@@ -87,7 +87,7 @@ jobs:
       run: |
         # Golang and docker are already installed on the agent
         sudo apt-get update
-        sudo apt -y install make tar wget curl rpm qemu-utils genisoimage python-minimal bison gawk parted
+        sudo apt -y install make tar wget curl rpm qemu-utils genisoimage python-is-python3 bison gawk parted
         sudo apt -y install pigz
 
     - name: VHDX Quick Start
