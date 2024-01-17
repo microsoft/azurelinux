@@ -3,7 +3,7 @@
 Summary:        Cython implementation of the toolz package
 Name:           python-%{srcname}
 Version:        0.12.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -87,8 +87,7 @@ pip3 install atomicwrites>=1.3.0 \
     pytest>=5.4.0 \
     pytest-cov>=2.7.1 \
     toolz>=0.9.0 \
-    Cython \
-    CPython
+    Cython
 python3 setup.py test
 PATH=%{buildroot}%{_bindir}:${PATH} \
 PYTHONPATH=%{buildroot}%{python3_sitelib} \
@@ -102,6 +101,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %exclude %{python3_sitearch}/.pytest_cache/
 
 %changelog
+* Thu Jan 11 2024 Mandeep Plaha <mandeepplaha@microsoft.com> - 0.12.2-2
+- Remove CPython from %check pip3 install.
+
 * Wed Dec 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.12.2-1
 - Auto-upgrade to 0.12.2 - none
 
