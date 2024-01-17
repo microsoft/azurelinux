@@ -13,6 +13,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safeloopback"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safemount"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 )
@@ -131,7 +132,7 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 	// If outputSplitPartitionsFormat is specified, extract the partition files.
 	if outputSplitPartitionsFormat != "" {
 		logger.Log.Infof("Extracting partition files")
-		err = extractPartitionsHelper(buildDirAbs, buildImageFile, outputImageFile, outputSplitPartitionsFormat)
+		err = extractPartitionsHelper(buildImageFile, outputImageFile, outputSplitPartitionsFormat)
 		if err != nil {
 			return err
 		}
@@ -307,20 +308,20 @@ func customizeImageHelper(buildDir string, baseConfigPath string, config *imagec
 	return nil
 }
 
-func extractPartitionsHelper(buildDir string, buildImageFile string, outputImageFile string, outputSplitPartitionsFormat string) error {
-	imageConnection, err := connectToExistingImage(buildImageFile, buildDir, "imageroot")
+func extractPartitionsHelper(buildImageFile string, outputImageFile string, outputSplitPartitionsFormat string) error {
+	imageLoopback, err := safeloopback.NewLoopback(buildImageFile)
 	if err != nil {
 		return err
 	}
-	defer imageConnection.Close()
+	defer imageLoopback.Close()
 
 	// Extract the partitions as files.
-	err = extractPartitions(imageConnection, outputImageFile, outputSplitPartitionsFormat)
+	err = extractPartitions(imageLoopback.DevicePath(), outputImageFile, outputSplitPartitionsFormat)
 	if err != nil {
 		return err
 	}
 
-	err = imageConnection.CleanClose()
+	err = imageLoopback.CleanClose()
 	if err != nil {
 		return err
 	}
