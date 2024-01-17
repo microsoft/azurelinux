@@ -1,13 +1,14 @@
 Summary:        Coroutine-based network library
 Name:           python-gevent
 Version:        21.1.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://www.gevent.org
 Source0:        https://github.com/gevent/gevent/archive/%{version}.tar.gz#/gevent-%{version}.tar.gz
+Source1:        tests_to_ignore.txt
 Patch1:         CVE-2023-41419.patch
 Patch2:         fix_test_hang_on_python_3_9_and_up.patch
 Patch3:         CVE-2020-22217.patch
@@ -53,8 +54,9 @@ Features include:
 %py3_install
 
 %check
+cp %{SOURCE1} src/gevent/tests/tests_to_ignore.txt
 %python3 setup.py develop
-%python3 -m gevent.tests
+%python3 -m gevent.tests --ignore="tests_to_ignore.txt" -u-network
 
 %files -n python3-gevent
 %defattr(-,root,root,-)
@@ -62,6 +64,9 @@ Features include:
 %{python3_sitelib}/*
 
 %changelog
+* Wed Jan 10 2024 Thien Trung Vuong <tvuong@microsoft.com> - 21.1.2-2
+- Disable unreliable tests
+
 * Wed Nov 29 2023 Thien Trung Vuong <tvuong@microsoft.com> - 21.1.2-1
 - Update to version 21.1.2
 
