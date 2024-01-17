@@ -51,7 +51,10 @@ and looking up the correct MIME type in a database.
 %autosetup -S git
 tar xjf %{SOURCE6}
 
-mv xdgmime-*/ xdgmime/
+if [ -d xdgmime ]; then
+  rm -rf xdgmime
+fi
+mv xdgmime-*/ xdgmime
 
 %build
 cd ./xdgmime/
