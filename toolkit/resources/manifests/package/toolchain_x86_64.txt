@@ -47,18 +47,11 @@ cracklib-lang-2.9.7-5.cm2.x86_64.rpm
 createrepo_c-0.17.5-1.cm2.x86_64.rpm
 createrepo_c-debuginfo-0.17.5-1.cm2.x86_64.rpm
 createrepo_c-devel-0.17.5-1.cm2.x86_64.rpm
-<<<<<<< HEAD
 cross-binutils-common-2.37-8.cm2.noarch.rpm
-curl-8.3.0-2.cm2.x86_64.rpm
-curl-debuginfo-8.3.0-2.cm2.x86_64.rpm
-curl-devel-8.3.0-2.cm2.x86_64.rpm
-curl-libs-8.3.0-2.cm2.x86_64.rpm
-=======
 curl-8.5.0-1.cm2.x86_64.rpm
 curl-debuginfo-8.5.0-1.cm2.x86_64.rpm
 curl-devel-8.5.0-1.cm2.x86_64.rpm
 curl-libs-8.5.0-1.cm2.x86_64.rpm
->>>>>>> main
 Cython-debuginfo-0.29.33-1.cm2.x86_64.rpm
 debugedit-5.0-2.cm2.x86_64.rpm
 debugedit-debuginfo-5.0-2.cm2.x86_64.rpm
