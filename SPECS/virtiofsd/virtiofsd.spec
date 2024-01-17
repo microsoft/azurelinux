@@ -22,10 +22,6 @@ BuildRequires:  cargo
 BuildRequires:  libcap-ng-devel
 BuildRequires:  libseccomp-devel
 
-Requires:       qemu-common
-Conflicts:      qemu-virtiofsd
-Provides:       vhostuser-backend(fs)
-
 %description
 Virtio-fs vhost-user device daemon (Rust version)
 
@@ -45,10 +41,7 @@ popd
 
 %install
 mkdir -p %{buildroot}%{_libexecdir}
-install -D -p -m 0755 target/release/virtiofsd %{buildroot}%{_libexecdir}/virtiofsd
-# NOTE: 50-qemu-virtiofsd.json is renamed to 50-virtiofsd.json in the sources
-# after v1.8.0 (destination remains unchanged).
-install -D -p -m 0644 50-qemu-virtiofsd.json %{buildroot}%{_datadir}/qemu/vhost-user/50-qemu-virtiofsd.json
+install -D -p -m 0755 target/release/virtiofsd %{buildroot}%{_libexecdir}/virtiofsd-rs
 
 %files
 %license LICENSE-APACHE LICENSE-BSD-3-Clause
