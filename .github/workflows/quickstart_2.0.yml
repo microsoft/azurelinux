@@ -23,7 +23,7 @@ jobs:
     - name: Set up Go 1.20
       uses: actions/setup-go@v5
       with:
-        go-version: 1.20
+        go-version: '1.20'
       id: go
 
     - name: Install Remaining Prerequisites
@@ -52,7 +52,7 @@ jobs:
     - name: Set up Go 1.20
       uses: actions/setup-go@v5
       with:
-        go-version: 1.20
+        go-version: '1.20'
       id: go
 
     - name: Install Remaining Prerequisites
@@ -80,7 +80,7 @@ jobs:
     - name: Set up Go 1.20
       uses: actions/setup-go@v5
       with:
-        go-version: 1.20
+        go-version: '1.20'
       id: go
 
     - name: Install Remaining Prerequisites
