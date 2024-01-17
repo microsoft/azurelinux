@@ -1,5 +1,5 @@
 filesystem-1.1-19.cm2.x86_64.rpm
-kernel-headers-5.15.139.1-1.cm2.noarch.rpm
+kernel-headers-5.15.145.2-1.cm2.noarch.rpm
 glibc-2.35-6.cm2.x86_64.rpm
 glibc-devel-2.35-6.cm2.x86_64.rpm
 glibc-i18n-2.35-6.cm2.x86_64.rpm
@@ -84,9 +84,9 @@ bison-3.7.6-2.cm2.x86_64.rpm
 popt-1.18-1.cm2.x86_64.rpm
 popt-devel-1.18-1.cm2.x86_64.rpm
 popt-lang-1.18-1.cm2.x86_64.rpm
-sqlite-3.39.2-2.cm2.x86_64.rpm
-sqlite-devel-3.39.2-2.cm2.x86_64.rpm
-sqlite-libs-3.39.2-2.cm2.x86_64.rpm
+sqlite-3.39.2-3.cm2.x86_64.rpm
+sqlite-devel-3.39.2-3.cm2.x86_64.rpm
+sqlite-libs-3.39.2-3.cm2.x86_64.rpm
 elfutils-0.186-2.cm2.x86_64.rpm
 elfutils-default-yama-scope-0.186-2.cm2.noarch.rpm
 elfutils-devel-0.186-2.cm2.x86_64.rpm

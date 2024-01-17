@@ -1,15 +1,16 @@
 Name:          libdwarf
-Version:       20200114
-Release:       3%{?dist}
+Version:       0.9.0
+Release:       1%{?dist}
 Summary:       Library to access the DWARF Debugging file format 
 
-License:       LGPLv2
+License:       LGPL-2.1-only AND BSD-2-Clause-FreeBSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:           http://www.prevanders.net/dwarf.html
-Source0:       http://www.prevanders.net/%{name}-%{version}.tar.gz
+URL:           https://www.prevanders.net/dwarf.html
+Source0:       https://www.prevanders.net/%{name}-%{version}.tar.xz
+Patch0:        libdwarf_skip_test.patch
 
-BuildRequires: gcc binutils-devel elfutils-libelf-devel dos2unix
+BuildRequires: gcc make python3
 
 %description
 Library to access the DWARF debugging file format which supports
@@ -18,7 +19,7 @@ and Fortran.  Please see http://www.dwarfstd.org for DWARF specification.
 
 %package devel
 Summary:       Library and header files of libdwarf
-License:       LGPLv2
+License:       LGPL-2.1-only AND BSD-2-Clause-FreeBSD
 Requires:      %{name} = %{version}-%{release}
 
 %description devel
@@ -26,7 +27,7 @@ Development package containing library and header files of libdwarf.
 
 %package static
 Summary:       Static libdwarf library
-License:       LGPLv2
+License:       LGPL-2.1-only AND BSD-2-Clause-FreeBSD
 Requires:      %{name}-devel = %{version}-%{release}
 
 %description static
@@ -34,7 +35,7 @@ Static libdwarf library.
 
 %package tools
 Summary:       Tools for accessing DWARF debugging information
-License:       GPLv2
+License:       GPL-2.0-only AND BSD-2-Clause-FreeBSD
 Requires:      %{name} = %{version}-%{release}
 
 %description tools
@@ -55,19 +56,17 @@ sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 
 %install
 %make_install
-mkdir %{buildroot}%{_includedir}/libdwarf
-mv %{buildroot}%{_includedir}/*.h %{buildroot}%{_includedir}/libdwarf
 
 
 %check
-LD_LIBRARY_PATH=$PWD/libdwarf/.libs %__make check
+TZ=:America/Los_Angeles %__make check
 
 
 %files
-%doc libdwarf/ChangeLog libdwarf/README
-%license libdwarf/COPYING libdwarf/LIBDWARFCOPYRIGHT libdwarf/LGPL.txt
-%{_libdir}/libdwarf.so.*
-%exclude %{_datadir}/libdwarf
+%doc src/lib/libdwarf/ChangeLog src/lib/libdwarf/README
+%license src/lib/libdwarf/COPYING src/lib/libdwarf/LIBDWARFCOPYRIGHT src/lib/libdwarf/LGPL.txt
+%{_libdir}/libdwarf.so.0
+%{_libdir}/libdwarf.so.0.*
 
 
 %files static
@@ -75,21 +74,27 @@ LD_LIBRARY_PATH=$PWD/libdwarf/.libs %__make check
 
 
 %files devel
-%doc libdwarf/*.pdf
-%{_includedir}/libdwarf
+%doc doc/*.pdf
+%{_includedir}/libdwarf-0
 %{_libdir}/libdwarf.so
 %exclude %{_libdir}/*.la
+%{_libdir}/pkgconfig/libdwarf.pc
 
 
 %files tools
-%doc dwarfdump/README dwarfdump/ChangeLog
-%license dwarfdump/COPYING dwarfdump/DWARFDUMPCOPYRIGHT dwarfdump/GPL.txt
+%license src/bin/dwarfdump/COPYING src/bin/dwarfdump/DWARFDUMPCOPYRIGHT src/bin/dwarfdump/GPL.txt
 %{_bindir}/dwarfdump
 %{_datadir}/dwarfdump/dwarfdump.conf
 %{_mandir}/man1/dwarfdump.1.gz
 
 
 %changelog
+* Tue Jan 02 2024 Sindhu Karri <lakarri@microsoft.com> - 0.9.0-1
+- Upgraded to 0.9.0
+- License verified
+- Promoted package to CBL-Mariner Core repository
+- Added patch libdwarf_skip_test.patch to skip two tests test_dwarfdumpPE.sh and test_dwarfdumpMacos.sh that require the packages to be installed in system repositories. Patch is added to avoid ptest failure due to issue https://github.com/davea42/libdwarf-code/issues/212
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200114-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

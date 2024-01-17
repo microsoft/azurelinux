@@ -1,14 +1,13 @@
 Summary:        Sudo
 Name:           sudo
-Version:        1.9.14p3
-Release:        2%{?dist}
+Version:        1.9.15p5
+Release:        1%{?dist}
 License:        ISC
 URL:            https://www.sudo.ws/
 Group:          System Environment/Security
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://www.sudo.ws/sudo/dist/%{name}-%{version}.tar.gz
-Patch0:         disable-newgroup-query-when-netgroup-base-is-not-set.patch
 BuildRequires:  audit-devel
 BuildRequires:  man-db
 BuildRequires:  openssl-devel
@@ -29,7 +28,6 @@ the ability to run some (or all) commands as root or another user while logging 
 
 %prep
 %setup -q
-%patch0 -p1
 
 %build
 ./configure \
@@ -101,6 +99,9 @@ fi
 %exclude  /etc/sudoers.dist
 
 %changelog
+* Mon Jan  8 13:11:48 EST 2024 Dan Streetman <ddstreet@ieee.org> - 1.9.15p5-1
+- Update for CVE-2023-42465
+
 * Tue Dec 19 2023 Andy Zaugg <azaugg@linkedin.com> - 1.9.14p3-2
 - Add patch to bug fix support for NETGROUP_QUERY
 
