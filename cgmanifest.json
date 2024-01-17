@@ -12800,16 +12800,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "maven3",
-          "version": "3.8.7",
-          "downloadUrl": "https://archive.apache.org/dist/maven/maven-3/3.8.7/source/apache-maven-3.8.7-src.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "mc",
           "version": "4.8.30",
           "downloadUrl": "http://ftp.midnight-commander.org/mc-4.8.30.tar.xz"

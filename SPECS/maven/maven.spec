@@ -8,8 +8,9 @@
 %define _prefixmvn %{_var}/opt/apache-%{name}
 %define _bindirmvn %{_prefixmvn}/bin
 %define _libdirmvn %{_prefixmvn}/lib
-# maven 1.0 package version being used. This needs to be updated in case of updates in 1.0.
-%define mvn_1_0_pmc_ver 3.5.4-13
+# maven 2.0 package version being used. This needs to be updated in case of updates in 1.0.
+%define mvn_2_0_pmc_ver 3.8.7-3
+%define pmc_url https://packages.microsoft.com/cbl-mariner/2.0/prod/base/x86_64/Packages/m/
 Summary:        Apache Maven
 Name:           maven
 Version:        3.9.4
@@ -21,9 +22,9 @@ Group:          Applications/System
 URL:            https://maven.apache.org/
 Source0:        https://archive.apache.org/dist/%{name}/%{name}-3/%{version}/source/apache-%{name}-%{version}-src.tar.gz
 # Since bootstrap has been removed for maven, it requires a pre-built maven binary to build itself.
-# Relying on 1.0 maven rpm to provide the mvn binary for the build.
-Source1:        %{_mariner_sources_url}/%{name}-%{mvn_1_0_pmc_ver}.cm1.x86_64.rpm
-Source2:        %{_mariner_sources_url}/%{name}-%{mvn_1_0_pmc_ver}.cm1.aarch64.rpm
+# Relying on 2.0 maven rpm to provide the mvn binary for the build.
+Source1:        %{pmc_url}/%{name}-%{mvn_2_0_pmc_ver}.cm2.x86_64.rpm
+Source2:        %{pmc_url}/%{name}-%{mvn_2_0_pmc_ver}.cm2.aarch64.rpm
 # CBL-Mariner build are without network connection. Hence, we need to generate build caches
 # as tarballs to build rpms in offline mode.
 # In order to generate tarballs, use "maven_build_caches.sh".
@@ -34,10 +35,10 @@ BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  msopenjdk-11
 BuildRequires:  wget
 BuildRequires:  which
+Provides:       maven3 = %{version}
 Requires:       %{_bindir}/which
 Requires:       msopenjdk-11
 Requires:       %{name}-jdk-binding = %{version}-%{release}
-Conflicts:      maven3
 
 %description
 Maven is a software project management and comprehension tool. Based on the concept of a project object model (POM). Maven can manage a project's build, reporting and documentation from a central piece of information.
