@@ -2,7 +2,7 @@
 Summary:        Tensors and Dynamic neural networks in Python with strong GPU acceleration.
 Name:           pytorch
 Version:        2.0.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -58,6 +58,8 @@ You can reuse your favorite Python packages such as NumPy, SciPy and Cython to e
 %autosetup -a 1 -n %{name}-v%{version}
 
 %build
+# Use MAX_JOBS=8 to prevent build failure in ADO pipelines
+export MAX_JOBS=8
 export USE_CUDA=0
 export BUILD_CAFFE2=0
 %py3_build
@@ -80,6 +82,9 @@ cp -arf docs %{buildroot}/%{_pkgdocdir}
 %{_docdir}/*
 
 %changelog
+* Mon Dec 18 2023 Mandeep Plaha <mandeepplaha@microsoft.com> - 2.0.0-3
+- Set MAX_JOBS=8 to prevent build failure in ADO pipelines
+
 * Thu Apr 06 2023 Riken Maharjan <rmaharjan@microsoft.com> - 2.0.0-2
 - Add missing runtine for 2.0.0
 

@@ -83,12 +83,23 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
+	err = handleKernelCommandLine(config.SystemConfig.KernelCommandLine.ExtraCommandLine, imageChroot,
+		partitionsCustomized)
+	if err != nil {
+		return fmt.Errorf("failed to add extra kernel command line: %w", err)
+	}
+
 	err = runScripts(baseConfigPath, config.SystemConfig.FinalizeImageScripts, imageChroot)
 	if err != nil {
 		return err
 	}
 
 	err = deleteResolvConf(imageChroot)
+	if err != nil {
+		return err
+	}
+
+	err = enableVerityPartition(config.SystemConfig.Verity, imageChroot)
 	if err != nil {
 		return err
 	}
@@ -286,6 +297,13 @@ func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageC
 	}
 
 	// Set user's SSH keys.
+	for i, _ := range user.SSHPubKeyPaths {
+		// If absolute path is not provided, then append baseConfigPath.
+		if !filepath.IsAbs(user.SSHPubKeyPaths[i]) {
+			user.SSHPubKeyPaths[i] = filepath.Join(baseConfigPath, user.SSHPubKeyPaths[i])
+		}
+	}
+
 	err = installutils.ProvisionUserSSHCerts(imageChroot, user.Name, user.SSHPubKeyPaths)
 	if err != nil {
 		return err
