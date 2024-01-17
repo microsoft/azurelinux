@@ -6,8 +6,8 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
-URL:            https://github.com/JuliaStrings/utf8proc
-# Source0:  https://github.com/JuliaStrings/utf8proc/archive/v%{version}.tar.gz
+URL:            https://github.com/juliastrings/utf8proc
+# Source0:  https://github.com/juliastrings/utf8proc/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 BuildRequires:  cmake
 %if %{with_check}
