@@ -10,8 +10,8 @@
 
 Summary:        Linux Kernel for SEV SNP enabled Kata UVMs
 Name:           kernel-uvm-cvm
-Version:        6.1.0.mshv11
-Release:        2%{?dist}
+Version:        6.1.0.mshv14
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -21,6 +21,7 @@ Source1:        config
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
+BuildRequires:  cpio
 BuildRequires:  diffutils
 BuildRequires:  dwarves
 BuildRequires:  elfutils-libelf-devel
@@ -153,6 +154,16 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %{_prefix}/src/linux-headers-%{uname_r}
 
 %changelog
+* Wed Nov 29 2023 Manuel Huber <mahuber@microsoft.com> - 6.1.0.mshv14-3
+- Enable tmpfs xattr for supporting use of extended attributes when container
+    rootfs is an overlayfs with tmps as upper dir as with tardev-snapshotter
+
+* Mon Nov 20 2023 Rachel Menge <rachelmenge@microsoft.com> - 6.1.0.mshv14-2
+- Add cpio as BuildRequires
+
+* Mon Nov 6 2023 Dallas Delaney <dadelan@microsoft.com> - 6.1.0.mshv14-1
+- Update to v6.1.0.mshv14
+
 * Fri Oct 06 2023 Manuel Huber <mahuber@microsoft.com> - 6.1.0.mshv11-2
 - Enable dm-crypt and dm-integrity for encfs sidecar functionality
 

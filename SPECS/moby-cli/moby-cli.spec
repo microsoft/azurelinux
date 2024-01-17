@@ -3,7 +3,7 @@
 
 Summary: The open-source application container engine client.
 Name: moby-%{upstream_name}
-Version: 20.10.25
+Version: 20.10.27
 Release: 2%{?dist}
 License: ASL 2.0
 Group: Tools/Container
@@ -12,6 +12,7 @@ Vendor: Microsoft Corporation
 Distribution: Mariner
 
 Source0: https://github.com/docker/cli/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0: CVE-2023-48795.patch
 
 BuildRequires: golang >= 1.16.12
 BuildRequires: make
@@ -80,6 +81,15 @@ install -p -m 644 contrib/completion/fish/docker.fish %{buildroot}%{_datadir}/fi
 %{_datadir}/fish/vendor_completions.d/docker.fish
 
 %changelog
+* Tue Jan 9 2024 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 20.10.27-2
+- Patch CVE-2023-48795
+
+* Fri Dec 15 2023 Rohit Rawat <rohitrawat@microsoft.com> - 20.10.27-1
+- Bump version to to match with moby-engine
+
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 20.10.25-3
+- Bump release to rebuild with go 1.20.9
+
 * Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 20.10.25-2
 - Bump release to rebuild with updated version of Go.
 

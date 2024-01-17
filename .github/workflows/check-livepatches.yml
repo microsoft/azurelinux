@@ -9,6 +9,8 @@ on:
   pull_request:
     branches: [2.0, fasttrack/*]
 
+permissions: read-all
+
 jobs:
   spec-check:
     name: Livepatches check
@@ -51,7 +53,7 @@ jobs:
           #################### CHECK FAILURE ####################
           Livepatch specs need to be updated!
           Run the following command to perform the update:
-          
+
               toolkit/scripts/livepatching/update_livepatches.sh
 
           #################### CHECK FAILURE ####################

@@ -132,6 +132,24 @@ func buildBuildNodeHelper(pkg *pkgjson.PackageVer) (node *PkgNode) {
 	return
 }
 
+// buildTestNodeHelper creates a new 'Test' PkgNode based on a PackageVer struct
+func buildTestNodeHelper(pkg *pkgjson.PackageVer) (node *PkgNode) {
+	pkgCopy := *pkg
+	node = &PkgNode{
+		VersionedPkg: &pkgCopy,
+		State:        StateBuild,
+		Type:         TypeTest,
+		SrpmPath:     pkgCopy.Name + ".src.rpm",
+		RpmPath:      pkgCopy.Name + ".rpm",
+		SpecPath:     pkgCopy.Name + ".spec",
+		SourceDir:    pkgCopy.Name + "/src/",
+		Architecture: "test_arch",
+		SourceRepo:   "test_repo",
+	}
+	node.This = node
+	return
+}
+
 // buildBuildNode creates a new 'Unresolved' PkgNode based on a PackageVer struct
 func buildUnresolvedNodeHelper(pkg *pkgjson.PackageVer) (node *PkgNode) {
 	pkgCopy := *pkg
@@ -245,6 +263,7 @@ func checkEqualComponents(t *testing.T, expected, actual []*PkgNode) {
 }
 
 func checkTestGraph(t *testing.T, g *PkgGraph) {
+	t.Helper()
 	// Make sure we got the same graph back!
 	assert.Equal(t, len(allNodes), len(g.AllNodes()))
 	assert.Equal(t, len(runNodes)+len(unresolvedNodes), len(g.AllRunNodes()))
@@ -264,14 +283,7 @@ func checkTestGraph(t *testing.T, g *PkgGraph) {
 		pkgD2Unresolved,
 		pkgD3Unresolved,
 	}
-	for _, mustHave := range component1 {
-		found := false
-		for _, n := range g.AllNodesFrom(a.RunNode) {
-			found = found || mustHave.Equal(n)
-		}
-		assert.True(t, found)
-	}
-	assert.Equal(t, len(component1), len(g.AllNodesFrom(a.RunNode)))
+	checkEqualComponents(t, component1, g.AllNodesFrom(a.RunNode))
 
 	c2, err := g.FindBestPkgNode(&pkgjson.PackageVer{Name: "C"})
 	assert.NoError(t, err)
@@ -282,14 +294,31 @@ func checkTestGraph(t *testing.T, g *PkgGraph) {
 		pkgD5Unresolved,
 		pkgD6Unresolved,
 	}
-	for _, mustHave := range component2 {
-		found := false
-		for _, n := range g.AllNodesFrom(c2.RunNode) {
-			found = found || mustHave.Equal(n)
-		}
-		assert.True(t, found)
+	checkEqualComponents(t, component2, g.AllNodesFrom(c2.RunNode))
+}
+
+// Given a (possibly duplicated) node 'n', find the real node in the graph that corresponds to the package
+func getRealNodeFromGraphHelper(t *testing.T, g *PkgGraph, n *PkgNode) (realN *PkgNode) {
+	t.Helper()
+	realNode, err := g.FindExactPkgNodeFromPkg(n.VersionedPkg)
+	assert.NoError(t, err)
+	assert.NotNil(t, realNode)
+
+	switch n.Type {
+	case TypeLocalBuild:
+		realN = realNode.BuildNode
+	case TypeTest:
+		realN = realNode.TestNode
+	case TypeLocalRun:
+		fallthrough
+	case TypeRemoteRun:
+		realN = realNode.RunNode
+	default:
+		assert.Fail(t, "Unknown node type")
+		return nil
 	}
-	assert.Equal(t, len(component2), len(g.AllNodesFrom(c2.RunNode)))
+	assert.NotNil(t, realN)
+	return
 }
 
 // Validate the test graph is well formed
@@ -774,6 +803,174 @@ func TestStrictGoalNodes(t *testing.T) {
 	assert.Error(t, err)
 }
 
+// Basic test of adding a goal node using two package node objects.
+func TestGoalWithNodes(t *testing.T) {
+	g := NewPkgGraph()
+	err := addNodesHelper(g, allNodes)
+	assert.NoError(t, err)
+	assert.NotNil(t, g)
+
+	nodeList := []*PkgNode{
+		getRealNodeFromGraphHelper(t, g, pkgARun),
+		getRealNodeFromGraphHelper(t, g, pkgBRun),
+	}
+
+	goal, err := g.AddGoalNodeToNodes("test", nodeList, 0)
+	assert.NoError(t, err)
+	assert.NotNil(t, goal)
+	assert.Equal(t, len(allNodes)+1, len(g.AllNodes()))
+	goalNodes := graph.NodesOf(g.From(goal.ID()))
+	assert.Equal(t, 2, len(goalNodes))
+}
+
+// Make sure we can't add a duplicate goal node with AddGoalNodeToNodes().
+func TestDuplicateGoalWithNodes(t *testing.T) {
+	g := NewPkgGraph()
+	goal, err := g.AddGoalNode("test", nil, nil, false)
+	assert.NoError(t, err)
+	assert.NotNil(t, goal)
+	assert.Equal(t, "test", goal.GoalName)
+
+	_, err = g.AddGoalNodeToNodes("test", nil, 0)
+	assert.Error(t, err)
+}
+
+// Ensure nodes that are outside the graph can't be added to a goal
+func TestGoalWithNodeOutsideGraph(t *testing.T) {
+	g := NewPkgGraph()
+	err := addNodesHelper(g, allNodes)
+	assert.NoError(t, err)
+	assert.NotNil(t, g)
+
+	nodeList := []*PkgNode{pkgARun, pkgBRun}
+
+	goal, err := g.AddGoalNodeToNodes("test", nodeList, 0)
+	assert.Error(t, err)
+	assert.Nil(t, goal)
+}
+
+func TestGoalWithLevelZero(t *testing.T) {
+	g, err := buildTestGraphHelper()
+	assert.NoError(t, err)
+	assert.NotNil(t, g)
+
+	goal, err := g.AddGoalNode("test_0", []*pkgjson.PackageVer{&pkgC}, nil, false)
+	assert.NoError(t, err)
+	assert.NotNil(t, goal)
+	nodesInGoal := []*PkgNode{}
+	for _, n := range graph.NodesOf(g.From(goal.ID())) {
+		nodesInGoal = append(nodesInGoal, n.(*PkgNode))
+	}
+	expectedGoalNodes := []*PkgNode{
+		pkgCRun,
+	}
+	checkEqualComponents(t, expectedGoalNodes, nodesInGoal)
+	expectedGoalTree := []*PkgNode{
+		pkgCRun,
+		pkgCBuild,
+		pkgD3Unresolved,
+		goal,
+	}
+	checkEqualComponents(t, expectedGoalTree, g.AllNodesFrom(goal))
+}
+
+func TestGoalWithLevelOne(t *testing.T) {
+	g, err := buildTestGraphHelper()
+	assert.NoError(t, err)
+	assert.NotNil(t, g)
+
+	goal, err := g.AddGoalNodeWithExtraLayers("test_1", []*pkgjson.PackageVer{&pkgC}, nil, false, 1)
+	assert.NoError(t, err)
+	assert.NotNil(t, goal)
+	nodesInGoal := []*PkgNode{}
+	for _, n := range graph.NodesOf(g.From(goal.ID())) {
+		nodesInGoal = append(nodesInGoal, n.(*PkgNode))
+	}
+	expectedGoalNodes := []*PkgNode{
+		pkgCRun,
+		pkgBRun,
+	}
+	checkEqualComponents(t, expectedGoalNodes, nodesInGoal)
+	expectedGoalPackages := []*PkgNode{
+		pkgBRun,
+		pkgBBuild,
+		pkgCRun,
+		pkgCBuild,
+		pkgD2Unresolved,
+		pkgD3Unresolved,
+		goal,
+	}
+	checkEqualComponents(t, expectedGoalPackages, g.AllNodesFrom(goal))
+}
+
+func TestGoalWithLevelTwo(t *testing.T) {
+	g, err := buildTestGraphHelper()
+	assert.NoError(t, err)
+	assert.NotNil(t, g)
+
+	goal, err := g.AddGoalNodeWithExtraLayers("test_2", []*pkgjson.PackageVer{&pkgC}, nil, false, 2)
+	assert.NoError(t, err)
+	assert.NotNil(t, goal)
+	nodesInGoal := []*PkgNode{}
+	for _, n := range graph.NodesOf(g.From(goal.ID())) {
+		nodesInGoal = append(nodesInGoal, n.(*PkgNode))
+	}
+	expectedGoalNodes := []*PkgNode{
+		pkgARun,
+		pkgCRun,
+		pkgBRun,
+	}
+	checkEqualComponents(t, expectedGoalNodes, nodesInGoal)
+	expectedGoalPackages := []*PkgNode{
+		pkgARun,
+		pkgABuild,
+		pkgBRun,
+		pkgBBuild,
+		pkgCRun,
+		pkgCBuild,
+		pkgD1Unresolved,
+		pkgD2Unresolved,
+		pkgD3Unresolved,
+		goal,
+	}
+	checkEqualComponents(t, expectedGoalPackages, g.AllNodesFrom(goal))
+}
+
+// Check if AddGoalNodeToNodes() works with a levels
+func TestGoalWithNodesWithLevelTwo(t *testing.T) {
+	g, err := buildTestGraphHelper()
+	assert.NoError(t, err)
+	assert.NotNil(t, g)
+
+	goalNode := getRealNodeFromGraphHelper(t, g, pkgCRun)
+	goal, err := g.AddGoalNodeToNodes("test_2", []*PkgNode{goalNode}, 2)
+	assert.NoError(t, err)
+	assert.NotNil(t, goal)
+	nodesInGoal := []*PkgNode{}
+	for _, n := range graph.NodesOf(g.From(goal.ID())) {
+		nodesInGoal = append(nodesInGoal, n.(*PkgNode))
+	}
+	expectedGoalNodes := []*PkgNode{
+		pkgARun,
+		pkgCRun,
+		pkgBRun,
+	}
+	checkEqualComponents(t, expectedGoalNodes, nodesInGoal)
+	expectedGoalPackages := []*PkgNode{
+		pkgARun,
+		pkgABuild,
+		pkgBRun,
+		pkgBBuild,
+		pkgCRun,
+		pkgCBuild,
+		pkgD1Unresolved,
+		pkgD2Unresolved,
+		pkgD3Unresolved,
+		goal,
+	}
+	checkEqualComponents(t, expectedGoalPackages, g.AllNodesFrom(goal))
+}
+
 // Add a meta node which should link the two disconnected graph components in the test graph
 func TestMetaNode(t *testing.T) {
 	g, err := buildTestGraphHelper()
@@ -815,14 +1012,7 @@ func TestMetaNode(t *testing.T) {
 		pkgD5Unresolved,
 		pkgD6Unresolved,
 	}
-	for _, mustHave := range component {
-		found := false
-		for _, n := range g.AllNodesFrom(a.RunNode) {
-			found = found || mustHave.Equal(n)
-		}
-		assert.True(t, found)
-	}
-	assert.Equal(t, len(component), len(g.AllNodesFrom(a.RunNode)))
+	checkEqualComponents(t, component, g.AllNodesFrom(a.RunNode))
 }
 
 // Make sure the graph updates after adding meta nodes
@@ -852,14 +1042,7 @@ func TestMetaNodeAddPkg(t *testing.T) {
 		pkgD5Unresolved,
 		pkgD6Unresolved,
 	}
-	for _, mustHave := range component {
-		found := false
-		for _, n := range g.AllNodesFrom(a.RunNode) {
-			found = found || mustHave.Equal(n)
-		}
-		assert.True(t, found)
-	}
-	assert.Equal(t, len(component), len(g.AllNodesFrom(a.RunNode)))
+	checkEqualComponents(t, component, g.AllNodesFrom(a.RunNode))
 
 	n, err := addNodeToGraphHelper(g, buildUnresolvedNodeHelper(&pkgjson.PackageVer{Name: "test", Version: "99"}))
 	assert.NoError(t, err)
@@ -869,6 +1052,86 @@ func TestMetaNodeAddPkg(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, 9+5+1+1, len(g.AllNodesFrom(a.RunNode)))
 	assert.Equal(t, 5, len(g.AllNodesFrom(c.RunNode)))
+}
+
+func TestGoalWithLevelOneAndMeta(t *testing.T) {
+	g, err := buildTestGraphHelper()
+	assert.NoError(t, err)
+	assert.NotNil(t, g)
+
+	c1, err := g.FindBestPkgNode(&pkgC)
+	assert.NoError(t, err)
+	c2, err := g.FindBestPkgNode(&pkgC2)
+	assert.NoError(t, err)
+	meta := g.AddMetaNode([]*PkgNode{c2.RunNode}, []*PkgNode{c1.RunNode})
+
+	goal, err := g.AddGoalNodeWithExtraLayers("test_1meta", []*pkgjson.PackageVer{&pkgC}, nil, false, 1)
+	assert.NoError(t, err)
+	assert.NotNil(t, goal)
+	nodesInGoal := []*PkgNode{}
+	for _, n := range graph.NodesOf(g.From(goal.ID())) {
+		nodesInGoal = append(nodesInGoal, n.(*PkgNode))
+	}
+	expectedGoalNodes := []*PkgNode{
+		pkgCRun,
+		pkgC2Run,
+		pkgBRun,
+	}
+	checkEqualComponents(t, expectedGoalNodes, nodesInGoal)
+	// But we now pull in the entire graph when looking at the tree
+	expectedGoalPackagesMeta := []*PkgNode{
+		pkgBRun,
+		pkgBBuild,
+		pkgCRun,
+		pkgCBuild,
+		pkgD2Unresolved,
+		pkgD3Unresolved,
+		pkgC2Run,
+		pkgC2Build,
+		pkgD4Unresolved,
+		pkgD5Unresolved,
+		pkgD6Unresolved,
+		meta,
+		goal,
+	}
+	checkEqualComponents(t, expectedGoalPackagesMeta, g.AllNodesFrom(goal))
+}
+
+func TestGoalWithMultipleGoalsAndOneExtraLayer(t *testing.T) {
+	g, err := buildTestGraphHelper()
+	assert.NoError(t, err)
+	assert.NotNil(t, g)
+
+	goal, err := g.AddGoalNodeWithExtraLayers("test_1multi", []*pkgjson.PackageVer{&pkgC, &pkgD4}, nil, false, 1)
+	assert.NoError(t, err)
+	assert.NotNil(t, goal)
+	nodesInGoal := []*PkgNode{}
+	for _, n := range graph.NodesOf(g.From(goal.ID())) {
+		nodesInGoal = append(nodesInGoal, n.(*PkgNode))
+	}
+	expectedGoalNodes := []*PkgNode{
+		pkgCRun,
+		pkgC2Run,
+		pkgD4Unresolved,
+		pkgBRun,
+	}
+	checkEqualComponents(t, expectedGoalNodes, nodesInGoal)
+	// But we now pull in the entire graph when looking at the tree
+	expectedGoalPackagesMeta := []*PkgNode{
+		pkgBRun,
+		pkgBBuild,
+		pkgCRun,
+		pkgCBuild,
+		pkgD2Unresolved,
+		pkgD3Unresolved,
+		pkgC2Run,
+		pkgC2Build,
+		pkgD4Unresolved,
+		pkgD5Unresolved,
+		pkgD6Unresolved,
+		goal,
+	}
+	checkEqualComponents(t, expectedGoalPackagesMeta, g.AllNodesFrom(goal))
 }
 
 // Test encoding and decoding a DOT formatted graph
@@ -949,6 +1212,13 @@ func TestReadWriteGraph(t *testing.T) {
 
 // Validate the reference graph is valid, and that it matches the output of the test graph.
 func TestReferenceDOTFile(t *testing.T) {
+	if testing.Short() {
+		// Encoding is unreliable on some systems. The final output is still a valid
+		// graph but the base64 encoding of the nodes is different. The final graph once
+		// decoded is the same however (probably gob encoding is different since its stateful?)
+		t.Skip("Short mode enabled")
+	}
+
 	gIn, err := ReadDOTGraphFile("test_graph_reference.dot")
 	assert.NoError(t, err)
 
@@ -1041,6 +1311,94 @@ func TestEncodingSubGraph(t *testing.T) {
 	assert.Equal(t, len(component), len(gCopy.AllNodes()))
 }
 
+func TestHasNode(t *testing.T) {
+	g := NewPkgGraph()
+	assert.NotNil(t, g)
+	n, err := addNodeToGraphHelper(g, pkgARun)
+	assert.NotNil(t, n)
+	assert.NoError(t, err)
+
+	assert.True(t, g.HasNode(n))
+	assert.False(t, g.HasNode(pkgBRun))
+}
+
+func TestHasNodeNil(t *testing.T) {
+	g := NewPkgGraph()
+	assert.NotNil(t, g)
+	n, err := addNodeToGraphHelper(g, pkgARun)
+	assert.NotNil(t, n)
+	assert.NoError(t, err)
+
+	assert.False(t, g.HasNode(nil))
+}
+
+func TestHasNodeCopyGraph(t *testing.T) {
+	g := NewPkgGraph()
+	assert.NotNil(t, g)
+	n, err := addNodeToGraphHelper(g, pkgARun)
+	assert.NotNil(t, n)
+	assert.NoError(t, err)
+
+	// A deep copy should have different objects, and should return false
+	gCopy, err := g.DeepCopy()
+	assert.NoError(t, err)
+	assert.False(t, gCopy.HasNode(n))
+}
+
+func TestHasNodeCopyNode(t *testing.T) {
+	g := NewPkgGraph()
+	assert.NotNil(t, g)
+	n, err := addNodeToGraphHelper(g, pkgARun)
+	assert.NotNil(t, n)
+	assert.NoError(t, err)
+
+	// A deep copy should have different objects, and should return false
+	nCopy := n.Copy()
+	assert.False(t, g.HasNode(nCopy))
+}
+
+// Ensure that HasNode functions as expected when we create a subgraph. The subgraph should only "have" the nodes
+// that make up the subgraph.
+func TestHasNodeSubgraph(t *testing.T) {
+	g, err := buildTestGraphHelper()
+	assert.NoError(t, err)
+	assert.NotNil(t, g)
+
+	root, err := g.FindBestPkgNode(&pkgjson.PackageVer{Name: "B"})
+	assert.NoError(t, err)
+	subGraph, err := g.CreateSubGraph(root.RunNode)
+	assert.NoError(t, err)
+	assert.NotNil(t, subGraph)
+
+	inSubgraph := []*PkgNode{
+		pkgBRun,
+		pkgBBuild,
+		pkgCRun,
+		pkgCBuild,
+		pkgD2Unresolved,
+		pkgD3Unresolved,
+	}
+
+	outsideSubgraph := []*PkgNode{
+		pkgARun,
+		pkgABuild,
+		pkgD1Unresolved,
+		pkgD4Unresolved,
+		pkgD5Unresolved,
+		pkgD6Unresolved,
+		pkgC2Run,
+		pkgC2Build,
+	}
+
+	for _, n := range inSubgraph {
+		assert.True(t, subGraph.HasNode(getRealNodeFromGraphHelper(t, g, n)))
+	}
+
+	for _, n := range outsideSubgraph {
+		assert.False(t, subGraph.HasNode(getRealNodeFromGraphHelper(t, g, n)))
+	}
+}
+
 func TestShouldSucceedMakeDAGWithGoalNode(t *testing.T) {
 	gOut, err := buildTestGraphHelper()
 	assert.NoError(t, err)
@@ -1104,6 +1462,25 @@ func TestShouldGetSRPMNameFromEmptySRPMPath(t *testing.T) {
 	assert.Equal(t, ".", node.SRPMFileName())
 }
 
+func TestAllBuildNodes(t *testing.T) {
+	g := NewPkgGraph()
+	assert.NotNil(t, g)
+	n, err := addNodeToGraphHelper(g, pkgARun)
+	assert.NotNil(t, n)
+	assert.NoError(t, err)
+	n, err = addNodeToGraphHelper(g, pkgABuild)
+	assert.NotNil(t, n)
+	assert.NoError(t, err)
+
+	checkEqualComponents(t, []*PkgNode{pkgABuild}, g.AllBuildNodes())
+
+	g, err = buildTestGraphHelper()
+	assert.NoError(t, err)
+	assert.NotNil(t, g)
+
+	checkEqualComponents(t, buildNodes, g.AllBuildNodes())
+}
+
 func TestShouldGetAllBuildNodesWithFilter(t *testing.T) {
 	gOut, err := buildTestGraphHelper()
 	assert.NoError(t, err)
@@ -1115,6 +1492,22 @@ func TestShouldGetAllBuildNodesWithFilter(t *testing.T) {
 	checkEqualComponents(t, buildNodes, foundNodes)
 }
 
+func TestAllNodes(t *testing.T) {
+	g := NewPkgGraph()
+	assert.NotNil(t, g)
+	n, err := addNodeToGraphHelper(g, pkgARun)
+	assert.NotNil(t, n)
+	assert.NoError(t, err)
+
+	checkEqualComponents(t, []*PkgNode{pkgARun}, g.AllNodes())
+
+	g, err = buildTestGraphHelper()
+	assert.NoError(t, err)
+	assert.NotNil(t, g)
+
+	checkEqualComponents(t, allNodes, g.AllNodes())
+}
+
 func TestShouldGetAllNodesWithFilter(t *testing.T) {
 	gOut, err := buildTestGraphHelper()
 	assert.NoError(t, err)
@@ -1124,6 +1517,42 @@ func TestShouldGetAllNodesWithFilter(t *testing.T) {
 		return true
 	})
 	checkEqualComponents(t, allNodes, foundNodes)
+}
+
+func TestAllRunNodes(t *testing.T) {
+	g := NewPkgGraph()
+	assert.NotNil(t, g)
+	n, err := addNodeToGraphHelper(g, pkgARun)
+	assert.NotNil(t, n)
+	assert.NoError(t, err)
+
+	checkEqualComponents(t, []*PkgNode{pkgARun}, g.AllRunNodes())
+
+	g, err = buildTestGraphHelper()
+	assert.NoError(t, err)
+	assert.NotNil(t, g)
+
+	checkEqualComponents(t, append(runNodes, unresolvedNodes...), g.AllRunNodes())
+}
+
+func TestAllPreferredRunNodes(t *testing.T) {
+	g := NewPkgGraph()
+	assert.NotNil(t, g)
+	n, err := addNodeToGraphHelper(g, pkgARun)
+	assert.NotNil(t, n)
+	assert.NoError(t, err)
+
+	checkEqualComponents(t, []*PkgNode{pkgARun}, g.AllRunNodes())
+	checkEqualComponents(t, []*PkgNode{pkgARun}, g.AllPreferredRunNodes())
+
+	duplicateRemote, err := addNodeToGraphHelper(g, buildUnresolvedNodeHelper(&pkgA))
+	assert.NotNil(t, duplicateRemote)
+	assert.NoError(t, err)
+
+	// Duplicate node should show here
+	checkEqualComponents(t, []*PkgNode{pkgARun, duplicateRemote}, g.AllRunNodes())
+	// But not here
+	checkEqualComponents(t, []*PkgNode{pkgARun}, g.AllPreferredRunNodes())
 }
 
 func TestShouldGetAllRunNodesWithFilter(t *testing.T) {
@@ -1146,4 +1575,58 @@ func TestShouldGetAllUnresolvedNodesWithFilter(t *testing.T) {
 		return node.State == StateUnresolved
 	})
 	checkEqualComponents(t, unresolvedNodes, foundNodes)
+}
+
+func TestAllTestNodes(t *testing.T) {
+	g := NewPkgGraph()
+	assert.NotNil(t, g)
+	n, err := addNodeToGraphHelper(g, pkgARun)
+	assert.NotNil(t, n)
+	assert.NoError(t, err)
+
+	testNode := buildTestNodeHelper(&pkgA)
+
+	n, err = addNodeToGraphHelper(g, testNode)
+	assert.NotNil(t, n)
+	assert.NoError(t, err)
+
+	checkEqualComponents(t, []*PkgNode{testNode}, g.AllTestNodes())
+
+	g, err = buildTestGraphHelper()
+	assert.NoError(t, err)
+	assert.NotNil(t, g)
+
+	n, err = addNodeToGraphHelper(g, testNode)
+	assert.NotNil(t, n)
+	assert.NoError(t, err)
+
+	checkEqualComponents(t, []*PkgNode{testNode}, g.AllTestNodes())
+}
+
+func TestAllImplicitNodes(t *testing.T) {
+	g := NewPkgGraph()
+	assert.NotNil(t, g)
+	n, err := addNodeToGraphHelper(g, pkgARun)
+	assert.NotNil(t, n)
+	assert.NoError(t, err)
+
+	implicitVersion := pkgjson.PackageVer{Name: "/path/to/implicit"}
+	implicitNode := buildUnresolvedNodeHelper(&implicitVersion)
+
+	actualImplicitNode, err := addNodeToGraphHelper(g, implicitNode)
+	assert.NotNil(t, actualImplicitNode)
+	assert.NoError(t, err)
+	assert.True(t, actualImplicitNode.Implicit)
+
+	checkEqualComponents(t, []*PkgNode{actualImplicitNode}, g.AllImplicitNodes())
+
+	g, err = buildTestGraphHelper()
+	assert.NoError(t, err)
+	assert.NotNil(t, g)
+
+	actualImplicitNode, err = addNodeToGraphHelper(g, implicitNode)
+	assert.NotNil(t, actualImplicitNode)
+	assert.NoError(t, err)
+
+	checkEqualComponents(t, []*PkgNode{actualImplicitNode}, g.AllImplicitNodes())
 }

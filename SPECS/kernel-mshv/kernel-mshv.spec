@@ -10,8 +10,8 @@
 
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
-Version:        5.15.126.mshv3
-Release:        1%{?dist}
+Version:        5.15.126.mshv9
+Release:        2%{?dist}
 License:        GPLv2
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
@@ -24,6 +24,7 @@ ExclusiveArch:  x86_64
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
+BuildRequires:  cpio
 BuildRequires:  diffutils
 BuildRequires:  dwarves
 BuildRequires:  elfutils-libelf-devel
@@ -247,6 +248,12 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner-mshv.cfg
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Mon Nov 20 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.126.mshv9-2
+- Add cpio as BuildRequires
+
+* Mon Nov 6 2023 Dallas Delaney <dadelan@microsoft.com> - 5.15.126.mshv9-1
+- Update to v5.15.126.mshv9
+
 * Thu Sep 21 2023 Saul Paredes <saulparedes@microsoft.com> - 5.15.126.mshv3-1
 - Update to v5.15.126.mshv3
 

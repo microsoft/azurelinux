@@ -4,8 +4,8 @@
 
 Summary: Industry-standard container runtime
 Name: moby-%{upstream_name}
-Version: 1.6.22
-Release: 3%{?dist}
+Version: 1.6.26
+Release: 2%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -90,8 +90,17 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
-* Tue Oct 10 2023 Chris PeBenito <chpebeni@microsoft.com> - 1.6.22-3
+* Wed Dec 20 2023 Ravi Prakash Pandey <rapandey@microsoft.com> - 1.6.26-2
+- Set oom_score_adj of containerd to -999 and bump the release version to 2
+
+* Fri Dec 15 2023 Rohit Rawat <rohitrawat@microsoft.com> - 1.6.26-1
+- Bump version to 1.6.26 to fix CVE-2020-8694, CVE-2020-8695 and CVE-2020-12912
+
+* Tue Oct 18 2023 Chris PeBenito <chpebeni@microsoft.com> - 1.6.22-4
 - Precreate /opt/containerd/{bin,lib} to ensure correct SELinux labeling.
+
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.6.22-3
+- Bump release to rebuild with go 1.20.9
 
 * Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 1.6.22-2
 - Bump release to rebuild with updated version of Go.

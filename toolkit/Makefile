@@ -55,6 +55,7 @@ INITRD_CACHE_SUMMARY                 ?=
 PACKAGE_ARCHIVE                      ?=
 PACKAGE_BUILD_RETRIES                ?= 1
 CHECK_BUILD_RETRIES                  ?= 1
+EXTRA_BUILD_LAYERS                   ?= 0
 REFRESH_WORKER_CHROOT                ?= y
 # Set to 0 to use the number of logical CPUs.
 CONCURRENT_PACKAGE_BUILDS            ?= 0
@@ -131,6 +132,7 @@ PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR
 PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/Microsoft/$(build_arch)
 REPO_LIST          ?=
 SRPM_URL_LIST      ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms
+DAILY_BUILD_REPO   ?=
 
 # Preview URLs/repos will be appended (via override) even if the user sets custom values for the lists.
 ifeq ($(USE_PREVIEW_REPO),y)
@@ -148,6 +150,19 @@ ifeq ($(USE_PREVIEW_REPO),y)
       $(warning )
    endif
 endif
+
+ifneq ($(DAILY_BUILD_REPO),)
+   PACKAGE_ROOT := $(shell grep -m 1 "baseurl" $(DAILY_BUILD_REPO) | sed 's|baseurl=||g')
+   $(warning )
+   $(warning ######################### WARNING #########################)
+   $(warning Using a Daily Build Repo at following location:)
+   $(warning $(PACKAGE_ROOT))
+   $(warning ######################### WARNING #########################)
+   $(warning )
+   override PACKAGE_URL_LIST  += $(PACKAGE_ROOT)/built_rpms_all
+   override SRPM_URL_LIST     += $(PACKAGE_ROOT)/SRPMS
+endif
+
 
 CA_CERT     ?=
 TLS_CERT    ?=
@@ -184,17 +199,19 @@ include $(SCRIPTS_DIR)/profile.mk
 # Set the variables for build number, distro tag, etc
 include $(SCRIPTS_DIR)/build_tag.mk
 
+# go utilities with:
+#   go-tools, clean-go-tools, go-tidy-all (tidy go utilities before committing) go-test-coverage
+include $(SCRIPTS_DIR)/tools.mk
+
 # Bootstrap the toolchain's compilers and other tools with:
 #   toolchain, raw-toolchain, clean-toolchain, check-manifests, check-x86_64-manifests, check-aarch64-manifests
 include $(SCRIPTS_DIR)/toolchain.mk
 
-# go utilities with:
-#   go-tools, clean-go-tools, go-tidy-all (tidy go utilities before committing) go-test-coverage
 # chroot worker with:
 #   chroot-tools clean-chroot-tools
 # macro definitions with:
 #   macro-tools clean-macro-tools
-include $(SCRIPTS_DIR)/tools.mk
+include $(SCRIPTS_DIR)/chroot.mk
 
 # Create SRPMS from local SPECS with:
 #   input-srpms, clean-input-srpms

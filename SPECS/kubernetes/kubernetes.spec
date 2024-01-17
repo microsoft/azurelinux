@@ -9,8 +9,8 @@
 %define container_image_components 'kube-proxy kube-apiserver kube-controller-manager kube-scheduler'
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
-Version:        1.28.2
-Release:        3%{?dist}
+Version:        1.28.4
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -93,9 +93,10 @@ Pause component for Microsoft Kubernetes %{version}.
 %setup -q -c -n %{name}
 
 %build
-# set version information using version file
+# set version information using KUBE_GIT_VERSION
 # (see k8s code: hack/lib/version.sh for more detail)
-export KUBE_GIT_VERSION_FILE=%{_builddir}/%{name}/version-file.sh
+export KUBE_GIT_TREE_STATE=archive
+export KUBE_GIT_VERSION=v%{version}
 
 # build host and container image related components
 echo "+++ build kubernetes components"
@@ -262,6 +263,15 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
+* Tue Dec 5 2023 Aadhar Agarwal <aadagarwal@microsoft.com> - 1.28.4-1
+- Upgrade to 1.28.4 to fix CVE-2023-5528
+
+* Fri Nov 10 2023 Muhammad Falak <mwani@microsoft.com> - 1.28.3-2
+- Fix version subcommand for components
+
+* Mon Oct 23 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 1.28.3-1
+- Upgrade to 1.28.3 to address CVE-2023-44487 and CVE-2023-39325.
+
 * Thu Oct 12 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.28.2-3
 - Bump release to rebuild with updated version of Go.
 

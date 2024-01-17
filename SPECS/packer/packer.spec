@@ -1,7 +1,7 @@
 Summary:        Tool for creating identical machine images for multiple platforms from a single source configuration.
 Name:           packer
-Version:        1.8.1
-Release:        14%{?dist}
+Version:        1.8.7
+Release:        1%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -43,7 +43,8 @@ Packer is a tool for building identical machine images for multiple platforms fr
 %build
 tar --no-same-owner -xf %{SOURCE1}
 export GOPATH=%{our_gopath}
-go build -mod=vendor -v -a -o packer
+LD_FLAGS="-X github.com/hashicorp/packer/version.Version=%{version} -X github.com/hashicorp/packer/version.VersionPrerelease="
+go build -mod=vendor -v -a -o packer -ldflags="$LD_FLAGS"
 
 %install
 install -m 755 -d %{buildroot}%{_bindir}
@@ -60,6 +61,12 @@ go test -mod=vendor
 %{_bindir}/packer
 
 %changelog
+* Wed Dec 20 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.7-1
+- Auto-upgrade to 1.8.7 - CVE-2023-45286
+
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.1-15
+- Bump release to rebuild with go 1.20.9
+
 * Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 1.8.1-14
 - Bump release to rebuild with updated version of Go.
 
