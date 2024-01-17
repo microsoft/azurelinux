@@ -3,15 +3,15 @@
 
 Summary:        Iconic font set
 Name:           %{fontname}-fonts
-Version:        4.7.0
-Release:        11%{?dist}
+Version:        6.5.1
+Release:        1%{?dist}
 License:        OFL AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://fontawesome.com
-Source0:        https://github.com/FortAwesome/Font-Awesome/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        %{name}-fontconfig.conf
-Source2:        README-Trademarks.txt
+Source0:        https://github.com/FortAwesome/Font-Awesome/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source1:        README-Trademarks.txt
+Source2:        60-fontawesome-6-free-fonts.conf
 
 BuildArch:      noarch
 
@@ -37,50 +37,49 @@ Font Awesome gives you scalable vector icons that can instantly be
 customized — size, color, drop shadow, and anything that can be done with the
 power of CSS.
 
-This package contains CSS, SCSS and LESS style files as well as Web Open Font
-Format versions 1 and 2, Embedded OpenType and SVG font files which are
-typically used on the web.
+This package contains CSS, SCSS and LESS style files for each of the
+fonts in the FontAwesome family, as well as JSON and YAML metadata.
+It also contains JavaScript, TTF, and SVG files, which are typically
+used on web pages.
 
 %prep
 %setup -q -n Font-Awesome-%{version}
-cp -p %{SOURCE2} .
+cp -p %{SOURCE1} .
 
 %build
-ttembed fonts/*.ttf fonts/*.otf
+ttembed webfonts/*.ttf otfs/*.otf
 
 %install
 install -m 0755 -d %{buildroot}%{_fontdir}
-install -m 0644 -p fonts/*.{ttf,otf,woff,svg,woff2,eot} %{buildroot}%{_fontdir}
+install -m 0644 -p webfonts/*.{ttf,woff2} %{buildroot}%{_fontdir}
+install -m 0644 -p otfs/*.otf %{buildroot}%{_fontdir}
 
 install -m 0755 -d %{buildroot}%{_fontconfig_templatedir} \
 		%{buildroot}%{_fontconfig_confdir}
 
-install -m 0644 -p %{SOURCE1} \
+install -m 0644 -p %{SOURCE2} \
 		%{buildroot}%{_fontconfig_templatedir}/%{fontconf}
 
 ln -s %{_fontconfig_templatedir}/%{fontconf} \
 		%{buildroot}%{_fontconfig_confdir}/%{fontconf}
 
-mkdir -p %{buildroot}%{_datadir}/font-awesome-web/
-cp -a css less scss %{buildroot}%{_datadir}/font-awesome-web/
+# Install the web files
+mkdir -p %{buildroot}%{_datadir}/fontawesome
+cp -a css js less metadata scss sprites svgs webfonts \
+    %{buildroot}%{_datadir}/fontawesome
 
 # files:
-%_font_pkg -f %{fontconf} *.ttf *.otf
-%exclude %{_datadir}/fonts/fontawesome/fontawesome-webfont.svg
-%exclude %{_datadir}/fonts/fontawesome/fontawesome-webfont.woff
-%exclude %{_datadir}/fonts/fontawesome/fontawesome-webfont.woff2
-%exclude %{_datadir}/fonts/fontawesome/fontawesome-webfont.eot
+%_font_pkg -f %{fontconf} *.ttf *.otf *.woff2
 
 %doc README-Trademarks.txt
 
 %files web
-%{_datadir}/font-awesome-web/
-%{_datadir}/fonts/fontawesome/fontawesome-webfont.svg
-%{_datadir}/fonts/fontawesome/fontawesome-webfont.woff
-%{_datadir}/fonts/fontawesome/fontawesome-webfont.woff2
-%{_datadir}/fonts/fontawesome/fontawesome-webfont.eot
+%{_datadir}/fontawesome
 
 %changelog
+* Thu Jan 11 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.5.1-1
+- Auto-upgrade to 6.5.1 - For 3.0 release
+
 * Sun Dec 05 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.7.0-11
 - License verified.
 - Updated sources URL.

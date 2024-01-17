@@ -625,8 +625,8 @@
         "type": "other",
         "other": {
           "name": "at",
-          "version": "3.2.2",
-          "downloadUrl": "https://salsa.debian.org/debian/at/-/archive/release/3.2.2/at-release-3.2.2.tar.gz"
+          "version": "3.2.5",
+          "downloadUrl": "https://salsa.debian.org/debian/at/-/archive/release/3.2.5/at-release-3.2.5.tar.gz"
         }
       }
     },
@@ -845,8 +845,8 @@
         "type": "other",
         "other": {
           "name": "azcopy",
-          "version": "10.15.0",
-          "downloadUrl": "https://github.com/Azure/azure-storage-azcopy/archive/refs/tags/v10.15.0.tar.gz"
+          "version": "10.22.1",
+          "downloadUrl": "https://github.com/Azure/azure-storage-azcopy/archive/refs/tags/v10.22.1.tar.gz"
         }
       }
     },
@@ -3699,8 +3699,8 @@
         "type": "other",
         "other": {
           "name": "fontawesome-fonts",
-          "version": "4.7.0",
-          "downloadUrl": "https://github.com/FortAwesome/Font-Awesome/archive/refs/tags/v4.7.0.tar.gz"
+          "version": "6.5.1",
+          "downloadUrl": "https://github.com/FortAwesome/Font-Awesome/archive/refs/tags/6.5.1.tar.gz"
         }
       }
     },
@@ -3830,8 +3830,8 @@
         "type": "other",
         "other": {
           "name": "freetds",
-          "version": "1.1.20",
-          "downloadUrl": "ftp://ftp.freetds.org/pub/freetds/stable/freetds-1.1.20.tar.bz2"
+          "version": "1.4.10",
+          "downloadUrl": "ftp://ftp.freetds.org/pub/freetds/stable/freetds-1.4.10.tar.bz2"
         }
       }
     },
@@ -4890,8 +4890,8 @@
         "type": "other",
         "other": {
           "name": "gsm",
-          "version": "1.0.19",
-          "downloadUrl": "http://www.quut.com/gsm/gsm-1.0.19.tar.gz"
+          "version": "1.0.22",
+          "downloadUrl": "https://www.quut.com/gsm/gsm-1.0.22.tar.gz"
         }
       }
     },
@@ -11581,8 +11581,8 @@
         "type": "other",
         "other": {
           "name": "libXaw",
-          "version": "1.0.13",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXaw-1.0.13.tar.bz2"
+          "version": "1.0.15",
+          "downloadUrl": "https://www.x.org/archive/individual/lib/libXaw-1.0.15.tar.gz"
         }
       }
     },
@@ -23464,8 +23464,8 @@
         "type": "other",
         "other": {
           "name": "python-psutil",
-          "version": "5.9.0",
-          "downloadUrl": "https://github.com/giampaolo/psutil/archive/release-5.9.0.tar.gz"
+          "version": "5.9.7",
+          "downloadUrl": "https://github.com/giampaolo/psutil/archive/release-5.9.7.tar.gz"
         }
       }
     },
