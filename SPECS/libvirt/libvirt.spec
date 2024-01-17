@@ -129,7 +129,7 @@
 %endif
 
 # RHEL doesn't ship many hypervisor drivers
-%if 0%{?rhel}
+%if 0%{?rhel} || 0%{?mariner}
     %define with_openvz 0
     %define with_vbox 0
     %define with_vmware 0
@@ -138,10 +138,15 @@
     %define with_lxc 0
 %endif
 
+%if 0%{!?mariner}
 %define with_firewalld_zone 0%{!?_without_firewalld_zone:1}
+%endif
 
 %if 0%{?rhel} && 0%{?rhel} < 9
     %define with_netcf 0%{!?_without_netcf:1}
+%endif
+%if 0%{?mariner}
+    %define with_netcf 0
 %endif
 
 # fuse is used to provide virtualized /proc for LXC
@@ -159,6 +164,9 @@
         %define with_sanlock 0%{!?_without_sanlock:1}
     %endif
 %endif
+%if 0%{?mariner}
+    %define with_sanlock 0%{!?_without_sanlock:1}
+%endif
 
 # Enable libssh2 transport for new enough distros
 %if 0%{?fedora}
@@ -166,7 +174,9 @@
 %endif
 
 # Enable wireshark plugins for all distros
+%if 0%{!?mariner}
 %define with_wireshark 0%{!?_without_wireshark:1}
+%endif
 %define wireshark_plugindir %(pkg-config --variable plugindir wireshark)/epan
 
 # Enable libssh transport for all distros
@@ -187,6 +197,7 @@
 %if %{with_qemu}
     # rhel-8 lacks pidfd_open
     %if 0%{?fedora} || 0%{?rhel} >= 9
+        # bfjelds: DO WE NEED THIS TOO???
         %define with_nbdkit 0%{!?_without_nbdkit:1}
 
         # setting 'with_nbdkit_config_default' must be done only when compiling
@@ -317,31 +328,41 @@ Requires: libvirt-libs = %{version}-%{release}
 BuildRequires: python3-docutils
 BuildRequires: meson >= 0.56.0
 BuildRequires: ninja-build
+# bfjelds: NEW
 BuildRequires: git
+# bfjelds: NEW
 BuildRequires: perl-interpreter
+# bfjelds: NEW
 BuildRequires: python3
+# bfjelds: NEW
 BuildRequires: python3-pytest
 # For xmllint
 BuildRequires: libxml2
 # For xsltproc
 BuildRequires: libxslt
 BuildRequires: gettext
+# bfjelds: NEW
 BuildRequires: systemd-rpm-macros
 # Fedora build root suckage
+# bfjelds: NEW
 BuildRequires: gawk
 %if %{with_native}
+# bfjelds: NEW
 BuildRequires: gcc
     %if %{with_libxl}
 BuildRequires: xen-devel
     %endif
+# bfjelds: NEW
 BuildRequires: glib2-devel >= 2.56
 BuildRequires: libxml2-devel
 BuildRequires: readline-devel
 BuildRequires: bash-completion >= 2.0
+# bfjelds: NEW
 BuildRequires: libtasn1-devel
 BuildRequires: gnutls-devel
 BuildRequires: libattr-devel
 # For pool-build probing for existing pools
+# bfjelds: NEW
 BuildRequires: libblkid-devel >= 2.17
 # for augparse, optionally used in testing
 BuildRequires: augeas
@@ -357,6 +378,7 @@ BuildRequires: libselinux-devel
 BuildRequires: iptables
 BuildRequires: ebtables
 # For modprobe
+# bfjelds: NEW
 BuildRequires: kmod
 BuildRequires: cyrus-sasl-devel
 BuildRequires: polkit >= 0.112
@@ -366,7 +388,11 @@ BuildRequires: util-linux
 # For managing ACLs
 BuildRequires: libacl-devel
 # From QEMU RPMs, used by virstoragetest
+%if 0%{?mariner}
+BuildRequires: qemu-img
+%else
 BuildRequires: /usr/bin/qemu-img
+%endif
     %endif
 # nbdkit support requires libnbd
     %if %{with_nbdkit}
@@ -381,12 +407,18 @@ BuildRequires: iscsi-initiator-utils
 BuildRequires: libiscsi-devel
     %endif
 # For disk driver
+# bfjelds: NEW
 BuildRequires: parted-devel
 # For Multipath support
 BuildRequires: device-mapper-devel
     %if %{with_storage_rbd}
+%if 0%{?mariner}
+BuildRequires: librados2-devel
+BuildRequires: librbd1-devel
+%else
 BuildRequires: librados-devel
 BuildRequires: librbd-devel
+%endif
     %endif
     %if %{with_storage_gluster}
 BuildRequires: glusterfs-api-devel >= 3.4.1
@@ -407,9 +439,11 @@ BuildRequires: libssh2-devel >= 1.3.0
 BuildRequires: netcf-devel >= 0.2.2
     %endif
     %if %{with_esx}
+# bfjelds: NEW .. defaults to not use, do we want it?
 BuildRequires: libcurl-devel
     %endif
     %if %{with_hyperv}
+# bfjelds: NEW .. defaults to not use, do we want it?
 BuildRequires: libwsman-devel >= 2.6.3
     %endif
 BuildRequires: audit-libs-devel
@@ -423,10 +457,15 @@ BuildRequires: nfs-utils
 BuildRequires: numad
     %endif
     %if %{with_wireshark}
+# was disabled before ... stay disabled?
 BuildRequires: wireshark-devel
     %endif
     %if %{with_libssh}
+%if 0%{?mariner}
+BuildRequires: libssh2-devel >= 0.8.1
+%else
 BuildRequires: libssh-devel >= 0.8.1
+%endif
     %endif
 BuildRequires: libtirpc-devel
     %if %{with_firewalld_zone}
@@ -659,7 +698,11 @@ Requires: util-linux
 Requires: scrub
     %if %{with_qemu}
 # From QEMU RPMs
+%if 0%{?mariner}
+Requires: qemu-img
+%else
 Requires: /usr/bin/qemu-img
+%endif
     %endif
     %if !%{with_storage_rbd}
 Obsoletes: libvirt-daemon-driver-storage-rbd < 5.2.0
@@ -737,11 +780,13 @@ multipath storage using device mapper.
 Summary: Storage driver plugin for gluster
 Requires: libvirt-daemon-driver-storage-core = %{version}-%{release}
 Requires: libvirt-libs = %{version}-%{release}
-        %if 0%{?fedora}
+        %if 0%{?fedora} || 0%{?mariner}
 Requires: glusterfs-client >= 2.0.1
         %endif
+        %if 0%{!?mariner}
         %if 0%{?fedora} || 0%{?with_storage_gluster}
 Requires: /usr/sbin/gluster
+        %endif
         %endif
 
 %description daemon-driver-storage-gluster
@@ -806,18 +851,26 @@ Summary: QEMU driver plugin for the libvirtd daemon
 Requires: libvirt-daemon-common = %{version}-%{release}
 Requires: libvirt-daemon-log = %{version}-%{release}
 Requires: libvirt-libs = %{version}-%{release}
+%if 0%{?mariner}
+Requires: qemu-img
+%else
 Requires: /usr/bin/qemu-img
+%endif
 # For image compression
 Requires: gzip
 Requires: bzip2
 Requires: lzop
 Requires: xz
+%if 0%{!?mariner}
 Requires: systemd-container
+%endif
+# bfjelds: NEW
 Requires: swtpm-tools
         %if %{with_numad}
 Requires: numad
         %endif
         %if 0%{?fedora} || 0%{?rhel} >= 9
+# bfjelds: DO WE NEED THIS TOO???
 Recommends: passt
 Recommends: passt-selinux
         %endif
@@ -899,7 +952,11 @@ Requires: libvirt-daemon-driver-nodedev = %{version}-%{release}
 Requires: libvirt-daemon-driver-nwfilter = %{version}-%{release}
 Requires: libvirt-daemon-driver-secret = %{version}-%{release}
 Requires: libvirt-daemon-driver-storage = %{version}-%{release}
+%if 0%{?mariner}
+Requires: qemu-kvm
+%else
 Requires: qemu
+%endif
 
 %description daemon-qemu
 Server side daemon and driver required to manage the virtualization
