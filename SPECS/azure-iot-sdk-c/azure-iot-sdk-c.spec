@@ -88,6 +88,7 @@ install -p -m 755 provisioning_client/tools/tpm_device_provision/tpm_device_prov
 %changelog
 *   Tue Jan 16 2024 Minghe Ren <mingheren@microsoft.com> - 2022.01.21-2
 -   Add patch for CVE-2024-21646
+-   change to use autosetup
 
 *   Mon Jan 24 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 2022.01.21-1
 -   Upgrade to 2022.01.21.
