@@ -293,8 +293,8 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %exclude %{osbuilder}/tools/osbuilder/rootfs-builder/ubuntu
 
 %changelog
-* Tue Jan 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.6.3-1
-- Auto-upgrade to 0.6.3
+*   Mon Jan 08 2024 Dallas Delaney <dadelan@microsoft.com> - 0.6.3-1
+-   Upgrade to version 0.6.3
 
 *   Tue Dec 05 2023 Archana Choudhary <archana1@microsoft.com> - 0.6.2-2
 -   Add qemu-virtiofsd as a requirement
