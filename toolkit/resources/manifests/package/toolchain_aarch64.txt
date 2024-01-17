@@ -18,11 +18,11 @@ bzip2-1.0.8-1.azl3.aarch64.rpm
 bzip2-debuginfo-1.0.8-1.azl3.aarch64.rpm
 bzip2-devel-1.0.8-1.azl3.aarch64.rpm
 bzip2-libs-1.0.8-1.azl3.aarch64.rpm
-ca-certificates-2.0.0-13.azl3.noarch.rpm
-ca-certificates-base-2.0.0-13.azl3.noarch.rpm
-ca-certificates-legacy-2.0.0-13.azl3.noarch.rpm
-ca-certificates-shared-2.0.0-13.azl3.noarch.rpm
-ca-certificates-tools-2.0.0-13.azl3.noarch.rpm
+ca-certificates-3.0.0-1.azl3.noarch.rpm
+ca-certificates-base-3.0.0-1.azl3.noarch.rpm
+ca-certificates-legacy-3.0.0-1.azl3.noarch.rpm
+ca-certificates-shared-3.0.0-1.azl3.noarch.rpm
+ca-certificates-tools-3.0.0-1.azl3.noarch.rpm
 ccache-4.8.3-1.azl3.aarch64.rpm
 ccache-debuginfo-4.8.3-1.azl3.aarch64.rpm
 check-0.15.2-1.azl3.aarch64.rpm
