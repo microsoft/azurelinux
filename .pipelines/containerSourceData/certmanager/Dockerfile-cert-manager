@@ -1,0 +1,16 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+ARG BASE_IMAGE
+
+FROM $BASE_IMAGE
+
+@INCLUDE_MAIN_RUN_INSTRUCTION@
+
+# set security context
+USER 1000
+
+# simple smoke test
+RUN stat @BINARY_PATH@
+
+ENTRYPOINT [ @BINARY_PATH@ ]
