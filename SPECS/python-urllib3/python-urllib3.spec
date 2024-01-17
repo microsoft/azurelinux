@@ -9,7 +9,7 @@ Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/urllib3
 Source0:        https://github.com/urllib3/urllib3/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
-Patch0: urllib3_test_recent_date.patch
+Patch0:         urllib3_test_recent_date.patch
 
 %description
 A powerful, sanity-friendly HTTP client for Python.
