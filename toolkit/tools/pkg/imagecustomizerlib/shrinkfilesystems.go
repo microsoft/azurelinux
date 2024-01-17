@@ -5,12 +5,6 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
-	// "os"
-	// "os/exec"
-	// "path/filepath"
-	// "strconv"
-	// "strings"
-	// "github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 )
 
 func shrinkFilesystems(imageLoopDevice string, outputImageFile string) error {

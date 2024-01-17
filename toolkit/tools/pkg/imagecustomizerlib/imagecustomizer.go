@@ -364,6 +364,27 @@ func shrinkFilesystemsHelper(buildDir string, buildImageFile string, outputImage
 	return nil
 }
 
+func shrinkFilesystemsHelper(buildDir string, buildImageFile string, outputImageFile string) error {
+	imageConnection, err := connectToExistingImage(buildImageFile, buildDir, "imageroot")
+	if err != nil {
+		return err
+	}
+	defer imageConnection.Close()
+
+	// Shrink the filesystems.
+	err = shrinkFilesystems(imageConnection, outputImageFile)
+	if err != nil {
+		return err
+	}
+
+	err = imageConnection.CleanClose()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
 	buildImageFile string, rpmsSources []string, useBaseImageRpmRepos bool,
 ) error {
