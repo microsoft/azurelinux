@@ -112,7 +112,7 @@ func resizePartition(partitionRawFilepath string, fstype string) (err error) {
 		return fmt.Errorf("failed to check %s with e2fsck:\n%w", partitionRawFilepath, err)
 	}
 
-	// Resize the file sytem with resize2fs
+	// Resize the file system with resize2fs
 	cmd = exec.Command("sudo", "resize2fs", "-M", partitionRawFilepath)
 	_, err = cmd.Output()
 	if err != nil {
