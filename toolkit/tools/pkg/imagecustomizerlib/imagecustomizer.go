@@ -33,7 +33,7 @@ var (
 
 func CustomizeImageWithConfigFile(buildDir string, configFile string, imageFile string,
 	rpmsSources []string, outputImageFile string, outputImageFormat string,
-	outputSplitPartitionsFormat string, useBaseImageRpmRepos bool,
+	outputSplitPartitionsFormat string, useBaseImageRpmRepos bool, enableShrinkFilesystems bool,
 ) error {
 	var err error
 
@@ -51,7 +51,7 @@ func CustomizeImageWithConfigFile(buildDir string, configFile string, imageFile 
 	}
 
 	err = CustomizeImage(buildDir, absBaseConfigPath, &config, imageFile, rpmsSources, outputImageFile, outputImageFormat,
-		outputSplitPartitionsFormat, useBaseImageRpmRepos)
+		outputSplitPartitionsFormat, useBaseImageRpmRepos, enableShrinkFilesystems)
 	if err != nil {
 		return err
 	}
@@ -60,7 +60,8 @@ func CustomizeImageWithConfigFile(buildDir string, configFile string, imageFile 
 }
 
 func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config, imageFile string,
-	rpmsSources []string, outputImageFile string, outputImageFormat string, outputSplitPartitionsFormat string, useBaseImageRpmRepos bool,
+	rpmsSources []string, outputImageFile string, outputImageFormat string, outputSplitPartitionsFormat string, 
+	useBaseImageRpmRepos bool, enableShrinkFilesystems bool,
 ) error {
 	var err error
 	var qemuOutputImageFormat string
@@ -111,6 +112,14 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 		partitionsCustomized)
 	if err != nil {
 		return err
+	}
+
+	// Shrink the filesystems.
+	if enableShrinkFilesystems {
+		err = shrinkFilesystemsHelper(buildDirAbs, buildImageFile, outputImageFile, outputSplitPartitionsFormat)
+		if err != nil {
+			return err
+		}
 	}
 
 	if config.SystemConfig.Verity != nil {
@@ -327,6 +336,27 @@ func extractPartitionsHelper(buildImageFile string, outputImageFile string, outp
 	}
 
 	err = imageLoopback.CleanClose()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func shrinkFilesystemsHelper(buildDir string, buildImageFile string, outputImageFile string) error {
+	imageConnection, err := connectToExistingImage(buildImageFile, buildDir, "imageroot")
+	if err != nil {
+		return err
+	}
+	defer imageConnection.Close()
+
+	// Shrink the filesystems.
+	err = shrinkFilesystems(imageConnection, outputImageFile)
+	if err != nil {
+		return err
+	}
+
+	err = imageConnection.CleanClose()
 	if err != nil {
 		return err
 	}
