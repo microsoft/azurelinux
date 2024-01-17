@@ -1,7 +1,7 @@
 Summary:        D-Bus Python Bindings
 Name:           dbus-python
-Version:        1.2.16
-Release:        3%{?dist}
+Version:        1.3.2
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -75,6 +75,9 @@ make check -k || (cat test-suite.log && false)
 %{_libdir}/pkgconfig/dbus-python.pc
 
 %changelog
+* Wed Jan 17 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.3.2-1
+- Auto-upgrade to 1.3.2 - For 3.0 release
+
 * Fri Jul 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.16-3
 - License verified.
 
