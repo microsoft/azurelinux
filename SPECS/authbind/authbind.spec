@@ -1,14 +1,14 @@
 %global build_flags prefix=%{_prefix} lib_dir=%{_libdir} libexec_dir=%{_libexecdir}/%{name} etc_dir=%{_sysconfdir}/%{name}
 
 Name:           authbind
-Version:        2.1.2
-Release:        4%{?dist}
+Version:        2.1.3
+Release:        1%{?dist}
 Summary:        Allow non-root users to open restricted ports
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.chiark.greenend.org.uk/ucgi/~ian/git/authbind.git/
-Source0:        https://deb.debian.org/debian/pool/main/a/%{name}/%{name}_%{version}.tar.gz
+Source0:        https://deb.debian.org/debian/pool/main/a/%{name}/%{name}_%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         authbind-makefile-fixes.patch
 
 BuildRequires:  gcc
@@ -39,6 +39,10 @@ ports, without any changes to the application.
 %dir %{_sysconfdir}/%{name}/byuid
 
 %changelog
+* Mon Jan 08 2024 Archana Choudhary <archana1@microsoft.com> - 2.1.3-1
+- Upgrade to version 2.1.3
+- Repackage tarball to align with folder structure expected
+
 * Fri Feb 17 2023 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.1.2-4
 - Initial CBL-Mariner import from Fedora 38 (license: MIT).
 - License Verified

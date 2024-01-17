@@ -1,7 +1,7 @@
 diff -ur b/at.c a/at.c
---- b/at.c	2021-04-25 03:31:30.000000000 +0200
-+++ a/at.c	2021-05-20 17:57:36.909775361 +0200
-@@ -145,18 +145,12 @@
+--- b/at.c	2022-01-29 17:42:19.000000000 +0100
++++ a/at.c	2022-02-23 18:42:45.941757090 +0100
+@@ -155,18 +155,12 @@
  /* If the user presses ^C, remove the spool file and exit 
   */
      if (fcreated) {
@@ -21,14 +21,14 @@ diff -ur b/at.c a/at.c
      }
      exit(EXIT_FAILURE);
  }
-@@ -316,26 +310,19 @@
+@@ -326,26 +320,19 @@
  	 * bit.  Yes, this is a kluge.
  	 */
  	cmask = umask(S_IRUSR | S_IWUSR | S_IXUSR);
 -        seteuid(real_uid);
 +       if ((seteuid(effective_uid)) < 0)
 +	    perr("Error in seteuid: %s", errno);
- 	if ((fd = open(atfile, O_CREAT | O_EXCL | O_TRUNC | O_WRONLY, S_IRUSR)) == -1)
+ 	if ((fd = open(atfile, O_CREAT | O_EXCL | O_TRUNC | O_WRONLY | O_SYNC, S_IRUSR)) == -1)
  	    perr("Cannot create atjob file %.500s", atfile);
 -        seteuid(effective_uid);
  
@@ -51,7 +51,7 @@ diff -ur b/at.c a/at.c
      /* We've successfully created the file; let's set the flag so it 
       * gets removed in case of an interrupt or error.
       */
-@@ -694,7 +681,7 @@
+@@ -733,7 +720,7 @@
                      We need the unprivileged uid here since the file is owned by the real
                      (not effective) uid.
                      */
@@ -60,7 +60,7 @@ diff -ur b/at.c a/at.c
  
  		    if (queue == '=') {
  			fprintf(stderr, "Warning: deleting running job\n");
-@@ -703,8 +690,8 @@
+@@ -742,8 +729,8 @@
  			perr("Cannot unlink %.500s", dirent->d_name);
  			rc = EXIT_FAILURE;
  		    }
@@ -70,7 +70,7 @@ diff -ur b/at.c a/at.c
  		    done = 1;
  
  		    break;
-@@ -714,7 +701,7 @@
+@@ -753,7 +740,7 @@
  			FILE *fp;
  			int ch;
  
@@ -79,7 +79,7 @@ diff -ur b/at.c a/at.c
  			fp = fopen(dirent->d_name, "r");
  
  			if (fp) {
-@@ -727,7 +714,7 @@
+@@ -768,7 +755,7 @@
  			    perr("Cannot open %.500s", dirent->d_name);
  			    rc = EXIT_FAILURE;
  			}
@@ -89,8 +89,8 @@ diff -ur b/at.c a/at.c
  		    break;
  
 diff -ur b/atd.c a/atd.c
---- b/atd.c	2021-04-25 03:31:30.000000000 +0200
-+++ a/atd.c	2021-05-20 17:57:35.005776469 +0200
+--- b/atd.c	2022-01-29 17:42:19.000000000 +0100
++++ a/atd.c	2022-02-23 18:50:53.743511813 +0100
 @@ -91,6 +91,10 @@
  
  /* Macros */
@@ -102,7 +102,7 @@ diff -ur b/atd.c a/atd.c
  #define BATCH_INTERVAL_DEFAULT 60
  #define CHECK_INTERVAL 3600
  
-@@ -114,7 +118,7 @@
+@@ -115,7 +119,7 @@
  
  static volatile sig_atomic_t term_signal = 0;
  
@@ -111,7 +111,7 @@ diff -ur b/atd.c a/atd.c
  #include <security/pam_appl.h>
  
  static pam_handle_t *pamh = NULL;
-@@ -123,15 +127,7 @@
+@@ -124,15 +128,7 @@
  	NULL
  };
  
@@ -128,7 +128,7 @@ diff -ur b/atd.c a/atd.c
  
  /* Signal handlers */
  RETSIGTYPE 
-@@ -292,7 +288,7 @@
+@@ -293,7 +289,7 @@
      char fmt[64];
      unsigned long jobno;
      int rc;
@@ -137,7 +137,7 @@ diff -ur b/atd.c a/atd.c
      int retcode;
  #endif
  
-@@ -449,17 +445,11 @@
+@@ -450,17 +446,11 @@
      fstat(fd_out, &buf);
      size = buf.st_size;
  
@@ -160,11 +160,10 @@ diff -ur b/atd.c a/atd.c
  #endif
  
      close(STDIN_FILENO);
-@@ -473,7 +463,14 @@
-     else if (pid == 0) {
+@@ -475,6 +465,14 @@
  	char *nul = NULL;
  	char **nenvp = &nul;
--
+ 
 +	char **pam_envp=0L;
 + 
 +	PRIV_START
@@ -176,16 +175,15 @@ diff -ur b/atd.c a/atd.c
  	/* Set up things for the child; we want standard input from the
  	 * input file, and standard output and error sent to our output file.
  	 */
-@@ -492,8 +489,6 @@
+@@ -493,7 +491,6 @@
  	close(fd_in);
  	close(fd_out);
  
 -	PRIV_START
--
+ 
  	    nice((tolower((int) queue) - 'a') * 2);
  
- #ifdef WITH_SELINUX
-@@ -514,9 +509,9 @@
+@@ -515,9 +512,9 @@
  
  	    chdir("/");
  
@@ -198,7 +196,7 @@ diff -ur b/atd.c a/atd.c
  	PRIV_END
      }
      /* We're the parent.  Let's wait.
-@@ -529,14 +524,6 @@
+@@ -530,14 +527,6 @@
       */
      waitpid(pid, (int *) NULL, 0);
  
@@ -213,21 +211,21 @@ diff -ur b/atd.c a/atd.c
      /* Send mail.  Unlink the output file after opening it, so it
       * doesn't hang around after the run.
       */
-@@ -567,8 +554,13 @@
+@@ -568,8 +557,13 @@
      unlink(newname);
      free(newname);
  
 +#ifdef ATD_MAIL_PROGRAM
      if (((send_mail != -1) && (buf.st_size != size)) || (send_mail == 1)) {
 +       int mail_pid = -1;
-+ 
-+     mail_pid = fork();
  
++     mail_pid = fork();
++
 +     if ( mail_pid == 0 ) {
  	PRIV_START
  
  	    if (initgroups(pentry->pw_name, pentry->pw_gid))
-@@ -590,7 +582,20 @@
+@@ -591,7 +585,20 @@
  	    perr("Exec failed for mail command");
  
  	PRIV_END
@@ -236,7 +234,7 @@ diff -ur b/atd.c a/atd.c
 +           syslog(LOG_ERR, "fork of mailer failed: %m");
 +     }
 +     /* Parent */
-+     waitpid(mail_pid, (int *) NULL, 0);    
++     waitpid(mail_pid, (int *) NULL, 0); 
      }
 +
 +#ifdef WITH_PAM
@@ -249,9 +247,9 @@ diff -ur b/atd.c a/atd.c
  }
  
 diff -ur b/config.h.in a/config.h.in
---- b/config.h.in	2021-04-25 03:31:30.000000000 +0200
-+++ a/config.h.in	2021-05-20 17:59:32.127708342 +0200
-@@ -71,8 +71,8 @@
+--- b/config.h.in	2022-01-29 17:42:19.000000000 +0100
++++ a/config.h.in	2022-02-23 18:51:31.467570176 +0100
+@@ -74,8 +74,8 @@
  /* Define to 1 if you have the <nlist.h> header file. */
  #undef HAVE_NLIST_H
  
@@ -263,9 +261,9 @@ diff -ur b/config.h.in a/config.h.in
  /* Define to 1 if you have the `pstat_getdynamic' function. */
  #undef HAVE_PSTAT_GETDYNAMIC
 diff -ur b/configure.ac a/configure.ac
---- b/configure.ac	2021-04-25 03:31:30.000000000 +0200
-+++ a/configure.ac	2021-05-20 17:59:29.088710109 +0200
-@@ -96,7 +96,7 @@
+--- b/configure.ac	2022-01-29 17:42:19.000000000 +0100
++++ a/configure.ac	2022-02-23 18:53:08.516720324 +0100
+@@ -97,7 +97,7 @@
  AC_CHECK_FUNCS(getcwd mktime strftime setreuid setresuid sigaction waitpid)
  AC_CHECK_HEADERS(security/pam_appl.h, [
    PAMLIB="-lpam"
@@ -274,7 +272,7 @@ diff -ur b/configure.ac a/configure.ac
  ])
  
  dnl Checking for programs
-@@ -257,6 +257,13 @@
+@@ -260,6 +260,13 @@
  )
  AC_SUBST(DAEMON_USERNAME)
  
@@ -289,9 +287,9 @@ diff -ur b/configure.ac a/configure.ac
  [ --with-selinux       Define to run with selinux (default=check)],
  [],
 diff -ur b/Makefile.in a/Makefile.in
---- b/Makefile.in	2021-04-25 03:31:30.000000000 +0200
-+++ a/Makefile.in	2021-05-20 18:00:04.874689294 +0200
-@@ -71,7 +71,7 @@
+--- b/Makefile.in	2022-02-23 18:33:26.999892289 +0100
++++ a/Makefile.in	2022-02-23 18:53:28.600751396 +0100
+@@ -76,7 +76,7 @@
  all: at atd atd.service atrun
  
  at: $(ATOBJECTS)
@@ -301,8 +299,8 @@ diff -ur b/Makefile.in a/Makefile.in
  	$(LN_S) -f at atq
  	$(LN_S) -f at atrm
 diff -ur b/perm.c a/perm.c
---- b/perm.c	2021-04-25 03:31:30.000000000 +0200
-+++ a/perm.c	2021-05-20 18:01:58.689621839 +0200
+--- b/perm.c	2022-01-29 17:42:19.000000000 +0100
++++ a/perm.c	2022-02-23 18:56:21.401018761 +0100
 @@ -51,6 +51,14 @@
  #define PRIV_END while(0)
  #endif
@@ -368,8 +366,8 @@ diff -ur b/perm.c a/perm.c
    if (allow==0 || allow==1)
      return allow;
 diff -ur b/privs.h a/privs.h
---- b/privs.h	2021-04-25 03:31:30.000000000 +0200
-+++ a/privs.h	2021-05-20 18:02:51.847589692 +0200
+--- b/privs.h	2022-01-29 17:42:19.000000000 +0100
++++ a/privs.h	2022-02-23 18:58:20.920203690 +0100
 @@ -144,3 +144,62 @@
  #error "Cannot implement user ID swapping without setreuid or setresuid"
  #endif
