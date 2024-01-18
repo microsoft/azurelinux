@@ -16,18 +16,6 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 )
 
-var (
-	// When calling mkfs, the default options change depending on the host OS you are running on and typically match
-	// what the distro has decided is best for their OS. For example, for ext2/3/4, the defaults are stored in
-	// /etc/mke2fs.conf.
-	// However, for the image customizer tool, the defaults should be as consistent as possible.
-	DefaultMkfsOptions = map[string][]string{
-		"ext2": {"-b", "4096", "-O", "none,sparse_super,large_file,filetype,resize_inode,dir_index,ext_attr"},
-		"ext3": {"-b", "4096", "-O", "none,sparse_super,large_file,filetype,resize_inode,dir_index,ext_attr,has_journal"},
-		"ext4": {"-b", "4096", "-O", "none,sparse_super,large_file,filetype,resize_inode,dir_index,ext_attr,has_journal,extent,huge_file,flex_bg,metadata_csum,64bit,dir_nlink,extra_isize"},
-	}
-)
-
 type installOSFunc func(imageChroot *safechroot.Chroot) error
 
 func connectToExistingImage(imageFilePath string, buildDir string, chrootDirName string, includeDefaultMounts bool,
@@ -175,7 +163,7 @@ func createImageBoilerplate(imageConnection *ImageConnection, filename string, b
 	// Set up partitions.
 	partIDToDevPathMap, partIDToFsTypeMap, _, _, err := diskutils.CreatePartitions(
 		imageConnection.Loopback().DevicePath(), imagerDiskConfig, configuration.RootEncryption{},
-		configuration.ReadOnlyVerityRoot{}, DefaultMkfsOptions)
+		configuration.ReadOnlyVerityRoot{})
 	if err != nil {
 		return nil, "", fmt.Errorf("failed to create partitions on disk (%s):\n%w", imageConnection.Loopback().DevicePath(), err)
 	}
