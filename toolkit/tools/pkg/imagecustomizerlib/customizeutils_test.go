@@ -25,7 +25,7 @@ func TestUpdateHostname(t *testing.T) {
 	// Setup environment.
 	proposedDir := filepath.Join(tmpDir, "TestUpdateHostname")
 	chroot := safechroot.NewChroot(proposedDir, false)
-	err := chroot.Initialize("", []string{}, []*safechroot.MountPoint{})
+	err := chroot.Initialize("", []string{}, []*safechroot.MountPoint{}, false)
 	assert.NoError(t, err)
 	defer chroot.Close(false)
 
@@ -52,7 +52,7 @@ func TestCopyAdditionalFiles(t *testing.T) {
 	chroot := safechroot.NewChroot(proposedDir, false)
 	baseConfigPath := testDir
 
-	err := chroot.Initialize("", []string{}, []*safechroot.MountPoint{})
+	err := chroot.Initialize("", []string{}, []*safechroot.MountPoint{}, false)
 	assert.NoError(t, err)
 	defer chroot.Close(false)
 
@@ -109,7 +109,7 @@ func TestAddCustomizerRelease(t *testing.T) {
 
 	proposedDir := filepath.Join(tmpDir, "TestAddCustomizerRelease")
 	chroot := safechroot.NewChroot(proposedDir, false)
-	err := chroot.Initialize("", []string{}, []*safechroot.MountPoint{})
+	err := chroot.Initialize("", []string{}, []*safechroot.MountPoint{}, false)
 	assert.NoError(t, err)
 	defer chroot.Close(false)
 

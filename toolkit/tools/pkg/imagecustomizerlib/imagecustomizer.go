@@ -287,7 +287,7 @@ func validatePackageLists(baseConfigPath string, config *imagecustomizerapi.Syst
 func customizeImageHelper(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
 	buildImageFile string, rpmsSources []string, useBaseImageRpmRepos bool, partitionsCustomized bool,
 ) error {
-	imageConnection, err := connectToExistingImage(buildImageFile, buildDir, "imageroot")
+	imageConnection, err := connectToExistingImage(buildImageFile, buildDir, "imageroot", true)
 	if err != nil {
 		return err
 	}

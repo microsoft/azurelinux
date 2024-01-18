@@ -76,7 +76,7 @@ func validateWorker(rpmsDir, chrootDir, workerTarPath, manifestPath string) (err
 	rpmMount := safechroot.NewMountPoint(rpmsDir, chrootToolchainRpmsDir, "", safechroot.BindMountPointFlags, "")
 	extraDirectories := []string{chrootToolchainRpmsDir}
 	rpmMounts := []*safechroot.MountPoint{rpmMount}
-	err = chroot.Initialize(workerTarPath, extraDirectories, rpmMounts)
+	err = chroot.Initialize(workerTarPath, extraDirectories, rpmMounts, true)
 	if err != nil {
 		chroot = nil
 		return

@@ -112,7 +112,7 @@ func createChroot(workerTar, chrootDir string, leaveChrootOnDisk bool) (queryChr
 	logger.Log.Info("Creating chroot for repoquery")
 
 	queryChroot = safechroot.NewChroot(chrootDir, false)
-	err = queryChroot.Initialize(workerTar, nil, nil)
+	err = queryChroot.Initialize(workerTar, nil, nil, true)
 	if err != nil {
 		err = fmt.Errorf("failed to initialize chroot:\n%w", err)
 		return

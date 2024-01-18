@@ -34,14 +34,14 @@ func (c *ImageConnection) ConnectLoopback(diskFilePath string) error {
 }
 
 func (c *ImageConnection) ConnectChroot(rootDir string, isExistingDir bool, extraDirectories []string,
-	extraMountPoints []*safechroot.MountPoint,
+	extraMountPoints []*safechroot.MountPoint, includeDefaultMounts bool,
 ) error {
 	if c.chroot != nil {
 		return fmt.Errorf("chroot already connected")
 	}
 
 	chroot := safechroot.NewChroot(rootDir, isExistingDir)
-	err := chroot.Initialize("", extraDirectories, extraMountPoints)
+	err := chroot.Initialize("", extraDirectories, extraMountPoints, includeDefaultMounts)
 	if err != nil {
 		return err
 	}
