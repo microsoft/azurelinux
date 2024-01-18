@@ -64,7 +64,7 @@
 %define with_esx           0%{!?_without_esx:1}
 %define with_hyperv        0%{!?_without_hyperv:1}
 
-%if 0%{!?mariner}
+%if 0%{?mariner}
 # bfjelds: to maintain previous mariner settings, explicitly disable curl
 # and enable driver_esx by setting with_esx=0
 %define with_esx           0
@@ -165,9 +165,9 @@
     %define with_fuse      0%{!?_without_fuse:1}
 %endif
 %if 0%{?mariner}
-# bfjelds: to maintain previous mariner settings, explicitly disable fuse
-# by setting with_fuse=0
-    %define with_fuse 0
+# bfjelds: to maintain previous mariner settings, explicitly enable fuse
+# by setting with_fuse=1
+    %define with_fuse 1
 %endif
 
 # Enable sanlock library for lock management with QEMU
