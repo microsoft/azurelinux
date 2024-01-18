@@ -1,8 +1,8 @@
 %define bits	%{?__isa_bits:%{__isa_bits}}%{!?__isa_bits:32}
 Summary:        Implementation of the TDS (Tabular DataStream) protocol
 Name:           freetds
-Version:        1.1.20
-Release:        5%{?dist}
+Version:        1.4.10
+Release:        1%{?dist}
 License:        LGPLv2+ AND GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -115,13 +115,13 @@ find docdir -type f -print0 | xargs -0 chmod -x
 
 %files
 %{_bindir}/*
-%license COPYING
-%doc AUTHORS BUGS NEWS README TODO doc/*.html
+%license COPYING.txt
+%doc AUTHORS.md ChangeLog NEWS.md README.md TODO.md doc/*.html
 %doc docdir/userguide docdir/images
 %{_mandir}/man1/*
 
 %files libs
-%license COPYING.LIB
+%license COPYING_LIB.txt
 %{_libdir}/*.so.*
 %{_libdir}/libtdsodbc.so
 %doc samples-odbc
@@ -138,6 +138,9 @@ find docdir -type f -print0 | xargs -0 chmod -x
 %doc docdir/reference
 
 %changelog
+* Thu Dec 21 2023 Muhammad Falak <mwani@microsoft.com> - 1.4.10-1
+- Upgrade version to 1.4.10
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.1.20-5
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

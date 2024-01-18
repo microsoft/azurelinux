@@ -1,8 +1,8 @@
 %bcond_without pam
 Summary:        Job spooling tools
 Name:           at
-Version:        3.2.2
-Release:        2%{?dist}
+Version:        3.2.5
+Release:        1%{?dist}
 # http://packages.debian.org/changelogs/pool/main/a/at/current/copyright
 # + install-sh is MIT license with changes under Public Domain
 License:        GPLv3+ AND GPLv2+ AND ISC AND MIT AND Public Domain
@@ -14,23 +14,23 @@ Source:         https://salsa.debian.org/debian/at/-/archive/release/%{version}/
 Source1:        pam_atd
 Source3:        atd.sysconf
 Source5:        atd.systemd
-Patch0:         at-aarch64.patch
-Patch1:         at-3.2.2-make.patch
-Patch2:         at-3.2.2-pam.patch
-Patch3:         at-3.1.14-opt_V.patch
-Patch4:         at-3.2.2-shell.patch
-Patch5:         at-3.1.18-nitpicks.patch
-Patch6:         at-3.1.14-fix_no_export.patch
-Patch7:         at-3.1.14-mailwithhostname.patch
-Patch8:         at-3.1.14-usePOSIXtimers.patch
-Patch9:         at-3.1.20-aborted-jobs.patch
-Patch10:        at-3.1.18-noabort.patch
-Patch11:        at-3.1.16-fclose-error.patch
-Patch12:        at-3.1.16-clear-nonjobs.patch
-Patch13:        at-3.2.2-lock-locks.patch
-Patch14:        at-3.1.23-document-n.patch
-Patch15:        at-3.1.20-log-jobs.patch
-Patch16:        at-3.2.23-coverity-fix.patch
+
+Patch1:       at-aarch64.patch
+Patch2:       at-3.2.5-make.patch
+Patch3:       at-3.2.5-pam.patch
+Patch4:       at-3.1.14-opt_V.patch
+Patch5:       at-3.2.2-shell.patch
+Patch6:       at-3.2.5-nitpicks.patch
+Patch7:       at-3.1.14-fix_no_export.patch
+Patch8:       at-3.2.5-mailwithhostname.patch
+Patch9:       at-3.2.5-aborted-jobs.patch
+Patch10:      at-3.2.5-noabort.patch
+Patch11:      at-3.1.16-fclose-error.patch
+Patch12:      at-3.1.16-clear-nonjobs.patch
+Patch13:      at-3.2.2-lock-locks.patch
+Patch14:      at-3.1.23-document-n.patch
+Patch15:      at-3.1.20-log-jobs.patch
+
 BuildRequires:  autoconf
 BuildRequires:  bison
 BuildRequires:  flex
@@ -92,15 +92,15 @@ make install \
 	DAEMON_USERNAME=`id -nu`\
 	DAEMON_GROUPNAME=`id -ng` \
 	DESTDIR=%{buildroot}\
-	sbindir=%{buildroot}%{_prefix}/sbin\
-	bindir=%{buildroot}%{_bindir}\
-	prefix=%{buildroot}%{_prefix}\
-	exec_prefix=%{buildroot}%{_prefix}\
-	docdir=%{buildroot}%{_prefix}/doc\
-	mandir=%{buildroot}%{_mandir}\
-	etcdir=%{buildroot}%{_sysconfdir} \
-	ATJOB_DIR=%{buildroot}%{_localstatedir}/spool/at \
-	ATSPOOL_DIR=%{buildroot}%{_localstatedir}/spool/at/spool \
+	sbindir=%{_prefix}/sbin\
+	bindir=%{_bindir}\
+	prefix=%{_prefix}\
+	exec_prefix=%{_prefix}\
+	docdir=%{_prefix}/doc\
+	mandir=%{_mandir}\
+	etcdir=%{_sysconfdir} \
+	ATJOB_DIR=%{_localstatedir}/spool/at \
+	ATSPOOL_DIR=%{_localstatedir}/spool/at/spool \
 	INSTALL_ROOT_USER=`id -nu` \
 	INSTALL_ROOT_GROUP=`id -nu`;
 
@@ -165,9 +165,13 @@ chown root:root %{_localstatedir}/spool/at/.SEQ
 %{_bindir}/atrm
 %{_bindir}/atq
 %attr(4755,root,root) %{_bindir}/at
+%{_datadir}/at/batch-job
 %attr(0644,root,root) /lib/systemd/system/atd.service
 
 %changelog
+* Fri Jan 05 2024 Muhammad Falak <mwani@microsoft.com> - 3.2.5-1
+- Bump version to 3.2.5
+
 * Mon Feb 14 2022 Bala <balakumaran.kannan@microsoft.com> - 3.2.2-2
 - BR perl-Test, perl-Test-More and perl-Test-Harness for ptest
 - Update source0 URL
