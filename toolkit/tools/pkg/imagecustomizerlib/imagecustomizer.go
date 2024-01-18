@@ -63,10 +63,11 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 	rpmsSources []string, outputImageFile string, outputImageFormat string, outputSplitPartitionsFormat string, useBaseImageRpmRepos bool,
 ) error {
 	var err error
+	var qemuOutputImageFormat string
 
 	// Validate 'outputImageFormat' value if specified.
 	if outputImageFormat != "" {
-		qemuOutputImageFormat, err := toQemuImageFormat(outputImageFormat)
+		qemuOutputImageFormat, err = toQemuImageFormat(outputImageFormat)
 		if err != nil {
 			return err
 		}
@@ -120,15 +121,17 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 		}
 	}
 
-	// Create final output image file.
-	logger.Log.Infof("Writing: %s", outputImageFile)
+	// Create final output image file if requested.
+	if outputImageFormat != "" {
+		logger.Log.Infof("Writing: %s", outputImageFile)
 
-	outDir := filepath.Dir(outputImageFile)
-	os.MkdirAll(outDir, os.ModePerm)
+		outDir := filepath.Dir(outputImageFile)
+		os.MkdirAll(outDir, os.ModePerm)
 
-	err = shell.ExecuteLiveWithErr(1, "qemu-img", "convert", "-O", qemuOutputImageFormat, buildImageFile, outputImageFile)
-	if err != nil {
-		return fmt.Errorf("failed to convert image file to format: %s:\n%w", outputImageFormat, err)
+		err = shell.ExecuteLiveWithErr(1, "qemu-img", "convert", "-O", qemuOutputImageFormat, buildImageFile, outputImageFile)
+		if err != nil {
+			return fmt.Errorf("failed to convert image file to format: %s:\n%w", outputImageFormat, err)
+		}
 	}
 
 	// If outputSplitPartitionsFormat is specified, extract the partition files.
