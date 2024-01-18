@@ -211,7 +211,7 @@ func createChroot(workerTar, buildDir, specsDir, srpmsDir string) (chroot *safec
 	chrootDir := filepath.Join(buildDir, chrootName)
 	chroot = safechroot.NewChroot(chrootDir, existingDir)
 
-	err = chroot.Initialize(workerTar, extraDirectories, extraMountPoints)
+	err = chroot.Initialize(workerTar, extraDirectories, extraMountPoints, true)
 	if err != nil {
 		return
 	}
