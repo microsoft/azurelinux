@@ -1,12 +1,12 @@
 Summary:        A general purpose TCP-IP emulator
 Name:           libslirp
-Version:        4.6.1
-Release:        3%{?dist}
+Version:        4.7.0
+Release:        1%{?dist}
 License:        BSD AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://gitlab.freedesktop.org/slirp/libslirp
-Source0:        %{url}/uploads/83b199ea6fcdfc0c243dfde8546ee4c9/%{name}-%{version}.tar.xz
+Source0:        %{url}/uploads/60113f60cfd6abe2c16dde9f6c81b631/%{name}-%{version}.tar.xz
 BuildRequires:  gcc
 BuildRequires:  glib-devel
 BuildRequires:  meson
