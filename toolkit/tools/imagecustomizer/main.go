@@ -26,7 +26,7 @@ var (
 	configFile                  = app.Flag("config-file", "Path of the image customization config file.").Required().String()
 	rpmSources                  = app.Flag("rpm-source", "Path to a RPM repo config file or a directory containing RPMs.").Strings()
 	disableBaseImageRpmRepos    = app.Flag("disable-base-image-rpm-repos", "Disable the base image's RPM repos as an RPM source").Bool()
-	enableShrinkFilesystems 	= app.Flag("shrink-filesystems", "Enable shrinking of filesystems to minimum size. Supports ext2, ext3, ext4 filesystem types.").Bool()
+	enableShrinkFilesystems     = app.Flag("shrink-filesystems", "Enable shrinking of filesystems to minimum size. Supports ext2, ext3, ext4 filesystem types.").Bool()
 	logFile                     = exe.LogFileFlag(app)
 	logLevel                    = exe.LogLevelFlag(app)
 	profFlags                   = exe.SetupProfileFlags(app)
