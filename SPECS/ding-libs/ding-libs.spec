@@ -49,7 +49,7 @@ librefarray libbasicobjects, and libpath_utils.
 
 %package devel
 Summary:        Development packages for ding-libs
-License:        LGPL-3.0-or-later
+License:        LGPLv3+
 
 # ding-libs is a meta-package that will pull in all of its own
 # sub-packages
@@ -71,7 +71,7 @@ libdhash, libini_config, librefarray and libpath_utils.
 %package -n libpath_utils
 Summary:        Filesystem Path Utilities
 Version:        %{path_utils_version}
-License:        LGPL-3.0-or-later
+License:        LGPLv3+
 
 %description -n libpath_utils
 Utility functions to manipulate filesystem pathnames
@@ -79,7 +79,7 @@ Utility functions to manipulate filesystem pathnames
 %package -n libpath_utils-devel
 Summary:        Development files for libpath_utils
 Version:        %{path_utils_version}
-License:        LGPL-3.0-or-later
+License:        LGPLv3+
 
 Requires:       libpath_utils = %{path_utils_version}-%{release}
 
@@ -108,7 +108,7 @@ Utility functions to manipulate filesystem pathnames
 %package -n libdhash
 Summary:        Dynamic hash table
 Version:        %{dhash_version}
-License:        LGPL-3.0-or-later
+License:        LGPLv3+
 
 %description -n libdhash
 A hash table which will dynamically resize to achieve optimal storage & access
@@ -117,7 +117,7 @@ time properties
 %package -n libdhash-devel
 Summary:        Development files for libdhash
 Version:        %{dhash_version}
-License:        LGPL-3.0-or-later
+License:        LGPLv3+
 
 Requires:       libdhash = %{dhash_version}-%{release}
 
@@ -146,7 +146,7 @@ time properties
 %package -n libcollection
 Summary:        Collection data-type for C
 Version:        %{collection_version}
-License:        LGPL-3.0-or-later
+License:        LGPLv3+
 
 %description -n libcollection
 A data-type to collect data in a hierarchical structure for easy iteration
@@ -155,7 +155,7 @@ and serialization
 %package -n libcollection-devel
 Summary:        Development files for libcollection
 Version:        %{collection_version}
-License:        LGPL-3.0-or-later
+License:        LGPLv3+
 
 Requires:       libcollection = %{collection_version}-%{release}
 
@@ -188,7 +188,7 @@ and serialization
 %package -n libref_array
 Summary:        A refcounted array for C
 Version:        %{ref_array_version}
-License:        LGPL-3.0-or-later
+License:        LGPLv3+
 
 %description -n libref_array
 A dynamically-growing, reference-counted array
@@ -196,7 +196,7 @@ A dynamically-growing, reference-counted array
 %package -n libref_array-devel
 Summary:        Development files for libref_array
 Version:        %{ref_array_version}
-License:        LGPL-3.0-or-later
+License:        LGPLv3+
 
 Requires:       libref_array = %{ref_array_version}-%{release}
 
@@ -260,7 +260,7 @@ Basic object types
 %package -n libini_config
 Summary:        INI file parser for C
 Version:        %{ini_config_version}
-License:        LGPL-3.0-or-later
+License:        LGPLv3+
 
 Requires:       libcollection%{?_isa} = %{collection_version}-%{release}
 Requires:       libref_array%{?_isa} = %{ref_array_version}-%{release}
@@ -274,7 +274,7 @@ structure
 %package -n libini_config-devel
 Summary:        Development files for libini_config
 Version:        %{ini_config_version}
-License:        LGPL-3.0-or-later
+License:        LGPLv3+
 
 Requires:       libini_config = %{ini_config_version}-%{release}
 Requires:       libcollection-devel = %{collection_version}-%{release}
