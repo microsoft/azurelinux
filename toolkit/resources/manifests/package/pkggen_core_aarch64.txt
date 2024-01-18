@@ -74,9 +74,9 @@ xz-5.4.4-1.azl3.aarch64.rpm
 xz-devel-5.4.4-1.azl3.aarch64.rpm
 xz-lang-5.4.4-1.azl3.aarch64.rpm
 xz-libs-5.4.4-1.azl3.aarch64.rpm
-zstd-1.5.5-1.azl3.aarch64.rpm
-zstd-devel-1.5.5-1.azl3.aarch64.rpm
-zstd-libs-1.5.5-1.azl3.aarch64.rpm
+zstd-1.5.5-2.azl3.aarch64.rpm
+zstd-devel-1.5.5-2.azl3.aarch64.rpm
+zstd-libs-1.5.5-2.azl3.aarch64.rpm
 libtool-2.4.7-1.azl3.aarch64.rpm
 flex-2.6.4-7.azl3.aarch64.rpm
 flex-devel-2.6.4-7.azl3.aarch64.rpm
