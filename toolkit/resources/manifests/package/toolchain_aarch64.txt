@@ -1,4 +1,4 @@
-asciidoc-9.1.0-1.azl3.noarch.rpm
+asciidoc-10.2.0-1.azl3.noarch.rpm
 audit-3.1.2-1.azl3.aarch64.rpm
 audit-debuginfo-3.1.2-1.azl3.aarch64.rpm
 audit-devel-3.1.2-1.azl3.aarch64.rpm
@@ -600,8 +600,8 @@ zip-debuginfo-3.0-5.azl3.aarch64.rpm
 zlib-1.3-1.azl3.aarch64.rpm
 zlib-debuginfo-1.3-1.azl3.aarch64.rpm
 zlib-devel-1.3-1.azl3.aarch64.rpm
-zstd-1.5.5-1.azl3.aarch64.rpm
-zstd-debuginfo-1.5.5-1.azl3.aarch64.rpm
-zstd-devel-1.5.5-1.azl3.aarch64.rpm
-zstd-doc-1.5.5-1.azl3.aarch64.rpm
-zstd-libs-1.5.5-1.azl3.aarch64.rpm
+zstd-1.5.5-2.azl3.aarch64.rpm
+zstd-debuginfo-1.5.5-2.azl3.aarch64.rpm
+zstd-devel-1.5.5-2.azl3.aarch64.rpm
+zstd-doc-1.5.5-2.azl3.aarch64.rpm
+zstd-libs-1.5.5-2.azl3.aarch64.rpm
