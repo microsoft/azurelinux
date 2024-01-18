@@ -1,21 +1,24 @@
 Summary:          Library to support IDNA2008 internationalized domain names
 Name:             libidn2
-Version:          2.3.0
-Release:          3%{?dist}
+Version:          2.3.4
+Release:          4%{?dist}
 License:          (GPLv2+ or LGPLv3+) and GPLv3+
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
 URL:              https://www.gnu.org/software/libidn/#libidn2
 
 Source0:          https://ftp.gnu.org/gnu/libidn/%{name}-%{version}.tar.gz
 Source1:          https://ftp.gnu.org/gnu/libidn/%{name}-%{version}.tar.gz.sig
-Source2:          gpgkey-1CB27DBC98614B2D5841646D08302DB6A2670428.gpg
-Patch0:           libidn2-2.0.0-rpath.patch
+Source2:          https://keys.openpgp.org/vks/v1/by-fingerprint/B1D2BD1375BECB784CF4F8C4D73CF638C53C06BE
 
+BuildRequires:    glibc-devel
+BuildRequires:    kernel-devel
+BuildRequires:    kernel-headers
+BuildRequires:    binutils
 BuildRequires:    gnupg2
 BuildRequires:    gcc
+BuildRequires:    make
 BuildRequires:    gettext
 BuildRequires:    libunistring-devel
+BuildRequires:    texinfo
 Provides:         bundled(gnulib)
 
 %description
@@ -33,30 +36,25 @@ developing applications that use libidn2.
 
 %package -n idn2
 Summary:          IDNA2008 internationalized domain names conversion tool
-License:          GPLv3+
+License:          GPL-3.0-or-later
 Requires:         %{name}%{?_isa} = %{version}-%{release}
-%if 0%{?rhel} && 0%{?rhel} <= 7
-Requires(post):   /usr/bin/install-info
-Requires(preun):  /usr/bin/install-info
-%endif
 
 %description -n idn2
 The idn2 package contains the idn2 command line tool for testing
 IDNA2008 conversions.
 
 %prep
-gpgv2 --keyring %{SOURCE2} %{SOURCE1} %{SOURCE0}
+%{!?el7:%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'}
 %setup -q
-%patch0 -p1 -b .rpath
-touch -c -r configure.rpath configure
-touch -c -r m4/libtool.m4.rpath m4/libtool.m4
 
 %build
 %configure --disable-static
-%make_build
+# Avoid (unnecessary) full autoreconf
+%make_build AUTOMAKE=true
+%make_build AUTOMAKE=true -C doc html
 
 %install
-%make_install
+%make_install AUTOMAKE=true
 
 # Clean-up examples for documentation
 %make_build -C examples distclean
@@ -75,27 +73,17 @@ rm -f $RPM_BUILD_ROOT%{_datadir}/info/dir
 
 %ldconfig_scriptlets
 
-%if 0%{?rhel} && 0%{?rhel} <= 7
-%post -n idn2            
-/usr/bin/install-info %{_infodir}/%{name}.info.gz %{_infodir}/dir || :            
-
-%preun -n idn2            
-if [ $1 = 0 ]; then            
-  /usr/bin/install-info --delete %{_infodir}/%{name}.info.gz %{_infodir}/dir || :            
-fi
-%endif
-
 %files -f %{name}.lang
 %license COPYING COPYING.LESSERv3 COPYING.unicode COPYINGv2
 %doc AUTHORS NEWS README.md
-%{_libdir}/%{name}.so.*
+%{_libdir}/%{name}.so.0*
 
 %files devel
 %doc doc/%{name}.html examples
 %{_libdir}/%{name}.so
 %{_libdir}/pkgconfig/%{name}.pc
-%{_includedir}/*.h
-%{_mandir}/man3/*
+%{_includedir}/idn2.h
+%{_mandir}/man3/idn2_*.3*
 %{_datadir}/gtk-doc/
 
 %files -n idn2
@@ -104,6 +92,52 @@ fi
 %{_infodir}/%{name}.info*
 
 %changelog
+* Tue Jan 16 17:26:11 EST 2024 Dan Streetman <ddstreet@ieee.org> - 2.3.4-4
+- Update to version from Fedora 39/rawhide.
+- Next line is present only to avoid tooling failures, and does not indicate the actual package license.
+- Initial CBL-Mariner import from Fedora 39 (license: MIT).
+- license verified
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.4-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Mon Oct 24 2022 Robert Scheck <robert@fedoraproject.org> 2.3.4-1
+- Upgrade to 2.3.4 (#2137124)
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Wed Jul 13 2022 Robert Scheck <robert@fedoraproject.org> 2.3.3-1
+- Upgrade to 2.3.3 (#2106161)
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.2-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Aug 31 2021 Robert Scheck <robert@fedoraproject.org> 2.3.2-3
+- Disable undesired Makefile rebuilding by automake (#1999520)
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jul 20 2021 Robert Scheck <robert@fedoraproject.org> 2.3.2-1
+- Upgrade to 2.3.2 (#1983906)
+
+* Wed May 12 2021 Robert Scheck <robert@fedoraproject.org> 2.3.1-1
+- Upgrade to 2.3.1 (#1960005)
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue May 26 2020 Jeff Law <law@redhat.com> - 2.3.0-3
+- Touch a couple autoconf related files to prevent undesired rebuilding
+  if %%configure changes one or more configure files.
+
 * Fri Apr 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.0-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Making binaries paths compatible with CBL-Mariner's paths.
