@@ -64,6 +64,12 @@
 %define with_esx           0%{!?_without_esx:1}
 %define with_hyperv        0%{!?_without_hyperv:1}
 
+%if 0%{!?mariner}
+# bfjelds: to maintain previous mariner settings, explicitly disable curl
+# and enable driver_esx by setting with_esx=0
+%define with_esx           0
+%endif
+
 # Then the secondary host drivers, which run inside libvirtd
 %define with_storage_rbd      0%{!?_without_storage_rbd:1}
 
@@ -90,6 +96,11 @@
 %define with_storage_iscsi_direct 0%{!?_without_storage_iscsi_direct:1}
 # libiscsi has been dropped in RHEL-9
 %if 0%{?rhel} > 8
+    %define with_storage_iscsi_direct 0
+%endif
+%if 0%{?mariner}
+# bfjelds: to maintain previous mariner settings, explicitly disable iscsi
+# by setting with_storage_iscsi_direct=0
     %define with_storage_iscsi_direct 0
 %endif
 
@@ -139,7 +150,7 @@
 %endif
 
 %if 0%{!?mariner}
-%define with_firewalld_zone 0%{!?_without_firewalld_zone:1}
+    %define with_firewalld_zone 0%{!?_without_firewalld_zone:1}
 %endif
 
 %if 0%{?rhel} && 0%{?rhel} < 9
@@ -152,6 +163,11 @@
 # fuse is used to provide virtualized /proc for LXC
 %if %{with_lxc}
     %define with_fuse      0%{!?_without_fuse:1}
+%endif
+%if 0%{?mariner}
+# bfjelds: to maintain previous mariner settings, explicitly disable fuse
+# by setting with_fuse=0
+    %define with_fuse 0
 %endif
 
 # Enable sanlock library for lock management with QEMU
@@ -172,6 +188,11 @@
 %if 0%{?fedora}
     %define with_libssh2 0%{!?_without_libssh2:1}
 %endif
+%if 0%{?mariner}
+# bfjelds: to maintain previous mariner settings, explicitly enable libssh2
+# by setting with_libssh2=1
+    %define with_libssh2 1
+%endif
 
 # Enable wireshark plugins for all distros
 %if 0%{!?mariner}
@@ -181,6 +202,11 @@
 
 # Enable libssh transport for all distros
 %define with_libssh 0%{!?_without_libssh:1}
+%if 0%{?mariner}
+# bfjelds: to maintain previous mariner settings, explicitly disable libssh
+# by setting with_libssh=0
+    %define with_libssh 0
+%endif
 
 %if %{with_qemu} || %{with_lxc}
 # numad is used to manage the CPU and memory placement dynamically,
