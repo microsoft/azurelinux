@@ -41,11 +41,6 @@ func extractPartitions(imageLoopDevice string, outputImageFile string, partition
 			case "raw":
 				// Do nothing for "raw" case.
 			case "raw-zstd":
-				fstype := diskPartitions[partitionNum].FileSystemType
-				err = resizePartition(partitionFilepath, fstype)
-				if err != nil {
-					return err
-				}
 				partitionFilepath, err = compressWithZstd(partitionFilepath)
 				if err != nil {
 					return err
