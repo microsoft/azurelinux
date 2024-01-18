@@ -21,7 +21,7 @@ var (
 	buildDir                    = app.Flag("build-dir", "Directory to run build out of.").Required().String()
 	imageFile                   = app.Flag("image-file", "Path of the base CBL-Mariner image which the customization will be applied to.").Required().String()
 	outputImageFile             = app.Flag("output-image-file", "Path to write the customized image to.").Required().String()
-	outputImageFormat           = app.Flag("output-image-format", "Format of output image. Supported: vhd, vhdx, qcow2, raw.").Required().Enum("vhd", "vhdx", "qcow2", "raw")
+	outputImageFormat           = app.Flag("output-image-format", "Format of output image. Supported: vhd, vhdx, qcow2, raw.").Enum("vhd", "vhdx", "qcow2", "raw")
 	outputSplitPartitionsFormat = app.Flag("output-split-partitions-format", "Format of partition files. Supported: raw, raw-zstd").Enum("raw", "raw-zstd")
 	configFile                  = app.Flag("config-file", "Path of the image customization config file.").Required().String()
 	rpmSources                  = app.Flag("rpm-source", "Path to a RPM repo config file or a directory containing RPMs.").Strings()
@@ -37,6 +37,9 @@ func main() {
 
 	app.Version(imagecustomizerlib.ToolVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
+	if *outputSplitPartitionsFormat == "" && *outputImageFormat == "" {
+		kingpin.Fatalf("Either --output-image-format or --output-split-partitions-format must be specified.")
+	}
 
 	logger.InitBestEffort(*logFile, *logLevel)
 
