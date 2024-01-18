@@ -225,7 +225,7 @@ A dynamically-growing, reference-counted array
 %package -n libbasicobjects
 Summary:        Basic object types for C
 Version:        %{basicobjects_version}
-License:        GPL-3.0-or-later
+License:        GPLv3+
 
 %description -n libbasicobjects
 Basic object types
@@ -233,7 +233,7 @@ Basic object types
 %package -n libbasicobjects-devel
 Summary:        Development files for libbasicobjects
 Version:        %{basicobjects_version}
-License:        GPL-3.0-or-later
+License:        GPLv3+
 
 Requires:       libbasicobjects = %{basicobjects_version}-%{release}
 
