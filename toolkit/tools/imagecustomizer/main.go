@@ -44,6 +44,10 @@ func main() {
 
 	logger.InitBestEffort(*logFile, *logLevel)
 
+	if *enableShrinkFilesystems && *outputSplitPartitionsFormat == "" {
+		logger.Log.Fatalf("--output-split-partitions-format must be specified to use --shrink-filesystems.")
+	}
+
 	prof, err := profile.StartProfiling(profFlags)
 	if err != nil {
 		logger.Log.Warnf("Could not start profiling: %s", err)

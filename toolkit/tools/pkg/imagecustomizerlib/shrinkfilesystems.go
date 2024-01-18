@@ -18,21 +18,21 @@ func shrinkFilesystems(imageLoopDevice string, outputImageFile string) error {
 	for partitionNum := 0; partitionNum < len(diskPartitions); partitionNum++ {
 		if diskPartitions[partitionNum].Type == "part" {
 			fstype := diskPartitions[partitionNum].FileSystemType
-
 			if fstype != "ext2" && fstype != "ext3" && fstype != "ext4" {
 				continue
 			}
 
-			const squashErrors = true
+			partitionLoopDevice := diskPartitions[partitionNum].Path
+
 			// Check the file system with e2fsck
-			err := shell.ExecuteLive(squashErrors, "sudo", "e2fsck", "-fy", partitionLoopDevice)
+			err := shell.ExecuteLive(true /*squashErrors*/, "sudo", "e2fsck", "-fy", partitionLoopDevice)
 
 			if err != nil {
 				return fmt.Errorf("failed to check %s with e2fsck:\n%w", partitionLoopDevice, err)
 			}
 
 			// Resize the file system with resize2fs
-			err = shell.ExecuteLive(squashErrors, "sudo", "resize2fs", "-M", partitionLoopDevice)
+			err = shell.ExecuteLive(true, "sudo", "resize2fs", "-M", partitionLoopDevice)
 			if err != nil {
 				return fmt.Errorf("failed to resize %s with resize2fs:\n%w", partitionLoopDevice, err)
 			}
