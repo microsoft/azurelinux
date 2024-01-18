@@ -29,7 +29,7 @@
     %{_bindir}/nvptx-arch \
     %{_bindir}/scan-build-py
 
-%global clang_srcdir  %{name}-%{version}.src
+%global clang_srcdir llvm-project-llvmorg-%{version}
 %global clang_tools_srcdir clang-tools-extra-%{version}.src
 
 Summary:        C, C++, Objective C and Objective C++ front-end for the LLVM compiler.
@@ -41,8 +41,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://clang.llvm.org
-Source0:        https://github.com/llvm/llvm-project/releases/download/llvmorg-%{version}/%{clang_srcdir}.tar.xz
-Source1:        https://github.com/llvm/llvm-project/releases/download/llvmorg-%{version}/%{clang_tools_srcdir}.tar.xz
+Source0:        https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-%{version}.tar.gz
 BuildRequires:  cmake
 BuildRequires:  libxml2-devel
 BuildRequires:  llvm-devel = %{version}
@@ -114,12 +113,7 @@ Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 A set of extra tools built using Clang's tooling API.
 
 %prep
-%setup -q -T -b 1 -n %{clang_tools_srcdir}
-
 %setup -q -n %{clang_srcdir}
-
-mkdir -pv tools
-mv ../%{clang_tools_srcdir} tools/extra
 
 %build
 # Disable symbol generation
@@ -128,12 +122,13 @@ export CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/ -g//'`"
 
 mkdir -p build
 cd build
-cmake -DCMAKE_INSTALL_PREFIX=%{_prefix}   \
-      -DCLANG_ENABLE_STATIC_ANALYZER:BOOL=ON \
-      -DCMAKE_BUILD_TYPE=Release    \
-      -DLLVM_ENABLE_EH=ON \
-      -DLLVM_ENABLE_RTTI=ON \
-      -DCLANG_LINK_CLANG_DYLIB=ON \
+cmake -DCMAKE_INSTALL_PREFIX=%{_prefix}       \
+      -DCLANG_ENABLE_STATIC_ANALYZER:BOOL=ON  \
+      -DCMAKE_BUILD_TYPE=Release              \
+      -DLLVM_ENABLE_EH=ON                     \
+      -DLLVM_ENABLE_RTTI=ON                   \
+      -DCLANG_LINK_CLANG_DYLIB=ON             \
+	    -DLLVM_INCLUDE_TESTS=OFF                \
       -Wno-dev ../clang
 
 %make_build
@@ -221,7 +216,6 @@ make clang-check
 %{_libexecdir}/analyze-cc
 %{_libexecdir}/intercept-c++
 %{_libexecdir}/intercept-cc
-
 
 %changelog
 * Fri Jan 12 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 17.0.6-1

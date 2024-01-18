@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://llvm.org/
-Source0:        https://github.com/llvm/llvm-project/releases/download/llvmorg-%{version}/%{name}-%{version}.src.tar.xz
+Source0:        https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-%{version}.tar.gz
 BuildRequires:  cmake
 BuildRequires:  libffi-devel
 BuildRequires:  libxml2-devel
@@ -29,7 +29,7 @@ The llvm-devel package contains libraries, header files and documentation
 for developing applications that use llvm.
 
 %prep
-%setup -q -n %{name}-%{version}.src
+%setup -q -n llvm-project-llvmorg-%{version}
 
 %build
 # Disable symbol generation
