@@ -461,11 +461,7 @@ BuildRequires: numad
 BuildRequires: wireshark-devel
     %endif
     %if %{with_libssh}
-%if 0%{?mariner}
-BuildRequires: libssh2-devel >= 0.8.1
-%else
 BuildRequires: libssh-devel >= 0.8.1
-%endif
     %endif
 BuildRequires: libtirpc-devel
     %if %{with_firewalld_zone}
@@ -2634,7 +2630,10 @@ exit 0
 %endif
 
 %changelog
-* Wed May 25 2023 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 7.10.0-5
+* Thu Jan 18 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 10.0.0-1
+- Updating to version 10.0.0.
+
+* Wed May 24 2023 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 7.10.0-5
 - Patch CVE-2023-2700
 
 * Thu Sep 08 2022 Andrew Phelps <anphel@microsoft.com> - 7.10.0-4
