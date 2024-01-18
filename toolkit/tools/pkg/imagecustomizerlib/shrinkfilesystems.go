@@ -9,6 +9,7 @@ import (
 
 func shrinkFilesystems(imageLoopDevice string, outputImageFile string) error {
 	logger.Log.Infof("Shrinking filesystems")
+
 	// Get partition info.
 	diskPartitions, err := diskutils.GetDiskPartitions(imageLoopDevice)
 	if err != nil {
@@ -18,6 +19,7 @@ func shrinkFilesystems(imageLoopDevice string, outputImageFile string) error {
 	for partitionNum := 0; partitionNum < len(diskPartitions); partitionNum++ {
 		if diskPartitions[partitionNum].Type == "part" {
 			fstype := diskPartitions[partitionNum].FileSystemType
+			// Currently only support ext2, ext3, ext4 filesystem types
 			if fstype != "ext2" && fstype != "ext3" && fstype != "ext4" {
 				continue
 			}
@@ -26,7 +28,6 @@ func shrinkFilesystems(imageLoopDevice string, outputImageFile string) error {
 
 			// Check the file system with e2fsck
 			err := shell.ExecuteLive(true /*squashErrors*/, "sudo", "e2fsck", "-fy", partitionLoopDevice)
-
 			if err != nil {
 				return fmt.Errorf("failed to check %s with e2fsck:\n%w", partitionLoopDevice, err)
 			}
