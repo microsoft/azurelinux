@@ -20,6 +20,8 @@ Source7: renew-dummy-cert
 Source9: configuration-switch.h
 Source10: configuration-prefix.h
 Source14: 0025-for-tests.patch
+# CVE only applies when Apache HTTP Server version 2.4.37 or less: https://nvd.nist.gov/vuln/detail/CVE-2019-0190
+Patch1:   CVE-2019-0190.nopatch
 # # Use more general default values in openssl.cnf
 Patch2:   0002-Use-more-general-default-values-in-openssl.cnf.patch
 # # Do not install html docs
