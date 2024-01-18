@@ -1,0 +1,22 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+ARG BASE_IMAGE
+
+FROM $BASE_IMAGE
+
+@INCLUDE_MAIN_RUN_INSTRUCTION@
+
+#copy modulefiles and source module
+RUN modulefile_openmpi=$(find /usr/share/modulefiles/ -name "openmpi-*" | head -n 1) && \
+    cp $modulefile_openmpi  /usr/share/modulefiles/mpi/openmpi && \
+    mkdir -p /usr/share/modulefiles/openmpi/ && \
+    cp /usr/share/modulefiles/mpi/openmpi /usr/share/modulefiles/openmpi/gcc && \
+    cat /etc/profile.d/modules.sh >> /etc/bash.bashrc
+
+# basic smoke test
+RUN source /etc/profile.d/modules.sh && \
+    module load mpi/openmpi && \
+    mpiexec  --version 
+
+CMD ["bash"]
