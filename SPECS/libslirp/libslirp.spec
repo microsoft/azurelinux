@@ -48,6 +48,10 @@ developing applications that use %{name}.
 %{_libdir}/pkgconfig/slirp.pc
 
 %changelog
+* Thu Jan 18 2024 Sindhu Karri <lakarri@microsoft.com> - 4.7.0-1
+- Upgrade slirp to 4.7.0
+- Updated source URL to a generic URL that allows autoupgrades in the future
+
 * Wed Sep 22 2021 Thomas Crain <thcrain@microsoft.com> - 4.6.1-3
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - Lint spec
