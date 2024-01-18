@@ -60,7 +60,7 @@ func CustomizeImageWithConfigFile(buildDir string, configFile string, imageFile 
 }
 
 func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config, imageFile string,
-	rpmsSources []string, outputImageFile string, outputImageFormat string, outputSplitPartitionsFormat string, 
+	rpmsSources []string, outputImageFile string, outputImageFormat string, outputSplitPartitionsFormat string,
 	useBaseImageRpmRepos bool, enableShrinkFilesystems bool,
 ) error {
 	var err error
@@ -116,7 +116,7 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 
 	// Shrink the filesystems.
 	if enableShrinkFilesystems && outputSplitPartitionsFormat != "" {
-		err = shrinkFilesystemsHelper(buildDirAbs, buildImageFile, outputImageFile)
+		err = shrinkFilesystemsHelper(buildImageFile, outputImageFile)
 		if err != nil {
 			return err
 		}
@@ -343,7 +343,7 @@ func extractPartitionsHelper(buildImageFile string, outputImageFile string, outp
 	return nil
 }
 
-func shrinkFilesystemsHelper(buildDir string, buildImageFile string, outputImageFile string) error {
+func shrinkFilesystemsHelper(buildImageFile string, outputImageFile string) error {
 	imageLoopback, err := safeloopback.NewLoopback(buildImageFile)
 	if err != nil {
 		return err
@@ -357,27 +357,6 @@ func shrinkFilesystemsHelper(buildDir string, buildImageFile string, outputImage
 	}
 
 	err = imageLoopback.CleanClose()
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func shrinkFilesystemsHelper(buildDir string, buildImageFile string, outputImageFile string) error {
-	imageConnection, err := connectToExistingImage(buildImageFile, buildDir, "imageroot")
-	if err != nil {
-		return err
-	}
-	defer imageConnection.Close()
-
-	// Shrink the filesystems.
-	err = shrinkFilesystems(imageConnection, outputImageFile)
-	if err != nil {
-		return err
-	}
-
-	err = imageConnection.CleanClose()
 	if err != nil {
 		return err
 	}
