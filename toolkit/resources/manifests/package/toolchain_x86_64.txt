@@ -49,7 +49,7 @@ createrepo_c-devel-0.17.5-1.cm2.x86_64.rpm
 curl-8.5.0-2.cm2.x86_64.rpm
 curl-debuginfo-8.5.0-2.cm2.x86_64.rpm
 curl-devel-8.5.0-2.cm2.x86_64.rpm
-curl-libs-8.5.0-1.cm2.x86_64.rpm
+curl-libs-8.5.0-2.cm2.x86_64.rpm
 Cython-debuginfo-0.29.33-1.cm2.x86_64.rpm
 debugedit-5.0-2.cm2.x86_64.rpm
 debugedit-debuginfo-5.0-2.cm2.x86_64.rpm
