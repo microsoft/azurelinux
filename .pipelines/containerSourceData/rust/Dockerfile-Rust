@@ -1,0 +1,18 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+ARG BASE_IMAGE
+
+FROM $BASE_IMAGE
+
+ENV CARGO_HOME=/usr/local/cargo \
+    PATH=/usr/local/cargo/bin:$PATH
+
+@INCLUDE_MAIN_RUN_INSTRUCTION@
+
+# basic smoke test
+RUN cargo --version; \
+    rustc --version;
+
+# set default command for the container
+CMD ["bash"]
