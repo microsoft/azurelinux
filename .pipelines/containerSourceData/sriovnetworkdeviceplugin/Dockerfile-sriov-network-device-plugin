@@ -1,0 +1,15 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+ARG BASE_IMAGE
+
+FROM $BASE_IMAGE
+
+@INCLUDE_MAIN_RUN_INSTRUCTION@
+
+RUN mkdir -p /usr/src/sriov-network-device-plugin/bin \ 
+  && cp /usr/bin/sriovdp /usr/src/sriov-network-device-plugin/bin/ \ 
+  && cp /usr/bin/sriov-network-device-plugin-entrypoint.sh /entrypoint.sh  \
+  && cp /usr/share/sriov-network-device-plugin/ddptool-1.0.1.12.tar.gz /ddptool.tar.gz
+
+ENTRYPOINT [ "/entrypoint.sh" ]
