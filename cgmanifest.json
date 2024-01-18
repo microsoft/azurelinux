@@ -856,7 +856,7 @@
         "other": {
           "name": "azure-iot-sdk-c",
           "version": "2023.08.07",
-          "downloadUrl": "https://github.com/Azure/%{name}/archive/refs/tags/LTS_08_2023.tar.gz"
+          "downloadUrl": "https://github.com/Azure/azure-iot-sdk-c/archive/refs/tags/LTS_08_2023.tar.gz"
         }
       }
     },
