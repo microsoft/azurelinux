@@ -11362,7 +11362,7 @@
         "other": {
           "name": "libvirt",
           "version": "10.0.0",
-          "downloadUrl": "https://libvirt.org/sources/libvirt-10.0.0.tar.xz"
+          "downloadUrl": "https://download.libvirt.org/libvirt-10.0.0.tar.xz"
         }
       }
     },
