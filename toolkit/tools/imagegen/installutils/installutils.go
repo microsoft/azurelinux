@@ -1550,17 +1550,17 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 		}
 	}
 
-    for _, pubKey := range sshPubKeys {
-        logger.Log.Infof("Adding ssh key (%s) to user (%s) .ssh/authorized_users", filepath.Base(pubKey), username)
+	for _, pubKey := range sshPubKeys {
+		logger.Log.Infof("Adding ssh key (%s) to user (%s) .ssh/authorized_users", filepath.Base(pubKey), username)
 
-        // Directly append the key string with a newline
-        pubKey += "\n"
-        err = file.Append(pubKey, authorizedKeysTempFile)
-        if err != nil {
-            logger.Log.Warnf("Failed to append to %s : %v", authorizedKeysTempFile, err)
-            return
-        }
-    }
+		// Directly append the key string with a newline
+		pubKey += "\n"
+		err = file.Append(pubKey, authorizedKeysTempFile)
+		if err != nil {
+			logger.Log.Warnf("Failed to append to %s : %v", authorizedKeysTempFile, err)
+			return
+		}
+	}
 
 	fileToCopy := safechroot.FileToCopy{
 		Src:  authorizedKeysTempFile,
