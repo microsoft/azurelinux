@@ -11602,7 +11602,7 @@
         "other": {
           "name": "libXcomposite",
           "version": "0.4.6",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXcomposite-0.4.5.tar.gz"
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXcomposite-0.4.6.tar.gz"
         }
       }
     },
