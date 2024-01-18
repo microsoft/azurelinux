@@ -1,55 +1,61 @@
-Summary:        Netfilter Tables userspace utillites
 Name:           nftables
-Version:        1.0.1
+Version:        1.0.9
 Release:        2%{?dist}
-License:        GPLv2
+Summary:        Netfilter Tables userspace utilites
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+
+License:        GPL-2.0-only
 URL:            https://netfilter.org/projects/nftables/
-Source0:        %{url}/files/%{name}-%{version}.tar.bz2
+Source0:        %{url}/files/%{name}-%{version}.tar.xz
 Source1:        nftables.service
 Source2:        nftables.conf
 Source3:        main.nft
 Source4:        router.nft
 Source5:        nat.nft
 
-# already upstream at https://git.netfilter.org/nftables/commit/?id=8492878961248b4b53fa97383c7c1b15d7062947
-Patch1:         nftables-1.0.1-drop-historyh.patch
-# already upstream at https://git.netfilter.org/nftables/commit/?id=3847fccf004525ceb97db6fbc681835b0ac9a61a
-Patch2:         nftables-1.0.1-fix-terse.patch
+#BuildRequires: autogen
+#BuildRequires: autoconf
+#BuildRequires: automake
+#BuildRequires: libtool
+BuildRequires: make
+BuildRequires: gcc
+BuildRequires: flex
+BuildRequires: bison
+BuildRequires: pkgconfig(libmnl) >= 1.0.4
+BuildRequires: gmp-devel
+BuildRequires: pkgconfig(libnftnl) >= 1.2.3
+BuildRequires: systemd
+BuildRequires: asciidoc
+BuildRequires: pkgconfig(xtables) >= 1.6.1
+BuildRequires: jansson-devel
+BuildRequires: python3-devel
+BuildRequires: readline-devel
+BuildRequires: libedit-devel
+BuildRequires: python3-setuptools
 
-BuildRequires:  asciidoc
-BuildRequires:  bison
-BuildRequires:  flex
-BuildRequires:  gcc
-BuildRequires:  gmp-devel
-BuildRequires:  iptables-devel
-BuildRequires:  jansson-devel
-BuildRequires:  libedit-devel
-BuildRequires:  libmnl-devel
-BuildRequires:  libnftnl-devel
-BuildRequires:  make
-BuildRequires:  python3-devel
-BuildRequires:  readline-devel
-BuildRequires:  systemd
+# These are required because our tooling does not support generate_buildrequires
+BuildRequires: python3-pip
+
+%generate_buildrequires
+cd py/
+%pyproject_buildrequires
 
 %description
 Netfilter Tables userspace utilities.
 
 %package        devel
 Summary:        Development library for nftables / libnftables
-
 Requires:       %{name} = %{version}-%{release}
-Requires:       pkg-config
+Requires:       pkgconfig
 
 %description devel
-Development tools and static libraries and header files for the libnftables library.
+Headers, man pages and other development files for the libnftables library.
 
 %package -n     python3-nftables
-%{?python_provide:%python_provide python3-nftables}
 Summary:        Python module providing an interface to libnftables
-
 Requires:       %{name} = %{version}-%{release}
+%{?python_provide:%python_provide python3-nftables}
 
 %description -n python3-nftables
 The nftables python module provides an interface to libnftables via ctypes.
@@ -59,41 +65,39 @@ The nftables python module provides an interface to libnftables via ctypes.
 
 %build
 #./autogen.sh
-%configure --disable-silent-rules --with-xtables --with-json \
-	--enable-python --with-python-bin=%{__python3}
+%configure --disable-silent-rules --with-xtables --with-json
 %make_build
+cd py/
+%pyproject_wheel
 
 %install
 %make_install
-find %{buildroot} -type f -name "*.la" -delete -print
+find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 
 # Don't ship static lib (for now at least)
-rm -f %{buildroot}/%{_libdir}/libnftables.a
+rm -f $RPM_BUILD_ROOT/%{_libdir}/libnftables.a
 
 # drop vendor-provided configs, they are not really useful
-rm -f %{buildroot}/%{_datadir}/nftables/*.nft
+rm -f $RPM_BUILD_ROOT/%{_datadir}/nftables/*.nft
 
-chmod 644 %{buildroot}/%{_mandir}/man8/nft*
+chmod 644 $RPM_BUILD_ROOT/%{_mandir}/man8/nft*
 
-mkdir -p %{buildroot}/%{_unitdir}
-cp -a %{SOURCE1} %{buildroot}/%{_unitdir}/
+mkdir -p $RPM_BUILD_ROOT/%{_unitdir}
+cp -a %{SOURCE1} $RPM_BUILD_ROOT/%{_unitdir}/
 
-mkdir -p %{buildroot}/%{_sysconfdir}/sysconfig
-cp -a %{SOURCE2} %{buildroot}/%{_sysconfdir}/sysconfig/
-
+mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/sysconfig
+cp -a %{SOURCE2} $RPM_BUILD_ROOT/%{_sysconfdir}/sysconfig/
 
 cp %{SOURCE3} %{SOURCE4} %{SOURCE5} \
-	%{buildroot}/%{_sysconfdir}/nftables/
+	$RPM_BUILD_ROOT/%{_sysconfdir}/nftables/
 
-find %{buildroot}/%{_sysconfdir} \
+find $RPM_BUILD_ROOT/%{_sysconfdir} \
 	\( -type d -exec chmod 0700 {} \; \) , \
 	\( -type f -exec chmod 0600 {} \; \)
 
-# make nftables.py use the real library file name
-# to avoid nftables-devel package dependency
-sofile=$(readlink %{buildroot}/%{_libdir}/libnftables.so)
-sed -i -e 's/\(sofile=\)".*"/\1"'$sofile'"/' \
-	%{buildroot}/%{python3_sitelib}/nftables/nftables.py
+cd py/
+%pyproject_install
+%pyproject_save_files nftables
 
 %post
 %systemd_post nftables.service
@@ -123,11 +127,100 @@ sed -i -e 's/\(sofile=\)".*"/\1"'$sofile'"/' \
 %{_includedir}/nftables/libnftables.h
 %{_mandir}/man3/libnftables.3*
 
-%files -n python3-nftables
-%{python3_sitelib}/nftables-*.egg-info
-%{python3_sitelib}/nftables/
+%files -n python3-nftables -f %{pyproject_files}
 
 %changelog
+* Thu Jan 18 13:06:19 EST 2024 Dan Streetman <ddstreet@ieee.org> - 1.0.9-2
+- Update to latest version from Fedora
+- Initial CBL-Mariner import from Fedora 39 (license: MIT).
+
+* Thu Oct 19 2023 Phil Sutter <psutter@redhat.com> - 1:1.0.9-1
+- Fix devel sub-package description
+- Utilize pyproject-rpm-macros for the python sub-package
+- new version 1.0.9
+
+* Fri Aug 11 2023 Phil Sutter <psutter@redhat.com> - 1:1.0.7-4
+- Convert license to SPDX format
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.0.7-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jun 15 2023 Python Maint <python-maint@redhat.com> - 1:1.0.7-2
+- Rebuilt for Python 3.12
+
+* Sat Apr 01 2023 Kevin Fenzi <kevin@scrye.com> - 1.0.7-1
+- Update to 1.0.7. Fixes rhbz#2155658
+- Build the package with setuptools instead of distutils. Fixes: rhbz#2154872
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.0.5-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Wed Aug 10 2022 Phil Sutter <psutter@redhat.com> - 1:1.0.5-1
+- New version 1.0.5
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.0.4-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 1:1.0.4-2
+- Rebuilt for Python 3.11
+
+* Fri Jun 10 2022 Phil Sutter <psutter@redhat.com> - 1:1.0.4-1
+- Review package dependencies
+- Update to 1.0.4. Fixes rhbz#2056594
+
+* Tue Mar 08 2022 Phil Sutter <psutter@redhat.com> - 1:1.0.1-4
+- Prevent port-shadow attacks in sample nat config. Fixes rhbz#2061917
+
+* Thu Feb 03 2022 Phil Sutter <psutter@redhat.com> - 1:1.0.1-3
+- Ship a more advanced default config. Fixes rhbz#1999596
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.0.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Sat Nov 27 2021 Kevin Fenzi <kevin@scrye.com> - 1.0.1-1
+- Update to 1.1.1. Fixes rhbz#2024594
+
+* Fri Aug 27 2021 Kevin Fenzi <kevin@scrye.com> - 1.0.0-1
+- Update to 1.1.0. Fixes rhbz#1995737
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.9.9-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 1:0.9.9-2
+- Rebuilt for Python 3.10
+
+* Wed Jun 02 2021 Phil Sutter <psutter@redhat.com> - 1:0.9.9-1
+- Update to 0.9.9. Fixes rhbz#1964718
+
+* Tue Mar 02 2021 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 1:0.9.8-3
+- Rebuilt for updated systemd-rpm-macros
+  See https://pagure.io/fesco/issue/2583.
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.9.8-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Sat Jan 16 2021 Kevin Fenzi <kevin@scrye.com> - 0.9.8-1
+- Update to 0.9.8. Fixes rhbz#1916940
+
+* Sat Oct 31 2020 Kevin Fenzi <kevin@scrye.com> - 0.9.7-1
+- Update to 0.9.7. Fixes bug #1891769
+
+* Thu Oct 29 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:0.9.6-2
+- Drop upstreamed patch
+
+* Sat Sep 05 2020 Neal Gompa <ngompa13@gmail.com> - 1:0.9.6-1
+- Update to 0.9.6 (RH#1846663)
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.9.3-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jul 14 2020 Tom Stellard <tstellar@redhat.com> - 1:0.9.3-5
+- Use make macros
+- https://fedoraproject.org/wiki/Changes/UseMakeBuildInstallMacro
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 1:0.9.3-4
+- Rebuilt for Python 3.9
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.0.1-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
@@ -152,7 +245,7 @@ sed -i -e 's/\(sofile=\)".*"/\1"'$sofile'"/' \
 - tests: monitor: use correct $nft value in EXIT trap
 - Extend testsuites to run against installed binaries
 
-* Fri May 15 2020 root <hobbes1069@gmail.com> - 1:0.9.3-3
+* Fri May 15 2020 Richard Shaw <hobbes1069@gmail.com> - 1:0.9.3-3
 - Add patch for json performance with ipsets, fixes RHBZ#1834853.
 
 * Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.9.3-2

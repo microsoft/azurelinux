@@ -18,13 +18,22 @@ table ip nftables_svc {
 		elements = { 192.168.122.0/24 }
 	}
 
+	# [CVE-2021-3773] force port randomization for non-locally originated
+	# connections using suspicious port values to prevent port-shadow
+	# attacks, i.e. accidental matching of new inbound connections vs.
+	# existing ones
+	chain do_masquerade {
+		meta iif > 0 th sport < 16384 th dport >= 32768 masquerade random
+		masquerade
+	}
+
 	# base-chain to manipulate conntrack in postrouting,
 	# will see packets for new or related traffic only
 	chain POSTROUTING {
 		type nat hook postrouting priority srcnat + 20
 		policy accept
 
-		iifname @masq_interfaces oifname != @masq_interfaces masquerade
-		ip saddr @masq_ips masquerade
+		iifname @masq_interfaces oifname != @masq_interfaces jump do_masquerade
+		ip saddr @masq_ips jump do_masquerade
 	}
 }
