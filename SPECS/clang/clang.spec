@@ -1,6 +1,4 @@
 %global maj_ver 17
-%global min_ver 0
-%global patch_ver 6
 
 %global clang_binaries \
     %{_bindir}/clang \
@@ -34,7 +32,7 @@
 
 Summary:        C, C++, Objective C and Objective C++ front-end for the LLVM compiler.
 Name:           clang
-Version:        %{maj_ver}.%{min_ver}.%{patch_ver}
+Version:        17.0.6
 Release:        1%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
