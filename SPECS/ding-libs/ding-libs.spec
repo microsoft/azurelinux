@@ -11,7 +11,7 @@ Summary:        "Ding is not GLib" assorted utility libraries
 Name:           ding-libs
 Version:        0.6.2
 Release:        55%{?dist}
-License:        LGPLv3+
+License:        LGPLv3+ AND GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://pagure.io/SSSD/ding-libs
@@ -351,24 +351,28 @@ rm -f */doc/html/installdox
 * Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.2-52
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
 
-* Tue Jan 25 2022 Alexey Tikhonov <atikhono@redhat.com> - 0.6.2-50
+* Tue Jan 25 2022 Alexey Tikhonov <atikhono@redhat.com> - 0.6.2-51
 - New upstream release 0.6.2
 
-* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1-49
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1-50
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 
-* Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1-48
+* Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1-49
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 
-* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1-47
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1-48
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
-* Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1-46
+* Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1-47
 - Second attempt - Rebuilt for
   https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
-* Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1-45
+* Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1-46
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Sep 02 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1-45
+- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+- License verified.
 
 * Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1-44
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
