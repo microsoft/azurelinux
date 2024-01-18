@@ -9641,8 +9641,8 @@
         "type": "other",
         "other": {
           "name": "libidn2",
-          "version": "2.3.0",
-          "downloadUrl": "https://ftp.gnu.org/gnu/libidn/libidn2-2.3.0.tar.gz"
+          "version": "2.3.4",
+          "downloadUrl": "https://ftp.gnu.org/gnu/libidn/libidn2-2.3.4.tar.gz"
         }
       }
     },

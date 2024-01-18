@@ -1,7 +1,0 @@
-{
- "Signatures": {
-  "gpgkey-1CB27DBC98614B2D5841646D08302DB6A2670428.gpg": "e6b85b04f892648561be23c49a3cfa09d3b1d26da063aa8e68b676835dcc15da",
-  "libidn2-2.3.0.tar.gz": "e1cb1db3d2e249a6a3eb6f0946777c2e892d5c5dc7bd91c74394fc3a01cab8b5",
-  "libidn2-2.3.0.tar.gz.sig": "6c920fb40d6f538c0ce00b08ac6727a8d4b7fd60caab013508f32c300f5d3d62"
- }
-}
