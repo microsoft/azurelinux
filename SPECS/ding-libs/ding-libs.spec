@@ -9,38 +9,39 @@
 %global ini_config_version 1.3.1
 Summary:        "Ding is not GLib" assorted utility libraries
 Name:           ding-libs
-Version:        0.6.1
-Release:        45%{?dist}
-License:        LGPLv3+ AND GPLv3+
+Version:        0.6.2
+Release:        55%{?dist}
+License:        LGPL-3.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://pagure.io/SSSD/ding-libs
 Source0:        https://releases.pagure.org/SSSD/ding-libs/%{name}-%{version}.tar.gz
+
 ### Patches ###
-Patch0:         INI-Silence-ini_augment-match-failures.patch
-Patch1:         INI-Remove-definiton-of-TRACE_LEVEL.patch
-Patch2:         INI-Fix-detection-of-error-messages.patch
-Patch3:         TEST-validators_ut_check-Fix-fail-with-new-glibc.patch
 
 ### Build Dependencies ###
+
 BuildRequires:  autoconf
 BuildRequires:  automake
-BuildRequires:  check-devel
+BuildRequires:  gettext-devel
 BuildRequires:  gcc
 BuildRequires:  git
 BuildRequires:  libtool
 BuildRequires:  m4
-BuildRequires:  pkg-config
+BuildRequires:  doxygen
+BuildRequires:  pkgconfig
+BuildRequires:  check-devel
+BuildRequires:  make
 
 ### Dependencies ###
 # ding-libs is a meta-package that will pull in all of its own
 # sub-packages
-Requires:       libbasicobjects = %{basicobjects_version}-%{release}
-Requires:       libcollection = %{collection_version}-%{release}
-Requires:       libdhash = %{dhash_version}-%{release}
-Requires:       libini_config = %{ini_config_version}-%{release}
 Requires:       libpath_utils = %{path_utils_version}-%{release}
+Requires:       libdhash = %{dhash_version}-%{release}
+Requires:       libcollection = %{collection_version}-%{release}
 Requires:       libref_array = %{ref_array_version}-%{release}
+Requires:       libbasicobjects = %{basicobjects_version}-%{release}
+Requires:       libini_config = %{ini_config_version}-%{release}
 
 %description
 A meta-package that pulls in libcollection, libdhash, libini_config,
@@ -48,16 +49,16 @@ librefarray libbasicobjects, and libpath_utils.
 
 %package devel
 Summary:        Development packages for ding-libs
-License:        LGPLv3+
+License:        LGPL-3.0-or-later
 
 # ding-libs is a meta-package that will pull in all of its own
 # sub-packages
-Requires:       libbasicobjects-devel = %{basicobjects_version}-%{release}
-Requires:       libcollection-devel = %{collection_version}-%{release}
-Requires:       libdhash-devel = %{dhash_version}-%{release}
-Requires:       libini_config-devel = %{ini_config_version}-%{release}
 Requires:       libpath_utils-devel = %{path_utils_version}-%{release}
+Requires:       libdhash-devel = %{dhash_version}-%{release}
+Requires:       libcollection-devel = %{collection_version}-%{release}
 Requires:       libref_array-devel = %{ref_array_version}-%{release}
+Requires:       libbasicobjects-devel = %{basicobjects_version}-%{release}
+Requires:       libini_config-devel = %{ini_config_version}-%{release}
 
 %description devel
 A meta-package that pulls in development libraries for libcollection,
@@ -70,7 +71,7 @@ libdhash, libini_config, librefarray and libpath_utils.
 %package -n libpath_utils
 Summary:        Filesystem Path Utilities
 Version:        %{path_utils_version}
-License:        LGPLv3+
+License:        LGPL-3.0-or-later
 
 %description -n libpath_utils
 Utility functions to manipulate filesystem pathnames
@@ -78,7 +79,7 @@ Utility functions to manipulate filesystem pathnames
 %package -n libpath_utils-devel
 Summary:        Development files for libpath_utils
 Version:        %{path_utils_version}
-License:        LGPLv3+
+License:        LGPL-3.0-or-later
 
 Requires:       libpath_utils = %{path_utils_version}-%{release}
 
@@ -88,7 +89,7 @@ Utility functions to manipulate filesystem pathnames
 %ldconfig_scriptlets -n libpath_utils
 
 %files -n libpath_utils
-%license COPYING COPYING.LESSER
+%doc COPYING COPYING.LESSER
 %{_libdir}/libpath_utils.so.1
 %{_libdir}/libpath_utils.so.1.0.1
 
@@ -97,6 +98,8 @@ Utility functions to manipulate filesystem pathnames
 %{_libdir}/libpath_utils.so
 %{_libdir}/pkgconfig/path_utils.pc
 %doc path_utils/README.path_utils
+%doc path_utils/doc/html/
+
 
 ##############################################################################
 # dhash
@@ -105,7 +108,7 @@ Utility functions to manipulate filesystem pathnames
 %package -n libdhash
 Summary:        Dynamic hash table
 Version:        %{dhash_version}
-License:        LGPLv3+
+License:        LGPL-3.0-or-later
 
 %description -n libdhash
 A hash table which will dynamically resize to achieve optimal storage & access
@@ -114,7 +117,7 @@ time properties
 %package -n libdhash-devel
 Summary:        Development files for libdhash
 Version:        %{dhash_version}
-License:        LGPLv3+
+License:        LGPL-3.0-or-later
 
 Requires:       libdhash = %{dhash_version}-%{release}
 
@@ -125,7 +128,7 @@ time properties
 %ldconfig_scriptlets -n libdhash
 
 %files -n libdhash
-%license COPYING COPYING.LESSER
+%doc COPYING COPYING.LESSER
 %{_libdir}/libdhash.so.1
 %{_libdir}/libdhash.so.1.1.0
 
@@ -136,13 +139,14 @@ time properties
 %doc dhash/README.dhash
 %doc dhash/examples/*.c
 
+
 ##############################################################################
 # collection
 ##############################################################################
 %package -n libcollection
 Summary:        Collection data-type for C
 Version:        %{collection_version}
-License:        LGPLv3+
+License:        LGPL-3.0-or-later
 
 %description -n libcollection
 A data-type to collect data in a hierarchical structure for easy iteration
@@ -151,7 +155,7 @@ and serialization
 %package -n libcollection-devel
 Summary:        Development files for libcollection
 Version:        %{collection_version}
-License:        LGPLv3+
+License:        LGPL-3.0-or-later
 
 Requires:       libcollection = %{collection_version}-%{release}
 
@@ -161,8 +165,10 @@ and serialization
 
 %ldconfig_scriptlets -n libcollection
 
+
 %files -n libcollection
-%license COPYING COPYING.LESSER
+%doc COPYING
+%doc COPYING.LESSER
 %{_libdir}/libcollection.so.*
 
 %files -n libcollection-devel
@@ -172,6 +178,8 @@ and serialization
 %{_includedir}/collection_stack.h
 %{_libdir}/libcollection.so
 %{_libdir}/pkgconfig/collection.pc
+%doc collection/doc/html/
+
 
 ##############################################################################
 # ref_array
@@ -180,7 +188,7 @@ and serialization
 %package -n libref_array
 Summary:        A refcounted array for C
 Version:        %{ref_array_version}
-License:        LGPLv3+
+License:        LGPL-3.0-or-later
 
 %description -n libref_array
 A dynamically-growing, reference-counted array
@@ -188,7 +196,7 @@ A dynamically-growing, reference-counted array
 %package -n libref_array-devel
 Summary:        Development files for libref_array
 Version:        %{ref_array_version}
-License:        LGPLv3+
+License:        LGPL-3.0-or-later
 
 Requires:       libref_array = %{ref_array_version}-%{release}
 
@@ -198,7 +206,8 @@ A dynamically-growing, reference-counted array
 %ldconfig_scriptlets -n libref_array
 
 %files -n libref_array
-%license COPYING COPYING.LESSER
+%doc COPYING
+%doc COPYING.LESSER
 %{_libdir}/libref_array.so.1
 %{_libdir}/libref_array.so.1.2.1
 
@@ -207,6 +216,7 @@ A dynamically-growing, reference-counted array
 %{_libdir}/libref_array.so
 %{_libdir}/pkgconfig/ref_array.pc
 %doc refarray/README.ref_array
+%doc refarray/doc/html/
 
 ##############################################################################
 # basicobjects
@@ -215,7 +225,7 @@ A dynamically-growing, reference-counted array
 %package -n libbasicobjects
 Summary:        Basic object types for C
 Version:        %{basicobjects_version}
-License:        GPLv3+
+License:        GPL-3.0-or-later
 
 %description -n libbasicobjects
 Basic object types
@@ -223,7 +233,7 @@ Basic object types
 %package -n libbasicobjects-devel
 Summary:        Development files for libbasicobjects
 Version:        %{basicobjects_version}
-License:        GPLv3+
+License:        GPL-3.0-or-later
 
 Requires:       libbasicobjects = %{basicobjects_version}-%{release}
 
@@ -233,7 +243,8 @@ Basic object types
 %ldconfig_scriptlets -n libbasicobjects
 
 %files -n libbasicobjects
-%license COPYING COPYING.LESSER
+%doc COPYING
+%doc COPYING.LESSER
 %{_libdir}/libbasicobjects.so.0
 %{_libdir}/libbasicobjects.so.0.1.0
 
@@ -249,7 +260,12 @@ Basic object types
 %package -n libini_config
 Summary:        INI file parser for C
 Version:        %{ini_config_version}
-License:        LGPLv3+
+License:        LGPL-3.0-or-later
+
+Requires:       libcollection%{?_isa} = %{collection_version}-%{release}
+Requires:       libref_array%{?_isa} = %{ref_array_version}-%{release}
+Requires:       libbasicobjects%{?_isa} = %{basicobjects_version}-%{release}
+Requires:       libpath_utils%{?_isa} = %{path_utils_version}-%{release}
 
 %description -n libini_config
 Library to process config files in INI format into a libcollection data
@@ -258,12 +274,12 @@ structure
 %package -n libini_config-devel
 Summary:        Development files for libini_config
 Version:        %{ini_config_version}
-License:        LGPLv3+
+License:        LGPL-3.0-or-later
 
-Requires:       libbasicobjects-devel = %{basicobjects_version}-%{release}
-Requires:       libcollection-devel = %{collection_version}-%{release}
 Requires:       libini_config = %{ini_config_version}-%{release}
+Requires:       libcollection-devel = %{collection_version}-%{release}
 Requires:       libref_array-devel = %{ref_array_version}-%{release}
+Requires:       libbasicobjects-devel = %{basicobjects_version}-%{release}
 
 %description -n libini_config-devel
 Library to process config files in INI format into a libcollection data
@@ -272,7 +288,8 @@ structure
 %ldconfig_scriptlets -n libini_config
 
 %files -n libini_config
-%license COPYING COPYING.LESSER
+%doc COPYING
+%doc COPYING.LESSER
 %{_libdir}/libini_config.so.5
 %{_libdir}/libini_config.so.5.2.1
 
@@ -284,6 +301,8 @@ structure
 %{_includedir}/ini_configmod.h
 %{_libdir}/libini_config.so
 %{_libdir}/pkgconfig/ini_config.pc
+%doc ini/doc/html/
+
 
 ##############################################################################
 # Build steps
@@ -297,7 +316,7 @@ autoreconf -ivf
 %configure \
     --disable-static
 
-make %{?_smp_mflags} all
+make %{?_smp_mflags} all docs
 
 %check
 make %{?_smp_mflags} check
@@ -306,23 +325,50 @@ make %{?_smp_mflags} check
 make install DESTDIR=%{buildroot}
 
 # Remove .la files created by libtool
-find %{buildroot} -type f -name "*.la" -delete -print
+rm -f %{buildroot}/%{_libdir}/*.la
 
 # Remove the example files from the output directory
 # We will copy them directly from the source directory
 # for packaging
 rm -f \
-    %{buildroot}%{_docdir}/ding-libs/README.* \
-    %{buildroot}%{_docdir}/ding-libs/examples/dhash_example.c \
-    %{buildroot}%{_docdir}/ding-libs/examples/dhash_test.c
+    %{buildroot}%{_datadir}/doc/ding-libs/README.* \
+    %{buildroot}%{_datadir}/doc/ding-libs/examples/dhash_example.c \
+    %{buildroot}%{_datadir}/doc/ding-libs/examples/dhash_test.c
 
 # Remove document install script. RPM is handling this
 rm -f */doc/html/installdox
 
 %changelog
-* Thu Sep 02 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.6.1-45
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- License verified.
+* Wed Jan 17 2024 Alberto Perez <aperezguevar@microsoft.com> - 0.6.2-55
+- Upgrade ding-libs to version 0.6.2
+
+* Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.2-54
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.2-53
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.2-52
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue Jan 25 2022 Alexey Tikhonov <atikhono@redhat.com> - 0.6.2-50
+- New upstream release 0.6.2
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1-49
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1-48
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1-47
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1-46
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1-45
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1-44
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

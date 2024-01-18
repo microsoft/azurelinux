@@ -2618,8 +2618,8 @@
         "type": "other",
         "other": {
           "name": "ding-libs",
-          "version": "0.6.1",
-          "downloadUrl": "https://releases.pagure.org/SSSD/ding-libs/ding-libs-0.6.1.tar.gz"
+          "version": "0.6.2",
+          "downloadUrl": "https://github.com/SSSD/ding-libs/releases/download/0.6.2/ding-libs-0.6.2.tar.gz"
         }
       }
     },
