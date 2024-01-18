@@ -1,7 +1,7 @@
 Summary:        Cloud instance init scripts
 Name:           cloud-init
 Version:        23.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -54,6 +54,8 @@ BuildArch:      noarch
 %if %{with_check}
 BuildRequires:  python3-configobj
 BuildRequires:  python3-jsonpatch
+BuildRequires:  python3-jsonschema
+BuildRequires:  python3-netifaces
 BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
 BuildRequires:  shadow-utils
@@ -143,6 +145,9 @@ make check %{?_smp_mflags}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
+* Thu Jan 18 16:59:25 EST 2024 Dan Streetman <ddstreet@ieee.org> - 23.3-2
+- add BuildRequires to avoid pip installing them
+
 * Tue Oct 10 2023 Minghe Ren <mingheren@microsoft.com> - 23.3-1
 - Upgrade to cloud-init 23.3 and remove unnecessary testGetInterfacesUnitTest.patch
 
