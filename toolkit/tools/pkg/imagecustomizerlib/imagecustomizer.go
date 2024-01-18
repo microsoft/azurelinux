@@ -115,7 +115,7 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 	}
 
 	// Shrink the filesystems.
-	if enableShrinkFilesystems && outputSplitPartitionsFormat != "" {
+	if enableShrinkFilesystems {
 		err = shrinkFilesystemsHelper(buildImageFile, outputImageFile)
 		if err != nil {
 			return err
