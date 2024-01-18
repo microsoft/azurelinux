@@ -1,7 +1,7 @@
 {
  "Signatures": {
-  "maven-3.9.4-caches.tar.gz": "57ff80abafadbd528a9c9683d30a10b8009e0e68ebe2e85f9b34be36aeab3719",
-  "apache-maven-3.9.4-src.tar.gz": "d34f6a488c741c31a717301cd7b42d37aaa939cf981e950b707f4203e0bab956",
+  "maven-3.9.6-caches.tar.gz": "47a2e7de7c69bcb864f1712e50b90445ca07cb8e807209c0690ee9b82fc0384a",
+  "apache-maven-3.9.6-src.tar.gz": "817d8fbfc1f4d91712bfb1ff839a603f9873c4125e89151ae52b56f72ee8043e",
   "maven-3.8.7-3.cm2.aarch64.rpm": "e6b84cb757128b9a893a4ba444c318ffea86670ce9f1e7b286deab1d4e5629c6",
   "maven-3.8.7-3.cm2.x86_64.rpm": "4591efa35ae766fe04c1e343f5744fba3bc52ab9ceeac49f450c8a75cf0da3c3"
  }
