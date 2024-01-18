@@ -21,7 +21,7 @@ type User struct {
 	Password            string   `json:"Password"`
 	PasswordExpiresDays int64    `json:"PasswordExpiresDays"`
 	SSHPubKeyPaths      []string `json:"SSHPubKeyPaths"`
-	SSHPubKeys          []string `yaml:"SSHPubKeys"`
+	SSHPubKeys          []string `json:"SSHPubKeys"`
 	PrimaryGroup        string   `json:"PrimaryGroup"`
 	SecondaryGroups     []string `json:"SecondaryGroups"`
 	StartupCommand      string   `json:"StartupCommand"`
