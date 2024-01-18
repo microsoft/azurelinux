@@ -1,20 +1,23 @@
+%define full_version 23.3.3
+%define short_version %(echo %{full_version} | cut -d. -f1-2)
+
 Summary:        Cloud instance init scripts
 Name:           cloud-init
-Version:        23.3
-Release:        1%{?dist}
+Version:        %{short_version}
+Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://launchpad.net/cloud-init
-Source0:        https://launchpad.net/cloud-init/trunk/%{version}/+download/%{name}-%{version}.tar.gz
+Source0:        https://launchpad.net/cloud-init/trunk/%{full_version}/+download/%{name}-%{version}.tar.gz
 Source1:        10-azure-kvp.cfg
 Patch0:         overrideDatasourceDetection.patch
 %define cl_services cloud-config.service cloud-config.target cloud-final.service cloud-init.service cloud-init.target cloud-init-local.service
 BuildRequires:  automake
 BuildRequires:  dbus
 BuildRequires:  iproute
-BuildRequires:  mariner-release 
+BuildRequires:  mariner-release
 BuildRequires:  python3
 BuildRequires:  python3-PyYAML
 BuildRequires:  python3-certifi
@@ -107,6 +110,8 @@ echo -e 'line1\nline2\nline3\ncloud-init-ca-certs.crt\n' > "${conf_file}"
 %define test_pkgs pytest-metadata unittest2 mock attrs iniconfig netifaces pyserial
 
 pip3 install --upgrade %{test_pkgs}
+# Higher versions of 'jsonschema' break the tests.
+sed -E -i 's/jsonschema/jsonschema==4.20.0/' test-requirements.txt
 pip3 install -r test-requirements.txt
 
 make check %{?_smp_mflags}
@@ -143,6 +148,10 @@ make check %{?_smp_mflags}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
+* Thu Jan 18 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 23.3-2
+- Freezing 'jsonschema' version to 4.20.0 to avoid test failures.
+- Fixing source URL.
+
 * Tue Oct 10 2023 Minghe Ren <mingheren@microsoft.com> - 23.3-1
 - Upgrade to cloud-init 23.3 and remove unnecessary testGetInterfacesUnitTest.patch
 
@@ -150,7 +159,7 @@ make check %{?_smp_mflags}
 - Add patch overrideDatasourceDetection bug from upstream
 
 * Thu Aug 24 2023 Minghe Ren <mingheren@microsoft.com> - 23.2-3
-- Remove the line prohibits cloud-init log dumping to serial console 
+- Remove the line prohibits cloud-init log dumping to serial console
 
 * Fri Aug 11 2023 Minghe Ren <mingheren@microsoft.com> - 23.2-2
 - Add patch for unit test failure
