@@ -465,7 +465,7 @@ fi
 %{_datadir}/mysql/hindi/errmsg.sys
 
 %changelog
-* Thu Jan 17 2024 Andy Zaugg <azaugg@linkedin.com> - 10.6.9-6
+* Thu Jan 18 2024 Andy Zaugg <azaugg@linkedin.com> - 10.6.9-6
 - Fix post scripts for rpm install, missing setup(mysql_install_db) script.
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 10.6.9-5
