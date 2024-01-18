@@ -12042,7 +12042,7 @@
         "other": {
           "name": "llvm",
           "version": "17.0.6",
-          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-17.0.6/llvm-17.0.6.src.tar.xz"
+          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-17.0.6.tar.gz"
         }
       }
     },
