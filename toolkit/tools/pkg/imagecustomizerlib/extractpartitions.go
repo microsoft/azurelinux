@@ -6,7 +6,6 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -80,8 +79,7 @@ func copyBlockDeviceToFile(outDir, devicePath, name string) (filename string, er
 // Compress file from raw to raw-zstd format using zstd.
 func compressWithZstd(partitionRawFilepath string) (partitionFilepath string, err error) {
 	// Using -f to overwrite a file with same name if it exists.
-	cmd := exec.Command("zstd", "-f", "-9", "-T0", partitionRawFilepath)
-	_, err = cmd.Output()
+	err = shell.ExecuteLive(true, "zstd", "-f", "-9", "-T0", partitionRawFilepath)
 	if err != nil {
 		return "", fmt.Errorf("failed to compress %s with zstd:\n%w", partitionRawFilepath, err)
 	}
