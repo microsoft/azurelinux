@@ -344,19 +344,19 @@ func extractPartitionsHelper(buildImageFile string, outputImageFile string, outp
 }
 
 func shrinkFilesystemsHelper(buildDir string, buildImageFile string, outputImageFile string) error {
-	imageConnection, err := connectToExistingImage(buildImageFile, buildDir, "imageroot")
+	imageLoopback, err := safeloopback.NewLoopback(buildImageFile)
 	if err != nil {
 		return err
 	}
-	defer imageConnection.Close()
+	defer imageLoopback.Close()
 
 	// Shrink the filesystems.
-	err = shrinkFilesystems(imageConnection, outputImageFile)
+	err = shrinkFilesystems(imageLoopback.DevicePath(), outputImageFile)
 	if err != nil {
 		return err
 	}
 
-	err = imageConnection.CleanClose()
+	err = imageLoopback.CleanClose()
 	if err != nil {
 		return err
 	}
