@@ -1,16 +1,16 @@
-%define full_version 23.3.3
-%define short_version %(echo %{full_version} | cut -d. -f1-2)
+%define upstream_version_group 23.3.3
+%define package_version %(echo %{upstream_version_group} | cut -d. -f1-2)
 
 Summary:        Cloud instance init scripts
 Name:           cloud-init
-Version:        %{short_version}
+Version:        %{package_version}
 Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://launchpad.net/cloud-init
-Source0:        https://launchpad.net/cloud-init/trunk/%{full_version}/+download/%{name}-%{version}.tar.gz
+Source0:        https://launchpad.net/cloud-init/trunk/%{upstream_version_group}/+download/%{name}-%{version}.tar.gz
 Source1:        10-azure-kvp.cfg
 Patch0:         overrideDatasourceDetection.patch
 %define cl_services cloud-config.service cloud-config.target cloud-final.service cloud-init.service cloud-init.target cloud-init-local.service
