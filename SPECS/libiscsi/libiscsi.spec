@@ -14,6 +14,9 @@ BuildRequires: libtool
 BuildRequires: popt-devel
 BuildRequires: CUnit-devel
 BuildRequires: libgcrypt-devel
+%ifnarch %{arm}
+BuildRequires: rdma-core-devel
+%endif
 
 %description
 libiscsi is a library for attaching to iSCSI resources across
