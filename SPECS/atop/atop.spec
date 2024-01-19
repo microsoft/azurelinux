@@ -91,7 +91,7 @@ install -Dp -m 0644 atop-rotate.* %{buildroot}%{_unitdir}/
 %{_sbindir}/atopacctd
 
 %changelog
-* Fri Jan 05 2024 Muhammad Falak <mwani@microsoft.com> -- 2.9.0-1
+* Fri Jan 05 2024 Muhammad Falak <mwani@microsoft.com> - 2.9.0-1
 - Bump version to 2.9.0
 - Drop un-needed patches
 
