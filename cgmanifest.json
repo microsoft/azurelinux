@@ -11701,8 +11701,8 @@
         "type": "other",
         "other": {
           "name": "libXinerama",
-          "version": "1.1.4",
-          "downloadUrl": "http://xorg.freedesktop.org/archive/individual/lib/libXinerama-1.1.4.tar.bz2"
+          "version": "1.1.5",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXinerama-1.1.5.tar.gz"
         }
       }
     },
