@@ -15,7 +15,7 @@ export AGENT_SOURCE_BIN=${SCRIPT_DIR}/kata-agent
 pushd ${OSBUILDER_DIR}
 sudo make clean
 rm -rf ${ROOTFS_DIR}
-sudo -E PATH=$PATH SECURITY_POLICY=yes make -B DISTRO=cbl-mariner rootfs
+sudo -E PATH=$PATH AGENT_POLICY=yes CONF_GUEST=yes make -B DISTRO=cbl-mariner rootfs
 popd
 
 # include both kernel-uvm and kernel-uvm-cvm modules in rootfs
@@ -33,8 +33,11 @@ do
     depmod -a -b "${ROOTFS_DIR}" ${MODULE_DIR_NAME}
 done
 
-# install other services
-cp ${SCRIPT_DIR}/coco-opa.service        ${ROOTFS_DIR}/usr/lib/systemd/system/coco-opa.service
+# Install other services.
+#
+# This is needed because we don't use `make install-services` (which installs
+# the service files on the host by default), therefore the rootfs builder can't
+# symlink the services from the host into the rootfs.
 cp ${SCRIPT_DIR}/kata-containers.target  ${ROOTFS_DIR}/usr/lib/systemd/system/kata-containers.target
 cp ${SCRIPT_DIR}/kata-agent.service.in   ${ROOTFS_DIR}/usr/lib/systemd/system/kata-agent.service
 sed -i 's/@BINDIR@\/@AGENT_NAME@/\/usr\/bin\/kata-agent/g'  ${ROOTFS_DIR}/usr/lib/systemd/system/kata-agent.service
@@ -42,5 +45,5 @@ sed -i 's/@BINDIR@\/@AGENT_NAME@/\/usr\/bin\/kata-agent/g'  ${ROOTFS_DIR}/usr/li
 # build image
 pushd ${OSBUILDER_DIR}
 mv rootfs-builder/rootfs-cbl-mariner cbl-mariner_rootfs
-sudo -E PATH=$PATH make DISTRO=cbl-mariner KATA_BUILD_CC=yes DM_VERITY_FORMAT=kernelinit image
+sudo -E PATH=$PATH make DISTRO=cbl-mariner MEASURED_ROOTFS=yes DM_VERITY_FORMAT=kernelinit image
 popd

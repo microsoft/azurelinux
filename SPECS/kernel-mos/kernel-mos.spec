@@ -18,7 +18,7 @@
 %define config_source %{SOURCE1}
 Summary:        Linux Kernel for MOS
 Name:           kernel-mos
-Version:        5.15.136.1
+Version:        5.15.145.2
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -377,6 +377,12 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Jan 16 2024 Gary Swalling <gaswal@microsoft.com> - 5.15.145.2-1
+- Update to 5.15.145.2
+
+* Mon Dec 11 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.139.1-1
+- Update to 5.15.139.1
+
 * Wed Nov 08 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.136.1-1
 - Initial CBL-Mariner import from Photon (license: Apache2).
 - License verified

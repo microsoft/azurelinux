@@ -1,7 +1,7 @@
 Summary:        C implementation of the Git core methods as a library with a solid API
 Name:           libgit2
 Version:        1.4.5
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2 with exceptions
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -76,6 +76,9 @@ rm -vr deps
 %{_includedir}/git2/
 
 %changelog
+* Wed Jan 17 2024 Harshit Gupta <guptaharshit@microsoft.com> - 1.4.5-3
+- Release bump with no changes to force a rebuild and consume new libssh2 build
+
 * Tue Mar 14 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 1.4.5-2
 - promote to core spec
 

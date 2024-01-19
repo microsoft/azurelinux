@@ -1,7 +1,7 @@
 Summary:        Nmap Network Mapper
 Name:           nmap
 Version:        7.93
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Nmap
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -59,6 +59,9 @@ ln -s ncat %{buildroot}%{_bindir}/nc
 %{_bindir}/nc
 
 %changelog
+* Wed Jan 17 2024 Harshit Gupta <guptaharshit@microsoft.com> - 7.93-2
+- Release bump with no changes to force a rebuild and consume new libssh2 build
+
 * Mon Apr 17 2023 Saul Paredes <saulparedes@microsoft.com> - 7.93-1
 - Upgrading to latest version to fix CVE-2018-25032
 

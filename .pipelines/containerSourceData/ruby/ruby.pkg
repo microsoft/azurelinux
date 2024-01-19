@@ -1,0 +1,15 @@
+binutils
+ca-certificates
+gcc
+glibc-devel
+gmp-devel
+kernel-headers
+libffi-devel
+libyaml-devel
+make
+ncurses
+procps
+ruby
+rubygem-rake
+sqlite-devel
+tzdata

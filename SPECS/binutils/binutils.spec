@@ -1,8 +1,7 @@
-# Overriding the default to call 'configure' from subdirectories.
-%global _configure ../configure
-
 # Where the binaries aimed at gcc will live (ie. /usr/<target>/bin/).
 %global auxbin_prefix %{_exec_prefix}
+
+%global srcdir %{name}-%{version}
 
 %ifarch x86_64
     %global build_cross 1
@@ -75,7 +74,7 @@ Documentation for the cross-compilation binutils package.
 %do_package aarch64-linux-gnu %{build_aarch64}
 
 %prep
-%autosetup -p1
+%setup -q -c
 
 function prep_target () {
     local target=$1
@@ -87,20 +86,19 @@ function prep_target () {
     fi
 }
 
+pushd %{srcdir}
+%autopatch -p1
+popd
+
 touch cross.list
 prep_target aarch64-linux-gnu %{build_aarch64}
-
-%if %{build_cross}
-    # $PACKAGE is used for the gettext catalog name when building 'cross-binutils-common'.
-    sed -i -e 's/^ PACKAGE=/ PACKAGE=cross-/' */configure
-%endif
 
 %build
 
 function config_cross_target () {
     local target=$1
 
-    mkdir $target
+    cp -r %{srcdir} $target
     pushd $target
 
     %configure \
@@ -115,7 +113,13 @@ function config_cross_target () {
     popd
 }
 
-mkdir build
+# Native components build steps.
+
+# Copying extracted sources for each run of "configure" and "make".
+# Building in separate subdirectories but with a single source causes
+# other packages to fail with a "configure: error: C compiler cannot create executables" error.
+# Proper fix needed and moved to a separate bug at the time of writing this comment.
+cp -r %{srcdir} build
 pushd build
 
 %configure \
@@ -128,8 +132,10 @@ pushd build
     --with-system-zlib
 
 popd
-
 %make_build -C build tooldir=%{_prefix}
+
+
+# Cross-compilation components build steps.
 
 while read -r target
 do
@@ -140,8 +146,12 @@ done < cross.list
 
 %if %{build_cross}
     # For documentation purposes only.
-    mkdir cross-binutils
+
+    cp -r %{srcdir} cross-binutils
     pushd cross-binutils
+
+    # $PACKAGE is used for the gettext catalog name when building 'cross-binutils-common'.
+    sed -i -e 's/^ PACKAGE=/ PACKAGE=cross-/' */configure
 
     %configure \
         --exec-prefix=%{auxbin_prefix} \
@@ -151,23 +161,30 @@ done < cross.list
         --disable-shared
 
     popd
-
     %make_build -C cross-binutils tooldir=%{_prefix}
 %endif
 
 
 %install
-%make_install -C build tooldir=%{_prefix}
+# Native components installation steps.
+
+pushd build
+
+%make_install tooldir=%{_prefix}
 %find_lang %{name} --all-name
 
-install -m 644 build/libiberty/pic/libiberty.a %{buildroot}%{_libdir}
+install -m 644 libiberty/pic/libiberty.a %{buildroot}%{_libdir}
 install -m 644 include/libiberty.h %{buildroot}%{_includedir}
+
+popd
+
+# Cross-compilation components installation steps.
 
 while read -r target
 do
     echo "=== INSTALL cross-compilation target $target ==="
     mkdir -p %{buildroot}%{_prefix}/$target/sys-root
-    %make_install -C $target tooldir=%{auxbin_prefix}/$target DESTDIR=%{buildroot}
+    %make_install -C $target tooldir=%{auxbin_prefix}/$target
 
     # Remove cross man files and ldscripts.
     rm -rf %{buildroot}%{_mandir}/man1/$target-*
@@ -181,7 +198,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
     echo "=== INSTALL po targets ==="
     for binary_name in binutils opcodes bfd gas ld gprof
     do
-        %make_install -C cross-binutils/$binary_name/po DESTDIR=%{buildroot}
+        %make_install -C cross-binutils/$binary_name/po
     done
 
     # Find the language files which only exist in the common package.
@@ -199,9 +216,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %ldconfig_scriptlets
 
-%files -f %{name}.lang
+%files -f build/%{name}.lang
 %defattr(-,root,root)
-%license COPYING
+%license %{srcdir}/COPYING
 %{_bindir}/dwp
 %{_bindir}/gprof
 %{_bindir}/ld.bfd
@@ -271,7 +288,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %if %{build_cross}
 %files -n cross-%{name}-common -f files.cross
-%license COPYING
+%license %{srcdir}/COPYING
 %endif
 
 %do_files aarch64-linux-gnu %{build_aarch64}

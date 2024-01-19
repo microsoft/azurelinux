@@ -1,0 +1,16 @@
+augeas
+ca-certificates
+iptables
+kubevirt-container-disk
+kubevirt-virt-launcher
+libcap
+libvirt-client
+libvirt-daemon-driver-qemu
+nftables
+procps
+qemu-device-usb-redirect
+qemu-system-x86
+qemu-tools
+socat
+tar
+xorriso
