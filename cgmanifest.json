@@ -11601,8 +11601,8 @@
         "type": "other",
         "other": {
           "name": "libXcomposite",
-          "version": "0.4.5",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXcomposite-0.4.5.tar.bz2"
+          "version": "0.4.6",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXcomposite-0.4.6.tar.gz"
         }
       }
     },
