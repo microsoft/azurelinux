@@ -10911,8 +10911,8 @@
         "type": "other",
         "other": {
           "name": "libSM",
-          "version": "1.2.3",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libSM-1.2.3.tar.bz2"
+          "version": "1.2.4",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libSM-1.2.4.tar.gz"
         }
       }
     },
