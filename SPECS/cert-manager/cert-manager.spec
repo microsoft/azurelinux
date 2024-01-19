@@ -1,7 +1,7 @@
 Summary:        Automatically provision and manage TLS certificates in Kubernetes
 Name:           cert-manager
 Version:        1.11.2
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,6 +19,7 @@ Source0:        https://github.com/jetstack/%{name}/archive/refs/tags/v%{version
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
 #           -cf %%{name}-%%{version}-govendor.tar.gz vendor
 Source1:        %{name}-%{version}-govendor.tar.gz
+Patch0:         CVE-2023-48795.patch
 BuildRequires:  golang
 Requires:       %{name}-acmesolver
 Requires:       %{name}-cainjector
@@ -63,8 +64,10 @@ Summary:        cert-manager's webhook binary
 Webhook component providing API validation, mutation and conversion functionality for cert-manager.
 
 %prep
-%autosetup -p1
-%setup -q -T -D -a 1
+# We need setup instead of autosetup because we have two sources and need the patch applied
+# after both sources have been extracted.
+%setup -q -a 1
+%patch -P 0 -p1
 
 %build
 go build -o bin/acmesolver cmd/acmesolver/main.go
@@ -109,6 +112,9 @@ install -D -m0755 bin/webhook %{buildroot}%{_bindir}/
 %{_bindir}/webhook
 
 %changelog
+* Fri Jan 18 2024 Tobias Brick <tobiasb@microsoft.com> - 1.11.2-7
+- Patch for CVE-2023-48795
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.11.2-6
 - Bump release to rebuild with go 1.20.9
 

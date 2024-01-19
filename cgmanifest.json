@@ -1808,7 +1808,7 @@
         "other": {
           "name": "cloud-init",
           "version": "23.3",
-          "downloadUrl": "https://launchpad.net/cloud-init/trunk/23.3/+download/cloud-init-23.3.tar.gz"
+          "downloadUrl": "https://launchpad.net/cloud-init/trunk/23.3.3/+download/cloud-init-23.3.tar.gz"
         }
       }
     },
@@ -29509,6 +29509,16 @@
           "name": "virt-who",
           "version": "0.24.2",
           "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/virt-who-0.24.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "virtiofsd",
+          "version": "1.8.0",
+          "downloadUrl": "https://gitlab.com/virtio-fs/virtiofsd/-/archive/v1.8.0/virtiofsd-v1.8.0.tar.gz"
         }
       }
     },
