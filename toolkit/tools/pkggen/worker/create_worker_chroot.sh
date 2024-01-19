@@ -24,7 +24,7 @@ chroot_log="$log_path"/$chroot_name.log
 
 # We have two major steps per entry in the packages file: install the RPM, then add to database
 total_steps=$(wc -l < "$packages")
-total_steps=$((total_steps * 2))
+total_steps=$((total_steps * 1))
 current_step=0
 # Print "<progress>%" and increment current_step
 function increment_progress() {
@@ -91,6 +91,8 @@ if [[ "$HOST_RPM_DB_BACKEND" == "$GUEST_RPM_DB_BACKEND" ]]; then
     echo "The host rpm db '$HOST_RPM_DB_BACKEND' matches the guest. Not rebuilding the database." | tee -a "$chroot_log"
 else
     echo "The host rpm db ('$HOST_RPM_DB_BACKEND') differs from the guest ('$GUEST_RPM_DB_BACKEND'). Rebuilding database for compatibility" | tee -a "$chroot_log"
+    # Reset current_step to show 0-100% progress for rebuild
+    current_step=0
     TEMP_DB_PATH="/temp_db"
     chroot "$chroot_builder_folder" mkdir -p "$TEMP_DB_PATH"
     chroot "$chroot_builder_folder" rpm --initdb --dbpath="$TEMP_DB_PATH"

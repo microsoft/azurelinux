@@ -1,0 +1,31 @@
+From 74a3f2f56d1343db18613f3bf0ea908a3d16910c Mon Sep 17 00:00:00 2001
+From: Ben Finney <ben+python@benfinney.id.au>
+Date: Thu, 4 Apr 2019 08:05:19 +0000
+Subject: [PATCH] =?UTF-8?q?Create=20the=20socket=20and=20catch=20=E2=80=9C?=
+ =?UTF-8?q?non-socket=E2=80=9D=20errors.?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ daemon/daemon.py | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/daemon/daemon.py b/daemon/daemon.py
+index f7cbaa2..d75b2c0 100644
+--- a/daemon/daemon.py
++++ b/daemon/daemon.py
+@@ -761,9 +761,8 @@ def is_socket(fd):
+         """
+     result = False
+ 
+-    file_socket = socket.fromfd(fd, socket.AF_INET, socket.SOCK_RAW)
+-
+     try:
++        file_socket = socket.fromfd(fd, socket.AF_INET, socket.SOCK_RAW)
+         file_socket.getsockopt(socket.SOL_SOCKET, socket.SO_TYPE)
+     except socket.error as exc:
+         exc_errno = exc.args[0]
+-- 
+2.41.0
+
