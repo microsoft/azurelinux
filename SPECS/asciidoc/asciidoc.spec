@@ -1,6 +1,6 @@
 Summary:        AsciiDoc is a human readable text document format
 Name:           asciidoc
-Version:        10.2.0
+Version:        9.1.0
 Release:        1%{?dist}
 License:        GPLv2
 URL:            https://asciidoc.org/
@@ -14,7 +14,6 @@ BuildRequires:  python3-xml
 BuildRequires:  libxslt
 BuildRequires:  docbook-style-xsl
 BuildRequires:  docbook-dtd-xml
-BuildRequires:  python3-pip
 Requires:       python3
 Requires:       python3-xml
 Requires:       libxslt
@@ -36,14 +35,7 @@ make %{?_smp_mflags}
 
 %install
 rm -rf %{buildroot}%{_infodir}
-make install docs manpages DESTDIR=%{buildroot}
-mkdir -p %{buildroot}%{_mandir}/man1
-mv %{buildroot}/share/doc/doc/{asciidoc.1,a2x.1,testasciidoc.1} %{buildroot}%{_mandir}/man1/
-mkdir -p %{buildroot}/%{_pkgdocdir}/doc
-mv %{buildroot}/share/doc/doc/ %{buildroot}/%{_pkgdocdir}/doc
-mkdir -p %{buildroot}/%{_pkgdocdir}/doc/images
-mv %{buildroot}/share/doc/images/ %{buildroot}/%{_pkgdocdir}/doc/images
-rm  %{buildroot}/share/doc/{BUGS.adoc,CHANGELOG.adoc,INSTALL.adoc,README.md,dblatex/dblatex-readme.txt,docbook-xsl/asciidoc-docbook-xsl.txt}
+make DESTDIR=%{buildroot} install
 
 %check
 python3 tests/testasciidoc.py update
@@ -55,21 +47,11 @@ python3 tests/testasciidoc.py run
 %files
 %defattr(-,root,root)
 %license COPYRIGHT
-%doc BUGS.adoc CHANGELOG.adoc README.md
 %{_bindir}/*
+%{_sysconfdir}/*
 %{_mandir}/*
-%{python3_sitelib}/asciidoc/
-%{_pkgdocdir}/doc
-%{python3_sitelib}/asciidoc-*.egg-info
-%dir %{python3_sitelib}/asciidoc/resources/filters/latex
-%dir %{python3_sitelib}/asciidoc/resources/filters/music
-
 
 %changelog
-*   Mon Jan 15 2024 Suresh Thelkar <sthelkar@microsoft.com> - 10.2.0-1
--   Upgraded to 10.2.0
--   Added BR for python3-pip
--   Added doc and man pages related changes as well
 *   Wed May 05 2021 Nick Samson <nisamson@microsoft.com> - 9.1.0-1
 -   Updated to 9.1.0, removed python2 support, verified license
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 8.6.10-4
