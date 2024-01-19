@@ -1,20 +1,23 @@
+%define upstream_version_group 23.3.3
+%define package_version %(echo %{upstream_version_group} | cut -d. -f1-2)
+
 Summary:        Cloud instance init scripts
 Name:           cloud-init
-Version:        23.3
-Release:        1%{?dist}
+Version:        %{package_version}
+Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://launchpad.net/cloud-init
-Source0:        https://launchpad.net/cloud-init/trunk/%{version}/+download/%{name}-%{version}.tar.gz
+Source0:        https://launchpad.net/cloud-init/trunk/%{upstream_version_group}/+download/%{name}-%{version}.tar.gz
 Source1:        10-azure-kvp.cfg
 Patch0:         overrideDatasourceDetection.patch
 %define cl_services cloud-config.service cloud-config.target cloud-final.service cloud-init.service cloud-init.target cloud-init-local.service
 BuildRequires:  automake
 BuildRequires:  dbus
 BuildRequires:  iproute
-BuildRequires:  mariner-release 
+BuildRequires:  mariner-release
 BuildRequires:  python3
 BuildRequires:  python3-PyYAML
 BuildRequires:  python3-certifi
@@ -23,7 +26,9 @@ BuildRequires:  python3-configobj
 BuildRequires:  python3-idna
 BuildRequires:  python3-ipaddr
 BuildRequires:  python3-jinja2
+BuildRequires:  python3-jsonschema
 BuildRequires:  python3-libs
+BuildRequires:  python3-netifaces
 BuildRequires:  python3-requests
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-six
@@ -143,6 +148,10 @@ make check %{?_smp_mflags}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
+* Thu Jan 18 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 23.3-2
+- Switching to our version of 'jsonschema' to keep the tests more stable.
+- Fixing source URL.
+
 * Tue Oct 10 2023 Minghe Ren <mingheren@microsoft.com> - 23.3-1
 - Upgrade to cloud-init 23.3 and remove unnecessary testGetInterfacesUnitTest.patch
 
@@ -150,7 +159,7 @@ make check %{?_smp_mflags}
 - Add patch overrideDatasourceDetection bug from upstream
 
 * Thu Aug 24 2023 Minghe Ren <mingheren@microsoft.com> - 23.2-3
-- Remove the line prohibits cloud-init log dumping to serial console 
+- Remove the line prohibits cloud-init log dumping to serial console
 
 * Fri Aug 11 2023 Minghe Ren <mingheren@microsoft.com> - 23.2-2
 - Add patch for unit test failure
