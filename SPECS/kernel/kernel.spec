@@ -435,6 +435,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 - Enable CONFIG_BPF_LSM (Thien Trung Vuong <tvuong@microsoft.com>)
 - Enable CUSE module (Juan Camposeco <juanarturoc@microsoft.com>)
 - Add IOMMU configs for aarch64 (David Daney <daviddaney@microsoft.com>)
+- Set selinux as default LSM
 
 * Wed Dec 13 2023 Rachel Menge <rachelmenge@microsoft.com> - 6.6.2.1-1
 - Upgrade to 6.6.2.1
