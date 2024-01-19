@@ -150,7 +150,7 @@ cp -p %{SOURCE20} .
 #manpage
 cp %{SOURCE10} %{name}/update-ca-trust.8.txt
 asciidoc -v -d manpage -b docbook %{name}/update-ca-trust.8.txt
-xsltproc --nonet -o %{name}/update-ca-trust.8 %{_sysconfdir}/asciidoc/docbook-xsl/manpage.xsl %{name}/update-ca-trust.8.xml
+xsltproc --nonet -o %{name}/update-ca-trust.8 %{python3_sitelib}/asciidoc/resources/docbook-xsl/manpage.xsl %{name}/update-ca-trust.8.xml
 
 %install
 mkdir -p -m 755 %{buildroot}%{pkidir}/tls/certs
@@ -409,10 +409,10 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 * Wed Oct 21 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-9
 - Switching to the correct source for the Microsoft bundle.
 
-* Mon Sep 13 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-8
+* Sun Sep 13 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-8
 - Aligning 'nssckbi.h' with the used 'certdata.txt' version for the Mozilla bundle.
 
-* Mon Sep 13 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-7
+* Sun Sep 13 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-7
 - Removing unused 'Requires*'.
 
 * Wed Sep 09 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-6
