@@ -10,12 +10,14 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/buildpipeline"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repocloner"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repomanager/rpmrepomanager"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/tdnf"
@@ -598,9 +600,14 @@ func (r *RpmRepoCloner) Close() error {
 // It will gradually enable more repos to consider until the package is found.
 func (r *RpmRepoCloner) clonePackage(baseArgs []string) (preBuilt bool, err error) {
 	const (
-		unresolvedOutputPrefix  = "No package"
-		toyboxConflictsPrefix   = "toybox conflicts"
-		unresolvedOutputPostfix = "available"
+		// With 6 attempts, initial delay of 1 second, and a backoff factor of 3.0 the total time spent retrying will be
+		// 1 + 3 + 9 + 27 + 81 = 121 seconds.
+		//
+		// *NOTE* These values are copied from downloader/downloader.go; they need not be the same but seemed like a
+		// good enough starting point.
+		downloadRetryAttempts = 6
+		failureBackoffBase    = 3.0
+		downloadRetryDuration = time.Second
 	)
 
 	releaseverCliArg, err := tdnf.GetReleaseverCliArg()
@@ -615,44 +622,89 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string) (preBuilt bool, err erro
 
 		finalArgs := append(baseArgs, reposArgs...)
 
-		var (
-			stdout string
-			stderr string
-		)
-		stdout, stderr, err = shell.Execute("tdnf", finalArgs...)
-
-		logger.Log.Debugf("stdout: %s", stdout)
-		logger.Log.Debugf("stderr: %s", stderr)
-
-		if err != nil {
-			logger.Log.Debugf("tdnf error (will continue if the only errors are toybox conflicts):\n '%s'", stderr)
-		}
-
-		// ============== TDNF SPECIFIC IMPLEMENTATION ==============
-		// Check if TDNF could not resolve a given package. If TDNF does not find a requested package,
-		// it will not error. Instead it will print a message to stdout. Check for this message.
-		//
-		// *NOTE*: TDNF will attempt best effort. If N packages are requested, and 1 cannot be found,
-		// it will still download N-1 packages while also printing the message.
-		splitStdout := strings.Split(stdout, "\n")
-		for _, line := range splitStdout {
-			trimmedLine := strings.TrimSpace(line)
-			// Toybox conflicts are a known issue, reset the err value if encountered
-			if strings.HasPrefix(trimmedLine, toyboxConflictsPrefix) {
-				logger.Log.Warn("Ignoring known toybox conflict")
-				err = nil
-				continue
+		// We run in a retry loop on errors deemed retriable.
+		cancel := make(chan struct{})
+		retryNum := 1
+		_, err = retry.RunWithExpBackoff(func() error {
+			downloadErr, retriable := tdnfDownload(finalArgs...)
+			if downloadErr != nil {
+				if retriable {
+					logger.Log.Warnf("Attempt %d/%d: Failed to clone packages", retryNum, downloadRetryAttempts)
+				} else {
+					close(cancel)
+				}
 			}
-			// If a package was not available, update err
-			if strings.HasPrefix(trimmedLine, unresolvedOutputPrefix) && strings.HasSuffix(trimmedLine, unresolvedOutputPostfix) {
-				err = fmt.Errorf(trimmedLine)
-				break
-			}
-		}
+
+			retryNum++
+			return downloadErr
+		}, downloadRetryAttempts, downloadRetryDuration, failureBackoffBase, cancel)
 
 		if err == nil {
 			preBuilt = r.reposArgsHaveOnlyLocalSources(reposArgs)
 			break
+		}
+	}
+
+	return
+}
+
+func tdnfDownload(args ...string) (err error, retriable bool) {
+	const (
+		unresolvedOutputPrefix  = "No package"
+		toyboxConflictsPrefix   = "toybox conflicts"
+		unresolvedOutputPostfix = "available"
+	)
+
+	var (
+		stdout string
+		stderr string
+	)
+	stdout, stderr, err = shell.Execute("tdnf", args...)
+
+	logger.Log.Debugf("stdout: %s", stdout)
+	logger.Log.Debugf("stderr: %s", stderr)
+
+	if err != nil {
+		logger.Log.Debugf("tdnf error (will continue if the only errors are toybox conflicts):\n '%s'", stderr)
+	}
+
+	// ============== TDNF SPECIFIC IMPLEMENTATION ==============
+	//
+	// Check if TDNF could not resolve a given package. If TDNF does not find a requested package,
+	// it will not error. Instead it will print a message to stdout. Check for this message.
+	//
+	// *NOTE*: TDNF will attempt best effort. If N packages are requested, and 1 cannot be found,
+	// it will still download N-1 packages while also printing the message.
+	splitStdout := strings.Split(stdout, "\n")
+	for _, line := range splitStdout {
+		trimmedLine := strings.TrimSpace(line)
+		// Toybox conflicts are a known issue, reset the err value if encountered
+		if strings.HasPrefix(trimmedLine, toyboxConflictsPrefix) {
+			logger.Log.Warn("Ignoring known toybox conflict")
+			err = nil
+			continue
+		}
+		// If a package was not available, update err
+		if strings.HasPrefix(trimmedLine, unresolvedOutputPrefix) && strings.HasSuffix(trimmedLine, unresolvedOutputPostfix) {
+			err = fmt.Errorf(trimmedLine)
+			break
+		}
+	}
+
+	//
+	// *NOTE*: There are cases in which some of our upstream package repositories are hosted
+	// on services that are prone to intermittent errors (e.g., HTTP 502 errors). We
+	// specifically look for such known cases and apply some retry logic in hopes of getting
+	// a better result; note that we don't indiscriminately retry because there are legitimate
+	// cases in which the upstream repo doesn't contain the package and a 404 error is to be
+	// expected. This involves scraping through stderr, but it's better than not doing so.
+	//
+	if err != nil {
+		for _, line := range strings.Split(stderr, "\n") {
+			if strings.Contains(line, "Error: 502 when downloading") {
+				logger.Log.Warn("Encountered possibly intermittent HTTP 502 error.")
+				retriable = true
+			}
 		}
 	}
 
