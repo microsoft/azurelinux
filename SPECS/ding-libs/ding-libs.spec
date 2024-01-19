@@ -370,7 +370,7 @@ rm -f */doc/html/installdox
 * Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1-46
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
-* Tue Sep 02 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.1-45
+* Thu Sep 02 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.6.1-45
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - License verified.
 
