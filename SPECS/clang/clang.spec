@@ -120,7 +120,9 @@ export CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/ -g//'`"
 
 mkdir -p build
 cd build
-cmake -DCMAKE_INSTALL_PREFIX=%{_prefix}       \
+cmake -G Ninja \
+      -DCMAKE_INSTALL_PREFIX=%{_prefix}       \
+      -DLLVM_PARALLEL_LINK_JOBS=1             \
       -DCLANG_ENABLE_STATIC_ANALYZER:BOOL=ON  \
       -DCMAKE_BUILD_TYPE=Release              \
       -DLLVM_ENABLE_EH=ON                     \
@@ -129,11 +131,11 @@ cmake -DCMAKE_INSTALL_PREFIX=%{_prefix}       \
 	    -DLLVM_INCLUDE_TESTS=OFF                \
       -Wno-dev ../clang
 
-%make_build
+%cmake_build
 
 %install
 cd build
-%make_install
+%cmake_install
 
 # Remove emacs integration files.
 rm %{buildroot}%{_datadir}/clang/*.el
