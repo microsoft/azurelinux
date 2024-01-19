@@ -1,11 +1,11 @@
 diff --git a/Makefile.in b/Makefile.in
-index 9b3a5d75..8c955d5a 100644
+index 38f1f9ab..905e122f 100644
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -16070,13 +16070,7 @@ maybe-check-gold:
+@@ -19587,13 +19587,7 @@ maybe-check-gold:
  @if gold
  maybe-check-gold: check-gold
- 
+
 -check-gold:
 -	@: $(MAKE); $(unstage)
 -	@r=`${PWD_COMMAND}`; export r; \
@@ -14,21 +14,5 @@ index 9b3a5d75..8c955d5a 100644
 -	(cd $(HOST_SUBDIR)/gold && \
 -	  $(MAKE) $(FLAGS_TO_PASS)  $(EXTRA_BOOTSTRAP_FLAGS) check)
 +check-gold: ;
- 
+
  @endif gold
- 
-@@ -52322,14 +52316,12 @@ all-stage3-gold: maybe-all-stage3-gas
- all-stage4-gold: maybe-all-stage4-gas
- all-stageprofile-gold: maybe-all-stageprofile-gas
- all-stagefeedback-gold: maybe-all-stagefeedback-gas
--check-gold: maybe-all-binutils
- check-stage1-gold: maybe-all-stage1-binutils
- check-stage2-gold: maybe-all-stage2-binutils
- check-stage3-gold: maybe-all-stage3-binutils
- check-stage4-gold: maybe-all-stage4-binutils
- check-stageprofile-gold: maybe-all-stageprofile-binutils
- check-stagefeedback-gold: maybe-all-stagefeedback-binutils
--check-gold: maybe-all-gas
- check-stage1-gold: maybe-all-stage1-gas
- check-stage2-gold: maybe-all-stage2-gas
- check-stage3-gold: maybe-all-stage3-gas
