@@ -22,6 +22,19 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 )
 
+var (
+	// When calling mkfs, the default options change depending on the host OS you are running on and typically match
+	// what the distro has decided is best for their OS. For example, for ext2/3/4, the defaults are stored in
+	// /etc/mke2fs.conf.
+	// However, when building Mariner images, the defaults should be as consistent as possible and should only contain
+	// features that are supported on Mariner.
+	DefaultMkfsOptions = map[string][]string{
+		"ext2": {"-b", "4096", "-O", "none,sparse_super,large_file,filetype,resize_inode,dir_index,ext_attr"},
+		"ext3": {"-b", "4096", "-O", "none,sparse_super,large_file,filetype,resize_inode,dir_index,ext_attr,has_journal"},
+		"ext4": {"-b", "4096", "-O", "none,sparse_super,large_file,filetype,resize_inode,dir_index,ext_attr,has_journal,extent,huge_file,flex_bg,metadata_csum,64bit,dir_nlink,extra_isize"},
+	}
+)
+
 type blockDevicesOutput struct {
 	Devices []blockDeviceInfo `json:"blockdevices"`
 }
@@ -53,6 +66,7 @@ type PartitionInfo struct {
 	PartUuid          string `json:"partuuid"`   // Example: 7b1367a6-5845-43f2-99b1-a742d873f590
 	Mountpoint        string `json:"mountpoint"` // Example: /mnt/os/boot
 	PartLabel         string `json:"partlabel"`  // Example: boot
+	Type              string `json:"type"`       // Example: part
 }
 
 type loopbackListOutput struct {
@@ -410,7 +424,9 @@ func WaitForDevicesToSettle() error {
 }
 
 // CreatePartitions creates partitions on the specified disk according to the disk config
-func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryption configuration.RootEncryption, readOnlyRootConfig configuration.ReadOnlyVerityRoot) (partDevPathMap map[string]string, partIDToFsTypeMap map[string]string, encryptedRoot EncryptedRootDevice, readOnlyRoot VerityDevice, err error) {
+func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryption configuration.RootEncryption,
+	readOnlyRootConfig configuration.ReadOnlyVerityRoot,
+) (partDevPathMap map[string]string, partIDToFsTypeMap map[string]string, encryptedRoot EncryptedRootDevice, readOnlyRoot VerityDevice, err error) {
 	const timeoutInSeconds = "5"
 	partDevPathMap = make(map[string]string)
 	partIDToFsTypeMap = make(map[string]string)
@@ -651,7 +667,8 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int, partitio
 }
 
 // FormatSinglePartition formats the given partition to the type specified in the partition configuration
-func FormatSinglePartition(partDevPath string, partition configuration.Partition) (fsType string, err error) {
+func FormatSinglePartition(partDevPath string, partition configuration.Partition,
+) (fsType string, err error) {
 	const (
 		totalAttempts = 5
 		retryDuration = time.Second
@@ -664,11 +681,18 @@ func FormatSinglePartition(partDevPath string, partition configuration.Partition
 	// To handle such cases, we can retry the command.
 	switch fsType {
 	case "fat32", "fat16", "vfat", "ext2", "ext3", "ext4", "xfs":
+		mkfsOptions := DefaultMkfsOptions[fsType]
+
 		if fsType == "fat32" || fsType == "fat16" {
 			fsType = "vfat"
 		}
+
+		mkfsArgs := []string{"-t", fsType}
+		mkfsArgs = append(mkfsArgs, mkfsOptions...)
+		mkfsArgs = append(mkfsArgs, partDevPath)
+
 		err = retry.Run(func() error {
-			_, stderr, err := shell.Execute("mkfs", "-t", fsType, partDevPath)
+			_, stderr, err := shell.Execute("mkfs", mkfsArgs...)
 			if err != nil {
 				logger.Log.Warnf("Failed to format partition using mkfs: %v", stderr)
 				return err
@@ -759,7 +783,7 @@ func GetDiskPartitions(diskDevPath string) ([]PartitionInfo, error) {
 	}
 
 	// Read the disk's partitions.
-	jsonString, _, err := shell.Execute("lsblk", diskDevPath, "--output", "NAME,PATH,PARTTYPE,FSTYPE,UUID,MOUNTPOINT,PARTUUID,PARTLABEL", "--json", "--list")
+	jsonString, _, err := shell.Execute("lsblk", diskDevPath, "--output", "NAME,PATH,PARTTYPE,FSTYPE,UUID,MOUNTPOINT,PARTUUID,PARTLABEL,TYPE", "--json", "--list")
 	if err != nil {
 		return nil, fmt.Errorf("failed to list disk (%s) partitions:\n%w", diskDevPath, err)
 	}

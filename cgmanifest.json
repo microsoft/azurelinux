@@ -9240,16 +9240,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libewf",
-          "version": "20140608",
-          "downloadUrl": "https://github.com/libyal/legacy/raw/main/libewf/libewf-20140608.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "libexif",
           "version": "0.6.24",
           "downloadUrl": "https://github.com/libexif/libexif/releases/download/v0.6.24/libexif-0.6.24.tar.bz2"
@@ -27497,8 +27487,8 @@
         "type": "other",
         "other": {
           "name": "shared-mime-info",
-          "version": "2.0",
-          "downloadUrl": "https://gitlab.freedesktop.org/xdg/shared-mime-info/uploads/0440063a2e6823a4b1a6fb2f2af8350f/shared-mime-info-2.0.tar.xz"
+          "version": "2.2",
+          "downloadUrl": "https://gitlab.freedesktop.org/xdg/shared-mime-info/-/archive/2.2/shared-mime-info-2.2.tar.bz2"
         }
       }
     },

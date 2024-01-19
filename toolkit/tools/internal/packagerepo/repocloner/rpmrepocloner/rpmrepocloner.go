@@ -165,7 +165,7 @@ func (r *RpmRepoCloner) initialize(destinationDir, tmpDir, workerTar, existingRp
 
 	// Also request that /overlaywork is created before any chroot mounts happen so the overlay can
 	// be created successfully
-	err = r.chroot.Initialize(workerTar, overlayExtraDirs, extraMountPoints)
+	err = r.chroot.Initialize(workerTar, overlayExtraDirs, extraMountPoints, true)
 	if err != nil {
 		r.chroot = nil
 		return
