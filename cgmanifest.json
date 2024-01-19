@@ -29598,8 +29598,8 @@
         "type": "other",
         "other": {
           "name": "xcb-proto",
-          "version": "1.13",
-          "downloadUrl": "https://xcb.freedesktop.org/dist/xcb-proto-1.13.tar.bz2"
+          "version": "1.16.0",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/proto/xcb-proto-1.16.0.tar.gz"
         }
       }
     },
