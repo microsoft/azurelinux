@@ -6,7 +6,7 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.x.org/
-Source0:        https://www.x.org/archive/individual/lib/%{name}-%{version}.tar.bz2
+Source0:        https://www.x.org/archive/individual/lib/%{name}-%{version}.tar.xz
 
 Patch0:         libpciaccess-rom-size.patch
 
