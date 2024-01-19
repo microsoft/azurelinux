@@ -14,6 +14,7 @@ BuildRequires:  bison
 BuildRequires:  cereal-devel
 BuildRequires:  clang-devel
 BuildRequires:  cmake
+BuildRequires:  dwarves
 BuildRequires:  elfutils-libelf-devel
 BuildRequires:  flex
 BuildRequires:  gcc
@@ -79,10 +80,11 @@ install -p -m 644 tools/*.txt %{buildroot}%{_datadir}/bpftrace/tools/doc
 %{_datadir}/bpftrace/tools
 
 %changelog
-* Thu Jan 04 2024 muhammad Falak <mwani@microsoft.com> - 0.19.1-1
+* Thu Jan 04 2024 Muhammad Falak <mwani@microsoft.com> - 0.19.1-1
 - Upgrade version to 0.19.1
 - Use system libbpf
 - Switch build type to RelWithDebInfo
+- Add BR on dwarves to fix %check
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.16.0-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
