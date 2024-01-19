@@ -56,7 +56,7 @@ func TestInitializeShouldCreateRoot(t *testing.T) {
 	dir := filepath.Join(t.TempDir(), "TestInitializeShouldCreateRoot")
 	chroot := NewChroot(dir, isExistingDir)
 
-	err := chroot.Initialize(emptyPath, extraDirectories, extraMountPoints, true)
+	err := chroot.Initialize(emptyPath, extraDirectories, extraMountPoints)
 	assert.NoError(t, err)
 
 	defer chroot.Close(defaultLeaveOnDisk)
@@ -72,7 +72,7 @@ func TestCloseShouldRemoveRoot(t *testing.T) {
 	dir := filepath.Join(t.TempDir(), "TestCloseShouldRemoveRoot")
 	chroot := NewChroot(dir, isExistingDir)
 
-	err := chroot.Initialize(emptyPath, extraDirectories, extraMountPoints, true)
+	err := chroot.Initialize(emptyPath, extraDirectories, extraMountPoints)
 	assert.NoError(t, err)
 
 	// save away chroot location and close
@@ -102,7 +102,7 @@ func TestCloseShouldLeaveRootOnRequest(t *testing.T) {
 		dir := filepath.Join(t.TempDir(), "TestCloseShouldLeaveRootOnRequest")
 		chroot := NewChroot(dir, isExistingDir)
 
-		err := chroot.Initialize(emptyPath, extraDirectories, extraMountPoints, true)
+		err := chroot.Initialize(emptyPath, extraDirectories, extraMountPoints)
 		assert.NoError(t, err)
 
 		err = chroot.Close(leaveOnDisk)
@@ -134,7 +134,7 @@ func TestRunShouldReturnCorrectError(t *testing.T) {
 	dir := filepath.Join(t.TempDir(), "TestRunShouldReturnCorrectError")
 	chroot := NewChroot(dir, isExistingDir)
 
-	err := chroot.Initialize(emptyPath, extraDirectories, extraMountPoints, true)
+	err := chroot.Initialize(emptyPath, extraDirectories, extraMountPoints)
 	assert.NoError(t, err)
 	defer chroot.Close(defaultLeaveOnDisk)
 
@@ -153,7 +153,7 @@ func TestRunShouldChangeCWD(t *testing.T) {
 	dir := filepath.Join(t.TempDir(), "TestRunShouldChangeCWD")
 	chroot := NewChroot(dir, isExistingDir)
 
-	err := chroot.Initialize(emptyPath, extraDirectories, extraMountPoints, true)
+	err := chroot.Initialize(emptyPath, extraDirectories, extraMountPoints)
 	assert.NoError(t, err)
 	defer chroot.Close(defaultLeaveOnDisk)
 
@@ -178,7 +178,7 @@ func TestShouldRestoreCWD(t *testing.T) {
 	dir := filepath.Join(t.TempDir(), "TestShouldRestoreCWD")
 	chroot := NewChroot(dir, isExistingDir)
 
-	err := chroot.Initialize(emptyPath, extraDirectories, extraMountPoints, true)
+	err := chroot.Initialize(emptyPath, extraDirectories, extraMountPoints)
 	assert.NoError(t, err)
 	defer chroot.Close(defaultLeaveOnDisk)
 
@@ -205,7 +205,7 @@ func TestInitializeShouldExtractTar(t *testing.T) {
 	dir := filepath.Join(t.TempDir(), "TestInitializeShouldExtractTar")
 	chroot := NewChroot(dir, isExistingDir)
 
-	err := chroot.Initialize(tarPath, extraDirectories, extraMountPoints, true)
+	err := chroot.Initialize(tarPath, extraDirectories, extraMountPoints)
 	assert.NoError(t, err)
 	defer chroot.Close(defaultLeaveOnDisk)
 
@@ -228,7 +228,7 @@ func TestInitializeShouldCreateCustomMountPoints(t *testing.T) {
 		dir := filepath.Join(t.TempDir(), "TestInitializeShouldCreateCustomMountPoints")
 		chroot := NewChroot(dir, isExistingDir)
 
-		err := chroot.Initialize(emptyPath, extraDirectories, extraMountPoints, true)
+		err := chroot.Initialize(emptyPath, extraDirectories, extraMountPoints)
 		assert.NoError(t, err)
 		defer chroot.Close(defaultLeaveOnDisk)
 
@@ -251,7 +251,7 @@ func TestInitializeShouldCleanupOnBadMountPoint(t *testing.T) {
 		dir := filepath.Join(t.TempDir(), "TestInitializeShouldCleanupOnBadMountPoint")
 		chroot := NewChroot(dir, isExistingDir)
 
-		err := chroot.Initialize(emptyPath, extraDirectories, extraMountPoints, true)
+		err := chroot.Initialize(emptyPath, extraDirectories, extraMountPoints)
 		assert.Error(t, err)
 
 		_, err = os.Stat(dir)
@@ -268,7 +268,7 @@ func TestInitializeShouldCreateExtraDirectories(t *testing.T) {
 	dir := filepath.Join(t.TempDir(), "TestInitializeShouldCreateExtraDirectories")
 	chroot := NewChroot(dir, isExistingDir)
 
-	err := chroot.Initialize(emptyPath, extraDirectories, extraMountPoints, true)
+	err := chroot.Initialize(emptyPath, extraDirectories, extraMountPoints)
 	assert.NoError(t, err)
 	defer chroot.Close(defaultLeaveOnDisk)
 

@@ -244,7 +244,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 		extraMountPoints = append(extraMountPoints, additionalExtraMountPoints...)
 
 		setupChroot := safechroot.NewChroot(setupChrootDir, existingChrootDir)
-		err = setupChroot.Initialize(*tdnfTar, extraDirectories, extraMountPoints, true)
+		err = setupChroot.Initialize(*tdnfTar, extraDirectories, extraMountPoints)
 		if err != nil {
 			logger.Log.Error("Failed to create setup chroot")
 			return
@@ -416,6 +416,11 @@ func setupLoopDeviceDisk(outputDir, diskName string, diskConfig configuration.Di
 }
 
 func setupRealDisk(diskDevPath string, diskConfig configuration.Disk, rootEncryption configuration.RootEncryption, readOnlyRootConfig configuration.ReadOnlyVerityRoot) (partIDToDevPathMap, partIDToFsTypeMap map[string]string, encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice, err error) {
+	const (
+		defaultBlockSize = diskutils.MiB
+		noMaxSize        = 0
+	)
+
 	// Set up partitions
 	partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err = diskutils.CreatePartitions(diskDevPath, diskConfig, rootEncryption, readOnlyRootConfig)
 	if err != nil {
@@ -559,7 +564,7 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 	installChroot := safechroot.NewChroot(installRoot, existingChrootDir)
 	extraInstallMountPoints := []*safechroot.MountPoint{}
 	extraDirectories := []string{}
-	err = installChroot.Initialize(emptyWorkerTar, extraDirectories, extraInstallMountPoints, true)
+	err = installChroot.Initialize(emptyWorkerTar, extraDirectories, extraInstallMountPoints)
 	if err != nil {
 		err = fmt.Errorf("failed to create install chroot: %s", err)
 		return

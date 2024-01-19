@@ -144,17 +144,9 @@ func ExecuteLive(squashErrors bool, program string, args ...string) (err error) 
 // ExecuteLiveWithErr runs a command in the shell and logs it in real-time.
 // In addition, if there is an error, the last x lines of stderr will be attached to the err object.
 func ExecuteLiveWithErr(stderrLines int, program string, args ...string) (err error) {
-	return ExecuteLiveWithErrAndCallbacks(stderrLines, logger.Log.Debug, logger.Log.Debug, program, args...)
-}
-
-// ExecuteLiveWithErr runs a command in the shell and logs it in real-time.
-// In addition, if there is an error, the last x lines of stderr will be attached to the err object.
-func ExecuteLiveWithErrAndCallbacks(stderrLines int, onStdout, onStderr func(...interface{}), program string,
-	args ...string,
-) (err error) {
 	stderrChan := make(chan string, stderrLines)
 
-	err = ExecuteLiveWithCallbackAndChannels(onStdout, onStderr, nil, stderrChan, program, args...)
+	err = ExecuteLiveWithCallbackAndChannels(logger.Log.Debug, logger.Log.Debug, nil, stderrChan, program, args...)
 	close(stderrChan)
 	if err != nil {
 		errLines := ""

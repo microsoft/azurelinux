@@ -21,7 +21,6 @@ type SystemConfig struct {
 	PackagesRemove          []string                  `yaml:"PackagesRemove"`
 	PackageListsUpdate      []string                  `yaml:"PackageListsUpdate"`
 	PackagesUpdate          []string                  `yaml:"PackagesUpdate"`
-	KernelCommandLine       KernelCommandLine         `yaml:"KernelCommandLine"`
 	AdditionalFiles         map[string]FileConfigList `yaml:"AdditionalFiles"`
 	PartitionSettings       []PartitionSetting        `yaml:"PartitionSettings"`
 	PostInstallScripts      []Script                  `yaml:"PostInstallScripts"`
@@ -29,7 +28,6 @@ type SystemConfig struct {
 	Users                   []User                    `yaml:"Users"`
 	Services                Services                  `yaml:"Services"`
 	Modules                 Modules                   `yaml:"Modules"`
-	Verity                  *Verity                   `yaml:"Verity"`
 }
 
 func (s *SystemConfig) IsValid() error {
@@ -44,11 +42,6 @@ func (s *SystemConfig) IsValid() error {
 		if !govalidator.IsDNSName(s.Hostname) || strings.Contains(s.Hostname, "_") {
 			return fmt.Errorf("invalid hostname: %s", s.Hostname)
 		}
-	}
-
-	err = s.KernelCommandLine.IsValid()
-	if err != nil {
-		return fmt.Errorf("invalid KernelCommandLine: %w", err)
 	}
 
 	for sourcePath, fileConfigList := range s.AdditionalFiles {
@@ -99,13 +92,6 @@ func (s *SystemConfig) IsValid() error {
 
 	if err := s.Modules.IsValid(); err != nil {
 		return err
-	}
-
-	if s.Verity != nil {
-		err = s.Verity.IsValid()
-		if err != nil {
-			return fmt.Errorf("invalid Verity: %w", err)
-		}
 	}
 
 	return nil

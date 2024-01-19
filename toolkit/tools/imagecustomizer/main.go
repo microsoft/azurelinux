@@ -18,18 +18,17 @@ import (
 var (
 	app = kingpin.New("imagecustomizer", "Customizes a pre-built CBL-Mariner image")
 
-	buildDir                    = app.Flag("build-dir", "Directory to run build out of.").Required().String()
-	imageFile                   = app.Flag("image-file", "Path of the base CBL-Mariner image which the customization will be applied to.").Required().String()
-	outputImageFile             = app.Flag("output-image-file", "Path to write the customized image to.").Required().String()
-	outputImageFormat           = app.Flag("output-image-format", "Format of output image. Supported: vhd, vhdx, qcow2, raw.").Enum("vhd", "vhdx", "qcow2", "raw")
-	outputSplitPartitionsFormat = app.Flag("output-split-partitions-format", "Format of partition files. Supported: raw, raw-zstd").Enum("raw", "raw-zstd")
-	configFile                  = app.Flag("config-file", "Path of the image customization config file.").Required().String()
-	rpmSources                  = app.Flag("rpm-source", "Path to a RPM repo config file or a directory containing RPMs.").Strings()
-	disableBaseImageRpmRepos    = app.Flag("disable-base-image-rpm-repos", "Disable the base image's RPM repos as an RPM source").Bool()
-	logFile                     = exe.LogFileFlag(app)
-	logLevel                    = exe.LogLevelFlag(app)
-	profFlags                   = exe.SetupProfileFlags(app)
-	timestampFile               = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
+	buildDir                 = app.Flag("build-dir", "Directory to run build out of.").Required().String()
+	imageFile                = app.Flag("image-file", "Path of the base CBL-Mariner image which the customization will be applied to.").Required().String()
+	outputImageFile          = app.Flag("output-image-file", "Path to write the customized image to.").Required().String()
+	outputImageFormat        = app.Flag("output-image-format", "Format of output image. Supported: vhd, vhdx, qcow2, raw.").Required().Enum("vhd", "vhdx", "qcow2", "raw")
+	configFile               = app.Flag("config-file", "Path of the image customization config file.").Required().String()
+	rpmSources               = app.Flag("rpm-source", "Path to a RPM repo config file or a directory containing RPMs.").Strings()
+	disableBaseImageRpmRepos = app.Flag("disable-base-image-rpm-repos", "Disable the base image's RPM repos as an RPM source").Bool()
+	logFile                  = exe.LogFileFlag(app)
+	logLevel                 = exe.LogLevelFlag(app)
+	profFlags                = exe.SetupProfileFlags(app)
+	timestampFile            = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
 )
 
 func main() {
@@ -37,9 +36,6 @@ func main() {
 
 	app.Version(imagecustomizerlib.ToolVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	if *outputSplitPartitionsFormat == "" && *outputImageFormat == "" {
-		kingpin.Fatalf("Either --output-image-format or --output-split-partitions-format must be specified.")
-	}
 
 	logger.InitBestEffort(*logFile, *logLevel)
 
@@ -62,7 +58,7 @@ func customizeImage() error {
 	var err error
 
 	err = imagecustomizerlib.CustomizeImageWithConfigFile(*buildDir, *configFile, *imageFile,
-		*rpmSources, *outputImageFile, *outputImageFormat, *outputSplitPartitionsFormat, !*disableBaseImageRpmRepos)
+		*rpmSources, *outputImageFile, *outputImageFormat, !*disableBaseImageRpmRepos)
 	if err != nil {
 		return err
 	}

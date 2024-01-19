@@ -1262,7 +1262,7 @@ func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err
 			return
 		}
 
-		err = ProvisionUserSSHCerts(installChroot, user.Name, user.SSHPubKeyPaths, user.SSHPubKeys)
+		err = ProvisionUserSSHCerts(installChroot, user.Name, user.SSHPubKeyPaths)
 		if err != nil {
 			return
 		}
@@ -1497,7 +1497,7 @@ func ConfigureUserStartupCommand(installChroot safechroot.ChrootInterface, usern
 	return
 }
 
-func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username string, sshPubKeyPaths []string, sshPubKeys []string) (err error) {
+func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username string, sshPubKeyPaths []string) (err error) {
 	var (
 		pubKeyData []string
 		exists     bool
@@ -1538,10 +1538,8 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 	}
 	defer os.Remove(authorizedKeysTempFile)
 
-	allSSHKeys := make([]string, 0, len(sshPubKeyPaths)+len(sshPubKeys))
-
-	// Add SSH keys from sshPubKeyPaths
 	for _, pubKey := range sshPubKeyPaths {
+		logger.Log.Infof("Adding ssh key (%s) to user (%s)", filepath.Base(pubKey), username)
 		relativeDst := filepath.Join(userSSHKeyDir, filepath.Base(pubKey))
 
 		fileToCopy := safechroot.FileToCopy{
@@ -1554,26 +1552,21 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 			return
 		}
 
+		logger.Log.Infof("Adding ssh key (%s) to user (%s) .ssh/authorized_users", filepath.Base(pubKey), username)
 		pubKeyData, err = file.ReadLines(pubKey)
 		if err != nil {
 			logger.Log.Warnf("Failed to read from SSHPubKey : %v", err)
 			return
 		}
 
-		allSSHKeys = append(allSSHKeys, pubKeyData...)
-	}
-
-	// Add direct SSH keys
-	allSSHKeys = append(allSSHKeys, sshPubKeys...)
-
-	for _, pubKey := range allSSHKeys {
-		logger.Log.Infof("Adding ssh key (%s) to user (%s) .ssh/authorized_users", filepath.Base(pubKey), username)
-		pubKey += "\n"
-
-		err = file.Append(pubKey, authorizedKeysTempFile)
-		if err != nil {
-			logger.Log.Warnf("Failed to append to %s : %v", authorizedKeysTempFile, err)
-			return
+		// Append to the tmp/authorized_users file
+		for _, sshkey := range pubKeyData {
+			sshkey += "\n"
+			err = file.Append(sshkey, authorizedKeysTempFile)
+			if err != nil {
+				logger.Log.Warnf("Failed to append to %s : %v", authorizedKeysTempFile, err)
+				return
+			}
 		}
 	}
 

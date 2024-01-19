@@ -17,7 +17,6 @@ type User struct {
 	PasswordPath        string   `yaml:"PasswordPath"`
 	PasswordExpiresDays *int64   `yaml:"PasswordExpiresDays"`
 	SSHPubKeyPaths      []string `yaml:"SSHPubKeyPaths"`
-	SSHPubKeys          []string `yaml:"SSHPubKeys"`
 	PrimaryGroup        string   `yaml:"PrimaryGroup"`
 	SecondaryGroups     []string `yaml:"SecondaryGroups"`
 	StartupCommand      string   `yaml:"StartupCommand"`
