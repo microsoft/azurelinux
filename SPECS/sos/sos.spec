@@ -11,8 +11,6 @@ URL:            https://github.com/sosreport/sos
 Source0:        %{name}-%{version}.tar.gz
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-# For the _tmpfilesdir macro.
-BuildRequires:  systemd
 Requires:       bzip2
 Requires:       python3
 Requires:       python3-libxml2
@@ -21,7 +19,7 @@ Requires:       python3-rpm
 Requires:       python3-setuptools
 Recommends:     python3-magic
 # Mandatory just for uploading to a SFTP server:
-Recommends: python3-requests
+Recommends:     python3-requests
 BuildArch:      noarch
 
 %description
@@ -48,9 +46,7 @@ install -d -m 700 %{buildroot}%{_sysconfdir}/%{name}/cleaner
 install -d -m 755 %{buildroot}%{_sysconfdir}/%{name}/presets.d
 install -d -m 755 %{buildroot}%{_sysconfdir}/%{name}/groups.d
 install -d -m 755 %{buildroot}%{_sysconfdir}/%{name}/extras.d
-install -d -m 755 %{buildroot}%{_tmpfilesdir}
 install -m 644 %{name}.conf %{buildroot}%{_sysconfdir}/%{name}/%{name}.conf
-install -m 644 tmpfiles/tmpfilesd-sos-rh.conf %{buildroot}%{_tmpfilesdir}/%{name}.conf
 
 rm -rf %{buildroot}%{_prefix}/config/
 
@@ -68,7 +64,6 @@ rm -rf %{buildroot}%{_prefix}/config/
 %dir %{_sysconfdir}/sos/presets.d
 %dir %{_sysconfdir}/sos/extras.d
 %dir %{_sysconfdir}/sos/groups.d
-%{_tmpfilesdir}/%{name}.conf
 %{python3_sitelib}/*
 %{_mandir}/man1/*
 %{_mandir}/man5/*
