@@ -149,7 +149,7 @@ cp -p %{SOURCE20} .
 
 #manpage
 cp %{SOURCE10} %{name}/update-ca-trust.8.txt
-asciidoc.py -v -d manpage -b docbook %{name}/update-ca-trust.8.txt
+asciidoc -v -d manpage -b docbook %{name}/update-ca-trust.8.txt
 xsltproc --nonet -o %{name}/update-ca-trust.8 %{_sysconfdir}/asciidoc/docbook-xsl/manpage.xsl %{name}/update-ca-trust.8.xml
 
 %install
@@ -324,6 +324,9 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %{_bindir}/bundle2pem.sh
 
 %changelog
+* Fri Jan 19 2024 Andrew Phelps <anphel@microsoft.com> - 3.0.0-2
+- Use asciidoc binary instead of asciidoc.py
+
 * Tue Jan 09 2024 Cameron Baird <cameronbaird@microsoft.com> - 3.0.0-1
 - Initial version for AzureLinux 3.0.
 
