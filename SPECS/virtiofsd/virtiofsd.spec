@@ -4,6 +4,7 @@ Release:        1%{?dist}
 Summary:        Virtio-fs vhost-user device daemon (Rust version)
 License:        Apache-2.0 AND BSD-3-Clause
 Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:            https://gitlab.com/virtio-fs/virtiofsd
 Source0:        https://gitlab.com/virtio-fs/virtiofsd/-/archive/v%{version}/%{name}-v%{version}.tar.gz
 
@@ -50,4 +51,5 @@ install -D -p -m 0755 target/release/virtiofsd %{buildroot}%{_libexecdir}/virtio
 
 %changelog
 * Tue Jan 9 2024 Aurélien Bombo <abombo@microsoft.com> - 1.8.0-1
-- Introduce package.
+- Initial CBL-Mariner import from Fedora 39 (license: MIT).
+- License verified.
