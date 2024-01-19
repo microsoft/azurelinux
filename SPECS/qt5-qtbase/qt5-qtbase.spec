@@ -33,7 +33,7 @@
 Name:         qt5-qtbase
 Summary:      Qt5 - QtBase components
 Version:      5.12.11
-Release:      9%{?dist}
+Release:      10%{?dist}
 # See LICENSE.GPL3-EXCEPT.txt, for exception details
 License:      GFDL AND LGPLv3 AND GPLv2 AND GPLv3 with exceptions AND QT License Agreement 4.0
 Vendor:       Microsoft Corporation
@@ -145,6 +145,9 @@ Patch84: CVE-2023-33285.patch
 Patch86: CVE-2023-37369.patch
 Patch87: CVE-2023-38197.patch
 
+# Fix CVE-2023-51714
+Patch88: CVE-2023-51714.patch
+
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
 # not there, the platform to integrate with isn't either. Then Qt will just
@@ -253,6 +256,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch84 -p1
 %patch86 -p1
 %patch87 -p1
+%patch88 -p1
 
 ## upstream patches
 
@@ -758,6 +762,9 @@ fi
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXdgDesktopPortalThemePlugin.cmake
 
 %changelog
+* Fri Jan 05 2024 Henry Beberman <henry.beberman@microsoft.com> - 5.12.11-10
+- Add patch to resolve CVE-2023-51714
+
 * Tue Aug 01 2023 Thien Trung Vuong <tvuong@microsoft.com> - 5.12.11-9
 - Add patch to resolve CVE-2023-33285, CVE-2023-37369, CVE-2023-38197
 
