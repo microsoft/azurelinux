@@ -50,7 +50,7 @@ find %{buildroot} -name README -delete
 
 %changelog
 * Fri Jan 19 2024 Andrew Phelps <anphel@microsoft.com> - 3.0.0-2
-- Use asciidoc binary instead of asciidoc.py
+- Making 'Release' match with 'ca-certificates'
 
 * Tue Jan 09 2024 Cameron Baird <cameronbaird@microsoft.com> - 3.0.0-1
 - Initial version for AzureLinux 3.0.
