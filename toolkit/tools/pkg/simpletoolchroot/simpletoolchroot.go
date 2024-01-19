@@ -58,7 +58,7 @@ func (s *SimpleToolChroot) InitializeChroot(buildDir, chrootName, workerTarPath,
 	extraMountPoints := []*safechroot.MountPoint{
 		safechroot.NewMountPoint(specsDirPath, chrootSpecDirPath, "", safechroot.BindMountPointFlags, ""),
 	}
-	err = s.chroot.Initialize(workerTarPath, extraDirectories, extraMountPoints, true)
+	err = s.chroot.Initialize(workerTarPath, extraDirectories, extraMountPoints)
 	if err != nil {
 		logger.Log.Errorf("Failed to initialize chroot (%s) inside (%s). Error: %v.", workerTarPath, chrootDirPath, err)
 	}
