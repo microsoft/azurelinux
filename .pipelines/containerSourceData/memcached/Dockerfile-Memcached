@@ -7,7 +7,9 @@ FROM $BASE_IMAGE
 
 @INCLUDE_MAIN_RUN_INSTRUCTION@
 
-USER memcached
+RUN useradd memcache
+
+USER memcache
 
 EXPOSE 11211
 
@@ -15,4 +17,4 @@ EXPOSE 11211
 RUN memcached -h
 
 # set default command for the container
-CMD ["memcached", "-u", "memcached"]
+CMD ["memcached"]
