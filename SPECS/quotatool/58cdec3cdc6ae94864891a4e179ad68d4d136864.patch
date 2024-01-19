@@ -1,0 +1,29 @@
+From 58cdec3cdc6ae94864891a4e179ad68d4d136864 Mon Sep 17 00:00:00 2001
+From: Bas Zoetekouw <bas.zoetekouw@surfnet.nl>
+Date: Fri, 10 Aug 2018 12:59:20 +0200
+Subject: [PATCH] Clearer error message if quota is off (see
+ https://bugs.debian.org/670642)
+
+---
+ src/linux/quota.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/src/linux/quota.c b/src/linux/quota.c
+index 362bf10..be569ff 100644
+--- a/src/linux/quota.c
++++ b/src/linux/quota.c
+@@ -531,7 +531,13 @@ int kern_quota_format(fs_t *fs, int q_type) {
+       retval = quotactl(QCMD(Q_GETFMT, q_type), fs->device, 0, (void *) &actfmt);
+       if (retval < 0) {
+ 	 if (! QF_IS_XFS(quota_format)) {
+-	    output_error("Error while detecting kernel quota version: %s\n", strerror(errno));
++	    if (errno == 3) {
++	       output_error("Quotatool cannot function while quotas are disabled. "
++	                    "Please enable quotas by running `quotaon -a`.\n");
++	    }
++	    else {
++	       output_error("Error while detecting kernel quota version: %i, %s\n", errno, strerror(errno));
++	    }
+ 	    exit(ERR_SYS);
+ 	 }
+       }

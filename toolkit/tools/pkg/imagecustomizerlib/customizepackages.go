@@ -15,32 +15,17 @@ import (
 )
 
 func addRemoveAndUpdatePackages(buildDir string, baseConfigPath string, config *imagecustomizerapi.SystemConfig,
-	imageChroot *safechroot.Chroot, rpmsSources []string, useBaseImageRpmRepos bool,
+	imageChroot *safechroot.Chroot, rpmsSources []string, useBaseImageRpmRepos bool, partitionsCustomized bool,
 ) error {
-	allPackagesRemove, err := collectPackagesList(baseConfigPath, config.PackageListsRemove, config.PackagesRemove)
-	if err != nil {
-		return err
-	}
+	var err error
 
-	allPackagesInstall, err := collectPackagesList(baseConfigPath, config.PackageListsInstall, config.PackagesInstall)
-	if err != nil {
-		return err
-	}
-
-	allPackagesUpdate, err := collectPackagesList(baseConfigPath, config.PackageListsUpdate, config.PackagesUpdate)
-	if err != nil {
-		return err
-	}
-
-	needRpmsSources := len(allPackagesInstall) > 0 || len(allPackagesUpdate) > 0 || config.UpdateBaseImagePackages
+	// Note: The 'validatePackageLists' function read the PackageLists files and merged them into the inline package lists.
+	needRpmsSources := len(config.PackagesInstall) > 0 || len(config.PackagesUpdate) > 0 ||
+		config.UpdateBaseImagePackages || partitionsCustomized
 
 	// Mount RPM sources.
 	var mounts *rpmSourcesMounts
 	if needRpmsSources {
-		if len(rpmsSources) <= 0 && !useBaseImageRpmRepos {
-			return fmt.Errorf("have packages to install or update but no RPM sources were specified")
-		}
-
 		mounts, err = mountRpmSources(buildDir, imageChroot, rpmsSources, useBaseImageRpmRepos)
 		if err != nil {
 			return err
@@ -48,7 +33,16 @@ func addRemoveAndUpdatePackages(buildDir string, baseConfigPath string, config *
 		defer mounts.close()
 	}
 
-	err = removePackages(allPackagesRemove, imageChroot)
+	if partitionsCustomized {
+		logger.Log.Infof("Updating initrd file")
+
+		err = installOrUpdatePackages("reinstall", []string{"initramfs"}, imageChroot)
+		if err != nil {
+			return err
+		}
+	}
+
+	err = removePackages(config.PackagesRemove, imageChroot)
 	if err != nil {
 		return err
 	}
@@ -60,14 +54,14 @@ func addRemoveAndUpdatePackages(buildDir string, baseConfigPath string, config *
 		}
 	}
 
-	logger.Log.Infof("Installing packages: %v", allPackagesInstall)
-	err = installOrUpdatePackages("install", allPackagesInstall, imageChroot)
+	logger.Log.Infof("Installing packages: %v", config.PackagesInstall)
+	err = installOrUpdatePackages("install", config.PackagesInstall, imageChroot)
 	if err != nil {
 		return err
 	}
 
-	logger.Log.Infof("Updating packages: %v", allPackagesUpdate)
-	err = installOrUpdatePackages("update", allPackagesUpdate, imageChroot)
+	logger.Log.Infof("Updating packages: %v", config.PackagesUpdate)
+	err = installOrUpdatePackages("update", config.PackagesUpdate, imageChroot)
 	if err != nil {
 		return err
 	}
