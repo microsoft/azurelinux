@@ -272,6 +272,7 @@ function config_cross_target () {
         --disable-libssp \
         --disable-libunwind-exceptions \
         --disable-multilib \
+        --disable-shared \
         --disable-silent-rules \
         --disable-sjlj-exceptions \
         --disable-threads \
@@ -281,7 +282,6 @@ function config_cross_target () {
         --enable-default-pie \
         --enable-languages=c,c++ \
         --enable-linker-build-id \
-        --enable-shared \
         --enable-targets=all \
         --program-prefix=$target- \
         --target=$target \
@@ -326,7 +326,16 @@ while read -r target
 do
     echo "=== BUILD cross-compilation target $target ==="
     config_cross_target $target
+    AR_FOR_TARGET=%{_bindir}/$target-ar \
+    AS_FOR_TARGET=%{_bindir}/$target-as \
+    LD_FOR_TARGET=%{_bindir}/$target-ld \
+    NM_FOR_TARGET=%{_bindir}/$target-nm \
+    OBJDUMP_FOR_TARGET=%{_bindir}/$target-objdump \
+    RANLIB_FOR_TARGET=%{_bindir}/$target-ranlib \
+    READELF_FOR_TARGET=%{_bindir}/$target-readelf \
+    STRIP_FOR_TARGET=%{_bindir}/$target-strip \
     make -C $target %{_smp_mflags} tooldir=%{_prefix} all-gcc
+    make -C $target %{_smp_mflags} tooldir=%{_prefix} all-target-libgcc
 done < cross.list
 
 %install
@@ -353,11 +362,29 @@ do
     echo "=== INSTALL cross-compilation target $target ==="
 
     mkdir -p %{buildroot}%{_prefix}/$target/sys-root
-    make -C $target %{?_smp_mflags} DESTDIR=%{buildroot} install-gcc
+    make -C $target %{?_smp_mflags} DESTDIR=%{buildroot} install-gcc install-target-libgcc
     rm -rf %{buildroot}%{_mandir}/man1/$target-*
 done < cross.list
 
 rm -rf %{buildroot}%{_infodir}
+
+# Workaround for cross-compilation object files stripping issue.
+# We skip stripping all object files for architectures different than %%{_target_platform}.
+# See Fedora's bug: https://bugzilla.redhat.com/show_bug.cgi?id=1863378.
+%global __ar_no_strip %{_builddir}/%{name}-%{version}/ar-no-strip
+cat >%{__ar_no_strip} <<EOF
+#!/bin/bash
+file=\$2
+if [[ \$file =~ \.[ao]$ && \$file = %{buildroot}%{_libdir}/gcc/* && ! \$file = */%{_host}/* ]]
+then
+    echo "Skipping stripping \$file. See spec file for details."
+    exit 0
+fi
+%{__strip} \$*
+EOF
+chmod +x %{__ar_no_strip}
+%undefine __strip
+%global __strip %{__ar_no_strip}
 
 %check
 ulimit -s 32768
