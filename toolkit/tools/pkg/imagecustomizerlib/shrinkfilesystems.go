@@ -25,7 +25,13 @@ func shrinkFilesystems(imageLoopDevice string, outputImageFile string) error {
 			}
 
 			partitionLoopDevice := diskPartitions[partitionNum].Path
+			out, stderr, _ := shell.Execute("sudo", "losetup", "-c", partitionLoopDevice)
+			println(out)
+			println(stderr)
 
+			out, stderr, _ = shell.Execute("df", "-h")
+			println(out)
+			println(stderr)
 			// Check the file system with e2fsck
 			err := shell.ExecuteLive(true /*squashErrors*/, "sudo", "e2fsck", "-fy", partitionLoopDevice)
 			if err != nil {

@@ -30,12 +30,17 @@ func extractPartitions(imageLoopDevice string, outputImageFile string, partition
 		if diskPartitions[partitionNum].Type == "part" {
 			rawFilename := basename + "_" + strconv.Itoa(partitionNum) + ".raw"
 			partitionLoopDevice := diskPartitions[partitionNum].Path
+			out, stderr, _ := shell.Execute("sudo", "losetup", partitionLoopDevice)
+			println(out)
+			println(stderr)
 
 			partitionFilepath, err := copyBlockDeviceToFile(outDir, partitionLoopDevice, rawFilename)
 			if err != nil {
 				return err
 			}
-
+			out, stderr, _ = shell.Execute("sudo", "losetup", partitionLoopDevice)
+			println(out)
+			println(stderr)
 			switch partitionFormat {
 			case "raw":
 				// Do nothing for "raw" case.
