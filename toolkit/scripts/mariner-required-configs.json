@@ -1362,6 +1362,19 @@
                 "PR": [
                     "https://github.com/microsoft/CBL-Mariner/pull/6829"
                 ]
+            },
+            "CONFIG_DEFAULT_SECURITY_SELINUX": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "Set SELinux as default LSM",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/"
+                ]
             }
         }
     }
