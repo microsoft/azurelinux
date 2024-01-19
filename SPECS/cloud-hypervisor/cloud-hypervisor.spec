@@ -24,10 +24,9 @@ Source1:        %{name}-%{version}-cargo.tar.gz
 Source2:        config.toml
 Patch0:         CVE-2023-45853.patch
 Patch1:         CVE-2023-50711-vmm-sys-util-fix1.patch 
-Patch2:         CVE-2023-50711-vmm-sys-util-fix2.patch
-Patch3:         CVE-2023-50711-vmm-sys-util-cargo-fix3.patch
-Patch4:         CVE-2023-50711-vhost.patch
-Patch5:         CVE-2023-50711-versionize.patch
+Patch2:         CVE-2023-50711-vmm-sys-util-fix2-cargo.patch
+Patch3:         CVE-2023-50711-vhost.patch
+Patch4:         CVE-2023-50711-versionize.patch
 %endif
 
 BuildRequires:  binutils
@@ -83,11 +82,10 @@ pushd vendor/libz-sys/src/zlib
 popd
 pushd vendor/vmm-sys-util
 %patch1 -p1
-%patch2 -p1
 popd
-%patch3 -p1	
+%patch2 -p1	
+%patch3 -p1
 %patch4 -p1
-%patch5 -p1
 mkdir -p .cargo
 cp %{SOURCE2} .cargo/
 %endif
