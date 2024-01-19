@@ -575,8 +575,8 @@
         "type": "other",
         "other": {
           "name": "asciidoc",
-          "version": "9.1.0",
-          "downloadUrl": "https://github.com/asciidoc-py/asciidoc-py/releases/download/9.1.0/asciidoc-9.1.0.tar.gz"
+          "version": "10.2.0",
+          "downloadUrl": "https://github.com/asciidoc-py/asciidoc-py/releases/download/10.2.0/asciidoc-10.2.0.tar.gz"
         }
       }
     },
@@ -695,8 +695,8 @@
         "type": "other",
         "other": {
           "name": "atop",
-          "version": "2.6.0",
-          "downloadUrl": "http://www.atoptool.nl/download/atop-2.6.0.tar.gz"
+          "version": "2.9.0",
+          "downloadUrl": "http://www.atoptool.nl/download/atop-2.9.0.tar.gz"
         }
       }
     },
@@ -2990,6 +2990,16 @@
           "name": "dtc",
           "version": "1.6.1",
           "downloadUrl": "https://kernel.org/pub/software/utils/dtc/dtc-1.6.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "duktape",
+          "version": "2.7.0",
+          "downloadUrl": "https://duktape.org/duktape-2.7.0.tar.xz"
         }
       }
     },
@@ -9240,16 +9250,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libewf",
-          "version": "20140608",
-          "downloadUrl": "https://github.com/libyal/legacy/raw/main/libewf/libewf-20140608.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "libexif",
           "version": "0.6.24",
           "downloadUrl": "https://github.com/libexif/libexif/releases/download/v0.6.24/libexif-0.6.24.tar.bz2"
@@ -9611,8 +9611,8 @@
         "type": "other",
         "other": {
           "name": "libICE",
-          "version": "1.0.10",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libICE-1.0.10.tar.bz2"
+          "version": "1.1.1",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libICE-1.1.1.tar.gz"
         }
       }
     },
@@ -9651,8 +9651,8 @@
         "type": "other",
         "other": {
           "name": "libidn2",
-          "version": "2.3.0",
-          "downloadUrl": "https://ftp.gnu.org/gnu/libidn/libidn2-2.3.0.tar.gz"
+          "version": "2.3.4",
+          "downloadUrl": "https://ftp.gnu.org/gnu/libidn/libidn2-2.3.4.tar.gz"
         }
       }
     },
@@ -10911,8 +10911,8 @@
         "type": "other",
         "other": {
           "name": "libslirp",
-          "version": "4.6.1",
-          "downloadUrl": "https://gitlab.freedesktop.org/slirp/libslirp/uploads/83b199ea6fcdfc0c243dfde8546ee4c9/libslirp-4.6.1.tar.xz"
+          "version": "4.7.0",
+          "downloadUrl": "https://gitlab.freedesktop.org/slirp/libslirp/-/archive/v4.7.0/libslirp-v4.7.0.tar.gz"
         }
       }
     },
@@ -10921,8 +10921,8 @@
         "type": "other",
         "other": {
           "name": "libSM",
-          "version": "1.2.3",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libSM-1.2.3.tar.bz2"
+          "version": "1.2.4",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libSM-1.2.4.tar.gz"
         }
       }
     },
@@ -11601,8 +11601,8 @@
         "type": "other",
         "other": {
           "name": "libXcomposite",
-          "version": "0.4.5",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXcomposite-0.4.5.tar.bz2"
+          "version": "0.4.6",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXcomposite-0.4.6.tar.gz"
         }
       }
     },
@@ -11711,8 +11711,8 @@
         "type": "other",
         "other": {
           "name": "libXinerama",
-          "version": "1.1.4",
-          "downloadUrl": "http://xorg.freedesktop.org/archive/individual/lib/libXinerama-1.1.4.tar.bz2"
+          "version": "1.1.5",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXinerama-1.1.5.tar.gz"
         }
       }
     },
@@ -11781,8 +11781,8 @@
         "type": "other",
         "other": {
           "name": "libXmu",
-          "version": "1.1.3",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXmu-1.1.3.tar.bz2"
+          "version": "1.1.4",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXmu-1.1.4.tar.gz"
         }
       }
     },
@@ -21154,8 +21154,8 @@
         "type": "other",
         "other": {
           "name": "polkit",
-          "version": "0.119",
-          "downloadUrl": "https://www.freedesktop.org/software/polkit/releases/polkit-0.119.tar.gz"
+          "version": "123",
+          "downloadUrl": "https://gitlab.freedesktop.org/polkit/polkit/-/archive/123/polkit-123.tar.gz"
         }
       }
     },
@@ -27497,8 +27497,8 @@
         "type": "other",
         "other": {
           "name": "shared-mime-info",
-          "version": "2.0",
-          "downloadUrl": "https://gitlab.freedesktop.org/xdg/shared-mime-info/uploads/0440063a2e6823a4b1a6fb2f2af8350f/shared-mime-info-2.0.tar.xz"
+          "version": "2.2",
+          "downloadUrl": "https://gitlab.freedesktop.org/xdg/shared-mime-info/-/archive/2.2/shared-mime-info-2.2.tar.bz2"
         }
       }
     },
@@ -29608,8 +29608,8 @@
         "type": "other",
         "other": {
           "name": "xcb-proto",
-          "version": "1.13",
-          "downloadUrl": "https://xcb.freedesktop.org/dist/xcb-proto-1.13.tar.bz2"
+          "version": "1.16.0",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/proto/xcb-proto-1.16.0.tar.gz"
         }
       }
     },
