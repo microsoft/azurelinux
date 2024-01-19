@@ -9,8 +9,7 @@ Summary:        A mediated device management utility for Linux
 
 License:        LGPL-2.1-only
 URL:            https://crates.io/crates/mdevctl
-Source:         %{crates_source}
-Source1:        https://github.com/mdevctl/mdevctl/releases/download/v%{version}/mdevctl-%{version}-vendor.tar.gz
+Source:         https://github.com/mdevctl/mdevctl/releases/download/v%{version}/mdevctl-%{version}-vendor.tar.gz
 
 BuildRequires: make systemd python3-docutils
 %if 0%{?rhel}
