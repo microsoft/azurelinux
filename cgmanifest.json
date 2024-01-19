@@ -695,8 +695,8 @@
         "type": "other",
         "other": {
           "name": "atop",
-          "version": "2.6.0",
-          "downloadUrl": "http://www.atoptool.nl/download/atop-2.6.0.tar.gz"
+          "version": "2.9.0",
+          "downloadUrl": "http://www.atoptool.nl/download/atop-2.9.0.tar.gz"
         }
       }
     },
