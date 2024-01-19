@@ -26,7 +26,9 @@ BuildRequires:  python3-configobj
 BuildRequires:  python3-idna
 BuildRequires:  python3-ipaddr
 BuildRequires:  python3-jinja2
+BuildRequires:  python3-jsonschema
 BuildRequires:  python3-libs
+BuildRequires:  python3-netifaces
 BuildRequires:  python3-requests
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-six
@@ -110,8 +112,6 @@ echo -e 'line1\nline2\nline3\ncloud-init-ca-certs.crt\n' > "${conf_file}"
 %define test_pkgs pytest-metadata unittest2 mock attrs iniconfig netifaces pyserial
 
 pip3 install --upgrade %{test_pkgs}
-# Higher versions of 'jsonschema' break the tests.
-sed -E -i 's/jsonschema/jsonschema==4.20.0/' test-requirements.txt
 pip3 install -r test-requirements.txt
 
 make check %{?_smp_mflags}
@@ -149,7 +149,7 @@ make check %{?_smp_mflags}
 
 %changelog
 * Thu Jan 18 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 23.3-2
-- Freezing 'jsonschema' version to 4.20.0 to avoid test failures.
+- Switching to our version of 'jsonschema' to keep the tests more stable.
 - Fixing source URL.
 
 * Tue Oct 10 2023 Minghe Ren <mingheren@microsoft.com> - 23.3-1
