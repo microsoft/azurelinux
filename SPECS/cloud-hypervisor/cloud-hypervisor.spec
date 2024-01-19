@@ -5,7 +5,7 @@
 Summary:        Cloud Hypervisor is an open source Virtual Machine Monitor (VMM) that runs on top of KVM.
 Name:           cloud-hypervisor
 Version:        32.0
-Release:        3%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0 OR BSD-3-clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,14 +19,9 @@ Source0:        https://github.com/cloud-hypervisor/cloud-hypervisor/archive/ref
 #   cd %{name}-%{version}
 #   cargo vendor > config.toml
 #   tar -czf %{name}-%{version}-cargo.tar.gz vendor/
-# rename the tarball to %{name}-%{version}-cargo.tar.gz when updating version
 Source1:        %{name}-%{version}-cargo.tar.gz
 Source2:        config.toml
 Patch0:         CVE-2023-45853.patch
-Patch1:         CVE-2023-50711-vmm-sys-util-fix1.patch 
-Patch2:         CVE-2023-50711-vmm-sys-util-fix2-cargo.patch
-Patch3:         CVE-2023-50711-vhost.patch
-Patch4:         CVE-2023-50711-versionize.patch
 %endif
 
 BuildRequires:  binutils
@@ -80,12 +75,6 @@ tar xf %{SOURCE1}
 pushd vendor/libz-sys/src/zlib
 %patch0 -p1
 popd
-pushd vendor/vmm-sys-util
-%patch1 -p1
-popd
-%patch2 -p1	
-%patch3 -p1
-%patch4 -p1
 mkdir -p .cargo
 cp %{SOURCE2} .cargo/
 %endif
@@ -166,9 +155,6 @@ cargo build --release --target=%{rust_musl_target} --package vhost_user_block %{
 %license LICENSE-BSD-3-Clause
 
 %changelog
-* Mon Jan 15 2024 Sindhu Karri <lakarri@microsoft.com> - 32.0-3
-- Patch CVE-2023-50711 in vendor/vmm-sys-util, vendor/vhost, vendor/versionize
-
 * Mon Oct 23 2023 Rohit Rawat <rohitrawat@microsoft.com> - 32.0-2
 - Patch CVE-2023-45853 in vendor/libz-sys/src/zlib
 
