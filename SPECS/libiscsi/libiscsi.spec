@@ -2,11 +2,9 @@ Name: libiscsi
 Summary: iSCSI client library
 Version: 1.19.0
 Release: 1%{?dist}
-License: LGPL-2.1-or-later
+License: LGPLv2+
 URL: https://github.com/sahlberg/%{name}
-%global commit 7577ec589cb34900f83a95797ef473f79603ad61
-#Source: https://github.com/sahlberg/libiscsi/archive/{version}.tar.gz
-#Source: https://github.com/sahlberg/libiscsi/archive/%{commit}.tar.gz#/%{name}-%{version}.tar.gz
+
 Source: https://github.com/sahlberg/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires: make
@@ -16,9 +14,6 @@ BuildRequires: libtool
 BuildRequires: popt-devel
 BuildRequires: CUnit-devel
 BuildRequires: libgcrypt-devel
-%ifnarch %{arm}
-BuildRequires: rdma-core-devel
-%endif
 
 %description
 libiscsi is a library for attaching to iSCSI resources across
@@ -33,7 +28,7 @@ a network.
 %global libiscsi_libdir %{_libdir}/iscsi
 
 %prep
-%autosetup -n libiscsi-%{commit}
+%setup -q
 %autopatch -p1
 
 %build
@@ -55,14 +50,14 @@ rm $RPM_BUILD_ROOT/%{libiscsi_libdir}/libiscsi.la
 
 %files
 %license COPYING LICENCE-LGPL-2.1.txt
-%doc README.md TODO
+%doc README TODO
 %dir %{libiscsi_libdir}
-%{libiscsi_libdir}/libiscsi.so.9*
+%{libiscsi_libdir}/libiscsi.so.*
 %config /etc/ld.so.conf.d/*
 
 %package utils
 Summary: iSCSI Client Utilities
-License: GPL-2.0-or-later
+License: GPLv2+
 Requires: %{name}%{?_isa} = %{version}-%{release}
 
 %description utils
@@ -77,9 +72,7 @@ to iSCSI servers without having to set up the Linux iSCSI initiator.
 %{_bindir}/iscsi-swp
 %{_bindir}/iscsi-perf
 %{_bindir}/iscsi-test-cu
-%{_bindir}/iscsi-pr
-%{_bindir}/iscsi-discard
-%{_bindir}/iscsi-md5sum
+%{_bindir}/ld_iscsi.so
 %{_mandir}/man1/iscsi-ls.1.gz
 %{_mandir}/man1/iscsi-inq.1.gz
 %{_mandir}/man1/iscsi-swp.1.gz
