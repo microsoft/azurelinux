@@ -5,10 +5,12 @@ Summary:        An Open Source software construction tool
 Group:          Development/Tools
 License:        MIT
 URL:            http://scons.org
-Source0:        http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
+Source0:        https://sourceforge.net/projects/scons/files/scons/4.6.0/scons-4.6.0.tar.gz
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 BuildRequires:  python3-devel
+BuildRequires:  python3-pip
+BuildRequires:  python-wheel
 Requires:       python3
 BuildArch:      noarch
 
@@ -19,7 +21,7 @@ with integrated functionality similar to autoconf/automake and compiler caches s
 In short, SCons is an easier, more reliable and faster way to build software.
 
 %prep
-%autosetup
+%autosetup -n SCons-%{version}
 
 %build
 %py3_build
