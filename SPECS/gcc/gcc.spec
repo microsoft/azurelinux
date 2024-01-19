@@ -4,9 +4,6 @@
 # Overriding the default to call 'configure' from subdirectories.
 %global _configure ../configure
 
-# Where the binaries aimed at gcc will live (ie. /usr/<target>/bin/).
-%global auxbin_prefix %{_exec_prefix}
-
 %ifarch x86_64
     %global build_cross 1
 %else
