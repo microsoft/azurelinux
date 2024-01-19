@@ -25,10 +25,12 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/resources"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safemount"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/tdnf"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/userutils"
+	"golang.org/x/sys/unix"
 )
 
 const (
@@ -1693,29 +1695,56 @@ func selinuxRelabelFiles(systemConfig configuration.SystemConfig, installChroot 
 	selinuxType := strings.TrimSpace(stdout)
 	fileContextPath := fmt.Sprintf(fileContextBasePath, selinuxType)
 
-	logger.Log.Debugf("Running setfiles to apply SELinux labels on mount points: %v", listOfMountsToLabel)
-	err = installChroot.UnsafeRun(func() error {
-		args := []string{"-m", "-v", fileContextPath}
-		args = append(args, listOfMountsToLabel...)
+	targetRootPath := "/mnt/_bindmountroot"
 
-		// We only want to print basic info, filter out the real output unless at trace level (Execute call handles that)
-		files := 0
-		lastFile := ""
-		onStdout := func(args ...interface{}) {
-			if len(args) > 0 {
-				files++
-				lastFile = fmt.Sprintf("%v", args)
-			}
-			if (files % 1000) == 0 {
-				ReportActionf("SELinux: labelled %d files", files)
-			}
-		}
-		err := shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, squashErrors, "setfiles", args...)
+	for _, mountToLabel := range listOfMountsToLabel {
+		logger.Log.Debugf("Running setfiles to apply SELinux labels on mount points: %v", mountToLabel)
+
+		// Create a bind mount so that the filesystem's files can be labelled without interference from other mounts.
+		sourceFullPath := filepath.Join(installChroot.RootDir(), mountToLabel)
+		targetPath := filepath.Join(targetRootPath, mountToLabel)
+		targetFullPath := filepath.Join(installChroot.RootDir(), targetPath)
+
+		bindMount, err := safemount.NewMount(sourceFullPath, targetFullPath, "", unix.MS_BIND, "", true)
 		if err != nil {
-			return fmt.Errorf("failed while labeling files (last file: %s) %w", lastFile, err)
+			return fmt.Errorf("failed to bind mount (%s) while SELinux labeling:\n%w", mountToLabel, err)
 		}
-		return err
-	})
+		defer bindMount.Close()
+
+		err = installChroot.UnsafeRun(func() error {
+			// We only want to print basic info, filter out the real output unless at trace level (Execute call handles that)
+			files := 0
+			lastFile := ""
+			onStdout := func(args ...interface{}) {
+				if len(args) > 0 {
+					files++
+					lastFile = fmt.Sprintf("%v", args)
+				}
+				if (files % 1000) == 0 {
+					ReportActionf("SELinux: labelled %d files", files)
+				}
+			}
+			err := shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, squashErrors, "setfiles", "-m", "-v", "-r",
+				targetRootPath, fileContextPath, targetPath)
+			if err != nil {
+				return fmt.Errorf("failed while labeling files (last file: %s) %w", lastFile, err)
+			}
+			return err
+		})
+		if err != nil {
+			return err
+		}
+
+		err = bindMount.CleanClose()
+		if err != nil {
+			return err
+		}
+	}
+
+	err = os.RemoveAll(targetRootPath)
+	if err != nil {
+		return fmt.Errorf("failed to remove temporary bind mount directory:\n%w", err)
+	}
 
 	return
 }
