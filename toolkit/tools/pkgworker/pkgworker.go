@@ -90,7 +90,7 @@ func main() {
 	defines[rpm.DistroBuildNumberDefine] = *distroBuildNumber
 	defines[rpm.MarinerModuleLdflagsDefine] = "-Wl,-dT,%{_topdir}/BUILD/module_info.ld"
 
-	ccacheManager, ccacheErr := ccachemanagerpkg.CreateManager(*ccacheRootDir, *ccachConfig)
+	ccacheManager, ccacheErr := ccachemanager.CreateManager(*ccacheRootDir, *ccachConfig)
 	if ccacheErr == nil {
 		if *useCcache {
 			buildArch, ccacheErr := rpm.GetRpmArch(runtime.GOARCH)
@@ -151,11 +151,11 @@ func buildChrootDirPath(workDir, srpmFilePath string, runCheck bool) (chrootDirP
 	return filepath.Join(workDir, buildDirName)
 }
 
-func isCCacheEnabled(ccacheManager *ccachemanagerpkg.CCacheManager) bool {
+func isCCacheEnabled(ccacheManager *ccachemanager.CCacheManager) bool {
 	return ccacheManager != nil && ccacheManager.CurrentPkgGroup.Enabled
 }
 
-func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmFile, repoFile, rpmmacrosFile, outArch string, defines map[string]string, noCleanup, runCheck bool, packagesToInstall []string, ccacheManager *ccachemanagerpkg.CCacheManager, timeout time.Duration) (builtRPMs []string, err error) {
+func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmFile, repoFile, rpmmacrosFile, outArch string, defines map[string]string, noCleanup, runCheck bool, packagesToInstall []string, ccacheManager *ccachemanager.CCacheManager, timeout time.Duration) (builtRPMs []string, err error) {
 
 	const (
 		buildHeartbeatTimeout = 30 * time.Minute

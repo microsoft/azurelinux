@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 5.15.138.1 Kernel Configuration
+# Linux/arm64 5.15.145.2 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="gcc (GCC) 11.2.0"
 CONFIG_CC_IS_GCC=y
@@ -3387,7 +3387,6 @@ CONFIG_DWMAC_ROCKCHIP=m
 CONFIG_DWMAC_SUN8I=m
 CONFIG_DWMAC_IMX8=m
 # CONFIG_DWMAC_INTEL_PLAT is not set
-# CONFIG_DWMAC_LOONGSON is not set
 # CONFIG_STMMAC_PCI is not set
 CONFIG_NET_VENDOR_SUN=y
 CONFIG_HAPPYMEAL=m

@@ -12,7 +12,7 @@ import (
 	"sync"
 	"time"
 
-	ccachemanagerpkg "github.com/microsoft/CBL-Mariner/toolkit/tools/internal/ccachemanager"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/ccachemanager"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
@@ -201,7 +201,7 @@ func main() {
 
 	if *useCcache {
 		logger.Log.Infof("  ccache is enabled. processing multi-package groups under (%s)...", *ccacheDir)
-		ccacheManager, ccacheErr := ccachemanagerpkg.CreateManager(*ccacheDir, *ccacheConfig)
+		ccacheManager, ccacheErr := ccachemanager.CreateManager(*ccacheDir, *ccacheConfig)
 		if ccacheErr == nil {
 			ccacheErr = ccacheManager.UploadMultiPkgGroupCCaches()
 			if ccacheErr != nil {
