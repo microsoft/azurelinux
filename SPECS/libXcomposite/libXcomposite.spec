@@ -1,12 +1,12 @@
 Summary:        X Composite Extension library
 Name:           libXcomposite
-Version:        0.4.5
-Release:        4%{?dist}
+Version:        0.4.6
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.x.org
-Source0:        https://www.x.org/pub/individual/lib/%{name}-%{version}.tar.bz2
+Source0:        https://www.x.org/pub/individual/lib/%{name}-%{version}.tar.gz
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libtool
@@ -53,6 +53,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man3/X?omposite*.3*
 
 %changelog
+* Wed Jan 17 2024 Alberto Perez <aperezguevar@microsoft.com> 0.4.6-1
+- Upgrade libXcomposite package to v0.4.6
+
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 0.4.5-4
 - License verified
 - Lint spec
