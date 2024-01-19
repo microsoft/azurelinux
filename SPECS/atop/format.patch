@@ -1,0 +1,33 @@
+--- drawbar.c~	2023-05-13 03:20:27.000000000 -0500
++++ drawbar.c	2023-05-15 10:34:00.882788701 -0500
+@@ -2105,7 +2105,7 @@
+ 	{
+         	colorswon(headwin, statuscol);
+ 		wattron(headwin, A_REVERSE);
+-		mvwprintw(headwin, 0, statcol, statusmsg);
++		mvwprintw(headwin, 0, statcol, "%s", statusmsg);
+ 		wattroff(headwin, A_REVERSE);
+         	colorswoff(headwin, statuscol);
+ 	}
+--- drawbar.c~	2023-05-15 10:34:51.232378376 -0500
++++ drawbar.c	2023-05-15 10:35:14.888185588 -0500
+@@ -2055,7 +2055,7 @@
+ 
+ 	line -= 1;
+        	wattron(w->win, A_BOLD);
+-	mvwprintw(w->win, line, column, text);
++	mvwprintw(w->win, line, column, "%s", text);
+        	wattroff(w->win, A_BOLD);
+ 
+ 	colorswoff(w->win, color);
+--- drawbar.c~	2023-05-15 10:35:14.888185588 -0500
++++ drawbar.c	2023-05-15 10:35:35.821014989 -0500
+@@ -2328,7 +2328,7 @@
+ 
+ 	// show the prompt
+ 	//
+-	mvwprintw(mywin, 1, 1, prompt);
++	mvwprintw(mywin, 1, 1, "%s", prompt);
+ 
+ 	// prepare reading input
+ 	//
