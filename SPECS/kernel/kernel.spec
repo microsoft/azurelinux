@@ -439,6 +439,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 - Enable CUSE module (Juan Camposeco <juanarturoc@microsoft.com>)
 - Add IOMMU configs for aarch64 (David Daney <daviddaney@microsoft.com>)
 - Set selinux as default LSM
+- Enable CONFIG_X86_IOPL_IOPERM
 
 * Wed Dec 13 2023 Rachel Menge <rachelmenge@microsoft.com> - 6.6.2.1-1
 - Upgrade to 6.6.2.1
