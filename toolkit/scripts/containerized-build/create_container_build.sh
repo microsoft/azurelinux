@@ -23,7 +23,7 @@ print_error() {
 help() {
 echo "
 Usage:
-sudo make containerized-rpmbuild [REPO_PATH=/path/to/CBL-Mariner] [MODE=test|build] [VERSION=1.0|2.0] [MOUNTS=/path/in/host:/path/in/container ...] [BUILD_MOUNT=/path/to/build/chroot/mount] [EXTRA_PACKAGES=pkg ...] [ENABLE_REPO=y] [KEEP_CONTAINER=y]
+sudo make containerized-rpmbuild [REPO_PATH=/path/to/CBL-Mariner] [MODE=test|build] [VERSION=2.0|3.0] [MOUNTS=/path/in/host:/path/in/container ...] [BUILD_MOUNT=/path/to/build/chroot/mount] [EXTRA_PACKAGES=pkg ...] [ENABLE_REPO=y] [KEEP_CONTAINER=y]
 
 Starts a docker container with the specified version of mariner.
 
@@ -32,7 +32,7 @@ Optional arguments:
     MODE            build or test. default:"build"
                         In 'test' mode it will use a pre-built mariner chroot image.
                         In 'build' mode it will use the latest published container.
-    VERISION        1.0 or 2.0. default: "2.0"
+    VERSION         2.0 or 3.0. default: "3.0"
     MOUNTS          Mount a host directory into container. Should be of form '/host/dir:/container/dir'. For multiple mounts, please use space (\" \") as delimiter
                         e.g. MOUNTS=\"/host/dir1:/container/dir1 /host/dir2:/container/dir2\"
     BUILD_MOUNT     path to folder to create mountpoints for container's BUILD and BUILDROOT directories.
@@ -101,7 +101,11 @@ done
 [[ -z "${repo_path}" ]] && repo_path=${script_dir} && repo_path=${repo_path%'/toolkit'*}
 [[ ! -d "${repo_path}" ]] && { print_error " Directory ${repo_path} does not exist"; exit 1; }
 [[ -z "${mode}" ]] && mode="build"
-[[ -z "${version}" ]] && version="2.0"
+[[ -z "${version}" ]] && version="3.0"
+# TODO: Remove when PMC is available for 3.0
+if [[ "${version}" == "3.0" ]]; then
+    [[ -z "${DAILY_BUILD_ID}" ]] && DAILY_BUILD_ID="3-0-$(date -d "2 day ago" '+%Y%m%d')" #latest available
+fi
 
 # Set relevant folder definitions using Mariner Makefile that can be overriden by user
 # Default values are populated from toolkit/Makefile
@@ -204,11 +208,22 @@ sed -i "s~<REPO_BRANCH>~${repo_branch}~" $tmp_dir/welcome.txt
 sed -i "s~<AARCH>~$(uname -m)~" $tmp_dir/welcome.txt
 cp resources/setup_functions.sh $tmp_dir/setup_functions.sh
 sed -i "s~<TOPDIR>~${topdir}~" $tmp_dir/setup_functions.sh
+# TODO: Remove when PMC is available for 3.0
+if [[ "${version}" == "3.0" ]]; then # Add 3.0 DailyBuild repo
+    cp resources/mariner-3_repo $tmp_dir/mariner-3_repo
+    sed -i "s~<DAILY_BUILD_ID>~${DAILY_BUILD_ID}~" $tmp_dir/mariner-3_repo
+    if [[ $(uname -m) == "x86_64" ]]; then
+        sed -i "s~<ARCH>~amd64~" $tmp_dir/mariner-3_repo
+    else
+        sed -i "s~<ARCH>~aarch64~" $tmp_dir/mariner-3_repo
+    fi
+fi
 
 # ============ Build the image ============
 dockerfile="${script_dir}/resources/mariner.Dockerfile"
 
-if [[ "${mode}" == "build" ]]; then # Configure base image
+# TODO: Remove test mode when image is available for 3.0
+if [[ "${mode}" == "build" || "${mode}" == "test" ]]; then # Configure base image
     echo "Importing chroot into docker..."
     chroot_file="$BUILD_DIR/worker/worker_chroot.tar.gz"
     if [[ ! -f "${chroot_file}" ]]; then build_worker_chroot; fi
