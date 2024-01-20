@@ -5,6 +5,14 @@
 # Quit on failure
 set -e
 
+# Parses config_file using jquery to find realpath to all filenames under:
+#
+#   - PackageLists
+#   - PostInstallScripts
+#   - PreInstallScripts
+#   - FinalizeImageScripts
+#   - AdditionalFiles (source file paths)
+
 # $1 - config_file
 
 if [[ $# -ne 1 ]]
@@ -31,7 +39,7 @@ additional_files=$(jq -r '.SystemConfigs[]?.AdditionalFiles?|keys?|join("\n")' $
 config_other_files="$pkg_lists $postinstall_scripts $preinstall_scripts $finalizeimg_scripts $additional_files"
 for filename in $config_other_files
 do
-    # fix path if it's relative to config_file
+	# fix path if it's relative to config_file
 	if [ "${filename:0:1}" == "/" ]
 	then
 		echo "$filename"
