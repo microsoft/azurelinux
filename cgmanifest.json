@@ -13113,8 +13113,8 @@
         "type": "other",
         "other": {
           "name": "mm-common",
-          "version": "1.0.4",
-          "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/mm-common/1.0/mm-common-1.0.4.tar.xz"
+          "version": "1.0.5",
+          "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/mm-common/1.0/mm-common-1.0.5.tar.xz"
         }
       }
     },
