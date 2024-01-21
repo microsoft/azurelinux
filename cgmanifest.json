@@ -8591,8 +8591,8 @@
         "type": "other",
         "other": {
           "name": "libaec",
-          "version": "1.0.4",
-          "downloadUrl": "https://gitlab.dkrz.de/k202009/libaec/-/archive/v1.0.4/libaec-v1.0.4.tar.gz"
+          "version": "1.0.6",
+          "downloadUrl": "https://gitlab.dkrz.de/k202009/libaec/-/archive/v1.0.6/libaec-v1.0.6.tar.gz"
         }
       }
     },

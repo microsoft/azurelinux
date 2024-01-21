@@ -1,7 +1,7 @@
 Summary:        Adaptive Entropy Coding library
 Name:           libaec
-Version:        1.0.4
-Release:        5%{?dist}
+Version:        1.0.6
+Release:        1%{?dist}
 License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -44,6 +44,8 @@ popd
 
 %install
 %make_install -C build
+rm %{buildroot}/%{_libdir}/lib*.a
+mv %{buildroot}/%{_prefix}/cmake %{buildroot}/%{_libdir}
 
 %check
 make -C build test CTEST_OUTPUT_ON_FAILURE=1
@@ -52,7 +54,7 @@ make -C build test CTEST_OUTPUT_ON_FAILURE=1
 
 %files
 %doc README.md README.SZIP CHANGELOG.md
-%license Copyright.txt doc/patent.txt
+%license LICENSE.txt doc/patent.txt
 %{_bindir}/aec
 %{_libdir}/lib*.so.*
 %{_mandir}/man1/aec.*
@@ -60,8 +62,14 @@ make -C build test CTEST_OUTPUT_ON_FAILURE=1
 %files devel
 %{_includedir}/*.h
 %{_libdir}/lib*.so
+%{_libdir}/cmake/%{name}-*.cmake
 
 %changelog
+* Mon Jan 22 2024 Sindhu Karri <lakarri@microsoft.com> - 1.0.6-1
+- Version bump to 1.0.6
+- Updated the name of license file
+- Remove the static libraries and package the cmake files in the devel package
+
 * Tue Nov 01 2022 Riken Maharjan <rmaharjan@microsoft.com> - 1.0.4-5
 - Move to core
 - License verified
