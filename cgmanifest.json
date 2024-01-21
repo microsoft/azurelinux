@@ -27285,8 +27285,8 @@
         "type": "other",
         "other": {
           "name": "seabios",
-          "version": "1.14.0",
-          "downloadUrl": "https://www.seabios.org/downloads/seabios-1.14.0.tar.gz"
+          "version": "1.16.2",
+          "downloadUrl": "https://www.seabios.org/downloads/seabios-1.16.2.tar.gz"
         }
       }
     },

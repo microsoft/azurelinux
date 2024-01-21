@@ -17,8 +17,8 @@
 
 Summary:        Open-source legacy BIOS implementation
 Name:           seabios
-Version:        1.14.0
-Release:        7%{?dist}
+Version:        1.16.2
+Release:        1%{?dist}
 License:        GPLv3+ AND LGPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -39,10 +39,7 @@ Source21:       config.vga-bochs-display
 Source22:       config.vga-ati
 Source23:       config.seabios-microvm
 Patch0001:      0001-Workaround-for-a-win8.1-32-S4-resume-bug.patch
-Patch0002:      0002-reserve-more-memory-on-fseg.patch
 Patch0003:      0003-vgabios-Reorder-video-modes-to-work-around-a-Windows.patch
-Patch0004:      0004-nvme-Record-maximum-allowed-request-size.patch
-Patch0005:      0005-nvme-improve-namespace-allocation.patch
 
 BuildRequires:  gcc
 BuildRequires:  make
@@ -152,6 +149,9 @@ install -m 0644 binaries/vgabios*.bin %{buildroot}%{_datadir}/seavgabios
 %{_datadir}/seavgabios/vgabios*.bin
 
 %changelog
+* Mon Jan 22 2024 Sindhu Karri <lakarri@microsoft.com> - 1.16.2-1
+- Upgrade to 1.16.2
+
 * Thu Aug 26 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.14.0-7
 - License verified.
 - Updated project's URL.
