@@ -157,7 +157,6 @@ rpmspec() {
 # TODO: Remove when PMC is available for 3.0
 # Add mariner 3.0 Daily Build Repo
 enable_mariner3_repo() {
-    echo "my arg is $@"
     local args=("$@")
     alias tdnf='tdnf --releasever=3.0 --disablerepo=* --enablerepo=mariner-3.0-daily-build'
     mv /mariner_setup_dir/mariner-3_repo /etc/yum.repos.d/mariner-3.repo
