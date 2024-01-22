@@ -25575,8 +25575,8 @@
         "type": "other",
         "other": {
           "name": "ruby",
-          "version": "3.1.4",
-          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/3.1/ruby-3.1.4.tar.xz"
+          "version": "3.2.2",
+          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/3.2/ruby-3.2.2.tar.xz"
         }
       }
     },

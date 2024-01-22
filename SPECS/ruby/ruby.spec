@@ -82,8 +82,8 @@ Name:           ruby
 # TODO: When changing ruby version, these gemified stdlib
 # provides should be versioned according to the ruby version.
 # More info: https://stdgems.org/
-Version:        3.1.4
-Release:        3%{?dist}
+Version:        3.2.2
+Release:        1%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -98,7 +98,6 @@ Source5:        rubygems.prov
 Source6:        rubygems.req
 Source7:        macros.rubygems
 # Updates default ruby-uri to 0.12.2 and vendored one to 0.10.3. Remove once ruby gets updated to a version that comes with both lib/uri/version.rb and lib/bundler/vendor/uri/lib/uri/version.rb versions >= 0.12.2 or == 0.10.3
-Patch0:         CVE-2023-36617.patch
 BuildRequires:  openssl-devel
 BuildRequires:  readline
 BuildRequires:  readline-devel
@@ -401,6 +400,9 @@ sudo -u test make test TESTS="-v"
 %{_rpmconfigdir}/rubygems.con
 
 %changelog
+* Mon Jan 22 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.2-1
+- Auto-upgrade to 3.2.2 - Azure Linux 3.0 - package upgrades
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.1.4-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
