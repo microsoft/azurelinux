@@ -10491,8 +10491,8 @@
         "type": "other",
         "other": {
           "name": "libpciaccess",
-          "version": "0.16",
-          "downloadUrl": "https://www.x.org/archive/individual/lib/libpciaccess-0.16.tar.bz2"
+          "version": "0.17",
+          "downloadUrl": "https://www.x.org/archive/individual/lib/libpciaccess-0.17.tar.xz"
         }
       }
     },
