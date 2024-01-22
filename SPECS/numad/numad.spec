@@ -9,7 +9,7 @@ Name:           numad
 # https://docs.fedoraproject.org/en-US/packaging-guidelines/Versioning/#_snapshots
 # Using "+" instead of "^" because our version of RPM errors-out on the "^" symbol.
 Version:        0.5+%{git_short_commit_date}.%{git_short_commit}
-Release:        33%{?dist}
+Release:        34%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -34,6 +34,7 @@ Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.xz
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        LICENSE.PTR
 Patch0:         0000-remove-conf.patch
+Patch1:         0001-numad_log-fix-buffer-overflow.patch
 
 BuildRequires:  gcc
 BuildRequires:  systemd-units
@@ -85,6 +86,9 @@ cp %{SOURCE1} .
 %systemd_postun numad.service
 
 %changelog
+* Fri Jan 19 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 0.5+20150602.aec1497e2b-34
+- Add buffer overflow patch
+
 * Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.5+20150602.aec1497e2b-33
 - Fixing source URL.
 
