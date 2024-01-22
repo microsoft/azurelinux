@@ -4,14 +4,22 @@
 # Overriding the default to call 'configure' from subdirectories.
 %global _configure ../configure
 
+# Set if we're building cross-compilation packages for a given host architecture.
 %ifarch x86_64
     %global build_cross 1
 %else
     %global build_cross 0
 %endif
 
-%global build_aarch64 %{build_cross}
-
+# Adds a list of excluded files related to cross-compilation.
+# This macro is used only in the files list of the default 'gcc' package,
+# so that it doesn't include the cross-compilation files meant to go to
+# the 'gcc-<arch>' and 'gcc-c++-<arch>' subpackages (see: do_files() macro).
+#
+# Arguments:
+# - %1: name of the cross-compilation target architecture.
+# - %2: boolean indicating if we're building the cross-compilation bits for the current host architecture.
+#       See: "build_<architecture>" macros for each host architecture listed above.
 %global do_exclude() \
 %if %2 \
 %exclude %{_bindir}/%{1}* \
@@ -20,6 +28,12 @@
 %exclude %{_prefix}/%{1}/sys-root/ \
 %endif
 
+# Creates the files lists for the cross-compilation packages.
+#
+# Arguments:
+# - %1: name of the cross-compilation target architecture. This appears in the package and file names.
+# - %2: boolean indicating if we're building the cross-compilation bits for the current host architecture.
+#       See: "build_<architecture>" macros for each host architecture listed above.
 %global do_files() \
 %if %2 \
 %files -n gcc-%1 \
@@ -220,7 +234,7 @@ user space programs is currently supplied as that would massively multiply the
 number of packages.
 %endif
 
-%do_package aarch64-linux-gnu %{build_aarch64}
+%do_package aarch64-linux-gnu %{build_cross}
 
 %prep
 %autosetup -p1
@@ -236,7 +250,7 @@ function prep_target () {
 }
 
 touch cross.list
-prep_target aarch64-linux-gnu %{build_aarch64}
+prep_target aarch64-linux-gnu %{build_cross}
 
 # disable no-pie for gcc binaries
 sed -i '/^NO_PIE_CFLAGS = /s/@NO_PIE_CFLAGS@//' gcc/Makefile.in
@@ -436,7 +450,7 @@ $tests_ok
 %exclude %{_lib64dir}/libstdc++*
 %exclude %{_lib64dir}/libsupc++*
 
-%do_exclude aarch64-linux-gnu %{build_aarch64}
+%do_exclude aarch64-linux-gnu %{build_cross}
 
 %files -n gfortran
 %defattr(-,root,root)
@@ -464,8 +478,10 @@ $tests_ok
 
 %files c++
 %defattr(-,root,root)
-%{_bindir}/*c++
-%{_bindir}/*g++
+%{_bindir}/c++
+%{_bindir}/%{_host}-c++
+%{_bindir}/g++
+%{_bindir}/%{_host}-g++
 %{_libexecdir}/gcc/%{_arch}-%{_host_vendor}-linux-gnu/%{version}/cc1plus
 
 %files -n libstdc++
@@ -501,7 +517,7 @@ $tests_ok
 %license COPYING
 %endif
 
-%do_files aarch64-linux-gnu %{build_aarch64}
+%do_files aarch64-linux-gnu %{build_cross}
 
 %changelog
 * Mon Dec 11 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 11.2.0-8
