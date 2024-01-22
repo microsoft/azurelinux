@@ -7491,8 +7491,8 @@
         "type": "other",
         "other": {
           "name": "iscsi-initiator-utils",
-          "version": "6.2.1.4+20210729.2a8f9d8",
-          "downloadUrl": "https://github.com/open-iscsi/open-iscsi/archive/2a8f9d81d0d6b5094c3fe9c686e2afb2ec27058a.tar.gz"
+          "version": "2.1.9",
+          "downloadUrl": "https://github.com/open-iscsi/open-iscsi/archive/c26218d9f8afdca44a492a4c3811648bd2880b26.tar.gz"
         }
       }
     },
@@ -12711,8 +12711,8 @@
         "type": "other",
         "other": {
           "name": "maven",
-          "version": "3.8.7",
-          "downloadUrl": "https://archive.apache.org/dist/maven/maven-3/3.8.7/source/apache-maven-3.8.7-src.tar.gz"
+          "version": "3.9.6",
+          "downloadUrl": "https://archive.apache.org/dist/maven/maven-3/3.9.6/source/apache-maven-3.9.6-src.tar.gz"
         }
       }
     },
@@ -12793,16 +12793,6 @@
           "name": "maven-wagon",
           "version": "3.5.3",
           "downloadUrl": "https://repo1.maven.org/maven2/org/apache/maven/wagon/wagon/3.5.3/wagon-3.5.3-source-release.zip"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "maven3",
-          "version": "3.8.7",
-          "downloadUrl": "https://archive.apache.org/dist/maven/maven-3/3.8.7/source/apache-maven-3.8.7-src.tar.gz"
         }
       }
     },
