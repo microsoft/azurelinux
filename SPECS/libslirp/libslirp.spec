@@ -1,12 +1,12 @@
 Summary:        A general purpose TCP-IP emulator
 Name:           libslirp
-Version:        4.6.1
-Release:        3%{?dist}
+Version:        4.7.0
+Release:        1%{?dist}
 License:        BSD AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://gitlab.freedesktop.org/slirp/libslirp
-Source0:        %{url}/uploads/83b199ea6fcdfc0c243dfde8546ee4c9/%{name}-%{version}.tar.xz
+Source0:        %{url}/-/archive/v%{version}/%{name}-v%{version}.tar.gz
 BuildRequires:  gcc
 BuildRequires:  glib-devel
 BuildRequires:  meson
@@ -24,7 +24,7 @@ The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
 %prep
-%autosetup
+%autosetup -n %{name}-v%{version}
 
 %build
 %meson
@@ -48,6 +48,10 @@ developing applications that use %{name}.
 %{_libdir}/pkgconfig/slirp.pc
 
 %changelog
+* Thu Jan 18 2024 Sindhu Karri <lakarri@microsoft.com> - 4.7.0-1
+- Upgrade slirp to 4.7.0
+- Updated source URL to a generic URL that allows autoupgrades in the future
+
 * Wed Sep 22 2021 Thomas Crain <thcrain@microsoft.com> - 4.6.1-3
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - Lint spec
