@@ -28496,6 +28496,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "tpm2-pkcs11",
+          "version": "1.9.0",
+          "downloadUrl": "https://github.com/tpm2-software/%{name}/releases/download/1.9.0RC0/tpm-pkcs11-1.9.0RC0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "tpm2-tools",
           "version": "4.3.2",
           "downloadUrl": "https://github.com/tpm2-software/tpm2-tools/releases/download/4.3.2/tpm2-tools-4.3.2.tar.gz"
