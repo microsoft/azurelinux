@@ -1,5 +1,8 @@
 {
     "Signatures": {
-     "libtpms-0.9.6.tar.gz": "2807466f1563ebe45fdd12dd26e501e8a0c4fbb99c7c428fbb508789efd221c0"
+     "libtpms-0.9.6.tar.gz": "2807466f1563ebe45fdd12dd26e501e8a0c4fbb99c7c428fbb508789efd221c0",
+     "libtpms-0.9.6.tar.gz.asc": "1d05670dca1829373edefc233e42f8f19fd7d52d39bfc1a02053415cac658baf",
+     "gpgkey-B818B9CADF9089C2D5CEC66B75AD65802A0B4211": "27e7c4bfe417e19582488c9d407676821f39d9538b89e8cc06880a01df5d7e46"
+
     }
-   }
+}
