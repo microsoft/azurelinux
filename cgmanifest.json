@@ -8241,8 +8241,8 @@
         "type": "other",
         "other": {
           "name": "kpatch",
-          "version": "0.9.7",
-          "downloadUrl": "https://github.com/dynup/kpatch/archive/refs/tags/v0.9.7.tar.gz"
+          "version": "0.9.8",
+          "downloadUrl": "https://github.com/dynup/kpatch/archive/refs/tags/v0.9.8.tar.gz"
         }
       }
     },
