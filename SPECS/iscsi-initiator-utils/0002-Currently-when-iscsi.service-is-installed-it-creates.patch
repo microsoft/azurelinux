@@ -1,0 +1,62 @@
+From 295bab75dfbb50904def98b46abd463a050a6e29 Mon Sep 17 00:00:00 2001
+From: Gordon Messmer <gordon.messmer@gmail.com>
+Date: Sat, 4 Feb 2023 11:17:20 -0800
+Subject: [PATCH 2/6] Currently, when iscsi.service is installed, it creates an
+ ordering dependency that forces network-online to start before
+ remote-fs-pre.target, which delays boot even when /var/lib/iscsi/nodes is
+ empty and the iscsi.service won't be started. This change moves the logic
+ that determines whether iscsi will be started to an external service file so
+ that the boot order dependency exists only when iscsi.service will be
+ started.
+ 
+---
+ etc/Makefile                               |  1 +
+ etc/systemd/iscsi-starter.service.template | 13 +++++++++++++
+ etc/systemd/iscsi.service.template         |  2 +-
+ 3 files changed, 15 insertions(+), 1 deletion(-)
+ create mode 100644 etc/systemd/iscsi-starter.service.template
+ 
+diff --git a/etc/Makefile b/etc/Makefile
+index 6dd6a41..3f92054 100644
+--- a/etc/Makefile
++++ b/etc/Makefile
+@@ -27,6 +27,7 @@ SYSTEMD_SOURCES		= $(addprefix systemd/,$(SYSTEMD_SOURCE_FILES))
+ SYSTEMD_TEMPLATE_FILES	= iscsi-init.service.template \
+ 			  iscsid.service.template \
+ 			  iscsi.service.template \
++			  iscsi-starter.service.template \
+ 			  iscsiuio.service.template
+ SYSTEMD_TEMPLATES	= $(addprefix systemd/,$(SYSTEMD_TEMPLATE_FILES))
+ SYSTEMD_RULES_FILES	= ibft-rule-generator
+diff --git a/etc/systemd/iscsi-starter.service.template b/etc/systemd/iscsi-starter.service.template
+new file mode 100644
+index 0000000..5e97941
+--- /dev/null
++++ b/etc/systemd/iscsi-starter.service.template
+@@ -0,0 +1,13 @@
++[Unit]
++DefaultDependencies=no
++Before=sysinit.target iscsi.service
++RequiresMountsFor=/var/lib/iscsi/nodes
++ConditionDirectoryNotEmpty=/var/lib/iscsi/nodes
++
++[Service]
++Type=oneshot
++RemainAfterExit=true
++ExecStart=@SBINDIR@/systemctl start --no-block --job-mode=fail iscsi.service
++
++[Install]
++WantedBy=sysinit.target
+diff --git a/etc/systemd/iscsi.service.template b/etc/systemd/iscsi.service.template
+index 6becab4..8a4de9b 100644
+--- a/etc/systemd/iscsi.service.template
++++ b/etc/systemd/iscsi.service.template
+@@ -15,4 +15,4 @@ SuccessExitStatus=21 15
+ RemainAfterExit=true
+ 
+ [Install]
+-WantedBy=remote-fs.target
++Also=iscsi-starter.service
+-- 
+2.39.2
+ 

@@ -287,4 +287,3 @@ index 1d0377f..909db34 100644
  					      iscsi_sysfs_iface_op_fn *fn);
 -- 
 2.26.2
-

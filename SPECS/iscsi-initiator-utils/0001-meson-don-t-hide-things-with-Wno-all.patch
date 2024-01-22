@@ -1,0 +1,32 @@
+From 51833a7ba053a0219e9e41f4b4c8c4b2f6860ff2 Mon Sep 17 00:00:00 2001
+From: Chris Leech <cleech@redhat.com>
+Date: Sat, 15 Apr 2023 16:01:15 -0700
+Subject: [PATCH 1/6] meson: don't hide things with -Wno-all
+ 
+It's breaking the build when platform defaults set
+-Werror=format-security
+---
+ meson.build | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+ 
+diff --git a/meson.build b/meson.build
+index 7537ea5..f352907 100644
+--- a/meson.build
++++ b/meson.build
+@@ -102,11 +102,10 @@ endif
+ # do not depend on anything local
+ #
+ libsysdeps = static_library('sysdeps', sysdeps_files,
+-  include_directories: [usr_inc, main_inc, lib_inc],
+-  c_args: '-Wno-all')
++  include_directories: [usr_inc, main_inc, lib_inc])
+ libfwparam = static_library('fwparam', fwparam_files,
+   include_directories: [usr_inc, main_inc, lib_inc],
+-  c_args: [genl_cargs, '-Wno-all'])
++  c_args: genl_cargs)
+ 
+ #
+ # build libopeniscsiusr, since it does not
+-- 
+2.39.2
+ 

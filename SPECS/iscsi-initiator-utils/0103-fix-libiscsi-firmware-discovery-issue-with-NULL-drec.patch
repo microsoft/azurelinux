@@ -1,0 +1,39 @@
+From 47dd191ab5c48932df4c0c219fca19fcedba6cd2 Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Thu, 2 Jun 2022 11:37:20 -0700
+Subject: [PATCH 1/1] fix libiscsi firmware discovery issue with NULL drec
+ argument
+
+---
+ libiscsi/libiscsi.c | 2 +-
+ usr/idbm.c          | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libiscsi/libiscsi.c b/libiscsi/libiscsi.c
+index c598aee..bddf9fc 100644
+--- a/libiscsi/libiscsi.c
++++ b/libiscsi/libiscsi.c
+@@ -258,7 +258,7 @@ int libiscsi_discover_firmware(struct libiscsi_context *context,
+ 	struct libiscsi_node *new_node = new_nodes;
+ 	/* in one loop, add nodes to idbm and create libiscsi_node entries */
+ 	list_for_each_entry(rec, &rec_list, list) {
+-		CHECK(idbm_add_node(rec, NULL, 1 /* overwrite */));
++		CHECK(idbm_add_node(rec, &drec, 1 /* overwrite */));
+ 
+ 		strlcpy(new_node->name, rec->name, LIBISCSI_VALUE_MAXLEN);
+ 		new_node->tpgt = rec->tpgt;
+diff --git a/usr/idbm.c b/usr/idbm.c
+index e9025bf..9cc9c40 100644
+--- a/usr/idbm.c
++++ b/usr/idbm.c
+@@ -2536,7 +2536,7 @@ int idbm_add_node(node_rec_t *newrec, discovery_rec_t *drec, int overwrite)
+ 		if (rc)
+ 			goto unlock;
+ 
+-		if (drec->type == DISCOVERY_TYPE_FW) {
++		if (drec && drec->type == DISCOVERY_TYPE_FW) {
+ 			log_debug(8, "setting firmware node 'startup' to 'onboot'");
+ 			newrec->startup = ISCSI_STARTUP_ONBOOT;
+ 			newrec->conn[0].startup = ISCSI_STARTUP_ONBOOT;
+-- 
+2.36.1

@@ -1,0 +1,25 @@
+From 1df58cafc3b5d2dea5dd53a539a0014b10664f51 Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Mon, 3 Jul 2023 18:22:14 -0700
+Subject: [PATCH 1/1] fix systemctl path in iscsi-starter.service
+ 
+---
+ etc/systemd/iscsi-starter.service.template | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+ 
+diff --git a/etc/systemd/iscsi-starter.service.template b/etc/systemd/iscsi-starter.service.template
+index d3ea7cd..466ddf0 100644
+--- a/etc/systemd/iscsi-starter.service.template
++++ b/etc/systemd/iscsi-starter.service.template
+@@ -7,7 +7,7 @@ ConditionDirectoryNotEmpty=@DBROOT@/nodes
+ [Service]
+ Type=oneshot
+ RemainAfterExit=true
+-ExecStart=@SBINDIR@/systemctl start --no-block --job-mode=fail iscsi.service
++ExecStart=/usr/bin/systemctl start --no-block --job-mode=fail iscsi.service
+ 
+ [Install]
+ WantedBy=sysinit.target
+-- 
+2.40.1
+ 
