@@ -21,21 +21,15 @@
 %global kataclhdir              /usr/share/cloud-hypervisor
 %global katainitrddir           /var/cache/kata-containers/osbuilder-images/kernel-uvm
 
-%global runtime_make_vars       QEMUPATH=%{qemupath} \\\
-                                KERNELTYPE="compressed" \\\
+%global runtime_make_vars       KERNELTYPE="compressed" \\\
                                 KERNELPARAMS="systemd.legacy_systemd_cgroup_controller=yes systemd.unified_cgroup_hierarchy=0" \\\
-                                DEFSHAREDFS="virtio-fs" \\\
-                                DEFVIRTIOFSDAEMON=%{_libexecdir}/"virtiofsd" \\\
-                                DEFVIRTIOFSCACHESIZE=0 \\\
-                                DEFSANDBOXCGROUPONLY=false \\\
+                                DEFVIRTIOFSDAEMON=%{_libexecdir}/"virtiofsd-rs" \\\
+                                DEFSTATICRESOURCEMGMT_CLH=true \\\
                                 DEFSTATICSANDBOXWORKLOADMEM=1792 \\\
                                 DEFMEMSZ=256 \\\
                                 SKIP_GO_VERSION_CHECK=y \\\
-                                MACHINETYPE=%{machinetype} \\\
                                 DESTDIR=%{buildroot} \\\
                                 PREFIX=/usr \\\
-                                FEATURE_SELINUX="yes" \\\
-                                DEFENABLEANNOTATIONS=['\\\".*\\\"'] \\\
                                 DEFAULT_HYPERVISOR=cloud-hypervisor
 
 %global agent_make_vars         LIBC=gnu \\\
@@ -52,15 +46,6 @@ Source0:        https://github.com/%{name}/%{name}/archive/refs/tags/%{version}.
 Source1:        https://github.com/%{name}/%{name}/releases/download/%{version}/%{name}-%{version}-vendor.tar.gz
 Source2:        50-kata
 Source3:        mariner-build-uvm.sh
-Patch0:         0001-Merged-PR-9607-Allow-10-seconds-for-VM-creation-star.patch
-Patch1:         0002-Merged-PR-9671-Wait-for-a-possibly-slow-Guest.patch
-Patch2:         0003-Merged-PR-9805-Add-support-for-MSHV.patch
-Patch3:         0004-Merged-PR-9806-Fix-enable_debug-for-hypervisor.clh.patch
-Patch4:         0005-Merged-PR-9956-shim-avoid-memory-hotplug-timeout.patch
-Patch5:         runtime-reduce-uvm-high-mem-footprint.patch
-Patch6:         drop-mut-for-variables-that-are-not-mutated.patch
-Patch7:         0001-osbuilder-Add-support-for-CBL-Mariner.patch
-Patch8:         0001-Append-systemd-kernel-cmdline-params-for-initrd.patch
 
 BuildRequires:  golang
 BuildRequires:  git-core
@@ -76,11 +61,15 @@ BuildRequires:  kernel
 BuildRequires:  busybox
 BuildRequires:  cargo
 BuildRequires:  rust
+BuildRequires:  device-mapper-devel
+BuildRequires:  clang
 
 Requires:       busybox
 Requires:       kernel
 Requires:       libseccomp
-Requires:       qemu-virtiofsd
+# Must match the version specified by the `assets.virtiofsd.version` field in
+# %{SOURCE0}/versions.yaml.
+Requires:       virtiofsd = 1.8.0
 
 Conflicts:      kata-agent
 Conflicts:      kata-ksm-throttler
@@ -143,12 +132,13 @@ install -m 0755 -D -t %{buildroot}%{katauvmdir} %{SOURCE3}
 install -m 0644 -D -t %{buildroot}%{katauvmdir} VERSION
 install -m 0644 -D -t %{buildroot}%{katauvmdir} versions.yaml
 install -D -m 0644 ci/install_yq.sh %{buildroot}%{katauvmdir}/ci/install_yq.sh
-sed -i 's#distro_config_dir="${script_dir}/${distro}#distro_config_dir="${script_dir}/cbl-mariner#g' tools/osbuilder/rootfs-builder/rootfs.sh
+sed --follow-symlinks -i 's#distro_config_dir="${script_dir}/${distro}#distro_config_dir="${script_dir}/cbl-mariner#g' tools/osbuilder/rootfs-builder/rootfs.sh
 
 pushd src/runtime
 %make_install %{runtime_make_vars}
-sed -i -e "s|image = .*$|initrd = \"%{katainitrddir}/kata-containers-initrd.img\"|" %{buildroot}%{kataconfigdir}/configuration.toml
-sed -i -e "s|kernel = .*$|kernel = \"%{kataclhdir}/vmlinux.bin\"|" %{buildroot}%{kataconfigdir}/configuration.toml
+# Ensure sed doesn't replace the configuration.toml symlink by a regular file.
+sed --follow-symlinks -i -e "s|image = .*$|initrd = \"%{katainitrddir}/kata-containers-initrd.img\"|" %{buildroot}%{kataconfigdir}/configuration.toml
+sed --follow-symlinks -i -e "s|kernel = .*$|kernel = \"%{kataclhdir}/vmlinux.bin\"|" %{buildroot}%{kataconfigdir}/configuration.toml
 popd
 
 pushd src/agent
