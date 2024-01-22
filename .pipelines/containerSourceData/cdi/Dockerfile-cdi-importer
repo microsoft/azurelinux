@@ -1,0 +1,29 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+ARG BASE_IMAGE
+
+FROM $BASE_IMAGE
+
+ARG BINARY_NAME
+ARG USER
+
+@INCLUDE_MAIN_RUN_INSTRUCTION@
+
+# Workaround till proper binaries are built as part of the cdi rpm & renames are removed
+# https://github.com/microsoft/CBL-Mariner/pull/5708/files#
+COPY cdi-containerimage-server /usr/bin/cdi-containerimage-server
+COPY cdi-image-size-detection /usr/bin/cdi-image-size-detection
+COPY cdi-source-update-poller /usr/bin/cdi-source-update-poller
+
+# workaround till binaries rename is merged
+RUN [ -f /usr/bin/virt-cdi-importer ] && mv -f /usr/bin/virt-cdi-importer /usr/bin/cdi-importer
+
+#simple smoke test
+RUN ls /usr/bin/cdi-importer
+
+# If the user specified for this image is not root (0), create a new user in the root (0) group
+RUN if [[ $USER != 0 ]]; then adduser -u $USER --gid 0 --create-home -s /bin/bash $BINARY_NAME ; fi
+USER $USER
+
+ENTRYPOINT [ "/usr/bin/cdi-importer", "-alsologtostderr" ]

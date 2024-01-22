@@ -35,6 +35,8 @@ The Mariner Image Customizer is configured using a YAML (or JSON) file.
 
 10. Delete `/etc/resolv.conf` file.
 
+11. Enable dm-verity root protection.
+
 ### /etc/resolv.conf
 
 The `/etc/resolv.conf` file is overridden so that the package installation and
@@ -142,6 +144,36 @@ The size of the disk, specified in mebibytes (MiB).
 
 The partitions to provision on the disk.
 
+## Verity type
+
+Specifies the configuration for dm-verity root integrity verification.
+
+- DataPartition: A partition configured with dm-verity, which verifies integrity
+  at each system boot.
+
+  - IdType: Specifies the type of id for the partition. The options are
+    `PartLabel` (partition label), `Uuid` (filesystem UUID), and `PartUuid`
+    (partition UUID).
+
+  - Id: The unique identifier value of the partition, corresponding to the
+    specified IdType.
+
+- HashPartition: A partition used exclusively for storing a calculated hash
+  tree.
+
+Example:
+
+```yaml
+SystemConfig:
+  Verity:
+    DataPartition:
+      IdType: PartUuid
+      Id: 00000000-0000-0000-0000-000000000000
+    HashPartition:
+      IdType: PartLabel
+      Id: hash_partition
+```
+
 ## FileConfig type
 
 Specifies options for placing a file in the OS.
@@ -178,6 +210,21 @@ SystemConfig:
     - Path: /a.txt
       Permissions: "664"
 ```
+
+## KernelCommandLine type
+
+Options for configuring the kernel.
+
+### ExtraCommandLine
+
+Additional Linux kernel command line options to add to the image.
+
+If the partitions are customized, then the `grub.cfg` file will be reset to handle the
+new partition layout.
+So, any existing ExtraCommandLine value in the base image will be replaced.
+
+If the partitions are not customized, then the `ExtraCommandLine` value will be appended
+to the existing `grub.cfg` file.
 
 ## Module type
 
@@ -253,7 +300,7 @@ Packages:
 Required.
 
 The ID of the partition.
-This is used correlate Partition objects with [PartitionSetting](#partitionsetting-type)
+This is used to correlate Partition objects with [PartitionSetting](#partitionsetting-type)
 objects.
 
 ### FsType [string]
@@ -460,6 +507,11 @@ Example:
 SystemConfig:
   Hostname: example-image
 ```
+
+### KernelCommandLine [[KernelCommandLine](#kernelcommandline-type)]
+
+Specifies extra kernel command line options, as well as other configuration values
+relating to the kernel.
 
 ### UpdateBaseImagePackages [bool]
 

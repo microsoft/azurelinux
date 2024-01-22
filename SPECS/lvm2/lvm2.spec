@@ -2,8 +2,8 @@
 
 Summary:        Userland logical volume management tools
 Name:           lvm2
-Version:        2.03.15
-Release:        3%{?dist}
+Version:        2.03.23
+Release:        1%{?dist}
 License:        GPLv2 AND BSD 2-Clause AND LGPLv2.1
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -329,12 +329,16 @@ echo "disable lvm2-monitor.service" >> %{buildroot}%{_libdir}/systemd/system-pre
 %{_libdir}/tmpfiles.d/lvm2.conf
 %dir %{_sysconfdir}/lvm
 %attr(644, -, -) %config(noreplace) %{_sysconfdir}/lvm/lvm.conf
+%attr(755, -, -) %{_libexecdir}/lvresize_fs_helper
 %config(noreplace) %{_sysconfdir}/lvm/lvmlocal.conf
 %dir %{_sysconfdir}/lvm/profile
 %{_sysconfdir}/lvm/profile/*
 %ghost %{_sysconfdir}/lvm/cache/.cache
 
 %changelog
+* Fri Jan 05 2024 Alberto Perez <aperezguevar@microsoft.com> - 2.03.23-1
+- Upgrading to newest version 2.03.23
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.03.15-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

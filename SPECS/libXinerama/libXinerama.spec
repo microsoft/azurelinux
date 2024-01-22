@@ -1,13 +1,13 @@
 %global libx11_min_ver 1.5.99.902
 Summary:        X.Org X11 libXinerama runtime library
 Name:           libXinerama
-Version:        1.1.4
-Release:        7%{?dist}
+Version:        1.1.5
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.x.org
-Source0:        http://xorg.freedesktop.org/archive/individual/lib/%{name}-%{version}.tar.bz2
+Source0:        https://xorg.freedesktop.org/archive/individual/lib/%{name}-%{version}.tar.gz
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libX11-devel >= %{libx11_min_ver}
@@ -57,6 +57,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_includedir}/X11/extensions/panoramiXext.h
 
 %changelog
+* Fri Jan 19 2024 Archana Choudhary <archana1@microsoft.com> - 1.1.5-1
+- Upgrade to 1.1.5
+
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.4-7
 - License verified
 - Lint spec
