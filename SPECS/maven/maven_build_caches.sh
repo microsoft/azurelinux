@@ -43,9 +43,9 @@ BUILDARCH=$(rpm --eval '%{_arch}')
 
 # Source URL to extract the sources.
 SOURCEURL="https://archive.apache.org/dist/maven/maven-3/${VERSION}/source/apache-maven-${VERSION}-src.tar.gz"
-# Maven binary dependency to download from blocb store.
+# Maven binary dependency to download from pmc.
 # NOTE: Version IN THIS IS HARDCODED.
-MAVENBINARY="https://cblmarinerstorage.blob.core.windows.net/sources/core/maven-3.5.4-13.cm1.${BUILDARCH}.rpm"
+MAVENBINARY="https://cblmarinerstorage.blob.core.windows.net/sources/core/maven-3.8.7-3.cm2.${BUILDARCH}.rpm"
 
 maven_m2_cache_tarball_name="apache-maven-${VERSION}-m2.tar.gz"
 maven_licenses_tarball_name="apache-maven-${VERSION}-licenses.tar.gz"

@@ -75,7 +75,7 @@ function cleanup {
 trap cleanup EXIT
 
 echo 'Starting maven cache tarball creation'
-mv maven_build_caches.sh $TEMPDIR
+cp maven_build_caches.sh $TEMPDIR
 cd $TEMPDIR
 echo $PWD
 sh ./maven_build_caches.sh -v $PKG_VERSION
