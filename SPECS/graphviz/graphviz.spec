@@ -15,103 +15,66 @@
 # Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
-
-%global SHARP  0
-%global ARRRR  0
-%global DEVIL  0
-%global GTS    0
-%global LASI   0
-%global QTAPPS 0
-%global MING   0
-%global OCAML  0
 # Plugins version
 %global pluginsver 6
-%global php_extdir %(php-config --extension-dir 2>/dev/null || echo %{_libdir}/php4)
-%if "%{php_version}" < "5.6"
-%global ini_name     %{name}.ini
-%else
-%global ini_name     40-%{name}.ini
-%endif
-# Fix for the 387 extended precision (rhbz#772637)
-%ifarch i386 i686
-%global FFSTORE -ffloat-store
-%endif
-%bcond_with php
-%if %{with php}
-%global PHP 1
-%else
-%global PHP 0
-%endif
+
 Summary:        Graph Visualization Tools
 Name:           graphviz
-Version:        2.42.4
-Release:        9%{?dist}
+Version:        9.0.0
+Release:        1%{?dist}
 License:        EPL-1.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.graphviz.org/
-Source0:        https://gitlab.com/%{name}/%{name}/-/archive/%{version}/%{name}-%{version}.tar.bz2
-# rhbz#1505230
-Patch0:         graphviz-2.42.2-dotty-menu-fix.patch
-Patch1:         graphviz-2.42.2-coverity-scan-fixes.patch
-Patch2:         CVE-2020-18032.patch
-BuildRequires:  autoconf
-BuildRequires:  automake
-BuildRequires:  bison
-BuildRequires:  expat-devel
-BuildRequires:  flex
-BuildRequires:  fontconfig-devel
-BuildRequires:  freefont
-BuildRequires:  freetype-devel >= 2
-BuildRequires:  gd-devel
-BuildRequires:  gmp-devel
-BuildRequires:  guile-devel
-BuildRequires:  java-devel
-BuildRequires:  libjpeg-devel
-BuildRequires:  libpng-devel
-BuildRequires:  libtool
-BuildRequires:  libtool-ltdl-devel
-BuildRequires:  lua-devel
-BuildRequires:  m4
-BuildRequires:  pango-devel
-BuildRequires:  perl
+Source0:        https://gitlab.com/api/v4/projects/%{name}%2F%{name}/packages/generic/%{name}-releases/%{version}/%{name}-%{version}.tar.xz
+BuildRequires:       gcc-g++
+BuildRequires:       zlib-devel
+BuildRequires:       libpng-devel
+BuildRequires:       libjpeg-devel
+BuildRequires:       expat-devel
+BuildRequires:       freetype-devel >= 2
+BuildRequires:       ksh
+BuildRequires:       bison
+BuildRequires:       m4
+BuildRequires:       flex
+BuildRequires:       tcl-devel >= 8.3
+BuildRequires:       swig
+BuildRequires:       sed
+BuildRequires:       fontconfig-devel
+BuildRequires:       libtool-ltdl-devel
+BuildRequires:       ruby-devel
+BuildRequires:       ruby
+BuildRequires:       libXt-devel
+BuildRequires:       libXmu-devel
+BuildRequires:       python3-devel
+BuildRequires:       libXaw-devel
+BuildRequires:       libSM-devel
+BuildRequires:       libXext-devel
+BuildRequires:       cairo-devel >= 1.1.10
+BuildRequires:       pango-devel
+BuildRequires:       gmp-devel
+BuildRequires:       lua-devel
+BuildRequires:       gd-devel
+BuildRequires:       perl-devel
+BuildRequires:       swig >= 1.3.33
+BuildRequires:       automake
+BuildRequires:       autoconf
+BuildRequires:       libtool
+#BuildRequires:       qpdf
 # Temporary workaound for perl(Carp) not pulled
-BuildRequires:  perl-Carp
-BuildRequires:  perl-ExtUtils-Embed
-BuildRequires:  perl-devel
-BuildRequires:  pkg-config
-BuildRequires:  python3-devel
-BuildRequires:  sed
-BuildRequires:  swig >= 1.3.33
-BuildRequires:  tcl-devel >= 8.3
-BuildRequires:  zlib-devel
-BuildRequires:  pkgconfig(cairo) >= 1.1.10
+BuildRequires:       perl-Carp
+BuildRequires:       perl-ExtUtils-Embed
+BuildRequires:       perl-generators
+#BuildRequires:       librsvg2-devel
+# for ps2pdf
+#BuildRequires:       libgs-devel
+BuildRequires:       make
+
+
+Requires:       freefont
+
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
-%if %{PHP}
-BuildRequires:  php-devel
-%endif
-%if %{SHARP}
-BuildRequires:  mono-core
-%endif
-%if %{DEVIL}
-BuildRequires:  DevIL-devel
-%endif
-%if %{ARRRR}
-BuildRequires:  R-devel
-%endif
-%if %{OCAML}
-BuildRequires:  ocaml
-%endif
-%if %{QTAPPS}
-BuildRequires:  qt-devel
-%endif
-%if %{GTS}
-BuildRequires:  gts-devel
-%endif
-%if %{LASI}
-BuildRequires:  lasi-devel
-%endif
 
 %description
 A collection of tools for the manipulation and layout of graphs (as in nodes
@@ -121,23 +84,18 @@ and edges, not as in barcharts).
 Summary:        Development package for graphviz
 Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-gd = %{version}-%{release}
-Requires:       pkg-config
 
 %description devel
 A collection of tools for the manipulation and layout of graphs (as in nodes
 and edges, not as in barcharts). This package contains development files for
 graphviz.
 
-%if %{DEVIL}
-%package devil
-Summary:        Graphviz plugin for renderers based on DevIL
-Requires:       %{name} = %{version}-%{release}
-
-%description devil
-Graphviz plugin for renderers based on DevIL. (Unless you absolutely have
-to use BMP, TIF, or TGA, you are recommended to use the PNG format instead
-supported directly by the cairo+pango based renderer in the base graphviz rpm.)
-%endif
+%package ruby
+Summary:		Ruby extension for graphviz
+Requires:		%{name} = %{version}-%{release}, ruby
+ 
+%description ruby
+Ruby extension for graphviz.
 
 %package doc
 Summary:        PDF and HTML documents for graphviz
@@ -149,9 +107,7 @@ Provides some additional PDF and HTML documentation for graphviz.
 Summary:        Graphviz plugin for renderers based on gd
 Requires:       %{name} = %{version}-%{release}
 Requires:       freefont
-Requires(post): %{_bindir}/dot
 Requires(post): /sbin/ldconfig
-Requires(postun): %{_bindir}/dot
 Requires(postun): /sbin/ldconfig
 
 %description gd
@@ -173,25 +129,6 @@ Requires:       lua
 %description lua
 Lua extension for graphviz.
 
-%if %{MING}
-%package ming
-Summary:        Graphviz plugin for flash renderer based on ming
-Requires:       %{name} = %{version}-%{release}
-
-%description ming
-Graphviz plugin for -Tswf (flash) renderer based on ming.
-%endif
-
-%if %{OCAML}
-%package ocaml
-Summary:        Ocaml extension for graphviz
-Requires:       %{name} = %{version}-%{release}
-Requires:       ocaml
-
-%description ocaml
-Ocaml extension for graphviz.
-%endif
-
 %package perl
 Summary:        Perl extension for graphviz
 Requires:       %{name} = %{version}-%{release}
@@ -199,17 +136,6 @@ Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %description perl
 Perl extension for graphviz.
-
-%if %{PHP}
-%package php
-Summary:        PHP extension for graphviz
-Requires:       %{name} = %{version}-%{release}
-Requires:       php(api) = %{?php_core_api}%{?!php_core_api:UNDEFINED}
-Requires:       php(zend-abi) = %{?php_zend_api}%{?!php_zend_api:UNDEFINED}
-
-%description php
-PHP extension for graphviz.
-%endif
 
 %package python3
 Summary:        Python 3 extension for graphviz
@@ -221,26 +147,6 @@ Provides:       python%{python3_version}dist(gv) = %{version}
 %description python3
 Python 3 extension for graphviz.
 
-%if %{ARRRR}
-%package R
-Summary:        R extension for graphviz
-Requires:       %{name} = %{version}-%{release}
-Requires:       R-core
-
-%description R
-R extension for graphviz.
-%endif
-
-%if %{SHARP}
-%package sharp
-Summary:        C# extension for graphviz
-Requires:       %{name} = %{version}-%{release}
-Requires:       mono-core
-
-%description sharp
-C# extension for graphviz.
-%endif
-
 %package tcl
 Summary:        Tcl extension & tools for graphviz
 Requires:       %{name} = %{version}-%{release}
@@ -250,50 +156,27 @@ Requires:       tcl >= 8.3
 Various tcl packages (extensions) for the graphviz tools.
 
 %prep
-%setup -q
-%patch0 -p1 -b .dotty-menu-fix
-%patch1 -p1 -b .coverity-scan-fixes
+%autosetup -p1
 
 # Attempt to fix rpmlint warnings about executable sources
 find -type f -regex '.*\.\(c\|h\)$' -exec chmod a-x {} ';'
 
 %build
-sed -i '/LIBPOSTFIX="64"/s/64//' configure.ac
-
-./autogen.sh
-# Hack in the java includes we need
-sed -i '/JavaVM.framework/!s/JAVA_INCLUDES=/JAVA_INCLUDES=\"_MY_JAVA_INCLUDES_\"/g' configure
-sed -i 's|_MY_JAVA_INCLUDES_|-I%{java_home}/include/ -I%{java_home}/include/linux/|g' configure
+autoreconf -fi
 
 %configure --with-x --disable-static --disable-dependency-tracking \
-	--without-mylibgd --with-ipsepcola --with-pangocairo \
-	--without-gdk-pixbuf --with-visio --disable-silent-rules \
+    --without-mylibgd --with-ipsepcola --with-pangocairo \
+    --without-gdk-pixbuf --with-visio --disable-silent-rules \
     --without-ruby --without-python2 \
     --with-freetypeincludedir=%{_includedir}/freetype2 --with-freetypelibdir=%{_libdir}/lib \
-%if ! %{LASI}
-	--without-lasi \
-%endif
-%if ! %{GTS}
-	--without-gts \
-%endif
-%if ! %{SHARP}
-	--disable-sharp \
-%endif
-%if ! %{OCAML}
-	--disable-ocaml \
-%endif
-%if ! %{MING}
-	--without-ming \
-%endif
-%if ! %{ARRRR}
-	--disable-r \
-%endif
-%if ! %{DEVIL}
-	--without-devil \
-%endif
-%if ! %{QTAPPS}
-	--without-qt
-%endif
+    --without-lasi \
+    --without-gts \
+    --disable-sharp \
+    --disable-ocaml \
+    --without-ming \
+    --disable-r \
+    --without-devil \
+    --without-qt
 
 # drop rpath
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
@@ -303,27 +186,18 @@ sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
   CXXFLAGS="%{optflags} -fno-strict-aliasing -fno-strict-overflow %{?FFSTORE}"
 
 %install
-make DESTDIR=%{buildroot} \
-	docdir=%{buildroot}%{_docdir}/%{name} \
-	pkgconfigdir=%{_libdir}/pkgconfig \
-	install
+%make_install DESTDIR=%{buildroot} \
+	docdir=%{_docdir}/%{name} \
+	pkgconfigdir=%{_libdir}/pkgconfig 
+
 find %{buildroot} -type f -name "*.la" -delete -print
 
 # Move docs to the right place
-mkdir -p %{buildroot}%{_docdir}/%{name}
-mv %{buildroot}%{_datadir}/%{name}/doc/* %{buildroot}%{_docdir}/%{name}
+#mkdir -p %{buildroot}%{_docdir}/%{name}
+#mv %{buildroot}%{_datadir}/%{name}/doc/* %{buildroot}%{_docdir}/%{name}
 
 # Install README
 install -m0644 README %{buildroot}%{_docdir}/%{name}
-
-%if %{PHP}
-# PHP configuration file
-mkdir -p %{buildroot}%{_sysconfdir}/php.d
-cat << __EOF__ > %{buildroot}%{_sysconfdir}/php.d/%{ini_name}
-; Enable %{name} extension module
-extension=gv.so
-__EOF__
-%endif
 
 # Remove executable modes from demos
 find %{buildroot}%{_datadir}/%{name}/demo -type f -exec chmod a-x {} ';'
@@ -352,21 +226,12 @@ install -p tclpkg/gv/gv.py %{buildroot}%{python3_sitearch}/gv.py
 touch %{buildroot}%{_libdir}/graphviz/config%{pluginsver}
 
 # Fix lua file placement for flatpak
-if [ "%{_prefix}" != "%{_prefix}" ]; then
-  cp -ru %{buildroot}%{_prefix}/* %{buildroot}%{_prefix}/
-  rm -rf %{buildroot}%{_prefix}/*
+if [ "%{_prefix}" != "/usr" ]; then
+  cp -ru %{buildroot}/usr/* %{buildroot}%{_prefix}/
+  rm -rf %{buildroot}/usr/*
 fi
 
 %check
-%if %{PHP}
-# Minimal load test of php extension
-LD_LIBRARY_PATH=%{buildroot}%{_libdir} \
-php --no-php-ini \
-    --define extension_dir=%{buildroot}%{_libdir}/graphviz/php/ \
-    --define extension=libgv_php.so \
-    --modules | grep gv
-%endif
-
 # upstream test suite
 # testsuite seems broken, disabling it for now
 # cd rtest
@@ -378,17 +243,6 @@ php --no-php-ini \
 
 %{ldconfig_postun}
 
-%if %{DEVIL}
-# run "dot -c" to generate plugin config in %%{_libdir}/graphviz/config*
-%post devil
-%{_bindir}/dot -c 2>/dev/null || :
-%{?ldconfig}
-
-%postun devil
-%{_bindir}/dot -c 2>/dev/null || :
-%{?ldconfig}
-%endif
-
 # run "dot -c" to generate plugin config in %%{_libdir}/graphviz/config*
 %post gd
 %{_bindir}/dot -c 2>/dev/null || :
@@ -398,19 +252,8 @@ php --no-php-ini \
 %{_bindir}/dot -c 2>/dev/null || :
 %{?ldconfig}
 
-%if %{MING}
-# run "dot -c" to generate plugin config in %%{_libdir}/graphviz/config*
-%post ming
-%{_bindir}/dot -c 2>/dev/null || :
-%{?ldconfig}
-
-%postun ming
-%{_bindir}/dot -c 2>/dev/null || :
-%{?ldconfig}
-%endif
-
 %files
-%license LICENSE
+%license COPYING
 %doc %{_docdir}/%{name}
 %{_bindir}/*
 %dir %{_libdir}/graphviz
@@ -419,25 +262,14 @@ php --no-php-ini \
 %{_mandir}/man1/*.1*
 %{_mandir}/man7/*.7*
 %dir %{_datadir}/graphviz
-%exclude %{_docdir}/%{name}/html
-%exclude %{_docdir}/%{name}/pdf
+%exclude %{_docdir}/%{name}/*.html
+%exclude %{_docdir}/%{name}/*.pdf
 %exclude %{_docdir}/%{name}/demo
 %{_datadir}/graphviz/gvpr
 %ghost %{_libdir}/graphviz/config%{pluginsver}
 
-%if %{QTAPPS}
-%{_datadir}/graphviz/gvedit
-%endif
-
 %exclude %{_libdir}/graphviz/*/*
 %exclude %{_libdir}/graphviz/libgvplugin_gd.*
-%if %{DEVIL}
-%exclude %{_libdir}/graphviz/libgvplugin_devil.*
-%endif
-%if %{MING}
-%exclude %{_libdir}/graphviz/libgvplugin_ming.*
-%exclude %{_libdir}/graphviz/*fdb
-%endif
 
 %files devel
 %{_includedir}/graphviz
@@ -446,14 +278,9 @@ php --no-php-ini \
 %{_libdir}/pkgconfig/*.pc
 %{_mandir}/man3/*.3*
 
-%if %{DEVIL}
-%files devil
-%{_libdir}/graphviz/libgvplugin_devil.so.*
-%endif
-
 %files doc
-%doc %{_docdir}/%{name}/html
-%doc %{_docdir}/%{name}/pdf
+%doc %{_docdir}/%{name}/*.html
+%doc %{_docdir}/%{name}/*.pdf
 %doc %{_docdir}/%{name}/demo
 
 %files gd
@@ -465,54 +292,26 @@ php --no-php-ini \
 
 %files lua
 %{_libdir}/graphviz/lua/
-%{_libdir}/lua*/*
+%{_prefix}/lib64/lua*/*
 %{_mandir}/man3/gv.3lua*
-
-%if %{MING}
-%files ming
-%{_libdir}/graphviz/libgvplugin_ming.so.*
-%{_libdir}/graphviz/*fdb
-%endif
-
-%if %{OCAML}
-%files ocaml
-%{_libdir}/graphviz/ocaml/
-%{_mandir}/man3/gv.3ocaml*
-%endif
 
 %files perl
 %{_libdir}/graphviz/perl/
 %{_libdir}/perl*/*
 %{_mandir}/man3/gv.3perl*
 
-%if %{PHP}
-%files php
-%config(noreplace) %{_sysconfdir}/php.d/%{ini_name}
-%{_libdir}/graphviz/php/
-%{php_extdir}/gv.so
-%{_datadir}/php*/*
-%{_mandir}/man3/gv.3php*
-%endif
-
 %files python3
 %{python3_sitearch}/*
 %{_mandir}/man3/gv.3python*
 
-%if %{ARRRR}
-%files R
-%{_libdir}/graphviz/R/
-%{_mandir}/man3/gv.3r*
-%endif
-
-%if %{SHARP}
-%files sharp
-%{_libdir}/graphviz/sharp/
-%{_mandir}/man3/gv.3sharp*
-%endif
+%files ruby
+%{_libdir}/graphviz/ruby/
+%{_libdir}/*ruby*/*
+%{_mandir}/man3/gv.3ruby*
 
 %files tcl
 %{_libdir}/graphviz/tcl/
-%{_libdir}/tcl*/*
+%{_prefix}/lib64/tcl*/*
 # hack to include gv.3tcl only if available
 # always includes tcldot.3tcl, gdtclft.3tcl
 %{_mandir}/man3/*.3tcl*

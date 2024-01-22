@@ -4760,8 +4760,8 @@
         "type": "other",
         "other": {
           "name": "graphviz",
-          "version": "2.42.4",
-          "downloadUrl": "https://gitlab.com/graphviz/graphviz/-/archive/2.42.4/graphviz-2.42.4.tar.bz2"
+          "version": "9.0.0",
+          "downloadUrl": "https://gitlab.com/api/v4/projects/4207231/packages/generic/graphviz-releases/9.0.0/graphviz-9.0.0.tar.xz"
         }
       }
     },
