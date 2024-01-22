@@ -1,7 +1,7 @@
 {
   "Signatures": {
     "gpgkey-8E1F50C1.gpg": "7562f3fa812b8b2d03dd47e80477e4fcb0833cbd874f7975c53b57c66cff3536",
-    "tpm-pkcs11-1.9.0.tar.gz": "35bf06c30cfa76fc0eba2c5f503cf7dd0d34a66afb2d292fee896b90362f633b",
-    "tpm-pkcs11-1.9.0.tar.gz.asc": "c0606df64e245e725f41b04745c2e03a36a180085d67db279590f638f751ce74"
+    "tpm2-pkcs11-1.9.0.tar.gz": "35bf06c30cfa76fc0eba2c5f503cf7dd0d34a66afb2d292fee896b90362f633b",
+    "tpm2-pkcs11-1.9.0.tar.gz.asc": "c0606df64e245e725f41b04745c2e03a36a180085d67db279590f638f751ce74"
   }
 }
