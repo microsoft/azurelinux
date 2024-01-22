@@ -1,7 +1,7 @@
 %define base_name systemd
 %define majver %(echo %{version} | cut -d. -f 1)
-# Ideally this is %%bcond bootstrap 0, but there are currently parsing issues with %%bcond
-%bcond_with bootstrap
+# Ideally this is %%bcond bootstrap 1, but there are currently parsing issues with %%bcond
+%bcond_without bootstrap
 
 %if %{with bootstrap}
 %define debug_package %{nil}

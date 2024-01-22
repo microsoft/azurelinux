@@ -1,0 +1,6 @@
+{
+ "Signatures": {
+  "systemd-254.5.tar.gz": "41873783aa1c680e10d2f2626797a1c2fef8018d69b68c8c77639e140ee7846d",
+  "95-disable-systemd-oomd.preset": "f2cc3a853de7d56431644b3b54d9a850dd6db01b7f00b86e108f50a845fc8edc"
+ }
+}

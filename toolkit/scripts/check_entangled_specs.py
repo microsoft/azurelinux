@@ -37,7 +37,11 @@ version_release_matching_groups = [
     frozenset([
         "SPECS/cyrus-sasl/cyrus-sasl.spec",
         "SPECS/cyrus-sasl-bootstrap/cyrus-sasl-bootstrap.spec"
-    ])
+    ]),
+    frozenset([
+        "SPECS/systemd/systemd.spec",
+        "SPECS/systemd/systemd-bootstrap.spec"
+    ]),
 ]
 
 version_matching_groups = [

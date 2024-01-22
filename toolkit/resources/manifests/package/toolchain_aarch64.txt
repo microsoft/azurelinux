@@ -565,10 +565,9 @@ sqlite-devel-3.44.0-1.azl3.aarch64.rpm
 sqlite-libs-3.44.0-1.azl3.aarch64.rpm
 swig-4.1.1-1.azl3.aarch64.rpm
 swig-debuginfo-4.1.1-1.azl3.aarch64.rpm
-systemd-bootstrap-250.3-14.azl3.aarch64.rpm
-systemd-bootstrap-debuginfo-250.3-14.azl3.aarch64.rpm
-systemd-bootstrap-devel-250.3-14.azl3.aarch64.rpm
-systemd-bootstrap-rpm-macros-250.3-14.azl3.noarch.rpm
+systemd-bootstrap-254.5-2.azl3.aarch64.rpm
+systemd-bootstrap-devel-254.5-2.azl3.aarch64.rpm
+systemd-bootstrap-rpm-macros-254.5-2.azl3.noarch.rpm
 tar-1.35-1.azl3.aarch64.rpm
 tar-debuginfo-1.35-1.azl3.aarch64.rpm
 tdnf-3.5.2-2.azl3.aarch64.rpm
