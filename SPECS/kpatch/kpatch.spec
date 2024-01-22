@@ -1,6 +1,6 @@
 Summary:        Kpatch tooling
 Name:           kpatch
-Version:        0.9.7
+Version:        0.9.8
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
