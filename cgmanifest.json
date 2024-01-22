@@ -28498,7 +28498,7 @@
         "other": {
           "name": "tpm2-pkcs11",
           "version": "1.9.0",
-          "downloadUrl": "https://github.com/tpm2-software/%{name}/releases/download/1.9.0RC0/tpm-pkcs11-1.9.0RC0.tar.gz"
+          "downloadUrl": "https://github.com/tpm2-software/tpm2-pkcs11/releases/download/1.9.0/tpm2-pkcs11-1.9.0.tar.gz"
         }
       }
     },
