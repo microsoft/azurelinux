@@ -2210,7 +2210,6 @@
                 "mariner-release",
                 "mariner-repos",
                 "mariner-rpm-macros",
-                "maven3",
                 "mm-common",
                 "moby-buildx",
                 "moby-cli",
