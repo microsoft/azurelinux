@@ -1,95 +1,97 @@
+%define majmin %(echo %{version} | cut -d. -f1-2)
+
 # The RubyGems library has to stay out of Ruby directory tree, since the
 # RubyGems should be share by all Ruby implementations.
 %global rubygems_dir  %{_datadir}/rubygems
 %global gem_dir %{_datadir}/ruby/gems
-%global rubygems_version        3.3.26
+%global rubygems_version        3.5.3
 # Add version for default gems from https://stdgems.org/
-# A helpful one-liner script to check the current default versions is available via RUBY_VER=3.1 ./get_gem_versions.sh
-%global abbrev_version          0.1.0
-%global base64_version          0.1.1
-%global benchmark_version       0.2.0
-# bigdecimal is available via rubygem-bigdecimal.spec with higher version 3.1.2 (default is 3.1.1)
-%global bundler_version         2.3.26
-%global cgi_version             0.3.5
-%global csv_version             3.2.5
-%global date_version            3.2.2
-%global delegate_version        0.2.0
-%global did_you_mean_version    1.6.1
-%global digest_version          3.1.0
-%global drb_version             2.1.0
-%global english_version         0.7.1
-%global erb_version             2.2.3
-%global error_highlight_version 0.3.0
-%global etc_version             1.3.0
-%global fcntl_version           1.0.1
-%global fiddle_version          1.1.0
-%global fileutils_version       1.6.0
-%global find_version            0.1.1
-%global forwardable_version     1.3.2
-%global getoptlong_version      0.1.1
-%global io_console_version      0.5.11
-%global io_nonblock_version     0.1.0
-%global io_wait_version         0.2.1
-%global ipaddr_version          1.2.4
-%global irb_version             1.4.1
-%global json_version            2.6.1
-%global logger_version          1.5.0
-%global mutex_m_version         0.1.1
-%global net_http_version        0.3.0
-%global net_protocol_version    0.1.2
-%global nkf_version             0.1.1
-%global observer_version        0.1.1
-%global open3_version           0.1.1
-%global openssl_version         3.0.1
-%global open_uri_version        0.2.0
-%global optparse_version        0.2.0
-%global ostruct_version         0.5.2
-%global pathname_version        0.2.0
-%global pp_version              0.3.0
-%global prettyprint_version     0.1.1
-%global pstore_version          0.1.1
-%global psych_version           4.0.4
-%global racc_version            1.6.0
-%global rdoc_version            6.4.0
-%global readline_version        0.0.3
-%global readline_ext_version    0.1.4
-%global reline_version          0.3.1
-%global resolv_version          0.2.1
-%global resolv_replace_version  0.1.0
-%global rinda_version           0.1.1
+# A helpful one-liner script to check the current default versions is available via RUBY_VER=%%{majmin} ./get_gem_versions.sh
+%global abbrev_version          0.1.2
+%global base64_version          0.2.0
+%global benchmark_version       0.3.0
+# bigdecimal is available via rubygem-bigdecimal.spec with higher version 3.1.6 (default is 3.1.5)
+%global bundler_version         2.5.3
+%global cgi_version             0.4.1
+%global csv_version             3.2.8
+%global date_version            3.3.4
+%global delegate_version        0.3.1
+%global did_you_mean_version    1.6.3
+%global digest_version          3.1.1
+%global drb_version             2.2.0
+%global english_version         0.8.0
+%global erb_version             4.0.3
+%global error_highlight_version 0.6.0
+%global etc_version             1.4.3
+%global fcntl_version           1.1.0
+%global fiddle_version          1.1.2
+%global fileutils_version       1.7.2
+%global find_version            0.2.0
+%global forwardable_version     1.3.3
+%global getoptlong_version      0.2.1
+%global io_console_version      0.7.1
+%global io_nonblock_version     0.3.0
+%global io_wait_version         0.3.1
+%global ipaddr_version          1.2.6
+%global irb_version             1.11.0
+%global json_version            2.7.1
+%global logger_version          1.6.0
+%global mutex_m_version         0.2.0
+%global net_http_version        0.4.0
+%global net_protocol_version    0.2.2
+%global nkf_version             0.1.3
+%global observer_version        0.1.2
+%global open3_version           0.2.1
+%global openssl_version         3.2.0
+%global open_uri_version        0.4.1
+%global optparse_version        0.4.0
+%global ostruct_version         0.6.0
+%global pathname_version        0.3.0
+%global prism_version           0.19.0
+%global pp_version              0.5.0
+%global prettyprint_version     0.2.0
+%global pstore_version          0.1.3
+%global psych_version           5.1.2
+%global rdoc_version            6.6.2
+%global readline_version        0.0.4
+%global reline_version          0.4.1
+%global resolv_version          0.3.0
+%global resolv_replace_version  0.1.1
+%global rinda_version           0.2.0
 %global ruby2_keywords_version  0.0.5
-%global securerandom_version    0.2.0
-%global set_version             1.0.2
-%global shellwords_version      0.1.0
-%global singleton_version       0.1.1
-%global stringio_version        3.0.1
-%global strscan_version         3.0.1
-%global syslog_version          0.1.0
-%global tempfile_version        0.1.2
-%global time_version            0.2.2
-%global timeout_version         0.2.0
-%global tmpdir_version          0.1.2
-%global tsort_version           0.1.0
-%global un_version              0.2.0
-%global uri_version             0.12.2
-%global weakref_version         0.1.1
-%global win32ole_version        1.8.8
-%global yaml_version            0.2.0
-%global zlib_version            2.1.1
+%global securerandom_version    0.3.1
+%global set_version             1.1.0
+%global shellwords_version      0.2.0
+%global singleton_version       0.2.0
+%global stringio_version        3.1.0
+%global strscan_version         3.0.7
+%global syslog_version          0.1.2
+%global syntax_suggest_version  2.0.0
+%global tempfile_version        0.2.1
+%global time_version            0.3.0
+%global timeout_version         0.4.1
+%global tmpdir_version          0.2.0
+%global tsort_version           0.2.0
+%global un_version              0.3.0
+%global uri_version             0.13.0
+%global weakref_version         0.1.3
+%global win32ole_version        1.8.10
+%global yaml_version            0.3.0
+%global zlib_version            3.1.0
 
 Summary:        Ruby
 Name:           ruby
 # TODO: When changing ruby version, these gemified stdlib
 # provides should be versioned according to the ruby version.
 # More info: https://stdgems.org/
-Version:        3.2.2
+Version:        3.3.0
 Release:        1%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.ruby-lang.org/en/
-Source0:        https://cache.ruby-lang.org/pub/ruby/3.1/%{name}-%{version}.tar.xz
+Source0:        https://cache.ruby-lang.org/pub/ruby/%{majmin}/%{name}-%{version}.tar.gz
 Source1:        macros.ruby
 Source2:        operating_system.rb
 Source3:        rubygems.attr
@@ -200,18 +202,16 @@ Provides:       rubygem-pp = %{pp_version}-%{release}
 Provides:       rubygem(pp) = %{pp_version}-%{release}
 Provides:       rubygem-prettyprint = %{prettyprint_version}-%{release}
 Provides:       rubygem(prettyprint) = %{prettyprint_version}-%{release}
+Provides:       rubygem-prism = %{prism_version}-%{release}
+Provides:       rubygem(prism) = %{prism_version}-%{release}
 Provides:       rubygem-pstore = %{pstore_version}-%{release}
 Provides:       rubygem(pstore) = %{pstore_version}-%{release}
 Provides:       rubygem-psych = %{psych_version}-%{release}
 Provides:       rubygem(psych) = %{psych_version}-%{release}
-Provides:       rubygem-racc = %{racc_version}-%{release}
-Provides:       rubygem(racc) = %{racc_version}-%{release}
 Provides:       rubygem-rdoc = %{rdoc_version}-%{release}
 Provides:       rubygem(rdoc) = %{rdoc_version}-%{release}
 Provides:       rubygem-readline = %{readline_version}-%{release}
 Provides:       rubygem(readline) = %{readline_version}-%{release}
-Provides:       rubygem-readline-ext = %{readline_ext_version}-%{release}
-Provides:       rubygem(readline-ext) = %{readline_ext_version}-%{release}
 Provides:       rubygem-reline = %{reline_version}-%{release}
 Provides:       rubygem(reline) = %{reline_version}-%{release}
 Provides:       rubygem-resolv = %{resolv_version}-%{release}
@@ -236,6 +236,8 @@ Provides:       rubygem-stringio = %{stringio_version}-%{release}
 Provides:       rubygem(stringio) = %{stringio_version}-%{release}
 Provides:       rubygem-strscan = %{strscan_version}-%{release}
 Provides:       rubygem(strscan) = %{strscan_version}-%{release}
+Provides:       rubygem-syntax_suggest = %{syntax_suggest_version}-%{release}
+Provides:       rubygem(syntax_suggest) = %{syntax_suggest_version}-%{release}
 Provides:       rubygem-syslog = %{syslog_version}-%{release}
 Provides:       rubygem(syslog) = %{syslog_version}-%{release}
 Provides:       rubygem-tempfile = %{tempfile_version}-%{release}
@@ -400,8 +402,8 @@ sudo -u test make test TESTS="-v"
 %{_rpmconfigdir}/rubygems.con
 
 %changelog
-* Mon Jan 22 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.2-1
-- Auto-upgrade to 3.2.2 - Azure Linux 3.0 - package upgrades
+* Mon Jan 22 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.3.0-1
+- Upgrading to 3.3.0.
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.1.4-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)

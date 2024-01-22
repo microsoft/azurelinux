@@ -15893,6 +15893,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-B-COW",
+          "version": "0.007",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/A/AT/ATOOMIC/B-COW-0.007.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-B-Debug",
           "version": "1.26",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RU/RURBAN/B-Debug-1.26.tar.gz"
@@ -16426,16 +16436,6 @@
           "name": "perl-Coro-Multicore",
           "version": "1.07",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/Coro-Multicore-1.07.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "perl-B-COW",
-          "version": "0.007",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/A/AT/ATOOMIC/B-COW-0.007.tar.gz"
         }
       }
     },
@@ -25575,8 +25575,8 @@
         "type": "other",
         "other": {
           "name": "ruby",
-          "version": "3.2.2",
-          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/3.2/ruby-3.2.2.tar.xz"
+          "version": "3.3.0",
+          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/3.3/ruby-3.3.0.tar.gz"
         }
       }
     },
