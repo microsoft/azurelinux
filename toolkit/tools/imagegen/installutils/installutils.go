@@ -1700,7 +1700,12 @@ func selinuxRelabelFiles(systemConfig configuration.SystemConfig, installChroot 
 	for _, mountToLabel := range listOfMountsToLabel {
 		logger.Log.Debugf("Running setfiles to apply SELinux labels on mount points: %v", mountToLabel)
 
-		// Create a bind mount so that the filesystem's files can be labelled without interference from other mounts.
+		// The chroot environment has a bunch of special filesystems (e.g. /dev, /proc, etc.) mounted within the OS
+		// image. In addition, an image may have placed system directories on separate partitions, and these partitions
+		// will also be mounted within the OS image. These mounts hide the underlying directory that is used as a mount
+		// point, which prevents that directory from receiving an SELinux label from the setfiles command. A well known
+		// way to get an unobstructed view of a filesystem, free from other mount-points, is to create a bind-mount for
+		// that filesystem. Therefore, bind mounts are used to ensure that all directories receive an SELinux label.
 		sourceFullPath := filepath.Join(installChroot.RootDir(), mountToLabel)
 		targetPath := filepath.Join(targetRootPath, mountToLabel)
 		targetFullPath := filepath.Join(installChroot.RootDir(), targetPath)
@@ -1741,6 +1746,7 @@ func selinuxRelabelFiles(systemConfig configuration.SystemConfig, installChroot 
 		}
 	}
 
+	// Cleanup temporary directory.
 	err = os.RemoveAll(targetRootPath)
 	if err != nil {
 		return fmt.Errorf("failed to remove temporary bind mount directory:\n%w", err)
