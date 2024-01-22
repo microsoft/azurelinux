@@ -1,4 +1,6 @@
 Name:           virtiofsd
+# The version should be kept in sync with the `assets.virtiofsd.version` field in
+# https://github.com/microsoft/kata-containers/blob/msft-main/versions.yaml
 Version:        1.8.0
 Release:        1%{?dist}
 Summary:        Virtio-fs vhost-user device daemon (Rust version)
