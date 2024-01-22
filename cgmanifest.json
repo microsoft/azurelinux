@@ -5240,8 +5240,8 @@
         "type": "other",
         "other": {
           "name": "helm",
-          "version": "3.13.2",
-          "downloadUrl": "https://github.com/helm/helm/archive/v3.13.2.tar.gz"
+          "version": "3.14.0",
+          "downloadUrl": "https://github.com/helm/helm/archive/v3.14.0.tar.gz"
         }
       }
     },
