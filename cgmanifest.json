@@ -3248,8 +3248,8 @@
         "type": "other",
         "other": {
           "name": "enchant2",
-          "version": "2.2.14",
-          "downloadUrl": "https://github.com/AbiWord/enchant/releases/download/v2.2.14/enchant-2.2.14.tar.gz"
+          "version": "2.6.5",
+          "downloadUrl": "https://github.com/AbiWord/enchant/releases/download/v2.6.5/enchant-2.6.5.tar.gz"
         }
       }
     },
