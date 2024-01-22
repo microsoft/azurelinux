@@ -2,7 +2,7 @@
 
 Summary:        Gives a fake root environment
 Name:           fakeroot
-Version:        1.29
+Version:        1.32.1
 Release:        1%{?dist}
 # setenv.c: LGPLv2+
 # contrib/Fakeroot-Stat-1.8.8: Perl (GPL+ or Artistic)
@@ -19,8 +19,8 @@ Patch4:         fakeroot-inttypes.patch
 # Fix LD_LIBRARY_PATH for multilib: https://bugzilla.redhat.com/show_bug.cgi?id=1241527
 Patch5:         fakeroot-multilib.patch
 Patch7:         relax_tartest.patch
-Patch8:         also-wrap-stat-library-call.patch
-Patch10:        po4a.patch
+#Patch8:         also-wrap-stat-library-call.patch
+#Patch10:        po4a.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -385,5 +385,5 @@ fi
 * Sun Jan 25 2004 Axel Thimm <Axel.Thimm@ATrpms.net>
 - Update to 0.8.3.
 
-* Wed Oct  8 2003 Axel Thimm <Axel.Thimm@ATrpms.net> 
+* Wed Oct  8 2003 Axel Thimm <Axel.Thimm@ATrpms.net>
 - Initial build.
