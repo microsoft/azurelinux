@@ -7,7 +7,7 @@
 Summary:        High Performance, Distributed Memory Object Cache
 Name:           memcached
 Version:        1.6.22
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -38,7 +38,7 @@ BuildRequires:  libseccomp-devel
 BuildRequires:  openssl-devel
 %endif
 Requires(pre):  shadow-utils
-%{?systemd_requires}
+#%{?systemd_requires}
 
 %description
 memcached is a high-performance, distributed memory object caching
@@ -120,6 +120,9 @@ exit 0
 %{_includedir}/memcached/*
 
 %changelog
+* Mon Jan 22 2024 Osama Esmail <osamaesmail@microsoft.com> - 1.6.22-2
+- Removing %%systemd_requires to shrink package size
+
 * Thu Nov 09 2023 Harshit Gupta <guptaharshit@microsoft.com> - 1.6.22-1
 - Upgrade to 1.6.22 for CVEs 2023-46852 and 2023-46853
 
