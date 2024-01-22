@@ -1,0 +1,34 @@
+From f3b8f65a16e6e8414f8dedca4330fc0dced113db Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Tue, 18 Apr 2023 16:00:44 -0700
+Subject: [PATCH 5/6] iscsid.conf Fedora / Red Hat defaults
+ 
+---
+ etc/iscsid.conf | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+ 
+diff --git a/etc/iscsid.conf b/etc/iscsid.conf
+index ca29e43..ec4d4df 100644
+--- a/etc/iscsid.conf
++++ b/etc/iscsid.conf
+@@ -18,7 +18,7 @@
+ # the time then leave this attribute commented out.
+ #
+ # Default for Fedora and RHEL. Uncomment to activate.
+-# iscsid.startup = /bin/systemctl start iscsid.socket iscsiuio.socket
++iscsid.startup = /bin/systemctl start iscsid.socket iscsiuio.socket
+ #
+ # Default for Debian and Ubuntu. Uncomment to activate.
+ # iscsid.startup = /bin/systemctl start iscsid.socket
+@@ -51,7 +51,7 @@
+ # node.startup = automatic
+ #
+ # To manually startup the session, use "manual". The default is manual.
+-node.startup = manual
++node.startup = automatic
+ 
+ # For "automatic" startup nodes, setting this to "Yes" will try logins on each
+ # available iface until one succeeds, and then stop.  The default "No" will try
+-- 
+2.39.2
+ 

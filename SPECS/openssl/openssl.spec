@@ -56,7 +56,9 @@ Patch49:  0049-Allow-disabling-of-SHA1-signatures.patch
 Patch52:  0052-Allow-SHA1-in-seclevel-1-if-rh-allow-sha1-signatures.patch
 # # https://github.com/openssl/openssl/pull/13817
 Patch79:  0079-RSA-PKCS15-implicit-rejection.patch
-
+# See notes in the patch for details, but this patch will not be needed if
+# the openssl issue https://github.com/openssl/openssl/issues/7048 is ever implemented and released.
+Patch80:  0001-Replacing-deprecated-functions-with-NULL-or-highest.patch
 
 License: Apache-2.0
 URL: http://www.openssl.org/

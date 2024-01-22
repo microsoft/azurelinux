@@ -7,10 +7,14 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safeloopback"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safemount"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 )
 
@@ -29,7 +33,7 @@ var (
 
 func CustomizeImageWithConfigFile(buildDir string, configFile string, imageFile string,
 	rpmsSources []string, outputImageFile string, outputImageFormat string,
-	useBaseImageRpmRepos bool,
+	outputSplitPartitionsFormat string, useBaseImageRpmRepos bool,
 ) error {
 	var err error
 
@@ -47,7 +51,7 @@ func CustomizeImageWithConfigFile(buildDir string, configFile string, imageFile 
 	}
 
 	err = CustomizeImage(buildDir, absBaseConfigPath, &config, imageFile, rpmsSources, outputImageFile, outputImageFormat,
-		useBaseImageRpmRepos)
+		outputSplitPartitionsFormat, useBaseImageRpmRepos)
 	if err != nil {
 		return err
 	}
@@ -56,14 +60,17 @@ func CustomizeImageWithConfigFile(buildDir string, configFile string, imageFile 
 }
 
 func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config, imageFile string,
-	rpmsSources []string, outputImageFile string, outputImageFormat string, useBaseImageRpmRepos bool,
+	rpmsSources []string, outputImageFile string, outputImageFormat string, outputSplitPartitionsFormat string, useBaseImageRpmRepos bool,
 ) error {
 	var err error
+	var qemuOutputImageFormat string
 
-	// Validate 'outputImageFormat' value.
-	qemuOutputImageFormat, err := toQemuImageFormat(outputImageFormat)
-	if err != nil {
-		return err
+	// Validate 'outputImageFormat' value if specified.
+	if outputImageFormat != "" {
+		qemuOutputImageFormat, err = toQemuImageFormat(outputImageFormat)
+		if err != nil {
+			return err
+		}
 	}
 
 	// Validate config.
@@ -106,15 +113,34 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 		return err
 	}
 
-	// Create final output image file.
-	logger.Log.Infof("Writing: %s", outputImageFile)
+	if config.SystemConfig.Verity != nil {
+		// Customize image for dm-verity, setting up verity metadata and security features.
+		err = customizeVerityImageHelper(buildDirAbs, baseConfigPath, config, buildImageFile, rpmsSources, useBaseImageRpmRepos)
+		if err != nil {
+			return err
+		}
+	}
 
-	outDir := filepath.Dir(outputImageFile)
-	os.MkdirAll(outDir, os.ModePerm)
+	// Create final output image file if requested.
+	if outputImageFormat != "" {
+		logger.Log.Infof("Writing: %s", outputImageFile)
 
-	err = shell.ExecuteLiveWithErr(1, "qemu-img", "convert", "-O", qemuOutputImageFormat, buildImageFile, outputImageFile)
-	if err != nil {
-		return fmt.Errorf("failed to convert image file to format: %s:\n%w", outputImageFormat, err)
+		outDir := filepath.Dir(outputImageFile)
+		os.MkdirAll(outDir, os.ModePerm)
+
+		err = shell.ExecuteLiveWithErr(1, "qemu-img", "convert", "-O", qemuOutputImageFormat, buildImageFile, outputImageFile)
+		if err != nil {
+			return fmt.Errorf("failed to convert image file to format: %s:\n%w", outputImageFormat, err)
+		}
+	}
+
+	// If outputSplitPartitionsFormat is specified, extract the partition files.
+	if outputSplitPartitionsFormat != "" {
+		logger.Log.Infof("Extracting partition files")
+		err = extractPartitionsHelper(buildImageFile, outputImageFile, outputSplitPartitionsFormat)
+		if err != nil {
+			return err
+		}
 	}
 
 	logger.Log.Infof("Success!")
@@ -138,9 +164,16 @@ func toQemuImageFormat(imageFormat string) (string, error) {
 func validateConfig(baseConfigPath string, config *imagecustomizerapi.Config, rpmsSources []string,
 	useBaseImageRpmRepos bool,
 ) error {
+	// Note: This IsValid() check does duplicate the one in UnmarshalYamlFile().
+	// But it is useful for functions that call CustomizeImage() directly. For example, test code.
+	err := config.IsValid()
+	if err != nil {
+		return err
+	}
+
 	partitionsCustomized := hasPartitionCustomizations(config)
 
-	err := validateSystemConfig(baseConfigPath, &config.SystemConfig, rpmsSources, useBaseImageRpmRepos,
+	err = validateSystemConfig(baseConfigPath, &config.SystemConfig, rpmsSources, useBaseImageRpmRepos,
 		partitionsCustomized)
 	if err != nil {
 		return err
@@ -259,7 +292,7 @@ func validatePackageLists(baseConfigPath string, config *imagecustomizerapi.Syst
 func customizeImageHelper(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
 	buildImageFile string, rpmsSources []string, useBaseImageRpmRepos bool, partitionsCustomized bool,
 ) error {
-	imageConnection, err := connectToExistingImage(buildImageFile, buildDir, "imageroot")
+	imageConnection, err := connectToExistingImage(buildImageFile, buildDir, "imageroot", true)
 	if err != nil {
 		return err
 	}
@@ -273,6 +306,121 @@ func customizeImageHelper(buildDir string, baseConfigPath string, config *imagec
 	}
 
 	err = imageConnection.CleanClose()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func extractPartitionsHelper(buildImageFile string, outputImageFile string, outputSplitPartitionsFormat string) error {
+	imageLoopback, err := safeloopback.NewLoopback(buildImageFile)
+	if err != nil {
+		return err
+	}
+	defer imageLoopback.Close()
+
+	// Extract the partitions as files.
+	err = extractPartitions(imageLoopback.DevicePath(), outputImageFile, outputSplitPartitionsFormat)
+	if err != nil {
+		return err
+	}
+
+	err = imageLoopback.CleanClose()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
+	buildImageFile string, rpmsSources []string, useBaseImageRpmRepos bool,
+) error {
+	var err error
+
+	// Connect the disk image to an NBD device using qemu-nbd
+	// Find a free NBD device
+	nbdDevice, err := findFreeNBDDevice()
+	if err != nil {
+		return fmt.Errorf("failed to find a free nbd device: %v", err)
+	}
+
+	err = shell.ExecuteLiveWithErr(1, "qemu-nbd", "-c", nbdDevice, "-f", "raw", buildImageFile)
+	if err != nil {
+		return fmt.Errorf("failed to connect nbd %s to image %s: %s", nbdDevice, buildImageFile, err)
+	}
+	defer func() {
+		// Disconnect the NBD device when the function returns
+		err = shell.ExecuteLiveWithErr(1, "qemu-nbd", "-d", nbdDevice)
+		if err != nil {
+			return
+		}
+	}()
+
+	diskPartitions, err := diskutils.GetDiskPartitions(nbdDevice)
+	if err != nil {
+		return err
+	}
+
+	// Extract the partition block device path.
+	dataPartition, err := idToPartitionBlockDevicePath(config.SystemConfig.Verity.DataPartition.IdType, config.SystemConfig.Verity.DataPartition.Id, nbdDevice, diskPartitions)
+	if err != nil {
+		return err
+	}
+	hashPartition, err := idToPartitionBlockDevicePath(config.SystemConfig.Verity.HashPartition.IdType, config.SystemConfig.Verity.HashPartition.Id, nbdDevice, diskPartitions)
+	if err != nil {
+		return err
+	}
+
+	// Extract root hash using regular expressions.
+	verityOutput, _, err := shell.Execute("veritysetup", "format", dataPartition, hashPartition)
+	if err != nil {
+		return fmt.Errorf("failed to calculate root hash:\n%w", err)
+	}
+
+	var rootHash string
+	rootHashRegex, err := regexp.Compile(`Root hash:\s+([0-9a-fA-F]+)`)
+	if err != nil {
+		// handle the error appropriately, for example:
+		return fmt.Errorf("failed to compile root hash regex: %w", err)
+	}
+
+	rootHashMatches := rootHashRegex.FindStringSubmatch(verityOutput)
+	if len(rootHashMatches) <= 1 {
+		return fmt.Errorf("failed to parse root hash from veritysetup output")
+	}
+	rootHash = rootHashMatches[1]
+
+	systemBootPartition, err := findSystemBootPartition(diskPartitions)
+	if err != nil {
+		return err
+	}
+	bootPartition, err := findBootPartitionFromEsp(systemBootPartition, diskPartitions, buildDir)
+	if err != nil {
+		return err
+	}
+
+	bootPartitionTmpDir := filepath.Join(buildDir, tmpParitionDirName)
+	// Temporarily mount the partition.
+	bootPartitionMount, err := safemount.NewMount(bootPartition.Path, bootPartitionTmpDir, bootPartition.FileSystemType, 0, "", true)
+	if err != nil {
+		return fmt.Errorf("failed to mount partition (%s):\n%w", bootPartition.Path, err)
+	}
+	defer bootPartitionMount.Close()
+
+	grubCfgFullPath := filepath.Join(bootPartitionTmpDir, "grub2/grub.cfg")
+	if err != nil {
+		return fmt.Errorf("failed to stat file (%s):\n%w", grubCfgFullPath, err)
+	}
+
+	err = updateGrubConfig(config.SystemConfig.Verity.DataPartition.IdType, config.SystemConfig.Verity.DataPartition.Id,
+		config.SystemConfig.Verity.HashPartition.IdType, config.SystemConfig.Verity.HashPartition.Id, rootHash, grubCfgFullPath)
+	if err != nil {
+		return err
+	}
+
+	err = bootPartitionMount.CleanClose()
 	if err != nil {
 		return err
 	}

@@ -1,0 +1,95 @@
+From d6344267de82b7ef38e2834522a8782579b77d42 Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Fri, 30 Jun 2023 22:19:23 +0000
+Subject: [PATCH 104/104] libiscsi build fixes
+
+---
+ Makefile          |  4 ++++
+ libiscsi/Makefile | 27 +++++++++++++++------------
+ 2 files changed, 19 insertions(+), 12 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index a537516..3fe76df 100644
+--- a/Makefile
++++ b/Makefile
+@@ -58,6 +58,10 @@ deprecation_msg:
+ 	@echo "***    Please see the README file for more information."
+ 	@echo "***"
+ 
++.PHONY: libiscsi
++libiscsi:
++	$(MAKE) $(MFLAGS) -C libiscsi
++
+ user: deprecation_msg iscsiuio/Makefile
+ 	$(MAKE) $(MFLAGS) -C libopeniscsiusr
+ 	$(MAKE) $(MFLAGS) -C sysdeps
+diff --git a/libiscsi/Makefile b/libiscsi/Makefile
+index 7f5d371..9f7b034 100644
+--- a/libiscsi/Makefile
++++ b/libiscsi/Makefile
+@@ -5,21 +5,22 @@ ifeq ($(TOPDIR),)
+ endif
+ 
+ OSNAME=$(shell uname -s)
+-OPTFLAGS ?= -O2 -g
+-WARNFLAGS ?= -Wall -Wstrict-prototypes
+-CFLAGS = $(OPTFLAGS) $(WARNFLAGS) -I../include -I../usr \
+-		-D$(OSNAME) -fPIC -D_GNU_SOURCE -fvisibility=hidden \
++# OPTFLAGS ?= -O2 -g
++# WARNFLAGS ?= -Wall -Wstrict-prototypes
++CFLAGS ?= -O2 -g -Wall
++CFLAGS += $(OPTFLAGS) $(WARNFLAGS) -I../include -I../usr \
++		-D$(OSNAME) -D_GNU_SOURCE -fvisibility=hidden \
+ 		-I../libopeniscsiusr
+ 
+-#CFLAGS ?= -O2 -g
+ #CFLAGS += -Wall -Werror -Wextra -fvisibility=hidden -fPIC
+-CFLAGS += -I../libopeniscsiusr -I../include -I../usr
++#CFLAGS += -I../libopeniscsiusr -I../include -I../usr
+ #CFLAGS += $(shell $(PKG_CONFIG) --cflags libkmod)
+ CFLAGS += -DSBINDIR=\"$(SBINDIR)\"
+ CFLAGS += -DISCSI_DB_ROOT=\"$(DBROOT)\"
+ CFLAGS += -DISCSI_VERSION_STR=\"$(ISCSI_VERSION_STR)\"
+ 
+-LDFLAGS = -L../libopeniscsiusr -lopeniscsiusr -lkmod -lcrypto
++CFLAGS += -L../redhat-linux-build
++LDLIBS += -lopeniscsiusr -lkmod -lcrypto
+ 
+ LIB = libiscsi.so.0
+ TESTS = tests/test_discovery_sendtargets tests/test_discovery_firmware
+@@ -39,7 +40,7 @@ USR_OBJS = $(patsubst %.o, usr-objs/%.o, $(ISCSI_LIB_SRCS) local_strings.o)
+ FW_OBJS = $(patsubst %.o, fw-objs/%.o, $(FW_PARAM_SRCS))
+ 
+ # Flags for the tests
+-tests/% : CFLAGS = $(OPTFLAGS) $(WARNFLAGS) -I.
++tests/% : CFLAGS += -I.
+ 
+ all: lib tests html
+ 
+@@ -48,18 +49,20 @@ tests: $(TESTS)
+ 
+ common-objs/%.o: ../sysdeps/%.c
+ 	mkdir -p common-objs
+-	$(CC) $(CFLAGS) -c $< -o $@
++	$(CC) $(CFLAGS) -c $< -o $@ $(LDFLAGS) $(LDLIBS)
+ 
+ usr-objs/%.o: ../usr/%.c
+ 	mkdir -p usr-objs
+-	$(CC) $(CFLAGS) -c $< -o $@
++	$(CC) $(CFLAGS) -c $< -o $@ $(LDFLAGS) $(LDLIBS)
+ 
+ fw-objs/%.o: ../usr/fwparam_ibft/%.c
+ 	mkdir -p fw-objs
+-	$(CC) $(CFLAGS) -c $< -o $@
++	$(CC) $(CFLAGS) -c $< -o $@ $(LDFLAGS) $(LDLIBS)
++
++$(LIB): CFLAGS += -fPIC
+ 
+ $(LIB): $(COMMON_OBJS) $(FW_OBJS) $(USR_OBJS) libiscsi.o
+-	$(CC) $(CFLAGS) -shared -Wl,-soname,$(LIB) $^ -o $@ -L$(TOPDIR)/libopeniscsiusr -lopeniscsiusr
++	$(CC) $(CFLAGS) -shared -Wl,-soname,$(LIB) $^ -o $@ $(LDFLAGS) $(LDLIBS)
+ 	ln -s -f $(LIB) libiscsi.so
+ 
+ $(TESTS): $(FW_OBJS) $(COMMON_OBJS) $(USR_OBJS) $(LIB)
+-- 
+2.40.1

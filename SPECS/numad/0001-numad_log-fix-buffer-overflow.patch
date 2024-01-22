@@ -1,0 +1,25 @@
+	
+From a9e6f292f4ce9443ee95c77c60dd8da68d0db7e9 Mon Sep 17 00:00:00 2001
+From: Lukas Nykryn <lnykryn@redhat.com>
+Date: Wed, 6 Sep 2023 12:27:47 +0200
+Subject: [PATCH] numad_log: fix buffer overflow
+ 
+---
+ numad.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+ 
+diff --git a/numad.c b/numad.c
+index 4c85486..2923842 100644
+--- a/numad.c
++++ b/numad.c
+@@ -153,7 +153,7 @@ void numad_log(int level, const char *fmt, ...) {
+     *p++ = ' ';
+     va_list ap;
+     va_start(ap, fmt);
+-    vsnprintf(p, BUF_SIZE, fmt, ap);
++    vsnprintf(p, BUF_SIZE - strlen(buf) , fmt, ap);
+     va_end(ap);
+     fprintf(log_fs, "%s", buf);
+     fflush(log_fs);
+-- 
+2.39.2

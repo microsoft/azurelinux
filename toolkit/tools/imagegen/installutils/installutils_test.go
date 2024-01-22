@@ -71,7 +71,7 @@ func TestCopyAdditionalFiles(t *testing.T) {
 	proposedDir := filepath.Join(tmpDir, "TestCopyAdditionalFiles")
 	chroot := safechroot.NewChroot(proposedDir, false)
 
-	err := chroot.Initialize("", []string{}, []*safechroot.MountPoint{})
+	err := chroot.Initialize("", []string{}, []*safechroot.MountPoint{}, true)
 	assert.NoError(t, err)
 
 	defer chroot.Close(false)

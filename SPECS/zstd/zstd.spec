@@ -1,7 +1,7 @@
 Summary:        Tools for zstd compression and decompression
 Name:           zstd
 Version:        1.5.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD-3-Clause AND GPL-2.0-only
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -41,10 +41,12 @@ Documentation files for zstd
 
 %build
 %make_build
+%make_build -C contrib/pzstd %{!?with_asm:ZSTD_NO_ASM=1}
 
 %install
 %make_install prefix=%{_prefix}
 find %{buildroot} -type f -name "*.a" -delete -print
+install -D -m755 contrib/pzstd/pzstd %{buildroot}%{_bindir}/pzstd
 
 %check
 %make_build check
@@ -55,6 +57,7 @@ find %{buildroot} -type f -name "*.a" -delete -print
 %defattr(-,root,root)
 %{_bindir}/unzstd
 %{_bindir}/zstd
+%{_bindir}/pzstd
 %{_bindir}/zstdless
 %{_bindir}/zstdmt
 %{_bindir}/zstdgrep
@@ -73,6 +76,9 @@ find %{buildroot} -type f -name "*.a" -delete -print
 %{_mandir}/man1/*
 
 %changelog
+* Tue Jan 16 2024 Andrew Phelps <anphel@microsoft.com> - 1.5.5-2
+- Add pzstd binary
+
 * Mon Oct 16 2023 Andrew Phelps <anphel@microsoft.com> - 1.5.5-1
 - Upgrade to version 1.5.5
 - License verified
