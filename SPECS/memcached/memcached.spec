@@ -38,7 +38,6 @@ BuildRequires:  libseccomp-devel
 BuildRequires:  openssl-devel
 %endif
 Requires(pre):  shadow-utils
-#%{?systemd_requires}
 
 %description
 memcached is a high-performance, distributed memory object caching
