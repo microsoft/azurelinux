@@ -1,7 +1,7 @@
 Summary:        Program for compiling packages
 Name:           make
-Version:        4.3
-Release:        3%{?dist}
+Version:        4.4.1
+Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
