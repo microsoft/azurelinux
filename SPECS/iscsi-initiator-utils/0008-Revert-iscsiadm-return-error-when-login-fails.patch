@@ -2,14 +2,14 @@ From 49dc2a687175f9671a159df38971a15287dae18c Mon Sep 17 00:00:00 2001
 From: Chris Leech <cleech@redhat.com>
 Date: Mon, 24 Feb 2014 09:33:33 -0800
 Subject: [PATCH] Revert "iscsiadm: return error when login fails"
-
+ 
 This reverts commit fc2a8e9a2911bc76f961fe3e4a159fab9b8b9691.
-
+ 
 Done to address RHBZ #1015563
 ---
  usr/session_mgmt.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
-
+ 
 diff --git a/usr/session_mgmt.c b/usr/session_mgmt.c
 index 0500f15..1e1f2bc 100644
 --- a/usr/session_mgmt.c
@@ -31,4 +31,4 @@ index 0500f15..1e1f2bc 100644
  
 -- 
 2.26.2
-
+ 
