@@ -1,6 +1,6 @@
 Summary:        RDMA core userspace libraries and daemons
 Name:           rdma-core
-Version:        49.0
+Version:        49.1
 Release:        1%{?dist}
 URL:            https://github.com/linux-rdma/rdma-core
 Vendor:         Microsoft Corporation
@@ -625,12 +625,12 @@ fi
 %endif
 
 %changelog
-* Mon Jan 22 2024 Kanika Nema <kanikanema@microsoft.com> - 49.0-1
-- Upgrade to version 49.0 for AzL 3.0 release
+* Mon Jan 22 2024 Kanika Nema <kanikanema@microsoft.com> - 49.1-1
+- Upgrade to version 49.1 for AzL 3.0 release
 - Disable pyverbs as it cannot build with Cython > 3, the default for AzL 3.0
 - Use released sources that include the prebuilt doc files as AzL does
   not include pandoc
-- Package the additional files present in v49.0
+- Package the additional files present in v49.1
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 39.0-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
