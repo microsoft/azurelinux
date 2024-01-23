@@ -234,8 +234,8 @@ lz4-debuginfo-1.9.4-1.azl3.aarch64.rpm
 lz4-devel-1.9.4-1.azl3.aarch64.rpm
 m4-1.4.19-2.azl3.aarch64.rpm
 m4-debuginfo-1.4.19-2.azl3.aarch64.rpm
-make-4.3-3.azl3.aarch64.rpm
-make-debuginfo-4.3-3.azl3.aarch64.rpm
+make-4.4.1-1.azl3.aarch64.rpm
+make-debuginfo-4.4.1-1.azl3.aarch64.rpm
 mariner-check-macros-2.0-24.azl3.noarch.rpm
 mariner-repos-2.0-8.azl3.noarch.rpm
 mariner-repos-debug-2.0-8.azl3.noarch.rpm
