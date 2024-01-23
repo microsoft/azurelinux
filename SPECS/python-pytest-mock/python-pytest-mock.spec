@@ -2,8 +2,8 @@
 %global file_name pytest_mock
 Summary:        Thin-wrapper around the mock package for easier use with py.test
 Name:           python-%{pypi_name}
-Version:        3.7.0
-Release:        2%{?dist}
+Version:        3.12.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -67,6 +67,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{python3_sitelib}/%{file_name}-%{version}-py%{python3_version}.egg-info/
 
 %changelog
+* Tue Jan 23 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.12.0-1
+- Auto-upgrade to 3.12.0 - Azure Linux 3.0 - package upgrades
+
 * Wed Oct 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.7.0-2
 - Freezing 'pytest' test dependency to version 7.1.2.
 
