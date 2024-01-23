@@ -2,8 +2,8 @@
 %global gem_name timers
 Summary:        Pure Ruby one-shot and periodic timers
 Name:           rubygem-%{gem_name}
-Version:        4.3.2
-Release:        2%{?dist}
+Version:        4.3.5
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -31,6 +31,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Mon Jan 22 2024 Riken Maharjan <rmaharjan@microsoft.com> - 4.3.5-1
+- Upgrade to 4.3.5.
+
 * Fri Apr 01 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 4.3.2-2
 - Build from .tar.gz source.
 
