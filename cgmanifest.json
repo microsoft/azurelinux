@@ -13103,8 +13103,8 @@
         "type": "other",
         "other": {
           "name": "mm-common",
-          "version": "1.0.4",
-          "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/mm-common/1.0/mm-common-1.0.4.tar.xz"
+          "version": "1.0.6",
+          "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/mm-common/1.0/mm-common-1.0.6.tar.xz"
         }
       }
     },
@@ -25304,8 +25304,8 @@
         "type": "other",
         "other": {
           "name": "redis",
-          "version": "6.2.13",
-          "downloadUrl": "https://download.redis.io/releases/redis-6.2.13.tar.gz"
+          "version": "7.2.4",
+          "downloadUrl": "https://download.redis.io/releases/redis-7.2.4.tar.gz"
         }
       }
     },
@@ -27275,8 +27275,8 @@
         "type": "other",
         "other": {
           "name": "seabios",
-          "version": "1.14.0",
-          "downloadUrl": "https://www.seabios.org/downloads/seabios-1.14.0.tar.gz"
+          "version": "1.16.3",
+          "downloadUrl": "https://www.seabios.org/downloads/seabios-1.16.3.tar.gz"
         }
       }
     },
