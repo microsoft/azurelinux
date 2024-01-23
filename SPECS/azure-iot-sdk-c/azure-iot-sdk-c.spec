@@ -25,12 +25,14 @@ Distribution:   Mariner
 #           -cf %{name}-%{version}.tar.gz %{name}
 Source0:        %{name}-%{version}.tar.gz
 
-BuildRequires:  cmake
+BuildRequires:  cmake >= 2.8.12
 BuildRequires:  build-essential
-BuildRequires:  curl-devel
-BuildRequires:  openssl-devel
-BuildRequires:  util-linux-devel
-BuildRequires:  valgrind
+BuildRequires:  curl
+BuildRequires:  libcurl4-openssl-dev
+BuildRequires:  libssl-dev
+BuildRequires:  uuid-dev
+BuildRequires:  ca-certificates
+BuildRequires:  gcc >= 4.4.7
 Requires:       util-linux
 Requires:       curl
 Requires:       openssl
