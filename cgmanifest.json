@@ -24954,8 +24954,8 @@
         "type": "other",
         "other": {
           "name": "qemu",
-          "version": "6.2.0",
-          "downloadUrl": "https://download.qemu.org/qemu-6.2.0.tar.xz"
+          "version": "8.2.0",
+          "downloadUrl": "https://download.qemu.org/qemu-8.2.0.tar.xz"
         }
       }
     },
