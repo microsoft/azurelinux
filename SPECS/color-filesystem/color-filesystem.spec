@@ -1,7 +1,7 @@
 Summary:        Color filesystem layout
 Name:           color-filesystem
-Version:        1
-Release:        26%{?dist}
+Version:        3
+Release:        1%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -44,6 +44,9 @@ EOF
 %{_rpmconfigdir}/macros.d/macros.color
 
 %changelog
+* Thu Jan 18 2024 Betty Lakes <bettylakes@microsoft.com> - 3-1
+- Version updated to 3.0
+
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 1-26
 - License verified
 - Lint spec
