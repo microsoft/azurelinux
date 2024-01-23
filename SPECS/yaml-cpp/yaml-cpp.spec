@@ -1,6 +1,6 @@
 Summary:        A YAML parser and emitter for C++
 Name:           yaml-cpp
-Version:        0.7.0
+Version:        0.8.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -78,6 +78,9 @@ pushd build_static
 %{_libdir}/*.a
 
 %changelog
+* Tue Jan 23 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 0.8.0-1
+- Bump version to 0.9.0 from 0.8.0
+
 * Wed Jan 26 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.7.0-1
 - Update to version 0.7.0.
 - License verified.
