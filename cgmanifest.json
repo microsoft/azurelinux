@@ -125,8 +125,8 @@
         "type": "other",
         "other": {
           "name": "aide",
-          "version": "0.16",
-          "downloadUrl": "https://github.com/aide/aide/releases/download/v0.16/aide-0.16.tar.gz"
+          "version": "0.18.6",
+          "downloadUrl": "https://github.com/aide/aide/releases/download/v0.18.6/aide-0.18.6.tar.gz"
         }
       }
     },

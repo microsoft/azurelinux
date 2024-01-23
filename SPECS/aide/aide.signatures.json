@@ -1,7 +1,7 @@
 {
  "Signatures": {
   "README.quickstart": "0af61a9986cac706ce2675e5fea2ca625df14922ccdfba53d8100e5559e17244",
-  "aide-0.16.tar.gz": "a81c53a131c4fd130b169b3a26ac35386a2f6e1e014f12807524cc273ed97345",
+  "aide-0.18.6.tar.gz": "8ff36ce47d37d0cc987762d5d961346d475de74bba8a1832fd006db6edd3c10e",
   "aide.conf": "f6b06f2c176e7b2aeccc10abff7928e3201ec2a7d3186f57cc444e80b7c9aad9",
   "aide.logrotate": "2a60afec39715c3331549229e6a186db5dca5b4dc032445e9e3abbd9bce0fb53"
  }
