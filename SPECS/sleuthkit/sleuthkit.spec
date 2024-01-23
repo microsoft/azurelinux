@@ -1,17 +1,15 @@
 Summary:        The Sleuth Kit (TSK)
 Name:           sleuthkit
-Version:        4.9.0
-Release:        5%{?dist}
+Version:        4.12.1
+Release:        1%{?dist}
 License:        BSD AND CPL AND GPLv2+ AND IBM AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.sleuthkit.org
 Source0:        https://github.com/sleuthkit/sleuthkit/releases/download/sleuthkit-%{version}/sleuthkit-%{version}.tar.gz
-
 BuildRequires:  gcc-c++
 BuildRequires:  perl-generators
 BuildRequires:  sqlite-devel
-
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 Requires:       file
 Requires:       mac-robber
@@ -94,6 +92,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_bindir}/srch_strings
 %{_bindir}/tsk_comparedir
 %{_bindir}/tsk_gettimes
+%{_bindir}/tsk_imageinfo
 %{_bindir}/tsk_loaddb
 %{_bindir}/tsk_recover
 %{_bindir}/usnjls
@@ -137,8 +136,12 @@ find %{buildroot} -type f -name "*.la" -delete -print
 # CPL and IBM
 %{_includedir}/tsk/
 %{_libdir}/*.so
+%{_libdir}/pkgconfig/tsk.pc
 
 %changelog
+* Mon Jan 22 2024 Andrew Phelps <anphel@microsoft.com> - 4.12.1-1
+- Upgrade to version 4.12.1
+
 * Thu Jan 18 2024 Andrew Phelps <anphel@microsoft.com> - 4.9.0-5
 - Build without libewf-devel
 
