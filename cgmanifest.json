@@ -10151,8 +10151,8 @@
         "type": "other",
         "other": {
           "name": "libmspack",
-          "version": "0.10.1alpha",
-          "downloadUrl": "http://www.cabextract.org.uk/libmspack/libmspack-0.10.1alpha.tar.gz"
+          "version": "0.11alpha",
+          "downloadUrl": "http://www.cabextract.org.uk/libmspack/libmspack-0.11alpha.tar.gz"
         }
       }
     },
