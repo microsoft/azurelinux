@@ -21884,8 +21884,8 @@
         "type": "other",
         "other": {
           "name": "python-cffi",
-          "version": "1.15.0",
-          "downloadUrl": "https://pypi.python.org/packages/source/c/cffi/cffi-1.15.0.tar.gz"
+          "version": "1.16.0",
+          "downloadUrl": "https://pypi.python.org/packages/source/c/cffi/cffi-1.16.0.tar.gz"
         }
       }
     },
@@ -21924,8 +21924,8 @@
         "type": "other",
         "other": {
           "name": "python-cherrypy",
-          "version": "18.6.1",
-          "downloadUrl": "https://pypi.io/packages/source/C/CherryPy/CherryPy-18.6.1.tar.gz"
+          "version": "18.9.0",
+          "downloadUrl": "https://pypi.io/packages/source/C/CherryPy/CherryPy-18.9.0.tar.gz"
         }
       }
     },
@@ -23714,8 +23714,8 @@
         "type": "other",
         "other": {
           "name": "python-pytest-mock",
-          "version": "3.7.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/96/e1/fb53b62056e6840a36d9a4beb4e42726155594c567b574103435a7131c60/pytest-mock-3.7.0.tar.gz"
+          "version": "3.12.0",
+          "downloadUrl": "https://pypi.io/packages/source/p/pytest-mock/pytest-mock-3.12.0.tar.gz"
         }
       }
     },
@@ -25304,8 +25304,8 @@
         "type": "other",
         "other": {
           "name": "redis",
-          "version": "6.2.13",
-          "downloadUrl": "https://download.redis.io/releases/redis-6.2.13.tar.gz"
+          "version": "7.2.4",
+          "downloadUrl": "https://download.redis.io/releases/redis-7.2.4.tar.gz"
         }
       }
     },
