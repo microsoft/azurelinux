@@ -2,6 +2,6 @@
  "Signatures": {
   "FedoraServer.xml": "818cbe9fdbe77be82053998492d240e893a92313a754fef41654d5b3798938f4",
   "FedoraWorkstation.xml": "a8927c24ca69b7a2973ea24af849a8d8e004c03719fa1cf591816432bc95a7e8",
-  "firewalld-1.0.3.tar.gz": "ef84df2efd01cdef3b33b512c1c4097afe2135062e61dc91b78c202441d5776d"
+  "firewalld-2.0.2.tar.bz2": "cb1999d4de42955c2d0b7cd95ae8f300a0bbad1c7063d034659405cdad4da8e6"
  }
 }
