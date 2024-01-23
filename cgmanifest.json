@@ -13062,16 +13062,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "mlnx-ofa_kernel",
-          "version": "23.04",
-          "downloadUrl": "https://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-23.04-0.5.3.tgz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "mlnx-tools",
           "version": "5.2.0",
           "downloadUrl": "https://linux.mellanox.com/public/repo/bluefield/3.9.0/extras/mlnx_ofed/5.6-1.0.3.3/SOURCES/mlnx-tools_5.2.0.orig.tar.gz"
