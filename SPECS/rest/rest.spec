@@ -15,7 +15,6 @@ BuildRequires:  libxml2-devel
 BuildRequires:  meson
 BuildRequires:  cmake
 BuildRequires:  json-glib-devel
-BuildRequires:  libadwaita-1
 
 %description
 This library was designed to make it easier to access web services that
