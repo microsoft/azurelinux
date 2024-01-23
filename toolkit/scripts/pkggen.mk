@@ -233,6 +233,7 @@ $(preprocessed_file): $(cached_file) $(go-graphPreprocessor)
 
 ######## PACKAGE BUILD ########
 
+cache_archive	= $(OUT_DIR)/cache.tar.gz
 pkggen_archive	= $(OUT_DIR)/rpms.tar.gz
 srpms_archive  	= $(OUT_DIR)/srpms.tar.gz
 
@@ -326,6 +327,10 @@ compress-rpms:
 	tar -cvp -f $(BUILD_DIR)/temp_rpms_tarball.tar.gz -C $(RPMS_DIR)/.. $(notdir $(RPMS_DIR))
 	mv $(BUILD_DIR)/temp_rpms_tarball.tar.gz $(pkggen_archive)
 
+##help:target:compress-cached-rpms=Compresses all cached RPMs in `build/rpm_cache/cache` into `out/cache.tar.gz`.
+compress-cached-rpms:
+	tar -cvp -f $(cache_archive) -C $(remote_rpms_cache_dir)/.. $(notdir $(remote_rpms_cache_dir))
+
 ##help:target:compress-srpms=Compresses all SRPMs in `../out/SRPMS` into `../out/srpms.tar.gz`.
 # use temp tarball to avoid tar warning "file changed as we read it"
 # that can sporadically occur when tarball is the dir that is compressed
@@ -333,12 +338,15 @@ compress-srpms:
 	tar -cvp -f $(BUILD_DIR)/temp_srpms_tarball.tar.gz -C $(SRPMS_DIR)/.. $(notdir $(SRPMS_DIR))
 	mv $(BUILD_DIR)/temp_srpms_tarball.tar.gz $(srpms_archive)
 
-# Seed the cached RPMs folder files from the archive.
+##help:target:hydrate-cached-rpms=Hydrates the external RPMs cache from the `CACHED_PACKAGES_ARCHIVE` file.
+# All of the '*.rpm' files inside the archive will be extracted into the cache directory in flat manner.
+# Any duplicates inside the archive's subdirectories will be overwritten by the last one.
+# Also see the `compress-cached-rpms` target.
 hydrate-cached-rpms:
 	$(if $(CACHED_PACKAGES_ARCHIVE),,$(error Must set CACHED_PACKAGES_ARCHIVE=<path>))
 	@mkdir -p $(remote_rpms_cache_dir)
 	@echo Unpacking cache RPMs from $(CACHED_PACKAGES_ARCHIVE) into $(remote_rpms_cache_dir)
-	@tar -xf $(CACHED_PACKAGES_ARCHIVE) -C $(remote_rpms_cache_dir) --strip-components 1 --skip-old-files --touch --checkpoint=100000 --checkpoint-action=echo="%T"
+	@tar -xf $(CACHED_PACKAGES_ARCHIVE) -C $(remote_rpms_cache_dir) --strip-components 1 --skip-old-files --touch --checkpoint=100000 --checkpoint-action=echo="%T" --wildcards '*.rpm'
 # The cached RPMs directory has a flat structure, so we need to move the RPMs into the cache's root directory.
 	@find $(remote_rpms_cache_dir) -mindepth 2 -name "*.rpm" -exec mv {} $(remote_rpms_cache_dir) \;
 	@find $(remote_rpms_cache_dir) -mindepth 1 -type d -and ! -name repodata -exec rm -fr {} +
