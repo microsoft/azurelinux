@@ -10251,8 +10251,8 @@
         "type": "other",
         "other": {
           "name": "libnfs",
-          "version": "4.0.0",
-          "downloadUrl": "https://github.com/sahlberg/libnfs/archive/libnfs-4.0.0/libnfs-4.0.0.tar.gz"
+          "version": "5.0.2",
+          "downloadUrl": "https://github.com/sahlberg/libnfs/archive/libnfs-5.0.2/libnfs-5.0.2.tar.gz"
         }
       }
     },
