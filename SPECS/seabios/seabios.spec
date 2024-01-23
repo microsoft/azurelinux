@@ -17,7 +17,7 @@
 
 Summary:        Open-source legacy BIOS implementation
 Name:           seabios
-Version:        1.16.2
+Version:        1.16.3
 Release:        1%{?dist}
 License:        GPLv3+ AND LGPLv3+
 Vendor:         Microsoft Corporation
@@ -149,8 +149,8 @@ install -m 0644 binaries/vgabios*.bin %{buildroot}%{_datadir}/seavgabios
 %{_datadir}/seavgabios/vgabios*.bin
 
 %changelog
-* Mon Jan 22 2024 Sindhu Karri <lakarri@microsoft.com> - 1.16.2-1
-- Upgrade to 1.16.2
+* Mon Jan 22 2024 Sindhu Karri <lakarri@microsoft.com> - 1.16.3-1
+- Upgrade to 1.16.3
 
 * Thu Aug 26 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.14.0-7
 - License verified.
