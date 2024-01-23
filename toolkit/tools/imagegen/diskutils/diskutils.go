@@ -516,7 +516,7 @@ func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 		}
 	}
 
-	// Check wehther the start sector is 4K-aligned
+	// Check whether the start sector is 4K-aligned
 	start = alignSectorAddress(start, logicalSectorSize, physicalSectorSize)
 
 	logger.Log.Debugf("Input partition start: %d, aligned start sector: %d", partition.Start, start)

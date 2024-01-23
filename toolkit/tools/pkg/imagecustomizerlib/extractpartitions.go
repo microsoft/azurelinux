@@ -30,17 +30,10 @@ func extractPartitions(imageLoopDevice string, outputImageFile string, partition
 		if diskPartitions[partitionNum].Type == "part" {
 			rawFilename := basename + "_" + strconv.Itoa(partitionNum) + ".raw"
 			partitionLoopDevice := diskPartitions[partitionNum].Path
-			out, stderr, _ := shell.Execute("sudo", "losetup", partitionLoopDevice)
-			println(out)
-			println(stderr)
-
 			partitionFilepath, err := copyBlockDeviceToFile(outDir, partitionLoopDevice, rawFilename)
 			if err != nil {
 				return err
 			}
-			out, stderr, _ = shell.Execute("sudo", "losetup", partitionLoopDevice)
-			println(out)
-			println(stderr)
 			switch partitionFormat {
 			case "raw":
 				// Do nothing for "raw" case.
@@ -52,7 +45,7 @@ func extractPartitions(imageLoopDevice string, outputImageFile string, partition
 			default:
 				return fmt.Errorf("unsupported partition format (supported: raw, raw-zstd): %s", partitionFormat)
 			}
-
+						
 			logger.Log.Infof("Partition file created: %s", partitionFilepath)
 		}
 	}
@@ -71,6 +64,7 @@ func copyBlockDeviceToFile(outDir, devicePath, name string) (filename string, er
 		fmt.Sprintf("if=%s", devicePath),       // Input file.
 		fmt.Sprintf("of=%s", fullPath),         // Output file.
 		fmt.Sprintf("bs=%d", defaultBlockSize), // Size of one copied block.
+		fmt.Sprintf("conv=%s", "sparse"),
 	}
 
 	err = shell.ExecuteLive(squashErrors, "dd", ddArgs...)
