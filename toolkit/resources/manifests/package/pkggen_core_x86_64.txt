@@ -1,5 +1,5 @@
 filesystem-1.1-20.cm2.x86_64.rpm
-kernel-headers-5.15.145.2-3.cm2.noarch.rpm
+kernel-headers-5.15.147.1-1.cm2.noarch.rpm
 glibc-2.35-6.cm2.x86_64.rpm
 glibc-devel-2.35-6.cm2.x86_64.rpm
 glibc-i18n-2.35-6.cm2.x86_64.rpm
