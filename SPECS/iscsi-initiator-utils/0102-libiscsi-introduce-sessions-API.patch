@@ -1,0 +1,289 @@
+From 2c28c620727e522f022689312d76f107eb8ef18f Mon Sep 17 00:00:00 2001
+From: Peter Hatina <phatina@redhat.com>
+Date: Mon, 5 Oct 2015 16:50:36 -0700
+Subject: [PATCH] libiscsi introduce sessions API
+
+---
+ libiscsi/libiscsi.c | 125 ++++++++++++++++++++++++++++++++++++++++++++
+ libiscsi/libiscsi.h |  56 ++++++++++++++++++++
+ usr/iscsi_sysfs.c   |   6 +++
+ usr/iscsi_sysfs.h   |   2 +
+ 4 files changed, 189 insertions(+)
+
+diff --git a/libiscsi/libiscsi.c b/libiscsi/libiscsi.c
+index 064e4b5..755c18c 100644
+--- a/libiscsi/libiscsi.c
++++ b/libiscsi/libiscsi.c
+@@ -3,6 +3,7 @@
+  *
+  * Copyright (C) 2008-2009 Red Hat, Inc. All rights reserved.
+  * Copyright (C) 2008-2009 Hans de Goede <hdegoede@redhat.com>
++ * Copyright (C) 2015      Peter Hatina <phatina@redhat.com>
+  * maintained by open-iscsi@googlegroups.com
+  *
+  * This program is free software; you can redistribute it and/or modify
+@@ -469,6 +470,130 @@ leave:
+ 	return rc;
+ }
+ 
++struct libiscsi_session_array {
++	int cnt;
++	int size;
++	struct libiscsi_session_info *data;
++};
++
++static void libiscsi_session_array_init(struct libiscsi_session_array *arr)
++{
++	arr->cnt = 0;
++	arr->size = 0;
++	arr->data = NULL;
++}
++
++static int libiscsi_session_array_grow(struct libiscsi_session_array *arr)
++{
++	if (arr->size == 0)
++		arr->size = 4;
++	else
++		arr->size *= 2;
++
++	arr->data = (struct libiscsi_session_info *) realloc(
++		arr->data,
++		arr->size * sizeof(struct libiscsi_session_info));
++
++	return arr->data ? 0 : 1;
++}
++
++static int libiscsi_session_array_grow_ondemand(struct libiscsi_session_array *arr)
++{
++	if (arr->size == arr->cnt)
++		return libiscsi_session_array_grow(arr);
++	return 0;
++}
++
++static int libiscsi_session_array_resize_precize(struct libiscsi_session_array *arr)
++{
++	arr->data = (struct libiscsi_session_info *) realloc(
++		arr->data,
++		arr->cnt * sizeof(struct libiscsi_session_info));
++	arr->size = arr->cnt;
++
++	return arr->data ? 0 : 1;
++}
++
++static void copy_session_info_to_libiscsi_session_info(
++	struct libiscsi_session_info *info,
++	struct session_info *s_info)
++{
++	/* Copy session info to public struct. */
++	info->sid = s_info->sid;
++	/* Timeouts */
++	memcpy(&info->tmo, &s_info->tmo, sizeof(struct libiscsi_session_timeout));
++	/* CHAP authentication information */
++	memcpy(&info->chap, &s_info->chap, sizeof(struct libiscsi_chap_auth_info));
++	/* Target information */
++	strncpy(info->targetname, s_info->targetname, LIBISCSI_VALUE_MAXLEN);
++	strncpy(info->address, s_info->address, NI_MAXHOST);
++	strncpy(info->persistent_address, s_info->persistent_address, NI_MAXHOST);
++	info->tpgt = s_info->tpgt;
++	info->persistent_port = s_info->persistent_port;
++}
++
++static int get_sessions_helper(void *data, struct session_info *s_info)
++{
++	struct libiscsi_session_array *arr = (struct libiscsi_session_array *) data;
++
++	if (libiscsi_session_array_grow_ondemand(arr) != 0)
++		return 1;
++
++	copy_session_info_to_libiscsi_session_info(&arr->data[arr->cnt++], s_info);
++
++	return 0;
++}
++
++int libiscsi_get_session_infos(struct libiscsi_context *context,
++	struct libiscsi_session_info **infos,
++	int *nr_sessions)
++{
++	int rc = 0;
++	int nr_found = 0;
++	struct libiscsi_session_array arr;
++
++	if (!context || !infos || !nr_sessions)
++		return 1;
++
++	libiscsi_session_array_init(&arr);
++
++	rc = iscsi_sysfs_for_each_session((void *) &arr, &nr_found,
++		get_sessions_helper, 0);
++	if (rc != 0 || nr_found == 0) {
++		strcpy(context->error_str, "No matching session");
++		return ENODEV;
++	}
++
++	if (libiscsi_session_array_resize_precize(&arr) != 0) {
++		strcpy(context->error_str, "Can't allocate memory for session infos");
++		return ENOMEM;
++	}
++
++	*infos = arr.data;
++	*nr_sessions = nr_found;
++
++	return 0;
++}
++
++int libiscsi_get_session_info_by_id(struct libiscsi_context *context,
++	struct libiscsi_session_info *info,
++	const char *session)
++{
++	struct session_info s_info;
++
++	if (!context || !info || !session)
++		return 1;
++
++	if (iscsi_sysfs_get_sessioninfo_by_id(&s_info, (char*) session) != 0) {
++		strcpy(context->error_str, "No matching session");
++		return ENODEV;
++	}
++
++	copy_session_info_to_libiscsi_session_info(info, &s_info);
++
++	return 0;
++}
++
+ int libiscsi_node_set_parameter(struct libiscsi_context *context,
+ 	const struct libiscsi_node *node,
+ 	const char *parameter, const char *value)
+diff --git a/libiscsi/libiscsi.h b/libiscsi/libiscsi.h
+index 756590e..a9891f4 100644
+--- a/libiscsi/libiscsi.h
++++ b/libiscsi/libiscsi.h
+@@ -3,6 +3,7 @@
+  *
+  * Copyright (C) 2008-2009 Red Hat, Inc. All rights reserved.
+  * Copyright (C) 2008-2009 Hans de Goede <hdegoede@redhat.com>
++ * Copyright (C) 2015      Peter Hatina <phatina@redhat.com>
+  * maintained by open-iscsi@googlegroups.com
+  *
+  * This program is free software; you can redistribute it and/or modify
+@@ -56,6 +57,17 @@ enum libiscsi_auth_t {
+  */
+ struct libiscsi_context;
+ 
++/** \brief iSCSI session timeouts
++ *
++ * Struct holding session timeouts.
++ */
++struct libiscsi_session_timeout {
++    int abort_tmo;
++    int lu_reset_tmo;
++    int recovery_tmo;
++    int tgt_reset_tmo;
++};
++
+ /** \brief iSCSI node record
+  *
+  * Struct holding data uniquely identifying an iSCSI node.
+@@ -84,6 +96,24 @@ struct libiscsi_chap_auth_info {
+     char reverse_password[LIBISCSI_VALUE_MAXLEN] /** Reverse Password */;
+ };
+ 
++/** \brief iSCSI session
++ *
++ * Struct hoding iSCSI session information.
++ */
++struct libiscsi_session_info {
++    int sid;
++
++    struct libiscsi_session_timeout tmo;
++    struct libiscsi_chap_auth_info chap;
++
++    char targetname[LIBISCSI_VALUE_MAXLEN];
++    int tpgt;
++    char address[NI_MAXHOST];
++    int port;
++    char persistent_address[NI_MAXHOST];
++    int persistent_port;
++};
++
+ /** \brief generic libiscsi authentication information struct
+  *
+  * Struct holding authentication information for discovery and login.
+@@ -248,6 +278,32 @@ PUBLIC int libiscsi_node_login(struct libiscsi_context *context,
+ PUBLIC int libiscsi_node_logout(struct libiscsi_context *context,
+     const struct libiscsi_node *node);
+ 
++/** \brief Get an array of iSCSI sessions.
++ *
++ * Get the array containing iSCSI sessions' information.
++ *
++ * \param context       libiscsi context to operate on.
++ * \param infos         Array of iSCSI sessions' information.
++ *                      Release with free().
++ * \param nr_sessions   The number of elements in \e infos.
++ * \return              0 on success, otherwise a standard error code
++ *                      (from errno.h).
++ */
++PUBLIC int libiscsi_get_session_infos(struct libiscsi_context *context,
++    struct libiscsi_session_info **infos, int *nr_sessions);
++
++/** \brief Get session information by session ID.
++ *
++ * \param context       libiscsi context to operate on.
++ * \param info          iSCSI session information.
++ * \param session       Session name.
++ * \return              0 on success, otherwise a standard error code
++ *                      (from errno.h)
++ */
++PUBLIC int libiscsi_get_session_info_by_id(struct libiscsi_context *context,
++    struct libiscsi_session_info *info,
++    const char *session);
++
+ /** \brief Set an iSCSI parameter for the given node
+  *
+  * Set the given nodes iSCSI parameter named by \e parameter to value \e value.
+diff --git a/usr/iscsi_sysfs.c b/usr/iscsi_sysfs.c
+index 435c576..e549afe 100644
+--- a/usr/iscsi_sysfs.c
++++ b/usr/iscsi_sysfs.c
+@@ -3,6 +3,7 @@
+  *
+  * Copyright (C) 2006 Mike Christie
+  * Copyright (C) 2006 Red Hat, Inc. All rights reserved.
++ * Copyright (C) 2015      Peter Hatina <phatina@redhat.com>
+  *
+  * This program is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License as published
+@@ -1151,6 +1152,11 @@ free_info:
+ 	return rc;
+ }
+ 
++const char *iscsi_sysfs_get_session_path(void)
++{
++	return ISCSI_SESSION_DIR;
++}
++
+ int iscsi_sysfs_for_each_iface_on_host(void *data, uint32_t host_no,
+ 				       int *nr_found,
+ 				       iscsi_sysfs_iface_op_fn *fn)
+diff --git a/usr/iscsi_sysfs.h b/usr/iscsi_sysfs.h
+index 1d0377f..909db34 100644
+--- a/usr/iscsi_sysfs.h
++++ b/usr/iscsi_sysfs.h
+@@ -3,6 +3,7 @@
+  *
+  * Copyright (C) 2006 Mike Christie
+  * Copyright (C) 2006 Red Hat, Inc. All rights reserved.
++ * Copyright (C) 2015      Peter Hatina <phatina@redhat.com>
+  *
+  * This program is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License as published
+@@ -47,6 +48,7 @@ typedef int (iscsi_sysfs_flashnode_op_fn)(void *, struct flashnode_rec *,
+ 					  uint32_t, uint32_t);
+ typedef int (iscsi_sysfs_iface_op_fn)(void *, struct iface_rec *);
+ 
++extern const char *iscsi_sysfs_get_session_path(void);
+ extern int iscsi_sysfs_for_each_iface_on_host(void *data, uint32_t host_no,
+ 					      int *nr_found,
+ 					      iscsi_sysfs_iface_op_fn *fn);
+-- 
+2.26.2
