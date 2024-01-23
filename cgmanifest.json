@@ -24564,8 +24564,8 @@
         "type": "other",
         "other": {
           "name": "python-typing-extensions",
-          "version": "4.2.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/t/typing_extensions/typing_extensions-4.2.0.tar.gz"
+          "version": "4.9.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/0c/1d/eb26f5e75100d531d7399ae800814b069bc2ed2a7410834d57374d010d96/typing_extensions-4.9.0.tar.gz"
         }
       }
     },

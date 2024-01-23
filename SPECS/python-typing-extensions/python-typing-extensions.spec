@@ -22,8 +22,8 @@ reaches end of life.}
 
 Summary:        Python Typing Extensions
 Name:           python-typing-extensions
-Version:        4.2.0
-Release:        6%{?dist}
+Version:        4.9.0
+Release:        1%{?dist}
 License:        PSF-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -69,6 +69,9 @@ pip3 install pytest==7.1.3
 %doc README.rst
 
 %changelog
+* Tue Jan 23 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.9.0-1
+- Auto-upgrade to 4.9.0 - Azure Linux 3.0 - package upgrades
+
 * Mon Oct 24 2022 Riken Maharjan <rmaharjan@microsoft.com> - 4.2.0-6
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
 - License verified
