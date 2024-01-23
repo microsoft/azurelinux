@@ -6,10 +6,10 @@
 
 Summary:        A pythonic, object-oriented HTTP framework
 Name:           python-%{pkgname}
-Version:        18.6.1
-Release:        3%{?dist}
+Version:        18.9.0
+Release:        1%{?dist}
 License:        BSD
-Url:            https://cherrypy.org/
+Url:            https://cherrypy.dev/
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://pypi.io/packages/source/C/%{pypiname}/%{pypiname}-%{version}.tar.gz
@@ -69,6 +69,9 @@ tox -e py%{python3_version_nodots}
 %{_bindir}/cherryd
 
 %changelog
+* Tue Jan 23 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 18.9.0-1
+- Auto-upgrade to 18.9.0 - Azure Linux 3.0 - package upgrades
+
 * Wed Mar 08 2023 Riken Maharjan <rmaharjan@microsoft.com> - 18.6.1-3
 - Suppress pytest deprecation warning 
 

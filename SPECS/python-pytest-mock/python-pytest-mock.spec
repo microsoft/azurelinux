@@ -2,13 +2,13 @@
 %global file_name pytest_mock
 Summary:        Thin-wrapper around the mock package for easier use with py.test
 Name:           python-%{pypi_name}
-Version:        3.7.0
-Release:        2%{?dist}
+Version:        3.12.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/pytest-dev/pytest-mock/
-Source0:        https://files.pythonhosted.org/packages/96/e1/fb53b62056e6840a36d9a4beb4e42726155594c567b574103435a7131c60/%{pypi_name}-%{version}.tar.gz
+Source0:        https://pypi.io/packages/source/p/pytest-mock/%{pypi_name}-%{version}.tar.gz
 # Can be removed once this bug is resolved: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1006736
 Patch0:         skip_broken_tests_since_3.6.1.patch
 
@@ -67,6 +67,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{python3_sitelib}/%{file_name}-%{version}-py%{python3_version}.egg-info/
 
 %changelog
+* Tue Jan 23 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.12.0-1
+- Auto-upgrade to 3.12.0 - Azure Linux 3.0 - package upgrades
+
 * Wed Oct 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.7.0-2
 - Freezing 'pytest' test dependency to version 7.1.2.
 
