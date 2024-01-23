@@ -9,6 +9,9 @@ Distribution:   Mariner
 URL:            https://github.com/sosreport/sos
 #Source0:       https://github.com/sosreport/sos/archive/%%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
+# The sos-4.6.1.tar.gz is missing a commit to bump the version to 4.6.1
+# https://github.com/orgs/sosreport/discussions/3492
+Patch0:         bump-version-4-6-1.patch
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 Requires:       bzip2
@@ -29,7 +32,7 @@ diagnostic purposes and debugging. Sos is commonly used to help
 support technicians and developers.
 
 %prep
-%autosetup -n %{name}-%{version}
+%autosetup -p1 -n %{name}-%{version}
 
 %build
 python3 setup.py build
