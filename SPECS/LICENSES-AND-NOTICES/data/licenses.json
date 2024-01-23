@@ -959,6 +959,7 @@
                 "nload",
                 "nlopt",
                 "nodejs-packaging",
+                "nss-mdns",
                 "nss-pam-ldapd",
                 "nss_nis",
                 "nss_wrapper",

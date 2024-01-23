@@ -1,0 +1,119 @@
+From 0cbe3ff2a64cdddbfb3884ccbe28be9f08077614 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20Men=C5=A1=C3=ADk?= <pemensik@redhat.com>
+Date: Tue, 6 Dec 2022 20:39:27 +0100
+Subject: [PATCH] Change .local domain heuristic
+
+Previous way skipped all multicast queries when unicast DNS contains
+local. SOA record. Change that behaviour and always request multicast
+name. But if local SOA is present, then make missing multicast optional
+and continue to DNS plugin. That would make names ending with .local to
+take longer resolve on unicast DNS, but should still deliver the answer.
+---
+ src/nss.c  | 11 ++++++++---
+ src/util.c | 15 ++++++++++-----
+ src/util.h |  9 ++++++++-
+ 3 files changed, 26 insertions(+), 9 deletions(-)
+
+diff --git a/src/nss.c b/src/nss.c
+index 93d140a..7f9230e 100644
+--- a/src/nss.c
++++ b/src/nss.c
+@@ -85,8 +85,8 @@ enum nss_status _nss_mdns_gethostbyname_impl(const char* name, int af,
+                                              userdata_t* u, int* errnop,
+                                              int* h_errnop) {
+ 
+-    int name_allowed;
+     FILE* mdns_allow_file = NULL;
++    use_name_result_t result;
+ 
+ #ifdef NSS_IPV4_ONLY
+     if (af == AF_UNSPEC) {
+@@ -118,13 +118,13 @@ enum nss_status _nss_mdns_gethostbyname_impl(const char* name, int af,
+ #ifndef MDNS_MINIMAL
+     mdns_allow_file = fopen(MDNS_ALLOW_FILE, "r");
+ #endif
+-    name_allowed = verify_name_allowed_with_soa(name, mdns_allow_file);
++    result = verify_name_allowed_with_soa(name, mdns_allow_file);
+ #ifndef MDNS_MINIMAL
+     if (mdns_allow_file)
+         fclose(mdns_allow_file);
+ #endif
+ 
+-    if (!name_allowed) {
++    if (result == USE_NAME_RESULT_SKIP) {
+         *errnop = EINVAL;
+         *h_errnop = NO_RECOVERY;
+         return NSS_STATUS_UNAVAIL;
+@@ -137,6 +137,11 @@ enum nss_status _nss_mdns_gethostbyname_impl(const char* name, int af,
+     case AVAHI_RESOLVE_RESULT_HOST_NOT_FOUND:
+         *errnop = ETIMEDOUT;
+         *h_errnop = HOST_NOT_FOUND;
++        if (result == USE_NAME_RESULT_OPTIONAL) {
++            /* continue to dns plugin if DNS .local zone is detected. */
++            *h_errnop = TRY_AGAIN;
++            return NSS_STATUS_UNAVAIL;
++	}
+         return NSS_STATUS_NOTFOUND;
+ 
+     case AVAHI_RESOLVE_RESULT_UNAVAIL:
+diff --git a/src/util.c b/src/util.c
+index d5e0290..4eacf07 100644
+--- a/src/util.c
++++ b/src/util.c
+@@ -55,16 +55,21 @@ int ends_with(const char* name, const char* suffix) {
+     return strcasecmp(name + ln - ls, suffix) == 0;
+ }
+ 
+-int verify_name_allowed_with_soa(const char* name, FILE* mdns_allow_file) {
++use_name_result_t verify_name_allowed_with_soa(const char* name, FILE* mdns_allow_file) {
+     switch (verify_name_allowed(name, mdns_allow_file)) {
+     case VERIFY_NAME_RESULT_NOT_ALLOWED:
+-        return 0;
++        return USE_NAME_RESULT_SKIP;
+     case VERIFY_NAME_RESULT_ALLOWED:
+-        return 1;
++        return USE_NAME_RESULT_AUTHORITATIVE;
+     case VERIFY_NAME_RESULT_ALLOWED_IF_NO_LOCAL_SOA:
+-        return !local_soa();
++	if (local_soa())
++		/* Make multicast resolution not authoritative for .local zone.
++		 * Allow continuing to unicast resolution after multicast had not worked. */
++		return USE_NAME_RESULT_OPTIONAL;
++	else
++		return USE_NAME_RESULT_AUTHORITATIVE;
+     default:
+-        return 0;
++        return USE_NAME_RESULT_SKIP;
+     }
+ }
+ 
+diff --git a/src/util.h b/src/util.h
+index 218c094..76809d4 100644
+--- a/src/util.h
++++ b/src/util.h
+@@ -61,6 +61,12 @@ char* buffer_strdup(buffer_t* buf, const char* str);
+ int set_cloexec(int fd);
+ int ends_with(const char* name, const char* suffix);
+ 
++typedef enum {
++    USE_NAME_RESULT_SKIP,
++    USE_NAME_RESULT_AUTHORITATIVE,
++    USE_NAME_RESULT_OPTIONAL,
++} use_name_result_t;
++
+ // Returns true if we should try to resolve the name with mDNS.
+ //
+ // If mdns_allow_file is NULL, then this implements the "local" SOA
+@@ -71,7 +77,8 @@ int ends_with(const char* name, const char* suffix);
+ //
+ // The two heuristics described above are disabled if mdns_allow_file
+ // is not NULL.
+-int verify_name_allowed_with_soa(const char* name, FILE* mdns_allow_file);
++use_name_result_t verify_name_allowed_with_soa(const char* name,
++                                               FILE* mdns_allow_file);
+ 
+ typedef enum {
+     VERIFY_NAME_RESULT_NOT_ALLOWED,
+-- 
+2.38.1
+

@@ -14462,6 +14462,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "nss-mdns",
+          "version": "0.15.1",
+          "downloadUrl": "https://github.com/avahi/nss-mdns/releases/download/v0.15.1/nss-mdns-0.15.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "nss-pam-ldapd",
           "version": "0.9.10",
           "downloadUrl": "http://arthurdejong.org/nss-pam-ldapd/nss-pam-ldapd-0.9.10.tar.gz"
