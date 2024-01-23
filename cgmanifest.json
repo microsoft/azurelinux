@@ -3588,8 +3588,8 @@
         "type": "other",
         "other": {
           "name": "firewalld",
-          "version": "1.0.3",
-          "downloadUrl": "https://github.com/firewalld/firewalld/releases/download/v1.0.3/firewalld-1.0.3.tar.gz"
+          "version": "2.0.2",
+          "downloadUrl": "https://github.com/firewalld/firewalld/releases/download/v2.0.2/firewalld-2.0.2.tar.bz2"
         }
       }
     },
