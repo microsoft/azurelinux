@@ -119,6 +119,7 @@ func validatePackages(config configuration.Config) (err error) {
 		verityDebugPkgName = "verity-read-only-root-debug-tools"
 		dracutFipsPkgName  = "dracut-fips"
 		fipsKernelCmdLine  = "fips=1"
+		userAddPkgName     = "shadow-utils"
 	)
 
 	for _, systemConfig := range config.SystemConfigs {
@@ -130,6 +131,7 @@ func validatePackages(config configuration.Config) (err error) {
 		foundVerityInitramfsPackage := false
 		foundVerityInitramfsDebugPackage := false
 		foundDracutFipsPackage := false
+		foundUserAddPackage := false
 		kernelCmdLineString := systemConfig.KernelCommandLine.ExtraCommandLine
 		selinuxPkgName := systemConfig.KernelCommandLine.SELinuxPolicy
 		if selinuxPkgName == "" {
@@ -152,6 +154,9 @@ func validatePackages(config configuration.Config) (err error) {
 			if pkg == selinuxPkgName {
 				foundSELinuxPackage = true
 			}
+			if pkg == userAddPkgName {
+				foundUserAddPackage = true
+			}
 		}
 		if systemConfig.ReadOnlyVerityRoot.Enable {
 			if !foundVerityInitramfsPackage {
@@ -169,6 +174,11 @@ func validatePackages(config configuration.Config) (err error) {
 		if systemConfig.KernelCommandLine.SELinux != configuration.SELinuxOff {
 			if !foundSELinuxPackage {
 				return fmt.Errorf("%s: [SELinux] selected, but '%s' package is not included in the package lists", validateError, selinuxPkgName)
+			}
+		}
+		if len(systemConfig.Users) > 0 {
+			if !foundUserAddPackage {
+				return fmt.Errorf("%s: add users require '%s' package that is not included in the package lists", validateError, userAddPkgName)
 			}
 		}
 	}
