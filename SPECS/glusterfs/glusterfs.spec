@@ -318,7 +318,7 @@ and client framework.
 %package cli
 Summary:          GlusterFS CLI
 %if ( 0%{?mariner} && 0%{?mariner} >= 3 )
-BuildRequires:    bash-completion
+BuildRequires:    bash-completion-devel
 %else
 %if ( ! (0%{?rhel} && 0%{?rhel} < 7) )
 BuildRequires:    pkgconfig(bash-completion)
