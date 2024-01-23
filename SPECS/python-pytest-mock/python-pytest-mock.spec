@@ -8,7 +8,7 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/pytest-dev/pytest-mock/
-Source0:        https://files.pythonhosted.org/packages/96/e1/fb53b62056e6840a36d9a4beb4e42726155594c567b574103435a7131c60/%{pypi_name}-%{version}.tar.gz
+Source0:        https://pypi.io/packages/source/p/pytest-mock/%{pypi_name}-%{version}.tar.gz
 # Can be removed once this bug is resolved: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1006736
 Patch0:         skip_broken_tests_since_3.6.1.patch
 
