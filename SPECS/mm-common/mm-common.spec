@@ -1,6 +1,6 @@
 Summary:        mm-common module
 Name:           mm-common
-Version:        1.0.5
+Version:        1.0.6
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
@@ -41,7 +41,7 @@ make install DESTDIR=%{buildroot}
 
 %changelog
 * Mon Jan 22 2024 Sindhu Karri <lakarri@microsoft.com> - 1.0.5-1
-- Upgrade to 1.0.5
+- Upgrade to 1.0.6
 
 * Thu Feb 17 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 1.0.4-1
 - Upgrading to v1.0.4
