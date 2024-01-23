@@ -3268,8 +3268,8 @@
         "type": "other",
         "other": {
           "name": "environment-modules",
-          "version": "5.2.0",
-          "downloadUrl": "http://downloads.sourceforge.net/modules/modules-5.2.0.tar.bz2"
+          "version": "5.3.1",
+          "downloadUrl": "https://downloads.sourceforge.net/modules/modules-5.3.1.tar.gz"
         }
       }
     },
