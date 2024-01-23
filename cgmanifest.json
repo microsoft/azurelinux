@@ -27577,8 +27577,8 @@
         "type": "other",
         "other": {
           "name": "sleuthkit",
-          "version": "4.9.0",
-          "downloadUrl": "https://github.com/sleuthkit/sleuthkit/releases/download/sleuthkit-4.9.0/sleuthkit-4.9.0.tar.gz"
+          "version": "4.12.1",
+          "downloadUrl": "https://github.com/sleuthkit/sleuthkit/releases/download/sleuthkit-4.12.1/sleuthkit-4.12.1.tar.gz"
         }
       }
     },
