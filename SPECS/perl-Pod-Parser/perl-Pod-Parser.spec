@@ -1,6 +1,6 @@
 Summary:        Basic perl modules for handling Plain Old Documentation (POD)
 Name:           perl-Pod-Parser
-Version:        1.66
+Version:        1.67
 Release:        1%{?dist}
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -72,6 +72,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Tue Jan 23 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.67-1
+- Auto-upgrade to 1.67 - Azure Linux 3.0 - package upgrades
+
 * Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.66-1
 - Auto-upgrade to 1.66 - Azure Linux 3.0 - package upgrades
 

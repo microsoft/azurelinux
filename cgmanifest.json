@@ -19174,8 +19174,8 @@
         "type": "other",
         "other": {
           "name": "perl-Pod-Parser",
-          "version": "1.66",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/MA/MAREKR/Pod-Parser-1.66.tar.gz"
+          "version": "1.67",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/M/MA/MAREKR/Pod-Parser-1.67.tar.gz"
         }
       }
     },
