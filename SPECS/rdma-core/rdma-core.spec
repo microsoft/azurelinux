@@ -626,7 +626,11 @@ fi
 
 %changelog
 * Mon Jan 22 2024 Kanika Nema <kanikanema@microsoft.com> - 49.0-1
-- Upgrade to 49.0 for AzL 3.0 release
+- Upgrade to version 49.0 for AzL 3.0 release
+- Disable pyverbs as it cannot build with Cython > 3, the default for AzL 3.0
+- Use released sources that include the prebuilt doc files as AzL does
+  not include pandoc
+- Package the additional files present in v49.0
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 39.0-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
