@@ -1,16 +1,16 @@
-From 8b4da8007ef59bbc833fed882ddae57bbcd51f1c Mon Sep 17 00:00:00 2001
+From 87b7c11947f6ba154271f8f70720a721d23f040e Mon Sep 17 00:00:00 2001
 From: rpm-build <rpm-build>
 Date: Mon, 26 Jan 2015 12:57:11 -0800
-Subject: [PATCH] libiscsi
+Subject: [PATCH 1/1] libiscsi
 
 ---
  Makefile                                    |    2 +
- libiscsi/Makefile                           |   65 +
- libiscsi/libiscsi.c                         |  617 ++++++++
+ libiscsi/Makefile                           |   77 +
+ libiscsi/libiscsi.c                         |  620 ++++++++
  libiscsi/libiscsi.doxy                      | 1473 +++++++++++++++++++
  libiscsi/libiscsi.h                         |  344 +++++
  libiscsi/no_date_footer.html                |    6 +
- libiscsi/pylibiscsi.c                       |  709 +++++++++
+ libiscsi/pylibiscsi.c                       |  719 +++++++++
  libiscsi/setup.py                           |    9 +
  libiscsi/tests/test_discovery_firmware.c    |   53 +
  libiscsi/tests/test_discovery_sendtargets.c |   60 +
@@ -21,12 +21,11 @@ Subject: [PATCH] libiscsi
  libiscsi/tests/test_logout.c                |   51 +
  libiscsi/tests/test_params.c                |  103 ++
  libiscsi/tests/test_set_auth.c              |   58 +
- usr/Makefile                                |    2 +-
- usr/discovery.c                             |    5 +
+ usr/discovery.c                             |    1 +
  usr/idbm.c                                  |    6 +-
  usr/idbm.h                                  |    3 +
  usr/iscsi_ipc.h                             |    2 +
- 22 files changed, 3769 insertions(+), 4 deletions(-)
+ 21 files changed, 3789 insertions(+), 3 deletions(-)
  create mode 100644 libiscsi/Makefile
  create mode 100644 libiscsi/libiscsi.c
  create mode 100644 libiscsi/libiscsi.doxy
@@ -45,31 +44,31 @@ Subject: [PATCH] libiscsi
  create mode 100644 libiscsi/tests/test_set_auth.c
 
 diff --git a/Makefile b/Makefile
-index 7b445a5..4ab091f 100644
+index 09bda07..a0859b7 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -65,6 +65,7 @@ user: iscsiuio/Makefile
- 	$(MAKE) -C usr
- 	$(MAKE) -C utils
- 	$(MAKE) -C iscsiuio
-+	$(MAKE) -C libiscsi
+@@ -66,6 +66,7 @@ user: deprecation_msg iscsiuio/Makefile
+ 	$(MAKE) $(MFLAGS) -C etc
+ 	$(MAKE) $(MFLAGS) -C iscsiuio
+ 	$(MAKE) $(MFLAGS) -C doc
++	$(MAKE) $(MFLAGS) -C libiscsi
  	@echo
  	@echo "Compilation complete                 Output file"
  	@echo "-----------------------------------  ----------------"
-@@ -85,6 +86,7 @@ iscsiuio/configure iscsiuio/Makefile.in: iscsiuio/configure.ac iscsiuio/Makefile
+@@ -86,6 +87,7 @@ iscsiuio/configure: iscsiuio/configure.ac iscsiuio/Makefile.am
  force: ;
  
- clean:
-+	$(MAKE) -C libiscsi clean
- 	$(MAKE) -C utils/sysdeps clean
- 	$(MAKE) -C utils/fwparam_ibft clean
- 	$(MAKE) -C utils clean
+ clean distclean:
++	$(MAKE) $(MFLAGS) -C libiscsi $@
+ 	$(MAKE) $(MFLAGS) -C sysdeps $@
+ 	$(MAKE) $(MFLAGS) -C utils $@
+ 	$(MAKE) $(MFLAGS) -C usr $@
 diff --git a/libiscsi/Makefile b/libiscsi/Makefile
 new file mode 100644
-index 0000000..53f9746
+index 0000000..7f5d371
 --- /dev/null
 +++ b/libiscsi/Makefile
-@@ -0,0 +1,65 @@
+@@ -0,0 +1,77 @@
 +# This Makefile will work only with GNU make.
 +
 +ifeq ($(TOPDIR),)
@@ -80,7 +79,19 @@ index 0000000..53f9746
 +OPTFLAGS ?= -O2 -g
 +WARNFLAGS ?= -Wall -Wstrict-prototypes
 +CFLAGS = $(OPTFLAGS) $(WARNFLAGS) -I../include -I../usr \
-+		-D$(OSNAME) -fPIC -D_GNU_SOURCE -fvisibility=hidden
++		-D$(OSNAME) -fPIC -D_GNU_SOURCE -fvisibility=hidden \
++		-I../libopeniscsiusr
++
++#CFLAGS ?= -O2 -g
++#CFLAGS += -Wall -Werror -Wextra -fvisibility=hidden -fPIC
++CFLAGS += -I../libopeniscsiusr -I../include -I../usr
++#CFLAGS += $(shell $(PKG_CONFIG) --cflags libkmod)
++CFLAGS += -DSBINDIR=\"$(SBINDIR)\"
++CFLAGS += -DISCSI_DB_ROOT=\"$(DBROOT)\"
++CFLAGS += -DISCSI_VERSION_STR=\"$(ISCSI_VERSION_STR)\"
++
++LDFLAGS = -L../libopeniscsiusr -lopeniscsiusr -lkmod -lcrypto
++
 +LIB = libiscsi.so.0
 +TESTS = tests/test_discovery_sendtargets tests/test_discovery_firmware
 +TESTS += tests/test_login tests/test_logout tests/test_params
@@ -89,13 +100,13 @@ index 0000000..53f9746
 +
 +COMMON_SRCS = sysdeps.o
 +# sources shared between iscsid, iscsiadm and iscsistart
-+ISCSI_LIB_SRCS = netlink.o transport.o cxgbi.o be2iscsi.o iscsi_timer.o initiator_common.o iscsi_err.o session_info.o iscsi_util.o io.o auth.o discovery.o login.o log.o md5.o sha1.o iface.o idbm.o sysfs.o iscsi_sysfs.o iscsi_net_util.o iscsid_req.o iser.o uip_mgmt_ipc.o
++ISCSI_LIB_SRCS = netlink.o transport.o cxgbi.o be2iscsi.o iscsi_timer.o initiator_common.o iscsi_err.o session_info.o iscsi_util.o io.o auth.o discovery.o login.o log.o iface.o idbm.o sysfs.o iscsi_sysfs.o iscsi_net_util.o iscsid_req.o iser.o uip_mgmt_ipc.o
 +FW_PARAM_SRCS = fw_entry.o prom_lex.o prom_parse.tab.o fwparam_ppc.o fwparam_sysfs.o
 +
 +# sources shared with the userspace utils, note we build these separately
 +# to get PIC versions.
 +COMMON_OBJS = $(patsubst %.o, common-objs/%.o, $(COMMON_SRCS))
-+USR_OBJS = $(patsubst %.o, usr-objs/%.o, $(ISCSI_LIB_SRCS) strings.o)
++USR_OBJS = $(patsubst %.o, usr-objs/%.o, $(ISCSI_LIB_SRCS) local_strings.o)
 +FW_OBJS = $(patsubst %.o, fw-objs/%.o, $(FW_PARAM_SRCS))
 +
 +# Flags for the tests
@@ -106,7 +117,7 @@ index 0000000..53f9746
 +lib: $(LIB)
 +tests: $(TESTS)
 +
-+common-objs/%.o: ../utils/sysdeps/%.c
++common-objs/%.o: ../sysdeps/%.c
 +	mkdir -p common-objs
 +	$(CC) $(CFLAGS) -c $< -o $@
 +
@@ -114,7 +125,7 @@ index 0000000..53f9746
 +	mkdir -p usr-objs
 +	$(CC) $(CFLAGS) -c $< -o $@
 +
-+fw-objs/%.o: ../utils/fwparam_ibft/%.c
++fw-objs/%.o: ../usr/fwparam_ibft/%.c
 +	mkdir -p fw-objs
 +	$(CC) $(CFLAGS) -c $< -o $@
 +
@@ -137,10 +148,10 @@ index 0000000..53f9746
 +-include .depend ../usr/.depend
 diff --git a/libiscsi/libiscsi.c b/libiscsi/libiscsi.c
 new file mode 100644
-index 0000000..064e4b5
+index 0000000..3e400a8
 --- /dev/null
 +++ b/libiscsi/libiscsi.c
-@@ -0,0 +1,617 @@
+@@ -0,0 +1,620 @@
 +/*
 + * iSCSI Administration library
 + *
@@ -278,6 +289,7 @@ index 0000000..064e4b5
 +
 +	/* Fill the drec struct with all needed info */
 +	memset(&drec, 0, sizeof drec);
++	drec.iscsid_req_tmo = -1;
 +	idbm_sendtargets_defaults(&drec.u.sendtargets);
 +	drec.type = DISCOVERY_TYPE_SENDTARGETS;
 +	strlcpy(drec.address, address, sizeof(drec.address));
@@ -318,7 +330,8 @@ index 0000000..064e4b5
 +		*found_nodes = calloc(found, sizeof **found_nodes);
 +		if (*found_nodes == NULL) {
 +			snprintf(context->error_str,
-+				 sizeof(context->error_str), strerror(ENOMEM));
++				 sizeof(context->error_str),
++				 "%s", strerror(ENOMEM));
 +			rc = ENOMEM;
 +			goto leave;
 +		}
@@ -370,6 +383,7 @@ index 0000000..064e4b5
 +	CHECK(iface_create_ifaces_from_boot_contexts(&ifaces, &targets));
 +
 +	memset(&drec, 0, sizeof(drec));
++	drec.iscsid_req_tmo = -1;
 +	drec.type = DISCOVERY_TYPE_FW;
 +	rc = idbm_bind_ifaces_to_nodes(discovery_fw, &drec, &ifaces, &rec_list);
 +	if (rc) {
@@ -568,7 +582,7 @@ index 0000000..064e4b5
 +
 +	CHECK(idbm_for_each_iface(&nr_found, (void*)node->iface, login_helper,
 +		(char *)node->name, node->tpgt,
-+		(char *)node->address, node->port))
++		(char *)node->address, node->port, false))
 +	if (nr_found == 0) {
 +		strcpy(context->error_str, "No such node");
 +		rc = ENODEV;
@@ -630,7 +644,7 @@ index 0000000..064e4b5
 +
 +	CHECK(idbm_for_each_iface(&nr_found, &params, idbm_node_set_param,
 +		(char *)node->name, node->tpgt,
-+		(char *)node->address, node->port))
++		(char *)node->address, node->port, false))
 +	if (nr_found == 0) {
 +		strcpy(context->error_str, "No such node");
 +		rc = ENODEV;
@@ -650,7 +664,7 @@ index 0000000..064e4b5
 +	info = idbm_recinfo_alloc(MAX_KEYS);
 +	if (!info) {
 +		snprintf(context->error_str, sizeof(context->error_str),
-+			 strerror(ENOMEM));
++			 "%s", strerror(ENOMEM));
 +		return ENOMEM;
 +	}
 +
@@ -692,7 +706,7 @@ index 0000000..064e4b5
 +	   as most settings should be the same independent of the iface. */
 +	CHECK(idbm_for_each_iface(&nr_found, context, get_parameter_helper,
 +		(char *)node->name, node->tpgt,
-+		(char *)node->address, node->port))
++		(char *)node->address, node->port, false))
 +	if (nr_found == 0) {
 +		strcpy(context->error_str, "No such node");
 +		rc = ENODEV;
@@ -2601,10 +2615,10 @@ index 0000000..1e0c6c4
 +</html>
 diff --git a/libiscsi/pylibiscsi.c b/libiscsi/pylibiscsi.c
 new file mode 100644
-index 0000000..8800853
+index 0000000..40b5955
 --- /dev/null
 +++ b/libiscsi/pylibiscsi.c
-@@ -0,0 +1,709 @@
+@@ -0,0 +1,719 @@
 +/*
 + * iSCSI Administration library
 + *
@@ -2971,8 +2985,13 @@ index 0000000..8800853
 +static PyObject *PyIscsiNode_login(PyObject *self)
 +{
 +	PyIscsiNode *node = (PyIscsiNode *)self;
++	int ret;
 +
-+	if (libiscsi_node_login(context, &node->node)) {
++	Py_BEGIN_ALLOW_THREADS
++	ret = libiscsi_node_login(context, &node->node);
++	Py_END_ALLOW_THREADS
++
++	if (ret) {
 +		PyErr_SetString(PyExc_IOError,
 +				libiscsi_get_error_string(context));
 +		return NULL;
@@ -3158,6 +3177,7 @@ index 0000000..8800853
 +	const struct libiscsi_auth_info *authinfo = NULL;
 +	struct libiscsi_node *found_nodes;
 +	PyObject* found_node_list;
++	int ret;
 +
 +	if (!PyArg_ParseTupleAndKeywords(args, kwds, "s|iO",
 +					kwlist, &address, &port,
@@ -3177,8 +3197,12 @@ index 0000000..8800853
 +		}
 +	}
 +
-+	if (libiscsi_discover_sendtargets(context, address, port, authinfo,
-+					  &nr_found, &found_nodes)) {
++	Py_BEGIN_ALLOW_THREADS
++	ret = libiscsi_discover_sendtargets(context, address, port, authinfo,
++					    &nr_found, &found_nodes);
++	Py_END_ALLOW_THREADS
++
++	if (ret) {
 +		PyErr_SetString(PyExc_IOError,
 +				libiscsi_get_error_string(context));
 +		return NULL;
@@ -3913,21 +3937,8 @@ index 0000000..a21f888
 +
 +	return rc;
 +}
-diff --git a/usr/Makefile b/usr/Makefile
-index 21bb154..885243a 100644
---- a/usr/Makefile
-+++ b/usr/Makefile
-@@ -37,7 +37,7 @@ PKG_CONFIG = /usr/bin/pkg-config
- CFLAGS ?= -O2 -g
- WARNFLAGS ?= -Wall -Wextra -Werror -Wstrict-prototypes -fno-common
- CFLAGS += $(WARNFLAGS) -I../include -I. -D_GNU_SOURCE \
--	  -I$(TOPDIR)/libopeniscsiusr
-+	  -I$(TOPDIR)/libopeniscsiusr -DISNS_ENABLE
- CFLAGS += $(shell $(PKG_CONFIG) --cflags libkmod)
- ISCSI_LIB = -L$(TOPDIR)/libopeniscsiusr -lopeniscsiusr
- LDFLAGS += $(shell $(PKG_CONFIG) --libs libkmod)
 diff --git a/usr/discovery.c b/usr/discovery.c
-index 7dec696..2cf1838 100644
+index 792abcf..ed4dc73 100644
 --- a/usr/discovery.c
 +++ b/usr/discovery.c
 @@ -36,6 +36,7 @@
@@ -3938,40 +3949,11 @@ index 7dec696..2cf1838 100644
  #include "log.h"
  #include "idbm.h"
  #include "iscsi_settings.h"
-@@ -49,10 +50,12 @@
- #include "iface.h"
- #include "iscsi_timer.h"
- #include "iscsi_err.h"
-+#ifdef ISNS_ENABLE
- /* libisns includes */
- #include <libisns/isns.h>
- #include <libisns/paths.h>
- #include <libisns/message.h>
-+#endif
- 
- #ifdef SLP_ENABLE
- #include "iscsi-slp-discovery.h"
-@@ -98,6 +101,7 @@ static int request_initiator_name(int tmo)
- 	return 0;
- }
- 
-+#ifdef ISNS_ENABLE
- void discovery_isns_free_servername(void)
- {
- 	if (isns_config.ic_server_name)
-@@ -377,6 +381,7 @@ retry:
- 	discovery_isns_free_servername();
- 	return rc;
- }
-+#endif
- 
- int discovery_fw(void *data,
- 		 __attribute__((unused))struct iface_rec *iface,
 diff --git a/usr/idbm.c b/usr/idbm.c
-index 27cad0a..2498a03 100644
+index 32e99bc..b730d1c 100644
 --- a/usr/idbm.c
 +++ b/usr/idbm.c
-@@ -1825,9 +1825,9 @@ int idbm_print_all_discovery(int info_level)
+@@ -1829,9 +1829,9 @@ int idbm_print_all_discovery(int info_level)
   * fn should return -1 if it skipped the rec, an ISCSI_ERR error code if
   * the operation failed or 0 if fn was run successfully.
   */
@@ -3985,10 +3967,10 @@ index 27cad0a..2498a03 100644
  	DIR *iface_dirfd;
  	struct dirent *iface_dent;
 diff --git a/usr/idbm.h b/usr/idbm.h
-index ce098b7..d1a7f63 100644
+index 7b1b271..52428ad 100644
 --- a/usr/idbm.h
 +++ b/usr/idbm.h
-@@ -105,6 +105,9 @@ struct rec_op_data {
+@@ -102,6 +102,9 @@ struct rec_op_data {
  	node_rec_t *match_rec;
  	idbm_iface_op_fn *fn;
  };
@@ -3999,10 +3981,10 @@ index ce098b7..d1a7f63 100644
  				char *targetname, bool ruw_lock);
  extern int idbm_for_each_node(int *found, void *data,
 diff --git a/usr/iscsi_ipc.h b/usr/iscsi_ipc.h
-index 47857dd..596543b 100644
+index c3c9917..73a8865 100644
 --- a/usr/iscsi_ipc.h
 +++ b/usr/iscsi_ipc.h
-@@ -162,4 +162,6 @@ struct iscsi_ipc {
+@@ -175,4 +175,6 @@ struct iscsi_ipc {
  			 char *host_stats);
  };
  
@@ -4010,5 +3992,4 @@ index 47857dd..596543b 100644
 +
  #endif /* ISCSI_IPC_H */
 -- 
-2.26.2
-
+2.40.1
