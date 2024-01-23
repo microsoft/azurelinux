@@ -341,41 +341,31 @@ func printSummary(failedSRPMs, failedSRPMsTests map[string]*BuildResult, prebuil
 	logger.Log.Info("--------- Summary ---------")
 	logger.Log.Info("---------------------------")
 
-	logger.Log.Infof(color.GreenString("Number of prebuilt SRPMs:           %d", len(prebuiltSRPMs)))
-	logger.Log.Infof(color.GreenString("Number of prebuilt delta SRPMs:     %d", len(prebuiltDeltaSRPMs)))
-	logger.Log.Infof(color.GreenString("Number of skipped SRPMs tests:      %d", len(skippedSRPMsTests)))
-	logger.Log.Infof(color.GreenString("Number of built SRPMs:              %d", len(builtSRPMs)))
-	logger.Log.Infof(color.GreenString("Number of tested SRPMs:             %d", len(testedSRPMs)))
-	printErrorInfoByVal(len(unresolvedDependencies), len(unresolvedDependencies), "Number of unresolved dependencies:  ")
-	printErrorInfoByVal(len(blockedSRPMs), len(blockedSRPMs), "Number of blocked SRPMs:            ")
-	printErrorInfoByVal(len(blockedSRPMsTests), len(blockedSRPMsTests), "Number of blocked SRPMs tests:      ")
-	printErrorInfoByVal(len(failedSRPMs), len(failedSRPMs), "Number of failed SRPMs:             ")
-	printErrorInfoByVal(len(failedSRPMsTests), len(failedSRPMsTests), "Number of failed SRPMs tests:       ")
-
+	logger.Log.Infof(color.GreenString("Number of prebuilt SRPMs:%12d", len(prebuiltSRPMs)))
+	logger.Log.Infof(color.GreenString("Number of prebuilt delta SRPMs:%6d", len(prebuiltDeltaSRPMs)))
+	logger.Log.Infof(color.GreenString("Number of skipped SRPMs tests:%7d", len(skippedSRPMsTests)))
+	logger.Log.Infof(color.GreenString("Number of built SRPMs:%15d", len(builtSRPMs)))
+	logger.Log.Infof(color.GreenString("Number of tested SRPMs:%14d", len(testedSRPMs)))
+	printErrorInfoByCondition(len(unresolvedDependencies)>0, "%s%3d", "Number of unresolved dependencies:", len(unresolvedDependencies))
+	printErrorInfoByCondition(len(blockedSRPMs)>0, "%s%13d", "Number of blocked SRPMs:", len(blockedSRPMs))
+	printErrorInfoByCondition(len(blockedSRPMsTests)>0, "%s%7d", "Number of blocked SRPMs tests:", len(blockedSRPMsTests))
+	printErrorInfoByCondition(len(failedSRPMs)>0, "%s%14d", "Number of failed SRPMs:", len(failedSRPMs))
+	printErrorInfoByCondition(len(failedSRPMsTests)>0, "%s%8d", "Number of failed SRPMs tests:", len(failedSRPMsTests))
 	if allowToolchainRebuilds && (len(rpmConflicts) > 0 || len(srpmConflicts) > 0) {
 		logger.Log.Infof("Toolchain RPMs conflicts are ignored since ALLOW_TOOLCHAIN_REBUILDS=y")
 	}
 
-	printErrorInfoByVal(boolToInt(!allowToolchainRebuilds), len(rpmConflicts), "Number of toolchain RPM conflicts:  ")
-	printErrorInfoByVal(boolToInt(!allowToolchainRebuilds), len(rpmConflicts), "Number of toolchain SRPM conflicts: ")
+	printErrorInfoByCondition(!allowToolchainRebuilds && len(rpmConflicts)>0, "%s%3d", "Number of toolchain RPM conflicts:", len(rpmConflicts))
+	printErrorInfoByCondition(!allowToolchainRebuilds && len(srpmConflicts)>0, "%s%2d", "Number of toolchain SRPM conflicts:", len(srpmConflicts))
 }
 
-// Helper function to print summary msg and count in specific color, based on val.
-// If val > 0, we print error, else we print info.
-func printErrorInfoByVal(val, count int, msg string) {
-	if (val > 0) {
-		logger.Log.Errorf(color.RedString("%s%d", msg, count))
+// Helper function to print error or info based on condition.
+func printErrorInfoByCondition(condition bool, format string, arg ...interface{}) {
+	if condition {
+		logger.Log.Errorf(color.RedString(format, arg...))
 	} else {
-		logger.Log.Infof(color.GreenString("%s%d", msg, count))
+		logger.Log.Infof(color.GreenString(format, arg...))
 	}
-}
-
-// Helper function converts bool to int. Returns 1 if input is true, 0 otherwise
-func boolToInt(input bool) int {
-	if input {
-		return 1
-	}
-	return 0
 }
 
 // Helper function that converts a map[string]V to a sorted slice containing the map's keys.
