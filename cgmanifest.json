@@ -4270,8 +4270,8 @@
         "type": "other",
         "other": {
           "name": "git-lfs",
-          "version": "3.1.4",
-          "downloadUrl": "https://github.com/git-lfs/git-lfs/archive/v3.1.4.tar.gz"
+          "version": "3.4.1",
+          "downloadUrl": "https://github.com/git-lfs/git-lfs/archive/v3.4.1.tar.gz"
         }
       }
     },
