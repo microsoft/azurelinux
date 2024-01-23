@@ -23234,8 +23234,8 @@
         "type": "other",
         "other": {
           "name": "python-oauthlib",
-          "version": "2.1.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/df/5f/3f4aae7b28db87ddef18afed3b71921e531ca288dc604eb981e9ec9f8853/oauthlib-2.1.0.tar.gz"
+          "version": "3.2.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/6d/fa/fbf4001037904031639e6bfbfc02badfc7e12f137a8afa254df6c4c8a670/oauthlib-3.2.2.tar.gz"
         }
       }
     },
