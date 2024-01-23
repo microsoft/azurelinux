@@ -1,6 +1,6 @@
 Summary:        Metapackage with core sets of packages for distroless containers.
 Name:           distroless-packages
-Version:        3
+Version:        3.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -55,8 +55,8 @@ Requires:       busybox
 %files debug
 
 %changelog
-* Mon Jan 22 2024 Betty Lakes <bettylakes@microsoft.com> - 3-1
-- Version upgraded to 3
+* Mon Jan 22 2024 Betty Lakes <bettylakes@microsoft.com> - 3.0-1
+- Version upgraded to 3.0
 
 * Wed Nov 16 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 0.1-3
 - Replace prebuilt-ca-certificates-base with prebuilt-ca-certificates in minimal
