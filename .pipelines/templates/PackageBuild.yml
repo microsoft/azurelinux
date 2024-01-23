@@ -162,7 +162,7 @@ steps:
       - task: DownloadPipelineArtifact@2
         displayName: "Download input cache RPM from ${{ inputCacheArtifact.name }}"
         inputs:
-          artifact: ${{ inputCacheArtifact.name }}
+          artifact: "${{ inputCacheArtifact.name }}"
           patterns: "**/${{ inputCacheArtifact.rpmsTarball }}"
 
       - script: |
