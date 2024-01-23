@@ -7,7 +7,7 @@ Vendor:        Microsoft Corporation
 Distribution:  Mariner
 Group:         Development/Tools
 URL:           git://git.kernel.org/pub/scm/utils/rt-tests/rt-tests.git
-Source0:       https://www.kernel.org/pub/linux/utils/rt-tests/older/%{name}-%{version}.tar.xz
+Source0:       https://mirrors.edge.kernel.org/pub/linux/utils/%{name}/%{name}-%{version}.tar.xz
 ExclusiveArch: x86_64
 Requires:      bash
 Requires:      bc
