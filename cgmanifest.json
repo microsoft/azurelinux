@@ -22204,8 +22204,8 @@
         "type": "other",
         "other": {
           "name": "python-distlib",
-          "version": "0.3.6",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/d/distlib/distlib-0.3.6.tar.gz"
+          "version": "0.3.8",
+          "downloadUrl": "https://files.pythonhosted.org/packages/c4/91/e2df406fb4efacdf46871c25cde65d3c6ee5e173b7e5a4547a47bae91920/distlib-0.3.8.tar.gz"
         }
       }
     },
