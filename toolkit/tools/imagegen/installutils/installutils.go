@@ -1495,6 +1495,29 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 
 	homeDir := userutils.UserHomeDirectory(username)
 	userSSHKeyDir := filepath.Join(homeDir, ".ssh")
+
+	exists, err = file.PathExists(userSSHKeyDir)
+	if err != nil {
+		logger.Log.Warnf("Error accessing %s directory: %v", userSSHKeyDir, err)
+		return
+	}
+	if !exists {
+		logger.Log.Debugf("Directory %s does not exist. Creating directory...", userSSHKeyDir)
+
+		var permissionVal uint64
+		permissionVal, err = strconv.ParseUint(sshDirectoryPermission, 8, 32)
+		if err != nil {
+			logger.Log.Warnf("Failed to parse permissions: %v", err)
+			return
+		}
+
+		err = os.Mkdir(userSSHKeyDir, os.FileMode(permissionVal))
+		if err != nil {
+			logger.Log.Warnf("Failed to create %s directory: %v", userSSHKeyDir, err)
+			return
+		}
+	}
+
 	authorizedKeysFile := filepath.Join(userSSHKeyDir, "authorized_keys")
 
 	exists, err = file.PathExists(authorizedKeysTempFile)
