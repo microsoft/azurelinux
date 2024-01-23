@@ -1,7 +1,7 @@
 Summary:        Program for compiling packages
 Name:           make
-Version:        4.3
-Release:        3%{?dist}
+Version:        4.4.1
+Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -43,6 +43,9 @@ rm -rf %{buildroot}%{_infodir}
 %{_mandir}/*/*
 
 %changelog
+* Mon Jan 22 2024 Andrew Phelps <anphel@microsoft.com> - 4.4.1-1
+- Upgrade to version 4.4.1
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.3-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
