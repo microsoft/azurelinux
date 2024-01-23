@@ -19,6 +19,12 @@ Provides abstractions for working with the HTTP protocol.
 %prep
 %setup -q -n %{gem_name}-%{version}
 
+# these certs are used to verify the package generated is valid
+# we don't have access to the signing_key private key
+# also redudant as azl already validate src tar while building
+sed -i '/spec.cert_chain/d' %{gem_name}.gemspec
+sed -i '/spec.signing_key/d' %{gem_name}.gemspec 
+
 %build
 gem build %{gem_name}
 
