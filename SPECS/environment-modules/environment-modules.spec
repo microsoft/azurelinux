@@ -1,13 +1,13 @@
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 Summary:        Provides dynamic modification of a user's environment
 Name:           environment-modules
-Version:        5.2.0
+Version:        5.3.1
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://modules.sourceforge.net/
-Source0:        http://downloads.sourceforge.net/modules/modules-%{version}.tar.bz2#/%{name}-%{version}.tar.bz2
+Source0:        https://downloads.sourceforge.net/modules/modules-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  dejagnu
 BuildRequires:  gcc
 BuildRequires:  hostname
@@ -133,7 +133,7 @@ fi
 
 %files
 %license COPYING.GPLv2
-%doc ChangeLog README NEWS.txt MIGRATING.txt CONTRIBUTING.txt INSTALL.txt changes.txt
+%doc ChangeLog.gz README NEWS.txt MIGRATING.txt CONTRIBUTING.txt INSTALL.txt changes.txt
 %{_sysconfdir}/modulefiles
 %ghost %{_sysconfdir}/profile.d/modules.csh
 %ghost %{_sysconfdir}/profile.d/modules.sh
@@ -178,7 +178,7 @@ fi
 * Fri Jan 08 2021 Ruying Chen <v-ruyche@microsoft.com> - 4.4.1-3
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Remove X11 dependencies.
-- Build without vim modules. 
+- Build without vim modules.
 
 * Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 4.4.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
