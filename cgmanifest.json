@@ -17924,8 +17924,8 @@
         "type": "other",
         "other": {
           "name": "perl-IO-Tty",
-          "version": "1.18",
-          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/IO/IO-Tty-1.18.tar.gz"
+          "version": "1.20",
+          "downloadUrl": "https://cpan.metacpan.org/modules/by-module/IO/IO-Tty-1.20.tar.gz"
         }
       }
     },
