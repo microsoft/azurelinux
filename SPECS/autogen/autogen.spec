@@ -1,10 +1,15 @@
 Summary:        The Automated Text and Program Generation Tool
 Name:           autogen
 Version:        5.18.16
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        GPLv3+
 URL:            https://www.gnu.org/software/autogen/
 Source0:        https://ftp.gnu.org/gnu/autogen/rel%{version}/%{name}-%{version}.tar.xz
+# The current autogen release (5.18.16) does not build with Guile > 2.2. The
+# guile version available in AzL 3 is 3.0.9. This patch allows atutogen to
+# accept Guile 3.x versions as well.
+# See https://sourceforge.net/p/autogen/bugs/196/
+Patch1:         allow-guile-3.0.patch
 Group:          System Environment/Tools
 Vendor:         Microsoft Corporation
 BuildRequires:  guile-devel
@@ -40,7 +45,7 @@ Requires:	%{name}-libopts
 This package contains development files for libopts.
 
 %prep
-%setup -q
+%autosetup -v -p1
 %build
 %configure --disable-dependency-tracking
 make %{?_smp_mflags} CFLAGS="%{build_cflags} -Wno-error=format-overflow="
@@ -82,6 +87,9 @@ make -k check
 %exclude /usr/share/info/
 
 %changelog
+* Tue Jan 23 2024 Kanika Nema <kanikanema@microsoft.com> - 5.18.16-9
+- Add a patch to build autogen with guile 3.x
+
 * Mon Feb 21 2022 Muhammad Falak <mwani@microsoft.com> - 5.18.16-8
 - Add an explicit BR on `perl(lib)` to enable build
 - Drop parallel `%{?_smp_mflags}` make flags to enable ptest
