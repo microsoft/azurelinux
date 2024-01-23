@@ -14,6 +14,6 @@
   "config.vga-stdvga": "ca7367ae57665fa01e0ebb741ba5823d646f4b65a9a87657ea163cc9f362a8a8",
   "config.vga-virtio": "afa7d59e1c18ed770cf0e83e3d5dc70866f75fdde83064fbea6e115f79504066",
   "config.vga-vmware": "1bd31f16dd43fb25aa92f9816cbfaae4a19a8faf29ff52bd02429fbaafb78f57",
-  "seabios-1.14.0.tar.gz": "eb70cc62b29aa83e10a653233acebf4bb154d00d0c87dc2a2c6e2da75e5e81fd"
+  "seabios-1.16.3.tar.gz": "374dd8f6938e1673b084de4b2964514f7f9fd1b60eca1c12066c484d26286272"
  }
 }
