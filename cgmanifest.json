@@ -22924,8 +22924,8 @@
         "type": "other",
         "other": {
           "name": "python-libclang",
-          "version": "14.0.6",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/l/libclang/libclang-14.0.6.tar.gz"
+          "version": "16.0.6",
+          "downloadUrl": "https://files.pythonhosted.org/packages/c2/01/ec65dffc8c94bd8cafd359a76992f3212a239a80ead05522995c105432b8/libclang-16.0.6.tar.gz"
         }
       }
     },
