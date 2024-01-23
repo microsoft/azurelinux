@@ -64,7 +64,7 @@ make check
 
 %changelog
 * Mon Jan 22 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 0.9.6-4
-- Initial CBL-Mariner import from Fedora 39.
+- Initial CBL-Mariner import from Fedora 39 (license: MIT).
 
 * Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.6-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
