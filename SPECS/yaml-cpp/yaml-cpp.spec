@@ -7,7 +7,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/jbeder/yaml-cpp
 Source0:        https://github.com/jbeder/yaml-cpp/archive/%{name}-%{version}.tar.gz
-Patch0:         yaml-cpp-static.patch
 BuildRequires:  cmake
 BuildRequires:  gcc
 
@@ -79,7 +78,8 @@ pushd build_static
 
 %changelog
 * Tue Jan 23 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 0.8.0-1
-- Bump version to 0.9.0 from 0.8.0
+- Bump version to 0.8.0 from 0.7.0
+- Removing patch SPECS/yaml-cpp/yaml-cpp-static.patch since the variable been replaced in 0.8.0 with commit hash 4aad2b1 in PR#1077
 
 * Wed Jan 26 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.7.0-1
 - Update to version 0.7.0.
