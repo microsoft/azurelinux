@@ -1,7 +1,7 @@
 Summary:      Default file system
 Name:         filesystem
 Version:      1.1
-Release:      19%{?dist}
+Release:      20%{?dist}
 License:      GPLv3
 Group:        System Environment/Base
 Vendor:       Microsoft Corporation
@@ -178,8 +178,6 @@ cat > %{buildroot}/etc/hosts <<- "EOF"
 
 # End /etc/hosts (network card version)
 EOF
-# and /etc/host.conf file
-echo "multi on" > %{buildroot}/etc/host.conf
 #
 #	7.9. Configuring the setclock Script"
 #
@@ -607,7 +605,6 @@ return 0
 %config(noreplace) /etc/fstab
 %config(noreplace) /etc/group
 %config(noreplace) /etc/hosts
-%config(noreplace) /etc/host.conf
 %config(noreplace) /etc/inputrc
 %config(noreplace) /etc/mtab
 %config(noreplace) /etc/passwd
@@ -732,6 +729,9 @@ return 0
 %config(noreplace) /etc/modprobe.d/tipc.conf
 
 %changelog
+* Tue Jan 23 11:01:43 EST 2024 Dan Streetman <ddstreet@ieee.org> - 1.1-20
+- Revert /etc/host.conf with multi enabled
+
 * Fri Dec 08 2023 Chris Co <chrco@microsoft.com> - 1.1-19
 - Add scriptlet to handle /media symlink failed upgrade issue
 
