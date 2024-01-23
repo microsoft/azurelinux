@@ -1,0 +1,7 @@
+{
+ "Signatures": {
+  "B1D2BD1375BECB784CF4F8C4D73CF638C53C06BE": "7b6d8dbdc6b4ca587ce4ad1a9e7c97379206880cf4b41315bdaef0bc42787cab",
+  "libidn2-2.3.4.tar.gz": "93caba72b4e051d1f8d4f5a076ab63c99b77faee019b72b9783b267986dbb45f",
+  "libidn2-2.3.4.tar.gz.sig": "c55c8cd14f398186407808f188ed5325faa01a62d88e79bb700bd8c839f75ceb"
+ }
+}

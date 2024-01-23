@@ -1362,6 +1362,31 @@
                 "PR": [
                     "https://github.com/microsoft/CBL-Mariner/pull/6829"
                 ]
+            },
+            "CONFIG_DEFAULT_SECURITY_SELINUX": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "Set SELinux as default LSM",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/7332"
+                ]
+            },
+            "CONFIG_X86_IOPL_IOPERM": {
+                "value": [
+                    "y"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for customer to avoid segfault with AMBIOS",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/7180"
+                ]
             }
         }
     }

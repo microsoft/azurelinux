@@ -25,10 +25,12 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/resources"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safemount"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/tdnf"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/userutils"
+	"golang.org/x/sys/unix"
 )
 
 const (
@@ -1262,7 +1264,7 @@ func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err
 			return
 		}
 
-		err = ProvisionUserSSHCerts(installChroot, user.Name, user.SSHPubKeyPaths)
+		err = ProvisionUserSSHCerts(installChroot, user.Name, user.SSHPubKeyPaths, user.SSHPubKeys)
 		if err != nil {
 			return
 		}
@@ -1497,7 +1499,7 @@ func ConfigureUserStartupCommand(installChroot safechroot.ChrootInterface, usern
 	return
 }
 
-func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username string, sshPubKeyPaths []string) (err error) {
+func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username string, sshPubKeyPaths []string, sshPubKeys []string) (err error) {
 	var (
 		pubKeyData []string
 		exists     bool
@@ -1538,8 +1540,10 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 	}
 	defer os.Remove(authorizedKeysTempFile)
 
+	allSSHKeys := make([]string, 0, len(sshPubKeyPaths)+len(sshPubKeys))
+
+	// Add SSH keys from sshPubKeyPaths
 	for _, pubKey := range sshPubKeyPaths {
-		logger.Log.Infof("Adding ssh key (%s) to user (%s)", filepath.Base(pubKey), username)
 		relativeDst := filepath.Join(userSSHKeyDir, filepath.Base(pubKey))
 
 		fileToCopy := safechroot.FileToCopy{
@@ -1552,21 +1556,26 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 			return
 		}
 
-		logger.Log.Infof("Adding ssh key (%s) to user (%s) .ssh/authorized_users", filepath.Base(pubKey), username)
 		pubKeyData, err = file.ReadLines(pubKey)
 		if err != nil {
 			logger.Log.Warnf("Failed to read from SSHPubKey : %v", err)
 			return
 		}
 
-		// Append to the tmp/authorized_users file
-		for _, sshkey := range pubKeyData {
-			sshkey += "\n"
-			err = file.Append(sshkey, authorizedKeysTempFile)
-			if err != nil {
-				logger.Log.Warnf("Failed to append to %s : %v", authorizedKeysTempFile, err)
-				return
-			}
+		allSSHKeys = append(allSSHKeys, pubKeyData...)
+	}
+
+	// Add direct SSH keys
+	allSSHKeys = append(allSSHKeys, sshPubKeys...)
+
+	for _, pubKey := range allSSHKeys {
+		logger.Log.Infof("Adding ssh key (%s) to user (%s) .ssh/authorized_users", filepath.Base(pubKey), username)
+		pubKey += "\n"
+
+		err = file.Append(pubKey, authorizedKeysTempFile)
+		if err != nil {
+			logger.Log.Warnf("Failed to append to %s : %v", authorizedKeysTempFile, err)
+			return
 		}
 	}
 
@@ -1686,29 +1695,62 @@ func selinuxRelabelFiles(systemConfig configuration.SystemConfig, installChroot 
 	selinuxType := strings.TrimSpace(stdout)
 	fileContextPath := fmt.Sprintf(fileContextBasePath, selinuxType)
 
-	logger.Log.Debugf("Running setfiles to apply SELinux labels on mount points: %v", listOfMountsToLabel)
-	err = installChroot.UnsafeRun(func() error {
-		args := []string{"-m", "-v", fileContextPath}
-		args = append(args, listOfMountsToLabel...)
+	targetRootPath := "/mnt/_bindmountroot"
 
-		// We only want to print basic info, filter out the real output unless at trace level (Execute call handles that)
-		files := 0
-		lastFile := ""
-		onStdout := func(args ...interface{}) {
-			if len(args) > 0 {
-				files++
-				lastFile = fmt.Sprintf("%v", args)
-			}
-			if (files % 1000) == 0 {
-				ReportActionf("SELinux: labelled %d files", files)
-			}
-		}
-		err := shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, squashErrors, "setfiles", args...)
+	for _, mountToLabel := range listOfMountsToLabel {
+		logger.Log.Debugf("Running setfiles to apply SELinux labels on mount points: %v", mountToLabel)
+
+		// The chroot environment has a bunch of special filesystems (e.g. /dev, /proc, etc.) mounted within the OS
+		// image. In addition, an image may have placed system directories on separate partitions, and these partitions
+		// will also be mounted within the OS image. These mounts hide the underlying directory that is used as a mount
+		// point, which prevents that directory from receiving an SELinux label from the setfiles command. A well known
+		// way to get an unobstructed view of a filesystem, free from other mount-points, is to create a bind-mount for
+		// that filesystem. Therefore, bind mounts are used to ensure that all directories receive an SELinux label.
+		sourceFullPath := filepath.Join(installChroot.RootDir(), mountToLabel)
+		targetPath := filepath.Join(targetRootPath, mountToLabel)
+		targetFullPath := filepath.Join(installChroot.RootDir(), targetPath)
+
+		bindMount, err := safemount.NewMount(sourceFullPath, targetFullPath, "", unix.MS_BIND, "", true)
 		if err != nil {
-			return fmt.Errorf("failed while labeling files (last file: %s) %w", lastFile, err)
+			return fmt.Errorf("failed to bind mount (%s) while SELinux labeling:\n%w", mountToLabel, err)
 		}
-		return err
-	})
+		defer bindMount.Close()
+
+		err = installChroot.UnsafeRun(func() error {
+			// We only want to print basic info, filter out the real output unless at trace level (Execute call handles that)
+			files := 0
+			lastFile := ""
+			onStdout := func(args ...interface{}) {
+				if len(args) > 0 {
+					files++
+					lastFile = fmt.Sprintf("%v", args)
+				}
+				if (files % 1000) == 0 {
+					ReportActionf("SELinux: labelled %d files", files)
+				}
+			}
+			err := shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, squashErrors, "setfiles", "-m", "-v", "-r",
+				targetRootPath, fileContextPath, targetPath)
+			if err != nil {
+				return fmt.Errorf("failed while labeling files (last file: %s) %w", lastFile, err)
+			}
+			return err
+		})
+		if err != nil {
+			return err
+		}
+
+		err = bindMount.CleanClose()
+		if err != nil {
+			return err
+		}
+	}
+
+	// Cleanup temporary directory.
+	err = os.RemoveAll(targetRootPath)
+	if err != nil {
+		return fmt.Errorf("failed to remove temporary bind mount directory:\n%w", err)
+	}
 
 	return
 }
