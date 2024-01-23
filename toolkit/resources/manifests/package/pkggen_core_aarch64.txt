@@ -62,7 +62,7 @@ findutils-4.9.0-1.azl3.aarch64.rpm
 findutils-lang-4.9.0-1.azl3.aarch64.rpm
 gettext-0.22-1.azl3.aarch64.rpm
 gzip-1.13-1.azl3.aarch64.rpm
-make-4.3-3.azl3.aarch64.rpm
+make-4.4.1-1.azl3.aarch64.rpm
 patch-2.7.6-8.azl3.aarch64.rpm
 libcap-ng-0.8.3-1.azl3.aarch64.rpm
 libcap-ng-devel-0.8.3-1.azl3.aarch64.rpm
