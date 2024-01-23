@@ -9,7 +9,7 @@ Name:           python-%{pkgname}
 Version:        18.9.0
 Release:        1%{?dist}
 License:        BSD
-Url:            https://cherrypy.org/
+Url:            https://cherrypy.dev/
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://pypi.io/packages/source/C/%{pypiname}/%{pypiname}-%{version}.tar.gz
