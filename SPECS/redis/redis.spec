@@ -1,15 +1,13 @@
 Summary:        advanced key-value store
 Name:           redis
-Version:        6.2.13
-Release:        2%{?dist}
+Version:        7.2.4
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/Databases
 URL:            https://redis.io/
 Source0:        https://download.redis.io/releases/%{name}-%{version}.tar.gz
-Patch0:         redis-conf.patch
-Patch1:         disable_active_defrag_big_keys.patch
 BuildRequires:  gcc
 BuildRequires:  make
 BuildRequires:  systemd
@@ -83,6 +81,10 @@ exit 0
 %config(noreplace) %attr(0640, %{name}, %{name}) %{_sysconfdir}/redis.conf
 
 %changelog
+* Tue Jan 23 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 7.2.4-1
+- Bump version to 7.2.4 for Mariner 3.0
+- Removing disable_active_defrag_big_keys.patch since the fix has already released (5843a45d01f76c55288abe00c29931a2520fe521) by PR#8294
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 6.2.13-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
