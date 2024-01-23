@@ -7501,8 +7501,8 @@
         "type": "other",
         "other": {
           "name": "isns-utils",
-          "version": "0.101",
-          "downloadUrl": "https://github.com/open-iscsi/open-isns/archive/v0.101.tar.gz"
+          "version": "0.102",
+          "downloadUrl": "https://github.com/open-iscsi/open-isns/archive/v0.102.tar.gz"
         }
       }
     },
