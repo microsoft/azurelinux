@@ -14464,7 +14464,7 @@
         "other": {
           "name": "nss-mdns",
           "version": "0.15.1",
-          "downloadUrl": "https://github.com/avahi/nss-mdns/releases/download/v0.15.1/nss-mdns-0.15.1.tar.gz"
+          "downloadUrl": "https://github.com/lathiat/nss-mdns/releases/download/v0.15.1/nss-mdns-0.15.1.tar.gz"
         }
       }
     },

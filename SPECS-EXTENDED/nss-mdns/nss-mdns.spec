@@ -66,7 +66,8 @@ authselect disable-feature with-mdns4 &> /dev/null || :
 
 %changelog
 * Mon Jan 22 2024 Alexander Dobrzhansky <cptlangley@gmail.com> - 0.15.1-11     
-- First version of nss-mdns for CBL-Mariner. Spec file imported from Fedora.
+- Initial CBL-Mariner import from Fedora 40 (license: MIT).
+- License verified
 
 * Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.15.1-10
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
