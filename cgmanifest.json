@@ -21914,8 +21914,8 @@
         "type": "other",
         "other": {
           "name": "python-cherrypy",
-          "version": "18.6.1",
-          "downloadUrl": "https://pypi.io/packages/source/C/CherryPy/CherryPy-18.6.1.tar.gz"
+          "version": "18.9.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/bd/5f/e265a49883bfcfb7f2c3d3d9e96197cfe8136783e96c5ce20e201550aaa0/CherryPy-18.9.0.tar.gz"
         }
       }
     },
