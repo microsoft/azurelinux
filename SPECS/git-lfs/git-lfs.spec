@@ -1,8 +1,8 @@
 %global debug_package %{nil}
 Summary:       Git extension for versioning large files
 Name:          git-lfs
-Version:       3.1.4
-Release:       15%{?dist}
+Version:       3.4.1
+Release:       1%{?dist}
 Group:         System Environment/Programming
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
@@ -31,9 +31,9 @@ Source1:       %{name}-%{version}-vendor.tar.gz
 
 BuildRequires: golang
 BuildRequires: which
-BuildRequires: rubygem-ronn
 BuildRequires: tar
 BuildRequires: git
+BuildRequires: rubygem-asciidoctor
 Requires:      git
 %define our_gopath %{_topdir}/.gopath
 
@@ -50,15 +50,15 @@ export GOFLAGS="-buildmode=pie -trimpath -mod=vendor -modcacherw -ldflags=-linkm
 go generate ./commands
 go build .
 export PATH=$PATH:%{gem_dir}/bin
-make man %{?_smp_mflags}
+make man GIT_LFS_SHA=unused VERSION=unused PREFIX=unused
 
 %install
 rm -rf %{buildroot}
 install -D git-lfs %{buildroot}%{_bindir}/git-lfs
 mkdir -p %{buildroot}%{_mandir}/man1
 mkdir -p %{buildroot}%{_mandir}/man5
-install -D man/*.1 %{buildroot}%{_mandir}/man1
-install -D man/*.5 %{buildroot}%{_mandir}/man5
+install -D man/man1/*.1 %{buildroot}%{_mandir}/man1
+install -D man/man5/*.5 %{buildroot}%{_mandir}/man5
 
 %check
 go test -mod=vendor ./...
@@ -77,6 +77,10 @@ git lfs uninstall
 %{_mandir}/man5/*
 
 %changelog
+* Fri Jan 05 2024 Muhammad Falak <mwani@microsoft.com> - 3.4.1-1
+- Bump version to 3.4.1
+- Add BR on asciidoctor & drop un-needed BR
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.1.4-15
 - Bump release to rebuild with go 1.20.10
 
