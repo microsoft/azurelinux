@@ -387,7 +387,8 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 	defer timestamp.StopEvent(nil)
 
 	const (
-		filesystemPkg = "filesystem"
+		filesystemPkg  = "filesystem"
+		shadowUtilsPkg = "shadow-utils"
 	)
 
 	defer stopGPGAgent(installChroot)
@@ -438,6 +439,14 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 	packagesInstalled, err = TdnfInstallWithProgress(filesystemPkg, installRoot, packagesInstalled, totalPackages, true)
 	if err != nil {
 		return
+	}
+	if len(config.Users) > 0 || len(config.Groups) > 0 {
+		shadowUtilsInstalled := 0
+		shadowUtilsInstalled, err = TdnfInstallWithProgress(shadowUtilsPkg, installRoot, packagesInstalled, totalPackages, true)
+		if err != nil {
+			return
+		}
+		packagesInstalled += shadowUtilsInstalled
 	}
 
 	hostname := config.Hostname
