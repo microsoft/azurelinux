@@ -1,5 +1,5 @@
 {
-    "Signatures": {
-     "libclang-14.0.6.tar.gz": "9052a8284d8846984f6fa826b1d7460a66d3b23a486d782633b42b6e3b418789"
-    }
-   }
+  "Signatures": {
+    "libclang-16.0.6.tar.gz": "4acdde39dfe410c877b4ccc0d4b57eb952100e4ee26bbdf6cfdb88e2033a7d31"
+  }
+}
