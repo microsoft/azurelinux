@@ -26515,8 +26515,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-protocol-http",
-          "version": "0.22.5",
-          "downloadUrl": "https://github.com/socketry/protocol-http/archive/refs/tags/v0.22.5.tar.gz"
+          "version": "0.24.7",
+          "downloadUrl": "https://github.com/socketry/protocol-http/archive/refs/tags/v0.24.7.tar.gz"
         }
       }
     },
