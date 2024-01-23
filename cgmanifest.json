@@ -3268,8 +3268,8 @@
         "type": "other",
         "other": {
           "name": "environment-modules",
-          "version": "5.2.0",
-          "downloadUrl": "http://downloads.sourceforge.net/modules/modules-5.2.0.tar.bz2"
+          "version": "5.3.1",
+          "downloadUrl": "https://downloads.sourceforge.net/modules/modules-5.3.1.tar.gz"
         }
       }
     },
@@ -4270,8 +4270,8 @@
         "type": "other",
         "other": {
           "name": "git-lfs",
-          "version": "3.1.4",
-          "downloadUrl": "https://github.com/git-lfs/git-lfs/archive/v3.1.4.tar.gz"
+          "version": "3.4.1",
+          "downloadUrl": "https://github.com/git-lfs/git-lfs/archive/v3.4.1.tar.gz"
         }
       }
     },
@@ -7491,8 +7491,8 @@
         "type": "other",
         "other": {
           "name": "iscsi-initiator-utils",
-          "version": "6.2.1.4+20210729.2a8f9d8",
-          "downloadUrl": "https://github.com/open-iscsi/open-iscsi/archive/2a8f9d81d0d6b5094c3fe9c686e2afb2ec27058a.tar.gz"
+          "version": "2.1.9",
+          "downloadUrl": "https://github.com/open-iscsi/open-iscsi/archive/c26218d9f8afdca44a492a4c3811648bd2880b26.tar.gz"
         }
       }
     },
@@ -10251,8 +10251,8 @@
         "type": "other",
         "other": {
           "name": "libnfs",
-          "version": "4.0.0",
-          "downloadUrl": "https://github.com/sahlberg/libnfs/archive/libnfs-4.0.0/libnfs-4.0.0.tar.gz"
+          "version": "5.0.2",
+          "downloadUrl": "https://github.com/sahlberg/libnfs/archive/libnfs-5.0.2/libnfs-5.0.2.tar.gz"
         }
       }
     },
@@ -10491,8 +10491,8 @@
         "type": "other",
         "other": {
           "name": "libpciaccess",
-          "version": "0.16",
-          "downloadUrl": "https://www.x.org/archive/individual/lib/libpciaccess-0.16.tar.bz2"
+          "version": "0.17",
+          "downloadUrl": "https://www.x.org/archive/individual/lib/libpciaccess-0.17.tar.xz"
         }
       }
     },
@@ -12711,8 +12711,8 @@
         "type": "other",
         "other": {
           "name": "maven",
-          "version": "3.8.7",
-          "downloadUrl": "https://archive.apache.org/dist/maven/maven-3/3.8.7/source/apache-maven-3.8.7-src.tar.gz"
+          "version": "3.9.6",
+          "downloadUrl": "https://archive.apache.org/dist/maven/maven-3/3.9.6/source/apache-maven-3.9.6-src.tar.gz"
         }
       }
     },
@@ -12793,16 +12793,6 @@
           "name": "maven-wagon",
           "version": "3.5.3",
           "downloadUrl": "https://repo1.maven.org/maven2/org/apache/maven/wagon/wagon/3.5.3/wagon-3.5.3-source-release.zip"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "maven3",
-          "version": "3.8.7",
-          "downloadUrl": "https://archive.apache.org/dist/maven/maven-3/3.8.7/source/apache-maven-3.8.7-src.tar.gz"
         }
       }
     },
@@ -27587,8 +27577,8 @@
         "type": "other",
         "other": {
           "name": "sleuthkit",
-          "version": "4.9.0",
-          "downloadUrl": "https://github.com/sleuthkit/sleuthkit/releases/download/sleuthkit-4.9.0/sleuthkit-4.9.0.tar.gz"
+          "version": "4.12.1",
+          "downloadUrl": "https://github.com/sleuthkit/sleuthkit/releases/download/sleuthkit-4.12.1/sleuthkit-4.12.1.tar.gz"
         }
       }
     },
