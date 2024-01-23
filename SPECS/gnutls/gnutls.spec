@@ -1,17 +1,15 @@
 Summary:        The GnuTLS Transport Layer Security Library
 Name:           gnutls
-Version:        3.7.7
-Release:        3%{?dist}
+Version:        3.8.2
+Release:        1%{?dist}
 License:        GPLv3+ AND LGPLv2.1+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://www.gnutls.org
-Source0:        https://www.gnupg.org/ftp/gcrypt/gnutls/v3.7/%{name}-%{version}.tar.xz
-Patch0:         CVE-2023-0361.patch
+Source0:        https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/%{name}-%{version}.tar.xz
 BuildRequires:  autogen-libopts-devel
 BuildRequires:  gc-devel
-BuildRequires:  guile-devel
 BuildRequires:  libtasn1-devel
 BuildRequires:  nettle-devel >= 3.7.2
 BuildRequires:  openssl-devel
@@ -23,7 +21,6 @@ BuildRequires:  which
 Requires:       autogen-libopts
 Requires:       gc
 Requires:       gmp
-Requires:       guile
 Requires:       libtasn1
 Requires:       nettle >= 3.7.2
 Requires:       openssl
@@ -82,9 +79,6 @@ sed -i 's/TESTS += test-ciphers-openssl.sh//'  tests/slow/Makefile.am
 %{_mandir}/man1/*
 %{_datadir}/locale/*
 %{_docdir}/gnutls/*.png
-%{_libdir}/guile/2.0/extensions/*.so*
-%{_libdir}/guile/2.0/site-ccache/gnutls*
-%{_datadir}/guile/site/2.0/gnutls*
 %config(noreplace) %{_sysconfdir}/gnutls/default-priorities
 
 %files devel
@@ -95,6 +89,10 @@ sed -i 's/TESTS += test-ciphers-openssl.sh//'  tests/slow/Makefile.am
 %{_mandir}/man3/*
 
 %changelog
+* Mon Jan 08 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 3.8.2-1
+- Update to version 3.8.2
+- Remove patch that has been incorporated into gnutls
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.7.7-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
