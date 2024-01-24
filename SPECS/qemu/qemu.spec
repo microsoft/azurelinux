@@ -281,7 +281,11 @@ Distribution:   Mariner
 %else
 %define requires_audio_pa %{nil}
 %endif
+%if %{with pipewire}
 %define requires_audio_pipewire Requires: %{name}-audio-pipewire = %{evr}
+%else
+%define requires_audio_pipewire %{nil}
+%endif
 %if %{with sdl}
 %define sdl_drv sdl,
 %define requires_audio_sdl Requires: %{name}-audio-sdl = %{evr}
@@ -455,6 +459,7 @@ Obsoletes: sgabios-bin <= 1:0.20180715git-10.fc38
 %bcond_with libssh
 %bcond_with pulseaudio
 %bcond_with sdl
+%bcond_with pipewire
 %if %{without ppc_support}
 %global excluded_targets %{excluded_targets},ppc-softmmu,ppc64-softmmu,ppc-linux-user,ppc64-linux-user,ppc64le-linux-user
 %endif
@@ -665,8 +670,10 @@ BuildRequires: SDL2_image-devel
 # Used by vnc-display-test
 BuildRequires: pkgconfig(gvnc-1.0)
 %endif
+%if %{with pipewire}
 # Used by pipewire audio backend
 BuildRequires: pipewire-devel
+%endif
 # Used by cryptodev-backend-lkcf
 BuildRequires: keyutils-libs-devel
 # Used by net AF_XDP
@@ -928,11 +935,13 @@ Requires: %{name}-common%{?_isa} = %{version}-%{release}
 This package provides the additional PulseAudio audio driver for QEMU.
 %endif
 
+%if %{with pipewire}
 %package  audio-pipewire
 Summary: QEMU Pipewire audio driver
 Requires: %{name}-common%{?_isa} = %{version}-%{release}
 %description audio-pipewire
 This package provides the additional Pipewire audio driver for QEMU.
+%endif
 
 %if %{with sdl}
 %package  audio-sdl
@@ -1924,7 +1933,9 @@ run_configure \
   --enable-oss \
   --enable-pa \
   --enable-pie \
+%if %{with pipewire}
   --enable-pipewire \
+%endif
   --enable-pixman \
 %if %{have_block_rbd}
   --enable-rbd \
@@ -2588,8 +2599,10 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %files audio-pa
 %{_libdir}/%{name}/audio-pa.so
 %endif
+%if %{with pipewire}
 %files audio-pipewire
 %{_libdir}/%{name}/audio-pipewire.so
+%endif
 %if %{with sdl}
 %files audio-sdl
 %{_libdir}/%{name}/audio-sdl.so
