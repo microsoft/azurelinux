@@ -76,7 +76,7 @@ func getStartSectors(imageLoopDevice string, partitionCount int) (matchStarts []
 		return nil, fmt.Errorf("fdisk failed to list partitions %v:", stderr)
 	}
 
-	// Note that regexp.QuoteMeta does not escape forward slashes, therefore implementing this here
+	// Since regexp.QuoteMeta doesn't escape forward slashes, handling it here
 	escapeForwardSlashesLoopDevice := strings.ReplaceAll(imageLoopDevice, "/", `\/`)
 
 	// Example line from fdisk -l output: "/dev/loop41p2   18432  103064   84633 41.3M Linux filesystem"
@@ -91,13 +91,6 @@ func getStartSectors(imageLoopDevice string, partitionCount int) (matchStarts []
 
 // Get the filesystem size in sectors.
 func getFilesystemSizeInSectors(resize2fsOutput string, imageLoopDevice string) (filesystemSizeInSectors int, err error) {
-	// Get the sector size
-	logicalSectorSize, _, err := diskutils.GetSectorSize(imageLoopDevice)
-	if err != nil {
-		fmt.Errorf("failed to get sector size")
-	}
-	sectorSizeInBytes := int(logicalSectorSize) // cast from uint64 to int
-
 	// Example resize2fs output first line: "Resizing the filesystem on /dev/loop44p2 to 21015 (4k) blocks."
 	re := regexp.MustCompile(`.*to (\d+) \((\d+)([a-zA-Z])\)`)
 	// Get the block count and block size
@@ -127,6 +120,14 @@ func getFilesystemSizeInSectors(resize2fsOutput string, imageLoopDevice string) 
 	}
 
 	filesystemSizeInBytes := blockCount * blockSize
+
+	// Get the sector size
+	logicalSectorSize, _, err := diskutils.GetSectorSize(imageLoopDevice)
+	if err != nil {
+		fmt.Errorf("failed to get sector size")
+	}
+	sectorSizeInBytes := int(logicalSectorSize) // cast from uint64 to int
+
 	return (filesystemSizeInBytes / sectorSizeInBytes), nil
 }
 
