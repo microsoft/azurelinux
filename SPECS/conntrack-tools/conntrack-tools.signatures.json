@@ -1,7 +1,7 @@
 {
  "Signatures": {
-  "conntrack-tools-1.4.5.tar.bz2": "36c6d99c7684851d4d72e75bd07ff3f0ff1baaf4b6f069eb7244990cd1a9a462",
-  "conntrackd.conf": "dc7fa36293263d0674508cba4499c90d20df15eabea7a7d901f2050094ede38b",
+  "conntrack-tools-1.4.8.tar.xz": "067677f4c5f6564819e78ed3a9d4a8980935ea9273f3abb22a420ea30ab5ded6",
+  "conntrackd.conf": "2cb844d97b20b722d9514b3cfdfc131bca6a9d3b4923800d7bfaa3ee2e18b12c",
   "conntrackd.service": "c18f00e7b76df6dce5b7b46e1bb35e6c34f5d1fe329892c1f0327c2712282778"
  }
 }
