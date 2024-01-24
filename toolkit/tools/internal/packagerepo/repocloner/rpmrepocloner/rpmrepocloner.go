@@ -624,7 +624,7 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string) (preBuilt bool, err erro
 			downloadErr, retriable := tdnfDownload(finalArgs...)
 			if downloadErr != nil {
 				if retriable {
-					logger.Log.Debugf("Package cloning attempt %d/%d failed.", retryNum, retry.DefaultDownloadRetryAttempts)
+					logger.Log.Debugf("Package cloning attempt %d/%d failed with a retriable error.", retryNum, retry.DefaultDownloadRetryAttempts)
 				} else {
 					close(cancel)
 				}
