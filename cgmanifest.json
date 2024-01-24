@@ -21593,16 +21593,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "PyPAM",
-          "version": "0.5.0",
-          "downloadUrl": "https://src.fedoraproject.org/repo/pkgs/PyPAM/PyPAM-0.5.0.tar.gz/f1e7c2c56421dda28a75ace59a3c8871/PyPAM-0.5.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "pyparsing",
           "version": "3.0.7",
           "downloadUrl": "https://github.com/pyparsing/pyparsing/releases/download/pyparsing_3.0.7/pyparsing-3.0.7.tar.gz"
