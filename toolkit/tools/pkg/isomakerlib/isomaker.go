@@ -1,7 +1,7 @@
 // Copyright Microsoft Corporation.
 // Licensed under the MIT License.
 
-package main
+package isomakerlib
 
 import (
 	"fmt"
@@ -26,10 +26,12 @@ const (
 	efiBootImgPathRelativeToIsoRoot = "boot/grub2/efiboot.img"
 	initrdEFIBootDirectoryPath      = "boot/efi/EFI/BOOT"
 	isoRootArchDependentDirPath     = "assets/isomaker/iso_root_arch-dependent_files"
+	defaultImageNameBase            = "azure-linux"
 )
 
 // IsoMaker builds ISO images and populates them with packages and files required by the installer.
 type IsoMaker struct {
+	enableBiosBoot     bool                 // Flag deciding whether to include BIOS bootloaders or not in the generated ISO image.
 	unattendedInstall  bool                 // Flag deciding if the installer should run in unattended mode.
 	config             configuration.Config // Configuration for the built ISO image and its installer.
 	configSubDirNumber int                  // Current number for the subdirectories storing files mentioned in the config.
@@ -39,9 +41,11 @@ type IsoMaker struct {
 	efiBootImgPath     string               // Path to the efiboot.img file needed to boot the ISO installer.
 	fetchedRepoDirPath string               // Path to the directory containing an RPM repository with all packages required by the ISO installer.
 	initrdPath         string               // Path to ISO's initrd file.
+	grubCfgPath        string               // Path to ISO's grub.cfg file. If provided, overrides the grub.cfg from the resourcesDirPath location.
 	outputDirPath      string               // Path to the output ISO directory.
 	releaseVersion     string               // Current Mariner release version.
 	resourcesDirPath   string               // Path to the 'resources' directory.
+	imageNameBase      string               // Base name of the ISO to generate (no path, and no file extension).
 	imageNameTag       string               // Optional user-supplied tag appended to the generated ISO's name.
 
 	isoMakerCleanUpTasks []func() // List of clean-up tasks to perform at the end of the ISO generation process.
@@ -52,12 +56,21 @@ func NewIsoMaker(unattendedInstall bool, baseDirPath, buildDirPath, releaseVersi
 	if baseDirPath == "" {
 		baseDirPath = filepath.Dir(configFilePath)
 	}
+
+	imageNameBase := strings.TrimSuffix(filepath.Base(configFilePath), ".json")
+
 	if imageNameTag != "" {
 		imageNameTag = "-" + imageNameTag
 	}
 
+	// readConfigFile() and verifyConfig() panic if an error occurs.
+	config := readConfigFile(configFilePath, baseDirPath)
+	verifyConfig(config, unattendedInstall)
+
 	return &IsoMaker{
+		enableBiosBoot:     true,
 		unattendedInstall:  unattendedInstall,
+		config:             config,
 		baseDirPath:        baseDirPath,
 		buildDirPath:       buildDirPath,
 		initrdPath:         initrdPath,
@@ -66,6 +79,38 @@ func NewIsoMaker(unattendedInstall bool, baseDirPath, buildDirPath, releaseVersi
 		configFilePath:     configFilePath,
 		fetchedRepoDirPath: isoRepoDirPath,
 		outputDirPath:      outputDir,
+		imageNameBase:      imageNameBase,
+		imageNameTag:       imageNameTag,
+	}
+}
+
+func NewIsoMakerWithConfig(unattendedInstall, enableBiosBoot bool, baseDirPath, buildDirPath, releaseVersion, resourcesDirPath string, config configuration.Config, initrdPath, grubCfgPath, isoRepoDirPath, outputDir, imageNameBase, imageNameTag string) *IsoMaker {
+
+	if imageNameBase == "" {
+		imageNameBase = defaultImageNameBase
+	}
+
+	if imageNameTag != "" {
+		imageNameTag = "-" + imageNameTag
+	}
+
+	// verifyConfig() panic if an error occurs.
+	verifyConfig(config, unattendedInstall)
+
+	return &IsoMaker{
+		enableBiosBoot:     enableBiosBoot,
+		unattendedInstall:  unattendedInstall,
+		config:             config,
+		baseDirPath:        baseDirPath,
+		buildDirPath:       buildDirPath,
+		initrdPath:         initrdPath,
+		grubCfgPath:        grubCfgPath,
+		releaseVersion:     releaseVersion,
+		resourcesDirPath:   resourcesDirPath,
+		configFilePath:     "",
+		fetchedRepoDirPath: isoRepoDirPath,
+		outputDirPath:      outputDir,
+		imageNameBase:      imageNameBase,
 		imageNameTag:       imageNameTag,
 	}
 }
@@ -73,8 +118,6 @@ func NewIsoMaker(unattendedInstall bool, baseDirPath, buildDirPath, releaseVersi
 // Make builds the ISO image to 'buildDirPath' with the packages included in the config JSON.
 func (im *IsoMaker) Make() {
 	defer im.isoMakerCleanUp()
-
-	im.readAndVerifyConfig()
 
 	im.initializePaths()
 
@@ -94,19 +137,24 @@ func (im *IsoMaker) buildIsoImage() {
 
 	// For detailed parameter explanation see: https://linux.die.net/man/8/mkisofs.
 	// Mkisofs requires all argument paths to be relative to the input directory.
-	mkisofsArgs := []string{
+	mkisofsArgs := []string{}
+
+	mkisofsArgs = append(mkisofsArgs,
 		// General mkisofs parameters.
-		"-R", "-l", "-D", "-o", isoImageFilePath,
+		"-R", "-l", "-D", "-o", isoImageFilePath)
 
-		// BIOS bootloader, params suggested by https://wiki.syslinux.org/wiki/index.php?title=ISOLINUX.
-		"-b", "isolinux/isolinux.bin", "-c", "isolinux/boot.cat", "-no-emul-boot", "-boot-load-size", "4", "-boot-info-table",
+	if im.enableBiosBoot {
+		mkisofsArgs = append(mkisofsArgs,
+			// BIOS bootloader, params suggested by https://wiki.syslinux.org/wiki/index.php?title=ISOLINUX.
+			"-b", "isolinux/isolinux.bin", "-c", "isolinux/boot.cat", "-no-emul-boot", "-boot-load-size", "4", "-boot-info-table")
+	}
 
+	mkisofsArgs = append(mkisofsArgs,
 		// UEFI bootloader.
 		"-eltorito-alt-boot", "-e", efiBootImgPathRelativeToIsoRoot, "-no-emul-boot",
 
 		// Directory to convert to an ISO.
-		im.buildDirPath,
-	}
+		im.buildDirPath)
 
 	shell.MustExecuteLive("mkisofs", mkisofsArgs...)
 }
@@ -276,16 +324,38 @@ func (im *IsoMaker) prepareWorkDirectory() {
 // copyStaticIsoRootFiles copies architecture-independent files from the
 // Mariner repo directories.
 func (im *IsoMaker) copyStaticIsoRootFiles() {
-	staticIsoRootFilesPath := filepath.Join(im.resourcesDirPath, "assets/isomaker/iso_root_static_files/*")
 
-	logger.Log.Debugf("Copying static ISO root files from '%s'.", staticIsoRootFilesPath)
+	if im.resourcesDirPath == "" && im.grubCfgPath == "" {
+		logger.Log.Panicf("Missing required parameters. Must specify either the resources directory or provide a grub.cfg.")
+	}
 
-	recursiveCopyDereferencingLinks(staticIsoRootFilesPath, im.buildDirPath)
+	if im.resourcesDirPath != "" {
+		staticIsoRootFilesPath := filepath.Join(im.resourcesDirPath, "assets/isomaker/iso_root_static_files/*")
+
+		logger.Log.Infof("Copying static ISO root files from '%s' to '%s'.", staticIsoRootFilesPath, im.buildDirPath)
+
+		recursiveCopyDereferencingLinks(staticIsoRootFilesPath, im.buildDirPath)
+	}
+
+	// im.grubCfgPath allows the user to overwrite the default grub.cfg that is
+	// copied from the resource folder.
+	if im.grubCfgPath != "" {
+		targetGrubCfg := filepath.Join(im.buildDirPath, "boot/grub2/grub.cfg")
+		targetGrubCfgDir := filepath.Dir(targetGrubCfg)
+		logger.PanicOnError(os.MkdirAll(targetGrubCfgDir, os.ModePerm), "Failed while creating directory '%s'.", targetGrubCfgDir)
+
+		logger.Log.Infof("Copying '%s' to '%s'.", im.grubCfgPath, targetGrubCfg)
+		shell.MustExecuteLive("cp", im.grubCfgPath, targetGrubCfg)
+	}
 }
 
 // copyArchitectureDependentIsoRootFiles copies the pre-built UEFI modules required
 // to boot the ISO image.
 func (im *IsoMaker) copyArchitectureDependentIsoRootFiles() {
+	if im.resourcesDirPath == "" || !im.enableBiosBoot {
+		return
+	}
+
 	architectureDependentFilesDirectory := filepath.Join(im.resourcesDirPath, isoRootArchDependentDirPath, runtime.GOARCH, "*")
 
 	logger.Log.Debugf("Copying architecture-dependent (%s) ISO root files from '%s'.", runtime.GOARCH, architectureDependentFilesDirectory)
@@ -462,8 +532,11 @@ func (im *IsoMaker) initializePaths() {
 // buildIsoImageFilePath gets the output ISO file path from the config JSON file name
 // and the image build environment.
 func (im *IsoMaker) buildIsoImageFilePath() string {
-	imageBaseName := strings.TrimSuffix(filepath.Base(im.configFilePath), ".json")
-	isoImageFileName := fmt.Sprintf("%v-%v%v.iso", imageBaseName, im.releaseVersion, im.imageNameTag)
+	isoImageFileNameSuffix := ""
+	if im.releaseVersion != "" || im.imageNameTag != "" {
+		isoImageFileNameSuffix = fmt.Sprintf("-%v%v", im.releaseVersion, im.imageNameTag)
+	}
+	isoImageFileName := fmt.Sprintf("%v%v.iso", im.imageNameBase, isoImageFileNameSuffix)
 
 	return filepath.Join(im.outputDirPath, isoImageFileName)
 }
@@ -484,20 +557,22 @@ func (im *IsoMaker) isoMakerCleanUp() {
 	}
 }
 
-func (im *IsoMaker) readAndVerifyConfig() {
-	config, err := configuration.LoadWithAbsolutePaths(im.configFilePath, im.baseDirPath)
-	logger.PanicOnError(err, "Failed while reading config file from '%s' with base directory '%s'.", im.configFilePath, im.baseDirPath)
+func readConfigFile(configFilePath, baseDirPath string) configuration.Config {
+	config, err := configuration.LoadWithAbsolutePaths(configFilePath, baseDirPath)
+	logger.PanicOnError(err, "Failed while reading config file from '%s' with base directory '%s'.", configFilePath, baseDirPath)
+	return config
+}
+
+func verifyConfig(config configuration.Config, unattendedInstall bool) {
 
 	// Set IsIsoInstall to true
 	for id := range config.SystemConfigs {
 		config.SystemConfigs[id].IsIsoInstall = true
 	}
 
-	if im.unattendedInstall && (len(config.SystemConfigs) > 1) && !config.DefaultSystemConfig.IsDefault {
+	if unattendedInstall && (len(config.SystemConfigs) > 1) && !config.DefaultSystemConfig.IsDefault {
 		logger.Log.Panic("For unattended installation with more than one system configuration present you must select a default one with the [IsDefault] field.")
 	}
-
-	im.config = config
 }
 
 // recursiveCopyDereferencingLinks simulates the behavior of "cp -r -L".
