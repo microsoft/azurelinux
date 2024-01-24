@@ -1,7 +1,7 @@
 Summary:        RDMA core userspace libraries and daemons
 Name:           rdma-core
-Version:        39.0
-Release:        2%{?dist}
+Version:        49.1
+Release:        1%{?dist}
 URL:            https://github.com/linux-rdma/rdma-core
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,13 +20,23 @@ Patch1: 0001-kernel-boot-Do-not-perform-device-rename-on-OPA-devi.patch
 # 32-bit arm is missing required arch-specific memory barriers,
 ExcludeArch: %{arm}
 
+%global azl3 1
 BuildRequires: binutils
 BuildRequires: cmake >= 2.8.11
 BuildRequires: gcc
 BuildRequires: pkg-config
 BuildRequires: pkgconfig(libnl-3.0)
 BuildRequires: pkgconfig(libnl-route-3.0)
+# Disable pyverbs for azl3, as pyverbs cannot build with cython > 3
+# pyverbs/device.c: error: redefinition of '__Pyx_Enum_ibv_event_type_to_py'
+# and non-matching exception definitions
+%if 0%{azl3}
+%define with_pyverbs 0
+%endif
+%if %{with_pyverbs}
 BuildRequires: python3-Cython
+%endif
+BuildRequires: python3
 BuildRequires: python3-docutils
 BuildRequires: python3-devel
 BuildRequires: python3-xml
@@ -210,6 +220,7 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 In conjunction with the kernel ib_srp driver, srp_daemon allows you to
 discover and use SCSI devices via the SCSI RDMA Protocol over InfiniBand.
 
+%if %{with_pyverbs}
 %package -n python3-pyverbs
 Summary: Python3 API over IB verbs
 %{?python_provide:%python_provide python3-pyverbs}
@@ -217,6 +228,7 @@ Summary: Python3 API over IB verbs
 %description -n python3-pyverbs
 Pyverbs is a Cython-based Python API over libibverbs, providing an
 easy, object-oriented access to IB verbs.
+%endif
 
 %prep
 %autosetup -v -p1
@@ -264,7 +276,11 @@ easy, object-oriented access to IB verbs.
          %{EXTRA_CMAKE_FLAGS} \
          -DPYTHON_EXECUTABLE:PATH=%{__python3} \
          -DCMAKE_INSTALL_PYTHON_ARCH_LIB:PATH=%{python3_sitearch} \
+%if %{with_pyverbs}
          -DNO_PYVERBS=0
+%else
+	-DNO_PYVERBS=1
+%endif
 %make_jobs
 
 %install
@@ -339,6 +355,7 @@ fi
 %doc %{_docdir}/%{name}/rxe.md
 %doc %{_docdir}/%{name}/udev.md
 %doc %{_docdir}/%{name}/tag_matching.md
+%doc %{_docdir}/%{name}/70-persistent-ipoib.rules
 %config(noreplace) %{_sysconfdir}/rdma/mlx4.conf
 %config(noreplace) %{_sysconfdir}/rdma/modules/infiniband.conf
 %config(noreplace) %{_sysconfdir}/rdma/modules/iwarp.conf
@@ -346,7 +363,6 @@ fi
 %config(noreplace) %{_sysconfdir}/rdma/modules/rdma.conf
 %config(noreplace) %{_sysconfdir}/rdma/modules/roce.conf
 %config(noreplace) %{_sysconfdir}/rdma/rdma.conf
-%config(noreplace) %{_sysconfdir}/udev/rules.d/*
 %dir %{_sysconfdir}/modprobe.d
 %config(noreplace) %{_sysconfdir}/modprobe.d/mlx4.conf
 %config(noreplace) %{_sysconfdir}/modprobe.d/truescale.conf
@@ -396,6 +412,9 @@ fi
 %{_mandir}/man7/mlx5dv*
 %{_mandir}/man7/mlx4dv*
 %{_mandir}/man3/ibnd_*
+# New in v49.0
+%{_mandir}/man3/manadv*
+%{_mandir}/man7/manadv*
 
 %files -n infiniband-diags-compat
 %{_sbindir}/ibcheckerrs
@@ -514,6 +533,7 @@ fi
 %{_libdir}/libibverbs/*.so
 %{_libdir}/libmlx5.so.*
 %{_libdir}/libmlx4.so.*
+%{_libdir}/libmana.so.*
 %config(noreplace) %{_sysconfdir}/libibverbs.d/*.driver
 %doc %{_docdir}/%{name}/libibverbs.md
 
@@ -598,11 +618,20 @@ fi
 %{_mandir}/man8/srp_daemon.8*
 %doc %{_docdir}/%{name}/ibsrpdm.md
 
+%if %{with_pyverbs}
 %files -n python3-pyverbs
 %{python3_sitearch}/pyverbs
 %{_docdir}/%{name}/tests/*.py
+%endif
 
 %changelog
+* Mon Jan 22 2024 Kanika Nema <kanikanema@microsoft.com> - 49.1-1
+- Upgrade to version 49.1 for AzL 3.0 release
+- Disable pyverbs as it cannot build with Cython > 3, the default for AzL 3.0
+- Use released sources that include the prebuilt doc files as AzL does
+  not include pandoc
+- Package the additional files present in v49.1
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 39.0-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
