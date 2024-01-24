@@ -595,8 +595,8 @@
         "type": "other",
         "other": {
           "name": "aspell",
-          "version": "0.60.8",
-          "downloadUrl": "ftp://ftp.gnu.org/gnu/aspell/aspell-0.60.8.tar.gz"
+          "version": "0.60.8.1",
+          "downloadUrl": "ftp://ftp.gnu.org/gnu/aspell/aspell-0.60.8.1.tar.gz"
         }
       }
     },

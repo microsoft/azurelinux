@@ -1,7 +1,7 @@
 Summary:        Spell checker
 Name:           aspell
-Version:        0.60.8
-Release:        8%{?dist}
+Version:        0.60.8.1
+Release:        1%{?dist}
 # LGPLv2+ .. common/gettext.h
 # LGPLv2  .. modules/speller/default/phonet.hpp,
 #            modules/speller/default/phonet.cpp,
@@ -15,8 +15,6 @@ URL:            http://aspell.net/
 Source:         ftp://ftp.gnu.org/gnu/aspell/aspell-%{version}.tar.gz
 Patch0:         aspell-0.60.7-fileconflict.patch
 Patch1:         aspell-0.60.7-pspell_conf.patch
-Patch2:         aspell-0.60.7-mp.patch
-Patch3:         CVE-2019-25051.patch
 BuildRequires:  chrpath
 BuildRequires:  gcc-c++
 BuildRequires:  gettext
@@ -47,8 +45,6 @@ and header files needed for Aspell development.
 %setup -q
 %patch0 -p1 -b .fc
 %patch1 -p1 -b .mlib
-%patch2 -p1 -b .ai
-%patch3 -p1 -b .obs
 iconv -f iso-8859-2 -t utf-8 < manual/aspell.info > manual/aspell.info.aux
 mv manual/aspell.info.aux manual/aspell.info
 
@@ -116,6 +112,9 @@ rm -f %{buildroot}%{_infodir}/dir
 %{_mandir}/man1/pspell-config.1*
 
 %changelog
+* Mon Jan 22 2024 Sean Dougherty <sdougherty@microsoft.com> - 0.60.8.1-1
+- Upgrade to 0.60.8.1 for Mariner 3.0
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.60.8-8
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
