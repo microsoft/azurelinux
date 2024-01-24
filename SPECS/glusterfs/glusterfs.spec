@@ -729,13 +729,12 @@ sed -i 's| \\\$compiler_flags |&\\\$LDFLAGS |' libtool
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|' libtool
 
-make %{?_smp_mflags}
+%make_build
 
 %check
 make check
 
 %install
-rm -rf %{buildroot}
 make install DESTDIR=%{buildroot}
 %if ( 0%{!?_without_server:1} )
 %if ( 0%{_for_fedora_koji_builds} )
