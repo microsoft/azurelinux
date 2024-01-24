@@ -890,11 +890,11 @@ fi
 # to /var/lib. (N.B. Starting with 3.3.0 all gluster files are in /var/lib
 # in gluster.org RPMs.) Be careful to copy them on the off chance that
 # /etc and /var/lib are on separate file systems
-if [ -d /etc/glusterd -a ! -h %{_sharedstatedir}/glusterd ]; then
+if [ -d %{_sysconfdir}/glusterd -a ! -h %{_sharedstatedir}/glusterd ]; then
     mkdir -p %{_sharedstatedir}/glusterd
-    cp -a /etc/glusterd %{_sharedstatedir}/glusterd
-    rm -rf /etc/glusterd
-    ln -sf %{_sharedstatedir}/glusterd /etc/glusterd
+    cp -a %{_sysconfdir}/glusterd %{_sharedstatedir}/glusterd
+    rm -rf %{_sysconfdir}/glusterd
+    ln -sf %{_sharedstatedir}/glusterd %{_sysconfdir}/glusterd
 fi
 
 # Rename old volfiles in an RPM-standard way.  These aren't actually
@@ -910,8 +910,8 @@ fi
 # add marker translator
 # but first make certain that there are no old libs around to bite us
 # BZ 834847
-if [ -e /etc/ld.so.conf.d/glusterfs.conf ]; then
-    rm -f /etc/ld.so.conf.d/glusterfs.conf
+if [ -e %{_sysconfdir}/ld.so.conf.d/glusterfs.conf ]; then
+    rm -f %{_sysconfdir}/ld.so.conf.d/glusterfs.conf
     %{_sbindir}/ldconfig
 fi
 
