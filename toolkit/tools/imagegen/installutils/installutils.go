@@ -1489,7 +1489,7 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 
 	// Skip user SSH directory generation when not provided with public keys
 	// Let SSH handle the creation of this folder on its first use
-	if len(sshPubKeyPaths) == 0 {
+	if len(sshPubKeyPaths) == 0 && len(sshPubKeys) == 0 {
 		return
 	}
 
