@@ -2902,7 +2902,6 @@
                 "pth",
                 "pyasn1-modules",
                 "pyOpenSSL",
-                "PyPAM",
                 "pyparsing",
                 "pytest",
                 "python-appdirs",
