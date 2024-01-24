@@ -346,7 +346,7 @@ hydrate-cached-rpms:
 	$(if $(CACHED_PACKAGES_ARCHIVE),,$(error Must set CACHED_PACKAGES_ARCHIVE=<path>))
 	@mkdir -p $(remote_rpms_cache_dir)
 	@echo Unpacking cache RPMs from $(CACHED_PACKAGES_ARCHIVE) into $(remote_rpms_cache_dir)
-	@tar -xf $(CACHED_PACKAGES_ARCHIVE) -C $(remote_rpms_cache_dir) --strip-components 1 --skip-old-files --touch --checkpoint=100000 --checkpoint-action=echo="%T" --wildcards '*.rpm'
+	@tar -xf $(CACHED_PACKAGES_ARCHIVE) -C $(remote_rpms_cache_dir) --strip-components 1 --skip-old-files --touch --checkpoint=100000 --checkpoint-action=echo="%T"
 # The cached RPMs directory has a flat structure, so we need to move the RPMs into the cache's root directory.
 	@find $(remote_rpms_cache_dir) -mindepth 2 -name "*.rpm" -exec mv {} $(remote_rpms_cache_dir) \;
 	@find $(remote_rpms_cache_dir) -mindepth 1 -type d -and ! -name repodata -exec rm -fr {} +
