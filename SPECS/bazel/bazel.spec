@@ -31,8 +31,8 @@ A fast, scalable, multi-language and extensible build system.
 export JAVA_HOME=$(find %{_libdir}/jvm -name "msopenjdk*")
 ln -s %{_bindir}/python3 %{_bindir}/python
 
-export BAZEL_CXXOPTS='-std=c++14'
-EXTRA_BAZEL_ARGS="--tool_java_runtime_version=local_jdk --repo_env=BAZEL_CXXOPTS --remote_download_minimal" ./compile.sh
+export BAZEL_CXXOPTS="-std=c++14"
+EXTRA_BAZEL_ARGS="--tool_java_runtime_version=local_jdk --cxxopt='-std=c++14'--remote_download_minimal" ./compile.sh
 
 %install
 mkdir -p %{buildroot}/%{_bindir}
