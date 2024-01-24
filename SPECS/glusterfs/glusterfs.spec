@@ -692,12 +692,6 @@ GlusterFS Events
 
 %prep
 %autosetup -p1 -n %{name}-%{version}%{?prereltag}
-%if ( ! %{_usepython3} )
-echo "fixing python shebangs..."
-for f in api events extras geo-replication libglusterfs tools xlators; do
-find $f -type f -exec sed -i 's|/usr/bin/python3|/usr/bin/python2|' {} \;
-done
-%endif
 
 %build
 
