@@ -26,13 +26,6 @@ A fast, scalable, multi-language and extensible build system.
 
 %prep
 %autosetup -p1 -c -n %{name}-%{version}
-# Modify source to "#include <limits>" which resolves gcc11 errors:
-# graphcycles.cc:451:26: error: 'numeric_limits' is not a member of 'std'"
-sed -i 's/#include <string.h>/#include <string.h>\n#include <limits>/g' third_party/ijar/common.h
-sed -i 's/<limits.h>/<limits>\n#include <climits>/g' src/main/cpp/util/numbers.cc
-# abseil-cpp source contains graphcycles.cc in "derived/distdir/df3ea785d8c30a9503321a3d35ee7d35808f190d.tar.gz"
-# since graphcycles.cc fails to compile on gcc11 and already includes <utility>, force inclusion of <limits>
-sed -i 's/#include <utility>/#include <utility>\n#include <limits>/g' /usr/include/c++/11.2.0/array
 
 %build
 export JAVA_HOME=$(find %{_libdir}/jvm -name "msopenjdk*")
