@@ -643,53 +643,6 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string) (preBuilt bool, err erro
 	return
 }
 
-func tdnfDownload(args ...string) (err error, retriable bool) {
-	const (
-		unresolvedOutputPrefix = "No package"
-		unresolvedOutputSuffix = "available"
-	)
-
-	stdout, stderr, err := shell.Execute("tdnf", args...)
-
-	logger.Log.Debugf("stdout: %s", stdout)
-	logger.Log.Debugf("stderr: %s", stderr)
-
-	// ============== TDNF SPECIFIC IMPLEMENTATION ==============
-	//
-	// Check if TDNF could not resolve a given package. If TDNF does not find a requested package,
-	// it will not error. Instead it will print a message to stdout. Check for this message.
-	//
-	// *NOTE*: TDNF will attempt best effort. If N packages are requested, and 1 cannot be found,
-	// it will still download N-1 packages while also printing the message.
-	splitStdout := strings.Split(stdout, "\n")
-	for _, line := range splitStdout {
-		trimmedLine := strings.TrimSpace(line)
-		// If a package was not available, update err
-		if strings.HasPrefix(trimmedLine, unresolvedOutputPrefix) && strings.HasSuffix(trimmedLine, unresolvedOutputSuffix) {
-			err = fmt.Errorf(trimmedLine)
-			return
-		}
-	}
-
-	//
-	// *NOTE*: There are cases in which some of our upstream package repositories are hosted
-	// on services that are prone to intermittent errors (e.g., HTTP 502 errors). We
-	// specifically look for such known cases and apply some retry logic in hopes of getting
-	// a better result; note that we don't indiscriminately retry because there are legitimate
-	// cases in which the upstream repo doesn't contain the package and a 404 error is to be
-	// expected. This involves scraping through stderr, but it's better than not doing so.
-	//
-	if err != nil {
-		serverErrorMatch := serverErrorsRegex.FindStringSubmatch(stderr)
-		if len(serverErrorMatch) > errorCodeIndex {
-			logger.Log.Debugf("Encountered possibly intermittent HTTP %s error.", serverErrorMatch[errorCodeIndex])
-			retriable = true
-		}
-	}
-
-	return
-}
-
 func convertPackageVersionToTdnfArg(pkgVer *pkgjson.PackageVer) (tdnfArg string) {
 	tdnfArg = pkgVer.Name
 
@@ -839,4 +792,51 @@ func (r *RpmRepoCloner) reposArgsHaveOnlyLocalSources(reposArgs []string) bool {
 	}
 
 	return true
+}
+
+func tdnfDownload(args ...string) (err error, retriable bool) {
+	const (
+		unresolvedOutputPrefix = "No package"
+		unresolvedOutputSuffix = "available"
+	)
+
+	stdout, stderr, err := shell.Execute("tdnf", args...)
+
+	logger.Log.Debugf("stdout: %s", stdout)
+	logger.Log.Debugf("stderr: %s", stderr)
+
+	// ============== TDNF SPECIFIC IMPLEMENTATION ==============
+	//
+	// Check if TDNF could not resolve a given package. If TDNF does not find a requested package,
+	// it will not error. Instead it will print a message to stdout. Check for this message.
+	//
+	// *NOTE*: TDNF will attempt best effort. If N packages are requested, and 1 cannot be found,
+	// it will still download N-1 packages while also printing the message.
+	splitStdout := strings.Split(stdout, "\n")
+	for _, line := range splitStdout {
+		trimmedLine := strings.TrimSpace(line)
+		// If a package was not available, update err
+		if strings.HasPrefix(trimmedLine, unresolvedOutputPrefix) && strings.HasSuffix(trimmedLine, unresolvedOutputSuffix) {
+			err = fmt.Errorf(trimmedLine)
+			return
+		}
+	}
+
+	//
+	// *NOTE*: There are cases in which some of our upstream package repositories are hosted
+	// on services that are prone to intermittent errors (e.g., HTTP 502 errors). We
+	// specifically look for such known cases and apply some retry logic in hopes of getting
+	// a better result; note that we don't indiscriminately retry because there are legitimate
+	// cases in which the upstream repo doesn't contain the package and a 404 error is to be
+	// expected. This involves scraping through stderr, but it's better than not doing so.
+	//
+	if err != nil {
+		serverErrorMatch := serverErrorsRegex.FindStringSubmatch(stderr)
+		if len(serverErrorMatch) > errorCodeIndex {
+			logger.Log.Debugf("Encountered possibly intermittent HTTP %s error.", serverErrorMatch[errorCodeIndex])
+			retriable = true
+		}
+	}
+
+	return
 }
