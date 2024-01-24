@@ -6,7 +6,7 @@ Distribution:   Mariner
 %bcond_without check
 
 # This spec is for AzLinux
-%global azl 1
+%global azl 3
 %global azl_no_ui 1
 
 %global __strip /bin/true
@@ -218,7 +218,7 @@ Distribution:   Mariner
 %endif
 %endif
 
-%global have_ui 0
+%global have_ui 1
 %if 0%{?azl_no_ui}
 %global have_ui 0
 %endif
@@ -548,7 +548,9 @@ BuildRequires: systemd-devel
 BuildRequires: libpmem-devel
 %endif
 # qemu-keymap
+%if %{have_ui}
 BuildRequires: pkgconfig(xkbcommon)
+%endif
 %if %{have_opengl}
 BuildRequires: pkgconfig(epoxy)
 BuildRequires: pkgconfig(libdrm)
@@ -697,12 +699,16 @@ Requires: %{name}-system-microblaze = %{version}-%{release}
 Requires: %{name}-system-mips = %{version}-%{release}
 Requires: %{name}-system-nios2 = %{version}-%{release}
 Requires: %{name}-system-or1k = %{version}-%{release}
+%if %{with ppc_support}
 Requires: %{name}-system-ppc = %{version}-%{release}
+%endif
 Requires: %{name}-system-riscv = %{version}-%{release}
 Requires: %{name}-system-rx = %{version}-%{release}
 Requires: %{name}-system-s390x = %{version}-%{release}
 Requires: %{name}-system-sh4 = %{version}-%{release}
+%if %{with sparc_support}
 Requires: %{name}-system-sparc = %{version}-%{release}
+%endif
 Requires: %{name}-system-tricore = %{version}-%{release}
 Requires: %{name}-system-x86 = %{version}-%{release}
 Requires: %{name}-system-xtensa = %{version}-%{release}
@@ -1507,7 +1513,7 @@ Requires: %{name}-common = %{version}-%{release}
 %description system-or1k-core
 This package provides the QEMU system emulator for OpenRisc32 boards.
 
-
+%if %{with ppc_support}
 %package system-ppc
 Summary: QEMU system emulator for PPC
 Requires: %{name}-system-ppc-core = %{version}-%{release}
@@ -1523,7 +1529,7 @@ Requires: SLOF
 Requires: seavgabios-bin
 %description system-ppc-core
 This package provides the QEMU system emulator for PPC and PPC64 systems.
-
+%endif
 
 %package system-riscv
 Summary: QEMU system emulator for RISC-V
@@ -1580,7 +1586,7 @@ Requires: %{name}-common = %{version}-%{release}
 %description system-sh4-core
 This package provides the QEMU system emulator for SH4 boards.
 
-
+%if %{with sparc_support}
 %package system-sparc
 Summary: QEMU system emulator for SPARC
 Requires: %{name}-system-sparc-core = %{version}-%{release}
@@ -1594,7 +1600,7 @@ Requires: %{name}-common = %{version}-%{release}
 Requires: openbios
 %description system-sparc-core
 This package provides the QEMU system emulator for SPARC and SPARC64 systems.
-
+%endif
 
 %package system-tricore
 Summary: QEMU system emulator for tricore
@@ -1950,7 +1956,9 @@ run_configure \
 %if %{enable_werror}
   --enable-werror \
 %endif
+%if %{have_ui}
   --enable-xkbcommon \
+%endif
   \
   \
   --audio-drv-list=pipewire,pa,sdl,alsa,%{?jack_drv}oss \
@@ -2710,17 +2718,21 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_bindir}/qemu-mipsn32el
 %{_bindir}/qemu-nios2
 %{_bindir}/qemu-or1k
+%if %{with ppc_support}
 %{_bindir}/qemu-ppc
 %{_bindir}/qemu-ppc64
 %{_bindir}/qemu-ppc64le
+%endif
 %{_bindir}/qemu-riscv32
 %{_bindir}/qemu-riscv64
 %{_bindir}/qemu-s390x
 %{_bindir}/qemu-sh4
 %{_bindir}/qemu-sh4eb
+%if %{with sparc_support}
 %{_bindir}/qemu-sparc
 %{_bindir}/qemu-sparc32plus
 %{_bindir}/qemu-sparc64
+%endif
 %{_bindir}/qemu-xtensa
 %{_bindir}/qemu-xtensaeb
 
@@ -2787,6 +2799,7 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_datadir}/systemtap/tapset/qemu-or1k.stp
 %{_datadir}/systemtap/tapset/qemu-or1k-log.stp
 %{_datadir}/systemtap/tapset/qemu-or1k-simpletrace.stp
+%if %{with ppc_support}
 %{_datadir}/systemtap/tapset/qemu-ppc.stp
 %{_datadir}/systemtap/tapset/qemu-ppc-log.stp
 %{_datadir}/systemtap/tapset/qemu-ppc-simpletrace.stp
@@ -2796,6 +2809,7 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_datadir}/systemtap/tapset/qemu-ppc64le.stp
 %{_datadir}/systemtap/tapset/qemu-ppc64le-log.stp
 %{_datadir}/systemtap/tapset/qemu-ppc64le-simpletrace.stp
+%endif
 %{_datadir}/systemtap/tapset/qemu-riscv32.stp
 %{_datadir}/systemtap/tapset/qemu-riscv32-log.stp
 %{_datadir}/systemtap/tapset/qemu-riscv32-simpletrace.stp
@@ -2811,6 +2825,7 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_datadir}/systemtap/tapset/qemu-sh4eb.stp
 %{_datadir}/systemtap/tapset/qemu-sh4eb-log.stp
 %{_datadir}/systemtap/tapset/qemu-sh4eb-simpletrace.stp
+%if %{with sparc_support}
 %{_datadir}/systemtap/tapset/qemu-sparc.stp
 %{_datadir}/systemtap/tapset/qemu-sparc-log.stp
 %{_datadir}/systemtap/tapset/qemu-sparc-simpletrace.stp
@@ -2820,6 +2835,7 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_datadir}/systemtap/tapset/qemu-sparc64.stp
 %{_datadir}/systemtap/tapset/qemu-sparc64-log.stp
 %{_datadir}/systemtap/tapset/qemu-sparc64-simpletrace.stp
+%endif
 %{_datadir}/systemtap/tapset/qemu-x86_64.stp
 %{_datadir}/systemtap/tapset/qemu-x86_64-log.stp
 %{_datadir}/systemtap/tapset/qemu-x86_64-simpletrace.stp
@@ -3196,7 +3212,7 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_datadir}/systemtap/tapset/qemu-system-or1k-simpletrace.stp
 %{_mandir}/man1/qemu-system-or1k.1*
 
-
+%if %{with ppc_support}
 %files system-ppc
 %files system-ppc-core
 %{_bindir}/qemu-system-ppc
@@ -3219,7 +3235,7 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %if %{have_memlock_limits}
 %{_sysconfdir}/security/limits.d/95-kvm-memlock.conf
 %endif
-
+%endif
 
 %files system-riscv
 %files system-riscv-core
@@ -3268,7 +3284,7 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_mandir}/man1/qemu-system-sh4.1*
 %{_mandir}/man1/qemu-system-sh4eb.1*
 
-
+%if %{with sparc_support}
 %files system-sparc
 %files system-sparc-core
 %{_bindir}/qemu-system-sparc
@@ -3283,7 +3299,7 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_mandir}/man1/qemu-system-sparc64.1*
 %{_datadir}/%{name}/QEMU,tcx.bin
 %{_datadir}/%{name}/QEMU,cgthree.bin
-
+%endif
 
 %files system-tricore
 %files system-tricore-core
