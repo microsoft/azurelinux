@@ -73,8 +73,8 @@ build_graph() {
 
 # exit if not running as root
 if [ "$EUID" -ne 0 ]; then
-  echo -e "\033[31mThis requires running as root\033[0m "
-  exit
+  print_error "This requires running as root"
+  exit 1
 fi
 
 script_dir=$(realpath $(dirname "${BASH_SOURCE[0]}"))
@@ -119,6 +119,8 @@ BUILD_SRPMS_DIR=$(make --no-print-directory -s printvar-BUILD_SRPMS_DIR 2> /dev/
 RPMS_DIR=$(make --no-print-directory -s printvar-RPMS_DIR 2> /dev/null)                 # default: $repo_path/out/RPMS
 TOOL_BINS_DIR=$(make --no-print-directory -s printvar-TOOL_BINS_DIR 2> /dev/null)       # default: $repo_path/toolkit/out/tools
 PKGBUILD_DIR=$(make --no-print-directory -s printvar-PKGBUILD_DIR 2> /dev/null)         # default: $repo_path/build/pkg_artifacts
+TOOLCHAIN_RPMS_DIR=$(make --no-print-directory -s printvar-TOOLCHAIN_RPMS_DIR 2> /dev/null) # default: $repo_path/build/toolchain_rpms
+build_arch=$(make --no-print-directory -s printvar-build_arch 2> /dev/null)
 popd
 
 # Assign remaining default values based on folder definitions
@@ -126,8 +128,13 @@ tmp_dir=${BUILD_DIR}/containerized-rpmbuild/tmp
 mkdir -p ${tmp_dir}
 [[ -z "${build_mount_dir}" ]] && build_mount_dir="$BUILD_DIR"
 [[ ! -d "${build_mount_dir}" ]] && { print_error " Directory ${build_mount_dir} does not exist"; exit 1; }
+# TODO: Modify toolchain make command when DAILY_BUILD_ID is discontinued
+if [[ ( ! -d "${TOOLCHAIN_RPMS_DIR}" ) || ( -z "$(ls -A ${TOOLCHAIN_RPMS_DIR}/${build_arch})" ) || ( -z "$(ls -A ${TOOLCHAIN_RPMS_DIR}/noarch)" ) ]]; then
+    print_error "Toolchain RPMS are not populated. Run make toolchain REBUILD_TOOLS=y DAILY_BUILD_ID=<daily_build_id>"
+    exit 1
+fi
 
-cd "${script_dir}"  || { echo "ERROR: Could not change directory to ${script_dir}"; exit 1; }
+cd "${script_dir}"  || { print_error "Could not change directory to ${script_dir}"; exit 1; }
 
 # ==================== Setup ====================
 
