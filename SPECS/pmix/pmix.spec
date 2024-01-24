@@ -99,6 +99,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libpmix.so.2*
 %{_libdir}/%{name}/*.so
 %{_mandir}/man1/*.1*
+%{_mandir}/man5/*.5*
 
 %files devel
 %{_datadir}/%{name}/*.supp
@@ -106,6 +107,8 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_includedir}/pmix/
 %{_libdir}/libpmix.so
 %{_libdir}/pkgconfig/*.pc
+%{_mandir}/man3/*.3*
+%{_docdir}/%{name}/
 
 %files tools
 %{_bindir}/*
