@@ -90,7 +90,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %files
 %license LICENSE
-%doc README
+%doc README.md
 %dir %{_datadir}/%{name}
 %dir %{_libdir}/%{name}
 %dir %{_sysconfdir}/%{name}
