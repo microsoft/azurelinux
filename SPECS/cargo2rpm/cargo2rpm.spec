@@ -12,6 +12,10 @@ Source:         %{url}/archive/%{version}/cargo2rpm-%{version}.tar.gz
 BuildArch:      noarch
  
 BuildRequires:  python3-devel
+BuildRequires:  python3-packaging
+BuildRequires:  python3-pip
+BuildRequires:  python3-setuptools
+BuildRequires:  python3-wheel
 %if %{with check}
 BuildRequires:  %{py3_dist pytest}
 %endif
