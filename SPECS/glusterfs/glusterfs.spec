@@ -115,15 +115,15 @@
 %global glustereventsd_svcfile %{_unitdir}/glustereventsd.service
 %global glusterfssharedstorage_svcfile %{_unitdir}/glusterfssharedstorage.service
 %else
-%global systemd_post()  /sbin/chkconfig --add %1 >/dev/null 2>&1 || : \
+%global systemd_post()  %{_sbindir}/chkconfig --add %1 >/dev/null 2>&1 || : \
 %{nil}
-%global systemd_preun() /sbin/chkconfig --del %1 >/dev/null 2>&1 || : \
+%global systemd_preun() %{_sbindir}/chkconfig --del %1 >/dev/null 2>&1 || : \
 %{nil}
-%global systemd_postun_with_restart() /sbin/service %1 condrestart >/dev/null 2>&1 || : \
+%global systemd_postun_with_restart() %{_sbindir}/service %1 condrestart >/dev/null 2>&1 || : \
 %{nil}
-%global service_start()   /sbin/service %1 start >/dev/null 2>&1 || : \
+%global service_start()   %{_sbindir}/service %1 start >/dev/null 2>&1 || : \
 %{nil}
-%global service_stop()    /sbin/service %1 stop >/dev/null 2>&1 || : \
+%global service_stop()    %{_sbindir}/service %1 stop >/dev/null 2>&1 || : \
 %{nil}
 %global service_install() install -D -p -m 0755 %1.init %{buildroot}%2 \
 %{nil}
@@ -621,10 +621,10 @@ Requires:         lvm2
 %if ( 0%{?_with_systemd:1} )
 %{?systemd_requires}
 %else
-Requires(post):   /sbin/chkconfig
-Requires(preun):  /sbin/service
-Requires(preun):  /sbin/chkconfig
-Requires(postun): /sbin/service
+Requires(post):   %{_sbindir}/chkconfig
+Requires(preun):  %{_sbindir}/service
+Requires(preun):  %{_sbindir}/chkconfig
+Requires(postun): %{_sbindir}/service
 %endif
 %if (0%{?_with_firewalld:1})
 # we install firewalld rules, so we need to have the directory owned
@@ -840,7 +840,7 @@ find ./tests ./run-tests.sh -type f | cpio -pd %{buildroot}%{_prefix}/share/glus
 ## All %%post should be placed here and keep them sorted
 ##
 %post
-/sbin/ldconfig
+%{_sbindir}/ldconfig
 %if ( 0%{!?_without_syslog:1} )
 %endif
 exit 0
@@ -862,19 +862,19 @@ exit 0
 %endif
 
 %post -n libglusterfs0
-/sbin/ldconfig
+%{_sbindir}/ldconfig
 
 %post -n libgfapi0
-/sbin/ldconfig
+%{_sbindir}/ldconfig
 
 %post -n libgfchangelog0
-/sbin/ldconfig
+%{_sbindir}/ldconfig
 
 %post -n libgfrpc0
-/sbin/ldconfig
+%{_sbindir}/ldconfig
 
 %post -n libgfxdr0
-/sbin/ldconfig
+%{_sbindir}/ldconfig
 
 %if ( 0%{!?_without_server:1} )
 %post server
@@ -919,7 +919,7 @@ fi
 # BZ 834847
 if [ -e /etc/ld.so.conf.d/glusterfs.conf ]; then
     rm -f /etc/ld.so.conf.d/glusterfs.conf
-    /sbin/ldconfig
+    %{_sbindir}/ldconfig
 fi
 
 %if (0%{?_with_firewalld:1})
@@ -955,7 +955,7 @@ exit 0
 ##
 %pre
 getent group gluster > /dev/null || groupadd -r gluster
-getent passwd gluster > /dev/null || useradd -r -g gluster -d %{_rundir}/gluster -s /sbin/nologin -c "GlusterFS daemons" gluster
+getent passwd gluster > /dev/null || useradd -r -g gluster -d %{_rundir}/gluster -s %{_sbindir}/nologin -c "GlusterFS daemons" gluster
 exit 0
 
 ##-----------------------------------------------------------------------------
@@ -1158,7 +1158,7 @@ exit 0
 %dir %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator
 %dir %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/mount
      %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/mount/fuse.so
-/sbin/mount.glusterfs
+%{_sbindir}/mount.glusterfs
 %if ( 0%{!?_without_fusermount:1} )
 %{_bindir}/fusermount-glusterfs
 %endif
