@@ -645,9 +645,9 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string) (preBuilt bool, err erro
 
 func tdnfDownload(args ...string) (err error, retriable bool) {
 	const (
-		unresolvedOutputPrefix  = "No package"
 		toyboxConflictsPrefix   = "toybox conflicts"
 		unresolvedOutputPostfix = "available"
+		unresolvedOutputPrefix  = "No package"
 	)
 
 	var (
