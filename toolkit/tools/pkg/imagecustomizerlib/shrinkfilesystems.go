@@ -66,7 +66,6 @@ func shrinkFilesystems(imageLoopDevice string, outputImageFile string) error {
 			}
 		}
 	}
-
 	return nil
 }
 
