@@ -73,7 +73,7 @@ func shrinkFilesystems(imageLoopDevice string, outputImageFile string) error {
 func getStartSectors(imageLoopDevice string, partitionCount int) (matchStarts [][]string, err error) {
 	stdout, stderr, err := shell.Execute("sudo", "fdisk", "-l", imageLoopDevice)
 	if err != nil {
-		return nil, fmt.Errorf("fdisk failed to list partitions %v:", stderr)
+		return nil, fmt.Errorf("fdisk failed to list partitions: \n%v", stderr)
 	}
 
 	// Since regexp.QuoteMeta doesn't escape forward slashes, handling it here
