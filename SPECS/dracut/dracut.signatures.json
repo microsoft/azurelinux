@@ -3,6 +3,8 @@
   "dracut-055.tar.xz": "4baa08206cceeb124dbf1075a0daf774b5a8f144ce2e01d82a144af3020fd65b",
   "lgpl-2.1.txt": "dc626520dcd53a22f727af3ee42c770e56c97a64fe3adb063799d8ab032fe551",
   "megaraid.conf": "914824cdbe0c525b71efa05a75e453335b0068beb8bc28bef2a5866d74bf7dd4",
-  "mkinitrd": "32a0e19de954a356a0f1903a1f75d3266493b55d71b0eeab6bd07b585e955dcf"
+  "mkinitrd": "32a0e19de954a356a0f1903a1f75d3266493b55d71b0eeab6bd07b585e955dcf",
+  "module-setup.sh": "d12f6f1e4e3e4300c7e635ff995cc27100072c570687ec5b35c601eaa4bc5096",
+  "overlayfs-mount.sh": "c07bda578a79a1fe2c4ce7f7c4d21a2e4487d3e94ea680c590c23a2ed00b3e5e"
  }
 }
