@@ -169,51 +169,51 @@ Patch001:       include-eventtypes-always.patch
 
 BuildRoot:        %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
-BuildRequires:    bison
-BuildRequires:    flex
-BuildRequires:    gcc
-BuildRequires:    libaio-devel
-BuildRequires:    libacl-devel
-BuildRequires:    libuuid-devel
-BuildRequires:    libtool
-BuildRequires:    libxml2-devel
-BuildRequires:    make
-BuildRequires:    ncurses-devel
-BuildRequires:    openssl-devel
-BuildRequires:    openssl
-BuildRequires:    python%{_pythonver}-devel
-BuildRequires:    readline-devel
-BuildRequires:    userspace-rcu-devel >= 0.7
+BuildRequires:  bison
+BuildRequires:  flex
+BuildRequires:  gcc
+BuildRequires:  libaio-devel
+BuildRequires:  libacl-devel
+BuildRequires:  libuuid-devel
+BuildRequires:  libtool
+BuildRequires:  libxml2-devel
+BuildRequires:  make
+BuildRequires:  ncurses-devel
+BuildRequires:  openssl-devel
+BuildRequires:  openssl
+BuildRequires:  python%{_pythonver}-devel
+BuildRequires:  readline-devel
+BuildRequires:  userspace-rcu-devel >= 0.7
 
 %if (0%{?_with_firewalld:1})
-BuildRequires:    firewalld
+BuildRequires:  firewalld
 %endif
 %if ( 0%{!?_without_tcmalloc:1} )
-BuildRequires:    gperftools-devel
+BuildRequires:  gperftools-devel
 %endif
 %if 0%{?_with_asan:1}
-BuildRequires:    libasan
+BuildRequires:  libasan
 %endif
 %if ( 0%{!?_without_georeplication:1} )
-BuildRequires:    libattr-devel
+BuildRequires:  libattr-devel
 %endif
 %if ( 0%{?_with_cmocka:1} )
-BuildRequires:    libcmocka-devel >= 1.0.1
+BuildRequires:  libcmocka-devel >= 1.0.1
 %endif
 %if ( 0%{?_with_ipv6default:1} ) || ( 0%{!?_without_libtirpc:1} )
-BuildRequires:    libtirpc-devel
+BuildRequires:  libtirpc-devel
 %endif
 %if 0%{?_with_tsan:1}
-BuildRequires:    libtsan
+BuildRequires:  libtsan
 %endif
 %if ( 0%{!?_without_linux_io_uring:1} )
-BuildRequires:    liburing-devel
+BuildRequires:  liburing-devel
 %endif
 %if 0%{?_require_rpcgen:1}
-BuildRequires:    rpcgen
+BuildRequires:  rpcgen
 %endif
 %if ( 0%{?_with_systemd:1} )
-BuildRequires:    systemd
+BuildRequires:  systemd
 %endif
 
 Requires:         libgfrpc0%{?_isa} = %{version}-%{release}
@@ -228,15 +228,15 @@ Requires:         gperftools-libs%{?_isa}
 %{?systemd_requires}
 %endif
 
-Obsoletes:        %{name}-common < %{version}-%{release}
-Obsoletes:        %{name}-core < %{version}-%{release}
-Obsoletes:        %{name}-rdma < %{version}-%{release}
+Obsoletes:      %{name}-common < %{version}-%{release}
+Obsoletes:      %{name}-core < %{version}-%{release}
+Obsoletes:      %{name}-rdma < %{version}-%{release}
 %if ( 0%{!?_with_gnfs:1} )
-Obsoletes:        %{name}-gnfs < %{version}-%{release}
+Obsoletes:      %{name}-gnfs < %{version}-%{release}
 %endif
 
-Provides:         %{name}-common = %{version}-%{release}
-Provides:         %{name}-core = %{version}-%{release}
+Provides:       %{name}-common = %{version}-%{release}
+Provides:       %{name}-core = %{version}-%{release}
 
 %description
 GlusterFS is a distributed file-system capable of scaling to several
