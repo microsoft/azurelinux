@@ -975,8 +975,11 @@ touch %{buildroot}%{_sharedstatedir}/glusterd/nfs/run/nfs.pid
 
 find ./tests ./run-tests.sh -type f | cpio -pd %{buildroot}%{_prefix}/share/glusterfs
 
+%if 0%{!?mariner}
+# Mariner does not require a clean stage
 %clean
 rm -rf %{buildroot}
+%endif
 
 ##-----------------------------------------------------------------------------
 ## All %%post should be placed here and keep them sorted
