@@ -130,7 +130,7 @@ mkdir -p ${tmp_dir}
 [[ ! -d "${build_mount_dir}" ]] && { print_error " Directory ${build_mount_dir} does not exist"; exit 1; }
 # TODO: Modify toolchain make command when DAILY_BUILD_ID is discontinued
 if [[ ( ! -d "${TOOLCHAIN_RPMS_DIR}" ) || ( -z "$(ls -A ${TOOLCHAIN_RPMS_DIR}/${build_arch})" ) || ( -z "$(ls -A ${TOOLCHAIN_RPMS_DIR}/noarch)" ) ]]; then
-    print_error "Toolchain RPMS are not populated. Run make toolchain REBUILD_TOOLS=y DAILY_BUILD_ID=<daily_build_id>"
+    print_error "Toolchain RPMS are not populated. Run sudo make toolchain REBUILD_TOOLS=y DAILY_BUILD_ID=<daily_build_id>"
     exit 1
 fi
 
