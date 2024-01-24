@@ -317,16 +317,12 @@ and client framework.
 
 %package cli
 Summary:          GlusterFS CLI
-%if ( 0%{?mariner} && 0%{?mariner} >= 3 )
-BuildRequires:    bash-completion-devel
-%else
 %if ( ! (0%{?rhel} && 0%{?rhel} < 7) )
 BuildRequires:    pkgconfig(bash-completion)
 # bash-completion >= 1.90 satisfies this requirement.
 # If it is not available, the condition can be adapted
 # and the completion script will be installed in the backwards compatible
 # %{sysconfdir}/bash_completion.d
-%endif
 %endif
 Requires:         libglusterfs0%{?_isa} = %{version}-%{release}
 
