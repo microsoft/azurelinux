@@ -173,7 +173,6 @@ steps:
           fi
 
           sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" hydrate-cached-rpms CACHED_PACKAGES_ARCHIVE="$rpms_archive"
-          rm "$rpms_archive"
         displayName: "Populate cache RPMs"
 
   - script: |
