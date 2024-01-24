@@ -589,7 +589,7 @@ BuildArch:        noarch
 # for glusterd
 Requires:         %{name}-server = %{version}-%{release}
 # depending on the distribution, we need pacemaker or resource-agents
-Requires:         %{_prefix}/lib/ocf/resource.d
+Requires:         %{_libdir}/ocf/resource.d
 
 %description resource-agents
 GlusterFS is a distributed file-system capable of scaling to several
@@ -1096,7 +1096,7 @@ exit 0
 #exclude ganesha related files
 %exclude %{_sysconfdir}/ganesha/ganesha-ha.conf.sample
 %exclude %{_libexecdir}/ganesha/*
-%exclude %{_prefix}/lib/ocf/resource.d/heartbeat/*
+%exclude %{_libdir}/ocf/resource.d/heartbeat/*
 %endif
 
 %files cli
@@ -1275,7 +1275,7 @@ exit 0
 %dir %{_libexecdir}/ganesha
 %{_sysconfdir}/ganesha/ganesha-ha.conf.sample
 %{_libexecdir}/ganesha/*
-%{_prefix}/lib/ocf/resource.d/heartbeat/*
+%{_libdir}/ocf/resource.d/heartbeat/*
 %{_sharedstatedir}/glusterd/hooks/1/start/post/S31ganesha-start.sh
 %ghost      %attr(0644,-,-) %config(noreplace) %{_sysconfdir}/ganesha/ganesha-ha.conf
 %ghost %dir %attr(0755,-,-) %{_localstatedir}/run/gluster/shared_storage/nfs-ganesha
@@ -1286,7 +1286,7 @@ exit 0
 %if ( 0%{!?_without_ocf:1} )
 %files resource-agents
 # /usr/lib is the standard for OCF, also on x86_64
-%{_prefix}/lib/ocf/resource.d/glusterfs
+%{_libdir}/ocf/resource.d/glusterfs
 %endif
 
 %if ( 0%{!?_without_server:1} )
@@ -1438,7 +1438,7 @@ exit 0
      %{_libexecdir}/glusterfs/peer_add_secret_pub
 
 %if ( 0%{?_with_firewalld:1} )
-%{_prefix}/lib/firewalld/services/glusterfs.xml
+%{_libdir}/firewalld/services/glusterfs.xml
 %endif
 # end of server files
 %endif
