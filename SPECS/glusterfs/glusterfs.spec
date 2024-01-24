@@ -1,11 +1,3 @@
-#
-# Use mariner=<version> for Mariner-specific settings
-#
-%global mariner 3
-#
-#
-#
-
 %global __brp_python_bytecompile %{nil}
 # This package depends on automagic byte compilation
 # https://fedoraproject.org/wiki/Changes/No_more_automagic_Python_bytecompilation_phase_2
@@ -19,9 +11,6 @@
 # if you wish to compile an rpm with address sanitizer...
 # rpmbuild -ta @PACKAGE_NAME@-@PACKAGE_VERSION@.tar.gz --with asan
 %{?_with_asan:%global _with_asan --enable-asan}
-%if ( 0%{?rhel} && 0%{?rhel} < 7 )
-%global _with_asan %{nil}
-%endif
 # cmocka
 # if you wish to compile an rpm with cmocka unit testing...
 # rpmbuild -ta @PACKAGE_NAME@-@PACKAGE_VERSION@.tar.gz --with cmocka
@@ -54,10 +43,6 @@
 # If you wish to compile an rpm without linux-io_uring support...
 # rpmbuild -ta  @PACKAGE_NAME@-@PACKAGE_VERSION@.tar.gz --without linux-io_uring
 %{?_without_linux_io_uring:%global _without_linux_io_uring --disable-linux-io_uring}
-# Disable linux-io_uring on unsupported distros.
-%if ( 0%{?fedora} && 0%{?fedora} <= 32 ) || ( 0%{?rhel} && 0%{?rhel} <= 7 )
-%global _without_linux_io_uring --disable-linux-io_uring
-%endif
 # libtirpc
 # if you wish to compile an rpm without TIRPC (i.e. use legacy glibc rpc)
 # rpmbuild -ta @PACKAGE_NAME@-@PACKAGE_VERSION@.tar.gz --without libtirpc
@@ -69,15 +54,8 @@
 %ifnarch x86_64
 %global _without_tcmalloc --without-tcmalloc
 %endif
-%if ( 0%{?mariner} && 0%{?mariner} >= 3 )
 # Use same malloc that previous CBL-Mariner used
 %global _without_tcmalloc --without-tcmalloc
-%endif
-# Do not use libtirpc on EL6, it does not have xdr_uint64_t() and xdr_uint32_t
-# Do not use libtirpc on EL7, it does not have xdr_sizeof()
-%if ( 0%{?rhel} && 0%{?rhel} <= 7 )
-%global _without_libtirpc --without-libtirpc
-%endif
 # ocf
 # if you wish to compile an rpm without the OCF resource agents...
 # rpmbuild -ta @PACKAGE_NAME@-@PACKAGE_VERSION@.tar.gz --without ocf
@@ -87,27 +65,15 @@
 # rpmbuild -ta @PACKAGE_NAME@-@PACKAGE_VERSION@.tar.gz --without server
 %{?_without_server:%global _without_server --without-server}
 # disable server components forcefully as rhel <= 6
-%if ( 0%{?rhel} && 0%{?rhel} <= 6 ) || ( 0%{?mariner} && 0%{?mariner} >= 3 )
 %global _without_server --without-server
-%endif
 # syslog
 # if you wish to build rpms without syslog logging, compile like this
 # rpmbuild -ta @PACKAGE_NAME@-@PACKAGE_VERSION@.tar.gz --without syslog
 %{?_without_syslog:%global _without_syslog --disable-syslog}
-# disable syslog forcefully as rhel <= 6 doesn't have rsyslog or rsyslog-mmcount
-# Fedora deprecated syslog, see
-#  https://fedoraproject.org/wiki/Changes/NoDefaultSyslog
-# (And what about RHEL7?)
-%if ( 0%{?fedora} && 0%{?fedora} >= 20 ) || ( 0%{?rhel} && 0%{?rhel} <= 6 )
-%global _without_syslog --disable-syslog
-%endif
 # tsan
 # if you wish to compile an rpm with thread sanitizer...
 # rpmbuild -ta @PACKAGE_NAME@-@PACKAGE_VERSION@.tar.gz --with tsan
 %{?_with_tsan:%global _with_tsan --enable-tsan}
-%if ( 0%{?rhel} && 0%{?rhel} < 7 )
-%global _with_tsan %{nil}
-%endif
 # valgrind
 # if you wish to compile an rpm to run all processes under valgrind...
 # rpmbuild -ta @PACKAGE_NAME@-@PACKAGE_VERSION@.tar.gz --with valgrind
@@ -117,15 +83,8 @@
 ##
 # selinux booleans whose defalut value needs modification
 # these booleans will be consumed by "%%selinux_set_booleans" macro.
-%if ( 0%{?rhel} && 0%{?rhel} >= 8 )
-%global selinuxbooleans rsync_full_access=1 rsync_client=1
-%endif
-%if ( 0%{?fedora} ) || ( 0%{?rhel} && 0%{?rhel} > 6 ) || ( 0%{?mariner} && 0%{?mariner} >= 3 )
 %global _with_systemd true
-%endif
-%if ( 0%{?fedora} ) || ( 0%{?rhel} && 0%{?rhel} >= 7 ) || ( 0%{?mariner} && 0%{?mariner} >= 3 )
 %global _with_firewalld --enable-firewalld
-%endif
 %if 0%{?_tmpfilesdir:1}
 %global _with_tmpfilesdir --with-tmpfilesdir=%{_tmpfilesdir}
 %else
@@ -139,19 +98,9 @@
 %global _with_gnfs %{nil}
 %global _without_ocf --without-ocf
 %endif
-%if ( 0%{?fedora} ) || ( 0%{?rhel} && 0%{?rhel} > 7 ) || ( 0%{?mariner} && 0%{?mariner} >= 3 )
 %global _usepython3 1
 %global _pythonver 3
-%else
-%global _usepython3 0
-%global _pythonver 2
-%endif
 # From https://fedoraproject.org/wiki/Packaging:Python#Macros
-%if ( 0%{?rhel} && 0%{?rhel} <= 6 ) && ( 0%{!?mariner} )
-%{!?python2_sitelib: %global python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
-%{!?python2_sitearch: %global python2_sitearch %(python2 -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(1))")}
-%global _rundir %{_localstatedir}/run
-%endif
 %if ( 0%{?_with_systemd:1} )
 %global service_start()   /bin/systemctl --quiet start %1.service || : \
 %{nil}
@@ -184,33 +133,19 @@
 %global glustereventsd_svcfile %{_sysconfdir}/init.d/glustereventsd
 %endif
 %{!?_pkgdocdir: %global _pkgdocdir %{_docdir}/%{name}-%{version}}
-# We do not want to generate useless provides and requires for xlator
-# .so files to be set for glusterfs packages.
-# Filter all generated:
-#
-# TODO: RHEL5 does not have a convenient solution
-%if ( 0%{?rhel} == 6 )
-# filter_setup exists in RHEL6 only
-%filter_provides_in %{_libdir}/glusterfs/%{version}/
-%global __filter_from_req %{?__filter_from_req} | grep -v -P '^(?!lib).*\.so.*$'
-%filter_setup
-%else
 # modern rpm and current Fedora do not generate requires when the
 # provides are filtered
 %global __provides_exclude_from ^%{_libdir}/glusterfs/%{version}/.*$
-%endif
 %global bashcompdir %(pkg-config --variable=completionsdir bash-completion 2>/dev/null)
 %if "%{bashcompdir}" == ""
 %global bashcompdir ${sysconfdir}/bash_completion.d
 %endif
-%if ( 0%{?mariner} && 0%{?mariner} >= 3 )
 # Skip regression-tests because they previously were excluded in
 # CBL-Mariner glusterfs and the new version introduces a dependency
 # (dbench)
 %global _without_regression_tests true
 # Explicitly require rpcgen
 %global _require_rpcgen true
-%endif
 ##-----------------------------------------------------------------------------
 ## All package definitions should be placed here and keep them sorted
 ##
@@ -227,11 +162,10 @@ Source1:        glusterd.sysconfig
 Source2:        glusterfsd.sysconfig
 Source7:        glusterfsd.service
 Source8:        glusterfsd.init
-%if ( 0%{?mariner} && 0%{?mariner} >= 3 )
+
 # Patch created for Mariner to fix build break related to
 # including eventtypes.h
 Patch001:       include-eventtypes-always.patch
-%endif
 
 BuildRoot:        %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
@@ -250,10 +184,10 @@ Requires:         libgfxdr0%{?_isa} = %{version}-%{release}
 %if ( 0%{?_with_systemd:1} )
 %{?systemd_requires}
 %endif
-%if 0%{?_with_asan:1} && !( 0%{?rhel} && 0%{?rhel} < 7 )
+%if 0%{?_with_asan:1}
 BuildRequires:    libasan
 %endif
-%if 0%{?_with_tsan:1} && !( 0%{?rhel} && 0%{?rhel} < 7 )
+%if 0%{?_with_tsan:1}
 BuildRequires:    libtsan
 %endif
 BuildRequires:    bison flex
@@ -265,19 +199,13 @@ BuildRequires:    python%{_pythonver}-devel
 %if ( 0%{!?_without_tcmalloc:1} )
 BuildRequires:    gperftools-devel
 %endif
-%if ( 0%{?rhel} && 0%{?rhel} < 8 )
-BuildRequires:    python-ctypes
-%endif
 %if ( 0%{?_with_ipv6default:1} ) || ( 0%{!?_without_libtirpc:1} )
 BuildRequires:    libtirpc-devel
 %endif
-%if ( 0%{?fedora} && 0%{?fedora} > 27 ) || ( 0%{?rhel} && 0%{?rhel} > 7 ) || ( 0%{?_require_rpcgen:1} )
+%if 0%{?_require_rpcgen:1}
 BuildRequires:    rpcgen
 %endif
 BuildRequires:    userspace-rcu-devel >= 0.7
-%if ( 0%{?rhel} && 0%{?rhel} <= 6 )
-BuildRequires:    automake
-%endif
 BuildRequires:    libuuid-devel
 %if ( 0%{?_with_cmocka:1} )
 BuildRequires:    libcmocka-devel >= 1.0.1
@@ -317,13 +245,11 @@ and client framework.
 
 %package cli
 Summary:          GlusterFS CLI
-%if ( ! (0%{?rhel} && 0%{?rhel} < 7) )
 BuildRequires:    pkgconfig(bash-completion)
 # bash-completion >= 1.90 satisfies this requirement.
 # If it is not available, the condition can be adapted
 # and the completion script will be installed in the backwards compatible
 # %{sysconfdir}/bash_completion.d
-%endif
 Requires:         libglusterfs0%{?_isa} = %{version}-%{release}
 
 %description cli
@@ -403,26 +329,6 @@ Requires:         pcs >= 0.10.0
 Requires:         resource-agents >= 4.2.0
 Requires:         dbus
 
-%if ( 0%{?rhel} && 0%{?rhel} == 6 )
-Requires:         cman, pacemaker, corosync
-%endif
-
-%if ( 0%{?fedora} ) || ( 0%{?rhel} && 0%{?rhel} > 5 )
-# we need portblock resource-agent in 3.9.5 and later.
-Requires:         net-tools
-%endif
-
-%if ( 0%{?fedora} && 0%{?fedora} > 25  || ( 0%{?rhel} && 0%{?rhel} > 6 ) )
-%if ( 0%{?rhel} && 0%{?rhel} < 8 )
-Requires: selinux-policy >= 3.13.1-160
-Requires(post):   policycoreutils-python
-Requires(postun): policycoreutils-python
-%else
-Requires(post):   policycoreutils-python-utils
-Requires(postun): policycoreutils-python-utils
-%endif
-%endif
-
 %description ganesha
 GlusterFS is a distributed file-system capable of scaling to several
 petabytes. It aggregates various storage bricks over Infiniband RDMA
@@ -448,15 +354,6 @@ Requires:         python%{_pythonver}-gluster = %{version}-%{release}
 Requires:         rsync
 Requires:         util-linux
 Requires:         tar
-
-# required for setting selinux bools
-%if ( 0%{?rhel} && 0%{?rhel} >= 8 )
-Requires(post):      policycoreutils-python-utils
-Requires(postun):    policycoreutils-python-utils
-Requires:            selinux-policy-targeted
-Requires(post):      selinux-policy-targeted
-BuildRequires:       selinux-policy-devel
-%endif
 
 %description geo-replication
 GlusterFS is a distributed file-system capable of scaling to several
@@ -714,9 +611,6 @@ Requires:         %{name}%{?_isa} = %{version}-%{release}
 Requires:         %{name}-cli%{?_isa} = %{version}-%{release}
 Requires:         libglusterfs0%{?_isa} = %{version}-%{release}
 Requires:         libgfchangelog0%{?_isa} = %{version}-%{release}
-%if ( 0%{?fedora} && 0%{?fedora} >= 30  || ( 0%{?rhel} && 0%{?rhel} >= 8 ) )
-Requires:         glusterfs-selinux >= 0.1.0-2
-%endif
 # some daemons (like quota) use a fuse-mount, glusterfsd is part of -fuse
 Requires:         %{name}-fuse%{?_isa} = %{version}-%{release}
 # self-heal daemon, rebalance, nfs-server etc. are actually clients
@@ -734,25 +628,12 @@ Requires(postun): /sbin/service
 %endif
 %if (0%{?_with_firewalld:1})
 # we install firewalld rules, so we need to have the directory owned
-%if ( 0%{!?rhel} )
 # not on RHEL because firewalld-filesystem appeared in 7.3
 # when EL7 rpm gets weak dependencies we can add a Suggests:
 Requires:         firewalld-filesystem
 %endif
-%endif
-%if ( 0%{?fedora} ) || ( 0%{?rhel} && 0%{?rhel} >= 6 )
-Requires:         rpcbind
-%else
 Requires:         portmap
-%endif
-%if ( 0%{?rhel} && 0%{?rhel} <= 6 )
-Requires:         python-argparse
-%endif
-%if ( 0%{?fedora} && 0%{?fedora} > 27 ) || ( 0%{?rhel} && 0%{?rhel} > 7 )
-Requires:         python%{_pythonver}-pyxattr
-%else
 Requires:         pyxattr
-%endif
 %if (0%{?_with_valgrind:1})
 Requires:         valgrind
 %endif
@@ -799,14 +680,7 @@ Summary:          GlusterFS Events
 Requires:         %{name}-server%{?_isa} = %{version}-%{release}
 Requires:         python%{_pythonver} python%{_pythonver}-prettytable
 Requires:         python%{_pythonver}-gluster = %{version}-%{release}
-%if ( 0%{?rhel} && 0%{?rhel} < 8 )
-Requires:         python-requests
-%else
 Requires:         python%{_pythonver}-requests
-%endif
-%if ( 0%{?rhel} && 0%{?rhel} < 7 )
-Requires:         python-argparse
-%endif
 %if ( 0%{?_with_systemd:1} )
 %{?systemd_requires}
 %endif
@@ -827,10 +701,7 @@ done
 
 %build
 
-# RHEL6 and earlier need to manually replace config.guess and config.sub
-%if ( 0%{?rhel} && 0%{?rhel} <= 6 ) || ( 0%{?mariner} && 0%{?mariner} >= 3 )
 ./autogen.sh
-%endif
 
 %configure \
         %{?_with_asan} \
@@ -854,9 +725,7 @@ done
         %{?_without_tcmalloc}
 
 ## fix hardening and remove rpath in shlibs
-%if ( 0%{?fedora} && 0%{?fedora} > 17 ) || ( 0%{?rhel} && 0%{?rhel} > 6 ) || ( 0%{?mariner} && 0%{?mariner} >= 3 )
 sed -i 's| \\\$compiler_flags |&\\\$LDFLAGS |' libtool
-%endif
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|' libtool
 
@@ -892,12 +761,8 @@ find %{buildroot}%{_libdir} -name '*.la' -delete
 # Remove installed docs, the ones we want are included by %%doc, in
 # /usr/share/doc/glusterfs or /usr/share/doc/glusterfs-x.y.z depending
 # on the distribution
-%if ( 0%{?fedora} && 0%{?fedora} > 19 ) || ( 0%{?rhel} && 0%{?rhel} > 6 )
-rm -rf %{buildroot}%{_pkgdocdir}/*
-%else
 rm -rf %{buildroot}%{_defaultdocdir}/%{name}
 mkdir -p %{buildroot}%{_pkgdocdir}
-%endif
 head -50 ChangeLog > ChangeLog.head && mv ChangeLog.head ChangeLog
 cat << EOM >> ChangeLog
 
@@ -971,21 +836,12 @@ touch %{buildroot}%{_sharedstatedir}/glusterd/nfs/run/nfs.pid
 
 find ./tests ./run-tests.sh -type f | cpio -pd %{buildroot}%{_prefix}/share/glusterfs
 
-%if 0%{!?mariner}
-# Mariner does not require a clean stage
-%clean
-rm -rf %{buildroot}
-%endif
-
 ##-----------------------------------------------------------------------------
 ## All %%post should be placed here and keep them sorted
 ##
 %post
 /sbin/ldconfig
 %if ( 0%{!?_without_syslog:1} )
-%if ( 0%{?fedora} ) || ( 0%{?rhel} && 0%{?rhel} >= 6 )
-%systemd_postun_with_restart rsyslog
-%endif
 %endif
 exit 0
 
@@ -995,23 +851,10 @@ exit 0
 %endif
 
 %if ( 0%{!?_without_server:1} )
-%if ( 0%{?fedora} && 0%{?fedora} > 25 || ( 0%{?rhel} && 0%{?rhel} > 6 ) )
-%post ganesha
-# first install
-if [ $1 -eq 1 ]; then
-  %selinux_set_booleans ganesha_use_fusefs=1
-fi
-exit 0
-%endif
 %endif
 
 %if ( 0%{!?_without_georeplication:1} )
 %post geo-replication
-%if ( 0%{?rhel} && 0%{?rhel} >= 8 )
-if [ $1 -eq 1 ]; then
-  %selinux_set_booleans %{selinuxbooleans}
-fi
-%endif
 if [ $1 -ge 1 ]; then
     %systemd_postun_with_restart glusterd
 fi
@@ -1163,9 +1006,6 @@ fi
 ##
 %postun
 %if ( 0%{!?_without_syslog:1} )
-%if ( 0%{?fedora} ) || ( 0%{?rhel} && 0%{?rhel} >= 6 )
-%systemd_postun_with_restart rsyslog
-%endif
 %endif
 
 %if ( 0%{!?_without_server:1} )
@@ -1177,36 +1017,16 @@ exit 0
 %endif
 
 %if ( 0%{!?_without_server:1} )
-%if ( 0%{?fedora} && 0%{?fedora} > 25  || ( 0%{?rhel} && 0%{?rhel} > 6 ) )
-%postun ganesha
-if [ $1 -eq 0 ]; then
-  # use the value of ganesha_use_fusefs from before glusterfs-ganesha was installed
-  %selinux_unset_booleans ganesha_use_fusefs=1
-fi
-exit 0
-%endif
 %endif
 
 %if ( 0%{!?_without_georeplication:1} )
 %postun geo-replication
-%if ( 0%{?rhel} && 0%{?rhel} >= 8 )
-if [ $1 -eq 0 ]; then
-  %selinux_unset_booleans %{selinuxbooleans}
-fi
-exit 0
-%endif
 %endif
 
 ##-----------------------------------------------------------------------------
 ## All %%trigger should be placed here and keep them sorted
 ##
 %if ( 0%{!?_without_server:1} )
-%if ( 0%{?fedora} && 0%{?fedora} > 25  || ( 0%{?rhel} && 0%{?rhel} > 6 ) )
-# ensure ganesha_use_fusefs is on in case of policy mode switch (eg. mls->targeted)
-%triggerin ganesha -- selinux-policy-targeted
-semanage boolean -m ganesha_use_fusefs --on -S targeted
-exit 0
-%endif
 %endif
 
 ##-----------------------------------------------------------------------------
