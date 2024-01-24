@@ -26,6 +26,11 @@ A fast, scalable, multi-language and extensible build system.
 
 %prep
 %autosetup -p1 -c -n %{name}-%{version}
+# Modify source to "#include <limits>" which resolves gcc11 errors:
+# graphcycles.cc:451:26: error: 'numeric_limits' is not a member of 'std'"
+sed -i 's/#include <string.h>/#include <string.h>\n#include <limits>/g' third_party/ijar/common.h
+sed -i 's/<limits.h>/<limits>\n#include <climits>/g' src/main/cpp/util/numbers.cc
+
 
 %build
 export JAVA_HOME=$(find %{_libdir}/jvm -name "msopenjdk*")
