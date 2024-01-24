@@ -48,7 +48,7 @@ func main() {
 		logger.Log.Fatalf("--output-split-partitions-format must be specified to use --shrink-filesystems.")
 	}
 
-	if *enableShrinkFilesystems && *outputImageFormat {
+	if *enableShrinkFilesystems && *outputImageFormat != "" {
 		logger.Log.Fatalf("--output-image-format cannot be used with --shrink-filesystems enabled.")
 	}
 
