@@ -5,6 +5,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
+	"math"
 	"regexp"
 	"strconv"
 	"strings"
@@ -128,12 +129,12 @@ func getFilesystemSizeInSectors(resize2fsOutput string, imageLoopDevice string) 
 	}
 	sectorSizeInBytes := int(logicalSectorSize) // cast from uint64 to int
 
-	return (filesystemSizeInBytes / sectorSizeInBytes), nil
+	return int(math.Ceil(float64(filesystemSizeInBytes) / float64(sectorSizeInBytes))), nil
 }
 
 // Get the new partition end in sectors.
-func getNewPartitionEndInSectors(stdout string, startSector string, imageLoopDevice string) (endInSectors string, err error) {
-	filesystemSizeInSectors, err := getFilesystemSizeInSectors(stdout, imageLoopDevice)
+func getNewPartitionEndInSectors(resize2fsOutput string, startSector string, imageLoopDevice string) (endInSectors string, err error) {
+	filesystemSizeInSectors, err := getFilesystemSizeInSectors(resize2fsOutput, imageLoopDevice)
 	if err != nil {
 		return "", err
 	}
