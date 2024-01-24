@@ -6,8 +6,8 @@ Summary:        Installer from a live CD/DVD/USB to disk
 # (it now refuses to run as root unless "export QTWEBENGINE_DISABLE_SANDBOX=1")
 # https://github.com/calamares/calamares/issues/1051
 Name:           calamares
-Version:        3.2.11
-Release:        40%{?dist}
+Version:        3.3.1
+Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,11 +15,11 @@ URL:            https://calamares.io/
 # Source0..19 - source tarballs
 Source0:        https://github.com/calamares/calamares/releases/download/v%{version}/%{name}-%{version}.tar.gz
 # Source1..4 is an artifact from https://dev.azure.com/mariner-org/mariner/_git/calamares-installer-module
-Source1:        calamares-users-1.1.0.tar.gz
-Source2:        calamares-finished-1.1.0.tar.gz
-Source3:        calamares-welcome-1.1.1.tar.gz
-Source4:        calamares-partition-1.1.2.tar.gz
-Source5:        calamares-license-1.1.0.tar.gz
+Source1:        calamares-users-2.0.0.tar.gz
+Source2:        calamares-finished-2.0.0.tar.gz
+Source3:        calamares-welcome-2.0.0.tar.gz
+Source4:        calamares-partition-2.0.0.tar.gz
+Source5:        calamares-license-2.0.0.tar.gz
 # Source20..39 - configuration files
 Source20:       license.conf
 Source21:       settings.conf
@@ -44,17 +44,15 @@ Source43:       calamares-auto_it.ts
 Source52:       mariner-welcome.png
 Source53:       mariner-eula
 # adjust some default settings (default shipped .conf files)
-Patch0:         calamares-3.2.11-default-settings.patch
-Patch1:         use-single-job-for-progress-bar-value.patch
-Patch2:         navigation-buttons-autodefault.patch
-Patch3:         round-to-full-disk-size.patch
+Patch0:         Azure-Linux-Calamares-Conf-Patch-3.3.1.patch
+#Patch3:         round-to-full-disk-size.patch
 # Due to a race condition, Calamares would crash intermittently when switching
 # partitioning method or encryption password. Patch4 fixes that bug.
 Patch4:         serialize-read-access.patch
 # Progress bar would expect a non-false return from a pooled thread, assuming
 # such result means a critical error. However, depending on timing
 # the process might return false since it already exited. Patch5 fixes that bug.
-Patch5:         install-progress-bar-fix.patch
+#Patch5:         install-progress-bar-fix.patch
 
 # Compilation tools
 BuildRequires:  cmake
@@ -80,10 +78,10 @@ BuildRequires:  pkg-config
 # Python 3
 BuildRequires:  python3-devel >= 3.3
 # Qt 5
-BuildRequires:  qt5-linguist >= 5.10
-BuildRequires:  qt5-qtbase-devel >= 5.10
-BuildRequires:  qt5-qtdeclarative-devel >= 5.10
-BuildRequires:  qt5-qtsvg-devel >= 5.10
+BuildRequires:  qt-linguist >= 6.6
+BuildRequires:  qtbase-devel >= 6.6
+BuildRequires:  qtdeclarative-devel >= 6.6
+BuildRequires:  qtsvg-devel >= 6.6
 BuildRequires:  util-linux-devel
 BuildRequires:  yaml-cpp-devel >= 0.5.1
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
@@ -104,7 +102,7 @@ ExclusiveArch:  x86_64
 %description
 Calamares is a distribution-independent installer framework, designed to install
 from a live CD/DVD/USB environment to a hard disk. It includes a graphical
-installation program based on Qt 5. This package includes the Calamares
+installation program based on Qt 6. This package includes the Calamares
 framework and the required configuration files to produce a working replacement
 for Anaconda's liveinst.
 
@@ -144,12 +142,10 @@ done
 mv %{SOURCE20} src/modules/license/license.conf
 mv %{SOURCE24} src/modules/users/users.conf
 
-%patch 0 -p1
-%patch 1 -p1
-%patch 2 -p1
-%patch 3 -p1
-%patch 4 -p1
-%patch 5 -p1
+%patch0 -p1
+#%patch3 -p1
+%patch4 -p1
+#%patch5 -p1
 
 %build
 mkdir -p %{_target_platform}
@@ -173,8 +169,6 @@ lrelease-qt5 %{SOURCE43} -qm %{buildroot}%{_datadir}/calamares/branding/mariner/
 mkdir -p %{buildroot}%{_sysconfdir}/calamares/modules
 mkdir -p %{buildroot}%{_sysconfdir}/calamares/branding
 
-# delete dummypythonqt translations, we do not use PythonQt at this time
-rm -f %{buildroot}%{_datadir}/locale/*/LC_MESSAGES/calamares-dummypythonqt.mo
 %find_lang calamares-python
 
 # Mariner branding
@@ -183,11 +177,11 @@ cp -r %{buildroot}%{_datadir}/calamares/branding/ %{buildroot}%{_sysconfdir}/cal
 cp -r %{buildroot}%{_datadir}/calamares/modules/ %{buildroot}%{_sysconfdir}/calamares/modules/
 
 install -p -m 644 %{SOURCE21} %{buildroot}%{_sysconfdir}/calamares/settings.conf
-install -p -m 644 %{SOURCE40} %{buildroot}%{_datadir}/calamares/branding/mariner/mariner-logo.png
+install -p -m 644 %{SOURCE40} %{buildroot}%{_datadir}/calamares/branding/mariner/azl-logo.png
 install -p -m 644 %{SOURCE22} %{buildroot}%{_datadir}/calamares/branding/mariner/show.qml
 install -p -m 644 %{SOURCE23} %{buildroot}%{_datadir}/calamares/branding/mariner/branding.desc
 install -p -m 644 %{SOURCE25} %{buildroot}%{_datadir}/calamares/branding/mariner/stylesheet.qss
-install -p -m 644 %{SOURCE52} %{buildroot}%{_datadir}/calamares/branding/mariner/mariner-welcome.png
+install -p -m 644 %{SOURCE52} %{buildroot}%{_datadir}/calamares/branding/mariner/azl-welcome.png
 
 
 # EULA
@@ -231,6 +225,10 @@ install -p -m 644 %{SOURCE53} %{buildroot}%{_sysconfdir}/calamares/mariner-eula
 %{_libdir}/cmake/Calamares/
 
 %changelog
+* Tue Jan 16 2024 Sam Meluch <sammeluch@microsoft.com> - 3.3.1-1
+- Upgrade to version 3.3.1 for Azure Linux 3.0
+- Update patches to accomodate version 3.3.1
+
 * Fri Jan 27 2023 Mateusz Malisz <mamalisz@microsoft.com> - 3.2.11-40
 - Fix application crash when discoverin partitions due to a race condition with serialize-read-access.patch
 - Fix application crash when the Mariner installer process thread have already exited during progress bar installation view

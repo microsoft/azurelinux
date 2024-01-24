@@ -4,20 +4,20 @@ componentName:  mariner
 welcomeStyleCalamares:   false
 
 strings:
-    productName:         "CBL-Mariner"
-    shortProductName:    "CBL-Mariner"
+    productName:         "Azure Linux"
+    shortProductName:    "Azure Linux"
     version:             "@{VERSION}"
     shortVersion:        "@{VERSION_ID}"
-    versionedName:       "CBL-Mariner @{VERSION_ID}"
-    shortVersionedName:  "CBL-Mariner @{VERSION_ID}"
-    bootloaderEntryName: "CBL-Mariner"
+    versionedName:       "Azure Linux @{VERSION_ID}"
+    shortVersionedName:  "Azure Linux @{VERSION_ID}"
+    bootloaderEntryName: "Azure Linux"
 
 welcomeExpandingLogo:   true
 
 images:
-    productLogo:         "mariner-logo.png"
-    productIcon:         "mariner-logo.png"
-    productWelcome:      "mariner-welcome.png"
+    productLogo:         "azl-logo.png"
+    productIcon:         "azl-logo.png"
+    productWelcome:      "azl-welcome.png"
 
 # The slideshow is displayed during execution steps (e.g. when the
 # installer is actually writing to disk and doing other slow things).
