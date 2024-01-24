@@ -26825,8 +26825,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-timers",
-          "version": "4.3.2",
-          "downloadUrl": "https://github.com/socketry/timers/archive/refs/tags/v4.3.2.tar.gz"
+          "version": "4.3.5",
+          "downloadUrl": "https://github.com/socketry/timers/archive/refs/tags/v4.3.5.tar.gz"
         }
       }
     },
