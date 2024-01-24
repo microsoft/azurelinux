@@ -1158,7 +1158,7 @@ exit 0
 %dir %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator
 %dir %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/mount
      %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/mount/fuse.so
-%{_sbindir}/mount.glusterfs
+/sbin/mount.glusterfs
 %if ( 0%{!?_without_fusermount:1} )
 %{_bindir}/fusermount-glusterfs
 %endif
