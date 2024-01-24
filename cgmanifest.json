@@ -26935,6 +26935,16 @@
         "type": "other",
         "other": {
           "name": "rust-packaging",
+          "version": "25.2",
+          "downloadUrl": "https://pagure.io/fedora-rust/rust-packaging/archive/25.2/rust-packaging-25.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rust-packaging",
           "version": "14",
           "downloadUrl": "https://releases.pagure.org/fedora-rust/rust2rpm/rust2rpm-14.tar.xz"
         }

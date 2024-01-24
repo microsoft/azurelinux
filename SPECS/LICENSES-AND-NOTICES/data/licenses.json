@@ -1891,6 +1891,7 @@
                 "rubygem-thread_order",
                 "rusers",
                 "rust-cbindgen",
+                "rust-packaging",
                 "samba",
                 "sanlock",
                 "sassist",
