@@ -8,23 +8,28 @@
 %bcond_with    rocm
 %bcond_with    ugni
 %bcond_with    xpmem
+%bcond_with    vfs
 
 Summary:        UCX is a communication library implementing high-performance messaging
 Name:           ucx
-Version:        1.11.0
-Release:        4%{?dist}
+Version:        1.15.0
+Release:        5%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            http://www.openucx.org
-Source0:        https://github.com/openucx/%{name}/releases/download/v1.11.0/ucx-1.11.0.tar.gz
+Source0:        https://github.com/openucx/%{name}/releases/download/v1.15.0/ucx-1.15.0.tar.gz
 
 
 # UCX currently supports only the following architectures
 ExclusiveArch: aarch64 ppc64le x86_64
 
-BuildRequires: automake autoconf libtool gcc-c++ numactl-devel
+%if %{defined extra_deps}
+Requires: %{?extra_deps}
+%endif
+
+BuildRequires: automake autoconf libtool gcc-c++
 %if %{with cma}
 BuildRequires: glibc-devel >= 2.15
 %endif
@@ -44,7 +49,13 @@ BuildRequires: librdmacm-devel
 BuildRequires: hsa-rocr-dev
 %endif
 %if %{with xpmem}
-BuildRequires: xpmem-devel
+BuildRequires: pkgconfig(cray-xpmem)
+%endif
+%if %{with vfs}
+BuildRequires: fuse3-devel
+%endif
+%if "%{debug}" == "1"
+BuildRequires: valgrind-devel
 %endif
 
 %description
@@ -73,10 +84,17 @@ Provides header files and examples for developing with UCX.
 %define _with_arg()   %{expand:%%{?with_%{1}:--with-%{2}}%%{!?with_%{1}:--without-%{2}}}
 %define _enable_arg() %{expand:%%{?with_%{1}:--enable-%{2}}%%{!?with_%{1}:--disable-%{2}}}
 %configure --disable-optimizations \
-           --disable-logging \
-           --disable-debug \
-           --disable-assertions \
-           --disable-params-check \
+           %{!?debug:--disable-logging} \
+           %{!?debug:--disable-debug} \
+           %{!?debug:--disable-assertions} \
+           %{!?debug:--disable-params-check} \
+           %{?debug:--with-valgrind} \
+           %{?debug:--enable-profiling} \
+           %{?debug:--enable-frame-pointer} \
+           %{?debug:--enable-stats} \
+           %{?debug:--enable-debug-data} \
+           %{?debug:--enable-mt} \
+           --without-go \
            --without-java \
            %_enable_arg cma cma \
            %_with_arg cuda cuda \
@@ -86,6 +104,7 @@ Provides header files and examples for developing with UCX.
            %_with_arg rdmacm rdmacm \
            %_with_arg rocm rocm \
            %_with_arg xpmem xpmem \
+           %_with_arg vfs fuse3 \
            %_with_arg ugni ugni \
            %{?configure_options}
 make %{?_smp_mflags} V=1
@@ -93,15 +112,19 @@ make %{?_smp_mflags} V=1
 %install
 make DESTDIR=%{buildroot} install
 rm -f %{buildroot}%{_libdir}/*.la
-rm -f %{buildroot}%{_libdir}/*.a
+rm -f %{buildroot}%{_libdir}/libucs_signal.a
 rm -f %{buildroot}%{_libdir}/ucx/*.la
 rm -f %{buildroot}%{_libdir}/ucx/lib*.so
-rm -f %{buildroot}%{_libdir}/ucx/lib*.a
 
 %files
 %{_libdir}/lib*.so.*
-%{_bindir}/uc*
-%{_bindir}/io_demo
+%{_bindir}/ucx_info
+%{_bindir}/ucx_perftest
+%{_bindir}/ucx_perftest_daemon
+%{_bindir}/ucx_read_profile
+%if "%{debug}" == "1"
+%{_bindir}/ucs_stats_parser
+%endif
 %{_datadir}/ucx
 %exclude %{_datadir}/ucx/examples
 %doc README AUTHORS NEWS
@@ -112,9 +135,14 @@ rm -f %{buildroot}%{_libdir}/ucx/lib*.a
 %{_includedir}/uc*
 %{_libdir}/lib*.so
 %{_libdir}/pkgconfig/ucx.pc
+%{_libdir}/pkgconfig/ucx-uct.pc
+%{_libdir}/pkgconfig/ucx-ucs.pc
+%{_libdir}/cmake/ucx/*.cmake
 %{_datadir}/ucx/examples
 
-%post -p /sbin/ldconfig
+%post
+/sbin/ldconfig
+
 %postun -p /sbin/ldconfig
 
 %if %{with cma}
@@ -191,7 +219,7 @@ for large messages.
 
 %if %{with rdmacm}
 %package rdmacm
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: %{name}-ib%{?_isa} = %{version}-%{release}
 Summary: UCX RDMA connection manager support
 
 %description rdmacm
@@ -253,8 +281,25 @@ process to map the memory of another process into its virtual address space.
 %{_libdir}/ucx/libuct_xpmem.so.*
 %endif
 
+%if %{with vfs}
+%package vfs
+Requires: %{name}%{?_isa} = %{version}-%{release}
+Summary: UCX Virtual Filesystem support.
+Group: System Environment/Libraries
+
+%description vfs
+Provides a virtual filesystem over FUSE which allows real-time monitoring of UCX
+library internals, protocol objects, transports status, and more.
+
+%files vfs
+%{_libdir}/ucx/libucs_fuse.so.*
+%{_bindir}/ucx_vfs
+%endif
 
 %changelog
+* Wed Jan 24 2024 Juan Camposeco <juanarturoc@microsoft.com> - 1.15.0-5
+- Update version to 1.15.0
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.11.0-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
