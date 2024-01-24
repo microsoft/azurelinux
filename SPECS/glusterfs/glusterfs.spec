@@ -834,16 +834,11 @@ find ./tests ./run-tests.sh -type f | cpio -pd %{buildroot}%{_prefix}/share/glus
 ##
 %post
 %{_sbindir}/ldconfig
-%if ( 0%{!?_without_syslog:1} )
-%endif
 exit 0
 
 %if ( 0%{!?_without_events:1} )
 %post events
 %systemd_post glustereventsd
-%endif
-
-%if ( 0%{!?_without_server:1} )
 %endif
 
 %if ( 0%{!?_without_georeplication:1} )
@@ -998,8 +993,6 @@ fi
 ## All %%postun should be placed here and keep them sorted
 ##
 %postun
-%if ( 0%{!?_without_syslog:1} )
-%endif
 
 %if ( 0%{!?_without_server:1} )
 %postun server
@@ -1009,9 +1002,6 @@ fi
 exit 0
 %endif
 
-%if ( 0%{!?_without_server:1} )
-%endif
-
 %if ( 0%{!?_without_georeplication:1} )
 %postun geo-replication
 %endif
@@ -1019,8 +1009,6 @@ exit 0
 ##-----------------------------------------------------------------------------
 ## All %%trigger should be placed here and keep them sorted
 ##
-%if ( 0%{!?_without_server:1} )
-%endif
 
 ##-----------------------------------------------------------------------------
 ## All %%files should be placed here and keep them grouped
