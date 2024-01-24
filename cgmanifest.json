@@ -27887,8 +27887,8 @@
         "type": "other",
         "other": {
           "name": "sscg",
-          "version": "2.6.2",
-          "downloadUrl": "https://github.com/sgallagher/sscg/releases/download/sscg-2.6.2/sscg-2.6.2.tar.xz"
+          "version": "3.0.5",
+          "downloadUrl": "https://github.com/sgallagher/sscg/archive/refs/tags/sscg-3.0.5.tar.gz"
         }
       }
     },
