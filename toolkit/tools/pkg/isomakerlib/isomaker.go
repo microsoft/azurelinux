@@ -37,7 +37,6 @@ type IsoMaker struct {
 	configSubDirNumber int                  // Current number for the subdirectories storing files mentioned in the config.
 	baseDirPath        string               // Base directory for config's relative paths.
 	buildDirPath       string               // Path to the temporary build directory.
-	configFilePath     string               // Path to the configuration JSON.
 	efiBootImgPath     string               // Path to the efiboot.img file needed to boot the ISO installer.
 	fetchedRepoDirPath string               // Path to the directory containing an RPM repository with all packages required by the ISO installer.
 	initrdPath         string               // Path to ISO's initrd file.
@@ -76,7 +75,6 @@ func NewIsoMaker(unattendedInstall bool, baseDirPath, buildDirPath, releaseVersi
 		initrdPath:         initrdPath,
 		releaseVersion:     releaseVersion,
 		resourcesDirPath:   resourcesDirPath,
-		configFilePath:     configFilePath,
 		fetchedRepoDirPath: isoRepoDirPath,
 		outputDirPath:      outputDir,
 		imageNameBase:      imageNameBase,
@@ -107,7 +105,6 @@ func NewIsoMakerWithConfig(unattendedInstall, enableBiosBoot bool, baseDirPath, 
 		grubCfgPath:        grubCfgPath,
 		releaseVersion:     releaseVersion,
 		resourcesDirPath:   resourcesDirPath,
-		configFilePath:     "",
 		fetchedRepoDirPath: isoRepoDirPath,
 		outputDirPath:      outputDir,
 		imageNameBase:      imageNameBase,
