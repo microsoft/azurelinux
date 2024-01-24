@@ -10,7 +10,7 @@
 
 Name:         kata-containers-cc
 Version:      0.6.3
-Release:      1%{?dist}
+Release:      2%{?dist}
 Summary:      Kata Confidential Containers package developed for Confidential Containers on AKS
 License:      ASL 2.0
 Vendor:       Microsoft Corporation
@@ -295,6 +295,9 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %exclude %{osbuilder}/tools/osbuilder/rootfs-builder/ubuntu
 
 %changelog
+*   Tue Jan 24 2024 Manuel Huber <mahuber@microsoft.com> - 0.6.3-2
+-   Enforce a restrictive security policy
+
 *   Mon Jan 08 2024 Dallas Delaney <dadelan@microsoft.com> - 0.6.3-1
 -   Upgrade to version 0.6.3
 
