@@ -1446,6 +1446,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "cargo2rpm",
+          "version": "0.1.15",
+          "downloadUrl": "https://pagure.io/fedora-rust/cargo2rpm/archive/0.1.15/cargo2rpm-0.1.15.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "cassandra",
           "version": "4.0.10",
           "downloadUrl": "https://archive.apache.org/dist/cassandra/4.0.10/apache-cassandra-4.0.10-src.tar.gz"
