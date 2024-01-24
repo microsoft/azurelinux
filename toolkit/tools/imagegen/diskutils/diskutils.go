@@ -498,7 +498,7 @@ func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 		timeoutInSeconds = "5"
 	)
 
-	logicalSectorSize, physicalSectorSize, err := getSectorSize(diskDevPath)
+	logicalSectorSize, physicalSectorSize, err := GetSectorSize(diskDevPath)
 	if err != nil {
 		return
 	}
@@ -837,7 +837,7 @@ func getSectorSizeFromFile(sectorFile string) (sectorSize uint64, err error) {
 	return
 }
 
-func getSectorSize(diskDevPath string) (logicalSectorSize, physicalSectorSize uint64, err error) {
+func GetSectorSize(diskDevPath string) (logicalSectorSize, physicalSectorSize uint64, err error) {
 	const (
 		diskNameStartIndex = 5
 	)
