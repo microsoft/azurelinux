@@ -45,7 +45,7 @@ func extractPartitions(imageLoopDevice string, outputImageFile string, partition
 			default:
 				return fmt.Errorf("unsupported partition format (supported: raw, raw-zstd): %s", partitionFormat)
 			}
-						
+
 			logger.Log.Infof("Partition file created: %s", partitionFilepath)
 		}
 	}

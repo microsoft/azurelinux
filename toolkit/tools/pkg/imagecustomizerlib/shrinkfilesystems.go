@@ -66,7 +66,7 @@ func shrinkFilesystems(imageLoopDevice string, outputImageFile string) error {
 			}
 		}
 	}
-		
+
 	return nil
 }
 
@@ -75,13 +75,13 @@ func getStartSectors(imageLoopDevice string, partitionCount int) (matchStarts []
 	stdout, stderr, err := shell.Execute("sudo", "fdisk", "-l", imageLoopDevice)
 	if err != nil {
 		return nil, fmt.Errorf("fdisk failed to list partitions %v:", stderr)
-	}	
-	
+	}
+
 	// Note that regexp.QuoteMeta does not escape forward slashes, therefore implementing this here
 	escapeForwardSlashesLoopDevice := strings.ReplaceAll(imageLoopDevice, "/", `\/`)
-	
+
 	// Example line from fdisk -l output: "/dev/loop41p2   18432  103064   84633 41.3M Linux filesystem"
-	reStarts := regexp.MustCompile(`(?m:^` + escapeForwardSlashesLoopDevice +  `p\d+ *(\d+).*?)`)
+	reStarts := regexp.MustCompile(`(?m:^` + escapeForwardSlashesLoopDevice + `p\d+ *(\d+).*?)`)
 	matchStarts = reStarts.FindAllStringSubmatch(stdout, -1)
 	if len(matchStarts) < partitionCount {
 		return nil, fmt.Errorf("could not find all partition starts")
@@ -103,7 +103,7 @@ func getFilesystemSizeInSectors(resize2fsOutput string, imageLoopDevice string) 
 	re := regexp.MustCompile(`.*to (\d+) \((\d+)([a-zA-Z])\)`)
 	// Get the block count and block size
 	match := re.FindStringSubmatch(resize2fsOutput)
-	if len(match) < 4 { 
+	if len(match) < 4 {
 		return 0, fmt.Errorf("failed to parse output of resize2fs")
 	}
 
@@ -114,21 +114,21 @@ func getFilesystemSizeInSectors(resize2fsOutput string, imageLoopDevice string) 
 	multiplier, err := strconv.Atoi(match[2]) // Example: 4
 	if err != nil {
 		return 0, err
-	}	
+	}
 	unit := match[3] // Example: 'k'
 
 	// Calculate block size
 	var blockSize int
 	const KB = 1024 // kilobyte in bytes
 	switch unit {
-	case "k": 
-		blockSize = multiplier*KB
-	default: 
+	case "k":
+		blockSize = multiplier * KB
+	default:
 		return 0, fmt.Errorf("unrecognized unit %s", unit)
 	}
 
 	filesystemSizeInBytes := blockCount * blockSize
-	return (filesystemSizeInBytes/sectorSizeInBytes) , nil
+	return (filesystemSizeInBytes / sectorSizeInBytes), nil
 }
 
 // Get the new partition end in sectors.
