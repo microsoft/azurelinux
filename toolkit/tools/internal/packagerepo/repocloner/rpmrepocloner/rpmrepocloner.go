@@ -9,8 +9,8 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
-	"time"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/buildpipeline"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
@@ -50,6 +50,11 @@ const (
 
 	useSingleTransaction    = true
 	useMultipleTransactions = !useSingleTransaction
+)
+
+var (
+	serverErrorsRegex = regexp.MustCompile(`(?m)Error: (5\d{2}) when downloading`)
+	errorCodeIndex    = 1
 )
 
 // RpmRepoCloner represents an RPM repository cloner.
@@ -599,16 +604,6 @@ func (r *RpmRepoCloner) Close() error {
 // clonePackage clones a given package using pre-populated arguments.
 // It will gradually enable more repos to consider until the package is found.
 func (r *RpmRepoCloner) clonePackage(baseArgs []string) (preBuilt bool, err error) {
-	const (
-		// With 6 attempts, initial delay of 1 second, and a backoff factor of 3.0 the total time spent retrying will be
-		// 1 + 3 + 9 + 27 + 81 = 121 seconds.
-		//
-		// *NOTE* These values are copied from downloader/downloader.go; they need not be the same but seemed like a
-		// good enough starting point.
-		downloadRetryAttempts = 6
-		failureBackoffBase    = 3.0
-		downloadRetryDuration = time.Second
-	)
 
 	releaseverCliArg, err := tdnf.GetReleaseverCliArg()
 	if err != nil {
@@ -625,11 +620,11 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string) (preBuilt bool, err erro
 		// We run in a retry loop on errors deemed retriable.
 		cancel := make(chan struct{})
 		retryNum := 1
-		_, err = retry.RunWithExpBackoff(func() error {
+		_, err = retry.RunWithDefaultDownloadBackoff(func() error {
 			downloadErr, retriable := tdnfDownload(finalArgs...)
 			if downloadErr != nil {
 				if retriable {
-					logger.Log.Warnf("Attempt %d/%d: Failed to clone packages", retryNum, downloadRetryAttempts)
+					logger.Log.Debugf("Package cloning attempt %d/%d failed.", retryNum, retry.DefaultDownloadRetryAttempts)
 				} else {
 					close(cancel)
 				}
@@ -637,7 +632,7 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string) (preBuilt bool, err erro
 
 			retryNum++
 			return downloadErr
-		}, downloadRetryAttempts, downloadRetryDuration, failureBackoffBase, cancel)
+		}, cancel)
 
 		if err == nil {
 			preBuilt = r.reposArgsHaveOnlyLocalSources(reposArgs)
@@ -700,11 +695,10 @@ func tdnfDownload(args ...string) (err error, retriable bool) {
 	// expected. This involves scraping through stderr, but it's better than not doing so.
 	//
 	if err != nil {
-		for _, line := range strings.Split(stderr, "\n") {
-			if strings.Contains(line, "Error: 502 when downloading") {
-				logger.Log.Warn("Encountered possibly intermittent HTTP 502 error.")
-				retriable = true
-			}
+		serverErrorMatch := serverErrorsRegex.FindStringSubmatch(stderr)
+		if len(serverErrorMatch) > errorCodeIndex {
+			logger.Log.Debugf("Encountered possibly intermittent HTTP %s error.", serverErrorMatch[errorCodeIndex])
+			retriable = true
 		}
 	}
 
