@@ -645,23 +645,14 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string) (preBuilt bool, err erro
 
 func tdnfDownload(args ...string) (err error, retriable bool) {
 	const (
-		toyboxConflictsPrefix   = "toybox conflicts"
-		unresolvedOutputPostfix = "available"
-		unresolvedOutputPrefix  = "No package"
+		unresolvedOutputPrefix = "No package"
+		unresolvedOutputSuffix = "available"
 	)
 
-	var (
-		stdout string
-		stderr string
-	)
-	stdout, stderr, err = shell.Execute("tdnf", args...)
+	stdout, stderr, err := shell.Execute("tdnf", args...)
 
 	logger.Log.Debugf("stdout: %s", stdout)
 	logger.Log.Debugf("stderr: %s", stderr)
-
-	if err != nil {
-		logger.Log.Debugf("tdnf error (will continue if the only errors are toybox conflicts):\n '%s'", stderr)
-	}
 
 	// ============== TDNF SPECIFIC IMPLEMENTATION ==============
 	//
@@ -673,16 +664,10 @@ func tdnfDownload(args ...string) (err error, retriable bool) {
 	splitStdout := strings.Split(stdout, "\n")
 	for _, line := range splitStdout {
 		trimmedLine := strings.TrimSpace(line)
-		// Toybox conflicts are a known issue, reset the err value if encountered
-		if strings.HasPrefix(trimmedLine, toyboxConflictsPrefix) {
-			logger.Log.Warn("Ignoring known toybox conflict")
-			err = nil
-			continue
-		}
 		// If a package was not available, update err
-		if strings.HasPrefix(trimmedLine, unresolvedOutputPrefix) && strings.HasSuffix(trimmedLine, unresolvedOutputPostfix) {
+		if strings.HasPrefix(trimmedLine, unresolvedOutputPrefix) && strings.HasSuffix(trimmedLine, unresolvedOutputSuffix) {
 			err = fmt.Errorf(trimmedLine)
-			break
+			return
 		}
 	}
 
