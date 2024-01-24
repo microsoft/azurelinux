@@ -1,14 +1,16 @@
 %{!?_versioneddocdir: %global _versioneddocdir %{_docdir}/%{name}-%{version}}
 Summary:        DBus for systemd
 Name:           dbus
-Version:        1.15.2
-Release:        4%{?dist}
+Version:        1.15.8
+Release:        1%{?dist}
 License:        GPLv2+ OR AFL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/File
 URL:            https://www.freedesktop.org/wiki/Software/dbus
 Source0:        https://%{name}.freedesktop.org/releases/%{name}/%{name}-%{version}.tar.xz
+BuildRequires:  autoconf-archive
+BuildRequires:  autoconf
 BuildRequires:  audit-devel
 BuildRequires:  expat-devel
 BuildRequires:  libselinux-devel
@@ -40,6 +42,9 @@ It contains the libraries and header files to create applications
 %autosetup -p1
 
 %build
+libtoolize && aclocal
+autoupdate
+autoreconf -i
 %configure \
     --docdir=%{_versioneddocdir}  \
     --enable-libaudit=yes \
@@ -86,6 +91,9 @@ make %{?_smp_mflags} check
 %{_libdir}/*.so
 
 %changelog
+* Thu Jan 04 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 1.15.8-1
+- Upgrade to 1.15.8
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.15.2-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
