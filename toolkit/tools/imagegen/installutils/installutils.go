@@ -1485,7 +1485,7 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 	const squashErrors = false
 	const authorizedKeysTempFilePerms = 0644
 	const authorizedKeysTempFile = "/tmp/authorized_keys"
-	const sshDirectoryPermission = "0700"
+	const sshDirectoryPermission = 0700
 
 	// Skip user SSH directory generation when not provided with public keys
 	// Let SSH handle the creation of this folder on its first use
@@ -1504,14 +1504,7 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 	if !exists {
 		logger.Log.Debugf("Directory %s does not exist. Creating directory...", userSSHKeyDir)
 
-		var permissionVal uint64
-		permissionVal, err = strconv.ParseUint(sshDirectoryPermission, 8, 32)
-		if err != nil {
-			logger.Log.Warnf("Failed to parse permissions: %v", err)
-			return
-		}
-
-		err = os.Mkdir(userSSHKeyDir, os.FileMode(permissionVal))
+		err = os.Mkdir(userSSHKeyDir, os.FileMode(sshDirectoryPermission))
 		if err != nil {
 			logger.Log.Warnf("Failed to create %s directory: %v", userSSHKeyDir, err)
 			return
@@ -1608,7 +1601,8 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 			return
 		}
 
-		err = shell.ExecuteLive(squashErrors, "chmod", "-R", sshDirectoryPermission, userSSHKeyDir)
+		sshDirectoryPermissionStr := fmt.Sprintf("%o", sshDirectoryPermission)
+		err = shell.ExecuteLive(squashErrors, "chmod", "-R", sshDirectoryPermissionStr, userSSHKeyDir)
 		return
 	})
 
