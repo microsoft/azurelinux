@@ -1,6 +1,6 @@
 Summary:        Process Management Interface Exascale (PMIx)
 Name:           pmix
-Version:        4.1.3
+Version:        5.0.1
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -111,6 +111,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_bindir}/*
 
 %changelog
+* Wed Jan 24 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.0.1-1
+- Auto-upgrade to 5.0.1 - none
+
 * Thu Sep 21 2023 Sumedh Sharma <sumsharma@microsoft.com> - 4.1.3-1
 - Bump version to address CVE-2023-41915
 
