@@ -6,7 +6,7 @@ Distribution:   Mariner
 %bcond_without check
 
 # This spec is for AzLinux
-%global azl 3
+%global azl 1
 %global azl_no_ui 1
 
 %global __strip /bin/true
@@ -116,10 +116,8 @@ Distribution:   Mariner
 %endif
 %endif
 
+# 2.0 has this set
 %global have_virgl 0
-# %if 0%{?azl}
-# %global have_virgl 1
-# %endif
 %if 0%{?fedora}
 %global have_virgl 1
 %endif
@@ -206,6 +204,9 @@ Distribution:   Mariner
 %endif
 
 %define have_libcacard 1
+%if 0%{?azl}
+%define have_libcacard 0
+%endif
 %if 0%{?rhel} >= 9
 %define have_libcacard 0
 %endif
@@ -217,7 +218,7 @@ Distribution:   Mariner
 %endif
 %endif
 
-%global have_ui 1
+%global have_ui 0
 %if 0%{?azl_no_ui}
 %global have_ui 0
 %endif
