@@ -102,9 +102,9 @@
 %global _pythonver 3
 # From https://fedoraproject.org/wiki/Packaging:Python#Macros
 %if ( 0%{?_with_systemd:1} )
-%global service_start()   /bin/systemctl --quiet start %1.service || : \
+%global service_start()   %{_bindir}/systemctl --quiet start %1.service || : \
 %{nil}
-%global service_stop()    /bin/systemctl --quiet stop %1.service || :\
+%global service_stop()    %{_bindir}/systemctl --quiet stop %1.service || :\
 %{nil}
 %global service_install() install -D -p -m 0644 %1.service %{buildroot}%2 \
 %{nil}
