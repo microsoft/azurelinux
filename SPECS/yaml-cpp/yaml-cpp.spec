@@ -30,7 +30,7 @@ Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
 The %{name}-static package contains the static library for %{name}.
 
 %prep
-%autosetup -n %{name}-%{name}-%{version}
+%autosetup -n %{name}-%{version}
 
 %build
 rm -rf build_shared && mkdir build_shared
@@ -80,6 +80,7 @@ pushd build_static
 * Tue Jan 23 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 0.8.0-1
 - Bump version to 0.8.0 from 0.7.0
 - Removing patch SPECS/yaml-cpp/yaml-cpp-static.patch since the variable been replaced in 0.8.0 with commit hash 4aad2b1 in PR#1077
+- Modifying name of folder to remove from %{name}-%{name}-%{version} to %{name}-%{version}
 
 * Wed Jan 26 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.7.0-1
 - Update to version 0.7.0.
