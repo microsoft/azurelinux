@@ -1,0 +1,22 @@
+--- a/modules.d/90dmsquash-live/dmsquash-live-root.sh	2021-05-27 05:34:19.000000000 -0700
++++ b/modules.d/90dmsquash-live/dmsquash-live-root.sh	2024-01-24 13:46:46.839171333 -0800
+@@ -25,6 +25,10 @@
+ getargbool 0 rd.live.ram -d -y live_ram && live_ram="yes"
+ getargbool 0 rd.live.overlay.reset -d -y reset_overlay && reset_overlay="yes"
+ getargbool 0 rd.live.overlay.readonly -d -y readonly_overlay && readonly_overlay="--readonly" || readonly_overlay=""
++# 'nouserconfirmprompt' is used to suppress a blocking prompt that asks for a
++# user confirmation before proceeding during boot time. This is to provide a
++# path for the image builder to boot it without user interaction.
++getargbool 0 rd.live.overlay.nouserconfirmprompt -d -y overlay_no_user_confirm_prompt && overlay_no_user_confirm_prompt="--noprompt" || overlay_no_user_confirm_prompt=""
+ overlay=$(getarg rd.live.overlay -d overlay)
+ getargbool 0 rd.writable.fsimg -d -y writable_fsimg && writable_fsimg="yes"
+ overlay_size=$(getarg rd.live.overlay.size=)
+@@ -185,7 +189,7 @@
+     fi
+ 
+     if [ -z "$setup" -o -n "$readonly_overlay" ]; then
+-        if [ -n "$setup" ]; then
++        if [ -n "$setup" -o -n "$overlay_no_user_confirm_prompt" ]; then
+             warn "Using temporary overlay."
+         elif [ -n "$devspec" -a -n "$pathspec" ]; then
+             [ -z "$m" ] \
