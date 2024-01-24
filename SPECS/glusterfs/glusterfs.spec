@@ -169,57 +169,63 @@ Patch001:       include-eventtypes-always.patch
 
 BuildRoot:        %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
-Requires(pre):    shadow-utils
-%if ( 0%{?_with_systemd:1} )
-BuildRequires:    systemd
-%endif
-
-%if ( 0%{!?_without_tcmalloc:1} )
-Requires:         gperftools-libs%{?_isa}
-%endif
-
-Requires:         libglusterfs0%{?_isa} = %{version}-%{release}
-Requires:         libgfrpc0%{?_isa} = %{version}-%{release}
-Requires:         libgfxdr0%{?_isa} = %{version}-%{release}
-%if ( 0%{?_with_systemd:1} )
-%{?systemd_requires}
-%endif
-%if 0%{?_with_asan:1}
-BuildRequires:    libasan
-%endif
-%if 0%{?_with_tsan:1}
-BuildRequires:    libtsan
-%endif
-BuildRequires:    bison flex
-BuildRequires:    gcc make libtool
-BuildRequires:    ncurses-devel readline-devel
-BuildRequires:    libxml2-devel openssl-devel openssl
-BuildRequires:    libaio-devel libacl-devel
-BuildRequires:    python%{_pythonver}-devel
-%if ( 0%{!?_without_tcmalloc:1} )
-BuildRequires:    gperftools-devel
-%endif
-%if ( 0%{?_with_ipv6default:1} ) || ( 0%{!?_without_libtirpc:1} )
-BuildRequires:    libtirpc-devel
-%endif
-%if 0%{?_require_rpcgen:1}
-BuildRequires:    rpcgen
-%endif
-BuildRequires:    userspace-rcu-devel >= 0.7
+BuildRequires:    bison
+BuildRequires:    flex
+BuildRequires:    gcc
+BuildRequires:    libaio-devel
+BuildRequires:    libacl-devel
 BuildRequires:    libuuid-devel
-%if ( 0%{?_with_cmocka:1} )
-BuildRequires:    libcmocka-devel >= 1.0.1
-%endif
-%if ( 0%{!?_without_georeplication:1} )
-BuildRequires:    libattr-devel
-%endif
+BuildRequires:    libtool
+BuildRequires:    libxml2-devel
+BuildRequires:    make
+BuildRequires:    ncurses-devel
+BuildRequires:    openssl-devel
+BuildRequires:    openssl
+BuildRequires:    python%{_pythonver}-devel
+BuildRequires:    readline-devel
+BuildRequires:    userspace-rcu-devel >= 0.7
 
 %if (0%{?_with_firewalld:1})
 BuildRequires:    firewalld
 %endif
-
+%if ( 0%{!?_without_tcmalloc:1} )
+BuildRequires:    gperftools-devel
+%endif
+%if 0%{?_with_asan:1}
+BuildRequires:    libasan
+%endif
+%if ( 0%{!?_without_georeplication:1} )
+BuildRequires:    libattr-devel
+%endif
+%if ( 0%{?_with_cmocka:1} )
+BuildRequires:    libcmocka-devel >= 1.0.1
+%endif
+%if ( 0%{?_with_ipv6default:1} ) || ( 0%{!?_without_libtirpc:1} )
+BuildRequires:    libtirpc-devel
+%endif
+%if 0%{?_with_tsan:1}
+BuildRequires:    libtsan
+%endif
 %if ( 0%{!?_without_linux_io_uring:1} )
 BuildRequires:    liburing-devel
+%endif
+%if 0%{?_require_rpcgen:1}
+BuildRequires:    rpcgen
+%endif
+%if ( 0%{?_with_systemd:1} )
+BuildRequires:    systemd
+%endif
+
+Requires:         libgfrpc0%{?_isa} = %{version}-%{release}
+Requires:         libgfxdr0%{?_isa} = %{version}-%{release}
+Requires:         libglusterfs0%{?_isa} = %{version}-%{release}
+Requires(pre):    shadow-utils
+
+%if ( 0%{!?_without_tcmalloc:1} )
+Requires:         gperftools-libs%{?_isa}
+%endif
+%if ( 0%{?_with_systemd:1} )
+%{?systemd_requires}
 %endif
 
 Obsoletes:        %{name}-common < %{version}-%{release}
@@ -228,6 +234,7 @@ Obsoletes:        %{name}-rdma < %{version}-%{release}
 %if ( 0%{!?_with_gnfs:1} )
 Obsoletes:        %{name}-gnfs < %{version}-%{release}
 %endif
+
 Provides:         %{name}-common = %{version}-%{release}
 Provides:         %{name}-core = %{version}-%{release}
 
