@@ -14383,8 +14383,8 @@
         "type": "other",
         "other": {
           "name": "nvml",
-          "version": "1.8",
-          "downloadUrl": "https://github.com/pmem/pmdk/releases/download/1.8/pmdk-1.8.tar.gz"
+          "version": "2.0.1",
+          "downloadUrl": "https://github.com/pmem/pmdk/releases/download/2.0.1/pmdk-2.0.1.tar.gz"
         }
       }
     },

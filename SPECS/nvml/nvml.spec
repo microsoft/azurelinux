@@ -25,8 +25,8 @@
 
 Summary:        Persistent Memory Development Kit (formerly NVML)
 Name:           nvml
-Version:        1.8
-Release:        4%{?dist}
+Version:        2.0.1
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -594,6 +594,9 @@ make check
 %endif
 
 %changelog
+* Wed Jan 24 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.1-1
+- Auto-upgrade to 2.0.1 - 3.0 release
+
 * Wed Dec 01 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.8-4
 - License verified.
 - Using 'make' macros instead of manually setting flags and paths.
