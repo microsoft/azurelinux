@@ -13,7 +13,7 @@
 Summary:        UCX is a communication library implementing high-performance messaging
 Name:           ucx
 Version:        1.15.0
-Release:        5%{?dist}
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
