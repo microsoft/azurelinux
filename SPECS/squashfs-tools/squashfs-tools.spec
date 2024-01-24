@@ -17,7 +17,7 @@ BuildRequires:  xz-devel
 BuildRequires:  zlib-devel
 BuildRequires:  zstd-devel
 
-%global major_ver 4.6
+%define major_ver %(echo %{version} | cut -d. -f 1-2)
 
 %description
 Squashfs is a highly compressed read-only filesystem for Linux.  This package
