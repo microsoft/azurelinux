@@ -5,6 +5,7 @@ package schedulerutils
 
 import (
 	"encoding/csv"
+	"fmt"
 	"os"
 	"path/filepath"
 	"sort"
@@ -341,22 +342,22 @@ func printSummary(failedSRPMs, failedSRPMsTests map[string]*BuildResult, prebuil
 	logger.Log.Info("--------- Summary ---------")
 	logger.Log.Info("---------------------------")
 
-	logger.Log.Infof(color.GreenString("Number of prebuilt SRPMs:%12d", len(prebuiltSRPMs)))
-	logger.Log.Infof(color.GreenString("Number of prebuilt delta SRPMs:%6d", len(prebuiltDeltaSRPMs)))
-	logger.Log.Infof(color.GreenString("Number of skipped SRPMs tests:%7d", len(skippedSRPMsTests)))
-	logger.Log.Infof(color.GreenString("Number of built SRPMs:%15d", len(builtSRPMs)))
-	logger.Log.Infof(color.GreenString("Number of tested SRPMs:%14d", len(testedSRPMs)))
-	printErrorInfoByCondition(len(unresolvedDependencies)>0, "%s%3d", "Number of unresolved dependencies:", len(unresolvedDependencies))
-	printErrorInfoByCondition(len(blockedSRPMs)>0, "%s%13d", "Number of blocked SRPMs:", len(blockedSRPMs))
-	printErrorInfoByCondition(len(blockedSRPMsTests)>0, "%s%7d", "Number of blocked SRPMs tests:", len(blockedSRPMsTests))
-	printErrorInfoByCondition(len(failedSRPMs)>0, "%s%14d", "Number of failed SRPMs:", len(failedSRPMs))
-	printErrorInfoByCondition(len(failedSRPMsTests)>0, "%s%8d", "Number of failed SRPMs tests:", len(failedSRPMsTests))
+	logger.Log.Infof(color.GreenString(summaryLine("Number of prebuilt SRPMs:", len(prebuiltSRPMs))))
+	logger.Log.Infof(color.GreenString(summaryLine("Number of prebuilt delta SRPMs:", len(prebuiltDeltaSRPMs))))
+	logger.Log.Infof(color.GreenString(summaryLine("Number of skipped SRPMs tests:", len(skippedSRPMsTests))))
+	logger.Log.Infof(color.GreenString(summaryLine("Number of built SRPMs:", len(builtSRPMs))))
+	logger.Log.Infof(color.GreenString(summaryLine("Number of tested SRPMs:", len(testedSRPMs))))
+	printErrorInfoByCondition(len(unresolvedDependencies)>0, "%s", summaryLine("Number of unresolved dependencies:", len(unresolvedDependencies)))
+	printErrorInfoByCondition(len(blockedSRPMs)>0, "%s", summaryLine("Number of blocked SRPMs:", len(blockedSRPMs)))
+	printErrorInfoByCondition(len(blockedSRPMsTests)>0, "%s", summaryLine("Number of blocked SRPMs tests:", len(blockedSRPMsTests)))
+	printErrorInfoByCondition(len(failedSRPMs)>0, "%s", summaryLine("Number of failed SRPMs:", len(failedSRPMs)))
+	printErrorInfoByCondition(len(failedSRPMsTests)>0, "%s", summaryLine("Number of failed SRPMs tests:", len(failedSRPMsTests)))
 	if allowToolchainRebuilds && (len(rpmConflicts) > 0 || len(srpmConflicts) > 0) {
 		logger.Log.Infof("Toolchain RPMs conflicts are ignored since ALLOW_TOOLCHAIN_REBUILDS=y")
 	}
 
-	printErrorInfoByCondition(!allowToolchainRebuilds && len(rpmConflicts)>0, "%s%3d", "Number of toolchain RPM conflicts:", len(rpmConflicts))
-	printErrorInfoByCondition(!allowToolchainRebuilds && len(srpmConflicts)>0, "%s%2d", "Number of toolchain SRPM conflicts:", len(srpmConflicts))
+	printErrorInfoByCondition(!allowToolchainRebuilds && len(rpmConflicts)>0, "%s", summaryLine("Number of toolchain RPM conflicts:", len(rpmConflicts)))
+	printErrorInfoByCondition(!allowToolchainRebuilds && len(srpmConflicts)>0, "%s", summaryLine("Number of toolchain SRPM conflicts:", len(srpmConflicts)))
 }
 
 // Helper function to print error or info based on condition.
@@ -366,6 +367,11 @@ func printErrorInfoByCondition(condition bool, format string, arg ...interface{}
 	} else {
 		logger.Log.Infof(color.GreenString(format, arg...))
 	}
+}
+
+// Helper function to get space formatted string for summary.
+func summaryLine(message string, count int) string {
+	return fmt.Sprintf("%-36s%d", message, count)
 }
 
 // Helper function that converts a map[string]V to a sorted slice containing the map's keys.
