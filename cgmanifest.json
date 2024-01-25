@@ -28498,7 +28498,17 @@
         "other": {
           "name": "tpm2-pkcs11",
           "version": "1.9.0",
-          "downloadUrl": "https://github.com/tpm2-software/tpm2-pkcs11/releases/download/1.9.0/tpm2-pkcs11-1.9.0.tar.gz"
+          "downloadUrl": "https://github.com/tpm2-software/tpm2-pkcs11/releases/download/1.8.0/tpm2-pkcs11-1.8.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "tpm2-pytss",
+          "version": "1.2.0",
+          "downloadUrl": "https://github.com/tpm2-software/tpm2-pytss/archive/refs/tags/1.2.0.tar.gz"
         }
       }
     },
