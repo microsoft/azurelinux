@@ -2,11 +2,11 @@
     "kernel": {
         "required-configs": {
             "CONFIG_ARCH_HAS_CPU_FINALIZE_INIT": {
-                "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5964"
-                ],
                 "arch": [
                     "AMD64"
+                ],
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5964"
                 ],
                 "comment": "Needed for kernel upgrade 5.15.125.1",
                 "value": [
