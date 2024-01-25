@@ -16,6 +16,12 @@ if __name__ == '__main__':
     with open(required_configs, 'r') as f:
         content = json.load(f)
 
+    # Sort lists, which is not something done by json.dump.
+    for config, info in content["kernel"]["required-configs"].items():
+        info["PR"] = sorted(info["PR"])
+        info["arch"] = sorted(info["arch"])
+        info["value"] = sorted(info["value"])
+
     # Sort the JSON file and write it to a temporary file.
     with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:
         json.dump(content, f, indent=4, sort_keys=True)
