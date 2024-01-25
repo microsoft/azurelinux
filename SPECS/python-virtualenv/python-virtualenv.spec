@@ -1,7 +1,7 @@
 Summary:        Virtual Python Environment builder
 Name:           python-virtualenv
 Version:        20.14.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -30,6 +30,7 @@ Requires:       python3
 Requires:       python3-filelock
 Requires:       python3-platformdirs = 2.0.0
 Requires:       python3-distlib < 1
+Requires:       python-six
 Provides:       %{name}-doc = %{version}-%{release}
 
 %description -n python3-virtualenv
@@ -55,6 +56,9 @@ tox -e py
 %{_bindir}/virtualenv
 
 %changelog
+* Thu Jan 25 2024 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 20.14.0-5
+- Add missing runtime dependency on python-six
+
 * Mon Dec 04 2023 Olivia Crain <oliviacrain@microsoft.com> - 20.14.0-4
 - Add upstream patch to fix package tests with newer versions of pluggy
 
