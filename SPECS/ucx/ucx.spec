@@ -29,7 +29,11 @@ ExclusiveArch: aarch64 ppc64le x86_64
 Requires: %{?extra_deps}
 %endif
 
-BuildRequires: automake autoconf libtool gcc-c++
+BuildRequires: automake
+BuildRequires: autoconf
+BuildRequires: libtool
+BuildRequires: gcc-c++
+
 %if %{with cma}
 BuildRequires: glibc-devel >= 2.15
 %endif
