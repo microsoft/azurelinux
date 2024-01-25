@@ -1,5 +1,5 @@
 filesystem-1.1-18.azl3.aarch64.rpm
-kernel-headers-6.6.2.1-2.azl3.noarch.rpm
+kernel-headers-6.6.2.1-3.azl3.noarch.rpm
 glibc-2.38-1.azl3.aarch64.rpm
 glibc-devel-2.38-1.azl3.aarch64.rpm
 glibc-i18n-2.38-1.azl3.aarch64.rpm
@@ -12,8 +12,8 @@ zlib-devel-1.3-1.azl3.aarch64.rpm
 file-5.45-1.azl3.aarch64.rpm
 file-devel-5.45-1.azl3.aarch64.rpm
 file-libs-5.45-1.azl3.aarch64.rpm
-binutils-2.41-1.azl3.aarch64.rpm
-binutils-devel-2.41-1.azl3.aarch64.rpm
+binutils-2.41-2.azl3.aarch64.rpm
+binutils-devel-2.41-2.azl3.aarch64.rpm
 gmp-6.3.0-1.azl3.aarch64.rpm
 gmp-devel-6.3.0-1.azl3.aarch64.rpm
 mpfr-4.2.1-1.azl3.aarch64.rpm
