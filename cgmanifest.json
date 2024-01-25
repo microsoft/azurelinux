@@ -1377,8 +1377,8 @@
         "type": "other",
         "other": {
           "name": "c-ares",
-          "version": "1.19.1",
-          "downloadUrl": "https://c-ares.haxx.se/download/c-ares-1.19.1.tar.gz"
+          "version": "1.25.0",
+          "downloadUrl": "https://c-ares.haxx.se/download/c-ares-1.25.0.tar.gz"
         }
       }
     },
