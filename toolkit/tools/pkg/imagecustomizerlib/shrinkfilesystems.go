@@ -53,7 +53,7 @@ func shrinkFilesystems(imageLoopDevice string, outputImageFile string) error {
 		// Find the new partition end value
 		end, err := getNewPartitionEndInSectors(stdout, matchStarts[partitionNum-1][1], imageLoopDevice)
 		if err != nil {
-			return fmt.Errorf("failed to calculate new partition end: \n%w", err)
+			return fmt.Errorf("failed to calculate new partition end:\n%w", err)
 		}
 
 		// Resize the partition with parted resizepart
@@ -65,7 +65,7 @@ func shrinkFilesystems(imageLoopDevice string, outputImageFile string) error {
 		// Re-read the partition table
 		err = shell.ExecuteLive(true, "flock", "--timeout", "5", imageLoopDevice, "partprobe", "-s", imageLoopDevice)
 		if err != nil {
-			return fmt.Errorf("partprobe failed: \n%w", err)
+			return fmt.Errorf("partprobe failed:\n%w", err)
 		}
 	}
 	return nil
@@ -75,13 +75,13 @@ func shrinkFilesystems(imageLoopDevice string, outputImageFile string) error {
 func getStartSectors(imageLoopDevice string, partitionCount int) (matchStarts [][]string, err error) {
 	stdout, stderr, err := shell.Execute("sudo", "fdisk", "-l", imageLoopDevice)
 	if err != nil {
-		return nil, fmt.Errorf("fdisk failed to list partitions: \n%v", stderr)
+		return nil, fmt.Errorf("fdisk failed to list partitions:\n%v", stderr)
 	}
 
 	// Example line from fdisk -l output: "/dev/loop41p2   18432  103064   84633 41.3M Linux filesystem"
 	reStarts, err := regexp.Compile(`(?m:^` + imageLoopDevice + `p\d+ *(\d+).*?)`)
 	if err != nil {
-		return nil, fmt.Errorf("failed to compile regex: \n%w", err)
+		return nil, fmt.Errorf("failed to compile regex:\n%w", err)
 	}
 	matchStarts = reStarts.FindAllStringSubmatch(stdout, -1)
 	if len(matchStarts) < partitionCount {
@@ -96,7 +96,7 @@ func getFilesystemSizeInSectors(resize2fsOutput string, imageLoopDevice string) 
 	// Example resize2fs output first line: "Resizing the filesystem on /dev/loop44p2 to 21015 (4k) blocks."
 	re, err := regexp.Compile(`.*to (\d+) \((\d+)([a-zA-Z])\)`)
 	if err != nil {
-		return 0, fmt.Errorf("failed to compile regex: \n%w", err)
+		return 0, fmt.Errorf("failed to compile regex:\n%w", err)
 	}
 	// Get the block count and block size
 	match := re.FindStringSubmatch(resize2fsOutput)
@@ -106,11 +106,11 @@ func getFilesystemSizeInSectors(resize2fsOutput string, imageLoopDevice string) 
 
 	blockCount, err := strconv.Atoi(match[1]) // Example: 21015
 	if err != nil {
-		return 0, fmt.Errorf("failed to get block count: \n%w", err)
+		return 0, fmt.Errorf("failed to get block count:\n%w", err)
 	}
 	multiplier, err := strconv.Atoi(match[2]) // Example: 4
 	if err != nil {
-		return 0, fmt.Errorf("failed to get multiplier for block size: \n%w", err)
+		return 0, fmt.Errorf("failed to get multiplier for block size:\n%w", err)
 	}
 	unit := match[3] // Example: 'k'
 
@@ -145,13 +145,13 @@ func getFilesystemSizeInSectors(resize2fsOutput string, imageLoopDevice string) 
 func getNewPartitionEndInSectors(resize2fsOutput string, startSector string, imageLoopDevice string) (endInSectors string, err error) {
 	filesystemSizeInSectors, err := getFilesystemSizeInSectors(resize2fsOutput, imageLoopDevice)
 	if err != nil {
-		return "", fmt.Errorf("failed to get filesystem size: \n%w", err)
+		return "", fmt.Errorf("failed to get filesystem size:\n%w", err)
 	}
 
 	// Convert start sector string to int
 	start, err := strconv.Atoi(startSector)
 	if err != nil {
-		return "", fmt.Errorf("failed to convert start sector to int: \n%w", err)
+		return "", fmt.Errorf("failed to convert start sector to int:\n%w", err)
 	}
 	// Calculate the new end
 	end := start + filesystemSizeInSectors
