@@ -9,6 +9,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/buildpipeline"
@@ -16,6 +17,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repocloner"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repomanager/rpmrepomanager"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/tdnf"
@@ -48,6 +50,11 @@ const (
 
 	useSingleTransaction    = true
 	useMultipleTransactions = !useSingleTransaction
+)
+
+var (
+	serverErrorsRegex    = regexp.MustCompile(`(?m)Error: (5\d{2}) when downloading`)
+	serverErrorCodeIndex = 1
 )
 
 // RpmRepoCloner represents an RPM repository cloner.
@@ -597,11 +604,6 @@ func (r *RpmRepoCloner) Close() error {
 // clonePackage clones a given package using pre-populated arguments.
 // It will gradually enable more repos to consider until the package is found.
 func (r *RpmRepoCloner) clonePackage(baseArgs []string) (preBuilt bool, err error) {
-	const (
-		unresolvedOutputPrefix  = "No package"
-		toyboxConflictsPrefix   = "toybox conflicts"
-		unresolvedOutputPostfix = "available"
-	)
 
 	releaseverCliArg, err := tdnf.GetReleaseverCliArg()
 	if err != nil {
@@ -615,40 +617,23 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string) (preBuilt bool, err erro
 
 		finalArgs := append(baseArgs, reposArgs...)
 
-		var (
-			stdout string
-			stderr string
-		)
-		stdout, stderr, err = shell.Execute("tdnf", finalArgs...)
-
-		logger.Log.Debugf("stdout: %s", stdout)
-		logger.Log.Debugf("stderr: %s", stderr)
-
-		if err != nil {
-			logger.Log.Debugf("tdnf error (will continue if the only errors are toybox conflicts):\n '%s'", stderr)
-		}
-
-		// ============== TDNF SPECIFIC IMPLEMENTATION ==============
-		// Check if TDNF could not resolve a given package. If TDNF does not find a requested package,
-		// it will not error. Instead it will print a message to stdout. Check for this message.
-		//
-		// *NOTE*: TDNF will attempt best effort. If N packages are requested, and 1 cannot be found,
-		// it will still download N-1 packages while also printing the message.
-		splitStdout := strings.Split(stdout, "\n")
-		for _, line := range splitStdout {
-			trimmedLine := strings.TrimSpace(line)
-			// Toybox conflicts are a known issue, reset the err value if encountered
-			if strings.HasPrefix(trimmedLine, toyboxConflictsPrefix) {
-				logger.Log.Warn("Ignoring known toybox conflict")
-				err = nil
-				continue
+		// We run in a retry loop on errors deemed retriable.
+		cancel := make(chan struct{})
+		retryNum := 1
+		_, err = retry.RunWithDefaultDownloadBackoff(func() error {
+			downloadErr, retriable := tdnfDownload(finalArgs...)
+			if downloadErr != nil {
+				if retriable {
+					logger.Log.Debugf("Package cloning attempt %d/%d failed with a retriable error.", retryNum, retry.DefaultDownloadRetryAttempts)
+				} else {
+					logger.Log.Debugf("Package cloning attempt %d/%d failed with an unrecoverable error. Cancelling.", retryNum, retry.DefaultDownloadRetryAttempts)
+					close(cancel)
+				}
 			}
-			// If a package was not available, update err
-			if strings.HasPrefix(trimmedLine, unresolvedOutputPrefix) && strings.HasSuffix(trimmedLine, unresolvedOutputPostfix) {
-				err = fmt.Errorf(trimmedLine)
-				break
-			}
-		}
+
+			retryNum++
+			return downloadErr
+		}, cancel)
 
 		if err == nil {
 			preBuilt = r.reposArgsHaveOnlyLocalSources(reposArgs)
@@ -808,4 +793,51 @@ func (r *RpmRepoCloner) reposArgsHaveOnlyLocalSources(reposArgs []string) bool {
 	}
 
 	return true
+}
+
+func tdnfDownload(args ...string) (err error, retriable bool) {
+	const (
+		unresolvedOutputPrefix = "No package"
+		unresolvedOutputSuffix = "available"
+	)
+
+	stdout, stderr, err := shell.Execute("tdnf", args...)
+
+	logger.Log.Debugf("stdout: %s", stdout)
+	logger.Log.Debugf("stderr: %s", stderr)
+
+	// ============== TDNF SPECIFIC IMPLEMENTATION ==============
+	//
+	// Check if TDNF could not resolve a given package. If TDNF does not find a requested package,
+	// it will not error. Instead it will print a message to stdout. Check for this message.
+	//
+	// *NOTE*: TDNF will attempt best effort. If N packages are requested, and 1 cannot be found,
+	// it will still download N-1 packages while also printing the message.
+	splitStdout := strings.Split(stdout, "\n")
+	for _, line := range splitStdout {
+		trimmedLine := strings.TrimSpace(line)
+		// If a package was not available, update err
+		if strings.HasPrefix(trimmedLine, unresolvedOutputPrefix) && strings.HasSuffix(trimmedLine, unresolvedOutputSuffix) {
+			err = fmt.Errorf(trimmedLine)
+			return
+		}
+	}
+
+	//
+	// *NOTE*: There are cases in which some of our upstream package repositories are hosted
+	// on services that are prone to intermittent errors (e.g., HTTP 502 errors). We
+	// specifically look for such known cases and apply some retry logic in hopes of getting
+	// a better result; note that we don't indiscriminately retry because there are legitimate
+	// cases in which the upstream repo doesn't contain the package and a 404 error is to be
+	// expected. This involves scraping through stderr, but it's better than not doing so.
+	//
+	if err != nil {
+		serverErrorMatch := serverErrorsRegex.FindStringSubmatch(stderr)
+		if len(serverErrorMatch) > serverErrorCodeIndex {
+			logger.Log.Debugf("Encountered possibly intermittent HTTP %s error.", serverErrorMatch[serverErrorCodeIndex])
+			retriable = true
+		}
+	}
+
+	return
 }
