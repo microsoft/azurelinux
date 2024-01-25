@@ -82,8 +82,8 @@
                 ],
                 "comment": "No device tree support needed",
                 "value": [
-                    "<missing>",
-                    "is not set"
+                    "is not set",
+                    "<missing>"
                 ]
             },
             "CONFIG_ARM_SMMU_QCOM": {
