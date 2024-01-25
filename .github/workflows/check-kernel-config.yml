@@ -11,10 +11,12 @@ on:
     branches: [main, 1.0*, 2.0*, 3.0*, fasttrack/*]
     paths:
       - 'SPECS/kernel*/config*'
+      - toolkit/scripts/mariner-required-configs.json
   pull_request:
     branches: [main, 1.0*, 2.0*, 3.0*, fasttrack/*]
     paths:
       - 'SPECS/kernel*/config*'
+      - toolkit/scripts/mariner-required-configs.json
 
 jobs:
   check:
@@ -25,7 +27,7 @@ jobs:
       # Checkout the branch of our repo that triggered this action
       - name: Workflow trigger checkout
         uses: actions/checkout@v4
-        
+
       - name: Get base commit for PRs
         if: ${{ github.event_name == 'pull_request' }}
         run: |
@@ -47,6 +49,14 @@ jobs:
 
       - name: Get Python dependencies
         run: python3 -m pip install -r toolkit/scripts/requirements.txt
+
+      # Check if the required configs file is sorted
+      # To fix this check, the output can be written to a file ./json.patch and
+      # applied:
+      #     > patch ./toolkit/scripts/mariner-required-configs.json ./json.patch
+      - name: Check mariner-required-configs.json format
+        run:
+          python3 toolkit/scripts/check_required_config_fmt.py --required_configs=toolkit/scripts/mariner-required-configs.json
 
       # Check if kernel configs changed
       - name: Check if config files changed
