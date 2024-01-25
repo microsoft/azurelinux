@@ -249,6 +249,7 @@ ln -s vmlinux-%{uname_r} %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vml
 cat > %{buildroot}/boot/linux-%{uname_r}.cfg << "EOF"
 # GRUB Environment Block
 mariner_cmdline=init=/lib/systemd/systemd ro no-vmw-sta crashkernel=256M
+mariner_cmdline=init=/lib/systemd/systemd ro crashkernel=256M
 mariner_linux=vmlinuz-%{uname_r}
 mariner_initrd=initrd.img-%{uname_r}
 EOF
