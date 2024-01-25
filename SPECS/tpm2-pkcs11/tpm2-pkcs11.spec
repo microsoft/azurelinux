@@ -89,9 +89,6 @@ cd tools
 python3 setup.py test
 %endif
 
-%clean
-rm -rf %{buildroot}/*
-
 %files
 %defattr(-,root,root,-)
 %license LICENSE
