@@ -12,7 +12,6 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
-	"time"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
@@ -107,32 +106,24 @@ func main() {
 }
 
 func downloadFile(srcUrl, dstFile string, caCerts *x509.CertPool, tlsCerts []tls.Certificate) (err error) {
-	const (
-		// With 6 attempts, initial delay of 1 second, and a backoff factor of 3.0 the total time spent retrying will be
-		// 1 + 3 + 9 + 27 + 81 = 121 seconds.
-		downloadRetryAttempts = 6
-		failureBackoffBase    = 3.0
-		downloadRetryDuration = time.Second
-	)
 	cancel := make(chan struct{})
-
 	retryNum := 1
-	_, err = retry.RunWithExpBackoff(func() error {
+	_, err = retry.RunWithDefaultDownloadBackoff(func() error {
 		netErr := network.DownloadFile(srcUrl, dstFile, caCerts, tlsCerts)
 		if netErr != nil {
 			// Check if the error contains the string "invalid response: 404", we should print a warning in that case so the
 			// sees it even if we are running with --no-verbose. 404's are unlikely to fix themselves on retry, give up.
 			if netErr.Error() == "invalid response: 404" {
-				logger.Log.Warnf("Attempt %d/%d: Failed to download '%s' with error: '%s'", retryNum, downloadRetryAttempts, srcUrl, netErr)
+				logger.Log.Warnf("Attempt %d/%d: Failed to download '%s' with error: '%s'", retryNum, retry.DefaultDownloadRetryAttempts, srcUrl, netErr)
 				logger.Log.Warnf("404 errors are likely unrecoverable, will not retry")
 				close(cancel)
 			} else {
-				logger.Log.Infof("Attempt %d/%d: Failed to download '%s' with error: '%s'", retryNum, downloadRetryAttempts, srcUrl, netErr)
+				logger.Log.Infof("Attempt %d/%d: Failed to download '%s' with error: '%s'", retryNum, retry.DefaultDownloadRetryAttempts, srcUrl, netErr)
 			}
 		}
 		retryNum++
 		return netErr
-	}, downloadRetryAttempts, downloadRetryDuration, failureBackoffBase, cancel)
+	}, cancel)
 
 	if err != nil {
 		err = fmt.Errorf("failed to download (%s) to (%s). Error:\n%w", srcUrl, dstFile, err)
