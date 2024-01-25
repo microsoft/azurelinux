@@ -18,7 +18,7 @@
 Summary:        Linux Kernel for HCI
 Name:           kernel-hci
 Version:        5.15.145.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -551,6 +551,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Thu Jan 25 2024 Vince Perri <viperri@microsoft.com> - 5.15.145.2-3
+- Add net/mlx5 patches (28-85) that backports upstream near-edge improvements and support for 100GB BOM.
+
 * Mon Jan 22 2024 Vince Perri <viperri@microsoft.com> - 5.15.145.2-2
 - Fix header for patch 27 and rename to
 - 0028-net-mlx5-Bridge-Use-debug-instead-of-warn-if-entry-d.patch
