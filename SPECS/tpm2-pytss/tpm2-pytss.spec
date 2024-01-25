@@ -61,6 +61,7 @@ export PYTHONPATH=%{buildroot}%{python3_sitelib}
 %changelog
 * Mon Jan 22 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 1.2.0-2
 - Initial CBL-Mariner import from Photon (license: Apache2).
+- Verified license
 * Mon Oct 31 2022 Prashant S Chauhan <psinghchauha@vmware.com> 1.2.0-2
 - Update release to compile with python 3.11
 * Wed Oct 05 2022 Shreenidhi Shedi <sshedi@vmware.com> 1.2.0-1
