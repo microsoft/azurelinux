@@ -19,6 +19,10 @@ Source3:        megaraid.conf
 Patch0:         disable-xattr.patch
 Patch1:         fix-initrd-naming-for-mariner.patch
 Patch2:         fix-functions-Avoid-calling-grep-with-PCRE-P.patch
+# allow-liveos-overlay-no-user-confirmation-prompt.patch has been introduced by
+# the Mariner team to allow skipping the user confirmation prompt during boot
+# when the overlay of the liveos is backed by ram. This allows the machine to
+# boot without being blocked on user input in such a scenario.
 Patch3:         allow-liveos-overlay-no-user-confirmation-prompt.patch
 BuildRequires:  asciidoc
 BuildRequires:  bash
