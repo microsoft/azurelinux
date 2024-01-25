@@ -1,6 +1,30 @@
---- a/modules.d/90dmsquash-live/dmsquash-live-root.sh	2021-05-27 05:34:19.000000000 -0700
-+++ b/modules.d/90dmsquash-live/dmsquash-live-root.sh	2024-01-24 13:46:46.839171333 -0800
-@@ -25,6 +25,10 @@
+From 4d47f0bae243577a4cf634ae5e01b324cf78e7eb Mon Sep 17 00:00:00 2001
+From: George Mileka <gmileka@microsoft.com>
+Date: Thu, 25 Jan 2024 15:06:13 -0800
+Subject: [PATCH] Update dracut to allow supressing user confirmation prompt
+ when the liveos overlay is backed by memory.
+
+Dracut allows the creation of a LiveOS using a read-only squashfs and an read-write overlay on top.
+
+If the read-write overlay is backed by a ram-disk, Dracut halts booting and prompts the user to confirm
+whether to continue or not.
+
+This interaction during the boot process is not desired in all cases.
+
+This change introduces a new flag (rd.live.overlay.nouserconfirmprompt) that when defined, it supresses
+the prompt and allows the boot process to continue to completion without user interation.
+
+There is no impact to existing configurations and their associated behavior. Only when the new switch
+is explicitly define by the image build (as a kernel parameter), the new behavior will take effect.
+---
+ modules.d/90dmsquash-live/dmsquash-live-root.sh | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/modules.d/90dmsquash-live/dmsquash-live-root.sh b/modules.d/90dmsquash-live/dmsquash-live-root.sh
+index 09128076..90d3e620 100755
+--- a/modules.d/90dmsquash-live/dmsquash-live-root.sh
++++ b/modules.d/90dmsquash-live/dmsquash-live-root.sh
+@@ -25,6 +25,10 @@ squash_image=$(getarg rd.live.squashimg)
  getargbool 0 rd.live.ram -d -y live_ram && live_ram="yes"
  getargbool 0 rd.live.overlay.reset -d -y reset_overlay && reset_overlay="yes"
  getargbool 0 rd.live.overlay.readonly -d -y readonly_overlay && readonly_overlay="--readonly" || readonly_overlay=""
@@ -11,7 +35,7 @@
  overlay=$(getarg rd.live.overlay -d overlay)
  getargbool 0 rd.writable.fsimg -d -y writable_fsimg && writable_fsimg="yes"
  overlay_size=$(getarg rd.live.overlay.size=)
-@@ -185,7 +189,7 @@
+@@ -185,7 +189,7 @@ do_live_overlay() {
      fi
  
      if [ -z "$setup" -o -n "$readonly_overlay" ]; then
@@ -20,3 +44,6 @@
              warn "Using temporary overlay."
          elif [ -n "$devspec" -a -n "$pathspec" ]; then
              [ -z "$m" ] \
+-- 
+2.34.1
+
