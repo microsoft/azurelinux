@@ -2,7 +2,7 @@
 
 Summary:        Gives a fake root environment
 Name:           fakeroot
-Version:        1.29
+Version:        1.32.2
 Release:        1%{?dist}
 # setenv.c: LGPLv2+
 # contrib/Fakeroot-Stat-1.8.8: Perl (GPL+ or Artistic)
@@ -15,12 +15,10 @@ Source0:        https://cdn-aws.deb.debian.org/debian/pool/main/f/fakeroot/%{nam
 # Debian package patches, from debian.tar.xz
 Patch2:         debian_fix-shell-in-fakeroot.patch
 # Address some POSIX-types related problems.
-Patch4:         fakeroot-inttypes.patch
+# Patch4:         fakeroot-inttypes.patch
 # Fix LD_LIBRARY_PATH for multilib: https://bugzilla.redhat.com/show_bug.cgi?id=1241527
 Patch5:         fakeroot-multilib.patch
 Patch7:         relax_tartest.patch
-Patch8:         also-wrap-stat-library-call.patch
-Patch10:        po4a.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -179,6 +177,9 @@ fi
 %ghost %{_libdir}/libfakeroot/libfakeroot-0.so
 
 %changelog
+* Tue Jan 23 2024 Andrew Phelps <anphel@microsoft.com> - 1.32.2-1
+- Upgrade to version 1.32.2
+
 * Mon Jun 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.29-1
 - Updating to 1.29 to fix a test.
 
@@ -385,5 +386,5 @@ fi
 * Sun Jan 25 2004 Axel Thimm <Axel.Thimm@ATrpms.net>
 - Update to 0.8.3.
 
-* Wed Oct  8 2003 Axel Thimm <Axel.Thimm@ATrpms.net> 
+* Wed Oct  8 2003 Axel Thimm <Axel.Thimm@ATrpms.net>
 - Initial build.
