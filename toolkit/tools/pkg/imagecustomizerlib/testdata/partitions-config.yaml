@@ -24,9 +24,9 @@ Disks:
     Start: 2048
     FsType: xfs
 
-SystemConfig:
-  BootType: efi
-  PartitionSettings:
+systemConfig:
+  bootType: efi
+  partitionSettings:
   - ID: esp
     MountPoint: /boot/efi
     MountOptions: umask=0077
