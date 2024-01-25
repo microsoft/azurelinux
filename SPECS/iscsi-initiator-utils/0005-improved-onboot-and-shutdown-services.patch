@@ -1,0 +1,142 @@
+From 5a62fe2c3c36b9d14b433edb8cbccbed7af4e2b7 Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Tue, 18 Apr 2023 15:53:33 -0700
+Subject: [PATCH 4/6] improved onboot and shutdown services
+ 
+---
+ etc/systemd/iscsi-mark-root-nodes           | 34 +++++++++++++++++++++
+ etc/systemd/iscsi-onboot.service.template   | 15 +++++++++
+ etc/systemd/iscsi-shutdown.service.template | 15 +++++++++
+ etc/systemd/iscsi.service.template          |  3 +-
+ etc/systemd/iscsid.service.template         |  2 +-
+ etc/systemd/meson.build                     |  2 +-
+ 6 files changed, 67 insertions(+), 4 deletions(-)
+ create mode 100755 etc/systemd/iscsi-mark-root-nodes
+ create mode 100644 etc/systemd/iscsi-onboot.service.template
+ create mode 100644 etc/systemd/iscsi-shutdown.service.template
+ 
+diff --git a/etc/systemd/iscsi-mark-root-nodes b/etc/systemd/iscsi-mark-root-nodes
+new file mode 100755
+index 0000000..9d48805
+--- /dev/null
++++ b/etc/systemd/iscsi-mark-root-nodes
+@@ -0,0 +1,34 @@
++#!/bin/bash
++
++ISCSIADM=/usr/sbin/iscsiadm
++start_iscsid=0
++start_iscsiuio=0
++
++while read t num p target flash; do
++  # strip tag number from portal, keep "ip:port"
++  portal=${p%,*}
++  transport=${t%:}
++
++  # use session number to find the iface name in use
++  num=${num#[}; num=${num%]}
++  iface=$(iscsiadm -m session -r $num | grep iface.iscsi_ifacename | cut -d= -f2)
++
++  $ISCSIADM -m node -p $portal -T $target -I $iface -o update -n node.startup -v onboot
++
++  start_iscsid=1
++
++  if [ "$transport" = bnx2i ] || [ "$transport" = qedi ]; then
++    start_iscsiuio=1
++  fi
++done < <( $ISCSIADM -m session )
++
++# force iscsid and iscsiuio to start if needed for
++# recovering sessions created in the initrd
++
++if [ "$start_iscsid" -eq 1 ]; then
++  systemctl --no-block start iscsid.service
++fi
++if [ "$start_iscsiuio" -eq 1 ]; then
++  systemctl --no-block start iscsiuio.service
++fi
++
+diff --git a/etc/systemd/iscsi-onboot.service.template b/etc/systemd/iscsi-onboot.service.template
+new file mode 100644
+index 0000000..42ced68
+--- /dev/null
++++ b/etc/systemd/iscsi-onboot.service.template
+@@ -0,0 +1,15 @@
++[Unit]
++Description=Special handling of early boot iSCSI sessions
++Documentation=man:iscsiadm(8) man:iscsid(8)
++DefaultDependencies=no
++RefuseManualStart=true
++Before=iscsi.service
++After=systemd-remount-fs.service
++ConditionDirectoryNotEmpty=/sys/class/iscsi_session
++
++[Service]
++Type=oneshot
++ExecStart=-/usr/libexec/iscsi-mark-root-nodes
++
++[Install]
++WantedBy=sysinit.target
+diff --git a/etc/systemd/iscsi-shutdown.service.template b/etc/systemd/iscsi-shutdown.service.template
+new file mode 100644
+index 0000000..fe5d5cd
+--- /dev/null
++++ b/etc/systemd/iscsi-shutdown.service.template
+@@ -0,0 +1,15 @@
++[Unit]
++Description=Logout off all iSCSI sessions on shutdown
++Documentation=man:iscsid(8) man:iscsiadm(8)
++DefaultDependencies=no
++Conflicts=shutdown.target
++After=systemd-remount-fs.service network.target iscsid.service iscsiuio.service
++Before=remote-fs-pre.target
++Wants=remote-fs-pre.target
++RefuseManualStop=yes
++
++[Service]
++Type=oneshot
++RemainAfterExit=true
++ExecStart=-/usr/bin/true
++ExecStop=-@SBINDIR@/iscsiadm -m node --logoutall=all
+diff --git a/etc/systemd/iscsi.service.template b/etc/systemd/iscsi.service.template
+index 8a4de9b..17153a1 100644
+--- a/etc/systemd/iscsi.service.template
++++ b/etc/systemd/iscsi.service.template
+@@ -9,8 +9,7 @@ Wants=network-online.target
+ [Service]
+ Type=oneshot
+ ExecStart=@SBINDIR@/iscsiadm -m node --loginall=automatic -W
+-ExecStop=@SBINDIR@/iscsiadm -m node --logoutall=automatic
+-ExecStop=@SBINDIR@/iscsiadm -m node --logoutall=manual
++ExecReload=@SBINDIR@/iscsiadm -m node --loginall=automatic -W
+ SuccessExitStatus=21 15
+ RemainAfterExit=true
+ 
+diff --git a/etc/systemd/iscsid.service.template b/etc/systemd/iscsid.service.template
+index e2a50d3..8987299 100644
+--- a/etc/systemd/iscsid.service.template
++++ b/etc/systemd/iscsid.service.template
+@@ -5,7 +5,7 @@ DefaultDependencies=no
+ After=network-online.target iscsiuio.service iscsi-init.service
+ Before=remote-fs-pre.target
+ Wants=remote-fs-pre.target
+-Requires=iscsi-init.service
++Requires=iscsi-init.service iscsi-shutdown.service
+ 
+ [Service]
+ Type=notify
+diff --git a/etc/systemd/meson.build b/etc/systemd/meson.build
+index 1470a53..adcc6a1 100644
+--- a/etc/systemd/meson.build
++++ b/etc/systemd/meson.build
+@@ -3,7 +3,7 @@
+ #
+ 
+ # templated systemd service files
+-iscsi_etc_systemd_service_units = ['iscsi-init', 'iscsid', 'iscsi', 'iscsi-starter', 'iscsiuio']
++iscsi_etc_systemd_service_units = ['iscsi-init', 'iscsid', 'iscsi', 'iscsi-starter', 'iscsiuio', 'iscsi-onboot', 'iscsi-shutdown']
+ iscsi_etc_systemd_service_units_arr = {}
+ foreach u: iscsi_etc_systemd_service_units
+   iscsi_etc_systemd_service_units_arr += {u + '.service': files(u + '.service.template')}
+-- 
+2.39.2
+ 

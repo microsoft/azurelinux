@@ -2,7 +2,7 @@
 %global gem_name protocol-http
 Summary:        Provides abstractions to handle HTTP protocols
 Name:           rubygem-%{gem_name}
-Version:        0.22.5
+Version:        0.24.7
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -19,6 +19,12 @@ Provides abstractions for working with the HTTP protocol.
 %prep
 %setup -q -n %{gem_name}-%{version}
 
+# these certs are used to verify the package generated is valid
+# we don't have access to the signing_key private key
+# also redudant as azl already validate src tar while building
+sed -i '/spec.cert_chain/d' %{gem_name}.gemspec
+sed -i '/spec.signing_key/d' %{gem_name}.gemspec 
+
 %build
 gem build %{gem_name}
 
@@ -30,6 +36,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Mon Jan 22 2024 Riken Maharjan <rmaharjan@microsoft.com> - 0.24.7-1
+- Update to v0.24.7.
+
 * Fri Apr 01 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.22.5-1
 - Update to v0.22.5.
 - Build from .tar.gz source.
