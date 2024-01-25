@@ -1,0 +1,89 @@
+From 2a277856df73b483e869dc82f9a9ffbfc632a0d5 Mon Sep 17 00:00:00 2001
+From: Yevgeny Kliteynik <kliteyn@nvidia.com>
+Date: Tue, 23 Nov 2021 02:11:12 +0200
+Subject: [PATCH 47/58] net/mlx5: DR, Ignore modify TTL if device doesn't
+ support it
+
+When modifying TTL, packet's csum has to be recalculated.
+Due to HW issue in ConnectX-5, csum recalculation for modify TTL
+is supported through a work-around that is specifically enabled
+by configuration.
+If the work-around isn't enabled, ignore the modify TTL action
+rather than adding an unsupported action.
+
+Signed-off-by: Yevgeny Kliteynik <kliteyn@nvidia.com>
+Change-Id: I1a400b4ffb5b8cbbdccc442571619420fec6a1a4
+---
+ .../mellanox/mlx5/core/steering/dr_action.c   | 21 ++++++++++++++++---
+ include/linux/mlx5/mlx5_ifc.h                 |  2 +-
+ 2 files changed, 19 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_action.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_action.c
+index 22782777a339..579b632fe4c5 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_action.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_action.c
+@@ -1557,6 +1557,12 @@ dr_action_modify_check_is_ttl_modify(const void *sw_action)
+ 	return sw_field == MLX5_ACTION_IN_FIELD_OUT_IP_TTL;
+ }
+ 
++static bool dr_action_modify_ttl_ignore(struct mlx5dr_domain *dmn)
++{
++	return !mlx5dr_ste_supp_ttl_cs_recalc(&dmn->info.caps) &&
++	       !MLX5_CAP_ESW_FLOWTABLE(dmn->mdev, fdb_ipv4_ttl_modify);
++}
++
+ static int dr_actions_convert_modify_header(struct mlx5dr_action *action,
+ 					    u32 max_hw_actions,
+ 					    u32 num_sw_actions,
+@@ -1588,8 +1594,13 @@ static int dr_actions_convert_modify_header(struct mlx5dr_action *action,
+ 		if (ret)
+ 			return ret;
+ 
+-		if (!(*modify_ttl))
+-			*modify_ttl = dr_action_modify_check_is_ttl_modify(sw_action);
++		if (!(*modify_ttl) &&
++		    dr_action_modify_check_is_ttl_modify(sw_action)) {
++			if (dr_action_modify_ttl_ignore(dmn))
++				continue;
++
++			*modify_ttl = true;
++		}
+ 
+ 		/* Convert SW action to HW action */
+ 		ret = dr_action_modify_sw_to_hw(dmn,
+@@ -1628,7 +1639,7 @@ static int dr_actions_convert_modify_header(struct mlx5dr_action *action,
+ 			 * modify actions doesn't exceeds the limit
+ 			 */
+ 			hw_idx++;
+-			if ((num_sw_actions + hw_idx - i) >= max_hw_actions) {
++			if (hw_idx >= max_hw_actions) {
+ 				mlx5dr_dbg(dmn, "Modify header action number exceeds HW limit\n");
+ 				return -EINVAL;
+ 			}
+@@ -1639,6 +1650,10 @@ static int dr_actions_convert_modify_header(struct mlx5dr_action *action,
+ 		hw_idx++;
+ 	}
+ 
++	/* if the resulting HW actions list is empty, add NOP action */
++	if (!hw_idx)
++		hw_idx++;
++
+ 	*num_hw_actions = hw_idx;
+ 
+ 	return 0;
+diff --git a/include/linux/mlx5/mlx5_ifc.h b/include/linux/mlx5/mlx5_ifc.h
+index d6fd4bca8a17..03351bc3072b 100644
+--- a/include/linux/mlx5/mlx5_ifc.h
++++ b/include/linux/mlx5/mlx5_ifc.h
+@@ -817,7 +817,7 @@ struct mlx5_ifc_flow_table_eswitch_cap_bits {
+ 	u8      fdb_to_vport_reg_c_id[0x8];
+ 	u8      reserved_at_8[0xd];
+ 	u8      fdb_modify_header_fwd_to_table[0x1];
+-	u8      reserved_at_16[0x1];
++	u8      fdb_ipv4_ttl_modify[0x1];
+ 	u8      flow_source[0x1];
+ 	u8      reserved_at_18[0x2];
+ 	u8      multi_fdb_encap[0x1];
+-- 
+2.31.1
+

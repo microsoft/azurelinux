@@ -1,0 +1,137 @@
+From 5a71e1b91f33985b0b7de1ebe3e5a24de5be0260 Mon Sep 17 00:00:00 2001
+From: Yevgeny Kliteynik <kliteyn@nvidia.com>
+Date: Sun, 24 Oct 2021 21:36:30 +0300
+Subject: [PATCH 40/58] net/mlx5: DR, Add support for UPLINK destination type
+
+Add support for a new destination type - UPLINK.
+
+Signed-off-by: Yevgeny Kliteynik <kliteyn@nvidia.com>
+Change-Id: I2581ff047f6e63c291d18d732d8b62222a43e0c2
+---
+ .../net/ethernet/mellanox/mlx5/core/fs_cmd.c  |  3 ++-
+ .../net/ethernet/mellanox/mlx5/core/fs_core.c |  3 ++-
+ .../mellanox/mlx5/core/steering/dr_cmd.c      | 20 +++++++++++++------
+ .../mellanox/mlx5/core/steering/fs_dr.c       | 18 +++++++++++++++--
+ 4 files changed, 34 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c b/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c
+index 750b21124a1a..98588e117349 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c
+@@ -451,7 +451,8 @@ static int mlx5_set_extended_dest(struct mlx5_core_dev *dev,
+ 	list_for_each_entry(dst, &fte->node.children, node.list) {
+ 		if (dst->dest_attr.type == MLX5_FLOW_DESTINATION_TYPE_COUNTER)
+ 			continue;
+-		if (dst->dest_attr.type == MLX5_FLOW_DESTINATION_TYPE_VPORT &&
++		if ((dst->dest_attr.type == MLX5_FLOW_DESTINATION_TYPE_VPORT ||
++		     dst->dest_attr.type == MLX5_FLOW_DESTINATION_TYPE_UPLINK) &&
+ 		    dst->dest_attr.vport.flags & MLX5_FLOW_DEST_VPORT_REFORMAT_ID)
+ 			num_encap++;
+ 		num_fwd_destinations++;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c b/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c
+index 3d437d1f99b0..f7ac426fbf9f 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c
+@@ -1493,7 +1493,8 @@ static bool mlx5_flow_dests_cmp(struct mlx5_flow_destination *d1,
+ 				struct mlx5_flow_destination *d2)
+ {
+ 	if (d1->type == d2->type) {
+-		if ((d1->type == MLX5_FLOW_DESTINATION_TYPE_VPORT &&
++		if (((d1->type == MLX5_FLOW_DESTINATION_TYPE_VPORT ||
++		      d1->type == MLX5_FLOW_DESTINATION_TYPE_UPLINK) &&
+ 		     d1->vport.num == d2->vport.num &&
+ 		     d1->vport.flags == d2->vport.flags &&
+ 		     ((d1->vport.flags & MLX5_FLOW_DEST_VPORT_VHCA_ID) ?
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_cmd.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_cmd.c
+index 868dd83c7329..3b2d8979fbe0 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_cmd.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_cmd.c
+@@ -599,7 +599,8 @@ static int mlx5dr_cmd_set_extended_dest(struct mlx5_core_dev *dev,
+ 	for (i = 0; i < fte->dests_size; i++) {
+ 		if (fte->dest_arr[i].type == MLX5_FLOW_DESTINATION_TYPE_COUNTER)
+ 			continue;
+-		if (fte->dest_arr[i].type == MLX5_FLOW_DESTINATION_TYPE_VPORT &&
++		if ((fte->dest_arr[i].type == MLX5_FLOW_DESTINATION_TYPE_VPORT ||
++		     fte->dest_arr[i].type == MLX5_FLOW_DESTINATION_TYPE_UPLINK) &&
+ 		    fte->dest_arr[i].vport.flags & MLX5_FLOW_DEST_VPORT_REFORMAT_ID)
+ 			num_encap++;
+ 		num_fwd_destinations++;
+@@ -724,12 +725,19 @@ int mlx5dr_cmd_set_fte(struct mlx5_core_dev *dev,
+ 			case MLX5_FLOW_DESTINATION_TYPE_FLOW_TABLE:
+ 				id = fte->dest_arr[i].ft_id;
+ 				break;
++			case MLX5_FLOW_DESTINATION_TYPE_UPLINK:
+ 			case MLX5_FLOW_DESTINATION_TYPE_VPORT:
+-				id = fte->dest_arr[i].vport.num;
+-				MLX5_SET(dest_format_struct, in_dests,
+-					 destination_eswitch_owner_vhca_id_valid,
+-					 !!(fte->dest_arr[i].vport.flags &
+-					    MLX5_FLOW_DEST_VPORT_VHCA_ID));
++				if (type == MLX5_FLOW_DESTINATION_TYPE_VPORT) {
++					id = fte->dest_arr[i].vport.num;
++					MLX5_SET(dest_format_struct, in_dests,
++						 destination_eswitch_owner_vhca_id_valid,
++						 !!(fte->dest_arr[i].vport.flags &
++						    MLX5_FLOW_DEST_VPORT_VHCA_ID));
++				} else {
++					id = 0;
++					MLX5_SET(dest_format_struct, in_dests,
++						 destination_eswitch_owner_vhca_id_valid, 1);
++				}
+ 				MLX5_SET(dest_format_struct, in_dests,
+ 					 destination_eswitch_owner_vhca_id,
+ 					 fte->dest_arr[i].vport.vhca_id);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/fs_dr.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/fs_dr.c
+index 5d22a28294d5..54dc366c5f0a 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/fs_dr.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/fs_dr.c
+@@ -1,6 +1,7 @@
+ // SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
+ /* Copyright (c) 2019 Mellanox Technologies */
+ 
++#include <linux/mlx5/vport.h>
+ #include "mlx5_core.h"
+ #include "fs_core.h"
+ #include "fs_cmd.h"
+@@ -193,6 +194,15 @@ static struct mlx5dr_action *create_vport_action(struct mlx5dr_domain *domain,
+ 					       dest_attr->vport.vhca_id);
+ }
+ 
++static struct mlx5dr_action *create_uplink_action(struct mlx5dr_domain *domain,
++						  struct mlx5_flow_rule *dst)
++{
++	struct mlx5_flow_destination *dest_attr = &dst->dest_attr;
++
++	return mlx5dr_action_create_dest_vport(domain, MLX5_VPORT_UPLINK, 1,
++					       dest_attr->vport.vhca_id);
++}
++
+ static struct mlx5dr_action *create_ft_action(struct mlx5dr_domain *domain,
+ 					      struct mlx5_flow_rule *dst)
+ {
+@@ -217,7 +227,8 @@ static struct mlx5dr_action *create_action_push_vlan(struct mlx5dr_domain *domai
+ 
+ static bool contain_vport_reformat_action(struct mlx5_flow_rule *dst)
+ {
+-	return dst->dest_attr.type == MLX5_FLOW_DESTINATION_TYPE_VPORT &&
++	return (dst->dest_attr.type == MLX5_FLOW_DESTINATION_TYPE_VPORT ||
++		dst->dest_attr.type == MLX5_FLOW_DESTINATION_TYPE_UPLINK) &&
+ 		dst->dest_attr.vport.flags & MLX5_FLOW_DEST_VPORT_REFORMAT_ID;
+ }
+ 
+@@ -410,8 +421,11 @@ static int mlx5_cmd_dr_create_fte(struct mlx5_flow_root_namespace *ns,
+ 				fs_dr_actions[fs_dr_num_actions++] = tmp_action;
+ 				term_actions[num_term_actions++].dest = tmp_action;
+ 				break;
++			case MLX5_FLOW_DESTINATION_TYPE_UPLINK:
+ 			case MLX5_FLOW_DESTINATION_TYPE_VPORT:
+-				tmp_action = create_vport_action(domain, dst);
++				tmp_action = type == MLX5_FLOW_DESTINATION_TYPE_VPORT ?
++					     create_vport_action(domain, dst) :
++					     create_uplink_action(domain, dst);
+ 				if (!tmp_action) {
+ 					err = -ENOMEM;
+ 					goto free_actions;
+-- 
+2.31.1
+

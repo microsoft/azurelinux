@@ -1,0 +1,243 @@
+From 791eb78285e8b81bc09bfc6bd928b981eaefb082 Mon Sep 17 00:00:00 2001
+From: Vlad Buslov <vladbu@nvidia.com>
+Date: Thu, 25 May 2023 15:19:00 +0200
+Subject: [PATCH 84/84] net/mlx5: Bridge, expose FDB state via debugfs
+
+For debugging purposes expose offloaded FDB state (flags, counters, etc.)
+via debugfs inside 'esw' root directory. Example debugfs file output:
+
+$ cat mlx5/0000\:08\:00.0/esw/bridge/bridge1/fdb
+DEV              MAC               VLAN              PACKETS                BYTES              LASTUSE FLAGS
+enp8s0f0_1       e4:0a:05:08:00:06    2                    2                  204           4295567112   0x0
+enp8s0f0_0       e4:0a:05:08:00:03    2                    3                  278           4295567112   0x0
+
+Conflicts:
+ - drivers/net/ethernet/mellanox/mlx5/core/Makefile
+   Context diff due to missing
+   c1fef618d611 ("net/mlx5: Implement thermal zone")
+
+ - drivers/net/ethernet/mellanox/mlx5/core/fs_counters.c
+ - include/linux/mlx5/fs.h
+   commit 2b68d659a704 ("net/mlx5e: TC, support per action stats")
+   is missing. Thus, function mlx5_fc_query_cached_raw() is missing 
+   and a build error occurs. Add needed function to the patch.  
+
+Signed-off-by: Vlad Buslov <vladbu@nvidia.com>
+Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
+Reviewed-by: Gal Pressman <gal@nvidia.com>
+Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+---
+ .../net/ethernet/mellanox/mlx5/core/Makefile  |  3 +-
+ .../ethernet/mellanox/mlx5/core/esw/bridge.c  |  4 +
+ .../ethernet/mellanox/mlx5/core/esw/bridge.h  |  2 +
+ .../mellanox/mlx5/core/esw/bridge_debugfs.c   | 89 +++++++++++++++++++
+ .../mellanox/mlx5/core/esw/bridge_priv.h      |  6 ++
+ 5 files changed, 103 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/esw/bridge_debugfs.c
+
+--- a/drivers/net/ethernet/mellanox/mlx5/core/Makefile
++++ b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
+@@ -60,7 +60,8 @@ mlx5_core-$(CONFIG_MLX5_ESWITCH)   += es
+ 				      esw/acl/egress_lgcy.o esw/acl/egress_ofld.o \
+ 				      esw/acl/ingress_lgcy.o esw/acl/ingress_ofld.o
+ 
+-mlx5_core-$(CONFIG_MLX5_BRIDGE)    += esw/bridge.o esw/bridge_mcast.o en/rep/bridge.o
++mlx5_core-$(CONFIG_MLX5_BRIDGE)    += esw/bridge.o esw/bridge_mcast.o esw/bridge_debugfs.o \
++				      en/rep/bridge.o
+ 
+ mlx5_core-$(CONFIG_MLX5_MPFS)      += lib/mpfs.o
+ mlx5_core-$(CONFIG_VXLAN)          += lib/vxlan.o
+--- a/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge.c
+@@ -850,6 +850,7 @@ static struct mlx5_esw_bridge *mlx5_esw_
+ 	bridge->ageing_time = clock_t_to_jiffies(BR_DEFAULT_AGEING_TIME);
+ 	bridge->vlan_proto = ETH_P_8021Q;
+ 	list_add(&bridge->list, &br_offloads->bridges);
++	mlx5_esw_bridge_debugfs_init(br_netdev, bridge);
+ 
+ 	return bridge;
+ 
+@@ -873,6 +874,7 @@ static void mlx5_esw_bridge_put(struct m
+ 	if (--bridge->refcnt)
+ 		return;
+ 
++	mlx5_esw_bridge_debugfs_cleanup(bridge);
+ 	mlx5_esw_bridge_egress_table_cleanup(bridge);
+ 	mlx5_esw_bridge_mcast_disable(bridge);
+ 	list_del(&bridge->list);
+@@ -1890,6 +1892,7 @@ struct mlx5_esw_bridge_offloads *mlx5_es
+ 	xa_init(&br_offloads->ports);
+ 	br_offloads->esw = esw;
+ 	esw->br_offloads = br_offloads;
++	mlx5_esw_bridge_debugfs_offloads_init(br_offloads);
+ 
+ 	return br_offloads;
+ }
+@@ -1905,6 +1908,7 @@ void mlx5_esw_bridge_cleanup(struct mlx5
+ 
+ 	mlx5_esw_bridge_flush(br_offloads);
+ 	WARN_ON(!xa_empty(&br_offloads->ports));
++	mlx5_esw_bridge_debugfs_offloads_cleanup(br_offloads);
+ 
+ 	esw->br_offloads = NULL;
+ 	kvfree(br_offloads);
+--- a/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge.h
+@@ -10,6 +10,7 @@
+ #include <linux/xarray.h>
+ #include "eswitch.h"
+ 
++struct dentry;
+ struct mlx5_flow_table;
+ struct mlx5_flow_group;
+ 
+@@ -17,6 +18,7 @@ struct mlx5_esw_bridge_offloads {
+ 	struct mlx5_eswitch *esw;
+ 	struct list_head bridges;
+ 	struct xarray ports;
++	struct dentry *debugfs_root;
+ 
+ 	struct notifier_block netdev_nb;
+ 	struct notifier_block nb_blk;
+--- /dev/null
++++ b/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge_debugfs.c
+@@ -0,0 +1,89 @@
++// SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
++/* Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved. */
++
++#include <linux/debugfs.h>
++#include "bridge.h"
++#include "bridge_priv.h"
++
++static void *mlx5_esw_bridge_debugfs_start(struct seq_file *seq, loff_t *pos);
++static void *mlx5_esw_bridge_debugfs_next(struct seq_file *seq, void *v, loff_t *pos);
++static void mlx5_esw_bridge_debugfs_stop(struct seq_file *seq, void *v);
++static int mlx5_esw_bridge_debugfs_show(struct seq_file *seq, void *v);
++
++static const struct seq_operations mlx5_esw_bridge_debugfs_sops = {
++	.start	= mlx5_esw_bridge_debugfs_start,
++	.next	= mlx5_esw_bridge_debugfs_next,
++	.stop	= mlx5_esw_bridge_debugfs_stop,
++	.show	= mlx5_esw_bridge_debugfs_show,
++};
++DEFINE_SEQ_ATTRIBUTE(mlx5_esw_bridge_debugfs);
++
++static void *mlx5_esw_bridge_debugfs_start(struct seq_file *seq, loff_t *pos)
++{
++	struct mlx5_esw_bridge *bridge = seq->private;
++
++	rtnl_lock();
++	return *pos ? seq_list_start(&bridge->fdb_list, *pos - 1) : SEQ_START_TOKEN;
++}
++
++static void *mlx5_esw_bridge_debugfs_next(struct seq_file *seq, void *v, loff_t *pos)
++{
++	struct mlx5_esw_bridge *bridge = seq->private;
++
++	return seq_list_next(v == SEQ_START_TOKEN ? &bridge->fdb_list : v, &bridge->fdb_list, pos);
++}
++
++static void mlx5_esw_bridge_debugfs_stop(struct seq_file *seq, void *v)
++{
++	rtnl_unlock();
++}
++
++static int mlx5_esw_bridge_debugfs_show(struct seq_file *seq, void *v)
++{
++	struct mlx5_esw_bridge_fdb_entry *entry;
++	u64 packets, bytes, lastuse;
++
++	if (v == SEQ_START_TOKEN) {
++		seq_printf(seq, "%-16s %-17s %4s %20s %20s %20s %5s\n",
++			   "DEV", "MAC", "VLAN", "PACKETS", "BYTES", "LASTUSE", "FLAGS");
++		return 0;
++	}
++
++	entry = list_entry(v, struct mlx5_esw_bridge_fdb_entry, list);
++	mlx5_fc_query_cached_raw(entry->ingress_counter, &bytes, &packets, &lastuse);
++	seq_printf(seq, "%-16s %-17pM %4d %20llu %20llu %20llu %#5x\n",
++		   entry->dev->name, entry->key.addr, entry->key.vid, packets, bytes, lastuse,
++		   entry->flags);
++	return 0;
++}
++
++void mlx5_esw_bridge_debugfs_init(struct net_device *br_netdev, struct mlx5_esw_bridge *bridge)
++{
++	if (!bridge->br_offloads->debugfs_root)
++		return;
++
++	bridge->debugfs_dir = debugfs_create_dir(br_netdev->name,
++						 bridge->br_offloads->debugfs_root);
++	debugfs_create_file("fdb", 0444, bridge->debugfs_dir, bridge,
++			    &mlx5_esw_bridge_debugfs_fops);
++}
++
++void mlx5_esw_bridge_debugfs_cleanup(struct mlx5_esw_bridge *bridge)
++{
++	debugfs_remove_recursive(bridge->debugfs_dir);
++	bridge->debugfs_dir = NULL;
++}
++
++void mlx5_esw_bridge_debugfs_offloads_init(struct mlx5_esw_bridge_offloads *br_offloads)
++{
++	if (!br_offloads->esw->debugfs_root)
++		return;
++
++	br_offloads->debugfs_root = debugfs_create_dir("bridge", br_offloads->esw->debugfs_root);
++}
++
++void mlx5_esw_bridge_debugfs_offloads_cleanup(struct mlx5_esw_bridge_offloads *br_offloads)
++{
++	debugfs_remove_recursive(br_offloads->debugfs_root);
++	br_offloads->debugfs_root = NULL;
++}
+--- a/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge_priv.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge_priv.h
+@@ -199,6 +199,7 @@ struct mlx5_esw_bridge {
+ 	int refcnt;
+ 	struct list_head list;
+ 	struct mlx5_esw_bridge_offloads *br_offloads;
++	struct dentry *debugfs_dir;
+ 
+ 	struct list_head fdb_list;
+ 	struct rhashtable fdb_ht;
+@@ -241,4 +242,9 @@ void mlx5_esw_bridge_port_mdb_vlan_flush
+ 					 struct mlx5_esw_bridge_vlan *vlan);
+ void mlx5_esw_bridge_mdb_flush(struct mlx5_esw_bridge *bridge);
+ 
++void mlx5_esw_bridge_debugfs_offloads_init(struct mlx5_esw_bridge_offloads *br_offloads);
++void mlx5_esw_bridge_debugfs_offloads_cleanup(struct mlx5_esw_bridge_offloads *br_offloads);
++void mlx5_esw_bridge_debugfs_init(struct net_device *br_netdev, struct mlx5_esw_bridge *bridge);
++void mlx5_esw_bridge_debugfs_cleanup(struct mlx5_esw_bridge *bridge);
++
+ #endif /* _MLX5_ESW_BRIDGE_PRIVATE_ */
+--- a/drivers/net/ethernet/mellanox/mlx5/core/fs_counters.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/fs_counters.c
+@@ -430,6 +430,16 @@ u64 mlx5_fc_query_lastuse(struct mlx5_fc
+ 	return counter->cache.lastuse;
+ }
+ 
++void mlx5_fc_query_cached_raw(struct mlx5_fc *counter,
++			      u64 *bytes, u64 *packets, u64 *lastuse)
++{
++	struct mlx5_fc_cache c = counter->cache;
++
++	*bytes = c.bytes;
++	*packets = c.packets;
++	*lastuse = c.lastuse;
++}
++
+ void mlx5_fc_query_cached(struct mlx5_fc *counter,
+ 			  u64 *bytes, u64 *packets, u64 *lastuse)
+ {
+--- a/include/linux/mlx5/fs.h
++++ b/include/linux/mlx5/fs.h
+@@ -248,6 +248,8 @@ void mlx5_fc_destroy(struct mlx5_core_de
+ u64 mlx5_fc_query_lastuse(struct mlx5_fc *counter);
+ void mlx5_fc_query_cached(struct mlx5_fc *counter,
+ 			  u64 *bytes, u64 *packets, u64 *lastuse);
++void mlx5_fc_query_cached_raw(struct mlx5_fc *counter,
++			      u64 *bytes, u64 *packets, u64 *lastuse);
+ int mlx5_fc_query(struct mlx5_core_dev *dev, struct mlx5_fc *counter,
+ 		  u64 *packets, u64 *bytes);
+ u32 mlx5_fc_id(struct mlx5_fc *counter);

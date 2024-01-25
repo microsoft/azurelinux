@@ -1,0 +1,165 @@
+From 9091b821aaa4c2d107ca8f97c32baefcb1e7e40d Mon Sep 17 00:00:00 2001
+From: Yevgeny Kliteynik <kliteyn@nvidia.com>
+Date: Wed, 3 Nov 2021 01:09:04 +0200
+Subject: [PATCH] net/mlx5: DR, Handle eswitch manager and uplink vports
+ separately
+
+When querying eswitch manager vport capabilities as "other = 1",
+we encounter a FW compatibility issue with older FW versions.
+To maintain backward compatibility, eswitch manager vport should
+be queried as "other = 0" vport both for ECPF and non-ECPF cases.
+
+This patch fixes these queries and improves the code readability
+by handling eswitch manager and uplink vports separately, avoiding
+the excessive 'if' conditions. Also, uplink caps are stored similar
+to esw manager and not as part of xarray.
+
+Fixes: dd4acb2a0954 ("net/mlx5: DR, Add missing query for vport 0")
+Signed-off-by: Yevgeny Kliteynik <kliteyn@nvidia.com>
+Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+---
+ .../mellanox/mlx5/core/steering/dr_domain.c   | 56 ++++++++-----------
+ .../mellanox/mlx5/core/steering/dr_types.h    |  1 +
+ 2 files changed, 24 insertions(+), 33 deletions(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_domain.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_domain.c
+index 49089cbe897c..8cbd36c82b3b 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_domain.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_domain.c
+@@ -135,25 +135,14 @@ static void dr_domain_fill_uplink_caps(struct mlx5dr_domain *dmn,
+ 
+ static int dr_domain_query_vport(struct mlx5dr_domain *dmn,
+ 				 u16 vport_number,
++				 bool other_vport,
+ 				 struct mlx5dr_cmd_vport_cap *vport_caps)
+ {
+-	u16 cmd_vport = vport_number;
+-	bool other_vport = true;
+ 	int ret;
+ 
+-	if (vport_number == MLX5_VPORT_UPLINK) {
+-		dr_domain_fill_uplink_caps(dmn, vport_caps);
+-		return 0;
+-	}
+-
+-	if (dmn->info.caps.is_ecpf && vport_number == MLX5_VPORT_ECPF) {
+-		other_vport = false;
+-		cmd_vport = 0;
+-	}
+-
+ 	ret = mlx5dr_cmd_query_esw_vport_context(dmn->mdev,
+ 						 other_vport,
+-						 cmd_vport,
++						 vport_number,
+ 						 &vport_caps->icm_address_rx,
+ 						 &vport_caps->icm_address_tx);
+ 	if (ret)
+@@ -161,7 +150,7 @@ static int dr_domain_query_vport(struct mlx5dr_domain *dmn,
+ 
+ 	ret = mlx5dr_cmd_query_gvmi(dmn->mdev,
+ 				    other_vport,
+-				    cmd_vport,
++				    vport_number,
+ 				    &vport_caps->vport_gvmi);
+ 	if (ret)
+ 		return ret;
+@@ -176,9 +165,15 @@ static int dr_domain_query_esw_mngr(struct mlx5dr_domain *dmn)
+ {
+ 	return dr_domain_query_vport(dmn,
+ 				     dmn->info.caps.is_ecpf ? MLX5_VPORT_ECPF : 0,
++				     false,
+ 				     &dmn->info.caps.vports.esw_manager_caps);
+ }
+ 
++static void dr_domain_query_uplink(struct mlx5dr_domain *dmn)
++{
++	dr_domain_fill_uplink_caps(dmn, &dmn->info.caps.vports.uplink_caps);
++}
++
+ static struct mlx5dr_cmd_vport_cap *
+ dr_domain_add_vport_cap(struct mlx5dr_domain *dmn, u16 vport)
+ {
+@@ -190,7 +185,7 @@ dr_domain_add_vport_cap(struct mlx5dr_domain *dmn, u16 vport)
+ 	if (!vport_caps)
+ 		return NULL;
+ 
+-	ret = dr_domain_query_vport(dmn, vport, vport_caps);
++	ret = dr_domain_query_vport(dmn, vport, true, vport_caps);
+ 	if (ret) {
+ 		kvfree(vport_caps);
+ 		return NULL;
+@@ -207,16 +202,26 @@ dr_domain_add_vport_cap(struct mlx5dr_domain *dmn, u16 vport)
+ 	return vport_caps;
+ }
+ 
++static bool dr_domain_is_esw_mgr_vport(struct mlx5dr_domain *dmn, u16 vport)
++{
++	struct mlx5dr_cmd_caps *caps = &dmn->info.caps;
++
++	return (caps->is_ecpf && vport == MLX5_VPORT_ECPF) ||
++	       (!caps->is_ecpf && vport == 0);
++}
++
+ struct mlx5dr_cmd_vport_cap *
+ mlx5dr_domain_get_vport_cap(struct mlx5dr_domain *dmn, u16 vport)
+ {
+ 	struct mlx5dr_cmd_caps *caps = &dmn->info.caps;
+ 	struct mlx5dr_cmd_vport_cap *vport_caps;
+ 
+-	if ((caps->is_ecpf && vport == MLX5_VPORT_ECPF) ||
+-	    (!caps->is_ecpf && vport == 0))
++	if (dr_domain_is_esw_mgr_vport(dmn, vport))
+ 		return &caps->vports.esw_manager_caps;
+ 
++	if (vport == MLX5_VPORT_UPLINK)
++		return &caps->vports.uplink_caps;
++
+ vport_load:
+ 	vport_caps = xa_load(&caps->vports.vports_caps_xa, vport);
+ 	if (vport_caps)
+@@ -241,17 +246,6 @@ static void dr_domain_clear_vports(struct mlx5dr_domain *dmn)
+ 	}
+ }
+ 
+-static int dr_domain_query_uplink(struct mlx5dr_domain *dmn)
+-{
+-	struct mlx5dr_cmd_vport_cap *vport_caps;
+-
+-	vport_caps = mlx5dr_domain_get_vport_cap(dmn, MLX5_VPORT_UPLINK);
+-	if (!vport_caps)
+-		return -EINVAL;
+-
+-	return 0;
+-}
+-
+ static int dr_domain_query_fdb_caps(struct mlx5_core_dev *mdev,
+ 				    struct mlx5dr_domain *dmn)
+ {
+@@ -281,11 +275,7 @@ static int dr_domain_query_fdb_caps(struct mlx5_core_dev *mdev,
+ 		goto free_vports_caps_xa;
+ 	}
+ 
+-	ret = dr_domain_query_uplink(dmn);
+-	if (ret) {
+-		mlx5dr_err(dmn, "Failed to query uplink vport caps (err: %d)", ret);
+-		goto free_vports_caps_xa;
+-	}
++	dr_domain_query_uplink(dmn);
+ 
+ 	return 0;
+ 
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_types.h b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_types.h
+index 3028b776da00..2333c2439c28 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_types.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_types.h
+@@ -764,6 +764,7 @@ struct mlx5dr_roce_cap {
+ 
+ struct mlx5dr_vports {
+ 	struct mlx5dr_cmd_vport_cap esw_manager_caps;
++	struct mlx5dr_cmd_vport_cap uplink_caps;
+ 	struct xarray vports_caps_xa;
+ };
+ 
+-- 
+2.31.1
+

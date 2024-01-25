@@ -1,0 +1,46 @@
+From e0cda7c293cf9dd2736897a7ae1a75dea2350c99 Mon Sep 17 00:00:00 2001
+From: Yevgeny Kliteynik <kliteyn@nvidia.com>
+Date: Thu, 11 Nov 2021 00:22:29 +0200
+Subject: [PATCH 37/58] net/mlx5: DR, Add check for flex parser ID value
+
+Allow only legal values for flex parser ID - values from 0 to 7.
+For other values skip the parser, and as a result the matcher creation
+will fail for using invalid flex parser ID.
+
+Signed-off-by: Hamdan Igbaria <hamdani@nvidia.com>
+Signed-off-by: Yevgeny Kliteynik <kliteyn@nvidia.com>
+Change-Id: Ib8b40cccde8e8dfe8dd3381a0511905d42a4492c
+---
+ drivers/net/ethernet/mellanox/mlx5/core/steering/dr_ste_v0.c | 2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/steering/dr_ste_v1.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_ste_v0.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_ste_v0.c
+index 9c704bce3c12..25de50daf263 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_ste_v0.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_ste_v0.c
+@@ -1703,7 +1703,7 @@ static void dr_ste_v0_set_flex_parser(u32 *misc4_field_id,
+ 	u32 id = *misc4_field_id;
+ 	u8 *parser_ptr;
+ 
+-	if (parser_is_used[id])
++	if (id >= DR_NUM_OF_FLEX_PARSERS || parser_is_used[id])
+ 		return;
+ 
+ 	parser_is_used[id] = true;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_ste_v1.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_ste_v1.c
+index b2481c99da79..282c4865d6ab 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_ste_v1.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_ste_v1.c
+@@ -1831,7 +1831,7 @@ static void dr_ste_v1_set_flex_parser(u32 *misc4_field_id,
+ 	u32 id = *misc4_field_id;
+ 	u8 *parser_ptr;
+ 
+-	if (parser_is_used[id])
++	if (id >= DR_NUM_OF_FLEX_PARSERS || parser_is_used[id])
+ 		return;
+ 
+ 	parser_is_used[id] = true;
+-- 
+2.31.1
+
