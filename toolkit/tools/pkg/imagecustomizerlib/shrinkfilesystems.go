@@ -103,7 +103,7 @@ func getFilesystemSizeInSectors(resize2fsOutput string, imageLoopDevice string) 
 	}
 	// Get the block count and block size
 	match := re.FindStringSubmatch(resize2fsOutput)
-	if len(match) < 4 {
+	if match == nil {
 		return 0, fmt.Errorf("failed to parse output of resize2fs")
 	}
 
