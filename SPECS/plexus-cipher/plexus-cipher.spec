@@ -2,7 +2,7 @@
 
 Summary:        Plexus Cipher: encryption/decryption Component
 Name:           plexus-cipher
-Version:        1.7
+Version:        2.0
 Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
@@ -16,39 +16,26 @@ BuildArch:      noarch
 BuildRequires:  javapackages-bootstrap
 BuildRequires:  javapackages-local-bootstrap
 %else
-BuildRequires:  mvn(javax.enterprise:cdi-api)
 BuildRequires:  mvn(javax.inject:javax.inject)
 BuildRequires:  mvn(junit:junit)
-BuildRequires:  mvn(org.sonatype.plugins:sisu-maven-plugin)
+BuildRequires:  mvn(org.codehaus.plexus:plexus:pom:)
+BuildRequires:  mvn(org.eclipse.sisu:org.eclipse.sisu.i
+BuildRequires:  mvn(org.eclipse.sisu:sisu-maven-plugin)
 %endif
  
 %description
 Plexus Cipher: encryption/decryption Component
  
 %{?javadoc_package}
- 
+
 %prep
-%setup -q
- 
-%pom_remove_parent
-%pom_xpath_inject "pom:dependency[pom:artifactId='junit']" "<scope>test</scope>"
- 
-# replace %{version}-SNAPSHOT with %{version}
-%pom_xpath_replace pom:project/pom:version "<version>%{version}</version>"
- 
-# fedora moved from sonatype sisu to eclipse sisu. sisu-inject-bean artifact
-# doesn't exist in eclipse sisu. this artifact contains nothing but
-# bundled classes from atinject, cdi-api, aopalliance and maybe others.
-%pom_remove_dep org.sonatype.sisu:sisu-inject-bean
-%pom_add_dep javax.inject:javax.inject:1:provided
-%pom_add_dep javax.enterprise:cdi-api:1.0:provided
- 
-%pom_xpath_set "pom:plugin[pom:artifactId='maven-compiler-plugin']/pom:configuration/*" 1.6
- 
+%setup -q -n %{name}-%{name}-%{version}
+
 %mvn_file : plexus/%{name}
- 
+%mvn_alias org.codehaus.plexus: org.sonatype.plexus:
+
 %build
-%mvn_build -f
+%mvn_build
  
 %install
 %mvn_install

@@ -20954,8 +20954,8 @@
         "type": "other",
         "other": {
           "name": "plexus-cipher",
-          "version": "1.7",
-          "downloadUrl": "https://github.com/codehaus-plexus/plexus-cipher/archive/plexus-cipher-1.7/plexus-cipher-1.7.tar.gz"
+          "version": "2.0",
+          "downloadUrl": "https://github.com/codehaus-plexus/plexus-cipher/archive/plexus-cipher-2.0/plexus-cipher-2.0.tar.gz"
         }
       }
     },
