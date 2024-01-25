@@ -12501,8 +12501,8 @@
         "type": "other",
         "other": {
           "name": "makedumpfile",
-          "version": "1.6.8",
-          "downloadUrl": "https://github.com/makedumpfile/makedumpfile/releases/download/1.6.8/makedumpfile-1.6.8.tar.gz"
+          "version": "1.7.4",
+          "downloadUrl": "https://github.com/makedumpfile/makedumpfile/releases/download/1.7.4/makedumpfile-1.7.4.tar.gz"
         }
       }
     },
