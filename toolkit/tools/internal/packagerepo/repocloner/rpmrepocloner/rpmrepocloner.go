@@ -53,8 +53,8 @@ const (
 )
 
 var (
-	serverErrorsRegex = regexp.MustCompile(`(?m)Error: (5\d{2}) when downloading`)
-	errorCodeIndex    = 1
+	serverErrorsRegex    = regexp.MustCompile(`(?m)Error: (5\d{2}) when downloading`)
+	serverErrorCodeIndex = 1
 )
 
 // RpmRepoCloner represents an RPM repository cloner.
@@ -626,6 +626,7 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string) (preBuilt bool, err erro
 				if retriable {
 					logger.Log.Debugf("Package cloning attempt %d/%d failed with a retriable error.", retryNum, retry.DefaultDownloadRetryAttempts)
 				} else {
+					logger.Log.Debugf("Package cloning attempt %d/%d failed with an unrecoverable error. Cancelling.", retryNum, retry.DefaultDownloadRetryAttempts)
 					close(cancel)
 				}
 			}
@@ -832,8 +833,8 @@ func tdnfDownload(args ...string) (err error, retriable bool) {
 	//
 	if err != nil {
 		serverErrorMatch := serverErrorsRegex.FindStringSubmatch(stderr)
-		if len(serverErrorMatch) > errorCodeIndex {
-			logger.Log.Debugf("Encountered possibly intermittent HTTP %s error.", serverErrorMatch[errorCodeIndex])
+		if len(serverErrorMatch) > serverErrorCodeIndex {
+			logger.Log.Debugf("Encountered possibly intermittent HTTP %s error.", serverErrorMatch[serverErrorCodeIndex])
 			retriable = true
 		}
 	}
