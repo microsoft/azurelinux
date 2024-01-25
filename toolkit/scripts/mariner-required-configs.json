@@ -182,8 +182,8 @@
                 ],
                 "comment": "The sx8 block driver removed in update to 5.15.118.1 for CBL-Mariner-Linux-Kernel",
                 "value": [
-                    "is not set",
-                    "<missing>"
+                    "<missing>",
+                    "is not set"
                 ]
             },
             "CONFIG_BLK_DEV_ZONED": {
@@ -299,8 +299,8 @@
                 ],
                 "comment": "DECNET support removed in update to 5.15.118.1 for CBL-Mariner-Linux-Kernel",
                 "value": [
-                    "is not set",
-                    "<missing>"
+                    "<missing>",
+                    "is not set"
                 ]
             },
             "CONFIG_DECNET_NF_GRABULATOR": {
@@ -313,8 +313,8 @@
                 ],
                 "comment": "DECNET support removed in update to 5.15.118.1 for CBL-Mariner-Linux-Kernel",
                 "value": [
-                    "is not set",
-                    "<missing>"
+                    "<missing>",
+                    "is not set"
                 ]
             },
             "CONFIG_DECNET_ROUTER": {
@@ -327,8 +327,8 @@
                 ],
                 "comment": "DECNET support removed in update to 5.15.118.1 for CBL-Mariner-Linux-Kernel",
                 "value": [
-                    "is not set",
-                    "<missing>"
+                    "<missing>",
+                    "is not set"
                 ]
             },
             "CONFIG_DEFAULT_SECURITY_SELINUX": {
@@ -705,8 +705,8 @@
                 ],
                 "comment": "Creates increased boot times and errors on large memory systems",
                 "value": [
-                    "is not set",
-                    "<missing>"
+                    "<missing>",
+                    "is not set"
                 ]
             },
             "CONFIG_INTEL_IOMMU_SVM": {
@@ -1116,8 +1116,8 @@
                 ],
                 "comment": "Removed in favor of SELinux",
                 "value": [
-                    "is not set",
-                    "<missing>"
+                    "<missing>",
+                    "is not set"
                 ]
             },
             "CONFIG_SENSORS_DELL_SMM": {
@@ -1169,10 +1169,10 @@
                 ],
                 "comment": "Needed for update to 5.15.131.1",
                 "value": [
+                    "<missing>",
                     "is not set",
-                    "y",
                     "m",
-                    "<missing>"
+                    "y"
                 ]
             },
             "CONFIG_TARGET_CORE": {
