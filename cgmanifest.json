@@ -28427,8 +28427,8 @@
         "type": "other",
         "other": {
           "name": "tpm2-tools",
-          "version": "4.3.2",
-          "downloadUrl": "https://github.com/tpm2-software/tpm2-tools/releases/download/4.3.2/tpm2-tools-4.3.2.tar.gz"
+          "version": "5.3",
+          "downloadUrl": "https://github.com/tpm2-software/tpm2-tools/releases/download/5.3/tpm2-tools-5.3.tar.gz"
         }
       }
     },
@@ -28437,8 +28437,8 @@
         "type": "other",
         "other": {
           "name": "tpm2-tss",
-          "version": "2.4.6",
-          "downloadUrl": "https://github.com/tpm2-software/tpm2-tss/releases/download/2.4.6/tpm2-tss-2.4.6.tar.gz"
+          "version": "3.2.0",
+          "downloadUrl": "https://github.com/tpm2-software/tpm2-tss/releases/download/3.2.0/tpm2-tss-3.2.0.tar.gz"
         }
       }
     },
