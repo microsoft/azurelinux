@@ -1,7 +1,27 @@
+# Where the binaries aimed at gcc will live (ie. /usr/<target>/bin/).
+%global auxbin_prefix %{_exec_prefix}
+
+%global srcdir %{name}-%{version}
+
+%ifarch x86_64
+    %global build_cross 1
+%else
+    %global build_cross 0
+%endif
+
+%global build_aarch64 %{build_cross}
+
+%global do_files() \
+%if %2 \
+%files -n binutils-%1 \
+%{_prefix}/%1 \
+%{_bindir}/%1-* \
+%endif
+
 Summary:        Contains a linker, an assembler, and other tools
 Name:           binutils
 Version:        2.41
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,7 +30,19 @@ URL:            https://www.gnu.org/software/binutils
 Source0:        https://ftp.gnu.org/gnu/binutils/%{name}-%{version}.tar.xz
 # Patch was derived from source: https://src.fedoraproject.org/rpms/binutils/blob/f34/f/binutils-export-demangle.h.patch
 Patch0:         export-demangle-header.patch
+# The gold linker doesn't understand the 'module_info.ld' script passed to all linkers and the tests fail to correctly link.
+Patch1:         disable_gold_test.patch
 Provides:       bundled(libiberty)
+
+# Moving macro before the "SourceX" tags breaks PR checks parsing the specs.
+%global do_package() \
+%if %2 \
+%package -n binutils-%1 \
+Summary: Cross-build binary utilities for %1 \
+Requires: cross-%{name}-common = %{version}-%{release} \
+%description -n binutils-%1 \
+Cross-build binary image generation, manipulation and query tools for the %1 architecture. \
+%endif
 
 %description
 The Binutils package contains a linker, an assembler,
@@ -24,10 +56,66 @@ Requires:       %{name} = %{version}
 It contains the libraries and header files to create applications
 for handling compiled objects.
 
+%if %{build_cross}
+%package -n cross-%{name}-common
+Summary: Cross-compilation binutils documentation
+BuildArch: noarch
+
+%description -n cross-%{name}-common
+Documentation for the cross-compilation binutils package.
+%endif
+
+%do_package aarch64-linux-gnu %{build_aarch64}
+
 %prep
-%autosetup -p1
+%setup -q -c
+
+function prep_target () {
+    local target=$1
+    local condition=$2
+
+    if [ $condition != 0 ]
+    then
+        echo $1 >> cross.list
+    fi
+}
+
+pushd %{srcdir}
+%autopatch -p1
+popd
+
+touch cross.list
+prep_target aarch64-linux-gnu %{build_aarch64}
 
 %build
+
+function config_cross_target () {
+    local target=$1
+
+    cp -r %{srcdir} $target
+    pushd $target
+
+    %configure \
+        --exec-prefix=%{auxbin_prefix} \
+        --program-prefix=$target- \
+        --target=$target \
+        --disable-multilib \
+        --disable-nls \
+        --disable-install_libbfd \
+        --with-sysroot=%{_prefix}/$target/sys-root
+
+    popd
+}
+
+# Native components build steps.
+
+# Copying extracted sources for each run of "configure" and "make".
+# Building in separate subdirectories but with a single source causes
+# other packages to fail with a "configure: error: C compiler cannot create executables" error.
+# Proper fix needed and moved to a separate bug at the time of writing this comment.
+cp -r %{srcdir} build
+pushd build
+
 %configure \
     --disable-silent-rules \
     --disable-werror    \
@@ -38,26 +126,94 @@ for handling compiled objects.
     --enable-64-bit-bfd \
     --with-system-zlib
 
-%make_build tooldir=%{_prefix}
+popd
+%make_build -C build tooldir=%{_prefix}
+
+
+# Cross-compilation components build steps.
+
+while read -r target
+do
+    echo "=== BUILD cross-compilation target $target ==="
+    config_cross_target $target
+    %make_build -C $target tooldir=%{_prefix}
+done < cross.list
+
+%if %{build_cross}
+    # For documentation purposes only.
+
+    cp -r %{srcdir} cross-binutils
+    pushd cross-binutils
+
+    # $PACKAGE is used for the gettext catalog name when building 'cross-binutils-common'.
+    sed -i -e 's/^ PACKAGE=/ PACKAGE=cross-/' */configure
+
+    %configure \
+        --exec-prefix=%{auxbin_prefix} \
+        --program-prefix=cross- \
+        --disable-dependency-tracking \
+        --disable-silent-rules \
+        --disable-shared
+
+    popd
+    %make_build -C cross-binutils tooldir=%{_prefix}
+%endif
+
 
 %install
+# Native components installation steps.
+
+pushd build
+
 %make_install tooldir=%{_prefix}
-find %{buildroot} -type f -name "*.la" -delete -print
-rm -rf %{buildroot}%{_infodir}
 %find_lang %{name} --all-name
 
 install -m 644 libiberty/pic/libiberty.a %{buildroot}%{_libdir}
 install -m 644 include/libiberty.h %{buildroot}%{_includedir}
 
+popd
+
+# Cross-compilation components installation steps.
+
+while read -r target
+do
+    echo "=== INSTALL cross-compilation target $target ==="
+    mkdir -p %{buildroot}%{_prefix}/$target/sys-root
+    %make_install -C $target tooldir=%{auxbin_prefix}/$target
+
+    # Remove cross man files and ldscripts.
+    rm -rf %{buildroot}%{_mandir}/man1/$target-*
+    rm -rf %{buildroot}%{auxbin_prefix}/*/lib
+done < cross.list
+
+rm -rf %{buildroot}%{_infodir}
+find %{buildroot} -type f -name "*.la" -delete -print
+
+%if %{build_cross}
+    echo "=== INSTALL po targets ==="
+    for binary_name in binutils opcodes bfd gas ld gprof
+    do
+        %make_install -C cross-binutils/$binary_name/po
+    done
+
+    # Find the language files which only exist in the common package.
+    (
+        for binary_name in binutils opcodes bfd gas ld gprof
+        do
+            %find_lang cross-$binary_name
+            cat cross-${binary_name}.lang
+        done
+    ) >files.cross
+%endif
+
 %check
-sed -i 's/testsuite/ /g' gold/Makefile
-%make_build check
+%make_build -C build tooldir=%{_prefix} check
 
 %ldconfig_scriptlets
 
-%files -f %{name}.lang
+%files -f build/%{name}.lang
 %defattr(-,root,root)
-%license COPYING
+%license %{srcdir}/COPYING
 %{_bindir}/dwp
 %{_bindir}/gprof
 %{_bindir}/ld.bfd
@@ -84,6 +240,8 @@ sed -i 's/testsuite/ /g' gold/Makefile
 %{_bindir}/gp-display-text
 %{_bindir}/gprofng
 %{_libdir}/ldscripts/*
+%{_libdir}/libbfd-%{version}.so
+%{_libdir}/libopcodes-%{version}.so
 %{_mandir}/man1/readelf.1.gz
 %{_mandir}/man1/windmc.1.gz
 %{_mandir}/man1/ranlib.1.gz
@@ -108,9 +266,6 @@ sed -i 's/testsuite/ /g' gold/Makefile
 %{_mandir}/man1/gp-display-src.1.gz
 %{_mandir}/man1/gp-display-text.1.gz
 %{_mandir}/man1/gprofng.1.gz
-
-%{_libdir}/libbfd-%{version}.so
-%{_libdir}/libopcodes-%{version}.so
 
 %files devel
 %{_includedir}/ansidecl.h
@@ -158,7 +313,18 @@ sed -i 's/testsuite/ /g' gold/Makefile
 %{_libdir}/libsframe.so.1
 %{_libdir}/libsframe.so.1.0.0
 
+%if %{build_cross}
+%files -n cross-%{name}-common -f files.cross
+%license %{srcdir}/COPYING
+%endif
+
+%do_files aarch64-linux-gnu %{build_aarch64}
+
 %changelog
+* Fri Nov 17 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.41-2
+- Add the cross-compilation subpackage for aarch64.
+- Used Fedora 38 spec (license: MIT) for guidance.
+
 * Wed Nov 08 2023 Andrew Phelps <anphel@microsoft.com> - 2.41-1
 - Upgrade to version 2.41
 
