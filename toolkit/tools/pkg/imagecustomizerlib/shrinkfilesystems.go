@@ -65,7 +65,7 @@ func shrinkFilesystems(imageLoopDevice string, outputImageFile string) error {
 		// Re-read the partition table
 		err = shell.ExecuteLive(true, "flock", "--timeout", "5", imageLoopDevice, "partprobe", "-s", imageLoopDevice)
 		if err != nil {
-			return fmt.Errorf("partprobe failed: \n%w, err")
+			return fmt.Errorf("partprobe failed: \n%w", err)
 		}
 	}
 	return nil
