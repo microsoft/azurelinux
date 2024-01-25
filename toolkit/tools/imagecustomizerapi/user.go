@@ -17,10 +17,7 @@ type User struct {
 	PasswordPath        string   `yaml:"passwordPath"`
 	PasswordExpiresDays *int64   `yaml:"passwordExpiresDays"`
 	SSHPubKeyPaths      []string `yaml:"sshPubKeyPaths"`
-<<<<<<< HEAD
-	SSHPubKeys          []string `yaml:"SSHPubKeys"`
-=======
->>>>>>> 248b03d44... update mic field names to camelCase
+	SSHPubKeys          []string `yaml:"sshPubKeys"`
 	PrimaryGroup        string   `yaml:"primaryGroup"`
 	SecondaryGroups     []string `yaml:"secondaryGroups"`
 	StartupCommand      string   `yaml:"startupCommand"`
