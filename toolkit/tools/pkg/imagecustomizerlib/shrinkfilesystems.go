@@ -114,7 +114,7 @@ func getFilesystemSizeInSectors(resize2fsOutput string, imageLoopDevice string) 
 
 	// Calculate block size
 	var blockSize int
-	const KB = 1024 // kilobyte in bytes
+	const KiB = 1024 // kibibyte in bytes
 	switch unit {
 	case "k":
 		blockSize = multiplier * KB
