@@ -66,7 +66,7 @@ func copyBlockDeviceToFile(outDir, devicePath, name string) (filename string, er
 		fmt.Sprintf("if=%s", devicePath),       // Input file.
 		fmt.Sprintf("of=%s", fullPath),         // Output file.
 		fmt.Sprintf("bs=%d", defaultBlockSize), // Size of one copied block.
-		fmt.Sprintf("conv=sparse"),
+		"conv=sparse",
 	}
 
 	err = shell.ExecuteLive(squashErrors, "dd", ddArgs...)
