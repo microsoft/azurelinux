@@ -33,7 +33,7 @@ var (
 
 func CustomizeImageWithConfigFile(buildDir string, configFile string, imageFile string,
 	rpmsSources []string, outputImageFile string, outputImageFormat string,
-	outputSplitPartitionsFormat string, useBaseImageRpmRepos bool,
+	outputSplitPartitionsFormat string, useBaseImageRpmRepos bool, enableShrinkFilesystems bool,
 ) error {
 	var err error
 
@@ -51,7 +51,7 @@ func CustomizeImageWithConfigFile(buildDir string, configFile string, imageFile 
 	}
 
 	err = CustomizeImage(buildDir, absBaseConfigPath, &config, imageFile, rpmsSources, outputImageFile, outputImageFormat,
-		outputSplitPartitionsFormat, useBaseImageRpmRepos)
+		outputSplitPartitionsFormat, useBaseImageRpmRepos, enableShrinkFilesystems)
 	if err != nil {
 		return err
 	}
@@ -60,7 +60,8 @@ func CustomizeImageWithConfigFile(buildDir string, configFile string, imageFile 
 }
 
 func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config, imageFile string,
-	rpmsSources []string, outputImageFile string, outputImageFormat string, outputSplitPartitionsFormat string, useBaseImageRpmRepos bool,
+	rpmsSources []string, outputImageFile string, outputImageFormat string, outputSplitPartitionsFormat string,
+	useBaseImageRpmRepos bool, enableShrinkFilesystems bool,
 ) error {
 	var err error
 	var qemuOutputImageFormat string
@@ -111,6 +112,14 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 		partitionsCustomized)
 	if err != nil {
 		return err
+	}
+
+	// Shrink the filesystems.
+	if enableShrinkFilesystems {
+		err = shrinkFilesystemsHelper(buildImageFile, outputImageFile)
+		if err != nil {
+			return fmt.Errorf("failed to shrink filesystems:\n%w", err)
+		}
 	}
 
 	if config.SystemConfig.Verity != nil {
@@ -322,6 +331,27 @@ func extractPartitionsHelper(buildImageFile string, outputImageFile string, outp
 
 	// Extract the partitions as files.
 	err = extractPartitions(imageLoopback.DevicePath(), outputImageFile, outputSplitPartitionsFormat)
+	if err != nil {
+		return err
+	}
+
+	err = imageLoopback.CleanClose()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func shrinkFilesystemsHelper(buildImageFile string, outputImageFile string) error {
+	imageLoopback, err := safeloopback.NewLoopback(buildImageFile)
+	if err != nil {
+		return err
+	}
+	defer imageLoopback.Close()
+
+	// Shrink the filesystems.
+	err = shrinkFilesystems(imageLoopback.DevicePath(), outputImageFile)
 	if err != nil {
 		return err
 	}

@@ -41,6 +41,15 @@ Format of partition files. If specified, disk partitions will be extracted as se
 
 Options: raw, raw-zstd.
 
+## --shrink-filesystems
+
+Enable shrinking of partition filesystems to their minimum size.
+
+Currently only supports ext2/ext3/ext4 filesystems.
+
+Can only be specified if `--output-split-partitions-format` is, and 
+cannot be specified with `--output-image-format`.
+
 ## --config-file=FILE-PATH
 
 Required.
