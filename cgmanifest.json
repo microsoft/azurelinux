@@ -28157,8 +28157,8 @@
         "type": "other",
         "other": {
           "name": "sriov-network-device-plugin",
-          "version": "3.5.1",
-          "downloadUrl": "https://github.com/k8snetworkplumbingwg/sriov-network-device-plugin/archive/refs/tags/v3.5.1.tar.gz"
+          "version": "3.6.2",
+          "downloadUrl": "https://github.com/k8snetworkplumbingwg/sriov-network-device-plugin/archive/refs/tags/v3.6.2.tar.gz"
         }
       }
     },
