@@ -338,7 +338,14 @@ build_rpm_in_chroot_no_install binutils
 build_rpm_in_chroot_no_install gmp
 build_rpm_in_chroot_no_install mpfr
 build_rpm_in_chroot_no_install libmpc
+
+if [[ $(uname -m) == "x86_64" ]]; then
+    # Need to install binutils-aarch64-linux-gnu to build gcc
+    chroot_and_install_rpms cross-binutils-common
+    chroot_and_install_rpms binutils-aarch64-linux-gnu
+fi
 build_rpm_in_chroot_no_install gcc
+
 build_rpm_in_chroot_no_install ncurses
 build_rpm_in_chroot_no_install readline
 build_rpm_in_chroot_no_install bash
