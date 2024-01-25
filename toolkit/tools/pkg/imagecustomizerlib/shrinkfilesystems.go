@@ -21,6 +21,7 @@ func shrinkFilesystems(imageLoopDevice string, outputImageFile string) error {
 
 	// Get the start sectors of all partitions
 	matchStarts, err := getStartSectors(imageLoopDevice, len(diskPartitions)-1)
+	// Number of partitions is len(diskPartitions)-1 as diskPartitions[0] refers to the loop device for the image itself
 	if err != nil {
 		return err
 	}
