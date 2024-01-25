@@ -43,6 +43,9 @@ Plexus Cipher: encryption/decryption Component
 %license LICENSE.txt NOTICE.txt
 
 %changelog
+* Wed Jan 24 2024 Dallas Delaney <dadelan@microsoft.com> - 2.0-1
+- Upgrade to 2.0
+
 * Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.7-1
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - License verified
