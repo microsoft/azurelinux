@@ -1,7 +1,7 @@
 Summary:        MySQL.
 Name:           mysql
 Version:        8.0.35
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        GPLv2 with exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,6 +9,7 @@ Group:          Applications/Databases
 URL:            https://www.mysql.com
 Source0:        https://dev.mysql.com/get/Downloads/MySQL-8.0/%{name}-boost-%{version}.tar.gz
 Patch0:         CVE-2012-5627.nopatch
+Patch1:         CVE-2023-46218.patch
 BuildRequires:  cmake
 BuildRequires:  libtirpc-devel
 BuildRequires:  openssl-devel
@@ -50,6 +51,18 @@ make DESTDIR=%{buildroot} install
 %check
 make test
 
+%pre
+getent group  mysql  >/dev/null || groupadd -r mysql
+getent passwd mysql  >/dev/null || useradd  -c "mysql" -s /bin/false -g mysql -M -r mysql
+
+%postun
+if getent passwd mysql >/dev/null; then
+   userdel mysql
+fi
+if getent group mysql >/dev/null; then
+    groupdel mysql
+fi
+
 %files
 %defattr(-,root,root)
 %license LICENSE router/LICENSE.router
@@ -83,6 +96,12 @@ make test
 %{_libdir}/pkgconfig/mysqlclient.pc
 
 %changelog
+* Wed Jan 10 2024 Andy Zaugg <azaugg@linkedin.com> - 8.0.35-3
+- Add mysql user as part of post scripts
+
+* Wed Dec 20 2023 Suresh Thelkar <sthelkar@microsoft.com> - 8.0.35-2
+- Patch CVE-2023-46218 
+
 * Tue Nov 28 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.0.35-1
 - Auto-upgrade to 8.0.35 - address CVE-2023-22078, CVE-2023-22068, CVE-2023-22084, CVE-2023-22070, CVE-2023-22092, CVE-2023-22079, CVE-2023-22032, CVE-2023-22103, CVE-2023-22112, CVE-2023-22059, CVE-2023-22114, CVE-2023-22097, CVE-2023-22064, CVE-2023-22066, etc.
 

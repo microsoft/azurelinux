@@ -11,11 +11,11 @@ import (
 
 func customizePartitions(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
 	buildImageFile string,
-) (string, error) {
-	if config.Disks == nil && config.SystemConfig.BootType == imagecustomizerapi.BootTypeUnset {
+) (bool, string, error) {
+	if !hasPartitionCustomizations(config) {
 		// No changes to make to the partitions.
 		// So, just use the original disk.
-		return buildImageFile, nil
+		return false, buildImageFile, nil
 	}
 
 	newBuildImageFile := filepath.Join(buildDir, PartitionCustomizedImageName)
@@ -24,8 +24,8 @@ func customizePartitions(buildDir string, baseConfigPath string, config *imagecu
 	// then fallback to creating the new partitions from scratch and doing a file copy.
 	err := customizePartitionsUsingFileCopy(buildDir, baseConfigPath, config, buildImageFile, newBuildImageFile)
 	if err != nil {
-		return "", err
+		return false, "", err
 	}
 
-	return newBuildImageFile, nil
+	return true, newBuildImageFile, nil
 }

@@ -1,15 +1,17 @@
-%global runtime_make_vars       DEFSTATICRESOURCEMGMT=true \\\
+%global runtime_make_vars       DEFMEMSZ=256 \\\
+                                DEFSHAREDFS_CLH_SNP_VIRTIOFS=none \\\
+                                DEFSTATICSANDBOXWORKLOADMEM=1792 \\\
                                 SKIP_GO_VERSION_CHECK=1
 
 %global agent_make_vars         LIBC=gnu \\\
-                                SECURITY_POLICY=yes
+                                AGENT_POLICY=yes
 
 %global debug_package %{nil}
 
 Name:         kata-containers-cc
-Version:      0.6.2
+Version:      0.6.3
 Release:      3%{?dist}
-Summary:      Kata Confidential Containers
+Summary:      Kata Confidential Containers package developed for Confidential Containers on AKS
 License:      ASL 2.0
 Vendor:       Microsoft Corporation
 URL:          https://github.com/microsoft/kata-containers
@@ -17,7 +19,6 @@ Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/cc-
 Source1:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{name}-%{version}.tar.gz
 Source2:      %{name}-%{version}-cargo.tar.gz
 Source3:      mariner-coco-build-uvm.sh
-Patch0:       keep-uvm-rootfs-dependencies.patch
 
 ExclusiveArch: x86_64
 
@@ -42,17 +43,19 @@ BuildRequires:  fuse-devel
 BuildRequires:  kernel-uvm-devel
 
 # kernel-uvm is required for allowing to test the kata-cc handler w/o SEV SNP but with the
-# policy feature using kernel-uvm and the kata-cc shim/agent from this package with policy features
+# policy feature using kernel-uvm and the kata-cc shim/agent from this package with policy and snapshotter features
 Requires:  kernel-uvm
 Requires:  moby-containerd-cc
 Requires:  qemu-virtiofsd
 
 %description
-Kata Confidential Containers.
+The Kata Confidential Containers package ships the Kata components for Confidential Containers on AKS.
+The package sources are based on a Microsoft fork of the kata-containers project and tailored to the use
+for Mariner-based AKS node images.
 
-# This subpackage is used to build the uvm and therefore has dependencies on the kernel-uvm(-cvm) binaries
+# This subpackage is used to build the UVM and therefore has dependencies on the kernel-uvm(-cvm) binaries
 %package tools
-Summary:        Kata CC tools package for building UVM components
+Summary:        Kata Confidential Containers tools package for building the UVM
 Requires:       cargo
 Requires:       qemu-img
 Requires:       parted
@@ -62,7 +65,7 @@ Requires:       opa >= 0.50.2
 Requires:       kernel-uvm
 
 %description tools
-This package contains the UVM osbuilder files
+This package contains the the tooling and files required to build the UVM
 
 %prep
 %autosetup -p1 -n %{name}-%{version}
@@ -166,11 +169,12 @@ find %{buildroot}/etc
 
 # agent
 pushd %{_builddir}/%{name}-%{version}/src/agent
-mkdir -p %{buildroot}%{osbuilder}/src/agent/samples/policy
-cp -aR samples/policy/all-allowed         %{buildroot}%{osbuilder}/src/agent/samples/policy
+mkdir -p %{buildroot}%{osbuilder}/src/kata-opa
+cp -a %{_builddir}/%{name}-%{version}/src/kata-opa/allow-all.rego %{buildroot}%{osbuilder}/src/kata-opa/
+cp -a %{_builddir}/%{name}-%{version}/src/kata-opa/allow-set-policy.rego %{buildroot}%{osbuilder}/src/kata-opa/
+cp -a %{_builddir}/%{name}-%{version}/src/kata-opa/kata-opa.service.in %{buildroot}%{osbuilder}/src/kata-opa/
 install -D -m 0755 kata-containers.target %{buildroot}%{osbuilder}/kata-containers.target
 install -D -m 0755 kata-agent.service.in  %{buildroot}%{osbuilder}/kata-agent.service.in
-install -D -m 0755 coco-opa.service       %{buildroot}%{osbuilder}/coco-opa.service
 install -D -m 0755 target/x86_64-unknown-linux-gnu/release/kata-agent %{buildroot}%{osbuilder}/kata-agent
 popd
 
@@ -243,13 +247,14 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %doc README.md
 
 %files tools
-%dir %{osbuilder}/src/agent/samples/policy/all-allowed
-%{osbuilder}/src/agent/samples/policy/all-allowed/all-allowed.rego
+%dir %{osbuilder}/src/kata-opa
+%{osbuilder}/src/kata-opa/allow-all.rego
+%{osbuilder}/src/kata-opa/allow-set-policy.rego
+%{osbuilder}/src/kata-opa/kata-opa.service.in
 
 %{osbuilder}/mariner-coco-build-uvm.sh
 %{osbuilder}/kata-containers.target
 %{osbuilder}/kata-agent.service.in
-%{osbuilder}/coco-opa.service
 %{osbuilder}/kata-agent
 %{osbuilder}/ci/install_yq.sh
 
@@ -270,10 +275,16 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %exclude %{osbuilder}/tools/osbuilder/rootfs-builder/ubuntu
 
 %changelog
-*   Thu Dec 07 2023 Archana Choudhary <archana1@microsoft.com> - 0.6.2-3
+*   Thu Dec 07 2023 Archana Choudhary <archana1@microsoft.com> - 0.6.3-3
 -   Remove kernel-uvm-cvm(-devel) dependency
 -   Remove kernel-uvm-cvm modules/sources/files
 -   Remove instructions to build kernel-uvm-cvm related binaries
+
+*   Tue Jan 24 2024 Manuel Huber <mahuber@microsoft.com> - 0.6.3-2
+-   Enforce a restrictive security policy
+
+*   Mon Jan 08 2024 Dallas Delaney <dadelan@microsoft.com> - 0.6.3-1
+-   Upgrade to version 0.6.3
 
 *   Tue Dec 05 2023 Archana Choudhary <archana1@microsoft.com> - 0.6.2-2
 -   Add qemu-virtiofsd as a requirement
@@ -304,7 +315,7 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 *   Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.6.0-2
 -   Bump release to rebuild with go 1.19.12
 
-*   Tue Jul 11 2023 Dallas Delaney <dadelan@microsoft.com> 0.6.0-1
+*   Tue Jul 13 2023 Dallas Delaney <dadelan@microsoft.com> 0.6.0-1
 -   Upgrade to version 0.6.0
 
 *   Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.4.2-2

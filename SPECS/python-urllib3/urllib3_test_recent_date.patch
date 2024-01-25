@@ -1,0 +1,12 @@
+diff -ur a/src/urllib3/connection.py b/src/urllib3/connection.py
+--- a/src/urllib3/connection.py	2023-10-17 10:26:30
++++ b/src/urllib3/connection.py	2024-01-17 08:03:33
+@@ -68,7 +68,7 @@
+ 
+ # When it comes time to update this value as a part of regular maintenance
+ # (ie test_recent_date is failing) update it to ~6 months before the current date.
+-RECENT_DATE = datetime.date(2022, 1, 1)
++RECENT_DATE = datetime.date(2023, 8, 1)
+ 
+ _CONTAINS_CONTROL_CHAR_RE = re.compile(r"[^-!#$%&'*+.^_`|~0-9a-zA-Z]")
+ 

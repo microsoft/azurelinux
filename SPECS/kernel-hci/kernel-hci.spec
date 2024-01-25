@@ -17,8 +17,8 @@
 %define config_source %{SOURCE1}
 Summary:        Linux Kernel for HCI
 Name:           kernel-hci
-Version:        5.15.139.1
-Release:        1%{?dist}
+Version:        5.15.145.2
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -54,7 +54,7 @@ Patch23:        0024-net-mlx5-Bridge-extract-VLAN-push-pop-actions-creati.patch
 Patch24:        0025-net-mlx5-Bridge-implement-infrastructure-for-VLAN-pr.patch
 Patch25:        0026-net-mlx5-Bridge-implement-QinQ-support.patch
 Patch26:        0027-mstflint-This-driver-enables-under-the-secure-boot.patch
-Patch27:        0028-net-mlx5-Bridge-use-debug-not-warn-if-entry-not-found.patch
+Patch27:        0028-net-mlx5-Bridge-Use-debug-instead-of-warn-if-entry-d.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -435,6 +435,13 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Mon Jan 22 2024 Vince Perri <viperri@microsoft.com> - 5.15.145.2-2
+- Fix header for patch 27 and rename to
+- 0028-net-mlx5-Bridge-Use-debug-instead-of-warn-if-entry-d.patch
+
+* Tue Jan 16 2024 Gary Swalling <gaswal@microsoft.com> - 5.15.145.2-1
+- Update to 5.15.145.2
+
 * Tue Dec 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.139.1-1
 - Auto-upgrade to 5.15.139.1
 
