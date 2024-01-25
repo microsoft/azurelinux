@@ -55,8 +55,6 @@ readonly SCRIPT_FOLDER="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd
 readonly ROOT_FOLDER="$(git rev-parse --show-toplevel)"
 
 # define golden images dependency components
-readonly AZURECLI="azure-cli"
-readonly AZURECLI_NO_DASH="azurecli"
 readonly CDI_BASE_COMPONENT="cdi"
 readonly CERT_MANAGER='cert-manager'
 readonly CERT_MANAGER_NO_DASH='certmanager'
@@ -144,8 +142,8 @@ function read_base_container_name {
 }
 
 # Builds, Tests, and Publishes Golden Container Image.
-# The first argument is the main package name i.e., component name (e.g., nodejs, azure-cli, postgresql, etc)
-# The second argument is the image name i.e., container type (e.g., nodejs, azure-cli, postgres, etc)
+# The first argument is the main package name i.e., component name (e.g., nodejs, postgresql, etc)
+# The second argument is the image name i.e., container type (e.g., nodejs, postgres, etc)
 # The third argument is the base container name
 # The fourth argument is the base container tag
 # The fifth argument is the set of packages to be installed in the image.
@@ -174,7 +172,7 @@ function CreateGoldenContainer {
     echo "Container Name:           -> $originalContainerName"
     
     echo "+++ create container based on $baseContainerName/core:$baseContainerTag for $componentName"
-    containerTypeNoDash=${containerType//-/}    # Removes dash from containerType. Ex: azure-cli -> azurecli
+    containerTypeNoDash=${containerType//-/}
 
     echo
     echo "----------------------------------------------------------------------"
@@ -338,8 +336,8 @@ function DockerBuild {
 }
 
 # Builds, Tests, and Publishes Distroless Golden Container Image.
-# The first argument is the main package name i.e., component name (e.g., nodejs, azure-cli, postgresql, etc).
-# The second argument is the image name i.e., container type (e.g., nodejs, azure-cli, postgres, etc).
+# The first argument is the main package name i.e., component name (e.g., nodejs, postgresql, etc).
+# The second argument is the image name i.e., container type (e.g., nodejs, postgres, etc).
 # The third argument is the base container tag.
 # The fourth argument is the set of packages to be installed in the image.
 # The fifth argument is the set of packages to holdback from getting installed.
@@ -370,7 +368,7 @@ function CreateDistrolessGoldenContainers {
     echo "Run Test:                 -> $runTest"
 
     echo "+++ create distroless container for $componentName"
-    containerTypeNoDash=${containerType//-/}    # Removes dash from containerType. Ex: azure-cli -> azurecli
+    containerTypeNoDash=${containerType//-/}
 
     echo
     echo "----------------------------------------------------------------------"
@@ -474,23 +472,6 @@ function getPkgsFromFile() {
     while read -r pkg; do
         array+=("$pkg")
     done < "$CONTAINER_SRC_DIR/$folderName/$fileName"
-}
-
-# Creates azurecli container
-function create_azurecli_container {
-    local pkgsFileName="$AZURECLI_NO_DASH.pkg"
-    local packagesToInstall=()
-    getPkgsFromFile $AZURECLI_NO_DASH $pkgsFileName packagesToInstall
-    local packages="${packagesToInstall[*]}"
-    CreateGoldenContainer \
-        "$AZURECLI" \
-        "$AZURECLI" \
-        "$base_container_name" \
-        "$base_container_tag" \
-        "$packages" \
-        "Dockerfile-AzureCLI" \
-        1 \
-        "$base_container_name/$AZURECLI"
 }
 
 # Creates memcached container
@@ -927,10 +908,6 @@ function create_sriov_dp_containers {
 
 function start_building_containers {
     case $GOLDEN_CONTAINER_IMAGE in
-
-    "$AZURECLI_NO_DASH")
-        create_azurecli_container
-        ;;
 
     "$MEMCACHED")
         create_memcached_container
