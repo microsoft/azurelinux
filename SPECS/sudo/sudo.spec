@@ -1,7 +1,7 @@
 Summary:        Sudo
 Name:           sudo
-Version:        1.9.14p3
-Release:        2%{?dist}
+Version:        1.9.15p5
+Release:        1%{?dist}
 License:        ISC
 URL:            https://www.sudo.ws/
 Group:          System Environment/Security
@@ -100,6 +100,9 @@ fi
 %exclude  /etc/sudoers.dist
 
 %changelog
+* Thu Jan 25 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.9.15p5-1
+- Auto-upgrade to 1.9.15p5 - Update to latest version
+
 * Tue Dec 19 2023 Andy Zaugg <azaugg@linkedin.com> - 1.9.14p3-2
 - Add patch to bug fix support for NETGROUP_QUERY
 
