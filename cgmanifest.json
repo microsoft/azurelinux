@@ -14183,8 +14183,8 @@
         "type": "other",
         "other": {
           "name": "nspr",
-          "version": "4.30",
-          "downloadUrl": "https://archive.mozilla.org/pub/nspr/releases/v4.30/src/nspr-4.30.tar.gz"
+          "version": "4.9.6",
+          "downloadUrl": "https://archive.mozilla.org/pub/nspr/releases/v4.9.6/src/nspr-4.9.6.tar.gz"
         }
       }
     },
