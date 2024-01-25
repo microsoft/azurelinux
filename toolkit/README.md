@@ -26,7 +26,7 @@
 
 ## [Understanding build logs](docs/how_it_works/6_logs.md)
 
-- Info common build logs with a focus on errors and warnings and how to interpret them.
+- Understanding common build logs with a focus on errors and warnings and how to interpret them.
 
 ## [OS security](docs/security/intro.md)
 
