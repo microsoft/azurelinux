@@ -20,8 +20,7 @@ BuildRequires:  tpm2-abrmd-devel
 BuildRequires:  libyaml-devel
 BuildRequires:  libgcrypt-devel
 BuildRequires:  sqlite-devel
-BuildRequires:  autoconf
-BuildRequires:  automake
+BuildRequires:  autoconf-archive
 BuildRequires:  python3-devel
 BuildRequires:  python3-cryptography
 BuildRequires:  python3-setuptools
@@ -59,9 +58,7 @@ Requires:         python3-PyYAML
 Tools for TCG TPM2 PKCSv11 Software Stack
 
 %prep
-find .
-ls ..
-%autosetup -v -p1 -n %{name}-%{version}
+%autosetup -v -n %{name}-%{version}
 find .
 ls ..
 
