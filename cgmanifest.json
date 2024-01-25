@@ -10971,8 +10971,8 @@
         "type": "other",
         "other": {
           "name": "libsolv",
-          "version": "0.7.24",
-          "downloadUrl": "https://github.com/openSUSE/libsolv/archive/0.7.24/libsolv-0.7.24.tar.gz"
+          "version": "0.7.27",
+          "downloadUrl": "https://src.fedoraproject.org/lookaside/pkgs/libsolv/libsolv-0.7.27.tar.gz/sha512/5f4de944114cebbcf35a993e5f969c3b7bf3b8dbc5dabab38014bd2d1ab83b524d1ed5b7fbed4b2f751c1f8043613f9e88cf96b14b121362655af1805d238b60/libsolv-0.7.27.tar.gz"
         }
       }
     },

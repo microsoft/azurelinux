@@ -1,10 +1,10 @@
 Summary:        A free package dependency solver
 Name:           libsolv
-Version:        0.7.24
+Version:        0.7.27
 Release:        1%{?dist}
 License:        BSD
 URL:            https://github.com/openSUSE/libsolv
-Source0:        https://github.com/openSUSE/libsolv/archive/%{version}/%{name}-%{version}.tar.gz
+Source0:        https://src.fedoraproject.org/lookaside/pkgs/libsolv/%{name}-%{version}.tar.gz/sha512/5f4de944114cebbcf35a993e5f969c3b7bf3b8dbc5dabab38014bd2d1ab83b524d1ed5b7fbed4b2f751c1f8043613f9e88cf96b14b121362655af1805d238b60/%{name}-%{version}.tar.gz
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -77,6 +77,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man1/*
 
 %changelog
+* Thu Jan 25 2024 Alberto Perez <aperezguevar@microsoft.com> - 0.7.27-1
+- Upgrade to version 0.7.27
+
 * Tue Jun 20 2023 Sam Meluch <sammeluch@microsoft.com> - 0.7.24-1
 - add ENABLE_COMPS option to support dnf5
 - Upgrade to version 0.7.24
