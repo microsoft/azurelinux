@@ -32,7 +32,7 @@
   "kexec-kdump-howto.txt": "e783390a9aa582a2b5e7981cd3277081385340b5873a3f0633c789811876eccb",
   "kexec-tools-2.0.27.tar.xz": "38d78bcfa33a88928324b57dc81f50c1dfc279eede45e80957ca18f4e84b8187",
   "live-image-kdump-howto.txt": "465a7ce28ecd9ff8f8c22ebfb17bbbafd01a52d81134be1203ee753856e4c37c",
-  "makedumpfile-1.6.8.tar.gz": "85d79b7090e9a8ce0d426795d3bc1de2858def7e12954d9bc6ae03de160b694c",
+  "makedumpfile-1.7.4.tar.gz": "0554f5de516c51f5756e437dbfc353722b16b20e875241275554b474e89298db",
   "mkdumprd": "ebe0cbd1152d9db3333357e898685854c7667d4c6d9df4c79196ab1e7294dad2",
   "mkdumprd.8": "c2e85b4f28cfda870a8d7b4dec656a0bc88895e4b138e9bc4cf756ff7f839bcf"
  }
