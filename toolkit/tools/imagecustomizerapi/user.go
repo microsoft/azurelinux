@@ -10,17 +10,17 @@ import (
 )
 
 type User struct {
-	Name                string   `yaml:"Name"`
+	Name                string   `yaml:"name"`
 	UID                 *int     `yaml:"UID"`
-	PasswordHashed      bool     `yaml:"PasswordHashed"`
-	Password            string   `yaml:"Password"`
-	PasswordPath        string   `yaml:"PasswordPath"`
-	PasswordExpiresDays *int64   `yaml:"PasswordExpiresDays"`
-	SSHPubKeyPaths      []string `yaml:"SSHPubKeyPaths"`
+	PasswordHashed      bool     `yaml:"passwordHashed"`
+	Password            string   `yaml:"password"`
+	PasswordPath        string   `yaml:"passwordPath"`
+	PasswordExpiresDays *int64   `yaml:"passwordExpiresDays"`
+	SSHPubKeyPaths      []string `yaml:"sshPubKeyPaths"`
 	SSHPubKeys          []string `yaml:"SSHPubKeys"`
-	PrimaryGroup        string   `yaml:"PrimaryGroup"`
-	SecondaryGroups     []string `yaml:"SecondaryGroups"`
-	StartupCommand      string   `yaml:"StartupCommand"`
+	PrimaryGroup        string   `yaml:"primaryGroup"`
+	SecondaryGroups     []string `yaml:"secondaryGroups"`
+	StartupCommand      string   `yaml:"startupCommand"`
 }
 
 func (u *User) IsValid() error {
