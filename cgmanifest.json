@@ -8051,8 +8051,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers-cc",
-          "version": "0.6.3",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/cc-0.6.3.tar.gz"
+          "version": "3.1.0.abombo2",
+          "downloadUrl": null
         }
       }
     },
