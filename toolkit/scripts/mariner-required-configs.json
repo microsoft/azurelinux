@@ -1,18 +1,6 @@
 {
     "kernel": {
         "required-configs": {
-            "CONFIG_ARCH_HAS_CPU_FINALIZE_INIT": {
-                "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5964"
-                ],
-                "arch": [
-                    "AMD64"
-                ],
-                "comment": "Needed for kernel upgrade 5.15.125.1",
-                "value": [
-                    "y"
-                ]
-            },
             "CONFIG_ARM64_ERRATUM_2054223": {
                 "PR": [
                     "https://github.com/microsoft/CBL-Mariner/pull/5916"
@@ -21,6 +9,18 @@
                     "ARM64"
                 ],
                 "comment": "Needed for kernel upgrade 5.15.123.1",
+                "value": [
+                    "y"
+                ]
+            },
+            "CONFIG_ARCH_HAS_CPU_FINALIZE_INIT": {
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/5964"
+                ],
+                "arch": [
+                    "AMD64"
+                ],
+                "comment": "Needed for kernel upgrade 5.15.125.1",
                 "value": [
                     "y"
                 ]
