@@ -483,7 +483,7 @@ cp utils/pmdk.magic %{buildroot}%{_datadir}/pmdk/
 
 %changelog
 * Wed Jan 25 2024 Kanika Nema <kanikanema@microsoft.com> - 2.0.1-2
-- Import spec from Fedora 40 for version 2.0.1 (license: MIT)
+- Initial CBL-Mariner import from Fedora 40 for version 2.0.1 (license: MIT)
 - License verified
 - Build with libfabric
 
