@@ -11591,8 +11591,8 @@
         "type": "other",
         "other": {
           "name": "libxcb",
-          "version": "1.13.1",
-          "downloadUrl": "https://xcb.freedesktop.org/dist/libxcb-1.13.1.tar.bz2"
+          "version": "1.16",
+          "downloadUrl": "https://xcb.freedesktop.org/dist/libxcb-1.16.tar.gz"
         }
       }
     },

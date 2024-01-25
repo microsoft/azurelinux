@@ -1,12 +1,12 @@
 Summary:        A C binding to the X11 protocol
 Name:           libxcb
-Version:        1.13.1
-Release:        8%{?dist}
+Version:        1.16
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://xcb.freedesktop.org/
-Source0:        https://xcb.freedesktop.org/dist/%{name}-%{version}.tar.bz2
+Source0:        https://xcb.freedesktop.org/dist/%{name}-%{version}.tar.gz
 # This is taken straight from the pthread-stubs source:
 # http://cgit.freedesktop.org/xcb/pthread-stubs/blob/?id=6900598192bacf5fd9a34619b11328f746a5956d
 # we don't need the library because glibc has working pthreads, but we need
@@ -19,7 +19,7 @@ BuildRequires:  pkg-config
 BuildRequires:  python3
 BuildRequires:  python3-devel
 BuildRequires:  pkgconfig(xau) >= 0.99.2
-BuildRequires:  pkgconfig(xcb-proto) >= 1.13
+BuildRequires:  pkgconfig(xcb-proto) >= 1.16
 BuildRequires:  pkgconfig(xorg-macros) >= 1.18
 
 %description
@@ -74,6 +74,7 @@ rm -r %{buildroot}/usr/share/doc/libxcb/tutorial
 %files
 %{_libdir}/libxcb-composite.so.0*
 %{_libdir}/libxcb-damage.so.0*
+%{_libdir}/libxcb-dbe.so.0*
 %{_libdir}/libxcb-dpms.so.0*
 %{_libdir}/libxcb-dri2.so.0*
 %{_libdir}/libxcb-dri3.so.0*
@@ -105,6 +106,9 @@ rm -r %{buildroot}/usr/share/doc/libxcb/tutorial
 %{_mandir}/man3/*.3*
 
 %changelog
+* Fri Jan 19 2024 Archana Choudhary <archana1@microsoft.com> - 1.16-1
+- Upgrade to 1.16
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.13.1-8
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
