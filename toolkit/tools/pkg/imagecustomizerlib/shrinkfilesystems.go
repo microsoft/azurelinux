@@ -83,7 +83,10 @@ func getStartSectors(imageLoopDevice string, partitionCount int) (matchStarts []
 	escapeForwardSlashesLoopDevice := strings.ReplaceAll(imageLoopDevice, "/", `\/`)
 
 	// Example line from fdisk -l output: "/dev/loop41p2   18432  103064   84633 41.3M Linux filesystem"
-	reStarts := regexp.Compile(`(?m:^` + escapeForwardSlashesLoopDevice + `p\d+ *(\d+).*?)`)
+	reStarts, err := regexp.Compile(`(?m:^` + escapeForwardSlashesLoopDevice + `p\d+ *(\d+).*?)`)
+	if err != nil {
+		return nil, fmt.Errorf("failed to compile regex: \n%w", err)
+	}
 	matchStarts = reStarts.FindAllStringSubmatch(stdout, -1)
 	if len(matchStarts) < partitionCount {
 		return nil, fmt.Errorf("could not find all partition starts")
@@ -95,7 +98,10 @@ func getStartSectors(imageLoopDevice string, partitionCount int) (matchStarts []
 // Get the filesystem size in sectors.
 func getFilesystemSizeInSectors(resize2fsOutput string, imageLoopDevice string) (filesystemSizeInSectors int, err error) {
 	// Example resize2fs output first line: "Resizing the filesystem on /dev/loop44p2 to 21015 (4k) blocks."
-	re := regexp.Compile(`.*to (\d+) \((\d+)([a-zA-Z])\)`)
+	re, err := regexp.Compile(`.*to (\d+) \((\d+)([a-zA-Z])\)`)
+	if err != nil {
+		return 0, fmt.Errorf("failed to compile regex: \n%w", err)
+	}
 	// Get the block count and block size
 	match := re.FindStringSubmatch(resize2fsOutput)
 	if len(match) < 4 {
@@ -117,7 +123,7 @@ func getFilesystemSizeInSectors(resize2fsOutput string, imageLoopDevice string) 
 	const KiB = 1024 // kibibyte in bytes
 	switch unit {
 	case "k":
-		blockSize = multiplier * KB
+		blockSize = multiplier * KiB
 	default:
 		return 0, fmt.Errorf("unrecognized unit %s", unit)
 	}
