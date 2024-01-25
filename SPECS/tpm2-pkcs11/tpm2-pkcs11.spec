@@ -20,7 +20,8 @@ BuildRequires:  tpm2-abrmd-devel
 BuildRequires:  libyaml-devel
 BuildRequires:  libgcrypt-devel
 BuildRequires:  sqlite-devel
-BuildRequires:  autoconf-archive
+BuildRequires:  autoconf
+BuildRequires:  automake
 BuildRequires:  python3-devel
 BuildRequires:  python3-cryptography
 BuildRequires:  python3-setuptools
