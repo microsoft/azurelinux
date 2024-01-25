@@ -8491,8 +8491,8 @@
         "type": "other",
         "other": {
           "name": "ldns",
-          "version": "1.7.0",
-          "downloadUrl": "http://www.nlnetlabs.nl/downloads/ldns/ldns-1.7.0.tar.gz"
+          "version": "1.8.3",
+          "downloadUrl": "http://www.nlnetlabs.nl/downloads/ldns/ldns-1.8.3.tar.gz"
         }
       }
     },

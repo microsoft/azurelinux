@@ -32,8 +32,8 @@
 
 Summary:        Low-level DNS(SEC) library with API
 Name:           ldns
-Version:        1.7.0
-Release:        32%{?dist}
+Version:        1.8.3
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -295,6 +295,9 @@ rm -rf doc/man
 %doc doc
 
 %changelog
+* Thu Jan 25 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.3-1
+- Auto-upgrade to 1.8.3 - Upgrade for Azure Linux 3.0
+
 * Mon Jul 25 2022 Rachel Menge <rachelmenge@microsoft.com> - 1.7.0-32
 - Move from SPECS-EXTENDED to SPECS
 
