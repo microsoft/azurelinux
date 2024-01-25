@@ -27,44 +27,46 @@ func shrinkFilesystems(imageLoopDevice string, outputImageFile string) error {
 	}
 
 	for partitionNum := 0; partitionNum < len(diskPartitions); partitionNum++ {
-		if diskPartitions[partitionNum].Type == "part" {
-			fstype := diskPartitions[partitionNum].FileSystemType
-			// Currently only support ext2, ext3, ext4 filesystem types
-			if fstype != "ext2" && fstype != "ext3" && fstype != "ext4" {
-				continue
-			}
+		if diskPartitions[partitionNum].Type != "part" {
+			continue
+		}
 
-			partitionLoopDevice := diskPartitions[partitionNum].Path
+		fstype := diskPartitions[partitionNum].FileSystemType
+		// Currently only support ext2, ext3, ext4 filesystem types
+		if fstype != "ext2" && fstype != "ext3" && fstype != "ext4" {
+			continue
+		}
 
-			// Check the file system with e2fsck
-			err := shell.ExecuteLive(true /*squashErrors*/, "sudo", "e2fsck", "-fy", partitionLoopDevice)
-			if err != nil {
-				return fmt.Errorf("failed to check %s with e2fsck:\n%w", partitionLoopDevice, err)
-			}
+		partitionLoopDevice := diskPartitions[partitionNum].Path
 
-			// Shrink the file system with resize2fs -M
-			stdout, stderr, err := shell.Execute("sudo", "resize2fs", "-M", partitionLoopDevice)
-			if err != nil {
-				return fmt.Errorf("failed to resize %s with resize2fs:\n%v", partitionLoopDevice, stderr)
-			}
+		// Check the file system with e2fsck
+		err := shell.ExecuteLive(true /*squashErrors*/, "sudo", "e2fsck", "-fy", partitionLoopDevice)
+		if err != nil {
+			return fmt.Errorf("failed to check %s with e2fsck:\n%w", partitionLoopDevice, err)
+		}
 
-			// Find the new partition end value
-			end, err := getNewPartitionEndInSectors(stdout, matchStarts[partitionNum-1][1], imageLoopDevice)
-			if err != nil {
-				return err
-			}
+		// Shrink the file system with resize2fs -M
+		stdout, stderr, err := shell.Execute("sudo", "resize2fs", "-M", partitionLoopDevice)
+		if err != nil {
+			return fmt.Errorf("failed to resize %s with resize2fs:\n%v", partitionLoopDevice, stderr)
+		}
 
-			// Resize the partition with parted resizepart
-			_, stderr, err = shell.ExecuteWithStdin("yes" /*stdin*/, "sudo", "parted", "---pretend-input-tty", imageLoopDevice, "resizepart", strconv.Itoa(partitionNum), end)
-			if err != nil {
-				return fmt.Errorf("failed to resizepart %s with parted:\n%v", partitionLoopDevice, stderr)
-			}
+		// Find the new partition end value
+		end, err := getNewPartitionEndInSectors(stdout, matchStarts[partitionNum-1][1], imageLoopDevice)
+		if err != nil {
+			return fmt.Errorf("failed to calculate new partition end: \n%w", err)
+		}
 
-			// Re-read the partition table
-			err = shell.ExecuteLive(true, "flock", "--timeout", "5", imageLoopDevice, "partprobe", "-s", imageLoopDevice)
-			if err != nil {
-				return err
-			}
+		// Resize the partition with parted resizepart
+		_, stderr, err = shell.ExecuteWithStdin("yes" /*stdin*/, "sudo", "parted", "---pretend-input-tty", imageLoopDevice, "resizepart", strconv.Itoa(partitionNum), end)
+		if err != nil {
+			return fmt.Errorf("failed to resizepart %s with parted:\n%v", partitionLoopDevice, stderr)
+		}
+
+		// Re-read the partition table
+		err = shell.ExecuteLive(true, "flock", "--timeout", "5", imageLoopDevice, "partprobe", "-s", imageLoopDevice)
+		if err != nil {
+			return fmt.Errorf("partprobe failed: \n%w, err")
 		}
 	}
 	return nil
@@ -100,13 +102,13 @@ func getFilesystemSizeInSectors(resize2fsOutput string, imageLoopDevice string) 
 		return 0, fmt.Errorf("failed to parse output of resize2fs")
 	}
 
-	blockCount, err := strconv.Atoi(match[1]) // Example: 10579
+	blockCount, err := strconv.Atoi(match[1]) // Example: 21015
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("failed to get block count: \n%w", err)
 	}
 	multiplier, err := strconv.Atoi(match[2]) // Example: 4
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("failed to get multiplier for block size: \n%w", err)
 	}
 	unit := match[3] // Example: 'k'
 
@@ -136,13 +138,13 @@ func getFilesystemSizeInSectors(resize2fsOutput string, imageLoopDevice string) 
 func getNewPartitionEndInSectors(resize2fsOutput string, startSector string, imageLoopDevice string) (endInSectors string, err error) {
 	filesystemSizeInSectors, err := getFilesystemSizeInSectors(resize2fsOutput, imageLoopDevice)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to get filesystem size: \n%w", err)
 	}
 
 	// Convert start sector string to int
 	start, err := strconv.Atoi(startSector)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to convert start sector to int: \n%w", err)
 	}
 	// Calculate the new end
 	end := start + filesystemSizeInSectors
