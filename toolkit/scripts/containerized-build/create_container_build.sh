@@ -102,10 +102,6 @@ done
 [[ ! -d "${repo_path}" ]] && { print_error " Directory ${repo_path} does not exist"; exit 1; }
 [[ -z "${mode}" ]] && mode="build"
 [[ -z "${version}" ]] && version="3.0"
-# TODO: Remove when PMC is available for 3.0
-if [[ "${version}" == "3.0" ]]; then
-    [[ -z "${DAILY_BUILD_ID}" ]] && DAILY_BUILD_ID="3-0-$(date -d "2 day ago" '+%Y%m%d')" #latest available
-fi
 
 # Set relevant folder definitions using Mariner Makefile that can be overriden by user
 # Default values are populated from toolkit/Makefile
@@ -132,6 +128,20 @@ mkdir -p ${tmp_dir}
 if [[ ( ! -d "${TOOLCHAIN_RPMS_DIR}" ) || ( -z "$(ls -A ${TOOLCHAIN_RPMS_DIR}/${build_arch})" ) || ( -z "$(ls -A ${TOOLCHAIN_RPMS_DIR}/noarch)" ) ]]; then
     print_error "Toolchain RPMS are not populated. Run sudo make toolchain REBUILD_TOOLS=y DAILY_BUILD_ID=<daily_build_id>"
     exit 1
+fi
+
+# TODO: Remove when PMC is available for 3.0
+lkg_url="https://mariner3dailydevrepo.blob.core.windows.net/lkg/lkg-3.0-dev.json"
+lkg_file="${tmp_dir}/lkg-3.0-dev.json"
+if [[ "${version}" == "3.0" ]]; then
+    if [[ -z "${DAILY_BUILD_ID}" ]]; then
+        echo "Downloading latest daily-repo-id ..."
+        rm ${lkg_file}*
+        wget -nv -P ${tmp_dir} ${lkg_url}
+        DAILY_BUILD_ID=$(cat ${lkg_file} | jq -r .date | tr -d '-')
+        [[ "$DAILY_BUILD_ID" = "null" ]] && { print_error "Unable to fetch latest daily-repo-id, please provide DAILY_REPO_ID"; exit 1; }
+        DAILY_BUILD_ID="3-0-"$DAILY_BUILD_ID
+    fi
 fi
 
 cd "${script_dir}"  || { print_error "Could not change directory to ${script_dir}"; exit 1; }
