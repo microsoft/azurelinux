@@ -3,7 +3,6 @@
 %bcond_with    cuda
 %bcond_with    gdrcopy
 %bcond_without ib
-%bcond_with    knem
 %bcond_without rdmacm
 %bcond_with    rocm
 %bcond_with    ugni
@@ -42,9 +41,6 @@ BuildRequires: gdrcopy
 %endif
 %if %{with ib}
 BuildRequires: libibverbs-devel
-%endif
-%if %{with knem}
-BuildRequires: knem
 %endif
 %if %{with rdmacm}
 BuildRequires: librdmacm-devel
@@ -104,7 +100,6 @@ Provides header files and examples for developing with UCX.
            %_with_arg cuda cuda \
            %_with_arg gdrcopy gdrcopy \
            %_with_arg ib verbs \
-           %_with_arg knem knem \
            %_with_arg rdmacm rdmacm \
            %_with_arg rocm rocm \
            %_with_arg xpmem xpmem \
@@ -207,20 +202,6 @@ hardware-offloaded data transfer.
 %{_libdir}/ucx/libuct_ib.so.*
 %endif
 
-%if %{with knem}
-%package knem
-Requires: %{name}%{?_isa} = %{version}-%{release}
-Summary: UCX KNEM transport support
-
-%description knem
-Provides KNEM (fast inter-process copy) transport for UCX. KNEM is a Linux
-kernel module that enables high-performance intra-node MPI communication
-for large messages.
-
-%files knem
-%{_libdir}/ucx/libuct_knem.so.*
-%endif
-
 %if %{with rdmacm}
 %package rdmacm
 Requires: %{name}-ib%{?_isa} = %{version}-%{release}
@@ -302,7 +283,7 @@ library internals, protocol objects, transports status, and more.
 
 %changelog
 * Wed Jan 24 2024 Juan Camposeco <juanarturoc@microsoft.com> - 1.15.0-5
-- Update version to 1.15.0
+- Update version to 1.15.0 and remove knem dependency
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.11.0-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
