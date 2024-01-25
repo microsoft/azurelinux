@@ -18,7 +18,7 @@
 Summary:        Linux Kernel for HCI
 Name:           kernel-hci
 Version:        5.15.145.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -55,6 +55,64 @@ Patch24:        0025-net-mlx5-Bridge-implement-infrastructure-for-VLAN-pr.patch
 Patch25:        0026-net-mlx5-Bridge-implement-QinQ-support.patch
 Patch26:        0027-mstflint-This-driver-enables-under-the-secure-boot.patch
 Patch27:        0028-net-mlx5-Bridge-Use-debug-instead-of-warn-if-entry-d.patch
+Patch28:        0029-Revert-net-mlx5-DR-Fix-uninitialized-var-warning.patch
+Patch29:        0030-net-mlx5-DR-Fix-code-indentation-in-dr_ste_v1.patch
+Patch30:        0031-net-mlx5-DR-Fix-vport-number-data-type-to-u16.patch
+Patch31:        0032-net-mlx5-DR-Replace-local-WIRE_PORT-macro-with-the-e.patch
+Patch32:        0033-net-mlx5-DR-Add-missing-query-for-vport-0.patch
+Patch33:        0034-net-mlx5-DR-Align-error-messages-for-failure-to-obta.patch
+Patch34:        0035-net-mlx5-DR-Support-csum-recalculation-flow-table-on.patch
+Patch35:        0036-net-mlx5-DR-Add-support-for-SF-vports.patch
+Patch36:        0037-net-mlx5-DR-Increase-supported-num-of-actions-to-32.patch
+Patch37:        0038-net-mlx5-DR-Fix-typo-offeset-to-offset.patch
+Patch38:        0039-net-mlx5-DR-init_next_match-only-if-needed.patch
+Patch39:        0040-net-mlx5-DR-Add-check-for-unsupported-fields-in-matc.patch
+Patch40:        0041-net-mlx5-DR-Fix-check-for-unsupported-fields-in-matc.patch
+Patch41:        0042-net-mlx5-DR-Fix-error-flow-in-creating-matcher.patch
+Patch42:        0043-net-mlx5-DR-Fix-lower-case-macro-prefix-mlx5_-to-MLX.patch
+Patch43:        0044-net-mlx5-DR-Remove-unused-struct-member-in-matcher.patch
+Patch44:        0045-net-mlx5-DR-Add-check-for-flex-parser-ID-value.patch
+Patch45:        0046-net-mlx5-DR-Add-missing-reserved-fields-to-dr_match_.patch
+Patch46:        0047-net-mlx5-DR-Add-support-for-dumping-steering-info.patch
+Patch47:        0048-net-mlx5-DR-Add-support-for-UPLINK-destination-type.patch
+Patch48:        0049-net-mlx5-DR-Warn-on-failure-to-destroy-objects-due-t.patch
+Patch49:        0050-net-mlx5-Add-misc5-flow-table-match-parameters.patch
+Patch50:        0051-net-mlx5-DR-Add-misc5-to-match_param-structs.patch
+Patch51:        0052-net-mlx5-DR-Support-matching-on-tunnel-headers-0-and.patch
+Patch52:        0053-net-mlx5-DR-Add-support-for-matching-on-geneve_tlv_o.patch
+Patch53:        0054-net-mlx5-DR-Improve-steering-for-empty-or-RX-TX-only.patch
+Patch54:        0055-net-mlx5-DR-Ignore-modify-TTL-if-device-doesn-t-supp.patch
+Patch55:        0056-net-mlx5-Add-ability-to-insert-to-specific-flow-grou.patch
+Patch56:        0057-net-mlx5-E-Switch-reserve-and-use-same-uplink-metada.patch
+Patch57:        0058-net-mlx5-E-switch-remove-special-uplink-ingress-ACL-.patch
+Patch58:        0059-net-mlx5-E-switch-add-drop-rule-support-to-ingress-A.patch
+Patch59:        0060-net-mlx5-Lag-use-local-variable-already-defined-to-a.patch
+Patch60:        0061-net-mlx5-Lag-don-t-use-magic-numbers-for-ports.patch
+Patch61:        0062-net-mlx5-Lag-record-inactive-state-of-bond-device.patch
+Patch62:        0063-net-mlx5-Lag-offload-active-backup-drops-to-hardware.patch
+Patch63:        0064-net-mlx5-Add-mlx5_ifc-definitions-for-bridge-multica.patch
+Patch64:        0065-net-mlx5-Bridge-increase-bridge-tables-sizes.patch
+Patch65:        0066-net-mlx5-Bridge-move-additional-data-structures-to-p.patch
+Patch66:        0067-net-mlx5-Bridge-extract-code-to-lookup-parent-bridge.patch
+Patch67:        0068-net-mlx5-Bridge-snoop-igmp-mld-packets.patch
+Patch68:        0069-net-mlx5-Bridge-add-per-port-multicast-replication-t.patch
+Patch69:        0070-net-mlx5-Bridge-support-multicast-VLAN-pop.patch
+Patch70:        0071-netlink-add-support-for-formatted-extack-messages.patch
+Patch71:        0072-net-mlx5-Bridge-implement-mdb-offload.patch
+Patch72:        0073-net-mlx5-Bridge-add-tracepoints-for-multicast.patch
+Patch73:        0074-net-mlx5-DR-Fix-uninitialized-var-warning.patch
+Patch74:        0075-net-mlx5-Fix-matching-on-inner-TTC.patch
+Patch75:        0076-net-mlx5-Lag-fix-a-potential-Oops-with-mlx5_lag_crea.patch
+Patch76:        0077-net-mlx5-DR-Fix-SMFS-steering-info-dump-format.patch
+Patch77:        0078-net-mlx5-DR-Fix-matcher-disconnect-error-flow.patch
+Patch78:        0079-net-mlx5-DR-Ignore-modify-TTL-on-RX-if-device-doesn-.patch
+Patch79:        0080-net-mlx5-DR-Handle-eswitch-manager-and-uplink-vports.patch
+Patch80:        0081-net-mlx5-DR-Fix-slab-out-of-bounds-in-mlx5_cmd_dr_cr.patch
+Patch81:        0082-net-mlx5-Create-eswitch-debugfs-root-directory.patch
+Patch82:        0083-net-mlx5-Bridge-pass-net-device-when-linking-vport-t.patch
+Patch83:        0084-net-mlx5-Bridge-expose-FDB-state-via-debugfs.patch
+Patch84:        0085-net-mlx5-DR-Align-mlx5dv_dr-API-vport-action-with-FW.patch
+Patch85:        0086-net-mlx5-Lag-add-debugfs-to-query-hardware-lag-state.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -200,6 +258,64 @@ manipulation of eBPF programs and maps.
 %patch25 -p1
 %patch26 -p1
 %patch27 -p1
+%patch28 -p1
+%patch29 -p1
+%patch30 -p1
+%patch31 -p1
+%patch32 -p1
+%patch33 -p1
+%patch34 -p1
+%patch35 -p1
+%patch36 -p1
+%patch37 -p1
+%patch38 -p1
+%patch39 -p1
+%patch40 -p1
+%patch41 -p1
+%patch42 -p1
+%patch43 -p1
+%patch44 -p1
+%patch45 -p1
+%patch46 -p1
+%patch47 -p1
+%patch48 -p1
+%patch49 -p1
+%patch50 -p1
+%patch51 -p1
+%patch52 -p1
+%patch53 -p1
+%patch54 -p1
+%patch55 -p1
+%patch56 -p1
+%patch57 -p1
+%patch58 -p1
+%patch59 -p1
+%patch60 -p1
+%patch61 -p1
+%patch62 -p1
+%patch63 -p1
+%patch64 -p1
+%patch65 -p1
+%patch66 -p1
+%patch67 -p1
+%patch68 -p1
+%patch69 -p1
+%patch70 -p1
+%patch71 -p1
+%patch72 -p1
+%patch73 -p1
+%patch74 -p1
+%patch75 -p1
+%patch76 -p1
+%patch77 -p1
+%patch78 -p1
+%patch79 -p1
+%patch80 -p1
+%patch81 -p1
+%patch82 -p1
+%patch83 -p1
+%patch84 -p1
+%patch85 -p1
 
 make mrproper
 
@@ -435,6 +551,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Thu Jan 25 2024 Vince Perri <viperri@microsoft.com> - 5.15.145.2-3
+- Add net/mlx5 patches (28-85) that backports upstream near-edge improvements and support for 100GB BOM.
+
 * Mon Jan 22 2024 Vince Perri <viperri@microsoft.com> - 5.15.145.2-2
 - Fix header for patch 27 and rename to
 - 0028-net-mlx5-Bridge-Use-debug-instead-of-warn-if-entry-d.patch

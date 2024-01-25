@@ -1,0 +1,47 @@
+From aa818fbf8f36e8c6f3e608ea960567906c2d6112 Mon Sep 17 00:00:00 2001
+From: Shun Hao <shunh@nvidia.com>
+Date: Mon, 17 Jan 2022 14:01:12 +0200
+Subject: [PATCH] net/mlx5: DR, Align mlx5dv_dr API vport action with FW
+ behavior
+
+This aligns the behavior with FW when creating an FDB rule with wire
+vport destination but no source port matching. Until now such rules
+would fail on internal DR RX rule creation since the source and
+destination are the wire vport.
+The new behavior is the same as done on FW steering, if destination is
+wire, we will create both TX and RX rules, but the RX packet coming from
+wire will be dropped due to loopback not supported.
+
+Signed-off-by: Shun Hao <shunh@nvidia.com>
+Reviewed-by: Alex Vesker <valex@nvidia.com>
+Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+---
+ .../ethernet/mellanox/mlx5/core/steering/dr_action.c | 12 +++---------
+ 1 file changed, 3 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_action.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_action.c
+index c61a5e83c78c..743422acc3d8 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_action.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_action.c
+@@ -669,15 +669,9 @@ int mlx5dr_actions_build_ste_arr(struct mlx5dr_matcher *matcher,
+ 		case DR_ACTION_TYP_VPORT:
+ 			attr.hit_gvmi = action->vport->caps->vhca_gvmi;
+ 			dest_action = action;
+-			if (rx_rule) {
+-				if (action->vport->caps->num == MLX5_VPORT_UPLINK) {
+-					mlx5dr_dbg(dmn, "Device doesn't support Loopback on WIRE vport\n");
+-					return -EOPNOTSUPP;
+-				}
+-				attr.final_icm_addr = action->vport->caps->icm_address_rx;
+-			} else {
+-				attr.final_icm_addr = action->vport->caps->icm_address_tx;
+-			}
++			attr.final_icm_addr = rx_rule ?
++				action->vport->caps->icm_address_rx :
++				action->vport->caps->icm_address_tx;
+ 			break;
+ 		case DR_ACTION_TYP_POP_VLAN:
+ 			if (!rx_rule && !(dmn->ste_ctx->actions_caps &
+-- 
+2.33.2
+

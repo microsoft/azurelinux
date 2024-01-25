@@ -1,0 +1,36 @@
+From 29c8c7db946e9e7f38f0f9f7dca39aa30aeac74b Mon Sep 17 00:00:00 2001
+From: Amir Tzin <amirtz@mellanox.com>
+Date: Tue, 11 Jul 2023 20:06:11 +0300
+Subject: [PATCH] Revert "net/mlx5: DR, Fix uninitialized var warning"
+
+This reverts commit 34feea3bfb37e09b20b9891ad72a815ac7895bd8.
+---
+ drivers/net/ethernet/mellanox/mlx5/core/steering/dr_table.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_table.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_table.c
+index 0c7b57bf01d0..4c40178e7d1e 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_table.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_table.c
+@@ -9,7 +9,7 @@ int mlx5dr_table_set_miss_action(struct mlx5dr_table *tbl,
+ 	struct mlx5dr_matcher *last_matcher = NULL;
+ 	struct mlx5dr_htbl_connect_info info;
+ 	struct mlx5dr_ste_htbl *last_htbl;
+-	int ret = -EOPNOTSUPP;
++	int ret;
+ 
+ 	if (action && action->action_type != DR_ACTION_TYP_FT)
+ 		return -EOPNOTSUPP;
+@@ -68,9 +68,6 @@ int mlx5dr_table_set_miss_action(struct mlx5dr_table *tbl,
+ 		}
+ 	}
+ 
+-	if (ret)
+-		goto out;
+-
+ 	/* Release old action */
+ 	if (tbl->miss_action)
+ 		refcount_dec(&tbl->miss_action->refcount);
+-- 
+2.31.1
+

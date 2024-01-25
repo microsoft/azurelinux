@@ -1,0 +1,26 @@
+From 5e1c53b044f09820c7c3f89db2fa65419a3c73f7 Mon Sep 17 00:00:00 2001
+From: Yevgeny Kliteynik <kliteyn@nvidia.com>
+Date: Thu, 11 Nov 2021 00:52:59 +0200
+Subject: [PATCH 35/58] net/mlx5: DR, Remove unused struct member in matcher
+
+Signed-off-by: Yevgeny Kliteynik <kliteyn@nvidia.com>
+Change-Id: I0dba991b5d3637a17dc7d542b84f35f8db089ab0
+---
+ drivers/net/ethernet/mellanox/mlx5/core/steering/dr_types.h | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_types.h b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_types.h
+index 76dc582fffba..ac1a736c625d 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_types.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_types.h
+@@ -897,7 +897,6 @@ struct mlx5dr_matcher {
+ 	struct mlx5dr_match_param mask;
+ 	u8 match_criteria;
+ 	refcount_t refcount;
+-	struct mlx5dv_flow_matcher *dv_matcher;
+ };
+ 
+ struct mlx5dr_ste_action_modify_field {
+-- 
+2.31.1
+

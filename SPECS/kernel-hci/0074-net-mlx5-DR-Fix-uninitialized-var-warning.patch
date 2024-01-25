@@ -1,0 +1,46 @@
+From 52f7cf70eb8fac6111786c59ae9dfc5cf2bee710 Mon Sep 17 00:00:00 2001
+From: YueHaibing <yuehaibing@huawei.com>
+Date: Thu, 10 Nov 2022 21:47:07 +0800
+Subject: [PATCH] net/mlx5: DR, Fix uninitialized var warning
+
+Smatch warns this:
+
+drivers/net/ethernet/mellanox/mlx5/core/steering/dr_table.c:81
+ mlx5dr_table_set_miss_action() error: uninitialized symbol 'ret'.
+
+Initializing ret with -EOPNOTSUPP and fix missing action case.
+
+Fixes: 7838e1725394 ("net/mlx5: DR, Expose steering table functionality")
+Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+Reviewed-by: Roi Dayan <roid@nvidia.com>
+Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/steering/dr_table.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_table.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_table.c
+index 31d443dd8386..f68461b13391 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_table.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_table.c
+@@ -46,7 +46,7 @@ static int dr_table_set_miss_action_nic(struct mlx5dr_domain *dmn,
+ int mlx5dr_table_set_miss_action(struct mlx5dr_table *tbl,
+ 				 struct mlx5dr_action *action)
+ {
+-	int ret;
++	int ret = -EOPNOTSUPP;
+ 
+ 	if (action && action->action_type != DR_ACTION_TYP_FT)
+ 		return -EOPNOTSUPP;
+@@ -67,6 +67,9 @@ int mlx5dr_table_set_miss_action(struct mlx5dr_table *tbl,
+ 			goto out;
+ 	}
+ 
++	if (ret)
++		goto out;
++
+ 	/* Release old action */
+ 	if (tbl->miss_action)
+ 		refcount_dec(&tbl->miss_action->refcount);
+-- 
+2.31.1
+
