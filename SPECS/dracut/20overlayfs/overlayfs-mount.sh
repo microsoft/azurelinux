@@ -1,13 +1,39 @@
 #!/bin/sh
 
+# Description: This script is designed to mount a DM-Verity root filesystem and
+# set up an OverlayFS. It is driven by kernel parameters and is invoked during
+# the dracut initramfs phase.
+
+# Kernel Parameters:
+# - root: Specifies the path to the root filesystem. This script expects it to
+#   be a DM-Verity protected device, typically for systemd at
+#   '/dev/mapper/root'.
+# - rd.overlayfs: A comma-separated list defining the OverlayFS configuration.
+#   Each entry should specify the overlay, upper, and work directories for an
+#   OverlayFS instance.
+# - rd.overlayfs_persistent_volume: Specifies the path to a persistent storage
+#   volume to be used by OverlayFS. If not provided, a volatile (tmpfs) overlay
+#   is created.
+
+# Behavior:
+# - Verifies the presence of the 'dracut-lib' for necessary utilities.
+# - Mounts the DM-Verity root filesystem as read-only at a predefined mount
+#   point.
+# - Sets up the OverlayFS based on the provided kernel parameters. If a
+#   persistent volume is specified, it's used as the upper layer for the
+#   OverlayFS; otherwise, a volatile overlay is created.
+# - Mounts the OverlayFS on top of the root filesystem, merging the read-only
+#   root with the writable overlay, allowing system modifications without
+#   altering the base system.
+
 set -ex
 
 parse_cmdline_args() {
     # Ensure that the 'dracut-lib' is present and loaded.
     type getarg >/dev/null 2>&1 || . /lib/dracut-lib.sh
 
-    VERITY_MOUNT="mnt/verity_mnt"
-    OVERLAY_MOUNT="/mnt/overlay_mnt"
+    VERITY_MOUNT="/mnt/verity_mnt_$$"
+    OVERLAY_MOUNT="/mnt/overlay_mnt_$$"
     OVERLAY_MNT_OPTS="rw,nodev,nosuid,nouser,noexec"
 
     # Retrieve the verity root. It is expected to be predefined by the dracut cmdline module.
@@ -32,7 +58,7 @@ mount_physical_partition() {
 
     if [ -z "${partition}" ]; then
         # Fallback to volatile overlay if no persistent volume is specified
-        info "No overlayfs persistent volume specified. Creating a volatile overlay."
+        echo "No overlayfs persistent volume specified. Creating a volatile overlay."
         mount -t tmpfs tmpfs -o ${OVERLAY_MNT_OPTS} "${OVERLAY_MOUNT}" || \
             die "Failed to create overlay tmpfs at ${OVERLAY_MOUNT}"
     else
@@ -63,20 +89,21 @@ create_overlay() {
 }
 
 mount_root() {
-    info "Mounting DM-Verity Target"
+    echo "Mounting DM-Verity Target"
     mkdir -p "${VERITY_MOUNT}"
     mount -o ro,defaults "/dev/mapper/root" "${VERITY_MOUNT}" || \
         die "Failed to mount dm-verity root target"
 
     mount_physical_partition
 
-    info "Creating OverlayFS"
+    echo "Starting to create OverlayFS"
     for _group in ${overlayfs}; do
         IFS=',' read -r overlay upper work <<< "$_group"
+        echo "Creating OverlayFS with overlay: $overlay, upper: ${OVERLAY_MOUNT}/${upper}, work: ${OVERLAY_MOUNT}/${work}"
         create_overlay "$overlay" "${OVERLAY_MOUNT}/${upper}" "${OVERLAY_MOUNT}/${work}"
     done
 
-    info "Done Verity Root Mounting and OverlayFS Mounting"
+    echo "Done Verity Root Mounting and OverlayFS Mounting"
     # Re-mount the verity mount along with overlayfs to the sysroot.
     mount --rbind "${VERITY_MOUNT}" "${NEWROOT}"
 }
