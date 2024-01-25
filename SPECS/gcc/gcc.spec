@@ -237,6 +237,7 @@ number of packages.
 %do_package aarch64-linux-gnu %{build_cross}
 
 %prep
+
 %autosetup -p1
 
 function prep_target () {
@@ -252,10 +253,8 @@ function prep_target () {
 touch cross.list
 prep_target aarch64-linux-gnu %{build_cross}
 
-# disable no-pie for gcc binaries
-sed -i '/^NO_PIE_CFLAGS = /s/@NO_PIE_CFLAGS@//' gcc/Makefile.in
-
 %build
+
 function config_cross_target () {
     local target=$1
 
@@ -315,13 +314,16 @@ export FCFLAGS="$FCFLAGS -Wno-error=missing-include-dirs"
 mkdir build
 pushd build
 
-SED=sed \
+LD=ld \
 %configure \
     --disable-bootstrap \
+    --disable-fixincludes \
+    --disable-libsanitizer \
     --disable-multilib \
     --enable-__cxa_atexit \
     --enable-clocale=gnu \
     --enable-default-pie \
+    --enable-default-ssp \
     --enable-languages=c,c++,fortran \
     --enable-linker-build-id \
     --enable-plugin \
@@ -350,6 +352,7 @@ do
 done < cross.list
 
 %install
+
 pushd build
 
 make %{?_smp_mflags} DESTDIR=%{buildroot} install
@@ -361,7 +364,7 @@ mv -v %{buildroot}%{_lib64dir}/*gdb.py %{buildroot}%{_datarootdir}/gdb/auto-load
 chmod 755 %{buildroot}/%{_lib64dir}/libgcc_s.so.1
 
 # Install libbacktrace-static components
-cp %{_host}/libbacktrace/.libs/libbacktrace.a %{buildroot}%{_lib64dir}
+cp host-%{_host}/libbacktrace/.libs/libbacktrace.a %{buildroot}%{_lib64dir}
 cp ../libbacktrace/backtrace.h %{buildroot}%{_includedir}
 
 %find_lang %{name} --all-name
