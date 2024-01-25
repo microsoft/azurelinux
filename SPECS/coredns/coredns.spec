@@ -3,7 +3,7 @@
 Summary:        Fast and flexible DNS server
 Name:           coredns
 Version:        1.11.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Apache License 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -31,6 +31,7 @@ Source0:        %{name}-%{version}.tar.gz
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         makefile-buildoption-commitnb.patch
+Patch1:         CVE-2023-49295.patch
 
 BuildRequires:  golang >= 1.12
 
@@ -58,6 +59,9 @@ install -p -m 755 -t %{buildroot}%{_bindir} %{name}
 %{_bindir}/%{name}
 
 %changelog
+* Wed Jan 24 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.11.1-2
+- patched vendored quic-go package to address CVE-2023-49295
+
 * Tue Oct 18 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 1.11.1-1
 - Upgrade to 1.11.1 to match version required by kubernetes
 
