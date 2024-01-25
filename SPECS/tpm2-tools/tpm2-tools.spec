@@ -1,20 +1,27 @@
 Summary:        The source repository for the TPM (Trusted Platform Module) 2 tools
 Name:           tpm2-tools
-Version:        4.3.2
+Version:        5.3
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://github.com/tpm2-software/tpm2-tools
-Source0:        https://github.com/tpm2-software/tpm2-tools/releases/download/%{version}/%{name}-%{version}.tar.gz
-BuildRequires:  curl-devel
-BuildRequires:  openssl-devel
-BuildRequires:  tpm2-tss-devel >= 2.3.0
-Requires:       /bin/awk
-Requires:       curl
-Requires:       openssl
-Requires:       tpm2-tss >= 2.3.0
+
+Source0: https://github.com/tpm2-software/tpm2-tools/releases/download/%{version}/%{name}-%{version}.tar.gz
+%define sha512 %{name}=224a5ea3448a877362abb35ac06b115c559c09b44b30d74c8326211be66d24e0e130c285b1e285be1842e7203ab488629b0f4e451cbd782c83ed72023d146675
+
+BuildRequires: openssl-devel
+BuildRequires: curl-devel
+BuildRequires: tpm2-tss-devel
+%if 0%{?with_check}
+BuildRequires:  ibmtpm
+BuildRequires:  systemd
+%endif
+
+Requires: openssl
+Requires: curl
+Requires: tpm2-tss
 
 %description
 The source repository for the TPM (Trusted Platform Module) 2 tools
@@ -23,21 +30,29 @@ The source repository for the TPM (Trusted Platform Module) 2 tools
 %autosetup -p1
 
 %build
-%configure \
-    --disable-static
-
-make %{?_smp_mflags}
+sed -i "/compatibility/a extern int BN_bn2binpad(const BIGNUM *a, unsigned char *to, int tolen);" lib/tpm2_openssl.c
+%configure --disable-static
+%make_build
 
 %install
-make DESTDIR=%{buildroot} install
+%make_install %{?_smp_mflags}
+
+%if 0%{?with_check}
+%check
+if [ ! -f /dev/tpm0 ];then
+   systemctl start ibmtpm_server.service
+   export TPM2TOOLS_TCTI=mssim:host=localhost,port=2321
+   tpm2_startup -c
+   tpm2_pcrlist
+fi
+make %{?_smp_mflags} check
+%endif
 
 %files
 %defattr(-,root,root)
-%license doc/LICENSE
 %{_bindir}/*
 %{_mandir}/man1
-%{_datarootdir}/bash-completion/completions/tpm2_*
-%{_datarootdir}/bash-completion/completions/tss2_*
+%{_datadir}/bash-completion/*
 
 %changelog
 * Tue Jan 18 2022 Daniel McIlvaney <damcilva@microsoft.com> - 4.3.2-1
