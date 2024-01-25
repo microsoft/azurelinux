@@ -43,7 +43,9 @@ License:        ASL 2.0
 Vendor:         Microsoft Corporation
 URL:            https://github.com/%{name}/%{name}
 Source0:        https://github.com/%{name}/%{name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        https://github.com/%{name}/%{name}/releases/download/%{version}/%{name}-%{version}-vendor.tar.gz
+# TODO: Make Source1 dynamic again on the next release. This helps for testing
+# with Kata-Pkgs-Upgrade.
+Source1:        kata-containers-cc-0.6.3-cargo.tar.gz
 Source2:        50-kata
 Source3:        mariner-build-uvm.sh
 
