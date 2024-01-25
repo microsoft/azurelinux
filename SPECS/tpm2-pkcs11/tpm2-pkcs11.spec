@@ -61,6 +61,7 @@ Tools for TCG TPM2 PKCSv11 Software Stack
 %autosetup -v -p1 -n %{name}-%{version}
 
 %build
+find .
 sh ./bootstrap
 
 %configure \
