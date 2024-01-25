@@ -103,6 +103,7 @@ python3 setup.py test
 %changelog
 * Mon Jan 22 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 1.8.0-5
 - Initial CBL-Mariner import from Photon (license: Apache2).
+- Verified license
 * Sun Nov 19 2023 Shreenidhi Shedi <sshedi@vmware.com> 1.8.0-5
 - Bump version as a part of openssl upgrade
 * Wed Jan 11 2023 Oliver Kurth <okurth@vmware.com> 1.8.0-4
