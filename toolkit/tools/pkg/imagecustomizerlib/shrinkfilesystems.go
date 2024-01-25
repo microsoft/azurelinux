@@ -31,9 +31,9 @@ func shrinkFilesystems(imageLoopDevice string, outputImageFile string) error {
 			continue
 		}
 
+		// Check if the filesystem type is supported
 		fstype := diskPartitions[partitionNum].FileSystemType
-		// Currently only support ext2, ext3, ext4 filesystem types
-		if fstype != "ext2" && fstype != "ext3" && fstype != "ext4" {
+		if !supportedFsType(fstype) {
 			continue
 		}
 
@@ -157,4 +157,15 @@ func getNewPartitionEndInSectors(resize2fsOutput string, startSector string, ima
 	// Convert to a string with sectors unit appended
 	endInSectors = strconv.Itoa(end) + "s"
 	return endInSectors, nil
+}
+
+// Checks if the provided fstype is supported.
+func supportedFsType(fstype string) (isSupported bool) {
+	switch fstype {
+	// Currently only support ext2, ext3, ext4 filesystem types
+	case "ext2", "ext3", "ext4":
+		return true
+	default:
+		return false
+	}
 }
