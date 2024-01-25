@@ -4850,8 +4850,8 @@
         "type": "other",
         "other": {
           "name": "grub2",
-          "version": "2.06",
-          "downloadUrl": "https://git.savannah.gnu.org/cgit/grub.git/snapshot/grub-2.06.tar.gz"
+          "version": "2.12",
+          "downloadUrl": "https://git.savannah.gnu.org/cgit/grub.git/snapshot/grub-2.12.tar.gz"
         }
       }
     },
