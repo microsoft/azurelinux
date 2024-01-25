@@ -7,7 +7,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"regexp"
 	"strconv"
-	"strings"
+	// "strings"
 )
 
 func shrinkFilesystems(imageLoopDevice string, outputImageFile string) error {
@@ -79,11 +79,8 @@ func getStartSectors(imageLoopDevice string, partitionCount int) (matchStarts []
 		return nil, fmt.Errorf("fdisk failed to list partitions: \n%v", stderr)
 	}
 
-	// Since regexp.QuoteMeta doesn't escape forward slashes, handling it here
-	escapeForwardSlashesLoopDevice := strings.ReplaceAll(imageLoopDevice, "/", `\/`)
-
 	// Example line from fdisk -l output: "/dev/loop41p2   18432  103064   84633 41.3M Linux filesystem"
-	reStarts, err := regexp.Compile(`(?m:^` + escapeForwardSlashesLoopDevice + `p\d+ *(\d+).*?)`)
+	reStarts, err := regexp.Compile(`(?m:^` + imageLoopDevice + `p\d+ *(\d+).*?)`)
 	if err != nil {
 		return nil, fmt.Errorf("failed to compile regex: \n%w", err)
 	}
