@@ -7,7 +7,6 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"regexp"
 	"strconv"
-	// "strings"
 )
 
 func shrinkFilesystems(imageLoopDevice string, outputImageFile string) error {
