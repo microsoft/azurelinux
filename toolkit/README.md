@@ -12,7 +12,7 @@
 - Learn how to create an Unattended Installer.
 - Other Advanced Topics.
 
-## [Build Users Guide](docs/building/building.md) 
+## [Build Users Guide](docs/building/building.md)
 
 - **Recommended if you are a developer and want to learn how to fully build CBL-Mariner.**
 - Build CBL-Mariner end-to-end.
@@ -23,6 +23,10 @@
 ## [How the Build System Works](docs/how_it_works/0_intro.md)
 
 - Initial prep, local packages, package builds, image generation.
+
+## [Understanding build logs](docs/how_it_works/6_logs.md)
+
+- Info common build logs with a focus on errors and warnings and how to interpret them.
 
 ## [OS security](docs/security/intro.md)
 
