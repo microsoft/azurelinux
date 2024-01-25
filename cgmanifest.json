@@ -1377,8 +1377,8 @@
         "type": "other",
         "other": {
           "name": "c-ares",
-          "version": "1.19.1",
-          "downloadUrl": "https://c-ares.haxx.se/download/c-ares-1.19.1.tar.gz"
+          "version": "1.25.0",
+          "downloadUrl": "https://c-ares.haxx.se/download/c-ares-1.25.0.tar.gz"
         }
       }
     },
@@ -9301,8 +9301,8 @@
         "type": "other",
         "other": {
           "name": "libfontenc",
-          "version": "1.1.3",
-          "downloadUrl": "ftp://ftp.x.org/pub/individual/lib/libfontenc-1.1.3.tar.bz2"
+          "version": "1.1.7",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libfontenc-1.1.7.tar.gz"
         }
       }
     },
@@ -9751,8 +9751,8 @@
         "type": "other",
         "other": {
           "name": "libiscsi",
-          "version": "1.18.0",
-          "downloadUrl": "https://github.com/sahlberg/libiscsi/archive/1.18.0.tar.gz"
+          "version": "1.19.0",
+          "downloadUrl": "https://github.com/sahlberg/libiscsi/archive/1.19.0.tar.gz"
         }
       }
     },
@@ -11591,8 +11591,8 @@
         "type": "other",
         "other": {
           "name": "libxcb",
-          "version": "1.13.1",
-          "downloadUrl": "https://xcb.freedesktop.org/dist/libxcb-1.13.1.tar.bz2"
+          "version": "1.16",
+          "downloadUrl": "https://xcb.freedesktop.org/dist/libxcb-1.16.tar.gz"
         }
       }
     },
@@ -14183,8 +14183,8 @@
         "type": "other",
         "other": {
           "name": "nspr",
-          "version": "4.30",
-          "downloadUrl": "https://archive.mozilla.org/pub/nspr/releases/v4.30/src/nspr-4.30.tar.gz"
+          "version": "4.9.6",
+          "downloadUrl": "https://archive.mozilla.org/pub/nspr/releases/v4.9.6/src/nspr-4.9.6.tar.gz"
         }
       }
     },
@@ -27847,8 +27847,8 @@
         "type": "other",
         "other": {
           "name": "squashfs-tools",
-          "version": "4.5.1",
-          "downloadUrl": "https://github.com/plougher/squashfs-tools/archive/4.5.1.tar.gz"
+          "version": "4.6.1",
+          "downloadUrl": "https://github.com/plougher/squashfs-tools/archive/4.6.1.tar.gz"
         }
       }
     },
