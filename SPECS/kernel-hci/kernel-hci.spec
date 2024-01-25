@@ -17,8 +17,8 @@
 %define config_source %{SOURCE1}
 Summary:        Linux Kernel for HCI
 Name:           kernel-hci
-Version:        5.15.145.2
-Release:        3%{?dist}
+Version:        5.15.147.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -551,6 +551,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Thu Jan 25 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.147.1-1
+- Auto-upgrade to 5.15.147.1
+
 * Thu Jan 25 2024 Vince Perri <viperri@microsoft.com> - 5.15.145.2-3
 - Add net/mlx5 patches (28-85) that backports upstream near-edge improvements and support for 100GB BOM.
 
