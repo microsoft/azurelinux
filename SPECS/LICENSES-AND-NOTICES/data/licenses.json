@@ -3006,6 +3006,8 @@
                 "texinfo",
                 "tmux",
                 "tpm2-abrmd",
+                "tpm2-pkcs11",
+                "tpm2-pytss",
                 "tpm2-tools",
                 "tpm2-tss",
                 "traceroute",
