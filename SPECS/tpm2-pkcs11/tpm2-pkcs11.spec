@@ -58,7 +58,7 @@ Requires:         python3-PyYAML
 Tools for TCG TPM2 PKCSv11 Software Stack
 
 %prep
-%autosetup -p1 -n %{name}-%{version}
+%autosetup -v -p1 -n %{name}-%{version}
 
 %build
 sh ./bootstrap
