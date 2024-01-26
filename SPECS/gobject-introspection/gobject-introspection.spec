@@ -1,8 +1,8 @@
-%define BaseVersion 1.71
+%define BaseVersion 1.79
 Summary:        Introspection system for GObject-based libraries
 Name:           gobject-introspection
-Version:        %{BaseVersion}.0
-Release:        16%{?dist}
+Version:        %{BaseVersion}.1
+Release:        1%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -98,6 +98,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man1/*.gz
 
 %changelog
+%changelog
+* Tue Jan 23 2024 Betty Lakes <bettylakes@microsoft.com> - 1.79.1-1
+- Update version to 1.79.1
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.71.0-16
 - Bump release to rebuild with go 1.20.10
 
