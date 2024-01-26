@@ -9,11 +9,10 @@ URL:            https://github.com/jetstack/cert-manager
 Source0:        https://github.com/jetstack/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
 # We're using pre-populated GO dependencies from this tarball, since network is disabled during build time.
-#   1. wget https://github.com/jetstack/%%{name}/archive/refs/tags/v%%{version}.tar.gz -o %%{name}-%%{version}.tar.gz
-#   2. tar -xf %%{name}-%%{version}.tar.gz
-#   3. edit SPECS/cert-manager/nested-vendoring.sh DESIRED_VERSION field to the version you update to
-#   4. sudo ./nested-vendoring.sh
-#   5. should produce %{name}-%{version}-govendor.tar.gz
+#   1. wget https://github.com/jetstack/%%{name}/archive/refs/tags/v%%{version}.tar.gz -o ./SPECS/cert-manager/%%{name}-%%{version}.tar.gz
+#   2. tar -xf ./SPECS/cert-manager/%%{name}-%%{version}.tar.gz
+#   3. Run sudo .toolkit/scripts/nested-vendoring.sh -d ./SPECS/cert-manager -n cert-manager -v %%{version}
+#   4. should produce %{name}-%{version}-govendor.tar.gz
 Source1:        %{name}-%{version}-govendor.tar.gz
 BuildRequires:  golang
 Requires:       %{name}-acmesolver
