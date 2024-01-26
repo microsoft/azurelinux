@@ -62,10 +62,6 @@ func NewIsoMaker(unattendedInstall bool, baseDirPath, buildDirPath, releaseVersi
 	config := readConfigFile(configFilePath, baseDirPath)
 	verifyConfig(config, unattendedInstall)
 
-	// readConfigFile() and verifyConfig() panic if an error occurs.
-	config := readConfigFile(configFilePath, baseDirPath)
-	verifyConfig(config, unattendedInstall)
-
 	return &IsoMaker{
 		enableBiosBoot:     true,
 		unattendedInstall:  unattendedInstall,

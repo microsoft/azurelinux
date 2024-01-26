@@ -144,7 +144,7 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 
 	// Shrink the filesystems.
 	if enableShrinkFilesystems {
-		err = shrinkFilesystemsHelper(buildImageFile, outputImageFile)
+		err = shrinkFilesystemsHelper(rawImageFile, outputImageFile)
 		if err != nil {
 			return fmt.Errorf("failed to shrink filesystems:\n%w", err)
 		}
