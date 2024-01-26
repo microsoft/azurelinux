@@ -1,15 +1,19 @@
+
+%define dist_version 3
+
 Summary:        Azure Linux release files
 Name:           azurelinux-release
-Version:        3.0
+Version:        %{dist_version}.0
 Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://aka.ms/azurelinux
-# Allows package management tools to find and set the default value
-# for the "releasever" variable from the RPM database.
-Provides:       system-release(releasever)
+
+Provides:       system-release
+Provides:       system-release(%{version})
+
 BuildArch:      noarch
 
 %description
@@ -19,23 +23,22 @@ Azure Linux release files such as yum configs and other %{_sysconfdir}/ release 
 install -d %{buildroot}%{_sysconfdir}
 install -d %{buildroot}/%{_libdir}
 
-echo "Azure Linux %{mariner_release_version}" > %{buildroot}%{_sysconfdir}/azurelinux-release
+echo "%{distribution} %{version}" > %{buildroot}%{_sysconfdir}/azurelinux-release
 echo "AZURELINUX_BUILD_NUMBER=%{mariner_build_number}" >> %{buildroot}%{_sysconfdir}/azurelinux-release
 
 cat > %{buildroot}%{_sysconfdir}/lsb-release <<- "EOF"
 DISTRIB_ID="azurelinux"
-DISTRIB_RELEASE="%{mariner_release_version}"
+DISTRIB_RELEASE="%{version}"
 DISTRIB_CODENAME=AzureLinux
-DISTRIB_DESCRIPTION="Microsoft Azure Linux %{mariner_release_version}"
+DISTRIB_DESCRIPTION="%{distribution} %{version}"
 EOF
 
-version_id=`echo %{mariner_release_version} | grep -o -E '[0-9]+.[0-9]+' | head -1`
 cat > %{buildroot}/%{_libdir}/os-release << EOF
-NAME="Microsoft Azure Linux"
-VERSION="%{mariner_release_version}"
+NAME="%{distribution}"
+VERSION="%{version}"
 ID=azurelinux
-VERSION_ID="$version_id"
-PRETTY_NAME="Microsoft Azure Linux $version_id"
+VERSION_ID="%{version}"
+PRETTY_NAME="%{distribution} %{version}"
 ANSI_COLOR="1;34"
 HOME_URL="%{url}"
 BUG_REPORT_URL="%{url}"
@@ -45,11 +48,11 @@ EOF
 ln -sv ../usr/lib/os-release %{buildroot}%{_sysconfdir}/os-release
 
 cat > %{buildroot}%{_sysconfdir}/issue <<- EOF
-Welcome to Azure Linux %{mariner_release_version} (%{_arch}) - (\l)
+Welcome to %{distribution} %{version} (%{_arch}) - (\l)
 EOF
 
 cat > %{buildroot}%{_sysconfdir}/issue.net <<- EOF
-Welcome to Azure Linux %{mariner_release_version} (%{_arch})
+Welcome to %{distribution} %{version} (%{_arch})
 EOF
 
 %files
@@ -64,6 +67,7 @@ EOF
 %changelog
 * Thu Feb 22 2024 Dan Streetman <ddstreet@microsoft.com> - 3.0-4
 - remove %%config(noreplace) from *-release files
+- define dist_version and use local macros
 
 * Thu Feb 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.0-3
 - Renamed mariner-release to azurelinux-release file
