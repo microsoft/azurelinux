@@ -113,7 +113,7 @@ make %{?_smp_mflags} V=1
 %install
 make DESTDIR=%{buildroot} install
 rm -f %{buildroot}%{_libdir}/*.la
-rm -f %{buildroot}%{_libdir}/*.a
+rm -f %{buildroot}%{_libdir}/libucs_signal.a
 rm -f %{buildroot}%{_libdir}/ucx/*.la
 rm -f %{buildroot}%{_libdir}/ucx/lib*.so
 
