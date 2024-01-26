@@ -1,6 +1,6 @@
 Summary:        A fast and easy to use template engine written in pure Python
 Name:           python-jinja2
-Version:        3.1.2
+Version:        3.1.3
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -19,7 +19,7 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-markupsafe >= 2.0
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 Requires:       python3
@@ -34,7 +34,6 @@ sandboxed environment.
 
 %prep
 %autosetup -n Jinja2-%{version}
-sed -i 's/\r$//' LICENSE.rst # Fix wrong EOL encoding
 
 %build
 %py3_build
@@ -53,6 +52,9 @@ tox -e py%{python3_version_nodots}
 %{python3_sitelib}/Jinja2-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Wed Janu 24 2024 Tobias Brick <tobiasb@microsoft.com> - 3.1.3-1
+- Upgrade to version 3.1.3
+
 * Mon Nov 27 2023 Andrew Phelps <anphel@microsoft.com> - 3.1.2-1
 - Upgrade to version 3.1.2
 
