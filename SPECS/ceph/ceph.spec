@@ -4,8 +4,8 @@
 
 Summary:        User space components of the Ceph file system
 Name:           ceph
-Version:        16.2.10
-Release:        2%{?dist}
+Version:        18.2.0
+Release:        1%{?dist}
 License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT and Public Domain and GPLv3 and ASL-2.0
 URL:            https://ceph.io/
 Vendor:         Microsoft Corporation
