@@ -29,13 +29,20 @@ Vendor:         %dist_vendor
 Distribution:   %dist_name
 URL:            %dist_home_url
 
+Source1:        90-default.preset
+Source2:        90-default-user.preset
+Source3:        99-default-disable.preset
+
 Provides:       system-release
 Provides:       system-release(%{version})
 
 BuildArch:      noarch
 
+BuildRequires:  systemd-rpm-macros
+
 %description
 Azure Linux release files such as dnf configs and other %{_sysconfdir}/ release related files
+and systemd preset files that determine which services are enabled by default.
 
 %install
 install -d %{buildroot}%{_sysconfdir}
@@ -93,6 +100,15 @@ cat <<-"EOF" > %{buildroot}%{_rpmmacrodir}/macros.dist
 %%dist_debuginfod_url %{dist_home_url}
 EOF
 
+# Default presets for system and user
+install -Dm0644 %{SOURCE1} -t %{buildroot}%{_presetdir}/
+install -Dm0644 %{SOURCE2} -t %{buildroot}%{_userpresetdir}/
+
+# Default disable presets
+install -Dm0644 %{SOURCE3} -t %{buildroot}%{_presetdir}/
+install -Dm0644 %{SOURCE3} -t %{buildroot}%{_userpresetdir}/
+
+
 %files
 %defattr(-,root,root,-)
 %{_libdir}/azurelinux-release
@@ -107,6 +123,9 @@ EOF
 %config(noreplace) %{_sysconfdir}/issue.net
 %dir %{_sysconfdir}/issue.d
 %{_rpmmacrodir}/macros.dist
+%{_presetdir}/*.preset
+%{_userpresetdir}/*.preset
+
 
 %changelog
 * Thu Feb 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.0-3
