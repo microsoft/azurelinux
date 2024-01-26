@@ -58,10 +58,6 @@ func NewIsoMaker(unattendedInstall bool, baseDirPath, buildDirPath, releaseVersi
 
 	imageNameBase := strings.TrimSuffix(filepath.Base(configFilePath), ".json")
 
-	if imageNameTag != "" {
-		imageNameTag = "-" + imageNameTag
-	}
-
 	// readConfigFile() and verifyConfig() panic if an error occurs.
 	config := readConfigFile(configFilePath, baseDirPath)
 	verifyConfig(config, unattendedInstall)
@@ -88,11 +84,7 @@ func NewIsoMakerWithConfig(unattendedInstall, enableBiosBoot bool, baseDirPath, 
 		imageNameBase = defaultImageNameBase
 	}
 
-	if imageNameTag != "" {
-		imageNameTag = "-" + imageNameTag
-	}
-
-	// verifyConfig() panic if an error occurs.
+	// verifyConfig() panics if an error occurs.
 	verifyConfig(config, unattendedInstall)
 
 	return &IsoMaker{
@@ -329,7 +321,7 @@ func (im *IsoMaker) copyStaticIsoRootFiles() {
 	if im.resourcesDirPath != "" {
 		staticIsoRootFilesPath := filepath.Join(im.resourcesDirPath, "assets/isomaker/iso_root_static_files/*")
 
-		logger.Log.Infof("Copying static ISO root files from '%s' to '%s'.", staticIsoRootFilesPath, im.buildDirPath)
+		logger.Log.Debugf("Copying static ISO root files from '%s' to '%s'.", staticIsoRootFilesPath, im.buildDirPath)
 
 		recursiveCopyDereferencingLinks(staticIsoRootFilesPath, im.buildDirPath)
 	}
@@ -341,7 +333,7 @@ func (im *IsoMaker) copyStaticIsoRootFiles() {
 		targetGrubCfgDir := filepath.Dir(targetGrubCfg)
 		logger.PanicOnError(os.MkdirAll(targetGrubCfgDir, os.ModePerm), "Failed while creating directory '%s'.", targetGrubCfgDir)
 
-		logger.Log.Infof("Copying '%s' to '%s'.", im.grubCfgPath, targetGrubCfg)
+		logger.Log.Debugf("Copying '%s' to '%s'.", im.grubCfgPath, targetGrubCfg)
 		shell.MustExecuteLive("cp", im.grubCfgPath, targetGrubCfg)
 	}
 }
@@ -349,6 +341,14 @@ func (im *IsoMaker) copyStaticIsoRootFiles() {
 // copyArchitectureDependentIsoRootFiles copies the pre-built UEFI modules required
 // to boot the ISO image.
 func (im *IsoMaker) copyArchitectureDependentIsoRootFiles() {
+	// If the resourceDirPath is empty, it means the user does not want the
+	// stock files that come from there. At the time of writing this comment
+	// , only the bios bootloaders are under that directory arch-specific
+	// subfolder.
+	// Likewise, if enableBiosBoot is set to false, it means the user does
+	// not want the bios bootloaders to be copied. Since the bootloaders are
+	// the only thing copied in this function, there is no need to proceed
+	// further.
 	if im.resourcesDirPath == "" || !im.enableBiosBoot {
 		return
 	}
