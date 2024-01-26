@@ -1,12 +1,12 @@
 %global eppic_ver e8844d3793471163ae4a56d8f95897be9e5bd554
 # First 7 digits from ^
 %global eppic_shortver e8844d3
-%global mkdf_ver 1.6.8
+%global mkdf_ver 1.7.4
 
 Summary:        The kexec/kdump userspace component
 Name:           kexec-tools
 Version:        2.0.27
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -110,7 +110,6 @@ Obsoletes: diskdumputils netdump kexec-tools-eppic
 #
 # Patches 601 onward are generic patches
 #
-Patch601: makedumpfile-printk-fix.patch
 
 %description
 kexec-tools provides /sbin/kexec binary that facilitates a new
@@ -125,8 +124,6 @@ component of the kernel's kexec feature.
 mkdir -p -m755 kcp
 tar -z -x -v -f %{SOURCE9}
 tar -z -x -v -f %{SOURCE19}
-
-%patch601 -p1
 
 %build
 autoreconf
@@ -188,13 +185,12 @@ install -m 644 %{SOURCE16} $RPM_BUILD_ROOT%{_unitdir}/kdump.service
 install -m 755 -D %{SOURCE22} $RPM_BUILD_ROOT%{_prefix}/lib/systemd/system-generators/kdump-dep-generator.sh
 
 %ifarch %{ix86} x86_64 aarch64
-install -m 755 makedumpfile-%{mkdf_ver}/makedumpfile $RPM_BUILD_ROOT/usr/sbin/makedumpfile
-install -m 644 makedumpfile-%{mkdf_ver}/makedumpfile.8.gz $RPM_BUILD_ROOT/%{_mandir}/man8/makedumpfile.8.gz
-install -m 644 makedumpfile-%{mkdf_ver}/makedumpfile.conf.5.gz $RPM_BUILD_ROOT/%{_mandir}/man5/makedumpfile.conf.5.gz
-install -m 644 makedumpfile-%{mkdf_ver}/makedumpfile.conf $RPM_BUILD_ROOT/%{_sysconfdir}/makedumpfile.conf.sample
+mkdir -p $RPM_BUILD_ROOT/usr/sbin
+mkdir -p $RPM_BUILD_ROOT/usr/share/man/man5
+mkdir -p $RPM_BUILD_ROOT/usr/share/man/man8
+mkdir -p $RPM_BUILD_ROOT/usr/share/makedumpfile-%{mkdf_ver}/eppic-scripts/
+make -C makedumpfile-%{mkdf_ver} install DESTDIR=$RPM_BUILD_ROOT
 install -m 755 makedumpfile-%{mkdf_ver}/eppic_makedumpfile.so $RPM_BUILD_ROOT/%{_libdir}/eppic_makedumpfile.so
-mkdir -p $RPM_BUILD_ROOT/usr/share/makedumpfile/eppic_scripts/
-install -m 644 makedumpfile-%{mkdf_ver}/eppic_scripts/* $RPM_BUILD_ROOT/usr/share/makedumpfile/eppic_scripts/
 %endif
 
 %define remove_dracut_prefix() %(echo -n %1|sed 's/.*dracut-//g')
@@ -301,12 +297,13 @@ done
 %files
 /usr/sbin/kexec
 /usr/sbin/makedumpfile
+/usr/sbin/makedumpfile-R.pl
 /usr/sbin/mkdumprd
 /usr/sbin/vmcore-dmesg
 %{_bindir}/*
 %{_datadir}/kdump
 %{_prefix}/lib/kdump
-%{_sysconfdir}/makedumpfile.conf.sample
+/usr/share/makedumpfile-%{mkdf_ver}/eppic-scripts/
 %config(noreplace,missingok) %{_sysconfdir}/sysconfig/kdump
 %config(noreplace,missingok) %verify(not mtime) %{_sysconfdir}/kdump.conf
 %config(noreplace) %{_sysconfdir}/default/grub.d/51_kexec_tools.cfg
@@ -334,11 +331,14 @@ done
 /usr/share/makedumpfile/
 
 %changelog
+* Fri Jan 19 2024 Elaheh Dehghani <edehghani@microsoft.com> - 2.0.27-3
+- Upgrade makedumpfile to 1.7.4 - Azure Linux 3.0 - package upgrades
+
 * Tue Dec 05 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.0.27-2
-- Enable grub2-mkconfig-based boot path by installing 
-    51_kexec_tools.cfg 
-- Call grub2-mkconfig to regenerate configs only if the user has 
-    previously used grub2-mkconfig for boot configuration. 
+- Enable grub2-mkconfig-based boot path by installing
+    51_kexec_tools.cfg
+- Call grub2-mkconfig to regenerate configs only if the user has
+    previously used grub2-mkconfig for boot configuration.
 
 * Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.27-1
 - Auto-upgrade to 2.0.27 - Azure Linux 3.0 - package upgrades
