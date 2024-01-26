@@ -9,7 +9,7 @@
 
 %global rubygems_version        3.5.3
 # Add version for default gems from https://stdgems.org/
-# A helpful one-liner script to check the current default versions is available via RUBY_VER=%%{majmin} ./get_gem_versions.sh
+# A helpful one-liner script to check the current default versions is available via RUBY_VER=%%{ruby_version_majmin} ./get_gem_versions.sh
 %global abbrev_version          0.1.2
 %global base64_version          0.2.0
 %global benchmark_version       0.3.0
@@ -94,7 +94,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.ruby-lang.org/en/
-Source0:        https://cache.ruby-lang.org/pub/ruby/%{majmin}/%{name}-%{ruby_version}.tar.gz
+Source0:        https://cache.ruby-lang.org/pub/ruby/%{ruby_version_majmin}/%{name}-%{ruby_version}.tar.gz
 Source1:        macros.ruby
 Source2:        operating_system.rb
 Source3:        rubygems.attr
