@@ -101,7 +101,7 @@ python3 setup.py test
 %{python3_sitelib}/*
 
 %changelog
-* Mon Jan 22 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 1.8.0-1
+* Mon Jan 22 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 1.9.0-1
 - Initial CBL-Mariner import from Photon (license: Apache2).
 - Verified license
 * Sun Nov 19 2023 Shreenidhi Shedi <sshedi@vmware.com> 1.8.0-5
