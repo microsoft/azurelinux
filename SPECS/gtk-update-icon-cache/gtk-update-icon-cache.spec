@@ -2,13 +2,13 @@
 %global gdk_pixbuf_version 2.30.0
 Summary:        Icon theme caching utility
 Name:           gtk-update-icon-cache
-Version:        3.24.26
+Version:        3.24.39
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.gtk.org
-Source0:        https://gitlab.gnome.org/Community/gentoo/%{name}/-/archive/%{version}/%{name}-%{version}.tar.gz
+Source0:        https://gitlab.gnome.org/Community/gentoo/%{name}/-/archive/%{version}/%{name}-%{version}.tar.bz2
 BuildRequires:  libxslt
 BuildRequires:  meson
 BuildRequires:  pkg-config
