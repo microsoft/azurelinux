@@ -165,11 +165,11 @@ texinfo-7.0.3-1.azl3.x86_64.rpm
 gtk-doc-1.33.2-1.azl3.noarch.rpm
 autoconf-2.71-3.azl3.noarch.rpm
 automake-1.16.5-1.azl3.noarch.rpm
-openssl-3.1.4-1.azl3.x86_64.rpm
-openssl-devel-3.1.4-1.azl3.x86_64.rpm
-openssl-libs-3.1.4-1.azl3.x86_64.rpm
-openssl-perl-3.1.4-1.azl3.x86_64.rpm
-openssl-static-3.1.4-1.azl3.x86_64.rpm
+openssl-3.1.4-2.azl3.x86_64.rpm
+openssl-devel-3.1.4-2.azl3.x86_64.rpm
+openssl-libs-3.1.4-2.azl3.x86_64.rpm
+openssl-perl-3.1.4-2.azl3.x86_64.rpm
+openssl-static-3.1.4-2.azl3.x86_64.rpm
 libcap-2.69-1.azl3.x86_64.rpm
 libcap-devel-2.69-1.azl3.x86_64.rpm
 debugedit-5.0-2.azl3.x86_64.rpm
