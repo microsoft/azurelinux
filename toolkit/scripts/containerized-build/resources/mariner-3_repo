@@ -1,0 +1,9 @@
+[mariner-3.0-daily-build]
+name=CBL-Mariner 3.0 Daily Build Repo
+baseurl=https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-<DAILY_BUILD_ID>-<ARCH>
+gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
+gpgcheck=0
+repo_gpgcheck=0
+enabled=1
+skip_if_unavailable=True
+sslverify=0
