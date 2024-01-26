@@ -21,7 +21,7 @@
 %define config_source %{SOURCE1}
 %endif
 
-Summary:        Linux Kernel
+Summary:        Realtime Linux Kernel
 Name:           kernel-rt
 Version:        6.6.7.1
 Release:        1%{?dist}
@@ -75,6 +75,7 @@ Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
 Requires(postun): coreutils
+ExclusiveArch:  x86_64
 # When updating the config files it is important to sanitize them.
 # Steps for updating a config file:
 #  1. Extract the linux sources into a folder
