@@ -41,10 +41,13 @@ Group:          System Environment/Libraries
 Url:            http://www.nlnetlabs.nl/%{name}/
 Source0:        http://www.nlnetlabs.nl/downloads/%{name}/%{name}-%{version}.tar.gz
 
+BuildRequires: autoconf
+BuildRequires: automake
 BuildRequires: doxygen
 BuildRequires: gcc
 BuildRequires: gcc-c++
 BuildRequires: libpcap-devel
+BuildRequires: libtool
 BuildRequires: make
 BuildRequires: openssl-devel
 %if %{with perl}
