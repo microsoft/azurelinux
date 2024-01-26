@@ -4,7 +4,7 @@
 Summary:        dracut to create initramfs
 Name:           dracut
 Version:        055
-Release:        5%{?dist}
+Release:        6%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
@@ -19,6 +19,11 @@ Source3:        megaraid.conf
 Patch0:         disable-xattr.patch
 Patch1:         fix-initrd-naming-for-mariner.patch
 Patch2:         fix-functions-Avoid-calling-grep-with-PCRE-P.patch
+# allow-liveos-overlay-no-user-confirmation-prompt.patch has been introduced by
+# the Mariner team to allow skipping the user confirmation prompt during boot
+# when the overlay of the liveos is backed by ram. This allows the machine to
+# boot without being blocked on user input in such a scenario.
+Patch3:         allow-liveos-overlay-no-user-confirmation-prompt.patch
 BuildRequires:  asciidoc
 BuildRequires:  bash
 BuildRequires:  git
@@ -188,6 +193,9 @@ ln -sr %{buildroot}%{_bindir}/dracut %{buildroot}%{_sbindir}/dracut
 %dir %{_sharedstatedir}/dracut/overlay
 
 %changelog
+* Wed Jan 24 2024 George Mileka <gmileka@microsoft.com> - 055-6
+- Add an option to supress user confirmation prompt for ram overlays.
+
 * Thu Apr 27 2023 Daniel McIlvaney <damcilva@microsoft.com> - 055-5
 - Avoid using JIT'd perl in grep since it is blocked by SELinux.
 
