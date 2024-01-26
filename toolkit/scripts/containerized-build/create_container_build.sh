@@ -142,6 +142,7 @@ if [[ "${version}" == "3.0" ]]; then
         [[ "$DAILY_BUILD_ID" = "null" ]] && { print_error "Unable to fetch latest daily-repo-id, please provide DAILY_REPO_ID"; exit 1; }
         DAILY_BUILD_ID="3-0-"$DAILY_BUILD_ID
     fi
+    echo "Using Daily Build $DAILY_BUILD_ID"
 fi
 
 cd "${script_dir}"  || { print_error "Could not change directory to ${script_dir}"; exit 1; }
