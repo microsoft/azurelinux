@@ -1,7 +1,0 @@
-{
- "Signatures": {
-  "lld-16.0.0.src.tar.xz": "005577d7e59f780e47e69b47188083e7ad9ce9ce6a52d05b831d06d24523851d",
-  "libunwind-16.0.0.src.tar.xz": "32b9bc69b2ccf8e30b689508c5cc9dbd34616991d5a91679a32a8fc4cde2f921",
-  "llvm-cmake-16.0.0.src.tar.xz": "04e62ab7d0168688d9102680adf8eabe7b04275f333fe20eef8ab5a3a8ea9fcc"
- }
-}
