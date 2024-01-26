@@ -1,6 +1,6 @@
 Summary:        The source repository for the TPM (Trusted Platform Module) 2 tools
 Name:           tpm2-tools
-Version:        5.3
+Version:        5.5
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
