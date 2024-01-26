@@ -21,13 +21,6 @@
 %define config_source %{SOURCE1}
 %endif
 
-%ifarch aarch64
-%global __provides_exclude_from %{_libdir}/debug/.build-id/
-%define arch arm64
-%define archdir arm64
-%define config_source %{SOURCE2}
-%endif
-
 Summary:        Linux Kernel
 Name:           kernel-rt
 Version:        6.6.7.1
@@ -40,11 +33,10 @@ URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-%{mariner_version}/kernel-%{version}.tar.gz
 # TODO Replace kernel- in above Source0 with %{name}
 Source1:        config
-Source2:        config_aarch64
-Source3:        sha512hmac-openssl.sh
-Source4:        cbl-mariner-ca-20211013.pem
-Source5:        cpupower
-Source6:        cpupower.service
+Source2:        sha512hmac-openssl.sh
+Source3:        cbl-mariner-ca-20211013.pem
+Source4:        cpupower
+Source5:        cpupower.service
 
 # When updating, make sure to grab the matching patch from
 # https://mirrors.edge.kernel.org/pub/linux/kernel/projects/rt/
@@ -175,7 +167,7 @@ make mrproper
 cp %{config_source} .config
 
 # Add CBL-Mariner cert into kernel's trusted keyring
-cp %{SOURCE4} certs/mariner.pem
+cp %{SOURCE3} certs/mariner.pem
 sed -i 's#CONFIG_SYSTEM_TRUSTED_KEYS=""#CONFIG_SYSTEM_TRUSTED_KEYS="certs/mariner.pem"#' .config
 
 cp .config current_config
@@ -235,18 +227,14 @@ install -vdm 755 %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}
 install -vdm 755 %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}
 
 install -d -m 755 %{buildroot}%{_sysconfdir}/sysconfig
-install -c -m 644 %{SOURCE5} %{buildroot}/%{_sysconfdir}/sysconfig/cpupower
+install -c -m 644 %{SOURCE4} %{buildroot}/%{_sysconfdir}/sysconfig/cpupower
 install -d -m 755 %{buildroot}%{_unitdir}
-install -c -m 644 %{SOURCE6} %{buildroot}%{_unitdir}/cpupower.service
+install -c -m 644 %{SOURCE5} %{buildroot}%{_unitdir}/cpupower.service
 
 make INSTALL_MOD_PATH=%{buildroot} modules_install
 
 %ifarch x86_64
 install -vm 600 arch/x86/boot/bzImage %{buildroot}/boot/vmlinuz-%{uname_r}
-%endif
-
-%ifarch aarch64
-install -vm 600 arch/arm64/boot/Image %{buildroot}/boot/vmlinuz-%{uname_r}
 %endif
 
 # Restrict the permission on System.map-X file
@@ -295,10 +283,6 @@ install -vsm 755 tools/objtool/fixdep %{buildroot}%{_prefix}/src/linux-headers-%
 cp .config %{buildroot}%{_prefix}/src/linux-headers-%{uname_r} # copy .config manually to be where it's expected to be
 ln -sf "%{_prefix}/src/linux-headers-%{uname_r}" "%{buildroot}/lib/modules/%{uname_r}/build"
 find %{buildroot}/lib/modules -name '*.ko' -print0 | xargs -0 chmod u+x
-
-%ifarch aarch64
-cp scripts/module.lds %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/scripts/module.lds
-%endif
 
 # disable (JOBS=1) parallel build to fix this issue:
 # fixdep: error opening depfile: ./.plugin_cfg80211.o.d: No such file or directory
@@ -419,9 +403,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_mandir}/man8/turbostat*.gz
 %{_datadir}/locale/*/LC_MESSAGES/cpupower.mo
 %{_datadir}/bash-completion/completions/cpupower
-%endif
-%ifarch aarch64
-%{_libdir}/libperf-jvmti.so
 %endif
 %{_bindir}
 %{_sysconfdir}/bash_completion.d/*
