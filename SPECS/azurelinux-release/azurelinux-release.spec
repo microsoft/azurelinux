@@ -1,15 +1,37 @@
+
+# Temporary transition from mariner->azurelinux
+%{?mariner_release_version:%define azurelinux_release_version %mariner_release_version}
+
+# This MUST be built with %azurelinux_release_version externally defined (e.g. by the build tools).
+# This package CANNOT be built using standard tooling (e.g. rpmbuild, mock, etc) without also manually defining the macro.
+%{!?azurelinux_release_version:%{error:This package must be built with azurelinux_release_version externally defined.}}
+
+%define get_version_major() %{lua: _, _, v = string.find(arg[1], "(%d+)%.?"); print(v)}
+%define get_version_minor() %{lua: _, _, v = string.find(arg[1], "%d+%.(%d+)%.?"); print(v or 0)}
+%define get_version_date() %{lua: _, _, v = string.find(arg[1], "%d+%.%d+%.(%d+)"); print(v or 0)}
+
+%define dist_version %azurelinux_release_version
+%define dist_version_major %get_version_major %dist_version
+%define dist_version_minor %get_version_minor %dist_version
+%define dist_version_date  %get_version_date  %dist_version
+
+%define dist_vendor Microsoft Corporation
+%define dist_name   Microsoft Azure Linux
+%define dist_home_url https://aka.ms/azurelinux
+
 Summary:        Azure Linux release files
 Name:           azurelinux-release
-Version:        3.0
+Version:        %{dist_version_major}.%{dist_version_minor}
 Release:        3%{?dist}
 License:        MIT
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 Group:          System Environment/Base
-URL:            https://aka.ms/azurelinux
-# Allows package management tools to find and set the default value
-# for the "releasever" variable from the RPM database.
-Provides:       system-release(releasever)
+Vendor:         %dist_vendor
+Distribution:   %dist_name
+URL:            %dist_home_url
+
+Provides:       system-release
+Provides:       system-release(%{version})
+
 BuildArch:      noarch
 
 %description
@@ -19,23 +41,22 @@ Azure Linux release files such as yum configs and other %{_sysconfdir}/ release 
 install -d %{buildroot}%{_sysconfdir}
 install -d %{buildroot}/%{_libdir}
 
-echo "Azure Linux %{mariner_release_version}" > %{buildroot}%{_sysconfdir}/azurelinux-release
-echo "AZURELINUX_BUILD_NUMBER=%{mariner_build_number}" >> %{buildroot}%{_sysconfdir}/azurelinux-release
+echo "Azure Linux %{dist_version}" > %{buildroot}%{_sysconfdir}/azurelinux-release
+echo "AZURELINUX_BUILD_NUMBER=%{azurelinux_build_number}" >> %{buildroot}%{_sysconfdir}/azurelinux-release
 
 cat > %{buildroot}%{_sysconfdir}/lsb-release <<- "EOF"
 DISTRIB_ID="azurelinux"
-DISTRIB_RELEASE="%{mariner_release_version}"
+DISTRIB_RELEASE="%{dist_version}"
 DISTRIB_CODENAME=AzureLinux
-DISTRIB_DESCRIPTION="Microsoft Azure Linux %{mariner_release_version}"
+DISTRIB_DESCRIPTION="%{dist_name} %{dist_version}"
 EOF
 
-version_id=`echo %{mariner_release_version} | grep -o -E '[0-9]+.[0-9]+' | head -1`
 cat > %{buildroot}/%{_libdir}/os-release << EOF
-NAME="Microsoft Azure Linux"
-VERSION="%{mariner_release_version}"
+NAME="%{dist_name}"
+VERSION="%{dist_version}"
 ID=azurelinux
-VERSION_ID="$version_id"
-PRETTY_NAME="Microsoft Azure Linux $version_id"
+VERSION_ID="%{version}"
+PRETTY_NAME="%{dist_name} %{version}"
 ANSI_COLOR="1;34"
 HOME_URL="%{url}"
 BUG_REPORT_URL="%{url}"
@@ -45,11 +66,11 @@ EOF
 ln -sv ../usr/lib/os-release %{buildroot}%{_sysconfdir}/os-release
 
 cat > %{buildroot}%{_sysconfdir}/issue <<- EOF
-Welcome to Azure Linux %{mariner_release_version} (%{_arch}) - (\l)
+Welcome to Azure Linux %{dist_version} (%{_arch}) - (\l)
 EOF
 
 cat > %{buildroot}%{_sysconfdir}/issue.net <<- EOF
-Welcome to Azure Linux %{mariner_release_version} (%{_arch})
+Welcome to Azure Linux %{dist_version} (%{_arch})
 EOF
 
 %files
