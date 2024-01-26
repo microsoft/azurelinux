@@ -18,7 +18,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            http://www.openucx.org
-Source0:        https://github.com/openucx/%{name}/releases/download/v1.15.0/ucx-1.15.0.tar.gz
+Source0:        https://github.com/openucx/%{name}/releases/download/v%{version}/ucx-%{version}.tar.gz
 
 
 # UCX currently supports only the following architectures
@@ -68,7 +68,7 @@ addition, UCX provides efficient intra-node communication, by leveraging the
 following shared memory mechanisms: posix, sysv, cma, knem, and xpmem.
 The acronym UCX stands for "Unified Communication X".
 
-This package was built from '' branch, commit c334359.
+This package was built from '' branch, commit f086c1d.
 
 %package devel
 Requires: %{name}%{?_isa} = %{version}-%{release}
@@ -119,7 +119,6 @@ rm -f %{buildroot}%{_libdir}/ucx/lib*.so
 %{_libdir}/lib*.so.*
 %{_bindir}/ucx_info
 %{_bindir}/ucx_perftest
-%{_bindir}/ucx_perftest_daemon
 %{_bindir}/ucx_read_profile
 %if "%{debug}" == "1"
 %{_bindir}/ucs_stats_parser
@@ -282,7 +281,7 @@ library internals, protocol objects, transports status, and more.
 %endif
 
 %changelog
-* Wed Jan 24 2024 Juan Camposeco <juanarturoc@microsoft.com> - 1.15.0-5
+* Fri Jan 26 2024 Juan Camposeco <juanarturoc@microsoft.com> - 1.15.0-5
 - Update version to 1.15.0 and remove knem dependency
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.11.0-4
