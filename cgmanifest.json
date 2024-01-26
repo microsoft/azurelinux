@@ -25725,8 +25725,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-bigdecimal",
-          "version": "3.1.2",
-          "downloadUrl": "https://github.com/ruby/bigdecimal/archive/refs/tags/v3.1.2.tar.gz"
+          "version": "3.1.6",
+          "downloadUrl": "https://github.com/ruby/bigdecimal/archive/refs/tags/v3.1.6.tar.gz"
         }
       }
     },

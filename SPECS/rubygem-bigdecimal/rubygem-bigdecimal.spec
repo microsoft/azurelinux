@@ -1,19 +1,19 @@
 %global debug_package %{nil}
 %global gem_name bigdecimal
 Summary:        BigDecimal provides arbitrary-precision floating point decimal arithmetic
-Name:           rubygem-bigdecimal
-Version:        3.1.2
+Name:           rubygem-%{gem_name}
+Version:        3.1.6
 Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages
-URL:            https://github.com/ruby/bigdecimal
-Source0:        https://github.com/ruby/bigdecimal/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
+URL:            https://github.com/ruby/%{gem_name}
+Source0:        https://github.com/ruby/%{gem_name}/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       ruby(release)
-Provides:       rubygem(bigdecimal) = %{version}-%{release}
+Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
 Ruby provides built-in support for arbitrary precision integer arithmetic.
