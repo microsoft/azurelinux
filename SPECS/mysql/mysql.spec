@@ -1,7 +1,7 @@
 Summary:        MySQL.
 Name:           mysql
 Version:        8.0.35
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2 with exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,6 +15,8 @@ BuildRequires:  libtirpc-devel
 BuildRequires:  openssl-devel
 BuildRequires:  rpcsvc-proto-devel
 BuildRequires:  zlib-devel
+Requires(postun): shadow-utils
+Requires(pre):  shadow-utils
 
 %description
 MySQL is a free, widely used SQL engine. It can be used as a fast database as well as a rock-solid DBMS using a modular engine architecture.
@@ -96,6 +98,9 @@ fi
 %{_libdir}/pkgconfig/mysqlclient.pc
 
 %changelog
+* Fri Jan 26 2024 Andy Zaugg <azaugg@linkedin.com> - 8.0.35-4
+- Add shadow-utils dependency for rpm post and uninstall scripts
+
 * Wed Jan 10 2024 Andy Zaugg <azaugg@linkedin.com> - 8.0.35-3
 - Add mysql user as part of post scripts
 
