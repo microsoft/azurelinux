@@ -39,7 +39,7 @@ menuentry "Mariner Baremetal Iso" {
 			rd.live.dir=config/additionalfiles/0 \
 			rd.live.squashimg=rootfs.img \
 			rd.live.overlay=1 \
-			rd.live.overlay.noprompt=1
+			rd.live.overlay.nouserconfirmprompt
 
 	initrd /isolinux/initrd.img
 }	
@@ -47,26 +47,26 @@ menuentry "Mariner Baremetal Iso" {
 	dracutConfig = `add_dracutmodules+=" dmsquash-live "
 add_drivers+=" overlay "
 `
-	dracutNoPromptPatch = `--- dmsquash-live-root.sh-ori	2023-12-19 16:24:38.973303242 -0800
-+++ dmsquash-live-root.sh	2023-12-19 16:28:45.053140504 -0800
-@@ -25,6 +25,7 @@
- getargbool 0 rd.live.ram -d -y live_ram && live_ram="yes"
- getargbool 0 rd.live.overlay.reset -d -y reset_overlay && reset_overlay="yes"
- getargbool 0 rd.live.overlay.readonly -d -y readonly_overlay && readonly_overlay="--readonly" || readonly_overlay=""
-+getargbool 0 rd.live.overlay.noprompt -d -y no_tmp_overlay_prompt && no_tmp_overlay_prompt="--noprompt" || no_tmp_overlay_prompt=""
- overlay=$(getarg rd.live.overlay -d overlay)
- getargbool 0 rd.writable.fsimg -d -y writable_fsimg && writable_fsimg="yes"
- overlay_size=$(getarg rd.live.overlay.size=)
-@@ -185,7 +186,7 @@
-     fi
+// 	dracutNoPromptPatch = `--- dmsquash-live-root.sh-ori	2023-12-19 16:24:38.973303242 -0800
+// +++ dmsquash-live-root.sh	2023-12-19 16:28:45.053140504 -0800
+// @@ -25,6 +25,7 @@
+//  getargbool 0 rd.live.ram -d -y live_ram && live_ram="yes"
+//  getargbool 0 rd.live.overlay.reset -d -y reset_overlay && reset_overlay="yes"
+//  getargbool 0 rd.live.overlay.readonly -d -y readonly_overlay && readonly_overlay="--readonly" || readonly_overlay=""
+// +getargbool 0 rd.live.overlay.noprompt -d -y no_tmp_overlay_prompt && no_tmp_overlay_prompt="--noprompt" || no_tmp_overlay_prompt=""
+//  overlay=$(getarg rd.live.overlay -d overlay)
+//  getargbool 0 rd.writable.fsimg -d -y writable_fsimg && writable_fsimg="yes"
+//  overlay_size=$(getarg rd.live.overlay.size=)
+// @@ -185,7 +186,7 @@
+//      fi
  
-     if [ -z "$setup" -o -n "$readonly_overlay" ]; then
--        if [ -n "$setup" ]; then
-+        if [ -n "$setup" -o -n "$no_tmp_overlay_prompt" ]; then
-             warn "Using temporary overlay."
-         elif [ -n "$devspec" -a -n "$pathspec" ]; then
-             [ -z "$m" ] \
-`
+//      if [ -z "$setup" -o -n "$readonly_overlay" ]; then
+// -        if [ -n "$setup" ]; then
+// +        if [ -n "$setup" -o -n "$no_tmp_overlay_prompt" ]; then
+//              warn "Using temporary overlay."
+//          elif [ -n "$devspec" -a -n "$pathspec" ]; then
+//              [ -z "$m" ] \
+// `
 )
 
 // IsoMaker builds ISO images and populates them with packages and files required by the installer.
@@ -140,6 +140,7 @@ func createIsoConfig(isoRootfsFile string) (configuration.Config, error) {
 	config := configuration.Config{
 		SystemConfigs: []configuration.SystemConfig{
 			{
+				Name: "dummy-name",
 				AdditionalFiles: map[string]configuration.FileConfigList{
 					isoRootfsFile: {{Path: "/dummy-name"}},
 				},
@@ -379,28 +380,28 @@ func (iae* IsoArtifactExtractor) prepareImageForDracut(writeableRootfsMountFullD
 
 	// -- patch dracut dmsquash-live-root modules -----------------------------
 
-	sourcePatchFile := filepath.Join(iae.tmpDir, "no_user_prompt.patch")
+	// sourcePatchFile := filepath.Join(iae.tmpDir, "no_user_prompt.patch")
 
-	logger.Log.Infof("--isohelpers.go - creating %s", sourcePatchFile)
-	err := ioutil.WriteFile(sourcePatchFile, []byte(dracutNoPromptPatch), 0644)
-	if err != nil {
-		logger.Log.Infof("--isohelpers.go - failed to create %s. Error:\n%v", sourcePatchFile, err)
-		return err
-	}
+	// logger.Log.Infof("--isohelpers.go - creating %s", sourcePatchFile)
+	// err := ioutil.WriteFile(sourcePatchFile, []byte(dracutNoPromptPatch), 0644)
+	// if err != nil {
+	// 	logger.Log.Infof("--isohelpers.go - failed to create %s. Error:\n%v", sourcePatchFile, err)
+	// 	return err
+	// }
 
-	targetPatchFile := filepath.Join(writeableRootfsMountFullDir, "/usr/lib/dracut/modules.d/90dmsquash-live/dmsquash-live-root.sh")
-	patchParams := []string{"-p1", "-i", sourcePatchFile, targetPatchFile}
-	err = shell.ExecuteLiveWithCallback(onStdOut, onStdErr, false, "patch", patchParams...)
-	if err != nil {
-		logger.Log.Infof("--isohelpers.go - failed to patch %v. Error:\n%v", targetPatchFile, err)
-		return err
-	}
+	// targetPatchFile := filepath.Join(writeableRootfsMountFullDir, "/usr/lib/dracut/modules.d/90dmsquash-live/dmsquash-live-root.sh")
+	// patchParams := []string{"-p1", "-i", sourcePatchFile, targetPatchFile}
+	// err = shell.ExecuteLiveWithCallback(onStdOut, onStdErr, false, "patch", patchParams...)
+	// if err != nil {
+	// 	logger.Log.Infof("--isohelpers.go - failed to patch %v. Error:\n%v", targetPatchFile, err)
+	// 	return err
+	// }
 
 	// -- delete fstab --------------------------------------------------------
 
 	fstabFile := filepath.Join(writeableRootfsMountFullDir, "/etc/fstab")
 	logger.Log.Infof("--isohelpers.go - deleting fstab from %v", fstabFile)
-	err = os.Remove(fstabFile)
+	err := os.Remove(fstabFile)
 	if err != nil {
 		logger.Log.Infof("--isohelpers.go - failed to delete fstab. Error=%v", err)
 		return err
