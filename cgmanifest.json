@@ -3547,16 +3547,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "finger",
-          "version": "0.17",
-          "downloadUrl": "http://ftp.linux.org.uk/pub/linux/Networking/netkit/bsd-finger-0.17.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "fio",
           "version": "3.30",
           "downloadUrl": "https://brick.kernel.dk/snaps/fio-3.30.tar.bz2"
