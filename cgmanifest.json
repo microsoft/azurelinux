@@ -1377,8 +1377,8 @@
         "type": "other",
         "other": {
           "name": "c-ares",
-          "version": "1.19.1",
-          "downloadUrl": "https://c-ares.haxx.se/download/c-ares-1.19.1.tar.gz"
+          "version": "1.25.0",
+          "downloadUrl": "https://c-ares.haxx.se/download/c-ares-1.25.0.tar.gz"
         }
       }
     },
@@ -1747,18 +1747,8 @@
         "type": "other",
         "other": {
           "name": "clang",
-          "version": "12.0.1",
-          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.1/clang-12.0.1.src.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "clang16",
-          "version": "16.0.0",
-          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-16.0.0.tar.gz"
+          "version": "17.0.6",
+          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-17.0.6.tar.gz"
         }
       }
     },
@@ -1957,8 +1947,8 @@
         "type": "other",
         "other": {
           "name": "compiler-rt",
-          "version": "12.0.1",
-          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.1/compiler-rt-12.0.1.src.tar.xz"
+          "version": "17.0.6",
+          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-17.0.6.tar.gz"
         }
       }
     },
@@ -3438,8 +3428,8 @@
         "type": "other",
         "other": {
           "name": "fakeroot",
-          "version": "1.29",
-          "downloadUrl": "https://cdn-aws.deb.debian.org/debian/pool/main/f/fakeroot/fakeroot_1.29.orig.tar.gz"
+          "version": "1.32.2",
+          "downloadUrl": "https://cdn-aws.deb.debian.org/debian/pool/main/f/fakeroot/fakeroot_1.32.2.orig.tar.gz"
         }
       }
     },
@@ -9301,8 +9291,8 @@
         "type": "other",
         "other": {
           "name": "libfontenc",
-          "version": "1.1.3",
-          "downloadUrl": "ftp://ftp.x.org/pub/individual/lib/libfontenc-1.1.3.tar.bz2"
+          "version": "1.1.7",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libfontenc-1.1.7.tar.gz"
         }
       }
     },
@@ -9751,8 +9741,8 @@
         "type": "other",
         "other": {
           "name": "libiscsi",
-          "version": "1.18.0",
-          "downloadUrl": "https://github.com/sahlberg/libiscsi/archive/1.18.0.tar.gz"
+          "version": "1.19.0",
+          "downloadUrl": "https://github.com/sahlberg/libiscsi/archive/1.19.0.tar.gz"
         }
       }
     },
@@ -11591,8 +11581,8 @@
         "type": "other",
         "other": {
           "name": "libxcb",
-          "version": "1.13.1",
-          "downloadUrl": "https://xcb.freedesktop.org/dist/libxcb-1.13.1.tar.bz2"
+          "version": "1.16",
+          "downloadUrl": "https://xcb.freedesktop.org/dist/libxcb-1.16.tar.gz"
         }
       }
     },
@@ -12011,18 +12001,8 @@
         "type": "other",
         "other": {
           "name": "lld",
-          "version": "12.0.1",
-          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.1/lld-12.0.1.src.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "lld16",
-          "version": "16.0.0",
-          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-16.0.0/lld-16.0.0.src.tar.xz"
+          "version": "17.0.6",
+          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-17.0.6.tar.gz"
         }
       }
     },
@@ -12031,8 +12011,8 @@
         "type": "other",
         "other": {
           "name": "lldb",
-          "version": "12.0.1",
-          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.1/lldb-12.0.1.src.tar.xz"
+          "version": "17.0.6",
+          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-17.0.6.tar.gz"
         }
       }
     },
@@ -12061,18 +12041,8 @@
         "type": "other",
         "other": {
           "name": "llvm",
-          "version": "12.0.1",
-          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.1/llvm-12.0.1.src.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "llvm16",
-          "version": "16.0.0",
-          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-16.0.0.tar.gz"
+          "version": "17.0.6",
+          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-17.0.6.tar.gz"
         }
       }
     },
@@ -12531,8 +12501,8 @@
         "type": "other",
         "other": {
           "name": "makedumpfile",
-          "version": "1.6.8",
-          "downloadUrl": "https://github.com/makedumpfile/makedumpfile/releases/download/1.6.8/makedumpfile-1.6.8.tar.gz"
+          "version": "1.7.4",
+          "downloadUrl": "https://github.com/makedumpfile/makedumpfile/releases/download/1.7.4/makedumpfile-1.7.4.tar.gz"
         }
       }
     },
@@ -14183,8 +14153,8 @@
         "type": "other",
         "other": {
           "name": "nspr",
-          "version": "4.30",
-          "downloadUrl": "https://archive.mozilla.org/pub/nspr/releases/v4.30/src/nspr-4.30.tar.gz"
+          "version": "4.9.6",
+          "downloadUrl": "https://archive.mozilla.org/pub/nspr/releases/v4.9.6/src/nspr-4.9.6.tar.gz"
         }
       }
     },
@@ -23384,8 +23354,8 @@
         "type": "other",
         "other": {
           "name": "python-pluggy",
-          "version": "1.0.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/a1/16/db2d7de3474b6e37cbb9c008965ee63835bba517e22cdb8c35b5116b5ce1/pluggy-1.0.0.tar.gz"
+          "version": "1.3.0",
+          "downloadUrl": "https://pypi.python.org/packages/source/p/pluggy/pluggy-1.3.0.tar.gz"
         }
       }
     },
@@ -27847,8 +27817,8 @@
         "type": "other",
         "other": {
           "name": "squashfs-tools",
-          "version": "4.5.1",
-          "downloadUrl": "https://github.com/plougher/squashfs-tools/archive/4.5.1.tar.gz"
+          "version": "4.6.1",
+          "downloadUrl": "https://github.com/plougher/squashfs-tools/archive/4.6.1.tar.gz"
         }
       }
     },
