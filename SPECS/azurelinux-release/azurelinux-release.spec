@@ -17,7 +17,7 @@ Provides:       system-release(%{version})
 BuildArch:      noarch
 
 %description
-Azure Linux release files such as yum configs and other %{_sysconfdir}/ release related files
+Azure Linux release files such as dnf configs and other %{_sysconfdir}/ release related files
 
 %install
 install -d %{buildroot}%{_sysconfdir}
