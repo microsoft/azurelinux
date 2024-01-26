@@ -36,7 +36,7 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
-* Fri Apr 01 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 4.3.5-1
+* Fri Jan 26 2024 Riken Maharjan <rmaharjan@microsoft.com> - 4.3.5-1
 - Upgrade to 4.3.5 for AZL 3.0
 
 * Fri Apr 01 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 4.3.2-2
