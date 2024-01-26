@@ -1962,6 +1962,7 @@
                 "SuperLU",
                 "supermin",
                 "switcheroo-control",
+                "swtpm",
                 "symlinks",
                 "sympy",
                 "sysfsutils",
