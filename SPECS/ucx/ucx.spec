@@ -113,7 +113,7 @@ make %{?_smp_mflags} V=1
 %install
 make DESTDIR=%{buildroot} install
 rm -f %{buildroot}%{_libdir}/*.la
-rm -f %{buildroot}%{_libdir}/libucs_signal.a
+rm -f %{buildroot}%{_libdir}/*.a
 rm -f %{buildroot}%{_libdir}/ucx/*.la
 rm -f %{buildroot}%{_libdir}/ucx/lib*.so
 
@@ -125,6 +125,7 @@ rm -f %{buildroot}%{_libdir}/ucx/lib*.so
 %if "%{debug}" == "1"
 %{_bindir}/ucs_stats_parser
 %endif
+@HAVE_GLIBCXX_NOTHROW_TRUE@%{_bindir}/io_demo
 %{_datadir}/ucx
 %exclude %{_datadir}/ucx/examples
 %doc README AUTHORS NEWS
@@ -144,6 +145,33 @@ rm -f %{buildroot}%{_libdir}/ucx/lib*.so
 /sbin/ldconfig
 
 %postun -p /sbin/ldconfig
+
+%package static
+Requires: %{name}%{?_isa} = %{version}-%{release}
+Summary: Static libraries required for developing with UCX
+Group: Development/Libraries
+
+%description static
+Provides static libraries required for developing with UCX.
+
+%files static
+%{_libdir}/lib*.a
+%{_libdir}/ucx/lib*.a
+%if %{with cma}
+%{_libdir}/pkgconfig/ucx-cma.pc
+%endif
+%if %{with xpmem}
+%{_libdir}/pkgconfig/ucx-xpmem.pc
+%endif
+%if %{with ib}
+%{_libdir}/pkgconfig/ucx-ib.pc
+%endif
+%if %{with rdmacm}
+%{_libdir}/pkgconfig/ucx-rdmacm.pc
+%endif
+%if %{with vfs}
+%{_libdir}/pkgconfig/ucx-fuse.pc
+%endif
 
 %if %{with cma}
 %package cma
