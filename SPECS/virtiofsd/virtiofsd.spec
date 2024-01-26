@@ -16,6 +16,7 @@ Source0:        https://gitlab.com/virtio-fs/virtiofsd/-/archive/v%{version}/%{n
 #   tar -czf ../%{name}-v%{version}-cargo.tar.gz vendor/
 Source1:        %{name}-v%{version}-cargo.tar.gz
 Source2:        config.toml
+Source3:        %{name}-v%{version}-cargo-CVE-2023-41051.tar.gz
 # Updates vm-memory to 0.12.2. Remove once virtiofsd gets updated to a version >= 1.9.0: 
 # https://gitlab.com/virtio-fs/virtiofsd/-/blob/v1.9.0/Cargo.toml
 Patch0: CVE-2023-41051.patch
@@ -33,7 +34,8 @@ Virtio-fs vhost-user device daemon (Rust version)
 %autosetup -p1 -n %{name}-v%{version}
 
 pushd %{_builddir}/%{name}-v%{version}
-tar -xf %{SOURCE1}
+# Updated vendor package in Source3 to fix CVE-2023-41051
+tar -xf %{SOURCE3}
 mkdir -p .cargo
 cp %{SOURCE2} .cargo/
 popd
@@ -53,8 +55,12 @@ install -D -p -m 0755 target/release/virtiofsd %{buildroot}%{_libexecdir}/virtio
 %{_libexecdir}/virtiofsd-rs
 
 %changelog
+* Fri Jan 26 2024 Nadiia Dubchak <ndubchak@microsoft.com> - 1.8.0-2
+- Update vendor tarball to include vm-memory version 0.12.2.
+- Set the new tarball as Source3 and use it in step %prep.
+
 * Wed Jan 24 2024 Nadiia Dubchak <ndubchak@microsoft.com> - 1.8.0-2
-- Patch CVE-2023-41051
+- Patch CVE-2023-41051.
 
 * Tue Jan 9 2024 Aurélien Bombo <abombo@microsoft.com> - 1.8.0-1
 - Initial CBL-Mariner import from Fedora 39 (license: MIT).
