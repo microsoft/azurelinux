@@ -302,7 +302,7 @@ pushd gems
 find -not -name 'bundled_gems' -delete
 sed -i '2,$d' bundled_gems
 popd
-# Remove bigdecimal. Add them back when version provided by ruby >= current version
+# Remove bigdecimal. Add them back when version provided by ruby >= current version in rubygem-bigdecmial.spec.
 rm -rf ext/bigdecimal
 
 %build
