@@ -196,7 +196,7 @@ fi
 
 %changelog
 * Mon Jan 22 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 0.8.1-3
-- Initial CBL-Mariner import from Fedora 39.
+- Initial CBL-Mariner import from Fedora 39 (license: MIT).  License verified.
 
 * Wed Aug 16 2023 Stefan Berger <stefanb@linux.ibm.com> - 0.8.1-3
 - Build for i686 again since dependency issue resolved
