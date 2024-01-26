@@ -22,7 +22,9 @@ Source0:        https://github.com/openucx/%{name}/releases/download/v%{version}
 
 
 # UCX currently supports only the following architectures
-ExclusiveArch: aarch64 ppc64le x86_64
+ExclusiveArch: aarch64
+ExclusiveArch: ppc64le
+ExclusiveArch: x86_64
 
 %if %{defined extra_deps}
 Requires: %{?extra_deps}
