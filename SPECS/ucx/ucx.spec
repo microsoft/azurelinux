@@ -3,28 +3,38 @@
 %bcond_with    cuda
 %bcond_with    gdrcopy
 %bcond_without ib
-%bcond_with    knem
 %bcond_without rdmacm
 %bcond_with    rocm
 %bcond_with    ugni
 %bcond_with    xpmem
+%bcond_with    vfs
 
 Summary:        UCX is a communication library implementing high-performance messaging
 Name:           ucx
-Version:        1.11.0
-Release:        4%{?dist}
+Version:        1.15.0
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            http://www.openucx.org
-Source0:        https://github.com/openucx/%{name}/releases/download/v1.11.0/ucx-1.11.0.tar.gz
+Source0:        https://github.com/openucx/%{name}/releases/download/v%{version}/ucx-%{version}.tar.gz
 
 
 # UCX currently supports only the following architectures
-ExclusiveArch: aarch64 ppc64le x86_64
+ExclusiveArch: aarch64
+ExclusiveArch: ppc64le
+ExclusiveArch: x86_64
 
-BuildRequires: automake autoconf libtool gcc-c++ numactl-devel
+%if %{defined extra_deps}
+Requires: %{?extra_deps}
+%endif
+
+BuildRequires: automake
+BuildRequires: autoconf
+BuildRequires: libtool
+BuildRequires: gcc-c++
+
 %if %{with cma}
 BuildRequires: glibc-devel >= 2.15
 %endif
@@ -34,9 +44,6 @@ BuildRequires: gdrcopy
 %if %{with ib}
 BuildRequires: libibverbs-devel
 %endif
-%if %{with knem}
-BuildRequires: knem
-%endif
 %if %{with rdmacm}
 BuildRequires: librdmacm-devel
 %endif
@@ -44,7 +51,13 @@ BuildRequires: librdmacm-devel
 BuildRequires: hsa-rocr-dev
 %endif
 %if %{with xpmem}
-BuildRequires: xpmem-devel
+BuildRequires: pkgconfig(cray-xpmem)
+%endif
+%if %{with vfs}
+BuildRequires: fuse3-devel
+%endif
+%if "%{debug}" == "1"
+BuildRequires: valgrind-devel
 %endif
 
 %description
@@ -57,7 +70,7 @@ addition, UCX provides efficient intra-node communication, by leveraging the
 following shared memory mechanisms: posix, sysv, cma, knem, and xpmem.
 The acronym UCX stands for "Unified Communication X".
 
-This package was built from '' branch, commit c334359.
+This package was built from '' branch, commit f086c1d.
 
 %package devel
 Requires: %{name}%{?_isa} = %{version}-%{release}
@@ -73,19 +86,26 @@ Provides header files and examples for developing with UCX.
 %define _with_arg()   %{expand:%%{?with_%{1}:--with-%{2}}%%{!?with_%{1}:--without-%{2}}}
 %define _enable_arg() %{expand:%%{?with_%{1}:--enable-%{2}}%%{!?with_%{1}:--disable-%{2}}}
 %configure --disable-optimizations \
-           --disable-logging \
-           --disable-debug \
-           --disable-assertions \
-           --disable-params-check \
+           %{!?debug:--disable-logging} \
+           %{!?debug:--disable-debug} \
+           %{!?debug:--disable-assertions} \
+           %{!?debug:--disable-params-check} \
+           %{?debug:--with-valgrind} \
+           %{?debug:--enable-profiling} \
+           %{?debug:--enable-frame-pointer} \
+           %{?debug:--enable-stats} \
+           %{?debug:--enable-debug-data} \
+           %{?debug:--enable-mt} \
+           --without-go \
            --without-java \
            %_enable_arg cma cma \
            %_with_arg cuda cuda \
            %_with_arg gdrcopy gdrcopy \
            %_with_arg ib verbs \
-           %_with_arg knem knem \
            %_with_arg rdmacm rdmacm \
            %_with_arg rocm rocm \
            %_with_arg xpmem xpmem \
+           %_with_arg vfs fuse3 \
            %_with_arg ugni ugni \
            %{?configure_options}
 make %{?_smp_mflags} V=1
@@ -93,14 +113,18 @@ make %{?_smp_mflags} V=1
 %install
 make DESTDIR=%{buildroot} install
 rm -f %{buildroot}%{_libdir}/*.la
-rm -f %{buildroot}%{_libdir}/*.a
+rm -f %{buildroot}%{_libdir}/libucs_signal.a
 rm -f %{buildroot}%{_libdir}/ucx/*.la
 rm -f %{buildroot}%{_libdir}/ucx/lib*.so
-rm -f %{buildroot}%{_libdir}/ucx/lib*.a
 
 %files
 %{_libdir}/lib*.so.*
-%{_bindir}/uc*
+%{_bindir}/ucx_info
+%{_bindir}/ucx_perftest
+%{_bindir}/ucx_read_profile
+%if "%{debug}" == "1"
+%{_bindir}/ucs_stats_parser
+%endif
 %{_bindir}/io_demo
 %{_datadir}/ucx
 %exclude %{_datadir}/ucx/examples
@@ -112,10 +136,42 @@ rm -f %{buildroot}%{_libdir}/ucx/lib*.a
 %{_includedir}/uc*
 %{_libdir}/lib*.so
 %{_libdir}/pkgconfig/ucx.pc
+%{_libdir}/pkgconfig/ucx-uct.pc
+%{_libdir}/pkgconfig/ucx-ucs.pc
+%{_libdir}/cmake/ucx/*.cmake
 %{_datadir}/ucx/examples
 
-%post -p /sbin/ldconfig
+%post
+/sbin/ldconfig
+
 %postun -p /sbin/ldconfig
+
+%package static
+Requires: %{name}%{?_isa} = %{version}-%{release}
+Summary: Static libraries required for developing with UCX
+Group: Development/Libraries
+
+%description static
+Provides static libraries required for developing with UCX.
+
+%files static
+%{_libdir}/lib*.a
+%{_libdir}/ucx/lib*.a
+%if %{with cma}
+%{_libdir}/pkgconfig/ucx-cma.pc
+%endif
+%if %{with xpmem}
+%{_libdir}/pkgconfig/ucx-xpmem.pc
+%endif
+%if %{with ib}
+%{_libdir}/pkgconfig/ucx-ib.pc
+%endif
+%if %{with rdmacm}
+%{_libdir}/pkgconfig/ucx-rdmacm.pc
+%endif
+%if %{with vfs}
+%{_libdir}/pkgconfig/ucx-fuse.pc
+%endif
 
 %if %{with cma}
 %package cma
@@ -175,23 +231,9 @@ hardware-offloaded data transfer.
 %{_libdir}/ucx/libuct_ib.so.*
 %endif
 
-%if %{with knem}
-%package knem
-Requires: %{name}%{?_isa} = %{version}-%{release}
-Summary: UCX KNEM transport support
-
-%description knem
-Provides KNEM (fast inter-process copy) transport for UCX. KNEM is a Linux
-kernel module that enables high-performance intra-node MPI communication
-for large messages.
-
-%files knem
-%{_libdir}/ucx/libuct_knem.so.*
-%endif
-
 %if %{with rdmacm}
 %package rdmacm
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: %{name}-ib%{?_isa} = %{version}-%{release}
 Summary: UCX RDMA connection manager support
 
 %description rdmacm
@@ -253,8 +295,25 @@ process to map the memory of another process into its virtual address space.
 %{_libdir}/ucx/libuct_xpmem.so.*
 %endif
 
+%if %{with vfs}
+%package vfs
+Requires: %{name}%{?_isa} = %{version}-%{release}
+Summary: UCX Virtual Filesystem support.
+Group: System Environment/Libraries
+
+%description vfs
+Provides a virtual filesystem over FUSE which allows real-time monitoring of UCX
+library internals, protocol objects, transports status, and more.
+
+%files vfs
+%{_libdir}/ucx/libucs_fuse.so.*
+%{_bindir}/ucx_vfs
+%endif
 
 %changelog
+* Fri Jan 26 2024 Juan Camposeco <juanarturoc@microsoft.com> - 1.15.0-5
+- Update version to 1.15.0 and remove knem dependency
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.11.0-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
