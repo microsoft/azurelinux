@@ -36,42 +36,26 @@ Version:        1.8.3
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 Url:            http://www.nlnetlabs.nl/%{name}/
 Source0:        http://www.nlnetlabs.nl/downloads/%{name}/%{name}-%{version}.tar.gz
-Patch1:         ldns-1.7.0-multilib.patch
-Patch2:         ldns-1.7.0-parse-limit.patch
-Patch3:         ldns-1.7.0-realloc.patch
-Patch4:         ldns-1.7.0-Update-for-SWIG-4.patch
 
-# Only needed for builds from svn snapshot
-%if 0%{snapshot}
-BuildRequires: libtool
-BuildRequires: autoconf
-BuildRequires: automake
-%endif
-
-BuildRequires: gcc, make
-BuildRequires: libpcap-devel
-%if %{with dane_ta}
-BuildRequires: openssl-devel >= 1.1.0
-%else
-BuildRequires: openssl-devel >= 1.0.2k
-%endif
-BuildRequires: gcc-c++
 BuildRequires: doxygen
-
-# for snapshots only
-# BuildRequires: libtool, autoconf, automake
-%if %{with python3}
-BuildRequires: python3-devel, swig
-%endif
+BuildRequires: gcc
+BuildRequires: gcc-c++
+BuildRequires: libpcap-devel
+BuildRequires: make
+BuildRequires: openssl-devel
 %if %{with perl}
 BuildRequires: perl-devel
 BuildRequires: perl-ExtUtils-MakeMaker
 BuildRequires: perl-generators
 BuildRequires: perl(Devel::CheckLib)
+%endif
+%if %{with python3}
+BuildRequires: python3-devel
+BuildRequires: swig
 %endif
 Requires: ca-certificates
 
@@ -128,20 +112,8 @@ This package contains documentation for the ldns library
 %prep
 %{?extra_version:%global pkgname %{name}-%{version}%{extra_version}}%{!?extra_version:%global pkgname %{name}-%{version}}
 
-%setup -qcn %{pkgname}
+%autosetup -cn %{pkgname} -N
 pushd %{pkgname}
-
-%patch1 -p2 -b .multilib
-%patch2 -p1 -b .limit
-%patch3 -p1 -b .realloc
-%patch4 -p2 -b .swig4
-# To built svn snapshots
-%if 0%{snapshot}
-  rm config.guess config.sub ltmain.sh
-  aclocal
-  libtoolize -c --install
-  autoreconf --install
-%endif
 
 # fixup .pc file
 sed -i "s/@includedir@/@includedir@\/ldns/" packaging/libldns.pc.in
@@ -193,12 +165,15 @@ pushd %{pkgname}
 
 %configure \
   --disable-rpath \
-  %{enable_gost} %{enable_ecdsa} %{enable_eddsa} %{?disable_dane_ta} \
+  --disable-static \
+  %{?disable_dane_ta} \
+  %{enable_gost} \
+  %{enable_ecdsa} \
+  %{enable_eddsa} \
   --with-ca-file=/etc/pki/tls/certs/ca-bundle.trust.crt \
   --with-ca-path=/etc/pki/tls/certs/ \
-  --disable-static \
-  --with-examples \
   --with-drill \
+  --with-examples \
 %if %{with python3}
   --with-pyldns PYTHON=%{__python3}
 %endif
@@ -228,7 +203,8 @@ pushd %{pkgname}_python3
 pushd %{pkgname}
 %endif
 
-make DESTDIR=%{buildroot} INSTALL="%{__install} -p" install
+# Added -D here to ensure that output folder for .pc file is created
+make DESTDIR=%{buildroot} INSTALL="%{__install} -D -p" install
 make DESTDIR=%{buildroot} INSTALL="%{__install} -p" install-doc
 
 # remove .la files
@@ -238,7 +214,6 @@ rm -rf %{buildroot}%{python3_sitearch}/*.la
 %endif
 
 # install pkg-config file
-install -D -m644  packaging/libldns.pc %{buildroot}%{_libdir}/pkgconfig/ldns.pc
 %if %{with perl}
   make -C contrib/DNS-LDNS DESTDIR=%{buildroot} pure_install
   chmod 755 %{buildroot}%{perl_vendorarch}/auto/DNS/LDNS/LDNS.so
@@ -258,7 +233,7 @@ rm -rf doc/man
 %files
 %doc README
 %license LICENSE
-%{_libdir}/libldns.so.2*
+%{_libdir}/libldns.so.3*
 
 %files utils
 %{_bindir}/drill
@@ -296,7 +271,9 @@ rm -rf doc/man
 
 %changelog
 * Thu Jan 25 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.3-1
-- Auto-upgrade to 1.8.3 - Upgrade for Azure Linux 3.0
+- Auto-upgrade to 1.8.3 - Upgrade for Azure Linux 3.0\
+- Removed unsupported multilib patch (azl only supports 64bit)
+- Removed other patches already integrated into this version
 
 * Mon Jul 25 2022 Rachel Menge <rachelmenge@microsoft.com> - 1.7.0-32
 - Move from SPECS-EXTENDED to SPECS
