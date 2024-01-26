@@ -1,13 +1,14 @@
 %global security_hardening none
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
-%global rt_version rt48
+%global rt_version rt18
 %define uname_r %{version}-%{rt_version}-%{release}
+%define mariner_version 3
 %define version_upstream %(echo %{version} | rev | cut -d'.' -f2- | rev)
 
 # find_debuginfo.sh arguments are set by default in rpm's macros.
-# The default arguments regenerate the build-id for vmlinux in the 
+# The default arguments regenerate the build-id for vmlinux in the
 # debuginfo package causing a mismatch with the build-id for vmlinuz in
-# the kernel package. Therefore, explicilty set the relevant default 
+# the kernel package. Therefore, explicilty set the relevant default
 # settings to prevent this behavior.
 %undefine _unique_build_ids
 %undefine _unique_debug_names
@@ -20,56 +21,68 @@
 %define config_source %{SOURCE1}
 %endif
 
-Summary:        Realtime Linux Kernel
+%ifarch aarch64
+%global __provides_exclude_from %{_libdir}/debug/.build-id/
+%define arch arm64
+%define archdir arm64
+%define config_source %{SOURCE2}
+%endif
+
+Summary:        Linux Kernel
 Name:           kernel-rt
-Version:        5.15.55.1
-Release:        3%{?dist}
+Version:        6.6.7.1
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
-Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/%{version}.tar.gz#/kernel-%{version}.tar.gz
+Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-%{mariner_version}/kernel-%{version}.tar.gz
+# TODO Replace kernel- in above Source0 with %{name}
 Source1:        config
-Source2:        sha512hmac-openssl.sh
-Source3:        cbl-mariner-ca-20211013.pem
-# When updating, make sure to grab the matching patch from 
+Source2:        config_aarch64
+Source3:        sha512hmac-openssl.sh
+Source4:        cbl-mariner-ca-20211013.pem
+Source5:        cpupower
+Source6:        cpupower.service
+
+# When updating, make sure to grab the matching patch from
 # https://mirrors.edge.kernel.org/pub/linux/kernel/projects/rt/
 # Also, remember to bump the global rt_version macro above ^
 Patch0:         patch-%{version_upstream}-%{rt_version}.patch
-Patch1:         realtime-with-memcg.patch
-# Kernel CVEs are addressed by moving to a newer version of the stable kernel.
-# Since kernel CVEs are filed against the upstream kernel version and not the
-# stable kernel version, our automated tooling will still flag the CVE as not
-# fixed.
-# To indicate a kernel CVE is fixed to our automated tooling, add nopatch files
-# but do not apply them as a real patch. Each nopatch file should contain
-# information on why the CVE nopatch was applied.
+
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
+BuildRequires:  build-essential
+BuildRequires:  cpio
 BuildRequires:  diffutils
 BuildRequires:  dwarves
 BuildRequires:  elfutils-libelf-devel
+BuildRequires:  flex
+BuildRequires:  gettext
 BuildRequires:  glib-devel
+BuildRequires:  grub2-rpm-macros
 BuildRequires:  kbd
 BuildRequires:  kmod-devel
+BuildRequires:  libcap-devel
 BuildRequires:  libdnet-devel
 BuildRequires:  libmspack-devel
+BuildRequires:  libtraceevent-devel
 BuildRequires:  openssl
 BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
 BuildRequires:  procps-ng-devel
 BuildRequires:  python3-devel
 BuildRequires:  sed
+BuildRequires:  systemd-rpm-macros
+%ifarch x86_64
+BuildRequires:  pciutils-devel
+%endif
 Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
 Requires(postun): coreutils
-ExclusiveArch:  x86_64
-%ifarch x86_64
-BuildRequires:  pciutils-devel
-%endif
 # When updating the config files it is important to sanitize them.
 # Steps for updating a config file:
 #  1. Extract the linux sources into a folder
@@ -106,6 +119,14 @@ Requires:       %{name} = %{version}-%{release}
 %description drivers-accessibility
 This package contains the Linux kernel accessibility support
 
+%package drivers-gpu
+Summary:        Kernel gpu modules
+Group:          System Environment/Kernel
+Requires:       %{name} = %{version}-%{release}
+
+%description drivers-gpu
+This package contains the Linux kernel gpu support
+
 %package drivers-sound
 Summary:        Kernel Sound modules
 Group:          System Environment/Kernel
@@ -138,13 +159,6 @@ Requires:       python3
 %description -n python3-perf
 This package contains the Python 3 extension for the 'perf' performance analysis tools for Linux kernel.
 
-%package dtb
-Summary:        This package contains common device tree blobs (dtb)
-Group:          System Environment/Kernel
-
-%description dtb
-This package contains common device tree blobs (dtb)
-
 %package -n     bpftool
 Summary:        Inspection and simple manipulation of eBPF programs and maps
 
@@ -153,16 +167,15 @@ This package contains the bpftool, which allows inspection and simple
 manipulation of eBPF programs and maps.
 
 %prep
-%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{version}
+%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{mariner_version}-%{version}
 %patch0 -p1
-%patch1 -p1
 
 make mrproper
 
 cp %{config_source} .config
 
 # Add CBL-Mariner cert into kernel's trusted keyring
-cp %{SOURCE3} certs/mariner.pem
+cp %{SOURCE4} certs/mariner.pem
 sed -i 's#CONFIG_SYSTEM_TRUSTED_KEYS=""#CONFIG_SYSTEM_TRUSTED_KEYS="certs/mariner.pem"#' .config
 
 cp .config current_config
@@ -220,23 +233,33 @@ install -vdm 700 %{buildroot}/boot
 install -vdm 755 %{buildroot}%{_defaultdocdir}/linux-%{uname_r}
 install -vdm 755 %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}
 install -vdm 755 %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}
+
+install -d -m 755 %{buildroot}%{_sysconfdir}/sysconfig
+install -c -m 644 %{SOURCE5} %{buildroot}/%{_sysconfdir}/sysconfig/cpupower
+install -d -m 755 %{buildroot}%{_unitdir}
+install -c -m 644 %{SOURCE6} %{buildroot}%{_unitdir}/cpupower.service
+
 make INSTALL_MOD_PATH=%{buildroot} modules_install
 
 %ifarch x86_64
 install -vm 600 arch/x86/boot/bzImage %{buildroot}/boot/vmlinuz-%{uname_r}
 %endif
 
+%ifarch aarch64
+install -vm 600 arch/arm64/boot/Image %{buildroot}/boot/vmlinuz-%{uname_r}
+%endif
+
 # Restrict the permission on System.map-X file
 install -vm 400 System.map %{buildroot}/boot/System.map-%{uname_r}
 install -vm 600 .config %{buildroot}/boot/config-%{uname_r}
 cp -r Documentation/*        %{buildroot}%{_defaultdocdir}/linux-%{uname_r}
-install -vm 644 vmlinux %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux-%{uname_r}
+install -vm 744 vmlinux %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux-%{uname_r}
 # `perf test vmlinux` needs it
 ln -s vmlinux-%{uname_r} %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux
 
 cat > %{buildroot}/boot/linux-%{uname_r}.cfg << "EOF"
 # GRUB Environment Block
-mariner_cmdline=init=/lib/systemd/systemd ro loglevel=3 quiet no-vmw-sta crashkernel=256M
+mariner_cmdline=init=/lib/systemd/systemd ro no-vmw-sta crashkernel=256M
 mariner_linux=vmlinuz-%{uname_r}
 mariner_initrd=initrd.img-%{uname_r}
 EOF
@@ -251,6 +274,9 @@ mkdir -p %{buildroot}/%{_localstatedir}/lib/initramfs/kernel
 cat > %{buildroot}/%{_localstatedir}/lib/initramfs/kernel/%{uname_r} << "EOF"
 --add-drivers "xen-scsifront xen-blkfront xen-acpi-processor xen-evtchn xen-gntalloc xen-gntdev xen-privcmd xen-pciback xenfs hv_utils hv_vmbus hv_storvsc hv_netvsc hv_sock hv_balloon virtio_blk virtio-rng virtio_console virtio_crypto virtio_mem vmw_vsock_virtio_transport vmw_vsock_virtio_transport_common 9pnet_virtio vrf"
 EOF
+
+# Symlink /lib/modules/uname/vmlinuz to boot partition
+ln -s /boot/vmlinuz-%{uname_r} %{buildroot}/lib/modules/%{uname_r}/vmlinuz
 
 #    Cleanup dangling symlinks
 rm -rf %{buildroot}/lib/modules/%{uname_r}/source
@@ -270,6 +296,10 @@ cp .config %{buildroot}%{_prefix}/src/linux-headers-%{uname_r} # copy .config ma
 ln -sf "%{_prefix}/src/linux-headers-%{uname_r}" "%{buildroot}/lib/modules/%{uname_r}/build"
 find %{buildroot}/lib/modules -name '*.ko' -print0 | xargs -0 chmod u+x
 
+%ifarch aarch64
+cp scripts/module.lds %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}/scripts/module.lds
+%endif
+
 # disable (JOBS=1) parallel build to fix this issue:
 # fixdep: error opening depfile: ./.plugin_cfg80211.o.d: No such file or directory
 # Linux version that was affected is 4.4.26
@@ -286,7 +316,7 @@ make -C tools/bpf/bpftool DESTDIR=%{buildroot} prefix=%{_prefix} bash_compdir=%{
 make -C tools DESTDIR=%{buildroot} prefix=%{_prefix} bash_compdir=%{_sysconfdir}/bash_completion.d/ mandir=%{_mandir} turbostat_install cpupower_install
 %endif
 
-# Remove trace (symlink to perf). This file creates duplicate identical debug symbols
+# Remove trace (symlink to perf). This file causes duplicate identical debug symbols
 rm -vf %{buildroot}%{_bindir}/trace
 
 %triggerin -- initramfs
@@ -299,6 +329,9 @@ rm -rf %{_localstatedir}/lib/rpm-state/initramfs/pending/%{uname_r}
 rm -rf /boot/initrd.img-%{uname_r}
 echo "initrd of kernel %{uname_r} removed" >&2
 
+%preun tools
+%systemd_preun cpupower.service
+
 %postun
 if [ ! -e /boot/mariner.cfg ]
 then
@@ -309,21 +342,32 @@ then
           test -n "$list" && ln -sf "$list" /boot/mariner.cfg
      fi
 fi
+%grub2_postun
+
+%postun tools
+%systemd_postun cpupower.service
 
 %post
 /sbin/depmod -a %{uname_r}
 ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
+%grub2_post
 
 %post drivers-accessibility
+/sbin/depmod -a %{uname_r}
+
+%post drivers-gpu
 /sbin/depmod -a %{uname_r}
 
 %post drivers-sound
 /sbin/depmod -a %{uname_r}
 
+%post tools
+%systemd_post cpupower.service
+
 %files
 %defattr(-,root,root)
 %license COPYING
-%exclude %dir %{_libdir}/debug
+%exclude %dir /usr/lib/debug
 /boot/System.map-%{uname_r}
 /boot/config-%{uname_r}
 /boot/vmlinuz-%{uname_r}
@@ -351,6 +395,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %defattr(-,root,root)
 /lib/modules/%{uname_r}/kernel/drivers/accessibility
 
+%files drivers-gpu
+%defattr(-,root,root)
+/lib/modules/%{uname_r}/kernel/drivers/gpu
+
 %files drivers-sound
 %defattr(-,root,root)
 /lib/modules/%{uname_r}/kernel/sound
@@ -361,25 +409,28 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %exclude %dir %{_libdir}/debug
 %ifarch x86_64
 %{_sbindir}/cpufreq-bench
-%{_lib64dir}/traceevent
 %{_lib64dir}/libperf-jvmti.so
 %{_lib64dir}/libcpupower.so*
 %{_sysconfdir}/cpufreq-bench.conf
 %{_includedir}/cpuidle.h
 %{_includedir}/cpufreq.h
+%{_includedir}/powercap.h
 %{_mandir}/man1/cpupower*.gz
 %{_mandir}/man8/turbostat*.gz
 %{_datadir}/locale/*/LC_MESSAGES/cpupower.mo
 %{_datadir}/bash-completion/completions/cpupower
+%endif
+%ifarch aarch64
+%{_libdir}/libperf-jvmti.so
 %endif
 %{_bindir}
 %{_sysconfdir}/bash_completion.d/*
 %{_datadir}/perf-core/strace/groups/file
 %{_datadir}/perf-core/strace/groups/string
 %{_docdir}/*
-%{_libdir}/perf/examples/bpf/*
-%{_libdir}/perf/include/bpf/*
 %{_includedir}/perf/perf_dlfilter.h
+%{_unitdir}/cpupower.service
+%config(noreplace) %{_sysconfdir}/sysconfig/cpupower
 
 %files -n python3-perf
 %{python3_sitearch}/*
@@ -389,39 +440,299 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Wed Apr 19 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.55.1-3
+* Thu Dec 14 2023 Rachel Menge <rachelmenge@microsoft.com> - 6.6.2.1-2
+- Add cpupower.service to kernel-tools
+- Enable user-based event tracing
+- Enable CONFIG_BPF_LSM (Thien Trung Vuong <tvuong@microsoft.com>)
+- Enable CUSE module (Juan Camposeco <juanarturoc@microsoft.com>)
+- Add IOMMU configs for aarch64 (David Daney <daviddaney@microsoft.com>)
+
+* Wed Dec 13 2023 Rachel Menge <rachelmenge@microsoft.com> - 6.6.2.1-1
+- Upgrade to 6.6.2.1
+- Add libtraceevent-devel to BuildRequires
+
+* Thu Dec 07 2023 Rachel Menge <rachelmenge@microsoft.com> - 6.1.58.1-3
+- Update 6.1 to have parity with ARM configs for 5.15
+
+* Fri Dec 01 2023 Cameron Baird <cameronbaird@microsoft.com> - 6.1.58.1-2
+- Remove loglevel=3, causing kernel to boot with the config-defined value,
+    CONSOLE_LOGLEVEL_DEFAULT.
+
+* Fri Oct 27 2023 Rachel Menge <rachelmenge@microsoft.com> - 6.1.58.1-1
+- Upgrade to 6.1.58.1
+- Remove support for imx8 dtb subpackage
+- Add patch for perf_bpf_test_add_nonnull_argument
+- Add cpio BuildRequires
+- Ensure parity with 2.0 kernel configs
+
+* Mon Oct 23 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.135.1-2
+- Enable CONFIG_BINFMT_MISC
+
+* Tue Oct 17 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.135.1-1
+- Auto-upgrade to 5.15.135.1
+
+* Tue Sep 26 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.133.1-1
+- Auto-upgrade to 5.15.133.1
+- Remove CONFIG_NET_CLS_RSVP and CONFIG_NET_CLS_RSVP6 that don't apply to the new version
+
+* Thu Sep 21 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.131.1-3
+- Call grub2-mkconfig to regenerate configs only if the user has
+    previously used grub2-mkconfig for boot configuration.
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.15.131.1-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
+* Fri Sep 08 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.131.1-1
+- Auto-upgrade to 5.15.131.1
+
+* Mon Aug 14 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.126.1-1
+- Auto-upgrade to 5.15.126.1
+
+* Thu Aug 10 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.125.1-2
+- Enable CONFIG_BLK_DEV_NBD module
+
+* Wed Aug 09 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.125.1-1
+- Auto-upgrade to 5.15.125.1
+
+* Tue Aug 01 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.123.1-1
+- Auto-upgrade to 5.15.123.1
+
+* Fri Jul 28 2023 Juan Camposeco <juanarturoc@microsoft.com> - 5.15.122.1-2
+- Enable Mellanox DPU drivers and configurations, ARM64 only
+
+* Wed Jul 26 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.122.1-1
+- Auto-upgrade to 5.15.122.1
+
+* Wed Jun 28 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.118.1-1
+- Auto-upgrade to 5.15.118.1
+
+* Tue Jun 20 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.116.1-2
+- Enable CONFIG_IP_VS_MH module
+
+* Tue Jun 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.116.1-1
+- Auto-upgrade to 5.15.116.1
+
+* Wed May 24 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.112.1-2
+- Enable CONFIG_NVME_MULTIPATH with patch to set default to off
+
+* Tue May 23 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.112.1-1
+- Auto-upgrade to 5.15.112.1
+
+* Mon May 15 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.111.1-1
+- Auto-upgrade to 5.15.111.1
+
+* Mon May 15 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.110.1-5
+- Revert CONFIG_NVME_MULTIPATH
+
+* Tue May 09 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.110.1-4
+- Enable CONFIG_EDAC_SKX
+
+* Thu May 04 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.110.1-3
+- Enable HWMON support, RAS_CEC, and BLK_DEV_IO_TRACE
+
+* Wed May 03 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.110.1-2
+- Enable CONFIG_NVME_MULTIPATH
+
+* Mon May 01 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.110.1-1
+- Auto-upgrade to 5.15.110.1
+
+* Thu Apr 27 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.107.1-4
+- Enable DRM_AMDGPU module
+
+* Wed Apr 26 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.107.1-3
+- Enable Dell drivers and supporting config options
+- Enable TLS
+
+* Wed Apr 19 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.107.1-2
 - Disable rpm's debuginfo defaults which regenerate build-ids
 
-* Tue Sep 13 2022 Saul Paredes <saulparedes@microsoft.com> - 5.15.55.1-2
+* Tue Apr 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.107.1-1
+- Auto-upgrade to 5.15.107.1
+
+* Tue Apr 11 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.102.1-5
+- Enable CONFIG_HIST_TRIGGERS
+
+* Wed Mar 29 2023 Kanika Nema <kanikanema@microsoft.com> - 5.15.102.1-4
+- Enable nvme-tcp and nvme-rdma modules
+
+* Wed Mar 29 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.102.1-3
+- Enable CONFIG_NET_CLS_FLOWER module
+
+* Wed Mar 22 2023 Thien Trung Vuong <tvuong@microsoft.com> - 5.15.102.1-2
+- Enable Wireguard module
+
+* Tue Mar 14 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.102.1-1
+- Auto-upgrade to 5.15.102.1
+
+* Mon Mar 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.98.1-1
+- Auto-upgrade to 5.15.98.1
+
+* Sat Feb 25 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.95.1-1
+- Auto-upgrade to 5.15.95.1
+
+* Wed Feb 22 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.94.1-1
+- Auto-upgrade to 5.15.94.1
+
+* Wed Feb 15 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.92.1-3
+- Install vmlinux as root executable for debuginfo
+
+* Thu Feb 09 2023 Minghe Ren <mingheren@microsoft.com> - 5.15.92.1-2
+- Disable CONFIG_INIT_ON_FREE_DEFAULT_ON
+
+* Mon Feb 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.92.1-1
+- Auto-upgrade to 5.15.92.1
+
+* Wed Jan 25 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.90.1-1
+- Auto-upgrade to 5.15.90.1
+
+* Sat Jan 14 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.87.1-1
+- Auto-upgrade to 5.15.87.1
+
+* Sat Jan 07 2023 nick black <niblack@microsoft.com> - 5.15.86.1-2
+- Add several missing BuildRequires (w/ Rachel Menge)
+
+* Tue Jan 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.86.1-1
+- Auto-upgrade to 5.15.86.1
+
+* Fri Dec 23 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.85.1-1
+- Auto-upgrade to 5.15.85.1
+
+* Mon Dec 19 2022 Betty Lakes <bettylakes@microsoft.com> - 5.15.82.1-2
+- Turn on Generic Target Core Mod
+
+* Tue Dec 13 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.82.1-1
+- Auto-upgrade to 5.15.82.1
+
+* Wed Dec 07 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.81.1-1
+- Auto-upgrade to 5.15.81.1
+
+* Mon Dec 05 2022 Betty Lakes <bettylakes@microsoft.com> - 5.15.80.1-2
+- Turn on hibernation and its dependencies
+
+* Tue Nov 29 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.80.1-1
+- Auto-upgrade to 5.15.80.1
+
+* Fri Nov 18 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.79.1-1
+- Auto-upgrade to 5.15.79.1
+
+* Tue Nov 08 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.77.1-1
+- Auto-upgrade to 5.15.77.1
+
+* Wed Oct 26 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.15.74.1-3
+- Turn on Configs for different TCP algorithms
+
+* Mon Oct 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.74.1-2
+- Package gpu kernel modules in new package kernel-drivers-gpu
+
+* Wed Oct 19 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.74.1-1
+- Upgrade to 5.15.74.1
+
+* Fri Oct 07 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.72.1-1
+- Upgrade to 5.15.72.1
+
+* Tue Sep 27 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.70.1-1
+- Upgrade to 5.15.70.1
+
+* Mon Sep 26 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.69.1-1
+- Upgrade to 5.15.69.1
+
+* Thu Sep 22 2022 Chris Co <chrco@microsoft.com> - 5.15.67.1-4
+- Enable SCSI logging facility
+
+* Tue Sep 20 2022 Chris Co <chrco@microsoft.com> - 5.15.67.1-3
+- Enable 32-bit time syscall support
+
+* Fri Sep 16 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.67.1-2
+- Enable CONFIG_NETFILTER_XT_TARGET_TRACE as a module
+
+* Thu Sep 15 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.67.1-1
+- Upgrade to 5.15.67.1
+
+* Thu Sep 15 2022 Adit Jha <aditjha@microsoft.com> - 5.15.63.1-4
+- Setting vfat module in kernel config to Y to be baked in
+
+* Tue Sep 13 2022 Saul Paredes <saulparedes@microsoft.com> - 5.15.63.1-3
 - Adjust crashkernel param to crash, dump memory to a file, and recover correctly
 
-* Sun Aug 28 2022 Xenofon Foukas <xefouk@microsoft.com> - 5.15.55.1-1
-- Update source to 5.15.55.1
+* Tue Sep 06 2022 Nikola Bojanic <t-nbojanic@microsoft.com> - 5.15.63.1-2
+- Enable CRIU support: https://criu.org/Linux_kernel
 
-* Mon Aug 08 2022 Sriram Nambakam <snambakam@microsoft.com> - 5.15.44.1-6
-- Enable CONFIG_PCI_PF_STUB
+* Mon Aug 29 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.63.1-1
+- Upgrade to 5.15.63.1
 
-* Mon Aug 08 2022 Sriram Nambakam <snambakam@microsoft.com> - 5.15.44.1-5
-- Enable ICE in-tree driver
-- Enable CONFIG_NO_HZ_FULL
+* Wed Aug 17 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.60.2-1
+- Upgrade to 5.15.60.2 to fix arm64 builds
 
-* Sun Aug 07 2022 Sriram Nambakam <snambakam@microsoft.com> - 5.15.44.1-4
-- Enable CONFIG_VFIO_NOIOMMU for RT Kernel
+* Tue Aug 02 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.15.57.1-3
+- Turn on CONFIG_SECURITY_LANDLOCK
 
-* Fri Jul 01 2022 Sriram Nambakam <snambakam@microsoft.com> - 5.15.44.1-3
-- Build turbostat and cpupower
+* Mon Aug 01 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.15.57.1-2
+- Turn on CONFIG_BLK_DEV_ZONED
 
-* Tue Jun 14 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.44.1-2
-- Updating build steps for the regular kernel.
+* Tue Jul 26 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.57.1-1
+- Upgrade to 5.15.57.1
 
-* Thu Jun 09 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.44.1-1
-- Update source to 5.15.44.1
+* Fri Jul 22 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.55.1-1
+- Upgrade to 5.15.55.1
 
-* Mon Jun 06 2022 Minghe Ren <mingheren@microsoft.com> - 5.15.34.1-2
+* Thu Jul 21 2022 Henry Li <lihl@microsoft.com> - 5.15.48.1-6
+- Add turbostat and cpupower to kernel-tools
+
+* Fri Jul 08 2022 Francis Laniel <flaniel@linux.microsoft.com> - 5.15.48.1-5
+- Add back CONFIG_FTRACE_SYSCALLS to enable eBPF CO-RE syscalls tracers.
+- Add CONFIG_IKHEADERS=m to enable eBPF standard tracers.
+
+* Mon Jun 27 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.48.1-4
+- Remove 'quiet' from commandline to enable verbose log
+
+* Mon Jun 27 2022 Henry Beberman <henry.beberman@microsoft.com> - 5.15.48.1-3
+- Enable CONFIG_VIRTIO_FS=m and CONFIG_FUSE_DAX=y
+- Symlink /lib/modules/uname/vmlinuz to /boot/vmlinuz-uname to improve compat with scripts seeking the kernel.
+
+* Wed Jun 22 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 5.15.48.1-2
+- Enabling Vgem driver in config.
+
+* Fri Jun 17 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.48.1-1
+- Update source to 5.15.48.1
+
+* Tue Jun 14 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.45.1-2
+- Moving ".config" update and check steps into the %%prep section.
+
+* Thu Jun 09 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.45.1-1
+- Update source to 5.15.45.1
+- Address CVE-2022-32250 with a nopatch
+
+* Mon Jun 06 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 5.15.41.1-4
+- Compiling ptp_kvm driver as a module
+
+* Wed Jun 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.41.1-3
+- Enabling "LIVEPATCH" config option.
+
+* Thu May 26 2022 Minghe Ren <mingheren@microsoft.com> - 5.15.41.1-2
 - Disable SMACK kernel configuration
+
+* Tue May 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.41.1-1
+- Update source to 5.15.41.1
+- Nopatch CVE-2020-35501, CVE-2022-28893, CVE-2022-29581
+
+* Mon May 23 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.37.1-3
+- Fix configs to bring down initrd boot time
+
+* Mon May 16 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.37.1-2
+- Fix cdrom, hyperv-mouse, kexec and crash-on-demand config in aarch64
+
+* Mon May 09 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.37.1-1
+- Update source to 5.15.37.1
+- Nopatch CVE-2021-4095, CVE-2022-0500, CVE-2022-0998, CVE-2022-28796, CVE-2022-29582,
+    CVE-2022-1048, CVE-2022-1195, CVE-2022-1353, CVE-2022-29968, CVE-2022-1015
+- Enable IFB config
 
 * Tue Apr 19 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.34.1-1
 - Update source to 5.15.34.1
+- Clean up nopatches in Patch list, no longer needed for CVE automation
+- Nopatch CVE-2022-28390, CVE-2022-28389, CVE-2022-28388, CVE-2022-28356, CVE-2022-0435,
+    CVE-2021-4202, CVE-2022-27950, CVE-2022-0433, CVE-2022-0494, CVE-2022-0330, CVE-2022-0854,
+    CVE-2021-4197, CVE-2022-29156
 
 * Tue Apr 19 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 5.15.32.1-3
 - Remove kernel lockdown config from grub envblock
@@ -433,6 +744,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 
 * Fri Apr 08 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 5.15.32.1-1
 - Update source to 5.15.32.1
+- Address CVES: 2022-0516, 2022-26878, 2022-27223, 2022-24958, 2022-0742,
+  2022-1011, 2022-26490, 2021-4002
+- Enable MANA driver config
+- Address CVEs 2022-0995, 2022-1055, 2022-27666
 
 * Tue Apr 05 2022 Henry Li <lihl@microsoft.com> - 5.15.26.1-4
 - Add Dell devices support
@@ -446,24 +761,40 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 
 * Tue Mar 08 2022 cameronbaird <cameronbaird@microsoft.com> - 5.15.26.1-1
 - Update source to 5.15.26.1
-- Add some documentation about update process for rt patch
+- Address CVES: 2022-0617, 2022-25375, 2022-25258, 2021-4090, 2022-25265,
+  2021-45402, 2022-0382, 2022-0185, 2021-44879, 2022-24959, 2022-0264,
+  2022-24448, 2022-24122, 2021-20194, 2022-0847, 1999-0524, 2008-4609,
+  2010-0298, 2010-4563, 2011-0640, 2022-0492, 2021-3743, 2022-26966
 
-* Thu Feb 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.18.1-4
+* Mon Mar 07 2022 George Mileka <gmileka@microsoft.com> - 5.15.18.1-5
+- Enabled vfio noiommu.
+
+* Fri Feb 25 2022 Henry Li <lihl@microsoft.com> - 5.15.18.1-4
+- Enable CONFIG_DEVMEM, CONFIG_STRICT_DEVMEM and CONFIG_IO_STRICT_DEVMEM
+
+* Thu Feb 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.18.1-3
 - CONFIG_BPF_UNPRIV_DEFAULT_OFF=y
-- Bump release number to match kernel release
+
+* Thu Feb 24 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.15.18.1-2
+- Add usbip required kernel configs CONFIG_USBIP_CORE CONFIG_USBIP_VHCI_HCD
 
 * Mon Feb 07 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.18.1-1
 - Update source to 5.15.18.1
+- Address CVE-2010-0309, CVE-2018-1000026, CVE-2018-16880, CVE-2019-3016,
+  CVE-2019-3819, CVE-2019-3887, CVE-2020-25672, CVE-2021-3564, CVE-2021-45095,
+  CVE-2021-45469, CVE-2021-45480
 
-* Thu Feb 03 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.2.1-4
-- Bump release number to match kernel release
+* Thu Feb 03 2022 Henry Li <lihl@microsoft.com> - 5.15.2.1-5
+- Enable CONFIG_X86_SGX and CONFIG_X86_SGX_KVM
 
-* Wed Jan 26 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.2.1-2
+* Wed Feb 02 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.15.2.1-4
+- Add libperf-jvmti.so to tools package
+
+* Thu Jan 27 2022 Daniel Mihai <dmihai@microsoft.com> - 5.15.2.1-3
+- Enable kdb frontend for kgdb
+
+* Sun Jan 23 2022 Chris Co <chrco@microsoft.com> - 5.15.2.1-2
 - Rotate Mariner cert
-
-* Tue Jan 11 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.15.2.1-1
-- Create realtime variant of kernel-5.15.2.1
-- Remove all references to aarch64
 
 * Thu Jan 06 2022 Rachel Menge <rachelmenge@microsoft.com> - 5.15.2.1-1
 - Update source to 5.15.2.1
