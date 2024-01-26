@@ -1,9 +1,0 @@
-[Unit]
-Description=Finger Socket
-
-[Socket]
-ListenStream=79
-Accept=yes
-
-[Install]
-WantedBy=sockets.target
