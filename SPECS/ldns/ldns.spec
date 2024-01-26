@@ -61,6 +61,7 @@ BuildRequires: python3-devel
 BuildRequires: swig
 %endif
 Requires: ca-certificates
+Patch1: ldns-swig-4.2.patch
 
 %description
 ldns is a library with the aim to simplify DNS programming in C. All
@@ -117,6 +118,8 @@ This package contains documentation for the ldns library
 
 %autosetup -cn %{pkgname} -N
 pushd %{pkgname}
+
+%autopatch -p2
 
 # fixup .pc file
 sed -i "s/@includedir@/@includedir@\/ldns/" packaging/libldns.pc.in
