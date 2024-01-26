@@ -33,16 +33,121 @@ Source1:        90-default.preset
 Source2:        90-default-user.preset
 Source3:        99-default-disable.preset
 
+Provides:       azure-release-variant = %{version}-%{release}
+
 Provides:       system-release
 Provides:       system-release(%{version})
+Requires:       azure-release-common = %{version}-%{release}
 
 BuildArch:      noarch
 
+# azure-release-common Requires: azure-release-identity, so at least one
+# package must provide it. This Recommends: pulls in
+# azure-release-identity-basic if nothing else is already doing so.
+Recommends:     azure-release-identity-basic
+
+BuildRequires:  redhat-rpm-config > 121-1
 BuildRequires:  systemd-rpm-macros
 
 %description
 Azure Linux release files such as dnf configs and other %{_sysconfdir}/ release related files
 and systemd preset files that determine which services are enabled by default.
+
+
+%package common
+Summary: Azure release files
+
+Requires:   azure-release-variant = %{version}-%{release}
+Suggests:   azure-release
+
+Requires:   azure-repos(%{version})
+Requires:   azure-release-identity = %{version}-%{release}
+
+%description common
+Release files common to all Editions and Spins of Azure
+
+
+%if %{with basic}
+%package identity-basic
+Summary:        Package providing the basic Azure identity
+
+RemovePathPostfixes: .basic
+Provides:       azure-release-identity = %{version}-%{release}
+Conflicts:      azure-release-identity
+
+
+%description identity-basic
+Provides the necessary files for a basic Azure installation.
+%endif
+
+
+%if %{with cloud}
+%package cloud
+Summary:        Base package for Azure Cloud-specific default configurations
+
+RemovePathPostfixes: .cloud
+Provides:       azure-release = %{version}-%{release}
+Provides:       azure-release-variant = %{version}-%{release}
+Provides:       system-release
+Provides:       system-release(%{version})
+Requires:       azure-release-common = %{version}-%{release}
+
+Recommends:     azure-release-identity-cloud
+
+
+%description cloud
+Provides a base package for Azure Cloud-specific configuration files to
+depend on.
+
+
+%package identity-cloud
+Summary:        Package providing the identity for Azure Cloud Edition
+
+RemovePathPostfixes: .cloud
+Provides:       azure-release-identity = %{version}-%{release}
+Conflicts:      azure-release-identity
+Requires(meta): azure-release-cloud = %{version}-%{release}
+
+
+%description identity-cloud
+Provides the necessary files for a Azure installation that is identifying
+itself as Azure Cloud Edition.
+%endif
+
+
+%if %{with container}
+%package container
+Summary:        Base package for Azure container specific default configurations
+
+RemovePathPostfixes: .container
+Provides:       azure-release = %{version}-%{release}
+Provides:       azure-release-variant = %{version}-%{release}
+Provides:       system-release
+Provides:       system-release(%{version})
+Requires:       azure-release-common = %{version}-%{release}
+
+Recommends:     azure-release-identity-container
+
+
+%description container
+Provides a base package for Azure container specific configuration files to
+depend on as well as container system defaults.
+
+
+%package identity-container
+Summary:        Package providing the identity for Azure Container Base Image
+
+RemovePathPostfixes: .container
+Provides:       azure-release-identity = %{version}-%{release}
+Conflicts:      azure-release-identity
+Requires(meta): azure-release-container = %{version}-%{release}
+
+
+%description identity-container
+Provides the necessary files for a Azure installation that is identifying
+itself as the Azure Container Base Image.
+%endif
+
 
 %install
 install -d %{buildroot}%{_sysconfdir}
@@ -108,8 +213,38 @@ install -Dm0644 %{SOURCE2} -t %{buildroot}%{_userpresetdir}/
 install -Dm0644 %{SOURCE3} -t %{buildroot}%{_presetdir}/
 install -Dm0644 %{SOURCE3} -t %{buildroot}%{_userpresetdir}/
 
+%if %{with basic}
+# Basic
+cp -p os-release \
+      %{buildroot}%{_libdir}/os-release.basic
+%endif
 
-%files
+%if %{with cloud}
+# Cloud
+cp -p os-release \
+      %{buildroot}%{_libdir}/os-release.cloud
+echo "VARIANT=\"Cloud Edition\"" >> %{buildroot}%{_libdir}/os-release.cloud
+echo "VARIANT_ID=cloud" >> %{buildroot}%{_libdir}/os-release.cloud
+%endif
+
+%if %{with container}
+# Container
+cp -p os-release \
+      %{buildroot}%{_libdir}/os-release.container
+echo "VARIANT=\"Container Image\"" >> %{buildroot}%{_libdir}/os-release.container
+echo "VARIANT_ID=container" >> %{buildroot}%{_libdir}/os-release.container
+%endif
+
+%if %{with server}
+# Server
+cp -p os-release \
+      %{buildroot}%{_libdir}/os-release.server
+echo "VARIANT=\"Server Edition\"" >> %{buildroot}%{_libdir}/os-release.server
+echo "VARIANT_ID=server" >> %{buildroot}%{_libdir}/os-release.server
+%endif
+
+
+%files common
 %defattr(-,root,root,-)
 %{_libdir}/azurelinux-release
 %{_libdir}/lsb-release
@@ -125,6 +260,34 @@ install -Dm0644 %{SOURCE3} -t %{buildroot}%{_userpresetdir}/
 %{_rpmmacrodir}/macros.dist
 %{_presetdir}/*.preset
 %{_userpresetdir}/*.preset
+
+
+%if %{with basic}
+%files
+%files identity-basic
+%{_libdir}/os-release.basic
+%endif
+
+
+%if %{with cloud}
+%files cloud
+%files identity-cloud
+%{_libdir}/os-release.cloud
+%endif
+
+
+%if %{with container}
+%files container
+%files identity-container
+%{_libdir}/os-release.container
+%endif
+
+
+%if %{with server}
+%files server
+%files identity-server
+%{_libdir}/os-release.server
+%endif
 
 
 %changelog
