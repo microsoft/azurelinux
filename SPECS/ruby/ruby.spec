@@ -1,9 +1,12 @@
-%define majmin %(echo %{version} | cut -d. -f1-2)
-
 # The RubyGems library has to stay out of Ruby directory tree, since the
 # RubyGems should be share by all Ruby implementations.
 %global rubygems_dir  %{_datadir}/rubygems
 %global gem_dir %{_datadir}/ruby/gems
+
+# Default package version defined separately, because the %%version macro gets overwritten by 'Version' tags of the subpackages.
+%global ruby_version            3.3.0
+%define ruby_version_majmin     %(echo %{ruby_version} | cut -d. -f1-2)
+
 %global rubygems_version        3.5.3
 # Add version for default gems from https://stdgems.org/
 # A helpful one-liner script to check the current default versions is available via RUBY_VER=%%{majmin} ./get_gem_versions.sh
@@ -84,14 +87,14 @@ Name:           ruby
 # TODO: When changing ruby version, these gemified stdlib
 # provides should be versioned according to the ruby version.
 # More info: https://stdgems.org/
-Version:        3.3.0
+Version:        %{ruby_version}
 Release:        1%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.ruby-lang.org/en/
-Source0:        https://cache.ruby-lang.org/pub/ruby/%{majmin}/%{name}-%{version}.tar.gz
+Source0:        https://cache.ruby-lang.org/pub/ruby/%{majmin}/%{name}-%{ruby_version}.tar.gz
 Source1:        macros.ruby
 Source2:        operating_system.rb
 Source3:        rubygems.attr
@@ -101,6 +104,8 @@ Source6:        rubygems.req
 Source7:        macros.rubygems
 # Updates default ruby-uri to 0.12.2 and vendored one to 0.10.3. Remove once ruby gets updated to a version that comes with both lib/uri/version.rb and lib/bundler/vendor/uri/lib/uri/version.rb versions >= 0.12.2 or == 0.10.3
 BuildRequires:  openssl-devel
+# Pkgconfig(yaml-0.1) is needed to build the 'psych' gem.
+BuildRequires:  pkgconfig(yaml-0.1)
 BuildRequires:  readline
 BuildRequires:  readline-devel
 BuildRequires:  tzdata
@@ -112,9 +117,9 @@ BuildRequires:  sudo
 Requires:       gmp
 Requires:       openssl
 Provides:       %{_prefix}/local/bin/ruby
-Provides:       %{name}-devel = %{version}-%{release}
-Provides:       %{name}(release) = %{version}-%{release}
-Provides:       %{name}-libs = %{version}-%{release}
+Provides:       %{name}-devel = %{ruby_version}-%{release}
+Provides:       %{name}(release) = %{ruby_version}-%{release}
+Provides:       %{name}-libs = %{ruby_version}-%{release}
 # TODO: When changing ruby version, these gemified stdlib
 # provides should be versioned according to the ruby version.
 # More info: https://stdgems.org/
@@ -330,7 +335,7 @@ autoconf
         --with-rubygemsdir=%{rubygems_dir} \
         --enable-shared \
         --with-compress-debug-sections=no \
-        --docdir=%{_docdir}/%{name}-%{version}
+        --docdir=%{_docdir}/%{name}-%{ruby_version}
 %make_build COPY="cp -p"
 
 %install
@@ -373,12 +378,12 @@ sudo -u test make test TESTS="-v"
 %{_bindir}/*
 %{_includedir}/*
 %{_libdir}/*.so
-%{_libdir}/*.so.3.1
-%{_libdir}/*.so.3.1.4
+%{_libdir}/*.so.%{ruby_version}
+%{_libdir}/*.so.%{ruby_version_majmin}
 %{_libdir}/pkgconfig/*.pc
 %{_libdir}/ruby/*
 %{_datadir}/ri/*
-%{_docdir}/%{name}-%{version}
+%{_docdir}/%{name}-%{ruby_version}
 %{_mandir}/man1/*
 %{_rpmconfigdir}/macros.d/macros.ruby
 %{_rpmconfigdir}/macros.d/macros.rubygems
