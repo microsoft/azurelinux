@@ -125,8 +125,8 @@
         "type": "other",
         "other": {
           "name": "aide",
-          "version": "0.16",
-          "downloadUrl": "https://github.com/aide/aide/releases/download/v0.16/aide-0.16.tar.gz"
+          "version": "0.18.6",
+          "downloadUrl": "https://github.com/aide/aide/releases/download/v0.18.6/aide-0.18.6.tar.gz"
         }
       }
     },
@@ -575,8 +575,8 @@
         "type": "other",
         "other": {
           "name": "asciidoc",
-          "version": "9.1.0",
-          "downloadUrl": "https://github.com/asciidoc-py/asciidoc-py/releases/download/9.1.0/asciidoc-9.1.0.tar.gz"
+          "version": "10.2.0",
+          "downloadUrl": "https://github.com/asciidoc-py/asciidoc-py/releases/download/10.2.0/asciidoc-10.2.0.tar.gz"
         }
       }
     },
@@ -695,8 +695,8 @@
         "type": "other",
         "other": {
           "name": "atop",
-          "version": "2.6.0",
-          "downloadUrl": "http://www.atoptool.nl/download/atop-2.6.0.tar.gz"
+          "version": "2.9.0",
+          "downloadUrl": "http://www.atoptool.nl/download/atop-2.9.0.tar.gz"
         }
       }
     },
@@ -1377,8 +1377,8 @@
         "type": "other",
         "other": {
           "name": "c-ares",
-          "version": "1.19.1",
-          "downloadUrl": "https://c-ares.haxx.se/download/c-ares-1.19.1.tar.gz"
+          "version": "1.25.0",
+          "downloadUrl": "https://c-ares.haxx.se/download/c-ares-1.25.0.tar.gz"
         }
       }
     },
@@ -1747,18 +1747,8 @@
         "type": "other",
         "other": {
           "name": "clang",
-          "version": "12.0.1",
-          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.1/clang-12.0.1.src.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "clang16",
-          "version": "16.0.0",
-          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-16.0.0.tar.gz"
+          "version": "17.0.6",
+          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-17.0.6.tar.gz"
         }
       }
     },
@@ -1957,8 +1947,8 @@
         "type": "other",
         "other": {
           "name": "compiler-rt",
-          "version": "12.0.1",
-          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.1/compiler-rt-12.0.1.src.tar.xz"
+          "version": "17.0.6",
+          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-17.0.6.tar.gz"
         }
       }
     },
@@ -2397,8 +2387,8 @@
         "type": "other",
         "other": {
           "name": "dbus",
-          "version": "1.15.2",
-          "downloadUrl": "https://dbus.freedesktop.org/releases/dbus/dbus-1.15.2.tar.xz"
+          "version": "1.15.8",
+          "downloadUrl": "https://dbus.freedesktop.org/releases/dbus/dbus-1.15.8.tar.xz"
         }
       }
     },
@@ -2618,8 +2608,8 @@
         "type": "other",
         "other": {
           "name": "ding-libs",
-          "version": "0.6.1",
-          "downloadUrl": "https://releases.pagure.org/SSSD/ding-libs/ding-libs-0.6.1.tar.gz"
+          "version": "0.6.2",
+          "downloadUrl": "https://github.com/SSSD/ding-libs/releases/download/0.6.2/ding-libs-0.6.2.tar.gz"
         }
       }
     },
@@ -2997,6 +2987,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "duktape",
+          "version": "2.7.0",
+          "downloadUrl": "https://duktape.org/duktape-2.7.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "dump",
           "version": "0.4",
           "downloadUrl": "http://downloads.sourceforge.net/dump/dump-0.4b46.tar.gz"
@@ -3258,8 +3258,8 @@
         "type": "other",
         "other": {
           "name": "environment-modules",
-          "version": "5.2.0",
-          "downloadUrl": "http://downloads.sourceforge.net/modules/modules-5.2.0.tar.bz2"
+          "version": "5.3.1",
+          "downloadUrl": "https://downloads.sourceforge.net/modules/modules-5.3.1.tar.gz"
         }
       }
     },
@@ -3428,8 +3428,8 @@
         "type": "other",
         "other": {
           "name": "fakeroot",
-          "version": "1.29",
-          "downloadUrl": "https://cdn-aws.deb.debian.org/debian/pool/main/f/fakeroot/fakeroot_1.29.orig.tar.gz"
+          "version": "1.32.2",
+          "downloadUrl": "https://cdn-aws.deb.debian.org/debian/pool/main/f/fakeroot/fakeroot_1.32.2.orig.tar.gz"
         }
       }
     },
@@ -3578,8 +3578,8 @@
         "type": "other",
         "other": {
           "name": "firewalld",
-          "version": "1.0.3",
-          "downloadUrl": "https://github.com/firewalld/firewalld/releases/download/v1.0.3/firewalld-1.0.3.tar.gz"
+          "version": "2.0.2",
+          "downloadUrl": "https://github.com/firewalld/firewalld/releases/download/v2.0.2/firewalld-2.0.2.tar.bz2"
         }
       }
     },
@@ -4260,8 +4260,8 @@
         "type": "other",
         "other": {
           "name": "git-lfs",
-          "version": "3.1.4",
-          "downloadUrl": "https://github.com/git-lfs/git-lfs/archive/v3.1.4.tar.gz"
+          "version": "3.4.1",
+          "downloadUrl": "https://github.com/git-lfs/git-lfs/archive/v3.4.1.tar.gz"
         }
       }
     },
@@ -4520,8 +4520,8 @@
         "type": "other",
         "other": {
           "name": "gnutls",
-          "version": "3.7.7",
-          "downloadUrl": "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.7/gnutls-3.7.7.tar.xz"
+          "version": "3.8.2",
+          "downloadUrl": "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.2.tar.xz"
         }
       }
     },
@@ -7481,8 +7481,8 @@
         "type": "other",
         "other": {
           "name": "iscsi-initiator-utils",
-          "version": "6.2.1.4+20210729.2a8f9d8",
-          "downloadUrl": "https://github.com/open-iscsi/open-iscsi/archive/2a8f9d81d0d6b5094c3fe9c686e2afb2ec27058a.tar.gz"
+          "version": "2.1.9",
+          "downloadUrl": "https://github.com/open-iscsi/open-iscsi/archive/c26218d9f8afdca44a492a4c3811648bd2880b26.tar.gz"
         }
       }
     },
@@ -7491,8 +7491,8 @@
         "type": "other",
         "other": {
           "name": "isns-utils",
-          "version": "0.101",
-          "downloadUrl": "https://github.com/open-iscsi/open-isns/archive/v0.101.tar.gz"
+          "version": "0.102",
+          "downloadUrl": "https://github.com/open-iscsi/open-isns/archive/v0.102.tar.gz"
         }
       }
     },
@@ -9240,16 +9240,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libewf",
-          "version": "20140608",
-          "downloadUrl": "https://github.com/libyal/legacy/raw/main/libewf/libewf-20140608.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "libexif",
           "version": "0.6.24",
           "downloadUrl": "https://github.com/libexif/libexif/releases/download/v0.6.24/libexif-0.6.24.tar.bz2"
@@ -9301,8 +9291,8 @@
         "type": "other",
         "other": {
           "name": "libfontenc",
-          "version": "1.1.3",
-          "downloadUrl": "ftp://ftp.x.org/pub/individual/lib/libfontenc-1.1.3.tar.bz2"
+          "version": "1.1.7",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libfontenc-1.1.7.tar.gz"
         }
       }
     },
@@ -9611,8 +9601,8 @@
         "type": "other",
         "other": {
           "name": "libICE",
-          "version": "1.0.10",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libICE-1.0.10.tar.bz2"
+          "version": "1.1.1",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libICE-1.1.1.tar.gz"
         }
       }
     },
@@ -9651,8 +9641,8 @@
         "type": "other",
         "other": {
           "name": "libidn2",
-          "version": "2.3.0",
-          "downloadUrl": "https://ftp.gnu.org/gnu/libidn/libidn2-2.3.0.tar.gz"
+          "version": "2.3.4",
+          "downloadUrl": "https://ftp.gnu.org/gnu/libidn/libidn2-2.3.4.tar.gz"
         }
       }
     },
@@ -9751,8 +9741,8 @@
         "type": "other",
         "other": {
           "name": "libiscsi",
-          "version": "1.18.0",
-          "downloadUrl": "https://github.com/sahlberg/libiscsi/archive/1.18.0.tar.gz"
+          "version": "1.19.0",
+          "downloadUrl": "https://github.com/sahlberg/libiscsi/archive/1.19.0.tar.gz"
         }
       }
     },
@@ -10251,8 +10241,8 @@
         "type": "other",
         "other": {
           "name": "libnfs",
-          "version": "4.0.0",
-          "downloadUrl": "https://github.com/sahlberg/libnfs/archive/libnfs-4.0.0/libnfs-4.0.0.tar.gz"
+          "version": "5.0.2",
+          "downloadUrl": "https://github.com/sahlberg/libnfs/archive/libnfs-5.0.2/libnfs-5.0.2.tar.gz"
         }
       }
     },
@@ -10491,8 +10481,8 @@
         "type": "other",
         "other": {
           "name": "libpciaccess",
-          "version": "0.16",
-          "downloadUrl": "https://www.x.org/archive/individual/lib/libpciaccess-0.16.tar.bz2"
+          "version": "0.17",
+          "downloadUrl": "https://www.x.org/archive/individual/lib/libpciaccess-0.17.tar.xz"
         }
       }
     },
@@ -10911,8 +10901,8 @@
         "type": "other",
         "other": {
           "name": "libslirp",
-          "version": "4.6.1",
-          "downloadUrl": "https://gitlab.freedesktop.org/slirp/libslirp/uploads/83b199ea6fcdfc0c243dfde8546ee4c9/libslirp-4.6.1.tar.xz"
+          "version": "4.7.0",
+          "downloadUrl": "https://gitlab.freedesktop.org/slirp/libslirp/-/archive/v4.7.0/libslirp-v4.7.0.tar.gz"
         }
       }
     },
@@ -10921,8 +10911,8 @@
         "type": "other",
         "other": {
           "name": "libSM",
-          "version": "1.2.3",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libSM-1.2.3.tar.bz2"
+          "version": "1.2.4",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libSM-1.2.4.tar.gz"
         }
       }
     },
@@ -11591,8 +11581,8 @@
         "type": "other",
         "other": {
           "name": "libxcb",
-          "version": "1.13.1",
-          "downloadUrl": "https://xcb.freedesktop.org/dist/libxcb-1.13.1.tar.bz2"
+          "version": "1.16",
+          "downloadUrl": "https://xcb.freedesktop.org/dist/libxcb-1.16.tar.gz"
         }
       }
     },
@@ -11601,8 +11591,8 @@
         "type": "other",
         "other": {
           "name": "libXcomposite",
-          "version": "0.4.5",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXcomposite-0.4.5.tar.bz2"
+          "version": "0.4.6",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXcomposite-0.4.6.tar.gz"
         }
       }
     },
@@ -11711,8 +11701,8 @@
         "type": "other",
         "other": {
           "name": "libXinerama",
-          "version": "1.1.4",
-          "downloadUrl": "http://xorg.freedesktop.org/archive/individual/lib/libXinerama-1.1.4.tar.bz2"
+          "version": "1.1.5",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXinerama-1.1.5.tar.gz"
         }
       }
     },
@@ -11781,8 +11771,8 @@
         "type": "other",
         "other": {
           "name": "libXmu",
-          "version": "1.1.3",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXmu-1.1.3.tar.bz2"
+          "version": "1.1.4",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXmu-1.1.4.tar.gz"
         }
       }
     },
@@ -12011,18 +12001,8 @@
         "type": "other",
         "other": {
           "name": "lld",
-          "version": "12.0.1",
-          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.1/lld-12.0.1.src.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "lld16",
-          "version": "16.0.0",
-          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-16.0.0/lld-16.0.0.src.tar.xz"
+          "version": "17.0.6",
+          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-17.0.6.tar.gz"
         }
       }
     },
@@ -12031,8 +12011,8 @@
         "type": "other",
         "other": {
           "name": "lldb",
-          "version": "12.0.1",
-          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.1/lldb-12.0.1.src.tar.xz"
+          "version": "17.0.6",
+          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-17.0.6.tar.gz"
         }
       }
     },
@@ -12061,18 +12041,8 @@
         "type": "other",
         "other": {
           "name": "llvm",
-          "version": "12.0.1",
-          "downloadUrl": "https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.1/llvm-12.0.1.src.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "llvm16",
-          "version": "16.0.0",
-          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-16.0.0.tar.gz"
+          "version": "17.0.6",
+          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-17.0.6.tar.gz"
         }
       }
     },
@@ -12531,8 +12501,8 @@
         "type": "other",
         "other": {
           "name": "makedumpfile",
-          "version": "1.6.8",
-          "downloadUrl": "https://github.com/makedumpfile/makedumpfile/releases/download/1.6.8/makedumpfile-1.6.8.tar.gz"
+          "version": "1.7.4",
+          "downloadUrl": "https://github.com/makedumpfile/makedumpfile/releases/download/1.7.4/makedumpfile-1.7.4.tar.gz"
         }
       }
     },
@@ -12711,8 +12681,8 @@
         "type": "other",
         "other": {
           "name": "maven",
-          "version": "3.8.7",
-          "downloadUrl": "https://archive.apache.org/dist/maven/maven-3/3.8.7/source/apache-maven-3.8.7-src.tar.gz"
+          "version": "3.9.6",
+          "downloadUrl": "https://archive.apache.org/dist/maven/maven-3/3.9.6/source/apache-maven-3.9.6-src.tar.gz"
         }
       }
     },
@@ -12793,16 +12763,6 @@
           "name": "maven-wagon",
           "version": "3.5.3",
           "downloadUrl": "https://repo1.maven.org/maven2/org/apache/maven/wagon/wagon/3.5.3/wagon-3.5.3-source-release.zip"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "maven3",
-          "version": "3.8.7",
-          "downloadUrl": "https://archive.apache.org/dist/maven/maven-3/3.8.7/source/apache-maven-3.8.7-src.tar.gz"
         }
       }
     },
@@ -13113,8 +13073,8 @@
         "type": "other",
         "other": {
           "name": "mm-common",
-          "version": "1.0.4",
-          "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/mm-common/1.0/mm-common-1.0.4.tar.xz"
+          "version": "1.0.6",
+          "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/mm-common/1.0/mm-common-1.0.6.tar.xz"
         }
       }
     },
@@ -14193,8 +14153,8 @@
         "type": "other",
         "other": {
           "name": "nspr",
-          "version": "4.30",
-          "downloadUrl": "https://archive.mozilla.org/pub/nspr/releases/v4.30/src/nspr-4.30.tar.gz"
+          "version": "4.9.6",
+          "downloadUrl": "https://archive.mozilla.org/pub/nspr/releases/v4.9.6/src/nspr-4.9.6.tar.gz"
         }
       }
     },
@@ -21154,8 +21114,8 @@
         "type": "other",
         "other": {
           "name": "polkit",
-          "version": "0.119",
-          "downloadUrl": "https://www.freedesktop.org/software/polkit/releases/polkit-0.119.tar.gz"
+          "version": "123",
+          "downloadUrl": "https://gitlab.freedesktop.org/polkit/polkit/-/archive/123/polkit-123.tar.gz"
         }
       }
     },
@@ -21603,16 +21563,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "PyPAM",
-          "version": "0.5.0",
-          "downloadUrl": "https://src.fedoraproject.org/repo/pkgs/PyPAM/PyPAM-0.5.0.tar.gz/f1e7c2c56421dda28a75ace59a3c8871/PyPAM-0.5.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "pyparsing",
           "version": "3.0.7",
           "downloadUrl": "https://github.com/pyparsing/pyparsing/releases/download/pyparsing_3.0.7/pyparsing-3.0.7.tar.gz"
@@ -21894,8 +21844,8 @@
         "type": "other",
         "other": {
           "name": "python-cffi",
-          "version": "1.15.0",
-          "downloadUrl": "https://pypi.python.org/packages/source/c/cffi/cffi-1.15.0.tar.gz"
+          "version": "1.16.0",
+          "downloadUrl": "https://pypi.python.org/packages/source/c/cffi/cffi-1.16.0.tar.gz"
         }
       }
     },
@@ -21934,8 +21884,8 @@
         "type": "other",
         "other": {
           "name": "python-cherrypy",
-          "version": "18.6.1",
-          "downloadUrl": "https://pypi.io/packages/source/C/CherryPy/CherryPy-18.6.1.tar.gz"
+          "version": "18.9.0",
+          "downloadUrl": "https://pypi.io/packages/source/C/CherryPy/CherryPy-18.9.0.tar.gz"
         }
       }
     },
@@ -23404,8 +23354,8 @@
         "type": "other",
         "other": {
           "name": "python-pluggy",
-          "version": "1.0.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/a1/16/db2d7de3474b6e37cbb9c008965ee63835bba517e22cdb8c35b5116b5ce1/pluggy-1.0.0.tar.gz"
+          "version": "1.3.0",
+          "downloadUrl": "https://pypi.python.org/packages/source/p/pluggy/pluggy-1.3.0.tar.gz"
         }
       }
     },
@@ -23724,8 +23674,8 @@
         "type": "other",
         "other": {
           "name": "python-pytest-mock",
-          "version": "3.7.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/96/e1/fb53b62056e6840a36d9a4beb4e42726155594c567b574103435a7131c60/pytest-mock-3.7.0.tar.gz"
+          "version": "3.12.0",
+          "downloadUrl": "https://pypi.io/packages/source/p/pytest-mock/pytest-mock-3.12.0.tar.gz"
         }
       }
     },
@@ -25224,8 +25174,8 @@
         "type": "other",
         "other": {
           "name": "rdma-core",
-          "version": "39.0",
-          "downloadUrl": "https://github.com/linux-rdma/rdma-core/releases/download/v39.0/rdma-core-39.0.tar.gz"
+          "version": "49.1",
+          "downloadUrl": "https://github.com/linux-rdma/rdma-core/releases/download/v49.1/rdma-core-49.1.tar.gz"
         }
       }
     },
@@ -25314,8 +25264,8 @@
         "type": "other",
         "other": {
           "name": "redis",
-          "version": "6.2.13",
-          "downloadUrl": "https://download.redis.io/releases/redis-6.2.13.tar.gz"
+          "version": "7.2.4",
+          "downloadUrl": "https://download.redis.io/releases/redis-7.2.4.tar.gz"
         }
       }
     },
@@ -26525,8 +26475,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-protocol-http",
-          "version": "0.22.5",
-          "downloadUrl": "https://github.com/socketry/protocol-http/archive/refs/tags/v0.22.5.tar.gz"
+          "version": "0.24.7",
+          "downloadUrl": "https://github.com/socketry/protocol-http/archive/refs/tags/v0.24.7.tar.gz"
         }
       }
     },
@@ -27285,8 +27235,8 @@
         "type": "other",
         "other": {
           "name": "seabios",
-          "version": "1.14.0",
-          "downloadUrl": "https://www.seabios.org/downloads/seabios-1.14.0.tar.gz"
+          "version": "1.16.3",
+          "downloadUrl": "https://www.seabios.org/downloads/seabios-1.16.3.tar.gz"
         }
       }
     },
@@ -27497,8 +27447,8 @@
         "type": "other",
         "other": {
           "name": "shared-mime-info",
-          "version": "2.0",
-          "downloadUrl": "https://gitlab.freedesktop.org/xdg/shared-mime-info/uploads/0440063a2e6823a4b1a6fb2f2af8350f/shared-mime-info-2.0.tar.xz"
+          "version": "2.2",
+          "downloadUrl": "https://gitlab.freedesktop.org/xdg/shared-mime-info/-/archive/2.2/shared-mime-info-2.2.tar.bz2"
         }
       }
     },
@@ -27587,8 +27537,8 @@
         "type": "other",
         "other": {
           "name": "sleuthkit",
-          "version": "4.9.0",
-          "downloadUrl": "https://github.com/sleuthkit/sleuthkit/releases/download/sleuthkit-4.9.0/sleuthkit-4.9.0.tar.gz"
+          "version": "4.12.1",
+          "downloadUrl": "https://github.com/sleuthkit/sleuthkit/releases/download/sleuthkit-4.12.1/sleuthkit-4.12.1.tar.gz"
         }
       }
     },
@@ -27867,8 +27817,8 @@
         "type": "other",
         "other": {
           "name": "squashfs-tools",
-          "version": "4.5.1",
-          "downloadUrl": "https://github.com/plougher/squashfs-tools/archive/4.5.1.tar.gz"
+          "version": "4.6.1",
+          "downloadUrl": "https://github.com/plougher/squashfs-tools/archive/4.6.1.tar.gz"
         }
       }
     },
@@ -29608,8 +29558,8 @@
         "type": "other",
         "other": {
           "name": "xcb-proto",
-          "version": "1.13",
-          "downloadUrl": "https://xcb.freedesktop.org/dist/xcb-proto-1.13.tar.bz2"
+          "version": "1.16.0",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/proto/xcb-proto-1.16.0.tar.gz"
         }
       }
     },
