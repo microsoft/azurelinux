@@ -3587,16 +3587,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "fish",
-          "version": "3.5.0",
-          "downloadUrl": "https://github.com/fish-shell/fish-shell/releases/download/3.5.0/fish-3.5.0.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "flac",
           "version": "1.4.3",
           "downloadUrl": "https://downloads.xiph.org/releases/flac/flac-1.4.3.tar.xz"
