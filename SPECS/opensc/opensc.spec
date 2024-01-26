@@ -2,7 +2,7 @@
 %define nssdb %{_sysconfdir}/pki/nssdb
 Summary:        Smart card library and applications
 Name:           opensc
-Version:        0.23.0
+Version:        0.24.0
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
@@ -140,6 +140,9 @@ rm %{buildroot}%{_mandir}/man1/opensc-notify.1*
 %{_mandir}/man5/*
 
 %changelog
+* Fri Jan 26 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.24.0-1
+- Auto-upgrade to 0.24.0 - Updated to latest for azl3
+
 * Thu Aug 31 2023 Henry Beberman <henry.beberman@microsoft.com> - 0.23.0-1
 - Upgrade to 0.23.0 to fix CVE-2021-34193
 - Update pinpad.patch to be compatible with 0.23.0
