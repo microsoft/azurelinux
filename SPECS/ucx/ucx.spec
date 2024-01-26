@@ -125,7 +125,7 @@ rm -f %{buildroot}%{_libdir}/ucx/lib*.so
 %if "%{debug}" == "1"
 %{_bindir}/ucs_stats_parser
 %endif
-@HAVE_GLIBCXX_NOTHROW_TRUE@%{_bindir}/io_demo
+%{_bindir}/io_demo
 %{_datadir}/ucx
 %exclude %{_datadir}/ucx/examples
 %doc README AUTHORS NEWS
