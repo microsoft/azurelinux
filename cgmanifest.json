@@ -3577,16 +3577,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "fish",
-          "version": "3.5.0",
-          "downloadUrl": "https://github.com/fish-shell/fish-shell/releases/download/3.5.0/fish-3.5.0.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "flac",
           "version": "1.4.3",
           "downloadUrl": "https://downloads.xiph.org/releases/flac/flac-1.4.3.tar.xz"
@@ -8121,8 +8111,8 @@
         "type": "other",
         "other": {
           "name": "kernel-rt",
-          "version": "5.15.55.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.55.1.tar.gz"
+          "version": "6.6.7.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.7.1.tar.gz"
         }
       }
     },
