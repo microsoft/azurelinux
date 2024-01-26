@@ -28717,8 +28717,8 @@
         "type": "other",
         "other": {
           "name": "ucx",
-          "version": "1.11.0",
-          "downloadUrl": "https://github.com/openucx/ucx/releases/download/v1.11.0/ucx-1.11.0.tar.gz"
+          "version": "1.15.0",
+          "downloadUrl": "https://github.com/openucx/ucx/releases/download/v1.15.0/ucx-1.15.0.tar.gz"
         }
       }
     },
