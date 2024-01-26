@@ -8,6 +8,7 @@ import (
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/isomakerlib"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -36,7 +37,7 @@ func main() {
 
 	logger.InitBestEffort(*logFilePath, *logLevel)
 
-	isoMaker := NewIsoMaker(
+	isoMaker := isomakerlib.NewIsoMaker(
 		*unattendedInstall,
 		*baseDirPath,
 		*buildDirPath,
