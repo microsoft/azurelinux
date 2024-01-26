@@ -28497,8 +28497,8 @@
         "type": "other",
         "other": {
           "name": "tpm2-pkcs11",
-          "version": "1.8.0",
-          "downloadUrl": "https://github.com/tpm2-software/tpm2-pkcs11/releases/download/1.8.0/tpm2-pkcs11-1.8.0.tar.gz"
+          "version": "1.9.0",
+          "downloadUrl": "https://github.com/tpm2-software/tpm2-pkcs11/releases/download/1.9.0/tpm2-pkcs11-1.9.0.tar.gz"
         }
       }
     },
@@ -28517,8 +28517,8 @@
         "type": "other",
         "other": {
           "name": "tpm2-tools",
-          "version": "5.3",
-          "downloadUrl": "https://github.com/tpm2-software/tpm2-tools/releases/download/5.3/tpm2-tools-5.3.tar.gz"
+          "version": "5.5",
+          "downloadUrl": "https://github.com/tpm2-software/tpm2-tools/releases/download/5.5/tpm2-tools-5.5.tar.gz"
         }
       }
     },
@@ -28527,8 +28527,8 @@
         "type": "other",
         "other": {
           "name": "tpm2-tss",
-          "version": "3.2.0",
-          "downloadUrl": "https://github.com/tpm2-software/tpm2-tss/releases/download/3.2.0/tpm2-tss-3.2.0.tar.gz"
+          "version": "4.0.1",
+          "downloadUrl": "https://github.com/tpm2-software/tpm2-tss/releases/download/4.0.1/tpm2-tss-4.0.1.tar.gz"
         }
       }
     },
