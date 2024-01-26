@@ -67,6 +67,9 @@ chown -R tss:tss /var/lib/tpm
 %{_mandir}/man7
 
 %changelog
+* Mon Jan 22 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 4.0.1-1
+- Updated to 4.0.1
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.4.6-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

@@ -2689,6 +2689,7 @@
                 "httpd",
                 "i2c-tools",
                 "iana-etc",
+                "ibmtpm",
                 "icu",
                 "initramfs",
                 "initscripts",

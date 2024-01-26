@@ -15,8 +15,8 @@ BuildRequires: openssl-devel
 BuildRequires: curl-devel
 BuildRequires: tpm2-tss-devel
 %if 0%{?with_check}
-# BuildRequires:  ibmtpm
-# BuildRequires:  systemd
+BuildRequires:  ibmtpm
+BuildRequires:  systemd
 %endif
 
 Requires: openssl
@@ -39,13 +39,13 @@ sed -i "/compatibility/a extern int BN_bn2binpad(const BIGNUM *a, unsigned char 
 
 %if 0%{?with_check}
 %check
-# if [ ! -f /dev/tpm0 ];then
-#    systemctl start ibmtpm_server.service
-#    export TPM2TOOLS_TCTI=mssim:host=localhost,port=2321
-#    tpm2_startup -c
-#    tpm2_pcrlist
-# fi
-# make %{?_smp_mflags} check
+if [ ! -f /dev/tpm0 ];then
+   systemctl start ibmtpm_server.service
+   export TPM2TOOLS_TCTI=mssim:host=localhost,port=2321
+   tpm2_startup -c
+   tpm2_pcrlist
+fi
+make %{?_smp_mflags} check
 %endif
 
 %files
@@ -55,6 +55,9 @@ sed -i "/compatibility/a extern int BN_bn2binpad(const BIGNUM *a, unsigned char 
 %{_datadir}/bash-completion/*
 
 %changelog
+* Mon Jan 22 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 5.5-1
+- Updated to 5.5
+
 * Tue Jan 18 2022 Daniel McIlvaney <damcilva@microsoft.com> - 4.3.2-1
 - Update to 4.3.2.
 - Verified license
