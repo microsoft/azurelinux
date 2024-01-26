@@ -59,13 +59,8 @@ Tools for TCG TPM2 PKCSv11 Software Stack
 
 %prep
 %autosetup -v -n %{name}-%{version}
-find .
-ls ..
 
 %build
-find .
-ls ..
-sh ./bootstrap
 
 %configure \
     --enable-unit
