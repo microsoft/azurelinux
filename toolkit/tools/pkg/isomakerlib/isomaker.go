@@ -315,7 +315,7 @@ func (im *IsoMaker) prepareWorkDirectory() {
 func (im *IsoMaker) copyStaticIsoRootFiles() {
 
 	if im.resourcesDirPath == "" && im.grubCfgPath == "" {
-		logger.Log.Panicf("Missing required parameters. Must specify either the resources directory or provide a grub.cfg.")
+		logger.Log.Panicf("missing required parameters. Must specify either the resources directory or provide a grub.cfg.")
 	}
 
 	if im.resourcesDirPath != "" {
@@ -338,19 +338,25 @@ func (im *IsoMaker) copyStaticIsoRootFiles() {
 	}
 }
 
-// copyArchitectureDependentIsoRootFiles copies the pre-built UEFI modules required
+// copyArchitectureDependentIsoRootFiles copies the pre-built BIOS modules required
 // to boot the ISO image.
 func (im *IsoMaker) copyArchitectureDependentIsoRootFiles() {
-	// If the resourceDirPath is empty, it means the user does not want the
-	// stock files that come from there. At the time of writing this comment
-	// , only the bios bootloaders are under that directory arch-specific
-	// subfolder.
-	// Likewise, if enableBiosBoot is set to false, it means the user does
-	// not want the bios bootloaders to be copied. Since the bootloaders are
-	// the only thing copied in this function, there is no need to proceed
-	// further.
+	// If the user does not want the generated ISO to have the BIOS bootloaders
+	// (which are copied from the im.resourcesDirPath folder), the user can
+	// either set im.resourcesDirPath to an empty string or enableBiosBoot to
+	// false. Given that there is nothing else under the 'architecture
+	// dependent` resource folder, if either of these two flags is set, we can
+	// return immediately.
+	// Note that setting resourcesDirPath to an empty string will affect other
+	// functions that copy non-architecture dependent files. Setting
+	// enableBiosBoot will not affect those on-architecture dependent files
+	// though.
 	if im.resourcesDirPath == "" || !im.enableBiosBoot {
 		return
+	}
+
+	if im.resourcesDirPath == "" && im.enableBiosBoot {
+		logger.Log.Panicf("missing required parameters. Must specify the resources directory if BIOS bootloaders are to be included.")
 	}
 
 	architectureDependentFilesDirectory := filepath.Join(im.resourcesDirPath, isoRootArchDependentDirPath, runtime.GOARCH, "*")
