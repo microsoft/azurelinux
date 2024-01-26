@@ -1,6 +1,6 @@
 Miscellaneous Topics
 ===
-## Prev: [Image Generation](4_image_generation.md)
+## Prev: [Image Generation](4_image_generation.md), Next: [Common Error Logs](6_logs.md)
 - [Chroot](#chroot)
 - [Makefile Advanced Components](#makefile-advanced-components)
     - [Config Tracking](#Config-Tracking)
@@ -130,7 +130,7 @@ For each entry in `$(go_tool_list)` the define `go_util_rule` is parsed and exec
 > ```
 
 ##### `$(TOOL_BINS_DIR)/%`
-Assuming local tool rebuilding is enabled with `REBUILD_TOOLS=y` (by default the go executables are pre-built as part of the toolkit) this target will match any go executable of the form `./out/tools/tool1, ./out/tools/tool2, ...`. 
+Assuming local tool rebuilding is enabled with `REBUILD_TOOLS=y` (by default the go executables are pre-built as part of the toolkit) this target will match any go executable of the form `./out/tools/tool1, ./out/tools/tool2, ...`.
 ```makefile
 $(TOOL_BINS_DIR)/%: $(go_common_files)
     cd $(TOOLS_DIR)/$* && \
@@ -158,9 +158,9 @@ Mariner distroless container images do not contain an RPM database. In order for
 rpm --query --all --query-format "%{NAME}\t%{VERSION}-%{RELEASE}\t%{INSTALLTIME}\t%{BUILDTIME}\t%{VENDOR}\t%{EPOCH}\t%{SIZE}\t%{ARCH}\t%{EPOCHNUM}\t%{SOURCERPM}\n"
 ```
 
-Note: The output of the above command also includes the `gpg-pubkey` which is not an RPM package. In order to filter it out, the output of the above command can be piped (i.e., `|`) to the following command: 
+Note: The output of the above command also includes the `gpg-pubkey` which is not an RPM package. In order to filter it out, the output of the above command can be piped (i.e., `|`) to the following command:
 ```bash
 grep -v gpg-pubkey
 ```
 
-## Prev: [Image Generation](4_image_generation.md)
+## Prev: [Image Generation](4_image_generation.md), Next: [Common Error Logs](6_logs.md)
