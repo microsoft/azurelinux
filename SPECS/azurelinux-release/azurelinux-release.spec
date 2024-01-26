@@ -54,10 +54,10 @@ EOF
 
 %files
 %defattr(-,root,root,-)
-%config(noreplace) %{_sysconfdir}/azurelinux-release
-%config(noreplace) %{_sysconfdir}/lsb-release
-%config(noreplace) %{_libdir}/os-release
-%config(noreplace) %{_sysconfdir}/os-release
+%{_sysconfdir}/azurelinux-release
+%{_sysconfdir}/lsb-release
+%{_libdir}/os-release
+%{_sysconfdir}/os-release
 %config(noreplace) %{_sysconfdir}/issue
 %config(noreplace) %{_sysconfdir}/issue.net
 
