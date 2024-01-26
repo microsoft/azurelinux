@@ -101,7 +101,7 @@ fi
 %changelog
 * Thu Jan 25 2024 Thien Trung Vuong <cblmargh@microsoft.com> - 1.9.15p5-1
 - Auto-upgrade to 1.9.15p5 - Update to latest version
-- Remove NETGROUP_QUERY patch - fix is added in 1.9.15p5
+- Remove NETGROUP_QUERY patch - upstream fix is added in 1.9.15p5
 
 * Tue Dec 19 2023 Andy Zaugg <azaugg@linkedin.com> - 1.9.14p3-2
 - Add patch to bug fix support for NETGROUP_QUERY
