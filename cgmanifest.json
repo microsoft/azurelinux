@@ -14053,8 +14053,8 @@
         "type": "other",
         "other": {
           "name": "nodejs",
-          "version": "16.20.2",
-          "downloadUrl": "https://nodejs.org/download/release/v16.20.2/node-v16.20.2.tar.xz"
+          "version": "20.10.0",
+          "downloadUrl": "https://nodejs.org/download/release/v20.10.0/node-v20.10.0.tar.xz"
         }
       }
     },
