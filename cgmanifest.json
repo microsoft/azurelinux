@@ -3547,16 +3547,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "finger",
-          "version": "0.17",
-          "downloadUrl": "http://ftp.linux.org.uk/pub/linux/Networking/netkit/bsd-finger-0.17.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "fio",
           "version": "3.30",
           "downloadUrl": "https://brick.kernel.dk/snaps/fio-3.30.tar.bz2"
@@ -3580,16 +3570,6 @@
           "name": "firewalld",
           "version": "2.0.2",
           "downloadUrl": "https://github.com/firewalld/firewalld/releases/download/v2.0.2/firewalld-2.0.2.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "fish",
-          "version": "3.5.0",
-          "downloadUrl": "https://github.com/fish-shell/fish-shell/releases/download/3.5.0/fish-3.5.0.tar.xz"
         }
       }
     },
@@ -6510,8 +6490,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "6.6.2.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.2.1.tar.gz"
+          "version": "6.6.12.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.12.1.tar.gz"
         }
       }
     },
@@ -8091,8 +8071,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "6.6.2.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.2.1.tar.gz"
+          "version": "6.6.12.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.12.1.tar.gz"
         }
       }
     },
@@ -8111,8 +8091,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "6.6.2.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.2.1.tar.gz"
+          "version": "6.6.12.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.12.1.tar.gz"
         }
       }
     },
@@ -8131,8 +8111,8 @@
         "type": "other",
         "other": {
           "name": "kernel-rt",
-          "version": "5.15.55.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.55.1.tar.gz"
+          "version": "6.6.7.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.7.1.tar.gz"
         }
       }
     },
@@ -26795,8 +26775,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-timers",
-          "version": "4.3.2",
-          "downloadUrl": "https://github.com/socketry/timers/archive/refs/tags/v4.3.2.tar.gz"
+          "version": "4.3.5",
+          "downloadUrl": "https://github.com/socketry/timers/archive/refs/tags/v4.3.5.tar.gz"
         }
       }
     },
@@ -28737,8 +28717,8 @@
         "type": "other",
         "other": {
           "name": "ucx",
-          "version": "1.11.0",
-          "downloadUrl": "https://github.com/openucx/ucx/releases/download/v1.11.0/ucx-1.11.0.tar.gz"
+          "version": "1.15.0",
+          "downloadUrl": "https://github.com/openucx/ucx/releases/download/v1.15.0/ucx-1.15.0.tar.gz"
         }
       }
     },
