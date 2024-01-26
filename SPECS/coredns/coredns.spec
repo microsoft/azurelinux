@@ -39,9 +39,11 @@ BuildRequires:  golang >= 1.12
 CoreDNS is a fast and flexible DNS server.
 
 %prep
+%setup -q
+%patch0 -p1
 # create vendor folder from the vendor tarball and set vendor mode
 tar -xf %{SOURCE1} --no-same-owner
-%autosetup -p1
+%patch1 -p1
 
 %build
 export BUILDOPTS="-mod=vendor -v"
