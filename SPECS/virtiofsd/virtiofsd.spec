@@ -16,7 +16,7 @@ Source0:        https://gitlab.com/virtio-fs/virtiofsd/-/archive/v%{version}/%{n
 #   tar -czf ../%{name}-v%{version}-cargo.tar.gz vendor/
 Source1:        %{name}-v%{version}-cargo.tar.gz
 Source2:        config.toml
-Source3:        %{name}-v%{version}-cargo-CVE-2023-41051-patch.tar.gz
+Source3:        %{name}-v%{version}-cargo-CVE-2023-41051-vendor.tar.gz
 # Updates vm-memory to 0.12.2. Remove once virtiofsd gets updated to a version >= 1.9.0: 
 # https://gitlab.com/virtio-fs/virtiofsd/-/blob/v1.9.0/Cargo.toml
 Patch0: CVE-2023-41051.patch
