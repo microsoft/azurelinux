@@ -1,15 +1,14 @@
-Summary:        Mellanox firmware burning tool
+Summary:        Mellanox firmware burning application
 Name:           mstflint
-Version:        4.21.0
-Release:        4%{?dist}
+Version:        4.26.0
+Release:        1%{?dist}
 License:        GPLv2 OR BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://github.com/Mellanox/%{name}
-Source0:        https://github.com/Mellanox/%{name}/releases/download/v%{version}-1/%{name}-%{version}-1.tar.gz
-Patch4:         add-default-link-flags-for-shared-libraries.patch
-Patch6:         replace-mlxfwreset-with-mstfwreset-in-mstflint-message.patch
+Source0:        https://github.com/Mellanox/%{name}/releases/download/v%{version}-%{release}/%{name}-%{version}-%{release}.tar.gz
+ExclusiveArch: i386 i486 i586 i686 x86_64 ia64 ppc ppc64 ppc64le arm64 aarch64
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  boost-devel
@@ -30,34 +29,105 @@ This package contains firmware update tool, vpd dump and register dump tools
 for network adapters based on Mellanox Technologies chips.
 
 %prep
-%autosetup -p1
-
-find . -type f -iname '*.[ch]' -exec chmod a-x '{}' ';'
-find . -type f -iname '*.cpp' -exec chmod a-x '{}' ';'
+%setup -q
 
 %build
-./autogen.sh
-%configure --enable-fw-mgr --enable-adb-generic-tools
-%make_build
+
+MSTFLINT_VERSION_STR="%{name} %{version}-%{release}"
+%configure --enable-fw-mgr --enable-adb-generic-tools MSTFLINT_VERSION_STR="${MSTFLINT_VERSION_STR}"
+make
 
 %install
-%make_install
-# Remove the devel files that we don't ship
-rm -fr %{buildroot}%{_includedir}
-find %{buildroot} -type f -name "*.la" -delete -print
-find %{buildroot} -type f -name '*.a' -delete
+rm -fr %{buildroot}
+make DESTDIR=%{buildroot} install
+# remove unpackaged files from the buildroot
+rm -f %{buildroot}/%{_libdir}/*.la
+# create softlinks to old mtcr header and lib locations
+# link mtcr_ul to old location
+mkdir -p %{buildroot}/%{_includedir}/mtcr_ul
+ln -s %{_includedir}/mstflint/mtcr.h %{buildroot}/%{_includedir}/mtcr_ul/mtcr.h
+ln -s %{_includedir}/mstflint/mtcr_com_defs.h %{buildroot}/%{_includedir}/mtcr_ul/mtcr_com_defs.h
+# link mtcr_ul to old lib path
+ln -s %{_libdir}/mstflint/libmtcr_ul.a %{buildroot}/%{_libdir}/libmtcr_ul.a 
+
+%clean
+rm -fr %{buildroot}
 
 %files
-%license COPYING
-%doc README
-%{_bindir}/*
-%{_sysconfdir}/mstflint
-%{_libdir}/mstflint
+%defattr(-,root,root)
+%{_bindir}/mstmread
+%{_bindir}/mstmwrite
+%{_bindir}/mstflint
+%{_bindir}/mstregdump
+%{_bindir}/mstmtserver
+%{_bindir}/mstvpd
+%{_bindir}/mstmcra
+%{_bindir}/mstconfig
+%{_bindir}/mstfwreset
+%{_bindir}/mstcongestion
+%{_bindir}/mstprivhost
+%{_bindir}/mstfwtrace
+%{_bindir}/mstresourcedump
+%{_bindir}/mstresourceparse
+ %{_bindir}/mstfwmanager
+ %{_bindir}/mstarchive
+%{CONF_DIR}/ca-bundle.crt
+ %{_bindir}/mstreg
+ %{_bindir}/mstlink
 
+%{_includedir}/mstflint/cmdif/icmd_cif_common.h
+%{_includedir}/mstflint/cmdif/icmd_cif_open.h
+%{_includedir}/mstflint/common/compatibility.h
+%{_includedir}/mstflint/mtcr.h
+%{_includedir}/mstflint/mtcr_com_defs.h
+%{_includedir}/mstflint/mtcr_mf.h
+%{_includedir}/mstflint/tools_layouts/adb_to_c_utils.h
+%{_includedir}/mstflint/tools_layouts/icmd_layouts.h
+%{_includedir}/mtcr_ul/mtcr.h
+%{_includedir}/mtcr_ul/mtcr_com_defs.h
+%{_libdir}/mstflint/libmtcr_ul.a
+%{_libdir}/libmtcr_ul.a
+
+%{mstflint_python_tools}/tools_version.py
+%{mstflint_python_tools}/mft_logger.py
+%{mstflint_python_tools}/mlxpci/*.py
+%{mstflint_python_tools}/mstfwtrace/*.py
+%{mstflint_python_tools}/mstfwreset/mstfwreset.py
+%{mstflint_python_tools}/mstfwreset/mlxfwresetlib/*.py
+%{mstflint_python_tools}/mtcr.py
+%{mstflint_python_tools}/cmtcr.so
+%{mstflint_python_tools}/cmdif.py
+%{mstflint_python_tools}/ccmdif.so
+%{mstflint_python_tools}/regaccess.py
+%{mstflint_python_tools}/regaccess_hca_ext_structs.py
+%{mstflint_python_tools}/regaccess_switch_ext_structs.py
+%{mstflint_python_tools}/rreg_access.so
+%{mstflint_python_tools}/dev_mgt.py
+%{mstflint_python_tools}/c_dev_mgt.so
+%{mstflint_python_tools}/mstprivhost/mstprivhost.py
+%{mstflint_sdkdir}/libresource_dump_sdk.so
+%{mstflint_python_tools}/resourcetools/*.py
+%{mstflint_python_tools}/resourcetools/segments/*.py
+
+%{mstflint_python_tools}/resourcetools/resourcedump_lib/*.py
+%{mstflint_python_tools}/resourcetools/resourcedump_lib/commands/*.py
+%{mstflint_python_tools}/resourcetools/resourcedump_lib/cresourcedump/*.py
+%{mstflint_python_tools}/resourcetools/resourcedump_lib/fetchers/*.py
+%{mstflint_python_tools}/resourcetools/resourcedump_lib/filters/*.py
+%{mstflint_python_tools}/resourcetools/resourcedump_lib/utils/*.py
+%{mstflint_python_tools}/resourcetools/resourcedump_lib/validation/*.py
+
+%{mstflint_python_tools}/resourcetools/resourceparse_lib/*.py
+%{mstflint_python_tools}/resourcetools/resourceparse_lib/parsers/*.py
+%{mstflint_python_tools}/resourcetools/resourceparse_lib/resource_data/*.py
+%{mstflint_python_tools}/resourcetools/resourceparse_lib/utils/*.py
 %{_datadir}/mstflint
 %{_mandir}/man1/*
 
 %changelog
+* Mon Jan 29 2024 Juan Camposeco <juanarturoc@microsoft.com> - 4.26.0-1
+- Upgrade to version 4.26.0-1 from 4.21.0-4
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.21.0-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
