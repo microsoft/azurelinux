@@ -18,7 +18,7 @@
 Summary:        CLI for managing resources in InfluxDB
 Name:           influx-cli
 Version:        2.6.1
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -40,7 +40,7 @@ Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
 Source1:        %{name}-%{version}-vendor.tar.gz
-BuildRequires:  golang <= 1.18.8
+BuildRequires:  golang
 BuildRequires:  systemd-rpm-macros
 
 %description
@@ -81,6 +81,9 @@ bin/influx completion zsh > %{buildroot}/%{_datadir}/zsh/site-functions/_influx
 %{_datadir}/zsh
 
 %changelog
+* Fri Jan 26 2024 Andrew Phelps <anphel@microsoft.com> - 2.6.1-14
+- Remove restriction on golang BR version
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.6.1-13
 - Bump release to rebuild with go 1.20.10
 
