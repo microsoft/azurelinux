@@ -2374,7 +2374,6 @@
                 "SymCrypt",
                 "SymCrypt-OpenSSL",
                 "tensorflow",
-                "terraform",
                 "tinyxml2",
                 "toml11",
                 "tracelogging",
