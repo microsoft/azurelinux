@@ -45,7 +45,7 @@ Name:           ca-certificates
 # When updating, "Epoch, "Version", AND "Release" tags must be updated in the "prebuilt-ca-certificates*" packages as well.
 Epoch:          1
 Version:        3.0.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -324,6 +324,9 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %{_bindir}/bundle2pem.sh
 
 %changelog
+* Sat Jan 27 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0.0-3
+- Updating Microsoft trusted root CAs.
+
 * Fri Jan 19 2024 Andrew Phelps <anphel@microsoft.com> - 3.0.0-2
 - Use asciidoc binary instead of asciidoc.py
 
