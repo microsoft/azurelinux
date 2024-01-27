@@ -3,7 +3,7 @@ Name:           prebuilt-ca-certificates
 # When updating, "Epoch, "Version", AND "Release" tags must be updated in the "ca-certificates" package as well.
 Epoch:          1
 Version:        2.0.0
-Release:        14%{?dist}
+Release:        15%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -49,6 +49,9 @@ find %{buildroot} -name README -delete
 %{_sysconfdir}/pki/java/cacerts
 
 %changelog
+* Fri Jan 26 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.0-15
+- Making 'Release' match with 'ca-certificates'
+
 * Tue Dec 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1:2.0.0-14
 - Making 'Release' match with 'ca-certificates'.
 
