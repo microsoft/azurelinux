@@ -19,6 +19,7 @@ BuildRequires:  msopenjdk-11
 BuildRequires:  python3
 BuildRequires:  unzip
 BuildRequires:  zip
+BuildRequires:  ca-certificates
 Requires:       msopenjdk-11
 
 %description
