@@ -3,7 +3,8 @@
 # https://fedoraproject.org/wiki/Changes/No_more_automagic_Python_bytecompilation_phase_2
 %global _python_bytecompile_extra 1
 # uncomment and add '%' to use the prereltag for pre-releases
-# %%global prereltag qa3
+# %%global prereltag rc0
+
 ##-----------------------------------------------------------------------------
 ## All argument definitions should be placed here and keep them sorted
 ##
@@ -54,7 +55,7 @@
 %ifnarch x86_64
 %global _without_tcmalloc --without-tcmalloc
 %endif
-# Use same malloc that previous CBL-Mariner used
+# Use same malloc that Azure Linux 2.0 used
 %global _without_tcmalloc --without-tcmalloc
 # ocf
 # if you wish to compile an rpm without the OCF resource agents...
@@ -64,12 +65,13 @@
 # if you wish to build rpms without server components, compile like this
 # rpmbuild -ta @PACKAGE_NAME@-@PACKAGE_VERSION@.tar.gz --without server
 %{?_without_server:%global _without_server --without-server}
-# disable server components forcefully as rhel <= 6
+# Disabling 'server' subpackage for CBL-Mariner as it's currently unnecessary.
 %global _without_server --without-server
 # syslog
 # if you wish to build rpms without syslog logging, compile like this
 # rpmbuild -ta @PACKAGE_NAME@-@PACKAGE_VERSION@.tar.gz --without syslog
 %{?_without_syslog:%global _without_syslog --disable-syslog}
+%global _without_syslog --disable-syslog
 # tsan
 # if you wish to compile an rpm with thread sanitizer...
 # rpmbuild -ta @PACKAGE_NAME@-@PACKAGE_VERSION@.tar.gz --with tsan
@@ -81,9 +83,6 @@
 ##-----------------------------------------------------------------------------
 ## All %%global definitions should be placed here and keep them sorted
 ##
-# selinux booleans whose defalut value needs modification
-# these booleans will be consumed by "%%selinux_set_booleans" macro.
-%global _with_systemd true
 %global _with_firewalld --enable-firewalld
 %if 0%{?_tmpfilesdir:1}
 %global _with_tmpfilesdir --with-tmpfilesdir=%{_tmpfilesdir}
@@ -98,10 +97,8 @@
 %global _with_gnfs %{nil}
 %global _without_ocf --without-ocf
 %endif
-%global _usepython3 1
 %global _pythonver 3
-# From https://fedoraproject.org/wiki/Packaging:Python#Macros
-%if ( 0%{?_with_systemd:1} )
+
 %global service_start()   %{_bindir}/systemctl --quiet start %1.service || : \
 %{nil}
 %global service_stop()    %{_bindir}/systemctl --quiet stop %1.service || :\
@@ -114,24 +111,7 @@
 %global glusterta_svcfile %{_unitdir}/gluster-ta-volume.service
 %global glustereventsd_svcfile %{_unitdir}/glustereventsd.service
 %global glusterfssharedstorage_svcfile %{_unitdir}/glusterfssharedstorage.service
-%else
-%global systemd_post()  %{_sbindir}/chkconfig --add %1 >/dev/null 2>&1 || : \
-%{nil}
-%global systemd_preun() %{_sbindir}/chkconfig --del %1 >/dev/null 2>&1 || : \
-%{nil}
-%global systemd_postun_with_restart() %{_sbindir}/service %1 condrestart >/dev/null 2>&1 || : \
-%{nil}
-%global service_start()   %{_sbindir}/service %1 start >/dev/null 2>&1 || : \
-%{nil}
-%global service_stop()    %{_sbindir}/service %1 stop >/dev/null 2>&1 || : \
-%{nil}
-%global service_install() install -D -p -m 0755 %1.init %{buildroot}%2 \
-%{nil}
-# can't seem to make a generic macro that works
-%global glusterd_svcfile   %{_sysconfdir}/init.d/glusterd
-%global glusterfsd_svcfile %{_sysconfdir}/init.d/glusterfsd
-%global glustereventsd_svcfile %{_sysconfdir}/init.d/glustereventsd
-%endif
+
 %{!?_pkgdocdir: %global _pkgdocdir %{_docdir}/%{name}-%{version}}
 # modern rpm and current Fedora do not generate requires when the
 # provides are filtered
@@ -140,12 +120,6 @@
 %if "%{bashcompdir}" == ""
 %global bashcompdir ${sysconfdir}/bash_completion.d
 %endif
-# Skip regression-tests because they previously were excluded in
-# CBL-Mariner glusterfs and the new version introduces a dependency
-# (dbench)
-%global _without_regression_tests true
-# Explicitly require rpcgen
-%global _require_rpcgen true
 ##-----------------------------------------------------------------------------
 ## All package definitions should be placed here and keep them sorted
 ##
@@ -172,8 +146,8 @@ BuildRoot:        %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 BuildRequires:  bison
 BuildRequires:  flex
 BuildRequires:  gcc
-BuildRequires:  libaio-devel
 BuildRequires:  libacl-devel
+BuildRequires:  libaio-devel
 BuildRequires:  libuuid-devel
 BuildRequires:  libtool
 BuildRequires:  libxml2-devel
@@ -209,12 +183,8 @@ BuildRequires:  libtsan
 %if ( 0%{!?_without_linux_io_uring:1} )
 BuildRequires:  liburing-devel
 %endif
-%if 0%{?_require_rpcgen:1}
 BuildRequires:  rpcgen
-%endif
-%if ( 0%{?_with_systemd:1} )
 BuildRequires:  systemd
-%endif
 
 Requires:         libgfrpc0%{?_isa} = %{version}-%{release}
 Requires:         libgfxdr0%{?_isa} = %{version}-%{release}
@@ -224,9 +194,7 @@ Requires(pre):    shadow-utils
 %if ( 0%{!?_without_tcmalloc:1} )
 Requires:         gperftools-libs%{?_isa}
 %endif
-%if ( 0%{?_with_systemd:1} )
 %{?systemd_requires}
-%endif
 
 Obsoletes:      %{name}-common < %{version}-%{release}
 Obsoletes:      %{name}-core < %{version}-%{release}
@@ -552,11 +520,6 @@ This package provides libgfxdr.so.
 %package -n python%{_pythonver}-gluster
 Summary:          GlusterFS python library
 Requires:         python%{_pythonver}
-%if ( ! %{_usepython3} )
-%{?python_provide:%python_provide python-gluster}
-Provides:         python-gluster = %{version}-%{release}
-Obsoletes:        python-gluster < 3.10
-%endif
 
 %description -n python%{_pythonver}-gluster
 GlusterFS is a distributed file-system capable of scaling to several
@@ -568,24 +531,6 @@ Much of the code in GlusterFS is in user space and easily manageable.
 
 This package contains the python modules of GlusterFS and own gluster
 namespace.
-
-%if ( 0%{!?_without_regression_tests:1} )
-%package regression-tests
-Summary:          Development Tools
-Requires:         %{name}%{?_isa} = %{version}-%{release}
-Requires:         %{name}-fuse%{?_isa} = %{version}-%{release}
-Requires:         %{name}-server%{?_isa} = %{version}-%{release}
-## thin provisioning support
-Requires:         lvm2 >= 2.02.89
-Requires:         perl(App::Prove) perl(Test::Harness) gcc util-linux-ng
-Requires:         python%{_pythonver}
-Requires:         attr dbench file git libacl-devel net-tools
-Requires:         nfs-utils xfsprogs yajl psmisc bc
-
-%description regression-tests
-The Gluster Test Framework, is a suite of scripts used for
-regression testing of Gluster.
-%endif
 
 %if ( 0%{!?_without_ocf:1} )
 %package resource-agents
@@ -625,14 +570,7 @@ Requires:         libgfapi0%{?_isa} = %{version}-%{release}
 Requires:         %{name}-client-xlators%{?_isa} = %{version}-%{release}
 # lvm2 for snapshot, and nfs-utils and rpcbind/portmap for gnfs server
 Requires:         lvm2
-%if ( 0%{?_with_systemd:1} )
 %{?systemd_requires}
-%else
-Requires(post):   %{_sbindir}/chkconfig
-Requires(preun):  %{_sbindir}/service
-Requires(preun):  %{_sbindir}/chkconfig
-Requires(postun): %{_sbindir}/service
-%endif
 %if (0%{?_with_firewalld:1})
 # we install firewalld rules, so we need to have the directory owned
 # not on RHEL because firewalld-filesystem appeared in 7.3
@@ -688,9 +626,7 @@ Requires:         %{name}-server%{?_isa} = %{version}-%{release}
 Requires:         python%{_pythonver} python%{_pythonver}-prettytable
 Requires:         python%{_pythonver}-gluster = %{version}-%{release}
 Requires:         python%{_pythonver}-requests
-%if ( 0%{?_with_systemd:1} )
 %{?systemd_requires}
-%endif
 
 %description events
 GlusterFS Events
@@ -1176,9 +1112,7 @@ exit 0
 %exclude %{_sysconfdir}/glusterfs/thin-arbiter.vol
 %endif
 
-%if ( 0%{?_with_systemd:1} )
 %{_unitdir}/gluster-ta-volume.service
-%endif
 
 %if ( 0%{!?_without_georeplication:1} )
 %files geo-replication
@@ -1236,27 +1170,13 @@ exit 0
 %files -n python%{_pythonver}-gluster
 # introducing glusterfs module in site packages.
 # so that all other gluster submodules can reside in the same namespace.
-%if ( %{_usepython3} )
 %dir %{python3_sitelib}/gluster
      %{python3_sitelib}/gluster/__init__.*
      %{python3_sitelib}/gluster/__pycache__
      %{python3_sitelib}/gluster/cliutils
-%else
-%dir %{python2_sitelib}/gluster
-     %{python2_sitelib}/gluster/__init__.*
-     %{python2_sitelib}/gluster/cliutils
-%endif
 
-%if ( 0%{!?_without_regression_tests:1} )
-%files regression-tests
-%dir %{_datadir}/glusterfs
-     %{_datadir}/glusterfs/run-tests.sh
-     %{_datadir}/glusterfs/tests
-%exclude %{_datadir}/glusterfs/tests/vagrant
-%else
 %exclude %{_datadir}/glusterfs/run-tests.sh
 %exclude %{_datadir}/glusterfs/tests
-%endif
 
 %if ( 0%{!?_without_server:1} )
 %files ganesha
@@ -1299,9 +1219,7 @@ exit 0
 %if ( 0%{_for_fedora_koji_builds} )
 %glusterfsd_svcfile
 %endif
-%if ( 0%{?_with_systemd:1} )
 %glusterfssharedstorage_svcfile
-%endif
 
 # binaries
 %{_sbindir}/glusterd
@@ -1414,11 +1332,9 @@ exit 0
 %dir %{_libexecdir}/glusterfs
 %dir %{_datadir}/glusterfs/scripts
      %{_datadir}/glusterfs/scripts/stop-all-gluster-processes.sh
-%if ( 0%{?_with_systemd:1} )
      %{_libexecdir}/glusterfs/mount-shared-storage.sh
      %{_datadir}/glusterfs/scripts/control-cpu-load.sh
      %{_datadir}/glusterfs/scripts/control-mem.sh
-%endif
 
 # Incrementalapi
      %{_libexecdir}/glusterfs/glusterfind
@@ -1443,11 +1359,7 @@ exit 0
 %{_sbindir}/glustereventsd
 %{_sbindir}/gluster-eventsapi
 %{_datadir}/glusterfs/scripts/eventsdash.py*
-%if ( 0%{?_with_systemd:1} )
 %{_unitdir}/glustereventsd.service
-%else
-%{_sysconfdir}/init.d/glustereventsd
-%endif
 %endif
 
 %changelog
