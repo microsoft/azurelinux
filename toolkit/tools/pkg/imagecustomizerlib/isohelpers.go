@@ -5,23 +5,21 @@ package imagecustomizerlib
 
 import (
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
-	// "time"
 
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safemount"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/isomakerlib"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/isomakerlib"
 )
 
 var (
-	rootfsContainerSizeInMB int64
 	grubCfgTemplate = `set default="0"
 set timeout=0
 
@@ -47,34 +45,16 @@ menuentry "Mariner Baremetal Iso" {
 	dracutConfig = `add_dracutmodules+=" dmsquash-live "
 add_drivers+=" overlay "
 `
-// 	dracutNoPromptPatch = `--- dmsquash-live-root.sh-ori	2023-12-19 16:24:38.973303242 -0800
-// +++ dmsquash-live-root.sh	2023-12-19 16:28:45.053140504 -0800
-// @@ -25,6 +25,7 @@
-//  getargbool 0 rd.live.ram -d -y live_ram && live_ram="yes"
-//  getargbool 0 rd.live.overlay.reset -d -y reset_overlay && reset_overlay="yes"
-//  getargbool 0 rd.live.overlay.readonly -d -y readonly_overlay && readonly_overlay="--readonly" || readonly_overlay=""
-// +getargbool 0 rd.live.overlay.noprompt -d -y no_tmp_overlay_prompt && no_tmp_overlay_prompt="--noprompt" || no_tmp_overlay_prompt=""
-//  overlay=$(getarg rd.live.overlay -d overlay)
-//  getargbool 0 rd.writable.fsimg -d -y writable_fsimg && writable_fsimg="yes"
-//  overlay_size=$(getarg rd.live.overlay.size=)
-// @@ -185,7 +186,7 @@
-//      fi
- 
-//      if [ -z "$setup" -o -n "$readonly_overlay" ]; then
-// -        if [ -n "$setup" ]; then
-// +        if [ -n "$setup" -o -n "$no_tmp_overlay_prompt" ]; then
-//              warn "Using temporary overlay."
-//          elif [ -n "$devspec" -a -n "$pathspec" ]; then
-//              [ -z "$m" ] \
-// `
 )
 
-// IsoMaker builds ISO images and populates them with packages and files required by the installer.
-type IsoArtifactExtractor struct {
+type IsoWorkingDirs struct {
 	buildDir       string
 	tmpDir         string
 	isomakerTmpDir string
 	outDir 	       string
+}
+
+type IsoArtifacts struct {
 	bootx64EfiPath string
 	grubx64EfiPath string
 	grubCfgPath    string
@@ -84,6 +64,12 @@ type IsoArtifactExtractor struct {
 	squashfsPath   string
 }
 
+// IsoMaker builds ISO images and populates them with packages and files required by the installer.
+type IsoArtifactExtractor struct {
+	workingDirs    IsoWorkingDirs
+	artifacts      IsoArtifacts
+}
+
 // runs dracut against a modified rootfs to create the initrd file.
 func (iae* IsoArtifactExtractor) generateInitrd(writeableRootfsImage string, isoMakerArtifactsStagingDirWithinRWImage string) error {
 
@@ -91,14 +77,14 @@ func (iae* IsoArtifactExtractor) generateInitrd(writeableRootfsImage string, iso
 
 	// image mount folder
 	writeableRootfsMountDir := "writable-rootfs-mount"
-	writeableRootfsMountFullDir := filepath.Join(iae.tmpDir, writeableRootfsMountDir)
+	writeableRootfsMountFullDir := filepath.Join(iae.workingDirs.tmpDir, writeableRootfsMountDir)
 
 	// initrd paths
 	initrdFileWithinRWImage := "/initrd.img"
 	initrdFileWithinBuildMachine := filepath.Join(writeableRootfsMountFullDir, initrdFileWithinRWImage)
 
 	// connect
-	writeableRootfsConnection, _, err := connectToExistingImage(writeableRootfsImage, iae.tmpDir, writeableRootfsMountDir, true)
+	writeableRootfsConnection, _, err := connectToExistingImage(writeableRootfsImage, iae.workingDirs.tmpDir, writeableRootfsMountDir, true)
 	if err != nil {
 		return err
 	}
@@ -108,24 +94,24 @@ func (iae* IsoArtifactExtractor) generateInitrd(writeableRootfsImage string, iso
 
 		dracutParams := []string{
 			initrdFileWithinRWImage,
-			"--kver", iae.kernelVersion,
+			"--kver", iae.artifacts.kernelVersion,
 			"--filesystems", "squashfs",
 			"--include", isoMakerArtifactsStagingDirWithinRWImage, "/boot" }
 
 		// `dracut` emits output to stderr even if there are no errors.
-		return shell.ExecuteLiveWithCallback(onStdOutSilent, onStdErrSilent, false, "dracut", dracutParams...)
+		return shell.ExecuteLive(false, "dracut", dracutParams...)
 	})
 	if err != nil {
 		return fmt.Errorf("failed to run dracut (%v)", err)
 	}
 
-	generatedInitrdPath := filepath.Join(iae.outDir, "initrd.img")
+	generatedInitrdPath := filepath.Join(iae.workingDirs.outDir, "initrd.img")
 	err = copyFile(initrdFileWithinBuildMachine, generatedInitrdPath)
 	if err != nil {
 		logger.Log.Infof("--isohelpers.go - failed to copy generated initrd.")
 		return err
 	}
-	iae.initrdPath = generatedInitrdPath
+	iae.artifacts.initrdPath = generatedInitrdPath
 
 	err = writeableRootfsConnection.CleanClose()
 	if err != nil {
@@ -207,7 +193,7 @@ func (iae* IsoArtifactExtractor) extractIsoArtifactsFromBoot(bootDevicePath stri
 
 	logger.Log.Infof("extracting artifacts from the boot partition...")
 
-	loopDevMountFullDir := filepath.Join(iae.buildDir, "readonly-boot-mount")
+	loopDevMountFullDir := filepath.Join(iae.workingDirs.buildDir, "readonly-boot-mount")
 	logger.Log.Infof("--isohelpers.go - mounting %s(%s) to %s", bootDevicePath, bootfsType, loopDevMountFullDir)
 
 	fullDiskBootMount, err := safemount.NewMount(bootDevicePath, loopDevMountFullDir, bootfsType, 0, "", true)
@@ -217,16 +203,16 @@ func (iae* IsoArtifactExtractor) extractIsoArtifactsFromBoot(bootDevicePath stri
 	defer fullDiskBootMount.Close()
 
 	sourceBootx64EfiPath := filepath.Join(loopDevMountFullDir, "/EFI/BOOT/bootx64.efi")
-	iae.bootx64EfiPath = filepath.Join(iae.outDir, "bootx64.efi")
-	err = copyFile(sourceBootx64EfiPath, iae.bootx64EfiPath)
+	iae.artifacts.bootx64EfiPath = filepath.Join(iae.workingDirs.outDir, "bootx64.efi")
+	err = copyFile(sourceBootx64EfiPath, iae.artifacts.bootx64EfiPath)
 	if err != nil {
 		logger.Log.Infof("--isohelpers.go - extractIsoArtifactsFromBoot() - failed to copy %v", sourceBootx64EfiPath)
 		return err
 	}
 
 	sourceGrubx64EfiPath := filepath.Join(loopDevMountFullDir, "/EFI/BOOT/grubx64.efi")
-	iae.grubx64EfiPath = filepath.Join(iae.outDir, "grubx64.efi")
-	err = copyFile(sourceGrubx64EfiPath, iae.grubx64EfiPath)
+	iae.artifacts.grubx64EfiPath = filepath.Join(iae.workingDirs.outDir, "grubx64.efi")
+	err = copyFile(sourceGrubx64EfiPath, iae.artifacts.grubx64EfiPath)
 	if err != nil {
 		logger.Log.Infof("--isohelpers.go - extractIsoArtifactsFromBoot() - failed to copy %v", sourceGrubx64EfiPath)
 		return err
@@ -241,7 +227,7 @@ func (iae* IsoArtifactExtractor) createWriteableRootfs(rootfsDevicePath, rootfsT
 
 	// -- mount .vhdx ---------------------------------------------------------
 
-	srcLoopDevMountFullDir := filepath.Join(iae.buildDir, "readonly-rootfs-mount")
+	srcLoopDevMountFullDir := filepath.Join(iae.workingDirs.buildDir, "readonly-rootfs-mount")
 	logger.Log.Infof("--isohelpers.go - mounting %s(%s) to %s", rootfsDevicePath, rootfsType, srcLoopDevMountFullDir)
 
 	srcLoopDevMount, err := safemount.NewMount(rootfsDevicePath, srcLoopDevMountFullDir, rootfsType, 0, "", true)
@@ -254,9 +240,14 @@ func (iae* IsoArtifactExtractor) createWriteableRootfs(rootfsDevicePath, rootfsT
 
 	logger.Log.Infof("--isohelpers.go - determining the size of new rootfs")
 	duParams := []string{"-sh", srcLoopDevMountFullDir}
-	err = shell.ExecuteLiveWithCallback(processDuOutputCallback, onStdOutSilent, false, "du", duParams...)
+	stdoutText, _, err := shell.Execute("du", duParams...)
 	if err != nil {
 		logger.Log.Infof("--isohelpers.go - failed to determine the size of the rootfs")
+		return err
+	}
+	rootfsContainerSizeInMB, err := getSizeEstimate(stdoutText)
+	if err != nil {
+		logger.Log.Infof("--isohelpers.go - failed to estimate the the size of the rootfs from the output of 'du'.")
 		return err
 	}
 	logger.Log.Infof("--isohelpers.go - rootfs size = %v", rootfsContainerSizeInMB)
@@ -271,7 +262,7 @@ func (iae* IsoArtifactExtractor) createWriteableRootfs(rootfsDevicePath, rootfsT
 	ddBlockCountParam := "count=" + strconv.FormatInt(rootfsContainerSizeInMB, 10)
 	ddParams := []string{"if=/dev/zero", ddOutputParam, "bs=1M", ddBlockCountParam}
 	// `dd` emits output to stderr even if there are no errors.
-	err = shell.ExecuteLiveWithCallback(onStdOutSilent, onStdErrSilent, false, "dd", ddParams...)
+	err = shell.ExecuteLive(false, "dd", ddParams...)
 	if err != nil {
 		logger.Log.Infof("--isohelpers.go - failed to create writeable rootfs image.")
 		return err
@@ -280,7 +271,7 @@ func (iae* IsoArtifactExtractor) createWriteableRootfs(rootfsDevicePath, rootfsT
 	logger.Log.Infof("--isohelpers.go - formatting new image file")
 	mkfsExt4Params := []string{"-b", "4096", dstRootfsImage}
 	// `mkfs.ext4` emits output to stderr even if there are no errors.
-	err = shell.ExecuteLiveWithCallback(onStdOutSilent, onStdErrSilent, false, "mkfs.ext4", mkfsExt4Params...)
+	err = shell.ExecuteLive(false, "mkfs.ext4", mkfsExt4Params...)
 	if err != nil {
 		logger.Log.Infof("--isohelpers.go - failed to format new writeable rootfs image.")
 		return err
@@ -297,7 +288,7 @@ func (iae* IsoArtifactExtractor) createWriteableRootfs(rootfsDevicePath, rootfsT
 
 	// -- mount the writeable image -------------------------------------------
 
-	dstLoopDdevMountFullDir := filepath.Join(iae.tmpDir, "writeable-rootfs-mount")
+	dstLoopDdevMountFullDir := filepath.Join(iae.workingDirs.tmpDir, "writeable-rootfs-mount")
 	err = os.MkdirAll(dstLoopDdevMountFullDir, os.ModePerm)
 	if err != nil {
 		logger.Log.Infof("--isohelpers.go - failed to create folder %s", dstLoopDdevMountFullDir)
@@ -311,18 +302,11 @@ func (iae* IsoArtifactExtractor) createWriteableRootfs(rootfsDevicePath, rootfsT
 	}
 	defer dstLoopDevMount.Close()
 
-	// mountParams := []string{dstRootFSImageConnection.Loopback().DevicePath(), dstLoopDdevMountFullDir}
-	// err = shell.ExecuteLiveWithCallback(onStdOut, onStdErr, false, "mount", mountParams...)
-	// if err != nil {
-	// 	logger.Log.Infof("--isohelpers.go - failed to mount writeable rootfs image loopback device.")
-	// 	return err
-	// }
-
 	// -- copy the content from the source partition to the new partition -----
 
 	logger.Log.Infof("--isohelpers.go - copying from %v to %v", srcLoopDevMountFullDir, dstLoopDdevMountFullDir)
 	cpParams := []string{"-aT", srcLoopDevMountFullDir, dstLoopDdevMountFullDir}
-	err = shell.ExecuteLiveWithCallback(onStdOut, onStdErr, false, "cp", cpParams...)
+	err = shell.ExecuteLive(false, "cp", cpParams...)
 	if err != nil {
 		logger.Log.Infof("--isohelpers.go - failed to copy rootfs contents to the writeable image.")
 		return err
@@ -344,7 +328,7 @@ func (iae* IsoArtifactExtractor) stageIsoMakerInitrdArtifacts(writeableRootfsMou
 		return err
 	}
 
-	sourceBoot64EfiFile := filepath.Join(iae.outDir, "bootx64.efi")
+	sourceBoot64EfiFile := filepath.Join(iae.workingDirs.outDir, "bootx64.efi")
 	targetBoot64EfiFile := filepath.Join(targetBootloadersLocalDir, "bootx64.efi")
 	err = copyFile(sourceBoot64EfiFile, targetBoot64EfiFile)
 	if err != nil {
@@ -352,7 +336,7 @@ func (iae* IsoArtifactExtractor) stageIsoMakerInitrdArtifacts(writeableRootfsMou
 		return err
 	}
 
-	sourceGrub64EfiFile := filepath.Join(iae.outDir, "grubx64.efi")
+	sourceGrub64EfiFile := filepath.Join(iae.workingDirs.outDir, "grubx64.efi")
 	targetGrub64EfiFile := filepath.Join(targetBootloadersLocalDir, "grubx64.efi")
 	err = copyFile(sourceGrub64EfiFile, targetGrub64EfiFile)
 	if err != nil {
@@ -363,7 +347,7 @@ func (iae* IsoArtifactExtractor) stageIsoMakerInitrdArtifacts(writeableRootfsMou
 	targetVmlinuzRWImageDir := isoMakerArtifactsStagingDirWithinRWImage
 	targetVmlinuzLocalDir := filepath.Join(writeableRootfsMountFullDir, targetVmlinuzRWImageDir)
 
-	sourceVmlinuzFile := iae.vmlinuzPath
+	sourceVmlinuzFile := iae.artifacts.vmlinuzPath
 	targetVmlinuzFile := filepath.Join(targetVmlinuzLocalDir, "vmlinuz")
 	err = copyFile(sourceVmlinuzFile, targetVmlinuzFile)
 	if err != nil {
@@ -378,25 +362,6 @@ func (iae* IsoArtifactExtractor) prepareImageForDracut(writeableRootfsMountFullD
 
 	logger.Log.Infof("preparing writeable image for dracut...")
 
-	// -- patch dracut dmsquash-live-root modules -----------------------------
-
-	// sourcePatchFile := filepath.Join(iae.tmpDir, "no_user_prompt.patch")
-
-	// logger.Log.Infof("--isohelpers.go - creating %s", sourcePatchFile)
-	// err := ioutil.WriteFile(sourcePatchFile, []byte(dracutNoPromptPatch), 0644)
-	// if err != nil {
-	// 	logger.Log.Infof("--isohelpers.go - failed to create %s. Error:\n%v", sourcePatchFile, err)
-	// 	return err
-	// }
-
-	// targetPatchFile := filepath.Join(writeableRootfsMountFullDir, "/usr/lib/dracut/modules.d/90dmsquash-live/dmsquash-live-root.sh")
-	// patchParams := []string{"-p1", "-i", sourcePatchFile, targetPatchFile}
-	// err = shell.ExecuteLiveWithCallback(onStdOut, onStdErr, false, "patch", patchParams...)
-	// if err != nil {
-	// 	logger.Log.Infof("--isohelpers.go - failed to patch %v. Error:\n%v", targetPatchFile, err)
-	// 	return err
-	// }
-
 	// -- delete fstab --------------------------------------------------------
 
 	fstabFile := filepath.Join(writeableRootfsMountFullDir, "/etc/fstab")
@@ -409,7 +374,7 @@ func (iae* IsoArtifactExtractor) prepareImageForDracut(writeableRootfsMountFullD
 
 	// -- upload dracut config ------------------------------------------------
 
-	sourceConfigFile := filepath.Join(iae.tmpDir, "20-live-cd.conf")
+	sourceConfigFile := filepath.Join(iae.workingDirs.tmpDir, "20-live-cd.conf")
 
 	logger.Log.Infof("--isohelpers.go - creating %s", sourceConfigFile)
 	err = ioutil.WriteFile(sourceConfigFile, []byte(dracutConfig), 0644)
@@ -432,7 +397,7 @@ func (iae* IsoArtifactExtractor) createSquashfs(writeableRootfsMountFullDir stri
 
 	logger.Log.Infof("creating squashfs of %v", writeableRootfsMountFullDir)
 
-	generatedSquashfsFile := filepath.Join(iae.outDir, "rootfs.img")
+	generatedSquashfsFile := filepath.Join(iae.workingDirs.outDir, "rootfs.img")
 
 	oldFileExists, err := fileExists(generatedSquashfsFile)
 	if err == nil && oldFileExists {
@@ -444,13 +409,13 @@ func (iae* IsoArtifactExtractor) createSquashfs(writeableRootfsMountFullDir stri
 	}
 
 	mksquashfsParams := []string{writeableRootfsMountFullDir, generatedSquashfsFile}
-	err = shell.ExecuteLiveWithCallback(onStdOutSilent, onStdErr, false, "mksquashfs", mksquashfsParams...)
+	err = shell.ExecuteLive(false, "mksquashfs", mksquashfsParams...)
 	if err != nil {
 		logger.Log.Infof("--isohelpers.go - failed to create squashfs")
 		return err
 	}
 
-	iae.squashfsPath = generatedSquashfsFile
+	iae.artifacts.squashfsPath = generatedSquashfsFile
 
 	return nil
 }
@@ -469,7 +434,7 @@ func (iae* IsoArtifactExtractor) convertToLiveOSImage(writeableRootfsImagePath, 
 	}
 	defer writeableRootfsConnection.Close()
 
-	writeableRootfsMountFullDir := filepath.Join(iae.buildDir, "writable-rootfs-mount")
+	writeableRootfsMountFullDir := filepath.Join(iae.workingDirs.buildDir, "writable-rootfs-mount")
 	logger.Log.Infof("--isohelpers.go - mounting %v to %v", writeableRootfsConnection.Loopback().DevicePath(), writeableRootfsMountFullDir)
 	writeableRootfsMount, err := safemount.NewMount(writeableRootfsConnection.Loopback().DevicePath(), writeableRootfsMountFullDir, "ext4", 0, "", true)
 	if err != nil {
@@ -491,13 +456,13 @@ func (iae* IsoArtifactExtractor) convertToLiveOSImage(writeableRootfsImagePath, 
 		return fmt.Errorf("found 0 kernels!")
 	}
 	// do we need to sort this?
-	iae.kernelVersion = kernelPaths[len(kernelPaths)-1].Name()
-	logger.Log.Infof("--isohelpers.go - found kernel version (%s)", iae.kernelVersion)	
+	iae.artifacts.kernelVersion = kernelPaths[len(kernelPaths)-1].Name()
+	logger.Log.Infof("--isohelpers.go - found kernel version (%s)", iae.artifacts.kernelVersion)	
 
 	// -- extract grub.cfg and vmlinuz ----------------------------------------
 
 	sourceGrubCfgPath := filepath.Join(writeableRootfsMountFullDir, "/boot/grub2/grub.cfg")
-	targetGrubCfgPath := filepath.Join(iae.outDir, "grub.cfg")
+	targetGrubCfgPath := filepath.Join(iae.workingDirs.outDir, "grub.cfg")
 
 	err = createGrubCfg(sourceGrubCfgPath, grubCfgTemplate, targetGrubCfgPath)
 	if err != nil {
@@ -505,11 +470,11 @@ func (iae* IsoArtifactExtractor) convertToLiveOSImage(writeableRootfsImagePath, 
 		return err
 	}
 
-	iae.grubCfgPath = targetGrubCfgPath
+	iae.artifacts.grubCfgPath = targetGrubCfgPath
 
-	sourceVmlinuzPath := filepath.Join(writeableRootfsMountFullDir, "/boot/vmlinuz-" + iae.kernelVersion)
-	iae.vmlinuzPath = filepath.Join(iae.outDir, "vmlinuz")
-	err = copyFile(sourceVmlinuzPath, iae.vmlinuzPath)
+	sourceVmlinuzPath := filepath.Join(writeableRootfsMountFullDir, "/boot/vmlinuz-" + iae.artifacts.kernelVersion)
+	iae.artifacts.vmlinuzPath = filepath.Join(iae.workingDirs.outDir, "vmlinuz")
+	err = copyFile(sourceVmlinuzPath, iae.artifacts.vmlinuzPath)
 	if err != nil {
 		logger.Log.Infof("--isohelpers.go - failed to copy vmlinuz")
 		return err
@@ -555,33 +520,14 @@ func (iae* IsoArtifactExtractor) convertToLiveOSImage(writeableRootfsImagePath, 
 	writeableRootfsConnection.Close()
 
 	// ---- generate initrd ---------------------------------------------------
-
-
-	/* enable when we can merge extracted grub.cfg with extracted one.
-	logger.Log.Infof("--isohelpers.go - updating grub.cfg.")
-	err = updateGrubCfg(extractedGrubCfgPath, "/home/george/git/CBL-Mariner-POC/toolkit/mic-iso-gen-0/grub.cfg")
-	if err != nil {
-		logger.Log.Infof("--isohelpers.go - failed to upgrade grub.cfg.")
-		return err
-	}
-	*/
-
 	return nil
 }
-
-/* enable when we can merge extracted grub.cfg with extracted one.
-func updateGrubCfg(extractedGrubCfgPath string, templateGrubCfg string) error {
-	// temporary: just overwrite the extracted grub.cfg
-	return copyFile(templateGrubCfg, extractedGrubCfgPath)
-}
-*/
 
 func createGrubCfg(sourceGrubCfgPath, grubCfgTemplate, targetGrubCfgPath string) error {
 
 	logger.Log.Infof("--isohelpers.go - using %s to create %s", sourceGrubCfgPath, targetGrubCfgPath)
 
 	// ToDo: we should merge sourceGrubCfgPath with grubCfgTemplate
-	//
 	err := ioutil.WriteFile(targetGrubCfgPath, []byte(grubCfgTemplate), 0644)
 	if err != nil {
 		return err
@@ -599,25 +545,7 @@ func copyFile(src, dst string) error {
 		return err
 	}
 
-	sourceFile, err := os.Open(src)
-	if err != nil {
-		return err
-	}
-	defer sourceFile.Close()
-
-
-	destinationFile, err := os.Create(dst)
-	if err != nil {
-		return err
-	}
-	defer destinationFile.Close()
-
-	_, err = io.Copy(destinationFile, sourceFile)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return file.Copy(src, dst)
 }
 
 func fileExists(filePath string) (bool, error) {
@@ -635,41 +563,21 @@ func fileExists(filePath string) (bool, error) {
 	}
 }
 
-func onStdOut(args ...interface{}) {
-	logger.Log.Infof(args[0].(string))
-}
+func getSizeEstimate(duOutput string) (int64, error) {
 
-func onStdErr(args ...interface{}) {
-	logger.Log.Errorf(args[0].(string))
-}
-
-func onStdOutSilent(args ...interface{}) {
-}
-
-func onStdErrSilent(args ...interface{}) {
-}
-
-// 421M   /home/george/git/CBL-Mariner-POC/build/tmppartition
-func processDuOutputCallback(args ...interface{}) {
-
-	if len(args) == 0 {
-		return
+	lines := strings.Split(duOutput, "\r")
+	for _, line := range lines {
+		parts := strings.Split(line, "\t")
+		sizeString := parts[0]
+		sizeStringNoUnit := sizeString[:len(sizeString) - 1]
+		size, err := strconv.ParseInt(sizeStringNoUnit, 10, 64)
+		if err != nil {
+			logger.Log.Infof("Something bad happened.")
+		}
+		safeSize := size * 2
+		return safeSize, nil	
 	}
 
-	line := args[0].(string)
-	parts := strings.Split(line, "\t")
-	sizeString := parts[0]
-	// sizeStringLen := len(sizeString)
-	// logger.Log.Infof("Found %s in %v", sizeString, sizeStringLen)	
-	// unit := sizeString[sizeStringLen - 1]
-	sizeStringNoUnit := sizeString[:len(sizeString) - 1]
-	size, err := strconv.ParseInt(sizeStringNoUnit, 10, 64)
-	if err != nil {
-		logger.Log.Infof("Something bad happened.")
-	}
-	maxSize := size * 2
-	// logger.Log.Infof("Need %d in %c", maxSize, unit)
-
-	rootfsContainerSizeInMB = maxSize
+	return 0, fmt.Errorf("could not parse 'du' output command.")
 }
 

@@ -505,11 +505,13 @@ func createIsoImage(buildDir, sourceImageFile, outputImageDir, outputImageBase s
 	defer imageConnection.Close()
 
 	iae := &IsoArtifactExtractor{
-		buildDir      : buildDir,
-		tmpDir        : filepath.Join(buildDir, "tmp"),
-		// IsoMaker needs its own folder to work in (it starts by deleting and re-creating it).
-		isomakerTmpDir: filepath.Join(buildDir, "isomaker-tmp"),
-		outDir        : filepath.Join(buildDir, "out"),	
+		workingDirs : IsoWorkingDirs {
+			buildDir      : buildDir,
+			tmpDir        : filepath.Join(buildDir, "tmp"),
+			// IsoMaker needs its own folder to work in (it starts by deleting and re-creating it).
+			isomakerTmpDir: filepath.Join(buildDir, "isomaker-tmp"),
+			outDir        : filepath.Join(buildDir, "out"),	
+		},
 	}
 
 	// extract boot artifacts (before rootfs artifacts)...
@@ -527,7 +529,7 @@ func createIsoImage(buildDir, sourceImageFile, outputImageDir, outputImageBase s
 	for _, mountPoint := range mountPoints {
 		if mountPoint.GetTarget() == "/" {
 
-			writeableRootfsImage := filepath.Join(iae.tmpDir, "writeable-rootfs.img")
+			writeableRootfsImage := filepath.Join(iae.workingDirs.tmpDir, "writeable-rootfs.img")
 
 			err := iae.createWriteableRootfs(mountPoint.GetSource(), mountPoint.GetFSType(), writeableRootfsImage)
 			if err != nil {
@@ -549,7 +551,7 @@ func createIsoImage(buildDir, sourceImageFile, outputImageDir, outputImageBase s
 		}
 	}
 
-	err = createIso(iae.isomakerTmpDir, iae.grubCfgPath, iae.initrdPath, iae.squashfsPath, outputImageDir, outputImageBase)
+	err = createIso(iae.workingDirs.isomakerTmpDir, iae.artifacts.grubCfgPath, iae.artifacts.initrdPath, iae.artifacts.squashfsPath, outputImageDir, outputImageBase)
 	if err != nil {
 		return err
 	}
