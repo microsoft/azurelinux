@@ -13,7 +13,7 @@
 %global abbrev_version          0.1.2
 %global base64_version          0.2.0
 %global benchmark_version       0.3.0
-# bigdecimal is available via rubygem-bigdecimal.spec with higher version 3.1.6 (default is 3.1.5)
+%global bigdecimal_version      3.1.5
 %global bundler_version         2.5.3
 %global cgi_version             0.4.1
 %global csv_version             3.2.8
@@ -129,6 +129,8 @@ Provides:       rubygem-base64 = %{base64_version}-%{release}
 Provides:       rubygem(base64) = %{base64_version}-%{release}
 Provides:       rubygem-benchmark = %{benchmark_version}-%{release}
 Provides:       rubygem(benchmark) = %{benchmark_version}-%{release}
+Provides:       rubygem-bigdecimal = %{bigdecimal_version}-%{release}
+Provides:       rubygem(bigdecimal) = %{bigdecimal_version}-%{release}
 Provides:       rubygem-bundler = %{bundler_version}-%{release}
 Provides:       rubygem(bundler) = %{bundler_version}-%{release}
 # we have transitioned away from a seperate spec/package for bundler, obsolete that package
@@ -307,8 +309,6 @@ pushd gems
 find -not -name 'bundled_gems' -delete
 sed -i '2,$d' bundled_gems
 popd
-# Remove bigdecimal. Add them back when version provided by ruby >= current version in rubygem-bigdecmial.spec.
-rm -rf ext/bigdecimal
 
 %build
 # Remove GCC specs and build environment linker scripts
@@ -409,6 +409,7 @@ sudo -u test make test TESTS="-v"
 %changelog
 * Mon Jan 22 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.3.0-1
 - Upgrading to 3.3.0.
+- Re-added the bigdecimal gem.
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.1.4-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
