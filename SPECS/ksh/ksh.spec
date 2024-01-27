@@ -1,23 +1,16 @@
-%global       verBetaPrefix 1.0.0
-%global       verBetaSuffix 1
-%global       verBetaFull %{verBetaPrefix}-beta.%{verBetaSuffix}
-
+%global debug_package %{nil}
 Summary:        The Original ATT Korn Shell
 Name:           ksh
-Version:        %{verBetaPrefix}~beta.%{verBetaSuffix}
-Release:        5%{?dist}
+Version:        1.0.8
+Release:        1%{?dist}
 License:        EPL-1.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://www.kornshell.com/
-Source0:        https://github.com/ksh93/%{name}/archive/v%{verBetaFull}/%{name}-%{verBetaFull}.tar.gz
+Source0:        https://github.com/ksh93/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        kshcomp.conf
 Source2:        kshrc.rhs
 Source3:        dotkshrc
-# temporary commenting out failing tests
-Patch1:         %{name}-%{verBetaFull}-regre-tests.patch
-# in some build commands relocate "-lm" flag
-Patch2:         %{name}-%{verBetaFull}-fix-build.patch
 
 BuildRequires:  bison
 BuildRequires:  gcc
@@ -37,6 +30,9 @@ Requires(post): grep
 Requires(post): systemd
 
 Requires(postun): sed
+Requires(rpmlib): rpmlib(CompressedFileNames) <= 3.0.4-1
+Requires(preun): /bin/sh
+Requires(verify): /bin/sh
 
 %description
 KSH-93 is the most recent version of the KornShell by David Korn of
@@ -45,7 +41,7 @@ KornShell is a shell programming language, which is upward compatible
 with "sh" (the Bourne Shell).
 
 %prep
-%autosetup -n %{name}-%{verBetaFull} -p1
+%autosetup -n %{name}-%{version}
 
 #/dev/fd test does not work because of mock
 sed -i 's|ls /dev/fd|ls /proc/self/fd|' src/cmd/ksh93/features/options
@@ -155,6 +151,9 @@ fi
 %config(noreplace) %{_sysconfdir}/binfmt.d/kshcomp.conf
 
 %changelog
+* Tue Jan 23 2024 Betty Lakes <bettylakes@microsoft.com> - 1.0.8-1
+- Version upgrade to 1.0.8
+
 * Tue Nov 14 2023 Andrew Phelps <anphel@microsoft.com> - 1.0.0~beta.1-5
 - Modify ksh-1.0.0-beta.1-fix-build.patch-fix-build.patch with proper "-lm" location for updated toolchain
 
