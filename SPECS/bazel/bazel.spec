@@ -3,7 +3,7 @@
 %define __os_install_post %{_libdir}/rpm/brp-compress %{nil}
 Summary:        Correct, reproducible, and fast builds for everyone.
 Name:           bazel
-Version:        5.3.2
+Version:        7.0.2
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -26,13 +26,6 @@ A fast, scalable, multi-language and extensible build system.
 
 %prep
 %autosetup -p1 -c -n %{name}-%{version}
-# Modify source to "#include <limits>" which resolves gcc11 errors:
-# graphcycles.cc:451:26: error: 'numeric_limits' is not a member of 'std'"
-sed -i 's/#include <string.h>/#include <string.h>\n#include <limits>/g' third_party/ijar/common.h
-sed -i 's/<limits.h>/<limits>\n#include <climits>/g' src/main/cpp/util/numbers.cc
-# abseil-cpp source contains graphcycles.cc in "derived/distdir/df3ea785d8c30a9503321a3d35ee7d35808f190d.tar.gz"
-# since graphcycles.cc fails to compile on gcc11 and already includes <utility>, force inclusion of <limits>
-sed -i 's/#include <utility>/#include <utility>\n#include <limits>/g' /usr/include/c++/11.2.0/array
 
 %build
 export JAVA_HOME=$(find %{_libdir}/jvm -name "msopenjdk*")
@@ -51,6 +44,9 @@ cp ./scripts/packages/bazel.sh %{buildroot}/%{_bindir}/bazel
 %attr(0755,root,root) %{_bindir}/bazel-real
 
 %changelog
+* Fri Jan 26 2024 Riken Maharjan <rmaharjan@microsoft.com> - 7.0.2-1
+- Upgrade to 7.0.2
+
 * Fri Dec 09 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.3.2-1
 - Auto-upgrade to 5.3.2 - CVE-2022-3474
 
