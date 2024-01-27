@@ -13342,16 +13342,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "msft-golang",
-          "version": "1.19.12",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.19.12-1/go.20230802.5.src.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "msgpack",
           "version": "3.3.0",
           "downloadUrl": "https://github.com/msgpack/msgpack-c/archive/cpp-3.3.0.tar.gz"
@@ -28339,16 +28329,6 @@
           "name": "tensorflow",
           "version": "2.11.1",
           "downloadUrl": "https://github.com/tensorflow/tensorflow/archive/refs/tags/v2.11.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "terraform",
-          "version": "1.3.2",
-          "downloadUrl": "https://github.com/hashicorp/terraform/archive/refs/tags/v1.3.2.tar.gz"
         }
       }
     },
