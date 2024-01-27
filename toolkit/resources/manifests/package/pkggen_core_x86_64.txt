@@ -231,10 +231,10 @@ libffi-devel-3.4.4-1.azl3.x86_64.rpm
 libtasn1-4.19.0-1.azl3.x86_64.rpm
 p11-kit-0.25.0-1.azl3.x86_64.rpm
 p11-kit-trust-0.25.0-1.azl3.x86_64.rpm
-ca-certificates-shared-3.0.0-2.azl3.noarch.rpm
-ca-certificates-tools-3.0.0-2.azl3.noarch.rpm
-ca-certificates-base-3.0.0-2.azl3.noarch.rpm
-ca-certificates-3.0.0-2.azl3.noarch.rpm
+ca-certificates-shared-3.0.0-3.azl3.noarch.rpm
+ca-certificates-tools-3.0.0-3.azl3.noarch.rpm
+ca-certificates-base-3.0.0-3.azl3.noarch.rpm
+ca-certificates-3.0.0-3.azl3.noarch.rpm
 dwz-0.14-2.azl3.x86_64.rpm
 unzip-6.0-20.azl3.x86_64.rpm
 python3-3.9.14-8.azl3.x86_64.rpm
