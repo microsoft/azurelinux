@@ -2,7 +2,7 @@
  "Signatures": {
   "virtiofsd-v1.8.0.tar.gz": "35a59628c44da64d72b25cbdea54fe2fa68ecd42482f34c4755f4020e6dc280b",
   "virtiofsd-v1.8.0-cargo.tar.gz": "47a1595ccee910ddb2f786469ac2601b5e5e114a42796072aa03bfe9f3706fd7",
-  "virtiofsd-v1.8.0-cargo-CVE-2023-41051.tar.gz": "3941e2e51ff9d962dc2983a97912449ea1dc934d56cfc01bf0d1431a85d71dbb",
+  "virtiofsd-v1.8.0-cargo-CVE-2023-41051-patch.tar.gz": "2e0b1d20142b995d8e77c14936e943b5a940f2080976c8f4cd9359b7414af095",
   "config.toml": "77e9219c27274120197571fd165cbe4121963b5ad3bc0b20b383c86ef0ce6c2b"
  }
 }
