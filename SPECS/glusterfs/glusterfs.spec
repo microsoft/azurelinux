@@ -138,7 +138,9 @@ Source7:        glusterfsd.service
 Source8:        glusterfsd.init
 
 # Patch created for Mariner to fix build break related to
-# including eventtypes.h
+# including eventtypes.h (which is required regardless of
+# whether USE_EVENTS is defined).  Without this patch, 
+# eventtypes.h is only included if USE_EVENTS is defined.
 Patch001:       include-eventtypes-always.patch
 
 BuildRoot:        %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
@@ -672,17 +674,10 @@ sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|' libtool
 make check
 
 %install
-make install DESTDIR=%{buildroot}
+%make_install
 %if ( 0%{!?_without_server:1} )
-%if ( 0%{_for_fedora_koji_builds} )
-install -D -p -m 0644 %{SOURCE1} \
-    %{buildroot}%{_sysconfdir}/sysconfig/glusterd
-install -D -p -m 0644 %{SOURCE2} \
-    %{buildroot}%{_sysconfdir}/sysconfig/glusterfsd
-%else
 install -D -p -m 0644 extras/glusterd-sysconfig \
     %{buildroot}%{_sysconfdir}/sysconfig/glusterd
-%endif
 %endif
 
 mkdir -p %{buildroot}%{_localstatedir}/log/glusterd
@@ -724,9 +719,6 @@ sed -i 's|option working-directory /etc/glusterd|option working-directory %{_sha
 
 # Install glusterfsd .service or init.d file
 %if ( 0%{!?_without_server:1} )
-%if ( 0%{_for_fedora_koji_builds} )
-%service_install glusterfsd %{glusterfsd_svcfile}
-%endif
 %endif
 
 install -D -p -m 0644 extras/glusterfs-logrotate \
@@ -811,9 +803,6 @@ exit 0
 %post server
 # Legacy server
 %systemd_post glusterd
-%if ( 0%{_for_fedora_koji_builds} )
-%systemd_post glusterfsd
-%endif
 # ".cmd_log_history" is renamed to "cmd_history.log" in GlusterFS-3.7 .
 # While upgrading glusterfs-server package form GlusterFS version <= 3.6 to
 # GlusterFS version 3.7, ".cmd_log_history" should be renamed to
@@ -1210,15 +1199,9 @@ exit 0
 %exclude %{_libdir}/glusterfs/%{version}%{?prereltag}/xlator/nfs/*
 %endif
 %config(noreplace) %{_sysconfdir}/sysconfig/glusterd
-%if ( 0%{_for_fedora_koji_builds} )
-%config(noreplace) %{_sysconfdir}/sysconfig/glusterfsd
-%endif
 
 # init files
 %glusterd_svcfile
-%if ( 0%{_for_fedora_koji_builds} )
-%glusterfsd_svcfile
-%endif
 %glusterfssharedstorage_svcfile
 
 # binaries
@@ -1364,7 +1347,7 @@ exit 0
 
 %changelog
 * Thu Dec 14 2023  Brian Fjeldstad <bfjelds@microsoft.com> - 11.1-1
-- Upgrade to 11.1
+- Upgrade to 11.1 using Fedora 39 spec for guidance (license: MIT)
 - add include-eventtypes-always.patch to fix 11.1 build error
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 7.9-5
