@@ -7,8 +7,7 @@ License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/sosreport/sos
-#Source0:       https://github.com/sosreport/sos/archive/%%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/sosreport/sos/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # The sos-4.6.1.tar.gz is missing a commit to bump the version to 4.6.1
 # https://github.com/orgs/sosreport/discussions/3492
 Patch0:         bump-version-4-6-1.patch
@@ -17,10 +16,10 @@ BuildRequires:  python3-setuptools
 Requires:       bzip2
 Requires:       python3
 Requires:       python3-libxml2
+Requires:       python3-magic
 Requires:       python3-pexpect
 Requires:       python3-rpm
 Requires:       python3-setuptools
-Recommends:     python3-magic
 # Mandatory just for uploading to a SFTP server:
 Recommends:     python3-requests
 BuildArch:      noarch
