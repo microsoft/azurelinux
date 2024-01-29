@@ -1,14 +1,14 @@
 Summary:        Mellanox firmware burning application
 Name:           mstflint
-Version:        4.26.0
+Version:        4.26.0-1
 Release:        1%{?dist}
 License:        GPLv2 OR BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://github.com/Mellanox/%{name}
-Source0:        https://github.com/Mellanox/%{name}/releases/download/v%{version}-%{release}/%{name}-%{version}-%{release}.tar.gz
-ExclusiveArch: i386 i486 i586 i686 x86_64 ia64 ppc ppc64 ppc64le arm64 aarch64
+Source0:        https://github.com/Mellanox/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz
+ExclusiveArch: arm64 aarch64
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  boost-devel
@@ -69,11 +69,11 @@ rm -fr %{buildroot}
 %{_bindir}/mstfwtrace
 %{_bindir}/mstresourcedump
 %{_bindir}/mstresourceparse
- %{_bindir}/mstfwmanager
- %{_bindir}/mstarchive
+%{_bindir}/mstfwmanager
+%{_bindir}/mstarchive
 %{CONF_DIR}/ca-bundle.crt
- %{_bindir}/mstreg
- %{_bindir}/mstlink
+%{_bindir}/mstreg
+%{_bindir}/mstlink
 
 %{_includedir}/mstflint/cmdif/icmd_cif_common.h
 %{_includedir}/mstflint/cmdif/icmd_cif_open.h
