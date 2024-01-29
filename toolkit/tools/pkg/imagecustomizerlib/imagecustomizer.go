@@ -38,7 +38,7 @@ func CustomizeImageWithConfigFile(buildDir string, configFile string, imageFile 
 ) error {
 	var err error
 
-	logger.Log.Infof("--imagecustomizer.go - starting...")
+	logger.Log.Infof("starting...")
 
 	var config imagecustomizerapi.Config
 	err = imagecustomizerapi.UnmarshalYamlFile(configFile, &config)
@@ -69,7 +69,7 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 	var err error
 	var qemuOutputImageFormat string
 
-	logger.Log.Infof("--imagecustomizer.go - validating config...")
+	logger.Log.Infof("validating config...")
 
 	outputImageBase := strings.TrimSuffix(filepath.Base(outputImageFile), filepath.Ext(outputImageFile))
 	outputImageDir := filepath.Dir(outputImageFile)
@@ -86,11 +86,11 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 		outputImageFormat = inputImageExt[1:]
 	}
 
-	logger.Log.Infof("--imagecustomizer.go - outputImageFormat  = %s", outputImageFormat)
-	logger.Log.Infof("--imagecustomizer.go - outputImageBase    = %s", outputImageBase)
-	logger.Log.Infof("--imagecustomizer.go - outputImageDir     = %s", outputImageDir)
-	logger.Log.Infof("--imagecustomizer.go - outputImageFile    = %s", outputImageFile)
-	logger.Log.Infof("--imagecustomizer.go - outputIsoImageFile = %s", outputIsoImageFile)
+	logger.Log.Infof("outputImageFormat  = %s", outputImageFormat)
+	logger.Log.Infof("outputImageBase    = %s", outputImageBase)
+	logger.Log.Infof("outputImageDir     = %s", outputImageDir)
+	logger.Log.Infof("outputImageFile    = %s", outputImageFile)
+	logger.Log.Infof("outputIsoImageFile = %s", outputIsoImageFile)
 	
 	// Validate 'outputImageFormat' value if specified.
 	if outputImageFormat != "" {
@@ -118,7 +118,7 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 		return err
 	}
 
-	logger.Log.Infof("--imagecustomizer.go - converting input image to raw format...")
+	logger.Log.Infof("converting input image to raw format...")
 	// Convert image file to raw format, so that a kernel loop device can be used to make changes to the image.
 	rawImageFile := filepath.Join(buildDirAbs, BaseImageName)
 
@@ -128,14 +128,14 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 	}
 
 	// Customize the partitions.
-	logger.Log.Infof("--imagecustomizer.go - customizing partitions...")
+	logger.Log.Infof("customizing partitions...")
 	partitionsCustomized, rawImageFile, err := customizePartitions(buildDirAbs, baseConfigPath, config, rawImageFile)
 	if err != nil {
 		return err
 	}
 
 	// Customize the raw image file.
-	logger.Log.Infof("--imagecustomizer.go - customizing raw image...")
+	logger.Log.Infof("customizing raw image...")
 	err = customizeImageHelper(buildDirAbs, baseConfigPath, config, rawImageFile, rpmsSources, useBaseImageRpmRepos,
 		partitionsCustomized)
 	if err != nil {
@@ -172,7 +172,7 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 	}
 
 	if enableIsoCreation {
-		logger.Log.Infof("--imagecustomizer.go - creating a live os iso from the customized image...")
+		logger.Log.Infof("creating a live os iso from the customized image...")
 		err = createIsoImage(buildDir, rawImageFile, outputImageDir, outputImageBase)
 		if err != nil {
 			return err
@@ -496,7 +496,7 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 
 func createIsoImage(buildDir, sourceImageFile, outputImageDir, outputImageBase string) error {
 
-	logger.Log.Infof("--imagecustomizer.go - connecting to customized raw image (%s)", sourceImageFile)
+	logger.Log.Infof("connecting to customized raw image (%s)", sourceImageFile)
 
 	imageConnection, mountPoints, err := connectToExistingImage(sourceImageFile, buildDir, "imageroot", true)
 	if err != nil {
@@ -506,18 +506,17 @@ func createIsoImage(buildDir, sourceImageFile, outputImageDir, outputImageBase s
 
 	iae := &IsoArtifactExtractor{
 		workingDirs : IsoWorkingDirs {
-			buildDir      : buildDir,
-			tmpDir        : filepath.Join(buildDir, "tmp"),
+			isoBuildDir     : filepath.Join(buildDir, "tmp"),
 			// IsoMaker needs its own folder to work in (it starts by deleting and re-creating it).
-			isomakerTmpDir: filepath.Join(buildDir, "isomaker-tmp"),
-			outDir        : filepath.Join(buildDir, "out"),	
+			isomakerBuildDir: filepath.Join(buildDir, "isomaker-tmp"),
+			outDir          : filepath.Join(buildDir, "out"),	
 		},
 	}
 
 	// extract boot artifacts (before rootfs artifacts)...
 	for _, mountPoint := range mountPoints {
 		if mountPoint.GetTarget() == "/boot/efi" {
-			err := iae.extractIsoArtifactsFromBoot(mountPoint.GetSource(), mountPoint.GetFSType())
+			err := iae.extractArtifactsFromBootDevice(mountPoint.GetSource(), mountPoint.GetFSType())
 			if err != nil {
 				return err
 			}
@@ -529,19 +528,25 @@ func createIsoImage(buildDir, sourceImageFile, outputImageDir, outputImageBase s
 	for _, mountPoint := range mountPoints {
 		if mountPoint.GetTarget() == "/" {
 
-		    writeableRootfsDir := filepath.Join(iae.workingDirs.tmpDir, "writeable-rootfs-mount")
-			err := iae.populateWriteableRootfs(mountPoint.GetSource(), mountPoint.GetFSType(), writeableRootfsDir)
+		    writeableRootfsDir := filepath.Join(iae.workingDirs.isoBuildDir, "writeable-rootfs-mount")
+			err := iae.populateWriteableRootfsDir(mountPoint.GetSource(), mountPoint.GetFSType(), writeableRootfsDir)
 			if err != nil {
 				return err
 			}
 
-			isoMakerArtifactsStagingDirWithinWriteableRootfsDir := "/boot-staging"
-			err = iae.convertToLiveOSImage(writeableRootfsDir, isoMakerArtifactsStagingDirWithinWriteableRootfsDir)
+			isoMakerArtifactsStagingDir := "/boot-staging"
+			err = iae.prepareLiveOSDir(writeableRootfsDir, isoMakerArtifactsStagingDir)
 			if err != nil {
 				return err
 			}
 
-			err = iae.generateInitrd(writeableRootfsDir, isoMakerArtifactsStagingDirWithinWriteableRootfsDir)
+			err = iae.createSquashfsImage(writeableRootfsDir)
+			if err != nil {
+				return fmt.Errorf("failed to create squashfs image.\n%w", err)
+			}			
+
+			isoMakerArtifactsDirInInitrd := "/boot"
+			err = iae.generateInitrd(writeableRootfsDir, isoMakerArtifactsStagingDir, isoMakerArtifactsDirInInitrd)
 			if err != nil {
 				return err
 			}
@@ -550,7 +555,7 @@ func createIsoImage(buildDir, sourceImageFile, outputImageDir, outputImageBase s
 		}
 	}
 
-	err = createIso(iae.workingDirs.isomakerTmpDir, iae.artifacts.grubCfgPath, iae.artifacts.initrdPath, iae.artifacts.squashfsPath, outputImageDir, outputImageBase)
+	err = createLiveOSISO(iae.workingDirs.isomakerBuildDir, iae.artifacts.grubCfgPath, iae.artifacts.initrdPath, iae.artifacts.squashfsImagePath, outputImageDir, outputImageBase)
 	if err != nil {
 		return err
 	}

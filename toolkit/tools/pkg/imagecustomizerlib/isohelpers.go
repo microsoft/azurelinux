@@ -47,54 +47,69 @@ add_drivers+=" overlay "
 )
 
 type IsoWorkingDirs struct {
-	buildDir       string
-	tmpDir         string
-	isomakerTmpDir string
-	outDir 	       string
+	isoBuildDir      string
+	// 'isomakerBuildDir' will be deleted/re-created by IsoMaker before it
+	// proceeds. It needs to be different from `isoBuildDir`.
+	isomakerBuildDir string
+	outDir 	         string
 }
 
+// `IsoArtifacts` holds the extracted/generated artifacts necessary to build
+// a LiveOS ISO image.
 type IsoArtifacts struct {
-	bootx64EfiPath string
-	grubx64EfiPath string
-	grubCfgPath    string
-	vmlinuzPath    string
-	kernelVersion  string
-	initrdPath     string
-	squashfsPath   string
+	kernelVersion     string
+	bootx64EfiPath    string
+	grubx64EfiPath    string
+	grubCfgPath       string
+	vmlinuzPath       string
+	initrdPath        string
+	squashfsImagePath string
 }
 
-// IsoMaker builds ISO images and populates them with packages and files required by the installer.
 type IsoArtifactExtractor struct {
 	workingDirs    IsoWorkingDirs
 	artifacts      IsoArtifacts
 }
 
-// runs dracut against a modified rootfs to create the initrd file.
-func (iae* IsoArtifactExtractor) generateInitrd(writeableRootfsDir string, isoMakerArtifactsDirInChroot string) error {
+// purpose:
+//   runs dracut against rootfs to create an initrd image file.
+//
+// inputs:
+//   - rootfsSourceDir [in]:
+//     - local folder (on the build machine) of the rootfs to be used when
+//       creating the initrd image.
+//   - artifactsSourceDir [in]:
+//     - source directory (on the build machine) holding an artifacts tree to
+//       include in the initrd image.
+//   - artifactsTargetDir [in]:
+//     - target directory (within the initrd image) where the contents of the
+//       artifactsSourceDir tree will be copied to.
+//
+// outputs:
+// - creates an initrd.img and stores its path in iae.artifacts.initrdPath.
+//
+func (iae* IsoArtifactExtractor) generateInitrd(rootfsSourceDir, artifactsSourceDir, artifactsTargetDir string) error {
 
 	logger.Log.Infof("generating initrd...")
 
-	initrdPathInChroot := "/initrd.img"
-	initrdPath := filepath.Join(writeableRootfsDir, initrdPathInChroot)
-	isoMakerArtifactsDirInInitrd := "/boot"
-
-	chroot := safechroot.NewChroot(writeableRootfsDir, true /*isExistingDir*/)
+	chroot := safechroot.NewChroot(rootfsSourceDir, true /*isExistingDir*/)
 	if chroot == nil {
-		return fmt.Errorf("failed to create a new chroot object for %s.", writeableRootfsDir)
+		return fmt.Errorf("failed to create a new chroot object for %s.", rootfsSourceDir)
 	}
 	defer chroot.Close(true /*leaveOnDisk*/)
 
 	err := chroot.Initialize("", nil, nil, true /*includeDefaultMounts*/)
 	if err != nil {
-		return fmt.Errorf("failed to initialize chroot object for %s.\n%w", writeableRootfsDir, err)
+		return fmt.Errorf("failed to initialize chroot object for %s.\n%w", rootfsSourceDir, err)
 	}
 
+	initrdPathInChroot := "/initrd.img"
 	err = chroot.Run(func() error {
 		dracutParams := []string{
 			initrdPathInChroot,
 			"--kver", iae.artifacts.kernelVersion,
 			"--filesystems", "squashfs",
-			"--include", isoMakerArtifactsDirInChroot, isoMakerArtifactsDirInInitrd }
+			"--include", artifactsSourceDir, artifactsTargetDir }
 
 		return shell.ExecuteLive(false /*squashErrors*/, "dracut", dracutParams...)
 	})
@@ -102,24 +117,45 @@ func (iae* IsoArtifactExtractor) generateInitrd(writeableRootfsDir string, isoMa
 		return fmt.Errorf("failed to run dracut.\n%w", err)
 	}
 
-	artifactsInitrdPath := filepath.Join(iae.workingDirs.outDir, "initrd.img")
-	err = copyFile(initrdPath, artifactsInitrdPath)
+	generatedInitrdPath := filepath.Join(rootfsSourceDir, initrdPathInChroot)
+	targetInitrdPath := filepath.Join(iae.workingDirs.outDir, "initrd.img")
+	err = copyFile(generatedInitrdPath, targetInitrdPath)
 	if err != nil {
 		return fmt.Errorf("failed to copy generated initrd.\n%w", err)
 	}
-	iae.artifacts.initrdPath = artifactsInitrdPath
+	iae.artifacts.initrdPath = targetInitrdPath
 
 	return nil
 }
 
-func createIsoConfig(isoRootfsPath string) (configuration.Config, error) {
+// purpose:
+//   creates an IsoMaker config objects with the necessary configuration.
+//
+// inputs:
+//   - squashfsImagePath [in]:
+//     - path to an existing squashfs image file. The configuration will instruct
+//       IsoMaker to place it under:
+//       - /config/additionalfiles/0/$(basename $squashfsImagePath).
+//
+// outputs:
+//   - returns an IsoMaker configuration.Config object.
+//
+func createIsoMakerConfig(squashfsImagePath string) (configuration.Config, error) {
 
 	config := configuration.Config{
 		SystemConfigs: []configuration.SystemConfig{
 			{
-				Name: "dummy-name",
 				AdditionalFiles: map[string]configuration.FileConfigList{
-					isoRootfsPath: {{Path: "/dummy-name"}},
+					// 'AdditionalFiles' is meant to do two things:
+					// 1. copy the files from the build machine to the ISO
+					//    media.
+					// 2. have Mariner installer copy those files from the ISO
+					//    media to the target storage device.
+					// In the MIC LiveOS ISO generation sceanrio, we do not
+					// have/run Mariner installer and do not need to copy them.
+					// So, we are setting the destination to 'dummy-name' as it
+					// never be used.
+					squashfsImagePath: {{Path: "/dummy-name"}},
 				},
 			},
 		},
@@ -128,26 +164,53 @@ func createIsoConfig(isoRootfsPath string) (configuration.Config, error) {
 	return config, nil
 }
 
-// invokes the iso maker library to create an iso image.
-func createIso(buildDir, isoGrubFile, isoInitrdFile, isoRootfsFile, isoOutputDir, isoOutputBaseName string) error {
+// purpose:
+//   creates an LiveOS ISO image.
+//
+// inputs:
+//   - isomakerBuildDir [in]:
+//	   - folder to be created by the IsoMaker tool to place its temporary files.
+//   - grubCfgPath [in]:
+//     - path to the grub.cfg file to be used with the bootloaders.
+//   - initrdImagePath [in]:
+//     - path to an existing initrd image file. The initrd image must be
+//       configured to run the LiveOS booting flow in Dracut.
+//   - squashfsImagePath [in]:
+//     - path to an existing squashfs image file. The squashfs must host a
+//       rootfs so that initrd can pivot.
+//   - isoOutputDir [in]:
+//     - path to a folder where the output image will be placed. It does not
+//       need to be created before calling this function.
+//   - isoOutputBaseName [in]:
+//     - path to the iso image to be created upon successful copmletion of this
+//       function.
+//
+// ouptuts:
+//   - create a LiveOS ISO.
+//
+func createLiveOSISO(isomakerBuildDir, grubCfgPath, initrdImagePath, squashfsImagePath, isoOutputDir, isoOutputBaseName string) error {
 
-	logger.Log.Infof("--isohelpers.go - creating iso...")
-	logger.Log.Infof("--isohelpers.go - - buildDir          = %s", buildDir)
-	logger.Log.Infof("--isohelpers.go - - isoGrubFile       = %s", isoGrubFile)
-	logger.Log.Infof("--isohelpers.go - - isoInitrdFile     = %s", isoInitrdFile)
-	logger.Log.Infof("--isohelpers.go - - isoRootfsFile     = %s", isoRootfsFile)
-	logger.Log.Infof("--isohelpers.go - - isoOutputDir      = %s", isoOutputDir)
-	logger.Log.Infof("--isohelpers.go - - isoOutputBaseName = %s", isoOutputBaseName)
+	logger.Log.Infof("creating iso...")
+	logger.Log.Infof("- isomakerBuildDir  = %s", isomakerBuildDir)
+	logger.Log.Infof("- grubCfgPath       = %s", grubCfgPath)
+	logger.Log.Infof("- initrdImagePath   = %s", initrdImagePath)
+	logger.Log.Infof("- squashfsImagePath = %s", squashfsImagePath)
+	logger.Log.Infof("- isoOutputDir      = %s", isoOutputDir)
+	logger.Log.Infof("- isoOutputBaseName = %s", isoOutputBaseName)
 
 	unattendedInstall := false
-	enableBiosBoot := false // if true, the bios bootloaders needs to be downloaded.
+	// We are disabling BIOS booloaders because enabling them will requires
+	// MIC to take a dependency on binary artifacts stored elsewhere.
+	// Should we decide to include the BIOS bootloader, we need to find a
+	// reliable and efficient way to pull those binaries.
+	enableBiosBoot := false
 	baseDirPath := ""
 	releaseVersion := ""
 	isoResourcesDir := ""
 	isoRepoDirPath := ""
 	imageNameTag := ""
 
-	config, err := createIsoConfig(isoRootfsFile)
+	config, err := createIsoMakerConfig(squashfsImagePath)
 	if err != nil {
 		return err
 	}
@@ -164,12 +227,12 @@ func createIso(buildDir, isoGrubFile, isoInitrdFile, isoRootfsFile, isoOutputDir
 		unattendedInstall,
 		enableBiosBoot,
 		baseDirPath,
-		buildDir,
+		isomakerBuildDir,
 		releaseVersion,
 		isoResourcesDir,
 		config,
-		isoInitrdFile,
-		isoGrubFile,
+		initrdImagePath,
+		grubCfgPath,
 		isoRepoDirPath,
 		isoOutputDir,
 		isoOutputBaseName,
@@ -180,12 +243,23 @@ func createIso(buildDir, isoGrubFile, isoInitrdFile, isoRootfsFile, isoOutputDir
 	return nil
 }
 
-func (iae* IsoArtifactExtractor) extractIsoArtifactsFromBoot(bootDevicePath string, bootfsType string) (error) {
+
+// purpose:
+//   extracts the bootloaders from the specified boot device.
+//
+// inputs:
+//   - 'bootDevicePath': path to an existing boot device.
+//   - 'bootfsType': file system type of the specified boot device.
+//
+// output:
+//   the bootloaders are saved to the iae.workingDirs.isoBuildDir
+//
+func (iae* IsoArtifactExtractor) extractArtifactsFromBootDevice(bootDevicePath string, bootfsType string) (error) {
 
 	logger.Log.Infof("extracting artifacts from the boot partition...")
 
-	loopDevMountFullDir := filepath.Join(iae.workingDirs.buildDir, "readonly-boot-mount")
-	logger.Log.Infof("--isohelpers.go - mounting %s(%s) to %s", bootDevicePath, bootfsType, loopDevMountFullDir)
+	loopDevMountFullDir := filepath.Join(iae.workingDirs.isoBuildDir, "readonly-boot-mount")
+	logger.Log.Infof("mounting %s(%s) to %s", bootDevicePath, bootfsType, loopDevMountFullDir)
 
 	fullDiskBootMount, err := safemount.NewMount(bootDevicePath, loopDevMountFullDir, bootfsType, 0, "", true)
 	if err != nil {
@@ -194,250 +268,306 @@ func (iae* IsoArtifactExtractor) extractIsoArtifactsFromBoot(bootDevicePath stri
 	defer fullDiskBootMount.Close()
 
 	sourceBootx64EfiPath := filepath.Join(loopDevMountFullDir, "/EFI/BOOT/bootx64.efi")
-	iae.artifacts.bootx64EfiPath = filepath.Join(iae.workingDirs.outDir, "bootx64.efi")
-	err = copyFile(sourceBootx64EfiPath, iae.artifacts.bootx64EfiPath)
+	targetBootx64EfiPath := filepath.Join(iae.workingDirs.outDir, "bootx64.efi")
+	err = copyFile(sourceBootx64EfiPath, targetBootx64EfiPath)
 	if err != nil {
-		logger.Log.Infof("--isohelpers.go - extractIsoArtifactsFromBoot() - failed to copy %w", sourceBootx64EfiPath)
-		return err
+		return fmt.Errorf("failed to copy bootloader file (bootx64.efi).\n%w", err)
 	}
+	iae.artifacts.bootx64EfiPath = targetBootx64EfiPath
 
 	sourceGrubx64EfiPath := filepath.Join(loopDevMountFullDir, "/EFI/BOOT/grubx64.efi")
-	iae.artifacts.grubx64EfiPath = filepath.Join(iae.workingDirs.outDir, "grubx64.efi")
-	err = copyFile(sourceGrubx64EfiPath, iae.artifacts.grubx64EfiPath)
+	targetGrubx64EfiPath := filepath.Join(iae.workingDirs.outDir, "grubx64.efi")
+	err = copyFile(sourceGrubx64EfiPath, targetGrubx64EfiPath)
 	if err != nil {
-		logger.Log.Infof("--isohelpers.go - extractIsoArtifactsFromBoot() - failed to copy %w", sourceGrubx64EfiPath)
-		return err
+		return fmt.Errorf("failed to copy bootloader file (grubx64.efi).\n%w", err)
 	}
+	iae.artifacts.grubx64EfiPath = targetGrubx64EfiPath
 
 	return nil
 }
 
-func (iae* IsoArtifactExtractor) populateWriteableRootfs(rootfsDevicePath, rootfsType, writeableRootfsDir string) (error) {
+// purpose:
+//   copies the contents of the rootfs partition unto the build machine.
+//
+// input:
+//   - 'rootfsDevicePath' [in]
+//     - path to an existing device - where the device holds a roootfs.
+//   - 'rootfsType' [in]
+//     - the file system type of the specified device.
+//   - 'writeableRootfsDir'
+//     - path to the folder where the contents of the rootfsDevice will be
+//       copied to.
+//
+func (iae* IsoArtifactExtractor) populateWriteableRootfsDir(rootfsDevicePath, rootfsType, writeableRootfsDir string) (error) {
 
 	logger.Log.Infof("creating writeable rootfs...")
 
-	// -- mount .vhdx ---------------------------------------------------------
+	sourceMountDir := filepath.Join(iae.workingDirs.isoBuildDir, "readonly-rootfs-mount")
+	logger.Log.Infof("mounting %s(%s) to %s", rootfsDevicePath, rootfsType, sourceMountDir)
 
-	srcLoopDevMountFullDir := filepath.Join(iae.workingDirs.buildDir, "readonly-rootfs-mount")
-	logger.Log.Infof("--isohelpers.go - mounting %s(%s) to %s", rootfsDevicePath, rootfsType, srcLoopDevMountFullDir)
-
-	srcLoopDevMount, err := safemount.NewMount(rootfsDevicePath, srcLoopDevMountFullDir, rootfsType, 0, "", true)
+	loopDevMount, err := safemount.NewMount(rootfsDevicePath, sourceMountDir, rootfsType, 0, "", true)
 	if err != nil {
 		return fmt.Errorf("failed to mount rootfs partition (%s):\n%w", rootfsDevicePath, err)
 	}
-	defer srcLoopDevMount.Close()
+	defer loopDevMount.Close()
 
 	err = os.MkdirAll(writeableRootfsDir, os.ModePerm)
 	if err != nil {
-		logger.Log.Infof("--isohelpers.go - failed to create folder %s", writeableRootfsDir)
-		return err
+		return fmt.Errorf("failed to create folder %s.\n%w", writeableRootfsDir, err)
 	}
 
-	logger.Log.Infof("--isohelpers.go - copying from %w to %w", srcLoopDevMountFullDir, writeableRootfsDir)
-	cpParams := []string{"-aT", srcLoopDevMountFullDir, writeableRootfsDir}
+	logger.Log.Infof("copying from %s to %s", sourceMountDir, writeableRootfsDir)
+	cpParams := []string{"-aT", sourceMountDir, writeableRootfsDir}
 	err = shell.ExecuteLive(false, "cp", cpParams...)
 	if err != nil {
-		logger.Log.Infof("--isohelpers.go - failed to copy rootfs contents to the writeable image.")
-		return err
+		return fmt.Errorf("failed to copy rootfs contents to a writeable folder (%s).\n%w", writeableRootfsDir, err)
 	}
 
 	return nil
 }
 
-func (iae* IsoArtifactExtractor) stageIsoMakerInitrdArtifacts(writeableRootfsDir, isoMakerArtifactsDirInChroot string) (error) {
+// purpose
+//  IsoMaker looks for the vmlinuz/bootloader files inside the initrd image
+//  file under specific directory structure.
+//  This function extracts those artifacts and places them under the same
+//  directory structure expected by IsoMaker.
+//  This is a staging steps until we run 'dracut' which will take this
+//  directory structure and embeds it into the initrd image.
+//  Finaly, the IsoMaker will read the initrd image and find the artifacts
+//  it needs.
+//  Something to consider in the future, change IsoMaker so that it can pick
+//  those artifacts from the build machine directly.
+//
+// inputs:
+//   - 'writeableRootfsDir':
+//     - path to an existing folder holding the contents of the rootfs.
+//   - 'isoMakerArtifactsStagingDir'
+//     - path to a folder where the extracted artifacts will stored under.
+//
+// outputs:
+//  the artifacts will be stored in 'isoMakerArtifactsStagingDir'.
+//
+func (iae* IsoArtifactExtractor) stageIsoMakerInitrdArtifacts(writeableRootfsDir, isoMakerArtifactsStagingDir string) (error) {
 
 	logger.Log.Infof("staging isomaker artifacts into writeable image...")
 
-	targetBootloadersRWImageDir:=filepath.Join(isoMakerArtifactsDirInChroot, "/efi/EFI/BOOT")
-	targetBootloadersLocalDir := filepath.Join(writeableRootfsDir, targetBootloadersRWImageDir)
+	targetBootloadersInChroot:=filepath.Join(isoMakerArtifactsStagingDir, "/efi/EFI/BOOT")
+	targetBootloadersDir := filepath.Join(writeableRootfsDir, targetBootloadersInChroot)
 
-	err := os.MkdirAll(targetBootloadersLocalDir, os.ModePerm)
+	err := os.MkdirAll(targetBootloadersDir, os.ModePerm)
 	if err != nil {
-		logger.Log.Infof("--isohelpers.go - failed to create %w", targetBootloadersLocalDir)
-		return err
+		return fmt.Errorf("failed to create %s\n%w", targetBootloadersDir, err)
 	}
 
-	sourceBoot64EfiFile := filepath.Join(iae.workingDirs.outDir, "bootx64.efi")
-	targetBoot64EfiFile := filepath.Join(targetBootloadersLocalDir, "bootx64.efi")
-	err = copyFile(sourceBoot64EfiFile, targetBoot64EfiFile)
+	sourceBoot64EfiPath := filepath.Join(iae.workingDirs.outDir, "bootx64.efi")
+	targetBoot64EfiPath := filepath.Join(targetBootloadersDir, "bootx64.efi")
+	err = copyFile(sourceBoot64EfiPath, targetBoot64EfiPath)
 	if err != nil {
-		logger.Log.Infof("--isohelpers.go - failed to copy boot64.efi")
-		return err
+		return fmt.Errorf("failed to bootloader file (bootx64.efi).\n%w", err)
 	}
 
-	sourceGrub64EfiFile := filepath.Join(iae.workingDirs.outDir, "grubx64.efi")
-	targetGrub64EfiFile := filepath.Join(targetBootloadersLocalDir, "grubx64.efi")
-	err = copyFile(sourceGrub64EfiFile, targetGrub64EfiFile)
+	sourceGrub64EfiPath := filepath.Join(iae.workingDirs.outDir, "grubx64.efi")
+	targetGrub64EfiPath := filepath.Join(targetBootloadersDir, "grubx64.efi")
+	err = copyFile(sourceGrub64EfiPath, targetGrub64EfiPath)
 	if err != nil {
-		logger.Log.Infof("--isohelpers.go - failed to copy grub64.efi")
-		return err
+		return fmt.Errorf("failed to bootloader file (grubx64.efi).\n%w", err)
 	}
 
-	targetVmlinuzRWImageDir := isoMakerArtifactsDirInChroot
-	targetVmlinuzLocalDir := filepath.Join(writeableRootfsDir, targetVmlinuzRWImageDir)
+	targetVmlinuzLocalDir := filepath.Join(writeableRootfsDir, isoMakerArtifactsStagingDir)
 
-	sourceVmlinuzFile := iae.artifacts.vmlinuzPath
-	targetVmlinuzFile := filepath.Join(targetVmlinuzLocalDir, "vmlinuz")
-	err = copyFile(sourceVmlinuzFile, targetVmlinuzFile)
+	sourceVmlinuzPath := iae.artifacts.vmlinuzPath
+	targetVmlinuzPath := filepath.Join(targetVmlinuzLocalDir, "vmlinuz")
+	err = copyFile(sourceVmlinuzPath, targetVmlinuzPath)
 	if err != nil {
-		logger.Log.Infof("--isohelpers.go - failed to copy vmlinuz")
-		return err
+		return fmt.Errorf("failed to stage vmlinuz.\n%w", err)
 	}
 
 	return nil
 }
 
-func (iae* IsoArtifactExtractor) prepareImageForDracut(writeableRootfsDir string) (error) {
+// purpose
+//  ensures two things:
+//  - initrd image build time configuration is in place.
+//  - rootfs (squashfs) image contents are compatible with our LiveOS initrd
+//    boot flow.
+//  note that the same rootfs is used for both:
+//  (1) creating the initrd image and
+//  (2) creating the squashfs image.
+//
+// inputs
+// - writeableRootfsDir [in]:
+//   - root directory of existing rootfs content to modify.
+//
+// outputs:
+// - all changes will be applied to the specified rootfs directory in the input.
+//
+func (iae* IsoArtifactExtractor) prepareRootfsForDracut(writeableRootfsDir string) (error) {
 
 	logger.Log.Infof("preparing writeable image for dracut...")
 
 	fstabFile := filepath.Join(writeableRootfsDir, "/etc/fstab")
-	logger.Log.Infof("--isohelpers.go - deleting fstab from %w", fstabFile)
+	logger.Log.Infof("deleting fstab from %s", fstabFile)
 	err := os.Remove(fstabFile)
 	if err != nil {
-		logger.Log.Infof("--isohelpers.go - failed to delete fstab. Error=%w", err)
-		return err
+		return fmt.Errorf("failed to delete fstab.\n%w", err)
 	}
 
-	sourceConfigFile := filepath.Join(iae.workingDirs.tmpDir, "20-live-cd.conf")
-
-	logger.Log.Infof("--isohelpers.go - creating %s", sourceConfigFile)
+	sourceConfigFile := filepath.Join(iae.workingDirs.isoBuildDir, "20-live-cd.conf")
 	err = ioutil.WriteFile(sourceConfigFile, []byte(dracutConfig), 0644)
 	if err != nil {
-		logger.Log.Infof("--isohelpers.go - failed to create %s. Error:\n%w", sourceConfigFile, err)
-		return err
+		return fmt.Errorf("failed to create %s.\n%w", sourceConfigFile, err)
 	}
 
 	targetConfigFile := filepath.Join(writeableRootfsDir, "/etc/dracut.conf.d/20-live-cd.conf")
 	err = copyFile(sourceConfigFile, targetConfigFile)
 	if err != nil {
-		logger.Log.Infof("--isohelpers.go - failed to copy dracut config")
-		return err
+		return fmt.Errorf("failed to copy dracut config at %s.\n%w", targetConfigFile, err)
 	}
 
 	return nil
 }
 
-func (iae* IsoArtifactExtractor) createSquashfs(writeableRootfsDir string) (error) {
+// purpose
+//   creates a squashfs image based on a given folder.
+// inputs
+//   writeableRootfsDir [in]:
+//   - directory tree root holding the contents to be placed in the squashfs image.
+//
+// output
+//   - creates a squashfs image and stores its path in 
+//     iae.artifacts.squashfsImagePath
+//
+func (iae* IsoArtifactExtractor) createSquashfsImage(writeableRootfsDir string) (error) {
 
-	logger.Log.Infof("creating squashfs of %w", writeableRootfsDir)
+	logger.Log.Infof("creating squashfs of %s", writeableRootfsDir)
 
-	generatedSquashfsFile := filepath.Join(iae.workingDirs.outDir, "rootfs.img")
+	squashfsImagePath := filepath.Join(iae.workingDirs.outDir, "rootfs.img")
 
-	oldFileExists, err := fileExists(generatedSquashfsFile)
-	if err == nil && oldFileExists {
-		err = os.Remove(generatedSquashfsFile)
+	exists, err := fileExists(squashfsImagePath)
+	if err == nil && exists {
+		err = os.Remove(squashfsImagePath)
 		if err != nil {
-			logger.Log.Infof("--isohelpers.go - failed to delete squashfs")
-			return err
+			return fmt.Errorf("failed to delete existing squashfs image (%s).\r%w", squashfsImagePath, err)
 		}
 	}
 
-	mksquashfsParams := []string{writeableRootfsDir, generatedSquashfsFile}
+	mksquashfsParams := []string{writeableRootfsDir, squashfsImagePath}
 	err = shell.ExecuteLive(false, "mksquashfs", mksquashfsParams...)
 	if err != nil {
-		logger.Log.Infof("--isohelpers.go - failed to create squashfs")
-		return err
+		return fmt.Errorf("failed to create squashfs.\r%w", err)
 	}
 
-	iae.artifacts.squashfsPath = generatedSquashfsFile
-
+	iae.artifacts.squashfsImagePath = squashfsImagePath
 	return nil
 }
 
-func (iae* IsoArtifactExtractor) convertToLiveOSImage(writeableRootfsDir, isoMakerArtifactsDirInChroot string) (error) {
+// purpose
+//  given a rootfs, it
+//  - extracts the kernel version, vmlinuz, and grub.cfg. 
+//  - stages files to be included in the initrd when it's generated. IsoMaker
+//    expects those files to be embedded in the initrd.
+//  - prepares the rootfs to run dracut (dracut will generate the initrd later).
+//  - creates the squashfs.
+// inputs
+// - writeableRootfsDir [in]:
+//     A writeable folder where the rootfs content is.
+// - isoMakerArtifactsStagingDir [in]:
+//     The folder where the artifacts needed by isoMaker will be staged before
+//     'dracut' is run. 'dracut' will include this folder as-is and place it in
+//     the initrd image.
+//
+// outputs
+//
+func (iae* IsoArtifactExtractor) prepareLiveOSDir(writeableRootfsDir, isoMakerArtifactsStagingDir string) (error) {
 
-	logger.Log.Infof("converting writeable image to be a LiveOS file system...")
+	logger.Log.Infof("creating LiveOS squashfs image...")
 
-	// -- determine kernel version --------------------------------------------
-
+	// extract kernel version
 	kernelParentPath := filepath.Join(writeableRootfsDir, "/usr/lib/modules")
-	logger.Log.Infof("--isohelpers.go - enumerating kernels under %w", kernelParentPath)
 	kernelPaths, err := os.ReadDir(kernelParentPath)
 	if err != nil {
-		logger.Log.Infof("--isohelpers.go - failed to enumerate kernels.")
-		return err
+		return fmt.Errorf("failed to enumerate kernels under (%s).\n%w", kernelParentPath, err)
 	}
 	if len(kernelPaths) == 0 {
-		logger.Log.Infof("--isohelpers.go - found 0 kernels.")
-		return fmt.Errorf("found 0 kernels!")
+		return fmt.Errorf("did not find any installed kernels under (%s).\n%w", kernelParentPath, err)
 	}
 	// do we need to sort this?
 	iae.artifacts.kernelVersion = kernelPaths[len(kernelPaths)-1].Name()
-	logger.Log.Infof("--isohelpers.go - found kernel version (%s)", iae.artifacts.kernelVersion)	
+	logger.Log.Infof("found installed kernel version (%s)", iae.artifacts.kernelVersion)	
 
-	// -- extract grub.cfg and vmlinuz ----------------------------------------
-
-	sourceGrubCfgPath := filepath.Join(writeableRootfsDir, "/boot/grub2/grub.cfg")
+	// create grub.cfg
 	targetGrubCfgPath := filepath.Join(iae.workingDirs.outDir, "grub.cfg")
 
-	err = createGrubCfg(sourceGrubCfgPath, grubCfgTemplate, targetGrubCfgPath)
+	err = ioutil.WriteFile(targetGrubCfgPath, []byte(grubCfgTemplate), 0644)
 	if err != nil {
-		logger.Log.Infof("--isohelpers.go - failed to create grub.cfg")
-		return err
+		return fmt.Errorf("failed to create grub.cfg.\n%w", err)
 	}
 
 	iae.artifacts.grubCfgPath = targetGrubCfgPath
 
+	// extract/create vmlinuz
 	sourceVmlinuzPath := filepath.Join(writeableRootfsDir, "/boot/vmlinuz-" + iae.artifacts.kernelVersion)
-	iae.artifacts.vmlinuzPath = filepath.Join(iae.workingDirs.outDir, "vmlinuz")
-	err = copyFile(sourceVmlinuzPath, iae.artifacts.vmlinuzPath)
+	targetVmLinuzPath := filepath.Join(iae.workingDirs.outDir, "vmlinuz")
+
+	err = copyFile(sourceVmlinuzPath, targetVmLinuzPath)
 	if err != nil {
-		logger.Log.Infof("--isohelpers.go - failed to copy vmlinuz")
-		return err
+		return fmt.Errorf("failed to extract vmlinuz from (%s).\n%w", sourceVmlinuzPath, err)
 	}
 
-	// -- upload bootloaders and vmlinuz to make isomaker happy ---------------
+	iae.artifacts.vmlinuzPath = targetVmLinuzPath
 
-	err = iae.stageIsoMakerInitrdArtifacts(writeableRootfsDir, isoMakerArtifactsDirInChroot)
+	// stage artifacts needed by isomaker
+	// the artifacts are staged inside initrd where isomaker will look for them
+	// when creating the final iso image.
+	err = iae.stageIsoMakerInitrdArtifacts(writeableRootfsDir, isoMakerArtifactsStagingDir)
 	if err != nil {
-		logger.Log.Infof("--isohelpers.go - failed to embed iso maker artifacts.")
-		return err
+		return fmt.Errorf("failed to stage isomaker initrd artifacts.\n%w", err)
 	}
 
-	// -- configure dracut ----------------------------------------------------
-
-	err = iae.prepareImageForDracut(writeableRootfsDir)
+	// configure dracut
+	err = iae.prepareRootfsForDracut(writeableRootfsDir)
 	if err != nil {
-		logger.Log.Infof("--isohelpers.go - failed to embed iso maker artifacts.")
-		return err
-	}
-	// -- generate squashfs ---------------------------------------------------
-
-	err = iae.createSquashfs(writeableRootfsDir)
-	if err != nil {
-		logger.Log.Infof("--isohelpers.go - failed to squashfs.")
-		return err
+		return fmt.Errorf("failed to prepare rootfs for dracut.\n%w", err)
 	}
 
 	return nil
 }
 
-func createGrubCfg(sourceGrubCfgPath, grubCfgTemplate, targetGrubCfgPath string) error {
+// purpose
+//   helper that ensures the target folder exists before copying the file to
+//   it.
+//
+// inputs:
+//   'sourcePath' [in]:
+//   - path to the source file.
+//   'targetPath' [in]:
+//   - path to the target file.
+//
+// outputs:
+//   the source file is copies to the target path.
+//
+func copyFile(sourcePath, targetPath string) error {
 
-	logger.Log.Infof("--isohelpers.go - using %s to create %s", sourceGrubCfgPath, targetGrubCfgPath)
+	logger.Log.Infof("copying %s to %s", sourcePath, targetPath)
 
-	// ToDo: we should merge sourceGrubCfgPath with grubCfgTemplate
-	err := ioutil.WriteFile(targetGrubCfgPath, []byte(grubCfgTemplate), 0644)
+	err := os.MkdirAll(filepath.Dir(targetPath), os.ModePerm)
 	if err != nil {
 		return err
 	}
 
-	return nil
+	return file.Copy(sourcePath, targetPath)
 }
 
-func copyFile(src, dst string) error {
-
-	logger.Log.Infof("--isohelpers.go - copying %s to %s", src, dst)
-
-	err := os.MkdirAll(filepath.Dir(dst), os.ModePerm)
-	if err != nil {
-		return err
-	}
-
-	return file.Copy(src, dst)
-}
-
+// purpose
+//   helper that checks if a given file exists or not.
+//
+// inputs:
+//   'filePath' [in]:
+//   - path of file to check.
+//
+// output:
+//   true if the file exists, otherwise, false.
+//
 func fileExists(filePath string) (bool, error) {
 	_, err := os.Stat(filePath)
 
