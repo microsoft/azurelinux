@@ -1,12 +1,12 @@
 Summary:        X.Org X11 libXext runtime library
 Name:           libXext
-Version:        1.3.4
-Release:        6%{?dist}
+Version:        1.3.5
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.x.org
-Source0:        https://xorg.freedesktop.org/archive/individual/lib/%{name}-%{version}.tar.bz2
+Source0:        https://xorg.freedesktop.org/archive/individual/lib/%{name}-%{version}.tar.gz
 
 BuildRequires:  autoconf
 BuildRequires:  automake
