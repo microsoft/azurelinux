@@ -16,7 +16,7 @@ Release: 1%{?dist}
 License: LGPL-3.0-only OR GPL-3.0-only WITH Qt-GPL-exception-1.0
 Url:     http://www.qt.io
 %global majmin %(echo %{version} | cut -d. -f1-2)
-%global  qt_version %(echo %{version} | cut -d~ -f1)
+%global qt_version %(echo %{version} | cut -d~ -f1)
  
 %if 0%{?unstable}
 Source0: https://download.qt.io/development_releases/qt/%{majmin}/%{qt_version}/submodules/%{qt_module}-everywhere-src-%{qt_version}-%{prerelease}.tar.xz
@@ -46,7 +46,7 @@ BuildRequires: libicu-devel
 %package devel
 Summary: Development files for %{name}
 Requires: %{name}%{?_isa} = %{version}-%{release}
-Requires: qt6-qtbase-devel%{?_isa}
+Requires: qtbase-devel%{?_isa}
 %description devel
 %{summary}.
  
@@ -60,11 +60,11 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
  
  
 %prep
-%autosetup -n %{qt_module}-everywhere-src-%{qt_version}%{?unstable:-%{prerelease}} -p1
+%autosetup -n %{qt_module}-everywhere-src-%{qt_version} -p1
  
  
 %build
-%cmake_qt6 -DQT_BUILD_EXAMPLES:BOOL=%{?examples:ON}%{!?examples:OFF}
+%cmake_qt -DQT_BUILD_EXAMPLES:BOOL=%{?examples:ON}%{!?examples:OFF}
  
 %cmake_build
  
@@ -110,6 +110,7 @@ popd
 %endif
  
 %changelog
+
 * Tue Jan 02 2024 Sam Meluch <sammeluch@microsoft.com> - 6.6.1-1
 - Initial CBL-Mariner import from Fedora 39 (license: MIT).
 - License Verified

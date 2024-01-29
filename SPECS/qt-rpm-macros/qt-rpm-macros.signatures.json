@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "macros.qt5": "55bf570ec45a0d35c16137c389735053a181c2f68df2e733710fc5efe10d0c09",
-  "qmake-qt5.sh": "b7425a23ab3ddaa0d55f5081e2d11b9a40e89181ce68a96a25bbafeaa65b94db"
+  "macros.qt": "55073429a97af47fc05ddd07b2b236b1708ccb7b1d3c7fe59fb94df4090bb394",
+  "qmake-qt.sh": "a7a06b296ee4b7e5f57734b3f815cdbcf0ed76848743d1bf04c31e37490bef07"
  }
 }

@@ -4,7 +4,7 @@
 # lack native qmake support (ie, qmake is run by buildsystem
 # instead of developer or fedora packager).
 
-QMAKE="$(rpm --eval %{_qt5_qmake})"
-QMAKE_FLAGS="$(rpm --eval %{?_qt5_qmake_flags})"
+QMAKE="$(rpm --eval %{_qt_qmake})"
+QMAKE_FLAGS="$(rpm --eval %{?_qt_qmake_flags})"
 
 eval $QMAKE $QMAKE_FLAGS $@

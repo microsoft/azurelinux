@@ -116,12 +116,11 @@ Requires: %{name}-common = %{version}-%{release}
 %setup -q -n qttools-everywhere-src-%{version}
 
 %build
-
-qmake-qt6 .
-make %{?_smp_mflags}
+%cmake_qt
+%cmake_build
 
 %install
-make install INSTALL_ROOT=%{buildroot}
+%cmake_install
 
 # icons
 install -m644 -p -D src/assistant/assistant/images/assistant.png %{buildroot}%{_datadir}/icons/hicolor/32x32/apps/assistant-qt6.png
@@ -195,7 +194,6 @@ done
 popd
 
 %endif
-
 
 %files
 %{_bindir}/qdbus-qt6

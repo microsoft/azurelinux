@@ -47,6 +47,8 @@ BuildRequires: systemd
 BuildRequires: gcc
 BuildRequires: make
 BuildRequires: which
+BuildRequires: cmake
+BuildRequires: ninja-build
 
 BuildRequires: icu-devel
 BuildRequires: glib-devel
@@ -58,7 +60,7 @@ BuildRequires: fontconfig-devel
 BuildRequires: libpng-devel
 BuildRequires: libjpeg-turbo-devel
 BuildRequires: zlib-devel
-BuildRequires: qt5-rpm-macros
+BuildRequires: qt-rpm-macros
 
 Requires:         icu
 Requires(post):   chkconfig
@@ -93,18 +95,11 @@ Patch50: qtbase-QT_VERSION_CHECK.patch
 # 2. Workaround sysmacros.h (pre)defining major/minor a breaking stuff
 Patch52: qtbase-moc-macros.patch
 
-# respect QMAKE_LFLAGS_RELEASE when building qmake
-Patch54: qtbase-qmake_LFLAGS.patch
-
 # drop -O3 and make -O2 by default
 Patch61: qtbase-cxxflag.patch
 
 # fix for new mariadb
 Patch65: qtbase-mysql.patch
-
-# https://fedoraproject.org/wiki/Changes/Qt_Wayland_By_Default_On_Gnome
-# https://bugzilla.redhat.com/show_bug.cgi?id=1732129
-Patch80: qtbase-use-wayland-on-gnome.patch
 
 # Do not check any files in %%{_qt_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -261,75 +256,49 @@ echo USRBIN
 ls /usr/bin/
 
 
-./configure \
-  -verbose \
-  -opensource \
-  -confirm-license \
-  -platform linuxfb \
-  -no-opengl \
-  -prefix %{_qt_prefix} \
-  -archdatadir %{_qt_archdatadir} \
-  -bindir %{_qt_bindir} \
-  -libdir %{_qt_libdir} \
-  -libexecdir %{_qt_libexecdir} \
-  -datadir %{_qt_datadir} \
-  -docdir %{_qt_docdir} \
-  -examplesdir %{_qt_examplesdir} \
-  -headerdir %{_qt_headerdir} \
-  -importdir %{_qt_importdir} \
-  -plugindir %{_qt_plugindir} \
-  -sysconfdir %{_qt_sysconfdir} \
-  -translationdir %{_qt_translationdir} \
-  -platform %{platform} \
-  -release \
-  -shared \
-  -accessibility \
-  %{?dbus}%{!?dbus:-dbus-runtime} \
-  -fontconfig \
-  -glib \
-  %{?ibase} \
-  -icu \
-  -optimized-qmake \
-  %{?openssl} \
-  %{!?examples:-nomake examples} \
-  %{!?tests:-nomake tests} \
-  -no-pch \
-  -no-rpath \
-  -no-separate-debug-info \
-  %{?no_sse2} \
-  -no-strip \
-  %{?harfbuzz} \
-  %{?pcre} \
-  %{?sqlite} \
-  %{?tds} \
-  %{?xcb} \
-  %{?xkbcommon} \
-  -zlib \
-  %{?use_gold_linker} \
-  %{?no_feature_renameat2} \
-  %{?no_feature_statx} \
-  QMAKE_CFLAGS_RELEASE="${CFLAGS:-$RPM_OPT_FLAGS}" \
-  QMAKE_CXXFLAGS_RELEASE="${CXXFLAGS:-$RPM_OPT_FLAGS}" \
-  QMAKE_LFLAGS_RELEASE="${LDFLAGS:-$RPM_LD_FLAGS}"
+%cmake_qt \
+ -DQT_FEATURE_accessibility=ON \
+ -DQT_FEATURE_fontconfig=ON \
+ -DQT_FEATURE_glib=ON \
+ -DQT_FEATURE_sse2=%{?no_sse2:OFF}%{!?no_sse2:ON} \
+ -DQT_FEATURE_icu=ON \
+ -DQT_FEATURE_enable_new_dtags=ON \
+ -DQT_FEATURE_journald=%{?journald:ON}%{!?journald:OFF} \
+ -DQT_FEATURE_openssl_linked=ON \
+ -DQT_FEATURE_openssl_hash=ON \
+ -DQT_FEATURE_libproxy=ON \
+ -DQT_FEATURE_sctp=ON \
+ -DQT_FEATURE_separate_debug_info=OFF \
+ -DQT_FEATURE_reduce_relocations=OFF \
+ -DQT_FEATURE_relocatable=OFF \
+ -DQT_FEATURE_system_jpeg=ON \
+ -DQT_FEATURE_system_png=ON \
+ -DQT_FEATURE_system_zlib=ON \
+ %{?ibase:-DQT_FEATURE_sql_ibase=ON} \
+ -DQT_FEATURE_sql_odbc=ON \
+ -DQT_FEATURE_sql_mysql=ON \
+ -DQT_FEATURE_sql_psql=ON \
+ -DQT_FEATURE_sql_sqlite=ON \
+ -DQT_FEATURE_rpath=OFF \
+ -DQT_FEATURE_zstd=ON \
+ %{?dbus_linked:-DQT_FEATURE_dbus_linked=ON} \
+ %{?pcre:-DQT_FEATURE_system_pcre2=ON} \
+ %{?sqlite:-DQT_FEATURE_system_sqlite=ON} \
+ -DBUILD_SHARED_LIBS=ON \
+ -DQT_BUILD_EXAMPLES=%{?examples:ON}%{!?examples:OFF} \
+ -DQT_BUILD_TESTS=%{?tests:ON}%{!?tests:OFF} \
+ -DQT_QMAKE_TARGET_MKSPEC=%{platform}
 
-
-# ensure qmake build using optflags (which can happen if not munging qmake.conf defaults)
-make clean -C qmake
-%make_build -C qmake all binary \
-  QMAKE_CFLAGS_RELEASE="${CFLAGS:-$RPM_OPT_FLAGS}" \
-  QMAKE_CXXFLAGS_RELEASE="${CXXFLAGS:-$RPM_OPT_FLAGS}" \
-  QMAKE_LFLAGS_RELEASE="${LDFLAGS:-$RPM_LD_FLAGS}" \
-  QMAKE_STRIP=
-
-%make_build
+%cmake_build
 
 
 %install
-make install INSTALL_ROOT=%{buildroot}
+%cmake_install
 
 install -m644 -p -D %{SOURCE1} %{buildroot}%{_qt_datadir}/qtlogging.ini
 
-# Qt5.pc
+# Qt6.pc
+mkdir -p %{buildroot}%{_libdir}/pkgconfig
 cat >%{buildroot}%{_libdir}/pkgconfig/Qt6.pc<<EOF
 prefix=%{_qt_prefix}
 archdatadir=%{_qt_archdatadir}

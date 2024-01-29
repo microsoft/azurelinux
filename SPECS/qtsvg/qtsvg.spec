@@ -39,12 +39,12 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 %autosetup -p1 -n qtsvg-everywhere-src-%{version}
 
 %build
-qmake-qt6 .
+%cmake_qt
 
-%make_build
+%cmake_build
 
 %install
-make install INSTALL_ROOT=%{buildroot}
+%cmake_install
 
 ## .prl/.la file love
 # nuke .prl reference(s) to %%buildroot, excessive (.la-like) libs

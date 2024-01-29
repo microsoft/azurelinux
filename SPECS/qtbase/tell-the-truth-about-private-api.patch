@@ -1,16 +1,28 @@
-diff --git a/mkspecs/features/qt_module.prf b/mkspecs/features/qt_module.prf
-index e6a0d97..cf93041 100644
---- a/mkspecs/features/qt_module.prf
-+++ b/mkspecs/features/qt_module.prf
-@@ -216,9 +216,9 @@ android: CONFIG += qt_android_deps no_linker_version_script
-     QMAKE_LFLAGS += $${QMAKE_LFLAGS_VERSION_SCRIPT}$$verscript
-
-     internal_module {
--        verscript_content = "Qt_$${QT_MAJOR_VERSION}_PRIVATE_API { *; };"
-+        verscript_content = "Qt_$${QT_MAJOR_VERSION}.$${QT_MINOR_VERSION}.$${QT_PATCH_VERSION}_PRIVATE_API { *; };"
-     } else {
--        verscript_content = "Qt_$${QT_MAJOR_VERSION}_PRIVATE_API {" \
-+        verscript_content = "Qt_$${QT_MAJOR_VERSION}.$${QT_MINOR_VERSION}.$${QT_PATCH_VERSION}_PRIVATE_API {" \
-                             "    qt_private_api_tag*;"
-
-         private_api_headers = $$SYNCQT.PRIVATE_HEADER_FILES $$SYNCQT.QPA_HEADER_FILES
+From 25e78cce15fdf737cc48ed5d7683ad1d01b55621 Mon Sep 17 00:00:00 2001
+From: Christophe Giboudeaux <christophe@krop.fr>
+Date: Sun, 20 Sep 2020 09:57:22 +0200
+Subject: [PATCH] Tell the truth about private API
+ 
+Mark private API with symbols only for the current patch release
+ 
+This change is a port of the libqt5-qtbase patch which was
+added during the Qt 5.6 cycle.
+---
+ cmake/QtFlagHandlingHelpers.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+ 
+diff --git a/cmake/QtFlagHandlingHelpers.cmake b/cmake/QtFlagHandlingHelpers.cmake
+index d8597326cc..f9da7b2171 100644
+--- a/cmake/QtFlagHandlingHelpers.cmake
++++ b/cmake/QtFlagHandlingHelpers.cmake
+@@ -23,7 +23,7 @@ function(qt_internal_add_linker_version_script target)
+     endif()
+ 
+     if(TEST_ld_version_script)
+-        set(contents "Qt_${PROJECT_VERSION_MAJOR}_PRIVATE_API {\n    qt_private_api_tag*;\n")
++        set(contents "Qt_${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}_PRIVATE_API {\n    qt_private_api_tag*;\n")
+         if(arg_PRIVATE_HEADERS)
+             foreach(ph ${arg_PRIVATE_HEADERS})
+                 string(APPEND contents "    @FILE:${ph}@\n")
+--
+2.40.0

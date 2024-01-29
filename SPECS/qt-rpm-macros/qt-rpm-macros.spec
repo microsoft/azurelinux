@@ -1,48 +1,51 @@
 Summary:        RPM macros for building Qt5 and KDE Frameworks 5 packages
-Name:           qt5-rpm-macros
-Version:        5.12.5
-Release:        3%{?dist}
+Name:           qt-rpm-macros
+Version:        6.6.1
+Release:        1%{?dist}
 License:        GPLv3
 URL:            https://getfedora.org/
-Source0:        macros.qt5
-Source1:        qmake-qt5.sh
+Source0:        macros.qt
+Source1:        qmake-qt.sh
 BuildArch:      noarch
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
-Conflicts: qt5
-Conflicts: qt5-qtbase-devel < 5.6.0-0.23
+Conflicts: qt6
+Conflicts: qtbase-devel < 6.6.1
 
 %description
 %{summary}.
 
 %install
-install -Dpm644 %{SOURCE0} %{buildroot}%{_rpmconfigdir}/macros.d/macros.qt5
-install -Dpm755 %{SOURCE1} %{buildroot}%{_bindir}/qmake-qt5.sh
-mkdir -p %{buildroot}%{_datadir}/qt5/wrappers
-ln -s %{_bindir}/qmake-qt5.sh %{buildroot}%{_datadir}/qt5/wrappers/qmake-qt5
-ln -s %{_bindir}/qmake-qt5.sh %{buildroot}%{_datadir}/qt5/wrappers/qmake
+install -Dpm644 %{SOURCE0} %{buildroot}%{_rpmconfigdir}/macros.d/macros.qt
+install -Dpm755 %{SOURCE1} %{buildroot}%{_bindir}/qmake-qt.sh
+mkdir -p %{buildroot}%{_datadir}/qt6/wrappers
+ln -s %{_bindir}/qmake-qt.sh %{buildroot}%{_datadir}/qt6/wrappers/qmake-qt
+ln -s %{_bindir}/qmake-qt.sh %{buildroot}%{_datadir}/qt6/wrappers/qmake
 
 # substitute custom flags, and the path to binaries: binaries referenced from
 # macros should not change if an application is built with a different prefix.
 # %_libdir is left as /usr/%{_lib} (e.g.) so that the resulting macros are
 # architecture independent, and don't hardcode /usr/lib or /usr/lib64.
 sed -i \
-  -e "s|@@QT5_CFLAGS@@|%{?qt5_cflags}|g" \
-  -e "s|@@QT5_CXXFLAGS@@|%{?qt5_cxxflags}|g" \
-  -e "s|@@QT5_RPM_LD_FLAGS@@|%{?qt5_rpm_ld_flags}|g" \
-  -e "s|@@QT5_RPM_OPT_FLAGS@@|%{?qt5_rpm_opt_flags}|g" \
-  -e "s|@@QMAKE@@|%{_prefix}/%%{_lib}/qt5/bin/qmake|g" \
-  -e "s|@@QMAKE_QT5_WRAPPER@@|%{_bindir}/qmake-qt5.sh|g" \
-  %{buildroot}%{_rpmconfigdir}/macros.d/macros.qt5
+  -e "s|@@QT_CFLAGS@@|%{?qt_cflags}|g" \
+  -e "s|@@QT_CXXFLAGS@@|%{?qt_cxxflags}|g" \
+  -e "s|@@QT_RPM_LD_FLAGS@@|%{?qt_rpm_ld_flags}|g" \
+  -e "s|@@QT_RPM_OPT_FLAGS@@|%{?qt_rpm_opt_flags}|g" \
+  -e "s|@@QMAKE@@|%{_prefix}/%%{_lib}/qt6/bin/qmake|g" \
+  -e "s|@@QMAKE_QT5_WRAPPER@@|%{_bindir}/qmake-qt.sh|g" \
+  %{buildroot}%{_rpmconfigdir}/macros.d/macros.qt
 
 %files
-%{_rpmconfigdir}/macros.d/macros.qt5
-%{_bindir}/qmake-qt5.sh
-%{_datadir}/qt5/wrappers/
+%{_rpmconfigdir}/macros.d/macros.qt
+%{_bindir}/qmake-qt.sh
+%{_datadir}/qt6/wrappers/
 
 
 %changelog
+* Thu Jan 25 2024 Sam Meluch <sammeluch@microsoft.com> - 6.6.1-1
+- Update version to 6.6.1
+
 * Fri May 26 2023 Thien Trung Vuong <tvuong@microsoft.com> - 5.12.5-3
 - Verified license.
 

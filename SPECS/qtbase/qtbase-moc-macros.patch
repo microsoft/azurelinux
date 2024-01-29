@@ -1,7 +1,8 @@
-diff -up qtbase-opensource-src-5.7.1/src/tools/moc/main.cpp.moc_WORDSIZE qtbase-opensource-src-5.7.1/src/tools/moc/main.cpp
---- qtbase-opensource-src-5.7.1/src/tools/moc/main.cpp.moc_WORDSIZE	2016-12-01 02:17:04.000000000 -0600
-+++ qtbase-opensource-src-5.7.1/src/tools/moc/main.cpp	2016-12-08 12:37:28.931589338 -0600
-@@ -179,6 +179,11 @@ int runMoc(int argc, char **argv)
+diff --git a/src/tools/moc/main.cpp b/src/tools/moc/main.cpp
+index 1cb383c9..6bfdee55 100644
+--- a/src/tools/moc/main.cpp
++++ b/src/tools/moc/main.cpp
+@@ -230,6 +230,11 @@ int runMoc(int argc, char **argv)
      Moc moc;
      pp.macros["Q_MOC_RUN"];
      pp.macros["__cplusplus"];

@@ -48,20 +48,19 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %{summary}.
 
 %prep
-%setup -q -n qtdeclarative-everywhere-src-%{version}
+%autosetup -n qtdeclarative-everywhere-src-%{version}
 
 %build
-
 # HACK so calls to "python" get what we want
 ln -s /usr/bin/python3 python
 export PATH=`pwd`:$PATH
 
-qmake-qt6 .
-make %{?_smp_mflags}
+%cmake_qt
+ 
+%cmake_build
 
 %install
-%make_install INSTALL_ROOT=%{buildroot}
-
+%cmake_install
 
 # hardlink files to %{_bindir}, add -qt6 postfix to not conflict
 mkdir %{buildroot}%{_bindir}
