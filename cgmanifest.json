@@ -1337,8 +1337,8 @@
         "type": "other",
         "other": {
           "name": "byacc",
-          "version": "1.9.20220109",
-          "downloadUrl": "https://invisible-mirror.net/archives/byacc/byacc-20220109.tgz"
+          "version": "1.9.20240109",
+          "downloadUrl": "https://invisible-mirror.net/archives/byacc/byacc-20240109.tgz"
         }
       }
     },
@@ -4540,28 +4540,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.17.13",
-          "downloadUrl": "https://golang.org/dl/go1.17.13.src.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "golang",
           "version": "1.18.8",
           "downloadUrl": "https://golang.org/dl/go1.18.8.src.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "golang",
-          "version": "1.19.12",
-          "downloadUrl": "https://golang.org/dl/go1.19.12.src.tar.gz"
         }
       }
     },
@@ -8261,8 +8241,8 @@
         "type": "other",
         "other": {
           "name": "kpatch",
-          "version": "0.9.7",
-          "downloadUrl": "https://github.com/dynup/kpatch/archive/refs/tags/v0.9.7.tar.gz"
+          "version": "0.9.8",
+          "downloadUrl": "https://github.com/dynup/kpatch/archive/refs/tags/v0.9.8.tar.gz"
         }
       }
     },
@@ -13335,16 +13315,6 @@
           "name": "mrtg",
           "version": "2.17.7",
           "downloadUrl": "http://oss.oetiker.ch/mrtg/pub/mrtg-2.17.7.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "msft-golang",
-          "version": "1.19.12",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.19.12-1/go.20230802.5.src.tar.gz"
         }
       }
     },
@@ -27837,8 +27807,8 @@
         "type": "other",
         "other": {
           "name": "sscg",
-          "version": "2.6.2",
-          "downloadUrl": "https://github.com/sgallagher/sscg/releases/download/sscg-2.6.2/sscg-2.6.2.tar.xz"
+          "version": "3.0.5",
+          "downloadUrl": "https://github.com/sgallagher/sscg/archive/refs/tags/sscg-3.0.5.tar.gz"
         }
       }
     },
@@ -28339,16 +28309,6 @@
           "name": "tensorflow",
           "version": "2.11.1",
           "downloadUrl": "https://github.com/tensorflow/tensorflow/archive/refs/tags/v2.11.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "terraform",
-          "version": "1.3.2",
-          "downloadUrl": "https://github.com/hashicorp/terraform/archive/refs/tags/v1.3.2.tar.gz"
         }
       }
     },
