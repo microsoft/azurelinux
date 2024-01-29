@@ -294,31 +294,6 @@ Much of the code in GlusterFS is in user space and easily manageable.
 This package provides support to FUSE based clients and inlcudes the
 glusterfs(d) binary.
 
-%if ( 0%{!?_without_server:1} )
-%package ganesha
-Summary:          NFS-Ganesha configuration
-Group:            Applications/File
-
-Requires:         %{name}-server%{?_isa} = %{version}-%{release}
-Requires:         nfs-ganesha-selinux >= 2.7.6
-Requires:         nfs-ganesha-gluster >= 2.7.6
-Requires:         pcs >= 0.10.0
-Requires:         resource-agents >= 4.2.0
-Requires:         dbus
-
-%description ganesha
-GlusterFS is a distributed file-system capable of scaling to several
-petabytes. It aggregates various storage bricks over Infiniband RDMA
-or TCP/IP interconnect into one large parallel network file
-system. GlusterFS is one of the most sophisticated file systems in
-terms of features and extensibility.  It borrows a powerful concept
-called Translators from GNU Hurd kernel. Much of the code in GlusterFS
-is in user space and easily manageable.
-
-This package provides the configuration and related files for using
-NFS-Ganesha as the NFS server using GlusterFS
-%endif
-
 %if ( 0%{!?_without_georeplication:1} )
 %package geo-replication
 Summary:          GlusterFS Geo-replication
@@ -724,15 +699,6 @@ sed -i 's|option working-directory /etc/glusterd|option working-directory %{_sha
 install -D -p -m 0644 extras/glusterfs-logrotate \
     %{buildroot}%{_sysconfdir}/logrotate.d/glusterfs
 
-# ganesha ghosts
-%if ( 0%{!?_without_server:1} )
-mkdir -p %{buildroot}%{_sysconfdir}/ganesha
-touch %{buildroot}%{_sysconfdir}/ganesha/ganesha-ha.conf
-mkdir -p %{buildroot}%{_localstatedir}/run/gluster/shared_storage/nfs-ganesha/
-touch %{buildroot}%{_localstatedir}/run/gluster/shared_storage/nfs-ganesha/ganesha.conf
-touch %{buildroot}%{_localstatedir}/run/gluster/shared_storage/nfs-ganesha/ganesha-ha.conf
-%endif
-
 %if ( 0%{!?_without_georeplication:1} )
 # geo-rep ghosts
 mkdir -p %{buildroot}%{_sharedstatedir}/glusterd/geo-replication
@@ -1005,12 +971,10 @@ exit 0
 %{_tmpfilesdir}/gluster.conf
 %endif
 
-%if ( 0%{?_without_server:1} )
 #exclude ganesha related files
 %exclude %{_sysconfdir}/ganesha/ganesha-ha.conf.sample
 %exclude %{_libexecdir}/ganesha/*
 %exclude %{_libdir}/ocf/resource.d/heartbeat/*
-%endif
 
 %files cli
 %{_sbindir}/gluster
@@ -1166,19 +1130,6 @@ exit 0
 
 %exclude %{_datadir}/glusterfs/run-tests.sh
 %exclude %{_datadir}/glusterfs/tests
-
-%if ( 0%{!?_without_server:1} )
-%files ganesha
-%dir %{_libexecdir}/ganesha
-%{_sysconfdir}/ganesha/ganesha-ha.conf.sample
-%{_libexecdir}/ganesha/*
-%{_libdir}/ocf/resource.d/heartbeat/*
-%{_sharedstatedir}/glusterd/hooks/1/start/post/S31ganesha-start.sh
-%ghost      %attr(0644,-,-) %config(noreplace) %{_sysconfdir}/ganesha/ganesha-ha.conf
-%ghost %dir %attr(0755,-,-) %{_localstatedir}/run/gluster/shared_storage/nfs-ganesha
-%ghost      %attr(0644,-,-) %config(noreplace) %{_localstatedir}/run/gluster/shared_storage/nfs-ganesha/ganesha.conf
-%ghost      %attr(0644,-,-) %config(noreplace) %{_localstatedir}/run/gluster/shared_storage/nfs-ganesha/ganesha-ha.conf
-%endif
 
 %if ( 0%{!?_without_ocf:1} )
 %files resource-agents
