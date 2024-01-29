@@ -1,13 +1,13 @@
 diff --git a/kured-ds.yaml b/kured-ds.yaml
-index 15869c4..b226865 100644
+index 340ef46..a6d9e64 100644
 --- a/kured-ds.yaml
 +++ b/kured-ds.yaml
-@@ -32,7 +32,7 @@ spec:
-           image: docker.io/weaveworks/kured:1.9.1
-                  # If you find yourself here wondering why there is no
-                  # :latest tag on Docker Hub,see the FAQ in the README
+@@ -39,7 +39,7 @@ spec:
+           # If you find yourself here wondering why there is no
+           # :latest tag on Docker Hub,see the FAQ in the README
+           image: ghcr.io/kubereboot/kured:1.15.0
 -          imagePullPolicy: IfNotPresent
 +          imagePullPolicy: Always
            securityContext:
              privileged: true # Give permission to nsenter /proc/1/ns/mnt
-           env:
+             readOnlyRootFilesystem: true

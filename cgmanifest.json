@@ -8381,8 +8381,8 @@
         "type": "other",
         "other": {
           "name": "kured",
-          "version": "1.9.1",
-          "downloadUrl": "https://github.com/weaveworks/kured/archive/refs/tags/1.9.1.tar.gz"
+          "version": "1.15.0",
+          "downloadUrl": "https://github.com/weaveworks/kured/archive/refs/tags/1.15.0.tar.gz"
         }
       }
     },
