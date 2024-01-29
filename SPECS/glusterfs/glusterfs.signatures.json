@@ -1,7 +1,7 @@
 {
  "Signatures": {
   "glusterd.sysconfig": "655bda588d5f2cb2dc9fc51e769bf1db0a8e6375e0b9a01f43862d915b1af4d7",
-  "glusterfs-7.9.tar.gz": "b5a0dde0713214594524d5948769863b6d274de05788471de59fbe6a1212a3b9",
+  "glusterfs-11.1.tar.gz": "6a31b8450d02cd12f47f4571c031e9d6b8705279a0e8970ae9a05e1c87dffb76",
   "glusterfsd.init": "1e4e3b3ec5904171c08cfe091a96551191daea2b9df8d3d4c61a5eeb409a1026",
   "glusterfsd.service": "7a0a0bcd39328b358798b6407d32f19a7255dec48866be4d0ec6dec91681f0d3",
   "glusterfsd.sysconfig": "082120fa6848b16cc7c8f9d0f6136bb683df4995f74f314e75fb0a6184d158f8"
