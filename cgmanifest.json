@@ -1337,8 +1337,8 @@
         "type": "other",
         "other": {
           "name": "byacc",
-          "version": "1.9.20220109",
-          "downloadUrl": "https://invisible-mirror.net/archives/byacc/byacc-20220109.tgz"
+          "version": "1.9.20240109",
+          "downloadUrl": "https://invisible-mirror.net/archives/byacc/byacc-20240109.tgz"
         }
       }
     },
