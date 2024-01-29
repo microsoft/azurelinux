@@ -150,8 +150,8 @@ BuildRequires:  flex
 BuildRequires:  gcc
 BuildRequires:  libacl-devel
 BuildRequires:  libaio-devel
-BuildRequires:  libuuid-devel
 BuildRequires:  libtool
+BuildRequires:  libuuid-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  make
 BuildRequires:  ncurses-devel
