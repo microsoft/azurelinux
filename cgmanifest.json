@@ -4360,8 +4360,8 @@
         "type": "other",
         "other": {
           "name": "glusterfs",
-          "version": "7.9",
-          "downloadUrl": "https://download.gluster.org/pub/gluster/glusterfs/7/7.9/glusterfs-7.9.tar.gz"
+          "version": "11.1",
+          "downloadUrl": "https://download.gluster.org/pub/gluster/glusterfs/11/11.1/glusterfs-11.1.tar.gz"
         }
       }
     },
