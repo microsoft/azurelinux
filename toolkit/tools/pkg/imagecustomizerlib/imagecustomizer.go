@@ -529,20 +529,19 @@ func createIsoImage(buildDir, sourceImageFile, outputImageDir, outputImageBase s
 	for _, mountPoint := range mountPoints {
 		if mountPoint.GetTarget() == "/" {
 
-			writeableRootfsImage := filepath.Join(iae.workingDirs.tmpDir, "writeable-rootfs.img")
-
-			err := iae.createWriteableRootfs(mountPoint.GetSource(), mountPoint.GetFSType(), writeableRootfsImage)
+		    writeableRootfsDir := filepath.Join(iae.workingDirs.tmpDir, "writeable-rootfs-mount")
+			err := iae.populateWriteableRootfs(mountPoint.GetSource(), mountPoint.GetFSType(), writeableRootfsDir)
 			if err != nil {
 				return err
 			}
 
-			isoMakerArtifactsStagingDirWithinRWImage := "/boot-staging"
-			err = iae.convertToLiveOSImage(writeableRootfsImage, isoMakerArtifactsStagingDirWithinRWImage)
+			isoMakerArtifactsStagingDirWithinWriteableRootfsDir := "/boot-staging"
+			err = iae.convertToLiveOSImage(writeableRootfsDir, isoMakerArtifactsStagingDirWithinWriteableRootfsDir)
 			if err != nil {
 				return err
 			}
 
-			err = iae.generateInitrd(writeableRootfsImage, isoMakerArtifactsStagingDirWithinRWImage)
+			err = iae.generateInitrd(writeableRootfsDir, isoMakerArtifactsStagingDirWithinWriteableRootfsDir)
 			if err != nil {
 				return err
 			}
