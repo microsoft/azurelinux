@@ -155,8 +155,8 @@ BuildRequires:  libuuid-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  make
 BuildRequires:  ncurses-devel
-BuildRequires:  openssl-devel
 BuildRequires:  openssl
+BuildRequires:  openssl-devel
 BuildRequires:  python%{_pythonver}-devel
 BuildRequires:  readline-devel
 BuildRequires:  userspace-rcu-devel >= 0.7
