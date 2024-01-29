@@ -1,12 +1,3 @@
-## START: Set by rpmautospec
-## (rpmautospec version 0.2.5)
-%define autorelease(e:s:pb:) %{?-p:0.}%{lua:
-    release_number = 1;
-    base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
-    print(release_number + base_release_number - 1);
-}%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{?dist}
-## END: Set by rpmautospec
-
 %global gem_name facter
 %global debug_package %{nil}
 
