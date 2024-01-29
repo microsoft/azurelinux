@@ -9,7 +9,6 @@ Group:          System Environment/Security
 URL:            https://github.com/tpm2-software/tpm2-tss
 
 Source0: https://github.com/tpm2-software/tpm2-tss/releases/download/%{version}/%{name}-%{version}.tar.gz
-%define sha512 %{name}=cabb411f074dfa94919ba914849aac77a0ac2f50622e28a1406cf575369148774748e0e2b7a7c566ec83561a96d4b883bac5a3b1763f4cf48668a0c5d68c0a23
 Source1: %{name}.sysusers
 BuildRequires:  json-c-devel
 BuildRequires:  openssl-devel
