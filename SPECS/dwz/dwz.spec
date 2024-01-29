@@ -9,6 +9,7 @@ URL:            https://sourceware.org/dwz
 Source0:        https://sourceware.org/ftp/dwz/releases/%{name}-%{version}.tar.xz
 BuildRequires:  elfutils-libelf-devel
 BuildRequires:  gcc
+BuildRequires:  xxhash-devel
 
 %description
 The dwz package contains a program that attempts to optimize DWARF
