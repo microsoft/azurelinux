@@ -78,6 +78,9 @@ rm -rf %{buildroot}%{_mandir}
 %{_bindir}/kpatch-build
 
 %changelog
+* Mon Jan 29 2024 Muhammad Falak <mwani@microsoft.com> - 0.9.8-1
+- Bump version to 0.9.8
+
 * Tue Nov 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.7-1
 - Updating to version 0.9.7 to add support for the "return_sites" section.
 
