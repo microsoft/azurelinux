@@ -14,10 +14,10 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 )
 
-func enableOverlayFS(overlayfs *imagecustomizerapi.OverlayFS, imageChroot *safechroot.Chroot) error {
+func enableOverlayFS(overlays *[]imagecustomizerapi.OverlayFS, imageChroot *safechroot.Chroot) error {
 	var err error
 
-	if overlayfs == nil {
+	if overlays == nil {
 		return nil
 	}
 
@@ -30,7 +30,7 @@ func enableOverlayFS(overlayfs *imagecustomizerapi.OverlayFS, imageChroot *safec
 		return err
 	}
 
-	err = updateGrubConfigForOverlayFS(imageChroot, overlayfs.LowerDir, overlayfs.UpperDir, overlayfs.WorkDir, overlayfs.PersistentPartition.IdType, overlayfs.PersistentPartition.Id)
+	err = updateGrubConfigForOverlayFS(imageChroot, overlays)
 	if err != nil {
 		return err
 	}
@@ -38,12 +38,15 @@ func enableOverlayFS(overlayfs *imagecustomizerapi.OverlayFS, imageChroot *safec
 	return nil
 }
 
-func updateGrubConfigForOverlayFS(imageChroot *safechroot.Chroot, overlays []imagecustomizerapi.OverlayFS) error {
+func updateGrubConfigForOverlayFS(imageChroot *safechroot.Chroot, overlays *[]imagecustomizerapi.OverlayFS) error {
 	var err error
 	var newArgsParts []string
 
+	// Dereference the pointer to get the slice
+	overlayFSConfigs := *overlays
+
 	// Iterate over each OverlayFS configuration
-	for _, overlay := range overlays {
+	for _, overlay := range overlayFSConfigs {
 		formattedPersistentPartition, err := systemdFormatPartitionId(overlay.PersistentPartition.IdType, overlay.PersistentPartition.Id)
 		if err != nil {
 			return err
