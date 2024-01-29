@@ -30,7 +30,9 @@ func enableOverlayFS(overlays *[]imagecustomizerapi.OverlayFS, imageChroot *safe
 		return err
 	}
 
-	err = updateGrubConfigForOverlayFS(imageChroot, overlays)
+	// Dereference the pointer to get the slice
+	overlayFSConfigs := *overlays
+	err = updateGrubConfigForOverlayFS(imageChroot, overlayFSConfigs)
 	if err != nil {
 		return err
 	}
@@ -38,15 +40,12 @@ func enableOverlayFS(overlays *[]imagecustomizerapi.OverlayFS, imageChroot *safe
 	return nil
 }
 
-func updateGrubConfigForOverlayFS(imageChroot *safechroot.Chroot, overlays *[]imagecustomizerapi.OverlayFS) error {
+func updateGrubConfigForOverlayFS(imageChroot *safechroot.Chroot, overlays []imagecustomizerapi.OverlayFS) error {
 	var err error
 	var newArgsParts []string
 
-	// Dereference the pointer to get the slice
-	overlayFSConfigs := *overlays
-
 	// Iterate over each OverlayFS configuration
-	for _, overlay := range overlayFSConfigs {
+	for _, overlay := range overlays {
 		formattedPersistentPartition, err := systemdFormatPartitionId(overlay.PersistentPartition.IdType, overlay.PersistentPartition.Id)
 		if err != nil {
 			return err
@@ -70,14 +69,20 @@ func updateGrubConfigForOverlayFS(imageChroot *safechroot.Chroot, overlays *[]im
 	}
 
 	var updatedLines []string
-	linuxLineRegex := regexp.MustCompile(`^linux .*rd.overlays=.*`)
+	linuxLineRegex, err := regexp.Compile(`^linux .*rd.overlays=.*`)
+	if err != nil {
+		return fmt.Errorf("failed to compile regex: %v", err)
+	}
 	for _, line := range lines {
 		trimmedLine := strings.TrimSpace(line)
 		if linuxLineRegex.MatchString(trimmedLine) {
 			// Replace existing arguments for overlays.
 			overlayRegexPattern := `rd.overlays=[^ ]*` +
 				`( rd.overlayfs_persistent_volume=[^ ]*)?`
-			overlayRegex := regexp.MustCompile(overlayRegexPattern)
+			overlayRegex, err := regexp.Compile(overlayRegexPattern)
+			if err != nil {
+				return fmt.Errorf("failed to compile overlay regex: %v", err)
+			}
 			newLinuxLine := overlayRegex.ReplaceAllString(trimmedLine, newArgs)
 			updatedLines = append(updatedLines, newLinuxLine)
 		} else if strings.HasPrefix(trimmedLine, "linux ") {
