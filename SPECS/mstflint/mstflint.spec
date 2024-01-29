@@ -1,13 +1,13 @@
 Summary:        Mellanox firmware burning application
 Name:           mstflint
-Version:        4.26.0-1
+Version:        4.26.0
 Release:        1%{?dist}
 License:        GPLv2 OR BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://github.com/Mellanox/%{name}
-Source0:        https://github.com/Mellanox/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz
+Source0:        https://github.com/Mellanox/%{name}/releases/download/v%{version}-1/%{name}-%{version}-1.tar.gz
 ExclusiveArch: arm64 aarch64
 BuildRequires:  autoconf
 BuildRequires:  automake
