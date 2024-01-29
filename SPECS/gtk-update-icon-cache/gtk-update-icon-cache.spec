@@ -41,6 +41,9 @@ applications, the overall memory consumption is reduced as well.
 %{_bindir}/gtk-update-icon-cache
 
 %changelog
+* Mon Jan 29 2024 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 3.24.29-1
+- Update to package version 3.24.39
+
 * Fri May 21 2021 Thomas Crain <thcrain@microsoft.com> - 3.24.26-1
 - Original version for CBL-Mariner
 - License verified
