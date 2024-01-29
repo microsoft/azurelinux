@@ -1,6 +1,6 @@
 Name:       tpm2-pytss
 Version:    1.2.0
-Release:    1%{?dist}
+Release:    3%{?dist}
 Summary:    Python bindings for tpm2-tss
 License:    BSD
 URL:        https://github.com/tpm2-software/tpm2-pytss
@@ -57,7 +57,7 @@ export PYTHONPATH=%{buildroot}%{python3_sitelib}
 %{python3_sitelib}/*
 
 %changelog
-* Mon Jan 22 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 1.2.0-1
+* Mon Jan 22 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 1.2.0-3
 - Initial CBL-Mariner import from Photon (license: Apache2).
 - Verified license
 * Mon Oct 31 2022 Prashant S Chauhan <psinghchauha@vmware.com> 1.2.0-2
