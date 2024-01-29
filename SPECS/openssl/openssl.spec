@@ -362,7 +362,7 @@ install -m644 %{SOURCE9} \
 %ldconfig_scriptlets libs
 
 %changelog
-* Fri Jan 26 2023 Maxwell Moyer-McKee <mamckee@microsoft.com> - 3.1.4-2
+* Fri Jan 26 2024 Maxwell Moyer-McKee <mamckee@microsoft.com> - 3.1.4-2
 - Add patches to load SymCrypt provider by default
 
 * Tue Nov 28 2023 Tobias Brick <tobiasb@microsoft.com> - 3.1.4-1
