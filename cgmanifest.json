@@ -25575,8 +25575,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-async-http",
-          "version": "0.56.5",
-          "downloadUrl": "https://github.com/socketry/async-http/archive/refs/tags/v0.56.5.tar.gz"
+          "version": "0.63.0",
+          "downloadUrl": "https://github.com/socketry/async-http/archive/refs/tags/v0.63.0.tar.gz"
         }
       }
     },

@@ -2,7 +2,7 @@
 %global gem_name async-http
 Summary:        A HTTP client and server library
 Name:           rubygem-%{gem_name}
-Version:        0.56.5
+Version:        0.63.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -38,6 +38,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Mon Jan 29 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.63.0-1
+- Auto-upgrade to 0.63.0 - Azure Linux 3.0 - package upgrades
+
 * Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.56.5-1
 - Update to v0.56.5.
 - Build from .tar.gz source.
