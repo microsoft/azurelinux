@@ -3,7 +3,7 @@
 Summary:        Fast and flexible DNS server
 Name:           coredns
 Version:        1.11.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Apache License 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -17,8 +17,12 @@ Source0:        %{name}-%{version}.tar.gz
 #   1. wget https://github.com/coredns/coredns/archive/v%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
 #   2. tar -xf %%{name}-%%{version}.tar.gz
 #   3. cd %%{name}-%%{version}
-#   4. go mod vendor
-#   5. tar  --sort=name \
+#  >>>> Required for Patch1: CVE-2023-44487.patch
+#   4. patch -p1 CVE-2023-44487.patch
+       go mod tidy
+#  >>>>
+#   5. go mod vendor
+#   6. tar  --sort=name \
 #           --mtime="2021-04-26 00:00Z" \
 #           --owner=0 --group=0 --numeric-owner \
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
@@ -29,8 +33,9 @@ Source0:        %{name}-%{version}.tar.gz
 #       - The additional options enable generation of a tarball with the same hash every time regardless of the environment.
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
-Source1:        %{name}-%{version}-vendor.tar.gz
+Source1:        %{name}-%{version}-vendor-CVE-2023-44487.tar.gz
 Patch0:         makefile-buildoption-commitnb.patch
+Patch1:         CVE-2023-44487.patch
 
 BuildRequires:  golang >= 1.12
 
@@ -39,6 +44,8 @@ CoreDNS is a fast and flexible DNS server.
 
 %prep
 %autosetup -p1
+# Patch1 updates the go.mod file, need to regenerate it.
+go mod tidy
 
 %build
 # create vendor folder from the vendor tarball and set vendor mode
@@ -47,6 +54,15 @@ export BUILDOPTS="-mod=vendor -v"
 # set commit number that correspond to the github tag for that version
 export GITCOMMIT="ae2bbc29be1aaae0b3ded5d188968a6c97bb3144"
 make
+
+%check
+# From go.test.yml
+go install github.com/fatih/faillint@latest
+go test -v -race request/...
+go test -v -race core/...
+go test -v -race coremain/...
+go test -v -race plugin/...
+go test -v -race test/...
 
 %install
 install -m 755 -d %{buildroot}%{_bindir}
@@ -58,6 +74,9 @@ install -p -m 755 -t %{buildroot}%{_bindir} %{name}
 %{_bindir}/%{name}
 
 %changelog
+* Mon Jan 29 2024 Daniel McIlvaney <damcilva@microsoft.com> - 1.11.1-2
+- Address CVE-2023-44487 by regenerating vendor with forced version upgrade for golang.org/x/net
+
 * Tue Oct 18 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 1.11.1-1
 - Upgrade to 1.11.1 to match version required by kubernetes
 

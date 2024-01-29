@@ -1,6 +1,6 @@
 {
   "Signatures": {
     "coredns-1.11.1.tar.gz": "4e1cde1759d1705baa9375127eb405cd2f5031f9152947bb958a51fee5898d8c",
-    "coredns-1.11.1-vendor.tar.gz": "f6713fb6bdb6da88bab4c93a53317907991fa2e304cc2f224bfee88df6c26846"
+    "coredns-1.11.1-vendor-CVE-2023-44487.tar.gz": "955a6c55b4851c7472bd291d9d04f8b581a2e51d2717caf5307e39ee2b595898"
   }
 }
