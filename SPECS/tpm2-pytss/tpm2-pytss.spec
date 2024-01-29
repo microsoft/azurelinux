@@ -26,7 +26,7 @@ BuildRequires: python3-setuptools_scm
 
 %if 0%{?with_check}
 BuildRequires: python3-pytest
-\BuildRequires: python3-cffi
+BuildRequires: python3-cffi
 BuildRequires: python3-PyYAML
 %endif
 
