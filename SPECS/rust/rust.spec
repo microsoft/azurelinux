@@ -146,7 +146,6 @@ rm %{buildroot}%{_bindir}/*.old
 %{_bindir}/rust-lldb
 %{_libdir}/lib*.so
 %{_libdir}/rustlib/*
-%{_libexecdir}/cargo-credential-1password
 %{_libexecdir}/rust-analyzer-proc-macro-srv
 %{_bindir}/rust-gdb
 %{_bindir}/rust-gdbgui
