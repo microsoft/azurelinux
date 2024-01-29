@@ -231,9 +231,9 @@ if [[ "${version}" == "3.0" ]]; then # Add 3.0 DailyBuild repo
     cp resources/mariner-3_repo $tmp_dir/mariner-3_repo
     sed -i "s~<DAILY_BUILD_ID>~${DAILY_BUILD_ID}~" $tmp_dir/mariner-3_repo
     if [[ $(uname -m) == "x86_64" ]]; then
-        sed -i "s~<ARCH>~amd64~" $tmp_dir/mariner-3_repo
+        sed -i "s~<ARCH>~x86-64~" $tmp_dir/mariner-3_repo
     else
-        sed -i "s~<ARCH>~arm64~" $tmp_dir/mariner-3_repo
+        sed -i "s~<ARCH>~aarch64~" $tmp_dir/mariner-3_repo
     fi
 fi
 
