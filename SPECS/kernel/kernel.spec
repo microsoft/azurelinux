@@ -28,8 +28,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        6.6.2.1
-Release:        2%{?dist}
+Version:        6.6.12.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -429,12 +429,20 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Fri Jan 26 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.12.1-1
+- Upgrade to 6.6.12.1
+
+* Wed Jan 17 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.6.2.1-3
+- Bump release to match kernel-headers.
+
 * Thu Dec 14 2023 Rachel Menge <rachelmenge@microsoft.com> - 6.6.2.1-2
 - Add cpupower.service to kernel-tools
 - Enable user-based event tracing
 - Enable CONFIG_BPF_LSM (Thien Trung Vuong <tvuong@microsoft.com>)
 - Enable CUSE module (Juan Camposeco <juanarturoc@microsoft.com>)
 - Add IOMMU configs for aarch64 (David Daney <daviddaney@microsoft.com>)
+- Set selinux as default LSM
+- Enable CONFIG_X86_IOPL_IOPERM
 
 * Wed Dec 13 2023 Rachel Menge <rachelmenge@microsoft.com> - 6.6.2.1-1
 - Upgrade to 6.6.2.1

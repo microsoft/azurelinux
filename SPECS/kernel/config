@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/x86_64 6.6.2.1 Kernel Configuration
+# Linux/x86_64 6.6.12.1 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="gcc (GCC) 13.2.0"
 CONFIG_CC_IS_GCC=y
@@ -434,7 +434,7 @@ CONFIG_PERF_EVENTS_AMD_UNCORE=y
 # end of Performance monitoring
 
 # CONFIG_X86_VSYSCALL_EMULATION is not set
-# CONFIG_X86_IOPL_IOPERM is not set
+CONFIG_X86_IOPL_IOPERM=y
 CONFIG_MICROCODE=y
 # CONFIG_MICROCODE_LATE_LOADING is not set
 CONFIG_X86_MSR=m
@@ -7324,10 +7324,10 @@ CONFIG_IMA_QUEUE_EARLY_BOOT_KEYS=y
 # CONFIG_IMA_SECURE_AND_OR_TRUSTED_BOOT is not set
 # CONFIG_IMA_DISABLE_HTABLE is not set
 # CONFIG_EVM is not set
-# CONFIG_DEFAULT_SECURITY_SELINUX is not set
-CONFIG_DEFAULT_SECURITY_APPARMOR=y
+CONFIG_DEFAULT_SECURITY_SELINUX=y
+# CONFIG_DEFAULT_SECURITY_APPARMOR is not set
 # CONFIG_DEFAULT_SECURITY_DAC is not set
-CONFIG_LSM="landlock,lockdown,yama,loadpin,safesetid,integrity,apparmor,selinux,tomoyo"
+CONFIG_LSM="landlock,lockdown,yama,loadpin,safesetid,integrity,selinux,apparmor,tomoyo"
 
 #
 # Kernel hardening options
@@ -7988,8 +7988,6 @@ CONFIG_DEBUG_SG=y
 CONFIG_DEBUG_NOTIFIERS=y
 # CONFIG_DEBUG_MAPLE_TREE is not set
 # end of Debug kernel data structures
-
-CONFIG_DEBUG_CREDENTIALS=y
 
 #
 # RCU Debugging

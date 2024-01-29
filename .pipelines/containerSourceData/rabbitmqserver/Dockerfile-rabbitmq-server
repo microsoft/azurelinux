@@ -1,0 +1,75 @@
+# Copyright (c) 2014 Docker, Inc.
+
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
+
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+ARG BASE_IMAGE
+
+FROM $BASE_IMAGE
+
+@INCLUDE_MAIN_RUN_INSTRUCTION@
+
+# setup rabbitmq user
+ENV RABBITMQ_DATA_DIR=/var/lib/rabbitmq
+
+RUN set -eux; \
+	erl -noshell -eval 'ok = crypto:start(), ok = io:format("~p~n~n~p~n~n", [crypto:supports(), ssl:versions()]), init:stop().'; \
+	groupadd -r rabbitmq --gid=999; \
+	useradd --uid=999 -r --home-dir="$RABBITMQ_DATA_DIR" -g rabbitmq rabbitmq; \
+	mkdir -p "$RABBITMQ_DATA_DIR" /etc/rabbitmq /etc/rabbitmq/conf.d /tmp/rabbitmq-ssl /var/log/rabbitmq; \
+	chown -fR rabbitmq:rabbitmq "$RABBITMQ_DATA_DIR" /etc/rabbitmq /etc/rabbitmq/conf.d /tmp/rabbitmq-ssl /var/log/rabbitmq; \
+	chmod 1777 "$RABBITMQ_DATA_DIR" /etc/rabbitmq /etc/rabbitmq/conf.d /tmp/rabbitmq-ssl /var/log/rabbitmq
+
+# set LANG Variables for elixir
+ENV LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8
+
+# put commands inside of directories on the path
+RUN set -eux; \
+	ln -s /usr/lib/rabbitmq/lib/rabbitmq_server-3.11.11/sbin/rabbitmqctl /usr/sbin/rabbitmqctl; \
+	ln -s /usr/lib/rabbitmq/lib/rabbitmq_server-3.11.11/sbin/rabbitmq-server /usr/sbin/rabbitmq-server; \
+	ln -s /usr/lib/rabbitmq/lib/rabbitmq_server-3.11.11/sbin/rabbitmq-plugins /usr/sbin/rabbitmq-plugins; \
+	ln -s /usr/lib/rabbitmq/lib/rabbitmq_server-3.11.11/sbin/rabbitmq-diagnostics /usr/sbin/rabbitmq-diagnostics; \
+	ln -s /usr/lib/rabbitmq/lib/rabbitmq_server-3.11.11/sbin/rabbitmq-defaults /usr/sbin/rabbitmq-defaults; \
+	ln -s /usr/lib/rabbitmq/lib/rabbitmq_server-3.11.11/sbin/rabbitmq-env /usr/sbin/rabbitmq-env
+
+# run basic smoke test as rabbitmq user
+RUN set -eux; \
+    # runuser is used in place of a heavier program like gosu, and setpriv cannot be used as the HOME and ENV variables are required by rabbitmq
+    runuser -u rabbitmq -- rabbitmqctl help; \
+	runuser -u rabbitmq -- rabbitmqctl list_ciphers; \
+	runuser -u rabbitmq -- rabbitmq-plugins list
+
+# enable Prometheus-style metrics by default (https://github.com/docker-library/rabbitmq/issues/419)
+RUN runuser -u rabbitmq -- rabbitmq-plugins enable --offline rabbitmq_prometheus
+
+# set home so that any `--user` knows where to put the erlang cookie
+ENV HOME $RABBITMQ_DATA_DIR
+
+# hint that the data (a.k.a. home dir) dir should be separate volume
+VOLUME $RABBITMQ_DATA_DIR
+
+COPY rabbitmq-server-docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/rabbitmq-server-docker-entrypoint.sh
+ENTRYPOINT ["/usr/local/bin/rabbitmq-server-docker-entrypoint.sh"]
+
+# expose default rabbitmq ports
+EXPOSE 4369 5671 5672 15691 15692 25672
+
+# set default command for the container
+CMD ["rabbitmq-server"]

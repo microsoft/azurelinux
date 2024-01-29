@@ -44,8 +44,8 @@ Name:           ca-certificates
 
 # When updating, "Epoch, "Version", AND "Release" tags must be updated in the "prebuilt-ca-certificates*" packages as well.
 Epoch:          1
-Version:        2.0.0
-Release:        13%{?dist}
+Version:        3.0.0
+Release:        3%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -149,8 +149,8 @@ cp -p %{SOURCE20} .
 
 #manpage
 cp %{SOURCE10} %{name}/update-ca-trust.8.txt
-asciidoc.py -v -d manpage -b docbook %{name}/update-ca-trust.8.txt
-xsltproc --nonet -o %{name}/update-ca-trust.8 %{_sysconfdir}/asciidoc/docbook-xsl/manpage.xsl %{name}/update-ca-trust.8.xml
+asciidoc -v -d manpage -b docbook %{name}/update-ca-trust.8.txt
+xsltproc --nonet -o %{name}/update-ca-trust.8 %{python3_sitelib}/asciidoc/resources/docbook-xsl/manpage.xsl %{name}/update-ca-trust.8.xml
 
 %install
 mkdir -p -m 755 %{buildroot}%{pkidir}/tls/certs
@@ -324,6 +324,15 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 %{_bindir}/bundle2pem.sh
 
 %changelog
+* Sat Jan 27 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0.0-3
+- Updating Microsoft trusted root CAs.
+
+* Fri Jan 19 2024 Andrew Phelps <anphel@microsoft.com> - 3.0.0-2
+- Use asciidoc binary instead of asciidoc.py
+
+* Tue Jan 09 2024 Cameron Baird <cameronbaird@microsoft.com> - 3.0.0-1
+- Initial version for AzureLinux 3.0.
+
 * Mon May 08 2023 CBL-Mariner Service Account <cblmargh@microsoft.com> - 2.0.0-13
 - Updating Microsoft trusted root CAs.
 
@@ -403,10 +412,10 @@ rm -f %{pkidir}/tls/certs/*.{0,pem}
 * Wed Oct 21 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-9
 - Switching to the correct source for the Microsoft bundle.
 
-* Mon Sep 13 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-8
+* Sun Sep 13 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-8
 - Aligning 'nssckbi.h' with the used 'certdata.txt' version for the Mozilla bundle.
 
-* Mon Sep 13 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-7
+* Sun Sep 13 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-7
 - Removing unused 'Requires*'.
 
 * Wed Sep 09 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 20200720-6
