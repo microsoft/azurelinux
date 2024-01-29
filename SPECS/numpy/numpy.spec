@@ -4,8 +4,8 @@
 
 Summary:        A fast multidimensional array facility for Python
 Name:           numpy
-Version:        1.23.4
-Release:        3%{?dist}
+Version:        1.26.3
+Release:        1%{?dist}
 # Everything is BSD except for class SafeEval in numpy/lib/utils.py which is Python
 License:        BSD AND Python AND ASL 2.0
 Vendor:         Microsoft Corporation
@@ -13,8 +13,6 @@ Distribution:   Mariner
 URL:            http://www.numpy.org/
 Source0:        https://github.com/%{name}/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Source1:        https://numpy.org/doc/%{majmin}/numpy-html.zip#/numpy-html-%{version}.zip
-
-Patch0:         test_fix.patch
 
 %description
 NumPy is a general-purpose array-processing package designed to
@@ -46,6 +44,7 @@ Provides:       libnpymath-static%{?_isa} = %{version}-%{release}
 Provides:       numpy = %{version}-%{release}
 Provides:       numpy%{?_isa} = %{version}-%{release}
 %if %{with_check}
+BuildRequires:  meson
 BuildRequires:  python3-pip
 %endif
 
@@ -146,6 +145,8 @@ python3 runtests.py --no-build -- -ra -k 'not test_ppc64_ibm_double_double128'
 %license LICENSE.txt
 %doc THANKS.txt site.cfg.example
 %{python3_sitearch}/%{name}/__pycache__
+%{python3_sitearch}/%{name}/_core
+%{python3_sitearch}/%{name}/_utils
 %dir %{python3_sitearch}/%{name}
 %{python3_sitearch}/%{name}/*.py*
 %{python3_sitearch}/%{name}/core
@@ -183,6 +184,11 @@ python3 runtests.py --no-build -- -ra -k 'not test_ppc64_ibm_double_double128'
 %doc docs/*
 
 %changelog
+* Wed Jan 24 2024 Osama Esmail <osamaesmail@microsoft.com> - 1.26.3-1
+- Upgrading for 3.0 release
+- Added %%{python3_sitearch}/%%{name}/{_core,_utils}
+- Removed old patch
+
 * Mon May 22 2023 Olivia Crain <oliviacrain@microsoft.com> - 1.23.4-3
 - Pin version of hypothesis used to avoid deprecation errors
 
