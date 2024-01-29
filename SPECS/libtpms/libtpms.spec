@@ -1,6 +1,6 @@
 Name:           libtpms
 Version:        0.9.6
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Library providing Trusted Platform Module (TPM) functionality
 License:        BSD and TCGL
 
@@ -63,7 +63,7 @@ make check
 %{_mandir}/man3/TPM*
 
 %changelog
-* Mon Jan 22 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 0.9.6-4
+* Mon Jan 22 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 0.9.6-5
 - Initial CBL-Mariner import from Fedora 39 (license: MIT).
 - license verified (TCG license in LICENSE file)
 
