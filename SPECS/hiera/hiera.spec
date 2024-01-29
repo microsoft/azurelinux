@@ -54,6 +54,7 @@ rspec -Ilib spec
 %changelog
 * Thu Dec 21 2023 Sindhu Karri <lakarri@microsoft.com> - 3.7.0-5
 - Promote package to Mariner Base repo
+- Install rspec, mocha and json gems for running tests
 
 * Thu Apr 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.7.0-4
 - Spec clean-up.
