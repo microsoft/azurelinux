@@ -31,7 +31,7 @@ Source0:        %{name}-%{version}.tar.gz
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         makefile-buildoption-commitnb.patch
-Patch1:         CVE-2023-49295.patch
+Patch1001:         CVE-2023-49295.patch
 
 BuildRequires:  golang >= 1.12
 
@@ -39,11 +39,11 @@ BuildRequires:  golang >= 1.12
 CoreDNS is a fast and flexible DNS server.
 
 %prep
-%setup -q
-%patch0 -p1
+%autosetup -N
+%autopatch -M 1000
 # create vendor folder from the vendor tarball and set vendor mode
 tar -xf %{SOURCE1} --no-same-owner
-%patch1 -p1
+%patch -p1 1001
 
 %build
 export BUILDOPTS="-mod=vendor -v"
