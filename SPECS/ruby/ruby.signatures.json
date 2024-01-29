@@ -1,12 +1,12 @@
 {
- "Signatures": {
-  "macros.ruby": "81ddf84b69c4833462425460e1360b9c547839acaea14eef1169c01b551f573b",
-  "macros.rubygems": "ab73aa910f59cb8041ca942d0031fe0b03c0385014e5c5e64c686c48ec5faa54",
-  "operating_system.rb": "91bb8c3c6742392dc18838b6c762c9ba2a39b7558afc9160239e946540207a51",
-  "ruby-3.1.4.tar.xz": "1b6d6010e76036c937b9671f4752f065aeca800a6c664f71f6c9a699453af94f",
-  "rubygems.attr": "a89a6c82d6e534539ab499e1d5464161429562133dfb5adad1c8d157a60994fa",
-  "rubygems.con": "eb804c6b50eeafdb2172285265bc487a80acaa9846233cd5f1d20a25f1dac2ea",
-  "rubygems.prov": "b79c1f5873dd20d251e100b276a5e584c1fb677f3e1b92534fc09130fabe8ee5",
-  "rubygems.req": "e85681d8fa45d214055f3b26a8c1829b3a4bd67b26a5ef3c1f6426e7eff83ad0"
- }
+  "Signatures": {
+    "macros.ruby": "81ddf84b69c4833462425460e1360b9c547839acaea14eef1169c01b551f573b",
+    "macros.rubygems": "ab73aa910f59cb8041ca942d0031fe0b03c0385014e5c5e64c686c48ec5faa54",
+    "operating_system.rb": "91bb8c3c6742392dc18838b6c762c9ba2a39b7558afc9160239e946540207a51",
+    "rubygems.attr": "a89a6c82d6e534539ab499e1d5464161429562133dfb5adad1c8d157a60994fa",
+    "rubygems.con": "eb804c6b50eeafdb2172285265bc487a80acaa9846233cd5f1d20a25f1dac2ea",
+    "rubygems.prov": "b79c1f5873dd20d251e100b276a5e584c1fb677f3e1b92534fc09130fabe8ee5",
+    "rubygems.req": "e85681d8fa45d214055f3b26a8c1829b3a4bd67b26a5ef3c1f6426e7eff83ad0",
+    "ruby-3.3.0.tar.gz": "96518814d9832bece92a85415a819d4893b307db5921ae1f0f751a9a89a56b7d"
+  }
 }
