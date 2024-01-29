@@ -71,7 +71,7 @@ cd tools
 
 %install
 %make_install %{?_smp_mflags}
-
+find %{buildroot}%{_libdir} -type f -name \*.la -delete
 rm %{buildroot}%{_libdir}/pkgconfig/tpm2-pkcs11.pc
 
 cd tools
@@ -90,7 +90,6 @@ python3 setup.py test
 %files
 %defattr(-,root,root,-)
 %license LICENSE
-%{_libdir}/libtpm2_pkcs11.la
 %{_libdir}/libtpm2_pkcs11.so
 %{_libdir}/libtpm2_pkcs11.so.0*
 
