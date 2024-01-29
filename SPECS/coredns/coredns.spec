@@ -54,12 +54,13 @@ make
 
 %check
 # From go.test.yml
-go install github.com/fatih/faillint@latest
-go test -v -race request/...
-go test -v -race core/...
-go test -v -race coremain/...
-go test -v -race plugin/...
-go test -v -race test/...
+go install github.com/fatih/faillint@latest && \
+(cd request && go test -v -race ./...) && \
+(cd core && go test -v -race ./...) && \
+(cd coremain && go test -v -race ./...) && \
+(cd plugin && go test -v -race ./...) && \
+(cd test && go test -v -race ./...) && \
+./coredns -version
 
 %install
 install -m 755 -d %{buildroot}%{_bindir}
