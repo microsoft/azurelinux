@@ -19,7 +19,7 @@ Source0:        %{name}-%{version}.tar.gz
 #   3. cd %%{name}-%%{version}
 #  >>>> Required for Patch1: CVE-2023-44487.patch
 #   4. patch -p1 CVE-2023-44487.patch
-       go mod tidy
+#      go mod tidy
 #  >>>>
 #   5. go mod vendor
 #   6. tar  --sort=name \
