@@ -19,7 +19,6 @@ Source0:        %{name}-%{version}.tar.gz
 #   3. cd %%{name}-%%{version}
 #  >>>> Required for Patch1: CVE-2023-44487.patch
 #   4. patch -p1 CVE-2023-44487.patch
-#      go mod tidy
 #  >>>>
 #   5. go mod vendor
 #   6. tar  --sort=name \
@@ -44,8 +43,6 @@ CoreDNS is a fast and flexible DNS server.
 
 %prep
 %autosetup -p1
-# Patch1 updates the go.mod file, need to regenerate it.
-go mod tidy
 
 %build
 # create vendor folder from the vendor tarball and set vendor mode
