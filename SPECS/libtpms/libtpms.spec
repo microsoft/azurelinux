@@ -344,3 +344,4 @@ make check
 - Version of library is now 0.5.0
 - Debuginfo rpm is built but empty -- seems to be a known problem
   Check https://bugzilla.redhat.com/show_bug.cgi?id=209316
+  
