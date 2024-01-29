@@ -1,6 +1,6 @@
 Summary:        Command line utility for i-node notifications and management.
 Name:           inotify-tools
-Version:        3.22.1.0
+Version:        4.23.9.0
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -58,6 +58,8 @@ make %{?_smp_mflags} check
 %doc AUTHORS
 %{_bindir}/inotifywait
 %{_bindir}/inotifywatch
+%{_bindir}/fsnotifywait
+%{_bindir}/fsnotifywatch
 %{_libdir}/libinotifytools.so.*
 %{_mandir}/man1/inotifywait.1*
 %{_mandir}/man1/inotifywatch.1*
@@ -75,6 +77,10 @@ make %{?_smp_mflags} check
 %{_libdir}/libinotifytools.so
 
 %changelog
+* Mon Jan 29 2024 CBL-Mariner Servicing Account <karimeldegwy@microsoft.com> - 4.23.9.0-1
+- Auto-upgrade to 4.23.9.0 - 3.0 upgrade
+- Added new bins
+
 * Thu Jan 27 2022 Rachel Menge <rachelmenge@microsoft.com> - 3.22.1.0-1
 - Update to 3.22.1.0
 
