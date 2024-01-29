@@ -2271,7 +2271,6 @@
                 "rubygem-aws-sdk-s3",
                 "rubygem-aws-sdk-sqs",
                 "rubygem-aws-sigv4",
-                "rubygem-bigdecimal",
                 "rubygem-bindata",
                 "rubygem-concurrent-ruby",
                 "rubygem-connection_pool",
