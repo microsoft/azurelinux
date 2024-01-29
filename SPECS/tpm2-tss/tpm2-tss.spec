@@ -42,6 +42,7 @@ The libraries and header files needed for TSS2 development.
 
 %install
 %make_install %{?_smp_mflags}
+find %{buildroot}%{_libdir} -type f -name \*.la -delete
 install -p -D -m 0644 %{SOURCE1} %{buildroot}%{_sysusersdir}/%{name}.sysusers
 
 %post
@@ -61,7 +62,6 @@ chown -R tss:tss /var/lib/tpm
 %{_includedir}/tss2/*
 %{_libdir}/pkgconfig/*
 %{_libdir}/*.so
-%{_libdir}/*.la
 %{_mandir}/man3
 %{_mandir}/man7
 
