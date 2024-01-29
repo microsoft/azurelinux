@@ -26,6 +26,7 @@ var (
 	configFile                  = app.Flag("config-file", "Path of the image customization config file.").Required().String()
 	rpmSources                  = app.Flag("rpm-source", "Path to a RPM repo config file or a directory containing RPMs.").Strings()
 	disableBaseImageRpmRepos    = app.Flag("disable-base-image-rpm-repos", "Disable the base image's RPM repos as an RPM source").Bool()
+	enableShrinkFilesystems     = app.Flag("shrink-filesystems", "Enable shrinking of filesystems to minimum size. Supports ext2, ext3, ext4 filesystem types.").Bool()
 	logFile                     = exe.LogFileFlag(app)
 	logLevel                    = exe.LogLevelFlag(app)
 	profFlags                   = exe.SetupProfileFlags(app)
@@ -42,6 +43,14 @@ func main() {
 	}
 
 	logger.InitBestEffort(*logFile, *logLevel)
+
+	if *enableShrinkFilesystems && *outputSplitPartitionsFormat == "" {
+		logger.Log.Fatalf("--output-split-partitions-format must be specified to use --shrink-filesystems.")
+	}
+
+	if *enableShrinkFilesystems && *outputImageFormat != "" {
+		logger.Log.Fatalf("--output-image-format cannot be used with --shrink-filesystems enabled.")
+	}
 
 	prof, err := profile.StartProfiling(profFlags)
 	if err != nil {
@@ -62,7 +71,7 @@ func customizeImage() error {
 	var err error
 
 	err = imagecustomizerlib.CustomizeImageWithConfigFile(*buildDir, *configFile, *imageFile,
-		*rpmSources, *outputImageFile, *outputImageFormat, *outputSplitPartitionsFormat, !*disableBaseImageRpmRepos)
+		*rpmSources, *outputImageFile, *outputImageFormat, *outputSplitPartitionsFormat, !*disableBaseImageRpmRepos, *enableShrinkFilesystems)
 	if err != nil {
 		return err
 	}
