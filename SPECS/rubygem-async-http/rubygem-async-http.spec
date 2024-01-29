@@ -1,4 +1,3 @@
-%global debug_package %{nil}
 %global gem_name async-http
 Summary:        A HTTP client and server library
 Name:           rubygem-%{gem_name}
@@ -26,6 +25,7 @@ and responses.
 
 %prep
 %setup -q -n %{gem_name}-%{version}
+%gemspec_clear_signing
 
 %build
 gem build %{gem_name}
@@ -39,7 +39,8 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 
 %changelog
 * Mon Jan 29 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.63.0-1
-- Auto-upgrade to 0.63.0 - Azure Linux 3.0 - package upgrades
+- Auto-upgrade to 0.63.0 - Azure Linux 3.0 - package upgrades.
+- Restored the debuginfo package.
 
 * Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.56.5-1
 - Update to v0.56.5.
