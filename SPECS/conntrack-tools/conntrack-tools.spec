@@ -13,7 +13,7 @@ BuildRequires:  bison
 BuildRequires:  flex
 BuildRequires:  gcc
 BuildRequires:  libmnl-devel >= 1.0.3
-BuildRequires:  libnetfilter_conntrack-devel >= 1.0.7
+BuildRequires:  libnetfilter_conntrack-devel >= 1.0.9
 BuildRequires:  libnetfilter_cthelper-devel >= 1.0.0
 BuildRequires:  libnetfilter_cttimeout-devel >= 1.0.0
 BuildRequires:  libnetfilter_queue-devel >= 1.0.2
@@ -99,6 +99,7 @@ echo "disable conntrackd.service" > %{buildroot}%{_libdir}/systemd/system-preset
 * Wed Jan 24 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 1.4.8-1
 - Bump version to v1.4.8 from v1.4.5
 - Updating source from tar.bz2 to tar.xz
+- Build requires libnetfilter_conntrack >= 1.0.9
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.4.5-8
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
