@@ -38,6 +38,7 @@ install -p -m0644 ext/hiera.yaml %{buildroot}%{_sysconfdir}/puppet
 mkdir -p %{buildroot}%{_sharedstatedir}/hiera
 
 %check
+gem install rspec mocha json
 rspec -Ilib spec
 
 %files
