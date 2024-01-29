@@ -1,7 +1,7 @@
 Summary:        Universally Unique Identifier library
 Name:           uuid
 Version:        1.6.2
-Release:        50%{?dist}
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -147,6 +147,9 @@ make check
 %{_libdir}/libossp-uuid_dce.so
 
 %changelog
+* Mon Jan 29 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.6.2-1
+- Auto-upgrade to 1.6.2 - none
+
 * Mon Nov 30 2020 Nicolas Ontiveros <niontive@microsoft.com> - 1.6.2-50
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - Replace ldconfig_scriptlets with post/postun ldconfig calls
