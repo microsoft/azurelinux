@@ -1,7 +1,7 @@
 Summary:        DWARF optimization and duplicate removal tool
 Name:           dwz
-Version:        0.14
-Release:        2%{?dist}
+Version:        0.15
+Release:        1%{?dist}
 License:        GPLv2+ and GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -37,6 +37,9 @@ make DESTDIR=%{buildroot} prefix=%{_prefix} mandir=%{_mandir} bindir=%{_bindir} 
 %{_mandir}/man1/dwz.1*
 
 %changelog
+* Thu Jan 25 2024 Suresh Thelkar <sthelkar@microsoft.com> - 0.15-1
+- Upgrade to 0.15
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.14-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

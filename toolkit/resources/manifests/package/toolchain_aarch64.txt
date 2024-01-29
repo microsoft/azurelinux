@@ -57,8 +57,8 @@ diffutils-3.10-1.azl3.aarch64.rpm
 diffutils-debuginfo-3.10-1.azl3.aarch64.rpm
 docbook-dtd-xml-4.5-11.azl3.noarch.rpm
 docbook-style-xsl-1.79.1-13.azl3.noarch.rpm
-dwz-0.14-2.azl3.aarch64.rpm
-dwz-debuginfo-0.14-2.azl3.aarch64.rpm
+dwz-0.15-1.azl3.aarch64.rpm
+dwz-debuginfo-0.15-1.azl3.aarch64.rpm
 e2fsprogs-1.47.0-1.azl3.aarch64.rpm
 e2fsprogs-debuginfo-1.47.0-1.azl3.aarch64.rpm
 e2fsprogs-devel-1.47.0-1.azl3.aarch64.rpm
