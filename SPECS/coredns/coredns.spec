@@ -31,7 +31,7 @@ Source0:        %{name}-%{version}.tar.gz
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         makefile-buildoption-commitnb.patch
-Patch1001:         CVE-2023-49295.patch
+Patch1001:      CVE-2023-49295.patch
 
 BuildRequires:  golang >= 1.12
 
