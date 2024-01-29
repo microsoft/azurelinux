@@ -1,8 +1,8 @@
 %define libnfnetlink 1.0.0
 
 Name:           libnetfilter_log
-Version:        1.0.1
-Release:        22%{?dist}
+Version:        1.0.2
+Release:        1%{?dist}
 Summary:        Netfilter logging userspace library
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -70,6 +70,9 @@ find $RPM_BUILD_ROOT -type f -name "*.la" -exec rm -f {} ';'
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Mon Jan 29 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> -1.0.2-1
+- Bump version to 1.0.2 from 1.0.1
+
 * Tue Dec 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.0.1-22
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
 - License verified.
