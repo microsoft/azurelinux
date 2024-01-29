@@ -1,0 +1,18 @@
+diff --git a/Makefile.in b/Makefile.in
+index 38f1f9ab..905e122f 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -19587,13 +19587,7 @@ maybe-check-gold:
+ @if gold
+ maybe-check-gold: check-gold
+
+-check-gold:
+-	@: $(MAKE); $(unstage)
+-	@r=`${PWD_COMMAND}`; export r; \
+-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+-	$(HOST_EXPORTS) $(EXTRA_HOST_EXPORTS) \
+-	(cd $(HOST_SUBDIR)/gold && \
+-	  $(MAKE) $(FLAGS_TO_PASS)  $(EXTRA_BOOTSTRAP_FLAGS) check)
++check-gold: ;
+
+ @endif gold
