@@ -675,7 +675,6 @@ These are the useful build targets:
 | clean-*                          | Most targets have a `clean-<target>` target which selectively cleans the target's output.
 | compress-rpms                    | Compresses all RPMs in `../out/RPMS` into `../out/rpms.tar.gz`. See `hydrate-rpms` target.
 | compress-srpms                   | Compresses all SRPMs in `../out/SRPMS` into `../out/srpms.tar.gz`.
-| copy-toolchain-rpms              | **[DEPRECATED]: This should no longer be needed as a work around in core repo builds. Will be removed in future versions.** Copy all toolchain RPMS from `../build/toolchain_rpms` to  `../out/RPMS`.
 | expand-specs                     | Extract working copies of the `*.spec` files from the local `*.src.rpm` files.
 | fetch-image-packages             | Locate and download all packages required for an image build.
 | fetch-external-image-packages    | Download all external packages required for an image build.

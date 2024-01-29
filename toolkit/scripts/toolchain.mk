@@ -88,14 +88,6 @@ clean-toolchain-rpms:
 	for f in $(toolchain_rpms_buildarch); do rm -vf $(RPMS_DIR)/$(build_arch)/$$f; done
 	for f in $(toolchain_rpms_noarch); do rm -vf $(RPMS_DIR)/noarch/$$f; done
 
-copy-toolchain-rpms:
-	for f in $(toolchain_rpms_buildarch); do cp -vf $(TOOLCHAIN_RPMS_DIR)/$(build_arch)/$$f $(RPMS_DIR)/$(build_arch); done
-	for f in $(toolchain_rpms_noarch); do cp -vf $(TOOLCHAIN_RPMS_DIR)/noarch/$$f $(RPMS_DIR)/noarch; done
-	@#Print a red warning message so that it is more visible to the user
-	@echo "\e[31m"
-	@echo "WARNING: copy-toolchain-rpms should no longer be required for most use-cases. Please remove it from your build script unless you need to build older versions of the repo."
-	@echo "\e[0m"
-
 # check that the manifest files only contain RPMs that could have been generated from toolchain specs.
 check-manifests: check-x86_64-manifests check-aarch64-manifests
 check-aarch64-manifests: $(toolchain_spec_list)

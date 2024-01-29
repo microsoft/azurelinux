@@ -1750,15 +1750,6 @@ func formatCycleErrorMessage(cycle []*PkgNode, err error) error {
 		fmt.Fprintf(&cycleStringBuilder, " --> {%s}", node.FriendlyName())
 	}
 	logger.Log.Errorf("Unfixable circular dependency found:\t%s\terror: %s", cycleStringBuilder.String(), err)
-
-	// Hydrating the toolchain RPMs was required to resolve the cycles at one point. This is no longer the case, but
-	// we should leave a message here to avoid confusion.
-	logger.Log.Warn("╔════════════════════════════════════════════════════════════════════════════════════════════════╗")
-	logger.Log.Warn("║ 'copy-toolchain-rpms' should no longer be required to resolve cycles even when using online    ║")
-	logger.Log.Warn("║ toolchain rpms. If you see this message, there is likely a legitimate cycle in the dependency  ║")
-	logger.Log.Warn("║ graph.                                                                                         ║")
-	logger.Log.Warn("╚════════════════════════════════════════════════════════════════════════════════════════════════╝")
-
 	return fmt.Errorf("cycles detected in dependency graph")
 }
 
