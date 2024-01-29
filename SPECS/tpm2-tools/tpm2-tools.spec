@@ -9,7 +9,6 @@ Group:          System Environment/Security
 URL:            https://github.com/tpm2-software/tpm2-tools
 
 Source0: https://github.com/tpm2-software/tpm2-tools/releases/download/%{version}/%{name}-%{version}.tar.gz
-%define sha512 %{name}=224a5ea3448a877362abb35ac06b115c559c09b44b30d74c8326211be66d24e0e130c285b1e285be1842e7203ab488629b0f4e451cbd782c83ed72023d146675
 
 BuildRequires: openssl-devel
 BuildRequires: curl-devel

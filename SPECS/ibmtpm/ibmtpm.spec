@@ -1,3 +1,6 @@
+# ibmtpm's versioning is not symver.  To update to a new
+# version of ibmtpm, modify `ibmversion` to reflect the 
+# source code version.
 %define ibmversion  1682
 
 Summary:        This project is an implementation of the TCG TPM 2.0 specification.
@@ -7,11 +10,10 @@ Release:        1%{?dist}
 License:        BSD 2-Clause
 URL:            https://sourceforge.net/projects/ibmswtpm2/files
 Group:          System Environment/Security
-Vendor:         VMware, Inc.
-Distribution:   Photon
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 
 Source0: https://sourceforge.net/projects/ibmswtpm2/files/%{name}%{ibmversion}.tar.gz
-%define sha512 %{name}=564c2154e5459cbbf4ec052bea7909d1eaff0aa07b291c7de44b1204ecfda3c4156fa18da4499e4202b8772b54ae30d0c7c89bd12cd415f3882d17c8d340686d
 
 Patch0: support-openssl-3.2.x-builds.patch
 

@@ -9,7 +9,7 @@ Vendor:     Microsoft Corporation
 Distribution: Mariner
 
 Source0: https://github.com/tpm2-software/tpm2-pytss/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-%define sha512 %{name}=9f317b2144e27ac0e6b876d1987cd5c64f4c1f70d1689cea3d926749d9778b2ad813335269cff70c8335f15b72b1233fffe062f4cb5791c5480c58119cf42db7
+
 
 BuildRequires: python3-devel
 BuildRequires: python3-setuptools
@@ -26,9 +26,7 @@ BuildRequires: python3-setuptools_scm
 
 %if 0%{?with_check}
 BuildRequires: python3-pytest
-BuildRequires: python3-cryptography
-BuildRequires: python3-cffi
-BuildRequires: python3-pip
+\BuildRequires: python3-cffi
 BuildRequires: python3-PyYAML
 %endif
 
