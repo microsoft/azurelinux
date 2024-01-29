@@ -30,6 +30,7 @@ type SystemConfig struct {
 	Services                Services           `yaml:"Services"`
 	Modules                 Modules            `yaml:"Modules"`
 	Verity                  *Verity            `yaml:"Verity"`
+	Overlays                *[]Overlay                `yaml:"Overlays"`
 }
 
 func (s *SystemConfig) IsValid() error {
@@ -103,6 +104,15 @@ func (s *SystemConfig) IsValid() error {
 		err = s.Verity.IsValid()
 		if err != nil {
 			return fmt.Errorf("invalid Verity: %w", err)
+		}
+	}
+
+	if s.OverlayFS != nil {
+		for i, overlayFS := range *s.OverlayFS {
+			err = overlayFS.IsValid()
+			if err != nil {
+				return fmt.Errorf("invalid OverlayFS item at index %d: %w", i, err)
+			}
 		}
 	}
 

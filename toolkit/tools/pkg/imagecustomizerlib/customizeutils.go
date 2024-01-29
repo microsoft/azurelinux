@@ -105,6 +105,11 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
+	err = enableOverlayFS(config.SystemConfig.OverlayFS, imageChroot)
+	if err != nil {
+		return err
+	}
+
 	err = enableVerityPartition(config.SystemConfig.Verity, imageChroot)
 	if err != nil {
 		return err
