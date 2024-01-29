@@ -1397,8 +1397,8 @@
         "type": "other",
         "other": {
           "name": "cairo",
-          "version": "1.17.4",
-          "downloadUrl": "https://cairographics.org/snapshots/cairo-1.17.4.tar.xz"
+          "version": "1.18.0",
+          "downloadUrl": "https://cairographics.org/releases/cairo-1.18.0.tar.xz"
         }
       }
     },

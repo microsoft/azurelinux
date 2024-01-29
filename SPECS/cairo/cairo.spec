@@ -1,46 +1,49 @@
 Summary:        A 2D graphics library.
 Name:           cairo
-Version:        1.17.4
-Release:        3%{?dist}
+Version:        1.18.0
+Release:        1%{?dist}
 License:        LGPLv2 OR MPLv1.1
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://cairographics.org
-Source0:        https://cairographics.org/snapshots/%{name}-%{version}.tar.xz
+Source0:        https://cairographics.org/releases/%{name}-%{version}.tar.xz
 
-BuildRequires:  fontconfig-devel
-BuildRequires:  freetype-devel
+
 BuildRequires:  gcc
-BuildRequires:  glib-devel
-BuildRequires:  libpng-devel
-BuildRequires:  libX11-devel
-BuildRequires:  libxml2-devel
-BuildRequires:  libXrender-devel
-BuildRequires:  pixman-devel
-BuildRequires:  pkg-config
+BuildRequires:  gcc-c++
+BuildRequires:  gtk-doc
+BuildRequires:  meson
+BuildRequires:  pkgconfig(expat)
+BuildRequires:  pkgconfig(pixman-1)
+BuildRequires:  pkgconfig(freetype2)
+BuildRequires:  pkgconfig(fontconfig)
+BuildRequires:  pkgconfig(gobject-2.0)
+BuildRequires:  pkgconfig(libpng)
 BuildRequires:  pkgconfig(xext)
-
-Requires:       expat
-Requires:       glib
-Requires:       libpng
-Requires:       pixman
+BuildRequires:  pkgconfig(xcb-render)
+BuildRequires:  pkgconfig(xrender)
 
 %description
-Cairo is a 2D graphics library with support for multiple output devices.
-
+Cairo is a 2D graphics library designed to provide high-quality display
+and print output. Currently supported output targets include the X Window
+System, in-memory image buffers, and image files (PDF, PostScript, and SVG).
+ 
+Cairo is designed to produce consistent output on all output media while
+taking advantage of display hardware acceleration when available.
+ 
 %package        devel
-Summary:        Header and development files
+Summary:        Development files for cairo
 License:        (LGPLv2 OR MPLv1.1) AND MIT AND Public Domain
 
-Requires:       %{name} = %{version}-%{release}
-Requires:       fontconfig-devel
-Requires:       freetype-devel
-Requires:       libpng-devel
-Requires:       pixman-devel
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description    devel
-It contains the libraries and header files to create applications
+Cairo is a 2D graphics library designed to provide high-quality display
+and print output.
+ 
+This package contains libraries, header files and developer documentation
+needed for developing software which uses the cairo graphics library.
 
 %package gobject
 Summary:        GObject bindings for cairo
@@ -71,8 +74,9 @@ needed for developing software which uses the cairo Gobject library.
 
 %package tools
 Summary:        Development tools for cairo
-
 License:        GPLv3
+
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description tools
 Cairo is a 2D graphics library designed to provide high-quality display
@@ -85,31 +89,22 @@ This package contains tools for working with the cairo graphics library.
 %autosetup -p1
 
 %build
-%configure \
-        --disable-gl \
-        --disable-gtk-doc \
-        --disable-static \
-        --disable-symbol-lookup \
-        --enable-ft \
-        --enable-gobject \
-        --enable-pdf \
-        --enable-ps \
-        --enable-svg \
-        --enable-tee \
-        --enable-win32=no \
-        --enable-xlib
 
-sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
-sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
-%make_build
-
+%meson \
+  -Dfreetype=enabled \
+  -Dfontconfig=enabled \
+  -Dglib=enabled \
+  -Dgtk_doc=true \
+  -Dspectre=disabled \
+  -Dsymbol-lookup=disabled \
+  -Dtee=enabled \
+  -Dtests=disabled \
+  -Dxcb=enabled \
+  -Dxlib=enabled \
+  %{nil}
+%meson_build
 %install
-%make_install
-find %{buildroot} -type f -name "*.la" -delete -print
-
-rm -rf %{buildroot}%{_datadir}/gtk-doc
-
-%ldconfig_scriptlets
+%meson_install
 
 %files
 %defattr(-,root,root)
@@ -118,26 +113,55 @@ rm -rf %{buildroot}%{_datadir}/gtk-doc
 %{_libdir}/libcairo-script-interpreter.so.*
 
 %files devel
-%defattr(-,root,root)
-%dir %{_includedir}/%{name}
-%{_includedir}/%{name}/*
-%{_libdir}/*.so
-%{_libdir}/pkgconfig/*.pc
-
+%dir %{_includedir}/cairo/
+%{_includedir}/cairo/cairo-deprecated.h
+%{_includedir}/cairo/cairo-features.h
+%{_includedir}/cairo/cairo-ft.h
+%{_includedir}/cairo/cairo.h
+%{_includedir}/cairo/cairo-pdf.h
+%{_includedir}/cairo/cairo-ps.h
+%{_includedir}/cairo/cairo-script-interpreter.h
+%{_includedir}/cairo/cairo-svg.h
+%{_includedir}/cairo/cairo-tee.h
+%{_includedir}/cairo/cairo-version.h
+%{_includedir}/cairo/cairo-xlib-xrender.h
+%{_includedir}/cairo/cairo-xlib.h
+%{_includedir}/cairo/cairo-script.h
+%{_includedir}/cairo/cairo-xcb.h
+%{_libdir}/libcairo.so
+%{_libdir}/libcairo-script-interpreter.so
+%{_libdir}/pkgconfig/cairo-fc.pc
+%{_libdir}/pkgconfig/cairo-ft.pc
+%{_libdir}/pkgconfig/cairo.pc
+%{_libdir}/pkgconfig/cairo-pdf.pc
+%{_libdir}/pkgconfig/cairo-png.pc
+%{_libdir}/pkgconfig/cairo-ps.pc
+%{_libdir}/pkgconfig/cairo-script-interpreter.pc
+%{_libdir}/pkgconfig/cairo-svg.pc
+%{_libdir}/pkgconfig/cairo-tee.pc
+%{_libdir}/pkgconfig/cairo-xlib.pc
+%{_libdir}/pkgconfig/cairo-xlib-xrender.pc
+%{_libdir}/pkgconfig/cairo-script.pc
+%{_libdir}/pkgconfig/cairo-xcb-shm.pc
+%{_libdir}/pkgconfig/cairo-xcb.pc
+%{_datadir}/gtk-doc/html/cairo
+ 
 %files gobject
-%{_libdir}/libcairo-gobject.so.*
-
+%{_libdir}/libcairo-gobject.so.2*
+ 
 %files gobject-devel
-%{_includedir}/%{name}/cairo-gobject.h
+%{_includedir}/cairo/cairo-gobject.h
 %{_libdir}/libcairo-gobject.so
 %{_libdir}/pkgconfig/cairo-gobject.pc
-
+ 
 %files tools
-%license util/cairo-trace/COPYING util/cairo-trace/COPYING-GPL-3
 %{_bindir}/cairo-trace
-%{_libdir}/%{name}/
-
+%{_libdir}/cairo/
+ 
 %changelog
+* Mon Jan 29 2024 Sean Dougherty <sdougherty@microsoft.com> - 1.18.0-1
+- Upgrading to 1.18.0 for Mariner 3.0
+
 * Wed Oct 06 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.17.4-3
 - Adding X components from "UI-cairo".
 - Adding the "tools" subpackage.
