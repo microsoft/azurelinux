@@ -57,7 +57,7 @@ BuildRequires: nspr-devel
 BuildRequires: nss-devel >= %{nss_version}
 BuildRequires: nss-tools >= %{nss_version}
 BuildRequires: openldap-devel
-BuildRequires: mariner-release
+BuildRequires: azurelinux-release
 BuildRequires: pam-devel
 BuildRequires: pkgconfig
 BuildRequires: systemd-devel

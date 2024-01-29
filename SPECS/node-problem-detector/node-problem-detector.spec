@@ -12,9 +12,9 @@ Patch0:         001-remove_arch_specific_makefile_logic.patch
 Patch1:         002-add_mariner_OSVersion.patch
 BuildRequires:  golang
 BuildRequires:  systemd-devel
-Requires:       mariner-release
+Requires:       azurelinux-release
 %if %{with_check}
-BuildRequires:  mariner-release
+BuildRequires:  azurelinux-release
 %endif
 
 %description
@@ -110,7 +110,7 @@ make test
 - Bump release to rebuild with golang 1.18.3
 
 * Wed Jun 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.8.10-2
-- Add explicit check/run-time dependencies on mariner-release
+- Add explicit check/run-time dependencies on azurelinux-release
 
 * Fri Feb 25 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 0.8.10-1
 - Upgrading to v0.8.10

@@ -25,7 +25,7 @@ BuildRequires:  libgcrypt-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  libxslt
 BuildRequires:  lz4-devel
-BuildRequires:  mariner-release
+BuildRequires:  azurelinux-release
 BuildRequires:  meson
 BuildRequires:  pam-devel
 BuildRequires:  perl-XML-Parser

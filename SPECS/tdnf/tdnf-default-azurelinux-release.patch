@@ -9,10 +9,10 @@ Fixes: Bug 24144834: TDNF does not support $basearch and $releasever in .repo fi
 
 By default, determine $ basearch and $ releasever from this package:
 mariner_user@mariner-aks [ /etc/tdnf ]$ sudo tdnf --refresh list installed | grep mariner
-mariner-release.noarch                      1.0-1.azl3                @System
+azurelinux-release.noarch                      1.0-1.azl3                @System
 
 Workaround: add the following to /etc/tdnf/tdnf.conf
-distroverpkg=mariner-release
+distroverpkg=azurelinux-release
 ---
  client/defines.h | 2 +-
  common/config.h  | 2 +-
@@ -27,7 +27,7 @@ index 602b249..59b058e 100644
  #define TDNF_DEFAULT_DB_LOCATION          HISTORY_DB_DIR
  
 -#define TDNF_DEFAULT_DISTROVERPKG         "system-release"
-+#define TDNF_DEFAULT_DISTROVERPKG         "mariner-release"
++#define TDNF_DEFAULT_DISTROVERPKG         "azurelinux-release"
  #define TDNF_DEFAULT_DISTROARCHPKG        "x86_64"
  #define TDNF_RPM_CACHE_DIR_NAME           "rpms"
  #define TDNF_REPODATA_DIR_NAME            "repodata"
@@ -40,7 +40,7 @@ index 222a448..b01e2ea 100644
  #define TDNF_DEFAULT_REPO_LOCATION        "/etc/yum.repos.d"
  #define TDNF_DEFAULT_CACHE_LOCATION       "/var/cache/tdnf"
 -#define TDNF_DEFAULT_DISTROVERPKG         "system-release"
-+#define TDNF_DEFAULT_DISTROVERPKG         "mariner-release"
++#define TDNF_DEFAULT_DISTROVERPKG         "azurelinux-release"
  #define TDNF_DEFAULT_DISTROARCHPKG        "x86_64"
  #define TDNF_RPM_CACHE_DIR_NAME           "rpms"
  #define TDNF_REPODATA_DIR_NAME            "repodata"

@@ -71,7 +71,7 @@ Requires:       dnf-plugins-core
 # RHBZ#771310
 Requires:       e2fsprogs-libs >= 1.42
 Requires:       findutils
-Requires:       mariner-release
+Requires:       azurelinux-release
 Requires:       rpm
 Requires:       tar
 Requires:       util-linux-ng
@@ -151,7 +151,7 @@ make check || {
 - Rebuilt for glibc-static 2.35-3
 
 * Tue Apr 26 2022 Olivia Crain <oliviacrain@microsoft.com> - 5.2.1-3
-- Explicitly require mariner-release at run-time
+- Explicitly require azurelinux-release at run-time
 
 * Wed Mar 30 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.2.1-2
 - Updating dependencies.

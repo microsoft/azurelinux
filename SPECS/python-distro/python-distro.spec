@@ -21,7 +21,7 @@ Distro provides information about the OS distribution it runs on, such as a reli
 
 %package -n     python3-distro
 Summary:        Distro - an OS platform information API
-Requires:       mariner-release
+Requires:       azurelinux-release
 Requires:       python3
 
 %description -n python3-distro

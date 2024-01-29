@@ -20,7 +20,7 @@ index 549bd9a..760c815 100644
 +  Config.rpm <> "no" && Config.rpm2cpio <> "no" && rpm_is_available () &&
 +    Config.dnf <> "no" &&
 +    Os_release.get_id () = "mariner" ||
-+     try (stat "/etc/mariner-release").st_kind = S_REG with Unix_error _ -> false
++     try (stat "/etc/azurelinux-release").st_kind = S_REG with Unix_error _ -> false
 +
  let settings = ref no_settings
  let rpm_major, rpm_minor, rpm_arch = ref 0, ref 0, ref ""
@@ -64,7 +64,7 @@ index aceef21..223cae9 100755
      distro=suse
  elif [ -f /etc/ibm_powerkvm-release ]; then
      distro=ibm-powerkvm
-+elif [ -f /etc/mariner-release ]; then
++elif [ -f /etc/azurelinux-release ]; then
 +	distro=mariner
  else
      exit 77

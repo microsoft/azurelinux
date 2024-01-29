@@ -1,5 +1,5 @@
 Summary:        Azure Linux release files
-Name:           mariner-release
+Name:           azurelinux-release
 Version:        3.0
 Release:        1%{?dist}
 License:        MIT
@@ -19,8 +19,8 @@ Azure Linux release files such as yum configs and other %{_sysconfdir}/ release 
 install -d %{buildroot}%{_sysconfdir}
 install -d %{buildroot}/%{_libdir}
 
-echo "Azure Linux %{mariner_release_version}" > %{buildroot}%{_sysconfdir}/mariner-release
-echo "MARINER_BUILD_NUMBER=%{mariner_build_number}" >> %{buildroot}%{_sysconfdir}/mariner-release
+echo "Azure Linux %{mariner_release_version}" > %{buildroot}%{_sysconfdir}/azurelinux-release
+echo "MARINER_BUILD_NUMBER=%{mariner_build_number}" >> %{buildroot}%{_sysconfdir}/azurelinux-release
 
 cat > %{buildroot}%{_sysconfdir}/lsb-release <<- "EOF"
 DISTRIB_ID="azurelinux"
@@ -54,7 +54,7 @@ EOF
 
 %files
 %defattr(-,root,root,-)
-%config(noreplace) %{_sysconfdir}/mariner-release
+%config(noreplace) %{_sysconfdir}/azurelinux-release
 %config(noreplace) %{_sysconfdir}/lsb-release
 %config(noreplace) %{_libdir}/os-release
 %config(noreplace) %{_sysconfdir}/os-release

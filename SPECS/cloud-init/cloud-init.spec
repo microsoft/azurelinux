@@ -15,7 +15,7 @@ Patch1:         make_fallback_network_config_work.patch
 BuildRequires:  automake
 BuildRequires:  dbus
 BuildRequires:  iproute
-BuildRequires:  mariner-release 
+BuildRequires:  azurelinux-release 
 BuildRequires:  python3
 BuildRequires:  python3-PyYAML
 BuildRequires:  python3-certifi
@@ -176,7 +176,7 @@ make check %{?_smp_mflags}
 - Remove add-mariner-distro-support and CVE-2022-2084 pathc as no longer needed in newer version
 
 * Tue Oct 04 2022 Minghe Ren <mingheren@microsoft.com> - 22.2-9
-- add BuildRequires mariner-release to make sure /etc/os-release exists so variant can be set as mariner properly
+- add BuildRequires azurelinux-release to make sure /etc/os-release exists so variant can be set as mariner properly
 
 * Thu Sep 15 2022 Minghe Ren <mingheren@microsoft.com> - 22.2-8
 - Revert the change for adding sysinit.target dependency on previous two releases

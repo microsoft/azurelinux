@@ -2205,7 +2205,7 @@
                 "lsb-release",
                 "ltp",
                 "lttng-consume",
-                "mariner-release",
+                "azurelinux-release",
                 "mariner-repos",
                 "mariner-rpm-macros",
                 "mm-common",

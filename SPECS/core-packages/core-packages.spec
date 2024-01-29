@@ -59,7 +59,7 @@ Requires:       filesystem
 Requires:       findutils
 Requires:       grep
 Requires:       gzip
-Requires:       mariner-release
+Requires:       azurelinux-release
 Requires:       mariner-repos
 Requires:       mariner-repos-extras
 Requires:       mariner-repos-microsoft

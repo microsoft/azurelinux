@@ -18,7 +18,7 @@ Source2:        cache-updateinfo.service
 Source3:        cache-updateinfo.timer
 Source4:        tdnfrepogpgcheck.conf
 Patch0:         tdnf-mandatory-space-list-output.patch
-Patch1:         tdnf-default-mariner-release.patch
+Patch1:         tdnf-default-azurelinux-release.patch
 Patch2:         tdnf-enable-plugins-by-default.patch
 # Patch to be removed once we upgrade to a version of tdnf which contains the upstream fix
 # https://github.com/vmware/tdnf/commit/d62d7097c009ee867bee992840334dbc12f4f0f3

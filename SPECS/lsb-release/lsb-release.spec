@@ -12,7 +12,7 @@ Source1:        %{LICENSE_PATH}
 %define LICENSE_PATH LICENSE.PTR
 BuildRequires:  coreutils
 BuildRequires:  gzip
-Requires:       mariner-release
+Requires:       azurelinux-release
 BuildArch:      noarch
 
 %description

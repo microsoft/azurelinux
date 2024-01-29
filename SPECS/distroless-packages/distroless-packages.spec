@@ -14,7 +14,7 @@ Metapackage holding sets of core packages for different applications.
 %package minimal
 Summary:        The smallest useful package list.
 Requires:       filesystem
-Requires:       mariner-release
+Requires:       azurelinux-release
 Requires:       prebuilt-ca-certificates
 Requires:       tzdata
 
@@ -28,7 +28,7 @@ Requires:       %{name}-minimal = %{version}-%{release}
 Requires:       filesystem
 Requires:       glibc-iconv
 Requires:       iana-etc
-Requires:       mariner-release
+Requires:       azurelinux-release
 Requires:       openssl
 Requires:       openssl-libs
 Requires:       tzdata
