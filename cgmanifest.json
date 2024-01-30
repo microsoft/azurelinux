@@ -4360,8 +4360,8 @@
         "type": "other",
         "other": {
           "name": "glusterfs",
-          "version": "7.9",
-          "downloadUrl": "https://download.gluster.org/pub/gluster/glusterfs/7/7.9/glusterfs-7.9.tar.gz"
+          "version": "11.1",
+          "downloadUrl": "https://download.gluster.org/pub/gluster/glusterfs/11/11.1/glusterfs-11.1.tar.gz"
         }
       }
     },
@@ -11143,6 +11143,16 @@
           "name": "libtool",
           "version": "2.4.7",
           "downloadUrl": "http://ftp.gnu.org/gnu/libtool/libtool-2.4.7.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libtpms",
+          "version": "0.9.6",
+          "downloadUrl": "https://github.com/stefanberger/libtpms/archive/v0.9.6/libtpms-0.9.6.tar.gz"
         }
       }
     },
