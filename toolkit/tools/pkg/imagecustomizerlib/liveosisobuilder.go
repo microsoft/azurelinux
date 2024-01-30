@@ -72,7 +72,7 @@ type LiveOSIsoBuilder struct {
 	artifacts   IsoArtifacts
 }
 
-// purpose:
+// extractArtifactsFromBootDevice
 //
 //	extracts the bootloaders from the specified boot device.
 //
@@ -115,7 +115,7 @@ func (b *LiveOSIsoBuilder) extractArtifactsFromBootDevice(bootDevicePath string,
 	return nil
 }
 
-// purpose:
+// populateWriteableRootfsDir
 //
 //	copies the contents of the rootfs partition unto the build machine.
 //
@@ -155,7 +155,7 @@ func (b *LiveOSIsoBuilder) populateWriteableRootfsDir(rootfsDevicePath, rootfsTy
 	return nil
 }
 
-// purpose
+// stageIsoMakerInitrdArtifacts
 //
 //	IsoMaker looks for the vmlinuz/bootloader files inside the initrd image
 //	file under specific directory structure.
@@ -215,7 +215,7 @@ func (b *LiveOSIsoBuilder) stageIsoMakerInitrdArtifacts(writeableRootfsDir, isoM
 	return nil
 }
 
-// purpose
+// prepareRootfsForDracut
 //
 //	ensures two things:
 //	- initrd image build time configuration is in place.
@@ -257,7 +257,7 @@ func (b *LiveOSIsoBuilder) prepareRootfsForDracut(writeableRootfsDir string) err
 	return nil
 }
 
-// purpose
+// prepareLiveOSDir
 //
 //		given a rootfs, this function:
 //		- extracts the kernel version, and vmlinuz.
@@ -279,7 +279,6 @@ func (b *LiveOSIsoBuilder) prepareRootfsForDracut(writeableRootfsDir string) err
 // outputs
 //   - customized writeableRootfsDir (new files, deleted files, etc)
 //   - extracted artifacts
-//
 func (b *LiveOSIsoBuilder) prepareLiveOSDir(writeableRootfsDir, isoMakerArtifactsStagingDir string) error {
 
 	logger.Log.Infof("creating LiveOS squashfs image...")
@@ -336,7 +335,7 @@ func (b *LiveOSIsoBuilder) prepareLiveOSDir(writeableRootfsDir, isoMakerArtifact
 	return nil
 }
 
-// purpose
+// createSquashfsImage
 //
 //	creates a squashfs image based on a given folder.
 //
@@ -372,7 +371,7 @@ func (b *LiveOSIsoBuilder) createSquashfsImage(writeableRootfsDir string) error 
 	return nil
 }
 
-// purpose:
+// generateInitrdImage
 //
 //	runs dracut against rootfs to create an initrd image file.
 //
@@ -389,7 +388,7 @@ func (b *LiveOSIsoBuilder) createSquashfsImage(writeableRootfsDir string) error 
 //
 // outputs:
 // - creates an initrd.img and stores its path in b.artifacts.initrdImagePath.
-func (b *LiveOSIsoBuilder) generateInitrd(rootfsSourceDir, artifactsSourceDir, artifactsTargetDir string) error {
+func (b *LiveOSIsoBuilder) generateInitrdImage(rootfsSourceDir, artifactsSourceDir, artifactsTargetDir string) error {
 
 	logger.Log.Infof("generating initrd...")
 
@@ -429,7 +428,7 @@ func (b *LiveOSIsoBuilder) generateInitrd(rootfsSourceDir, artifactsSourceDir, a
 	return nil
 }
 
-// purpose:
+// prepareArtifactsFromFullImage
 //
 //	extracts and generates all LiveOS Iso artifacts from a given raw full disk
 //	image (has boot and rootfs partitions).
@@ -486,7 +485,7 @@ func (b *LiveOSIsoBuilder) prepareArtifactsFromFullImage(rawImageFile string) er
 	}
 
 	isoMakerArtifactsDirInInitrd := "/boot"
-	err = b.generateInitrd(writeableRootfsDir, isoMakerArtifactsStagingDir, isoMakerArtifactsDirInInitrd)
+	err = b.generateInitrdImage(writeableRootfsDir, isoMakerArtifactsStagingDir, isoMakerArtifactsDirInInitrd)
 	if err != nil {
 		return fmt.Errorf("failed to generate initrd image.\n%w", err)
 	}
@@ -499,7 +498,7 @@ func (b *LiveOSIsoBuilder) prepareArtifactsFromFullImage(rawImageFile string) er
 	return nil
 }
 
-// purpose:
+// createIsoMakerConfig
 //
 //	creates an IsoMaker config objects with the necessary configuration.
 //
@@ -535,7 +534,7 @@ func createIsoMakerConfig(squashfsImagePath string) (configuration.Config, error
 	return config, nil
 }
 
-// purpose:
+// createIsoImage
 //
 //	creates an LiveOS ISO image.
 //
@@ -562,12 +561,12 @@ func createIsoMakerConfig(squashfsImagePath string) (configuration.Config, error
 func (b *LiveOSIsoBuilder) createIsoImage(isoOutputDir, isoOutputBaseName string) error {
 
 	logger.Log.Infof("creating iso...")
-	logger.Log.Infof("- isomakerBuildDir  = %s", b.workingDirs.isomakerBuildDir)
-	logger.Log.Infof("- grubCfgPath       = %s", b.artifacts.grubCfgPath)
-	logger.Log.Infof("- initrdImagePath   = %s", b.artifacts.initrdImagePath)
-	logger.Log.Infof("- squashfsImagePath = %s", b.artifacts.squashfsImagePath)
-	logger.Log.Infof("- isoOutputDir      = %s", isoOutputDir)
-	logger.Log.Infof("- isoOutputBaseName = %s", isoOutputBaseName)
+	logger.Log.Debugf("- isomakerBuildDir  = %s", b.workingDirs.isomakerBuildDir)
+	logger.Log.Debugf("- grubCfgPath       = %s", b.artifacts.grubCfgPath)
+	logger.Log.Debugf("- initrdImagePath   = %s", b.artifacts.initrdImagePath)
+	logger.Log.Debugf("- squashfsImagePath = %s", b.artifacts.squashfsImagePath)
+	logger.Log.Debugf("- isoOutputDir      = %s", isoOutputDir)
+	logger.Log.Debugf("- isoOutputBaseName = %s", isoOutputBaseName)
 
 	unattendedInstall := false
 	// We are disabling BIOS booloaders because enabling them will requires
@@ -614,7 +613,7 @@ func (b *LiveOSIsoBuilder) createIsoImage(isoOutputDir, isoOutputBaseName string
 	return nil
 }
 
-// purpose
+// copyFile
 //
 //	helper that ensures the target folder exists before copying the file to
 //	it.
@@ -641,7 +640,7 @@ func copyFile(sourcePath, targetPath string) error {
 	return file.Copy(sourcePath, targetPath)
 }
 
-// purpose
+// fileExists
 //
 //	helper that checks if a given file exists or not.
 //

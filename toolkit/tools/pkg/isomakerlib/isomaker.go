@@ -273,6 +273,10 @@ func (im *IsoMaker) createVmlinuzImage() {
 // createIsoRpmsRepo initializes the RPMs repo on the ISO image
 // later accessed by the ISO installer.
 func (im *IsoMaker) createIsoRpmsRepo() {
+	if im.fetchedRepoDirPath == "" {
+		return
+	}
+
 	isoRpmsRepoDirPath := filepath.Join(im.buildDirPath, "RPMS")
 
 	logger.Log.Debugf("Creating ISO RPMs repo under '%s'.", isoRpmsRepoDirPath)
