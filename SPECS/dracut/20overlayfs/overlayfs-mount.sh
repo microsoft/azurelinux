@@ -5,9 +5,12 @@
 # the dracut initramfs phase.
 
 # Kernel Parameters:
-# - root: Specifies the path to the root filesystem. This script expects it to
-#   be a DM-Verity protected device, typically for systemd at
-#   '/dev/mapper/root'.
+# - root: Specifies the path to the root filesystem. This script is designed to
+#   support both DM-Verity protected devices and general filesystems. When a
+#   DM-Verity protected device is detected (typically '/dev/mapper/root' for
+#   systemd), the script performs steps specific to Verity. For non-DM-Verity
+#   setups, the script will proceed with the standard OverlayFS setup, ensuring
+#   versatility in its application.
 # - rd.overlayfs: A comma-separated list defining the OverlayFS configuration.
 #   Each entry should specify the overlay, upper, and work directories for an
 #   OverlayFS instance.
