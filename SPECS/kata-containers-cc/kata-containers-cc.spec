@@ -275,7 +275,7 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %exclude %{osbuilder}/tools/osbuilder/rootfs-builder/ubuntu
 
 %changelog
-*   Thu Dec 07 2023 Archana Choudhary <archana1@microsoft.com> - 0.6.3-3
+*   Tue Jan 30 2024 Archana Choudhary <archana1@microsoft.com> - 0.6.3-3
 -   Remove kernel-uvm-cvm(-devel) dependency
 -   Remove kernel-uvm-cvm modules/sources/files
 -   Remove instructions to build kernel-uvm-cvm related binaries
