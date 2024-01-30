@@ -15,6 +15,7 @@ BuildRequires:  libnfnetlink-devel >= %{libnfnetlink}
 BuildRequires:  make
 BuildRequires:  pkg-config
 BuildRequires:  kernel-headers
+BuildRequires:  libmnl
 
 %description
 libnetfilter_log is a userspace library providing interface to packets that
