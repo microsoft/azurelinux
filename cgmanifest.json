@@ -5100,8 +5100,8 @@
         "type": "other",
         "other": {
           "name": "harfbuzz",
-          "version": "3.4.0",
-          "downloadUrl": "https://github.com/harfbuzz/harfbuzz/releases/download/3.4.0/harfbuzz-3.4.0.tar.xz"
+          "version": "8.3.0",
+          "downloadUrl": "https://github.com/harfbuzz/harfbuzz/releases/download/8.3.0/harfbuzz-8.3.0.tar.xz"
         }
       }
     },
@@ -11611,8 +11611,8 @@
         "type": "other",
         "other": {
           "name": "libXext",
-          "version": "1.3.4",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXext-1.3.4.tar.bz2"
+          "version": "1.3.5",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXext-1.3.5.tar.gz"
         }
       }
     },
@@ -11651,8 +11651,8 @@
         "type": "other",
         "other": {
           "name": "libXft",
-          "version": "2.3.3",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXft-2.3.3.tar.bz2"
+          "version": "2.3.8",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXft-2.3.8.tar.gz"
         }
       }
     },
@@ -11691,8 +11691,8 @@
         "type": "other",
         "other": {
           "name": "libxkbfile",
-          "version": "1.1.0",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libxkbfile-1.1.0.tar.bz2"
+          "version": "1.1.2",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libxkbfile-1.1.2.tar.gz"
         }
       }
     },
@@ -26755,8 +26755,8 @@
         "type": "other",
         "other": {
           "name": "rust",
-          "version": "1.72.0",
-          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.72.0-src.tar.xz"
+          "version": "1.75.0",
+          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.75.0-src.tar.xz"
         }
       }
     },
