@@ -23,42 +23,36 @@ var (
 
 func findPartitions(buildDir string, diskDevice string) ([]string, []*safechroot.MountPoint, error) {
 	var err error
+
 	diskPartitions, err := diskutils.GetDiskPartitions(diskDevice)
 	if err != nil {
 		return nil, nil, err
 	}
 
+	systemBootPartition, err := findSystemBootPartition(diskPartitions)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	var rootfsPartition *diskutils.PartitionInfo
-	var mountPoints []*safechroot.MountPoint
 
-	if len(diskPartitions) > 1 {
-		systemBootPartition, err := findSystemBootPartition(diskPartitions)
+	switch systemBootPartition.PartitionTypeUuid {
+	case diskutils.EfiSystemPartitionTypeUuid:
+		rootfsPartition, err = findRootfsPartitionFromEsp(systemBootPartition, diskPartitions, buildDir)
 		if err != nil {
 			return nil, nil, err
 		}
 
-		switch systemBootPartition.PartitionTypeUuid {
-		case diskutils.EfiSystemPartitionTypeUuid:
-			rootfsPartition, err = findRootfsPartitionFromEsp(systemBootPartition, diskPartitions, buildDir)
-			if err != nil {
-				return nil, nil, err
-			}
-
-		case diskutils.BiosBootPartitionTypeUuid:
-			rootfsPartition, err = findRootfsPartitionFromBiosBootPartition(systemBootPartition, diskPartitions, buildDir)
-			if err != nil {
-				return nil, nil, err
-			}
-		}
-
-		mountPoints, err = findMountsFromRootfs(rootfsPartition, diskPartitions, buildDir)
+	case diskutils.BiosBootPartitionTypeUuid:
+		rootfsPartition, err = findRootfsPartitionFromBiosBootPartition(systemBootPartition, diskPartitions, buildDir)
 		if err != nil {
 			return nil, nil, err
 		}
-	} else {
-		var mountPoint *safechroot.MountPoint
-		mountPoint = safechroot.NewPreDefaultsMountPoint(diskDevice, "/", "ext4", 0, "")
-		mountPoints = append(mountPoints, mountPoint)
+	}
+
+	mountPoints, err := findMountsFromRootfs(rootfsPartition, diskPartitions, buildDir)
+	if err != nil {
+		return nil, nil, err
 	}
 
 	return nil, mountPoints, nil
