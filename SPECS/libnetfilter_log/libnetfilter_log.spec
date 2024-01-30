@@ -40,7 +40,6 @@ libnetfilter_log is used by ulogd2.
 
 %prep
 %setup -q
-%patch0 -p1
 
 %build
 %configure --disable-static --disable-rpath
