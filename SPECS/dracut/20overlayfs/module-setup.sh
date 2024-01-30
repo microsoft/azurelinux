@@ -8,6 +8,7 @@ depends() {
     echo base
 }
 
+# Install Overlay driver.
 installkernel() {
     instmods overlay
 }
