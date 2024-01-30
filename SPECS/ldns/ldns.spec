@@ -11,8 +11,6 @@
 # GOST is not allowed in Fedora/RHEL due to legal reasons (not NIST ECC)
 %bcond_with     gost
 
-%{?!snapshot:         %global snapshot        0}
-
 %if %{with python3}
 %{?filter_setup:
 %global _ldns_internal_filter /^_ldns[.]so.*/d;
@@ -41,30 +39,30 @@ Group:          System Environment/Libraries
 Url:            http://www.nlnetlabs.nl/%{name}/
 Source0:        http://www.nlnetlabs.nl/downloads/%{name}/%{name}-%{version}.tar.gz
 
-BuildRequires: autoconf
-BuildRequires: automake
-BuildRequires: doxygen
-BuildRequires: gcc
-BuildRequires: gcc-c++
-BuildRequires: libpcap-devel
-BuildRequires: libtool
-BuildRequires: make
-BuildRequires: openssl-devel
+Patch1:         ldns-swig-4.2.patch
+
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  doxygen
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
+BuildRequires:  libpcap-devel
+BuildRequires:  libtool
+BuildRequires:  make
+BuildRequires:  openssl-devel
 %if %{with perl}
-BuildRequires: perl-devel
-BuildRequires: perl-ExtUtils-MakeMaker
-BuildRequires: perl-generators
-BuildRequires: perl(Devel::CheckLib)
+BuildRequires:  perl-devel
+BuildRequires:  perl-ExtUtils-MakeMaker
+BuildRequires:  perl-generators
+BuildRequires:  perl(Devel::CheckLib)
 %endif
 %if %{with python3}
-BuildRequires: python3-devel
-BuildRequires: swig
+BuildRequires:  python3-devel
+BuildRequires:  swig
 %endif
-Requires: ca-certificates
-Requires: glibc
-Requires: openssl
-
-Patch1: ldns-swig-4.2.patch
+Requires:       ca-certificates
+Requires:       glibc
+Requires:       openssl
 
 %description
 ldns is a library with the aim to simplify DNS programming in C. All
@@ -123,7 +121,7 @@ This package contains documentation for the ldns library
 %autosetup -cn %{pkgname} -N
 pushd %{pkgname}
 
-%autopatch -p2
+%autopatch -p1
 
 # fixup .pc file
 sed -i "s/@includedir@/@includedir@\/ldns/" packaging/libldns.pc.in
@@ -281,7 +279,7 @@ rm -rf doc/man
 
 %changelog
 * Thu Jan 25 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.3-1
-- Auto-upgrade to 1.8.3 - Upgrade for Azure Linux 3.0\
+- Auto-upgrade to 1.8.3 - Upgrade for Azure Linux 3.0
 - Removed unsupported multilib patch (azl only supports 64bit)
 - Removed other patches already integrated into this version
 - Updated license name to SPDX standard.
