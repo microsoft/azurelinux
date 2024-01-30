@@ -12,9 +12,6 @@ Source0:          https://github.com/xdp-project/%{name}/releases/download/v%{ve
 
 %global azl 3
 # /bin/strip causes errors during install
-%if %{azl}
-%global __strip /bin/true
-%endif
 BuildRequires:    libbpf-devel
 BuildRequires:    elfutils-libelf-devel
 BuildRequires:    zlib-devel
@@ -45,6 +42,9 @@ Requires:         libxdp = %{version}-%{release}
 # disable the debug package to avoid rpmbuild error'ing out because of this
 %global debug_package %{nil}
 %global _hardened_build 1
+%if %{azl}
+%global __strip /bin/true
+%endif
 
 %description
 Utilities and example programs for use with XDP
@@ -91,6 +91,7 @@ export LLC=%{_bindir}/llc
 export PRODUCTION=1
 export DYNAMIC_LIBXDP=1
 export FORCE_SYSTEM_LIBBPF=1
+# AzLinux does not build emacs. Docs will not be available
 %if %{azl}
 export FORCE_EMACS=0
 %else
@@ -142,7 +143,7 @@ make install V=1
 
 %changelog
 * Mon Jan 29 2024 Kanika Nema <kanikanema@microsoft.com> 1.4.1-2
-- Initial import for CBL-Mariner from Fedora 40 (License: MIT)
+- Initial CBL-Mariner import from Fedora 40 (License: MIT)
 - License Verified
 - Azlinux specific changes to turn off tests and docs
 
