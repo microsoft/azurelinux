@@ -88,7 +88,7 @@ Name:           ruby
 # provides should be versioned according to the ruby version.
 # More info: https://stdgems.org/
 Version:        %{ruby_version}
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -407,6 +407,9 @@ sudo -u test make test TESTS="-v"
 %{_rpmconfigdir}/rubygems.con
 
 %changelog
+* Mon Jan 29 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.3.0-2
+- Added the 'gemspec_clear_signing' macro.
+
 * Mon Jan 22 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.3.0-1
 - Upgrading to 3.3.0.
 - Re-added the bigdecimal gem.
