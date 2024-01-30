@@ -33,7 +33,7 @@ This is an ingress controller that can be run on Azure Kubernetes Service (AKS) 
 to act as the ingress for an AKS cluster. 
 
 %prep
-%setup
+%autosetup -N
 rm -rf vendor
 tar -xf %{SOURCE1} --no-same-owner
 %patch -P 0 -p 1 -d vendor/github.com/prometheus/client_golang
