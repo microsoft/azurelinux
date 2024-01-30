@@ -11,17 +11,19 @@ Distribution: Mariner
 Source0: https://github.com/tpm2-software/tpm2-pytss/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 
+BuildRequires: git
 BuildRequires: python3-devel
-BuildRequires: python3-setuptools
+BuildRequires: python3-pip
 BuildRequires: python3-pkgconfig
 BuildRequires: python3-pycparser
-BuildRequires: python3-pip
-BuildRequires: git
+BuildRequires: python3-setuptools
 BuildRequires: tpm2-tss-devel
 
-BuildRequires: python3-packaging
-BuildRequires: python3-asn1crypto 
+# packaging, asn1crypto, cryptography, and setuptools_scm are required in
+# Mariner build system, so these are additions to the photon spec
+BuildRequires: python3-asn1crypto
 BuildRequires: python3-cryptography
+BuildRequires: python3-packaging
 BuildRequires: python3-setuptools_scm
 
 %if 0%{?with_check}
@@ -30,8 +32,8 @@ BuildRequires: python3-cffi
 BuildRequires: python3-PyYAML
 %endif
 
-Requires: tpm2-tss
 Requires: python3
+Requires: tpm2-tss
 
 %description
 TPM2 TSS Python bindings for Enhanced System API (ESYS).
