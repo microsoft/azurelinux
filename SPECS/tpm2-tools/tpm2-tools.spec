@@ -38,9 +38,10 @@ sed -i "/compatibility/a extern int BN_bn2binpad(const BIGNUM *a, unsigned char 
 %if 0%{?with_check}
 %check
 if [ ! -f /dev/tpm0 ];then
+   find / -name "*swtpm*"
    mkdir /tmp/swtpm
    swtpm_setup --tpm-state /tmp/swtpm --tpm2
-   swtpm socket --server --daemon
+   swtpm socket --server &
    tpm2_startup -c
    tpm2_pcrlist
 fi
