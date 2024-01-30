@@ -33,9 +33,9 @@ chkconfig-debuginfo-1.25-1.azl3.x86_64.rpm
 chkconfig-lang-1.25-1.azl3.x86_64.rpm
 cmake-3.21.4-10.azl3.x86_64.rpm
 cmake-debuginfo-3.21.4-10.azl3.x86_64.rpm
-coreutils-8.32-7.azl3.x86_64.rpm
-coreutils-debuginfo-8.32-7.azl3.x86_64.rpm
-coreutils-lang-8.32-7.azl3.x86_64.rpm
+coreutils-9.4-1.azl3.x86_64.rpm
+coreutils-debuginfo-9.4-1.azl3.x86_64.rpm
+coreutils-lang-9.4-1.azl3.x86_64.rpm
 cpio-2.14-1.azl3.x86_64.rpm
 cpio-debuginfo-2.14-1.azl3.x86_64.rpm
 cpio-lang-2.14-1.azl3.x86_64.rpm

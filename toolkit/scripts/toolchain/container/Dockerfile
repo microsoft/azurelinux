@@ -93,7 +93,6 @@ COPY [ "./.bashrc", \
 USER lfs
 COPY [ "./toolchain_build_temp_tools.sh", \
        "./sanity_check.sh", \
-       "./coreutils-fix-get-sys_getdents-aarch64.patch", \
        "./CVE-2023-4039.patch", \
        "./rpm-define-RPM-LD-FLAGS.patch", \
        "$LFS/tools/" ]
