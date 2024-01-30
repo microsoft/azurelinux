@@ -1,7 +1,7 @@
 Summary:        OSS implementation of the TCG TPM2 Software Stack (TSS2)
 Name:           tpm2-pkcs11
 Version:        1.9.0
-Release:        6%{?dist}
+Release:        1%{?dist}
 License:        BSD 2-Clause
 URL:            https://github.com/tpm2-software/tpm2-pkcs11
 Group:          System Environment/Security
@@ -99,7 +99,7 @@ python3 setup.py test
 %{python3_sitelib}/*
 
 %changelog
-* Mon Jan 22 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 1.9.0-6
+* Mon Jan 22 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 1.9.0-1
 - Initial CBL-Mariner import from Photon (license: Apache2).
 - Verified license
 * Sun Nov 19 2023 Shreenidhi Shedi <sshedi@vmware.com> 1.8.0-5
