@@ -14,7 +14,6 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safeloopback"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safemount"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
@@ -497,14 +496,6 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 
 func createLiveOSIsoImage(buildDir, sourceImageFile, outputImageDir, outputImageBase string) error {
 
-	logger.Log.Infof("connecting to customized raw image (%s)", sourceImageFile)
-
-	imageConnection, mountPoints, err := connectToExistingImage(sourceImageFile, buildDir, "imageroot", true)
-	if err != nil {
-		return err
-	}
-	defer imageConnection.Close()
-
 	iae := &IsoArtifactExtractor{
 		workingDirs: IsoWorkingDirs{
 			isoBuildDir: filepath.Join(buildDir, "tmp"),
@@ -514,50 +505,12 @@ func createLiveOSIsoImage(buildDir, sourceImageFile, outputImageDir, outputImage
 		},
 	}
 
-	bootMountPoint := safechroot.FindMountPointByTarget(mountPoints, "/boot/efi")
-	if bootMountPoint == nil {
-		return fmt.Errorf("failed to find boot partition mount point in %s", sourceImageFile)
-	}
-
-	err = iae.extractArtifactsFromBootDevice(bootMountPoint.GetSource(), bootMountPoint.GetFSType())
-	if err != nil {
-		return err
-	}
-
-	rootfsMountPoint := safechroot.FindMountPointByTarget(mountPoints, "/")
-	if rootfsMountPoint == nil {
-		return fmt.Errorf("failed to find rootfs partition mount point in %s", sourceImageFile)
-	}
-
-	writeableRootfsDir := filepath.Join(iae.workingDirs.isoBuildDir, "writeable-rootfs")
-	err = iae.populateWriteableRootfsDir(rootfsMountPoint.GetSource(), rootfsMountPoint.GetFSType(), writeableRootfsDir)
-	if err != nil {
-		return err
-	}
-
-	isoMakerArtifactsStagingDir := "/boot-staging"
-	err = iae.prepareLiveOSDir(writeableRootfsDir, isoMakerArtifactsStagingDir)
-	if err != nil {
-		return err
-	}
-
-	err = iae.createSquashfsImage(writeableRootfsDir)
-	if err != nil {
-		return fmt.Errorf("failed to create squashfs image.\n%w", err)
-	}
-
-	isoMakerArtifactsDirInInitrd := "/boot"
-	err = iae.generateInitrd(writeableRootfsDir, isoMakerArtifactsStagingDir, isoMakerArtifactsDirInInitrd)
+	err := iae.prepareLiveOSIsoArtifactsFromFullImage(sourceImageFile)
 	if err != nil {
 		return err
 	}
 
 	err = iae.createLiveOSIsoImage(outputImageDir, outputImageBase)
-	if err != nil {
-		return err
-	}
-
-	err = imageConnection.CleanClose()
 	if err != nil {
 		return err
 	}

@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sort"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
@@ -466,10 +467,12 @@ func (iae *IsoArtifactExtractor) createSquashfsImage(writeableRootfsDir string) 
 
 // purpose
 //
-//	given a rootfs, it
-//	- extracts the kernel version, vmlinuz, and grub.cfg.
-//	- stages files to be included in the initrd when it's generated. IsoMaker
-//	  expects those files to be embedded in the initrd.
+//	given a rootfs, this function:
+//	- extracts the kernel version, and vmlinuz.
+//	- stages bootloaders and vmlinuz to a specific folder structure.
+//    This folder structure is to be included later in the initrd image when
+//    it gets generated. IsoMaker extracts those artifacts from the initrd 
+//    image file and uses them.
 //	- prepares the rootfs to run dracut (dracut will generate the initrd later).
 //	- creates the squashfs.
 //
@@ -482,6 +485,9 @@ func (iae *IsoArtifactExtractor) createSquashfsImage(writeableRootfsDir string) 
 //     the initrd image.
 //
 // outputs
+//   - customized writeableRootfsDir (new files, deleted files, etc)
+//   - extracted artifacts
+//
 func (iae *IsoArtifactExtractor) prepareLiveOSDir(writeableRootfsDir, isoMakerArtifactsStagingDir string) error {
 
 	logger.Log.Infof("creating LiveOS squashfs image...")
@@ -495,9 +501,23 @@ func (iae *IsoArtifactExtractor) prepareLiveOSDir(writeableRootfsDir, isoMakerAr
 	if len(kernelPaths) == 0 {
 		return fmt.Errorf("did not find any installed kernels under (%s).\n%w", kernelParentPath, err)
 	}
-	// do we need to sort this?
+	sort.Slice(kernelPaths, func(i, j int) bool {
+		return kernelPaths[i].Name() > kernelPaths[j].Name()
+	})
+
 	iae.artifacts.kernelVersion = kernelPaths[len(kernelPaths)-1].Name()
 	logger.Log.Infof("found installed kernel version (%s)", iae.artifacts.kernelVersion)
+
+	// extract vmlinuz
+	sourceVmlinuzPath := filepath.Join(writeableRootfsDir, "/boot/vmlinuz-"+iae.artifacts.kernelVersion)
+	targetVmLinuzPath := filepath.Join(iae.workingDirs.outDir, "vmlinuz")
+
+	err = copyFile(sourceVmlinuzPath, targetVmLinuzPath)
+	if err != nil {
+		return fmt.Errorf("failed to extract vmlinuz from (%s).\n%w", sourceVmlinuzPath, err)
+	}
+
+	iae.artifacts.vmlinuzPath = targetVmLinuzPath
 
 	// create grub.cfg
 	targetGrubCfgPath := filepath.Join(iae.workingDirs.outDir, "grub.cfg")
@@ -509,20 +529,7 @@ func (iae *IsoArtifactExtractor) prepareLiveOSDir(writeableRootfsDir, isoMakerAr
 
 	iae.artifacts.grubCfgPath = targetGrubCfgPath
 
-	// extract/create vmlinuz
-	sourceVmlinuzPath := filepath.Join(writeableRootfsDir, "/boot/vmlinuz-"+iae.artifacts.kernelVersion)
-	targetVmLinuzPath := filepath.Join(iae.workingDirs.outDir, "vmlinuz")
-
-	err = copyFile(sourceVmlinuzPath, targetVmLinuzPath)
-	if err != nil {
-		return fmt.Errorf("failed to extract vmlinuz from (%s).\n%w", sourceVmlinuzPath, err)
-	}
-
-	iae.artifacts.vmlinuzPath = targetVmLinuzPath
-
 	// stage artifacts needed by isomaker
-	// the artifacts are staged inside initrd where isomaker will look for them
-	// when creating the final iso image.
 	err = iae.stageIsoMakerInitrdArtifacts(writeableRootfsDir, isoMakerArtifactsStagingDir)
 	if err != nil {
 		return fmt.Errorf("failed to stage isomaker initrd artifacts.\n%w", err)
@@ -536,6 +543,77 @@ func (iae *IsoArtifactExtractor) prepareLiveOSDir(writeableRootfsDir, isoMakerAr
 
 	return nil
 }
+
+// purpose:
+//   extracts and generates all LiveOS Iso artifacts from a given raw full disk
+//   image (has boot and rootfs partitions).
+//
+// inputs
+//   - 'rawImageFile':
+//     - path to an existing raw full disk image (i.e. image with boot
+//       partition and a rootfs partition).
+//
+// outputs
+//   - all the extracted/generated artifacts will be placed in the 
+//     `IsoArtifactExtractor.workingDirs.outDir` folder.
+//   - the paths to individual artifaces are found in the 
+//     `IsoArtifactExtractor.artifacts` data structure.
+//
+func (iae *IsoArtifactExtractor) prepareLiveOSIsoArtifactsFromFullImage(rawImageFile string) error {
+
+	logger.Log.Infof("connecting to raw image (%s)", rawImageFile)
+	imageConnection, mountPoints, err := connectToExistingImage(rawImageFile, iae.workingDirs.isoBuildDir, "imageroot", true)
+	if err != nil {
+		return err
+	}
+	defer imageConnection.CleanClose()
+
+	bootMountPoint := safechroot.FindMountPointByTarget(mountPoints, "/boot/efi")
+	if bootMountPoint == nil {
+		return fmt.Errorf("failed to find boot partition mount point in %s", rawImageFile)
+	}
+
+	err = iae.extractArtifactsFromBootDevice(bootMountPoint.GetSource(), bootMountPoint.GetFSType())
+	if err != nil {
+		return fmt.Errorf("failed to extract boot artifacts from image (%s).\n%w", rawImageFile, err)
+	}
+
+	rootfsMountPoint := safechroot.FindMountPointByTarget(mountPoints, "/")
+	if rootfsMountPoint == nil {
+		return fmt.Errorf("failed to find rootfs partition mount point in %s", rawImageFile)
+	}
+
+	writeableRootfsDir := filepath.Join(iae.workingDirs.isoBuildDir, "writeable-rootfs")
+	err = iae.populateWriteableRootfsDir(rootfsMountPoint.GetSource(), rootfsMountPoint.GetFSType(), writeableRootfsDir)
+	if err != nil {
+		return fmt.Errorf("failed to copy the contents of rootfs from image (%s) to local folder (%s).\n%w", rawImageFile, writeableRootfsDir, err)
+	}
+
+	isoMakerArtifactsStagingDir := "/boot-staging"
+	err = iae.prepareLiveOSDir(writeableRootfsDir, isoMakerArtifactsStagingDir)
+	if err != nil {
+		return fmt.Errorf("failed to convert rootfs folder to a LiveOS folder.\n%w", err)
+	}
+
+	err = iae.createSquashfsImage(writeableRootfsDir)
+	if err != nil {
+		return fmt.Errorf("failed to create squashfs image.\n%w", err)
+	}
+
+	isoMakerArtifactsDirInInitrd := "/boot"
+	err = iae.generateInitrd(writeableRootfsDir, isoMakerArtifactsStagingDir, isoMakerArtifactsDirInInitrd)
+	if err != nil {
+		return fmt.Errorf("failed to generate initrd image.\n%w", err)
+	}
+
+	err = os.RemoveAll(writeableRootfsDir)
+	if err != nil {
+		return fmt.Errorf("failed to remove working folder (%s).\n%w", writeableRootfsDir, err)
+	}
+
+	return nil
+}
+
 
 // purpose
 //
