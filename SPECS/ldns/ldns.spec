@@ -61,6 +61,7 @@ BuildRequires: python3-devel
 BuildRequires: swig
 %endif
 Requires: ca-certificates
+Requires: glibc
 Requires: openssl
 
 Patch1: ldns-swig-4.2.patch
@@ -102,6 +103,7 @@ Python3 extensions for ldns
 %package -n perl-ldns
 Summary: Perl extensions for ldns
 Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires:  perl-libs
 Requires:  perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 
 %description -n perl-ldns
