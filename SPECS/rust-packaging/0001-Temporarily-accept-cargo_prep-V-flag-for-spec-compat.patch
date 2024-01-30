@@ -1,0 +1,26 @@
+From c1cb014722147a3373a7d7ebbf99781cbb335cbf Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Fri, 13 Oct 2023 00:31:15 +0200
+Subject: [PATCH] Temporarily accept cargo_prep -V flag for spec compatibiltiy
+ with RHEL
+
+---
+ macros.d/macros.cargo | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/macros.d/macros.cargo b/macros.d/macros.cargo
+index e99f5a6..05159d8 100644
+--- a/macros.d/macros.cargo
++++ b/macros.d/macros.cargo
+@@ -54,7 +54,8 @@
+ #   -v <directory> - use vendored sources from <directory> instead of
+ #                    %%cargo_registry
+ #   -N             - Don't set up any registry. Only set up the build configuration.
+-%cargo_prep(v:N)\
++%cargo_prep(V:v:N)\
++%{-V:%{?fedora:%{error:The -V flag for cargo_prep is not supported in Fedora}}}\
+ %{-v:%{-N:%{error:-v and -N are mutually exclusive!}}}\
+ (\
+ set -euo pipefail\
+-- 
+2.41.0
