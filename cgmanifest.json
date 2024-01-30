@@ -4360,8 +4360,8 @@
         "type": "other",
         "other": {
           "name": "glusterfs",
-          "version": "7.9",
-          "downloadUrl": "https://download.gluster.org/pub/gluster/glusterfs/7/7.9/glusterfs-7.9.tar.gz"
+          "version": "11.1",
+          "downloadUrl": "https://download.gluster.org/pub/gluster/glusterfs/11/11.1/glusterfs-11.1.tar.gz"
         }
       }
     },
@@ -5100,8 +5100,8 @@
         "type": "other",
         "other": {
           "name": "harfbuzz",
-          "version": "3.4.0",
-          "downloadUrl": "https://github.com/harfbuzz/harfbuzz/releases/download/3.4.0/harfbuzz-3.4.0.tar.xz"
+          "version": "8.3.0",
+          "downloadUrl": "https://github.com/harfbuzz/harfbuzz/releases/download/8.3.0/harfbuzz-8.3.0.tar.xz"
         }
       }
     },
@@ -11150,6 +11150,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libtpms",
+          "version": "0.9.6",
+          "downloadUrl": "https://github.com/stefanberger/libtpms/archive/v0.9.6/libtpms-0.9.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libtraceevent",
           "version": "1.7.2",
           "downloadUrl": "https://git.kernel.org/pub/scm/libs/libtrace/libtraceevent.git/snapshot/libtraceevent-1.7.2.tar.gz"
@@ -11601,8 +11611,8 @@
         "type": "other",
         "other": {
           "name": "libXext",
-          "version": "1.3.4",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXext-1.3.4.tar.bz2"
+          "version": "1.3.5",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXext-1.3.5.tar.gz"
         }
       }
     },
@@ -11641,8 +11651,8 @@
         "type": "other",
         "other": {
           "name": "libXft",
-          "version": "2.3.3",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXft-2.3.3.tar.bz2"
+          "version": "2.3.8",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXft-2.3.8.tar.gz"
         }
       }
     },
@@ -11681,8 +11691,8 @@
         "type": "other",
         "other": {
           "name": "libxkbfile",
-          "version": "1.1.0",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libxkbfile-1.1.0.tar.bz2"
+          "version": "1.1.2",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libxkbfile-1.1.2.tar.gz"
         }
       }
     },
@@ -25565,8 +25575,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-async",
-          "version": "1.30.2",
-          "downloadUrl": "https://github.com/socketry/async/archive/refs/tags/v1.30.2.tar.gz"
+          "version": "2.8.0",
+          "downloadUrl": "https://github.com/socketry/async/archive/refs/tags/v2.8.0.tar.gz"
         }
       }
     },
@@ -25575,8 +25585,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-async-http",
-          "version": "0.56.5",
-          "downloadUrl": "https://github.com/socketry/async-http/archive/refs/tags/v0.56.5.tar.gz"
+          "version": "0.63.0",
+          "downloadUrl": "https://github.com/socketry/async-http/archive/refs/tags/v0.63.0.tar.gz"
         }
       }
     },
@@ -25597,76 +25607,6 @@
           "name": "rubygem-async-pool",
           "version": "0.4.0",
           "downloadUrl": "https://github.com/socketry/async-pool/archive/refs/tags/v0.4.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-aws-eventstream",
-          "version": "1.2.0",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/aws-eventstream-1.2.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-aws-partitions",
-          "version": "1.576.0",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/aws-partitions-1.576.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-aws-sdk-core",
-          "version": "3.130.1",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/aws-sdk-core-3.130.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-aws-sdk-kms",
-          "version": "1.55.0",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/aws-sdk-kms-1.55.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-aws-sdk-s3",
-          "version": "1.113.0",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/aws-sdk-s3-1.113.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-aws-sdk-sqs",
-          "version": "1.51.0",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/aws-sdk-sqs-1.51.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-aws-sigv4",
-          "version": "1.4.0",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/aws-sigv4-1.4.0.tar.gz"
         }
       }
     },
@@ -26037,16 +25977,6 @@
           "name": "rubygem-fluent-plugin-rewrite-tag-filter",
           "version": "2.4.0",
           "downloadUrl": "https://github.com/fluent/fluent-plugin-rewrite-tag-filter/archive/refs/tags/v2.4.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-fluent-plugin-s3",
-          "version": "1.7.2",
-          "downloadUrl": "https://github.com/fluent/fluent-plugin-s3/archive/refs/tags/v1.7.2.tar.gz"
         }
       }
     },
@@ -26825,8 +26755,8 @@
         "type": "other",
         "other": {
           "name": "rust",
-          "version": "1.72.0",
-          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.72.0-src.tar.xz"
+          "version": "1.75.0",
+          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.75.0-src.tar.xz"
         }
       }
     },
@@ -27597,8 +27527,8 @@
         "type": "other",
         "other": {
           "name": "sos",
-          "version": "4.4",
-          "downloadUrl": "https://github.com/sosreport/sos/archive/4.4.tar.gz"
+          "version": "4.6.1",
+          "downloadUrl": "https://github.com/sosreport/sos/archive/4.6.1.tar.gz"
         }
       }
     },
