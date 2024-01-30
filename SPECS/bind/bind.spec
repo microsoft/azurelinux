@@ -9,8 +9,8 @@
 
 Summary:        Domain Name System software
 Name:           bind
-Version:        9.16.44
-Release:        2%{?dist}
+Version:        9.18.18
+Release:        1%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -617,6 +617,9 @@ fi;
 %{_mandir}/man8/named-nzd2nzf.8*
 
 %changelog
+* Tue Jan 30 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.18.18-1
+- Auto-upgrade to 9.18.18 - Update to 9.18.18
+
 * Thu Dec 14 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 9.16.44-2
 - Fix resetting of passwd and group on package update
 
