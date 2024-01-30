@@ -10,6 +10,11 @@ License:          GPL-2.0-only
 URL:              https://github.com/xdp-project/%{name}
 Source0:          https://github.com/xdp-project/%{name}/releases/download/v%{version}/xdp-tools-%{version}.tar.gz
 
+%global azl 3
+# /bin/strip causes errors during install
+%if %{azl}
+%global __strip /bin/true
+%endif
 BuildRequires:    libbpf-devel
 BuildRequires:    elfutils-libelf-devel
 BuildRequires:    zlib-devel
@@ -20,8 +25,14 @@ BuildRequires:    make
 BuildRequires:    gcc
 BuildRequires:    pkgconfig
 BuildRequires:    m4
-# BuildRequires:    emacs-nox
+# Azlinux does not have emacs. Docs will not be built.
+%if !%{azl}
+BuildRequires:    emacs-nox
+%endif
+# Azlinux does not have wireshark, required for tests. Tests will not be run.
+%if !%{azl}
 BuildRequires:    wireshark-cli
+%endif
 
 %ifnarch i686
 BuildRequires:    bpftool
@@ -80,7 +91,11 @@ export LLC=%{_bindir}/llc
 export PRODUCTION=1
 export DYNAMIC_LIBXDP=1
 export FORCE_SYSTEM_LIBBPF=1
+%if %{azl}
 export FORCE_EMACS=0
+%else
+export FORCE_EMACS=1
+%endif
 ./configure
 make %{?_smp_mflags} V=1
 
@@ -129,6 +144,7 @@ make install V=1
 * Mon Jan 29 2024 Kanika Nema <kanikanema@microsoft.com> 1.4.1-2
 - Initial import for CBL-Mariner from Fedora 40 (License: MIT)
 - License Verified
+- Azlinux specific changes to turn off tests and docs
 
 * Fri Oct 20 2023 Toke Høiland-Jørgensen <toke@redhat.com> 1.4.1-1
 - Upstream version bump
