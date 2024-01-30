@@ -1,6 +1,6 @@
 Summary:        USB network redirection protocol libraries
 Name:           usbredir
-Version:        0.12.0
+Version:        0.13.0
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
@@ -36,13 +36,14 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
-%package        server
-Summary:        Simple USB host TCP server
+%package        tools
+Summary:        usbredir utility tools
 License:        GPLv2+
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 
-%description    server
-A simple USB host TCP server, using libusbredirhost.
+%description    tools
+Includes usbredirect that uses libusbredirhost to export an USB device for use
+in another (virtual) machine
 
 %prep
 %autosetup
@@ -70,14 +71,14 @@ A simple USB host TCP server, using libusbredirhost.
 %{_libdir}/libusbredir*.so
 %{_libdir}/pkgconfig/libusbredir*.pc
 
-%files server
+%files tools
 %license COPYING
 %{_bindir}/usbredirect
-%{_sbindir}/usbredirserver
 %{_mandir}/man1/usbredirect.1*
-%{_mandir}/man1/usbredirserver.1*
 
 %changelog
+* Tue Jan 30 2024 Dallas Delaney <dadelan@microsoft.com> - 0.13.0-1
+
 * Tue Jun 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.12.0-1
 - Updating to 0.12.0 to fix CVE-2021-3700.
 
