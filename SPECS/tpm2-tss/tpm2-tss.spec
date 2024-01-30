@@ -10,10 +10,13 @@ URL:            https://github.com/tpm2-software/tpm2-tss
 
 Source0: https://github.com/tpm2-software/tpm2-tss/releases/download/%{version}/%{name}-%{version}.tar.gz
 Source1: %{name}.sysusers
-BuildRequires:  json-c-devel
+
 BuildRequires:  openssl-devel
-BuildRequires:  systemd-devel
 BuildRequires:  shadow-utils
+BuildRequires:  systemd-devel
+
+# Between tpm2-tss 3.2.0 and 4.0.1, json-c became a requirement.
+BuildRequires:  json-c-devel
 
 Requires: openssl
 Requires: systemd-rpm-macros
