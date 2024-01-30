@@ -130,8 +130,8 @@ install -m 0755 %{SOURCE2} %{buildroot}%{_bindir}/mkinitrd
 install -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/dracut.conf.d/50-megaraid.conf
 
 mkdir -p %{buildroot}%{_libdir}/dracut/modules.d/20overlayfs/
-install -p -m 0755 %{SOURCE4} %{buildroot}%{_libdir}/dracut/modules.d/20verity-mount/
-install -p -m 0755 %{SOURCE5} %{buildroot}%{_libdir}/dracut/modules.d/20verity-mount/
+install -p -m 0755 %{SOURCE4} %{buildroot}%{_libdir}/dracut/modules.d/20overlayfs/
+install -p -m 0755 %{SOURCE5} %{buildroot}%{_libdir}/dracut/modules.d/20overlayfs/
 
 # create compat symlink
 mkdir -p %{buildroot}%{_sbindir}
