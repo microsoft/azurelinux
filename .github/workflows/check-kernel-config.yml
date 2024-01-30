@@ -56,7 +56,7 @@ jobs:
       #     > patch ./toolkit/scripts/mariner-required-configs.json ./json.patch
       - name: Check mariner-required-configs.json format
         run:
-          python3 toolkit/scripts/check_required_config_fmt.py --required_configs=toolkit/scripts/mariner-required-configs.json
+          python3 toolkit/scripts/check_required_config_fmt.py toolkit/scripts/mariner-required-configs.json
 
       # Check if kernel configs changed
       - name: Check if config files changed

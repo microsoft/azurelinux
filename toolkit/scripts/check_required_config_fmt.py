@@ -15,9 +15,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Check that a JSON of required configs is sorted and indented"
     )
-    parser.add_argument(
-        "--path", help="path to JSON of required configs", required=True
-    )
+    parser.add_argument("path", help="path to JSON of required configs")
     args = parser.parse_args()
     path = args.path
 
