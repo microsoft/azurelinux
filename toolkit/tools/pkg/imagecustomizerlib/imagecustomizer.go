@@ -38,8 +38,6 @@ func CustomizeImageWithConfigFile(buildDir string, configFile string, imageFile 
 ) error {
 	var err error
 
-	logger.Log.Infof("starting...")
-
 	var config imagecustomizerapi.Config
 	err = imagecustomizerapi.UnmarshalYamlFile(configFile, &config)
 	if err != nil {
@@ -118,7 +116,6 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 		return err
 	}
 
-	logger.Log.Infof("converting input image to raw format...")
 	// Convert image file to raw format, so that a kernel loop device can be used to make changes to the image.
 	rawImageFile := filepath.Join(buildDirAbs, BaseImageName)
 
@@ -128,14 +125,12 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 	}
 
 	// Customize the partitions.
-	logger.Log.Infof("customizing partitions...")
 	partitionsCustomized, rawImageFile, err := customizePartitions(buildDirAbs, baseConfigPath, config, rawImageFile)
 	if err != nil {
 		return err
 	}
 
 	// Customize the raw image file.
-	logger.Log.Infof("customizing raw image...")
 	err = customizeImageHelper(buildDirAbs, baseConfigPath, config, rawImageFile, rpmsSources, useBaseImageRpmRepos,
 		partitionsCustomized)
 	if err != nil {
@@ -494,7 +489,7 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 	return nil
 }
 
-func createLiveOSIsoImage(buildDir, sourceImageFile, outputImageDir, outputImageBase string) error {
+func createLiveOSIsoImage(buildDir, rawImageFile, outputImageDir, outputImageBase string) error {
 
 	b := &LiveOSIsoBuilder{
 		workingDirs: IsoWorkingDirs{
@@ -505,7 +500,7 @@ func createLiveOSIsoImage(buildDir, sourceImageFile, outputImageDir, outputImage
 		},
 	}
 
-	err := b.prepareArtifactsFromFullImage(sourceImageFile)
+	err := b.prepareArtifactsFromFullImage(rawImageFile)
 	if err != nil {
 		return err
 	}
