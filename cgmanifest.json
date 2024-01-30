@@ -6931,7 +6931,7 @@
         "other": {
           "name": "ibus",
           "version": "1.5.22",
-          "downloadUrl": "https://sourceforge.net/projects/ibmswtpm2/files/ibmtpm1682.tar.gz"
+          "downloadUrl": "https://github.com/ibus/ibus/releases/download/1.5.22/ibus-1.5.22.tar.gz"
         }
       }
     },
