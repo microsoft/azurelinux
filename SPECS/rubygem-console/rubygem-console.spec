@@ -2,8 +2,8 @@
 %global gem_name console
 Summary:        Logging for Ruby
 Name:           rubygem-console
-Version:        1.10.1
-Release:        3%{?dist}
+Version:        1.23.3
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -32,6 +32,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Tue Jan 30 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.23.3-1
+- Auto-upgrade to 1.23.3 - Azure Linux 3.0 - package upgrades
+
 * Tue Jul 19 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.10.1-3
 - Add provides.
 
