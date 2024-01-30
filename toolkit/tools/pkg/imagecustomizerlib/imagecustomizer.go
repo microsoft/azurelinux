@@ -99,7 +99,7 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 	// Convert image file to raw format, so that a kernel loop device can be used to make changes to the image.
 	rawImageFile := filepath.Join(buildDirAbs, BaseImageName)
 
-	logger.Log.Infof("Create raw base image: %s", rawImageFile)
+	logger.Log.Infof("Creating raw base image: %s", rawImageFile)
 	err = shell.ExecuteLiveWithErr(1, "qemu-img", "convert", "-O", "raw", imageFile, rawImageFile)
 	if err != nil {
 		return fmt.Errorf("failed to convert image file to raw format:\n%w", err)
@@ -147,7 +147,7 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 		}
 
 	} else if outputImageFormat == "iso" {
-		logger.Log.Infof("creating a liveos iso from the customized image...")
+		logger.Log.Infof("Creating a liveos iso from the customized image...")
 
 		err = createLiveOSIsoImage(buildDir, rawImageFile, outputImageDir, outputImageBase)
 		if err != nil {

@@ -85,10 +85,10 @@ type LiveOSIsoBuilder struct {
 //	the bootloaders are saved to the b.workingDirs.isoBuildDir
 func (b *LiveOSIsoBuilder) extractArtifactsFromBootDevice(bootDevicePath string, bootfsType string) error {
 
-	logger.Log.Infof("extracting artifacts from the boot partition...")
+	logger.Log.Infof("Extracting artifacts from the boot partition...")
 
 	loopDevMountFullDir := filepath.Join(b.workingDirs.isoBuildDir, "readonly-boot-mount")
-	logger.Log.Infof("mounting %s(%s) to %s", bootDevicePath, bootfsType, loopDevMountFullDir)
+	logger.Log.Infof("Mounting %s(%s) to %s", bootDevicePath, bootfsType, loopDevMountFullDir)
 
 	fullDiskBootMount, err := safemount.NewMount(bootDevicePath, loopDevMountFullDir, bootfsType, 0, "", true)
 	if err != nil {
@@ -129,10 +129,10 @@ func (b *LiveOSIsoBuilder) extractArtifactsFromBootDevice(bootDevicePath string,
 //     copied to.
 func (b *LiveOSIsoBuilder) populateWriteableRootfsDir(rootfsDevicePath, rootfsType, writeableRootfsDir string) error {
 
-	logger.Log.Infof("creating writeable rootfs...")
+	logger.Log.Infof("Creating writeable rootfs...")
 
 	sourceMountDir := filepath.Join(b.workingDirs.isoBuildDir, "readonly-rootfs-mount")
-	logger.Log.Infof("mounting %s(%s) to %s", rootfsDevicePath, rootfsType, sourceMountDir)
+	logger.Log.Infof("Mounting %s(%s) to %s", rootfsDevicePath, rootfsType, sourceMountDir)
 
 	loopDevMount, err := safemount.NewMount(rootfsDevicePath, sourceMountDir, rootfsType, 0, "", true)
 	if err != nil {
@@ -145,7 +145,7 @@ func (b *LiveOSIsoBuilder) populateWriteableRootfsDir(rootfsDevicePath, rootfsTy
 		return fmt.Errorf("failed to create folder %s.\n%w", writeableRootfsDir, err)
 	}
 
-	logger.Log.Infof("copying from %s to %s", sourceMountDir, writeableRootfsDir)
+	logger.Log.Infof("Copying from %s to %s", sourceMountDir, writeableRootfsDir)
 	cpParams := []string{"-aT", sourceMountDir, writeableRootfsDir}
 	err = shell.ExecuteLive(false, "cp", cpParams...)
 	if err != nil {
@@ -179,7 +179,7 @@ func (b *LiveOSIsoBuilder) populateWriteableRootfsDir(rootfsDevicePath, rootfsTy
 //	the artifacts will be stored in 'isoMakerArtifactsStagingDir'.
 func (b *LiveOSIsoBuilder) stageIsoMakerInitrdArtifacts(writeableRootfsDir, isoMakerArtifactsStagingDir string) error {
 
-	logger.Log.Infof("staging isomaker artifacts into writeable image...")
+	logger.Log.Infof("Staging isomaker artifacts into writeable image...")
 
 	targetBootloadersInChroot := filepath.Join(isoMakerArtifactsStagingDir, "/efi/EFI/BOOT")
 	targetBootloadersDir := filepath.Join(writeableRootfsDir, targetBootloadersInChroot)
@@ -233,10 +233,10 @@ func (b *LiveOSIsoBuilder) stageIsoMakerInitrdArtifacts(writeableRootfsDir, isoM
 // - all changes will be applied to the specified rootfs directory in the input.
 func (b *LiveOSIsoBuilder) prepareRootfsForDracut(writeableRootfsDir string) error {
 
-	logger.Log.Infof("preparing writeable image for dracut...")
+	logger.Log.Infof("Preparing writeable image for dracut...")
 
 	fstabFile := filepath.Join(writeableRootfsDir, "/etc/fstab")
-	logger.Log.Infof("deleting fstab from %s", fstabFile)
+	logger.Log.Infof("Deleting fstab from %s", fstabFile)
 	err := os.Remove(fstabFile)
 	if err != nil {
 		return fmt.Errorf("failed to delete fstab.\n%w", err)
@@ -281,7 +281,7 @@ func (b *LiveOSIsoBuilder) prepareRootfsForDracut(writeableRootfsDir string) err
 //   - extracted artifacts
 func (b *LiveOSIsoBuilder) prepareLiveOSDir(writeableRootfsDir, isoMakerArtifactsStagingDir string) error {
 
-	logger.Log.Infof("creating LiveOS squashfs image...")
+	logger.Log.Infof("Creating LiveOS squashfs image...")
 
 	// extract kernel version
 	kernelParentPath := filepath.Join(writeableRootfsDir, "/usr/lib/modules")
@@ -297,7 +297,7 @@ func (b *LiveOSIsoBuilder) prepareLiveOSDir(writeableRootfsDir, isoMakerArtifact
 	})
 
 	b.artifacts.kernelVersion = kernelPaths[len(kernelPaths)-1].Name()
-	logger.Log.Infof("found installed kernel version (%s)", b.artifacts.kernelVersion)
+	logger.Log.Infof("Found installed kernel version (%s)", b.artifacts.kernelVersion)
 
 	// extract vmlinuz
 	sourceVmlinuzPath := filepath.Join(writeableRootfsDir, "/boot/vmlinuz-"+b.artifacts.kernelVersion)
@@ -349,7 +349,7 @@ func (b *LiveOSIsoBuilder) prepareLiveOSDir(writeableRootfsDir, isoMakerArtifact
 //     b.artifacts.squashfsImagePath
 func (b *LiveOSIsoBuilder) createSquashfsImage(writeableRootfsDir string) error {
 
-	logger.Log.Infof("creating squashfs of %s", writeableRootfsDir)
+	logger.Log.Infof("Creating squashfs of %s", writeableRootfsDir)
 
 	squashfsImagePath := filepath.Join(b.workingDirs.outDir, "rootfs.img")
 
@@ -390,7 +390,7 @@ func (b *LiveOSIsoBuilder) createSquashfsImage(writeableRootfsDir string) error 
 // - creates an initrd.img and stores its path in b.artifacts.initrdImagePath.
 func (b *LiveOSIsoBuilder) generateInitrdImage(rootfsSourceDir, artifactsSourceDir, artifactsTargetDir string) error {
 
-	logger.Log.Infof("generating initrd...")
+	logger.Log.Infof("Generating initrd...")
 
 	chroot := safechroot.NewChroot(rootfsSourceDir, true /*isExistingDir*/)
 	if chroot == nil {
@@ -445,7 +445,7 @@ func (b *LiveOSIsoBuilder) generateInitrdImage(rootfsSourceDir, artifactsSourceD
 //     `LiveOSIsoBuilder.artifacts` data structure.
 func (b *LiveOSIsoBuilder) prepareArtifactsFromFullImage(rawImageFile string) error {
 
-	logger.Log.Infof("connecting to raw image (%s)", rawImageFile)
+	logger.Log.Infof("Connecting to raw image (%s)", rawImageFile)
 	imageConnection, mountPoints, err := connectToExistingImage(rawImageFile, b.workingDirs.isoBuildDir, "imageroot", true)
 	if err != nil {
 		return err
@@ -560,25 +560,29 @@ func createIsoMakerConfig(squashfsImagePath string) (configuration.Config, error
 //   - create a LiveOS ISO.
 func (b *LiveOSIsoBuilder) createIsoImage(isoOutputDir, isoOutputBaseName string) error {
 
-	logger.Log.Infof("creating iso...")
-	logger.Log.Debugf("- isomakerBuildDir  = %s", b.workingDirs.isomakerBuildDir)
-	logger.Log.Debugf("- grubCfgPath       = %s", b.artifacts.grubCfgPath)
-	logger.Log.Debugf("- initrdImagePath   = %s", b.artifacts.initrdImagePath)
-	logger.Log.Debugf("- squashfsImagePath = %s", b.artifacts.squashfsImagePath)
-	logger.Log.Debugf("- isoOutputDir      = %s", isoOutputDir)
-	logger.Log.Debugf("- isoOutputBaseName = %s", isoOutputBaseName)
+	logger.Log.Infof("Creating iso image...")
 
+	baseDirPath := ""
+
+	// unattended install is where the ISO OS configures a persistent storage
+	// and installs RPMs to it. This is different from the LiveOS scenario.
 	unattendedInstall := false
+
 	// We are disabling BIOS booloaders because enabling them will requires
 	// MIC to take a dependency on binary artifacts stored elsewhere.
 	// Should we decide to include the BIOS bootloader, we need to find a
 	// reliable and efficient way to pull those binaries.
 	enableBiosBoot := false
-	enableRpmRepo := false
-	baseDirPath := ""
-	releaseVersion := ""
 	isoResourcesDir := ""
+
+	// No stock resources are needed for the LiveOS scenario.
+	// No rpms are needed for the LiveOS scenario.
+	enableRpmRepo := false
 	isoRepoDirPath := ""
+
+	// isoMaker constructs the final image name as follows:
+	// {isoOutputDir}/{isoOutputBaseName}{releaseVersion}{imageNameTag}.iso
+	releaseVersion := ""
 	imageNameTag := ""
 
 	config, err := createIsoMakerConfig(b.artifacts.squashfsImagePath)
@@ -590,9 +594,6 @@ func (b *LiveOSIsoBuilder) createIsoImage(isoOutputDir, isoOutputBaseName string
 	if err != nil {
 		return err
 	}
-
-	// isoMaker constructs the final image name as follows:
-	// {isoOutputDir}/{isoOutputBaseName}{releaseVersion}{imageNameTag}.iso
 
 	isoMaker := isomakerlib.NewIsoMakerWithConfig(
 		unattendedInstall,
@@ -632,7 +633,7 @@ func (b *LiveOSIsoBuilder) createIsoImage(isoOutputDir, isoOutputBaseName string
 //	the source file is copies to the target path.
 func copyFile(sourcePath, targetPath string) error {
 
-	logger.Log.Infof("copying %s to %s", sourcePath, targetPath)
+	logger.Log.Infof("Copying %s to %s", sourcePath, targetPath)
 
 	err := os.MkdirAll(filepath.Dir(targetPath), os.ModePerm)
 	if err != nil {
