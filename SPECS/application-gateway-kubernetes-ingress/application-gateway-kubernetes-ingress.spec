@@ -36,7 +36,7 @@ to act as the ingress for an AKS cluster.
 %autosetup -N
 rm -rf vendor
 tar -xf %{SOURCE1} --no-same-owner
-%patch -P 0 -p 1 -d vendor/github.com/prometheus/client_golang
+%patch 0 -p1 -d vendor/github.com/prometheus/client_golang
 
 %build
 export VERSION=%{version}
