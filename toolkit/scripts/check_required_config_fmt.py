@@ -23,20 +23,20 @@ if __name__ == '__main__':
         info["value"] = sorted(info["value"])
 
     # Sort the JSON file and write it to a temporary file.
-    with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:
+    with tempfile.NamedTemporaryFile(mode='w') as f:
         json.dump(content, f, indent=4, sort_keys=True)
-        tmp_file = f.name
 
-    # Compare the sorted JSON file to the original. If they are different,
-    # print the diff that can be applied to the JSON file to fix it and
-    # exit with a non-zero exit code. Otherwise, print nothing and exit
-    # successfully.
-    try:
-        subprocess.check_call(['git', 'diff',
-            '--no-index',
-            required_configs,
-            tmp_file])
-    except subprocess.CalledProcessError:
-        sys.exit(1)
-    finally:
-        os.remove(tmp_file)
+        # Flush the file to disk before passing it to 'git diff' below so
+        # that the entire contents of the file are checked against the
+        # original.
+        f.flush()
+
+        # Compare the sorted JSON file to the original. If they are different,
+        # print the diff that can be applied to the JSON file to fix it and
+        # exit with a non-zero exit code. Otherwise, print nothing and exit
+        # successfully.
+        try:
+            subprocess.check_call(['git', 'diff',
+                '--no-index',
+                required_configs,
+                f.name])
