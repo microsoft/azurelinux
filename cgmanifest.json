@@ -15504,8 +15504,8 @@
         "type": "other",
         "other": {
           "name": "pango",
-          "version": "1.45.5",
-          "downloadUrl": "https://download.gnome.org/sources/pango/1.45/pango-1.45.5.tar.xz"
+          "version": "1.90.0",
+          "downloadUrl": "https://download.gnome.org/sources/pango/1.90/pango-1.90.0.tar.xz"
         }
       }
     },
