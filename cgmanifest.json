@@ -11691,8 +11691,8 @@
         "type": "other",
         "other": {
           "name": "libXft",
-          "version": "2.3.3",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXft-2.3.3.tar.bz2"
+          "version": "2.3.8",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXft-2.3.8.tar.gz"
         }
       }
     },
