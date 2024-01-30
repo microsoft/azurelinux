@@ -41,11 +41,6 @@ fi
 make install \
         DESTDIR=$RPM_BUILD_ROOT
 
-%clean
-if [ "$RPM_BUILD_ROOT" != "/" ]; then
-        rm -rf $RPM_BUILD_ROOT
-fi
-
 %files
 %defattr(-,root,root)
 %doc AUTHORS ChangeLog COPYING COVERAGE CREDITS INSTALL NEWS README README.sg_start

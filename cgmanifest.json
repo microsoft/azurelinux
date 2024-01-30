@@ -27337,8 +27337,8 @@
         "type": "other",
         "other": {
           "name": "sg3_utils",
-          "version": "1.46",
-          "downloadUrl": "https://github.com/hreinecke/sg3_utils/archive/v1.46.tar.gz"
+          "version": "1.48",
+          "downloadUrl": "https://github.com/hreinecke/sg3_utils/archive/v1.48.tar.gz"
         }
       }
     },
