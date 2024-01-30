@@ -12,7 +12,7 @@
 Summary: TPM Emulator
 Name:           swtpm
 Version:        0.8.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD-3-Clause
 Url:            http://github.com/stefanberger/swtpm
 Source0:        %{url}/archive/%{gitcommit}/%{name}-%{gitshortcommit}.tar.gz
@@ -195,7 +195,7 @@ fi
 %{_datadir}/swtpm/swtpm-create-tpmca
 
 %changelog
-* Mon Jan 22 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 0.8.1-3
+* Mon Jan 22 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 0.8.1-4
 - Initial CBL-Mariner import from Fedora 39 (license: MIT).  License verified.
 
 * Wed Aug 16 2023 Stefan Berger <stefanb@linux.ibm.com> - 0.8.1-3
