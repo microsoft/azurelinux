@@ -38,12 +38,13 @@ sed -i "/compatibility/a extern int BN_bn2binpad(const BIGNUM *a, unsigned char 
 %if 0%{?with_check}
 %check
 if [ ! -f /dev/tpm0 ];then
-   find / -name "*tpm2*"
+   find / -name tpm2_startup
+   find / -name tpm2_pcrread
    mkdir /tmp/swtpm
    swtpm_setup --tpm-state /tmp/swtpm --tpm2
    swtpm socket --server type=unixio,path=/tmp/swtpm/socket --ctrl type=unixio,path=/tmp/swtpm/socket.ctrl --tpmstate dir=/tmp/swtpm --flags startup-clear --tpm2 --daemon
-   %{_bindir}/tpm2_startup -c
-   %{_bindir}/tpm2_pcrlist
+   $(find / -name tpm2_startup) -c
+   $(find / -name tpm2_pcrread)
 fi
 make %{?_smp_mflags} check
 if [ ! -f /dev/tpm0 ];then
