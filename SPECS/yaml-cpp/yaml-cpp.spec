@@ -83,6 +83,7 @@ pushd build_static
 - Modifying name of folder to move from %{name}-%{name}-%{version} to %{name}-%{version}
 - Updating the .so files from 0.7* to 0.8*
 - Changing directories of cmake/yaml-cpp and pkgconfig/yaml-cpp.pc files since they are created under /usr/lib in this version
+- Changing Source to reflect the new URL format with {version}.tar.gz as opposed to yaml-cpp-{version}.tar.gz (new change in 0.8.0)
 
 * Wed Jan 26 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.7.0-1
 - Update to version 0.7.0.
