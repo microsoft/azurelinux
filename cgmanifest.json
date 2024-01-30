@@ -1337,8 +1337,8 @@
         "type": "other",
         "other": {
           "name": "byacc",
-          "version": "1.9.20220109",
-          "downloadUrl": "https://invisible-mirror.net/archives/byacc/byacc-20220109.tgz"
+          "version": "1.9.20240109",
+          "downloadUrl": "https://invisible-mirror.net/archives/byacc/byacc-20240109.tgz"
         }
       }
     },
@@ -3547,16 +3547,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "finger",
-          "version": "0.17",
-          "downloadUrl": "http://ftp.linux.org.uk/pub/linux/Networking/netkit/bsd-finger-0.17.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "fio",
           "version": "3.30",
           "downloadUrl": "https://brick.kernel.dk/snaps/fio-3.30.tar.bz2"
@@ -3580,16 +3570,6 @@
           "name": "firewalld",
           "version": "2.0.2",
           "downloadUrl": "https://github.com/firewalld/firewalld/releases/download/v2.0.2/firewalld-2.0.2.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "fish",
-          "version": "3.5.0",
-          "downloadUrl": "https://github.com/fish-shell/fish-shell/releases/download/3.5.0/fish-3.5.0.tar.xz"
         }
       }
     },
@@ -4380,8 +4360,8 @@
         "type": "other",
         "other": {
           "name": "glusterfs",
-          "version": "7.9",
-          "downloadUrl": "https://download.gluster.org/pub/gluster/glusterfs/7/7.9/glusterfs-7.9.tar.gz"
+          "version": "11.1",
+          "downloadUrl": "https://download.gluster.org/pub/gluster/glusterfs/11/11.1/glusterfs-11.1.tar.gz"
         }
       }
     },
@@ -4560,28 +4540,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.17.13",
-          "downloadUrl": "https://golang.org/dl/go1.17.13.src.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "golang",
           "version": "1.18.8",
           "downloadUrl": "https://golang.org/dl/go1.18.8.src.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "golang",
-          "version": "1.19.12",
-          "downloadUrl": "https://golang.org/dl/go1.19.12.src.tar.gz"
         }
       }
     },
@@ -5140,8 +5100,8 @@
         "type": "other",
         "other": {
           "name": "harfbuzz",
-          "version": "3.4.0",
-          "downloadUrl": "https://github.com/harfbuzz/harfbuzz/releases/download/3.4.0/harfbuzz-3.4.0.tar.xz"
+          "version": "8.3.0",
+          "downloadUrl": "https://github.com/harfbuzz/harfbuzz/releases/download/8.3.0/harfbuzz-8.3.0.tar.xz"
         }
       }
     },
@@ -6510,8 +6470,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "6.6.2.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.2.1.tar.gz"
+          "version": "6.6.12.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.12.1.tar.gz"
         }
       }
     },
@@ -8091,8 +8051,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "6.6.2.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.2.1.tar.gz"
+          "version": "6.6.12.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.12.1.tar.gz"
         }
       }
     },
@@ -8111,8 +8071,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "6.6.2.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.2.1.tar.gz"
+          "version": "6.6.12.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.12.1.tar.gz"
         }
       }
     },
@@ -8131,8 +8091,8 @@
         "type": "other",
         "other": {
           "name": "kernel-rt",
-          "version": "5.15.55.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.55.1.tar.gz"
+          "version": "6.6.7.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.7.1.tar.gz"
         }
       }
     },
@@ -8281,8 +8241,8 @@
         "type": "other",
         "other": {
           "name": "kpatch",
-          "version": "0.9.7",
-          "downloadUrl": "https://github.com/dynup/kpatch/archive/refs/tags/v0.9.7.tar.gz"
+          "version": "0.9.8",
+          "downloadUrl": "https://github.com/dynup/kpatch/archive/refs/tags/v0.9.8.tar.gz"
         }
       }
     },
@@ -11190,6 +11150,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libtpms",
+          "version": "0.9.6",
+          "downloadUrl": "https://github.com/stefanberger/libtpms/archive/v0.9.6/libtpms-0.9.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libtraceevent",
           "version": "1.7.2",
           "downloadUrl": "https://git.kernel.org/pub/scm/libs/libtrace/libtraceevent.git/snapshot/libtraceevent-1.7.2.tar.gz"
@@ -11641,8 +11611,8 @@
         "type": "other",
         "other": {
           "name": "libXext",
-          "version": "1.3.4",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXext-1.3.4.tar.bz2"
+          "version": "1.3.5",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXext-1.3.5.tar.gz"
         }
       }
     },
@@ -11681,8 +11651,8 @@
         "type": "other",
         "other": {
           "name": "libXft",
-          "version": "2.3.3",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXft-2.3.3.tar.bz2"
+          "version": "2.3.8",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXft-2.3.8.tar.gz"
         }
       }
     },
@@ -11721,8 +11691,8 @@
         "type": "other",
         "other": {
           "name": "libxkbfile",
-          "version": "1.1.0",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libxkbfile-1.1.0.tar.bz2"
+          "version": "1.1.2",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libxkbfile-1.1.2.tar.gz"
         }
       }
     },
@@ -13362,16 +13332,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "msft-golang",
-          "version": "1.19.12",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.19.12-1/go.20230802.5.src.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "msgpack",
           "version": "3.3.0",
           "downloadUrl": "https://github.com/msgpack/msgpack-c/archive/cpp-3.3.0.tar.gz"
@@ -14283,8 +14243,8 @@
         "type": "other",
         "other": {
           "name": "numpy",
-          "version": "1.23.4",
-          "downloadUrl": "https://github.com/numpy/numpy/releases/download/v1.23.4/numpy-1.23.4.tar.gz"
+          "version": "1.26.3",
+          "downloadUrl": "https://github.com/numpy/numpy/releases/download/v1.26.3/numpy-1.26.3.tar.gz"
         }
       }
     },
@@ -15893,6 +15853,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-B-COW",
+          "version": "0.007",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/A/AT/ATOOMIC/B-COW-0.007.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-B-Debug",
           "version": "1.26",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RU/RURBAN/B-Debug-1.26.tar.gz"
@@ -16426,16 +16396,6 @@
           "name": "perl-Coro-Multicore",
           "version": "1.07",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/Coro-Multicore-1.07.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "perl-B-COW",
-          "version": "0.007",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/A/AT/ATOOMIC/B-COW-0.007.tar.gz"
         }
       }
     },
@@ -25575,8 +25535,8 @@
         "type": "other",
         "other": {
           "name": "ruby",
-          "version": "3.1.4",
-          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/3.1/ruby-3.1.4.tar.xz"
+          "version": "3.3.0",
+          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/3.3/ruby-3.3.0.tar.gz"
         }
       }
     },
@@ -25717,16 +25677,6 @@
           "name": "rubygem-aws-sigv4",
           "version": "1.4.0",
           "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/aws-sigv4-1.4.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-bigdecimal",
-          "version": "3.1.2",
-          "downloadUrl": "https://github.com/ruby/bigdecimal/archive/refs/tags/v3.1.2.tar.gz"
         }
       }
     },
@@ -26795,8 +26745,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-timers",
-          "version": "4.3.2",
-          "downloadUrl": "https://github.com/socketry/timers/archive/refs/tags/v4.3.2.tar.gz"
+          "version": "4.3.5",
+          "downloadUrl": "https://github.com/socketry/timers/archive/refs/tags/v4.3.5.tar.gz"
         }
       }
     },
@@ -26885,8 +26835,8 @@
         "type": "other",
         "other": {
           "name": "rust",
-          "version": "1.72.0",
-          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.72.0-src.tar.xz"
+          "version": "1.75.0",
+          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.75.0-src.tar.xz"
         }
       }
     },
@@ -27857,8 +27807,8 @@
         "type": "other",
         "other": {
           "name": "sscg",
-          "version": "2.6.2",
-          "downloadUrl": "https://github.com/sgallagher/sscg/releases/download/sscg-2.6.2/sscg-2.6.2.tar.xz"
+          "version": "3.0.5",
+          "downloadUrl": "https://github.com/sgallagher/sscg/archive/refs/tags/sscg-3.0.5.tar.gz"
         }
       }
     },
@@ -28366,16 +28316,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "terraform",
-          "version": "1.3.2",
-          "downloadUrl": "https://github.com/hashicorp/terraform/archive/refs/tags/v1.3.2.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "texinfo",
           "version": "7.0.3",
           "downloadUrl": "http://ftp.gnu.org/gnu/texinfo/texinfo-7.0.3.tar.xz"
@@ -28737,8 +28677,8 @@
         "type": "other",
         "other": {
           "name": "ucx",
-          "version": "1.11.0",
-          "downloadUrl": "https://github.com/openucx/ucx/releases/download/v1.11.0/ucx-1.11.0.tar.gz"
+          "version": "1.15.0",
+          "downloadUrl": "https://github.com/openucx/ucx/releases/download/v1.15.0/ucx-1.15.0.tar.gz"
         }
       }
     },
