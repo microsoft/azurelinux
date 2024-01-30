@@ -1,0 +1,24 @@
+From 9ac40d805925f130283ed54f3cbb424afad41461 Mon Sep 17 00:00:00 2001
+From: Nan Liu <liunan@microsoft.com>
+Date: Tue, 30 Jan 2024 17:58:36 +0000
+Subject: [PATCH] Add firewall rules to protect access to Azure host node
+ services
+
+---
+ config/mariner/waagent.conf | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/config/mariner/waagent.conf b/config/mariner/waagent.conf
+index 65da131..cda61de 100644
+--- a/config/mariner/waagent.conf
++++ b/config/mariner/waagent.conf
+@@ -78,3 +78,6 @@ AutoUpdate.GAFamily=Prod
+ # handling until inVMArtifactsProfile.OnHold is false.
+ # Default is disabled
+ # EnableOverProvisioning=n
++
++# Add firewall rules to protect access to Azure host node services
++OS.EnableFirewall=y
+-- 
+2.25.1
+
