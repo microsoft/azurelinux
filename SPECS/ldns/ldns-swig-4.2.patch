@@ -6,8 +6,8 @@ management requirements.
 Submitted upstream: <https://github.com/NLnetLabs/ldns/pull/232>
 
 diff -ur ldns-1.8.3.orig/ldns-1.8.3/contrib/python/ldns_rdf.i ldns-1.8.3/ldns-1.8.3/contrib/python/ldns_rdf.i
---- ldns-1.8.3.orig/ldns-1.8.3/contrib/python/ldns_rdf.i	2022-08-15 12:38:22.000000000 +0200
-+++ ldns-1.8.3/ldns-1.8.3/contrib/python/ldns_rdf.i	2024-01-26 11:28:52.983540469 +0100
+--- ldns-1.8.3/contrib/python/ldns_rdf.i	2022-08-15 12:38:22.000000000 +0200
++++ ldns-1.8.3/contrib/python/ldns_rdf.i	2024-01-26 11:28:52.983540469 +0100
 @@ -56,7 +56,11 @@
   */
  %typemap(arginit, noblock=1) const ldns_rdf *
