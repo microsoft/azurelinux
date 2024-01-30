@@ -136,7 +136,7 @@ lkg_file="${tmp_dir}/lkg-3.0-dev.json"
 if [[ "${version}" == "3.0" ]]; then
     if [[ -z "${DAILY_BUILD_ID}" ]]; then
         echo "Downloading latest daily-repo-id ..."
-        rm ${lkg_file}*
+        rm -f ${lkg_file}*
         wget -nv -P ${tmp_dir} ${lkg_url}
         DAILY_BUILD_ID=$(cat ${lkg_file} | jq -r .date | tr -d '-')
         [[ "$DAILY_BUILD_ID" = "null" ]] && { print_error "Unable to fetch latest daily-repo-id, please provide DAILY_REPO_ID"; exit 1; }
