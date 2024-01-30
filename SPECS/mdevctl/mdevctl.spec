@@ -17,7 +17,6 @@ BuildRequires:  rust-toolset
 %else
 BuildRequires:  rust-packaging >= 21
 %endif
-Requires(post,postun): %{_sbindir}/udevadm
 
 %description
 mdevctl is a utility for managing and persisting devices in the
