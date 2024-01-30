@@ -505,12 +505,12 @@ func createLiveOSIsoImage(buildDir, sourceImageFile, outputImageDir, outputImage
 		},
 	}
 
-	err := b.prepareLiveOSIsoArtifactsFromFullImage(sourceImageFile)
+	err := b.prepareArtifactsFromFullImage(sourceImageFile)
 	if err != nil {
 		return err
 	}
 
-	err = b.createLiveOSIsoImage(outputImageDir, outputImageBase)
+	err = b.createIsoImage(outputImageDir, outputImageBase)
 	if err != nil {
 		return err
 	}

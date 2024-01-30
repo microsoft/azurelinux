@@ -28,11 +28,15 @@ enlistmentRoot=$scriptDir
 isoBuildDir=$enlistmentRoot/mic-build
 isoOutDir=$isoBuildDir/out
 
-inputImage=${1:-$scriptDir/out/images/baremetal/core-2.0.20240119.1908.vhdx}
+inputImage=${1:-$scriptDir/out/images/baremetal/core-3.0.20240129.1326.vhdx}
 inputConfigFile=${2:-$scriptDir/mic-config.yaml}
 outputImage=${3:-$isoOutDir/mic-$(date +'%Y%m%d-%H%M').iso}
 
 sudo apt-get install --assume-yes squashfs-tools
+
+pushd $scriptDir/toolkit
+sudo make go-tidy-all
+popd
 
 # build mic
 pushd $scriptDir/toolkit/tools/imagecustomizer
@@ -46,5 +50,8 @@ sudo ./imagecustomizer \
     --output-image-file $outputImage \
     --output-image-format iso \
     --config-file $inputConfigFile
+    # \
+    # --log-level debug
+
 
 popd
