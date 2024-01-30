@@ -2298,7 +2298,6 @@
                 "rubygem-fluent-plugin-prometheus_pushgateway",
                 "rubygem-fluent-plugin-record-modifier",
                 "rubygem-fluent-plugin-rewrite-tag-filter",
-                "rubygem-fluent-plugin-s3",
                 "rubygem-fluent-plugin-systemd",
                 "rubygem-fluent-plugin-td",
                 "rubygem-fluent-plugin-webhdfs",
