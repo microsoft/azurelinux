@@ -6,7 +6,7 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/jbeder/yaml-cpp
-Source0:        https://github.com/jbeder/yaml-cpp/archive/%{name}-%{version}.tar.gz
+Source0:        https://github.com/jbeder/yaml-cpp/archive/refs/tags/%{name}-%{version}.tar.gz
 BuildRequires:  cmake
 BuildRequires:  gcc
 
