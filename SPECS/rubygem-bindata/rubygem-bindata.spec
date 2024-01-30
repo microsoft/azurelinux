@@ -2,7 +2,7 @@
 %global gem_name bindata
 Summary:        BinData - Parsing Binary Data in Ruby
 Name:           rubygem-%{gem_name}
-Version:        2.4.10
+Version:        2.4.15
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -38,6 +38,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Tue Jan 30 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.15-1
+- Auto-upgrade to 2.4.15 - Azure Linux 3.0 - package upgrades
+
 * Mon Jun 13 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.4.10-1
 - License verified
 - Original version for CBL-Mariner
