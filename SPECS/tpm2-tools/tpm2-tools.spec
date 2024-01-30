@@ -38,7 +38,7 @@ sed -i "/compatibility/a extern int BN_bn2binpad(const BIGNUM *a, unsigned char 
 %if 0%{?with_check}
 %check
 if [ ! -f /dev/tpm0 ];then
-   find / -name "*swtpm*"
+   find / -name "*tpm2*"
    mkdir /tmp/swtpm
    swtpm_setup --tpm-state /tmp/swtpm --tpm2
    swtpm socket --server type=unixio,path=/tmp/swtpm/socket --ctrl type=unixio,path=/tmp/swtpm/socket.ctrl --tpmstate dir=/tmp/swtpm --flags startup-clear --tpm2 --daemon
