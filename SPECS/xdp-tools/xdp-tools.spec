@@ -8,7 +8,7 @@ Summary:          Utilities and example programs for use with XDP
 
 License:          GPL-2.0-only
 URL:              https://github.com/xdp-project/%{name}
-Source0:          https://github.com/xdp-project/xdp-tools/archive/refs/tags/v%{version}.tar.gz/#%{name}-%{version}.tar.gz
+Source0:          https://github.com/xdp-project/xdp-tools/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 %global azl 3
 BuildRequires:    libbpf-devel
