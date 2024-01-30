@@ -61,6 +61,8 @@ BuildRequires: python3-devel
 BuildRequires: swig
 %endif
 Requires: ca-certificates
+Requires: openssl
+
 Patch1: ldns-swig-4.2.patch
 
 %description
