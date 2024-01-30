@@ -1,7 +1,7 @@
 Summary:        Linux kernel packet control tool
 Name:           iptables
 Version:        1.8.7
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,7 +16,7 @@ Source5:        ip6save
 BuildRequires:  jansson-devel
 BuildRequires:  libmnl-devel
 BuildRequires:  libnftnl-devel
-BuildRequires:  systemd
+BuildRequires:  systemd-bootstrap-rpm-macros
 Requires:       iana-etc
 Requires:       systemd
 Provides:       %{name}-services = %{version}-%{release}
@@ -98,6 +98,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man3/*
 
 %changelog
+* Thu Jan 25 18:31:11 EST 2024 Dan Streetman <ddstreet@ieee.org> - 1.8.7-5
+- use bootstrap to avoid "circular deps"
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.8.7-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
