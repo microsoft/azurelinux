@@ -152,6 +152,15 @@ func (m *MountPoint) GetTarget() string {
 	return m.target
 }
 
+func FindMountPointByTarget(mountPoints []*MountPoint, targetPath string) *MountPoint {
+	for _, mountPoint := range mountPoints {
+		if mountPoint.GetTarget() == targetPath {
+			return mountPoint
+		}
+	}
+	return nil
+}
+
 // NewChroot creates a new Chroot struct
 func NewChroot(rootDir string, isExistingDir bool) *Chroot {
 	// get chroot folder
