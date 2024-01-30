@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:             xdp-tools
 Version:          1.4.1
-Release:          1%{?dist}
+Release:          2%{?dist}
 Summary:          Utilities and example programs for use with XDP
 %global _soversion 1.4.0
 
@@ -145,7 +145,7 @@ make install V=1
 
 %changelog
 * Mon Jan 29 2024 Kanika Nema <kanikanema@microsoft.com> 1.4.1-2
-- Initial CBL-Mariner import from Fedora 40 (License: MIT)
+- Initial CBL-Mariner import from Fedora 40 (license: MIT)
 - License Verified
 - Azlinux specific changes to turn off tests and docs
 
