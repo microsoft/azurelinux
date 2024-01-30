@@ -6929,16 +6929,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "ibmtpm",
-          "version": "0.1682",
-          "downloadUrl": "https://sourceforge.net/projects/ibmswtpm2/files/ibmtpm1682.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "ibus",
           "version": "1.5.22",
           "downloadUrl": "https://sourceforge.net/projects/ibmswtpm2/files/ibmtpm1682.tar.gz"
@@ -27989,6 +27979,16 @@
           "name": "swupdate",
           "version": "2021.04",
           "downloadUrl": "https://github.com/sbabic/swupdate/archive/2021.04.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "swtpm",
+          "version": "0.8.1",
+          "downloadUrl": "http://github.com/stefanberger/swtpm/archive/d2849a9f5ced70438d67036693438344b47b4161/swtpm-d2849a9.tar.gz"
         }
       }
     },

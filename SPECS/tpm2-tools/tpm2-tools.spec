@@ -14,8 +14,7 @@ BuildRequires: openssl-devel
 BuildRequires: curl-devel
 BuildRequires: tpm2-tss-devel
 %if 0%{?with_check}
-BuildRequires:  ibmtpm
-BuildRequires:  systemd
+BuildRequires:  swtpm
 %endif
 
 Requires: openssl
@@ -39,12 +38,16 @@ sed -i "/compatibility/a extern int BN_bn2binpad(const BIGNUM *a, unsigned char 
 %if 0%{?with_check}
 %check
 if [ ! -f /dev/tpm0 ];then
-   systemctl start ibmtpm_server.service
-   export TPM2TOOLS_TCTI=mssim:host=localhost,port=2321
+   mkdir /tmp/swtpm
+   swtpm_setup --tpm-state /tmp/swtpm --tpm2
+   swtpm socket --server --daemon
    tpm2_startup -c
    tpm2_pcrlist
 fi
 make %{?_smp_mflags} check
+if [ ! -f /dev/tpm0 ];then
+   # kill swtpm
+fi
 %endif
 
 %files
