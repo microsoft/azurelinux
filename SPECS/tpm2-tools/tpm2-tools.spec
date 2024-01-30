@@ -43,6 +43,9 @@ if [ ! -f /dev/tpm0 ];then
    mkdir /tmp/swtpm
    swtpm_setup --tpm-state /tmp/swtpm --tpm2
    swtpm socket --server type=unixio,path=/tmp/swtpm/socket --ctrl type=unixio,path=/tmp/swtpm/socket.ctrl --tpmstate dir=/tmp/swtpm --flags startup-clear --tpm2 --daemon
+   printenv
+   export TPM2TOOLS_TCTI=swtpm:path=/tmp/swtpm/socket
+   printenv
    $(find / -name tpm2_startup) -c
    $(find / -name tpm2_pcrread)
 fi
