@@ -5100,8 +5100,8 @@
         "type": "other",
         "other": {
           "name": "harfbuzz",
-          "version": "3.4.0",
-          "downloadUrl": "https://github.com/harfbuzz/harfbuzz/releases/download/3.4.0/harfbuzz-3.4.0.tar.xz"
+          "version": "8.3.0",
+          "downloadUrl": "https://github.com/harfbuzz/harfbuzz/releases/download/8.3.0/harfbuzz-8.3.0.tar.xz"
         }
       }
     },
