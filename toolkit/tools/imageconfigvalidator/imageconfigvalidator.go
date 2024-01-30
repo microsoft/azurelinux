@@ -176,7 +176,7 @@ func validatePackages(config configuration.Config) (err error) {
 				return fmt.Errorf("%s: [SELinux] selected, but '%s' package is not included in the package lists", validateError, selinuxPkgName)
 			}
 		}
-		if len(systemConfig.Users) > 0 {
+		if len(systemConfig.Users) > 0 || len(systemConfig.Groups) > 0 {
 			if !foundUserAddPackage {
 				return fmt.Errorf("%s: add users require '%s' package that is not included in the package lists", validateError, userAddPkgName)
 			}
