@@ -5,7 +5,6 @@ import json
 import subprocess
 import sys
 import tempfile
-import os
 
 if __name__ == "__main__":
     # Load the JSON file from the command line argument.
