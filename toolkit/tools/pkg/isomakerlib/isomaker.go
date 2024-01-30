@@ -32,6 +32,7 @@ const (
 // IsoMaker builds ISO images and populates them with packages and files required by the installer.
 type IsoMaker struct {
 	enableBiosBoot     bool                 // Flag deciding whether to include BIOS bootloaders or not in the generated ISO image.
+	enableRpmRepo      bool                 // Flag deciding whether to include the contents of the Rpm repo folder in the generated ISO image.
 	unattendedInstall  bool                 // Flag deciding if the installer should run in unattended mode.
 	config             configuration.Config // Configuration for the built ISO image and its installer.
 	configSubDirNumber int                  // Current number for the subdirectories storing files mentioned in the config.
@@ -64,6 +65,7 @@ func NewIsoMaker(unattendedInstall bool, baseDirPath, buildDirPath, releaseVersi
 
 	return &IsoMaker{
 		enableBiosBoot:     true,
+		enableRpmRepo:      true,
 		unattendedInstall:  unattendedInstall,
 		config:             config,
 		baseDirPath:        baseDirPath,
@@ -78,7 +80,7 @@ func NewIsoMaker(unattendedInstall bool, baseDirPath, buildDirPath, releaseVersi
 	}
 }
 
-func NewIsoMakerWithConfig(unattendedInstall, enableBiosBoot bool, baseDirPath, buildDirPath, releaseVersion, resourcesDirPath string, config configuration.Config, initrdPath, grubCfgPath, isoRepoDirPath, outputDir, imageNameBase, imageNameTag string) *IsoMaker {
+func NewIsoMakerWithConfig(unattendedInstall, enableBiosBoot, enableRpmRepo bool, baseDirPath, buildDirPath, releaseVersion, resourcesDirPath string, config configuration.Config, initrdPath, grubCfgPath, isoRepoDirPath, outputDir, imageNameBase, imageNameTag string) *IsoMaker {
 
 	if imageNameBase == "" {
 		imageNameBase = defaultImageNameBase
@@ -89,6 +91,7 @@ func NewIsoMakerWithConfig(unattendedInstall, enableBiosBoot bool, baseDirPath, 
 
 	return &IsoMaker{
 		enableBiosBoot:     enableBiosBoot,
+		enableRpmRepo:      enableRpmRepo,
 		unattendedInstall:  unattendedInstall,
 		config:             config,
 		baseDirPath:        baseDirPath,
@@ -273,7 +276,7 @@ func (im *IsoMaker) createVmlinuzImage() {
 // createIsoRpmsRepo initializes the RPMs repo on the ISO image
 // later accessed by the ISO installer.
 func (im *IsoMaker) createIsoRpmsRepo() {
-	if im.fetchedRepoDirPath == "" {
+	if !im.enableRpmRepo {
 		return
 	}
 

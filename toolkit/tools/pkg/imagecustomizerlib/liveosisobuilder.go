@@ -574,6 +574,7 @@ func (b *LiveOSIsoBuilder) createIsoImage(isoOutputDir, isoOutputBaseName string
 	// Should we decide to include the BIOS bootloader, we need to find a
 	// reliable and efficient way to pull those binaries.
 	enableBiosBoot := false
+	enableRpmRepo := false
 	baseDirPath := ""
 	releaseVersion := ""
 	isoResourcesDir := ""
@@ -596,6 +597,7 @@ func (b *LiveOSIsoBuilder) createIsoImage(isoOutputDir, isoOutputBaseName string
 	isoMaker := isomakerlib.NewIsoMakerWithConfig(
 		unattendedInstall,
 		enableBiosBoot,
+		enableRpmRepo,
 		baseDirPath,
 		b.workingDirs.isomakerBuildDir,
 		releaseVersion,
