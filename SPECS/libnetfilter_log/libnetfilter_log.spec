@@ -72,7 +72,7 @@ find $RPM_BUILD_ROOT -type f -name "*.la" -exec rm -f {} ';'
 %changelog
 * Mon Jan 29 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> -1.0.2-1
 - Bump version to 1.0.2 from 1.0.1
-- Changing patch file to have the latest contents of linux_nfnetlink_log.h (the contents of this file have changed in latest release)
+- Removing the patch file since the contents of the files it patches have changed in this release leading to incorrect patch application.
 
 * Tue Dec 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.0.1-22
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
