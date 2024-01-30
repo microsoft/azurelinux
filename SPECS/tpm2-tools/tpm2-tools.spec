@@ -41,7 +41,7 @@ if [ ! -f /dev/tpm0 ];then
    find / -name "*swtpm*"
    mkdir /tmp/swtpm
    swtpm_setup --tpm-state /tmp/swtpm --tpm2
-   swtpm socket --server &
+   swtpm socket --server swtpm socket --server type=unixio,path=/tmp/swtpm/socket --ctrl type=unixio,path=/tmp/swtpm/socket.ctrl --tpmstate dir=/tmp/swtpm --flags startup-clear --tpm2 --daemon
    tpm2_startup -c
    tpm2_pcrlist
 fi
