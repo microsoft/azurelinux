@@ -8,10 +8,9 @@ Summary:          Utilities and example programs for use with XDP
 
 License:          GPL-2.0-only
 URL:              https://github.com/xdp-project/%{name}
-Source0:          https://github.com/xdp-project/%{name}/releases/download/v%{version}/xdp-tools-%{version}.tar.gz
+Source0:          https://github.com/xdp-project/xdp-tools/archive/refs/tags/v%{version}.tar.gz/#%{name}-%{version}.tar.gz
 
 %global azl 3
-# /bin/strip causes errors during install
 BuildRequires:    libbpf-devel
 BuildRequires:    elfutils-libelf-devel
 BuildRequires:    zlib-devel
@@ -42,6 +41,9 @@ Requires:         libxdp = %{version}-%{release}
 # disable the debug package to avoid rpmbuild error'ing out because of this
 %global debug_package %{nil}
 %global _hardened_build 1
+# To avoid install errors of the kind:
+# /bin/strip: Unable to recognise the format of the input file
+# `/usr/src/mariner/BUILDROOT/xdp-tools-1.4.1-1.azl3.x86_64/usr/lib/bpf/xdpdump_xdp.o'
 %if %{azl}
 %global __strip /bin/true
 %endif
