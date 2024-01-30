@@ -210,7 +210,7 @@ ln -sr %{buildroot}%{_bindir}/dracut %{buildroot}%{_sbindir}/dracut
 %dir %{_sharedstatedir}/dracut/overlay
 
 %changelog
-* Tue Jan 29 2024 Lanze Liu <lanzeliu@microsoft.com> - 055-7
+* Mon Jan 29 2024 Lanze Liu <lanzeliu@microsoft.com> - 055-7
 - Add overlayfs sub-package.
 
 * Wed Jan 24 2024 George Mileka <gmileka@microsoft.com> - 055-6
