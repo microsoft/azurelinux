@@ -42,8 +42,8 @@ if [ ! -f /dev/tpm0 ];then
    mkdir /tmp/swtpm
    swtpm_setup --tpm-state /tmp/swtpm --tpm2
    swtpm socket --server type=unixio,path=/tmp/swtpm/socket --ctrl type=unixio,path=/tmp/swtpm/socket.ctrl --tpmstate dir=/tmp/swtpm --flags startup-clear --tpm2 --daemon
-   tpm2_startup -c
-   tpm2_pcrlist
+   %{_bindir}/tpm2_startup -c
+   %{_bindir}/tpm2_pcrlist
 fi
 make %{?_smp_mflags} check
 if [ ! -f /dev/tpm0 ];then
