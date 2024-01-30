@@ -26,13 +26,8 @@ func enableVerityPartition(verity *imagecustomizerapi.Verity, imageChroot *safec
 
 	// Integrate systemd veritysetup dracut module into initramfs img.
 	systemdVerityDracutModule := "systemd-veritysetup"
-	err = buildDracutModule(systemdVerityDracutModule, imageChroot)
-	if err != nil {
-		return err
-	}
-
-	// Update mariner config file with the new generated initramfs file.
-	err = updateMarinerCfgWithInitramfs(imageChroot)
+	dmVerityDracutDriver := "dm-verity"
+	err = buildDracutModule(systemdVerityDracutModule, dmVerityDracutDriver, imageChroot)
 	if err != nil {
 		return err
 	}
@@ -40,7 +35,7 @@ func enableVerityPartition(verity *imagecustomizerapi.Verity, imageChroot *safec
 	return nil
 }
 
-func buildDracutModule(dracutModuleName string, imageChroot *safechroot.Chroot) error {
+func buildDracutModule(dracutModuleName string, dracutDriverName string, imageChroot *safechroot.Chroot) error {
 	var err error
 
 	listKernels := func() ([]string, error) {
@@ -73,7 +68,10 @@ func buildDracutModule(dracutModuleName string, imageChroot *safechroot.Chroot) 
 
 	// Check if the dracut module configuration file already exists.
 	if _, err := os.Stat(dracutConfigFile); os.IsNotExist(err) {
-		lines := []string{"add_dracutmodules+=\"" + dracutModuleName + "\""}
+		lines := []string{
+			"add_dracutmodules+=\"" + dracutModuleName + "\"",
+			"add_drivers+=\"" + dracutDriverName + "\"",
+		}
 		err = file.WriteLines(lines, dracutConfigFile)
 		if err != nil {
 			return fmt.Errorf("failed to write to dracut module config file (%s): %w", dracutConfigFile, err)
@@ -81,51 +79,12 @@ func buildDracutModule(dracutModuleName string, imageChroot *safechroot.Chroot) 
 	}
 
 	err = imageChroot.Run(func() error {
-		err = shell.ExecuteLiveWithErr(1, "dracut", "-f", "--kver", kernelVersion)
+		initrdImagePath := "/boot/initrd.img-" + kernelVersion
+		err = shell.ExecuteLiveWithErr(1, "mkinitrd", "-f", initrdImagePath, kernelVersion)
 		return err
 	})
 	if err != nil {
-		return fmt.Errorf("failed to build dracut module - (%s):\n%w", dracutModuleName, err)
-	}
-
-	return nil
-}
-
-func updateMarinerCfgWithInitramfs(imageChroot *safechroot.Chroot) error {
-	var err error
-
-	initramfsPattern := filepath.Join(imageChroot.RootDir(), "boot", "initramfs-*")
-	// Fetch the initramfs file name.
-	var initramfsFiles []string
-	initramfsFiles, err = filepath.Glob(initramfsPattern)
-	if err != nil {
-		return fmt.Errorf("failed to list initramfs file: %w", err)
-	}
-
-	// Ensure an initramfs file is found
-	if len(initramfsFiles) != 1 {
-		return fmt.Errorf("expected one initramfs file, but found %d", len(initramfsFiles))
-	}
-
-	newInitramfs := filepath.Base(initramfsFiles[0])
-
-	cfgPath := filepath.Join(imageChroot.RootDir(), "boot", "mariner.cfg")
-
-	lines, err := file.ReadLines(cfgPath)
-	if err != nil {
-		return fmt.Errorf("failed to read mariner.cfg: %w", err)
-	}
-
-	// Update lines to reference the new initramfs
-	for i, line := range lines {
-		if strings.HasPrefix(line, "mariner_initrd=") {
-			lines[i] = "mariner_initrd=" + newInitramfs
-		}
-	}
-	// Write the updated lines back to mariner.cfg using the internal method
-	err = file.WriteLines(lines, cfgPath)
-	if err != nil {
-		return fmt.Errorf("failed to write to mariner.cfg: %w", err)
+		return fmt.Errorf("failed to build initrd img for kernel - (%s):\n%w", kernelVersion, err)
 	}
 
 	return nil
