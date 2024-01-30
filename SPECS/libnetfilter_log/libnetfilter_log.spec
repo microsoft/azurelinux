@@ -9,7 +9,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://netfilter.org
 Source0:        https://netfilter.org/projects/%{name}/files/%{name}-%{version}.tar.bz2
-Patch0:		    libnetfilter_log-sysheader.patch
 
 BuildRequires:  gcc
 BuildRequires:  libnfnetlink-devel >= %{libnfnetlink}
