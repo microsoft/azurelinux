@@ -1387,6 +1387,42 @@
                 "PR": [
                     "https://github.com/microsoft/CBL-Mariner/pull/7180"
                 ]
+            },
+            "CONFIG_DWMAC_LOONGSON": {
+                "value": [
+                    "<missing>"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Not available",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/7539"
+                ]
+            },
+            "CONFIG_PHY_RTK_RTD_USB2PHY": {
+                "value": [
+                    "<missing>"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Not available",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/7539"
+                ]
+            },
+            "CONFIG_PHY_RTK_RTD_USB3PHY": {
+                "value": [
+                    "<missing>"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Not available",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/7539"
+                ]
             }
         }
     }
