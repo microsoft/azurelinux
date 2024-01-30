@@ -14,7 +14,7 @@ BuildRequires: openssl-devel
 BuildRequires: curl-devel
 BuildRequires: tpm2-tss-devel
 %if 0%{?with_check}
-BuildRequires:  swtpm
+BuildRequires:  swtpm-tools
 %endif
 
 Requires: openssl
