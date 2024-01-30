@@ -13373,7 +13373,7 @@
         "type": "other",
         "other": {
           "name": "mstflint",
-          "version": "4.26.0-1",
+          "version": "4.26.0",
           "downloadUrl": "https://github.com/Mellanox/mstflint/releases/download/v4.26.0-1/mstflint-4.26.0-1.tar.gz"
         }
       }
