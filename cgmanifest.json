@@ -4360,8 +4360,8 @@
         "type": "other",
         "other": {
           "name": "glusterfs",
-          "version": "7.9",
-          "downloadUrl": "https://download.gluster.org/pub/gluster/glusterfs/7/7.9/glusterfs-7.9.tar.gz"
+          "version": "11.1",
+          "downloadUrl": "https://download.gluster.org/pub/gluster/glusterfs/11/11.1/glusterfs-11.1.tar.gz"
         }
       }
     },
@@ -5100,8 +5100,8 @@
         "type": "other",
         "other": {
           "name": "harfbuzz",
-          "version": "3.4.0",
-          "downloadUrl": "https://github.com/harfbuzz/harfbuzz/releases/download/3.4.0/harfbuzz-3.4.0.tar.xz"
+          "version": "8.3.0",
+          "downloadUrl": "https://github.com/harfbuzz/harfbuzz/releases/download/8.3.0/harfbuzz-8.3.0.tar.xz"
         }
       }
     },
@@ -11150,6 +11150,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libtpms",
+          "version": "0.9.6",
+          "downloadUrl": "https://github.com/stefanberger/libtpms/archive/v0.9.6/libtpms-0.9.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libtraceevent",
           "version": "1.7.2",
           "downloadUrl": "https://git.kernel.org/pub/scm/libs/libtrace/libtraceevent.git/snapshot/libtraceevent-1.7.2.tar.gz"
@@ -14233,8 +14243,8 @@
         "type": "other",
         "other": {
           "name": "numpy",
-          "version": "1.23.4",
-          "downloadUrl": "https://github.com/numpy/numpy/releases/download/v1.23.4/numpy-1.23.4.tar.gz"
+          "version": "1.26.3",
+          "downloadUrl": "https://github.com/numpy/numpy/releases/download/v1.26.3/numpy-1.26.3.tar.gz"
         }
       }
     },
@@ -15843,6 +15853,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "perl-B-COW",
+          "version": "0.007",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/A/AT/ATOOMIC/B-COW-0.007.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "perl-B-Debug",
           "version": "1.26",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/R/RU/RURBAN/B-Debug-1.26.tar.gz"
@@ -16376,16 +16396,6 @@
           "name": "perl-Coro-Multicore",
           "version": "1.07",
           "downloadUrl": "https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/Coro-Multicore-1.07.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "perl-B-COW",
-          "version": "0.007",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/A/AT/ATOOMIC/B-COW-0.007.tar.gz"
         }
       }
     },
@@ -25525,8 +25535,8 @@
         "type": "other",
         "other": {
           "name": "ruby",
-          "version": "3.1.4",
-          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/3.1/ruby-3.1.4.tar.xz"
+          "version": "3.3.0",
+          "downloadUrl": "https://cache.ruby-lang.org/pub/ruby/3.3/ruby-3.3.0.tar.gz"
         }
       }
     },
@@ -25667,16 +25677,6 @@
           "name": "rubygem-aws-sigv4",
           "version": "1.4.0",
           "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/aws-sigv4-1.4.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-bigdecimal",
-          "version": "3.1.2",
-          "downloadUrl": "https://github.com/ruby/bigdecimal/archive/refs/tags/v3.1.2.tar.gz"
         }
       }
     },
