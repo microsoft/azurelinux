@@ -4930,8 +4930,8 @@
         "type": "other",
         "other": {
           "name": "gtk-update-icon-cache",
-          "version": "3.24.26",
-          "downloadUrl": "https://gitlab.gnome.org/Community/gentoo/gtk-update-icon-cache/-/archive/3.24.26/gtk-update-icon-cache-3.24.26.tar.gz"
+          "version": "3.24.39",
+          "downloadUrl": "https://gitlab.gnome.org/Community/gentoo/gtk-update-icon-cache/-/archive/3.24.39/gtk-update-icon-cache-3.24.39.tar.bz2"
         }
       }
     },
