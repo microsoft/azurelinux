@@ -40,3 +40,5 @@ if __name__ == '__main__':
                 '--no-index',
                 required_configs,
                 f.name])
+        except subprocess.CalledProcessError:
+            sys.exit(1)
