@@ -496,7 +496,7 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 
 func createLiveOSIsoImage(buildDir, sourceImageFile, outputImageDir, outputImageBase string) error {
 
-	iae := &IsoArtifactExtractor{
+	b := &LiveOSIsoBuilder{
 		workingDirs: IsoWorkingDirs{
 			isoBuildDir: filepath.Join(buildDir, "tmp"),
 			// IsoMaker needs its own folder to work in (it starts by deleting and re-creating it).
@@ -505,12 +505,12 @@ func createLiveOSIsoImage(buildDir, sourceImageFile, outputImageDir, outputImage
 		},
 	}
 
-	err := iae.prepareLiveOSIsoArtifactsFromFullImage(sourceImageFile)
+	err := b.prepareLiveOSIsoArtifactsFromFullImage(sourceImageFile)
 	if err != nil {
 		return err
 	}
 
-	err = iae.createLiveOSIsoImage(outputImageDir, outputImageBase)
+	err = b.createLiveOSIsoImage(outputImageDir, outputImageBase)
 	if err != nil {
 		return err
 	}
