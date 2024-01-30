@@ -1,33 +1,35 @@
 #!/usr/bin/env python3
 
+
 import argparse
 import json
 import subprocess
 import sys
 import tempfile
 
+
+from sort_required_configs import sort_required_config_lists
+
+
 if __name__ == "__main__":
-    # Load the JSON file from the command line argument.
     parser = argparse.ArgumentParser(
-        description="Check that a JSON file is sorted and indented"
+        description="Check that a JSON of required configs is sorted and indented"
     )
     parser.add_argument(
-        "--required_configs", help="path to JSON of required configs", required=True
+        "--path", help="path to JSON of required configs", required=True
     )
     args = parser.parse_args()
-    required_configs = args.required_configs
-    with open(required_configs, "r") as f:
-        content = json.load(f)
+    path = args.path
 
-    # Sort lists, which is not something done by json.dump.
-    for config, info in content["kernel"]["required-configs"].items():
-        info["PR"] = sorted(info["PR"])
-        info["arch"] = sorted(info["arch"])
-        info["value"] = sorted(info["value"])
+    with open(path, "r") as f:
+        config = json.load(f)
+
+    sort_required_config_lists(config)
 
     # Sort the JSON file and write it to a temporary file.
     with tempfile.NamedTemporaryFile(mode="w") as f:
-        json.dump(content, f, indent=4, sort_keys=True)
+        json.dump(config, f, indent=4, sort_keys=True)
+        f.write("\n")
 
         # Flush the file to disk before passing it to 'git diff' below so
         # that the entire contents of the file are checked against the
@@ -39,8 +41,12 @@ if __name__ == "__main__":
         # exit with a non-zero exit code. Otherwise, print nothing and exit
         # successfully.
         try:
-            subprocess.check_call(
-                ["git", "diff", "--no-index", required_configs, f.name]
-            )
+            subprocess.check_call(["git", "diff", "--no-index", path, f.name])
         except subprocess.CalledProcessError:
+            print(
+                "\n"
+                f"The JSON file at {path} is not sorted and indented correctly.\n"
+                f"Apply the patch above or run 'toolkit/scripts/sort_required_configs.py {path}' to fix it.",
+                file=sys.stderr,
+            )
             sys.exit(1)
