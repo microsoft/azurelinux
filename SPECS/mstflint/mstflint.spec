@@ -35,7 +35,7 @@ for network adapters based on Mellanox Technologies chips.
 
 MSTFLINT_VERSION_STR="%{name} %{version}-%{release}"
 %configure --enable-fw-mgr --enable-adb-generic-tools MSTFLINT_VERSION_STR="${MSTFLINT_VERSION_STR}"
-make
+%make_build
 
 %install
 rm -fr %{buildroot}
