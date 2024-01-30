@@ -34,7 +34,7 @@ Summary:        Low-level DNS(SEC) library with API
 Name:           ldns
 Version:        1.8.3
 Release:        1%{?dist}
-License:        BSD
+License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Libraries
@@ -284,6 +284,7 @@ rm -rf doc/man
 - Auto-upgrade to 1.8.3 - Upgrade for Azure Linux 3.0\
 - Removed unsupported multilib patch (azl only supports 64bit)
 - Removed other patches already integrated into this version
+- Updated license name to SPDX standard.
 
 * Mon Jul 25 2022 Rachel Menge <rachelmenge@microsoft.com> - 1.7.0-32
 - Move from SPECS-EXTENDED to SPECS
