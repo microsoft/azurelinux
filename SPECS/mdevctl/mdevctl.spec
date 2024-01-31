@@ -27,7 +27,6 @@ vfio-mdev for assignment to virtual machines.
 
 %generate_buildrequires
 %cargo_generate_buildrequires
-%endif
 
 %build
 %cargo_build
