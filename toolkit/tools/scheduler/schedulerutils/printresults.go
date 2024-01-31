@@ -110,7 +110,6 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 		}
 	}
 
-	// print summary
 	printSummary(failedSRPMs, failedSRPMsTests, prebuiltSRPMs, prebuiltDeltaSRPMs, builtSRPMs, testedSRPMs, skippedSRPMsTests, unresolvedDependencies, blockedSRPMs, blockedSRPMsTests, rpmConflicts, srpmConflicts, allowToolchainRebuilds, conflictsLogger)
 
 	if len(prebuiltSRPMs) != 0 {
@@ -211,7 +210,6 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 		}
 	}
 
-	// print summary
 	printSummary(failedSRPMs, failedSRPMsTests, prebuiltSRPMs, prebuiltDeltaSRPMs, builtSRPMs, testedSRPMs, skippedSRPMsTests, unresolvedDependencies, blockedSRPMs, blockedSRPMsTests, rpmConflicts, srpmConflicts, allowToolchainRebuilds, conflictsLogger)
 }
 
@@ -336,7 +334,7 @@ func unbuiltPackagesCSVRows(pkgGraph *pkggraph.PkgGraph, unbuiltPackages, failed
 	return
 }
 
-// Helper function to print summarized numbers of the build to the logger.
+// printSummary prints summarized numbers of the build to the logger.
 func printSummary(failedSRPMs, failedSRPMsTests map[string]*BuildResult, prebuiltSRPMs, prebuiltDeltaSRPMs, builtSRPMs, testedSRPMs, skippedSRPMsTests, unresolvedDependencies map[string]bool, blockedSRPMs, blockedSRPMsTests map[string]*pkggraph.PkgNode, rpmConflicts, srpmConflicts []string, allowToolchainRebuilds bool, conflictsLogger func(format string, args ...interface{})) {
 	logger.Log.Info("---------------------------")
 	logger.Log.Info("--------- Summary ---------")
@@ -360,7 +358,8 @@ func printSummary(failedSRPMs, failedSRPMsTests map[string]*BuildResult, prebuil
 	printErrorInfoByCondition(!allowToolchainRebuilds && len(srpmConflicts)>0, summaryLine("Number of toolchain SRPM conflicts:", len(srpmConflicts)))
 }
 
-// Helper function to print error or info based on condition.
+// printErrorInfoByCondition prints error or info level logs depending on the input condition.
+// If the condition is true, it prints an error level log and an info level one otherwise.
 func printErrorInfoByCondition(condition bool, format string, arg ...any) {
 	if condition {
 		logger.Log.Errorf(color.RedString(format, arg...))
@@ -369,12 +368,12 @@ func printErrorInfoByCondition(condition bool, format string, arg ...any) {
 	}
 }
 
-// Helper function to get space formatted string for summary.
+// summaryLine returns padded and type-formatted string for build summary.
 func summaryLine(message string, count int) string {
 	return fmt.Sprintf("%-36s%d", message, count)
 }
 
-// Helper function that converts a map[string]V to a sorted slice containing the map's keys.
+// mapToSortedSlice converts a map[string]V to a sorted slice containing the map's keys.
 func mapToSortedSlice[V any](inputMap map[string]V) []string {
 	outputSlice := sliceutils.MapToSlice(inputMap)
 	sort.Strings(outputSlice)
