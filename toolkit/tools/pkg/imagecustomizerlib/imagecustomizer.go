@@ -159,9 +159,7 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 	case ImageFormatVhd, ImageFormatVhdx, ImageFormatQCow2, ImageFormatRaw:
 		logger.Log.Infof("Writing: %s", outputImageFile)
 
-		outDir := filepath.Dir(outputImageFile)
-		os.MkdirAll(outDir, os.ModePerm)
-
+		os.MkdirAll(outputImageDir, os.ModePerm)
 		err = shell.ExecuteLiveWithErr(1, "qemu-img", "convert", "-O", qemuOutputImageFormat, rawImageFile, outputImageFile)
 		if err != nil {
 			return fmt.Errorf("failed to convert image file to format: %s:\n%w", outputImageFormat, err)
