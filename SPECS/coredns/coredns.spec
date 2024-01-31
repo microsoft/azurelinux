@@ -17,9 +17,6 @@ Source0:        %{name}-%{version}.tar.gz
 #   1. wget https://github.com/coredns/coredns/archive/v%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
 #   2. tar -xf %%{name}-%%{version}.tar.gz
 #   3. cd %%{name}-%%{version}
-#  >>>> Required for Patch1: CVE-2023-44487.patch
-#   4. patch -p1 CVE-2023-44487.patch
-#  >>>>
 #   5. go mod vendor
 #   6. tar  --sort=name \
 #           --mtime="2021-04-26 00:00Z" \
@@ -32,9 +29,11 @@ Source0:        %{name}-%{version}.tar.gz
 #       - The additional options enable generation of a tarball with the same hash every time regardless of the environment.
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
-Source1:        %{name}-%{version}-vendor-CVE-2023-44487.tar.gz
+Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         makefile-buildoption-commitnb.patch
-Patch1:         CVE-2023-44487.patch
+
+# Patch for vendored code, apply later
+Patch1000:         CVE-2023-44487.patch
 
 BuildRequires:  golang >= 1.12
 
@@ -42,11 +41,13 @@ BuildRequires:  golang >= 1.12
 CoreDNS is a fast and flexible DNS server.
 
 %prep
-%autosetup -p1
+%autosetup -N
+%autopatch -p1 -M 999
 
 %build
 # create vendor folder from the vendor tarball and set vendor mode
 tar -xf %{SOURCE1} --no-same-owner
+patch -p1 < %{PATCH1000}
 export BUILDOPTS="-mod=vendor -v"
 # set commit number that correspond to the github tag for that version
 export GITCOMMIT="ae2bbc29be1aaae0b3ded5d188968a6c97bb3144"
