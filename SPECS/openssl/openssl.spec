@@ -9,7 +9,7 @@
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.1.4
-Release: 2%{?dist}
+Release: 1%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source: https://www.openssl.org/source/openssl-%{version}.tar.gz
@@ -362,9 +362,6 @@ install -m644 %{SOURCE9} \
 %ldconfig_scriptlets libs
 
 %changelog
-* Fri Jan 26 2024 Maxwell Moyer-McKee <mamckee@microsoft.com> - 3.1.4-2
-- Add patches to load SymCrypt provider by default
-
 * Tue Nov 28 2023 Tobias Brick <tobiasb@microsoft.com> - 3.1.4-1
 - Upgrade to 3.1.4
 - Initial CBL-Mariner import from Fedora 39 (license: MIT).
@@ -373,6 +370,7 @@ install -m644 %{SOURCE9} \
 - Remove handling of different architectures -- we always build on the target architecture
 - Align config options with Marinver version 2.0
 - Remove fips-related patches and config options
+- Add patches to load SymCrypt provider by default
 
 * Thu Oct 26 2023 Sahana Prasad <sahana@redhat.com> - 1:3.1.4-1
 - Rebase to upstream version 3.1.4
