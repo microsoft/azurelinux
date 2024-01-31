@@ -2074,6 +2074,7 @@
                 "xdelta",
                 "xdg-dbus-proxy",
                 "xdg-utils",
+		"xdp-tools",
                 "xerces-c",
                 "xfconf",
                 "xfsdump",
