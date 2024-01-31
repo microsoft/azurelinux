@@ -17,8 +17,8 @@ Source0:        %{name}-%{version}.tar.gz
 #   1. wget https://github.com/coredns/coredns/archive/v%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
 #   2. tar -xf %%{name}-%%{version}.tar.gz
 #   3. cd %%{name}-%%{version}
-#   5. go mod vendor
-#   6. tar  --sort=name \
+#   4. go mod vendor
+#   5. tar  --sort=name \
 #           --mtime="2021-04-26 00:00Z" \
 #           --owner=0 --group=0 --numeric-owner \
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
@@ -32,7 +32,7 @@ Source0:        %{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         makefile-buildoption-commitnb.patch
 
-# Patch for vendored code, apply later
+# Patch for old x/net/http2 vendored code, apply after vendored code is extracted.
 Patch1000:         CVE-2023-44487.patch
 
 BuildRequires:  golang >= 1.12
