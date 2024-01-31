@@ -1,6 +1,6 @@
 Summary:        Inspect container images and repositories on registries
 Name:           skopeo
-Version:        1.13.3
+Version:        1.14.1
 Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
@@ -46,6 +46,9 @@ make test-unit-local
 %{_mandir}/man1/%%{name}*
 
 %changelog
+* Tue Jan 30 2024 Henry Li <lihl@microsoft.com> - 1.14.1-1
+- Upgrade to v1.14.1
+
 * Tue Oct 17 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 1.13.3-1
 - Update to v1.13.3 to fix CVE-2023-33199 in rekor.
 
