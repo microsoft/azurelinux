@@ -1,11 +1,11 @@
 # Retrieved from 'deps/npm/package.json' inside the sources tarball.
-%define npm_version 8.19.4
+%define npm_version 10.2.3
 Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
-Version:        16.20.2
-Release:        2%{?dist}
+Version:        20.10.0
+Release:        1%{?dist}
 License:        BSD AND MIT AND Public Domain AND NAIST-2003 AND Artistic-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,8 +16,6 @@ URL:            https://github.com/nodejs/node
 # !!!  => use clean-source-tarball.sh script to create a clean and reproducible source tarball.
 Source0:        https://nodejs.org/download/release/v%{version}/node-v%{version}.tar.xz
 Patch0:         disable-tlsv1-tlsv1-1.patch
-Patch1:         CVE-2022-25883.patch
-Patch2:         CVE-2023-35945.patch
 BuildRequires:  brotli-devel
 BuildRequires:  c-ares-devel
 BuildRequires:  coreutils >= 8.22
@@ -29,6 +27,7 @@ BuildRequires:  python3
 BuildRequires:  which
 BuildRequires:  zlib-devel
 Requires:       brotli
+Requires:       c-ares
 Requires:       coreutils >= 8.22
 Requires:       openssl >= 1.1.1
 Provides:       npm = %{npm_version}.%{version}-%{release}
@@ -76,7 +75,6 @@ python3 configure.py \
   --shared-brotli \
   --with-intl=small-icu \
   --with-icu-source=deps/icu-small \
-  --without-dtrace \
   --openssl-use-def-ca-store \
   --shared-cares
 
@@ -102,19 +100,20 @@ make cctest
 %files
 %defattr(-,root,root)
 %license LICENSE
-%doc CHANGELOG.md README.md
+%doc CHANGELOG.md LICENSE README.md
 %{_bindir}/*
 %{_libdir}/node_modules/*
 %{_mandir}/man*/*
-
 
 %files devel
 %defattr(-,root,root)
 %{_includedir}/*
 %{_docdir}/*
-%{_datadir}/systemtap/tapset/node.stp
 
 %changelog
+* Wed Jan 31 2024 Saul Paredes <saulparedes@microsoft.com> - 20.10.0-1
+- Upgrade to nodejs to 20.10.0 and npm to 10.2.3
+
 * Wed Sep 06 2023 Brian Fjeldstad <bfjelds@microsoft.com> - 16.20.2-2
 - Patch CVE-2023-35945
 
