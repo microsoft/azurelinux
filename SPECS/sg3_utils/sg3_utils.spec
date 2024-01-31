@@ -52,8 +52,8 @@ make install \
 %{_includedir}/scsi/*.h
 %{_libdir}/*.so
 %{_libdir}/*.a
-%{_libdir}/libsgutils2-1.48.so.2
-%{_libdir}/libsgutils2-1.48.so.2.0.0
+%{_libdir}/libsgutils2-%{version}.so.2
+%{_libdir}/libsgutils2-%{version}.so.2.0.0
 %{_libdir}/libsgutils2.la
 
 
