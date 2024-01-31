@@ -3,16 +3,16 @@
 # Automating the extraction of these alternate version strings has proven to be tricky,
 # with regards to tooling available in the toolchain build environment.
 # These will be manually maintained for the time being.
-%global majmin 3.9
-%global majmin_nodots 39
+%global majmin 3.12
+%global majmin_nodots 312
 # See Lib/ensurepip/__init__.py in Source0 for these version numbers
-%global pip_version 22.0.4
-%global setuptools_version 58.1.0
+%global pip_version 23.2.1
+%global setuptools_version 67.6.1
 
 Summary:        A high-level scripting language
 Name:           python3
-Version:        3.9.14
-Release:        8%{?dist}
+Version:        3.12.0
+Release:        1%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -163,13 +163,13 @@ The test package contains all regression tests for Python as well as the modules
 
 # Ideally we would use '%%autopatch -p1 -M 999', but unfortunately the GitHub CI pipelines use a very old version of rpm which doesn't support it.
 # We use the CI to validate the toolchain manifests, which means we need to parse this .spec file
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
+#%%patch0 -p1
+#%%patch1 -p1
+#%%patch2 -p1
+#%%patch3 -p1
+#%%patch4 -p1
+#%%patch5 -p1
+#%%patch6 -p1
 
 %build
 # Remove GCC specs and build environment linker scripts
@@ -212,23 +212,21 @@ python3 Lib/ensurepip
 # and install fails. We will install these two bundled wheels manually.
 # https://github.com/pypa/pip/issues/3063
 # https://bugs.python.org/issue31916
-pushd Lib/ensurepip/_bundled
 pip3 install --no-cache-dir --no-index --ignore-installed \
     --root %{buildroot} \
-    setuptools-%{setuptools_version}-py3-none-any.whl \
-    pip-%{pip_version}-py3-none-any.whl
-popd
+    ./Lib/test/setuptools-%{setuptools_version}-py3-none-any.whl \
+    ./Lib/ensurepip/_bundled/pip-%{pip_version}-py3-none-any.whl
 
 # Manually patch CVE-2022-40897 which is a bundled wheel. We can only update the source code after install
-echo 'Patching CVE-2022-40897 in bundled wheel file %{_libdir}/python%{majmin}/site-packages/setuptools/package_index.py'
-patch %{buildroot}%{_libdir}/python%{majmin}/site-packages/setuptools/package_index.py < %{PATCH1000}
+#echo 'Patching CVE-2022-40897 in bundled wheel file %{_libdir}/python%{majmin}/site-packages/setuptools/package_index.py'
+#patch %{buildroot}%{_libdir}/python%{majmin}/site-packages/setuptools/package_index.py < %{PATCH1000}
 
 # Windows executables get installed by pip and setuptools- we don't need these.
 find %{buildroot}%{_libdir}/python%{majmin}/site-packages -name '*.exe' -delete -print
 
 # Install pathfix.py to bindir
-cp -p Tools/scripts/pathfix.py %{buildroot}%{_bindir}/pathfix%{majmin}.py
-ln -s ./pathfix%{majmin}.py %{buildroot}%{_bindir}/pathfix.py
+#cp -p Tools/scripts/pathfix.py %{buildroot}%{_bindir}/pathfix%{majmin}.py
+#ln -s ./pathfix%{majmin}.py %{buildroot}%{_bindir}/pathfix.py
 
 # Remove unused stuff
 find %{buildroot}%{_libdir} -name '*.pyc' -delete
@@ -254,12 +252,13 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %dir %{_libdir}/python%{majmin}
 %dir %{_libdir}/python%{majmin}/site-packages
 
-%exclude %{_libdir}/python%{majmin}/ctypes/test
-%exclude %{_libdir}/python%{majmin}/distutils/tests
-%exclude %{_libdir}/python%{majmin}/sqlite3/test
+%exclude %{_libdir}/python%{majmin}/test/test_ctypes
+%exclude %{_libdir}/python%{majmin}/test/test_sqlite3
 %exclude %{_libdir}/python%{majmin}/idlelib/idle_test
 %exclude %{_libdir}/python%{majmin}/test
 %exclude %{_libdir}/python%{majmin}/lib-dynload/_ctypes_test.*.so
+
+%exclude %{_libdir}/python3.9
 
 %files libs
 %defattr(-,root,root)
@@ -268,11 +267,9 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/libpython3.so
 %{_libdir}/libpython%{majmin}.so.1.0
 %{_libdir}/python%{majmin}
-%{_libdir}/python%{majmin}/site-packages/README.txt
 %exclude %{_libdir}/python%{majmin}/site-packages/
-%exclude %{_libdir}/python%{majmin}/ctypes/test
-%exclude %{_libdir}/python%{majmin}/distutils/tests
-%exclude %{_libdir}/python%{majmin}/sqlite3/test
+%exclude %{_libdir}/python%{majmin}/test/test_ctypes
+%exclude %{_libdir}/python%{majmin}/test/test_sqlite3
 %exclude %{_libdir}/python%{majmin}/idlelib/idle_test
 %exclude %{_libdir}/python%{majmin}/test
 %exclude %{_libdir}/python%{majmin}/lib-dynload/_ctypes_test.*.so
@@ -293,9 +290,7 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/libpython%{majmin}.so
 %{_bindir}/python3-config
 %{_bindir}/python%{majmin}-config
-%{_bindir}/pathfix.py
-%{_bindir}/pathfix%{majmin}.py
-%doc Misc/README.valgrind Misc/valgrind-python.supp Misc/gdbinit
+%doc Misc/README.valgrind Misc/valgrind-python.supp
 %exclude %{_bindir}/2to3*
 %exclude %{_bindir}/idle*
 
@@ -308,21 +303,18 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 
 %files pip
 %defattr(-,root,root,755)
-%{_libdir}/python%{majmin}/site-packages/pip/*
-%{_libdir}/python%{majmin}/site-packages/pip-%{pip_version}.dist-info/*
 %{_bindir}/pip*
 
 %files setuptools
 %defattr(-,root,root,755)
-%{_libdir}/python%{majmin}/site-packages/pkg_resources/*
-%{_libdir}/python%{majmin}/site-packages/setuptools/*
-%{_libdir}/python%{majmin}/site-packages/_distutils_hack/
-%{_libdir}/python%{majmin}/site-packages/setuptools-%{setuptools_version}.dist-info/*
 
 %files test
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Tue Jan 30 2024 Andrew Phelps <anphel@microsoft.com> - 3.12.0-1
+- Upgrade to version 3.12.0
+
 * Wed Oct 11 2023 Amrita Kohli <amritakohli@microsoft.com> - 3.9.14-8
 - Patch for CVE-2023-24329
 
@@ -355,11 +347,11 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 - Add CVE-2015-20107 patch from upstream
 
 * Tue Jul 12 2022 Olivia Crain <oliviacrain> - 3.9.13-3
-- Update cgi3 patch to use versioned python shebang 
+- Update cgi3 patch to use versioned python shebang
 
 * Fri Jul 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.9.13-2
 - Remove Windows executables from pip, setuptools subpackages
-- Add provides in the style of python39-%%{subpackage}, python3.9-%%{subpackage} for all packages except pip, setuptools 
+- Add provides in the style of python39-%%{subpackage}, python3.9-%%{subpackage} for all packages except pip, setuptools
 
 * Mon Jun 20 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.9.13-1
 - Upgrade to latest maintenance release for the 3.9 series
