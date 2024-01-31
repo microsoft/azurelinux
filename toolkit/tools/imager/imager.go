@@ -108,11 +108,11 @@ func main() {
 		timestamp.StopEvent(nil) // applying kickstart
 	}
 
-	err = buildSystemConfig(systemConfig, config.Disks, *outputDir, *buildDir, *imgContentFile)
+	err = buildSystemConfig(systemConfig, config.Disks, *outputDir, *buildDir, *imgContentFile, config.IsContainerImage)
 	logger.PanicOnError(err, "Failed to build system configuration")
 }
 
-func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configuration.Disk, outputDir, buildDir string, imgContentFile string) (err error) {
+func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configuration.Disk, outputDir, buildDir string, imgContentFile string, isContainerImage bool) (err error) {
 	logger.Log.Infof("Building system configuration (%s)", systemConfig.Name)
 	timestamp.StartEvent("building system config", nil)
 	defer timestamp.StopEvent(nil)
@@ -128,6 +128,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 		existingChrootDir     = false
 		leaveChrootOnDisk     = false
 		marinerReleasePackage = "mariner-release"
+		grub2Package          = "grub2"
 	)
 
 	var (
@@ -156,6 +157,11 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 	// As a stopgap to this, mariner-release will now be added to all images regardless
 	// of presence in the CONFIG_FILE
 	packagesToInstall = append([]string{marinerReleasePackage}, packagesToInstall...)
+
+	// Insert the package providing grub2-mkconfig, if our image build depends on it.
+	if systemConfig.EnableGrubMkconfig && !isContainerImage {
+		packagesToInstall = append([]string{grub2Package}, packagesToInstall...)
+	}
 
 	isRootFS = len(systemConfig.PartitionSettings) == 0
 	if isRootFS {

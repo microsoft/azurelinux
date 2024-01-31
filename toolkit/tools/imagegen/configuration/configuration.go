@@ -68,7 +68,13 @@ type Config struct {
 
 	// Computed values not present in the config JSON.
 	DefaultSystemConfig *SystemConfig // A system configuration with the "IsDefault" field set or the first system configuration if there is no explicit default.
+	// Indicates if the config describes a container image configuration, rather than a system image (default).
+	IsContainerImage bool `json:"IsContainerImage"`
 }
+
+const (
+	isContainerImageDefault bool = false
+)
 
 // GetDiskPartByID returns the disk partition object with the desired ID, nil if no partition found
 func (c *Config) GetDiskPartByID(ID string) (diskPart *Partition) {
@@ -282,6 +288,7 @@ func (c *Config) IsValid() (err error) {
 func (c *Config) UnmarshalJSON(b []byte) (err error) {
 	// Use an intermediate type which will use the default JSON unmarshal implementation
 	type IntermediateTypeConfig Config
+	(*c).IsContainerImage = isContainerImageDefault
 	err = json.Unmarshal(b, (*IntermediateTypeConfig)(c))
 	if err != nil {
 		return fmt.Errorf("failed to parse [Config]: %w", err)

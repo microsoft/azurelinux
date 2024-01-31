@@ -2,6 +2,8 @@
 
 Image configuration consists of two sections - Disks and SystemConfigs - that describe the produced artifact(image). Image configuration code can be found in (configuration.go)[../../tools/imagegen/configuration/configuration.go] and validity of the configuration file can be verified by the [imageconfigvalidator](../../tools/imageconfigvalidator/imageconfigvalidator.go)
 
+### IsContainerImage
+IsContainerImage is a optional boolean that indicates to the imager tool whether the config describes a container or system rootfs. If IsContainerImage is specified, the only valid values are `true` and `false`. Default is `false`. When IsContainerImage is `true`, no bootloader or kernel will be installed. 
 
 ## Disks
 Disks entry specifies the disk configuration like its size (for virtual disks), partitions and partition table.
@@ -174,7 +176,7 @@ A sample `ParitionSettings` entry using `overlay` algorithm:
 `OverlayBaseImage` represents the base image when `overlay` algorithm is used.
 
 ### EnableGrubMkconfig
-EnableGrubMkconfig is a optional boolean that controls whether the image uses grub2-mkconfig to generate the boot configuration (/boot/grub2/grub.cfg) or not. If EnableGrubMkconfig is specified, only valid values are `true` and `false`. Default is `false`.
+EnableGrubMkconfig is a optional boolean that controls whether the image uses grub2-mkconfig to generate the boot configuration (/boot/grub2/grub.cfg) or not. If EnableGrubMkconfig is specified, only valid values are `true` and `false`. Default is `true`.
 
 ### PackageLists
 

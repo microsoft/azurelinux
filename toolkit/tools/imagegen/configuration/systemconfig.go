@@ -42,6 +42,10 @@ type SystemConfig struct {
 	EnableHidepid        bool                      `json:"EnableHidepid"`
 }
 
+const (
+	enableGrubMkconfigDefault bool = true
+)
+
 // GetRootPartitionSetting returns a pointer to the partition setting describing the disk which
 // will be mounted at "/", or nil if no partition is found
 func (s *SystemConfig) GetRootPartitionSetting() (rootPartitionSetting *PartitionSetting) {
@@ -185,6 +189,7 @@ func (s *SystemConfig) IsValid() (err error) {
 func (s *SystemConfig) UnmarshalJSON(b []byte) (err error) {
 	// Use an intermediate type which will use the default JSON unmarshal implementation
 	type IntermediateTypeSystemConfig SystemConfig
+	(*s).EnableGrubMkconfig = enableGrubMkconfigDefault
 	err = json.Unmarshal(b, (*IntermediateTypeSystemConfig)(s))
 	if err != nil {
 		return fmt.Errorf("failed to parse [SystemConfig]: %w", err)
