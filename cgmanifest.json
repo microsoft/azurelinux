@@ -3289,7 +3289,7 @@
         "other": {
           "name": "espeak-ng",
           "version": "1.51.1",
-          "downloadUrl": "https://github.com/espeak-ng/espeak-ng/archive/1.51.1/espeak-ng-1.51.1.tgz"
+          "downloadUrl": "https://github.com/espeak-ng/espeak-ng/archive/1.51.1/espeak-ng-1.51.1.tar.gz"
         }
       }
     },
