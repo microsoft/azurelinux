@@ -97,7 +97,7 @@ create_overlay() {
 }
 
 mount_root() {
-    if [ "$is_dverity" = true ]; then
+    if [ "$is_verity" = true ]; then
         echo "Mounting DM-Verity Target"
         mkdir -p "${VERITY_MOUNT}"
         mount -o ro,defaults "/dev/mapper/root" "${VERITY_MOUNT}" || \
