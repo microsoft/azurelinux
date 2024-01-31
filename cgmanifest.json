@@ -4930,8 +4930,8 @@
         "type": "other",
         "other": {
           "name": "gtk-update-icon-cache",
-          "version": "3.24.26",
-          "downloadUrl": "https://gitlab.gnome.org/Community/gentoo/gtk-update-icon-cache/-/archive/3.24.26/gtk-update-icon-cache-3.24.26.tar.gz"
+          "version": "3.24.39",
+          "downloadUrl": "https://gitlab.gnome.org/Community/gentoo/gtk-update-icon-cache/-/archive/3.24.39/gtk-update-icon-cache-3.24.39.tar.bz2"
         }
       }
     },
@@ -8213,16 +8213,6 @@
           "name": "kmod",
           "version": "30",
           "downloadUrl": "http://www.kernel.org/pub/linux/utils/kernel/kmod/kmod-30.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "knem",
-          "version": "1.1.4",
-          "downloadUrl": "https://linux.mellanox.com/public/repo/bluefield/3.9.0/extras/mlnx_ofed/5.6-1.0.3.3/SOURCES/knem_1.1.4.90mlnx1.orig.tar.gz"
         }
       }
     },
