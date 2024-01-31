@@ -78,6 +78,7 @@ in another (virtual) machine
 
 %changelog
 * Tue Jan 30 2024 Dallas Delaney <dadelan@microsoft.com> - 0.13.0-1
+- Upgrade to 0.13.0
 
 * Tue Jun 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.12.0-1
 - Updating to 0.12.0 to fix CVE-2021-3700.
