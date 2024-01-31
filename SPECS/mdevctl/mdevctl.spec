@@ -12,11 +12,7 @@ URL:            https://crates.io/crates/mdevctl
 Source:         https://github.com/mdevctl/mdevctl/archive/refs/tags/v%{version}.tar.gz#/mdevctl-%{version}.tar.gz
 
 BuildRequires: make systemd python3-docutils
-%if 0%{?rhel}
-BuildRequires:  rust-toolset
-%else
 BuildRequires:  rust-packaging >= 21
-%endif
 
 %description
 mdevctl is a utility for managing and persisting devices in the
@@ -27,9 +23,6 @@ vfio-mdev for assignment to virtual machines.
 
 %prep
 %autosetup -n %{crate}-%{version_no_tilde} -p1
-%if 0%{?rhel}
-%cargo_prep -V 1
-%else
 %cargo_prep
 
 %generate_buildrequires
