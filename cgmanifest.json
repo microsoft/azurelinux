@@ -25605,8 +25605,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-bindata",
-          "version": "2.4.10",
-          "downloadUrl": "https://github.com/dmendel/bindata/archive/refs/tags/v2.4.10.tar.gz"
+          "version": "2.4.15",
+          "downloadUrl": "https://github.com/dmendel/bindata/archive/refs/tags/v2.4.15.tar.gz"
         }
       }
     },
