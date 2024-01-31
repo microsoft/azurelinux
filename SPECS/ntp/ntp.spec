@@ -1,7 +1,7 @@
 Summary:        Network Time Protocol reference implementation
 Name:           ntp
-Version:        4.2.8p15
-Release:        3%{?dist}
+Version:        4.2.8p17
+Release:        1%{?dist}
 License:        BSD AND GPLv2+ AND LGPLv2+ AND MIT AND OpenLDAP AND Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -199,6 +199,9 @@ fi
 %{_mandir}/man8/ntpstat.8*
 
 %changelog
+* Wed Jan 31 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.2.8p17-1
+- Auto-upgrade to 4.2.8p17 - 3.0 - Upgrade
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.2.8p15-3
 - Removing the explicit %%clean stage.
 
