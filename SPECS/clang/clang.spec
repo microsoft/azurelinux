@@ -91,10 +91,6 @@ Development header files for clang tools.
 %prep
 %setup -q -n %{clang_srcdir}
 
-# failing test case
-# rm clang-tools-extra/test/clang-tidy/checkers/altera/struct-pack-align.cpp
-# rm clang-tools-extra/test/CodeGen/profile-filter.c
- 
 %py3_shebang_fix \
 	clang-tools-extra/clang-tidy/tool/ \
 	clang-tools-extra/clang-include-fixer/find-all-symbols/tool/run-find-all-symbols.py
@@ -122,9 +118,11 @@ cmake  -DCMAKE_INSTALL_PREFIX=%{_prefix}       \
        -DCMAKE_BUILD_TYPE=Release              \
        -DLLVM_ENABLE_EH=ON                     \
        -DLLVM_ENABLE_RTTI=ON                   \
+       -DLLVM_LINK_LLVM_DYLIB:BOOL=ON          \
        -DCLANG_LINK_CLANG_DYLIB=ON             \
  	     -DLLVM_INCLUDE_TESTS=OFF                \
        -DLLVM_EXTERNAL_CLANG_TOOLS_EXTRA_SOURCE_DIR=../clang-tools-extra \
+       -DCLANG_RESOURCE_DIR=../lib/clang/%{maj_ver} \
        -Wno-dev ../clang
 
 %make_build
