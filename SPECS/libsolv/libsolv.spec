@@ -1,6 +1,6 @@
 Summary:        A free package dependency solver
 Name:           libsolv
-Version:        0.7.24
+Version:        0.7.28
 Release:        1%{?dist}
 License:        BSD
 URL:            https://github.com/openSUSE/libsolv
@@ -77,6 +77,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man1/*
 
 %changelog
+* Wed Jan 31 2024 Sam Meluch <sammeluch@microsoft.com> - 0.7.28-1
+- Upgrade libsolv to version 0.7.28
+
 * Tue Jun 20 2023 Sam Meluch <sammeluch@microsoft.com> - 0.7.24-1
 - add ENABLE_COMPS option to support dnf5
 - Upgrade to version 0.7.24

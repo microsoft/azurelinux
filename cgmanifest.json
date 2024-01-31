@@ -10911,8 +10911,8 @@
         "type": "other",
         "other": {
           "name": "libsolv",
-          "version": "0.7.24",
-          "downloadUrl": "https://github.com/openSUSE/libsolv/archive/0.7.24/libsolv-0.7.24.tar.gz"
+          "version": "0.7.28",
+          "downloadUrl": "https://github.com/openSUSE/libsolv/archive/0.7.28/libsolv-0.7.28.tar.gz"
         }
       }
     },
