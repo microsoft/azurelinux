@@ -23,10 +23,9 @@ Source0:        https://github.com/cloud-hypervisor/cloud-hypervisor/archive/ref
 Source1:        %{name}-%{version}-cargo.tar.gz
 Source2:        config.toml
 Patch0:         CVE-2023-45853.patch
-Patch1:         CVE-2023-50711-vmm-sys-util-fix1.patch 
-Patch2:         CVE-2023-50711-vmm-sys-util-fix2-cargo.patch
-Patch3:         CVE-2023-50711-vhost.patch
-Patch4:         CVE-2023-50711-versionize.patch
+Patch1:         CVE-2023-50711-vmm-sys-util.patch
+Patch2:         CVE-2023-50711-vhost.patch
+Patch3:         CVE-2023-50711-versionize.patch
 %endif
 
 BuildRequires:  binutils
@@ -80,12 +79,9 @@ tar xf %{SOURCE1}
 pushd vendor/libz-sys/src/zlib
 %patch0 -p1
 popd
-pushd vendor/vmm-sys-util
 %patch1 -p1
-popd
 %patch2 -p1	
 %patch3 -p1
-%patch4 -p1
 mkdir -p .cargo
 cp %{SOURCE2} .cargo/
 %endif
