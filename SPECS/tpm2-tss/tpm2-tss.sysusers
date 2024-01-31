@@ -1,0 +1,2 @@
+g tss 59
+u tss 59 "TCG Software Stack" /var/lib/tpm /bin/false

@@ -1,20 +1,26 @@
 Summary:        The source repository for the TPM (Trusted Platform Module) 2 tools
 Name:           tpm2-tools
-Version:        4.3.2
+Version:        5.5
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://github.com/tpm2-software/tpm2-tools
-Source0:        https://github.com/tpm2-software/tpm2-tools/releases/download/%{version}/%{name}-%{version}.tar.gz
-BuildRequires:  curl-devel
-BuildRequires:  openssl-devel
-BuildRequires:  tpm2-tss-devel >= 2.3.0
-Requires:       /bin/awk
-Requires:       curl
-Requires:       openssl
-Requires:       tpm2-tss >= 2.3.0
+
+Source0: https://github.com/tpm2-software/tpm2-tools/releases/download/%{version}/%{name}-%{version}.tar.gz
+
+BuildRequires: curl-devel
+BuildRequires: openssl-devel
+BuildRequires: tpm2-tss-devel
+
+%if 0%{?with_check}
+BuildRequires:  swtpm-tools
+%endif
+
+Requires: curl
+Requires: openssl
+Requires: tpm2-tss
 
 %description
 The source repository for the TPM (Trusted Platform Module) 2 tools
@@ -23,23 +29,37 @@ The source repository for the TPM (Trusted Platform Module) 2 tools
 %autosetup -p1
 
 %build
-%configure \
-    --disable-static
-
-make %{?_smp_mflags}
+sed -i "/compatibility/a extern int BN_bn2binpad(const BIGNUM *a, unsigned char *to, int tolen);" lib/tpm2_openssl.c
+%configure --disable-static
+%make_build
 
 %install
-make DESTDIR=%{buildroot} install
+%make_install %{?_smp_mflags}
+
+%if 0%{?with_check}
+%check
+if [ ! -f /dev/tpm0 ];then
+   mkdir /tmp/swtpm
+   swtpm_setup --tpm-state /tmp/swtpm --tpm2
+   swtpm socket --server type=unixio,path=/tmp/swtpm/socket --ctrl type=unixio,path=/tmp/swtpm/socket.ctrl --tpmstate dir=/tmp/swtpm --flags startup-clear --tpm2 --daemon
+   export TPM2TOOLS_TCTI=swtpm:path=/tmp/swtpm/socket
+   %{buildroot}/%{_bindir}/tpm2_startup -c
+   %{buildroot}/%{_bindir}/tpm2_pcrread
+
+fi
+make %{?_smp_mflags} check
+%endif
 
 %files
 %defattr(-,root,root)
-%license doc/LICENSE
 %{_bindir}/*
 %{_mandir}/man1
-%{_datarootdir}/bash-completion/completions/tpm2_*
-%{_datarootdir}/bash-completion/completions/tss2_*
+%{_datadir}/bash-completion/*
 
 %changelog
+* Mon Jan 22 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 5.5-1
+- Updated to 5.5
+
 * Tue Jan 18 2022 Daniel McIlvaney <damcilva@microsoft.com> - 4.3.2-1
 - Update to 4.3.2.
 - Verified license
