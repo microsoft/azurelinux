@@ -74,7 +74,7 @@ install -p -m 755 -t %{buildroot}%{_bindir} %{name}
 
 %changelog
 * Mon Jan 29 2024 Daniel McIlvaney <damcilva@microsoft.com> - 1.11.1-2
-- Address CVE-2023-44487 by regenerating vendor with forced version upgrade for golang.org/x/net
+- Address CVE-2023-44487 by patching vendored golang.org/x/net
 
 * Tue Oct 18 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 1.11.1-1
 - Upgrade to 1.11.1 to match version required by kubernetes
