@@ -8631,8 +8631,8 @@
         "type": "other",
         "other": {
           "name": "libatomic_ops",
-          "version": "7.6.12",
-          "downloadUrl": "https://github.com/ivmai/libatomic_ops/releases/download/v7.6.12/libatomic_ops-7.6.12.tar.gz"
+          "version": "7.8.2",
+          "downloadUrl": "https://github.com/ivmai/libatomic_ops/releases/download/v7.8.2/libatomic_ops-7.8.2.tar.gz"
         }
       }
     },
