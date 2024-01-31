@@ -10,15 +10,16 @@ URL:            https://github.com/tpm2-software/tpm2-tools
 
 Source0: https://github.com/tpm2-software/tpm2-tools/releases/download/%{version}/%{name}-%{version}.tar.gz
 
-BuildRequires: openssl-devel
 BuildRequires: curl-devel
+BuildRequires: openssl-devel
 BuildRequires: tpm2-tss-devel
+
 %if 0%{?with_check}
 BuildRequires:  swtpm-tools
 %endif
 
-Requires: openssl
 Requires: curl
+Requires: openssl
 Requires: tpm2-tss
 
 %description
@@ -42,8 +43,6 @@ if [ ! -f /dev/tpm0 ];then
    swtpm_setup --tpm-state /tmp/swtpm --tpm2
    swtpm socket --server type=unixio,path=/tmp/swtpm/socket --ctrl type=unixio,path=/tmp/swtpm/socket.ctrl --tpmstate dir=/tmp/swtpm --flags startup-clear --tpm2 --daemon
    export TPM2TOOLS_TCTI=swtpm:path=/tmp/swtpm/socket
-   $(find / -name tpm2_startup) -c
-   $(find / -name tpm2_pcrread)
 fi
 make %{?_smp_mflags} check
 %endif
