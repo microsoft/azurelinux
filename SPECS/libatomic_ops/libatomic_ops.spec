@@ -44,7 +44,7 @@ rm -rf %{buildroot}%{_docdir}/%{name}/{COPYING,LICENSING.txt}
 
 %files
 %defattr(-,root,root)
-%license COPYING doc/LICENSING.txt
+%license COPYING doc/LICENSE
 %{_libdir}/libatomic_ops.so.1*
 %{_libdir}/libatomic_ops_gpl.so.1*
 
@@ -59,6 +59,7 @@ rm -rf %{buildroot}%{_docdir}/%{name}/{COPYING,LICENSING.txt}
 %changelog
 * Wed Jan 31 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 7.8.2-1
 - Auto-upgrade to 7.8.2 - Azure Linux 3.0
+- Updated LICENSE filename
 
 * Wed Jan 12 2022 Thomas Crain <thcrain@microsoft.com> - 7.6.12-1
 - Upgrade to latest upstream version
