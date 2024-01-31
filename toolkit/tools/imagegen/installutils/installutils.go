@@ -1018,7 +1018,7 @@ func ConfigureDiskBootloader(bootType string, encryptionEnable bool, readOnlyVer
 	}
 
 	// Grub will always use filesystem UUID, never PARTUUID or PARTLABEL
-	err = InstallGrubCfg(installChroot.RootDir(), rootDevice, bootUUID, bootPrefix, encryptedRoot,
+	err = InstallGrubDefaults(installChroot.RootDir(), rootDevice, bootUUID, bootPrefix, encryptedRoot,
 		kernelCommandLine, readOnlyRoot, isBootPartitionSeparate)
 	if err != nil {
 		err = fmt.Errorf("failed to install main grub config file: %s", err)
@@ -1060,7 +1060,7 @@ func InstallGrubEnv(installRoot string) (err error) {
 	return
 }
 
-// InstallGrubCfg installs the main grub config to the boot partition
+// InstallGrubDefaults installs the main grub config to the rootfs partition
 // - installRoot is the base install directory
 // - rootDevice holds the root partition
 // - bootUUID is the UUID for the boot partition
@@ -1071,105 +1071,93 @@ func InstallGrubEnv(installRoot string) (err error) {
 // - isBootPartitionSeparate is a boolean value which is true if the /boot partition is separate from the root partition
 // Note: this boot partition could be different than the boot partition specified in the bootloader.
 // This boot partition specifically indicates where to find the kernel, config files, and initrd
-func InstallGrubCfg(installRoot, rootDevice, bootUUID, bootPrefix string, encryptedRoot diskutils.EncryptedRootDevice, kernelCommandLine configuration.KernelCommandLine, readOnlyRoot diskutils.VerityDevice, isBootPartitionSeparate bool) (err error) {
+func InstallGrubDefaults(installRoot, rootDevice, bootUUID, bootPrefix string, encryptedRoot diskutils.EncryptedRootDevice, kernelCommandLine configuration.KernelCommandLine, readOnlyRoot diskutils.VerityDevice, isBootPartitionSeparate bool) (err error) {
 	const (
-		assetGrubcfgFile = "assets/grub2/grub.cfg"
-		grubCfgFile      = "boot/grub2/grub.cfg"
 		assetGrubDefFile = "assets/grub2/grub"
 		grubDefFile      = "etc/default/grub"
 	)
 
-	// Copy the bootloader's grub.cfg and set the file permission
-	installGrubCfgFile := filepath.Join(installRoot, grubCfgFile)
-
+	// Copy the bootloader's /etc/default/grub and set the file permission
 	installGrubDefFile := filepath.Join(installRoot, grubDefFile)
 
-	err = file.CopyResourceFile(resources.ResourcesFS, assetGrubcfgFile, installGrubCfgFile, bootDirectoryDirMode,
-		bootDirectoryFileMode)
-	if err != nil {
-		return
-	}
 	err = file.CopyResourceFile(resources.ResourcesFS, assetGrubDefFile, installGrubDefFile, bootDirectoryDirMode,
 		bootDirectoryFileMode)
 	if err != nil {
 		return
 	}
 
-	for _, installedFile := range []string{installGrubCfgFile, installGrubDefFile} {
+	// Add in bootUUID
+	err = setGrubCfgBootUUID(bootUUID, installGrubDefFile)
+	if err != nil {
+		logger.Log.Warnf("Failed to set bootUUID in %s: %v", installGrubDefFile, err)
+		return
+	}
 
-		// Add in bootUUID
-		err = setGrubCfgBootUUID(bootUUID, installedFile)
-		if err != nil {
-			logger.Log.Warnf("Failed to set bootUUID in %s: %v", installedFile, err)
-			return
-		}
+	// Add in bootPrefix
+	err = setGrubCfgBootPrefix(bootPrefix, installGrubDefFile)
+	if err != nil {
+		logger.Log.Warnf("Failed to set bootPrefix in %s: %v", installGrubDefFile, err)
+		return
+	}
 
-		// Add in bootPrefix
-		err = setGrubCfgBootPrefix(bootPrefix, installedFile)
-		if err != nil {
-			logger.Log.Warnf("Failed to set bootPrefix in %s: %v", installedFile, err)
-			return
-		}
+	// Add in rootDevice
+	err = setGrubCfgRootDevice(rootDevice, installGrubDefFile, encryptedRoot.LuksUUID)
+	if err != nil {
+		logger.Log.Warnf("Failed to set rootDevice in %s: %v", installGrubDefFile, err)
+		return
+	}
 
-		// Add in rootDevice
-		err = setGrubCfgRootDevice(rootDevice, installedFile, encryptedRoot.LuksUUID)
-		if err != nil {
-			logger.Log.Warnf("Failed to set rootDevice in %s: %v", installedFile, err)
-			return
-		}
+	// Add in rootLuksUUID
+	err = setGrubCfgLuksUUID(installGrubDefFile, encryptedRoot.LuksUUID)
+	if err != nil {
+		logger.Log.Warnf("Failed to set luksUUID in %s: %v", installGrubDefFile, err)
+		return
+	}
 
-		// Add in rootLuksUUID
-		err = setGrubCfgLuksUUID(installedFile, encryptedRoot.LuksUUID)
-		if err != nil {
-			logger.Log.Warnf("Failed to set luksUUID in %s: %v", installedFile, err)
-			return
-		}
+	// Add in logical volumes to active
+	err = setGrubCfgLVM(installGrubDefFile, encryptedRoot.LuksUUID)
+	if err != nil {
+		logger.Log.Warnf("Failed to set lvm.lv in %s: %v", installGrubDefFile, err)
+		return
+	}
 
-		// Add in logical volumes to active
-		err = setGrubCfgLVM(installedFile, encryptedRoot.LuksUUID)
-		if err != nil {
-			logger.Log.Warnf("Failed to set lvm.lv in %s: %v", installedFile, err)
-			return
-		}
+	// Configure IMA policy
+	err = setGrubCfgIMA(installGrubDefFile, kernelCommandLine)
+	if err != nil {
+		logger.Log.Warnf("Failed to set ima_policy in in %s: %v", installGrubDefFile, err)
+		return
+	}
 
-		// Configure IMA policy
-		err = setGrubCfgIMA(installedFile, kernelCommandLine)
-		if err != nil {
-			logger.Log.Warnf("Failed to set ima_policy in in %s: %v", installedFile, err)
-			return
-		}
+	err = setGrubCfgReadOnlyVerityRoot(installGrubDefFile, readOnlyRoot)
+	if err != nil {
+		logger.Log.Warnf("Failed to set verity root in in %s: %v", installGrubDefFile, err)
+		return
+	}
 
-		err = setGrubCfgReadOnlyVerityRoot(installedFile, readOnlyRoot)
-		if err != nil {
-			logger.Log.Warnf("Failed to set verity root in in %s: %v", installedFile, err)
-			return
-		}
+	err = setGrubCfgSELinux(installGrubDefFile, kernelCommandLine)
+	if err != nil {
+		logger.Log.Warnf("Failed to set SELinux in %s: %v", installGrubDefFile, err)
+		return
+	}
 
-		err = setGrubCfgSELinux(installedFile, kernelCommandLine)
-		if err != nil {
-			logger.Log.Warnf("Failed to set SELinux in %s: %v", installedFile, err)
-			return
-		}
+	// Configure FIPS
+	err = setGrubCfgFIPS(isBootPartitionSeparate, bootUUID, installGrubDefFile, kernelCommandLine)
+	if err != nil {
+		logger.Log.Warnf("Failed to set FIPS in %s: %v", installGrubDefFile, err)
+		return
+	}
 
-		// Configure FIPS
-		err = setGrubCfgFIPS(isBootPartitionSeparate, bootUUID, installedFile, kernelCommandLine)
-		if err != nil {
-			logger.Log.Warnf("Failed to set FIPS in %s: %v", installedFile, err)
-			return
-		}
+	err = setGrubCfgCGroup(installGrubDefFile, kernelCommandLine)
+	if err != nil {
+		logger.Log.Warnf("Failed to set CGroup configuration in %s: %v", installGrubDefFile, err)
+		return
+	}
 
-		err = setGrubCfgCGroup(installedFile, kernelCommandLine)
-		if err != nil {
-			logger.Log.Warnf("Failed to set CGroup configuration in %s: %v", installedFile, err)
-			return
-		}
-
-		// Append any additional command line parameters
-		err = setGrubCfgAdditionalCmdLine(installedFile, kernelCommandLine)
-		if err != nil {
-			logger.Log.Warnf("Failed to append extra command line parameters in %s: %v", installedFile, err)
-			return
-		}
+	// Append any additional command line parameters
+	err = setGrubCfgAdditionalCmdLine(installGrubDefFile, kernelCommandLine)
+	if err != nil {
+		logger.Log.Warnf("Failed to append extra command line parameters in %s: %v", installGrubDefFile, err)
+		return
 	}
 
 	return
@@ -1967,10 +1955,11 @@ func installEfiBootloader(encryptEnabled bool, installRoot, bootUUID, bootPrefix
 		return
 	}
 
-	// Set the boot prefix
-	err = setGrubCfgBootPrefix(bootPrefix, grubFinalPath)
+	// Set the boot prefix path
+	prefixPath := filepath.Join(bootPrefix, "grub2")
+	err = setGrubCfgPrefixPath(prefixPath, grubFinalPath)
 	if err != nil {
-		logger.Log.Warnf("Failed to set bootPrefix in grub.cfg: %v", err)
+		logger.Log.Warnf("Failed to set prefixPath in grub.cfg: %v", err)
 		return
 	}
 
@@ -2345,6 +2334,20 @@ func setGrubCfgBootUUID(bootUUID, grubPath string) (err error) {
 	err = sed(bootUUIDPattern, bootUUID, cmdline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set grub.cfg's bootUUID: %v", err)
+		return
+	}
+	return
+}
+
+func setGrubCfgPrefixPath(prefixPath string, grubPath string) (err error) {
+	const (
+		prefixPathPattern = "{{.PrefixPath}}"
+	)
+	var cmdline configuration.KernelCommandLine
+
+	err = sed(prefixPathPattern, prefixPath, cmdline.GetSedDelimeter(), grubPath)
+	if err != nil {
+		logger.Log.Warnf("Failed to set grub.cfg's prefixPath: %v", err)
 		return
 	}
 	return
