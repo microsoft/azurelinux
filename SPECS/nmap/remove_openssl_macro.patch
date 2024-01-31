@@ -1,19 +1,31 @@
+From 370372352516de753582c69a7707d259ea8b40ba Mon Sep 17 00:00:00 2001
+From: Mitch Zhu <zhumc11@gmail.com>
+Date: Mon, 29 Jan 2024 14:53:49 -0800
+Subject: [PATCH] Remove openssl macro
+
+---
+ ncat/http_digest.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
 diff --git a/ncat/http_digest.c b/ncat/http_digest.c
-index b5f80a9..7877887 100644
+index f6a636b..ec40cbd 100644
 --- a/ncat/http_digest.c
 +++ b/ncat/http_digest.c
-@@ -133,10 +133,10 @@ int http_digest_init_secret(void)
+@@ -131,10 +131,10 @@ int http_digest_init_secret(void)
      return 0;
  }
  
--#if OPENSSL_API_LEVEL < 10100
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
 -#define EVP_MD_CTX_new EVP_MD_CTX_create
 -#define EVP_MD_CTX_free EVP_MD_CTX_destroy
 -#endif
-+// #if OPENSSL_API_LEVEL < 10100
++// #if OPENSSL_VERSION_NUMBER < 0x10100000L
 +// #define EVP_MD_CTX_new EVP_MD_CTX_create
 +// #define EVP_MD_CTX_free EVP_MD_CTX_destroy
 +// #endif
  static char *make_nonce(const struct timeval *tv)
  {
      char *buf = NULL;
+-- 
+2.34.1
+
