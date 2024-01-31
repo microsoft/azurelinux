@@ -1,7 +1,7 @@
 Summary:        Compact text-to-speech synthesizer
 Name:           espeak-ng
-Version:        1.50
-Release:        3%{?dist}
+Version:        1.51.1
+Release:        1%{?dist}
 # Apache2 license applies only to Android APK code- does not apply here
 # BSD license applies only to Windows code- does not apply here
 License:        GPLv3 AND Unicode
@@ -80,6 +80,9 @@ make check
 %{_libdir}/*.so
 
 %changelog
+* Wed Jan 31 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.51.1-1
+- Auto-upgrade to 1.51.1 - none
+
 * Mon May 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.50-3
 - Rename "Mr serious" voice to "Mr_serious"
 
