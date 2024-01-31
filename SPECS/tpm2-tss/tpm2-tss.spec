@@ -1,31 +1,34 @@
 Summary:        OSS implementation of the TCG TPM2 Software Stack (TSS2)
 Name:           tpm2-tss
-Version:        2.4.6
-Release:        3%{?dist}
+Version:        4.0.1
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://github.com/tpm2-software/tpm2-tss
-Source0:        https://github.com/tpm2-software/tpm2-tss/releases/download/%{version}/%{name}-%{version}.tar.gz
-Patch0:         CVE-2023-22745.patch
-BuildRequires:  json-c-devel
+
+Source0: https://github.com/tpm2-software/tpm2-tss/releases/download/%{version}/%{name}-%{version}.tar.gz
+Source1: %{name}.sysusers
+
 BuildRequires:  openssl-devel
-Requires:       json-c
-Requires:       openssl
-Requires(postun): %{_sbindir}/groupdel
-Requires(postun): %{_sbindir}/userdel
-Requires(pre):  %{_sbindir}/groupadd
-Requires(pre):  %{_sbindir}/useradd
+BuildRequires:  shadow-utils
+BuildRequires:  systemd-devel
+
+# Between tpm2-tss 3.2.0 and 4.0.1, json-c became a requirement.
+BuildRequires:  json-c-devel
+
+Requires: openssl
+Requires: systemd-rpm-macros
 
 %description
 OSS implementation of the TCG TPM2 Software Stack (TSS2)
 
-%package devel
-Summary:        The libraries and header files needed for TSS2 development.
-Requires:       %{name} = %{version}-%{release}
+%package      devel
+Summary:      The libraries and header files needed for TSS2 development.
+Requires:     %{name} = %{version}-%{release}
 
-%description devel
+%description    devel
 The libraries and header files needed for TSS2 development.
 
 %prep
@@ -33,62 +36,42 @@ The libraries and header files needed for TSS2 development.
 
 %build
 %configure \
-    --disable-static \
-    --disable-doxygen-doc \
-    --with-udevrulesdir=%{_sysconfdir}/udev/rules.d
+  --disable-static \
+  --disable-doxygen-doc \
+  --enable-fapi=no \
+  --with-udevrulesdir=%{_sysconfdir}/udev/rules.d
 
-make %{?_smp_mflags}
+%make_build
 
 %install
-make DESTDIR=%{buildroot} install
-find %{buildroot} -type f -name "*.la" -delete -print
+%make_install %{?_smp_mflags}
+find %{buildroot}%{_libdir} -type f -name \*.la -delete
+install -p -D -m 0644 %{SOURCE1} %{buildroot}%{_sysusersdir}/%{name}.sysusers
 
 %post
+%sysusers_create_compat %{SOURCE1}
+mkdir -p /var/lib/tpm
+chown -R tss:tss /var/lib/tpm
 /sbin/ldconfig
-mkdir -p %{_sharedstatedir}/tpm
-if [ $1 -eq 1 ]; then
-    # this is initial installation
-    if ! getent group tss >/dev/null; then
-        groupadd tss
-    fi
-    if ! getent passwd tss >/dev/null; then
-        useradd -c "TCG Software Stack" -d %{_sharedstatedir}/tpm -g tss \
-            -s /bin/false tss
-    fi
-fi
-
-%postun
-/sbin/ldconfig
-if [ $1 -eq 0 ]; then
-    # this is delete operation
-    if getent passwd tss >/dev/null; then
-        userdel tss
-    fi
-    if getent group tss >/dev/null; then
-        groupdel tss
-    fi
-fi
 
 %files
 %defattr(-,root,root)
-%license LICENSE
 %{_sysconfdir}/udev/rules.d/tpm-udev.rules
-%{_sysconfdir}/tmpfiles.d/tpm2-tss-fapi.conf
-%{_sysconfdir}/tpm2-tss/*
-%{_libdir}/*.so.0.0.0
-%exclude %{_sysconfdir}/sysusers.d/tpm2-tss.conf
+%{_libdir}/*.so.*
+%{_sysusersdir}/%{name}.sysusers
 
 %files devel
 %defattr(-,root,root)
 %{_includedir}/tss2/*
 %{_libdir}/pkgconfig/*
 %{_libdir}/*.so
-%{_libdir}/*.so.0
-%{_mandir}/man3/*
-%{_mandir}/man5/*
-%{_mandir}/man7/*
+%{_mandir}/man3
+%{_mandir}/man7
 
 %changelog
+* Mon Jan 22 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 4.0.1-1
+- Updated to 4.0.1
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.4.6-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
