@@ -1,13 +1,16 @@
 Summary:        Atomic memory update operations portable implementation
 Name:           libatomic_ops
-Version:        7.6.12
+Version:        7.8.2
 Release:        1%{?dist}
-License:        GPLv2 and MIT
+License:        GPL-2.0-or-later and MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries
 URL:            https://github.com/ivmai/libatomic_ops
 Source0:        https://github.com/ivmai/libatomic_ops/releases/download/v%{version}/%{name}-%{version}.tar.gz
+
+BuildRequires:  gcc
+BuildRequires:  make
 
 %description
 This package provides semi-portable access to hardware-provided atomic memory update operations on a number of architectures.
@@ -35,7 +38,7 @@ Libraries and header files for the libatomic_ops library.
 find %{buildroot} -type f -name "*.la" -delete -print
 find %{buildroot} -type f -name "*.a" -delete -print
 # We will package these files manually using the %%license macro
-rm -rf %{buildroot}%{_docdir}/%{name}/{COPYING,LICENSING.txt}
+rm -rf %{buildroot}%{_docdir}/%{name}/{COPYING,LICENSE}
 
 %check
 %make_build check
@@ -44,7 +47,8 @@ rm -rf %{buildroot}%{_docdir}/%{name}/{COPYING,LICENSING.txt}
 
 %files
 %defattr(-,root,root)
-%license COPYING doc/LICENSING.txt
+%license COPYING
+%license LICENSE
 %{_libdir}/libatomic_ops.so.1*
 %{_libdir}/libatomic_ops_gpl.so.1*
 
@@ -52,11 +56,18 @@ rm -rf %{buildroot}%{_docdir}/%{name}/{COPYING,LICENSING.txt}
 %defattr(-,root,root)
 %{_includedir}/*
 %{_docdir}/libatomic_ops/README*
+%{_docdir}/libatomic_ops/AUTHORS
+%{_docdir}/libatomic_ops/ChangeLog
 %{_libdir}/libatomic_ops.so
 %{_libdir}/libatomic_ops_gpl.so
 %{_libdir}/pkgconfig/atomic_ops.pc
 
 %changelog
+* Wed Jan 31 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 7.8.2-1
+- Auto-upgrade to 7.8.2 - Azure Linux 3.0
+- Updated LICENSE filename
+- Updated Licenses to match SPDX standard.
+
 * Wed Jan 12 2022 Thomas Crain <thcrain@microsoft.com> - 7.6.12-1
 - Upgrade to latest upstream version
 - Remove static libraries
