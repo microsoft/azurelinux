@@ -1,13 +1,12 @@
 Summary:        A YAML parser and emitter for C++
 Name:           yaml-cpp
-Version:        0.7.0
+Version:        0.8.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/jbeder/yaml-cpp
-Source0:        https://github.com/jbeder/yaml-cpp/archive/%{name}-%{version}.tar.gz
-Patch0:         yaml-cpp-static.patch
+Source0:        https://github.com/jbeder/yaml-cpp/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  cmake
 BuildRequires:  gcc
 
@@ -31,7 +30,7 @@ Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
 The %{name}-static package contains the static library for %{name}.
 
 %prep
-%autosetup -n %{name}-%{name}-%{version}
+%autosetup
 
 %build
 rm -rf build_shared && mkdir build_shared
@@ -65,19 +64,26 @@ pushd build_static
 %files
 %doc CONTRIBUTING.md README.md
 %license LICENSE
-%{_libdir}/*.so.0.7*
+%{_libdir}/*.so.0.8*
 
 %files devel
 %{_includedir}/yaml-cpp/
 %{_libdir}/*.so
-%{_datadir}/cmake/%{name}
-%{_datadir}/pkgconfig/%{name}.pc
+%{_libdir}/cmake/%{name}
+%{_libdir}/pkgconfig/%{name}.pc
 
 %files static
 %license LICENSE
 %{_libdir}/*.a
 
 %changelog
+* Tue Jan 23 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 0.8.0-1
+- Bump version to 0.8.0 from 0.7.0
+- Removing patch SPECS/yaml-cpp/yaml-cpp-static.patch since the variable been replaced in 0.8.0 with commit hash 4aad2b1 in PR#1077
+- Modifying name of folder to move from %{name}-%{name}-%{version} to %{name}-%{version}
+- Updating the .so files from 0.7* to 0.8*
+- Changing directories of cmake/yaml-cpp and pkgconfig/yaml-cpp.pc files since they are created under /usr/lib in this version
+
 * Wed Jan 26 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.7.0-1
 - Update to version 0.7.0.
 - License verified.
