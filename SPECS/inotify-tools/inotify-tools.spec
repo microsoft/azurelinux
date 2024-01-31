@@ -77,7 +77,7 @@ make %{?_smp_mflags} check
 %{_libdir}/libinotifytools.so
 
 %changelog
-* Mon Jan 29 2024 CBL-Mariner Servicing Account <karimeldegwy@microsoft.com> - 4.23.9.0-1
+* Mon Jan 29 2024 Karim Eldegwy <karimeldegwy@microsoft.com> - 4.23.9.0-1
 - Auto-upgrade to 4.23.9.0 - 3.0 upgrade
 - Added new bins
 
