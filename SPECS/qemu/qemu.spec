@@ -512,9 +512,10 @@ BuildRequires: libusbx-devel >= %{libusbx_version}
 BuildRequires: usbredir-devel >= %{usbredir_version}
 %endif
 # Required for docs. Disable for AzLinux, to reduce python package dependencies
+%if ! 0%{?azl}
 BuildRequires: python3-sphinx
 BuildRequires: python3-sphinx_rtd_theme
-
+%endif
 BuildRequires: libseccomp-devel >= %{libseccomp_version}
 # For network block driver
 BuildRequires: libcurl-devel
@@ -755,13 +756,13 @@ the KVM hypervisor.
 
 This package provides documentation and auxiliary programs used with %{name}.
 
-
+%if ! 0%{?azl}
 %package docs
 Summary: %{name} documentation
 BuildArch: noarch
 %description docs
 %{name}-docs provides documentation files regarding %{name}.
-
+%endif
 
 %package -n qemu-img
 Summary: QEMU command line tool for manipulating disk images
@@ -1896,7 +1897,9 @@ run_configure \
   --enable-dbus-display \
 %endif
   --enable-debug-info \
+%if ! 0%{azl}
   --enable-docs \
+%endif
 %if %{have_fdt}
   --enable-fdt=system \
 %endif
@@ -2518,10 +2521,10 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 # Fedora specific
 %{_bindir}/elf2dmp
 
-
+%if ! 0%{azl}
 %files docs
 %doc %{qemudocdir}
-
+%endif
 
 %files common -f %{name}.lang
 %license COPYING COPYING.LIB LICENSE
