@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<service>
+  <short>systemd-journal-gatewayd</short>
+  <description>Journal Gateway Service</description>
+  <port protocol="tcp" port="19531"/>
+</service>

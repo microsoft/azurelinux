@@ -1,0 +1,24 @@
+ # Disable badfuncs check that has tons of false positives.
+badfuncs:
+  allowed:
+    /usr/lib/systemd/tests/unit-tests/*:
+       - inet_addr
+       - inet_aton
+    /usr/bin/networkctl:
+       - inet_addr
+       - inet_aton
+
+# don't report changed content of compiled files
+# that is expected with every update
+changedfiles:
+  exclude_path: .*
+
+# completely disable inspections:
+inspections:
+  # we know about our patches, no need to report anything
+  patches: off
+
+  # this inspection uses `udevadm` which comes from this package
+  # disable so we do not check udev rules with a possibly outdated version
+  # of the command
+  udevrules: off
