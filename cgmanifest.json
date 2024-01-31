@@ -855,8 +855,8 @@
         "type": "other",
         "other": {
           "name": "azure-iot-sdk-c",
-          "version": "2022.01.21",
-          "downloadUrl": "https://github.com/Azure/azure-iot-sdk-c/archive/LTS_01_2022_Ref01.tar.gz"
+          "version": "2023.08.07",
+          "downloadUrl": "https://github.com/Azure/azure-iot-sdk-c/archive/refs/tags/LTS_08_2023.tar.gz"
         }
       }
     },
@@ -4020,8 +4020,8 @@
         "type": "other",
         "other": {
           "name": "gcovr",
-          "version": "5.0",
-          "downloadUrl": "https://github.com/gcovr/gcovr/archive/5.0/gcovr-5.0.tar.gz"
+          "version": "7.0",
+          "downloadUrl": "https://github.com/gcovr/gcovr/archive/7.0/gcovr-7.0.tar.gz"
         }
       }
     },
@@ -8441,8 +8441,8 @@
         "type": "other",
         "other": {
           "name": "ldns",
-          "version": "1.7.0",
-          "downloadUrl": "http://www.nlnetlabs.nl/downloads/ldns/ldns-1.7.0.tar.gz"
+          "version": "1.8.3",
+          "downloadUrl": "http://www.nlnetlabs.nl/downloads/ldns/ldns-1.8.3.tar.gz"
         }
       }
     },
@@ -8621,8 +8621,8 @@
         "type": "other",
         "other": {
           "name": "libatomic_ops",
-          "version": "7.6.12",
-          "downloadUrl": "https://github.com/ivmai/libatomic_ops/releases/download/v7.6.12/libatomic_ops-7.6.12.tar.gz"
+          "version": "7.8.2",
+          "downloadUrl": "https://github.com/ivmai/libatomic_ops/releases/download/v7.8.2/libatomic_ops-7.8.2.tar.gz"
         }
       }
     },
@@ -10131,8 +10131,8 @@
         "type": "other",
         "other": {
           "name": "libnetfilter_conntrack",
-          "version": "1.0.8",
-          "downloadUrl": "http://www.netfilter.org/projects/libnetfilter_conntrack/files/libnetfilter_conntrack-1.0.8.tar.bz2"
+          "version": "1.0.9",
+          "downloadUrl": "http://www.netfilter.org/projects/libnetfilter_conntrack/files/libnetfilter_conntrack-1.0.9.tar.bz2"
         }
       }
     },
@@ -11651,8 +11651,8 @@
         "type": "other",
         "other": {
           "name": "libXi",
-          "version": "1.7.10",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXi-1.7.10.tar.bz2"
+          "version": "1.8.1",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXi-1.8.1.tar.gz"
         }
       }
     },
@@ -14303,8 +14303,8 @@
         "type": "other",
         "other": {
           "name": "nvml",
-          "version": "1.8",
-          "downloadUrl": "https://github.com/pmem/pmdk/releases/download/1.8/pmdk-1.8.tar.gz"
+          "version": "2.0.1",
+          "downloadUrl": "https://github.com/pmem/pmdk/releases/download/2.0.1/pmdk-2.0.1.tar.gz"
         }
       }
     },
@@ -20874,8 +20874,8 @@
         "type": "other",
         "other": {
           "name": "plexus-cipher",
-          "version": "1.7",
-          "downloadUrl": "https://github.com/codehaus-plexus/plexus-cipher/archive/plexus-cipher-1.7/plexus-cipher-1.7.tar.gz"
+          "version": "2.0",
+          "downloadUrl": "https://github.com/codehaus-plexus/plexus-cipher/archive/plexus-cipher-2.0/plexus-cipher-2.0.tar.gz"
         }
       }
     },
@@ -27377,8 +27377,8 @@
         "type": "other",
         "other": {
           "name": "skopeo",
-          "version": "1.13.3",
-          "downloadUrl": "https://github.com/containers/skopeo/archive/refs/tags/v1.13.3.tar.gz"
+          "version": "1.14.1",
+          "downloadUrl": "https://github.com/containers/skopeo/archive/refs/tags/v1.14.1.tar.gz"
         }
       }
     },
@@ -27896,6 +27896,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "swtpm",
+          "version": "0.8.1",
+          "downloadUrl": "http://github.com/stefanberger/swtpm/archive/d2849a9f5ced70438d67036693438344b47b4161/swtpm-d2849a9.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "SymCrypt",
           "version": "103.0.1",
           "downloadUrl": "https://github.com/microsoft/SymCrypt/archive/v103.0.1.tar.gz"
@@ -28406,9 +28416,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "tpm2-pkcs11",
+          "version": "1.9.0",
+          "downloadUrl": "https://github.com/tpm2-software/tpm2-pkcs11/releases/download/1.9.0/tpm2-pkcs11-1.9.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "tpm2-pytss",
+          "version": "1.2.0",
+          "downloadUrl": "https://github.com/tpm2-software/tpm2-pytss/archive/refs/tags/1.2.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "tpm2-tools",
-          "version": "4.3.2",
-          "downloadUrl": "https://github.com/tpm2-software/tpm2-tools/releases/download/4.3.2/tpm2-tools-4.3.2.tar.gz"
+          "version": "5.5",
+          "downloadUrl": "https://github.com/tpm2-software/tpm2-tools/releases/download/5.5/tpm2-tools-5.5.tar.gz"
         }
       }
     },
@@ -28417,8 +28447,8 @@
         "type": "other",
         "other": {
           "name": "tpm2-tss",
-          "version": "2.4.6",
-          "downloadUrl": "https://github.com/tpm2-software/tpm2-tss/releases/download/2.4.6/tpm2-tss-2.4.6.tar.gz"
+          "version": "4.0.1",
+          "downloadUrl": "https://github.com/tpm2-software/tpm2-tss/releases/download/4.0.1/tpm2-tss-4.0.1.tar.gz"
         }
       }
     },
@@ -28817,8 +28847,8 @@
         "type": "other",
         "other": {
           "name": "usbredir",
-          "version": "0.12.0",
-          "downloadUrl": "https://spice-space.org/download/usbredir/usbredir-0.12.0.tar.xz"
+          "version": "0.13.0",
+          "downloadUrl": "https://spice-space.org/download/usbredir/usbredir-0.13.0.tar.xz"
         }
       }
     },
@@ -29571,6 +29601,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "xdp-tools",
+          "version": "1.4.1",
+          "downloadUrl": "https://github.com/xdp-project/xdp-tools/archive/refs/tags/v1.4.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "xerces-c",
           "version": "3.2.4",
           "downloadUrl": "https://downloads.apache.org/xerces/c/3/sources/xerces-c-3.2.4.tar.xz"
@@ -30270,8 +30310,8 @@
         "type": "other",
         "other": {
           "name": "yaml-cpp",
-          "version": "0.7.0",
-          "downloadUrl": "https://github.com/jbeder/yaml-cpp/archive/yaml-cpp-0.7.0.tar.gz"
+          "version": "0.8.0",
+          "downloadUrl": "https://github.com/jbeder/yaml-cpp/archive/refs/tags/0.8.0.tar.gz"
         }
       }
     },
