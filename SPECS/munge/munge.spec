@@ -1,7 +1,7 @@
 Summary:        Enables uid & gid authentication across a host cluster
 Name:           munge
-Version:        0.5.13
-Release:        9%{?dist}
+Version:        0.5.15
+Release:        1%{?dist}
 # The libs and devel package is GPLv3+ and LGPLv3+ where as the main package is GPLv3 only.
 License:        GPLv3+ AND LGPLv3+
 Vendor:         Microsoft Corporation
@@ -68,9 +68,11 @@ sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 install -p -m 755 create-munge-key %{buildroot}/%{_sbindir}/create-munge-key
 install -p -D -m 644 munge.logrotate %{buildroot}/%{_sysconfdir}/logrotate.d/munge
 
+# Not installed by make
+install -p -D -m 0644 src/etc/munge.tmpfiles.conf  %{buildroot}%{_tmpfilesdir}/%{name}.conf
+
 # rm unneeded files.
 rm %{buildroot}/%{_sysconfdir}/sysconfig/munge
-rm %{buildroot}/%{_initddir}/munge
 
 # Exclude .la files
 rm %{buildroot}/%{_libdir}/libmunge.la
@@ -83,6 +85,7 @@ chmod 700 %{buildroot}%{_sysconfdir}/munge
 # Create and empty key file and pid file to be marked as a ghost file below.
 # i.e it is not actually included in the rpm, only the record
 # of it is.
+mkdir -p  %{buildroot}%{_var}/run/munge/
 touch %{buildroot}%{_var}/run/munge/munged.pid
 mv %{buildroot}%{_var}/run %{buildroot}
 
@@ -110,11 +113,13 @@ exit 0
 %{_bindir}/unmunge
 %{_sbindir}/munged
 %{_sbindir}/create-munge-key
+%{_sbindir}/mungekey
 %{_mandir}/man1/munge.1.gz
 %{_mandir}/man1/remunge.1.gz
 %{_mandir}/man1/unmunge.1.gz
 %{_mandir}/man7/munge.7.gz
 %{_mandir}/man8/munged.8.gz
+%{_mandir}/man8/mungekey.8.gz
 %{_unitdir}/munge.service
 
 %attr(0700,munge,munge) %dir %{_var}/log/munge
@@ -128,7 +133,7 @@ exit 0
 
 %license COPYING COPYING.LESSER
 %doc AUTHORS
-%doc JARGON META NEWS QUICKSTART README
+%doc JARGON NEWS QUICKSTART README
 %doc doc
 
 %files libs
@@ -156,6 +161,9 @@ exit 0
 %{_mandir}/man3/munge_strerror.3.gz
 
 %changelog
+* Wed Jan 31 2024 Mitch Zhu <cblmargh@microsoft.com> - 0.5.15-1
+- Upstream 0.5.15.
+
 * Mon Feb 06 2023 Riken Maharjan <rmaharjan@microsoft.com> - 0.5.13-9
 - Move from Extended to Core.
 - License verified.
