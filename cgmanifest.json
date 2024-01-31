@@ -13763,8 +13763,8 @@
         "type": "other",
         "other": {
           "name": "ndctl",
-          "version": "65",
-          "downloadUrl": "https://github.com/pmem/ndctl/archive/v65.tar.gz"
+          "version": "78",
+          "downloadUrl": "https://github.com/pmem/ndctl/archive/v78.tar.gz"
         }
       }
     },
