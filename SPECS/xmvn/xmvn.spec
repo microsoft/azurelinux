@@ -6,7 +6,7 @@
 
 Summary:        Local Extensions for Apache Maven
 Name:           xmvn
-Version:        4.0.0
+Version:        4.2.0
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -263,6 +263,9 @@ end
 %license LICENSE NOTICE
 
 %changelog
+* Wed Jan 31 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.2.0-1
+- Auto-upgrade to 4.2.0 - Update to 4.2.0
+
 * Mon Mar 27 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 4.2.0-1
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - License verified
