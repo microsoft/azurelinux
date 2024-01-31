@@ -33,7 +33,7 @@ RPM macros for building source packages for Rust projects.
 %package -n cargo-rpm-macros
 Summary:        RPM macros for building projects with cargo
 
-# obsolete + provide rust-packaging (removed in Fedora 38)
+# obsolete + provide rust-packaging
 Obsoletes:      rust-packaging < 24
 Provides:       rust-packaging = %{version}-%{release}
 
