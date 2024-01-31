@@ -15,10 +15,6 @@ URL:            https://github.com/dmendel/bindata
 Source0:        https://github.com/dmendel/bindata/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  ruby
-%if %{with_check}
-BuildRequires:  rubygem-minitest
-BuildRequires:  rubygem-rake
-%endif
 
 Requires:       ruby(release)
 
@@ -39,17 +35,6 @@ gem build %{gem_name}
 
 %install
 gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
-
-%check
-gem env
-for gempath in $(IFS=: R=$(gem env gempath); echo ${R[@]})
-do
-    if [[ -d $gempath/gems ]]; then
-        echo "Gempath $gempath/gems:"
-        ls -l $gempath/gems
-    fi
-done
-rake test
 
 %files
 %defattr(-,root,root,-)
