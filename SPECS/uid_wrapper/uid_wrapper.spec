@@ -58,7 +58,7 @@ make test || cat $(find Testing -name "*.log")
 popd
 
 %files
-%doc AUTHORS README.md ChangeLog
+%doc AUTHORS README.md CHANGELOG
 %license LICENSE
 %{_libdir}/libuid_wrapper.so*
 %dir %{_libdir}/cmake
@@ -71,7 +71,7 @@ popd
 
 %changelog
 * Wed Jan 31 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.3.0-1
-- Auto-upgrade to 1.3.0 - Update to 1.3.0
+- Auto-upgrade to 1.3.0 in Mariner 3.0
 
 * Mon Jul 25 2022 Sumedh Sharma <sumsharma@microsoft.com> - 1.2.9-1
 - Bumping version to 1.2.9.
