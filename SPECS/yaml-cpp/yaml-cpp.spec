@@ -6,7 +6,7 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/jbeder/yaml-cpp
-Source0:        https://github.com/jbeder/yaml-cpp/archive/refs/tags/%{version}.tar.gz
+Source0:        https://github.com/jbeder/yaml-cpp/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  cmake
 BuildRequires:  gcc
 
@@ -30,7 +30,7 @@ Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
 The %{name}-static package contains the static library for %{name}.
 
 %prep
-%autosetup -n %{name}-%{version}
+%autosetup
 
 %build
 rm -rf build_shared && mkdir build_shared
