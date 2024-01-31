@@ -22,11 +22,15 @@ import (
 const (
 	tmpParitionDirName = "tmppartition"
 
-	ImageFormatVpc   = "vpc"
+	// supported input formats
+	ImageFormatVhd   = "vhd"
 	ImageFormatVhdx  = "vhdx"
 	ImageFormatQCow2 = "qcow2"
 	ImageFormatIso   = "iso"
 	ImageFormatRaw   = "raw"
+
+	// qemu-specific formats
+	QemuFormatVpc = "vpc"
 
 	BaseImageName                = "image.raw"
 	PartitionCustomizedImageName = "image2.raw"
@@ -77,7 +81,7 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 	outputImageDir := filepath.Dir(outputImageFile)
 
 	// Validate 'outputImageFormat' value if specified.
-	if outputImageFormat != "" && outputImageFormat != "iso" {
+	if outputImageFormat != "" && outputImageFormat != ImageFormatIso {
 		qemuOutputImageFormat, err = toQemuImageFormat(outputImageFormat)
 		if err != nil {
 			return err
@@ -152,7 +156,7 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 
 	// Create final output image file if requested.
 	switch outputImageFormat {
-	case ImageFormatVpc, ImageFormatVhdx, ImageFormatQCow2, ImageFormatRaw:
+	case ImageFormatVhd, ImageFormatVhdx, ImageFormatQCow2, ImageFormatRaw:
 		logger.Log.Infof("Writing: %s", outputImageFile)
 
 		outDir := filepath.Dir(outputImageFile)
@@ -185,10 +189,10 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 
 func toQemuImageFormat(imageFormat string) (string, error) {
 	switch imageFormat {
-	case "vhd":
-		return ImageFormatVpc, nil
+	case ImageFormatVhd:
+		return QemuFormatVpc, nil
 
-	case "vhdx", "raw", "qcow2":
+	case ImageFormatVhdx, ImageFormatRaw, ImageFormatQCow2:
 		return imageFormat, nil
 
 	default:
