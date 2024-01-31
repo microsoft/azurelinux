@@ -12802,7 +12802,7 @@
         "other": {
           "name": "mdevctl",
           "version": "1.3.0",
-          "downloadUrl": "https://github.com/mdevctl/mdevctl/releases/download/v1.3.0/mdevctl-1.3.0-vendor.tar.gz"
+          "downloadUrl": "https://github.com/mdevctl/mdevctl/archive/refs/tags/v1.3.0.tar.gz"
         }
       }
     },

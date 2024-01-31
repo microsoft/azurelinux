@@ -9,7 +9,7 @@ Summary:        A mediated device management utility for Linux
 
 License:        LGPL-2.1-only
 URL:            https://crates.io/crates/mdevctl
-Source:         https://github.com/mdevctl/mdevctl/releases/download/v%{version}/mdevctl-%{version}-vendor.tar.gz
+Source:         https://github.com/mdevctl/mdevctl/archive/refs/tags/v%{version}.tar.gz#/mdevctl-%{version}.tar.gz
 
 BuildRequires: make systemd python3-docutils
 %if 0%{?rhel}
@@ -63,7 +63,8 @@ vfio-mdev for assignment to virtual machines.
 
 %changelog
 * Fri Jan 19 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 1.3.0-1
-- Initial CBL-Mariner import from Fedora 39.
+- Initial CBL-Mariner import from Fedora 39 (license: MIT).
+- License verified.
 
 * Thu Jan 11 2024 Alex Williamson <alex.williamson@redhat.com> - 1.3.0-1
 - New upstream release: https://github.com/mdevctl/mdevctl/releases/tag/v1.3.0
