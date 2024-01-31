@@ -1,7 +1,7 @@
 Summary:        Basic system utilities
 Name:           coreutils
-Version:        8.32
-Release:        7%{?dist}
+Version:        9.4
+Release:        1%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,12 +10,7 @@ URL:            https://www.gnu.org/software/coreutils
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
 # make this package to own serial console profile since it utilizes stty tool
 Source1:        serial-console.sh
-# The following two patches are sourced from RedHat via Photon
-Patch0:         coreutils-8.32-i18n-1.patch
-Patch1:         coreutils-8.10-uname-1.patch
-Patch2:         skip_test_if_run_as_root.patch
-Patch3:         fix_test_env_signal_handler.patch
-Patch4:         coreutils-fix-get-sys_getdents-aarch64.patch
+Patch0:         coreutils-9.4-i18n-1.patch
 BuildRequires:  libselinux-devel
 BuildRequires:  libselinux-utils
 Requires:       gmp
@@ -40,14 +35,7 @@ Requires:       coreutils >= %{version}
 These are the additional language files of coreutils.
 
 %prep
-%autosetup -N
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%ifarch aarch64
-%patch4 -p1
-%endif
+%autosetup -p1
 
 %build
 autoreconf -fi
@@ -103,6 +91,9 @@ LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8 make -k check
 %defattr(-,root,root)
 
 %changelog
+* Fri Jan 26 2024 Andrew Phelps <anphel@microsoft.com> - 9.4-1
+- Upgrade to version 9.4
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 8.32-7
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
