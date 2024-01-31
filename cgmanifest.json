@@ -8441,8 +8441,8 @@
         "type": "other",
         "other": {
           "name": "ldns",
-          "version": "1.7.0",
-          "downloadUrl": "http://www.nlnetlabs.nl/downloads/ldns/ldns-1.7.0.tar.gz"
+          "version": "1.8.3",
+          "downloadUrl": "http://www.nlnetlabs.nl/downloads/ldns/ldns-1.8.3.tar.gz"
         }
       }
     },
@@ -11651,8 +11651,8 @@
         "type": "other",
         "other": {
           "name": "libXi",
-          "version": "1.7.10",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXi-1.7.10.tar.bz2"
+          "version": "1.8.1",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXi-1.8.1.tar.gz"
         }
       }
     },
@@ -14303,8 +14303,8 @@
         "type": "other",
         "other": {
           "name": "nvml",
-          "version": "1.8",
-          "downloadUrl": "https://github.com/pmem/pmdk/releases/download/1.8/pmdk-1.8.tar.gz"
+          "version": "2.0.1",
+          "downloadUrl": "https://github.com/pmem/pmdk/releases/download/2.0.1/pmdk-2.0.1.tar.gz"
         }
       }
     },
@@ -20874,8 +20874,8 @@
         "type": "other",
         "other": {
           "name": "plexus-cipher",
-          "version": "1.7",
-          "downloadUrl": "https://github.com/codehaus-plexus/plexus-cipher/archive/plexus-cipher-1.7/plexus-cipher-1.7.tar.gz"
+          "version": "2.0",
+          "downloadUrl": "https://github.com/codehaus-plexus/plexus-cipher/archive/plexus-cipher-2.0/plexus-cipher-2.0.tar.gz"
         }
       }
     },
@@ -28817,8 +28817,8 @@
         "type": "other",
         "other": {
           "name": "usbredir",
-          "version": "0.12.0",
-          "downloadUrl": "https://spice-space.org/download/usbredir/usbredir-0.12.0.tar.xz"
+          "version": "0.13.0",
+          "downloadUrl": "https://spice-space.org/download/usbredir/usbredir-0.13.0.tar.xz"
         }
       }
     },
@@ -29564,6 +29564,16 @@
           "name": "xdg-utils",
           "version": "1.1.3",
           "downloadUrl": "https://people.freedesktop.org/~rdieter/xdg-utils/xdg-utils-1.1.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "xdp-tools",
+          "version": "1.4.1",
+          "downloadUrl": "https://github.com/xdp-project/xdp-tools/archive/refs/tags/v1.4.1.tar.gz"
         }
       }
     },
