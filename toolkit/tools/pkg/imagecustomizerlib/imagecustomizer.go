@@ -22,6 +22,12 @@ import (
 const (
 	tmpParitionDirName = "tmppartition"
 
+	ImageFormatVpc   = "vpc"
+	ImageFormatVhdx  = "vhdx"
+	ImageFormatQCow2 = "qcow2"
+	ImageFormatIso   = "iso"
+	ImageFormatRaw   = "raw"
+
 	BaseImageName                = "image.raw"
 	PartitionCustomizedImageName = "image2.raw"
 )
@@ -135,7 +141,8 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 	}
 
 	// Create final output image file if requested.
-	if outputImageFormat != "" && outputImageFormat != "iso" {
+	switch outputImageFormat {
+	case ImageFormatVpc, ImageFormatVhdx, ImageFormatQCow2, ImageFormatRaw:
 		logger.Log.Infof("Writing: %s", outputImageFile)
 
 		outDir := filepath.Dir(outputImageFile)
@@ -145,10 +152,7 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 		if err != nil {
 			return fmt.Errorf("failed to convert image file to format: %s:\n%w", outputImageFormat, err)
 		}
-
-	} else if outputImageFormat == "iso" {
-		logger.Log.Infof("Creating a liveos iso from the customized image...")
-
+	case ImageFormatIso:
 		err = createLiveOSIsoImage(buildDir, rawImageFile, outputImageDir, outputImageBase)
 		if err != nil {
 			return err
@@ -172,7 +176,7 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 func toQemuImageFormat(imageFormat string) (string, error) {
 	switch imageFormat {
 	case "vhd":
-		return "vpc", nil
+		return ImageFormatVpc, nil
 
 	case "vhdx", "raw", "qcow2":
 		return imageFormat, nil
@@ -463,30 +467,6 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 	}
 
 	err = bootPartitionMount.CleanClose()
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func createLiveOSIsoImage(buildDir, rawImageFile, outputImageDir, outputImageBase string) error {
-
-	b := &LiveOSIsoBuilder{
-		workingDirs: IsoWorkingDirs{
-			isoBuildDir: filepath.Join(buildDir, "tmp"),
-			// IsoMaker needs its own folder to work in (it starts by deleting and re-creating it).
-			isomakerBuildDir: filepath.Join(buildDir, "isomaker-tmp"),
-			outDir:           filepath.Join(buildDir, "out"),
-		},
-	}
-
-	err := b.prepareArtifactsFromFullImage(rawImageFile)
-	if err != nil {
-		return err
-	}
-
-	err = b.createIsoImage(outputImageDir, outputImageBase)
 	if err != nil {
 		return err
 	}
