@@ -10131,8 +10131,8 @@
         "type": "other",
         "other": {
           "name": "libnetfilter_conntrack",
-          "version": "1.0.8",
-          "downloadUrl": "http://www.netfilter.org/projects/libnetfilter_conntrack/files/libnetfilter_conntrack-1.0.8.tar.bz2"
+          "version": "1.0.9",
+          "downloadUrl": "http://www.netfilter.org/projects/libnetfilter_conntrack/files/libnetfilter_conntrack-1.0.9.tar.bz2"
         }
       }
     },
