@@ -44,7 +44,7 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %changelog
 * Tue Jan 30 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.15-1
 - Auto-upgrade to 2.4.15 - Azure Linux 3.0 - package upgrades.
-- Re-introduced the debuginfo package.
+- Removed outdated patch.
 
 * Mon Jun 13 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.4.10-1
 - License verified
