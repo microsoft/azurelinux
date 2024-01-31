@@ -25,14 +25,11 @@ BuildRequires:  sudo
 Requires:       coreutils
 Requires:       diffutils
 
-Requires(post): coreutils
-Requires(post): grep
-Requires(post): systemd
-
+Requires(post): grep, coreutils, systemd
 Requires(postun): sed
-Requires(rpmlib): rpmlib(CompressedFileNames) <= 3.0.4-1
-Requires(preun): /bin/sh
-Requires(verify): /bin/sh
+
+Provides: /bin/ksh
+Provides: /bin/rksh
 
 %description
 KSH-93 is the most recent version of the KornShell by David Korn of
@@ -76,12 +73,12 @@ touch %{buildroot}%{_bindir}/rksh
 touch %{buildroot}%{_mandir}/man1/rksh.1.gz
 
 %check
-# We run more tests as non-root user
-chmod g+w . -R
-useradd test -G root -m
-
-# Disabling tests as they tend to freez and the package is low-pri at the moment.
-false && sudo -u test ./bin/shtests --compile
+# disable pty tests as they tend to freeze
+shopt -s globstar; shopt -s nullglob; for test in bin/tests/**/*.sh; do
+  if [[ $test != *"pty.sh" ]]; then
+    $test || exit 1;
+  fi;
+done
 
 %post
 for s in /bin/ksh /bin/rksh %{_bindir}/ksh %{_bindir}/rksh
@@ -153,6 +150,7 @@ fi
 %changelog
 * Tue Jan 23 2024 Betty Lakes <bettylakes@microsoft.com> - 1.0.8-1
 - Version upgrade to 1.0.8
+- Disabled pty tests
 
 * Tue Nov 14 2023 Andrew Phelps <anphel@microsoft.com> - 1.0.0~beta.1-5
 - Modify ksh-1.0.0-beta.1-fix-build.patch-fix-build.patch with proper "-lm" location for updated toolchain
