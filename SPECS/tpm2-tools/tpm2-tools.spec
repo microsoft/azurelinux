@@ -38,6 +38,26 @@ sed -i "/compatibility/a extern int BN_bn2binpad(const BIGNUM *a, unsigned char 
 
 %if 0%{?with_check}
 %check
+# Check for presence of tpm2
+if ! ls %{buildroot}/%{_bindir}/tpm2 | wc -l | grep "^1$"; then
+   echo "expected to find 1 tpm2 in %{buildroot}/%{_bindir}"
+   exit 1
+fi
+# Check for presence of tpm2_* ... note `101` may change in future versions
+if ! ls %{buildroot}/%{_bindir}/tpm2_* | wc -l | grep "^101$"; then
+   echo "expected to find 101 tpm2_* files in %{buildroot}/%{_bindir}"
+   exit 1
+fi
+# Check for presence of tpm2_startup
+if [ ! -f %{buildroot}/%{_bindir}/tpm2_startup ];then
+   echo "tmp2_startup not found"
+   exit 1
+fi
+# Check for presence of tpm2_pcrread
+if [ ! -f %{buildroot}/%{_bindir}/tpm2_pcrread ];then
+   echo "tpm2_pcrread not found"
+   exit 1
+fi
 if [ ! -f /dev/tpm0 ];then
    mkdir /tmp/swtpm
    swtpm_setup --tpm-state /tmp/swtpm --tpm2
