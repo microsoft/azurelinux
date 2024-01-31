@@ -237,10 +237,10 @@ ca-certificates-base-3.0.0-3.azl3.noarch.rpm
 ca-certificates-3.0.0-3.azl3.noarch.rpm
 dwz-0.14-2.azl3.x86_64.rpm
 unzip-6.0-20.azl3.x86_64.rpm
-python3-3.9.14-8.azl3.x86_64.rpm
-python3-devel-3.9.14-8.azl3.x86_64.rpm
-python3-libs-3.9.14-8.azl3.x86_64.rpm
-python3-setuptools-3.9.14-8.azl3.noarch.rpm
+python3-3.12.0-1.azl3.x86_64.rpm
+python3-devel-3.12.0-1.azl3.x86_64.rpm
+python3-libs-3.12.0-1.azl3.x86_64.rpm
+python3-setuptools-3.12.0-1.azl3.noarch.rpm
 python3-pygments-2.5.2-1.azl3.noarch.rpm
 which-2.21-8.azl3.x86_64.rpm
 libselinux-3.5-1.azl3.x86_64.rpm
