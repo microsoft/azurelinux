@@ -141,9 +141,7 @@ func (b *LiveOSIsoBuilder) populateWriteableRootfsDir(rootfsDevicePath, rootfsTy
 		return fmt.Errorf("failed to create folder %s:\n%w", writeableRootfsDir, err)
 	}
 
-	logger.Log.Debugf("Copying from %s to %s", sourceMountDir, writeableRootfsDir)
-	cpParams := []string{"-aT", sourceMountDir, writeableRootfsDir}
-	err = shell.ExecuteLive(false, "cp", cpParams...)
+	err = copyPartitionFiles(sourceMountDir+"/.", writeableRootfsDir)
 	if err != nil {
 		return fmt.Errorf("failed to copy rootfs contents to a writeable folder (%s):\n%w", writeableRootfsDir, err)
 	}
