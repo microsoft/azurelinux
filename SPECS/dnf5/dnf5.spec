@@ -105,7 +105,7 @@ BuildRequires:  pkgconfig(libsolv) >= %{libsolv_version}
 BuildRequires:  pkgconfig(libsolvext) >= %{libsolv_version}
 BuildRequires:  pkgconfig(rpm) >= 4.17.0
 BuildRequires:  pkgconfig(sqlite3) >= %{sqlite_version}
-BuildRequires:  toml11-static
+BuildRequires:  toml11-devel
 
 %if %{with clang}
 BuildRequires:  clang
@@ -151,7 +151,7 @@ BuildRequires:  pkgconfig(smartcols)
 %endif
 
 %if %{with dnf5_plugins}
-BuildRequires:  libcurl-devel >= 7.62.0
+BuildRequires:  curl-devel >= 7.62.0
 %endif
 
 %if %{with dnf5daemon_server}
@@ -616,7 +616,7 @@ Package management service with a DBus interface.
 Summary:        Plugins for dnf5
 License:        LGPL-2.1-or-later
 Requires:       dnf5%{?_isa} = %{version}-%{release}
-Requires:       libcurl%{?_isa} >= 7.62.0
+Requires:       curl-libs%{?_isa} >= 7.62.0
 Requires:       libdnf5-cli%{?_isa} = %{version}-%{release}
 Provides:       dnf5-command(builddep)
 Provides:       dnf5-command(changelog)
@@ -728,6 +728,7 @@ done
 * Wed Jan 31 2024 Sam Meluch <sammeluch@microsoft.com> - 5.1.11-1
 - Update to version 5.1.11
 - Merge spec from upstream dnf5 repo
+- Update dependency lists for Azure Linux provided packages
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.0.14-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
