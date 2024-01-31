@@ -15,11 +15,11 @@ BuildRequires:  libxml2-devel
 BuildRequires:  openldap
 BuildRequires:  openssl-devel
 BuildRequires:  perl
+BuildRequires:  pkgconfig(icu-i18n)
+BuildRequires:  pkgconfig(icu-uc)
 BuildRequires:  readline-devel
 BuildRequires:  tzdata
 BuildRequires:  zlib-devel
-BuildRequires:  pkgconfig(icu-i18n)
-BuildRequires:  pkgconfig(icu-uc)
 
 %if %{with_check}
 BuildRequires:  sudo
