@@ -10,7 +10,7 @@
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-signed-%{buildarch}
 Version:        6.6.12.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -69,8 +69,10 @@ Source0:        kernel-%{version}-%{release}.%{buildarch}.rpm
 Source1:        vmlinuz-%{uname_r}
 Source2:        sha512hmac-openssl.sh
 BuildRequires:  cpio
+BuildRequires:  grub2-rpm-macros
 BuildRequires:  openssl
 BuildRequires:  sed
+%{?grub2_configuration_requires}
 
 %description
 This package contains the Linux kernel package with kernel signed with the production key
@@ -121,19 +123,11 @@ rm -rf /boot/initrd.img-%{uname_r}
 echo "initrd of kernel %{uname_r} removed" >&2
 
 %postun -n kernel
-if [ ! -e /boot/mariner.cfg ]
-then
-     ls /boot/linux-*.cfg 1> /dev/null 2>&1
-     if [ $? -eq 0 ]
-     then
-          list=`ls -tu /boot/linux-*.cfg | head -n1`
-          test -n "$list" && ln -sf "$list" /boot/mariner.cfg
-     fi
-fi
+%grub2_postun
 
 %post -n kernel
 /sbin/depmod -a %{uname_r}
-ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
+%grub2_post
 
 %files -n kernel
 %defattr(-,root,root)
@@ -142,7 +136,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 /boot/config-%{uname_r}
 /boot/vmlinuz-%{uname_r}
 /boot/.vmlinuz-%{uname_r}.hmac
-%config(noreplace) /boot/linux-%{uname_r}.cfg
+%config(noreplace) %{_sysconfdir}/default/grub.d/10_kernel.cfg
 %config %{_localstatedir}/lib/initramfs/kernel/%{uname_r}
 %defattr(0644,root,root)
 /lib/modules/%{uname_r}/*
@@ -153,6 +147,10 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %exclude /module_info.ld
 
 %changelog
+* Tue Jan 30 2024 Cameron Baird <cameronbaird@microsoft.com> - 6.6.12.1-3
+- Remove legacy /boot/mariner.cfg
+- Introduce /etc/default/grub.d/10_kernel.cfg
+
 * Sat Jan 27 11:11:08 EST 2024 Dan Streetman <ddstreet@ieee.org> - 6.6.12.1-2
 - update to match kernel version
 
