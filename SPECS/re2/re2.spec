@@ -1,21 +1,15 @@
-%global longver 2019-08-01
+%global longver 2024-02-01
 %global shortver %(echo %{longver}|sed 's|-||g')
+
 Summary:        C++ fast alternative to backtracking RE engines
 Name:           re2
 Version:        %{shortver}
-Release:        10%{?dist}
-License:        BSD
+Release:        1%{?dist}
+License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/google/%{name}/
-Source0:        https://github.com/google/%{name}/archive/%{longver}.tar.gz#/%{name}-%{longver}.tar.gz
-# downstream patch to change soname .0 => .0a
-# This is in response to symbol changes in recent release per
-# https://bugzilla.redhat.com/show_bug.cgi?id=1672014#c10
-# TODO: poke upstream on their policy/intentions regarding maintaining
-# stable ABI, or at least get them to bump soname appropriately so we
-# won't have to handle it ourselves downsream via this patch indefinitely.
-Patch1:         re2-soname.patch
+Source0:        https://github.com/google/%{name}/archive/refs/tags/%{longver}.tar.gz#/%{name}-%{longver}.tar.gz
 BuildRequires:  gcc
 BuildRequires:  make
 
@@ -43,8 +37,6 @@ you will need to install %{name}-devel.
 
 %prep
 %setup -q -n %{name}-%{longver}
-
-%patch1 -p1 -b .soname
 
 %build
 # The -pthread flag issue has been submitted upstream:
@@ -86,6 +78,11 @@ rm -fv %{buildroot}%{_libdir}/libre2.a
 %{_libdir}/pkgconfig/re2.pc
 
 %changelog
+* Wed Jan 31 2024 Jon Slobodzian <joslobo@microsoft.com> - 20240201-1
+- Upgrading for Mariner 3.0
+- Removed unnecessary patch file
+- Updated License to SPDX compliant style
+ 
 * Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 20190801-10
 - Fixing source URL.
 
