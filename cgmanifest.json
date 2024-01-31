@@ -24763,6 +24763,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-zstd",
+          "version": "1.5.5.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/z/zstd/zstd-1.5.5.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python3",
           "version": "3.12.0",
           "downloadUrl": "https://www.python.org/ftp/python/3.12.0/Python-3.12.0.tar.xz"
