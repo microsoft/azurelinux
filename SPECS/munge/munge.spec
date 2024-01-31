@@ -1,7 +1,7 @@
 Summary:        Enables uid & gid authentication across a host cluster
 Name:           munge
-Version:        0.5.13
-Release:        9%{?dist}
+Version:        0.5.15
+Release:        1%{?dist}
 # The libs and devel package is GPLv3+ and LGPLv3+ where as the main package is GPLv3 only.
 License:        GPLv3+ AND LGPLv3+
 Vendor:         Microsoft Corporation
@@ -156,6 +156,9 @@ exit 0
 %{_mandir}/man3/munge_strerror.3.gz
 
 %changelog
+* Wed Jan 31 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.5.15-1
+- Auto-upgrade to 0.5.15 - none
+
 * Mon Feb 06 2023 Riken Maharjan <rmaharjan@microsoft.com> - 0.5.13-9
 - Move from Extended to Core.
 - License verified.

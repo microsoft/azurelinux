@@ -1,7 +1,7 @@
 {
- "Signatures": {
-  "create-munge-key": "faf294f275027c9165524daa17e862ae7e28cb32aed5f9c452d9bd37065ccebe",
-  "munge-0.5.13.tar.xz": "99753dfd06a4f063c36f3fb0eb1964f394feb649937d94c4734d85b7964144da",
-  "munge.logrotate": "f8443edd07c98e0e3c9178c93a0a35e1c690cf3b6fbdb33508b34871657a9879"
- }
+  "Signatures": {
+    "create-munge-key": "faf294f275027c9165524daa17e862ae7e28cb32aed5f9c452d9bd37065ccebe",
+    "munge.logrotate": "f8443edd07c98e0e3c9178c93a0a35e1c690cf3b6fbdb33508b34871657a9879",
+    "munge-0.5.15.tar.xz": "3f979df117a34c74db8fe2835521044bdeb08e3b7d0f168ca97c3547f51da9ba"
+  }
 }
