@@ -25655,8 +25655,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-console",
-          "version": "1.10.1",
-          "downloadUrl": "https://github.com/socketry/console/archive/refs/tags/v1.10.1.tar.gz"
+          "version": "1.23.3",
+          "downloadUrl": "https://github.com/socketry/console/archive/refs/tags/v1.23.3.tar.gz"
         }
       }
     },
