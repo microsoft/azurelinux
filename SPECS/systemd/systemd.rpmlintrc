@@ -1,0 +1,50 @@
+# Just kill all warnings about README being wrong in every possible way
+addFilter(r'README')
+
+addFilter(r'missing-call-to-(chdir-with-chroot|setgroups-before-setuid)')
+
+addFilter(r'executable-marked-as-config-file /etc/X11/xinit/xinitrc.d/50-systemd-user.sh')
+
+addFilter(r'non-readable /etc/crypttab')
+
+addFilter(r'non-conffile-in-etc /etc/inittab')
+
+addFilter(r'systemd-unit-in-etc /etc/systemd/.*\.wants')
+
+addFilter(r'dangling-relative-symlink /usr/lib/environment.d/99-environment.conf ../../../etc/environment')
+
+addFilter(r'devel-file-in-non-devel-package /usr/share/pkgconfig/(systemd|udev).pc')
+
+addFilter(r'non-standard-dir-perm /var/cache/private 700')
+
+addFilter(r'non-root-group-log-file /var/log/btmp utmp')
+
+addFilter(r'non-standard-dir-perm /var/log/private 700')
+
+addFilter(r'non-root-group-log-file /var/log/wtmp utmp')
+
+addFilter(r'dangerous-command-in-')
+
+addFilter(r'summary-not-capitalized C systemd')
+
+addFilter(r'obsolete-not-provided')
+
+addFilter(r'postin-without-ldconfig')
+
+addFilter(r'systemd-rpm-macros.noarch: W: only-non-binary-in-usr-lib')
+
+addFilter(r'systemd-rpm-macros.noarch: W: no-documentation')
+
+addFilter(r'systemd-tests\..*: W: no-documentation')
+
+addFilter(r'systemd-tests.*: E: zero-length /usr/lib/systemd/tests/testdata/test-umount/empty.mountinfo')
+
+addFilter(r'hardcoded-library-path in.*(firewalld|install.d|lib/systemd)')
+
+# everybody does it this way: systemd, syslog-ng, rsyslog
+addFilter(r'unversioned-explicit-provides syslog')
+
+# systemd-machine-id-setup requires libssl
+addFilter(r'explicit-lib-dependency openssl-libs')
+
+addFilter(r'systemd.src:.*strange-permission')
