@@ -347,21 +347,21 @@ func printSummary(failedSRPMs, failedSRPMsTests map[string]*BuildResult, prebuil
 	logger.Log.Infof(color.GreenString(summaryLine("Number of skipped SRPMs tests:", len(skippedSRPMsTests))))
 	logger.Log.Infof(color.GreenString(summaryLine("Number of built SRPMs:", len(builtSRPMs))))
 	logger.Log.Infof(color.GreenString(summaryLine("Number of tested SRPMs:", len(testedSRPMs))))
-	printErrorInfoByCondition(len(unresolvedDependencies)>0, "%s", summaryLine("Number of unresolved dependencies:", len(unresolvedDependencies)))
-	printErrorInfoByCondition(len(blockedSRPMs)>0, "%s", summaryLine("Number of blocked SRPMs:", len(blockedSRPMs)))
-	printErrorInfoByCondition(len(blockedSRPMsTests)>0, "%s", summaryLine("Number of blocked SRPMs tests:", len(blockedSRPMsTests)))
-	printErrorInfoByCondition(len(failedSRPMs)>0, "%s", summaryLine("Number of failed SRPMs:", len(failedSRPMs)))
-	printErrorInfoByCondition(len(failedSRPMsTests)>0, "%s", summaryLine("Number of failed SRPMs tests:", len(failedSRPMsTests)))
+	printErrorInfoByCondition(len(unresolvedDependencies)>0, summaryLine("Number of unresolved dependencies:", len(unresolvedDependencies)))
+	printErrorInfoByCondition(len(blockedSRPMs)>0, summaryLine("Number of blocked SRPMs:", len(blockedSRPMs)))
+	printErrorInfoByCondition(len(blockedSRPMsTests)>0, summaryLine("Number of blocked SRPMs tests:", len(blockedSRPMsTests)))
+	printErrorInfoByCondition(len(failedSRPMs)>0, summaryLine("Number of failed SRPMs:", len(failedSRPMs)))
+	printErrorInfoByCondition(len(failedSRPMsTests)>0, summaryLine("Number of failed SRPMs tests:", len(failedSRPMsTests)))
 	if allowToolchainRebuilds && (len(rpmConflicts) > 0 || len(srpmConflicts) > 0) {
 		logger.Log.Infof("Toolchain RPMs conflicts are ignored since ALLOW_TOOLCHAIN_REBUILDS=y")
 	}
 
-	printErrorInfoByCondition(!allowToolchainRebuilds && len(rpmConflicts)>0, "%s", summaryLine("Number of toolchain RPM conflicts:", len(rpmConflicts)))
-	printErrorInfoByCondition(!allowToolchainRebuilds && len(srpmConflicts)>0, "%s", summaryLine("Number of toolchain SRPM conflicts:", len(srpmConflicts)))
+	printErrorInfoByCondition(!allowToolchainRebuilds && len(rpmConflicts)>0, summaryLine("Number of toolchain RPM conflicts:", len(rpmConflicts)))
+	printErrorInfoByCondition(!allowToolchainRebuilds && len(srpmConflicts)>0, summaryLine("Number of toolchain SRPM conflicts:", len(srpmConflicts)))
 }
 
 // Helper function to print error or info based on condition.
-func printErrorInfoByCondition(condition bool, format string, arg ...interface{}) {
+func printErrorInfoByCondition(condition bool, format string, arg ...any) {
 	if condition {
 		logger.Log.Errorf(color.RedString(format, arg...))
 	} else {
