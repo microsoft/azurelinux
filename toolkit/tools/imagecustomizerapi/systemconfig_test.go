@@ -56,7 +56,7 @@ func TestSystemConfigIsValidKernelCommandLineInvalidChars(t *testing.T) {
 
 func TestSystemConfigValidVerity(t *testing.T) {
 	validVerity := SystemConfig{
-		Verity: Verity{
+		Verity: &Verity{
 			DataPartition: VerityPartition{
 				IdType: "PartUuid",
 				Id:     "0f2884c0-8fe0-4a19-87bf-286b7fe9d6f2",
@@ -74,7 +74,7 @@ func TestSystemConfigValidVerity(t *testing.T) {
 
 func TestSystemConfigInValidVerity(t *testing.T) {
 	invalidVerity := SystemConfig{
-		Verity: Verity{
+		Verity: &Verity{
 			DataPartition: VerityPartition{
 				IdType: "PartUuid",
 				Id:     "incorrect-uuid-format",
