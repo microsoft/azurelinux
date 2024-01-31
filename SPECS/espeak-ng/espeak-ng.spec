@@ -1,16 +1,17 @@
 Summary:        Compact text-to-speech synthesizer
 Name:           espeak-ng
-Version:        1.50
-Release:        3%{?dist}
+Version:        1.51.1
+Release:        1%{?dist}
 # Apache2 license applies only to Android APK code- does not apply here
 # BSD license applies only to Windows code- does not apply here
-License:        GPLv3 AND Unicode
+License:        GPL-3.0-only AND GPL-3.0-or-later AND Unicode-DFS-2016 AND CC-BY-SA-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/espeak-ng/espeak-ng
-Source0:        https://github.com/%{name}/%{name}/releases/download/%{version}/%{name}-%{version}.tgz
-Patch0:         tests-fix-greek-letter-variants.patch
-Patch1:         tests-newline-fixes.patch
+Source0:        https://github.com/%{name}/%{name}/archive/%{version}/%{name}-%{version}.tgz
+# Backported from:
+# https://github.com/espeak-ng/espeak-ng/commit/58f1e0b6a4e6aa55621c6f01118994d01fd6f68c
+Patch0:         espeak-ng-1.51-CVE-2023-49990-4.patch
 BuildRequires:  alsa-lib-devel
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -32,54 +33,71 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 %description devel
 Libraries and header files for %{name}
 
+%package vim
+Summary:        Vim syntax highlighting for espeak-ng data files
+BuildArch:      noarch
+Requires:       %{name} = %{version}-%{release}
+
+%description vim
+%{summary}.
+
 %prep
-%autosetup -n %{name} -p1
+%autosetup -p1
+# Remove unused files to make sure we've got the License tag right
+rm -rf src/include/compat/endian.h src/compat/getopt.c android/
 
 %build
 ./autogen.sh
 %configure --without-sonic
-# Don't use -j here: messes with data compilation
-make
+%make_build src/espeak-ng src/speak-ng
+%make_build
 
 %install
-make DESTDIR=%{buildroot} install
-find %{buildroot} -type f -name "*.la" -delete -print
-ln -s libespeak-ng.so %{buildroot}%{_libdir}/libespeak.so
-rm %{buildroot}%{_libdir}/libespeak.la
-
-# Rename problematic file with space in name
-# This file does not work well with our GNU Make build system when placed in the ISO initrd
-# GNU Make hacks to allow spaces in filenames are hacky and likely to make things worse
-# Sample error: "make[1]: *** No rule to make target 'serious', needed by 'image'. Stop."
-mv "%{buildroot}%{_datadir}/espeak-ng-data/voices/!v/Mr serious" "%{buildroot}%{_datadir}/espeak-ng-data/voices/!v/Mr_serious"
+%make_install
+rm -vf %{buildroot}%{_libdir}/libespeak-ng-test.so*
+rm -vf %{buildroot}%{_libdir}/*.{a,la}
+# Remove files conflicting with espeak
+rm -vf %{buildroot}%{_bindir}/{speak,espeak}
+rm -vrf %{buildroot}%{_includedir}/espeak
+# Move Vim files
+mv %{buildroot}%{_datadir}/vim/addons %{buildroot}%{_datadir}/vim/vimfiles
+rm -vrf %{buildroot}%{_datadir}/vim/registry
 
 %check
-make check
+%make_build check
 
 %post	-p /sbin/ldconfig
 %postun	-p /sbin/ldconfig
 
 %files
-%defattr(-,root,root)
 %license COPYING
-%doc AUTHORS CHANGELOG.md README.md
-%{_bindir}/*
+%license COPYING.APACHE
+%license COPYING.BSD2
+%license COPYING.UCD
+%doc README.md
+%doc CHANGELOG.md
+%{_bindir}/speak-ng
+%{_bindir}/espeak-ng
+%{_libdir}/libespeak-ng.so.1
+%{_libdir}/libespeak-ng.so.1.*
 %{_datadir}/espeak-ng-data
-%{_datadir}/vim/addons/ftdetect/espeakfiletype.vim
-%{_datadir}/vim/addons/syntax/espeaklist.vim
-%{_datadir}/vim/addons/syntax/espeakrules.vim
-%{_datadir}/vim/registry/espeak.yaml
-%{_libdir}/libespeak-ng.so.*
 
 %files devel
-%defattr(-,root,root)
-%{_includedir}/espeak
+%{_libdir}/pkgconfig/espeak-ng.pc
+%{_libdir}/libespeak-ng.so
 %{_includedir}/espeak-ng
-%{_libdir}/pkgconfig/*.pc
-%{_libdir}/*.a
-%{_libdir}/*.so
+
+%files vim
+%{_datadir}/vim/vimfiles/ftdetect/espeakfiletype.vim
+%{_datadir}/vim/vimfiles/syntax/espeaklist.vim
+%{_datadir}/vim/vimfiles/syntax/espeakrules.vim
 
 %changelog
+* Wed Jan 31 2024 Sumedh Sharma <sumsharma@microsoft.com> - 1.51.1-1
+- Bump package version to 1.51.1
+- move vim specific builds to sub-package 'vim'
+- remove unneeded patch files
+
 * Mon May 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.50-3
 - Rename "Mr serious" voice to "Mr_serious"
 
