@@ -8,7 +8,7 @@ License:        GPL-3.0-only AND GPL-3.0-or-later AND Unicode-DFS-2016 AND CC-BY
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/espeak-ng/espeak-ng
-Source0:        https://github.com/%{name}/%{name}/archive/%{version}/%{name}-%{version}.tgz
+Source0:        https://github.com/%{name}/%{name}/archive/%{version}/%{name}-%{version}.tgz#/%{name}-%{version}.tgz
 # Backported from:
 # https://github.com/espeak-ng/espeak-ng/commit/58f1e0b6a4e6aa55621c6f01118994d01fd6f68c
 Patch0:         espeak-ng-1.51-CVE-2023-49990-4.patch
