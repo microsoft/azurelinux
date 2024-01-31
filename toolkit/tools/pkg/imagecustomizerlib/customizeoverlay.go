@@ -14,25 +14,25 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 )
 
-func enableOverlayFS(overlays *[]imagecustomizerapi.OverlayFS, imageChroot *safechroot.Chroot) error {
+func enableOverlay(overlays *[]imagecustomizerapi.Overlay, imageChroot *safechroot.Chroot) error {
 	var err error
 
 	if overlays == nil {
 		return nil
 	}
 
-	// Integrate overlayfs dracut module and overlay driver into initramfs img.
+	// Integrate overlay dracut module and overlay driver into initramfs img.
 	// Integrate systemd veritysetup dracut module into initramfs img.
-	overlayfsDracutModule := "overlayfs"
+	overlayDracutModule := "overlay"
 	overlayDracutDriver := "overlay"
-	err = buildDracutModule(overlayfsDracutModule, overlayDracutDriver, imageChroot)
+	err = buildDracutModule(overlayDracutModule, overlayDracutDriver, imageChroot)
 	if err != nil {
 		return err
 	}
 
 	// Dereference the pointer to get the slice
-	overlayFSConfigs := *overlays
-	err = updateGrubConfigForOverlayFS(imageChroot, overlayFSConfigs)
+	overlaysDereference := *overlays
+	err = updateGrubConfigForOverlay(imageChroot, overlaysDereference)
 	if err != nil {
 		return err
 	}
@@ -40,27 +40,30 @@ func enableOverlayFS(overlays *[]imagecustomizerapi.OverlayFS, imageChroot *safe
 	return nil
 }
 
-func updateGrubConfigForOverlayFS(imageChroot *safechroot.Chroot, overlays []imagecustomizerapi.OverlayFS) error {
+func updateGrubConfigForOverlay(imageChroot *safechroot.Chroot, overlays []imagecustomizerapi.Overlay) error {
 	var err error
-	var newArgsParts []string
+	var overlayConfigs []string
 
-	// Iterate over each OverlayFS configuration
+	// Iterate over each Overlay configuration
 	for _, overlay := range overlays {
-		formattedPersistentPartition, err := systemdFormatPartitionId(overlay.PersistentPartition.IdType, overlay.PersistentPartition.Id)
+		formattedPartition, err := systemdFormatPartitionId(overlay.Partition.IdType, overlay.Partition.Id)
 		if err != nil {
 			return err
 		}
 
-		// Construct cmdline arguments for each OverlayFS
-		newArg := fmt.Sprintf(
-			"rd.overlays=%s,%s,%s rd.overlayfs_persistent_volume=%s",
-			overlay.LowerDir, overlay.UpperDir, overlay.WorkDir, formattedPersistentPartition,
+		// Construct the argument for each Overlay
+		overlayConfig := fmt.Sprintf(
+			"%s,%s,%s,%s",
+			overlay.LowerDir, overlay.UpperDir, overlay.WorkDir, formattedPartition,
 		)
-		newArgsParts = append(newArgsParts, newArg)
+		overlayConfigs = append(overlayConfigs, overlayConfig)
 	}
 
-	// Concatenate all cmdline arguments
-	newArgs := strings.Join(newArgsParts, " ")
+	// Concatenate all overlay configurations with spaces
+	concatenatedOverlays := strings.Join(overlayConfigs, " ")
+
+	// Construct the final cmdline argument
+	newArgs := fmt.Sprintf("rd.overlays=%s", concatenatedOverlays)
 
 	grubCfgPath := filepath.Join(imageChroot.RootDir(), "boot/grub2/grub.cfg")
 	lines, err := file.ReadLines(grubCfgPath)
@@ -78,7 +81,7 @@ func updateGrubConfigForOverlayFS(imageChroot *safechroot.Chroot, overlays []ima
 		if linuxLineRegex.MatchString(trimmedLine) {
 			// Replace existing arguments for overlays.
 			overlayRegexPattern := `rd.overlays=[^ ]*` +
-				`( rd.overlayfs_persistent_volume=[^ ]*)?`
+				`( rd.overlay_persistent_volume=[^ ]*)?`
 			overlayRegex, err := regexp.Compile(overlayRegexPattern)
 			if err != nil {
 				return fmt.Errorf("failed to compile overlay regex: %v", err)

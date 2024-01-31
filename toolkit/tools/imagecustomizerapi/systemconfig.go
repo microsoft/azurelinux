@@ -107,12 +107,28 @@ func (s *SystemConfig) IsValid() error {
 		}
 	}
 
-	if s.OverlayFS != nil {
-		for i, overlayFS := range *s.OverlayFS {
-			err = overlayFS.IsValid()
+	if s.Overlays != nil {
+		upperDirs := make(map[string]bool)
+		workDirs := make(map[string]bool)
+
+		for i, overlay := range *s.Overlays {
+			// Validate the overlay itself
+			err := overlay.IsValid()
 			if err != nil {
-				return fmt.Errorf("invalid OverlayFS item at index %d: %w", i, err)
+				return fmt.Errorf("invalid Overlay item at index %d: %w", i, err)
 			}
+
+			// Check for unique UpperDir
+			if _, exists := upperDirs[overlay.UpperDir]; exists {
+				return fmt.Errorf("duplicate UpperDir found in Overlay item at index %d", i)
+			}
+			upperDirs[overlay.UpperDir] = true
+
+			// Check for unique WorkDir
+			if _, exists := workDirs[overlay.WorkDir]; exists {
+				return fmt.Errorf("duplicate WorkDir found in Overlay item at index %d", i)
+			}
+			workDirs[overlay.WorkDir] = true
 		}
 	}
 
