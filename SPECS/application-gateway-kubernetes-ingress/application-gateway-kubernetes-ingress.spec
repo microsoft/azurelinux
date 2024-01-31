@@ -2,7 +2,7 @@
 Summary:        Application Gateway Ingress Controller
 Name:           application-gateway-kubernetes-ingress
 Version:        1.4.0
-Release:        16%{?dist}
+Release:        17%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -24,7 +24,8 @@ Source0:        %{name}-%{version}.tar.gz
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
 Source1:        %{name}-%{version}-vendor.tar.gz
-
+# If upstream ever upgrades client_goland to 1.11.1, we can get rid of this patch.
+Patch0:         CVE-2022-21698.patch
 BuildRequires:  golang >= 1.13
 
 %description
@@ -32,12 +33,12 @@ This is an ingress controller that can be run on Azure Kubernetes Service (AKS) 
 to act as the ingress for an AKS cluster. 
 
 %prep
-%autosetup
-
-%build
+%autosetup -N
 rm -rf vendor
 tar -xf %{SOURCE1} --no-same-owner
+%patch 0 -p1 -d vendor/github.com/prometheus/client_golang
 
+%build
 export VERSION=%{version}
 export VERSION_PATH=github.com/Azure/application-gateway-kubernetes-ingress/pkg/version
 
@@ -54,6 +55,10 @@ cp appgw-ingress %{buildroot}%{_bindir}/
 %{_bindir}/appgw-ingress
 
 %changelog
+* Mon Jan 01 2024 Tobias Brick <tobiasb@microsoft.com> - 1.4.0-17
+- Patch for CVE-2022-21698
+- Moved vendored tarball extraction into %prep and changed from %autosetup to %setup
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.4.0-16
 - Bump release to rebuild with go 1.20.9
 
