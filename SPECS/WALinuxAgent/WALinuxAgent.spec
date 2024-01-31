@@ -39,8 +39,7 @@ VMs in the Windows Azure cloud. This package should be installed on Linux disk
 images that are built to run in the Windows Azure environment.
 
 %prep
-%setup -q -n %{name}-%{version}
-%patch0 -p1
+%autosetup -n %{name}-%{version} -p1
 
 %pre -p /bin/sh
 
