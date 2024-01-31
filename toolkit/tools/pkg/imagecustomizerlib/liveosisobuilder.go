@@ -46,11 +46,15 @@ add_drivers+=" overlay "
 )
 
 type IsoWorkingDirs struct {
+	// 'isoBuildDir' is where intermediate files will be placed during the
+	// build.
 	isoBuildDir string
+	// 'isoArtifactsDir' is where extracted and generated files will be placed
+	// during the build.
+	isoArtifactsDir string
 	// 'isomakerBuildDir' will be deleted/re-created by IsoMaker before it
 	// proceeds. It needs to be different from `isoBuildDir`.
 	isomakerBuildDir string
-	outDir           string
 }
 
 // `IsoArtifacts` holds the extracted/generated artifacts necessary to build
@@ -94,7 +98,7 @@ func (b *LiveOSIsoBuilder) extractArtifactsFromBootDevice(bootDevicePath string,
 	defer fullDiskBootMount.Close()
 
 	sourceBootx64EfiPath := filepath.Join(loopDevMountFullDir, "/EFI/BOOT/bootx64.efi")
-	targetBootx64EfiPath := filepath.Join(b.workingDirs.outDir, "bootx64.efi")
+	targetBootx64EfiPath := filepath.Join(b.workingDirs.isoArtifactsDir, "bootx64.efi")
 	err = file.Copy(sourceBootx64EfiPath, targetBootx64EfiPath)
 	if err != nil {
 		return fmt.Errorf("failed to copy bootloader file (bootx64.efi):\n%w", err)
@@ -102,7 +106,7 @@ func (b *LiveOSIsoBuilder) extractArtifactsFromBootDevice(bootDevicePath string,
 	b.artifacts.bootx64EfiPath = targetBootx64EfiPath
 
 	sourceGrubx64EfiPath := filepath.Join(loopDevMountFullDir, "/EFI/BOOT/grubx64.efi")
-	targetGrubx64EfiPath := filepath.Join(b.workingDirs.outDir, "grubx64.efi")
+	targetGrubx64EfiPath := filepath.Join(b.workingDirs.isoArtifactsDir, "grubx64.efi")
 	err = file.Copy(sourceGrubx64EfiPath, targetGrubx64EfiPath)
 	if err != nil {
 		return fmt.Errorf("failed to copy bootloader file (grubx64.efi):\n%w", err)
@@ -183,14 +187,14 @@ func (b *LiveOSIsoBuilder) stageIsoMakerInitrdArtifacts(writeableRootfsDir, isoM
 		return fmt.Errorf("failed to create %s\n%w", targetBootloadersDir, err)
 	}
 
-	sourceBoot64EfiPath := filepath.Join(b.workingDirs.outDir, "bootx64.efi")
+	sourceBoot64EfiPath := filepath.Join(b.workingDirs.isoArtifactsDir, "bootx64.efi")
 	targetBoot64EfiPath := filepath.Join(targetBootloadersDir, "bootx64.efi")
 	err = file.Copy(sourceBoot64EfiPath, targetBoot64EfiPath)
 	if err != nil {
 		return fmt.Errorf("failed to bootloader file (bootx64.efi):\n%w", err)
 	}
 
-	sourceGrub64EfiPath := filepath.Join(b.workingDirs.outDir, "grubx64.efi")
+	sourceGrub64EfiPath := filepath.Join(b.workingDirs.isoArtifactsDir, "grubx64.efi")
 	targetGrub64EfiPath := filepath.Join(targetBootloadersDir, "grubx64.efi")
 	err = file.Copy(sourceGrub64EfiPath, targetGrub64EfiPath)
 	if err != nil {
@@ -236,7 +240,7 @@ func (b *LiveOSIsoBuilder) prepareRootfsForDracut(writeableRootfsDir string) err
 		return fmt.Errorf("failed to delete fstab:\n%w", err)
 	}
 
-	sourceConfigFile := filepath.Join(b.workingDirs.isoBuildDir, "20-live-cd.conf")
+	sourceConfigFile := filepath.Join(b.workingDirs.isoArtifactsDir, "20-live-cd.conf")
 	err = os.WriteFile(sourceConfigFile, []byte(dracutConfig), 0o644)
 	if err != nil {
 		return fmt.Errorf("failed to create %s:\n%w", sourceConfigFile, err)
@@ -294,7 +298,7 @@ func (b *LiveOSIsoBuilder) prepareLiveOSDir(writeableRootfsDir, isoMakerArtifact
 
 	// extract vmlinuz
 	sourceVmlinuzPath := filepath.Join(writeableRootfsDir, "/boot/vmlinuz-"+b.artifacts.kernelVersion)
-	targetVmLinuzPath := filepath.Join(b.workingDirs.outDir, "vmlinuz")
+	targetVmLinuzPath := filepath.Join(b.workingDirs.isoArtifactsDir, "vmlinuz")
 
 	err = file.Copy(sourceVmlinuzPath, targetVmLinuzPath)
 	if err != nil {
@@ -304,7 +308,7 @@ func (b *LiveOSIsoBuilder) prepareLiveOSDir(writeableRootfsDir, isoMakerArtifact
 	b.artifacts.vmlinuzPath = targetVmLinuzPath
 
 	// create grub.cfg
-	targetGrubCfgPath := filepath.Join(b.workingDirs.outDir, "grub.cfg")
+	targetGrubCfgPath := filepath.Join(b.workingDirs.isoArtifactsDir, "grub.cfg")
 
 	err = os.WriteFile(targetGrubCfgPath, []byte(grubCfgTemplate), 0o644)
 	if err != nil {
@@ -343,7 +347,7 @@ func (b *LiveOSIsoBuilder) createSquashfsImage(writeableRootfsDir string) error 
 
 	logger.Log.Debugf("Creating squashfs of %s", writeableRootfsDir)
 
-	squashfsImagePath := filepath.Join(b.workingDirs.outDir, "rootfs.img")
+	squashfsImagePath := filepath.Join(b.workingDirs.isoArtifactsDir, "rootfs.img")
 
 	exists, err := file.PathExists(squashfsImagePath)
 	if err == nil && exists {
@@ -410,7 +414,7 @@ func (b *LiveOSIsoBuilder) generateInitrdImage(rootfsSourceDir, artifactsSourceD
 	}
 
 	generatedInitrdPath := filepath.Join(rootfsSourceDir, initrdPathInChroot)
-	targetInitrdPath := filepath.Join(b.workingDirs.outDir, "initrd.img")
+	targetInitrdPath := filepath.Join(b.workingDirs.isoArtifactsDir, "initrd.img")
 	err = file.Copy(generatedInitrdPath, targetInitrdPath)
 	if err != nil {
 		return fmt.Errorf("failed to copy generated initrd:\n%w", err)
@@ -432,7 +436,7 @@ func (b *LiveOSIsoBuilder) generateInitrdImage(rootfsSourceDir, artifactsSourceD
 //
 // outputs:
 //   - all the extracted/generated artifacts will be placed in the
-//     `LiveOSIsoBuilder.workingDirs.outDir` folder.
+//     `LiveOSIsoBuilder.workingDirs.isoArtifactsDir` folder.
 //   - the paths to individual artifaces are found in the
 //     `LiveOSIsoBuilder.artifacts` data structure.
 func (b *LiveOSIsoBuilder) prepareArtifactsFromFullImage(rawImageFile string) error {
@@ -482,11 +486,6 @@ func (b *LiveOSIsoBuilder) prepareArtifactsFromFullImage(rawImageFile string) er
 	err = b.generateInitrdImage(writeableRootfsDir, isoMakerArtifactsStagingDir, isoMakerArtifactsDirInInitrd)
 	if err != nil {
 		return fmt.Errorf("failed to generate initrd image:\n%w", err)
-	}
-
-	err = os.RemoveAll(writeableRootfsDir)
-	if err != nil {
-		return fmt.Errorf("failed to remove working folder (%s):\n%w", writeableRootfsDir, err)
 	}
 
 	return nil
@@ -627,18 +626,37 @@ func (b *LiveOSIsoBuilder) createIsoImage(isoOutputDir, isoOutputBaseName string
 // outputs:
 //
 //	creates a LiveOS ISO image.
-func createLiveOSIsoImage(buildDir, rawImageFile, outputImageDir, outputImageBase string) error {
+func createLiveOSIsoImage(buildDir, rawImageFile, outputImageDir, outputImageBase string) (err error) {
+
+	isoBuildDir := filepath.Join(buildDir, "tmp")
 
 	isoBuilder := &LiveOSIsoBuilder{
+		//
+		// buildDir (might be shared with other build tools)
+		//  |--tmp   (LiveOSIsoBuilder specific)
+		//     |--<various mount points>
+		//     |--artifacts        (extracted and generated artifacts)
+		//     |--isomaker-tmp     (used exclusively by isomaker)
+		//
 		workingDirs: IsoWorkingDirs{
-			isoBuildDir: filepath.Join(buildDir, "tmp"),
+			isoBuildDir:     isoBuildDir,
+			isoArtifactsDir: filepath.Join(isoBuildDir, "artifacts"),
 			// IsoMaker needs its own folder to work in (it starts by deleting and re-creating it).
-			isomakerBuildDir: filepath.Join(buildDir, "isomaker-tmp"),
-			outDir:           filepath.Join(buildDir, "out"),
+			isomakerBuildDir: filepath.Join(isoBuildDir, "isomaker-tmp"),
 		},
 	}
+	defer func() {
+		cleanupErr := os.RemoveAll(isoBuilder.workingDirs.isoBuildDir)
+		if cleanupErr != nil {
+			if err != nil {
+				err = fmt.Errorf("%w:\nfailed to clean-up (%s): %w", err, isoBuilder.workingDirs.isoBuildDir, cleanupErr)
+			} else {
+				err = fmt.Errorf("failed to clean-up (%s): %w", isoBuilder.workingDirs.isoBuildDir, cleanupErr)
+			}
+		}
+	}()
 
-	err := isoBuilder.prepareArtifactsFromFullImage(rawImageFile)
+	err = isoBuilder.prepareArtifactsFromFullImage(rawImageFile)
 	if err != nil {
 		return err
 	}

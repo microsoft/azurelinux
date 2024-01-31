@@ -104,6 +104,16 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 
 	// Convert image file to raw format, so that a kernel loop device can be used to make changes to the image.
 	rawImageFile := filepath.Join(buildDirAbs, BaseImageName)
+	defer func() {
+		cleanupErr := file.RemoveFileIfExists(rawImageFile)
+		if cleanupErr != nil {
+			if err != nil {
+				err = fmt.Errorf("%w:\nfailed to clean-up (%s): %w", err, rawImageFile, cleanupErr)
+			} else {
+				err = fmt.Errorf("failed to clean-up (%s): %w", rawImageFile, cleanupErr)
+			}
+		}
+	}()
 
 	logger.Log.Infof("Creating raw base image: %s", rawImageFile)
 	err = shell.ExecuteLiveWithErr(1, "qemu-img", "convert", "-O", "raw", imageFile, rawImageFile)
