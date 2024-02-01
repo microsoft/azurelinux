@@ -16,8 +16,8 @@ func TestVerityIsValid(t *testing.T) {
 			Id:     "0f2884c0-8fe0-4a19-87bf-286b7fe9d6f2",
 		},
 		HashPartition: VerityPartition{
-			IdType: "Partition",
-			Id:     "/dev/sda4",
+			IdType: "IdTypePartLabel",
+			Id:     "hash_partition",
 		},
 	}
 
@@ -32,7 +32,7 @@ func TestVerityIsInvalid(t *testing.T) {
 			Id:     "incorrect-uuid-format",
 		},
 		HashPartition: VerityPartition{
-			IdType: "Partition",
+			IdType: "IdTypePartLabel",
 			Id:     "",
 		},
 	}
