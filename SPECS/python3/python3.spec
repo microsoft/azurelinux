@@ -303,10 +303,16 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 
 %files pip
 %defattr(-,root,root,755)
+%{_libdir}/python%{majmin}/site-packages/pip/*
+%{_libdir}/python%{majmin}/site-packages/pip-%{pip_version}.dist-info/*
 %{_bindir}/pip*
 
 %files setuptools
 %defattr(-,root,root,755)
+%{_libdir}/python%{majmin}/site-packages/pkg_resources/*
+%{_libdir}/python%{majmin}/site-packages/setuptools/*
+%{_libdir}/python%{majmin}/site-packages/_distutils_hack/
+%{_libdir}/python%{majmin}/site-packages/setuptools-%{setuptools_version}.dist-info/*
 
 %files test
 %{_libdir}/python%{majmin}/test/*
