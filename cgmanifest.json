@@ -28167,8 +28167,8 @@
         "type": "other",
         "other": {
           "name": "tcsh",
-          "version": "6.22.03",
-          "downloadUrl": "https://astron.com/pub/tcsh/old/tcsh-6.22.03.tar.gz"
+          "version": "6.24.10",
+          "downloadUrl": "https://github.com/tcsh-org/tcsh/archive/refs/tags/TCSH6_24_10.tar.gz"
         }
       }
     },
