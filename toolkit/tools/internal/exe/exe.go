@@ -43,7 +43,7 @@ func OutputDirFlag(k *kingpin.Application, doc string) *string {
 func SetupLogFlags(k *kingpin.Application) *logger.LogFlags {
 	lf := &logger.LogFlags{}
 	lf.LogColor = k.Flag(logger.ColorFlag, logger.ColorFlagHelp).PlaceHolder(logger.ColorsPlaceholder).Enum(logger.Colors()...)
-	lf.LogFile  = k.Flag(logger.FileFlag, logger.FileFlagHelp).String()
+	lf.LogFile = k.Flag(logger.FileFlag, logger.FileFlagHelp).String()
 	lf.LogLevel = k.Flag(logger.LevelsFlag, logger.LevelsHelp).PlaceHolder(logger.LevelsPlaceholder).Enum(logger.Levels()...)
 	return lf
 }

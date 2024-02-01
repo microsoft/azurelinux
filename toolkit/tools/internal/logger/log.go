@@ -60,9 +60,9 @@ const (
 	defaultLogFileLevel   = logrus.DebugLevel
 	defaultStderrLogLevel = logrus.InfoLevel
 	parentCallerLevel     = 1
-	colorModeAuto        = "auto"
-	colorModeAlways      = "always"
-	colorModeNever       = "never"
+	colorModeAuto         = "auto"
+	colorModeAlways       = "always"
+	colorModeNever        = "never"
 )
 
 type LogFlags struct {
@@ -122,7 +122,7 @@ func SetStderrLogLevel(level string) (err error) {
 func InitBestEffort(lf *LogFlags) {
 	level := *lf.LogLevel
 	color := *lf.LogColor
-	path  := *lf.LogFile
+	path := *lf.LogFile
 
 	if level == "" {
 		level = defaultStderrLogLevel.String()

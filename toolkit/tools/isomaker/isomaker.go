@@ -26,7 +26,7 @@ var (
 
 	imageTag = app.Flag("image-tag", "Tag (text) appended to the image name. Empty by default.").String()
 
-	logFlags    = exe.SetupLogFlags(app)
+	logFlags = exe.SetupLogFlags(app)
 )
 
 func main() {

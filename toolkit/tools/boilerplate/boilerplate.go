@@ -19,7 +19,7 @@ import (
 var (
 	app = kingpin.New("boilerplate", "A sample golang tool for Mariner.")
 
-	logFlags = exe.SetupLogFlags(app)
+	logFlags      = exe.SetupLogFlags(app)
 	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
 )
 
