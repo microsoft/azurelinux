@@ -9,7 +9,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 # no homepage exists for this component
 URL:            https://gitlab.gnome.org/GNOME/gsettings-desktop-schemas
-Source0:        https://download.gnome.org/sources/%{name}/3.36/%{name}-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/%{name}/45/%{name}-%{version}.tar.xz
 BuildRequires:  gettext
 BuildRequires:  glib2-devel >= 2.31.0
 BuildRequires:  gobject-introspection-devel
