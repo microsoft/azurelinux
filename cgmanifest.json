@@ -1468,7 +1468,7 @@
         "other": {
           "name": "catch",
           "version": "3.5.2",
-          "downloadUrl": "https://github.com/catchorg/catch2/archive/refs/tags/v3.5.2.tar.gz"
+          "downloadUrl": "https://github.com/catchorg/Catch2/archive/refs/tags/v3.5.2.tar.gz"
         }
       }
     },
