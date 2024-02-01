@@ -29,7 +29,6 @@ A fast, scalable, multi-language and extensible build system.
 %autosetup -p1 -c -n %{name}-%{version}
 
 %build
-export JAVA_HOME=$(find %{_libdir}/jvm -name "msopenjdk*")
 ln -s %{_bindir}/python3 %{_bindir}/python
 
 EXTRA_BAZEL_ARGS="--tool_java_runtime_version=local_jdk --remote_download_minimal" ./compile.sh
