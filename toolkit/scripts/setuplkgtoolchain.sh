@@ -2,7 +2,10 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
+set -e
+
 ROOT_FOLDER=$(git rev-parse --show-toplevel)
+LKG_FILENAME="lkg-3.0-dev.json"
 
 usage() {
     echo "./setuplkgtoolchain.sh"
@@ -10,36 +13,42 @@ usage() {
     exit 1
 }
 
-getlkg() {
-    wget -O lkg-3.0-dev.json -nv https://mariner3dailydevrepo.blob.core.windows.net/lkg/lkg-3.0-dev.json
-    DAILY_BUILD_ID=$(cat lkg-3.0-dev.json | jq -r .dailybuildid | tr . -)
-    GIT_COMMIT=$(cat lkg-3.0-dev.json | jq -r .commit)
+get_lkg() {
+    wget -O $LKG_FILENAME -nv https://mariner3dailydevrepo.blob.core.windows.net/lkg/$LKG_FILENAME
+    DAILY_BUILD_ID=$(jq -r .dailybuildid $LKG_FILENAME | tr . -)
+    GIT_COMMIT=$(jq -r .commit $LKG_FILENAME)
 }
 
-checkformodifiedmanifests() {
-    if [[ $(git status --porcelain | grep pkggen_core_$(uname -p).txt | wc -l) -ne "0" ||
-          $(git status --porcelain | grep toolchain_$(uname -p).txt | wc -l) -ne "0" ]]; then
+check_for_modified_manifests() {
+    if git status --porcelain | grep -qP "(pkggen_core|toolchain)_$(uname -p).txt"; then
         echo "Local modifications to 'pkggen_core_$(uname -p).txt' or 'toolchain_$(uname -p).txt' detected."
         echo -e "\nNOTE: Changes to manifests were detected, and these will be overwritten. Hit Ctrl+C within 10 seconds to cancel...\n"
         sleep 10s
     fi
 }
 
-updatemanifests() {
+update_manifests() {
     wget -nv https://raw.githubusercontent.com/microsoft/CBL-Mariner/$GIT_COMMIT/toolkit/resources/manifests/package/toolchain_$(uname -p).txt -O $ROOT_FOLDER/toolkit/resources/manifests/package/toolchain_$(uname -p).txt
     wget -nv https://raw.githubusercontent.com/microsoft/CBL-Mariner/$GIT_COMMIT/toolkit/resources/manifests/package/pkggen_core_$(uname -p).txt -O $ROOT_FOLDER/toolkit/resources/manifests/package/pkggen_core_$(uname -p).txt
 }
 
 [[ "$1" == "--help" ]] && usage
 
-getlkg
-echo -e "===\n=== Current LKG:\n=== DAILY_BUILD_ID=\t'$DAILY_BUILD_ID'\n=== commit=\t\t'$GIT_COMMIT'\n===\n"
+get_lkg
 
-checkformodifiedmanifests
+check_for_modified_manifests
 
-updatemanifests
+update_manifests
 
-echo -e "\nFinished syncing toolchain to LKG ('$DAILY_BUILD_ID' - '$GIT_COMMIT')"
+cat << EOF
+===
+=== Current LKG:
+=== DAILY_BUILD_ID='$DAILY_BUILD_ID'
+=== Commit='$GIT_COMMIT'
+===
+EOF
+
+echo -e "Finished syncing toolchain to LKG ('$DAILY_BUILD_ID' - '$GIT_COMMIT')"
 echo -e "To download LKG toolchain, run:\n\tsudo make toolchain -j$(nproc) REBUILD_TOOLCHAIN=n REBUILD_TOOLS=y DAILY_BUILD_ID=$DAILY_BUILD_ID"
 
 exit 0
