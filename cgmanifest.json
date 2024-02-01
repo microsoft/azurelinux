@@ -28907,8 +28907,8 @@
         "type": "other",
         "other": {
           "name": "utf8proc",
-          "version": "2.6.1",
-          "downloadUrl": "https://github.com/JuliaStrings/utf8proc/archive/v2.6.1.tar.gz"
+          "version": "2.9.0",
+          "downloadUrl": "https://github.com/juliastrings/utf8proc/archive/v2.9.0.tar.gz"
         }
       }
     },
