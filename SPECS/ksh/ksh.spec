@@ -1,3 +1,4 @@
+# Added global debug_package to fix the failure of empty debugfiles.list
 %global debug_package %{nil}
 Summary:        The Original ATT Korn Shell
 Name:           ksh
@@ -18,6 +19,7 @@ BuildRequires:  gcc
 BuildRequires:  procps
 
 %if %{with_check}
+BuildRequires: tzdata
 BuildRequires:  shadow-utils
 BuildRequires:  sudo
 %endif
@@ -25,11 +27,10 @@ BuildRequires:  sudo
 Requires:       coreutils
 Requires:       diffutils
 
-Requires(post): grep, coreutils, systemd
+Requires(post): grep
+Requires(post): coreutils
+Requires(post): systemd
 Requires(postun): sed
-
-Provides: /bin/ksh
-Provides: /bin/rksh
 
 %description
 KSH-93 is the most recent version of the KornShell by David Korn of
@@ -38,7 +39,7 @@ KornShell is a shell programming language, which is upward compatible
 with "sh" (the Bourne Shell).
 
 %prep
-%autosetup -n %{name}-%{version}
+%autosetup
 
 #/dev/fd test does not work because of mock
 sed -i 's|ls /dev/fd|ls /proc/self/fd|' src/cmd/ksh93/features/options
@@ -73,12 +74,10 @@ touch %{buildroot}%{_bindir}/rksh
 touch %{buildroot}%{_mandir}/man1/rksh.1.gz
 
 %check
+useradd test -G root -m
 # disable pty tests as they tend to freeze
-shopt -s globstar; shopt -s nullglob; for test in bin/tests/**/*.sh; do
-  if [[ $test != *"pty.sh" ]]; then
-    $test || exit 1;
-  fi;
-done
+find src/cmd/ksh93/tests -name "pty.sh" -delete
+bin/package test
 
 %post
 for s in /bin/ksh /bin/rksh %{_bindir}/ksh %{_bindir}/rksh
