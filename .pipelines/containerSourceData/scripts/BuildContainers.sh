@@ -358,3 +358,5 @@ set_image_tag
 finalize
 publish_to_acr
 generate_image_sbom
+
+docker images
