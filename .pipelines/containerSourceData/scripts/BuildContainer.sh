@@ -360,7 +360,7 @@ function distroless_container {
 
     echo "+++ Create distroless container"
     # shellcheck source=/dev/null
-    source BuildDistrolessContainer.sh
+    source "$CONTAINER_SRC_DIR/scripts/BuildDistrolessContainer.sh"
     create_distroless_container
 }
 
