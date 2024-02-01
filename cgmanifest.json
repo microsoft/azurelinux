@@ -3979,6 +3979,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "gbenchmark",
+          "version": "1.8.3",
+          "downloadUrl": "https://github.com/google/benchmark/archive/refs/tags/v1.8.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "gc",
           "version": "8.2.2",
           "downloadUrl": "https://www.hboehm.info/gc/gc_source/gc-8.2.2.tar.gz"
@@ -25144,8 +25154,8 @@
         "type": "other",
         "other": {
           "name": "re2",
-          "version": "20190801",
-          "downloadUrl": "https://github.com/google/re2/archive/2019-08-01.tar.gz"
+          "version": "20240201",
+          "downloadUrl": "https://github.com/google/re2/archive/2024-02-01.tar.gz"
         }
       }
     },
