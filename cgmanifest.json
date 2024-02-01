@@ -855,8 +855,8 @@
         "type": "other",
         "other": {
           "name": "azure-iot-sdk-c",
-          "version": "2022.01.21",
-          "downloadUrl": "https://github.com/Azure/azure-iot-sdk-c/archive/LTS_01_2022_Ref01.tar.gz"
+          "version": "2023.08.07",
+          "downloadUrl": "https://github.com/Azure/azure-iot-sdk-c/archive/refs/tags/LTS_08_2023.tar.gz"
         }
       }
     },
@@ -8621,8 +8621,8 @@
         "type": "other",
         "other": {
           "name": "libatomic_ops",
-          "version": "7.6.12",
-          "downloadUrl": "https://github.com/ivmai/libatomic_ops/releases/download/v7.6.12/libatomic_ops-7.6.12.tar.gz"
+          "version": "7.8.2",
+          "downloadUrl": "https://github.com/ivmai/libatomic_ops/releases/download/v7.8.2/libatomic_ops-7.8.2.tar.gz"
         }
       }
     },
@@ -14023,8 +14023,8 @@
         "type": "other",
         "other": {
           "name": "nmap",
-          "version": "7.93",
-          "downloadUrl": "https://nmap.org/dist/nmap-7.93.tar.bz2"
+          "version": "7.94",
+          "downloadUrl": "https://nmap.org/dist/nmap-7.94.tar.bz2"
         }
       }
     },
@@ -14053,8 +14053,8 @@
         "type": "other",
         "other": {
           "name": "nodejs",
-          "version": "16.20.2",
-          "downloadUrl": "https://nodejs.org/download/release/v16.20.2/node-v16.20.2.tar.xz"
+          "version": "20.10.0",
+          "downloadUrl": "https://nodejs.org/download/release/v20.10.0/node-v20.10.0.tar.xz"
         }
       }
     },
@@ -25605,8 +25605,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-bindata",
-          "version": "2.4.10",
-          "downloadUrl": "https://github.com/dmendel/bindata/archive/refs/tags/v2.4.10.tar.gz"
+          "version": "2.4.15",
+          "downloadUrl": "https://github.com/dmendel/bindata/archive/refs/tags/v2.4.15.tar.gz"
         }
       }
     },
@@ -25645,8 +25645,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-connection_pool",
-          "version": "2.2.5",
-          "downloadUrl": "https://github.com/mperham/connection_pool/archive/refs/tags/v2.2.5.tar.gz"
+          "version": "2.4.1",
+          "downloadUrl": "https://github.com/mperham/connection_pool/archive/refs/tags/v2.4.1.tar.gz"
         }
       }
     },
@@ -25655,8 +25655,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-console",
-          "version": "1.10.1",
-          "downloadUrl": "https://github.com/socketry/console/archive/refs/tags/v1.10.1.tar.gz"
+          "version": "1.23.3",
+          "downloadUrl": "https://github.com/socketry/console/archive/refs/tags/v1.23.3.tar.gz"
         }
       }
     },
