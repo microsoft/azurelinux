@@ -186,15 +186,15 @@ function prepare_docker_directory {
     # Get additional required files for the container build from CBL-Mariner repo.
     configurationDirectoryPath="$CONTAINER_SRC_DIR/$IMAGE/configuration-files"
     if [ -d "$configurationDirectoryPath" ]; then
-        cp "$configurationDirectoryPath"/* "$WORK_DIR"
+        cp -v "$configurationDirectoryPath"/* "$WORK_DIR"
     fi
 
     local hostMountedDir="$WORK_DIR/Stage"
-    mkdir -p "$hostMountedDir"
+    mkdir -pv "$hostMountedDir"
 
     # Copy files into docker context directory
     tar -xf "$RPMS_TARBALL" -C "$hostMountedDir"/
-    cp "$CONTAINER_SRC_DIR/marinerLocalRepo.repo" "$hostMountedDir"/
+    cp -v "$CONTAINER_SRC_DIR/marinerLocalRepo.repo" "$hostMountedDir"/
 }
 
 function docker_build {
