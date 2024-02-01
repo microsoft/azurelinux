@@ -1,9 +1,9 @@
 --- scowl/r/special/abbreviations	2008-11-29 23:02:41.000000000 +0000
 +++ scowl/r/special/abbreviations	2010-07-30 11:18:33.000000000 +0100
-@@ -3,6 +3,11 @@
- API
- ATM
- BTW
+@@ -6,6 +6,11 @@
+ DVR
+ DVR's
+ DVRs
 +EB
 +Eb
 +Ei
@@ -12,7 +12,7 @@
  EULA
  EULAs
  FAQ
-@@ -16,39 +21,75 @@
+@@ -20,12 +25,17 @@
  GIF
  GPU
  GUI
@@ -25,19 +25,22 @@
  HDMI
  HTML
  HTTP
+ IDE
 +IEC
+ IEEE
  IMHO
  IMNSHO
- IMO
+@@ -34,22 +44,41 @@
  IRC
  ISO
+ ISS
 +JEDEC
+ JPEG
 +KB
 +Kb
 +Ki
 +KiB
 +Kib
- JPEG
  MB
  MP3
  MP3s
@@ -55,10 +58,12 @@
 +Pi
 +PiB
 +Pib
+ QA
  RFC
  ROFL
  RTFM
  SQL
+ Sep
 +TB
 +Tb
 +Ti
@@ -66,7 +71,8 @@
 +Tib
  URL
  USB
- USB
+ UTC
+@@ -57,11 +86,23 @@
  WWW
  WYSIWYG
  XML
@@ -81,10 +87,12 @@
 +Zi
 +ZiB
 +Zib
+ bpm
  cf
  dpi
+ fMRI
 +kB
 +kb
  pp
  resp
- vs
+ vols
