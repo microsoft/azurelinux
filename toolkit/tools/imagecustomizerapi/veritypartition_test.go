@@ -9,30 +9,31 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestVerityPartitionIsValid_PartUuid_Valid(t *testing.T) {
+func TestVerityPartitionIsValidInvalidPartLabel(t *testing.T) {
 	validPartition := VerityPartition{
-		IdType: IdTypePartUuid,
-		Id:     "0f2884c0-8fe0-4a19-87bf-286b7fe9d6f2",
+		IdType: "PartLabel",
+		Id:     "",
 	}
 
 	err := validPartition.IsValid()
-	assert.NoError(t, err)
+	assert.Error(t, err)
+	assert.ErrorContains(t, err, "invalid Id: empty string")
 }
 
-func TestVerityPartitionIsValid_EmptyId_Invalid(t *testing.T) {
+func TestVerityPartitionIsValidInvalidEmptyPartUuid(t *testing.T) {
 	emptyIdPartition := VerityPartition{
-		IdType: IdTypePartUuid,
+		IdType: "PartUuid",
 		Id:     "",
 	}
 
 	err := emptyIdPartition.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "invalid Id")
+	assert.ErrorContains(t, err, "invalid Id: empty string")
 }
 
-func TestVerityPartitionIsValid_IncorrectUuidFormat_Invalid(t *testing.T) {
+func TestVerityPartitionIsValidInvalidPartUuidFormat(t *testing.T) {
 	incorrectUuidPartition := VerityPartition{
-		IdType: IdTypePartUuid,
+		IdType: "PartUuid",
 		Id:     "incorrect-uuid-format",
 	}
 

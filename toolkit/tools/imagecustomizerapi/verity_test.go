@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestVerityIsValid(t *testing.T) {
+func TestVerityIsValidInvalidPartLabel(t *testing.T) {
 	validVerity := Verity{
 		DataPartition: VerityPartition{
 			IdType: "PartUuid",
@@ -17,15 +17,16 @@ func TestVerityIsValid(t *testing.T) {
 		},
 		HashPartition: VerityPartition{
 			IdType: "PartLabel",
-			Id:     "hash_partition",
+			Id:     "",
 		},
 	}
 
 	err := validVerity.IsValid()
-	assert.NoError(t, err)
+	assert.Error(t, err)
+	assert.ErrorContains(t, err, "invalid Id: empty string")
 }
 
-func TestVerityIsInvalid(t *testing.T) {
+func TestVerityIsValidInvalidPartUuid(t *testing.T) {
 	invalidVerity := Verity{
 		DataPartition: VerityPartition{
 			IdType: "PartUuid",
@@ -33,11 +34,11 @@ func TestVerityIsInvalid(t *testing.T) {
 		},
 		HashPartition: VerityPartition{
 			IdType: "PartLabel",
-			Id:     "",
+			Id:     "hash_partition",
 		},
 	}
 
 	err := invalidVerity.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "invalid Id")
+	assert.ErrorContains(t, err, "invalid Id format")
 }

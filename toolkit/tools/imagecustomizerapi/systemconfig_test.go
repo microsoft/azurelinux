@@ -54,7 +54,7 @@ func TestSystemConfigIsValidKernelCommandLineInvalidChars(t *testing.T) {
 	assert.ErrorContains(t, err, "ExtraCommandLine")
 }
 
-func TestSystemConfigValidVerity(t *testing.T) {
+func TestSystemConfigIsValidVerityInvalidPartLabel(t *testing.T) {
 	validVerity := SystemConfig{
 		Verity: &Verity{
 			DataPartition: VerityPartition{
@@ -63,16 +63,17 @@ func TestSystemConfigValidVerity(t *testing.T) {
 			},
 			HashPartition: VerityPartition{
 				IdType: "PartLabel",
-				Id:     "hash_partition",
+				Id:     "",
 			},
 		},
 	}
 
 	err := validVerity.IsValid()
-	assert.NoError(t, err)
+	assert.Error(t, err)
+	assert.ErrorContains(t, err, "invalid Id: empty string")
 }
 
-func TestSystemConfigInValidVerity(t *testing.T) {
+func TestSystemConfigIsValidVerityInValidPartUuid(t *testing.T) {
 	invalidVerity := SystemConfig{
 		Verity: &Verity{
 			DataPartition: VerityPartition{
@@ -81,12 +82,12 @@ func TestSystemConfigInValidVerity(t *testing.T) {
 			},
 			HashPartition: VerityPartition{
 				IdType: "PartLabel",
-				Id:     "",
+				Id:     "hash_partition",
 			},
 		},
 	}
 
 	err := invalidVerity.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "invalid Id")
+	assert.ErrorContains(t, err, "invalid Id format")
 }
