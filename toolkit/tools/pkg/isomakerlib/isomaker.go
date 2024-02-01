@@ -380,7 +380,7 @@ func (im *IsoMaker) createIsoRpmsRepo() (err error) {
 
 	err = os.MkdirAll(isoRpmsRepoDirPath, os.ModePerm)
 	if err != nil {
-		return fmt.Errorf("failed to mkdir '%s'.", isoRpmsRepoDirPath)
+		return fmt.Errorf("failed to mkdir '%s'", isoRpmsRepoDirPath)
 	}
 
 	fetchedRepoDirContentsPath := filepath.Join(im.fetchedRepoDirPath, "*")
@@ -402,7 +402,7 @@ func (im *IsoMaker) prepareWorkDirectory() (err error) {
 		return fmt.Errorf("failed while checking if directory '%s' exists:\n%w", im.buildDirPath, err)
 	}
 	if exists {
-		logger.Log.Warningf("Unexpected: temporary ISO build path '%s' exists. Removing.", im.buildDirPath)
+		logger.Log.Warningf("Unexpected: temporary ISO build path '%s' exists. Removing", im.buildDirPath)
 		err = os.RemoveAll(im.buildDirPath)
 		if err != nil {
 			return fmt.Errorf("failed while removing directory '%s':\n%w", im.buildDirPath, err)
@@ -414,13 +414,13 @@ func (im *IsoMaker) prepareWorkDirectory() (err error) {
 		return fmt.Errorf("failed while creating directory '%s':\n%w", im.buildDirPath, err)
 	}
 
-	im.deferIsoMakerCleanUp(func() error {
+	im.deferIsoMakerCleanUp(func() (removeErr error) {
 		logger.Log.Debugf("Removing '%s'.", im.buildDirPath)
-		err := os.RemoveAll(im.buildDirPath)
-		if err != nil {
-			err = fmt.Errorf("failed to remove '%s':\n%w", im.buildDirPath, err)
+		removeErr = os.RemoveAll(im.buildDirPath)
+		if removeErr != nil {
+			removeErr = fmt.Errorf("failed to remove '%s':\n%w", im.buildDirPath, err)
 		}
-		return err
+		return removeErr
 	})
 
 	err = im.copyStaticIsoRootFiles()
@@ -446,13 +446,13 @@ func (im *IsoMaker) prepareWorkDirectory() (err error) {
 func (im *IsoMaker) copyStaticIsoRootFiles() (err error) {
 
 	if im.resourcesDirPath == "" && im.grubCfgPath == "" {
-		return fmt.Errorf("missing required parameters. Must specify either the resources directory or provide a grub.cfg.")
+		return fmt.Errorf("missing required parameters. Must specify either the resources directory or provide a grub.cfg")
 	}
 
 	if im.resourcesDirPath != "" {
 		staticIsoRootFilesPath := filepath.Join(im.resourcesDirPath, "assets/isomaker/iso_root_static_files/*")
 
-		logger.Log.Debugf("Copying static ISO root files from '%s' to '%s'.", staticIsoRootFilesPath, im.buildDirPath)
+		logger.Log.Debugf("Copying static ISO root files from '%s' to '%s'", staticIsoRootFilesPath, im.buildDirPath)
 
 		err = recursiveCopyDereferencingLinks(staticIsoRootFilesPath, im.buildDirPath)
 		if err != nil {
@@ -497,7 +497,7 @@ func (im *IsoMaker) copyArchitectureDependentIsoRootFiles() error {
 	}
 
 	if im.resourcesDirPath == "" && im.enableBiosBoot {
-		return fmt.Errorf("missing required parameters. Must specify the resources directory if BIOS bootloaders are to be included.")
+		return fmt.Errorf("missing required parameters. Must specify the resources directory if BIOS bootloaders are to be included")
 	}
 
 	architectureDependentFilesDirectory := filepath.Join(im.resourcesDirPath, isoRootArchDependentDirPath, runtime.GOARCH, "*")
@@ -791,7 +791,7 @@ func verifyConfig(config configuration.Config, unattendedInstall bool) error {
 	}
 
 	if unattendedInstall && (len(config.SystemConfigs) > 1) && !config.DefaultSystemConfig.IsDefault {
-		return fmt.Errorf("for unattended installation with more than one system configuration present you must select a default one with the [IsDefault] field.")
+		return fmt.Errorf("for unattended installation with more than one system configuration present you must select a default one with the [IsDefault] field")
 	}
 	return nil
 }
