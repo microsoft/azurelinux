@@ -279,6 +279,7 @@ stages:
 
       steps:
       - checkout: ${{ parameters.selfRepoName }}
+        lfs: false
 
       # After the following task, we will have the following variables:
       # -> $(setAcrRepoVariables.data_is_golden_image)
