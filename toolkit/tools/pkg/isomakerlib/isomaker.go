@@ -119,7 +119,7 @@ func (im *IsoMaker) Make() (err error) {
 			if err != nil {
 				err = fmt.Errorf("%w\n%w", err, cleanupErr)
 			} else {
-				err = fmt.Errorf("%w", cleanupErr)
+				err = cleanupErr
 			}
 		}
 	}()
@@ -414,7 +414,10 @@ func (im *IsoMaker) prepareWorkDirectory() error {
 	}
 	if exists {
 		logger.Log.Warningf("Unexpected: temporary ISO build path '%s' exists. Removing.", im.buildDirPath)
-		logger.PanicOnError(os.RemoveAll(im.buildDirPath), "Failed while removing directory '%s'.", im.buildDirPath)
+		err = os.RemoveAll(im.buildDirPath)
+		if err != nil {
+			return fmt.Errorf("failed while removing directory '%s':\n%w", im.buildDirPath, err)
+		}
 	}
 
 	err = os.Mkdir(im.buildDirPath, os.ModePerm)
@@ -505,7 +508,7 @@ func (im *IsoMaker) copyArchitectureDependentIsoRootFiles() error {
 	}
 
 	if im.resourcesDirPath == "" && im.enableBiosBoot {
-		logger.Log.Panicf("missing required parameters. Must specify the resources directory if BIOS bootloaders are to be included.")
+		return fmt.Errorf("missing required parameters. Must specify the resources directory if BIOS bootloaders are to be included.")
 	}
 
 	architectureDependentFilesDirectory := filepath.Join(im.resourcesDirPath, isoRootArchDependentDirPath, runtime.GOARCH, "*")
@@ -770,20 +773,17 @@ func (im *IsoMaker) deferIsoMakerCleanUp(cleanUpTask func() error) {
 // isoMakerCleanUp runs all clean-up tasks scheduled through "deferIsoMakerCleanUp".
 // Tasks are ran in reverse order to how they were scheduled.
 func (im *IsoMaker) isoMakerCleanUp() (err error) {
-	// We defer again to run the tasks in the correct order AND so that a potential
-	// panic from one of these doesn't prevent other ones from running.
-	for _, cleanUpTask := range im.isoMakerCleanUpTasks {
-		defer func() {
-			cleanupErr := cleanUpTask()
-			if cleanupErr != nil {
-				if err != nil {
-					err = fmt.Errorf("%w\n%w", err, cleanupErr)
-				} else {
-					err = fmt.Errorf("%w", cleanupErr)
-				}
+	for i := len(im.isoMakerCleanUpTasks) - 1; i >= 0; i-- {
+		cleanupErr := im.isoMakerCleanUpTasks[i]()
+		if cleanupErr != nil {
+			if err != nil {
+				err = fmt.Errorf("%w\n%w", err, cleanupErr)
+			} else {
+				err = cleanupErr
 			}
-		}()
+		}
 	}
+
 	return err
 }
 
