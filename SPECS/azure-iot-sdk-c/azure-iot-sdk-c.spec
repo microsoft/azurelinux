@@ -6,20 +6,24 @@ Name:           azure-iot-sdk-c
 # For apt-get packages they fix the version number to 0.2.0 and increase the release number with each release.
 # Since we want to control the release number as thr distribution, this scheme is not applicable for us.
 # They also used to use a regular versioning scheme like 1.3.7 but they did not tag their latest LTS with a version like that.
-Version:        2022.01.21
+Version:        2023.08.07
 Release:        1%{?dist}
 License:        MIT
 Group:          Applications/File
 URL:            https://github.com/Azure/azure-iot-sdk-c
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-# Source0: https://github.com/Azure/%{name}/archive/LTS_01_2022_Ref01.tar.gz
+# Source0: https://github.com/Azure/%{name}/archive/refs/tags/LTS_08_2023.tar.gz
 # The below tarball includes all submodules.
 
 # This tarball is created using the following command:
-# git clone --recursive --single-branch --branch LTS_01_2022_Ref01 --depth 1 https://github.com/Azure/azure-iot-sdk-c.git
-# tar cjvf azure-iot-sdk-c-2022.01.21.tar.bz2 azure-iot-sdk-c/
-Source0:        %{name}-%{version}.tar.bz2
+# 1. git clone --recursive --single-branch --branch LTS_08_2023 --depth 1 https://github.com/Azure/azure-iot-sdk-c.git
+# 2. tar  --sort=name \
+#           --mtime="2021-04-26 00:00Z" \
+#           --owner=0 --group=0 --numeric-owner \
+#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+#           -cf %{name}-%{version}.tar.gz %{name}
+Source0:        %{name}-%{version}.tar.gz
 
 BuildRequires:  cmake
 BuildRequires:  build-essential
@@ -86,6 +90,9 @@ install -p -m 755 provisioning_client/tools/tpm_device_provision/tpm_device_prov
 /usr/cmake/*
 
 %changelog
+*   Thu Jan 04 2024 Karim Eldegwy <karimeldegwy@microsoft.com> - 2023.08.07-1
+-   Upgrate to  2023.08.07-1
+
 *   Mon Jan 24 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 2022.01.21-1
 -   Upgrade to 2022.01.21.
 
@@ -94,15 +101,21 @@ install -p -m 755 provisioning_client/tools/tpm_device_provision/tpm_device_prov
 
 *   Thu Nov 11 2021 Andrew Phelps <anphel@microsoft.com> 2020.02.04.1-7
 -   Fix build with gcc11
+
 *   Mon Jun 22 2020 Saravanan Somasundaram <sarsoma@microsoft.com> 2020.02.04.1-6
 -   Removing the Conflict reference to azure-iot-sdk-c-public-preview.
+
 *   Sun May 31 2020 Henry Beberman <henry.beberman@microsoft.com> 2020.02.04.1-5
 -   Add -Wno-error to cflags to fix compilation with updated -Werror default.
+
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 2020.02.04.1-4
 -   Added %%license line automatically
+
 *   Mon May 04 2020 Eric Li <eli@microsoft.com> 2020.02.04.1-3
 -   Add #Source0: and license verified.
+
 *   Wed Apr 29 2020 Emre Girgin <mrgirgin@microsoft.com> 2020.02.04.1-2
 -   Build the provisioning client, add tpm_device_provision to the package.
+
 *   Mon Apr 27 2020 Emre Girgin <mrgirgin@microsoft.com> 2020.02.04.1-1
 -   Original version for CBL-Mariner.
