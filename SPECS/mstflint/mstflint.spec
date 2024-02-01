@@ -28,6 +28,11 @@ Requires:       python3
 This package contains firmware update tool, vpd dump and register dump tools
 for network adapters based on Mellanox Technologies chips.
 
+%package devel
+Summary:        Scripts and header files for mstflint
+Requires:       %{name} = %{version}-1
+Provides:       mstflint-devel = %{version}-1
+
 %prep
 %setup -q
 
@@ -38,8 +43,7 @@ MSTFLINT_VERSION_STR="%{name} %{version}-%{release}"
 %make_build
 
 %install
-rm -fr %{buildroot}
-make DESTDIR=%{buildroot} install
+%make_install DESTDIR=%{buildroot}
 # remove unpackaged files from the buildroot
 rm -f %{buildroot}/%{_libdir}/*.la
 # create softlinks to old mtcr header and lib locations
@@ -75,6 +79,7 @@ rm -fr %{buildroot}
 %{_bindir}/mstreg
 %{_bindir}/mstlink
 
+%files devel
 %{_includedir}/mstflint/cmdif/icmd_cif_common.h
 %{_includedir}/mstflint/cmdif/icmd_cif_open.h
 %{_includedir}/mstflint/common/compatibility.h
