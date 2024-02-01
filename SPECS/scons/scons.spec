@@ -10,9 +10,8 @@ Source0:        https://sourceforge.net/projects/scons/files/scons/4.6.0/scons-4
 Patch0:         0001-Remove-unnecessary-build-deps.patch
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-BuildRequires:  python%{python3_pkgversion}-devel 
-BuildRequires:  python%{python3_pkgversion}-pip
-Requires:       python3
+BuildRequires:  python%{python3_pkgversion}-devel
+Requires:       python%{python3_pkgversion}
 BuildArch:      noarch
 
 %description
