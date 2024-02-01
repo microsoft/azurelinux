@@ -10,6 +10,8 @@
 parameters:
 - name: imageName
   type: string
+- name: selfRepoRoot
+  type: string
 - name: gitBranch
   type: string
   default: ''
@@ -22,8 +24,8 @@ steps:
   inputs:
     pythonInterpreter: /usr/bin/python3
     scriptSource: 'filePath'
-    scriptPath: '../scripts/acrRepoParser.py'
-    arguments: '--config-file-path ../configuration/acrRepoV2.json
+    scriptPath: '${{ parameters.selfRepoRoot }}/.pipelines/containerSourceData/scripts/acrRepoParser.py'
+    arguments: '--config-file-path ${{ parameters.selfRepoRoot }}/.pipelines/containerSourceData/configuration/acrRepoV2.json
                 --image-name ${{ parameters.imageName }}
                 --git-branch ${{ parameters.gitBranch }}
                 --publishing-level ${{ parameters.publishingLevel }}'

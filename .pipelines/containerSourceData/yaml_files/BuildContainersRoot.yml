@@ -7,15 +7,19 @@ parameters:
   type: object
 - name: agentPool
   type: object
+- name: selfRepoName
+  type: string
+- name: selfRepoRoot
+  type: string
 
 stages:
-- template: BuildContainersValidation.yml
+- template: BuildContainersValidation.yml@${{ parameters.selfRepoName }}
   parameters:
     stageName: validation_stage
     publishingLevel: ${{ parameters.publishingLevel }}
     agentPool: ${{ parameters.agentPool }}
 
-- template: BuildContainers.yml
+- template: BuildContainers.yml@${{ parameters.selfRepoName }}
   parameters:
     dependsOnStage: validation_stage
     stageName: build_containers_stage
@@ -23,8 +27,10 @@ stages:
     architecture: ${{ parameters.architecture }}
     containerImages: ${{ parameters.containerImages }}
     agentPool: ${{ parameters.agentPool }}
+    selfRepoName: ${{ parameters.selfRepoName }}
+    selfRepoRoot: ${{ parameters.selfRepoRoot }}
 
-- template: BuildContainersWrapup.yml
+- template: BuildContainersWrapup.yml@${{ parameters.selfRepoName }}
   parameters:
     dependsOnStage: build_containers_stage
     containerImages: ${{ parameters.containerImages }}
