@@ -1,12 +1,12 @@
 Summary:        Make sure you didn't emit any warnings while testing
 Name:           perl-Test-NoWarnings
-Version:        1.04
-Release:        23%{?dist}
+Version:        1.06
+Release:        1%{?dist}
 License:        LGPLv2.1
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            https://metacpan.org/release/Test-NoWarnings
-Source0:        https://cpan.metacpan.org/authors/id/A/AD/ADAMK/Test-NoWarnings-%{version}.tar.gz#/perl-Test-NoWarnings-%{version}.tar.gz
+URL:            https://metacpan.org/dist/Test-NoWarnings
+Source0:        https://cpan.metacpan.org/authors/id/H/HA/HAARG/Test-NoWarnings-%{version}.tar.gz#/perl-Test-NoWarnings-%{version}.tar.gz
 BuildArch:      noarch
 
 BuildRequires:  make
@@ -61,6 +61,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Thu Feb 01 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 1.06-1
+- Upgrade to 1.06
+
 * Tue May 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.04-23
 - License verified.
 

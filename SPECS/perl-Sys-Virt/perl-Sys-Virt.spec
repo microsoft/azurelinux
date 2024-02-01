@@ -1,11 +1,11 @@
 Summary:        Represent and manage a libvirt hypervisor connection
 Name:           perl-Sys-Virt
-Version:        6.1.0
-Release:        4%{?dist}
+Version:        10.0.0
+Release:        1%{?dist}
 License:        GPLv2+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            https://metacpan.org/release/Sys-Virt
+URL:            https://metacpan.org/dist/Sys-Virt
 Source0:        https://cpan.metacpan.org/authors/id/D/DA/DANBERR/Sys-Virt-v%{version}.tar.gz#/%{name}-v%{version}.tar.gz
 
 # Build
@@ -72,6 +72,9 @@ perl Build.PL installdirs=vendor
 %{_mandir}/man3/*
 
 %changelog
+* Thu Feb 01 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 10.0.0-1
+- Upgrade to 10.0.0
+
 * Fri Apr 01 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.1.0-4
 - Cleaning-up spec. License verified.
 

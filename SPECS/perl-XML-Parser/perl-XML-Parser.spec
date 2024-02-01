@@ -1,7 +1,7 @@
 Summary:        XML-Parser perl module
 Name:           perl-XML-Parser
-Version:        2.46
-Release:        2%{?dist}
+Version:        2.47
+Release:        1%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -47,6 +47,9 @@ make %{?_smp_mflags} test
 %{_mandir}/man3/*
 
 %changelog
+* Thu Feb 01 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 2.47-1
+- Upgrade to 2.47
+
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.46-2
 - Adding 'BuildRequires: perl-generators'.
 

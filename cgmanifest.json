@@ -19564,8 +19564,8 @@
         "type": "other",
         "other": {
           "name": "perl-Sys-Virt",
-          "version": "9.8.0",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/D/DA/DANBERR/Sys-Virt-v9.8.0.tar.gz"
+          "version": "10.0.0",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/D/DA/DANBERR/Sys-Virt-v10.0.0.tar.gz"
         }
       }
     },
@@ -19924,8 +19924,8 @@
         "type": "other",
         "other": {
           "name": "perl-Test-NoWarnings",
-          "version": "1.04",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/A/AD/ADAMK/Test-NoWarnings-1.04.tar.gz"
+          "version": "1.06",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/H/HA/HAARG/Test-NoWarnings-1.06.tar.gz"
         }
       }
     },
@@ -20524,8 +20524,8 @@
         "type": "other",
         "other": {
           "name": "perl-XML-Parser",
-          "version": "2.46",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/T/TO/TODDR/XML-Parser-2.46.tar.gz"
+          "version": "2.47",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/T/TO/TODDR/XML-Parser-2.47.tar.gz"
         }
       }
     },
