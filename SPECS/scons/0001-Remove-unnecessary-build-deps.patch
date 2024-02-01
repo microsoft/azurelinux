@@ -1,16 +1,29 @@
-From d3044add8e7d57b5aaa6c8bf7697511f50093abb Mon Sep 17 00:00:00 2001
+From e6dd33f678acbbbbbb7d7ad3c795ad7b76db934c Mon Sep 17 00:00:00 2001
 From: amritakohli <amritakohli@microsoft.com>
-Date: Thu, 1 Feb 2024 14:47:48 -0800
-Subject: [PATCH] Patch to remove incorrect dependencies from setup.cfg.
- Changes taken from
+Date: Thu, 1 Feb 2024 15:31:24 -0800
+Subject: [PATCH] Patch to remove incorrect dependencies from setup.cfg. 
+ Changes taken from 
  https://src.fedoraproject.org/rpms/scons/blob/rawhide/f/0001-Remove-unnecessary-build-deps.patch.
- Modified for CBL-Mariner by Amrita Kohli <amritakohli@microsoft.com>
+  Modified for CBL-Mariner by Amrita Kohli <amritakohli@microsoft.com>
 
 ---
+ PKG-INFO       | 1 -
  pyproject.toml | 4 ----
  setup.cfg      | 4 ----
- 2 files changed, 8 deletions(-)
+ 3 files changed, 9 deletions(-)
 
+diff --git a/PKG-INFO b/PKG-INFO
+index a883d81..3253a83 100644
+--- a/PKG-INFO
++++ b/PKG-INFO
+@@ -34,7 +34,6 @@ Classifier: Operating System :: Microsoft :: Windows
+ Requires-Python: >=3.6
+ Description-Content-Type: text/x-rst
+ License-File: LICENSE
+-Requires-Dist: setuptools
+ 
+ SCons - a Software Construction Tool
+ ####################################
 diff --git a/pyproject.toml b/pyproject.toml
 index 548ae2d..f470f03 100644
 --- a/pyproject.toml

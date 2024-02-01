@@ -1,7 +1,7 @@
 %global python3_pkgversion 3
 Name:           scons
 Version:        4.6.0
-Release:        3%{?dist}
+Release:        1%{?dist}
 Summary:        An Open Source software construction tool
 Group:          Development/Tools
 License:        MIT
@@ -28,12 +28,12 @@ In short, SCons is an easier, more reliable and faster way to build software.
 %py3_build
 
 %install
-%{py3_install "--prefix=%{_prefix}" "--standard-lib" "--install-data=%{_datadir}"}
+%{py3_install "--prefix=%{_prefix}" "--install-data=%{_datadir}"}
 %py3_shebang_fix %{buildroot}%{_bindir}/*
 
 %files
 %defattr(-,root,root,-)
-%license LICENSE.txt
+%license LICENSE
 %{python3_sitelib}/*
 %{_bindir}/*
 %{_datadir}/*
