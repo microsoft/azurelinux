@@ -1,6 +1,6 @@
 Summary:        Device Tree Compiler
 Name:           dtc
-Version:        1.6.1
+Version:        1.7.0
 Release:        1%{?dist}
 License:        BSD OR GPLv2+
 Vendor:         Microsoft Corporation
@@ -12,6 +12,10 @@ BuildRequires:  bison
 BuildRequires:  flex
 BuildRequires:  gcc
 BuildRequires:  make
+BuildRequires:  python3-pip
+BuildRequires:  python3-setuptools
+BuildRequires:  python3-setuptools_scm
+BuildRequires:  python3-wheel
 BuildRequires:  swig
 Provides:       libfdt = %{name}-%{version}
 Provides:       python3-libfdt = %{name}-%{version}
@@ -35,18 +39,26 @@ This package provides development files for libfdt
 
 %prep
 %autosetup -p1
-sed -i 's/python2/python3/' pylibfdt/setup.py
-sed -i 's/SUBLEVEL = 0/SUBLEVEL = 1/' Makefile
+# to prevent setuptools from installing an .egg, we need to pass --root to setup.py install
+# since $(PREFIX) already contains %%{buildroot}, we set root to /
+# .eggs are going to be deprecated, see https://github.com/pypa/pip/issues/11501
+sed -i 's@--prefix=$(PREFIX)@--prefix=$(PREFIX) --root=/@' pylibfdt/Makefile.pylibfdt
 
 %build
+export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
 make %{?_smp_mflags} V=1 CC="gcc %{optflags} $LDFLAGS -Wno-error=missing-prototypes -Wno-error=cast-qual" NO_PYTHON=1
 
 %install
+export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
 %make_install \
     PREFIX=%{buildroot}%{_prefix} \
     LIBDIR=%{_libdir} \
     BINDIR=%{_bindir} \
     INCLUDEDIR=%{_includedir}
+
+%check
+export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
+make %{?_smp_mflags} check
 
 %files
 %license GPL
@@ -62,6 +74,10 @@ make %{?_smp_mflags} V=1 CC="gcc %{optflags} $LDFLAGS -Wno-error=missing-prototy
 %{_includedir}/*
 
 %changelog
+* Thu Feb 01 2024 Rachel Menge <rachelmenge@microsoft.com> - 1.7.0-1
+- Update to version 1.7.0
+- Add %check section
+
 * Tue Nov 09 2021 Andrew Phelps <anphel@microsoft.com> - 1.6.1-1
 - Update to version 1.6.1
 - Remove dtc-disable-warning.patch
