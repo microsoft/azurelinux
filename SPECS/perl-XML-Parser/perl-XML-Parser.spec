@@ -11,7 +11,15 @@ Source0:        https://cpan.metacpan.org/authors/id/T/TO/TODDR/XML-Parser-%{ver
 BuildRequires:  expat-devel
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-generators
+BuildRequires:  perl(English)
+BuildRequires:  perl(ExtUtils::MakeMaker)
+%if %{with_check}
+BuildRequires:  perl(Test)
+BuildRequires:  perl(Test::More)
+%endif
+
 Requires:       expat
+Requires:       perl(:MODULE_COMPAT_%(eval "$(perl -V:version)"; echo $version))
 Requires:       perl-libs
 Requires:       perl(IO::File)
 Requires:       perl(IO::Handle)
