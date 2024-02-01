@@ -332,11 +332,8 @@ function generate_image_sbom {
     GOLDEN_IMAGE_NAME_SANITIZED=$(echo "$GOLDEN_IMAGE_NAME_FINAL" | tr '/' '-' | tr ':' '_')
     echo "GOLDEN_IMAGE_NAME_SANITIZED   -> $GOLDEN_IMAGE_NAME_SANITIZED"
 
-    DOCKER_BUILD_DIR="$(pwd)"
-    OUTPUT_FOLDER="$OUTPUT_DIR/SBOM_IMAGES"
-    mkdir -p "$OUTPUT_FOLDER"
-
-    # generate-container-sbom.sh will create the SBOM at the following path
+    DOCKER_BUILD_DIR=$(mktemp -d)
+    # SBOM script will create the SBOM at the following path.
     IMAGE_SBOM_MANIFEST_PATH="$DOCKER_BUILD_DIR/_manifest/spdx_2.2/manifest.spdx.json"
     /bin/bash "$SBOM_SCRIPT" \
         "$DOCKER_BUILD_DIR" \
@@ -345,8 +342,11 @@ function generate_image_sbom {
         "$BASE_IMAGE_NAME-$COMPONENT" \
         "$COMPONENT_VERSION-$DISTRO_IDENTIFIER$BASE_IMAGE_TAG"
 
-    cp -v "$IMAGE_SBOM_MANIFEST_PATH" "$OUTPUT_FOLDER/$GOLDEN_IMAGE_NAME_SANITIZED.spdx.json"
-    echo "Generated SBOM:'$OUTPUT_FOLDER/$GOLDEN_IMAGE_NAME_SANITIZED.spdx.json'"
+    SBOM_IMAGES_DIR="$OUTPUT_DIR/SBOM_IMAGES"
+    mkdir -p "$SBOM_IMAGES_DIR"
+    cp -v "$IMAGE_SBOM_MANIFEST_PATH" "$SBOM_IMAGES_DIR/$GOLDEN_IMAGE_NAME_SANITIZED.spdx.json"
+    echo "Generated SBOM:'$SBOM_IMAGES_DIR/$GOLDEN_IMAGE_NAME_SANITIZED.spdx.json'"
+    sudo rm -rf "$DOCKER_BUILD_DIR"
 }
 
 print_inputs
