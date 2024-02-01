@@ -1,21 +1,27 @@
-Summary:        Lightweight library for embedding a webserver in applications
 Name:           libmicrohttpd
-Version:        0.9.76
-Release:        1%{?dist}
-License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            https://www.gnu.org/software/libmicrohttpd/
+Version:        0.9.77
+Release:        3%{?dist}
+Summary:        Lightweight library for embedding a webserver in applications
+
+# * COPYING says that some main sources are only under LGPL-2.1-or-later
+#   and the rest is dual licensed under LGPL-2.1-or-later OR GPL-2.0-or-later WITH eCos-exception-2.0.
+# * Some docs are under GFDL-1.3-no-invariants-or-later.
+# * Tests and some parts of the build system are under other licenses but they are NOT shipped.
+License:        LGPL-2.1-or-later AND (LGPL-2.1-or-later OR GPL-2.0-or-later WITH eCos-exception-2.0) AND GFDL-1.3-no-invariants-or-later
+
+URL:            http://www.gnu.org/software/libmicrohttpd/
 Source0:        https://ftp.gnu.org/gnu/libmicrohttpd/%{name}-%{version}.tar.gz
 Patch0:         gnutls-utilize-system-crypto-policy.patch
-BuildRequires:  autoconf
-BuildRequires:  automake
-BuildRequires:  doxygen
-BuildRequires:  gettext-devel
-BuildRequires:  gnutls-devel
-BuildRequires:  graphviz
+
 BuildRequires:  libtool
 BuildRequires:  texinfo
+BuildRequires:  gnutls-devel
+BuildRequires:  doxygen
+# Needed only for doc/doxygen 'full' build including dependency graphs
+#BuildRequires:  graphviz
+BuildRequires:  make
 Requires(post): info
 Requires(preun): info
 
@@ -52,24 +58,19 @@ Doxygen documentation for libmicrohttpd and some example source code
 %autosetup -p1
 
 %build
-# Required because patches modify .am files
-autoreconf --install --force
 %configure --disable-static --with-gnutls --enable-https=yes
 %make_build
-make -C doc/doxygen full
-
-# Disabled for now due to problems reported at
-# https://gnunet.org/bugs/view.php?id=1619
+# Using 'fast' to avoid BuildRequires on graphviz; when/if graphviz is available,
+# this can be switched to 'full' to build dependency graphs
+make -C doc/doxygen fast
 
 %check
-%ifnarch s390x
 %make_build check
-%endif
 
 %install
 %make_install
 
-find %{buildroot} -type f -name "*.la" -delete -print
+rm -f %{buildroot}%{_libdir}/*.la
 rm -f %{buildroot}%{_infodir}/dir
 rm -f %{buildroot}%{_bindir}/demo
 
@@ -81,17 +82,17 @@ install -m 644 doc/examples/*.c examples
 cp -R doc/doxygen/html html
 
 %post doc
-%{_bindir}/install-info %{_infodir}/libmicrohttpd.info.gz %{_infodir}/dir || :
-%{_bindir}/install-info %{_infodir}/libmicrohttpd-tutorial.info.gz %{_infodir}/dir || :
+install-info %{_infodir}/libmicrohttpd.info.gz %{_infodir}/dir || :
+install-info %{_infodir}/libmicrohttpd-tutorial.info.gz %{_infodir}/dir || :
 
 %preun doc
 if [ $1 = 0 ] ; then
-%{_bindir}/install-info --delete %{_infodir}/libmicrohttpd.info.gz %{_infodir}/dir || :
-%{_bindir}/install-info --delete %{_infodir}/libmicrohttpd-tutorial.info.gz %{_infodir}/dir || :
+install-info --delete %{_infodir}/libmicrohttpd.info.gz %{_infodir}/dir || :
+install-info --delete %{_infodir}/libmicrohttpd-tutorial.info.gz %{_infodir}/dir || :
 fi
 
 %files
-%doc README
+%doc README NEWS
 %license COPYING
 %{_libdir}/libmicrohttpd.so.*
 
@@ -110,17 +111,59 @@ fi
 %doc html
 
 %changelog
-* Thu Sep 05 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 0.9.76-1
-- Upgrade to 0.9.76 to address CVE-2023-27371
-- Lint spec
-- License verified
+* Thu Feb 01 2024 Dan Streetman <ddstreet@ieee.org> - 0.9.77-3
+- Update to version from Fedora 39.
+- Next line is present only to avoid tooling failures, and does not indicate the actual package license.
+- Initial CBL-Mariner import from Fedora 39 (license: MIT).
+- license verified
+- drop epoch
+- remove prefix from install-info calls
+- change doc/doxygen build from 'full' to 'fast' to avoid (currently missing) graphviz build dep
 
-* Mon Nov 01 2021 Muhammad Falak <mwani@microsft.com> - 0.9.71-3
-- Remove epoch
+* Mon Aug 07 2023 Lukáš Zaoral <lzaoral@redhat.com> - 1:0.9.77-2
+- migrate to SPDX license format
 
-* Fri Apr 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1:0.9.71-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
-- Making binaries paths compatible with CBL-Mariner's paths.
+* Fri Jul 28 2023 Martin Gansser <martinkg@fedoraproject.org> - 1:0.9.77-1
+- Update to 1:0.9.77
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.9.76-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Feb 28 2023 Martin Gansser <martinkg@fedoraproject.org> - 1:0.9.76-1
+- Update to 1:0.9.76
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.9.75-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.9.75-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.9.75-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Dec 28 2021 Martin Gansser <martinkg@fedoraproject.org> - 1:0.9.75-2
+- Cleanup specfile
+
+* Mon Dec 27 2021 Martin Gansser <martinkg@fedoraproject.org> - 1:0.9.75-1
+- Update to 1:0.9.75
+
+* Mon Dec 20 2021 Martin Gansser <martinkg@fedoraproject.org> - 1:0.9.74-1
+- Update to 1:0.9.74
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.9.73-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon Apr 26 2021 Martin Gansser <martinkg@fedoraproject.org> - 1:0.9.73-1
+- Update to 1:0.9.73
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.9.72-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Dec 29 2020 Martin Gansser <martinkg@fedoraproject.org> - 1:0.9.72-1
+- Update to 1:0.9.72
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.9.71-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
 * Mon Jun 29 2020 Martin Gansser <martinkg@fedoraproject.org> - 1:0.9.71-1
 - Update to 1:0.9.71
