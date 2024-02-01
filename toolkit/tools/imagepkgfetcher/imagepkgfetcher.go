@@ -159,11 +159,11 @@ func cloneSystemConfigs(cloner repocloner.RepoCloner, configFile, baseDirPath st
 	if err != nil {
 		// Fallback to legacy flow with multiple transactions in case we get a OOM error from a large transaction.
 		logger.Log.Warnf("Failed to clone packages in a single transaction, will retry with individual transactions... (%s)", err)
-		logger.Log.Warnf("\tCheck log file '%s' for more details from package manager.", *logFile)
+		logger.Log.Warnf("\tCheck log file '%s' for more details from package manager.", *logFlags.LogFile)
 		_, err = cloner.CloneByPackageVer(cloneDeps, packageVersionsInConfig...)
 		if err != nil {
 			logger.Log.Errorf("Also failed to clone packages with individual transactions. Error: %s", err)
-			logger.Log.Errorf("\tCheck log file '%s' for more details from package manager.", *logFile)
+			logger.Log.Errorf("\tCheck log file '%s' for more details from package manager.", *logFlags.LogFile)
 		}
 	}
 	return
