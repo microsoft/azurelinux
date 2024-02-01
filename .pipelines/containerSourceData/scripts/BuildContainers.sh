@@ -115,6 +115,7 @@ function print_inputs {
     echo "PUBLISH_TO_ACR                -> $PUBLISH_TO_ACR"
     echo "CREATE_SBOM                   -> $CREATE_SBOM"
     echo "SBOM_TOOL_PATH                -> $SBOM_TOOL_PATH"
+    echo "SBOM_SCRIPT                   -> $SBOM_SCRIPT"
 }
 
 function validate_inputs {
