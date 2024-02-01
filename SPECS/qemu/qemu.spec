@@ -180,6 +180,10 @@ Distribution:   Mariner
 %ifarch %{ix86} %{arm}
 %define have_block_rbd 0
 %endif
+# disable for azl till dependency is available
+%if 0%{?azl}
+%define have_block_rbd 0
+%endif
 
 
 %global have_block_gluster 1
@@ -200,9 +204,6 @@ Distribution:   Mariner
 
 %define have_librdma 1
 %ifarch %{arm}
-%define have_librdma 0
-%endif
-%if 0%{?azl}
 %define have_librdma 0
 %endif
 
