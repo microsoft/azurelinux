@@ -46,7 +46,6 @@ if __name__ == "__main__":
             print(
                 "\n"
                 f"The JSON file at {path} is not sorted and indented correctly.\n"
-                f"Apply the patch above or run 'toolkit/scripts/sort_required_configs.py {path}' to fix it.",
-                file=sys.stderr,
+                f"Apply the patch above or run 'toolkit/scripts/sort_required_configs.py {path}' to fix it."
             )
             sys.exit(1)
