@@ -10,12 +10,12 @@ import (
 )
 
 func TestVerityPartitionIsValidInvalidPartLabel(t *testing.T) {
-	validPartition := VerityPartition{
+	invalidPartition := VerityPartition{
 		IdType: "PartLabel",
 		Id:     "",
 	}
 
-	err := validPartition.IsValid()
+	err := invalidPartition.IsValid()
 	assert.Error(t, err)
 	assert.ErrorContains(t, err, "invalid Id: empty string")
 }

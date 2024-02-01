@@ -10,7 +10,7 @@ import (
 )
 
 func TestVerityIsValidInvalidPartLabel(t *testing.T) {
-	validVerity := Verity{
+	invalidVerity := Verity{
 		DataPartition: VerityPartition{
 			IdType: "PartUuid",
 			Id:     "0f2884c0-8fe0-4a19-87bf-286b7fe9d6f2",
@@ -21,7 +21,7 @@ func TestVerityIsValidInvalidPartLabel(t *testing.T) {
 		},
 	}
 
-	err := validVerity.IsValid()
+	err := invalidVerity.IsValid()
 	assert.Error(t, err)
 	assert.ErrorContains(t, err, "invalid Id: empty string")
 }

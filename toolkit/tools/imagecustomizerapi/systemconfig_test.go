@@ -55,7 +55,7 @@ func TestSystemConfigIsValidKernelCommandLineInvalidChars(t *testing.T) {
 }
 
 func TestSystemConfigIsValidVerityInvalidPartLabel(t *testing.T) {
-	validVerity := SystemConfig{
+	invalidVerity := SystemConfig{
 		Verity: &Verity{
 			DataPartition: VerityPartition{
 				IdType: "PartUuid",
@@ -68,7 +68,7 @@ func TestSystemConfigIsValidVerityInvalidPartLabel(t *testing.T) {
 		},
 	}
 
-	err := validVerity.IsValid()
+	err := invalidVerity.IsValid()
 	assert.Error(t, err)
 	assert.ErrorContains(t, err, "invalid Id: empty string")
 }
