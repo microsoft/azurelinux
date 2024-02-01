@@ -18,9 +18,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://pagure.io/gfs2-utils
 Source:         https://releases.pagure.org/gfs2-utils/gfs2-utils-%{version}.tar.gz
-Patch0:         0-Fix_libuuid_linking.patch
-Patch1:         1-Fix_more_linking_errors.patch
-Patch2:         fix-format-security.patch
 
 BuildRequires:  automake
 BuildRequires:  bison
@@ -79,7 +76,8 @@ modifying, and correcting inconsistencies in GFS2 file systems.
 
 %changelog
 * Thu Feb 01 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.1-1
-- Auto-upgrade to 3.5.1 - Upgrade to 3.5.1
+- Auto-upgrade to 3.5.1.
+- Remove patches.
 
 * Tue Sep 26 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.2.0-12
 - Removing 'exit' calls from the '%%check' section.
