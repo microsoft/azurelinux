@@ -11,6 +11,10 @@ parameters:
   type: string
 - name: selfRepoRoot
   type: string
+- name: sbomToolPath
+  type: string
+- name: sbomScript
+  type: string
 
 stages:
 - template: BuildContainersValidation.yml@${{ parameters.selfRepoName }}
@@ -29,6 +33,8 @@ stages:
     agentPool: ${{ parameters.agentPool }}
     selfRepoName: ${{ parameters.selfRepoName }}
     selfRepoRoot: ${{ parameters.selfRepoRoot }}
+    sbomToolPath: ${{ parameters.sbomToolPath }}
+    sbomScript: ${{ parameters.sbomScript }}
 
 - template: BuildContainersWrapup.yml@${{ parameters.selfRepoName }}
   parameters:

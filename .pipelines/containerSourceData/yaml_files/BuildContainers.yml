@@ -15,6 +15,10 @@ parameters:
   type: string
 - name: selfRepoRoot
   type: string
+- name: sbomToolPath
+  type: string
+- name: sbomScript
+  type: string
 
 # An image is defined by a set of following parameters:
 # - imageName: the name of the image (e.g. nodejs, postgres, cdi, etc.)
@@ -276,6 +280,10 @@ stages:
         branchName: $[ stageDependencies.${{ parameters.dependsOnStage }}.validation_job.outputs['set_out_variables.github_branch'] ]
         ${{ if eq(parameters.publishingLevel, 'Preview') }}:
           securityConfigArgument: '--prodConfig'
+          createSbom: 'true'
+          sbomToolPath: ${{ parameters.sbomToolPath }}
+          sbomScript: ${{ parameters.sbomScript }}
+          manifestToolPath: $(Build.Repository.LocalPath)/sbom/Microsoft.ManifestTool
 
       steps:
       - checkout: ${{ parameters.selfRepoName }}
@@ -339,6 +347,15 @@ stages:
           targetType: 'inline'
           script: sudo tdnf install -y moby-buildx
         condition: eq(variables['proceed'], 'true')
+
+      - task: Bash@3
+        displayName: 'Install ManifestTool'
+        inputs:
+          targetType: 'inline'
+          script: |
+            sudo tdnf install -y unzip
+            unzip $(sbomToolPath) -d $(manifestToolPath)
+        condition: and(eq(variables['proceed'], 'true'), ne(variables['sbomToolPath'], ''))
 
       - task: DownloadPipelineArtifact@2
         displayName: 'Download $(baseContainerFile) - ${{ parameters.architecture }}'
@@ -410,7 +427,10 @@ stages:
                           -n "${{ goldenImage.useRpmQaCmd }}"
                           -o "$(setAcrRepoVariables.data_repo_prefix)"
                           -p "${{ lower(parameters.publishingLevel) }}"
-                          -q "true"'
+                          -q "true"
+                          -r "$(createSbom)"
+                          -s "$(manifestToolPath)"
+                          -t "$(sbomScript)"'
             condition: and(
                           eq(variables['proceed'], 'true'),
                           eq(variables['setAcrRepoVariables.data_is_golden_image'], 'True'),
@@ -439,7 +459,10 @@ stages:
                           -n "${{ hciImage.useRpmQaCmd }}"
                           -o "$(setAcrRepoVariables.data_repo_prefix)"
                           -p "${{ lower(parameters.publishingLevel) }}"
-                          -q "true"'
+                          -q "true"
+                          -r "$(createSbom)"
+                          -s "$(manifestToolPath)"
+                          -t "$(sbomScript)"'
             condition: and(
                           eq(variables['proceed'], 'true'),
                           eq(variables['setAcrRepoVariables.data_is_hci_golden_image'], 'True')

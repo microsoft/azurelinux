@@ -23,6 +23,9 @@ set -e
 # - o) Repo prefix (e.g. public/cbl-mariner, unlisted/cbl-mariner, etc.)
 # - p) Publishing level (e.g. preview, development)
 # - q) Publish to ACR (e.g. true, false. If true, the script will push the container to ACR)
+# - r) Create SBOM (e.g. true, false. If true, the script will create SBOM for the container)
+# - s) SBOM tool path.
+# - t) Script to create SBOM for the container image.
 
 # Assuming you are in your current working directory. Below should be the directory structure:
 #   ls
@@ -50,7 +53,7 @@ set -e
 #     -j OUTPUT -k ./rpms.tar.gz -l ~/CBL-Mariner/.pipelines/containerSourceData \
 #     -m "false" -n "false" -p development -q "false"
 
-while getopts ":a:b:c:d:e:f:g:h:i:j:k:l:m:n:o:p:q:" OPTIONS; do
+while getopts ":a:b:c:d:e:f:g:h:i:j:k:l:m:n:o:p:q:r:s:t:" OPTIONS; do
     case ${OPTIONS} in
     a ) BASE_IMAGE_NAME_FULL=$OPTARG;;
     b ) ACR=$OPTARG;;
@@ -69,6 +72,9 @@ while getopts ":a:b:c:d:e:f:g:h:i:j:k:l:m:n:o:p:q:" OPTIONS; do
     o ) REPO_PREFIX=$OPTARG;;
     p ) PUBLISHING_LEVEL=$OPTARG;;
     q ) PUBLISH_TO_ACR=$OPTARG;;
+    r ) CREATE_SBOM=$OPTARG;;
+    s ) SBOM_TOOL_PATH=$OPTARG;;
+    t ) SBOM_SCRIPT=$OPTARG;;
 
     \? )
         echo "Error - Invalid Option: -$OPTARG" 1>&2
@@ -107,6 +113,8 @@ function print_inputs {
     echo "REPO_PREFIX                   -> $REPO_PREFIX"
     echo "PUBLISHING_LEVEL              -> $PUBLISHING_LEVEL"
     echo "PUBLISH_TO_ACR                -> $PUBLISH_TO_ACR"
+    echo "CREATE_SBOM                   -> $CREATE_SBOM"
+    echo "SBOM_TOOL_PATH                -> $SBOM_TOOL_PATH"
 }
 
 function validate_inputs {
@@ -159,6 +167,17 @@ function validate_inputs {
         echo "Error - Publishing level cannot be empty."
         exit 1
     fi
+
+    if [[ "$CREATE_SBOM" =~ [Tt]rue ]]; then
+        if [[ -z "$SBOM_TOOL_PATH" ]] ; then
+            echo "Error - SBOM tool path cannot be empty."
+            exit 1
+        fi
+        if [[ ! -f "$SBOM_SCRIPT" ]]; then
+            echo "Error - SBOM script does not exist."
+            exit 1
+        fi
+    fi
 }
 
 function initialization {
@@ -169,13 +188,15 @@ function initialization {
         GOLDEN_IMAGE_NAME=${ACR}.azurecr.io/${REPOSITORY}
     fi
 
+    BASE_IMAGE_NAME=${BASE_IMAGE_NAME_FULL%:*}
     BASE_IMAGE_TAG=${BASE_IMAGE_NAME_FULL#*:}
-    
+
     # For Azure Linux 2.0, we have shipped the container images with
     # the below value of DISTRO_IDENTIFIER in the image tag.
     # TODO: We may need to update this value for Azure Linux 3.0.
     DISTRO_IDENTIFIER="cm"
     echo "Golden Image Name             -> $GOLDEN_IMAGE_NAME"
+    echo "Base ACR Container Name       -> $BASE_IMAGE_NAME"
     echo "Base ACR Container Tag        -> $BASE_IMAGE_TAG"
     echo "Distro Identifier             -> $DISTRO_IDENTIFIER"
 }
@@ -247,7 +268,6 @@ function set_image_tag {
     echo "+++ Get version of the installed package in the container."
     local containerId
     local installedPackage
-    local componentVersion
 
     containerId=$(docker run --entrypoint /bin/bash -dt "$GOLDEN_IMAGE_NAME")
 
@@ -263,18 +283,18 @@ function set_image_tag {
     fi
 
     echo "Full Installed Package:       -> $installedPackage"
-    componentVersion=$(echo "$installedPackage" | awk '{n=split($0,a,"-")};{split(a[n],b,".")}; {print a[n-1]"-"b[1]}') # 16.16.0-1
-    echo "Component Version             -> $componentVersion"
+    COMPONENT_VERSION=$(echo "$installedPackage" | awk '{n=split($0,a,"-")};{split(a[n],b,".")}; {print a[n-1]"-"b[1]}') # 16.16.0-1
+    echo "Component Version             -> $COMPONENT_VERSION"
     docker rm -f "$containerId"
 
     # Rename the image to include package version
     # For HCI Images, do not include "-$DISTRO_IDENTIFIER" in the image tag; Instead use a "."
     if [ "$IS_HCI_IMAGE" = true ]; then
         # Example: acrafoimages.azurecr.io/base/kubevirt/virt-operator:0.59.0-2.2.0.20230607-amd64
-        GOLDEN_IMAGE_NAME_FINAL="$GOLDEN_IMAGE_NAME:$componentVersion.$BASE_IMAGE_TAG"
+        GOLDEN_IMAGE_NAME_FINAL="$GOLDEN_IMAGE_NAME:$COMPONENT_VERSION.$BASE_IMAGE_TAG"
     else
         # Example: azurelinuxpreview.azurecr.io/base/nodejs:16.19.1-2-$DISTRO_IDENTIFIER2.0.20230607-amd64
-        GOLDEN_IMAGE_NAME_FINAL="$GOLDEN_IMAGE_NAME:$componentVersion-$DISTRO_IDENTIFIER$BASE_IMAGE_TAG"
+        GOLDEN_IMAGE_NAME_FINAL="$GOLDEN_IMAGE_NAME:$COMPONENT_VERSION-$DISTRO_IDENTIFIER$BASE_IMAGE_TAG"
     fi
 }
 
@@ -287,17 +307,43 @@ function finalize {
 }
 
 function publish_to_acr {
-    if [[ "$PUBLISH_TO_ACR" =~ [Tt]rue ]]; then
-
-        echo "+++ Publish container $GOLDEN_IMAGE_NAME_FINAL"
-        echo
-
-        echo "login into ACR: $ACR"
-        az acr login --name "$ACR"
-
-        docker image push "$GOLDEN_IMAGE_NAME_FINAL"
-        echo
+    if [[ ! "$PUBLISH_TO_ACR" =~ [Tt]rue ]]; then
+        echo "+++ Skip publishing to ACR"
+        return
     fi
+
+    echo "+++ Publish container $GOLDEN_IMAGE_NAME_FINAL"
+    echo "login into ACR: $ACR"
+    az acr login --name "$ACR"
+    docker image push "$GOLDEN_IMAGE_NAME_FINAL"
+}
+
+function generate_image_sbom {
+    if [[ ! "$CREATE_SBOM" =~ [Tt]rue ]]; then
+        echo "+++ Skip creating SBOM"
+        return
+    fi
+
+    echo "+++ Generate SBOM for the container image"
+    echo "Sanitized image name has '/' replaced with '-' and ':' replaced with '_'."
+    GOLDEN_IMAGE_NAME_SANITIZED=$(echo "$GOLDEN_IMAGE_NAME_FINAL" | tr '/' '-' | tr ':' '_')
+    echo "GOLDEN_IMAGE_NAME_SANITIZED   -> $GOLDEN_IMAGE_NAME_SANITIZED"
+
+    DOCKER_BUILD_DIR="$(pwd)"
+    OUTPUT_FOLDER="$OUTPUT_DIR/SBOM_IMAGES"
+    mkdir -p "$OUTPUT_FOLDER"
+
+    # generate-container-sbom.sh will create the SBOM at the following path
+    IMAGE_SBOM_MANIFEST_PATH="$DOCKER_BUILD_DIR/_manifest/spdx_2.2/manifest.spdx.json"
+    ./"$SBOM_SCRIPT" \
+        "$DOCKER_BUILD_DIR" \
+        "$GOLDEN_IMAGE_NAME_FINAL" \
+        "$SBOM_TOOL_PATH" \
+        "$BASE_IMAGE_NAME-$COMPONENT" \
+        "$COMPONENT_VERSION-$DISTRO_IDENTIFIER$BASE_IMAGE_TAG"
+
+    cp -v "$IMAGE_SBOM_MANIFEST_PATH" "$OUTPUT_FOLDER/SBOM_IMAGES/$GOLDEN_IMAGE_NAME_SANITIZED.spdx.json"
+    echo "Generated SBOM:'$OUTPUT_FOLDER/SBOM_IMAGES/$GOLDEN_IMAGE_NAME_SANITIZED.spdx.json'"
 }
 
 print_inputs
@@ -310,3 +356,4 @@ docker_build
 set_image_tag
 finalize
 publish_to_acr
+generate_image_sbom
