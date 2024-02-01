@@ -202,6 +202,9 @@ Distribution:   Mariner
 %ifarch %{arm}
 %define have_librdma 0
 %endif
+%if 0%{?azl}
+%define have_librdma 0
+%endif
 
 %define have_libcacard 1
 %if 0%{?azl}
