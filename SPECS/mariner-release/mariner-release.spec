@@ -62,7 +62,7 @@ EOF
 %config(noreplace) %{_sysconfdir}/issue.net
 
 %changelog
-* Thu Feb 01 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.0-3
+* Thu Feb 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.0-3
 - Renamed mariner-release to azurelinux-release file
 - Renamed MARINER_BUILD_NUMBER property to AZURELINUX_BUILD_NUMBER
 
