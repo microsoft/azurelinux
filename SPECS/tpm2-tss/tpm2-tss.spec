@@ -12,6 +12,7 @@ Source0: https://github.com/tpm2-software/tpm2-tss/releases/download/%{version}/
 Source1: %{name}.sysusers
 BuildRequires:  json-c-devel
 BuildRequires:  openssl-devel
+BuildRequires:  systemd-devel
 BuildRequires:  shadow-utils
 
 Requires: openssl
