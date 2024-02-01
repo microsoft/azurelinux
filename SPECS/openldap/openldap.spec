@@ -1,8 +1,8 @@
 %global _default_patch_fuzz 2
 Summary:        OpenLDAP (Lightweight Directory Access Protocol)
 Name:           openldap
-Version:        2.4.57
-Release:        8%{?dist}
+Version:        2.6.7
+Release:        1%{?dist}
 License:        OpenLDAP
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,9 +12,6 @@ URL:            https://www.openldap.org/
 Source0:        https://gpl.savoirfairelinux.net/pub/mirrors/openldap/openldap-release/%{name}-%{version}.tgz
 Patch0:         openldap-2.4.40-gssapi-1.patch
 Patch1:         openldap-2.4.44-consolidated-2.patch
-Patch2:         CVE-2015-3276.patch
-Patch3:         CVE-2021-27212.patch
-Patch4:         CVE-2022-29155.patch
 BuildRequires:  cyrus-sasl-bootstrap-devel >= 2.1
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  groff
@@ -72,6 +69,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_sysconfdir}/openldap/*
 
 %changelog
+* Thu Feb 01 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.6.7-1
+- Auto-upgrade to 2.6.7 - Package upgrade for Azure Linux 3.0
+
 * Fri Feb 10 2023 Sriram Nambakam <snambakam@microsoft.com> - 2.4.57-8
 - Let openldap depend on cyrus-sasl.
 

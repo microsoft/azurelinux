@@ -15064,8 +15064,8 @@
         "type": "other",
         "other": {
           "name": "openldap",
-          "version": "2.4.57",
-          "downloadUrl": "https://gpl.savoirfairelinux.net/pub/mirrors/openldap/openldap-release/openldap-2.4.57.tgz"
+          "version": "2.6.7",
+          "downloadUrl": "https://gpl.savoirfairelinux.net/pub/mirrors/openldap/openldap-release/openldap-2.6.7.tgz"
         }
       }
     },
