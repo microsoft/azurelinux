@@ -428,6 +428,10 @@ chroot_and_install_rpms unzip
 build_rpm_in_chroot_no_install gperf
 chroot_and_install_rpms gperf
 
+# Python3 and pam need libxcrypt
+build_rpm_in_chroot_no_install libxcrypt
+chroot_and_install_rpms libxcrypt
+
 # Python3 needs to be installed for RPM to build
 build_rpm_in_chroot_no_install python3
 chroot_and_install_rpms python3 python3
@@ -485,8 +489,8 @@ build_rpm_in_chroot_no_install curl
 build_rpm_in_chroot_no_install cracklib
 
 # pam needs libxcrypt
-build_rpm_in_chroot_no_install libxcrypt
-chroot_and_install_rpms libxcrypt
+#build_rpm_in_chroot_no_install libxcrypt
+#chroot_and_install_rpms libxcrypt
 # pam needs cracklib
 chroot_and_install_rpms cracklib
 build_rpm_in_chroot_no_install cmake
@@ -578,7 +582,7 @@ chroot_and_install_rpms libassuan
 chroot_and_install_rpms libksba
 build_rpm_in_chroot_no_install gnupg2
 
-# gpgme needs gnupg2 and python3
+# gpgme needs gnupg2 and python3 and setuptools
 chroot_and_install_rpms gnupg2
 build_rpm_in_chroot_no_install gpgme
 
