@@ -1,9 +1,11 @@
+%global maj_ver 17
+
 %global compiler_rt_srcdir llvm-project-llvmorg-%{version}
 
 Summary:        LLVM compiler support routines
 Name:           compiler-rt
 Version:        17.0.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Apache 2.0 WITH exceptions
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -29,7 +31,7 @@ BlocksRuntime is an implementation of Apple "blocks" interface.
 mkdir -p build
 cd build
 %cmake -DCMAKE_BUILD_TYPE=Release  \
-	-DCOMPILER_RT_INSTALL_PATH=%{_prefix}/lib/clang/%{version} \
+	-DCOMPILER_RT_INSTALL_PATH=%{_prefix}/lib/clang/%{maj_ver} \
        -Wno-dev ../compiler-rt
 
 %make_build
@@ -42,12 +44,15 @@ cd build
 %defattr(-,root,root)
 %license LICENSE.TXT
 
-%{_libdir}/clang/%{version}/bin/*
-%{_libdir}/clang/%{version}/include/*
-%{_libdir}/clang/%{version}/lib/*
-%{_libdir}/clang/%{version}/share/*
+%{_libdir}/clang/%{maj_ver}/bin/*
+%{_libdir}/clang/%{maj_ver}/include/*
+%{_libdir}/clang/%{maj_ver}/lib/*
+%{_libdir}/clang/%{maj_ver}/share/*
 
 %changelog
+* Mon Jan 29 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 17.0.6-2
+- fix install folder
+
 * Tue Jan 16 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 17.0.6-1
 - Upgrade to 17.0.6
 
