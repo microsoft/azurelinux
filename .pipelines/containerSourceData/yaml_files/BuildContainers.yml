@@ -278,6 +278,8 @@ stages:
           securityConfigArgument: '--prodConfig'
 
       steps:
+      - checkout: ${{ parameters.selfRepoName }}
+
       # After the following task, we will have the following variables:
       # -> $(setAcrRepoVariables.data_is_golden_image)
       # -> $(setAcrRepoVariables.data_is_hci_golden_image)
