@@ -5530,8 +5530,8 @@
         "type": "other",
         "other": {
           "name": "hunspell-en",
-          "version": "0.20140811.1",
-          "downloadUrl": "https://github.com/en-wl/wordlist/archive/rel-2014.08.11.1.tar.gz"
+          "version": "0.20201207",
+          "downloadUrl": "https://github.com/en-wl/wordlist/archive/refs/tags/rel-2020.12.07.tar.gz"
         }
       }
     },
