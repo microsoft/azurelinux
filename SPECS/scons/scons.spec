@@ -39,8 +39,8 @@ In short, SCons is an easier, more reliable and faster way to build software.
 %{_datadir}/*
 
 %changelog
-* Thu Jan 18 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.6.0-1
-- Auto-upgrade to 4.6.0 - For 3.0 release
+* Thu Feb 01 2024 Amrita Kohli <amritakohli@microsoft.com> - 4.6.0-1
+- Upgrade to 4.6.0 - For 3.0 release
 
 * Thu Feb 17 2022 Thomas Crain <thcrain@microsoft.com> - 3.0.1-6
 - Build with python3 instead of python2
