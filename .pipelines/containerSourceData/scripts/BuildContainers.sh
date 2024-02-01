@@ -45,12 +45,10 @@ set -e
 
 # Example usage:
 # /bin/bash ~/CBL-Mariner/.pipelines/containerSourceData/scripts/BuildContainers.sh \
-#     -a "mcr.microsoft.com/cbl-mariner/base/core:2.0" \
-#     -b azurelinuxlocal -c "base/nodejs" -d "nodejs" \
-#     -e "nodejs18" -f nodejs18.pkg -g Dockerfile-Nodejs \
-#     -h "" -i "" -j OUTPUT -k ./rpms.tar.gz \
-#     -l ~/CBL-Mariner/.pipelines/containerSourceData \
-#     -m "false" -n "false" -o "" -p development -q "false"
+#     -a "mcr.microsoft.com/cbl-mariner/base/core:2.0" -b azurelinuxlocal \
+#     -c "base/nodejs" -d "nodejs" -e "nodejs18" -f nodejs18.pkg -g Dockerfile-Nodejs \
+#     -j OUTPUT -k ./rpms.tar.gz -l ~/CBL-Mariner/.pipelines/containerSourceData \
+#     -m "false" -n "false" -p development -q "false"
 
 while getopts ":a:b:c:d:e:f:g:h:i:j:k:l:m:n:o:p:q:" OPTIONS; do
     case ${OPTIONS} in
