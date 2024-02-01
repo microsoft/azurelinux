@@ -152,15 +152,6 @@ func (m *MountPoint) GetTarget() string {
 	return m.target
 }
 
-func FindMountPointByTarget(mountPoints []*MountPoint, targetPath string) *MountPoint {
-	for _, mountPoint := range mountPoints {
-		if mountPoint.GetTarget() == targetPath {
-			return mountPoint
-		}
-	}
-	return nil
-}
-
 // NewChroot creates a new Chroot struct
 func NewChroot(rootDir string, isExistingDir bool) *Chroot {
 	// get chroot folder
@@ -678,6 +669,15 @@ func (c *Chroot) createMountPoints() (err error) {
 	}
 
 	return
+}
+
+func (c *Chroot) FindMountPointByTarget(targetPath string) *MountPoint {
+	for _, mountPoint := range c.mountPoints {
+		if mountPoint.GetTarget() == targetPath {
+			return mountPoint
+		}
+	}
+	return nil
 }
 
 // extractWorkerTar uses tar with gzip or pigz to setup a chroot directory using a rootfs tar

@@ -15,7 +15,7 @@ import (
 func customizePartitionsUsingFileCopy(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
 	buildImageFile string, newBuildImageFile string,
 ) error {
-	existingImageConnection, _, err := connectToExistingImage(buildImageFile, buildDir, "imageroot", false)
+	existingImageConnection, err := connectToExistingImage(buildImageFile, buildDir, "imageroot", false)
 	if err != nil {
 		return err
 	}

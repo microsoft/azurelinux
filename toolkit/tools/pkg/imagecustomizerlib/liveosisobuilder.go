@@ -444,13 +444,13 @@ func (b *LiveOSIsoBuilder) prepareArtifactsFromFullImage(rawImageFile string) er
 	logger.Log.Infof("Preparing iso artifacts")
 
 	logger.Log.Debugf("Connecting to raw image (%s)", rawImageFile)
-	imageConnection, mountPoints, err := connectToExistingImage(rawImageFile, b.workingDirs.isoBuildDir, "imageroot", true)
+	imageConnection, err := connectToExistingImage(rawImageFile, b.workingDirs.isoBuildDir, "imageroot", true)
 	if err != nil {
 		return err
 	}
 	defer imageConnection.Close()
 
-	bootMountPoint := safechroot.FindMountPointByTarget(mountPoints, "/boot/efi")
+	bootMountPoint := imageConnection.Chroot().FindMountPointByTarget("/boot/efi")
 	if bootMountPoint == nil {
 		return fmt.Errorf("failed to find boot partition mount point in %s", rawImageFile)
 	}
@@ -460,7 +460,7 @@ func (b *LiveOSIsoBuilder) prepareArtifactsFromFullImage(rawImageFile string) er
 		return fmt.Errorf("failed to extract boot artifacts from image (%s):\n%w", rawImageFile, err)
 	}
 
-	rootfsMountPoint := safechroot.FindMountPointByTarget(mountPoints, "/")
+	rootfsMountPoint := imageConnection.Chroot().FindMountPointByTarget("/")
 	if rootfsMountPoint == nil {
 		return fmt.Errorf("failed to find rootfs partition mount point in %s", rawImageFile)
 	}
