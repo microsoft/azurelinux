@@ -303,6 +303,7 @@ fi
 %{_libdir}/%{name}/plugins/vmsvc/libvmbackup.so
 %{_libdir}/%{name}/plugins/vmsvc/libgdp.so
 %{_libdir}/%{name}/plugins/vmsvc/libguestStore.so
+%{_libdir}/%{name}/plugins/vmsvc/libcomponentMgr.so
 #Usually in desktop package
 %{_bindir}/vmware-vmblock-fuse
 
