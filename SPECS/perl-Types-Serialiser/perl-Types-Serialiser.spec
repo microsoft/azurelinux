@@ -1,8 +1,8 @@
 # Got the intial spec from Fedora and modified it
 Summary:	Simple data types for common serialization formats
 Name:		perl-Types-Serialiser
-Version:	1.0
-Release:        8%{?dist}
+Version:	1.01
+Release:        1%{?dist}
 License:	GPL+ or Artistic
 Group:		Development/Libraries
 URL:		http://search.cpan.org/dist/Types-Serialiser/
@@ -57,6 +57,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Thu Feb 01 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.01-1
+- Auto-upgrade to 1.01 - Azure Linux 3.0 - package upgrades
+
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0-8
 - Adding 'BuildRequires: perl-generators'.
 
