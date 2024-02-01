@@ -66,6 +66,7 @@ parameters:
     packageFileName: nodejs18.pkg
     dockerfile: Dockerfile-Nodejs
     repository: base/nodejs18
+    distroless: true
   - imageName: openmpi
     componentName: openmpi
     packageFileName: openmpi.pkg
@@ -86,16 +87,19 @@ parameters:
     packageFileName: prometheus.pkg
     dockerfile: Dockerfile-Prometheus
     repository: base/prometheus
+    distroless: true
   - imageName: prometheusadapter
     componentName: prometheus-adapter
     packageFileName: prometheusadapter.pkg
     dockerfile: Dockerfile-Prometheus-Adapter
     repository: base/prometheus-adapter
+    distroless: true
   - imageName: python
     componentName: python
     packageFileName: python.pkg
     dockerfile: Dockerfile-Python
     repository: base/python
+    distroless: true
   - imageName: pytorch
     componentName: python3-pytorch
     packageFileName: pytorch.pkg
@@ -430,7 +434,8 @@ stages:
                           -q "true"
                           -r "$(createSbom)"
                           -s "$(manifestToolPath)"
-                          -t "$(sbomScript)"'
+                          -t "$(sbomScript)"
+                          -u "${{ goldenImage.distroless }}"'
             condition: and(
                           eq(variables['proceed'], 'true'),
                           eq(variables['setAcrRepoVariables.data_is_golden_image'], 'True'),
@@ -462,7 +467,8 @@ stages:
                           -q "true"
                           -r "$(createSbom)"
                           -s "$(manifestToolPath)"
-                          -t "$(sbomScript)"'
+                          -t "$(sbomScript)"
+                          -u "${{ hciImage.distroless }}"'
             condition: and(
                           eq(variables['proceed'], 'true'),
                           eq(variables['setAcrRepoVariables.data_is_hci_golden_image'], 'True')

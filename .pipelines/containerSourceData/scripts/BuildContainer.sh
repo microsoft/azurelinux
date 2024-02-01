@@ -26,6 +26,7 @@ set -e
 # - r) Create SBOM (e.g. true, false. If true, the script will create SBOM for the container)
 # - s) SBOM tool path.
 # - t) Script to create SBOM for the container image.
+# - u) Distroless container (e.g. true, false. If true, the script will create distroless container)
 
 # Assuming you are in your current working directory. Below should be the directory structure:
 #   │   rpms.tar.gz
@@ -52,7 +53,7 @@ set -e
 #     -j OUTPUT -k ./rpms.tar.gz -l ~/CBL-Mariner/.pipelines/containerSourceData \
 #     -m "false" -n "false" -p development -q "false"
 
-while getopts ":a:b:c:d:e:f:g:h:i:j:k:l:m:n:o:p:q:r:s:t:" OPTIONS; do
+while getopts ":a:b:c:d:e:f:g:h:i:j:k:l:m:n:o:p:q:r:s:t:u:" OPTIONS; do
     case ${OPTIONS} in
     a ) BASE_IMAGE_NAME_FULL=$OPTARG;;
     b ) ACR=$OPTARG;;
@@ -74,6 +75,7 @@ while getopts ":a:b:c:d:e:f:g:h:i:j:k:l:m:n:o:p:q:r:s:t:" OPTIONS; do
     r ) CREATE_SBOM=$OPTARG;;
     s ) SBOM_TOOL_PATH=$OPTARG;;
     t ) SBOM_SCRIPT=$OPTARG;;
+    u ) DISTROLESS=$OPTARG;;
 
     \? )
         echo "Error - Invalid Option: -$OPTARG" 1>&2
@@ -115,6 +117,7 @@ function print_inputs {
     echo "CREATE_SBOM                   -> $CREATE_SBOM"
     echo "SBOM_TOOL_PATH                -> $SBOM_TOOL_PATH"
     echo "SBOM_SCRIPT                   -> $SBOM_SCRIPT"
+    echo "DISTROLESS                    -> $DISTROLESS"
 }
 
 function validate_inputs {
@@ -349,6 +352,18 @@ function generate_image_sbom {
     sudo rm -rf "$DOCKER_BUILD_DIR"
 }
 
+function distroless_container {
+    if [[ ! "$DISTROLESS" =~ [Tt]rue ]]; then
+            echo "+++ Skip creating distroless container"
+        return
+    fi
+
+    echo "+++ Create distroless container"
+    # shellcheck source=/dev/null
+    source BuildDistrolessContainer.sh
+    create_distroless_container
+}
+
 print_inputs
 validate_inputs
 initialization
@@ -360,3 +375,4 @@ set_image_tag
 finalize
 publish_to_acr
 generate_image_sbom
+distroless_container
