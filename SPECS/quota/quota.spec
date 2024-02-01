@@ -60,22 +60,6 @@ Source4:        rpc-rquotad.sysconfig
 Patch0:         quota-4.06-warnquota-configuration-tunes.patch
 # Fix parsing a TCP port number
 Patch1:         quota-4.03-Validate-upper-bound-of-RPC-port.patch
-# Remove a dead code from process_file(), in upstream after 4.06,
-# <https://sourceforge.net/p/linuxquota/patches/54/>
-Patch2:         quota-4.06-quotacheck-Remove-a-dead-code-from-process_file.patch
-# Fix a compilation warning in quotaops.c, in upstream after 4.06
-Patch3:         quota-4.06-quotaops-fix-compilation-warning.patch
-# Warn when kernel XFS large time stamp does fit into (32-bit) user-space
-# time_t, in upstream after 4.06
-Patch4:         quota-4.06-quotaio_xfs-Warn-when-large-kernel-timestamps-cannot.patch
-# Do not use a pointless compiler-internal __P() macro, in upstream after 4.06
-Patch5:         quota-4.06-Drop-sys-cdefs.h-usage.patch
-# Fix sa_mask initialization when registering PID file removal,
-# upstream bug #141, in upstream after 4.06
-Patch6:         quota-4.06-quota_nld-Initialize-sa_mask-when-registering-PID-fi.patch
-Patch7:         quota-4.06-quotacheck-quotaon-Always-display-message-about-depr.patch
-Patch8:         quota-4.06-common.c-fix-strncat-usage.patch
-Patch9:         quota-4.06-quotasys.c-fix-strncpy-usage.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -345,8 +329,9 @@ make check
 
 
 %changelog
-* Thu Feb 01 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.09-1
-- Auto-upgrade to 4.09 - none
+* Thu Feb 01 2024 Mitch Zhu <mitchzhu@microsoft.com> - 4.09-1
+- Update to 4.09
+- Remove unnecessary patches
 
 * Fri May 13 2022 Chris Co <chrco@microsoft.com> 4.06-1
 - Update to 4.06 (Imported from Fedora 36, license: MIT)
