@@ -1,0 +1,41 @@
+# Sets the following ADO variables:
+# -> setAcrRepoVariables.data_is_core_image
+# -> setAcrRepoVariables.data_is_golden_image
+# -> setAcrRepoVariables.data_is_hci_golden_image
+# -> setAcrRepoVariables.data_architecture_to_build
+# -> setAcrRepoVariables.data_repo_prefix
+# -> setAcrRepoVariables.data_can_build_for_branch
+# -> setAcrRepoVariables.data_target_acr
+
+parameters:
+- name: imageName
+  type: string
+- name: gitBranch
+  type: string
+  default: ''
+- name: publishingLevel
+  type: string
+  default: ''
+
+steps:
+- task: PythonScript@0
+  inputs:
+    pythonInterpreter: /usr/bin/python3
+    scriptSource: 'filePath'
+    scriptPath: '../scripts/acrRepoParser.py'
+    arguments: '--config-file-path ../configuration/acrRepoV2.json
+                --image-name ${{ parameters.imageName }}
+                --git-branch ${{ parameters.gitBranch }}
+                --publishing-level ${{ parameters.publishingLevel }}'
+  displayName: "Set ACR Repo Variables"
+  name: setAcrRepoVariables
+
+- bash: |
+    echo "Is Core Image                         -> $(setAcrRepoVariables.data_is_core_image)"
+    echo "Is Golden Image                       -> $(setAcrRepoVariables.data_is_golden_image)"
+    echo "Is HCI Golden Image                   -> $(setAcrRepoVariables.data_is_hci_golden_image)"
+    echo "Architecture to build for this image  -> $(setAcrRepoVariables.data_architecture_to_build)"
+    echo "Repo Prefix                           -> $(setAcrRepoVariables.data_repo_prefix)"
+    echo "Can image build for this branch       -> $(setAcrRepoVariables.data_can_build_for_branch)"
+    echo "Target ACR for this image             -> $(setAcrRepoVariables.data_target_acr)"
+  displayName: 'Display ACR Repo Data'

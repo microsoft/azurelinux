@@ -1,0 +1,90 @@
+parameters:
+- name: stageName
+  type: string
+- name: publishingLevel
+  type: string
+- name: agentPool
+  type: object
+
+stages:
+- stage: ${{ parameters.stageName }}
+  displayName: 'Validation'
+  jobs:
+  - job: validation_job
+    timeoutInMinutes: 20
+    displayName: Validate Inputs
+    pool: ${{ parameters.agentPool }}
+
+    variables:
+      ob_outputDirectory: $(Build.ArtifactStagingDirectory)
+      ob_artifactBaseName: validation_stage_artifacts
+      baseContainerFilesDir: from_base_container_build
+      artifactsDownloadDir: $(Build.Repository.LocalPath)/downloaded-artifacts
+      buildNumberConfig: build-number.config
+      githubBranchConfig: github_branch.config
+
+    steps:
+    - task: DownloadPipelineArtifact@2
+      displayName: 'Download $(buildConfigDir)'
+      inputs:
+        buildType: specific
+        project: mariner
+        definition: $(baseContainersPipelineId)
+        buildVersionToDownload: specific
+        pipelineId: $(baseContainersBuildId)
+        artifactName: $(artifactName)
+        itemPattern: $(buildConfigDir)/*
+        targetPath: $(artifactsDownloadDir)
+
+    - task: Bash@3
+      displayName: 'Set Build Number'
+      inputs:
+        targetType: 'inline'
+        script: |
+          BUILD_NUMBER=$(cat "$(artifactsDownloadDir)/$(buildConfigDir)/$(buildNumberConfig)")
+          echo "##vso[build.updatebuildnumber]$BUILD_NUMBER"
+
+    - task: Bash@3
+      displayName: 'Validate Publishing Level Selection'
+      inputs:
+        targetType: 'inline'
+        script: |
+          echo "Validate that the publishing level selected is aligned with the branch name for given build IDs."
+          BRANCH_NAME=$(cat "$(artifactsDownloadDir)/$(buildConfigDir)/$(githubBranchConfig)")
+          echo "Branch Name           -> $BRANCH_NAME"
+          echo "Publishing Level      -> ${{ parameters.publishingLevel }}"
+
+          if [[ ${{ parameters.publishingLevel }} == "Preview" ]]; then
+            if ! [[ "$BRANCH_NAME" =~ ^(2.0|3.0)$ ]]; then
+              echo "##vso[task.logissue type=error;]Preview building is only allowed from official release branches."
+              exit 1
+            fi
+          elif [[ ${{ parameters.publishingLevel }} == "Development" ]]; then
+            if [[ "$BRANCH_NAME" =~ ^(2.0|3.0)$ ]]; then
+              echo "##vso[task.logissue type=error;]Development building is not allowed from official release branches."
+              exit 1
+            fi
+          fi
+
+    - task: Bash@3
+      name: set_out_variables
+      displayName: 'Set out variables'
+      inputs:
+        targetType: 'inline'
+        script: |
+          BRANCH_NAME=$(cat "$(artifactsDownloadDir)/$(buildConfigDir)/$(githubBranchConfig)")
+          if ! [[ "$BRANCH_NAME" =~ ^(main|2.0|3.0|3.0-dev)$ ]]; then
+            echo "Original Branch Name  -> $BRANCH_NAME"
+            BRANCH_NAME="topic"
+            echo "Modified Branch Name  -> $BRANCH_NAME"
+          fi
+          echo "Set variable 'github_branch' with value '$BRANCH_NAME'."
+          echo "##vso[task.setvariable variable=github_branch;isoutput=true]$BRANCH_NAME"
+
+    - task: Bash@3
+      displayName: 'Drop base container config files'
+      inputs:
+        targetType: 'inline'
+        script: |
+          mkdir -pv $(ob_outputDirectory)/$(baseContainerFilesDir)
+          cp -r $(artifactsDownloadDir)/$(buildConfigDir)/* $(ob_outputDirectory)/$(baseContainerFilesDir)

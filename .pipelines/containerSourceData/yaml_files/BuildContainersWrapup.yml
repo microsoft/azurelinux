@@ -1,0 +1,39 @@
+parameters:
+- name: dependsOnStage
+  type: object
+- name: containerImages
+  type: object
+- name: agentPool
+  type: object
+
+stages:
+- stage: wrapup_stage
+  displayName: Wrapup
+  dependsOn: ${{ parameters.dependsOnStage }}
+  jobs:
+  - job: wrapup_job
+    displayName: Wrapup
+    timeoutInMinutes: 60
+    pool: ${{ parameters.agentPool }}
+
+    variables:
+      ob_outputDirectory: $(Build.ArtifactStagingDirectory)
+      ob_artifactBaseName: build_container_artifacts
+      artifactsDownloadDir: $(Build.Repository.LocalPath)/downloaded-artifacts
+    
+    steps:
+    - ${{ each containerImage in parameters.containerImages }}:
+      - task: DownloadPipelineArtifact@2
+        displayName: 'Download ${{ containerImage }} Artifact'
+        inputs:
+          artifact: build_${{ containerImage }}_container_artifacts
+          patterns: '$(containerArtifactDir)/*.txt'
+          targetPath: $(artifactsDownloadDir)
+    
+    - task: Bash@3
+      displayName: 'Move artifacts to output directory'
+      inputs:
+        targetType: 'inline'
+        script: |
+          mkdir -p $(ob_outputDirectory)/$(containerArtifactDir)
+          cp -r $(artifactsDownloadDir)/$(containerArtifactDir)/* $(ob_outputDirectory)/$(containerArtifactDir)

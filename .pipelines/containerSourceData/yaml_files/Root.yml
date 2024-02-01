@@ -1,0 +1,31 @@
+parameters:
+- name: publishingLevel
+  type: string
+- name: architecture
+  type: string
+- name: containerImages
+  type: object
+- name: agentPool
+  type: object
+
+stages:
+- template: BuildContainersValidation.yml
+  parameters:
+    stageName: validation_stage
+    publishingLevel: ${{ parameters.publishingLevel }}
+    agentPool: ${{ parameters.agentPool }}
+
+- template: BuildContainers.yml
+  parameters:
+    dependsOnStage: validation_stage
+    stageName: build_containers_stage
+    publishingLevel: ${{ parameters.publishingLevel }}
+    architecture: ${{ parameters.architecture }}
+    containerImages: ${{ parameters.containerImages }}
+    agentPool: ${{ parameters.agentPool }}
+
+- template: BuildContainersWrapup.yml
+  parameters:
+    dependsOnStage: build_containers_stage
+    containerImages: ${{ parameters.containerImages }}
+    agentPool: ${{ parameters.agentPool }}

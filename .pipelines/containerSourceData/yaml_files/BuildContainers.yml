@@ -1,0 +1,438 @@
+parameters:
+- name: dependsOnStage
+  type: object
+- name: stageName
+  type: string
+- name: publishingLevel
+  type: string
+- name: architecture
+  type: string
+- name: containerImages
+  type: object
+- name: agentPool
+  type: object
+
+# An image is defined by a set of following parameters:
+# - imageName: the name of the image (e.g. nodejs, postgres, cdi, etc.)
+# - componentName: the name of the component or the azl package (e.g. nodejs18, postgresql, containerized-data-importer-api, etc.)
+# - packageFileName: the name of the package file (e.g. nodejs18.pkg, postgres.pkg, api.pkg, etc.)
+# - dockerfile: the name of the Dockerfile (e.g. Dockerfile-nodejs, Dockerfile-Postgres, Dockerfile-cdi-apiserver, etc.)
+# - repository: the name of the repository (e.g. base/nodejs, base/postgres, base/kubevirt/cdi-apiserver, etc.)
+# - textReplacement: the text to be replaced in the Dockerfile (e.g. '@BINARY_PATH@ \"/usr/bin/acmesolver\"')
+# - buildArgs: the build arguments (e.g. '--build-arg BINARY_NAME="cdi-apiserver" --build-arg USER=1001')
+# - useRpmQaCmd: a boolean value to indicate whether to use the rpm -qa command to get the package version (e.g. true, false)
+
+# Some of the fields are optional, and some are required.
+# The required fields are:
+# - imageName
+# - componentName
+# - packageFileName
+# - dockerfile
+# - repository
+
+# The optional fields are:
+# - textReplacement
+# - buildArgs
+# - useRpmQaCmd
+
+- name: goldenImages
+  type: object
+  default:
+  - imageName: influxdb
+    componentName: influxdb
+    packageFileName: influxdb.pkg
+    dockerfile: Dockerfile-Influxdb
+    repository: base/influxdb
+  - imageName: memcached
+    componentName: memcached
+    packageFileName: memcached.pkg
+    dockerfile: Dockerfile-Memcached
+    repository: base/memcached
+  - imageName: nginx
+    componentName: nginx
+    packageFileName: nginx.pkg
+    dockerfile: Dockerfile-Nginx
+    repository: base/nginx
+  - imageName: nodejs
+    componentName: nodejs18
+    packageFileName: nodejs18.pkg
+    dockerfile: Dockerfile-Nodejs
+    repository: base/nodejs18
+  - imageName: openmpi
+    componentName: openmpi
+    packageFileName: openmpi.pkg
+    dockerfile: Dockerfile-Openmpi
+    repository: base/openmpi
+  - imageName: php
+    componentName: php
+    packageFileName: php.pkg
+    dockerfile: Dockerfile-PHP
+    repository: base/php
+  - imageName: postgres
+    componentName: postgresql
+    packageFileName: postgres.pkg
+    dockerfile: Dockerfile-Postgres
+    repository: base/postgres
+  - imageName: prometheus
+    componentName: prometheus
+    packageFileName: prometheus.pkg
+    dockerfile: Dockerfile-Prometheus
+    repository: base/prometheus
+  - imageName: prometheusadapter
+    componentName: prometheus-adapter
+    packageFileName: prometheusadapter.pkg
+    dockerfile: Dockerfile-Prometheus-Adapter
+    repository: base/prometheus-adapter
+  - imageName: python
+    componentName: python
+    packageFileName: python.pkg
+    dockerfile: Dockerfile-Python
+    repository: base/python
+  - imageName: pytorch
+    componentName: python3-pytorch
+    packageFileName: pytorch.pkg
+    dockerfile: Dockerfile-Pytorch
+    repository: base/pytorch
+  - imageName: rabbitmqserver
+    componentName: rabbitmq-server
+    packageFileName: rabbitmqserver.pkg
+    dockerfile: Dockerfile-rabbitmq-server
+    repository: base/rabbitmq-server
+  - imageName: redis
+    componentName: redis
+    packageFileName: redis.pkg
+    dockerfile: Dockerfile-Redis
+    repository: base/redis
+  - imageName: ruby
+    componentName: ruby
+    packageFileName: ruby.pkg
+    dockerfile: Dockerfile-Ruby
+    repository: base/ruby
+  - imageName: rust
+    componentName: rust
+    packageFileName: rust.pkg
+    dockerfile: Dockerfile-Rust
+    repository: base/rust
+  - imageName: telegraf
+    componentName: telegraf
+    packageFileName: telegraf.pkg
+    dockerfile: Dockerfile-Telegraf
+    repository: base/telegraf
+  - imageName: tensorflow
+    componentName: python3-tensorflow
+    packageFileName: tensorflow.pkg
+    dockerfile: Dockerfile-Tensorflow
+    repository: base/tensorflow
+
+- name: hciImages
+  type: object
+  default:
+  - imageName: cdi
+    componentName: containerized-data-importer-api
+    packageFileName: api.pkg
+    dockerfile: Dockerfile-cdi-apiserver
+    repository: base/kubevirt/cdi-apiserver
+    buildArgs: '--build-arg BINARY_NAME="cdi-apiserver" --build-arg USER=1001'
+    useRpmQaCmd: true
+  - imageName: cdi
+    componentName: containerized-data-importer-cloner
+    packageFileName: cloner.pkg
+    dockerfile: Dockerfile-cdi-cloner
+    repository: base/kubevirt/cdi-cloner
+    buildArgs: '--build-arg BINARY_NAME="cdi-cloner" --build-arg USER=1001'
+    useRpmQaCmd: true
+  - imageName: cdi
+    componentName: containerized-data-importer-controller
+    packageFileName: controller.pkg
+    dockerfile: Dockerfile-cdi-controller
+    repository: base/kubevirt/cdi-controller
+    buildArgs: '--build-arg BINARY_NAME="cdi-controller" --build-arg USER=1001'
+    useRpmQaCmd: true
+  - imageName: cdi
+    componentName: containerized-data-importer-importer
+    packageFileName: importer.pkg
+    dockerfile: Dockerfile-cdi-importer
+    repository: base/kubevirt/cdi-importer
+    buildArgs: '--build-arg BINARY_NAME="cdi-importer" --build-arg USER=1001'
+    useRpmQaCmd: true
+  - imageName: cdi
+    componentName: containerized-data-importer-operator
+    packageFileName: operator.pkg
+    dockerfile: Dockerfile-cdi-operator
+    repository: base/kubevirt/cdi-operator
+    buildArgs: '--build-arg BINARY_NAME="cdi-operator" --build-arg USER=1001'
+    useRpmQaCmd: true
+  - imageName: cdi
+    componentName: containerized-data-importer-uploadproxy
+    packageFileName: uploadproxy.pkg
+    dockerfile: Dockerfile-cdi-uploadproxy
+    repository: base/kubevirt/cdi-uploadproxy
+    buildArgs: '--build-arg BINARY_NAME="cdi-uploadproxy" --build-arg USER=1001'
+    useRpmQaCmd: true
+  - imageName: cdi
+    componentName: containerized-data-importer-uploadserver
+    packageFileName: uploadserver.pkg
+    dockerfile: Dockerfile-cdi-uploadserver
+    repository: base/kubevirt/cdi-uploadserver
+    buildArgs: '--build-arg BINARY_NAME="cdi-uploadserver" --build-arg USER=1001'
+    useRpmQaCmd: true
+
+  - imageName: certmanager
+    componentName: cert-manager-acmesolver
+    packageFileName: acmesolver.pkg
+    dockerfile: Dockerfile-cert-manager
+    repository: base/cert-manager-acmesolver
+    textReplacement: '@BINARY_PATH@ \"/usr/bin/acmesolver\"'
+    useRpmQaCmd: true
+  - imageName: certmanager
+    componentName: cert-manager-cainjector
+    packageFileName: cainjector.pkg
+    dockerfile: Dockerfile-cert-manager
+    repository: base/cert-manager-cainjector
+    textReplacement: '@BINARY_PATH@ \"/usr/bin/cainjector\"'
+    useRpmQaCmd: true
+  - imageName: certmanager
+    componentName: cert-manager-cmctl
+    packageFileName: cmctl.pkg
+    dockerfile: Dockerfile-cert-manager
+    repository: base/cert-manager-cmctl
+    textReplacement: '@BINARY_PATH@ \"/usr/bin/cmctl\"'
+    useRpmQaCmd: true
+  - imageName: certmanager
+    componentName: cert-manager-controller
+    packageFileName: controller.pkg
+    dockerfile: Dockerfile-cert-manager
+    repository: base/cert-manager-controller
+    textReplacement: '@BINARY_PATH@ \"/usr/bin/controller\"'
+    useRpmQaCmd: true
+  - imageName: certmanager
+    componentName: cert-manager-webhook
+    packageFileName: webhook.pkg
+    dockerfile: Dockerfile-cert-manager
+    repository: base/cert-manager-webhook
+    textReplacement: '@BINARY_PATH@ \"/usr/bin/webhook\"'
+    useRpmQaCmd: true
+
+  - imageName: kubevirt
+    componentName: kubevirt-virt-api
+    packageFileName: virt-api.pkg
+    dockerfile: Dockerfile-kubevirt-virt-api
+    repository: base/kubevirt/virt-api
+  - imageName: kubevirt
+    componentName: kubevirt-virt-controller
+    packageFileName: virt-controller.pkg
+    dockerfile: Dockerfile-kubevirt-virt-controller
+    repository: base/kubevirt/virt-controller
+  - imageName: kubevirt
+    componentName: kubevirt-virt-handler
+    packageFileName: virt-handler.pkg
+    dockerfile: Dockerfile-kubevirt-virt-handler
+    repository: base/kubevirt/virt-handler
+  - imageName: kubevirt
+    componentName: kubevirt-virt-launcher
+    packageFileName: virt-launcher.pkg
+    dockerfile: Dockerfile-kubevirt-virt-launcher
+    repository: base/kubevirt/virt-launcher
+  - imageName: kubevirt
+    componentName: kubevirt-virt-operator
+    packageFileName: virt-operator.pkg
+    dockerfile: Dockerfile-kubevirt-virt-operator
+    repository: base/kubevirt/virt-operator
+
+  - imageName: multus
+    componentName: multus
+    packageFileName: multus.pkg
+    dockerfile: Dockerfile-Multus
+    repository: base/multus
+    useRpmQaCmd: true
+
+  - imageName: sriovnetworkdeviceplugin
+    componentName: sriov-network-device-plugin
+    packageFileName: sriovnetworkdeviceplugin.pkg
+    dockerfile: Dockerfile-sriov-network-device-plugin
+    repository: base/sriov-network-device-plugin
+    useRpmQaCmd: true
+
+stages:
+- stage: ${{ parameters.stageName }}
+  displayName: 'Build Containers'
+  dependsOn: ${{ parameters.dependsOnStage }}
+  jobs:
+  - ${{ each containerImage in parameters.containerImages }}:
+    - job: build_${{ containerImage }}_container_job
+      timeoutInMinutes: 120
+      displayName: Build ${{ containerImage }} Container
+      pool: ${{ parameters.agentPool }}
+
+      variables:
+        ob_outputDirectory: $(Build.ArtifactStagingDirectory)
+        ob_artifactBaseName: build_${{ containerImage }}_container_artifacts
+        artifactsDownloadDir: $(Build.Repository.LocalPath)/downloaded-artifacts
+        containersSrcDirectory: $(Build.SourcesDirectory)/pipelines/build-golden-containers/containerSrcDir
+        branchName: $[ stageDependencies.${{ parameters.dependsOnStage }}.validation_job.outputs['set_out_variables.github_branch'] ]
+        ${{ if eq(parameters.publishingLevel, 'Preview') }}:
+          securityConfigArgument: '--prodConfig'
+
+      steps:
+      # After the following task, we will have the following variables:
+      # -> $(setAcrRepoVariables.data_is_golden_image)
+      # -> $(setAcrRepoVariables.data_is_hci_golden_image)
+      # -> $(setAcrRepoVariables.data_architecture_to_build)
+      # -> $(setAcrRepoVariables.data_repo_prefix)
+      # -> $(setAcrRepoVariables.data_can_build_for_branch)
+      # -> $(setAcrRepoVariables.data_target_acr)
+      # We will use these variables to determine whether to run the remaining tasks or not.
+      # We will also use these variables to determine the repo prefix and the target ACR for the image.
+      - template: acrRepoMappingSteps.yml
+        parameters:
+          imageName: ${{ containerImage }}
+          gitBranch: $(branchName)
+          publishingLevel: ${{ lower(parameters.publishingLevel) }}
+
+      - task: Bash@3
+        displayName: 'Check whether to proceed or not'
+        inputs:
+          targetType: 'inline'
+          script: |
+            proceed="false"
+            if [[ "$(setAcrRepoVariables.data_is_golden_image)" =~ [Tt]rue && \
+              "$(setAcrRepoVariables.data_can_build_for_branch)" =~ [Tt]rue && \
+              "$(setAcrRepoVariables.data_architecture_to_build)" == *"${{ parameters.architecture }}"* && \
+              "$(setAcrRepoVariables.data_target_acr)" ]]; then
+                proceed="true"
+            fi
+
+            echo "Proceed: $proceed"
+            echo "Set variable 'proceed' with value '$proceed'."
+            echo "##vso[task.setvariable variable=proceed;]$proceed"
+
+      - task: PipAuthenticate@1
+        displayName: Provision - Authenticate Pip
+        inputs:
+          artifactFeeds: 'mariner/Mariner-Pypi-Feed'
+        condition: eq(variables['proceed'], 'true')
+
+      - task: Bash@3
+        displayName: 'Set security config'
+        inputs:
+          filePath: $(Build.SourcesDirectory)/pipelines/configurations/apply-security-config.sh
+          arguments: $(securityConfigArgument)
+        condition: eq(variables['proceed'], 'true')
+
+      - task: Bash@3
+        displayName: 'Configure 1ES machine'
+        inputs:
+          filePath: $(Build.SourcesDirectory)/.pipelines/Configure-1ES.sh
+        condition: eq(variables['proceed'], 'true')
+
+      - task: Bash@3
+        displayName: 'Install moby-buildx'
+        inputs:
+          targetType: 'inline'
+          script: sudo tdnf install -y moby-buildx
+        condition: eq(variables['proceed'], 'true')
+
+      - task: DownloadPipelineArtifact@2
+        displayName: 'Download $(baseContainerFile) - ${{ parameters.architecture }}'
+        inputs:
+          buildType: specific
+          project: mariner
+          definition: $(baseContainersPipelineId)
+          buildVersionToDownload: specific
+          pipelineId: $(baseContainersBuildId)
+          artifactName: $(artifactName)
+          itemPattern: $(containerArtifactDir)/$(baseContainerFile)
+          targetPath: $(artifactsDownloadDir)
+        condition: eq(variables['proceed'], 'true')
+
+      - task: DownloadPipelineArtifact@2
+        displayName: 'Download $(rpmsTarball) - ${{ parameters.architecture }}'
+        inputs:
+          buildType: specific
+          project: mariner
+          definition: $(baseContainersPipelineId)
+          buildVersionToDownload: specific
+          pipelineId: $(baseContainersBuildId)
+          artifactName: $(artifactName)
+          itemPattern: $(buildArtifactsDir)/$(rpmsTarball)
+          targetPath: $(artifactsDownloadDir)
+        condition: eq(variables['proceed'], 'true')
+
+      - task: Bash@3
+        displayName: 'Set BASE_IMAGE variable'
+        inputs:
+          targetType: 'inline'
+          script: |
+            base_image_name=`cat $(artifactsDownloadDir)/$(containerArtifactDir)/$(baseContainerFile)`
+            echo "##vso[task.setvariable variable=BASE_IMAGE]$base_image_name"
+        condition: eq(variables['proceed'], 'true')
+
+      - task: Bash@3
+        displayName: 'Az ACR login & pull base image'
+        inputs:
+          targetType: 'inline'
+          script: |
+            echo "ACR login"
+            az acr login --name "${baseImage%%.*}"
+            echo "Pull base image"
+            docker pull $baseImage
+        env:
+          baseImage: $(BASE_IMAGE)
+        condition: eq(variables['proceed'], 'true')
+
+      - ${{ each goldenImage in parameters.goldenImages }}:
+        - ${{ if eq(containerImage, goldenImage.imageName) }}:
+          - task: Bash@3
+            displayName: 'Build ${{ goldenImage.componentName }} Container'
+            inputs:
+              filePath: ../scripts/BuildContainers.sh
+              arguments: '-a "$(BASE_IMAGE)"
+                          -b "$(setAcrRepoVariables.data_target_acr)"
+                          -c "${{ goldenImage.repository }}"
+                          -d "${{ goldenImage.imageName }}"
+                          -e "${{ goldenImage.componentName }}"
+                          -f "${{ goldenImage.packageFileName }}"
+                          -g "${{ goldenImage.dockerfile }}"
+                          -h "${{ goldenImage.buildArgs }}"
+                          -i "${{ goldenImage.textReplacement }}"
+                          -j "$(ob_outputDirectory)/$(containerArtifactDir)/PublishedContainers-${{ goldenImage.imageName }}.txt"
+                          -k "$(artifactsDownloadDir)/$(buildArtifactsDir)/$(rpmsTarball)"
+                          -l "$(containersSrcDirectory)"
+                          -m "false"
+                          -n "${{ goldenImage.useRpmQaCmd }}"
+                          -o "$(setAcrRepoVariables.data_repo_prefix)"
+                          -p "${{ lower(parameters.publishingLevel) }}"
+                          -q "true"'
+            condition: and(
+                          eq(variables['proceed'], 'true'),
+                          eq(variables['setAcrRepoVariables.data_is_golden_image'], 'True'),
+                          ne(variables['setAcrRepoVariables.data_is_hci_golden_image'], 'True')
+                        )
+
+      - ${{ each hciImage in parameters.hciImages }}:
+        - ${{ if eq(containerImage, hciImage.imageName) }}:
+          - task: Bash@3
+            displayName: 'Build ${{ hciImage.componentName }} Container'
+            inputs:
+              filePath: ../scripts/BuildContainers.sh
+              arguments: '-a "$(BASE_IMAGE)"
+                          -b "$(setAcrRepoVariables.data_target_acr)"
+                          -c "${{ hciImage.repository }}"
+                          -d "${{ hciImage.imageName }}"
+                          -e "${{ hciImage.componentName }}"
+                          -f "${{ hciImage.packageFileName }}"
+                          -g "${{ hciImage.dockerfile }}"
+                          -h "${{ hciImage.buildArgs }}"
+                          -i "${{ hciImage.textReplacement }}"
+                          -j "$(ob_outputDirectory)/$(containerArtifactDir)/PublishedContainers-${{ hciImage.imageName }}.txt"
+                          -k "$(artifactsDownloadDir)/$(buildArtifactsDir)/$(rpmsTarball)"
+                          -l "$(containersSrcDirectory)"
+                          -m "true"
+                          -n "${{ hciImage.useRpmQaCmd }}"
+                          -o "$(setAcrRepoVariables.data_repo_prefix)"
+                          -p "${{ lower(parameters.publishingLevel) }}"
+                          -q "true"'
+            condition: and(
+                          eq(variables['proceed'], 'true'),
+                          eq(variables['setAcrRepoVariables.data_is_hci_golden_image'], 'True')
+                        )

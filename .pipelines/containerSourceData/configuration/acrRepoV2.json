@@ -1,0 +1,144 @@
+{
+  "goldenImages": {
+    "allowedBranches": [
+      "main",
+      "2.0",
+      "3.0-dev",
+      "3.0"
+    ],
+    "azurecli": {
+      "architecture": "AMD64-ARM64",
+      "repoPrefix": "public/cbl-mariner"
+    },
+    "influxdb": {
+      "architecture": "AMD64-ARM64",
+      "repoPrefix": "public/cbl-mariner"
+    },
+    "memcached": {
+      "architecture": "AMD64-ARM64",
+      "repoPrefix": "public/cbl-mariner"
+    },
+    "nginx": {
+      "architecture": "AMD64-ARM64",
+      "repoPrefix": "public/cbl-mariner"
+    },
+    "nodejs": {
+      "architecture": "AMD64-ARM64",
+      "repoPrefix": "public/cbl-mariner"
+    },
+    "openmpi": {
+      "architecture": "AMD64-ARM64",
+      "repoPrefix": "public/cbl-mariner"
+    },
+    "php": {
+      "architecture": "AMD64-ARM64",
+      "repoPrefix": "public/cbl-mariner"
+    },
+    "postgres": {
+      "architecture": "AMD64-ARM64",
+      "repoPrefix": "public/cbl-mariner"
+    },
+    "prometheus": {
+      "architecture": "AMD64-ARM64",
+      "repoPrefix": "public/cbl-mariner"
+    },
+    "prometheusadapter": {
+      "architecture": "AMD64-ARM64",
+      "repoPrefix": "public/cbl-mariner"
+    },
+    "python": {
+      "architecture": "AMD64-ARM64",
+      "repoPrefix": "public/cbl-mariner"
+    },
+    "pytorch": {
+      "architecture": "AMD64-ARM64",
+      "repoPrefix": "public/cbl-mariner"
+    },
+    "rabbitmqserver": {
+      "architecture": "AMD64-ARM64",
+      "repoPrefix": "public/cbl-mariner"
+    },
+    "redis": {
+      "architecture": "AMD64-ARM64",
+      "repoPrefix": "public/cbl-mariner"
+    },
+    "ruby": {
+      "architecture": "AMD64-ARM64",
+      "repoPrefix": "public/cbl-mariner"
+    },
+    "rust": {
+      "architecture": "AMD64-ARM64",
+      "repoPrefix": "public/cbl-mariner"
+    },
+    "telegraf": {
+      "architecture": "AMD64-ARM64",
+      "repoPrefix": "public/cbl-mariner"
+    },
+    "tensorflow": {
+      "architecture": "AMD64",
+      "repoPrefix": "public/cbl-mariner"
+    }
+  },
+  "hciGoldenImages": {
+    "allowedBranches": [
+      "main",
+      "2.0",
+      "3.0-dev",
+      "3.0"
+    ],
+    "cdi": {
+      "architecture": "AMD64",
+      "repoPrefix": "unlisted/cbl-mariner"
+    },
+    "certmanager": {
+      "architecture": "AMD64",
+      "repoPrefix": "unlisted/cbl-mariner"
+    },
+    "kubevirt": {
+      "architecture": "AMD64",
+      "repoPrefix": "unlisted/cbl-mariner"
+    },
+    "multus": {
+      "architecture": "AMD64",
+      "repoPrefix": "unlisted/cbl-mariner"
+    },
+    "sriovnetworkdeviceplugin": {
+      "architecture": "AMD64",
+      "repoPrefix": "unlisted/cbl-mariner"
+    }
+  },
+  "coreImages": {
+    "allowedBranches": [
+      "main",
+      "2.0",
+      "3.0-dev",
+      "3.0",
+      "topic"
+    ],
+    "base": {
+      "architecture": "AMD64-ARM64",
+      "repoPrefix": "public/cbl-mariner"
+    }
+  },
+  "targetACRs": {
+    "main": {
+      "development": "cblmarinermain",
+      "hciRedirect": "acrafoimages"
+    },
+    "2.0": {
+      "preview": "cblmarineracr2mcrpreview",
+      "production": "azurelinuxpreview"
+    },
+    "3.0-dev": {
+      "development": "cblmariner3dev",
+      "hciRedirect": "acrafoimages"
+    },
+    "3.0": {
+      "preview": "cblmarineracr2mcrpreview",
+      "production": "azurelinuxpreview"
+    },
+    "topic": {
+      "development": "cblmarinertopic"
+    }
+  }
+}
