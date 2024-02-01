@@ -1,4 +1,5 @@
 %global _default_patch_fuzz 2
+%define debug_package %{nil}
 Summary:        OpenLDAP (Lightweight Directory Access Protocol)
 Name:           openldap
 Version:        2.6.7
@@ -8,15 +9,14 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://www.openldap.org/
-# Using Canadian mirror. Original source link didn't work: ftp://ftp.openldap.org/pub/OpenLDAP/openldap-release/%{name}-%{version}.tgz
+# Using Canadian mirror. Original source link didn't work: ftp://ftp.openldap.org/pub/OpenLDAP/openldap-release/%%{name}-%%{version}.tgz
 Source0:        https://gpl.savoirfairelinux.net/pub/mirrors/openldap/openldap-release/%{name}-%{version}.tgz
-Patch0:         openldap-2.4.40-gssapi-1.patch
-Patch1:         openldap-2.4.44-consolidated-2.patch
-BuildRequires:  cyrus-sasl-bootstrap-devel >= 2.1
+Patch0:         liblber-add-ber_sockbuf_io_udp-to-symbol-ma.patch
+BuildRequires:  cyrus-sasl-bootstrap-devel >= 2.1.27
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  groff
-BuildRequires:  openssl-devel >= 1.0.1
-Requires:       openssl >= 1.0.1
+BuildRequires:  openssl-devel >= 1.1.1
+Requires:       openssl >= 1.1.1
 Provides:       %{name}-clients = %{version}-%{release}
 Provides:       %{name}-compat = %{version}-%{release}
 Provides:       %{name}-devel = %{version}-%{release}
@@ -35,7 +35,6 @@ libraries, and documentation for OpenLDAP.
 
 %build
 autoconf
-sed -i '/6.0.20/ a\\t__db_version_compat' configure
 export CPPFLAGS="${CPPFLAGS} -D_REENTRANT -DLDAP_CONNECTIONLESS -D_GNU_SOURCE -D_AVL_H"
 %configure \
         --disable-static    \
@@ -62,6 +61,8 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_bindir}/*
 %{_libdir}/*.so*
 %{_includedir}/*
+%{_libdir}/pkgconfig/lber.pc
+%{_libdir}/pkgconfig/ldap.pc
 %{_mandir}/man1/*
 %{_mandir}/man3/*
 %{_mandir}/man5/*
@@ -69,8 +70,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_sysconfdir}/openldap/*
 
 %changelog
-* Thu Feb 01 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.6.7-1
-- Auto-upgrade to 2.6.7 - Package upgrade for Azure Linux 3.0
+* Thu Feb 01 2024 Thien Trung Vuong <tvuong@microsoft.com> - 2.6.7-1
+- Upgrade to version 2.6.7 - Package upgrade for Azure Linux 3.0
+- Add patch to resolve reference to ber_sockbuf_io_udp
 
 * Fri Feb 10 2023 Sriram Nambakam <snambakam@microsoft.com> - 2.4.57-8
 - Let openldap depend on cyrus-sasl.
@@ -122,7 +124,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 - License verified.
 - Fixed 'Source0' tag.
 
-* Fri Mar 03 2020 Jon Slobodzian <joslobo@microsoft.com> 2.4.46-4
+* Tue Mar 03 2020 Jon Slobodzian <joslobo@microsoft.com> 2.4.46-4
 - Replaced incorrect URL link. Verified license. Removed incorrect version from Summary.
 
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 2.4.46-3
