@@ -15,6 +15,7 @@ resources:
     - repository: CBL-Mariner-Pipelines
       type: git
       name: mariner/CBL-Mariner-Pipelines
+      ref: refs/heads/tvuong/master/fasttrack-update
 
 jobs:
   - job: 'CherryPick'
