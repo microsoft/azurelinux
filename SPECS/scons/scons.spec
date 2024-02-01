@@ -1,16 +1,17 @@
+%global python3_pkgversion 3
 Name:           scons
 Version:        4.6.0
-Release:        1%{?dist}
+Release:        3%{?dist}
 Summary:        An Open Source software construction tool
 Group:          Development/Tools
 License:        MIT
 URL:            http://scons.org
 Source0:        https://sourceforge.net/projects/scons/files/scons/4.6.0/scons-4.6.0.tar.gz
+Patch0:         0001-Remove-unnecessary-build-deps.patch
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-BuildRequires:  python3-devel
-BuildRequires:  python3-pip
-BuildRequires:  python-wheel
+BuildRequires:  python%{python3_pkgversion}-devel 
+BuildRequires:  python%{python3_pkgversion}-pip
 Requires:       python3
 BuildArch:      noarch
 
@@ -21,7 +22,7 @@ with integrated functionality similar to autoconf/automake and compiler caches s
 In short, SCons is an easier, more reliable and faster way to build software.
 
 %prep
-%autosetup -n SCons-%{version}
+%autosetup -p1 -n SCons-%{version}
 
 %build
 %py3_build
