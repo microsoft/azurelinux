@@ -33,7 +33,7 @@ install local-path-provisioner %{buildroot}%{_bindir}/local-path-provisioner
 %{_bindir}/local-path-provisioner
 
 %changelog
-* Mon Jan 31 2024 Tobias Brick <tobiasb@microsoft.com> - 0.0.21-14
+* Wed Jan 31 2024 Tobias Brick <tobiasb@microsoft.com> - 0.0.21-14
 - Fix CVE-2022-21698
 
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.0.21-13
