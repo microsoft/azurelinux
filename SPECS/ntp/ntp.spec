@@ -17,7 +17,6 @@ Source5:        ntpdate.sysconfig
 Source6:        ntpdate.service
 Source7:        ntpd.service
 Source8:        LICENSE.PTR
-Patch0:         ntp-gcc11.patch
 
 BuildRequires:  gcc >= 11.2.0
 BuildRequires:  glibc >= 2.34
@@ -63,7 +62,6 @@ state of the NTP daemon running on the local machine.
 
 %prep
 %setup -q -a 1
-%patch0 -p1
 
 %build
 
@@ -199,8 +197,9 @@ fi
 %{_mandir}/man8/ntpstat.8*
 
 %changelog
-* Wed Jan 31 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.2.8p17-1
+* Wed Jan 31 2024 Karim Eldegwy <karimeldegwy@microsoft.com> - 4.2.8p17-1
 - Auto-upgrade to 4.2.8p17 - 3.0 - Upgrade
+- Remove not applicable patch
 
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.2.8p15-3
 - Removing the explicit %%clean stage.
