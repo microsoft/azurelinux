@@ -272,7 +272,7 @@ stages:
         ob_outputDirectory: $(Build.ArtifactStagingDirectory)
         ob_artifactBaseName: build_${{ containerImage }}_container_artifacts
         artifactsDownloadDir: $(Build.Repository.LocalPath)/downloaded-artifacts
-        containersSrcDirectory: $(Build.SourcesDirectory)/pipelines/build-golden-containers/containerSrcDir
+        containersSrcDirectory: ${{ parameters.selfRepoRoot }}/.pipelines/containerSourceData
         branchName: $[ stageDependencies.${{ parameters.dependsOnStage }}.validation_job.outputs['set_out_variables.github_branch'] ]
         ${{ if eq(parameters.publishingLevel, 'Preview') }}:
           securityConfigArgument: '--prodConfig'
