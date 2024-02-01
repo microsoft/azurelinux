@@ -45,8 +45,8 @@ ln -s ../jitterentropy-library-3.3.1 3rdparty/jitterentropy-library
 
 %build
 SYMCRYPT_BRANCH=main \
-SYMCRYPT_COMMIT_HASH=c55c670 \
-SYMCRYPT_COMMIT_TIMESTAMP=2023-12-01T15:59:37-08:00 \
+SYMCRYPT_COMMIT_HASH=a84ffe1 \
+SYMCRYPT_COMMIT_TIMESTAMP=2024-01-26T22:00:47-08:00 \
 cmake   -S . -B bin \
         -DSYMCRYPT_TARGET_ARCH=%{symcrypt_arch} \
         -DCMAKE_BUILD_TYPE=Release \

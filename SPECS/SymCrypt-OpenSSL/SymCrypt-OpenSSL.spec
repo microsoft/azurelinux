@@ -67,7 +67,7 @@ install SymCryptProvider/symcrypt_prov.cnf %{buildroot}%{_sysconfdir}/pki/tls/sy
 %changelog
 * Thu Dec 28 2023 Maxwell Moyer-McKee <mamckee@microsoft.com> - 1.4.0-1
 - Update SymCrypt-OpenSSL to v1.4.0.
-- Adds SymCryptp-OpenSSL provider for OpenSSL 3.
+- Adds SymCrypt-OpenSSL provider for OpenSSL 3.
 
 * Mon May 22 2023 Samuel Lee <saml@microsoft.com> - 1.3.0-1
 - Update SymCrypt-OpenSSL to v1.3.0. Adds support for HMAC and fixes corner RSA-PSS bug. Run smoke test in check
