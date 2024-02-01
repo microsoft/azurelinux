@@ -6,7 +6,7 @@ Version:        1.2.5
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://rubydoc.info/gems/rake-compiler
 Source0:        https://github.com/rake-compiler/rake-compiler/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  ruby(release)

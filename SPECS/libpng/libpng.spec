@@ -4,7 +4,7 @@ Version:        1.6.40
 Release:        1%{?dist}
 License:        zlib
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 # The site does NOT have an HTTPS cert available.
 URL:            http://www.libpng.org/

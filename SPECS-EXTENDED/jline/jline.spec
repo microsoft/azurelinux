@@ -4,7 +4,7 @@ Version:        2.14.6
 Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            https://github.com/jline/jline2
 Source0:        https://github.com/jline/jline2/archive/refs/tags/%{name}-%{version}.tar.gz

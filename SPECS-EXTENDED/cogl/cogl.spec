@@ -5,7 +5,7 @@ Version:        1.22.8
 Release:        7%{?dist}
 License:        LGPL-2.1-or-later
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.clutter-project.org/
 Source0:        https://download.gnome.org/sources/cogl/1.22/%{name}-%{version}.tar.xz
 # Vaguely related to https://bugzilla.gnome.org/show_bug.cgi?id=772419

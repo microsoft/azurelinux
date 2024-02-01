@@ -4,7 +4,7 @@ Version:        1.8
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            http://www.libndp.org/
 Source:         http://www.libndp.org/files/%{name}-%{version}.tar.gz

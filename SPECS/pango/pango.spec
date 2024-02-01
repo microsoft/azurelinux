@@ -4,7 +4,7 @@ Version:        1.45.5
 Release:        1%{?dist}
 License:        LGPLv2 OR MPLv1.1
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://pango.org
 Source0:        https://download.gnome.org/sources/pango/1.45/%{name}-%{version}.tar.xz

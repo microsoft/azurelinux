@@ -14,7 +14,7 @@ Release:        12%{?dist}
 License:        MIT
 URL:            https://pypi.python.org/pypi/pytest-runner
 Vendor:         Microsoft
-Distribution:   Mariner
+Distribution:   Azure Linux
 # setuptools-scm requires a pypi tarball and doesn't like github tarball
 Source0:        https://files.pythonhosted.org/packages/source/p/%{modulename}/%{modulename}-%{version}.tar.gz
 BuildArch:      noarch

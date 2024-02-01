@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global	gem_name	pkg-config
 
 %undefine        _changelog_trimtime

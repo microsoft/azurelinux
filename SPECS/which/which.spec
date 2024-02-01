@@ -7,7 +7,7 @@ URL:		http://savannah.gnu.org/projects/which
 Source0:	http://ftp.gnu.org/gnu/which/%{name}-%{version}.tar.gz
 Group:		Development/Tools
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Conflicts:      toybox
 %description
 Program for showing the full the path of (shell) commands.

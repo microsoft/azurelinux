@@ -4,7 +4,7 @@ Version:        3.10.4
 Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment
 URL:            https://github.com/nlohmann/json
 #Source0:       https://github.com/nlohmann/json/archive/v%{version}.tar.gz

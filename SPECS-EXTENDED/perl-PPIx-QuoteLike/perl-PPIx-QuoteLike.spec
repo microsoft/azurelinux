@@ -7,7 +7,7 @@ Release:        3%{?dist}
 Summary:        Parse Perl string literals and string-literal-like things
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/PPIx-QuoteLike
 Source0:        https://cpan.metacpan.org/authors/id/W/WY/WYANT/PPIx-QuoteLike-%{version}.tar.gz#/perl-PPIx-QuoteLike-%{version}.tar.gz
 BuildArch:      noarch

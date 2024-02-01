@@ -5,7 +5,7 @@ Release:        3%{?dist}
 # BSD (setmode.c), ISC (strlcpy.c), MirOS (the rest)
 License:        MirOS AND ISC AND BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://www.mirbsd.org/mksh.htm
 Source0:        http://www.mirbsd.org/MirOS/dist/mir/%{name}/%{name}-R%{version}.tgz
 Source1:        dot-mkshrc

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:		Judy
 Version:	1.0.5
 Release:	23%{?dist}

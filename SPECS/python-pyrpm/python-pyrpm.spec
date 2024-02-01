@@ -4,7 +4,7 @@ Version:        0.14.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/bkircher/python-rpm-spec
 Source0:        https://github.com/bkircher/python-rpm-spec/archive/refs/tags/v0.14.1.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch

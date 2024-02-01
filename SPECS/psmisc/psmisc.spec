@@ -4,7 +4,7 @@ Version:        23.6
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            http://psmisc.sourceforge.net/
 Source0:        http://prdownloads.sourceforge.net/psmisc/%{name}-%{version}.tar.xz

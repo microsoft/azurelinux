@@ -21,7 +21,7 @@ Version:        4.13
 Release:        5%{?dist}
 License:        EPL-1.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            https://www.junit.org/
 Source0:        https://github.com/junit-team/junit/archive/r%{version}.tar.gz#/%{name}-%{version}.tar.gz

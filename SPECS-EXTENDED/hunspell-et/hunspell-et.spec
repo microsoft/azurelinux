@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-et
 Summary: Estonian hunspell dictionaries
 %global upstreamid 20030606

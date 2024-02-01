@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Set --with test to run the Samba torture testsuite.
 %bcond_with testsuite
 

@@ -7,7 +7,7 @@ Version:        0.0.11
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/fedora-python/tox-current-env
 Source0:        https://github.com/fedora-python/tox-current-env/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 

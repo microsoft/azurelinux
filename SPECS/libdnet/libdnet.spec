@@ -4,7 +4,7 @@ Version:        1.14
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://code.google.com/p/libdnet
 Source0:        https://github.com/dugsong/%{name}/archive/%{name}-%{version}.tar.gz

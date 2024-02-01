@@ -7,7 +7,7 @@ License:        MIT
 Url:            https://duktape.org/
 Source0:        https://duktape.org/%{name}-%{version}.tar.xz
 Patch0:         duktape-2.7.0-link-against-libm.patch
-Distribution:   Mariner 
+Distribution:   Azure Linux 
 BuildRequires:  gcc
 BuildRequires:  pkgconfig
 BuildRequires:  make

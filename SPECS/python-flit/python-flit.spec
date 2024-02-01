@@ -18,7 +18,7 @@ Release:        1%{?dist}
 # ./flit/upload.py under PSF license
 License:        BSD AND ASL 2.0 AND Python
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://flit.readthedocs.io/en/latest/
 Source0:        https://github.com/takluyver/flit/archive/%{version}/%{srcname}-%{version}.tar.gz
 # For the tests

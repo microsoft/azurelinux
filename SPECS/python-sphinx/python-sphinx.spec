@@ -17,7 +17,7 @@ Release:        2%{?dist}
 # sphinx/themes/haiku/static/haiku.css_t has bits licensed with MIT
 License:        BSD AND Python AND MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.sphinx-doc.org/
 Source0:        https://files.pythonhosted.org/packages/c9/08/c2932e66460cfbc8973928d276dc82ccde2d24b365055eeda9f0afc1951e/Sphinx-%{version}.tar.gz
 

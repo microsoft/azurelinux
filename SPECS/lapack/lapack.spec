@@ -34,7 +34,7 @@ Version:        3.11.0
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://www.netlib.org/lapack/
 Source0:        https://github.com/Reference-LAPACK/lapack/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source4:        http://www.netlib.org/lapack/lapackqref.ps

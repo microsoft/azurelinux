@@ -4,7 +4,7 @@ Version:        3.17.0
 Release:        1%{?dist}
 License:        CPL
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/opencryptoki/opencryptoki
 Source0:        https://github.com/opencryptoki/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
 Source1:        opencryptoki.module

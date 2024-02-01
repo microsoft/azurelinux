@@ -4,7 +4,7 @@ Version:        2.5.2
 Release:        18%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://code.google.com/archive/p/diskscrub
 Source0:        https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/diskscrub/%{name}-%{version}.tar.bz2
 

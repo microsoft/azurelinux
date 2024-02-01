@@ -4,7 +4,7 @@ Version:        4.9.6
 Release:        1%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSPR
 Source0:        https://archive.mozilla.org/pub/nspr/releases/v%{version}/src/%{name}-%{version}.tar.gz

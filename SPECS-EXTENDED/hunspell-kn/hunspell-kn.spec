@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-kn
 Summary: Kannada hunspell dictionaries
 Version: 1.0.3

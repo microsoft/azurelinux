@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: ipcalc
 Version: 0.4.1
 Release: 2%{?dist}

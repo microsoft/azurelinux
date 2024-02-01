@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # All package versioning is found here:
 # the actual version is composed from these below, including leading 0 for release candidates
 #   bzrmajor:  main bzr version
