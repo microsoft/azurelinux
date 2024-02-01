@@ -2,22 +2,22 @@
 
 Summary:        A collection of GSettings schemas
 Name:           gsettings-desktop-schemas
-Version:        3.36.1
-Release:        2%{?dist}
+Version:        45.0
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 # no homepage exists for this component
 URL:            https://gitlab.gnome.org/GNOME/gsettings-desktop-schemas
-Source0:        https://download.gnome.org/sources/%{name}/3.36/%{name}-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/%{name}/45/%{name}-%{version}.tar.xz
 BuildRequires:  gettext
 BuildRequires:  glib2-devel >= 2.31.0
 BuildRequires:  gobject-introspection-devel
 BuildRequires:  meson
-Requires: glib2 >= 2.31.0
+Requires:       glib2 >= 2.31.0
 # Recommend the default fonts set in the schemas
-Recommends: font(cantarell)
-Recommends: font(sourcecodepro)
+Recommends:     font(cantarell)
+Recommends:     font(sourcecodepro)
 
 %description
 gsettings-desktop-schemas contains a collection of GSettings schemas for
@@ -61,6 +61,9 @@ glib-compile-schemas --dry-run --strict %{buildroot}%{_datadir}/glib-2.0/schemas
 %{_datadir}/gir-1.0/GDesktopEnums-3.0.gir
 
 %changelog
+* Thu Feb 1 2024 Sumedh Sharma <sumsharma@microsoft.com> - 45.0-1
+- Upgrade to version 45.0
+
 * Tue Feb 15 2022 Cameron Baird <cameronbaird@microsoft.com> - 3.36.1-2
 - Promote to SPECS 
 - License verified.
