@@ -1,7 +1,7 @@
 Summary:        Tools and Utilities for interaction with SCSI devices.
 Name:           sg3_utils
-Version:        1.46
-Release:        2%{?dist}
+Version:        1.48
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,7 +15,7 @@ Provides:       %{name}-libs
 Linux tools and utilities to send commands to SCSI devices.
 
 %package -n libsg3_utils-devel
-Summary:        Devel pacjage for sg3_utils.
+Summary:        Devel package for sg3_utils.
 Group:          Development/Library.
 Provides:       %{name}-devel
 
@@ -26,35 +26,41 @@ Package containing static library object for development.
 %setup -q
 
 %build
-#make some fixes required by glibc-2.28:
-sed -i '/unistd/a #include <sys/sysmacros.h>' src/sg_dd.c src/sg_map26.c src/sg_xcopy.c
-
+./autogen.sh
 %configure
 
-%install
-make DESTDIR=%{buildroot} install %{?_smp_mflags}
-install -m 755 scripts/scsi_logging_level %{buildroot}/%{_bindir}
-install -m 755 scripts/rescan-scsi-bus.sh %{buildroot}/%{_bindir}
+# Don't use rpath!
+sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
+sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 
-%post -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+%install
+if [ "$RPM_BUILD_ROOT" != "/" ]; then
+        rm -rf $RPM_BUILD_ROOT
+fi
+
+make install \
+        DESTDIR=$RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root)
-%license COPYING
-%{_bindir}/*
-%{_mandir}/*
+%doc AUTHORS ChangeLog COPYING COVERAGE CREDITS INSTALL NEWS README README.sg_start
+%attr(755,root,root) %{_bindir}/*
+%{_mandir}/man8/*
 
 %files -n libsg3_utils-devel
 %defattr(-,root,root)
-%{_libdir}/libsgutils2.a
+%{_includedir}/scsi/*.h
+%{_libdir}/*.so
+%{_libdir}/*.a
+%{_libdir}/libsgutils2-%{version}.so.2
+%{_libdir}/libsgutils2-%{version}.so.2.0.0
 %{_libdir}/libsgutils2.la
-%{_libdir}/libsgutils2.so
-%{_libdir}/libsgutils2-1.46.so.2
-%{_libdir}/libsgutils2-1.46.so.2.0.0
-%{_includedir}/scsi/*
+
 
 %changelog
+* Thu Jan 25 2024 Dallas Delaney <dadelan@microsoft.com> - 1.48-1
+- Upgrade to version 1.48
+
 * Mon Apr 11 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.46-2
 - Fixing invalid source URL.
 
