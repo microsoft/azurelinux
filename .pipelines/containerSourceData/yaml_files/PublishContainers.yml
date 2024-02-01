@@ -20,7 +20,6 @@ stages:
     variables:
       ob_outputDirectory: $(Build.ArtifactStagingDirectory)
       ob_artifactBaseName: validation_artifacts
-      containersSrcDirectory: ${{ parameters.selfRepoRoot }}/.pipelines/containerSourceData
       amd64ArtifactsDownloadDir: $(Build.Repository.LocalPath)/downloaded-artifacts/AMD64
       arm64ArtifactsDownloadDir: $(Build.Repository.LocalPath)/downloaded-artifacts/ARM64
       buildNumberConfig: build-number.config
@@ -111,6 +110,7 @@ stages:
     variables:
       ob_outputDirectory: $(Build.ArtifactStagingDirectory)
       ob_artifactBaseName: publish_job_artifacts
+      containersSrcDirectory: ${{ parameters.selfRepoRoot }}/.pipelines/containerSourceData
       amd64ArtifactsDownloadDir: $(Build.Repository.LocalPath)/downloaded-artifacts/AMD64
       arm64ArtifactsDownloadDir: $(Build.Repository.LocalPath)/downloaded-artifacts/ARM64
       branchName: $[ dependencies.validation_job.outputs['set_out_variables.github_branch'] ]
@@ -169,7 +169,7 @@ stages:
     - task: Bash@3
       displayName: 'Publish Containers'
       inputs:
-        filePath: ${{ parameters.selfRepoRoot }}/.pipelines/containerSourceData/scripts/PublishContainers.sh
+        filePath: $(containersSrcDirectory)/scripts/PublishContainers.sh
         arguments: '-c "$(containersSrcDirectory)"
                     -d "$(amd64ArtifactsDownloadDir)/$(containerArtifactDir)"
                     -e "$(containerFilesPrefix)"
