@@ -51,9 +51,6 @@ jobs:
         run: python3 -m pip install -r toolkit/scripts/requirements.txt
 
       # Check if the required configs file is sorted
-      # To fix this check, the output can be written to a file ./json.patch and
-      # applied:
-      #     > patch ./toolkit/scripts/mariner-required-configs.json ./json.patch
       - name: Check mariner-required-configs.json format
         run:
           python3 toolkit/scripts/check_required_config_fmt.py toolkit/scripts/mariner-required-configs.json
