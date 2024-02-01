@@ -7231,8 +7231,8 @@
         "type": "other",
         "other": {
           "name": "intel-ipsec-mb",
-          "version": "1.2.0",
-          "downloadUrl": "https://github.com/intel/intel-ipsec-mb/archive/v1.2.tar.gz"
+          "version": "1.5.0",
+          "downloadUrl": "https://github.com/intel/intel-ipsec-mb/archive/v1.5/intel-ipsec-mb-1.5.tar.gz"
         }
       }
     },
