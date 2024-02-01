@@ -12,7 +12,7 @@ import (
 func TestVerityPartitionIsValidValidPartUuidFormat(t *testing.T) {
 	correctUuidPartition := VerityPartition{
 		IdType: "PartUuid",
-		Id:     "123e4567-e89b-12d3-a456-426614174000",
+		Id:     "123e4567-e89b-4d3a-a456-426614174000",
 	}
 
 	err := correctUuidPartition.IsValid()
