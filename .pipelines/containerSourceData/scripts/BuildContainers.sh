@@ -336,7 +336,7 @@ function generate_image_sbom {
 
     # generate-container-sbom.sh will create the SBOM at the following path
     IMAGE_SBOM_MANIFEST_PATH="$DOCKER_BUILD_DIR/_manifest/spdx_2.2/manifest.spdx.json"
-    ./"$SBOM_SCRIPT" \
+    /bin/bash "$SBOM_SCRIPT" \
         "$DOCKER_BUILD_DIR" \
         "$GOLDEN_IMAGE_NAME_FINAL" \
         "$SBOM_TOOL_PATH" \
