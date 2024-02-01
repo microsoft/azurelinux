@@ -10,6 +10,7 @@ LKG_FILENAME="lkg-3.0-dev.json"
 usage() {
     echo "./setuplkgtoolchain.sh"
     echo " Syncs toolchain manifests to match LKG build"
+    echo " WARNING: can overwrite local changes to 'toolkit/resources/manifests/package/pkggen_core_$(uname -p).txt' or 'toolchain_$(uname -p).txt'"
     exit 1
 }
 
@@ -32,7 +33,7 @@ update_manifests() {
     wget -nv https://raw.githubusercontent.com/microsoft/CBL-Mariner/$GIT_COMMIT/toolkit/resources/manifests/package/pkggen_core_$(uname -p).txt -O $ROOT_FOLDER/toolkit/resources/manifests/package/pkggen_core_$(uname -p).txt
 }
 
-[[ "$1" == "--help" ]] && usage
+[[ "$1" == "--help" || "$1" == "help" ]] && usage
 
 get_lkg
 
