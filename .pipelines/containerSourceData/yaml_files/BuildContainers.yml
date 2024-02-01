@@ -353,7 +353,7 @@ stages:
         inputs:
           targetType: 'inline'
           script: |
-            sudo tdnf install -y unzip
+            mkdir -p $(manifestToolPath)
             unzip $(sbomToolPath) -d $(manifestToolPath)
         condition: and(eq(variables['proceed'], 'true'), ne(variables['sbomToolPath'], ''))
 
