@@ -348,7 +348,7 @@ func printSummary(failedSRPMs, failedSRPMsTests map[string]*BuildResult, prebuil
 	printErrorInfoByCondition(len(unresolvedDependencies) > 0, summaryLine("Number of unresolved dependencies:", len(unresolvedDependencies)))
 	printErrorInfoByCondition(len(blockedSRPMs) > 0, summaryLine("Number of blocked SRPMs:", len(blockedSRPMs)))
 	printErrorInfoByCondition(len(blockedSRPMsTests) > 0, summaryLine("Number of blocked SRPMs tests:", len(blockedSRPMsTests)))
-	printErrorInfoByCondition(len(failedSRPMs) >0, summaryLine("Number of failed SRPMs:", len(failedSRPMs)))
+	printErrorInfoByCondition(len(failedSRPMs) > 0, summaryLine("Number of failed SRPMs:", len(failedSRPMs)))
 	printErrorInfoByCondition(len(failedSRPMsTests) > 0, summaryLine("Number of failed SRPMs tests:", len(failedSRPMsTests)))
 	if allowToolchainRebuilds && (len(rpmConflicts) > 0 || len(srpmConflicts) > 0) {
 		logger.Log.Infof("Toolchain RPMs conflicts are ignored since ALLOW_TOOLCHAIN_REBUILDS=y")
