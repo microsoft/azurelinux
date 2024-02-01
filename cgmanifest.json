@@ -3288,8 +3288,8 @@
         "type": "other",
         "other": {
           "name": "espeak-ng",
-          "version": "1.50",
-          "downloadUrl": "https://github.com/espeak-ng/espeak-ng/releases/download/1.50/espeak-ng-1.50.tgz"
+          "version": "1.51.1",
+          "downloadUrl": "https://github.com/espeak-ng/espeak-ng/archive/1.51.1/espeak-ng-1.51.1.tar.gz"
         }
       }
     },
@@ -27247,8 +27247,8 @@
         "type": "other",
         "other": {
           "name": "sg3_utils",
-          "version": "1.46",
-          "downloadUrl": "https://github.com/hreinecke/sg3_utils/archive/v1.46.tar.gz"
+          "version": "1.48",
+          "downloadUrl": "https://github.com/hreinecke/sg3_utils/archive/v1.48.tar.gz"
         }
       }
     },
@@ -28167,8 +28167,8 @@
         "type": "other",
         "other": {
           "name": "tcsh",
-          "version": "6.22.03",
-          "downloadUrl": "https://astron.com/pub/tcsh/old/tcsh-6.22.03.tar.gz"
+          "version": "6.24.10",
+          "downloadUrl": "https://github.com/tcsh-org/tcsh/archive/refs/tags/TCSH6_24_10.tar.gz"
         }
       }
     },
