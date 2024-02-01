@@ -51,7 +51,7 @@ type IsoMaker struct {
 }
 
 // NewIsoMaker returns a new ISO maker.
-func NewIsoMaker(unattendedInstall bool, baseDirPath, buildDirPath, releaseVersion, resourcesDirPath, configFilePath, initrdPath, isoRepoDirPath, outputDir, imageNameTag string) (*IsoMaker, error) {
+func NewIsoMaker(unattendedInstall bool, baseDirPath, buildDirPath, releaseVersion, resourcesDirPath, configFilePath, initrdPath, isoRepoDirPath, outputDir, imageNameTag string) (isoMaker *IsoMaker, err error) {
 	if baseDirPath == "" {
 		baseDirPath = filepath.Dir(configFilePath)
 	}
@@ -67,7 +67,7 @@ func NewIsoMaker(unattendedInstall bool, baseDirPath, buildDirPath, releaseVersi
 		return nil, err
 	}
 
-	return &IsoMaker{
+	isoMaker = &IsoMaker{
 		enableBiosBoot:     true,
 		unattendedInstall:  unattendedInstall,
 		config:             config,
@@ -80,21 +80,23 @@ func NewIsoMaker(unattendedInstall bool, baseDirPath, buildDirPath, releaseVersi
 		outputDirPath:      outputDir,
 		imageNameBase:      imageNameBase,
 		imageNameTag:       imageNameTag,
-	}, nil
+	}
+
+	return isoMaker, nil
 }
 
-func NewIsoMakerWithConfig(unattendedInstall, enableBiosBoot bool, baseDirPath, buildDirPath, releaseVersion, resourcesDirPath string, config configuration.Config, initrdPath, grubCfgPath, isoRepoDirPath, outputDir, imageNameBase, imageNameTag string) (*IsoMaker, error) {
+func NewIsoMakerWithConfig(unattendedInstall, enableBiosBoot bool, baseDirPath, buildDirPath, releaseVersion, resourcesDirPath string, config configuration.Config, initrdPath, grubCfgPath, isoRepoDirPath, outputDir, imageNameBase, imageNameTag string) (isoMaker *IsoMaker, err error) {
 
 	if imageNameBase == "" {
 		imageNameBase = defaultImageNameBase
 	}
 
-	err := verifyConfig(config, unattendedInstall)
+	err = verifyConfig(config, unattendedInstall)
 	if err != nil {
 		return nil, err
 	}
 
-	return &IsoMaker{
+	isoMaker = &IsoMaker{
 		enableBiosBoot:     enableBiosBoot,
 		unattendedInstall:  unattendedInstall,
 		config:             config,
@@ -108,7 +110,9 @@ func NewIsoMakerWithConfig(unattendedInstall, enableBiosBoot bool, baseDirPath, 
 		outputDirPath:      outputDir,
 		imageNameBase:      imageNameBase,
 		imageNameTag:       imageNameTag,
-	}, nil
+	}
+
+	return isoMaker, nil
 }
 
 // Make builds the ISO image to 'buildDirPath' with the packages included in the config JSON.
@@ -117,9 +121,9 @@ func (im *IsoMaker) Make() (err error) {
 		cleanupErr := im.isoMakerCleanUp()
 		if cleanupErr != nil {
 			if err != nil {
-				err = fmt.Errorf("%w\n%w", err, cleanupErr)
+				err = fmt.Errorf("%w\nclean-up error: %w", err, cleanupErr)
 			} else {
-				err = cleanupErr
+				err = fmt.Errorf("clean-up error: %w", cleanupErr)
 			}
 		}
 	}()
@@ -178,17 +182,12 @@ func (im *IsoMaker) buildIsoImage() error {
 		// Directory to convert to an ISO.
 		im.buildDirPath)
 
-	err := shell.ExecuteLive(false /*squashErrors*/, "mkisofs", mkisofsArgs...)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return shell.ExecuteLive(false /*squashErrors*/, "mkisofs", mkisofsArgs...)
 }
 
 // prepareIsoBootLoaderFilesAndFolders copies the files required by the ISO's bootloader
-func (im *IsoMaker) prepareIsoBootLoaderFilesAndFolders() error {
-	err := im.setUpIsoGrub2Bootloader()
+func (im *IsoMaker) prepareIsoBootLoaderFilesAndFolders() (err error) {
+	err = im.setUpIsoGrub2Bootloader()
 	if err != nil {
 		return err
 	}
@@ -212,12 +211,7 @@ func (im *IsoMaker) copyInitrd() error {
 
 	logger.Log.Debugf("Copying initrd from '%s'.", im.initrdPath)
 
-	err := file.Copy(im.initrdPath, initrdDestinationPath)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return file.Copy(im.initrdPath, initrdDestinationPath)
 }
 
 // setUpIsoGrub2BootLoader prepares an efiboot.img containing Grub2,
@@ -260,9 +254,9 @@ func (im *IsoMaker) setUpIsoGrub2Bootloader() (err error) {
 		cleanupErr := os.RemoveAll(efiBootImgTempMountDir)
 		if cleanupErr != nil {
 			if err != nil {
-				err = fmt.Errorf("failed to remove temporary mount directory '%s':\n%w\n%w", efiBootImgTempMountDir, err, cleanupErr)
+				err = fmt.Errorf("%w\nclean-up error: failed to remove temporary mount directory '%s':\n%w", err, efiBootImgTempMountDir, cleanupErr)
 			} else {
-				err = fmt.Errorf("failed to remove temporary mount directory '%s':\n%w", efiBootImgTempMountDir, cleanupErr)
+				err = fmt.Errorf("clean-up error: failed to remove temporary mount directory '%s':\n%w", efiBootImgTempMountDir, cleanupErr)
 			}
 		}
 	}()
@@ -284,9 +278,9 @@ func (im *IsoMaker) setUpIsoGrub2Bootloader() (err error) {
 		cleanupErr := syscall.Unmount(efiBootImgTempMountDir, 0)
 		if cleanupErr != nil {
 			if err != nil {
-				err = fmt.Errorf("failed to unmount '%s':\n%w\n%w", efiBootImgTempMountDir, err, cleanupErr)
+				err = fmt.Errorf("%w\nclean-up error: failed to unmount '%s':\n%w", err, efiBootImgTempMountDir, cleanupErr)
 			} else {
-				err = fmt.Errorf("failed to unmount '%s':\n%w", efiBootImgTempMountDir, cleanupErr)
+				err = fmt.Errorf("clean-up error: failed to unmount '%s':\n%w", efiBootImgTempMountDir, cleanupErr)
 			}
 		}
 	}()
@@ -308,12 +302,12 @@ func (im *IsoMaker) setUpIsoGrub2Bootloader() (err error) {
 	return nil
 }
 
-func (im *IsoMaker) copyShimFromInitrd(efiBootImgTempMountDir, bootBootloaderFile, grubBootloaderFile string) error {
+func (im *IsoMaker) copyShimFromInitrd(efiBootImgTempMountDir, bootBootloaderFile, grubBootloaderFile string) (err error) {
 	bootDirPath := filepath.Join(efiBootImgTempMountDir, "EFI", "BOOT")
 
 	initrdBootBootloaderFilePath := filepath.Join(initrdEFIBootDirectoryPath, bootBootloaderFile)
 	buildDirBootEFIFilePath := filepath.Join(bootDirPath, bootBootloaderFile)
-	err := im.extractFromInitrdAndCopy(initrdBootBootloaderFilePath, buildDirBootEFIFilePath)
+	err = im.extractFromInitrdAndCopy(initrdBootBootloaderFilePath, buildDirBootEFIFilePath)
 	if err != nil {
 		return err
 	}
@@ -344,12 +338,12 @@ func (im *IsoMaker) copyShimFromInitrd(efiBootImgTempMountDir, bootBootloaderFil
 // Rufus prioritizes the presence of an EFI folder on the ISO disk over extraction of the efi*.img archive.
 // So to workaround the limitation, create an EFI folder and make a duplicate copy of the bootloader files
 // in EFI/Boot so Rufus doesn't attempt to extract the efi*.img in the first place.
-func (im *IsoMaker) applyRufusWorkaround(bootBootloaderFile, grubBootloaderFile string) error {
+func (im *IsoMaker) applyRufusWorkaround(bootBootloaderFile, grubBootloaderFile string) (err error) {
 	const buildDirBootEFIDirectoryPath = "efi/boot"
 
 	initrdBootloaderFilePath := filepath.Join(initrdEFIBootDirectoryPath, bootBootloaderFile)
 	buildDirBootEFIUsbFilePath := filepath.Join(im.buildDirPath, buildDirBootEFIDirectoryPath, bootBootloaderFile)
-	err := im.extractFromInitrdAndCopy(initrdBootloaderFilePath, buildDirBootEFIUsbFilePath)
+	err = im.extractFromInitrdAndCopy(initrdBootloaderFilePath, buildDirBootEFIUsbFilePath)
 	if err != nil {
 		return err
 	}
@@ -374,22 +368,17 @@ func (im *IsoMaker) createVmlinuzImage() error {
 	// In order to select the correct kernel for isolinux, open the initrd archive
 	// and extract the vmlinuz file in it. An initrd is a gzip of a cpio archive.
 	//
-	err := im.extractFromInitrdAndCopy(bootKernelFile, vmlinuzFilePath)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return im.extractFromInitrdAndCopy(bootKernelFile, vmlinuzFilePath)
 }
 
 // createIsoRpmsRepo initializes the RPMs repo on the ISO image
 // later accessed by the ISO installer.
-func (im *IsoMaker) createIsoRpmsRepo() error {
+func (im *IsoMaker) createIsoRpmsRepo() (err error) {
 	isoRpmsRepoDirPath := filepath.Join(im.buildDirPath, "RPMS")
 
 	logger.Log.Debugf("Creating ISO RPMs repo under '%s'.", isoRpmsRepoDirPath)
 
-	err := os.MkdirAll(isoRpmsRepoDirPath, os.ModePerm)
+	err = os.MkdirAll(isoRpmsRepoDirPath, os.ModePerm)
 	if err != nil {
 		return fmt.Errorf("failed to mkdir '%s'.", isoRpmsRepoDirPath)
 	}
@@ -405,7 +394,7 @@ func (im *IsoMaker) createIsoRpmsRepo() error {
 
 // prepareWorkDirectory makes sure we start with a clean directory
 // under "im.buildDirPath". The work directory will contain the contents of the ISO image.
-func (im *IsoMaker) prepareWorkDirectory() error {
+func (im *IsoMaker) prepareWorkDirectory() (err error) {
 	logger.Log.Infof("Building ISO under '%s'.", im.buildDirPath)
 
 	exists, err := file.DirExists(im.buildDirPath)
@@ -454,7 +443,7 @@ func (im *IsoMaker) prepareWorkDirectory() error {
 
 // copyStaticIsoRootFiles copies architecture-independent files from the
 // Mariner repo directories.
-func (im *IsoMaker) copyStaticIsoRootFiles() error {
+func (im *IsoMaker) copyStaticIsoRootFiles() (err error) {
 
 	if im.resourcesDirPath == "" && im.grubCfgPath == "" {
 		return fmt.Errorf("missing required parameters. Must specify either the resources directory or provide a grub.cfg.")
@@ -465,7 +454,7 @@ func (im *IsoMaker) copyStaticIsoRootFiles() error {
 
 		logger.Log.Debugf("Copying static ISO root files from '%s' to '%s'.", staticIsoRootFilesPath, im.buildDirPath)
 
-		err := recursiveCopyDereferencingLinks(staticIsoRootFilesPath, im.buildDirPath)
+		err = recursiveCopyDereferencingLinks(staticIsoRootFilesPath, im.buildDirPath)
 		if err != nil {
 			return err
 		}
@@ -520,13 +509,13 @@ func (im *IsoMaker) copyArchitectureDependentIsoRootFiles() error {
 
 // copyAndRenameConfigFiles takes care of copying the config JSON along with all the files
 // required by the installed system.
-func (im *IsoMaker) copyAndRenameConfigFiles() error {
+func (im *IsoMaker) copyAndRenameConfigFiles() (err error) {
 	const configDirName = "config"
 
 	logger.Log.Debugf("Copying the config JSON and required files to the ISO's root.")
 
 	configFilesAbsDirPath := filepath.Join(im.buildDirPath, configDirName)
-	err := os.Mkdir(configFilesAbsDirPath, os.ModePerm)
+	err = os.Mkdir(configFilesAbsDirPath, os.ModePerm)
 	if err != nil {
 		return fmt.Errorf("failed to create ISO's config files directory under '%s':\n%w", configFilesAbsDirPath, err)
 	}
@@ -565,7 +554,7 @@ func (im *IsoMaker) copyAndRenameConfigFiles() error {
 // ISO directory to make them available to the installer.
 // Each file gets placed in a separate directory to avoid potential name conflicts and
 // the config gets updated with the new ISO paths.
-func (im *IsoMaker) copyAndRenameAdditionalFiles(configFilesAbsDirPath string) error {
+func (im *IsoMaker) copyAndRenameAdditionalFiles(configFilesAbsDirPath string) (err error) {
 	const additionalFilesSubDirName = "additionalfiles"
 
 	for i := range im.config.SystemConfigs {
@@ -589,7 +578,7 @@ func (im *IsoMaker) copyAndRenameAdditionalFiles(configFilesAbsDirPath string) e
 // ISO directory to make them available to the installer.
 // Each file gets placed in a separate directory to avoid potential name conflicts and
 // the config gets updated with the new ISO paths.
-func (im *IsoMaker) copyAndRenamePackagesJSONs(configFilesAbsDirPath string) error {
+func (im *IsoMaker) copyAndRenamePackagesJSONs(configFilesAbsDirPath string) (err error) {
 	const packagesSubDirName = "packages"
 
 	for _, systemConfig := range im.config.SystemConfigs {
@@ -610,7 +599,7 @@ func (im *IsoMaker) copyAndRenamePackagesJSONs(configFilesAbsDirPath string) err
 // ISO directory to make them available to the installer.
 // Each file gets placed in a separate directory to avoid potential name conflicts and
 // the config gets updated with the new ISO paths.
-func (im *IsoMaker) copyAndRenamePreInstallScripts(configFilesAbsDirPath string) error {
+func (im *IsoMaker) copyAndRenamePreInstallScripts(configFilesAbsDirPath string) (err error) {
 	const preInstallScriptsSubDirName = "preinstallscripts"
 
 	for _, systemConfig := range im.config.SystemConfigs {
@@ -631,7 +620,7 @@ func (im *IsoMaker) copyAndRenamePreInstallScripts(configFilesAbsDirPath string)
 // ISO directory to make them available to the installer.
 // Each file gets placed in a separate directory to avoid potential name conflicts and
 // the config gets updated with the new ISO paths.
-func (im *IsoMaker) copyAndRenamePostInstallScripts(configFilesAbsDirPath string) error {
+func (im *IsoMaker) copyAndRenamePostInstallScripts(configFilesAbsDirPath string) (err error) {
 	const postInstallScriptsSubDirName = "postinstallscripts"
 
 	for _, systemConfig := range im.config.SystemConfigs {
@@ -652,7 +641,7 @@ func (im *IsoMaker) copyAndRenamePostInstallScripts(configFilesAbsDirPath string
 // ISO directory to make them available to the installer.
 // Each file gets placed in a separate directory to avoid potential name conflicts and
 // the config gets updated with the new ISO paths.
-func (im *IsoMaker) copyAndRenameFinalizeImageScripts(configFilesAbsDirPath string) error {
+func (im *IsoMaker) copyAndRenameFinalizeImageScripts(configFilesAbsDirPath string) (err error) {
 	const finalizeImageScriptsSubDirName = "finalizeimagescripts"
 
 	for _, systemConfig := range im.config.SystemConfigs {
@@ -673,7 +662,7 @@ func (im *IsoMaker) copyAndRenameFinalizeImageScripts(configFilesAbsDirPath stri
 // ISO directory to make them available to the installer.
 // Each file gets placed in a separate directory to avoid potential name conflicts and
 // the config gets updated with the new ISO paths.
-func (im *IsoMaker) copyAndRenameSSHPublicKeys(configFilesAbsDirPath string) error {
+func (im *IsoMaker) copyAndRenameSSHPublicKeys(configFilesAbsDirPath string) (err error) {
 	const sshPublicKeysSubDirName = "sshpublickeys"
 
 	for _, systemConfig := range im.config.SystemConfigs {
@@ -694,7 +683,7 @@ func (im *IsoMaker) copyAndRenameSSHPublicKeys(configFilesAbsDirPath string) err
 
 // saveConfigJSON will save the modified config JSON into an
 // ISO directory to make it available to the installer.
-func (im *IsoMaker) saveConfigJSON(configFilesAbsDirPath string) error {
+func (im *IsoMaker) saveConfigJSON(configFilesAbsDirPath string) (err error) {
 	const (
 		attendedInstallConfigFileName   = "attended_config.json"
 		unattendedInstallConfigFileName = "unattended_config.json"
@@ -705,7 +694,7 @@ func (im *IsoMaker) saveConfigJSON(configFilesAbsDirPath string) error {
 		isoConfigFileAbsPath = filepath.Join(configFilesAbsDirPath, unattendedInstallConfigFileName)
 	}
 
-	err := jsonutils.WriteJSONFile(isoConfigFileAbsPath, &im.config)
+	err = jsonutils.WriteJSONFile(isoConfigFileAbsPath, &im.config)
 	if err != nil {
 		return fmt.Errorf("failed to save config JSON to '%s':\n%w", isoConfigFileAbsPath, err)
 	}
@@ -714,17 +703,17 @@ func (im *IsoMaker) saveConfigJSON(configFilesAbsDirPath string) error {
 
 // copyFileToConfigRoot copies a single file to its own, numbered subdirectory to avoid name conflicts
 // and returns the relative path to the file for the sake of config updates for the installer.
-func (im *IsoMaker) copyFileToConfigRoot(configFilesAbsDirPath, configFilesSubDirName, localAbsFilePath string) (string, error) {
+func (im *IsoMaker) copyFileToConfigRoot(configFilesAbsDirPath, configFilesSubDirName, localAbsFilePath string) (isoRelativeFilePath string, err error) {
 	fileName := filepath.Base(localAbsFilePath)
 	configFileSubDirRelativePath := fmt.Sprintf("%s/%d", configFilesSubDirName, im.configSubDirNumber)
 	configFileSubDirAbsPath := filepath.Join(configFilesAbsDirPath, configFileSubDirRelativePath)
 
-	err := os.MkdirAll(configFileSubDirAbsPath, os.ModePerm)
+	err = os.MkdirAll(configFileSubDirAbsPath, os.ModePerm)
 	if err != nil {
 		return "", fmt.Errorf("failed to create ISO's config subdirectory '%s':\n%w", configFileSubDirAbsPath, err)
 	}
 
-	isoRelativeFilePath := filepath.Join(configFileSubDirRelativePath, fileName)
+	isoRelativeFilePath = filepath.Join(configFileSubDirRelativePath, fileName)
 	isoAbsFilePath := filepath.Join(configFilesAbsDirPath, isoRelativeFilePath)
 
 	logger.Log.Tracef("Copying file to ISO's config root '%s' from '%s'.", isoAbsFilePath, localAbsFilePath)
@@ -740,8 +729,7 @@ func (im *IsoMaker) copyFileToConfigRoot(configFilesAbsDirPath, configFilesSubDi
 }
 
 // initializePaths initializes absolute, global directory paths used by multiple other functions.
-func (im *IsoMaker) initializePaths() error {
-	var err error
+func (im *IsoMaker) initializePaths() (err error) {
 	im.buildDirPath, err = filepath.Abs(im.buildDirPath)
 	if err != nil {
 		return fmt.Errorf("failed while retrieving absolute path from source root path: '%s':\n%w", im.buildDirPath, err)
@@ -777,9 +765,9 @@ func (im *IsoMaker) isoMakerCleanUp() (err error) {
 		cleanupErr := im.isoMakerCleanUpTasks[i]()
 		if cleanupErr != nil {
 			if err != nil {
-				err = fmt.Errorf("%w\n%w", err, cleanupErr)
+				err = fmt.Errorf("%w\nclean-up error: %w", err, cleanupErr)
 			} else {
-				err = cleanupErr
+				err = fmt.Errorf("clean-up error: %w", cleanupErr)
 			}
 		}
 	}
@@ -787,8 +775,8 @@ func (im *IsoMaker) isoMakerCleanUp() (err error) {
 	return err
 }
 
-func readConfigFile(configFilePath, baseDirPath string) (configuration.Config, error) {
-	config, err := configuration.LoadWithAbsolutePaths(configFilePath, baseDirPath)
+func readConfigFile(configFilePath, baseDirPath string) (config configuration.Config, err error) {
+	config, err = configuration.LoadWithAbsolutePaths(configFilePath, baseDirPath)
 	if err != nil {
 		return configuration.Config{}, fmt.Errorf("failed while reading config file from '%s' with base directory '%s':\n%w", configFilePath, baseDirPath, err)
 	}
@@ -809,8 +797,8 @@ func verifyConfig(config configuration.Config, unattendedInstall bool) error {
 }
 
 // recursiveCopyDereferencingLinks simulates the behavior of "cp -r -L".
-func recursiveCopyDereferencingLinks(source string, target string) error {
-	err := os.MkdirAll(target, os.ModePerm)
+func recursiveCopyDereferencingLinks(source string, target string) (err error) {
+	err = os.MkdirAll(target, os.ModePerm)
 	if err != nil {
 		return err
 	}
@@ -830,7 +818,7 @@ func recursiveCopyDereferencingLinks(source string, target string) error {
 	}
 
 	for sourcePath, targetPath := range sourceToTarget {
-		err := shell.ExecuteLive(false /*squashErrors*/, "cp", "-r", "-L", sourcePath, targetPath)
+		err = shell.ExecuteLive(false /*squashErrors*/, "cp", "-r", "-L", sourcePath, targetPath)
 		if err != nil {
 			return err
 		}
@@ -839,7 +827,7 @@ func recursiveCopyDereferencingLinks(source string, target string) error {
 	return nil
 }
 
-func (im *IsoMaker) extractFromInitrdAndCopy(srcFileName, destFilePath string) error {
+func (im *IsoMaker) extractFromInitrdAndCopy(srcFileName, destFilePath string) (err error) {
 	// Setup a series of io readers: initrd file -> parallelized gzip -> cpio
 
 	logger.Log.Debugf("Searching for (%s) in initrd (%s) and copying to (%s)", srcFileName, im.initrdPath, destFilePath)
