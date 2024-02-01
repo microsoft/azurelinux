@@ -37,7 +37,7 @@ func main() {
 
 	logger.InitBestEffort(*logFilePath, *logLevel)
 
-	isoMaker := isomakerlib.NewIsoMaker(
+	isoMaker, err := isomakerlib.NewIsoMaker(
 		*unattendedInstall,
 		*baseDirPath,
 		*buildDirPath,
@@ -48,5 +48,11 @@ func main() {
 		*isoRepoDirPath,
 		*outputDir,
 		*imageTag)
-	isoMaker.Make()
+	if err != nil {
+		logger.PanicOnError(err)
+	}
+	err = isoMaker.Make()
+	if err != nil {
+		logger.PanicOnError(err)
+	}
 }
