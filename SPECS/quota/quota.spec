@@ -11,7 +11,7 @@
 %bcond_with quota_enables_tcpwrappers
 
 Name:       quota
-Version:    4.06
+Version:    4.09
 Release:    1%{?dist}
 Summary:    System administration tools for monitoring users' disk usage
 # quota_nld.c, quotaio_xfs.h:       GPLv2
@@ -345,6 +345,9 @@ make check
 
 
 %changelog
+* Thu Feb 01 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.09-1
+- Auto-upgrade to 4.09 - none
+
 * Fri May 13 2022 Chris Co <chrco@microsoft.com> 4.06-1
 - Update to 4.06 (Imported from Fedora 36, license: MIT)
 

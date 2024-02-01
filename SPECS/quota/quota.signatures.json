@@ -1,9 +1,9 @@
 {
- "Signatures": {
-  "quota-4.06.tar.gz": "2f3e03039f378d4f0d97acdb49daf581dcaad64d2e1ddf129495fd579fbd268d",
-  "quota_nld.service": "95235d6fe245ffe3802956036210ca30d5ef5544e1537df9c536dc0f41e6aa95",
-  "quota_nld.sysconfig": "3947079eed442d61d5c3447c9908cc672d600940dbf8f8dd2bffee6c2f5967eb",
-  "rpc-rquotad.service": "b02f388201740d1736be0e6fb92efa9afce027c5887b0da0b9f710d05df73648",
-  "rpc-rquotad.sysconfig": "e4ab26f4608788e6581d58b52d6355792fafe55ecbefc83abb652904c52bcd5d"
- }
+  "Signatures": {
+    "quota_nld.service": "95235d6fe245ffe3802956036210ca30d5ef5544e1537df9c536dc0f41e6aa95",
+    "quota_nld.sysconfig": "3947079eed442d61d5c3447c9908cc672d600940dbf8f8dd2bffee6c2f5967eb",
+    "rpc-rquotad.service": "b02f388201740d1736be0e6fb92efa9afce027c5887b0da0b9f710d05df73648",
+    "rpc-rquotad.sysconfig": "e4ab26f4608788e6581d58b52d6355792fafe55ecbefc83abb652904c52bcd5d",
+    "quota-4.09.tar.gz": "9cdaca154bc92afc3117f0e5f5b3208dd5f84583af1cf061c39baa0a2bb142f9"
+  }
 }
