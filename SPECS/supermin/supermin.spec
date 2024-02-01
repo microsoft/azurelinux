@@ -21,17 +21,17 @@
 Summary:        Tool for creating supermin appliances
 Name:           supermin
 Version:        5.2.1
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Microsoft Azure Linux
 URL:            https://github.com/libguestfs/supermin
 Source0:        https://download.libguestfs.org/supermin/%{source_directory}/%{name}-%{version}.tar.gz
 # For automatic RPM dependency generation.
 # See: http://www.rpm.org/wiki/PackagerDocs/DependencyGenerator
 Source3:        supermin.attr
 Source4:        supermin-find-requires
-Patch0:         %{name}-mariner.patch
+Patch0:         %{name}-azurelinux.patch
 
 BuildRequires:  %{_bindir}/pod2html
 BuildRequires:  %{_bindir}/pod2man
@@ -129,6 +129,9 @@ make check || {
 %{_rpmconfigdir}/supermin-find-requires
 
 %changelog
+* Thu Feb 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 5.2.1-11
+- Fix patch file with new changed azure linux OS files.
+
 * Tue Nov 07 2023 Andrew Phelps <anphel@microsoft.com> - 5.2.1-10
 - Bump release to rebuild against glibc 2.38-1
 

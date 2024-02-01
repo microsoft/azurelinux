@@ -1,7 +1,7 @@
 From f4a3020f202d67ad5682304e7710bfc14f1320eb Mon Sep 17 00:00:00 2001
 From: Thomas Crain <thcrain@microsoft.com>
 Date: Wed, 19 Jan 2022 21:36:29 -0800
-Subject: [PATCH] Add Mariner support to supermin
+Subject: [PATCH] Add Microsoft Azure Linux support to supermin
 
 ---
  src/ph_rpm.ml        | 18 +++++++++++++++++-
@@ -16,11 +16,11 @@ index 549bd9a..760c815 100644
        (stat "/etc/ibm_powerkvm-release").st_kind = S_REG
      with Unix_error _ -> false
  
-+let mariner_detect () =
++let azurelinux_detect () =
 +  Config.rpm <> "no" && Config.rpm2cpio <> "no" && rpm_is_available () &&
 +    Config.dnf <> "no" &&
-+    Os_release.get_id () = "mariner" ||
-+     try (stat "/etc/mariner-release").st_kind = S_REG with Unix_error _ -> false
++    Os_release.get_id () = "azurelinux" ||
++     try (stat "/etc/azurelinux-release").st_kind = S_REG with Unix_error _ -> false
 +
  let settings = ref no_settings
  let rpm_major, rpm_minor, rpm_arch = ref 0, ref 0, ref ""
@@ -29,7 +29,7 @@ index 549bd9a..760c815 100644
  
    rpm_unpack tdir dir
  
-+and mariner_download_all_packages pkgs dir =
++and azurelinux_download_all_packages pkgs dir =
 +  let tdir = !settings.tmpdir // string_random8 () in
 +  download_all_packages_with_dnf pkgs dir tdir
 +
@@ -42,12 +42,12 @@ index 549bd9a..760c815 100644
    } in
 -  register_package_handler "openmandriva" "rpm" openmandriva
 +  register_package_handler "openmandriva" "rpm" openmandriva;
-+  let mariner = {
++  let azurelinux = {
 +    fedora with
-+    ph_detect = mariner_detect;
-+    ph_download_package = PHDownloadAllPackages mariner_download_all_packages;
++    ph_detect = azurelinux_detect;
++    ph_download_package = PHDownloadAllPackages azurelinux_download_all_packages;
 +  } in
-+  register_package_handler "mariner" "rpm" mariner
++  register_package_handler "azurelinux" "rpm" azurelinux
 diff --git a/tests/test-harder.sh b/tests/test-harder.sh
 index aceef21..223cae9 100755
 --- a/tests/test-harder.sh
@@ -56,7 +56,7 @@ index aceef21..223cae9 100755
          opensuse*|sled|sles) distro=suse ;;
          ubuntu) distro=debian ;;
          openmandriva) distro=openmandriva ;;
-+		mariner) distro=mariner ;;
++		azurelinux) distro=azurelinux ;;
      esac
  elif [ -f /etc/arch-release ]; then
      distro=arch
@@ -64,8 +64,8 @@ index aceef21..223cae9 100755
      distro=suse
  elif [ -f /etc/ibm_powerkvm-release ]; then
      distro=ibm-powerkvm
-+elif [ -f /etc/mariner-release ]; then
-+	distro=mariner
++elif [ -f /etc/azurelinux-release ]; then
++	distro=azurelinux
  else
      exit 77
  fi
@@ -73,7 +73,7 @@ index aceef21..223cae9 100755
  	# installed.  (See commit fb40baade8e3441b73ce6fd10a32fbbfe49cc4da)
  	pkgs="augeas hivex rpm"
  	;;
-+	mariner)
++	azurelinux)
 +	pkgs="augeas hivex tar"
      redhat)
          # Choose tar because it has an epoch > 0 and is commonly
@@ -82,7 +82,7 @@ index aceef21..223cae9 100755
  	    exit 1
  	fi
  	;;
-+	mariner)
++	azurelinux)
 +	if [ ! -x $d2/usr/bin/augtool ]; then
 +	    echo "$0: $distro: augtool binary not installed in chroot"
 +	    ls -lR $d2
