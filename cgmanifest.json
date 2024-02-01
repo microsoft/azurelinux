@@ -9961,8 +9961,8 @@
         "type": "other",
         "other": {
           "name": "libmicrohttpd",
-          "version": "0.9.76",
-          "downloadUrl": "https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.76.tar.gz"
+          "version": "0.9.77",
+          "downloadUrl": "https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.77.tar.gz"
         }
       }
     },
