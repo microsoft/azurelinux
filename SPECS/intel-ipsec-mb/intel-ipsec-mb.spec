@@ -1,5 +1,5 @@
 %global major        1
-%global minor        2
+%global minor        5
 %global patch        0
 %global fullversion  %{major}.%{minor}.%patch
 # GitHub properties
@@ -11,15 +11,16 @@
 Summary:        IPSEC cryptography library optimized for Intel Architecture
 Name:           %{githubname}
 Version:        %{fullversion}
-Release:        2%{?dist}
-License:        BSD
+Release:        1%{?dist}
+License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://github.com/intel/%{githubname}
-Source0:        https://github.com/intel/%{githubname}/archive/v%{githubver}.tar.gz#/%{githubfull}.tar.gz
+Source0:        https://github.com/intel/%{githubname}/archive/v%{githubver}/%{githubfull}.tar.gz
+BuildRequires:  cmake
 BuildRequires:  gcc >= 4.8.3
-BuildRequires:  make
+BuildRequires:  gcc-c++
 BuildRequires:  nasm >= 2.14
 ExclusiveArch:  x86_64
 
@@ -40,44 +41,37 @@ https://github.com/intel/%{githubname}
 
 %prep
 %autosetup -n %{githubfull}
+sed -i 's|man/man7|share/man/man7|g' lib/cmake/unix.cmake
 
 %build
-cd lib
-%make_build EXTRA_CFLAGS='%{optflags}'
+%cmake
+%cmake_build
 
 %install
+%cmake_install
 
-# Install the library
-install -d %{buildroot}/%{_includedir}
-install -m 0644 %{_builddir}/%{githubfull}/lib/intel-ipsec-mb.h %{buildroot}/%{_includedir}
-install -d %{buildroot}/%{_libdir}
-install -s -m 0755 %{_builddir}/%{githubfull}/lib/libIPSec_MB.so.%{fullversion} %{buildroot}/%{_libdir}
-install -d %{buildroot}/%{_mandir}/man7
-install -m 0444 lib/libipsec-mb.7 %{buildroot}/%{_mandir}/man7
-install -m 0444 lib/libipsec-mb-dev.7 %{buildroot}/%{_mandir}/man7
-cd %{buildroot}/%{_libdir}
-ln -s libIPSec_MB.so.%{fullversion} libIPSec_MB.so.%{major}
-ln -s libIPSec_MB.so.%{fullversion} libIPSec_MB.so
+%check
+%ctest
 
 %ldconfig_scriptlets
 
 %files
 
 %license LICENSE
-%doc README ReleaseNotes.txt
-
+%doc README.md ReleaseNotes.txt
 %{_libdir}/libIPSec_MB.so.%{fullversion}
 %{_libdir}/libIPSec_MB.so.%{major}
-
-%{_mandir}/man7/libipsec-mb.7.gz
+%{_mandir}/man7/libipsec-mb.*
 
 %files -n %{name}-devel
 %{_includedir}/intel-ipsec-mb.h
 %{_libdir}/libIPSec_MB.so
-
-%{_mandir}/man7/libipsec-mb-dev.7.gz
+%{_mandir}/man7/libipsec-mb-dev.*
 
 %changelog
+* Thu Feb 01 2024 Sumedh Sharma <sumsharma@microsoft.com> - 1.5.0-1
+- Upgrade to version 1.5
+
 * Mon Jul 04 2022 Sriram Nambakam <snambakam@microsoft.com> - 1.2.0-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - Verified license
