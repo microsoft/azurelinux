@@ -586,7 +586,7 @@ func (b *LiveOSIsoBuilder) createIsoImage(isoOutputDir, isoOutputBaseName string
 		return err
 	}
 
-	isoMaker := isomakerlib.NewIsoMakerWithConfig(
+	isoMaker, err := isomakerlib.NewIsoMakerWithConfig(
 		unattendedInstall,
 		enableBiosBoot,
 		enableRpmRepo,
@@ -601,8 +601,14 @@ func (b *LiveOSIsoBuilder) createIsoImage(isoOutputDir, isoOutputBaseName string
 		isoOutputDir,
 		isoOutputBaseName,
 		imageNameTag)
+	if err != nil {
+		return err
+	}
 
-	isoMaker.Make()
+	err = isoMaker.Make()
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
