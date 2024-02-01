@@ -25795,8 +25795,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-faraday-httpclient",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/lostisland/faraday-httpclient/archive/refs/tags/v1.0.tar.gz"
+          "version": "2.0.1",
+          "downloadUrl": "https://github.com/lostisland/faraday-httpclient/archive/refs/tags/v2.0.1.tar.gz"
         }
       }
     },
@@ -25835,8 +25835,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-faraday-patron",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/lostisland/faraday-patron/archive/refs/tags/v1.0.tar.gz"
+          "version": "2.0.1",
+          "downloadUrl": "https://github.com/lostisland/faraday-patron/archive/refs/tags/v2.0.1.tar.gz"
         }
       }
     },
@@ -25865,8 +25865,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-ffi",
-          "version": "1.15.5",
-          "downloadUrl": "https://github.com/ffi/ffi/archive/refs/tags/v1.15.5.tar.gz"
+          "version": "1.16.3",
+          "downloadUrl": "https://github.com/ffi/ffi/archive/refs/tags/v1.16.3.tar.gz"
         }
       }
     },
@@ -27886,9 +27886,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "swupdate",
-          "version": "2021.04",
-          "downloadUrl": "https://github.com/sbabic/swupdate/archive/2021.04.tar.gz"
+          "name": "swtpm",
+          "version": "0.8.1",
+          "downloadUrl": "http://github.com/stefanberger/swtpm/archive/d2849a9f5ced70438d67036693438344b47b4161/swtpm-d2849a9.tar.gz"
         }
       }
     },
@@ -27896,9 +27896,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "swtpm",
-          "version": "0.8.1",
-          "downloadUrl": "http://github.com/stefanberger/swtpm/archive/d2849a9f5ced70438d67036693438344b47b4161/swtpm-d2849a9.tar.gz"
+          "name": "swupdate",
+          "version": "2021.04",
+          "downloadUrl": "https://github.com/sbabic/swupdate/archive/2021.04.tar.gz"
         }
       }
     },
