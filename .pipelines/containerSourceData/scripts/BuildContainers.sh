@@ -149,12 +149,9 @@ function initialization {
     # the below value of DISTRO_IDENTIFIER in the image tag.
     # TODO: We may need to update this value for Azure Linux 3.0.
     DISTRO_IDENTIFIER="cm"
-
-    echo
     echo "Golden Image Name             -> $GOLDEN_IMAGE_NAME"
     echo "Base ACR Container Tag        -> $BASE_IMAGE_TAG"
     echo "Distro Identifier             -> $DISTRO_IDENTIFIER"
-    echo
 }
 
 function prepare_dockerfile {
