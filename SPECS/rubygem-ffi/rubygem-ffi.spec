@@ -11,6 +11,7 @@ URL:            https://github.com/ffi/ffi
 Source0:        https://github.com/ffi/ffi/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  ruby
+BuildRequires:  libffi-devel
 Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
