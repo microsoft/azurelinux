@@ -6440,8 +6440,8 @@
         "type": "other",
         "other": {
           "name": "hwdata",
-          "version": "0.356",
-          "downloadUrl": "https://github.com/vcrhonek/hwdata/archive/v0.356.tar.gz"
+          "version": "0.373",
+          "downloadUrl": "https://github.com/vcrhonek/hwdata/archive/v0.373.tar.gz"
         }
       }
     },
