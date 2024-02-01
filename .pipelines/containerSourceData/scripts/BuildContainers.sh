@@ -155,6 +155,7 @@ function initialization {
 }
 
 function prepare_dockerfile {
+    echo "+++ Prepare dockerfile"
     # Copy original dockerfile from CBL-Mariner repo.
     cp "$CONTAINER_SRC_DIR/$IMAGE/$DOCKERFILE" "$WORK_DIR/dockerfile"
 
@@ -174,12 +175,14 @@ function prepare_dockerfile {
 }
 
 function get_packages_to_install {
+    echo "+++ Get packages to install"
     packagesFilePath="$CONTAINER_SRC_DIR/$IMAGE/$PACKAGE_FILE"
     PACKAGES_TO_INSTALL=$(paste -s -d' ' < "$packagesFilePath")
     echo "Packages to install           -> $PACKAGES_TO_INSTALL"
 }
 
 function prepare_docker_directory {
+    echo "+++ Prepare docker directory"
     # Get additional required files for the container build from CBL-Mariner repo.
     configurationDirectoryPath="$CONTAINER_SRC_DIR/$IMAGE/configuration-files"
     if [ -d "$configurationDirectoryPath" ]; then
@@ -195,6 +198,7 @@ function prepare_docker_directory {
 }
 
 function docker_build {
+    echo "+++ Build container"
     pushd "$WORK_DIR" > /dev/null
     echo " docker build command"
     echo "----------------------"
@@ -249,6 +253,7 @@ function set_image_tag {
 }
 
 function finalize {
+    echo "+++ Finalize"
     docker image tag "$GOLDEN_IMAGE_NAME" "$GOLDEN_IMAGE_NAME_FINAL"
     docker rmi -f "$GOLDEN_IMAGE_NAME"
     mkdir -p "$(dirname "$OUTPUT_CONTAINER_NAME_FILE")"
@@ -257,8 +262,8 @@ function finalize {
 
 function publish_to_acr {
     if [[ "$PUBLISH_TO_ACR" =~ [Tt]rue ]]; then
-        echo
-        echo "Publish container $GOLDEN_IMAGE_NAME_FINAL"
+
+        echo "+++ Publish container $GOLDEN_IMAGE_NAME_FINAL"
         echo
 
         echo "login into ACR: $ACR"
