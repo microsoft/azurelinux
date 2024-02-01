@@ -12,6 +12,13 @@ URL:            https://github.com/google/%{name}/
 Source0:        https://github.com/google/%{name}/archive/refs/tags/%{longver}.tar.gz#/%{name}-%{longver}.tar.gz
 BuildRequires:  gcc
 BuildRequires:  make
+BuildRequires:  cmake
+BuildRequires:  abseil-cpp-devel
+%if %{with_check}
+BuildRequires:  gtest-devel
+BuildRequires:  gmock-devel
+BuildRequires:  gbenchmark-devel
+%endif
 
 %description
 RE2 is a C++ library providing a fast, safe, thread-friendly alternative to
@@ -39,43 +46,41 @@ you will need to install %{name}-devel.
 %setup -q -n %{name}-%{longver}
 
 %build
-# The -pthread flag issue has been submitted upstream:
-# http://groups.google.com/forum/?fromgroups=#!topic/re2-dev/bkUDtO5l6Lo
-# The RPM macro for the linker flags does not exist on EPEL
 %{!?__global_ldflags: %global __global_ldflags -Wl,-z,relro}
-CXXFLAGS="${CXXFLAGS:-%{optflags}} -pthread"
-LDFLAGS="${LDFLAGS:-%{__global_ldflags}} -pthread"
 
-%make_build \
-  CXXFLAGS="$CXXFLAGS"\
-  LDFLAGS="$LDFLAGS" \
-  includedir=%{_includedir}\
-  libdir=%{_libdir}
+%cmake . \
+  -DOVERRIDE_INSTALL_PREFIX=/usr \
+  -DCMAKE_COLOR_MAKEFILE:BOOL=OFF \
+  -DINSTALL_LIBDIR:PATH=%{_libdir} \
+%if %{with_check}
+  -DRE2_BUILD_TESTING:BOOL=ON \
+%endif
+  "-GUnix Makefiles"
+
+%cmake_build
 
 %install
-%make_install \
-  INSTALL="install -p"\
-  includedir=%{_includedir}\
-  libdir=%{_libdir}
+%cmake_install
 
 # Suppress the static library
 rm -fv %{buildroot}%{_libdir}/libre2.a
 
 %check
-%make_build shared-test
+%ctest
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
 %files
 %license LICENSE
-%doc AUTHORS CONTRIBUTORS README
-%{_libdir}/libre2.so.0a*
+%doc README
+%{_libdir}/libre2.so.11*
 
 %files devel
 %{_includedir}/re2/
 %{_libdir}/libre2.so
 %{_libdir}/pkgconfig/re2.pc
+%{_libdir}/cmake/re2/*.cmake
 
 %changelog
 * Wed Jan 31 2024 Jon Slobodzian <joslobo@microsoft.com> - 20240201-1
