@@ -5,6 +5,7 @@ name: Cherry Pick fast-track commits from PR
 
 trigger:
 - fasttrack/*
+- tvuong/fasttrack/*
 pr: none
 
 variables:
