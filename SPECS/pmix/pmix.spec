@@ -1,6 +1,6 @@
 Summary:        Process Management Interface Exascale (PMIx)
 Name:           pmix
-Version:        4.1.3
+Version:        5.0.1
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -90,7 +90,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %files
 %license LICENSE
-%doc README
+%doc README.md
 %dir %{_datadir}/%{name}
 %dir %{_libdir}/%{name}
 %dir %{_sysconfdir}/%{name}
@@ -99,6 +99,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libpmix.so.2*
 %{_libdir}/%{name}/*.so
 %{_mandir}/man1/*.1*
+%{_mandir}/man5/*.5*
 
 %files devel
 %{_datadir}/%{name}/*.supp
@@ -106,11 +107,16 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_includedir}/pmix/
 %{_libdir}/libpmix.so
 %{_libdir}/pkgconfig/*.pc
+%{_mandir}/man3/*.3*
+%{_docdir}/%{name}/
 
 %files tools
 %{_bindir}/*
 
 %changelog
+* Wed Jan 24 2024 Sindhu Karri <lakarri@microsoft.com> - 5.0.1-1
+- Upgrade to 5.0.1
+
 * Thu Sep 21 2023 Sumedh Sharma <sumsharma@microsoft.com> - 4.1.3-1
 - Bump version to address CVE-2023-41915
 
