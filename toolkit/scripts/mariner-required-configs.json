@@ -534,6 +534,18 @@
                     "y"
                 ]
             },
+            "CONFIG_DWMAC_LOONGSON": {
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/7539"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Not available",
+                "value": [
+                    "<missing>"
+                ]
+            },
             "CONFIG_EDAC_BLUEFIELD": {
                 "PR": [
                     "https://github.com/microsoft/CBL-Mariner/pull/5896"
@@ -1029,6 +1041,30 @@
                     "y"
                 ]
             },
+            "CONFIG_PHY_RTK_RTD_USB2PHY": {
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/7539"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Not available",
+                "value": [
+                    "<missing>"
+                ]
+            },
+            "CONFIG_PHY_RTK_RTD_USB3PHY": {
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/7539"
+                ],
+                "arch": [
+                    "ARM64"
+                ],
+                "comment": "Not available",
+                "value": [
+                    "<missing>"
+                ]
+            },
             "CONFIG_PHY_TEGRA_XUSB": {
                 "PR": [
                     "https://github.com/microsoft/CBL-Mariner/pull/6574"
@@ -1386,42 +1422,6 @@
                 "comment": "Needed for customer",
                 "value": [
                     "y"
-                ]
-            },
-            "CONFIG_DWMAC_LOONGSON": {
-                "value": [
-                    "<missing>"
-                ],
-                "arch": [
-                    "ARM64"
-                ],
-                "comment": "Not available",
-                "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/7539"
-                ]
-            },
-            "CONFIG_PHY_RTK_RTD_USB2PHY": {
-                "value": [
-                    "<missing>"
-                ],
-                "arch": [
-                    "ARM64"
-                ],
-                "comment": "Not available",
-                "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/7539"
-                ]
-            },
-            "CONFIG_PHY_RTK_RTD_USB3PHY": {
-                "value": [
-                    "<missing>"
-                ],
-                "arch": [
-                    "ARM64"
-                ],
-                "comment": "Not available",
-                "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/7539"
                 ]
             }
         }
