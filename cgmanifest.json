@@ -4820,8 +4820,8 @@
         "type": "other",
         "other": {
           "name": "gsettings-desktop-schemas",
-          "version": "3.36.1",
-          "downloadUrl": "https://download.gnome.org/sources/gsettings-desktop-schemas/3.36/gsettings-desktop-schemas-3.36.1.tar.xz"
+          "version": "45.0",
+          "downloadUrl": "https://download.gnome.org/sources/gsettings-desktop-schemas/45/gsettings-desktop-schemas-45.0.tar.xz"
         }
       }
     },
