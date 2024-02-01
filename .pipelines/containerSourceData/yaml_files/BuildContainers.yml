@@ -410,7 +410,7 @@ stages:
           - task: Bash@3
             displayName: 'Build ${{ goldenImage.componentName }} Container'
             inputs:
-              filePath: ${{ parameters.selfRepoRoot }}/.pipelines/containerSourceData/scripts/BuildContainers.sh
+              filePath: ${{ parameters.selfRepoRoot }}/.pipelines/containerSourceData/scripts/BuildContainer.sh
               arguments: '-a "$(BASE_IMAGE)"
                           -b "$(setAcrRepoVariables.data_target_acr)"
                           -c "${{ goldenImage.repository }}"
@@ -442,7 +442,7 @@ stages:
           - task: Bash@3
             displayName: 'Build ${{ hciImage.componentName }} Container'
             inputs:
-              filePath: ${{ parameters.selfRepoRoot }}/.pipelines/containerSourceData/scripts/BuildContainers.sh
+              filePath: ${{ parameters.selfRepoRoot }}/.pipelines/containerSourceData/scripts/BuildContainer.sh
               arguments: '-a "$(BASE_IMAGE)"
                           -b "$(setAcrRepoVariables.data_target_acr)"
                           -c "${{ hciImage.repository }}"

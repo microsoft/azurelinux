@@ -28,26 +28,25 @@ set -e
 # - t) Script to create SBOM for the container image.
 
 # Assuming you are in your current working directory. Below should be the directory structure:
-#   ls
 #   │   rpms.tar.gz
 #   │   OUTPUT
 #   │   ├── 
 
 # Assuming CBL-Mariner repo is cloned in your home directory. Below should be the directory structure:
-#   ls ~/CBL-Mariner/.pipelines/containerSourceData
+#   ~/CBL-Mariner/.pipelines/containerSourceData
 #   ├── nodejs  
 #   │   ├── Dockerfile-Nodejs
 #   │   ├── nodejs18.pkg
 #   ├── configuration
 #   │   ├── acrRepoV2.json
 #   ├── scripts
-#   │   ├── BuildContainers.sh
+#   │   ├── BuildContainer.sh
 #   │   ├── acrRepoParser.py
 #   ├── Dockerfile-Initial
 #   ├── marinerLocalRepo.repo
 
 # Example usage:
-# /bin/bash ~/CBL-Mariner/.pipelines/containerSourceData/scripts/BuildContainers.sh \
+# /bin/bash ~/CBL-Mariner/.pipelines/containerSourceData/scripts/BuildContainer.sh \
 #     -a "mcr.microsoft.com/cbl-mariner/base/core:2.0" -b azurelinuxlocal \
 #     -c "base/nodejs" -d "nodejs" -e "nodejs18" -f nodejs18.pkg -g Dockerfile-Nodejs \
 #     -j OUTPUT -k ./rpms.tar.gz -l ~/CBL-Mariner/.pipelines/containerSourceData \
@@ -189,16 +188,19 @@ function initialization {
         GOLDEN_IMAGE_NAME=${ACR}.azurecr.io/${REPOSITORY}
     fi
 
-    BASE_IMAGE_NAME=${BASE_IMAGE_NAME_FULL%:*}
-    BASE_IMAGE_TAG=${BASE_IMAGE_NAME_FULL#*:}
+    BASE_IMAGE_NAME=${BASE_IMAGE_NAME_FULL%:*}  # mcr.microsoft.com/cbl-mariner/base/core
+    BASE_IMAGE_TAG=${BASE_IMAGE_NAME_FULL#*:}   # 2.0
+    AZURE_LINUX_VERSION=${BASE_IMAGE_TAG%%.*}.0 # 2.0
 
     # For Azure Linux 2.0, we have shipped the container images with
     # the below value of DISTRO_IDENTIFIER in the image tag.
     # TODO: We may need to update this value for Azure Linux 3.0.
     DISTRO_IDENTIFIER="cm"
+
     echo "Golden Image Name             -> $GOLDEN_IMAGE_NAME"
     echo "Base ACR Container Name       -> $BASE_IMAGE_NAME"
     echo "Base ACR Container Tag        -> $BASE_IMAGE_TAG"
+    echo "Azure Linux Version           -> $AZURE_LINUX_VERSION"
     echo "Distro Identifier             -> $DISTRO_IDENTIFIER"
 }
 
