@@ -9,24 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestVerityIsValidInvalidPartLabel(t *testing.T) {
-	invalidVerity := Verity{
-		DataPartition: VerityPartition{
-			IdType: "PartUuid",
-			Id:     "0f2884c0-8fe0-4a19-87bf-286b7fe9d6f2",
-		},
-		HashPartition: VerityPartition{
-			IdType: "PartLabel",
-			Id:     "",
-		},
-	}
-
-	err := invalidVerity.IsValid()
-	assert.Error(t, err)
-	assert.ErrorContains(t, err, "invalid Id: empty string")
-}
-
-func TestVerityIsValidInvalidPartUuid(t *testing.T) {
+func TestVerityIsValidInvalidDataPartition(t *testing.T) {
 	invalidVerity := Verity{
 		DataPartition: VerityPartition{
 			IdType: "PartUuid",
@@ -40,5 +23,22 @@ func TestVerityIsValidInvalidPartUuid(t *testing.T) {
 
 	err := invalidVerity.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "invalid Id format")
+	assert.ErrorContains(t, err, "invalid DataPartition")
+}
+
+func TestVerityIsValidInvalidHashPartition(t *testing.T) {
+	invalidVerity := Verity{
+		DataPartition: VerityPartition{
+			IdType: "PartUuid",
+			Id:     "123e4567-e89b-12d3-a456-426614174000",
+		},
+		HashPartition: VerityPartition{
+			IdType: "PartLabel",
+			Id:     "",
+		},
+	}
+
+	err := invalidVerity.IsValid()
+	assert.Error(t, err)
+	assert.ErrorContains(t, err, "invalid HashPartition")
 }
