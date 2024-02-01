@@ -1,7 +1,7 @@
 {
-  "Signatures": {
-    "nbd-server.service": "2c3ff56374614a3dcd957c73455af17f4cfe9f5b941ce66f8b8dd37ed1f0a555",
-    "nbd-server.sysconfig": "bd81a6672244ded8de2b84baeabdc44ae89e3558e57f4abf40b170183f71070a",
-    "nbd-3.25.tar.xz": "f5c8fd0fcb57b1c926594d0e57f356432ee08678bef1d40d088f0830f0cbdd0a"
-  }
+ "Signatures": {
+  "nbd-3.25.tar.xz": "f5c8fd0fcb57b1c926594d0e57f356432ee08678bef1d40d088f0830f0cbdd0a",
+  "nbd-server.service": "2c3ff56374614a3dcd957c73455af17f4cfe9f5b941ce66f8b8dd37ed1f0a555",
+  "nbd-server.sysconfig": "bd81a6672244ded8de2b84baeabdc44ae89e3558e57f4abf40b170183f71070a"
+ }
 }

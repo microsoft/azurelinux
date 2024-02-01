@@ -5,8 +5,8 @@ Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            http://nbd.sourceforge.net
-Source0:        http://downloads.sourceforge.net/project/nbd/%{name}/%{version}/%{name}-%{version}.tar.xz
+URL:            https://github.com/NetworkBlockDevice/nbd
+Source0:        https://github.com/NetworkBlockDevice/nbd/releases/download/%{name}-%{version}/%{name}-%{version}.tar.xz
 Source1:        nbd-server.service
 Source2:        nbd-server.sysconfig
 BuildRequires:  gcc
@@ -14,6 +14,7 @@ BuildRequires:  glib2-devel >= 2.26
 BuildRequires:  gnutls-devel
 BuildRequires:  zlib-devel
 BuildRequires:  libnl3-devel
+BuildRequires:  bison
 BuildRequires:  systemd
 %{?systemd_requires}
 
@@ -25,7 +26,7 @@ remote block devices over a TCP/IP network.
 %autosetup -p1
 
 %build
-%configure --enable-syslog --enable-lfs --enable-gznbd
+%configure --enable-syslog --enable-lfs
 %make_build
 
 %install
@@ -60,7 +61,7 @@ install -pDm644 %{S:2} %{buildroot}%{_sysconfdir}/sysconfig/nbd-server
 %license COPYING
 %{_bindir}/nbd-server
 %{_bindir}/nbd-trdump
-%{_bindir}/gznbd
+%{_bindir}/nbd-trplay
 %{_mandir}/man*/nbd*
 %{_sbindir}/nbd-client
 %{_sbindir}/min-nbd-client
@@ -70,8 +71,9 @@ install -pDm644 %{S:2} %{buildroot}%{_sysconfdir}/sysconfig/nbd-server
 %{_unitdir}/nbd@.service.d
 
 %changelog
-* Thu Feb 01 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.25-1
-- Auto-upgrade to 3.25 - none
+* Thu Feb 01 2024 Mitch Zhu <mitchzhu@microsoft.com> - 3.25-1
+- Update to 3.25
+- Disable obsoleted gznbd
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.20-6
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)

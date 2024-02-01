@@ -13724,7 +13724,7 @@
         "other": {
           "name": "nbd",
           "version": "3.25",
-          "downloadUrl": "https://github.com/networkblockdevice/nbd/releases/download/nbd-3.25/nbd-3.25.tar.xz"
+          "downloadUrl": "https://github.com/NetworkBlockDevice/nbd/releases/download/nbd-3.25/nbd-3.25.tar.xz"
         }
       }
     },
