@@ -1,4 +1,3 @@
-%global python3_pkgversion 3
 Name:           scons
 Version:        4.6.0
 Release:        1%{?dist}
@@ -10,8 +9,8 @@ Source0:        https://sourceforge.net/projects/scons/files/scons/4.6.0/scons-4
 Patch0:         0001-Remove-unnecessary-build-deps.patch
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-BuildRequires:  python%{python3_pkgversion}-devel
-Requires:       python%{python3_pkgversion}
+BuildRequires:  python3-devel
+Requires:       python3
 BuildArch:      noarch
 
 %description
