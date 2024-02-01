@@ -12,7 +12,7 @@ Release:        1%{?dist}
 # internal/semver: ASL 2.0
 License:        ASL 2.0 AND MIT
 Vendor:         Microsoft Corporation
-Distribution:   Azure Linux 
+Distribution:   Azure Linux
 URL:            https://github.com/open-policy-agent/opa
 #Source0:       https://github.com/open-policy-agent/%{name}/archive/refs/tags/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
