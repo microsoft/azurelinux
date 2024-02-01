@@ -933,11 +933,10 @@ popd
 rm -rf "$DEBUGEDIT_WITH_VERSION"
 touch /logs/status_debugedit_complete
 
-RPM_WITH_VERSION=rpm-4.17.0
-RPM_FOLDER="$RPM_WITH_VERSION"-release
+RPM_WITH_VERSION=rpm-4.18.1
+RPM_FOLDER="$RPM_WITH_VERSION"
 echo $RPM_WITH_VERSION
-tar xf "$RPM_WITH_VERSION"-release.tar.gz
-mv rpm-"$RPM_WITH_VERSION"-release "$RPM_FOLDER"
+tar xf "$RPM_WITH_VERSION".tar.bz2
 pushd "$RPM_FOLDER"
 
 # Still not in the upstream

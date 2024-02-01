@@ -1,7 +1,7 @@
 Summary:        Package manager
 Name:           rpm
-Version:        4.18.0
-Release:        4%{?dist}
+Version:        4.18.1
+Release:        1%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -281,6 +281,9 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Tue Jan 30 2024 Andrew Phelps <anphel@microsoft.com> - 4.18.1-1
+- Upgrade to version 4.18.1
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.18.0-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
