@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 6.6.2.1 Kernel Configuration
+# Linux/arm64 6.6.12.1 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="gcc (GCC) 13.2.0"
 CONFIG_CC_IS_GCC=y
@@ -3477,7 +3477,6 @@ CONFIG_DWMAC_SUN8I=m
 CONFIG_DWMAC_IMX8=m
 # CONFIG_DWMAC_INTEL_PLAT is not set
 # CONFIG_DWMAC_TEGRA is not set
-# CONFIG_DWMAC_LOONGSON is not set
 # CONFIG_STMMAC_PCI is not set
 CONFIG_NET_VENDOR_SUN=y
 CONFIG_HAPPYMEAL=m
@@ -9868,8 +9867,6 @@ CONFIG_PHY_MTK_MIPI_DSI=m
 # CONFIG_PHY_QCOM_USB_SS is not set
 # CONFIG_PHY_QCOM_IPQ806X_USB is not set
 # CONFIG_PHY_QCOM_SGMII_ETH is not set
-# CONFIG_PHY_RTK_RTD_USB2PHY is not set
-# CONFIG_PHY_RTK_RTD_USB3PHY is not set
 # CONFIG_PHY_R8A779F0_ETHERNET_SERDES is not set
 # CONFIG_PHY_RCAR_GEN2 is not set
 # CONFIG_PHY_RCAR_GEN3_PCIE is not set
@@ -11108,8 +11105,6 @@ CONFIG_DEBUG_SG=y
 CONFIG_DEBUG_NOTIFIERS=y
 # CONFIG_DEBUG_MAPLE_TREE is not set
 # end of Debug kernel data structures
-
-CONFIG_DEBUG_CREDENTIALS=y
 
 #
 # RCU Debugging
