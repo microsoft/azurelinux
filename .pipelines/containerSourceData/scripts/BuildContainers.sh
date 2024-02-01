@@ -6,23 +6,51 @@ set -e
 
 # This script is used to build a golden container image for a given component.
 # The script takes the following inputs:
-#   - Base container image name (e.g. mcr.microsoft.com/cbl-mariner/base/core:2.0)
-#   - ACR name (e.g. azurelinepreview, acrafoimages, etc.)
-#   - Container repository name (e.g. base/nodejs, base/postgres, base/kubevirt/cdi-apiserver, etc.)
-#   - Image name (e.g. nodejs, postgres, cdi, etc.)
-#   - Component name (e.g. nodejs18, postgresql, containerized-data-importer-api, etc.)
-#   - Package file name (e.g. nodejs18.pkg, postgres.pkg, api.pkg, etc.)
-#   - Dockerfile name (e.g. Dockerfile-nodejs, Dockerfile-Postgres, Dockerfile-cdi-apiserver, etc.)
-#   - Docker build arguments (e.g. '--build-arg BINARY_NAME="cdi-apiserver" --build-arg USER=1001')
-#   - Dockerfile text replacement (e.g. '@BINARY_PATH@ \"/usr/bin/acmesolver\"')
-#   - Output container name file (e.g. PublishedContainers-nodejs.txt)
-#   - RPMS tarball file path (e.g. ./rpms.tar.gz)
-#   - Container source directory (e.g. ~/workspace/CBL-Mariner/.pipelines/containerSourceData)
-#   - Is HCI image (e.g. true, false. HCI images have different naming convention)
-#   - Use rpm -qa command (e.g. true, false. Some images use rpm -qa command to get installed package)
-#   - Repo prefix (e.g. public/cbl-mariner, unlisted/cbl-mariner, etc.)
-#   - Publishing level (e.g. preview, development)
-#   - Publish to ACR (e.g. true, false. If true, the script will push the container to ACR)
+# - a) Base container image name (e.g. mcr.microsoft.com/cbl-mariner/base/core:2.0)
+# - b) ACR name (e.g. azurelinepreview, acrafoimages, etc.)
+# - c) Container repository name (e.g. base/nodejs, base/postgres, base/kubevirt/cdi-apiserver, etc.)
+# - d) Image name (e.g. nodejs, postgres, cdi, etc.)
+# - e) Component name (e.g. nodejs18, postgresql, containerized-data-importer-api, etc.)
+# - f) Package file name (e.g. nodejs18.pkg, postgres.pkg, api.pkg, etc.)
+# - g) Dockerfile name (e.g. Dockerfile-nodejs, Dockerfile-Postgres, Dockerfile-cdi-apiserver, etc.)
+# - h) Docker build arguments (e.g. '--build-arg BINARY_NAME="cdi-apiserver" --build-arg USER=1001')
+# - i) Dockerfile text replacement (e.g. '@BINARY_PATH@ \"/usr/bin/acmesolver\"')
+# - j) Output directory for container artifacts.
+# - k) RPMS tarball file path (e.g. ./rpms.tar.gz)
+# - l) Container source directory (e.g. ~/workspace/CBL-Mariner/.pipelines/containerSourceData)
+# - m) Is HCI image (e.g. true, false. HCI images have different naming convention)
+# - n) Use rpm -qa command (e.g. true, false. Some images use rpm -qa command to get installed package)
+# - o) Repo prefix (e.g. public/cbl-mariner, unlisted/cbl-mariner, etc.)
+# - p) Publishing level (e.g. preview, development)
+# - q) Publish to ACR (e.g. true, false. If true, the script will push the container to ACR)
+
+# Assuming you are in your current working directory. Below should be the directory structure:
+#   ls
+#   │   rpms.tar.gz
+#   │   OUTPUT
+#   │   ├── 
+
+# Assuming CBL-Mariner repo is cloned in your home directory. Below should be the directory structure:
+#   ls ~/CBL-Mariner/.pipelines/containerSourceData
+#   ├── nodejs  
+#   │   ├── Dockerfile-Nodejs
+#   │   ├── nodejs18.pkg
+#   ├── configuration
+#   │   ├── acrRepoV2.json
+#   ├── scripts
+#   │   ├── BuildContainers.sh
+#   │   ├── acrRepoParser.py
+#   ├── Dockerfile-Initial
+#   ├── marinerLocalRepo.repo
+
+# Example usage:
+# /bin/bash ~/CBL-Mariner/.pipelines/containerSourceData/scripts/BuildContainers.sh \
+#     -a "mcr.microsoft.com/cbl-mariner/base/core:2.0" \
+#     -b azurelinuxlocal -c "base/nodejs" -d "nodejs" \
+#     -e "nodejs18" -f nodejs18.pkg -g Dockerfile-Nodejs \
+#     -h "" -i "" -j OUTPUT -k ./rpms.tar.gz \
+#     -l ~/CBL-Mariner/.pipelines/containerSourceData \
+#     -m "false" -n "false" -o "" -p development -q "false"
 
 while getopts ":a:b:c:d:e:f:g:h:i:j:k:l:m:n:o:p:q:" OPTIONS; do
     case ${OPTIONS} in
@@ -35,7 +63,7 @@ while getopts ":a:b:c:d:e:f:g:h:i:j:k:l:m:n:o:p:q:" OPTIONS; do
     g ) DOCKERFILE=$OPTARG;;
     h ) DOCKER_BUILD_ARGS=$OPTARG;;
     i ) DOCKERFILE_TEXT_REPLACEMENT=$OPTARG;;
-    j ) OUTPUT_CONTAINER_NAME_FILE=$OPTARG;;
+    j ) OUTPUT_DIR=$OPTARG;;
     k ) RPMS_TARBALL=$OPTARG;;
     l ) CONTAINER_SRC_DIR=$OPTARG;;
     m ) IS_HCI_IMAGE=$OPTARG;;
@@ -73,7 +101,7 @@ function print_inputs {
     echo "DOCKERFILE                    -> $DOCKERFILE"
     echo "DOCKER_BUILD_ARGS             -> $DOCKER_BUILD_ARGS"
     echo "DOCKERFILE_TEXT_REPLACEMENT   -> $DOCKERFILE_TEXT_REPLACEMENT"
-    echo "OUTPUT_CONTAINER_NAME_FILE    -> $OUTPUT_CONTAINER_NAME_FILE"
+    echo "OUTPUT_DIR                    -> $OUTPUT_DIR"
     echo "RPMS_TARBALL                  -> $RPMS_TARBALL"
     echo "CONTAINER_SRC_DIR             -> $CONTAINER_SRC_DIR"
     echo "IS_HCI_IMAGE                  -> $IS_HCI_IMAGE"
@@ -114,9 +142,9 @@ function validate_inputs {
         exit 1
     fi
 
-    if [[ -z "$OUTPUT_CONTAINER_NAME_FILE" ]]; then
-        echo "Error - Output container file name cannot be empty."
-        exit 1
+    if [ ! -d "$OUTPUT_DIR" ]; then
+        echo "Create output directory: $OUTPUT_DIR"
+        mkdir -p "$OUTPUT_DIR"
     fi
 
     if [[ ! -f $RPMS_TARBALL ]]; then
@@ -140,7 +168,7 @@ function initialization {
     if [ "$PUBLISHING_LEVEL" = "preview" ]; then
         GOLDEN_IMAGE_NAME=${ACR}.azurecr.io/${REPO_PREFIX}/${REPOSITORY}
     elif [ "$PUBLISHING_LEVEL" = "development" ]; then
-        GOLDEN_IMAGE_NAME=${ACR}.azurecr.io/${REPOSITORY}        
+        GOLDEN_IMAGE_NAME=${ACR}.azurecr.io/${REPOSITORY}
     fi
 
     BASE_IMAGE_TAG=${BASE_IMAGE_NAME_FULL#*:}
@@ -256,8 +284,8 @@ function finalize {
     echo "+++ Finalize"
     docker image tag "$GOLDEN_IMAGE_NAME" "$GOLDEN_IMAGE_NAME_FINAL"
     docker rmi -f "$GOLDEN_IMAGE_NAME"
-    mkdir -p "$(dirname "$OUTPUT_CONTAINER_NAME_FILE")"
-    echo "$GOLDEN_IMAGE_NAME_FINAL" >> "$OUTPUT_CONTAINER_NAME_FILE"
+    echo "+++ Save container image name to file PublishedContainers-$IMAGE.txt"
+    echo "$GOLDEN_IMAGE_NAME_FINAL" >> "$OUTPUT_DIR/PublishedContainers-$IMAGE.txt"
 }
 
 function publish_to_acr {
