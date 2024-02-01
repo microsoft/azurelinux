@@ -8,6 +8,9 @@ Distribution:  Mariner
 Group:         Development/Tools
 URL:           git://git.kernel.org/pub/scm/utils/rt-tests/rt-tests.git
 Source0:       https://mirrors.edge.kernel.org/pub/linux/utils/%{name}/%{name}-%{version}.tar.xz
+Patch1:        rt-tests-Makefile-Restore-support-for-Exuberant-Ctag.patch
+Patch2:        rt-tests-Add-missing-SPDX-licenses.patch
+Patch3:        rt-tests-Remove-remaining-unnecessary-texts-after-ad.patch
 ExclusiveArch: x86_64
 Requires:      bash
 Requires:      bc
@@ -21,7 +24,7 @@ real-time kernel behavior. This package measures timer, signal, and hardware
 latency. It also tests the functioning of priority-inheritance mutexes.
 
 %prep
-%setup -q
+%autosetup -p1 -n %{name}-%{version}
 
 %build
 make %{?_smp_mflags} NUMA=1 HAVE_PARSE_CPUSTRING_ALL=1
