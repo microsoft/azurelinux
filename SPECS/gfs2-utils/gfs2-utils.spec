@@ -11,8 +11,8 @@
 ###############################################################################
 Summary:        Utilities for managing the global file system (GFS2)
 Name:           gfs2-utils
-Version:        3.2.0
-Release:        12%{?dist}
+Version:        3.5.1
+Release:        1%{?dist}
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -78,6 +78,9 @@ modifying, and correcting inconsistencies in GFS2 file systems.
 %{_libdir}/udev/rules.d/82-gfs2-withdraw.rules
 
 %changelog
+* Thu Feb 01 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.1-1
+- Auto-upgrade to 3.5.1 - Upgrade to 3.5.1
+
 * Tue Sep 26 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.2.0-12
 - Removing 'exit' calls from the '%%check' section.
 

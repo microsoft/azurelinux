@@ -4200,8 +4200,8 @@
         "type": "other",
         "other": {
           "name": "gfs2-utils",
-          "version": "3.2.0",
-          "downloadUrl": "https://releases.pagure.org/gfs2-utils/gfs2-utils-3.2.0.tar.gz"
+          "version": "3.5.1",
+          "downloadUrl": "https://releases.pagure.org/gfs2-utils/gfs2-utils-3.5.1.tar.gz"
         }
       }
     },
