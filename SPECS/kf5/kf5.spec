@@ -1,13 +1,12 @@
 Name:         kf5
-Version:      5.61.0
-Release:      5%{?dist}
+Version:      5.109.0
+Release:      1%{?dist}
 Summary:      Filesystem and RPM macros for KDE Frameworks 5
 License:      BSD
 URL:          http://www.kde.org
 Vendor:       Microsoft Corporation
 Distribution: Mariner
 
-BuildArch: noarch
 Source0: macros.kf5
 
 Requires: %{name}-filesystem
@@ -28,7 +27,9 @@ Filesystem for KDE Frameworks 5.
 Summary: RPM macros for KDE Frameworks 5
 Requires: cmake
 Requires: qt5-qtbase-devel >= 5.11
-
+# misc build environment dependencies
+Requires: gcc-c++
+BuildArch: noarch
 %description rpm-macros
 RPM macros for building KDE Frameworks 5 packages.
 
@@ -42,6 +43,7 @@ mkdir -p %{buildroot}%{_datadir}/kpackage/{genericqml,kcms}
 mkdir -p %{buildroot}%{_datadir}/kservices5/ServiceMenus
 mkdir -p %{buildroot}%{_datadir}/qlogging-categories5/
 mkdir -p %{buildroot}%{_datadir}/solid/{actions,devices}
+mkdir -p %{buildroot}%{_docdir}/qt5/
 mkdir -p %{buildroot}%{_libexecdir}/kf5
 mkdir -p %{buildroot}%{_sysconfdir}/xdg/plasma-workspace/{env,shutdown}
 
@@ -66,14 +68,19 @@ sed -i \
 %{_datadir}/kpackage/
 %{_datadir}/kservices5/
 %{_datadir}/kservicetypes5/
+%{_datadir}/knsrcfiles/
 %{_datadir}/qlogging-categories5/
 %{_datadir}/solid/
+%{_docdir}/qt5/
 
 %files rpm-macros
 %{_rpmconfigdir}/macros.d/macros.kf5
 
 
 %changelog
+* Tue January 30 2024 Saul Paredes <saulparedes@microsoft.com> - 5.61.0-5
+- Upgrade to 5.109.0
+
 * Fri May 26 2023 Thien Trung Vuong <tvuong@microsoft.com> - 5.61.0-5
 - License verified.
 
