@@ -1837,8 +1837,8 @@
         "type": "other",
         "other": {
           "name": "cmake",
-          "version": "3.21.4",
-          "downloadUrl": "https://github.com/Kitware/CMake/releases/download/v3.21.4/cmake-3.21.4.tar.gz"
+          "version": "3.28.2",
+          "downloadUrl": "https://github.com/Kitware/CMake/releases/download/v3.28.2/cmake-3.28.2.tar.gz"
         }
       }
     },
