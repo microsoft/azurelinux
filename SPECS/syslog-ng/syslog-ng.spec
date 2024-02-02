@@ -86,6 +86,7 @@ cp -a . ../p3dir
     --disable-java \
     --disable-redis \
     --with-python=3 \
+    --with-python-packages=system \
     PYTHON=/bin/python3 \
     PKG_CONFIG_PATH=%{_prefix}/local/lib/pkgconfig/
 make %{?_smp_mflags}
