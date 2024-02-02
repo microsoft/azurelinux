@@ -24,7 +24,7 @@ function DockerBuild {
     echo "+++ Create container $containerName"
     docker build . \
         -t "$containerName" \
-        -f "$marinaraSrcDir/dockerfiles/dockerfile-new-image" \
+        -f "/$marinara/dockerfiles/dockerfile-new-image" \
         --build-arg MARINER_VERSION="$azureLinuxVersion" \
         --build-arg IMAGE_TYPE="$imageType" \
         --build-arg PACKAGES_TO_INSTALL="$packagesToInstall" \
@@ -32,6 +32,7 @@ function DockerBuild {
         --build-arg USER="$user" \
         --build-arg USER_UID=$userUid \
         --build-arg RPMS="$rpmsDir" \
+        --build-arg LOCAL_REPO_FILE="/$marinara/local.repo" \
         --no-cache \
         --progress=plain
 }
@@ -60,7 +61,7 @@ function create_distroless_container {
     git clone -b 'mandeepsplaha/add-support-for-local-rpms' "https://github.com/microsoft/$marinara.git" "$marinaraSrcDir"
     
     # It is important to operate from the $WORK_DIR to ensure that docker can access the files.
-    pushd "$WORK_DIR"
+    pushd "$WORK_DIR" > /dev/null
 
     # TODO: Get the marinara image from the latest build
     # MARINARA_IMAGE=${BASE_IMAGE_NAME_FULL/base\/core/marinara}
@@ -68,6 +69,10 @@ function create_distroless_container {
     echo "MARINARA_IMAGE -> $MARINARA_IMAGE"
 
     sed -E "s|^FROM .*builder$|FROM $MARINARA_IMAGE as builder|g" -i "$marinaraSrcDir/dockerfiles/dockerfile-new-image"
+
+    # WORK_DIR has a directory named 'Stage' which created inside prepare_docker_directory function
+    # This directory has a directory named RPMS which contains the RPMs to be installed in the container.
+    # The path to rpms is /Stage/RPMS
 
     # Create standard container
     DockerBuild \
@@ -77,7 +82,7 @@ function create_distroless_container {
         "$DISTROLESS_PACKAGES_TO_INSTALL" \
         "$DISTROLESS_PACKAGES_TO_HOLD_BACK" \
         false \
-        "$HOST_MOUNTED_DIR/RPMS"
+        "/Stage/RPMS"
 
     # Create debug container
     DockerBuild \
@@ -87,7 +92,7 @@ function create_distroless_container {
         "$DISTROLESS_PACKAGES_TO_INSTALL" \
         "$DISTROLESS_PACKAGES_TO_HOLD_BACK" \
         false \
-        "$HOST_MOUNTED_DIR/RPMS"
+        "/Stage/RPMS"
 
     # Create nonroot container
     DockerBuild \
@@ -97,7 +102,7 @@ function create_distroless_container {
         "$DISTROLESS_PACKAGES_TO_INSTALL" \
         "$DISTROLESS_PACKAGES_TO_HOLD_BACK" \
         true \
-        "$HOST_MOUNTED_DIR/RPMS"
+        "/Stage/RPMS"
 
     # Create debug nonroot container
     DockerBuild \
@@ -107,7 +112,7 @@ function create_distroless_container {
         "$DISTROLESS_PACKAGES_TO_INSTALL" \
         "$DISTROLESS_PACKAGES_TO_HOLD_BACK" \
         true \
-        "$HOST_MOUNTED_DIR/RPMS"
+        "/Stage/RPMS"
 
     popd > /dev/null
     
