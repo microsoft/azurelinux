@@ -509,8 +509,8 @@ perl-utils-5.38.2-503.azl3.noarch.rpm
 perl-vars-1.05-503.azl3.noarch.rpm
 perl-version-0.99.29-503.azl3.noarch.rpm
 perl-vmsish-1.04-503.azl3.noarch.rpm
-perl-XML-Parser-2.46-2.azl3.x86_64.rpm
-perl-XML-Parser-debuginfo-2.46-2.azl3.x86_64.rpm
+perl-XML-Parser-2.47-1.azl3.x86_64.rpm
+perl-XML-Parser-debuginfo-2.47-1.azl3.x86_64.rpm
 pinentry-1.2.1-1.azl3.x86_64.rpm
 pinentry-debuginfo-1.2.1-1.azl3.x86_64.rpm
 pkgconf-2.0.2-1.azl3.x86_64.rpm
