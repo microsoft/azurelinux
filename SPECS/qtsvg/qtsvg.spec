@@ -1,4 +1,5 @@
 %define majmin %(echo %{version} | cut -d. -f1-2)
+%global examples 1
 
 Summary:        Qt6 - Support for rendering and displaying SVG
 Name:           qtsvg
@@ -14,6 +15,8 @@ Source0:        https://download.qt.io/archive/qt/%{majmin}/%{version}/submodule
 BuildRequires:  qtbase-devel >= %{version}
 BuildRequires:  qtbase-private-devel
 BuildRequires:  zlib-devel
+BuildRequires:  cmake
+BuildRequires:  ninja-build
 
 %description
 Scalable Vector Graphics (SVG) is an XML-based language for describing
@@ -39,12 +42,12 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 %autosetup -p1 -n qtsvg-everywhere-src-%{version}
 
 %build
-%cmake_qt
+%cmake_qt -DQT_BUILD_EXAMPLES:BOOL=%{?examples:ON}%{!?examples:OFF}
 
-%cmake_build
+%ninja_build
 
 %install
-%cmake_install
+%ninja_install
 
 ## .prl/.la file love
 # nuke .prl reference(s) to %%buildroot, excessive (.la-like) libs
@@ -59,26 +62,34 @@ done
 popd
 
 %files
-%license LICENSE.*
-%dir %{_qt_libdir}/cmake/Qt6Svg/
-%{_qt_libdir}/cmake/Qt6Svg/Qt6Svg_*Plugin.cmake
+%license LICENSES/GPL* LICENSES/LGPL*
 %{_qt_libdir}/libQt6Svg.so.6*
+%{_qt_libdir}/libQt6SvgWidgets.so.6*
 %{_qt_plugindir}/iconengines/libqsvgicon.so
 %{_qt_plugindir}/imageformats/libqsvg.so
 
 %files devel
-%{_qt_archdatadir}/mkspecs/modules/qt_lib_svg*.pri
+%{_qt_archdatadir}/mkspecs/modules/*.pri
 %{_qt_headerdir}/QtSvg/
-%{_qt_libdir}/cmake/Qt6Svg/Qt6SvgConfig*.cmake
+%{_qt_headerdir}/QtSvgWidgets/
+%{_qt_libdir}/cmake/Qt6BuildInternals/StandaloneTests/QtSvgTestsConfig.cmake
+%{_qt_libdir}/cmake/Qt6Gui/*.cmake
+%{_qt_libdir}/cmake/Qt6Svg/*.cmake
+%{_qt_libdir}/cmake/Qt6SvgWidgets/*.cmake
 %{_qt_libdir}/libQt6Svg.prl
 %{_qt_libdir}/libQt6Svg.so
-%{_qt_libdir}/pkgconfig/Qt6Svg.pc
+%{_qt_libdir}/libQt6SvgWidgets.prl
+%{_qt_libdir}/libQt6SvgWidgets.so
+%{_qt_libdir}/pkgconfig/*.pc
+%{_qt_libdir}/qt6/metatypes/qt6*_metatypes.json
+%dir %{_qt_libdir}/cmake/Qt6Svg/
+%dir %{_qt_libdir}/cmake/Qt6SvgWidgets/
+/usr/modules/Svg.json
+/usr/modules/SvgWidgets.json
 
-%files examples
-%{_qt_examplesdir}/
 
 %changelog
-* Tue Jan 02 2023 Sam Meluch <sammeluch@microsoft.com> - 6.6.1-1
+* Tue Jan 02 2024 Sam Meluch <sammeluch@microsoft.com> - 6.6.1-1
 - Upgrade to version 6.6.1
 
 * Mon Aug 28 2023 Andrew Phelps <anphel@microsoft.com> - 5.12.11-6

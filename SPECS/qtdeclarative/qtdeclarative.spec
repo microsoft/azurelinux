@@ -18,14 +18,18 @@ Source0: https://download.qt.io/archive/qt/%{majmin}/%{version}/submodules/qtdec
 # filter qml provides
 %global __provides_exclude_from ^%{_qt_archdatadir}/qml/.*\\.so$
 
+%global examples 1
+
 BuildRequires: gcc
 # qt macros
 BuildRequires: qtbase-devel >= %{version}
 BuildRequires: qtbase-private-devel
 BuildRequires: python3
+BuildRequires: cmake
+BuildRequires: ninja-build
 
 %description
-%{summary}.
+%{summary}.examples 
 
 %package devel
 Summary: Development files for %{name}
@@ -55,12 +59,12 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 ln -s /usr/bin/python3 python
 export PATH=`pwd`:$PATH
 
-%cmake_qt
- 
-%cmake_build
+%cmake_qt -DQT_BUILD_EXAMPLES:BOOL=%{?examples:ON}%{!?examples:OFF}
+
+%ninja_build
 
 %install
-%cmake_install
+%ninja_install
 
 # hardlink files to %{_bindir}, add -qt6 postfix to not conflict
 mkdir %{buildroot}%{_bindir}
@@ -96,46 +100,125 @@ done
 popd
 
 %post -p /sbin/ldconfig
+
 %postun -p /sbin/ldconfig
 
 %files
-%license LICENSE.LGPL*
+%license LICENSES/LGPL*
 %{_qt_archdatadir}/qml/
+%{_qt_libdir}/libQt6LabsFolderListModel.so.6*
+%{_qt_libdir}/libQt6LabsQmlModels.so.6*
+%{_qt_libdir}/libQt6LabsSettings.so.6*
 %{_qt_libdir}/libQt6Qml.so.6*
-%{_qt_libdir}/libQt6Quick.so.6*
-# Not needed for calamares
-#%{_qt_libdir}/libQt6QuickParticles.so.6*
-%{_qt_libdir}/libQt6QuickShapes.so.6*
-%{_qt_libdir}/libQt6QuickTest.so.6*
-%{_qt_libdir}/libQt6QuickWidgets.so.6*
+%{_qt_libdir}/libQt6QmlCompiler.so.*
+%{_qt_libdir}/libQt6QmlCore.so.6*
+%{_qt_libdir}/libQt6QmlLocalStorage.so.6*
+%{_qt_libdir}/libQt6QmlModels.so.6*
+%{_qt_libdir}/libQt6QmlWorkerScript.so.6*
+%{_qt_libdir}/libQt6QmlXmlListModel.so.6*
 %{_qt_plugindir}/qmltooling/
 
 %files devel
 %{_bindir}/qml*
+%{_qt_archdatadir}/mkspecs/features/*.prf
+%{_qt_archdatadir}/mkspecs/modules/*.pri
 %{_qt_bindir}/qml*
 %{_qt_headerdir}/Qt*/
+%{_qt_libdir}/cmake/Qt6BuildInternals/StandaloneTests/QtDeclarativeTestsConfig.cmake
+%{_qt_libdir}/cmake/Qt6LabsFolderListModel/*.cmake
+%{_qt_libdir}/cmake/Qt6LabsQmlModels/*.cmake
+%{_qt_libdir}/cmake/Qt6LabsSettings/*.cmake
+%{_qt_libdir}/cmake/Qt6PacketProtocolPrivate/*.cmake
+%{_qt_libdir}/cmake/Qt6Qml/*.cmake*
+%{_qt_libdir}/cmake/Qt6Qml/*.cpp.in
+%{_qt_libdir}/cmake/Qt6Qml/*.qrc.in
+%{_qt_libdir}/cmake/Qt6Qml/QmlPlugins/*.cmake
+%{_qt_libdir}/cmake/Qt6QmlCompiler/*.cmake
+%{_qt_libdir}/cmake/Qt6QmlCore/*.cmake
+%{_qt_libdir}/cmake/Qt6QmlDebugPrivate/*.cmake
+%{_qt_libdir}/cmake/Qt6QmlDomPrivate/*.cmake
+%{_qt_libdir}/cmake/Qt6QmlImportScanner/*.cmake
+%{_qt_libdir}/cmake/Qt6QmlIntegration/*.cmake
+%{_qt_libdir}/cmake/Qt6QmlLocalStorage/*.cmake
+%{_qt_libdir}/cmake/Qt6QmlModels/*.cmake
+%{_qt_libdir}/cmake/Qt6QmlToolingSettingsPrivate/*.cmake
+%{_qt_libdir}/cmake/Qt6QmlTools/*.cmake
+%{_qt_libdir}/cmake/Qt6QmlTypeRegistrarPrivate/*.cmake
+%{_qt_libdir}/cmake/Qt6QmlWorkerScript/*.cmake
+%{_qt_libdir}/cmake/Qt6QmlXmlListModel/*.cmake
+%{_qt_libdir}/libQt6LabsFolderListModel.so
+%{_qt_libdir}/libQt6LabsQmlModels.so
+%{_qt_libdir}/libQt6LabsSettings.so
 %{_qt_libdir}/libQt6Qml.so
-%{_qt_libdir}/libQt6Qml.prl
-%{_qt_libdir}/libQt6Quick*.so
-%{_qt_libdir}/libQt6Quick*.prl
-%dir %{_qt_libdir}/cmake/Qt6Quick*/
-%{_qt_libdir}/cmake/Qt6*/Qt6*Config*.cmake
-%{_qt_libdir}/pkgconfig/Qt6*.pc
-%{_qt_archdatadir}/mkspecs/modules/*.pri
-%{_qt_archdatadir}/mkspecs/features/*.prf
-%dir %{_qt_libdir}/cmake/Qt6Qml/
-%{_qt_libdir}/cmake/Qt5Qml/Qt6Qml_*Factory.cmake
+%{_qt_libdir}/libQt6QmlCompiler.so
+%{_qt_libdir}/libQt6QmlCore.so
+%{_qt_libdir}/libQt6QmlLocalStorage.so
+%{_qt_libdir}/libQt6QmlModels.so
+%{_qt_libdir}/libQt6QmlWorkerScript.so
+%{_qt_libdir}/libQt6QmlXmlListModel.so
+%{_qt_libdir}/pkgconfig/*.pc
+%{_qt_libdir}/qt6/metatypes/qt6*_metatypes.json
+%{_qt_libexecdir}/qmlcachegen
+%{_qt_libexecdir}/qmlimportscanner
+%{_qt_libexecdir}/qmltyperegistrar
+%dir %{_qt_libdir}/cmake/Qt6LabsFolderListModel
+%dir %{_qt_libdir}/cmake/Qt6LabsQmlModels
+%dir %{_qt_libdir}/cmake/Qt6LabsSettings
+%dir %{_qt_libdir}/cmake/Qt6PacketProtocolPrivate
+%dir %{_qt_libdir}/cmake/Qt6Qml
+%dir %{_qt_libdir}/cmake/Qt6Qml/QmlPlugins
+%dir %{_qt_libdir}/cmake/Qt6QmlCompiler
+%dir %{_qt_libdir}/cmake/Qt6QmlCore
+%dir %{_qt_libdir}/cmake/Qt6QmlDebugPrivate
+%dir %{_qt_libdir}/cmake/Qt6QmlDomPrivate
+%dir %{_qt_libdir}/cmake/Qt6QmlImportScanner
+%dir %{_qt_libdir}/cmake/Qt6QmlIntegration
+%dir %{_qt_libdir}/cmake/Qt6QmlLocalStorage
+%dir %{_qt_libdir}/cmake/Qt6QmlModels
+%dir %{_qt_libdir}/cmake/Qt6QmlToolingSettingsPrivate
+%dir %{_qt_libdir}/cmake/Qt6QmlTools
+%dir %{_qt_libdir}/cmake/Qt6QmlTypeRegistrarPrivate
+%dir %{_qt_libdir}/cmake/Qt6QmlWorkerScript
+%dir %{_qt_libdir}/cmake/Qt6QmlXmlListModel
+/usr/modules/LabsFolderListModel.json
+/usr/modules/LabsQmlModels.json
+/usr/modules/LabsSettings.json
+/usr/modules/PacketProtocolPrivate.json
+/usr/modules/Qml.json
+/usr/modules/QmlCompiler.json
+/usr/modules/QmlCore.json
+/usr/modules/QmlDebugPrivate.json
+/usr/modules/QmlDomPrivate.json
+/usr/modules/QmlIntegration.json
+/usr/modules/QmlLocalStorage.json
+/usr/modules/QmlModels.json
+/usr/modules/QmlToolingSettingsPrivate.json
+/usr/modules/QmlTypeRegistrarPrivate.json
+/usr/modules/QmlWorkerScript.json
+/usr/modules/QmlXmlListModel.json
+
 
 %files static
-%{_qt_libdir}/libQt6QmlDevTools.a
-%{_qt_libdir}/libQt6QmlDevTools.prl
+%{_qt_libdir}/libQt6LabsFolderListModel.prl
+%{_qt_libdir}/libQt6LabsQmlModels.prl
+%{_qt_libdir}/libQt6LabsSettings.prl
 %{_qt_libdir}/libQt6PacketProtocol.a
 %{_qt_libdir}/libQt6PacketProtocol.prl
+%{_qt_libdir}/libQt6Qml.prl
+%{_qt_libdir}/libQt6QmlCompiler.prl
+%{_qt_libdir}/libQt6QmlCore.prl
 %{_qt_libdir}/libQt6QmlDebug.a
 %{_qt_libdir}/libQt6QmlDebug.prl
-
-%files examples
-%{_qt_examplesdir}/
+%{_qt_libdir}/libQt6QmlDom.a
+%{_qt_libdir}/libQt6QmlDom.prl
+%{_qt_libdir}/libQt6QmlLocalStorage.prl
+%{_qt_libdir}/libQt6QmlModels.prl
+%{_qt_libdir}/libQt6QmlToolingSettings.a
+%{_qt_libdir}/libQt6QmlToolingSettings.prl
+%{_qt_libdir}/libQt6QmlTypeRegistrar.a
+%{_qt_libdir}/libQt6QmlTypeRegistrar.prl
+%{_qt_libdir}/libQt6QmlWorkerScript.prl
+%{_qt_libdir}/libQt6QmlXmlListModel.prl
 
 %changelog
 * Tue Jan 02 2024 Sam Meluch <sammeluch@microsoft.com> - 6.6.1-1

@@ -19,6 +19,8 @@
 
 %global qt_module qtbase
 
+%global  qt_version %(echo %{version} | cut -d~ -f1)
+
 %global rpm_macros_dir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
 # use external qt_settings pkg
@@ -177,41 +179,13 @@ Provides:  qtbase-x11 = %{version}-%{release}
 %description gui
 Qt libraries used for drawing widgets and OpenGL items.
 
-
 %prep
-%setup -q -n %{qt_module}-everywhere-src-%{version}
-
-## upstream fixes
-
-%patch 4 -p1 -b .QTBUG-35459
-# omit '-b .tell-the-truth-about-private-api' so it doesn't end up in installed files -- rdieter
-%patch 8 -p1
-
-%patch50 -p1 -b .QT_VERSION_CHECK
-%patch52 -p1 -b .moc_macros
-%patch54 -p1 -b .qmake_LFLAGS
-%patch61 -p1 -b .qtbase-cxxflag
-%patch65 -p1 -b .mysql
-%patch68 -p1
-
-%patch 80 -p1 -b .use-wayland-on-gnome.patch
-%patch 81 -p1
-%patch 82 -p1
-%patch 83 -p1
-%patch 84 -p1
-%patch 86 -p1
-%patch 87 -p1
-
-## upstream patches
-
+%autosetup -n %{qt_module}-everywhere-src-%{version} -p1
 
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
 mkdir UNUSED
-mv freetype libjpeg libpng zlib UNUSED/
-%if "%{?sqlite}" == "-system-sqlite"
-mv sqlite UNUSED/
-%endif
+mv harfbuzz-ng freetype libjpeg libpng zlib UNUSED/
 popd
 
 # builds failing mysteriously on f20
@@ -219,19 +193,9 @@ popd
 # check to ensure that can't happen -- rex
 test -x configure || chmod +x configure
 
-# use proper perl interpretter so autodeps work as expected
-sed -i -e "s|^#!/usr/bin/env perl$|#!%{__perl}|" \
- bin/fixqt4headers.pl \
- bin/syncqt.pl \
- mkspecs/features/data/unix/findclasslist.pl
-
-# gcc 11 requires <limits> to be explicitly included for std::numeric_limits
-sed -i 's/#  include <utility>/#  include <utility>\n#  include <limits>/g' src/corelib/global/qglobal.h
-
-
 %build
 ## FIXME/TODO:
-# * for %%ix86, add sse2 enabled builds for Qt5Gui, Qt5Core, QtNetwork, see also:
+# * for %%ix86, add sse2 enabled builds for Qt6Gui, Qt6Core, QtNetwork, see also:
 #   http://anonscm.debian.org/cgit/pkg-kde/qt/qtbase.git/tree/debian/rules (234-249)
 
 ## adjust $RPM_OPT_FLAGS
@@ -255,6 +219,8 @@ ls /sbin
 echo USRBIN
 ls /usr/bin/
 
+./configure \
+  -no-opengl
 
 %cmake_qt \
  -DQT_FEATURE_accessibility=ON \
@@ -264,6 +230,7 @@ ls /usr/bin/
  -DQT_FEATURE_icu=ON \
  -DQT_FEATURE_enable_new_dtags=ON \
  -DQT_FEATURE_journald=%{?journald:ON}%{!?journald:OFF} \
+ -DINPUT_opengl=no \
  -DQT_FEATURE_openssl_linked=ON \
  -DQT_FEATURE_openssl_hash=ON \
  -DQT_FEATURE_libproxy=ON \
@@ -289,11 +256,11 @@ ls /usr/bin/
  -DQT_BUILD_TESTS=%{?tests:ON}%{!?tests:OFF} \
  -DQT_QMAKE_TARGET_MKSPEC=%{platform}
 
-%cmake_build
+%ninja_build
 
 
 %install
-%cmake_install
+%ninja_install
 
 install -m644 -p -D %{SOURCE1} %{buildroot}%{_qt_datadir}/qtlogging.ini
 
@@ -448,132 +415,155 @@ fi
 %endif
 
 %files
-%license LICENSE.FDL
-%license LICENSE.GPL*
-%license LICENSE.LGPL*
-%license LICENSE.QT-LICENSE-AGREEMENT-4.2
+%license LICENSES/GPL*
+%license LICENSES/LGPL*
+%{_qt_datadir}/qtlogging.ini
+%{_qt_docdir}/config/
+%{_qt_docdir}/global/
+%{_qt_importdir}/
+%{_qt_libdir}/libQt6Concurrent.so.6*
+%{_qt_libdir}/libQt6Core.so.6*
+%{_qt_libdir}/libQt6DBus.so.6*
+%{_qt_libdir}/libQt6Network.so.6*
+%{_qt_libdir}/libQt6Sql.so.6*
+%{_qt_libdir}/libQt6Test.so.6*
+%{_qt_libdir}/libQt6Xml.so.6*
+%{_qt_plugindir}/networkinformation/libqglib.so
+%{_qt_plugindir}/networkinformation/libqnetworkmanager.so
+%{_qt_plugindir}/sqldrivers/libqsqlite.so
+%{_qt_plugindir}/tls/libqcertonlybackend.so
+%{_qt_plugindir}/tls/libqopensslbackend.so
+%{_qt_translationdir}/
 %dir %{_qt_archdatadir}/
 %dir %{_qt_datadir}/
 %dir %{_qt_docdir}/
-%dir %{_qt_libdir}/cmake/
-%dir %{_qt_libdir}/cmake/Qt6/
-%dir %{_qt_libdir}/cmake/Qt6Concurrent/
-%dir %{_qt_libdir}/cmake/Qt6Core/
-%dir %{_qt_libdir}/cmake/Qt6DBus/
-%dir %{_qt_libdir}/cmake/Qt6Gui/
-%dir %{_qt_libdir}/cmake/Qt6Network/
-%dir %{_qt_libdir}/cmake/Qt6PrintSupport/
-%dir %{_qt_libdir}/cmake/Qt6Sql/
-%dir %{_qt_libdir}/cmake/Qt6Test/
-%dir %{_qt_libdir}/cmake/Qt6Widgets/
-%dir %{_qt_libdir}/cmake/Qt6Xml/
 %dir %{_qt_libexecdir}/
 %dir %{_qt_plugindir}/
-%dir %{_qt_plugindir}/bearer/
 %dir %{_qt_plugindir}/designer/
 %dir %{_qt_plugindir}/generic/
 %dir %{_qt_plugindir}/iconengines/
 %dir %{_qt_plugindir}/imageformats/
-%dir %{_qt_plugindir}/platforminputcontexts/
 %dir %{_qt_plugindir}/platforms/
 %dir %{_qt_plugindir}/platformthemes/
 %dir %{_qt_plugindir}/script/
 %dir %{_qt_plugindir}/sqldrivers/
 %dir %{_qt_plugindir}/styles/
+%dir %{_sysconfdir}/xdg/QtProject/
+
+/etc/xdg/qtchooser/6-64.conf
+/etc/xdg/qtchooser/6.conf
+/etc/xdg/qtchooser/default.conf
+%{_libdir}/objects-RelWithDebInfo/ExampleIconsPrivate_resources_1/.rcc/qrc_example_icons.cpp.o
+%{_libdir}/qt6/bin/qdbuscpp2xml-qt5
+%{_libdir}/qt6/bin/qdbusxml2cpp-qt5
+%{_libdir}/qt6/bin/qmake-qt5
+%{_libdir}/qt6/libexec/ensure_pro_file.cmake
+%{_libdir}/qt6/libexec/qt-cmake-private-install.cmake
+/usr/modules/Concurrent.json
+/usr/modules/Core.json
+/usr/modules/DBus.json
+/usr/modules/DeviceDiscoverySupportPrivate.json
+/usr/modules/ExampleIconsPrivate.json
+/usr/modules/FbSupportPrivate.json
+/usr/modules/Gui.json
+/usr/modules/InputSupportPrivate.json
+/usr/modules/Network.json
+/usr/modules/PrintSupport.json
+/usr/modules/Sql.json
+/usr/modules/Test.json
+/usr/modules/Widgets.json
+/usr/modules/Xml.json
+
+
 %if "%{_qt_prefix}" != "%{_prefix}"
 %dir %{_qt_prefix}/
-%endif
-%dir %{_sysconfdir}/xdg/QtProject/
-%{_qt_datadir}/qtlogging.ini
-%{_qt_docdir}/global/
-%{_qt_importdir}/
-%{_qt_libdir}/cmake/Qt6Sql/Qt6Sql_QSQLiteDriverPlugin.cmake
-%{_qt_libdir}/cmake/Qt6Network/Qt6Network_QConnmanEnginePlugin.cmake
-%{_qt_libdir}/cmake/Qt6Network/Qt6Network_QGenericEnginePlugin.cmake
-%{_qt_libdir}/cmake/Qt6Network/Qt6Network_QNetworkManagerEnginePlugin.cmake
-%{_qt_libdir}/libQt6Concurrent.so.6*
-%{_qt_libdir}/libQt6Core.so.6*
-%{_qt_libdir}/libQt6DBus.so.6*
-%{_qt_libdir}/libQt6Network.so.6*
-%{_qt_libdir}/libQt6PrintSupport.so.6*
-%{_qt_libdir}/libQt6Sql.so.6*
-%{_qt_libdir}/libQt6Test.so.6*
-%{_qt_libdir}/libQt6Xml.so.6*
-%{_qt_plugindir}/bearer/libqconnmanbearer.so
-%{_qt_plugindir}/bearer/libqgenericbearer.so
-%{_qt_plugindir}/bearer/libqnmbearer.so
-%{_qt_plugindir}/sqldrivers/libqsqlite.so
-%{_qt_translationdir}/
-%if 0%{?qtchooser}
-%dir %{_sysconfdir}/xdg/qtchooser
-# not editable config files, so not using %%config here
-%ghost %{_sysconfdir}/xdg/qtchooser/default.conf
-%ghost %{_sysconfdir}/xdg/qtchooser/5.conf
-%{_sysconfdir}/xdg/qtchooser/6-%{__isa_bits}.conf
 %endif
 
 %files common
 # mostly empty for now, consider: filesystem/dir ownership, licenses
 %{rpm_macros_dir}/macros.qtbase
 
+	
 %files devel
-%if "%{_qt_bindir}" != "%{_bindir}"
-%dir %{_qt_bindir}
-%endif
-%if "%{_qt_headerdir}" != "%{_includedir}"
-%dir %{_qt_headerdir}
-%endif
-%{_bindir}/fixqt4headers.pl
-%{_bindir}/moc*
+%{_bindir}/androiddeployqt
+%{_bindir}/androiddeployqt6
+%{_bindir}/androidtestrunner
 %{_bindir}/qdbuscpp2xml*
 %{_bindir}/qdbusxml2cpp*
-%{_bindir}/qlalr
 %{_bindir}/qmake*
-%{_bindir}/qvkgen
-%{_bindir}/rcc*
-%{_bindir}/syncqt*
-%{_bindir}/uic*
-%{_qt_archdatadir}/mkspecs/
-%{_qt_bindir}/fixqt4headers.pl
-%{_qt_bindir}/moc*
-%{_qt_bindir}/qdbuscpp2xml*
-%{_qt_bindir}/qdbusxml2cpp*
-%{_qt_bindir}/qlalr
-%{_qt_bindir}/qmake*
-%{_qt_bindir}/qvkgen
-%{_qt_bindir}/rcc*
-%{_qt_bindir}/syncqt*
-%{_qt_bindir}/uic*
+%{_bindir}/qt-cmake
+%{_bindir}/qt-cmake-create
+%{_bindir}/qt-configure-module
+%{_bindir}/qtpaths*
+%{_libdir}/qt6/bin/qmake6
+%{_qt_bindir}/androiddeployqt
+%{_qt_bindir}/androiddeployqt6
+%{_qt_bindir}/androidtestrunner
+%{_qt_bindir}/qdbuscpp2xml
+%{_qt_bindir}/qdbusxml2cpp
+%{_qt_bindir}/qmake
+%{_qt_bindir}/qt-cmake
+%{_qt_bindir}/qt-cmake-create
+%{_qt_bindir}/qt-configure-module
+%{_qt_bindir}/qtpaths*
 %{_qt_headerdir}/QtConcurrent/
 %{_qt_headerdir}/QtCore/
 %{_qt_headerdir}/QtDBus/
-%{_qt_headerdir}/QtEdidSupport
+%{_qt_headerdir}/QtExampleIcons
 %{_qt_headerdir}/QtGui/
 %{_qt_headerdir}/QtInputSupport
 %{_qt_headerdir}/QtNetwork/
-%{_qt_headerdir}/QtPlatformHeaders/
 %{_qt_headerdir}/QtPrintSupport/
 %{_qt_headerdir}/QtSql/
 %{_qt_headerdir}/QtTest/
 %{_qt_headerdir}/QtWidgets/
 %{_qt_headerdir}/QtXcb/
 %{_qt_headerdir}/QtXml/
-%{_qt_libdir}/cmake/Qt6/Qt6Config*.cmake
-%{_qt_libdir}/cmake/Qt6/Qt6ModuleLocation.cmake
-%{_qt_libdir}/cmake/Qt6Concurrent/Qt6ConcurrentConfig*.cmake
-%{_qt_libdir}/cmake/Qt6Core/Qt6CTestMacros.cmake
-%{_qt_libdir}/cmake/Qt6Core/Qt6CoreConfig*.cmake
-%{_qt_libdir}/cmake/Qt6Core/Qt6CoreMacros.cmake
-%{_qt_libdir}/cmake/Qt6DBus/Qt6DBusConfig*.cmake
-%{_qt_libdir}/cmake/Qt6DBus/Qt6DBusMacros.cmake
-%{_qt_libdir}/cmake/Qt6Gui/Qt6GuiConfig*.cmake
-%{_qt_libdir}/cmake/Qt6Network/Qt6NetworkConfig*.cmake
-%{_qt_libdir}/cmake/Qt6PrintSupport/Qt6PrintSupportConfig*.cmake
-%{_qt_libdir}/cmake/Qt6Sql/Qt6SqlConfig*.cmake
-%{_qt_libdir}/cmake/Qt6Test/Qt6TestConfig*.cmake
-%{_qt_libdir}/cmake/Qt6Widgets/Qt6WidgetsConfig*.cmake
-%{_qt_libdir}/cmake/Qt6Widgets/Qt6WidgetsMacros.cmake
-%{_qt_libdir}/cmake/Qt6Xml/Qt6XmlConfig*.cmake
+%{_qt_libdir}/cmake/Qt6/*.cmake
+%{_qt_libdir}/cmake/Qt6/*.cmake.in
+%{_qt_libdir}/cmake/Qt6/*.h.in
+%{_qt_libdir}/cmake/Qt6/3rdparty/extra-cmake-modules/COPYING-CMAKE-SCRIPTS
+%{_qt_libdir}/cmake/Qt6/3rdparty/extra-cmake-modules/find-modules/*.cmake
+%{_qt_libdir}/cmake/Qt6/3rdparty/extra-cmake-modules/modules/*.cmake
+%{_qt_libdir}/cmake/Qt6/3rdparty/extra-cmake-modules/qt_attribution.json
+%{_qt_libdir}/cmake/Qt6/3rdparty/kwin/*.cmake
+%{_qt_libdir}/cmake/Qt6/3rdparty/kwin/COPYING-CMAKE-SCRIPTS
+%{_qt_libdir}/cmake/Qt6/3rdparty/kwin/qt_attribution.json
+%{_qt_libdir}/cmake/Qt6/config.tests/*
+%{_qt_libdir}/cmake/Qt6/libexec/*
+%{_qt_libdir}/cmake/Qt6/ModuleDescription.json.in
+%{_qt_libdir}/cmake/Qt6/PkgConfigLibrary.pc.in
+%{_qt_libdir}/cmake/Qt6/platforms/*.cmake
+%{_qt_libdir}/cmake/Qt6/platforms/Platform/*.cmake
+%{_qt_libdir}/cmake/Qt6/qbatchedtestrunner.in.cpp
+%{_qt_libdir}/cmake/Qt6/QtConfigureTimeExecutableCMakeLists.txt.in
+%{_qt_libdir}/cmake/Qt6/QtFileConfigure.txt.in
+%{_qt_libdir}/cmake/Qt6/QtSeparateDebugInfo.Info.plist.in
+%{_qt_libdir}/cmake/Qt6BuildInternals/*.cmake
+%{_qt_libdir}/cmake/Qt6BuildInternals/QtStandaloneTestTemplateProject/CMakeLists.txt
+%{_qt_libdir}/cmake/Qt6BuildInternals/QtStandaloneTestTemplateProject/Main.cmake
+%{_qt_libdir}/cmake/Qt6BuildInternals/StandaloneTests/QtBaseTestsConfig.cmake
+%{_qt_libdir}/cmake/Qt6Concurrent/*.cmake
+%{_qt_libdir}/cmake/Qt6Core/*.cmake
+%{_qt_libdir}/cmake/Qt6Core/Qt6CoreConfigureFileTemplate.in
+%{_qt_libdir}/cmake/Qt6CoreTools/*.cmake
+%{_qt_libdir}/cmake/Qt6DBus/*.cmake
+%{_qt_libdir}/cmake/Qt6DBusTools/*.cmake
+%{_qt_libdir}/cmake/Qt6DeviceDiscoverySupportPrivate/*.cmake
+%{_qt_libdir}/cmake/Qt6ExampleIconsPrivate/*.cmake
+%{_qt_libdir}/cmake/Qt6FbSupportPrivate/*.cmake
+%{_qt_libdir}/cmake/Qt6Gui/*.cmake
+%{_qt_libdir}/cmake/Qt6GuiTools/*.cmake
+%{_qt_libdir}/cmake/Qt6HostInfo/*.cmake
+%{_qt_libdir}/cmake/Qt6InputSupportPrivate/*.cmake
+%{_qt_libdir}/cmake/Qt6Network/*.cmake
+%{_qt_libdir}/cmake/Qt6PrintSupport/*.cmake
+%{_qt_libdir}/cmake/Qt6Sql/Qt6QSQLiteDriverPlugin*.cmake
+%{_qt_libdir}/cmake/Qt6Sql/Qt6Sql*.cmake
+%{_qt_libdir}/cmake/Qt6Test/*.cmake
+%{_qt_libdir}/cmake/Qt6Widgets/*.cmake
+%{_qt_libdir}/cmake/Qt6WidgetsTools/*.cmake
+%{_qt_libdir}/cmake/Qt6Xml/*.cmake
 %{_qt_libdir}/libQt6Concurrent.prl
 %{_qt_libdir}/libQt6Concurrent.so
 %{_qt_libdir}/libQt6Core.prl
@@ -594,93 +584,130 @@ fi
 %{_qt_libdir}/libQt6Widgets.so
 %{_qt_libdir}/libQt6Xml.prl
 %{_qt_libdir}/libQt6Xml.so
-%{_qt_libdir}/pkgconfig/Qt6.pc
-%{_qt_libdir}/pkgconfig/Qt6Concurrent.pc
-%{_qt_libdir}/pkgconfig/Qt6Core.pc
-%{_qt_libdir}/pkgconfig/Qt6DBus.pc
-%{_qt_libdir}/pkgconfig/Qt6Gui.pc
-%{_qt_libdir}/pkgconfig/Qt6Network.pc
-%{_qt_libdir}/pkgconfig/Qt6PrintSupport.pc
-%{_qt_libdir}/pkgconfig/Qt6Sql.pc
-%{_qt_libdir}/pkgconfig/Qt6Test.pc
-%{_qt_libdir}/pkgconfig/Qt6Widgets.pc
-%{_qt_libdir}/pkgconfig/Qt6Xml.pc
+%{_qt_libdir}/pkgconfig/*.pc
+%{_qt_libdir}/qt6/metatypes/*.json
+%{_qt_libexecdir}/android_emulator_launcher.sh
+%{_qt_libexecdir}/cmake_automoc_parser
+%{_qt_libexecdir}/moc
+%{_qt_libexecdir}/qlalr
+%{_qt_libexecdir}/qt-cmake-private
+%{_qt_libexecdir}/qt-cmake-standalone-test
+%{_qt_libexecdir}/qt-internal-configure-tests
+%{_qt_libexecdir}/qt-testrunner.py
+%{_qt_libexecdir}/qvkgen
+%{_qt_libexecdir}/rcc
+%{_qt_libexecdir}/sanitizer-testrunner.py
+%{_qt_libexecdir}/syncqt
+%{_qt_libexecdir}/tracegen
+%{_qt_libexecdir}/tracepointgen
+%{_qt_libexecdir}/uic
+%{_qt_mkspecsdir}/
+%dir %{_qt_libdir}/cmake/Qt6
+%dir %{_qt_libdir}/cmake/Qt6/3rdparty/extra-cmake-modules
+%dir %{_qt_libdir}/cmake/Qt6/3rdparty/kwin
+%dir %{_qt_libdir}/cmake/Qt6/config.tests
+%dir %{_qt_libdir}/cmake/Qt6/platforms
+%dir %{_qt_libdir}/cmake/Qt6/platforms/Platform
+%dir %{_qt_libdir}/cmake/Qt6BuildInternals
+%dir %{_qt_libdir}/cmake/Qt6BuildInternals/StandaloneTests
+%dir %{_qt_libdir}/cmake/Qt6Concurrent
+%dir %{_qt_libdir}/cmake/Qt6Core
+%dir %{_qt_libdir}/cmake/Qt6CoreTools
+%dir %{_qt_libdir}/cmake/Qt6DBus
+%dir %{_qt_libdir}/cmake/Qt6DBusTools
+%dir %{_qt_libdir}/cmake/Qt6DeviceDiscoverySupportPrivate
+%dir %{_qt_libdir}/cmake/Qt6ExampleIconsPrivate
+%dir %{_qt_libdir}/cmake/Qt6FbSupportPrivate
+%dir %{_qt_libdir}/cmake/Qt6Gui
+%dir %{_qt_libdir}/cmake/Qt6GuiTools
+%dir %{_qt_libdir}/cmake/Qt6HostInfo
+%dir %{_qt_libdir}/cmake/Qt6Network
+%dir %{_qt_libdir}/cmake/Qt6PrintSupport
+%dir %{_qt_libdir}/cmake/Qt6Sql
+%dir %{_qt_libdir}/cmake/Qt6Test
+%dir %{_qt_libdir}/cmake/Qt6Widgets
+%dir %{_qt_libdir}/cmake/Qt6WidgetsTools
+%dir %{_qt_libdir}/cmake/Qt6Xml
+%dir %{_qt_libdir}/qt6/metatypes
+
+%if "%{_qt_bindir}" != "%{_bindir}"
+%dir %{_qt_bindir}
+%endif
+
+%if "%{_qt_headerdir}" != "%{_includedir}"
+%dir %{_qt_headerdir}
+%endif
+
 ## private-devel globs
-# keep mkspecs/modules stuff  in -devel for now, https://bugzilla.redhat.com/show_bug.cgi?id=1705280
-# PERCENT_SIGN exclude PERCENT_SIGN {_qt_archdatadir}/mkspecs/modules/qt_lib_*_private.pri
-%exclude %{_qt_headerdir}/*/%{version}/*/private/
+%exclude %{_qt_headerdir}/*/%{qt_version}/
 
 %files private-devel
-%{_qt_headerdir}/*/%{version}/*/private/
+%{_qt_headerdir}/*/%{qt_version}/
 
 %files static
-%{_qt_headerdir}/QtAccessibilitySupport
 %{_qt_headerdir}/QtDeviceDiscoverySupport
-%{_qt_headerdir}/QtEventDispatcherSupport
-%{_qt_headerdir}/QtFbSupport
-%{_qt_headerdir}/QtFontDatabaseSupport
-%{_qt_headerdir}/QtServiceSupport
-%{_qt_headerdir}/QtThemeSupport
-%{_qt_libdir}/libQt6AccessibilitySupport.*a
-%{_qt_libdir}/libQt6AccessibilitySupport.prl
-%{_qt_libdir}/libQt6Bootstrap.*a
-%{_qt_libdir}/libQt6Bootstrap.prl
 %{_qt_libdir}/libQt6DeviceDiscoverySupport.*a
 %{_qt_libdir}/libQt6DeviceDiscoverySupport.prl
-%{_qt_libdir}/libQt6EdidSupport.*a
-%{_qt_libdir}/libQt6EdidSupport.prl
-%{_qt_libdir}/libQt6EventDispatcherSupport.*a
-%{_qt_libdir}/libQt6EventDispatcherSupport.prl
+%{_qt_libdir}/libQt6ExampleIcons.a
+%{_qt_libdir}/libQt6ExampleIcons.prl
+%{_qt_headerdir}/QtFbSupport
 %{_qt_libdir}/libQt6FbSupport.*a
 %{_qt_libdir}/libQt6FbSupport.prl
-%{_qt_libdir}/libQt6FontDatabaseSupport.*a
-%{_qt_libdir}/libQt6FontDatabaseSupport.prl
 %{_qt_libdir}/libQt6InputSupport.*a
 %{_qt_libdir}/libQt6InputSupport.prl
-%{_qt_libdir}/libQt6ServiceSupport.*a
-%{_qt_libdir}/libQt6ServiceSupport.prl
-%{_qt_libdir}/libQt6ThemeSupport.*a
-%{_qt_libdir}/libQt6ThemeSupport.prl
 
 %if 0%{?examples}
 %files examples
 %{_qt_examplesdir}/
 %endif
 
+%if 0%{?ibase}
+%files ibase
+%{_qt_libdir}/cmake/Qt6Sql/Qt6QIBaseDriverPlugin*.cmake
+%{_qt_plugindir}/sqldrivers/libqsqlibase.so
+%endif
+
+%ldconfig_scriptlets gui
+
 %files gui
-%{_qt_libdir}/cmake/Qt6Gui/Qt6Gui_QEvdevKeyboardPlugin.cmake
-%{_qt_libdir}/cmake/Qt6Gui/Qt6Gui_QEvdevMousePlugin.cmake
-%{_qt_libdir}/cmake/Qt6Gui/Qt6Gui_QEvdevTabletPlugin.cmake
-%{_qt_libdir}/cmake/Qt6Gui/Qt6Gui_QEvdevTouchScreenPlugin.cmake
-%{_qt_libdir}/cmake/Qt6Gui/Qt6Gui_QGifPlugin.cmake
-%{_qt_libdir}/cmake/Qt6Gui/Qt6Gui_QICOPlugin.cmake
-%{_qt_libdir}/cmake/Qt6Gui/Qt6Gui_QIbusPlatformInputContextPlugin.cmake
-%{_qt_libdir}/cmake/Qt6Gui/Qt6Gui_QJpegPlugin.cmake
-%{_qt_libdir}/cmake/Qt6Gui/Qt6Gui_QLinuxFbIntegrationPlugin.cmake
-%{_qt_libdir}/cmake/Qt6Gui/Qt6Gui_QMinimalIntegrationPlugin.cmake
-%{_qt_libdir}/cmake/Qt6Gui/Qt6Gui_QOffscreenIntegrationPlugin.cmake
-%{_qt_libdir}/cmake/Qt6Gui/Qt6Gui_QTuioTouchPlugin.cmake
-%{_qt_libdir}/cmake/Qt6Gui/Qt6Gui_QVncIntegrationPlugin.cmake
-%{_qt_libdir}/cmake/Qt6Gui/Qt6Gui_QXdgDesktopPortalThemePlugin.cmake
 %{_qt_libdir}/libQt6Gui.so.6*
+%{_qt_libdir}/libQt6PrintSupport.so.6*
 %{_qt_libdir}/libQt6Widgets.so.6*
+# Generic
 %{_qt_plugindir}/generic/libqevdevkeyboardplugin.so
 %{_qt_plugindir}/generic/libqevdevmouseplugin.so
 %{_qt_plugindir}/generic/libqevdevtabletplugin.so
 %{_qt_plugindir}/generic/libqevdevtouchplugin.so
 %{_qt_plugindir}/generic/libqtuiotouchplugin.so
+%if 0%{?fedora} || 0%{?epel}
+%{_qt_plugindir}/generic/libqtslibplugin.so
+%endif
+# Imageformats
 %{_qt_plugindir}/imageformats/libqgif.so
 %{_qt_plugindir}/imageformats/libqico.so
 %{_qt_plugindir}/imageformats/libqjpeg.so
-%{_qt_plugindir}/platforminputcontexts/libibusplatforminputcontextplugin.so
+# EGL
+%if 0%{?egl}
+%{_qt_libdir}/libQt6EglFSDeviceIntegration.so.6*
+%{_qt_plugindir}/egldeviceintegrations/libqeglfs-emu-integration.so
+%{_qt_plugindir}/egldeviceintegrations/libqeglfs-kms-egldevice-integration.so
+%{_qt_plugindir}/egldeviceintegrations/libqeglfs-kms-integration.so
+%{_qt_plugindir}/egldeviceintegrations/libqeglfs-x11-integration.so
+%{_qt_plugindir}/platforms/libqeglfs.so
+%{_qt_plugindir}/platforms/libqminimalegl.so
+%{_qt_plugindir}/xcbglintegrations/libqxcb-egl-integration.so
+%dir %{_qt_plugindir}/egldeviceintegrations/
+%endif
+# Platforms
 %{_qt_plugindir}/platforms/libqlinuxfb.so
 %{_qt_plugindir}/platforms/libqminimal.so
 %{_qt_plugindir}/platforms/libqoffscreen.so
 %{_qt_plugindir}/platforms/libqvnc.so
+# Platformthemes
 %{_qt_plugindir}/platformthemes/libqxdgdesktopportal.so
 
 %changelog
-* Tue Jan 02 2023 Sam Meluch <sammeluch@micrsoft.com> - 6.6.1
+* Tue Jan 02 2024 Sam Meluch <sammeluch@micrsoft.com> - 6.6.1
 - Upgrade to version 6.6.1 for Azure Linux 3.0
 
 * Tue Aug 01 2023 Thien Trung Vuong <tvuong@microsoft.com> - 5.12.11-9

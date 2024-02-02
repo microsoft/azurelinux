@@ -1,7 +1,7 @@
 Summary:      Qt6 - QtTool components
 Name:         qttools
 Version:      6.6.1
-Release:      6%{?dist}
+Release:      1%{?dist}
 Vendor:       Microsoft Corporation
 Distribution:   Azure Linux
 
@@ -17,8 +17,12 @@ BuildRequires: qtbase-private-devel
 BuildRequires: qt-rpm-macros >= %{version}
 BuildRequires: qtbase-static >= %{version}
 BuildRequires: qtdeclarative-static >= %{version}
+BuildRequires: cmake
+BuildRequires: ninja-build
 
 Requires: %{name}-common = %{version}-%{release}
+
+%global examples 1
 
 %description
 %{summary}.
@@ -111,16 +115,15 @@ Requires: %{name}-common = %{version}-%{release}
 %description examples
 %{summary}.
 
-
 %prep
 %setup -q -n qttools-everywhere-src-%{version}
 
 %build
-%cmake_qt
-%cmake_build
+%cmake_qt -DQT_BUILD_EXAMPLES:BOOL=%{?examples:ON}%{!?examples:OFF}
+%ninja_build
 
 %install
-%cmake_install
+%ninja_install
 
 # icons
 install -m644 -p -D src/assistant/assistant/images/assistant.png %{buildroot}%{_datadir}/icons/hicolor/32x32/apps/assistant-qt6.png
@@ -134,14 +137,14 @@ for icon in src/linguist/linguist/images/icons/linguist-*-32.png ; do
   install -p -m644 -D ${icon} %{buildroot}%{_datadir}/icons/hicolor/${size}x${size}/apps/linguist-qt6.png
 done
 
-# hardlink files to {_bindir}, add -qt5 postfix to not conflict
+# hardlink files to {_bindir}, add -qt6 postfix to not conflict
 mkdir %{buildroot}%{_bindir}
 pushd %{buildroot}%{_qt_bindir}
 for i in * ; do
   case "${i}" in
    assistant|designer|lconvert|linguist|lrelease|lupdate|pixeltool|qcollectiongenerator|qdbus|qdbusviewer|qhelpconverter|qhelpgenerator|qtplugininfo|qtattributionsscanner)
       ln -v  ${i} %{buildroot}%{_bindir}/${i}-qt6
-      ln -sv ${i} ${i}-qt5
+      ln -sv ${i} ${i}-qt6
       ;;
     *)
       ln -v  ${i} %{buildroot}%{_bindir}/${i}
@@ -162,26 +165,12 @@ for prl_file in libQt6*.prl ; do
 done
 popd
 
-## Qt5Designer.pc references non-existent Qt5UiPlugin.pc, remove the reference for now
+## Qt6Designer.pc references non-existent Qt6UiPlugin.pc, remove the reference for now
 sed -i -e 's| Qt6UiPlugin||g' %{buildroot}%{_qt_libdir}/pkgconfig/Qt6Designer.pc
 
 
 ## work-in-progress... -- rex
-%if 0%{?fedora} || 0%{?rhel} > 6
 %check
-# verify validity of Qt5Designer.pc
-export PKG_CONFIG_PATH=%{buildroot}%{_libdir}/pkgconfig
-pkg-config --print-requires --print-requires-private Qt6Designer
-export CMAKE_PREFIX_PATH=%{buildroot}%{_qt_prefix}:%{buildroot}%{_prefix}
-export PATH=%{buildroot}%{_qt_bindir}:%{_qt_bindir}:$PATH
-export LD_LIBRARY_PATH=%{buildroot}%{_qt_libdir}
-mkdir tests/auto/cmake/%{_target_platform}
-pushd tests/auto/cmake/%{_target_platform}
-cmake ..
-ctest --output-on-failure ||:
-popd
-
-
 # check icon resolutions
 pushd %{buildroot}%{_datadir}/icons
 for RES in $(ls hicolor); do
@@ -193,113 +182,42 @@ for RES in $(ls hicolor); do
 done
 popd
 
-%endif
-
 %files
 %{_bindir}/qdbus-qt6
-%{_bindir}/qtpaths
 %{_qt_bindir}/qdbus
-%{_qt_bindir}/qdbus-qt6
-%{_qt_bindir}/qtpaths
+%{_qt_libdir}/libQt6UiTools.so.6*
 
 %files common
-%license LICENSE.LGPL*
+%license LICENSES/LGPL*
+ 
+%ldconfig_scriptlets libs-designer
 
 %files  libs-designer
-%dir %{_qt_libdir}/cmake/Qt6Designer/
 %{_qt_libdir}/libQt6Designer.so.6*
+%{_qt_plugindir}/designer/*
+%dir %{_qt_libdir}/cmake/Qt6Designer/
+ 
+%ldconfig_scriptlets libs-designercomponents
 
 %files  libs-designercomponents
 %{_qt_libdir}/libQt6DesignerComponents.so.6*
+ 
+%ldconfig_scriptlets libs-help
 
 %files  libs-help
 %{_qt_libdir}/libQt6Help.so.6*
-
-%if 0%{?rhel} && 0%{?rhel} <= 7
-%post -n qt-assistant
-touch --no-create %{_datadir}/icons/hicolor ||:
-
-%posttrans -n qt-assistant
-gtk-update-icon-cache -q %{_datadir}/icons/hicolor 2> /dev/null ||:
-
-%postun -n qt-assistant
-if [ $1 -eq 0 ] ; then
-touch --no-create %{_datadir}/icons/hicolor ||:
-gtk-update-icon-cache -q %{_datadir}/icons/hicolor 2> /dev/null ||:
-fi
-%endif
-
-%files -n qt-assistant
-%{_bindir}/assistant-qt6
-%{_datadir}/icons/hicolor/*/apps/assistant*.*
-%{_qt5_bindir}/assistant*
-
-%if 0%{?rhel} && 0%{?rhel} <= 7
-%post -n qt-doctools
-touch --no-create %{_datadir}/icons/hicolor ||:
-
-%posttrans -n qt-doctools
-gtk-update-icon-cache -q %{_datadir}/icons/hicolor 2> /dev/null ||:
-
-%postun -n qt-doctools
-if [ $1 -eq 0 ] ; then
-touch --no-create %{_datadir}/icons/hicolor ||:
-gtk-update-icon-cache -q %{_datadir}/icons/hicolor 2> /dev/null ||:
-fi
-%endif
-
-%files -n qt-doctools
-%{_bindir}/qdistancefieldgenerator*
-%{_bindir}/qdoc*
-%{_bindir}/qhelpgenerator*
-%{_bindir}/qtattributionsscanner-qt6
-%{_qt_bindir}/qdistancefieldgenerator*
-%{_qt_bindir}/qdoc*
-%{_qt_bindir}/qhelpgenerator*
-%{_qt_bindir}/qtattributionsscanner*
-
-%if 0%{?rhel} && 0%{?rhel} <= 7
-%post -n qt-designer
-touch --no-create %{_datadir}/icons/hicolor ||:
-
-%posttrans -n qt-designer
-gtk-update-icon-cache -q %{_datadir}/icons/hicolor 2> /dev/null ||:
-update-desktop-database -q &> /dev/null ||:
-
-%postun -n qt-designer
-if [ $1 -eq 0 ] ; then
-touch --no-create %{_datadir}/icons/hicolor ||:
-gtk-update-icon-cache -q %{_datadir}/icons/hicolor 2> /dev/null ||:
-fi
-%endif
 
 %files -n qt-designer
 %{_bindir}/designer*
 %{_datadir}/icons/hicolor/*/apps/designer*.*
 %{_qt_bindir}/designer*
 
-%if 0%{?rhel} && 0%{?rhel} <= 7
-%post -n qt-linguist
-touch --no-create %{_datadir}/icons/hicolor ||:
-
-%posttrans -n qt-linguist
-gtk-update-icon-cache -q %{_datadir}/icons/hicolor 2> /dev/null ||:
-update-desktop-database -q &> /dev/null ||:
-
-%postun -n qt-linguist
-if [ $1 -eq 0 ] ; then
-touch --no-create %{_datadir}/icons/hicolor ||:
-gtk-update-icon-cache -q %{_datadir}/icons/hicolor 2> /dev/null ||:
-fi
-%endif
-
 %files -n qt-linguist
 %{_bindir}/linguist*
 %{_qt_bindir}/linguist*
-# cmake config
-%dir %{_qt_libdir}/cmake/Qt6LinguistTools/
-%{_qt_libdir}/cmake/Qt6LinguistTools/Qt6LinguistToolsConfig*.cmake
-%{_qt_libdir}/cmake/Qt6LinguistTools/Qt6LinguistToolsMacros.cmake
+# phrasebooks used by linguist
+%{_datadir}/icons/hicolor/*/apps/linguist*.*
+%{_datadir}/qt6/phrasebooks/*.qph
 # linguist friends
 %{_bindir}/lconvert*
 %{_bindir}/lrelease*
@@ -307,84 +225,120 @@ fi
 %{_qt_bindir}/lconvert*
 %{_qt_bindir}/lrelease*
 %{_qt_bindir}/lupdate*
-# phrasebooks used by linguist
-%{_datadir}/icons/hicolor/*/apps/linguist*.*
-%{_qt_datadir}/phrasebooks/
-
-%if 0%{?rhel} && 0%{?rhel} <= 7
-%post -n qt-qdbusviewer
-touch --no-create %{_datadir}/icons/hicolor ||:
-
-%posttrans -n qt-qdbusviewer
-gtk-update-icon-cache -q %{_datadir}/icons/hicolor 2> /dev/null ||:
-
-%postun -n qt-qdbusviewer
-if [ $1 -eq 0 ] ; then
-touch --no-create %{_datadir}/icons/hicolor ||:
-gtk-update-icon-cache -q %{_datadir}/icons/hicolor 2> /dev/null ||:
-fi
-%endif
+%{_qt_libexecdir}/lprodump*
+%{_qt_libexecdir}/lrelease*
+%{_qt_libexecdir}/lupdate*
 
 %files -n qt-qdbusviewer
 %{_bindir}/qdbusviewer*
-%{_datadir}/icons/hicolor/*/apps/qdbusviewer*.*
 %{_qt_bindir}/qdbusviewer*
+%{_datadir}/icons/hicolor/*/apps/qdbusviewer*.*
 
 %files devel
-#{_bindir}/qhelpconverter*
-#{_qt5_bindir}/qhelpconverter*
-%dir %{_qt_libdir}/cmake/Qt6Help/
+/usr/modules/Designer.json
+/usr/modules/DesignerComponentsPrivate.json
+/usr/modules/Help.json
+/usr/modules/Linguist.json
+/usr/modules/QDocCatchConversionsPrivate.json
+/usr/modules/QDocCatchGeneratorsPrivate.json
+/usr/modules/QDocCatchPrivate.json
+/usr/modules/Tools.json
+/usr/modules/UiPlugin.json
+/usr/modules/UiTools.json
+/usr/share/icons/hicolor/128x128/apps/assistant-qt6.png
+/usr/share/icons/hicolor/32x32/apps/assistant-qt6.png
+%{_bindir}/assistant-qt6
 %{_bindir}/pixeltool*
-%{_bindir}/qcollectiongenerator*
 %{_bindir}/qtdiag*
 %{_bindir}/qtplugininfo*
-%{_qt_archdatadir}/mkspecs/modules/qt_lib_designer.pri
 %{_qt_archdatadir}/mkspecs/modules/qt_lib_designer_private.pri
+%{_qt_archdatadir}/mkspecs/modules/qt_lib_designer.pri
 %{_qt_archdatadir}/mkspecs/modules/qt_lib_designercomponents_private.pri
-%{_qt_archdatadir}/mkspecs/modules/qt_lib_help.pri
 %{_qt_archdatadir}/mkspecs/modules/qt_lib_help_private.pri
+%{_qt_archdatadir}/mkspecs/modules/qt_lib_help.pri
+%{_qt_archdatadir}/mkspecs/modules/qt_lib_linguist_private.pri
+%{_qt_archdatadir}/mkspecs/modules/qt_lib_linguist.pri
+%{_qt_archdatadir}/mkspecs/modules/qt_lib_qdoccatch_private.pri
+%{_qt_archdatadir}/mkspecs/modules/qt_lib_qdoccatchconversionsprivate_private.pri
+%{_qt_archdatadir}/mkspecs/modules/qt_lib_qdoccatchconversionsprivate.pri
+%{_qt_archdatadir}/mkspecs/modules/qt_lib_qdoccatchgeneratorsprivate_private.pri
+%{_qt_archdatadir}/mkspecs/modules/qt_lib_qdoccatchgeneratorsprivate.pri
+%{_qt_archdatadir}/mkspecs/modules/qt_lib_tools_private.pri
 %{_qt_archdatadir}/mkspecs/modules/qt_lib_uiplugin.pri
+%{_qt_archdatadir}/mkspecs/modules/qt_lib_uitools_private.pri
+%{_qt_archdatadir}/mkspecs/modules/qt_lib_uitools.pri
+%{_qt_bindir}/assistant
+%{_qt_bindir}/assistant-qt6
 %{_qt_bindir}/pixeltool*
-%{_qt_bindir}/qcollectiongenerator*
+%{_qt_bindir}/qdbus-qt6
 %{_qt_bindir}/qtdiag*
 %{_qt_bindir}/qtplugininfo*
+%{_qt_examplesdir}/assistant/remotecontrol/remotecontrol
+%{_qt_examplesdir}/assistant/simpletextviewer/simpletextviewer
+%{_qt_examplesdir}/designer/calculatorbuilder/calculatorbuilder
+%{_qt_examplesdir}/designer/calculatorform_mi/calculatorform_mi
+%{_qt_examplesdir}/designer/calculatorform/calculatorform
+%{_qt_examplesdir}/help/contextsensitivehelp/contextsensitivehelp
+%{_qt_examplesdir}/linguist/arrowpad/arrowpad
+%{_qt_examplesdir}/linguist/arrowpad/arrowpad_fr.qm
+%{_qt_examplesdir}/linguist/arrowpad/arrowpad_nl.qm
+%{_qt_examplesdir}/linguist/hellotr/hellotr
+%{_qt_examplesdir}/linguist/hellotr/hellotr_la.qm
+%{_qt_examplesdir}/linguist/i18n/i18n
+%{_qt_examplesdir}/linguist/trollprint/trollprint
+%{_qt_examplesdir}/linguist/trollprint/trollprint_pt.qm
+%{_qt_examplesdir}/uitools/textfinder/textfinder
 %{_qt_headerdir}/QtDesigner/
 %{_qt_headerdir}/QtDesignerComponents/
 %{_qt_headerdir}/QtHelp/
+%{_qt_headerdir}/QtQDocCatch/
+%{_qt_headerdir}/QtQDocCatchConversionsPrivate/
+%{_qt_headerdir}/QtQDocCatchGeneratorsPrivate/
+%{_qt_headerdir}/QtTools/
 %{_qt_headerdir}/QtUiPlugin
-%{_qt_libdir}/Qt6UiPlugin.la
-%{_qt_libdir}/cmake/Qt6Designer/Qt6DesignerConfig*.cmake
-%{_qt_libdir}/cmake/Qt6Help/Qt6HelpConfig*.cmake
-%{_qt_libdir}/cmake/Qt5UiPlugin/
-%{_qt_libdir}/libQt6Designer*.prl
+%{_qt_headerdir}/QtUiTools/
+%{_qt_libdir}/cmake/Qt6/FindWrapLibClang.cmake
+%{_qt_libdir}/cmake/Qt6BuildInternals/StandaloneTests/QtToolsTestsConfig.cmake
+%{_qt_libdir}/cmake/Qt6Designer/*.cmake
+%{_qt_libdir}/cmake/Qt6DesignerComponentsPrivate/*.cmake
+%{_qt_libdir}/cmake/Qt6Help/*.cmake
+%{_qt_libdir}/cmake/Qt6Linguist/*.cmake
+%{_qt_libdir}/cmake/Qt6LinguistTools/*.cmake
+%{_qt_libdir}/cmake/Qt6QDocCatchConversionsPrivate/*.cmake
+%{_qt_libdir}/cmake/Qt6QDocCatchGeneratorsPrivate/*.cmake
+%{_qt_libdir}/cmake/Qt6QDocCatchPrivate/*.cmake
+%{_qt_libdir}/cmake/Qt6Tools/*.cmake
+%{_qt_libdir}/cmake/Qt6ToolsTools/*.cmake
+%{_qt_libdir}/cmake/Qt6UiPlugin/*.cmake
+%{_qt_libdir}/cmake/Qt6UiTools/
 %{_qt_libdir}/libQt6Designer*.so
-%{_qt_libdir}/libQt6Help.prl
 %{_qt_libdir}/libQt6Help.so
-%{_qt_libdir}/libQt6UiPlugin.prl
-%{_qt_libdir}/pkgconfig/Qt6Designer.pc
-%{_qt_libdir}/pkgconfig/Qt6Help.pc
-%{_qt_libdir}/pkgconfig/Qt6UiPlugin.pc
+%{_qt_libdir}/libQt6UiTools.so
+%{_qt_libdir}/pkgconfig/*.pc
+%{_qt_libdir}/qt6/metatypes/qt6*_metatypes.json
+%dir %{_qt_libdir}/cmake/Qt6Help/
+%dir %{_qt_libdir}/cmake/Qt6Linguist
+%dir %{_qt_libdir}/cmake/Qt6LinguistTools
+%dir %{_qt_libdir}/cmake/Qt6QDocCatchConversionsPrivate
+%dir %{_qt_libdir}/cmake/Qt6QDocCatchGeneratorsPrivate
+%dir %{_qt_libdir}/cmake/Qt6QDocCatchPrivate
+%dir %{_qt_libdir}/cmake/Qt6Tools/
+%dir %{_qt_libdir}/cmake/Qt6ToolsTools/
+%dir %{_qt_libdir}/cmake/Qt6UiPlugin/
 
 %files static
-%{_qt_archdatadir}/mkspecs/modules/qt_lib_uitools.pri
-%{_qt_archdatadir}/mkspecs/modules/qt_lib_uitools_private.pri
-%{_qt_headerdir}/QtUiTools/
-%{_qt_libdir}/cmake/Qt5UiTools/
-%{_qt_libdir}/libQt6UiTools.*a
+%{_qt_libdir}/libQt6Designer*.prl
+%{_qt_libdir}/libQt6Help.prl
 %{_qt_libdir}/libQt6UiTools.prl
-%{_qt_libdir}/pkgconfig/Qt6UiTools.pc
 
-%if ! 0%{?no_examples:1}
-%files examples
-%{_qt_examplesdir}/
-%{_qt_plugindir}/designer/*
-%dir %{_qt_libdir}/cmake/Qt6Designer
-%{_qt_libdir}/cmake/Qt6Designer/Qt6Designer_*
-%endif
-
+%files -n qt-doctools
+%{_bindir}/qdoc*
+%{_qt6_bindir}/qdoc*
+%{_qt6_libexecdir}/qhelpgenerator*
+%{_qt6_libexecdir}/qtattributionsscanner*
 
 %changelog
-* Tue Jan 02 2023 Sam Meluch <sammeluch@microsoft.com> - 6.6.1-1
+* Tue Jan 02 2024 Sam Meluch <sammeluch@microsoft.com> - 6.6.1-1
 - Update qttools to version 6.6.1
 
 * Mon Nov 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.12.5-6
