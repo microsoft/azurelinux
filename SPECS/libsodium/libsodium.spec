@@ -2,8 +2,8 @@
 %global soname  23
 Summary:        The Sodium crypto library
 Name:           libsodium
-Version:        1.0.18
-Release:        6%{?dist}
+Version:        1.0.19
+Release:        1%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -68,6 +68,9 @@ find %{buildroot} -type f -name "*.a" -delete -print
 
 
 %changelog
+* Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0.19-1
+- Auto-upgrade to 1.0.19 - Package upgrade for Azure Linux 3.0
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.0.18-6
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

@@ -10901,8 +10901,8 @@
         "type": "other",
         "other": {
           "name": "libsodium",
-          "version": "1.0.18",
-          "downloadUrl": "https://download.libsodium.org/libsodium/releases/libsodium-1.0.18.tar.gz"
+          "version": "1.0.19",
+          "downloadUrl": "https://download.libsodium.org/libsodium/releases/libsodium-1.0.19.tar.gz"
         }
       }
     },
