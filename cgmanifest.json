@@ -28997,8 +28997,8 @@
         "type": "other",
         "other": {
           "name": "tzdata",
-          "version": "2023c",
-          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2023c.tar.gz"
+          "version": "2024a",
+          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2024a.tar.gz"
         }
       }
     },
