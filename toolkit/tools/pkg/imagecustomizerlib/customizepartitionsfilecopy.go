@@ -42,19 +42,19 @@ func customizePartitionsUsingFileCopy(buildDir string, baseConfigPath string, co
 }
 
 func copyFilesIntoNewDisk(existingImageChroot *safechroot.Chroot, newImageChroot *safechroot.Chroot) error {
-	err := copyFilesIntoNewDiskHelper(existingImageChroot, newImageChroot)
+	err := copyPartitionFiles(existingImageChroot.RootDir()+"/.", newImageChroot.RootDir())
 	if err != nil {
 		return fmt.Errorf("failed to copy files into new partition layout:\n%w", err)
 	}
 	return nil
 }
 
-func copyFilesIntoNewDiskHelper(existingImageChroot *safechroot.Chroot, newImageChroot *safechroot.Chroot) error {
+func copyPartitionFiles(sourceRoot, targetRoot string) error {
 	// Notes:
 	// `-a` ensures unix permissions, extended attributes (including SELinux), and sub-directories (-r) are copied.
 	// `--no-dereference` ensures that symlinks are copied as symlinks.
 	copyArgs := []string{"--verbose", "--no-clobber", "-a", "--no-dereference", "--sparse", "always",
-		existingImageChroot.RootDir() + "/.", newImageChroot.RootDir()}
+		sourceRoot, targetRoot}
 
 	err := shell.ExecuteLiveWithErrAndCallbacks(1, func(...interface{}) {}, logger.Log.Debug, "cp", copyArgs...)
 	if err != nil {
