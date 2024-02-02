@@ -1,13 +1,13 @@
 Summary:        YAML parser and emitter for Python
 Name:           PyYAML
-Version:        5.3.1
+Version:        6.0.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Libraries
-URL:            https://pyyaml.org/
-Source0:        https://pyyaml.org/download/pyyaml/%{name}-%{version}.tar.gz
+URL:            https://github.com/yaml/pyyaml
+Source0:        https://github.com/yaml/pyyaml/archive/%{version}.tar.gz
 BuildRequires:  libyaml-devel
 BuildRequires:  python3
 #BuildRequires:  python3-Cython
@@ -55,6 +55,9 @@ chmod a-x examples/yaml-highlight/yaml_hl.py
 %{python3_sitelib}/*
 
 %changelog
+* Thu Feb 01 2024 Henry Li <lihl@microsoft.com> - 6.0.1-1
+- Upgrade to version 6.0.1
+
 * Tue Nov 14 2023 Andrew Phelps <anphel@microsoft.com> - 5.3.1-1
 - Upgrade to version 5.3.1
 - Disable building with Cython due to compat issue in Cython 3
