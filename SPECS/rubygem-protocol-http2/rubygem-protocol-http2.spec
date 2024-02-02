@@ -2,7 +2,7 @@
 %global gem_name protocol-http2
 Summary:        A low level implementation of the HTTP/2 protocol
 Name:           rubygem-%{gem_name}
-Version:        0.14.2
+Version:        0.15.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -32,6 +32,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Thu Feb 01 2024 Riken Maharjan <rmaharjan@microsoft.com> - 0.15.1-1
+- Update to v0.15.1
+
 * Fri Apr 01 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.14.2-1
 - Update to v0.14.2.
 - Build from .tar.gz source.
