@@ -19,10 +19,12 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.h5py.org/
 Source0:        https://files.pythonhosted.org/packages/source/h/h5py/h5py-%{version}.tar.gz
+Patch0:         h5py-3.10.0-fix.patch
 BuildRequires:  gcc
 BuildRequires:  hdf5-devel
 BuildRequires:  liblzf-devel
-BuildRequires:  python%{python3_pkgversion}-Cython >= 0.23
+BuildRequires:  python%{python3_pkgversion}-Cython >= 0.23 
+# "Cython >=0.29.31,<4",
 BuildRequires:  python%{python3_pkgversion}-cached_property
 BuildRequires:  python%{python3_pkgversion}-devel >= 3.2
 BuildRequires:  python%{python3_pkgversion}-numpy >= 1.7
@@ -45,8 +47,8 @@ Requires:       python%{python3_pkgversion}-six
 %description -n python%{python3_pkgversion}-h5py %{_description}
 
 %prep
-%setup -q -c -n %{name}-%{version}
-%patch0
+%setup -p1 -q -c -n %{name}-%{version}
+# %patch0
 mv %{name}-%{version} serial
 cd serial
 %{__python3} api_gen.py

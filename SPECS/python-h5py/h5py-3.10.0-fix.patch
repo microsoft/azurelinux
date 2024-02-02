@@ -1,0 +1,479 @@
+From b8cc539ce501f95b7f9720b318c54672c512ec16 Mon Sep 17 00:00:00 2001
+From: Thomas Kluyver <thomas@kluyver.me.uk>
+Date: Thu, 5 Oct 2023 12:44:12 +0100
+Subject: [PATCH 1/9] Fix compiling fileobj file driver with Cython 3.0
+
+---
+ h5py/api_types_hdf5.pxd | 24 ++++++++++++------------
+ h5py/h5fd.pyx           |  4 ++--
+ 2 files changed, 14 insertions(+), 14 deletions(-)
+
+diff --git a/h5py/api_types_hdf5.pxd b/h5py/api_types_hdf5.pxd
+index f3d537c47..a1369e8a7 100644
+--- a/h5py/api_types_hdf5.pxd
++++ b/h5py/api_types_hdf5.pxd
+@@ -257,27 +257,27 @@ cdef extern from "hdf5.h":
+       herr_t  (*sb_encode)(H5FD_t *file, char *name, unsigned char *p)
+       herr_t  (*sb_decode)(H5FD_t *f, const char *name, const unsigned char *p)
+       size_t  fapl_size
+-      void *  (*fapl_get)(H5FD_t *file)
+-      void *  (*fapl_copy)(const void *fapl)
+-      herr_t  (*fapl_free)(void *fapl)
++      void *  (*fapl_get)(H5FD_t *file) except *
++      void *  (*fapl_copy)(const void *fapl) except *
++      herr_t  (*fapl_free)(void *fapl) except *
+       size_t  dxpl_size
+       void *  (*dxpl_copy)(const void *dxpl)
+       herr_t  (*dxpl_free)(void *dxpl)
+-      H5FD_t *(*open)(const char *name, unsigned flags, hid_t fapl, haddr_t maxaddr)
+-      herr_t  (*close)(H5FD_t *file)
++      H5FD_t *(*open)(const char *name, unsigned flags, hid_t fapl, haddr_t maxaddr) except *
++      herr_t  (*close)(H5FD_t *file) except *
+       int     (*cmp)(const H5FD_t *f1, const H5FD_t *f2)
+       herr_t  (*query)(const H5FD_t *f1, unsigned long *flags)
+       herr_t  (*get_type_map)(const H5FD_t *file, H5FD_mem_t *type_map)
+       haddr_t (*alloc)(H5FD_t *file, H5FD_mem_t type, hid_t dxpl_id, hsize_t size)
+       herr_t  (*free)(H5FD_t *file, H5FD_mem_t type, hid_t dxpl_id, haddr_t addr, hsize_t size)
+-      haddr_t (*get_eoa)(const H5FD_t *file, H5FD_mem_t type)
+-      herr_t  (*set_eoa)(H5FD_t *file, H5FD_mem_t type, haddr_t addr)
+-      haddr_t (*get_eof)(const H5FD_t *file, H5FD_mem_t type)
++      haddr_t (*get_eoa)(const H5FD_t *file, H5FD_mem_t type) except *
++      herr_t  (*set_eoa)(H5FD_t *file, H5FD_mem_t type, haddr_t addr) except *
++      haddr_t (*get_eof)(const H5FD_t *file, H5FD_mem_t type) except *
+       herr_t  (*get_handle)(H5FD_t *file, hid_t fapl, void**file_handle)
+-      herr_t  (*read)(H5FD_t *file, H5FD_mem_t type, hid_t dxpl, haddr_t addr, size_t size, void *buffer)
+-      herr_t  (*write)(H5FD_t *file, H5FD_mem_t type, hid_t dxpl, haddr_t addr, size_t size, const void *buffer)
+-      herr_t  (*flush)(H5FD_t *file, hid_t dxpl_id, hbool_t closing)
+-      herr_t  (*truncate)(H5FD_t *file, hid_t dxpl_id, hbool_t closing)
++      herr_t  (*read)(H5FD_t *file, H5FD_mem_t type, hid_t dxpl, haddr_t addr, size_t size, void *buffer) except *
++      herr_t  (*write)(H5FD_t *file, H5FD_mem_t type, hid_t dxpl, haddr_t addr, size_t size, const void *buffer) except *
++      herr_t  (*flush)(H5FD_t *file, hid_t dxpl_id, hbool_t closing) except *
++      herr_t  (*truncate)(H5FD_t *file, hid_t dxpl_id, hbool_t closing) except *
+       herr_t  (*lock)(H5FD_t *file, hbool_t rw)
+       herr_t  (*unlock)(H5FD_t *file)
+       H5FD_mem_t fl_map[<int>H5FD_MEM_NTYPES]
+diff --git a/h5py/h5fd.pyx b/h5py/h5fd.pyx
+index e97460573..f1b4aade7 100644
+--- a/h5py/h5fd.pyx
++++ b/h5py/h5fd.pyx
+@@ -144,10 +144,10 @@ cdef herr_t H5FD_fileobj_close(H5FD_fileobj_t *f) except -1 with gil:
+     stdlib_free(f)
+     return 0
+ 
+-cdef haddr_t H5FD_fileobj_get_eoa(const H5FD_fileobj_t *f, H5FD_mem_t type):
++cdef haddr_t H5FD_fileobj_get_eoa(const H5FD_fileobj_t *f, H5FD_mem_t type) noexcept nogil:
+     return f.eoa
+ 
+-cdef herr_t H5FD_fileobj_set_eoa(H5FD_fileobj_t *f, H5FD_mem_t type, haddr_t addr):
++cdef herr_t H5FD_fileobj_set_eoa(H5FD_fileobj_t *f, H5FD_mem_t type, haddr_t addr) noexcept nogil:
+     f.eoa = addr
+     return 0
+ 
+
+From c0a7b9848eedbd3b64c248ed579ee629903231f1 Mon Sep 17 00:00:00 2001
+From: David Hoese <david.hoese@ssec.wisc.edu>
+Date: Tue, 28 Nov 2023 09:57:33 -0600
+Subject: [PATCH 2/9] Add minimal except definitions for Cython 3 compatibility
+
+---
+ h5py/api_types_hdf5.pxd | 38 +++++++++++++++++++-------------------
+ h5py/h5fd.pyx           | 36 ++++++++++++++++++++++++++----------
+ 2 files changed, 45 insertions(+), 29 deletions(-)
+
+diff --git a/h5py/api_types_hdf5.pxd b/h5py/api_types_hdf5.pxd
+index a1369e8a7..0523b2feb 100644
+--- a/h5py/api_types_hdf5.pxd
++++ b/h5py/api_types_hdf5.pxd
+@@ -259,25 +259,25 @@ cdef extern from "hdf5.h":
+       size_t  fapl_size
+       void *  (*fapl_get)(H5FD_t *file) except *
+       void *  (*fapl_copy)(const void *fapl) except *
+-      herr_t  (*fapl_free)(void *fapl) except *
++      herr_t  (*fapl_free)(void *fapl) except -1
+       size_t  dxpl_size
+       void *  (*dxpl_copy)(const void *dxpl)
+       herr_t  (*dxpl_free)(void *dxpl)
+       H5FD_t *(*open)(const char *name, unsigned flags, hid_t fapl, haddr_t maxaddr) except *
+-      herr_t  (*close)(H5FD_t *file) except *
++      herr_t  (*close)(H5FD_t *file) except -1
+       int     (*cmp)(const H5FD_t *f1, const H5FD_t *f2)
+       herr_t  (*query)(const H5FD_t *f1, unsigned long *flags)
+       herr_t  (*get_type_map)(const H5FD_t *file, H5FD_mem_t *type_map)
+       haddr_t (*alloc)(H5FD_t *file, H5FD_mem_t type, hid_t dxpl_id, hsize_t size)
+       herr_t  (*free)(H5FD_t *file, H5FD_mem_t type, hid_t dxpl_id, haddr_t addr, hsize_t size)
+-      haddr_t (*get_eoa)(const H5FD_t *file, H5FD_mem_t type) except *
+-      herr_t  (*set_eoa)(H5FD_t *file, H5FD_mem_t type, haddr_t addr) except *
+-      haddr_t (*get_eof)(const H5FD_t *file, H5FD_mem_t type) except *
++      haddr_t (*get_eoa)(const H5FD_t *file, H5FD_mem_t type) noexcept
++      herr_t  (*set_eoa)(H5FD_t *file, H5FD_mem_t type, haddr_t addr) noexcept
++      haddr_t (*get_eof)(const H5FD_t *file, H5FD_mem_t type) noexcept
+       herr_t  (*get_handle)(H5FD_t *file, hid_t fapl, void**file_handle)
+       herr_t  (*read)(H5FD_t *file, H5FD_mem_t type, hid_t dxpl, haddr_t addr, size_t size, void *buffer) except *
+       herr_t  (*write)(H5FD_t *file, H5FD_mem_t type, hid_t dxpl, haddr_t addr, size_t size, const void *buffer) except *
+-      herr_t  (*flush)(H5FD_t *file, hid_t dxpl_id, hbool_t closing) except *
+-      herr_t  (*truncate)(H5FD_t *file, hid_t dxpl_id, hbool_t closing) except *
++      herr_t  (*flush)(H5FD_t *file, hid_t dxpl_id, hbool_t closing) except -1
++      herr_t  (*truncate)(H5FD_t *file, hid_t dxpl_id, hbool_t closing) except -1
+       herr_t  (*lock)(H5FD_t *file, hbool_t rw)
+       herr_t  (*unlock)(H5FD_t *file)
+       H5FD_mem_t fl_map[<int>H5FD_MEM_NTYPES]
+@@ -295,27 +295,27 @@ cdef extern from "hdf5.h":
+       herr_t  (*sb_encode)(H5FD_t *file, char *name, unsigned char *p)
+       herr_t  (*sb_decode)(H5FD_t *f, const char *name, const unsigned char *p)
+       size_t  fapl_size
+-      void *  (*fapl_get)(H5FD_t *file)
+-      void *  (*fapl_copy)(const void *fapl)
+-      herr_t  (*fapl_free)(void *fapl)
++      void *  (*fapl_get)(H5FD_t *file) except *
++      void *  (*fapl_copy)(const void *fapl) except *
++      herr_t  (*fapl_free)(void *fapl) except -1
+       size_t  dxpl_size
+       void *  (*dxpl_copy)(const void *dxpl)
+       herr_t  (*dxpl_free)(void *dxpl)
+-      H5FD_t *(*open)(const char *name, unsigned flags, hid_t fapl, haddr_t maxaddr)
+-      herr_t  (*close)(H5FD_t *file)
++      H5FD_t *(*open)(const char *name, unsigned flags, hid_t fapl, haddr_t maxaddr) except *
++      herr_t  (*close)(H5FD_t *file) except -1
+       int     (*cmp)(const H5FD_t *f1, const H5FD_t *f2)
+       herr_t  (*query)(const H5FD_t *f1, unsigned long *flags)
+       herr_t  (*get_type_map)(const H5FD_t *file, H5FD_mem_t *type_map)
+       haddr_t (*alloc)(H5FD_t *file, H5FD_mem_t type, hid_t dxpl_id, hsize_t size)
+       herr_t  (*free)(H5FD_t *file, H5FD_mem_t type, hid_t dxpl_id, haddr_t addr, hsize_t size)
+-      haddr_t (*get_eoa)(const H5FD_t *file, H5FD_mem_t type)
+-      herr_t  (*set_eoa)(H5FD_t *file, H5FD_mem_t type, haddr_t addr)
+-      haddr_t (*get_eof)(const H5FD_t *file, H5FD_mem_t type)
++      haddr_t (*get_eoa)(const H5FD_t *file, H5FD_mem_t type) noexcept
++      herr_t  (*set_eoa)(H5FD_t *file, H5FD_mem_t type, haddr_t addr) noexcept
++      haddr_t (*get_eof)(const H5FD_t *file, H5FD_mem_t type) noexcept
+       herr_t  (*get_handle)(H5FD_t *file, hid_t fapl, void**file_handle)
+-      herr_t  (*read)(H5FD_t *file, H5FD_mem_t type, hid_t dxpl, haddr_t addr, size_t size, void *buffer)
+-      herr_t  (*write)(H5FD_t *file, H5FD_mem_t type, hid_t dxpl, haddr_t addr, size_t size, const void *buffer)
+-      herr_t  (*flush)(H5FD_t *file, hid_t dxpl_id, hbool_t closing)
+-      herr_t  (*truncate)(H5FD_t *file, hid_t dxpl_id, hbool_t closing)
++      herr_t  (*read)(H5FD_t *file, H5FD_mem_t type, hid_t dxpl, haddr_t addr, size_t size, void *buffer) except *
++      herr_t  (*write)(H5FD_t *file, H5FD_mem_t type, hid_t dxpl, haddr_t addr, size_t size, const void *buffer) except *
++      herr_t  (*flush)(H5FD_t *file, hid_t dxpl_id, hbool_t closing) except -1
++      herr_t  (*truncate)(H5FD_t *file, hid_t dxpl_id, hbool_t closing) except -1
+       herr_t  (*lock)(H5FD_t *file, hbool_t rw)
+       herr_t  (*unlock)(H5FD_t *file)
+       H5FD_mem_t fl_map[<int>H5FD_MEM_NTYPES]
+diff --git a/h5py/h5fd.pyx b/h5py/h5fd.pyx
+index f1b4aade7..5e2ea9cd1 100644
+--- a/h5py/h5fd.pyx
++++ b/h5py/h5fd.pyx
+@@ -151,7 +151,7 @@ cdef herr_t H5FD_fileobj_set_eoa(H5FD_fileobj_t *f, H5FD_mem_t type, haddr_t add
+     f.eoa = addr
+     return 0
+ 
+-cdef haddr_t H5FD_fileobj_get_eof(const H5FD_fileobj_t *f, H5FD_mem_t type) except -1 with gil:  # HADDR_UNDEF
++cdef haddr_t H5FD_fileobj_get_eof(const H5FD_fileobj_t *f, H5FD_mem_t type) noexcept with gil:  # HADDR_UNDEF
+     (<object>f.fileobj).seek(0, libc.stdio.SEEK_END)
+     return (<object>f.fileobj).tell()
+ 
+@@ -191,22 +191,38 @@ cdef herr_t H5FD_fileobj_flush(H5FD_fileobj_t *f, hid_t dxpl, hbool_t closing) e
+ cdef H5FD_class_t info
+ memset(&info, 0, sizeof(info))
+ 
++# Cython doesn't support "except X" in casting definition currently
++ctypedef herr_t (*file_free_func_ptr)(void *) except -1
++
++ctypedef herr_t (*file_close_func_ptr)(H5FD_t *) except -1
++ctypedef haddr_t (*file_get_eoa_func_ptr)(const H5FD_t *, H5FD_mem_t) noexcept
++ctypedef herr_t (*file_set_eof_func_ptr)(H5FD_t *, H5FD_mem_t, haddr_t) noexcept
++ctypedef haddr_t (*file_get_eof_func_ptr)(const H5FD_t *, H5FD_mem_t) noexcept
++ctypedef herr_t (*file_read_func_ptr)(H5FD_t *, H5FD_mem_t, hid_t, haddr_t, size_t, void*) except -1
++ctypedef herr_t (*file_write_func_ptr)(H5FD_t *, H5FD_mem_t, hid_t, haddr_t, size_t, const void*) except -1
++ctypedef herr_t (*file_truncate_func_ptr)(H5FD_t *, hid_t, hbool_t) except -1
++ctypedef herr_t (*file_flush_func_ptr)(H5FD_t *, hid_t, hbool_t) except -1
++
++
+ info.name = 'fileobj'
+ info.maxaddr = libc.stdint.SIZE_MAX - 1
+ info.fc_degree = H5F_CLOSE_WEAK
+ info.fapl_size = sizeof(PyObject *)
+ info.fapl_get = <void *(*)(H5FD_t *)>H5FD_fileobj_fapl_get
+ info.fapl_copy = <void *(*)(const void *)>H5FD_fileobj_fapl_copy
+-info.fapl_free = <herr_t (*)(void *)>H5FD_fileobj_fapl_free
++
++info.fapl_free = <file_free_func_ptr>H5FD_fileobj_fapl_free
++
+ info.open = <H5FD_t *(*)(const char *name, unsigned flags, hid_t fapl, haddr_t maxaddr)>H5FD_fileobj_open
+-info.close = <herr_t (*)(H5FD_t *)>H5FD_fileobj_close
+-info.get_eoa = <haddr_t (*)(const H5FD_t *, H5FD_mem_t)>H5FD_fileobj_get_eoa
+-info.set_eoa = <herr_t (*)(H5FD_t *, H5FD_mem_t, haddr_t)>H5FD_fileobj_set_eoa
+-info.get_eof = <haddr_t (*)(const H5FD_t *, H5FD_mem_t)>H5FD_fileobj_get_eof
+-info.read = <herr_t (*)(H5FD_t *, H5FD_mem_t, hid_t, haddr_t, size_t, void *)>H5FD_fileobj_read
+-info.write = <herr_t (*)(H5FD_t *, H5FD_mem_t, hid_t, haddr_t, size_t, const void *)>H5FD_fileobj_write
+-info.truncate = <herr_t (*)(H5FD_t *, hid_t, hbool_t)>H5FD_fileobj_truncate
+-info.flush = <herr_t (*)(H5FD_t *, hid_t, hbool_t)>H5FD_fileobj_flush
++
++info.close = <file_close_func_ptr>H5FD_fileobj_close
++info.get_eoa = <file_get_eoa_func_ptr>H5FD_fileobj_get_eoa
++info.set_eoa = <file_set_eof_func_ptr>H5FD_fileobj_set_eoa
++info.get_eof = <file_get_eof_func_ptr>H5FD_fileobj_get_eof
++info.read = <file_read_func_ptr>H5FD_fileobj_read
++info.write = <file_write_func_ptr>H5FD_fileobj_write
++info.truncate = <file_truncate_func_ptr>H5FD_fileobj_truncate
++info.flush = <file_flush_func_ptr>H5FD_fileobj_flush
+ # H5FD_FLMAP_DICHOTOMY
+ info.fl_map = [H5FD_MEM_SUPER,  # default
+                H5FD_MEM_SUPER,  # super
+
+From 8a1c2ed5cfe7527244ec452ddb0cdb6b14e9595f Mon Sep 17 00:00:00 2001
+From: David Hoese <david.hoese@ssec.wisc.edu>
+Date: Tue, 28 Nov 2023 09:58:49 -0600
+Subject: [PATCH 3/9] Force Cython to version 3 during build
+
+---
+ pyproject.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index ee573d2fc..3bc08b762 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -1,6 +1,6 @@
+ [build-system]
+ requires = [
+-    "Cython >=0.29.31,<1",
++    "Cython >=3",
+     "oldest-supported-numpy",
+     "pkgconfig",
+     "setuptools >=61",
+
+From 2f7c05123ca3490dd2617b7a6e4545c1063e7082 Mon Sep 17 00:00:00 2001
+From: David Hoese <david.hoese@ssec.wisc.edu>
+Date: Tue, 28 Nov 2023 14:12:29 -0600
+Subject: [PATCH 4/9] Update remaining except/nogil cython 3 issues
+
+---
+ h5py/_errors.pxd | 2 +-
+ h5py/_errors.pyx | 4 ++--
+ h5py/_locks.pxi  | 2 +-
+ h5py/_proxy.pyx  | 4 ++--
+ 4 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/h5py/_errors.pxd b/h5py/_errors.pxd
+index df9c1bbe4..f56d7353a 100644
+--- a/h5py/_errors.pxd
++++ b/h5py/_errors.pxd
+@@ -425,4 +425,4 @@ ctypedef struct err_cookie:
+ cdef err_cookie set_error_handler(err_cookie handler)
+ 
+ # Set the default error handler set by silence_errors/unsilence_errors
+-cdef void set_default_error_handler() nogil
++cdef void set_default_error_handler() noexcept nogil
+diff --git a/h5py/_errors.pyx b/h5py/_errors.pyx
+index c3bd184ee..2a7524b2c 100644
+--- a/h5py/_errors.pyx
++++ b/h5py/_errors.pyx
+@@ -94,7 +94,7 @@ cdef struct err_data_t:
+     H5E_error_t err
+     int n
+ 
+-cdef herr_t walk_cb(unsigned int n, const H5E_error_t *desc, void *e) nogil noexcept:
++cdef herr_t walk_cb(unsigned int n, const H5E_error_t *desc, void *e) noexcept nogil:
+ 
+     cdef err_data_t *ee = <err_data_t*>e
+ 
+@@ -168,7 +168,7 @@ cdef err_cookie _error_handler  # Store error handler used by h5py
+ _error_handler.func = NULL
+ _error_handler.data = NULL
+ 
+-cdef void set_default_error_handler() nogil:
++cdef void set_default_error_handler() noexcept nogil:
+     """Set h5py's current default error handler"""
+     H5Eset_auto(<hid_t>H5E_DEFAULT, _error_handler.func, _error_handler.data)
+ 
+diff --git a/h5py/_locks.pxi b/h5py/_locks.pxi
+index bc8b2dd92..c6cea88dd 100644
+--- a/h5py/_locks.pxi
++++ b/h5py/_locks.pxi
+@@ -111,7 +111,7 @@ cdef bint _acquire_lock(FastRLock lock, long current_thread, int wait) nogil:
+     lock._count = 1
+     return 1
+ 
+-cdef inline void unlock_lock(FastRLock lock) nogil:
++cdef inline void unlock_lock(FastRLock lock) noexcept nogil:
+     # Note that this function *must* hold the GIL when being called.
+     # We just use 'nogil' in the signature to make sure that no Python
+     # code execution slips in that might free the GIL
+diff --git a/h5py/_proxy.pyx b/h5py/_proxy.pyx
+index 46b4fe0d8..e40504f53 100644
+--- a/h5py/_proxy.pyx
++++ b/h5py/_proxy.pyx
+@@ -241,7 +241,7 @@ ctypedef struct h5py_scatter_t:
+     void* buf
+ 
+ cdef herr_t h5py_scatter_cb(void* elem, hid_t type_id, unsigned ndim,
+-                const hsize_t *point, void *operator_data) nogil except -1:
++                const hsize_t *point, void *operator_data) except -1 nogil:
+     cdef h5py_scatter_t* info = <h5py_scatter_t*>operator_data
+ 
+     memcpy(elem, (<char*>info[0].buf)+((info[0].i)*(info[0].elsize)),
+@@ -252,7 +252,7 @@ cdef herr_t h5py_scatter_cb(void* elem, hid_t type_id, unsigned ndim,
+     return 0
+ 
+ cdef herr_t h5py_gather_cb(void* elem, hid_t type_id, unsigned ndim,
+-                const hsize_t *point, void *operator_data) nogil except -1:
++                const hsize_t *point, void *operator_data) except -1 nogil:
+     cdef h5py_scatter_t* info = <h5py_scatter_t*>operator_data
+ 
+     memcpy((<char*>info[0].buf)+((info[0].i)*(info[0].elsize)), elem,
+
+From d6b267d980b391561047af0e573d26140c7d35bd Mon Sep 17 00:00:00 2001
+From: David Hoese <david.hoese@ssec.wisc.edu>
+Date: Fri, 1 Dec 2023 09:49:29 -0600
+Subject: [PATCH 5/9] Fix get_eof exception definition
+
+---
+ h5py/api_types_hdf5.pxd | 4 ++--
+ h5py/h5fd.pyx           | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/h5py/api_types_hdf5.pxd b/h5py/api_types_hdf5.pxd
+index 6e2fc2399..099e0f588 100644
+--- a/h5py/api_types_hdf5.pxd
++++ b/h5py/api_types_hdf5.pxd
+@@ -272,7 +272,7 @@ cdef extern from "hdf5.h":
+       herr_t  (*free)(H5FD_t *file, H5FD_mem_t type, hid_t dxpl_id, haddr_t addr, hsize_t size)
+       haddr_t (*get_eoa)(const H5FD_t *file, H5FD_mem_t type) noexcept
+       herr_t  (*set_eoa)(H5FD_t *file, H5FD_mem_t type, haddr_t addr) noexcept
+-      haddr_t (*get_eof)(const H5FD_t *file, H5FD_mem_t type) noexcept
++      haddr_t (*get_eof)(const H5FD_t *file, H5FD_mem_t type) except -1
+       herr_t  (*get_handle)(H5FD_t *file, hid_t fapl, void**file_handle)
+       herr_t  (*read)(H5FD_t *file, H5FD_mem_t type, hid_t dxpl, haddr_t addr, size_t size, void *buffer) except *
+       herr_t  (*write)(H5FD_t *file, H5FD_mem_t type, hid_t dxpl, haddr_t addr, size_t size, const void *buffer) except *
+@@ -310,7 +310,7 @@ cdef extern from "hdf5.h":
+       herr_t  (*free)(H5FD_t *file, H5FD_mem_t type, hid_t dxpl_id, haddr_t addr, hsize_t size)
+       haddr_t (*get_eoa)(const H5FD_t *file, H5FD_mem_t type) noexcept
+       herr_t  (*set_eoa)(H5FD_t *file, H5FD_mem_t type, haddr_t addr) noexcept
+-      haddr_t (*get_eof)(const H5FD_t *file, H5FD_mem_t type) noexcept
++      haddr_t (*get_eof)(const H5FD_t *file, H5FD_mem_t type) except -1
+       herr_t  (*get_handle)(H5FD_t *file, hid_t fapl, void**file_handle)
+       herr_t  (*read)(H5FD_t *file, H5FD_mem_t type, hid_t dxpl, haddr_t addr, size_t size, void *buffer) except *
+       herr_t  (*write)(H5FD_t *file, H5FD_mem_t type, hid_t dxpl, haddr_t addr, size_t size, const void *buffer) except *
+diff --git a/h5py/h5fd.pyx b/h5py/h5fd.pyx
+index 5e2ea9cd1..d39cf68f2 100644
+--- a/h5py/h5fd.pyx
++++ b/h5py/h5fd.pyx
+@@ -151,7 +151,7 @@ cdef herr_t H5FD_fileobj_set_eoa(H5FD_fileobj_t *f, H5FD_mem_t type, haddr_t add
+     f.eoa = addr
+     return 0
+ 
+-cdef haddr_t H5FD_fileobj_get_eof(const H5FD_fileobj_t *f, H5FD_mem_t type) noexcept with gil:  # HADDR_UNDEF
++cdef haddr_t H5FD_fileobj_get_eof(const H5FD_fileobj_t *f, H5FD_mem_t type) except -1 with gil:  # HADDR_UNDEF
+     (<object>f.fileobj).seek(0, libc.stdio.SEEK_END)
+     return (<object>f.fileobj).tell()
+ 
+@@ -197,7 +197,7 @@ ctypedef herr_t (*file_free_func_ptr)(void *) except -1
+ ctypedef herr_t (*file_close_func_ptr)(H5FD_t *) except -1
+ ctypedef haddr_t (*file_get_eoa_func_ptr)(const H5FD_t *, H5FD_mem_t) noexcept
+ ctypedef herr_t (*file_set_eof_func_ptr)(H5FD_t *, H5FD_mem_t, haddr_t) noexcept
+-ctypedef haddr_t (*file_get_eof_func_ptr)(const H5FD_t *, H5FD_mem_t) noexcept
++ctypedef haddr_t (*file_get_eof_func_ptr)(const H5FD_t *, H5FD_mem_t) except -1
+ ctypedef herr_t (*file_read_func_ptr)(H5FD_t *, H5FD_mem_t, hid_t, haddr_t, size_t, void*) except -1
+ ctypedef herr_t (*file_write_func_ptr)(H5FD_t *, H5FD_mem_t, hid_t, haddr_t, size_t, const void*) except -1
+ ctypedef herr_t (*file_truncate_func_ptr)(H5FD_t *, hid_t, hbool_t) except -1
+
+From f0aa23d35b69343d3ca0f7697d96e42cc2403c73 Mon Sep 17 00:00:00 2001
+From: David Hoese <david.hoese@ssec.wisc.edu>
+Date: Fri, 1 Dec 2023 21:09:23 -0600
+Subject: [PATCH 6/9] Fix numpy warning about array to scalar conversion
+
+---
+ h5py/tests/test_dataset.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/h5py/tests/test_dataset.py b/h5py/tests/test_dataset.py
+index e104dd53d..0ffa5c800 100644
+--- a/h5py/tests/test_dataset.py
++++ b/h5py/tests/test_dataset.py
+@@ -1939,9 +1939,9 @@ def test_numpy_commutative(self,):
+         dset = self.f.create_dataset("test", shape, dtype=float,
+                                      data=np.random.rand(*shape))
+ 
+-        # grab a value from the elements, ie dset[0]
++        # grab a value from the elements, ie dset[0, 0]
+         # check that mask arrays are commutative wrt ==, !=
+-        val = np.float64(dset[0])
++        val = np.float64(dset[0, 0])
+ 
+         assert np.all((val == dset) == (dset == val))
+         assert np.all((val != dset) == (dset != val))
+
+From 51d3c3a7db33ab3ee9e69d680cd08a149dd05335 Mon Sep 17 00:00:00 2001
+From: David Hoese <david.hoese@ssec.wisc.edu>
+Date: Fri, 1 Dec 2023 21:09:37 -0600
+Subject: [PATCH 7/9] Fix compatibility with numpy 2
+
+---
+ h5py/api_compat.h | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
+
+diff --git a/h5py/api_compat.h b/h5py/api_compat.h
+index 52917f4d0..a359e8278 100644
+--- a/h5py/api_compat.h
++++ b/h5py/api_compat.h
+@@ -24,7 +24,6 @@ typedef void *PyMPI_MPI_Message;
+ #include <stddef.h>
+ #include "Python.h"
+ #include "numpy/arrayobject.h"
+-#include "hdf5.h"
+ 
+ /* The HOFFSET macro can't be used from Cython. */
+ 
+@@ -35,14 +34,14 @@ typedef void *PyMPI_MPI_Message;
+ #define h5py_size_n256 (sizeof(npy_complex256))
+ #endif
+ 
+-#define h5py_offset_n64_real (HOFFSET(npy_complex64, real))
+-#define h5py_offset_n64_imag (HOFFSET(npy_complex64, imag))
+-#define h5py_offset_n128_real (HOFFSET(npy_complex128, real))
+-#define h5py_offset_n128_imag (HOFFSET(npy_complex128, imag))
++#define h5py_offset_n64_real (0)
++#define h5py_offset_n64_imag (sizeof(float))
++#define h5py_offset_n128_real (0)
++#define h5py_offset_n128_imag (sizeof(double))
+ 
+ #ifdef NPY_COMPLEX256
+-#define h5py_offset_n256_real (HOFFSET(npy_complex256, real))
+-#define h5py_offset_n256_imag (HOFFSET(npy_complex256, imag))
++#define h5py_offset_n256_real (0)
++#define h5py_offset_n256_imag (sizeof(long double))
+ #endif
+ 
+ #endif
+
+From 502be1786591076ad7012e6abe1576d5f6ba48a6 Mon Sep 17 00:00:00 2001
+From: David Hoese <david.hoese@ssec.wisc.edu>
+Date: Mon, 4 Dec 2023 13:52:52 -0600
+Subject: [PATCH 8/9] Add explicit noexcept to lock functions
+
+---
+ h5py/_locks.pxi | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/h5py/_locks.pxi b/h5py/_locks.pxi
+index c6cea88dd..1ec4e2fc9 100644
+--- a/h5py/_locks.pxi
++++ b/h5py/_locks.pxi
+@@ -63,7 +63,7 @@ cdef class FastRLock:
+         return self._owner == pythread.PyThread_get_thread_ident()
+ 
+ 
+-cdef inline bint lock_lock(FastRLock lock, long current_thread, bint blocking) nogil:
++cdef inline bint lock_lock(FastRLock lock, long current_thread, bint blocking) noexcept nogil:
+     # Note that this function *must* hold the GIL when being called.
+     # We just use 'nogil' in the signature to make sure that no Python
+     # code execution slips in that might free the GIL
+@@ -83,7 +83,7 @@ cdef inline bint lock_lock(FastRLock lock, long current_thread, bint blocking) n
+         lock, current_thread,
+         pythread.WAIT_LOCK if blocking else pythread.NOWAIT_LOCK)
+ 
+-cdef bint _acquire_lock(FastRLock lock, long current_thread, int wait) nogil:
++cdef bint _acquire_lock(FastRLock lock, long current_thread, int wait) noexcept nogil:
+     # Note that this function *must* hold the GIL when being called.
+     # We just use 'nogil' in the signature to make sure that no Python
+     # code execution slips in that might free the GIL
+
