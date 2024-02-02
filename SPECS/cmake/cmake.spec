@@ -12,10 +12,10 @@ Source0:        https://github.com/Kitware/CMake/releases/download/v%{version}/%
 Source1:        macros.cmake
 Patch0:         disableUnstableUT.patch
 # We could use --system-curl instead of patching, but unfortuately curl isn't currently available in time during the toolchain build.
-Patch2:         CVE-2023-23914-0001-share-add-sharing-of-HSTS-cache-among-handles.patch
-Patch3:         CVE-2023-23914-0002-hsts-handle-adding-the-same-host-name-again.patch
-Patch4:         CVE-2023-28322-lib-unify-the-upload-method-handling.patch
-Patch8:         cve-2023-44487.patch
+# Patch2:         CVE-2023-23914-0001-share-add-sharing-of-HSTS-cache-among-handles.patch
+# Patch3:         CVE-2023-23914-0002-hsts-handle-adding-the-same-host-name-again.patch
+# Patch4:         CVE-2023-28322-lib-unify-the-upload-method-handling.patch
+# Patch8:         cve-2023-44487.patch
 BuildRequires:  bzip2
 BuildRequires:  bzip2-devel
 BuildRequires:  curl
@@ -81,8 +81,9 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %{_prefix}/doc/%{name}-*/*
 
 %changelog
-* Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.28.2-1
+* Fri Feb 02 2024 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 3.28.2-1
 - Auto-upgrade to 3.28.2 - Upgrades for 3.0-dev
+- Remove old CVE patches that don't apply
 
 * Thu Oct 19 2023 Dan Streetman <ddstreet@ieee.org> - 3.21.4-10
 - Patch vendored nghttp2 for CVE-2023-44487
