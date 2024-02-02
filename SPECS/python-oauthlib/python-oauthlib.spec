@@ -1,13 +1,13 @@
 Summary:        An implementation of the OAuth request-signing logic
 Name:           python-oauthlib
-Version:        2.1.0
-Release:        7%{?dist}
+Version:        3.2.2
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://github.com/oauthlib/oauthlib
-Source0:        https://files.pythonhosted.org/packages/df/5f/3f4aae7b28db87ddef18afed3b71921e531ca288dc604eb981e9ec9f8853/oauthlib-%{version}.tar.gz
+Source0:        https://github.com/oauthlib/oauthlib/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 %if %{with_check}
 BuildRequires:  python3-pip
@@ -45,6 +45,9 @@ pip3 install mock wheel
 %{python3_sitelib}/*
 
 %changelog
+* Fri Feb 02 2024 Henry Li <lihl@microsoft.com> - 3.2.2-1
+- Upgrade to version 3.2.2
+
 * Wed Feb 09 2022 Muhammad Falak <mwani@microsoft.com> - 2.1.0-7
 - Add an explicit BR on 'pip'
 - Install 'wheel' to enable ptest
