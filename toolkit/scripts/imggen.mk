@@ -119,6 +119,7 @@ $(image_package_cache_summary): $(go-imagepkgfetcher) $(chroot_worker) $(toolcha
 		--base-dir=$(CONFIG_BASE_DIR) \
 		--log-level=$(LOG_LEVEL) \
 		--log-file=$(LOGS_DIR)/imggen/imagepkgfetcher.log \
+		--log-color=$(LOG_COLOR) \
 		--rpm-dir=$(RPMS_DIR) \
 		--tmp-dir=$(image_fetcher_tmp_dir) \
 		--toolchain-rpms-dir="$(TOOLCHAIN_RPMS_DIR)" \
@@ -154,6 +155,7 @@ $(STATUS_FLAGS_DIR)/imager_disk_output.flag: $(go-imager) $(image_package_cache_
 		--base-dir=$(CONFIG_BASE_DIR) \
 		--log-level=$(LOG_LEVEL) \
 		--log-file=$(LOGS_DIR)/imggen/imager.log \
+		--log-color=$(LOG_COLOR) \
 		--local-repo $(local_and_external_rpm_cache) \
 		--tdnf-worker $(chroot_worker) \
 		--repo-file=$(imggen_local_repo) \
@@ -184,6 +186,7 @@ image: $(imager_disk_output_dir) $(imager_disk_output_files) $(go-roast) $(depen
 		--release-version $(RELEASE_VERSION) \
 		--log-level=$(LOG_LEVEL) \
 		--log-file=$(LOGS_DIR)/imggen/roast.log \
+		--log-color=$(LOG_COLOR) \
 		--image-tag=$(IMAGE_TAG) \
 		--cpu-prof-file=$(PROFILE_DIR)/roast.cpu.pprof \
 		--mem-prof-file=$(PROFILE_DIR)/roast.mem.pprof \
@@ -200,6 +203,7 @@ $(image_external_package_cache_summary): $(cached_file) $(go-imagepkgfetcher) $(
 		--base-dir=$(CONFIG_BASE_DIR) \
 		--log-level=$(LOG_LEVEL) \
 		--log-file=$(LOGS_DIR)/imggen/externalimagepkgfetcher.log \
+		--log-color=$(LOG_COLOR) \
 		--rpm-dir=$(RPMS_DIR) \
 		--tmp-dir=$(image_fetcher_tmp_dir) \
 		--toolchain-rpms-dir="$(TOOLCHAIN_RPMS_DIR)" \
@@ -247,6 +251,7 @@ iso: $(initrd_img) $(iso_deps)
 		--iso-repo $(local_and_external_rpm_cache) \
 		--log-level=$(LOG_LEVEL) \
 		--log-file=$(LOGS_DIR)/imggen/isomaker.log \
+		--log-color=$(LOG_COLOR) \
 		$(if $(filter y,$(UNATTENDED_INSTALLER)),--unattended-install) \
 		--output-dir $(artifact_dir) \
 		--image-tag=$(IMAGE_TAG)
