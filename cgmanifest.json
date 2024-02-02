@@ -30079,8 +30079,8 @@
         "type": "other",
         "other": {
           "name": "xorg-x11-xtrans-devel",
-          "version": "1.4.0",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/xtrans-1.4.0.tar.bz2"
+          "version": "1.5.0",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/xtrans-1.5.0.tar.gz"
         }
       }
     },
