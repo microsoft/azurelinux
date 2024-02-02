@@ -11,7 +11,7 @@ import (
 
 type User struct {
 	Name                string   `yaml:"name"`
-	UID                 *int     `yaml:"UID"`
+	UID                 *int     `yaml:"uid"`
 	PasswordHashed      bool     `yaml:"passwordHashed"`
 	Password            string   `yaml:"password"`
 	PasswordPath        string   `yaml:"passwordPath"`

@@ -161,7 +161,7 @@ func UIDIsValid(uid int) error {
 	)
 
 	if uid < uidLowerBound || uid > uidUpperBound {
-		return fmt.Errorf("invalid value for UID (%d), not within [%d, %d]", uid, uidLowerBound, uidUpperBound)
+		return fmt.Errorf("invalid value for uid (%d), not within [%d, %d]", uid, uidLowerBound, uidUpperBound)
 	}
 
 	return nil
@@ -175,7 +175,7 @@ func PasswordExpiresDaysIsValid(passwordExpiresDays int64) error {
 		upperBoundChage = 99999
 	)
 	if passwordExpiresDays < noExpiration || passwordExpiresDays > upperBoundChage {
-		return fmt.Errorf("invalid value for PasswordExpiresDays (%d), not within [%d, %d]", passwordExpiresDays, noExpiration, upperBoundChage)
+		return fmt.Errorf("invalid value for passwordExpiresDays (%d), not within [%d, %d]", passwordExpiresDays, noExpiration, upperBoundChage)
 	}
 	return nil
 }
