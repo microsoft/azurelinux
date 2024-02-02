@@ -45,7 +45,7 @@ make install DESTDIR=%{buildroot} libdir=%{_libdir}
 
 %changelog
 * Thu Feb 02 2024 Nan Liu <liunan@microsoft.com> - 0.378-1
-- Upgrade to 0.373
+- Upgrade to 0.378
 - Update License
 - Add devel package with pkgconfig file and BuildRequires
 
