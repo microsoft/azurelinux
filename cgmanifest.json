@@ -30029,8 +30029,8 @@
         "type": "other",
         "other": {
           "name": "xorg-x11-util-macros",
-          "version": "1.19.2",
-          "downloadUrl": "https://www.x.org/pub/individual/util/util-macros-1.19.2.tar.bz2"
+          "version": "1.20.0",
+          "downloadUrl": "https://www.x.org/pub/individual/util/util-macros-1.20.0.tar.xz"
         }
       }
     },
