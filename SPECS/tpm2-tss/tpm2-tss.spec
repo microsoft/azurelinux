@@ -16,7 +16,7 @@ Source0:        https://github.com/tpm2-software/tpm2-tss/releases/download/%{ve
 BuildRequires:  json-c-devel
 BuildRequires:  openssl-devel
 BuildRequires:  shadow-utils
-BuildRequires:  systemd-devel
+BuildRequires:  systemd-bootstrap-devel
 Requires:       json-c
 Requires:       openssl
 Requires(postun): %{_sbindir}/groupdel
