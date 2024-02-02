@@ -73,9 +73,9 @@ type LogFlags struct {
 
 // initLogFile initializes the common logger with a file
 func initLogFile(filePath string, color string) (err error) {
-	useColors := true
-	if color == colorModeNever {
-		useColors = false
+	useColors := false
+	if color == colorModeAlways {
+		useColors = true
 	}
 	const (
 		noToolName = ""
