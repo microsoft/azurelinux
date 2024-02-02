@@ -57,8 +57,7 @@ function create_distroless_container {
     marinaraSrcDir="$WORK_DIR/$marinara-src"
 
     echo "+++ Clone marinara repo"
-    # TODO: Get the marinara image from the latest build
-    git clone -b 'mandeepsplaha/add-support-for-local-rpms' "https://github.com/microsoft/$marinara.git" "$marinaraSrcDir"
+    git clone "https://github.com/microsoft/$marinara.git" "$marinaraSrcDir"
     
     # It is important to operate from the $WORK_DIR to ensure that docker can access the files.
     pushd "$WORK_DIR" > /dev/null
@@ -73,6 +72,7 @@ function create_distroless_container {
     # WORK_DIR has a directory named 'Stage' which created inside prepare_docker_directory function
     # This directory has a directory named RPMS which contains the RPMs to be installed in the container.
     # The path to rpms is /Stage/RPMS
+    rpmsPath="/Stage/RPMS"
 
     # Create standard container
     DockerBuild \
@@ -82,7 +82,7 @@ function create_distroless_container {
         "$DISTROLESS_PACKAGES_TO_INSTALL" \
         "$DISTROLESS_PACKAGES_TO_HOLD_BACK" \
         false \
-        "/Stage/RPMS"
+        "$rpmsPath"
 
     # Create debug container
     DockerBuild \
@@ -92,7 +92,7 @@ function create_distroless_container {
         "$DISTROLESS_PACKAGES_TO_INSTALL" \
         "$DISTROLESS_PACKAGES_TO_HOLD_BACK" \
         false \
-        "/Stage/RPMS"
+        "$rpmsPath"
 
     # Create nonroot container
     DockerBuild \
@@ -102,7 +102,7 @@ function create_distroless_container {
         "$DISTROLESS_PACKAGES_TO_INSTALL" \
         "$DISTROLESS_PACKAGES_TO_HOLD_BACK" \
         true \
-        "/Stage/RPMS"
+        "$rpmsPath"
 
     # Create debug nonroot container
     DockerBuild \
@@ -112,7 +112,7 @@ function create_distroless_container {
         "$DISTROLESS_PACKAGES_TO_INSTALL" \
         "$DISTROLESS_PACKAGES_TO_HOLD_BACK" \
         true \
-        "/Stage/RPMS"
+        "$rpmsPath"
 
     popd > /dev/null
     
