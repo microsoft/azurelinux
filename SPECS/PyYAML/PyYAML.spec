@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Libraries
 URL:            https://github.com/yaml/pyyaml
-Source0:        https://github.com/yaml/pyyaml/archive/%{version}.tar.gz
+Source0:        https://github.com/yaml/pyyaml/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  libyaml-devel
 BuildRequires:  python3
 #BuildRequires:  python3-Cython
@@ -33,7 +33,7 @@ PyYAML is applicable for a broad range of tasks from complex
 configuration files to object serialization and persistence.
 
 %prep
-%autosetup -p 1 -n PyYAML-%{version}
+%autosetup -p 1 -n pyyaml-%{version}
 #find -type f -name "*.c" -delete -print
 
 %build

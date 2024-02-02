@@ -24855,7 +24855,7 @@
         "other": {
           "name": "PyYAML",
           "version": "6.0.1",
-          "downloadUrl": "https://github.com/yaml/pyyaml/archive/6.0.1.tar.gz"
+          "downloadUrl": "https://github.com/yaml/pyyaml/archive/refs/tags/6.0.1.tar.gz"
         }
       }
     },
