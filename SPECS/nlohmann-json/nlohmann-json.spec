@@ -1,7 +1,7 @@
 Summary:        Modern C++11 JSON library
 Name:           nlohmann-json
-Version:        3.10.4
-Release:        2%{?dist}
+Version:        3.11.3
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -49,6 +49,9 @@ make test -C build
 %{_libdir}/pkgconfig/nlohmann_json.pc
 
 %changelog
+* Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.11.3-1
+- Auto-upgrade to 3.11.3 - Package upgrade for Azure Linux 3.0
+
 * Fri Mar 04 2022 Muhammad Falak <mwani@microsoft.com> - 3.10.4-2
 - Switch to `autosetup -S git`
 - Add an explicit BR on `git` to enable ptest
