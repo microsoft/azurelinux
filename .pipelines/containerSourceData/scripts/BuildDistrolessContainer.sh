@@ -21,6 +21,7 @@ function DockerBuild {
     fi
 
     # Create container
+    echo "+++ Create container $containerName"
     docker build . \
         -t "$containerName" \
         -f "$marinaraSrcDir/dockerfiles/dockerfile-new-image" \
@@ -53,6 +54,8 @@ function create_distroless_container {
 
     marinara="marinara"
     marinaraSrcDir="$WORK_DIR/$marinara-src"
+
+    echo "+++ Clone marinara repo"
     # TODO: Get the marinara image from the latest build
     git clone -b 'mandeepsplaha/add-support-for-local-rpms' "https://github.com/microsoft/$marinara.git" "$marinaraSrcDir"
     
