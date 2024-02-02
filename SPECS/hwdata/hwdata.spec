@@ -10,6 +10,7 @@ URL:            https://github.com/vcrhonek/hwdata
 #Source0:       %%{url}/archive/v%%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 BuildArch:      noarch
+BuildRequires:  make
 
 %description
 hwdata contains various hardware identification and configuration data,
@@ -46,7 +47,7 @@ make install DESTDIR=%{buildroot} libdir=%{_libdir}
 * Thu Feb 02 2024 Nan Liu <liunan@microsoft.com> - 0.378-1
 - Upgrade to 0.373
 - Update License
-- Add devel package with pkgconfig file
+- Add devel package with pkgconfig file and BuildRequires
 
 * Fri Feb 18 2022 Cameron Baird <cameronbaird@microsoft.com> - 0.356-1
 - Update source to v0.356
