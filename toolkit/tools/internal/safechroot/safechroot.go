@@ -140,18 +140,6 @@ func NewOverlayMountPoint(chrootDir, source, target, lowerDir, upperDir, workDir
 	return
 }
 
-func (m *MountPoint) GetSource() string {
-	return m.source
-}
-
-func (m *MountPoint) GetFSType() string {
-	return m.fstype
-}
-
-func (m *MountPoint) GetTarget() string {
-	return m.target
-}
-
 // NewChroot creates a new Chroot struct
 func NewChroot(rootDir string, isExistingDir bool) *Chroot {
 	// get chroot folder

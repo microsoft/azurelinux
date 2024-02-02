@@ -27,7 +27,6 @@ func connectToExistingImage(imageFilePath string, buildDir string, chrootDirName
 		imageConnection.Close()
 		return nil, err
 	}
-
 	return imageConnection, nil
 }
 
