@@ -1,3 +1,4 @@
+%global debug_package %{nil}
 Summary:        YAML parser and emitter for Python
 Name:           PyYAML
 Version:        6.0.1
