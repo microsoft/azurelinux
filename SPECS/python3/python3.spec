@@ -258,7 +258,7 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %exclude %{_libdir}/python%{majmin}/test
 %exclude %{_libdir}/python%{majmin}/lib-dynload/_ctypes_test.*.so
 
-%exclude %{_libdir}/python3.9
+#%%exclude %%{_libdir}/python3.9
 
 %files libs
 %defattr(-,root,root)
