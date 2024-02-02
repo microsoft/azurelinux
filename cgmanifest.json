@@ -4620,8 +4620,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.20.10",
-          "downloadUrl": "https://golang.org/dl/go1.20.10.src.tar.gz"
+          "version": "1.21.6",
+          "downloadUrl": "https://golang.org/dl/go1.21.6.src.tar.gz"
         }
       }
     },
