@@ -58,6 +58,7 @@ chmod a-x examples/yaml-highlight/yaml_hl.py
 %changelog
 * Thu Feb 01 2024 Henry Li <lihl@microsoft.com> - 6.0.1-1
 - Upgrade to version 6.0.1
+- Fix Source0
 
 * Tue Nov 14 2023 Andrew Phelps <anphel@microsoft.com> - 5.3.1-1
 - Upgrade to version 5.3.1

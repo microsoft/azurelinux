@@ -47,6 +47,7 @@ pip3 install mock wheel
 %changelog
 * Fri Feb 02 2024 Henry Li <lihl@microsoft.com> - 3.2.2-1
 - Upgrade to version 3.2.2
+- Fix Source0
 
 * Wed Feb 09 2022 Muhammad Falak <mwani@microsoft.com> - 2.1.0-7
 - Add an explicit BR on 'pip'

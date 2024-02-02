@@ -171,6 +171,10 @@ fi
 - Upgrade to v4.3.1
 - Change to using autosetup
 - Apply patch to disable hardcoded python module versioning
+- Add multiple python packages as build requirements
+- Add --with-python-packages=system to load the python modules in the system instead of
+  from virtual environment which is default setting
+- Add README.md to python3-syslog-ng sub-package
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.33.2-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
