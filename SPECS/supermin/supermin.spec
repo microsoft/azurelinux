@@ -130,7 +130,7 @@ make check || {
 
 %changelog
 * Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.2.2-1
-- Auto-upgrade to 5.2.2 - Upgrade to 5.2.2 in Mariner 3.0
+- Auto-upgrade to 5.2.2
 
 * Thu Feb 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 5.2.1-11
 - Fix patch file with new changed azure linux OS files.
