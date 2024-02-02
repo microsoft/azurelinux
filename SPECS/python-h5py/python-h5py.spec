@@ -19,10 +19,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.h5py.org/
 Source0:        https://files.pythonhosted.org/packages/source/h/h5py/h5py-%{version}.tar.gz
-# drop the unnecessary workaround for float128 type after
-# https://fedoraproject.org/wiki/Changes/PPC64LE_Float128_Transition
-# in F-36
-Patch0:         h5py-3.7.0-ppc-float128.patch
 BuildRequires:  gcc
 BuildRequires:  hdf5-devel
 BuildRequires:  liblzf-devel
