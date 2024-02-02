@@ -48,8 +48,7 @@ type downloadResult struct {
 var (
 	app = kingpin.New("precacher", "Pre-hydrate RPM cache for a given set of repo URLs and a RPM snapshot file.")
 
-	logFile       = exe.LogFileFlag(app)
-	logLevel      = exe.LogLevelFlag(app)
+	logFlags      = exe.SetupLogFlags(app)
 	profFlags     = exe.SetupProfileFlags(app)
 	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
 
@@ -68,7 +67,7 @@ var (
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel)
+	logger.InitBestEffort(logFlags)
 
 	prof, err := profile.StartProfiling(profFlags)
 	if err != nil {
