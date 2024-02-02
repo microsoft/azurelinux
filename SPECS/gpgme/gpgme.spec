@@ -80,11 +80,12 @@ cd tests
 
 %files -n python3-gpg
 %doc lang/python/README
-#%%{python3_sitearch}/gpg-*.egg
-#%%{python3_sitearch}/gpg/
 %{python3_sitearch}/gpg-%{version}-*
 
 %changelog
+* Fri Feb 02 2024 Andrew Phelps <anphel@microsoft.com> - 1.23.2-2
+- Fix python3-gpg files location
+
 * Tue Nov 28 2023 Andrew Phelps <anphel@microsoft.com> - 1.23.2-1
 - Upgrade to version 1.23.2
 

@@ -658,16 +658,8 @@ pushd Python-3.12.0
 ./configure --prefix=/usr       \
             --enable-shared     \
             --with-system-expat
-#           --with-system-ffi
-#           --enable-optimizations
-#              Not needed?
-#           --with-ensurepip
-#              Include pip and setuptools?
 make -j$(nproc)
 make install
-#chmod -v 755 /usr/lib/libpython3.9.so.1.0
-#chmod -v 755 /usr/lib/libpython3.so
-#ln -sfv pip3.9 /usr/bin/pip3
 popd
 rm -rf Python-3.12.0
 touch /logs/status_python312_complete
@@ -676,44 +668,9 @@ echo "Debug - check python 3.12 install"
 ls -la /usr/bin/p*
 ls -la /usr/bin/pip3
 ls -la /usr/lib/libpython*
+ls -la /usr/lib/python3.12/site-packages
 
 # https://www.linuxfromscratch.org/lfs/downloads/development/LFS-BOOK-r12.0-190-NOCHUNKS.html#ch-system-Python
-
-# 8.52. Flit-Core-3.9.0
-echo Flit-Core-3.9.0
-tar xf flit_core-3.9.0.tar.gz
-pushd flit_core-3.9.0
-pip3 wheel -w dist --no-cache-dir --no-build-isolation --no-deps $PWD
-pip3 install --no-index --no-user --find-links dist flit_core
-popd
-rm -rf flit_core-3.9.0
-touch /logs/status_flit_core_390_complete
-
-# 8.53. Wheel-0.42.0
-echo wheel-0.42.0
-tar xf wheel-0.42.0.tar.gz
-pushd wheel-0.42.0
-pip3 wheel -w dist --no-cache-dir --no-build-isolation --no-deps $PWD
-pip3 install --no-index --find-links=dist wheel
-popd
-rm -rf wheel-0.42.0
-touch /logs/status_wheel_0420_complete
-
-# 8.54. Setuptools-69.0.3
-echo setuptools-69.0.3
-tar xf setuptools-69.0.3.tar.gz
-pushd setuptools-69.0.3
-pip3 wheel -w dist --no-cache-dir --no-build-isolation --no-deps $PWD
-pip3 install --no-index --find-links dist setuptools
-popd
-rm -rf setuptools-69.0.3
-touch /logs/status_setuptools_6903_complete
-
-echo "Debug - check setuptools and wheel install"
-ls -la /usr/lib/python3.12/site-packages
-ls -la /usr/lib/python3.12/site-packages/setuptools
-ls -la /usr/lib/python3.12/site-packages/wheel
-ls -la /usr/lib/python3.12/site-packages/flit_core
 
 echo Coreutils-9.4
 tar xf coreutils-9.4.tar.xz

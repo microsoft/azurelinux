@@ -488,10 +488,7 @@ build_rpm_in_chroot_no_install curl
 # cracklib needs python3-setuptools (installed with python3)
 build_rpm_in_chroot_no_install cracklib
 
-# pam needs libxcrypt
-#build_rpm_in_chroot_no_install libxcrypt
-#chroot_and_install_rpms libxcrypt
-# pam needs cracklib
+# pam needs cracklib and libxcrypt (installed above)
 chroot_and_install_rpms cracklib
 build_rpm_in_chroot_no_install cmake
 build_rpm_in_chroot_no_install pam
@@ -582,7 +579,7 @@ chroot_and_install_rpms libassuan
 chroot_and_install_rpms libksba
 build_rpm_in_chroot_no_install gnupg2
 
-# gpgme needs gnupg2 and python3 and setuptools
+# gpgme needs gnupg2 and python3
 chroot_and_install_rpms gnupg2
 build_rpm_in_chroot_no_install gpgme
 
