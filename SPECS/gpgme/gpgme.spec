@@ -1,7 +1,7 @@
 Summary:        High-Level Crypto API
 Name:           gpgme
 Version:        1.23.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+ and LGPLv2+ and MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -80,8 +80,9 @@ cd tests
 
 %files -n python3-gpg
 %doc lang/python/README
-%{python3_sitearch}/gpg-*.egg-info
-%{python3_sitearch}/gpg/
+#%%{python3_sitearch}/gpg-*.egg
+#%%{python3_sitearch}/gpg/
+%{python3_sitearch}/gpg-%{version}-*
 
 %changelog
 * Tue Nov 28 2023 Andrew Phelps <anphel@microsoft.com> - 1.23.2-1

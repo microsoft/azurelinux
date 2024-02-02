@@ -146,6 +146,8 @@ rm -r docs/man/{fr,ja,ko,pl,ru,sk}
 %make_build
 
 pushd python
+# prevent error: could not create 'rpm.egg-info': File exists
+rm -vf %{_topdir}/BUILD/%{name}-%{version}/python/rpm.egg-info
 %py3_build
 popd
 
@@ -180,6 +182,7 @@ install -vm755 %{SOURCE5} %{buildroot}%{_libdir}/rpm/
 
 pushd python
 python3 setup.py install --skip-build --prefix=%{_prefix} --root=%{buildroot}
+# should be `pip install` ?
 popd
 
 %post   libs -p /sbin/ldconfig
@@ -253,7 +256,6 @@ popd
 %{_libdir}/rpm/pkgconfigdeps.sh
 %{_libdir}/rpm/*.prov
 %{_libdir}/rpm/pythondistdeps.py
-
 %{_libdir}/rpm/pythondeps.sh
 %{_libdir}/rpm/ocamldeps.sh
 %{_libdir}/rpm/rpmdeps

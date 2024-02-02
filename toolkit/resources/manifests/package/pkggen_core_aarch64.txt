@@ -223,7 +223,7 @@ npth-1.6-4.azl3.aarch64.rpm
 pinentry-1.2.1-1.azl3.aarch64.rpm
 gnupg2-2.4.3-1.azl3.aarch64.rpm
 gnupg2-lang-2.4.3-1.azl3.aarch64.rpm
-gpgme-1.23.2-1.azl3.aarch64.rpm
+gpgme-1.23.2-2.azl3.aarch64.rpm
 mariner-repos-shared-2.0-8.azl3.noarch.rpm
 mariner-repos-2.0-8.azl3.noarch.rpm
 libffi-3.4.4-1.azl3.aarch64.rpm
