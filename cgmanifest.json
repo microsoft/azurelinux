@@ -14193,8 +14193,8 @@
         "type": "other",
         "other": {
           "name": "ntp",
-          "version": "4.2.8p15",
-          "downloadUrl": "https://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/ntp-4.2/ntp-4.2.8p15.tar.gz"
+          "version": "4.2.8p17",
+          "downloadUrl": "https://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/ntp-4.2/ntp-4.2.8p17.tar.gz"
         }
       }
     },
