@@ -32,7 +32,7 @@ function DockerBuild {
         --build-arg USER="$user" \
         --build-arg USER_UID=$userUid \
         --build-arg RPMS="$rpmsDir" \
-        --build-arg LOCAL_REPO_FILE="/$marinara/local.repo" \
+        --build-arg LOCAL_REPO_FILE="/marinara-src/local.repo" \
         --no-cache \
         --progress=plain
 }
