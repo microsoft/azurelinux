@@ -2,7 +2,7 @@ Summary:        Hardware identification and configuration data
 Name:           hwdata
 Version:        0.378
 Release:        1%{?dist}
-License:        GPLv2+ OR XFree86 1.0
+License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/vcrhonek/hwdata
@@ -14,6 +14,14 @@ BuildArch:      noarch
 %description
 hwdata contains various hardware identification and configuration data,
 such as the pci.ids and usb.ids databases.
+
+%package        devel
+Summary:        Development files for %{name}
+Requires:       %{name} = %{version}-%{release}
+ 
+%description    devel
+The %{name}-devel package contains files for developing applications that use
+%{name}.
 
 %prep
 %setup -q
@@ -31,9 +39,14 @@ make install DESTDIR=%{buildroot} libdir=%{_libdir}
 %{_libdir}/modprobe.d/dist-blacklist.conf
 %{_datadir}/%{name}/*
 
+%files devel
+%{_datadir}/pkgconfig/%{name}.pc
+
 %changelog
-* Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.378-1
-- Auto-upgrade to 0.378 - Upgrade to 0.378
+* Thu Feb 02 2024 Nan Liu <liunan@microsoft.com> - 0.378-1
+- Upgrade to 0.373
+- Update License
+- Add devel package with pkgconfig file
 
 * Fri Feb 18 2022 Cameron Baird <cameronbaird@microsoft.com> - 0.356-1
 - Update source to v0.356
