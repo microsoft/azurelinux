@@ -27,7 +27,9 @@ https://ftp.gnu.org/gnu/cpio/cpio-2.14.tar.bz2
 https://github.com/libarchive/libarchive/releases/download/v3.7.1/libarchive-3.7.1.tar.gz
 https://www.lua.org/ftp/lua-5.4.6.tar.gz
 http://ftp.rpm.org/popt/releases/popt-1.x/popt-1.19.tar.gz
+https://github.com/rpm-software-management/rpm/archive/rpm-4.17.0-release.tar.gz
 http://ftp.rpm.org/releases/rpm-4.18.x/rpm-4.18.1.tar.bz2
+http://ftp.rpm.org/releases/rpm-4.19.x/rpm-4.19.0.tar.bz2
 https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/python.attr
 https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/pythondeps.sh
 https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/pythondistdeps.py

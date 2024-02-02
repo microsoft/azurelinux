@@ -1,8 +1,8 @@
---- rpm-4.18.1/macros.in
-+++ rpm-4.18.1/macros.in
-@@ -727,10 +727,11 @@ package or when debugging this package.\
-   RPM_SOURCE_DIR=\"%{_sourcedir}\"\
-   RPM_BUILD_DIR=\"%{_builddir}\"\
+--- orig-rpm-4.17.0-release/macros.in	2021-09-03 02:41:20.000000000 -0700
++++ fixed-rpm-4.17.0-release/macros.in	2021-12-02 21:35:53.475842878 -0800
+@@ -742,10 +742,11 @@
+   RPM_SOURCE_DIR=\"%{u2p:%{_sourcedir}}\"\
+   RPM_BUILD_DIR=\"%{u2p:%{_builddir}}\"\
    RPM_OPT_FLAGS=\"%{optflags}\"\
 +  RPM_LD_FLAGS=\"%{?build_ldflags}\"\
    RPM_ARCH=\"%{_arch}\"\
