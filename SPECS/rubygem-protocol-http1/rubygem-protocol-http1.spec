@@ -2,7 +2,7 @@
 %global gem_name protocol-http1
 Summary:        A low level implementation of the HTTP/1 protocol
 Name:           rubygem-protocol-http1
-Version:        0.15.1
+Version:        0.18.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -32,6 +32,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Thu Feb 01 2024 Riken Maharjan <rmaharjan@microsoft.com> - 0.18.0-1
+- Update to v0.18.0
+
 * Mon Aug 21 2023 Dallas Delaney <dadelan@microsoft.com> - 0.15.1-1
 - Update to v0.15.1 to fix CVE-2023-38697
 
