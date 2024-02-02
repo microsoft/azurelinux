@@ -8,17 +8,10 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 )
 
 // Extract all partitions of connected image into separate files with specified format.
-func extractPartitions(imageLoopDevice string, outputImageFile string, partitionFormat string) error {
-
-	// Extract basename from outputImageFile. E.g. if outputImageFile is "image.qcow2", then basename is "image".
-	basename := strings.TrimSuffix(filepath.Base(outputImageFile), filepath.Ext(outputImageFile))
-
-	// Get output directory path.
-	outDir := filepath.Dir(outputImageFile)
+func extractPartitions(imageLoopDevice string, outDir string, basename string, partitionFormat string) error {
 
 	// Get partition info.
 	diskPartitions, err := diskutils.GetDiskPartitions(imageLoopDevice)
