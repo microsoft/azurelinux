@@ -20,6 +20,7 @@ Provides a low-level implementation of the HTTP/2 protocol.
 
 %prep
 %setup -q -n %{gem_name}-%{version}
+%gemspec_clear_signing
 
 %build
 gem build %{gem_name}
