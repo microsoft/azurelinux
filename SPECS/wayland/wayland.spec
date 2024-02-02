@@ -1,6 +1,6 @@
 Summary:        Wayland Compositor Infrastructure
 Name:           wayland
-Version:        1.21.0
+Version:        1.22.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -113,6 +113,9 @@ Wayland server library
 %{_libdir}/libwayland-server.so.0*
 
 %changelog
+* Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.22.0-1
+- Auto-upgrade to 1.22.0 - Upgrade to 1.22.0 in Mariner 3.0
+
 * Wed Oct 05 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.21.0-1
 - Upgrade to version 1.21.0 to fix CVE-2021-3782
 
