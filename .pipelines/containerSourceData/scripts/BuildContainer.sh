@@ -242,12 +242,12 @@ function prepare_docker_directory {
         cp -v "$configurationDirectoryPath"/* "$WORK_DIR"
     fi
 
-    local hostMountedDir="$WORK_DIR/Stage"
-    mkdir -pv "$hostMountedDir"
+    HOST_MOUNTED_DIR="$WORK_DIR/Stage"
+    mkdir -pv "$HOST_MOUNTED_DIR"
 
     # Copy files into docker context directory
-    tar -xf "$RPMS_TARBALL" -C "$hostMountedDir"/
-    cp -v "$CONTAINER_SRC_DIR/marinerLocalRepo.repo" "$hostMountedDir"/
+    tar -xf "$RPMS_TARBALL" -C "$HOST_MOUNTED_DIR"/
+    cp -v "$CONTAINER_SRC_DIR/marinerLocalRepo.repo" "$HOST_MOUNTED_DIR"/
 }
 
 function docker_build {

@@ -11,6 +11,7 @@ function DockerBuild {
     local packagesToInstall=$4
     local packagesToHoldback=$5
     local installNonrootUser=$6
+    local rpmsDir=$7
     local user=root
     local userUid=0
 
@@ -29,6 +30,7 @@ function DockerBuild {
         --build-arg PACKAGES_TO_HOLDBACK="$packagesToHoldback" \
         --build-arg USER="$user" \
         --build-arg USER_UID=$userUid \
+        --build-arg RPMS="$rpmsDir" \
         --no-cache \
         --progress=plain
 }
@@ -51,7 +53,7 @@ function create_distroless_container {
 
     marinara="marinara"
     marinaraSrcDir="$WORK_DIR/$marinara-src"
-    git clone "https://github.com/microsoft/$marinara.git" "$marinaraSrcDir"
+    git clone -b 'mandeepsplaha/add-support-for-local-rpms' "https://github.com/microsoft/$marinara.git" "$marinaraSrcDir"
     pushd "$marinaraSrcDir"
 
     # TODO: Get the marinara image from the latest build
@@ -62,13 +64,44 @@ function create_distroless_container {
     sed -E "s|^FROM .*builder$|FROM $MARINARA_IMAGE as builder|g" -i "dockerfiles/dockerfile-new-image"
 
     # Create standard container
-    DockerBuild "$standardContainerName" "$AZURE_LINUX_VERSION" "custom" "$DISTROLESS_PACKAGES_TO_INSTALL" "$DISTROLESS_PACKAGES_TO_HOLD_BACK" false
+    DockerBuild \
+        "$standardContainerName" \
+        "$AZURE_LINUX_VERSION" \
+        "custom" \
+        "$DISTROLESS_PACKAGES_TO_INSTALL" \
+        "$DISTROLESS_PACKAGES_TO_HOLD_BACK" \
+        false \
+        "$HOST_MOUNTED_DIR/RPMS"
+
     # Create debug container
-    DockerBuild "$debugContainerName" "$AZURE_LINUX_VERSION" "custom-debug" "$DISTROLESS_PACKAGES_TO_INSTALL" "$DISTROLESS_PACKAGES_TO_HOLD_BACK" false
+    DockerBuild \
+        "$debugContainerName" \
+        "$AZURE_LINUX_VERSION" \
+        "custom-debug" \
+        "$DISTROLESS_PACKAGES_TO_INSTALL" \
+        "$DISTROLESS_PACKAGES_TO_HOLD_BACK" \
+        false \
+        "$HOST_MOUNTED_DIR/RPMS"
+
     # Create nonroot container
-    DockerBuild "$nonrootContainerName" "$AZURE_LINUX_VERSION" "custom-nonroot" "$DISTROLESS_PACKAGES_TO_INSTALL" "$DISTROLESS_PACKAGES_TO_HOLD_BACK" true
+    DockerBuild \
+        "$nonrootContainerName" \
+        "$AZURE_LINUX_VERSION" \
+        "custom-nonroot" \
+        "$DISTROLESS_PACKAGES_TO_INSTALL" \
+        "$DISTROLESS_PACKAGES_TO_HOLD_BACK" \
+        true \
+        "$HOST_MOUNTED_DIR/RPMS"
+
     # Create debug nonroot container
-    DockerBuild "$debugNonrootContainerName" "$AZURE_LINUX_VERSION" "custom-debug-nonroot" "$DISTROLESS_PACKAGES_TO_INSTALL" "$DISTROLESS_PACKAGES_TO_HOLD_BACK" true
+    DockerBuild \
+        "$debugNonrootContainerName" \
+        "$AZURE_LINUX_VERSION" \
+        "custom-debug-nonroot" \
+        "$DISTROLESS_PACKAGES_TO_INSTALL" \
+        "$DISTROLESS_PACKAGES_TO_HOLD_BACK" \
+        true \
+        "$HOST_MOUNTED_DIR/RPMS"
 
     popd > /dev/null
     
