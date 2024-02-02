@@ -25,6 +25,11 @@ almost all the artifacts unchanged - some artifacts are changed as follows:
   dracut configuration that got used before will be re-used again when we are
   re-generating the `initrd.img` and hence the original behavior is retained.
 
-The current implementation for the LiveOS ISO does not support persistent
-storage. This means that the machine loses all its state on reboot or
-shutdown.
+The current implementation for the LiveOS ISO does not support the following:
+- persistent storage.
+  - The machine loses all its state on reboot or shutdown.
+- dm-verity.
+  - The ISO image cannot run dm-verity for the LiveOS partitions.
+- disk layout.
+  - There is always one disk generated when an `iso` output format is
+    specified.
