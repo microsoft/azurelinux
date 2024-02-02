@@ -5,12 +5,17 @@ package schedulerutils
 
 import (
 	"encoding/csv"
+	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"sync"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
+
+	"github.com/fatih/color"
 )
 
 // PrintBuildResult prints a build result to the logger.
@@ -105,113 +110,107 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 		}
 	}
 
-	logger.Log.Info("---------------------------")
-	logger.Log.Info("--------- Summary ---------")
-	logger.Log.Info("---------------------------")
-
-	logger.Log.Infof("Number of built SRPMs:             %d", len(builtSRPMs))
-	logger.Log.Infof("Number of tested SRPMs:            %d", len(testedSRPMs))
-	logger.Log.Infof("Number of prebuilt SRPMs:          %d", len(prebuiltSRPMs))
-	logger.Log.Infof("Number of prebuilt delta SRPMs:    %d", len(prebuiltDeltaSRPMs))
-	logger.Log.Infof("Number of skipped SRPMs tests:     %d", len(skippedSRPMsTests))
-	logger.Log.Infof("Number of failed SRPMs:            %d", len(failedSRPMs))
-	logger.Log.Infof("Number of failed SRPMs tests:      %d", len(failedSRPMsTests))
-	logger.Log.Infof("Number of blocked SRPMs:           %d", len(blockedSRPMs))
-	logger.Log.Infof("Number of blocked SRPMs tests:     %d", len(blockedSRPMsTests))
-	logger.Log.Infof("Number of unresolved dependencies: %d", len(unresolvedDependencies))
-
-	if allowToolchainRebuilds && (len(rpmConflicts) > 0 || len(srpmConflicts) > 0) {
-		logger.Log.Infof("Toolchain RPMs conflicts are ignored since ALLOW_TOOLCHAIN_REBUILDS=y")
-	}
-
-	if len(rpmConflicts) > 0 || len(srpmConflicts) > 0 {
-		conflictsLogger("Number of toolchain RPM conflicts: %d", len(rpmConflicts))
-		conflictsLogger("Number of toolchain SRPM conflicts: %d", len(srpmConflicts))
-	}
-
-	if len(builtSRPMs) != 0 {
-		logger.Log.Info("Built SRPMs:")
-		for srpm := range builtSRPMs {
-			logger.Log.Infof("--> %s", filepath.Base(srpm))
-		}
-	}
-
-	if len(testedSRPMs) != 0 {
-		logger.Log.Info("Tested SRPMs:")
-		for srpm := range testedSRPMs {
-			logger.Log.Infof("--> %s", filepath.Base(srpm))
-		}
-	}
+	printSummary(failedSRPMs, failedSRPMsTests, prebuiltSRPMs, prebuiltDeltaSRPMs, builtSRPMs, testedSRPMs, skippedSRPMsTests, unresolvedDependencies, blockedSRPMs, blockedSRPMsTests, rpmConflicts, srpmConflicts, allowToolchainRebuilds, conflictsLogger)
 
 	if len(prebuiltSRPMs) != 0 {
-		logger.Log.Info("Prebuilt SRPMs:")
-		for srpm := range prebuiltSRPMs {
-			logger.Log.Infof("--> %s", filepath.Base(srpm))
+		logger.Log.Info(color.GreenString("Prebuilt SRPMs:"))
+		keys := mapToSortedSlice(prebuiltSRPMs)
+		for _, prebuiltSRPM := range keys {
+			logger.Log.Infof("--> %s", filepath.Base(prebuiltSRPM))
 		}
 	}
 
 	if len(prebuiltDeltaSRPMs) != 0 {
-		logger.Log.Info("Skipped SRPMs (i.e., delta mode is on, packages are already available in a repo):")
-		for srpm := range prebuiltDeltaSRPMs {
-			logger.Log.Infof("--> %s", filepath.Base(srpm))
+		logger.Log.Info(color.GreenString("Skipped SRPMs (i.e., delta mode is on, packages are already available in a repo):"))
+		keys := mapToSortedSlice(prebuiltDeltaSRPMs)
+		for _, prebuiltDeltaSRPM := range keys {
+			logger.Log.Infof("--> %s", filepath.Base(prebuiltDeltaSRPM))
 		}
 	}
 
 	if len(skippedSRPMsTests) != 0 {
-		logger.Log.Info("Skipped SRPMs tests:")
-		for srpm := range skippedSRPMsTests {
-			logger.Log.Infof("--> %s", filepath.Base(srpm))
+		logger.Log.Info(color.GreenString("Skipped SRPMs tests:"))
+		keys := mapToSortedSlice(skippedSRPMsTests)
+		for _, skippedSRPMsTest := range keys {
+			logger.Log.Infof("--> %s", filepath.Base(skippedSRPMsTest))
 		}
 	}
 
-	if len(failedSRPMs) != 0 {
-		logger.Log.Info("Failed SRPMs:")
-		for _, failure := range failedSRPMs {
-			logger.Log.Infof("--> %s , error: %s, for details see: %s", failure.Node.SRPMFileName(), failure.Err, failure.LogFile)
+	if len(builtSRPMs) != 0 {
+		logger.Log.Info(color.GreenString("Built SRPMs:"))
+		keys := mapToSortedSlice(builtSRPMs)
+		for _, builtSRPM := range keys {
+			logger.Log.Infof("--> %s ", filepath.Base(builtSRPM))
 		}
 	}
 
-	if len(failedSRPMsTests) != 0 {
-		logger.Log.Info("Failed SRPMs tests:")
-		for _, failure := range failedSRPMsTests {
-			logger.Log.Infof("--> %s , error: %s, for details see: %s", failure.Node.SRPMFileName(), failure.Err, failure.LogFile)
-		}
-	}
-
-	if len(blockedSRPMs) != 0 {
-		logger.Log.Info("Blocked SRPMs:")
-		for srpm := range blockedSRPMs {
-			logger.Log.Infof("--> %s", filepath.Base(srpm))
-		}
-	}
-
-	if len(blockedSRPMsTests) != 0 {
-		logger.Log.Info("Blocked SRPMs tests:")
-		for srpm := range blockedSRPMsTests {
-			logger.Log.Infof("--> %s", filepath.Base(srpm))
+	if len(testedSRPMs) != 0 {
+		logger.Log.Info(color.GreenString("Tested SRPMs:"))
+		keys := mapToSortedSlice(testedSRPMs)
+		for _, testedSRPM := range keys {
+			logger.Log.Infof("--> %s", filepath.Base(testedSRPM))
 		}
 	}
 
 	if len(unresolvedDependencies) != 0 {
-		logger.Log.Info("Unresolved dependencies:")
-		for dependency := range unresolvedDependencies {
-			logger.Log.Infof("--> %s", dependency)
+		logger.Log.Info(color.RedString("Unresolved dependencies:"))
+		keys := mapToSortedSlice(unresolvedDependencies)
+		for _, unresolvedDependency := range keys {
+			logger.Log.Infof("--> %s", filepath.Base(unresolvedDependency))
+		}
+	}
+
+	if len(blockedSRPMs) != 0 {
+		logger.Log.Info(color.RedString("Blocked SRPMs:"))
+		keys := mapToSortedSlice(blockedSRPMs)
+		for _, blockedSRPM := range keys {
+			logger.Log.Infof("--> %s", filepath.Base(blockedSRPM))
+		}
+	}
+
+	if len(blockedSRPMsTests) != 0 {
+		logger.Log.Info(color.RedString("Blocked SRPMs tests:"))
+		keys := mapToSortedSlice(blockedSRPMsTests)
+		for _, blockedSRPMsTest := range keys {
+			logger.Log.Infof("--> %s", filepath.Base(blockedSRPMsTest))
 		}
 	}
 
 	if len(rpmConflicts) != 0 {
-		conflictsLogger("RPM conflicts with toolchain: ")
+		conflictsLogger(color.RedString("RPM conflicts with toolchain:"))
+		sort.Strings(rpmConflicts)
 		for _, conflict := range rpmConflicts {
 			conflictsLogger("--> %s", conflict)
 		}
 	}
 
 	if len(srpmConflicts) != 0 {
-		conflictsLogger("SRPM conflicts with toolchain: ")
+		conflictsLogger(color.RedString("SRPM conflicts with toolchain:"))
+		sort.Strings(srpmConflicts)
 		for _, conflict := range srpmConflicts {
 			conflictsLogger("--> %s", conflict)
 		}
 	}
+
+	if len(failedSRPMs) != 0 {
+		logger.Log.Info(color.RedString("Failed SRPMs:"))
+		keys := mapToSortedSlice(failedSRPMs)
+		for _, key := range keys {
+			failure := failedSRPMs[key]
+			logger.Log.Infof("--> %s , error: %s, for details see: %s", failure.Node.SRPMFileName(), failure.Err, failure.LogFile)
+		}
+	}
+
+	if len(failedSRPMsTests) != 0 {
+		logger.Log.Info(color.RedString("Failed SRPMs tests:"))
+		keys := mapToSortedSlice(failedSRPMsTests)
+		for _, key := range keys {
+			failure := failedSRPMsTests[key]
+			logger.Log.Infof("--> %s , error: %s, for details see: %s", failure.Node.SRPMFileName(), failure.Err, failure.LogFile)
+		}
+	}
+
+	printSummary(failedSRPMs, failedSRPMsTests, prebuiltSRPMs, prebuiltDeltaSRPMs, builtSRPMs, testedSRPMs, skippedSRPMsTests, unresolvedDependencies, blockedSRPMs, blockedSRPMsTests, rpmConflicts, srpmConflicts, allowToolchainRebuilds, conflictsLogger)
 }
 
 func buildResultsSetToNodesSet(statesSet map[string]*BuildResult) (result map[string]*pkggraph.PkgNode) {
@@ -333,4 +332,50 @@ func unbuiltPackagesCSVRows(pkgGraph *pkggraph.PkgGraph, unbuiltPackages, failed
 	}
 
 	return
+}
+
+// printSummary prints summarized numbers of the build to the logger.
+func printSummary(failedSRPMs, failedSRPMsTests map[string]*BuildResult, prebuiltSRPMs, prebuiltDeltaSRPMs, builtSRPMs, testedSRPMs, skippedSRPMsTests, unresolvedDependencies map[string]bool, blockedSRPMs, blockedSRPMsTests map[string]*pkggraph.PkgNode, rpmConflicts, srpmConflicts []string, allowToolchainRebuilds bool, conflictsLogger func(format string, args ...interface{})) {
+	logger.Log.Info("---------------------------")
+	logger.Log.Info("--------- Summary ---------")
+	logger.Log.Info("---------------------------")
+
+	logger.Log.Infof(color.GreenString(summaryLine("Number of prebuilt SRPMs:", len(prebuiltSRPMs))))
+	logger.Log.Infof(color.GreenString(summaryLine("Number of prebuilt delta SRPMs:", len(prebuiltDeltaSRPMs))))
+	logger.Log.Infof(color.GreenString(summaryLine("Number of skipped SRPMs tests:", len(skippedSRPMsTests))))
+	logger.Log.Infof(color.GreenString(summaryLine("Number of built SRPMs:", len(builtSRPMs))))
+	logger.Log.Infof(color.GreenString(summaryLine("Number of tested SRPMs:", len(testedSRPMs))))
+	printErrorInfoByCondition(len(unresolvedDependencies) > 0, summaryLine("Number of unresolved dependencies:", len(unresolvedDependencies)))
+	printErrorInfoByCondition(len(blockedSRPMs) > 0, summaryLine("Number of blocked SRPMs:", len(blockedSRPMs)))
+	printErrorInfoByCondition(len(blockedSRPMsTests) > 0, summaryLine("Number of blocked SRPMs tests:", len(blockedSRPMsTests)))
+	printErrorInfoByCondition(len(failedSRPMs) > 0, summaryLine("Number of failed SRPMs:", len(failedSRPMs)))
+	printErrorInfoByCondition(len(failedSRPMsTests) > 0, summaryLine("Number of failed SRPMs tests:", len(failedSRPMsTests)))
+	if allowToolchainRebuilds && (len(rpmConflicts) > 0 || len(srpmConflicts) > 0) {
+		logger.Log.Infof("Toolchain RPMs conflicts are ignored since ALLOW_TOOLCHAIN_REBUILDS=y")
+	}
+
+	printErrorInfoByCondition(!allowToolchainRebuilds && len(rpmConflicts) > 0, summaryLine("Number of toolchain RPM conflicts:", len(rpmConflicts)))
+	printErrorInfoByCondition(!allowToolchainRebuilds && len(srpmConflicts) > 0, summaryLine("Number of toolchain SRPM conflicts:", len(srpmConflicts)))
+}
+
+// printErrorInfoByCondition prints error or info level logs depending on the input condition.
+// If the condition is true, it prints an error level log and an info level one otherwise.
+func printErrorInfoByCondition(condition bool, format string, arg ...any) {
+	if condition {
+		logger.Log.Errorf(color.RedString(format, arg...))
+	} else {
+		logger.Log.Infof(color.GreenString(format, arg...))
+	}
+}
+
+// summaryLine returns padded and type-formatted string for build summary.
+func summaryLine(message string, count int) string {
+	return fmt.Sprintf("%-36s%d", message, count)
+}
+
+// mapToSortedSlice converts a map[string]V to a sorted slice containing the map's keys.
+func mapToSortedSlice[V any](inputMap map[string]V) []string {
+	outputSlice := sliceutils.MapToSlice(inputMap)
+	sort.Strings(outputSlice)
+	return outputSlice
 }

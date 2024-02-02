@@ -36,8 +36,7 @@ var (
 	buildDir           = app.Flag("build-dir", "Directory to store temporary files while building.").Required().ExistingDir()
 	baseDirPath        = app.Flag("base-dir", "Base directory for relative file paths from the config. Defaults to config's directory.").ExistingDir()
 
-	logFile  = exe.LogFileFlag(app)
-	logLevel = exe.LogLevelFlag(app)
+	logFlags = exe.SetupLogFlags(app)
 )
 
 // Every valid mouse event handler will follow the format:
@@ -69,7 +68,7 @@ func main() {
 
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel)
+	logger.InitBestEffort(logFlags)
 
 	// Prevent a SIGINT (Ctr-C) from stopping liveinstaller while an installation is in progress.
 	// It is the responsibility of the installer's user interface (terminal installer or Calamares) to handle quit requests from the user.

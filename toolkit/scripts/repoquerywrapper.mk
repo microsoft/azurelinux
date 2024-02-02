@@ -46,6 +46,7 @@ $(STATUS_FLAGS_DIR)/repoquerywrapper.flag: $(go-repoquerywrapper) $(chroot_worke
 		--worker-dir $(repoquerywrapper_chroot_dir) \
 		--log-file=$(repoquerywrapper_logs_path) \
 		--log-level=$(LOG_LEVEL) \
+		--log-color=$(LOG_COLOR) \
 		--cpu-prof-file=$(PROFILE_DIR)/repoquerywrapper.cpu.pprof \
 		--mem-prof-file=$(PROFILE_DIR)/repoquerywrapper.mem.pprof \
 		--trace-file=$(PROFILE_DIR)/repoquerywrapper.trace \

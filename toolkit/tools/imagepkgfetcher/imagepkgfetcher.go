@@ -48,8 +48,7 @@ var (
 	inputSummaryFile  = app.Flag("input-summary-file", "Path to a file with the summary of packages cloned to be restored").String()
 	outputSummaryFile = app.Flag("output-summary-file", "Path to save the summary of packages cloned").String()
 
-	logFile       = exe.LogFileFlag(app)
-	logLevel      = exe.LogLevelFlag(app)
+	logFlags      = exe.SetupLogFlags(app)
 	profFlags     = exe.SetupProfileFlags(app)
 	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
 )
@@ -57,7 +56,7 @@ var (
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel)
+	logger.InitBestEffort(logFlags)
 
 	prof, profErr := profile.StartProfiling(profFlags)
 	if profErr != nil {
@@ -160,11 +159,11 @@ func cloneSystemConfigs(cloner repocloner.RepoCloner, configFile, baseDirPath st
 	if err != nil {
 		// Fallback to legacy flow with multiple transactions in case we get a OOM error from a large transaction.
 		logger.Log.Warnf("Failed to clone packages in a single transaction, will retry with individual transactions... (%s)", err)
-		logger.Log.Warnf("\tCheck log file '%s' for more details from package manager.", *logFile)
+		logger.Log.Warnf("\tCheck log file '%s' for more details from package manager.", *logFlags.LogFile)
 		_, err = cloner.CloneByPackageVer(cloneDeps, packageVersionsInConfig...)
 		if err != nil {
 			logger.Log.Errorf("Also failed to clone packages with individual transactions. Error: %s", err)
-			logger.Log.Errorf("\tCheck log file '%s' for more details from package manager.", *logFile)
+			logger.Log.Errorf("\tCheck log file '%s' for more details from package manager.", *logFlags.LogFile)
 		}
 	}
 	return

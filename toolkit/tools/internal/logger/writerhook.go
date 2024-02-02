@@ -6,9 +6,11 @@ package logger
 import (
 	"fmt"
 	"io"
+	"regexp"
 	"runtime"
 	"sync"
 
+	"github.com/fatih/color"
 	"github.com/sirupsen/logrus"
 )
 
@@ -18,7 +20,14 @@ type writerHook struct {
 	level     logrus.Level
 	writer    io.Writer
 	formatter logrus.Formatter
+	useColors bool
 }
+
+var (
+
+	// colorCodeRegex is of type '\x1b[0m' or '\x1b[31m', etc.
+	colorCodeRegex = regexp.MustCompile(`\x1b\[[0-9]+m`)
+)
 
 // newWriterHook returns new writerHook
 func newWriterHook(writer io.Writer, level logrus.Level, useColors bool, toolName string) *writerHook {
@@ -31,11 +40,9 @@ func newWriterHook(writer io.Writer, level logrus.Level, useColors bool, toolNam
 
 	if toolName != "" {
 		formatter.CallerPrettyfier = func(frame *runtime.Frame) (function string, file string) {
-			const gray = 90
-
 			toolNameField := fmt.Sprintf("[%s]", toolName)
 			if useColors {
-				toolNameField = fmt.Sprintf("[\x1b[%dm%s\x1b[0m]", gray, toolName)
+				toolNameField = fmt.Sprintf(color.HiYellowString("[%s]"), toolName)
 			}
 
 			return "", toolNameField
@@ -46,6 +53,7 @@ func newWriterHook(writer io.Writer, level logrus.Level, useColors bool, toolNam
 		level:     level,
 		writer:    writer,
 		formatter: formatter,
+		useColors: useColors,
 	}
 }
 
@@ -54,6 +62,10 @@ func (h *writerHook) Fire(entry *logrus.Entry) (err error) {
 	// Filter out entries that are at a higher level (more verbose) than the current filter
 	if entry.Level > h.level {
 		return
+	}
+
+	if !h.useColors {
+		entry.Message = colorCodeRegex.ReplaceAllString(entry.Message, "")
 	}
 
 	h.lock.Lock()

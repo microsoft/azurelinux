@@ -154,3 +154,33 @@ func TestShouldRemoveDuplicates(t *testing.T) {
 	assert.Contains(t, outputSlice, "C")
 	assert.NotContains(t, outputSlice, "X")
 }
+
+// MapToSlice() should return empty slice for nil map
+func TestMapToSliceShouldCreateEmptySliceFromNil(t *testing.T) {
+	outputSlice := MapToSlice[string, any](nil)
+
+	assert.NotNil(t, outputSlice)
+	assert.Empty(t, outputSlice)
+}
+
+// MapToSlice() should return empty slice for empty map
+func TestMapToSliceShouldCreateEmptySliceFromEmptyMap(t *testing.T) {
+	outputSlice := MapToSlice(make(map[string]string))
+
+	assert.NotNil(t, outputSlice)
+	assert.Empty(t, outputSlice)
+}
+
+// MapToSlice() should return slice with all the keys in the map
+func TestMapToSliceReturnKeysInMap(t *testing.T) {
+	inputMap := map[string]bool{
+		"A": true,
+		"B": true,
+		"X": false,
+		"Y": false,
+	}
+	expectedOutput := []string{"A", "B", "X", "Y"}
+	outputSlice := MapToSlice(inputMap)
+
+	assert.ElementsMatch(t, expectedOutput, outputSlice)
+}
