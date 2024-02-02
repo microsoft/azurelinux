@@ -4,7 +4,7 @@
 Summary: The open-source application container engine
 Name:    %{upstream_name}-engine
 Version: 20.10.27
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: ASL 2.0
 Group:   Tools/Container
 URL: https://mobyproject.org
@@ -20,6 +20,7 @@ Source1: https://github.com/moby/libnetwork/archive/master.tar.gz/#/%{upstream_n
 Source3: docker.service
 Source4: docker.socket
 Patch0:  CVE-2023-25153.patch
+Patch1:  CVE-2022-21698.patch
 
 %{?systemd_requires}
 
@@ -67,7 +68,10 @@ Moby is an open-source project created by Docker to enable and accelerate softwa
 %define OUR_GOPATH %{_topdir}/.gopath
 
 %prep
-%autosetup -p1 -n %{upstream_name}-%{version}
+%autosetup -N -n %{upstream_name}-%{version}
+%patch 0 -p1
+%patch 1 -p1 -d vendor/github.com/prometheus/client_golang
+
 tar xf %{SOURCE1} --no-same-owner
 
 mkdir -p %{OUR_GOPATH}/src/github.com/docker
@@ -126,6 +130,9 @@ fi
 %{_unitdir}/*
 
 %changelog
+* Fri Feb 02 2024 Tobias Brick <tobiasb@microsoft.com> - 20.10.27-2
+- Patch CVE-2022-21698
+
 * Fri Dec 15 2023 Rohit Rawat <rohitrawat@microsoft.com> - 20.10.27-1
 - Upgrade version to fix CVE-2020-8694, CVE-2020-8695 and CVE-2020-12912
 
