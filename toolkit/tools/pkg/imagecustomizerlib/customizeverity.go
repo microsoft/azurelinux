@@ -69,8 +69,9 @@ func buildDracutModule(dracutModuleName string, dracutDriverName string, imageCh
 	// Check if the dracut module configuration file already exists.
 	if _, err := os.Stat(dracutConfigFile); os.IsNotExist(err) {
 		lines := []string{
-			"add_dracutmodules+=\"" + dracutModuleName + "\"",
-			"add_drivers+=\"" + dracutDriverName + "\"",
+			// Add white spaces on both sides for dracut config syntax.
+			"add_dracutmodules+=\" " + dracutModuleName + " \"",
+			"add_drivers+=\" " + dracutDriverName + " \"",
 		}
 		err = file.WriteLines(lines, dracutConfigFile)
 		if err != nil {
