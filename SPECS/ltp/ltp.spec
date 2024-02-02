@@ -9,8 +9,8 @@
 
 Summary:        Linux Test Project
 Name:           ltp
-Version:        20230127
-Release:        2%{?dist}
+Version:        20240129
+Release:        1%{?dist}
 License:        GPL-2.0-only
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -92,6 +92,9 @@ rm -rf %{ltp_prefix}/{output,results,testcases/bin/[0-9]*}
 %{_mandir}/*
 
 %changelog
+* Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 20240129-1
+- Auto-upgrade to 20240129 - Mariner 3.0 release
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 20230127-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

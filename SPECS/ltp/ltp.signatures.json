@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "ltp-20230127.tar.gz": "ecefb6147dff5abd821a7f621ec2845ade22b8adf3022c0a451f79ecd02ab6f7",
-  "ltp_submodules-20230127.tar.gz": "48616fc76a18d0a166649fe1f0f3d1457d39e1ba7c2399ae7a03e3a09a8d734d"
- }
+  "Signatures": {
+    "ltp_submodules-20230127.tar.gz": "48616fc76a18d0a166649fe1f0f3d1457d39e1ba7c2399ae7a03e3a09a8d734d",
+    "ltp-20240129.tar.gz": "c302f6b2ca09cbb7835f549777bdb9233fe31f7086d7ad8e65472a0804e3e025"
+  }
 }
