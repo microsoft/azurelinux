@@ -27,7 +27,7 @@ stages:
         displayName: 'Download ${{ containerImage }} Artifact'
         inputs:
           artifact: build_${{ containerImage }}_container_artifacts
-          patterns: '$(containerArtifactDir)/*.txt'
+          patterns: '$(containerArtifactDir)/*'
           targetPath: $(artifactsDownloadDir)
     
     - task: Bash@3
