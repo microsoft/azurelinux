@@ -24,7 +24,7 @@ function DockerBuild {
     echo "+++ Create container $containerName"
     docker build . \
         -t "$containerName" \
-        -f "/$marinara/dockerfiles/dockerfile-new-image" \
+        -f "$marinaraSrcDir/dockerfiles/dockerfile-new-image" \
         --build-arg MARINER_VERSION="$azureLinuxVersion" \
         --build-arg IMAGE_TYPE="$imageType" \
         --build-arg PACKAGES_TO_INSTALL="$packagesToInstall" \
