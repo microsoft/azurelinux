@@ -32,7 +32,7 @@ function DockerBuild {
         --build-arg USER="$user" \
         --build-arg USER_UID=$userUid \
         --build-arg RPMS="$rpmsDir" \
-        --build-arg LOCAL_REPO_FILE="/marinara-src/local.repo" \
+        --build-arg LOCAL_REPO_FILE="$marinaraSrcDir/local.repo" \
         --no-cache \
         --progress=plain
 }
@@ -54,17 +54,17 @@ function create_distroless_container {
     debugNonrootContainerName="$DISTROLESS_GOLDEN_IMAGE_NAME:$COMPONENT_VERSION-debug-nonroot-$DISTRO_IDENTIFIER$BASE_IMAGE_TAG"
 
     marinara="marinara"
-    marinaraSrcDir="$WORK_DIR/$marinara-src"
+    marinaraSrcDir="$marinara-src"
 
     echo "+++ Clone marinara repo"
-    git clone "https://github.com/microsoft/$marinara.git" "$marinaraSrcDir"
+    git clone "https://github.com/microsoft/$marinara.git" "$WORK_DIR/$marinaraSrcDir"
     
     # It is important to operate from the $WORK_DIR to ensure that docker can access the files.
     pushd "$WORK_DIR" > /dev/null
 
     # TODO: Get the marinara image from the latest build
-    # MARINARA_IMAGE=${BASE_IMAGE_NAME_FULL/base\/core/marinara}
-    MARINARA_IMAGE="mcr.microsoft.com/cbl-mariner/marinara:2.0"
+    # MARINARA_IMAGE=${BASE_IMAGE_NAME_FULL/base\/core/$marinara}
+    MARINARA_IMAGE="mcr.microsoft.com/cbl-mariner/$marinara:2.0"
     echo "MARINARA_IMAGE -> $MARINARA_IMAGE"
 
     sed -E "s|^FROM .*builder$|FROM $MARINARA_IMAGE as builder|g" -i "$marinaraSrcDir/dockerfiles/dockerfile-new-image"
