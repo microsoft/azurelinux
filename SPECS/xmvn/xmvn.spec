@@ -7,8 +7,8 @@
 Summary:        Local Extensions for Apache Maven
 Name:           xmvn
 Version:        4.2.0
-Release:        1%{?dist}
-License:        ASL 2.0
+Release:        2%{?dist}
+License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
@@ -24,6 +24,7 @@ BuildRequires:  javapackages-local-bootstrap
 # Maven home is used as template for XMvn home
 BuildRequires:  maven
 BuildRequires:  mvn(com.beust:jcommander)
+BuildRequires:  mvn(javax.inject:javax.inject)
 BuildRequires:  mvn(org.apache.commons:commons-compress)
 BuildRequires:  mvn(org.apache.maven.plugin-tools:maven-plugin-annotations)
 BuildRequires:  mvn(org.apache.maven.plugins:maven-assembly-plugin)
@@ -36,14 +37,11 @@ BuildRequires:  mvn(org.apache.maven:maven-model)
 BuildRequires:  mvn(org.apache.maven:maven-model-builder)
 BuildRequires:  mvn(org.apache.maven:maven-plugin-api)
 BuildRequires:  mvn(org.codehaus.modello:modello-maven-plugin)
-BuildRequires:  mvn(org.codehaus.mojo:build-helper-maven-plugin)
-BuildRequires:  mvn(org.codehaus.plexus:plexus-classworlds)
-BuildRequires:  mvn(org.codehaus.plexus:plexus-component-annotations)
-BuildRequires:  mvn(org.codehaus.plexus:plexus-component-metadata)
-BuildRequires:  mvn(org.codehaus.plexus:plexus-container-default)
-BuildRequires:  mvn(org.codehaus.plexus:plexus-utils)
 BuildRequires:  mvn(org.easymock:easymock)
-BuildRequires:  mvn(org.junit.jupiter:junit-jupiter)
+BuildRequires:  mvn(org.eclipse.sisu:org.eclipse.sisu.inject)
+BuildRequires:  mvn(org.eclipse.sisu:org.eclipse.sisu.plexus)
+BuildRequires:  mvn(org.eclipse.sisu:sisu-maven-plugin)
+BuildRequires:  mvn(org.junit.jupiter:junit-jupiter-api)
 BuildRequires:  mvn(org.ow2.asm:asm)
 BuildRequires:  mvn(org.slf4j:slf4j-api)
 BuildRequires:  mvn(org.slf4j:slf4j-simple)
@@ -76,8 +74,7 @@ Requires:       plexus-sec-dispatcher
 Requires:       plexus-utils
 Requires:       sisu
 Requires:       slf4j
-Suggests:       maven-openjdk11
-Obsoletes:      xmvn-connector-aether < 4.0.0
+Suggests:       maven-openjdk17
 
 %description    minimal
 This package provides minimal version of XMvn, incapable of using
@@ -85,8 +82,6 @@ remote repositories.
 
 %package        core
 Summary:        XMvn library
-Obsoletes:      xmvn-parent-pom < 4.0.0
-Obsoletes:      xmvn-api < 4.0.0
 
 %description    core
 This package provides XMvn API and XMvn Core modules, which implement
@@ -107,11 +102,6 @@ Summary:        XMvn tools
 # Explicit javapackages-tools requires since scripts use
 # /usr/share/java-utils/java-functions
 Requires:       javapackages-tools
-Obsoletes:      xmvn-tools-pom < 4.0.0
-Obsoletes:      xmvn-bisect < 4.0.0
-Obsoletes:      xmvn-install < 4.0.0
-Obsoletes:      xmvn-resolve < 4.0.0
-Obsoletes:      xmvn-subst < 4.0.0
 
 %description    tools
 This package provides various XMvn tools:
@@ -153,10 +143,17 @@ mver=$(sed -n '/<mavenVersion>/{s/.*>\(.*\)<.*/\1/;p}' \
 mkdir -p target/dependency/
 cp -a "${maven_home}" target/dependency/apache-maven-$mver
 
+# Workaround easymock incompatibility with Java 17that should be fixed
+# in easymock 4.4: https://github.com/easymock/easymock/issues/274
+%pom_add_plugin :maven-surefire-plugin xmvn-connector "<configuration>
+    <argLine>--add-opens=java.base/java.lang=ALL-UNNAMED</argLine></configuration>"
+%pom_add_plugin :maven-surefire-plugin xmvn-tools/xmvn-install "<configuration>
+    <argLine>--add-opens=java.base/java.lang=ALL-UNNAMED</argLine></configuration>"
+
 %build
 %mvn_build -j -- -P\\!quality
 
-version=4.0.0
+version=4.2.0
 tar --delay-directory-restore -xvf target/xmvn-*-bin.tar.gz
 chmod -R +rwX %{name}-${version}*
 # These are installed as doc
@@ -170,7 +167,7 @@ rm -f %{name}-${version}*/bin/*
 %install
 %mvn_install
 
-version=4.0.0
+version=4.2.0
 maven_home=$(realpath $(dirname $(realpath $(%{?jpb_env} which mvn)))/..)
 
 install -d -m 755 %{buildroot}%{_datadir}/%{name}
@@ -263,8 +260,8 @@ end
 %license LICENSE NOTICE
 
 %changelog
-* Wed Jan 31 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.2.0-1
-- Auto-upgrade to 4.2.0 - Update to 4.2.0
+* Fri Feb 2 2024 Nan Liu <liunan@microsoft.com> - 4.2.0-2
+- Update to 4.2.0, update License.
 
 * Mon Mar 27 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 4.2.0-1
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
