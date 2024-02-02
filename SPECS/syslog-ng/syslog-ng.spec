@@ -156,6 +156,7 @@ fi
 %files -n python3-syslog-ng
 %defattr(-,root,root,-)
 %{_libdir}/syslog-ng/python/*
+%{_sysconfdir}/%{name}/python/README.md
 
 %files devel
 %defattr(-,root,root)
