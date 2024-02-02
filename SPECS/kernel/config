@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/x86_64 5.15.145.2 Kernel Configuration
+# Linux/x86_64 5.15.148.1 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="gcc (GCC) 11.2.0"
 CONFIG_CC_IS_GCC=y
@@ -423,7 +423,7 @@ CONFIG_PERF_EVENTS_AMD_UNCORE=y
 # end of Performance monitoring
 
 # CONFIG_X86_VSYSCALL_EMULATION is not set
-# CONFIG_X86_IOPL_IOPERM is not set
+CONFIG_X86_IOPL_IOPERM=y
 # CONFIG_I8K is not set
 CONFIG_MICROCODE=y
 CONFIG_MICROCODE_INTEL=y

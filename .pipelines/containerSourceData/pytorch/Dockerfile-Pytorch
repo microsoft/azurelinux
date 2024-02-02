@@ -1,0 +1,24 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+ARG BASE_IMAGE
+
+FROM $BASE_IMAGE
+
+WORKDIR /app
+
+RUN tdnf install -y mariner-repos-debug && tdnf clean all
+
+@INCLUDE_MAIN_RUN_INSTRUCTION@
+
+RUN ln -s /usr/bin/python3 /usr/bin/python
+
+# basic smoke test
+RUN python -c "import torch; print(torch.__version__)"
+
+COPY pytorch-docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/pytorch-docker-entrypoint.sh
+ENTRYPOINT ["/usr/local/bin/pytorch-docker-entrypoint.sh"]
+
+# set default command for the container
+CMD [ "python" ]

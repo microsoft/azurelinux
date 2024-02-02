@@ -1,0 +1,13 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+ARG BASE_IMAGE
+
+FROM $BASE_IMAGE
+
+@INCLUDE_MAIN_RUN_INSTRUCTION@
+
+#simple smoke test
+RUN ls /usr/bin/virt-handler
+
+ENTRYPOINT [ "/usr/bin/virt-handler" ]

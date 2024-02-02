@@ -1,0 +1,33 @@
+From c7ebe23cee350fb187ee00ff445b01e11de0bfe9 Mon Sep 17 00:00:00 2001
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Date: Wed, 10 Nov 2021 11:07:06 +0300
+Subject: [PATCH] net/mlx5: Lag, fix a potential Oops with
+ mlx5_lag_create_definer()
+
+There is a minus character missing from ERR_PTR(ENOMEM) so if this
+allocation fails it will lead to an Oops in the caller.
+
+Fixes: dc48516ec7d3 ("net/mlx5: Lag, add support to create definers for LAG")
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/lag/port_sel.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lag/port_sel.c b/drivers/net/ethernet/mellanox/mlx5/core/lag/port_sel.c
+index adc836b3d857..ad63dd45c8fb 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/lag/port_sel.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lag/port_sel.c
+@@ -289,7 +289,7 @@ mlx5_lag_create_definer(struct mlx5_lag *ldev, enum netdev_lag_hash hash,
+ 
+ 	lag_definer = kzalloc(sizeof(*lag_definer), GFP_KERNEL);
+ 	if (!lag_definer)
+-		return ERR_PTR(ENOMEM);
++		return ERR_PTR(-ENOMEM);
+ 
+ 	match_definer_mask = kvzalloc(MLX5_FLD_SZ_BYTES(match_definer,
+ 							match_mask),
+-- 
+2.31.1
+

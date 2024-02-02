@@ -4,7 +4,7 @@
 Summary:        dracut to create initramfs
 Name:           dracut
 Version:        055
-Release:        5%{?dist}
+Release:        7%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
@@ -16,9 +16,16 @@ Source0:        http://www.kernel.org/pub/linux/utils/boot/dracut/%{name}-%{vers
 Source1:        https://www.gnu.org/licenses/lgpl-2.1.txt
 Source2:        mkinitrd
 Source3:        megaraid.conf
+Source4:        20overlayfs/module-setup.sh
+Source5:        20overlayfs/overlayfs-mount.sh
 Patch0:         disable-xattr.patch
 Patch1:         fix-initrd-naming-for-mariner.patch
 Patch2:         fix-functions-Avoid-calling-grep-with-PCRE-P.patch
+# allow-liveos-overlay-no-user-confirmation-prompt.patch has been introduced by
+# the Mariner team to allow skipping the user confirmation prompt during boot
+# when the overlay of the liveos is backed by ram. This allows the machine to
+# boot without being blocked on user input in such a scenario.
+Patch3:         allow-liveos-overlay-no-user-confirmation-prompt.patch
 BuildRequires:  asciidoc
 BuildRequires:  bash
 BuildRequires:  git
@@ -68,6 +75,13 @@ Requires:       %{name} = %{version}-%{release}
 %description tools
 This package contains tools to assemble the local initrd and host configuration.
 
+%package overlayfs
+Summary:        dracut module to build a dracut initramfs with OverlayFS support
+Requires:       %{name} = %{version}-%{release}
+
+%description overlayfs
+This package contains dracut module needed to build an initramfs with OverlayFS support.
+
 %prep
 %autosetup -p1
 cp %{SOURCE1} .
@@ -114,6 +128,10 @@ install -m 0644 dracut.conf.d/fips.conf.example %{buildroot}%{_sysconfdir}/dracu
 install -m 0755 %{SOURCE2} %{buildroot}%{_bindir}/mkinitrd
 
 install -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/dracut.conf.d/50-megaraid.conf
+
+mkdir -p %{buildroot}%{_libdir}/dracut/modules.d/20overlayfs/
+install -p -m 0755 %{SOURCE4} %{buildroot}%{_libdir}/dracut/modules.d/20overlayfs/
+install -p -m 0755 %{SOURCE5} %{buildroot}%{_libdir}/dracut/modules.d/20overlayfs/
 
 # create compat symlink
 mkdir -p %{buildroot}%{_sbindir}
@@ -182,12 +200,22 @@ ln -sr %{buildroot}%{_bindir}/dracut %{buildroot}%{_sbindir}/dracut
 %files tools
 %defattr(-,root,root,0755)
 
+%files overlayfs
+%dir %{_libdir}/dracut/modules.d/20overlayfs
+%{_libdir}/dracut/modules.d/20overlayfs/*
+
 %{_bindir}/dracut-catimages
 %dir /boot/dracut
 %dir %{_sharedstatedir}/dracut
 %dir %{_sharedstatedir}/dracut/overlay
 
 %changelog
+* Mon Jan 29 2024 Lanze Liu <lanzeliu@microsoft.com> - 055-7
+- Add overlayfs sub-package.
+
+* Wed Jan 24 2024 George Mileka <gmileka@microsoft.com> - 055-6
+- Add an option to supress user confirmation prompt for ram overlays.
+
 * Thu Apr 27 2023 Daniel McIlvaney <damcilva@microsoft.com> - 055-5
 - Avoid using JIT'd perl in grep since it is blocked by SELinux.
 

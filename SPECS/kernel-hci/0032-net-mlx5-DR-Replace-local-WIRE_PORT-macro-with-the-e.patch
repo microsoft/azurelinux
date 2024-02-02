@@ -1,0 +1,98 @@
+From 7ae8ac9a582088c85154970982766617c9ebf8dc Mon Sep 17 00:00:00 2001
+From: Yevgeny Kliteynik <kliteyn@nvidia.com>
+Date: Thu, 23 Sep 2021 02:23:23 +0300
+Subject: [PATCH 71/78] net/mlx5: DR, Replace local WIRE_PORT macro with the
+ existing MLX5_VPORT_UPLINK
+
+SW steering defines its own macro for uplink vport number.
+Replace this macro with an already existing mlx5 macro.
+
+Signed-off-by: Yevgeny Kliteynik <kliteyn@nvidia.com>
+Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+---
+ .../net/ethernet/mellanox/mlx5/core/steering/dr_action.c   | 2 +-
+ .../net/ethernet/mellanox/mlx5/core/steering/dr_domain.c   | 2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/steering/dr_rule.c | 4 ++--
+ .../net/ethernet/mellanox/mlx5/core/steering/dr_types.h    | 7 +++----
+ 4 files changed, 7 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_action.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_action.c
+index 032b4a2546d3..8ca8fb804798 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_action.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_action.c
+@@ -669,7 +669,7 @@ int mlx5dr_actions_build_ste_arr(struct mlx5dr_matcher *matcher,
+ 			attr.hit_gvmi = action->vport->caps->vhca_gvmi;
+ 			dest_action = action;
+ 			if (rx_rule) {
+-				if (action->vport->caps->num == WIRE_PORT) {
++				if (action->vport->caps->num == MLX5_VPORT_UPLINK) {
+ 					mlx5dr_dbg(dmn, "Device doesn't support Loopback on WIRE vport\n");
+ 					return -EOPNOTSUPP;
+ 				}
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_domain.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_domain.c
+index ca299d480579..73646322c7bc 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_domain.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_domain.c
+@@ -170,7 +170,7 @@ static int dr_domain_query_vports(struct mlx5dr_domain *dmn)
+ 
+ 	/* Last vport is the wire port */
+ 	wire_vport = &dmn->info.caps.vports_caps[vport];
+-	wire_vport->num = WIRE_PORT;
++	wire_vport->num = MLX5_VPORT_UPLINK;
+ 	wire_vport->icm_address_rx = esw_caps->uplink_icm_address_rx;
+ 	wire_vport->icm_address_tx = esw_caps->uplink_icm_address_tx;
+ 	wire_vport->vport_gvmi = 0;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_rule.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_rule.c
+index aca80efc28fa..323ea138ad99 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_rule.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_rule.c
+@@ -1042,10 +1042,10 @@ static bool dr_rule_skip(enum mlx5dr_domain_type domain,
+ 		return false;
+ 
+ 	if (mask->misc.source_port) {
+-		if (rx && value->misc.source_port != WIRE_PORT)
++		if (rx && value->misc.source_port != MLX5_VPORT_UPLINK)
+ 			return true;
+ 
+-		if (!rx && value->misc.source_port == WIRE_PORT)
++		if (!rx && value->misc.source_port == MLX5_VPORT_UPLINK)
+ 			return true;
+ 	}
+ 
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_types.h b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_types.h
+index 441c03e645db..8e171a6d3a9d 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_types.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_types.h
+@@ -4,7 +4,7 @@
+ #ifndef	_DR_TYPES_
+ #define	_DR_TYPES_
+ 
+-#include <linux/mlx5/driver.h>
++#include <linux/mlx5/vport.h>
+ #include <linux/refcount.h>
+ #include "fs_core.h"
+ #include "wq.h"
+@@ -14,7 +14,6 @@
+ 
+ #define DR_RULE_MAX_STES 18
+ #define DR_ACTION_MAX_STES 5
+-#define WIRE_PORT 0xFFFF
+ #define DR_STE_SVLAN 0x1
+ #define DR_STE_CVLAN 0x2
+ #define DR_SZ_MATCH_PARAM (MLX5_ST_SZ_DW_MATCH_PARAM * 4)
+@@ -1106,10 +1105,10 @@ static inline struct mlx5dr_cmd_vport_cap *
+ mlx5dr_get_vport_cap(struct mlx5dr_cmd_caps *caps, u16 vport)
+ {
+ 	if (!caps->vports_caps ||
+-	    (vport >= caps->num_vports && vport != WIRE_PORT))
++	    (vport >= caps->num_vports && vport != MLX5_VPORT_UPLINK))
+ 		return NULL;
+ 
+-	if (vport == WIRE_PORT)
++	if (vport == MLX5_VPORT_UPLINK)
+ 		vport = caps->num_vports;
+ 
+ 	return &caps->vports_caps[vport];
+-- 
+2.31.1
+
