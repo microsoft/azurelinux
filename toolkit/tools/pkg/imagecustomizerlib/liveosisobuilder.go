@@ -12,7 +12,6 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safemount"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/isomakerlib"
 )
@@ -79,33 +78,24 @@ type LiveOSIsoBuilder struct {
 //	extracts the bootloaders from the specified boot device.
 //
 // inputs:
-//   - 'bootDevicePath': path to an existing boot device.
-//   - 'bootfsType': file system type of the specified boot device.
+//   - 'sourceDir'
+//     path to full image mount root.
 //
 // output:
-//
-//	the bootloaders are saved to the b.workingDirs.isoBuildDir
-func (b *LiveOSIsoBuilder) extractArtifactsFromBootDevice(bootDevicePath string, bootfsType string) error {
+//   - the bootloaders are saved to the b.workingDirs.isoBuildDir
+func (b *LiveOSIsoBuilder) extractArtifactsFromBootDevice(sourceDir string) error {
 
 	logger.Log.Debugf("Extracting artifacts from the boot partition")
 
-	loopDevMountFullDir := filepath.Join(b.workingDirs.isoBuildDir, "readonly-boot-mount")
-
-	fullDiskBootMount, err := safemount.NewMount(bootDevicePath, loopDevMountFullDir, bootfsType, 0, "", true)
-	if err != nil {
-		return fmt.Errorf("failed to mount boot partition (%s):\n%w", bootDevicePath, err)
-	}
-	defer fullDiskBootMount.Close()
-
-	sourceBootx64EfiPath := filepath.Join(loopDevMountFullDir, "/EFI/BOOT/bootx64.efi")
+	sourceBootx64EfiPath := filepath.Join(sourceDir, "/boot/efi/EFI/BOOT/bootx64.efi")
 	targetBootx64EfiPath := filepath.Join(b.workingDirs.isoArtifactsDir, "bootx64.efi")
-	err = file.Copy(sourceBootx64EfiPath, targetBootx64EfiPath)
+	err := file.Copy(sourceBootx64EfiPath, targetBootx64EfiPath)
 	if err != nil {
 		return fmt.Errorf("failed to copy bootloader file (bootx64.efi):\n%w", err)
 	}
 	b.artifacts.bootx64EfiPath = targetBootx64EfiPath
 
-	sourceGrubx64EfiPath := filepath.Join(loopDevMountFullDir, "/EFI/BOOT/grubx64.efi")
+	sourceGrubx64EfiPath := filepath.Join(sourceDir, "/boot/efi/EFI/BOOT/grubx64.efi")
 	targetGrubx64EfiPath := filepath.Join(b.workingDirs.isoArtifactsDir, "grubx64.efi")
 	err = file.Copy(sourceGrubx64EfiPath, targetGrubx64EfiPath)
 	if err != nil {
@@ -121,31 +111,24 @@ func (b *LiveOSIsoBuilder) extractArtifactsFromBootDevice(bootDevicePath string,
 //	copies the contents of the rootfs partition unto the build machine.
 //
 // input:
-//   - 'rootfsDevicePath' [in]
-//   - path to an existing device - where the device holds a roootfs.
-//   - 'rootfsType' [in]
-//   - the file system type of the specified device.
+//   - 'sourceDir'
+//     path to full image mount root.
 //   - 'writeableRootfsDir'
-//   - path to the folder where the contents of the rootfsDevice will be
+//     path to the folder where the contents of the rootfsDevice will be
 //     copied to.
-func (b *LiveOSIsoBuilder) populateWriteableRootfsDir(rootfsDevicePath, rootfsType, writeableRootfsDir string) error {
+//
+// output:
+//   - writeableRootfsDir will hold the contents of sourceDir.
+func (b *LiveOSIsoBuilder) populateWriteableRootfsDir(sourceDir, writeableRootfsDir string) error {
 
 	logger.Log.Debugf("Creating writeable rootfs")
 
-	sourceMountDir := filepath.Join(b.workingDirs.isoBuildDir, "readonly-rootfs-mount")
-
-	loopDevMount, err := safemount.NewMount(rootfsDevicePath, sourceMountDir, rootfsType, 0, "", true)
-	if err != nil {
-		return fmt.Errorf("failed to mount rootfs partition (%s):\n%w", rootfsDevicePath, err)
-	}
-	defer loopDevMount.Close()
-
-	err = os.MkdirAll(writeableRootfsDir, os.ModePerm)
+	err := os.MkdirAll(writeableRootfsDir, os.ModePerm)
 	if err != nil {
 		return fmt.Errorf("failed to create folder %s:\n%w", writeableRootfsDir, err)
 	}
 
-	err = copyPartitionFiles(sourceMountDir+"/.", writeableRootfsDir)
+	err = copyPartitionFiles(sourceDir+"/.", writeableRootfsDir)
 	if err != nil {
 		return fmt.Errorf("failed to copy rootfs contents to a writeable folder (%s):\n%w", writeableRootfsDir, err)
 	}
@@ -444,29 +427,19 @@ func (b *LiveOSIsoBuilder) prepareArtifactsFromFullImage(rawImageFile string) er
 	logger.Log.Infof("Preparing iso artifacts")
 
 	logger.Log.Debugf("Connecting to raw image (%s)", rawImageFile)
-	imageConnection, err := connectToExistingImage(rawImageFile, b.workingDirs.isoBuildDir, "imageroot", true)
+	rawImageConnection, err := connectToExistingImage(rawImageFile, b.workingDirs.isoBuildDir, "readonly-rootfs-mount", false /*includeDefaultMounts*/)
 	if err != nil {
 		return err
 	}
-	defer imageConnection.Close()
+	defer rawImageConnection.Close()
 
-	bootMountPoint := imageConnection.Chroot().FindMountPointByTarget("/boot/efi")
-	if bootMountPoint == nil {
-		return fmt.Errorf("failed to find boot partition mount point in %s", rawImageFile)
-	}
-
-	err = b.extractArtifactsFromBootDevice(bootMountPoint.GetSource(), bootMountPoint.GetFSType())
+	err = b.extractArtifactsFromBootDevice(rawImageConnection.Chroot().RootDir())
 	if err != nil {
 		return fmt.Errorf("failed to extract boot artifacts from image (%s):\n%w", rawImageFile, err)
 	}
 
-	rootfsMountPoint := imageConnection.Chroot().FindMountPointByTarget("/")
-	if rootfsMountPoint == nil {
-		return fmt.Errorf("failed to find rootfs partition mount point in %s", rawImageFile)
-	}
-
 	writeableRootfsDir := filepath.Join(b.workingDirs.isoBuildDir, "writeable-rootfs")
-	err = b.populateWriteableRootfsDir(rootfsMountPoint.GetSource(), rootfsMountPoint.GetFSType(), writeableRootfsDir)
+	err = b.populateWriteableRootfsDir(rawImageConnection.Chroot().RootDir(), writeableRootfsDir)
 	if err != nil {
 		return fmt.Errorf("failed to copy the contents of rootfs from image (%s) to local folder (%s):\n%w", rawImageFile, writeableRootfsDir, err)
 	}
