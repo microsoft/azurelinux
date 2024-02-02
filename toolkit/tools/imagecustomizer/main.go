@@ -27,8 +27,7 @@ var (
 	rpmSources                  = app.Flag("rpm-source", "Path to a RPM repo config file or a directory containing RPMs.").Strings()
 	disableBaseImageRpmRepos    = app.Flag("disable-base-image-rpm-repos", "Disable the base image's RPM repos as an RPM source").Bool()
 	enableShrinkFilesystems     = app.Flag("shrink-filesystems", "Enable shrinking of filesystems to minimum size. Supports ext2, ext3, ext4 filesystem types.").Bool()
-	logFile                     = exe.LogFileFlag(app)
-	logLevel                    = exe.LogLevelFlag(app)
+	logFlags                    = exe.SetupLogFlags(app)
 	profFlags                   = exe.SetupProfileFlags(app)
 	timestampFile               = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
 )
@@ -42,7 +41,7 @@ func main() {
 		kingpin.Fatalf("Either --output-image-format or --output-split-partitions-format must be specified.")
 	}
 
-	logger.InitBestEffort(*logFile, *logLevel)
+	logger.InitBestEffort(logFlags)
 
 	if *enableShrinkFilesystems && *outputSplitPartitionsFormat == "" {
 		logger.Log.Fatalf("--output-split-partitions-format must be specified to use --shrink-filesystems.")
