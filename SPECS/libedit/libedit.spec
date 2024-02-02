@@ -1,9 +1,9 @@
 %define libedit_version 3.1
-%define libedit_release 20210910
+%define libedit_release 20230828
 
 Summary:        The NetBSD Editline library
 Name:           libedit
-Version:        3.1.20210910
+Version:        3.1.20230828
 Release:        1%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -84,6 +84,9 @@ rm -rf %{buildroot}/%{_mandir}/man3/history.3*
     %{_includedir}/*
 
 %changelog
+*   Thu Feb 01 2024 Suresh Thelkar <sthelkaro@microsoft.com> - 3.1.20230828-1
+-   Upgrade to 3.1.20230828-1
+
 *   Fri Mar 11 2022 Jon Slobodzian <joslobo@microsoft.com> - 3.1.20210910-1
 -   Upgrade to 3.1.20210910-1
 
