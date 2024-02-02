@@ -125,7 +125,6 @@ fi
 %defattr(-,root,root)
 %license COPYING GPL.txt LGPL.txt
 %config(noreplace) %{_sysconfdir}/syslog-ng/syslog-ng.conf
-%config(noreplace) %{_sysconfdir}/syslog-ng/scl.conf
 %{_sysconfdir}/systemd/journald.conf.d/*
 %{_libdir}/systemd/system/syslog-ng.service
 %{_libdir}/systemd/system-preset/50-syslog-ng.preset
