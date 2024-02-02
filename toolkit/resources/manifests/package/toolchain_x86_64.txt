@@ -1,4 +1,4 @@
-asciidoc-10.2.0-1.azl3.noarch.rpm
+asciidoc-10.2.0-2.azl3.noarch.rpm
 audit-3.1.2-1.azl3.x86_64.rpm
 audit-debuginfo-3.1.2-1.azl3.x86_64.rpm
 audit-devel-3.1.2-1.azl3.x86_64.rpm

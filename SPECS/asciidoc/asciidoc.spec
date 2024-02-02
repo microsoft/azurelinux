@@ -1,7 +1,7 @@
 Summary:        AsciiDoc is a human readable text document format
 Name:           asciidoc
 Version:        10.2.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 URL:            https://asciidoc.org/
 Group:          System Environment/Development
@@ -60,12 +60,15 @@ python3 tests/testasciidoc.py run
 %{_mandir}/*
 %{python3_sitelib}/asciidoc/
 %{_pkgdocdir}/doc
-%{python3_sitelib}/asciidoc-*.egg-info
+%{python3_sitelib}/asciidoc-*
+
 %dir %{python3_sitelib}/asciidoc/resources/filters/latex
 %dir %{python3_sitelib}/asciidoc/resources/filters/music
 
 
 %changelog
+*   Fri Feb 02 2024 Andrew Phelps <anphel@microsoft.com> - 10.2.0-2
+-   Fix path for egg-info
 *   Mon Jan 15 2024 Suresh Thelkar <sthelkar@microsoft.com> - 10.2.0-1
 -   Upgraded to 10.2.0
 -   Added BR for python3-pip
