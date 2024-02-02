@@ -9071,8 +9071,8 @@
         "type": "other",
         "other": {
           "name": "libedit",
-          "version": "3.1.20210910",
-          "downloadUrl": "https://www.thrysoee.dk/editline/libedit-20210910-3.1.tar.gz"
+          "version": "3.1.20230828",
+          "downloadUrl": "https://www.thrysoee.dk/editline/libedit-20230828-3.1.tar.gz"
         }
       }
     },
@@ -26345,8 +26345,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-protocol-http1",
-          "version": "0.15.1",
-          "downloadUrl": "https://github.com/socketry/protocol-http1/archive/refs/tags/v0.15.1.tar.gz"
+          "version": "0.18.0",
+          "downloadUrl": "https://github.com/socketry/protocol-http1/archive/refs/tags/v0.18.0.tar.gz"
         }
       }
     },
@@ -26355,8 +26355,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-protocol-http2",
-          "version": "0.14.2",
-          "downloadUrl": "https://github.com/socketry/protocol-http2/archive/refs/tags/v0.14.2.tar.gz"
+          "version": "0.15.1",
+          "downloadUrl": "https://github.com/socketry/protocol-http2/archive/refs/tags/v0.15.1.tar.gz"
         }
       }
     },
