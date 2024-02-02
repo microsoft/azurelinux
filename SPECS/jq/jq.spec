@@ -1,3 +1,6 @@
+%define major 1
+%define minor 7
+
 Summary:        jq is a lightweight and flexible command-line JSON processor.
 Name:           jq
 Version:        1.7.1
@@ -29,7 +32,7 @@ Requires:   %{name} = %{version}-%{release}
 Development files for jq
 
 %prep
-%setup -q
+%autosetup -n %{name}-%{major}.%{minor}
 
 %build
 %configure \
@@ -52,14 +55,15 @@ make check
 %{_bindir}/*
 %{_datadir}/*
 %{_libdir}/libjq.so.*
+%{_libdir}/pkgconfig/libjq.pc
 
 %files devel
 %{_libdir}/libjq.so
 %{_includedir}/*
 
 %changelog
-* Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7.1-1
-- Auto-upgrade to 1.7.1 - Package upgrade for Azure Linux 3.0
+* Fri Feb 02 2024 Thien Trung Vuong <tvuong@microsoft.com> - 1.7.1-1
+- Upgrade to version 1.7.1s
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.6-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
@@ -67,7 +71,7 @@ make check
 * Thu Feb 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.6-1
 - Update source to v1.6
 - Remove CVE-2015-8863.patch, CVE-2016-4074.patch (changes found in this release)
-- Move oniguruma BuildRequires outside of check block 
+- Move oniguruma BuildRequires outside of check block
 
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5-7
 - Removing the explicit %%clean stage.
