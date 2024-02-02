@@ -29,6 +29,6 @@ func (m MountIdentifierType) IsValid() error {
 		return nil
 
 	default:
-		return fmt.Errorf("invalid MountIdentifierType value (%v)", m)
+		return fmt.Errorf("invalid mountIdentifierType value (%v)", m)
 	}
 }

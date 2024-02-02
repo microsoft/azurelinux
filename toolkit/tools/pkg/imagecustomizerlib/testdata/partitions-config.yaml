@@ -1,44 +1,44 @@
-Disks:
-- PartitionTableType: gpt
-  MaxSize: 4096
-  Partitions:
-  - ID: esp
-    Flags:
+disks:
+- partitionTableType: gpt
+  maxSize: 4096
+  partitions:
+  - id: esp
+    flags:
     - esp
     - boot
-    Start: 1
-    End: 9
-    FsType: fat32
+    start: 1
+    end: 9
+    fsType: fat32
 
-  - ID: boot
-    Start: 9
-    End: 108
-    FsType: ext4
+  - id: boot
+    start: 9
+    end: 108
+    fsType: ext4
 
-  - ID: rootfs
-    Start: 108
-    End: 2048
-    FsType: xfs
+  - id: rootfs
+    start: 108
+    end: 2048
+    fsType: xfs
 
-  - ID: var
-    Start: 2048
-    FsType: xfs
+  - id: var
+    start: 2048
+    fsType: xfs
 
 systemConfig:
   bootType: efi
   partitionSettings:
-  - ID: esp
-    MountPoint: /boot/efi
-    MountOptions: umask=0077
+  - id: esp
+    mountPoint: /boot/efi
+    mountOptions: umask=0077
 
-  - ID: boot
-    MountPoint: /boot
+  - id: boot
+    mountPoint: /boot
 
-  - ID: rootfs
-    MountPoint: /
+  - id: rootfs
+    mountPoint: /
 
-  - ID: var
-    MountPoint: /var
+  - id: var
+    mountPoint: /var
 
-  KernelCommandLine:
-    ExtraCommandLine: console=tty0 console=ttyS0
+  kernelCommandLine:
+    extraCommandLine: console=tty0 console=ttyS0

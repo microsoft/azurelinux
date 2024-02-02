@@ -2,21 +2,21 @@ disks:
 - partitionTableType: gpt
   maxSize: 4096
   partitions:
-  - ID: boot
-    Flags:
+  - id: boot
+    flags:
     - bios_grub
-    Start: 1
-    Size: 8
-    FsType: fat32
+    start: 1
+    size: 8
+    fsType: fat32
 
-  - ID: rootfs
-    Start: 9
-    FsType: ext4
+  - id: rootfs
+    start: 9
+    fsType: ext4
 
 systemConfig:
   bootType: legacy
   partitionSettings:
-  - ID: boot
+  - id: boot
 
-  - ID: rootfs
+  - id: rootfs
     mountPoint: /

@@ -8,17 +8,17 @@ import (
 )
 
 type Verity struct {
-	DataPartition VerityPartition `yaml:"DataPartition"`
-	HashPartition VerityPartition `yaml:"HashPartition"`
+	DataPartition VerityPartition `yaml:"dataPartition"`
+	HashPartition VerityPartition `yaml:"hashPartition"`
 }
 
 func (v *Verity) IsValid() error {
 	if err := v.DataPartition.IdType.IsValid(); err != nil {
-		return fmt.Errorf("invalid DataPartition: %v", err)
+		return fmt.Errorf("invalid dataPartition: %v", err)
 	}
 
 	if err := v.HashPartition.IdType.IsValid(); err != nil {
-		return fmt.Errorf("invalid HashPartition: %v", err)
+		return fmt.Errorf("invalid hashPartition: %v", err)
 	}
 
 	return nil
