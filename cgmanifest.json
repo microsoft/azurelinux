@@ -13723,8 +13723,8 @@
         "type": "other",
         "other": {
           "name": "nbd",
-          "version": "3.20",
-          "downloadUrl": "http://downloads.sourceforge.net/project/nbd/nbd/3.20/nbd-3.20.tar.xz"
+          "version": "3.25",
+          "downloadUrl": "https://github.com/NetworkBlockDevice/nbd/releases/download/nbd-3.25/nbd-3.25.tar.xz"
         }
       }
     },
