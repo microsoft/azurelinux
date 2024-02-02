@@ -12161,8 +12161,8 @@
         "type": "other",
         "other": {
           "name": "ltp",
-          "version": "20230127",
-          "downloadUrl": "https://github.com/linux-test-project/ltp/archive/refs/tags/20230127.tar.gz"
+          "version": "20240129",
+          "downloadUrl": "https://github.com/linux-test-project/ltp/releases/download/20240129/ltp-full-20240129.tar.xz"
         }
       }
     },
