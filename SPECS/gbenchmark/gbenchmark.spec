@@ -9,7 +9,7 @@ License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/google/%{intname}
-Source0:        https://github.com/google/%{intname}/archive/refs/tags/v{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/google/%{intname}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires: cmake
 BuildRequires: doxygen
