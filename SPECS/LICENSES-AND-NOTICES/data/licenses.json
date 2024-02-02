@@ -2043,6 +2043,7 @@
                 "virt-top",
                 "virt-what",
                 "virt-who",
+                "virtiofsd",
                 "vitess",
                 "vmem",
                 "volume_key",

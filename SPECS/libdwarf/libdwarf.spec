@@ -1,6 +1,7 @@
 Name:          libdwarf
+Epoch:         1
 Version:       0.9.0
-Release:       1%{?dist}
+Release:       2%{?dist}
 Summary:       Library to access the DWARF Debugging file format 
 
 License:       LGPL-2.1-only AND BSD-2-Clause-FreeBSD
@@ -11,6 +12,7 @@ Source0:       https://www.prevanders.net/%{name}-%{version}.tar.xz
 Patch0:        libdwarf_skip_test.patch
 
 BuildRequires: gcc make python3
+Provides:      %{name} = %{version}-%{release}
 
 %description
 Library to access the DWARF debugging file format which supports
@@ -21,6 +23,7 @@ and Fortran.  Please see http://www.dwarfstd.org for DWARF specification.
 Summary:       Library and header files of libdwarf
 License:       LGPL-2.1-only AND BSD-2-Clause-FreeBSD
 Requires:      %{name} = %{version}-%{release}
+Provides:      %{name}-devel = %{version}-%{release}
 
 %description devel
 Development package containing library and header files of libdwarf.
@@ -89,6 +92,9 @@ TZ=:America/Los_Angeles %__make check
 
 
 %changelog
+* Fri Jan 19 2024 Sindhu Karri <lakarri@microsoft.com> - 1:0.9.0-2
+- Add Epoch to fix version ordering as date versioning had changed to normal versioning
+
 * Tue Jan 02 2024 Sindhu Karri <lakarri@microsoft.com> - 0.9.0-1
 - Upgraded to 0.9.0
 - License verified

@@ -1,7 +1,7 @@
 Summary:        An URL retrieval utility and library
 Name:           curl
 Version:        8.5.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        curl
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -85,6 +85,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libcurl.so.*
 
 %changelog
+* Wed Jan 17 2024 Harshit Gupta <guptaharshit@microsoft.com> - 8.5.0-2
+- Release bump with no changes to force a rebuild and consume new libssh2 build
+
 * Tue Dec 19 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.5.0-1
 - Auto-upgrade to 8.5.0 - CVE-2023-46219
 

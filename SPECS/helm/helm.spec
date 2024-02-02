@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:          helm
-Version:       3.13.2
+Version:       3.14.0
 Release:       1%{?dist}
 Summary:       The Kubernetes Package Manager
 Group:         Applications/Networking
@@ -55,6 +55,9 @@ install -m 755 ./helm %{buildroot}%{_bindir}
 go test -v ./cmd/helm
 
 %changelog
+* Fri Jan 19 2024 Muhammad Falak <mwani@microsoft.com> - 3.14.0-1
+- Bump version to address CVE-2023-44487
+
 * Thu Nov 30 2023 Sindhu Karri <lakarri@microsoft.com> - 3.13.2-1
 - Upgrade to 3.13.2 to fix CVE-2023-2253, CVE-2023-28840, CVE-2022-27664, CVE-2022-41721, CVE-2022-41723, CVE-2023-39325, CVE-2022-32149, GHSA-m425-mq94-257g, CVE-2022-23471, CVE-2023-25153, CVE-2023-25173, GHSA-6xv5-86q9-7xr8, CVE-2023-28841, CVE-2023-28842, GHSA-jq35-85cj-fj4p, CVE-2023-3978, CVE-2023-44487, CVE-2023-44487, CVE-2023-25165
 - Remove dependency on golang version <= 1.18.8. Builds with latest golang version 1.20.10

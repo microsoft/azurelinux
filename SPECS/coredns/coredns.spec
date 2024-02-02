@@ -3,7 +3,7 @@
 Summary:        Fast and flexible DNS server
 Name:           coredns
 Version:        1.11.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Apache License 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -32,21 +32,36 @@ Source0:        %{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         makefile-buildoption-commitnb.patch
 
+# Patch for old x/net/http2 vendored code, apply after vendored code is extracted.
+Patch1000:         CVE-2023-44487.patch
+
 BuildRequires:  golang >= 1.12
 
 %description
 CoreDNS is a fast and flexible DNS server.
 
 %prep
-%autosetup -p1
+%autosetup -N
+%autopatch -p1 -M 999
 
 %build
 # create vendor folder from the vendor tarball and set vendor mode
 tar -xf %{SOURCE1} --no-same-owner
+patch -p1 < %{PATCH1000}
 export BUILDOPTS="-mod=vendor -v"
 # set commit number that correspond to the github tag for that version
 export GITCOMMIT="ae2bbc29be1aaae0b3ded5d188968a6c97bb3144"
 make
+
+%check
+# From go.test.yml
+go install github.com/fatih/faillint@latest && \
+(cd request && go test -v -race ./...) && \
+(cd core && go test -v -race ./...) && \
+(cd coremain && go test -v -race ./...) && \
+(cd plugin && go test -v -race ./...) && \
+(cd test && go test -v -race ./...) && \
+./coredns -version
 
 %install
 install -m 755 -d %{buildroot}%{_bindir}
@@ -58,6 +73,9 @@ install -p -m 755 -t %{buildroot}%{_bindir} %{name}
 %{_bindir}/%{name}
 
 %changelog
+* Mon Jan 29 2024 Daniel McIlvaney <damcilva@microsoft.com> - 1.11.1-2
+- Address CVE-2023-44487 by patching vendored golang.org/x/net
+
 * Tue Oct 18 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 1.11.1-1
 - Upgrade to 1.11.1 to match version required by kubernetes
 

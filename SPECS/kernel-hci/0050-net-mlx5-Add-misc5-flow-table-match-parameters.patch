@@ -1,0 +1,109 @@
+From 9a52dab6410affdf1a7184b07481c7fa20cca0d4 Mon Sep 17 00:00:00 2001
+From: Muhammad Sammar <muhammads@nvidia.com>
+Date: Sun, 5 Sep 2021 15:16:21 +0300
+Subject: [PATCH 42/58] net/mlx5: Add misc5 flow table match parameters
+
+Add support for misc5 match parameter as per HW spec, this will allow
+matching on tunnel_header fields.
+
+Signed-off-by: Muhammad Sammar <muhammads@nvidia.com>
+Signed-off-by: Yevgeny Kliteynik <kliteyn@nvidia.com>
+Change-Id: I5099189a66a2c316157e2a1493758a5d59ae7921
+---
+ .../net/ethernet/mellanox/mlx5/core/fs_core.h |  2 +-
+ include/linux/mlx5/device.h                   |  1 +
+ include/linux/mlx5/mlx5_ifc.h                 | 25 ++++++++++++++++++-
+ include/uapi/rdma/mlx5_user_ioctl_cmds.h      |  2 +-
+ 4 files changed, 27 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fs_core.h b/drivers/net/ethernet/mellanox/mlx5/core/fs_core.h
+index 7711db245c63..5469b08d635f 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/fs_core.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/fs_core.h
+@@ -203,7 +203,7 @@ struct mlx5_ft_underlay_qp {
+ 	u32 qpn;
+ };
+ 
+-#define MLX5_FTE_MATCH_PARAM_RESERVED	reserved_at_c00
++#define MLX5_FTE_MATCH_PARAM_RESERVED	reserved_at_e00
+ /* Calculate the fte_match_param length and without the reserved length.
+  * Make sure the reserved field is the last.
+  */
+diff --git a/include/linux/mlx5/device.h b/include/linux/mlx5/device.h
+index b2352a0fdd23..2ab2cac3d60b 100644
+--- a/include/linux/mlx5/device.h
++++ b/include/linux/mlx5/device.h
+@@ -1099,6 +1099,7 @@ enum {
+ 	MLX5_MATCH_MISC_PARAMETERS_2	= 1 << 3,
+ 	MLX5_MATCH_MISC_PARAMETERS_3	= 1 << 4,
+ 	MLX5_MATCH_MISC_PARAMETERS_4	= 1 << 5,
++	MLX5_MATCH_MISC_PARAMETERS_5	= 1 << 6,
+ };
+ 
+ enum {
+diff --git a/include/linux/mlx5/mlx5_ifc.h b/include/linux/mlx5/mlx5_ifc.h
+index 84e6e5cdd3b2..1465fbcc9b51 100644
+--- a/include/linux/mlx5/mlx5_ifc.h
++++ b/include/linux/mlx5/mlx5_ifc.h
+@@ -662,6 +662,26 @@ struct mlx5_ifc_fte_match_set_misc4_bits {
+ 	u8         reserved_at_100[0x100];
+ };
+ 
++struct mlx5_ifc_fte_match_set_misc5_bits {
++	u8         macsec_tag_0[0x20];
++
++	u8         macsec_tag_1[0x20];
++
++	u8         macsec_tag_2[0x20];
++
++	u8         macsec_tag_3[0x20];
++
++	u8         tunnel_header_0[0x20];
++
++	u8         tunnel_header_1[0x20];
++
++	u8         tunnel_header_2[0x20];
++
++	u8         tunnel_header_3[0x20];
++
++	u8         reserved_at_100[0x100];
++};
++
+ struct mlx5_ifc_cmd_pas_bits {
+ 	u8         pa_h[0x20];
+ 
+@@ -1819,7 +1839,9 @@ struct mlx5_ifc_fte_match_param_bits {
+ 
+ 	struct mlx5_ifc_fte_match_set_misc4_bits misc_parameters_4;
+ 
+-	u8         reserved_at_c00[0x400];
++	struct mlx5_ifc_fte_match_set_misc5_bits misc_parameters_5;
++
++	u8         reserved_at_e00[0x200];
+ };
+ 
+ enum {
+@@ -5868,6 +5890,7 @@ enum {
+ 	MLX5_QUERY_FLOW_GROUP_IN_MATCH_CRITERIA_ENABLE_MISC_PARAMETERS_2 = 0x3,
+ 	MLX5_QUERY_FLOW_GROUP_IN_MATCH_CRITERIA_ENABLE_MISC_PARAMETERS_3 = 0x4,
+ 	MLX5_QUERY_FLOW_GROUP_IN_MATCH_CRITERIA_ENABLE_MISC_PARAMETERS_4 = 0x5,
++	MLX5_QUERY_FLOW_GROUP_IN_MATCH_CRITERIA_ENABLE_MISC_PARAMETERS_5 = 0x6,
+ };
+ 
+ struct mlx5_ifc_query_flow_group_out_bits {
+diff --git a/include/uapi/rdma/mlx5_user_ioctl_cmds.h b/include/uapi/rdma/mlx5_user_ioctl_cmds.h
+index ca2372864b70..e539c84d63f1 100644
+--- a/include/uapi/rdma/mlx5_user_ioctl_cmds.h
++++ b/include/uapi/rdma/mlx5_user_ioctl_cmds.h
+@@ -252,7 +252,7 @@ enum mlx5_ib_device_query_context_attrs {
+ 	MLX5_IB_ATTR_QUERY_CONTEXT_RESP_UCTX = (1U << UVERBS_ID_NS_SHIFT),
+ };
+ 
+-#define MLX5_IB_DW_MATCH_PARAM 0x90
++#define MLX5_IB_DW_MATCH_PARAM 0xA0
+ 
+ struct mlx5_ib_match_params {
+ 	__u32	match_params[MLX5_IB_DW_MATCH_PARAM];
+-- 
+2.31.1
+

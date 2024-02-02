@@ -1807,8 +1807,8 @@
         "type": "other",
         "other": {
           "name": "cloud-init",
-          "version": "23.3",
-          "downloadUrl": "https://launchpad.net/cloud-init/trunk/23.3/+download/cloud-init-23.3.tar.gz"
+          "version": "23.4.1",
+          "downloadUrl": "https://launchpad.net/cloud-init/trunk/23.4.1/+download/cloud-init-23.4.1.tar.gz"
         }
       }
     },
@@ -5240,8 +5240,8 @@
         "type": "other",
         "other": {
           "name": "helm",
-          "version": "3.13.2",
-          "downloadUrl": "https://github.com/helm/helm/archive/v3.13.2.tar.gz"
+          "version": "3.14.0",
+          "downloadUrl": "https://github.com/helm/helm/archive/v3.14.0.tar.gz"
         }
       }
     },
@@ -6540,8 +6540,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.145.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.145.2.tar.gz"
+          "version": "5.15.148.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.148.1.tar.gz"
         }
       }
     },
@@ -8051,8 +8051,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers-cc",
-          "version": "0.6.2",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/cc-0.6.2.tar.gz"
+          "version": "0.6.3",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/cc-0.6.3.tar.gz"
         }
       }
     },
@@ -8121,8 +8121,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.145.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.145.2.tar.gz"
+          "version": "5.15.148.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.148.1.tar.gz"
         }
       }
     },
@@ -8131,8 +8131,8 @@
         "type": "other",
         "other": {
           "name": "kernel-azure",
-          "version": "5.15.145.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.145.2.tar.gz"
+          "version": "5.15.148.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.148.1.tar.gz"
         }
       }
     },
@@ -8141,8 +8141,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hci",
-          "version": "5.15.145.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.145.2.tar.gz"
+          "version": "5.15.148.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.148.1.tar.gz"
         }
       }
     },
@@ -8151,8 +8151,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.145.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.145.2.tar.gz"
+          "version": "5.15.148.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.148.1.tar.gz"
         }
       }
     },
@@ -8161,8 +8161,8 @@
         "type": "other",
         "other": {
           "name": "kernel-mos",
-          "version": "5.15.145.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2-mos/5.15.145.2.tar.gz"
+          "version": "5.15.148.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2-mos/5.15.148.1.tar.gz"
         }
       }
     },
@@ -27827,8 +27827,8 @@
         "type": "other",
         "other": {
           "name": "skopeo",
-          "version": "1.13.3",
-          "downloadUrl": "https://github.com/containers/skopeo/archive/refs/tags/v1.13.3.tar.gz"
+          "version": "1.14.1",
+          "downloadUrl": "https://github.com/containers/skopeo/archive/refs/tags/v1.14.1.tar.gz"
         }
       }
     },
@@ -29509,6 +29509,16 @@
           "name": "virt-who",
           "version": "0.24.2",
           "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/virt-who-0.24.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "virtiofsd",
+          "version": "1.8.0",
+          "downloadUrl": "https://gitlab.com/virtio-fs/virtiofsd/-/archive/v1.8.0/virtiofsd-v1.8.0.tar.gz"
         }
       }
     },
