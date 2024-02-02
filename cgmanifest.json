@@ -26996,7 +26996,7 @@
         "other": {
           "name": "scons",
           "version": "4.6.0",
-          "downloadUrl": "https://sourceforge.net/projects/scons/files/scons/4.6.0/SCons-4.6.0.tar.gz/download"
+          "downloadUrl": "https://sourceforge.net/projects/scons/files/scons/4.6.0/scons-4.6.0.tar.gz"
         }
       }
     },
