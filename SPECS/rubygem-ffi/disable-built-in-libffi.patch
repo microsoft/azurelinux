@@ -1,0 +1,36 @@
+From d693b5d6751c585763b3a235e7e9954a15081d5a Mon Sep 17 00:00:00 2001
+From: Pawel Winogrodzki <pawelwi@microsoft.com>
+Date: Thu, 1 Feb 2024 16:02:08 -0800
+Subject: [PATCH] Disable built-in 'libffi'.
+
+---
+ ffi.gemspec | 13 -------------
+ 1 file changed, 13 deletions(-)
+
+diff --git a/ffi.gemspec b/ffi.gemspec
+index 07d549f..8f8551b 100644
+--- a/ffi.gemspec
++++ b/ffi.gemspec
+@@ -16,19 +16,6 @@ Gem::Specification.new do |s|
+     s.metadata['source_code_uri'] = 'https://github.com/ffi/ffi/'
+     s.metadata['mailing_list_uri'] = 'http://groups.google.com/group/ruby-ffi'
+   end
+-  s.files = `git ls-files -z`.split("\x0").reject do |f|
+-    f =~ /^(\.|bench|gen|libtest|nbproject|spec)/
+-  end
+-
+-  # Add libffi git files
+-  lfs = `git --git-dir ext/ffi_c/libffi/.git ls-files -z`.split("\x0")
+-  # Add autoconf generated files of libffi
+-  lfs += %w[ compile configure config.guess config.sub install-sh ltmain.sh missing fficonfig.h.in ]
+-  # Add automake generated files of libffi
+-  lfs += `git --git-dir ext/ffi_c/libffi/.git ls-files -z *.am */*.am`.gsub(".am\0", ".in\0").split("\x0")
+-  s.files += lfs.map do |f|
+-    File.join("ext/ffi_c/libffi", f)
+-  end
+ 
+   s.extensions << 'ext/ffi_c/extconf.rb'
+   s.rdoc_options = %w[--exclude=ext/ffi_c/.*\.o$ --exclude=ffi_c\.(bundle|so)$]
+-- 
+2.34.1
+
