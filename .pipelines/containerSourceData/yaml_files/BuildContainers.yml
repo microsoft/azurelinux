@@ -65,7 +65,7 @@ parameters:
     componentName: nodejs18
     packageFileName: nodejs18.pkg
     dockerfile: Dockerfile-Nodejs
-    repository: base/nodejs18
+    repository: base/nodejs
     distroless: true
   - imageName: openmpi
     componentName: openmpi
