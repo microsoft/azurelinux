@@ -1,0 +1,41 @@
+diff --git a/requirements.txt b/requirements.txt
+index f9f5cc3..64c04fd 100644
+--- a/requirements.txt
++++ b/requirements.txt
+@@ -1,18 +1,18 @@
+-cachetools==4.2.4
+-certifi==2023.7.22
+-charset-normalizer==2.0.12
+-google-auth==2.13.0
+-idna==3.4
+-kubernetes==25.3.0
+-oauthlib==3.2.2
+-pyasn1==0.4.8
+-pyasn1-modules==0.2.8
+-python-dateutil==2.8.2
+-PyYAML==6.0.1
+-requests==2.27.1
+-requests-oauthlib==1.3.1
+-rsa==4.9
+-six==1.16.0
+-urllib3==1.26.12
+-websocket-client==1.3.1
+-ply==3.11
++cachetools
++certifi
++charset-normalizer
++google-auth
++idna
++kubernetes
++oauthlib
++pyasn1
++pyasn1-modules
++python-dateutil
++PyYAML
++requests
++requests-oauthlib
++rsa
++six
++urllib3
++websocket-client
++ply

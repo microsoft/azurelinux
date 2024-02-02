@@ -10,6 +10,7 @@ URL:            https://syslog-ng.org/
 Source0:        https://github.com/balabit/%{name}/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
 Source1:        60-syslog-ng-journald.conf
 Source2:        syslog-ng.service
+Patch0:         remove-hardcoded-python-module-versioning.patch
 BuildRequires:  glib-devel
 BuildRequires:  json-c-devel
 BuildRequires:  json-glib-devel
@@ -50,7 +51,7 @@ Requires:       %{name} = %{version}-%{release}
  needed to build applications using syslog-ng APIs.
 
 %prep
-%setup -q
+%autosetup -p1
 rm -rf ../p3dir
 cp -a . ../p3dir
 
@@ -147,6 +148,11 @@ fi
 %{_libdir}/pkgconfig/*
 
 %changelog
+* Thu Feb 01 2024 Henry Li <lihl@microsoft.com> - 4.3.1-1
+- Upgrade to v4.3.1
+- Change to using autosetup
+- Apply patch to disable hardcoded python module versioning
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.33.2-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
