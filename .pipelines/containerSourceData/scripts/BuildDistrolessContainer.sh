@@ -53,6 +53,7 @@ function create_distroless_container {
 
     marinara="marinara"
     marinaraSrcDir="$WORK_DIR/$marinara-src"
+    # TODO: Get the marinara image from the latest build
     git clone -b 'mandeepsplaha/add-support-for-local-rpms' "https://github.com/microsoft/$marinara.git" "$marinaraSrcDir"
     
     # It is important to operate from the $WORK_DIR to ensure that docker can access the files.
