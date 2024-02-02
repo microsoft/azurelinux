@@ -7711,8 +7711,8 @@
         "type": "other",
         "other": {
           "name": "javapackages-bootstrap",
-          "version": "1.5.0",
-          "downloadUrl": "https://github.com/fedora-java/javapackages-bootstrap/releases/download/1.5.0/javapackages-bootstrap-1.5.0.tar.xz"
+          "version": "1.14.0",
+          "downloadUrl": "https://github.com/fedora-java/javapackages-bootstrap/releases/download/1.14.0/javapackages-bootstrap-1.14.0.tar.xz"
         }
       }
     },
