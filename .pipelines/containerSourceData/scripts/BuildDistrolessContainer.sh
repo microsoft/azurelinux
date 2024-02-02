@@ -23,7 +23,7 @@ function DockerBuild {
     # Create container
     docker build . \
         -t "$containerName" \
-        -f dockerfiles/dockerfile-new-image \
+        -f "$marinaraSrcDir/dockerfiles/dockerfile-new-image" \
         --build-arg MARINER_VERSION="$azureLinuxVersion" \
         --build-arg IMAGE_TYPE="$imageType" \
         --build-arg PACKAGES_TO_INSTALL="$packagesToInstall" \
@@ -54,14 +54,16 @@ function create_distroless_container {
     marinara="marinara"
     marinaraSrcDir="$WORK_DIR/$marinara-src"
     git clone -b 'mandeepsplaha/add-support-for-local-rpms' "https://github.com/microsoft/$marinara.git" "$marinaraSrcDir"
-    pushd "$marinaraSrcDir"
+    
+    # It is important to operate from the $WORK_DIR to ensure that docker can access the files.
+    pushd "$WORK_DIR"
 
     # TODO: Get the marinara image from the latest build
     # MARINARA_IMAGE=${BASE_IMAGE_NAME_FULL/base\/core/marinara}
     MARINARA_IMAGE="mcr.microsoft.com/cbl-mariner/marinara:2.0"
     echo "MARINARA_IMAGE -> $MARINARA_IMAGE"
 
-    sed -E "s|^FROM .*builder$|FROM $MARINARA_IMAGE as builder|g" -i "dockerfiles/dockerfile-new-image"
+    sed -E "s|^FROM .*builder$|FROM $MARINARA_IMAGE as builder|g" -i "$marinaraSrcDir/dockerfiles/dockerfile-new-image"
 
     # Create standard container
     DockerBuild \

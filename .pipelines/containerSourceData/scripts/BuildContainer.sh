@@ -358,7 +358,6 @@ function distroless_container {
         return
     fi
 
-    echo "+++ Create distroless container"
     # shellcheck source=/dev/null
     source "$CONTAINER_SRC_DIR/scripts/BuildDistrolessContainer.sh"
     create_distroless_container
