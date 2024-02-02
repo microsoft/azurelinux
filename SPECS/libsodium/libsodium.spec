@@ -1,5 +1,5 @@
 %global libname libsodium
-%global soname  23
+%global soname  26
 Summary:        The Sodium crypto library
 Name:           libsodium
 Version:        1.0.19
@@ -34,7 +34,7 @@ This package contains libraries and header files for
 developing applications that use %{name} libraries.
 
 %prep
-%autosetup
+%autosetup -n %{name}-stable
 
 %build
 %configure \
@@ -68,8 +68,9 @@ find %{buildroot} -type f -name "*.a" -delete -print
 
 
 %changelog
-* Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0.19-1
-- Auto-upgrade to 1.0.19 - Package upgrade for Azure Linux 3.0
+* Fri Feb 02 2024 Thien Trung Vuong <tvuong@microsoft.com> - 1.0.19-1
+- Update to version 1.0.19
+- Update soname to 26
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.0.18-6
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
