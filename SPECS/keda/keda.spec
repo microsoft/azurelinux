@@ -68,7 +68,7 @@ cp ./bin/keda-adapter %{buildroot}%{_bindir}
 %{_bindir}/%{name}-adapter
 
 %changelog
-* Mon Feb 05 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 2.4.0-18
+* Thu Feb 08 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 2.4.0-18
 - Patch CVE-2021-44716
 
 * Mon Feb 05 2024 Daniel McIlvaney <damcilva@microsoft.com> - 2.4.0-17
