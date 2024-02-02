@@ -18,11 +18,11 @@ bzip2-1.0.8-1.cm2.aarch64.rpm
 bzip2-debuginfo-1.0.8-1.cm2.aarch64.rpm
 bzip2-devel-1.0.8-1.cm2.aarch64.rpm
 bzip2-libs-1.0.8-1.cm2.aarch64.rpm
-ca-certificates-2.0.0-14.cm2.noarch.rpm
-ca-certificates-base-2.0.0-14.cm2.noarch.rpm
-ca-certificates-legacy-2.0.0-14.cm2.noarch.rpm
-ca-certificates-shared-2.0.0-14.cm2.noarch.rpm
-ca-certificates-tools-2.0.0-14.cm2.noarch.rpm
+ca-certificates-2.0.0-15.cm2.noarch.rpm
+ca-certificates-base-2.0.0-15.cm2.noarch.rpm
+ca-certificates-legacy-2.0.0-15.cm2.noarch.rpm
+ca-certificates-shared-2.0.0-15.cm2.noarch.rpm
+ca-certificates-tools-2.0.0-15.cm2.noarch.rpm
 ccache-4.8-1.cm2.aarch64.rpm
 ccache-debuginfo-4.8-1.cm2.aarch64.rpm
 check-0.15.2-1.cm2.aarch64.rpm
@@ -136,7 +136,7 @@ intltool-0.51.0-7.cm2.noarch.rpm
 itstool-2.0.6-4.cm2.noarch.rpm
 kbd-2.2.0-1.cm2.aarch64.rpm
 kbd-debuginfo-2.2.0-1.cm2.aarch64.rpm
-kernel-headers-5.15.145.2-3.cm2.noarch.rpm
+kernel-headers-5.15.148.1-1.cm2.noarch.rpm
 kmod-29-2.cm2.aarch64.rpm
 kmod-debuginfo-29-2.cm2.aarch64.rpm
 kmod-devel-29-2.cm2.aarch64.rpm

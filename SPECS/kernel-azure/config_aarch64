@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 5.15.145.2 Kernel Configuration
+# Linux/arm64 5.15.148.1 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="gcc (GCC) 11.2.0"
 CONFIG_CC_IS_GCC=y
@@ -5128,8 +5128,6 @@ CONFIG_AMLOGIC_THERMAL=y
 CONFIG_BCM_SR_THERMAL=y
 # end of Broadcom thermal drivers
 
-# CONFIG_TI_SOC_THERMAL is not set
-
 #
 # NVIDIA Tegra thermal drivers
 #
@@ -7392,10 +7390,8 @@ CONFIG_MMC_BCM2835=m
 CONFIG_MMC_MTK=m
 CONFIG_MMC_SDHCI_BRCMSTB=m
 CONFIG_MMC_SDHCI_XENON=m
-CONFIG_MMC_SDHCI_OMAP=m
 CONFIG_MMC_SDHCI_AM654=m
 # CONFIG_MMC_OWL is not set
-CONFIG_MMC_SDHCI_EXTERNAL_DMA=y
 CONFIG_MEMSTICK=m
 # CONFIG_MEMSTICK_DEBUG is not set
 
