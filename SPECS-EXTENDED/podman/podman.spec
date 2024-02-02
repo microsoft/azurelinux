@@ -29,7 +29,7 @@
 # https://github.com/containers/gvisor-tap-vsock
 %global import_path_gvproxy %%{provider}.%{provider_tld}/%{project}/%{repo_gvproxy}
 %global git_gvproxy https://%{import_path_gvproxy}
-%global commit_gvproxy aab0ac9367fc5142f5857c36ac2352bcb3c60ab7
+%global commit_gvproxy 012bc90eed47444b08986d56ffd65b0f68cfff20
 %global shortcommit_gvproxy %(c=%{commit_gvproxy}; echo ${c:0:7})
 
 %global built_tag v4.1.1
@@ -387,8 +387,9 @@ cp -pav test/system %{buildroot}/%{_datadir}/%{name}/test/
 
 # rhcontainerbot account currently managed by lsm5
 %changelog
-* Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.1.1-19
+* Fri Feb 02 2024 Muhammad Falak <mwani@microsoft.com> - 4.1.1-19
 - Bump release to rebuild with go 1.21.6
+- Bump version of gvproxy to enable build with go1.21
 
 * Wed Oct 18 2023 Minghe Ren <mingheren@microsoft.com> - 4.1.1-18
 - Bump release to rebuild against glibc 2.35-6
