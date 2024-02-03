@@ -36,7 +36,60 @@ The current implementation for the LiveOS ISO does not support the following:
   - There is always one disk generated when an `iso` output format is
     specified.
 
-  ## ISO Specific Customizations
+## ISO Specific Customizations
 
-  - The user can specify one or more files to be copied to the iso media.
-    See MIC's iso configuration [Config.ISO](./configuration.md#iso-type).
+- The user can specify one or more files to be copied to the iso media.
+- The user can add kernel parameters.
+
+For a full list of capabilities, see Mariner Image Customizer's iso configuration 
+section: [Config.ISO](./configuration.md#iso-type).
+
+## cloud-init Support
+
+In some user scenarios, it desired to embed the cloud-init data files into the
+iso media. The easiest way is to include the data files on the media, and then
+the cloud-init `ds` kernel parameter to where the files are.
+
+The files can be placed directly within the iso file system or they can be
+placed within the LiveOS root file system.
+
+Placing those files directly on the iso file system will allow a more efficient
+replacement flow in the future (i.e. when it is desired to only replace the
+cloud-init data files).
+
+#### Example 1
+
+If cloud-init data is to be placed directly within the iso file system:
+
+```yaml
+Iso:
+  AdditionalFiles:
+    cloud-init-data/user-data: /cloud-init-data/user-data
+    cloud-init-data/network-config: /cloud-init-data/network-config
+    cloud-init-data/meta-data: /cloud-init-data/meta-data
+  KernelCommandLine: ds=nocloud;s=file://run/initramfs/live/cloud-init-data
+SystemConfig:
+  Users:
+  - Name: test
+    Password: testpassword
+    PrimaryGroup: sudo
+```
+
+#### Example 2
+
+If cloud-init data is to be placed within the LiveOS root file system:
+
+```yaml
+Iso:
+  KernelCommandLine:
+    ExtraCommandLine: ds=nocloud;s=file://cloud-init-data
+  SystemConfig:
+    Users:
+    - Name: test
+      Password: testpassword
+      PrimaryGroup: sudo
+    AdditionalFiles:
+      cloud-init-data/user-data: /cloud-init-data/user-data
+      cloud-init-data/network-config: /cloud-init-data/network-config
+      cloud-init-data/meta-data: /cloud-init-data/meta-data
+```
