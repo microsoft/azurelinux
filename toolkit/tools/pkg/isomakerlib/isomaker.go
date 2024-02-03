@@ -16,6 +16,7 @@ import (
 	"github.com/klauspost/pgzip"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
@@ -470,7 +471,7 @@ func (im *IsoMaker) copyStaticIsoRootFiles() (err error) {
 	// im.grubCfgPath allows the user to overwrite the default grub.cfg that is
 	// copied from the resource folder.
 	if im.grubCfgPath != "" {
-		targetGrubCfg := filepath.Join(im.buildDirPath, "boot/grub2/grub.cfg")
+		targetGrubCfg := filepath.Join(im.buildDirPath, installutils.GrubCfgFile)
 		targetGrubCfgDir := filepath.Dir(targetGrubCfg)
 		err := os.MkdirAll(targetGrubCfgDir, os.ModePerm)
 		if err != nil {
