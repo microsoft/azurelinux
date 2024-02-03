@@ -17,13 +17,13 @@ parameters:
   type: string
 
 stages:
-- template: BuildContainersValidation.yml@${{ parameters.selfRepoName }}
+- template: BuildGoldenContainersValidation.yml@${{ parameters.selfRepoName }}
   parameters:
     stageName: validation_stage
     publishingLevel: ${{ parameters.publishingLevel }}
     agentPool: ${{ parameters.agentPool }}
 
-- template: BuildContainers.yml@${{ parameters.selfRepoName }}
+- template: BuildGoldenContainers.yml@${{ parameters.selfRepoName }}
   parameters:
     dependsOnStage: validation_stage
     stageName: build_containers_stage
@@ -36,7 +36,7 @@ stages:
     sbomToolPath: ${{ parameters.sbomToolPath }}
     sbomScript: ${{ parameters.sbomScript }}
 
-- template: BuildContainersWrapup.yml@${{ parameters.selfRepoName }}
+- template: BuildGoldenContainersWrapup.yml@${{ parameters.selfRepoName }}
   parameters:
     dependsOnStage: build_containers_stage
     containerImages: ${{ parameters.containerImages }}
