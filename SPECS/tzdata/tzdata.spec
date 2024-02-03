@@ -1,6 +1,6 @@
 Summary:        Time zone data
 Name:           tzdata
-Version:        2023c
+Version:        2024a
 Release:        1%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
@@ -45,6 +45,9 @@ ln -svf %{_datarootdir}/zoneinfo/UTC %{buildroot}%{_sysconfdir}/localtime
 %{_datadir}/*
 
 %changelog
+* Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2024a-1
+- Auto-upgrade to 2024a - upgrade to version 2024a
+
 * Thu Mar 30 2023 CBL-Mariner Service Account <cblmargh@microsoft.com> - 2023c-1
 - Update to version  "2023c".
 

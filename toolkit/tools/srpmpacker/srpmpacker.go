@@ -15,7 +15,6 @@ import (
 	"runtime"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/buildpipeline"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/directory"
@@ -102,8 +101,7 @@ var (
 
 	specsDir      = exe.InputDirFlag(app, "Path to the SPEC directory to create SRPMs from.")
 	outDir        = exe.OutputDirFlag(app, "Directory to place the output SRPM.")
-	logFile       = exe.LogFileFlag(app)
-	logLevel      = exe.LogLevelFlag(app)
+	logFlags      = exe.SetupLogFlags(app)
 	profFlags     = exe.SetupProfileFlags(app)
 	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
 
@@ -132,7 +130,7 @@ var (
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel)
+	logger.InitBestEffort(logFlags)
 
 	prof, err := profile.StartProfiling(profFlags)
 	if err != nil {
@@ -917,13 +915,6 @@ func tryToHydrateFromLocalSource(fileHydrationState map[string]bool, newSourceDi
 // hydrateFromRemoteSource will update fileHydrationState.
 // Will alter `currentSignatures`.
 func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir string, srcConfig sourceRetrievalConfiguration, skipSignatureHandling bool, currentSignatures map[string]string, cancel <-chan struct{}, netOpsSemaphore chan struct{}) (err error) {
-	const (
-		// With 5 attempts, initial delay of 1 second, and a backoff factor of 2.0 the total time spent retrying will be
-		// ~30 seconds.
-		downloadRetryAttempts = 5
-		failureBackoffBase    = 2.0
-		downloadRetryDuration = time.Second
-	)
 	errPackerCancelReceived := fmt.Errorf("packer cancel signal received")
 
 	for fileName, alreadyHydrated := range fileHydrationState {
@@ -947,14 +938,14 @@ func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir st
 			}
 		}
 
-		cancelled, internalErr := retry.RunWithExpBackoff(func() error {
+		cancelled, internalErr := retry.RunWithDefaultDownloadBackoff(func() error {
 			downloadErr := network.DownloadFile(url, destinationFile, srcConfig.caCerts, srcConfig.tlsCerts)
 			if downloadErr != nil {
 				logger.Log.Debugf("Failed an attempt to download (%s). Error: %s.", url, downloadErr)
 			}
 
 			return downloadErr
-		}, downloadRetryAttempts, downloadRetryDuration, failureBackoffBase, cancel)
+		}, cancel)
 
 		if netOpsSemaphore != nil {
 			// Clear the channel to allow another operation to start

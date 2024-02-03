@@ -1,0 +1,235 @@
+From f59464e257bdbd4df6df9a4505d7858a0baf6cf7 Mon Sep 17 00:00:00 2001
+From: Yevgeny Kliteynik <kliteyn@nvidia.com>
+Date: Mon, 8 Nov 2021 02:42:50 +0200
+Subject: [PATCH] net/mlx5: DR, Add support for matching on
+ geneve_tlv_option_0_exist field
+
+Match on geneve_tlv_option_0_exist field on devices that support STEv1.
+
+Signed-off-by: Muhammad Sammar <muhammads@nvidia.com>
+Signed-off-by: Yevgeny Kliteynik <kliteyn@nvidia.com>
+---
+ .../mellanox/mlx5/core/steering/dr_cmd.c      |  7 +++++
+ .../mellanox/mlx5/core/steering/dr_matcher.c  | 17 +++++++++++
+ .../mellanox/mlx5/core/steering/dr_ste.c      | 17 +++++++++++
+ .../mellanox/mlx5/core/steering/dr_ste.h      |  1 +
+ .../mellanox/mlx5/core/steering/dr_ste_v1.c   | 28 +++++++++++++++++++
+ .../mellanox/mlx5/core/steering/dr_types.h    |  9 +++++-
+ .../mellanox/mlx5/core/steering/mlx5_ifc_dr.h |  8 ++++++
+ include/linux/mlx5/mlx5_ifc.h                 |  6 ++--
+ 8 files changed, 90 insertions(+), 3 deletions(-)
+
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_cmd.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_cmd.c
+@@ -134,6 +134,13 @@ int mlx5dr_cmd_query_device(struct mlx5_
+ 
+ 	caps->isolate_vl_tc = MLX5_CAP_GEN(mdev, isolate_vl_tc_new);
+ 
++	/* geneve_tlv_option_0_exist is the indication of
++	 * STE support for lookup type flex_parser_ok
++	 */
++	caps->flex_parser_ok_bits_supp =
++		MLX5_CAP_FLOWTABLE(mdev,
++				   flow_table_properties_nic_receive.ft_field_support.geneve_tlv_option_0_exist);
++
+ 	if (caps->flex_protocols & MLX5_FLEX_PARSER_ICMP_V4_ENABLED) {
+ 		caps->flex_parser_id_icmp_dw0 = MLX5_CAP_GEN(mdev, flex_parser_id_icmp_dw0);
+ 		caps->flex_parser_id_icmp_dw1 = MLX5_CAP_GEN(mdev, flex_parser_id_icmp_dw1);
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_matcher.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_matcher.c
+@@ -129,6 +129,19 @@ static bool dr_mask_is_tnl_geneve_tlv_op
+ }
+ 
+ static bool
++dr_matcher_supp_flex_parser_ok(struct mlx5dr_cmd_caps *caps)
++{
++	return caps->flex_parser_ok_bits_supp;
++}
++
++static bool dr_mask_is_tnl_geneve_tlv_opt_exist_set(struct mlx5dr_match_misc *misc,
++						    struct mlx5dr_domain *dmn)
++{
++	return dr_matcher_supp_flex_parser_ok(&dmn->info.caps) &&
++	       misc->geneve_tlv_option_0_exist;
++}
++
++static bool
+ dr_matcher_supp_tnl_geneve(struct mlx5dr_cmd_caps *caps)
+ {
+ 	return (caps->sw_format_ver == MLX5_STEERING_FORMAT_CONNECTX_6DX) ||
+@@ -509,6 +522,10 @@ static int dr_matcher_set_ste_builders(s
+ 				mlx5dr_ste_build_tnl_geneve_tlv_opt(ste_ctx, &sb[idx++],
+ 								    &mask, &dmn->info.caps,
+ 								    inner, rx);
++			if (dr_mask_is_tnl_geneve_tlv_opt_exist_set(&mask.misc, dmn))
++				mlx5dr_ste_build_tnl_geneve_tlv_opt_exist(ste_ctx, &sb[idx++],
++									  &mask, &dmn->info.caps,
++									  inner, rx);
+ 		} else if (dr_mask_is_tnl_gtpu_any(&mask, dmn)) {
+ 			if (dr_mask_is_tnl_gtpu_flex_parser_0(&mask, dmn))
+ 				mlx5dr_ste_build_tnl_gtpu_flex_parser_0(ste_ctx, &sb[idx++],
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_ste.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_ste.c
+@@ -750,6 +750,8 @@ static void dr_ste_copy_mask_misc(char *
+ 	spec->vxlan_vni = IFC_GET_CLR(fte_match_set_misc, mask, vxlan_vni, clr);
+ 
+ 	spec->geneve_vni = IFC_GET_CLR(fte_match_set_misc, mask, geneve_vni, clr);
++	spec->geneve_tlv_option_0_exist =
++		IFC_GET_CLR(fte_match_set_misc, mask, geneve_tlv_option_0_exist, clr);
+ 	spec->geneve_oam = IFC_GET_CLR(fte_match_set_misc, mask, geneve_oam, clr);
+ 
+ 	spec->outer_ipv6_flow_label =
+@@ -1245,6 +1247,21 @@ void mlx5dr_ste_build_tnl_geneve_tlv_opt
+ 	ste_ctx->build_tnl_geneve_tlv_opt_init(sb, mask);
+ }
+ 
++void mlx5dr_ste_build_tnl_geneve_tlv_opt_exist(struct mlx5dr_ste_ctx *ste_ctx,
++					       struct mlx5dr_ste_build *sb,
++					       struct mlx5dr_match_param *mask,
++					       struct mlx5dr_cmd_caps *caps,
++					       bool inner, bool rx)
++{
++	if (!ste_ctx->build_tnl_geneve_tlv_opt_exist_init)
++		return;
++
++	sb->rx = rx;
++	sb->caps = caps;
++	sb->inner = inner;
++	ste_ctx->build_tnl_geneve_tlv_opt_exist_init(sb, mask);
++}
++
+ void mlx5dr_ste_build_tnl_gtpu(struct mlx5dr_ste_ctx *ste_ctx,
+ 			       struct mlx5dr_ste_build *sb,
+ 			       struct mlx5dr_match_param *mask,
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_ste.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_ste.h
+@@ -135,6 +135,7 @@ struct mlx5dr_ste_ctx {
+ 	void DR_STE_CTX_BUILDER(tnl_vxlan_gpe);
+ 	void DR_STE_CTX_BUILDER(tnl_geneve);
+ 	void DR_STE_CTX_BUILDER(tnl_geneve_tlv_opt);
++	void DR_STE_CTX_BUILDER(tnl_geneve_tlv_opt_exist);
+ 	void DR_STE_CTX_BUILDER(register_0);
+ 	void DR_STE_CTX_BUILDER(register_1);
+ 	void DR_STE_CTX_BUILDER(src_gvmi_qpn);
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_ste_v1.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_ste_v1.c
+@@ -47,6 +47,7 @@ enum {
+ 	DR_STE_V1_LU_TYPE_ETHL3_IPV4_MISC_I		= 0x000f,
+ 	DR_STE_V1_LU_TYPE_STEERING_REGISTERS_0		= 0x010f,
+ 	DR_STE_V1_LU_TYPE_STEERING_REGISTERS_1		= 0x0110,
++	DR_STE_V1_LU_TYPE_FLEX_PARSER_OK		= 0x0011,
+ 	DR_STE_V1_LU_TYPE_FLEX_PARSER_0			= 0x0111,
+ 	DR_STE_V1_LU_TYPE_FLEX_PARSER_1			= 0x0112,
+ 	DR_STE_V1_LU_TYPE_ETHL4_MISC_O			= 0x0113,
+@@ -1942,6 +1943,32 @@ dr_ste_v1_build_flex_parser_tnl_geneve_t
+ 	sb->ste_build_tag_func = &dr_ste_v1_build_flex_parser_tnl_geneve_tlv_opt_tag;
+ }
+ 
++static int
++dr_ste_v1_build_flex_parser_tnl_geneve_tlv_opt_exist_tag(struct mlx5dr_match_param *value,
++							 struct mlx5dr_ste_build *sb,
++							 uint8_t *tag)
++{
++	u8 parser_id = sb->caps->flex_parser_id_geneve_tlv_option_0;
++	struct mlx5dr_match_misc *misc = &value->misc;
++
++	if (misc->geneve_tlv_option_0_exist) {
++		MLX5_SET(ste_flex_parser_ok, tag, flex_parsers_ok, 1 << parser_id);
++		misc->geneve_tlv_option_0_exist = 0;
++	}
++
++	return 0;
++}
++
++static void
++dr_ste_v1_build_flex_parser_tnl_geneve_tlv_opt_exist_init(struct mlx5dr_ste_build *sb,
++							  struct mlx5dr_match_param *mask)
++{
++	sb->lu_type = DR_STE_V1_LU_TYPE_FLEX_PARSER_OK;
++	dr_ste_v1_build_flex_parser_tnl_geneve_tlv_opt_exist_tag(mask, sb, sb->bit_mask);
++	sb->byte_mask = mlx5dr_ste_conv_bit_to_byte_mask(sb->bit_mask);
++	sb->ste_build_tag_func = &dr_ste_v1_build_flex_parser_tnl_geneve_tlv_opt_exist_tag;
++}
++
+ static int dr_ste_v1_build_flex_parser_tnl_gtpu_tag(struct mlx5dr_match_param *value,
+ 						    struct mlx5dr_ste_build *sb,
+ 						    u8 *tag)
+@@ -2041,6 +2068,7 @@ struct mlx5dr_ste_ctx ste_ctx_v1 = {
+ 	.build_tnl_vxlan_gpe_init	= &dr_ste_v1_build_flex_parser_tnl_vxlan_gpe_init,
+ 	.build_tnl_geneve_init		= &dr_ste_v1_build_flex_parser_tnl_geneve_init,
+ 	.build_tnl_geneve_tlv_opt_init	= &dr_ste_v1_build_flex_parser_tnl_geneve_tlv_opt_init,
++	.build_tnl_geneve_tlv_opt_exist_init = &dr_ste_v1_build_flex_parser_tnl_geneve_tlv_opt_exist_init,
+ 	.build_register_0_init		= &dr_ste_v1_build_register_0_init,
+ 	.build_register_1_init		= &dr_ste_v1_build_register_1_init,
+ 	.build_src_gvmi_qpn_init	= &dr_ste_v1_build_src_gvmi_qpn_init,
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_types.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_types.h
+@@ -442,6 +442,11 @@ void mlx5dr_ste_build_tnl_geneve_tlv_opt
+ 					 struct mlx5dr_match_param *mask,
+ 					 struct mlx5dr_cmd_caps *caps,
+ 					 bool inner, bool rx);
++void mlx5dr_ste_build_tnl_geneve_tlv_opt_exist(struct mlx5dr_ste_ctx *ste_ctx,
++					       struct mlx5dr_ste_build *sb,
++					       struct mlx5dr_match_param *mask,
++					       struct mlx5dr_cmd_caps *caps,
++					       bool inner, bool rx);
+ void mlx5dr_ste_build_tnl_gtpu(struct mlx5dr_ste_ctx *ste_ctx,
+ 			       struct mlx5dr_ste_build *sb,
+ 			       struct mlx5dr_match_param *mask,
+@@ -666,7 +671,8 @@ struct mlx5dr_match_misc {
+ 	u32 reserved_auto3:8;
+ 
+ 	u32 geneve_vni:24;		/* GENEVE VNI field (outer) */
+-	u32 reserved_auto4:7;
++	u32 reserved_auto4:6;
++	u32 geneve_tlv_option_0_exist:1;
+ 	u32 geneve_oam:1;		/* GENEVE OAM field (outer) */
+ 
+ 	u32 reserved_auto5:12;
+@@ -851,6 +857,7 @@ struct mlx5dr_cmd_caps {
+ 	u8 flex_parser_id_gtpu_teid;
+ 	u8 flex_parser_id_gtpu_dw_2;
+ 	u8 flex_parser_id_gtpu_first_ext_dw_0;
++	u8 flex_parser_ok_bits_supp;
+ 	u8 max_ft_level;
+ 	u16 roce_min_src_udp;
+ 	u8 sw_format_ver;
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/mlx5_ifc_dr.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/mlx5_ifc_dr.h
+@@ -447,6 +447,14 @@ struct mlx5_ifc_ste_flex_parser_1_bits {
+ 	u8         flex_parser_4[0x20];
+ };
+ 
++struct mlx5_ifc_ste_flex_parser_ok_bits {
++	u8         flex_parser_3[0x20];
++	u8         flex_parser_2[0x20];
++	u8         flex_parsers_ok[0x8];
++	u8         reserved_at_48[0x18];
++	u8         flex_parser_0[0x20];
++};
++
+ struct mlx5_ifc_ste_flex_parser_tnl_bits {
+ 	u8         flex_parser_tunneling_header_63_32[0x20];
+ 
+--- a/include/linux/mlx5/mlx5_ifc.h
++++ b/include/linux/mlx5/mlx5_ifc.h
+@@ -372,7 +372,8 @@ struct mlx5_ifc_flow_table_fields_suppor
+ 	u8         reserved_at_37[0x9];
+ 
+ 	u8         geneve_tlv_option_0_data[0x1];
+-	u8         reserved_at_41[0x4];
++	u8         geneve_tlv_option_0_exist[0x1];
++	u8         reserved_at_42[0x3];
+ 	u8         outer_first_mpls_over_udp[0x4];
+ 	u8         outer_first_mpls_over_gre[0x4];
+ 	u8         inner_first_mpls[0x4];
+@@ -543,7 +544,8 @@ struct mlx5_ifc_fte_match_set_misc_bits
+ 	u8         reserved_at_b8[0x8];
+ 
+ 	u8         geneve_vni[0x18];
+-	u8         reserved_at_d8[0x7];
++	u8         reserved_at_d8[0x6];
++	u8         geneve_tlv_option_0_exist[0x1];
+ 	u8         geneve_oam[0x1];
+ 
+ 	u8         reserved_at_e0[0xc];

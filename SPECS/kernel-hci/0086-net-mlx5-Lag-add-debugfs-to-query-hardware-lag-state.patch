@@ -1,0 +1,286 @@
+From 66a6f7cc7fcf5ea8d09fc0dc414946447e4a584a Mon Sep 17 00:00:00 2001
+From: Mark Bloch <mbloch@nvidia.com>
+Date: Tue, 15 Mar 2022 16:56:50 +0000
+Subject: [PATCH] net/mlx5: Lag, add debugfs to query hardware lag state
+
+Lag state has become very complicated with many modes, flags, types and
+port selections methods and future work will add additional features.
+
+Add a debugfs to query the current lag state. A new directory named "lag"
+will be created under the mlx5 debugfs directory. As the driver has
+debugfs per pci function the location will be: <debugfs>/mlx5/<BDF>/lag
+
+For example:
+/sys/kernel/debug/mlx5/0000:08:00.0/lag
+
+The following files are exposed:
+
+- state: Returns "active" or "disabled". If "active" it means hardware
+         lag is active.
+
+- members: Returns the BDFs of all the members of lag object.
+
+- type: Returns the type of the lag currently configured. Valid only
+	if hardware lag is active.
+	* "roce" - Members are bare metal PFs.
+	* "switchdev" - Members are in switchdev mode.
+	* "multipath" - ECMP offloads.
+
+- port_sel_mode: Returns the egress port selection method, valid
+		 only if hardware lag is active.
+		 * "queue_affinity" - Egress port is selected by
+		   the QP/SQ affinity.
+		 * "hash" - Egress port is selected by hash done on
+		   each packet. Controlled by: xmit_hash_policy of the
+		   bond device.
+- flags: Returns flags that are specific per lag @type. Valid only if
+	 hardware lag is active.
+	 * "shared_fdb" - "on" or "off", if "on" single FDB is used.
+
+- mapping: Returns the mapping which is used to select egress port.
+	   Valid only if hardware lag is active.
+	   If @port_sel_mode is "hash" returns the active egress ports.
+	   The hash result will select only active ports.
+	   if @port_sel_mode is "queue_affinity" returns the mapping
+	   between the configured port affinity of the QP/SQ and actual
+	   egress port. For example:
+	   * 1:1 - Mapping means if the configured affinity is port 1
+	           traffic will egress via port 1.
+	   * 1:2 - Mapping means if the configured affinity is port 1
+		   traffic will egress via port 2. This can happen
+		   if port 1 is down or in active/backup mode and port 1
+		   is backup.
+
+Signed-off-by: Mark Bloch <mbloch@nvidia.com>
+Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+---
+ .../net/ethernet/mellanox/mlx5/core/Makefile  |   2 +-
+ .../ethernet/mellanox/mlx5/core/lag/debugfs.c | 123 ++++++++++++++++++
+ .../net/ethernet/mellanox/mlx5/core/lag/lag.c |   9 +-
+ .../net/ethernet/mellanox/mlx5/core/lag/lag.h |   8 ++
+ include/linux/mlx5/driver.h                   |   1 +
+ 5 files changed, 140 insertions(+), 3 deletions(-)
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/lag/debugfs.c
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/Makefile b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
+index f4f69ed17954..f39903d2b0d2 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/Makefile
++++ b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
+@@ -14,7 +14,7 @@ obj-$(CONFIG_MLX5_CORE) += mlx5_core.o
+ mlx5_core-y :=	main.o cmd.o debugfs.o fw.o eq.o uar.o pagealloc.o \
+ 		health.o mcg.o cq.o alloc.o port.o mr.o pd.o \
+ 		transobj.o vport.o sriov.o fs_cmd.o fs_core.o pci_irq.o \
+-		fs_counters.o fs_ft_pool.o rl.o lag/lag.o dev.o events.o wq.o lib/gid.o \
++		fs_counters.o fs_ft_pool.o rl.o lag/debugfs.o lag/lag.o dev.o events.o wq.o lib/gid.o \
+ 		lib/devcom.o lib/pci_vsc.o lib/dm.o lib/fs_ttc.o diag/fs_tracepoint.o \
+ 		diag/fw_tracer.o diag/crdump.o devlink.o diag/rsc_dump.o \
+ 		fw_reset.o qos.o
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lag/debugfs.c b/drivers/net/ethernet/mellanox/mlx5/core/lag/debugfs.c
+new file mode 100644
+index 000000000000..bf4f179374a9
+--- /dev/null
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lag/debugfs.c
+@@ -0,0 +1,123 @@
++// SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
++/* Copyright (c) 2022, NVIDIA CORPORATION & AFFILIATES. All rights reserved. */
++
++#include "lag.h"
++
++static char *get_str_mode_type(struct mlx5_lag *ldev)
++{
++	if (ldev->flags & MLX5_LAG_FLAG_ROCE)
++		return "roce";
++	if (ldev->flags & MLX5_LAG_FLAG_SRIOV)
++		return "switchdev";
++	if (ldev->flags & MLX5_LAG_FLAG_MULTIPATH)
++		return "multipath";
++
++	return NULL;
++}
++
++static int type_show(struct seq_file *file, void *priv)
++{
++	struct mlx5_core_dev *dev = file->private;
++	struct mlx5_lag *ldev;
++	char *mode = NULL;
++
++	ldev = dev->priv.lag;
++	if (__mlx5_lag_is_active(ldev))
++		mode = get_str_mode_type(ldev);
++	if (!mode)
++		return -EINVAL;
++	seq_printf(file, "%s\n", mode);
++
++	return 0;
++}
++
++static int port_sel_mode_show(struct seq_file *file, void *priv)
++{
++	struct mlx5_core_dev *dev = file->private;
++	struct mlx5_lag *ldev;
++	int ret = 0;
++	char *mode;
++
++	ldev = dev->priv.lag;
++	if (__mlx5_lag_is_active(ldev))
++		mode = get_str_port_sel_mode(ldev->flags);
++	else
++		ret = -EINVAL;
++	if (ret || !mode)
++		return ret;
++
++	seq_printf(file, "%s\n", mode);
++	return 0;
++}
++
++static int state_show(struct seq_file *file, void *priv)
++{
++	struct mlx5_core_dev *dev = file->private;
++	struct mlx5_lag *ldev;
++	bool active;
++
++	ldev = dev->priv.lag;
++	active = __mlx5_lag_is_active(ldev);
++	seq_printf(file, "%s\n", active ? "active" : "disabled");
++	return 0;
++}
++
++static int flags_show(struct seq_file *file, void *priv)
++{
++	struct mlx5_core_dev *dev = file->private;
++	struct mlx5_lag *ldev;
++	bool shared_fdb;
++	bool lag_active;
++
++	ldev = dev->priv.lag;
++	lag_active = __mlx5_lag_is_active(ldev);
++	if (lag_active)
++		shared_fdb = ldev->shared_fdb;
++
++	if (!lag_active)
++		return -EINVAL;
++
++	seq_printf(file, "%s:%s\n", "shared_fdb", shared_fdb ? "on" : "off");
++	return 0;
++}
++
++static int mapping_show(struct seq_file *file, void *priv)
++{
++	struct mlx5_core_dev *dev = file->private;
++	struct mlx5_lag *ldev;
++	bool lag_active;
++
++	ldev = dev->priv.lag;
++	lag_active = __mlx5_lag_is_active(ldev);
++	if (!lag_active)
++		return -EINVAL;
++
++	seq_printf(file, "1:%d 2:%d\n", ldev->v2p_map[0], ldev->v2p_map[1]);
++
++	return 0;
++}
++
++DEFINE_SHOW_ATTRIBUTE(type);
++DEFINE_SHOW_ATTRIBUTE(port_sel_mode);
++DEFINE_SHOW_ATTRIBUTE(state);
++DEFINE_SHOW_ATTRIBUTE(flags);
++DEFINE_SHOW_ATTRIBUTE(mapping);
++
++void mlx5_ldev_add_debugfs(struct mlx5_core_dev *dev)
++{
++	struct dentry *dbg;
++
++	dbg = debugfs_create_dir("lag", dev->priv.dbg_root);
++	dev->priv.lag_debugfs = dbg;
++
++	debugfs_create_file("type", 0444, dbg, dev, &type_fops);
++	debugfs_create_file("port_sel_mode", 0444, dbg, dev, &port_sel_mode_fops);
++	debugfs_create_file("state", 0444, dbg, dev, &state_fops);
++	debugfs_create_file("flags", 0444, dbg, dev, &flags_fops);
++	debugfs_create_file("mapping", 0444, dbg, dev, &mapping_fops);
++}
++
++void mlx5_ldev_remove_debugfs(struct dentry *dbg)
++{
++	debugfs_remove_recursive(dbg);
++}
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c b/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
+index 1301f8f98cd8..820a15633cc9 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
+@@ -181,7 +181,7 @@ static bool __mlx5_lag_is_sriov(struct mlx5_lag *ldev)
+ 	return !!(ldev->flags & MLX5_LAG_FLAG_SRIOV);
+ }
+ 
+-static void mlx5_infer_tx_affinity_mapping(struct lag_tracker *tracker,
++void mlx5_infer_tx_affinity_mapping(struct lag_tracker *tracker,
+ 					   u8 *port1, u8 *port2)
+ {
+ 	bool p1en;
+@@ -253,7 +253,7 @@ static void mlx5_lag_set_port_sel_mode(struct mlx5_lag *ldev,
+ 	*flags |= MLX5_LAG_FLAG_HASH_BASED;
+ }
+ 
+-static char *get_str_port_sel_mode(u8 flags)
++char *get_str_port_sel_mode(u8 flags)
+ {
+ 	if (flags &  MLX5_LAG_FLAG_HASH_BASED)
+ 		return "hash";
+@@ -833,6 +833,10 @@ void mlx5_lag_remove_mdev(struct mlx5_core_dev *dev)
+ 	if (!ldev)
+ 		return;
+ 
++	/* mdev is being removed, might as well remove debugfs
++	 * as early as possible.
++	 */
++	mlx5_ldev_remove_debugfs(dev->priv.lag_debugfs);
+ recheck:
+ 	mlx5_dev_list_lock();
+ 	if (ldev->mode_changes_in_progress) {
+@@ -863,6 +867,7 @@ void mlx5_lag_add_mdev(struct mlx5_core_dev *dev)
+ 		goto recheck;
+ 	}
+ 	mlx5_dev_list_unlock();
++	mlx5_ldev_add_debugfs(dev);
+ }
+ 
+ /* Must be called with intf_mutex held */
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.h b/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.h
+index e5d231c31b54..448e4ef0541d 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.h
+@@ -4,6 +4,7 @@
+ #ifndef __MLX5_LAG_H__
+ #define __MLX5_LAG_H__
+ 
++#include <linux/debugfs.h>
+ #include "mlx5_core.h"
+ #include "mp.h"
+ #include "port_sel.h"
+@@ -83,4 +84,11 @@ int mlx5_activate_lag(struct mlx5_lag *ldev,
+ int mlx5_lag_dev_get_netdev_idx(struct mlx5_lag *ldev,
+ 				struct net_device *ndev);
+ 
++char *get_str_port_sel_mode(u8 flags);
++void mlx5_infer_tx_enabled(struct lag_tracker *tracker, u8 num_ports,
++			   u8 *ports, int *num_enabled);
++
++void mlx5_ldev_add_debugfs(struct mlx5_core_dev *dev);
++void mlx5_ldev_remove_debugfs(struct dentry *dbg);
++
+ #endif /* __MLX5_LAG_H__ */
+diff --git a/include/linux/mlx5/driver.h b/include/linux/mlx5/driver.h
+index f17d2101af7a..54a6e012a620 100644
+--- a/include/linux/mlx5/driver.h
++++ b/include/linux/mlx5/driver.h
+@@ -578,6 +578,7 @@ struct mlx5_priv {
+ 	struct dentry	       *eq_debugfs;
+ 	struct dentry	       *cq_debugfs;
+ 	struct dentry	       *cmdif_debugfs;
++	struct dentry	       *lag_debugfs;
+ 	/* end: qp staff */
+ 
+ 	/* start: alloc staff */
+-- 
+2.21.3
+

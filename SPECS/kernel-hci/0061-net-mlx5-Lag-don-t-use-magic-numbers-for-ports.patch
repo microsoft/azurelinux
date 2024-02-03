@@ -1,0 +1,53 @@
+From 4f4551435ce000a47cd4f331af7b67e962f5f6f4 Mon Sep 17 00:00:00 2001
+From: Mark Bloch <mbloch@nvidia.com>
+Date: Mon, 29 Nov 2021 09:24:49 +0000
+Subject: [PATCH 105/107] net/mlx5: Lag, don't use magic numbers for ports
+
+Instead of using 1 & 2 as the ports numbers use an enum value.
+
+Signed-off-by: Mark Bloch <mbloch@nvidia.com>
+Reviewed-by: Maor Gottlieb <maorg@nvidia.com>
+Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c b/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
+index 0758a98a08d1..05e8cbece095 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
+@@ -40,6 +40,11 @@
+ #include "lag.h"
+ #include "mp.h"
+ 
++enum {
++	MLX5_LAG_EGRESS_PORT_1 = 1,
++	MLX5_LAG_EGRESS_PORT_2,
++};
++
+ /* General purpose, use for short periods of time.
+  * Beware of lock dependencies (preferably, no locks should be acquired
+  * under it).
+@@ -193,15 +198,15 @@ static void mlx5_infer_tx_affinity_mapping(struct lag_tracker *tracker,
+ 	p2en = tracker->netdev_state[MLX5_LAG_P2].tx_enabled &&
+ 	       tracker->netdev_state[MLX5_LAG_P2].link_up;
+ 
+-	*port1 = 1;
+-	*port2 = 2;
++	*port1 = MLX5_LAG_EGRESS_PORT_1;
++	*port2 = MLX5_LAG_EGRESS_PORT_2;
+ 	if ((!p1en && !p2en) || (p1en && p2en))
+ 		return;
+ 
+ 	if (p1en)
+-		*port2 = 1;
++		*port2 = MLX5_LAG_EGRESS_PORT_1;
+ 	else
+-		*port1 = 2;
++		*port1 = MLX5_LAG_EGRESS_PORT_2;
+ }
+ 
+ static int _mlx5_modify_lag(struct mlx5_lag *ldev, u8 v2p_port1, u8 v2p_port2)
+-- 
+2.33.2
+

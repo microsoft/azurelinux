@@ -54,7 +54,8 @@ validate-chroot: $(go-validatechroot) $(chroot_worker)
 	--worker-chroot="$(chroot_worker)" \
 	--worker-manifest="$(worker_chroot_manifest)" \
 	--log-file="$(LOGS_DIR)/worker/validate.log" \
-	--log-level="$(LOG_LEVEL)"
+	--log-level="$(LOG_LEVEL)" \
+	--log-color="$(LOG_COLOR)"
 
 ######## MACRO TOOLS ########
 

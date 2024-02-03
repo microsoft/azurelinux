@@ -1,0 +1,104 @@
+From 270782c35785f4c62a96ac3014c9ef2e5b4ed441 Mon Sep 17 00:00:00 2001
+From: Amir Tzin <amirtz@nvidia.com>
+Date: Mon, 29 May 2023 11:24:22 +0300
+Subject: [PATCH 56/58] netlink: add support for formatted extack messages
+
+Upstream Status: v6.2-rc1
+Conflicts:
+ - include/linux/netlink.h
+   context diff due to missing commit
+   690252f19f0e ("netlink: add support for ext_ack missing attributes")
+
+commit 51c352bdbcd2 ("netlink: add support for formatted extack messages")
+Author: Edward Cree <ecree.xilinx@gmail.com>
+Date:   Tue Oct 18 15:37:27 2022 +0100
+
+    netlink: add support for formatted extack messages
+
+    Include an 80-byte buffer in struct netlink_ext_ack that can be used
+     for scnprintf()ed messages.  This does mean that the resulting string
+     can't be enumerated, translated etc. in the way NL_SET_ERR_MSG() was
+     designed to allow.
+
+    Signed-off-by: Edward Cree <ecree.xilinx@gmail.com>
+    Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+    Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+Change-Id: Ica7463bfae1483c6a9d9032257fd273c9e626f28
+Signed-off-by: Amir Tzin <amirtz@nvidia.com>
+---
+ include/linux/netlink.h | 29 +++++++++++++++++++++++++++--
+ 1 file changed, 27 insertions(+), 2 deletions(-)
+
+diff --git a/include/linux/netlink.h b/include/linux/netlink.h
+index 61b1c7fcc401..f7a280517d0b 100644
+--- a/include/linux/netlink.h
++++ b/include/linux/netlink.h
+@@ -64,6 +64,7 @@ netlink_kernel_create(struct net *net, int unit, struct netlink_kernel_cfg *cfg)
+ 
+ /* this can be increased when necessary - don't expose to userland */
+ #define NETLINK_MAX_COOKIE_LEN	20
++#define NETLINK_MAX_FMTMSG_LEN	80
+ 
+ /**
+  * struct netlink_ext_ack - netlink extended ACK report struct
+@@ -73,6 +74,8 @@ netlink_kernel_create(struct net *net, int unit, struct netlink_kernel_cfg *cfg)
+  * @policy: policy for a bad attribute
+  * @cookie: cookie data to return to userspace (for success)
+  * @cookie_len: actual cookie data length
++ * @_msg_buf: output buffer for formatted message strings - don't access
++ *	directly, use %NL_SET_ERR_MSG_FMT
+  */
+ struct netlink_ext_ack {
+ 	const char *_msg;
+@@ -80,13 +83,13 @@ struct netlink_ext_ack {
+ 	const struct nla_policy *policy;
+ 	u8 cookie[NETLINK_MAX_COOKIE_LEN];
+ 	u8 cookie_len;
++	char _msg_buf[NETLINK_MAX_FMTMSG_LEN];
+ };
+ 
+ /* Always use this macro, this allows later putting the
+  * message into a separate section or such for things
+  * like translation or listing all possible messages.
+- * Currently string formatting is not supported (due
+- * to the lack of an output buffer.)
++ * If string formatting is needed use NL_SET_ERR_MSG_FMT.
+  */
+ #define NL_SET_ERR_MSG(extack, msg) do {		\
+ 	static const char __msg[] = msg;		\
+@@ -98,9 +101,31 @@ struct netlink_ext_ack {
+ 		__extack->_msg = __msg;			\
+ } while (0)
+ 
++/* We splice fmt with %s at each end even in the snprintf so that both calls
++ * can use the same string constant, avoiding its duplication in .ro
++ */
++#define NL_SET_ERR_MSG_FMT(extack, fmt, args...) do {			       \
++	struct netlink_ext_ack *__extack = (extack);			       \
++									       \
++	if (!__extack)							       \
++		break;							       \
++	if (snprintf(__extack->_msg_buf, NETLINK_MAX_FMTMSG_LEN,	       \
++		     "%s" fmt "%s", "", ##args, "") >=			       \
++	    NETLINK_MAX_FMTMSG_LEN)					       \
++		net_warn_ratelimited("%s" fmt "%s", "truncated extack: ",      \
++				     ##args, "\n");			       \
++									       \
++	do_trace_netlink_extack(__extack->_msg_buf);			       \
++									       \
++	__extack->_msg = __extack->_msg_buf;				       \
++} while (0)
++
+ #define NL_SET_ERR_MSG_MOD(extack, msg)			\
+ 	NL_SET_ERR_MSG((extack), KBUILD_MODNAME ": " msg)
+ 
++#define NL_SET_ERR_MSG_FMT_MOD(extack, fmt, args...)	\
++	NL_SET_ERR_MSG_FMT((extack), KBUILD_MODNAME ": " fmt, ##args)
++
+ #define NL_SET_BAD_ATTR_POLICY(extack, attr, pol) do {	\
+ 	if ((extack)) {					\
+ 		(extack)->bad_attr = (attr);		\
+-- 
+2.31.1
+

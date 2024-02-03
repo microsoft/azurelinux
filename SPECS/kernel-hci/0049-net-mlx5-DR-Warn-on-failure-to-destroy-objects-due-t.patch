@@ -1,0 +1,73 @@
+From c62ddd0d8f803c986dbe76535c7f6fb00a07f1a5 Mon Sep 17 00:00:00 2001
+From: Yevgeny Kliteynik <kliteyn@nvidia.com>
+Date: Wed, 29 Sep 2021 15:36:32 +0300
+Subject: [PATCH 41/58] net/mlx5: DR, Warn on failure to destroy objects due to
+ refcount
+
+Add WARN_ON_ONCE on refcount checks in SW steering object destructors
+
+Signed-off-by: Paul Blakey <paulb@nvidia.com>
+Signed-off-by: Yevgeny Kliteynik <kliteyn@nvidia.com>
+Change-Id: Id08e59d21fa6b6cb4c9f73c06a5d2322420781e8
+---
+ drivers/net/ethernet/mellanox/mlx5/core/steering/dr_action.c  | 2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/steering/dr_domain.c  | 2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/steering/dr_matcher.c | 2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/steering/dr_table.c   | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_action.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_action.c
+index d82df9cefb91..22782777a339 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_action.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_action.c
+@@ -1787,7 +1787,7 @@ mlx5dr_action_create_dest_vport(struct mlx5dr_domain *dmn,
+ 
+ int mlx5dr_action_destroy(struct mlx5dr_action *action)
+ {
+-	if (refcount_read(&action->refcount) > 1)
++	if (WARN_ON_ONCE(refcount_read(&action->refcount) > 1))
+ 		return -EBUSY;
+ 
+ 	switch (action->action_type) {
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_domain.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_domain.c
+index 0a07c8e2962d..7abab7a078cd 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_domain.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_domain.c
+@@ -391,7 +391,7 @@ int mlx5dr_domain_sync(struct mlx5dr_domain *dmn, u32 flags)
+ 
+ int mlx5dr_domain_destroy(struct mlx5dr_domain *dmn)
+ {
+-	if (refcount_read(&dmn->refcount) > 1)
++	if (WARN_ON_ONCE(refcount_read(&dmn->refcount) > 1))
+ 		return -EBUSY;
+ 
+ 	/* make sure resources are not used by the hardware */
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_matcher.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_matcher.c
+index 4ed0918b6401..28ef80ce0bbc 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_matcher.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_matcher.c
+@@ -1057,7 +1057,7 @@ int mlx5dr_matcher_destroy(struct mlx5dr_matcher *matcher)
+ {
+ 	struct mlx5dr_table *tbl = matcher->tbl;
+ 
+-	if (refcount_read(&matcher->refcount) > 1)
++	if (WARN_ON_ONCE(refcount_read(&matcher->refcount) > 1))
+ 		return -EBUSY;
+ 
+ 	mlx5dr_domain_lock(tbl->dmn);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_table.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_table.c
+index 241ee49a24ba..1d6b43a52c58 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_table.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_table.c
+@@ -283,7 +283,7 @@ int mlx5dr_table_destroy(struct mlx5dr_table *tbl)
+ {
+ 	int ret;
+ 
+-	if (refcount_read(&tbl->refcount) > 1)
++	if (WARN_ON_ONCE(refcount_read(&tbl->refcount) > 1))
+ 		return -EBUSY;
+ 
+ 	mlx5dr_dbg_tbl_del(tbl);
+-- 
+2.31.1
+
