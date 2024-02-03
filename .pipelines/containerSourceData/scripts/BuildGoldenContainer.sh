@@ -44,13 +44,13 @@ set -e
 #   ├── configuration
 #   │   ├── acrRepoV2.json
 #   ├── scripts
-#   │   ├── BuildContainer.sh
+#   │   ├── BuildGoldenContainer.sh
 #   │   ├── acrRepoParser.py
 #   ├── Dockerfile-Initial
 #   ├── marinerLocalRepo.repo
 
 # Example usage:
-# /bin/bash ~/CBL-Mariner/.pipelines/containerSourceData/scripts/BuildContainer.sh \
+# /bin/bash ~/CBL-Mariner/.pipelines/containerSourceData/scripts/BuildGoldenContainer.sh \
 #     -a "mcr.microsoft.com/cbl-mariner/base/core:2.0" -b azurelinuxlocal \
 #     -c "base/nodejs" -d "nodejs" -e "nodejs18" -f nodejs18.pkg -g Dockerfile-Nodejs \
 #     -j OUTPUT -k ./rpms.tar.gz -l ~/CBL-Mariner/.pipelines/containerSourceData \
