@@ -26,7 +26,7 @@ set -e
 # - r) Create SBOM (e.g. true, false. If true, the script will create SBOM for the container)
 # - s) SBOM tool path.
 # - t) Script to create SBOM for the container image.
-# - u) Distroless container (e.g. true, false. If true, the script will create distroless container)
+# - u) Create Distroless container (e.g. true, false. If true, the script will also create a distroless container)
 
 # Assuming you are in your current working directory. Below should be the directory structure:
 #   │   rpms.tar.gz
@@ -35,7 +35,10 @@ set -e
 
 # Assuming CBL-Mariner repo is cloned in your home directory. Below should be the directory structure:
 #   ~/CBL-Mariner/.pipelines/containerSourceData
-#   ├── nodejs  
+#   ├── nodejs
+#   │   ├── distroless
+#   │   │   ├── holdback-nodejs18.pkg
+#   │   │   ├── nodejs18.pkg
 #   │   ├── Dockerfile-Nodejs
 #   │   ├── nodejs18.pkg
 #   ├── configuration
@@ -51,7 +54,7 @@ set -e
 #     -a "mcr.microsoft.com/cbl-mariner/base/core:2.0" -b azurelinuxlocal \
 #     -c "base/nodejs" -d "nodejs" -e "nodejs18" -f nodejs18.pkg -g Dockerfile-Nodejs \
 #     -j OUTPUT -k ./rpms.tar.gz -l ~/CBL-Mariner/.pipelines/containerSourceData \
-#     -m "false" -n "false" -p development -q "false"
+#     -m "false" -n "false" -p development -q "false" -u "true"
 
 while getopts ":a:b:c:d:e:f:g:h:i:j:k:l:m:n:o:p:q:r:s:t:u:" OPTIONS; do
     case ${OPTIONS} in
