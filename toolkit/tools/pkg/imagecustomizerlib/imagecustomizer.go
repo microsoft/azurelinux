@@ -165,7 +165,7 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 			return fmt.Errorf("failed to convert image file to format: %s:\n%w", outputImageFormat, err)
 		}
 	case ImageFormatIso:
-		err = createLiveOSIsoImage(buildDir, rawImageFile, outputImageDir, outputImageBase)
+		err = createLiveOSIsoImage(buildDir, baseConfigPath, config.Iso, rawImageFile, outputImageDir, outputImageBase)
 		if err != nil {
 			return err
 		}
