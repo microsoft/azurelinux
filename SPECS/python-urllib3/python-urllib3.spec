@@ -21,9 +21,8 @@ BuildRequires:  openssl-devel
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
-%if %{with_check}
 BuildRequires:  python3-pip
-%endif
+BuildRequires:  python3-wheel
 Requires:       python3
 
 %description -n python3-urllib3
