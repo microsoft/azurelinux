@@ -30,15 +30,14 @@ of an executable and change the RPATH of an executable or library.
 rm src/elf.h
 
 %build
-
 %configure
-make %{?_smp_mflags}
+%make_build
 
 %check
-make check
+make check || (cat tests/*.log; exit 1)
 
 %install
-make install DESTDIR=%{buildroot}
+%make_install
 
 # the docs get put in a funny place, so delete and include in the
 # standard way in the docs section below
