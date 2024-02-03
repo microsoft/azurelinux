@@ -21,7 +21,7 @@ Version:        2.7.3
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Microsoft Azure Linux
+Distribution:   Azure Linux
 Group:          Productivity/Databases/Servers
 URL:            https://github.com/influxdata/influx-cli
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz

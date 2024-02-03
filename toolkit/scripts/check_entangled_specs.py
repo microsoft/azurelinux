@@ -50,6 +50,10 @@ version_matching_groups = [
         "SPECS/python-flit-core/python-flit-core.spec"
     ]),
     frozenset([
+        "SPECS/influxdb/influxdb.spec",
+        "SPECS/influx-cli/influx-cli.spec"
+    ]),
+    frozenset([
         "SPECS/clang/clang.spec",
         "SPECS/compiler-rt/compiler-rt.spec",
         "SPECS/lld/lld.spec",
