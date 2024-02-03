@@ -1,0 +1,32 @@
+Based off of: https://github.com/acpica/acpica/pull/869/commits/aea0a5cfce262ce2ab16fd96d87c12cf5e756380
+
+diff --git a/source/components/utilities/utdebug.c b/source/components/utilities/utdebug.c
+index 9ceed97..7bd5bf9 100644
+--- a/source/components/utilities/utdebug.c
++++ b/source/components/utilities/utdebug.c
+@@ -77,7 +77,12 @@ AcpiUtInitStackPtrTrace (
+     ACPI_SIZE               CurrentSp;
+
+
++#pragma GCC diagnostic push
++#if defined(__GNUC__) && __GNUC__ >= 12
++#pragma GCC diagnostic ignored "-Wdangling-pointer="
++#endif
+     AcpiGbl_EntryStackPointer = &CurrentSp;
++#pragma GCC diagnostic pop
+ }
+
+
+@@ -102,7 +107,12 @@ AcpiUtTrackStackPtr (
+
+     if (&CurrentSp < AcpiGbl_LowestStackPointer)
+     {
++#pragma GCC diagnostic push
++#if defined(__GNUC__) && __GNUC__ >= 12
++#pragma GCC diagnostic ignored "-Wdangling-pointer="
++#endif
+         AcpiGbl_LowestStackPointer = &CurrentSp;
++#pragma GCC diagnostic pop
+     }
+
+     if (AcpiGbl_NestingLevel > AcpiGbl_DeepestNesting)
