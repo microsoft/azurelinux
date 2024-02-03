@@ -14,24 +14,3 @@
  calibrate/SAGDN
  calibrater's
  calico/M
---- wordlist/alt12dicts/2of12full.txt	2011-02-08 11:55:46.478837084 +0000
-+++ wordlist/alt12dicts/2of12full.txt	2011-02-08 11:59:12.455202478 +0000
-@@ -6468,7 +6468,6 @@
- 12: 12  -#  -&   calendar
-  2:  1  1#  -&   calendar month
-  2:  1  1#  -&   calendar year
-- 4:  4  -#  -&   calender
- 12: 12  -#  -&   calf
-  9:  8  1#  -&   calfskin
-  3:  3  -#  -&   Calgary
-diff -ru wordlist/alt12dicts/5desk.txt wordlist/alt12dicts/5desk.txt
---- wordlist/alt12dicts/5desk.txt	2011-02-08 11:55:46.548837888 +0000
-+++ wordlist/alt12dicts/5desk.txt	2011-02-08 11:58:55.162003701 +0000
-@@ -7353,7 +7353,6 @@
- Caledonia
- Caledonian
- calendar
--calender
- calendric
- calendrical
- calends
