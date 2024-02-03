@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment
 URL:            https://github.com/nlohmann/json
-#Source0:       https://github.com/nlohmann/json/archive/v%{version}.tar.gz
+#Source0:       https://github.com/nlohmann/json/archive/v%%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 %global debug_package %{nil}
 BuildRequires:  cmake
@@ -45,12 +45,14 @@ make test -C build
 %license LICENSE.MIT
 %doc README.md
 %{_includedir}/nlohmann
-%{_libdir}/cmake/nlohmann_json
-%{_libdir}/pkgconfig/nlohmann_json.pc
+%{_datadir}/cmake/nlohmann_json/nlohmann_jsonConfig.cmake
+%{_datadir}/cmake/nlohmann_json/nlohmann_jsonConfigVersion.cmake
+%{_datadir}/cmake/nlohmann_json/nlohmann_jsonTargets.cmake
+%{_datadir}/pkgconfig/nlohmann_json.pc
 
 %changelog
-* Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.11.3-1
-- Auto-upgrade to 3.11.3 - Package upgrade for Azure Linux 3.0
+* Fri Feb 02 2024 Thien Trung Vuong <tvuong@microsoft.com> - 3.11.3-1
+- Update to version 3.11.3 for Azure Linux 3.0
 
 * Fri Mar 04 2022 Muhammad Falak <mwani@microsoft.com> - 3.10.4-2
 - Switch to `autosetup -S git`
