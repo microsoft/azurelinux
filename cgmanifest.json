@@ -12661,8 +12661,8 @@
         "type": "other",
         "other": {
           "name": "maven-jar-plugin",
-          "version": "3.2.2",
-          "downloadUrl": "https://repo1.maven.org/maven2/org/apache/maven/plugins/maven-jar-plugin/3.2.2/maven-jar-plugin-3.2.2-source-release.zip"
+          "version": "3.3.0",
+          "downloadUrl": "https://repo1.maven.org/maven2/org/apache/maven/plugins/maven-jar-plugin/3.3.0/maven-jar-plugin-3.3.0-source-release.zip"
         }
       }
     },

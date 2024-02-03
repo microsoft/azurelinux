@@ -1,8 +1,8 @@
 %bcond_without bootstrap
 Summary:        Maven JAR Plugin
 Name:           maven-jar-plugin
-Version:        3.2.2
-Release:        4%{?dist}
+Version:        3.3.0
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -42,6 +42,9 @@ API documentation for %{name}.
 %doc NOTICE
 
 %changelog
+* Sat Feb 03 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.3.0-1
+- Auto-upgrade to 3.3.0 - azl 3.0
+
 * Thu Mar 24 2023 Riken Maharjan <rmaharjan@microsoft.com> - 3.2.2-4
 - Initial CBL-Mariner import from Fedora 38 (license: MIT)
 - License verified
