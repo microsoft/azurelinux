@@ -7171,8 +7171,8 @@
         "type": "other",
         "other": {
           "name": "influxdb",
-          "version": "2.7.5",
-          "downloadUrl": "https://github.com/influxdata/influxdb/archive/refs/tags/v2.7.5.tar.gz"
+          "version": "2.7.3",
+          "downloadUrl": "https://github.com/influxdata/influxdb/archive/refs/tags/v2.7.3.tar.gz"
         }
       }
     },
