@@ -1,7 +1,7 @@
 %define debug_package %{nil}
 Summary:        A core cryptographic library written by Microsoft
 Name:           SymCrypt
-Version:        103.0.1
+Version:        103.4.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -40,15 +40,20 @@ A core cryptographic library written by Microsoft
 %setup -q
 %setup -q -a 1
 # Create a symbolic link as if jitterentropy-library has been pulled in as git submodule
-rm -rf jitterentropy-library
-ln -s jitterentropy-library-3.3.1 jitterentropy-library
+rm -rf 3rdparty/jitterentropy-library
+ln -s ../jitterentropy-library-3.3.1 3rdparty/jitterentropy-library
 
 %build
+SYMCRYPT_BRANCH=main \
+SYMCRYPT_COMMIT_HASH=a84ffe1 \
+SYMCRYPT_COMMIT_TIMESTAMP=2024-01-26T22:00:47-08:00 \
 cmake   -S . -B bin \
         -DSYMCRYPT_TARGET_ARCH=%{symcrypt_arch} \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_C_COMPILER=%{symcrypt_cc} \
-        -DCMAKE_CXX_COMPILER=%{symcrypt_cxx}
+        -DCMAKE_CXX_COMPILER=%{symcrypt_cxx} \
+        -DCMAKE_C_FLAGS="-Wno-maybe-uninitialized" \
+        -DCMAKE_CXX_FLAGS="-Wno-unused-but-set-variable"
 
 cmake --build bin
 
@@ -70,6 +75,9 @@ chmod 755 %{buildroot}%{_libdir}/libsymcrypt.so.%{version}
 %{_includedir}/*
 
 %changelog
+* Thu Dec 28 2023 Maxwell Moyer-McKee <mamckee@microsoft.com> - 103.4.1-1
+- Update SymCrypt to v103.4.1 for SymCrypt-OpenSSL provider.
+
 * Mon May 22 2023 Samuel Lee <saml@microsoft.com> - 103.0.1-1
 - Update SymCrypt to v103.0.1 for FIPS certification. Run unit tests in check
 
