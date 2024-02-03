@@ -10,6 +10,7 @@ URL:            https://pypi.python.org/pypi/urllib3
 Source0:        https://github.com/urllib3/urllib3/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 Patch0:         urllib3_test_recent_date.patch
+Patch1:         change-backend-to-flit_core.patch
 
 %description
 A powerful, sanity-friendly HTTP client for Python.
@@ -23,6 +24,7 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
+BuildRequires:  python-flit_core
 Requires:       python3
 
 %description -n python3-urllib3

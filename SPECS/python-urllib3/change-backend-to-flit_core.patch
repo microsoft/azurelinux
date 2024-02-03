@@ -1,0 +1,15 @@
+diff --git a/pyproject.toml b/pyproject.toml
+index d0df969..1e5f448 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -1,8 +1,8 @@
+ # This file is protected via CODEOWNERS
+ 
+ [build-system]
+-requires = ["flit_core >=3.2,<4"]
+-build-backend = "flit_core.buildapi"
++requires = ["hatchling>=1.6.0,<2"]
++build-backend = "hatchling.build"
+ 
+ [project]
+ name = "urllib3"
