@@ -26,6 +26,7 @@ parameters:
 # - packageFileName: the name of the package file (e.g. nodejs18.pkg, postgres.pkg, api.pkg, etc.)
 # - dockerfile: the name of the Dockerfile (e.g. Dockerfile-nodejs, Dockerfile-Postgres, Dockerfile-cdi-apiserver, etc.)
 # - repository: the name of the repository (e.g. base/nodejs, base/postgres, base/kubevirt/cdi-apiserver, etc.)
+# - distroless: a boolean value to indicate whether to create a distroless image as well or not (e.g. true, false)
 # - textReplacement: the text to be replaced in the Dockerfile (e.g. '@BINARY_PATH@ \"/usr/bin/acmesolver\"')
 # - buildArgs: the build arguments (e.g. '--build-arg BINARY_NAME="cdi-apiserver" --build-arg USER=1001')
 # - useRpmQaCmd: a boolean value to indicate whether to use the rpm -qa command to get the package version (e.g. true, false)
@@ -39,6 +40,7 @@ parameters:
 # - repository
 
 # The optional fields are:
+# - distroless
 # - textReplacement
 # - buildArgs
 # - useRpmQaCmd
